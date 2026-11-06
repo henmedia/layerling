@@ -1,10 +1,10 @@
 import { describe, expect, it } from "vitest";
-import { HINGE_PIN_GRIP, LID_DEFAULTS, MAX_CLICK_BUMP_HEIGHT, MAX_HINGE_PIN, MAX_HINGE_PIN_PLAY, MAX_LID_GAP, MAX_LID_THICKNESS, MAX_MAGNET_GAP, MIN_CLICK_BUMP_HEIGHT, MIN_HINGE_PIN, MIN_HINGE_PIN_PLAY, MIN_LID_WALL, MIN_MAGNET_DIAMETER, clickBumpPlaces, hingeKnuckleRadius, hingePinHoles, lidClickBumpsFit, lidHandleFits, lidThicknessForMagnets, magnetPlaces, magnetPocketDepth, normalizeLidOptions } from "@/lib/lidTool";
+import { HINGE_PIN_GRIP, LID_DEFAULTS, MAX_CLICK_BUMP_HEIGHT, MAX_HINGE_PIN, MAX_HINGE_PIN_PLAY, MAX_LID_GAP, MAX_LID_THICKNESS, MAX_MAGNET_GAP, MIN_CLICK_BUMP_HEIGHT, MIN_HINGE_PIN, MIN_HINGE_PIN_PLAY, MIN_LID_WALL, MIN_MAGNET_DIAMETER, clickBumpPlaces, endPlugPlan, hingeKnuckleRadius, hingePinHoles, lidClickBumpsFit, lidHandleFits, lidThicknessForMagnets, magnetPlaces, magnetPocketDepth, normalizeLidOptions } from "@/lib/lidTool";
 
 describe("lid options (#1009)", () => {
   it("starts from a push-in lid with a normal fit", () => {
     expect(normalizeLidOptions()).toEqual(LID_DEFAULTS);
-    expect(LID_DEFAULTS).toEqual({ type: "plug", thickness: 2, gap: 0.2, depth: 4, wall: 1.6, magnets: false, magnetDiameter: 6, magnetHeight: 2, magnetGap: 0.1, hinge: false, hingePin: 1.75, hingeGap: 0.3, hingePinPlay: 0.2, hingeKnuckles: 0, hingePrintPin: false, hingeSide: "back", hingeTeardrop: true, hingeStyle: "outside", clickBumps: false, clickBumpHeight: 0.4, handle: "none" });
+    expect(LID_DEFAULTS).toEqual({ type: "plug", thickness: 2, gap: 0.2, depth: 4, wall: 1.6, magnets: false, magnetDiameter: 6, magnetHeight: 2, magnetGap: 0.1, hinge: false, hingePin: 1.75, hingeGap: 0.3, hingePinPlay: 0.2, hingeKnuckles: 0, hingePrintPin: false, hingeSide: "back", hingeTeardrop: true, hingeStyle: "outside", hingeEndPlugs: false, clickBumps: false, clickBumpHeight: 0.4, handle: "none" });
   });
 
   it("takes the kind in any case and keeps the default for an unknown one", () => {
@@ -27,6 +27,32 @@ describe("lid options (#1009)", () => {
     expect(normalizeLidOptions({ hingeStyle: " Flush " }).hingeStyle).toBe("flush");
     expect(normalizeLidOptions({ hingeStyle: "pivot" }).hingeStyle).toBe("pivot");
     expect(normalizeLidOptions({ hingeStyle: "inside" }).hingeStyle).toBe("outside");
+  });
+
+  it("closes a flush hinge's pin hole with end plugs only when asked to (Discussion #1387)", () => {
+    expect(normalizeLidOptions().hingeEndPlugs).toBe(false);
+    expect(normalizeLidOptions({ hingeEndPlugs: true }).hingeEndPlugs).toBe(true);
+    expect(normalizeLidOptions({ hingeEndPlugs: "true" }).hingeEndPlugs).toBe(true);
+    expect(normalizeLidOptions({ hingeEndPlugs: "yes" }).hingeEndPlugs).toBe(false);
+    expect(normalizeLidOptions({ hingeEndPlugs: 1 }).hingeEndPlugs).toBe(false);
+  });
+
+  it("puts the end plugs where the hinge's line leaves the body, 4 mm deep, less where an end knuckle is short (Discussion #1387)", () => {
+    // Seven knuckles corner to corner on a 60 mm back: in from the sides 4 mm each, and the pin 0.5 mm short of each plug.
+    const seven = Array.from({ length: 7 }, (_, index): [number, number] => [-30 + index * 8.6, -30 + index * 8.6 + 8.3]);
+    expect(endPlugPlan(seven, [-30, 30])).toEqual({ outer: [-30, 30], depth: 4, pinLength: 51 });
+    // Rounded corners: the knuckles stop where the back's straight stretch does, the hinge's line leaves the body further out.
+    const rounded = endPlugPlan([[-24, -14.6], [-14.3, 14.3], [14.6, 24]], [-29, 29]);
+    expect(rounded).toEqual({ outer: [-29, 29], depth: 4, pinLength: 49 });
+    // Without a crossing, the knuckles' own ends.
+    expect(endPlugPlan([[-20, -12], [-11.7, 11.7], [12, 20]], null)).toEqual({ outer: [-20, 20], depth: 4, pinLength: 31 });
+    // An end knuckle 3.6 mm wide keeps 1.5 mm of itself to the pin: plugs 2.1 mm deep, at both ends alike.
+    const narrow = endPlugPlan([[-20, -16.4], [-16.1, 15.1], [15.4, 20]], [-20, 20]);
+    if ("error" in narrow) throw new Error(narrow.error.code);
+    expect(narrow.depth).toBeCloseTo(2.1, 9);
+    expect(narrow.pinLength).toBeCloseTo(40 - 4.2 - 1, 9);
+    // Under 3.5 mm, a plug would be shorter than 2 mm: refused.
+    expect(endPlugPlan([[-20, -16.6], [-16.3, 16.3], [16.6, 20]], [-20, 20])).toEqual({ error: { code: "endPlugsShort" } });
   });
 
   it("makes teardrop pin holes unless told not to", () => {

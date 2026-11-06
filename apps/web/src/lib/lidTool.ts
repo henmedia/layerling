@@ -30,7 +30,9 @@ import type { WorkplaneShape } from "@/types/layerling";
  * (a piece of filament, or a pin printed apart). The pin sits tight in the body's holes (a pivot lid's: in the side
  * walls) and turns in the lid's, which alone have its play (#1220): with the play in every hole, a piece of filament slid
  * out. The body's knuckles stand out from its back wall on a 45 degree slope, so the body prints upright without
- * support; the lid's lie on the plate when it is printed turned over.
+ * support; the lid's lie on the plate when it is printed turned over. A flush hinge can have end plugs (Discussion #1387):
+ * the last few millimetres of the pin's hole at each end are a square pocket, and a square plug in each, its outer end
+ * cut to the body's outline, closes the hole flush with the outside, so the pin is hidden and cannot slide out.
  * The lid comes out as a body of its own beside the one it closes, turned over with its plate on the plate, ready to
  * print. Everything is worked out with Manifold, in a frame where z is up (the scene's y).
  */
@@ -60,7 +62,8 @@ export type LidHandle = "none" | "tab" | "notch";
  * another is picked) for a pin of `hingePin` mm, `hingeGap` between its knuckles, `hingeKnuckles` of them (0: as many as
  * suit its length), and the pin printed apart with `hingePrintPin`. `hingePinPlay` is the pin's play per side in the
  * lid's holes, where it turns; in the body's it sits tight (HINGE_PIN_GRIP). With `hingeTeardrop` (the default) the pin's
- * holes have a point on top as each part is printed, so they do not droop.
+ * holes have a point on top as each part is printed, so they do not droop. With `hingeEndPlugs`, a flush hinge's pin hole
+ * ends in a square pocket at each end, for a plug that closes it flush with the body's outside; the pin is shorter by them.
  * With `clickBumps`, bumps on the lip or rim and dimples for them in the body, so the lid clicks into place, each reaching
  * `clickBumpHeight` into the body's wall past the gap; `handle` a pull tab or a finger notch.
  */
@@ -83,6 +86,7 @@ export type LidOptions = {
   hingeSide: LidHingeSide;
   hingeTeardrop: boolean;
   hingeStyle: LidHingeStyle;
+  hingeEndPlugs: boolean;
   clickBumps: boolean;
   clickBumpHeight: number;
   handle: LidHandle;
@@ -91,7 +95,7 @@ export type LidOptions = {
 export const LID_TYPES: readonly LidType[] = ["plug", "cap", "both", "flat"];
 export const LID_DEFAULTS: LidOptions = {
   type: "plug", thickness: 2, gap: 0.2, depth: 4, wall: 1.6, magnets: false, magnetDiameter: 6, magnetHeight: 2, magnetGap: 0.1,
-  hinge: false, hingePin: 1.75, hingeGap: 0.3, hingePinPlay: 0.2, hingeKnuckles: 0, hingePrintPin: false, hingeSide: "back", hingeTeardrop: true, hingeStyle: "outside",
+  hinge: false, hingePin: 1.75, hingeGap: 0.3, hingePinPlay: 0.2, hingeKnuckles: 0, hingePrintPin: false, hingeSide: "back", hingeTeardrop: true, hingeStyle: "outside", hingeEndPlugs: false,
   clickBumps: false, clickBumpHeight: 0.4, handle: "none",
 };
 /**
@@ -178,6 +182,15 @@ const PIN_FLAT = 0.1;
 const HINGE_WALL_REACH = 0.4;
 /** How many sides a knuckle's and a pin's circle has. */
 const HINGE_SIDES = 48;
+/**
+ * A flush hinge's end plugs (Discussion #1387): how far each reaches into the pin's hole from where the hinge's line
+ * leaves the body, in mm, and how short it may become where an end knuckle is short. Its pocket stops END_PLUG_KEEP
+ * short of the end knuckle's inner side, so the pin still runs into that knuckle and the lid's beside it turns on the
+ * pin all along.
+ */
+const END_PLUG_DEPTH = 4;
+const MIN_END_PLUG_DEPTH = 2;
+const END_PLUG_KEEP = 1.5;
 export const LID_HANDLES: readonly LidHandle[] = ["none", "tab", "notch"];
 /** A click bump's radius, in mm: a piece of a ball standing out of the lip's or the rim's face. */
 const BUMP_RADIUS = 1.5;
@@ -273,6 +286,7 @@ export function normalizeLidOptions(value?: Partial<Record<keyof LidOptions, unk
   if (value?.hingeTeardrop === false || value?.hingeTeardrop === "false") result.hingeTeardrop = false;
   const hingeStyle = typeof value?.hingeStyle === "string" ? value.hingeStyle.trim().toLowerCase() : "";
   if ((LID_HINGE_STYLES as readonly string[]).includes(hingeStyle)) result.hingeStyle = hingeStyle as LidHingeStyle;
+  if (value?.hingeEndPlugs === true || value?.hingeEndPlugs === "true") result.hingeEndPlugs = true;
   if (value?.clickBumps === true || value?.clickBumps === "true") result.clickBumps = true;
   const clickBumpHeight = finiteNumber(value?.clickBumpHeight);
   if (clickBumpHeight !== null) result.clickBumpHeight = clamp(clickBumpHeight, MIN_CLICK_BUMP_HEIGHT, MAX_CLICK_BUMP_HEIGHT);
@@ -420,6 +434,26 @@ export function pivotPlan(outline: readonly (readonly Point[])[], opening: reado
   if (axisZ - radius < bottom + 0.4 + PIVOT_LEDGE) return { error: { code: "hingeTooLow" } };
   const depth = Math.min(PIVOT_PIN_DEPTH, (barTo - barFrom) / 4);
   return { axisY, axisZ, radius, ...hingePinHoles(options), outer, inner, barFrom, barTo, depth, innerBack };
+}
+
+/**
+ * Where a flush hinge's end plugs go (Discussion #1387), worked out with the hinge at the back (its line along x): `outer`,
+ * where the hinge's line leaves the body at each end (`across`, the outline crossed at the axis's height: past the
+ * knuckles where the back runs on into rounded corners, which the end knuckles then fill), how far each plug reaches in
+ * from there (`depth`: END_PLUG_DEPTH, less where an end knuckle is short), and how long the pin is between them, half a
+ * millimetre short of each, as a pin printed apart is of the hinge's ends. An error when an end knuckle leaves less than
+ * MIN_END_PLUG_DEPTH.
+ */
+export function endPlugPlan(segments: readonly (readonly [number, number])[], across: readonly [number, number] | null):
+  | { outer: [number, number]; depth: number; pinLength: number }
+  | { error: LidError } {
+  const first = segments[0];
+  const last = segments[segments.length - 1];
+  const outer: [number, number] = [Math.min(across?.[0] ?? first[0], first[0]), Math.max(across?.[1] ?? last[1], last[1])];
+  // Both alike: as deep as the shorter end allows.
+  const depth = Math.min(END_PLUG_DEPTH, first[1] - outer[0] - END_PLUG_KEEP, outer[1] - last[0] - END_PLUG_KEEP);
+  if (depth < MIN_END_PLUG_DEPTH - 1e-9) return { error: { code: "endPlugsShort" } };
+  return { outer, depth, pinLength: outer[1] - outer[0] - 2 * depth - 1 };
 }
 
 /**
@@ -643,6 +677,7 @@ export function lidThicknessForMagnets(options: Pick<LidOptions, "magnetHeight">
 
 export type LidError =
   | { code: "notClosed" | "notOpen" | "tooSmall" | "tooShallow" | "empty" | "magnetsNoRoom" | "hingeLidType" | "hingeNoBack" | "hingeTooLow" | "hingeStyleStraight" | "hingeStyleMagnets" | "pivotNoSides" }
+  | { code: "endPlugsFlush" | "endPlugsShort" }
   | { code: "clickBumpsNoLip" | "clickBumpsNoRoom" | "handlePivot" | "handleSideShort" | "handleNotchNoRoom" }
   | { code: "magnetsThinLid"; thickness: number }
   | { code: "kernel"; message?: string };
@@ -819,9 +854,10 @@ export type LidMagnets = { posts: ManifoldSolid | null; postParts: MagnetPostPar
 
 /**
  * With a hinge: the body's knuckles with their slope (to be grouped with it), a pin printed apart if asked for, lying
- * beside the lid, both in the scene's frame, and how many knuckles the hinge has.
+ * beside the lid, both in the scene's frame, and how many knuckles the hinge has. With end plugs, the two plugs lying
+ * beside the lid too, and how long the pin is between them.
  */
-export type LidHinge = { knuckles: ManifoldSolid; pin: ManifoldSolid | null; count: number; cuts: ManifoldSolid | null; style: LidHingeStyle };
+export type LidHinge = { knuckles: ManifoldSolid; pin: ManifoldSolid | null; count: number; cuts: ManifoldSolid | null; style: LidHingeStyle; plugs: ManifoldSolid | null; pinLength: number | null };
 
 /** With click bumps: how many the lid has, and the dimples for them as one solid to cut out of the body, in the scene's frame. */
 export type LidClickBumps = { count: number; dimples: ManifoldSolid };
@@ -870,6 +906,10 @@ export function lidForSolid(runtime: ManifoldToplevel, body: ManifoldSolid, give
     if (plan && "error" in plan) return { error: plan.error };
     // In the wall, a knuckle needs the wall to run straight along it.
     if (plan && style === "flush" && plan.curved) return { error: { code: "hingeStyleStraight" } };
+    // End plugs close a flush hinge's pin hole at both ends, where its line leaves the body (Discussion #1387).
+    if (options.hinge && options.hingeEndPlugs && style !== "flush") return { error: { code: "endPlugsFlush" } };
+    const endPlugs = plan && style === "flush" && options.hingeEndPlugs ? endPlugPlan(plan.segments, acrossAt(turnedOutline, plan.axisY)) : null;
+    if (endPlugs && "error" in endPlugs) return { error: endPlugs.error };
     const pivot = options.hinge && style === "pivot" ? pivotPlan(turnedOutline, turnedOpening, options, top, box.min[2]) : null;
     if (pivot && "error" in pivot) return { error: pivot.error };
 
@@ -981,16 +1021,21 @@ export function lidForSolid(runtime: ManifoldToplevel, body: ManifoldSolid, give
     };
     const unturned = (solid: ManifoldSolid) => (turn ? keep(created, solid.rotate([0, 0, -turn])) : solid);
     const unionOf = (solids: ManifoldSolid[]) => (solids.length === 1 ? solids[0] : keep(created, runtime.Manifold.union(solids)));
+    // A flush hinge's end plugs, worked out with the hinge at the back: laid beside the lid further down.
+    const plugPieces: ManifoldSolid[] = [];
     if (plan && style === "flush") {
       // In the wall: the knuckles take turns as outside, flush with the back face and the lid's top. The body's grow out
       // of the wall's inner face on a 45 degree slope where they reach into the opening; the wall is cut round the lid's
       // and the lid's plate round the body's, by the gap, and behind the axis only the round knuckles stay. The lid's lip
       // stops short of the body's knuckles.
       const clearance = plan.radius + options.hingeGap;
+      const ends = endPlugs;
       const lidPieces: ManifoldSolid[] = [];
       const bodyPieces: ManifoldSolid[] = [];
       const notches: ManifoldSolid[] = [];
       const slots: ManifoldSolid[] = [];
+      // The body's outline standing from below the bottom to above the lid's top, with the hinge at the back.
+      const outlineColumn = ends ? prism(keep(created, outline.rotate(turn)), box.min[2] - 1, top + options.thickness + 1) : null;
       plan.segments.forEach(([from, to], index) => {
         const round = along(from, to, plan.radius, plan.axisY, plan.axisZ);
         const room = along(from - options.hingeGap + 0.01, to + options.hingeGap - 0.01, clearance, plan.axisY, plan.axisZ);
@@ -998,37 +1043,73 @@ export function lidForSolid(runtime: ManifoldToplevel, body: ManifoldSolid, give
           lidPieces.push(round);
           slots.push(room);
         } else {
-          const strip = keep(created, keep(created, runtime.Manifold.cube([to - from, 0.4, plan.axisZ - plan.low])).translate([from, plan.innerBack, plan.low]));
-          bodyPieces.push(keep(created, runtime.Manifold.hull([round, strip])));
+          // With end plugs the end knuckles run on to where the hinge's line leaves the body, cut to its outline, so the
+          // pin's hole and the plugs' pockets end in the body's own outer face: on a box with rounded corners, the end
+          // knuckles fill the corners instead of the wall being cut round the axis there.
+          const start = ends && index === 0 ? ends.outer[0] - 1 : from;
+          const end = ends && index === plan.segments.length - 1 ? ends.outer[1] + 1 : to;
+          const knuckle = start === from && end === to ? round : along(start, end, plan.radius, plan.axisY, plan.axisZ);
+          const strip = keep(created, keep(created, runtime.Manifold.cube([end - start, 0.4, plan.axisZ - plan.low])).translate([start, plan.innerBack, plan.low]));
+          const piece = keep(created, runtime.Manifold.hull([knuckle, strip]));
+          bodyPieces.push(outlineColumn && knuckle !== round ? keep(created, piece.intersect(outlineColumn)) : piece);
           notches.push(room);
         }
       });
       // Where the back runs on past the straight stretch into rounded corners, plate and wall are both cut round the axis
       // there, so neither stands in the other's way: the plate on into the room round the body's knuckle at that end, the
       // wall right up to that knuckle. Ending a gap short of the knuckle, each left a sliver standing there, a hair thin in
-      // the plate and a fin as thick as the gap in the wall.
+      // the plate and a fin as thick as the gap in the wall. With end plugs the end knuckle fills the corner: only the
+      // plate is cut there, wherever the outline runs on past the knuckle at all.
       const across = acrossAt(turnedOutline, plan.axisY);
       if (across) {
         for (const [outer, knuckle, toward] of [[across[0] - 1, plan.start, -1], [across[1] + 1, plan.end, 1]] as const) {
-          if ((outer - knuckle) * toward - options.hingeGap < 1.01) continue;
+          if ((outer - knuckle) * toward - options.hingeGap < 1.01 && !(ends && (outer - knuckle) * toward > 1)) continue;
           const span = (end: number) => along(Math.min(outer, end), Math.max(outer, end), clearance, plan.axisY, plan.axisZ);
           notches.push(span(knuckle + toward * (options.hingeGap - 0.02)));
-          slots.push(span(knuckle + toward * 0.01));
+          if (!ends) slots.push(span(knuckle + toward * 0.01));
         }
       }
-      const lipCut = keep(created, keep(created, runtime.Manifold.cube([plan.end - plan.start + 2 * options.hingeGap + 1, plan.backY - (plan.axisY - clearance) + 1, top - box.min[2] + 1])).translate([plan.start - options.hingeGap - 0.5, plan.axisY - clearance, box.min[2] - 1]));
-      // The pin's hole along the whole hinge, `radius` round: the lid's with the play, the body's tight.
-      const holeFor = (radius: number, tip: 1 | -1) => unturned(options.hingeTeardrop ? teardropAlong(plan.start - 1, plan.end + 1, radius, tip, plan.radius - TEARDROP_WALL, plan.axisY, plan.axisZ) : along(plan.start - 1, plan.end + 1, radius, plan.axisY, plan.axisZ));
+      // The lip stops short of the knuckles; with end plugs, of the end knuckles' slopes in the corners too.
+      const lipFrom = ends ? ends.outer[0] - 1 : plan.start - options.hingeGap - 0.5;
+      const lipTo = ends ? ends.outer[1] + 1 : plan.end + options.hingeGap + 0.5;
+      const lipCut = keep(created, keep(created, runtime.Manifold.cube([lipTo - lipFrom, plan.backY - (plan.axisY - clearance) + 1, top - box.min[2] + 1])).translate([lipFrom, plan.axisY - clearance, box.min[2] - 1]));
+      // The pin's hole along the whole hinge, `radius` round: the lid's with the play, the body's tight; with end plugs,
+      // out through the end knuckles' outer faces.
+      const holeFrom = (ends ? ends.outer[0] : plan.start) - 1;
+      const holeTo = (ends ? ends.outer[1] : plan.end) + 1;
+      const holeFor = (radius: number, tip: 1 | -1) => unturned(options.hingeTeardrop ? teardropAlong(holeFrom, holeTo, radius, tip, plan.radius - TEARDROP_WALL, plan.axisY, plan.axisZ) : along(holeFrom, holeTo, radius, plan.axisY, plan.axisZ));
       const bodyHole = holeFor(plan.bodyHole, 1);
       // Behind the axis only the knuckles stay, round about it: a square corner of the plate there would swing down into
       // the wall as the lid opens.
       const behind = keep(created, keep(created, runtime.Manifold.cube([(across ? across[1] - across[0] : plan.end - plan.start) + 20, plan.backY - plan.axisY + 1, options.thickness + 2])).translate([(across ? across[0] : plan.start) - 10, plan.axisY, top - 1]));
       made = keep(created, keep(created, made.subtract(unturned(lipCut))).subtract(unturned(behind)));
       made = keep(created, keep(created, keep(created, made.add(unturned(unionOf(lidPieces)))).subtract(unturned(unionOf(notches)))).subtract(holeFor(plan.lidHole, -1)));
-      bodyKnuckles = keep(created, unturned(unionOf(bodyPieces)).subtract(bodyHole));
+      let knuckleHoles = bodyHole;
+      if (ends && outlineColumn) {
+        // End plugs: over the plug's depth at each end the hole is a square instead, `half` from its middle to each side,
+        // standing on a corner so its top is a point at 45 degrees, as the teardrop's (which lies within it), and it prints
+        // without droop; its corners are cut flat where they would leave less than TEARDROP_WALL of the knuckle, as the
+        // teardrop's point is. The body's square is as tight round the pin as its round holes, so the pin goes in through it
+        // before the plugs; each plug is that square HINGE_PIN_GRIP smaller all round, as thick as the pin, so it sits as
+        // tight as the pin does in the body and cannot turn, and its outer end is cut to the body's outline, flush with it.
+        const squareAlong = (from: number, to: number, half: number, corner: number) => {
+          const square = keep(created, keep(created, runtime.CrossSection.square([2 * half, 2 * half], true)).rotate(45));
+          const profile = keep(created, square.intersect(keep(created, runtime.CrossSection.square([2 * corner, 2 * corner], true))));
+          return keep(created, keep(created, keep(created, profile.extrude(to - from)).rotate([0, 90, 0])).translate([from, plan.axisY, plan.axisZ]));
+        };
+        const corner = plan.radius - TEARDROP_WALL;
+        const [left, right] = ends.outer;
+        const pockets = unionOf([squareAlong(left - 1, left + ends.depth, plan.bodyHole, corner), squareAlong(right - ends.depth, right + 1, plan.bodyHole, corner)]);
+        const plugHalf = plan.bodyHole - HINGE_PIN_GRIP;
+        for (const [from, to] of [[left - 1, left + ends.depth], [right - ends.depth, right + 1]] as const) {
+          plugPieces.push(keep(created, squareAlong(from, to, plugHalf, corner - HINGE_PIN_GRIP).intersect(outlineColumn)));
+        }
+        knuckleHoles = keep(created, bodyHole.add(unturned(pockets)));
+      }
+      bodyKnuckles = keep(created, unturned(unionOf(bodyPieces)).subtract(knuckleHoles));
       // The pin's hole runs through the wall too, where the knuckles reach into it: as tight, for these cuts are grouped
-      // with the body and its knuckles and so cut them as well.
-      bodyCuts = keep(created, unturned(unionOf(slots)).add(bodyHole));
+      // with the body and its knuckles and so cut them as well. So do the plugs' pockets.
+      bodyCuts = keep(created, unturned(unionOf(slots)).add(knuckleHoles));
     } else if (pivot) {
       // The plate's back edge becomes a round bar the plate turns about, clear of the back wall by the gap; a pin from
       // outside through each side wall into the bar's end (teardrops, each pointing up as its part is printed), tight in
@@ -1186,26 +1267,47 @@ export function lidForSolid(runtime: ManifoldToplevel, body: ManifoldSolid, give
       const cuts = bodyCuts ? bodyCuts.transform(UP_TO_SCENE) : null;
       if (cuts) handed.add(cuts);
       let pin: ManifoldSolid | null = null;
+      const placedBox = placed.boundingBox();
+      // The rows beside the lid, from its back edge out: the pins, then the end plugs.
+      let row = placedBox.max[1] + PIN_SPACING;
+      // With end plugs the pin is as long as the room between them less half a millimetre at each end.
+      const pinLength = endPlugs ? endPlugs.pinLength : null;
       // A pin printed apart lies beside the lid, a millimetre shorter than the hinge, so it does not stand out; a pivot
       // lid's two lie side by side, each half a millimetre shorter than wall, gap and the bar's hole together.
       if (options.hingePrintPin) {
-        const placedBox = placed.boundingBox();
         const radius = options.hingePin / 2;
         const lengths = pivot
           ? [pivot.inner[0] - pivot.outer[0], pivot.outer[1] - pivot.inner[1]].map((wall) => wall + options.hingeGap + pivot.depth - 0.5)
-          : [plan!.end - plan!.start - 1];
+          : [pinLength ?? plan!.end - plan!.start - 1];
         // Lying on a flat a tenth of its diameter wide, so it does not roll and its underside prints clean.
         const flat = PIN_FLAT * 2 * radius;
         const pins = lengths.map((length, index) => {
-          const y = placedBox.max[1] + PIN_SPACING + radius + index * (2 * radius + PIN_SPACING);
+          const y = row + radius + index * (2 * radius + PIN_SPACING);
           const round = along(placedBox.min[0], placedBox.min[0] + length, radius, y, box.min[2] + radius - flat);
           const above = keep(created, keep(created, runtime.Manifold.cube([length + 2, 2 * radius + 2, 2 * radius + 1])).translate([placedBox.min[0] - 1, y - radius - 1, box.min[2]]));
           return keep(created, round.intersect(above));
         });
+        row += lengths.length * (2 * radius + PIN_SPACING);
         pin = unionOf(pins).transform(UP_TO_SCENE);
         handed.add(pin);
       }
-      hinge = { knuckles, pin, count: pivot ? 2 : plan!.segments.length, cuts, style };
+      // The end plugs lie beside the lid in a row of their own, along x as the pin, each turned an eighth about its length
+      // onto the side that faced the front: its outer end, cut to a corner that rounds towards the back, then leans up
+      // rather than over, and both print without support.
+      let plugs: ManifoldSolid | null = null;
+      if (plugPieces.length) {
+        let x = placedBox.min[0];
+        const laid = plugPieces.map((piece) => {
+          const lying = keep(created, piece.rotate([45, 0, 0]));
+          const lyingBox = lying.boundingBox();
+          const moved = keep(created, lying.translate([x - lyingBox.min[0], row - lyingBox.min[1], box.min[2] - lyingBox.min[2]]));
+          x += lyingBox.max[0] - lyingBox.min[0] + PIN_SPACING;
+          return moved;
+        });
+        plugs = unionOf(laid).transform(UP_TO_SCENE);
+        handed.add(plugs);
+      }
+      hinge = { knuckles, pin, count: pivot ? 2 : plan!.segments.length, cuts, style, plugs, pinLength };
     }
     let clickBumps: LidClickBumps | undefined;
     if (dimples) {
@@ -1267,6 +1369,10 @@ export function lidErrorMessage(error: LidError) {
       return t("lid.error.hingeStyleMagnets");
     case "pivotNoSides":
       return t("lid.error.pivotNoSides");
+    case "endPlugsFlush":
+      return t("lid.error.endPlugsFlush");
+    case "endPlugsShort":
+      return t("lid.error.endPlugsShort");
     case "clickBumpsNoLip":
       return t("lid.error.clickBumpsNoLip");
     case "clickBumpsNoRoom":
@@ -1297,8 +1403,11 @@ function positionsOf(mesh: ReturnType<ManifoldSolid["getMesh"]>) {
  */
 export type LidShapeMagnets = { posts: WorkplaneShape[]; pockets: WorkplaneShape[] };
 
-/** With a hinge, the body's knuckles (grouped with it, as the posts are) and the pin printed apart, if asked for. */
-export type LidShapeHinge = { knuckles: WorkplaneShape; pin: WorkplaneShape | null; count: number; cuts: WorkplaneShape | null; style: LidHingeStyle };
+/**
+ * With a hinge, the body's knuckles (grouped with it, as the posts are) and the pin printed apart, if asked for; with end
+ * plugs, the plugs as one body and how long the pin is between them.
+ */
+export type LidShapeHinge = { knuckles: WorkplaneShape; pin: WorkplaneShape | null; count: number; cuts: WorkplaneShape | null; style: LidHingeStyle; plugs: WorkplaneShape | null; pinLength: number | null };
 
 /** With click bumps, how many the lid has and the dimples for them, a hole to group with the body. */
 export type LidShapeClickBumps = { count: number; dimples: WorkplaneShape };
@@ -1341,7 +1450,7 @@ export async function lidForShapes(targets: readonly WorkplaneShape[], given: Li
     if ("error" in result) return { lid: null, error: lidErrorMessage(result.error) };
     created.push(result.lid);
     if (result.magnets?.posts) created.push(result.magnets.posts);
-    if (result.hinge) created.push(result.hinge.knuckles, ...(result.hinge.pin ? [result.hinge.pin] : []), ...(result.hinge.cuts ? [result.hinge.cuts] : []));
+    if (result.hinge) created.push(result.hinge.knuckles, ...[result.hinge.pin, result.hinge.cuts, result.hinge.plugs].filter((part): part is ManifoldSolid => part !== null));
     if (result.clickBumps) created.push(result.clickBumps.dimples);
     if (result.handle?.notch) created.push(result.handle.notch);
     const source = solids[0];
@@ -1357,7 +1466,13 @@ export async function lidForShapes(targets: readonly WorkplaneShape[], given: Li
       // The slots or pin holes are a hole grouped with the body, as the magnets' pockets are.
       const cutShape = result.hinge.cuts ? splitShapeFromWorldPositions(source, positionsOf(result.hinge.cuts.getMesh()), createLocalId(`${source.id}-hinge-cuts`), t("lid.hingeCutsName", { name: source.name })) : null;
       const cuts = cutShape ? canonicalizeShape({ ...cutShape, hole: true, hidden: false }) : null;
-      hinge = { knuckles: canonicalizeShape({ ...knuckles, hidden: false }), pin: pin ? canonicalizeShape({ ...pin, hidden: false }) : null, count: result.hinge.count, cuts, style: result.hinge.style };
+      // The end plugs are a body of their own beside the lid, as a pin printed apart is.
+      const plugs = result.hinge.plugs ? splitShapeFromWorldPositions(source, positionsOf(result.hinge.plugs.getMesh()), createLocalId(`${source.id}-hinge-plugs`), t("lid.hingeEndPlugsName", { name: source.name })) : null;
+      if (result.hinge.plugs && !plugs) return { lid: null, error: lidErrorMessage({ code: "empty" }) };
+      hinge = {
+        knuckles: canonicalizeShape({ ...knuckles, hidden: false }), pin: pin ? canonicalizeShape({ ...pin, hidden: false }) : null, count: result.hinge.count, cuts, style: result.hinge.style,
+        plugs: plugs ? canonicalizeShape({ ...plugs, hidden: false }) : null, pinLength: result.hinge.pinLength,
+      };
     }
     // The dimples and the finger notch are holes grouped with the body too.
     const holeShape = (solid: ManifoldSolid, suffix: string, name: string) => {
