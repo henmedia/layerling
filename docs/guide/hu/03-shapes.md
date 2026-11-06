@@ -199,6 +199,22 @@ Az eredmény egy háló, mint egy importált modell, és megőrzi a testet, amel
 
 Kétszínű nyomtatáshoz kapcsold be a {{ui:inspector.surfacePatternPart}} lehetőséget, bármelyik mintánál: a minta külön alkatrész lesz, és a {{ui:inspector.surfacePatternColor}} adja meg a színét – először olyat, amely elüt a testtől, legközelebb azt, amelyet legutóbb választottál. Kifelé az alkatrész az, ami kiemelkedik, a test pedig olyan marad, amilyen volt; befelé a test bevágva kapja a mintát, az alkatrész pedig a felületig kitölti a bemélyedést, mint a repedések aranya. A kettő együtt van egy kötegben: együtt mozognak, mindkettő megtartja a színét, és egy 3MF fájlban két alkatrészként kerülnek a szeletelőhöz. A textúrát a megszokott módon módosíthatod vagy távolíthatod el; a minta alkatrésze vele együtt változik. Több rétegnél mindnek ugyanarra kell mennie, kifelé vagy befelé; a mindkét irányba menő minta egyben marad a testtel.
 
+## Festés több színben
+
+Többszínű nyomtatáshoz a {{ui:paint.title}} közvetlenül a tervben színezi ki egy test részeit: egy lapot, egy kerek falat, egy furat belsejét, egy kerek foltot vagy egy körberajzolt területet. Úgy működik, mint a szeletelők festőeszközei, de a festés a tervvel együtt mentődik. Jelölj ki egy testet, és kattints a {{ui:editor.group.modify}} csoportban a {{ui:paint.title}} gombra, a {{ui:inspector.surfaceTexture}} mellett. A panel felkínálja a terved színeit, a {{ui:paint.customColor}} pedig saját színt kever. Utána fess a nézetben a három eszköz egyikével:
+
+- {{ui:paint.mode.fill}}: egy kattintás a lapot az éles széleiig kitölti, mint a rajzprogramok festékesvödre: egy hasáb tetejét, egy henger falát, egy zseb alját vagy egy furat belsejét, mindegyiket egy kattintással. A {{ui:paint.angle}} megadja, milyen élesnek kell lennie egy élnek, hogy megállítsa a kitöltést; 90°-nál átfut a hasáb élein.
+- {{ui:paint.mode.circle}}: egy kattintás a beállított méretű ({{ui:paint.diameter}}) kerek foltot tesz a felületre, ott középre, ahová kattintasz, íves felületen is. Megáll a test éles élein, és soha nem jön át egy fal hátoldalára.
+- {{ui:paint.mode.lasso}}: tartsd lenyomva az egérgombot, és rajzolj körbe egy területet. Az fest, amit az alakzaton belül látsz; a test mögötte lévő hátoldala nem.
+
+![A három eszközzel festett hasáb: a teteje sárgára töltve, elöl egy fehér kör, oldalt egy lasszóval körberajzolt zöld csillag; mellette a festés panelje.](shot:paint)
+
+A {{ui:paint.eraser}} ugyanezekkel az eszközökkel leveszi a festéket, a {{ui:paint.clear}} egyszerre az egészet. Minden vonás külön lépés, így a [[Ctrl]]+[[Z]] az utolsót vonja vissza. A vonások között a jobb egérgomb a szokott módon forgatja a nézetet; a {{ui:paint.done}} vagy az [[Esc]] bezárja a panelt.
+
+A kör vagy a lasszó széle belevágódik a test hálójába: egy hasáb lapján a kör kerek, nem néhány háromszög, és a test zárt marad. A festés a testhez tartozik: vele mozog és fordul, átméretezéskor vele nyúlik, és az a vonás, amely egy változtatás után már nem talál semmit, kimarad. A 3MF-export festett lapokként írja ki a festést, amelyeket az OrcaSlicer, a Bambu Studio és a PrusaSlicer a saját filamentjeikkel nyomtatnak (lásd [Fájlok és mentés](chapter:files-and-saving)); az OBJ is megtartja a színeket, az STL egyszínű marad.
+
+Az egy testté vágott csoportot, például egy hasábot a furataival, egy testként festheted: a furatok kivágása után fesd ki, és a festés megmarad, ha a csoportot megnyitva módosítod. Egy köteg részeit egyenként fested. Egy festett test, amelyet másokkal csoportosítasz, részként megtartja a festését, és a csoport bontásakor újra mutatja. A nem zárt importált hálót a saját háromszögein festi.
+
 ## Váza
 
 A {{ui:shape.vase}} önálló test vázákhoz, cserepekhez és lámpaernyőkhöz. Méretei a {{ui:inspector.properties}} alatt vannak, formája és mintája a {{ui:inspector.vaseForm}} kártyán; mindez bármikor módosítható, mentés után is:

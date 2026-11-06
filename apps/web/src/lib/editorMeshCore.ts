@@ -840,8 +840,8 @@ export function meshForShape(shape: WorkplaneShape): MeshData {
 // Moving or turning a spring built it again from scratch, about 300 ms each time it was aligned,
 // exported or split. The mesh before transformMesh does not depend on where the shape stands, so
 // the last ones are kept and found by the other fields. Text is left out: it builds a stand-in
-// until its font has loaded.
-const PLACEMENT_FIELDS = new Set(["id", "name", "color", "gridfinityLabelColor", "x", "z", "elevation", "rotation", "rotationX", "rotationZ"]);
+// until its font has loaded. Paint (paint.ts) lies on the mesh and does not change it.
+const PLACEMENT_FIELDS = new Set(["id", "name", "color", "gridfinityLabelColor", "paint", "x", "z", "elevation", "rotation", "rotationX", "rotationZ"]);
 const MAX_UNPLACED_MESHES = 24;
 const MAX_UNPLACED_MESH_VERTICES = 1_500_000;
 const unplacedMeshCache: Array<{ shape: WorkplaneShape; mesh: MeshData; fontRevision: number }> = [];

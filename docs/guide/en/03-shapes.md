@@ -209,6 +209,22 @@ The result is a mesh like an imported model, and it keeps the body it was made o
 
 For a print in two colours, switch on {{ui:inspector.surfacePatternPart}}, with any pattern: the pattern becomes a part of its own, and {{ui:inspector.surfacePatternColor}} gives it its colour – to begin with one that stands out against the body, the next time the one you chose last. Out of the body, the part is what stands out, and the body stays as it was; into the body, the body gets the pattern cut in and the part fills the cut up to the surface, like the gold of the cracks. Both go together in a bundle: they move together, each keeps its colour, and a 3MF has them as two parts for the slicer. Change or remove the texture as before; the pattern part goes along. With several layers, all have to go the same way, out of the body or into it; a pattern going both ways stays one with the body.
 
+## Painting in several colours
+
+For a print in several colours, {{ui:paint.title}} colours parts of a body right in the design: a face, a round wall, the inside of a hole, a round patch or an area you draw round. It works like the paint tools of the slicers, but the paint is saved with the design. Select one body and click {{ui:paint.title}} in the {{ui:editor.group.modify}} group, next to {{ui:inspector.surfaceTexture}}. The panel offers the colours of your design, and {{ui:paint.customColor}} mixes one of your own. Then paint in the view with one of three tools:
+
+- {{ui:paint.mode.fill}}: a click fills the face up to its sharp edges, like the bucket of a paint program: the top of a box, the wall of a cylinder, the floor of a pocket or the inside of a hole, each in one click. {{ui:paint.angle}} says how sharp an edge has to be to stop the fill; at 90° it runs over the edges of a box.
+- {{ui:paint.mode.circle}}: a click lays a round patch of the {{ui:paint.diameter}} set onto the surface, centred where you click, on a curved surface too. It stops at the body's sharp edges and never comes through on the back of a wall.
+- {{ui:paint.mode.lasso}}: hold the mouse button and draw round an area. What you see inside the shape is painted; the back of the body behind it is not.
+
+![A box painted with the three tools: its top filled in yellow, a white circle on the front and a green star drawn round on the side, the Paint panel beside it.](shot:paint)
+
+{{ui:paint.eraser}} takes the paint off again with the same tools, {{ui:paint.clear}} takes all of it off at once. Every stroke is a step of its own, so [[Ctrl]]+[[Z]] takes the last one back. Between strokes the right mouse button turns the view as always; {{ui:paint.done}} or [[Esc]] closes the panel.
+
+The edges of a circle or a lasso are cut into the body's mesh, so a circle on the face of a box is round, not a few triangles, and the body stays closed. The paint belongs to the body: it moves and turns with it, stretches with it when you resize it, and a stroke that finds nothing any more after a change is left out. A 3MF export writes the paint as painted faces, which OrcaSlicer, Bambu Studio and PrusaSlicer print with their filaments (see [Files and saving](chapter:files-and-saving)); an OBJ keeps the colours too, an STL stays one colour.
+
+A group cut into one body, a box with its holes for instance, is painted as one body: paint it after cutting the holes, and its paint stays when you change the group in an open group. The parts of a bundle are painted one by one. A painted body that you group with others keeps its paint as a part and shows it again when you ungroup it. An imported mesh that is not closed is painted on its own triangles.
+
 ## A vase
 
 The {{ui:shape.vase}} is a body of its own for vases, pots and lampshades. Its measures are under {{ui:inspector.properties}}, its form and pattern on the card {{ui:inspector.vaseForm}}; all of it can be changed at any time, also after saving:

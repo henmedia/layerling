@@ -209,6 +209,22 @@ El resultado es una malla como un modelo importado, y conserva el cuerpo sobre e
 
 Para una impresión en dos colores, activa {{ui:inspector.surfacePatternPart}}, con cualquier dibujo: el dibujo se convierte en una pieza propia, y {{ui:inspector.surfacePatternColor}} le da su color – al principio uno que destaca sobre el cuerpo, la vez siguiente el que elegiste por última vez. Hacia fuera, la pieza es lo que sobresale, y el cuerpo queda como estaba; hacia dentro, el cuerpo recibe el dibujo tallado y la pieza rellena el hueco hasta la superficie, como el oro de las grietas. Ambos van juntos en un conjunto: se mueven juntos, cada uno conserva su color, y un 3MF los lleva como dos piezas para el laminador. Cambia o quita la textura como siempre; la pieza del dibujo va con ella. Con varias capas, todas tienen que ir en el mismo sentido, hacia fuera o hacia dentro; un dibujo en ambos sentidos sigue formando un solo cuerpo.
 
+## Pintar en varios colores
+
+Para imprimir en varios colores, {{ui:paint.title}} colorea partes de un cuerpo directamente en el diseño: una cara, una pared redonda, el interior de un orificio, una mancha redonda o una zona que rodeas. Funciona como las herramientas de pintura de los laminadores, pero la pintura se guarda con el diseño. Selecciona un cuerpo y haz clic en {{ui:paint.title}} en el grupo {{ui:editor.group.modify}}, junto a {{ui:inspector.surfaceTexture}}. El panel ofrece los colores de tu diseño, y {{ui:paint.customColor}} mezcla uno propio. Luego pinta en la vista con una de tres herramientas:
+
+- {{ui:paint.mode.fill}}: un clic rellena la cara hasta sus aristas vivas, como el bote de pintura de un programa de dibujo: la parte de arriba de un prisma, la pared de un cilindro, el fondo de un hueco o el interior de un orificio, cada uno con un clic. {{ui:paint.angle}} dice lo viva que tiene que ser una arista para detener el relleno; con 90° pasa por encima de las aristas de un prisma.
+- {{ui:paint.mode.circle}}: un clic pone sobre la superficie una mancha redonda del {{ui:paint.diameter}} elegido, centrada donde haces clic, también sobre una superficie curva. Se detiene en las aristas vivas del cuerpo y nunca atraviesa al dorso de una pared.
+- {{ui:paint.mode.lasso}}: mantén pulsado el botón del ratón y rodea una zona. Se pinta lo que ves dentro de la forma; el dorso del cuerpo que queda detrás, no.
+
+![Un prisma pintado con las tres herramientas: la parte de arriba rellena de amarillo, un círculo blanco delante y una estrella verde rodeada con el lazo en el lateral; al lado, el panel Pintar.](shot:paint)
+
+El {{ui:paint.eraser}} quita la pintura con las mismas herramientas, {{ui:paint.clear}} la quita toda de una vez. Cada trazo es un paso propio, así que [[Ctrl]]+[[Z]] deshace el último. Entre trazos, el botón derecho del ratón gira la vista como siempre; {{ui:paint.done}} o [[Esc]] cierra el panel.
+
+Los bordes de un círculo o de un lazo se cortan en la malla del cuerpo: un círculo en la cara de un prisma es redondo, no unos pocos triángulos, y el cuerpo sigue cerrado. La pintura pertenece al cuerpo: se mueve y gira con él, se estira con él al cambiar su tamaño, y un trazo que después de un cambio ya no encuentra nada se omite. La exportación 3MF escribe la pintura como caras pintadas, que OrcaSlicer, Bambu Studio y PrusaSlicer imprimen con sus filamentos (consulta [Archivos y guardado](chapter:files-and-saving)); un OBJ también conserva los colores, un STL sigue siendo de un color.
+
+Un grupo cortado en un solo cuerpo, por ejemplo un prisma con sus orificios, se pinta como un solo cuerpo: píntalo después de cortar los orificios, y su pintura se queda cuando cambias el grupo abierto. Las partes de un conjunto se pintan una a una. Un cuerpo pintado que agrupas con otros conserva su pintura como parte y la vuelve a mostrar al desagruparlo. Una malla importada que no está cerrada se pinta sobre sus propios triángulos.
+
 ## Un jarrón
 
 El {{ui:shape.vase}} es un cuerpo propio para jarrones, macetas y pantallas de lámpara. Sus medidas están en {{ui:inspector.properties}}, su forma y su patrón en la tarjeta {{ui:inspector.vaseForm}}; todo se puede cambiar en cualquier momento, también después de guardar:

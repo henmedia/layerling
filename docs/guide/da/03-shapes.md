@@ -214,6 +214,22 @@ Resultatet er et mesh som en importeret model, og det bevarer det legeme, det bl
 
 Til et print i to farver slår du {{ui:inspector.surfacePatternPart}} til, med ethvert mønster: mønsteret bliver en selvstændig del, og {{ui:inspector.surfacePatternColor}} giver det dets farve – først en, der skiller sig ud fra legemet, næste gang den, du valgte sidst. Ud af legemet er delen det, der stikker ud, og legemet forbliver, som det var; ind i legemet får legemet mønsteret skåret ind, og delen fylder fordybningen op til overfladen, som guldet i sprækkerne. De to ligger sammen i et bundt: de flytter sammen, hver beholder sin farve, og en 3MF har dem som to dele til sliceren. Ændr eller fjern overfladestrukturen som før; mønsterdelen følger med. Med flere lag skal alle gå samme vej, ud af legemet eller ind i det; et mønster, der går begge veje, forbliver ét med legemet.
 
+## Mal i flere farver
+
+Til print i flere farver farver {{ui:paint.title}} dele af et legeme direkte i designet: en flade, en rund væg, indersiden af et hul, en rund plet eller et område, du tegner rundt om. Det virker som slicernes maleværktøjer, men malingen gemmes med designet. Vælg ét legeme, og klik på {{ui:paint.title}} i gruppen {{ui:editor.group.modify}}, ved siden af {{ui:inspector.surfaceTexture}}. Panelet tilbyder dit designs farver, og {{ui:paint.customColor}} blander en, du selv vælger. Mal så i visningen med et af tre værktøjer:
+
+- {{ui:paint.mode.fill}}: et klik fylder fladen ud til dens skarpe kanter, som malerspanden i et tegneprogram: toppen af en kasse, væggen i en cylinder, bunden af en lomme eller indersiden af et hul, hver med ét klik. {{ui:paint.angle}} siger, hvor skarp en kant skal være for at stoppe fyldet; ved 90° går det hen over kanterne på en kasse.
+- {{ui:paint.mode.circle}}: et klik lægger en rund plet med den valgte {{ui:paint.diameter}} på overfladen, centreret der, hvor du klikker, også på en buet flade. Den stopper ved legemets skarpe kanter og kommer aldrig igennem på bagsiden af en væg.
+- {{ui:paint.mode.lasso}}: hold museknappen nede, og tegn rundt om et område. Det, du ser inden for formen, bliver malet; bagsiden af legemet bag den gør ikke.
+
+![En kasse malet med de tre værktøjer: toppen fyldt med gult, en hvid cirkel foran og en grøn stjerne tegnet med lassoen på siden; ved siden af panelet Mal.](shot:paint)
+
+{{ui:paint.eraser}} tager malingen af igen med de samme værktøjer, {{ui:paint.clear}} tager det hele af på én gang. Hvert strøg er et trin for sig, så [[Ctrl]]+[[Z]] tager det sidste tilbage. Mellem strøgene drejer højre museknap visningen som altid; {{ui:paint.done}} eller [[Esc]] lukker panelet.
+
+Kanterne af en cirkel eller en lasso skæres ind i legemets net: en cirkel på en kasses flade er rund og ikke et par trekanter, og legemet forbliver lukket. Malingen hører til legemet: den flytter og drejer med det, strækkes med, når du ændrer størrelsen, og et strøg, der ikke finder noget længere efter en ændring, udelades. 3MF-eksporten skriver malingen som malede flader, som OrcaSlicer, Bambu Studio og PrusaSlicer printer med deres filamenter (se [Filer og gemning](chapter:files-and-saving)); en OBJ beholder også farverne, en STL forbliver i én farve.
+
+En gruppe, der er skåret til ét legeme, for eksempel en kasse med sine huller, males som ét legeme: mal den, efter hullerne er skåret, så bliver malingen, når du ændrer gruppen åbnet. Delene i et bundt males hver for sig. Et malet legeme, som du grupperer med andre, beholder sin maling som del og viser den igen, når du opdeler gruppen. Et importeret net, der ikke er lukket, males på sine egne trekanter.
+
 ## En vase
 
 {{ui:shape.vase}} er et legeme for sig til vaser, potter og lampeskærme. Dine mål står under {{ui:inspector.properties}}, formen og mønsteret på kortet {{ui:inspector.vaseForm}}; alt sammen kan ændres når som helst, også efter at have gemt:

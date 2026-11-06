@@ -51,6 +51,8 @@ import { roundSideCount } from "@/lib/roundSideCount";
 import { createPyramidGeometry } from "@/lib/pyramidGeometry";
 import { positionsForTwist, twistBandCount } from "@/lib/heightSlices";
 import { toCreasedNormals } from "@/lib/creasedNormals";
+import { canPaintShape } from "@/lib/paint";
+import { paintedBodyMesh } from "@/lib/paintMesh";
 import { shapeHasAlongDeform, slopePositions } from "@/lib/slopeAlong";
 import { DEFAULT_EDGE_LINE_COLOR } from "@/lib/workplaneGrid";
 import { deformsAboutOrigin, mirroredAxisCount, mirrorSign, preservesEdgeTreatmentSize, resizedImportedCoordinates, resizedImportedMeshPositions, shapeDepth, shapeExtrudeDeformAt, shapeHasExtrudeDeform, shapeHasShapeDeform, shapeHasTaper, shapeSupportsTaper, shapeTaperDimensions, shapeTaperScaleAt, shapeWidth } from "@/lib/workplaneShapes";
@@ -603,6 +605,16 @@ export function polygonSidesForShape(shape: WorkplaneShape) {
 }
 
 export function shapeGeometrySignature(shape: WorkplaneShape): string {
+  // A painted body is drawn from its mesh with the paint cut in, in millimetres (paintedBodyGeometry): its strokes,
+  // its size and whether the kernel was there to cut them are part of it too.
+  if (shapeShowsPaint(shape)) {
+    return JSON.stringify({
+      painted: shapeGeometrySignature({ ...shape, paint: undefined }),
+      size: [shapeWidth(shape), shape.height, shapeDepth(shape)],
+      strokes: shapeResourceId(shape.paint),
+      kernel: manifoldRevision(),
+    });
+  }
   const taper = !shapeSupportsTaper(shape.kind) || !shapeHasTaper(shape)
     ? null
     : { ...shapeTaperDimensions(shape), baseWidth: shapeWidth(shape), baseDepth: shapeDepth(shape) };
@@ -1083,7 +1095,8 @@ export function syncShapeObjectDimensions(object: THREE.Group, shape: WorkplaneS
   object.userData.tapeDimensions = [shapeWidth(shape), shape.height, shapeDepth(shape)] satisfies [number, number, number];
   object.userData.tapeTopologyKey = tapeShapeTopologyKey(shape);
   const surface = object.children.find((child): child is THREE.Mesh => child instanceof THREE.Mesh && Boolean(child.userData.shapeSurface));
-  if (!surface) return;
+  // A painted body's mesh is built at its size (paintedBodyGeometry): it is no unit body to stretch.
+  if (!surface || surface.geometry.userData.paintColors) return;
   const width = shapeWidth(shape);
   const depth = shapeDepth(shape);
   let scale: THREE.Vector3 | null = null;
@@ -1174,7 +1187,8 @@ export function syncShapeObjectAppearance(
     const material = sharedShapeMaterial(shape, Boolean(surface.geometry.getAttribute("color")) && !shape.hole);
     const nextMaterial = shape.kind === "box" && shape.imagePlate && !shape.hole
       ? createImagePlateMaterials(shape, material, onTextureReady)
-      : shape.kind === "gridfinity" ? gridfinityMaterials(shape, material, surface.geometry) : material;
+      : surface.geometry.userData.paintColors ? paintMaterials(shape, material, surface.geometry)
+        : shape.kind === "gridfinity" ? gridfinityMaterials(shape, material, surface.geometry) : material;
     const currentMaterials = Array.isArray(surface.material) ? surface.material : null;
     const sameMaterial = Array.isArray(nextMaterial)
       ? Boolean(currentMaterials && nextMaterial.every((entry, index) => currentMaterials[index] === entry))
@@ -1733,7 +1747,9 @@ export function retainSharedShapeGeometry(mesh: THREE.Mesh, geometry: THREE.Buff
 export function groupChildAppearance(group: WorkplaneShape, child: WorkplaneShape): WorkplaneShape {
   if (group.hole) return { ...child, hole: true, color: "#b8c2cc" };
   // One colour for the whole group, nested groups included.
-  const tinted = groupShowsPartColors(group) ? child : { ...child, color: group.color, multicolor: false, gridfinityLabelColor: undefined };
+  // A part's paint shows where the part stays a body of its own, in a bundle; a group's own paint is the group's (paint.ts).
+  const ownPaint = group.groupOperation === "bundle" ? child.paint : undefined;
+  const tinted = groupShowsPartColors(group) ? { ...child, paint: ownPaint } : { ...child, color: group.color, multicolor: false, gridfinityLabelColor: undefined, paint: undefined };
   if (group.transparent) return { ...tinted, transparent: true };
   return tinted;
 }
@@ -1746,6 +1762,69 @@ export const TRANSPARENT_SOLID_OPACITY = 0.4;
 export function holeOpacity(shape: WorkplaneShape) {
   if (strongHoles) return shape.importedMesh ? 0.6 : 0.72;
   return shape.importedMesh ? 0.34 : 0.52;
+}
+
+/** Whether a body is drawn with its paint (paint.ts): a solid body of its own with strokes; a hole shows none. */
+export function shapeShowsPaint(shape: WorkplaneShape) {
+  return Boolean(shape.paint?.length) && canPaintShape(shape);
+}
+
+/** The body as addMesh and the edge lines take it once its mesh already carries its taper, twist and slope. */
+function shapeWithoutDeform(shape: WorkplaneShape): WorkplaneShape {
+  return {
+    ...shape,
+    taperTopWidth: undefined,
+    taperTopDepth: undefined,
+    taperBottomWidth: undefined,
+    taperBottomDepth: undefined,
+    taperTopScale: undefined,
+    taperBottomScale: undefined,
+    extrudeTwist: undefined,
+    extrudeTopOffsetX: undefined,
+    extrudeTopOffsetZ: undefined,
+    slopeEnd: undefined,
+    narrowEnd: undefined,
+  };
+}
+
+/** A painted body's materials: its own for the faces without paint, then one per colour of the paint, for the groups of paintedBodyGeometry. */
+function paintMaterials(shape: WorkplaneShape, material: THREE.MeshStandardMaterial, geometry: THREE.BufferGeometry) {
+  const colors = geometry.userData.paintColors as string[] | undefined;
+  return colors?.length ? [material, ...colors.map((color) => sharedShapeMaterial({ ...shape, color }))] : material;
+}
+
+/**
+ * A painted body's geometry, in the frame of its object as addMesh sets it: the faces of its painted mesh
+ * (paintMesh.ts) in one group per colour, the body's own colour first, its normals creased at 30° as a
+ * plain body's are smooth round a cylinder and sharp at a box's edges. Null when there is nothing to draw.
+ */
+function paintedBodyGeometry(shape: WorkplaneShape): THREE.BufferGeometry | null {
+  const painted = paintedBodyMesh(shape);
+  if (!painted || painted.faces.length === 0) return null;
+  const colors: string[] = [];
+  painted.colors.forEach((color) => {
+    if (color && !colors.includes(color)) colors.push(color);
+  });
+  const positions = new Float32Array(painted.vertices.length * 3);
+  painted.vertices.forEach(([x, y, z], index) => positions.set([x, y, z], index * 3));
+  const index: number[] = [];
+  const indexed = new THREE.BufferGeometry();
+  indexed.setAttribute("position", new THREE.BufferAttribute(positions, 3));
+  [null, ...colors].forEach((color, materialIndex) => {
+    const start = index.length;
+    painted.faces.forEach((face, faceIndex) => {
+      if ((painted.colors[faceIndex] ?? null) === color) index.push(face[0], face[1], face[2]);
+    });
+    if (index.length > start) indexed.addGroup(start, index.length - start, materialIndex);
+  });
+  indexed.setIndex(index);
+  const geometry = toCreasedNormals(indexed, Math.PI / 6);
+  if (geometry !== indexed) indexed.dispose();
+  geometry.computeBoundingBox();
+  geometry.computeBoundingSphere();
+  geometry.userData.paintColors = colors;
+  geometry.userData.cached = true;
+  return geometry;
 }
 
 /** A bin's material, and a second one in its letters' colour when they have one of their own (#1308), for the second group of its mesh, which holds their faces. */
@@ -1968,6 +2047,21 @@ export function createShapeObject(
   const size = Math.min(width, depth);
   const height = shape.height;
   const geometryCacheKey = shapeGeometrySignature(shape);
+
+  // A painted body (paint.ts) is drawn from its mesh with the paint cut in, already tapered and twisted and in
+  // millimetres: it is not stretched by the object, nor tapered once more by addMesh.
+  if (shapeShowsPaint(shape)) {
+    const painted = sharedShapeGeometry(geometryCacheKey, () => paintedBodyGeometry(shape) ?? new THREE.BufferGeometry());
+    if (painted.getAttribute("position")) {
+      addMesh(group, painted, paintMaterials(shape, material, painted), shapeWithoutDeform(shape));
+      group.traverse((child) => {
+        child.userData.shapeId = shape.id;
+      });
+      setObjectRenderLayer(group, RENDER_LAYER_SHAPES);
+      freezeStaticObjectMatrices(group);
+      return group;
+    }
+  }
 
   switch (shape.kind) {
     case "box":
@@ -3186,7 +3280,8 @@ export function lowestY(positions: ArrayLike<number>) {
 }
 
 export function getEdgesGeometry(shape: WorkplaneShape, geometry: THREE.BufferGeometry, threshold: number) {
-  const importedCache = shape.importedMesh && !preservesEdgeTreatmentSize(shape) && !shapeHasShapeDeform(shape)
+  // A painted body is drawn from a mesh of its own, not the import's (paintedBodyGeometry): its edges are worked out from it.
+  const importedCache = shape.importedMesh && !geometry.userData.paintColors && !preservesEdgeTreatmentSize(shape) && !shapeHasShapeDeform(shape)
     ? getImportedMeshCache(shape.importedMesh).edges
     : null;
   let cache = importedCache ?? sharedEdgesGeometryCache.get(geometry);

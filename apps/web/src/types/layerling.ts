@@ -1486,6 +1486,11 @@ export type WorkplaneShape = {
   surfaceTextureMask?: import("@/lib/surfaceTexture").SurfaceTextureMaskMode;
   /** The gold filling the cracks of this textured body (see surfaceTextureShape.ts): it goes when the texture is made anew or taken off. */
   surfaceFillOf?: string;
+  /**
+   * Paint on the body's surface, for printing in several colours (paint.ts): strokes laid in order,
+   * each a region found again on the mesh whenever it is built, in a colour of its own or erasing.
+   */
+  paint?: import("@/lib/paint").PaintStroke[];
   /** Only for "vase": the vase tool's settings; the frame gives its height and widest diameter. */
   vase?: import("@/lib/vase/vase-geometry.mjs").VaseSettings;
   /** An accessory laid out for a vase (its id): laying them out again replaces it. */

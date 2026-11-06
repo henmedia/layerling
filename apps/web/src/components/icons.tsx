@@ -158,6 +158,7 @@ export {
   ToolbarSimplifyIcon,
   ToolbarMakeExactIcon,
   ToolbarSurfaceTextureIcon,
+  ToolbarPaintIcon,
   ToolbarBundleIcon,
   ToolbarGroupIcon,
   ToolbarGuideIcon,
