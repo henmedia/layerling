@@ -405,6 +405,8 @@ export function TransformOverlay({
           onClick={(event) => event.stopPropagation()}
         >
           <svg className="slide-handle-icon" viewBox="-16 -8 32 16" aria-hidden="true" focusable="false">
+            {/* A light rim under the arrow: the red one has to show on a red body too. */}
+            <path className="slide-arrow-rim" d="M-14 0 H4 M2 -5.5 L14 0 L2 5.5 Z" />
             <path className="slide-arrow-shaft" d="M-14 0 H4" />
             <path className="slide-arrow-head" d="M2 -5.5 L14 0 L2 5.5 Z" />
           </svg>

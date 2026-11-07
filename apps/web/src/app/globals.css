@@ -9379,8 +9379,15 @@ html[data-theme="dark"] .touch-multi-select {
   height: 16px;
   margin: 1px;
   overflow: visible;
-  /* A light edge all round keeps the arrow readable on the grid and on the shape, as on the turn arrows. */
-  filter: drop-shadow(0 0 1px var(--slide-handle-halo)) drop-shadow(0 0 1.5px var(--slide-handle-halo));
+}
+
+/* The arrows stand on the body: a rim in the halo colour keeps the red one readable on a red body. */
+.slide-arrow-rim {
+  fill: var(--slide-handle-halo);
+  stroke: var(--slide-handle-halo);
+  stroke-width: 5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
 }
 
 .slide-arrow-shaft {

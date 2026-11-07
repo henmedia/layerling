@@ -3885,8 +3885,9 @@ html[data-theme="dark"]:where([data-palette="graphite"]) .touch-multi-select {
   --slide-handle-axis: #2f9a4b;
 }
 
-:where(html[data-theme="dark"][data-palette="graphite"]) .slide-handle-icon {
-  filter: drop-shadow(0 0 1px var(--slide-handle-halo)) drop-shadow(0 0 1.5px var(--slide-handle-halo));
+:where(html[data-theme="dark"][data-palette="graphite"]) .slide-arrow-rim {
+  fill: var(--slide-handle-halo);
+  stroke: var(--slide-handle-halo);
 }
 
 :where(html[data-theme="dark"][data-palette="graphite"]) .slide-arrow-shaft {
