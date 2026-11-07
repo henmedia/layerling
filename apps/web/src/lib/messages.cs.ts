@@ -1613,6 +1613,7 @@ export const MESSAGES_CS: Record<MessageKey, string> = {
   "holePattern.size.corners": "Průměr přes vrcholy (Ø)",
   "holePattern.size.width": "Šířka",
   "holePattern.size.height": "Výška",
+  "holePattern.holeAngle": "Úhel otvorů",
   "holePattern.spacing": "Rozteč středů",
   "holePattern.rowSpacing": "Rozestup řad",
   "holePattern.arrangement": "Uspořádání",

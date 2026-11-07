@@ -1475,6 +1475,7 @@ export const MESSAGES_EN = {
   "holePattern.size.corners": "Diameter across the corners (Ø)",
   "holePattern.size.width": "Width",
   "holePattern.size.height": "Height",
+  "holePattern.holeAngle": "Angle of the holes",
   "holePattern.spacing": "Spacing centre to centre",
   "holePattern.rowSpacing": "Rows centre to centre",
   "holePattern.wall": "Wall between the holes",

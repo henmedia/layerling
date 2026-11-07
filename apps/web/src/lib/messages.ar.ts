@@ -1479,6 +1479,7 @@ export const MESSAGES_AR: Partial<Record<MessageKey, string>> = {
   "holePattern.size.corners": "القطر عبر الزوايا (Ø)",
   "holePattern.size.width": "العرض",
   "holePattern.size.height": "الارتفاع",
+  "holePattern.holeAngle": "زاوية الثقوب",
   "holePattern.spacing": "المسافة من المركز إلى المركز",
   "holePattern.rowSpacing": "الصفوف من مركز إلى مركز",
   "holePattern.wall": "الجدار بين الثقوب",

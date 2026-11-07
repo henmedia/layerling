@@ -1471,6 +1471,7 @@ export const MESSAGES_RU: Partial<Record<MessageKey, string>> = {
   "holePattern.size.corners": "Диаметр по вершинам (Ø)",
   "holePattern.size.width": "Ширина",
   "holePattern.size.height": "Высота",
+  "holePattern.holeAngle": "Угол отверстий",
   "holePattern.spacing": "Шаг между центрами",
   "holePattern.rowSpacing": "Расстояние между рядами",
   "holePattern.wall": "Перемычка между отверстиями",
