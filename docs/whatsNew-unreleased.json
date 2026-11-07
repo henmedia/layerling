@@ -40,5 +40,45 @@
       "en": "A hull fills whatever is hollow in its parts: a tube, a hollowed cylinder, the holes in a group. With Keep the parts' holes under Properties they stay open, and the hull only fills the space between the parts.",
       "da": "Et hylster fylder alt, hvad der er hult i dets dele: et rør, en udhulet cylinder, hullerne i en gruppe. Med „Bevar delenes huller“ under Egenskaber forbliver de åbne, og hylsteret fylder kun rummet mellem delene."
     }
+  },
+  {
+    "title": {
+      "de": "Einschub-Deckel",
+      "en": "A slide-in lid"
+    },
+    "body": {
+      "de": "Das Deckel-Werkzeug hat eine neue Art „Einschub“, wie der Deckel einer Holz-Federmappe: Er gleitet mit Zungen in Nuten dreier Wände und wird durch die vierte hineingeschoben. Die Box druckt aufrecht, der Deckel umgedreht, beide ohne Stützen.",
+      "en": "The Lid tool has a new kind, Slide-in, like a wooden pencil box's lid: it runs on tongues in grooves in three walls and slides in over the fourth. The box prints upright and the lid turned over, both without support."
+    }
+  },
+  {
+    "title": {
+      "de": "Klappdeckel und Halteband",
+      "en": "Flip-top and tether"
+    },
+    "body": {
+      "de": "Schraub- und Bajonettdeckel können eine Ausgießöffnung mit angedruckter Klappe bekommen, wie bei einer Shampooflasche, und ein Halteband, das den Deckel am Körper hält. Beides druckt ohne Stützen.",
+      "en": "Screw and bayonet caps can get a pouring opening with a printed flap, like a shampoo bottle's, and a tether that keeps the cap on the body. Both print without support."
+    }
+  },
+  {
+    "title": {
+      "de": "Normgewinde für Flaschen und Gläser",
+      "en": "Standard bottle and jar threads"
+    },
+    "body": {
+      "de": "Der Schraubdeckel kann das Gewinde einer Norm bekommen (PCO 1881, PCO 1810, GL 45, Einmachglas), damit er auf eine gekaufte Flasche passt. Beim Bajonettdeckel lässt sich außerdem die Drehung einstellen, und ein abgerundeter Rand wird nicht mehr abgelehnt.",
+      "en": "The screw lid can take a standard's thread (PCO 1881, PCO 1810, GL 45, mason jars) so it fits a bottle from the shop. The bayonet lid's turn can be set, and a rounded rim is no longer refused."
+    }
+  },
+  {
+    "title": {
+      "de": "Bildtextur glatter",
+      "en": "Smoother image textures"
+    },
+    "body": {
+      "de": "Ein Bild auf einer großen oder runden Vase kommt nicht mehr in Stufen des Rasters heraus, und „Fein“ ist wirklich feiner als „Mittel“.",
+      "en": "A picture on a large or round vase no longer comes out in steps of the grid, and Fine is really finer than Medium."
+    }
   }
 ]
