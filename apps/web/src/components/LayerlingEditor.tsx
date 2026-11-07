@@ -13566,7 +13566,7 @@ export function LayerlingEditor({
           notDown: "That face does not look down; support_rib needs the lower face of a tilted part",
           tooFlat: "That face is almost level; a rib cannot stand under it",
           tooSteep: "That face is almost upright and needs no rib",
-          offBed: "That face does not reach down to the bed straight down its slope from the point; the part must stand tilted on one edge",
+          offBed: "That face does not reach down to the bed straight down its slope from the point, nor stop within 3 mm of it at a rounded or chamfered bottom edge; the part must stand tilted on one edge",
           tooLow: "The rib would be too low; give a greater height",
           collides: "The rib would run into the part; pick another point on the face or a lower height",
           partOffBed: "The part does not stand on the bed; drop it onto the workplane first so the bridges meet their layers",
@@ -13575,7 +13575,7 @@ export function LayerlingEditor({
         const sourceFingerprint = projectShapesFingerprint(currentShapes());
         const sourceProjectId = projectInfoRef.current.projectId;
         const read = readPerforableFace(await faceReadPositionsOffThread(target, geometryAbortRef.current?.signal), point, normal);
-        if (!read.ok) throw new Error(read.reason === "curved" ? "That face is curved; support_rib needs a flat lower face" : "support_rib found no flat face there");
+        if (!read.ok) throw new Error(read.reason === "curved" ? "That face is curved; support_rib needs a flat lower face - with a rounded bottom edge, the flat face above the rounding" : "support_rib found no flat face there");
         const face = supportRibFace(read.face);
         if (!face.ok) throw new Error(reasons[face.reason]);
         const built = buildSupportRib(await getManifoldRuntime(), face.face, settings, target);

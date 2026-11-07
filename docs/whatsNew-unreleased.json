@@ -48,5 +48,15 @@
       "de": "Ein kurzer Klick mit der mittleren Maustaste öffnet das Rastermenü direkt am Mauszeiger, im 3D-Editor und in der Skizze. Es bleibt offen, bis du eine Stufe wählst oder daneben klickst. Ziehen mit der mittleren Taste verschiebt die Ansicht wie bisher.",
       "en": "A short click with the middle mouse button opens the snap grid menu right at the pointer, in the 3D editor and in a sketch. It stays open until you pick a step or click beside it. Dragging with the middle button still moves the view."
     }
+  },
+  {
+    "title": {
+      "de": "Stützrippe an gerundeter Kante",
+      "en": "Support rib at a rounded edge"
+    },
+    "body": {
+      "de": "Rundest oder fast du die Kante, auf der ein schräges Teil steht, damit der Slicer die erste Schicht findet, lässt sich die Stützrippe jetzt trotzdem setzen. Klicke die ebene Fläche über der Rundung an: Sie darf bis zu 3 mm über der Platte enden, die Rippe reicht trotzdem bis hinunter.",
+      "en": "Round or chamfer the edge a tilted part stands on, so the slicer finds its first layer, and the support rib still goes on. Click the flat face above the rounding: it may end up to 3 mm above the plate, and the rib still reaches down to it."
+    }
   }
 ]
