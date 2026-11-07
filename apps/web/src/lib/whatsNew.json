@@ -1,5 +1,80 @@
 [
   {
+    "version": "1.150.0",
+    "items": [
+      {
+        "title": {
+          "de": "Schablonenstege",
+          "en": "Stencil bridges"
+        },
+        "body": {
+          "de": "Schneidest du Text durch eine Platte, fällt beim Druck die Mitte von o, a und b heraus. Das neue Werkzeug „Schablonenstege“ hält sie mit kleinen Stegen an der Platte. Breite, Anzahl und Höhe stellst du ein, niedrigere Stege sitzen unten, in der Mitte oder oben. Jeder Steg ist ein normaler Quader, den du verschieben oder löschen kannst.",
+          "en": "Cut text through a plate and the middle of o, a and b falls out of the print. The new Stencil bridges tool holds it to the plate with small bridges. You set their width, number and height, and lower bridges sit at the bottom, in the middle or at the top. Each bridge is an ordinary box you can move or delete."
+        }
+      },
+      {
+        "title": {
+          "de": "Pfeile für X und Y",
+          "en": "Arrows for X and Y"
+        },
+        "body": {
+          "de": "Neben dem schwarzen Hebepfeil sitzen jetzt ein roter und ein grüner Pfeil. Ziehst du daran, wandert die Auswahl nur entlang X oder nur entlang Y und folgt der Maus auf dieser Linie, auch wenn du flach auf die Platte schaust. Sie rastet an anderen Körpern ein wie beim Ziehen, und den Weg kannst du danach anklicken und genau eintippen.",
+          "en": "Beside the black lift arrow there are now a red and a green arrow. Pull one and the selection moves along X or along Y only, following the mouse along that line, even when you look at the plate from low down. It snaps to other bodies as a drag does, and afterwards you can click the distance and type it exactly."
+        }
+      },
+      {
+        "title": {
+          "de": "Bajonettdeckel für runde Körper",
+          "en": "Bayonet lid for round bodies"
+        },
+        "body": {
+          "de": "Das Deckelwerkzeug hat eine sechste Art: „Bajonett“. Ein runder Körper bekommt außen am oberen Rand Nasen und der Deckel passende L-Schlitze: aufsetzen, andrücken, ein Stück im Uhrzeigersinn drehen, und er rastet ein. Anzahl der Nasen, Randtiefe, Spiel und Rastung stellst du selbst ein.",
+          "en": "The Lid tool has a sixth kind, Bayonet. A round body gets lugs on the outside of its top and the cap matching L-shaped slots: set it on, push down and turn it a short way clockwise, and it clicks shut. You set the number of lugs, the rim depth, the gaps and the click yourself."
+        }
+      },
+      {
+        "title": {
+          "de": "Schwalbenschwanz beim Teilen",
+          "en": "Dovetail when splitting"
+        },
+        "body": {
+          "de": "Das Teilen hat als vierte Verbindungsart den Schwalbenschwanz: Eine sich verbreiternde Zunge an der einen Hälfte passt in eine Nut der anderen, die Hälften halten ohne Kleber zusammen und lassen sich quer zur Fuge nicht abziehen. Breite, Tiefe, Flankenwinkel, Richtung und Anzahl stellst du ein; das Spiel kommt aus deinem Passungstest.",
+          "en": "Split has the dovetail as a fourth kind of connector: a tongue that widens away from the cut on one half fits a groove in the other, so the halves hold together without glue and cannot be pulled apart across the joint. You set width, depth, flank angle, direction and number; the clearance comes from your fit test."
+        }
+      },
+      {
+        "title": {
+          "de": "Rastermenü per Mittelklick",
+          "en": "Snap menu with a middle click"
+        },
+        "body": {
+          "de": "Ein kurzer Klick mit der mittleren Maustaste öffnet das Rastermenü direkt am Mauszeiger, im 3D-Editor und in der Skizze. Es bleibt offen, bis du eine Stufe wählst oder daneben klickst. Ziehen mit der mittleren Taste verschiebt die Ansicht wie bisher.",
+          "en": "A short click with the middle mouse button opens the snap grid menu right at the pointer, in the 3D editor and in a sketch. It stays open until you pick a step or click beside it. Dragging with the middle button still moves the view."
+        }
+      },
+      {
+        "title": {
+          "de": "Stützrippe an gerundeter Kante",
+          "en": "Support rib at a rounded edge"
+        },
+        "body": {
+          "de": "Rundest oder fast du die Kante, auf der ein schräges Teil steht, damit der Slicer die erste Schicht findet, lässt sich die Stützrippe jetzt trotzdem setzen. Klicke die ebene Fläche über der Rundung an: Sie darf bis zu 3 mm über der Platte enden, die Rippe reicht trotzdem bis hinunter.",
+          "en": "Round or chamfer the edge a tilted part stands on, so the slicer finds its first layer, and the support rib still goes on. Click the flat face above the rounding: it may end up to 3 mm above the plate, and the rib still reaches down to it."
+        }
+      },
+      {
+        "title": {
+          "de": "Richtige Zahl nach dem Löschen",
+          "en": "The right count after deleting"
+        },
+        "body": {
+          "de": "Löschst du einen Entwurf im Serverspeicher, zeigt die Zahl über den Entwürfen jetzt gleich die richtige Anzahl. Bisher stand dort bis zum Neuladen der Seite noch der gelöschte Entwurf mit.",
+          "en": "Delete a design in the server store and the count above the designs is right at once. Until now it still counted the deleted design until the page was reloaded."
+        }
+      }
+    ]
+  },
+  {
     "version": "1.149.0",
     "items": [
       {
