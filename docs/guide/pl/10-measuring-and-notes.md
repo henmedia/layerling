@@ -34,6 +34,7 @@ Kątownik leży na płaszczyźnie roboczej. Jeśli ta leży na boku bryły, kąt
 - **Przeciąganie uchwytu** przesuwa kątownik.
 - **Krótkie kliknięcie uchwytu** obraca go o 90°.
 - **×** obok go usuwa.
+- **Przeciągnięcie kółka na końcu ramienia** wydłuża lub skraca to ramię, o pełne milimetry. Najniższy przycisk pod uchwytem, {{ui:ruler.armsToPlate}}, ustawia oba ramiona na szerokość i głębokość stołu drukarki wybranej w ustawieniach. Kątownik zapamiętuje długość ramion razem z projektem, a nowo postawiony ją przejmuje.
 - **Mały przycisk na lewo od uchwytu** przełącza, od czego się mierzy: od zewnętrznej strony bryły (punkt końcowy, ikona z liniami) albo od jej środka (punkt środkowy, celownik). Mały przełącznik tego samego rodzaju stoi przy każdej zielonej liczbie i ustawia tylko tę jedną liczbę: dla stojącego walca środek w obu ramionach i spód w wysokości, dla leżącego środek w poprzek i koniec wzdłuż. Gdy wszystkie trzy znów się zgadzają, przycisk przy uchwycie pokazuje wspólny tryb.
 
 Jeśli przy jednym z ramion stoją bryły, kątownik automatycznie pokazuje ich wymiary, zaznaczone czy nie: bryły wewnątrz kątownika, obok ramienia albo w poprzek niego. Bryła poza nim, za narożnikiem albo obok ramienia od zewnątrz, nie dostaje wymiarów. Działa to tylko na płycie bazowej, a nie na boku bryły. Przycisk ze strzałką pod uchwytem kątownika to wyłącza, więc wymiary pokazują tylko zaznaczone bryły; zapisuje się razem z projektem.

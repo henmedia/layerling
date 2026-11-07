@@ -34,6 +34,7 @@ Pro měření v pravém úhlu použijte {{ui:camera.cornerRulerTool}} v liště 
 - **Tažením úchytu** měníte polohu.
 - **Krátkým kliknutím na úchyt** otočíte úhelník o 90°.
 - **×** vedle úhelníku jej odstraní.
+- **Tažením malého kroužku na konci ramene** rameno prodloužíte nebo zkrátíte, po celých milimetrech. Nejspodnější tlačítko pod úchytem, {{ui:ruler.armsToPlate}}, nastaví obě ramena na šířku a hloubku tiskové podložky tiskárny zvolené v nastavení. Úhelník si délky ramen pamatuje s návrhem a nově umístěný je převezme.
 - **Malé tlačítko vlevo od úchytu** přepíná měření od vnějšího okraje tělesa, se symbolem čar, nebo od jeho středu, se zaměřovacím křížem. Stejný malý přepínač je i u každého zeleného čísla a nastavuje pouze danou kótu. U stojícího válce tak můžete měřit v obou ramenech ke středu a ve výšce ke spodní straně, u ležícího napříč ke středu a podélně ke konci. Pokud se všechna tři nastavení shodují, tlačítko u úchytu ukáže společný režim.
 
 U těles umístěných u ramen úhelník automaticky ukazuje rozměry. To funguje pouze na základní podložce, nikoli na boční stěně. Tlačítko se šipkou pod úchytem úhelníku to vypne, takže míry ukazují jen vybraná tělesa; ukládá se s projektem.
