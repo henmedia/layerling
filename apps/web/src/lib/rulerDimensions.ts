@@ -300,6 +300,33 @@ export function cornerRulerFrameForWorkplane(workplane: { xAxis: CornerRulerVect
   return rotateCornerRulerFrame({ xAxis: workplane.xAxis, zAxis: workplane.zAxis, normal: workplane.normal });
 }
 
+/** An arm dragged at its end stays this long at least and this long at most, in whole millimetres (Discussion #1469). */
+export const CORNER_RULER_MIN_ARM = 10;
+export const CORNER_RULER_MAX_ARM = 5000;
+
+/**
+ * How long an arm becomes when its end is dragged to `point`: the distance from the corner along that arm, rounded
+ * to whole millimetres and kept between CORNER_RULER_MIN_ARM and CORNER_RULER_MAX_ARM. A point behind the corner
+ * leaves the shortest arm (Discussion #1469).
+ */
+export function cornerRulerArmLength(ruler: { corner: CornerRulerVector; frame: CornerRulerFrame }, arm: "x" | "z", point: CornerRulerVector) {
+  const axis = toVector(arm === "x" ? ruler.frame.xAxis : ruler.frame.zAxis).normalize();
+  const along = toVector(point).sub(toVector(ruler.corner)).dot(axis);
+  return Math.min(CORNER_RULER_MAX_ARM, Math.max(CORNER_RULER_MIN_ARM, Math.round(along)));
+}
+
+/**
+ * Both arms as long as the build plate: the arm that runs more along the plate's width (x) gets the width, the other
+ * its depth, so a square turned a quarter still spans the plate (Discussion #1469).
+ */
+export function cornerRulerPlateArms(frame: CornerRulerFrame, width: number, depth: number) {
+  const alongWidth = (axis: CornerRulerVector) => Math.abs(axis.x) >= Math.abs(axis.z);
+  return {
+    armLengthX: Math.round(alongWidth(frame.xAxis) ? width : depth),
+    armLengthZ: Math.round(alongWidth(frame.zAxis) ? width : depth),
+  };
+}
+
 /**
  * The turn about the vertical of a frame that lies flat on the plate the right
  * way up, in degrees; null for any other frame. The measurements of shapes at

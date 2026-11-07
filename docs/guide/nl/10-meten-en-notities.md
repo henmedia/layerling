@@ -34,6 +34,7 @@ De winkelhaak ligt op het werkvlak. Ligt dat op de zijkant van een lichaam, dan 
 - **De greep slepen** verplaatst hem.
 - **Een korte klik op de greep** draait hem 90°.
 - **Het ×** ernaast verwijdert hem.
+- **Sleep aan het cirkeltje aan het einde van een arm** om die arm langer of korter te maken, in hele millimeters. De onderste knop onder de greep, {{ui:ruler.armsToPlate}}, maakt beide armen zo lang als het printbed van de printer in de instellingen breed en diep is. De winkelhaak bewaart de lengte van zijn armen bij het ontwerp, en een opnieuw geplaatste neemt die over.
 - **Het knopje links van de greep** wisselt waarvandaan gemeten wordt: de buitenkant van een lichaam (eindpunt, een icoon met lijnen) of het midden ervan (middelpunt, een vizierkruis). Naast elk groen getal zit zo'n klein schakelaartje dat alleen dat getal omzet: bij een staande cilinder het midden in de twee armen en de onderkant in de hoogte, bij een liggende het midden dwars en een uiteinde in de lengte. Komen alle drie weer overeen, dan toont het knopje bij de greep de gemeenschappelijke stand.
 
 Staan er lichamen bij een van de armen, dan toont de winkelhaak automatisch hun afmetingen. Dat werkt alleen op de bodemplaat, niet op de zijkant van een lichaam. De knop met de pijl onder de greep van de winkelhaak schakelt dat uit, zodat alleen de geselecteerde lichamen hun afmetingen tonen; hij wordt met het ontwerp opgeslagen.

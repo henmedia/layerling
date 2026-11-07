@@ -8367,6 +8367,21 @@ html[data-theme="dark"] .touch-multi-select {
   filter: drop-shadow(0 0 4px rgba(129, 67, 0, 0.4));
 }
 
+/* An arm's end, dragged to make the arm longer or shorter (Discussion #1469): smaller than the corner's handle. */
+.corner-ruler-end-handle {
+  fill: #ffffff;
+  stroke: #b66108;
+  stroke-width: 2;
+  vector-effect: non-scaling-stroke;
+  pointer-events: all;
+  cursor: ew-resize;
+}
+
+.corner-ruler-end-handle:active {
+  fill: #f6f1e8;
+  filter: drop-shadow(0 0 4px rgba(129, 67, 0, 0.4));
+}
+
 .corner-ruler-tick-label {
   position: absolute;
   z-index: 2;
@@ -8475,7 +8490,8 @@ html[data-theme="dark"] .touch-multi-select {
 
 /* The ruler's lines stay in view over bodies (the eye is open) or hide behind them. */
 .corner-ruler-occlude-toggle,
-.corner-ruler-selected-toggle {
+.corner-ruler-selected-toggle,
+.corner-ruler-plate-toggle {
   color: #6b5b46;
   background: rgba(255, 255, 255, 0.96);
   border-color: rgba(182, 97, 8, 0.45);

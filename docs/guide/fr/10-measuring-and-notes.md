@@ -34,6 +34,7 @@ Le carré d'encadrement repose sur le plan de travail. Si cela se trouve sur le 
 - **Faire glisser la poignée** la déplace.
 - **Un clic court sur la poignée** la fait tourner de 90°.
 - **Le ×** à côté le supprime.
+- **Faire glisser le petit cercle au bout d'un bras** allonge ou raccourcit ce bras, au millimètre entier. Le bouton le plus bas sous la poignée, {{ui:ruler.armsToPlate}}, rend les deux bras aussi longs que le plateau de l'imprimante choisie dans les réglages est large et profond. L'équerre garde la longueur de ses bras avec le projet, et une équerre posée à nouveau la reprend.
 - **Le petit bouton à gauche de la poignée** change ce qui est mesuré à partir de : l'extérieur d'un corps (point final, une icône avec des lignes) ou son milieu (point médian, un réticule).
 
 Si des corps se tiennent près de l'un des bras, le carré d'encadrement affiche automatiquement leurs dimensions. Cela fonctionne uniquement sur la plaque de base, pas sur le côté d'une carrosserie. Le bouton à la flèche sous la poignée de l'équerre le désactive, de sorte que seuls les corps sélectionnés montrent leurs dimensions ; il est enregistré avec le design.
