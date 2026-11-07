@@ -46,6 +46,8 @@ Ziehst du eine Form über die Arbeitsebene, rastet sie an anderen Formen ein: Ih
 
 Hältst du beim Ziehen [[Umschalt]] gedrückt, bleibt die Bewegung auf einer Achse: Die Form folgt der Richtung, X oder Y, in die du weiter gezogen hast, und lässt die andere unberührt. Drück [[Umschalt]] am besten erst, wenn du schon ziehst; auf einer Form, die noch nicht ausgewählt ist, nimmt ein Klick mit [[Umschalt]] sie nur zur Auswahl dazu.
 
+Oder du ziehst am roten oder grünen Pfeil oben auf der Auswahl: Er verschiebt nur entlang X oder nur entlang Y, und die Form folgt der Maus auf dieser Linie, auch in einer flachen Ansicht, in der freies Ziehen weit davonläuft. Die Pfeile rasten ein wie beim Ziehen, [[Alt]] lässt los, und danach klickst du den gefahrenen Weg an und tippst den genauen Wert ein.
+
 Ist [[Alt]] schon gedrückt, wenn das Ziehen beginnt, ziehst du eine Kopie, wie in Tinkercad: Die Form bleibt, wo sie ist, und die Kopie landet dort, wo du loslässt. Drückst du [[Alt]] erst unterwegs, setzt das Fangen aus und die Form folgt nur dem Raster. Auch beim Ziehen einer Kopie fängt sie erst, wenn du [[Alt]] unterwegs loslässt. Ganz abschalten lässt sich das Fangen im Rastermenü unten rechts ({{ui:inspector.objectSnap}}) oder in den Einstellungen. Bisher fängt nur das Verschieben auf der normalen Arbeitsebene, nicht das Anheben und nicht die Größenänderung.
 
 ## Ausrichten

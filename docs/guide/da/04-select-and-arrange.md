@@ -48,6 +48,8 @@ Når du trækker en form hen over arbejdsplanet, snapper den til andre former: d
 
 Hold [[Shift]] mens du trækker for at holde flytningen på én akse: formen følger den retning, X eller Y, du har trukket længst i, og lader den anden være. Bedst at trykke [[Shift]] når du allerede trækker; på en form der ikke er valgt endnu, tilføjer et klik med [[Shift]] den kun til markeringen.
 
+Eller træk i den røde eller grønne pil oven på markeringen: den flytter kun langs X eller kun langs Y, og formen følger musen langs den linje, også i en lav visning, hvor frit træk løber langt væk. Pilene snapper som ved træk, [[Alt]] slipper, og bagefter kan du klikke på den tilbagelagte afstand og skrive den nøjagtige værdi.
+
 Med [[Alt]] allerede holdt når trækket begynder, trækker du en kopi, som i Tinkercad: formen bliver hvor den er, og kopien lander hvor du slap. At trykke [[Alt]] først på vejen pauserer snap; formen følger så kun gitteret. En kopi snapper også først når du slipper [[Alt]] på vejen. For at slå snap helt fra, brug gittermenuen nederst til højre ({{ui:inspector.objectSnap}}) eller indstillingerne. Indtil videre snapper kun flytning på det almindelige arbejdsplan, ikke løft og ikke ændring af størrelse.
 
 ## Justering

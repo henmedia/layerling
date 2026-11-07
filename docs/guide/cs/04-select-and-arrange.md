@@ -46,6 +46,8 @@ Při tažení po pracovní rovině se levý, pravý, přední a zadní okraj i s
 
 [[Shift]] během tažení omezí posun na osu X nebo Y podle toho, v kterém směru jste táhli více. Druhá souřadnice se zachová. Klávesu stiskněte nejlépe až po zahájení pohybu, protože Shift+klik na nevybraný tvar jej pouze přidá do výběru.
 
+Nebo táhněte za červenou či zelenou šipku nahoře na výběru: posouvá jen ve směru X nebo jen ve směru Y a tvar sleduje myš po této přímce i v pohledu z nízkého úhlu, kde volné tažení uteče daleko. Šipky se přichytávají jako při tažení, [[Alt]] přichytávání vypne a ujetou vzdálenost pak můžete kliknout a zadat přesně.
+
 Přidržíte-li [[Alt]] už před zahájením tažení, přesouváte kopii jako v Tinkercadu. Originál zůstane a kopie dopadne na místo uvolnění. Stisknutí [[Alt]] až během tažení pozastaví přichytávání k objektům, zůstane jen krok mřížky. I kopie se začne přichytávat po uvolnění [[Alt]] během pohybu. Trvale přichytávání vypnete přes {{ui:inspector.objectSnap}} v nabídce mřížky vpravo dole nebo v nastavení. Zatím se týká jen posouvání po běžné pracovní rovině, nikoli zvedání a změny rozměrů.
 
 ## Zarovnání

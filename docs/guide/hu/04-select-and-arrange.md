@@ -46,6 +46,8 @@ Amikor egy alakzatot a munkasíkon húzol, más alakzatokhoz illeszkedik: a bal,
 
 Húzás közben tartsd nyomva a [[Shift]] billentyűt, hogy a mozgás egy tengelyen maradjon: az alakzat abba az irányba, X-be vagy Y-ba megy, amerre jobban elhúztad, a másikat pedig békén hagyja. A [[Shift]] billentyűt legjobb akkor megnyomni, amikor már húzod; egy még ki nem jelölt alakzaton a nyomva tartott [[Shift]] billentyűvel végzett kattintás csak a kijelöléshez adja hozzá.
 
+Vagy húzd a kijelölés tetején lévő piros vagy zöld nyilat: csak X vagy csak Y mentén mozgat, és az alakzat ezen a vonalon követi az egeret alacsony nézetben is, ahol a szabad húzás messzire elszalad. A nyilak úgy illeszkednek, mint húzáskor, az [[Alt]] ezt kikapcsolja, a megtett távolságra pedig utána rákattinthatsz, és beírhatod a pontos értéket.
+
 Ha az [[Alt]] már a húzás kezdetekor le van nyomva, egy másolatot húzol, mint a Tinkercadben: az alakzat a helyén marad, a másolat pedig oda kerül, ahol elengeded. Ha az [[Alt]] billentyűt csak húzás közben nyomod meg, az szünetelteti az illesztést; az alakzat ilyenkor csak a rácsot követi. A másolat is csak akkor illeszkedik, ha húzás közben elengeded az [[Alt]] billentyűt. Az illesztés végleges kikapcsolásához használd a jobb alsó rácsmenüt ({{ui:inspector.objectSnap}}) vagy a beállításokat. Egyelőre csak a normál munkasíkon való mozgatás illeszkedik, az emelés és az átméretezés nem.
 
 ## Igazítás

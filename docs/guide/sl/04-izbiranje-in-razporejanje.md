@@ -46,6 +46,8 @@ Obliko lahko povlečeš čez rob plošče in jo pustiš tam, približno za širi
 
 Če pri vlečenju držiš [[Shift]], ostane gibanje na eni osi: oblika sledi smeri, X ali Y, v katero si vlekel dalje, drugo pa pusti nedotaknjeno. Najbolje je, da [[Shift]] pritisneš šele, ko že vlečeš; na obliki, ki še ni izbrana, klik s [[Shift]] samo doda k izboru.
 
+Ali povleci rdečo ali zeleno puščico na vrhu izbire: premika samo vzdolž X ali samo vzdolž Y, oblika pa sledi miški po tej črti tudi v nizkem pogledu, kjer prosto vlečenje uide daleč. Puščici se pripenjata kot pri vlečenju, [[Alt]] to izklopi, prevoženo razdaljo pa lahko potem klikneš in vpišeš natančno.
+
 Če je [[Alt]] že pritisnjen, ko se vlečenje začne, vlečeš kopijo, kot v Tinkercadu: oblika ostane, kjer je, kopija pa pristane tam, kjer spustiš. Če [[Alt]] pritisneš šele med potjo, se zaskakovanje prekine in oblika sledi samo mreži. Tudi pri vlečenju kopije se zaskoči šele, ko [[Alt]] med potjo spustiš. Zaskakovanje lahko povsem izklopiš v meniju pripenjanja spodaj desno ({{ui:inspector.objectSnap}}) ali v nastavitvah. Zaenkrat se zaskoči samo premikanje na običajni delovni ravnini, ne dviganje in ne sprememba velikosti.
 
 ## Poravnava

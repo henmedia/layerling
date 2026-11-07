@@ -46,6 +46,8 @@ Lorsque vous faites glisser une forme sur le plan de travail, elle s'aligne sur 
 
 Maintenez [[Shift]] tout en faisant glisser pour conserver le déplacement sur un axe : la forme suit la direction, X ou Y, dans laquelle vous avez tiré plus loin et laisse l'autre seule. Il est préférable d'appuyer sur [[Shift]] une fois que vous faites déjà glisser ; sur une forme qui n'est pas encore sélectionnée, un clic avec [[Shift]] ne fait que l'ajouter à la sélection.
 
+Ou tirez la flèche rouge ou verte en haut de la sélection : elle déplace uniquement le long de X ou de Y, et la forme suit la souris sur cette ligne même dans une vue basse, où un glisser libre part loin. Les flèches s'alignent comme un glisser, [[Alt]] les libère, et ensuite vous pouvez cliquer sur la distance parcourue et saisir la valeur exacte.
+
 Avec [[Alt]] déjà maintenu lorsque le glisser commence, vous faites glisser une copie, comme dans Tinkercad : la forme reste là où elle est et la copie atterrit là où vous la lâchez. Appuyer sur [[Alt]] uniquement en cours de route interrompt la capture ; la forme suit alors uniquement la grille. Une copie également ne se prend qu'une fois que vous lâchez [[Alt]] en cours de route. Pour désactiver définitivement l'accrochage, utilisez le menu grille en bas à droite ({{ui:inspector.objectSnap}}) ou les paramètres. Pour l'instant, déplacez-vous uniquement sur les accrochages normaux du plan de travail, sans soulever ni redimensionner.
 
 ## Alignement

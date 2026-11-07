@@ -46,6 +46,8 @@ Gdy przeciągasz kształt po płaszczyźnie roboczej, przyciąga się on do inny
 
 Przytrzymaj [[Shift]] podczas przeciągania, aby ruch został na jednej osi: kształt podąża w tym kierunku, X albo Y, w którym przeciągnąłeś dalej, a drugiego nie rusza. Najlepiej naciśnij [[Shift]] dopiero w trakcie przeciągania, bo na kształcie, który nie jest jeszcze zaznaczony, kliknięcie z [[Shift]] tylko dodaje go do zaznaczenia.
 
+Albo pociągnij czerwoną lub zieloną strzałkę na górze zaznaczenia: przesuwa tylko wzdłuż X albo tylko wzdłuż Y, a kształt podąża za myszą po tej linii także w niskim widoku, gdzie swobodne przeciąganie ucieka daleko. Strzałki przyciągają jak przy przeciąganiu, [[Alt]] to wyłącza, a przebytą odległość możesz potem kliknąć i wpisać dokładnie.
+
 Jeśli [[Alt]] jest wciśnięty już na początku przeciągania, przeciągasz kopię, jak w Tinkercadzie: kształt zostaje na miejscu, a kopia ląduje tam, gdzie ją puścisz. Naciśnięcie [[Alt]] dopiero w trakcie wstrzymuje przyciąganie i kształt podąża wtedy tylko za siatką. Także kopia przyciąga się dopiero wtedy, gdy w trakcie puścisz [[Alt]]. Aby wyłączyć przyciąganie na stałe, użyj menu siatki w prawym dolnym rogu ({{ui:inspector.objectSnap}}) albo ustawień. Na razie przyciąga tylko przesuwanie na zwykłej płaszczyźnie roboczej, a nie podnoszenie i nie zmiana rozmiaru.
 
 ## Wyrównywanie

@@ -46,6 +46,8 @@ Cuando arrastras una forma por el plano de trabajo, se ajusta a otras formas: su
 
 Mantén pulsado [[Mayús]] mientras arrastras para que el movimiento siga un solo eje: la forma sigue la dirección, X o Y, en la que más hayas arrastrado y no se mueve en la otra. Lo mejor es pulsar [[Mayús]] cuando ya estás arrastrando; sobre una forma que aún no está seleccionada, un clic con [[Mayús]] solo la añade a la selección.
 
+O tira de la flecha roja o verde de arriba de la selección: mueve solo a lo largo de X o de Y, y la forma sigue al ratón por esa línea incluso en una vista baja, donde un arrastre libre se va lejos. Las flechas se ajustan como al arrastrar, [[Alt]] las suelta, y después puedes hacer clic en la distancia recorrida y escribir el valor exacto.
+
 Si ya tienes pulsado [[Alt]] al empezar a arrastrar, arrastras una copia, como en Tinkercad: la forma se queda donde está y la copia cae donde sueltes. Si pulsas [[Alt]] cuando ya vas arrastrando, el ajuste se detiene y la forma solo sigue la cuadrícula. Con una copia pasa lo mismo: solo se ajusta cuando sueltas [[Alt]] durante el arrastre. Para desactivar el ajuste del todo, usa el menú de la cuadrícula de abajo a la derecha ({{ui:inspector.objectSnap}}) o la ventana de ajustes. De momento solo se ajusta el movimiento sobre el plano de trabajo normal, no al elevar ni al cambiar el tamaño.
 
 ## Alinear

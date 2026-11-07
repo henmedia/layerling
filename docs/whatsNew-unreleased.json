@@ -1,6 +1,16 @@
 [
   {
     "title": {
+      "de": "Pfeile für X und Y",
+      "en": "Arrows for X and Y"
+    },
+    "body": {
+      "de": "Neben dem schwarzen Hebepfeil sitzen jetzt ein roter und ein grüner Pfeil. Ziehst du daran, wandert die Auswahl nur entlang X oder nur entlang Y und folgt der Maus auf dieser Linie, auch wenn du flach auf die Platte schaust. Sie rastet an anderen Körpern ein wie beim Ziehen, und den Weg kannst du danach anklicken und genau eintippen.",
+      "en": "Beside the black lift arrow there are now a red and a green arrow. Pull one and the selection moves along X or along Y only, following the mouse along that line, even when you look at the plate from low down. It snaps to other bodies as a drag does, and afterwards you can click the distance and type it exactly."
+    }
+  },
+  {
+    "title": {
       "de": "Bajonettdeckel für runde Körper",
       "en": "Bayonet lid for round bodies"
     },

@@ -46,6 +46,8 @@ Quando trascini una forma sul piano di lavoro, questa si aggancia alle altre for
 
 Tieni premuto [[Shift]] mentre trascini per vincolare lo spostamento a un asse: la forma segue la direzione in cui ti sei spostato di più, X oppure Y, e non si muove lungo l’altro asse. È preferibile premere [[Shift]] dopo aver iniziato a trascinare; se la forma non è ancora selezionata, un clic con [[Shift]] la aggiunge soltanto alla selezione.
 
+Oppure tira la freccia rossa o verde in cima alla selezione: sposta solo lungo X o solo lungo Y, e la forma segue il mouse su quella linea anche in una vista bassa, dove un trascinamento libero scappa lontano. Le frecce si agganciano come quando trascini, [[Alt]] le libera, e dopo puoi fare clic sulla distanza percorsa e digitare il valore esatto.
+
 Se tieni già premuto [[Alt]] quando inizi a trascinare, sposti una copia, come in Tinkercad: la forma originale resta dov’è e la copia si posiziona quando rilasci il pulsante. Premendo [[Alt]] solo durante il trascinamento, sospendi l’aggancio e la forma segue soltanto la griglia. Anche la copia si aggancia solo dopo aver rilasciato [[Alt]]. Per disattivare definitivamente l’aggancio, usa il menu della griglia in basso a destra ({{ui:inspector.objectSnap}}) o le impostazioni. Per ora l’aggancio funziona solo quando sposti una forma sul piano di lavoro normale, non quando la sollevi o la ridimensioni.
 
 ## Allineare

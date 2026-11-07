@@ -46,6 +46,8 @@ Als je een vorm over het werkvlak sleept, lijnt hij uit op andere vormen: zijn l
 
 Houd [[Shift]] ingedrukt tijdens het slepen om de verplaatsing op één as te houden: de vorm volgt de richting, X of Y, waarin je het verst hebt gesleept, en laat de andere met rust. Druk [[Shift]] het best pas in als je al aan het slepen bent; bij een vorm die nog niet geselecteerd is, voegt een klik met [[Shift]] hem alleen aan de selectie toe.
 
+Of trek aan de rode of groene pijl boven op de selectie: die verplaatst alleen langs X of alleen langs Y, en de vorm volgt de muis over die lijn, ook in een lage weergave, waar vrij slepen ver wegloopt. De pijlen lijnen uit zoals bij slepen, [[Alt]] laat los, en daarna klik je op de afgelegde afstand en typ je de exacte waarde.
+
 Heb je [[Alt]] al ingedrukt als het slepen begint, dan sleep je een kopie, zoals in Tinkercad: de vorm blijft waar hij is en de kopie komt waar je loslaat. Druk je [[Alt]] pas onderweg in, dan pauzeert het uitlijnen; de vorm volgt dan alleen het raster. Ook een kopie lijnt pas uit als je [[Alt]] onderweg loslaat. Om het uitlijnen voorgoed uit te zetten, gebruik je het rastermenu rechtsonder ({{ui:inspector.objectSnap}}) of de instellingen. Voorlopig lijnt alleen verplaatsen op het normale werkvlak uit, niet optillen en niet van grootte veranderen.
 
 ## Uitlijnen
