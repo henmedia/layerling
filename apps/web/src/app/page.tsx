@@ -1881,6 +1881,9 @@ export default function Home() {
         throw new Error(payload.error ?? "Could not delete shared project");
       }
       setSharedProjects((current) => current.filter((project) => project.fileName !== sharedProject.fileName));
+      // The tab counts the whole server store from the listing; without this it kept the deleted design until the
+      // next listing, a reload (Jürgen Keller, 07.11.2026: "Entwürfe (2)" over one design).
+      setSharedTotal((total) => (total === null ? null : Math.max(0, total - 1)));
       // The working copy in this browser is only a mirror of the server file, and the file was
       // deleted on purpose: the copy goes too, or it would turn up again among the browser designs
       // without a thumbnail (#265).

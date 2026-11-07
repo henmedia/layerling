@@ -58,5 +58,15 @@
       "de": "Rundest oder fast du die Kante, auf der ein schräges Teil steht, damit der Slicer die erste Schicht findet, lässt sich die Stützrippe jetzt trotzdem setzen. Klicke die ebene Fläche über der Rundung an: Sie darf bis zu 3 mm über der Platte enden, die Rippe reicht trotzdem bis hinunter.",
       "en": "Round or chamfer the edge a tilted part stands on, so the slicer finds its first layer, and the support rib still goes on. Click the flat face above the rounding: it may end up to 3 mm above the plate, and the rib still reaches down to it."
     }
+  },
+  {
+    "title": {
+      "de": "Richtige Zahl nach dem Löschen",
+      "en": "The right count after deleting"
+    },
+    "body": {
+      "de": "Löschst du einen Entwurf im Serverspeicher, zeigt die Zahl über den Entwürfen jetzt gleich die richtige Anzahl. Bisher stand dort bis zum Neuladen der Seite noch der gelöschte Entwurf mit.",
+      "en": "Delete a design in the server store and the count above the designs is right at once. Until now it still counted the deleted design until the page was reloaded."
+    }
   }
 ]
