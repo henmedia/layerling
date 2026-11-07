@@ -10,6 +10,7 @@ import {
   renderPrintAll,
   readChapters,
   readShortcutGroups,
+  readToolIcons,
   renderBlocks,
   renderInline,
   slugify,
@@ -31,6 +32,7 @@ async function contextFor(language: (typeof LANGUAGES)[number]) {
     language,
     messages: await loadMessages(language),
     values: await loadValues(),
+    toolIcons: await readToolIcons(),
     imageSize: () => null,
     references: { uiKeys: new Set<string>(), shots: new Set<string>(), chapters: new Set<string>() },
   };
@@ -100,6 +102,53 @@ describe("guide markdown", () => {
     expect(html).toContain('<aside class="tip">');
     expect(html).toContain('src="/guide/img/some-picture.webp"');
     expect(context.references.shots.has("some-picture")).toBe(true);
+  });
+
+  it("builds a card: the tool's picture, its name without quotes, its key, one step to a line (#1322)", async () => {
+    const context = await contextFor("en");
+    const { html } = renderBlocks(
+      [
+        "Some text right above",
+        "::: icon=line {{ui:sketch.line}} | [[1]]",
+        "Click points one after another.",
+        "Hold [[Shift]] to snap,",
+        "  in 15° steps.",
+        "",
+        "=> The length shows at the pointer.",
+        "> A tip.",
+        ":::",
+        "",
+        "::: Closing a line",
+        "- Click the first point again.",
+        ":::",
+      ].join("\n"),
+      context,
+    );
+    expect(html).toContain("<p>Some text right above</p>");
+    expect(html).toContain('<img src="/assets/editor/sketch-tool-line.png"');
+    expect(html).toContain('<span class="card-title"><strong class="ui">Line</strong></span>');
+    expect(html).toContain('<span class="card-keys"><kbd>1</kbd></span>');
+    expect(html).toContain('<li class="step">Hold <kbd>Shift</kbd> to snap, in 15° steps.</li>');
+    expect(html).toContain('<li class="result">The length shows at the pointer.</li>');
+    expect(html).toContain('<li class="tip">A tip.</li>');
+    expect(html).toContain('<div class="tool-card no-icon"><div class="card-head"><span class="card-title">Closing a line</span></div><ul class="card-steps"><li class="step">Click the first point again.</li></ul></div>');
+    // A name in a sentence keeps its quotation marks.
+    expect(renderInline("{{ui:sketch.line}}", context)).toContain("“Line”");
+  });
+
+  it("stops on a card that is not closed, has no title, is empty or names a picture the toolbar does not have", async () => {
+    const context = await contextFor("en");
+    expect(() => renderBlocks("::: Open card\nA step.", context)).toThrow(/no closing/);
+    expect(() => renderBlocks("A step.\n:::", context)).toThrow(/closes no card/);
+    expect(() => renderBlocks("::: Empty\n\n:::", context)).toThrow(/empty/);
+    expect(() => renderBlocks("::: icon=nothing Title\nA step.\n:::", context)).toThrow(/Unknown tool picture/);
+    expect(() => renderBlocks("::: One\n::: Two\n:::", context)).toThrow(/inside a card/);
+  });
+
+  it("reads the toolbar's pictures, each one there", async () => {
+    const icons = await readToolIcons();
+    expect(icons.line).toBe("sketch-tool-line.png");
+    for (const file of Object.values(icons)) expect(existsSync(join(root, "apps", "web", "public", "assets", "editor", file as string)), file as string).toBe(true);
   });
 
   it("reads front matter, with or without quotes", () => {

@@ -120,6 +120,8 @@ Gitteret viser pladens størrelse. Nederst til højre er **snap-trinnet**: flytn
 
 Tandhjulet i titellinjen ({{ui:editor.workspaceSettings}}) åbner indstillingerne. Til venstre er fem områder: {{ui:workspace.appearance}}, {{ui:workspace.measurement}}, {{ui:workspace.workplane}}, {{ui:workspace.shapeDefaults}} og {{ui:workspace.history}}. En ændring gælder med det samme. {{ui:workspace.makeDefault}} nederst gemmer de aktuelle indstillinger som standard, så et nyt design starter med dem. En fil du åbner bringer sine egne indstillinger med; {{ui:workspace.useMyDefault}} ved siden af den lægger dine gemte farver, dit gitter og resten på det åbne design, mens enhederne bliver som de er. Står der en printer i din standard, kommer den med sin pladestørrelse; ellers beholder designet sin plade og sin printer. {{ui:workspace.close}} øverst til højre lukker vinduet. Det her gennemgår indstillingerne én for én.
 
+{{ui:workspace.exportSettings}} gemmer vinduets indstillinger i en fil (layerling-settings-<dato>.json): farver, gitter, skygger, kamera og standardværdier for former sammen med tema, værktøjslinjens størrelse, visningskubens hjørne, formfarver og hver printers slør. På en anden computer eller efter datatab i browseren læser {{ui:workspace.importSettings}} filen igen: den bliver din standard for nye designs og lægges på det åbne design som {{ui:workspace.useMyDefault}}. Dine egne taster fra tastaturgenvejene kommer også med.
+
 ### Udseende: tema, værktøjsbjælke og visningskube
 
 {{ui:workspace.theme}} sætter farveskemaet for hele programmet: {{ui:workspace.themeSystem}} følger din computer, de andre er {{ui:workspace.themeLight}}, {{ui:workspace.themeDark}} og {{ui:workspace.themeGraphite}}. Du kan også ændre det øverst til højre i editoren.

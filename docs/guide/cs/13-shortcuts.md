@@ -25,6 +25,21 @@ Vyhledávací pole má i tato příručka, nahoře na každé stránce. Zadejte 
 - Názvem tělesa vyhledáte a vyberete příslušný objekt v projektu. Pomůže to ve složitém modelu. Objekty se nabízejí až po zadání textu.
 - Vyhledávání funguje i v režimu náčrtu a nabízí jeho nástroje.
 
+## Vlastní klávesy
+
+Každý příkaz z vyhledávání příkazů můžete dát na vlastní klávesu: nástroj, který používáte pořád, tvar, {{ui:editor.tool.centerOnWorkplane}} nebo {{ui:palette.openShapes}}.
+
+1. Otevřete {{ui:editor.keyboardShortcuts}} a nahoře v okně pod {{ui:customKeys.title}} klikněte na {{ui:customKeys.add}}.
+2. Napište pár písmen příkazu a klikněte na něj, nebo stiskněte [[Enter]] pro první.
+3. Stiskněte požadovanou klávesu, samotnou nebo s [[Ctrl]], [[Alt]] či [[Shift]]. Příkaz mohou nést písmena, číslice a F1 až F12.
+
+Klávesa, kterou už používá editor, kterou si nechává prohlížeč (třeba [[Ctrl]]+[[W]]), nebo některá z vašich vlastních kláves se odmítne a okno řekne, k čemu slouží. Kliknutím na klávesu v seznamu ji změníte, křížkem vedle ní ji odeberete, {{ui:customKeys.removeAll}} začne znovu.
+
+- Klávesa spustí příkaz stejně jako vyhledávání příkazů. Když teď nejde, většinou proto, že nic není vybráno, řekne to stavový řádek.
+- Vaše klávesy jsou vidět vedle svých příkazů ve vyhledávání příkazů a na vytištěném seznamu.
+- Zůstávají v tomto prohlížeči, stejně jako motiv. Klávesa pro nástroj náčrtu funguje v náčrtu, klávesa pro 3D editor mimo něj.
+- Když píšete do pole, vaše klávesy se drží stranou jako všechny ostatní.
+
 ## Interaktivní nápověda
 
 Nevíte, kde si o tlačítku nebo políčku přečíst? Nechte se k tomu zavést programem. Klikněte na otazník v oblasti {{ui:editor.group.help}} nebo stiskněte [[Shift]]+[[F1]]. Ukazatel se změní na otazník a to, co je pod ním, dostane rámeček.

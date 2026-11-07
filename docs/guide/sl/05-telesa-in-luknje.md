@@ -104,6 +104,14 @@ Opomba: posnetja in zaokrožitve, ki si jih položil na **celotno** skupino, se 
 
 {{ui:split.apply}} ali [[Enter]] razreže, [[Esc]] prekine (pri izbiranju ploskve prvi [[Esc]] konča samo izbiranje). Vsak predmet, skozi katerega gre ravnina, postane dve zaprti telesi, poimenovani po svoji strani, na primer »Kvader (Z+)« in »Kvader (Z-)«; predmeti, ki jih zgreši, ostanejo, kot so. Iz luknje nastaneta dve luknji, izdolbeno telo pa obdrži svojo votlino. Obe polovici ostaneta, kjer sta bili – za tisk vsako z {{ui:editor.tool.layFlat}} položiš na njeno ploskev reza.
 
+{{ui:split.connectors}} spet poravnajo polovici, kot to delajo orodja za rez v PrusaSlicerju, OrcaSlicerju in Bambu Studiu. Z možnostjo {{ui:split.connectors.none}}, ki je privzeta, se razdeli, kot je opisano zgoraj. {{ui:split.connectors.dowels}} naredi luknjo v vsaki polovici in ločene moznike, ki gredo v obe: mozniki pridejo kot tretje telo, ki stoji poleg polovic na njunem dnu, da jih natisneš z njima – stoje so v plasteh okrogli kot njihove luknje, in prav to meri preizkus ujemanja. {{ui:split.connectors.plugs}} postavi okrogle čepe na polovico, katere ime se konča z minusom, luknje zanje pa naredi v drugi polovici. Spojniki gredo noter pravokotno na ravnino, kakorkoli je zasukana, vsak s svojim premerom in 1,2 mm materiala do vsakega roba ploskve reza, dva pa dvakrat toliko narazen. Vsak ločen kos ploskve reza dobi svoje, enakomerno razporejene po njem: {{ui:split.connectorCount}} pove, koliko, 0 pa to prepusti velikosti kosa, vsaj dva. Kos, ki je premajhen za enega, ne dobi nobenega, spojnik pa izpade tam, kjer je polovica tanjša, kot je njegova luknja globoka; plošča to pove, preden razdeliš, beli obročki na ravnini pa kažejo, kam pridejo. Če ne gre noben, se deli razdelijo brez njih, in vrstica stanja to pove.
+
+- {{ui:split.connectorDiameter}} je premer moznikov in čepov, na začetku 5 mm.
+- {{ui:split.connectorDepth}} pove, kako globoko gre vsaka luknja v svojo polovico. Moznik je dvakrat toliko dolg manj 0,6 mm, čep pa 0,3 mm krajši od svoje luknje, da nikoli ne stojita na dnu luknje in se polovici povsem zapreta. Mozniki in čepi imajo na koncih majhno posnetje, vsaka luknja pa ga ima ob ustju, da je razlezena prva plast ne zoži.
+- {{ui:split.connectorClearance}} je prostor med moznikom ali čepom in njegovo luknjo. Ko izmeriš zračnost svojega tiskalnika s preizkusom ujemanja (v poglavju o tiskanju), se začne z njo, sicer z 0,2 mm.
+
+Oblike, ki so luknje, se razdelijo brez spojnikov.
+
 Polovici sta preprosti mreži: nastavitve, kot je število stranic valja ali črke besedila, se izgubijo, zato jih nastavi prej. [[Ctrl]]+[[Z]] vrne original v enem koraku. Zaklenjenih in skritih predmetov ni mogoče razrezati.
 
 ## Ločevanje delov

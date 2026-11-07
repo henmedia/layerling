@@ -118,6 +118,8 @@ The grid shows the size of the plate. At the bottom right is the **snap step**: 
 
 The cogwheel in the title row ({{ui:editor.workspaceSettings}}) opens the settings. On the left are five areas: {{ui:workspace.appearance}}, {{ui:workspace.measurement}}, {{ui:workspace.workplane}}, {{ui:workspace.shapeDefaults}} and {{ui:workspace.history}}. A change counts at once. {{ui:workspace.makeDefault}} at the bottom saves the current settings as the default, so that a new design starts with them. A file you open brings its own settings; {{ui:workspace.useMyDefault}} next to it puts your saved colours, grid and the rest on the open design, keeping its units. If your default has a printer, that printer comes along with its plate size; without one the design keeps its plate and printer. {{ui:workspace.close}} at the top right closes the window. This part goes through the settings one by one.
 
+{{ui:workspace.exportSettings}} next to it saves the settings of the window in a file (layerling-settings-<date>.json): the colours, grid, shadows, camera and shape defaults, together with the theme, toolbar size, view cube corner, shape colours and the play of each printer. On another computer, or after the browser lost its data, {{ui:workspace.importSettings}} reads the file again: it becomes your default for new designs and goes onto the open design like {{ui:workspace.useMyDefault}}. Your own keys from the keyboard shortcuts go along too.
+
 ### Appearance: theme, toolbar and view cube
 
 {{ui:workspace.theme}} sets the colour scheme of the whole program: {{ui:workspace.themeSystem}} follows your computer, the others are {{ui:workspace.themeLight}}, {{ui:workspace.themeDark}} and {{ui:workspace.themeGraphite}}. You can also change it at the top right of the editor.

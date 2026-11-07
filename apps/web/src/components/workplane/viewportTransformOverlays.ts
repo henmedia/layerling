@@ -16,6 +16,7 @@ import { outwardFaceNormal } from "@/lib/layFlat";
 import { narrowEndWidth, normalizeSlopeSide, shapeSupportsNarrow, shapeSupportsSlope, slopeEndHeight } from "@/lib/slopeAlong";
 import { JOINED_FACE_REACH, nearestFaceTriangle, planarFaceTriangles } from "@/lib/rotationPivot";
 import { roundFaceTriangles } from "@/lib/roundFaceAxis";
+import { flatOrRoundFaceTriangles } from "@/lib/holePatternShapes";
 import { isReferenceImage, referenceImageFacingAxis } from "@/lib/referenceImage";
 import { aimPickRay, firstShapeHit, RENDER_LAYER_SHAPES } from "@/components/workplane/viewportPicking";
 import { type ThreeState, type RotationHandleSide, type RotationHandleSides, syncTransformGuideWorldLines, formatMeasure, findShapeObject, disposeChildren } from "@/components/workplane/ViewportOverlays";
@@ -1020,7 +1021,8 @@ export function syncLayFlatHover(
   theme: ResolvedAppTheme,
   clientX: number | null,
   clientY: number | null,
-  round = false,
+  /** A round face (a hole's wall) instead of a flat one; "either" lights a round wall or a flat face, as the hole pattern picks (#1393). */
+  round: boolean | "either" = false,
   joined: ArrayLike<number> | null = null,
 ) {
   if (!state) return;
@@ -1068,7 +1070,7 @@ export function syncLayFlatHover(
   let positions: ArrayLike<number>;
   // With a group's parts joined, the face runs on across them; where the joined body has no face there, the part's is lit.
   let joinedTriangle = -1;
-  if (joined && !round && joined.length / 3 <= 600000) {
+  if (joined && round !== true && joined.length / 3 <= 600000) {
     const faceIndex = hit.faceIndex;
     const [a, b, c] = [0, 1, 2].map((offset) => worldCorner(faceIndex * 3 + offset).clone());
     const normal = outwardFaceNormal(a, b, c, state.raycaster.ray.direction);
@@ -1082,7 +1084,7 @@ export function syncLayFlatHover(
   }
   if (joined && joinedTriangle >= 0) {
     positions = joined;
-    triangles = planarFaceTriangles(joined, joinedTriangle)?.triangles ?? [joinedTriangle];
+    triangles = (round === "either" ? flatOrRoundFaceTriangles(joined, joinedTriangle) : planarFaceTriangles(joined, joinedTriangle))?.triangles ?? [joinedTriangle];
   } else if (cornerCount <= 600000) {
     const world = new Float64Array(cornerCount * 3);
     for (let offset = 0; offset < cornerCount; offset += 1) {
@@ -1092,7 +1094,9 @@ export function syncLayFlatHover(
       world[offset * 3 + 2] = corner.z;
     }
     positions = world;
-    triangles = (round ? roundFaceTriangles(world, hit.faceIndex) : planarFaceTriangles(world, hit.faceIndex))?.triangles ?? triangles;
+    triangles = (round === "either"
+      ? flatOrRoundFaceTriangles(world, hit.faceIndex)
+      : round ? roundFaceTriangles(world, hit.faceIndex) : planarFaceTriangles(world, hit.faceIndex))?.triangles ?? triangles;
   } else {
     // A very dense mesh is too slow to search on every move: show the one facet.
     const world = new Float64Array(9);

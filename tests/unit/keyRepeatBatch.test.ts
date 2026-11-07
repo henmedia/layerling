@@ -78,4 +78,19 @@ describe("keyRepeatBatch (#1042)", () => {
     scheduler.frame();
     expect(moves).toEqual([]);
   });
+
+  it("marks the repeats of a held key as live, and a fresh press or the key's release as committed", () => {
+    const moves: Array<KeyNudge & { live: boolean }> = [];
+    const scheduler = manualScheduler();
+    const batch = createKeyRepeatBatch((nudge, live) => moves.push({ ...nudge, live }), scheduler);
+    batch.add({ x: 1, z: 0, rise: 0 }, false);
+    batch.add({ x: 1, z: 0, rise: 0 }, true);
+    batch.add({ x: 1, z: 0, rise: 0 }, true);
+    scheduler.frame();
+    batch.flush();
+    expect(moves).toEqual([
+      { x: 1, z: 0, rise: 0, live: false },
+      { x: 2, z: 0, rise: 0, live: true },
+    ]);
+  });
 });

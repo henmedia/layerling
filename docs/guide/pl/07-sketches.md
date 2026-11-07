@@ -15,26 +15,187 @@ Na górze przełącz z {{ui:editor.modeGeometry}} na {{ui:editor.modeSketch}}. W
 
 Edytor pokazuje wtedy arkusz z siatką. To Twoja powierzchnia do rysowania.
 
+Szkic leży na płaszczyźnie roboczej. Aby rysować na ścianie bryły, na przykład gdy kontur ma zaczynać się wyżej, najpierw połóż płaszczyznę roboczą na tej ścianie klawiszem [[W]] (zobacz [Widok i płaszczyzna robocza](chapter:view-and-workplane)), a potem zacznij szkic.
+
 ## Rysowanie
 
-Wstążka w trybie szkicu jest podzielona na sekcje:
+Wstążka w trybie szkicu jest podzielona na sekcje. Niżej każde narzędzie ma własną kartę: co robisz, jeden krok w wierszu, a po strzałce, co się wtedy dzieje. Klawisz po prawej stronie karty wybiera narzędzie.
 
-- **Rysowanie:** {{ui:sketch.line}} tworzy proste odcinki: klikaj punkty jeden po drugim. Przytrzymanie [[Shift]] przyciąga nową linię co 15°, także poziomo i pionowo. Długość i kąt nowej linii widać przy wskaźniku. Możesz też wpisać, jak długa ma być, zobacz [Linie liczbami](#linie-liczbami). {{ui:sketch.arc}} rysuje prawdziwy łuk okręgu przez trzy punkty: najpierw kliknij jego dwa końce, potem trzeci punkt, przez który ma przechodzić łuk. Do trzeciego kliknięcia za wskaźnikiem podąża podgląd, a komunikat podaje promień. Koniec kliknięty na istniejącym punkcie łączy się z nim, więc łuk może zamknąć kontur. [[Esc]] porzuca kliknięte dotąd punkty i wraca do {{ui:sketch.select}}. Potem łuk jest zwykłą geometrią z punktów i krzywych: przesuwasz go, tniesz i wymazujesz jak każdą inną linię. {{ui:sketch.bezier}} kształtuje się uchwytami: kliknij punkt i przeciągnij w kierunku, w którym linia ma biec dalej, jak narzędziem pióra w Illustratorze albo Inkscape. Im dalej przeciągniesz, tym mocniej się wygina. Odcinek do nowego punktu wygina się w trakcie przeciągania, więc widzisz, co dostaniesz. Przeciąganie przy stawianiu punktu wygina krzywą. Jeśli przychodzisz z Tinkercada i chcesz tylko klikać punkty, weź {{ui:sketch.smooth}}. {{ui:sketch.smooth}} prowadzi płynną ścieżkę przez klikane punkty. Aby zamknąć kontur, na końcu kliknij ponownie pierwszy punkt. Ciąg linii zakończysz bez zamykania konturu prawym kliknięciem bez ruchu wskaźnika albo dwukrotnym kliknięciem ostatniego punktu.
-- **{{ui:sketch.freehand}}:** rysuj piórkiem, palcem lub myszą jak na papierze. Gdy je podniesiesz, linia zmieni się w zwykłe punkty: narożnik tam, gdzie ostro skręciła, gładkie punkty pomiędzy, tylko tyle, ile potrzebuje kształt, więc każdy da się potem przeciągnąć. Przybliż widok dla drobnych szczegółów: im bliżej patrzysz, tym wierniej linia podąża za ręką. Linia, która kończy się tam, gdzie się zaczęła, zamyka się w obrys, z którego może powstać bryła; otwarta pozostaje linią, dla {{ui:sketch.stroke}} lub jako ścieżka przeciągania. Zaczyna się też na liniach i na obrazie szablonu, więc obraz można odrysować ręcznie. Pociągnięcie, które zaczyna się lub kończy na otwartym końcu, przedłuża tę linię, więc kształt można narysować kilkoma pociągnięciami.
-- **Kształty:** {{ui:sketch.addShape}} oferuje gotowe kontury: {{ui:sketch.rectangle}}, {{ui:sketch.circle}}, {{ui:sketch.ellipse}}, {{ui:sketch.halfCircle}}, {{ui:sketch.pieSlice}}, {{ui:sketch.boltCircle}} (tarcza z otworami), {{ui:sketch.triangle}}, {{ui:sketch.hexagon}}, {{ui:sketch.polygon}} i {{ui:sketch.star}}. Kliknij jeden, aby umieścić go w początku układu szkicu, albo przeciągnij go z menu tam, gdzie chcesz. Na dole menu {{ui:sketch.polygonSides}} ustawia liczbę boków wielokąta i ramion gwiazdy, a {{ui:sketch.starInner}} to, jak głęboko wcięcia gwiazdy sięgają do środka (od 10 do 90 procent promienia zewnętrznego). Oba dotyczą następnego dodanego kształtu. Jak każdy kształt szkicu, potem są to zwykłe punkty narożne, więc możesz je osobno przesuwać, zaokrąglać i fazować. Prostokąt zaczyna od szerokości i głębokości ustawionych dla prostopadłościanu w {{ui:workspace.shapeDefaults}} w ustawieniach, a koło i elipsa od szerokości walca; bez własnej wartości, i przy pozostałych kształtach, mają 20 mm.
-- **Nakładanie:** przesuń dwa zamknięte kontury na siebie, a zostaną dwiema bryłami, które w edytorze 3D się połączą. Część wspólna nie jest otworem. Otwór powstaje tylko z konturu leżącego w całości wewnątrz innego. Przesuwanie nie łączy linii w miejscach przecięcia, więc kształty możesz znów rozsunąć. Jeśli jednak narysujesz linię w poprzek innych, layerling postawi punkt na każdym przecięciu.
-- **Zaznaczanie:** {{ui:sketch.select}} przesuwa punkty i linie. Kliknięcie wewnątrz zamkniętego konturu zaznacza cały kontur, więc od razu możesz go przeciągnąć albo zmienić jego rozmiar. Wewnątrz otworu wybiera otwór. Ramka wokół zaznaczenia ma osiem uchwytów: narożne zmieniają szerokość i wysokość razem, zachowując proporcje, gdy trzymasz [[Shift]]. Uchwyty na bokach zmieniają tylko jeden kierunek. {{ui:sketch.keepProportions}} na pasku, który się pojawi, zachowuje proporcje bez [[Shift]]: narożniki i boki rozciągają wtedy w obu kierunkach jednakowo, a wpisana szerokość albo wysokość zmienia też drugą. layerling zapamiętuje ten przełącznik. {{ui:sketch.lockOutline}} obok blokuje zaznaczony kontur, jak zablokowaną bryłę w edytorze 3D (to samo robi [[Ctrl]]+[[L]]): nie da się go już przesunąć, zmienić jego rozmiaru, obrócić ani zmienić, jego linie bledną, a punkty szarzeją; uchwyty ramki stają się szare i przestają reagować. Gdy jest zaznaczony, kliknięcie kłódki w jego narożniku go odblokowuje. Linie mogą nadal zaczynać się w jego narożnikach. {{ui:sketch.unlockOutline}} albo ponownie [[Ctrl]]+[[L]] go uwalnia. Zakrzywione strzałki przy narożnikach ramki obracają całe zaznaczenie wokół jego środka: liczba nad kursorem pokazuje kąt, a z wciśniętym [[Shift]] obrót idzie co 15°. Podczas obracania pojawia się pierścień: z kursorem wewnątrz obrót przyciąga się co 22,5°, na zewnątrz idzie o pełne stopnie, niezależnie od siatki. [[R]] obraca cały zamknięty kontur o 45° przy każdym naciśnięciu. Kliknij etykietę szerokości lub wysokości, aby wpisać nowy rozmiar, także jako sumę („60+12.5”) albo w procentach („150%”). Pola X i Y na pasku nad szkicem pokazują, gdzie leży środek zaznaczenia, w mm od początku szkicu; wpisz wartość, a zaznaczenie przesunie się dokładnie tam, na przykład otwór 12 mm od środka. Y rośnie w górę, jak w edytorze 3D. Z wciśniętym [[Shift]] kliknięcie punktu albo linii dodaje go do zaznaczenia albo z niego usuwa, więc możesz wybrać kilka i przesuwać je razem. Przeciągnij ramkę po pustym miejscu, aby zaznaczyć wszystko w niej. Gdy zaznaczone są dwa kontury lub więcej, pasek także je wyrównuje: do lewej, do środka albo do prawej oraz do góry, do środka albo do dołu, względem ramki wokół nich wszystkich. Każdy kontur przesuwa się w całości i zachowuje kształt. Wyśrodkowane w obu kierunkach dwa okręgi tworzą pierścień. Zablokowany kontur zostaje na miejscu, a pozostałe wyrównują się do niego. Linię też można przeciągać (przesuwa się za oba końce, albo całe zaznaczenie, jeśli do niego należy). Klawisze strzałek przesuwają zaznaczenie o jeden krok siatki, z [[Shift]] o większy, a [[Shift]] trzymany podczas przeciągania utrzymuje ruch na jednej osi. {{ui:sketch.refine}}: kliknięcie odcinka dodaje punkt, kliknięcie punktu go usuwa. Są tam też {{ui:sketch.erase}} (kliknięcie punktu albo linii ją usuwa, okno przeciągnięte nad kilkoma usuwa wszystko w jego wnętrzu, a gdy coś jest zaznaczone, przycisk wymazuje zaznaczenie) oraz wstawianie obrazu wzorcowego ({{ui:sketch.addImage}}). Gdy usuwasz punkt, layerling łączy jego dwóch sąsiadów, więc kontur zostaje zamknięty. Aby zamknąć lukę, na przykład po wymazaniu jednego boku sześciokąta, przeciągnij jeden otwarty koniec na drugi: przyciągnie się tam, a oba staną się jednym punktem, więc kontur znów będzie zamknięty. Na przecięciu, na przykład tam, gdzie linia przecina okrąg, łączą się boki biegnące prosto dalej: łuk z łukiem, linia z linią, a okrąg zostaje okrągły. Aby pozbyć się tylko kawałka okręgu, na przykład do zaokrąglonego narożnika, kliknij gumką dokładnie ten kawałek łuku między dwoma punktami, a reszta zostanie.
-- **Schowek:** {{ui:editor.tool.copy}}, {{ui:editor.tool.paste}}, {{ui:editor.tool.duplicate}} i {{ui:editor.tool.delete}} działają na zaznaczone punkty, linie i obrazy, jak w edytorze 3D. [[Ctrl]]+[[X]] wycina. Wklejona i zduplikowana geometria ląduje obok oryginału z odstępem 10 mm, w wolnym miejscu, w którym nie dotyka żadnej istniejącej linii, więc nigdy nie łączy się z tym, co już jest. Zostaje zaznaczona, więc możesz od razu przeciągnąć ją na miejsce.
-- **Historia:** {{ui:sketch.undo}} i {{ui:sketch.redo}}.
-- **{{ui:sketch.viewControls}}:** {{ui:editor.tool.note}} (lub [[N]]) umieszcza notatkę na szkicu, jak w edytorze 3D: następne kliknięcie ją stawia, w dowolnym miejscu, także na linii. Przeciągnięcie pinezki ją przesuwa, a kliknięcie pinezki zwija kartę. Notatki szkicu należą do jego bryły: w widoku 3D siedzą na wierzchu bryły utworzonej przez {{ui:sketch.extrude}} lub {{ui:sketch.sweep}} i na narysowanym profilu bryły utworzonej przez {{ui:sketch.revolve}}, i przesuwają się razem z nią. Ponowne otwarcie szkicu pokazuje wszystkie notatki bryły, także te umieszczone w 3D. {{ui:sketch.undo}} cofa notatkę tak jak linię, a {{ui:sketch.cancel}} odrzuca zmiany w notatkach. Więcej w rozdziale Pomiary i notatki.
-- **Widok:** przesuwasz go środkowym przyciskiem myszy albo [[Shift]] lub [[Ctrl]] z prawym przyciskiem myszy, jak w edytorze 3D. Gdy nic nie jest zaznaczone, przesuwa go też [[Ctrl]] ze strzałkami: o jedną dziesiątą obrazu na naciśnięcie, o połowę z dodatkowym [[Shift]]; szkic przesuwa się w stronę, w którą wskazują. [[Home]] mieści cały szkic w widoku, [[F]] przybliża do zaznaczenia (gdy nic nie jest zaznaczone, do całego szkicu), a [[+]] i [[−]] przybliżają i oddalają, jak w edytorze 3D. Gdy nic nie jest zaznaczone, dwuklik w pustym miejscu przesuwa widok tak, by to miejsce znalazło się na środku, jak w edytorze 3D; {{ui:workspace.doubleClickCentersView}} w ustawieniach to wyłącza. {{ui:camera.tapeTools}} na pasku narzędzi szkicu mierzy odległość między dwoma punktami. Szkic pokazuje też wymiary, gdy tylko coś klikniesz: długość linii, a dla punktu długości linii, które się w nim spotykają. Przycisk {{ui:sketch.showMeasurements}} na pasku narzędzi szkicu ukrywa i pokazuje te wymiary, gdy przeszkadzają, na przykład podczas kształtowania krzywych. Narzędzie Zmierz działa dalej. Na prostej linii możesz kliknąć etykietę wymiaru i wpisać długość w milimetrach. [[Enter]] ją stosuje, [[Esc]] anuluje. Linia zachowuje kierunek, jej punkt początkowy zostaje na miejscu, a linie na drugim końcu podążają za nią. Gdy zaznaczony jest punkt końcowy, przesuwa się ten punkt. [[Alt]]+[[Enter]] wydłuża linię w obie strony wokół jej środka. Na krzywych etykieta tylko pokazuje długość.
+### Narzędzia rysowania
 
-Bryła powstaje tylko z **zamkniętego** konturu.
+::: icon=line {{ui:sketch.line}} | [[1]]
+Klikaj punkty jeden po drugim.
+Przytrzymaj [[Shift]], aby nowa linia przyciągała się co 15°, także poziomo i pionowo.
+=> Długość i kąt nowej linii widać przy wskaźniku.
+Jak wpisać, jak długa ma być, opisuje część [Linie liczbami](#linie-liczbami).
+:::
+
+::: icon=arc {{ui:sketch.arc}}
+Kliknij dwa końce łuku.
+Kliknij trzeci punkt, przez który ma przechodzić łuk.
+=> Do trzeciego kliknięcia za wskaźnikiem podąża podgląd, a komunikat podaje promień.
+=> Koniec kliknięty na istniejącym punkcie łączy się z nim, więc łuk może zamknąć kontur.
+[[Esc]] porzuca kliknięte dotąd punkty i wraca do {{ui:sketch.select}}.
+> Narysowany łuk jest zwykłą geometrią z punktów i krzywych: przesuwasz go, tniesz i wymazujesz jak każdą inną linię.
+:::
+
+::: icon=bezier {{ui:sketch.bezier}} | [[2]]
+Kliknij punkt i przeciągnij w kierunku, w którym linia ma biec dalej, jak narzędziem pióra w Illustratorze albo Inkscape.
+=> Im dalej przeciągniesz, tym mocniej się wygina.
+=> Odcinek do nowego punktu wygina się w trakcie przeciągania, więc widzisz, co dostaniesz.
+> Przychodzisz z Tinkercada i chcesz tylko klikać punkty? Weź {{ui:sketch.smooth}}.
+:::
+
+::: icon=smooth {{ui:sketch.smooth}} | [[3]]
+Klikaj punkty jeden po drugim.
+=> Przez klikane punkty prowadzi płynną ścieżkę.
+:::
+
+::: Zamykanie albo kończenie linii
+Aby zamknąć kontur, na końcu kliknij ponownie pierwszy punkt.
+Aby zakończyć ciąg linii bez zamykania konturu, kliknij prawym przyciskiem bez ruszania wskaźnikiem albo kliknij dwukrotnie ostatni punkt.
+=> Bryła powstaje tylko z **zamkniętego** konturu.
+:::
+
+::: icon=freehand {{ui:sketch.freehand}} | [[5]]
+Rysuj piórkiem, palcem albo myszą jak na papierze.
+=> Gdy je podniesiesz, linia zmieni się w zwykłe punkty: narożnik tam, gdzie ostro skręciła, gładkie punkty pomiędzy, tylko tyle, ile potrzebuje kształt, więc każdy da się potem przeciągnąć.
+Przybliż widok dla drobnych szczegółów: im bliżej patrzysz, tym wierniej linia podąża za ręką.
+=> Linia, która kończy się tam, gdzie się zaczęła, zamyka się w kontur, z którego może powstać bryła. Otwarta zostaje linią, dla {{ui:sketch.stroke}} albo jako ścieżka do przeciągania profilu.
+Zacznij na liniach albo na obrazie wzorcowym, aby odrysować obraz ręcznie.
+Zacznij albo zakończ pociągnięcie na otwartym końcu, aby przedłużyć tę linię, więc kształt można narysować kilkoma pociągnięciami.
+:::
+
+> Cyfry wybierają narzędzie, dopóki nie jest rysowana żadna linia. W trakcie rysowania są jej długością (zobacz niżej). Gdy aktywne jest {{ui:sketch.select}} i zaznaczone są linie lub punkty, te same klawisze je zmieniają: [[1]] prostuje linie i robi z punktów narożniki, [[2]] zamienia linie w krzywe, a [[3]] wygładza punkty. Gdy nic nie jest zaznaczone, wybierają narzędzie jak wcześniej.
+
+### Kształty
+
+::: {{ui:sketch.addShape}}
+Wybierz gotowy kontur: {{ui:sketch.rectangle}}, {{ui:sketch.circle}}, {{ui:sketch.ellipse}}, {{ui:sketch.halfCircle}}, {{ui:sketch.pieSlice}}, {{ui:sketch.boltCircle}} (tarcza z otworami), {{ui:sketch.triangle}}, {{ui:sketch.hexagon}}, {{ui:sketch.polygon}} albo {{ui:sketch.star}}.
+Kliknij go, aby umieścić go w początku układu szkicu, albo przeciągnij go z menu tam, gdzie chcesz.
+Na dole menu {{ui:sketch.polygonSides}} ustawia liczbę boków wielokąta i ramion gwiazdy, a {{ui:sketch.starInner}} to, jak głęboko wcięcia gwiazdy sięgają do środka (od 10 do 90 procent promienia zewnętrznego).
+=> Oba dotyczą następnego dodanego kształtu.
+=> Jak każdy kształt szkicu, potem są to zwykłe punkty narożne, więc możesz je osobno przesuwać, zaokrąglać i fazować.
+> Prostokąt zaczyna od szerokości i głębokości ustawionych dla prostopadłościanu w {{ui:workspace.shapeDefaults}} w ustawieniach, a koło i elipsa od szerokości walca. Bez własnej wartości, i przy pozostałych kształtach, mają 20 mm.
+:::
+
+::: Nakładające się kontury
+Przesuń dwa zamknięte kontury na siebie.
+=> Zostają dwiema bryłami, które w edytorze 3D się łączą. Część wspólna nie jest otworem.
+=> Przesuwanie nie łączy linii w miejscach przecięcia, więc kształty możesz znów rozsunąć.
+Jeśli natomiast narysujesz linię w poprzek innych, layerling postawi punkt na każdym przecięciu.
+> Otwór powstaje tylko z konturu leżącego w całości wewnątrz innego.
+:::
+
+### Zaznaczanie i zmiany
+
+::: icon=select {{ui:sketch.select}}
+Kliknij punkt albo linię i przeciągnij, aby ją przesunąć.
+Kliknij wewnątrz zamkniętego konturu, aby zaznaczyć cały kontur. Wewnątrz otworu wybiera otwór.
+=> Od razu możesz go przeciągnąć albo zmienić jego rozmiar.
+Przytrzymaj [[Shift]] i kliknij, aby dodać punkt albo linię do zaznaczenia albo je z niego usunąć, więc możesz przesuwać kilka naraz.
+Przeciągnij ramkę po pustym miejscu, aby zaznaczyć wszystko w niej.
+Przeciągnij linię, aby przesunąć ją za oba końce, albo całe zaznaczenie, jeśli do niego należy.
+Klawisze strzałek przesuwają zaznaczenie o jeden krok siatki, z [[Shift]] o większy.
+Przytrzymaj [[Shift]] podczas przeciągania, aby ruch został na jednej osi.
+:::
+
+::: Ramka wokół zaznaczenia
+Przeciągnij uchwyt narożny, aby zmienić szerokość i wysokość razem. Przytrzymaj [[Shift]], aby zachować proporcje.
+Przeciągnij uchwyt na boku, aby zmienić tylko jeden kierunek.
+Kliknij etykietę szerokości albo wysokości, aby wpisać nowy rozmiar, także jako sumę („60+12.5”) albo w procentach („150%”).
+Przeciągnij zakrzywione strzałki przy narożnikach, aby obrócić całe zaznaczenie wokół jego środka.
+=> Liczba nad wskaźnikiem pokazuje kąt, a z wciśniętym [[Shift]] obrót idzie co 15°.
+=> Podczas obracania pojawia się pierścień: ze wskaźnikiem wewnątrz obrót przyciąga się co 22,5°, na zewnątrz idzie o pełne stopnie, niezależnie od siatki.
+[[R]] obraca cały zamknięty kontur o 45° przy każdym naciśnięciu.
+:::
+
+::: Pasek nad szkicem
+{{ui:sketch.keepProportions}} zachowuje proporcje bez [[Shift]]: narożniki i boki rozciągają wtedy w obu kierunkach jednakowo, a wpisana szerokość albo wysokość zmienia też drugą.
+=> layerling zapamiętuje ten przełącznik.
+Pola X i Y pokazują, gdzie leży środek zaznaczenia, w mm od początku szkicu. Wpisz wartość, a zaznaczenie przesunie się dokładnie tam, na przykład otwór 12 mm od środka. Y rośnie w górę, jak w edytorze 3D.
+Gdy zaznaczone są dwa kontury lub więcej, pasek je wyrównuje: do lewej, do środka albo do prawej oraz do góry, do środka albo do dołu, względem ramki wokół nich wszystkich.
+=> Każdy kontur przesuwa się w całości i zachowuje kształt. Wyśrodkowane w obu kierunkach dwa okręgi tworzą pierścień.
+:::
+
+::: Blokowanie konturu | [[Ctrl]]+[[L]]
+Kliknij {{ui:sketch.lockOutline}} na pasku, aby zablokować zaznaczony kontur, jak zablokowaną bryłę w edytorze 3D.
+=> Nie da się go już przesunąć, zmienić jego rozmiaru, obrócić ani zmienić. Jego linie bledną, punkty szarzeją, a uchwyty ramki stają się szare i przestają reagować.
+=> Linie mogą nadal zaczynać się w jego narożnikach.
+=> Przy wyrównywaniu konturów zablokowany zostaje na miejscu, a pozostałe wyrównują się do niego.
+Aby go uwolnić, kliknij kłódkę w jego narożniku, gdy jest zaznaczony, albo kliknij {{ui:sketch.unlockOutline}}.
+:::
+
+::: icon=refine {{ui:sketch.refine}} | [[4]]
+Kliknij odcinek, aby dodać punkt.
+Kliknij punkt, aby go usunąć.
+=> layerling łączy jego dwóch sąsiadów, więc kontur zostaje zamknięty.
+:::
+
+::: icon=erase {{ui:sketch.erase}}
+Kliknij punkt albo linię, aby je usunąć.
+Przeciągnij okno nad kilkoma, aby usunąć wszystko w jego wnętrzu.
+Gdy coś jest zaznaczone, przycisk wymazuje zaznaczenie.
+Aby pozbyć się tylko kawałka okręgu, na przykład do zaokrąglonego narożnika, kliknij dokładnie ten kawałek łuku między dwoma punktami.
+=> Reszta zostaje.
+:::
+
+::: Zamykanie luki
+Przeciągnij jeden otwarty koniec na drugi, na przykład po wymazaniu jednego boku sześciokąta.
+=> Przyciąga się tam, a oba stają się jednym punktem, więc kontur znów jest zamknięty.
+=> Na przecięciu, na przykład tam, gdzie linia przecina okrąg, łączą się boki biegnące prosto dalej: łuk z łukiem, linia z linią, a okrąg zostaje okrągły.
+:::
+
+::: icon=image {{ui:sketch.addImage}}
+Podłóż pod szkic obraz wzorcowy, aby go obrysować, zobacz [Obraz jako wzorzec](#obraz-jako-wzorzec).
+:::
+
+### Schowek i historia
+
+::: Kopiowanie, wklejanie, duplikowanie, usuwanie
+{{ui:editor.tool.copy}}, {{ui:editor.tool.paste}}, {{ui:editor.tool.duplicate}} i {{ui:editor.tool.delete}} działają na zaznaczone punkty, linie i obrazy, jak w edytorze 3D. [[Ctrl]]+[[X]] wycina.
+=> Wklejona i zduplikowana geometria ląduje obok oryginału z odstępem 10 mm, w wolnym miejscu, w którym nie dotyka żadnej istniejącej linii, więc nigdy nie łączy się z tym, co już jest.
+=> Zostaje zaznaczona, więc możesz od razu przeciągnąć ją na miejsce.
+{{ui:sketch.undo}} i {{ui:sketch.redo}} cofają krok i przywracają go.
+:::
+
+### Notatki
+
+::: {{ui:editor.tool.note}} | [[N]]
+Kliknij {{ui:editor.tool.note}} w sekcji {{ui:sketch.viewControls}}, a potem miejsce, w którym ma stanąć notatka: dowolne, także na linii.
+Przeciągnij pinezkę, aby ją przesunąć. Kliknięcie pinezki zwija kartę.
+=> Notatki szkicu należą do jego bryły: w widoku 3D siedzą na wierzchu bryły utworzonej przez {{ui:sketch.extrude}} lub {{ui:sketch.sweep}} i na narysowanym profilu bryły utworzonej przez {{ui:sketch.revolve}}, i przesuwają się razem z nią.
+=> Ponowne otwarcie szkicu pokazuje wszystkie notatki bryły, także te umieszczone w 3D.
+{{ui:sketch.undo}} cofa notatkę tak jak linię, a {{ui:sketch.cancel}} odrzuca zmiany w notatkach.
+> Więcej w rozdziale [Pomiary i notatki](chapter:measuring-and-notes).
+:::
+
+### Widok i wymiary
+
+::: Przesuwanie widoku
+Przesuwaj widok środkowym przyciskiem myszy albo [[Shift]] lub [[Ctrl]] z prawym przyciskiem myszy, jak w edytorze 3D.
+Gdy nic nie jest zaznaczone, przesuwa go też [[Ctrl]] ze strzałkami: o jedną dziesiątą widoku na naciśnięcie, o połowę z dodatkowym [[Shift]]. Szkic przesuwa się w stronę, w którą wskazują.
+[[Home]] mieści cały szkic w widoku, [[F]] przybliża do zaznaczenia (gdy nic nie jest zaznaczone, do całego szkicu), a [[+]] i [[−]] przybliżają i oddalają, jak w edytorze 3D.
+Gdy nic nie jest zaznaczone, kliknij dwukrotnie puste miejsce, aby przesunąć je na środek widoku.
+> {{ui:workspace.doubleClickCentersView}} w ustawieniach wyłącza dwuklik.
+:::
+
+::: Wymiary
+Kliknij linię albo punkt.
+=> Szkic pokazuje długość linii, a dla punktu długości linii, które się w nim spotykają.
+{{ui:sketch.showMeasurements}} na pasku narzędzi szkicu ukrywa i pokazuje te wymiary, gdy przeszkadzają, na przykład podczas kształtowania krzywych.
+{{ui:camera.tapeTools}} na pasku narzędzi szkicu mierzy odległość między dwoma punktami. Działa dalej, gdy wymiary są ukryte.
+:::
 
 ![Kontur w kształcie litery L. Przy zaznaczonym punkcie narożnym, w lewym górnym rogu, widać długości obu linii w milimetrach i kąt między nimi w stopniach.](shot:sketch-outline)
 
-Klawisze od [[1]] do [[4]] wybierają narzędzia rysowania w kolejności z paska: {{ui:sketch.line}}, {{ui:sketch.bezier}}, {{ui:sketch.smooth}} i {{ui:sketch.refine}}. Działają, dopóki nie jest rysowana żadna linia. W trakcie rysowania cyfry to jej długość (zobacz niżej). Gdy aktywne jest narzędzie {{ui:sketch.select}} i zaznaczone są linie lub punkty, te same klawisze je zmieniają: [[1]] prostuje linie i robi z punktów narożniki, [[2]] zamienia linie w krzywe, a [[3]] wygładza punkty. Gdy nic nie jest zaznaczone, wybierają narzędzie jak wcześniej.
-[[5]] wybiera {{ui:sketch.freehand}}.
+::: Wpisywanie długości
+Kliknij etykietę wymiaru prostej linii i wpisz długość w milimetrach.
+[[Enter]] ją stosuje, [[Esc]] anuluje.
+=> Linia zachowuje kierunek, jej punkt początkowy zostaje na miejscu, a linie na drugim końcu podążają za nią. Gdy zaznaczony jest punkt końcowy, przesuwa się ten punkt.
+[[Alt]]+[[Enter]] wydłuża zamiast tego linię w obie strony wokół jej środka.
+=> Na krzywych etykieta tylko pokazuje długość.
+:::
 
 ## Linie liczbami
 

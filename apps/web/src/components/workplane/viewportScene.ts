@@ -1097,7 +1097,10 @@ export function splitCutOutlinePoints(state: ThreeState, plane: ModelSplitPlane,
   return planeCrossingSegments(meshes, plane.origin, plane.normal);
 }
 
-export function syncSplitPlane(state: ThreeState | null, plane: ModelSplitPlane | null, handleActive = false, selectedIds: readonly string[] = []) {
+/** The middles of a split's connectors on the plane, in world space, and the radius of their holes (Discussion #832). */
+export type SplitConnectorMarks = { points: ReadonlyArray<readonly [number, number, number]>; radius: number };
+
+export function syncSplitPlane(state: ThreeState | null, plane: ModelSplitPlane | null, handleActive = false, selectedIds: readonly string[] = [], connectorMarks: SplitConnectorMarks | null = null) {
   if (!state) return;
   disposeChildren(state.splitLayer);
   if (!plane) {
@@ -1183,6 +1186,31 @@ export function syncSplitPlane(state: ThreeState | null, plane: ModelSplitPlane 
     outline.renderOrder = 905;
     outline.layers.set(RENDER_LAYER_PREVIEWS);
     state.splitLayer.add(outline);
+  }
+  // Each connector as the ring of its hole on the plane, filled faintly, drawn over the bodies like the cut line.
+  if (connectorMarks?.points.length && connectorMarks.radius > 0) {
+    const ring = new THREE.BufferGeometry().setFromPoints(Array.from({ length: 48 }, (_, index) => {
+      const angle = (index / 48) * Math.PI * 2;
+      return new THREE.Vector3(Math.cos(angle) * connectorMarks.radius, Math.sin(angle) * connectorMarks.radius, 0);
+    }));
+    const disc = new THREE.CircleGeometry(connectorMarks.radius, 48);
+    const ringMaterial = new THREE.LineBasicMaterial({ color: "#ffffff", transparent: true, opacity: 1, depthTest: false });
+    const discMaterial = new THREE.MeshBasicMaterial({ color: "#ffffff", transparent: true, opacity: 0.45, side: THREE.DoubleSide, depthTest: false, depthWrite: false });
+    const facing = new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0, 0, 1), new THREE.Vector3(...plane.normal).normalize());
+    const marks = new THREE.Group();
+    marks.name = "SplitConnectorMarks";
+    connectorMarks.points.forEach((point) => {
+      const outlineLoop = new THREE.LineLoop(ring, ringMaterial);
+      const fill = new THREE.Mesh(disc, discMaterial);
+      [outlineLoop, fill].forEach((mark) => {
+        mark.position.set(point[0], point[1], point[2]);
+        mark.quaternion.copy(facing);
+        mark.renderOrder = 906;
+        mark.layers.set(RENDER_LAYER_PREVIEWS);
+        marks.add(mark);
+      });
+    });
+    state.splitLayer.add(marks);
   }
   state.splitLayer.visible = true;
   state.needsRender = true;

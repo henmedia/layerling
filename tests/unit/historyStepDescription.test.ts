@@ -46,6 +46,10 @@ describe("history step descriptions", () => {
     // A handle keeps the opposite side in place, so the centre moves with the size.
     expect(step([box()], [box({ width: 30, x: 5 })]).key).toBe("historyStep.resizedOne");
     expect(step([box()], [box({ color: "#00ff00" })]).key).toBe("historyStep.colorOne");
+    // A stroke of paint, or all of it taken off, colours the body too.
+    const paint = [{ mode: "fill" as const, color: "#00ff00", size: [10, 10, 10] as [number, number, number], point: [0, 10, 0] as [number, number, number], normal: [0, 1, 0] as [number, number, number], angle: 30 }];
+    expect(step([box()], [box({ paint })]).key).toBe("historyStep.colorOne");
+    expect(step([box({ paint })], [box()]).key).toBe("historyStep.colorOne");
     expect(step([box()], [box({ hole: true })]).key).toBe("historyStep.holeOne");
     expect(step([box({ hole: true })], [box({ hole: false })]).key).toBe("historyStep.solidOne");
     expect(step([box()], [box({ hidden: true })]).key).toBe("historyStep.hiddenOne");

@@ -727,7 +727,7 @@ function joinedShellSolids(cad: OcctKernel, sewn: ShapeHandle) {
  * grouped with afterwards.
  */
 // The solids of a bundle's scope: its own solids and the groups inside it, its holes left to the level above.
-function combinedScopeSolids(cad: OcctKernel, parts: CadModifierMeshPart[], depth: number): ShapeHandle[] {
+function combinedScopeSolids(cad: OcctKernel, parts: CadModifierMeshPart[], depth: number, guardedFuse = false): ShapeHandle[] {
   const inner = new Map<number, CadModifierMeshPart[]>();
   for (const part of parts) {
     if ((part.scope?.length ?? 0) <= depth) continue;
@@ -736,11 +736,15 @@ function combinedScopeSolids(cad: OcctKernel, parts: CadModifierMeshPart[], dept
   }
   return [
     ...parts.filter((part) => (part.scope?.length ?? 0) === depth && !part.hole).map((part) => reconstructSolid(cad, part)),
-    ...[...inner.values()].flatMap((nested) => combinedScope(cad, nested, depth + 1) ?? []),
+    ...[...inner.values()].flatMap((nested) => combinedScope(cad, nested, depth + 1, guardedFuse) ?? []),
   ];
 }
 
-function combinedScope(cad: OcctKernel, parts: CadModifierMeshPart[], depth: number): ShapeHandle | null {
+/**
+ * guardedFuse: a union whose faces cannot be merged without breaking it is kept as it is (#1425). Only on a second
+ * try, when the group did not come through the plain way: a group that did keeps the body, and the edges, it had.
+ */
+function combinedScope(cad: OcctKernel, parts: CadModifierMeshPart[], depth: number, guardedFuse = false): ShapeHandle | null {
   const here = parts.filter((part) => (part.scope?.length ?? 0) === depth);
   const inner = new Map<number, CadModifierMeshPart[]>();
   for (const part of parts) {
@@ -750,20 +754,22 @@ function combinedScope(cad: OcctKernel, parts: CadModifierMeshPart[], depth: num
   }
   // A bundle with a hole in it (#1164): its hole cuts what it is grouped with, its solids are added afterwards.
   const bundles = [...inner.entries()].filter(([key]) => isBundleScopeKey(key)).map(([, nested]) => nested);
-  const bundleSolids = bundles.flatMap((nested) => combinedScopeSolids(cad, nested, depth + 1));
+  const bundleSolids = bundles.flatMap((nested) => combinedScopeSolids(cad, nested, depth + 1, guardedFuse));
   const bundleHoles = bundles.flatMap((nested) => nested.filter((part) => part.hole && (part.scope?.length ?? 0) === depth + 1).map((part) => reconstructSolid(cad, part)));
   const solids = [
     ...here.filter((part) => !part.hole).map((part) => reconstructSolid(cad, part)),
-    ...[...inner.entries()].filter(([key]) => !isBundleScopeKey(key)).flatMap(([, nested]) => combinedScope(cad, nested, depth + 1) ?? []),
+    ...[...inner.entries()].filter(([key]) => !isBundleScopeKey(key)).flatMap(([, nested]) => combinedScope(cad, nested, depth + 1, guardedFuse) ?? []),
   ];
   const holes = here.filter((part) => part.hole).map((part) => reconstructSolid(cad, part));
   if (solids.length === 0 && bundleSolids.length === 0) return null;
   const fused = (shapes: ShapeHandle[]) => {
     let joined = shapes[0];
     for (let index = 1; index < shapes.length; index += 1) {
-      joined = cad.fuse(joined, shapes[index]);
-      joined = cad.simplify(joined);
-      joined = cad.unifySameDomain(joined);
+      const union = cad.fuse(joined, shapes[index]);
+      // Merging the faces of a valid union can break it, as it can after a cut (#938): an enclosure joined with a
+      // screen holder made exact from a mesh came out of simplify with a broken shell, every step after it stayed
+      // broken, and the group could not be chamfered at all (#1425).
+      joined = guardedFuse ? tidiedIfValid(cad, union, cadShapeIsValid) : cad.unifySameDomain(cad.simplify(union));
     }
     return joined;
   };
@@ -778,11 +784,11 @@ function combinedScope(cad: OcctKernel, parts: CadModifierMeshPart[], depth: num
   return result;
 }
 
-function reconstructParts(cad: OcctKernel, parts: CadModifierMeshPart[]) {
+function reconstructParts(cad: OcctKernel, parts: CadModifierMeshPart[], guardedFuse = false): ShapeHandle {
   // A hole on its own, or a group of holes only, is the body to treat itself (#1055): it stays a
   // hole in the scene, and here it is built like a solid.
   const holesOnly = parts.length > 0 && parts.every((part) => part.hole);
-  const combined = combinedScope(cad, holesOnly ? parts.map((part) => ({ ...part, hole: false })) : parts, 0);
+  const combined = combinedScope(cad, holesOnly ? parts.map((part) => ({ ...part, hole: false })) : parts, 0, guardedFuse);
   if (combined === null) throw new Error("The group has no solid body to modify");
   let result: ShapeHandle;
   // The repair runs on a copy: ShapeFix also rewrites the sub-shapes it
@@ -804,7 +810,14 @@ function reconstructParts(cad: OcctKernel, parts: CadModifierMeshPart[]) {
       result = combined;
     }
   }
-  if (!cadShapeIsValid(cad, result)) throw new Error("The grouped solid could not be repaired into valid topology");
+  if (!cadShapeIsValid(cad, result)) {
+    // Once more with every union kept whole where merging its faces breaks it (#1425). The first try's handles can go.
+    if (!guardedFuse) {
+      releaseSession(cad);
+      return reconstructParts(cad, parts, true);
+    }
+    throw new Error("The grouped solid could not be repaired into valid topology");
+  }
   return result;
 }
 

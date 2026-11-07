@@ -919,6 +919,7 @@ export function workplaneShapesEqual(a: WorkplaneShape, b: WorkplaneShape) {
     JSON.stringify(a.surfaceTextureLayers ?? null) === JSON.stringify(b.surfaceTextureLayers ?? null) &&
     a.surfaceTextureMask === b.surfaceTextureMask &&
     a.surfaceFillOf === b.surfaceFillOf &&
+    (a.paint === b.paint || JSON.stringify(a.paint ?? null) === JSON.stringify(b.paint ?? null)) &&
     vaseSettingsEqual(a.vase, b.vase) &&
     a.vasePartOf === b.vasePartOf &&
     a.gridfinityKeyOf === b.gridfinityKeyOf &&
@@ -942,6 +943,7 @@ export function workplaneShapesEqual(a: WorkplaneShape, b: WorkplaneShape) {
     Boolean(a.sbcBoard?.ribbonUp) === Boolean(b.sbcBoard?.ribbonUp) &&
     Boolean(a.sbcBoard?.ribbonSide) === Boolean(b.sbcBoard?.ribbonSide) &&
     Boolean(a.sbcBoard?.gpioUp) === Boolean(b.sbcBoard?.gpioUp) &&
+    Boolean(a.sbcBoard?.lensUp) === Boolean(b.sbcBoard?.lensUp) &&
     (a.sbcBoard?.upReach ?? 0) === (b.sbcBoard?.upReach ?? 0) &&
     (a.sbcBoard?.buttonReach ?? 0) === (b.sbcBoard?.buttonReach ?? 0) &&
     a.importedMesh === b.importedMesh &&

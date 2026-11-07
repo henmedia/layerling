@@ -29,6 +29,7 @@ const MORE = [
   ["welcome.moreSbcTitle", "welcome.moreSbcBody"],
   ["welcome.morePatternTitle", "welcome.morePatternBody"],
   ["welcome.moreHolePatternTitle", "welcome.moreHolePatternBody"],
+  ["welcome.moreSupportRibTitle", "welcome.moreSupportRibBody"],
   ["welcome.moreFaceTitle", "welcome.moreFaceBody"],
   ["welcome.moreOffsetTitle", "welcome.moreOffsetBody"],
   ["welcome.morePunchTitle", "welcome.morePunchBody"],

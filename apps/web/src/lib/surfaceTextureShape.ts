@@ -22,6 +22,7 @@ import {
   SURFACE_TEXTURE_MAX_MASK_PLANES,
   type SurfaceTextureCarbonWeave,
   type SurfaceTextureBrickBond,
+  type SurfaceTextureTimberBracing,
   type SurfaceTextureBarkType,
   type SurfaceTextureCrackStart,
   type SurfaceTextureCrackStyle,
@@ -143,6 +144,8 @@ export const SURFACE_TEXTURE_LABELS: {
   carbonWeaveHint: Record<SurfaceTextureCarbonWeave, MessageKey>;
   brickBond: Record<SurfaceTextureBrickBond, MessageKey>;
   brickBondHint: Record<SurfaceTextureBrickBond, MessageKey>;
+  timberBracing: Record<SurfaceTextureTimberBracing, MessageKey>;
+  timberBracingHint: Record<SurfaceTextureTimberBracing, MessageKey>;
   barkType: Record<SurfaceTextureBarkType, MessageKey>;
   barkTypeHint: Record<SurfaceTextureBarkType, MessageKey>;
   woodType: Record<SurfaceTextureWoodType, MessageKey>;
@@ -161,6 +164,8 @@ export const SURFACE_TEXTURE_LABELS: {
     bumps: "surfaceTexture.bumps",
     cells: "surfaceTexture.cells",
     bricks: "surfaceTexture.bricks",
+    timber: "surfaceTexture.timber",
+    stones: "surfaceTexture.stones",
     squares: "surfaceTexture.squares",
     triangles: "surfaceTexture.triangles",
     knit: "surfaceTexture.knit",
@@ -199,6 +204,14 @@ export const SURFACE_TEXTURE_LABELS: {
     english: "surfaceTexture.bondEnglishHint",
     englishCross: "surfaceTexture.bondEnglishCrossHint",
     flemish: "surfaceTexture.bondFlemishHint",
+  },
+  timberBracing: { none: "surfaceTexture.timberNone", braces: "surfaceTexture.timberBraces", cross: "surfaceTexture.timberCross", knee: "surfaceTexture.timberKnee", mixed: "surfaceTexture.timberMixed" },
+  timberBracingHint: {
+    none: "surfaceTexture.timberNoneHint",
+    braces: "surfaceTexture.timberBracesHint",
+    cross: "surfaceTexture.timberCrossHint",
+    knee: "surfaceTexture.timberKneeHint",
+    mixed: "surfaceTexture.timberMixedHint",
   },
   barkType: { oak: "surfaceTexture.barkOak", pine: "surfaceTexture.barkPine", spruce: "surfaceTexture.barkSpruce", birch: "surfaceTexture.barkBirch", beech: "surfaceTexture.barkBeech" },
   barkTypeHint: {
@@ -388,6 +401,7 @@ export function mergedSurfaceTextureStats(all: readonly SurfaceTextureOutcome["s
     image: all.find((stats) => stats.image)?.image ?? last.image,
     bricks: all.find((stats) => stats.bricks)?.bricks ?? last.bricks,
     tiles: all.find((stats) => stats.tiles)?.tiles ?? last.tiles,
+    timber: all.find((stats) => stats.timber)?.timber ?? last.timber,
     limited: all.some((stats) => stats.limited),
     tooDeep: all.some((stats) => stats.tooDeep),
     nothing: all.every((stats) => stats.nothing),

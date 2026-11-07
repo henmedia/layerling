@@ -14,7 +14,9 @@ import { groupDisplayMergeable, groupShowsPartColors } from "@/lib/groupColors";
 import { gridfinityLabelColor, gridfinityLetterMeshes } from "@/lib/gridfinityLetterColor";
 import { acceleratedRaycast, computeBoundsTree } from "three-mesh-bvh";
 import { groupedContentScale, groupedPartSizeScale, scaleGroupedVertices, type GroupPartPlacement } from "@/lib/groupScale";
-import { dropSplitSlivers, splitByPlaneClearOfFaces, unionSplitManifoldComponents } from "@/lib/manifoldSplit";
+import { applySplitConnectors, dropSplitSlivers, planSplitConnectors, splitByPlaneClearOfFaces, unionSplitManifoldComponents } from "@/lib/manifoldSplit";
+import { paintedWorldMesh } from "@/lib/paintMesh";
+import { addConnectorTallies, NO_CONNECTORS, splitFramePoint, type SplitConnectorKind, type SplitConnectorOptions, type SplitConnectorTally } from "@/lib/splitConnectors";
 import { splitAxisLabel, splitPlaneIntersectsPoints, splitShapeFromWorldPositions, type ModelSplitPlane } from "@/lib/modelSplit";
 import { starSettingsForSize } from "@/lib/starGeometry";
 import { canonicalizeShape, cleanRotationDegrees, isNonSolidShape, meshYawDegrees, mirrorSign, normalizeDegrees, resizedImportedCoordinates, resizedShapeSize, shapeDepth, shapeHasShapeDeform, shapeHasTaper, shapeTaperDimensions, shapeWidth, withHoleMode } from "@/lib/workplaneShapes";
@@ -840,40 +842,72 @@ function shapesToManifoldUnion(runtime: ManifoldToplevel, shapes: WorkplaneShape
   return union.status() === "NoError" && union.numTri() > 0 ? union : null;
 }
 
-export async function splitShapeByPlane(shape: WorkplaneShape, plane: Pick<ModelSplitPlane, "axis" | "normal" | "position">) {
+type SplitPlaneArgs = Pick<ModelSplitPlane, "axis" | "normal" | "position">;
+
+/**
+ * The two halves of a shape's solid, cut by the plane with the skins of no thickness dropped, and the solid they were cut
+ * from; or why there are none. What it makes goes into `created`, for the caller to free.
+ */
+async function splitShapeHalves(shape: WorkplaneShape, plane: SplitPlaneArgs, created: ManifoldSolid[]) {
+  const runtime = await getManifoldRuntime();
+  let solid = shapeToManifoldSolid(runtime, shape, created);
+  if (!solid || solid.status() !== "NoError" || solid.numTri() < 1) {
+    return { error: openHolesError() ?? t("split.error.notClosed", { status: solid?.status() ?? "empty" }) };
+  }
+  const { closed: closedHoles } = takeHoleFillTally();
+  created.push(solid);
+  const normalized = unionSplitManifoldComponents(runtime, solid);
+  created.push(...normalized.created);
+  if (!normalized.solid) {
+    return { error: t("split.error.overlapping") };
+  }
+  solid = normalized.solid;
+  const [rawPositive, rawNegative] = splitByPlaneClearOfFaces(solid, plane.normal, plane.position);
+  created.push(rawPositive, rawNegative);
+  const trimmedPositive = dropSplitSlivers(runtime, rawPositive);
+  const trimmedNegative = dropSplitSlivers(runtime, rawNegative);
+  created.push(...trimmedPositive.created, ...trimmedNegative.created);
+  const positive = trimmedPositive.solid;
+  const negative = trimmedNegative.solid;
+  if (
+    !positive || !negative
+    || positive.status() !== "NoError" || negative.status() !== "NoError"
+    || positive.numTri() < 1 || negative.numTri() < 1
+  ) {
+    return { error: t("split.error.emptyHalf") };
+  }
+  return { runtime, solid, positive, negative, closedHoles };
+}
+
+/**
+ * Splits a shape in two with the plane: the two halves, named after their side, and with `connectors` (Discussion #832)
+ * the holes, pegs and loose dowels that line them up again (splitConnectors.ts) - the dowels as a third body beside them.
+ * A hole is split without: it has nothing to line up.
+ */
+export async function splitShapeByPlane(shape: WorkplaneShape, plane: SplitPlaneArgs, connectors?: SplitConnectorOptions) {
   const created: ManifoldSolid[] = [];
   takeHoleFillTally();
   try {
-    const runtime = await getManifoldRuntime();
-    let solid = shapeToManifoldSolid(runtime, shape, created);
-    if (!solid || solid.status() !== "NoError" || solid.numTri() < 1) {
-      return { parts: null, error: openHolesError() ?? t("split.error.notClosed", { status: solid?.status() ?? "empty" }) };
+    const halves = await splitShapeHalves(shape, plane, created);
+    if ("error" in halves) {
+      return { parts: null, error: halves.error };
     }
-    const { closed: closedHoles } = takeHoleFillTally();
-    created.push(solid);
-    const normalized = unionSplitManifoldComponents(runtime, solid);
-    created.push(...normalized.created);
-    if (!normalized.solid) {
-      return { parts: null, error: t("split.error.overlapping") };
-    }
-    solid = normalized.solid;
-    const [rawPositive, rawNegative] = splitByPlaneClearOfFaces(solid, plane.normal, plane.position);
-    created.push(rawPositive, rawNegative);
-    const trimmedPositive = dropSplitSlivers(runtime, rawPositive);
-    const trimmedNegative = dropSplitSlivers(runtime, rawNegative);
-    created.push(...trimmedPositive.created, ...trimmedNegative.created);
-    const positive = trimmedPositive.solid;
-    const negative = trimmedNegative.solid;
-    if (
-      !positive || !negative
-      || positive.status() !== "NoError" || negative.status() !== "NoError"
-      || positive.numTri() < 1 || negative.numTri() < 1
-    ) {
-      return { parts: null, error: t("split.error.emptyHalf") };
+    const { runtime, closedHoles } = halves;
+    let { positive, negative } = halves;
+    let pins: ManifoldSolid | null = null;
+    let tally: SplitConnectorTally | null = null;
+    if (connectors && connectors.kind !== "none" && !shape.hole) {
+      const plan = planSplitConnectors(runtime, positive, negative, plane.normal, plane.position, connectors, created);
+      ({ positive, negative, pins } = applySplitConnectors(runtime, positive, negative, plan, connectors, halves.solid.boundingBox(), created));
+      tally = plan.tally;
+      if (positive.status() !== "NoError" || negative.status() !== "NoError" || positive.numTri() < 1 || negative.numTri() < 1) {
+        return { parts: null, error: t("split.error.emptyHalf") };
+      }
     }
 
     const positiveMesh = positive.getMesh();
     const negativeMesh = negative.getMesh();
+    const pinsMesh = pins?.getMesh() ?? null;
     try {
       const label = splitAxisLabel(plane.axis);
       const positiveShape = splitShapeFromWorldPositions(
@@ -888,12 +922,18 @@ export async function splitShapeByPlane(shape: WorkplaneShape, plane: Pick<Model
         createLocalId(`${shape.id}-split-negative`),
         `${shape.name} (${label}-)`,
       );
-      return positiveShape && negativeShape
-        ? { parts: [canonicalizeShape(positiveShape), canonicalizeShape(negativeShape)] as [WorkplaneShape, WorkplaneShape], closedHoles }
-        : { parts: null, error: t("split.error.store") };
+      const pinsShape = pinsMesh
+        ? splitShapeFromWorldPositions(shape, manifoldMeshToPositions(pinsMesh), createLocalId(`${shape.id}-split-dowels`), t("split.dowelsName", { name: shape.name }))
+        : null;
+      if (!positiveShape || !negativeShape || (pinsMesh && !pinsShape)) {
+        return { parts: null, error: t("split.error.store") };
+      }
+      const parts: WorkplaneShape[] = [canonicalizeShape(positiveShape), canonicalizeShape(negativeShape), ...(pinsShape ? [canonicalizeShape(pinsShape)] : [])];
+      return { parts, closedHoles, ...(tally ? { connectors: tally } : {}) };
     } finally {
       disposeManifold(positiveMesh);
       disposeManifold(negativeMesh);
+      disposeManifold(pinsMesh);
     }
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error ?? "");
@@ -903,10 +943,63 @@ export async function splitShapeByPlane(shape: WorkplaneShape, plane: Pick<Model
   }
 }
 
+/** Where the connectors would go, for the Split panel to show before the cut: what they come to, and their middles in the world. */
+export type SplitConnectorPreview = { tally: SplitConnectorTally; points: Array<[number, number, number]>; holes: number };
+
+/**
+ * The connectors the split would make, worked out as the split works them out, without making them: for each solid the
+ * plane crosses, its halves, the pieces of its cut face and what fits there. Holes are counted apart; a body that cannot
+ * be split adds nothing, the split itself says why.
+ */
+export async function previewSplitConnectors(targets: readonly WorkplaneShape[], plane: SplitPlaneArgs, connectors: SplitConnectorOptions): Promise<SplitConnectorPreview> {
+  let tally = NO_CONNECTORS;
+  const points: Array<[number, number, number]> = [];
+  let holes = 0;
+  if (connectors.kind === "none") return { tally, points, holes };
+  for (const shape of targets) {
+    if (!splitPlaneIntersectsPoints(meshForShape(shape).vertices, plane.normal, plane.position)) continue;
+    if (shape.hole) {
+      holes += 1;
+      continue;
+    }
+    const created: ManifoldSolid[] = [];
+    takeHoleFillTally();
+    try {
+      const halves = await splitShapeHalves(shape, plane, created);
+      if ("error" in halves) continue;
+      const plan = planSplitConnectors(halves.runtime, halves.positive, halves.negative, plane.normal, plane.position, connectors, created);
+      tally = addConnectorTallies(tally, plan.tally);
+      points.push(...plan.points.map((point) => splitFramePoint(plan.frame, point, plan.position)));
+    } catch {
+      // The split will say what went wrong with this body.
+    } finally {
+      takeHoleFillTally();
+      Array.from(new Set(created)).forEach(disposeManifold);
+    }
+  }
+  return { tally, points, holes };
+}
+
 /** A status message with the note that small holes of the mesh were closed first (#791). */
 export function withClosedHolesNote(message: string, closedHoles = 0) {
   if (closedHoles < 1) return message;
   const note = closedHoles === 1 ? t("status.holeClosedOne") : t("status.holesClosedMany", { count: closedHoles });
+  return `${/[.!?。]$/.test(message) ? message : `${message}.`} ${note}`;
+}
+
+/**
+ * A split's status message with what its connectors came to (Discussion #832): the dowels to print beside the halves,
+ * the plugs that line them up, or that none fit and the parts were split without. Nothing for a split without
+ * connectors, or one that only cut holes.
+ */
+export function withConnectorsNote(message: string, kind: SplitConnectorKind, tally?: SplitConnectorTally) {
+  if (kind === "none" || !tally || tally.faces === 0) return message;
+  const count = tally.placed;
+  const note = count === 0
+    ? t("status.splitNoConnectors")
+    : kind === "dowels"
+      ? (count === 1 ? t("status.splitDowelsOne") : t("status.splitDowelsMany", { count }))
+      : (count === 1 ? t("status.splitPlugsOne") : t("status.splitPlugsMany", { count }));
   return `${/[.!?。]$/.test(message) ? message : `${message}.`} ${note}`;
 }
 
@@ -919,12 +1012,19 @@ function openHolesError() {
 export type SplitShapesOutcome =
   | { status: "stale" }
   | { status: "failed"; shape: WorkplaneShape; error: string }
-  | { status: "done"; replacements: Map<string, WorkplaneShape[]>; splitCount: number; closedHoles: number };
+  | {
+    status: "done";
+    replacements: Map<string, WorkplaneShape[]>;
+    splitCount: number;
+    closedHoles: number;
+    /** What the connectors came to, when the split was asked for them. */
+    connectors?: SplitConnectorTally;
+  };
 
 /** The cut of one target, or `missed` when the plane does not go through it. */
-export async function splitShapeIfCrossed(shape: WorkplaneShape, plane: Pick<ModelSplitPlane, "axis" | "normal" | "position">) {
+export async function splitShapeIfCrossed(shape: WorkplaneShape, plane: SplitPlaneArgs, connectors?: SplitConnectorOptions) {
   if (!splitPlaneIntersectsPoints(meshForShape(shape).vertices, plane.normal, plane.position)) return { missed: true as const };
-  return splitShapeByPlane(shape, plane);
+  return splitShapeByPlane(shape, plane, connectors);
 }
 
 /**
@@ -934,23 +1034,27 @@ export async function splitShapeIfCrossed(shape: WorkplaneShape, plane: Pick<Mod
  */
 export async function splitShapesByPlane(
   targets: readonly WorkplaneShape[],
-  plane: Pick<ModelSplitPlane, "axis" | "normal" | "position">,
+  plane: SplitPlaneArgs,
   stillCurrent: () => boolean,
   splitOne: typeof splitShapeIfCrossed = splitShapeIfCrossed,
+  connectors?: SplitConnectorOptions,
 ): Promise<SplitShapesOutcome> {
   const replacements = new Map<string, WorkplaneShape[]>();
   let splitCount = 0;
   let closedHoles = 0;
+  const asked = connectors && connectors.kind !== "none" ? connectors : undefined;
+  let tally: SplitConnectorTally | undefined = asked ? NO_CONNECTORS : undefined;
   for (const shape of targets) {
-    const result = await splitOne(shape, plane);
+    const result = await splitOne(shape, plane, asked);
     if ("missed" in result) continue;
     if (!stillCurrent()) return { status: "stale" };
     if (!result.parts) return { status: "failed", shape, error: result.error ?? t("split.error.failedDefault") };
     replacements.set(shape.id, result.parts);
     splitCount += 1;
     closedHoles += result.closedHoles ?? 0;
+    if (tally && "connectors" in result && result.connectors) tally = addConnectorTallies(tally, result.connectors);
   }
-  return { status: "done", replacements, splitCount, closedHoles };
+  return { status: "done", replacements, splitCount, closedHoles, ...(tally ? { connectors: tally } : {}) };
 }
 
 function manifoldMeshToPositions(mesh: InstanceType<ManifoldToplevel["Mesh"]>) {
@@ -1154,9 +1258,12 @@ async function unionOverlappingExportMeshesRaw(shapes: WorkplaneShape[], meshes:
  * already did. Only the holes that go along count: with a selection, the selected ones.
  * A body cut away entirely drops out; one whose cut fails stays whole and is counted.
  */
-export async function exportBodiesWithLooseHoles(visible: readonly WorkplaneShape[]) {
+export async function exportBodiesWithLooseHoles(visible: readonly WorkplaneShape[], options: { painted?: boolean } = {}) {
   const solids = visible.filter((shape) => !shape.hole && !isNonSolidShape(shape));
-  const meshes = solids.map(meshForShape);
+  // A file that keeps colours (3MF, OBJ) takes a painted body cut along its paint (paintMesh.ts), the kernel loaded
+  // first so the strokes are cut in rather than coloured on whole faces. An STL stays one colour and as it was.
+  if (options.painted && solids.some((shape) => shape.paint?.length)) await getManifoldRuntime().catch(() => null);
+  const meshes = solids.map((shape) => (options.painted ? paintedWorldMesh(shape)?.mesh : undefined) ?? meshForShape(shape));
   const holes = visible.filter((shape) => shape.hole && !isNonSolidShape(shape));
   const untouched = { solids, meshes, cut: solids.map(() => false), holeCutsFailed: 0 };
   if (holes.length === 0 || solids.length === 0) return untouched;
@@ -1302,14 +1409,44 @@ export function multicolorExportSolids(shape: WorkplaneShape): PartColorSolid[] 
     const bounds = meshBounds(meshForShape(shape).vertices);
     return letters.length && bounds ? [...letters, partColorSolid(cuboidsToMesh("bin", [bounds], 0, 0), shape.color)] : null;
   }
-  if (shape.hole || !shape.groupedShapes?.length || !groupShowsPartColors(shape)) return null;
-  const parts = shape.groupedShapes.filter((part) => !part.hole && !part.hidden);
-  if (parts.length === 0 || new Set(parts.flatMap((part) => [part.color, gridfinityLabelColor(part) ?? part.color])).size < 2) return null;
+  if (!showsOwnPartColors(shape)) return null;
+  const colors = new Set<string>();
+  collectPartColors(shape, colors);
+  if (colors.size < 2) return null;
+  const meshes = partColorMeshes(shape);
+  return meshes.length ? meshes.map(({ mesh, color }) => partColorSolid(mesh, color)) : null;
+}
+
+/**
+ * Whether a group's parts keep their own colours, as the view draws them. A part of such a group that is a group or
+ * bundle itself - an Icon tag is a bundle of its layers - shows its own parts' colours in turn (#1398).
+ */
+function showsOwnPartColors(shape: WorkplaneShape) {
+  return !shape.hole && Boolean(shape.groupedShapes?.length) && groupShowsPartColors(shape);
+}
+
+/** The colours a group shows, down through the groups and bundles inside it that show their parts' colours too. */
+function collectPartColors(shape: WorkplaneShape, into: Set<string>) {
+  (shape.groupedShapes ?? []).filter((part) => !part.hole && !part.hidden).forEach((part) => {
+    const letters = gridfinityLabelColor(part);
+    if (letters) into.add(letters);
+    if (showsOwnPartColors(part)) collectPartColors(part, into);
+    else into.add(part.color);
+  });
+}
+
+/**
+ * The parts of a group as meshes in their own colours, placed as `meshForShape` places the group: in the world for a
+ * group on the plate, in its group's frame for a group inside another one. A part that shows its own parts' colours
+ * gives those parts instead of one mesh in its own colour, so an Icon tag in a Multicolor group keeps its layers (#1398).
+ */
+function partColorMeshes(shape: WorkplaneShape): Array<{ mesh: MeshData; color: string }> {
+  const parts = (shape.groupedShapes ?? []).filter((part) => !part.hole && !part.hidden);
   const imported = shape.importedMesh;
   let lowest = Number.POSITIVE_INFINITY;
   if (imported) for (let index = 1; index < imported.positions.length; index += 3) lowest = Math.min(lowest, imported.positions[index]);
-  const scale = imported ? null : groupedContentScale(shape, localGroupBounds(shape.groupedShapes));
-  const solids: PartColorSolid[] = [];
+  const scale = imported ? null : groupedContentScale(shape, localGroupBounds(shape.groupedShapes ?? []));
+  const meshes: Array<{ mesh: MeshData; color: string }> = [];
   const add = (local: MeshData, color: string) => {
     if (local.faces.length === 0) return;
     let vertices: Vec3[];
@@ -1321,16 +1458,17 @@ export function multicolorExportSolids(shape: WorkplaneShape): PartColorSolid[] 
     } else {
       vertices = scaleGroupedVertices(local.vertices, scale!) as Vec3[];
     }
-    solids.push(partColorSolid(transformMesh({ name: local.name, vertices, faces: local.faces }, shape), color));
+    meshes.push({ mesh: transformMesh({ name: local.name, vertices, faces: local.faces }, shape), color });
   };
   parts.forEach((part) => {
     // A bin's letters in their own colour come before the bin, as for a bin on its own; here the bin stays its mesh, as
     // the group's other parts lie in its box.
     const color = gridfinityLabelColor(part);
     if (color) gridfinityLetterMeshes(part).forEach((letter) => add(transformMesh(letter, part), color));
-    add(meshForShape(part), part.color);
+    if (showsOwnPartColors(part)) partColorMeshes(part).forEach((inner) => add(inner.mesh, inner.color));
+    else add(meshForShape(part), part.color);
   });
-  return solids.length ? solids : null;
+  return meshes;
 }
 
 /** A body in the world as a solid to ask "is this point in it". */
@@ -2633,7 +2771,7 @@ export function splitBoreTube(shape: WorkplaneShape): WorkplaneShape[] {
 }
 
 function expandGroupsForBoolean(selection: WorkplaneShape[]): WorkplaneShape[] {
-  return selection.flatMap((shape) => {
+  return selection.filter(shownInCut).flatMap((shape) => {
     if (shape.importedMesh) {
       return [shape];
     }
@@ -2644,6 +2782,7 @@ function expandGroupsForBoolean(selection: WorkplaneShape[]): WorkplaneShape[] {
 /**
  * A part hidden inside a group stays one of its parts, but it is not cut and not cut with (#1323): the group's
  * body is what is shown, as the plain group and the export already had it. A hidden ring came back on Done.
+ * A group hidden as a whole stays out too, before it is taken apart into parts that are not hidden themselves.
  */
 function shownInCut(shape: WorkplaneShape) {
   return !shape.hidden;
@@ -2651,7 +2790,75 @@ function shownInCut(shape: WorkplaneShape) {
 
 function expandGroupsForBoxBoolean(selection: WorkplaneShape[]): WorkplaneShape[] {
   // An intersection or a hull is not the sum of its parts: opened, a hull of four boxes would be cut as the four boxes (#863).
-  return selection.flatMap((shape) => (shape.groupedShapes?.length && shape.groupOperation !== "intersection" && shape.groupOperation !== "hull" && shape.groupOperation !== "loft" ? restoreGroupedChildren(shape) : [shape])).flatMap(splitBoreTube).filter(shownInCut);
+  return selection.filter(shownInCut).flatMap((shape) => (shape.groupedShapes?.length && shape.groupOperation !== "intersection" && shape.groupOperation !== "hull" && shape.groupOperation !== "loft" ? restoreGroupedChildren(shape) : [shape])).flatMap(splitBoreTube).filter(shownInCut);
+}
+
+/** The solids hidden among the parts of a group, where they stand, also those hidden inside a group among them. */
+function hiddenSolidsAmong(selection: WorkplaneShape[]): WorkplaneShape[] {
+  return selection.flatMap((shape) => {
+    if (shape.hidden) return shape.hole ? [] : [shape];
+    if (shape.importedMesh || !shape.groupedShapes?.length) return [];
+    return hiddenSolidsAmong(restoreGroupedChildren(shape));
+  });
+}
+
+/**
+ * A group with a hole is cut into one body, and its box was that body's box. A solid hidden in it stays out of the
+ * body (shownInCut) but is still one of its parts, and in a plain group it keeps its room: a wide ring hidden on an
+ * axle kept the group as wide as the ring, until the group had a hole (#1323). The box now takes in the hidden solids
+ * there too, the body standing where it was inside it, and the alignment counts them (alignBounds). Not below the
+ * body's foot: the view stands a body on the foot of its box. The same goes for a group with an imported mesh.
+ */
+function withRoomForHiddenParts(group: WorkplaneShape, selected: WorkplaneShape[]): WorkplaneShape {
+  const mesh = group.importedMesh;
+  if (!mesh || mesh.positions.length < 9 || mesh.assetId || mesh.storageResourceId || mesh.brepStep || group.cadBrep || !group.groupedShapes?.length) return group;
+  if (group.rotation || group.rotationX || group.rotationZ) return group;
+  const hidden = hiddenSolidsAmong(selected);
+  if (!hidden.length) return group;
+  const room = boundsForShapesOfVertices(hidden);
+  if (![room.minX, room.maxX, room.maxY, room.minZ, room.maxZ].every(Number.isFinite)) return group;
+  const width = shapeWidth(group);
+  const depth = shapeDepth(group);
+  const foot = group.elevation ?? 0;
+  const minX = Math.min(group.x - width / 2, room.minX);
+  const maxX = Math.max(group.x + width / 2, room.maxX);
+  const minZ = Math.min(group.z - depth / 2, room.minZ);
+  const maxZ = Math.max(group.z + depth / 2, room.maxZ);
+  const nextWidth = cleanModelDimension(Math.max(width, maxX - minX));
+  const nextDepth = cleanModelDimension(Math.max(depth, maxZ - minZ));
+  const nextHeight = cleanModelDimension(Math.max(group.height, room.maxY - foot));
+  const grows = (next: number, now: number) => next - now > POINT_TOLERANCE;
+  if (!grows(nextWidth, width) && !grows(nextDepth, depth) && !grows(nextHeight, group.height)) return group;
+  const centerX = (minX + maxX) / 2;
+  const centerZ = (minZ + maxZ) / 2;
+  const shiftX = centerX - group.x;
+  const shiftZ = centerZ - group.z;
+  // The body's points and the parts are kept at the size the group was built at, a hair from its size in the world.
+  const meshX = mesh.baseWidth / Math.max(MIN_SHAPE_DIMENSION, width);
+  const meshY = mesh.baseHeight / Math.max(MIN_SHAPE_DIMENSION, group.height);
+  const meshZ = mesh.baseDepth / Math.max(MIN_SHAPE_DIMENSION, depth);
+  const partsX = (group.groupedBaseWidth ?? width) / Math.max(MIN_SHAPE_DIMENSION, width);
+  const partsY = (group.groupedBaseHeight ?? group.height) / Math.max(MIN_SHAPE_DIMENSION, group.height);
+  const partsZ = (group.groupedBaseDepth ?? depth) / Math.max(MIN_SHAPE_DIMENSION, depth);
+  const positions = mesh.positions.slice();
+  for (let offset = 0; offset + 2 < positions.length; offset += 3) {
+    positions[offset] -= shiftX * meshX;
+    positions[offset + 2] -= shiftZ * meshZ;
+  }
+  return {
+    ...group,
+    x: centerX,
+    z: centerZ,
+    width: nextWidth,
+    depth: nextDepth,
+    height: nextHeight,
+    size: Math.max(nextWidth, nextDepth),
+    importedMesh: { ...mesh, positions, baseWidth: nextWidth * meshX, baseDepth: nextDepth * meshZ, baseHeight: nextHeight * meshY },
+    groupedBaseWidth: nextWidth * partsX,
+    groupedBaseDepth: nextDepth * partsZ,
+    groupedBaseHeight: nextHeight * partsY,
+    groupedShapes: group.groupedShapes.map((part) => ({ ...part, x: part.x - shiftX * partsX, z: part.z - shiftZ * partsZ })),
+  };
 }
 
 function canUseBoxBoolean(selection: WorkplaneShape[]) {
@@ -2732,7 +2939,7 @@ export async function buildGroupedShapeFromSelection(selected: WorkplaneShape[],
   const manifoldImportedMerge = hasImportedMesh && hasSolid && !hasHole ? await manifoldUnionMeshShape(booleanSelection, triangleLimit, groupable) : null;
   const exactImportedGroup = hasImportedMesh && hasSolid && hasHole ? manifoldCutGroup ?? importedBooleanMeshShape(booleanSelection, groupable) : null;
   const bakedImportedMerge = hasImportedMesh && !(hasSolid && hasHole) ? manifoldImportedMerge ?? mergedMeshShape(booleanSelection, groupable) : null;
-  const group = hasSolid && hasHole
+  const built = hasSolid && hasHole
     ? cleanBoxGroup ??
       exactImportedGroup ??
       (hasImportedMesh
@@ -2741,13 +2948,14 @@ export async function buildGroupedShapeFromSelection(selected: WorkplaneShape[],
     : hasImportedMesh
       ? bakedImportedMerge ?? groupedShape(groupable)
       : newPlainGroup(groupable);
+  const group = built ? withRoomForHiddenParts(built, selected) : null;
   const consumed = !group && hasSolid && hasHole && cutFullyConsumesSolids(booleanSelection);
   // The cut was made, but the fallback left its face open: say so when the cause is gaps in the surface (#346).
   const openGapEdges = group && hasImportedMesh && hasSolid && hasHole && OPEN_CUT_ID.test(group.id)
     ? openSurfaceEdgeCount(booleanSelection.filter((shape) => !shape.hole && !shape.locked))
     : 0;
   // Above the limit the solids are only laid together, they are kept overlapping when exported.
-  const unmergedTriangles = group && group === bakedImportedMerge && !manifoldImportedMerge && hasSolid
+  const unmergedTriangles = group && built === bakedImportedMerge && !manifoldImportedMerge && hasSolid
     ? group.importedMesh?.triangleCount ?? 0
     : 0;
   const mergeWarning = unmergedTriangles > triangleLimit

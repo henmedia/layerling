@@ -25,6 +25,21 @@ Le guide que vous lisez dispose également d'un champ de recherche, en haut de c
 - Le nom d'un corps dans votre conception trouve ce corps et le sélectionne, ce qui facilite une conception comportant de nombreuses pièces. Les corps n'apparaissent qu'une fois que vous tapez.
 - Cela fonctionne également en mode esquisse, avec les outils d'esquisse.
 
+## Vos propres touches
+
+Toute commande de la recherche de commandes peut aller sur une touche de votre choix : un outil que vous utilisez sans cesse, une forme, {{ui:editor.tool.centerOnWorkplane}} ou {{ui:palette.openShapes}}.
+
+1. Ouvrez {{ui:editor.keyboardShortcuts}} et cliquez sur {{ui:customKeys.add}} sous {{ui:customKeys.title}}, en haut de la fenêtre.
+2. Tapez quelques lettres de la commande et cliquez dessus, ou appuyez sur [[Enter]] pour la première.
+3. Appuyez sur la touche voulue, seule ou avec [[Ctrl]], [[Alt]] ou [[Shift]]. Les lettres, les chiffres et F1 à F12 peuvent porter une commande.
+
+Une touche que l’éditeur utilise déjà, une que le navigateur garde pour lui (comme [[Ctrl]]+[[W]]) ou une de vos propres touches est refusée, et la fenêtre dit à quoi elle sert. Cliquez sur une touche de la liste pour la changer, sur le X à côté pour la retirer, ou sur {{ui:customKeys.removeAll}} pour repartir de zéro.
+
+- La touche lance la commande exactement comme la recherche de commandes. Si elle ne peut pas s’exécuter pour le moment, le plus souvent parce que rien n’est sélectionné, la barre d’état le dit.
+- Vos touches apparaissent à côté de leurs commandes dans la recherche de commandes et sur la liste imprimée.
+- Elles restent dans ce navigateur, comme le thème. Une touche pour un outil d’esquisse marche en mode esquisse, une pour l’éditeur 3D en dehors.
+- Pendant que vous tapez dans un champ, vos touches s’effacent comme toutes les autres.
+
 ## Aide interactive
 
 Vous ne trouvez pas où lire quelque chose sur un bouton ou un champ ? Laissez le programme vous y conduire. Cliquez sur le point d'interrogation dans la zone {{ui:editor.group.help}} ou appuyez sur [[Shift]]+[[F1]]. Le pointeur devient un point d'interrogation, et ce qui se trouve dessous est entouré.

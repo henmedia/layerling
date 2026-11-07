@@ -116,6 +116,8 @@ X 與 [[Esc]] 會關閉視窗；若正在量測，[[Esc]] 會先結束量測。�
 
 標題列中的齒輪（{{ui:editor.workspaceSettings}}）會開啟設定。左側有五個區域：{{ui:workspace.appearance}}、{{ui:workspace.measurement}}、{{ui:workspace.workplane}}、{{ui:workspace.shapeDefaults}} 與 {{ui:workspace.history}}。變更會立即生效。底部的 {{ui:workspace.makeDefault}} 會將目前設定儲存為預設值，讓新設計從這些設定開始。開啟的檔案會帶著它自己的設定；旁邊的 {{ui:workspace.useMyDefault}} 會把你儲存的顏色、網格等套用到開啟的設計上，同時保留它的單位。如果你的預設設定裡有印表機，這台印表機連同它的平台尺寸也會一起帶過來；沒有的話，設計保留原有的平台與印表機。右上角的 {{ui:workspace.close}} 則關閉視窗。本節會逐一說明這些設定。
 
+{{ui:workspace.exportSettings}} 把視窗的設定儲存成檔案（layerling-settings-<日期>.json）：顏色、格線、陰影、相機和形狀預設值，以及主題、工具列大小、檢視立方體的角落、形狀顏色和每台印表機的間隙。在另一台電腦上或瀏覽器資料遺失後，{{ui:workspace.importSettings}} 會再次讀取該檔案：它成為新設計的預設值，並像 {{ui:workspace.useMyDefault}} 一樣套用到已開啟的設計。你在鍵盤快速鍵中設定的自訂按鍵也會一起儲存。
+
 ### 外觀：主題、工具列與視圖立方體
 
 {{ui:workspace.theme}} 設定整個程式的配色方案：{{ui:workspace.themeSystem}} 跟隨你的電腦，其餘為 {{ui:workspace.themeLight}}、{{ui:workspace.themeDark}} 與 {{ui:workspace.themeGraphite}}。也可以在編輯器右上角變更。
