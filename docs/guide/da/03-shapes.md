@@ -226,9 +226,9 @@ Til print i flere farver farver {{ui:paint.title}} dele af et legeme direkte i d
 
 {{ui:paint.eraser}} tager malingen af igen med de samme værktøjer, {{ui:paint.clear}} tager det hele af på én gang. Hvert strøg er et trin for sig, så [[Ctrl]]+[[Z]] tager det sidste tilbage. Mellem strøgene drejer højre museknap visningen som altid; {{ui:paint.done}} eller [[Esc]] lukker panelet.
 
-Kanterne af en cirkel eller en lasso skæres ind i legemets net: en cirkel på en kasses flade er rund og ikke et par trekanter, og legemet forbliver lukket. Malingen hører til legemet: den flytter og drejer med det, strækkes med, når du ændrer størrelsen, og et strøg, der ikke finder noget længere efter en ændring, udelades. 3MF-eksporten skriver malingen som malede flader, som OrcaSlicer, Bambu Studio og PrusaSlicer printer med deres filamenter (se [Filer og gemning](chapter:files-and-saving)); en OBJ beholder også farverne, en STL forbliver i én farve.
+Kanterne af en cirkel eller en lasso skæres ind i legemets mesh: en cirkel på en kasses flade er rund og ikke et par trekanter, og legemet forbliver lukket. Malingen hører til legemet: den flytter og drejer med det, strækkes med, når du ændrer størrelsen, og et strøg, der ikke finder noget længere efter en ændring, udelades. 3MF-eksporten skriver malingen som malede flader, som OrcaSlicer, Bambu Studio og PrusaSlicer printer med deres filamenter (se [Filer og gemning](chapter:files-and-saving)); en OBJ beholder også farverne, en STL forbliver i én farve.
 
-En gruppe, der er skåret til ét legeme, for eksempel en kasse med sine huller, males som ét legeme: mal den, efter hullerne er skåret, så bliver malingen, når du ændrer gruppen åbnet. Delene i et bundt males hver for sig. Et malet legeme, som du grupperer med andre, beholder sin maling som del og viser den igen, når du opdeler gruppen. Et importeret net, der ikke er lukket, males på sine egne trekanter.
+En gruppe, der er skåret til ét legeme, for eksempel en kasse med sine huller, males som ét legeme: mal den, efter hullerne er skåret, så bliver malingen, når du ændrer gruppen åbnet. Delene i et bundt males hver for sig. Et malet legeme, som du grupperer med andre, beholder sin maling som del og viser den igen, når du opdeler gruppen. Et importeret mesh, der ikke er lukket, males på sine egne trekanter.
 
 ## En vase
 

@@ -4994,7 +4994,7 @@ export const MESSAGES_DA: Partial<Record<MessageKey, string>> = {
   "status.paintErased": "Maling fjernet",
   "status.paintCleared": "Al maling fjernet fra kroppen",
   "status.paintTooMany": "Denne krop har {count} strøg, mere kan den ikke. Fjern alt for at begynde forfra.",
-  "paint.wholeFaces": "Dette net er ikke lukket: cirkler og lassoer følger dets trekanter.",
+  "paint.wholeFaces": "Dette mesh er ikke lukket: cirkler og lassoer følger dets trekanter.",
   "status.faceToolMissed": "Det var ikke en flade af den valgte krop.",
   "status.faceToolNeedsSolid": "Fladeværktøjet virker på en massiv krop, ikke på et hul.",
   "status.faceToolOtherTool": "Afslut det andet værktøj først.",
