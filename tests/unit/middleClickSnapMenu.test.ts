@@ -76,6 +76,29 @@ describe("a short middle click, not a middle drag (Discussion #1439)", () => {
     expect(clicks).toEqual([[41, 50]]);
   });
 
+  it("keeps working when the view is built anew, as the sketch plate is", () => {
+    function Rebuilt({ round, onClick }: { round: number; onClick: (x: number, y: number) => void }) {
+      const ref = useRef<HTMLElement>(null);
+      useMiddleClick(ref, onClick);
+      return createElement("section", { key: round, ref, className: `plate-${round}` }, createElement("svg"));
+    }
+    const clicks: Array<[number, number]> = [];
+    const host = document.createElement("div");
+    document.body.appendChild(host);
+    const root = createRoot(host);
+    const onClick = (x: number, y: number) => clicks.push([x, y]);
+    act(() => root.render(createElement(Rebuilt, { round: 1, onClick })));
+    act(() => root.render(createElement(Rebuilt, { round: 2, onClick })));
+    cleanups.push(() => {
+      act(() => root.unmount());
+      host.remove();
+    });
+    const plate = host.querySelector(".plate-2 svg")!;
+    plate.dispatchEvent(pointer("pointerdown", { button: 1, clientX: 70, clientY: 80 }));
+    window.dispatchEvent(pointer("pointerup", { button: 1, clientX: 70, clientY: 80 }));
+    expect(clicks).toEqual([[70, 80]]);
+  });
+
   it("opens nothing after a middle drag that came back, a left click or a press elsewhere", () => {
     const clicks: Array<[number, number]> = [];
     const host = mount(createElement(View, { onClick: (x: number, y: number) => clicks.push([x, y]) }));
