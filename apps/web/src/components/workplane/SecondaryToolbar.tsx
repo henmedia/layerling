@@ -15,10 +15,11 @@ import { useSimpleMode } from "@/lib/useSimpleMode";
 import { simpleModeKeepsShape, simpleModeKeepsTool } from "@/lib/simpleMode";
 import { normalizePolygonSides, normalizeStarInnerPercent, SKETCH_POLYGON_MAX_SIDES, SKETCH_POLYGON_MIN_SIDES, SKETCH_STAR_MAX_INNER_PERCENT, SKETCH_STAR_MIN_INNER_PERCENT } from "@/lib/sketchPrimitives";
 import { SketchBoltCircleIcon, SketchEllipseIcon, SketchHalfCircleIcon, SketchPieSliceIcon, ToolbarAlignIcon, ToolbarAttachmentsIcon, ToolbarBuildPlatesIcon, ToolbarCenterOnWorkplaneIcon, ToolbarChamferIcon, ToolbarCaretDownIcon, ToolbarCookieCutterIcon, ToolbarFlexiIcon, ToolbarLidIcon,
-  ToolbarCableChannelIcon, ToolbarCopyIcon, ToolbarDuplicateIcon, ToolbarDropToWorkplaneIcon, ToolbarBundleIcon, ToolbarGroupIcon, ToolbarGuideIcon, ToolbarHideSelectedIcon, ToolbarHomeIcon, ToolbarImportIcon, ToolbarIntersectionIcon,ToolbarClearanceIcon, ToolbarPrintCheckIcon, ToolbarHullIcon, ToolbarLoftSketchesIcon, ToolbarKeyboardIcon, ToolbarFilletIcon, ToolbarHistoryIcon, ToolbarHollowIcon, ToolbarOffsetIcon, ToolbarCutOutIcon, ToolbarPunchIcon, ToolbarDeleteFaceIcon, ToolbarSimplifyIcon, ToolbarMakeExactIcon, ToolbarSurfaceTextureIcon, ToolbarMirrorIcon, ToolbarRotationPivotIcon, ToolbarPatternIcon, ToolbarHolePatternIcon, ToolbarFaceToolIcon, ToolbarConstructionLineIcon, ToolbarMiddleLineIcon, ToolbarLayFlatIcon, ToolbarMateFacesIcon, ToolbarNoteIcon, ToolbarSplitIcon, ToolbarPasteIcon, ToolbarRedoIcon, ToolbarSnapGridIcon, ToolbarSettingsIcon, ToolbarShapeAddIcon, ToolbarTrashIcon, ToolbarUngroupIcon, ToolbarUndoIcon, ToolbarVectorExportIcon } from "../icons";
+  ToolbarCableChannelIcon, ToolbarCopyIcon, ToolbarDuplicateIcon, ToolbarDropToWorkplaneIcon, ToolbarBundleIcon, ToolbarGroupIcon, ToolbarGuideIcon, ToolbarHideSelectedIcon, ToolbarHomeIcon, ToolbarImportIcon, ToolbarIntersectionIcon,ToolbarClearanceIcon, ToolbarPrintCheckIcon, ToolbarHullIcon, ToolbarLoftSketchesIcon, ToolbarKeyboardIcon, ToolbarFilletIcon, ToolbarHistoryIcon, ToolbarHollowIcon, ToolbarOffsetIcon, ToolbarCutOutIcon, ToolbarPunchIcon, ToolbarDeleteFaceIcon, ToolbarSimplifyIcon, ToolbarMakeExactIcon, ToolbarSurfaceTextureIcon, ToolbarPaintIcon, ToolbarMirrorIcon, ToolbarRotationPivotIcon, ToolbarPatternIcon, ToolbarHolePatternIcon, ToolbarFaceToolIcon, ToolbarSupportRibIcon, ToolbarConstructionLineIcon, ToolbarMiddleLineIcon, ToolbarLayFlatIcon, ToolbarMateFacesIcon, ToolbarNoteIcon, ToolbarSplitIcon, ToolbarPasteIcon, ToolbarRedoIcon, ToolbarSnapGridIcon, ToolbarSettingsIcon, ToolbarShapeAddIcon, ToolbarTrashIcon, ToolbarUngroupIcon, ToolbarUndoIcon, ToolbarVectorExportIcon } from "../icons";
 import { type SketchPrimitive, type SketchTool } from "../SketchWorkspace";
 import { CommandPalette, type PaletteCommand } from "./CommandPalette";
 import { COMMAND_KEYWORDS, COMMAND_SHORTCUTS, SHAPE_KEYWORDS } from "@/lib/commandKeywords";
+import { readCustomShortcuts, runCustomShortcutKey, setCustomShortcutCommandSource } from "@/lib/customShortcuts";
 import { LanguageSwitch } from "@/components/LanguageSwitch";
 import { ThemeSwitch } from "@/components/ThemeSwitch";
 import { libraryShapeAssets, shapeAssetColor, shapeAssetLabel, shapeAssetMenuLabel, type ToolbarShapeAsset } from "@/lib/shapeCatalog";
@@ -301,6 +302,8 @@ export function SecondaryToolbar({
   canHolePattern,
   onFaceTool,
   faceToolActive,
+  onSupportRib,
+  supportRibActive,
   canFaceTool,
   onGroup,
   onBundle,
@@ -338,6 +341,9 @@ export function SecondaryToolbar({
   canSurfaceTexture,
   onSurfaceTextureTool,
   surfaceTextureActive,
+  canPaint,
+  onPaint,
+  paintActive,
   onMirror,
   onRotationPivot,
   rotationPivotActive,
@@ -373,6 +379,8 @@ export function SecondaryToolbar({
   shapeCustomizations,
   objects,
   onSelectObject,
+  onNotice,
+  splitActive,
 }: {
   toolbarMode: ToolbarMode;
   projectName: string;
@@ -471,6 +479,9 @@ export function SecondaryToolbar({
   canHolePattern: boolean;
   onFaceTool: () => void;
   faceToolActive: boolean;
+  /** "Support rib" (#1385): a rib under the lower face of a tilted part. */
+  onSupportRib: () => void;
+  supportRibActive: boolean;
   canFaceTool: boolean;
   onGroup: () => void;
   onBundle: () => void;
@@ -516,6 +527,11 @@ export function SecondaryToolbar({
   /** Opens or closes the selected body's surface texture card. */
   onSurfaceTextureTool: () => void;
   surfaceTextureActive: boolean;
+  /** One solid body selected that can be painted (paint.ts). */
+  canPaint: boolean;
+  /** Opens or closes the paint tool for the selected body. */
+  onPaint: () => void;
+  paintActive: boolean;
   onMirror: () => void;
   onRotationPivot: () => void;
   rotationPivotActive: boolean;
@@ -555,6 +571,10 @@ export function SecondaryToolbar({
   /** The bodies of the design, so the command search can find them by name. */
   objects: ReadonlyArray<{ id: string; name: string; kind: string; hidden: boolean }>;
   onSelectObject: (id: string) => void;
+  /** Shows a line in the status bar - here: that a command on a key of your own cannot run right now. */
+  onNotice?: (text: string) => void;
+  /** While a body is being split the editor keeps every key; keys of your own wait too. */
+  splitActive?: boolean;
 }) {
   const [shapesOpen, setShapesOpen] = useState(false);
   // The name of the clip button: with the number of files once there are some, so a screen reader hears what the dot shows.
@@ -774,6 +794,31 @@ export function SecondaryToolbar({
     window.addEventListener("keydown", openOnShortcut);
     return () => window.removeEventListener("keydown", openOnShortcut);
   }, []);
+  // Keys of your own (Discussion #1399): the shortcut list puts a command of the search on a key, and the key runs it
+  // here, through the same entry the search would run. The listener sits before every other one (capture on the
+  // window) and stops the key when it is one of yours, so nothing else answers it as well. It keeps out of the way
+  // where the editor's own keys do: in a text field, behind a window that holds the keys, behind the project overview,
+  // while a body is split, and while the list waits for a key to set.
+  const buildPaletteCommandsRef = useRef<() => PaletteCommand[]>(() => []);
+  const onNoticeRef = useRef(onNotice);
+  onNoticeRef.current = onNotice;
+  const splitActiveRef = useRef(Boolean(splitActive));
+  splitActiveRef.current = Boolean(splitActive);
+  useEffect(() => {
+    const runOwnKey = (event: KeyboardEvent) => {
+      runCustomShortcutKey(event, () => buildPaletteCommandsRef.current(), {
+        blocked: splitActiveRef.current,
+        unavailable: (command) => onNoticeRef.current?.(t("customKeys.unavailable", { command: command.label })),
+      });
+    };
+    window.addEventListener("keydown", runOwnKey, true);
+    // The shortcut list reads the commands from here to offer them for a key.
+    setCustomShortcutCommandSource(() => buildPaletteCommandsRef.current().filter((command) => !command.transient));
+    return () => {
+      window.removeEventListener("keydown", runOwnKey, true);
+      setCustomShortcutCommandSource(null);
+    };
+  }, []);
   // Leaving the sketch closes the sketch's shape palette; at the start there is nothing to close (a pinned panel opens then).
   const sketchWasActiveRef = useRef(sketchActive);
   useEffect(() => {
@@ -899,6 +944,7 @@ export function SecondaryToolbar({
     { id: "faceTool", section: "pattern", label: t("faceTool.title"), icon: ToolbarFaceToolIcon, action: onFaceTool, enabled: canFaceTool, active: faceToolActive, needs: need("oneSolid") },
     { id: "split", section: "shape", label: t("editor.tool.split"), icon: ToolbarSplitIcon, action: onSplit, enabled: splitMode || canSplit, active: splitMode, needs: need("visibleBodies") },
     { id: "flexi", section: "shape", label: t("editor.tool.flexi"), icon: ToolbarFlexiIcon, action: onFlexi, enabled: canFlexi || flexiActive, active: flexiActive, needs: need("solid") },
+    { id: "supportRib", section: "shape", label: t("supportRib.title"), icon: ToolbarSupportRibIcon, action: onSupportRib, enabled: canFaceTool || supportRibActive, active: supportRibActive, needs: need("oneSolid") },
     { id: "cookieCutter", section: "shape", label: t("editor.tool.cookieCutter"), icon: ToolbarCookieCutterIcon, action: onCookieCutter, enabled: canCookieCutter, needs: need("body") },
     { id: "chamfer", section: "edges", label: t("editor.tool.chamfer"), icon: ToolbarChamferIcon, action: onChamfer, enabled: canEdgeModify, active: edgeModifierKind === "chamfer" || edgeModifierKind === "chamfillet", needs: need("oneBody") },
     { id: "fillet", section: "edges", label: t("editor.tool.fillet"), icon: ToolbarFilletIcon, action: onFillet, enabled: canEdgeModify, active: edgeModifierKind === "fillet", needs: need("oneBody") },
@@ -910,6 +956,7 @@ export function SecondaryToolbar({
     { id: "simplify", section: "surface", label: t("editor.tool.simplify"), icon: ToolbarSimplifyIcon, action: onSimplify, enabled: canSimplify, active: simplifyActive, needs: need("mesh") },
     { id: "makeExact", section: "surface", label: t("editor.tool.makeExact"), icon: ToolbarMakeExactIcon, action: onMakeExact, enabled: canMakeExact && !makeExactBusy, active: makeExactBusy, needs: need("exactMesh") },
     { id: "surfaceTexture", section: "surface", label: t("inspector.surfaceTexture"), icon: ToolbarSurfaceTextureIcon, action: onSurfaceTextureTool, enabled: canSurfaceTexture, active: surfaceTextureActive, needs: need("oneBody") },
+    { id: "paint", section: "surface", label: t("paint.title"), icon: ToolbarPaintIcon, action: onPaint, enabled: canPaint || paintActive, active: paintActive, needs: need("oneSolid") },
   ] satisfies readonly ({ section: ModifySection } & Record<string, unknown>)[];
   const arrangeTools = [
     { id: "align", label: t("editor.tool.align"), icon: ToolbarAlignIcon, action: onAlign, enabled: canAlign, active: alignMode, needs: need("twoObjects") },
@@ -1052,9 +1099,19 @@ export function SecondaryToolbar({
   // Everything the toolbar and its menus can do, as entries of the command
   // search. Built from the same lists as the buttons, so a new tool shows up in
   // both without a second place to remember; only built while the search is open.
-  const buildPaletteCommands = (): PaletteCommand[] => buildAllPaletteCommands().map((command) =>
-    historyViewActive && !HISTORY_VIEW_COMMANDS.has(command.id) ? { ...command, enabled: false } : command,
-  );
+  const buildPaletteCommands = (): PaletteCommand[] => {
+    // A key of your own is shown where the command's usual key would be.
+    const ownKeys = readCustomShortcuts();
+    return buildAllPaletteCommands().map((command) => {
+      const shown = ownKeys[command.id] ? { ...command, shortcut: ownKeys[command.id].combo } : command;
+      return historyViewActive && !HISTORY_VIEW_COMMANDS.has(command.id) ? { ...shown, enabled: false } : shown;
+    });
+  };
+  // Opens or closes the shapes panel, as its button does: a command of its own, so it can go on a key (#1399).
+  const toggleShapesPanel = () => {
+    setVisibilityOpen(false);
+    setShapesOpen((open) => !open);
+  };
   const buildAllPaletteCommands = (): PaletteCommand[] => {
     const fromTool = (
       tool: { id: string; label: string; icon: PaletteCommand["icon"]; action: () => void; enabled: boolean; active?: boolean },
@@ -1119,6 +1176,7 @@ export function SecondaryToolbar({
           () => onSketchPrimitive(primitive),
           { icon, keywords: [primitive] },
         )),
+        plain("shapes-panel", t("palette.openShapes"), t("sketch.group.shapes"), true, toggleShapesPanel, { icon: ToolbarShapeAddIcon, active: shapesOpen }),
         plain("sketch-select", t("sketch.select"), selectGroup, true, () => onSketchTool("select"), { icon: SKETCH_PALETTE_ICONS.select, active: sketchTool === "select" }),
         plain("sketch-image", t("sketch.addImage"), selectGroup, true, onSketchImage, { icon: SKETCH_PALETTE_ICONS.image }),
         plain("sketch-refine", t("sketch.refine"), selectGroup, true, () => onSketchTool("refine"), { icon: SKETCH_PALETTE_ICONS.refine, active: sketchTool === "refine" }),
@@ -1149,6 +1207,7 @@ export function SecondaryToolbar({
         () => addShapeFromMenu(shape),
         { image: shape.menuIcon, keywords: [shape.id, shape.name, ...(SHAPE_KEYWORDS[shape.id] ?? [])] },
       )),
+      plain("shapes-panel", t("palette.openShapes"), shapesGroup, true, toggleShapesPanel, { icon: ToolbarShapeAddIcon, active: shapesOpen }),
       ...visibilityTools.map((tool) => fromTool(tool, visibilityGroup)),
       plain(
         "show-hidden",
@@ -1183,6 +1242,7 @@ export function SecondaryToolbar({
       )),
     ];
   };
+  buildPaletteCommandsRef.current = buildPaletteCommands;
 
   return (
     <div className="secondary-toolbar">

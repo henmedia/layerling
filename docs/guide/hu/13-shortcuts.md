@@ -25,6 +25,21 @@ Az útmutatónak, amelyet olvasol, szintén van keresőmezője, minden oldal tet
 - A tervedben lévő test neve megtalálja és kijelöli azt a testet, ami sok részből álló tervben segít. A testek csak akkor jelennek meg, amikor gépelsz.
 - Vázlatmódban is működik, a vázlateszközökkel.
 
+## Saját billentyűk
+
+A parancskereső bármelyik parancsát saját billentyűre teheted: egy eszközt, amit folyton használsz, egy alakzatot, a {{ui:editor.tool.centerOnWorkplane}} parancsot vagy a {{ui:palette.openShapes}} parancsot.
+
+1. Nyisd meg a {{ui:editor.keyboardShortcuts}} ablakot, és felül, a {{ui:customKeys.title}} alatt kattints a {{ui:customKeys.add}} gombra.
+2. Írd be a parancs néhány betűjét, és kattints rá, vagy nyomd meg az [[Enter]]-t az elsőhöz.
+3. Nyomd meg a kívánt billentyűt, magában vagy [[Ctrl]], [[Alt]] vagy [[Shift]] mellett. Betűk, számjegyek és az F1–F12 billentyűk kaphatnak parancsot.
+
+Az a billentyű, amelyet a szerkesztő már használ, amelyet a böngésző magának tart (például [[Ctrl]]+[[W]]), vagy amely már a saját billentyűid egyike, nem fogadható el, és az ablak megmondja, mire szolgál. A listában egy billentyűre kattintva megváltoztathatod, a mellette lévő X-szel eltávolíthatod, a {{ui:customKeys.removeAll}} gombbal pedig elölről kezdheted.
+
+- A billentyű pontosan úgy indítja a parancsot, mint a parancskereső. Ha most nem indulhat el, többnyire azért, mert semmi sincs kijelölve, az állapotsor megmondja.
+- A saját billentyűid a parancskeresőben a parancsuk mellett és a kinyomtatott listán is megjelennek.
+- Ebben a böngészőben maradnak, mint a téma. Egy vázlateszköz billentyűje vázlat módban működik, a 3D-szerkesztőé azon kívül.
+- Amíg egy mezőbe gépelsz, a saját billentyűid is félreállnak, mint a többi.
+
 ## Interaktív súgó
 
 Nem találod, hol olvashatsz egy gombról vagy mezőről? Hadd vigyen oda a program. Kattints a kérdőjelre a {{ui:editor.group.help}} területen, vagy nyomd meg a [[Shift]]+[[F1]] billentyűket. A mutató kérdőjellé változik, és ami alatta van, körvonalat kap.

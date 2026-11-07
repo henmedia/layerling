@@ -74,7 +74,7 @@ import { writeDesignView, writeSavedViews } from "@/lib/designView";
 import { seedStartCornerRuler, writeCornerRulers } from "@/lib/cornerRulerStore";
 import { readTape, writeTape } from "@/lib/tapeStore";
 import { useFileAccept } from "@/lib/fileAccept";
-import { lylFileAccessSupported, onLylFilesLaunched, pickFilesToImport, rememberLylFile, type LylFileHandle } from "@/lib/lylFileAccess";
+import { dropBackupTarget, lylFileAccessSupported, onLylFilesLaunched, pickBackupTarget, pickFilesToImport, rememberLylFile, writeBackupTarget, type LylFileHandle } from "@/lib/lylFileAccess";
 import { exportLylProject, importLylProject, inspectLylProjectPackage, LYL_CREATED_WITH_VERSION, LYL_MEDIA_TYPE, withLylProjectName, withLylThumbnail } from "@/lib/lylProject";
 import { relieveOverFineCadMeshes, type RemeshCadBrep } from "@/lib/cadMeshRelief";
 import { backupDesignAlreadyThere, backupEntryPaths, backupFileName, backupFolderPaths, backupNamePrefix, backupThumbnailPath, unpackBackupFolders, isBackupFileName, createBackupWriter, unpackBackup, zipHoldsDesigns } from "@/lib/projectBackup";
@@ -2321,12 +2321,29 @@ export default function Home() {
       : "designIds" in scope
         ? localDesigns.filter((project) => scope.designIds.includes(project.id))
         : localDesigns.filter((project) => inFolder(scope.folderId, project.folderId));
+    // A folder's backup is named after it, and so is the backup of one chosen design (Discussion #1317), so several of
+    // them stay apart in the downloads.
+    const folder = scope && "folderId" in scope ? designFolders.find((entry) => entry.id === scope.folderId) : undefined;
+    const single = scope && "designIds" in scope && designs.length === 1 ? designs[0] : undefined;
+    const named = folder?.name ?? single?.name;
+    const suggestedName = backupFileName(new Date(), named ? backupNamePrefix(named) : undefined);
+    if (scope && designs.length === 0) {
+      setDashboardNotice(t("notice.backupEmpty"));
+      return;
+    }
+    // Where the backup goes is asked first, while the click still counts for the browser: reading the designs can
+    // take a while. Chrome and Edge show a save dialog that remembers its folder; elsewhere it is a download.
+    let target = designs.length > 0 ? await pickBackupTarget(suggestedName) : null;
+    if (designs.length > 0 && !target) return;
     const shapeEntries = scope ? [] : await customShapesBackupEntries().catch(() => []);
     const shapeCount = Math.max(0, shapeEntries.length - 1);
     if (designs.length === 0 && shapeCount === 0) {
       setDashboardNotice(t("notice.backupEmpty"));
       return;
     }
+    // Only custom shapes: asked once they are read, which is quick.
+    target ??= await pickBackupTarget(suggestedName);
+    if (!target) return;
     try {
       // A design in a folder goes into the ZIP in that folder, so a restore puts it back there (#496).
       const names = backupEntryPaths(designs.map((project) => ({ name: project.name, folder: folderPathNames(designFolders, project.folderId) })), t("dashboard.backupFallbackName"));
@@ -2355,13 +2372,8 @@ export default function Home() {
       const foldersAlong = !scope ? designFolders : "folderId" in scope ? designFolders.filter((folder) => inFolder(scope.folderId, folder.id)) : [];
       const emptyFolders = foldersAlong.filter((folder) => !holding.has(folder.id) && !designFolders.some((other) => other.parentId === folder.id));
       backupFolderPaths(emptyFolders.map((folder) => folderPathNames(designFolders, folder.id))).forEach((name) => writer.add(name, new Uint8Array()));
-      // A folder's backup is named after it, and so is the backup of one chosen design (Discussion #1317), so several of
-      // them stay apart in the downloads.
-      const folder = scope && "folderId" in scope ? designFolders.find((entry) => entry.id === scope.folderId) : undefined;
-      const single = scope && "designIds" in scope && designs.length === 1 ? designs[0] : undefined;
-      const named = folder?.name ?? single?.name;
-      const fileName = backupFileName(new Date(), named ? backupNamePrefix(named) : undefined);
-      downloadBackup(writer.finish(), fileName);
+      await writeBackupTarget(target, writer.finish(), (name, zip) => downloadBackup(zip, name));
+      const fileName = target.fileName;
       writeBackupProgress(null);
       const saved = designs.length - skipped.length;
       const done = shapeCount
@@ -2378,6 +2390,9 @@ export default function Home() {
   // Every design of the server, in its folders, and its custom shapes, as the same kind of ZIP:
   // "Restore backup" brings it back, on this computer or another.
   const backupAllServerDesigns = useCallback(async () => {
+    // Asked before the designs are fetched, while the click still counts (see backupProjects).
+    const target = await pickBackupTarget(backupFileName(new Date(), "layerling-server-backup"));
+    if (!target) return;
     try {
       const writer = createBackupWriter();
       const { count, skipped } = await writeServerBackup(writer, t("dashboard.backupFallbackName"), (index, total, name) => {
@@ -2389,11 +2404,12 @@ export default function Home() {
       shapes.entries.forEach((entry) => writer.add(entry.name, entry.bytes));
       writeBackupProgress(null);
       if (count === 0 && skipped.length === 0 && shapes.count === 0) {
+        await dropBackupTarget(target);
         setDashboardNotice(t("notice.backupEmpty"));
         return;
       }
-      const fileName = backupFileName(new Date(), "layerling-server-backup");
-      downloadBackup(writer.finish(), fileName);
+      await writeBackupTarget(target, writer.finish(), (name, zip) => downloadBackup(zip, name));
+      const fileName = target.fileName;
       const done = shapes.count
         ? t("notice.backupDoneWithShapes", { count, shapes: shapes.count, name: fileName })
         : t("notice.backupDone", { count, name: fileName });

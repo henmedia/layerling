@@ -25,6 +25,21 @@ La guía que estás leyendo también tiene un cuadro de búsqueda, arriba en cad
 - El nombre de un cuerpo de tu diseño encuentra ese cuerpo y lo selecciona, algo muy útil en un diseño con muchas piezas. Los cuerpos solo aparecen cuando empiezas a escribir.
 - También funciona en el modo de boceto, con las herramientas de boceto.
 
+## Tus propias teclas
+
+Cualquier comando de la búsqueda de comandos puede ir en una tecla tuya: una herramienta que usas todo el rato, una forma, {{ui:editor.tool.centerOnWorkplane}} o {{ui:palette.openShapes}}.
+
+1. Abre {{ui:editor.keyboardShortcuts}} y haz clic en {{ui:customKeys.add}} bajo {{ui:customKeys.title}}, arriba en la ventana.
+2. Escribe unas letras del comando y haz clic en él, o pulsa [[Intro]] para el primero.
+3. Pulsa la tecla que quieras, sola o con [[Ctrl]], [[Alt]] o [[Mayús]]. Las letras, los números y F1 a F12 pueden llevar un comando.
+
+Una tecla que el editor ya usa, una que el navegador guarda para sí (como [[Ctrl]]+[[W]]) o una de tus propias teclas se rechaza, y la ventana dice para qué sirve. Haz clic en una tecla de la lista para cambiarla, en la X de al lado para quitarla, o en {{ui:customKeys.removeAll}} para empezar de nuevo.
+
+- La tecla ejecuta el comando igual que la búsqueda de comandos. Si ahora no puede ejecutarse, casi siempre porque no hay nada seleccionado, la barra de estado lo dice.
+- Tus teclas aparecen junto a sus comandos en la búsqueda de comandos y en la lista impresa.
+- Se quedan en este navegador, como el tema. Una tecla para una herramienta de boceto funciona en el modo Boceto, una para el editor 3D fuera de él.
+- Mientras escribes en un campo, tus teclas no estorban, como todas las demás.
+
 ## Ayuda interactiva
 
 ¿No encuentras dónde se explica un botón o un campo? Deja que el programa te lleve. Haz clic en el signo de interrogación del grupo {{ui:editor.group.help}} o pulsa [[Mayús]]+[[F1]]. El puntero se convierte en un signo de interrogación, y lo que tenga debajo se marca con un contorno.

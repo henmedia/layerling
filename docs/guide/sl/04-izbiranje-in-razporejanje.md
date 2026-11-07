@@ -125,7 +125,7 @@ Z odkljukanim {{ui:array.groupCopies}} {{ui:array.apply}} v istem koraku združi
 
 Za prezračevalne reže, zvočniške mreže, košare in ohišja {{ui:holePattern.title}} enakomerno razporedi luknje po ravni ploskvi. Zato ti ni treba vsake luknje posebej ustvariti, pomnožiti in prestaviti na steno. Izberi natanko eno telo in v skupini {{ui:editor.group.modify}} orodne vrstice klikni {{ui:holePattern.title}}, tik ob polju. Lahko tudi z desnim gumbom klikneš na telo ali ga poiščeš s [[Ctrl]]+[[K]].
 
-1. Klikni ravno ploskev telesa. Šteje cela ravna ploskev okoli tvojega klika, ne samo trikotnik pod kazalcem. Ukrivljena ploskev ne gre: dobiš opombo in klikneš ravno. Pri skupini ali svežnju se ploskev razteza čez dele, ki se stikajo, kot pri enem telesu, pri svežnju pa le, če med deli ni luknje. Deli se spojijo kmalu po tem, ko se orodje odpre; do takrat se pod kazalcem osvetli le ploskev enega dela, klik pa počaka, da se spojijo. Pri skupini ali svežnju z besedilom se osvetli le ploskev enega dela, dele pa spoji šele klik.
+1. Klikni ravno ploskev telesa. Šteje cela ravna ploskev okoli tvojega klika, ne samo trikotnik pod kazalcem. Gre tudi okrogla stena valja, cevi ali izvrtine, glej spodaj; druga ukrivljena ploskev ne: dobiš opombo in klikneš ravno. Pri skupini ali svežnju se ploskev razteza čez dele, ki se stikajo, kot pri enem telesu, pri svežnju pa le, če med deli ni luknje. Deli se spojijo kmalu po tem, ko se orodje odpre; do takrat se pod kazalcem osvetli le ploskev enega dela, klik pa počaka, da se spojijo. Pri skupini ali svežnju z besedilom se osvetli le ploskev enega dela, dele pa spoji šele klik.
 2. V oknu nastavi, kako luknje izgledajo in ležijo:
    - **{{ui:holePattern.form}}:** {{ui:holePattern.form.round}}, {{ui:holePattern.form.square}}, {{ui:holePattern.form.rectangle}}, {{ui:holePattern.form.hexagon}} ali {{ui:holePattern.form.slot}}.
    - **Velikost:** {{ui:holePattern.size.diameter}} okrogle luknje, {{ui:holePattern.size.side}} kvadratne, {{ui:holePattern.size.width}} in {{ui:holePattern.size.height}} pri pravokotniku in podolgovati luknji. Pri šestkotniku velja mera {{ui:holePattern.size.corners}}.
@@ -143,13 +143,15 @@ Za prezračevalne reže, zvočniške mreže, košare in ohišja {{ui:holePattern
 
 Luknje so čisto navadne luknje in združene v skupino s telesom, popolnoma tako kot po {{ui:editor.tool.group}}: nič ni vpečeno. {{ui:editor.tool.ungroup}} skupino spet razpusti in sprosti vsako luknjo, ki jo potem lahko posebej premakneš, spremeniš ali izbrišeš. Celota je en korak za {{ui:editor.tool.undo}}. Več kot 400 lukenj naenkrat orodje ne ustvari; potem naredi luknje večje ali razmik širši.
 
+Luknje sprejme tudi okrogla stena valja, cevi ali izvrtine: lonček za svinčnike, senčnik, cev z zračniki. Namesto ravne ploskve klikni steno; pod kazalcem se osvetli cela stena. Vsaka luknja potem kaže naravnost proti osi, vrste pa tečejo okrog stene. Na steni, ki gre v celoti naokrog, ima vsaka vrsta celo število lukenj, izravnano tako, da se obroč sklene brez reže in luknje niso nikoli bližje od razmika; okno pove, koliko jih gre naokrog in kako narazen. Rob velja do zgornjega in spodnjega roba ter do odprtin v steni, na delu stene (na primer zaobljenju) tudi do njegovih stranic. {{ui:holePattern.depth.throughWall}} preseka samo steno, ki si jo kliknil, drugo stran cevi pa pusti celo; pri polnem valju gredo luknje do njegove sredine. Če klikneš v notranjost izvrtine, gredo luknje navzven skozi njeno steno. {{ui:holePattern.arrangement.perimeter}} je za ravne ploskve in ga pri steni ni.
+
 Umetna inteligenca lahko isto naredi prek vmesnika MCP, z `layerling_perforate_face` (glej poglavje [Umetna inteligenca z MCP](chapter:ai-z-mcp)).
 
 ## Vlečenje ploskve navzven ali navznoter
 
 Za debelejšo steno, dvignjeno ploščico na ploskvi ali vanjo izrezan žep orodje {{ui:faceTool.title}} dela na eni ravni ploskvi. Deluje tudi na uvoženem STL, ki nima skice za spreminjanje. Izberi natanko eno telo in v skupini {{ui:editor.group.modify}} orodne vrstice klikni {{ui:faceTool.title}}, tik ob vzorcu lukenj. Lahko tudi z desnim gumbom klikneš na telo ali ga poiščeš s [[Ctrl]]+[[K]].
 
-1. Klikni ravno ploskev telesa. Tako kot pri vzorcu lukenj šteje cela ravna ploskev okoli tvojega klika; ukrivljena ploskev ne gre. Pri skupini ali svežnju se ploskev kot pri vzorcu lukenj razteza čez dele, ki se stikajo.
+1. Klikni ravno ploskev telesa. Tako kot pri vzorcu lukenj šteje cela ravna ploskev okoli tvojega klika; ukrivljena ploskev tu ne gre, tudi okrogla stena ne. Pri skupini ali svežnju se ploskev kot pri vzorcu lukenj razteza čez dele, ki se stikajo.
 2. V oknu:
    - **{{ui:faceTool.direction}}:** {{ui:faceTool.direction.out}} za material na ploskvi ali {{ui:faceTool.direction.in}} za žep, izrezan vanjo. Žep ne gre globlje od telesa za ploskvijo; pri izdolbenem telesu lahko vseeno seže do votline.
    - **{{ui:faceTool.inset}}:** kako daleč nov obris ostane znotraj roba ploskve. Navzven pri 0 šteje cela ploskev, tako se stena odebeli. Odprtine v ploskvi se povečajo za isto mero.

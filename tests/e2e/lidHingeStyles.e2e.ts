@@ -100,54 +100,212 @@ describe("a flush hinge, in the back wall (real Manifold kernel)", () => {
   });
 });
 
-describe("a flush hinge on a box with rounded corners (real Manifold kernel)", () => {
-  it("cuts plate and wall round the axis right up to the end knuckles: no sliver left standing at either end", async () => {
+/**
+ * As openBox, its upright edges rounded by `corner` outside (2 mm less inside, or square inside under 2 mm): with 6 mm the
+ * back runs straight from x -24 to 24. Also the outline standing up, from the floor to above the lid.
+ */
+function roundedBox(kernel: Kernel, created: Solid[], corner: number) {
+  const rounded = (width: number, depth: number, radius: number) => kernel.CrossSection.square([width - 2 * radius, depth - 2 * radius], true).offset(radius, "Round", 2, 64);
+  const outline = rounded(60, 40, corner);
+  const hollow = corner > 2 ? rounded(56, 36, corner - 2) : kernel.CrossSection.square([56, 36], true);
+  const outer = outline.extrude(30).rotate([-90, 0, 0]);
+  const inner = hollow.extrude(30).rotate([-90, 0, 0]).translate([0, 2, 0]);
+  const body = outer.subtract(inner);
+  const column = outline.extrude(32).rotate([-90, 0, 0]);
+  created.push(outline, hollow, outer, inner, body, column);
+  return { body, column };
+}
+
+/** The lid turned back over and laid on the rim of the 60 x 40 box, as it closes it. */
+function closing(lid: Body, created: Solid[]) {
+  const turned = lid.rotate([180, 0, 0]);
+  const lidBox = turned.boundingBox();
+  const closed = turned.translate([-30 - lidBox.min[0], 32 - lidBox.max[1], 20 - lidBox.max[2]]);
+  created.push(turned, closed);
+  return closed;
+}
+
+/** A rod round the hinge's line (along x at height `y` and depth `z`), from `from` to `to`, `outer` round and hollow to `inner`. */
+function rodAlong(kernel: Kernel, from: number, to: number, outer: number, inner: number, y: number, z: number, created: Solid[]) {
+  const full = kernel.Manifold.cylinder(to - from, outer, outer, 96);
+  const ring = inner > 0 ? full.subtract(kernel.Manifold.cylinder(to - from, inner, inner, 96)) : full;
+  const placed = ring.rotate([0, 90, 0]).translate([from, y, z]);
+  created.push(full, ring, placed);
+  return placed;
+}
+
+/** How much of `solid` lies in `other`. */
+function overlapOf(solid: Body, other: Body, created: Solid[]) {
+  const common = solid.intersect(other);
+  created.push(common);
+  return common.volume();
+}
+
+describe("a flush hinge on a box with rounded corners, without end plugs (Discussion #1387, real Manifold kernel)", () => {
+  const axisY = 32 - RADIUS;
+  const axisZ = -20 + RADIUS;
+
+  it("fills the corners with its end knuckles, its pin's hole running out through the round, and still opens past upright", async () => {
     const kernel = await runtime();
     const created: Solid[] = [];
     try {
-      // As openBox, its upright edges rounded by 6 mm outside (4 mm inside): the back runs straight from x -24 to 24.
-      const rounded = (width: number, depth: number, radius: number) => kernel.CrossSection.square([width - 2 * radius, depth - 2 * radius], true).offset(radius, "Round", 2, 64);
-      const outline = rounded(60, 40, 6);
-      const hollow = rounded(56, 36, 4);
-      const outer = outline.extrude(30).rotate([-90, 0, 0]);
-      const inner = hollow.extrude(30).rotate([-90, 0, 0]).translate([0, 2, 0]);
-      const body = outer.subtract(inner);
-      created.push(outline, hollow, outer, inner, body);
+      const { body, column } = roundedBox(kernel, created, 6);
       const result = lidForSolid(kernel, body, normalizeLidOptions({ ...HINGED, hingeStyle: "flush" }));
       if ("error" in result) throw new Error(JSON.stringify(result.error));
-      const { knuckles, cuts, count } = result.hinge!;
+      const { knuckles, cuts, count, plugs } = result.hinge!;
       created.push(result.lid, knuckles, cuts!);
       expect(count).toBe(5);
+      expect(plugs).toBeNull();
       const whole = body.add(knuckles).subtract(cuts!);
-      const turned = result.lid.rotate([180, 0, 0]);
-      created.push(whole, turned);
-      const lidBox = turned.boundingBox();
-      const closed = turned.translate([-30 - lidBox.min[0], 32 - lidBox.max[1], 20 - lidBox.max[2]]);
-      created.push(closed);
+      const closed = closing(result.lid, created);
+      created.push(whole);
       expect(whole.decompose().length).toBe(1);
       expect(closed.decompose().length).toBe(1);
-      const axisY = 32 - RADIUS;
-      const axisZ = -20 + RADIUS;
-      // Round the axis beside each end knuckle (the body's, where the knuckles start and end), out into the corner:
-      // nothing of the lid, and nothing of the box. (A sliver of the plate 0.01 mm thin stood here, and a fin of the wall
-      // as thick as the gap.)
-      const ends = knuckles.boundingBox();
-      expect(ends.min[0]).toBeGreaterThan(-26);
-      expect(ends.max[0]).toBeLessThan(26);
+      // The end knuckles reach out into the corners, to the round: the hinge's line leaves the box at about ±28.99.
+      const reach = knuckles.boundingBox();
+      expect(reach.min[0]).toBeLessThan(-28.9);
+      expect(reach.max[0]).toBeGreaterThan(28.9);
+      // Round the axis in the corners, out to the round and in past the straight back, the box fills all of the knuckle's
+      // round outside the pin's hole (whose point reaches 1.31 mm up): no notch is left in either corner. (Plate and wall
+      // were cut round the axis there, by the knuckle's radius and the gap.)
+      for (const [from, to] of [[-29.4, -23.9], [23.9, 29.4]]) {
+        const within = rodAlong(kernel, from, to, RADIUS - 0.05, 1.4, axisY, axisZ, created).intersect(column);
+        const empty = within.subtract(whole);
+        created.push(within, empty);
+        expect(within.volume()).toBeGreaterThan(60);
+        expect(empty.volume(), `empty round the axis from ${from}`).toBeLessThan(1e-3);
+      }
+      // The pin's hole still runs right through: a piece of filament along the axis, longer than the box is wide, touches
+      // neither the box nor the lid. So it comes out of the corners' round faces.
+      const filament = rodAlong(kernel, -35, 35, 0.875, 0, axisY, axisZ, created);
+      expect(overlapOf(whole, filament, created)).toBeLessThan(0.001);
+      expect(overlapOf(closed, filament, created)).toBeLessThan(0.001);
+      // Nothing of the lid round the end knuckles, from the round in to their inner sides: no sliver of the plate is left
+      // between the cut round the knuckle's straight part and the one in the corner.
+      const pieces = knuckles.decompose().sort((a, b) => a.boundingBox().min[0] - b.boundingBox().min[0]);
+      created.push(...pieces);
+      expect(pieces.length).toBe(3);
       const room = RADIUS + 0.3 - 0.05;
-      for (const [from, to] of [[ends.min[0] - 2, ends.min[0] - 0.02], [ends.max[0] + 0.02, ends.max[0] + 2]]) {
-        const zone = kernel.Manifold.cylinder(to - from, room, room, 48).rotate([0, 90, 0]).translate([from, axisY, axisZ]);
-        const inLid = closed.intersect(zone);
-        const inBox = whole.intersect(zone);
-        created.push(zone, inLid, inBox);
-        expect(inLid.volume()).toBeLessThan(1e-4);
-        expect(inBox.volume()).toBeLessThan(1e-4);
+      for (const [from, to] of [[-31, pieces[0].boundingBox().max[0] - 0.02], [pieces[2].boundingBox().min[0] + 0.02, 31]]) {
+        expect(overlapOf(closed, rodAlong(kernel, from, to, room, 0, axisY, axisZ, created), created), `the lid round the end knuckle from ${from}`).toBeLessThan(1e-4);
       }
       // And it still closes without overlap and opens well past upright.
-      const overlap = closed.intersect(whole);
-      created.push(overlap);
-      expect(overlap.volume()).toBeLessThan(0.01);
+      expect(overlapOf(closed, whole, created)).toBeLessThan(0.01);
       expect(widestOpening(closed, whole, axisY, axisZ, created)).toBeGreaterThanOrEqual(110);
+    } finally {
+      dispose(created);
+    }
+  });
+
+  it("ends the pin half a millimetre inside where its hole is still whole, and prints it that long", async () => {
+    const kernel = await runtime();
+    const created: Solid[] = [];
+    try {
+      const { body, column } = roundedBox(kernel, created, 6);
+      const result = lidForSolid(kernel, body, normalizeLidOptions({ ...HINGED, hingeStyle: "flush", hingePrintPin: true }));
+      if ("error" in result) throw new Error(JSON.stringify(result.error));
+      const { knuckles, cuts, pin, pinLength } = result.hinge!;
+      created.push(result.lid, knuckles, cuts!, pin!);
+      // The hole, 0.925 mm round, is whole out to where the round crosses the line 0.925 mm behind the axis: 1.75 mm in
+      // front of the back, 4.25 mm in front of the corner's middle, 6 mm round it (on a round of 64 sides).
+      const whole = 24 + Math.sqrt(36 - 4.25 ** 2);
+      expect(pinLength).toBeCloseTo(2 * whole - 1, 2);
+      const printed = pin!.boundingBox();
+      expect(printed.max[0] - printed.min[0]).toBeCloseTo(pinLength!, 3);
+      // In its place, in the middle of the hinge, it lies within the box all round; one as long as the hole is at the
+      // axis's height, less the half millimetres, would stand out of the round behind the axis at both ends.
+      const inPlace = rodAlong(kernel, -pinLength! / 2, pinLength! / 2, 0.875, 0, axisY, axisZ, created);
+      const outside = inPlace.subtract(column);
+      created.push(outside);
+      expect(outside.volume()).toBeLessThan(1e-4);
+      const atAxis = 24 + Math.sqrt(36 - (6 - RADIUS) ** 2);
+      const longer = rodAlong(kernel, -atAxis + 0.5, atAxis - 0.5, 0.875, 0, axisY, axisZ, created);
+      const standingOut = longer.subtract(column);
+      created.push(standingOut);
+      expect(standingOut.volume()).toBeGreaterThan(0.01);
+      expect(standingOut.decompose().length).toBe(2);
+      // And the pin turns freely in the lid and sits in the box's hole without overlapping it.
+      const box = body.add(knuckles).subtract(cuts!);
+      created.push(box);
+      expect(overlapOf(box, inPlace, created)).toBeLessThan(1e-3);
+    } finally {
+      dispose(created);
+    }
+  });
+
+  it("builds the very lid it builds with end plugs, and the same end knuckles but for the plugs' pockets", async () => {
+    const kernel = await runtime();
+    const created: Solid[] = [];
+    try {
+      const { body } = roundedBox(kernel, created, 6);
+      const without = lidForSolid(kernel, body, normalizeLidOptions({ ...HINGED, hingeStyle: "flush" }));
+      const withPlugs = lidForSolid(kernel, body, normalizeLidOptions({ ...HINGED, hingeStyle: "flush", hingeEndPlugs: true }));
+      if ("error" in without || "error" in withPlugs) throw new Error("no lid");
+      created.push(without.lid, without.hinge!.knuckles, without.hinge!.cuts!, withPlugs.lid, withPlugs.hinge!.knuckles, withPlugs.hinge!.cuts!, withPlugs.hinge!.plugs!);
+      const [a, b] = [without.lid.getMesh(), withPlugs.lid.getMesh()];
+      expect(Array.from(a.vertProperties)).toEqual(Array.from(b.vertProperties));
+      expect(Array.from(a.triVerts)).toEqual(Array.from(b.triVerts));
+      // The knuckles with plugs are those without, less the square pockets: the corners of a square on its corner that the
+      // teardrop leaves, over the last 4 mm at each end (in from where the hinge's line leaves the box, about ±28.99, to
+      // ±24.99), and nowhere else.
+      const pockets = without.hinge!.knuckles.subtract(withPlugs.hinge!.knuckles);
+      const extra = withPlugs.hinge!.knuckles.subtract(without.hinge!.knuckles);
+      created.push(pockets, extra);
+      expect(extra.volume()).toBeLessThan(1e-4);
+      const between = kernel.Manifold.cube([2 * 24.95, 100, 100], true);
+      const atEnds = kernel.Manifold.cube([62, 100, 100], true).subtract(between);
+      created.push(between, atEnds);
+      // The square's four corners outside the round hole, less what the teardrop's point takes of the top one.
+      const corners = (4 - Math.PI) * 0.925 ** 2;
+      expect(pockets.volume()).toBeGreaterThan(2 * 4 * corners * 0.6);
+      expect(pockets.volume()).toBeLessThan(2 * 4 * corners);
+      expect(pockets.volume() - overlapOf(pockets, atEnds, created)).toBeLessThan(1e-4);
+    } finally {
+      dispose(created);
+    }
+  });
+});
+
+describe("a flush hinge's ends where there is nothing to fill (Discussion #1387, real Manifold kernel)", () => {
+  it("come out exactly as before on a box with square corners or corners rounded within the gap, with end plugs, and for other hinges", async () => {
+    const kernel = await runtime();
+    const created: Solid[] = [];
+    // A pot 50 mm across with 2 mm walls and floor, open at the top.
+    const pot = () => {
+      const outer = kernel.Manifold.cylinder(30, 25, 25, 96).rotate([-90, 0, 0]);
+      const inner = kernel.Manifold.cylinder(30, 23, 23, 96).rotate([-90, 0, 0]).translate([0, 2, 0]);
+      const body = outer.subtract(inner);
+      created.push(outer, inner, body);
+      return body;
+    };
+    // Taken before the end knuckles filled rounded corners without end plugs: the volume and the number of triangles of the
+    // lid, the body's knuckles, the cuts grouped with the body, the printed pin and the plugs, and the pin's length.
+    const before = [
+      ["square box, flush", openBox(kernel, created), { hingeStyle: "flush" }, [5429.1403, 1196], [773.2198, 1184], [841.0166, 1180], [134.205, 160], null, null],
+      ["square box, flush on the right", openBox(kernel, created), { hingeStyle: "flush", hingeSide: "right" }, [5574.8683, 830], [541.2539, 888], [535.0294, 836], null, null, null],
+      ["square box, end plugs", openBox(kernel, created), { hingeStyle: "flush", hingeEndPlugs: true }, [5429.1403, 1196], [768.767, 1256], [846.5826, 1384], [116.0078, 160], [24.5, 24], 51],
+      ["rounded box, end plugs", roundedBox(kernel, created, 6).body, { hingeStyle: "flush", hingeEndPlugs: true }, [5269.6395, 1530], [851.3119, 1268], [683.4519, 976], [111.4305, 160], [24.2372, 104], 48.9877],
+      ["box rounded within the gap, flush", roundedBox(kernel, created, 0.3).body, { hingeStyle: "flush" }, [5398.8937, 1092], [815.8299, 888], [787.1663, 836], [133.4842, 160], null, null],
+      ["rounded box, outside", roundedBox(kernel, created, 6).body, { hingeStyle: "outside" }, [6219.7112, 1808], [941.7402, 840], null, [107.3232, 160], null, null],
+      ["round pot, outside", pot(), { hingeStyle: "outside" }, [4953.8011, 2478], [757.364, 632], null, [46.5776, 160], null, null],
+    ] as const;
+    try {
+      for (const [name, body, style, lid, knuckles, cuts, pin, plugs, pinLength] of before) {
+        const result = lidForSolid(kernel, body, normalizeLidOptions({ ...HINGED, ...style, hingePrintPin: !("hingeSide" in style) }));
+        if ("error" in result) throw new Error(`${name}: ${JSON.stringify(result.error)}`);
+        const hinge = result.hinge!;
+        created.push(result.lid, hinge.knuckles, ...[hinge.cuts, hinge.pin, hinge.plugs].filter((part) => part !== null));
+        for (const [part, solid, expected] of [["lid", result.lid, lid], ["knuckles", hinge.knuckles, knuckles], ["cuts", hinge.cuts, cuts], ["pin", hinge.pin, pin], ["plugs", hinge.plugs, plugs]] as const) {
+          if (!expected) {
+            expect(solid, `${name}: ${part}`).toBeNull();
+            continue;
+          }
+          expect(Math.abs(solid!.volume() - expected[0]), `${name}: ${part}'s volume`).toBeLessThan(1e-4);
+          expect(solid!.numTri(), `${name}: ${part}'s triangles`).toBe(expected[1]);
+        }
+        if (pinLength === null) expect(hinge.pinLength, name).toBeNull();
+        else expect(hinge.pinLength, name).toBeCloseTo(pinLength, 4);
+      }
     } finally {
       dispose(created);
     }

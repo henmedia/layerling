@@ -1,12 +1,27 @@
 "use client";
 
-import { Printer, Search, X } from "lucide-react";
-import { Fragment, useEffect, useRef, useState } from "react";
+import { Plus, Printer, Search, X } from "lucide-react";
+import { Fragment, useEffect, useMemo, useRef, useState, type KeyboardEvent as ReactKeyboardEvent } from "react";
 import { createPortal } from "react-dom";
 import { useMovablePanel } from "@/lib/useMovablePanel";
 import { t, type MessageKey } from "@/lib/i18n";
 import { useLanguage } from "@/lib/useLanguage";
 import { GuideHelpLink } from "@/components/GuideHelpLink";
+import { searchCommands } from "@/lib/commandSearch";
+import {
+  comboFromKeyPress,
+  customShortcutCommands,
+  isBindableCommandId,
+  keyRefusal,
+  readCustomShortcuts,
+  setCustomShortcutRecording,
+  subscribeCustomShortcuts,
+  takenKeys,
+  writeCustomShortcuts,
+  type CustomShortcuts,
+  type KeyRefusal,
+} from "@/lib/customShortcuts";
+import type { PaletteCommand } from "./CommandPalette";
 
 /**
  * One shortcut: the keys stay literal in both languages, only the sentence
@@ -301,6 +316,295 @@ function ShortcutGroups({ groups }: { groups: ShortcutGroup[] }) {
   );
 }
 
+/** The keys of your own, kept up to date with the store (this window, another window, another tab). */
+function useCustomShortcuts(): CustomShortcuts {
+  const [shortcuts, setShortcuts] = useState<CustomShortcuts>(readCustomShortcuts);
+  useEffect(() => subscribeCustomShortcuts(() => setShortcuts(readCustomShortcuts())), []);
+  return shortcuts;
+}
+
+/** Every line of the list in both modes: a key of your own must not take a key the editor already uses anywhere. */
+const LISTED_SHORTCUTS = SHORTCUT_GROUPS.flatMap((group) => group.shortcuts.map((shortcut) => ({ combos: shortcut.combos, label: shortcut.label })));
+
+function refusalText(refusal: KeyRefusal, combo: string) {
+  if (refusal.reason === "unusable") return t("customKeys.unusable", { key: combo });
+  if (refusal.reason === "own") return t("customKeys.takenOwn", { key: combo, command: refusal.label });
+  if (refusal.owner.kind === "list") return t("customKeys.takenList", { key: combo, use: t(refusal.owner.label as MessageKey) });
+  if (refusal.owner.kind === "browser") return t("customKeys.takenBrowser", { key: combo });
+  return t("customKeys.takenEditor", { key: combo });
+}
+
+/** The keys of your own, sorted by the name of their command; the name is the command's as it is now, if it is here. */
+function customRows(shortcuts: CustomShortcuts, commands: readonly PaletteCommand[]) {
+  return Object.entries(shortcuts)
+    .map(([id, shortcut]) => {
+      const command = commands.find((entry) => entry.id === id);
+      return { id, combo: shortcut.combo, label: command?.label ?? shortcut.label, here: Boolean(command) };
+    })
+    .sort((a, b) => a.label.localeCompare(b.label));
+}
+
+/**
+ * "Your own keys" (Discussion #1399): any command of the command search on a key you choose. Find the command, press
+ * the key; a key the editor or the browser uses already, or one of your own keys, is refused with what it does. The
+ * keys stay in this browser. While the window waits for a key, no key runs anything.
+ */
+function CustomKeysSection({ query }: { query: string }) {
+  const apple = appleKeyboard();
+  const shortcuts = useCustomShortcuts();
+  // The commands of the current mode, read once when the window opens: they are what the toolbar offers now.
+  const [commands] = useState<PaletteCommand[]>(() => customShortcutCommands<PaletteCommand>().filter((command) => isBindableCommandId(command.id)));
+  const taken = useMemo(() => takenKeys(LISTED_SHORTCUTS), []);
+  const [step, setStep] = useState<{ kind: "idle" } | { kind: "find" } | { kind: "record"; command: { id: string; label: string } }>({ kind: "idle" });
+  const [find, setFind] = useState("");
+  const [message, setMessage] = useState<{ text: string; error: boolean } | null>(null);
+  const [confirmReset, setConfirmReset] = useState(false);
+  const findRef = useRef<HTMLInputElement>(null);
+  const recordRef = useRef<HTMLDivElement>(null);
+  const addRef = useRef<HTMLButtonElement>(null);
+  const sectionRef = useRef<HTMLElement>(null);
+  const previousStepRef = useRef(step.kind);
+  const recordingNow = step.kind === "record";
+
+  useEffect(() => {
+    setCustomShortcutRecording(recordingNow);
+    if (recordingNow) recordRef.current?.focus();
+    return () => setCustomShortcutRecording(false);
+  }, [recordingNow]);
+  useEffect(() => {
+    if (step.kind === "find") findRef.current?.focus();
+    // Back from finding or pressing a key, the focus stays in the window (on "Add a key"), so Esc still closes it
+    // and the editor behind it gets no key.
+    else if (step.kind === "idle" && previousStepRef.current !== "idle") (addRef.current ?? sectionRef.current)?.focus();
+    previousStepRef.current = step.kind;
+  }, [step.kind]);
+  useEffect(() => {
+    if (!confirmReset) return;
+    const timer = window.setTimeout(() => setConfirmReset(false), 4000);
+    return () => window.clearTimeout(timer);
+  }, [confirmReset]);
+
+  const found = useMemo(() => searchCommands(commands, find).slice(0, 8), [commands, find]);
+  const terms = query.trim().toLocaleLowerCase().split(/\s+/).filter(Boolean);
+  const rows = customRows(shortcuts, commands).filter((row) => terms.every((term) => `${row.label} ${row.combo}`.toLocaleLowerCase().includes(term)));
+  // A search in the window that finds none of your keys leaves this part out, as it does with the other groups.
+  if (terms.length > 0 && rows.length === 0) return null;
+
+  const record = (event: ReactKeyboardEvent<HTMLDivElement>, command: { id: string; label: string }) => {
+    // The window's own Esc (close) and the editor's keys stay out of this.
+    event.stopPropagation();
+    event.preventDefault();
+    if (event.key === "Escape") {
+      setStep({ kind: "idle" });
+      setMessage(null);
+      return;
+    }
+    const combo = comboFromKeyPress(event.nativeEvent);
+    if (!combo) return;
+    const refusal = keyRefusal(combo, command.id, taken, shortcuts);
+    if (refusal) {
+      setMessage({ text: refusalText(refusal, combo), error: true });
+      return;
+    }
+    writeCustomShortcuts({ ...shortcuts, [command.id]: { combo, label: command.label } });
+    setStep({ kind: "idle" });
+    setMessage({ text: t("customKeys.saved", { key: combo, command: command.label }), error: false });
+  };
+
+  const remove = (id: string, label: string) => {
+    const next = { ...shortcuts };
+    delete next[id];
+    writeCustomShortcuts(next);
+    setMessage({ text: t("customKeys.removed", { command: label }), error: false });
+  };
+
+  return (
+    <section ref={sectionRef} tabIndex={-1} className="shortcuts-group shortcuts-custom" aria-label={t("customKeys.title")}>
+      <h3>
+        {t("customKeys.title")}
+        <GuideHelpLink section="customKeys" />
+      </h3>
+      {terms.length === 0 ? <p className="shortcuts-custom-intro">{t("customKeys.intro")}</p> : null}
+      {rows.length > 0 ? (
+        <dl>
+          {rows.map((row) => (
+            <div className={`shortcuts-row${row.here ? "" : " shortcuts-custom-elsewhere"}`} key={row.id}>
+              <dt>
+                {row.label}
+                {row.here ? null : <span className="shortcuts-custom-note"> {t("customKeys.notHere")}</span>}
+              </dt>
+              <dd className="shortcuts-custom-keys">
+                <button
+                  type="button"
+                  className="shortcuts-custom-change"
+                  title={t("customKeys.change", { command: row.label })}
+                  aria-label={t("customKeys.change", { command: row.label })}
+                  onClick={() => {
+                    setMessage(null);
+                    setStep({ kind: "record", command: { id: row.id, label: row.label } });
+                  }}
+                >
+                  <ShortcutKeys combos={[row.combo]} apple={apple} />
+                </button>
+                <button
+                  type="button"
+                  className="shortcuts-custom-remove"
+                  title={t("customKeys.remove", { command: row.label })}
+                  aria-label={t("customKeys.remove", { command: row.label })}
+                  onClick={() => remove(row.id, row.label)}
+                >
+                  <X size={14} />
+                </button>
+              </dd>
+            </div>
+          ))}
+        </dl>
+      ) : null}
+      {step.kind === "record" ? (
+        <div
+          ref={recordRef}
+          className="shortcuts-custom-record"
+          tabIndex={0}
+          role="textbox"
+          aria-label={t("customKeys.press", { command: step.command.label })}
+          onKeyDown={(event) => record(event, step.command)}
+        >
+          <span>{t("customKeys.press", { command: step.command.label })}</span>
+          <button
+            type="button"
+            className="shortcuts-custom-cancel"
+            onClick={() => {
+              setStep({ kind: "idle" });
+              setMessage(null);
+            }}
+          >
+            {t("customKeys.cancel")}
+          </button>
+        </div>
+      ) : step.kind === "find" ? (
+        <div className="shortcuts-custom-find">
+          <div className="shortcuts-search-box">
+            <Search size={15} className="shortcuts-search-icon" aria-hidden="true" />
+            <input
+              ref={findRef}
+              className="shortcuts-search-input"
+              type="text"
+              value={find}
+              placeholder={t("customKeys.find")}
+              aria-label={t("customKeys.find")}
+              onChange={(event) => setFind(event.target.value)}
+              onKeyDown={(event) => {
+                if (event.key === "Escape") {
+                  event.stopPropagation();
+                  event.preventDefault();
+                  setStep({ kind: "idle" });
+                } else if (event.key === "Enter" && found[0]) {
+                  event.preventDefault();
+                  setStep({ kind: "record", command: { id: found[0].id, label: found[0].label } });
+                }
+              }}
+            />
+            <button
+              className="shortcuts-search-clear"
+              type="button"
+              aria-label={t("customKeys.cancel")}
+              title={t("customKeys.cancel")}
+              onClick={() => setStep({ kind: "idle" })}
+            >
+              <X size={14} />
+            </button>
+          </div>
+          {found.length > 0 ? (
+            <ul className="shortcuts-custom-results">
+              {found.map((command) => (
+                <li key={command.id}>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setMessage(null);
+                      setStep({ kind: "record", command: { id: command.id, label: command.label } });
+                    }}
+                  >
+                    <span className="shortcuts-custom-result-label">{command.label}</span>
+                    {shortcuts[command.id] ? <ShortcutKeys combos={[shortcuts[command.id].combo]} apple={apple} /> : null}
+                    <span className="shortcuts-custom-result-group">{command.group}</span>
+                  </button>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p className="shortcuts-no-matches">{t("customKeys.noCommand")}</p>
+          )}
+        </div>
+      ) : terms.length === 0 ? (
+        <div className="shortcuts-custom-actions">
+          <button
+            ref={addRef}
+            type="button"
+            className="shortcuts-custom-add"
+            disabled={commands.length === 0}
+            onClick={() => {
+              setFind("");
+              setMessage(null);
+              setStep({ kind: "find" });
+            }}
+          >
+            <Plus size={15} aria-hidden="true" />
+            {t("customKeys.add")}
+          </button>
+          {rows.length > 0 ? (
+            <button
+              type="button"
+              className="shortcuts-custom-reset"
+              onClick={() => {
+                if (!confirmReset) {
+                  setConfirmReset(true);
+                  return;
+                }
+                setConfirmReset(false);
+                writeCustomShortcuts({});
+                setMessage({ text: t("customKeys.removedAll"), error: false });
+              }}
+            >
+              {confirmReset ? t("customKeys.removeAllConfirm") : t("customKeys.removeAll")}
+            </button>
+          ) : null}
+        </div>
+      ) : null}
+      {message ? (
+        <p className={`shortcuts-custom-message${message.error ? " error" : ""}`} role={message.error ? "alert" : "status"}>
+          {message.text}
+        </p>
+      ) : null}
+    </section>
+  );
+}
+
+/** Your keys on the printed sheet, as a group of their own. */
+function CustomKeysPrint() {
+  const apple = appleKeyboard();
+  const shortcuts = useCustomShortcuts();
+  const rows = customRows(shortcuts, customShortcutCommands<PaletteCommand>());
+  if (rows.length === 0) return null;
+  return (
+    <div className="shortcuts-groups">
+      <section className="shortcuts-group">
+        <h3>{t("customKeys.title")}</h3>
+        <dl>
+          {rows.map((row) => (
+            <div className="shortcuts-row" key={row.id}>
+              <dt>{row.label}</dt>
+              <dd>
+                <ShortcutKeys combos={[row.combo]} apple={apple} />
+              </dd>
+            </div>
+          ))}
+        </dl>
+      </section>
+    </div>
+  );
+}
+
 /** While this attribute is on the page, the print style shows the sheet of shortcuts and nothing else. */
 const PRINT_ATTRIBUTE = "data-print-shortcuts";
 
@@ -414,6 +718,7 @@ export function ShortcutsModal({ sketchMode, onClose }: { sketchMode: boolean; o
           </div>
           <div className="workspace-modal-body shortcuts-modal-body">
             <p className="shortcuts-intro">{t("shortcuts.intro")}</p>
+            <CustomKeysSection query={query} />
             {groups.length > 0 ? <ShortcutGroups groups={groups} /> : <p className="shortcuts-no-matches">{t("shortcuts.noMatches")}</p>}
           </div>
         </div>
@@ -424,6 +729,7 @@ export function ShortcutsModal({ sketchMode, onClose }: { sketchMode: boolean; o
         : createPortal(
             <div className="shortcuts-print-sheet" aria-hidden="true">
               <h1>{t("shortcuts.title")}</h1>
+              <CustomKeysPrint />
               <ShortcutGroups groups={groups} />
             </div>,
             document.body,

@@ -179,7 +179,7 @@ import { numberLocale, t, type MessageKey } from "@/lib/i18n";
 import { localizedError } from "@/lib/userErrors";
 import { displayShapeName, makeShapeFromAsset, renamedShapeName, shapeAssetDefaultDimensions } from "@/lib/shapeCatalog";
 import { cylinderToEllipsePatch } from "@/lib/cylinderToEllipse";
-import { normalizeSurfaceTexture, SURFACE_TEXTURE_AXES, SURFACE_TEXTURE_CAP_EDGES, SURFACE_TEXTURE_CAP_STYLES, SURFACE_TEXTURE_CARBON_WEAVES, SURFACE_TEXTURE_BARK_TYPES, SURFACE_TEXTURE_BRICK_BONDS, SURFACE_TEXTURE_BUMP_GRIDS, SURFACE_TEXTURE_CRACK_STARTS, SURFACE_TEXTURE_CRACK_STYLES, SURFACE_TEXTURE_DEFAULTS, SURFACE_TEXTURE_DETAILS, SURFACE_TEXTURE_DIRECTIONS, SURFACE_TEXTURE_IMAGES, SURFACE_TEXTURE_LIMITS, SURFACE_TEXTURE_MASK_MODES, SURFACE_TEXTURE_PROFILES, SURFACE_TEXTURE_PROJECTIONS, SURFACE_TEXTURE_STARTERS, SURFACE_TEXTURE_TILINGS, SURFACE_TEXTURE_WOOD_CUTS, SURFACE_TEXTURE_WOOD_TYPES, surfaceTextureImageTile, type SurfaceTextureFace, type SurfaceTextureMaskMode, type SurfaceTexturePattern, type SurfaceTextureSettings } from "@/lib/surfaceTexture";
+import { normalizeSurfaceTexture, SURFACE_TEXTURE_AXES, SURFACE_TEXTURE_CAP_EDGES, SURFACE_TEXTURE_CAP_STYLES, SURFACE_TEXTURE_CARBON_WEAVES, SURFACE_TEXTURE_BARK_TYPES, SURFACE_TEXTURE_BRICK_BONDS, SURFACE_TEXTURE_BUMP_GRIDS, SURFACE_TEXTURE_CRACK_STARTS, SURFACE_TEXTURE_CRACK_STYLES, SURFACE_TEXTURE_DEFAULTS, SURFACE_TEXTURE_DETAILS, SURFACE_TEXTURE_DIRECTIONS, SURFACE_TEXTURE_IMAGES, SURFACE_TEXTURE_LIMITS, SURFACE_TEXTURE_MASK_MODES, SURFACE_TEXTURE_PROFILES, SURFACE_TEXTURE_PROJECTIONS, SURFACE_TEXTURE_STARTERS, SURFACE_TEXTURE_TILINGS, SURFACE_TEXTURE_TIMBER_BRACINGS, SURFACE_TEXTURE_WOOD_CUTS, SURFACE_TEXTURE_WOOD_TYPES, surfaceTextureImageTile, type SurfaceTextureFace, type SurfaceTextureMaskMode, type SurfaceTexturePattern, type SurfaceTextureSettings } from "@/lib/surfaceTexture";
 import { SURFACE_TEXTURE_OWN_IMAGE_SIZE, surfaceTextureOwnImage } from "@/lib/surfaceTextureImages";
 import { BARK_STARTS, WOOD_RINGS } from "@/lib/surfaceTextureWood";
 import { offersSurfaceTextureMask, SURFACE_TEXTURE_LABELS, surfacePatternColor, surfacePatternLabel, surfacePatternPartOf, surfacePatternPartWay, surfaceTextureEntry, surfaceTextureLayerPlaced } from "@/lib/surfaceTextureShape";
@@ -210,7 +210,7 @@ import { FONT_MANAGER_OPTION, requestFontManager } from "@/lib/fontManagerEvents
 import { FontPicker } from "@/components/workplane/FontPicker";
 import { SurfacePatternPicker } from "@/components/workplane/SurfacePatternPicker";
 import { QR_BYTE_CAPACITY, qrByteLength, qrTextFits, type QrCodeSettings } from "@/lib/qrCode";
-import { MAX_SBC_BUTTON_REACH, MAX_SBC_CLEARANCE, MAX_SBC_REACH, MAX_SBC_UP_REACH, MIN_SBC_UP_REACH, normalizeSbcBoardSettings, SBC_BOARDS, SBC_BOARD_ORDER, sbcBoardHasButtons, sbcBoardHasGpio, sbcBoardHasRibbon, type SbcBoardSettings, type SbcBoardType } from "@/lib/sbcBoards";
+import { MAX_SBC_BUTTON_REACH, MAX_SBC_CLEARANCE, MAX_SBC_REACH, MAX_SBC_UP_REACH, MIN_SBC_UP_REACH, normalizeSbcBoardSettings, SBC_BOARDS, SBC_BOARD_ORDER, sbcBoardHasButtons, sbcBoardHasGpio, sbcBoardHasLens, sbcBoardHasRibbon, type SbcBoardSettings, type SbcBoardType } from "@/lib/sbcBoards";
 import { ICON_TAG_LAYERS, iconTagFitCount, MAX_ICON_TAG_WIDTH, MAX_ICON_TAGS, MIN_ICON_TAG_WIDTH, normalizeIconTagCount, type IconLayerStack } from "@/lib/iconTag";
 import { PICTURE_FILE_ACCEPT } from "@/lib/pictureIcon";
 import { customFontList, textFontLabel } from "@/lib/textFonts";
@@ -619,7 +619,7 @@ function scrollingAncestor(element: HTMLElement): HTMLElement | null {
 }
 
 function propertyUsesLengthUnit(key: string) {
-  return ["textLineWidth", "textBlockGap", "textEdgeSize", "letterSize", "iconWidth", "keyringDiameter", "keyringAlong", "positionX", "positionY", "positionZ", "pivotX", "pivotY", "pivotZ", "radius", "length", "width", "height", "bevel", "topRadius", "baseRadius", "curvedConeTop", "thickness", "outerDiameter", "innerDiameter", "textRadius", "extrudeTopOffsetX", "extrudeTopOffsetZ", "toothSize", "toothWidth", "gearBacklash", "centerHole", "slotSmallEnd", "slotCentreDistance", "torusTube", "sketchLineWidth", "sketchCuttingEdge", "topLength", "topWidth", "bottomLength", "bottomWidth", "diameter", "pitch", "clearance", "axialClearance", "boltClearance", "threadDepth", "threadCoreDiameter", "threadLength", "headHeight", "headDiameter", "collarHeight", "collarDiameter", "driveSize", "driveDepth", "chamfer", "chamferBottom", "headChamfer", "wire", "starOuterSize", "starInnerSize", "starOuterFillet", "starInnerFillet", "heartTipFillet", "crescentThickness", "crescentTipFillet", "honeycombCellSize", "honeycombWallThickness", "honeycombFrameWidth", "cornerFillet", "topBottomFillet", "bentTubeSize", "bentTubeWall", "bentTubeSegmentLength", "bentTubeBendRadius", "dovetailNeckWidth", "dovetailClearance", "screwBossHole", "screwBossHoleDepth", "screwBossDiameter", "screwBossGussetHeight", "screwBossGussetThickness", "screwBossReach", "snapFitThickness", "snapFitUndercut", "snapFitClearance", "snapFitFoot", "ribLength", "ribThickness", "ribFootThickness", "portClearance", "hingePinDiameter", "hingeLeafThickness", "hingeClearance", "hingeCornerRadius", "hingeScrewDiameter", "hingeScrewSpacing", "hingeScrewAcross", "hingeNutWidth", "screwHoleShaft", "screwHoleHeadDepth", "knurlDepth", "knurlChamfer", "loftBottomWidth", "loftBottomDepth", "loftTopWidth", "loftTopDepth", "loftBottomCorner", "loftTopCorner", "loftOffsetX", "loftOffsetZ", "loftWall", "loftSectionHeight", "loftSectionWidth", "loftSectionDepth", "loftSectionCorner", "loftSectionOffsetX", "loftSectionOffsetZ", "gridfinityLabelBackLength", "gridfinityLabelBackOffset", "gridfinityLabelBackWidth", "gridfinityLabelCornerSize", "gridfinityLabelTextSize", "gridfinityLabelFrontLength", "gridfinityLabelFrontOffset", "gridfinityLabelFrontWidth", "gridfinityLabelLeftLength", "gridfinityLabelLeftOffset", "gridfinityLabelLeftWidth", "gridfinityLabelRightLength", "gridfinityLabelRightOffset", "gridfinityLabelRightWidth", "gridfinityScoopRadius", "gridfinityFloorHeight", "gridfinityLipChamfer", "gridfinityWallThickness", "gridfinityDrawerWidth", "gridfinityDrawerDepth", "gridfinityPaddingBack", "gridfinityPaddingFront", "gridfinityPaddingLeft", "gridfinityPaddingRight", "gridfinityCornerRadius", "gridfinityBinCornerRadius", "gridfinitySwallowtailClearance", "gridfinityDividerThickness", "gridfinityDividerPositionX", "gridfinityDividerPositionZ", "gridfinityCompartmentLabelWidth", "gridfinityOpeningCornerSize", "gridfinityOpeningDepthBack", "gridfinityOpeningDepthFront", "gridfinityOpeningDepthLeft", "gridfinityOpeningDepthRight", "gridfinityOpeningWidthBack", "gridfinityOpeningWidthFront", "gridfinityOpeningWidthLeft", "gridfinityOpeningWidthRight", "gridfinityOpeningDistanceBack", "gridfinityOpeningDistanceFront", "gridfinityOpeningDistanceLeft", "gridfinityOpeningDistanceRight", "surfaceSpacing", "surfaceDepth", "surfaceFade", "surfaceCrackWidth", "surfaceCrackRecess", "surfaceTextSize", "surfaceCarbonCross", "surfaceBrickHeight", "surfaceBrickJoint", "surfaceTileGap", "surfaceRingWidth", "surfaceTileHeight", "vase.wall", "vase.bottom", "vase.ribDepth", "vase.stripeDepth", "vase.voronoiCell", "vase.voronoiGap", "vase.voronoiDepth", "vase.waveAmplitude", "vaseFloor.drainDiameter", "vaseFloor.floorSlope", "vaseFloor.footHeight", "vaseFloor.rubberFootDiameter", "vaseFloor.rubberFootDepth", "vaseFloor.cutoutSize", "vaseFloor.cutoutWeb", "vaseFloor.lampHole", "vaseFloor.puckDiameter", "vaseFloor.lampNotch", "vaseFloor.lampNotchHeight", "vaseFloor.reinforceDepth", "vaseFloor.slitWidth", "vaseFloor.lineWidth", "vasePrint.lineWidth", "vaseParts.legHeight", "vaseParts.legDiameter", "vaseParts.saucerHeight", "vaseParts.saucerGap", "vaseParts.saucerWall", "vaseParts.insertWall", "vaseParts.insertStandoff", "vaseParts.reservoirHeight", "vaseParts.frogHole", "vaseParts.tubeDiameter", "vaseParts.lidClearance", "vaseParts.lidThickness", "vaseParts.lidDepth", "vaseParts.lidHeight", "vaseParts.lidJoint", "vaseParts.threadPitch", "vaseParts.fitClearance"].includes(key);
+  return ["textLineWidth", "textBlockGap", "textEdgeSize", "letterSize", "iconWidth", "keyringDiameter", "keyringAlong", "positionX", "positionY", "positionZ", "pivotX", "pivotY", "pivotZ", "radius", "length", "width", "height", "bevel", "topRadius", "baseRadius", "curvedConeTop", "thickness", "outerDiameter", "innerDiameter", "textRadius", "extrudeTopOffsetX", "extrudeTopOffsetZ", "toothSize", "toothWidth", "gearBacklash", "centerHole", "slotSmallEnd", "slotCentreDistance", "torusTube", "sketchLineWidth", "sketchCuttingEdge", "topLength", "topWidth", "bottomLength", "bottomWidth", "diameter", "pitch", "clearance", "axialClearance", "boltClearance", "threadDepth", "threadCoreDiameter", "threadLength", "headHeight", "headDiameter", "collarHeight", "collarDiameter", "driveSize", "driveDepth", "chamfer", "chamferBottom", "headChamfer", "wire", "starOuterSize", "starInnerSize", "starOuterFillet", "starInnerFillet", "heartTipFillet", "crescentThickness", "crescentTipFillet", "honeycombCellSize", "honeycombWallThickness", "honeycombFrameWidth", "cornerFillet", "topBottomFillet", "bentTubeSize", "bentTubeWall", "bentTubeSegmentLength", "bentTubeBendRadius", "dovetailNeckWidth", "dovetailClearance", "screwBossHole", "screwBossHoleDepth", "screwBossDiameter", "screwBossGussetHeight", "screwBossGussetThickness", "screwBossReach", "snapFitThickness", "snapFitUndercut", "snapFitClearance", "snapFitFoot", "ribLength", "ribThickness", "ribFootThickness", "portClearance", "hingePinDiameter", "hingeLeafThickness", "hingeClearance", "hingeCornerRadius", "hingeScrewDiameter", "hingeScrewSpacing", "hingeScrewAcross", "hingeNutWidth", "screwHoleShaft", "screwHoleHeadDepth", "knurlDepth", "knurlChamfer", "loftBottomWidth", "loftBottomDepth", "loftTopWidth", "loftTopDepth", "loftBottomCorner", "loftTopCorner", "loftOffsetX", "loftOffsetZ", "loftWall", "loftSectionHeight", "loftSectionWidth", "loftSectionDepth", "loftSectionCorner", "loftSectionOffsetX", "loftSectionOffsetZ", "gridfinityLabelBackLength", "gridfinityLabelBackOffset", "gridfinityLabelBackWidth", "gridfinityLabelCornerSize", "gridfinityLabelTextSize", "gridfinityLabelFrontLength", "gridfinityLabelFrontOffset", "gridfinityLabelFrontWidth", "gridfinityLabelLeftLength", "gridfinityLabelLeftOffset", "gridfinityLabelLeftWidth", "gridfinityLabelRightLength", "gridfinityLabelRightOffset", "gridfinityLabelRightWidth", "gridfinityScoopRadius", "gridfinityFloorHeight", "gridfinityLipChamfer", "gridfinityWallThickness", "gridfinityDrawerWidth", "gridfinityDrawerDepth", "gridfinityPaddingBack", "gridfinityPaddingFront", "gridfinityPaddingLeft", "gridfinityPaddingRight", "gridfinityCornerRadius", "gridfinityBinCornerRadius", "gridfinitySwallowtailClearance", "gridfinityDividerThickness", "gridfinityDividerPositionX", "gridfinityDividerPositionZ", "gridfinityCompartmentLabelWidth", "gridfinityOpeningCornerSize", "gridfinityOpeningDepthBack", "gridfinityOpeningDepthFront", "gridfinityOpeningDepthLeft", "gridfinityOpeningDepthRight", "gridfinityOpeningWidthBack", "gridfinityOpeningWidthFront", "gridfinityOpeningWidthLeft", "gridfinityOpeningWidthRight", "gridfinityOpeningDistanceBack", "gridfinityOpeningDistanceFront", "gridfinityOpeningDistanceLeft", "gridfinityOpeningDistanceRight", "surfaceSpacing", "surfaceDepth", "surfaceFade", "surfaceCrackWidth", "surfaceCrackRecess", "surfaceTextSize", "surfaceCarbonCross", "surfaceBrickHeight", "surfaceBrickJoint", "surfaceTimberHeight", "surfaceTimberBeam", "surfaceStoneJoint", "surfaceTileGap", "surfaceRingWidth", "surfaceTileHeight", "vase.wall", "vase.bottom", "vase.ribDepth", "vase.stripeDepth", "vase.voronoiCell", "vase.voronoiGap", "vase.voronoiDepth", "vase.waveAmplitude", "vaseFloor.drainDiameter", "vaseFloor.floorSlope", "vaseFloor.footHeight", "vaseFloor.rubberFootDiameter", "vaseFloor.rubberFootDepth", "vaseFloor.cutoutSize", "vaseFloor.cutoutWeb", "vaseFloor.lampHole", "vaseFloor.puckDiameter", "vaseFloor.lampNotch", "vaseFloor.lampNotchHeight", "vaseFloor.reinforceDepth", "vaseFloor.slitWidth", "vaseFloor.lineWidth", "vasePrint.lineWidth", "vaseParts.legHeight", "vaseParts.legDiameter", "vaseParts.saucerHeight", "vaseParts.saucerGap", "vaseParts.saucerWall", "vaseParts.insertWall", "vaseParts.insertStandoff", "vaseParts.reservoirHeight", "vaseParts.frogHole", "vaseParts.tubeDiameter", "vaseParts.lidClearance", "vaseParts.lidThickness", "vaseParts.lidDepth", "vaseParts.lidHeight", "vaseParts.lidJoint", "vaseParts.threadPitch", "vaseParts.fitClearance"].includes(key);
 }
 
 /**
@@ -5955,7 +5955,13 @@ function SbcBoardCard({ shapeId, controls, workspace, disabled, onInteractionAct
               <span>{t("sbcBoard.gpioUp")}</span>
             </label>
           ) : null}
-          {controls.settings.ribbonUp || controls.settings.gpioUp ? (
+          {sbcBoardHasLens(SBC_BOARDS[controls.settings.board]) ? (
+            <label className="check-property sbc-board-lens-up">
+              <input type="checkbox" checked={controls.settings.lensUp === true} disabled={disabled || busy} data-testid="sbc-board-lens-up" onChange={(event) => regenerate({ lensUp: event.currentTarget.checked })} />
+              <span>{t("sbcBoard.lensUp")}</span>
+            </label>
+          ) : null}
+          {controls.settings.ribbonUp || controls.settings.gpioUp || controls.settings.lensUp ? (
             <label className="select-property sbc-board-up-reach">
               <span>{t("sbcBoard.upReach")} ({unit})</span>
               <CompactMeasureField
@@ -6350,6 +6356,8 @@ const BUMP_SHAPES = ["dome", "pointed", "round", "flat"] as const;
 const SURFACE_SPACING_LABEL: Partial<Record<SurfaceTexturePattern, MessageKey>> = {
   cells: "inspector.surfaceSpacingCells",
   bricks: "inspector.surfaceSpacingBricks",
+  timber: "inspector.surfaceSpacingTimber",
+  stones: "inspector.surfaceSpacingStones",
   squares: "inspector.surfaceSpacingSquares",
   triangles: "inspector.surfaceSpacingTriangles",
   knit: "inspector.surfaceSpacingKnit",
@@ -6541,6 +6549,10 @@ export function SurfaceTextureCard({
   const bricks = settings.pattern === "bricks";
   // Squares and triangles: the gap in mm, and the first row at the bottom edge if wanted.
   const tiles = settings.pattern === "squares" || settings.pattern === "triangles";
+  // Half-timbering: its bracing, a storey's height, the beams' width (the depth is their height), rails and grain.
+  const timber = settings.pattern === "timber";
+  // A natural stone wall: how different and how round its stones are, the joint in mm, and its arrangement.
+  const stones = settings.pattern === "stones";
   // Bark and wood: a tree and a wood of their own, and the annual rings on a log's ends.
   const bark = settings.pattern === "bark";
   const wood = settings.pattern === "wood";
@@ -6732,6 +6744,17 @@ export function SurfaceTextureCard({
                       onChange={(value) => set({ brickBond: value as SurfaceTextureSettings["brickBond"] })}
                     />
                   ) : null}
+                  {timber ? (
+                    <SelectProperty
+                      type="select"
+                      label={t("inspector.surfaceTimberBracing")}
+                      value={settings.timberBracing}
+                      options={options(SURFACE_TEXTURE_TIMBER_BRACINGS, (value) => t(SURFACE_TEXTURE_LABELS.timberBracing[value]))}
+                      hint={t(SURFACE_TEXTURE_LABELS.timberBracingHint[settings.timberBracing])}
+                      disabled={disabled || busy}
+                      onChange={(value) => set({ timberBracing: value as SurfaceTextureSettings["timberBracing"] })}
+                    />
+                  ) : null}
                   {bark ? (
                     <SelectProperty
                       type="select"
@@ -6823,6 +6846,27 @@ export function SurfaceTextureCard({
                       <p className="cylinder-wrap-hint">{t("inspector.surfaceBrickHint")}</p>
                     </>
                   ) : null}
+                  {timber ? (
+                    <>
+                      {range("surfaceTimberHeight", t("inspector.surfaceTimberHeight"), settings.timberHeight, [SURFACE_TEXTURE_LIMITS.timberHeight[0], 100], 0.5, (timberHeight) => set({ timberHeight }))}
+                      {range("surfaceTimberBeam", t("inspector.surfaceTimberBeam"), settings.timberBeam, [SURFACE_TEXTURE_LIMITS.timberBeam[0], 10], 0.1, (timberBeam) => set({ timberBeam }))}
+                      {range("surfaceTimberRails", t("inspector.surfaceTimberRails"), settings.timberRails, SURFACE_TEXTURE_LIMITS.timberRails, 1, (timberRails) => set({ timberRails }))}
+                      {percent("surfaceTimberGrain", t("inspector.surfaceTimberGrain"), settings.timberGrain, (timberGrain) => set({ timberGrain }))}
+                      <p className="cylinder-wrap-hint">{t("inspector.surfaceTimberGrainHint")}</p>
+                      <p className="cylinder-wrap-hint">{t("inspector.surfaceTimberHint")}</p>
+                    </>
+                  ) : null}
+                  {stones ? (
+                    <>
+                      {percent("surfaceStoneVary", t("inspector.surfaceStoneVary"), settings.stoneVary, (stoneVary) => set({ stoneVary }))}
+                      {percent("surfaceStoneRound", t("inspector.surfaceStoneRound"), settings.stoneRound, (stoneRound) => set({ stoneRound }))}
+                      <p className="cylinder-wrap-hint">{t("inspector.surfaceStoneRoundHint")}</p>
+                      {range("surfaceStoneJoint", t("inspector.surfaceBrickJoint"), settings.stoneJoint, [SURFACE_TEXTURE_LIMITS.stoneJoint[0], 5], 0.05, (stoneJoint) => set({ stoneJoint }))}
+                      {range("surfaceSeed", t("inspector.surfaceSeed"), settings.seed, [1, 999], 1, (seed) => set({ seed }))}
+                      <p className="cylinder-wrap-hint">{t("inspector.surfaceStoneSeedHint")}</p>
+                      <p className="cylinder-wrap-hint">{t("inspector.surfaceStoneHint")}</p>
+                    </>
+                  ) : null}
                   {tiles ? (
                     <>
                       {range("surfaceTileGap", t("inspector.surfaceTileGap"), settings.tileGap, [SURFACE_TEXTURE_LIMITS.tileGap[0], 20], 0.1, (tileGap) => set({ tileGap }))}
@@ -6858,7 +6902,7 @@ export function SurfaceTextureCard({
                   />
                 </>
               ) : null}
-              {range("surfaceDepth", t("inspector.surfaceDepth"), settings.depth, SURFACE_TEXTURE_LIMITS.depth, 0.05, (depth) => set({ depth }))}
+              {range("surfaceDepth", t(timber ? "inspector.surfaceDepthTimber" : "inspector.surfaceDepth"), settings.depth, SURFACE_TEXTURE_LIMITS.depth, 0.05, (depth) => set({ depth }))}
               <SelectProperty
                 type="select"
                 label={t("inspector.surfaceDirection")}
@@ -7009,7 +7053,7 @@ export function SurfaceTextureCard({
                         </>
                       ) : null}
                     </>
-                  ) : tiles ? null : (
+                  ) : tiles || timber || stones ? null : (
                     range(
                       "surfaceCoverage",
                       t(SURFACE_COVERAGE_LABEL[settings.pattern] ?? "inspector.surfaceCoverage"),
@@ -7021,7 +7065,7 @@ export function SurfaceTextureCard({
                   )}
                   {placedHere ? null : (
                     <>
-                      {settings.pattern === "bumps" || grain || image || bark || wood ? null : (
+                      {settings.pattern === "bumps" || grain || image || bark || wood || timber || stones ? null : (
                         <SelectProperty
                           type="select"
                           label={t("inspector.surfaceProfile")}
@@ -7063,7 +7107,7 @@ export function SurfaceTextureCard({
                           <p className="cylinder-wrap-hint">{t(SURFACE_TEXTURE_LABELS.capEdgeHint[capEdgeShown])}</p>
                         </>
                       ) : null}
-                      {grain || cracks || bricks || tiles || wood || bark ? null : (
+                      {grain || cracks || bricks || tiles || timber || stones || wood || bark ? null : (
                         <>
                           {range("surfaceFaceTurn", t("inspector.surfaceFaceTurn"), settings.faceTurn, SURFACE_TEXTURE_LIMITS.faceTurn, 1, (faceTurn) => set({ faceTurn }))}
                           <p className="cylinder-wrap-hint">{t("inspector.surfaceFaceTurnHint")}</p>

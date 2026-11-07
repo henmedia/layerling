@@ -127,9 +127,9 @@ With {{ui:array.groupCopies}} ticked, {{ui:array.apply}} groups the original and
 
 ## Hole pattern on a face
 
-For vents, speaker grilles, baskets and enclosures the {{ui:holePattern.title}} spreads holes evenly over a flat face. You no longer have to make one hole, repeat it and set it onto the wall. Select exactly one body and click {{ui:holePattern.title}} in the {{ui:editor.group.modify}} group of the ribbon, next to the pattern. You can also right-click the body, or find it with [[Ctrl]]+[[K]].
+For vents, speaker grilles, baskets and enclosures the {{ui:holePattern.title}} spreads holes evenly over a flat face or round the wall of a cylinder. You no longer have to make one hole, repeat it and set it onto the wall. Select exactly one body and click {{ui:holePattern.title}} in the {{ui:editor.group.modify}} group of the ribbon, next to the pattern. You can also right-click the body, or find it with [[Ctrl]]+[[K]].
 
-1. Click a flat face of the body. The whole flat face around your click counts, not just the triangle under the pointer. A curved face does not work: you get a hint and click a flat one instead. On a group or a bundle a face runs on across parts that meet, as on one body; on a bundle only when no hole is among them. The parts are joined shortly after the tool opens; until then only one part's face lights up under the pointer, and a click waits for the join. On a group or bundle with text in it, only one part's face lights up, and the click joins the parts.
+1. Click a flat face of the body. The whole flat face around your click counts, not just the triangle under the pointer. The round wall of a cylinder, a tube or a bore works too, see below; any other curved face does not: you get a hint and click a flat one instead. On a group or a bundle a face runs on across parts that meet, as on one body; on a bundle only when no hole is among them. The parts are joined shortly after the tool opens; until then only one part's face lights up under the pointer, and a click waits for the join. On a group or bundle with text in it, only one part's face lights up, and the click joins the parts.
 2. In the window, set how the holes look and lie:
    - **{{ui:holePattern.form}}:** {{ui:holePattern.form.round}}, {{ui:holePattern.form.square}}, {{ui:holePattern.form.rectangle}}, {{ui:holePattern.form.hexagon}} or {{ui:holePattern.form.slot}}.
    - **Size:** the {{ui:holePattern.size.diameter}} of a round hole, the {{ui:holePattern.size.side}} of a square one, {{ui:holePattern.size.width}} and {{ui:holePattern.size.height}} for a rectangle and a slot. For the hexagon the size is the {{ui:holePattern.size.corners}}.
@@ -147,13 +147,15 @@ For vents, speaker grilles, baskets and enclosures the {{ui:holePattern.title}} 
 
 The holes are ordinary holes grouped with the body, just as after {{ui:editor.tool.group}}: nothing is baked in. {{ui:editor.tool.ungroup}} dissolves the group again and frees every hole, which you can then move, change or delete one by one. The whole thing is one step for {{ui:editor.tool.undo}}. The tool does not make more than 400 holes at once; make the holes bigger or the spacing wider then.
 
+The round wall of a cylinder, a tube or a bore takes holes too: a pen holder, a lamp shade, a tube with vents. Click the wall instead of a flat face; the whole wall lights up under the pointer. Every hole then points straight at the axis, and the rows go round the wall. On a wall that goes all the way round, each row holds a whole number of holes, evened out so the ring closes without a gap and never closer than the spacing; the window says how many go round and how far apart. The margin holds to the rims at the top and the bottom and to openings in the wall, on a part of a wall (a rounded edge, say) to its sides as well. {{ui:holePattern.depth.throughWall}} cuts through the one wall you clicked and leaves the far side of a tube whole; on a solid cylinder the holes go in to its middle. Clicked inside a bore, the holes go outward through its wall. {{ui:holePattern.arrangement.perimeter}} is for flat faces and is not offered on a wall.
+
 An AI can do the same through the MCP bridge with `layerling_perforate_face` (see the chapter [AI with MCP](chapter:ai-with-mcp)).
 
 ## Pushing a face out or in
 
 For a thicker wall, a raised pad on a face or a pocket cut into it, the {{ui:faceTool.title}} tool works on one flat face. It works on an imported STL too, where there is no sketch to change. Select exactly one body and click {{ui:faceTool.title}} in the {{ui:editor.group.modify}} group of the ribbon, next to the hole pattern. You can also right-click the body, or find it with [[Ctrl]]+[[K]].
 
-1. Click a flat face of the body. As with the hole pattern, the whole flat face around your click counts; a curved face does not work. On a group or a bundle the face runs on across parts that meet, as with the hole pattern.
+1. Click a flat face of the body. As with the hole pattern, the whole flat face around your click counts; a curved face does not work here, a round wall neither. On a group or a bundle the face runs on across parts that meet, as with the hole pattern.
 2. In the window:
    - **{{ui:faceTool.direction}}:** choose {{ui:faceTool.direction.out}} for material standing on the face or {{ui:faceTool.direction.in}} for a pocket cut into it. A pocket goes no deeper than the body behind the face; on a hollow body it can still reach the cavity.
    - **{{ui:faceTool.inset}}:** how far the new outline stays inside the face's edge. Going out, 0 takes the whole face, which makes a wall thicker. Openings in the face grow by the same amount.

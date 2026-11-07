@@ -91,9 +91,12 @@ export function ShapeMenuPanel({
   children: ReactNode;
 }) {
   useLanguage();
-  // The panel is placed within the whole editor, so it can leave the toolbar it hangs from.
+  // The panel is placed within the whole editor, so it can leave the toolbar it hangs from, but its title bar stays
+  // below the toolbar, where it can be grabbed (#1418). Pinned, the 3D editor's panel lies in the workplane under the
+  // toolbar (#1283), so the toolbar is looked up in the editor, not among the panel's parents.
   const movable = useMovablePanel<HTMLDivElement>(scope === "sketch" ? "layerling.sketch.shapeMenuPosition" : "layerling.editor.shapeMenuPosition", {
     area: (panel) => panel.closest<HTMLElement>(".layerling-editor"),
+    below: (panel) => panel.closest(".layerling-editor")?.querySelector<HTMLElement>(".secondary-toolbar") ?? null,
   });
   const PinIcon = pinned ? PinOff : Pin;
 

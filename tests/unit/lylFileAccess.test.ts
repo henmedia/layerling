@@ -1,17 +1,20 @@
 // @vitest-environment jsdom
 import { afterEach, describe, expect, it, vi } from "vitest";
 import {
+  dropBackupTarget,
   ensureLylFileWritable,
   forgetLylFile,
   forgetStlFile,
   linkedLylFile,
   linkedStlFile,
   lylFileAccessSupported,
+  pickBackupTarget,
   pickLylFileToOpen,
   pickLylFileToSave,
   pickStlFileToSave,
   rememberLylFile,
   rememberStlFile,
+  writeBackupTarget,
   writeLylFile,
   type LylFileHandle,
 } from "@/lib/lylFileAccess";
@@ -157,5 +160,56 @@ describe("saving into a file of the user's choosing (#251)", () => {
 
     const refused = fakeHandle({ permission: "prompt", asks: "denied" });
     expect(await ensureLylFileWritable(refused.handle)).toBe(false);
+  });
+});
+
+describe("backups into a folder of one's own (Facebook group, 07.11.2026)", () => {
+  it("stays a download where the browser has no save dialog", async () => {
+    expect(await pickBackupTarget("layerling-backup.zip")).toEqual({ fileName: "layerling-backup.zip" });
+    const download = vi.fn();
+    const zip = new Blob(["zip"]);
+    await writeBackupTarget({ fileName: "layerling-backup.zip" }, zip, download);
+    expect(download).toHaveBeenCalledWith("layerling-backup.zip", zip);
+  });
+
+  it("asks where it goes, in a folder memory of its own, and writes the ZIP into the picked file", async () => {
+    const { handle, log } = fakeHandle({ name: "my-backup.zip" });
+    const save = vi.fn(async () => handle);
+    pickers().showSaveFilePicker = save;
+    const target = await pickBackupTarget("layerling-backup.zip");
+    expect(target).toEqual({ fileName: "my-backup.zip", handle });
+    const options = (save.mock.calls[0] as unknown as [Record<string, unknown>])[0];
+    expect(options.suggestedName).toBe("layerling-backup.zip");
+    expect(options.id).toBe("layerling-backups");
+    expect(JSON.stringify(options.types)).toContain(".zip");
+
+    const download = vi.fn();
+    const zip = new Blob(["zip"]);
+    await writeBackupTarget(target!, zip, download);
+    expect(log.written).toBe(zip);
+    expect(log.closed).toBe(true);
+    expect(download).not.toHaveBeenCalled();
+  });
+
+  it("makes no backup when the dialog is closed, and falls back to the download when it will not open", async () => {
+    pickers().showSaveFilePicker = vi.fn(async () => {
+      throw new DOMException("closed", "AbortError");
+    });
+    expect(await pickBackupTarget("layerling-backup.zip")).toBeNull();
+    // No click left to it after a long wait, or a policy: the download as before.
+    pickers().showSaveFilePicker = vi.fn(async () => {
+      throw new DOMException("Must be handling a user gesture", "SecurityError");
+    });
+    expect(await pickBackupTarget("layerling-backup.zip")).toEqual({ fileName: "layerling-backup.zip" });
+  });
+
+  it("removes a picked file again when there was nothing to put in it", async () => {
+    const { handle } = fakeHandle({ name: "empty.zip" });
+    const remove = vi.fn(async () => undefined);
+    await dropBackupTarget({ fileName: "empty.zip", handle: { ...handle, remove } });
+    expect(remove).toHaveBeenCalledTimes(1);
+    // A browser without remove(), and a download, leave nothing to do.
+    await dropBackupTarget({ fileName: "empty.zip", handle });
+    await dropBackupTarget({ fileName: "empty.zip" });
   });
 });

@@ -26,6 +26,21 @@ Navodila, ki jih bereš, imajo tudi iskalno polje, na vrhu vsake strani: vpiši 
 - Ime telesa v tvojem načrtu najde to telo in ga izbere, praktično pri načrtih z mnogimi deli. Telesa se pokažejo šele, ko začneš tipkati.
 - Deluje tudi v skicirnem načinu, tam s skicirnimi orodji.
 
+## Lastne tipke
+
+Vsak ukaz iz iskanja ukazov lahko daš na svojo tipko: orodje, ki ga ves čas uporabljaš, obliko, {{ui:editor.tool.centerOnWorkplane}} ali {{ui:palette.openShapes}}.
+
+1. Odpri {{ui:editor.keyboardShortcuts}} in na vrhu okna pod {{ui:customKeys.title}} klikni {{ui:customKeys.add}}.
+2. Vtipkaj nekaj črk ukaza in ga klikni ali pritisni [[Enter]] za prvega.
+3. Pritisni želeno tipko, samo ali s [[Ctrl]], [[Alt]] ali [[Shift]]. Ukaz lahko nosijo črke, števke in F1 do F12.
+
+Tipka, ki jo urejevalnik že uporablja, tipka, ki jo brskalnik zadrži zase (na primer [[Ctrl]]+[[W]]), ali ena tvojih lastnih tipk se zavrne, okno pa pove, čemu služi. Klik na tipko v seznamu jo spremeni, X ob njej jo odstrani, {{ui:customKeys.removeAll}} začne znova.
+
+- Tipka zažene ukaz natanko tako kot iskanje ukazov. Če se trenutno ne more zagnati, največkrat ker ni nič izbrano, to pove vrstica stanja.
+- Tvoje tipke so vidne ob svojih ukazih v iskanju ukazov in na natisnjenem seznamu.
+- Ostanejo v tem brskalniku, tako kot tema. Tipka za orodje skice deluje v načinu skice, tipka za 3D-urejevalnik zunaj njega.
+- Medtem ko tipkaš v polje, se tvoje tipke umaknejo kot vse druge.
+
 ## Interaktivna pomoč
 
 Ne najdeš, kje prebrati o gumbu ali polju? Naj te program pripelje tja. Klikni vprašaj v območju {{ui:editor.group.help}} ali pritisni [[Shift]]+[[F1]]. Kazalec postane vprašaj, vse pod njim pa dobi okvir.

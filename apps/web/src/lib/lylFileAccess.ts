@@ -14,6 +14,7 @@ export interface LylFileHandle {
   createWritable(): Promise<{ write(data: Blob | ArrayBuffer | Uint8Array): Promise<void>; close(): Promise<void>; abort(): Promise<void> }>;
   queryPermission?(descriptor: { mode: "read" | "readwrite" }): Promise<PermissionState>;
   requestPermission?(descriptor: { mode: "read" | "readwrite" }): Promise<PermissionState>;
+  remove?(): Promise<void>;
 }
 
 interface FilePickerWindow {
@@ -103,7 +104,7 @@ export async function ensureLylFileWritable(handle: LylFileHandle): Promise<bool
   return handle.requestPermission ? (await handle.requestPermission({ mode: "readwrite" })) === "granted" : false;
 }
 
-export async function writeLylFile(handle: LylFileHandle, bytes: Uint8Array) {
+export async function writeLylFile(handle: LylFileHandle, bytes: Uint8Array | Blob) {
   const writable = await handle.createWritable();
   try {
     await writable.write(bytes);
@@ -113,6 +114,45 @@ export async function writeLylFile(handle: LylFileHandle, bytes: Uint8Array) {
     await writable.abort().catch(() => undefined);
     throw error;
   }
+}
+
+/** Backups often go somewhere else again - onto a cloud drive, say - so their dialog remembers its own folder. */
+const BACKUP_PICKER_ID = "layerling-backups";
+
+/** Where a backup ZIP goes: its file name, and in Chrome and Edge the file picked for it. */
+export interface BackupTarget {
+  fileName: string;
+  handle?: LylFileHandle;
+}
+
+/**
+ * Asks where a backup goes. In Chrome and Edge that is a save dialog that remembers its folder, so backups can go
+ * straight into a folder of one's own, on a cloud drive say, instead of Downloads (asked in the Facebook group,
+ * 07.11.2026). Other browsers, or a dialog that will not open, keep the download. null when the dialog is closed
+ * without a choice: then there is no backup. The dialog needs the click that started it, so this comes before
+ * anything slow.
+ */
+export async function pickBackupTarget(suggestedName: string): Promise<BackupTarget | null> {
+  const picker = filePickerWindow().showSaveFilePicker;
+  if (!picker) return { fileName: suggestedName };
+  try {
+    const handle = await picker({ id: BACKUP_PICKER_ID, suggestedName, types: [{ description: "layerling backup", accept: { "application/zip": [".zip"] } }] });
+    return { fileName: handle.name, handle };
+  } catch (error) {
+    if (isPickerCancelled(error)) return null;
+    return { fileName: suggestedName };
+  }
+}
+
+/** Puts a backup where `pickBackupTarget` said: into the picked file, or as a download. */
+export async function writeBackupTarget(target: BackupTarget, zip: Blob, download: (fileName: string, zip: Blob) => unknown) {
+  if (target.handle) await writeLylFile(target.handle, zip);
+  else await download(target.fileName, zip);
+}
+
+/** A picked file that is left empty after all (nothing to back up) is removed again, where the browser can. */
+export async function dropBackupTarget(target: BackupTarget) {
+  await target.handle?.remove?.().catch(() => undefined);
 }
 
 /** The import dialog of the overview: any of the listed endings, and the handles of what was chosen. */
