@@ -73,7 +73,7 @@ FLSun、SeeMeCNC 等品牌的三角洲（Delta）打印机以及 Anycubic Predat
 按它摆放的样子打印，然后把销钉带倒角的一端朝前，从最紧的孔开始依次插入。**销钉仍能转动的最紧的那个孔**就给出你的打印机的间隙。在{{ui:workspace.printerPlay}}中输入这个数字，或在输入框下方的数值中点选它。间隙按每侧计，单位为毫米，浏览器会为所有设计保存它；输入框为空表示尚未测量。
 如果有多台打印机，请先在 {{ui:workspace.printer}} 中选择要用的那台：每台打印机都保存自己的间隙，新的使用从设计所设打印机的间隙开始。没有自己间隙的打印机使用未选择打印机时设置的间隙。
 
-从此以后，新的使用都会以这个间隙而不是内置数值为起点：{{ui:editor.tool.lid}}工具中的{{ui:lid.gap}}和{{ui:lid.hingePinPlay}}，新建{{ui:shape.dovetail}}和{{ui:shape.snapFit}}的间隙，新建螺母或螺纹孔的{{ui:prop.clearance}}——取间隙的两倍，因为它是整个直径上的余量——以及{{ui:editor.tool.clearance}}中的{{ui:clearance.threshold}}。{{ui:editor.tool.split}}中销钉和凸柱的{{ui:split.connectorClearance}}也是如此。只要这样的字段仍保持该数值，旁边的“{{ui:printerPlay.fromFitTest}}”就会说明这个数字的来历。一体打印的铰链和{{ui:editor.tool.flexi}}工具的关节保持 0.4 mm：一体打印时，它们的缝隙在层与层之间也必须保持张开，而单独打印的销钉测不出这一点。压入磁铁或 Gridfinity 键的余量，以及为买来的插座或电路板留的余量，也都保持各自的数值。设计中已有的实体永远不会改变，你打开的设计也不会。
+从此以后，新的使用都会以这个间隙而不是内置数值为起点：{{ui:editor.tool.lid}}工具中的{{ui:lid.gap}}和{{ui:lid.hingePinPlay}}，新建{{ui:shape.dovetail}}和{{ui:shape.snapFit}}的间隙，新建螺母或螺纹孔的{{ui:prop.clearance}}——取间隙的两倍，因为它是整个直径上的余量——以及{{ui:editor.tool.clearance}}中的{{ui:clearance.threshold}}。{{ui:editor.tool.split}}中销钉、凸柱和燕尾榫的{{ui:split.connectorClearance}}也是如此。只要这样的字段仍保持该数值，旁边的“{{ui:printerPlay.fromFitTest}}”就会说明这个数字的来历。一体打印的铰链和{{ui:editor.tool.flexi}}工具的关节保持 0.4 mm：一体打印时，它们的缝隙在层与层之间也必须保持张开，而单独打印的销钉测不出这一点。压入磁铁或 Gridfinity 键的余量，以及为买来的插座或电路板留的余量，也都保持各自的数值。设计中已有的实体永远不会改变，你打开的设计也不会。
 
 ## 检查打印
 

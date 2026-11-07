@@ -114,6 +114,16 @@ A note: fillets and chamfers you had put on the **whole** group are lost on rebu
 - {{ui:split.connectorDepth}} is how far each hole goes into its half. A dowel is twice that less 0.6 mm long and a peg 0.3 mm shorter than its hole, so they never stand on the floor of a hole and the halves close fully. Pins and pegs have a small chamfer at their ends, and each hole one at its mouth, so a first layer that spread does not narrow it.
 - {{ui:split.connectorClearance}} is the room between a pin or peg and its hole. Once you have measured your printer's play with the fit test (in the chapter on printing), it starts from that, otherwise from 0.2 mm.
 
+{{ui:split.connectors.dovetail}} holds the halves together without glue, like the dovetail cut of OrcaSlicer: a tongue that widens away from the cut face stands on the half whose name ends in a minus and runs straight across it, from edge to edge, and the other half gets the matching groove, open at both ends. Slide the halves together from the side, along the tongue; once in, they cannot be pulled apart across the cut. The tongues run the long way of the cut face, and where a body meets the plane in several pieces, they run the same way on all of them, so a half slides on in one move. {{ui:split.connectorCount}} is the number of tongues side by side on each piece; 0 leaves it to the piece's width, one for every six tongue widths, at least one. Beside its wide top a tongue keeps half its own width and another 1.2 mm of material to the edge of the cut face, and two tongues twice that apart. A piece too narrow for one, or too short along it, gets none, and a tongue is left out where the other half is thinner than its groove is deep. White outlines on the plane show where they will go: the filled strip is the tongue's foot, the line about it its wide top.
+
+- {{ui:split.dovetailWidth}} is the tongue's width where it leaves the cut face, 6 mm to begin with.
+- {{ui:split.dovetailDepth}} is how far it stands out of the cut face into the other half, 4 mm to begin with. The groove is 0.3 mm deeper, so the halves close fully.
+- {{ui:split.dovetailAngle}} is how far each flank leans out from square to the cut face, from 5° to 30°, 15° to begin with. The larger it is, the wider the tongue's top and the firmer it holds.
+- {{ui:split.dovetailTurn}}: 0 runs the tongues lengthwise, 90 across the cut face, and an angle between turns them that far.
+- {{ui:split.connectorClearance}} is the room on each side between the tongue and its groove, from your fit test as for the dowels. The tongue's ends are chamfered all round so it finds the groove, and the groove has a chamfer at its mouth.
+
+For printing, lay the half with the groove on its cut face, and print the half with the tongue the other way up, its cut face on top: the tongue's flanks then lean out by no more than their angle, which prints without supports.
+
 Holes are split without connectors.
 
 The halves are plain meshes: settings such as a cylinder's sides or a text's lettering are gone, so set those first. [[Ctrl]]+[[Z]] brings the original back in one step. Locked and hidden objects cannot be split.

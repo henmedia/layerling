@@ -110,6 +110,16 @@ Upozornění: zkosení a zaoblení provedená na **celém** sloučeném tělese 
 - {{ui:split.connectorDepth}} je, jak hluboko jde každý otvor do své poloviny. Kolík je dvakrát tak dlouhý bez 0,6 mm a čep o 0,3 mm kratší než jeho otvor, aby nikdy nestály na dně otvoru a poloviny se úplně dovřely. Kolíky a čepy mají na koncích malé sražení a každý otvor jedno u svého ústí, aby ho rozteklá první vrstva nezúžila.
 - {{ui:split.connectorClearance}} je místo mezi kolíkem nebo čepem a jeho otvorem. Jakmile změříte vůli své tiskárny testem vůle (v kapitole o tisku), začíná od ní, jinak od 0,2 mm.
 
+{{ui:split.connectors.dovetail}} drží poloviny pohromadě bez lepidla, jako rybinový řez v OrcaSliceru: lišta, která se směrem od plochy řezu rozšiřuje, stojí na polovině, jejíž název končí mínusem, a vede rovně přes plochu řezu od okraje k okraji; druhá polovina dostane odpovídající drážku, otevřenou na obou koncích. Zasuňte poloviny do sebe ze strany, podél lišty; pak už je nelze odtáhnout napříč řezem. Lišty vedou podél delší strany plochy řezu, a když těleso protíná rovinu v několika kusech, vedou na všech stejným směrem, aby se polovina nasunula jedním pohybem. {{ui:split.connectorCount}} je počet lišt vedle sebe na každém kusu; 0 to nechá na šířce kusu, jedna na každých šest šířek lišty, nejméně jedna. Vedle své široké horní strany si lišta nechá polovinu své šířky a dalších 1,2 mm materiálu k okraji plochy řezu a dvě lišty od sebe dvakrát tolik. Kus, který je na lištu příliš úzký nebo v jejím směru příliš krátký, nedostane žádnou, a lišta odpadne tam, kde je druhá polovina tenčí, než je hluboká její drážka. Bílé obrysy na rovině ukazují, kam přijdou: vyplněný pruh je pata lišty, čára kolem ní její široká horní strana.
+
+- {{ui:split.dovetailWidth}} je šířka lišty tam, kde vychází z plochy řezu, zpočátku 6 mm.
+- {{ui:split.dovetailDepth}} je, jak daleko vyčnívá z plochy řezu do druhé poloviny, zpočátku 4 mm. Drážka je o 0,3 mm hlubší, aby se poloviny úplně dovřely.
+- {{ui:split.dovetailAngle}} je, jak moc se každý bok odklání ven od kolmice k ploše řezu, od 5° do 30°, zpočátku 15°. Čím větší, tím širší je horní strana lišty a tím pevněji drží.
+- {{ui:split.dovetailTurn}}: 0 vede lišty podélně, 90 napříč plochou řezu a úhel mezi tím je natočí o tolik.
+- {{ui:split.connectorClearance}} je místo na každé straně mezi lištou a její drážkou, z vašeho testu vůle jako u kolíků. Konce lišty jsou dokola sražené, aby našla drážku, a drážka má sražení u svého ústí.
+
+Pro tisk položte polovinu s drážkou na její plochu řezu a polovinu s lištou tiskněte obráceně, plochou řezu nahoru: boky lišty se pak odklánějí ven jen o svůj úhel, a to se vytiskne bez podpor.
+
 Výřezy se rozdělují bez spojovacích prvků.
 
 Poloviny jsou běžné polygonové sítě. Parametry původního tvaru, například počet stran válce nebo text nápisu, už nemají; nastavte je před rozdělením. [[Ctrl]]+[[Z]] obnoví originál jediným krokem. Zamčené a skryté objekty nelze rozdělit.
