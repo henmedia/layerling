@@ -6,6 +6,10 @@ code still carries it - so a lower number further down is older, not newer.
 
 ## Unreleased
 
+- **Hide others and Invert selection (Discussion #1472):** To work on a few parts deep inside a design, select them and choose **Hide others** in the right-click menu or the Visibility menu: everything else is hidden in one undo step, so Ctrl+Z or Ctrl+Shift+H brings it back. **Invert selection** in the right-click menu selects every visible part that was not selected (hidden parts and reference images stay out, as with Select all). Both are in the command search (Ctrl+K), where a key of your own can be set for them. MCP: `layerling_select_objects` takes `invert: true`, and `layerling_hide_others` is new. Asked for by @Elkniwt.
+
+- **Align: the dots in the colours of their axis (Discussion #1472):** The align dots and the equal-gaps pills are red, green and blue like the move and size handles (red X, green Y, blue Z for the height), so overlapping dots can be told apart; hovered and greyed-out dots look as before. Asked for by @Elkniwt.
+
 ## 1.151.0
 
 - **Lid: a slide-in lid for boxes (Discussion #1443):** The Lid tool has a seventh kind, **Slide-in**, like a wooden pencil box's lid: a plate in the opening, flush with the rim, whose lower edges run as tongues in grooves in three walls. The fourth wall (the front unless another is picked) is cut down to the lid's underside where it passes, so the lid slides in over it, and the lid's end fills that cut. The body prints upright and the lid turned over on its top without support. Rounded box corners work, walls too thin for the tongue and round or leaning bodies are refused with the thickness needed. Click bumps, a finger notch and a pull tab are available; magnets and a hinge are not for this kind. MCP `layerling_make_lid` takes `type: "slide"` and `slideSide`. Texts in 14 languages, guide chapter 6 in 15.

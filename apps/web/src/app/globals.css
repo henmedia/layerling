@@ -8721,6 +8721,16 @@ html[data-theme="dark"] .touch-multi-select {
   transform: translate(-50%, -50%);
 }
 
+/* The dots and the equal-gaps pills in the colours of their axis, as the move and size handles (Discussion #1472):
+   the align axis y is the height (blue), z the depth (green). The dark theme's rules sit in :where() so they
+   weigh no more than these, and hover and disabled below still win. */
+.align-dot.axis-x, .align-spread.axis-x { background: #d6363c; }
+.align-dot.axis-y, .align-spread.axis-y { background: #2f6fe0; }
+.align-dot.axis-z, .align-spread.axis-z { background: #2f9a4b; }
+:where(html[data-theme="dark"]) .align-dot.axis-x, :where(html[data-theme="dark"]) .align-spread.axis-x { background: #ff6b70; }
+:where(html[data-theme="dark"]) .align-dot.axis-y, :where(html[data-theme="dark"]) .align-spread.axis-y { background: #6aa0ff; }
+:where(html[data-theme="dark"]) .align-dot.axis-z, :where(html[data-theme="dark"]) .align-spread.axis-z { background: #5fd47c; }
+
 /* For a finger or a rubber-tip stylus the dots keep their look and catch from further away, a finger's width round them (#854). */
 @media (pointer: coarse) {
   .align-dot {

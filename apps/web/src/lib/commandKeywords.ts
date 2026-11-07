@@ -16,6 +16,8 @@ export const COMMAND_KEYWORDS: Readonly<Record<string, readonly string[]>> = {
   outliner: ["outliner", "object list", "objektliste", "liste", "ebenen", "layers"],
   "toggle-hidden": ["hide", "show", "visible", "ausblenden", "einblenden", "verstecken", "sichtbar"],
   "show-hidden": ["show all", "unhide", "alles zeigen", "alles einblenden", "versteckte"],
+  "hide-others": ["hide others", "hide unselected", "isolate", "focus", "only selected", "andere ausblenden", "isolieren", "nur auswahl", "rest ausblenden"],
+  "invert-selection": ["invert", "inverse", "reverse selection", "select others", "auswahl umkehren", "umkehren", "invertieren", "andere auswählen"],
   notes: ["notes", "points", "notizen", "punkte", "bezugspunkte"],
   overhangs: ["overhang", "ueberhang", "überhang", "ueberhaenge", "überhänge", "support", "stuetze"],
   group: ["group", "union", "merge", "combine", "gruppieren", "verbinden", "vereinen", "verschmelzen", "aussparung", "hole"],

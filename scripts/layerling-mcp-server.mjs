@@ -100,6 +100,8 @@ async function callTool(name, args) {
       return bridgeCommand("list_objects", args);
     case "layerling_select_objects":
       return bridgeCommand("select_objects", args);
+    case "layerling_hide_others":
+      return bridgeCommand("hide_others", args);
     case "layerling_delete_objects":
       return bridgeCommand("delete_objects", args);
     case "layerling_move_object":

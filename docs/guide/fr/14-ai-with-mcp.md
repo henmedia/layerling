@@ -82,6 +82,7 @@ L'IA fonctionne avec les mêmes fonctions que vous, via le même chemin que votr
 | `layerling_read_scene` | lit la scène, la sélection, les unités et les dimensions exactes de tous les objets |
 | `layerling_list_objects` | répertorie tous les objets avec les dimensions, la position, la rotation et l'identifiant |
 | `layerling_select_objects` | sélectionne des objets |
+| `layerling_hide_others` | masque tout sauf la sélection ou les objets indiqués, en une seule étape d'annulation |
 | `layerling_delete_objects` | supprime des objets |
 | `layerling_move_object` | déplace un objet à un autre endroit de la liste des objets |
 | `layerling_create_shape` | crée une forme : boîte, cylindre, texte (également courbé), fil, engrenage, corps d'esquisse et tous les autres |

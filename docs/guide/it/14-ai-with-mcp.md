@@ -86,6 +86,7 @@ L’IA usa le stesse funzioni che hai a disposizione, attraverso lo stesso perco
 | `layerling_read_scene` | Legge la scena, la selezione, le unità e le dimensioni esatte di tutti gli oggetti. |
 | `layerling_list_objects` | Elenca tutti gli oggetti con dimensioni, posizione, rotazione e ID. |
 | `layerling_select_objects` | Seleziona gli oggetti. |
+| `layerling_hide_others` | Nasconde tutto tranne la selezione o gli oggetti indicati, in un solo passo di annullamento. |
 | `layerling_delete_objects` | Elimina gli oggetti. |
 | `layerling_move_object` | sposta un oggetto in un altro punto dell'elenco degli oggetti |
 | `layerling_create_shape` | Crea una forma: cubo, cilindro, testo (anche curvo), filettatura, ingranaggio, corpo da schizzo e tutte le altre forme. |

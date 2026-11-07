@@ -82,6 +82,7 @@ Az MI ugyanazokkal a funkciókkal dolgozik, mint te, ugyanazon az úton, mint a 
 | `layerling_read_scene` | beolvassa a jelenetet, a kijelölést, a mértékegységeket és az összes objektum pontos méreteit |
 | `layerling_list_objects` | felsorolja az összes objektumot méretekkel, helyzettel, elforgatással és azonosítóval |
 | `layerling_select_objects` | objektumokat jelöl ki |
+| `layerling_hide_others` | a kijelölésen vagy a megadott objektumokon kívül mindent elrejt, egyetlen visszavonási lépésben |
 | `layerling_delete_objects` | objektumokat töröl |
 | `layerling_move_object` | áthelyez egy objektumot az objektumlista egy másik helyére |
 | `layerling_create_shape` | alakzatot hoz létre: dobozt, hengert, szöveget (íveset is), menetet, fogaskereket, vázlattestet és az összes többit |

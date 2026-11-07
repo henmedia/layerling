@@ -3,7 +3,7 @@
 import { GuideHelpLink } from "@/components/GuideHelpLink";
 import { ShapeMenuPanel } from "@/components/workplane/ShapeMenuPanel";
 import { ShapeLibraryList } from "@/components/workplane/ShapeLibraryList";
-import { AlertTriangle, ArrowDownToLine, ArrowUpFromLine, Check, CircleHelp, Percent, Circle as CircleIcon, Eye, EyeOff, Hexagon as HexagonIcon, ListTree, Pencil, Pentagon as PentagonIcon, Pin, PinOff, Rotate3d, Route as RouteIcon, ScanEye, Search, Square as SquareIcon, Star as StarIcon, Triangle as TriangleIcon, X } from "lucide-react";
+import { AlertTriangle, ArrowDownToLine, ArrowLeftRight, ArrowUpFromLine, Check, CircleHelp, Percent, Circle as CircleIcon, Eye, EyeOff, Hexagon as HexagonIcon, ListTree, Pencil, Pentagon as PentagonIcon, Pin, PinOff, Rotate3d, Route as RouteIcon, ScanEye, Search, Square as SquareIcon, Star as StarIcon, Triangle as TriangleIcon, X } from "lucide-react";
 import { useEffect, useLayoutEffect, useRef, useState, type CSSProperties } from "react";
 import { createPortal } from "react-dom";
 import { useWheelField } from "@/lib/useWheelField";
@@ -360,6 +360,8 @@ export function SecondaryToolbar({
   onRedo,
   onSnap,
   onShowHidden,
+  onHideOthers,
+  onInvertSelection,
   onToggleHidden,
   onUngroup,
   onUndo,
@@ -552,6 +554,9 @@ export function SecondaryToolbar({
   onRedo: () => void;
   onSnap: () => void;
   onShowHidden: () => void;
+  /** Hide everything but the selection, and select what is not selected (Discussion #1472). */
+  onHideOthers: () => void;
+  onInvertSelection: () => void;
   onToggleHidden: () => void;
   onUngroup: () => void;
   onUndo: () => void;
@@ -1225,6 +1230,8 @@ export function SecondaryToolbar({
         onShowHidden,
         { icon: Eye },
       ),
+      plain("hide-others", t("contextMenu.hideOthers"), visibilityGroup, hasSelection, onHideOthers, { icon: EyeOff }),
+      plain("invert-selection", t("contextMenu.invertSelection"), t("shortcuts.group.selection"), true, onInvertSelection, { icon: ArrowLeftRight }),
       plain("notes", t("visibility.notes"), visibilityGroup, noteCount > 0, onToggleNotes, { icon: notesVisible ? Eye : EyeOff, active: notesVisible }),
       plain("overhangs", t("visibility.overhangs", { angle: overhangAngle }), visibilityGroup, true, onToggleOverhangs, { icon: AlertTriangle, active: overhangsVisible }),
       plain("look-onto-workplane", t("camera.lookOntoWorkplane"), t("shortcuts.group.view"), true, () => window.dispatchEvent(new Event("layerling:look-onto-workplane")), { icon: ScanEye }),
@@ -1377,6 +1384,20 @@ export function SecondaryToolbar({
                 <strong>{hiddenShapeCount === 0
                   ? t("visibility.nothingHidden")
                   : t("visibility.showAllHidden", { count: hiddenShapeCount })}</strong>
+              </button>
+              <button
+                className="visibility-dropdown-action"
+                type="button"
+                role="menuitem"
+                disabled={!hasSelection}
+                title={hasSelection ? undefined : t("editor.needs.selection")}
+                onClick={() => {
+                  setVisibilityOpen(false);
+                  onHideOthers();
+                }}
+              >
+                <EyeOff size={20} aria-hidden="true" />
+                <strong>{t("contextMenu.hideOthers")}</strong>
               </button>
               <button
                 className="visibility-dropdown-action"

@@ -1,1 +1,22 @@
-[]
+[
+  {
+    "title": {
+      "de": "Andere ausblenden, Auswahl umkehren",
+      "en": "Hide others, invert selection"
+    },
+    "body": {
+      "de": "Wähle ein paar Teile aus und nimm „Andere ausblenden“ im Rechtsklick-Menü: Alles andere verschwindet, Strg+Z holt es zurück. „Auswahl umkehren“ wählt jedes andere sichtbare Teil aus.",
+      "en": "Select a few parts and choose \"Hide others\" in the right-click menu: everything else goes, Ctrl+Z brings it back. \"Invert selection\" selects every other visible part."
+    }
+  },
+  {
+    "title": {
+      "de": "Farbige Ausrichten-Punkte",
+      "en": "Align dots in colour"
+    },
+    "body": {
+      "de": "Die Punkte des Ausrichtens sind jetzt rot, grün und blau wie die Griffe beim Verschieben, so siehst du auch bei überlappenden Punkten, welcher was tut.",
+      "en": "The align dots are now red, green and blue like the move handles, so you can tell which does what even where they overlap."
+    }
+  }
+]

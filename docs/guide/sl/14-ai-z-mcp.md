@@ -82,6 +82,7 @@ Umetna inteligenca dela z istimi funkcijami kot ti, teče po isti poti kot tvoje
 | `layerling_read_scene` | prebere prizor, izbor, enote in natančne mere vseh objektov |
 | `layerling_list_objects` | našteje vse objekte z merami, lego, zasukom in oznako |
 | `layerling_select_objects` | izbere objekte |
+| `layerling_hide_others` | skrije vse razen izbora ali navedenih objektov, v enem koraku razveljavitve |
 | `layerling_delete_objects` | izbriše objekte |
 | `layerling_move_object` | premakne objekt na drugo mesto na seznamu objektov |
 | `layerling_create_shape` | ustvari obliko: kvader, valj, besedilo (tudi ukrivljeno), navoj, zobnik, skicirano telo in vse druge |

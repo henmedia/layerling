@@ -82,6 +82,7 @@ AI používá stejné funkce a stejné zpracování příkazů jako ruční ovl�
 | `layerling_read_scene` | přečte scénu, výběr, jednotky a přesné rozměry objektů |
 | `layerling_list_objects` | vypíše objekty s rozměry, polohou, natočením a identifikátorem |
 | `layerling_select_objects` | vybere objekty |
+| `layerling_hide_others` | skryje vše kromě výběru nebo zadaných objektů, v jednom kroku zpět |
 | `layerling_delete_objects` | odstraní objekty |
 | `layerling_move_object` | přesune objekt na jiné místo v seznamu objektů |
 | `layerling_create_shape` | vytvoří kvádr, válec, text i po oblouku, závit, ozubené kolo, těleso z náčrtu a další tvary |

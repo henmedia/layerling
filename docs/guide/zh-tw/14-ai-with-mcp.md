@@ -86,6 +86,7 @@ AI 使用的是與你相同的功能，走的也是你在編輯器中操作時�
 | `layerling_read_scene` | 讀取場景、選取範圍、單位，以及所有物件的精確尺寸 |
 | `layerling_list_objects` | 列出所有物件及其尺寸、位置、旋轉與 id |
 | `layerling_select_objects` | 選取物件 |
+| `layerling_hide_others` | 隱藏選取或指定物件以外的所有內容，只佔一步復原 |
 | `layerling_delete_objects` | 刪除物件 |
 | `layerling_move_object` | 把物件移到物件清單中的另一個位置 |
 | `layerling_create_shape` | 建立形狀：方塊、圓柱、文字（也能彎曲）、螺紋、齒輪、草圖實體，以及其他所有形狀 |

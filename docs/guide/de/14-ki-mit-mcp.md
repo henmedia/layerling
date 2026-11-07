@@ -86,6 +86,7 @@ Die KI arbeitet mit denselben Funktionen wie du, sie läuft über denselben Weg 
 | `layerling_read_scene` | liest Szene, Auswahl, Einheiten und die genauen Maße aller Objekte |
 | `layerling_list_objects` | listet alle Objekte mit Maßen, Lage, Drehung und Kennung |
 | `layerling_select_objects` | wählt Objekte aus |
+| `layerling_hide_others` | blendet alles außer der Auswahl oder den genannten Objekten aus, in einem Rückgängig-Schritt |
 | `layerling_delete_objects` | löscht Objekte |
 | `layerling_move_object` | verschiebt ein Objekt an eine andere Stelle der Objektliste |
 | `layerling_create_shape` | legt eine Form an: Quader, Zylinder, Text (auch gebogen), Gewinde, Zahnrad, Skizzenkörper und alle anderen |

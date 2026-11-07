@@ -86,6 +86,7 @@ La IA trabaja con las mismas funciones que tú, por el mismo camino que sigues c
 | `layerling_read_scene` | lee la escena, la selección, las unidades y las medidas exactas de todos los objetos |
 | `layerling_list_objects` | lista todos los objetos con sus medidas, posición, giro e id |
 | `layerling_select_objects` | selecciona objetos |
+| `layerling_hide_others` | oculta todo salvo la selección o los objetos indicados, en un solo paso de deshacer |
 | `layerling_delete_objects` | elimina objetos |
 | `layerling_move_object` | mueve un objeto a otro lugar de la lista de objetos |
 | `layerling_create_shape` | crea una forma: caja, cilindro, texto (también curvado), rosca, engranaje, cuerpo de boceto y todas las demás |

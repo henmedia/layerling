@@ -86,6 +86,7 @@ The AI works with the same functions as you, through the same path as your opera
 | `layerling_read_scene` | reads scene, selection, units and the exact dimensions of all objects |
 | `layerling_list_objects` | lists all objects with dimensions, position, rotation and id |
 | `layerling_select_objects` | selects objects |
+| `layerling_hide_others` | hides everything but the selection or the given objects, in one undo step |
 | `layerling_delete_objects` | deletes objects |
 | `layerling_move_object` | moves an object to another place in the object list |
 | `layerling_create_shape` | creates a shape: box, cylinder, text (also curved), thread, gear, sketch body and all the others |

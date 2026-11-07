@@ -421,10 +421,21 @@ export const tools = [
   },
   {
     name: "layerling_select_objects",
-    description: "Select objects by id in the Layerling editor.",
+    description: "Select objects by id in the Layerling editor. With invert true it is the editor's \"Invert selection\" (Discussion #1472): every visible object except these ids is selected (without ids: except the current selection, so nothing selected gives every visible object); hidden objects and reference images stay out, as with Select all. The answer has selectedIds and the objects.",
     inputSchema: {
       ...editorTargetSchema,
-      required: ["ids"],
+      properties: {
+        ...editorTargetSchema.properties,
+        ids: { type: "array", items: { type: "string" } },
+        invert: { type: "boolean", description: "Select every visible object except the ids given (or except the current selection when ids are left out)." },
+      },
+    },
+  },
+  {
+    name: "layerling_hide_others",
+    description: "Hide every visible object except these ids, or except the current selection when ids are left out - the editor's \"Hide others\" (Discussion #1472), to work on a few parts deep inside a design. One undo step: undo brings the hidden objects back, and so does update_object with hidden false or the editor's Show all hidden (Ctrl+Shift+H). The kept objects end up selected. Returns hiddenIds and keptIds. Fails when nothing is selected or nothing else is visible.",
+    inputSchema: {
+      ...editorTargetSchema,
       properties: {
         ...editorTargetSchema.properties,
         ids: { type: "array", items: { type: "string" } },
