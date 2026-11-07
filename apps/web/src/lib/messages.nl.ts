@@ -2937,6 +2937,7 @@ export const MESSAGES_NL: Record<MessageKey, string> = {
   "nameTag.edge.round": "Rond",
   "nameTag.edge.chamfer": "Afschuining",
   "nameTag.letterEdgeSize": "Randgrootte",
+  "nameTag.letterEdgeTooLong": "Alleen bij een tekst tot {max} tekens: bij een langere duurt het berekenen minuten.",
   "nameTag.keyring": "Gat voor sleutelring",
   "nameTag.keyringDiameter": "Gatdiameter",
   "nameTag.keyringSide": "Kant",

@@ -198,7 +198,7 @@ import { MAX_TEARDROP_TIP_ANGLE, MIN_TEARDROP_TIP_ANGLE, normalizeTeardropTipAng
 import { MAX_PORT_CLEARANCE, maxPortCorner, normalizePortClearance, normalizePortCorner, PORT_PRESET_ORDER, PORT_PRESETS, portPresetFor, portPresetSize, type PortPreset } from "@/lib/portGeometry";
 import { MAX_DOVETAIL_CLEARANCE, maxDovetailNeckWidth, normalizeDovetailClearance, normalizeDovetailNeckWidth } from "@/lib/dovetailGeometry";
 import { DEFAULT_SKETCH_STROKE, MAX_SKETCH_STROKE_WIDTH, MIN_SKETCH_STROKE_EDGE, MIN_SKETCH_STROKE_WIDTH, normalizeSketchStroke, SKETCH_STROKE_JOINS } from "@/lib/sketchStroke";
-import { MAX_TEXT_EDGE, MIN_TEXT_EDGE, normalizeTextEdge } from "@/lib/textEdge";
+import { MAX_EDGED_TEXT_LENGTH, MAX_TEXT_EDGE, MIN_TEXT_EDGE, normalizeTextEdge, textAllowsEdge, textHasEdge } from "@/lib/textEdge";
 import { wheelBaseStep, wheelNextValue, wheelTurn } from "@/lib/wheelValueStep";
 import { textHasFill } from "@/lib/textFill";
 import { TEXT_FILL_CHOICES, textFillChoice, textLineSettingsInView, textStrokeForChoice, textStrokeWider, type TextFillChoice } from "@/lib/textFillChoice";
@@ -206,6 +206,7 @@ import { MAX_TEXT_LAYERS, MAX_TEXT_LAYER_GROW, MIN_TEXT_LAYER_HEIGHT, nameTagKey
 import { iconKeyringAlongLimit } from "@/lib/sketchKeyring";
 import { DEFAULT_KEYRING_DIAMETER, curvedRadiusPatch, MAX_TEXT_LETTER_WIDTH, MAX_TEXT_SPACING, MIN_KEYRING_DIAMETER, MIN_TEXT_LETTER_WIDTH, MIN_TEXT_SPACING, TEXT_KEYRING_SIDES } from "@/lib/textGeometry";
 import { DEFAULT_TEXT_BLOCK_GAP, MAX_TEXT_BLOCK_GAP, MAX_TEXT_BLOCK_LINES, MAX_TEXT_BLOCK_STEP, MIN_TEXT_BLOCK_STEP, TEXT_BLOCK_ALIGNS, textBlockLines, type TextBlockAlign, type TextBlockOptions } from "@/lib/textBlock";
+import { limitedText, MAX_TEXT_LENGTH } from "@/lib/textLength";
 import { addTextLayer, MIN_LETTER_SIZE, MIN_NAME_TAG_LAYERS, NAME_TAG_GAP, NAME_TAG_LAYERS, NAME_TAG_LETTER_SIZE, removeTextLayer, textBaselineKeepShift, textLetterSize, textLetterSizePatch, textKerningPatch, textSpacingPatch, type NameTagStack } from "@/lib/nameTag";
 import { FONT_MANAGER_OPTION, requestFontManager } from "@/lib/fontManagerEvents";
 import { FontPicker } from "@/components/workplane/FontPicker";
@@ -552,6 +553,8 @@ type TextPropertyConfig = {
   value: string;
   /** A line under the row, as a range row has. */
   hint?: string;
+  /** How many characters the field takes; 24 when not given (a Gridfinity label shelf). */
+  maxLength?: number;
   onChange: (value: string) => void;
 };
 
@@ -572,6 +575,8 @@ type SelectPropertyConfig = {
   hint?: string;
   /** The words a font picker draws every font with: set, the entries are fonts and the field is a picker, not a plain select. */
   fontSample?: string;
+  /** Greyed out on its own, the hint saying why (a letter edge on a long text). */
+  disabled?: boolean;
   onChange: (value: string) => void;
 };
 
@@ -749,7 +754,7 @@ type ShapePropertyView = {
 };
 const NO_PROPERTY_VIEW: ShapePropertyView = { loftSection: 0, setLoftSection: () => undefined };
 
-function getShapePropertiesWithAppLimits(shape: WorkplaneShape, onUpdate: ShapeInspectorUpdate, textWidthMax = 260, view: ShapePropertyView = NO_PROPERTY_VIEW): ShapePropertyConfig[] {
+function getShapePropertiesWithAppLimits(shape: WorkplaneShape, onUpdate: ShapeInspectorUpdate, view: ShapePropertyView = NO_PROPERTY_VIEW): ShapePropertyConfig[] {
   const baseWidth = shapeWidth(shape);
   const baseDepth = shapeDepth(shape);
   const footprint = shapeOverallFootprintDimensions(shape);
@@ -3723,15 +3728,13 @@ function getShapePropertiesWithAppLimits(shape: WorkplaneShape, onUpdate: ShapeI
         id: "text",
         label: t("prop.text"),
         value: shape.text ?? "TEXT",
+        maxLength: MAX_TEXT_LENGTH,
         onChange: (text) => {
-          const nextText = text.slice(0, 24) || " ";
+          const nextText = limitedText(text);
           // Other words keep the letter size and the box follows the letters (#871): only the width was
-          // changed before, and the letters were stretched to fill the old depth.
+          // changed before, and the letters were stretched to fill the old depth. There is no width cap
+          // any more: a long text simply gets longer, and Letter size makes it smaller (Facebook, 07.11.2026).
           const sized = textLetterSizePatch({ ...shape, text: nextText } as WorkplaneShape, textLetterSize(shape));
-          if (typeof sized.width === "number" && sized.width > textWidthMax) {
-            onUpdate({ text: nextText, width: textWidthMax, size: textWidthMax });
-            return;
-          }
           // The baseline stays where it was (#871), so a tail reaches below the line instead of the letters sitting on the bottom of the box.
           const shift = textBaselineKeepShift(shape, { ...shape, text: nextText, ...sized } as WorkplaneShape);
           onUpdate({ text: nextText, ...sized, ...(shift ? { x: shape.x + shift.x, z: shape.z + shift.z } : {}) });
@@ -3745,7 +3748,7 @@ function getShapePropertiesWithAppLimits(shape: WorkplaneShape, onUpdate: ShapeI
       // The top edge of the letters (#499), as on a name tag; a rounded or chamfered edge takes the place of the bevel.
       ...textEdgeProperties(shape, onUpdate),
       // A fill mode or the silhouette draws the letters flat; bevel and segments belong to the filled letters.
-      ...(textHasFill(shape) || shape.textEdge ? [] : [
+      ...(textHasFill(shape) || textHasEdge(shape) ? [] : [
         { id: "bevel", label: t("prop.bevel"), value: shape.bevel ?? 0, min: 0, max: 8, onChange: (bevel: number) => onUpdate({ bevel }) },
         { id: "segments", label: t("prop.segments"), value: shape.segments ?? 0, min: 0, max: 24, step: 1, onChange: (segments: number) => onUpdate({ segments: Math.round(segments) }) },
       ] satisfies ShapePropertyConfig[]),
@@ -3870,6 +3873,20 @@ const TEXT_FILL_IN_VIEW_IDS = new Set(["textFill", "textLineWidth", "textCorners
 
 /** The letters' top edge, round or chamfered, and how large (#499): the setting the name tag has for its top layer. */
 function textEdgeProperties(shape: WorkplaneShape, onUpdate: ShapeInspectorUpdate): ShapePropertyConfig[] {
+  // A text longer than MAX_EDGED_TEXT_LENGTH takes no letter edge (its build would take a minute): the field is greyed
+  // out and says why; a setting it had stays, and comes back once the text is short enough again.
+  if (!textAllowsEdge(shape)) {
+    return [{
+      type: "select",
+      id: "textEdge",
+      label: t("nameTag.letterEdge"),
+      value: "none",
+      options: [{ value: "none", label: t("nameTag.edge.none") }],
+      hint: t("nameTag.letterEdgeTooLong", { max: MAX_EDGED_TEXT_LENGTH }),
+      disabled: true,
+      onChange: () => undefined,
+    }];
+  }
   const edge = normalizeTextEdge(shape.textEdge);
   return [
     {
@@ -4083,7 +4100,7 @@ function getShapeProperties(shape: WorkplaneShape, onUpdate: ShapeInspectorUpdat
   const customLimit = workspace.shapeCustomizations[shape.kind]?.maxDimension;
   // A body turned by right angles names its measures by the way they run now (#230).
   const oriented = orientedMeasures(shape);
-  const own = getShapePropertiesWithAppLimits(shape, onUpdate, customLimit ?? 260, view);
+  const own = getShapePropertiesWithAppLimits(shape, onUpdate, view);
   const properties = withOrientedMeasures(own, oriented, { width: t("prop.width"), height: t("prop.height"), length: t("prop.length") });
   if (customLimit === undefined) return properties;
   return properties.map((property) => {
@@ -5696,10 +5713,12 @@ function NameTagCard({
 }) {
   const [open, setOpen] = useState(true);
   const { source, layers, keyring } = stack;
+  // A long text takes no letter edge (MAX_EDGED_TEXT_LENGTH): the buttons are greyed out and a line says why.
+  const edgeAllowed = textAllowsEdge(source);
   const writeLayers = (next: TextLayer[]) => onLayerText({ layers: next });
   const changeLayer = (index: number, changes: Partial<TextLayer>) => writeLayers(layers.map((entry, position) => (position === index ? { ...entry, ...changes } : entry)));
   const properties: ShapePropertyConfig[] = [
-    { type: "text", id: "nameTagText", label: t("prop.text"), value: source.text ?? "TEXT", onChange: (text) => onLayerText({ text: text.slice(0, 24) || " " }) },
+    { type: "text", id: "nameTagText", label: t("prop.text"), value: source.text ?? "TEXT", maxLength: MAX_TEXT_LENGTH, onChange: (text) => onLayerText({ text: limitedText(text) }) },
     textFontProperty(source, (patch) => { if (typeof patch.font === "string") onLayerText({ font: patch.font }); }),
     { id: "letterSize", label: t("nameTag.letterSize"), value: textLetterSize(source), min: MIN_LETTER_SIZE, max: 60, step: 0.5, hint: t("nameTag.letterSizeHint"), onChange: (letterSize) => onLayerText({ letterSize }) },
     ...(source.textCurved ? [] : [{ type: "toggle", id: "nameTagVertical", label: t("prop.textVertical"), value: Boolean(source.textVertical), onChange: (vertical: boolean) => onLayerText({ vertical }) } satisfies ShapePropertyConfig]),
@@ -5725,7 +5744,7 @@ function NameTagCard({
           <div className="name-tag-sides name-tag-edge" role="radiogroup" aria-label={t("nameTag.letterEdge")}>
             <span>{t("nameTag.letterEdge")}</span>
             {(["none", "round", "chamfer"] as const).map((kind) => {
-              const active = (layers[0]?.edge?.kind ?? "none") === kind;
+              const active = (edgeAllowed ? layers[0]?.edge?.kind ?? "none" : "none") === kind;
               return (
                 <button
                   key={kind}
@@ -5733,7 +5752,7 @@ function NameTagCard({
                   role="radio"
                   aria-checked={active}
                   className={active ? "active" : ""}
-                  disabled={disabled || !layers.length}
+                  disabled={disabled || !layers.length || !edgeAllowed}
                   onClick={() => changeLayer(0, { edge: kind === "none" ? undefined : { kind, size: layers[0]?.edge?.size ?? Math.min(0.4, layers[0].height) } })}
                 >
                   {t(`nameTag.edge.${kind}`)}
@@ -5741,7 +5760,8 @@ function NameTagCard({
               );
             })}
           </div>
-          {layers[0]?.edge ? (
+          {edgeAllowed ? null : <p className="property-hint">{t("nameTag.letterEdgeTooLong", { max: MAX_EDGED_TEXT_LENGTH })}</p>}
+          {edgeAllowed && layers[0]?.edge ? (
             <RangeProperty
               id="letterEdgeSize"
               label={t("nameTag.letterEdgeSize")}
@@ -7589,7 +7609,7 @@ function ShapePropertyRows({
     const fallback = disabled || NO_RESET_PROPERTY_IDS.has(property.id) ? undefined : defaults?.get(property.id);
     if (property.type === "select") {
       const onReset = typeof fallback === "string" && fallback !== property.value ? () => property.onChange(fallback) : undefined;
-      return <SelectProperty {...property} key={property.id} disabled={disabled} onReset={onReset} />;
+      return <SelectProperty {...property} key={property.id} disabled={disabled || property.disabled} onReset={property.disabled ? undefined : onReset} />;
     }
     if (property.type === "toggle") {
       // A switch greyed out on its own offers no reset either.

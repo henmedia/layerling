@@ -2937,6 +2937,7 @@ export const MESSAGES_EN = {
   "nameTag.edge.round": "Round",
   "nameTag.edge.chamfer": "Chamfer",
   "nameTag.letterEdgeSize": "Edge size",
+  "nameTag.letterEdgeTooLong": "Only for a text of up to {max} characters: on a longer one it would take minutes to build.",
   "nameTag.keyring": "Key ring hole",
   "nameTag.keyringDiameter": "Hole diameter",
   "nameTag.keyringSide": "Side",

@@ -133,7 +133,7 @@ describe("workplane settings helpers", () => {
         roundRoof: { sides: 900 },
         sphere: { steps: 2 },
         cone: { topRadius: -4, baseRadius: 9000, sides: 40 },
-        text: { text: "A custom label that is much too long", font: "Serif", bevel: 12, segments: 9.6 },
+        text: { text: "A custom label that is much too long ".repeat(8).trim(), font: "Serif", bevel: 12, segments: 9.6 },
         gear: { gearType: "helical", teeth: 23.7, toothSize: 3, centerHoleSize: -5, helixAngle: 90, helixQuality: 3 },
       },
     });
@@ -143,7 +143,7 @@ describe("workplane settings helpers", () => {
     expect(customized.shapeCustomizations.roundRoof).toEqual({ sides: 512 });
     expect(customized.shapeCustomizations.sphere).toEqual({ steps: 6 });
     expect(customized.shapeCustomizations.cone).toEqual({ topRadius: 0, baseRadius: 1000, sides: 40 });
-    expect(customized.shapeCustomizations.text).toEqual({ text: "A custom label that is m", font: "Serif", bevel: 8, segments: 10 });
+    expect(customized.shapeCustomizations.text).toEqual({ text: "A custom label that is much too long ".repeat(8).trim().slice(0, 250), font: "Serif", bevel: 8, segments: 10 });
     expect(customized.shapeCustomizations.gear).toEqual({ gearType: "helical", teeth: 24, toothSize: 3, centerHoleSize: 0, helixAngle: 45, helixQuality: 4 });
   });
 

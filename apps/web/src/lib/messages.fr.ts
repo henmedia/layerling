@@ -2923,6 +2923,7 @@ export const MESSAGES_FR: Partial<Record<MessageKey, string>> = {
   "nameTag.edge.round": "Rond",
   "nameTag.edge.chamfer": "Chanfrein",
   "nameTag.letterEdgeSize": "Taille du bord",
+  "nameTag.letterEdgeTooLong": "Uniquement pour un texte de {max} caractères au plus : sur un texte plus long, le calcul prendrait plusieurs minutes.",
   "nameTag.keyring": "Trou pour porte-clés",
   "nameTag.keyringDiameter": "Diamètre du trou",
   "nameTag.keyringSide": "Côté",

@@ -3352,6 +3352,7 @@ export const MESSAGES_DA: Partial<Record<MessageKey, string>> = {
   "nameTag.edge.round": "Rund",
   "nameTag.edge.chamfer": "Fas",
   "nameTag.letterEdgeSize": "Kantstørrelse",
+  "nameTag.letterEdgeTooLong": "Kun på en tekst på op til {max} tegn: på en længere tager beregningen flere minutter.",
   "nameTag.keyring": "Nøgleringshul",
   "nameTag.keyringDiameter": "Huldiameter",
   "nameTag.keyringSide": "Side",

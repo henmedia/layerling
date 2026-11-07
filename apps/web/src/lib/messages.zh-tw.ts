@@ -2888,6 +2888,7 @@ export const MESSAGES_ZH_TW: Partial<Record<MessageKey, string>> = {
   "nameTag.edge.round": "圓角",
   "nameTag.edge.chamfer": "倒角",
   "nameTag.letterEdgeSize": "邊緣尺寸",
+  "nameTag.letterEdgeTooLong": "僅適用於不超過 {max} 個字元的文字：更長的文字需要幾分鐘才能算出。",
   "nameTag.keyring": "鑰匙圈孔",
   "nameTag.keyringDiameter": "孔徑",
   "nameTag.keyringSide": "側邊",

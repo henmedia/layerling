@@ -2939,6 +2939,7 @@ export const MESSAGES_ES: Partial<Record<MessageKey, string>> = {
   "nameTag.edge.round": "Redondas",
   "nameTag.edge.chamfer": "Chaflán",
   "nameTag.letterEdgeSize": "Tamaño de arista",
+  "nameTag.letterEdgeTooLong": "Solo en un texto de hasta {max} caracteres: en uno más largo el cálculo tardaría minutos.",
   "nameTag.keyring": "Orificio para llavero",
   "nameTag.keyringDiameter": "Diámetro del orificio",
   "nameTag.keyringSide": "Lado",

@@ -2924,6 +2924,7 @@ export const MESSAGES_IT: Partial<Record<MessageKey, string>> = {
   "nameTag.edge.round": "Arrotondato",
   "nameTag.edge.chamfer": "Smussato",
   "nameTag.letterEdgeSize": "Dimensione del bordo",
+  "nameTag.letterEdgeTooLong": "Solo per un testo fino a {max} caratteri: su uno più lungo il calcolo richiederebbe minuti.",
   "nameTag.keyring": "Foro per portachiavi",
   "nameTag.keyringDiameter": "Diametro del foro",
   "nameTag.keyringSide": "Lato",

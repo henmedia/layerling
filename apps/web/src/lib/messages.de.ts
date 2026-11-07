@@ -2936,6 +2936,7 @@ export const MESSAGES_DE: Record<MessageKey, string> = {
   "nameTag.edge.round": "Rund",
   "nameTag.edge.chamfer": "Fase",
   "nameTag.letterEdgeSize": "Größe der Kante",
+  "nameTag.letterEdgeTooLong": "Nur bei einem Text bis {max} Zeichen: bei einem längeren dauert das Berechnen Minuten.",
   "nameTag.keyring": "Loch für den Schlüsselring",
   "nameTag.keyringDiameter": "Lochdurchmesser",
   "nameTag.keyringSide": "Seite",

@@ -2930,6 +2930,7 @@ export const MESSAGES_RU: Partial<Record<MessageKey, string>> = {
   "nameTag.edge.round": "Скругление",
   "nameTag.edge.chamfer": "Фаска",
   "nameTag.letterEdgeSize": "Размер кромки",
+  "nameTag.letterEdgeTooLong": "Только для текста до {max} символов: для более длинного расчёт занял бы минуты.",
   "nameTag.keyring": "Отверстие под колечко",
   "nameTag.keyringDiameter": "Диаметр отверстия",
   "nameTag.keyringSide": "Сторона",

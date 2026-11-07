@@ -2945,6 +2945,7 @@ export const MESSAGES_AR: Partial<Record<MessageKey, string>> = {
   "nameTag.edge.round": "مستديرة",
   "nameTag.edge.chamfer": "شطف",
   "nameTag.letterEdgeSize": "حجم الحافة",
+  "nameTag.letterEdgeTooLong": "فقط لنص حتى {max} حرفًا: في نص أطول يستغرق الحساب دقائق.",
   "nameTag.keyring": "ثقب حلقة المفاتيح",
   "nameTag.keyringDiameter": "قطر الثقب",
   "nameTag.keyringSide": "الجانب",

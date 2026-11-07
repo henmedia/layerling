@@ -4908,6 +4908,7 @@ export const MESSAGES_SL: Partial<Record<MessageKey, string>> = {
   "nameTag.edge.round": "Zaobljen",
   "nameTag.edge.chamfer": "Posnet",
   "nameTag.letterEdgeSize": "Velikost roba",
+  "nameTag.letterEdgeTooLong": "Samo pri besedilu do {max} znakov: pri daljšem bi izračun trajal več minut.",
   "workspace.gridLinesGrow": "Črte mreže se debelijo ob povečavi",
   "workspace.gridLinesGrowHint": "Črte mreže ležijo na plošči tudi kot pasovi, ki so ob povečavi vse debelejši, kot v Tinkercadu. Če je izklopljeno, ostanejo pri vsaki povečavi široke en piksel, kot pri skici.",
   "shortcuts.fillet": "Orodje za zaokrožitev izbranega telesa (še enkrat: zapre ga)",

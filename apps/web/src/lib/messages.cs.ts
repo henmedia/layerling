@@ -3009,6 +3009,7 @@ export const MESSAGES_CS: Record<MessageKey, string> = {
   "nameTag.edge.round": "Zaoblit",
   "nameTag.edge.chamfer": "Zkosit",
   "nameTag.letterEdgeSize": "Rozměr úpravy hrany",
+  "nameTag.letterEdgeTooLong": "Jen u textu do {max} znaků: u delšího by výpočet trval minuty.",
   "nameTag.keyring": "Otvor na kroužek",
   "nameTag.keyringDiameter": "Průměr otvoru",
   "nameTag.keyringSide": "Strana",
