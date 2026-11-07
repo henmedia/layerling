@@ -110,6 +110,16 @@ A(z) {{ui:split.connectors}} újra egymáshoz igazítják a feleket, ahogy a Pru
 - A(z) {{ui:split.connectorDepth}} megadja, milyen mélyen megy be minden furat a saját felébe. Egy laza csap ennek kétszerese mínusz 0,6 mm hosszú, egy álló csap pedig 0,3 mm-rel rövidebb a furatánál, így sosem ülnek a furat alján, és a felek teljesen összezárnak. A csapok végein kis letörés van, minden furat szájánál is, hogy egy szétlapult első réteg ne szűkítse.
 - A(z) {{ui:split.connectorClearance}} a csap és a furata közötti hely. Ha a nyomtatód hézagát megmérted az illesztési próbával (a nyomtatásról szóló fejezetben), ebből indul, különben 0,2 mm-ről.
 
+A(z) {{ui:split.connectors.dovetail}} ragasztó nélkül tartja össze a feleket, mint az OrcaSlicer fecskefarkas vágása: egy léc, amely a vágott laptól távolodva szélesedik, azon a félen áll, amelynek a neve mínuszra végződik, és egyenesen fut át a vágott lapon, széltől szélig; a másik fél megkapja a hozzá illő hornyot, mindkét végén nyitva. A feleket oldalról, a léc mentén told egymásba; ezután a vágásra merőlegesen már nem húzhatók szét. A lécek a vágott lap hosszában futnak, és ha egy test több darabban metszi a síkot, mindegyiken egy irányba futnak, hogy egy fél egyetlen mozdulattal rácsúsztatható legyen. A(z) {{ui:split.connectorCount}} a lécek száma egymás mellett minden darabon; a 0 a darab szélességére bízza, hat lécszélességenként egyet, legalább egyet. Széles teteje mellett a léc megtartja saját szélességének felét és még 1,2 mm anyagot a vágott lap széléig, két léc pedig ennek kétszeresét egymástól. Az a darab, amely egy léchez túl keskeny vagy a léc irányában túl rövid, nem kap egyet sem, és a léc elmarad ott, ahol a másik fél vékonyabb, mint amilyen mély a horonya. A síkon fehér körvonalak mutatják, hová kerülnek: a kitöltött sáv a léc talpa, a körülötte futó vonal a széles teteje.
+
+- A(z) {{ui:split.dovetailWidth}} a léc szélessége ott, ahol kilép a vágott lapból, kezdetben 6 mm.
+- A(z) {{ui:split.dovetailDepth}} megadja, milyen messze áll ki a vágott lapból a másik félbe, kezdetben 4 mm. A horony 0,3 mm-rel mélyebb, hogy a felek teljesen összezárjanak.
+- A(z) {{ui:split.dovetailAngle}} megadja, mennyire dől kifelé minden oldal a vágott lapra merőlegeshez képest, 5° és 30° között, kezdetben 15°. Minél nagyobb, annál szélesebb a léc teteje, és annál erősebben tart.
+- A(z) {{ui:split.dovetailTurn}}: a 0 hosszában fekteti a léceket, a 90 keresztben a vágott lapon, a köztes szög pedig ennyivel elfordítja őket.
+- A(z) {{ui:split.connectorClearance}} a hely mindkét oldalon a léc és a horonya között, az illesztési próbából, mint a csapoknál. A léc végei körben le vannak törve, hogy megtalálja a hornyot, és a horony szájánál is van letörés.
+
+Nyomtatáshoz a horonyos felet fektesd a vágott lapjára, a lécest pedig fordítva nyomtasd, a vágott lappal felfelé: így a léc oldalai csak a szögükkel dőlnek kifelé, ami támasz nélkül nyomtatható.
+
 A lyukak összekötők nélkül válnak ketté.
 
 A felek egyszerű hálók: az olyan beállítások, mint egy henger oldalszáma vagy egy szöveg betűi, elvesznek, ezért ezeket előbb állítsd be. A [[Ctrl]]+[[Z]] egy lépésben visszahozza az eredetit. Zárolt és elrejtett objektumok nem vághatók ketté.

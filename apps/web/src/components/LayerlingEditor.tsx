@@ -396,7 +396,7 @@ type SplitSession = {
   error: string | null;
   /** The next click on a face sets the plane's position. */
   picking: boolean;
-  /** Dowels or plugs to line the halves up again, or none (Discussion #832); each opening starts from none. */
+  /** Dowels, plugs or a dovetail to line the halves up again, or none (Discussion #832); each opening starts from none. */
   connectors: SplitConnectorOptions;
 };
 
@@ -7415,12 +7415,12 @@ export function LayerlingEditor({
       controller.abort();
     };
   }, [splitConnectorQuestion]); // eslint-disable-line react-hooks/exhaustive-deps -- the question names everything it reads
-  const splitConnectorMarks = useMemo(
-    () => splitSession && splitSession.connectors.kind !== "none" && splitConnectorPreview.state === "done" && splitConnectorPreview.points.length
-      ? { points: splitConnectorPreview.points, radius: connectorHoleRadius(splitSession.connectors) }
-      : null,
-    [splitConnectorPreview, splitSession],
-  );
+  const splitConnectorMarks = useMemo(() => {
+    if (!splitSession || splitSession.connectors.kind === "none" || splitConnectorPreview.state !== "done") return null;
+    // A dovetail shows its tongues' outlines, dowels and plugs the rings of their holes.
+    if (splitSession.connectors.kind === "dovetail") return splitConnectorPreview.tongues?.length ? { points: [], radius: 0, tongues: splitConnectorPreview.tongues } : null;
+    return splitConnectorPreview.points.length ? { points: splitConnectorPreview.points, radius: connectorHoleRadius(splitSession.connectors) } : null;
+  }, [splitConnectorPreview, splitSession]);
 
   const changeSplitRotation = useCallback((index: 0 | 1, rotation: number) => {
     const angle = Math.max(-180, Math.min(180, rotation));
@@ -14390,14 +14390,22 @@ export function LayerlingEditor({
         if (alongWorkplane && (params.axis !== undefined || params.rotationX !== undefined || params.rotationY !== undefined || params.rotationZ !== undefined)) {
           throw new Error("alongWorkplane sets the axis and the tilt itself - leave out axis and rotationX/Y/Z");
         }
-        // Dowels or plugs through the cut face, as the panel's Connectors (Discussion #832); a setting left out starts as it does there.
+        // Dowels, plugs or a dovetail through the cut face, as the panel's Connectors (Discussion #832); a setting left out starts as it does there.
         const connectorKind = params.connectors === undefined ? "none" : mcpString(params.connectors, "").trim().toLowerCase();
-        if (!(SPLIT_CONNECTOR_KINDS as readonly string[]).includes(connectorKind)) throw new Error("connectors must be none, dowels or plugs");
-        const connectorFields = ["connectorCount", "connectorDiameter", "connectorDepth", "connectorClearance"] as const;
+        if (!(SPLIT_CONNECTOR_KINDS as readonly string[]).includes(connectorKind)) throw new Error("connectors must be none, dowels, plugs or dovetail");
+        const roundFields = ["connectorDiameter", "connectorDepth"] as const;
+        const dovetailFields = ["dovetailWidth", "dovetailDepth", "dovetailAngle", "dovetailDirection"] as const;
+        const connectorFields = ["connectorCount", "connectorClearance", ...roundFields, ...dovetailFields] as const;
         const badConnectorField = connectorFields.find((field) => params[field] !== undefined && !(typeof params[field] === "number" && Number.isFinite(params[field])));
         if (badConnectorField) throw new Error(`${badConnectorField} must be a number`);
         if (connectorKind === "none" && connectorFields.some((field) => params[field] !== undefined)) {
-          throw new Error("connectorCount, connectorDiameter, connectorDepth and connectorClearance go with connectors dowels or plugs");
+          throw new Error("connectorCount, connectorClearance and the connectors' measures go with connectors dowels, plugs or dovetail");
+        }
+        if (connectorKind === "dovetail" && roundFields.some((field) => params[field] !== undefined)) {
+          throw new Error("connectorDiameter and connectorDepth go with dowels or plugs - a dovetail takes dovetailWidth and dovetailDepth");
+        }
+        if (connectorKind !== "dovetail" && dovetailFields.some((field) => params[field] !== undefined)) {
+          throw new Error("dovetailWidth, dovetailDepth, dovetailAngle and dovetailDirection go with connectors dovetail");
         }
         const connectors = normalizeSplitConnectorOptions({
           kind: connectorKind,
@@ -14405,6 +14413,10 @@ export function LayerlingEditor({
           diameter: params.connectorDiameter,
           depth: params.connectorDepth,
           clearance: params.connectorClearance,
+          dovetailWidth: params.dovetailWidth,
+          dovetailDepth: params.dovetailDepth,
+          dovetailAngle: params.dovetailAngle,
+          dovetailTurn: params.dovetailDirection,
         }, splitConnectorDefaults(getPrinterPlay()));
         const workplane = placementWorkplaneRef.current;
         const workplaneDirection = alongWorkplane === "parallel" ? workplane.normal : alongWorkplane === "acrossX" ? workplane.xAxis : alongWorkplane === "acrossY" ? workplane.zAxis : null;
@@ -14463,8 +14475,9 @@ export function LayerlingEditor({
             connectors: {
               kind: connectors.kind,
               count: connectors.count,
-              diameter: connectors.diameter,
-              depth: connectors.depth,
+              ...(connectors.kind === "dovetail"
+                ? { width: connectors.dovetailWidth, depth: connectors.dovetailDepth, angle: connectors.dovetailAngle, direction: connectors.dovetailTurn }
+                : { diameter: connectors.diameter, depth: connectors.depth }),
               clearance: connectors.clearance,
               ...(outcome.connectors ?? { placed: 0, faces: 0, tooSmall: 0, tooThin: 0 }),
             },

@@ -114,6 +114,16 @@ Uwaga: zaokrąglenia i fazki nałożone na **całą** grupę przepadają przy od
 - {{ui:split.connectorDepth}} to, jak głęboko każdy otwór wchodzi w swoją połówkę. Kołek ma dwa razy tyle minus 0,6 mm długości, a czop jest o 0,3 mm krótszy od swojego otworu, żeby nigdy nie stały na dnie otworu i połówki domykały się całkiem. Kołki i czopy mają na końcach małą fazkę, a każdy otwór jedną u wlotu, żeby rozlana pierwsza warstwa go nie zwężała.
 - {{ui:split.connectorClearance}} to miejsce między kołkiem lub czopem a jego otworem. Gdy zmierzysz luz swojej drukarki testem pasowania (w rozdziale o drukowaniu), zaczyna się od niego, w przeciwnym razie od 0,2 mm.
 
+{{ui:split.connectors.dovetail}} trzyma połówki razem bez kleju, jak cięcie na jaskółczy ogon w OrcaSlicerze: listwa, która rozszerza się w miarę oddalania od powierzchni cięcia, stoi na połówce, której nazwa kończy się minusem, i biegnie prosto przez powierzchnię cięcia od krawędzi do krawędzi; druga połówka dostaje pasujący rowek, otwarty na obu końcach. Wsuń połówki jedna w drugą z boku, wzdłuż listwy; potem nie da się ich już rozdzielić w poprzek cięcia. Listwy biegną wzdłuż dłuższego boku powierzchni cięcia, a gdy bryła przecina płaszczyznę w kilku kawałkach, na wszystkich biegną w tę samą stronę, żeby połówkę nasunąć jednym ruchem. {{ui:split.connectorCount}} to liczba listew obok siebie na każdym kawałku; 0 zostawia to szerokości kawałka, jedna na każde sześć szerokości listwy, co najmniej jedna. Obok swojej szerokiej góry listwa zachowuje połowę własnej szerokości i jeszcze 1,2 mm materiału do krawędzi powierzchni cięcia, a dwie listwy dwa razy tyle od siebie. Kawałek za wąski na listwę albo za krótki wzdłuż niej nie dostaje żadnej, a listwa odpada tam, gdzie druga połówka jest cieńsza, niż głęboki jest jej rowek. Białe obrysy na płaszczyźnie pokazują, gdzie się znajdą: wypełniony pas to stopa listwy, linia wokół niego to jej szeroka góra.
+
+- {{ui:split.dovetailWidth}} to szerokość listwy tam, gdzie wychodzi z powierzchni cięcia, na początek 6 mm.
+- {{ui:split.dovetailDepth}} mówi, jak daleko wystaje z powierzchni cięcia w drugą połówkę, na początek 4 mm. Rowek jest o 0,3 mm głębszy, żeby połówki całkiem się zamknęły.
+- {{ui:split.dovetailAngle}} mówi, jak bardzo każdy bok odchyla się na zewnątrz od prostopadłej do powierzchni cięcia, od 5° do 30°, na początek 15°. Im większy, tym szersza góra listwy i tym mocniej trzyma.
+- {{ui:split.dovetailTurn}}: 0 kładzie listwy wzdłuż, 90 w poprzek powierzchni cięcia, a kąt pośredni obraca je o tyle.
+- {{ui:split.connectorClearance}} to miejsce z każdej strony między listwą a jej rowkiem, z twojego testu pasowania jak przy kołkach. Końce listwy są sfazowane dookoła, żeby trafiła w rowek, a rowek ma fazę przy wejściu.
+
+Do druku połóż połówkę z rowkiem na jej powierzchni cięcia, a połówkę z listwą drukuj odwrotnie, powierzchnią cięcia do góry: boki listwy odchylają się wtedy na zewnątrz tylko o swój kąt, co drukuje się bez podpór.
+
 Obiekty-otwory dzieli się bez łączników.
 
 Połowy są zwykłymi siatkami: ustawienia takie jak liczba boków walca albo napis tekstu znikają, więc ustaw je wcześniej. [[Ctrl]]+[[Z]] przywraca oryginał jednym krokiem. Zablokowanych i ukrytych obiektów nie da się podzielić.

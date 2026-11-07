@@ -65,16 +65,16 @@ function expectRoomAround(rings: readonly SectionRing[], points: readonly Point[
 
 describe("the connectors' settings", () => {
   it("start from none, 5 mm pins 6 mm deep and the built-in clearance", () => {
-    expect(SPLIT_CONNECTOR_DEFAULTS).toEqual({ kind: "none", count: 0, diameter: 5, depth: 6, clearance: 0.2 });
+    expect(SPLIT_CONNECTOR_DEFAULTS).toMatchObject({ kind: "none", count: 0, diameter: 5, depth: 6, clearance: 0.2 });
     expect(splitConnectorDefaults(null)).toEqual(SPLIT_CONNECTOR_DEFAULTS);
   });
 
   it("hold every value within its field and keep the rest", () => {
     expect(normalizeSplitConnectorOptions({ kind: "Dowels", count: 40, diameter: 0.5, depth: 99, clearance: -1 })).toEqual({
-      kind: "dowels", count: MAX_CONNECTOR_COUNT, diameter: 2, depth: 30, clearance: 0,
+      ...SPLIT_CONNECTOR_DEFAULTS, kind: "dowels", count: MAX_CONNECTOR_COUNT, diameter: 2, depth: 30, clearance: 0,
     });
     expect(normalizeSplitConnectorOptions({ kind: "screws", count: 2.6, diameter: "6,5", clearance: 0.9 })).toEqual({
-      kind: "none", count: 3, diameter: 6.5, depth: 6, clearance: MAX_CONNECTOR_CLEARANCE,
+      ...SPLIT_CONNECTOR_DEFAULTS, kind: "none", count: 3, diameter: 6.5, depth: 6, clearance: MAX_CONNECTOR_CLEARANCE,
     });
     const start = { ...SPLIT_CONNECTOR_DEFAULTS, kind: "plugs" as const, clearance: 0.15 };
     expect(normalizeSplitConnectorOptions({ depth: 8 }, start)).toEqual({ ...start, depth: 8 });

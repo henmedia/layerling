@@ -16,11 +16,20 @@ import {
   MAX_CONNECTOR_COUNT,
   MAX_CONNECTOR_DEPTH,
   MAX_CONNECTOR_DIAMETER,
+  MAX_DOVETAIL_ANGLE,
+  MAX_DOVETAIL_DEPTH,
+  MAX_DOVETAIL_TURN,
+  MAX_DOVETAIL_WIDTH,
   MIN_CONNECTOR_DEPTH,
   MIN_CONNECTOR_DIAMETER,
+  MIN_DOVETAIL_ANGLE,
+  MIN_DOVETAIL_DEPTH,
+  MIN_DOVETAIL_WIDTH,
   SPLIT_CONNECTOR_KINDS,
+  type SplitConnectorKind,
   type SplitConnectorOptions,
   type SplitConnectorTally,
+  type SplitTongueOutline,
 } from "@/lib/splitConnectors";
 import { useLanguage } from "@/lib/useLanguage";
 import { usePrinterPlay } from "@/lib/usePrinterPlay";
@@ -37,25 +46,29 @@ const SPLIT_WORKPLANE_DIRECTIONS = [
 
 /**
  * Where the connectors would go, as the editor last worked it out for the plane and settings shown (Discussion #832):
- * nothing yet, being worked out, or what fits, with the middles the view marks on the plane.
+ * nothing yet, being worked out, or what fits, with the middles the view marks on the plane - or a dovetail's tongues.
  */
 export type SplitConnectorPreviewState =
   | { state: "idle" }
   | { state: "working" }
-  | { state: "done"; tally: SplitConnectorTally; holes: number; points: Array<[number, number, number]> };
+  | { state: "done"; tally: SplitConnectorTally; holes: number; points: Array<[number, number, number]>; tongues?: SplitTongueOutline[] };
 
-/** What the panel says under the connectors' settings: how many fit and on how many cut faces, and why some got none. */
-export function splitConnectorSummary(preview: SplitConnectorPreviewState): string[] {
+/**
+ * What the panel says under the connectors' settings: how many fit and on how many cut faces, and why some got none - in
+ * a dovetail's own words where the dowels' would not fit it.
+ */
+export function splitConnectorSummary(preview: SplitConnectorPreviewState, kind: SplitConnectorKind = "dowels"): string[] {
   if (preview.state === "working") return [t("split.connectorsFinding")];
   if (preview.state !== "done") return [];
   const { tally, holes } = preview;
+  const dovetail = kind === "dovetail";
   const lines: string[] = [];
   if (tally.faces > 0 && tally.placed === 0) {
-    lines.push(t("split.connectorsNoRoom"));
+    lines.push(t(dovetail ? "split.dovetailNoRoom" : "split.connectorsNoRoom"));
   } else if (tally.placed > 0) {
     lines.push(tally.faces === 1 ? t("split.connectorsFitOne", { count: tally.placed }) : t("split.connectorsFitMany", { count: tally.placed, faces: tally.faces }));
-    if (tally.tooSmall === 1) lines.push(t("split.connectorsTooSmallOne"));
-    else if (tally.tooSmall > 1) lines.push(t("split.connectorsTooSmallMany", { count: tally.tooSmall }));
+    if (tally.tooSmall === 1) lines.push(t(dovetail ? "split.dovetailTooSmallOne" : "split.connectorsTooSmallOne"));
+    else if (tally.tooSmall > 1) lines.push(t(dovetail ? "split.dovetailTooSmallMany" : "split.connectorsTooSmallMany", { count: tally.tooSmall }));
   }
   if (tally.tooThin > 0) lines.push(t("split.connectorsTooThin", { count: tally.tooThin }));
   if (holes > 0) lines.push(t("split.connectorsHoles"));
@@ -95,7 +108,7 @@ export function SplitPanel({
   error: string | null;
   /** The next click on a face moves the plane there. */
   picking: boolean;
-  /** Dowels or plugs that line the halves up again, or none (Discussion #832). */
+  /** Dowels, plugs or a dovetail that line the halves up again, or none (Discussion #832). */
   connectors: SplitConnectorOptions;
   connectorPreview: SplitConnectorPreviewState;
   onPickToggle: () => void;
@@ -303,28 +316,75 @@ export function SplitPanel({
           disabled={busy}
           onChange={(value) => onConnectorsChange({ count: value })}
         />
-        <EdgeModifierSlider
-          label={t("split.connectorDiameter")}
-          value={connectors.diameter}
-          min={MIN_CONNECTOR_DIAMETER}
-          max={MAX_CONNECTOR_DIAMETER}
-          step={0.5}
-          workspace={workspace}
-          length
-          disabled={busy}
-          onChange={(value) => onConnectorsChange({ diameter: value })}
-        />
-        <EdgeModifierSlider
-          label={t("split.connectorDepth")}
-          value={connectors.depth}
-          min={MIN_CONNECTOR_DEPTH}
-          max={MAX_CONNECTOR_DEPTH}
-          step={0.5}
-          workspace={workspace}
-          length
-          disabled={busy}
-          onChange={(value) => onConnectorsChange({ depth: value })}
-        />
+        {connectors.kind === "dovetail" ? (<>
+          <EdgeModifierSlider
+            label={t("split.dovetailWidth")}
+            value={connectors.dovetailWidth}
+            min={MIN_DOVETAIL_WIDTH}
+            max={MAX_DOVETAIL_WIDTH}
+            step={0.5}
+            workspace={workspace}
+            length
+            disabled={busy}
+            onChange={(value) => onConnectorsChange({ dovetailWidth: value })}
+          />
+          <EdgeModifierSlider
+            label={t("split.dovetailDepth")}
+            value={connectors.dovetailDepth}
+            min={MIN_DOVETAIL_DEPTH}
+            max={MAX_DOVETAIL_DEPTH}
+            step={0.5}
+            workspace={workspace}
+            length
+            disabled={busy}
+            onChange={(value) => onConnectorsChange({ dovetailDepth: value })}
+          />
+          <EdgeModifierSlider
+            label={t("split.dovetailAngle")}
+            value={connectors.dovetailAngle}
+            min={MIN_DOVETAIL_ANGLE}
+            max={MAX_DOVETAIL_ANGLE}
+            step={1}
+            unit="°"
+            workspace={workspace}
+            disabled={busy}
+            onChange={(value) => onConnectorsChange({ dovetailAngle: value })}
+          />
+          <EdgeModifierSlider
+            label={t("split.dovetailTurn")}
+            value={connectors.dovetailTurn}
+            min={-MAX_DOVETAIL_TURN}
+            max={MAX_DOVETAIL_TURN}
+            step={1}
+            unit="°"
+            workspace={workspace}
+            disabled={busy}
+            onChange={(value) => onConnectorsChange({ dovetailTurn: value })}
+          />
+        </>) : (<>
+          <EdgeModifierSlider
+            label={t("split.connectorDiameter")}
+            value={connectors.diameter}
+            min={MIN_CONNECTOR_DIAMETER}
+            max={MAX_CONNECTOR_DIAMETER}
+            step={0.5}
+            workspace={workspace}
+            length
+            disabled={busy}
+            onChange={(value) => onConnectorsChange({ diameter: value })}
+          />
+          <EdgeModifierSlider
+            label={t("split.connectorDepth")}
+            value={connectors.depth}
+            min={MIN_CONNECTOR_DEPTH}
+            max={MAX_CONNECTOR_DEPTH}
+            step={0.5}
+            workspace={workspace}
+            length
+            disabled={busy}
+            onChange={(value) => onConnectorsChange({ depth: value })}
+          />
+        </>)}
         <EdgeModifierSlider
           label={t("split.connectorClearance")}
           value={connectors.clearance}
@@ -338,7 +398,7 @@ export function SplitPanel({
         />
         {fromPrinterPlay("split.connectorClearance", connectors.clearance, printerPlay) ? <span className="shell-openings-summary">{t("printerPlay.fromFitTest")}</span> : null}
         <div className="split-connector-summary" role="status">
-          {splitConnectorSummary(connectorPreview).map((line) => <span key={line}>{line}</span>)}
+          {splitConnectorSummary(connectorPreview, connectors.kind).map((line) => <span key={line}>{line}</span>)}
         </div>
       </>)}
 

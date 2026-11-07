@@ -141,7 +141,7 @@ export const PRINTER_PLAY_SETTINGS: readonly PrinterPlaySetting[] = [
   { id: "vase.fitClearance", takes: null },
   // A vase's lid serves a lip and a screw thread with one value, wider than a plain fit (0.35), for a lip round a whole rim.
   { id: "vase.lidClearance", takes: null },
-  // Split's dowels and plugs (Discussion #832): a pin or peg printed apart from the hole it goes into, room per side.
+  // Split's dowels, plugs and dovetail (Discussion #832): a pin, peg or tongue printed apart from the hole or groove it goes into, room per side.
   { id: "split.connectorClearance", takes: "perSide" },
 ];
 

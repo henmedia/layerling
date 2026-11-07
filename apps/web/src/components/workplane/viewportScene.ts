@@ -1097,8 +1097,15 @@ export function splitCutOutlinePoints(state: ThreeState, plane: ModelSplitPlane,
   return planeCrossingSegments(meshes, plane.origin, plane.normal);
 }
 
-/** The middles of a split's connectors on the plane, in world space, and the radius of their holes (Discussion #832). */
-export type SplitConnectorMarks = { points: ReadonlyArray<readonly [number, number, number]>; radius: number };
+/**
+ * The middles of a split's connectors on the plane, in world space, and the radius of their holes (Discussion #832); for a
+ * dovetail, the outlines of its tongues instead, each its foot and its wide top, four corners each.
+ */
+export type SplitConnectorMarks = {
+  points: ReadonlyArray<readonly [number, number, number]>;
+  radius: number;
+  tongues?: ReadonlyArray<{ foot: ReadonlyArray<readonly [number, number, number]>; top: ReadonlyArray<readonly [number, number, number]> }>;
+};
 
 export function syncSplitPlane(state: ThreeState | null, plane: ModelSplitPlane | null, handleActive = false, selectedIds: readonly string[] = [], connectorMarks: SplitConnectorMarks | null = null) {
   if (!state) return;
@@ -1205,6 +1212,29 @@ export function syncSplitPlane(state: ThreeState | null, plane: ModelSplitPlane 
       [outlineLoop, fill].forEach((mark) => {
         mark.position.set(point[0], point[1], point[2]);
         mark.quaternion.copy(facing);
+        mark.renderOrder = 906;
+        mark.layers.set(RENDER_LAYER_PREVIEWS);
+        marks.add(mark);
+      });
+    });
+    state.splitLayer.add(marks);
+  }
+  // A dovetail's tongues as their outlines on the plane: the foot filled faintly like a dowel's ring, the wide top a fainter line about it.
+  if (connectorMarks?.tongues?.length) {
+    const footMaterial = new THREE.LineBasicMaterial({ color: "#ffffff", transparent: true, opacity: 1, depthTest: false });
+    const topMaterial = new THREE.LineBasicMaterial({ color: "#ffffff", transparent: true, opacity: 0.6, depthTest: false });
+    const fillMaterial = new THREE.MeshBasicMaterial({ color: "#ffffff", transparent: true, opacity: 0.45, side: THREE.DoubleSide, depthTest: false, depthWrite: false });
+    const marks = new THREE.Group();
+    marks.name = "SplitTongueMarks";
+    const corners = (points: ReadonlyArray<readonly [number, number, number]>) => points.map((point) => new THREE.Vector3(point[0], point[1], point[2]));
+    connectorMarks.tongues.forEach(({ foot, top }) => {
+      const fill = new THREE.BufferGeometry().setFromPoints(corners(foot));
+      fill.setIndex([0, 1, 2, 0, 2, 3]);
+      [
+        new THREE.Mesh(fill, fillMaterial),
+        new THREE.LineLoop(new THREE.BufferGeometry().setFromPoints(corners(foot)), footMaterial),
+        new THREE.LineLoop(new THREE.BufferGeometry().setFromPoints(corners(top)), topMaterial),
+      ].forEach((mark) => {
         mark.renderOrder = 906;
         mark.layers.set(RENDER_LAYER_PREVIEWS);
         marks.add(mark);

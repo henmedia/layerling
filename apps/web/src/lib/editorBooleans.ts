@@ -16,7 +16,7 @@ import { acceleratedRaycast, computeBoundsTree } from "three-mesh-bvh";
 import { groupedContentScale, groupedPartSizeScale, scaleGroupedVertices, type GroupPartPlacement } from "@/lib/groupScale";
 import { applySplitConnectors, dropSplitSlivers, planSplitConnectors, splitByPlaneClearOfFaces, unionSplitManifoldComponents } from "@/lib/manifoldSplit";
 import { paintedWorldMesh } from "@/lib/paintMesh";
-import { addConnectorTallies, NO_CONNECTORS, splitFramePoint, type SplitConnectorKind, type SplitConnectorOptions, type SplitConnectorTally } from "@/lib/splitConnectors";
+import { addConnectorTallies, NO_CONNECTORS, splitFramePoint, tongueOutlines, type SplitConnectorKind, type SplitConnectorOptions, type SplitConnectorTally, type SplitTongueOutline } from "@/lib/splitConnectors";
 import { splitAxisLabel, splitPlaneIntersectsPoints, splitShapeFromWorldPositions, type ModelSplitPlane } from "@/lib/modelSplit";
 import { starSettingsForSize } from "@/lib/starGeometry";
 import { canonicalizeShape, cleanRotationDegrees, isNonSolidShape, meshYawDegrees, mirrorSign, normalizeDegrees, resizedImportedCoordinates, resizedShapeSize, shapeDepth, shapeHasShapeDeform, shapeHasTaper, shapeTaperDimensions, shapeWidth, withHoleMode } from "@/lib/workplaneShapes";
@@ -943,8 +943,11 @@ export async function splitShapeByPlane(shape: WorkplaneShape, plane: SplitPlane
   }
 }
 
-/** Where the connectors would go, for the Split panel to show before the cut: what they come to, and their middles in the world. */
-export type SplitConnectorPreview = { tally: SplitConnectorTally; points: Array<[number, number, number]>; holes: number };
+/**
+ * Where the connectors would go, for the Split panel to show before the cut: what they come to, and their middles in the
+ * world - or, for a dovetail, the outlines of its tongues on the plane.
+ */
+export type SplitConnectorPreview = { tally: SplitConnectorTally; points: Array<[number, number, number]>; holes: number; tongues?: SplitTongueOutline[] };
 
 /**
  * The connectors the split would make, worked out as the split works them out, without making them: for each solid the
@@ -955,6 +958,7 @@ export async function previewSplitConnectors(targets: readonly WorkplaneShape[],
   let tally = NO_CONNECTORS;
   const points: Array<[number, number, number]> = [];
   let holes = 0;
+  const tongues: SplitTongueOutline[] = [];
   if (connectors.kind === "none") return { tally, points, holes };
   for (const shape of targets) {
     if (!splitPlaneIntersectsPoints(meshForShape(shape).vertices, plane.normal, plane.position)) continue;
@@ -970,6 +974,7 @@ export async function previewSplitConnectors(targets: readonly WorkplaneShape[],
       const plan = planSplitConnectors(halves.runtime, halves.positive, halves.negative, plane.normal, plane.position, connectors, created);
       tally = addConnectorTallies(tally, plan.tally);
       points.push(...plan.points.map((point) => splitFramePoint(plan.frame, point, plan.position)));
+      tongues.push(...plan.tongues.flatMap((tongue) => tongueOutlines(plan.frame, plan.position, tongue, connectors)));
     } catch {
       // The split will say what went wrong with this body.
     } finally {
@@ -977,7 +982,7 @@ export async function previewSplitConnectors(targets: readonly WorkplaneShape[],
       Array.from(new Set(created)).forEach(disposeManifold);
     }
   }
-  return { tally, points, holes };
+  return { tally, points, holes, ...(connectors.kind === "dovetail" ? { tongues } : {}) };
 }
 
 /** A status message with the note that small holes of the mesh were closed first (#791). */
@@ -989,17 +994,19 @@ export function withClosedHolesNote(message: string, closedHoles = 0) {
 
 /**
  * A split's status message with what its connectors came to (Discussion #832): the dowels to print beside the halves,
- * the plugs that line them up, or that none fit and the parts were split without. Nothing for a split without
- * connectors, or one that only cut holes.
+ * the plugs that line them up, the dovetails that hold them and how they go together, or that none fit and the parts
+ * were split without. Nothing for a split without connectors, or one that only cut holes.
  */
 export function withConnectorsNote(message: string, kind: SplitConnectorKind, tally?: SplitConnectorTally) {
   if (kind === "none" || !tally || tally.faces === 0) return message;
   const count = tally.placed;
   const note = count === 0
-    ? t("status.splitNoConnectors")
+    ? t(kind === "dovetail" ? "status.splitNoDovetail" : "status.splitNoConnectors")
     : kind === "dowels"
       ? (count === 1 ? t("status.splitDowelsOne") : t("status.splitDowelsMany", { count }))
-      : (count === 1 ? t("status.splitPlugsOne") : t("status.splitPlugsMany", { count }));
+      : kind === "dovetail"
+        ? (count === 1 ? t("status.splitDovetailOne") : t("status.splitDovetailMany", { count }))
+        : (count === 1 ? t("status.splitPlugsOne") : t("status.splitPlugsMany", { count }));
   return `${/[.!?。]$/.test(message) ? message : `${message}.`} ${note}`;
 }
 

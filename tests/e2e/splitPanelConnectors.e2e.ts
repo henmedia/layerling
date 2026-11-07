@@ -11,7 +11,7 @@ import { DEFAULT_WORKPLANE_WORKSPACE } from "@/lib/workplaneSettings";
 /*
  * The Split panel's connectors (Discussion #832): None shows nothing more, Dowels and Plugs show their settings and what
  * fits on the cut face, a cut face too small and a split without room say so, and the clearance says when it comes from
- * the fit test.
+ * the fit test. A dovetail shows its tongue's own measures and says it in its own words.
  */
 (globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = true;
 
@@ -71,10 +71,10 @@ const done = (tally: Partial<{ placed: number; faces: number; tooSmall: number; 
 });
 
 describe("the Split panel's connectors", () => {
-  it("offers None, Dowels and Plugs, with None chosen and nothing more shown", () => {
+  it("offers None, Dowels, Plugs and Dovetail, with None chosen and nothing more shown", () => {
     const { panel, changes } = mount({});
-    expect(kindButtons(panel).map((button) => button.textContent)).toEqual(["None", "Dowels", "Plugs"]);
-    expect(kindButtons(panel).map((button) => button.getAttribute("aria-pressed"))).toEqual(["true", "false", "false"]);
+    expect(kindButtons(panel).map((button) => button.textContent)).toEqual(["None", "Dowels", "Plugs", "Dovetail"]);
+    expect(kindButtons(panel).map((button) => button.getAttribute("aria-pressed"))).toEqual(["true", "false", "false", "false"]);
     expect(fieldLabels(panel)).toEqual([]);
     expect(panel.querySelector(".split-connector-summary")).toBeNull();
     act(() => kindButtons(panel)[1].click());
@@ -114,5 +114,23 @@ describe("the Split panel's connectors", () => {
     act(() => root?.unmount());
     const own = mount({ kind: "dowels", clearance: 0.3 });
     expect(text(own.panel)).not.toContain("From your fit test");
+  });
+
+  it("shows the dovetail's measures, and says in its own words when a cut face has no room for one", () => {
+    const { panel, changes } = mount({ kind: "dovetail" }, done({ placed: 1, faces: 2, tooSmall: 1 }));
+    expect(kindButtons(panel).map((button) => button.getAttribute("aria-pressed"))).toEqual(["false", "false", "false", "true"]);
+    expect(fieldLabels(panel)).toEqual(["Per cut face (0 = automatic)", "Width at the cut face", "Depth into the other half", "Flank angle", "Direction (0 = lengthwise)", "Clearance per side"]);
+    expect(text(panel)).toContain("Slide the halves together from the side");
+    expect(summary(panel)).toEqual(["Room for 1 on 2 cut faces.", "One cut face is too small for a dovetail."]);
+    const direction = [...panel.querySelectorAll<HTMLInputElement>(".split-panel input[type=range]")].find((input) => input.min === "-90");
+    expect(direction?.max).toBe("90");
+    act(() => {
+      Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, "value")!.set!.call(direction, "90");
+      direction!.dispatchEvent(new Event("input", { bubbles: true }));
+    });
+    expect(changes).toContainEqual({ dovetailTurn: 90 });
+    act(() => root?.unmount());
+    const none = mount({ kind: "dovetail" }, done({ placed: 0, faces: 1, tooSmall: 1 }));
+    expect(summary(none.panel)).toEqual(["No dovetail fits on the cut face, so the parts will be split without. A narrower or shallower tongue may fit."]);
   });
 });

@@ -166,7 +166,7 @@ type WorkplaneViewportProps = {
   /** With `splitActive`: objects can still be picked and show the selection outline, but nothing can be edited (History view). */
   pickOnly?: PickOnlySelection | null;
   splitPlane?: ModelSplitPlane | null;
-  /** Where the split's connectors would go, as rings of the holes' size on the plane (Discussion #832). */
+  /** Where the split's connectors would go, as rings of the holes' size on the plane, or a dovetail's tongues as their outlines (Discussion #832). */
   splitConnectorMarks?: SplitConnectorMarks | null;
   /** Dragging the plane's arrow head moves the plane along its normal. */
   onSplitPositionChange?: (position: number) => void;

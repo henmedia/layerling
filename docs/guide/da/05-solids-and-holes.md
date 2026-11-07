@@ -115,6 +115,16 @@ En bemærkning: fas og rund du har lagt på **hele** gruppen mistes ved genopbyg
 - {{ui:split.connectorDepth}} er, hvor langt hvert hul går ind i sin halvdel. En dyvel er dobbelt så lang minus 0,6 mm og en tap 0,3 mm kortere end sit hul, så de aldrig står på bunden af et hul og halvdelene lukker helt. Dyvler og tappe har en lille affasning i enderne, og hvert hul en ved sin åbning, så et udflydt første lag ikke gør det snævrere.
 - {{ui:split.connectorClearance}} er pladsen mellem en dyvel eller tap og dens hul. Når du har målt din printers spillerum med pasprøven (i kapitlet om print), starter det med det, ellers med 0,2 mm.
 
+{{ui:split.connectors.dovetail}} holder halvdelene sammen uden lim, som svalehalesnittet i OrcaSlicer: en liste, der bliver bredere væk fra snitfladen, står på den halvdel, hvis navn ender på minus, og løber lige hen over snitfladen fra kant til kant; den anden halvdel får den passende not, åben i begge ender. Skub halvdelene ind i hinanden fra siden, langs listen; derefter kan de ikke trækkes fra hinanden på tværs af snittet. Listerne løber på langs af snitfladen, og møder et legeme planet i flere stykker, løber de samme vej på dem alle, så en halvdel skubbes på i ét træk. {{ui:split.connectorCount}} er antallet af lister side om side på hvert stykke; 0 overlader det til stykkets bredde, én for hver seks listebredder, mindst én. Ved siden af sin brede overside beholder en liste sin halve bredde og yderligere 1,2 mm materiale til snitfladens kant, og to lister dobbelt så meget fra hinanden. Et stykke, der er for smalt til en liste eller for kort på langs af den, får ingen, og en liste udelades, hvor den anden halvdel er tyndere, end dens not er dyb. Hvide omrids på planet viser, hvor de kommer: den udfyldte stribe er listens fod, linjen omkring den dens brede overside.
+
+- {{ui:split.dovetailWidth}} er listens bredde, hvor den kommer ud af snitfladen, til at begynde med 6 mm.
+- {{ui:split.dovetailDepth}} er, hvor langt den rager ud af snitfladen ind i den anden halvdel, til at begynde med 4 mm. Noten er 0,3 mm dybere, så halvdelene lukker helt.
+- {{ui:split.dovetailAngle}} er, hvor meget hver flanke hælder udad i forhold til vinkelret på snitfladen, fra 5° til 30°, til at begynde med 15°. Jo større, jo bredere listens overside, og jo fastere holder den.
+- {{ui:split.dovetailTurn}}: 0 lægger listerne på langs, 90 på tværs af snitfladen, og en vinkel derimellem drejer dem så meget.
+- {{ui:split.connectorClearance}} er pladsen på hver side mellem listen og dens not, fra din pasprøve som ved dyvlerne. Listens ender er affaset hele vejen rundt, så den finder noten, og noten har en affasning ved sin åbning.
+
+Til printning lægger du halvdelen med noten på sin snitflade og printer halvdelen med listen omvendt, med snitfladen opad: så hælder listens flanker kun udad med deres vinkel, og det kan printes uden støtte.
+
 Former, der er huller, deles uden samling.
 
 Halvdelene er almindelige meshes: indstillinger som en cylinders sider eller en teksts bogstaver er væk, så sæt dem først. [[Ctrl]]+[[Z]] bringer originalen tilbage i ét skridt. Låste og skjulte objekter kan ikke deles.

@@ -110,6 +110,16 @@ Opomba: posnetja in zaokrožitve, ki si jih položil na **celotno** skupino, se 
 - {{ui:split.connectorDepth}} pove, kako globoko gre vsaka luknja v svojo polovico. Moznik je dvakrat toliko dolg manj 0,6 mm, čep pa 0,3 mm krajši od svoje luknje, da nikoli ne stojita na dnu luknje in se polovici povsem zapreta. Mozniki in čepi imajo na koncih majhno posnetje, vsaka luknja pa ga ima ob ustju, da je razlezena prva plast ne zoži.
 - {{ui:split.connectorClearance}} je prostor med moznikom ali čepom in njegovo luknjo. Ko izmeriš zračnost svojega tiskalnika s preizkusom ujemanja (v poglavju o tiskanju), se začne z njo, sicer z 0,2 mm.
 
+{{ui:split.connectors.dovetail}} drži polovici skupaj brez lepila, kot rez z lastovičjim repom v OrcaSlicerju: letev, ki se od ploskve reza navzven širi, stoji na polovici, katere ime se konča z minusom, in teče naravnost čez ploskev reza od roba do roba; druga polovica dobi ustrezen utor, odprt na obeh koncih. Polovici potisneš eno v drugo s strani, vzdolž letve; potem ju prečno na rez ni več mogoče razdvojiti. Letve tečejo vzdolž daljše strani ploskve reza, in če telo seka ravnino v več kosih, tečejo na vseh v isto smer, da polovico nasuneš z enim gibom. {{ui:split.connectorCount}} je število letev drugo ob drugi na vsakem kosu; 0 to prepusti širini kosa, ena na vsakih šest širin letve, vsaj ena. Ob svoji široki zgornji strani letev obdrži polovico svoje širine in še 1,2 mm materiala do roba ploskve reza, dve letvi pa dvakrat toliko druga od druge. Kos, ki je za letev preozek ali v njeni smeri prekratek, ne dobi nobene, letev pa odpade tam, kjer je druga polovica tanjša, kot je globok njen utor. Beli obrisi na ravnini kažejo, kam pridejo: zapolnjeni pas je vznožje letve, črta okoli njega njena široka zgornja stran.
+
+- {{ui:split.dovetailWidth}} je širina letve tam, kjer pride iz ploskve reza, na začetku 6 mm.
+- {{ui:split.dovetailDepth}} pove, kako daleč štrli iz ploskve reza v drugo polovico, na začetku 4 mm. Utor je 0,3 mm globlji, da se polovici povsem zapreta.
+- {{ui:split.dovetailAngle}} pove, koliko se vsak bok nagne navzven od pravokotnice na ploskev reza, od 5° do 30°, na začetku 15°. Večji ko je, širša je zgornja stran letve in trdneje drži.
+- {{ui:split.dovetailTurn}}: 0 položi letve vzdolžno, 90 prečno čez ploskev reza, kot vmes pa jih zasuče za toliko.
+- {{ui:split.connectorClearance}} je prostor na vsaki strani med letvijo in njenim utorom, iz tvojega preizkusa ujemanja kot pri moznikih. Konca letve sta naokoli posneta, da najde utor, utor pa ima posnetje ob ustju.
+
+Za tisk položi polovico z utorom na njeno ploskev reza, polovico z letvijo pa natisni obrnjeno, s ploskvijo reza zgoraj: boka letve se tedaj nagibata navzven le za svoj kot, kar se natisne brez podpor.
+
 Oblike, ki so luknje, se razdelijo brez spojnikov.
 
 Polovici sta preprosti mreži: nastavitve, kot je število stranic valja ali črke besedila, se izgubijo, zato jih nastavi prej. [[Ctrl]]+[[Z]] vrne original v enem koraku. Zaklenjenih in skritih predmetov ni mogoče razrezati.
