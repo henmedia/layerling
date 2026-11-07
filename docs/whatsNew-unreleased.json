@@ -1,6 +1,16 @@
 [
   {
     "title": {
+      "de": "Deckel zum Einschrauben",
+      "en": "A lid that screws in"
+    },
+    "body": {
+      "de": "Das Deckel-Werkzeug hat eine neue Art „Eingeschraubt“: Der Körper bekommt das Gewinde innen in seiner Öffnung, der Deckel einen Gewindezapfen darunter. Außen bleibt der Körper glatt, etwa bei einem runden Stiftehalter. Beide Teile drucken ohne Stützen.",
+      "en": "The Lid tool has a new kind, Screw in: the body gets the thread inside its opening and the lid a threaded plug below it. The outside of the body stays smooth, for a round pen holder, say. Both parts print without support."
+    }
+  },
+  {
+    "title": {
       "de": "Gedrehte Langlöcher im Lochmuster",
       "en": "Turned slots in a hole pattern"
     },
