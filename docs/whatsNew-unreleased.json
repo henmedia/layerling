@@ -1,6 +1,16 @@
 [
   {
     "title": {
+      "de": "Gedrehte Langlöcher im Lochmuster",
+      "en": "Turned slots in a hole pattern"
+    },
+    "body": {
+      "de": "Langlöcher und Rechtecke im Lochmuster lassen sich jetzt drehen: Mit „Winkel der Löcher“ steht jedes Loch schräg, etwa Lüftungsschlitze auf 45°, und das Raster bleibt gerade. Die Wand zwischen den Löchern bleibt dabei erhalten.",
+      "en": "Slots and rectangles in a hole pattern can now be turned: with Angle of the holes each hole stands at a slant, ventilation slots at 45° for example, while the grid stays straight. The wall between the holes is kept."
+    }
+  },
+  {
+    "title": {
       "de": "Hülle mit offenen Löchern",
       "en": "Hull with open holes",
       "da": "Hylster med åbne huller"

@@ -1481,6 +1481,7 @@ export const MESSAGES_PL: Partial<Record<MessageKey, string>> = {
   "holePattern.size.corners": "Średnica po narożnikach (Ø)",
   "holePattern.size.width": "Szerokość",
   "holePattern.size.height": "Wysokość",
+  "holePattern.holeAngle": "Kąt otworów",
   "holePattern.spacing": "Rozstaw od środka do środka",
   "holePattern.rowSpacing": "Rozstaw rzędów od środka do środka",
   "holePattern.wall": "Ścianka między otworami",

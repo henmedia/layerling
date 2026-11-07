@@ -1475,6 +1475,7 @@ export const MESSAGES_ZH_CN: Partial<Record<MessageKey, string>> = {
   "holePattern.size.corners": "对角直径（Ø）",
   "holePattern.size.width": "宽度",
   "holePattern.size.height": "高度",
+  "holePattern.holeAngle": "孔的角度",
   "holePattern.spacing": "中心距",
   "holePattern.rowSpacing": "行距（中心到中心）",
   "holePattern.wall": "孔间壁厚",

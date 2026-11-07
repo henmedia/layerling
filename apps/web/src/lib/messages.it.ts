@@ -1511,6 +1511,7 @@ export const MESSAGES_IT: Partial<Record<MessageKey, string>> = {
   "holePattern.size.corners": "Diametro tra gli angoli opposti (Ø)",
   "holePattern.size.width": "Larghezza",
   "holePattern.size.height": "Altezza",
+  "holePattern.holeAngle": "Angolo dei fori",
   "holePattern.spacing": "Distanza da centro a centro",
   "holePattern.rowSpacing": "Distanza tra i centri delle file",
   "holePattern.wall": "Parete tra i fori",

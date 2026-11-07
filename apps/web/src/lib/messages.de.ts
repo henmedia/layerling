@@ -1519,6 +1519,7 @@ export const MESSAGES_DE: Record<MessageKey, string> = {
   "holePattern.size.corners": "Durchmesser über die Ecken (Ø)",
   "holePattern.size.width": "Breite",
   "holePattern.size.height": "Höhe",
+  "holePattern.holeAngle": "Winkel der Löcher",
   "holePattern.spacing": "Abstand Mitte zu Mitte",
   "holePattern.rowSpacing": "Reihenabstand",
   "holePattern.wall": "Wand zwischen den Löchern",

@@ -923,6 +923,7 @@ export const MESSAGES_PT_PT: Partial<Record<MessageKey, string>> = {
   "holePattern.size.corners": "Diâmetro entre vértices opostos (Ø)",
   "holePattern.size.width": "Largura",
   "holePattern.size.height": "Altura",
+  "holePattern.holeAngle": "Ângulo dos furos",
   "holePattern.spacing": "Distância entre centros",
   "holePattern.wall": "Parede entre os furos",
   "holePattern.arrangement": "Disposição",

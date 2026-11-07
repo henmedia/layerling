@@ -1172,6 +1172,7 @@ export const MESSAGES_JA: Partial<Record<MessageKey, string>> = {
   "holePattern.size.corners": "対角の直径（Ø）",
   "holePattern.size.width": "幅",
   "holePattern.size.height": "高さ",
+  "holePattern.holeAngle": "穴の角度",
   "holePattern.spacing": "中心間の間隔",
   "holePattern.rowSpacing": "列の中心から中心まで",
   "holePattern.wall": "穴と穴の間の壁",

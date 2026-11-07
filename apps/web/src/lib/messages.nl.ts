@@ -1519,6 +1519,7 @@ export const MESSAGES_NL: Record<MessageKey, string> = {
   "holePattern.size.corners": "Diameter over de hoeken (Ø)",
   "holePattern.size.width": "Breedte",
   "holePattern.size.height": "Hoogte",
+  "holePattern.holeAngle": "Hoek van de gaten",
   "holePattern.spacing": "Hart-op-hartafstand",
   "holePattern.rowSpacing": "Rijafstand",
   "holePattern.wall": "Wand tussen de gaten",
