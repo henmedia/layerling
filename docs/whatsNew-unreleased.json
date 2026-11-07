@@ -1,26 +1,14 @@
 [
   {
     "title": {
-      "de": "Sicherungen in einen eigenen Ordner",
-      "en": "Backups into a folder of your own",
-      "da": "Sikkerhedskopier ind i en mappe af eget valg"
+      "de": "Hülle mit offenen Löchern",
+      "en": "Hull with open holes",
+      "da": "Hylster med åbne huller"
     },
     "body": {
-      "de": "In Chrome und Edge fragen „Alle sichern“, „Sichern“ und „Eigene Formen sichern“ jetzt, wohin die ZIP-Datei soll, und merken sich den Ordner für das nächste Mal – etwa einen Ordner auf deinem Cloud-Laufwerk statt der Downloads. Andere Browser laden die Sicherung wie bisher herunter.",
-      "en": "In Chrome and Edge, \"Back up all\", \"Back up\" and \"Back up custom shapes\" now ask where the ZIP file should go, and remember the folder for next time - a folder on your cloud drive, say, instead of Downloads. Other browsers download the backup as before.",
-      "da": "I Chrome og Edge spørger „Sikkerhedskopiér alle“, „Sikkerhedskopiér“ og „Sikkerhedskopiér egne former“ nu, hvor ZIP-filen skal ligge, og husker mappen til næste gang, for eksempel en mappe på dit clouddrev i stedet for Downloads. Andre browsere henter sikkerhedskopien som før."
-    }
-  },
-  {
-    "title": {
-      "de": "Stützrippe ohne falsche Warnungen",
-      "en": "Support rib without false warnings",
-      "da": "Støtteribbe uden falske advarsler"
-    },
-    "body": {
-      "de": "„Spiel prüfen“ und „Druck prüfen“ kennen die Stützrippe jetzt: Dass ihre Brücken ins Teil reichen und dass Rippe und Brücken dünn sind, ist gewollt und wird nicht mehr gemeldet. Eine Rippe aus 1.148.0 legst du dafür einmal neu an.",
-      "en": "Check clearance and Print check now know the support rib: its bridges reaching into the part, and the rib and its bridges being thin, are meant to be so and no longer reported. A rib made with 1.148.0 needs making again once for this.",
-      "da": "„Tjek spillerum“ og „Tjek print“ kender nu støtteribben: at dens broer rækker ind i delen, og at ribben og dens broer er tynde, er meningen og meldes ikke længere. En ribbe lavet med 1.148.0 skal laves igen én gang for dette."
+      "de": "Eine Hülle füllt alles, was in ihren Teilen hohl ist: ein Rohr, einen ausgehöhlten Zylinder, Löcher in einer Gruppe. Mit „Löcher der Teile behalten“ unter Eigenschaften bleiben sie offen, und die Hülle füllt nur den Raum zwischen den Teilen.",
+      "en": "A hull fills whatever is hollow in its parts: a tube, a hollowed cylinder, the holes in a group. With Keep the parts' holes under Properties they stay open, and the hull only fills the space between the parts.",
+      "da": "Et hylster fylder alt, hvad der er hult i dets dele: et rør, en udhulet cylinder, hullerne i en gruppe. Med „Bevar delenes huller“ under Egenskaber forbliver de åbne, og hylsteret fylder kun rummet mellem delene."
     }
   }
 ]
