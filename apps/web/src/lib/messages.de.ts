@@ -855,6 +855,7 @@ export const MESSAGES_DE: Record<MessageKey, string> = {
   "lid.error.endPlugsFlush": "Endstopfen gibt es nur beim bündigen Scharnier.",
   "lid.error.endPlugsShort": "Die Knöchel an den Enden sind zu kurz für Endstopfen: Jeder braucht mindestens 3,5 mm. Nimm weniger Knöchel.",
   "status.lidMadeHingeFlushPlugs": "Deckel gemacht ({type}) mit bündigem Scharnier: {count} Knöchel in der Wand, ein Loch für einen Stift von {pin} mm und {length} mm Länge und zwei Endstopfen, die es verschließen. Deckel und Stopfen liegen neben dem Körper, fertig zum Drucken.",
+  "status.lidMadeHingeFlushCorners": "Deckel gemacht ({type}) mit bündigem Scharnier: {count} Knöchel in der Wand, die äußeren füllen die abgerundeten Ecken, und ein Loch für einen Stift von {pin} mm und {length} mm Länge. Der Deckel liegt umgedreht neben dem Körper, fertig zum Drucken.",
   "lid.error.hingeLidType": "Ein Scharnier geht nur mit eingestecktem oder flachem Deckel: Ein Rand außen herum würde beim Aufklappen an die Rückwand stoßen.",
   "lid.error.hingeNoBack": "An der gewählten Seite ist kein Platz für drei Knöchel: Sie ist zu kurz oder zu stark gekrümmt.",
   "lid.error.hingeTooLow": "Der Körper ist für das Scharnier zu niedrig: Unter den Knöcheln braucht es Platz für ihre Schräge. Nimm einen dünneren Stift oder einen höheren Körper.",
