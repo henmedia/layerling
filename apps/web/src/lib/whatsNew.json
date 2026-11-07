@@ -1,5 +1,92 @@
 [
   {
+    "version": "1.151.0",
+    "items": [
+      {
+        "title": {
+          "de": "Winkellineal so lang wie die Platte",
+          "en": "A framing square as long as the plate"
+        },
+        "body": {
+          "de": "Die Arme des Winkellineals lassen sich jetzt an ihrem Ende länger oder kürzer ziehen. Ein Knopf unter dem Griff macht sie so lang wie die Druckplatte deines Druckers.",
+          "en": "The framing square's arms can now be dragged longer or shorter at their ends. A button under the handle makes them as long as your printer's build plate."
+        }
+      },
+      {
+        "title": {
+          "de": "Deckel zum Einschrauben",
+          "en": "A lid that screws in"
+        },
+        "body": {
+          "de": "Das Deckel-Werkzeug hat eine neue Art „Eingeschraubt“: Der Körper bekommt das Gewinde innen in seiner Öffnung, der Deckel einen Gewindezapfen darunter. Außen bleibt der Körper glatt, etwa bei einem runden Stiftehalter. Beide Teile drucken ohne Stützen.",
+          "en": "The Lid tool has a new kind, Screw in: the body gets the thread inside its opening and the lid a threaded plug below it. The outside of the body stays smooth, for a round pen holder, say. Both parts print without support."
+        }
+      },
+      {
+        "title": {
+          "de": "Gedrehte Langlöcher im Lochmuster",
+          "en": "Turned slots in a hole pattern"
+        },
+        "body": {
+          "de": "Langlöcher und Rechtecke im Lochmuster lassen sich jetzt drehen: Mit „Winkel der Löcher“ steht jedes Loch schräg, etwa Lüftungsschlitze auf 45°, und das Raster bleibt gerade. Die Wand zwischen den Löchern bleibt dabei erhalten.",
+          "en": "Slots and rectangles in a hole pattern can now be turned: with Angle of the holes each hole stands at a slant, ventilation slots at 45° for example, while the grid stays straight. The wall between the holes is kept."
+        }
+      },
+      {
+        "title": {
+          "de": "Hülle mit offenen Löchern",
+          "en": "Hull with open holes",
+          "da": "Hylster med åbne huller"
+        },
+        "body": {
+          "de": "Eine Hülle füllt alles, was in ihren Teilen hohl ist: ein Rohr, einen ausgehöhlten Zylinder, Löcher in einer Gruppe. Mit „Löcher der Teile behalten“ unter Eigenschaften bleiben sie offen, und die Hülle füllt nur den Raum zwischen den Teilen.",
+          "en": "A hull fills whatever is hollow in its parts: a tube, a hollowed cylinder, the holes in a group. With Keep the parts' holes under Properties they stay open, and the hull only fills the space between the parts.",
+          "da": "Et hylster fylder alt, hvad der er hult i dets dele: et rør, en udhulet cylinder, hullerne i en gruppe. Med „Bevar delenes huller“ under Egenskaber forbliver de åbne, og hylsteret fylder kun rummet mellem delene."
+        }
+      },
+      {
+        "title": {
+          "de": "Einschub-Deckel",
+          "en": "A slide-in lid"
+        },
+        "body": {
+          "de": "Das Deckel-Werkzeug hat eine neue Art „Einschub“, wie der Deckel einer Holz-Federmappe: Er gleitet mit Zungen in Nuten dreier Wände und wird durch die vierte hineingeschoben. Die Box druckt aufrecht, der Deckel umgedreht, beide ohne Stützen.",
+          "en": "The Lid tool has a new kind, Slide-in, like a wooden pencil box's lid: it runs on tongues in grooves in three walls and slides in over the fourth. The box prints upright and the lid turned over, both without support."
+        }
+      },
+      {
+        "title": {
+          "de": "Klappdeckel und Halteband",
+          "en": "Flip-top and tether"
+        },
+        "body": {
+          "de": "Schraub- und Bajonettdeckel können eine Ausgießöffnung mit angedruckter Klappe bekommen, wie bei einer Shampooflasche, und ein Halteband, das den Deckel am Körper hält. Beides druckt ohne Stützen.",
+          "en": "Screw and bayonet caps can get a pouring opening with a printed flap, like a shampoo bottle's, and a tether that keeps the cap on the body. Both print without support."
+        }
+      },
+      {
+        "title": {
+          "de": "Normgewinde für Flaschen und Gläser",
+          "en": "Standard bottle and jar threads"
+        },
+        "body": {
+          "de": "Der Schraubdeckel kann das Gewinde einer Norm bekommen (PCO 1881, PCO 1810, GL 45, Einmachglas), damit er auf eine gekaufte Flasche passt. Beim Bajonettdeckel lässt sich außerdem die Drehung einstellen, und ein abgerundeter Rand wird nicht mehr abgelehnt.",
+          "en": "The screw lid can take a standard's thread (PCO 1881, PCO 1810, GL 45, mason jars) so it fits a bottle from the shop. The bayonet lid's turn can be set, and a rounded rim is no longer refused."
+        }
+      },
+      {
+        "title": {
+          "de": "Bildtextur glatter",
+          "en": "Smoother image textures"
+        },
+        "body": {
+          "de": "Ein Bild auf einer großen oder runden Vase kommt nicht mehr in Stufen des Rasters heraus, und „Fein“ ist wirklich feiner als „Mittel“.",
+          "en": "A picture on a large or round vase no longer comes out in steps of the grid, and Fine is really finer than Medium."
+        }
+      }
+    ]
+  },
+  {
     "version": "1.150.0",
     "items": [
       {

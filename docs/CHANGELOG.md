@@ -6,6 +6,8 @@ code still carries it - so a lower number further down is older, not newer.
 
 ## Unreleased
 
+## 1.151.0
+
 - **Lid: a slide-in lid for boxes (Discussion #1443):** The Lid tool has a seventh kind, **Slide-in**, like a wooden pencil box's lid: a plate in the opening, flush with the rim, whose lower edges run as tongues in grooves in three walls. The fourth wall (the front unless another is picked) is cut down to the lid's underside where it passes, so the lid slides in over it, and the lid's end fills that cut. The body prints upright and the lid turned over on its top without support. Rounded box corners work, walls too thin for the tongue and round or leaning bodies are refused with the thickness needed. Click bumps, a finger notch and a pull tab are available; magnets and a hinge are not for this kind. MCP `layerling_make_lid` takes `type: "slide"` and `slideSide`. Texts in 14 languages, guide chapter 6 in 15.
 
 - **Lid: a flip-top for screw and bayonet caps:** With **Flip-top** ticked, the cap's plate gets a round opening (8 mm to begin with, 4 to 40) and a flap that closes it, printed in the opening itself and joined to the plate by a 0.4 mm hinge strip, as on a shampoo bottle. A catch clicks it shut, a groove takes a fingernail, and everything prints in one piece without support (PETG or PP, since a PLA strip breaks after a few bends). Openings too large and plates too thin are refused with the figure that fits. MCP `flipTop` and `flipTopOpening`. Texts in 14 languages, guide chapter 6 in 15.
