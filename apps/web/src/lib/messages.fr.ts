@@ -1330,6 +1330,8 @@ export const MESSAGES_FR: Partial<Record<MessageKey, string>> = {
   "transform.slope": "Hauteur de l'extrémité basse",
   "transform.narrow": "Largeur de l'extrémité étroite",
   "transform.lift": "Ascenseur",
+  "transform.slideX": "Déplacer uniquement le long de X",
+  "transform.slideY": "Déplacer uniquement le long de Y",
   "sketch.modeBadge": "Vue d'esquisse",
   "sketch.modeBadgeRevolve": "Esquisse de révolution",
   "status.sketchUpdated": "Esquisse mise à jour",

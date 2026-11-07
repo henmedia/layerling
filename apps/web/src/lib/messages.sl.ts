@@ -1091,6 +1091,8 @@ export const MESSAGES_SL: Partial<Record<MessageKey, string>> = {
   "transform.slope": "Višina nižjega konca",
   "transform.narrow": "Širina ožjega konca",
   "transform.lift": "Dvig",
+  "transform.slideX": "Premakni samo vzdolž X",
+  "transform.slideY": "Premakni samo vzdolž Y",
   "sketch.modeBadge": "Pogled skice",
   "sketch.modeBadgeRevolve": "Skica za vrtenje",
   "status.sketchUpdated": "Skica posodobljena",

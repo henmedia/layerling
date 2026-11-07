@@ -8654,7 +8654,8 @@ html[data-theme="dark"] .touch-multi-select {
 .transform-overlay.hide-selection-chrome .transform-guides,
 .transform-overlay.hide-selection-chrome .dimension-label,
 .transform-overlay.hide-selection-chrome .transform-handle,
-.transform-overlay.hide-selection-chrome .rotate-handle {
+.transform-overlay.hide-selection-chrome .rotate-handle,
+.transform-overlay.hide-selection-chrome .slide-handle {
   opacity: 0;
 }
 
@@ -9343,6 +9344,71 @@ html[data-theme="dark"] .touch-multi-select {
   stroke: currentColor;
   stroke-width: 0.8;
   stroke-linejoin: round;
+}
+
+/* The X and Y arrows beside the lift arrow (Discussion #1434): pulled, the selection moves along that axis only.
+   The button is the grab area along the arrow, turned to where the axis runs on the screen. */
+.slide-handle {
+  position: absolute;
+  left: 0;
+  top: 0;
+  z-index: 4;
+  width: 34px;
+  height: 18px;
+  padding: 0;
+  --slide-handle-axis: #433629;
+  --slide-handle-halo: rgba(255, 252, 247, 0.95);
+  color: var(--slide-handle-axis);
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  cursor: inherit;
+  pointer-events: auto;
+  touch-action: none;
+  transform: translate3d(var(--overlay-x, 0), var(--overlay-y, 0), 0) translate(-50%, -50%) rotate(var(--slide-handle-angle, 0deg));
+  will-change: transform;
+}
+
+.slide-handle.axis-x { --slide-handle-axis: #d6363c; }
+.slide-handle.axis-y { --slide-handle-axis: #2f9a4b; }
+
+.slide-handle-icon {
+  display: block;
+  width: 32px;
+  height: 16px;
+  margin: 1px;
+  overflow: visible;
+  /* A light edge all round keeps the arrow readable on the grid and on the shape, as on the turn arrows. */
+  filter: drop-shadow(0 0 1px var(--slide-handle-halo)) drop-shadow(0 0 1.5px var(--slide-handle-halo));
+}
+
+.slide-arrow-shaft {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.4;
+  stroke-linecap: round;
+}
+
+.slide-arrow-head {
+  fill: currentColor;
+  stroke: currentColor;
+  stroke-width: 0.8;
+  stroke-linejoin: round;
+}
+
+/* Hovered, the arrow gets heavier. */
+.slide-handle:hover .slide-arrow-shaft {
+  stroke-width: 3.2;
+}
+
+/* For a finger or a rubber-tip stylus the arrows catch from further away, as the other handles do. */
+@media (pointer: coarse) {
+  .slide-handle::before {
+    position: absolute;
+    inset: -10px;
+    content: "";
+  }
 }
 
 .rotation-edit {
@@ -14289,6 +14355,9 @@ html[data-theme="dark"] .rotate-handle {
 
 html[data-theme="dark"] .rotate-handle.axis-x { --rotate-handle-axis: #ff6b70; }
 html[data-theme="dark"] .rotate-handle.axis-y { --rotate-handle-axis: #5fd47c; }
+html[data-theme="dark"] .slide-handle { --slide-handle-halo: rgba(28, 24, 20, 0.9); }
+html[data-theme="dark"] .slide-handle.axis-x { --slide-handle-axis: #ff6b70; }
+html[data-theme="dark"] .slide-handle.axis-y { --slide-handle-axis: #5fd47c; }
 html[data-theme="dark"] .rotate-handle.axis-z { --rotate-handle-axis: #6aa0ff; }
 html[data-theme="dark"] .transform-handle.axis-x { background: #ff6b70; border-color: #7d1a1e; }
 html[data-theme="dark"] .transform-handle.axis-y { background: #5fd47c; border-color: #17542a; }

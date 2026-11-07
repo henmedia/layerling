@@ -1340,6 +1340,8 @@ export const MESSAGES_EN = {
   "transform.slope": "Height of the lower end",
   "transform.narrow": "Width of the narrow end",
   "transform.lift": "Lift",
+  "transform.slideX": "Move along X only",
+  "transform.slideY": "Move along Y only",
   "sketch.modeBadge": "Sketch view",
   "sketch.modeBadgeRevolve": "Revolve sketch",
   "status.sketchUpdated": "Sketch updated",

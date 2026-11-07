@@ -1336,6 +1336,8 @@ export const MESSAGES_RU: Partial<Record<MessageKey, string>> = {
   "transform.slope": "Высота нижнего конца",
   "transform.narrow": "Ширина узкого конца",
   "transform.lift": "Подъём",
+  "transform.slideX": "Двигать только по X",
+  "transform.slideY": "Двигать только по Y",
   "sketch.modeBadge": "Вид эскиза",
   "sketch.modeBadgeRevolve": "Эскиз вращения",
   "status.sketchUpdated": "Эскиз обновлён",

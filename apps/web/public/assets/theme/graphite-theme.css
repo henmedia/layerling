@@ -3868,6 +3868,37 @@ html[data-theme="dark"]:where([data-palette="graphite"]) .touch-multi-select {
   stroke: currentColor;
 }
 
+:where(html[data-theme="dark"][data-palette="graphite"]) .slide-handle {
+  --slide-handle-axis: #3a3a3a;
+  --slide-handle-halo: rgba(251, 251, 251, 0.95);
+  color: var(--slide-handle-axis);
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .slide-handle.axis-x {
+  --slide-handle-axis: #d6363c;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .slide-handle.axis-y {
+  --slide-handle-axis: #2f9a4b;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .slide-handle-icon {
+  filter: drop-shadow(0 0 1px var(--slide-handle-halo)) drop-shadow(0 0 1.5px var(--slide-handle-halo));
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .slide-arrow-shaft {
+  fill: none;
+  stroke: currentColor;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .slide-arrow-head {
+  fill: currentColor;
+  stroke: currentColor;
+}
+
 :where(html[data-theme="dark"][data-palette="graphite"]) .rotation-edit {
   border: 1px solid rgba(210, 210, 210, 0.92);
   background: rgba(255, 255, 255, 0.98);
@@ -6453,6 +6484,18 @@ html[data-theme="dark"]:where([data-palette="graphite"]) .rotate-handle.axis-x {
 
 html[data-theme="dark"]:where([data-palette="graphite"]) .rotate-handle.axis-y {
   --rotate-handle-axis: #5fd47c;
+}
+
+html[data-theme="dark"]:where([data-palette="graphite"]) .slide-handle {
+  --slide-handle-halo: rgba(31, 31, 31, 0.9);
+}
+
+html[data-theme="dark"]:where([data-palette="graphite"]) .slide-handle.axis-x {
+  --slide-handle-axis: #ff6b70;
+}
+
+html[data-theme="dark"]:where([data-palette="graphite"]) .slide-handle.axis-y {
+  --slide-handle-axis: #5fd47c;
 }
 
 html[data-theme="dark"]:where([data-palette="graphite"]) .rotate-handle.axis-z {

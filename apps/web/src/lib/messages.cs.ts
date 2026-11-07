@@ -1479,6 +1479,8 @@ export const MESSAGES_CS: Record<MessageKey, string> = {
   "transform.slope": "Výška nižšího konce",
   "transform.narrow": "Šířka užšího konce",
   "transform.lift": "Zvednout",
+  "transform.slideX": "Posunout jen ve směru X",
+  "transform.slideY": "Posunout jen ve směru Y",
   "sketch.modeBadge": "Pohled náčrtu",
   "sketch.modeBadgeRevolve": "Rotační náčrt",
   "status.sketchUpdated": "Náčrt byl upraven",

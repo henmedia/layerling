@@ -930,6 +930,8 @@ export const MESSAGES_JA: Partial<Record<MessageKey, string>> = {
   "transform.slope": "低い側の端の高さ",
   "transform.narrow": "細い端の幅",
   "transform.lift": "持ち上げ",
+  "transform.slideX": "X方向にのみ移動",
+  "transform.slideY": "Y方向にのみ移動",
   "sketch.modeBadge": "スケッチ表示",
   "sketch.modeBadgeRevolve": "回転体スケッチ",
   "status.sketchUpdated": "スケッチを更新しました",

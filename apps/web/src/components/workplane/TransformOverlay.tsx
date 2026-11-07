@@ -381,6 +381,35 @@ export function TransformOverlay({
           </span>
         </button>
       ))}
+      {/* The X and Y arrows (Discussion #1434) only move the selection; a locked one keeps still and shows none. */}
+      {locked ? null : box.slideHandles.map((handle) => (
+        <button
+          key={handle.key}
+          className={`slide-handle ${handle.className}`}
+          style={{
+            "--overlay-x": `${handle.x}px`,
+            "--overlay-y": `${handle.y}px`,
+            "--slide-handle-angle": `${handle.angle}deg`,
+          } as CSSProperties}
+          title={handle.title}
+          aria-label={handle.title}
+          onPointerEnter={() => onHoverMeasure(null)}
+          onPointerDown={(event) => {
+            if (event.button === 0) {
+              onBeginTransform("slide", handle.key, event);
+            }
+          }}
+          onPointerMove={(event) => onMoveTransform(event.clientX, event.clientY, event.shiftKey, event.altKey)}
+          onPointerUp={onFinishTransform}
+          onPointerCancel={onFinishTransform}
+          onClick={(event) => event.stopPropagation()}
+        >
+          <svg className="slide-handle-icon" viewBox="-16 -8 32 16" aria-hidden="true" focusable="false">
+            <path className="slide-arrow-shaft" d="M-14 0 H4" />
+            <path className="slide-arrow-head" d="M2 -5.5 L14 0 L2 5.5 Z" />
+          </svg>
+        </button>
+      ))}
       {liftHandle ? (
         <span
           className="transform-lock-badge"

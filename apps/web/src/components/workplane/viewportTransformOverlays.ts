@@ -9,6 +9,7 @@ import { t } from "@/lib/i18n";
 import { horizontalPlacementWorkplane, type PlacementWorkplane } from "@/lib/placementWorkplane";
 import { liftGeometryForFrame, type SelectionFrame } from "@/lib/liftGeometry";
 import { liftHandleScreenPoint } from "@/components/workplane/transformOverlayTypes";
+import { SLIDE_AXES, SLIDE_HANDLE_KEYS, slideArrowLayout, slideAxisVector } from "@/lib/slideArrows";
 import { dimensionMarkNeedsScreenLayout, dimensionMarkScreenPush, isPointInsideTransformBounds, screenSpaceDimensionMark, rotateHandleArrow, rotationPlaneDirectionSign, transformBoundsIntersectClipVolume, transformOverlayScreenPoint, type DimensionMark, type RotationAxis, type RotationPlaneView, type TransformOverlayState } from "@/components/workplane/TransformOverlay";
 import { cuboidCorners, pointAlongAxes } from "@/lib/alignFrame";
 import type { AlignAxis, AlignHandleStatus, AlignTarget, MeasurementAccuracy, WorkplaneShape } from "@/types/layerling";
@@ -286,6 +287,16 @@ export function updateTransformOverlayDom(state: ThreeState, next: TransformOver
     element.style.setProperty("--overlay-y", `${handle.y}px`);
     element.querySelector(".rotate-arrow-arc")?.setAttribute("d", handle.arc);
     element.querySelector(".rotate-arrow-heads")?.setAttribute("d", handle.heads);
+  });
+  const slideHandles = root.querySelectorAll<HTMLElement>(".transform-overlay .slide-handle");
+  next.slideHandles.forEach((handle, index) => {
+    const element = slideHandles[index];
+    if (!element) {
+      return;
+    }
+    element.style.setProperty("--overlay-x", `${handle.x}px`);
+    element.style.setProperty("--overlay-y", `${handle.y}px`);
+    element.style.setProperty("--slide-handle-angle", `${handle.angle}deg`);
   });
 }
 
@@ -657,6 +668,32 @@ export function syncTransformOverlay(
     rotateRightSource.visible ? rotateArrowHandle("rotate-right", "screen-right axis-y", zFootAxis, zFaceCenter, sidePoint(rotationSides.z, frame.max.y), yFootAxis) : null,
     rotateBottomSource.visible ? rotateArrowHandle("rotate-bottom", "screen-bottom axis-z", yFootAxis, yFaceCenter, sidePoint(rotationSides.y, footprintY), xFootAxis) : null,
   ].filter((handle): handle is NonNullable<typeof handle> => Boolean(handle)) : [];
+  // The X and Y arrows (Discussion #1434) stand round the middle of the top, where the lift arrow starts.
+  // Each axis is measured against a step across the view: one seen end on gets no arrow.
+  const liftBaseScreen = liftBasePoint;
+  const cameraRight = new THREE.Vector3(1, 0, 0).applyQuaternion(state.camera.quaternion);
+  const acrossScreen = project(liftBaseWorld.clone().addScaledVector(cameraRight, planeWorldStep));
+  const acrossLength = Math.hypot(acrossScreen.x - liftBaseScreen.x, acrossScreen.y - liftBaseScreen.y);
+  const slideHandles = rotationChromeVisible && liftBaseScreen.visible && acrossLength > 1e-6
+    ? slideArrowLayout(
+        liftBaseScreen,
+        SLIDE_AXES.map((axis) => {
+          const vector = slideAxisVector(activeWorkplane, axis);
+          const tip = project(liftBaseWorld.clone().add(new THREE.Vector3(vector.x, vector.y, vector.z).multiplyScalar(planeWorldStep)));
+          const dx = tip.x - liftBaseScreen.x;
+          const dy = tip.y - liftBaseScreen.y;
+          return { axis, dx, dy, foreshortening: tip.visible ? Math.hypot(dx, dy) / acrossLength : 0 };
+        }),
+        liftPoint.visible ? { x: liftPoint.x - liftBasePoint.x, y: liftPoint.y - liftBasePoint.y } : null,
+      ).map((placement) => ({
+        key: SLIDE_HANDLE_KEYS[placement.axis],
+        className: `axis-${placement.axis}`,
+        x: placement.x,
+        y: placement.y,
+        angle: placement.angle,
+        title: t(placement.axis === "x" ? "transform.slideX" : "transform.slideY"),
+      }))
+    : [];
 
   // Which mid-edge handle sits on the side of the shape currently facing the
   // camera - same sign convention as showLowerHandles above, so always-visible
@@ -675,6 +712,7 @@ export function syncTransformOverlay(
     guides: [],
     handles,
     rotateHandles,
+    slideHandles,
     dimensions: dimensionMarks,
     alwaysVisibleDimensionKeys,
     rotationWheel: rotationWheels.y,

@@ -1332,6 +1332,8 @@ export const MESSAGES_IT: Partial<Record<MessageKey, string>> = {
   "transform.slope": "Altezza dell'estremità più bassa",
   "transform.narrow": "Larghezza dell'estremità più stretta",
   "transform.lift": "Solleva",
+  "transform.slideX": "Sposta solo lungo X",
+  "transform.slideY": "Sposta solo lungo Y",
   "sketch.modeBadge": "Vista schizzo",
   "sketch.modeBadgeRevolve": "Schizzo di rivoluzione",
   "status.sketchUpdated": "Schizzo aggiornato",

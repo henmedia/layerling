@@ -3635,6 +3635,8 @@ export const MESSAGES_PT_BR: Partial<Record<MessageKey, string>> = {
   "transform.slope": "Altura da extremidade mais baixa",
   "transform.narrow": "Largura da extremidade estreita",
   "transform.lift": "Elevar",
+  "transform.slideX": "Mover só ao longo de X",
+  "transform.slideY": "Mover só ao longo de Y",
   "pivot.dragHint": "Arraste para mover o ponto de rotação - ele se encaixa em cantos e meios de arestas, e com Shift no centro de uma face",
   "status.closeProfile": "Feche pelo menos um perfil antes de concluir o esboço",
   "status.edgeCancelled": "Tratamento de aresta cancelado",

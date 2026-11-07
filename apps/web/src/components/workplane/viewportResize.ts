@@ -7,6 +7,7 @@ import { starSettingsForSize } from "@/lib/starGeometry";
 import { gridfinityFootprintPatch } from "@/lib/gridfinityGeometry";
 import { pulleyFootprint, pulleyFromSize, pulleySizedPatch } from "@/lib/pulleyGeometry";
 import { type SelectionFrame } from "@/lib/liftGeometry";
+import type { SnapBox } from "@/lib/objectSnap";
 import { scaledHorizontalShapePatch } from "@/lib/scaleByPercent";
 import { POSITION_TYPED_LIMIT } from "@/lib/workplaneSettings";
 import { heightPatchKeepingBase, shapeIsTurned } from "@/lib/rotationPivot";
@@ -52,6 +53,8 @@ export type TransformDragState = {
   liftStartValue?: number;
   /** Alt was held when a lift began: the shapes stand in for a copy that is made on release (#865). */
   duplicate?: { standIns: THREE.Object3D[] };
+  /** An X or Y arrow on the flat workplane (Discussion #1434): the footprints it snaps to, as a drag does; guideY: where its lines are drawn. */
+  slideSnap?: { moving: SnapBox; targets: SnapBox[]; guideY: number };
   rotationAxisVector?: THREE.Vector3;
   rotationPivot?: THREE.Vector3;
   /** A pivot the user set; the shapes then move around it instead of spinning in place. */

@@ -1,6 +1,7 @@
 import type { PointerEvent as ReactPointerEvent, WheelEvent as ReactWheelEvent } from "react";
 
-export type TransformHandleKind = "scale" | "height" | "lift" | "rotate";
+/** "slide": the red and green arrows that move the selection along X or Y only (Discussion #1434). */
+export type TransformHandleKind = "scale" | "height" | "lift" | "rotate" | "slide";
 export type RotationAxis = "x" | "y" | "z";
 export type RotationWheelView = { x: number; y: number; radius: number };
 
@@ -383,6 +384,8 @@ export type TransformOverlayState = {
   handles: Array<{ key: string; className: string; kind: TransformHandleKind; x: number; y: number; title: string; angle?: number }>;
   /** arc/heads: the arrow's SVG paths, relative to x/y (see rotateHandleArrow). */
   rotateHandles: Array<{ key: string; className: string; x: number; y: number; arc: string; heads: string }>;
+  /** The X and Y arrows beside the lift arrow (Discussion #1434); angle: where the tip points on the screen, in degrees. */
+  slideHandles: Array<{ key: string; className: string; x: number; y: number; angle: number; title: string }>;
   dimensions: Record<string, DimensionMark[]>;
   /**
    * Handle keys whose dimension marks stay on screen for a single selected

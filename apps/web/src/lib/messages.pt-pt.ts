@@ -805,6 +805,8 @@ export const MESSAGES_PT_PT: Partial<Record<MessageKey, string>> = {
   "transform.resize": "Redimensionar",
   "transform.height": "Altura",
   "transform.lift": "Elevar",
+  "transform.slideX": "Mover só ao longo de X",
+  "transform.slideY": "Mover só ao longo de Y",
   "sketch.modeBadge": "Vista de esboço",
   "sketch.modeBadgeRevolve": "Esboço de revolução",
   "status.sketchUpdated": "Esboço atualizado",

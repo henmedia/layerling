@@ -64,6 +64,7 @@ import { printerPresetById } from "@/lib/printBed";
 import { plateCenterX, plateCount, plateName, platesExtentX } from "@/lib/buildPlates";
 import { GuideHelpLink } from "@/components/GuideHelpLink";
 import { heightWithFaceOnGrid, liftDeltaOnGrid, liftGeometryForFrame, type SelectionFrame } from "@/lib/liftGeometry";
+import { slideAxisForHandle, slideAxisVector } from "@/lib/slideArrows";
 import { projectThumbnailDimensions } from "@/lib/projectThumbnail";
 import { displayShapeName, makeShapeFromAsset, parseDroppedShapeAsset } from "@/lib/shapeCatalog";
 import { getPrinterPlay, withPrinterPlay } from "@/lib/printerPlay";
@@ -1017,6 +1018,26 @@ function dragWorkplaneAtGrab(state: ThreeState, clientX: number, clientY: number
   if (!(Math.abs(lift) > 1e-6)) return workplane;
   origin.addScaledVector(normal, lift);
   return { ...workplane, origin: { x: origin.x, y: origin.y, z: origin.z } };
+}
+
+/** A workplane that lies flat with its axes along X and Y: the only one snapping and the move dimensions work on. */
+function isWorldHorizontalWorkplane(workplane: PlacementWorkplane) {
+  return Math.abs(workplane.normal.y - 1) < 1e-6
+    && Math.abs(workplane.xAxis.x - 1) < 1e-6
+    && Math.abs(workplane.zAxis.z - 1) < 1e-6;
+}
+
+/**
+ * What a moved selection snaps to: every other body that shows, the reference points while the notes
+ * show, and the middle of the workplane, so a part can be put in its centre along X, Y or both (Discussion #1266).
+ */
+function moveSnapTargets(shapes: WorkplaneShape[], moved: Set<string>, points: Array<{ x: number; z: number }>, workplane: PlacementWorkplane): SnapBox[] {
+  return [
+    ...shapes.filter((entry) => !moved.has(entry.id) && !entry.hidden).map(worldSnapBox),
+    // A reference point is a box with no size: its edges and centre are one line.
+    ...points.map((point) => ({ minX: point.x, maxX: point.x, minZ: point.z, maxZ: point.z })),
+    { minX: workplane.origin.x, maxX: workplane.origin.x, minZ: workplane.origin.z, maxZ: workplane.origin.z },
+  ];
 }
 
 function unionSnapBox(boxes: SnapBox[]): SnapBox | null {
@@ -4263,11 +4284,24 @@ export function WorkplaneViewport({
       const narrowAxis = handleKey === "narrow-end"
         ? (slopeAlongWidth(normalizeSlopeSide(shape.kind, shape.narrowSide)) ? frame.zAxis : frame.xAxis).clone().normalize()
         : null;
-      const liftAxis = kind === "lift" ? lift.axis : narrowAxis ?? (kind === "height" ? frame.yAxis.clone().normalize() : undefined);
+      // An X or Y arrow (Discussion #1434) moves the selection along that axis of the workplane. The way is
+      // measured on a plane through the axis that faces the camera, as for the lift arrow, so it follows the
+      // pointer along a line and does not run off into the distance in a low view as a drag on the plane does.
+      const slideAxis = kind === "slide" ? slideAxisForHandle(handleKey) : null;
+      const slideVector = slideAxis ? slideAxisVector(activeWorkplane, slideAxis) : null;
+      if (kind === "slide" && !slideVector) {
+        return;
+      }
+      const slideFromBelow = Boolean(state && state.camera.position.clone().sub(frame.center).dot(lift.axis) < 0);
+      const liftAxis = slideVector
+        ? new THREE.Vector3(slideVector.x, slideVector.y, slideVector.z).normalize()
+        : kind === "lift" ? lift.axis : narrowAxis ?? (kind === "height" ? frame.yAxis.clone().normalize() : undefined);
       const liftHandlePoint = liftAxis
-        ? (kind === "lift"
-            ? lift.pointAt(handlesLowerSide ? lift.low : lift.high).addScaledVector(liftAxis, liftOffset)
-            : framePoint(frame, 0, handlesLowerSide ? frame.min.y : frame.max.y, 0).addScaledVector(liftAxis, liftOffset))
+        ? (kind === "slide"
+            ? lift.pointAt(slideFromBelow ? lift.low : lift.high)
+            : kind === "lift"
+              ? lift.pointAt(handlesLowerSide ? lift.low : lift.high).addScaledVector(liftAxis, liftOffset)
+              : framePoint(frame, 0, handlesLowerSide ? frame.min.y : frame.max.y, 0).addScaledVector(liftAxis, liftOffset))
         : undefined;
       const liftPlane = state && liftAxis && liftHandlePoint
         ? axisDragPlaneForCamera(state, liftAxis, liftHandlePoint)
@@ -4279,9 +4313,24 @@ export function WorkplaneViewport({
       if (kind === "scale" && !scaleStartPoint) {
         return;
       }
-      if ((kind === "lift" || kind === "height") && !liftStartPoint) {
+      if ((kind === "lift" || kind === "height" || kind === "slide") && !liftStartPoint) {
         return;
       }
+      // On the flat workplane an arrow snaps to the edges and middles of other bodies as a drag does.
+      const slideFlat = kind === "slide" && isWorldHorizontalWorkplane(activeWorkplane);
+      const slideMoving = slideFlat && workspaceRef.current.objectSnap
+        ? unionSnapBox(frame.ids.flatMap((id) => {
+            const entry = shapesRef.current.find((candidate) => candidate.id === id);
+            return entry ? [worldSnapBox(entry)] : [];
+          }))
+        : null;
+      const slideSnap = slideMoving
+        ? {
+            moving: slideMoving,
+            targets: moveSnapTargets(shapesRef.current, new Set(frame.ids), notesVisibleRef.current ? referencePoints(notesRef.current) : [], activeWorkplane),
+            guideY: activeWorkplane.origin.y,
+          }
+        : undefined;
       rememberResizeAnchor(shape.id, kind, resizeHandleKey);
       event.preventDefault();
       event.stopPropagation();
@@ -4333,6 +4382,7 @@ export function WorkplaneViewport({
         liftHandlePoint,
         liftStartValue,
         duplicate: kind === "lift" && event.altKey && state ? beginLiftDuplicate(state, frame.ids) : undefined,
+        slideSnap,
         rotationAxisVector: kind === "rotate" ? axisVector : undefined,
         rotationPivot: kind === "rotate" ? pivot : undefined,
         customPivot: kind === "rotate" && Boolean(rotationPivotRef.current),
@@ -4363,6 +4413,22 @@ export function WorkplaneViewport({
         });
       } else {
         setRotationReadout(null);
+      }
+      // The way an arrow moves shows in the move dimensions as for a drag, and can be typed after it.
+      if (slideFlat && state && moveDimensionsEnabledRef.current) {
+        const anchor = moveDimensionAnchorForCamera(state, frame);
+        moveDimensionSessionRef.current = {
+          active: true,
+          originX: anchor.x,
+          originZ: anchor.z,
+          planeY: anchor.y,
+          deltaX: 0,
+          deltaZ: 0,
+          items: frame.ids.flatMap((id) => {
+            const entry = shapesRef.current.find((candidate) => candidate.id === id);
+            return entry ? [{ id, startX: entry.x, startZ: entry.z }] : [];
+          }),
+        };
       }
       if (state) {
         state.needsRender = true;
@@ -4609,6 +4675,75 @@ export function WorkplaneViewport({
         return true;
       }
 
+      if (transform.kind === "slide") {
+        const state = threeRef.current;
+        const axis = (transform.liftAxis ?? transform.selectionFrame.xAxis).clone().normalize();
+        const currentPoint = transform.liftPlane
+          ? toRawPlanePoint(clientX, clientY, transform.liftPlane)
+          : null;
+        const rawDelta = currentPoint && transform.liftStartPoint
+          ? currentPoint.clone().sub(transform.liftStartPoint).dot(axis)
+          : 0;
+        // Whole grid steps from where it started, as a drag moves.
+        let delta = snapValue(rawDelta, step);
+        const snap = transform.slideSnap;
+        if (snap && state) {
+          // As in a drag, an edge or the middle that comes near one of another body is pulled onto it;
+          // Alt lets the selection go free. On the flat workplane the axis is X or minus Z of the scene.
+          const alongX = Math.abs(axis.x) >= Math.abs(axis.z);
+          let guides: ObjectSnapGuide[] = [];
+          if (!altKey) {
+            const pull = objectSnapOffset(
+              shiftSnapBox(snap.moving, axis.x * rawDelta, axis.z * rawDelta),
+              snap.targets,
+              objectSnapThreshold(state, currentPoint ?? transform.selectionFrame.center),
+            );
+            const extra = alongX ? pull.dx : pull.dz;
+            if (extra !== null) {
+              delta = rawDelta + extra / (alongX ? axis.x : axis.z);
+              guides = objectSnapOffset(shiftSnapBox(snap.moving, axis.x * delta, axis.z * delta), snap.targets, 1e-4)
+                .guides.filter((guide) => guide.axis === (alongX ? "x" : "z"));
+            }
+          }
+          syncObjectSnapGuides(state, guides, snap.guideY + 0.06);
+        }
+        // On a flat workplane the height is not touched, so it does not pick up a rounding rest.
+        const rises = Math.abs(axis.y) > 1e-9;
+        transform.items.forEach((item) => {
+          const nextCenter = item.startCenter.clone().addScaledVector(axis, delta);
+          onUpdateShape(item.id, {
+            x: cleanNearZero(nextCenter.x, 0.0005),
+            z: cleanNearZero(nextCenter.z, 0.0005),
+            ...(rises
+              ? { elevation: cleanNearZero(clamp(nextCenter.y - item.startShape.height / 2, MIN_ELEVATION, MAX_ELEVATION), 0.0005) }
+              : {}),
+          });
+        });
+        const session = moveDimensionSessionRef.current;
+        if (state && session && !session.lift && !session.keyboard) {
+          session.deltaX = axis.x * delta;
+          session.deltaZ = axis.z * delta;
+          session.active = true;
+          syncMoveDimensionOverlay(
+            state,
+            session,
+            moveDimensionOverlayRef,
+            setMoveDimensionOverlay,
+            workspaceRef.current.accuracy,
+            resolvedThemeRef.current,
+          );
+        } else if (state) {
+          // Off the flat workplane there are no move dimensions: the way stands at the pointer.
+          const readoutPoint = projectToScreen((transform.liftHandlePoint ?? transform.selectionFrame.center).clone().addScaledVector(axis, delta), state);
+          setRotationReadout({
+            x: readoutPoint.x + 28,
+            y: readoutPoint.y - 30,
+            text: formatMeasure(delta, workspaceRef.current.accuracy),
+          });
+        }
+        return true;
+      }
+
       if (transform.kind === "scale") {
         const worldPoint = transform.scalePlane ? toRawPlanePoint(clientX, clientY, transform.scalePlane) : null;
         if (!worldPoint) {
@@ -4762,6 +4897,31 @@ export function WorkplaneViewport({
     }
   }, [clearMoveDimensions]);
 
+  /**
+   * After an X or Y arrow (Discussion #1434) the way stays shown at the body and can be typed, as after a
+   * drag; an arrow that went nowhere shows none. The snap lines go.
+   */
+  const settleSlide = useCallback(() => {
+    const session = moveDimensionSessionRef.current;
+    if (session && !session.lift && (Math.abs(session.deltaX) > 1e-9 || Math.abs(session.deltaZ) > 1e-9)) {
+      session.active = false;
+    } else {
+      clearMoveDimensions();
+    }
+    const state = threeRef.current;
+    if (state) {
+      syncObjectSnapGuides(state, [], 0);
+      syncMoveDimensionOverlay(
+        state,
+        moveDimensionSessionRef.current,
+        moveDimensionOverlayRef,
+        setMoveDimensionOverlay,
+        workspaceRef.current.accuracy,
+        resolvedThemeRef.current,
+      );
+    }
+  }, [clearMoveDimensions]);
+
   const finishTransform = useCallback((event: ReactPointerEvent<Element>) => {
     const transform = transformRef.current;
     if (!transform) {
@@ -4794,6 +4954,10 @@ export function WorkplaneViewport({
       setPinnedMeasureKey(getElevationMeasureKey(transformOverlayRef.current));
       settleLiftMoveDimension();
     }
+    if (transform.kind === "slide") {
+      setPinnedMeasureKey(null);
+      settleSlide();
+    }
     if (transform.kind === "lift" && transform.hasMoved) {
       suppressLiftEditAfterDrag();
     }
@@ -4818,7 +4982,7 @@ export function WorkplaneViewport({
     }
     onInteractionActiveChange?.(false);
     bakeRotatedShapes.forEach((id) => onUpdateShape(id, { bakeTransform: true }));
-  }, [onDuplicateShapesMoved, onInteractionActiveChange, onUpdateShape, settleLiftMoveDimension, suppressCornerEditAfterDrag, suppressLiftEditAfterDrag]);
+  }, [onDuplicateShapesMoved, onInteractionActiveChange, onUpdateShape, settleLiftMoveDimension, settleSlide, suppressCornerEditAfterDrag, suppressLiftEditAfterDrag]);
 
   // The calculation a box was last set from (#180), while it still gives the body's size; the
   // box then opens on the formula instead of the number, as the Properties field does.
@@ -6816,9 +6980,7 @@ export function WorkplaneViewport({
             }
           : undefined,
       };
-      const usesWorldHorizontalAxes = Math.abs(activeWorkplane.normal.y - 1) < 1e-6
-        && Math.abs(activeWorkplane.xAxis.x - 1) < 1e-6
-        && Math.abs(activeWorkplane.zAxis.z - 1) < 1e-6;
+      const usesWorldHorizontalAxes = isWorldHorizontalWorkplane(activeWorkplane);
       if (workspaceRef.current.objectSnap && usesWorldHorizontalAxes && dragRef.current) {
         const dragged = new Set(items.map((item) => item.id));
         const shapeById = new Map(shapesRef.current.map((entry) => [entry.id, entry]));
@@ -6826,17 +6988,12 @@ export function WorkplaneViewport({
           const entry = shapeById.get(item.id);
           return entry ? [worldSnapBox(entry)] : [];
         }));
-        dragRef.current.snapTargets = [
-          ...shapesRef.current
-            .filter((entry) => !dragged.has(entry.id) && !entry.hidden)
-            .map(worldSnapBox),
-          // A reference point is a box with no size: its edges and centre are one line.
-          ...(notesVisibleRef.current
-            ? referencePoints(notesRef.current).map((point) => ({ minX: point.x, maxX: point.x, minZ: point.z, maxZ: point.z }))
-            : []),
-          // The middle of the workplane, so a part can be put in its centre along X, Z or both (Discussion #1266).
-          { minX: activeWorkplane.origin.x, maxX: activeWorkplane.origin.x, minZ: activeWorkplane.origin.z, maxZ: activeWorkplane.origin.z },
-        ];
+        dragRef.current.snapTargets = moveSnapTargets(
+          shapesRef.current,
+          dragged,
+          notesVisibleRef.current ? referencePoints(notesRef.current) : [],
+          activeWorkplane,
+        );
       }
       if (moveDimensionsEnabledRef.current && usesWorldHorizontalAxes) {
         const dragFrame = selectionFrameForShapes(shapesRef.current, items.map((item) => item.id));
@@ -7349,6 +7506,9 @@ export function WorkplaneViewport({
         if (transform.kind === "lift") {
           setPinnedMeasureKey(getElevationMeasureKey(transformOverlayRef.current));
           settleLiftMoveDimension();
+        } else if (transform.kind === "slide") {
+          setPinnedMeasureKey(null);
+          settleSlide();
         } else if (transform.kind === "height") {
           setPinnedMeasureKey(null);
           setHoverMeasureKey(null);
@@ -7489,7 +7649,7 @@ export function WorkplaneViewport({
       }
       onInteractionActiveChange?.(false);
     },
-    [cancelGestureForCamera, clearMoveDimensions, onAlignAnchorChange, onDuplicateShapesMoved, onInteractionActiveChange, onSelectShape, onUpdateShape, rememberResizeAnchor, setMarqueeFromState, shapesInMarquee, suppressCornerEditAfterDrag, suppressLiftEditAfterDrag, onShapeContextMenu, pickShape, shapeStackAt, faceCentreAt, insideSelectionFrame],
+    [cancelGestureForCamera, clearMoveDimensions, onAlignAnchorChange, onDuplicateShapesMoved, onInteractionActiveChange, onSelectShape, onUpdateShape, rememberResizeAnchor, setMarqueeFromState, settleSlide, shapesInMarquee, suppressCornerEditAfterDrag, suppressLiftEditAfterDrag, onShapeContextMenu, pickShape, shapeStackAt, faceCentreAt, insideSelectionFrame],
   );
 
   const handleDrop = useCallback(

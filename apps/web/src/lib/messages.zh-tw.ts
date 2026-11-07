@@ -1296,6 +1296,8 @@ export const MESSAGES_ZH_TW: Partial<Record<MessageKey, string>> = {
   "transform.slope": "較低一端的高度",
   "transform.narrow": "收窄端的寬度",
   "transform.lift": "抬升",
+  "transform.slideX": "僅沿 X 移動",
+  "transform.slideY": "僅沿 Y 移動",
   "sketch.modeBadge": "草圖視圖",
   "sketch.modeBadgeRevolve": "旋轉草圖",
   "status.sketchUpdated": "草圖已更新",

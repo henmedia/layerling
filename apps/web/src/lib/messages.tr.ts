@@ -838,6 +838,8 @@ export const MESSAGES_TR: Partial<Record<MessageKey, string>> = {
   "transform.slope": "Alçak ucun yüksekliği",
   "transform.narrow": "Dar ucun genişliği",
   "transform.lift": "Kaldır",
+  "transform.slideX": "Yalnızca X boyunca taşı",
+  "transform.slideY": "Yalnızca Y boyunca taşı",
   "sketch.modeBadge": "Eskiz görünümü",
   "sketch.modeBadgeRevolve": "Döndürme eskizi",
   "status.sketchUpdated": "Eskiz güncellendi",

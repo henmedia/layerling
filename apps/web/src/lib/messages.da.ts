@@ -2000,6 +2000,8 @@ export const MESSAGES_DA: Partial<Record<MessageKey, string>> = {
   "transform.slope": "Højde i den laveste ende",
   "transform.narrow": "Bredde i den smalle ende",
   "transform.lift": "Løft",
+  "transform.slideX": "Flyt kun langs X",
+  "transform.slideY": "Flyt kun langs Y",
   "sketch.modeBadge": "Skitsevisning",
   "sketch.modeBadgeRevolve": "Revolvér skitse",
   "status.sketchUpdated": "Skitse opdateret",

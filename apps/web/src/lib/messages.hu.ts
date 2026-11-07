@@ -852,6 +852,8 @@ export const MESSAGES_HU: Partial<Record<MessageKey, string>> = {
   "transform.slope": "Az alacsonyabb vég magassága",
   "transform.narrow": "A szűkülő vég szélessége",
   "transform.lift": "Emelés",
+  "transform.slideX": "Mozgatás csak X mentén",
+  "transform.slideY": "Mozgatás csak Y mentén",
   "sketch.modeBadge": "Vázlatnézet",
   "sketch.modeBadgeRevolve": "Forgatási vázlat",
   "sketch.modeBadgeExtrude": "Kihúzás vázlat",

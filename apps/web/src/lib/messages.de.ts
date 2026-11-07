@@ -1339,6 +1339,8 @@ export const MESSAGES_DE: Record<MessageKey, string> = {
   "transform.slope": "Höhe des tieferen Endes",
   "transform.narrow": "Breite des schmalen Endes",
   "transform.lift": "Anheben",
+  "transform.slideX": "Nur entlang X verschieben",
+  "transform.slideY": "Nur entlang Y verschieben",
   "sketch.modeBadge": "Skizzenansicht",
   "sketch.modeBadgeRevolve": "Rotationsskizze",
   "status.sketchUpdated": "Skizze aktualisiert",

@@ -1338,6 +1338,8 @@ export const MESSAGES_AR: Partial<Record<MessageKey, string>> = {
   "transform.slope": "ارتفاع الطرف الأدنى",
   "transform.narrow": "عرض الطرف الضيّق",
   "transform.lift": "رفع",
+  "transform.slideX": "تحريك على المحور X فقط",
+  "transform.slideY": "تحريك على المحور Y فقط",
   "sketch.modeBadge": "عرض الرسم التخطيطي",
   "sketch.modeBadgeRevolve": "رسم تخطيطي للدوران",
   "status.sketchUpdated": "تم تحديث الرسم التخطيطي",

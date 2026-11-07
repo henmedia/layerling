@@ -1339,6 +1339,8 @@ export const MESSAGES_NL: Record<MessageKey, string> = {
   "transform.slope": "Hoogte van het laagste uiteinde",
   "transform.narrow": "Breedte van het smalle uiteinde",
   "transform.lift": "Optillen",
+  "transform.slideX": "Alleen langs X verplaatsen",
+  "transform.slideY": "Alleen langs Y verplaatsen",
   "sketch.modeBadge": "Schetsweergave",
   "sketch.modeBadgeRevolve": "Omwentelingsschets",
   "status.sketchUpdated": "Schets bijgewerkt",
