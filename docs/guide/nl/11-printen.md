@@ -58,6 +58,8 @@ Een onderdeel dat schuin op een rand wordt geprint, bijvoorbeeld onder 45°, hee
 
 De rib is een meshlichaam: om hem te veranderen verwijder je hem en maak je hem opnieuw. Elke klik maakt één rib; voor meer klik je op {{ui:supportRib.repick}} of herhaal je hem met {{ui:editor.tool.array}}. De rib mag nergens in het onderdeel lopen en het onderdeel moet op de plaat staan - anders zegt het venster waarom. Je instellingen blijven in deze browser bewaard voor de volgende rib.
 
+{{ui:clearance.title}} en {{ui:printCheck.title}} kennen de rib: dat de bruggen in het onderdeel reiken en dat rib en bruggen dun zijn en één laag hoog over de spleet liggen, is zo bedoeld en wordt niet gemeld. Een rib uit layerling 1.148.0 heeft dit kenmerk nog niet; maak hem opnieuw, dan laten de controles hem weg.
+
 ## Wanddikte, speling en afschuiningen
 
 - Wanden moeten minstens twee extrusielijnen breed zijn, dus 0,8 mm bij een spuitmond van 0,4 mm. Stevige onderdelen hebben 1,2 tot 2 mm nodig.

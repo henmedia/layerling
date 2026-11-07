@@ -58,6 +58,8 @@ Díl tištěný šikmo na hraně, třeba pod 45°, často žádné podpěry nepo
 
 Žebro je síťové těleso: chcete-li ho změnit, smažte ho a vytvořte znovu. Každé kliknutí vytvoří jedno žebro; pro další klikněte na {{ui:supportRib.repick}} nebo ho opakujte pomocí {{ui:editor.tool.array}}. Žebro nesmí nikde vniknout do dílu a díl musí stát na podložce - jinak okno řekne proč. Nastavení si tento prohlížeč pamatuje pro další žebro.
 
+{{ui:clearance.title}} a {{ui:printCheck.title}} žebro znají: to, že jeho můstky zasahují do dílu a že žebro i můstky jsou tenké a leží jednu vrstvu vysoko přes mezeru, je záměr a nehlásí se. Žebro vytvořené v layerling 1.148.0 toto označení ještě nemá; vytvořte ho znovu a kontroly ho vynechají.
+
 ## Tloušťka stěn, vůle a zkosení
 
 - Stěna by měla mít nejméně dvě šířky extruzní čáry, tedy přibližně 0,8 mm při trysce 0,4 mm. Pevnější díly potřebují 1,2 až 2 mm.

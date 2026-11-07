@@ -10167,7 +10167,7 @@ export function LayerlingEditor({
       setNotice(t(`supportRib.reason.${built.reason}`));
       return;
     }
-    const rib = supportRibShape(createLocalId("support-rib"), t("supportRib.name"), source.color, built.positions);
+    const rib = supportRibShape(createLocalId("support-rib"), t("supportRib.name"), source.color, built.positions, source.id);
     if (!rib) {
       setSupportRibTool((current) => (current ? { ...current, busy: false } : current));
       setNotice(t("supportRib.reason.failed"));
@@ -13362,7 +13362,7 @@ export function LayerlingEditor({
         if (!face.ok) throw new Error(reasons[face.reason]);
         const built = buildSupportRib(await getManifoldRuntime(), face.face, settings, target);
         if (!built.ok) throw new Error(reasons[built.reason]);
-        const rib = supportRibShape(createLocalId("support-rib"), t("supportRib.name"), target.color, built.positions);
+        const rib = supportRibShape(createLocalId("support-rib"), t("supportRib.name"), target.color, built.positions, target.id);
         if (!rib) throw new Error(reasons.failed);
         if (projectInfoRef.current.projectId !== sourceProjectId || projectShapesFingerprint(currentShapes()) !== sourceFingerprint) {
           throw new Error("The scene changed while building the rib; run the command again");

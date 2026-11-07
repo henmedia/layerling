@@ -60,6 +60,8 @@ Ein Teil, das schräg auf einer Kante gedruckt wird, etwa mit 45°, braucht oft 
 
 Die Rippe ist ein Netzkörper: Um sie zu ändern, lösche sie und leg sie neu an. Jeder Klick macht eine Rippe; für weitere klicke {{ui:supportRib.repick}} oder wiederhole sie mit {{ui:editor.tool.array}}. Die Rippe darf nirgends in das Teil laufen, und das Teil muss auf der Platte stehen - sonst sagt das Fenster, warum es nicht geht. Deine Einstellungen merkt sich dieser Browser für die nächste Rippe.
 
+{{ui:clearance.title}} und {{ui:printCheck.title}} kennen die Rippe: Dass ihre Brücken ins Teil reichen und dass Rippe und Brücken dünn sind und eine Schicht hoch über dem Spalt liegen, ist so gewollt und wird nicht gemeldet. Eine Rippe aus layerling 1.148.0 trägt diese Kennung noch nicht; leg sie neu an, dann lassen die Prüfungen sie aus.
+
 ## Wandstärke, Spiel und Fasen
 
 - Wände sollten mindestens zwei Druckbahnen breit sein, bei einer 0,4-mm-Düse also 0,8 mm. Robuste Teile brauchen 1,2 bis 2 mm.

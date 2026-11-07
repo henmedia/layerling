@@ -58,6 +58,8 @@ Une pièce imprimée inclinée sur une arête, à 45° par exemple, n'a souvent 
 
 La nervure est un corps maillé : pour la modifier, supprimez-la et refaites-la. Chaque clic crée une nervure ; pour d'autres, cliquez sur {{ui:supportRib.repick}} ou répétez-la avec {{ui:editor.tool.array}}. La nervure ne doit entrer nulle part dans la pièce, et la pièce doit reposer sur le plateau - sinon la fenêtre dit pourquoi. Vos réglages sont gardés dans ce navigateur pour la prochaine nervure.
 
+{{ui:clearance.title}} et {{ui:printCheck.title}} connaissent la nervure : que ses ponts entrent dans la pièce, et que la nervure et ses ponts soient fins et posés à une couche de hauteur au-dessus de l'écart, c'est voulu et ce n'est pas signalé. Une nervure faite avec layerling 1.148.0 ne porte pas encore cette marque ; refaites-la, et les vérifications la laissent de côté.
+
 ## Épaisseur de paroi, jeu et chanfreins
 
 - Les parois doivent avoir une largeur d'au moins deux lignes d'extrusion, soit 0,8 mm avec une buse de 0,4 mm. Les pièces robustes ont besoin de 1,2 à 2 mm.

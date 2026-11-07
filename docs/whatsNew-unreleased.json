@@ -8,5 +8,15 @@
       "de": "In Chrome und Edge fragen „Alle sichern“, „Sichern“ und „Eigene Formen sichern“ jetzt, wohin die ZIP-Datei soll, und merken sich den Ordner für das nächste Mal – etwa einen Ordner auf deinem Cloud-Laufwerk statt der Downloads. Andere Browser laden die Sicherung wie bisher herunter.",
       "en": "In Chrome and Edge, \"Back up all\", \"Back up\" and \"Back up custom shapes\" now ask where the ZIP file should go, and remember the folder for next time - a folder on your cloud drive, say, instead of Downloads. Other browsers download the backup as before."
     }
+  },
+  {
+    "title": {
+      "de": "Stützrippe ohne falsche Warnungen",
+      "en": "Support rib without false warnings"
+    },
+    "body": {
+      "de": "„Spiel prüfen“ und „Druck prüfen“ kennen die Stützrippe jetzt: Dass ihre Brücken ins Teil reichen und dass Rippe und Brücken dünn sind, ist gewollt und wird nicht mehr gemeldet. Eine Rippe aus 1.148.0 legst du dafür einmal neu an.",
+      "en": "Check clearance and Print check now know the support rib: its bridges reaching into the part, and the rib and its bridges being thin, are meant to be so and no longer reported. A rib made with 1.148.0 needs making again once for this."
+    }
   }
 ]

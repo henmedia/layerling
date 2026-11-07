@@ -60,6 +60,8 @@ Un pezzo stampato inclinato su uno spigolo, per esempio a 45°, spesso non ha bi
 
 La nervatura è un corpo mesh: per cambiarla, eliminala e rifalla. Ogni clic crea una nervatura; per altre fai clic su {{ui:supportRib.repick}} o ripetila con {{ui:editor.tool.array}}. La nervatura non deve entrare nel pezzo da nessuna parte e il pezzo deve poggiare sul piano, altrimenti la finestra dice perché. Le impostazioni restano in questo browser per la nervatura successiva.
 
+{{ui:clearance.title}} e {{ui:printCheck.title}} conoscono la nervatura: che i suoi ponti entrino nel pezzo e che nervatura e ponti siano sottili e attraversino la fessura all'altezza di uno strato è voluto e non viene segnalato. Una nervatura fatta con layerling 1.148.0 non porta ancora questo contrassegno; rifalla e i controlli la lasceranno fuori.
+
 ## Spessore delle pareti, gioco e smussi
 
 - Le pareti dovrebbero essere larghe almeno due linee di estrusione: 0,8 mm con un ugello da 0,4 mm. Per pezzi robusti, servono da 1,2 a 2 mm.

@@ -60,6 +60,8 @@ Uma peça impressa inclinada sobre uma aresta, a 45° por exemplo, muitas vezes 
 
 A nervura é um sólido de malha: para mudá-la, apague-a e faça de novo. Cada clique faz uma nervura; para mais, clique em {{ui:supportRib.repick}} ou repita-a com {{ui:editor.tool.array}}. A nervura não pode entrar na peça em lugar nenhum, e a peça precisa estar sobre a mesa - senão a janela diz por quê. Seus ajustes ficam guardados neste navegador para a próxima nervura.
 
+{{ui:clearance.title}} e {{ui:printCheck.title}} conhecem a nervura: que suas pontes entrem na peça e que a nervura e as pontes sejam finas e fiquem a uma camada de altura sobre a folga é proposital e não é avisado. Uma nervura feita no layerling 1.148.0 ainda não tem essa marca; faça-a de novo e as verificações a deixam de fora.
+
 ## Espessura de parede, folga e chanfros
 
 - As paredes devem ter pelo menos a largura de duas linhas de extrusão, ou seja, 0,8 mm com um bico de 0,4 mm. Peças resistentes precisam de 1,2 a 2 mm.
