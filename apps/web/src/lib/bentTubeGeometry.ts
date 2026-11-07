@@ -705,13 +705,14 @@ function sectionsOverlap(a: BentTubeStation, b: BentTubeStation, radius: number)
   return Math.min(first[1], second[1]) - Math.max(first[0], second[0]) > 1e-6;
 }
 
-type Placement = Pick<WorkplaneShape, "x" | "z" | "width" | "depth" | "height" | "rotation" | "rotationX" | "rotationZ" | "mirrorX" | "mirrorY" | "mirrorZ" | "parametricSource">;
+type Placement = Pick<WorkplaneShape, "x" | "z" | "elevation" | "width" | "depth" | "height" | "rotation" | "rotationX" | "rotationZ" | "mirrorX" | "mirrorY" | "mirrorZ" | "parametricSource">;
 
 /**
- * Horizontal offset from the shape's stored position to the start of the
- * tube, in world units. For a plain shape the position is the centre of its
- * box. A rotated shape is stored baked, and then the position is the centre
- * of the rotated body's bounds - that case is measured the same way here.
+ * Offset from the shape's stored position to the start of the tube, in world
+ * units, and the height of the body that position is the centre of. For a
+ * plain shape the position is the centre of its box. A rotated shape is stored
+ * baked, and then the position is the centre of the rotated body's bounds -
+ * that case is measured the same way here.
  */
 function startOffset(shape: Placement & BentTubeShapeFields, fitted: { width: number; depth: number; height: number }) {
   const settings = bentTubeSettings(shape);
@@ -733,16 +734,24 @@ function startOffset(shape: Placement & BentTubeShapeFields, fitted: { width: nu
     return [vector.x, vector.y, vector.z];
   };
   const start = toObject([0, 0, 0]);
-  if (!baked) return start;
+  // Height is how tall the body is that the position is the centre of: the shape's own box, or the rotated body's bounds.
+  if (!baked) return { offset: start, height: fitted.height };
   const { min, max } = boundsOf(mesh.positions, mesh.outerVertexCount, toObject);
-  return sub(start, [(min[0] + max[0]) / 2, (min[1] + max[1]) / 2, (min[2] + max[2]) / 2]);
+  return { offset: sub(start, [(min[0] + max[0]) / 2, (min[1] + max[1]) / 2, (min[2] + max[2]) / 2]), height: max[1] - min[1] };
 }
 
 /**
  * The patch for a changed bent-tube parameter: the normalised fields, the new
  * natural size, and a position that keeps the start of the tube where it was,
- * whether or not the shape has been moved or rotated. Height is left to the
- * caller, which keeps the body standing on the same floor.
+ * whether or not the shape has been moved or rotated.
+ *
+ * A change to the segments (length, bend angle, bend radius, roll, adding or
+ * removing one) keeps the start in all three directions, so only the far end
+ * moves (#1422). Without that, a tube tilted off the plate had its start
+ * carried up or down, because the body was kept standing on the same floor.
+ * It may then reach below the plate; lifting it would move the start again.
+ * Any other change (size, wall, profile, quality) leaves the height to the
+ * caller, which keeps the body standing on the same floor as before.
  */
 export function bentTubeParameterPatch(shape: Placement & BentTubeShapeFields, changes: BentTubeShapeFields): Partial<WorkplaneShape> {
   const current = normalizedBentTubeFields(shape);
@@ -757,8 +766,14 @@ export function bentTubeParameterPatch(shape: Placement & BentTubeShapeFields, c
     depth: natural.depth * stretch(shape.depth, naturalNow.depth),
     height: natural.height * stretch(shape.height, naturalNow.height),
   };
-  const before = startOffset(shape, { width: shape.width, depth: shape.depth, height: shape.height });
-  const after = startOffset({ ...shape, ...nextFields }, stretched);
+  const beforeStart = startOffset(shape, { width: shape.width, depth: shape.depth, height: shape.height });
+  const afterStart = startOffset({ ...shape, ...nextFields }, stretched);
+  const before = beforeStart.offset;
+  const after = afterStart.offset;
+  // The start's height: the body's floor, half its height up to its centre, and the start's offset from that centre.
+  const elevation = changes.bentTubeSegments !== undefined
+    ? { elevation: (shape.elevation ?? 0) + beforeStart.height / 2 + before[1] - after[1] - afterStart.height / 2 }
+    : {};
   return {
     ...nextFields,
     width: stretched.width,
@@ -767,5 +782,6 @@ export function bentTubeParameterPatch(shape: Placement & BentTubeShapeFields, c
     size: Math.max(stretched.width, stretched.depth),
     x: shape.x + before[0] - after[0],
     z: shape.z + before[2] - after[2],
+    ...elevation,
   };
 }
