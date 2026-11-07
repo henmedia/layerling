@@ -79,6 +79,17 @@ Så:
 
 Til bogstaver på en sidevæg, læg først arbejdsplanet på den væg, se [Visning og arbejdsplan](chapter:view-and-workplane).
 
+## Stenciler: broer til midten af bogstaver
+
+Skåret gennem en plade mister bogstaver som O, A og B deres midte: den ligger løst inde i bogstavet og falder ud. {{ui:stencilBridges.title}} holder den fast til pladen med små broer, som på en stencil.
+
+1. Skift teksten til {{ui:inspector.hole}}, lad den gå gennem pladen, og vælg begge, grupperet eller ej.
+2. Klik på {{ui:stencilBridges.title}} i gruppen {{ui:editor.group.modify}} i båndet, højreklik på markeringen, eller find det med [[Ctrl]]+[[K]]. Broerne vises i orange, hvor de kommer til at sidde.
+3. Indstil {{ui:stencilBridges.width}} og {{ui:stencilBridges.count}}. {{ui:stencilBridges.height}} starter ved pladens tykkelse; lavere broer sidder i flugt med bunden, i midten eller i flugt med toppen af pladen, som {{ui:stencilBridges.position}} angiver. På en sprøjtestencil giver broer øverst plads til malingen under dem.
+4. {{ui:stencilBridges.apply}} grupperer broerne med pladen.
+
+Hver bro er en almindelig kasse: åbn gruppen for at flytte en, slette en eller tilføje din egen. Ændrer du teksten senere, så vælg gruppen og klik på {{ui:stencilBridges.title}} igen; nye broer træder i stedet for de gamle. En tekst, der kun er graveret og ikke går igennem, får ingen broer, for der falder intet ud. Til en laser eller en plotter tilføjer DXF- og SVG-eksporten de samme broer, se [Filer, lagring og deling](chapter:files-and-saving).
+
 ## Omrids, silhuet og bredere
 
 En tekst behøver ikke bygges som fyldte bogstaver. {{ui:prop.textFill}} i egenskaberne tilbyder det samme valg som Tinkercad:

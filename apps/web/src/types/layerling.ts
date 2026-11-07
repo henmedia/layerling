@@ -1569,6 +1569,12 @@ export type WorkplaneShape = {
    */
   supportRibFor?: string;
   /**
+   * A bridge the stencil bridge tool made (Discussion #1438): a box that holds a part inside a hole, such as the middle
+   * of an "o", to the plate round it. Running the tool on its group again puts new bridges in place of these. See
+   * lib/stencilBridgeTool.
+   */
+  stencilBridge?: boolean;
+  /**
    * The point this body turns about, kept with the body: a fraction of its
    * width, height and depth from its centre, in its own frame, so it moves,
    * turns and scales with it. See lib/rotationPivot.

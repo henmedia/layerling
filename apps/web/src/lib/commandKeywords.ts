@@ -33,6 +33,7 @@ export const COMMAND_KEYWORDS: Readonly<Record<string, readonly string[]>> = {
   mirror: ["mirror", "flip", "spiegeln", "spiegelung"],
   pivot: ["pivot", "rotation point", "drehpunkt", "drehen", "rotate"],
   scalePercent: ["scale", "percent", "resize", "bigger", "smaller", "skalieren", "prozent", "vergrößern", "vergroessern", "verkleinern", "größe"],
+  stencilBridges: ["stencil", "stencil bridges", "bridges", "bridge", "islands", "counter", "letters fall out", "falls out", "cut out text", "schablone", "schablonenstege", "stege", "steg", "brücken", "bruecken", "inseln", "buchstaben fallen heraus", "fällt heraus", "faellt heraus"],
   supportRib: ["support rib", "support", "supports", "tilted", "tilt", "45 degrees", "falls over", "tip over", "brim", "stützrippe", "stuetzrippe", "stütze", "stuetze", "schräg drucken", "schraeg drucken", "kippt", "umkippen", "rippe"],
   holePattern: ["hole pattern", "perforate", "perforation", "perforated", "holes", "vent", "ventilation", "grille", "honeycomb", "hexagon holes", "slots", "lochmuster", "lochraster", "perforieren", "locher", "löcher", "loecher", "lüftung", "lueftung", "gitter", "wabe", "langloch", "luftschlitze", "cylinder holes", "round wall", "pen holder", "zylinder löcher", "runde wand", "stiftebecher"],
   faceTool: ["face", "push", "pull", "push pull", "extrude", "pad", "boss", "pocket", "recess", "thicken", "thicker", "wall", "inset", "flaeche", "fläche", "herausziehen", "hineinziehen", "tasche", "vertiefung", "aufdicken", "verdicken", "erhebung"],

@@ -99,6 +99,7 @@ AI používá stejné funkce a stejné zpracování příkazů jako ruční ovl�
 | `layerling_push_face` | vysune rovinnou plochu ven nebo do ní vyřízne kapsu, s odsazením od okraje a poloměrem rohů; nový díl je těleso z náčrtu sloučené s tělesem |
 | `layerling_paint` | obarví části tělesa vlastními barvami pro tisk více barvami (Malování): vyplnit plochu k ostrým hranám, kulatá skvrna nebo laso v rovinném pohledu; gumovat, smazat vše; uloží se s tělesem a do 3MF se zapíše jako obarvené plochy |
 | `layerling_support_rib` | postaví tenké podpěrné žebro pod spodní plochu dílu tištěného šikmo na hraně, s můstky vysokými jednu vrstvu (Podpěrné žebro) |
+| `layerling_stencil_bridges` | drží části desky s textem prořezaným skrz, které by vypadly, můstky seskupenými s deskou, o zadané šířce a výšce (Můstky šablony) |
 | `layerling_mate_faces` | přiloží plochy dvou objektů proti sobě nebo do společné roviny |
 | `layerling_open_group` | otevře sloučený celek k úpravě částí, i uvnitř jiného otevřeného celku |
 | `layerling_close_group` | potvrdí úpravu celku nebo ji zruší |

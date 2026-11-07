@@ -74,6 +74,17 @@ Projekt **neukládá soubor písma**, jen obrysy použitých znaků včetně tě
 
 Pro nápis na boční stěně nejprve položte pracovní rovinu na tuto plochu, viz [Pohled a pracovní rovina](chapter:view-and-workplane).
 
+## Šablony: můstky pro střed písmen
+
+Když se text prořízne deskou, písmena jako O, A a B ztratí střed: leží volně v písmenu a vypadne. {{ui:stencilBridges.title}} ho přidrží k desce malými můstky, jako u šablony.
+
+1. Přepněte text na {{ui:inspector.hole}}, nechte ho projít deskou a vyberte obojí, seskupené nebo ne.
+2. Klikněte na {{ui:stencilBridges.title}} ve skupině {{ui:editor.group.modify}} na pásu, klikněte pravým tlačítkem na výběr nebo to najděte přes [[Ctrl]]+[[K]]. Můstky se oranžově ukážou tam, kam přijdou.
+3. Nastavte {{ui:stencilBridges.width}} a {{ui:stencilBridges.count}}. {{ui:stencilBridges.height}} začíná na tloušťce desky; nižší můstky leží zarovnané se spodkem, uprostřed nebo zarovnané s vrchem desky, podle {{ui:stencilBridges.position}}. U šablony na sprej nechají můstky nahoře pod sebou místo pro barvu.
+4. {{ui:stencilBridges.apply}} seskupí můstky s deskou.
+
+Každý můstek je obyčejný kvádr: otevřete skupinu, chcete-li některý posunout, smazat nebo přidat vlastní. Když později změníte text, vyberte skupinu a klikněte znovu na {{ui:stencilBridges.title}}; nové můstky nahradí staré. Text, který je jen vyrytý a neprochází skrz, můstky nedostane, protože tam nic nevypadne. Pro laser nebo plotr přidá stejné můstky export DXF a SVG, viz [Soubory, ukládání a sdílení](chapter:files-and-saving).
+
 ## Obrys, silueta a rozšíření
 
 Text nemusí tvořit plná písmena. {{ui:prop.textFill}} nabízí stejné možnosti jako Tinkercad:

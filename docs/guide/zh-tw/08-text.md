@@ -77,6 +77,17 @@ layerling 無法讀取 WOFF2 檔案（幾乎總是有 TTF 或 OTF 版本）、�
 
 要在側面加上文字，先把工作平面放到該面上，見[檢視與工作平面](chapter:view-and-workplane)。
 
+## 鏤空模板：字母中間部分的連接橋
+
+文字穿透板時，O、A、B 等字母會失去中間部分：它鬆散地留在字母裡並掉出。{{ui:stencilBridges.title}} 用小連接橋把它固定在板上，就像鏤空模板一樣。
+
+1. 把文字切換為{{ui:inspector.hole}}，讓它穿透板，然後選取兩者，組合與否皆可。
+2. 點擊功能區 {{ui:editor.group.modify}} 群組中的 {{ui:stencilBridges.title}}，或在選取範圍上按右鍵，或用 [[Ctrl]]+[[K]] 搜尋。連接橋會以橘色顯示在將要放置的位置。
+3. 設定 {{ui:stencilBridges.width}} 和 {{ui:stencilBridges.count}}。{{ui:stencilBridges.height}} 從板的厚度開始；較矮的連接橋依 {{ui:stencilBridges.position}} 與板底齊平、位於中間或與板頂齊平。用於噴漆的模板，頂部的連接橋下方會給油漆留出空間。
+4. {{ui:stencilBridges.apply}} 把連接橋與板組合在一起。
+
+每個連接橋都是普通的長方體：打開組合即可移動、刪除或自行加入。之後修改文字時，選取組合並再次點擊 {{ui:stencilBridges.title}}；新的連接橋會取代舊的。只是凹刻、沒有穿透的文字不會得到連接橋，因為那裡沒有東西會掉出。對於雷射切割機或繪圖機，DXF 和 SVG 匯出會加入同樣的連接橋，參見[檔案、儲存與分享](chapter:files-and-saving)。
+
 ## 輪廓、剪影與加寬
 
 文字不一定要做成實心字母。屬性中的 {{ui:prop.textFill}} 提供與 Tinkercad 相同的選項：

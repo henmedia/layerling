@@ -76,6 +76,17 @@ Dus:
 
 Voor belettering op een zijvlak zet je eerst het werkvlak op dat vlak, zie [Weergave en werkvlak](chapter:weergave-en-werkvlak).
 
+## Stencils: bruggen voor het midden van letters
+
+Door een plaat gesneden verliezen letters als O, A en B hun midden: het ligt los in de letter en valt eruit. {{ui:stencilBridges.title}} houdt het met kleine bruggen aan de plaat vast, zoals bij een stencil.
+
+1. Zet de tekst op {{ui:inspector.hole}}, laat hem door de plaat gaan en selecteer beide, gegroepeerd of niet.
+2. Klik op {{ui:stencilBridges.title}} in de groep {{ui:editor.group.modify}} van het lint, klik met rechts op de selectie of zoek het met [[Ctrl]]+[[K]]. De bruggen verschijnen in oranje waar ze komen.
+3. Stel {{ui:stencilBridges.width}} en {{ui:stencilBridges.count}} in. {{ui:stencilBridges.height}} begint bij de dikte van de plaat; lagere bruggen zitten gelijk met de onderkant, in het midden of gelijk met de bovenkant, zoals {{ui:stencilBridges.position}} zegt. Bij een spuitstencil laten bruggen bovenaan ruimte eronder voor de verf.
+4. {{ui:stencilBridges.apply}} groepeert de bruggen met de plaat.
+
+Elke brug is een gewone balk: open de groep om er een te verplaatsen, te verwijderen of er zelf een toe te voegen. Verander je de tekst later, selecteer dan de groep en klik nogmaals op {{ui:stencilBridges.title}}; nieuwe bruggen nemen de plaats van de oude in. Een tekst die alleen gegraveerd is en niet doorgaat, krijgt geen bruggen, want daar valt niets uit. Voor een laser of plotter voegen de DXF- en SVG-export dezelfde bruggen toe, zie [Bestanden, opslaan en delen](chapter:bestanden-en-opslaan).
+
 ## Contour, silhouet en breder
 
 Een tekst hoeft niet uit gevulde letters te bestaan. {{ui:prop.textFill}} in de eigenschappen biedt dezelfde keuze als Tinkercad:

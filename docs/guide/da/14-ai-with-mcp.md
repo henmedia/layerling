@@ -103,6 +103,7 @@ AI'en arbejder med de samme funktioner som dig, gennem den samme vej som din han
 | `layerling_push_face` | skubber en flad flade ud eller skærer en lomme ind i den, med en indrykning fra kanten og en hjørneradius; den nye del er en skitseform grupperet med formen, eller et frit legeme for sig med `separate` |
 | `layerling_paint` | maler dele af et legeme i egne farver til print i flere farver (Mal): fyld en flade ud til de skarpe kanter, en rund plet eller en lasso i en flad visning; viskelæder, fjern alt; gemt med legemet og skrevet til 3MF som malede flader |
 | `layerling_support_rib` | stiller en tynd støtteribbe under den nederste flade på en del, der printes skråt på en kant, med broer ét lag høje (Støtteribbe) |
+| `layerling_stencil_bridges` | holder de dele af en plade med tekst skåret igennem, der ville falde ud, med broer grupperet med pladen, så brede og høje som angivet (Stencilbroer) |
 | `layerling_mate_faces` | bringer en flade på et objekt mod en flade på et andet, flade mod flade eller flugtende, eller lægger to runde flader på én akse |
 | `layerling_open_group` | åbner en gruppe så dens dele kan ændres én ad gangen, også en gruppe inden i en åben |
 | `layerling_close_group` | lukker den igen ("Udført") eller annullerer |

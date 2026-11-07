@@ -77,6 +77,17 @@ Di conseguenza:
 
 Per scrivere su una faccia laterale, prima posiziona il piano di lavoro su quella faccia; vedi [Vista e piano di lavoro](chapter:view-and-workplane).
 
+## Stencil: ponticelli per il centro delle lettere
+
+Tagliate attraverso una piastra, lettere come O, A e B perdono il loro centro: resta libero dentro la lettera e cade. {{ui:stencilBridges.title}} lo trattiene alla piastra con piccoli ponticelli, come su uno stencil.
+
+1. Imposta il testo su {{ui:inspector.hole}}, fallo passare attraverso la piastra e seleziona entrambi, raggruppati o no.
+2. Fai clic su {{ui:stencilBridges.title}} nel gruppo {{ui:editor.group.modify}} della barra, fai clic destro sulla selezione o cercalo con [[Ctrl]]+[[K]]. I ponticelli appaiono in arancione dove andranno.
+3. Imposta {{ui:stencilBridges.width}} e {{ui:stencilBridges.count}}. {{ui:stencilBridges.height}} parte dallo spessore della piastra; i ponticelli più bassi stanno a filo con il fondo, al centro o a filo con la cima della piastra, come indica {{ui:stencilBridges.position}}. Su uno stencil per vernice spray, i ponticelli in alto lasciano passare la vernice sotto.
+4. {{ui:stencilBridges.apply}} raggruppa i ponticelli con la piastra.
+
+Ogni ponticello è un normale parallelepipedo: apri il gruppo per spostarne uno, eliminarne uno o aggiungerne uno tuo. Se in seguito cambi il testo, seleziona il gruppo e fai di nuovo clic su {{ui:stencilBridges.title}}; i nuovi ponticelli prendono il posto dei vecchi. Un testo solo inciso, che non attraversa, non riceve ponticelli, perché lì non cade nulla. Per un laser o un plotter, l'esportazione DXF e SVG aggiunge gli stessi ponticelli, vedi [File, salvataggio e condivisione](chapter:files-and-saving).
+
 ## Contorno, sagoma e spessore
 
 Il testo non deve per forza essere composto da lettere piene. {{ui:prop.textFill}} nelle proprietà offre le stesse opzioni di Tinkercad:

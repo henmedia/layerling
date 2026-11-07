@@ -79,6 +79,17 @@ Daraus folgt:
 
 Für Beschriftungen auf einer Seitenfläche legst du vorher die Arbeitsebene auf diese Fläche, siehe [Ansicht und Arbeitsebene](chapter:ansicht-und-arbeitsebene).
 
+## Schablonen: Stege für die Mitte von Buchstaben
+
+Durch eine Platte geschnitten, verlieren Buchstaben wie O, A und B ihre Mitte: Sie liegt lose im Buchstaben und fällt heraus. {{ui:stencilBridges.title}} hält sie mit kleinen Stegen an der Platte, wie bei einer Schablone.
+
+1. Schalte den Text auf {{ui:inspector.hole}}, lass ihn durch die Platte reichen und wähle beides aus, gruppiert oder nicht.
+2. Klicke im Menüband in der Gruppe {{ui:editor.group.modify}} auf {{ui:stencilBridges.title}}, mach einen Rechtsklick auf die Auswahl oder finde es mit [[Ctrl]]+[[K]]. Die Stege erscheinen orange dort, wo sie hinkommen.
+3. Stelle {{ui:stencilBridges.width}} und {{ui:stencilBridges.count}} ein. {{ui:stencilBridges.height}} beginnt bei der Dicke der Platte; niedrigere Stege sitzen bündig unten, in der Mitte oder bündig oben, wie es {{ui:stencilBridges.position}} sagt. Bei einer Sprühschablone lassen Stege oben darunter Platz für die Farbe.
+4. {{ui:stencilBridges.apply}} gruppiert die Stege mit der Platte.
+
+Jeder Steg ist ein gewöhnlicher Quader: Öffne die Gruppe, um einen zu verschieben, zu löschen oder einen eigenen dazuzulegen. Änderst du den Text später, wähle die Gruppe und klicke noch einmal auf {{ui:stencilBridges.title}}; neue Stege treten an die Stelle der alten. Ein Text, der nur eingraviert ist und nicht durchgeht, bekommt keine Stege, denn dort fällt nichts heraus. Für einen Laser oder Plotter setzen der DXF- und der SVG-Export dieselben Stege, siehe [Dateien, Speichern und Weitergeben](chapter:dateien-und-speichern).
+
 ## Kontur, Silhouette und breiter
 
 Ein Text muss nicht als gefüllte Buchstaben gebaut werden. {{ui:prop.textFill}} in den Eigenschaften bietet dieselbe Auswahl wie Tinkercad:

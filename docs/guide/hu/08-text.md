@@ -76,6 +76,17 @@ Tehát:
 
 Egy oldallapon lévő felirathoz előbb tedd a munkasíkot arra a lapra, lásd a [Nézet és munkasík](chapter:view-and-workplane) fejezetet.
 
+## Sablonok: hidak a betűk közepéhez
+
+Ha a szöveg átvágja a lemezt, az olyan betűk, mint az O, A és B, elveszítik a közepüket: lazán fekszik a betűben, és kiesik. A {{ui:stencilBridges.title}} kis hidakkal a lemezhez rögzíti, mint egy sablonon.
+
+1. Állítsd a szöveget {{ui:inspector.hole}} módba, vezesd át a lemezen, és jelöld ki mindkettőt, csoportosítva vagy anélkül.
+2. Kattints a {{ui:stencilBridges.title}} gombra a szalag {{ui:editor.group.modify}} csoportjában, kattints jobb gombbal a kijelölésre, vagy keresd meg a [[Ctrl]]+[[K]] billentyűkkel. A hidak narancssárgán jelennek meg ott, ahová kerülnek.
+3. Állítsd be a {{ui:stencilBridges.width}} és a {{ui:stencilBridges.count}} értékét. A {{ui:stencilBridges.height}} a lemez vastagságáról indul; az alacsonyabb hidak az alsó lappal egy síkban, középen vagy a felső lappal egy síkban ülnek, ahogy a {{ui:stencilBridges.position}} mondja. Festékszórós sablonon a felül lévő hidak alatt marad hely a festéknek.
+4. A {{ui:stencilBridges.apply}} csoportosítja a hidakat a lemezzel.
+
+Minden híd egy közönséges téglatest: nyisd meg a csoportot, ha egyet áthelyeznél, törölnél, vagy sajátot adnál hozzá. Ha később módosítod a szöveget, jelöld ki a csoportot, és kattints újra a {{ui:stencilBridges.title}} gombra; az új hidak a régiek helyére kerülnek. A csak bevésett, át nem menő szöveg nem kap hidat, mert ott semmi sem esik ki. Lézerhez vagy plotterhez a DXF- és SVG-export ugyanilyen hidakat ad, lásd [Fájlok, mentés és megosztás](chapter:files-and-saving).
+
 ## Körvonal, sziluett és szélesebb
 
 Egy szöveget nem kell kitöltött betűkként felépíteni. A tulajdonságok között a {{ui:prop.textFill}} ugyanazt a választékot kínálja, mint a Tinkercad:

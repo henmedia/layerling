@@ -103,6 +103,7 @@ The AI works with the same functions as you, through the same path as your opera
 | `layerling_push_face` | pushes a flat face out or cuts a pocket into it, with an inset from the edge and a corner radius; the new part is a sketch body grouped with the body, or a free body of its own with `separate` |
 | `layerling_paint` | paints parts of a body in colours of their own for printing in several colours (Paint): fill a face up to its sharp edges, a round patch, or a lasso drawn in a flat view; erase, clear; saved with the body and written to a 3MF as painted faces |
 | `layerling_support_rib` | stands a thin support rib under the lower face of a part printed tilted on one edge, with bridges one layer high (Support rib) |
+| `layerling_stencil_bridges` | holds the parts of a plate with text cut through that would fall out, with bridges grouped with the plate, as wide and high as set (Stencil bridges) |
 | `layerling_mate_faces` | brings a face of one object against a face of another, face to face or flush, or puts two round faces on one axis |
 | `layerling_open_group` | opens a group so its parts can be changed one by one, also a group inside an open one |
 | `layerling_close_group` | closes it again ("Done") or cancels |

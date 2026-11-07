@@ -788,6 +788,21 @@ export const tools = [
     },
   },
   {
+    name: "layerling_stencil_bridges",
+    description: "Hold the parts of a stencil that would fall out - the editor's Stencil bridges tool (Discussion #1438). A plate with text cut through it loses the middle of letters like o, a and b; seen from above (as the SVG export sees it), every part lying inside a hole gets bridges: boxes count per part, width wide, straight across the gap to the material round it, never touching another outline, parts that only hold each other tied to the plate too (the same bridges as the DXF/SVG export's). The boxes are as high as the plate (or height, at the bottom, in the middle or at the top of it) and are grouped with it, so the result is one group in place of the given objects; each bridge is an ordinary box that can be moved or deleted in the group. Give the plate grouped with its text hole, or the plate and the text hole not grouped yet (they are grouped first, so the text cuts the plate and not the bridges). Run on a group it made before, it puts new bridges in place of its own. A text engraved but not cut through is whole from above and gets none; nothing to hold, or no bridge that fits at the width, is refused. The answer counts the parts, the bridges and the parts no bridge reaches. One undo step.",
+    inputSchema: {
+      ...editorTargetSchema,
+      properties: {
+        ...editorTargetSchema.properties,
+        ids: { type: "array", items: { type: "string" }, description: "The plate with the text cut through (a group), or the plate and its text hole. If omitted, the selection (targetId or id for one object also work)." },
+        width: { type: "number", minimum: 0.5, maximum: 5, description: "Width of each bridge in mm (default 1.5)." },
+        count: { type: "number", minimum: 1, maximum: 4, description: "Bridges per part (default 2)." },
+        height: { type: "number", minimum: 0.2, description: "Height of the bridges in mm (default the plate's whole height)." },
+        position: { type: "string", enum: ["bottom", "middle", "top"], description: "Where bridges lower than the plate sit: flush with its bottom, in the middle, or flush with its top (default bottom)." },
+      },
+    },
+  },
+  {
     name: "layerling_push_face",
     description: "Push a flat face of a solid body out or cut a pocket into it - the editor's Face tool. out adds a body standing on the face, in cuts a pocket reaching depth into it; inset keeps the new outline that far inside the face's edge (0 takes the whole face, so a wall gets thicker) and openings in the face grow by it; radius rounds every corner of the outline, the inner ones too, and closes a gap narrower than twice the radius. The new part is an ordinary sketch body grouped with the body (nothing is baked: Edit group and Edit sketch reach it). On the top or the bottom of a plain sketch body (one area, not grouped, mirrored, tapered, twisted or leaning, without a stroke, key ring or edge treatment) it keeps that body's own outline, exact where the CAD kernel can set it in, and keeps the inset when resized; on any other face, and on every face of an imported mesh, it follows the face's triangles. A pocket goes no deeper than the body behind the face. Name the body and a side of its own box (targetFace, snapped to the nearest real face) or give point and normal on the face yourself. A curved face is refused. One undo step.",
     inputSchema: {

@@ -99,6 +99,7 @@ Az MI ugyanazokkal a funkciókkal dolgozik, mint te, ugyanazon az úton, mint a 
 | `layerling_push_face` | kihúz egy sík lapot, vagy zsebet vág bele, a lap szélétől mért távolsággal és sarokrádiusszal; az új rész a testtel csoportosított vázlattest |
 | `layerling_paint` | többszínű nyomtatáshoz saját színekkel festi egy test részeit (Festés): lap kitöltése az éles élekig, kerek folt vagy sík nézetben rajzolt lasszó; radírozás, mindent levesz; a testtel mentődik, és a 3MF-be festett lapokként kerül |
 | `layerling_support_rib` | vékony támasztóbordát állít egy élére döntve nyomtatott alkatrész alsó lapja alá, egy réteg magas hidakkal (Támasztóborda) |
+| `layerling_stencil_bridges` | az átvágott szövegű lemez kieső részeit a lemezzel csoportosított, megadott szélességű és magasságú hidakkal tartja meg (Sablonhidak) |
 | `layerling_mate_faces` | egy objektum lapját egy másik lapjához illeszti, laptól lapig vagy egy síkba |
 | `layerling_open_group` | megnyit egy csoportot, hogy a részei egyenként módosíthatók legyenek, egy nyitott csoporton belüli csoportot is |
 | `layerling_close_group` | újra bezárja („Kész”) vagy megszakítja |

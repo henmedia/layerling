@@ -81,6 +81,8 @@ import { FaceToolPanel } from "./workplane/FaceToolPanel";
 import { SupportRibPanel } from "./workplane/SupportRibPanel";
 import { DEFAULT_FACE_TOOL, faceToolSettingsOn, normalizeFaceTool, type FaceToolSettings } from "@/lib/faceTool";
 import { buildSupportRib, normalizeSupportRib, readSupportRibSettings, supportRibFace, supportRibShape, writeSupportRibSettings, type SupportRibFace, type SupportRibPlan, type SupportRibSettings } from "@/lib/supportRib";
+import { StencilBridgePanel } from "./workplane/StencilBridgePanel";
+import { normalizeStencilBridgeTool, readStencilBridgeToolSettings, stencilBridgeBase, stencilBridgeBoxes, stencilBridgeLevels, stencilBridgePlan, writeStencilBridgeToolSettings, STENCIL_BRIDGE_POSITIONS, type StencilBridgePlan, type StencilBridgePosition, type StencilBridgeToolSettings } from "@/lib/stencilBridgeTool";
 import { faceToolBody } from "@/lib/faceToolBody";
 import { DEFAULT_HOLE_PATTERN, normalizeHolePattern, type HolePatternSettings } from "@/lib/holePattern";
 import { holePatternCustomFootprint, holePatternScrewPatch, holePatternScrewSizes, holePatternShapes, isRoundWallFace, readHolePatternFace, readPerforableFace, type HolePatternFace, type PerforableFace } from "@/lib/holePatternShapes";
@@ -3275,6 +3277,10 @@ export function LayerlingEditor({
   const supportRibPreviewRunRef = useRef(0);
   const supportRibPickRunRef = useRef(0);
   const supportRibPickAbortRef = useRef<AbortController | null>(null);
+  // "Stencil bridges" (Discussion #1438): the parts of a plate with text cut through that would fall out, held by bridges.
+  const [stencilBridgeTool, setStencilBridgeTool] = useState<{ sourceIds: string[]; settings: StencilBridgeToolSettings; busy: boolean } | null>(null);
+  const [stencilBridgePreview, setStencilBridgePreview] = useState<{ bridges: WorkplaneShape[]; plan: StencilBridgePlan; replaced: number } | null>(null);
+  const stencilBridgePreviewRunRef = useRef(0);
   const faceToolPreviewRunRef = useRef(0);
   const faceToolPickRunRef = useRef(0);
   const faceToolPickAbortRef = useRef<AbortController | null>(null);
@@ -4250,6 +4256,8 @@ export function LayerlingEditor({
         ? [...shapes, faceToolPreview.shape]
         : supportRibPreview?.shape
         ? [...shapes, supportRibPreview.shape]
+        : stencilBridgePreview?.bridges.length
+        ? [...shapes, ...stencilBridgePreview.bridges]
         : edgeModifier?.preview && cadModifierBaseShapeRef.current
         ? shapes.map((shape) => shape.id === cadModifierBaseShapeRef.current?.id ? edgeModifier.preview as WorkplaneShape : shape)
         : alignMode && alignPreview?.spread
@@ -4261,7 +4269,7 @@ export function LayerlingEditor({
         : mirrorMode && mirrorPreviewAxis
           ? mirroredShapesForSelection(shapes, selectedIds, selectedShapes, mirrorPreviewAxis).nextShapes
           : shapes,
-    [alignAxes, alignMode, alignPreview, alignSelection, arrayPreview, edgeModifier?.preview, effectiveAlignAnchorId, faceToolPreview, supportRibPreview, holePatternPreview, mirrorMode, mirrorPreviewAxis, selectedIds, selectedShapes, shapes],
+    [alignAxes, alignMode, alignPreview, alignSelection, arrayPreview, edgeModifier?.preview, effectiveAlignAnchorId, faceToolPreview, supportRibPreview, stencilBridgePreview, holePatternPreview, mirrorMode, mirrorPreviewAxis, selectedIds, selectedShapes, shapes],
   );
   // The preview of an intersection (#372): the operands see-through, and what they share as a body of its own on top.
   const [intersectPreviewIds, setIntersectPreviewIds] = useState<string[] | null>(null);
@@ -10214,6 +10222,147 @@ export function LayerlingEditor({
     if (supportRibTool?.step !== "pick") supportRibPickAbortRef.current?.abort();
   }, [supportRibTool]);
 
+  // "Stencil bridges" (Discussion #1438): a plate with text cut through, seen from above; every part inside a hole - the
+  // middle of an o, the bellies of a B - gets bridges, boxes grouped with the plate. Run on that group again, new
+  // bridges take the place of the ones it made.
+  const toggleStencilBridges = useCallback(() => {
+    if (stencilBridgeTool) {
+      setStencilBridgeTool(null);
+      setNotice(t("status.stencilBridgesCancelled"));
+      return;
+    }
+    if (refuseBodyLockedSelection()) return;
+    if (selectedShapes.length === 0) {
+      setNotice(t("status.stencilBridgesSelect"));
+      return;
+    }
+    if (selectedShapes.some((shape) => isNonSolidShape(shape)) || selectedShapes.every((shape) => shape.hole)) {
+      setNotice(t("status.stencilBridgesNeedsSolid"));
+      return;
+    }
+    if (edgeModifier || shellTool || deleteFaceTool || splitSession || simplifyToolId) {
+      setNotice(t("status.faceToolOtherTool"));
+      return;
+    }
+    stopCruise();
+    holePatternPickRunRef.current += 1;
+    setHolePatternTool(null);
+    faceToolPickRunRef.current += 1;
+    setFaceTool(null);
+    supportRibPickRunRef.current += 1;
+    setSupportRibTool(null);
+    setAlignMode(false);
+    setMirrorMode(false);
+    setPivotPickMode(false);
+    setLayFlatPickMode(false);
+    setMateTool(null);
+    setArrayTool(null);
+    setScalePercentTool(null);
+    setStencilBridgeTool({ sourceIds: selectedShapes.map((shape) => shape.id), settings: readStencilBridgeToolSettings(), busy: false });
+    setNotice(t("status.stencilBridgesStart"));
+  }, [deleteFaceTool, edgeModifier, refuseBodyLockedSelection, selectedShapes, shellTool, simplifyToolId, splitSession, stencilBridgeTool, stopCruise]);
+
+  const changeStencilBridgeSettings = useCallback((patch: Partial<StencilBridgeToolSettings>) => {
+    setStencilBridgeTool((current) => {
+      if (!current) return current;
+      const settings = normalizeStencilBridgeTool({ ...current.settings, ...patch });
+      writeStencilBridgeToolSettings(settings);
+      return { ...current, settings };
+    });
+  }, []);
+
+  // The bridges are found a moment after the numbers change and show where they will go.
+  useEffect(() => {
+    const run = ++stencilBridgePreviewRunRef.current;
+    const sources = stencilBridgeTool ? stencilBridgeTool.sourceIds.map((id) => shapes.find((shape) => shape.id === id)) : [];
+    if (!stencilBridgeTool || sources.length === 0 || sources.some((shape) => !shape)) {
+      setStencilBridgePreview(null);
+      return;
+    }
+    const { base, replaced } = stencilBridgeBase(sources as WorkplaneShape[]);
+    const settings = stencilBridgeTool.settings;
+    const timer = window.setTimeout(() => {
+      void stencilBridgePlan(base, settings)
+        .then((plan) => {
+          if (stencilBridgePreviewRunRef.current !== run) return;
+          const bridges = plan.ok
+            ? stencilBridgeBoxes(plan.rects, stencilBridgeLevels(plan.minY, plan.maxY, settings), { color: "#f59f00", name: t("stencilBridges.name"), idPrefix: "stencil-bridge-preview" })
+            : [];
+          setStencilBridgePreview({ bridges, plan, replaced });
+        })
+        .catch(() => {
+          if (stencilBridgePreviewRunRef.current === run) setStencilBridgePreview({ bridges: [], plan: { ok: false, reason: "failed" }, replaced });
+        });
+    }, 150);
+    return () => window.clearTimeout(timer);
+  }, [shapes, stencilBridgeTool]);
+
+  /**
+   * The group of the plate and its bridges, for the panel and the AI bridge alike. Bodies not grouped yet (a plate and
+   * the text as a hole beside it) are grouped first, so the text cuts the plate and not the bridges.
+   */
+  const buildStencilBridgeGroup = useCallback(async (sources: WorkplaneShape[], settings: StencilBridgeToolSettings) => {
+    const { base, replaced } = stencilBridgeBase(sources);
+    const plan = await stencilBridgePlan(base, settings);
+    if (!plan.ok) return { ok: false as const, reason: plan.reason };
+    if (plan.parts === 0) return { ok: false as const, reason: "nothing" as const };
+    if (plan.rects.length === 0) return { ok: false as const, reason: "unreachable" as const };
+    const color = base.find((shape) => !shape.hole)?.color ?? sources[0].color;
+    const bridges = stencilBridgeBoxes(plan.rects, stencilBridgeLevels(plan.minY, plan.maxY, settings), { color, name: t("stencilBridges.name") });
+    const limit = workspaceSettingsRef.current.booleanTriangleLimit;
+    let plate = base[0];
+    if (base.length > 1) {
+      const inner = await buildGroupedShapeOffThread(base, limit, geometryAbortRef.current?.signal);
+      if (!inner.group) return { ok: false as const, reason: "failed" as const };
+      plate = canonicalizeShape({ ...inner.group, groupOperation: "group" });
+    }
+    const outer = await buildGroupedShapeOffThread([plate, ...bridges], limit, geometryAbortRef.current?.signal);
+    if (!outer.group) return { ok: false as const, reason: "failed" as const };
+    const group = canonicalizeShape({ ...outer.group, name: sources.length === 1 ? sources[0].name : plate.name, groupOperation: "group" });
+    return { ok: true as const, group, plan, bridges, replaced };
+  }, []);
+
+  const applyStencilBridges = useCallback(async () => {
+    const tool = stencilBridgeTool;
+    if (!tool || tool.busy) return;
+    const sources = tool.sourceIds.map((id) => shapesRef.current.find((shape) => shape.id === id));
+    if (sources.some((shape) => !shape)) return;
+    setStencilBridgeTool({ ...tool, busy: true });
+    const sourceFingerprint = projectShapesFingerprint(shapesRef.current);
+    const sourceProjectId = projectInfoRef.current.projectId;
+    const built = await buildStencilBridgeGroup(sources as WorkplaneShape[], tool.settings).catch(() => ({ ok: false as const, reason: "failed" as const }));
+    if (projectInfoRef.current.projectId !== sourceProjectId || projectShapesFingerprint(shapesRef.current) !== sourceFingerprint) {
+      setStencilBridgeTool((current) => (current ? { ...current, busy: false } : current));
+      setNotice(t("status.groupChanged"));
+      return;
+    }
+    if (!built.ok) {
+      setStencilBridgeTool((current) => (current ? { ...current, busy: false } : current));
+      setNotice(t(`stencilBridges.reason.${built.reason}`));
+      return;
+    }
+    setStencilBridgeTool(null);
+    const removed = new Set(tool.sourceIds);
+    const message = built.plan.unheld > 0
+      ? t("status.stencilBridgesCreatedUnheld", { count: built.bridges.length, parts: built.plan.parts, unheld: built.plan.unheld })
+      : t("status.stencilBridgesCreated", { count: built.bridges.length, parts: built.plan.parts });
+    commitShapes([...shapesRef.current.filter((shape) => !removed.has(shape.id)), built.group], built.group.id, message);
+  }, [buildStencilBridgeGroup, commitShapes, stencilBridgeTool]);
+
+  // The tool belongs to the bodies it was started for and gives way to the other tools.
+  useEffect(() => {
+    if (!stencilBridgeTool) return;
+    const selected = new Set(selectedIds);
+    if (
+      selectedIds.length !== stencilBridgeTool.sourceIds.length
+      || stencilBridgeTool.sourceIds.some((id) => !selected.has(id))
+      || mateTool || layFlatPickMode || pivotPickMode || arrayTool || scalePercentTool
+      || shellTool || deleteFaceTool || edgeModifier || splitSession || simplifyToolId || holePatternTool || faceTool || supportRibTool
+    ) {
+      setStencilBridgeTool(null);
+    }
+  }, [arrayTool, deleteFaceTool, edgeModifier, faceTool, holePatternTool, layFlatPickMode, mateTool, pivotPickMode, scalePercentTool, selectedIds, shellTool, simplifyToolId, splitSession, stencilBridgeTool, supportRibTool]);
+
   // The worker reads the body's faces for picking; the tool starts empty and fills in when they come.
   // `error`: a refusal that is still to be read stays in the panel while the faces come again.
   const readDeleteFaces = useCallback((target: WorkplaneShape, error: string | null = null) => {
@@ -10695,7 +10844,7 @@ export function LayerlingEditor({
   // Another tool opens its panel where this one stands, and what it applies changes the design anyway: the check gives way,
   // and does not open over it.
   const otherToolPanelOpen = Boolean(
-    arrayTool || scalePercentTool || simplifyToolId || holePatternTool || faceTool || supportRibTool || mateTool || cookieCutterTool || flexiTool
+    arrayTool || scalePercentTool || simplifyToolId || holePatternTool || faceTool || supportRibTool || stencilBridgeTool || mateTool || cookieCutterTool || flexiTool
     || lidTool || cableTool || cutOutTool || punchTool || shellTool || deleteFaceTool || splitSession || edgeModifier,
   );
   /**
@@ -13307,6 +13456,66 @@ export function LayerlingEditor({
           colors: paintColors(painted),
           skipped,
           ...(laid ? { cut: laid.cut || !strokes.some((stroke) => stroke.mode !== "fill"), paintedFaces: laid.colors.filter(Boolean).length } : {}),
+        };
+      }
+
+      if (command.action === "stencil_bridges") {
+        // The same code as the stencil bridge tool in the view (Discussion #1438).
+        const all = currentShapes();
+        const selectedNow = selectedIdsRef.current;
+        const ids = Array.isArray(params.ids) && params.ids.every((id) => typeof id === "string")
+          ? params.ids as string[]
+          : typeof params.targetId === "string"
+            ? [params.targetId]
+            : typeof params.id === "string" ? [params.id] : selectedNow;
+        if (ids.length === 0) throw new Error("stencil_bridges needs ids (or a selection): the plate with the text cut through, grouped or with the text beside it as a hole");
+        const targets = ids.map((id) => all.find((shape) => shape.id === id));
+        const missing = ids.filter((_, index) => !targets[index]);
+        if (missing.length) throw new Error(`No object with id ${missing.join(", ")}`);
+        const sources = targets as WorkplaneShape[];
+        if (sources.some((shape) => bodyLocked(shape))) throw new Error("Unlock the objects before adding stencil bridges");
+        if (sources.some((shape) => isNonSolidShape(shape)) || sources.every((shape) => shape.hole)) throw new Error("stencil_bridges needs a solid body, not only holes");
+        const given = (key: string) => mcpOptionalNumber(params[key]);
+        if (params.position !== undefined && !STENCIL_BRIDGE_POSITIONS.includes(params.position as StencilBridgePosition)) {
+          throw new Error(`position must be one of ${STENCIL_BRIDGE_POSITIONS.join(", ")}`);
+        }
+        const settings = normalizeStencilBridgeTool({
+          ...readStencilBridgeToolSettings(),
+          ...(given("width") !== undefined ? { width: given("width") } : {}),
+          ...(given("count") !== undefined ? { count: given("count") } : {}),
+          height: given("height") ?? null,
+          ...(typeof params.position === "string" ? { position: params.position as StencilBridgePosition } : {}),
+        });
+        const reasons: Record<string, string> = {
+          noBody: "There is no solid body to hold",
+          nothing: "Nothing would fall out: seen from above, no part lies inside a hole. Cut the text through the plate first",
+          unreachable: "No bridge reaches the parts that would fall out at this width; try a smaller width",
+          failed: "The bridges could not be made",
+        };
+        const sourceFingerprint = projectShapesFingerprint(currentShapes());
+        const sourceProjectId = projectInfoRef.current.projectId;
+        const built = await buildStencilBridgeGroup(sources, settings);
+        if (!built.ok) throw new Error(reasons[built.reason]);
+        if (projectInfoRef.current.projectId !== sourceProjectId || projectShapesFingerprint(currentShapes()) !== sourceFingerprint) {
+          throw new Error("The scene changed while making the bridges; run the command again");
+        }
+        writeStencilBridgeToolSettings(settings);
+        const removed = new Set(ids);
+        const message = built.plan.unheld > 0
+          ? t("status.stencilBridgesCreatedUnheld", { count: built.bridges.length, parts: built.plan.parts, unheld: built.plan.unheld })
+          : t("status.stencilBridgesCreated", { count: built.bridges.length, parts: built.plan.parts });
+        commitShapes([...currentShapes().filter((shape) => !removed.has(shape.id)), built.group], built.group.id, message);
+        const levels = stencilBridgeLevels(built.plan.minY, built.plan.maxY, settings);
+        const round = (value: number) => Number(value.toFixed(4));
+        return {
+          object: mcpShapeSummary(built.group),
+          parts: built.plan.parts,
+          bridges: built.bridges.length,
+          unheld: built.plan.unheld,
+          replaced: built.replaced,
+          bridgeHeight: round(levels.height),
+          bridgeElevation: round(levels.elevation),
+          settings,
         };
       }
 
@@ -17071,6 +17280,11 @@ export function LayerlingEditor({
           setNotice(t("status.supportRibCancelled"));
           return;
         }
+        if (stencilBridgeTool) {
+          setStencilBridgeTool(null);
+          setNotice(t("status.stencilBridgesCancelled"));
+          return;
+        }
         if (deleteFaceTool) {
           // While the faces are being deleted Esc waits, so a refusal still reaches the panel.
           if (deleteFaceTool.busy) return;
@@ -17374,6 +17588,7 @@ export function LayerlingEditor({
     holePatternTool,
     faceTool,
     supportRibTool,
+    stencilBridgeTool,
     deleteFaceTool,
     applyDeleteFaceTool,
     surfaceFacePick,
@@ -17541,6 +17756,10 @@ export function LayerlingEditor({
         items.push({ key: "supportRib", label: t("supportRib.title"), onSelect: toggleSupportRib });
       }
     }
+    // A plate with text cut through, grouped or with the text beside it as a hole (Discussion #1438).
+    if (!bodyHeld && selectedShapes.some((shape) => !shape.hole) && selectedShapes.every((shape) => !isNonSolidShape(shape))) {
+      items.push({ key: "stencilBridges", label: t("stencilBridges.title"), onSelect: toggleStencilBridges });
+    }
     // Align from the menu at the pointer (Discussion #1275): with two or more parts, as the L key; locked parts stay put as there.
     const canAlign = selectedShapes.length >= 2 && !allLocked;
     if (canAlign) items.push({ key: "align", label: t("editor.tool.align"), shortcut: "L", separated: true, onSelect: toggleAlignMode });
@@ -17687,6 +17906,9 @@ export function LayerlingEditor({
         faceToolActive={Boolean(faceTool)}
         onSupportRib={toggleSupportRib}
         supportRibActive={Boolean(supportRibTool)}
+        onStencilBridges={toggleStencilBridges}
+        stencilBridgesActive={Boolean(stencilBridgeTool)}
+        canStencilBridges={selectedShapes.length > 0 && selectedShapes.every((shape) => !bodyLocked(shape) && !isNonSolidShape(shape)) && selectedShapes.some((shape) => !shape.hole)}
         canFaceTool={selectedShapes.length === 1 && Boolean(selectedShape && !bodyLocked(selectedShape) && !selectedShape.hole && !isNonSolidShape(selectedShape))}
         onGroup={groupSelected}
         onBundle={bundleSelected}
@@ -18326,6 +18548,23 @@ export function LayerlingEditor({
             supportRibPickRunRef.current += 1;
             setSupportRibTool(null);
             setNotice(t("status.supportRibCancelled"));
+          }}
+        />
+      ) : null}
+      {stencilBridgeTool && selectedShape ? (
+        <StencilBridgePanel
+          targetName={stencilBridgeTool.sourceIds.length === 1 ? displayShapeName(selectedShape) : t("stencilBridges.selection", { count: stencilBridgeTool.sourceIds.length })}
+          settings={stencilBridgeTool.settings}
+          workspace={workspaceSettings}
+          plan={stencilBridgePreview?.plan ?? null}
+          bridgeCount={stencilBridgePreview?.bridges.length ?? 0}
+          replaced={stencilBridgePreview?.replaced ?? 0}
+          busy={stencilBridgeTool.busy}
+          onChange={changeStencilBridgeSettings}
+          onApply={() => void applyStencilBridges()}
+          onCancel={() => {
+            setStencilBridgeTool(null);
+            setNotice(t("status.stencilBridgesCancelled"));
           }}
         />
       ) : null}

@@ -1,6 +1,16 @@
 [
   {
     "title": {
+      "de": "Schablonenstege",
+      "en": "Stencil bridges"
+    },
+    "body": {
+      "de": "Schneidest du Text durch eine Platte, fällt beim Druck die Mitte von o, a und b heraus. Das neue Werkzeug „Schablonenstege“ hält sie mit kleinen Stegen an der Platte. Breite, Anzahl und Höhe stellst du ein, niedrigere Stege sitzen unten, in der Mitte oder oben. Jeder Steg ist ein normaler Quader, den du verschieben oder löschen kannst.",
+      "en": "Cut text through a plate and the middle of o, a and b falls out of the print. The new Stencil bridges tool holds it to the plate with small bridges. You set their width, number and height, and lower bridges sit at the bottom, in the middle or at the top. Each bridge is an ordinary box you can move or delete."
+    }
+  },
+  {
+    "title": {
       "de": "Pfeile für X und Y",
       "en": "Arrows for X and Y"
     },

@@ -77,6 +77,17 @@ Iz tega sledi:
 
 Za napise na stranski ploskvi najprej položi delovno ravnino na to ploskev, glej [Pogled in delovna ravnina](chapter:pogled-in-delovna-ravnina).
 
+## Šablone: mostički za sredino črk
+
+Ko besedilo izrežeš skozi ploščo, črke, kot so O, A in B, izgubijo sredino: ohlapno leži v črki in izpade. {{ui:stencilBridges.title}} jo z majhnimi mostički drži na plošči, kot pri šabloni.
+
+1. Besedilo preklopi na {{ui:inspector.hole}}, naj gre skozi ploščo, in izberi oboje, združeno ali ne.
+2. Klikni {{ui:stencilBridges.title}} v skupini {{ui:editor.group.modify}} na traku, desno klikni izbor ali ga poišči z [[Ctrl]]+[[K]]. Mostički se oranžno pokažejo tam, kamor pridejo.
+3. Nastavi {{ui:stencilBridges.width}} in {{ui:stencilBridges.count}}. {{ui:stencilBridges.height}} se začne pri debelini plošče; nižji mostički so poravnani s spodnjo stranjo, na sredini ali poravnani z zgornjo stranjo plošče, kot pove {{ui:stencilBridges.position}}. Pri šabloni za razpršilno barvo mostički zgoraj pod seboj pustijo prostor za barvo.
+4. {{ui:stencilBridges.apply}} združi mostičke s ploščo.
+
+Vsak mostiček je navaden kvader: odpri skupino, da enega premakneš, izbrišeš ali dodaš svojega. Če besedilo pozneje spremeniš, izberi skupino in znova klikni {{ui:stencilBridges.title}}; novi mostički nadomestijo stare. Besedilo, ki je le vgravirano in ne gre skozi, ne dobi mostičkov, saj tam nič ne izpade. Za laser ali risalnik izvoz DXF in SVG doda enake mostičke, glej [Datoteke, shranjevanje in deljenje](chapter:datoteke-in-shranjevanje).
+
 ## Kontura, silhueta in širše
 
 Besedila ni treba zgraditi kot napolnjene črke. {{ui:prop.textFill}} v lastnostih ponuja isto izbiro kot Tinkercad:

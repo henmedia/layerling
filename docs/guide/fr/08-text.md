@@ -77,6 +77,17 @@ Donc:
 
 Pour lettrage sur une face latérale, placez d'abord le plan de travail sur cette face, voir [Vue et plan de travail](chapter:view-and-workplane).
 
+## Pochoirs : des ponts pour le centre des lettres
+
+Découpées à travers une plaque, les lettres comme O, A et B perdent leur centre : il reste libre dans la lettre et tombe. {{ui:stencilBridges.title}} le retient à la plaque par de petits ponts, comme sur un pochoir.
+
+1. Basculez le texte sur {{ui:inspector.hole}}, faites-lui traverser la plaque et sélectionnez les deux, regroupés ou non.
+2. Cliquez sur {{ui:stencilBridges.title}} dans le groupe {{ui:editor.group.modify}} du ruban, faites un clic droit sur la sélection ou trouvez-le avec [[Ctrl]]+[[K]]. Les ponts apparaissent en orange là où ils seront.
+3. Réglez {{ui:stencilBridges.width}} et {{ui:stencilBridges.count}}. {{ui:stencilBridges.height}} commence à l'épaisseur de la plaque ; des ponts plus bas se placent au ras du dessous, au milieu ou au ras du dessus de la plaque, selon {{ui:stencilBridges.position}}. Sur un pochoir pour peinture en bombe, des ponts en haut laissent passer la peinture dessous.
+4. {{ui:stencilBridges.apply}} regroupe les ponts avec la plaque.
+
+Chaque pont est une boîte ordinaire : ouvrez le groupe pour en déplacer un, en supprimer un ou ajouter le vôtre. Si vous modifiez le texte plus tard, sélectionnez le groupe et cliquez à nouveau sur {{ui:stencilBridges.title}} ; de nouveaux ponts remplacent les anciens. Un texte seulement gravé, qui ne traverse pas, ne reçoit aucun pont, car rien ne tombe. Pour un laser ou un traceur, les exports DXF et SVG ajoutent les mêmes ponts, voir [Fichiers, sauvegarde et partage](chapter:files-and-saving).
+
 ## Contour, silhouette et plus large
 
 Un texte n'a pas besoin d'être construit sous forme de lettres remplies. {{ui:prop.textFill}} dans les propriétés propose le même choix que Tinkercad :

@@ -79,6 +79,17 @@ So:
 
 For lettering on a side face, first put the workplane on that face, see [View and workplane](chapter:view-and-workplane).
 
+## Stencils: bridges for the middle of letters
+
+Cut through a plate, letters like O, A and B lose their middle: it lies loose inside the letter and falls out. {{ui:stencilBridges.title}} holds it to the plate with small bridges, as on a stencil.
+
+1. Switch the text to {{ui:inspector.hole}}, let it reach through the plate and select both, grouped or not.
+2. Click {{ui:stencilBridges.title}} in the {{ui:editor.group.modify}} group of the ribbon, right-click the selection, or find it with [[Ctrl]]+[[K]]. The bridges show in orange where they will go.
+3. Set {{ui:stencilBridges.width}} and {{ui:stencilBridges.count}}. {{ui:stencilBridges.height}} starts at the plate's thickness; lower bridges sit flush with the bottom, in the middle or flush with the top of the plate, as {{ui:stencilBridges.position}} says. On a spray stencil, bridges at the top leave room under them for the paint.
+4. {{ui:stencilBridges.apply}} groups the bridges with the plate.
+
+Each bridge is an ordinary box: open the group to move one, delete one or add one of your own. If you change the text later, select the group and click {{ui:stencilBridges.title}} again; new bridges take the place of the old ones. A text that is engraved and does not go through gets no bridges, as nothing falls out there. For a laser or a plotter, the DXF and SVG export add the same bridges, see [Files, saving and sharing](chapter:files-and-saving).
+
 ## Outline, silhouette and wider
 
 A text need not be built as filled letters. {{ui:prop.textFill}} in the properties offers the same choice as Tinkercad:

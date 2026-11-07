@@ -79,6 +79,17 @@ Zatem:
 
 Aby umieścić napis na bocznej ścianie, najpierw połóż na niej płaszczyznę roboczą, zobacz [Widok i płaszczyzna robocza](chapter:view-and-workplane).
 
+## Szablony: mostki dla środka liter
+
+Po przecięciu płyty litery takie jak O, A i B tracą środek: leży luźno w literze i wypada. {{ui:stencilBridges.title}} utrzymuje go przy płycie małymi mostkami, jak w szablonie.
+
+1. Przełącz tekst na {{ui:inspector.hole}}, niech przechodzi przez płytę, i zaznacz oba obiekty, zgrupowane lub nie.
+2. Kliknij {{ui:stencilBridges.title}} w grupie {{ui:editor.group.modify}} na wstążce, kliknij prawym przyciskiem zaznaczenie albo znajdź to przez [[Ctrl]]+[[K]]. Mostki pojawiają się na pomarańczowo tam, gdzie będą.
+3. Ustaw {{ui:stencilBridges.width}} i {{ui:stencilBridges.count}}. {{ui:stencilBridges.height}} zaczyna się od grubości płyty; niższe mostki leżą równo z dołem, pośrodku albo równo z górą płyty, zgodnie z {{ui:stencilBridges.position}}. W szablonie do malowania sprayem mostki u góry zostawiają pod sobą miejsce na farbę.
+4. {{ui:stencilBridges.apply}} grupuje mostki z płytą.
+
+Każdy mostek to zwykły prostopadłościan: otwórz grupę, aby jakiś przesunąć, usunąć albo dodać własny. Jeśli później zmienisz tekst, zaznacz grupę i kliknij ponownie {{ui:stencilBridges.title}}; nowe mostki zajmą miejsce starych. Tekst tylko grawerowany, który nie przechodzi na wylot, nie dostaje mostków, bo nic tam nie wypada. Dla lasera lub plotera eksport DXF i SVG dodaje te same mostki, zobacz [Pliki, zapis i udostępnianie](chapter:files-and-saving).
+
 ## Kontur, sylwetka i poszerzenie
 
 Tekst nie musi być budowany jako wypełnione litery. {{ui:prop.textFill}} we właściwościach oferuje ten sam wybór co Tinkercad:

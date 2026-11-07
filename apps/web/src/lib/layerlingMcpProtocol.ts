@@ -110,6 +110,7 @@ export type LayerlingMcpCommandName =
   | "push_face"
   | "paint_object"
   | "support_rib"
+  | "stencil_bridges"
   | "scale_objects"
   | "mate_faces"
   | "open_group"

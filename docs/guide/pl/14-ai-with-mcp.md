@@ -103,6 +103,7 @@ AI pracuje tymi samymi funkcjami co Ty, tą samą drogą co Twoja praca w edytor
 | `layerling_push_face` | wypycha płaską ścianę na zewnątrz albo wycina w niej kieszeń, z odsunięciem od krawędzi i promieniem narożników. Nowa część to bryła ze szkicu zgrupowana z bryłą albo, z `separate`, osobna wolna bryła |
 | `layerling_paint` | maluje części bryły własnymi kolorami do druku w wielu kolorach (Malowanie): wypełnienie ściany do ostrych krawędzi, okrągła plama albo lasso w płaskim widoku; gumka, usuń wszystko; zapisywane z bryłą i zapisywane w 3MF jako pomalowane ściany |
 | `layerling_support_rib` | stawia cienkie żebro podporowe pod dolną ścianą części drukowanej pochyloną na krawędzi, z mostkami o wysokości jednej warstwy (Żebro podporowe) |
+| `layerling_stencil_bridges` | utrzymuje części płyty z tekstem wyciętym na wylot, które by wypadły, mostkami zgrupowanymi z płytą, o podanej szerokości i wysokości (Mostki szablonu) |
 | `layerling_mate_faces` | przykłada ścianę jednego obiektu do ściany drugiego, ściana do ściany, na równo albo dwie okrągłe ściany na jednej osi |
 | `layerling_open_group` | otwiera grupę, żeby zmieniać jej części po kolei, także grupę wewnątrz otwartej |
 | `layerling_close_group` | zamyka ją z powrotem („Gotowe”) albo anuluje |
