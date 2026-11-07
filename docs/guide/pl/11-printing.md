@@ -60,6 +60,8 @@ Część drukowana pochylona na krawędzi, na przykład pod kątem 45°, często
 
 Żebro jest bryłą siatkową: żeby je zmienić, usuń je i utwórz ponownie. Każde kliknięcie tworzy jedno żebro; po kolejne kliknij {{ui:supportRib.repick}} albo powtórz je przez {{ui:editor.tool.array}}. Żebro nie może nigdzie wchodzić w część, a część musi stać na stole - inaczej okno powie dlaczego. Ustawienia zostają w tej przeglądarce na następne żebro.
 
+{{ui:clearance.title}} i {{ui:printCheck.title}} znają żebro: to, że jego mostki wchodzą w część, a żebro i mostki są cienkie i leżą na wysokości jednej warstwy nad szczeliną, jest zamierzone i nie jest zgłaszane. Żebro utworzone w layerling 1.148.0 nie ma jeszcze tego oznaczenia; utwórz je ponownie, a sprawdzenia je pominą.
+
 ## Grubość ścianek, luz i fazki
 
 - Ścianki powinny mieć szerokość co najmniej dwóch ścieżek, czyli 0,8 mm przy dyszy 0,4 mm. Solidne części potrzebują od 1,2 do 2 mm.

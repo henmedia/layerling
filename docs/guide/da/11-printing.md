@@ -60,6 +60,8 @@ En del, der printes skråt på en kant, for eksempel ved 45°, behøver ofte ing
 
 Ribben er en mesh-form: for at ændre den sletter du den og laver den igen. Hvert klik laver én ribbe; for flere klik {{ui:supportRib.repick}} eller gentag den med {{ui:editor.tool.array}}. Ribben må ingen steder gå ind i delen, og delen skal stå på pladen - ellers siger vinduet hvorfor. Dine indstillinger gemmes i denne browser til den næste ribbe.
 
+{{ui:clearance.title}} og {{ui:printCheck.title}} kender ribben: at dens broer går ind i delen, og at ribben og broerne er tynde og ligger ét lag høje over spalten, er meningen og meldes ikke. En ribbe lavet med layerling 1.148.0 har ikke dette mærke endnu; lav den igen, så springer kontrollerne den over.
+
 ## Vægtykkelse, frirum og faser
 
 - Vægge bør være mindst to ekstruderingslinjer brede, så 0,8 mm med en 0,4 mm dyse. Robuste dele har brug for 1,2 til 2 mm.

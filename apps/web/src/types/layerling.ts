@@ -1563,6 +1563,12 @@ export type WorkplaneShape = {
    */
   groupOperation?: "group" | "intersection" | "hull" | "bundle" | "loft";
   /**
+   * A support rib (Discussion #1385) keeps the id of the part it holds, as it was before any grouping
+   * (localIdBase): its bridges are meant to reach into that part and to be thin, so the clearance and print
+   * checks leave them out. See lib/supportRib.
+   */
+  supportRibFor?: string;
+  /**
    * The point this body turns about, kept with the body: a fraction of its
    * width, height and depth from its centre, in its own frame, so it moves,
    * turns and scales with it. See lib/rotationPivot.

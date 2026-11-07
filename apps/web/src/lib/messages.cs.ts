@@ -1007,6 +1007,7 @@ export const MESSAGES_CS: Record<MessageKey, string> = {
   "lid.error.endPlugsFlush": "Koncové zátky jdou jen se zapuštěným pantem.",
   "lid.error.endPlugsShort": "Kloubky na koncích jsou na koncové zátky příliš krátké: každý potřebuje aspoň 3,5 mm. Vezměte méně kloubků.",
   "status.lidMadeHingeFlushPlugs": "Víko hotovo ({type}) se zapuštěným pantem: {count} kloubků ve stěně, otvor pro čep {pin} mm dlouhý {length} mm a dvě koncové zátky, které ho uzavírají. Víko a zátky leží vedle těla, připravené k tisku.",
+  "status.lidMadeHingeFlushCorners": "Víko hotovo ({type}) se zapuštěným pantem: {count} kloubků ve stěně, krajní vyplňují zaoblené rohy, a otvor pro čep {pin} mm dlouhý {length} mm. Víko leží obrácené vedle těla, připravené k tisku.",
   "lid.error.hingeLidType": "Pant jde jen s vkládacím nebo plochým víkem: okraj kolem dokola by při otevírání narazil do zadní stěny.",
   "lid.error.hingeNoBack": "Na zvolené straně není místo pro tři kloubky: je příliš krátká nebo příliš zakřivená.",
   "lid.error.hingeTooLow": "Tělo je na pant příliš nízké: pod kloubky je potřeba místo pro jejich šikminu. Vezměte tenčí čep nebo vyšší tělo.",

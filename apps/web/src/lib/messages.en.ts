@@ -864,6 +864,7 @@ export const MESSAGES_EN = {
   "lid.error.endPlugsFlush": "End plugs go only with a flush hinge.",
   "lid.error.endPlugsShort": "The knuckles at the ends are too short for end plugs: each needs at least 3.5 mm. Take fewer knuckles.",
   "status.lidMadeHingeFlushPlugs": "Lid made ({type}) with a flush hinge: {count} knuckles in the wall, a hole for a {pin} mm pin {length} mm long, and two end plugs that close it. The lid and the plugs lie beside the body, ready to print.",
+  "status.lidMadeHingeFlushCorners": "Lid made ({type}) with a flush hinge: {count} knuckles in the wall, the end ones filling the rounded corners, and a hole for a {pin} mm pin {length} mm long. The lid lies turned over beside the body, ready to print.",
   "lid.error.hingeLidType": "A hinge goes only with a lid that pushes in or a flat one: a rim round the outside would hit the back wall as the lid swings open.",
   "lid.error.hingeNoBack": "The side picked has no room for three knuckles: it is too short, or too sharply curved.",
   "lid.error.hingeTooLow": "The body is too low for the hinge: below the knuckles it needs room for their slope. Take a thinner pin or a taller body.",

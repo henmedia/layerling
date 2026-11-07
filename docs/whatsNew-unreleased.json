@@ -2,11 +2,33 @@
   {
     "title": {
       "de": "Sicherungen in einen eigenen Ordner",
-      "en": "Backups into a folder of your own"
+      "en": "Backups into a folder of your own",
+      "da": "Sikkerhedskopier ind i en mappe af eget valg"
     },
     "body": {
       "de": "In Chrome und Edge fragen „Alle sichern“, „Sichern“ und „Eigene Formen sichern“ jetzt, wohin die ZIP-Datei soll, und merken sich den Ordner für das nächste Mal – etwa einen Ordner auf deinem Cloud-Laufwerk statt der Downloads. Andere Browser laden die Sicherung wie bisher herunter.",
-      "en": "In Chrome and Edge, \"Back up all\", \"Back up\" and \"Back up custom shapes\" now ask where the ZIP file should go, and remember the folder for next time - a folder on your cloud drive, say, instead of Downloads. Other browsers download the backup as before."
+      "en": "In Chrome and Edge, \"Back up all\", \"Back up\" and \"Back up custom shapes\" now ask where the ZIP file should go, and remember the folder for next time - a folder on your cloud drive, say, instead of Downloads. Other browsers download the backup as before.",
+      "da": "I Chrome og Edge spørger „Sikkerhedskopiér alle“, „Sikkerhedskopiér“ og „Sikkerhedskopiér egne former“ nu, hvor ZIP-filen skal ligge, og husker mappen til næste gang, for eksempel en mappe på dit clouddrev i stedet for Downloads. Andre browsere henter sikkerhedskopien som før."
+    }
+  },
+  {
+    "title": {
+      "de": "Stützrippe ohne falsche Warnungen",
+      "en": "Support rib without false warnings"
+    },
+    "body": {
+      "de": "„Spiel prüfen“ und „Druck prüfen“ kennen die Stützrippe jetzt: Dass ihre Brücken ins Teil reichen und dass Rippe und Brücken dünn sind, ist gewollt und wird nicht mehr gemeldet. Eine Rippe aus 1.148.0 legst du dafür einmal neu an.",
+      "en": "Check clearance and Print check now know the support rib: its bridges reaching into the part, and the rib and its bridges being thin, are meant to be so and no longer reported. A rib made with 1.148.0 needs making again once for this."
+    }
+  },
+  {
+    "title": {
+      "de": "Fase und Rundung an verschachtelten Gruppen",
+      "en": "Chamfer and fillet on nested groups"
+    },
+    "body": {
+      "de": "Bei manchen Gruppen meldete das Kantenwerkzeug „Der gruppierte Körper ließ sich nicht zu gültiger Geometrie reparieren“, bevor sich eine einzige Kante wählen ließ – etwa bei einem Gehäuse mit einem aus einem Netz exakt gemachten Teil darin. Solche Gruppen lassen sich jetzt anfasen und abrunden. Gruppen, die schon gingen, bleiben, wie sie waren.",
+      "en": "With some groups the edge tool said \"The grouped body could not be repaired into valid geometry\" before a single edge could be picked - an enclosure with a part made exact from a mesh in it, say. Such groups can now be chamfered and filleted. Groups that worked already stay as they were."
     }
   }
 ]

@@ -60,6 +60,8 @@ Una pieza impresa inclinada sobre una arista, a 45° por ejemplo, a menudo no ne
 
 El nervio es un cuerpo de malla: para cambiarlo, bórralo y vuelve a hacerlo. Cada clic hace un nervio; para más, haz clic en {{ui:supportRib.repick}} o repítelo con {{ui:editor.tool.array}}. El nervio no debe entrar en la pieza por ningún lado y la pieza debe estar sobre la cama; si no, la ventana dice por qué. Tus ajustes se guardan en este navegador para el siguiente nervio.
 
+{{ui:clearance.title}} y {{ui:printCheck.title}} conocen el nervio: que sus puentes entren en la pieza y que el nervio y sus puentes sean finos y crucen el hueco a una capa de altura es intencionado y no se avisa. Un nervio hecho con layerling 1.148.0 todavía no lleva esta marca; vuelve a hacerlo y las comprobaciones lo dejarán fuera.
+
 ## Grosor de pared, holgura y chaflanes
 
 - Las paredes deberían tener como mínimo dos líneas de extrusión de ancho, es decir, 0,8 mm con una boquilla de 0,4 mm. Las piezas resistentes necesitan de 1,2 a 2 mm.

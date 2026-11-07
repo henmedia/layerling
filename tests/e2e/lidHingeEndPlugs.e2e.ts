@@ -233,7 +233,7 @@ describe("end plugs for a flush hinge (Discussion #1387, real Manifold kernel)",
         }
       }
       // Round the axis, from the round in to past the plugs, the box and the plugs fill all but the play: no room cut
-      // round the axis in the corners any more (without plugs, all of it is empty).
+      // round the axis in the corners (without plugs, the pin's hole runs on through them).
       const outline = kernel.CrossSection.square([48, 28], true).offset(6, "Round", 2, 64);
       const column = outline.extrude(32).rotate([-90, 0, 0]);
       created.push(outline, column);

@@ -2,6 +2,7 @@ import type { ManifoldToplevel } from "manifold-3d";
 import type { PerforableFace } from "@/lib/holePatternShapes";
 import { clearanceMeshShape } from "@/lib/clearanceCheck";
 import { shapeToManifoldSolid } from "@/lib/editorBooleans";
+import { supportRibMark } from "@/lib/supportRibMark";
 import type { ManifoldSolid } from "@/lib/editorMeshCore";
 import type { WorkplaneShape } from "@/types/layerling";
 
@@ -352,9 +353,10 @@ export function buildSupportRib(runtime: ManifoldToplevel, face: SupportRibFace,
   }
 }
 
-/** The rib as a body of the design. */
-export function supportRibShape(id: string, name: string, color: string, positions: ArrayLike<number>): WorkplaneShape | null {
-  return clearanceMeshShape(id, name, color, positions);
+/** The rib as a body of the design, marked with its part for the checks (lib/supportRibMark). */
+export function supportRibShape(id: string, name: string, color: string, positions: ArrayLike<number>, partId?: string): WorkplaneShape | null {
+  const shape = clearanceMeshShape(id, name, color, positions);
+  return shape && partId ? { ...shape, ...supportRibMark(partId) } : shape;
 }
 
 const SUPPORT_RIB_SETTINGS_KEY = "layerling.supportRib";

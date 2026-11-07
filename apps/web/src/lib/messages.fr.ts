@@ -854,6 +854,7 @@ export const MESSAGES_FR: Partial<Record<MessageKey, string>> = {
   "lid.error.endPlugsFlush": "Les bouchons d'extrémité ne vont qu'avec une charnière affleurante.",
   "lid.error.endPlugsShort": "Les nœuds aux extrémités sont trop courts pour des bouchons : chacun doit faire au moins 3,5 mm. Prenez moins de nœuds.",
   "status.lidMadeHingeFlushPlugs": "Couvercle créé ({type}) avec une charnière affleurante : {count} nœuds dans la paroi, un trou pour un axe de {pin} mm long de {length} mm, et deux bouchons d'extrémité qui le ferment. Le couvercle et les bouchons sont posés à côté du corps, prêts à imprimer.",
+  "status.lidMadeHingeFlushCorners": "Couvercle créé ({type}) avec une charnière affleurante : {count} nœuds dans la paroi, ceux des bouts remplissant les coins arrondis, et un trou pour un axe de {pin} mm long de {length} mm. Le couvercle est posé retourné à côté du corps, prêt à imprimer.",
   "lid.error.hingeLidType": "Une charnière ne va qu'avec un couvercle emboîté ou plat : un rebord tout autour heurterait la paroi arrière à l'ouverture.",
   "lid.error.hingeNoBack": "Le côté choisi n'a pas la place pour trois nœuds : il est trop court ou trop courbé.",
   "lid.error.hingeTooLow": "Le corps est trop bas pour la charnière : sous les nœuds, il faut de la place pour leur pente. Prenez un axe plus fin ou un corps plus haut.",

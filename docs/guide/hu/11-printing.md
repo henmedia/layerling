@@ -58,6 +58,8 @@ Egy élére döntve, például 45°-ban nyomtatott alkatrésznek gyakran nem kel
 
 A borda hálós test: módosításához töröld, és készítsd el újra. Minden kattintás egy bordát készít; továbbiakhoz kattints a {{ui:supportRib.repick}} gombra, vagy ismételd meg az {{ui:editor.tool.array}} eszközzel. A borda sehol sem futhat bele az alkatrészbe, és az alkatrésznek a tálcán kell állnia - különben az ablak megmondja, miért nem megy. A beállításaidat ez a böngésző megjegyzi a következő bordához.
 
+A {{ui:clearance.title}} és a {{ui:printCheck.title}} ismeri a bordát: hogy a hídjai belenyúlnak az alkatrészbe, és hogy a borda és a hidak vékonyak, és egy rétegnyi magasan ívelnek át a résen, szándékos, és nem jelzik. A layerling 1.148.0-ban készült borda még nem hordozza ezt a jelölést; készítsd el újra, és az ellenőrzések kihagyják.
+
 ## Falvastagság, hézag és letörések
 
 - A falak legyenek legalább két extrudálási vonal szélesek, vagyis 0,4 mm-es fúvókánál 0,8 mm. Az erős alkatrészeknek 1,2–2 mm kell.

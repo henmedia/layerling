@@ -60,6 +60,8 @@ A part printed tilted on one edge, at 45° say, often needs no supports: its fac
 
 The rib is a mesh body: to change it, delete it and make it again. Each click makes one rib; for more, click {{ui:supportRib.repick}} or repeat it with {{ui:editor.tool.array}}. The rib must not run into the part anywhere, and the part must stand on the plate - otherwise the window says why. Your settings are kept in this browser for the next rib.
 
+{{ui:clearance.title}} and {{ui:printCheck.title}} know the rib: that its bridges reach into the part, and that the rib and its bridges are thin and lie one layer high across the gap, is meant to be so and is not reported. A rib made with layerling 1.148.0 does not carry this mark yet; make it again and the checks leave it out.
+
 ## Wall thickness, clearance and chamfers
 
 - Walls should be at least two extrusion lines wide, so 0.8 mm with a 0.4 mm nozzle. Sturdy parts need 1.2 to 2 mm.

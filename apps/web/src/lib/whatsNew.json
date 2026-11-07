@@ -5,141 +5,169 @@
       {
         "title": {
           "de": "Körper bemalen für den Mehrfarbdruck",
-          "en": "Paint a body for printing in several colours"
+          "en": "Paint a body for printing in several colours",
+          "da": "Mal en krop til print i flere farver"
         },
         "body": {
           "de": "„Bemalen“ unter „Ändern“, gleich neben der Oberfläche, färbt Teile eines Körpers direkt im Entwurf: „Füllen“ füllt eine Fläche bis an ihre scharfen Kanten, „Kreis“ setzt einen runden Fleck, „Lasso“ bemalt, was du in einem umfahrenen Bereich siehst. Der Radierer nimmt Farbe wieder ab. 3MF und OBJ bringen die Farben in Bambu Studio, OrcaSlicer und PrusaSlicer, ohne dass du im Slicer neu malen musst.",
-          "en": "\"Paint\" under Modify, next to Surface texture, colours parts of a body right in the design: \"Fill\" fills a face up to its sharp edges, \"Circle\" lays a round patch, \"Lasso\" paints what you see inside a shape you draw. The eraser takes paint off again. 3MF and OBJ bring the colours to Bambu Studio, OrcaSlicer and PrusaSlicer, with no painting again in the slicer."
+          "en": "\"Paint\" under Modify, next to Surface texture, colours parts of a body right in the design: \"Fill\" fills a face up to its sharp edges, \"Circle\" lays a round patch, \"Lasso\" paints what you see inside a shape you draw. The eraser takes paint off again. 3MF and OBJ bring the colours to Bambu Studio, OrcaSlicer and PrusaSlicer, with no painting again in the slicer.",
+          "da": "„Mal“ under „Modificér“, lige ved siden af Overfladestruktur, farver dele af en krop direkte i designet: „Fyld“ fylder en flade ud til dens skarpe kanter, „Cirkel“ lægger en rund plet, „Lasso“ maler det, du ser inden i en form, du tegner. Viskelæderen tager malingen af igen. 3MF og OBJ bringer farverne videre til Bambu Studio, OrcaSlicer og PrusaSlicer, uden at du maler igen i sliceren."
         }
       },
       {
         "title": {
           "de": "Stützrippe für schräg gedruckte Teile",
-          "en": "A support rib for parts printed tilted"
+          "en": "A support rib for parts printed tilted",
+          "da": "Støtteribbe til dele, der printes skråt"
         },
         "body": {
           "de": "Ein Teil schräg auf einer Kante drucken, ohne die Stützen des Slicers: „Stützrippe“ unter „Ändern“, die untere Fläche anklicken, und eine dünne Rippe steht mit etwas Abstand darunter auf einem ovalen Fuß. Winzige Brücken von genau einer Schicht halten das Teil und lassen sich danach abbrechen. Düse und Schichten stellst du wie im Slicer ein.",
-          "en": "Print a part tilted on one edge without the slicer's supports: \"Support rib\" under Modify, click the lower face, and a thin rib stands under it a gap away, on an oval foot. Tiny bridges exactly one layer high hold the part and break off afterwards. Set the nozzle and the layers as in your slicer."
+          "en": "Print a part tilted on one edge without the slicer's supports: \"Support rib\" under Modify, click the lower face, and a thin rib stands under it a gap away, on an oval foot. Tiny bridges exactly one layer high hold the part and break off afterwards. Set the nozzle and the layers as in your slicer.",
+          "da": "Print en del skråt på én kant uden slicerens støtter: „Støtteribbe“ under „Modificér“, klik på den nederste flade, så står en tynd ribbe under den med lidt afstand, på en oval fod. Små broer på præcis ét lag holder delen og brækkes af bagefter. Sæt dysen og lagene som i din slicer."
         }
       },
       {
         "title": {
           "de": "Schraubdeckel für runde Dosen",
-          "en": "Screw lids for round boxes"
+          "en": "Screw lids for round boxes",
+          "da": "Skruelåg til runde krukker"
         },
         "body": {
           "de": "Das Deckel-Werkzeug hat die neue Art „Aufgeschraubt“: Der Körper bekommt oben außen ein Gewinde, der Deckel dasselbe innen im Rand, wie bei einem Schraubglas. Die Flanken stehen auf 45°, so druckt beides ohne Stützen. Gewindesteigung und Umdrehungen stellst du ein, das Spiel kommt von deinem Drucker. Für Zylinder, Rohre und runde Töpfe.",
-          "en": "The Lid tool has a new kind, \"Screw on\": the body gets a thread on the outside of its top and the lid the same one inside its rim, as on a jar. The flanks are at 45°, so both print without supports. Set the thread pitch and the turns; the fit comes from your printer's play. For cylinders, tubes and round pots."
+          "en": "The Lid tool has a new kind, \"Screw on\": the body gets a thread on the outside of its top and the lid the same one inside its rim, as on a jar. The flanks are at 45°, so both print without supports. Set the thread pitch and the turns; the fit comes from your printer's play. For cylinders, tubes and round pots.",
+          "da": "Lågværktøjet har en ny slags, „Skrues på“: legemet får et gevind udvendigt på sin top, og låget det samme gevind inden i sin kant, som på et syltetøjsglas. Flankerne står på 45°, så begge printes uden støtter. Sæt gevindstigning og omgange; pasningen kommer fra din printers spillerum. Til cylindre, rør og runde krukker."
         }
       },
       {
         "title": {
           "de": "Endstopfen für das bündige Scharnier",
-          "en": "End plugs for the flush hinge"
+          "en": "End plugs for the flush hinge",
+          "da": "Endepropper til det forsænkede hængsel"
         },
         "body": {
           "de": "„Endstopfen“ beim bündigen Scharnier verschließt beide Enden des Stiftlochs bündig mit der Kiste, auch an runden Ecken: Der Stift bleibt verborgen und kann nicht herausrutschen. Erst den Stift einschieben, dann die beiden quadratischen Stopfen eindrücken.",
-          "en": "\"End plugs\" on a flush hinge close both ends of the pin's hole flush with the box, also on rounded corners: the pin stays hidden and cannot slide out. Push the pin in first, then press in the two square plugs."
+          "en": "\"End plugs\" on a flush hinge close both ends of the pin's hole flush with the box, also on rounded corners: the pin stays hidden and cannot slide out. Push the pin in first, then press in the two square plugs.",
+          "da": "„Endepropper“ på et forsænket hængsel lukker begge ender af stifthullet i flugt med kassen, også på rundede hjørner: stiften bliver skjult og kan ikke glide ud. Skub stiften ind først og tryk så de to firkantede propper i."
         }
       },
       {
         "title": {
           "de": "Einstellungen in eine Datei und zurück",
-          "en": "Settings to a file and back"
+          "en": "Settings to a file and back",
+          "da": "Indstillinger til en fil og tilbage"
         },
         "body": {
           "de": "Im Einstellungsfenster speichert „Einstellungen exportieren“ Farben, Raster, Kamera, Formvorgaben, Werkzeugleiste und das Spiel jedes Druckers in eine Datei. „Einstellungen importieren“ holt sie in einem anderen Browser oder auf einem anderen Rechner zurück.",
-          "en": "In the settings window, \"Export settings\" saves the colours, grid, camera, shape defaults, toolbar and each printer's play to a file. \"Import settings\" brings them back in another browser or on another computer."
+          "en": "In the settings window, \"Export settings\" saves the colours, grid, camera, shape defaults, toolbar and each printer's play to a file. \"Import settings\" brings them back in another browser or on another computer.",
+          "da": "I indstillingsvinduet gemmer „Eksportér indstillinger“ farver, gitter, kamera, standardværdier for former, værktøjslinjen og hver printers spillerum i en fil. „Importér indstillinger“ henter dem tilbage i en anden browser eller på en anden computer."
         }
       },
       {
         "title": {
           "de": "Eigene Tasten für jeden Befehl",
-          "en": "Your own keys for any command"
+          "en": "Your own keys for any command",
+          "da": "Dine egne taster til enhver kommando"
         },
         "body": {
           "de": "Unter „Tastenkürzel“ legst du jeden Befehl der Befehlssuche auf eine eigene Taste: „Auf der Arbeitsebene zentrieren“ etwa auf Umschalt+C, die Formenauswahl auf G, deinen liebsten Zylinder auf eine weitere. Ist eine Taste schon belegt, sagt layerling, wofür.",
-          "en": "Under Keyboard shortcuts, put any command of the command search on a key of your own: Center on workplane on Shift+C, say, the shapes panel on G, your favourite cylinder on another. If a key is taken, layerling tells you what for."
+          "en": "Under Keyboard shortcuts, put any command of the command search on a key of your own: Center on workplane on Shift+C, say, the shapes panel on G, your favourite cylinder on another. If a key is taken, layerling tells you what for.",
+          "da": "Under Tastaturgenveje kan du lægge enhver kommando fra kommandosøgningen på din egen tast: „Centrér på arbejdsplan“ på Shift+C, fx, panelet med former på G, din yndlingscylinder på en tredje. Er en tast optaget, fortæller layerling, hvad den bruges til."
         }
       },
       {
         "title": {
           "de": "Ein Spiel für jeden Drucker",
-          "en": "A play for each printer"
+          "en": "A play for each printer",
+          "da": "Et spillerum for hver printer"
         },
         "body": {
           "de": "Mehrere Drucker, jeder anders eingestellt: In den Einstellungen unter „Drucker“ den Drucker wählen und darunter sein Spiel eintragen. Neue Deckel, Schwalbenschwänze, Muttern und die Verbinder beim Teilen starten dann vom Spiel des Druckers, auf den der Entwurf eingestellt ist.",
-          "en": "Several printers, each tuned differently: choose the printer under Printer in the settings and enter its play below it. New lids, dovetails, nuts and Split's connectors then start from the play of the printer the design is set to."
+          "en": "Several printers, each tuned differently: choose the printer under Printer in the settings and enter its play below it. New lids, dovetails, nuts and Split's connectors then start from the play of the printer the design is set to.",
+          "da": "Flere printere, hver indstillet for sig: vælg printeren under Printer i indstillingerne og indtast dens spillerum under den. Nye låg, svalehaler, møtrikker og samlingerne i Del starter så fra spillerummet for den printer, designet er sat til."
         }
       },
       {
         "title": {
           "de": "Neue Mikrocontroller-Boards: Pico, MEGA, ESP32",
-          "en": "New microcontroller boards: Pico, MEGA, ESP32"
+          "en": "New microcontroller boards: Pico, MEGA, ESP32",
+          "da": "Nye mikrokontroller-print: Pico, MEGA, ESP32"
         },
         "body": {
           "de": "Die Form „SBC-Board“ kennt jetzt Raspberry Pi Pico, Pico W, Pico 2 und Pico 2 W, den Arduino MEGA 2560, ESP32-DevKitC V4 und ESP32 DevKit V1 sowie die Kamera-Boards ESP32-CAM und ESP32-S3-CAM. Bei den Kameras reicht die Linse auf Wunsch durch den Deckel.",
-          "en": "The SBC board shape now knows the Raspberry Pi Pico, Pico W, Pico 2 and Pico 2 W, the Arduino MEGA 2560, the ESP32-DevKitC V4 and ESP32 DevKit V1, and the camera boards ESP32-CAM and ESP32-S3-CAM, whose lens can reach up through the lid."
+          "en": "The SBC board shape now knows the Raspberry Pi Pico, Pico W, Pico 2 and Pico 2 W, the Arduino MEGA 2560, the ESP32-DevKitC V4 and ESP32 DevKit V1, and the camera boards ESP32-CAM and ESP32-S3-CAM, whose lens can reach up through the lid.",
+          "da": "SBC-printformen kender nu Raspberry Pi Pico, Pico W, Pico 2 og Pico 2 W, Arduino MEGA 2560, ESP32-DevKitC V4 og ESP32 DevKit V1 samt kamera-printene ESP32-CAM og ESP32-S3-CAM, hvis linse kan nå op gennem låget."
         }
       },
       {
         "title": {
           "de": "Fachwerk: Holzmaserung von fein bis kräftig",
-          "en": "Half-timbering: wood grain from fine to strong"
+          "en": "Half-timbering: wood grain from fine to strong",
+          "da": "Bindingsværk: træårer fra fine til kraftige"
         },
         "body": {
           "de": "Die Holzmaserung auf den Balken ist jetzt ein Regler statt an oder aus: von 0 % (keine) über fein, wie gehobeltes Holz für kleine Maßstäbe, bis 100 %, grob wie ein rohes Brett. Bisherige Entwürfe behalten ihre Maserung.",
-          "en": "The wood grain on the beams is now a slider instead of on or off: from 0 % (none) through fine, like planed wood for small scales, to 100 %, coarse like a rough plank. Your designs keep the grain they have."
+          "en": "The wood grain on the beams is now a slider instead of on or off: from 0 % (none) through fine, like planed wood for small scales, to 100 %, coarse like a rough plank. Your designs keep the grain they have.",
+          "da": "Træårerne på bjælkerne er nu en skyder i stedet for til og fra: fra 0 % (ingen) over fine, som høvlet træ til små skalaer, til 100 %, grove som et ru bræt. Dine designs beholder de årer, de har."
         }
       },
       {
         "title": {
           "de": "Saubere Ränder bei Oberflächenmustern",
-          "en": "Clean rims on surface textures"
+          "en": "Clean rims on surface textures",
+          "da": "Rene kanter på overfladestrukturer"
         },
         "body": {
           "de": "Mit „Einblenden über“ auf 0 enden eingedrückte Muster am Rand jetzt in einer sauberen, steilen Kante statt in Fächern und Splittern. Fachwerk auf einem Quader hat ganze Ecken ohne Gruben.",
-          "en": "With \"Fade in over\" at 0, patterns pressed in now end at the rim in a clean steep wall instead of fans and splinters. Half-timbering on a box has whole corners, without pits."
+          "en": "With \"Fade in over\" at 0, patterns pressed in now end at the rim in a clean steep wall instead of fans and splinters. Half-timbering on a box has whole corners, without pits.",
+          "da": "Med „Ton ind over“ på 0 ender mønstre, der er presset ind, nu ved kanten i en ren, stejl væg i stedet for faner og splinter. Bindingsværk på en kasse får hele hjørner, uden gruber."
         }
       },
       {
         "title": {
           "de": "Mehrere Körper gleichmäßig skalieren",
-          "en": "Scale several bodies evenly"
+          "en": "Scale several bodies evenly",
+          "da": "Skalér flere legemer jævnt"
         },
         "body": {
           "de": "Skalierst du mehrere Körper zusammen bei eingeschaltetem Raster, wächst jetzt jeder um denselben Faktor. Vorher rundete jeder Körper seine Größe einzeln aufs Raster, sodass die Ebenen importierter Zeichnungen verrutschten und kleine Körper wuchsen.",
-          "en": "Scaling several bodies together with snapping on now grows each by the same factor. Before, each body rounded its size to the grid on its own, so the layers of imported drawings slipped and small bodies grew."
+          "en": "Scaling several bodies together with snapping on now grows each by the same factor. Before, each body rounded its size to the grid on its own, so the layers of imported drawings slipped and small bodies grew.",
+          "da": "Når du skalerer flere legemer sammen med snap slået til, vokser nu hvert med den samme faktor. Før rundede hvert legeme sin størrelse til gitteret på egen hånd, så lagene i importerede tegninger skred, og små legemer voksede."
         }
       },
       {
         "title": {
           "de": "Verdrehte Bündel richtig gezeichnet",
-          "en": "Twisted bundles drawn right"
+          "en": "Twisted bundles drawn right",
+          "da": "Vridne bundter tegnet rigtigt"
         },
         "body": {
           "de": "Ein verdrehtes Bündel, etwa vier Tischbeine, windet sich in der Ansicht jetzt so, wie es exportiert und gedruckt wird. Vorher zeigte es gerade Stäbe, und beim Gruppieren mit Strg+G wurden die Teile daneben größer.",
-          "en": "A twisted bundle, four table legs say, now winds round in the view as it is exported and printed. Before, it showed straight bars, and grouping it with Ctrl+G made the parts beside it grow."
+          "en": "A twisted bundle, four table legs say, now winds round in the view as it is exported and printed. Before, it showed straight bars, and grouping it with Ctrl+G made the parts beside it grow.",
+          "da": "Et vridet bundt, fire ben på et bord for eksempel, snor sig nu rundt i visningen, som det eksporteres og printes. Før viste det lige stænger, og at gruppere det med Ctrl+G fik delene ved siden af til at vokse."
         }
       },
       {
         "title": {
           "de": "Symbolschild behält seine Farben im 3MF",
-          "en": "Icon tags keep their colours in 3MF"
+          "en": "Icon tags keep their colours in 3MF",
+          "da": "Ikon-tags beholder deres farver i 3MF"
         },
         "body": {
           "de": "Ein Symbolschild in einer mehrfarbigen Gruppe, etwa mit einem QR-Code darunter, kommt in 3MF und OBJ jetzt mit den Farben seiner Schichten heraus, so wie die Ansicht es zeigt.",
-          "en": "An Icon tag in a Multicolor group, with a QR code under it say, now reaches 3MF and OBJ with its layers' colours, as the view shows it."
+          "en": "An Icon tag in a Multicolor group, with a QR code under it say, now reaches 3MF and OBJ with its layers' colours, as the view shows it.",
+          "da": "Et Ikon-tag i en Multifarve-gruppe, med en QR-kode under sig for eksempel, kommer nu i 3MF og OBJ med farverne på sine lag, som visningen viser det."
         }
       },
       {
         "title": {
           "de": "Formen-Fenster bleibt erreichbar",
-          "en": "The Shapes panel stays within reach"
+          "en": "The Shapes panel stays within reach",
+          "da": "Panelet med former bliver inden for rækkevidde"
         },
         "body": {
           "de": "Das Formen-Fenster lässt sich nicht mehr unter die Werkzeugleiste schieben, wo seine Titelleiste nicht mehr zu greifen war. Ein Fenster, das dort hängt, kommt beim Öffnen von selbst wieder hervor.",
-          "en": "The Shapes panel can no longer be dragged under the toolbar, where its title bar could not be grabbed. A panel stuck there comes back down by itself when it opens."
+          "en": "The Shapes panel can no longer be dragged under the toolbar, where its title bar could not be grabbed. A panel stuck there comes back down by itself when it opens.",
+          "da": "Panelet med former kan ikke længere trækkes ind under værktøjslinjen, hvor dens titellinje ikke kunne gribes. Et panel, der sidder fast der, kommer selv ned igen, når det åbnes."
         }
       }
     ]
@@ -150,71 +178,85 @@
       {
         "title": {
           "de": "Lochmuster rund um einen Zylinder",
-          "en": "Hole patterns round a cylinder"
+          "en": "Hole patterns round a cylinder",
+          "da": "Hulmønstre rundt om en cylinder"
         },
         "body": {
           "de": "Das Lochmuster nimmt jetzt auch die runde Wand eines Zylinders, Rohrs oder einer Bohrung: Wand anklicken, und die Löcher gehen in Reihen ganz herum, jedes zeigt auf die Achse. Gut für Stiftebecher, Lampenschirme und Rohre mit Lüftung. „Durch die Wand“ schneidet nur die angeklickte Wand.",
-          "en": "The hole pattern now also takes the round wall of a cylinder, tube or bore: click the wall, and the holes go all the way round in rows, each pointing at the axis. Good for pen holders, lamp shades and tubes with vents. \"Through the wall\" cuts only the wall you clicked."
+          "en": "The hole pattern now also takes the round wall of a cylinder, tube or bore: click the wall, and the holes go all the way round in rows, each pointing at the axis. Good for pen holders, lamp shades and tubes with vents. \"Through the wall\" cuts only the wall you clicked.",
+          "da": "Hulmønsteret tager nu også den runde væg på en cylinder, et rør eller en boring: klik på væggen, og hullerne går hele vejen rundt i rækker, hvert pegende mod aksen. Godt til penneholdere, lampeskærme og rør med udluftninger. „Gennem væggen“ skærer kun den væg, du klikkede."
         }
       },
       {
         "title": {
           "de": "Teilen mit Dübeln oder Zapfen",
-          "en": "Split with dowels or plugs"
+          "en": "Split with dowels or plugs",
+          "da": "Del med dyvler eller tappe"
         },
         "body": {
           "de": "Wenn du ein zu großes Teil teilst, setzt das Fenster „Teilen“ unter „Verbinder“ jetzt auf Wunsch Dübel oder Zapfen, die die Hälften wieder genau zusammenführen: „Dübel“ macht in jede Hälfte ein Loch und legt lose Stifte daneben, „Zapfen“ stellt runde Zapfen auf eine Hälfte und ihre Löcher in die andere. Ringe auf der Schnittebene zeigen vorher, wo sie hinkommen, und das Spiel folgt dem Spiel deines Druckers.",
-          "en": "When you split a part that is too big, \"Connectors\" in the Split panel can now add dowels or plugs that line the halves up again: \"Dowels\" makes a hole in each half and lays loose pins beside them, \"Plugs\" puts round pegs on one half and their holes in the other. Rings on the plane show where they go first, and the fit follows your printer's play."
+          "en": "When you split a part that is too big, \"Connectors\" in the Split panel can now add dowels or plugs that line the halves up again: \"Dowels\" makes a hole in each half and lays loose pins beside them, \"Plugs\" puts round pegs on one half and their holes in the other. Rings on the plane show where they go first, and the fit follows your printer's play.",
+          "da": "Når du deler en del, der er for stor, kan „Samling“ i Del-panelet nu tilføje dyvler eller tappe, der retter halvdelene ind igen: „Dyvler“ laver et hul i hver halvdel og lægger løse stifter ved siden af dem, „Tappe“ sætter runde tapper på den ene halvdel og deres huller i den anden. Ringe på pladen viser, hvor de sidder først, og pasningen følger din printers spillerum."
         }
       },
       {
         "title": {
           "de": "Sacklöcher mit Bohrerspitze",
-          "en": "Blind holes with a drill point"
+          "en": "Blind holes with a drill point",
+          "da": "Blindhuller med borspids"
         },
         "body": {
           "de": "Ein Zylinder als Aussparung, eine Senkbohrung und eine Stufenbohrung können jetzt in der Spitze eines Bohrers enden statt flach: Unter „Boden“ stehen 90°, 118° und 135° oder ein eigener Winkel. Die Tiefe zählt wie in einer Zeichnung bis zum Beginn der Spitze, der Hinweis sagt, wie weit sie tiefer reicht.",
-          "en": "A cylinder set as a hole, a counterbore and a countersink can now end in the point of a drill instead of flat: \"Bottom\" offers 90°, 118° and 135° or an angle of your own. As in a drawing the depth counts to where the point begins, and the hint says how much further it reaches."
+          "en": "A cylinder set as a hole, a counterbore and a countersink can now end in the point of a drill instead of flat: \"Bottom\" offers 90°, 118° and 135° or an angle of your own. As in a drawing the depth counts to where the point begins, and the hint says how much further it reaches.",
+          "da": "En cylinder sat som et hul, en forsænkning og en undersænkning kan nu ende i en borspids i stedet for fladt: „Bund“ tilbyder 90°, 118° og 135° eller en vinkel af eget valg. Som på en tegning tæller dybden til der, hvor spidsen begynder, og hinten siger, hvor meget længere den rækker."
         }
       },
       {
         "title": {
           "de": "Fachwerk und Natursteinmauer als Oberfläche",
-          "en": "Half-timbering and a stone wall as surface textures"
+          "en": "Half-timbering and a stone wall as surface textures",
+          "da": "Bindingsværk og naturstensmur som overfladestrukturer"
         },
         "body": {
           "de": "Für Modellbahnhäuser und Dioramen hat die Karte Oberfläche zwei neue Muster: „Fachwerk“ mit Balken, Riegeln und Streben über leicht rauem Putz, und „Natursteinmauer“ mit unregelmäßigen Steinen, vom Bruchstein bis zum runden Feldstein. Mit „Muster als eigenes Teil“ druckst du die Balken oder Steine in einer zweiten Farbe.",
-          "en": "For model railway houses and dioramas the Surface texture card has two new patterns: \"Half-timbering\", beams, rails and braces over slightly rough plaster, and \"Stone wall\", irregular stones from broken rubble to round field stones. With \"Pattern as its own part\" the beams or stones print in a second colour."
+          "en": "For model railway houses and dioramas the Surface texture card has two new patterns: \"Half-timbering\", beams, rails and braces over slightly rough plaster, and \"Stone wall\", irregular stones from broken rubble to round field stones. With \"Pattern as its own part\" the beams or stones print in a second colour.",
+          "da": "Til modelbanegårde og dioramer har Overfladestruktur-kortet to nye mønstre: „Bindingsværk“ med bjælker, løsholter og afstivninger over en let ru puds, og „Naturstensmur“ med ujævne sten fra brudt murgrus til runde marksten. Med „Mønster som en selvstændig del“ printer bjælkerne eller stenene i en anden farve."
         }
       },
       {
         "title": {
           "de": "Neue Entwürfe mit Winkellineal im Nullpunkt",
-          "en": "New designs with a framing square at the origin"
+          "en": "New designs with a framing square at the origin",
+          "da": "Nye designs med vinkelmåler i nulpunktet"
         },
         "body": {
           "de": "Wer das Winkellineal fast immer braucht, setzt in den Einstellungen unter „Maße“ das Häkchen bei „Neue Entwürfe mit Winkellineal im Nullpunkt beginnen“. Dann liegt in jedem neuen Entwurf dieses Browsers schon eines im Nullpunkt. Vorhandene Entwürfe bleiben, wie sie sind.",
-          "en": "If you use the framing square nearly all the time, tick \"Start new designs with a framing square at the origin\" under Measurement in the settings. Every new design in this browser then starts with one at the origin. Designs you already have stay as they are."
+          "en": "If you use the framing square nearly all the time, tick \"Start new designs with a framing square at the origin\" under Measurement in the settings. Every new design in this browser then starts with one at the origin. Designs you already have stay as they are.",
+          "da": "Bruger du vinkelmåleren næsten hele tiden, så sæt „Start nye designs med vinkelmåler i nulpunktet“ under Måling i indstillingerne. Hvert nyt design i denne browser starter så med en i nulpunktet. Designs, du allerede har, bliver som de er."
         }
       },
       {
         "title": {
           "de": "Ziegel ohne Stummel am Rand",
-          "en": "Bricks without stubs at the edges"
+          "en": "Bricks without stubs at the edges",
+          "da": "Mursten uden stubbe ved kanterne"
         },
         "body": {
           "de": "Kleine Ziegel zeigten an der Oberkante, an der Unterkante und um Fenster herum kurze Striche statt Mauerwerk, wo der Rand nur einen schmalen Rest einer Reihe übrig ließ. Solche Reste bleiben jetzt glatt; Wände ohne solche Reste sehen aus wie bisher.",
-          "en": "Small bricks showed short ticks instead of brickwork along the top, the bottom and round windows, where the border left only a sliver of a course. Such slivers now stay smooth; walls without them look as before."
+          "en": "Small bricks showed short ticks instead of brickwork along the top, the bottom and round windows, where the border left only a sliver of a course. Such slivers now stay smooth; walls without them look as before.",
+          "da": "Små mursten viste korte streger i stedet for murværk langs toppen, bunden og rundt om vinduer, hvor kanten kun efterlod en smule af en murgang. Sådanne rester er nu glatte; vægge uden dem ser ud som før."
         }
       },
       {
         "title": {
           "de": "Pfeiltasten bewegen flüssig",
-          "en": "Arrow keys move smoothly"
+          "en": "Arrow keys move smoothly",
+          "da": "Piletaster flytter jævnt"
         },
         "body": {
           "de": "Eine gehaltene Pfeiltaste bewegt die Auswahl jetzt so flüssig wie das Ziehen mit der Maus, auch in großen Entwürfen. Beim Loslassen entsteht ein einziger Schritt, den ein Rückgängig ganz zurücknimmt.",
-          "en": "A held arrow key now moves the selection as smoothly as dragging with the mouse, even in a large design. Letting go makes one step, which one Undo takes back whole."
+          "en": "A held arrow key now moves the selection as smoothly as dragging with the mouse, even in a large design. Letting go makes one step, which one Undo takes back whole.",
+          "da": "En holdt piletast flytter nu markeringen lige så jævnt som at trække med musen, også i et stort design. Når du slipper, gør den ét skridt, som ét „Fortryd“ tager helt tilbage."
         }
       }
     ]

@@ -58,6 +58,8 @@ Del, ki ga tiskaš poševno na robu, na primer pod 45°, pogosto ne potrebuje po
 
 Rebro je mrežno telo: če ga želiš spremeniti, ga izbriši in ustvari znova. Vsak klik ustvari eno rebro; za več klikni {{ui:supportRib.repick}} ali ga ponovi z {{ui:editor.tool.array}}. Rebro nikjer ne sme teči v del, del pa mora stati na podlagi - sicer okno pove, zakaj ne gre. Nastavitve si ta brskalnik zapomni za naslednje rebro.
 
+{{ui:clearance.title}} in {{ui:printCheck.title}} poznata rebro: da njegovi mostički segajo v del ter da sta rebro in mostički tanka in ležita eno plast visoko čez režo, je namenoma in se ne sporoča. Rebro, narejeno v layerling 1.148.0, te oznake še nima; naredi ga znova in preverjanji ga izpustita.
+
 ## Debelina stene, zračnost in posnetja
 
 - Stene naj bodo široke vsaj dve tiskalni poti, pri šobi 0,4 mm torej 0,8 mm. Trdni deli potrebujejo 1,2 do 2 mm.
