@@ -6,6 +6,8 @@ code still carries it - so a lower number further down is older, not newer.
 
 ## Unreleased
 
+- **Windows quickstart: runs on a PC that does not allow scripts:** On Windows 10 and 11, PowerShell runs no script files until they are allowed, and the one-line installer stopped at `npm install` with "npm.ps1 cannot be loaded because running scripts is disabled on this system". It now calls `npm.cmd`, which needs no permission, so the one line works on a fresh PC as the README says (reported in the drucktipps3d forum).
+
 - **Hide others and Invert selection (Discussion #1472):** To work on a few parts deep inside a design, select them and choose **Hide others** in the right-click menu or the Visibility menu: everything else is hidden in one undo step, so Ctrl+Z or Ctrl+Shift+H brings it back. **Invert selection** in the right-click menu selects every visible part that was not selected (hidden parts and reference images stay out, as with Select all). Both are in the command search (Ctrl+K), where a key of your own can be set for them. MCP: `layerling_select_objects` takes `invert: true`, and `layerling_hide_others` is new. Asked for by @Elkniwt.
 
 - **Align: the dots in the colours of their axis (Discussion #1472):** The align dots and the equal-gaps pills are red, green and blue like the move and size handles (red X, green Y, blue Z for the height), so overlapping dots can be told apart; hovered and greyed-out dots look as before. Asked for by @Elkniwt.
