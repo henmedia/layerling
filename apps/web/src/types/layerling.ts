@@ -1599,6 +1599,11 @@ export type WorkplaneShape = {
    * See lib/groupKeepParts.
    */
   groupResize?: GroupResizeMode;
+  /**
+   * A hull only (Discussion #1440): the holes and hollows of each part stay open - a hollowed cylinder, a tube, a part
+   * grouped with its holes - where the hull would wrap and fill them. Left out, the hull fills them, as it always has.
+   */
+  hullKeepHoles?: boolean;
   locked?: boolean;
   /**
    * Lock shape (#1277): the part still moves, turns and groups with others, but its size, settings,

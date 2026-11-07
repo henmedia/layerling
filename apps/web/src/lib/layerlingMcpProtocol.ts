@@ -53,6 +53,8 @@ export type LayerlingMcpShapeSummary = {
   groupedCount: number;
   /** Groups and bundles: what the group does with its parts when it is resized (Discussion #526). */
   groupResize?: GroupResizeMode;
+  /** A hull: whether the holes and hollows of its parts stay open (Discussion #1440). */
+  keepHoles?: boolean;
   importedTriangles: number;
   cadDisplayEdgeCount: number | null;
   sketchPointCount: number;

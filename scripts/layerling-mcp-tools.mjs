@@ -946,13 +946,14 @@ export const tools = [
   },
   {
     name: "layerling_hull_objects",
-    description: "Wrap the given objects in their convex hull, like the editor's Hull button: the smallest convex body round all of them, as if shrink-wrapped (a half sphere on a cylinder, four posts become a box). Pass two or more objects. With a solid among them, the holes among them are cut out of the hull afterwards; when all of them are holes, the hull is a hole itself, so two cylinder holes cut a slot. The result replaces them and opens like a group, so the parts stay editable; the hull itself is a mesh.",
+    description: "Wrap the given objects in their convex hull, like the editor's Hull button: the smallest convex body round all of them, as if shrink-wrapped (a half sphere on a cylinder, four posts become a box). Pass two or more objects. With a solid among them, the holes among them are cut out of the hull afterwards; when all of them are holes, the hull is a hole itself, so two cylinder holes cut a slot. The result replaces them and opens like a group, so the parts stay editable; the hull itself is a mesh. keepHoles true keeps the holes and hollows of each part open (a hollowed cylinder, a tube, a part grouped with its holes), which the hull would otherwise wrap and fill; a recess at the side of a part stays too. Pass the id of one hull with keepHoles to build that hull again with its parts' holes kept (true) or filled (false); the summary of a hull says keepHoles.",
     inputSchema: {
       ...editorTargetSchema,
       required: ["ids"],
       properties: {
         ...editorTargetSchema.properties,
         ids: { type: "array", items: { type: "string" } },
+        keepHoles: { type: "boolean", description: "Keep the holes and hollows of each part open (Discussion #1440). Default false: the hull fills them." },
       },
     },
   },
