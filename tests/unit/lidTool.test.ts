@@ -1,11 +1,11 @@
 import { describe, expect, it } from "vitest";
-import { BAYONET_MIN_WALL, HINGE_PIN_GRIP, HINGE_PRINTED_PIN_GRIP, LID_DEFAULTS, LID_TYPES, MAX_BAYONET_AXIAL_GAP, MAX_BAYONET_DEPTH, MAX_BAYONET_DETENT, MAX_BAYONET_LUGS, MIN_BAYONET_AXIAL_GAP, MIN_BAYONET_DEPTH, MIN_BAYONET_LUGS, MAX_CLICK_BUMP_HEIGHT, MAX_HINGE_PIN, MAX_HINGE_PIN_PLAY, MAX_LID_GAP, MAX_LID_THICKNESS, MAX_LID_THREAD_PITCH, MAX_LID_THREAD_TURNS, MAX_MAGNET_GAP, MIN_CLICK_BUMP_HEIGHT, MIN_HINGE_PIN, MIN_HINGE_PIN_PLAY, MIN_LID_THREAD_PITCH, MIN_LID_THREAD_TURNS, MIN_LID_WALL, MIN_MAGNET_DIAMETER, SCREW_MIN_WALL, bayonetLugSize, bayonetPlan, bayonetTurn, clickBumpPlaces, cornerKnucklePlan, endPlugPlan, hingeKnuckleRadius, hingePinGrip, hingePinHoles, lidClickBumpsFit, lidHandleFits, lidTakesExtras, lidThicknessForMagnets, lidThread, magnetPlaces, magnetPocketDepth, normalizeLidOptions, roundOutline, screwInPlan, screwPlan } from "@/lib/lidTool";
+import { BAYONET_MIN_WALL, HINGE_PIN_GRIP, HINGE_PRINTED_PIN_GRIP, LID_DEFAULTS, LID_THREAD_STANDARD_SPECS, LID_THREAD_STANDARDS, LID_TYPES, NECK_LARGER, NECK_SMALLER, MAX_BAYONET_AXIAL_GAP, MAX_BAYONET_DEPTH, MAX_BAYONET_DETENT, MAX_BAYONET_LUGS, MAX_BAYONET_TURN, MIN_BAYONET_AXIAL_GAP, MIN_BAYONET_DEPTH, MIN_BAYONET_LUGS, MIN_BAYONET_TURN, MAX_CLICK_BUMP_HEIGHT, MAX_HINGE_PIN, MAX_HINGE_PIN_PLAY, MAX_LID_GAP, MAX_LID_THICKNESS, MAX_LID_THREAD_PITCH, MAX_LID_THREAD_TURNS, MAX_MAGNET_GAP, MIN_CLICK_BUMP_HEIGHT, MIN_HINGE_PIN, MIN_HINGE_PIN_PLAY, MIN_LID_THREAD_PITCH, MIN_LID_THREAD_TURNS, MIN_LID_WALL, MIN_MAGNET_DIAMETER, SCREW_MIN_WALL, bayonetLugSize, bayonetPlan, bayonetTurn, clickBumpPlaces, cornerKnucklePlan, endPlugPlan, hingeKnuckleRadius, hingePinGrip, hingePinHoles, lidClickBumpsFit, lidHandleFits, lidNeckFit, lidStandardThread, lidTakesExtras, lidThicknessForMagnets, lidThread, magnetPlaces, magnetPocketDepth, normalizeLidOptions, roundOutline, screwPlan, lidTetherFits, tetherPlan, FLIP_HINGE_LENGTH, FLIP_HINGE_THICKNESS, MAX_FLIP_TOP_OPENING, MIN_FLIP_TOP_OPENING, flipTopPlan, flipTopThickness, lidFlipTopFits, screwInPlan } from "@/lib/lidTool";
 import { threadSize } from "@/lib/vase/vase-geometry.mjs";
 
 describe("lid options (#1009)", () => {
   it("starts from a push-in lid with a normal fit", () => {
     expect(normalizeLidOptions()).toEqual(LID_DEFAULTS);
-    expect(LID_DEFAULTS).toEqual({ type: "plug", thickness: 2, gap: 0.2, depth: 4, wall: 1.6, magnets: false, magnetDiameter: 6, magnetHeight: 2, magnetGap: 0.1, hinge: false, hingePin: 1.75, hingeGap: 0.3, hingePinPlay: 0.2, hingeKnuckles: 0, hingePrintPin: false, hingeSide: "back", hingeTeardrop: true, hingeStyle: "outside", hingeEndPlugs: false, clickBumps: false, clickBumpHeight: 0.4, handle: "none", threadPitch: 3, threadTurns: 2, bayonetLugs: 3, bayonetDepth: 8, bayonetAxialGap: 0.3, bayonetDetent: 0.3 });
+    expect(LID_DEFAULTS).toEqual({ type: "plug", thickness: 2, gap: 0.2, depth: 4, wall: 1.6, magnets: false, magnetDiameter: 6, magnetHeight: 2, magnetGap: 0.1, hinge: false, hingePin: 1.75, hingeGap: 0.3, hingePinPlay: 0.2, hingeKnuckles: 0, hingePrintPin: false, hingeSide: "back", hingeTeardrop: true, hingeStyle: "outside", hingeEndPlugs: false, clickBumps: false, clickBumpHeight: 0.4, handle: "none", threadPitch: 3, threadTurns: 2, threadStandard: "own", bayonetLugs: 3, bayonetDepth: 8, bayonetAxialGap: 0.3, bayonetDetent: 0.3, bayonetTurn: 0, tether: false, flipTop: false, flipTopOpening: 8 });
   });
 
   it("takes the kind in any case and keeps the default for an unknown one", () => {
@@ -452,6 +452,247 @@ describe("where a screw lid's thread goes (Discussion #1393)", () => {
   });
 });
 
+describe("a screw lid with a standard's thread", () => {
+  it("offers its own thread first, as before, and five standards, taken as they are written", () => {
+    expect(LID_THREAD_STANDARDS).toEqual(["own", "pco1881", "pco1810", "gl45", "mason70", "mason86"]);
+    expect(normalizeLidOptions({ type: "screw" }).threadStandard).toBe("own");
+    expect(normalizeLidOptions({ threadStandard: "PCO 1881" }).threadStandard).toBe("pco1881");
+    expect(normalizeLidOptions({ threadStandard: " GL45 " }).threadStandard).toBe("gl45");
+    expect(normalizeLidOptions({ threadStandard: "GL 45" }).threadStandard).toBe("gl45");
+    expect(normalizeLidOptions({ threadStandard: "mason-70" }).threadStandard).toBe("mason70");
+    expect(normalizeLidOptions({ threadStandard: "Mason_86" }).threadStandard).toBe("mason86");
+    expect(normalizeLidOptions({ threadStandard: "pco1882" }).threadStandard).toBe("own");
+    expect(normalizeLidOptions({ threadStandard: 1881 }).threadStandard).toBe("own");
+    expect(Object.keys(LID_THREAD_STANDARD_SPECS)).toEqual(LID_THREAD_STANDARDS.slice(1));
+  });
+
+  it("has each standard's thread as its sources give it", () => {
+    // PCO 1881 (ISBT; the patents and BOSL2): 27.40 across, 2.7 mm pitch, 650 degrees from 1.7 mm down; 24.94 under
+    // the thread; BOSL2's lip of 25.07 above it, which the cap's ridges must pass.
+    expect(LID_THREAD_STANDARD_SPECS.pco1881).toEqual({ name: "PCO 1881", major: 27.4, minor: 24.94, clear: 25.07, pitch: 2.7, flank: 15, crest: 1.02, start: 1.7, turns: 650 / 360, capDepth: 10 });
+    expect(LID_THREAD_STANDARD_SPECS.pco1810).toEqual({ name: "PCO 1810", major: 27.43, minor: 24.51, clear: 25.07, pitch: 3.18, flank: 20, crest: 1.06, start: 1.7, turns: 810 / 360, capDepth: 13 });
+    // GL 45 (DIN 168-1): the glass's largest, 45 and 42.3; a 4 mm pitch, 60 degrees between the flanks.
+    expect(LID_THREAD_STANDARD_SPECS.gl45).toMatchObject({ name: "GL 45", major: 45, minor: 42.3, clear: 42.3, pitch: 4, flank: 30 });
+    // Mason jars: 2.75 and 3.38 inches across the thread, 4 threads per inch.
+    expect(LID_THREAD_STANDARD_SPECS.mason70).toMatchObject({ major: expect.closeTo(2.75 * 25.4, 9), pitch: expect.closeTo(25.4 / 4, 9), flank: 30 });
+    expect(LID_THREAD_STANDARD_SPECS.mason86).toMatchObject({ major: expect.closeTo(3.38 * 25.4, 2), pitch: expect.closeTo(25.4 / 4, 9), flank: 30 });
+    const gl45 = lidStandardThread("gl45");
+    // The glass's tooth is 0.675 of the pitch wide at the core and half that high (DIN 168 Bild 1), here with a flat crest.
+    expect(gl45.depth).toBeCloseTo(1.35, 9);
+    expect(gl45.root).toBeCloseTo(0.675 * 4, 2);
+    // A mason jar's tooth: 3.6 wide at its root, 1.8 deep (BOSL2).
+    expect(lidStandardThread("mason70").depth).toBeCloseTo(1.8, 9);
+    expect(lidStandardThread("mason70").root).toBeCloseTo(3.6, 2);
+    expect(lidStandardThread("mason86").root).toBeCloseTo(3.6, 2);
+    // PCO's crest is as wide as the root's gap, as BOSL2 draws it.
+    for (const standard of ["pco1881", "pco1810"] as const) {
+      const thread = lidStandardThread(standard);
+      expect(thread.crest, standard).toBeCloseTo(thread.pitch - thread.root, 2);
+    }
+  });
+
+  it("keeps every standard's thread on its neck inside the cap, its ridges off the neck, and the usual fits within reach", () => {
+    for (const standard of LID_THREAD_STANDARDS.slice(1) as Exclude<typeof LID_THREAD_STANDARDS[number], "own">[]) {
+      const thread = lidStandardThread(standard);
+      expect(thread.depth, standard).toBeCloseTo((thread.major - thread.minor) / 2, 12);
+      expect(thread.length, standard).toBeCloseTo(thread.turns * thread.pitch + thread.root, 12);
+      expect(thread.end, standard).toBeCloseTo(thread.start + thread.length, 12);
+      expect(thread.end, standard).toBeLessThan(thread.capDepth);
+      expect(thread.root, standard).toBeLessThan(thread.pitch);
+      expect(thread.clear, standard).toBeGreaterThanOrEqual(thread.minor);
+      expect(thread.clear, standard).toBeLessThan(thread.major);
+      // The loose fit, 0.3 mm, is within half the thread's depth.
+      expect(thread.depth / 2, standard).toBeGreaterThan(0.6);
+      expect([thread.neckFrom, thread.neckTo]).toEqual([thread.minor - NECK_SMALLER, thread.minor + NECK_LARGER]);
+    }
+    expect(lidStandardThread("pco1881")).toMatchObject({ depth: expect.closeTo(1.23, 9), end: expect.closeTo(1.7 + 650 / 360 * 2.7 + 1.02 + 2 * 1.23 * Math.tan(Math.PI / 12), 9) });
+  });
+
+  it("takes a body's top as the neck from a millimetre smaller to a fifth of one larger across, and says why not otherwise", () => {
+    expect([NECK_SMALLER, NECK_LARGER]).toEqual([1, 0.2]);
+    const top = (diameter: number) => ({ outer: diameter / 2, inner: diameter / 2 });
+    expect(lidNeckFit("pco1881", top(24.94))).toBeNull();
+    expect(lidNeckFit("pco1881", top(23.94))).toBeNull();
+    expect(lidNeckFit("pco1881", top(25.14))).toBeNull();
+    expect(lidNeckFit("pco1881", top(23.9))).toEqual({ reason: "size", diameter: 23.9 });
+    expect(lidNeckFit("pco1881", top(25.2))).toEqual({ reason: "size", diameter: 25.2 });
+    // The bottle a cap is wanted for: as wide as its neck over the thread.
+    expect(lidNeckFit("pco1881", top(28))).toEqual({ reason: "size", diameter: 28 });
+    expect(lidNeckFit("pco1881", null)).toEqual({ reason: "notRound" });
+    // Its nearest point must reach the smallest, its farthest stay within the largest.
+    expect(lidNeckFit("gl45", { outer: 21.1, inner: 20.6 })).toEqual({ reason: "size", diameter: 42.2 });
+    expect(lidNeckFit("gl45", { outer: 21.26, inner: 21.1 })).toEqual({ reason: "size", diameter: 42.5 });
+    expect(lidNeckFit("gl45", { outer: 21.2, inner: 21.1 })).toBeNull();
+    expect(lidNeckFit("mason70", top(66))).toBeNull();
+    expect(lidNeckFit("mason86", top(82.25))).toBeNull();
+    expect(lidNeckFit("mason86", top(66.25))).toEqual({ reason: "size", diameter: 66.3 });
+  });
+});
+
+describe("where a standard's thread and cap go", () => {
+  /** A pot `diameter` across with a `wall`, seen from above, or what `shape` gives at a height. */
+  const pot = (diameter: number, wall = 1.6, shape?: (z: number) => { outer: [number, number][][]; opening: [number, number][][] }) => (z: number) => {
+    const level = shape ? shape(z) : { outer: [polygonRound(diameter / 2)], opening: [polygonRound(diameter / 2 - wall, 192, 0, 0, true)] };
+    return { outline: level.outer, opening: level.opening };
+  };
+  const options = (patch: Record<string, unknown> = {}) => normalizeLidOptions({ type: "screw", threadStandard: "pco1881", ...patch });
+
+  it("puts a PCO 1881 neck's thread where the standard has it on a body that is the neck, and makes the cap to the standard", () => {
+    const plan = screwPlan(pot(24.94), options(), 30, 0, 29.7);
+    if ("error" in plan) throw new Error(plan.error.code);
+    expect(plan.neck).toBeNull();
+    expect(plan.standard).toBe("pco1881");
+    // From 1.7 mm below the rim, 650 degrees and its tooth down; the cap 10 mm deep.
+    expect(plan.to).toBeCloseTo(28.3, 9);
+    expect(plan.from).toBeCloseTo(30 - lidStandardThread("pco1881").end, 9);
+    expect(plan.mouth).toBe(20);
+    expect([plan.pitch, plan.turns, plan.crest]).toEqual([2.7, 650 / 360, 1.02]);
+    expect(plan.depth).toBeCloseTo(1.23, 9);
+    // On the neck under the thread, whatever the body's own size; 15 degree flanks fall 3.73 mm a millimetre.
+    expect(plan.base).toBeCloseTo(12.47, 9);
+    expect(plan.slope).toBeCloseTo(1 / Math.tan(Math.PI / 12), 9);
+    // The cap's ridges 25.07 / 2 and the gap from the axis, its grooves the gap square to the flanks wider, its rim
+    // the thread, the gap and the wall out.
+    expect(plan.clear).toBeCloseTo(12.535 + 0.2, 9);
+    expect(plan.widen).toBeCloseTo(0.2 * (1 / Math.cos(Math.PI / 12) - Math.tan(Math.PI / 12)), 9);
+    expect(plan.capRadius).toBeCloseTo(13.7 + 0.2 + 1.6, 9);
+    expect(plan.reach).toBeCloseTo(0.8, 2);
+    // A body a little thinner gets the same thread, standing on the standard's neck.
+    const thinner = screwPlan(pot(24), options(), 30, 0, 29.7);
+    if ("error" in thinner) throw new Error(thinner.error.code);
+    expect(thinner.neck).toBeNull();
+    expect(thinner.base).toBeCloseTo(12.47, 9);
+    expect(thinner.inner).toBeCloseTo(12 * Math.cos(Math.PI / 192), 9);
+  });
+
+  it("makes the cap alone for a body that is not the neck, whatever its height, wall or opening", () => {
+    const wide = screwPlan(pot(30, 2), options(), 30, 0, 29.7);
+    if ("error" in wide) throw new Error(wide.error.code);
+    expect(wide.neck).toEqual({ reason: "size", diameter: 30 });
+    expect(wide.capRadius).toBeCloseTo(15.5, 9);
+    expect(wide.mouth).toBe(20);
+    // A ring 3 mm high with a thin wall, a solid rod: the cap all the same.
+    expect(screwPlan(pot(30, 0.3), options(), 30, 27, 29.7)).toMatchObject({ neck: { reason: "size", diameter: 30 } });
+    const rod = screwPlan(() => ({ outline: [polygonRound(15)], opening: [] }), options(), 30, 0, 29.7);
+    expect(rod).toMatchObject({ neck: { reason: "size", diameter: 30 } });
+    // A box is no neck: the cap goes round its middle.
+    const box = screwPlan(() => ({ outline: [[[-20, -10], [30, -10], [30, 20], [-20, 20]]], opening: [] }), options(), 30, 0, 29.7);
+    if ("error" in box) throw new Error(box.error.code);
+    expect(box.neck).toEqual({ reason: "notRound" });
+    expect(box.centre).toEqual([5, 5]);
+  });
+
+  it("refuses a neck too low for the thread, one that does not stay the neck as far as the cap reaches, a thin wall and a gap too large", () => {
+    // 650 degrees and the tooth from 1.7 mm down end 8.25 mm down; 0.4 mm must stay below.
+    expect(screwPlan(pot(24.94), options(), 30, 21.5, 29.7)).toEqual({ error: { code: "screwStandardTooLow", standard: "pco1881", height: 8.3 } });
+    // A neck on a ring shorter than the cap reaches is fine: nothing is in the cap's way below it.
+    expect("error" in screwPlan(pot(24.94), options(), 30, 21.3, 29.7)).toBe(false);
+    // A shoulder 6 mm below the rim, where the cap still reaches, or a neck that tapers.
+    const shoulder = pot(24.94, 1.6, (z) => ({ outer: [polygonRound(z < 24 ? 20 : 12.47)], opening: [polygonRound(10.87, 192, 0, 0, true)] }));
+    expect(screwPlan(shoulder, options(), 30, 0, 29.7)).toEqual({ error: { code: "screwStandardNeck", standard: "pco1881", depth: 10 } });
+    const tapering = pot(24.94, 1.6, (z) => ({ outer: [polygonRound(12.47 + (30 - z) / 40)], opening: [polygonRound(10.87, 192, 0, 0, true)] }));
+    expect(screwPlan(tapering, options(), 30, 0, 29.7)).toEqual({ error: { code: "screwStandardNeck", standard: "pco1881", depth: 10 } });
+    expect(screwPlan(pot(24.94, 0.6), options(), 30, 0, 29.7)).toEqual({ error: { code: "screwThinWall" } });
+    // At most half the depth: 0.61 mm on PCO 1881, 0.9 on a mason jar; for the cap alone as well.
+    expect(screwPlan(pot(24.94), options({ gap: 0.65 }), 30, 0, 29.7)).toEqual({ error: { code: "screwStandardGapDeep", gap: 0.61 } });
+    expect(screwPlan(pot(30), options({ gap: 0.65 }), 30, 0, 29.7)).toEqual({ error: { code: "screwStandardGapDeep", gap: 0.61 } });
+    expect("error" in screwPlan(pot(66.25), options({ threadStandard: "mason70", gap: 0.9 }), 30, 0, 29.7)).toBe(false);
+    // The own thread's pitch and turns do not count.
+    expect("error" in screwPlan(pot(24.94), options({ threadPitch: 8, threadTurns: 8 }), 30, 0, 29.7)).toBe(false);
+  });
+});
+
+/**
+ * A pot 60 across with a 2 mm wall whose rim is rounded or chamfered (Discussion #1426), as lidForSolid slices it: how far
+ * the outline reaches from the axis and the opening's edge at a height, its top at 50. `outer` and `inner` give how far
+ * the rounding takes the outline in and the opening out at a height.
+ */
+const roundedRim = (outer: (z: number) => number, inner: (z: number) => number = () => 0, radius = 30, wall = 2) => (z: number) => ({
+  outline: [polygonRound(radius - outer(z))],
+  opening: [polygonRound(radius - wall + inner(z), 192, 0, 0, true)],
+});
+/** How far a quarter circle of `size` at the rim's edge takes it in at a height, 50 the top. */
+const fillet = (size: number, top = 50) => (z: number) => (z <= top - size ? 0 : size - Math.sqrt(size ** 2 - (z - (top - size)) ** 2));
+/** How far a chamfer of `size` at 45 degrees takes it in. */
+const chamfer = (size: number, top = 50) => (z: number) => Math.max(0, z - (top - size));
+
+describe("a screw lid or a bayonet lid on a rim that is rounded or chamfered (Discussion #1426)", () => {
+  const screw = (patch: Record<string, unknown> = {}) => normalizeLidOptions({ type: "screw", ...patch });
+  const bayonet = (patch: Record<string, unknown> = {}) => normalizeLidOptions({ type: "bayonet", ...patch });
+
+  it("puts the thread on the straight wall below an outside fillet, where the outline comes within 0.05 mm of the wall's", () => {
+    // A fillet of 1.5 mm comes within 0.05 mm of the wall 1.116 mm under the top; found to 0.05 mm.
+    const plan = screwPlan(roundedRim(fillet(1.5)), screw(), 50, 0, 49.7);
+    if ("error" in plan) throw new Error(plan.error.code);
+    const begins = 48.5 + Math.sqrt(1.5 ** 2 - 1.45 ** 2);
+    expect(plan.wallTop).toBeLessThanOrEqual(begins);
+    expect(plan.wallTop).toBeGreaterThan(begins - 0.05);
+    // The thread its height under it, the rest as on a square rim: the wall's own size, its whole thickness to reach into.
+    expect(plan.from).toBeCloseTo(plan.wallTop - 6, 9);
+    expect(plan.radius).toBeCloseTo(30, 9);
+    expect(plan.reach).toBe(0.8);
+    expect(plan.capRadius).toBeCloseTo(32.7, 9);
+    // A square rim keeps the thread where it was: the wall reaches the top.
+    const square = screwPlan(roundedRim(() => 0), screw(), 50, 0, 49.7);
+    if ("error" in square) throw new Error(square.error.code);
+    expect([square.wallTop, square.from]).toEqual([50, 44]);
+  });
+
+  it("goes as far down as a chamfer outside, or one inside that leaves the rim too thin, and as a fillet small enough to pass leaves it", () => {
+    const outside = screwPlan(roundedRim(chamfer(1.5)), screw(), 50, 0, 49.7);
+    if ("error" in outside) throw new Error(outside.error.code);
+    expect(outside.wallTop).toBeGreaterThan(48.5);
+    expect(outside.wallTop).toBeLessThanOrEqual(48.55);
+    // 1.8 mm of the 2 mm wall chamfered away inside: 0.5 mm of wall at the rim, too thin; whole from 48.2 mm down.
+    const inside = screwPlan(roundedRim(() => 0, chamfer(1.8)), screw(), 50, 0, 49.7);
+    if ("error" in inside) throw new Error(inside.error.code);
+    expect(inside.wallTop).toBeGreaterThan(48.2);
+    expect(inside.wallTop).toBeLessThanOrEqual(48.25);
+    expect(inside.reach).toBe(0.8);
+    // A chamfer of 1 mm inside leaves 1.3 mm at the rim, and a fillet of 0.6 mm outside comes in only 0.08 mm there:
+    // both take a thread as before, up to the top.
+    for (const rim of [roundedRim(() => 0, chamfer(1)), roundedRim(fillet(0.6))]) {
+      const plan = screwPlan(rim, screw(), 50, 0, 49.7);
+      if ("error" in plan) throw new Error(plan.error.code);
+      expect(plan.wallTop).toBe(50);
+    }
+  });
+
+  it("refuses a rounding that leaves too little straight wall for the thread, and a rim that flares out or a pot that tapers as before", () => {
+    // 8.5 mm high, a 4 mm wall: under a square rim the thread fits, under a fillet of 3 mm it does not, one turn does.
+    const low = roundedRim(fillet(3), () => 0, 30, 4);
+    expect("error" in screwPlan(roundedRim(() => 0, () => 0, 30, 4), screw(), 50, 41.5, 49.83)).toBe(false);
+    expect(screwPlan(low, screw(), 50, 41.5, 49.83)).toEqual({ error: { code: "screwRimRound", height: 6 } });
+    expect("error" in screwPlan(low, screw({ threadTurns: 1 }), 50, 41.5, 49.83)).toBe(false);
+    // A rim flaring a millimetre out past the wall over its last 3 mm: no cap passes over it.
+    const flared = roundedRim((z) => -Math.max(0, (z - 47) / 3));
+    expect(screwPlan(flared, screw(), 50, 0, 49.7)).toEqual({ error: { code: "screwNotRound" } });
+    // A pot narrowing to the top all the way up, a millimetre in 6 mm, and a wall too thin all the way up.
+    const narrowing = roundedRim((z) => (z - 40) / 6, (z) => -(z - 40) / 6);
+    expect(screwPlan(narrowing, screw(), 50, 0, 49.7)).toEqual({ error: { code: "screwNotRound" } });
+    expect(screwPlan(roundedRim(() => 0, () => 1.4), screw(), 50, 0, 49.7)).toEqual({ error: { code: "screwThinWall" } });
+    // On a pot just high enough for the thread, too thin a wall under a square rim is that, not a rounding.
+    expect(screwPlan(roundedRim(() => 0, () => 1.4), screw(), 50, 43.5, 49.87)).toEqual({ error: { code: "screwThinWall" } });
+  });
+
+  it("puts a bayonet's lugs below the rounding and its cap's mouth the rim depth under where it begins, or refuses as for a screw lid", () => {
+    const plan = bayonetPlan(roundedRim(fillet(1.5)), bayonet(), 50, 0, 49.7);
+    if ("error" in plan) throw new Error(plan.error.code);
+    expect(plan.wallTop).toBeLessThan(48.885);
+    expect(plan.wallTop).toBeGreaterThan(48.83);
+    expect(plan.lugTop).toBeCloseTo(plan.wallTop - 0.2, 9);
+    expect(plan.lugLow).toBeCloseTo(plan.wallTop - 0.2 - 1.5, 9);
+    expect(plan.from).toBeCloseTo(plan.wallTop - 8, 9);
+    expect(plan.capRadius).toBeCloseTo(30 + 1.5 + 0.2 + 1.6, 9);
+    const square = bayonetPlan(roundedRim(() => 0), bayonet(), 50, 0, 49.7);
+    if ("error" in square) throw new Error(square.error.code);
+    expect([square.wallTop, square.lugTop, square.from]).toEqual([50, expect.closeTo(49.8, 9), 42]);
+    expect(bayonetPlan(roundedRim(fillet(3), () => 0, 30, 4), bayonet(), 50, 41.5, 49.83)).toEqual({ error: { code: "bayonetRimRound", height: 8 } });
+    expect("error" in bayonetPlan(roundedRim(() => 0, () => 0, 30, 4), bayonet(), 50, 41.5, 49.83)).toBe(false);
+    expect(bayonetPlan(roundedRim((z) => -Math.max(0, (z - 47) / 3)), bayonet(), 50, 0, 49.7)).toEqual({ error: { code: "bayonetNotRound" } });
+  });
+});
+
 describe("a bayonet lid (Discussion #1424)", () => {
   it("is a sixth kind of lid, taken in any case, and the push-in lid stays the one to begin with", () => {
     expect(LID_TYPES.at(-1)).toBe("bayonet");
@@ -478,6 +719,22 @@ describe("a bayonet lid (Discussion #1424)", () => {
     expect(bayonetLugSize(30)).toEqual({ height: 1.2, width: 6 });
     expect(bayonetLugSize(200)).toEqual({ height: 2.5, width: 20 });
     expect(bayonetLugSize(82)).toEqual({ height: 2.1, width: expect.closeTo(12.3, 12) });
+  });
+
+  it("leaves the turn to the lugs unless it is set by hand, in whole degrees from 15 to a quarter turn", () => {
+    expect(LID_DEFAULTS.bayonetTurn).toBe(0);
+    expect([MIN_BAYONET_TURN, MAX_BAYONET_TURN]).toEqual([15, 90]);
+    expect(normalizeLidOptions({ bayonetTurn: 90 }).bayonetTurn).toBe(90);
+    expect(normalizeLidOptions({ bayonetTurn: "62.4" }).bayonetTurn).toBe(62);
+    expect(normalizeLidOptions({ bayonetTurn: 37.5 }).bayonetTurn).toBe(38);
+    // 0 is the lugs' own turn; a turn set by hand is 15 at least and 90 at most.
+    expect(normalizeLidOptions({ bayonetTurn: 0 }).bayonetTurn).toBe(0);
+    expect(normalizeLidOptions({ bayonetTurn: 0.4 }).bayonetTurn).toBe(0);
+    expect(normalizeLidOptions({ bayonetTurn: -30 }).bayonetTurn).toBe(0);
+    expect(normalizeLidOptions({ bayonetTurn: 5 }).bayonetTurn).toBe(MIN_BAYONET_TURN);
+    expect(normalizeLidOptions({ bayonetTurn: 180 }).bayonetTurn).toBe(MAX_BAYONET_TURN);
+    expect(normalizeLidOptions({ bayonetTurn: "x" }).bayonetTurn).toBe(0);
+    expect(normalizeLidOptions({ bayonetTurn: null }, { ...LID_DEFAULTS, bayonetTurn: 45 }).bayonetTurn).toBe(45);
   });
 
   it("takes no magnets, hinge, click bumps or handle", () => {
@@ -553,6 +810,82 @@ describe("where a bayonet lid's lugs and slots go (Discussion #1424)", () => {
     expect(bayonetPlan(pot(undefined, 10, 1.6), options({ bayonetLugs: 3 }), 50, 0, 49.7)).toEqual({ error: { code: "bayonetNoRoom" } });
   });
 
+  /**
+   * Of each lug's share of the way round, what its slot, turn, lug and the stop's gap take, and what is left of the cap's
+   * ring before the next lug's slot, in mm where the ring is nearest the axis (the gap outside the body's wall).
+   */
+  const ringLeft = (plan: Exclude<ReturnType<typeof bayonetPlan>, { error: unknown }>, gap = 0.2) => {
+    const taken = plan.slotHalf + plan.turn + plan.half + plan.stop;
+    return ((360 / plan.angles.length - taken) * Math.PI / 180) * (plan.radius + gap);
+  };
+
+  it("turns as far as set when the turn is set by hand: a quarter turn with two lugs, and the lugs' own turn gives the plan as before", () => {
+    const own = bayonetPlan(pot(), options(), 50, 0, 49.7);
+    const set = bayonetPlan(pot(), options({ bayonetTurn: 40 }), 50, 0, 49.7);
+    if ("error" in own || "error" in set) throw new Error("refused");
+    expect(set).toEqual(own);
+    const quarter = bayonetPlan(pot(), options({ bayonetLugs: 2, bayonetTurn: 90 }), 50, 0, 49.7);
+    if ("error" in quarter) throw new Error(quarter.error.code);
+    expect(quarter.turn).toBe(90);
+    expect(quarter.angles).toEqual([-90, 90]);
+    // The lugs as wide as the pot gives them, the rib and the stop where they are with the lugs' own turn: both lie by
+    // the locked lug, so they go with the turn.
+    expect(quarter.width).toBeCloseTo(9, 9);
+    expect([quarter.half, quarter.slotHalf, quarter.stop]).toEqual([own.half, own.slotHalf, own.stop]);
+    expect(quarter.rib).toEqual(own.rib);
+    // Slot, turn, lug and the stop's gap take about 107 of each lug's 180 degrees: 38 mm of ring are left before the next slot.
+    expect(ringLeft(quarter)).toBeGreaterThan(38);
+    expect(ringLeft(quarter)).toBeLessThan(39);
+  });
+
+  it("holds a turn set by hand to what fits round the body: never so far that the slots run into each other, never so short that the lugs get too narrow", () => {
+    // Four lugs on a 60 mm pot: 66 degrees leave 3 mm of ring and more before the next slot, 67 would not.
+    const four = bayonetPlan(pot(), options({ bayonetLugs: 4, bayonetTurn: 90 }), 50, 0, 49.7);
+    if ("error" in four) throw new Error(four.error.code);
+    expect(four.turn).toBe(66);
+    expect(four.width).toBeCloseTo(9, 9);
+    expect(ringLeft(four)).toBeGreaterThanOrEqual(3);
+    expect(ringLeft({ ...four, turn: 67 })).toBeLessThan(3);
+    // A turn that fits is kept as it is.
+    const fits = bayonetPlan(pot(), options({ bayonetLugs: 4, bayonetTurn: 60 }), 50, 0, 49.7);
+    if ("error" in fits) throw new Error(fits.error.code);
+    expect(fits.turn).toBe(60);
+    // Three lugs on a tube 30 mm across: 84 degrees at most; 15 is too short for a lug 4 mm wide, 29 the least that gives one.
+    const most = bayonetPlan(pot(undefined, 15, 1.6), options({ bayonetTurn: 90 }), 50, 0, 49.7);
+    const least = bayonetPlan(pot(undefined, 15, 1.6), options({ bayonetTurn: 15 }), 50, 0, 49.7);
+    if ("error" in most || "error" in least) throw new Error("refused");
+    expect(most.turn).toBe(84);
+    expect(ringLeft(most)).toBeGreaterThanOrEqual(3);
+    expect(ringLeft({ ...most, turn: 85 })).toBeLessThan(3);
+    expect(least.turn).toBe(29);
+    expect(least.width).toBeGreaterThanOrEqual(4);
+    // A degree less is 0.28 mm narrower on the lugs' outer faces, 16.2 mm from the axis: under 4.
+    expect(least.width).toBeLessThan(4 + 16.2 * (Math.PI / 180));
+    // On every size and count it builds, a lug's slot, turn and stop leave 3 mm of ring before the next slot.
+    for (const radius of [8, 10, 15, 20, 30, 50, 75]) {
+      for (const lugs of [2, 3, 4]) {
+        for (const turn of [15, 45, 60, 75, 90]) {
+          const plan = bayonetPlan(pot(undefined, radius, 1.6), options({ bayonetLugs: lugs, bayonetTurn: turn }), 50, 0, 49.7);
+          if ("error" in plan) continue;
+          expect(ringLeft(plan), `${2 * radius} mm, ${lugs} lugs, ${turn} degrees`).toBeGreaterThanOrEqual(3 - 1e-9);
+          expect(plan.width).toBeGreaterThanOrEqual(4 - 1e-9);
+          expect(Number.isInteger(plan.turn)).toBe(true);
+        }
+      }
+    }
+  });
+
+  it("takes three lugs on a body too small for them at their own turn when a longer one is set, and refuses a body with no room for the lugs at any turn", () => {
+    // 20 mm across: three lugs and 40 degrees leave the lugs too narrow; 90 is held to 68, and they fit.
+    expect(bayonetPlan(pot(undefined, 10, 1.6), options({ bayonetLugs: 3 }), 50, 0, 49.7)).toEqual({ error: { code: "bayonetNoRoom" } });
+    const longer = bayonetPlan(pot(undefined, 10, 1.6), options({ bayonetLugs: 3, bayonetTurn: 90 }), 50, 0, 49.7);
+    if ("error" in longer) throw new Error(longer.error.code);
+    expect(longer.turn).toBe(68);
+    expect(longer.width).toBe(6);
+    // 16 mm across: four lugs leave no room for a lug 4 mm wide and its stop at any turn.
+    for (const turn of [15, 45, 90]) expect(bayonetPlan(pot(undefined, 8, 1.6), options({ bayonetLugs: 4, bayonetTurn: turn }), 50, 0, 49.7)).toEqual({ error: { code: "bayonetNoRoom" } });
+  });
+
   it("refuses a body that is not round, a wall under 0.8 mm, a body too low, a gap over half the lugs' height and a rim too short for lugs and ledge", () => {
     const box = pot(() => ({ outer: [[[-30, -30], [30, -30], [30, 30], [-30, 30]]], opening: [[[-28, -28], [-28, 28], [28, 28], [28, -28]]] }));
     expect(bayonetPlan(box, options(), 50, 0, 49.7)).toEqual({ error: { code: "bayonetNotRound" } });
@@ -574,6 +907,157 @@ describe("where a bayonet lid's lugs and slots go (Discussion #1424)", () => {
     expect("error" in bayonetPlan(pot(), options({ bayonetDepth: 4.3 }), 50, 0, 49.7)).toBe(false);
     expect(bayonetPlan(pot(), options({ bayonetDepth: 4.3, bayonetAxialGap: 0.6 }), 50, 0, 49.7)).toEqual({ error: { code: "bayonetShallow", depth: 4.6 } });
     expect(bayonetPlan(pot(undefined, 50, 2), options({ bayonetDepth: 6 }), 50, 0, 49.7)).toEqual({ error: { code: "bayonetShallow", depth: 6.3 } });
+  });
+});
+
+describe("a tether for a screw or bayonet cap (asked in the Layerling User Group on Facebook)", () => {
+  /** A pot 60 across with a 2 mm wall, 50 high, as the screw lid's tests slice it, or what `shape` gives at a height. */
+  const pot = (shape?: (z: number) => { outer: [number, number][][]; opening: [number, number][][] }) => (z: number) => {
+    const level = shape ? shape(z) : { outer: [polygonRound(30)], opening: [polygonRound(28, 192, 0, 0, true)] };
+    return { outline: level.outer, opening: level.opening };
+  };
+  const options = (patch: Record<string, unknown> = {}) => normalizeLidOptions({ type: "screw", tether: true, ...patch });
+  /** The screw cap on that pot: two turns of 3 mm, its mouth 6 mm under the rim, 30 + 0.2 + 0.9 + 1.6 from the axis. */
+  const screwCap = { from: 44, capRadius: 32.7 };
+
+  it("is off unless asked for, and goes only with a screw or a bayonet lid", () => {
+    expect(LID_DEFAULTS.tether).toBe(false);
+    expect(normalizeLidOptions({ tether: true }).tether).toBe(true);
+    expect(normalizeLidOptions({ tether: "true" }).tether).toBe(true);
+    expect(normalizeLidOptions({ tether: "yes" }).tether).toBe(false);
+    expect(["plug", "cap", "both", "flat", "screw", "bayonet"].map((type) => lidTetherFits(normalizeLidOptions({ type })))).toEqual([false, false, false, false, true, true]);
+  });
+
+  it("puts the body's ring under the cap's mouth on a bead, and the cap's ring under a collar round its top with a bead below it, the gap round each", () => {
+    const plan = tetherPlan(pot(), options(), 50, 0, 49.7, screwCap);
+    if ("error" in plan) throw new Error(plan.error.code);
+    expect(plan.play).toBe(0.2);
+    expect(plan.centre[0]).toBeCloseTo(0, 9);
+    expect(plan.radius).toBeCloseTo(30, 9);
+    expect(plan.reach).toBe(0.8);
+    // The body's ring: 1.2 mm wide, 2 mm tall, the gap round the pot, under the cap's mouth and over the bead.
+    expect([plan.neckInner, plan.neckOuter, plan.neckLow, plan.neckHigh]).toEqual([expect.closeTo(30.2, 9), expect.closeTo(31.4, 9), expect.closeTo(41.8, 9), expect.closeTo(43.8, 9)]);
+    // The bead's flat top reaches 0.5 mm past the ring's inner face; its upright face is 0.4 mm tall.
+    expect([plan.beadTop, plan.beadOuter, plan.beadLow]).toEqual([expect.closeTo(41.6, 9), expect.closeTo(30.7, 9), expect.closeTo(41.2, 9)]);
+    // The cap's ring the gap round the cap (32.7) and under the collar, whose underside is 1 mm below the plate's top
+    // (52); the collar and the bead stand out as far as the bead on the body does past its ring, and reach 0.8 mm into
+    // the cap's 1.6 mm wall.
+    expect([plan.capInner, plan.capOuter, plan.capLow, plan.capHigh, plan.collarLow]).toEqual([expect.closeTo(32.9, 9), expect.closeTo(34.1, 9), expect.closeTo(48.8, 9), expect.closeTo(50.8, 9), expect.closeTo(51, 9)]);
+    expect([plan.capBeadOuter, plan.capRoot]).toEqual([expect.closeTo(33.4, 9), expect.closeTo(31.9, 9)]);
+    // The bead's upper flank the gap under the ring at its inner face, then 0.5 lower out at its crest, 0.4 tall.
+    expect([plan.crestHigh, plan.crestLow]).toEqual([expect.closeTo(48.1, 9), expect.closeTo(47.7, 9)]);
+    // The strap: from the cap's ring's lower edge to the body's ring's upper edge, the cap lifted 7 mm, 12.9 mm, and 3
+    // more: 16 mm.
+    expect(plan.strap).toBe(16);
+  });
+
+  it("keeps the gap round each ring, at least 0.1 mm, and makes the strap longer for a deeper cap", () => {
+    const tight = tetherPlan(pot(), options({ gap: 0 }), 50, 0, 49.7, screwCap);
+    const loose = tetherPlan(pot(), options({ gap: 0.3 }), 50, 0, 49.7, screwCap);
+    if ("error" in tight || "error" in loose) throw new Error("refused");
+    expect(tight.play).toBe(0.1);
+    expect(tight.neckInner).toBeCloseTo(30.1, 9);
+    expect(tight.capInner).toBeCloseTo(32.8, 9);
+    expect(loose.play).toBe(0.3);
+    expect(loose.neckHigh).toBeCloseTo(43.7, 9);
+    expect(loose.beadTop).toBeCloseTo(43.7 - 2 - 0.3, 9);
+    expect(loose.capHigh).toBeCloseTo(50.7, 9);
+    // A bayonet cap on the same pot, 8 mm deep and 33.3 from the axis: the strap 20 mm.
+    const bayonet = tetherPlan(pot(), options({ type: "bayonet" }), 50, 0, 49.7, { from: 42, capRadius: 33.3 });
+    if ("error" in bayonet) throw new Error(bayonet.error.code);
+    expect(bayonet.neckHigh).toBeCloseTo(41.8, 9);
+    expect(bayonet.strap).toBe(20);
+  });
+
+  it("refuses a cap too short for its ring, a body too low or not round below the cap, and a wall too thin there", () => {
+    // The collar, the ring with the gap over and under it and the bead below take 3.8 mm of the cap's rim.
+    expect(tetherPlan(pot(), options(), 50, 0, 49.7, { from: 47, capRadius: 32.7 })).toEqual({ error: { code: "tetherCapShort", depth: 3.8 } });
+    expect("error" in tetherPlan(pot(), options(), 50, 0, 49.7, { from: 46.2, capRadius: 32.7 })).toBe(false);
+    // Below the cap the gap, the ring, the gap, the bead's face and slope (at most 1.7 mm) take 4.5 mm, and 0.4 mm stays.
+    expect(tetherPlan(pot(), options(), 50, 39.2, 49.7, screwCap)).toEqual({ error: { code: "tetherNoNeck", length: 4.5 } });
+    expect("error" in tetherPlan(pot(), options(), 50, 39, 49.7, screwCap)).toBe(false);
+    // A pot that widens under its neck, 41 mm up: 4.5 mm below the cap (39.5) it is not as wide as at its top.
+    const shoulder = pot((z) => ({ outer: [polygonRound(z < 41 ? 31 : 30)], opening: [polygonRound(28, 192, 0, 0, true)] }));
+    expect(tetherPlan(shoulder, options(), 50, 0, 49.7, screwCap)).toEqual({ error: { code: "tetherNoNeck", length: 4.5 } });
+    const lowerShoulder = pot((z) => ({ outer: [polygonRound(z < 39.4 ? 31 : 30)], opening: [polygonRound(28, 192, 0, 0, true)] }));
+    expect("error" in tetherPlan(lowerShoulder, options(), 50, 0, 49.7, screwCap)).toBe(false);
+    // A wall 0.6 mm thick below 43 mm, where the bead goes.
+    const thinBelow = pot((z) => ({ outer: [polygonRound(30)], opening: [polygonRound(z < 43 ? 29.4 : 28, 192, 0, 0, true)] }));
+    expect(tetherPlan(thinBelow, options(), 50, 0, 49.7, screwCap)).toEqual({ error: { code: "tetherThinWall" } });
+  });
+});
+
+describe("a flip-top on a screw or bayonet cap", () => {
+  it("is off unless asked for, with an opening 8 mm across to begin with, 4 to 40", () => {
+    expect([LID_DEFAULTS.flipTop, LID_DEFAULTS.flipTopOpening]).toEqual([false, 8]);
+    expect(normalizeLidOptions({ flipTop: "true", flipTopOpening: "12.5" })).toMatchObject({ flipTop: true, flipTopOpening: 12.5 });
+    expect(normalizeLidOptions({ flipTop: 1, flipTopOpening: "x" })).toMatchObject({ flipTop: false, flipTopOpening: 8 });
+    expect(normalizeLidOptions({ flipTopOpening: 1 }).flipTopOpening).toBe(MIN_FLIP_TOP_OPENING);
+    expect(normalizeLidOptions({ flipTopOpening: 90 }).flipTopOpening).toBe(MAX_FLIP_TOP_OPENING);
+    expect([MIN_FLIP_TOP_OPENING, MAX_FLIP_TOP_OPENING, FLIP_HINGE_THICKNESS, FLIP_HINGE_LENGTH]).toEqual([4, 40, 0.4, 3]);
+  });
+
+  it("goes only with a cap that stays on: a screw lid's or a bayonet lid's", () => {
+    expect(["plug", "cap", "both", "flat", "screw", "bayonet"].map((type) => lidFlipTopFits(normalizeLidOptions({ type })))).toEqual([false, false, false, false, true, true]);
+  });
+
+  it("needs a plate deep enough for the V under the strip, or for seat and catch with a large gap", () => {
+    // The strip's 0.4 and the V's 1.4 (half of 3 less the gap): 1.8 mm; with no gap the V is deeper.
+    expect(flipTopThickness({ gap: 0.2 })).toBe(1.8);
+    expect(flipTopThickness({ gap: 0 })).toBe(1.9);
+    // 0.6 of seat, the gap at 45 degrees and once more, and 0.2 of catch: 2.25, up to 2.3.
+    expect(flipTopThickness({ gap: 0.6 })).toBe(2.3);
+  });
+
+  describe("where the flap and its hinge go", () => {
+    /** A round opening `radius` round the axis, as the body's rim has it seen from above. */
+    const opening = (radius = 28, cx = 0) => [polygonRound(radius, 192, cx, 0, true)];
+    const options = (patch: Record<string, unknown> = {}) => normalizeLidOptions({ type: "screw", flipTop: true, ...patch });
+
+    it("makes the flap 0.6 less the gap wider than the opening each side, its back 0.1 behind the opening's under the V", () => {
+      const plan = flipTopPlan(options(), [0, 0], opening());
+      if ("error" in plan) throw new Error(plan.error.code);
+      expect(plan.opening).toBe(8);
+      expect(plan.radius).toBeCloseTo(4.4, 12);
+      // The catch: the gap at 45 degrees, the gap the flap can slide back, and 0.2 to click past.
+      expect(plan.catchWidth).toBeCloseTo(0.2 * Math.SQRT2 + 0.4, 12);
+      // The V leans 1.4 each way, to a slit as wide as the gap; that slit is 0.1 behind the opening at the plate's
+      // underside (4 from the axis): the flap's back 2.5 behind the middle.
+      expect(plan.lean).toBeCloseTo(1.4, 12);
+      expect(plan.back).toBeCloseTo(2.5, 12);
+      expect(plan.back + plan.lean + 0.2).toBeCloseTo(4 + 0.1, 12);
+      // The strip as wide as the flap's straight back, a chord of its 4.4 at 2.5.
+      expect(plan.hingeWidth).toBeCloseTo(2 * Math.sqrt(4.4 ** 2 - 2.5 ** 2), 12);
+      expect([plan.hingeLength, plan.hingeThickness]).toEqual([3, 0.4]);
+      // The farthest cut: the slot's back corners at the plate's top, behind the round opening there (4.4 + 0.28).
+      expect(plan.reach).toBeCloseTo(Math.hypot(plan.hingeWidth / 2 + 0.2, 2.5 + 3), 12);
+      expect(plan.back + 3).toBeGreaterThan(4.4 + 0.2 * Math.SQRT2);
+    });
+
+    it("keeps the flap's back at least 0.3 of its radius behind its middle, so a small flap's strip is narrower than it", () => {
+      const plan = flipTopPlan(options({ flipTopOpening: 4 }), [0, 0], opening());
+      if ("error" in plan) throw new Error(plan.error.code);
+      expect(plan.radius).toBeCloseTo(2.4, 12);
+      expect(plan.back).toBeCloseTo(0.72, 12);
+      expect(plan.hingeWidth).toBeLessThan(2 * plan.radius);
+    });
+
+    it("keeps everything cut through the plate 0.5 inside the body's opening, and says how large an opening fits", () => {
+      // 13.8 round the axis: 20 mm reaches 13.06, 20.5 reaches 13.32.
+      expect("error" in flipTopPlan(options({ flipTopOpening: 20 }), [0, 0], opening(13.8))).toBe(false);
+      expect(flipTopPlan(options({ flipTopOpening: 20.5 }), [0, 0], opening(13.8))).toEqual({ error: { code: "flipTopTooLarge", opening: 20 } });
+      expect(flipTopPlan(options({ flipTopOpening: 30 }), [0, 0], opening(13.8))).toEqual({ error: { code: "flipTopTooLarge", opening: 20 } });
+      // Not even 4 mm in an opening 4.8 round, or one that is not round the cap's axis.
+      expect(flipTopPlan(options({ flipTopOpening: 4 }), [0, 0], opening(4.8))).toEqual({ error: { code: "flipTopNoRoom" } });
+      expect(flipTopPlan(options(), [0, 0], opening(10, 30))).toEqual({ error: { code: "flipTopNoRoom" } });
+      expect(flipTopPlan(options(), [0, 0], [])).toEqual({ error: { code: "flipTopNoRoom" } });
+    });
+
+    it("refuses a plate thinner than the flap and its hinge need, saying how thick", () => {
+      expect(flipTopPlan(options({ thickness: 1.7 }), [0, 0], opening())).toEqual({ error: { code: "flipTopThin", thickness: 1.8 } });
+      expect("error" in flipTopPlan(options({ thickness: 1.8 }), [0, 0], opening())).toBe(false);
+      expect(flipTopPlan(options({ gap: 0.6 }), [0, 0], opening())).toEqual({ error: { code: "flipTopThin", thickness: 2.3 } });
+    });
   });
 });
 

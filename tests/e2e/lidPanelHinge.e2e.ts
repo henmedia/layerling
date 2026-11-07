@@ -320,6 +320,29 @@ describe("the lid's panel with a bayonet lid (Discussion #1424)", () => {
     expect(texts(mount({ type: "bayonet", bayonetLugs: 2 }).panel)).toContain("turn it 45° clockwise");
   });
 
+  it("asks how far the cap turns, 0 for the lugs' own turn, up to a quarter turn, and says that a turn that does not fit is held to what fits", () => {
+    const { panel, changes } = mount({ type: "bayonet" });
+    const turn = slider(panel, "Turn (0 = automatic)")!;
+    expect(turn.value).toBe("0");
+    expect([turn.min, turn.max, turn.step]).toEqual(["0", "90", "5"]);
+    expect(texts(panel)).toContain("turn it 40° clockwise");
+    expect(texts(panel)).not.toContain("a quarter turn");
+    drag(panel, "Turn (0 = automatic)", "90");
+    expect(changes.at(-1)).toEqual({ bayonetTurn: 90 });
+    // A turn set by hand is 15 degrees at least.
+    drag(panel, "Turn (0 = automatic)", "5");
+    expect(changes.at(-1)).toEqual({ bayonetTurn: 15 });
+    act(() => root?.unmount());
+    const quarter = mount({ type: "bayonet", bayonetLugs: 2, bayonetTurn: 90 });
+    expect(slider(quarter.panel, "Turn (0 = automatic)")!.value).toBe("90");
+    expect(texts(quarter.panel)).toContain("2 lugs on the outside");
+    expect(texts(quarter.panel)).toContain("turn it 90° clockwise");
+    expect(texts(quarter.panel)).toContain("Up to 90°, a quarter turn, which two lugs leave room for. More lugs or a small body leave less room for the slots and the stops between them: a turn that does not fit is then held to what fits, and the status bar says so.");
+    // Back at 0 it is the lugs' own again.
+    drag(quarter.panel, "Turn (0 = automatic)", "0");
+    expect(quarter.changes.at(-1)).toEqual({ bayonetTurn: 0 });
+  });
+
   it("switches off magnets, hinge, click bumps and handle and says once why", () => {
     const { panel } = mount({ type: "bayonet", magnets: true, hinge: true, clickBumps: true, handle: "notch" });
     for (const name of ["Magnets in the corners", "Hinge", "Click bumps"]) {
@@ -333,6 +356,115 @@ describe("the lid's panel with a bayonet lid (Discussion #1424)", () => {
     expect(texts(panel)).not.toContain("A screw lid holds by its thread");
     expect(texts(panel)).not.toContain("A hinge goes with a lid that pushes in or a flat one.");
     expect(texts(panel)).not.toContain("Magnet diameter");
+  });
+});
+
+describe("the lid's panel with a standard bottle's or jar's thread", () => {
+  const thread = (panel: HTMLElement) => panel.querySelector<HTMLElement>('[role="radiogroup"][aria-label="Thread"]');
+
+  it("offers a screw lid its own thread or a standard's, its own to begin with", () => {
+    const { panel, changes } = mount({ type: "screw" });
+    const group = thread(panel)!;
+    expect(group).not.toBeNull();
+    const options = [...group.querySelectorAll<HTMLButtonElement>('[role="radio"]')];
+    expect(options.map((button) => button.textContent)).toEqual(["Custom", "PCO 1881", "PCO 1810", "GL 45", "Mason 70", "Mason 86"]);
+    expect(group.querySelector('[aria-checked="true"]')?.textContent).toBe("Custom");
+    expect(options[3].title).toBe("Laboratory bottles with the GL 45 thread (DIN 168).");
+    expect(slider(panel, "Thread pitch")).not.toBeNull();
+    expect(slider(panel, "Turns")).not.toBeNull();
+    act(() => options[1].click());
+    expect(changes.at(-1)).toEqual({ threadStandard: "pco1881" });
+    act(() => root?.unmount());
+    // Only a screw lid has a thread to choose.
+    for (const type of ["plug", "cap", "bayonet"] as const) {
+      expect(thread(mount({ type, threadStandard: "gl45" }).panel), type).toBeNull();
+      act(() => root?.unmount());
+    }
+  });
+
+  it("hides pitch and turns with a standard and says what it is, what the cap fits and which body gets the neck's thread", () => {
+    const { panel } = mount({ type: "screw", threadStandard: "pco1881" });
+    expect(thread(panel)!.querySelector('[aria-checked="true"]')?.textContent).toBe("PCO 1881");
+    expect(slider(panel, "Thread pitch")).toBeNull();
+    expect(slider(panel, "Turns")).toBeNull();
+    expect(slider(panel, "Gap per side")).not.toBeNull();
+    expect(slider(panel, "Rim wall")).not.toBeNull();
+    expect(texts(panel)).toContain("Most water and soft-drink bottles: the 28 mm neck with the short thread.");
+    expect(texts(panel)).toContain("The cap fits a PCO 1881 neck: 27.4 mm across its thread, 2.7 mm a turn; it reaches 10 mm down. A body whose top is as wide as the neck under the thread (23.94 to 25.14 mm) gets the neck's thread; any other stays as it is, and only the cap is made.");
+    // The own thread's line about its depth stays away.
+    expect(texts(panel)).not.toContain("The flanks are at 45°");
+    act(() => root?.unmount());
+    const jar = mount({ type: "screw", threadStandard: "mason86" }).panel;
+    expect(texts(jar)).toContain("Mason jars with a wide mouth.");
+    expect(texts(jar)).toContain("try the cap on your jar first");
+    expect(texts(jar)).toContain("85.85 mm across its thread, 6.35 mm a turn; it reaches 13 mm down");
+    expect(texts(jar)).toContain("(81.25 to 82.45 mm)");
+  });
+});
+
+describe("the lid's panel with a tether (asked in the Layerling User Group on Facebook)", () => {
+  it("offers a tether for a screw or bayonet lid only, and says what it is and what to print it in once ticked", () => {
+    for (const type of ["plug", "cap", "both", "flat"] as const) {
+      const { panel } = mount({ type, tether: true });
+      expect(checkbox(panel, "Tether"), type).toBeNull();
+      expect(texts(panel), type).not.toContain("Keeps the cap with the body");
+      act(() => root?.unmount());
+    }
+    for (const type of ["screw", "bayonet"] as const) {
+      const off = mount({ type });
+      const box = checkbox(off.panel, "Tether")!;
+      expect(box, type).not.toBeNull();
+      expect(box.checked).toBe(false);
+      expect(texts(off.panel)).not.toContain("Keeps the cap with the body");
+      act(() => box.click());
+      expect(off.changes.at(-1)).toEqual({ tether: true });
+      act(() => root?.unmount());
+      const on = mount({ type, tether: true });
+      expect(checkbox(on.panel, "Tether")!.checked).toBe(true);
+      expect(texts(on.panel)).toContain("Keeps the cap with the body when it is open, as on a drinks bottle");
+      expect(texts(on.panel)).toContain("best in PETG or TPU");
+      act(() => checkbox(on.panel, "Tether")!.click());
+      expect(on.changes.at(-1)).toEqual({ tether: false });
+      act(() => root?.unmount());
+    }
+  });
+});
+
+describe("the lid's panel with a flip-top", () => {
+  it("offers a flip-top with a screw lid and a bayonet lid only, off to begin with", () => {
+    for (const type of ["plug", "cap", "both", "flat"] as const) {
+      expect(checkbox(mount({ type }).panel, "Flip-top"), type).toBeNull();
+      act(() => root?.unmount());
+    }
+    for (const type of ["screw", "bayonet"] as const) {
+      const { panel, changes } = mount({ type });
+      const flipTop = checkbox(panel, "Flip-top")!;
+      expect(flipTop.checked, type).toBe(false);
+      expect(slider(panel, "Opening"), type).toBeNull();
+      act(() => flipTop.click());
+      expect(changes.at(-1)).toEqual({ flipTop: true });
+      act(() => root?.unmount());
+    }
+  });
+
+  it("asks for the opening once it is on, 8 mm to begin with, says what it is and what to print it in", () => {
+    const { panel, changes } = mount({ type: "screw", flipTop: true });
+    expect(checkbox(panel, "Flip-top")!.checked).toBe(true);
+    const opening = slider(panel, "Opening")!;
+    expect(opening.value).toBe("8");
+    expect([opening.min, opening.max]).toEqual(["4", "40"]);
+    expect(texts(panel)).toContain("A thin strip at the flap's back is its hinge, so the cap stays on and the flap never comes off.");
+    expect(texts(panel)).toContain("in PLA the strip breaks after a few bends");
+    act(() => {
+      const setValue = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, "value")!.set!;
+      setValue.call(opening, "12");
+      opening.dispatchEvent(new Event("input", { bubbles: true }));
+    });
+    expect(changes.at(-1)).toEqual({ flipTopOpening: 12 });
+    // The plate is thick enough to begin with; thinner than flap and hinge need, it says how thick.
+    expect(texts(panel)).not.toContain("too thin for a flip-top");
+    act(() => root?.unmount());
+    expect(texts(mount({ type: "bayonet", flipTop: true, thickness: 1.4 }).panel)).toContain("The lid is too thin for a flip-top's flap and hinge: make it at least 1.8 mm thick.");
   });
 });
 
