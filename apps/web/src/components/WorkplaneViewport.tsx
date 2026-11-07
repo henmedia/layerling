@@ -101,6 +101,7 @@ import type { CadModifierEdge } from "@/lib/cadModifierTypes";
 import { type CadFacePick } from "@/lib/cadFacePick";
 import { disposeCadFacePickMesh } from "@/lib/cadFacePickMesh";
 import { latchedDragAxis, type DragAxis } from "@/lib/dragAxisLatch";
+import { dragHasStarted } from "@/lib/dragStart";
 import { axisLockedPoint, circleOfEdgePoints, perpendicularFootOnSegment, pointAcrossCircle, pointOnCircle, tapeAxisLengthShift, tapeLengthShift } from "@/lib/tapeCircle";
 import { TAPE_SCENE_AXIS, tapeLengthMcpRefusal, type TapeAxis, type TapeLengthTypedRefusal, type TapeMeasurementsAnswer, type TapeMeasurementsRequest } from "@/lib/tapeLengthEdit";
 import { tapeAxisSpans, tapeDeltaAxes } from "@/lib/tapeLabels";
@@ -143,9 +144,6 @@ const LONG_PRESS_SLOP_PX = 8;
 const CAMERA_MIN_TARGET_Y = -70;
 const CAMERA_MAX_TARGET_Y = 120;
 const ROTATION_PROTRACTOR_OUTER_RADIUS = 94;
-/** How far the pointer goes before a pressed shape starts to move, in screen pixels - as the marquee. */
-const DRAG_START_PIXELS = 5;
-
 const MODIFIER_EDGE_PICK_RADIUS_PX = 14;
 
 type WorkplaneViewportProps = {
@@ -4585,7 +4583,11 @@ export function WorkplaneViewport({
       if (!transform) {
         return false;
       }
-      if (Math.hypot(clientX - transform.startClientX, clientY - transform.startClientY) > 3) {
+      // A handle acts once the pointer has really travelled, as a dragged part does (#150): a click on a size,
+      // height, lift, turn or arrow handle with a slightly shaky hand leaves the part as it was. Past that, the
+      // handle follows the pointer from where it was pressed.
+      if (!transform.hasMoved) {
+        if (!dragHasStarted(transform.startClientX, transform.startClientY, clientX, clientY)) return false;
         transform.hasMoved = true;
       }
 
@@ -7248,7 +7250,7 @@ export function WorkplaneViewport({
       // A shaky click or double click must not nudge the part: it moves once the pointer has
       // gone a few pixels, and then follows it from where the drag began (#150).
       if (!drag.started) {
-        if (Math.hypot(event.clientX - drag.startClient.x, event.clientY - drag.startClient.y) < DRAG_START_PIXELS) return;
+        if (!dragHasStarted(drag.startClient.x, drag.startClient.y, event.clientX, event.clientY)) return;
         drag.started = true;
       }
 
