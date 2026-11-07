@@ -29,9 +29,9 @@ beforeAll(async () => {
  * Ingo's 50 mm cube tilted by 45 degrees onto one edge, that edge rounded by `radius` as the edge tool does, set down
  * onto the bed: a square with one corner rounded, turned so that corner points down, drawn out 50 mm along X.
  */
-const cube = (radius: number): WorkplaneShape => {
+const cube = (radius: number, edge: "round" | "chamfer" = "round"): WorkplaneShape => {
   const profile: Array<[number, number]> = [[radius, 0], [50, 0], [50, 50], [0, 50], [0, radius]];
-  for (let k = 1; k < 16; k += 1) {
+  for (let k = 1; edge === "round" && k < 16; k += 1) {
     const a = Math.PI + (Math.PI / 2) * (k / 16);
     profile.push([radius + radius * Math.cos(a), radius + radius * Math.sin(a)]);
   }
@@ -100,6 +100,17 @@ describe("the support rib under a rounded bottom edge (#1385)", () => {
     // The bridges begin above the rounding, where the flat face is there to hold them.
     expect(built.plan.bridges.length).toBeGreaterThan(2);
     expect(Math.min(...built.plan.bridges)).toBeGreaterThanOrEqual(face.face.low - 1e-6);
+  });
+
+  it("stands under the flat face beside a 45-degree chamfer, which is no round wall", () => {
+    // The two faces and the chamfer have their four corners on one circle and were read as a cylinder: "curved".
+    const part = cube(3, "chamfer");
+    const { face } = lowerFace(part);
+    if (!face.ok) throw new Error(face.reason);
+    expect(face.face.angle).toBeCloseTo(45, 3);
+    const built = buildSupportRib(runtime, face.face, normalizeSupportRib({}), part);
+    if (!built.ok) throw new Error(built.reason);
+    expect(built.plan.bridges.length).toBeGreaterThan(2);
   });
 
   it("still refuses a face that stops more than 3 mm above the bed", () => {

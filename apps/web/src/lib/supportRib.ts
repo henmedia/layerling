@@ -17,7 +17,7 @@ import type { WorkplaneShape } from "@/types/layerling";
  * The rib is built in its own frame - s along the bed under the face (the way the face looks down), y up, w across the
  * rib - and set into the scene from there. One cut by the plane a gap off the face keeps every part of it clear of the
  * face; the bridges come after that cut. The result is a mesh body; a part not standing on the bed, a face that does
- * not reach the bed, one too flat or too steep, are refused.
+ * not reach the bed (or stop just above it, at a rounded or chamfered edge), one too flat or too steep, are refused.
  */
 
 type Vec = { x: number; y: number; z: number };
