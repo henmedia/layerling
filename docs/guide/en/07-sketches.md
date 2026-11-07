@@ -28,6 +28,7 @@ Click points one after another.
 Hold [[Shift]] to snap the new line in 15° steps, horizontal and vertical included.
 => The length and angle of the new line show at the pointer.
 To type how long it should be, see [Lines by numbers](#lines-by-numbers).
+> Every point you click lands on the snap grid set under {{ui:inspector.snapGrid}}. With [[Shift]] held the 15° step comes first: the length still goes in grid steps, but the end can lie between the grid lines.
 :::
 
 ::: icon=arc {{ui:sketch.arc}}
@@ -44,11 +45,13 @@ Click a point and drag in the direction the line should carry on, as with the pe
 => The further you drag, the more it bends.
 => The stretch to the new point bends along while you drag, so you see what you get.
 > Coming from Tinkercad and just want to click points? Take the {{ui:sketch.smooth}}.
+> The first stretch only bends at its start if you drag at the first point too. Just clicked, the line leaves that point straight; to bend it later, select the point with {{ui:sketch.select}} and drag its handle.
 :::
 
 ::: icon=smooth {{ui:sketch.smooth}} | [[3]]
 Click points one after another.
 => It lays a flowing path through the points you click.
+> At the two ends of an open line the curve heads straight for the next point, so the first and the last stretch bend less than the others. To bend one more, select its end point with {{ui:sketch.select}} and drag its handle. In a closed outline every point bends alike.
 :::
 
 ::: Closing or ending a line
@@ -64,6 +67,7 @@ Zoom in for fine detail: the closer you look, the more closely the line follows 
 => A line that ends where it began closes into an outline that can become a body; an open one stays a line, for {{ui:sketch.stroke}} or as a path to sweep along.
 Start on lines or on a template picture to trace a picture by hand.
 Begin or end a stroke at an open end to carry that line on, so a shape can be drawn in several strokes.
+> The stroke does not keep to the snap grid, so that it follows your hand. A point you drag afterwards does snap to it, unless {{ui:inspector.snapGrid}} is switched off.
 :::
 
 > The digits pick a tool as long as no line is being drawn; while one is, they are its length (see below). With {{ui:sketch.select}} and lines or points selected, the same keys change them instead: [[1]] makes lines straight and points corners, [[2]] turns lines into curves and [[3]] makes points smooth. With nothing selected they pick the tool as before.

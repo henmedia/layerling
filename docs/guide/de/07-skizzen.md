@@ -28,6 +28,7 @@ Punkte nacheinander anklicken.
 Mit gehaltener [[Umschalt]]-Taste rastet die neue Linie in 15°-Schritten ein, waagerecht und senkrecht eingeschlossen.
 => Am Zeiger stehen Länge und Winkel der neuen Linie.
 Wie lang sie werden soll und in welchem Winkel, kannst du auch eintippen, siehe [Linien nach Maß und Winkel](#linien-nach-mass-und-winkel).
+> Jeder Punkt, den du anklickst, landet auf dem Raster, das unter {{ui:inspector.snapGrid}} eingestellt ist. Mit gehaltener [[Umschalt]]-Taste geht der 15°-Schritt vor: Die Länge zählt weiter in Rasterschritten, das Ende kann aber zwischen den Rasterlinien liegen.
 :::
 
 ::: icon=arc {{ui:sketch.arc}}
@@ -44,11 +45,13 @@ Punkt anklicken und ziehen, und zwar in die Richtung, in der die Linie weiterlau
 => Je weiter du ziehst, desto stärker biegt sie sich.
 => Der Abschnitt zum neuen Punkt biegt sich schon während des Ziehens mit, so dass du siehst, was entsteht.
 > Du kommst aus Tinkercad und willst nur Punkte anklicken? Nimm die {{ui:sketch.smooth}}.
+> Der erste Abschnitt biegt sich an seinem Anfang nur, wenn du auch am ersten Punkt ziehst. Nur angeklickt, verlässt ihn die Linie gerade; um ihn später zu biegen, wählst du den Punkt mit {{ui:sketch.select}} aus und ziehst an seinem Griff.
 :::
 
 ::: icon=smooth {{ui:sketch.smooth}} | [[3]]
 Punkte nacheinander anklicken.
 => Sie legt einen fließenden Verlauf durch die Punkte, die du anklickst.
+> An den beiden Enden einer offenen Linie läuft die Kurve geradewegs auf den nächsten Punkt zu, deshalb biegen sich der erste und der letzte Abschnitt weniger als die übrigen. Soll sich einer stärker biegen, wählst du seinen Endpunkt mit {{ui:sketch.select}} aus und ziehst an seinem Griff. In einem geschlossenen Umriss biegen sich alle Punkte gleich.
 :::
 
 ::: Eine Linie schließen oder beenden
@@ -64,6 +67,7 @@ Für feine Einzelheiten hineinzoomen: Je näher du hinsiehst, desto genauer folg
 => Eine Linie, die dort endet, wo sie begann, schließt sich zum Umriss und kann ein Körper werden; eine offene bleibt eine Linie, für {{ui:sketch.stroke}} oder als Pfad zum Entlangführen.
 Auf Linien oder auf einem Vorlagenbild beginnen, um ein Bild von Hand nachzuzeichnen.
 Einen Strich an einem offenen Ende beginnen oder enden lassen, um diese Linie fortzusetzen; so lässt sich eine Form in mehreren Strichen zeichnen.
+> Der Strich hält sich nicht an das Raster, damit er deiner Hand folgt. Ein Punkt, den du danach ziehst, rastet dagegen darauf ein, außer {{ui:inspector.snapGrid}} ist ausgeschaltet.
 :::
 
 > Die Ziffern wählen ein Werkzeug, solange keine Linie gezeichnet wird; während einer Linie sind sie ihre Länge (siehe unten). Mit dem Werkzeug {{ui:sketch.select}} und ausgewählten Linien oder Punkten ändern dieselben Tasten stattdessen die Auswahl: [[1]] macht Linien gerade und Punkte zu Ecken, [[2]] macht Linien zu Kurven und [[3]] macht Punkte weich. Ohne Auswahl wählen sie wie bisher das Werkzeug.
