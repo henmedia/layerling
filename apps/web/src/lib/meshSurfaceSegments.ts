@@ -1,3 +1,4 @@
+import { touchPlanesToCylinders } from "@/lib/meshSurfaceTouch";
 import {
   type AnalyticSurface,
   perpendicularFrame as perpendicularFrameOf,
@@ -591,6 +592,9 @@ export function segmentMesh(mesh: WeldedMesh, options: SegmentationOptions = {})
   const renumber = new Map(kept.map((r, i) => [r.id, i]));
   kept.forEach((r, i) => { r.id = i; });
   for (let t = 0; t < T; t += 1) regionOfTriangle[t] = renumber.get(regionOfTriangle[t])!;
+
+  // 6. A flat side that runs into a cylinder at almost no angle (a hull's, a slot's) set onto it exactly (#1442).
+  touchPlanesToCylinders(kept, regionOfTriangle, neighbors, crease, (t) => mesh.triangles[t].map((v) => P[v]), tolerance);
   return { mesh, regions: kept, regionOfTriangle, neighbors, normals, areas, tolerance };
 }
 
