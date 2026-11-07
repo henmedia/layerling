@@ -18,6 +18,7 @@ import {
   MAX_BAYONET_DEPTH,
   MAX_BAYONET_DETENT,
   MAX_BAYONET_LUGS,
+  MAX_BAYONET_TURN,
   MAX_CLICK_BUMP_HEIGHT,
   MAX_HINGE_GAP,
   MAX_HINGE_KNUCKLES,
@@ -72,7 +73,7 @@ import type { WorkplaneWorkspaceSettings } from "@/types/layerling";
  * notch in the body (#1230). A screw lid (Discussion #1393) is a cap with a thread inside its rim for a round body, which
  * gets the matching thread on the outside of its top; it holds by that alone. A bayonet lid (Discussion #1424) is a cap
  * for a round body too, with an L-shaped slot inside its rim for each of the lugs on the outside of the body's top: pushed
- * down and turned, it locks.
+ * down and turned, it locks, as far as its lugs give or as far as set, up to a quarter turn.
  */
 export function LidPanel({
   targetName,
@@ -250,6 +251,20 @@ export function LidPanel({
             disabled={busy}
             onChange={(value) => onChange({ bayonetLugs: normalizeLidOptions({ bayonetLugs: value }).bayonetLugs })}
           />
+          {/* How far the cap turns to lock: 0 as the lugs give, or set by hand, held to what fits round the body. */}
+          <EdgeModifierSlider
+            label={t("lid.bayonetTurn")}
+            value={settings.bayonetTurn}
+            min={0}
+            max={MAX_BAYONET_TURN}
+            step={5}
+            unit="°"
+            workspace={workspace}
+            decimals={0}
+            disabled={busy}
+            onChange={(value) => onChange({ bayonetTurn: normalizeLidOptions({ bayonetTurn: value }).bayonetTurn })}
+          />
+          {settings.bayonetTurn > 0 ? <span className="shell-openings-summary">{t("lid.bayonetTurnHint")}</span> : null}
           <EdgeModifierSlider
             label={t("lid.depthCap")}
             value={settings.bayonetDepth}
@@ -299,7 +314,7 @@ export function LidPanel({
         {screw ? (
           <span className="shell-openings-summary">{t("lid.screwHint", { depth: millimetres(Math.round(thread.depth * 100) / 100), height: millimetres(Math.round(thread.height * 10) / 10) })}</span>
         ) : null}
-        {/* The rib behind each locked lug, which it clicks past; then how it goes on, with the turn its count gives. */}
+        {/* The rib behind each locked lug, which it clicks past; then how it goes on, with the turn set or its count's. */}
         {bayonet ? (<>
           <EdgeModifierSlider
             label={t("lid.bayonetDetent")}
@@ -313,7 +328,7 @@ export function LidPanel({
             onChange={(value) => onChange({ bayonetDetent: value })}
           />
           <span className="shell-openings-summary">{t("lid.bayonetDetentHint")}</span>
-          <span className="shell-openings-summary">{t("lid.bayonetHint", { count: settings.bayonetLugs, turn: millimetres(bayonetTurn(settings.bayonetLugs)) })}</span>
+          <span className="shell-openings-summary">{t("lid.bayonetHint", { count: settings.bayonetLugs, turn: millimetres(settings.bayonetTurn || bayonetTurn(settings.bayonetLugs)) })}</span>
         </>) : null}
       </>)}
 

@@ -320,6 +320,29 @@ describe("the lid's panel with a bayonet lid (Discussion #1424)", () => {
     expect(texts(mount({ type: "bayonet", bayonetLugs: 2 }).panel)).toContain("turn it 45° clockwise");
   });
 
+  it("asks how far the cap turns, 0 for the lugs' own turn, up to a quarter turn, and says that a turn that does not fit is held to what fits", () => {
+    const { panel, changes } = mount({ type: "bayonet" });
+    const turn = slider(panel, "Turn (0 = automatic)")!;
+    expect(turn.value).toBe("0");
+    expect([turn.min, turn.max, turn.step]).toEqual(["0", "90", "5"]);
+    expect(texts(panel)).toContain("turn it 40° clockwise");
+    expect(texts(panel)).not.toContain("a quarter turn");
+    drag(panel, "Turn (0 = automatic)", "90");
+    expect(changes.at(-1)).toEqual({ bayonetTurn: 90 });
+    // A turn set by hand is 15 degrees at least.
+    drag(panel, "Turn (0 = automatic)", "5");
+    expect(changes.at(-1)).toEqual({ bayonetTurn: 15 });
+    act(() => root?.unmount());
+    const quarter = mount({ type: "bayonet", bayonetLugs: 2, bayonetTurn: 90 });
+    expect(slider(quarter.panel, "Turn (0 = automatic)")!.value).toBe("90");
+    expect(texts(quarter.panel)).toContain("2 lugs on the outside");
+    expect(texts(quarter.panel)).toContain("turn it 90° clockwise");
+    expect(texts(quarter.panel)).toContain("Up to 90°, a quarter turn, which two lugs leave room for. More lugs or a small body leave less room for the slots and the stops between them: a turn that does not fit is then held to what fits, and the status bar says so.");
+    // Back at 0 it is the lugs' own again.
+    drag(quarter.panel, "Turn (0 = automatic)", "0");
+    expect(quarter.changes.at(-1)).toEqual({ bayonetTurn: 0 });
+  });
+
   it("switches off magnets, hinge, click bumps and handle and says once why", () => {
     const { panel } = mount({ type: "bayonet", magnets: true, hinge: true, clickBumps: true, handle: "notch" });
     for (const name of ["Magnets in the corners", "Hinge", "Click bumps"]) {
