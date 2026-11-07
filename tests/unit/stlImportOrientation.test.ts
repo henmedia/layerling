@@ -31,12 +31,13 @@ describe("STL import orientation", () => {
     expect(shape.importedMesh?.baseDepth).toBeCloseTo(60);
   });
 
-  it("preserves an unmistakably flat Y-up legacy model", () => {
-    const shape = importedShapeFromStl("raspberry-pi-like.stl", boxStl(89, 20, 58));
+  it("keeps an upright, thin model standing as it was made (Discussion #1450)", () => {
+    // A knife standing on its back: long in X, thin in Y, tall in Z. It used to be taken for a Y-up file and lay flat.
+    const shape = importedShapeFromStl("knife-upright.stl", boxStl(306, 30, 70));
 
-    expect(shape.importedMesh?.baseWidth).toBeCloseTo(89);
-    expect(shape.importedMesh?.baseHeight).toBeCloseTo(20);
-    expect(shape.importedMesh?.baseDepth).toBeCloseTo(58);
+    expect(shape.importedMesh?.baseWidth).toBeCloseTo(306);
+    expect(shape.importedMesh?.baseHeight).toBeCloseTo(70);
+    expect(shape.importedMesh?.baseDepth).toBeCloseTo(30);
   });
 
   it("works out the normals from the triangles when the file's are 0 0 0 (#988)", () => {

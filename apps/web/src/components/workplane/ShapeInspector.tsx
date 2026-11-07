@@ -4112,6 +4112,7 @@ export function ShapeInspector({
   onObjectSnapChange,
   onEditSketch,
   onOpenGroup,
+  onHullKeepHolesChange,
   canSeparateParts = false,
   onSeparateParts,
   onWrapAroundCylinder,
@@ -4153,6 +4154,8 @@ export function ShapeInspector({
   onEditSketch?: () => void;
   /** Opens a group so its parts can be changed one by one. */
   onOpenGroup?: () => void;
+  /** A hull built again with its parts' holes kept open or filled (Discussion #1440). */
+  onHullKeepHolesChange?: (keepHoles: boolean) => void;
   canSeparateParts?: boolean;
   onSeparateParts?: () => void;
   /** Wraps this body around a cylinder of the given diameter (#106). */
@@ -4803,6 +4806,24 @@ export function ShapeInspector({
         <button className="inspector-action-button" type="button" disabled={frozen} onClick={onOpenGroup}>
           {t(shape.groupOperation === "bundle" ? "group.editBundle" : "group.edit")} (E)
         </button>
+      ) : null}
+
+      {/* A hull keeps its parts' holes open or fills them (Discussion #1440); switching builds it again. */}
+      {shape.groupOperation === "hull" && !shape.hole && onHullKeepHolesChange ? (
+        <div className="property-card" data-help-section-all="intersection">
+          <div className="property-list cylinder-wrap-body">
+            <ToggleProperty
+              label={t("inspector.hullKeepHoles")}
+              value={Boolean(shape.hullKeepHoles)}
+              disabled={frozen}
+              onChange={onHullKeepHolesChange}
+            />
+            <p className="cylinder-wrap-hint">
+              {t(shape.hullKeepHoles ? "inspector.hullKeepHolesOnHint" : "inspector.hullKeepHolesOffHint")}
+              <GuideHelpLink section="intersection" className="inspector-help-link" />
+            </p>
+          </div>
+        </div>
       ) : null}
 
       {/* What the group does with its parts when it is resized (Discussion #526): two long choices, side by side. */}

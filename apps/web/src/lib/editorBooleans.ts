@@ -2164,7 +2164,16 @@ export function canHullShapes(shapes: WorkplaneShape[]) {
  * group, which Edit group opens again and builds anew; the hull itself is a mesh (Manifold.hull of the
  * parts' solids), so its round faces are facets, as the parts' own meshes are.
  */
-export async function buildHullShapeFromSelection(groupable: WorkplaneShape[], triangleLimit: number): Promise<HullBuildResult> {
+export type HullBuildOptions = {
+  /**
+   * The holes and hollows of each part stay open (Discussion #1440): what a part's own hull has more than the part - the
+   * bore of a tube, the inside of a hollowed cylinder, the holes of a group - is cut out of the hull again, and the parts
+   * are joined back in, so a neighbour that reaches into it is not cut. A recess at the side of a part stays too.
+   */
+  keepHoles?: boolean;
+};
+
+export async function buildHullShapeFromSelection(groupable: WorkplaneShape[], triangleLimit: number, options: HullBuildOptions = {}): Promise<HullBuildResult> {
   const shapes = groupable.filter((shape) => !isNonSolidShape(shape));
   if (!canHullShapes(shapes)) return { group: null, failureNotice: t("status.hullNeedsShapes") };
   const holesOnly = shapes.every((shape) => shape.hole);
@@ -2186,6 +2195,22 @@ export async function buildHullShapeFromSelection(groupable: WorkplaneShape[], t
     }
     let result = runtime.Manifold.hull(parts);
     created.push(result);
+    const keepHoles = Boolean(options.keepHoles) && !holesOnly;
+    if (keepHoles) {
+      for (const part of parts) {
+        const own = runtime.Manifold.hull([part]);
+        created.push(own);
+        const inside = own.subtract(part);
+        created.push(inside);
+        if (inside.isEmpty()) continue;
+        result = result.subtract(inside);
+        created.push(result);
+      }
+      for (const part of parts) {
+        result = result.add(part);
+        created.push(result);
+      }
+    }
     if (holes.length) {
       const cutter = shapesToManifoldUnion(runtime, holes, created);
       if (!cutter) return { group: null, failureNotice: t("status.hullFailed") };
@@ -2194,7 +2219,9 @@ export async function buildHullShapeFromSelection(groupable: WorkplaneShape[], t
     }
     if (result.status() !== "NoError" || result.numTri() < 1) return { group: null, failureNotice: t("status.hullFailed") };
     const group = meshPositionsToGroupShape(shapes, solids, manifoldMeshToPositions(result.getMesh()), "grouped-hull");
-    return group ? { group: { ...group, name: "Hull", hole: holesOnly }, failureNotice: "" } : { group: null, failureNotice: t("status.hullFailed") };
+    return group
+      ? { group: { ...group, name: "Hull", hole: holesOnly, ...(keepHoles ? { hullKeepHoles: true } : {}) }, failureNotice: "" }
+      : { group: null, failureNotice: t("status.hullFailed") };
   } catch {
     return { group: null, failureNotice: t("status.hullFailed") };
   } finally {

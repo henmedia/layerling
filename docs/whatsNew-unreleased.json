@@ -1,1 +1,12 @@
-[]
+[
+  {
+    "title": {
+      "de": "Hülle mit offenen Löchern",
+      "en": "Hull with open holes"
+    },
+    "body": {
+      "de": "Eine Hülle füllt alles, was in ihren Teilen hohl ist: ein Rohr, einen ausgehöhlten Zylinder, Löcher in einer Gruppe. Mit „Löcher der Teile behalten“ unter Eigenschaften bleiben sie offen, und die Hülle füllt nur den Raum zwischen den Teilen.",
+      "en": "A hull fills whatever is hollow in its parts: a tube, a hollowed cylinder, the holes in a group. With Keep the parts' holes under Properties they stay open, and the hull only fills the space between the parts."
+    }
+  }
+]

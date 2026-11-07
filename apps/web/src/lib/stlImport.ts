@@ -16,29 +16,14 @@ function stlHeader(buffer: ArrayBuffer) {
   return new TextDecoder("ascii").decode(new Uint8Array(buffer, 0, Math.min(80, buffer.byteLength))).toLowerCase();
 }
 
-function stlUsesLayerlingYUp(buffer: ArrayBuffer, position: THREE.BufferAttribute | THREE.InterleavedBufferAttribute) {
-  // Our own ASCII STL exports are already Y-up. Preserve those, including tall
-  // models where geometry alone cannot reveal an up axis.
-  const header = stlHeader(buffer);
-  if (header.includes("layerling")) return true;
-
-  let minY = Number.POSITIVE_INFINITY;
-  let maxY = Number.NEGATIVE_INFINITY;
-  let minZ = Number.POSITIVE_INFINITY;
-  let maxZ = Number.NEGATIVE_INFINITY;
-  for (let i = 0; i < position.count; i += 1) {
-    minY = Math.min(minY, position.getY(i));
-    maxY = Math.max(maxY, position.getY(i));
-    minZ = Math.min(minZ, position.getZ(i));
-    maxZ = Math.max(maxZ, position.getZ(i));
-  }
-
-  const ySpan = maxY - minY;
-  const zSpan = maxZ - minZ;
-  // Some legacy/model-library STLs (including the Raspberry Pi fixture) are
-  // unmistakably flat on Y. Keep that established orientation; ambiguous STL
-  // files follow the slicer-standard Z-up convention.
-  return Number.isFinite(ySpan) && Number.isFinite(zSpan) && ySpan <= zSpan * 0.55;
+/**
+ * Whether an STL is already in layerling's own Y-up frame: only our own ASCII exports, known by their header. Every
+ * other STL is Z-up, as every slicer reads it, and keeps the orientation it was made in. A guess from the proportions
+ * (thin in Y means Y-up) laid upright flat parts down: a knife standing on its back, 306 × 30 × 70 mm, came in lying
+ * flat (Discussion #1450).
+ */
+function stlUsesLayerlingYUp(buffer: ArrayBuffer) {
+  return stlHeader(buffer).includes("layerling");
 }
 
 /** The name an imported body takes after its file. */
@@ -131,7 +116,7 @@ export function importedShapeFromStl(fileName: string, buffer: ArrayBuffer): Wor
   const geometry = rawGeometry.index ? rawGeometry.toNonIndexed() : rawGeometry.clone();
   const position = geometry.getAttribute("position");
   const rawPositions: number[] = [];
-  const usesLayerlingYUp = stlUsesLayerlingYUp(buffer, position);
+  const usesLayerlingYUp = stlUsesLayerlingYUp(buffer);
 
   for (let i = 0; i < position.count; i += 1) {
     const sourcePosition: [number, number, number] = [position.getX(i), position.getY(i), position.getZ(i)];

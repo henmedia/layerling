@@ -158,6 +158,8 @@ export function mcpShapeSummary(shape: WorkplaneShape): LayerlingMcpShapeSummary
     groupedCount: shape.groupedShapes?.length ?? 0,
     // What a group does with its parts when it is resized (Discussion #526).
     ...(offersGroupResize(shape) ? { groupResize: shape.groupResize ?? "stretch" } : {}),
+    // A hull: whether its parts' own holes stay open (Discussion #1440).
+    ...(shape.groupOperation === "hull" ? { keepHoles: Boolean(shape.hullKeepHoles) } : {}),
     importedTriangles: shape.importedMesh?.triangleCount ?? 0,
     cadDisplayEdgeCount: shape.cadDisplayEdges?.length ?? null,
     sketchPointCount: shape.sketchProfile?.points.length ?? 0,

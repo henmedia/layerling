@@ -625,6 +625,8 @@ export function canonicalizeShape(unrepaired: WorkplaneShape): WorkplaneShape {
     if (groupResize) next.groupResize = groupResize;
     else delete next.groupResize;
   }
+  // Only a hull keeps its parts' holes, and only when told to: false is the same as left out.
+  if (next.hullKeepHoles !== true || next.groupOperation !== "hull") delete next.hullKeepHoles;
   if (shape.sketchRevolve) {
     next.sketchRevolve = {
       startAngle: shape.sketchRevolve.startAngle,
@@ -984,6 +986,7 @@ export function workplaneShapesEqual(a: WorkplaneShape, b: WorkplaneShape) {
     a.groupOperation === b.groupOperation &&
     a.multicolor === b.multicolor &&
     a.groupResize === b.groupResize &&
+    Boolean(a.hullKeepHoles) === Boolean(b.hullKeepHoles) &&
     a.rotationPivot === b.rotationPivot &&
     fieldFormulasEqual(a.formulas, b.formulas) &&
     a.locked === b.locked &&

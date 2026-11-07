@@ -206,9 +206,16 @@ describe("a flush hinge on a box with rounded corners, without end plugs (Discus
       if ("error" in result) throw new Error(JSON.stringify(result.error));
       const { knuckles, cuts, pin, pinLength } = result.hinge!;
       created.push(result.lid, knuckles, cuts!, pin!);
-      // The hole, 0.925 mm round, is whole out to where the round crosses the line 0.925 mm behind the axis: 1.75 mm in
-      // front of the back, 4.25 mm in front of the corner's middle, 6 mm round it (on a round of 64 sides).
-      const whole = 24 + Math.sqrt(36 - 4.25 ** 2);
+      // The hole, 1.025 mm round (a printed pin's, #1220), is whole out to where the round crosses the line 1.025 mm behind
+      // the axis: 1.65 mm in front of the back, 4.35 mm in front of the corner's middle, 6 mm round it, on a round of 64
+      // sides (16 to the corner), which crosses that line a little nearer the middle than a true circle would.
+      const corner = (depth: number) => {
+        const step = Math.PI / 32;
+        const k = Math.floor(Math.asin(depth / 6) / step);
+        const [a, b] = [[6 * Math.cos(k * step), 6 * Math.sin(k * step)], [6 * Math.cos((k + 1) * step), 6 * Math.sin((k + 1) * step)]];
+        return a[0] + ((depth - a[1]) / (b[1] - a[1])) * (b[0] - a[0]);
+      };
+      const whole = 24 + corner(4.35);
       expect(pinLength).toBeCloseTo(2 * whole - 1, 2);
       const printed = pin!.boundingBox();
       expect(printed.max[0] - printed.min[0]).toBeCloseTo(pinLength!, 3);
@@ -279,15 +286,17 @@ describe("a flush hinge's ends where there is nothing to fill (Discussion #1387,
       return body;
     };
     // Taken before the end knuckles filled rounded corners without end plugs: the volume and the number of triangles of the
-    // lid, the body's knuckles, the cuts grouped with the body, the printed pin and the plugs, and the pin's length.
+    // lid, the body's knuckles, the cuts grouped with the body, the printed pin and the plugs, and the pin's length. With a
+    // printed pin the body's holes and the plugs' pockets have since been 0.1 mm per side roomier (#1220), so knuckles,
+    // cuts and plugs there are taken again; lid, pin and length are as before.
     const before = [
-      ["square box, flush", openBox(kernel, created), { hingeStyle: "flush" }, [5429.1403, 1196], [773.2198, 1184], [841.0166, 1180], [134.205, 160], null, null],
+      ["square box, flush", openBox(kernel, created), { hingeStyle: "flush" }, [5429.1403, 1196], [751.498, 1184], [864.0838, 1180], [134.205, 160], null, null],
       ["square box, flush on the right", openBox(kernel, created), { hingeStyle: "flush", hingeSide: "right" }, [5574.8683, 830], [541.2539, 888], [535.0294, 836], null, null, null],
-      ["square box, end plugs", openBox(kernel, created), { hingeStyle: "flush", hingeEndPlugs: true }, [5429.1403, 1196], [768.767, 1256], [846.5826, 1384], [116.0078, 160], [24.5, 24], 51],
-      ["rounded box, end plugs", roundedBox(kernel, created, 6).body, { hingeStyle: "flush", hingeEndPlugs: true }, [5269.6395, 1530], [851.3119, 1268], [683.4519, 976], [111.4305, 160], [24.2372, 104], 48.9877],
-      ["box rounded within the gap, flush", roundedBox(kernel, created, 0.3).body, { hingeStyle: "flush" }, [5398.8937, 1092], [815.8299, 888], [787.1663, 836], [133.4842, 160], null, null],
-      ["rounded box, outside", roundedBox(kernel, created, 6).body, { hingeStyle: "outside" }, [6219.7112, 1808], [941.7402, 840], null, [107.3232, 160], null, null],
-      ["round pot, outside", pot(), { hingeStyle: "outside" }, [4953.8011, 2478], [757.364, 632], null, [46.5776, 160], null, null],
+      ["square box, end plugs", openBox(kernel, created), { hingeStyle: "flush", hingeEndPlugs: true }, [5429.1403, 1196], [746.0303, 1216], [870.9185, 1364], [116.0078, 160], [30.42, 24], 51],
+      ["rounded box, end plugs", roundedBox(kernel, created, 6).body, { hingeStyle: "flush", hingeEndPlugs: true }, [5269.6395, 1530], [825.8996, 1244], [710.6078, 944], [111.4305, 160], [30.0224, 120], 48.9877],
+      ["box rounded within the gap, flush", roundedBox(kernel, created, 0.3).body, { hingeStyle: "flush" }, [5398.8937, 1092], [792.9111, 888], [811.4176, 836], [133.4842, 160], null, null],
+      ["rounded box, outside", roundedBox(kernel, created, 6).body, { hingeStyle: "outside" }, [6219.7112, 1808], [923.3285, 840], null, [107.3232, 160], null, null],
+      ["round pot, outside", pot(), { hingeStyle: "outside" }, [4953.8011, 2478], [748.2736, 632], null, [46.5776, 160], null, null],
     ] as const;
     try {
       for (const [name, body, style, lid, knuckles, cuts, pin, plugs, pinLength] of before) {

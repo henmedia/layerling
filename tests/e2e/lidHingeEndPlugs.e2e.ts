@@ -121,28 +121,29 @@ describe("end plugs for a flush hinge (Discussion #1387, real Manifold kernel)",
       const box = whole.boundingBox();
       expect(box.max[0] - box.min[0]).toBeCloseTo(60, 3);
       expect(box.max[2] - box.min[2]).toBeCloseTo(40, 3);
-      // Over the plug's 4 mm at each end the hole is a square standing on a corner, 0.925 mm from its middle to each side
-      // (as tight round the pin as the body's round holes): a square rod a hair smaller goes in 4 mm, not 4.5.
+      // Over the plug's 4 mm at each end the hole is a square standing on a corner, 1.025 mm from its middle to each side
+      // (as roomy round the printed pin as the body's round holes): a square rod a hair smaller goes in 4 mm, not 4.5.
       for (const [from, to, deeper] of [[-31, -26.05, -25.5], [26.05, 31, 25.5]] as const) {
-        expect(overlap(whole, squareRod(kernel, 0.915, from, to, AXIS_Y, AXIS_Z, created)), `square at ${from}`).toBeLessThan(1e-4);
-        const longer = from < 0 ? squareRod(kernel, 0.915, from, deeper, AXIS_Y, AXIS_Z, created) : squareRod(kernel, 0.915, deeper, to, AXIS_Y, AXIS_Z, created);
+        expect(overlap(whole, squareRod(kernel, 1.015, from, to, AXIS_Y, AXIS_Z, created)), `square at ${from}`).toBeLessThan(1e-4);
+        const longer = from < 0 ? squareRod(kernel, 1.015, from, deeper, AXIS_Y, AXIS_Z, created) : squareRod(kernel, 1.015, deeper, to, AXIS_Y, AXIS_Z, created);
         expect(overlap(whole, longer), `square past the pocket at ${from}`).toBeGreaterThan(1e-3);
-        expect(overlap(whole, squareRod(kernel, 0.94, from, to, AXIS_Y, AXIS_Z, created)), `a larger square at ${from}`).toBeGreaterThan(1e-3);
+        expect(overlap(whole, squareRod(kernel, 1.04, from, to, AXIS_Y, AXIS_Z, created)), `a larger square at ${from}`).toBeGreaterThan(1e-3);
       }
       // So the pin goes in from either end, through every knuckle and both pockets.
       const filament = kernel.Manifold.cylinder(70, 0.875, 0.875, 48).rotate([0, 90, 0]).translate([-35, AXIS_Y, AXIS_Z]);
       created.push(filament);
       expect(overlap(whole, filament)).toBeLessThan(0.001);
 
-      // Two plugs, each a square as thick as the pin (1.75 mm) and 4 mm long, lying on a flat side beside the lid.
+      // Two plugs, each a square 0.05 mm per side smaller than its pocket (1.95 mm: the printed pin's 1.75 and the 0.1 mm
+      // more room its holes have per side) and 4 mm long, lying on a flat side beside the lid.
       const pieces = plugs!.decompose();
       created.push(...pieces);
       expect(pieces.length).toBe(2);
       for (const piece of pieces) {
         const lying = piece.boundingBox();
-        expect(piece.volume()).toBeCloseTo(1.75 * 1.75 * 4, 2);
+        expect(piece.volume()).toBeCloseTo(1.95 * 1.95 * 4, 2);
         expect(lying.min[1]).toBeCloseTo(0, 6);
-        expect(lying.max[1] - lying.min[1]).toBeCloseTo(1.75, 3);
+        expect(lying.max[1] - lying.min[1]).toBeCloseTo(1.95, 3);
         expect(lying.max[0] - lying.min[0]).toBeCloseTo(4, 3);
         expect(overlap(piece, result.lid)).toBeLessThan(1e-6);
         expect(overlap(piece, pin!)).toBeLessThan(1e-6);
@@ -156,11 +157,11 @@ describe("end plugs for a flush hinge (Discussion #1387, real Manifold kernel)",
         expect(index === 0 ? placed.min[0] : placed.max[0]).toBeCloseTo(index === 0 ? -30 : 30, 3);
         expect(overlap(plug, whole), `plug ${index} in the box`).toBeLessThan(1e-3);
         expect(overlap(plug, closed), `plug ${index} in the lid`).toBeLessThan(1e-3);
-        const larger = (index === 0 ? squareRod(kernel, 0.925 - 0.01, -30.01, -26.01, AXIS_Y, AXIS_Z, created) : squareRod(kernel, 0.925 - 0.01, 26.01, 30.01, AXIS_Y, AXIS_Z, created));
+        const larger = (index === 0 ? squareRod(kernel, 1.025 - 0.01, -30.01, -26.01, AXIS_Y, AXIS_Z, created) : squareRod(kernel, 1.025 - 0.01, 26.01, 30.01, AXIS_Y, AXIS_Z, created));
         const filled = larger.subtract(plug);
         created.push(filled);
         // What of the pocket the plug leaves: a skin of 0.04 mm round its four sides.
-        expect(filled.volume()).toBeLessThan(4 * 1.83 * 0.045 * 4);
+        expect(filled.volume()).toBeLessThan(4 * 2.03 * 0.045 * 4);
         // Turned by 5 degrees about the hinge's line it runs into the pocket's walls: it cannot turn.
         const there = plug.translate([0, -AXIS_Y, -AXIS_Z]);
         const turned = there.rotate([5, 0, 0]);
