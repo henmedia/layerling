@@ -93,8 +93,8 @@ export type PrinterPlaySetting = {
 
 export const PRINTER_PLAY_SETTINGS: readonly PrinterPlaySetting[] = [
   // The lid's lip in the opening, or its rim over the wall: two parts printed apart that slide together, room per side.
-  // A screw lid's thread takes it too, in the radius, as a nut's room is (twice the play across the diameter), and a bayonet
-  // lid's room round its lugs and along the body's wall.
+  // A screw lid's thread takes it too, in the radius, as a nut's room is (twice the play across the diameter), a bayonet
+  // lid's room round its lugs and along the body's wall, and a flip-top's flap in its opening, printed apart in place.
   { id: "lid.gap", takes: "perSide" },
   // The lid hinge's pin in the lid's holes, per side: exactly the pin in a hole the fit test measures.
   { id: "lid.hingePinPlay", takes: "perSide" },

@@ -1,11 +1,11 @@
 import { describe, expect, it } from "vitest";
-import { BAYONET_MIN_WALL, HINGE_PIN_GRIP, HINGE_PRINTED_PIN_GRIP, LID_DEFAULTS, LID_THREAD_STANDARD_SPECS, LID_THREAD_STANDARDS, LID_TYPES, NECK_LARGER, NECK_SMALLER, MAX_BAYONET_AXIAL_GAP, MAX_BAYONET_DEPTH, MAX_BAYONET_DETENT, MAX_BAYONET_LUGS, MAX_BAYONET_TURN, MIN_BAYONET_AXIAL_GAP, MIN_BAYONET_DEPTH, MIN_BAYONET_LUGS, MIN_BAYONET_TURN, MAX_CLICK_BUMP_HEIGHT, MAX_HINGE_PIN, MAX_HINGE_PIN_PLAY, MAX_LID_GAP, MAX_LID_THICKNESS, MAX_LID_THREAD_PITCH, MAX_LID_THREAD_TURNS, MAX_MAGNET_GAP, MIN_CLICK_BUMP_HEIGHT, MIN_HINGE_PIN, MIN_HINGE_PIN_PLAY, MIN_LID_THREAD_PITCH, MIN_LID_THREAD_TURNS, MIN_LID_WALL, MIN_MAGNET_DIAMETER, SCREW_MIN_WALL, bayonetLugSize, bayonetPlan, bayonetTurn, clickBumpPlaces, cornerKnucklePlan, endPlugPlan, hingeKnuckleRadius, hingePinGrip, hingePinHoles, lidClickBumpsFit, lidHandleFits, lidNeckFit, lidStandardThread, lidTakesExtras, lidThicknessForMagnets, lidThread, magnetPlaces, magnetPocketDepth, normalizeLidOptions, roundOutline, screwPlan, lidTetherFits, tetherPlan } from "@/lib/lidTool";
+import { BAYONET_MIN_WALL, HINGE_PIN_GRIP, HINGE_PRINTED_PIN_GRIP, LID_DEFAULTS, LID_THREAD_STANDARD_SPECS, LID_THREAD_STANDARDS, LID_TYPES, NECK_LARGER, NECK_SMALLER, MAX_BAYONET_AXIAL_GAP, MAX_BAYONET_DEPTH, MAX_BAYONET_DETENT, MAX_BAYONET_LUGS, MAX_BAYONET_TURN, MIN_BAYONET_AXIAL_GAP, MIN_BAYONET_DEPTH, MIN_BAYONET_LUGS, MIN_BAYONET_TURN, MAX_CLICK_BUMP_HEIGHT, MAX_HINGE_PIN, MAX_HINGE_PIN_PLAY, MAX_LID_GAP, MAX_LID_THICKNESS, MAX_LID_THREAD_PITCH, MAX_LID_THREAD_TURNS, MAX_MAGNET_GAP, MIN_CLICK_BUMP_HEIGHT, MIN_HINGE_PIN, MIN_HINGE_PIN_PLAY, MIN_LID_THREAD_PITCH, MIN_LID_THREAD_TURNS, MIN_LID_WALL, MIN_MAGNET_DIAMETER, SCREW_MIN_WALL, bayonetLugSize, bayonetPlan, bayonetTurn, clickBumpPlaces, cornerKnucklePlan, endPlugPlan, hingeKnuckleRadius, hingePinGrip, hingePinHoles, lidClickBumpsFit, lidHandleFits, lidNeckFit, lidStandardThread, lidTakesExtras, lidThicknessForMagnets, lidThread, magnetPlaces, magnetPocketDepth, normalizeLidOptions, roundOutline, screwPlan, lidTetherFits, tetherPlan, FLIP_HINGE_LENGTH, FLIP_HINGE_THICKNESS, MAX_FLIP_TOP_OPENING, MIN_FLIP_TOP_OPENING, flipTopPlan, flipTopThickness, lidFlipTopFits } from "@/lib/lidTool";
 import { threadSize } from "@/lib/vase/vase-geometry.mjs";
 
 describe("lid options (#1009)", () => {
   it("starts from a push-in lid with a normal fit", () => {
     expect(normalizeLidOptions()).toEqual(LID_DEFAULTS);
-    expect(LID_DEFAULTS).toEqual({ type: "plug", thickness: 2, gap: 0.2, depth: 4, wall: 1.6, magnets: false, magnetDiameter: 6, magnetHeight: 2, magnetGap: 0.1, hinge: false, hingePin: 1.75, hingeGap: 0.3, hingePinPlay: 0.2, hingeKnuckles: 0, hingePrintPin: false, hingeSide: "back", hingeTeardrop: true, hingeStyle: "outside", hingeEndPlugs: false, clickBumps: false, clickBumpHeight: 0.4, handle: "none", threadPitch: 3, threadTurns: 2, threadStandard: "own", bayonetLugs: 3, bayonetDepth: 8, bayonetAxialGap: 0.3, bayonetDetent: 0.3, bayonetTurn: 0, tether: false });
+    expect(LID_DEFAULTS).toEqual({ type: "plug", thickness: 2, gap: 0.2, depth: 4, wall: 1.6, magnets: false, magnetDiameter: 6, magnetHeight: 2, magnetGap: 0.1, hinge: false, hingePin: 1.75, hingeGap: 0.3, hingePinPlay: 0.2, hingeKnuckles: 0, hingePrintPin: false, hingeSide: "back", hingeTeardrop: true, hingeStyle: "outside", hingeEndPlugs: false, clickBumps: false, clickBumpHeight: 0.4, handle: "none", threadPitch: 3, threadTurns: 2, threadStandard: "own", bayonetLugs: 3, bayonetDepth: 8, bayonetAxialGap: 0.3, bayonetDetent: 0.3, bayonetTurn: 0, tether: false, flipTop: false, flipTopOpening: 8 });
   });
 
   it("takes the kind in any case and keeps the default for an unknown one", () => {
@@ -893,5 +893,79 @@ describe("a tether for a screw or bayonet cap (asked in the Layerling User Group
     // A wall 0.6 mm thick below 43 mm, where the bead goes.
     const thinBelow = pot((z) => ({ outer: [polygonRound(30)], opening: [polygonRound(z < 43 ? 29.4 : 28, 192, 0, 0, true)] }));
     expect(tetherPlan(thinBelow, options(), 50, 0, 49.7, screwCap)).toEqual({ error: { code: "tetherThinWall" } });
+  });
+});
+
+describe("a flip-top on a screw or bayonet cap", () => {
+  it("is off unless asked for, with an opening 8 mm across to begin with, 4 to 40", () => {
+    expect([LID_DEFAULTS.flipTop, LID_DEFAULTS.flipTopOpening]).toEqual([false, 8]);
+    expect(normalizeLidOptions({ flipTop: "true", flipTopOpening: "12.5" })).toMatchObject({ flipTop: true, flipTopOpening: 12.5 });
+    expect(normalizeLidOptions({ flipTop: 1, flipTopOpening: "x" })).toMatchObject({ flipTop: false, flipTopOpening: 8 });
+    expect(normalizeLidOptions({ flipTopOpening: 1 }).flipTopOpening).toBe(MIN_FLIP_TOP_OPENING);
+    expect(normalizeLidOptions({ flipTopOpening: 90 }).flipTopOpening).toBe(MAX_FLIP_TOP_OPENING);
+    expect([MIN_FLIP_TOP_OPENING, MAX_FLIP_TOP_OPENING, FLIP_HINGE_THICKNESS, FLIP_HINGE_LENGTH]).toEqual([4, 40, 0.4, 3]);
+  });
+
+  it("goes only with a cap that stays on: a screw lid's or a bayonet lid's", () => {
+    expect(["plug", "cap", "both", "flat", "screw", "bayonet"].map((type) => lidFlipTopFits(normalizeLidOptions({ type })))).toEqual([false, false, false, false, true, true]);
+  });
+
+  it("needs a plate deep enough for the V under the strip, or for seat and catch with a large gap", () => {
+    // The strip's 0.4 and the V's 1.4 (half of 3 less the gap): 1.8 mm; with no gap the V is deeper.
+    expect(flipTopThickness({ gap: 0.2 })).toBe(1.8);
+    expect(flipTopThickness({ gap: 0 })).toBe(1.9);
+    // 0.6 of seat, the gap at 45 degrees and once more, and 0.2 of catch: 2.25, up to 2.3.
+    expect(flipTopThickness({ gap: 0.6 })).toBe(2.3);
+  });
+
+  describe("where the flap and its hinge go", () => {
+    /** A round opening `radius` round the axis, as the body's rim has it seen from above. */
+    const opening = (radius = 28, cx = 0) => [polygonRound(radius, 192, cx, 0, true)];
+    const options = (patch: Record<string, unknown> = {}) => normalizeLidOptions({ type: "screw", flipTop: true, ...patch });
+
+    it("makes the flap 0.6 less the gap wider than the opening each side, its back 0.1 behind the opening's under the V", () => {
+      const plan = flipTopPlan(options(), [0, 0], opening());
+      if ("error" in plan) throw new Error(plan.error.code);
+      expect(plan.opening).toBe(8);
+      expect(plan.radius).toBeCloseTo(4.4, 12);
+      // The catch: the gap at 45 degrees, the gap the flap can slide back, and 0.2 to click past.
+      expect(plan.catchWidth).toBeCloseTo(0.2 * Math.SQRT2 + 0.4, 12);
+      // The V leans 1.4 each way, to a slit as wide as the gap; that slit is 0.1 behind the opening at the plate's
+      // underside (4 from the axis): the flap's back 2.5 behind the middle.
+      expect(plan.lean).toBeCloseTo(1.4, 12);
+      expect(plan.back).toBeCloseTo(2.5, 12);
+      expect(plan.back + plan.lean + 0.2).toBeCloseTo(4 + 0.1, 12);
+      // The strip as wide as the flap's straight back, a chord of its 4.4 at 2.5.
+      expect(plan.hingeWidth).toBeCloseTo(2 * Math.sqrt(4.4 ** 2 - 2.5 ** 2), 12);
+      expect([plan.hingeLength, plan.hingeThickness]).toEqual([3, 0.4]);
+      // The farthest cut: the slot's back corners at the plate's top, behind the round opening there (4.4 + 0.28).
+      expect(plan.reach).toBeCloseTo(Math.hypot(plan.hingeWidth / 2 + 0.2, 2.5 + 3), 12);
+      expect(plan.back + 3).toBeGreaterThan(4.4 + 0.2 * Math.SQRT2);
+    });
+
+    it("keeps the flap's back at least 0.3 of its radius behind its middle, so a small flap's strip is narrower than it", () => {
+      const plan = flipTopPlan(options({ flipTopOpening: 4 }), [0, 0], opening());
+      if ("error" in plan) throw new Error(plan.error.code);
+      expect(plan.radius).toBeCloseTo(2.4, 12);
+      expect(plan.back).toBeCloseTo(0.72, 12);
+      expect(plan.hingeWidth).toBeLessThan(2 * plan.radius);
+    });
+
+    it("keeps everything cut through the plate 0.5 inside the body's opening, and says how large an opening fits", () => {
+      // 13.8 round the axis: 20 mm reaches 13.06, 20.5 reaches 13.32.
+      expect("error" in flipTopPlan(options({ flipTopOpening: 20 }), [0, 0], opening(13.8))).toBe(false);
+      expect(flipTopPlan(options({ flipTopOpening: 20.5 }), [0, 0], opening(13.8))).toEqual({ error: { code: "flipTopTooLarge", opening: 20 } });
+      expect(flipTopPlan(options({ flipTopOpening: 30 }), [0, 0], opening(13.8))).toEqual({ error: { code: "flipTopTooLarge", opening: 20 } });
+      // Not even 4 mm in an opening 4.8 round, or one that is not round the cap's axis.
+      expect(flipTopPlan(options({ flipTopOpening: 4 }), [0, 0], opening(4.8))).toEqual({ error: { code: "flipTopNoRoom" } });
+      expect(flipTopPlan(options(), [0, 0], opening(10, 30))).toEqual({ error: { code: "flipTopNoRoom" } });
+      expect(flipTopPlan(options(), [0, 0], [])).toEqual({ error: { code: "flipTopNoRoom" } });
+    });
+
+    it("refuses a plate thinner than the flap and its hinge need, saying how thick", () => {
+      expect(flipTopPlan(options({ thickness: 1.7 }), [0, 0], opening())).toEqual({ error: { code: "flipTopThin", thickness: 1.8 } });
+      expect("error" in flipTopPlan(options({ thickness: 1.8 }), [0, 0], opening())).toBe(false);
+      expect(flipTopPlan(options({ gap: 0.6 }), [0, 0], opening())).toEqual({ error: { code: "flipTopThin", thickness: 2.3 } });
+    });
   });
 });
