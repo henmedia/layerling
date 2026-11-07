@@ -1783,6 +1783,9 @@ function imageValue(u: number, v: number, s: SurfaceTextureSettings, layout: Sur
  * than its own triangles: terrazzo's chips came out in steps of the grid, about 0.6 mm each, which a printer prints too
  * (cutting along the picture's contour lines did not help: the facets next to the cut still followed the grid). Softened,
  * their walls slope over about a triangle and run smoothly; a 0.4 mm nozzle could not print them sharper anyway.
+ * The edge is the grid's as it was made: on a large or curved body the budget makes it coarser than the edge asked for
+ * (see refined), up to twice and more, and a picture softened for the edge asked for came out in steps of the grid that
+ * was made - pixelated on a wavy vase (Discussion #1347).
  */
 const imageCache = new Map<string, GreyImage>();
 const SOFTEN_TO_MESH = 0.25;
@@ -6358,7 +6361,6 @@ export function createSurfaceTextureSession(positions: ArrayLike<number>) {
       const minEdge = Math.sqrt(texturableArea(smooth.points) / (0.15 * maxTriangles));
       raised = edge < minEdge;
       if (raised) edge = minEdge;
-      if (s.pattern === "image") layout.image = textureImage(s, edge, layout.cell);
     }
     let smoothKey = 2166136261;
     for (let i = 0; i < smooth.points.length; i += 1) smoothKey = Math.imul(smoothKey ^ smooth.points[i] ^ (i & 0xff), 16777619);
@@ -6372,7 +6374,11 @@ export function createSurfaceTextureSession(positions: ArrayLike<number>) {
     // A raised pattern round an outline's corners is cut along arcs as deep as the pattern stands out (cornerCuts).
     const cornerReach = s.projection === "cylinder" && layout.outline?.corners.length && standsOut(s) ? Math.max(1, s.depth) : 0;
     const key = `${edge.toFixed(5)}|${smoothKey}|${JSON.stringify(s.faces)}|${JSON.stringify(s.exceptFaces)}|${maxTriangles}|${s.edgeAngle}|${s.detail}|${scale}|${cornerReach}|${layoutKey}`;
-    if (cache?.key === key) return cache;
+    if (cache?.key === key) {
+      // An image softened to the grid made before (see below).
+      if (s.pattern === "image" && !once) layout.image = textureImage(s, cache.edge, layout.cell);
+      return cache;
+    }
     let mesh: SurfaceMesh;
     const net = layout.crack;
     const place = layout.text;
@@ -6590,8 +6596,10 @@ export function createSurfaceTextureSession(positions: ArrayLike<number>) {
       // Bark's side round a cylinder in long strips: cut across first (see cutStrips). Not yet the other patterns': halving
       // the strips gave them a grid finer than asked for along the axis, and a weave's strands lost their straight edges
       // on the even one. Half-timbering's plaster grid and a stone wall's likewise: halved, a tower 100 mm across came out
-      // in three times the triangles, which the beams' and stones' cuts then cut again.
-      if ((s.pattern === "bark" || s.pattern === "timber" || s.pattern === "stones") && s.projection === "cylinder" && !layout.outline) start = cutStrips(start, s, layout, edge, smooth.faces);
+      // in three times the triangles, which the beams' and stones' cuts then cut again. An image's too (Discussion #1347):
+      // halved, a cylinder 50 mm across spent the budget on slivers and came out twice as coarse as asked, Fine no finer
+      // than Medium, and the picture's outlines in steps of that grid.
+      if ((s.pattern === "bark" || s.pattern === "timber" || s.pattern === "stones" || s.pattern === "image") && s.projection === "cylinder" && !layout.outline) start = cutStrips(start, s, layout, edge, smooth.faces);
       // Grooves, bricks, squares and triangles on straight faces are cut, not refined: points only on such faces (or smooth
       // ones) stay as they are.
       let keep = smooth.points;
@@ -6631,6 +6639,8 @@ export function createSurfaceTextureSession(positions: ArrayLike<number>) {
           edge *= f;
         }
       }
+      // An image softened to the grid as it was made, after the budget made it coarser (see textureImage).
+      if (s.pattern === "image") layout.image = textureImage(s, edge, layout.cell);
     }
     // Honeycomb and bumps (cylinder or flat): cut at cell borders and profile levels instead of refining the flanks. The
     // preview with half as many levels: each level cuts along the whole joint or round every bump.
