@@ -8669,10 +8669,13 @@ export function LayerlingEditor({
     const pin = options.hingePin.toLocaleString(numberLocale());
     const magnetCount = result.magnets?.pockets.length ?? 0;
     const millimetres = (value: number) => (Math.round(value * 10) / 10).toLocaleString(numberLocale());
+    // Under a rim rounded or chamfered, the thread or the lugs sit below the rounding and the cap reaches over it (#1426).
+    const rimRounding = screw?.rimRounding ?? bayonet?.rimRounding ?? 0;
+    const roundedRim = rimRounding > 0 ? ` ${t("status.lidRimRounded", { depth: millimetres(rimRounding) })}` : "";
     const message = screw
-      ? t("status.lidMadeScrew", { pitch: millimetres(screw.pitch), height: millimetres(screw.pitch * screw.turns), diameter: millimetres(screw.diameter) })
+      ? t("status.lidMadeScrew", { pitch: millimetres(screw.pitch), height: millimetres(screw.pitch * screw.turns), diameter: millimetres(screw.diameter) }) + roundedRim
       : bayonet
-      ? t("status.lidMadeBayonet", { count: bayonet.count, height: millimetres(bayonet.height), diameter: millimetres(bayonet.diameter), turn: millimetres(bayonet.turn) })
+      ? t("status.lidMadeBayonet", { count: bayonet.count, height: millimetres(bayonet.height), diameter: millimetres(bayonet.diameter), turn: millimetres(bayonet.turn) }) + roundedRim
       : hinge
       ? hinge.style === "pivot"
         ? t("status.lidMadePivot", { pin })
@@ -8691,9 +8694,10 @@ export function LayerlingEditor({
         knuckles: hinge.style === "pivot" ? 0 : hinge.count, pins: hinge.style === "pivot" ? 2 : 1, pinDiameter: options.hingePin, side: options.hingeSide, style: hinge.style, pinId: hinge.pin?.id ?? null,
         plugsId: hinge.plugs?.id ?? null, pinLength: hinge.pinLength,
       } } : {}),
-      ...(screw ? { screw: { pitch: screw.pitch, turns: screw.turns, depth: Math.round(screw.depth * 1000) / 1000, diameter: Math.round(screw.diameter * 1000) / 1000 } } : {}),
+      ...(screw ? { screw: { pitch: screw.pitch, turns: screw.turns, depth: Math.round(screw.depth * 1000) / 1000, diameter: Math.round(screw.diameter * 1000) / 1000, rimRounding: Math.round(screw.rimRounding * 100) / 100 } } : {}),
       ...(bayonet ? { bayonet: {
         lugs: bayonet.count, turn: bayonet.turn, diameter: Math.round(bayonet.diameter * 1000) / 1000, lugHeight: bayonet.height, lugWidth: Math.round(bayonet.width * 1000) / 1000, depth: options.bayonetDepth,
+        rimRounding: Math.round(bayonet.rimRounding * 100) / 100,
       } } : {}),
     };
   }, [commitShapes, exactLid, selectedShapes]);

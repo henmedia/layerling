@@ -279,6 +279,17 @@ const SCREW_STEP = 0.5;
 /** How many rows of points a pitch of the thread has, up the wall: as many as the vase's screw lid. */
 const SCREW_ROWS_PER_PITCH = 16;
 /**
+ * Under a rim that is rounded or chamfered (Discussion #1426), where a screw lid's thread or a bayonet's lugs go instead:
+ * how far apart two heights are compared in looking for the straight wall below the rounding, in mm, and how much they may
+ * differ, outside and inside, and still both lie on it (a slope of a tenth: a wall leaning more is no wall for a thread
+ * anyway); how near the wall's outline must come at the height where the rounding begins (within the thread's root
+ * inset, so the thread's top end still lies inside the wall there); and how closely that height is found.
+ */
+const SHOULDER_STEP = 0.5;
+const SHOULDER_FLAT = 0.05;
+const SHOULDER_FULL = 0.05;
+const SHOULDER_PRECISION = 0.05;
+/**
  * A bayonet lid's lugs (Discussion #1424): two to four round the body, three to begin with, which hold the cap evenly
  * and leave it a turn of 40 degrees between them.
  */
@@ -871,10 +882,10 @@ export type LidError =
   | { code: "endPlugsFlush" | "endPlugsShort" }
   | { code: "clickBumpsNoLip" | "clickBumpsNoRoom" | "handlePivot" | "handleSideShort" | "handleNotchNoRoom" }
   | { code: "screwExtras" | "screwNotRound" | "screwThinWall" }
-  | { code: "screwTooLow"; height: number }
+  | { code: "screwTooLow" | "screwRimRound"; height: number }
   | { code: "screwGapDeep"; gap: number }
   | { code: "bayonetExtras" | "bayonetNotRound" | "bayonetThinWall" | "bayonetNoRoom" }
-  | { code: "bayonetTooLow"; height: number }
+  | { code: "bayonetTooLow" | "bayonetRimRound"; height: number }
   | { code: "bayonetGapDeep"; gap: number }
   | { code: "bayonetShallow"; depth: number }
   | { code: "magnetsThinLid"; thickness: number }
@@ -1075,6 +1086,11 @@ export type ScrewPlan = {
   reach: number;
   /** Where the thread starts: the height the cap's rim reaches down to when screwed on. */
   from: number;
+  /**
+   * How high the straight wall reaches, which the thread ends SCREW_TOP_INSET below: the top, or under a rim rounded or
+   * chamfered where the rounding begins (Discussion #1426). The cap's plate rests on the top all the same.
+   */
+  wallTop: number;
   pitch: number;
   depth: number;
   crest: number;
@@ -1092,18 +1108,20 @@ export type ScrewPlan = {
  * most), which must be SCREW_MIN_WALL thick where it is thinnest: from the farthest point of an opening to the nearest of
  * the outline. Below the thread, SCREW_FLOOR of the body stays. The gap may be at most half the thread's depth, so the
  * threads still overlap by as much as they keep apart.
+ * A rim rounded or chamfered, outside, inside or both, is no circle as large as the wall below it (Discussion #1426): a
+ * vessel revolved from a stroke with round ends has one. Then the thread goes on the straight wall below the rounding,
+ * as it would below a square rim there (`roundWall`), and the cap reaches over the rounding, its plate on the top.
  */
 export function screwPlan(sliceAt: LidSlicer, options: LidOptions, top: number, bottom: number, rim: number): ScrewPlan | { error: LidError } {
   const thread = lidThread(options);
   if (options.gap > thread.depth / 2 + 1e-9) return { error: { code: "screwGapDeep", gap: Math.floor((thread.depth / 2) * 100 + 1e-6) / 100 } };
-  const from = top - thread.height;
-  if (from < bottom + SCREW_FLOOR) return { error: { code: "screwTooLow", height: Math.round(thread.height * 10) / 10 } };
-  const body = roundBody(sliceAt, rim, from + 0.05);
-  if (!body) return { error: { code: "screwNotRound" } };
-  if (body.wall < SCREW_MIN_WALL - 1e-9) return { error: { code: "screwThinWall" } };
-  const { centre, radius, inner, wall } = body;
+  const height = Math.round(thread.height * 10) / 10;
+  if (top - thread.height < bottom + SCREW_FLOOR) return { error: { code: "screwTooLow", height } };
+  const found = roundWall(sliceAt, top, rim, thread.height, bottom + SCREW_FLOOR, SCREW_MIN_WALL);
+  if ("error" in found) return { error: found.error === "notRound" ? { code: "screwNotRound" } : found.error === "thinWall" ? { code: "screwThinWall" } : { code: "screwRimRound", height } };
+  const { centre, radius, inner, wall } = found.body;
   return {
-    centre, radius, inner, reach: Math.min(SCREW_REACH, wall / 2), from,
+    centre, radius, inner, reach: Math.min(SCREW_REACH, wall / 2), from: found.wallTop - thread.height, wallTop: found.wallTop,
     pitch: thread.pitch, depth: thread.depth, crest: thread.crest, capRadius: radius + options.gap + thread.depth + options.wall,
   };
 }
@@ -1118,7 +1136,7 @@ export type LidSlicer = (z: number) => { outline: readonly (readonly Point[])[];
  * thinnest: from the farthest point of an opening to the nearest of the outline. Null for a box, an oval, a pot that
  * tapers there.
  */
-function roundBody(sliceAt: LidSlicer, rim: number, lowest: number): { centre: Point; radius: number; inner: number; wall: number } | null {
+function roundBody(sliceAt: LidSlicer, rim: number, lowest: number): RoundBody | null {
   const atRim = sliceAt(rim);
   const round = roundOutline(atRim.outline);
   if (!round) return null;
@@ -1134,6 +1152,78 @@ function roundBody(sliceAt: LidSlicer, rim: number, lowest: number): { centre: P
     for (const point of level.opening.flat()) opening = Math.max(opening, Math.hypot(point[0] - round.centre[0], point[1] - round.centre[1]));
   }
   return { centre: round.centre, radius, inner, wall: inner - opening };
+}
+
+/** The round body as `roundBody` finds it. */
+type RoundBody = { centre: Point; radius: number; inner: number; wall: number };
+
+/** How far the farthest point of these contours lies from `centre`: 0 for none. */
+function farthestFrom(polygons: readonly (readonly Point[])[], centre: Point) {
+  return polygons.flat().reduce((farthest, [x, y]) => Math.max(farthest, Math.hypot(x - centre[0], y - centre[1])), 0);
+}
+
+/**
+ * Where the straight wall ends under a rim that is rounded or chamfered, outside, inside or both (Discussion #1426): a
+ * vessel revolved from a stroke with round ends has such a rim, and so has a pot whose top edge was filleted. Its ring
+ * seen from above is narrower than the wall's: the outline smaller, the opening larger. Two heights SHOULDER_STEP apart are
+ * compared further and further down, SHOULDER_STEP under the rim and twice as far each time, until they are as large
+ * within SHOULDER_FLAT, outside and inside: there is the straight wall, as large as the lower of them. Between it and the
+ * last height above still in the rounding, the highest height whose outline comes within SHOULDER_FULL of the wall's,
+ * outside and inside, found to SHOULDER_PRECISION: there the rounding begins. Null where there is none: the rim is no
+ * round outline or as large as the wall (a rim that flares out is one too, and `roundBody` refuses it from there), or no
+ * straight wall is found down to `lowest` or the opening's bottom.
+ */
+function rimShoulder(sliceAt: LidSlicer, rim: number, lowest: number): number | null {
+  const atRim = sliceAt(rim);
+  const round = roundOutline(atRim.outline);
+  if (!round) return null;
+  const size = (z: number) => {
+    const level = z === rim ? atRim : sliceAt(z);
+    const here = roundOutline(level.outline, round.centre);
+    return here && level.opening.length ? { outer: here.outer, opening: farthestFrom(level.opening, round.centre) } : null;
+  };
+  const rimSize = size(rim);
+  if (!rimSize) return null;
+  // The last height known to lie in the rounding.
+  let above = rim;
+  for (let depth = SHOULDER_STEP; rim - depth - SHOULDER_STEP >= lowest; depth *= 2) {
+    const high = size(rim - depth);
+    const wall = size(rim - depth - SHOULDER_STEP);
+    if (!high || !wall) return null;
+    if (Math.abs(high.outer - wall.outer) <= SHOULDER_FLAT && Math.abs(high.opening - wall.opening) <= SHOULDER_FLAT) {
+      const full = (here: { outer: number; opening: number } | null) => here !== null && here.outer >= wall.outer - SHOULDER_FULL && here.opening <= wall.opening + SHOULDER_FULL;
+      if (full(rimSize)) return null;
+      let lower = rim - depth - SHOULDER_STEP;
+      let upper = above;
+      while (upper - lower > SHOULDER_PRECISION) {
+        const middle = (lower + upper) / 2;
+        if (full(size(middle))) lower = middle;
+        else upper = middle;
+      }
+      return lower;
+    }
+    above = rim - depth;
+  }
+  return null;
+}
+
+/**
+ * The round body a screw lid's thread or a bayonet's lugs go on, `reach` down from the top of its straight wall, and that
+ * top (`wallTop`): as `roundBody` finds it from the rim down, with a wall of at least `minWall`; or else, under a rim
+ * rounded or chamfered (`rimShoulder`), the same from where the rounding begins (Discussion #1426). What is refused says
+ * why: not round, a wall too thin, or a rounding that leaves too little straight wall below it, down to `lowest`.
+ */
+function roundWall(sliceAt: LidSlicer, top: number, rim: number, reach: number, lowest: number, minWall: number):
+  { body: RoundBody; wallTop: number } | { error: "notRound" | "thinWall" | "rimRound" } {
+  const atRim = roundBody(sliceAt, rim, top - reach + 0.05);
+  if (atRim && atRim.wall >= minWall - 1e-9) return { body: atRim, wallTop: top };
+  const shoulder = rimShoulder(sliceAt, rim, lowest);
+  if (shoulder === null) return { error: atRim ? "thinWall" : "notRound" };
+  if (shoulder - reach < lowest) return { error: "rimRound" };
+  const below = roundBody(sliceAt, shoulder, shoulder - reach + 0.05);
+  if (!below) return { error: "notRound" };
+  if (below.wall < minWall - 1e-9) return { error: "thinWall" };
+  return { body: below, wallTop: shoulder };
 }
 
 /** A bayonet lid as `bayonetPlan` works it out, in the frame where z is up and the body's rim is at `top`. */
@@ -1166,6 +1256,11 @@ export type BayonetPlan = {
   lugLow: number;
   /** Where the cap's mouth is: the height its rim reaches down to. */
   from: number;
+  /**
+   * How high the straight wall reaches, which the lugs' tops stay LUG_TOP_INSET below: the top, or under a rim rounded or
+   * chamfered where the rounding begins (Discussion #1426). The cap's plate rests on the top all the same.
+   */
+  wallTop: number;
   /** How far the cap's rim reaches from the axis: the lugs, the gap and the wall. */
   capRadius: number;
 };
@@ -1186,24 +1281,26 @@ export type BayonetPlan = {
  * what the turn leaves past its slot (the slot's play, the rib with the gap before it, and BAYONET_LEDGE_MARGIN); one
  * narrower than MIN_LUG_WIDTH refuses the body for so many lugs. The stop after it is then always a few millimetres
  * long at least, for the turn is at most a third of the way to the next lug.
+ * Under a rim rounded or chamfered (Discussion #1426), the lugs go below the rounding as below a square rim there, the
+ * cap's rim reaching `bayonetDepth` down the straight wall from where it begins (`roundWall`), and over the rounding.
  */
 export function bayonetPlan(sliceAt: LidSlicer, options: LidOptions, top: number, bottom: number, rim: number): BayonetPlan | { error: LidError } {
   const depth = options.bayonetDepth;
-  const from = top - depth;
-  if (from < bottom + SCREW_FLOOR) return { error: { code: "bayonetTooLow", height: Math.round(depth * 10) / 10 } };
-  const body = roundBody(sliceAt, rim, from + 0.05);
-  if (!body) return { error: { code: "bayonetNotRound" } };
-  if (body.wall < BAYONET_MIN_WALL - 1e-9) return { error: { code: "bayonetThinWall" } };
-  const { centre, radius, inner, wall } = body;
+  if (top - depth < bottom + SCREW_FLOOR) return { error: { code: "bayonetTooLow", height: Math.round(depth * 10) / 10 } };
+  const found = roundWall(sliceAt, top, rim, depth, bottom + SCREW_FLOOR, BAYONET_MIN_WALL);
+  if ("error" in found) return { error: found.error === "notRound" ? { code: "bayonetNotRound" } : found.error === "thinWall" ? { code: "bayonetThinWall" } : { code: "bayonetRimRound", height: Math.round(depth * 10) / 10 } };
+  const { centre, radius, inner, wall } = found.body;
+  const wallTop = found.wallTop;
+  const from = wallTop - depth;
   const size = bayonetLugSize(2 * radius);
   const height = size.height;
   const gap = options.gap;
   if (gap > height / 2 + 1e-9) return { error: { code: "bayonetGapDeep", gap: Math.floor((height / 2) * 100 + 1e-6) / 100 } };
-  const lugTop = top - LUG_TOP_INSET;
+  const lugTop = wallTop - LUG_TOP_INSET;
   const lugLow = lugTop - height;
   // The ledge's slope is the axial gap under the lugs' and reaches in to the gap from the wall, height lower than out at
   // the lugs' outer faces.
-  const needed = top - (lugLow - options.bayonetAxialGap + gap - height - BAYONET_MIN_LEDGE);
+  const needed = wallTop - (lugLow - options.bayonetAxialGap + gap - height - BAYONET_MIN_LEDGE);
   if (depth < needed - 1e-9) return { error: { code: "bayonetShallow", depth: Math.ceil(needed * 10 - 1e-6) / 10 } };
   const count = options.bayonetLugs;
   const turn = bayonetTurn(count);
@@ -1229,7 +1326,7 @@ export function bayonetPlan(sliceAt: LidSlicer, options: LidOptions, top: number
   return {
     centre, radius, inner, reach: Math.min(SCREW_REACH, wall / 2), angles: Array.from({ length: count }, (_, index) => -90 + (360 * index) / count), turn,
     height, width, half, slotHalf: half + degrees(entry), stop: degrees(stop), rib: rib ? { middle: rib.middle, behind: degrees(rib.behind) } : null,
-    lugTop, lugLow, from, capRadius: rimInside + options.wall,
+    lugTop, lugLow, from, wallTop, capRadius: rimInside + options.wall,
   };
 }
 
@@ -1303,10 +1400,12 @@ function rowsFrom(low: number, high: number, step: number) {
  * - The thread on the body is a ring reaching `reach` into the wall, to be grouped with it. Its crest stands the depth
  *   out from the body's outer face; its flanks run at 45 degrees on down to its root, a hair inside that face, so no face
  *   of it lies on the body's. At both ends it is cut back at 45 degrees from the root, so it begins and ends gently and
- *   prints upright without support; at the top it stays SCREW_TOP_INSET below the rim, inside the wall.
+ *   prints upright without support; at the top it stays SCREW_TOP_INSET below the rim, inside the wall: below where a
+ *   rounded rim's rounding begins (`wallTop`), so it stands on the straight wall.
  * - The cap is the plate on the rim and a rim reaching down to where the thread starts, its inside the body's thread
  *   moved the gap further out all round, so the two never meet, its outside the wall further out. Its mouth widens at 45
  *   degrees to clear the thread's crest, so it finds the thread; turned over, it prints on its plate without support.
+ *   Over a rounded rim its thread goes on up to the plate, the rounding inside it nearer the axis than the wall.
  */
 function screwSolids(runtime: ManifoldToplevel, plan: ScrewPlan, options: LidOptions, top: number, created: { delete?: () => void }[]) {
   const sides = Math.min(512, Math.max(96, 4 * Math.ceil((2 * Math.PI * plan.capRadius) / SCREW_STEP / 4)));
@@ -1319,7 +1418,7 @@ function screwSolids(runtime: ManifoldToplevel, plan: ScrewPlan, options: LidOpt
     return plan.depth - Math.max(0, along - plan.crest / 2);
   };
   const root = plan.inner - SCREW_ROOT_INSET;
-  const to = top - SCREW_TOP_INSET;
+  const to = plan.wallTop - SCREW_TOP_INSET;
   const thread = roundMesh(runtime, plan.centre, sides, {
     rows: rowsFrom(plan.from, to, step),
     radius: (angle, z) => Math.max(root, Math.min(plan.radius + crestHeight(angle, z), root + (z - plan.from), root + (to - z))),
@@ -1426,15 +1525,17 @@ export type LidHandleResult = { style: Exclude<LidHandle, "none">; notch: Manifo
 
 /**
  * A screw lid's: the thread on the body (to be grouped with it, in the scene's frame), its pitch, turns and depth, and
- * how wide the cap is across, in mm.
+ * how wide the cap is across, in mm. `rimRounding` is how far down a rounded or chamfered rim reaches, 0 for a square
+ * one: the thread sits that much lower, on the straight wall, and the cap reaches that much further down (Discussion #1426).
  */
-export type LidScrew = { thread: ManifoldSolid; pitch: number; turns: number; depth: number; diameter: number };
+export type LidScrew = { thread: ManifoldSolid; pitch: number; turns: number; depth: number; diameter: number; rimRounding: number };
 
 /**
  * A bayonet lid's: the lugs for the body (one solid, to be grouped with it, in the scene's frame), how many, how far the
- * cap turns to lock in degrees, how far a lug stands out and how wide it is, and how wide the cap is across, in mm.
+ * cap turns to lock in degrees, how far a lug stands out and how wide it is, and how wide the cap is across, in mm;
+ * `rimRounding` as for a screw lid.
  */
-export type LidBayonet = { lugs: ManifoldSolid; count: number; turn: number; height: number; width: number; diameter: number };
+export type LidBayonet = { lugs: ManifoldSolid; count: number; turn: number; height: number; width: number; diameter: number; rimRounding: number };
 
 export type LidResult = { lid: ManifoldSolid; magnets?: LidMagnets; hinge?: LidHinge; clickBumps?: LidClickBumps; handle?: LidHandleResult; screw?: LidScrew; bayonet?: LidBayonet } | { error: LidError };
 
@@ -1921,14 +2022,14 @@ export function lidForSolid(runtime: ManifoldToplevel, body: ManifoldSolid, give
     if (screw) {
       const thread = screw.thread.transform(UP_TO_SCENE);
       handed.add(thread);
-      screwResult = { thread, pitch: screw.plan.pitch, turns: options.threadTurns, depth: screw.plan.depth, diameter: 2 * screw.plan.capRadius };
+      screwResult = { thread, pitch: screw.plan.pitch, turns: options.threadTurns, depth: screw.plan.depth, diameter: 2 * screw.plan.capRadius, rimRounding: top - screw.plan.wallTop };
     }
     let bayonetResult: LidBayonet | undefined;
     if (bayonet) {
       const lugs = bayonet.lugs.transform(UP_TO_SCENE);
       handed.add(lugs);
       const { plan } = bayonet;
-      bayonetResult = { lugs, count: plan.angles.length, turn: plan.turn, height: plan.height, width: plan.width, diameter: 2 * plan.capRadius };
+      bayonetResult = { lugs, count: plan.angles.length, turn: plan.turn, height: plan.height, width: plan.width, diameter: 2 * plan.capRadius, rimRounding: top - plan.wallTop };
     }
     const extras = { ...(hinge ? { hinge } : {}), ...(clickBumps ? { clickBumps } : {}), ...(handle ? { handle } : {}), ...(screwResult ? { screw: screwResult } : {}), ...(bayonetResult ? { bayonet: bayonetResult } : {}) };
     if (!options.magnets) return { lid, ...extras };
@@ -2002,6 +2103,8 @@ export function lidErrorMessage(error: LidError) {
       return t("lid.error.screwThinWall", { wall: SCREW_MIN_WALL.toLocaleString(numberLocale()) });
     case "screwTooLow":
       return t("lid.error.screwTooLow", { height: error.height.toLocaleString(numberLocale()) });
+    case "screwRimRound":
+      return t("lid.error.screwRimRound", { height: error.height.toLocaleString(numberLocale()) });
     case "screwGapDeep":
       return t("lid.error.screwGapDeep", { gap: error.gap.toLocaleString(numberLocale()) });
     case "bayonetExtras":
@@ -2012,6 +2115,8 @@ export function lidErrorMessage(error: LidError) {
       return t("lid.error.bayonetThinWall", { wall: BAYONET_MIN_WALL.toLocaleString(numberLocale()) });
     case "bayonetTooLow":
       return t("lid.error.bayonetTooLow", { height: error.height.toLocaleString(numberLocale()) });
+    case "bayonetRimRound":
+      return t("lid.error.bayonetRimRound", { height: error.height.toLocaleString(numberLocale()) });
     case "bayonetGapDeep":
       return t("lid.error.bayonetGapDeep", { gap: error.gap.toLocaleString(numberLocale()) });
     case "bayonetShallow":
@@ -2052,10 +2157,10 @@ export type LidShapeClickBumps = { count: number; dimples: WorkplaneShape };
 export type LidShapeHandle = { style: Exclude<LidHandle, "none">; notch: WorkplaneShape | null };
 
 /** With a screw lid, the thread for the body (grouped with it, as the hinge's knuckles are) and its sizes, in mm. */
-export type LidShapeScrew = { thread: WorkplaneShape; pitch: number; turns: number; depth: number; diameter: number };
+export type LidShapeScrew = { thread: WorkplaneShape; pitch: number; turns: number; depth: number; diameter: number; rimRounding: number };
 
 /** With a bayonet lid, the lugs for the body (one mesh, grouped with it as a screw lid's thread is), the turn and the sizes. */
-export type LidShapeBayonet = { lugs: WorkplaneShape; count: number; turn: number; height: number; width: number; diameter: number };
+export type LidShapeBayonet = { lugs: WorkplaneShape; count: number; turn: number; height: number; width: number; diameter: number; rimRounding: number };
 
 export type LidShapeResult = { lid: WorkplaneShape; magnets?: LidShapeMagnets; hinge?: LidShapeHinge; clickBumps?: LidShapeClickBumps; handle?: LidShapeHandle; screw?: LidShapeScrew; bayonet?: LidShapeBayonet } | { lid: null; error: string };
 
@@ -2139,15 +2244,15 @@ export async function lidForShapes(targets: readonly WorkplaneShape[], given: Li
     if (result.screw) {
       const thread = splitShapeFromWorldPositions(source, positionsOf(result.screw.thread.getMesh()), createLocalId(`${source.id}-thread`), t("lid.screwThreadName", { name: source.name }));
       if (!thread) return { lid: null, error: lidErrorMessage({ code: "empty" }) };
-      const { pitch, turns, depth, diameter } = result.screw;
-      screw = { thread: canonicalizeShape({ ...thread, hidden: false }), pitch, turns, depth, diameter };
+      const { pitch, turns, depth, diameter, rimRounding } = result.screw;
+      screw = { thread: canonicalizeShape({ ...thread, hidden: false }), pitch, turns, depth, diameter, rimRounding };
     }
     let bayonet: LidShapeBayonet | undefined;
     if (result.bayonet) {
       const lugs = splitShapeFromWorldPositions(source, positionsOf(result.bayonet.lugs.getMesh()), createLocalId(`${source.id}-lugs`), t("lid.bayonetLugsName", { name: source.name }));
       if (!lugs) return { lid: null, error: lidErrorMessage({ code: "empty" }) };
-      const { count, turn, height, width, diameter } = result.bayonet;
-      bayonet = { lugs: canonicalizeShape({ ...lugs, hidden: false }), count, turn, height, width, diameter };
+      const { count, turn, height, width, diameter, rimRounding } = result.bayonet;
+      bayonet = { lugs: canonicalizeShape({ ...lugs, hidden: false }), count, turn, height, width, diameter, rimRounding };
     }
     const extras = { ...(hinge ? { hinge } : {}), ...(clickBumps ? { clickBumps } : {}), ...(handle ? { handle } : {}), ...(screw ? { screw } : {}), ...(bayonet ? { bayonet } : {}) };
     if (!result.magnets) return { lid, ...extras };
