@@ -960,6 +960,7 @@ export const MESSAGES_TR: Partial<Record<MessageKey, string>> = {
   "holePattern.size.corners": "Köşeden köşeye çap (Ø)",
   "holePattern.size.width": "Genişlik",
   "holePattern.size.height": "Yükseklik",
+  "holePattern.holeAngle": "Delik açısı",
   "holePattern.spacing": "Merkezden merkeze aralık",
   "holePattern.wall": "Delikler arasındaki duvar",
   "holePattern.arrangement": "Yerleşim",
