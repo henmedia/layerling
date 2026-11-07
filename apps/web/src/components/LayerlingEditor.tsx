@@ -8582,9 +8582,9 @@ export function LayerlingEditor({
    * and with posts for the magnets, which the lip has to go round: the mesh lid stays then.
    */
   const exactLid = useCallback(async (targets: readonly WorkplaneShape[], options: LidOptions, meshLid: WorkplaneShape, magnets?: { posts: WorkplaneShape[]; pockets: WorkplaneShape[] }): Promise<WorkplaneShape | null> => {
-    // A hinged lid stays the mesh lid for now: the exact one has no knuckles, nor click bumps or a pull tab; nor a thread
-    // or a bayonet's slots.
-    if (targets.length !== 1 || targets[0].hole || magnets?.posts.length || options.hinge || options.clickBumps || options.handle === "tab" || options.type === "screw" || options.type === "bayonet") return null;
+    // A hinged lid stays the mesh lid for now: the exact one has no knuckles, nor click bumps or a pull tab; nor a thread,
+    // screwed on or in, or a bayonet's slots.
+    if (targets.length !== 1 || targets[0].hole || magnets?.posts.length || options.hinge || options.clickBumps || options.handle === "tab" || options.type === "screw" || options.type === "screwIn" || options.type === "bayonet") return null;
     const pocketDepth = magnetPocketDepth(options);
     const request: CadLidRequest = {
       type: options.type,
@@ -8625,9 +8625,9 @@ export function LayerlingEditor({
     if (!targets.some((shape) => !shape.hole)) return fail(t("lid.error.needsBody"));
     // What is not given starts from the printer's play where it follows it, as the panel does.
     const options = normalizeLidOptions(given, lidDefaults(getPrinterPlay()));
-    // The pockets, the hinge's knuckles, the click bumps' dimples, a finger notch, a screw lid's thread and a bayonet's lugs
-    // go into the body, so it must be free to change and one body.
-    const changesBody = options.magnets || options.hinge || options.clickBumps || options.handle === "notch" || options.type === "screw" || options.type === "bayonet";
+    // The pockets, the hinge's knuckles, the click bumps' dimples, a finger notch, a screw lid's thread (outside or in the
+    // opening) and a bayonet's lugs go into the body, so it must be free to change and one body.
+    const changesBody = options.magnets || options.hinge || options.clickBumps || options.handle === "notch" || options.type === "screw" || options.type === "screwIn" || options.type === "bayonet";
     if (changesBody && targets.some((shape) => bodyLocked(shape))) return fail(t("status.objectLocked"));
     if (changesBody && targets.some((shape) => shape.groupOperation === "bundle")) return fail(t("lid.error.magnetsBundle"));
     const sourceFingerprint = projectShapesFingerprint(shapesRef.current);
@@ -8659,7 +8659,8 @@ export function LayerlingEditor({
     const posts = result.magnets?.posts ?? [];
     // A flush hinge's slots and a pivot lid's pin holes are cut into the body as the magnets' pockets are.
     const pockets = [...(result.magnets?.pockets ?? []), ...(hinge?.cuts ? [hinge.cuts] : []), ...bodyCuts];
-    // The body's knuckles, a screw lid's thread and a bayonet's lugs are grouped with it as the magnets' posts are.
+    // The body's knuckles, a screw lid's thread (a screw-in lid's in its opening) and a bayonet's lugs are grouped with it
+    // as the magnets' posts are.
     const grouped = await groupedWithMagnets(targets, { posts: [...posts, ...(hinge ? [hinge.knuckles] : []), ...(screw ? [screw.thread] : []), ...(bayonet ? [bayonet.lugs] : [])], pockets }, (shapes) => buildGroupedShapeOffThread(shapes, workspaceSettingsRef.current.booleanTriangleLimit, geometryAbortRef.current?.signal));
     if (changed()) return fail(t("lid.error.changed"));
     if (!grouped.group) return fail(grouped.failureNotice || t(screw ? "lid.error.screwKernel" : bayonet ? "lid.error.bayonetKernel" : hinge ? "lid.error.hingeKernel" : result.magnets ? "lid.error.magnetsKernel" : "lid.error.cutsKernel"));
@@ -8670,7 +8671,7 @@ export function LayerlingEditor({
     const magnetCount = result.magnets?.pockets.length ?? 0;
     const millimetres = (value: number) => (Math.round(value * 10) / 10).toLocaleString(numberLocale());
     const message = screw
-      ? t("status.lidMadeScrew", { pitch: millimetres(screw.pitch), height: millimetres(screw.pitch * screw.turns), diameter: millimetres(screw.diameter) })
+      ? t(screw.inside ? "status.lidMadeScrewIn" : "status.lidMadeScrew", { pitch: millimetres(screw.pitch), height: millimetres(screw.pitch * screw.turns), diameter: millimetres(screw.diameter) })
       : bayonet
       ? t("status.lidMadeBayonet", { count: bayonet.count, height: millimetres(bayonet.height), diameter: millimetres(bayonet.diameter), turn: millimetres(bayonet.turn) })
       : hinge
@@ -8691,7 +8692,11 @@ export function LayerlingEditor({
         knuckles: hinge.style === "pivot" ? 0 : hinge.count, pins: hinge.style === "pivot" ? 2 : 1, pinDiameter: options.hingePin, side: options.hingeSide, style: hinge.style, pinId: hinge.pin?.id ?? null,
         plugsId: hinge.plugs?.id ?? null, pinLength: hinge.pinLength,
       } } : {}),
-      ...(screw ? { screw: { pitch: screw.pitch, turns: screw.turns, depth: Math.round(screw.depth * 1000) / 1000, diameter: Math.round(screw.diameter * 1000) / 1000 } } : {}),
+      // A screw-in lid's diameter is its plug's, and the plug may be hollow.
+      ...(screw ? { screw: {
+        pitch: screw.pitch, turns: screw.turns, depth: Math.round(screw.depth * 1000) / 1000, diameter: Math.round(screw.diameter * 1000) / 1000,
+        ...(screw.inside ? { inside: true, hollow: screw.hollow } : {}),
+      } } : {}),
       ...(bayonet ? { bayonet: {
         lugs: bayonet.count, turn: bayonet.turn, diameter: Math.round(bayonet.diameter * 1000) / 1000, lugHeight: bayonet.height, lugWidth: Math.round(bayonet.width * 1000) / 1000, depth: options.bayonetDepth,
       } } : {}),

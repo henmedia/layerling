@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { BAYONET_MIN_WALL, HINGE_PIN_GRIP, LID_DEFAULTS, LID_TYPES, MAX_BAYONET_AXIAL_GAP, MAX_BAYONET_DEPTH, MAX_BAYONET_DETENT, MAX_BAYONET_LUGS, MIN_BAYONET_AXIAL_GAP, MIN_BAYONET_DEPTH, MIN_BAYONET_LUGS, MAX_CLICK_BUMP_HEIGHT, MAX_HINGE_PIN, MAX_HINGE_PIN_PLAY, MAX_LID_GAP, MAX_LID_THICKNESS, MAX_LID_THREAD_PITCH, MAX_LID_THREAD_TURNS, MAX_MAGNET_GAP, MIN_CLICK_BUMP_HEIGHT, MIN_HINGE_PIN, MIN_HINGE_PIN_PLAY, MIN_LID_THREAD_PITCH, MIN_LID_THREAD_TURNS, MIN_LID_WALL, MIN_MAGNET_DIAMETER, SCREW_MIN_WALL, bayonetLugSize, bayonetPlan, bayonetTurn, clickBumpPlaces, cornerKnucklePlan, endPlugPlan, hingeKnuckleRadius, hingePinHoles, lidClickBumpsFit, lidHandleFits, lidTakesExtras, lidThicknessForMagnets, lidThread, magnetPlaces, magnetPocketDepth, normalizeLidOptions, roundOutline, screwPlan } from "@/lib/lidTool";
+import { BAYONET_MIN_WALL, HINGE_PIN_GRIP, LID_DEFAULTS, LID_TYPES, MAX_BAYONET_AXIAL_GAP, MAX_BAYONET_DEPTH, MAX_BAYONET_DETENT, MAX_BAYONET_LUGS, MIN_BAYONET_AXIAL_GAP, MIN_BAYONET_DEPTH, MIN_BAYONET_LUGS, MAX_CLICK_BUMP_HEIGHT, MAX_HINGE_PIN, MAX_HINGE_PIN_PLAY, MAX_LID_GAP, MAX_LID_THICKNESS, MAX_LID_THREAD_PITCH, MAX_LID_THREAD_TURNS, MAX_MAGNET_GAP, MIN_CLICK_BUMP_HEIGHT, MIN_HINGE_PIN, MIN_HINGE_PIN_PLAY, MIN_LID_THREAD_PITCH, MIN_LID_THREAD_TURNS, MIN_LID_WALL, MIN_MAGNET_DIAMETER, SCREW_MIN_WALL, bayonetLugSize, bayonetPlan, bayonetTurn, clickBumpPlaces, cornerKnucklePlan, endPlugPlan, hingeKnuckleRadius, hingePinHoles, lidClickBumpsFit, lidHandleFits, lidTakesExtras, lidThicknessForMagnets, lidThread, magnetPlaces, magnetPocketDepth, normalizeLidOptions, roundOutline, screwInPlan, screwPlan } from "@/lib/lidTool";
 import { threadSize } from "@/lib/vase/vase-geometry.mjs";
 
 describe("lid options (#1009)", () => {
@@ -313,7 +313,7 @@ function polygonRound(radius: number, sides = 192, cx = 0, cy = 0, hole = false)
 
 describe("a screw lid (Discussion #1393)", () => {
   it("is a fifth kind of lid, taken in any case, and the push-in lid stays the one to begin with", () => {
-    expect(LID_TYPES).toEqual(["plug", "cap", "both", "flat", "screw", "bayonet"]);
+    expect(LID_TYPES).toEqual(["plug", "cap", "both", "flat", "screw", "screwIn", "bayonet"]);
     expect(normalizeLidOptions({ type: " Screw " }).type).toBe("screw");
     expect(normalizeLidOptions().type).toBe("plug");
   });
@@ -556,5 +556,110 @@ describe("where a bayonet lid's lugs and slots go (Discussion #1424)", () => {
     expect("error" in bayonetPlan(pot(), options({ bayonetDepth: 4.3 }), 50, 0, 49.7)).toBe(false);
     expect(bayonetPlan(pot(), options({ bayonetDepth: 4.3, bayonetAxialGap: 0.6 }), 50, 0, 49.7)).toEqual({ error: { code: "bayonetShallow", depth: 4.6 } });
     expect(bayonetPlan(pot(undefined, 50, 2), options({ bayonetDepth: 6 }), 50, 0, 49.7)).toEqual({ error: { code: "bayonetShallow", depth: 6.3 } });
+  });
+});
+
+describe("a screw-in lid (Discussion #1432)", () => {
+  it("is a seventh kind of lid, beside the screw lid, taken in any case, and the push-in lid stays the one to begin with", () => {
+    expect(LID_TYPES.indexOf("screwIn")).toBe(LID_TYPES.indexOf("screw") + 1);
+    for (const type of ["screwIn", " ScrewIn ", "screwin", "SCREWIN"]) expect(normalizeLidOptions({ type }).type, type).toBe("screwIn");
+    expect(normalizeLidOptions({ type: "screw in" }).type).toBe("plug");
+    expect(normalizeLidOptions().type).toBe("plug");
+  });
+
+  it("takes no magnets, hinge, click bumps or handle", () => {
+    const screwIn = normalizeLidOptions({ type: "screwIn" });
+    expect(lidTakesExtras(screwIn)).toBe(false);
+    expect(lidClickBumpsFit(screwIn)).toBe(false);
+    expect(lidHandleFits(screwIn)).toBe(false);
+  });
+});
+
+describe("where a screw-in lid's thread and plug go (Discussion #1432)", () => {
+  /**
+   * The body seen from above at a height, as lidForSolid slices it: a pot 60 across with a 2 mm wall and a floor 2 mm
+   * thick, 50 high (the rim sliced at 49.7), or what `shape` gives at that height.
+   */
+  const pot = (shape?: (z: number) => { outer: [number, number][][]; opening: [number, number][][] }) => (z: number) => {
+    const level = shape ? shape(z) : { outer: [polygonRound(30)], opening: z > 2 ? [polygonRound(28, 192, 0, 0, true)] : [] };
+    return { outline: level.outer, opening: level.opening };
+  };
+  const options = (patch: Record<string, unknown> = {}) => normalizeLidOptions({ type: "screwIn", ...patch });
+
+  it("puts the thread inside the opening, the pitch times the turns down, and makes the plug the opening less the gap, a ring with the lid's wall", () => {
+    const plan = screwInPlan(pot(), options(), 50, 0, 49.7);
+    if ("error" in plan) throw new Error(plan.error.code);
+    expect(plan.centre[0]).toBeCloseTo(0, 9);
+    // The plate is as large as the body; the opening's face 28 mm from the axis, the nearest at the middle of a side.
+    expect(plan.radius).toBeCloseTo(30, 9);
+    expect(plan.openingFar).toBeCloseTo(28, 9);
+    expect(plan.opening).toBeCloseTo(28 * Math.cos(Math.PI / 192), 9);
+    expect(plan.from).toBe(44);
+    // The screw lid's thread: 3 mm pitch, 0.9 mm deep, the crest 0.6 mm wide.
+    expect([plan.pitch, plan.depth, plan.crest]).toEqual([3, expect.closeTo(0.9, 12), expect.closeTo(0.6, 12)]);
+    // 0.8 mm into the 2 mm wall; the plug the gap inside the opening, its hole 1.6 mm inside the thread's root.
+    expect(plan.reach).toBe(0.8);
+    expect(plan.plugRadius).toBeCloseTo(plan.opening - 0.2, 9);
+    expect(plan.holeRadius).toBeCloseTo(plan.opening - 0.2 - 0.9 - 1.6, 9);
+    // A thinner wall: the thread reaches half of it in.
+    const thin = screwInPlan(pot(() => ({ outer: [polygonRound(30)], opening: [polygonRound(29.1, 192, 0, 0, true)] })), options(), 50, 0, 49.7);
+    if ("error" in thin) throw new Error(thin.error.code);
+    expect(thin.reach).toBeCloseTo((30 * Math.cos(Math.PI / 192) - 29.1) / 2, 9);
+  });
+
+  it("keeps 0.8 mm of wall in the plug however thin the lid's wall is, and leaves a plug solid where a hole would be under 4 mm across", () => {
+    const thinWall = screwInPlan(pot(), options({ wall: 0.4 }), 50, 0, 49.7);
+    if ("error" in thinWall) throw new Error(thinWall.error.code);
+    expect(thinWall.plugRadius - thinWall.depth - thinWall.holeRadius).toBeCloseTo(SCREW_MIN_WALL, 9);
+    // A tube 12 across with a 1 mm wall: a plug 8.8 across at its thread's root, a hole of 5.6 inside 1.6 mm of wall.
+    const tube = (radius: number) => pot(() => ({ outer: [polygonRound(radius + 1)], opening: [polygonRound(radius, 192, 0, 0, true)] }));
+    const hollow = screwInPlan(tube(5), options(), 50, 0, 49.7);
+    if ("error" in hollow) throw new Error(hollow.error.code);
+    expect(2 * hollow.holeRadius).toBeCloseTo(2 * (5 * Math.cos(Math.PI / 192) - 0.2 - 0.9 - 1.6), 9);
+    // 10 across: the hole would be 3.6, so the plug is solid; with a thinner wall in it, 5.2.
+    const solid = screwInPlan(tube(4), options(), 50, 0, 49.7);
+    if ("error" in solid) throw new Error(solid.error.code);
+    expect(solid.holeRadius).toBe(0);
+    const ring = screwInPlan(tube(4), options({ wall: 0.8 }), 50, 0, 49.7);
+    if ("error" in ring) throw new Error(ring.error.code);
+    expect(2 * ring.holeRadius).toBeCloseTo(2 * (4 * Math.cos(Math.PI / 192) - 0.2 - 0.9 - 0.8), 9);
+  });
+
+  it("refuses a body that is not round, an opening that is not round or not round the same middle, or one that narrows down the thread", () => {
+    const box = pot(() => ({ outer: [[[-30, -30], [30, -30], [30, 30], [-30, 30]]], opening: [[[-28, -28], [-28, 28], [28, 28], [28, -28]]] }));
+    expect(screwInPlan(box, options(), 50, 0, 49.7)).toEqual({ error: { code: "screwInNotRound" } });
+    const squareOpening = pot(() => ({ outer: [polygonRound(30)], opening: [[[-18, -18], [-18, 18], [18, 18], [18, -18]]] }));
+    expect(screwInPlan(squareOpening, options(), 50, 0, 49.7)).toEqual({ error: { code: "screwInNotRound" } });
+    const offMiddle = pot(() => ({ outer: [polygonRound(30)], opening: [polygonRound(25, 192, 1, 0, true)] }));
+    expect(screwInPlan(offMiddle, options(), 50, 0, 49.7)).toEqual({ error: { code: "screwInNotRound" } });
+    const twoOpenings = pot(() => ({ outer: [polygonRound(30)], opening: [polygonRound(8, 96, -12, 0, true), polygonRound(8, 96, 12, 0, true)] }));
+    expect(screwInPlan(twoOpenings, options(), 50, 0, 49.7)).toEqual({ error: { code: "screwInNotRound" } });
+    // A cone-shaped pocket: half a millimetre narrower at the bottom of the thread, 6 mm down.
+    const narrowing = pot((z) => ({ outer: [polygonRound(30)], opening: [polygonRound(28 - (50 - z) / 12, 192, 0, 0, true)] }));
+    expect(screwInPlan(narrowing, options(), 50, 0, 49.7)).toEqual({ error: { code: "screwInNotRound" } });
+  });
+
+  it("refuses a wall under 0.8 mm, a body too low, an opening not deep enough or too small, and a gap too large for the thread", () => {
+    const thin = pot(() => ({ outer: [polygonRound(30)], opening: [polygonRound(29.4, 192, 0, 0, true)] }));
+    expect(screwInPlan(thin, options(), 50, 0, 49.7)).toEqual({ error: { code: "screwThinWall" } });
+    // Two turns of 3 mm and 0.4 mm below them: 6.4 mm.
+    expect(screwInPlan(pot(), options(), 50, 43.7, 49.7)).toEqual({ error: { code: "screwTooLow", height: 6 } });
+    // The opening's floor 44 mm up, where the plug's end would lie on it; at 43.5 the plug keeps half a millimetre above it.
+    const floor = (thickness: number) => pot((z) => ({ outer: [polygonRound(30)], opening: z > thickness ? [polygonRound(28, 192, 0, 0, true)] : [] }));
+    expect(screwInPlan(floor(44), options(), 50, 0, 49.7)).toEqual({ error: { code: "screwInShallow", height: 6 } });
+    expect(screwInPlan(floor(43.7), options(), 50, 0, 49.7)).toEqual({ error: { code: "screwInShallow", height: 6 } });
+    expect("error" in screwInPlan(floor(43.5), options(), 50, 0, 49.7)).toBe(false);
+    // A floor above where the thread starts.
+    expect(screwInPlan(floor(20), options({ threadTurns: 8, threadPitch: 4 }), 50, 0, 49.7)).toEqual({ error: { code: "screwInShallow", height: 32 } });
+    // An opening 5.6 mm across: a plug 4 mm across at its thread's root needs 6.2 with a 3 mm pitch and a 0.2 mm gap,
+    // 5.6 with a 2 mm pitch (0.6 mm deep), and 6.0 with a 0.4 mm gap.
+    const small = pot(() => ({ outer: [polygonRound(4)], opening: [polygonRound(2.8, 192, 0, 0, true)] }));
+    expect(screwInPlan(small, options(), 50, 0, 49.7)).toEqual({ error: { code: "screwInSmallOpening", diameter: 6.2 } });
+    const wider = pot(() => ({ outer: [polygonRound(4)], opening: [polygonRound(2.81, 192, 0, 0, true)] }));
+    expect("error" in screwInPlan(wider, options({ threadPitch: 2 }), 50, 0, 49.7)).toBe(false);
+    expect(screwInPlan(small, options({ gap: 0.4, threadPitch: 4 }), 50, 0, 49.7)).toEqual({ error: { code: "screwInSmallOpening", diameter: 7.2 } });
+    // At most half the depth, as for a screw lid.
+    expect("error" in screwInPlan(pot(), options({ gap: 0.45 }), 50, 0, 49.7)).toBe(false);
+    expect(screwInPlan(pot(), options({ gap: 0.5 }), 50, 0, 49.7)).toEqual({ error: { code: "screwGapDeep", gap: 0.45 } });
   });
 });

@@ -46,6 +46,7 @@ import {
   MIN_LID_WALL,
   MIN_MAGNET_DIAMETER,
   MIN_MAGNET_HEIGHT,
+  SCREW_MIN_WALL,
   bayonetTurn,
   hingeKnuckleRadius,
   lidClickBumpsFit,
@@ -70,9 +71,10 @@ import type { WorkplaneWorkspaceSettings } from "@/types/layerling";
  * have end plugs that close the pin's hole flush with the body's outside (Discussion #1387). With click bumps
  * it snaps into dimples in the body (#1234), the bumps as high as asked; a handle is a pull tab on the lid or a finger
  * notch in the body (#1230). A screw lid (Discussion #1393) is a cap with a thread inside its rim for a round body, which
- * gets the matching thread on the outside of its top; it holds by that alone. A bayonet lid (Discussion #1424) is a cap
- * for a round body too, with an L-shaped slot inside its rim for each of the lugs on the outside of the body's top: pushed
- * down and turned, it locks.
+ * gets the matching thread on the outside of its top; it holds by that alone. A screw-in lid (Discussion #1432) is the
+ * other way round: a plate with a threaded plug below it that screws into the same thread inside the body's opening. A
+ * bayonet lid (Discussion #1424) is a cap for a round body too, with an L-shaped slot inside its rim for each of the lugs
+ * on the outside of the body's top: pushed down and turned, it locks.
  */
 export function LidPanel({
   targetName,
@@ -120,6 +122,7 @@ export function LidPanel({
   // off, with one line saying why.
   const extras = lidTakesExtras(settings);
   const screw = settings.type === "screw";
+  const screwIn = settings.type === "screwIn";
   const bayonet = settings.type === "bayonet";
   const thread = lidThread(settings);
   return (
@@ -213,8 +216,8 @@ export function LidPanel({
           onChange={(value) => onChange({ gap: value })}
         />
         {fromPrinterPlay("lid.gap", settings.gap, printerPlay) ? <span className="shell-openings-summary">{t("printerPlay.fromFitTest")}</span> : null}
-        {/* A screw lid's rim reaches down as far as its thread goes: the pitch times the turns. */}
-        {screw ? (<>
+        {/* A screw lid's rim, and a screw-in lid's plug, reach down as far as their thread goes: the pitch times the turns. */}
+        {screw || screwIn ? (<>
           <EdgeModifierSlider
             label={t("lid.threadPitch")}
             value={settings.threadPitch}
@@ -286,7 +289,7 @@ export function LidPanel({
           />
         )}
         <EdgeModifierSlider
-          label={t(settings.type === "cap" || screw || bayonet ? "lid.wallCap" : settings.type === "both" ? "lid.wallBoth" : "lid.wall")}
+          label={t(screwIn ? "lid.wallPlug" : settings.type === "cap" || screw || bayonet ? "lid.wallCap" : settings.type === "both" ? "lid.wallBoth" : "lid.wall")}
           value={settings.wall}
           min={MIN_LID_WALL}
           max={MAX_LID_WALL}
@@ -298,6 +301,12 @@ export function LidPanel({
         />
         {screw ? (
           <span className="shell-openings-summary">{t("lid.screwHint", { depth: millimetres(Math.round(thread.depth * 100) / 100), height: millimetres(Math.round(thread.height * 10) / 10) })}</span>
+        ) : null}
+        {/* The plug's wall is SCREW_MIN_WALL at least, whatever the slider says. */}
+        {screwIn ? (
+          <span className="shell-openings-summary">
+            {t("lid.screwInHint", { depth: millimetres(Math.round(thread.depth * 100) / 100), height: millimetres(Math.round(thread.height * 10) / 10), wall: millimetres(Math.max(settings.wall, SCREW_MIN_WALL)) })}
+          </span>
         ) : null}
         {/* The rib behind each locked lug, which it clicks past; then how it goes on, with the turn its count gives. */}
         {bayonet ? (<>
