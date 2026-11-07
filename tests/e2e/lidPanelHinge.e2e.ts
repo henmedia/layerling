@@ -335,3 +335,46 @@ describe("the lid's panel with a bayonet lid (Discussion #1424)", () => {
     expect(texts(panel)).not.toContain("Magnet diameter");
   });
 });
+
+describe("the lid's panel with a standard bottle's or jar's thread", () => {
+  const thread = (panel: HTMLElement) => panel.querySelector<HTMLElement>('[role="radiogroup"][aria-label="Thread"]');
+
+  it("offers a screw lid its own thread or a standard's, its own to begin with", () => {
+    const { panel, changes } = mount({ type: "screw" });
+    const group = thread(panel)!;
+    expect(group).not.toBeNull();
+    const options = [...group.querySelectorAll<HTMLButtonElement>('[role="radio"]')];
+    expect(options.map((button) => button.textContent)).toEqual(["Custom", "PCO 1881", "PCO 1810", "GL 45", "Mason 70", "Mason 86"]);
+    expect(group.querySelector('[aria-checked="true"]')?.textContent).toBe("Custom");
+    expect(options[3].title).toBe("Laboratory bottles with the GL 45 thread (DIN 168).");
+    expect(slider(panel, "Thread pitch")).not.toBeNull();
+    expect(slider(panel, "Turns")).not.toBeNull();
+    act(() => options[1].click());
+    expect(changes.at(-1)).toEqual({ threadStandard: "pco1881" });
+    act(() => root?.unmount());
+    // Only a screw lid has a thread to choose.
+    for (const type of ["plug", "cap", "bayonet"] as const) {
+      expect(thread(mount({ type, threadStandard: "gl45" }).panel), type).toBeNull();
+      act(() => root?.unmount());
+    }
+  });
+
+  it("hides pitch and turns with a standard and says what it is, what the cap fits and which body gets the neck's thread", () => {
+    const { panel } = mount({ type: "screw", threadStandard: "pco1881" });
+    expect(thread(panel)!.querySelector('[aria-checked="true"]')?.textContent).toBe("PCO 1881");
+    expect(slider(panel, "Thread pitch")).toBeNull();
+    expect(slider(panel, "Turns")).toBeNull();
+    expect(slider(panel, "Gap per side")).not.toBeNull();
+    expect(slider(panel, "Rim wall")).not.toBeNull();
+    expect(texts(panel)).toContain("Most water and soft-drink bottles: the 28 mm neck with the short thread.");
+    expect(texts(panel)).toContain("The cap fits a PCO 1881 neck: 27.4 mm across its thread, 2.7 mm a turn; it reaches 10 mm down. A body whose top is as wide as the neck under the thread (23.94 to 25.14 mm) gets the neck's thread; any other stays as it is, and only the cap is made.");
+    // The own thread's line about its depth stays away.
+    expect(texts(panel)).not.toContain("The flanks are at 45°");
+    act(() => root?.unmount());
+    const jar = mount({ type: "screw", threadStandard: "mason86" }).panel;
+    expect(texts(jar)).toContain("Mason jars with a wide mouth.");
+    expect(texts(jar)).toContain("try the cap on your jar first");
+    expect(texts(jar)).toContain("85.85 mm across its thread, 6.35 mm a turn; it reaches 13 mm down");
+    expect(texts(jar)).toContain("(81.25 to 82.45 mm)");
+  });
+});

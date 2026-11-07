@@ -13,6 +13,8 @@ import {
   LID_HINGE_STYLES,
   LID_HINGE_TYPES,
   LID_MAGNET_SIZES,
+  LID_THREAD_STANDARDS,
+  LID_THREAD_STANDARD_SPECS,
   LID_TYPES,
   MAX_BAYONET_AXIAL_GAP,
   MAX_BAYONET_DEPTH,
@@ -51,6 +53,7 @@ import {
   lidClickBumpsFit,
   lidHandleFits,
   lidTakesExtras,
+  lidStandardThread,
   lidThicknessForMagnets,
   lidThread,
   normalizeLidOptions,
@@ -70,7 +73,9 @@ import type { WorkplaneWorkspaceSettings } from "@/types/layerling";
  * have end plugs that close the pin's hole flush with the body's outside (Discussion #1387). With click bumps
  * it snaps into dimples in the body (#1234), the bumps as high as asked; a handle is a pull tab on the lid or a finger
  * notch in the body (#1230). A screw lid (Discussion #1393) is a cap with a thread inside its rim for a round body, which
- * gets the matching thread on the outside of its top; it holds by that alone. A bayonet lid (Discussion #1424) is a cap
+ * gets the matching thread on the outside of its top; it holds by that alone. Its thread can be a standard bottle's or
+ * jar's instead of its own: the cap then fits that bottle, and the body gets the neck's thread only if it is that neck,
+ * which the panel says how to make. A bayonet lid (Discussion #1424) is a cap
  * for a round body too, with an L-shaped slot inside its rim for each of the lugs on the outside of the body's top: pushed
  * down and turned, it locks.
  */
@@ -122,6 +127,8 @@ export function LidPanel({
   const screw = settings.type === "screw";
   const bayonet = settings.type === "bayonet";
   const thread = lidThread(settings);
+  // A standard's thread sets its own pitch and turns: their sliders give way to what the standard is and what it takes.
+  const standard = screw && settings.threadStandard !== "own" ? lidStandardThread(settings.threadStandard) : null;
   return (
     <MovableToolPanel className="edge-modifier-panel shell-panel offset-panel lid-panel" ariaLabel={title}>
       {(handleProps) => (<>
@@ -161,6 +168,30 @@ export function LidPanel({
         </div>
       </div>
       <span className="shell-openings-summary">{t(`lid.type.${settings.type}Hint`)}</span>
+
+      {/* A screw lid's thread is its own or a standard bottle's or jar's. */}
+      {screw ? (
+        <div className="edge-modifier-field shell-openings" role="radiogroup" aria-label={t("lid.threadStandard")}>
+          <span>{t("lid.threadStandard")}</span>
+          <div className="shell-opening-options">
+            {LID_THREAD_STANDARDS.map((option) => (
+              <button
+                key={option}
+                type="button"
+                role="radio"
+                aria-checked={settings.threadStandard === option}
+                className={settings.threadStandard === option ? "active" : ""}
+                title={option === "own" ? undefined : t(`lid.threadStandardHint.${option}`)}
+                disabled={busy}
+                onClick={() => onChange({ threadStandard: option })}
+              >
+                {option === "own" ? t("lid.threadStandard.own") : LID_THREAD_STANDARD_SPECS[option].name}
+              </button>
+            ))}
+          </div>
+          {settings.threadStandard === "own" ? null : <span className="shell-openings-summary">{t(`lid.threadStandardHint.${settings.threadStandard}`)}</span>}
+        </div>
+      ) : null}
 
       <EdgeModifierSlider
         label={t("lid.thickness")}
@@ -213,8 +244,8 @@ export function LidPanel({
           onChange={(value) => onChange({ gap: value })}
         />
         {fromPrinterPlay("lid.gap", settings.gap, printerPlay) ? <span className="shell-openings-summary">{t("printerPlay.fromFitTest")}</span> : null}
-        {/* A screw lid's rim reaches down as far as its thread goes: the pitch times the turns. */}
-        {screw ? (<>
+        {/* A screw lid's rim reaches down as far as its own thread goes: the pitch times the turns. */}
+        {screw && !standard ? (<>
           <EdgeModifierSlider
             label={t("lid.threadPitch")}
             value={settings.threadPitch}
@@ -237,7 +268,7 @@ export function LidPanel({
             disabled={busy}
             onChange={(value) => onChange({ threadTurns: value })}
           />
-        </>) : bayonet ? (<>
+        </>) : screw ? null : bayonet ? (<>
           {/* How many lugs, how far the cap's rim reaches down over them, and its room along the axis above the ledge. */}
           <EdgeModifierSlider
             label={t("lid.bayonetLugs")}
@@ -296,7 +327,12 @@ export function LidPanel({
           disabled={busy}
           onChange={(value) => onChange({ wall: value })}
         />
-        {screw ? (
+        {standard ? (
+          <span className="shell-openings-summary">{t("lid.screwStandardHint", {
+            standard: standard.name, major: millimetres(standard.major), pitch: millimetres(standard.pitch), depth: millimetres(standard.capDepth),
+            from: millimetres(Math.round(standard.neckFrom * 100) / 100), to: millimetres(Math.round(standard.neckTo * 100) / 100),
+          })}</span>
+        ) : screw ? (
           <span className="shell-openings-summary">{t("lid.screwHint", { depth: millimetres(Math.round(thread.depth * 100) / 100), height: millimetres(Math.round(thread.height * 10) / 10) })}</span>
         ) : null}
         {/* The rib behind each locked lug, which it clicks past; then how it goes on, with the turn its count gives. */}
