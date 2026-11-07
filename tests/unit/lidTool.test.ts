@@ -1,11 +1,11 @@
 import { describe, expect, it } from "vitest";
-import { BAYONET_MIN_WALL, HINGE_PIN_GRIP, LID_DEFAULTS, LID_TYPES, MAX_BAYONET_AXIAL_GAP, MAX_BAYONET_DEPTH, MAX_BAYONET_DETENT, MAX_BAYONET_LUGS, MIN_BAYONET_AXIAL_GAP, MIN_BAYONET_DEPTH, MIN_BAYONET_LUGS, MAX_CLICK_BUMP_HEIGHT, MAX_HINGE_PIN, MAX_HINGE_PIN_PLAY, MAX_LID_GAP, MAX_LID_THICKNESS, MAX_LID_THREAD_PITCH, MAX_LID_THREAD_TURNS, MAX_MAGNET_GAP, MIN_CLICK_BUMP_HEIGHT, MIN_HINGE_PIN, MIN_HINGE_PIN_PLAY, MIN_LID_THREAD_PITCH, MIN_LID_THREAD_TURNS, MIN_LID_WALL, MIN_MAGNET_DIAMETER, SCREW_MIN_WALL, bayonetLugSize, bayonetPlan, bayonetTurn, clickBumpPlaces, cornerKnucklePlan, endPlugPlan, hingeKnuckleRadius, hingePinHoles, lidClickBumpsFit, lidHandleFits, lidTakesExtras, lidThicknessForMagnets, lidThread, magnetPlaces, magnetPocketDepth, normalizeLidOptions, roundOutline, screwPlan } from "@/lib/lidTool";
+import { BAYONET_MIN_WALL, HINGE_PIN_GRIP, LID_DEFAULTS, LID_TYPES, MAX_BAYONET_AXIAL_GAP, MAX_BAYONET_DEPTH, MAX_BAYONET_DETENT, MAX_BAYONET_LUGS, MIN_BAYONET_AXIAL_GAP, MIN_BAYONET_DEPTH, MIN_BAYONET_LUGS, MAX_CLICK_BUMP_HEIGHT, MAX_HINGE_PIN, MAX_HINGE_PIN_PLAY, MAX_LID_GAP, MAX_LID_THICKNESS, MAX_LID_THREAD_PITCH, MAX_LID_THREAD_TURNS, MAX_MAGNET_GAP, MIN_CLICK_BUMP_HEIGHT, MIN_HINGE_PIN, MIN_HINGE_PIN_PLAY, MIN_LID_THREAD_PITCH, MIN_LID_THREAD_TURNS, MIN_LID_WALL, MIN_MAGNET_DIAMETER, LID_HINGE_TYPES, SCREW_MIN_WALL, SLIDE_EDGE, SLIDE_LIP, SLIDE_MAX_GROOVE, SLIDE_MIN_HOLD, SLIDE_WALL_KEEP, bayonetLugSize, bayonetPlan, bayonetTurn, clickBumpPlaces, cornerKnucklePlan, endPlugPlan, hingeKnuckleRadius, hingePinHoles, lidClickBumpsFit, lidHandleFits, lidTakesExtras, lidTakesMagnets, lidThicknessForMagnets, lidThread, magnetPlaces, magnetPocketDepth, normalizeLidOptions, roundOutline, screwPlan, slidePlan, slideWall } from "@/lib/lidTool";
 import { threadSize } from "@/lib/vase/vase-geometry.mjs";
 
 describe("lid options (#1009)", () => {
   it("starts from a push-in lid with a normal fit", () => {
     expect(normalizeLidOptions()).toEqual(LID_DEFAULTS);
-    expect(LID_DEFAULTS).toEqual({ type: "plug", thickness: 2, gap: 0.2, depth: 4, wall: 1.6, magnets: false, magnetDiameter: 6, magnetHeight: 2, magnetGap: 0.1, hinge: false, hingePin: 1.75, hingeGap: 0.3, hingePinPlay: 0.2, hingeKnuckles: 0, hingePrintPin: false, hingeSide: "back", hingeTeardrop: true, hingeStyle: "outside", hingeEndPlugs: false, clickBumps: false, clickBumpHeight: 0.4, handle: "none", threadPitch: 3, threadTurns: 2, bayonetLugs: 3, bayonetDepth: 8, bayonetAxialGap: 0.3, bayonetDetent: 0.3 });
+    expect(LID_DEFAULTS).toEqual({ type: "plug", thickness: 2, gap: 0.2, depth: 4, wall: 1.6, magnets: false, magnetDiameter: 6, magnetHeight: 2, magnetGap: 0.1, hinge: false, hingePin: 1.75, hingeGap: 0.3, hingePinPlay: 0.2, hingeKnuckles: 0, hingePrintPin: false, hingeSide: "back", hingeTeardrop: true, hingeStyle: "outside", hingeEndPlugs: false, clickBumps: false, clickBumpHeight: 0.4, handle: "none", threadPitch: 3, threadTurns: 2, bayonetLugs: 3, bayonetDepth: 8, bayonetAxialGap: 0.3, bayonetDetent: 0.3, slideSide: "front" });
   });
 
   it("takes the kind in any case and keeps the default for an unknown one", () => {
@@ -313,7 +313,7 @@ function polygonRound(radius: number, sides = 192, cx = 0, cy = 0, hole = false)
 
 describe("a screw lid (Discussion #1393)", () => {
   it("is a fifth kind of lid, taken in any case, and the push-in lid stays the one to begin with", () => {
-    expect(LID_TYPES).toEqual(["plug", "cap", "both", "flat", "screw", "bayonet"]);
+    expect(LID_TYPES).toEqual(["plug", "cap", "both", "flat", "screw", "bayonet", "slide"]);
     expect(normalizeLidOptions({ type: " Screw " }).type).toBe("screw");
     expect(normalizeLidOptions().type).toBe("plug");
   });
@@ -436,7 +436,7 @@ describe("where a screw lid's thread goes (Discussion #1393)", () => {
 
 describe("a bayonet lid (Discussion #1424)", () => {
   it("is a sixth kind of lid, taken in any case, and the push-in lid stays the one to begin with", () => {
-    expect(LID_TYPES.at(-1)).toBe("bayonet");
+    expect(LID_TYPES[5]).toBe("bayonet");
     expect(normalizeLidOptions({ type: " Bayonet " }).type).toBe("bayonet");
     expect(normalizeLidOptions().type).toBe("plug");
   });
@@ -556,5 +556,148 @@ describe("where a bayonet lid's lugs and slots go (Discussion #1424)", () => {
     expect("error" in bayonetPlan(pot(), options({ bayonetDepth: 4.3 }), 50, 0, 49.7)).toBe(false);
     expect(bayonetPlan(pot(), options({ bayonetDepth: 4.3, bayonetAxialGap: 0.6 }), 50, 0, 49.7)).toEqual({ error: { code: "bayonetShallow", depth: 4.6 } });
     expect(bayonetPlan(pot(undefined, 50, 2), options({ bayonetDepth: 6 }), 50, 0, 49.7)).toEqual({ error: { code: "bayonetShallow", depth: 6.3 } });
+  });
+});
+
+describe("a slide-in lid (Discussion #1443)", () => {
+  it("is a seventh kind of lid, taken in any case, and the push-in lid stays the one to begin with", () => {
+    expect(LID_TYPES.at(-1)).toBe("slide");
+    expect(normalizeLidOptions({ type: " Slide " }).type).toBe("slide");
+    expect(normalizeLidOptions().type).toBe("plug");
+  });
+
+  it("slides in through the front unless another wall is picked, in any case", () => {
+    expect(LID_DEFAULTS.slideSide).toBe("front");
+    expect(normalizeLidOptions({ slideSide: " Left " }).slideSide).toBe("left");
+    expect(normalizeLidOptions({ slideSide: "back" }).slideSide).toBe("back");
+    expect(normalizeLidOptions({ slideSide: "top" }).slideSide).toBe("front");
+    expect(normalizeLidOptions({ slideSide: 2 }).slideSide).toBe("front");
+    // Its own setting: the hinge's side stays as it was.
+    expect(normalizeLidOptions({ slideSide: "right" }).hingeSide).toBe("back");
+  });
+
+  it("takes click bumps and a handle, but neither magnets nor a hinge", () => {
+    const slide = normalizeLidOptions({ type: "slide" });
+    expect(lidTakesExtras(slide)).toBe(true);
+    expect(lidTakesMagnets(slide)).toBe(false);
+    expect(LID_HINGE_TYPES).not.toContain("slide");
+    expect(lidClickBumpsFit(slide)).toBe(true);
+    expect(lidHandleFits(slide)).toBe(true);
+    // The others as they were: magnets with the four plain kinds, not with a screw or bayonet lid.
+    expect(LID_TYPES.filter((type) => lidTakesMagnets({ type }))).toEqual(["plug", "cap", "both", "flat"]);
+  });
+});
+
+describe("where a slide-in lid's grooves go (Discussion #1443)", () => {
+  const rectangle = (left: number, front: number, right: number, back: number): [number, number][] => [[left, front], [right, front], [right, back], [left, back]];
+  /** A rectangle from `left` to `right` and `front` to `back` with its corners rounded `radius`, a point every 5 degrees. */
+  const rounded = (left: number, front: number, right: number, back: number, radius: number): [number, number][] => {
+    const corner = (cx: number, cy: number, from: number) => Array.from({ length: 19 }, (_, index): [number, number] => {
+      const angle = ((from + index * 5) * Math.PI) / 180;
+      return [cx + radius * Math.cos(angle), cy + radius * Math.sin(angle)];
+    });
+    return [...corner(right - radius, front + radius, -90), ...corner(right - radius, back - radius, 0), ...corner(left + radius, back - radius, 90), ...corner(left + radius, front + radius, 180)];
+  };
+  /**
+   * A box seen from above as `slidePlan` slices it, the wall it slides in through at the front (the least y): 60 x 40 with
+   * 2 mm walls to begin with, 30 high, its floor 2 mm thick; `low` gives other contours below a height.
+   */
+  const box = (outline = rectangle(-30, -20, 30, 20), opening = rectangle(-28, -18, 28, 18), floor = 2, low?: { below: number; outline: [number, number][]; opening: [number, number][] }) => (z: number) => {
+    if (low && z < low.below) return { outline: [low.outline], opening: [low.opening] };
+    return { outline: [outline], opening: z > floor ? [[...opening].reverse()] : [] };
+  };
+  const options = (patch: Record<string, unknown> = {}) => normalizeLidOptions({ type: "slide", ...patch });
+  // The groove's depth a 2 mm plate allows with a 0.2 mm gap: its tip, the gap upright on the slope and the lip above.
+  const fromPlate = (thickness: number, gap = 0.2) => thickness - SLIDE_EDGE - gap * (Math.SQRT2 - 1) - SLIDE_LIP;
+
+  it("puts the grooves as deep as a 2 mm plate allows into 2 mm walls, under it the gap, the lid's underside flat with the plate's", () => {
+    expect([SLIDE_MAX_GROOVE, SLIDE_WALL_KEEP, SLIDE_EDGE, SLIDE_LIP, SLIDE_MIN_HOLD]).toEqual([1.5, 0.8, 0.4, 0.6, 0.4]);
+    const plan = slidePlan(box(), options(), 30, 29.7);
+    if ("error" in plan) throw new Error(plan.error.code);
+    expect(plan.depth).toBeCloseTo(fromPlate(2), 12);
+    expect(plan.depth).toBeCloseTo(0.917, 3);
+    expect(plan.wall).toBeCloseTo(2, 12);
+    expect(plan.underside).toBe(28);
+    expect(plan.floor).toBeCloseTo(27.8, 12);
+    expect([...plan.opening].sort((a, b) => a[0] - b[0] || a[1] - b[1])).toEqual([[-28, -18], [-28, 18], [28, -18], [28, 18]]);
+    expect(plan.outline).toEqual([rectangle(-30, -20, 30, 20)]);
+  });
+
+  it("goes deeper with a thicker plate, as far as the walls leave 0.8 mm behind the grooves and 1.5 mm at most", () => {
+    const deep = (thickness: number, wall: number) => {
+      const plan = slidePlan(box(rectangle(-30, -20, 30, 20), rectangle(-30 + wall, -20 + wall, 30 - wall, 20 - wall)), options({ thickness }), 30, 29.7);
+      if ("error" in plan) throw new Error(plan.error.code);
+      return plan.depth;
+    };
+    expect(deep(2.2, 2)).toBeCloseTo(fromPlate(2.2), 12);
+    expect(deep(3, 2)).toBeCloseTo(2 - SLIDE_WALL_KEEP, 12);
+    expect(deep(3, 3)).toBeCloseTo(SLIDE_MAX_GROOVE, 12);
+    expect(deep(5, 4)).toBeCloseTo(SLIDE_MAX_GROOVE, 12);
+  });
+
+  it("measures the thinnest of the side and back walls, never the wall it slides in through", () => {
+    const plan = (opening: [number, number][]) => {
+      const result = slidePlan(box(rectangle(-30, -20, 30, 20), opening), options({ thickness: 4 }), 30, 29.7);
+      if ("error" in result) throw new Error(result.error.code);
+      return result;
+    };
+    // A thin back, a thin right side, both, a thin front.
+    expect(plan(rectangle(-28, -18, 28, 18.3)).wall).toBeCloseTo(1.7, 12);
+    expect(plan(rectangle(-28, -18, 28.5, 18)).wall).toBeCloseTo(1.5, 12);
+    expect(plan(rectangle(-28, -18, 28.5, 18)).depth).toBeCloseTo(1.5 - SLIDE_WALL_KEEP, 12);
+    expect(plan(rectangle(-28, -18, 28.5, 18.3)).wall).toBeCloseTo(1.5, 12);
+    expect(plan(rectangle(-28, -19.5, 28, 18)).wall).toBeCloseTo(2, 12);
+    expect(plan(rectangle(-28, -19.5, 28, 18)).depth).toBeCloseTo(1.2, 12);
+    // Without the front: no wall in front of the opening's front edge counts, nor the outline before it.
+    expect(slideWall([rectangle(-30, -20, 30, 20)], rectangle(-28, -19.9, 28, 18), -19.9)).toBeCloseTo(2, 12);
+    expect(slideWall([rectangle(-30, -20, 30, 20)], rectangle(-28, -19.9, 28, 18), -25)).toBeCloseTo(0.1, 12);
+    // An opening that reaches out of the outline, or round a corner of it, leaves no wall.
+    expect(slideWall([rectangle(-30, -20, 30, 20)], rectangle(-28, -18, 31, 18), -18)).toBe(0);
+    const lShape: [number, number][] = [[-30, -20], [30, -20], [30, 0], [0, 0], [0, 20], [-30, 20]];
+    expect(slideWall([lShape], rectangle(-28, -18, 28, 18), -18)).toBe(0);
+    // Two boxes side by side: one opening's hull spans the gap between them.
+    expect(slideWall([rectangle(-30, -20, -1, 20), rectangle(1, -20, 30, 20)], rectangle(-28, -18, 28, 18), -18)).toBe(0);
+  });
+
+  it("takes a box with rounded corners, but not a round pot nor one whose sides do not run straight from near the front", () => {
+    // Corners of 5 mm outside and 3 mm inside: the opening is as wide as it gets 3 mm behind its front, of 36.
+    const roundedBox = box(rounded(-30, -20, 30, 20, 5), rounded(-28, -18, 28, 18, 3));
+    const plan = slidePlan(roundedBox, options(), 30, 29.7);
+    if ("error" in plan) throw new Error(plan.error.code);
+    expect(plan.wall).toBeCloseTo(2, 2);
+    expect(plan.depth).toBeCloseTo(fromPlate(2), 12);
+    // Corners up to a quarter of the opening's length, 9 mm: the lid's end fills them.
+    expect("error" in slidePlan(box(rounded(-30, -20, 30, 20, 11), rounded(-28, -18, 28, 18, 9)), options(), 30, 29.7)).toBe(false);
+    expect(slidePlan(box(rounded(-30, -20, 30, 20, 12), rounded(-28, -18, 28, 18, 10)), options(), 30, 29.7)).toEqual({ error: { code: "slideNotBox" } });
+    expect(slidePlan(box([polygonRound(25)], [polygonRound(23, 192, 0, 0, true)].flat() as [number, number][]), options(), 30, 29.7)).toEqual({ error: { code: "slideNotBox" } });
+    expect(slidePlan(box(polygonRound(25), polygonRound(23)), options(), 30, 29.7)).toEqual({ error: { code: "slideNotBox" } });
+  });
+
+  it("refuses walls that lean or step in or out between the rim and below the grooves' floor", () => {
+    const under = (outline: [number, number][], opening: [number, number][]) => slidePlan(box(rectangle(-30, -20, 30, 20), rectangle(-28, -18, 28, 18), 2, { below: 29, outline, opening }), options(), 30, 29.7);
+    expect("error" in under(rectangle(-30, -20, 30, 20), rectangle(-28, -18, 28, 18))).toBe(false);
+    expect("error" in under(rectangle(-30.05, -20, 30, 20), rectangle(-28, -18, 28, 18.05))).toBe(false);
+    expect(under(rectangle(-29.5, -20, 30, 20), rectangle(-28, -18, 28, 18))).toEqual({ error: { code: "slideNotBox" } });
+    expect(under(rectangle(-30, -20, 30, 20), rectangle(-28, -18, 28, 17.5))).toEqual({ error: { code: "slideNotBox" } });
+  });
+
+  it("refuses walls or a plate too thin for a tongue reaching 0.4 mm past the gap, a box too shallow and one closed at the top", () => {
+    const walls = (wall: number) => box(rectangle(-30, -20, 30, 20), rectangle(-30 + wall, -20 + wall, 30 - wall, 20 - wall));
+    // 0.4 mm into the wall past the gap and 0.8 mm behind it: 1.4 mm with a gap of 0.2, 1.5 with 0.3.
+    expect(slidePlan(walls(1.39), options(), 30, 29.7)).toEqual({ error: { code: "slideThinWall", wall: 1.4 } });
+    expect("error" in slidePlan(walls(1.4), options(), 30, 29.7)).toBe(false);
+    expect(slidePlan(walls(1.4), options({ gap: 0.3 }), 30, 29.7)).toEqual({ error: { code: "slideThinWall", wall: 1.5 } });
+    // The plate holds the tongue's tip, its slope, the gap upright on it and the wall's lip above: 1.7 mm with a gap of 0.2.
+    expect(slidePlan(walls(2), options({ thickness: 1.6 }), 30, 29.7)).toEqual({ error: { code: "slideThinLid", thickness: 1.7 } });
+    expect("error" in slidePlan(walls(2), options({ thickness: 1.7 }), 30, 29.7)).toBe(false);
+    expect(slidePlan(walls(2), options({ thickness: 1.7, gap: 0.3 }), 30, 29.7)).toEqual({ error: { code: "slideThinLid", thickness: 1.9 } });
+    // Both too thin: the walls are named, for a thicker plate would not help them.
+    expect(slidePlan(walls(1.2), options({ thickness: 1.2 }), 30, 29.7)).toEqual({ error: { code: "slideThinWall", wall: 1.4 } });
+    expect(slidePlan(walls(1.6), options({ thickness: 1.2 }), 30, 29.7)).toEqual({ error: { code: "slideThinLid", thickness: 1.7 } });
+    // The opening must reach below the grooves' floor, 2.2 mm under the rim with a 2 mm plate.
+    expect(slidePlan(box(undefined, undefined, 27.8), options(), 30, 29.7)).toEqual({ error: { code: "slideShallow", depth: 2.3 } });
+    expect("error" in slidePlan(box(undefined, undefined, 27.7), options(), 30, 29.7)).toBe(false);
+    expect(slidePlan(box(undefined, undefined, 26.8), options({ thickness: 3 }), 30, 29.7)).toEqual({ error: { code: "slideShallow", depth: 3.3 } });
+    expect(slidePlan(() => ({ outline: [rectangle(-30, -20, 30, 20)], opening: [] }), options(), 30, 29.7)).toEqual({ error: { code: "notOpen" } });
   });
 });

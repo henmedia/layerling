@@ -51,6 +51,7 @@ import {
   lidClickBumpsFit,
   lidHandleFits,
   lidTakesExtras,
+  lidTakesMagnets,
   lidThicknessForMagnets,
   lidThread,
   normalizeLidOptions,
@@ -72,7 +73,8 @@ import type { WorkplaneWorkspaceSettings } from "@/types/layerling";
  * notch in the body (#1230). A screw lid (Discussion #1393) is a cap with a thread inside its rim for a round body, which
  * gets the matching thread on the outside of its top; it holds by that alone. A bayonet lid (Discussion #1424) is a cap
  * for a round body too, with an L-shaped slot inside its rim for each of the lugs on the outside of the body's top: pushed
- * down and turned, it locks.
+ * down and turned, it locks. A slide-in lid (Discussion #1443) is a plate for a box that slides in through the wall picked,
+ * its edges in grooves in the other three, like a pencil box's; its click bump and finger grip are its own.
  */
 export function LidPanel({
   targetName,
@@ -108,7 +110,9 @@ export function LidPanel({
     onChange(raise ? { ...patch, thickness } : patch);
   };
   const needed = lidThicknessForMagnets(settings);
-  const tooThin = settings.magnets && settings.thickness < needed - 1e-9;
+  // A slide-in lid takes no magnets: its plate lies between the walls, with no rim under it for their pockets.
+  const magnetsFit = lidTakesMagnets(settings);
+  const tooThin = settings.magnets && magnetsFit && settings.thickness < needed - 1e-9;
   const millimetres = (value: number) => value.toLocaleString(numberLocale());
   // A rim round the outside would hit the back wall as the lid swings open: the hinge goes with a lip or a flat lid.
   const hingeFits = LID_HINGE_TYPES.includes(settings.type);
@@ -121,6 +125,7 @@ export function LidPanel({
   const extras = lidTakesExtras(settings);
   const screw = settings.type === "screw";
   const bayonet = settings.type === "bayonet";
+  const slide = settings.type === "slide";
   const thread = lidThread(settings);
   return (
     <MovableToolPanel className="edge-modifier-panel shell-panel offset-panel lid-panel" ariaLabel={title}>
@@ -178,7 +183,7 @@ export function LidPanel({
       />
       {tooThin ? (
         <span className="shell-openings-summary" role="status">{t("lid.error.magnetsThinLid", { thickness: millimetres(needed) })}</span>
-      ) : settings.magnets && raised ? (
+      ) : settings.magnets && magnetsFit && raised ? (
         <span className="shell-openings-summary" role="status">{t("lid.magnetsThicknessRaised", { thickness: millimetres(settings.thickness) })}</span>
       ) : null}
 
@@ -272,6 +277,27 @@ export function LidPanel({
             disabled={busy}
             onChange={(value) => onChange({ bayonetAxialGap: value })}
           />
+        </>) : slide ? (<>
+          {/* The wall it slides in through, as in the starting view (the view cube's Front faces you). */}
+          <div className="edge-modifier-field shell-openings" role="radiogroup" aria-label={t("lid.slideSide")}>
+            <span>{t("lid.slideSide")}</span>
+            <div className="shell-opening-options">
+              {LID_HINGE_SIDES.map((side) => (
+                <button
+                  key={side}
+                  type="button"
+                  role="radio"
+                  aria-checked={settings.slideSide === side}
+                  className={settings.slideSide === side ? "active" : ""}
+                  disabled={busy}
+                  onClick={() => onChange({ slideSide: side })}
+                >
+                  {t(`shell.side.${side}`)}
+                </button>
+              ))}
+            </div>
+          </div>
+          <span className="shell-openings-summary">{t("lid.slideHint")}</span>
         </>) : (
           <EdgeModifierSlider
             label={t(settings.type === "cap" ? "lid.depthCap" : settings.type === "both" ? "lid.depthBoth" : "lid.depth")}
@@ -285,17 +311,20 @@ export function LidPanel({
             onChange={(value) => onChange({ depth: value })}
           />
         )}
-        <EdgeModifierSlider
-          label={t(settings.type === "cap" || screw || bayonet ? "lid.wallCap" : settings.type === "both" ? "lid.wallBoth" : "lid.wall")}
-          value={settings.wall}
-          min={MIN_LID_WALL}
-          max={MAX_LID_WALL}
-          step={0.2}
-          workspace={workspace}
-          length
-          disabled={busy}
-          onChange={(value) => onChange({ wall: value })}
-        />
+        {/* A slide-in lid has neither lip nor rim: its tongues follow the walls' grooves. */}
+        {slide ? null : (
+          <EdgeModifierSlider
+            label={t(settings.type === "cap" || screw || bayonet ? "lid.wallCap" : settings.type === "both" ? "lid.wallBoth" : "lid.wall")}
+            value={settings.wall}
+            min={MIN_LID_WALL}
+            max={MAX_LID_WALL}
+            step={0.2}
+            workspace={workspace}
+            length
+            disabled={busy}
+            onChange={(value) => onChange({ wall: value })}
+          />
+        )}
         {screw ? (
           <span className="shell-openings-summary">{t("lid.screwHint", { depth: millimetres(Math.round(thread.depth * 100) / 100), height: millimetres(Math.round(thread.height * 10) / 10) })}</span>
         ) : null}
@@ -317,12 +346,12 @@ export function LidPanel({
         </>) : null}
       </>)}
 
-      {!extras ? <span className="shell-openings-summary" role="status">{t(bayonet ? "lid.error.bayonetExtras" : "lid.error.screwExtras")}</span> : null}
+      {!extras || slide ? <span className="shell-openings-summary" role="status">{t(slide ? "lid.error.slideExtras" : bayonet ? "lid.error.bayonetExtras" : "lid.error.screwExtras")}</span> : null}
       <label className="edge-modifier-field offset-copy">
-        <input type="checkbox" checked={settings.magnets && extras} disabled={busy || !extras} onChange={(event) => withMagnet({ magnets: event.target.checked })} />
+        <input type="checkbox" checked={settings.magnets && magnetsFit} disabled={busy || !magnetsFit} onChange={(event) => withMagnet({ magnets: event.target.checked })} />
         <span>{t("lid.magnets")}</span>
       </label>
-      {settings.magnets && extras ? (<>
+      {settings.magnets && magnetsFit ? (<>
         <div className="edge-modifier-field shell-openings" role="radiogroup" aria-label={t("lid.magnetSize")}>
           <span>{t("lid.magnetSize")}</span>
           <div className="shell-opening-options">
@@ -384,7 +413,7 @@ export function LidPanel({
         <input type="checkbox" checked={settings.hinge && hingeFits} disabled={busy || !hingeFits} onChange={(event) => onChange({ hinge: event.target.checked })} />
         <span>{t("lid.hinge")}</span>
       </label>
-      {!hingeFits && extras ? <span className="shell-openings-summary">{t("lid.hingeTypeHint")}</span> : null}
+      {!hingeFits && extras && !slide ? <span className="shell-openings-summary">{t("lid.hingeTypeHint")}</span> : null}
       {settings.hinge && hingeFits ? (<>
         {/* Where it sits: behind the back, in the wall (the box keeps its size), or a lid that turns on two pins. */}
         <div className="edge-modifier-field shell-openings" role="radiogroup" aria-label={t("lid.hingeStyle")}>
@@ -498,7 +527,8 @@ export function LidPanel({
         <input type="checkbox" checked={settings.clickBumps && bumpsFit} disabled={busy || !bumpsFit} onChange={(event) => onChange({ clickBumps: event.target.checked })} />
         <span>{t("lid.clickBumps")}</span>
       </label>
-      {(settings.clickBumps || !bumpsFit) && extras ? <span className="shell-openings-summary">{t("lid.clickBumpsHint")}</span> : null}
+      {/* A slide-in lid's is one bump under its end, which clicks past the cut wall; it says what its height is. */}
+      {(settings.clickBumps || !bumpsFit) && extras ? <span className="shell-openings-summary">{t(slide ? "lid.slideBumpHint" : "lid.clickBumpsHint")}</span> : null}
       {/* How far they reach into the body's wall: a small box or a stiff lip wants less (#1220). */}
       {settings.clickBumps && bumpsFit ? (<>
         <EdgeModifierSlider
@@ -512,10 +542,10 @@ export function LidPanel({
           disabled={busy}
           onChange={(value) => onChange({ clickBumpHeight: value })}
         />
-        <span className="shell-openings-summary">{t("lid.clickBumpHeightHint")}</span>
+        {slide ? null : <span className="shell-openings-summary">{t("lid.clickBumpHeightHint")}</span>}
       </>) : null}
 
-      {/* On the side the lid opens at: the front, or opposite the hinge. */}
+      {/* On the side the lid opens at: the front, or opposite the hinge; a slide-in lid's on its end at the cut wall. */}
       <div className="edge-modifier-field shell-openings" role="radiogroup" aria-label={t("lid.handle")}>
         <span>{t("lid.handle")}</span>
         <div className="shell-opening-options">
@@ -536,7 +566,7 @@ export function LidPanel({
         {!handleFits && !extras ? null : !handleFits ? (
           <span className="shell-openings-summary">{t("lid.error.handlePivot")}</span>
         ) : handle !== "none" ? (
-          <span className="shell-openings-summary">{t(`lid.handleHint.${handle}`)}</span>
+          <span className="shell-openings-summary">{t(slide ? (handle === "tab" ? "lid.handleHint.tabSlide" : "lid.handleHint.notchSlide") : `lid.handleHint.${handle}`)}</span>
         ) : null}
       </div>
 
