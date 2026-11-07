@@ -108,7 +108,7 @@ export const LANGUAGE_INFO: Readonly<Record<Language, LanguageInfo>> = {
     readme: "README.md",
     quickstartAnchor: "windows-quickstart",
     legal: { imprint: "Údaje o provozovateli", privacy: "Ochrana osobních údajů" },
-    keyNames: { Shift: "Shift", Delete: "Delete", Home: "Home", Click: "Kliknutí", RightClick: "Pravé tlačítko", Drag: "Tažení" },
+    keyNames: { Shift: "Shift", Delete: "Delete", Home: "Home", Click: "Kliknutí", RightClick: "Pravé tlačítko", MiddleClick: "Prostřední tlačítko", Drag: "Tažení" },
     asciiUmlauts: false,
     complete: true,
     guide: {
@@ -145,7 +145,7 @@ export const LANGUAGE_INFO: Readonly<Record<Language, LanguageInfo>> = {
     readme: "README.md",
     quickstartAnchor: "windows-quickstart",
     legal: { imprint: "Imprint", privacy: "Privacy Policy" },
-    keyNames: { RightClick: "Right click" },
+    keyNames: { RightClick: "Right click", MiddleClick: "Middle click" },
     asciiUmlauts: false,
     complete: true,
     guide: {
@@ -182,7 +182,7 @@ export const LANGUAGE_INFO: Readonly<Record<Language, LanguageInfo>> = {
     readme: "README.de.md",
     quickstartAnchor: "schnellstart-unter-windows",
     legal: { imprint: "Impressum", privacy: "Datenschutz" },
-    keyNames: { Ctrl: "Strg", Shift: "Umschalt", Delete: "Entf", Backspace: "Rücktaste", Home: "Pos1", Click: "Klick", RightClick: "Rechtsklick", Drag: "Ziehen" },
+    keyNames: { Ctrl: "Strg", Shift: "Umschalt", Delete: "Entf", Backspace: "Rücktaste", Home: "Pos1", Click: "Klick", RightClick: "Rechtsklick", MiddleClick: "Mittelklick", Drag: "Ziehen" },
     asciiUmlauts: true,
     complete: true,
     guide: {
@@ -235,7 +235,7 @@ export const LANGUAGE_INFO: Readonly<Record<Language, LanguageInfo>> = {
       "Page Down": "Av Pág",
       Enter: "Intro",
       Click: "Clic",
-      RightClick: "Clic derecho",
+      RightClick: "Clic derecho", MiddleClick: "Clic central",
       Drag: "Arrastrar",
     },
     asciiUmlauts: false,
@@ -274,7 +274,7 @@ export const LANGUAGE_INFO: Readonly<Record<Language, LanguageInfo>> = {
     readme: "README.nl.md",
     quickstartAnchor: "snelstart-op-windows",
     legal: { imprint: "Colofon", privacy: "Privacybeleid" },
-    keyNames: { Click: "Klik", RightClick: "Rechtsklik", Drag: "Slepen" },
+    keyNames: { Click: "Klik", RightClick: "Rechtsklik", MiddleClick: "Middelklik", Drag: "Slepen" },
     asciiUmlauts: false,
     complete: true,
     guide: {
@@ -318,7 +318,7 @@ export const LANGUAGE_INFO: Readonly<Record<Language, LanguageInfo>> = {
       Backspace: "Retour arrière",
       Home: "Début",
       Click: "Clic",
-      RightClick: "Clic droit",
+      RightClick: "Clic droit", MiddleClick: "Clic milieu",
       Drag: "Glisser",
     },
     asciiUmlauts: false,
@@ -361,7 +361,7 @@ export const LANGUAGE_INFO: Readonly<Record<Language, LanguageInfo>> = {
     quickstartAnchor: "windows-quickstart",
     legal: { imprint: "Nota prawna", privacy: "Polityka prywatności" },
     // Polish keyboards label most keys in English; only the mouse actions get Polish names.
-    keyNames: { Click: "Klik", RightClick: "Prawy klik", Drag: "Przeciągnij" },
+    keyNames: { Click: "Klik", RightClick: "Prawy klik", MiddleClick: "Środkowy klik", Drag: "Przeciągnij" },
     asciiUmlauts: false,
     complete: false,
     guide: {
@@ -400,7 +400,7 @@ export const LANGUAGE_INFO: Readonly<Record<Language, LanguageInfo>> = {
     quickstartAnchor: "windows-quickstart",
     legal: { imprint: "Künye", privacy: "Gizlilik" },
     // Turkish keyboards label the keys in English; only the mouse actions get Turkish names.
-    keyNames: { Click: "Tık", RightClick: "Sağ tık", Drag: "Sürükle" },
+    keyNames: { Click: "Tık", RightClick: "Sağ tık", MiddleClick: "Orta tık", Drag: "Sürükle" },
     asciiUmlauts: false,
     complete: false,
     guide: {
@@ -437,7 +437,7 @@ export const LANGUAGE_INFO: Readonly<Record<Language, LanguageInfo>> = {
     readme: "README.md",
     quickstartAnchor: "windows-quickstart",
     legal: { imprint: "Выходные данные", privacy: "Политика конфиденциальности" },
-    keyNames: { Ctrl: "Ctrl", Shift: "Shift", Delete: "Del", Backspace: "Backspace", Home: "Home", Click: "Щёлчок", RightClick: "Правый клик", Drag: "Перетаскивание" },
+    keyNames: { Ctrl: "Ctrl", Shift: "Shift", Delete: "Del", Backspace: "Backspace", Home: "Home", Click: "Щёлчок", RightClick: "Правый клик", MiddleClick: "Средний клик", Drag: "Перетаскивание" },
     asciiUmlauts: false,
     complete: true,
     guide: {
@@ -478,7 +478,7 @@ export const LANGUAGE_INFO: Readonly<Record<Language, LanguageInfo>> = {
     readme: "README.md",
     quickstartAnchor: "windows-quickstart",
     legal: { imprint: "Informações legais", privacy: "Política de privacidade" },
-    keyNames: { Click: "Clique", RightClick: "Clique direito", Drag: "Arraste" },
+    keyNames: { Click: "Clique", RightClick: "Clique direito", MiddleClick: "Clique do meio", Drag: "Arraste" },
     asciiUmlauts: false,
     complete: false,
     guide: {
@@ -516,7 +516,7 @@ export const LANGUAGE_INFO: Readonly<Record<Language, LanguageInfo>> = {
     readme: "README.md",
     quickstartAnchor: "windows-quickstart",
     legal: { imprint: "Informações legais", privacy: "Política de privacidade" },
-    keyNames: { Click: "Clique", RightClick: "Clique com o botão direito", Drag: "Arrastar" },
+    keyNames: { Click: "Clique", RightClick: "Clique com o botão direito", MiddleClick: "Clique com o botão do meio", Drag: "Arrastar" },
     asciiUmlauts: false,
     complete: false,
     guide: {
@@ -553,7 +553,7 @@ export const LANGUAGE_INFO: Readonly<Record<Language, LanguageInfo>> = {
     readme: "README.md",
     quickstartAnchor: "windows-quickstart",
     legal: { imprint: "Odtis", privacy: "Zasebnost" },
-    keyNames: { Click: "Klik", RightClick: "Desni klik", Drag: "Vlečenje" },
+    keyNames: { Click: "Klik", RightClick: "Desni klik", MiddleClick: "Srednji klik", Drag: "Vlečenje" },
     asciiUmlauts: false,
     complete: true,
     guide: {
@@ -595,7 +595,7 @@ export const LANGUAGE_INFO: Readonly<Record<Language, LanguageInfo>> = {
     quickstartAnchor: "windows-quickstart",
     legal: { imprint: "Impresszum", privacy: "Adatvédelem" },
     // Hungarian keyboards label the keys in English; only the mouse actions get Hungarian names.
-    keyNames: { Click: "Kattintás", RightClick: "Jobb kattintás", Drag: "Húzás" },
+    keyNames: { Click: "Kattintás", RightClick: "Jobb kattintás", MiddleClick: "Középső kattintás", Drag: "Húzás" },
     asciiUmlauts: false,
     complete: false,
     guide: {
@@ -634,7 +634,7 @@ export const LANGUAGE_INFO: Readonly<Record<Language, LanguageInfo>> = {
     readme: "README.md",
     quickstartAnchor: "windows-quickstart",
     legal: { imprint: "Impressum", privacy: "Privatlivspolitik" },
-    keyNames: { RightClick: "Højreklik" },
+    keyNames: { RightClick: "Højreklik", MiddleClick: "Midterklik" },
     asciiUmlauts: false,
     complete: false,
     guide: {
@@ -683,7 +683,7 @@ export const LANGUAGE_INFO: Readonly<Record<Language, LanguageInfo>> = {
       Backspace: "Backspace",
       Home: "Home",
       Click: "Clic",
-      RightClick: "Clic destro",
+      RightClick: "Clic destro", MiddleClick: "Clic centrale",
       Drag: "Trascina",
     },
     asciiUmlauts: false,
@@ -725,7 +725,7 @@ export const LANGUAGE_INFO: Readonly<Record<Language, LanguageInfo>> = {
     readme: "README.ar.md",
     quickstartAnchor: "البدء-السريع-على-windows",
     legal: { imprint: "بيانات الناشر", privacy: "سياسة الخصوصية" },
-    keyNames: { Click: "نقرة", RightClick: "نقرة بالزر الأيمن", Drag: "سحب" },
+    keyNames: { Click: "نقرة", RightClick: "نقرة بالزر الأيمن", MiddleClick: "نقرة بالزر الأوسط", Drag: "سحب" },
     asciiUmlauts: false,
     complete: false,
     guide: {
@@ -764,7 +764,7 @@ export const LANGUAGE_INFO: Readonly<Record<Language, LanguageInfo>> = {
     readme: "README.md",
     quickstartAnchor: "windows-quickstart",
     legal: { imprint: "運営者情報", privacy: "プライバシーポリシー" },
-    keyNames: { Click: "クリック", RightClick: "右クリック", Drag: "ドラッグ" },
+    keyNames: { Click: "クリック", RightClick: "右クリック", MiddleClick: "中クリック", Drag: "ドラッグ" },
     asciiUmlauts: false,
     complete: false,
     guide: {
@@ -805,7 +805,7 @@ export const LANGUAGE_INFO: Readonly<Record<Language, LanguageInfo>> = {
     quickstartAnchor: "windows-快速上手",
     legal: { imprint: "版本说明", privacy: "隐私政策" },
     // Chinese keyboards label the keys in English; only the mouse actions get Chinese names.
-    keyNames: { Ctrl: "Ctrl", Shift: "Shift", Delete: "Delete", Backspace: "Backspace", Home: "Home", End: "End", "Page Up": "Page Up", "Page Down": "Page Down", Enter: "Enter", Click: "单击", RightClick: "右键单击", Drag: "拖动" },
+    keyNames: { Ctrl: "Ctrl", Shift: "Shift", Delete: "Delete", Backspace: "Backspace", Home: "Home", End: "End", "Page Up": "Page Up", "Page Down": "Page Down", Enter: "Enter", Click: "单击", RightClick: "右键单击", MiddleClick: "中键单击", Drag: "拖动" },
     asciiUmlauts: false,
     complete: false,
     guide: {
@@ -845,7 +845,7 @@ export const LANGUAGE_INFO: Readonly<Record<Language, LanguageInfo>> = {
     quickstartAnchor: "windows-快速上手",
     legal: { imprint: "版本說明", privacy: "隱私權政策" },
     // Chinese keyboards label the keys in English; only the mouse actions get Chinese names.
-    keyNames: { Ctrl: "Ctrl", Shift: "Shift", Delete: "Delete", Backspace: "Backspace", Home: "Home", End: "End", "Page Up": "Page Up", "Page Down": "Page Down", Enter: "Enter", Click: "點擊", RightClick: "右鍵點擊", Drag: "拖曳" },
+    keyNames: { Ctrl: "Ctrl", Shift: "Shift", Delete: "Delete", Backspace: "Backspace", Home: "Home", End: "End", "Page Up": "Page Up", "Page Down": "Page Down", Enter: "Enter", Click: "點擊", RightClick: "右鍵點擊", MiddleClick: "中鍵點擊", Drag: "拖曳" },
     asciiUmlauts: false,
     complete: false,
     guide: {

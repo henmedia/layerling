@@ -109,6 +109,7 @@ La fenêtre d'export propose alors {{ui:export.plates}} : tous les plateaux dans
 ## Grille et capture
 
 La grille montre la taille de la plaque. En bas à droite se trouve l'**étape d'accrochage** : déplacer et mettre à l'échelle l'accrochage par pas de cette taille, par exemple 1 mm. Réduisez-le pour un travail fin et plus grand pour un arrangement grossier. {{ui:editor.tool.snapToGrid}} dans le ruban déplace ensuite les formes sélectionnées sur le croisement de grille le plus proche. Lors du déplacement, les formes s'alignent également sur d'autres formes, voir [Sélection et organisation] (chapter:select-and-arrange).
+Un clic bref avec le bouton du milieu de la souris, sans bouger la souris, ouvre le menu des pas d'accrochage juste sous le pointeur, dans une esquisse aussi ; glisser en tenant le bouton du milieu déplace toujours la vue.
 
 > **Conseil :** Arrêtez de faire pivoter la vue lorsque vous assemblez exactement les pièces. Utilisez les touches numériques pour accéder à la vue droite de dessus ou de face et appuyez sur [[O]] pour l'affichage plat. Vous voyez alors immédiatement si les deux bords sont vraiment à égalité.
 

@@ -111,6 +111,7 @@ La ventana de exportación ofrece entonces {{ui:export.plates}}: todas las placa
 ## Cuadrícula y ajuste
 
 La cuadrícula muestra el tamaño de la placa. Abajo a la derecha está el **paso de ajuste**: al mover y al cambiar el tamaño, las formas avanzan a saltos de ese tamaño, por ejemplo de 1 mm. Hazlo más pequeño para el trabajo fino y más grande para colocar a grandes rasgos. {{ui:editor.tool.snapToGrid}}, en la cinta, lleva después las formas seleccionadas al cruce de la cuadrícula más cercano. Al moverlas, las formas también se ajustan a otras formas: consulta [Seleccionar y organizar](chapter:select-and-arrange). Sin ratón: de [[Alt]]+[[1]] a [[Alt]]+[[0]] eligen la opción correspondiente del menú ([[Alt]]+[[1]] desactiva el ajuste), y [[,]] y [[.]] hacen el paso un tamaño más fino o más grueso. También funciona en un boceto.
+Un clic corto con el botón central del ratón, sin mover el ratón, abre el menú de pasos de ajuste justo en el puntero, también en un boceto; arrastrar con el botón central pulsado sigue moviendo la vista.
 
 > **Consejo:** cuando encajes piezas con exactitud, deja de girar la vista. Con las teclas numéricas, pasa a la vista desde arriba o de frente y pulsa [[O]] para la vista plana. Así ves enseguida si dos aristas están de verdad a ras.
 

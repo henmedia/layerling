@@ -114,6 +114,7 @@ Eksportvinduet tilbyder så {{ui:export.plates}}: alle plader i én fil, side om
 ## Gitter og snap
 
 Gitteret viser pladens størrelse. Nederst til højre er **snap-trinnet**: flytning og skalering snapper i trin af den størrelse, for eksempel 1 mm. Gør det mindre til fint arbejde og større til grov arrangering. {{ui:editor.tool.snapToGrid}} i båndet flytter de valgte former bagefter hen på det nærmeste gitterkryds. Mens der flyttes, snapper former også til andre former, se [Valg og arrangering](chapter:select-and-arrange). Uden musen: [[Alt]]+[[1]] til [[Alt]]+[[0]] vælger den post i menuen med det nummer ([[Alt]]+[[1]] slår snapping fra), og [[,]] og [[.]] gør trinnet ét trin finere eller grovere. Det virker i en skitse også.
+Et kort klik med den midterste museknap, uden at flytte musen, åbner menuen med snap-trin lige ved markøren, også i en skitse; træk med den midterste knap holdt nede flytter stadig visningen.
 
 > **Tip:** Stop med at dreje visningen når du sætter dele helt præcist sammen. Brug taltasterne til at gå til den lige visning fra top eller for og tryk [[O]] for den flade visning. Så ser du straks om to kanter virkelig flugter.
 ### Indstillingsvinduet

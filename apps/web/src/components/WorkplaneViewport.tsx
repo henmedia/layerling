@@ -23,6 +23,7 @@ import { AlignOverlay, MirrorOverlay, type AlignOverlayState, type MirrorOverlay
 import { ALIGN_PLATE_ID } from "@/lib/alignDistribute";
 import { MoveDimensionOverlay } from "@/components/workplane/MoveDimensionOverlay";
 import { OriginDimensionOverlay } from "@/components/workplane/OriginDimensionOverlay";
+import { SnapGridPointerMenu } from "@/components/workplane/SnapGridMenu";
 import { SelectionInspector, ShapeInspector, SnapGridControl, type IconTagControls, type QrCodeControls, type ReferenceImageControls, type SbcBoardControls, type ShapeInspectorUpdateOptions, type TextLayerPatch } from "@/components/workplane/ShapeInspector";
 import type { NameTagStack } from "@/lib/nameTag";
 import { WorkspaceSettingsModal } from "@/components/workplane/WorkspaceSettingsModal";
@@ -60,6 +61,7 @@ import { createMoveDimensionOverlay, type MoveDimensionAxis, type MoveDimensionO
 import { computeOriginAxisDistance, createOriginDimensionOverlay, type OriginDimensionOverlayData } from "@/lib/originDimensionLines";
 import { horizontalPlacementWorkplane, placementPatchForNewShape, placementWorkplaneCoordinates, placementWorkplaneFromSurface, placementWorkplaneIsBase, placementWorkplanePoint, snapPlacementWorkplaneOrigin, type PlacementPoint, type PlacementWorkplane } from "@/lib/placementWorkplane";
 import { capturePointer } from "@/lib/pointerCapture";
+import { useMiddleClick } from "@/lib/middleClick";
 import { printerPresetById } from "@/lib/printBed";
 import { plateCenterX, plateCount, plateName, platesExtentX } from "@/lib/buildPlates";
 import { GuideHelpLink } from "@/components/GuideHelpLink";
@@ -1623,6 +1625,9 @@ export function WorkplaneViewport({
   onSectionBodies,
 }: WorkplaneViewportProps) {
   const [snapOpen, setSnapOpen] = useState(false);
+  // The snap menu a short middle click opens at the pointer (Discussion #1439).
+  const [snapMenuAt, setSnapMenuAt] = useState<{ x: number; y: number } | null>(null);
+  const closeSnapMenuAt = useCallback(() => setSnapMenuAt(null), []);
   // The inspector hands the snap grid control back to the workplane while collapsed or floating.
   const [inspectorSnapGridAway, setInspectorSnapGridAway] = useState(false);
   // The panel for several selected parts carries the snap grid at its foot (#601).
@@ -1798,6 +1803,12 @@ export function WorkplaneViewport({
   });
   const sectionFineDraggingRef = useRef(false);
   const hostRef = useRef<HTMLDivElement | null>(null);
+  // A middle drag moves the view; a short middle click opens the snap menu where it happened (Discussion #1439).
+  // The History view edits nothing, so it has no use for it.
+  useMiddleClick(hostRef, (x, y) => {
+    setSnapOpen(false);
+    setSnapMenuAt({ x, y });
+  }, !pickOnly);
   const threeRef = useRef<ThreeState | null>(null);
   // A 3D mouse the site may use steers this view (#1013).
   useSpaceMouse(threeRef);
@@ -9164,6 +9175,20 @@ export function WorkplaneViewport({
             onObjectSnapChange={changeObjectSnap}
           />
         </div>
+      ) : null}
+
+      {snapMenuAt ? (
+        <SnapGridPointerMenu
+          x={snapMenuAt.x}
+          y={snapMenuAt.y}
+          units={workspace.units}
+          customGrids={workspace.customSnapGrids}
+          snap={snap}
+          onSnapChange={chooseSnapGrid}
+          objectSnap={workspace.objectSnap}
+          onObjectSnapChange={changeObjectSnap}
+          onClose={closeSnapMenuAt}
+        />
       ) : null}
 
       {settingsOpen ? (

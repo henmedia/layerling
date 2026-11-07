@@ -150,6 +150,7 @@ const SHORTCUT_GROUPS: ShortcutGroup[] = [
       { combos: ["+", "−"], label: "shortcuts.zoom" },
       { combos: ["Alt+1 – 0"], label: "shortcuts.snapGridPick" },
       { combos: [",", "."], label: "shortcuts.snapGridStep" },
+      { combos: ["MiddleClick"], label: "shortcuts.snapGridMenu" },
       { combos: ["W"], label: "shortcuts.placeWorkplane" },
       { combos: ["Shift+W"], label: "shortcuts.placeWorkplaneOnSelection" },
       { combos: ["Alt+W"], label: "shortcuts.resetWorkplane" },
@@ -193,6 +194,7 @@ const SHORTCUT_GROUPS: ShortcutGroup[] = [
       { combos: ["+", "−"], label: "shortcuts.sketchZoom" },
       { combos: ["Alt+1 – 0"], label: "shortcuts.snapGridPick" },
       { combos: [",", "."], label: "shortcuts.snapGridStep" },
+      { combos: ["MiddleClick"], label: "shortcuts.snapGridMenu" },
       { combos: ["Alt+Enter"], label: "shortcuts.sketchDimensionSymmetric" },
       { combos: ["← / → / ↑ / ↓", "Shift+← / → / ↑ / ↓"], label: "shortcuts.sketchNudge" },
       { combos: ["← / → / ↑ / ↓", "Shift+← / → / ↑ / ↓"], label: "shortcuts.sketchHandleNudge" },
@@ -233,6 +235,7 @@ const APPLE_KEY_NAMES: Record<string, string> = { Ctrl: "Cmd", Alt: "Option" };
 function keyLabel(key: string, apple: boolean) {
   if (key === "Click") return t("shortcuts.click");
   if (key === "RightClick") return t("shortcuts.rightClick");
+  if (key === "MiddleClick") return t("shortcuts.middleClick");
   if (key === "Drag") return t("shortcuts.drag");
   if (key === "Wheel") return t("shortcuts.wheel");
   return apple ? APPLE_KEY_NAMES[key] ?? key : key;

@@ -111,6 +111,7 @@ Okno exportu pak nabízí {{ui:export.plates}}: všechny podložky v jednom soub
 ## Mřížka a přichytávání
 
 Mřížka usnadňuje odhad rozměrů podložky. Vpravo dole se nastavuje **krok přichytávání**: posun a změna velikosti se provádějí v násobcích tohoto rozměru, například 1 mm. Pro jemnou práci krok zmenšete, pro hrubé rozmístění zvětšete. {{ui:editor.tool.snapToGrid}} dodatečně přesune vybrané tvary na nejbližší průsečík mřížky. Při přesouvání se přichytávají také k jiným tvarům, viz [Výběr a uspořádání](chapter:select-and-arrange). Bez myši: [[Alt]]+[[1]] až [[Alt]]+[[0]] vyberou položku s tímto číslem v nabídce ([[Alt]]+[[1]] přichytávání vypne) a [[,]] a [[.]] krok o stupeň zjemní nebo zhrubí. Funguje to i v náčrtu.
+Krátké kliknutí prostředním tlačítkem myši, bez pohybu myší, otevře nabídku kroku přichytávání přímo u ukazatele, i ve skice; tažení se stisknutým prostředním tlačítkem dál posouvá pohled.
 
 > **Tip:** Při přesném lícování dílů přestaňte pohledem otáčet. Číselnou klávesou zvolte pohled shora nebo zepředu a [[O]] přepněte na rovnoběžné promítání. Snadněji pak poznáte, zda jsou hrany skutečně v jedné rovině.
 

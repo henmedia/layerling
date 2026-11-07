@@ -11944,6 +11944,28 @@ html[data-theme="dark"] .pattern-picker-empty {
   margin: 0;
 }
 
+/* The snap menu a short middle click opens at the pointer (Discussion #1439): over every panel, inside the window. */
+.snap-menu.snap-menu-at-pointer {
+  position: fixed;
+  right: auto;
+  bottom: auto;
+  z-index: 90;
+  max-height: calc(100vh - 16px);
+}
+
+.snap-menu-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 4px;
+  padding: 3px 9px 6px;
+  color: #725a42;
+  font-size: 12px;
+  font-weight: 600;
+  border-bottom: 1px solid var(--border);
+}
+
 .workspace-modal {
   position: absolute;
   inset: 0;
@@ -14115,6 +14137,7 @@ html[data-theme="dark"] .shape-menu-item .sketch-shape-menu-icon {
 html[data-theme="dark"] .camera-controls button,
 html[data-theme="dark"] .snap-menu button,
 html[data-theme="dark"] .snap-object-toggle,
+html[data-theme="dark"] .snap-menu-title,
 html[data-theme="dark"] .snap-row {
   color: #d5c4b3;
 }

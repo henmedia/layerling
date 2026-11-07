@@ -111,6 +111,7 @@ Okno za izvoz nato ponudi {{ui:export.plates}}: vse plošče v eni datoteki, dru
 ## Mreža in pripenjanje
 
 Mreža kaže velikost plošče. Spodaj desno je **pripenjanje**: premikanje in spreminjanje velikosti se zaskočita v korakih te velikosti, na primer 1 mm. Za drobno delo ga nastaviš manjšega, za grobo razporejanje večjega. {{ui:editor.tool.snapToGrid}} v orodni vrstici naknadno pomakne izbrane oblike na najbližje presečišče mreže. Pri premikanju se oblike poleg tega zaskočijo na druge oblike, glej [Izbiranje in razporejanje](chapter:izbiranje-in-razporejanje).
+Kratek klik s srednjo miškino tipko, brez premikanja miške, odpre meni koraka pripenjanja tik ob kazalcu, tudi v skici; vlečenje s pritisnjeno srednjo tipko še naprej premika pogled.
 
 > **Namig:** Ne vrti več pogleda, ko deleže natančno postavljaš drug ob drugega. S številskimi tipkami preklopi na raven pogled od zgoraj ali od spredaj in s [[O]] preklopi na ploski prikaz. Tako takoj vidiš, ali sta dva roba res poravnana.
 

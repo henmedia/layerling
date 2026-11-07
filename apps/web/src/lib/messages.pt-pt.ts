@@ -739,6 +739,7 @@ export const MESSAGES_PT_PT: Partial<Record<MessageKey, string>> = {
   "shortcuts.noMatches": "Nenhum atalho corresponde à pesquisa.",
   "shortcuts.click": "Clique",
   "shortcuts.rightClick": "Clique com o botão direito",
+  "shortcuts.middleClick": "Clique com o botão do meio",
   "shortcuts.drag": "Arrastar",
   "shortcuts.group.selection": "Seleção",
   "shortcuts.group.clipboard": "Área de transferência",

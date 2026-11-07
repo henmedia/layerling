@@ -2,6 +2,7 @@
 
 import { displayY, displayYTurn, insideZ, insideZTurn } from "@/lib/displayAxes";
 import { GuideHelpLink } from "@/components/GuideHelpLink";
+import { SnapGridMenuItems } from "@/components/workplane/SnapGridMenu";
 import { guideChapterForShape, guideSectionForShape } from "@/lib/guideLinks";
 import { useInspectorCard } from "@/lib/inspectorCards";
 import { AlignCenter, ChevronDown, ChevronUp, Cylinder, Eraser, Eye, EyeOff, FolderOpen, Grid3x3, ImageUp, Layers, Link2, Lock, Minus, MousePointerClick, Pencil, Plus, RefreshCw, RotateCcw, Ruler, Shield, ShieldCheck, Split, Tags, Trash2, Unlock, Waves } from "lucide-react";
@@ -353,7 +354,7 @@ import {
   normalizeSpringForm,
 } from "@/lib/flatSpringGeometry";
 import { regularPolygonAspect } from "@/lib/regularPolygonFootprint";
-import { DEFAULT_TAPER_DIMENSION_MAX, MAX_HIGH_RESOLUTION_SIDES, MAX_HIGH_RESOLUTION_STEPS, POSITION_TYPED_LIMIT, RULER_MAX_LENGTH, customSnapGridLabel, positionReach, shapeDimensionLimit, snapGridOptions, snapGridStep } from "@/lib/workplaneSettings";
+import { DEFAULT_TAPER_DIMENSION_MAX, MAX_HIGH_RESOLUTION_SIDES, MAX_HIGH_RESOLUTION_STEPS, POSITION_TYPED_LIMIT, RULER_MAX_LENGTH, customSnapGridLabel, positionReach, shapeDimensionLimit, snapGridStep } from "@/lib/workplaneSettings";
 import { printerPresetById } from "@/lib/printBed";
 import { narrowCrossWidth, narrowEndWidth, normalizeNarrowStart, normalizeSlopeCurve, normalizeSlopeSide, shapeSupportsNarrow, shapeSupportsSlope, SLOPE_MIN_END, slopeAlongWidth, slopeEndHeight, slopeSidesFor } from "@/lib/slopeAlong";
 import type { BentTubeInnerProfile, BentTubeProfile, CustomSnapGrid, GearType, GridfinityCompartmentLabel, GridfinityType, GridSize, MeasurementAccuracy, ShapeCustomization, SketchProfile, SketchStroke, SketchStrokeAlign, SketchStrokeJoin, ThreadDrive, ThreadHead, ThreadProfile, ThreadRole, WorkplaneShape, WorkplaneWorkspaceSettings } from "@/types/layerling";
@@ -7679,24 +7680,17 @@ export function SnapGridControl({
       ) : null}
       {snapOpen && menuPlace ? createPortal(
         <div className="snap-menu" style={menuPlace}>
-          {snapGridOptions(units, customGrids).map((size) => (
-            <button
-              key={size}
-              className={size === snap ? "selected" : ""}
-              onClick={() => {
-                onSnapChange(size);
-                onSnapOpenChange(false);
-              }}
-            >
-              {label(size)}
-            </button>
-          ))}
-          {onObjectSnapChange ? (
-            <label className="snap-object-toggle" title={t("inspector.objectSnapHint")}>
-              <input type="checkbox" checked={Boolean(objectSnap)} onChange={(event) => onObjectSnapChange(event.target.checked)} />
-              <span>{t("inspector.objectSnap")}</span>
-            </label>
-          ) : null}
+          <SnapGridMenuItems
+            units={units}
+            customGrids={customGrids}
+            snap={snap}
+            objectSnap={objectSnap}
+            onObjectSnapChange={onObjectSnapChange}
+            onPick={(size) => {
+              onSnapChange(size);
+              onSnapOpenChange(false);
+            }}
+          />
         </div>,
         document.body,
       ) : null}

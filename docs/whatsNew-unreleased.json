@@ -38,5 +38,15 @@
       "de": "Das Teilen hat als vierte Verbindungsart den Schwalbenschwanz: Eine sich verbreiternde Zunge an der einen Hälfte passt in eine Nut der anderen, die Hälften halten ohne Kleber zusammen und lassen sich quer zur Fuge nicht abziehen. Breite, Tiefe, Flankenwinkel, Richtung und Anzahl stellst du ein; das Spiel kommt aus deinem Passungstest.",
       "en": "Split has the dovetail as a fourth kind of connector: a tongue that widens away from the cut on one half fits a groove in the other, so the halves hold together without glue and cannot be pulled apart across the joint. You set width, depth, flank angle, direction and number; the clearance comes from your fit test."
     }
+  },
+  {
+    "title": {
+      "de": "Rastermenü per Mittelklick",
+      "en": "Snap menu with a middle click"
+    },
+    "body": {
+      "de": "Ein kurzer Klick mit der mittleren Maustaste öffnet das Rastermenü direkt am Mauszeiger, im 3D-Editor und in der Skizze. Es bleibt offen, bis du eine Stufe wählst oder daneben klickst. Ziehen mit der mittleren Taste verschiebt die Ansicht wie bisher.",
+      "en": "A short click with the middle mouse button opens the snap grid menu right at the pointer, in the 3D editor and in a sketch. It stays open until you pick a step or click beside it. Dragging with the middle button still moves the view."
+    }
   }
 ]

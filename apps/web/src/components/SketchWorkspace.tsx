@@ -7,6 +7,7 @@ import { curveStretches } from "@/lib/sketchCurveThroughPoints";
 import { markEscapeHandled } from "@/lib/escapeHandled";
 import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties, type Dispatch, type SetStateAction, type FocusEvent as ReactFocusEvent, type KeyboardEvent as ReactKeyboardEvent, type MouseEvent as ReactMouseEvent, type PointerEvent as ReactPointerEvent, type WheelEvent as ReactWheelEvent } from "react";
 import { SnapGridControl } from "@/components/workplane/ShapeInspector";
+import { SnapGridPointerMenu } from "@/components/workplane/SnapGridMenu";
 import { SketchRevolvePreview } from "@/components/SketchRevolvePreview";
 import { SketchNotes } from "@/components/SketchNotes";
 import { SketchLockBadge, SketchRotateHandles, SketchTurnRing } from "@/components/SketchHandles";
@@ -53,6 +54,7 @@ import { displayY, insideZ } from "@/lib/displayAxes";
 import { clampNudge, constrainToAxis, sketchSegmentDragPointIds, sketchSelectedPointIds, sketchSelectedSegmentIds, sketchSelectionMovePointIds, type SketchSelectableEntity, type SketchSelection } from "@/lib/sketchSelection";
 import { closedPathAt, closedPathRegions, cubicPoint, curveControls, isInsideEdges, orderedPaths, pathEdges, type DisplayPath, type PlaneEdge } from "@/lib/sketchPaths";
 import { capturePointer } from "@/lib/pointerCapture";
+import { useMiddleClick } from "@/lib/middleClick";
 import { sketchBoardSize, sketchFarthestReach, sketchMinZoom, sketchPointerReach } from "@/lib/sketchBoard";
 import { arcPreviewPoints, arcThroughThreePoints, type SketchArcEnd } from "@/lib/sketchArc";
 import { constrainToAngle, sketchLineAngle, sketchPolarPoint, splitTypedLine } from "@/lib/sketchPolar";
@@ -902,6 +904,13 @@ export function SketchWorkspace({
   const [editingNoteId, setEditingNoteId] = useState<string | null>(null);
   const svgRef = useRef<SVGSVGElement | null>(null);
   const wrapRef = useRef<HTMLElement | null>(null);
+  // A middle drag moves the plate; a short middle click opens the snap menu where it happened (Discussion #1439).
+  const [snapMenuAt, setSnapMenuAt] = useState<{ x: number; y: number } | null>(null);
+  const closeSnapMenuAt = useCallback(() => setSnapMenuAt(null), []);
+  useMiddleClick(wrapRef, (x, y) => {
+    setSnapOpen(false);
+    setSnapMenuAt({ x, y });
+  });
   // Width or height of the selected shape, while its value is typed (#168).
   const [editingBoxSize, setEditingBoxSize] = useState<{ axis: "x" | "z"; value: string; sketchPos: { x: number; z: number } } | null>(null);
   const boxSizeEditDoneRef = useRef(false);
@@ -3743,6 +3752,9 @@ export function SketchWorkspace({
       <div className="grid-settings">
         <SnapGridControl units={workspace.units} customGrids={workspace.customSnapGrids} snap={snap} snapOpen={snapOpen} onSnapChange={chooseSnap} onSnapOpenChange={setSnapOpen} />
       </div>
+      {snapMenuAt ? (
+        <SnapGridPointerMenu x={snapMenuAt.x} y={snapMenuAt.y} units={workspace.units} customGrids={workspace.customSnapGrids} snap={snap} onSnapChange={chooseSnap} onClose={closeSnapMenuAt} />
+      ) : null}
     </main>
   );
 }

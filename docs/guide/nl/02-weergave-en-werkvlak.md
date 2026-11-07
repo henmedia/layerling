@@ -111,6 +111,7 @@ Het exportvenster biedt dan {{ui:export.plates}}: alle platen in één bestand, 
 ## Raster en vastklikken
 
 Het raster toont de grootte van de plaat. Rechtsonder staat de **snapstap**: verplaatsen en schalen klikken vast in stappen van die grootte, bijvoorbeeld 1 mm. Maak hem kleiner voor fijn werk en groter voor grof schikken. {{ui:editor.tool.snapToGrid}} in het lint verplaatst de geselecteerde vormen achteraf naar het dichtstbijzijnde rasterkruispunt. Tijdens het verplaatsen klikken vormen ook vast aan andere vormen, zie [Selecteren en schikken](chapter:selecteren-en-schikken). Zonder muis: [[Alt]]+[[1]] tot [[Alt]]+[[0]] kiezen het item met dat nummer in het menu ([[Alt]]+[[1]] zet vastklikken uit), en [[,]] en [[.]] maken de stap een maat fijner of grover. Dat werkt ook in een schets.
+Een korte klik met de middelste muisknop, zonder de muis te bewegen, opent het menu met rasterstappen direct bij de muisaanwijzer, ook in een schets; slepen met de middelste knop ingedrukt verschuift de weergave zoals voorheen.
 
 > **Tip:** Stop met draaien als je onderdelen precies op elkaar laat aansluiten. Ga met de cijfertoetsen naar het rechte aanzicht van boven of voren en druk op [[O]] voor de platte weergave. Dan zie je meteen of twee randen echt gelijk liggen.
 

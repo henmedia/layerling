@@ -110,6 +110,7 @@ La finestra di esportazione offre allora {{ui:export.plates}}: tutti i piatti in
 ## Griglia e aggancio
 
 La griglia mostra le dimensioni della piastra. In basso a destra trovi il **passo di aggancio**: spostamento e ridimensionamento procedono a scatti della misura impostata, per esempio 1 mm. Riducila per lavorare con precisione e aumentala per disporre gli elementi in modo approssimativo. {{ui:editor.tool.snapToGrid}} nella barra multifunzione sposta le forme selezionate sull’incrocio della griglia più vicino. Durante lo spostamento, le forme possono anche agganciarsi ad altre forme; vedi [Selezionare e disporre](chapter:select-and-arrange).
+Un breve clic con il tasto centrale del mouse, senza muovere il mouse, apre il menu del passo di aggancio proprio sul puntatore, anche in uno schizzo; trascinare tenendo premuto il tasto centrale continua a spostare la vista.
 
 > **Suggerimento:** interrompi la rotazione della vista quando devi far combaciare con precisione alcuni elementi. Premi i tasti numerici per passare alla vista dritta dall’alto o dal davanti e premi [[O]] per attivare la vista piatta. Vedrai subito se due spigoli sono davvero allineati.
 

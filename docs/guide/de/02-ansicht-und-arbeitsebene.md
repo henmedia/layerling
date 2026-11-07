@@ -111,6 +111,7 @@ Das Exportfenster bietet dann {{ui:export.plates}}: alle Platten in einer Datei,
 ## Gitter und Raster
 
 Das Gitter zeigt die Größe der Platte. Unten rechts steht das **Raster**: Verschieben und Skalieren rasten in Schritten dieser Größe ein, zum Beispiel 1 mm. Für Feinarbeit stellst du es kleiner, für grobes Anordnen größer. {{ui:editor.tool.snapToGrid}} im Menüband rückt die ausgewählten Formen nachträglich auf das nächste Rasterkreuz. Beim Verschieben rasten Formen außerdem an anderen Formen ein, siehe [Auswählen und Anordnen](chapter:auswaehlen-und-anordnen). Ohne Maus: [[Alt]]+[[1]] bis [[Alt]]+[[0]] wählen den Eintrag mit dieser Nummer im Menü ([[Alt]]+[[1]] schaltet das Einrasten aus), [[,]] und [[.]] machen den Schritt eine Stufe feiner oder gröber. Das geht auch in einer Skizze.
+Ein kurzer Klick mit der mittleren Maustaste, ohne die Maus zu bewegen, öffnet das Rastermenü direkt am Mauszeiger, auch in einer Skizze; Ziehen mit gedrückter mittlerer Taste verschiebt die Ansicht wie bisher.
 
 > **Tipp:** Dreh die Ansicht nicht mehr, wenn du Teile genau aneinander setzt. Wechsle mit den Zifferntasten in die gerade Ansicht von oben oder von vorn und schalte mit [[O]] auf die flache Darstellung um. So erkennst du sofort, ob zwei Kanten wirklich bündig sind.
 
