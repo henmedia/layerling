@@ -335,3 +335,41 @@ describe("the lid's panel with a bayonet lid (Discussion #1424)", () => {
     expect(texts(panel)).not.toContain("Magnet diameter");
   });
 });
+
+describe("the lid's panel with a flip-top", () => {
+  it("offers a flip-top with a screw lid and a bayonet lid only, off to begin with", () => {
+    for (const type of ["plug", "cap", "both", "flat"] as const) {
+      expect(checkbox(mount({ type }).panel, "Flip-top"), type).toBeNull();
+      act(() => root?.unmount());
+    }
+    for (const type of ["screw", "bayonet"] as const) {
+      const { panel, changes } = mount({ type });
+      const flipTop = checkbox(panel, "Flip-top")!;
+      expect(flipTop.checked, type).toBe(false);
+      expect(slider(panel, "Opening"), type).toBeNull();
+      act(() => flipTop.click());
+      expect(changes.at(-1)).toEqual({ flipTop: true });
+      act(() => root?.unmount());
+    }
+  });
+
+  it("asks for the opening once it is on, 8 mm to begin with, says what it is and what to print it in", () => {
+    const { panel, changes } = mount({ type: "screw", flipTop: true });
+    expect(checkbox(panel, "Flip-top")!.checked).toBe(true);
+    const opening = slider(panel, "Opening")!;
+    expect(opening.value).toBe("8");
+    expect([opening.min, opening.max]).toEqual(["4", "40"]);
+    expect(texts(panel)).toContain("A thin strip at the flap's back is its hinge, so the cap stays on and the flap never comes off.");
+    expect(texts(panel)).toContain("in PLA the strip breaks after a few bends");
+    act(() => {
+      const setValue = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, "value")!.set!;
+      setValue.call(opening, "12");
+      opening.dispatchEvent(new Event("input", { bubbles: true }));
+    });
+    expect(changes.at(-1)).toEqual({ flipTopOpening: 12 });
+    // The plate is thick enough to begin with; thinner than flap and hinge need, it says how thick.
+    expect(texts(panel)).not.toContain("too thin for a flip-top");
+    act(() => root?.unmount());
+    expect(texts(mount({ type: "bayonet", flipTop: true, thickness: 1.4 }).panel)).toContain("The lid is too thin for a flip-top's flap and hinge: make it at least 1.8 mm thick.");
+  });
+});

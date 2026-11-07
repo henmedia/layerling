@@ -25,7 +25,7 @@ import { DEFAULT_TEXT_LAYERS, layerTextKeyringArgument, placedKeyring, layerText
 import { NAME_TAG_LAYERS, NAME_TAG_LETTER_SIZE, textKerningPatch, textLetterSize, textLetterSizePatch, textShrinkPatch, textSpacingPatch } from "@/lib/nameTag";
 import { DEFAULT_ICON_TAG_WIDTH, ICON_TAG_LAYERS, MAX_ICON_TAG_WIDTH, MIN_ICON_TAG_WIDTH, isIconLayerBody, normalizeIconTagCount } from "@/lib/iconTag";
 import { automaticFlexiJoints, automaticFoldJoints, DEFAULT_FLEXI_FOLD, FLEXI_DEFAULTS, normalizeFlexiOptions, type FlexiOptions } from "@/lib/flexiJoints";
-import { groupedWithMagnets, lidClickBumpsFit, lidDefaults, lidHandleFits, lidTakesExtras, magnetPocketDepth, normalizeLidOptions, type LidOptions } from "@/lib/lidTool";
+import { groupedWithMagnets, lidClickBumpsFit, lidDefaults, lidFlipTopFits, lidHandleFits, lidTakesExtras, magnetPocketDepth, normalizeLidOptions, type LidOptions } from "@/lib/lidTool";
 import { FIT_TEST_CLEARANCES, getPrinterPlay, MAX_PRINTER_PLAY, MIN_PRINTER_PLAY, normalizePrinterPlay, PRINTER_PLAY_SETTINGS, printerPlayPrinter, printerPlaySource, printerPlayStart, setPrinterPlay, setPrinterPlayPrinter, withPrinterPlay } from "@/lib/printerPlay";
 import { FIT_TEST_PIN_DIAMETER, fitTestHoles, fitTestShape, fitTestSpot } from "@/lib/fitTest";
 import { CABLE_DEFAULTS, cableChannelShapeFields, cableEndNear, cableGrid, findCableChannel, normalizeCableOptions, type CableChannelError, type CableChannelOptions, type CableChannelResult, type CableEnd, type CableGrid, type Vec3 as CableVec3 } from "@/lib/cableChannel";
@@ -8643,10 +8643,12 @@ export function LayerlingEditor({
     const hinge = result.hinge;
     const screw = result.screw;
     const bayonet = result.bayonet;
-    // What else the lid has, said after what it is: its click bumps, its tab, or the notch in the body.
+    // What else the lid has, said after what it is: its click bumps, its tab, the notch in the body, or a flip-top.
+    const flipTop = result.flipTop;
     const extras = [
       ...(result.clickBumps ? [t("status.lidClickBumps", { count: result.clickBumps.count })] : []),
       ...(result.handle?.style === "tab" ? [t("status.lidHandleTab")] : result.handle?.style === "notch" ? [t("status.lidHandleNotch")] : []),
+      ...(flipTop ? [t("status.lidFlipTop", { opening: flipTop.opening.toLocaleString(numberLocale()) })] : []),
     ];
     const withExtras = (message: string) => [message, ...extras].join(" ");
     const handle = result.handle?.style ?? "none";
@@ -8695,6 +8697,9 @@ export function LayerlingEditor({
       ...(bayonet ? { bayonet: {
         lugs: bayonet.count, turn: bayonet.turn, diameter: Math.round(bayonet.diameter * 1000) / 1000, lugHeight: bayonet.height, lugWidth: Math.round(bayonet.width * 1000) / 1000, depth: options.bayonetDepth,
       } } : {}),
+      ...(flipTop ? { flipTop: {
+        opening: flipTop.opening, flapDiameter: Math.round(flipTop.flap * 1000) / 1000, hingeWidth: Math.round(flipTop.hingeWidth * 1000) / 1000, hingeLength: flipTop.hingeLength, hingeThickness: flipTop.hingeThickness,
+      } } : {}),
     };
   }, [commitShapes, exactLid, selectedShapes]);
 
@@ -8721,16 +8726,16 @@ export function LayerlingEditor({
       setLidTool(null);
       return;
     }
-    const { type, thickness, gap, depth, wall, magnets, magnetDiameter, magnetHeight, magnetGap, hinge, hingePin, hingeGap, hingePinPlay, hingeKnuckles, hingePrintPin, hingeSide, hingeTeardrop, hingeStyle, hingeEndPlugs, clickBumps, clickBumpHeight, handle, threadPitch, threadTurns, bayonetLugs, bayonetDepth, bayonetAxialGap, bayonetDetent } = lidTool;
+    const { type, thickness, gap, depth, wall, magnets, magnetDiameter, magnetHeight, magnetGap, hinge, hingePin, hingeGap, hingePinPlay, hingeKnuckles, hingePrintPin, hingeSide, hingeTeardrop, hingeStyle, hingeEndPlugs, clickBumps, clickBumpHeight, handle, threadPitch, threadTurns, bayonetLugs, bayonetDepth, bayonetAxialGap, bayonetDetent, flipTop, flipTopOpening } = lidTool;
     setLidTool((current) => current ? { ...current, busy: true, error: null } : current);
     // Click bumps, a handle and end plugs the panel does not show (a flat lid, a pivot lid, a hinge not flush)
-    // are not asked for, nor magnets and a hinge with a screw lid or a bayonet lid.
+    // are not asked for, nor magnets and a hinge with a screw lid or a bayonet lid, nor a flip-top with another lid.
     const extras = lidTakesExtras(lidTool);
     void makeLid({
       type, thickness, gap, depth, wall, magnets: magnets && extras, magnetDiameter, magnetHeight, magnetGap, hinge: hinge && extras, hingePin, hingeGap, hingePinPlay, hingeKnuckles, hingePrintPin, hingeSide, hingeTeardrop, hingeStyle,
       hingeEndPlugs: hingeEndPlugs && hingeStyle === "flush",
       clickBumps: clickBumps && lidClickBumpsFit(lidTool), clickBumpHeight, handle: lidHandleFits(lidTool) ? handle : "none", threadPitch, threadTurns,
-      bayonetLugs, bayonetDepth, bayonetAxialGap, bayonetDetent,
+      bayonetLugs, bayonetDepth, bayonetAxialGap, bayonetDetent, flipTop: flipTop && lidFlipTopFits(lidTool), flipTopOpening,
     }, targets).then((result) => {
       if (result.ok) setLidTool(null);
       else setLidTool((current) => current ? { ...current, busy: false, error: result.message } : current);
@@ -14246,6 +14251,8 @@ export function LayerlingEditor({
           bayonetDepth: params.bayonetDepth,
           bayonetAxialGap: params.bayonetAxialGap,
           bayonetDetent: params.bayonetDetent,
+          flipTop: params.flipTop,
+          flipTopOpening: params.flipTopOpening,
         }, targets);
         if (!result.ok) throw new Error(result.message);
         const made = currentShapes().find((shape) => shape.id === result.id);
@@ -14263,6 +14270,7 @@ export function LayerlingEditor({
           } } : {}),
           ...("screw" in result && result.screw ? { screw: result.screw } : {}),
           ...("bayonet" in result && result.bayonet ? { bayonet: result.bayonet } : {}),
+          ...("flipTop" in result && result.flipTop ? { flipTop: result.flipTop } : {}),
         };
       }
 

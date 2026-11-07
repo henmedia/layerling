@@ -21,6 +21,8 @@ import type { WorkplaneShape } from "@/types/layerling";
  * - bayonet: a twist lock (Discussion #1424), for a round body too: lugs standing out of the outside of its top, grouped
  *   with it, and a cap with an L-shaped slot inside its rim for each, pushed down over them and turned to lock, where a
  *   rib behind each lug makes it click (see `bayonetPlan`).
+ * Either cap can be a flip-top, as on a bottle of shampoo or ketchup: the cap stays on, and a flap in its plate opens a
+ * round opening to pour from (see `flipTopPlan`).
  * With magnets, the lid holds by four round magnets in the corners: a pocket for each in the body's rim and one facing
  * it in the lid's plate. A wall too thin for a pocket gets a post in that corner, from the bottom up to the rim, which
  * the lid's lip then goes round.
@@ -80,6 +82,8 @@ export type LidHandle = "none" | "tab" | "notch";
  * room per side across the radius, round the lugs and along the body's wall; `bayonetAxialGap` is the room along the
  * axis between the lugs' undersides and the ledge of the cap under them, how far the locked cap lifts before it holds;
  * `bayonetDetent` how far the rib behind each locked lug reaches past the gap (0: none). The wall is the cap's rim's.
+ * With `flipTop`, a screw or bayonet cap's plate has a round opening `flipTopOpening` mm across, closed by a flap printed
+ * in it, the gap round it, and joined to the plate by a thin strip that bends as a hinge.
  */
 export type LidOptions = {
   type: LidType;
@@ -110,6 +114,8 @@ export type LidOptions = {
   bayonetDepth: number;
   bayonetAxialGap: number;
   bayonetDetent: number;
+  flipTop: boolean;
+  flipTopOpening: number;
 };
 
 export const LID_TYPES: readonly LidType[] = ["plug", "cap", "both", "flat", "screw", "bayonet"];
@@ -118,6 +124,7 @@ export const LID_DEFAULTS: LidOptions = {
   hinge: false, hingePin: 1.75, hingeGap: 0.3, hingePinPlay: 0.2, hingeKnuckles: 0, hingePrintPin: false, hingeSide: "back", hingeTeardrop: true, hingeStyle: "outside", hingeEndPlugs: false,
   clickBumps: false, clickBumpHeight: 0.4, handle: "none", threadPitch: 3, threadTurns: 2,
   bayonetLugs: 3, bayonetDepth: 8, bayonetAxialGap: 0.3, bayonetDetent: 0.3,
+  flipTop: false, flipTopOpening: 8,
 };
 /**
  * What a lid starts from with this printer's play (printerPlay.ts): the gap per side and the hinge pin's play take it,
@@ -323,6 +330,49 @@ const SLOT_EXTRA = 0.1;
 const DETENT_RADIUS = 3;
 /** How far the rib reaches into the cap round it, in mm, so the two are one. */
 const DETENT_OVERLAP = 0.1;
+/**
+ * A flip-top's opening, in mm across where it is narrowest, at the plate's underside: 8 to begin with, enough to pour a
+ * sauce or a shampoo; the body's opening must hold it and the flap's hinge (`flipTopPlan`).
+ */
+export const MIN_FLIP_TOP_OPENING = 4;
+export const MAX_FLIP_TOP_OPENING = 40;
+/**
+ * How deep the flap's seat reaches into the plate, in mm: the flap narrows at 45 degrees from the plate's top down to the
+ * opening, the plate's edge round it alike the gap further out, so pressed down it rests there and cannot be pushed in.
+ */
+const FLIP_SEAT = 0.6;
+/**
+ * How far the catch at the flap's front still reaches past the plate's edge above it when the flap is pushed back as far
+ * as the slit under its hinge lets it, in mm: it clicks past that as the flap is lifted open or pressed shut, and holds
+ * it shut.
+ */
+const FLIP_SNAP = 0.2;
+/** How far the catch reaches round the flap's front to each side, in degrees. */
+const FLIP_CATCH_HALF = 40;
+/** A flip-top's flap and its room are drawn round with a point every so many millimetres, at least 128 and at most 512. */
+const FLIP_STEP = 0.2;
+/**
+ * The hinge: a strip at the plate's top, flat on the bed as the cap prints, as wide as the flap's straight back, 0.4 mm
+ * (two layers of 0.2) thick and 3 mm long between flap and plate. It bends over its whole length, so its faces stretch
+ * and squeeze by about a seventh with the flap open upright and a fifth laid right back: PETG and PP take that many
+ * times, PLA breaks after a few.
+ */
+export const FLIP_HINGE_THICKNESS = 0.4;
+export const FLIP_HINGE_LENGTH = 3;
+/** The flap's back is at least this much of its radius behind its middle, so the strip is not wider than the flap. */
+const FLIP_MIN_BACK = 0.3;
+/** How far behind the opening's back at the plate's underside the slit at the hinge lies at least, in mm. */
+const FLIP_BACK_MARGIN = 0.1;
+/**
+ * The groove across the flap's top for a fingernail to lift it by: how deep (and as wide), and how far in front of the
+ * flap's middle its upright front lies, as a share of the flap's radius, so a small flap still has a groove long enough.
+ */
+const FLIP_GROOVE = 0.8;
+const FLIP_GROOVE_AT = 0.4;
+/** How much of the flap the groove leaves at its ends, in mm. */
+const FLIP_GROOVE_SKIN = 0.4;
+/** How far inside the body's opening everything cut through the plate stays, in mm, so the cap still rests on the rim. */
+const FLIP_RIM_MARGIN = 0.5;
 /** How far the lid lies from a pin printed apart, in mm. */
 const PIN_SPACING = 5;
 /** How far apart the lid lies from the body it closes, in mm. */
@@ -400,6 +450,9 @@ export function normalizeLidOptions(value?: Partial<Record<keyof LidOptions, unk
   if (bayonetAxialGap !== null) result.bayonetAxialGap = clamp(bayonetAxialGap, MIN_BAYONET_AXIAL_GAP, MAX_BAYONET_AXIAL_GAP);
   const bayonetDetent = finiteNumber(value?.bayonetDetent);
   if (bayonetDetent !== null) result.bayonetDetent = clamp(bayonetDetent, 0, MAX_BAYONET_DETENT);
+  if (value?.flipTop === true || value?.flipTop === "true") result.flipTop = true;
+  const flipTopOpening = finiteNumber(value?.flipTopOpening);
+  if (flipTopOpening !== null) result.flipTopOpening = clamp(flipTopOpening, MIN_FLIP_TOP_OPENING, MAX_FLIP_TOP_OPENING);
   return result;
 }
 
@@ -409,6 +462,14 @@ export function normalizeLidOptions(value?: Partial<Record<keyof LidOptions, unk
  */
 export function lidTakesExtras(options: Pick<LidOptions, "type">) {
   return options.type !== "screw" && options.type !== "bayonet";
+}
+
+/**
+ * Whether a flip-top goes with this kind of lid: a cap that stays on while the flap in its plate opens, a screw lid's or
+ * a bayonet lid's. A lid that is lifted off has no need of one.
+ */
+export function lidFlipTopFits(options: Pick<LidOptions, "type">) {
+  return options.type === "screw" || options.type === "bayonet";
 }
 
 /**
@@ -877,6 +938,9 @@ export type LidError =
   | { code: "bayonetTooLow"; height: number }
   | { code: "bayonetGapDeep"; gap: number }
   | { code: "bayonetShallow"; depth: number }
+  | { code: "flipTopType" | "flipTopNoRoom" }
+  | { code: "flipTopThin"; thickness: number }
+  | { code: "flipTopTooLarge"; opening: number }
   | { code: "magnetsThinLid"; thickness: number }
   | { code: "kernel"; message?: string };
 
@@ -1234,6 +1298,92 @@ export function bayonetPlan(sliceAt: LidSlicer, options: LidOptions, top: number
 }
 
 /**
+ * A flip-top as `flipTopPlan` works it out, in the frame where z is up, round the cap's axis (`centre`): the flap lies in
+ * the plate, its top flush with the plate's, its hinge at its back (+y) and its catch at its front. Sizes in mm.
+ */
+export type FlipTopPlan = {
+  centre: Point;
+  /** The opening across where it is narrowest, at the plate's underside. */
+  opening: number;
+  /** The flap's radius at the plate's top; its seat narrows it by FLIP_SEAT at 45 degrees below. */
+  radius: number;
+  /** How much wider the catch at the flap's front makes it below the seat. */
+  catchWidth: number;
+  /** How far behind the middle the flap's straight back is at the plate's top, and how far it leans back below the strip. */
+  back: number;
+  lean: number;
+  /** The strip that is the hinge: as wide as the flap's straight back, as long as the room behind it, and how thick. */
+  hingeWidth: number;
+  hingeLength: number;
+  hingeThickness: number;
+  /** How far from the axis what is cut out of the plate reaches. */
+  reach: number;
+};
+
+/**
+ * How a flip-top's flap and hinge lie for an opening `opening` mm across with the lid's `gap`, round its middle, in mm:
+ * see `flipTopPlan`. The flap's back is far enough back that the plate's top behind the strip is clear of the round
+ * opening, the slit under the strip clear of the opening at the plate's underside, and at least FLIP_MIN_BACK of the
+ * radius behind the middle; how far everything cut out of the plate reaches grows with the opening.
+ */
+function flipTopLayout(opening: number, gap: number) {
+  const radius = opening / 2 + FLIP_SEAT - gap;
+  const lean = (FLIP_HINGE_LENGTH - gap) / 2;
+  const back = Math.max(radius + gap * Math.SQRT2 - FLIP_HINGE_LENGTH, opening / 2 + FLIP_BACK_MARGIN - lean - gap, FLIP_MIN_BACK * radius);
+  const half = Math.sqrt(radius ** 2 - back ** 2);
+  const catchWidth = gap * Math.SQRT2 + gap + FLIP_SNAP;
+  // The round opening at the plate's top, the catch's room below the seat, and the slot's back corners at the top.
+  const reach = Math.max(radius + gap * Math.SQRT2, opening / 2 + catchWidth, Math.hypot(half + gap, back + FLIP_HINGE_LENGTH));
+  return { radius, lean, back, half, catchWidth, reach };
+}
+
+/**
+ * The thinnest plate a flip-top goes in with this gap, in mm (to a tenth, up): it holds the V under the strip down to the
+ * slit, the seat and the catch below it, and the flap under its groove.
+ */
+export function flipTopThickness(options: Pick<LidOptions, "gap">) {
+  const gap = options.gap;
+  const needed = Math.max(FLIP_HINGE_THICKNESS + (FLIP_HINGE_LENGTH - gap) / 2, FLIP_SEAT + gap * Math.SQRT2 + gap + FLIP_SNAP, FLIP_GROOVE + FLIP_GROOVE_SKIN);
+  return Math.ceil(needed * 10 - 1e-6) / 10;
+}
+
+/**
+ * A flip-top for a screw or bayonet cap (as on a bottle of shampoo or ketchup): a round opening in the cap's plate, round
+ * the cap's axis (`centre`), `flipTopOpening` across at the plate's underside, and a flap that closes it, joined to the
+ * plate by a strip that bends as a hinge, so the cap stays on and the flap never comes off.
+ * The cap prints on its plate. Whatever stood out of the flap's underside towards the opening - a plug, a ring - would
+ * then lie against the bed, however it were hinged: a flap folded over from beside the cap lands upside down on the plate.
+ * So the flap is printed where it closes, in the opening itself, flush with the plate's top, the gap round it, and it is
+ * its own plug: its edge narrows at 45 degrees for FLIP_SEAT below the top (the seat), so it rests on the plate's edge
+ * round the opening and cannot be pushed in; at its front a catch widens it again at 45 degrees below the seat, under the
+ * plate's edge, so it clicks shut and stays shut (`catchWidth`: the gap at 45 degrees, the gap it may slide back, and
+ * FLIP_SNAP). Every face slopes at 45 degrees or less, so it all prints without support.
+ * Its back is straight, `back` behind the middle; the strip, FLIP_HINGE_THICKNESS thick at the plate's top, spans the
+ * FLIP_HINGE_LENGTH from there to the plate. Under it flap and plate lean towards each other at 45 degrees, a V down to a
+ * slit as wide as the gap, which keeps the flap from sliding back and its catch from slipping out; lifted at its front by
+ * a fingernail in the groove across its top, it swings up about the strip, clear of the plate all the way, until it lies
+ * on the plate behind the hinge. Nothing is cut through the plate where it rests on the body's rim: everything stays FLIP_RIM_MARGIN inside the
+ * body's `opening` round the axis. An error when the plate is too thin for flap and hinge (`flipTopThickness`), or the
+ * opening too large for the body (with the largest that fits, in half millimetres), or no opening fits at all.
+ */
+export function flipTopPlan(options: LidOptions, centre: Point, opening: readonly (readonly Point[])[]): FlipTopPlan | { error: LidError } {
+  const thickness = flipTopThickness(options);
+  if (options.thickness < thickness - 1e-9) return { error: { code: "flipTopThin", thickness } };
+  const room = opening.length && insideOutline(opening, centre) ? nearestOnOutline(opening, centre).distance - FLIP_RIM_MARGIN : 0;
+  const layout = flipTopLayout(options.flipTopOpening, options.gap);
+  if (layout.reach > room + 1e-9) {
+    for (let size = Math.floor(options.flipTopOpening * 2) / 2; size >= MIN_FLIP_TOP_OPENING; size -= 0.5) {
+      if (flipTopLayout(size, options.gap).reach <= room + 1e-9) return { error: { code: "flipTopTooLarge", opening: size } };
+    }
+    return { error: { code: "flipTopNoRoom" } };
+  }
+  return {
+    centre, opening: options.flipTopOpening, radius: layout.radius, catchWidth: layout.catchWidth, back: layout.back, lean: layout.lean,
+    hingeWidth: 2 * layout.half, hingeLength: FLIP_HINGE_LENGTH, hingeThickness: FLIP_HINGE_THICKNESS, reach: layout.reach,
+  };
+}
+
+/**
  * A closed mesh round the up axis through `centre`, `sides` points round, as a Manifold: an outer face through the
  * heights `outer.rows` at `outer.radius(angle, z)` from the axis, and an inner one through `inner.rows`, joined to it by
  * a ring at the bottom (both start at the same height). At the top a ring as well where both end at the same height (a
@@ -1394,6 +1544,73 @@ function bayonetSolids(runtime: ManifoldToplevel, plan: BayonetPlan, options: Li
   return { lugs, cap: keep(created, runtime.Manifold.union(parts)) };
 }
 
+/**
+ * A flip-top's parts, in the frame where z is up, the cap's plate from `top` to its thickness above, as `flipTopPlan`
+ * lays them out:
+ * - `cut`, what comes out of the plate: round the flap the gap further out (at 45 degrees along its seat and its catch,
+ *   and level with the seat's foot below), and behind it the slot the strip spans, the plate's side of the V under it;
+ * - `flap`, lying in it: its seat, the catch round its front, its straight back with the flap's side of the V, and a
+ *   groove across its top for a fingernail, upright at the front and sloping at 45 degrees behind;
+ * - `strip`, the hinge, at the plate's top from a millimetre inside the flap to a millimetre inside the plate.
+ */
+function flipTopSolids(runtime: ManifoldToplevel, plan: FlipTopPlan, options: LidOptions, top: number, created: { delete?: () => void }[]) {
+  const [x, y] = plan.centre;
+  const gap = options.gap;
+  const high = top + options.thickness;
+  // Every turned part has its points at the same angles round the axis, a point every FLIP_STEP or so, so flap and plate
+  // keep their gap between the points too.
+  const sides = Math.min(512, Math.max(128, 4 * Math.ceil((2 * Math.PI * (plan.radius + 2)) / FLIP_STEP / 4)));
+  const step = 360 / sides;
+  // A profile of (distance from the axis, height) points turned about the axis from `start` degrees on to `end`,
+  // anticlockwise seen from above, both whole steps.
+  const turned = (points: [number, number][], start: number, end: number) => {
+    const profile = keep(created, new runtime.CrossSection([points], "NonZero"));
+    const solid = keep(created, profile.revolve(Math.round((end - start) / step), end - start));
+    return keep(created, keep(created, solid.rotate([0, 0, start])).translate([x, y, 0]));
+  };
+  // A profile of (y, height) points drawn out along x from `from` to `to`: x of the profile becomes y, its y the height.
+  const alongX = (from: number, to: number, points: [number, number][]) => {
+    const profile = keep(created, new runtime.CrossSection([points], "NonZero"));
+    return keep(created, keep(created, profile.extrude(to - from)).transform([0, 1, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, from, 0, 0, 1]));
+  };
+  const box = (from: [number, number, number], to: [number, number, number]) =>
+    keep(created, keep(created, runtime.Manifold.cube([to[0] - from[0], to[1] - from[1], to[2] - from[2]])).translate(from));
+  const shank = plan.radius - FLIP_SEAT;
+  const foot = high - FLIP_SEAT;
+  const catchWidth = plan.catchWidth;
+  const slope = gap * Math.SQRT2;
+  const strip = FLIP_HINGE_THICKNESS;
+  const back = y + plan.back;
+  const lean = plan.lean;
+  const half = plan.hingeWidth / 2;
+  const reach = plan.radius + 5;
+  // The catch round the front, the least y (-90 degrees round the axis); its room reaches the gap and a little more past
+  // its ends.
+  const catchFrom = step * Math.round((-90 - FLIP_CATCH_HALF) / step);
+  const catchTo = step * Math.round((-90 + FLIP_CATCH_HALF) / step);
+  const ends = (((gap + 0.05) / shank) * 180) / Math.PI;
+  const flapRound = turned([[0, top], [shank, top], [shank, foot], [plan.radius, high], [0, high]], 0, 360);
+  const flapCatch = turned([[shank - 0.2, top], [shank + catchWidth, top], [shank + catchWidth, foot - catchWidth], [shank, foot], [shank - 0.2, foot]], catchFrom, catchTo);
+  // Behind its middle the flap is as wide as its straight back all the way down, and its back stops where the V begins:
+  // upright through the strip, then leaning back at 45 degrees, then upright again.
+  const flapBack = box([x - half, y, top], [x + half, back + lean + 1, high]);
+  const behind = alongX(x - reach, x + reach, [[y - reach, top - 1], [back + lean, top - 1], [back + lean, high - strip - lean], [back, high - strip], [back, high + 1], [y - reach, high + 1]]);
+  let flap = keep(created, keep(created, runtime.Manifold.union([flapRound, flapCatch, flapBack])).intersect(behind));
+  // The groove for a fingernail: across the flap, at FLIP_GROOVE_AT of its radius in front of its middle, ending
+  // FLIP_GROOVE_SKIN inside the flap's edge below the seat.
+  const grooveAt = y - FLIP_GROOVE_AT * plan.radius;
+  const grooveHalf = Math.sqrt(Math.max(0, (shank - FLIP_GROOVE_SKIN) ** 2 - (FLIP_GROOVE_AT * plan.radius) ** 2));
+  if (grooveHalf > 0.5) flap = keep(created, flap.subtract(alongX(x - grooveHalf, x + grooveHalf, [[grooveAt, high + 1], [grooveAt, high - FLIP_GROOVE], [grooveAt + FLIP_GROOVE + 1, high + 1]])));
+  const roundRoom = turned([[0, top - 1], [shank + gap, top - 1], [shank + gap, foot - slope + gap], [plan.radius + slope + 1, high + 1], [0, high + 1]], 0, 360);
+  const catchRoom = turned([[shank, foot], [shank + slope, foot], [shank + catchWidth + gap, foot - catchWidth - gap + slope], [shank + catchWidth + gap, top - 1], [shank, top - 1]], step * Math.floor((catchFrom - ends) / step), step * Math.ceil((catchTo + ends) / step));
+  const slot = alongX(x - half - gap, x + half + gap, [[y - gap, top - 1], [back + lean + gap, top - 1], [back + lean + gap, high - strip - lean], [back + FLIP_HINGE_LENGTH, high - strip], [back + FLIP_HINGE_LENGTH, high + 1], [y - gap, high + 1]]);
+  return {
+    cut: keep(created, runtime.Manifold.union([roundRoom, catchRoom, slot])),
+    flap,
+    strip: box([x - half, back - 1, high - strip], [x + half, back + FLIP_HINGE_LENGTH + 1, high]),
+  };
+}
+
 /** A pocket for a magnet in the body, in the scene's frame: a hole cylinder of this diameter whose bottom lies at `elevation`. */
 export type MagnetPocket = { x: number; z: number; elevation: number; height: number; diameter: number };
 
@@ -1436,7 +1653,13 @@ export type LidScrew = { thread: ManifoldSolid; pitch: number; turns: number; de
  */
 export type LidBayonet = { lugs: ManifoldSolid; count: number; turn: number; height: number; width: number; diameter: number };
 
-export type LidResult = { lid: ManifoldSolid; magnets?: LidMagnets; hinge?: LidHinge; clickBumps?: LidClickBumps; handle?: LidHandleResult; screw?: LidScrew; bayonet?: LidBayonet } | { error: LidError };
+/**
+ * A flip-top's (part of the cap, nothing for the body): the opening across, the flap across at the plate's top, and the
+ * strip that is its hinge, how wide, long and thick, in mm.
+ */
+export type LidFlipTop = { opening: number; flap: number; hingeWidth: number; hingeLength: number; hingeThickness: number };
+
+export type LidResult = { lid: ManifoldSolid; magnets?: LidMagnets; hinge?: LidHinge; clickBumps?: LidClickBumps; handle?: LidHandleResult; screw?: LidScrew; bayonet?: LidBayonet; flipTop?: LidFlipTop } | { error: LidError };
 
 /**
  * The lid for `body` (in the scene's frame, y up), lying turned over beside it: its plate on the workplane at the
@@ -1465,6 +1688,8 @@ export function lidForSolid(runtime: ManifoldToplevel, body: ManifoldSolid, give
     if (options.type !== "flat" && options.type !== "screw" && options.type !== "bayonet" && options.depth >= height) return { error: { code: "tooShallow" } };
     // A screw lid holds by its thread alone and a bayonet lid by its lugs, both turned to close.
     if (!lidTakesExtras(options) && (options.magnets || options.hinge || options.clickBumps || options.handle !== "none")) return { error: { code: options.type === "bayonet" ? "bayonetExtras" : "screwExtras" } };
+    // A flip-top's flap opens in a cap that stays on.
+    if (options.flipTop && !lidFlipTopFits(options)) return { error: { code: "flipTopType" } };
     if (options.hinge && !LID_HINGE_TYPES.includes(options.type)) return { error: { code: "hingeLidType" } };
     // A flush hinge's slots and a pivot lid's pins go where magnets' pockets would sit, in the corners.
     const style: LidHingeStyle = options.hinge ? options.hingeStyle : "outside";
@@ -1586,6 +1811,16 @@ export function lidForSolid(runtime: ManifoldToplevel, body: ManifoldSolid, give
       if (options.type !== "plug") parts.push(prism(keep(created, outer.subtract(inner)), top - options.depth, top));
     }
     let made = parts.length === 1 ? parts[0] : keep(created, runtime.Manifold.union(parts));
+    // A flip-top: the opening and the flap's room cut out of the cap's plate, the flap and its hinge put in.
+    let flipTop: FlipTopPlan | null = null;
+    const capPlan = screw?.plan ?? bayonet?.plan;
+    if (options.flipTop && capPlan) {
+      const plan = flipTopPlan(options, capPlan.centre, opening.toPolygons() as Point[][]);
+      if ("error" in plan) return { error: plan.error };
+      const solids = flipTopSolids(runtime, plan, options, top, created);
+      made = keep(created, keep(created, made.subtract(solids.cut)).add(keep(created, runtime.Manifold.union([solids.flap, solids.strip]))));
+      flipTop = plan;
+    }
     // A pivot lid is only a plate lying in the opening, the gap all round, its top level with the rim.
     if (pivot) {
       const inset = keep(created, opening.offset(-options.gap, "Round", 2, 48));
@@ -1930,7 +2165,13 @@ export function lidForSolid(runtime: ManifoldToplevel, body: ManifoldSolid, give
       const { plan } = bayonet;
       bayonetResult = { lugs, count: plan.angles.length, turn: plan.turn, height: plan.height, width: plan.width, diameter: 2 * plan.capRadius };
     }
-    const extras = { ...(hinge ? { hinge } : {}), ...(clickBumps ? { clickBumps } : {}), ...(handle ? { handle } : {}), ...(screwResult ? { screw: screwResult } : {}), ...(bayonetResult ? { bayonet: bayonetResult } : {}) };
+    const flipTopResult: LidFlipTop | undefined = flipTop
+      ? { opening: flipTop.opening, flap: 2 * flipTop.radius, hingeWidth: flipTop.hingeWidth, hingeLength: flipTop.hingeLength, hingeThickness: flipTop.hingeThickness }
+      : undefined;
+    const extras = {
+      ...(hinge ? { hinge } : {}), ...(clickBumps ? { clickBumps } : {}), ...(handle ? { handle } : {}), ...(screwResult ? { screw: screwResult } : {}), ...(bayonetResult ? { bayonet: bayonetResult } : {}),
+      ...(flipTopResult ? { flipTop: flipTopResult } : {}),
+    };
     if (!options.magnets) return { lid, ...extras };
     handed.add(posts);
     // Back in the scene's frame: up is y, and the frame's y is the scene's z turned round.
@@ -2018,6 +2259,14 @@ export function lidErrorMessage(error: LidError) {
       return t("lid.error.bayonetShallow", { depth: error.depth.toLocaleString(numberLocale()) });
     case "bayonetNoRoom":
       return t("lid.error.bayonetNoRoom");
+    case "flipTopType":
+      return t("lid.error.flipTopType");
+    case "flipTopThin":
+      return t("lid.error.flipTopThin", { thickness: error.thickness.toLocaleString(numberLocale()) });
+    case "flipTopTooLarge":
+      return t("lid.error.flipTopTooLarge", { opening: error.opening.toLocaleString(numberLocale()) });
+    case "flipTopNoRoom":
+      return t("lid.error.flipTopNoRoom", { opening: MIN_FLIP_TOP_OPENING.toLocaleString(numberLocale()) });
     default:
       return error.message ? t("lid.error.kernel", { message: error.message }) : t("lid.error.kernelUnknown");
   }
@@ -2057,7 +2306,7 @@ export type LidShapeScrew = { thread: WorkplaneShape; pitch: number; turns: numb
 /** With a bayonet lid, the lugs for the body (one mesh, grouped with it as a screw lid's thread is), the turn and the sizes. */
 export type LidShapeBayonet = { lugs: WorkplaneShape; count: number; turn: number; height: number; width: number; diameter: number };
 
-export type LidShapeResult = { lid: WorkplaneShape; magnets?: LidShapeMagnets; hinge?: LidShapeHinge; clickBumps?: LidShapeClickBumps; handle?: LidShapeHandle; screw?: LidShapeScrew; bayonet?: LidShapeBayonet } | { lid: null; error: string };
+export type LidShapeResult = { lid: WorkplaneShape; magnets?: LidShapeMagnets; hinge?: LidShapeHinge; clickBumps?: LidShapeClickBumps; handle?: LidShapeHandle; screw?: LidShapeScrew; bayonet?: LidShapeBayonet; flipTop?: LidFlipTop } | { lid: null; error: string };
 
 /**
  * The lid for the selected bodies: the solids joined and the holes among them cut away, then the lid made for what is
@@ -2149,7 +2398,11 @@ export async function lidForShapes(targets: readonly WorkplaneShape[], given: Li
       const { count, turn, height, width, diameter } = result.bayonet;
       bayonet = { lugs: canonicalizeShape({ ...lugs, hidden: false }), count, turn, height, width, diameter };
     }
-    const extras = { ...(hinge ? { hinge } : {}), ...(clickBumps ? { clickBumps } : {}), ...(handle ? { handle } : {}), ...(screw ? { screw } : {}), ...(bayonet ? { bayonet } : {}) };
+    // A flip-top is all in the cap: only its sizes come with it.
+    const extras = {
+      ...(hinge ? { hinge } : {}), ...(clickBumps ? { clickBumps } : {}), ...(handle ? { handle } : {}), ...(screw ? { screw } : {}), ...(bayonet ? { bayonet } : {}),
+      ...(result.flipTop ? { flipTop: result.flipTop } : {}),
+    };
     if (!result.magnets) return { lid, ...extras };
     const postName = t("lid.magnetPosts", { name: source.name });
     const meshPost = result.magnets.posts
