@@ -7,7 +7,7 @@ import { hirthMeasures } from "@/lib/hirthGeometry";
 import { profileArcPoint, profileLoopBounds, TWIST_SECTION_STEP, validateCadProfile } from "@/lib/cadProfileSolid";
 import { cadTransformFromMatrix } from "@/lib/cadBakeMetadata";
 import { CAD_MODIFIER_EXACT_SEGMENT_LIMIT } from "@/lib/cadModifierRuntime";
-import { deformsAboutOrigin, meshYawDegrees, mirrorSign, shapeDepth, shapeHasExtrudeDeform, shapeHasShapeDeform, shapeHasTaper, shapeTaperDimensions, shapeWidth } from "@/lib/workplaneShapes";
+import { deformsAboutOrigin, extrudeTwistPivot, meshYawDegrees, mirrorSign, shapeDepth, shapeHasExtrudeDeform, shapeHasShapeDeform, shapeHasTaper, shapeTaperDimensions, shapeWidth } from "@/lib/workplaneShapes";
 import { alongLevels, LYING_ALONG_KINDS, narrowCurveForShape, narrowHalfWidthAt, normalizeSlopeSide, shapeHasAlongDeform, shapeHasNarrow, shapeHasSlope, slopeAlongWidth, slopeCurveForShape, slopeScaleAt, slopeSectionCount } from "@/lib/slopeAlong";
 import { regularPolygonFootprintScale } from "@/lib/regularPolygonFootprint";
 import { roundSideCount } from "@/lib/roundSideCount";
@@ -1365,11 +1365,13 @@ function deformedLoftProfile(shape: WorkplaneShape, width: number, depth: number
     if (Math.abs(bottom - taper.bottomDepth / depth) > 1e-6 || Math.abs(top - taper.topDepth / depth) > 1e-6) return null;
     part.capChamfer = { ...capChamfer, bottomScale: bottom, topScale: top, lean: { x: offsetX, z: offsetZ } };
   }
-  // A twist turns each section around the middle of the outline as it rises, as the display does.
+  // A twist turns each section around the middle of the outline as it rises, as the display does; a body with a
+  // rotation pivot of its own turns about the vertical through that instead (extrudeTwistPivot).
   const twist = shape.extrudeTwist ?? 0;
   if (Math.abs(twist) > 1e-6) {
     part.twist = twist;
-    part.twistCenter = { x: centerX, z: centerZ };
+    const pivot = extrudeTwistPivot(shape, width, depth);
+    part.twistCenter = pivot ?? { x: centerX, z: centerZ };
     part.twistLean = { x: offsetX, z: offsetZ };
     // Fine grooves need sections closer than the standard step, or the smooth loft swings out between them.
     if (shape.kind === "knurl") part.twistStep = Math.min(TWIST_SECTION_STEP, 90 / Math.max(1, knurlSettings({ ...shape, width }).count));

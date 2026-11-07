@@ -16,7 +16,7 @@ import { type PlacementPoint, type PlacementWorkplane } from "@/lib/placementWor
 import { capturePointer } from "@/lib/pointerCapture";
 import { GuideHelpLink } from "@/components/GuideHelpLink";
 import { displayY, insideZ } from "@/lib/displayAxes";
-import { isNonSolidShape, preservesEdgeTreatmentSize, resizedImportedMeshPositions, shapeDepth, shapeExtrudeDeformAt, shapeHasExtrudeDeform, shapeHasTaper, shapeOverallFootprintDimensions, shapeTaperScaleAt, shapeWidth } from "@/lib/workplaneShapes";
+import { extrudeTwistPivot, isNonSolidShape, preservesEdgeTreatmentSize, resizedImportedMeshPositions, shapeDepth, shapeExtrudeDeformAt, shapeHasExtrudeDeform, shapeHasTaper, shapeOverallFootprintDimensions, shapeTaperScaleAt, shapeWidth } from "@/lib/workplaneShapes";
 import { type RotationAxis } from "@/components/workplane/TransformOverlay";
 import { type AlignAxes, type FrameCuboid } from "@/lib/alignFrame";
 import type { MeasurementAccuracy, MouseScheme, WorkplaneNote, WorkplaneShape, WorkplaneWorkspaceSettings } from "@/types/layerling";
@@ -2260,6 +2260,10 @@ function importedShapeProjectionBounds(
   const projected = new THREE.Vector3();
   const tapered = shapeHasTaper(shape);
   const deformed = shapeHasExtrudeDeform(shape);
+  // A body with a rotation pivot of its own twists about the vertical through it, not about its origin.
+  const twistPivot = deformed ? extrudeTwistPivot(shape) : undefined;
+  const pivotX = twistPivot?.x ?? 0;
+  const pivotZ = twistPivot?.z ?? 0;
   let taperMinY = Number.POSITIVE_INFINITY;
   let taperMaxY = Number.NEGATIVE_INFINITY;
   if (tapered || deformed) {
@@ -2282,8 +2286,10 @@ function importedShapeProjectionBounds(
       const deform = shapeExtrudeDeformAt(shape, normalizedHeight);
       const cos = Math.cos(deform.twistRadians);
       const sin = Math.sin(deform.twistRadians);
-      const twistedX = localX * cos - localZ * sin;
-      const twistedZ = localX * sin + localZ * cos;
+      const aboutX = localX - pivotX;
+      const aboutZ = localZ - pivotZ;
+      const twistedX = pivotX + aboutX * cos - aboutZ * sin;
+      const twistedZ = pivotZ + aboutX * sin + aboutZ * cos;
       localX = twistedX + deform.offsetX;
       localZ = twistedZ + deform.offsetZ;
     }

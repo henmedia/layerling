@@ -55,7 +55,7 @@ import { canPaintShape } from "@/lib/paint";
 import { paintedBodyMesh } from "@/lib/paintMesh";
 import { shapeHasAlongDeform, slopePositions } from "@/lib/slopeAlong";
 import { DEFAULT_EDGE_LINE_COLOR } from "@/lib/workplaneGrid";
-import { deformsAboutOrigin, mirroredAxisCount, mirrorSign, preservesEdgeTreatmentSize, resizedImportedCoordinates, resizedImportedMeshPositions, shapeDepth, shapeExtrudeDeformAt, shapeHasExtrudeDeform, shapeHasShapeDeform, shapeHasTaper, shapeSupportsTaper, shapeTaperDimensions, shapeTaperScaleAt, shapeWidth } from "@/lib/workplaneShapes";
+import { deformsAboutOrigin, extrudeTwistPivot, mirroredAxisCount, mirrorSign, preservesEdgeTreatmentSize, resizedImportedCoordinates, resizedImportedMeshPositions, shapeDepth, shapeExtrudeDeformAt, shapeHasExtrudeDeform, shapeHasShapeDeform, shapeHasTaper, shapeSupportsTaper, shapeTaperDimensions, shapeTaperScaleAt, shapeWidth } from "@/lib/workplaneShapes";
 import { sphereTessellation } from "@/lib/sphereTessellation";
 import { torusTessellation } from "@/lib/torusTessellation";
 import { torusRadii, torusTubeRatio } from "@/lib/torusShape";
@@ -626,7 +626,7 @@ export function shapeGeometrySignature(shape: WorkplaneShape): string {
     ? { end: shape.slopeEnd, side: shape.slopeSide, curve: shape.slopeCurve, narrow: [shape.narrowEnd, shape.narrowSide, shape.narrowCurve, shape.narrowStart] }
     : null;
   const deform = shapeHasExtrudeDeform(shape) || slope
-    ? { twist: shape.extrudeTwist, offsetX: shape.extrudeTopOffsetX, offsetZ: shape.extrudeTopOffsetZ, slope }
+    ? { twist: shape.extrudeTwist, offsetX: shape.extrudeTopOffsetX, offsetZ: shape.extrudeTopOffsetZ, slope, pivot: extrudeTwistPivot(shape) }
     : null;
   if (shape.groupedShapes?.length && !shape.importedMesh) {
     return JSON.stringify({
@@ -728,6 +728,7 @@ export function shapeGeometrySignature(shape: WorkplaneShape): string {
     taperTopScale: shape.taperTopScale,
     taperBottomScale: shape.taperBottomScale,
     extrudeTwist: shape.extrudeTwist,
+    twistPivot: extrudeTwistPivot(shape),
     extrudeTopOffsetX: shape.extrudeTopOffsetX,
     extrudeTopOffsetZ: shape.extrudeTopOffsetZ,
     slopeEnd: shape.slopeEnd,
@@ -2649,6 +2650,12 @@ export function taperGeometryForShape(geometry: THREE.BufferGeometry, shape: Wor
   const scaleX = stretch(shapeWidth(shape), box.max.x - box.min.x);
   const scaleZ = stretch(shapeDepth(shape), box.max.z - box.min.z);
   const unit = scaleX !== 1 || scaleZ !== 1;
+  // A body with a rotation pivot of its own twists about the vertical through it, not about its middle.
+  // The pivot is in millimetres; the drawn body may be a unit one stretched afterwards, so it is brought back into
+  // the geometry's own units, where the taper above and the turn below both work.
+  const twistPivot = deformed ? extrudeTwistPivot(shape) : undefined;
+  const twistX = twistPivot ? twistPivot.x / scaleX : centerX;
+  const twistZ = twistPivot ? twistPivot.z / scaleZ : centerZ;
   for (let index = 0; index < position.count; index += 1) {
     const y = position.getY(index);
     const normalizedHeight = (y - box.min.y) / height;
@@ -2660,10 +2667,10 @@ export function taperGeometryForShape(geometry: THREE.BufferGeometry, shape: Wor
       const deform = shapeExtrudeDeformAt(shape, normalizedHeight);
       const cos = Math.cos(deform.twistRadians);
       const sin = Math.sin(deform.twistRadians);
-      const relativeX = (localX - centerX) * scaleX;
-      const relativeZ = (localZ - centerZ) * scaleZ;
-      localX = centerX + (relativeX * cos - relativeZ * sin + deform.offsetX) / scaleX;
-      localZ = centerZ + (relativeX * sin + relativeZ * cos + deform.offsetZ) / scaleZ;
+      const relativeX = (localX - twistX) * scaleX;
+      const relativeZ = (localZ - twistZ) * scaleZ;
+      localX = twistX + (relativeX * cos - relativeZ * sin + deform.offsetX) / scaleX;
+      localZ = twistZ + (relativeX * sin + relativeZ * cos + deform.offsetZ) / scaleZ;
     }
     position.setXYZ(index, localX, y, localZ);
   }
@@ -2701,6 +2708,12 @@ export function applyGroupedContentTaper(content: THREE.Group, shape: WorkplaneS
   const centerX = (baseBounds.min.x + baseBounds.max.x) / 2;
   const centerZ = (baseBounds.min.z + baseBounds.max.z) / 2;
   const deformed = shapeHasExtrudeDeform(shape);
+  // A group with a rotation pivot of its own twists about the vertical through it, not about its middle. The
+  // content is stretched to the group's size (content.scale) and the twist works in its own units, so the
+  // pivot, in millimetres, is brought back by that stretch.
+  const twistPivot = deformed ? extrudeTwistPivot(shape) : undefined;
+  const twistX = twistPivot ? twistPivot.x / Math.max(1e-6, content.scale.x) : centerX;
+  const twistZ = twistPivot ? twistPivot.z / Math.max(1e-6, content.scale.z) : centerZ;
   const deformPoint = (point: THREE.Vector3) => {
     const normalizedHeight = (point.y - baseBounds.min.y) / height;
     const widthScale = shapeTaperScaleAt(shape, normalizedHeight, "width");
@@ -2711,10 +2724,10 @@ export function applyGroupedContentTaper(content: THREE.Group, shape: WorkplaneS
       const deform = shapeExtrudeDeformAt(shape, normalizedHeight);
       const cos = Math.cos(deform.twistRadians);
       const sin = Math.sin(deform.twistRadians);
-      const relativeX = point.x - centerX;
-      const relativeZ = point.z - centerZ;
-      point.x = centerX + relativeX * cos - relativeZ * sin + deform.offsetX;
-      point.z = centerZ + relativeX * sin + relativeZ * cos + deform.offsetZ;
+      const relativeX = point.x - twistX;
+      const relativeZ = point.z - twistZ;
+      point.x = twistX + relativeX * cos - relativeZ * sin + deform.offsetX;
+      point.z = twistZ + relativeX * sin + relativeZ * cos + deform.offsetZ;
     }
   };
   // A twist needs vertices partway up to turn, as on a single body (#184): the parts are cut into
