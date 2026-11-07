@@ -2771,7 +2771,7 @@ export function splitBoreTube(shape: WorkplaneShape): WorkplaneShape[] {
 }
 
 function expandGroupsForBoolean(selection: WorkplaneShape[]): WorkplaneShape[] {
-  return selection.flatMap((shape) => {
+  return selection.filter(shownInCut).flatMap((shape) => {
     if (shape.importedMesh) {
       return [shape];
     }
@@ -2782,6 +2782,7 @@ function expandGroupsForBoolean(selection: WorkplaneShape[]): WorkplaneShape[] {
 /**
  * A part hidden inside a group stays one of its parts, but it is not cut and not cut with (#1323): the group's
  * body is what is shown, as the plain group and the export already had it. A hidden ring came back on Done.
+ * A group hidden as a whole stays out too, before it is taken apart into parts that are not hidden themselves.
  */
 function shownInCut(shape: WorkplaneShape) {
   return !shape.hidden;
@@ -2789,7 +2790,75 @@ function shownInCut(shape: WorkplaneShape) {
 
 function expandGroupsForBoxBoolean(selection: WorkplaneShape[]): WorkplaneShape[] {
   // An intersection or a hull is not the sum of its parts: opened, a hull of four boxes would be cut as the four boxes (#863).
-  return selection.flatMap((shape) => (shape.groupedShapes?.length && shape.groupOperation !== "intersection" && shape.groupOperation !== "hull" && shape.groupOperation !== "loft" ? restoreGroupedChildren(shape) : [shape])).flatMap(splitBoreTube).filter(shownInCut);
+  return selection.filter(shownInCut).flatMap((shape) => (shape.groupedShapes?.length && shape.groupOperation !== "intersection" && shape.groupOperation !== "hull" && shape.groupOperation !== "loft" ? restoreGroupedChildren(shape) : [shape])).flatMap(splitBoreTube).filter(shownInCut);
+}
+
+/** The solids hidden among the parts of a group, where they stand, also those hidden inside a group among them. */
+function hiddenSolidsAmong(selection: WorkplaneShape[]): WorkplaneShape[] {
+  return selection.flatMap((shape) => {
+    if (shape.hidden) return shape.hole ? [] : [shape];
+    if (shape.importedMesh || !shape.groupedShapes?.length) return [];
+    return hiddenSolidsAmong(restoreGroupedChildren(shape));
+  });
+}
+
+/**
+ * A group with a hole is cut into one body, and its box was that body's box. A solid hidden in it stays out of the
+ * body (shownInCut) but is still one of its parts, and in a plain group it keeps its room: a wide ring hidden on an
+ * axle kept the group as wide as the ring, until the group had a hole (#1323). The box now takes in the hidden solids
+ * there too, the body standing where it was inside it, and the alignment counts them (alignBounds). Not below the
+ * body's foot: the view stands a body on the foot of its box. The same goes for a group with an imported mesh.
+ */
+function withRoomForHiddenParts(group: WorkplaneShape, selected: WorkplaneShape[]): WorkplaneShape {
+  const mesh = group.importedMesh;
+  if (!mesh || mesh.positions.length < 9 || mesh.assetId || mesh.storageResourceId || mesh.brepStep || group.cadBrep || !group.groupedShapes?.length) return group;
+  if (group.rotation || group.rotationX || group.rotationZ) return group;
+  const hidden = hiddenSolidsAmong(selected);
+  if (!hidden.length) return group;
+  const room = boundsForShapesOfVertices(hidden);
+  if (![room.minX, room.maxX, room.maxY, room.minZ, room.maxZ].every(Number.isFinite)) return group;
+  const width = shapeWidth(group);
+  const depth = shapeDepth(group);
+  const foot = group.elevation ?? 0;
+  const minX = Math.min(group.x - width / 2, room.minX);
+  const maxX = Math.max(group.x + width / 2, room.maxX);
+  const minZ = Math.min(group.z - depth / 2, room.minZ);
+  const maxZ = Math.max(group.z + depth / 2, room.maxZ);
+  const nextWidth = cleanModelDimension(Math.max(width, maxX - minX));
+  const nextDepth = cleanModelDimension(Math.max(depth, maxZ - minZ));
+  const nextHeight = cleanModelDimension(Math.max(group.height, room.maxY - foot));
+  const grows = (next: number, now: number) => next - now > POINT_TOLERANCE;
+  if (!grows(nextWidth, width) && !grows(nextDepth, depth) && !grows(nextHeight, group.height)) return group;
+  const centerX = (minX + maxX) / 2;
+  const centerZ = (minZ + maxZ) / 2;
+  const shiftX = centerX - group.x;
+  const shiftZ = centerZ - group.z;
+  // The body's points and the parts are kept at the size the group was built at, a hair from its size in the world.
+  const meshX = mesh.baseWidth / Math.max(MIN_SHAPE_DIMENSION, width);
+  const meshY = mesh.baseHeight / Math.max(MIN_SHAPE_DIMENSION, group.height);
+  const meshZ = mesh.baseDepth / Math.max(MIN_SHAPE_DIMENSION, depth);
+  const partsX = (group.groupedBaseWidth ?? width) / Math.max(MIN_SHAPE_DIMENSION, width);
+  const partsY = (group.groupedBaseHeight ?? group.height) / Math.max(MIN_SHAPE_DIMENSION, group.height);
+  const partsZ = (group.groupedBaseDepth ?? depth) / Math.max(MIN_SHAPE_DIMENSION, depth);
+  const positions = mesh.positions.slice();
+  for (let offset = 0; offset + 2 < positions.length; offset += 3) {
+    positions[offset] -= shiftX * meshX;
+    positions[offset + 2] -= shiftZ * meshZ;
+  }
+  return {
+    ...group,
+    x: centerX,
+    z: centerZ,
+    width: nextWidth,
+    depth: nextDepth,
+    height: nextHeight,
+    size: Math.max(nextWidth, nextDepth),
+    importedMesh: { ...mesh, positions, baseWidth: nextWidth * meshX, baseDepth: nextDepth * meshZ, baseHeight: nextHeight * meshY },
+    groupedBaseWidth: nextWidth * partsX,
+    groupedBaseDepth: nextDepth * partsZ,
+    groupedBaseHeight: nextHeight * partsY,
+    groupedShapes: group.groupedShapes.map((part) => ({ ...part, x: part.x - shiftX * partsX, z: part.z - shiftZ * partsZ })),
+  };
 }
 
 function canUseBoxBoolean(selection: WorkplaneShape[]) {
@@ -2870,7 +2939,7 @@ export async function buildGroupedShapeFromSelection(selected: WorkplaneShape[],
   const manifoldImportedMerge = hasImportedMesh && hasSolid && !hasHole ? await manifoldUnionMeshShape(booleanSelection, triangleLimit, groupable) : null;
   const exactImportedGroup = hasImportedMesh && hasSolid && hasHole ? manifoldCutGroup ?? importedBooleanMeshShape(booleanSelection, groupable) : null;
   const bakedImportedMerge = hasImportedMesh && !(hasSolid && hasHole) ? manifoldImportedMerge ?? mergedMeshShape(booleanSelection, groupable) : null;
-  const group = hasSolid && hasHole
+  const built = hasSolid && hasHole
     ? cleanBoxGroup ??
       exactImportedGroup ??
       (hasImportedMesh
@@ -2879,13 +2948,14 @@ export async function buildGroupedShapeFromSelection(selected: WorkplaneShape[],
     : hasImportedMesh
       ? bakedImportedMerge ?? groupedShape(groupable)
       : newPlainGroup(groupable);
+  const group = built ? withRoomForHiddenParts(built, selected) : null;
   const consumed = !group && hasSolid && hasHole && cutFullyConsumesSolids(booleanSelection);
   // The cut was made, but the fallback left its face open: say so when the cause is gaps in the surface (#346).
   const openGapEdges = group && hasImportedMesh && hasSolid && hasHole && OPEN_CUT_ID.test(group.id)
     ? openSurfaceEdgeCount(booleanSelection.filter((shape) => !shape.hole && !shape.locked))
     : 0;
   // Above the limit the solids are only laid together, they are kept overlapping when exported.
-  const unmergedTriangles = group && group === bakedImportedMerge && !manifoldImportedMerge && hasSolid
+  const unmergedTriangles = group && built === bakedImportedMerge && !manifoldImportedMerge && hasSolid
     ? group.importedMesh?.triangleCount ?? 0
     : 0;
   const mergeWarning = unmergedTriangles > triangleLimit
