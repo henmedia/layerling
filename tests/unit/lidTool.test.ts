@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { BAYONET_MIN_WALL, HINGE_PIN_GRIP, LID_DEFAULTS, LID_TYPES, MAX_BAYONET_AXIAL_GAP, MAX_BAYONET_DEPTH, MAX_BAYONET_DETENT, MAX_BAYONET_LUGS, MIN_BAYONET_AXIAL_GAP, MIN_BAYONET_DEPTH, MIN_BAYONET_LUGS, MAX_CLICK_BUMP_HEIGHT, MAX_HINGE_PIN, MAX_HINGE_PIN_PLAY, MAX_LID_GAP, MAX_LID_THICKNESS, MAX_LID_THREAD_PITCH, MAX_LID_THREAD_TURNS, MAX_MAGNET_GAP, MIN_CLICK_BUMP_HEIGHT, MIN_HINGE_PIN, MIN_HINGE_PIN_PLAY, MIN_LID_THREAD_PITCH, MIN_LID_THREAD_TURNS, MIN_LID_WALL, MIN_MAGNET_DIAMETER, SCREW_MIN_WALL, bayonetLugSize, bayonetPlan, bayonetTurn, clickBumpPlaces, cornerKnucklePlan, endPlugPlan, hingeKnuckleRadius, hingePinHoles, lidClickBumpsFit, lidHandleFits, lidTakesExtras, lidThicknessForMagnets, lidThread, magnetPlaces, magnetPocketDepth, normalizeLidOptions, roundOutline, screwPlan } from "@/lib/lidTool";
+import { BAYONET_MIN_WALL, HINGE_PIN_GRIP, HINGE_PRINTED_PIN_GRIP, LID_DEFAULTS, LID_TYPES, MAX_BAYONET_AXIAL_GAP, MAX_BAYONET_DEPTH, MAX_BAYONET_DETENT, MAX_BAYONET_LUGS, MIN_BAYONET_AXIAL_GAP, MIN_BAYONET_DEPTH, MIN_BAYONET_LUGS, MAX_CLICK_BUMP_HEIGHT, MAX_HINGE_PIN, MAX_HINGE_PIN_PLAY, MAX_LID_GAP, MAX_LID_THICKNESS, MAX_LID_THREAD_PITCH, MAX_LID_THREAD_TURNS, MAX_MAGNET_GAP, MIN_CLICK_BUMP_HEIGHT, MIN_HINGE_PIN, MIN_HINGE_PIN_PLAY, MIN_LID_THREAD_PITCH, MIN_LID_THREAD_TURNS, MIN_LID_WALL, MIN_MAGNET_DIAMETER, SCREW_MIN_WALL, bayonetLugSize, bayonetPlan, bayonetTurn, clickBumpPlaces, cornerKnucklePlan, endPlugPlan, hingeKnuckleRadius, hingePinGrip, hingePinHoles, lidClickBumpsFit, lidHandleFits, lidTakesExtras, lidThicknessForMagnets, lidThread, magnetPlaces, magnetPocketDepth, normalizeLidOptions, roundOutline, screwPlan } from "@/lib/lidTool";
 import { threadSize } from "@/lib/vase/vase-geometry.mjs";
 
 describe("lid options (#1009)", () => {
@@ -152,14 +152,32 @@ describe("lid options (#1009)", () => {
     // The knuckles keep their size, so the body's keep at least the 1.6 mm wall the lid's have round their hole, more
     // round their tighter one, for every pin and play.
     for (const hingePin of [MIN_HINGE_PIN, 1.75, 3, MAX_HINGE_PIN]) {
-      for (const hingePinPlay of [MIN_HINGE_PIN_PLAY, 0.2, MAX_HINGE_PIN_PLAY]) {
-        const radius = hingeKnuckleRadius({ hingePin, hingePinPlay });
-        const { lidHole, bodyHole } = hingePinHoles({ hingePin, hingePinPlay });
-        expect(radius - lidHole).toBeCloseTo(1.6, 9);
-        expect(radius - bodyHole).toBeGreaterThanOrEqual(1.6 - 1e-9);
-        expect(bodyHole).toBeLessThanOrEqual(lidHole + 1e-9);
+      for (const hingePinPlay of [MIN_HINGE_PIN_PLAY, 0.1, 0.2, MAX_HINGE_PIN_PLAY]) {
+        for (const hingePrintPin of [false, true]) {
+          const radius = hingeKnuckleRadius({ hingePin, hingePinPlay });
+          const { lidHole, bodyHole } = hingePinHoles({ hingePin, hingePinPlay, hingePrintPin });
+          expect(radius - lidHole).toBeCloseTo(1.6, 9);
+          expect(radius - bodyHole).toBeGreaterThanOrEqual(1.6 - 1e-9);
+          expect(bodyHole).toBeLessThanOrEqual(lidHole + 1e-9);
+        }
       }
     }
+  });
+
+  it("gives a printed pin more room in the body's holes, so it can be pressed in", () => {
+    // A printed pin comes out at its full diameter and the printed holes a little smaller: at 0.05 mm it hardly went in.
+    expect(HINGE_PRINTED_PIN_GRIP).toBe(0.15);
+    const printed = hingePinHoles(normalizeLidOptions({ hingePin: 3, hingePrintPin: true }));
+    expect(printed.bodyHole).toBeCloseTo(1.5 + 0.15, 9);
+    expect(printed.lidHole).toBeCloseTo(1.5 + 0.2, 9);
+    // Filament keeps its tight fit.
+    expect(hingePinHoles(normalizeLidOptions({ hingePin: 3 })).bodyHole).toBeCloseTo(1.5 + 0.05, 9);
+    // Never looser than the lid's holes: with less play than that, both are as wide.
+    const tight = hingePinHoles(normalizeLidOptions({ hingePin: 3, hingePinPlay: 0.1, hingePrintPin: true }));
+    expect(tight.bodyHole).toBeCloseTo(tight.lidHole, 9);
+    expect(hingePinGrip({ hingePinPlay: 0.1, hingePrintPin: true })).toBeCloseTo(0.1, 9);
+    expect(hingePinGrip({ hingePinPlay: 0.3, hingePrintPin: true })).toBeCloseTo(0.15, 9);
+    expect(hingePinGrip({ hingePinPlay: 0.3, hingePrintPin: false })).toBe(HINGE_PIN_GRIP);
   });
 
   it("brings sizes into range and ignores what is not a number", () => {

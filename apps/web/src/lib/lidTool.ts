@@ -34,7 +34,7 @@ import type { WorkplaneShape } from "@/types/layerling";
  * take turns along it, the outer ones the body's, those between the lid's, a gap apart, and a pin goes through them all
  * (a piece of filament, or a pin printed apart). The pin sits tight in the body's holes (a pivot lid's: in the side
  * walls) and turns in the lid's, which alone have its play (#1220): with the play in every hole, a piece of filament slid
- * out. The body's knuckles stand out from its back wall on a 45 degree slope, so the body prints upright without
+ * out. A printed pin has a little more room in the body's holes than filament, or it would not go in at all. The body's knuckles stand out from its back wall on a 45 degree slope, so the body prints upright without
  * support; the lid's lie on the plate when it is printed turned over. A flush hinge can have end plugs (Discussion #1387):
  * the last few millimetres of the pin's hole at each end are a square pocket, and a square plug in each, its outer end
  * cut to the body's outline, closes the hole flush with the outside, so the pin is hidden and cannot slide out. On a box
@@ -68,7 +68,7 @@ export type LidHandle = "none" | "tab" | "notch";
  * side (a little to press them in, more to glue them). With `hinge`, a hinge along the `hingeSide` (the back unless
  * another is picked) for a pin of `hingePin` mm, `hingeGap` between its knuckles, `hingeKnuckles` of them (0: as many as
  * suit its length), and the pin printed apart with `hingePrintPin`. `hingePinPlay` is the pin's play per side in the
- * lid's holes, where it turns; in the body's it sits tight (HINGE_PIN_GRIP). With `hingeTeardrop` (the default) the pin's
+ * lid's holes, where it turns; in the body's it sits tight (hingePinGrip). With `hingeTeardrop` (the default) the pin's
  * holes have a point on top as each part is printed, so they do not droop. With `hingeEndPlugs`, a flush hinge's pin hole
  * ends in a square pocket at each end, for a plug that closes it flush with the body's outside; the pin is shorter by them.
  * With `clickBumps`, bumps on the lip or rim and dimples for them in the body, so the lid clicks into place, each reaching
@@ -180,12 +180,19 @@ export const MAX_HINGE_KNUCKLES = 15;
 export const MIN_HINGE_PIN_PLAY = 0.05;
 export const MAX_HINGE_PIN_PLAY = 0.5;
 /**
- * How much larger than the pin the body's holes are, per side, in mm, whatever the play: the pin sits tight in the body's
- * part of the hinge and only the lid turns on it, so a piece of filament does not slide out (#1220). A printed hole comes
- * out a little smaller than drawn, so this presses filament in. The same as the least play, so the body's knuckles keep
- * at least HINGE_KNUCKLE_WALL round their hole.
+ * How much larger than a piece of filament as the pin the body's holes are, per side, in mm, whatever the play: the pin
+ * sits tight in the body's part of the hinge and only the lid turns on it, so the filament does not slide out (#1220). A
+ * printed hole comes out a little smaller than drawn, so this presses filament in. The same as the least play, so the
+ * body's knuckles keep at least HINGE_KNUCKLE_WALL round their hole.
  */
 export const HINGE_PIN_GRIP = 0.05;
+/**
+ * How much larger than the pin the body's holes are, per side, in mm, when the pin is printed apart: a printed pin comes
+ * out at its full diameter and the holes a little smaller than drawn, so at HINGE_PIN_GRIP it hardly ever went in (a
+ * 3 mm pin went in hard even at 0.15 in #1220). At this it still sits tight but can be pressed in. A piece of filament
+ * keeps HINGE_PIN_GRIP.
+ */
+export const HINGE_PRINTED_PIN_GRIP = 0.15;
 /**
  * How much a knuckle keeps round the lid's hole, in mm; round the body's tighter one it keeps the play less the grip more.
  * The knuckles' size stays that of the lid's.
@@ -465,11 +472,20 @@ export function hingeKnuckleRadius(options: Pick<LidOptions, "hingePin"> & Parti
 }
 
 /**
- * The radius of the pin's hole in mm: in the lid's part of the hinge with the pin's play, so the lid turns on it; in the
- * body's only HINGE_PIN_GRIP larger than the pin, so it sits tight there and does not slide out (#1220).
+ * How much larger than the pin the body's holes are, per side, in mm: HINGE_PIN_GRIP for a piece of filament,
+ * HINGE_PRINTED_PIN_GRIP for a pin printed apart. Never more than the pin's play, so the body's holes are never looser
+ * than the lid's and its knuckles keep at least HINGE_KNUCKLE_WALL round them.
  */
-export function hingePinHoles(options: Pick<LidOptions, "hingePin" | "hingePinPlay">) {
-  return { lidHole: options.hingePin / 2 + options.hingePinPlay, bodyHole: options.hingePin / 2 + HINGE_PIN_GRIP };
+export function hingePinGrip(options: Pick<LidOptions, "hingePinPlay"> & Partial<Pick<LidOptions, "hingePrintPin">>) {
+  return options.hingePrintPin ? Math.min(HINGE_PRINTED_PIN_GRIP, options.hingePinPlay) : HINGE_PIN_GRIP;
+}
+
+/**
+ * The radius of the pin's hole in mm: in the lid's part of the hinge with the pin's play, so the lid turns on it; in the
+ * body's only the grip larger than the pin (hingePinGrip), so it sits tight there and does not slide out (#1220).
+ */
+export function hingePinHoles(options: Pick<LidOptions, "hingePin" | "hingePinPlay"> & Partial<Pick<LidOptions, "hingePrintPin">>) {
+  return { lidHole: options.hingePin / 2 + options.hingePinPlay, bodyHole: options.hingePin / 2 + hingePinGrip(options) };
 }
 
 /**
@@ -1687,8 +1703,9 @@ export function lidForSolid(runtime: ManifoldToplevel, body: ManifoldSolid, give
         // standing on a corner so its top is a point at 45 degrees, as the teardrop's (which lies within it), and it prints
         // without droop; its corners are cut flat where they would leave less than TEARDROP_WALL of the knuckle, as the
         // teardrop's point is. The body's square is as tight round the pin as its round holes, so the pin goes in through it
-        // before the plugs; each plug is that square HINGE_PIN_GRIP smaller all round, as thick as the pin, so it sits as
-        // tight as the pin does in the body and cannot turn, and its outer end is cut to the body's outline, flush with it.
+        // before the plugs; each plug is that square HINGE_PIN_GRIP smaller all round (as thick as a piece of filament, a
+        // little thicker for a printed pin's roomier hole), so it sits tight and cannot turn, and its outer end is cut to the
+        // body's outline, flush with it.
         const squareAlong = (from: number, to: number, half: number, corner: number) => {
           const square = keep(created, keep(created, runtime.CrossSection.square([2 * half, 2 * half], true)).rotate(45));
           const profile = keep(created, square.intersect(keep(created, runtime.CrossSection.square([2 * corner, 2 * corner], true))));
