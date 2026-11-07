@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { HINGE_PIN_GRIP, LID_DEFAULTS, LID_TYPES, MAX_CLICK_BUMP_HEIGHT, MAX_HINGE_PIN, MAX_HINGE_PIN_PLAY, MAX_LID_GAP, MAX_LID_THICKNESS, MAX_LID_THREAD_PITCH, MAX_LID_THREAD_TURNS, MAX_MAGNET_GAP, MIN_CLICK_BUMP_HEIGHT, MIN_HINGE_PIN, MIN_HINGE_PIN_PLAY, MIN_LID_THREAD_PITCH, MIN_LID_THREAD_TURNS, MIN_LID_WALL, MIN_MAGNET_DIAMETER, SCREW_MIN_WALL, clickBumpPlaces, endPlugPlan, hingeKnuckleRadius, hingePinHoles, lidClickBumpsFit, lidHandleFits, lidTakesExtras, lidThicknessForMagnets, lidThread, magnetPlaces, magnetPocketDepth, normalizeLidOptions, roundOutline, screwPlan } from "@/lib/lidTool";
+import { HINGE_PIN_GRIP, LID_DEFAULTS, LID_TYPES, MAX_CLICK_BUMP_HEIGHT, MAX_HINGE_PIN, MAX_HINGE_PIN_PLAY, MAX_LID_GAP, MAX_LID_THICKNESS, MAX_LID_THREAD_PITCH, MAX_LID_THREAD_TURNS, MAX_MAGNET_GAP, MIN_CLICK_BUMP_HEIGHT, MIN_HINGE_PIN, MIN_HINGE_PIN_PLAY, MIN_LID_THREAD_PITCH, MIN_LID_THREAD_TURNS, MIN_LID_WALL, MIN_MAGNET_DIAMETER, SCREW_MIN_WALL, clickBumpPlaces, cornerKnucklePlan, endPlugPlan, hingeKnuckleRadius, hingePinHoles, lidClickBumpsFit, lidHandleFits, lidTakesExtras, lidThicknessForMagnets, lidThread, magnetPlaces, magnetPocketDepth, normalizeLidOptions, roundOutline, screwPlan } from "@/lib/lidTool";
 import { threadSize } from "@/lib/vase/vase-geometry.mjs";
 
 describe("lid options (#1009)", () => {
@@ -54,6 +54,37 @@ describe("lid options (#1009)", () => {
     expect(narrow.pinLength).toBeCloseTo(40 - 4.2 - 1, 9);
     // Under 3.5 mm, a plug would be shorter than 2 mm: refused.
     expect(endPlugPlan([[-20, -16.6], [-16.3, 16.3], [16.6, 20]], [-20, 20])).toEqual({ error: { code: "endPlugsShort" } });
+  });
+
+  it("fills rounded corners with a flush hinge's end knuckles without end plugs too, the pin ending where its hole is whole (Discussion #1387)", () => {
+    // A 60 x 40 box seen from above, its back at y 20 and its corners cut off by `cut` (a straight cut is as good as a round
+    // for this, and its crossings are exact); `right` cuts only the two on the right.
+    const box = (cut: number, right = false) => [[[-30 + (right ? 0 : cut), 20], [30 - cut, 20], [30, 20 - cut], [30, -20 + cut], [30 - cut, -20], [-30 + (right ? 0 : cut), -20], [-30, -20 + (right ? 0 : cut)], [-30, 20 - (right ? 0 : cut)]]] as [number, number][][];
+    // Five knuckles along the straight back from `from` to `to`, 0.3 mm apart.
+    const knuckles = (from: number, to: number) => Array.from({ length: 5 }, (_, index): [number, number] => {
+      const width = (to - from - 4 * 0.3) / 5;
+      return [from + index * (width + 0.3), from + index * (width + 0.3) + width];
+    });
+    // Square corners: the knuckles reach the ends of the back, nothing to fill.
+    expect(cornerKnucklePlan(box(0), knuckles(-30, 30), 17, 1, 0.3)).toBeNull();
+    // Cut by 6 mm: the axis 3 mm in front of the back crosses the outline at ±27, where the end knuckles now end. The hole,
+    // 1 mm round, is whole out to where the line 1 mm behind the axis crosses (±26): the pin ends half a millimetre inside.
+    const cut = cornerKnucklePlan(box(6), knuckles(-24, 24), 17, 1, 0.3)!;
+    expect(cut.outer[0]).toBeCloseTo(-27, 9);
+    expect(cut.outer[1]).toBeCloseTo(27, 9);
+    expect(cut.pinLength).toBeCloseTo(51, 9);
+    // Within the gap and a hundredth of the knuckles, as on a square box: nothing to fill. A little further, filled.
+    expect(cornerKnucklePlan(box(0.3), knuckles(-29.7, 29.7), 17, 1, 0.3)).toBeNull();
+    const just = cornerKnucklePlan(box(0.4), knuckles(-29.6, 29.6), 17, 1, 0.3)!;
+    expect(just.outer).toEqual([-30, 30]);
+    expect(just.pinLength).toBeCloseTo(59, 9);
+    // One end rounded is enough, and the other end then ends where the body does.
+    const one = cornerKnucklePlan(box(6, true), knuckles(-30, 24), 17, 1, 0.3)!;
+    expect(one.outer[0]).toBeCloseTo(-30, 9);
+    expect(one.outer[1]).toBeCloseTo(27, 9);
+    expect(one.pinLength).toBeCloseTo(55, 9);
+    // An axis that does not cross the outline at all.
+    expect(cornerKnucklePlan(box(6), knuckles(-24, 24), 25, 1, 0.3)).toBeNull();
   });
 
   it("makes teardrop pin holes unless told not to", () => {

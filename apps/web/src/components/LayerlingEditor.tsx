@@ -8665,8 +8665,9 @@ export function LayerlingEditor({
       ? hinge.style === "pivot"
         ? t("status.lidMadePivot", { pin })
         : hinge.pinLength !== null
-          // With end plugs the pin is shorter than the hinge: how long it is, for a piece of filament cut to fit.
-          ? t("status.lidMadeHingeFlushPlugs", { type, count: hinge.count, pin, length: (Math.round(hinge.pinLength * 10) / 10).toLocaleString(numberLocale()) })
+          // With end plugs the pin is shorter than the hinge, and with end knuckles in rounded corners shorter than its
+          // hole: how long it is, for a piece of filament cut to fit.
+          ? t(hinge.plugs ? "status.lidMadeHingeFlushPlugs" : "status.lidMadeHingeFlushCorners", { type, count: hinge.count, pin, length: (Math.round(hinge.pinLength * 10) / 10).toLocaleString(numberLocale()) })
           : t(magnetCount ? "status.lidMadeHingeMagnets" : hinge.style === "flush" ? "status.lidMadeHingeFlush" : "status.lidMadeHinge", { type, count: hinge.count, pin, magnets: magnetCount })
       : magnetCount
         ? t(posts.length ? "status.lidMadeMagnetsPosts" : "status.lidMadeMagnets", { type, count: magnetCount })
@@ -14036,7 +14037,8 @@ export function LayerlingEditor({
           ...(result.clickBumps ? { clickBumps: result.clickBumps } : {}), ...(result.handle !== "none" ? { handle: result.handle } : {}),
           ...("hinge" in result && result.hinge ? { hinge: {
             knuckles: result.hinge.knuckles, pins: result.hinge.pins, pinDiameter: result.hinge.pinDiameter, side: result.hinge.side, style: result.hinge.style, pin: pin ? mcpShapeSummary(pin) : null,
-            ...(result.hinge.pinLength !== null ? { endPlugs: plugs ? mcpShapeSummary(plugs) : { id: result.hinge.plugsId }, pinLength: Math.round(result.hinge.pinLength * 100) / 100 } : {}),
+            ...(result.hinge.plugsId ? { endPlugs: plugs ? mcpShapeSummary(plugs) : { id: result.hinge.plugsId } } : {}),
+            ...(result.hinge.pinLength !== null ? { pinLength: Math.round(result.hinge.pinLength * 100) / 100 } : {}),
           } } : {}),
           ...("screw" in result && result.screw ? { screw: result.screw } : {}),
         };
