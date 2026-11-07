@@ -602,6 +602,97 @@ describe("where a standard's thread and cap go", () => {
   });
 });
 
+/**
+ * A pot 60 across with a 2 mm wall whose rim is rounded or chamfered (Discussion #1426), as lidForSolid slices it: how far
+ * the outline reaches from the axis and the opening's edge at a height, its top at 50. `outer` and `inner` give how far
+ * the rounding takes the outline in and the opening out at a height.
+ */
+const roundedRim = (outer: (z: number) => number, inner: (z: number) => number = () => 0, radius = 30, wall = 2) => (z: number) => ({
+  outline: [polygonRound(radius - outer(z))],
+  opening: [polygonRound(radius - wall + inner(z), 192, 0, 0, true)],
+});
+/** How far a quarter circle of `size` at the rim's edge takes it in at a height, 50 the top. */
+const fillet = (size: number, top = 50) => (z: number) => (z <= top - size ? 0 : size - Math.sqrt(size ** 2 - (z - (top - size)) ** 2));
+/** How far a chamfer of `size` at 45 degrees takes it in. */
+const chamfer = (size: number, top = 50) => (z: number) => Math.max(0, z - (top - size));
+
+describe("a screw lid or a bayonet lid on a rim that is rounded or chamfered (Discussion #1426)", () => {
+  const screw = (patch: Record<string, unknown> = {}) => normalizeLidOptions({ type: "screw", ...patch });
+  const bayonet = (patch: Record<string, unknown> = {}) => normalizeLidOptions({ type: "bayonet", ...patch });
+
+  it("puts the thread on the straight wall below an outside fillet, where the outline comes within 0.05 mm of the wall's", () => {
+    // A fillet of 1.5 mm comes within 0.05 mm of the wall 1.116 mm under the top; found to 0.05 mm.
+    const plan = screwPlan(roundedRim(fillet(1.5)), screw(), 50, 0, 49.7);
+    if ("error" in plan) throw new Error(plan.error.code);
+    const begins = 48.5 + Math.sqrt(1.5 ** 2 - 1.45 ** 2);
+    expect(plan.wallTop).toBeLessThanOrEqual(begins);
+    expect(plan.wallTop).toBeGreaterThan(begins - 0.05);
+    // The thread its height under it, the rest as on a square rim: the wall's own size, its whole thickness to reach into.
+    expect(plan.from).toBeCloseTo(plan.wallTop - 6, 9);
+    expect(plan.radius).toBeCloseTo(30, 9);
+    expect(plan.reach).toBe(0.8);
+    expect(plan.capRadius).toBeCloseTo(32.7, 9);
+    // A square rim keeps the thread where it was: the wall reaches the top.
+    const square = screwPlan(roundedRim(() => 0), screw(), 50, 0, 49.7);
+    if ("error" in square) throw new Error(square.error.code);
+    expect([square.wallTop, square.from]).toEqual([50, 44]);
+  });
+
+  it("goes as far down as a chamfer outside, or one inside that leaves the rim too thin, and as a fillet small enough to pass leaves it", () => {
+    const outside = screwPlan(roundedRim(chamfer(1.5)), screw(), 50, 0, 49.7);
+    if ("error" in outside) throw new Error(outside.error.code);
+    expect(outside.wallTop).toBeGreaterThan(48.5);
+    expect(outside.wallTop).toBeLessThanOrEqual(48.55);
+    // 1.8 mm of the 2 mm wall chamfered away inside: 0.5 mm of wall at the rim, too thin; whole from 48.2 mm down.
+    const inside = screwPlan(roundedRim(() => 0, chamfer(1.8)), screw(), 50, 0, 49.7);
+    if ("error" in inside) throw new Error(inside.error.code);
+    expect(inside.wallTop).toBeGreaterThan(48.2);
+    expect(inside.wallTop).toBeLessThanOrEqual(48.25);
+    expect(inside.reach).toBe(0.8);
+    // A chamfer of 1 mm inside leaves 1.3 mm at the rim, and a fillet of 0.6 mm outside comes in only 0.08 mm there:
+    // both take a thread as before, up to the top.
+    for (const rim of [roundedRim(() => 0, chamfer(1)), roundedRim(fillet(0.6))]) {
+      const plan = screwPlan(rim, screw(), 50, 0, 49.7);
+      if ("error" in plan) throw new Error(plan.error.code);
+      expect(plan.wallTop).toBe(50);
+    }
+  });
+
+  it("refuses a rounding that leaves too little straight wall for the thread, and a rim that flares out or a pot that tapers as before", () => {
+    // 8.5 mm high, a 4 mm wall: under a square rim the thread fits, under a fillet of 3 mm it does not, one turn does.
+    const low = roundedRim(fillet(3), () => 0, 30, 4);
+    expect("error" in screwPlan(roundedRim(() => 0, () => 0, 30, 4), screw(), 50, 41.5, 49.83)).toBe(false);
+    expect(screwPlan(low, screw(), 50, 41.5, 49.83)).toEqual({ error: { code: "screwRimRound", height: 6 } });
+    expect("error" in screwPlan(low, screw({ threadTurns: 1 }), 50, 41.5, 49.83)).toBe(false);
+    // A rim flaring a millimetre out past the wall over its last 3 mm: no cap passes over it.
+    const flared = roundedRim((z) => -Math.max(0, (z - 47) / 3));
+    expect(screwPlan(flared, screw(), 50, 0, 49.7)).toEqual({ error: { code: "screwNotRound" } });
+    // A pot narrowing to the top all the way up, a millimetre in 6 mm, and a wall too thin all the way up.
+    const narrowing = roundedRim((z) => (z - 40) / 6, (z) => -(z - 40) / 6);
+    expect(screwPlan(narrowing, screw(), 50, 0, 49.7)).toEqual({ error: { code: "screwNotRound" } });
+    expect(screwPlan(roundedRim(() => 0, () => 1.4), screw(), 50, 0, 49.7)).toEqual({ error: { code: "screwThinWall" } });
+    // On a pot just high enough for the thread, too thin a wall under a square rim is that, not a rounding.
+    expect(screwPlan(roundedRim(() => 0, () => 1.4), screw(), 50, 43.5, 49.87)).toEqual({ error: { code: "screwThinWall" } });
+  });
+
+  it("puts a bayonet's lugs below the rounding and its cap's mouth the rim depth under where it begins, or refuses as for a screw lid", () => {
+    const plan = bayonetPlan(roundedRim(fillet(1.5)), bayonet(), 50, 0, 49.7);
+    if ("error" in plan) throw new Error(plan.error.code);
+    expect(plan.wallTop).toBeLessThan(48.885);
+    expect(plan.wallTop).toBeGreaterThan(48.83);
+    expect(plan.lugTop).toBeCloseTo(plan.wallTop - 0.2, 9);
+    expect(plan.lugLow).toBeCloseTo(plan.wallTop - 0.2 - 1.5, 9);
+    expect(plan.from).toBeCloseTo(plan.wallTop - 8, 9);
+    expect(plan.capRadius).toBeCloseTo(30 + 1.5 + 0.2 + 1.6, 9);
+    const square = bayonetPlan(roundedRim(() => 0), bayonet(), 50, 0, 49.7);
+    if ("error" in square) throw new Error(square.error.code);
+    expect([square.wallTop, square.lugTop, square.from]).toEqual([50, expect.closeTo(49.8, 9), 42]);
+    expect(bayonetPlan(roundedRim(fillet(3), () => 0, 30, 4), bayonet(), 50, 41.5, 49.83)).toEqual({ error: { code: "bayonetRimRound", height: 8 } });
+    expect("error" in bayonetPlan(roundedRim(() => 0, () => 0, 30, 4), bayonet(), 50, 41.5, 49.83)).toBe(false);
+    expect(bayonetPlan(roundedRim((z) => -Math.max(0, (z - 47) / 3)), bayonet(), 50, 0, 49.7)).toEqual({ error: { code: "bayonetNotRound" } });
+  });
+});
+
 describe("a bayonet lid (Discussion #1424)", () => {
   it("is a sixth kind of lid, taken in any case, and the push-in lid stays the one to begin with", () => {
     expect(LID_TYPES.at(-1)).toBe("bayonet");

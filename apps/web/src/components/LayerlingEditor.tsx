@@ -8660,7 +8660,7 @@ export function LayerlingEditor({
     const bodyCuts = [...(result.clickBumps ? [result.clickBumps.dimples] : []), ...(result.handle?.notch ? [result.handle.notch] : [])];
     const millimetres = (value: number) => (Math.round(value * 10) / 10).toLocaleString(numberLocale());
     const screwAnswer = screw ? {
-      pitch: screw.pitch, turns: Math.round(screw.turns * 1000) / 1000, depth: Math.round(screw.depth * 1000) / 1000, diameter: Math.round(screw.diameter * 1000) / 1000,
+      pitch: screw.pitch, turns: Math.round(screw.turns * 1000) / 1000, depth: Math.round(screw.depth * 1000) / 1000, diameter: Math.round(screw.diameter * 1000) / 1000, rimRounding: Math.round(screw.rimRounding * 100) / 100,
       // A screw-in lid's diameter is its plug's, and the plug may be hollow.
       ...(screw.inside ? { inside: true, hollow: screw.hollow } : {}),
       ...(screw.standard === "own" ? {} : (() => {
@@ -8697,17 +8697,20 @@ export function LayerlingEditor({
     const magnetCount = result.magnets?.pockets.length ?? 0;
     // A turn set by hand that does not fit round the body is held to what fits (bayonetPlan): said after the rest.
     const turnFitted = bayonet && options.bayonetTurn > 0 && bayonet.turn !== options.bayonetTurn ? options.bayonetTurn : null;
+    // Under a rim rounded or chamfered, the thread or the lugs sit below the rounding and the cap reaches over it (#1426).
+    const rimRounding = screw?.rimRounding ?? bayonet?.rimRounding ?? 0;
+    const roundedRim = rimRounding > 0 ? ` ${t("status.lidRimRounded", { depth: millimetres(rimRounding) })}` : "";
     const message = screw
       ? screw.inside
-        ? t("status.lidMadeScrewIn", { pitch: millimetres(screw.pitch), height: millimetres(screw.pitch * screw.turns), diameter: millimetres(screw.diameter) })
+        ? t("status.lidMadeScrewIn", { pitch: millimetres(screw.pitch), height: millimetres(screw.pitch * screw.turns), diameter: millimetres(screw.diameter) }) + roundedRim
         : screw.standard === "own"
-          ? t("status.lidMadeScrew", { pitch: millimetres(screw.pitch), height: millimetres(screw.pitch * screw.turns), diameter: millimetres(screw.diameter) })
-          : t("status.lidMadeScrewStandard", { standard: lidStandardThread(screw.standard).name, pitch: millimetres(screw.pitch), diameter: millimetres(screw.diameter) })
+          ? t("status.lidMadeScrew", { pitch: millimetres(screw.pitch), height: millimetres(screw.pitch * screw.turns), diameter: millimetres(screw.diameter) }) + roundedRim
+          : t("status.lidMadeScrewStandard", { standard: lidStandardThread(screw.standard).name, pitch: millimetres(screw.pitch), diameter: millimetres(screw.diameter) }) + roundedRim
       : bayonet
       ? [
         t("status.lidMadeBayonet", { count: bayonet.count, height: millimetres(bayonet.height), diameter: millimetres(bayonet.diameter), turn: millimetres(bayonet.turn) }),
         ...(turnFitted !== null ? [t("status.lidBayonetTurnFitted", { asked: millimetres(turnFitted), turn: millimetres(bayonet.turn) })] : []),
-      ].join(" ")
+      ].join(" ") + roundedRim
       : hinge
       ? hinge.style === "pivot"
         ? t("status.lidMadePivot", { pin })
@@ -8729,7 +8732,7 @@ export function LayerlingEditor({
       } } : {}),
       ...(screwAnswer ? { screw: screwAnswer } : {}),
       ...(bayonet ? { bayonet: {
-        lugs: bayonet.count, turn: bayonet.turn, ...(turnFitted !== null ? { turnAsked: turnFitted } : {}), diameter: Math.round(bayonet.diameter * 1000) / 1000, lugHeight: bayonet.height, lugWidth: Math.round(bayonet.width * 1000) / 1000, depth: options.bayonetDepth,
+        lugs: bayonet.count, turn: bayonet.turn, ...(turnFitted !== null ? { turnAsked: turnFitted } : {}), diameter: Math.round(bayonet.diameter * 1000) / 1000, lugHeight: bayonet.height, lugWidth: Math.round(bayonet.width * 1000) / 1000, depth: options.bayonetDepth, rimRounding: Math.round(bayonet.rimRounding * 100) / 100,
       } } : {}),
       ...(tether ? { tether: { partId: tether.part.id, strap: tether.strap, neckRing: Math.round(tether.neckRing * 1000) / 1000, capRing: Math.round(tether.capRing * 1000) / 1000 } } : {}),
       ...(flipTop ? { flipTop: {
