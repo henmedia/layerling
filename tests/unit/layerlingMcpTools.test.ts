@@ -5,6 +5,7 @@ import { toolbarShapeAssets } from "@/lib/shapeCatalog";
 import { MCP_SHAPE_SETTING_KEYS } from "@/lib/mcpShapeSettings";
 import { THREAD_SIZES } from "@/lib/threadGeometry";
 import { THREAD_PROFILES } from "@/lib/threadProfiles";
+import { LID_DEFAULTS } from "@/lib/lidTool";
 
 /*
  * Die Formenliste steht an zwei Stellen: im Katalog, aus dem das Formenmenü und
@@ -136,5 +137,13 @@ describe("tool schemas every MCP client can load (#1285)", () => {
     const trace = toolByName("layerling_reference_image").inputSchema.properties?.trace as { anyOf: { type: string; properties?: Record<string, unknown> }[] };
     expect(trace.anyOf.map((branch) => branch.type)).toEqual(["object", "boolean"]);
     expect(Object.keys(trace.anyOf[0].properties ?? {})).toEqual(["part", "threshold", "height"]);
+  });
+});
+
+describe("the lid tool over MCP", () => {
+  it("takes every option the Lid panel has, the tether for a screw or bayonet cap among them", () => {
+    const properties = toolByName("layerling_make_lid").inputSchema.properties ?? {};
+    expect(Object.keys(LID_DEFAULTS).filter((key) => !(key in properties))).toEqual([]);
+    expect(properties.tether).toMatchObject({ type: "boolean" });
   });
 });

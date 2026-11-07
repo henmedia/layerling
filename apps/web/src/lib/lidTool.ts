@@ -21,6 +21,9 @@ import type { WorkplaneShape } from "@/types/layerling";
  * - bayonet: a twist lock (Discussion #1424), for a round body too: lugs standing out of the outside of its top, grouped
  *   with it, and a cap with an L-shaped slot inside its rim for each, pushed down over them and turned to lock, where a
  *   rib behind each lug makes it click (see `bayonetPlan`).
+ * A screw or bayonet cap can have a tether (asked in the Layerling User Group on Facebook), so it stays with the body
+ * when it is off, as a drinks bottle's cap does: two open rings joined by a strap, printed flat beside the cap, one
+ * turning round the cap under a collar, the other round the body below the cap on a bead (see `tetherPlan`).
  * With magnets, the lid holds by four round magnets in the corners: a pocket for each in the body's rim and one facing
  * it in the lid's plate. A wall too thin for a pocket gets a post in that corner, from the bottom up to the rim, which
  * the lid's lip then goes round.
@@ -80,6 +83,7 @@ export type LidHandle = "none" | "tab" | "notch";
  * room per side across the radius, round the lugs and along the body's wall; `bayonetAxialGap` is the room along the
  * axis between the lugs' undersides and the ledge of the cap under them, how far the locked cap lifts before it holds;
  * `bayonetDetent` how far the rib behind each locked lug reaches past the gap (0: none). The wall is the cap's rim's.
+ * With `tether`, a screw or bayonet cap comes with a tether that keeps it on the body (see `tetherPlan`).
  */
 export type LidOptions = {
   type: LidType;
@@ -110,6 +114,7 @@ export type LidOptions = {
   bayonetDepth: number;
   bayonetAxialGap: number;
   bayonetDetent: number;
+  tether: boolean;
 };
 
 export const LID_TYPES: readonly LidType[] = ["plug", "cap", "both", "flat", "screw", "bayonet"];
@@ -117,7 +122,7 @@ export const LID_DEFAULTS: LidOptions = {
   type: "plug", thickness: 2, gap: 0.2, depth: 4, wall: 1.6, magnets: false, magnetDiameter: 6, magnetHeight: 2, magnetGap: 0.1,
   hinge: false, hingePin: 1.75, hingeGap: 0.3, hingePinPlay: 0.2, hingeKnuckles: 0, hingePrintPin: false, hingeSide: "back", hingeTeardrop: true, hingeStyle: "outside", hingeEndPlugs: false,
   clickBumps: false, clickBumpHeight: 0.4, handle: "none", threadPitch: 3, threadTurns: 2,
-  bayonetLugs: 3, bayonetDepth: 8, bayonetAxialGap: 0.3, bayonetDetent: 0.3,
+  bayonetLugs: 3, bayonetDepth: 8, bayonetAxialGap: 0.3, bayonetDetent: 0.3, tether: false,
 };
 /**
  * What a lid starts from with this printer's play (printerPlay.ts): the gap per side and the hinge pin's play take it,
@@ -323,6 +328,33 @@ const SLOT_EXTRA = 0.1;
 const DETENT_RADIUS = 3;
 /** How far the rib reaches into the cap round it, in mm, so the two are one. */
 const DETENT_OVERLAP = 0.1;
+/**
+ * A tether's rings, in mm: how wide across the radius (three lines of a 0.4 mm nozzle) and how tall along the axis, as
+ * they are printed lying flat. Thin enough to open a little and snap over a bead in PETG or TPU, and to bend back.
+ */
+const TETHER_RING_WIDTH = 1.2;
+const TETHER_RING_HEIGHT = 2;
+/** The strap between them, in mm: as wide as a finger's nail is long, and three layers of 0.2 mm thick, so it bends. */
+const TETHER_STRAP_WIDTH = 5;
+const TETHER_STRAP_THICKNESS = 0.6;
+/** How far a bead reaches past the inner face of the ring it holds, in mm: how far the ring must open to pass it. */
+const TETHER_HOLD = 0.5;
+/** How tall the upright face of a bead is, between its flat top (the cap's: its crest) and its 45 degree slope, in mm. */
+const TETHER_BEAD_FACE = 0.4;
+/** How tall the collar round the cap's top is, in mm: the cap's ring sits under it. */
+const TETHER_COLLAR = 1;
+/** How wide the opening in each ring is, in mm, so its ends are not printed together. */
+const TETHER_SLOT = 1.5;
+/**
+ * The least room a ring keeps round what it turns on, in mm, however tight the lid's gap: with none it would not turn.
+ */
+const TETHER_MIN_PLAY = 0.1;
+/**
+ * How far above the body's rim the cap's mouth is lifted before it tips aside, and how much longer than that reach the
+ * strap is, in mm, for its bends at the rings and so the open cap hangs loose.
+ */
+const TETHER_LIFT = 1;
+const TETHER_SLACK = 3;
 /** How far the lid lies from a pin printed apart, in mm. */
 const PIN_SPACING = 5;
 /** How far apart the lid lies from the body it closes, in mm. */
@@ -400,6 +432,7 @@ export function normalizeLidOptions(value?: Partial<Record<keyof LidOptions, unk
   if (bayonetAxialGap !== null) result.bayonetAxialGap = clamp(bayonetAxialGap, MIN_BAYONET_AXIAL_GAP, MAX_BAYONET_AXIAL_GAP);
   const bayonetDetent = finiteNumber(value?.bayonetDetent);
   if (bayonetDetent !== null) result.bayonetDetent = clamp(bayonetDetent, 0, MAX_BAYONET_DETENT);
+  if (value?.tether === true || value?.tether === "true") result.tether = true;
   return result;
 }
 
@@ -409,6 +442,11 @@ export function normalizeLidOptions(value?: Partial<Record<keyof LidOptions, unk
  */
 export function lidTakesExtras(options: Pick<LidOptions, "type">) {
   return options.type !== "screw" && options.type !== "bayonet";
+}
+
+/** Whether a tether goes with this kind of lid: it keeps a cap that is turned off the body, a screw or a bayonet cap. */
+export function lidTetherFits(options: Pick<LidOptions, "type">) {
+  return options.type === "screw" || options.type === "bayonet";
 }
 
 /**
@@ -877,6 +915,9 @@ export type LidError =
   | { code: "bayonetTooLow"; height: number }
   | { code: "bayonetGapDeep"; gap: number }
   | { code: "bayonetShallow"; depth: number }
+  | { code: "tetherType" | "tetherThinWall" }
+  | { code: "tetherNoNeck"; length: number }
+  | { code: "tetherCapShort"; depth: number }
   | { code: "magnetsThinLid"; thickness: number }
   | { code: "kernel"; message?: string };
 
@@ -1234,6 +1275,107 @@ export function bayonetPlan(sliceAt: LidSlicer, options: LidOptions, top: number
 }
 
 /**
+ * A tether as `tetherPlan` works it out, in the frame where z is up and the body's rim is at `top`: heights, and
+ * distances from the axis of the cap it keeps. The rings are where they sit with the cap closed.
+ */
+export type TetherPlan = {
+  centre: Point;
+  /** How far the body's outer face reaches from the axis below the cap at most, and how near it comes. */
+  radius: number;
+  inner: number;
+  /** How far the bead reaches into the body's wall, from `inner`. */
+  reach: number;
+  /** The room a ring keeps round what it turns on, across the radius and along the axis. */
+  play: number;
+  /** The body's ring: from `neckInner` to `neckOuter` from the axis, from `neckLow` up to `neckHigh`, below the cap. */
+  neckInner: number;
+  neckOuter: number;
+  neckLow: number;
+  neckHigh: number;
+  /** The bead under it: a flat top at `beadTop` out to `beadOuter`, an upright face down to `beadLow`, then a slope. */
+  beadTop: number;
+  beadOuter: number;
+  beadLow: number;
+  /** How far the cap reaches from the axis, and how far into its wall its collar and bead reach (to `capRoot`). */
+  capRadius: number;
+  capRoot: number;
+  /** The collar round the cap's top, from `collarLow` up to the plate's top, standing out as far as the cap's bead. */
+  collarLow: number;
+  capBeadOuter: number;
+  /** The cap's ring: from `capInner` to `capOuter` from the axis, from `capLow` up to `capHigh`, under the collar. */
+  capInner: number;
+  capOuter: number;
+  capLow: number;
+  capHigh: number;
+  /** The cap's bead below its ring: its crest from `crestLow` to `crestHigh`, both flanks at 45 degrees. */
+  crestLow: number;
+  crestHigh: number;
+  /** How long the strap is between the rings, in whole millimetres. */
+  strap: number;
+};
+
+/**
+ * A tether for a screw or bayonet cap (asked in the Layerling User Group on Facebook), as on a drinks bottle, where the
+ * cap stays with the bottle when it is open: one part, two open rings joined by a strap, printed lying flat beside the
+ * cap. A hinge does not do for a cap that turns, so each ring turns freely where it sits, and the cap screws or twists
+ * on and off as it did without one.
+ * - The body's ring goes round it just below the cap's mouth, above a bead round the body: the bead's top is flat, so
+ *   the ring does not slide down off it, and its underside slopes into the wall at 45 degrees, as a lug's does, so the
+ *   body prints upright without support. Above, the thread or the lugs stand in its way, so it stays on the neck; it goes
+ *   on over them, opened a little, or from below over the bead.
+ * - The cap's ring goes round the cap under a collar round its top, which stands out as far as a bead below the ring;
+ *   the bead's flanks slope at 45 degrees both ways, so the ring snaps over it from the mouth, and the cap, turned over
+ *   on its plate, still prints without support. Both reach into the cap's wall, half of it at most, outside the thread
+ *   or the bayonet's slots, and above the cap's mouth: a cap whose rim is too short for them is refused.
+ * Each ring keeps the play round what it turns on (the lid's gap, TETHER_MIN_PLAY at least), and above and below it
+ * (on the cap's bead's slope, 0.7 of it); each bead stands TETHER_HOLD past its ring's inner face. The body must be
+ * round, as wide as at its top, and its wall at least SCREW_MIN_WALL thick, as far down as the bead can reach (with the
+ * most the bead's slope can need, before the body is known), and SCREW_FLOOR of it must stay below.
+ * The strap joins the cap's ring at its lower edge and the body's ring at its upper edge, on the same side. It is as long
+ * as the way between them with the cap lifted until its mouth is TETHER_LIFT above the body's rim, where it can tip
+ * aside, and TETHER_SLACK more, so the open cap hangs beside the neck; with the cap on it bows out in a loop.
+ */
+export function tetherPlan(sliceAt: LidSlicer, options: LidOptions, top: number, bottom: number, rim: number, cap: { from: number; capRadius: number }): TetherPlan | { error: LidError } {
+  const play = Math.max(options.gap, TETHER_MIN_PLAY);
+  const { from, capRadius } = cap;
+  const capRoot = capRadius - Math.min(SCREW_REACH, options.wall / 2);
+  const capInner = capRadius + play;
+  const capBeadOuter = capInner + TETHER_HOLD;
+  const collarLow = top + options.thickness - TETHER_COLLAR;
+  const capHigh = collarLow - play;
+  const capLow = capHigh - TETHER_RING_HEIGHT;
+  // The bead's upper flank is the play below the ring where it meets the ring's inner edge.
+  const crestHigh = capLow - play - TETHER_HOLD;
+  const crestLow = crestHigh - TETHER_BEAD_FACE;
+  const capBeadBottom = crestLow - (capBeadOuter - capRoot);
+  if (capBeadBottom < from - 1e-9) return { error: { code: "tetherCapShort", depth: Math.ceil((top - capBeadBottom) * 10 - 1e-6) / 10 } };
+  const neckHigh = from - play;
+  const neckLow = neckHigh - TETHER_RING_HEIGHT;
+  const beadTop = neckLow - play;
+  const beadLow = beadTop - TETHER_BEAD_FACE;
+  // The bead's slope reaches from its outer face (the play and the hold out of the body) into the wall: at most so far.
+  const lowest = beadLow - (play + TETHER_HOLD + SCREW_ROUND + SCREW_REACH);
+  const noNeck = { error: { code: "tetherNoNeck" as const, length: Math.ceil((from - lowest) * 10 - 1e-6) / 10 } };
+  if (lowest < bottom + SCREW_FLOOR) return noNeck;
+  const body = roundBody(sliceAt, rim, lowest);
+  if (!body) return noNeck;
+  if (body.wall < SCREW_MIN_WALL - 1e-9) return { error: { code: "tetherThinWall" } };
+  const { centre, radius, inner, wall } = body;
+  const neckInner = radius + play;
+  const neckOuter = neckInner + TETHER_RING_WIDTH;
+  const capOuter = capInner + TETHER_RING_WIDTH;
+  // The strap's ends lie in the middle of its thickness, at the rings' outer faces.
+  const lifted = capLow + TETHER_STRAP_THICKNESS / 2 + (top - from) + TETHER_LIFT;
+  const reach = Math.hypot(capOuter - neckOuter, lifted - (neckHigh - TETHER_STRAP_THICKNESS / 2));
+  return {
+    centre, radius, inner, reach: Math.min(SCREW_REACH, wall / 2), play,
+    neckInner, neckOuter, neckLow, neckHigh, beadTop, beadOuter: neckInner + TETHER_HOLD, beadLow,
+    capRadius, capRoot, collarLow, capBeadOuter, capInner, capOuter, capLow, capHigh, crestLow, crestHigh,
+    strap: Math.ceil(reach + TETHER_SLACK - 1e-6),
+  };
+}
+
+/**
  * A closed mesh round the up axis through `centre`, `sides` points round, as a Manifold: an outer face through the
  * heights `outer.rows` at `outer.radius(angle, z)` from the axis, and an inner one through `inner.rows`, joined to it by
  * a ring at the bottom (both start at the same height). At the top a ring as well where both end at the same height (a
@@ -1394,6 +1536,42 @@ function bayonetSolids(runtime: ManifoldToplevel, plan: BayonetPlan, options: Li
   return { lugs, cap: keep(created, runtime.Manifold.union(parts)) };
 }
 
+/**
+ * The pieces of a tether, in the frame where z is up: the bead for the body (to be grouped with it) and the collar and
+ * bead for the cap (to be joined to it), each a profile turned about the axis as a bayonet's cap is, as they sit with the
+ * cap closed; and the tether itself as it is printed, lying flat with its lowest face at 0: the cap's ring, the strap
+ * along x, then the body's ring, the cap's ring's middle at its outer radius in x and y. The strap lies along the bottom
+ * of the rings, its ends reaching in to their inner faces; each ring's opening is on the side away from the strap.
+ * Mounted, the cap's ring keeps that face down and the body's is turned over, so the strap leaves both on the same side,
+ * from the cap's ring's lower edge to the body's ring's upper edge.
+ */
+function tetherSolids(runtime: ManifoldToplevel, plan: TetherPlan, options: LidOptions, top: number, created: { delete?: () => void }[]) {
+  const sides = (radius: number) => Math.min(512, Math.max(96, 4 * Math.ceil((2 * Math.PI * radius) / SCREW_STEP / 4)));
+  const turned = (points: [number, number][], radius: number) => {
+    const profile = keep(created, new runtime.CrossSection([points], "NonZero"));
+    return keep(created, keep(created, profile.revolve(sides(radius), 360)).translate([plan.centre[0], plan.centre[1], 0]));
+  };
+  const root = plan.inner - plan.reach;
+  const bead = turned([[root, plan.beadTop], [root, plan.beadLow - (plan.beadOuter - root)], [plan.beadOuter, plan.beadLow], [plan.beadOuter, plan.beadTop]], plan.beadOuter);
+  const plateTop = top + options.thickness;
+  const slope = plan.capBeadOuter - plan.capRoot;
+  const collar = turned([[plan.capRoot, plan.collarLow], [plan.capBeadOuter, plan.collarLow], [plan.capBeadOuter, plateTop], [plan.capRoot, plateTop]], plan.capBeadOuter);
+  const capBead = turned([[plan.capRoot, plan.crestLow - slope], [plan.capBeadOuter, plan.crestLow], [plan.capBeadOuter, plan.crestHigh], [plan.capRoot, plan.crestHigh + slope]], plan.capBeadOuter);
+  const capMiddle: Point = [plan.capOuter, plan.capOuter];
+  const neckMiddle: Point = [2 * plan.capOuter + plan.strap + plan.neckOuter, plan.capOuter];
+  const disc = (radius: number, [x, y]: Point) => keep(created, keep(created, runtime.CrossSection.circle(radius, sides(radius))).translate([x, y]));
+  const box = (x0: number, x1: number, y: number, width: number) => keep(created, keep(created, runtime.CrossSection.square([x1 - x0, width])).translate([x0, y - width / 2]));
+  const holes = keep(created, runtime.CrossSection.union([disc(plan.capInner, capMiddle), disc(plan.neckInner, neckMiddle)]));
+  const openings = keep(created, runtime.CrossSection.union([
+    box(capMiddle[0] - plan.capOuter - 1, capMiddle[0] - plan.capInner + 1, capMiddle[1], TETHER_SLOT),
+    box(neckMiddle[0] + plan.neckInner - 1, neckMiddle[0] + plan.neckOuter + 1, neckMiddle[1], TETHER_SLOT),
+  ]));
+  const rings = keep(created, keep(created, keep(created, runtime.CrossSection.union([disc(plan.capOuter, capMiddle), disc(plan.neckOuter, neckMiddle)])).subtract(holes)).subtract(openings));
+  const strap = keep(created, box(capMiddle[0], neckMiddle[0], capMiddle[1], TETHER_STRAP_WIDTH).subtract(holes));
+  const part = keep(created, runtime.Manifold.union([keep(created, rings.extrude(TETHER_RING_HEIGHT)), keep(created, strap.extrude(TETHER_STRAP_THICKNESS))]));
+  return { bead, collar, capBead, part };
+}
+
 /** A pocket for a magnet in the body, in the scene's frame: a hole cylinder of this diameter whose bottom lies at `elevation`. */
 export type MagnetPocket = { x: number; z: number; elevation: number; height: number; diameter: number };
 
@@ -1436,13 +1614,21 @@ export type LidScrew = { thread: ManifoldSolid; pitch: number; turns: number; de
  */
 export type LidBayonet = { lugs: ManifoldSolid; count: number; turn: number; height: number; width: number; diameter: number };
 
-export type LidResult = { lid: ManifoldSolid; magnets?: LidMagnets; hinge?: LidHinge; clickBumps?: LidClickBumps; handle?: LidHandleResult; screw?: LidScrew; bayonet?: LidBayonet } | { error: LidError };
+/**
+ * With a tether: the tether itself, lying flat beside the cap, and the bead for the body, standing where it goes (to be
+ * grouped with it), both in the scene's frame; how long its strap is, and how wide its rings are inside, the body's
+ * (`neckRing`) and the cap's (`capRing`), in mm.
+ */
+export type LidTether = { part: ManifoldSolid; bead: ManifoldSolid; strap: number; neckRing: number; capRing: number };
+
+export type LidResult = { lid: ManifoldSolid; magnets?: LidMagnets; hinge?: LidHinge; clickBumps?: LidClickBumps; handle?: LidHandleResult; screw?: LidScrew; bayonet?: LidBayonet; tether?: LidTether } | { error: LidError };
 
 /**
  * The lid for `body` (in the scene's frame, y up), lying turned over beside it: its plate on the workplane at the
  * height of the body's bottom, the lip or rim pointing up. With magnets, also the pockets the body needs, and the posts
  * for the corners where its wall is too thin to hold one (both in the scene's frame, where the body stands). A screw
- * lid comes with the thread for the body, standing where it goes, a bayonet lid with its lugs.
+ * lid comes with the thread for the body, standing where it goes, a bayonet lid with its lugs; with a tether, also its
+ * bead for the body, and the tether lying beside the cap.
  */
 export function lidForSolid(runtime: ManifoldToplevel, body: ManifoldSolid, given: LidOptions): LidResult {
   const created: { delete?: () => void }[] = [];
@@ -1465,6 +1651,8 @@ export function lidForSolid(runtime: ManifoldToplevel, body: ManifoldSolid, give
     if (options.type !== "flat" && options.type !== "screw" && options.type !== "bayonet" && options.depth >= height) return { error: { code: "tooShallow" } };
     // A screw lid holds by its thread alone and a bayonet lid by its lugs, both turned to close.
     if (!lidTakesExtras(options) && (options.magnets || options.hinge || options.clickBumps || options.handle !== "none")) return { error: { code: options.type === "bayonet" ? "bayonetExtras" : "screwExtras" } };
+    // A tether keeps a cap that is turned off the body.
+    if (options.tether && !lidTetherFits(options)) return { error: { code: "tetherType" } };
     if (options.hinge && !LID_HINGE_TYPES.includes(options.type)) return { error: { code: "hingeLidType" } };
     // A flush hinge's slots and a pivot lid's pins go where magnets' pockets would sit, in the corners.
     const style: LidHingeStyle = options.hinge ? options.hingeStyle : "outside";
@@ -1584,6 +1772,16 @@ export function lidForSolid(runtime: ManifoldToplevel, body: ManifoldSolid, give
         parts.push(prism(ring, top - options.depth, top));
       }
       if (options.type !== "plug") parts.push(prism(keep(created, outer.subtract(inner)), top - options.depth, top));
+    }
+    // A tether: the collar and the bead its ring sits between are joined to the cap; the bead for the body comes with it.
+    let tether: { plan: TetherPlan; bead: ManifoldSolid; part: ManifoldSolid } | null = null;
+    const turnedCap = screw?.plan ?? bayonet?.plan;
+    if (options.tether && turnedCap) {
+      const plan = tetherPlan(sliceAt, options, top, box.min[2], rim, turnedCap);
+      if ("error" in plan) return { error: plan.error };
+      const solids = tetherSolids(runtime, plan, options, top, created);
+      parts.push(solids.collar, solids.capBead);
+      tether = { plan, bead: solids.bead, part: solids.part };
     }
     let made = parts.length === 1 ? parts[0] : keep(created, runtime.Manifold.union(parts));
     // A pivot lid is only a plate lying in the opening, the gap all round, its top level with the rim.
@@ -1917,20 +2115,34 @@ export function lidForSolid(runtime: ManifoldToplevel, body: ManifoldSolid, give
       handle = { style: options.handle, notch: notch ? notch.solid.transform(UP_TO_SCENE) : null };
       if (handle.notch) handed.add(handle.notch);
     }
+    // How wide the cap is across: its rim, or with a tether its collar.
+    const capWidth = (capRadius: number) => 2 * (tether ? tether.plan.capBeadOuter : capRadius);
     let screwResult: LidScrew | undefined;
     if (screw) {
       const thread = screw.thread.transform(UP_TO_SCENE);
       handed.add(thread);
-      screwResult = { thread, pitch: screw.plan.pitch, turns: options.threadTurns, depth: screw.plan.depth, diameter: 2 * screw.plan.capRadius };
+      screwResult = { thread, pitch: screw.plan.pitch, turns: options.threadTurns, depth: screw.plan.depth, diameter: capWidth(screw.plan.capRadius) };
     }
     let bayonetResult: LidBayonet | undefined;
     if (bayonet) {
       const lugs = bayonet.lugs.transform(UP_TO_SCENE);
       handed.add(lugs);
       const { plan } = bayonet;
-      bayonetResult = { lugs, count: plan.angles.length, turn: plan.turn, height: plan.height, width: plan.width, diameter: 2 * plan.capRadius };
+      bayonetResult = { lugs, count: plan.angles.length, turn: plan.turn, height: plan.height, width: plan.width, diameter: capWidth(plan.capRadius) };
     }
-    const extras = { ...(hinge ? { hinge } : {}), ...(clickBumps ? { clickBumps } : {}), ...(handle ? { handle } : {}), ...(screwResult ? { screw: screwResult } : {}), ...(bayonetResult ? { bayonet: bayonetResult } : {}) };
+    // The tether lies in a row of its own beside the cap, beyond its back edge, as a printed hinge pin does.
+    let tetherResult: LidTether | undefined;
+    if (tether) {
+      const placedBox = placed.boundingBox();
+      const laid = keep(created, tether.part.translate([placedBox.min[0], placedBox.max[1] + PIN_SPACING, box.min[2]]));
+      const part = laid.transform(UP_TO_SCENE);
+      const bead = tether.bead.transform(UP_TO_SCENE);
+      handed.add(part);
+      handed.add(bead);
+      const { plan } = tether;
+      tetherResult = { part, bead, strap: plan.strap, neckRing: 2 * plan.neckInner, capRing: 2 * plan.capInner };
+    }
+    const extras = { ...(hinge ? { hinge } : {}), ...(clickBumps ? { clickBumps } : {}), ...(handle ? { handle } : {}), ...(screwResult ? { screw: screwResult } : {}), ...(bayonetResult ? { bayonet: bayonetResult } : {}), ...(tetherResult ? { tether: tetherResult } : {}) };
     if (!options.magnets) return { lid, ...extras };
     handed.add(posts);
     // Back in the scene's frame: up is y, and the frame's y is the scene's z turned round.
@@ -2018,6 +2230,14 @@ export function lidErrorMessage(error: LidError) {
       return t("lid.error.bayonetShallow", { depth: error.depth.toLocaleString(numberLocale()) });
     case "bayonetNoRoom":
       return t("lid.error.bayonetNoRoom");
+    case "tetherType":
+      return t("lid.error.tetherType");
+    case "tetherThinWall":
+      return t("lid.error.tetherThinWall", { wall: SCREW_MIN_WALL.toLocaleString(numberLocale()) });
+    case "tetherNoNeck":
+      return t("lid.error.tetherNoNeck", { length: error.length.toLocaleString(numberLocale()) });
+    case "tetherCapShort":
+      return t("lid.error.tetherCapShort", { depth: error.depth.toLocaleString(numberLocale()) });
     default:
       return error.message ? t("lid.error.kernel", { message: error.message }) : t("lid.error.kernelUnknown");
   }
@@ -2057,7 +2277,13 @@ export type LidShapeScrew = { thread: WorkplaneShape; pitch: number; turns: numb
 /** With a bayonet lid, the lugs for the body (one mesh, grouped with it as a screw lid's thread is), the turn and the sizes. */
 export type LidShapeBayonet = { lugs: WorkplaneShape; count: number; turn: number; height: number; width: number; diameter: number };
 
-export type LidShapeResult = { lid: WorkplaneShape; magnets?: LidShapeMagnets; hinge?: LidShapeHinge; clickBumps?: LidShapeClickBumps; handle?: LidShapeHandle; screw?: LidShapeScrew; bayonet?: LidShapeBayonet } | { lid: null; error: string };
+/**
+ * With a tether, the tether (a body of its own beside the cap, as a hinge pin printed apart is) and the bead for the body
+ * (grouped with it, as the thread is), the strap's length and the rings' inner diameters, in mm.
+ */
+export type LidShapeTether = { part: WorkplaneShape; bead: WorkplaneShape; strap: number; neckRing: number; capRing: number };
+
+export type LidShapeResult = { lid: WorkplaneShape; magnets?: LidShapeMagnets; hinge?: LidShapeHinge; clickBumps?: LidShapeClickBumps; handle?: LidShapeHandle; screw?: LidShapeScrew; bayonet?: LidShapeBayonet; tether?: LidShapeTether } | { lid: null; error: string };
 
 /**
  * The lid for the selected bodies: the solids joined and the holes among them cut away, then the lid made for what is
@@ -2097,6 +2323,7 @@ export async function lidForShapes(targets: readonly WorkplaneShape[], given: Li
     if (result.handle?.notch) created.push(result.handle.notch);
     if (result.screw) created.push(result.screw.thread);
     if (result.bayonet) created.push(result.bayonet.lugs);
+    if (result.tether) created.push(result.tether.part, result.tether.bead);
     const source = solids[0];
     const shape = splitShapeFromWorldPositions(source, positionsOf(result.lid.getMesh()), createLocalId(`${source.id}-lid`), t("lid.name", { name: source.name }));
     if (!shape) return { lid: null, error: lidErrorMessage({ code: "empty" }) };
@@ -2149,7 +2376,15 @@ export async function lidForShapes(targets: readonly WorkplaneShape[], given: Li
       const { count, turn, height, width, diameter } = result.bayonet;
       bayonet = { lugs: canonicalizeShape({ ...lugs, hidden: false }), count, turn, height, width, diameter };
     }
-    const extras = { ...(hinge ? { hinge } : {}), ...(clickBumps ? { clickBumps } : {}), ...(handle ? { handle } : {}), ...(screw ? { screw } : {}), ...(bayonet ? { bayonet } : {}) };
+    let tether: LidShapeTether | undefined;
+    if (result.tether) {
+      const part = splitShapeFromWorldPositions(source, positionsOf(result.tether.part.getMesh()), createLocalId(`${source.id}-tether`), t("lid.tetherName", { name: source.name }));
+      const bead = splitShapeFromWorldPositions(source, positionsOf(result.tether.bead.getMesh()), createLocalId(`${source.id}-tether-bead`), t("lid.tetherBeadName", { name: source.name }));
+      if (!part || !bead) return { lid: null, error: lidErrorMessage({ code: "empty" }) };
+      const { strap, neckRing, capRing } = result.tether;
+      tether = { part: canonicalizeShape({ ...part, hidden: false }), bead: canonicalizeShape({ ...bead, hidden: false }), strap, neckRing, capRing };
+    }
+    const extras = { ...(hinge ? { hinge } : {}), ...(clickBumps ? { clickBumps } : {}), ...(handle ? { handle } : {}), ...(screw ? { screw } : {}), ...(bayonet ? { bayonet } : {}), ...(tether ? { tether } : {}) };
     if (!result.magnets) return { lid, ...extras };
     const postName = t("lid.magnetPosts", { name: source.name });
     const meshPost = result.magnets.posts
