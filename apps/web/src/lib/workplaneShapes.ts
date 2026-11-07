@@ -268,6 +268,23 @@ export function shapeExtrudeDeformAt(shape: WorkplaneShape, normalizedHeight: nu
   };
 }
 
+/**
+ * The vertical line a twist turns about, when the body has a rotation pivot of its own (lib/rotationPivot): its
+ * x and z in millimetres from the body's origin, in the body's own frame before any mirror or turn. The pivot is
+ * stored as a fraction of the body's width and depth from its middle, so this is that fraction times the size
+ * (a mirror cancels out: the pivot is stored after it and the mesh is mirrored after the twist). Only x and z
+ * count: the twist axis is the body's own up axis, so the pivot's height does not move it.
+ * Undefined when there is no pivot or no twist, so the twist keeps turning about the middle of the body, as it
+ * always did, and the geometry signatures of such bodies stay as they were. A lean is a plain shift of the
+ * top, which has no centre, so only the twist follows the pivot.
+ */
+export function extrudeTwistPivot(shape: WorkplaneShape, width = shapeWidth(shape), depth = shapeDepth(shape)): { x: number; z: number } | undefined {
+  const stored = shape.rotationPivot;
+  if (!stored || stored.length < 3 || !stored.every(Number.isFinite)) return undefined;
+  if (!shapeSupportsExtrudeDeform(shape.kind) || Math.abs(shape.extrudeTwist ?? 0) <= 1e-6) return undefined;
+  return { x: stored[0] * Math.max(1e-6, width), z: stored[2] * Math.max(1e-6, depth) };
+}
+
 const THREE_MATH_DEG2RAD = Math.PI / 180;
 const EXTRUDE_TWIST_MAX = 720;
 const EXTRUDE_OFFSET_MAX = 80;
