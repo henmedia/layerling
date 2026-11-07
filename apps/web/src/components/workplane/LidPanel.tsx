@@ -51,6 +51,7 @@ import {
   MIN_LID_WALL,
   MIN_MAGNET_DIAMETER,
   MIN_MAGNET_HEIGHT,
+  SCREW_MIN_WALL,
   bayonetTurn,
   flipTopThickness,
   hingeKnuckleRadius,
@@ -81,7 +82,7 @@ import type { WorkplaneWorkspaceSettings } from "@/types/layerling";
  * notch in the body (#1230). A screw lid (Discussion #1393) is a cap with a thread inside its rim for a round body, which
  * gets the matching thread on the outside of its top; it holds by that alone. Its thread can be a standard bottle's or
  * jar's instead of its own: the cap then fits that bottle, and the body gets the neck's thread only if it is that neck,
- * which the panel says how to make. A bayonet lid (Discussion #1424) is a cap
+ * which the panel says how to make. A screw-in lid (Discussion #1432) is the other way round: a plate with a threaded plug below it that screws into the same thread inside the body's opening. A bayonet lid (Discussion #1424) is a cap
  * for a round body too, with an L-shaped slot inside its rim for each of the lugs on the outside of the body's top: pushed
  * down and turned, it locks, as far as its lugs give or as far as set, up to a quarter turn. Either can have a tether that keeps the cap with the body when it is off (asked in the
  * Layerling User Group on Facebook), or be a flip-top: a flap in its plate opens a round opening to pour from.
@@ -132,6 +133,7 @@ export function LidPanel({
   // off, with one line saying why.
   const extras = lidTakesExtras(settings);
   const screw = settings.type === "screw";
+  const screwIn = settings.type === "screwIn";
   const bayonet = settings.type === "bayonet";
   const thread = lidThread(settings);
   // A standard's thread sets its own pitch and turns: their sliders give way to what the standard is and what it takes.
@@ -254,8 +256,8 @@ export function LidPanel({
           onChange={(value) => onChange({ gap: value })}
         />
         {fromPrinterPlay("lid.gap", settings.gap, printerPlay) ? <span className="shell-openings-summary">{t("printerPlay.fromFitTest")}</span> : null}
-        {/* A screw lid's rim reaches down as far as its own thread goes: the pitch times the turns. */}
-        {screw && !standard ? (<>
+        {/* A screw lid's rim, and a screw-in lid's plug, reach down as far as their thread goes: the pitch times the turns. */}
+        {(screw && !standard) || screwIn ? (<>
           <EdgeModifierSlider
             label={t("lid.threadPitch")}
             value={settings.threadPitch}
@@ -341,7 +343,7 @@ export function LidPanel({
           />
         )}
         <EdgeModifierSlider
-          label={t(settings.type === "cap" || screw || bayonet ? "lid.wallCap" : settings.type === "both" ? "lid.wallBoth" : "lid.wall")}
+          label={t(screwIn ? "lid.wallPlug" : settings.type === "cap" || screw || bayonet ? "lid.wallCap" : settings.type === "both" ? "lid.wallBoth" : "lid.wall")}
           value={settings.wall}
           min={MIN_LID_WALL}
           max={MAX_LID_WALL}
@@ -358,6 +360,12 @@ export function LidPanel({
           })}</span>
         ) : screw ? (
           <span className="shell-openings-summary">{t("lid.screwHint", { depth: millimetres(Math.round(thread.depth * 100) / 100), height: millimetres(Math.round(thread.height * 10) / 10) })}</span>
+        ) : null}
+        {/* The plug's wall is SCREW_MIN_WALL at least, whatever the slider says. */}
+        {screwIn ? (
+          <span className="shell-openings-summary">
+            {t("lid.screwInHint", { depth: millimetres(Math.round(thread.depth * 100) / 100), height: millimetres(Math.round(thread.height * 10) / 10), wall: millimetres(Math.max(settings.wall, SCREW_MIN_WALL)) })}
+          </span>
         ) : null}
         {/* The rib behind each locked lug, which it clicks past; then how it goes on, with the turn set or its count's. */}
         {bayonet ? (<>
