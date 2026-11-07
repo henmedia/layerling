@@ -1,12 +1,14 @@
 [
   {
     "title": {
-      "de": "Neue Entwürfe mit Winkellineal im Nullpunkt",
-      "en": "New designs with a framing square at the origin"
+      "de": "Sicherungen in einen eigenen Ordner",
+      "en": "Backups into a folder of your own",
+      "da": "Sikkerhedskopier ind i en mappe af eget valg"
     },
     "body": {
-      "de": "Wer das Winkellineal fast immer braucht, setzt in den Einstellungen unter „Maße“ das Häkchen bei „Neue Entwürfe mit Winkellineal im Nullpunkt beginnen“. Dann liegt in jedem neuen Entwurf dieses Browsers schon eines im Nullpunkt. Vorhandene Entwürfe bleiben, wie sie sind.",
-      "en": "If you use the framing square nearly all the time, tick \"Start new designs with a framing square at the origin\" under Measurement in the settings. Every new design in this browser then starts with one at the origin. Designs you already have stay as they are."
+      "de": "In Chrome und Edge fragen „Alle sichern“, „Sichern“ und „Eigene Formen sichern“ jetzt, wohin die ZIP-Datei soll, und merken sich den Ordner für das nächste Mal – etwa einen Ordner auf deinem Cloud-Laufwerk statt der Downloads. Andere Browser laden die Sicherung wie bisher herunter.",
+      "en": "In Chrome and Edge, \"Back up all\", \"Back up\" and \"Back up custom shapes\" now ask where the ZIP file should go, and remember the folder for next time - a folder on your cloud drive, say, instead of Downloads. Other browsers download the backup as before.",
+      "da": "I Chrome og Edge spørger „Sikkerhedskopiér alle“, „Sikkerhedskopiér“ og „Sikkerhedskopiér egne former“ nu, hvor ZIP-filen skal ligge, og husker mappen til næste gang, for eksempel en mappe på dit clouddrev i stedet for Downloads. Andre browsere henter sikkerhedskopien som før."
     }
   }
 ]
