@@ -2100,6 +2100,40 @@ export function slideWall(outline: readonly (readonly Point[])[], hull: readonly
 }
 
 /**
+ * How far a box stands turned on the plate about the up axis, in degrees from -45 to 45 (Discussion #1443): the turn of
+ * the smallest rectangle round its opening seen from above, which lies along a box's straight walls, rounded corners or
+ * not. A slide-in lid is worked out with the box turned back square by it, so a box set down at an angle takes one as a
+ * square one does, and its walls facing most nearly the front, back, right and left are the sides to slide in through.
+ * 0 for a box standing square, and for an opening of fewer than three corners.
+ */
+export function slideBoxTurn(opening: readonly (readonly Point[])[]) {
+  const points = opening.flat();
+  if (points.length < 3) return 0;
+  const hull = convexHull(points);
+  let best = { area: Infinity, angle: 0 };
+  hull.forEach((start, index) => {
+    const end = hull[(index + 1) % hull.length];
+    if (Math.hypot(end[0] - start[0], end[1] - start[1]) < 1e-9) return;
+    const angle = Math.atan2(end[1] - start[1], end[0] - start[0]);
+    const along = hull.map(([x, y]) => x * Math.cos(angle) + y * Math.sin(angle));
+    const across = hull.map(([x, y]) => -x * Math.sin(angle) + y * Math.cos(angle));
+    const area = (Math.max(...along) - Math.min(...along)) * (Math.max(...across) - Math.min(...across));
+    if (area < best.area - 1e-9) best = { area, angle };
+  });
+  // A box's walls are a quarter turn apart: the turn to the nearest of them, either way.
+  const quarter = ((((best.angle * 180) / Math.PI) % 90) + 90) % 90;
+  const turn = quarter > 45 ? quarter - 90 : quarter;
+  return Math.abs(turn) < 1e-6 ? 0 : turn;
+}
+
+/** `polygons` turned `degrees` anticlockwise about the origin by any angle, where `turnedPolygons` takes quarter turns exactly. */
+function turnedByAngle(polygons: readonly (readonly Point[])[], degrees: number): Point[][] {
+  const cos = Math.cos((degrees * Math.PI) / 180);
+  const sin = Math.sin((degrees * Math.PI) / 180);
+  return polygons.map((polygon) => polygon.map(([x, y]): Point => [x * cos - y * sin, x * sin + y * cos]));
+}
+
+/**
  * A slide-in lid for a box (Discussion #1443), like a wooden pencil box's, worked out with the wall it slides in through
  * at the front (the least y; `sliceAt` gives the body turned so). The lid is a plate in the opening, its top flush with
  * the rim, the gap from the walls; along its sides and back its lower part reaches on into the walls as a tongue, which
@@ -2901,18 +2935,20 @@ export function lidForSolid(runtime: ManifoldToplevel, body: ManifoldSolid, give
       parts.push(solids.cap);
       bayonet = { plan, lugs: solids.lugs };
     } else if (options.type === "slide") {
-      // Worked out with the wall it slides in through at the front, then turned back: the side's turn to the back, and
-      // half a turn more.
+      // Worked out with the box turned back square, if it stands turned on the plate (`slideBoxTurn`), and the wall it
+      // slides in through at the front, then turned back: the side's turn to the back and half a turn more, and the box's.
+      const boxTurn = slideBoxTurn(sliceAt(rim).opening);
       const slideTurn = (HINGE_SIDE_TURN[options.slideSide] + 180) % 360;
+      const square = (polygons: readonly (readonly Point[])[]) => turnedPolygons(boxTurn ? turnedByAngle(polygons, -boxTurn) : polygons, slideTurn);
       const turnedSlice: LidSlicer = (z) => {
         const level = sliceAt(z);
-        return { outline: turnedPolygons(level.outline, slideTurn), opening: turnedPolygons(level.opening, slideTurn) };
+        return { outline: square(level.outline), opening: square(level.opening) };
       };
       const plan = slidePlan(turnedSlice, options, top, rim);
       if ("error" in plan) return { error: plan.error };
       const solids = slideSolids(runtime, plan, options, top, created);
       if ("error" in solids) return { error: solids.error };
-      const back = (solid: ManifoldSolid) => (slideTurn ? keep(created, solid.rotate([0, 0, -slideTurn])) : solid);
+      const back = (solid: ManifoldSolid) => (slideTurn || boxTurn ? keep(created, solid.rotate([0, 0, boxTurn - slideTurn])) : solid);
       parts.push(back(solids.lid));
       slide = { plan, cuts: back(solids.cuts), bumps: solids.bumps };
     } else if (options.type === "flat") {
