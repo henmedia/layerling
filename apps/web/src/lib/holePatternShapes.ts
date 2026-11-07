@@ -3,11 +3,13 @@ import { faceFrameWorkplane } from "@/lib/carryOntoFace";
 import {
   faceOutlineFromTriangles,
   HOLE_PATTERN_MIN_SIZE,
+  holeFootprintPolygon,
   holeFootprintSize,
   holeHasHead,
   holeHeadDepth,
   holeHeadSize,
   holePatternCenters,
+  holeTurn,
   roundWallCenters,
   type FaceOutline,
   type HolePatternSettings,
@@ -366,6 +368,23 @@ const FORM_KIND: Record<HolePatternSettings["form"], ShapeKind> = {
   custom: "box",
 };
 
+/**
+ * A hole's frame turned round its normal by `turn` radians from x towards z, as `holeTurn` gives it: a turned rectangle
+ * or slot stands in it, its width along the new x. The turn stays in the face, so the frame keeps its handedness.
+ */
+function turnedWorkplane(workplane: PlacementWorkplane, turn: number): PlacementWorkplane {
+  if (turn === 0) return workplane;
+  const x = new THREE.Vector3(workplane.xAxis.x, workplane.xAxis.y, workplane.xAxis.z);
+  const z = new THREE.Vector3(workplane.zAxis.x, workplane.zAxis.y, workplane.zAxis.z);
+  const cos = Math.cos(turn);
+  const sin = Math.sin(turn);
+  return {
+    ...workplane,
+    xAxis: vec(x.clone().multiplyScalar(cos).addScaledVector(z, sin)),
+    zAxis: vec(z.clone().multiplyScalar(cos).addScaledVector(x, -sin)),
+  };
+}
+
 /** The depth the holes actually get: the body's thickness plus a skin's worth, or what was asked for. */
 export function holeDepth(face: Pick<PerforableFace, "thickness">, settings: Pick<HolePatternSettings, "depth">) {
   return settings.depth === null ? face.thickness + HOLE_OVERSHOOT : settings.depth;
@@ -498,6 +517,8 @@ export function holePatternShapes(
   const origin = new THREE.Vector3(workplane.origin.x, workplane.origin.y, workplane.origin.z);
   const xAxis = new THREE.Vector3(workplane.xAxis.x, workplane.xAxis.y, workplane.xAxis.z);
   const zAxis = new THREE.Vector3(workplane.zAxis.x, workplane.zAxis.y, workplane.zAxis.z);
+  // A turned rectangle or slot stands turned in the face as its outline was when the holes were fitted.
+  const holeFrame = turnedWorkplane(workplane, holeTurn(settings));
 
   const holes = centers.map((center, index) => {
     const top = origin.clone().addScaledVector(xAxis, center.u).addScaledVector(zAxis, center.v).addScaledVector(normal, HOLE_OVERSHOOT);
@@ -514,7 +535,7 @@ export function holePatternShapes(
       },
     );
     const sized = { ...made, width: size.width, depth: size.height, height, size: Math.max(size.width, size.height) };
-    const placed = { ...sized, ...placementPatchForNewShape(sized, workplane, base), ...(previewIdPrefix ? { id: `${previewIdPrefix}-${index}` } : {}) };
+    const placed = { ...sized, ...placementPatchForNewShape(sized, holeFrame, base), ...(previewIdPrefix ? { id: `${previewIdPrefix}-${index}` } : {}) };
     return canonicalizeShape(withHoleMode(placed, true));
   });
   return { holes, tooMany: false, ...(ring ? { ring } : {}) };
@@ -533,7 +554,13 @@ function roundWallHoleShapes(
   custom?: WorkplaneShape | null,
 ): HolePatternPlan {
   const { round } = face;
-  const result = roundWallCenters(round.outline, settings);
+  // The wall's flat frame runs round it and along the axis; seen from outside that turns the other way to a flat
+  // face's frame (and to a hole's own frame there, whose x points back round the wall). So on the outside a turned
+  // hole is fitted turned the other way round, and both the fit and the hole come out turned as seen looking at the wall.
+  const fitSettings: HolePatternSettings = round.outside && holeTurn(settings) !== 0
+    ? { ...settings, holeAngle: -(settings.holeAngle ?? 0) }
+    : settings;
+  const result = roundWallCenters(round.outline, fitSettings);
   const wall = { diameter: round.radius * 2, closed: round.outline.closed, ...(result.columns !== undefined ? { columns: result.columns, spacing: result.spacing } : {}) };
   if (settings.form === "custom" && !custom) return { holes: [], tooMany: false, wall };
   if (result.tooMany || result.centers.length === 0) return { holes: [], tooMany: result.tooMany, wall };
@@ -570,7 +597,11 @@ function roundWallHoleShapes(
   if (!asset) return { holes: [], tooMany: false, wall };
   const footprint = holeFootprintSize(settings);
   const width = headType ? holeHeadSize(settings) : footprint.width;
-  const half = width / 2;
+  // How far the hole reaches round the wall from its middle: half its width, or more for a turned hole.
+  const turn = holeTurn(settings);
+  const half = turn !== 0 && !headType
+    ? Math.max(...holeFootprintPolygon(fitSettings).map((point) => Math.abs(point.u)))
+    : width / 2;
   // The open end stands just clear of the face: outside a cylinder in its middle, inside a bore at its edges as well.
   const top = inward ? radius + HOLE_OVERSHOOT : clearOfSurface(radius - HOLE_OVERSHOOT, half, true);
   const topOver = Math.abs(top - radius);
@@ -601,7 +632,7 @@ function roundWallHoleShapes(
     );
     const sized = { ...made, width: size.width, depth: size.height, height, size: Math.max(size.width, size.height) };
     // The hole stands on its far end and reaches up to the open end, along the frame's normal.
-    const placed = { ...sized, ...placementPatchForNewShape(sized, place.workplane, place.at(end)), ...(previewIdPrefix ? { id: `${previewIdPrefix}-${index}` } : {}) };
+    const placed = { ...sized, ...placementPatchForNewShape(sized, turnedWorkplane(place.workplane, turn), place.at(end)), ...(previewIdPrefix ? { id: `${previewIdPrefix}-${index}` } : {}) };
     return canonicalizeShape(withHoleMode(placed, true));
   });
   return { holes, tooMany: false, wall };

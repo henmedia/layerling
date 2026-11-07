@@ -129,6 +129,7 @@ summary: 选择形状、在对象列表中查找它们、对齐、镜像、旋�
 2. 在窗口中设置孔的外观和排布：
    - **{{ui:holePattern.form}}：** {{ui:holePattern.form.round}}、{{ui:holePattern.form.square}}、{{ui:holePattern.form.rectangle}}、{{ui:holePattern.form.hexagon}} 或 {{ui:holePattern.form.slot}}。
    - **大小：** 圆孔用 {{ui:holePattern.size.diameter}}，方孔用 {{ui:holePattern.size.side}}，矩形和槽孔用 {{ui:holePattern.size.width}} 与 {{ui:holePattern.size.height}}。六边形的大小是 {{ui:holePattern.size.corners}}。
+   - **{{ui:holePattern.holeAngle}}：** 仅限矩形和槽孔：把每个孔在面内转过这么多度，面向该面看为逆时针，范围 -90 到 90。行保持笔直；如果转过的孔彼此太近（斜向也算），layerling 会加大间距和行距，让孔之间留有壁。
    - **{{ui:holePattern.form.custom}}：** 用场景中的一个形状代替孔来重复：铆钉、凸点，或花纹板上的花纹。在 {{ui:holePattern.customShape}} 中选择它。它的宽度和深度就是它占用的位置；它按原样竖立在面上，不带自身的旋转。实体会放到面上并与之合并，孔则按其高度切入。形状本身保持原位。
    - **{{ui:holePattern.holeType}}：** 仅限圆孔。{{ui:holePattern.holeType.plain}} 是直孔，{{ui:shape.counterbore}} 为圆柱头螺钉的头部加一个沉台，{{ui:shape.countersink}} 为沉头螺钉加一个 90° 锥面。此时大小就是 {{ui:prop.screwHoleShaft}}；{{ui:prop.screwHoleHead}} 以及沉台的 {{ui:prop.screwHoleHeadDepth}} 设定头部。{{ui:prop.screwHoleSize}} 会按公制螺钉填好所有值。
    - **{{ui:holePattern.spacing}}：** 从一个孔的中心到下一个孔中心的距离。如果它小于孔所允许的最小值，layerling 会将其提高到最小可能值，以便孔之间保留壁。对于矩形和槽孔，它沿一行从左到右计算。

@@ -12,6 +12,7 @@ import {
   HOLE_PATTERN_MAX_MARGIN,
   HOLE_PATTERN_MAX_PERIMETER_COUNT,
   HOLE_PATTERN_MAX_SIZE,
+  HOLE_PATTERN_MAX_HOLE_ANGLE,
   HOLE_PATTERN_MAX_SPACING,
   HOLE_PATTERN_MIN_SIZE,
   HOLE_PATTERN_MIN_PERIMETER_COUNT,
@@ -250,6 +251,20 @@ export function HolePatternPanel({
           workspace={workspace}
           length
           onChange={(value) => onChange({ height: value })}
+        />
+      ) : null}
+      {/* A rectangle or slot can lie at any angle in the face, counter-clockwise as seen looking at it; 0 lays its width along x. */}
+      {twoSizes ? (
+        <EdgeModifierSlider
+          label={t("holePattern.holeAngle")}
+          value={settings.holeAngle ?? 0}
+          min={-HOLE_PATTERN_MAX_HOLE_ANGLE}
+          max={HOLE_PATTERN_MAX_HOLE_ANGLE}
+          step={1}
+          decimals={1}
+          unit="°"
+          workspace={workspace}
+          onChange={(value) => onChange({ holeAngle: value })}
         />
       ) : null}
       {byCount ? null : (

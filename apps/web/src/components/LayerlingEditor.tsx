@@ -13369,6 +13369,7 @@ export function LayerlingEditor({
           arrangement,
           size,
           height: mcpNumber(params.height, size),
+          holeAngle: mcpOptionalNumber(params.holeAngle),
           spacing: mcpNumber(params.spacing, DEFAULT_HOLE_PATTERN.spacing),
           rowSpacing: mcpOptionalNumber(params.rowSpacing),
           margin: mcpNumber(params.margin, DEFAULT_HOLE_PATTERN.margin),

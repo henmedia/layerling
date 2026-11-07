@@ -4580,6 +4580,7 @@ export const MESSAGES_SL: Partial<Record<MessageKey, string>> = {
   "holePattern.size.corners": "Premer čez oglišča (Ø)",
   "holePattern.size.width": "Širina",
   "holePattern.size.height": "Višina",
+  "holePattern.holeAngle": "Kot lukenj",
   "holePattern.spacing": "Razmik od središča do središča",
   "holePattern.rowSpacing": "Razmik med vrstami",
   "holePattern.arrangement": "Razporeditev",
