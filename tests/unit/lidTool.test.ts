@@ -1,11 +1,11 @@
 import { describe, expect, it } from "vitest";
-import { HINGE_PIN_GRIP, LID_DEFAULTS, LID_TYPES, MAX_CLICK_BUMP_HEIGHT, MAX_HINGE_PIN, MAX_HINGE_PIN_PLAY, MAX_LID_GAP, MAX_LID_THICKNESS, MAX_LID_THREAD_PITCH, MAX_LID_THREAD_TURNS, MAX_MAGNET_GAP, MIN_CLICK_BUMP_HEIGHT, MIN_HINGE_PIN, MIN_HINGE_PIN_PLAY, MIN_LID_THREAD_PITCH, MIN_LID_THREAD_TURNS, MIN_LID_WALL, MIN_MAGNET_DIAMETER, SCREW_MIN_WALL, clickBumpPlaces, cornerKnucklePlan, endPlugPlan, hingeKnuckleRadius, hingePinHoles, lidClickBumpsFit, lidHandleFits, lidTakesExtras, lidThicknessForMagnets, lidThread, magnetPlaces, magnetPocketDepth, normalizeLidOptions, roundOutline, screwPlan } from "@/lib/lidTool";
+import { BAYONET_MIN_WALL, HINGE_PIN_GRIP, LID_DEFAULTS, LID_TYPES, MAX_BAYONET_AXIAL_GAP, MAX_BAYONET_DEPTH, MAX_BAYONET_DETENT, MAX_BAYONET_LUGS, MIN_BAYONET_AXIAL_GAP, MIN_BAYONET_DEPTH, MIN_BAYONET_LUGS, MAX_CLICK_BUMP_HEIGHT, MAX_HINGE_PIN, MAX_HINGE_PIN_PLAY, MAX_LID_GAP, MAX_LID_THICKNESS, MAX_LID_THREAD_PITCH, MAX_LID_THREAD_TURNS, MAX_MAGNET_GAP, MIN_CLICK_BUMP_HEIGHT, MIN_HINGE_PIN, MIN_HINGE_PIN_PLAY, MIN_LID_THREAD_PITCH, MIN_LID_THREAD_TURNS, MIN_LID_WALL, MIN_MAGNET_DIAMETER, SCREW_MIN_WALL, bayonetLugSize, bayonetPlan, bayonetTurn, clickBumpPlaces, cornerKnucklePlan, endPlugPlan, hingeKnuckleRadius, hingePinHoles, lidClickBumpsFit, lidHandleFits, lidTakesExtras, lidThicknessForMagnets, lidThread, magnetPlaces, magnetPocketDepth, normalizeLidOptions, roundOutline, screwPlan } from "@/lib/lidTool";
 import { threadSize } from "@/lib/vase/vase-geometry.mjs";
 
 describe("lid options (#1009)", () => {
   it("starts from a push-in lid with a normal fit", () => {
     expect(normalizeLidOptions()).toEqual(LID_DEFAULTS);
-    expect(LID_DEFAULTS).toEqual({ type: "plug", thickness: 2, gap: 0.2, depth: 4, wall: 1.6, magnets: false, magnetDiameter: 6, magnetHeight: 2, magnetGap: 0.1, hinge: false, hingePin: 1.75, hingeGap: 0.3, hingePinPlay: 0.2, hingeKnuckles: 0, hingePrintPin: false, hingeSide: "back", hingeTeardrop: true, hingeStyle: "outside", hingeEndPlugs: false, clickBumps: false, clickBumpHeight: 0.4, handle: "none", threadPitch: 3, threadTurns: 2 });
+    expect(LID_DEFAULTS).toEqual({ type: "plug", thickness: 2, gap: 0.2, depth: 4, wall: 1.6, magnets: false, magnetDiameter: 6, magnetHeight: 2, magnetGap: 0.1, hinge: false, hingePin: 1.75, hingeGap: 0.3, hingePinPlay: 0.2, hingeKnuckles: 0, hingePrintPin: false, hingeSide: "back", hingeTeardrop: true, hingeStyle: "outside", hingeEndPlugs: false, clickBumps: false, clickBumpHeight: 0.4, handle: "none", threadPitch: 3, threadTurns: 2, bayonetLugs: 3, bayonetDepth: 8, bayonetAxialGap: 0.3, bayonetDetent: 0.3 });
   });
 
   it("takes the kind in any case and keeps the default for an unknown one", () => {
@@ -313,7 +313,7 @@ function polygonRound(radius: number, sides = 192, cx = 0, cy = 0, hole = false)
 
 describe("a screw lid (Discussion #1393)", () => {
   it("is a fifth kind of lid, taken in any case, and the push-in lid stays the one to begin with", () => {
-    expect(LID_TYPES).toEqual(["plug", "cap", "both", "flat", "screw"]);
+    expect(LID_TYPES).toEqual(["plug", "cap", "both", "flat", "screw", "bayonet"]);
     expect(normalizeLidOptions({ type: " Screw " }).type).toBe("screw");
     expect(normalizeLidOptions().type).toBe("plug");
   });
@@ -431,5 +431,130 @@ describe("where a screw lid's thread goes (Discussion #1393)", () => {
     expect("error" in screwPlan(pot(), options({ gap: 0.45 }), 50, 0, 49.7)).toBe(false);
     expect(screwPlan(pot(), options({ gap: 0.5 }), 50, 0, 49.7)).toEqual({ error: { code: "screwGapDeep", gap: 0.45 } });
     expect(screwPlan(pot(), options({ gap: 0.35, threadPitch: 2 }), 50, 0, 49.7)).toEqual({ error: { code: "screwGapDeep", gap: 0.3 } });
+  });
+});
+
+describe("a bayonet lid (Discussion #1424)", () => {
+  it("is a sixth kind of lid, taken in any case, and the push-in lid stays the one to begin with", () => {
+    expect(LID_TYPES.at(-1)).toBe("bayonet");
+    expect(normalizeLidOptions({ type: " Bayonet " }).type).toBe("bayonet");
+    expect(normalizeLidOptions().type).toBe("plug");
+  });
+
+  it("has three lugs, a rim 8 mm deep, 0.3 mm of room above the ledge and a detent of 0.3 mm unless told otherwise, each held in its range", () => {
+    expect([LID_DEFAULTS.bayonetLugs, LID_DEFAULTS.bayonetDepth, LID_DEFAULTS.bayonetAxialGap, LID_DEFAULTS.bayonetDetent]).toEqual([3, 8, 0.3, 0.3]);
+    expect(normalizeLidOptions({ bayonetLugs: "4", bayonetDepth: 12.5, bayonetAxialGap: "0.25", bayonetDetent: 0 })).toMatchObject({ bayonetLugs: 4, bayonetDepth: 12.5, bayonetAxialGap: 0.25, bayonetDetent: 0 });
+    // Whole lugs only.
+    expect(normalizeLidOptions({ bayonetLugs: 2.6 }).bayonetLugs).toBe(3);
+    expect(normalizeLidOptions({ bayonetLugs: 1, bayonetDepth: 0, bayonetAxialGap: 0, bayonetDetent: -1 })).toMatchObject({ bayonetLugs: MIN_BAYONET_LUGS, bayonetDepth: MIN_BAYONET_DEPTH, bayonetAxialGap: MIN_BAYONET_AXIAL_GAP, bayonetDetent: 0 });
+    expect(normalizeLidOptions({ bayonetLugs: 9, bayonetDepth: 80, bayonetAxialGap: 3, bayonetDetent: 2 })).toMatchObject({ bayonetLugs: MAX_BAYONET_LUGS, bayonetDepth: MAX_BAYONET_DEPTH, bayonetAxialGap: MAX_BAYONET_AXIAL_GAP, bayonetDetent: MAX_BAYONET_DETENT });
+    expect([MIN_BAYONET_LUGS, MAX_BAYONET_LUGS, MIN_BAYONET_DEPTH, MAX_BAYONET_DEPTH, MIN_BAYONET_AXIAL_GAP, MAX_BAYONET_AXIAL_GAP, MAX_BAYONET_DETENT]).toEqual([2, 4, 3, 30, 0.05, 1, 0.5]);
+    expect(normalizeLidOptions({ bayonetLugs: "x", bayonetDetent: null })).toMatchObject({ bayonetLugs: 3, bayonetDetent: 0.3 });
+  });
+
+  it("turns a third of the way to the next lug, 45 degrees at most, and sizes its lugs from the body's diameter", () => {
+    expect([2, 3, 4].map(bayonetTurn)).toEqual([45, 40, 30]);
+    // A fortieth of the diameter out of the wall, 1.2 to 2.5 mm, and 0.15 of it wide, 6 to 20 mm.
+    expect(bayonetLugSize(60)).toEqual({ height: 1.5, width: expect.closeTo(9, 12) });
+    expect(bayonetLugSize(100)).toEqual({ height: 2.5, width: expect.closeTo(15, 12) });
+    expect(bayonetLugSize(30)).toEqual({ height: 1.2, width: 6 });
+    expect(bayonetLugSize(200)).toEqual({ height: 2.5, width: 20 });
+    expect(bayonetLugSize(82)).toEqual({ height: 2.1, width: expect.closeTo(12.3, 12) });
+  });
+
+  it("takes no magnets, hinge, click bumps or handle", () => {
+    const bayonet = normalizeLidOptions({ type: "bayonet" });
+    expect(lidTakesExtras(bayonet)).toBe(false);
+    expect(lidClickBumpsFit(bayonet)).toBe(false);
+    expect(lidHandleFits(bayonet)).toBe(false);
+  });
+});
+
+describe("where a bayonet lid's lugs and slots go (Discussion #1424)", () => {
+  const pot = (shape?: (z: number) => { outer: [number, number][][]; opening: [number, number][][] }, radius = 30, wall = 2) => (z: number) => {
+    const level = shape ? shape(z) : { outer: [polygonRound(radius)], opening: [polygonRound(radius - wall, 192, 0, 0, true)] };
+    return { outline: level.outer, opening: level.opening };
+  };
+  const options = (patch: Record<string, unknown> = {}) => normalizeLidOptions({ type: "bayonet", ...patch });
+
+  it("puts three lugs 1.5 mm out of a 60 mm pot's wall, the first at the front, under the rim, with the ledge's slope the axial gap under theirs", () => {
+    const plan = bayonetPlan(pot(), options(), 50, 0, 49.7);
+    if ("error" in plan) throw new Error(plan.error.code);
+    expect(plan.centre[0]).toBeCloseTo(0, 9);
+    expect(plan.radius).toBeCloseTo(30, 9);
+    expect(plan.inner).toBeCloseTo(30 * Math.cos(Math.PI / 192), 9);
+    expect(plan.reach).toBe(0.8);
+    // The front is the least y: -90 degrees, the others evenly round.
+    expect(plan.angles).toEqual([-90, 30, 150]);
+    expect(plan.turn).toBe(40);
+    expect([plan.height, plan.width]).toEqual([1.5, expect.closeTo(9, 9)]);
+    // 0.2 under the rim, an outer face 1.5 tall; the cap 8 down, its rim the gap and the wall outside the lugs.
+    expect(plan.lugTop).toBeCloseTo(49.8, 9);
+    expect(plan.lugLow).toBeCloseTo(48.3, 9);
+    expect(plan.from).toBe(42);
+    expect(plan.capRadius).toBeCloseTo(30 + 1.5 + 0.2 + 1.6, 9);
+    // A lug 9 mm wide on a face 31.5 from the axis: 16.4 degrees; its slot 0.5 mm wider each side where the cap's ring
+    // begins, 30.2 from the axis; the stop the gap past the lug there.
+    expect(2 * plan.half).toBeCloseTo((9 / 31.5) * (180 / Math.PI), 9);
+    expect(plan.slotHalf - plan.half).toBeCloseTo((0.5 / 30.2) * (180 / Math.PI), 9);
+    expect(plan.stop).toBeCloseTo((0.2 / 30.2) * (180 / Math.PI), 9);
+  });
+
+  it("puts the rib behind a locked lug so that the lug's outer corner keeps the gap from it, and the rib stands the detent past the gap", () => {
+    for (const [gap, detent] of [[0.2, 0.3], [0.3, 0.5], [0.1, 0.1]]) {
+      const plan = bayonetPlan(pot(), options({ gap, bayonetDetent: detent }), 50, 0, 49.7);
+      if ("error" in plan) throw new Error(plan.error.code);
+      const rib = plan.rib!;
+      const outer = plan.radius + plan.height;
+      // The round's nearest point to the axis is the detent inside the lugs' outer faces.
+      expect(rib.middle - 3).toBeCloseTo(outer - detent, 9);
+      const corner = (((plan.angles[0] - plan.half) * Math.PI) / 180);
+      const middle = (((plan.angles[0] - plan.half - rib.behind) * Math.PI) / 180);
+      const distance = Math.hypot(outer * Math.cos(corner) - rib.middle * Math.cos(middle), outer * Math.sin(corner) - rib.middle * Math.sin(middle));
+      expect(distance - 3, `gap ${gap}, detent ${detent}`).toBeCloseTo(gap, 9);
+    }
+    const none = bayonetPlan(pot(), options({ bayonetDetent: 0 }), 50, 0, 49.7);
+    if ("error" in none) throw new Error(none.error.code);
+    expect(none.rib).toBeNull();
+  });
+
+  it("narrows the lugs where the turn leaves less room, and refuses a body too small for so many", () => {
+    // 30 mm across: 6 mm lugs where the turn leaves room, less with four lugs and their 30 degrees.
+    const three = bayonetPlan(pot(undefined, 15, 1.6), options(), 50, 0, 49.7);
+    const four = bayonetPlan(pot(undefined, 15, 1.6), options({ bayonetLugs: 4 }), 50, 0, 49.7);
+    if ("error" in three || "error" in four) throw new Error("refused");
+    expect(three.width).toBe(6);
+    expect(four.width).toBeLessThan(6);
+    expect(four.width).toBeGreaterThan(4);
+    // Without the rib behind the lug there is more room.
+    const free = bayonetPlan(pot(undefined, 15, 1.6), options({ bayonetLugs: 4, bayonetDetent: 0 }), 50, 0, 49.7);
+    if ("error" in free) throw new Error(free.error.code);
+    expect(free.width).toBe(6);
+    // 20 mm across: two lugs and 45 degrees, not three.
+    expect("error" in bayonetPlan(pot(undefined, 10, 1.6), options({ bayonetLugs: 2 }), 50, 0, 49.7)).toBe(false);
+    expect(bayonetPlan(pot(undefined, 10, 1.6), options({ bayonetLugs: 3 }), 50, 0, 49.7)).toEqual({ error: { code: "bayonetNoRoom" } });
+  });
+
+  it("refuses a body that is not round, a wall under 0.8 mm, a body too low, a gap over half the lugs' height and a rim too short for lugs and ledge", () => {
+    const box = pot(() => ({ outer: [[[-30, -30], [30, -30], [30, 30], [-30, 30]]], opening: [[[-28, -28], [-28, 28], [28, 28], [28, -28]]] }));
+    expect(bayonetPlan(box, options(), 50, 0, 49.7)).toEqual({ error: { code: "bayonetNotRound" } });
+    // Round at the rim, but tapering down where the cap's rim reaches, 8 mm.
+    const tapering = pot((z) => ({ outer: [polygonRound(30 - (50 - z) / 16)], opening: [polygonRound(28 - (50 - z) / 16, 192, 0, 0, true)] }));
+    expect(bayonetPlan(tapering, options(), 50, 0, 49.7)).toEqual({ error: { code: "bayonetNotRound" } });
+    expect(BAYONET_MIN_WALL).toBe(0.8);
+    expect(bayonetPlan(pot(undefined, 30, 0.6), options(), 50, 0, 49.7)).toEqual({ error: { code: "bayonetThinWall" } });
+    // 8 mm of rim and 0.4 mm below it.
+    expect(bayonetPlan(pot(), options(), 50, 41.7, 49.7)).toEqual({ error: { code: "bayonetTooLow", height: 8 } });
+    expect("error" in bayonetPlan(pot(), options(), 50, 41.5, 49.7)).toBe(false);
+    // Half of 1.5 mm lugs; 2.5 mm ones on a pot 100 across take the largest gap there is.
+    expect("error" in bayonetPlan(pot(), options({ gap: 0.75 }), 50, 0, 49.7)).toBe(false);
+    expect(bayonetPlan(pot(), options({ gap: 0.8 }), 50, 0, 49.7)).toEqual({ error: { code: "bayonetGapDeep", gap: 0.75 } });
+    expect("error" in bayonetPlan(pot(undefined, 50, 2), options({ gap: 1 }), 50, 0, 49.7)).toBe(false);
+    // The lugs' tops 0.2 under the rim, their 1.5 mm faces, the axial gap, the slope's 1.5 less the gap, and 1 mm of
+    // ledge: 4.3 mm; more with a larger axial gap or larger lugs.
+    expect(bayonetPlan(pot(), options({ bayonetDepth: 4.2 }), 50, 0, 49.7)).toEqual({ error: { code: "bayonetShallow", depth: 4.3 } });
+    expect("error" in bayonetPlan(pot(), options({ bayonetDepth: 4.3 }), 50, 0, 49.7)).toBe(false);
+    expect(bayonetPlan(pot(), options({ bayonetDepth: 4.3, bayonetAxialGap: 0.6 }), 50, 0, 49.7)).toEqual({ error: { code: "bayonetShallow", depth: 4.6 } });
+    expect(bayonetPlan(pot(undefined, 50, 2), options({ bayonetDepth: 6 }), 50, 0, 49.7)).toEqual({ error: { code: "bayonetShallow", depth: 6.3 } });
   });
 });

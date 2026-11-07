@@ -220,7 +220,7 @@ describe("the lid's panel with a screw lid (Discussion #1393)", () => {
     const { panel, changes } = mount();
     const group = panel.querySelector<HTMLElement>('[role="radiogroup"][aria-label="Kind"]')!;
     const kinds = [...group.querySelectorAll<HTMLButtonElement>('[role="radio"]')];
-    expect(kinds.map((button) => button.textContent)).toEqual(["Push in", "Over the top", "Both sides", "Flat", "Screw on"]);
+    expect(kinds.map((button) => button.textContent)).toEqual(["Push in", "Over the top", "Both sides", "Flat", "Screw on", "Bayonet"]);
     expect(group.querySelector('[aria-checked="true"]')?.textContent).toBe("Push in");
     act(() => kinds[4].click());
     expect(changes.at(-1)).toEqual({ type: "screw" });
@@ -265,6 +265,73 @@ describe("the lid's panel with a screw lid (Discussion #1393)", () => {
     expect(texts(panel)).not.toContain("A hinge goes with a lid that pushes in or a flat one.");
     expect(texts(panel)).not.toContain("Not for a flat lid or pivot pins.");
     expect(texts(panel)).not.toContain("A pivot lid lies in the opening");
+    expect(texts(panel)).not.toContain("Magnet diameter");
+  });
+});
+
+describe("the lid's panel with a bayonet lid (Discussion #1424)", () => {
+  /** Types `value` into the slider named `name`, as a person drags it. */
+  const drag = (panel: HTMLElement, name: string, value: string) => {
+    const input = slider(panel, name)!;
+    act(() => {
+      const setValue = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, "value")!.set!;
+      setValue.call(input, value);
+      input.dispatchEvent(new Event("input", { bubbles: true }));
+    });
+  };
+
+  it("offers a bayonet lid as a sixth kind, the push-in lid still the one to begin with", () => {
+    const { panel, changes } = mount();
+    const group = panel.querySelector<HTMLElement>('[role="radiogroup"][aria-label="Kind"]')!;
+    const kinds = [...group.querySelectorAll<HTMLButtonElement>('[role="radio"]')];
+    expect(kinds[5].textContent).toBe("Bayonet");
+    expect(kinds[5].title).toContain("turned to lock");
+    expect(group.querySelector('[aria-checked="true"]')?.textContent).toBe("Push in");
+    act(() => kinds[5].click());
+    expect(changes.at(-1)).toEqual({ type: "bayonet" });
+  });
+
+  it("asks for the lugs, how far the cap reaches down, the room above the ledge and the detent, keeps the gap and the rim's wall, and says how far to turn", () => {
+    const { panel, changes } = mount({ type: "bayonet" });
+    expect(slider(panel, "Lugs")!.value).toBe("3");
+    expect(slider(panel, "Rim depth")!.value).toBe("8");
+    expect(slider(panel, "Gap in height")!.value).toBe("0.3");
+    expect(slider(panel, "Detent height")!.value).toBe("0.3");
+    expect(slider(panel, "Gap per side")).not.toBeNull();
+    expect(slider(panel, "Rim wall")).not.toBeNull();
+    expect(slider(panel, "Lip depth")).toBeNull();
+    expect(slider(panel, "Thread pitch")).toBeNull();
+    // Three lugs: a turn of 40 degrees.
+    expect(texts(panel)).toContain("3 lugs on the outside of the body's top, sized from its diameter, and an L-shaped slot for each inside the cap's rim. Push the cap down over them and turn it 40° clockwise until it clicks.");
+    expect(texts(panel)).toContain("A small rib behind each locked lug");
+    drag(panel, "Rim depth", "12");
+    expect(changes.at(-1)).toEqual({ bayonetDepth: 12 });
+    drag(panel, "Gap in height", "0.4");
+    expect(changes.at(-1)).toEqual({ bayonetAxialGap: 0.4 });
+    drag(panel, "Detent height", "0");
+    expect(changes.at(-1)).toEqual({ bayonetDetent: 0 });
+    drag(panel, "Lugs", "4");
+    expect(changes.at(-1)).toEqual({ bayonetLugs: 4 });
+    act(() => root?.unmount());
+    // Four lugs turn 30 degrees, two 45.
+    expect(texts(mount({ type: "bayonet", bayonetLugs: 4 }).panel)).toContain("turn it 30° clockwise");
+    act(() => root?.unmount());
+    expect(texts(mount({ type: "bayonet", bayonetLugs: 2 }).panel)).toContain("2 lugs on the outside");
+    expect(texts(mount({ type: "bayonet", bayonetLugs: 2 }).panel)).toContain("turn it 45° clockwise");
+  });
+
+  it("switches off magnets, hinge, click bumps and handle and says once why", () => {
+    const { panel } = mount({ type: "bayonet", magnets: true, hinge: true, clickBumps: true, handle: "notch" });
+    for (const name of ["Magnets in the corners", "Hinge", "Click bumps"]) {
+      const box = checkbox(panel, name)!;
+      expect(box.checked, name).toBe(false);
+      expect(box.disabled, name).toBe(true);
+    }
+    const handles = panel.querySelector<HTMLElement>('[role="radiogroup"][aria-label="Handle"]')!;
+    expect(handles.querySelector('[aria-checked="true"]')?.textContent).toBe("None");
+    expect(texts(panel).split("A bayonet lid holds by its lugs: magnets, a hinge, click bumps and a handle do not go with it.").length).toBe(2);
+    expect(texts(panel)).not.toContain("A screw lid holds by its thread");
+    expect(texts(panel)).not.toContain("A hinge goes with a lid that pushes in or a flat one.");
     expect(texts(panel)).not.toContain("Magnet diameter");
   });
 });
