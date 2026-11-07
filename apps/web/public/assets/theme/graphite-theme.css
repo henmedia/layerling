@@ -3530,6 +3530,39 @@ html[data-theme="dark"]:where([data-palette="graphite"]) .touch-multi-select {
   box-shadow: 0 1px 5px rgba(33, 33, 33, 0.32);
 }
 
+:where(html[data-theme="dark"][data-palette="graphite"]) .align-dot.axis-x,
+:where(html[data-theme="dark"][data-palette="graphite"]) .align-spread.axis-x {
+  --align-axis-color: #d6363c;
+  background: var(--align-axis-color);
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .align-dot.axis-y,
+:where(html[data-theme="dark"][data-palette="graphite"]) .align-spread.axis-y {
+  --align-axis-color: #2f6fe0;
+  background: var(--align-axis-color);
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .align-dot.axis-z,
+:where(html[data-theme="dark"][data-palette="graphite"]) .align-spread.axis-z {
+  --align-axis-color: #2f9a4b;
+  background: var(--align-axis-color);
+}
+
+html[data-theme="dark"]:where([data-palette="graphite"]) .align-dot.axis-x,
+html[data-theme="dark"]:where([data-palette="graphite"]) .align-spread.axis-x {
+  --align-axis-color: #ff6b70;
+}
+
+html[data-theme="dark"]:where([data-palette="graphite"]) .align-dot.axis-y,
+html[data-theme="dark"]:where([data-palette="graphite"]) .align-spread.axis-y {
+  --align-axis-color: #6aa0ff;
+}
+
+html[data-theme="dark"]:where([data-palette="graphite"]) .align-dot.axis-z,
+html[data-theme="dark"]:where([data-palette="graphite"]) .align-spread.axis-z {
+  --align-axis-color: #5fd47c;
+}
+
 :where(html[data-theme="dark"][data-palette="graphite"]) .align-dot:hover:not(:disabled),
 :where(html[data-theme="dark"][data-palette="graphite"]) .align-dot:focus-visible:not(:disabled) {
   background: #e17709;
