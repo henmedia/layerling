@@ -116,6 +116,8 @@ X 和 [[Esc]] 会关闭窗口；如果正在测量，[[Esc]] 会先结束测量�
 
 标题行中的齿轮（{{ui:editor.workspaceSettings}}）打开设置。左侧有五个区域：{{ui:workspace.appearance}}、{{ui:workspace.measurement}}、{{ui:workspace.workplane}}、{{ui:workspace.shapeDefaults}} 和 {{ui:workspace.history}}。改动立即生效。底部的 {{ui:workspace.makeDefault}} 把当前设置保存为默认值，让新设计从这些设置开始。打开的文件会带着它自己的设置；旁边的 {{ui:workspace.useMyDefault}} 会把你保存的颜色、网格等应用到打开的设计上，同时保留它的单位。如果你的默认设置里有打印机，这台打印机连同它的平台尺寸也会一起带过来；没有的话，设计保留原有的平台和打印机。右上角的 {{ui:workspace.close}} 关闭窗口。本节逐项介绍这些设置。
 
+{{ui:workspace.exportSettings}} 把窗口的设置保存为文件（layerling-settings-<日期>.json）：颜色、网格、阴影、相机和形状默认值，以及主题、工具栏大小、视图立方体的角落、形状颜色和每台打印机的间隙。在另一台电脑上或浏览器数据丢失后，{{ui:workspace.importSettings}} 会再次读取该文件：它成为新设计的默认值，并像 {{ui:workspace.useMyDefault}} 一样应用到已打开的设计。你在键盘快捷键中设定的自定义按键也会一起保存。
+
 ### 外观：主题、工具栏与视图立方体
 
 {{ui:workspace.theme}} 设定整个程序的配色：{{ui:workspace.themeSystem}} 跟随电脑，其余为 {{ui:workspace.themeLight}}、{{ui:workspace.themeDark}} 和 {{ui:workspace.themeGraphite}}。也可以在编辑器右上角更改。

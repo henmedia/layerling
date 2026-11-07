@@ -123,7 +123,7 @@ Con {{ui:array.groupCopies}} spuntato, {{ui:array.apply}} raggruppa l'originale 
 
 Per creare prese d’aria, griglie per altoparlanti, cestini e involucri, {{ui:holePattern.title}} distribuisce regolarmente i fori su una faccia piatta. Non devi più creare un foro, duplicarlo e posizionarlo sulla parete. Seleziona esattamente un corpo e fai clic su {{ui:holePattern.title}} nel gruppo {{ui:editor.group.modify}} della barra degli strumenti, accanto allo strumento per gli schemi. Puoi anche fare clic destro sul corpo o cercare lo strumento con [[Ctrl]]+[[K]].
 
-1. Fai clic su una faccia piatta del corpo. Viene considerata tutta la faccia piatta intorno al punto, non solo il triangolo sotto il puntatore. Le facce curve non sono supportate: compare un suggerimento e puoi fare clic su una faccia piatta.
+1. Fai clic su una faccia piatta del corpo. Viene considerata tutta la faccia piatta intorno al punto, non solo il triangolo sotto il puntatore. Funziona anche la parete tonda di un cilindro, un tubo o un foro, vedi più sotto; le altre facce curve non sono supportate: compare un suggerimento e puoi fare clic su una faccia piatta.
 2. Nella finestra, imposta forma e disposizione dei fori:
    - **{{ui:holePattern.form}}:** {{ui:holePattern.form.round}}, {{ui:holePattern.form.square}}, {{ui:holePattern.form.rectangle}}, {{ui:holePattern.form.hexagon}} o {{ui:holePattern.form.slot}}.
    - **Dimensioni:** {{ui:holePattern.size.diameter}} per il diametro di un foro rotondo, {{ui:holePattern.size.side}} per il lato di un quadrato e {{ui:holePattern.size.width}} e {{ui:holePattern.size.height}} per rettangoli e asole. Per gli esagoni, la misura è {{ui:holePattern.size.corners}}.
@@ -141,13 +141,15 @@ Per creare prese d’aria, griglie per altoparlanti, cestini e involucri, {{ui:h
 
 I fori sono normali forme raggruppate con il corpo, come dopo aver usato {{ui:editor.tool.group}}: non vengono incorporati in modo permanente. {{ui:editor.tool.ungroup}} scioglie di nuovo il gruppo e libera ogni foro, che puoi poi spostare, modificare o eliminare singolarmente. L’intera operazione è un solo passaggio per {{ui:editor.tool.undo}}. Lo strumento crea al massimo 400 fori per volta; se ne servono di più, aumenta la dimensione dei fori o la loro spaziatura.
 
+Anche la parete tonda di un cilindro, un tubo o un foro accetta fori: un portapenne, un paralume, un tubo con prese d’aria. Fai clic sulla parete invece che su una faccia piatta; sotto il puntatore si illumina tutta la parete. Ogni foro punta allora dritto all’asse, e le file girano intorno alla parete. Su una parete che fa tutto il giro, ogni fila ha un numero intero di fori, distribuito in modo che l’anello si chiuda senza vuoti e mai più fitto della spaziatura; la finestra dice quanti fori fanno il giro e a che distanza. Il margine vale verso i bordi in alto e in basso e verso le aperture nella parete, su una parte di parete (un raccordo, per esempio) anche verso i suoi lati. {{ui:holePattern.depth.throughWall}} attraversa solo la parete su cui hai fatto clic e lascia intero l’altro lato di un tubo; in un cilindro pieno i fori arrivano fino al centro. Con un clic dentro un foro, i fori vanno verso l’esterno attraverso la sua parete. {{ui:holePattern.arrangement.perimeter}} è per le facce piatte e non viene proposto su una parete.
+
 Un’IA può eseguire la stessa operazione tramite il bridge MCP con `layerling_perforate_face` (vedi il capitolo [Progettare con un’IA (MCP)](chapter:ai-with-mcp)).
 
 ## Estrudere una faccia verso l’esterno o l’interno
 
 Per ispessire una parete, aggiungere una sporgenza su una faccia o ricavarvi una cavità, lo strumento {{ui:faceTool.title}} agisce su una singola faccia piatta. Funziona anche con un file STL importato, che non contiene schizzi modificabili. Seleziona esattamente un corpo e fai clic su {{ui:faceTool.title}} nel gruppo {{ui:editor.group.modify}} della barra degli strumenti, accanto allo schema di fori. Puoi anche fare clic destro sul corpo o cercare lo strumento con [[Ctrl]]+[[K]].
 
-1. Fai clic su una faccia piatta del corpo. Come per lo schema di fori, viene considerata l’intera faccia piatta intorno al punto; le facce curve non sono supportate.
+1. Fai clic su una faccia piatta del corpo. Come per lo schema di fori, viene considerata l’intera faccia piatta intorno al punto; le facce curve qui non sono supportate, nemmeno una parete tonda.
 2. Nella finestra:
    - **{{ui:faceTool.direction}}:** scegli {{ui:faceTool.direction.out}} per aggiungere materiale sulla faccia o {{ui:faceTool.direction.in}} per ricavare una cavità. La cavità non può essere più profonda del corpo dietro la faccia; in un corpo cavo può comunque raggiungere la cavità interna.
    - **{{ui:faceTool.inset}}:** definisce quanto il nuovo contorno deve restare all’interno rispetto al bordo della faccia. Quando aggiungi materiale verso l’esterno, il valore 0 usa tutta la faccia e ispessisce la parete. Anche le aperture sulla faccia si allargano della stessa misura.

@@ -54,7 +54,7 @@ En plade med et hul 5 mm fra hvert hjørne og en slids i midten, gjort 40 mm læ
 
 Nogle gange bør dele kun blive sammen uden at blive til én - et hvidt logo på en sort plade til et flerfarvet print for eksempel. Det er det {{ui:editor.tool.bundle}} ([[Ctrl]]+[[B]]) er til, som i Tinkercad. Et bundt flytter, drejer og skalerer som en form, men intet flettes:
 
-- Hver del beholder sin farve og forbliver en solid eller et hul. Bundtets indstillinger har de samme kort som en gruppes: {{ui:inspector.solid}} og {{ui:inspector.hole}} for hele bundtet (de bevarer delenes farver), {{ui:inspector.transparent}} ([[T]]) og {{ui:inspector.multicolor}} ([[Shift]]+[[M]]); med Multicolor slået fra vises og eksporteres bundtet i én farve. {{ui:inspector.separateParts}} tager bundtet ad, som [[Ctrl]]+[[Shift]]+[[G]] gør.
+- Hver del beholder sin farve og forbliver en solid eller et hul. Bundtets indstillinger har de samme kort som en gruppes: {{ui:inspector.solid}} og {{ui:inspector.hole}} for hele bundtet (de bevarer delenes farver), {{ui:inspector.transparent}} ([[T]]) og {{ui:inspector.multicolor}} ([[Shift]]+[[M]]); med Multifarve slået fra vises og eksporteres bundtet i én farve. {{ui:inspector.separateParts}} tager bundtet ad, som [[Ctrl]]+[[Shift]]+[[G]] gør.
 - Huller skærer intet. Når du grupperer bundtet med andre dele, skærer dets huller de dele, men stadig ikke bundtets egne solider, som i Tinkercad. Så kan en tap med sit hul ved siden af for eksempel bruges igen og igen som et bundt.
 - I en STL-, 3MF- eller OBJ-eksport er hver del sin egen form; i 3MF og OBJ med sin farve.
 
@@ -108,6 +108,14 @@ En bemærkning: fas og rund du har lagt på **hele** gruppen mistes ved genopbyg
 - De to rotationsskydere nedenunder drejer planet om de to andre akser, op til 180° hver vej, for et skråt snit. De kan kombineres.
 
 {{ui:split.apply}} eller [[Enter]] laver snittet, [[Esc]] annullerer (mens der vælges en flade, stopper den første [[Esc]] kun valget). Hvert objekt planet skærer bliver til to lukkede former, opkaldt efter deres side, for eksempel "Kasse (Z+)" og "Kasse (Z-)"; objekter det rammer ved siden af bliver som de er. Et hul bliver til to huller, og en udhulet form beholder sit hulrum. Begge halvdele bliver hvor de var - til printning, læg hver på sin snitflade med {{ui:editor.tool.layFlat}}.
+
+{{ui:split.connectors}} retter halvdelene ind igen, sådan som skæreværktøjerne i PrusaSlicer, OrcaSlicer og Bambu Studio gør. Med {{ui:split.connectors.none}}, standarden, deles der som beskrevet ovenfor. {{ui:split.connectors.dowels}} laver et hul i hver halvdel og løse dyvler, der går ind i begge: dyvlerne kommer som et tredje legeme, stående ved siden af halvdelene på deres bund, og printes med dem – stående bliver de runde i lagene ligesom deres huller, og det er netop det, pasprøven måler. {{ui:split.connectors.plugs}} stiller runde tappe på den halvdel, hvis navn ender på minus, med hullerne til dem i den anden halvdel. Dyvler og tappe går vinkelret på planet ind, hvordan det end er drejet, hver med sin diameter og 1,2 mm materiale til hver kant af snitfladen, og to af dem dobbelt så langt fra hinanden. Hvert adskilt stykke af snitfladen får sine egne, jævnt fordelt over det: {{ui:split.connectorCount}} siger hvor mange, og 0 overlader det til stykkets størrelse, mindst to. Et stykke, der er for lille til én, får ingen, og en dyvel eller tap udelades, hvor en halvdel er tyndere, end dens hul er dybt; panelet siger det, før du deler, og hvide ringe på planet viser, hvor de kommer. Passer der slet ingen, deles delene uden, og statuslinjen siger det.
+
+- {{ui:split.connectorDiameter}} er dyvlernes og tappenes, til at begynde med 5 mm.
+- {{ui:split.connectorDepth}} er, hvor langt hvert hul går ind i sin halvdel. En dyvel er dobbelt så lang minus 0,6 mm og en tap 0,3 mm kortere end sit hul, så de aldrig står på bunden af et hul og halvdelene lukker helt. Dyvler og tappe har en lille affasning i enderne, og hvert hul en ved sin åbning, så et udflydt første lag ikke gør det snævrere.
+- {{ui:split.connectorClearance}} er pladsen mellem en dyvel eller tap og dens hul. Når du har målt din printers spillerum med pasprøven (i kapitlet om print), starter det med det, ellers med 0,2 mm.
+
+Former, der er huller, deles uden samling.
 
 Halvdelene er almindelige meshes: indstillinger som en cylinders sider eller en teksts bogstaver er væk, så sæt dem først. [[Ctrl]]+[[Z]] bringer originalen tilbage i ét skridt. Låste og skjulte objekter kan ikke deles.
 

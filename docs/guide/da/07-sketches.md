@@ -15,6 +15,8 @@ Ikke alt kan sættes sammen af basiske former. For dele med deres eget omrids, s
 
 Editoren viser så et ark med et gitter. Det er din tegneflade.
 
+Skitsen ligger på arbejdsplanet. Vil du tegne på en flade af et legeme, fx et omrids der skal begynde højere op, lægger du først arbejdsplanet på den flade med [[W]] (se [Visning og arbejdsplan](chapter:view-and-workplane)) og starter så skitsen.
+
 ## Tegning
 
 Båndet i skitsetilstand er delt i områder:

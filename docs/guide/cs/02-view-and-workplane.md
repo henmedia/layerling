@@ -118,6 +118,8 @@ Mřížka usnadňuje odhad rozměrů podložky. Vpravo dole se nastavuje **krok 
 
 Ozubené kolo v titulním řádku ({{ui:editor.workspaceSettings}}) otevře nastavení. Vlevo je pět oblastí: {{ui:workspace.appearance}}, {{ui:workspace.measurement}}, {{ui:workspace.workplane}}, {{ui:workspace.shapeDefaults}} a {{ui:workspace.history}}. Změna platí okamžitě. {{ui:workspace.makeDefault}} dole uloží současné nastavení jako výchozí, takže nový projekt začne s ním. Otevřený soubor si přinese vlastní nastavení; {{ui:workspace.useMyDefault}} vedle něj použije na otevřený projekt vaše uložené barvy, mřížku a ostatní, přičemž zachová jeho jednotky. Pokud vaše výchozí nastavení obsahuje tiskárnu, přijde i s velikostí své podložky; bez tiskárny si projekt ponechá svou podložku a tiskárnu. {{ui:workspace.close}} vpravo nahoře okno zavře. Tato část prochází nastavení jedno po druhém.
 
+{{ui:workspace.exportSettings}} uloží nastavení okna do souboru (layerling-settings-<datum>.json): barvy, mřížku, stíny, kameru a výchozí hodnoty tvarů spolu s motivem, velikostí panelu nástrojů, rohem kostky pohledu, barvami tvarů a vůlí každé tiskárny. Na jiném počítači nebo po ztrátě dat prohlížeče {{ui:workspace.importSettings}} soubor znovu načte: stane se vaším výchozím nastavením pro nové návrhy a použije se na otevřený návrh jako {{ui:workspace.useMyDefault}}. Vaše vlastní klávesy z klávesových zkratek jdou do souboru také.
+
 ### Vzhled: motiv, pás nástrojů a krychle
 
 {{ui:workspace.theme}} určuje barevné schéma celého programu: {{ui:workspace.themeSystem}} se řídí počítačem, další jsou {{ui:workspace.themeLight}}, {{ui:workspace.themeDark}} a {{ui:workspace.themeGraphite}}. Změnit ho lze i vpravo nahoře v editoru.

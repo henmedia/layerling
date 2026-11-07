@@ -25,6 +25,21 @@ Auch diese Anleitung hat oben auf jeder Seite ein Suchfeld: Tippe ein oder zwei 
 - Der Name eines Körpers in deinem Entwurf findet diesen Körper und wählt ihn aus, praktisch bei Entwürfen mit vielen Teilen. Körper erscheinen erst, sobald du etwas tippst.
 - Sie funktioniert auch im Skizzenmodus, dort mit den Skizzenwerkzeugen.
 
+## Eigene Tasten
+
+Jeden Befehl der Befehlssuche kannst du auf eine eigene Taste legen: ein Werkzeug, das du ständig brauchst, eine Form, {{ui:editor.tool.centerOnWorkplane}} oder {{ui:palette.openShapes}}.
+
+1. Öffne {{ui:editor.keyboardShortcuts}} und klicke oben im Fenster unter {{ui:customKeys.title}} auf {{ui:customKeys.add}}.
+2. Tippe ein paar Buchstaben des Befehls und klicke ihn an, oder drück [[Enter]] für den ersten.
+3. Drück die gewünschte Taste, allein oder mit [[Strg]], [[Alt]] oder [[Umschalt]]. Buchstaben, Ziffern und F1 bis F12 können einen Befehl tragen.
+
+Eine Taste, die der Editor schon nutzt, eine, die der Browser für sich behält (etwa [[Strg]]+[[W]]), oder eine deiner eigenen Tasten wird abgelehnt, und das Fenster sagt, wofür sie belegt ist. Ein Klick auf eine Taste in der Liste ändert sie, das X daneben entfernt sie, {{ui:customKeys.removeAll}} fängt von vorn an.
+
+- Die Taste startet den Befehl genau wie die Befehlssuche. Geht er gerade nicht, meist weil nichts ausgewählt ist, sagt es die Statuszeile.
+- Deine Tasten stehen in der Befehlssuche neben ihren Befehlen und auf der gedruckten Liste.
+- Sie bleiben in diesem Browser, wie das Farbschema. Eine Taste für ein Skizzenwerkzeug wirkt im Skizzenmodus, eine für den 3D-Editor außerhalb.
+- Während du in ein Feld tippst, halten sich deine Tasten zurück wie alle anderen.
+
 ## Interaktive Hilfe
 
 Du findest nicht, wo etwas über einen Knopf oder ein Feld steht? Lass dich vom Programm hinführen. Klicke auf das Fragezeichen im Bereich {{ui:editor.group.help}} oder drücke [[Umschalt]]+[[F1]]. Der Mauszeiger wird zum Fragezeichen, und was darunter liegt, bekommt einen Rahmen.

@@ -10,5 +10,15 @@
       "en": "In Chrome and Edge, \"Back up all\", \"Back up\" and \"Back up custom shapes\" now ask where the ZIP file should go, and remember the folder for next time - a folder on your cloud drive, say, instead of Downloads. Other browsers download the backup as before.",
       "da": "I Chrome og Edge spørger „Sikkerhedskopiér alle“, „Sikkerhedskopiér“ og „Sikkerhedskopiér egne former“ nu, hvor ZIP-filen skal ligge, og husker mappen til næste gang, for eksempel en mappe på dit clouddrev i stedet for Downloads. Andre browsere henter sikkerhedskopien som før."
     }
+  },
+  {
+    "title": {
+      "de": "Stützrippe ohne falsche Warnungen",
+      "en": "Support rib without false warnings"
+    },
+    "body": {
+      "de": "„Spiel prüfen“ und „Druck prüfen“ kennen die Stützrippe jetzt: Dass ihre Brücken ins Teil reichen und dass Rippe und Brücken dünn sind, ist gewollt und wird nicht mehr gemeldet. Eine Rippe aus 1.148.0 legst du dafür einmal neu an.",
+      "en": "Check clearance and Print check now know the support rib: its bridges reaching into the part, and the rib and its bridges being thin, are meant to be so and no longer reported. A rib made with 1.148.0 needs making again once for this."
+    }
   }
 ]

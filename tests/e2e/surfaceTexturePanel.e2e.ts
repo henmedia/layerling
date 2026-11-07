@@ -104,8 +104,18 @@ function choose(select: HTMLSelectElement, value: string) {
   });
 }
 
+/** Types a value into a field and leaves it, as a user does. */
+function type(input: HTMLInputElement, value: string) {
+  act(() => input.focus());
+  act(() => {
+    Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, "value")!.set!.call(input, value);
+    input.dispatchEvent(new Event("input", { bubbles: true }));
+  });
+  act(() => input.blur());
+}
+
 describe("the surface texture card in a shape's settings", () => {
-  it("shows the eighteen patterns by their pictures, knurling first chosen", () => {
+  it("shows the twenty patterns by their pictures, knurling first chosen", () => {
     const { panel } = mount(cylinder);
     // The pattern is no longer a list of names: the field shows the chosen one's picture.
     expect(selectWith(panel, "knurl")).toBeUndefined();
@@ -114,7 +124,7 @@ describe("the surface texture card in a shape's settings", () => {
     act(() => patternField(panel).click());
     const tiles = patternTiles(panel);
     expect(tiles.map((tile) => tile.textContent)).toEqual([
-      "Grooves", "Knurling", "Honeycomb", "Bumps", "Cells", "Bricks", "Squares", "Triangles", "Knitting", "Rope", "Basket weave", "Bark", "Wood grain", "Carbon (twill)", "Grain", "Image", "Cracks (kintsugi)", "Text (stuck on)",
+      "Grooves", "Knurling", "Honeycomb", "Bumps", "Cells", "Bricks", "Half-timbering", "Stone wall", "Squares", "Triangles", "Knitting", "Rope", "Basket weave", "Bark", "Wood grain", "Carbon (twill)", "Grain", "Image", "Cracks (kintsugi)", "Text (stuck on)",
     ]);
     expect(tiles.map((tile) => tile.querySelector("img")?.getAttribute("src"))).toEqual(SURFACE_TEXTURE_PATTERNS.map((pattern) => `assets/editor/surface-patterns/${pattern}.png`));
     expect(tiles.filter((tile) => tile.getAttribute("aria-selected") === "true").map((tile) => tile.textContent)).toEqual(["Knurling"]);
@@ -188,6 +198,54 @@ describe("the surface texture card in a shape's settings", () => {
     // Leaving bricks gives the next pattern its own spacing and profile back.
     choosePattern(panel, "Knurling");
     expect(rangeNamed(panel, "Spacing")?.value).toBe("3.00");
+  });
+
+  it("lays half-timbering: its bracing, a storey's height, the beams' width and height, rails and how strong the grain is", async () => {
+    const { panel, calls } = mount(cylinder);
+    choosePattern(panel, "Half-timbering");
+    const bracing = selectWith(panel, "knee")!;
+    expect(bracing.value).toBe("mixed");
+    expect([...bracing.options].map((option) => option.textContent)).toEqual(["None", "Braces", "St Andrew's crosses", "Corner braces", "Mixed"]);
+    expect(card(panel).textContent).toContain("Braces at the ends, then crosses and corner braces in turn towards the middle.");
+    expect(rangeNamed(panel, "Panel width")?.value).toBe("12.00");
+    expect(rangeNamed(panel, "Storey height")?.value).toBe("30.00");
+    expect(rangeNamed(panel, "Beam width")?.value).toBe("2.40");
+    expect(rangeNamed(panel, "Rails per storey")?.value).toBe("1");
+    // The depth is how far the beams stand out; they stand out, and the profile and a groove's width are not theirs.
+    expect(rangeNamed(panel, "Beam height")?.value).toBe("0.80");
+    expect(rangeNamed(panel, "Depth")).toBeUndefined();
+    expect(selectWith(panel, "outward")?.value).toBe("outward");
+    // The grain from none through fine to strong, starting as it was when it was only on or off.
+    const grain = rangeNamed(panel, "Wood grain (%)")!;
+    expect(grain.value).toBe("50");
+    expect(card(panel).textContent).toContain("0 %: none. Below 50 % finer: more grooves, thinner and shallower. Above 50 % stronger: two wide, deep ones.");
+    type(grain, "20");
+    choose(bracing, "cross");
+    expect(card(panel).textContent).toContain("An X in the panel under the lowest rail.");
+    act(() => button(panel, "More")!.click());
+    expect(rangeNamed(panel, "Groove width (%)")).toBeUndefined();
+    expect(selectWith(panel, "pointed")).toBeUndefined();
+    await act(async () => button(panel, "Apply texture")!.click());
+    expect(calls.applied[0]).toMatchObject({ pattern: "timber", timberBracing: "cross", spacing: 12, timberHeight: 30, timberBeam: 2.4, timberRails: 1, timberGrain: 0.2, depth: 0.8, direction: "outward", keepEdges: false });
+    // Leaving it gives knurling its own spacing, depth and direction back.
+    choosePattern(panel, "Knurling");
+    expect(rangeNamed(panel, "Spacing")?.value).toBe("3.00");
+    expect(rangeNamed(panel, "Depth")?.value).toBe("0.60");
+    expect(selectWith(panel, "outward")?.value).toBe("inward");
+  });
+
+  it("lays a stone wall: stone size, how different and how round, the joint and the arrangement", async () => {
+    const { panel, calls } = mount(cylinder);
+    choosePattern(panel, "Stone wall");
+    expect(rangeNamed(panel, "Stone size")?.value).toBe("8.00");
+    expect(rangeNamed(panel, "Size variation (%)")?.value).toBe("50");
+    expect(rangeNamed(panel, "Roundness (%)")?.value).toBe("50");
+    expect(card(panel).textContent).toContain("0 %: broken stone with sharp edges, 100 %: rounded field stones.");
+    expect(rangeNamed(panel, "Joint width")?.value).toBe("0.80");
+    expect(rangeNamed(panel, "Arrangement")?.value).toBe("1");
+    expect(selectWith(panel, "outward")?.value).toBe("outward");
+    await act(async () => button(panel, "Apply texture")!.click());
+    expect(calls.applied[0]).toMatchObject({ pattern: "stones", spacing: 8, stoneVary: 0.5, stoneRound: 0.5, stoneJoint: 0.8, seed: 1, depth: 0.8, direction: "outward" });
   });
 
   it("lays squares and triangles with a gap in mm, from the bottom edge if asked, and hands them to the editor", async () => {

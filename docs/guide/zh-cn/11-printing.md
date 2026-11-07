@@ -48,6 +48,20 @@ FLSun、SeeMeCNC 等品牌的三角洲（Delta）打印机以及 Anycubic Predat
 
 打印机能够应付多陡的倾斜，在设置的 {{ui:workspace.appearance}} 下设置：从 30°（谨慎）到 70°（适合散热良好的打印机）。搭在另一个实体上的面仍会被标记——layerling 只看面本身。
 
+## 倾斜零件的支撑肋
+
+以一条棱边倾斜打印的零件（例如 45°）往往完全不需要支撑：它的面足够陡。但它立在一条细棱上，可能会倒。{{ui:supportRib.title}} 可以托住它：在它的下表面下方留一点间隙立起一条薄肋，站在椭圆底座上，再用细小的连接桥把零件固定住。请先把零件转到棱边上，让它立在打印板上。
+
+1. 选中零件，在功能区的 {{ui:editor.group.modify}} 组中单击 {{ui:supportRib.title}}，或右键单击零件，或用 [[Ctrl]]+[[K]] 查找。
+2. 单击下表面上要放支撑肋的位置。该面必须朝下、倾斜 15° 到 75°，并一直延伸到打印板；支撑肋从你单击处沿该面笔直向下。
+3. 按照切片软件设置 {{ui:supportRib.nozzle}}、{{ui:supportRib.layerHeight}} 和 {{ui:supportRib.firstLayer}}。支撑肋厚度为两条喷嘴线宽，与零件的间隙为半条线宽；每个连接桥宽一条线、高正好一层，并落在打印的某一层上，因此切片软件会把它打印成一条细线，能干净地掰掉。{{ui:supportRib.height}} 表示支撑肋沿该面向上到达多高（开始时为一半），{{ui:supportRib.bridgeSpacing}} 表示连接桥之间的距离，以整层计。
+4. 在 {{ui:supportRib.more}} 中可以手动设置厚度、间隙、连接桥宽度和底座厚度（在此之前它们跟随喷嘴和层高），以及底座宽度、底部和顶部的圆角。
+5. {{ui:supportRib.apply}} 添加支撑肋。勾选 {{ui:supportRib.bundle}}（初始为开）时，支撑肋与零件捆绑在一起：它们一起移动，作为并排的两个实体进入切片软件，打印时由连接桥连接。
+
+支撑肋是网格实体：要修改它，请删除后重新创建。每次单击生成一条支撑肋；要更多，请单击 {{ui:supportRib.repick}}，或用 {{ui:editor.tool.array}} 重复。支撑肋不能伸入零件的任何地方，零件也必须立在打印板上，否则窗口会说明原因。你的设置会保存在这个浏览器中，供下一条支撑肋使用。
+
+{{ui:clearance.title}}和{{ui:printCheck.title}}认得支撑肋：连接桥伸入零件，支撑肋和连接桥很薄、以一层的高度跨过间隙，这些都是有意为之，不会报告。用 layerling 1.148.0 制作的支撑肋还没有这个标记；重新创建一次，检查就会略过它。
+
 ## 壁厚、间隙与倒角
 
 - 壁至少要有两条挤出线宽，即 0.4 mm 喷嘴对应 0.8 mm。结实的部件需要 1.2 至 2 mm。
@@ -59,8 +73,9 @@ FLSun、SeeMeCNC 等品牌的三角洲（Delta）打印机以及 Anycubic Predat
 每台打印机打印出的孔都比图纸略小、销钉比图纸略粗，而且各有各的偏差，所以两个打印件之间需要多少间隙，起初只能靠猜。不如测一次：在设置的{{ui:workspace.workplane}}下，{{ui:workspace.fitTestMake}}会在平台上放一个配合测试件。它是一块 60 × 20 × 4 mm 的板，上面有七个孔，都用于同一根 5 mm 销钉，每个孔按 5 mm 加两倍的 0.05、0.10、0.15、0.20、0.25、0.30 或 0.40 mm 绘制，旁边凸印着数值；另外还有这根 5 mm 销钉本身，立在板旁边，顶端有一个小倒角。它由普通形状组成，所以可以和平台上的其他部件一起打印，无需支撑。
 
 按它摆放的样子打印，然后把销钉带倒角的一端朝前，从最紧的孔开始依次插入。**销钉仍能转动的最紧的那个孔**就给出你的打印机的间隙。在{{ui:workspace.printerPlay}}中输入这个数字，或在输入框下方的数值中点选它。间隙按每侧计，单位为毫米，浏览器会为所有设计保存它；输入框为空表示尚未测量。
+如果有多台打印机，请先在 {{ui:workspace.printer}} 中选择要用的那台：每台打印机都保存自己的间隙，新的使用从设计所设打印机的间隙开始。没有自己间隙的打印机使用未选择打印机时设置的间隙。
 
-从此以后，新的使用都会以这个间隙而不是内置数值为起点：{{ui:editor.tool.lid}}工具中的{{ui:lid.gap}}和{{ui:lid.hingePinPlay}}，新建{{ui:shape.dovetail}}和{{ui:shape.snapFit}}的间隙，新建螺母或螺纹孔的{{ui:prop.clearance}}——取间隙的两倍，因为它是整个直径上的余量——以及{{ui:editor.tool.clearance}}中的{{ui:clearance.threshold}}。只要这样的字段仍保持该数值，旁边的“{{ui:printerPlay.fromFitTest}}”就会说明这个数字的来历。一体打印的铰链和{{ui:editor.tool.flexi}}工具的关节保持 0.4 mm：一体打印时，它们的缝隙在层与层之间也必须保持张开，而单独打印的销钉测不出这一点。压入磁铁或 Gridfinity 键的余量，以及为买来的插座或电路板留的余量，也都保持各自的数值。设计中已有的实体永远不会改变，你打开的设计也不会。
+从此以后，新的使用都会以这个间隙而不是内置数值为起点：{{ui:editor.tool.lid}}工具中的{{ui:lid.gap}}和{{ui:lid.hingePinPlay}}，新建{{ui:shape.dovetail}}和{{ui:shape.snapFit}}的间隙，新建螺母或螺纹孔的{{ui:prop.clearance}}——取间隙的两倍，因为它是整个直径上的余量——以及{{ui:editor.tool.clearance}}中的{{ui:clearance.threshold}}。{{ui:editor.tool.split}}中销钉和凸柱的{{ui:split.connectorClearance}}也是如此。只要这样的字段仍保持该数值，旁边的“{{ui:printerPlay.fromFitTest}}”就会说明这个数字的来历。一体打印的铰链和{{ui:editor.tool.flexi}}工具的关节保持 0.4 mm：一体打印时，它们的缝隙在层与层之间也必须保持张开，而单独打印的销钉测不出这一点。压入磁铁或 Gridfinity 键的余量，以及为买来的插座或电路板留的余量，也都保持各自的数值。设计中已有的实体永远不会改变，你打开的设计也不会。
 
 ## 检查打印
 

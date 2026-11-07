@@ -31,6 +31,7 @@ import { findSketchOutlineIntersection } from "@/lib/sketchProfileValidation";
 import { isReferenceImageOpacity } from "@/lib/referenceImage";
 import { isThreadProfile } from "@/lib/threadProfiles";
 import { PORT_PROFILES } from "@/lib/portGeometry";
+import { normalizePaintStroke, PAINT_MAX_STROKES } from "@/lib/paint";
 import { MAX_GEAR_TEETH, MIN_GEAR_TEETH } from "@/lib/gearGeometry";
 import { GRIDFINITY_LABEL_FONTS, GRIDFINITY_LABEL_TEXT_KEYS, MAX_GRIDFINITY_LABEL_TEXT_LENGTH, MAX_GRIDFINITY_OUTLINE_POINTS } from "@/lib/gridfinityGeometry";
 import type { PortProfile } from "@/types/layerling";
@@ -63,7 +64,7 @@ export const LYL_FILE_TYPES_FORMAT_VERSION = 4;
 /** The newest format this layerling reads. */
 export const LYL_NEWEST_READABLE_FORMAT_VERSION = LYL_FILE_TYPES_FORMAT_VERSION;
 export const LYL_OLDEST_READABLE_FORMAT_VERSION = 1;
-export const LYL_CREATED_WITH_VERSION = "1.146.1";
+export const LYL_CREATED_WITH_VERSION = "1.148.0";
 export const LYL_MEDIA_TYPE = "application/vnd.layerling.project+zip";
 
 export const LYL_LIMITS = {
@@ -1405,6 +1406,12 @@ function validateShapeDefinition(definition: Record<string, unknown>, label: str
       if (typeof text !== "string" || text.length > 80) throw new Error(`${label}.formulas.${field} must be a short text`);
     }
   }
+  // Paint on the body (paint.ts): strokes, each of which must be one.
+  if (definition.paint !== undefined) {
+    if (!Array.isArray(definition.paint) || definition.paint.length > PAINT_MAX_STROKES || definition.paint.some((stroke) => !normalizePaintStroke(stroke))) {
+      throw new Error(`${label}.paint must be a list of at most ${PAINT_MAX_STROKES} paint strokes`);
+    }
+  }
   // What a group does with its parts when it is resized (Discussion #526).
   if (definition.groupResize !== undefined && definition.groupResize !== "stretch" && definition.groupResize !== "keepParts") {
     throw new Error(`${label}.groupResize must be stretch or keepParts`);
@@ -1457,7 +1464,7 @@ function validateShapeDefinition(definition: Record<string, unknown>, label: str
   // An SBC board's settings (#1098): a known board, a clearance of 0 to 2 mm and a reach of 0 to 10 mm;
   // the openings up and out as true or false, and how far up as 20 to 100 mm. Old projects have none.
   if (definition.sbcBoard !== undefined) {
-    const board = definition.sbcBoard as { board?: unknown; clearance?: unknown; reach?: unknown; ribbonUp?: unknown; ribbonSide?: unknown; gpioUp?: unknown; upReach?: unknown; buttonReach?: unknown } | null;
+    const board = definition.sbcBoard as { board?: unknown; clearance?: unknown; reach?: unknown; ribbonUp?: unknown; ribbonSide?: unknown; gpioUp?: unknown; lensUp?: unknown; upReach?: unknown; buttonReach?: unknown } | null;
     if (!board || typeof board !== "object" || !SBC_BOARD_ORDER.includes(board.board as never)) {
       throw new Error(`${label}.sbcBoard.board must be one of ${SBC_BOARD_ORDER.join(", ")}`);
     }
@@ -1467,7 +1474,7 @@ function validateShapeDefinition(definition: Record<string, unknown>, label: str
     if (board.reach !== undefined && (typeof board.reach !== "number" || !Number.isFinite(board.reach) || board.reach < 0 || board.reach > MAX_SBC_REACH)) {
       throw new Error(`${label}.sbcBoard.reach is outside the supported range`);
     }
-    for (const key of ["ribbonUp", "ribbonSide", "gpioUp"] as const) {
+    for (const key of ["ribbonUp", "ribbonSide", "gpioUp", "lensUp"] as const) {
       if (board[key] !== undefined && typeof board[key] !== "boolean") throw new Error(`${label}.sbcBoard.${key} must be true or false`);
     }
     if (board.upReach !== undefined && (typeof board.upReach !== "number" || !Number.isFinite(board.upReach) || board.upReach < MIN_SBC_UP_REACH || board.upReach > MAX_SBC_UP_REACH)) {

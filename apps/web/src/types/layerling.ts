@@ -1486,6 +1486,11 @@ export type WorkplaneShape = {
   surfaceTextureMask?: import("@/lib/surfaceTexture").SurfaceTextureMaskMode;
   /** The gold filling the cracks of this textured body (see surfaceTextureShape.ts): it goes when the texture is made anew or taken off. */
   surfaceFillOf?: string;
+  /**
+   * Paint on the body's surface, for printing in several colours (paint.ts): strokes laid in order,
+   * each a region found again on the mesh whenever it is built, in a colour of its own or erasing.
+   */
+  paint?: import("@/lib/paint").PaintStroke[];
   /** Only for "vase": the vase tool's settings; the frame gives its height and widest diameter. */
   vase?: import("@/lib/vase/vase-geometry.mjs").VaseSettings;
   /** An accessory laid out for a vase (its id): laying them out again replaces it. */
@@ -1557,6 +1562,12 @@ export type WorkplaneShape = {
    * its own body.
    */
   groupOperation?: "group" | "intersection" | "hull" | "bundle" | "loft";
+  /**
+   * A support rib (Discussion #1385) keeps the id of the part it holds, as it was before any grouping
+   * (localIdBase): its bridges are meant to reach into that part and to be thin, so the clearance and print
+   * checks leave them out. See lib/supportRib.
+   */
+  supportRibFor?: string;
   /**
    * The point this body turns about, kept with the body: a fraction of its
    * width, height and depth from its centre, in its own frame, so it moves,
@@ -1636,7 +1647,7 @@ export type QrErrorCorrection = "L" | "M" | "Q" | "H";
 export type QrStyle = "code" | "raised" | "engraved";
 /** What a QR body keeps so it can be made again from the inspector (#553). */
 /** The single-board computers the SBC board shape knows (#1098). */
-export type SbcBoardType = "pi5" | "pi4" | "pi3bPlus" | "zero2w" | "bttPi12" | "xiaoEsp32c6" | "esp32c3SuperMini" | "esp32c6SuperMini" | "featherEsp32s3" | "arduinoUno" | "arduinoNano" | "wemosD1Mini";
+export type SbcBoardType = "pi5" | "pi4" | "pi3bPlus" | "zero2w" | "bttPi12" | "xiaoEsp32c6" | "esp32c3SuperMini" | "esp32c6SuperMini" | "featherEsp32s3" | "arduinoUno" | "arduinoMega" | "arduinoNano" | "wemosD1Mini" | "pico" | "picoW" | "pico2" | "pico2W" | "esp32CamMb" | "esp32s3Cam" | "esp32DevKitC" | "esp32DevKitV1";
 
 export type SbcBoardSettings = {
   board: SbcBoardType;
@@ -1650,6 +1661,8 @@ export type SbcBoardSettings = {
   ribbonSide?: boolean;
   /** The GPIO header reaches up through a lid, by `upReach`. */
   gpioUp?: boolean;
+  /** A camera's lens reaches up through a lid, by `upReach`. */
+  lensUp?: boolean;
   /** How far in mm the openings going up reach above their part, 20 to 100 (default 20). */
   upReach?: number;
   /** How far in mm the buttons reach the way they are pressed (up through a lid, or out of a side), 0 to 100; missing is 0. */

@@ -118,6 +118,8 @@ Mreža kaže velikost plošče. Spodaj desno je **pripenjanje**: premikanje in s
 
 Zobnik v naslovni vrstici ({{ui:editor.workspaceSettings}}) odpre nastavitve. Levo je pet področij: {{ui:workspace.appearance}}, {{ui:workspace.measurement}}, {{ui:workspace.workplane}}, {{ui:workspace.shapeDefaults}} in {{ui:workspace.history}}. Sprememba velja takoj. {{ui:workspace.makeDefault}} spodaj shrani trenutne nastavitve kot privzete, tako da nov načrt začne z njimi. Odprta datoteka prinese svoje nastavitve; {{ui:workspace.useMyDefault}} poleg tega uporabi tvoje shranjene barve, mrežo in ostalo na odprtem načrtu in pri tem obdrži njegove enote. Če tvoje privzete nastavitve vsebujejo tiskalnik, pride zraven tudi velikost njegove plošče; brez tiskalnika načrt obdrži svojo ploščo in tiskalnik. {{ui:workspace.close}} zgoraj desno okno zapre. Ta del gre skozi nastavitve eno za drugo.
 
+{{ui:workspace.exportSettings}} shrani nastavitve okna v datoteko (layerling-settings-<datum>.json): barve, mrežo, sence, kamero in privzete vrednosti oblik skupaj s temo, velikostjo orodne vrstice, kotom kocke pogleda, barvami oblik in režo vsakega tiskalnika. Na drugem računalniku ali po izgubi podatkov brskalnika {{ui:workspace.importSettings}} datoteko znova prebere: postane tvoja privzeta nastavitev za nove načrte in se uporabi na odprtem načrtu kot {{ui:workspace.useMyDefault}}. Tudi tvoje lastne tipke iz bližnjic gredo zraven.
+
 ### Videz: tema, orodna vrstica in kocka
 
 {{ui:workspace.theme}} izbere barvno shemo celotnega programa: {{ui:workspace.themeSystem}} sledi računalniku, poleg tega so {{ui:workspace.themeLight}}, {{ui:workspace.themeDark}} in {{ui:workspace.themeGraphite}}. Zamenjaš jo lahko tudi zgoraj desno v urejevalniku.

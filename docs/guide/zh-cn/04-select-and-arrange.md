@@ -123,7 +123,7 @@ summary: 选择形状、在对象列表中查找它们、对齐、镜像、旋�
 
 对于通风口、扬声器格栅、篮子和外壳，{{ui:holePattern.title}} 会在平面上均匀分布孔。你不必再先做一个孔、重复它，再把它放到壁上。只选中一个实体，然后单击 {{ui:holePattern.title}}，它位于功能区的 {{ui:editor.group.modify}} 组中、阵列旁边。也可以右键单击实体，或用 [[Ctrl]]+[[K]] 找到它。
 
-1. 单击实体的一个平面。你单击处周围的整个平面都算数，而不只是指针下的三角形。曲面不行：会给出提示，请改选一个平面。
+1. 单击实体的一个平面。你单击处周围的整个平面都算数，而不只是指针下的三角形。圆柱、圆管或孔的圆形侧壁也可以，见下文；其他曲面不行：会给出提示，请改选一个平面。
 2. 在窗口中设置孔的外观和排布：
    - **{{ui:holePattern.form}}：** {{ui:holePattern.form.round}}、{{ui:holePattern.form.square}}、{{ui:holePattern.form.rectangle}}、{{ui:holePattern.form.hexagon}} 或 {{ui:holePattern.form.slot}}。
    - **大小：** 圆孔用 {{ui:holePattern.size.diameter}}，方孔用 {{ui:holePattern.size.side}}，矩形和槽孔用 {{ui:holePattern.size.width}} 与 {{ui:holePattern.size.height}}。六边形的大小是 {{ui:holePattern.size.corners}}。
@@ -141,13 +141,15 @@ summary: 选择形状、在对象列表中查找它们、对齐、镜像、旋�
 
 这些孔是与实体分组的普通孔，就像使用 {{ui:editor.tool.group}} 之后一样：没有任何内容被固化。{{ui:editor.tool.ungroup}} 会再次解散分组并释放每个孔，之后你可以逐个移动、修改或删除。整个操作在 {{ui:editor.tool.undo}} 中算一步。该工具一次最多制作 400 个孔；超过时请把孔做大或把间距加宽。
 
+圆柱、圆管或孔的圆形侧壁也能打孔：笔筒、灯罩、带通风孔的管子。单击侧壁而不是平面；指针下整面侧壁都会亮起。每个孔都正对轴线，各排孔绕侧壁一圈。在绕满一整圈的侧壁上，每排的孔数都是整数，并均匀调整，使一圈闭合不留缺口，且孔距不小于设定的间距；窗口会显示一圈有几个孔、相距多远。边距从上下边缘和侧壁上的开口算起；在侧壁的一部分（例如圆角）上，也从它的两侧算起。{{ui:holePattern.depth.throughWall}} 只切穿你单击的那面侧壁，圆管的另一侧保持完整；在实心圆柱上，孔一直通到中心。在孔的内壁上单击时，孔会向外穿过它的侧壁。{{ui:holePattern.arrangement.perimeter}} 只用于平面，侧壁上不提供。
+
 AI 可以通过 MCP 桥接使用 `layerling_perforate_face` 完成同样的事（参见 [AI 与 MCP](chapter:ai-with-mcp) 一章）。
 
 ## 将面推出或推入
 
 要加厚壁、在面上加凸台或在面上挖凹槽，可使用 {{ui:faceTool.title}} 工具处理一个平面。它也可用于导入的 STL，那里没有草图可改。只选中一个实体，然后单击 {{ui:faceTool.title}}，它位于功能区的 {{ui:editor.group.modify}} 组中、孔阵列旁边。也可以右键单击实体，或用 [[Ctrl]]+[[K]] 找到它。
 
-1. 单击实体的一个平面。与孔阵列一样，你单击处周围的整个平面都算数；曲面不行。
+1. 单击实体的一个平面。与孔阵列一样，你单击处周围的整个平面都算数；曲面在这里不行，圆柱侧壁也不行。
 2. 在窗口中：
    - **{{ui:faceTool.direction}}：** 选择 {{ui:faceTool.direction.out}} 让材料凸出于面，或选择 {{ui:faceTool.direction.in}} 挖出凹槽。凹槽不会比面后方的实体更深；在抽壳实体上，它仍可通向内部空腔。
    - **{{ui:faceTool.inset}}：** 新轮廓在面边缘内缩多少。向外时，0 会取整个面，从而加厚壁。面中的开口会按同样数值扩大。

@@ -125,7 +125,7 @@ Bejelölt {{ui:array.groupCopies}} mellett a(z) {{ui:array.apply}} ugyanabban a 
 
 Szellőzőkhöz, hangszórórácsokhoz, kosarakhoz és dobozokhoz a {{ui:holePattern.title}} egyenletesen elosztja a lyukakat egy sík lapon. Többé nem kell egy lyukat elkészítened, megismételned és a falra tenned. Jelölj ki pontosan egy testet, és kattints a szalag {{ui:editor.group.modify}} csoportjában az ismétlés melletti {{ui:holePattern.title}} gombra. Jobb kattintással is elérheted a testen, vagy megkeresheted a [[Ctrl]]+[[K]] billentyűvel.
 
-1. Kattints a test egyik sík lapjára. A kattintás körüli teljes sík lap számít, nem csak a mutató alatti háromszög. Görbe lap nem működik: kapsz egy figyelmeztetést, és helyette egy sík lapra kattintasz.
+1. Kattints a test egyik sík lapjára. A kattintás körüli teljes sík lap számít, nem csak a mutató alatti háromszög. Egy henger, cső vagy furat kerek fala is működik, lásd lent; más görbe lap nem: kapsz egy figyelmeztetést, és helyette egy sík lapra kattintasz.
 2. Az ablakban állítsd be, milyenek legyenek a lyukak, és hogyan helyezkedjenek el:
    - **{{ui:holePattern.form}}:** {{ui:holePattern.form.round}}, {{ui:holePattern.form.square}}, {{ui:holePattern.form.rectangle}}, {{ui:holePattern.form.hexagon}} vagy {{ui:holePattern.form.slot}}.
    - **Méret:** a kerek lyuk {{ui:holePattern.size.diameter}} értéke, a négyzet alakúé az {{ui:holePattern.size.side}}, a téglalapé és a hosszlyuké a {{ui:holePattern.size.width}} és a {{ui:holePattern.size.height}}. A hatszögnél a méret a {{ui:holePattern.size.corners}}.
@@ -143,13 +143,15 @@ Szellőzőkhöz, hangszórórácsokhoz, kosarakhoz és dobozokhoz a {{ui:holePat
 
 A lyukak közönséges lyukak, a testtel csoportosítva, pont mint a {{ui:editor.tool.group}} után: semmi sincs „beégetve”. A {{ui:editor.tool.ungroup}} újra feloldja a csoportot, és minden lyukat felszabadít, amelyeket ezután egyenként mozgathatsz, módosíthatsz vagy törölhetsz. Az egész egyetlen lépés a {{ui:editor.tool.undo}} számára. Az eszköz egyszerre legfeljebb 400 lyukat készít; ilyenkor legyenek nagyobbak a lyukak, vagy nagyobb a távolság.
 
+Egy henger, cső vagy furat kerek fala is kaphat lyukakat: ceruzatartó, lámpabura, szellőzős cső. Sík lap helyett kattints a falra; a mutató alatt az egész fal kivilágosodik. Minden lyuk ekkor egyenesen a tengely felé mutat, és a sorok körbefutnak a falon. Ha a fal teljesen körbeér, minden sorban egész számú lyuk van, úgy kiegyenlítve, hogy a gyűrű rés nélkül záródjon, és a lyukak sosem kerülnek közelebb a távolságnál; az ablak megmondja, hány lyuk megy körbe és milyen távolságra. A szegély a felső és alsó peremhez és a fal nyílásaihoz számít, egy fal részén (például lekerekítésen) az oldalaihoz is. A {{ui:holePattern.depth.throughWall}} csak azt az egy falat vágja át, amelyre kattintottál, a cső túloldalát épen hagyja; tömör hengernél a lyukak a közepéig érnek. Furat belsejében kattintva a lyukak kifelé mennek át a falán. A {{ui:holePattern.arrangement.perimeter}} sík lapokhoz való, falon nem kínálja fel.
+
 Egy MI ugyanezt az MCP-hídon keresztül is meg tudja tenni a `layerling_perforate_face` paranccsal (lásd az [MI MCP-vel](chapter:ai-with-mcp) fejezetet).
 
 ## Lap kitolása vagy benyomása
 
 Vastagabb falhoz, egy lapra emelt párnához vagy egy belevágott zsebhez a {{ui:faceTool.title}} eszköz egyetlen sík lapon dolgozik. Importált STL-en is működik, ahol nincs módosítható vázlat. Jelölj ki pontosan egy testet, és kattints a szalag {{ui:editor.group.modify}} csoportjában a {{ui:faceTool.title}} gombra, a lyukminta mellett. A testre jobb gombbal is kattinthatsz, vagy megkeresheted a [[Ctrl]]+[[K]] billentyűkkel.
 
-1. Kattints a test egy sík lapjára. A lyukmintához hasonlóan a kattintás körüli teljes sík lap számít; görbe lap nem működik. Csoporton vagy kötegen a lap átfut az összeérő részeken, mint a lyukmintánál.
+1. Kattints a test egy sík lapjára. A lyukmintához hasonlóan a kattintás körüli teljes sík lap számít; görbe lap itt nem működik, kerek fal sem. Csoporton vagy kötegen a lap átfut az összeérő részeken, mint a lyukmintánál.
 2. Az ablakban:
    - **{{ui:faceTool.direction}}:** válaszd a {{ui:faceTool.direction.out}} lehetőséget a lapon álló anyaghoz, vagy a {{ui:faceTool.direction.in}} lehetőséget egy belevágott zsebhez. Egy zseb nem megy mélyebbre, mint a lap mögötti test; üreges testen elérheti az üreget.
    - **{{ui:faceTool.inset}}:** mennyivel marad az új körvonal a lap szélén belül. Kifelé a 0 az egész lapot veszi, ami vastagabbá tesz egy falat. A lapon lévő nyílások ugyanennyivel nőnek.
