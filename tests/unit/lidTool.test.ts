@@ -1,11 +1,11 @@
 import { describe, expect, it } from "vitest";
-import { BAYONET_MIN_WALL, HINGE_PIN_GRIP, HINGE_PRINTED_PIN_GRIP, LID_DEFAULTS, LID_TYPES, MAX_BAYONET_AXIAL_GAP, MAX_BAYONET_DEPTH, MAX_BAYONET_DETENT, MAX_BAYONET_LUGS, MAX_BAYONET_TURN, MIN_BAYONET_AXIAL_GAP, MIN_BAYONET_DEPTH, MIN_BAYONET_LUGS, MIN_BAYONET_TURN, MAX_CLICK_BUMP_HEIGHT, MAX_HINGE_PIN, MAX_HINGE_PIN_PLAY, MAX_LID_GAP, MAX_LID_THICKNESS, MAX_LID_THREAD_PITCH, MAX_LID_THREAD_TURNS, MAX_MAGNET_GAP, MIN_CLICK_BUMP_HEIGHT, MIN_HINGE_PIN, MIN_HINGE_PIN_PLAY, MIN_LID_THREAD_PITCH, MIN_LID_THREAD_TURNS, MIN_LID_WALL, MIN_MAGNET_DIAMETER, SCREW_MIN_WALL, bayonetLugSize, bayonetPlan, bayonetTurn, clickBumpPlaces, cornerKnucklePlan, endPlugPlan, hingeKnuckleRadius, hingePinGrip, hingePinHoles, lidClickBumpsFit, lidHandleFits, lidTakesExtras, lidThicknessForMagnets, lidThread, magnetPlaces, magnetPocketDepth, normalizeLidOptions, roundOutline, screwPlan } from "@/lib/lidTool";
+import { BAYONET_MIN_WALL, HINGE_PIN_GRIP, HINGE_PRINTED_PIN_GRIP, LID_DEFAULTS, LID_THREAD_STANDARD_SPECS, LID_THREAD_STANDARDS, LID_TYPES, NECK_LARGER, NECK_SMALLER, MAX_BAYONET_AXIAL_GAP, MAX_BAYONET_DEPTH, MAX_BAYONET_DETENT, MAX_BAYONET_LUGS, MAX_BAYONET_TURN, MIN_BAYONET_AXIAL_GAP, MIN_BAYONET_DEPTH, MIN_BAYONET_LUGS, MIN_BAYONET_TURN, MAX_CLICK_BUMP_HEIGHT, MAX_HINGE_PIN, MAX_HINGE_PIN_PLAY, MAX_LID_GAP, MAX_LID_THICKNESS, MAX_LID_THREAD_PITCH, MAX_LID_THREAD_TURNS, MAX_MAGNET_GAP, MIN_CLICK_BUMP_HEIGHT, MIN_HINGE_PIN, MIN_HINGE_PIN_PLAY, MIN_LID_THREAD_PITCH, MIN_LID_THREAD_TURNS, MIN_LID_WALL, MIN_MAGNET_DIAMETER, SCREW_MIN_WALL, bayonetLugSize, bayonetPlan, bayonetTurn, clickBumpPlaces, cornerKnucklePlan, endPlugPlan, hingeKnuckleRadius, hingePinGrip, hingePinHoles, lidClickBumpsFit, lidHandleFits, lidNeckFit, lidStandardThread, lidTakesExtras, lidThicknessForMagnets, lidThread, magnetPlaces, magnetPocketDepth, normalizeLidOptions, roundOutline, screwPlan } from "@/lib/lidTool";
 import { threadSize } from "@/lib/vase/vase-geometry.mjs";
 
 describe("lid options (#1009)", () => {
   it("starts from a push-in lid with a normal fit", () => {
     expect(normalizeLidOptions()).toEqual(LID_DEFAULTS);
-    expect(LID_DEFAULTS).toEqual({ type: "plug", thickness: 2, gap: 0.2, depth: 4, wall: 1.6, magnets: false, magnetDiameter: 6, magnetHeight: 2, magnetGap: 0.1, hinge: false, hingePin: 1.75, hingeGap: 0.3, hingePinPlay: 0.2, hingeKnuckles: 0, hingePrintPin: false, hingeSide: "back", hingeTeardrop: true, hingeStyle: "outside", hingeEndPlugs: false, clickBumps: false, clickBumpHeight: 0.4, handle: "none", threadPitch: 3, threadTurns: 2, bayonetLugs: 3, bayonetDepth: 8, bayonetAxialGap: 0.3, bayonetDetent: 0.3, bayonetTurn: 0 });
+    expect(LID_DEFAULTS).toEqual({ type: "plug", thickness: 2, gap: 0.2, depth: 4, wall: 1.6, magnets: false, magnetDiameter: 6, magnetHeight: 2, magnetGap: 0.1, hinge: false, hingePin: 1.75, hingeGap: 0.3, hingePinPlay: 0.2, hingeKnuckles: 0, hingePrintPin: false, hingeSide: "back", hingeTeardrop: true, hingeStyle: "outside", hingeEndPlugs: false, clickBumps: false, clickBumpHeight: 0.4, handle: "none", threadPitch: 3, threadTurns: 2, threadStandard: "own", bayonetLugs: 3, bayonetDepth: 8, bayonetAxialGap: 0.3, bayonetDetent: 0.3, bayonetTurn: 0 });
   });
 
   it("takes the kind in any case and keeps the default for an unknown one", () => {
@@ -449,6 +449,156 @@ describe("where a screw lid's thread goes (Discussion #1393)", () => {
     expect("error" in screwPlan(pot(), options({ gap: 0.45 }), 50, 0, 49.7)).toBe(false);
     expect(screwPlan(pot(), options({ gap: 0.5 }), 50, 0, 49.7)).toEqual({ error: { code: "screwGapDeep", gap: 0.45 } });
     expect(screwPlan(pot(), options({ gap: 0.35, threadPitch: 2 }), 50, 0, 49.7)).toEqual({ error: { code: "screwGapDeep", gap: 0.3 } });
+  });
+});
+
+describe("a screw lid with a standard's thread", () => {
+  it("offers its own thread first, as before, and five standards, taken as they are written", () => {
+    expect(LID_THREAD_STANDARDS).toEqual(["own", "pco1881", "pco1810", "gl45", "mason70", "mason86"]);
+    expect(normalizeLidOptions({ type: "screw" }).threadStandard).toBe("own");
+    expect(normalizeLidOptions({ threadStandard: "PCO 1881" }).threadStandard).toBe("pco1881");
+    expect(normalizeLidOptions({ threadStandard: " GL45 " }).threadStandard).toBe("gl45");
+    expect(normalizeLidOptions({ threadStandard: "GL 45" }).threadStandard).toBe("gl45");
+    expect(normalizeLidOptions({ threadStandard: "mason-70" }).threadStandard).toBe("mason70");
+    expect(normalizeLidOptions({ threadStandard: "Mason_86" }).threadStandard).toBe("mason86");
+    expect(normalizeLidOptions({ threadStandard: "pco1882" }).threadStandard).toBe("own");
+    expect(normalizeLidOptions({ threadStandard: 1881 }).threadStandard).toBe("own");
+    expect(Object.keys(LID_THREAD_STANDARD_SPECS)).toEqual(LID_THREAD_STANDARDS.slice(1));
+  });
+
+  it("has each standard's thread as its sources give it", () => {
+    // PCO 1881 (ISBT; the patents and BOSL2): 27.40 across, 2.7 mm pitch, 650 degrees from 1.7 mm down; 24.94 under
+    // the thread; BOSL2's lip of 25.07 above it, which the cap's ridges must pass.
+    expect(LID_THREAD_STANDARD_SPECS.pco1881).toEqual({ name: "PCO 1881", major: 27.4, minor: 24.94, clear: 25.07, pitch: 2.7, flank: 15, crest: 1.02, start: 1.7, turns: 650 / 360, capDepth: 10 });
+    expect(LID_THREAD_STANDARD_SPECS.pco1810).toEqual({ name: "PCO 1810", major: 27.43, minor: 24.51, clear: 25.07, pitch: 3.18, flank: 20, crest: 1.06, start: 1.7, turns: 810 / 360, capDepth: 13 });
+    // GL 45 (DIN 168-1): the glass's largest, 45 and 42.3; a 4 mm pitch, 60 degrees between the flanks.
+    expect(LID_THREAD_STANDARD_SPECS.gl45).toMatchObject({ name: "GL 45", major: 45, minor: 42.3, clear: 42.3, pitch: 4, flank: 30 });
+    // Mason jars: 2.75 and 3.38 inches across the thread, 4 threads per inch.
+    expect(LID_THREAD_STANDARD_SPECS.mason70).toMatchObject({ major: expect.closeTo(2.75 * 25.4, 9), pitch: expect.closeTo(25.4 / 4, 9), flank: 30 });
+    expect(LID_THREAD_STANDARD_SPECS.mason86).toMatchObject({ major: expect.closeTo(3.38 * 25.4, 2), pitch: expect.closeTo(25.4 / 4, 9), flank: 30 });
+    const gl45 = lidStandardThread("gl45");
+    // The glass's tooth is 0.675 of the pitch wide at the core and half that high (DIN 168 Bild 1), here with a flat crest.
+    expect(gl45.depth).toBeCloseTo(1.35, 9);
+    expect(gl45.root).toBeCloseTo(0.675 * 4, 2);
+    // A mason jar's tooth: 3.6 wide at its root, 1.8 deep (BOSL2).
+    expect(lidStandardThread("mason70").depth).toBeCloseTo(1.8, 9);
+    expect(lidStandardThread("mason70").root).toBeCloseTo(3.6, 2);
+    expect(lidStandardThread("mason86").root).toBeCloseTo(3.6, 2);
+    // PCO's crest is as wide as the root's gap, as BOSL2 draws it.
+    for (const standard of ["pco1881", "pco1810"] as const) {
+      const thread = lidStandardThread(standard);
+      expect(thread.crest, standard).toBeCloseTo(thread.pitch - thread.root, 2);
+    }
+  });
+
+  it("keeps every standard's thread on its neck inside the cap, its ridges off the neck, and the usual fits within reach", () => {
+    for (const standard of LID_THREAD_STANDARDS.slice(1) as Exclude<typeof LID_THREAD_STANDARDS[number], "own">[]) {
+      const thread = lidStandardThread(standard);
+      expect(thread.depth, standard).toBeCloseTo((thread.major - thread.minor) / 2, 12);
+      expect(thread.length, standard).toBeCloseTo(thread.turns * thread.pitch + thread.root, 12);
+      expect(thread.end, standard).toBeCloseTo(thread.start + thread.length, 12);
+      expect(thread.end, standard).toBeLessThan(thread.capDepth);
+      expect(thread.root, standard).toBeLessThan(thread.pitch);
+      expect(thread.clear, standard).toBeGreaterThanOrEqual(thread.minor);
+      expect(thread.clear, standard).toBeLessThan(thread.major);
+      // The loose fit, 0.3 mm, is within half the thread's depth.
+      expect(thread.depth / 2, standard).toBeGreaterThan(0.6);
+      expect([thread.neckFrom, thread.neckTo]).toEqual([thread.minor - NECK_SMALLER, thread.minor + NECK_LARGER]);
+    }
+    expect(lidStandardThread("pco1881")).toMatchObject({ depth: expect.closeTo(1.23, 9), end: expect.closeTo(1.7 + 650 / 360 * 2.7 + 1.02 + 2 * 1.23 * Math.tan(Math.PI / 12), 9) });
+  });
+
+  it("takes a body's top as the neck from a millimetre smaller to a fifth of one larger across, and says why not otherwise", () => {
+    expect([NECK_SMALLER, NECK_LARGER]).toEqual([1, 0.2]);
+    const top = (diameter: number) => ({ outer: diameter / 2, inner: diameter / 2 });
+    expect(lidNeckFit("pco1881", top(24.94))).toBeNull();
+    expect(lidNeckFit("pco1881", top(23.94))).toBeNull();
+    expect(lidNeckFit("pco1881", top(25.14))).toBeNull();
+    expect(lidNeckFit("pco1881", top(23.9))).toEqual({ reason: "size", diameter: 23.9 });
+    expect(lidNeckFit("pco1881", top(25.2))).toEqual({ reason: "size", diameter: 25.2 });
+    // The bottle a cap is wanted for: as wide as its neck over the thread.
+    expect(lidNeckFit("pco1881", top(28))).toEqual({ reason: "size", diameter: 28 });
+    expect(lidNeckFit("pco1881", null)).toEqual({ reason: "notRound" });
+    // Its nearest point must reach the smallest, its farthest stay within the largest.
+    expect(lidNeckFit("gl45", { outer: 21.1, inner: 20.6 })).toEqual({ reason: "size", diameter: 42.2 });
+    expect(lidNeckFit("gl45", { outer: 21.26, inner: 21.1 })).toEqual({ reason: "size", diameter: 42.5 });
+    expect(lidNeckFit("gl45", { outer: 21.2, inner: 21.1 })).toBeNull();
+    expect(lidNeckFit("mason70", top(66))).toBeNull();
+    expect(lidNeckFit("mason86", top(82.25))).toBeNull();
+    expect(lidNeckFit("mason86", top(66.25))).toEqual({ reason: "size", diameter: 66.3 });
+  });
+});
+
+describe("where a standard's thread and cap go", () => {
+  /** A pot `diameter` across with a `wall`, seen from above, or what `shape` gives at a height. */
+  const pot = (diameter: number, wall = 1.6, shape?: (z: number) => { outer: [number, number][][]; opening: [number, number][][] }) => (z: number) => {
+    const level = shape ? shape(z) : { outer: [polygonRound(diameter / 2)], opening: [polygonRound(diameter / 2 - wall, 192, 0, 0, true)] };
+    return { outline: level.outer, opening: level.opening };
+  };
+  const options = (patch: Record<string, unknown> = {}) => normalizeLidOptions({ type: "screw", threadStandard: "pco1881", ...patch });
+
+  it("puts a PCO 1881 neck's thread where the standard has it on a body that is the neck, and makes the cap to the standard", () => {
+    const plan = screwPlan(pot(24.94), options(), 30, 0, 29.7);
+    if ("error" in plan) throw new Error(plan.error.code);
+    expect(plan.neck).toBeNull();
+    expect(plan.standard).toBe("pco1881");
+    // From 1.7 mm below the rim, 650 degrees and its tooth down; the cap 10 mm deep.
+    expect(plan.to).toBeCloseTo(28.3, 9);
+    expect(plan.from).toBeCloseTo(30 - lidStandardThread("pco1881").end, 9);
+    expect(plan.mouth).toBe(20);
+    expect([plan.pitch, plan.turns, plan.crest]).toEqual([2.7, 650 / 360, 1.02]);
+    expect(plan.depth).toBeCloseTo(1.23, 9);
+    // On the neck under the thread, whatever the body's own size; 15 degree flanks fall 3.73 mm a millimetre.
+    expect(plan.base).toBeCloseTo(12.47, 9);
+    expect(plan.slope).toBeCloseTo(1 / Math.tan(Math.PI / 12), 9);
+    // The cap's ridges 25.07 / 2 and the gap from the axis, its grooves the gap square to the flanks wider, its rim
+    // the thread, the gap and the wall out.
+    expect(plan.clear).toBeCloseTo(12.535 + 0.2, 9);
+    expect(plan.widen).toBeCloseTo(0.2 * (1 / Math.cos(Math.PI / 12) - Math.tan(Math.PI / 12)), 9);
+    expect(plan.capRadius).toBeCloseTo(13.7 + 0.2 + 1.6, 9);
+    expect(plan.reach).toBeCloseTo(0.8, 2);
+    // A body a little thinner gets the same thread, standing on the standard's neck.
+    const thinner = screwPlan(pot(24), options(), 30, 0, 29.7);
+    if ("error" in thinner) throw new Error(thinner.error.code);
+    expect(thinner.neck).toBeNull();
+    expect(thinner.base).toBeCloseTo(12.47, 9);
+    expect(thinner.inner).toBeCloseTo(12 * Math.cos(Math.PI / 192), 9);
+  });
+
+  it("makes the cap alone for a body that is not the neck, whatever its height, wall or opening", () => {
+    const wide = screwPlan(pot(30, 2), options(), 30, 0, 29.7);
+    if ("error" in wide) throw new Error(wide.error.code);
+    expect(wide.neck).toEqual({ reason: "size", diameter: 30 });
+    expect(wide.capRadius).toBeCloseTo(15.5, 9);
+    expect(wide.mouth).toBe(20);
+    // A ring 3 mm high with a thin wall, a solid rod: the cap all the same.
+    expect(screwPlan(pot(30, 0.3), options(), 30, 27, 29.7)).toMatchObject({ neck: { reason: "size", diameter: 30 } });
+    const rod = screwPlan(() => ({ outline: [polygonRound(15)], opening: [] }), options(), 30, 0, 29.7);
+    expect(rod).toMatchObject({ neck: { reason: "size", diameter: 30 } });
+    // A box is no neck: the cap goes round its middle.
+    const box = screwPlan(() => ({ outline: [[[-20, -10], [30, -10], [30, 20], [-20, 20]]], opening: [] }), options(), 30, 0, 29.7);
+    if ("error" in box) throw new Error(box.error.code);
+    expect(box.neck).toEqual({ reason: "notRound" });
+    expect(box.centre).toEqual([5, 5]);
+  });
+
+  it("refuses a neck too low for the thread, one that does not stay the neck as far as the cap reaches, a thin wall and a gap too large", () => {
+    // 650 degrees and the tooth from 1.7 mm down end 8.25 mm down; 0.4 mm must stay below.
+    expect(screwPlan(pot(24.94), options(), 30, 21.5, 29.7)).toEqual({ error: { code: "screwStandardTooLow", standard: "pco1881", height: 8.3 } });
+    // A neck on a ring shorter than the cap reaches is fine: nothing is in the cap's way below it.
+    expect("error" in screwPlan(pot(24.94), options(), 30, 21.3, 29.7)).toBe(false);
+    // A shoulder 6 mm below the rim, where the cap still reaches, or a neck that tapers.
+    const shoulder = pot(24.94, 1.6, (z) => ({ outer: [polygonRound(z < 24 ? 20 : 12.47)], opening: [polygonRound(10.87, 192, 0, 0, true)] }));
+    expect(screwPlan(shoulder, options(), 30, 0, 29.7)).toEqual({ error: { code: "screwStandardNeck", standard: "pco1881", depth: 10 } });
+    const tapering = pot(24.94, 1.6, (z) => ({ outer: [polygonRound(12.47 + (30 - z) / 40)], opening: [polygonRound(10.87, 192, 0, 0, true)] }));
+    expect(screwPlan(tapering, options(), 30, 0, 29.7)).toEqual({ error: { code: "screwStandardNeck", standard: "pco1881", depth: 10 } });
+    expect(screwPlan(pot(24.94, 0.6), options(), 30, 0, 29.7)).toEqual({ error: { code: "screwThinWall" } });
+    // At most half the depth: 0.61 mm on PCO 1881, 0.9 on a mason jar; for the cap alone as well.
+    expect(screwPlan(pot(24.94), options({ gap: 0.65 }), 30, 0, 29.7)).toEqual({ error: { code: "screwStandardGapDeep", gap: 0.61 } });
+    expect(screwPlan(pot(30), options({ gap: 0.65 }), 30, 0, 29.7)).toEqual({ error: { code: "screwStandardGapDeep", gap: 0.61 } });
+    expect("error" in screwPlan(pot(66.25), options({ threadStandard: "mason70", gap: 0.9 }), 30, 0, 29.7)).toBe(false);
+    // The own thread's pitch and turns do not count.
+    expect("error" in screwPlan(pot(24.94), options({ threadPitch: 8, threadTurns: 8 }), 30, 0, 29.7)).toBe(false);
   });
 });
 

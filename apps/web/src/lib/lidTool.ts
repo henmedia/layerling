@@ -17,7 +17,9 @@ import type { WorkplaneShape } from "@/types/layerling";
  * - both: the lip of the plug and the rim of the cap on one plate, so the body's wall sits in a groove between them (#1062);
  * - flat: only the plate, as large as the body, to glue on or lay on top;
  * - screw: like a jar (Discussion #1393), for a round body: a thread on the outside of its top, grouped with it, and a
- *   cap whose rim has the matching thread inside, the gap all round (see `screwPlan`);
+ *   cap whose rim has the matching thread inside, the gap all round (see `screwPlan`); or a standard bottle's or jar's
+ *   thread (`LID_THREAD_STANDARD_SPECS`), whose cap fits that bottle, the body getting the neck's thread only if it is
+ *   one (`lidNeckFit`);
  * - bayonet: a twist lock (Discussion #1424), for a round body too: lugs standing out of the outside of its top, grouped
  *   with it, and a cap with an L-shaped slot inside its rim for each, pushed down over them and turned to lock, where a
  *   rib behind each lug makes it click (see `bayonetPlan`).
@@ -75,7 +77,10 @@ export type LidHandle = "none" | "tab" | "notch";
  * `clickBumpHeight` into the body's wall past the gap; `handle` a pull tab or a finger notch.
  * A screw lid's thread climbs `threadPitch` mm a turn and goes `threadTurns` times round: that is how far its cap's rim
  * reaches down. The gap is then the thread's room per side, measured across the radius as a nut's clearance is (on the
- * 45 degree flanks that leaves about 0.7 of it), and the wall what the cap's rim keeps outside the thread.
+ * 45 degree flanks that leaves about 0.7 of it), and the wall what the cap's rim keeps outside the thread. With a
+ * `threadStandard` other than `own`, the thread is that standard's and pitch and turns do not count; the gap is then the
+ * room all round the thread, square to its faces as well, and the body gets the thread only if its top is that
+ * standard's neck (`lidNeckFit`): otherwise the cap is made alone.
  * A bayonet lid has `bayonetLugs` lugs round the body's top, and its cap's rim reaches `bayonetDepth` down. The gap is the
  * room per side across the radius, round the lugs and along the body's wall; `bayonetAxialGap` is the room along the
  * axis between the lugs' undersides and the ledge of the cap under them, how far the locked cap lifts before it holds;
@@ -108,6 +113,7 @@ export type LidOptions = {
   handle: LidHandle;
   threadPitch: number;
   threadTurns: number;
+  threadStandard: LidThreadStandard;
   bayonetLugs: number;
   bayonetDepth: number;
   bayonetAxialGap: number;
@@ -119,7 +125,7 @@ export const LID_TYPES: readonly LidType[] = ["plug", "cap", "both", "flat", "sc
 export const LID_DEFAULTS: LidOptions = {
   type: "plug", thickness: 2, gap: 0.2, depth: 4, wall: 1.6, magnets: false, magnetDiameter: 6, magnetHeight: 2, magnetGap: 0.1,
   hinge: false, hingePin: 1.75, hingeGap: 0.3, hingePinPlay: 0.2, hingeKnuckles: 0, hingePrintPin: false, hingeSide: "back", hingeTeardrop: true, hingeStyle: "outside", hingeEndPlugs: false,
-  clickBumps: false, clickBumpHeight: 0.4, handle: "none", threadPitch: 3, threadTurns: 2,
+  clickBumps: false, clickBumpHeight: 0.4, handle: "none", threadPitch: 3, threadTurns: 2, threadStandard: "own",
   bayonetLugs: 3, bayonetDepth: 8, bayonetAxialGap: 0.3, bayonetDetent: 0.3, bayonetTurn: 0,
 };
 /**
@@ -288,6 +294,104 @@ const SCREW_FLOOR = 0.4;
 const SCREW_STEP = 0.5;
 /** How many rows of points a pitch of the thread has, up the wall: as many as the vase's screw lid. */
 const SCREW_ROWS_PER_PITCH = 16;
+
+/**
+ * A screw lid's thread: its own (`own`, sized by `threadPitch` and `threadTurns`), or a standard neck's, so that the cap
+ * fits a bottle or jar from the shop and a body made as that neck takes a cap from the shop (see `LID_THREAD_STANDARD_SPECS`).
+ */
+export type LidThreadStandard = "own" | "pco1881" | "pco1810" | "gl45" | "mason70" | "mason86";
+export const LID_THREAD_STANDARDS: readonly LidThreadStandard[] = ["own", "pco1881", "pco1810", "gl45", "mason70", "mason86"];
+
+/**
+ * A standard neck's thread and the cap for it, in mm. All of them are single-start right-hand threads, and their profile
+ * is a trapezoid as the own thread's, but with the standard's flanks, which are steeper than 45 degrees.
+ * - `name`: what the standard is called, the same in every language.
+ * - `major`: the thread's outside diameter on the neck (T), `minor`: the neck's diameter under the thread (E). Where the
+ *   standard gives tolerances, the largest it allows: a cap that clears these clears every neck of the standard, and a
+ *   neck made to them fits every cap.
+ * - `clear`: how close to the axis the cap's ridges may come, across, before the gap: the neck under the thread, or what
+ *   the cap must pass above the thread when it is wider.
+ * - `pitch`; `flank`: each flank's angle from the plane square to the axis, in degrees (half the angle between them);
+ *   `crest`: how wide the thread is at its outside, along the axis.
+ * - `start`: how far below the rim the thread on the neck begins; `turns`: how far it goes round there.
+ * - `capDepth`: how far the cap reaches down from the rim, inside; no standard here sets it, it follows the caps sold.
+ *
+ * The standards' drawings are not free (ISBT, DIN, GPI), so the numbers are taken from where they are quoted, and where
+ * none is published they are measured ones; each entry says which.
+ */
+export type LidThreadStandardSpec = {
+  name: string;
+  major: number;
+  minor: number;
+  clear: number;
+  pitch: number;
+  flank: number;
+  crest: number;
+  start: number;
+  turns: number;
+  capDepth: number;
+};
+
+export const LID_THREAD_STANDARD_SPECS: Record<Exclude<LidThreadStandard, "own">, LidThreadStandardSpec> = {
+  /**
+   * PCO 1881, the 28 mm neck of most water and soft-drink bottles (ISBT voluntary guideline, drawing 3784253; the
+   * drawing itself is for members). The patents WO2016019321A1 and US20170210503A1 describe "the standard 28 mm PCO 1881
+   * finish" as single-start, the thread starting 1.70 mm below the top, 2.70 mm pitch, 650 degrees of thread, 27.40 mm
+   * across it (T); the OpenSCAD library BOSL2 (`pco1881_neck` in bottlecaps.scad) draws the same, its 15 degree flanks,
+   * a lip 25.07 mm across above the thread and the tamper ring's bead from 11.2 mm down. Under the thread the neck is
+   * 24.94 mm across (E), as the OpenSCAD threads library thread_profile.scad (`bottle_pco1881_neck_thread_dia`) and the
+   * alpaco.it blog give it; BOSL2 draws the thread's root at 24.2, deeper than the cap's ridges go (25.5 in BOSL2's
+   * `pco1881_cap`, 25.5 in thread_profile.scad), so it does not change what fits. Approximations: the flanks (BOSL2's 15
+   * degrees; thread_profile.scad's thread has about 10) and the crest, as wide as the root's gap as BOSL2 draws it,
+   * 1.02 mm (thread_profile.scad: 1.0). The cap reaches 10 mm down, above the bead.
+   */
+  pco1881: { name: "PCO 1881", major: 27.4, minor: 24.94, clear: 25.07, pitch: 2.7, flank: 15, crest: 1.02, start: 1.7, turns: 650 / 360, capDepth: 10 },
+  /**
+   * PCO 1810, the older 28 mm drinks bottle neck with a taller thread, which PCO 1881 replaced (ISBT). BOSL2's
+   * `pco1810_neck`: 27.43 mm across the thread, 3.18 mm pitch, 810 degrees of thread from 1.70 mm below the top, 20
+   * degree flanks, the thread's root 24.51 mm across, the lip above it 25.07 mm, the tamper ring's bead from 14.1 mm down;
+   * the diameter and pitch as imajeenyus.com and alpaco.it give them. Approximations: the root (BOSL2's only) and the crest,
+   * drawn as BOSL2 does, 1.06 mm. The cap reaches 13 mm down.
+   */
+  pco1810: { name: "PCO 1810", major: 27.43, minor: 24.51, clear: 25.07, pitch: 3.18, flank: 20, crest: 1.06, start: 1.7, turns: 810 / 360, capDepth: 13 },
+  /**
+   * GL 45, the thread of laboratory bottles (DIN 168-1:1998-04, as the bottles of ISO 4796-1 have it). Tabelle 1 and Bild
+   * 1 as the OpenSCAD library din168-thread-scad records them from the standard (its docs/references.md), and the
+   * tables of gewindebohrer.de and gewinde-normen.de: single-start, 4 mm pitch; on the glass 45.00 mm across the thread
+   * (down to 44.30) and 42.30 under it (down to 41.60), in the cap 45.15 to 45.55 and 42.45 to 42.85; 60 degrees between
+   * the glass's flanks, its tooth 0.675 of the pitch wide at the core, 2.7 mm. Approximation: the standard rounds the
+   * crest (R 0.99), the trapezoid ends it flat, 1.14 mm wide, a little fuller, which only gives the cap more room. The
+   * standard sets neither the thread's place on the neck nor the cap: the thread starts 3 mm down and goes round twice,
+   * and the cap reaches 20 mm down, as DURAN's GL 45 cap (DWK: 25 mm high) less its top, which din168-thread-scad's
+   * printed cap found to thread on cleanly.
+   */
+  gl45: { name: "GL 45", major: 45, minor: 42.3, clear: 42.3, pitch: 4, flank: 30, crest: 1.14, start: 3, turns: 2, capDepth: 20 },
+  /**
+   * The mason jar's regular mouth, 70-450 (Ball, Kerr). The Glass Packaging Institute does not publish its drawing, so
+   * these are approximations from measured jars and a cap maker's drawing: BOSL2's `mason_neck` (70-450: 69.85 mm across
+   * the thread, 4 threads per inch, the thread 3 mm below the top, 3.6 mm wide at its root and 1.8 deep with 60 degrees
+   * between its flanks), Comet Tool's drawing of a 70-450 cap (1340-0109: 0.250 in pitch, 4 per inch, 1 1/4 turns, 13.4 mm
+   * high, its ridges 68.6 mm across) and a printed cap tried on jars (canning_jar_lids.scad, a Thingiverse model: 1/4 in
+   * pitch, its ridges best at about 67.2 mm across). The cap's ridges keep a millimetre more room than the neck under the
+   * thread, as that cap's did; the thread on a neck goes round once, and the cap reaches 13 mm down, as a ring does.
+   */
+  mason70: { name: "Mason 70", major: 69.85, minor: 66.25, clear: 67.25, pitch: 6.35, flank: 30, crest: 1.52, start: 3, turns: 1, capDepth: 13 },
+  /**
+   * The mason jar's wide mouth, 86 mm (86-400 in BOSL2, 86-450 elsewhere): BOSL2's 85.85 mm across the thread, the same
+   * thread as the regular mouth; the printed cap above went on best at 83.3 to 83.8 mm across its ridges. Approximations
+   * as for the regular mouth.
+   */
+  mason86: { name: "Mason 86", major: 85.85, minor: 82.25, clear: 83.25, pitch: 6.35, flank: 30, crest: 1.52, start: 3, turns: 1, capDepth: 13 },
+};
+
+/**
+ * How far a body's top may be from a standard's neck under the thread (`minor`) and still get its thread, across, in
+ * mm: a millimetre smaller (the thread's ring then fills up to the neck), or a fifth of a millimetre larger, as round as
+ * an editor's cylinder of the neck's size. A larger one would come near the cap's ridges, which keep the gap from the
+ * standard's neck, not the body's.
+ */
+export const NECK_SMALLER = 1;
+export const NECK_LARGER = 0.2;
 /**
  * A bayonet lid's lugs (Discussion #1424): two to four round the body, three to begin with, which hold the cap evenly
  * and leave it a turn of 40 degrees between them.
@@ -417,6 +521,9 @@ export function normalizeLidOptions(value?: Partial<Record<keyof LidOptions, unk
   if (threadPitch !== null) result.threadPitch = clamp(threadPitch, MIN_LID_THREAD_PITCH, MAX_LID_THREAD_PITCH);
   const threadTurns = finiteNumber(value?.threadTurns);
   if (threadTurns !== null) result.threadTurns = clamp(threadTurns, MIN_LID_THREAD_TURNS, MAX_LID_THREAD_TURNS);
+  // Written as the standard is ("PCO 1881", "GL45", "mason-70") or as the list has it.
+  const threadStandard = typeof value?.threadStandard === "string" ? value.threadStandard.toLowerCase().replace(/[\s_-]+/g, "") : "";
+  if ((LID_THREAD_STANDARDS as readonly string[]).includes(threadStandard)) result.threadStandard = threadStandard as LidThreadStandard;
   const bayonetLugs = finiteNumber(value?.bayonetLugs);
   if (bayonetLugs !== null) result.bayonetLugs = Math.round(clamp(bayonetLugs, MIN_BAYONET_LUGS, MAX_BAYONET_LUGS));
   const bayonetDepth = finiteNumber(value?.bayonetDepth);
@@ -470,6 +577,35 @@ export function lidThread(options: Pick<LidOptions, "threadPitch" | "threadTurns
   const pitch = options.threadPitch;
   const depth = Math.min(MAX_THREAD_DEPTH, 0.3 * pitch);
   return { pitch, depth, crest: (pitch - 2 * depth) / 2, height: pitch * options.threadTurns };
+}
+
+/**
+ * A standard's thread as the lid draws it, in mm: its spec, how deep it is (`depth`, from the neck under it to its
+ * outside), how wide its tooth is at the root (`root`), how much of the neck it takes up (`length`: its turns times the
+ * pitch, and the tooth), where it ends below the rim (`end`), and which sizes of a body's top count as its neck
+ * (`neckFrom` to `neckTo`, across).
+ */
+export function lidStandardThread(standard: Exclude<LidThreadStandard, "own">) {
+  const spec = LID_THREAD_STANDARD_SPECS[standard];
+  const depth = (spec.major - spec.minor) / 2;
+  const root = spec.crest + 2 * depth * Math.tan((spec.flank * Math.PI) / 180);
+  const length = spec.turns * spec.pitch + root;
+  return { ...spec, depth, root, length, end: spec.start + length, neckFrom: spec.minor - NECK_SMALLER, neckTo: spec.minor + NECK_LARGER };
+}
+
+/** Why a body takes no standard's thread, and the cap is made alone: its top is not round, or not the neck's size. */
+export type LidCapOnly = { reason: "notRound" } | { reason: "size"; diameter: number };
+
+/**
+ * Whether a body's top, as `roundOutline` finds it at the rim (null: not round), is the neck of `standard`: across it,
+ * from `neckFrom` at its nearest to `neckTo` at its farthest. Null if it is; otherwise why not, with the top's diameter
+ * (its farthest, to a tenth) when it is round.
+ */
+export function lidNeckFit(standard: Exclude<LidThreadStandard, "own">, round: { outer: number; inner: number } | null): LidCapOnly | null {
+  if (!round) return { reason: "notRound" };
+  const { neckFrom, neckTo } = lidStandardThread(standard);
+  if (2 * round.inner >= neckFrom - 1e-9 && 2 * round.outer <= neckTo + 1e-9) return null;
+  return { reason: "size", diameter: Math.round(20 * round.outer) / 10 };
 }
 
 /**
@@ -913,7 +1049,9 @@ export type LidError =
   | { code: "clickBumpsNoLip" | "clickBumpsNoRoom" | "handlePivot" | "handleSideShort" | "handleNotchNoRoom" }
   | { code: "screwExtras" | "screwNotRound" | "screwThinWall" }
   | { code: "screwTooLow"; height: number }
-  | { code: "screwGapDeep"; gap: number }
+  | { code: "screwGapDeep" | "screwStandardGapDeep"; gap: number }
+  | { code: "screwStandardTooLow"; standard: Exclude<LidThreadStandard, "own">; height: number }
+  | { code: "screwStandardNeck"; standard: Exclude<LidThreadStandard, "own">; depth: number }
   | { code: "bayonetExtras" | "bayonetNotRound" | "bayonetThinWall" | "bayonetNoRoom" }
   | { code: "bayonetTooLow"; height: number }
   | { code: "bayonetGapDeep"; gap: number }
@@ -1114,13 +1252,36 @@ export type ScrewPlan = {
   inner: number;
   /** How far the thread on the body reaches into its wall, from `inner`. */
   reach: number;
-  /** Where the thread starts: the height the cap's rim reaches down to when screwed on. */
+  /**
+   * Where the thread on the body starts and ends. The own thread's start is the height the cap's rim reaches down to
+   * when screwed on, its end just below the rim; a standard's lies where the standard has it on its neck.
+   */
   from: number;
+  to: number;
   pitch: number;
+  /** How many times the thread goes round: the turns asked for, or the standard's on its neck. */
+  turns: number;
   depth: number;
   crest: number;
+  /** How steeply the flanks fall from the crest: across the radius per mm along the axis, 1 at 45 degrees. */
+  slope: number;
+  /** The radius the thread stands on: the body's outer face (`radius`), or a standard's neck under its thread. */
+  base: number;
+  /** Where the cap's mouth is: the height its rim reaches down to. */
+  mouth: number;
+  /** How close to the axis the cap's ridges come: the gap outside the body, or outside a standard's `clear`. */
+  clear: number;
+  /**
+   * How much wider each of the cap's grooves is than the thread at its crest, along the axis, each side, beyond what the
+   * gap across the radius gives: 0 for the own thread, whose gap is a nut's, across the radius; for a standard's, whose
+   * flanks are steep, as much more as keeps the gap square to them too.
+   */
+  widen: number;
   /** How far the cap's rim reaches from the axis: the thread, the gap and the wall. */
   capRadius: number;
+  standard: LidThreadStandard;
+  /** Null when the body gets the thread; otherwise why a standard's cap is made alone. */
+  neck: LidCapOnly | null;
 };
 
 /**
@@ -1132,9 +1293,10 @@ export type ScrewPlan = {
  * so the wall keeps its strength and a thin one takes a thread too; it reaches SCREW_REACH into the wall (half the wall at
  * most), which must be SCREW_MIN_WALL thick where it is thinnest: from the farthest point of an opening to the nearest of
  * the outline. Below the thread, SCREW_FLOOR of the body stays. The gap may be at most half the thread's depth, so the
- * threads still overlap by as much as they keep apart.
+ * threads still overlap by as much as they keep apart. With a standard's thread, see `standardScrewPlan`.
  */
 export function screwPlan(sliceAt: LidSlicer, options: LidOptions, top: number, bottom: number, rim: number): ScrewPlan | { error: LidError } {
+  if (options.threadStandard !== "own") return standardScrewPlan(sliceAt, options, options.threadStandard, top, bottom, rim);
   const thread = lidThread(options);
   if (options.gap > thread.depth / 2 + 1e-9) return { error: { code: "screwGapDeep", gap: Math.floor((thread.depth / 2) * 100 + 1e-6) / 100 } };
   const from = top - thread.height;
@@ -1144,9 +1306,52 @@ export function screwPlan(sliceAt: LidSlicer, options: LidOptions, top: number, 
   if (body.wall < SCREW_MIN_WALL - 1e-9) return { error: { code: "screwThinWall" } };
   const { centre, radius, inner, wall } = body;
   return {
-    centre, radius, inner, reach: Math.min(SCREW_REACH, wall / 2), from,
-    pitch: thread.pitch, depth: thread.depth, crest: thread.crest, capRadius: radius + options.gap + thread.depth + options.wall,
+    centre, radius, inner, reach: Math.min(SCREW_REACH, wall / 2), from, to: top - SCREW_TOP_INSET,
+    pitch: thread.pitch, turns: options.threadTurns, depth: thread.depth, crest: thread.crest, slope: 1, base: radius, mouth: from, clear: radius + options.gap, widen: 0,
+    capRadius: radius + options.gap + thread.depth + options.wall, standard: "own", neck: null,
   };
+}
+
+/**
+ * A screw lid with a standard's thread (`LID_THREAD_STANDARD_SPECS`): the cap is made to the standard whatever the body,
+ * so it fits a bottle or jar from the shop. Its inside is the standard neck's thread moved the gap away all round:
+ * square to the steep flanks too, not only across the radius as the own thread's cap (`widen`), its ridges no nearer the
+ * axis than the standard's `clear` and the gap, its grooves the standard's outside diameter and the gap; its rim reaches
+ * the standard's `capDepth` down and its mouth widens at 45 degrees, as the own cap's does.
+ * The body gets the neck's thread, at the standard's sizes and place, only if its top is that neck (`lidNeckFit`): round
+ * and as wide as the neck under the thread. Otherwise it stays as it is and the cap is made alone (`neck` says why): a
+ * stand-in for the bottle a cap is wanted for, or any other body. A body that is the neck must stay so - round and as
+ * wide - as far down as the cap reaches (or to its bottom, for a ring shorter than that), have SCREW_FLOOR below the thread
+ * and a wall of SCREW_MIN_WALL; else it is refused with a message. A body a little thinner than the neck gets the
+ * thread's ring filled up to the neck's size; its ends, as the own thread's, are cut back at 45 degrees from the body's face.
+ */
+function standardScrewPlan(sliceAt: LidSlicer, options: LidOptions, standard: Exclude<LidThreadStandard, "own">, top: number, bottom: number, rim: number): ScrewPlan | { error: LidError } {
+  const thread = lidStandardThread(standard);
+  const gap = options.gap;
+  if (gap > thread.depth / 2 + 1e-9) return { error: { code: "screwStandardGapDeep", gap: Math.floor((thread.depth / 2) * 100 + 1e-6) / 100 } };
+  const flank = (thread.flank * Math.PI) / 180;
+  const base = thread.minor / 2;
+  const from = top - thread.end;
+  const shared = {
+    from, to: top - thread.start, pitch: thread.pitch, turns: thread.turns, depth: thread.depth, crest: thread.crest, slope: 1 / Math.tan(flank), base,
+    mouth: top - thread.capDepth, clear: thread.clear / 2 + gap, widen: gap * (1 / Math.cos(flank) - Math.tan(flank)), capRadius: thread.major / 2 + gap + options.wall, standard,
+  };
+  const atRim = sliceAt(rim);
+  const round = roundOutline(atRim.outline);
+  const neck = lidNeckFit(standard, round);
+  if (neck) {
+    // The cap alone: round a round top's middle, else the middle of the top's box; it is laid beside the body anyway.
+    const points = atRim.outline.flat();
+    const centre: Point = round?.centre ?? (points.length ? [(Math.min(...points.map(([x]) => x)) + Math.max(...points.map(([x]) => x))) / 2, (Math.min(...points.map(([, y]) => y)) + Math.max(...points.map(([, y]) => y))) / 2] : [0, 0]);
+    return { ...shared, centre, radius: base, inner: base, reach: 0, neck };
+  }
+  if (from < bottom + SCREW_FLOOR) return { error: { code: "screwStandardTooLow", standard, height: Math.round(thread.end * 10) / 10 } };
+  const lowest = Math.max(top - thread.capDepth, bottom + SCREW_FLOOR);
+  const body = roundBody(sliceAt, rim, lowest + 0.05);
+  if (!body || lidNeckFit(standard, { outer: body.radius, inner: body.inner })) return { error: { code: "screwStandardNeck", standard, depth: Math.round((top - Math.max(top - thread.capDepth, bottom)) * 10) / 10 } };
+  if (body.wall < SCREW_MIN_WALL - 1e-9) return { error: { code: "screwThinWall" } };
+  const { centre, radius, inner, wall } = body;
+  return { ...shared, centre, radius, inner, reach: Math.min(SCREW_REACH, wall / 2), neck: null };
 }
 
 /** The body seen from above at a height, as lidForSolid slices it: its outer contours and the openings in them. */
@@ -1366,8 +1571,10 @@ function rowsFrom(low: number, high: number, step: number) {
  * - The cap is the plate on the rim and a rim reaching down to where the thread starts, its inside the body's thread
  *   moved the gap further out all round, so the two never meet, its outside the wall further out. Its mouth widens at 45
  *   degrees to clear the thread's crest, so it finds the thread; turned over, it prints on its plate without support.
+ * A standard's thread and cap are drawn otherwise (`standardScrewSolids`).
  */
 function screwSolids(runtime: ManifoldToplevel, plan: ScrewPlan, options: LidOptions, top: number, created: { delete?: () => void }[]) {
+  if (plan.standard !== "own") return standardScrewSolids(runtime, plan, options, top, created);
   const sides = Math.min(512, Math.max(96, 4 * Math.ceil((2 * Math.PI * plan.capRadius) / SCREW_STEP / 4)));
   const step = plan.pitch / SCREW_ROWS_PER_PITCH;
   // How far the crest stands out at this angle and height: the depth on the crest, less along the flanks; below 0 in
@@ -1378,7 +1585,7 @@ function screwSolids(runtime: ManifoldToplevel, plan: ScrewPlan, options: LidOpt
     return plan.depth - Math.max(0, along - plan.crest / 2);
   };
   const root = plan.inner - SCREW_ROOT_INSET;
-  const to = top - SCREW_TOP_INSET;
+  const to = plan.to;
   const thread = roundMesh(runtime, plan.centre, sides, {
     rows: rowsFrom(plan.from, to, step),
     radius: (angle, z) => Math.max(root, Math.min(plan.radius + crestHeight(angle, z), root + (z - plan.from), root + (to - z))),
@@ -1388,6 +1595,117 @@ function screwSolids(runtime: ManifoldToplevel, plan: ScrewPlan, options: LidOpt
     rows: rowsFrom(plan.from, top, step),
     radius: (angle, z) => plan.radius + gap + Math.max(0, crestHeight(angle, z), plan.depth - (z - plan.from)),
   }, created);
+  return { thread, cap };
+}
+
+/**
+ * A solid that winds round the up axis through `centre` as a thread does, rising `pitch` a turn anticlockwise seen from
+ * above, a crest's middle at `top` on the x axis: between `inner` from the axis and `outer(s)`, where s is how far along
+ * the axis a point lies from the middle of the nearest crest, -pitch/2 to pitch/2. Its rows of points wind with it, one
+ * at each of `corners` (values of s where the profile bends) in every pitch, so the profile is drawn exactly at every
+ * angle; rows at fixed heights, as `roundMesh` draws, would cut its corners as they wind past them, by as much as a
+ * steep flank falls between two rows. It reaches from below `low` to above `high` by more than a pitch, its two ends
+ * winding as well, and is cut to length by the caller. Each sheet's points lie at the same angles, `sides` round.
+ */
+function windingMesh(runtime: ManifoldToplevel, centre: Point, sides: number, pitch: number, top: number, corners: readonly number[], outer: (s: number) => number, inner: number, low: number, high: number, created: { delete?: () => void }[]) {
+  const offsets = Array.from(new Set([-pitch / 2, ...corners.filter((s) => s > -pitch / 2 + 1e-6 && s < pitch / 2 - 1e-6)])).sort((a, b) => a - b);
+  const perPitch = offsets.length;
+  // The rows, from more than two pitches below `low` to more than one above `high`: where each starts on the x axis and
+  // where in the profile it lies.
+  const rows: { start: number; s: number }[] = [];
+  for (let turn = Math.floor((low - top) / pitch) - 2; turn <= Math.ceil((high - top) / pitch) + 2; turn += 1) {
+    for (const s of offsets) rows.push({ start: top + turn * pitch + s, s });
+  }
+  const count = rows.length;
+  const positions: number[] = [];
+  for (const radius of [(s: number) => outer(s), () => inner]) {
+    for (const row of rows) {
+      for (let side = 0; side < sides; side += 1) {
+        const angle = (2 * Math.PI * side) / sides;
+        const distance = radius(row.s);
+        positions.push(centre[0] + distance * Math.cos(angle), centre[1] + distance * Math.sin(angle), row.start + (pitch * side) / sides);
+      }
+    }
+  }
+  const at = (sheet: 0 | 1, side: number, row: number) => (sheet * count + row) * sides + side;
+  const triangles: number[] = [];
+  const outerEdges = new Set<string>();
+  const quad = (a: number, b: number, c: number, d: number) => triangles.push(a, b, c, a, c, d);
+  for (let row = 0; row + 1 < count; row += 1) {
+    for (let side = 0; side < sides; side += 1) {
+      // Past the last side the row goes on as the row a pitch higher, at the first side again.
+      const last = side === sides - 1;
+      if (last && row + 1 + perPitch >= count) continue;
+      const corners4 = [[side, row], last ? [0, row + perPitch] : [side + 1, row], last ? [0, row + 1 + perPitch] : [side + 1, row + 1], [side, row + 1]];
+      const [a, b, c, d] = corners4.map(([s, r]) => at(0, s, r));
+      quad(a, b, c, d);
+      [[a, b], [b, c], [c, a], [a, c], [c, d], [d, a]].forEach(([from, to]) => outerEdges.add(`${from},${to}`));
+      const [ia, ib, ic, id] = corners4.map(([s, r]) => at(1, s, r));
+      quad(ia, id, ic, ib);
+    }
+  }
+  // The edges of the outer sheet that no other triangle of it shares are its two winding ends: a wall joins each to the
+  // inner sheet's.
+  for (const edge of outerEdges) {
+    const [from, to] = edge.split(",").map(Number);
+    if (outerEdges.has(`${to},${from}`)) continue;
+    quad(from, from + count * sides, to + count * sides, to);
+  }
+  const mesh = new runtime.Mesh({ numProp: 3, vertProperties: new Float32Array(positions), triVerts: new Uint32Array(triangles) });
+  return keep(created, runtime.Manifold.ofMesh(mesh));
+}
+
+/**
+ * A screw lid's thread and cap with a standard's thread (`standardScrewPlan`), in the frame where z is up, as they sit
+ * screwed together. Its flanks are steeper than 45 degrees, so both are drawn as `windingMesh`es, whose rows of points
+ * follow the thread round, and cut to shape with the kernel; that keeps the gap square to the flanks to a few thousandths.
+ * - The thread on the body (none when the cap is made alone) stands on the standard's neck under it (`base`), the
+ *   standard's profile out to its outside, and reaches `reach` into the wall from the body's face; a body a little
+ *   thinner than the neck has it filled up to the neck. From `from` to `to` it is cut back at 45 degrees from a hair
+ *   inside the body's face at both ends, as the own thread is, so it begins and ends gently.
+ * - The cap is the plate on the rim and a rim reaching down to `mouth`, `wall` thick outside the standard's outside and
+ *   the gap. Inside, the standard's thread moved the gap away all round, square to the flanks too (`widen`), its ridges
+ *   no nearer the axis than `clear`; its mouth widens at 45 degrees to clear the thread's crest, as the own cap's does.
+ * Both overhang more than the own thread as they print: the thread's underside on the body, upright, and the ridges'
+ * undersides in the cap, turned over, lie at the standard's flank angle.
+ */
+function standardScrewSolids(runtime: ManifoldToplevel, plan: ScrewPlan, options: LidOptions, top: number, created: { delete?: () => void }[]) {
+  const sides = Math.min(512, Math.max(96, 4 * Math.ceil((2 * Math.PI * plan.capRadius) / SCREW_STEP / 4)));
+  const gap = options.gap;
+  const { pitch, depth, crest, slope, base, widen } = plan;
+  // A revolved profile of (distance from the axis, height) points, `sides` round as the winding solids.
+  const revolved = (points: [number, number][]) => {
+    const profile = keep(created, new runtime.CrossSection([points], "NonZero"));
+    return keep(created, keep(created, profile.revolve(sides)).translate([plan.centre[0], plan.centre[1], 0]));
+  };
+  let thread: ManifoldSolid | null = null;
+  if (!plan.neck) {
+    const foot = crest / 2 + depth / slope;
+    const tooth = (s: number) => base + Math.max(0, depth - Math.max(0, Math.abs(s) - crest / 2) * slope);
+    const inner = plan.inner - plan.reach;
+    const winding = windingMesh(runtime, plan.centre, sides, pitch, top, [-foot, -crest / 2, crest / 2, foot], tooth, inner, plan.from, plan.to, created);
+    // Cut to length, its ends cut back at 45 degrees from a hair inside the body's face, reaching up to a peak halfway.
+    const root = plan.inner - SCREW_ROOT_INSET;
+    const half = (plan.to - plan.from) / 2;
+    const length = revolved([[inner - 1, plan.from], [root, plan.from], [root + half, plan.from + half], [root, plan.to], [inner - 1, plan.to]]);
+    thread = keep(created, winding.intersect(length));
+  }
+  // The cap's inside: the thread's grooves, `widen` wider each side, and its ridges' tips at `clear`.
+  const groove = crest / 2 + widen;
+  const tip = groove + (base + gap + depth - plan.clear) / slope;
+  const inside = (s: number) => Math.max(plan.clear, base + gap + depth - Math.max(0, Math.abs(s) - groove) * slope);
+  const core = plan.clear - 0.5;
+  const winding = windingMesh(runtime, plan.centre, sides, pitch, top, [-tip, -groove, groove, tip], inside, core, plan.mouth, top, created);
+  const outside = base + gap + depth;
+  const below = plan.mouth - 1;
+  const lip = outside - core;
+  const hollow = keep(created, runtime.Manifold.union([
+    keep(created, winding.intersect(revolved([[0, below], [plan.capRadius + 1, below], [plan.capRadius + 1, top], [0, top]]))),
+    revolved([[0, below], [core + 0.25, below], [core + 0.25, top], [0, top]]),
+    // The mouth, widening at 45 degrees from inside the ridges out to clear the crest.
+    revolved([[0, below], [outside + 1, below], [core, plan.mouth + lip], [0, plan.mouth + lip]]),
+  ]));
+  const cap = keep(created, revolved([[0, plan.mouth], [plan.capRadius, plan.mouth], [plan.capRadius, top + options.thickness], [0, top + options.thickness]]).subtract(hollow));
   return { thread, cap };
 }
 
@@ -1485,9 +1803,9 @@ export type LidHandleResult = { style: Exclude<LidHandle, "none">; notch: Manifo
 
 /**
  * A screw lid's: the thread on the body (to be grouped with it, in the scene's frame), its pitch, turns and depth, and
- * how wide the cap is across, in mm.
+ * how wide the cap is across, in mm; which thread it is, and for a standard's cap made alone (no thread, `capOnly`) why.
  */
-export type LidScrew = { thread: ManifoldSolid; pitch: number; turns: number; depth: number; diameter: number };
+export type LidScrew = { thread: ManifoldSolid | null; pitch: number; turns: number; depth: number; diameter: number; standard: LidThreadStandard; capOnly: LidCapOnly | null };
 
 /**
  * A bayonet lid's: the lugs for the body (one solid, to be grouped with it, in the scene's frame), how many, how far the
@@ -1519,7 +1837,9 @@ export function lidForSolid(runtime: ManifoldToplevel, body: ManifoldSolid, give
     const outline = filled(runtime, section, created);
     let opening = keep(created, outline.subtract(section));
     const hasOpening = opening.area() >= MIN_OPENING_AREA;
-    if (options.type !== "flat" && !hasOpening) return { error: { code: "notOpen" } };
+    // A standard's cap is made to the standard whatever the body: a stand-in for a bottle from the shop may be solid.
+    const standardCap = options.type === "screw" && options.threadStandard !== "own";
+    if (options.type !== "flat" && !hasOpening && !standardCap) return { error: { code: "notOpen" } };
     // A screw lid's rim reaches down as far as its thread does, a bayonet's by its own depth, not by `depth`.
     if (options.type !== "flat" && options.type !== "screw" && options.type !== "bayonet" && options.depth >= height) return { error: { code: "tooShallow" } };
     // A screw lid holds by its thread alone and a bayonet lid by its lugs, both turned to close.
@@ -1612,7 +1932,7 @@ export function lidForSolid(runtime: ManifoldToplevel, body: ManifoldSolid, give
     const inner = keep(created, outline.offset(options.gap, "Round", 2, 48));
     const outer = keep(created, outline.offset(options.gap + options.wall, "Round", 2, 48));
     // A screw lid: the cap, and the thread for the body beside it; a bayonet lid: the cap, and the lugs for the body.
-    let screw: { plan: ScrewPlan; thread: ManifoldSolid } | null = null;
+    let screw: { plan: ScrewPlan; thread: ManifoldSolid | null } | null = null;
     let bayonet: { plan: BayonetPlan; lugs: ManifoldSolid } | null = null;
     const sliceAt: LidSlicer = (z) => {
       const cut = keep(created, up.slice(z));
@@ -1979,9 +2299,10 @@ export function lidForSolid(runtime: ManifoldToplevel, body: ManifoldSolid, give
     }
     let screwResult: LidScrew | undefined;
     if (screw) {
-      const thread = screw.thread.transform(UP_TO_SCENE);
-      handed.add(thread);
-      screwResult = { thread, pitch: screw.plan.pitch, turns: options.threadTurns, depth: screw.plan.depth, diameter: 2 * screw.plan.capRadius };
+      const thread = screw.thread ? screw.thread.transform(UP_TO_SCENE) : null;
+      if (thread) handed.add(thread);
+      const { plan } = screw;
+      screwResult = { thread, pitch: plan.pitch, turns: plan.turns, depth: plan.depth, diameter: 2 * plan.capRadius, standard: plan.standard, capOnly: plan.neck };
     }
     let bayonetResult: LidBayonet | undefined;
     if (bayonet) {
@@ -2064,6 +2385,14 @@ export function lidErrorMessage(error: LidError) {
       return t("lid.error.screwTooLow", { height: error.height.toLocaleString(numberLocale()) });
     case "screwGapDeep":
       return t("lid.error.screwGapDeep", { gap: error.gap.toLocaleString(numberLocale()) });
+    case "screwStandardGapDeep":
+      return t("lid.error.screwStandardGapDeep", { gap: error.gap.toLocaleString(numberLocale()) });
+    case "screwStandardTooLow":
+      return t("lid.error.screwStandardTooLow", { standard: LID_THREAD_STANDARD_SPECS[error.standard].name, height: error.height.toLocaleString(numberLocale()) });
+    case "screwStandardNeck": {
+      const thread = lidStandardThread(error.standard);
+      return t("lid.error.screwStandardNeck", { standard: thread.name, neck: thread.minor.toLocaleString(numberLocale()), depth: error.depth.toLocaleString(numberLocale()) });
+    }
     case "bayonetExtras":
       return t("lid.error.bayonetExtras");
     case "bayonetNotRound":
@@ -2111,8 +2440,11 @@ export type LidShapeClickBumps = { count: number; dimples: WorkplaneShape };
 /** With a handle, which, and for a finger notch its recess, a hole to group with the body. */
 export type LidShapeHandle = { style: Exclude<LidHandle, "none">; notch: WorkplaneShape | null };
 
-/** With a screw lid, the thread for the body (grouped with it, as the hinge's knuckles are) and its sizes, in mm. */
-export type LidShapeScrew = { thread: WorkplaneShape; pitch: number; turns: number; depth: number; diameter: number };
+/**
+ * With a screw lid, the thread for the body (grouped with it, as the hinge's knuckles are) and its sizes, in mm; with a
+ * standard's thread, which, and null for the thread when the cap is made alone (`capOnly` says why).
+ */
+export type LidShapeScrew = { thread: WorkplaneShape | null; pitch: number; turns: number; depth: number; diameter: number; standard: LidThreadStandard; capOnly: LidCapOnly | null };
 
 /** With a bayonet lid, the lugs for the body (one mesh, grouped with it as a screw lid's thread is), the turn and the sizes. */
 export type LidShapeBayonet = { lugs: WorkplaneShape; count: number; turn: number; height: number; width: number; diameter: number };
@@ -2155,7 +2487,7 @@ export async function lidForShapes(targets: readonly WorkplaneShape[], given: Li
     if (result.hinge) created.push(result.hinge.knuckles, ...[result.hinge.pin, result.hinge.cuts, result.hinge.plugs].filter((part): part is ManifoldSolid => part !== null));
     if (result.clickBumps) created.push(result.clickBumps.dimples);
     if (result.handle?.notch) created.push(result.handle.notch);
-    if (result.screw) created.push(result.screw.thread);
+    if (result.screw?.thread) created.push(result.screw.thread);
     if (result.bayonet) created.push(result.bayonet.lugs);
     const source = solids[0];
     const shape = splitShapeFromWorldPositions(source, positionsOf(result.lid.getMesh()), createLocalId(`${source.id}-lid`), t("lid.name", { name: source.name }));
@@ -2197,10 +2529,10 @@ export async function lidForShapes(targets: readonly WorkplaneShape[], given: Li
     }
     let screw: LidShapeScrew | undefined;
     if (result.screw) {
-      const thread = splitShapeFromWorldPositions(source, positionsOf(result.screw.thread.getMesh()), createLocalId(`${source.id}-thread`), t("lid.screwThreadName", { name: source.name }));
-      if (!thread) return { lid: null, error: lidErrorMessage({ code: "empty" }) };
-      const { pitch, turns, depth, diameter } = result.screw;
-      screw = { thread: canonicalizeShape({ ...thread, hidden: false }), pitch, turns, depth, diameter };
+      const thread = result.screw.thread ? splitShapeFromWorldPositions(source, positionsOf(result.screw.thread.getMesh()), createLocalId(`${source.id}-thread`), t("lid.screwThreadName", { name: source.name })) : null;
+      if (result.screw.thread && !thread) return { lid: null, error: lidErrorMessage({ code: "empty" }) };
+      const { pitch, turns, depth, diameter, standard, capOnly } = result.screw;
+      screw = { thread: thread ? canonicalizeShape({ ...thread, hidden: false }) : null, pitch, turns, depth, diameter, standard, capOnly };
     }
     let bayonet: LidShapeBayonet | undefined;
     if (result.bayonet) {
