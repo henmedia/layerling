@@ -1,11 +1,11 @@
 import { describe, expect, it } from "vitest";
-import { BAYONET_MIN_WALL, HINGE_PIN_GRIP, HINGE_PRINTED_PIN_GRIP, LID_DEFAULTS, LID_THREAD_STANDARD_SPECS, LID_THREAD_STANDARDS, LID_TYPES, NECK_LARGER, NECK_SMALLER, MAX_BAYONET_AXIAL_GAP, MAX_BAYONET_DEPTH, MAX_BAYONET_DETENT, MAX_BAYONET_LUGS, MAX_BAYONET_TURN, MIN_BAYONET_AXIAL_GAP, MIN_BAYONET_DEPTH, MIN_BAYONET_LUGS, MIN_BAYONET_TURN, MAX_CLICK_BUMP_HEIGHT, MAX_HINGE_PIN, MAX_HINGE_PIN_PLAY, MAX_LID_GAP, MAX_LID_THICKNESS, MAX_LID_THREAD_PITCH, MAX_LID_THREAD_TURNS, MAX_MAGNET_GAP, MIN_CLICK_BUMP_HEIGHT, MIN_HINGE_PIN, MIN_HINGE_PIN_PLAY, MIN_LID_THREAD_PITCH, MIN_LID_THREAD_TURNS, MIN_LID_WALL, MIN_MAGNET_DIAMETER, SCREW_MIN_WALL, bayonetLugSize, bayonetPlan, bayonetTurn, clickBumpPlaces, cornerKnucklePlan, endPlugPlan, hingeKnuckleRadius, hingePinGrip, hingePinHoles, lidClickBumpsFit, lidHandleFits, lidNeckFit, lidStandardThread, lidTakesExtras, lidThicknessForMagnets, lidThread, magnetPlaces, magnetPocketDepth, normalizeLidOptions, roundOutline, screwPlan } from "@/lib/lidTool";
+import { BAYONET_MIN_WALL, HINGE_PIN_GRIP, HINGE_PRINTED_PIN_GRIP, LID_DEFAULTS, LID_THREAD_STANDARD_SPECS, LID_THREAD_STANDARDS, LID_TYPES, NECK_LARGER, NECK_SMALLER, MAX_BAYONET_AXIAL_GAP, MAX_BAYONET_DEPTH, MAX_BAYONET_DETENT, MAX_BAYONET_LUGS, MAX_BAYONET_TURN, MIN_BAYONET_AXIAL_GAP, MIN_BAYONET_DEPTH, MIN_BAYONET_LUGS, MIN_BAYONET_TURN, MAX_CLICK_BUMP_HEIGHT, MAX_HINGE_PIN, MAX_HINGE_PIN_PLAY, MAX_LID_GAP, MAX_LID_THICKNESS, MAX_LID_THREAD_PITCH, MAX_LID_THREAD_TURNS, MAX_MAGNET_GAP, MIN_CLICK_BUMP_HEIGHT, MIN_HINGE_PIN, MIN_HINGE_PIN_PLAY, MIN_LID_THREAD_PITCH, MIN_LID_THREAD_TURNS, MIN_LID_WALL, MIN_MAGNET_DIAMETER, SCREW_MIN_WALL, bayonetLugSize, bayonetPlan, bayonetTurn, clickBumpPlaces, cornerKnucklePlan, endPlugPlan, hingeKnuckleRadius, hingePinGrip, hingePinHoles, lidClickBumpsFit, lidHandleFits, lidNeckFit, lidStandardThread, lidTakesExtras, lidThicknessForMagnets, lidThread, magnetPlaces, magnetPocketDepth, normalizeLidOptions, roundOutline, screwPlan, lidTetherFits, tetherPlan } from "@/lib/lidTool";
 import { threadSize } from "@/lib/vase/vase-geometry.mjs";
 
 describe("lid options (#1009)", () => {
   it("starts from a push-in lid with a normal fit", () => {
     expect(normalizeLidOptions()).toEqual(LID_DEFAULTS);
-    expect(LID_DEFAULTS).toEqual({ type: "plug", thickness: 2, gap: 0.2, depth: 4, wall: 1.6, magnets: false, magnetDiameter: 6, magnetHeight: 2, magnetGap: 0.1, hinge: false, hingePin: 1.75, hingeGap: 0.3, hingePinPlay: 0.2, hingeKnuckles: 0, hingePrintPin: false, hingeSide: "back", hingeTeardrop: true, hingeStyle: "outside", hingeEndPlugs: false, clickBumps: false, clickBumpHeight: 0.4, handle: "none", threadPitch: 3, threadTurns: 2, threadStandard: "own", bayonetLugs: 3, bayonetDepth: 8, bayonetAxialGap: 0.3, bayonetDetent: 0.3, bayonetTurn: 0 });
+    expect(LID_DEFAULTS).toEqual({ type: "plug", thickness: 2, gap: 0.2, depth: 4, wall: 1.6, magnets: false, magnetDiameter: 6, magnetHeight: 2, magnetGap: 0.1, hinge: false, hingePin: 1.75, hingeGap: 0.3, hingePinPlay: 0.2, hingeKnuckles: 0, hingePrintPin: false, hingeSide: "back", hingeTeardrop: true, hingeStyle: "outside", hingeEndPlugs: false, clickBumps: false, clickBumpHeight: 0.4, handle: "none", threadPitch: 3, threadTurns: 2, threadStandard: "own", bayonetLugs: 3, bayonetDepth: 8, bayonetAxialGap: 0.3, bayonetDetent: 0.3, bayonetTurn: 0, tether: false });
   });
 
   it("takes the kind in any case and keeps the default for an unknown one", () => {
@@ -816,5 +816,82 @@ describe("where a bayonet lid's lugs and slots go (Discussion #1424)", () => {
     expect("error" in bayonetPlan(pot(), options({ bayonetDepth: 4.3 }), 50, 0, 49.7)).toBe(false);
     expect(bayonetPlan(pot(), options({ bayonetDepth: 4.3, bayonetAxialGap: 0.6 }), 50, 0, 49.7)).toEqual({ error: { code: "bayonetShallow", depth: 4.6 } });
     expect(bayonetPlan(pot(undefined, 50, 2), options({ bayonetDepth: 6 }), 50, 0, 49.7)).toEqual({ error: { code: "bayonetShallow", depth: 6.3 } });
+  });
+});
+
+describe("a tether for a screw or bayonet cap (asked in the Layerling User Group on Facebook)", () => {
+  /** A pot 60 across with a 2 mm wall, 50 high, as the screw lid's tests slice it, or what `shape` gives at a height. */
+  const pot = (shape?: (z: number) => { outer: [number, number][][]; opening: [number, number][][] }) => (z: number) => {
+    const level = shape ? shape(z) : { outer: [polygonRound(30)], opening: [polygonRound(28, 192, 0, 0, true)] };
+    return { outline: level.outer, opening: level.opening };
+  };
+  const options = (patch: Record<string, unknown> = {}) => normalizeLidOptions({ type: "screw", tether: true, ...patch });
+  /** The screw cap on that pot: two turns of 3 mm, its mouth 6 mm under the rim, 30 + 0.2 + 0.9 + 1.6 from the axis. */
+  const screwCap = { from: 44, capRadius: 32.7 };
+
+  it("is off unless asked for, and goes only with a screw or a bayonet lid", () => {
+    expect(LID_DEFAULTS.tether).toBe(false);
+    expect(normalizeLidOptions({ tether: true }).tether).toBe(true);
+    expect(normalizeLidOptions({ tether: "true" }).tether).toBe(true);
+    expect(normalizeLidOptions({ tether: "yes" }).tether).toBe(false);
+    expect(["plug", "cap", "both", "flat", "screw", "bayonet"].map((type) => lidTetherFits(normalizeLidOptions({ type })))).toEqual([false, false, false, false, true, true]);
+  });
+
+  it("puts the body's ring under the cap's mouth on a bead, and the cap's ring under a collar round its top with a bead below it, the gap round each", () => {
+    const plan = tetherPlan(pot(), options(), 50, 0, 49.7, screwCap);
+    if ("error" in plan) throw new Error(plan.error.code);
+    expect(plan.play).toBe(0.2);
+    expect(plan.centre[0]).toBeCloseTo(0, 9);
+    expect(plan.radius).toBeCloseTo(30, 9);
+    expect(plan.reach).toBe(0.8);
+    // The body's ring: 1.2 mm wide, 2 mm tall, the gap round the pot, under the cap's mouth and over the bead.
+    expect([plan.neckInner, plan.neckOuter, plan.neckLow, plan.neckHigh]).toEqual([expect.closeTo(30.2, 9), expect.closeTo(31.4, 9), expect.closeTo(41.8, 9), expect.closeTo(43.8, 9)]);
+    // The bead's flat top reaches 0.5 mm past the ring's inner face; its upright face is 0.4 mm tall.
+    expect([plan.beadTop, plan.beadOuter, plan.beadLow]).toEqual([expect.closeTo(41.6, 9), expect.closeTo(30.7, 9), expect.closeTo(41.2, 9)]);
+    // The cap's ring the gap round the cap (32.7) and under the collar, whose underside is 1 mm below the plate's top
+    // (52); the collar and the bead stand out as far as the bead on the body does past its ring, and reach 0.8 mm into
+    // the cap's 1.6 mm wall.
+    expect([plan.capInner, plan.capOuter, plan.capLow, plan.capHigh, plan.collarLow]).toEqual([expect.closeTo(32.9, 9), expect.closeTo(34.1, 9), expect.closeTo(48.8, 9), expect.closeTo(50.8, 9), expect.closeTo(51, 9)]);
+    expect([plan.capBeadOuter, plan.capRoot]).toEqual([expect.closeTo(33.4, 9), expect.closeTo(31.9, 9)]);
+    // The bead's upper flank the gap under the ring at its inner face, then 0.5 lower out at its crest, 0.4 tall.
+    expect([plan.crestHigh, plan.crestLow]).toEqual([expect.closeTo(48.1, 9), expect.closeTo(47.7, 9)]);
+    // The strap: from the cap's ring's lower edge to the body's ring's upper edge, the cap lifted 7 mm, 12.9 mm, and 3
+    // more: 16 mm.
+    expect(plan.strap).toBe(16);
+  });
+
+  it("keeps the gap round each ring, at least 0.1 mm, and makes the strap longer for a deeper cap", () => {
+    const tight = tetherPlan(pot(), options({ gap: 0 }), 50, 0, 49.7, screwCap);
+    const loose = tetherPlan(pot(), options({ gap: 0.3 }), 50, 0, 49.7, screwCap);
+    if ("error" in tight || "error" in loose) throw new Error("refused");
+    expect(tight.play).toBe(0.1);
+    expect(tight.neckInner).toBeCloseTo(30.1, 9);
+    expect(tight.capInner).toBeCloseTo(32.8, 9);
+    expect(loose.play).toBe(0.3);
+    expect(loose.neckHigh).toBeCloseTo(43.7, 9);
+    expect(loose.beadTop).toBeCloseTo(43.7 - 2 - 0.3, 9);
+    expect(loose.capHigh).toBeCloseTo(50.7, 9);
+    // A bayonet cap on the same pot, 8 mm deep and 33.3 from the axis: the strap 20 mm.
+    const bayonet = tetherPlan(pot(), options({ type: "bayonet" }), 50, 0, 49.7, { from: 42, capRadius: 33.3 });
+    if ("error" in bayonet) throw new Error(bayonet.error.code);
+    expect(bayonet.neckHigh).toBeCloseTo(41.8, 9);
+    expect(bayonet.strap).toBe(20);
+  });
+
+  it("refuses a cap too short for its ring, a body too low or not round below the cap, and a wall too thin there", () => {
+    // The collar, the ring with the gap over and under it and the bead below take 3.8 mm of the cap's rim.
+    expect(tetherPlan(pot(), options(), 50, 0, 49.7, { from: 47, capRadius: 32.7 })).toEqual({ error: { code: "tetherCapShort", depth: 3.8 } });
+    expect("error" in tetherPlan(pot(), options(), 50, 0, 49.7, { from: 46.2, capRadius: 32.7 })).toBe(false);
+    // Below the cap the gap, the ring, the gap, the bead's face and slope (at most 1.7 mm) take 4.5 mm, and 0.4 mm stays.
+    expect(tetherPlan(pot(), options(), 50, 39.2, 49.7, screwCap)).toEqual({ error: { code: "tetherNoNeck", length: 4.5 } });
+    expect("error" in tetherPlan(pot(), options(), 50, 39, 49.7, screwCap)).toBe(false);
+    // A pot that widens under its neck, 41 mm up: 4.5 mm below the cap (39.5) it is not as wide as at its top.
+    const shoulder = pot((z) => ({ outer: [polygonRound(z < 41 ? 31 : 30)], opening: [polygonRound(28, 192, 0, 0, true)] }));
+    expect(tetherPlan(shoulder, options(), 50, 0, 49.7, screwCap)).toEqual({ error: { code: "tetherNoNeck", length: 4.5 } });
+    const lowerShoulder = pot((z) => ({ outer: [polygonRound(z < 39.4 ? 31 : 30)], opening: [polygonRound(28, 192, 0, 0, true)] }));
+    expect("error" in tetherPlan(lowerShoulder, options(), 50, 0, 49.7, screwCap)).toBe(false);
+    // A wall 0.6 mm thick below 43 mm, where the bead goes.
+    const thinBelow = pot((z) => ({ outer: [polygonRound(30)], opening: [polygonRound(z < 43 ? 29.4 : 28, 192, 0, 0, true)] }));
+    expect(tetherPlan(thinBelow, options(), 50, 0, 49.7, screwCap)).toEqual({ error: { code: "tetherThinWall" } });
   });
 });

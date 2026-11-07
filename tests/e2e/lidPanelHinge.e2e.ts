@@ -401,3 +401,31 @@ describe("the lid's panel with a standard bottle's or jar's thread", () => {
     expect(texts(jar)).toContain("(81.25 to 82.45 mm)");
   });
 });
+
+describe("the lid's panel with a tether (asked in the Layerling User Group on Facebook)", () => {
+  it("offers a tether for a screw or bayonet lid only, and says what it is and what to print it in once ticked", () => {
+    for (const type of ["plug", "cap", "both", "flat"] as const) {
+      const { panel } = mount({ type, tether: true });
+      expect(checkbox(panel, "Tether"), type).toBeNull();
+      expect(texts(panel), type).not.toContain("Keeps the cap with the body");
+      act(() => root?.unmount());
+    }
+    for (const type of ["screw", "bayonet"] as const) {
+      const off = mount({ type });
+      const box = checkbox(off.panel, "Tether")!;
+      expect(box, type).not.toBeNull();
+      expect(box.checked).toBe(false);
+      expect(texts(off.panel)).not.toContain("Keeps the cap with the body");
+      act(() => box.click());
+      expect(off.changes.at(-1)).toEqual({ tether: true });
+      act(() => root?.unmount());
+      const on = mount({ type, tether: true });
+      expect(checkbox(on.panel, "Tether")!.checked).toBe(true);
+      expect(texts(on.panel)).toContain("Keeps the cap with the body when it is open, as on a drinks bottle");
+      expect(texts(on.panel)).toContain("best in PETG or TPU");
+      act(() => checkbox(on.panel, "Tether")!.click());
+      expect(on.changes.at(-1)).toEqual({ tether: false });
+      act(() => root?.unmount());
+    }
+  });
+});

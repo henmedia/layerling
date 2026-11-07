@@ -55,6 +55,7 @@ import {
   lidHandleFits,
   lidTakesExtras,
   lidStandardThread,
+  lidTetherFits,
   lidThicknessForMagnets,
   lidThread,
   normalizeLidOptions,
@@ -78,7 +79,8 @@ import type { WorkplaneWorkspaceSettings } from "@/types/layerling";
  * jar's instead of its own: the cap then fits that bottle, and the body gets the neck's thread only if it is that neck,
  * which the panel says how to make. A bayonet lid (Discussion #1424) is a cap
  * for a round body too, with an L-shaped slot inside its rim for each of the lugs on the outside of the body's top: pushed
- * down and turned, it locks, as far as its lugs give or as far as set, up to a quarter turn.
+ * down and turned, it locks, as far as its lugs give or as far as set, up to a quarter turn. Either can have a tether that keeps the cap with the body when it is off (asked in the
+ * Layerling User Group on Facebook).
  */
 export function LidPanel({
   targetName,
@@ -365,6 +367,14 @@ export function LidPanel({
           />
           <span className="shell-openings-summary">{t("lid.bayonetDetentHint")}</span>
           <span className="shell-openings-summary">{t("lid.bayonetHint", { count: settings.bayonetLugs, turn: millimetres(settings.bayonetTurn || bayonetTurn(settings.bayonetLugs)) })}</span>
+        </>) : null}
+        {/* A cap that is turned off can stay tied to the body: two rings and a strap, printed beside it. */}
+        {lidTetherFits(settings) ? (<>
+          <label className="edge-modifier-field offset-copy">
+            <input type="checkbox" checked={settings.tether} disabled={busy} onChange={(event) => onChange({ tether: event.target.checked })} />
+            <span>{t("lid.tether")}</span>
+          </label>
+          {settings.tether ? <span className="shell-openings-summary">{t("lid.tetherHint")}</span> : null}
         </>) : null}
       </>)}
 
