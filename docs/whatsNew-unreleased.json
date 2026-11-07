@@ -14,11 +14,13 @@
   {
     "title": {
       "de": "Stützrippe ohne falsche Warnungen",
-      "en": "Support rib without false warnings"
+      "en": "Support rib without false warnings",
+      "da": "Støtteribbe uden falske advarsler"
     },
     "body": {
       "de": "„Spiel prüfen“ und „Druck prüfen“ kennen die Stützrippe jetzt: Dass ihre Brücken ins Teil reichen und dass Rippe und Brücken dünn sind, ist gewollt und wird nicht mehr gemeldet. Eine Rippe aus 1.148.0 legst du dafür einmal neu an.",
-      "en": "Check clearance and Print check now know the support rib: its bridges reaching into the part, and the rib and its bridges being thin, are meant to be so and no longer reported. A rib made with 1.148.0 needs making again once for this."
+      "en": "Check clearance and Print check now know the support rib: its bridges reaching into the part, and the rib and its bridges being thin, are meant to be so and no longer reported. A rib made with 1.148.0 needs making again once for this.",
+      "da": "„Tjek spillerum“ og „Tjek print“ kender nu støtteribben: at dens broer rækker ind i delen, og at ribben og dens broer er tynde, er meningen og meldes ikke længere. En ribbe lavet med 1.148.0 skal laves igen én gang for dette."
     }
   },
   {
