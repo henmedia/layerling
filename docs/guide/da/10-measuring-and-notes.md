@@ -37,6 +37,7 @@ Vinkelmåleren ligger på arbejdsplanet. Ligger det på siden af en form, ligger
 - **At trække håndtaget** flytter den.
 - **Et kort klik på håndtaget** drejer den 90°.
 - **×** ved siden af fjerner den.
+- **Træk i den lille cirkel for enden af en arm** for at gøre armen længere eller kortere, i hele millimeter. Den nederste knap under håndtaget, {{ui:ruler.armsToPlate}}, gør begge arme lige så lange, som printpladen på printeren fra indstillingerne er bred og dyb. Vinklen gemmer armenes længder med designet, og en vinkel, der sættes igen, overtager dem.
 - **Den lille knap til venstre for håndtaget** skifter hvad der måles fra: ydersiden af en form (endepunkt, et ikon med streger) eller dens midte (midtpunkt, et sigtekorn).
   En lille kontakt af samme slags sidder ved siden af hvert grønt tal og sætter kun det tal: for en stående cylinder er det midten i de to arme og bunden i højden, for en liggende midten på tværs og en ende i længden. Når alle tre igen er enige, viser knappen ved håndtaget den fælles tilstand.
 

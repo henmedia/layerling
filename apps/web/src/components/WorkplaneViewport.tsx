@@ -56,7 +56,7 @@ import { fitCameraDepthRange, frameBounds, resetCamera, selectionBounds, startVi
 import { disposeCutPreviewResources, renderFrame } from "@/components/workplane/renderFrame";
 import { DIMENSION_FORMULA_FIELDS, formulaMatchesMillimeters, formulaToRemember, withFieldFormula } from "@/lib/fieldFormulas";
 import { displayToMillimeters, formatLengthMm, lengthDisplayUnit, measurementOptionLabel, millimetersToDisplay, parseLengthMm, parseMeasurementInput, resolveLengthMm, setLengthUnit } from "@/lib/measurementUnits";
-import { computeCornerRulerRelativeCoordinates, cornerRulerAxisModes, cornerRulerFrameForWorkplane, cornerRulerShiftVector, pointAlongRuler, rotateCornerRulerFrame, rulerDimensionMatch, toggledCornerRulerAxis, toggledCornerRulerMode, type CornerRulerAxis, type RulerDimensionField } from "@/lib/rulerDimensions";
+import { computeCornerRulerRelativeCoordinates, cornerRulerArmLength, cornerRulerAxisModes, cornerRulerPlateArms, cornerRulerFrameForWorkplane, cornerRulerShiftVector, pointAlongRuler, rotateCornerRulerFrame, rulerDimensionMatch, toggledCornerRulerAxis, toggledCornerRulerMode, type CornerRulerAxis, type RulerDimensionField } from "@/lib/rulerDimensions";
 import { createMoveDimensionOverlay, type MoveDimensionAxis, type MoveDimensionOverlayData } from "@/lib/moveDimensionLines";
 import { computeOriginAxisDistance, createOriginDimensionOverlay, type OriginDimensionOverlayData } from "@/lib/originDimensionLines";
 import { horizontalPlacementWorkplane, placementPatchForNewShape, placementWorkplaneCoordinates, placementWorkplaneFromSurface, placementWorkplaneIsBase, placementWorkplanePoint, snapPlacementWorkplaneOrigin, type PlacementPoint, type PlacementWorkplane } from "@/lib/placementWorkplane";
@@ -2027,6 +2027,7 @@ export function WorkplaneViewport({
   const cornerRulerOverlayRef = useRef<CornerRulerOverlayState | null>(null);
   const cornerRulerIdRef = useRef(toolMemory?.current.cornerRulerId ?? storedCornerRulers.current.length);
   const cornerRulerDragRef = useRef<{ id: string; pointerId: number; moved: boolean } | null>(null);
+  const cornerRulerArmDragRef = useRef<{ id: string; arm: "x" | "z"; pointerId: number } | null>(null);
   const protractorOpenRef = useRef(false);
   const protractorModelRef = useRef<ProtractorModel>(EMPTY_PROTRACTOR);
   const protractorOverlayRef = useRef<ProtractorOverlayState | null>(null);
@@ -5933,13 +5934,15 @@ export function WorkplaneViewport({
     const existingAxisModes = cornerRulerModelRef.current[0]?.axisModes;
     const stayInView = cornerRulerModelRef.current[0]?.occlude === false;
     const measuresOfSelection = cornerRulerModelRef.current[0]?.selectedOnly === true;
+    // A square set again keeps the arms it had, made longer or shorter (Discussion #1469).
+    const previous = cornerRulerModelRef.current[0];
     const instance: CornerRulerInstance = {
       id: `corner-ruler-${++cornerRulerIdRef.current}`,
       corner: point,
       workplane,
       frame: cornerRulerFrameForWorkplane(workplane),
-      armLengthX: CORNER_RULER_DEFAULT_ARM_X,
-      armLengthZ: CORNER_RULER_DEFAULT_ARM_Z,
+      armLengthX: previous?.armLengthX ?? CORNER_RULER_DEFAULT_ARM_X,
+      armLengthZ: previous?.armLengthZ ?? CORNER_RULER_DEFAULT_ARM_Z,
       mode: existingMode,
       ...(existingAxisModes ? { axisModes: existingAxisModes } : {}),
       ...(stayInView ? { occlude: false } : {}),
@@ -6340,6 +6343,44 @@ export function WorkplaneViewport({
     }
     if (drag.moved) return;
     storeCornerRulerModel(cornerRulerModelRef.current.map((ruler) => ruler.id === id ? { ...ruler, frame: rotateCornerRulerFrame(ruler.frame) } : ruler));
+  }, [storeCornerRulerModel]);
+
+  /** Dragging an arm's end makes the arm as long as the pointer is far from the corner along it, in whole millimetres (Discussion #1469). */
+  const handleCornerRulerArmPointerDown = useCallback((event: ReactPointerEvent<SVGCircleElement>, id: string, arm: "x" | "z") => {
+    event.preventDefault();
+    event.stopPropagation();
+    cornerRulerArmDragRef.current = { id, arm, pointerId: event.pointerId };
+    capturePointer(event.currentTarget, event.pointerId);
+  }, []);
+
+  const handleCornerRulerArmPointerMove = useCallback((event: ReactPointerEvent<SVGCircleElement>, id: string, arm: "x" | "z") => {
+    const drag = cornerRulerArmDragRef.current;
+    if (!drag || drag.id !== id || drag.arm !== arm || drag.pointerId !== event.pointerId) return;
+    event.preventDefault();
+    event.stopPropagation();
+    const current = cornerRulerModelRef.current.find((ruler) => ruler.id === id);
+    if (!current) return;
+    const point = resolveCornerRulerPoint(event.clientX, event.clientY, current.workplane);
+    if (!point) return;
+    const length = cornerRulerArmLength(current, arm, point);
+    const key = arm === "x" ? "armLengthX" : "armLengthZ";
+    if (current[key] === length) return;
+    storeCornerRulerModel(cornerRulerModelRef.current.map((ruler) => ruler.id === id ? { ...ruler, [key]: length } : ruler));
+  }, [resolveCornerRulerPoint, storeCornerRulerModel]);
+
+  const handleCornerRulerArmPointerUp = useCallback((event: ReactPointerEvent<SVGCircleElement>, id: string, arm: "x" | "z") => {
+    const drag = cornerRulerArmDragRef.current;
+    if (!drag || drag.id !== id || drag.arm !== arm) return;
+    cornerRulerArmDragRef.current = null;
+    if (event.currentTarget.hasPointerCapture(event.pointerId)) {
+      event.currentTarget.releasePointerCapture(event.pointerId);
+    }
+  }, []);
+
+  /** Both arms as long as the build plate: the arm that runs along its width gets the width, the other its depth (Discussion #1469). */
+  const cornerRulerArmsToPlate = useCallback((id: string) => {
+    const { width, depth } = workspaceRef.current;
+    storeCornerRulerModel(cornerRulerModelRef.current.map((ruler) => ruler.id === id ? { ...ruler, ...cornerRulerPlateArms(ruler.frame, width, depth) } : ruler));
   }, [storeCornerRulerModel]);
 
   const toggleNoteCard = useCallback((noteId: string) => {
@@ -9015,6 +9056,10 @@ export function WorkplaneViewport({
               onToggleAxisMode={toggleCornerRulerAxisMode}
               onToggleOcclude={toggleCornerRulerOcclude}
               onToggleSelectedOnly={toggleCornerRulerSelectedOnly}
+              onArmEndPointerDown={handleCornerRulerArmPointerDown}
+              onArmEndPointerMove={handleCornerRulerArmPointerMove}
+              onArmEndPointerUp={handleCornerRulerArmPointerUp}
+              onArmsToPlate={cornerRulerArmsToPlate}
               onCoordinateClick={beginRulerCoordinateEdit}
             />
           ) : null}

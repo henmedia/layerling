@@ -1,5 +1,5 @@
 
-import { Crosshair, Eye, EyeOff, MousePointer2, Plus, Rows3, X } from "lucide-react";
+import { Crosshair, Eye, EyeOff, Maximize2, MousePointer2, Plus, Rows3, X } from "lucide-react";
 import { useLayoutEffect, useRef, useState, type Dispatch, type MutableRefObject, type PointerEvent as ReactPointerEvent, type SetStateAction } from "react";
 import type { CameraTurn } from "@/lib/viewCubeTransition";
 import * as THREE from "three";
@@ -1591,6 +1591,8 @@ type CornerRulerOverlayItem = {
   modes: Record<CornerRulerAxis, CornerRulerMode>;
   handleX: number;
   handleY: number;
+  /** Where the two arms end on the screen, and how long they are: their ends are dragged to make them longer or shorter (Discussion #1469). */
+  ends: Record<"x" | "z", { x: number; y: number; text: string }>;
   /** The axis of the position fields (X, Y, Z) that each green number counts along: by where its arm points (#597). */
   axisNames: Record<CornerRulerAxis, "X" | "Y" | "Z">;
   /** True when a body in front hides the ruler's lines; false when they stay in view. */
@@ -1676,8 +1678,12 @@ export function syncCornerRulerToolOverlay(
       const pushSegment = (target: number[], a: THREE.Vector3, b: THREE.Vector3) => {
         target.push(a.x, a.y, a.z, b.x, b.y, b.z);
       };
-      pushSegment(lines.arms, corner, corner.clone().addScaledVector(xAxis, ruler.armLengthX));
-      pushSegment(lines.arms, corner, corner.clone().addScaledVector(zAxis, ruler.armLengthZ));
+      const xArmEnd = corner.clone().addScaledVector(xAxis, ruler.armLengthX);
+      const zArmEnd = corner.clone().addScaledVector(zAxis, ruler.armLengthZ);
+      pushSegment(lines.arms, corner, xArmEnd);
+      pushSegment(lines.arms, corner, zArmEnd);
+      const xEndHandle = projectToScreen(xArmEnd, state);
+      const zEndHandle = projectToScreen(zArmEnd, state);
 
       const labels: CornerRulerLabelScreen[] = [];
       const buildTicks = (axisDir: THREE.Vector3, acrossDir: THREE.Vector3, length: number) => {
@@ -1825,6 +1831,10 @@ export function syncCornerRulerToolOverlay(
         modes,
         handleX: handleScreen.x,
         handleY: handleScreen.y,
+        ends: {
+          x: { x: xEndHandle.x, y: xEndHandle.y, text: `${formatMeasure(ruler.armLengthX, accuracy)} ${currentLengthUnitLabel()}` },
+          z: { x: zEndHandle.x, y: zEndHandle.y, text: `${formatMeasure(ruler.armLengthZ, accuracy)} ${currentLengthUnitLabel()}` },
+        },
         axisNames: { x: worldAxisNameOfDirection(xAxis), z: worldAxisNameOfDirection(zAxis), elevation: worldAxisNameOfDirection(yAxis) },
         occlude,
         selectedOnly: ruler.selectedOnly === true,
@@ -1957,6 +1967,10 @@ export function CornerRulerToolOverlay({
   onToggleAxisMode,
   onToggleOcclude,
   onToggleSelectedOnly,
+  onArmEndPointerDown,
+  onArmEndPointerMove,
+  onArmEndPointerUp,
+  onArmsToPlate,
   onCoordinateClick,
 }: {
   overlay: CornerRulerOverlayState;
@@ -1970,6 +1984,12 @@ export function CornerRulerToolOverlay({
   onToggleOcclude: (id: string) => void;
   /** Switches whether the bodies at the arms show their measures without being selected (#831). */
   onToggleSelectedOnly: (id: string) => void;
+  /** Dragging an arm's end makes that arm longer or shorter (Discussion #1469). */
+  onArmEndPointerDown: (event: ReactPointerEvent<SVGCircleElement>, id: string, arm: "x" | "z") => void;
+  onArmEndPointerMove: (event: ReactPointerEvent<SVGCircleElement>, id: string, arm: "x" | "z") => void;
+  onArmEndPointerUp: (event: ReactPointerEvent<SVGCircleElement>, id: string, arm: "x" | "z") => void;
+  /** Makes both arms as long as the build plate is wide and deep (Discussion #1469). */
+  onArmsToPlate: (id: string) => void;
   onCoordinateClick: (rulerId: string, shapeIds: string[], axis: "x" | "z" | "elevation", value: number, x: number, y: number) => void;
 }) {
   if (overlay.items.length === 0) {
@@ -1990,6 +2010,22 @@ export function CornerRulerToolOverlay({
               onPointerUp={(event) => onHandlePointerUp(event, item.id)}
               onPointerCancel={(event) => onHandlePointerUp(event, item.id)}
             />
+            {(["x", "z"] as const).map((arm) => (
+              <circle
+                key={arm}
+                className="corner-ruler-end-handle"
+                cx={item.ends[arm].x}
+                cy={item.ends[arm].y}
+                r="5"
+                data-arm={arm}
+                onPointerDown={(event) => onArmEndPointerDown(event, item.id, arm)}
+                onPointerMove={(event) => onArmEndPointerMove(event, item.id, arm)}
+                onPointerUp={(event) => onArmEndPointerUp(event, item.id, arm)}
+                onPointerCancel={(event) => onArmEndPointerUp(event, item.id, arm)}
+              >
+                <title>{t("ruler.armEnd", { length: item.ends[arm].text })}</title>
+              </circle>
+            ))}
           </g>
         ))}
       </svg>
@@ -2080,6 +2116,17 @@ export function CornerRulerToolOverlay({
             onClick={() => onToggleSelectedOnly(item.id)}
           >
             <MousePointer2 size={11} strokeWidth={2.5} aria-hidden="true" />
+          </button>
+          <button
+            type="button"
+            className="corner-ruler-mode-toggle corner-ruler-plate-toggle"
+            style={{ left: item.handleX, top: item.handleY + 54 }}
+            aria-label={t("aria.cornerRulerArmsToPlate")}
+            title={t("ruler.armsToPlate")}
+            onPointerDown={(event) => event.stopPropagation()}
+            onClick={() => onArmsToPlate(item.id)}
+          >
+            <Maximize2 size={11} strokeWidth={2.5} aria-hidden="true" />
           </button>
           <button
             type="button"
