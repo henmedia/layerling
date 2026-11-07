@@ -60,6 +60,29 @@ function moved(cap: Body, degrees: number, lift: number, created: Solid[]) {
   return turned;
 }
 
+/**
+ * The stops of a locked cap on a pot standing round the y axis: the cap cut to a band round the axis from `inner` to
+ * `outer` and from `low` to `high` - inside its ring, above the ledge, below the plate and short of the ribs - where only
+ * the ring between one lug's channel and the next lug's slot is left. For each piece, how far it reaches round the axis,
+ * in degrees.
+ */
+function stopSpans(kernel: Kernel, cap: Body, inner: number, outer: number, low: number, high: number, created: Solid[]) {
+  const ring = kernel.Manifold.cylinder(high - low, outer, outer, 384);
+  const hole = kernel.Manifold.cylinder(high - low, inner, inner, 384);
+  const band = ring.subtract(hole).rotate([-90, 0, 0]).translate([0, low, 0]);
+  const left = cap.intersect(band);
+  const pieces = left.decompose();
+  created.push(ring, hole, band, left, ...pieces);
+  return pieces.map((piece) => {
+    const mesh = piece.getMesh();
+    const angles = Array.from({ length: mesh.vertProperties.length / mesh.numProp }, (_, index) => Math.atan2(-mesh.vertProperties[index * mesh.numProp + 2], mesh.vertProperties[index * mesh.numProp]));
+    const box = piece.boundingBox();
+    const middle = Math.atan2(-(box.min[2] + box.max[2]) / 2, (box.min[0] + box.max[0]) / 2);
+    const from = angles.map((angle) => Math.atan2(Math.sin(angle - middle), Math.cos(angle - middle)));
+    return ((Math.max(...from) - Math.min(...from)) * 180) / Math.PI;
+  });
+}
+
 const BAYONET = { type: "bayonet", thickness: 2, gap: 0.2, wall: 1.6, bayonetLugs: 3, bayonetDepth: 8, bayonetAxialGap: 0.3, bayonetDetent: 0.3 };
 
 describe("a bayonet lid for a round body (real Manifold kernel, Discussion #1424)", () => {
@@ -191,6 +214,92 @@ describe("a bayonet lid for a round body (real Manifold kernel, Discussion #1424
         const under = closed.translate([0, 0.1, 0]);
         created.push(under);
         expect(under.minGap(outside, 2)).toBeCloseTo((0.4 - 0.1) * Math.SQRT1_2, 2);
+      }
+    } finally {
+      dispose(created);
+    }
+  });
+
+  it("turns a quarter turn with two lugs when the turn is set: down over the lugs a quarter turn back, then to the stop past the rib, and holds", async () => {
+    const kernel = await runtime();
+    const created: Solid[] = [];
+    try {
+      for (const detent of [0.3, 0]) {
+        const body = openPot(kernel, created);
+        const result = lidForSolid(kernel, body, normalizeLidOptions({ ...BAYONET, bayonetLugs: 2, bayonetTurn: 90, bayonetDetent: detent }));
+        if ("error" in result) throw new Error(JSON.stringify(result.error));
+        created.push(result.lid, result.bayonet!.lugs);
+        const { bayonet } = result;
+        expect(result.lid.status()).toBe("NoError");
+        expect(result.lid.decompose().length).toBe(1);
+        expect([bayonet!.count, bayonet!.turn]).toEqual([2, 90]);
+        expect(bayonet!.width).toBeCloseTo(9, 6);
+        const withLugs = body.add(bayonet!.lugs);
+        created.push(withLugs);
+        const closed = closing(body, result.lid, 2, created);
+        const at = (degrees: number, lift: number) => shared(moved(closed, degrees, lift, created), withLugs, created);
+        // Turned back a quarter turn, the slots stand over the lugs: it goes all the way down onto the rim.
+        for (const lift of [10, 6, 3, 1, 0.5, 0]) expect(at(90, lift), `detent ${detent}, open, ${lift} mm up`).toBeLessThan(1e-6);
+        expect(at(80, 3)).toBeGreaterThan(0.1);
+        expect(at(100, 3)).toBeGreaterThan(0.1);
+        // Down on the rim and turned clockwise to the lock degree by degree: nothing touches the body or its lugs but the
+        // ribs, which stand just behind the locked lugs, over the last 22 degrees as with the lugs' own turn.
+        const sweep = Array.from({ length: 91 }, (_, step) => ({ degrees: 90 - step, volume: at(90 - step, 0) }));
+        const touched = sweep.filter(({ volume }) => volume > 1e-6);
+        if (detent === 0) expect(touched).toEqual([]);
+        else {
+          expect(Math.min(...touched.map(({ degrees }) => degrees))).toBeGreaterThan(0);
+          expect(Math.max(...touched.map(({ degrees }) => degrees))).toBeLessThan(23);
+          expect(Math.max(...touched.map(({ degrees }) => degrees))).toBeGreaterThan(20);
+          expect(Math.max(...sweep.map(({ volume }) => volume))).toBeLessThan(3);
+        }
+        expect(sweep[sweep.length - 1].volume).toBeLessThan(1e-6);
+        // The stops a step past the lock; locked, the ledges let it lift by the axial gap and no further.
+        expect(at(-2, 0)).toBeGreaterThan(0.1);
+        expect(at(0, 0.25)).toBeLessThan(1e-6);
+        expect(at(0, 0.6)).toBeGreaterThan(0.1);
+        const outside = bayonet!.lugs.subtract(body);
+        created.push(outside);
+        expect(closed.minGap(outside, 2)).toBeGreaterThan(0.199);
+        expect(closed.minGap(outside, 2)).toBeLessThan(0.2 + 1e-3);
+        // Between each lug's channel and the next slot the ring stands whole, about 72 degrees of it.
+        const spans = stopSpans(kernel, closed, 30.3, 31.1, 48.1, 49.9, created);
+        expect(spans.length).toBe(2);
+        for (const span of spans) expect(span).toBeCloseTo(180 - 90 - 2 * (180 / Math.PI) * (4.5 / 31.5) - (180 / Math.PI) * (0.7 / 30.2), 1);
+      }
+    } finally {
+      dispose(created);
+    }
+  });
+
+  it("holds a turn too large for four lugs to what fits round the pot: the slots never run into each other, and it still turns without touching", async () => {
+    const kernel = await runtime();
+    const created: Solid[] = [];
+    try {
+      const body = openPot(kernel, created);
+      const result = lidForSolid(kernel, body, normalizeLidOptions({ ...BAYONET, bayonetLugs: 4, bayonetTurn: 90, bayonetDetent: 0 }));
+      if ("error" in result) throw new Error(JSON.stringify(result.error));
+      created.push(result.lid, result.bayonet!.lugs);
+      const { bayonet } = result;
+      expect(result.lid.decompose().length).toBe(1);
+      expect(bayonet!.lugs.decompose().length).toBe(4);
+      // 66 degrees, the most that leaves 3 mm of ring before the next slot on a pot 60 mm across.
+      expect(bayonet!.turn).toBe(66);
+      const withLugs = body.add(bayonet!.lugs);
+      created.push(withLugs);
+      const closed = closing(body, result.lid, 2, created);
+      const at = (degrees: number, lift: number) => shared(moved(closed, degrees, lift, created), withLugs, created);
+      for (const lift of [6, 3, 1, 0]) expect(at(66, lift), `open, ${lift} mm up`).toBeLessThan(1e-6);
+      const sweep = Array.from({ length: 34 }, (_, step) => at(66 - 2 * step, 0));
+      expect(Math.max(...sweep)).toBeLessThan(1e-6);
+      expect(at(-2, 0)).toBeGreaterThan(0.1);
+      expect(at(0, 0.25)).toBeLessThan(1e-6);
+      // Four stops, each 3 mm and more along the ring where it is nearest the axis, 30.2 mm from it.
+      const spans = stopSpans(kernel, closed, 30.3, 31.1, 48.1, 49.9, created);
+      expect(spans.length).toBe(4);
+      for (const span of spans) {
+        expect((span * Math.PI * 30.2) / 180).toBeGreaterThanOrEqual(3);
+        expect((span * Math.PI * 30.2) / 180).toBeLessThan(3.6);
       }
     } finally {
       dispose(created);

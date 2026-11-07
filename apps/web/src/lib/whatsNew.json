@@ -5,71 +5,85 @@
       {
         "title": {
           "de": "Schablonenstege",
-          "en": "Stencil bridges"
+          "en": "Stencil bridges",
+          "da": "Stencilbroer"
         },
         "body": {
           "de": "Schneidest du Text durch eine Platte, fällt beim Druck die Mitte von o, a und b heraus. Das neue Werkzeug „Schablonenstege“ hält sie mit kleinen Stegen an der Platte. Breite, Anzahl und Höhe stellst du ein, niedrigere Stege sitzen unten, in der Mitte oder oben. Jeder Steg ist ein normaler Quader, den du verschieben oder löschen kannst.",
-          "en": "Cut text through a plate and the middle of o, a and b falls out of the print. The new Stencil bridges tool holds it to the plate with small bridges. You set their width, number and height, and lower bridges sit at the bottom, in the middle or at the top. Each bridge is an ordinary box you can move or delete."
+          "en": "Cut text through a plate and the middle of o, a and b falls out of the print. The new Stencil bridges tool holds it to the plate with small bridges. You set their width, number and height, and lower bridges sit at the bottom, in the middle or at the top. Each bridge is an ordinary box you can move or delete.",
+          "da": "Skåret gennem en plade mister bogstaver som o, a og b deres midte: den ligger løst inde i bogstavet og falder ud af printet. Det nye værktøj „Stencilbroer“ holder den fast til pladen med små broer. Du indstiller deres bredde, antal og højde, og lavere broer sidder nederst, i midten eller øverst. Hver bro er en almindelig kasse, du kan flytte eller slette."
         }
       },
       {
         "title": {
           "de": "Pfeile für X und Y",
-          "en": "Arrows for X and Y"
+          "en": "Arrows for X and Y",
+          "da": "Pile til X og Y"
         },
         "body": {
           "de": "Neben dem schwarzen Hebepfeil sitzen jetzt ein roter und ein grüner Pfeil. Ziehst du daran, wandert die Auswahl nur entlang X oder nur entlang Y und folgt der Maus auf dieser Linie, auch wenn du flach auf die Platte schaust. Sie rastet an anderen Körpern ein wie beim Ziehen, und den Weg kannst du danach anklicken und genau eintippen.",
-          "en": "Beside the black lift arrow there are now a red and a green arrow. Pull one and the selection moves along X or along Y only, following the mouse along that line, even when you look at the plate from low down. It snaps to other bodies as a drag does, and afterwards you can click the distance and type it exactly."
+          "en": "Beside the black lift arrow there are now a red and a green arrow. Pull one and the selection moves along X or along Y only, following the mouse along that line, even when you look at the plate from low down. It snaps to other bodies as a drag does, and afterwards you can click the distance and type it exactly.",
+          "da": "Ved siden af den sorte løftepil står der nu en rød og en grøn pil. Træk i den ene, og markeringen flytter sig kun langs X eller kun langs Y og følger musen langs den linje, også når du ser lavt hen over pladen. Pilen snapper til andre legemer som ved træk, og bagefter kan du klikke på afstanden og skrive den nøjagtig ind."
         }
       },
       {
         "title": {
           "de": "Bajonettdeckel für runde Körper",
-          "en": "Bayonet lid for round bodies"
+          "en": "Bayonet lid for round bodies",
+          "da": "Bajonetlåg til runde legemer"
         },
         "body": {
           "de": "Das Deckelwerkzeug hat eine sechste Art: „Bajonett“. Ein runder Körper bekommt außen am oberen Rand Nasen und der Deckel passende L-Schlitze: aufsetzen, andrücken, ein Stück im Uhrzeigersinn drehen, und er rastet ein. Anzahl der Nasen, Randtiefe, Spiel und Rastung stellst du selbst ein.",
-          "en": "The Lid tool has a sixth kind, Bayonet. A round body gets lugs on the outside of its top and the cap matching L-shaped slots: set it on, push down and turn it a short way clockwise, and it clicks shut. You set the number of lugs, the rim depth, the gaps and the click yourself."
+          "en": "The Lid tool has a sixth kind, Bayonet. A round body gets lugs on the outside of its top and the cap matching L-shaped slots: set it on, push down and turn it a short way clockwise, and it clicks shut. You set the number of lugs, the rim depth, the gaps and the click yourself.",
+          "da": "Lågværktøjet har en sjette slags, bajonet. Et rundt legeme får knaster udvendigt på sin top, og låget L-formede spor, der passer til dem: sæt låget på, tryk det ned og drej det en smule med uret, så klikker det lukket. Du bestemmer selv antallet af knaster, kantens dybde, spalterne og klikket."
         }
       },
       {
         "title": {
           "de": "Schwalbenschwanz beim Teilen",
-          "en": "Dovetail when splitting"
+          "en": "Dovetail when splitting",
+          "da": "Svalehale ved deling"
         },
         "body": {
           "de": "Das Teilen hat als vierte Verbindungsart den Schwalbenschwanz: Eine sich verbreiternde Zunge an der einen Hälfte passt in eine Nut der anderen, die Hälften halten ohne Kleber zusammen und lassen sich quer zur Fuge nicht abziehen. Breite, Tiefe, Flankenwinkel, Richtung und Anzahl stellst du ein; das Spiel kommt aus deinem Passungstest.",
-          "en": "Split has the dovetail as a fourth kind of connector: a tongue that widens away from the cut on one half fits a groove in the other, so the halves hold together without glue and cannot be pulled apart across the joint. You set width, depth, flank angle, direction and number; the clearance comes from your fit test."
+          "en": "Split has the dovetail as a fourth kind of connector: a tongue that widens away from the cut on one half fits a groove in the other, so the halves hold together without glue and cannot be pulled apart across the joint. You set width, depth, flank angle, direction and number; the clearance comes from your fit test.",
+          "da": "Del har svalehalen som sin fjerde slags samling: en liste, der bliver bredere væk fra snittet på den ene halvdel, passer i en not på den anden, så halvdelene holdes sammen uden lim og ikke kan trækkes fra hinanden på tværs af snittet. Du indstiller bredde, dybde, flankevinkel, retning og antal; spillerummet kommer fra din pasprøve."
         }
       },
       {
         "title": {
           "de": "Rastermenü per Mittelklick",
-          "en": "Snap menu with a middle click"
+          "en": "Snap menu with a middle click",
+          "da": "Snap-menu med mellemmuseknappen"
         },
         "body": {
           "de": "Ein kurzer Klick mit der mittleren Maustaste öffnet das Rastermenü direkt am Mauszeiger, im 3D-Editor und in der Skizze. Es bleibt offen, bis du eine Stufe wählst oder daneben klickst. Ziehen mit der mittleren Taste verschiebt die Ansicht wie bisher.",
-          "en": "A short click with the middle mouse button opens the snap grid menu right at the pointer, in the 3D editor and in a sketch. It stays open until you pick a step or click beside it. Dragging with the middle button still moves the view."
+          "en": "A short click with the middle mouse button opens the snap grid menu right at the pointer, in the 3D editor and in a sketch. It stays open until you pick a step or click beside it. Dragging with the middle button still moves the view.",
+          "da": "Et kort klik med den midterste museknap åbner menuen med snap-trin lige ved markøren, både i 3D-editoren og i en skitse. Den bliver stående, indtil du vælger et trin eller klikker ved siden af den. At trække med den midterste knap flytter stadig visningen."
         }
       },
       {
         "title": {
           "de": "Stützrippe an gerundeter Kante",
-          "en": "Support rib at a rounded edge"
+          "en": "Support rib at a rounded edge",
+          "da": "Støtteribbe ved en afrundet kant"
         },
         "body": {
           "de": "Rundest oder fast du die Kante, auf der ein schräges Teil steht, damit der Slicer die erste Schicht findet, lässt sich die Stützrippe jetzt trotzdem setzen. Klicke die ebene Fläche über der Rundung an: Sie darf bis zu 3 mm über der Platte enden, die Rippe reicht trotzdem bis hinunter.",
-          "en": "Round or chamfer the edge a tilted part stands on, so the slicer finds its first layer, and the support rib still goes on. Click the flat face above the rounding: it may end up to 3 mm above the plate, and the rib still reaches down to it."
+          "en": "Round or chamfer the edge a tilted part stands on, so the slicer finds its first layer, and the support rib still goes on. Click the flat face above the rounding: it may end up to 3 mm above the plate, and the rib still reaches down to it.",
+          "da": "Afrund eller fas den kant, en skrå del står på, så sliceren finder sit første lag, og støtteribben kommer stadig på. Klik på den plane flade over afrundingen: den kan ende op til 3 mm over pladen, og ribben når stadig ned til den."
         }
       },
       {
         "title": {
           "de": "Richtige Zahl nach dem Löschen",
-          "en": "The right count after deleting"
+          "en": "The right count after deleting",
+          "da": "Det rigtige tal efter sletning"
         },
         "body": {
           "de": "Löschst du einen Entwurf im Serverspeicher, zeigt die Zahl über den Entwürfen jetzt gleich die richtige Anzahl. Bisher stand dort bis zum Neuladen der Seite noch der gelöschte Entwurf mit.",
-          "en": "Delete a design in the server store and the count above the designs is right at once. Until now it still counted the deleted design until the page was reloaded."
+          "en": "Delete a design in the server store and the count above the designs is right at once. Until now it still counted the deleted design until the page was reloaded.",
+          "da": "Slet et design på serveren, så er tallet over designsene rigtigt med det samme. Før blev det slettede design stadig talt med, indtil siden blev genindlæst."
         }
       }
     ]
@@ -92,11 +106,13 @@
       {
         "title": {
           "de": "Bündiges Scharnier füllt runde Ecken",
-          "en": "Flush hinge fills rounded corners"
+          "en": "Flush hinge fills rounded corners",
+          "da": "Forsænket hængsel fylder rundede hjørner"
         },
         "body": {
           "de": "Auch ohne Endstopfen laufen die äußeren Knöchel eines bündigen Scharniers jetzt in die abgerundeten Ecken der Box hinein, statt dort eine Kerbe zu lassen. Der Stift endet kurz vor der Rundung; wie lang er ist, steht in der Statusleiste.",
-          "en": "Without end plugs too, the end knuckles of a flush hinge now run on into the box's rounded corners instead of leaving a notch there. The pin ends just short of the round; the status bar says how long it is."
+          "en": "Without end plugs too, the end knuckles of a flush hinge now run on into the box's rounded corners instead of leaving a notch there. The pin ends just short of the round; the status bar says how long it is.",
+          "da": "Også uden endepropper løber enderne af et forsænket hængsel nu ind i kassens afrundede hjørner i stedet for at efterlade et hak. Stiften ender lige inden for runden; statuslinjen siger, hvor lang den er."
         }
       },
       {
@@ -114,21 +130,25 @@
       {
         "title": {
           "de": "Versteckte Teile in Gruppen mit Loch",
-          "en": "Hidden parts in a group with a hole"
+          "en": "Hidden parts in a group with a hole",
+          "da": "Skjulte dele i en gruppe med et hul"
         },
         "body": {
           "de": "Ein Teil, das du in einer offenen Gruppe mit Loch versteckst, behält beim Schließen seinen Platz: Die Gruppe schrumpft nicht mehr auf die übrigen Teile, und beim Ausrichten zählt es weiter mit – wie in einer Gruppe ohne Loch.",
-          "en": "A part you hide in an open group with a hole keeps its room when you close it: the group no longer shrinks to the parts left, and aligning still counts it - as in a group without a hole."
+          "en": "A part you hide in an open group with a hole keeps its room when you close it: the group no longer shrinks to the parts left, and aligning still counts it - as in a group without a hole.",
+          "da": "En del, du skjuler i en åben gruppe med et hul, beholder sin plads, når du lukker gruppen: den skrumper ikke længere ned til de dele, der er tilbage, og „Justér“ tæller den stadig med - som i en gruppe uden hul."
         }
       },
       {
         "title": {
           "de": "Fase und Rundung an verschachtelten Gruppen",
-          "en": "Chamfer and fillet on nested groups"
+          "en": "Chamfer and fillet on nested groups",
+          "da": "Fas og rund på indlejrede grupper"
         },
         "body": {
           "de": "Bei manchen Gruppen meldete das Kantenwerkzeug „Der gruppierte Körper ließ sich nicht zu gültiger Geometrie reparieren“, bevor sich eine einzige Kante wählen ließ – etwa bei einem Gehäuse mit einem aus einem Netz exakt gemachten Teil darin. Solche Gruppen lassen sich jetzt anfasen und abrunden. Gruppen, die schon gingen, bleiben, wie sie waren.",
-          "en": "With some groups the edge tool said \"The grouped body could not be repaired into valid geometry\" before a single edge could be picked - an enclosure with a part made exact from a mesh in it, say. Such groups can now be chamfered and filleted. Groups that worked already stay as they were."
+          "en": "With some groups the edge tool said \"The grouped body could not be repaired into valid geometry\" before a single edge could be picked - an enclosure with a part made exact from a mesh in it, say. Such groups can now be chamfered and filleted. Groups that worked already stay as they were.",
+          "da": "Med nogle grupper sagde kantværktøjet „Den grupperede form kunne ikke repareres til gyldig geometri“, før man overhovedet kunne vælge en kant - et kabinet med en del i, der er gjort eksakt ud fra et mesh, for eksempel. Sådanne grupper kan nu fases og rundes. Grupper, der allerede virkede, er uændrede."
         }
       }
     ]

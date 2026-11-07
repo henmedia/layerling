@@ -1,12 +1,34 @@
 [
   {
     "title": {
+      "de": "Deckel zum Einschrauben",
+      "en": "A lid that screws in"
+    },
+    "body": {
+      "de": "Das Deckel-Werkzeug hat eine neue Art „Eingeschraubt“: Der Körper bekommt das Gewinde innen in seiner Öffnung, der Deckel einen Gewindezapfen darunter. Außen bleibt der Körper glatt, etwa bei einem runden Stiftehalter. Beide Teile drucken ohne Stützen.",
+      "en": "The Lid tool has a new kind, Screw in: the body gets the thread inside its opening and the lid a threaded plug below it. The outside of the body stays smooth, for a round pen holder, say. Both parts print without support."
+    }
+  },
+  {
+    "title": {
+      "de": "Gedrehte Langlöcher im Lochmuster",
+      "en": "Turned slots in a hole pattern"
+    },
+    "body": {
+      "de": "Langlöcher und Rechtecke im Lochmuster lassen sich jetzt drehen: Mit „Winkel der Löcher“ steht jedes Loch schräg, etwa Lüftungsschlitze auf 45°, und das Raster bleibt gerade. Die Wand zwischen den Löchern bleibt dabei erhalten.",
+      "en": "Slots and rectangles in a hole pattern can now be turned: with Angle of the holes each hole stands at a slant, ventilation slots at 45° for example, while the grid stays straight. The wall between the holes is kept."
+    }
+  },
+  {
+    "title": {
       "de": "Hülle mit offenen Löchern",
-      "en": "Hull with open holes"
+      "en": "Hull with open holes",
+      "da": "Hylster med åbne huller"
     },
     "body": {
       "de": "Eine Hülle füllt alles, was in ihren Teilen hohl ist: ein Rohr, einen ausgehöhlten Zylinder, Löcher in einer Gruppe. Mit „Löcher der Teile behalten“ unter Eigenschaften bleiben sie offen, und die Hülle füllt nur den Raum zwischen den Teilen.",
-      "en": "A hull fills whatever is hollow in its parts: a tube, a hollowed cylinder, the holes in a group. With Keep the parts' holes under Properties they stay open, and the hull only fills the space between the parts."
+      "en": "A hull fills whatever is hollow in its parts: a tube, a hollowed cylinder, the holes in a group. With Keep the parts' holes under Properties they stay open, and the hull only fills the space between the parts.",
+      "da": "Et hylster fylder alt, hvad der er hult i dets dele: et rør, en udhulet cylinder, hullerne i en gruppe. Med „Bevar delenes huller“ under Egenskaber forbliver de åbne, og hylsteret fylder kun rummet mellem delene."
     }
   }
 ]
