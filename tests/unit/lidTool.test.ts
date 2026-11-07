@@ -1,11 +1,11 @@
 import { describe, expect, it } from "vitest";
-import { BAYONET_MIN_WALL, HINGE_PIN_GRIP, HINGE_PRINTED_PIN_GRIP, LID_DEFAULTS, LID_TYPES, MAX_BAYONET_AXIAL_GAP, MAX_BAYONET_DEPTH, MAX_BAYONET_DETENT, MAX_BAYONET_LUGS, MIN_BAYONET_AXIAL_GAP, MIN_BAYONET_DEPTH, MIN_BAYONET_LUGS, MAX_CLICK_BUMP_HEIGHT, MAX_HINGE_PIN, MAX_HINGE_PIN_PLAY, MAX_LID_GAP, MAX_LID_THICKNESS, MAX_LID_THREAD_PITCH, MAX_LID_THREAD_TURNS, MAX_MAGNET_GAP, MIN_CLICK_BUMP_HEIGHT, MIN_HINGE_PIN, MIN_HINGE_PIN_PLAY, MIN_LID_THREAD_PITCH, MIN_LID_THREAD_TURNS, MIN_LID_WALL, MIN_MAGNET_DIAMETER, SCREW_MIN_WALL, bayonetLugSize, bayonetPlan, bayonetTurn, clickBumpPlaces, cornerKnucklePlan, endPlugPlan, hingeKnuckleRadius, hingePinGrip, hingePinHoles, lidClickBumpsFit, lidHandleFits, lidTakesExtras, lidThicknessForMagnets, lidThread, magnetPlaces, magnetPocketDepth, normalizeLidOptions, roundOutline, screwPlan } from "@/lib/lidTool";
+import { BAYONET_MIN_WALL, HINGE_PIN_GRIP, HINGE_PRINTED_PIN_GRIP, LID_DEFAULTS, LID_TYPES, MAX_BAYONET_AXIAL_GAP, MAX_BAYONET_DEPTH, MAX_BAYONET_DETENT, MAX_BAYONET_LUGS, MAX_BAYONET_TURN, MIN_BAYONET_AXIAL_GAP, MIN_BAYONET_DEPTH, MIN_BAYONET_LUGS, MIN_BAYONET_TURN, MAX_CLICK_BUMP_HEIGHT, MAX_HINGE_PIN, MAX_HINGE_PIN_PLAY, MAX_LID_GAP, MAX_LID_THICKNESS, MAX_LID_THREAD_PITCH, MAX_LID_THREAD_TURNS, MAX_MAGNET_GAP, MIN_CLICK_BUMP_HEIGHT, MIN_HINGE_PIN, MIN_HINGE_PIN_PLAY, MIN_LID_THREAD_PITCH, MIN_LID_THREAD_TURNS, MIN_LID_WALL, MIN_MAGNET_DIAMETER, SCREW_MIN_WALL, bayonetLugSize, bayonetPlan, bayonetTurn, clickBumpPlaces, cornerKnucklePlan, endPlugPlan, hingeKnuckleRadius, hingePinGrip, hingePinHoles, lidClickBumpsFit, lidHandleFits, lidTakesExtras, lidThicknessForMagnets, lidThread, magnetPlaces, magnetPocketDepth, normalizeLidOptions, roundOutline, screwPlan } from "@/lib/lidTool";
 import { threadSize } from "@/lib/vase/vase-geometry.mjs";
 
 describe("lid options (#1009)", () => {
   it("starts from a push-in lid with a normal fit", () => {
     expect(normalizeLidOptions()).toEqual(LID_DEFAULTS);
-    expect(LID_DEFAULTS).toEqual({ type: "plug", thickness: 2, gap: 0.2, depth: 4, wall: 1.6, magnets: false, magnetDiameter: 6, magnetHeight: 2, magnetGap: 0.1, hinge: false, hingePin: 1.75, hingeGap: 0.3, hingePinPlay: 0.2, hingeKnuckles: 0, hingePrintPin: false, hingeSide: "back", hingeTeardrop: true, hingeStyle: "outside", hingeEndPlugs: false, clickBumps: false, clickBumpHeight: 0.4, handle: "none", threadPitch: 3, threadTurns: 2, bayonetLugs: 3, bayonetDepth: 8, bayonetAxialGap: 0.3, bayonetDetent: 0.3 });
+    expect(LID_DEFAULTS).toEqual({ type: "plug", thickness: 2, gap: 0.2, depth: 4, wall: 1.6, magnets: false, magnetDiameter: 6, magnetHeight: 2, magnetGap: 0.1, hinge: false, hingePin: 1.75, hingeGap: 0.3, hingePinPlay: 0.2, hingeKnuckles: 0, hingePrintPin: false, hingeSide: "back", hingeTeardrop: true, hingeStyle: "outside", hingeEndPlugs: false, clickBumps: false, clickBumpHeight: 0.4, handle: "none", threadPitch: 3, threadTurns: 2, bayonetLugs: 3, bayonetDepth: 8, bayonetAxialGap: 0.3, bayonetDetent: 0.3, bayonetTurn: 0 });
   });
 
   it("takes the kind in any case and keeps the default for an unknown one", () => {
@@ -480,6 +480,22 @@ describe("a bayonet lid (Discussion #1424)", () => {
     expect(bayonetLugSize(82)).toEqual({ height: 2.1, width: expect.closeTo(12.3, 12) });
   });
 
+  it("leaves the turn to the lugs unless it is set by hand, in whole degrees from 15 to a quarter turn", () => {
+    expect(LID_DEFAULTS.bayonetTurn).toBe(0);
+    expect([MIN_BAYONET_TURN, MAX_BAYONET_TURN]).toEqual([15, 90]);
+    expect(normalizeLidOptions({ bayonetTurn: 90 }).bayonetTurn).toBe(90);
+    expect(normalizeLidOptions({ bayonetTurn: "62.4" }).bayonetTurn).toBe(62);
+    expect(normalizeLidOptions({ bayonetTurn: 37.5 }).bayonetTurn).toBe(38);
+    // 0 is the lugs' own turn; a turn set by hand is 15 at least and 90 at most.
+    expect(normalizeLidOptions({ bayonetTurn: 0 }).bayonetTurn).toBe(0);
+    expect(normalizeLidOptions({ bayonetTurn: 0.4 }).bayonetTurn).toBe(0);
+    expect(normalizeLidOptions({ bayonetTurn: -30 }).bayonetTurn).toBe(0);
+    expect(normalizeLidOptions({ bayonetTurn: 5 }).bayonetTurn).toBe(MIN_BAYONET_TURN);
+    expect(normalizeLidOptions({ bayonetTurn: 180 }).bayonetTurn).toBe(MAX_BAYONET_TURN);
+    expect(normalizeLidOptions({ bayonetTurn: "x" }).bayonetTurn).toBe(0);
+    expect(normalizeLidOptions({ bayonetTurn: null }, { ...LID_DEFAULTS, bayonetTurn: 45 }).bayonetTurn).toBe(45);
+  });
+
   it("takes no magnets, hinge, click bumps or handle", () => {
     const bayonet = normalizeLidOptions({ type: "bayonet" });
     expect(lidTakesExtras(bayonet)).toBe(false);
@@ -551,6 +567,82 @@ describe("where a bayonet lid's lugs and slots go (Discussion #1424)", () => {
     // 20 mm across: two lugs and 45 degrees, not three.
     expect("error" in bayonetPlan(pot(undefined, 10, 1.6), options({ bayonetLugs: 2 }), 50, 0, 49.7)).toBe(false);
     expect(bayonetPlan(pot(undefined, 10, 1.6), options({ bayonetLugs: 3 }), 50, 0, 49.7)).toEqual({ error: { code: "bayonetNoRoom" } });
+  });
+
+  /**
+   * Of each lug's share of the way round, what its slot, turn, lug and the stop's gap take, and what is left of the cap's
+   * ring before the next lug's slot, in mm where the ring is nearest the axis (the gap outside the body's wall).
+   */
+  const ringLeft = (plan: Exclude<ReturnType<typeof bayonetPlan>, { error: unknown }>, gap = 0.2) => {
+    const taken = plan.slotHalf + plan.turn + plan.half + plan.stop;
+    return ((360 / plan.angles.length - taken) * Math.PI / 180) * (plan.radius + gap);
+  };
+
+  it("turns as far as set when the turn is set by hand: a quarter turn with two lugs, and the lugs' own turn gives the plan as before", () => {
+    const own = bayonetPlan(pot(), options(), 50, 0, 49.7);
+    const set = bayonetPlan(pot(), options({ bayonetTurn: 40 }), 50, 0, 49.7);
+    if ("error" in own || "error" in set) throw new Error("refused");
+    expect(set).toEqual(own);
+    const quarter = bayonetPlan(pot(), options({ bayonetLugs: 2, bayonetTurn: 90 }), 50, 0, 49.7);
+    if ("error" in quarter) throw new Error(quarter.error.code);
+    expect(quarter.turn).toBe(90);
+    expect(quarter.angles).toEqual([-90, 90]);
+    // The lugs as wide as the pot gives them, the rib and the stop where they are with the lugs' own turn: both lie by
+    // the locked lug, so they go with the turn.
+    expect(quarter.width).toBeCloseTo(9, 9);
+    expect([quarter.half, quarter.slotHalf, quarter.stop]).toEqual([own.half, own.slotHalf, own.stop]);
+    expect(quarter.rib).toEqual(own.rib);
+    // Slot, turn, lug and the stop's gap take about 107 of each lug's 180 degrees: 38 mm of ring are left before the next slot.
+    expect(ringLeft(quarter)).toBeGreaterThan(38);
+    expect(ringLeft(quarter)).toBeLessThan(39);
+  });
+
+  it("holds a turn set by hand to what fits round the body: never so far that the slots run into each other, never so short that the lugs get too narrow", () => {
+    // Four lugs on a 60 mm pot: 66 degrees leave 3 mm of ring and more before the next slot, 67 would not.
+    const four = bayonetPlan(pot(), options({ bayonetLugs: 4, bayonetTurn: 90 }), 50, 0, 49.7);
+    if ("error" in four) throw new Error(four.error.code);
+    expect(four.turn).toBe(66);
+    expect(four.width).toBeCloseTo(9, 9);
+    expect(ringLeft(four)).toBeGreaterThanOrEqual(3);
+    expect(ringLeft({ ...four, turn: 67 })).toBeLessThan(3);
+    // A turn that fits is kept as it is.
+    const fits = bayonetPlan(pot(), options({ bayonetLugs: 4, bayonetTurn: 60 }), 50, 0, 49.7);
+    if ("error" in fits) throw new Error(fits.error.code);
+    expect(fits.turn).toBe(60);
+    // Three lugs on a tube 30 mm across: 84 degrees at most; 15 is too short for a lug 4 mm wide, 29 the least that gives one.
+    const most = bayonetPlan(pot(undefined, 15, 1.6), options({ bayonetTurn: 90 }), 50, 0, 49.7);
+    const least = bayonetPlan(pot(undefined, 15, 1.6), options({ bayonetTurn: 15 }), 50, 0, 49.7);
+    if ("error" in most || "error" in least) throw new Error("refused");
+    expect(most.turn).toBe(84);
+    expect(ringLeft(most)).toBeGreaterThanOrEqual(3);
+    expect(ringLeft({ ...most, turn: 85 })).toBeLessThan(3);
+    expect(least.turn).toBe(29);
+    expect(least.width).toBeGreaterThanOrEqual(4);
+    // A degree less is 0.28 mm narrower on the lugs' outer faces, 16.2 mm from the axis: under 4.
+    expect(least.width).toBeLessThan(4 + 16.2 * (Math.PI / 180));
+    // On every size and count it builds, a lug's slot, turn and stop leave 3 mm of ring before the next slot.
+    for (const radius of [8, 10, 15, 20, 30, 50, 75]) {
+      for (const lugs of [2, 3, 4]) {
+        for (const turn of [15, 45, 60, 75, 90]) {
+          const plan = bayonetPlan(pot(undefined, radius, 1.6), options({ bayonetLugs: lugs, bayonetTurn: turn }), 50, 0, 49.7);
+          if ("error" in plan) continue;
+          expect(ringLeft(plan), `${2 * radius} mm, ${lugs} lugs, ${turn} degrees`).toBeGreaterThanOrEqual(3 - 1e-9);
+          expect(plan.width).toBeGreaterThanOrEqual(4 - 1e-9);
+          expect(Number.isInteger(plan.turn)).toBe(true);
+        }
+      }
+    }
+  });
+
+  it("takes three lugs on a body too small for them at their own turn when a longer one is set, and refuses a body with no room for the lugs at any turn", () => {
+    // 20 mm across: three lugs and 40 degrees leave the lugs too narrow; 90 is held to 68, and they fit.
+    expect(bayonetPlan(pot(undefined, 10, 1.6), options({ bayonetLugs: 3 }), 50, 0, 49.7)).toEqual({ error: { code: "bayonetNoRoom" } });
+    const longer = bayonetPlan(pot(undefined, 10, 1.6), options({ bayonetLugs: 3, bayonetTurn: 90 }), 50, 0, 49.7);
+    if ("error" in longer) throw new Error(longer.error.code);
+    expect(longer.turn).toBe(68);
+    expect(longer.width).toBe(6);
+    // 16 mm across: four lugs leave no room for a lug 4 mm wide and its stop at any turn.
+    for (const turn of [15, 45, 90]) expect(bayonetPlan(pot(undefined, 8, 1.6), options({ bayonetLugs: 4, bayonetTurn: turn }), 50, 0, 49.7)).toEqual({ error: { code: "bayonetNoRoom" } });
   });
 
   it("refuses a body that is not round, a wall under 0.8 mm, a body too low, a gap over half the lugs' height and a rim too short for lugs and ledge", () => {

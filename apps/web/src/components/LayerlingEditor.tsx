@@ -8669,10 +8669,15 @@ export function LayerlingEditor({
     const pin = options.hingePin.toLocaleString(numberLocale());
     const magnetCount = result.magnets?.pockets.length ?? 0;
     const millimetres = (value: number) => (Math.round(value * 10) / 10).toLocaleString(numberLocale());
+    // A turn set by hand that does not fit round the body is held to what fits (bayonetPlan): said after the rest.
+    const turnFitted = bayonet && options.bayonetTurn > 0 && bayonet.turn !== options.bayonetTurn ? options.bayonetTurn : null;
     const message = screw
       ? t("status.lidMadeScrew", { pitch: millimetres(screw.pitch), height: millimetres(screw.pitch * screw.turns), diameter: millimetres(screw.diameter) })
       : bayonet
-      ? t("status.lidMadeBayonet", { count: bayonet.count, height: millimetres(bayonet.height), diameter: millimetres(bayonet.diameter), turn: millimetres(bayonet.turn) })
+      ? [
+        t("status.lidMadeBayonet", { count: bayonet.count, height: millimetres(bayonet.height), diameter: millimetres(bayonet.diameter), turn: millimetres(bayonet.turn) }),
+        ...(turnFitted !== null ? [t("status.lidBayonetTurnFitted", { asked: millimetres(turnFitted), turn: millimetres(bayonet.turn) })] : []),
+      ].join(" ")
       : hinge
       ? hinge.style === "pivot"
         ? t("status.lidMadePivot", { pin })
@@ -8693,7 +8698,7 @@ export function LayerlingEditor({
       } } : {}),
       ...(screw ? { screw: { pitch: screw.pitch, turns: screw.turns, depth: Math.round(screw.depth * 1000) / 1000, diameter: Math.round(screw.diameter * 1000) / 1000 } } : {}),
       ...(bayonet ? { bayonet: {
-        lugs: bayonet.count, turn: bayonet.turn, diameter: Math.round(bayonet.diameter * 1000) / 1000, lugHeight: bayonet.height, lugWidth: Math.round(bayonet.width * 1000) / 1000, depth: options.bayonetDepth,
+        lugs: bayonet.count, turn: bayonet.turn, ...(turnFitted !== null ? { turnAsked: turnFitted } : {}), diameter: Math.round(bayonet.diameter * 1000) / 1000, lugHeight: bayonet.height, lugWidth: Math.round(bayonet.width * 1000) / 1000, depth: options.bayonetDepth,
       } } : {}),
     };
   }, [commitShapes, exactLid, selectedShapes]);
@@ -8721,7 +8726,7 @@ export function LayerlingEditor({
       setLidTool(null);
       return;
     }
-    const { type, thickness, gap, depth, wall, magnets, magnetDiameter, magnetHeight, magnetGap, hinge, hingePin, hingeGap, hingePinPlay, hingeKnuckles, hingePrintPin, hingeSide, hingeTeardrop, hingeStyle, hingeEndPlugs, clickBumps, clickBumpHeight, handle, threadPitch, threadTurns, bayonetLugs, bayonetDepth, bayonetAxialGap, bayonetDetent } = lidTool;
+    const { type, thickness, gap, depth, wall, magnets, magnetDiameter, magnetHeight, magnetGap, hinge, hingePin, hingeGap, hingePinPlay, hingeKnuckles, hingePrintPin, hingeSide, hingeTeardrop, hingeStyle, hingeEndPlugs, clickBumps, clickBumpHeight, handle, threadPitch, threadTurns, bayonetLugs, bayonetDepth, bayonetAxialGap, bayonetDetent, bayonetTurn } = lidTool;
     setLidTool((current) => current ? { ...current, busy: true, error: null } : current);
     // Click bumps, a handle and end plugs the panel does not show (a flat lid, a pivot lid, a hinge not flush)
     // are not asked for, nor magnets and a hinge with a screw lid or a bayonet lid.
@@ -8730,7 +8735,7 @@ export function LayerlingEditor({
       type, thickness, gap, depth, wall, magnets: magnets && extras, magnetDiameter, magnetHeight, magnetGap, hinge: hinge && extras, hingePin, hingeGap, hingePinPlay, hingeKnuckles, hingePrintPin, hingeSide, hingeTeardrop, hingeStyle,
       hingeEndPlugs: hingeEndPlugs && hingeStyle === "flush",
       clickBumps: clickBumps && lidClickBumpsFit(lidTool), clickBumpHeight, handle: lidHandleFits(lidTool) ? handle : "none", threadPitch, threadTurns,
-      bayonetLugs, bayonetDepth, bayonetAxialGap, bayonetDetent,
+      bayonetLugs, bayonetDepth, bayonetAxialGap, bayonetDetent, bayonetTurn,
     }, targets).then((result) => {
       if (result.ok) setLidTool(null);
       else setLidTool((current) => current ? { ...current, busy: false, error: result.message } : current);
@@ -14278,6 +14283,7 @@ export function LayerlingEditor({
           bayonetDepth: params.bayonetDepth,
           bayonetAxialGap: params.bayonetAxialGap,
           bayonetDetent: params.bayonetDetent,
+          bayonetTurn: params.bayonetTurn,
         }, targets);
         if (!result.ok) throw new Error(result.message);
         const made = currentShapes().find((shape) => shape.id === result.id);

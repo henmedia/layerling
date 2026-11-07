@@ -80,6 +80,8 @@ export type LidHandle = "none" | "tab" | "notch";
  * room per side across the radius, round the lugs and along the body's wall; `bayonetAxialGap` is the room along the
  * axis between the lugs' undersides and the ledge of the cap under them, how far the locked cap lifts before it holds;
  * `bayonetDetent` how far the rib behind each locked lug reaches past the gap (0: none). The wall is the cap's rim's.
+ * `bayonetTurn` is how far the cap turns to lock, in degrees: 0 leaves it to the lugs (the function `bayonetTurn`), a
+ * turn set by hand is held to what fits round the body (`bayonetPlan`).
  */
 export type LidOptions = {
   type: LidType;
@@ -110,6 +112,7 @@ export type LidOptions = {
   bayonetDepth: number;
   bayonetAxialGap: number;
   bayonetDetent: number;
+  bayonetTurn: number;
 };
 
 export const LID_TYPES: readonly LidType[] = ["plug", "cap", "both", "flat", "screw", "bayonet"];
@@ -117,7 +120,7 @@ export const LID_DEFAULTS: LidOptions = {
   type: "plug", thickness: 2, gap: 0.2, depth: 4, wall: 1.6, magnets: false, magnetDiameter: 6, magnetHeight: 2, magnetGap: 0.1,
   hinge: false, hingePin: 1.75, hingeGap: 0.3, hingePinPlay: 0.2, hingeKnuckles: 0, hingePrintPin: false, hingeSide: "back", hingeTeardrop: true, hingeStyle: "outside", hingeEndPlugs: false,
   clickBumps: false, clickBumpHeight: 0.4, handle: "none", threadPitch: 3, threadTurns: 2,
-  bayonetLugs: 3, bayonetDepth: 8, bayonetAxialGap: 0.3, bayonetDetent: 0.3,
+  bayonetLugs: 3, bayonetDepth: 8, bayonetAxialGap: 0.3, bayonetDetent: 0.3, bayonetTurn: 0,
 };
 /**
  * What a lid starts from with this printer's play (printerPlay.ts): the gap per side and the hinge pin's play take it,
@@ -310,8 +313,23 @@ export const MAX_BAYONET_AXIAL_GAP = 1;
  * turn. At most half a millimetre, so the rib always stands on the ledge, however large the gap.
  */
 export const MAX_BAYONET_DETENT = 0.5;
+/**
+ * How far a bayonet's cap turns to lock when the turn is set by hand, in whole degrees (0 leaves it to the lugs): at
+ * least 15, short of which the cap hardly moves from where it goes on to where it holds, and at most a quarter turn, as
+ * far as a wrist turns in one go, like a cap that goes on with a 90 degree twist (asked in the Layerling User Group on
+ * Facebook). Two lugs leave room for that on all but the smallest bodies; with more, or on a small body, the slots and
+ * the stops between them leave less, and `bayonetPlan` holds it to what fits: four lugs turn 63 degrees at most on a pot
+ * 40 mm across, 68 on one of 80.
+ */
+export const MIN_BAYONET_TURN = 15;
+export const MAX_BAYONET_TURN = 90;
 /** The thinnest wall a bayonet's lugs go on, in mm: as for a screw lid's thread. */
 export const BAYONET_MIN_WALL = 0.8;
+/**
+ * How long the cap's ring stays at least between the stop at the end of one lug's turn and the next lug's slot, in mm
+ * where it is nearest the axis: that piece of ring is the stop, and a turn set by hand that would leave less is cut back.
+ */
+const BAYONET_MIN_STOP = 3;
 /** How far below the rim a lug's top lies, in mm, so it stays clear of the cap's plate resting on the rim. */
 const LUG_TOP_INSET = 0.2;
 /** How tall the cap's ledge is at least below its slope, at its inner edge, in mm. */
@@ -407,6 +425,12 @@ export function normalizeLidOptions(value?: Partial<Record<keyof LidOptions, unk
   if (bayonetAxialGap !== null) result.bayonetAxialGap = clamp(bayonetAxialGap, MIN_BAYONET_AXIAL_GAP, MAX_BAYONET_AXIAL_GAP);
   const bayonetDetent = finiteNumber(value?.bayonetDetent);
   if (bayonetDetent !== null) result.bayonetDetent = clamp(bayonetDetent, 0, MAX_BAYONET_DETENT);
+  // Whole degrees; 0 leaves the turn to the lugs, and one set by hand is MIN_BAYONET_TURN at least.
+  const turn = finiteNumber(value?.bayonetTurn);
+  if (turn !== null) {
+    const whole = Math.round(clamp(turn, 0, MAX_BAYONET_TURN));
+    result.bayonetTurn = whole === 0 ? 0 : Math.max(MIN_BAYONET_TURN, whole);
+  }
   return result;
 }
 
@@ -419,8 +443,9 @@ export function lidTakesExtras(options: Pick<LidOptions, "type">) {
 }
 
 /**
- * How far a bayonet's cap is turned to lock, in degrees: a third of the way to the next lug and 45 at most, so one twist
- * of the wrist does it - 45 for two lugs, 40 for three, 30 for four.
+ * How far a bayonet's cap is turned to lock, in degrees, unless the turn is set by hand (`bayonetTurn` in the options): a
+ * third of the way to the next lug and 45 at most, so one twist of the wrist does it - 45 for two lugs, 40 for three, 30
+ * for four.
  */
 export function bayonetTurn(lugs: number) {
   return Math.min(45, 120 / lugs);
@@ -1163,7 +1188,10 @@ export type BayonetPlan = {
   reach: number;
   /** Where the lugs' middles are with the cap locked, in degrees anticlockwise from the x axis seen from above. */
   angles: number[];
-  /** How far the cap turns clockwise from where it goes down over the lugs to where it is locked, in degrees. */
+  /**
+   * How far the cap turns clockwise from where it goes down over the lugs to where it is locked, in degrees: as the lugs
+   * give, or as set by hand and held to what fits.
+   */
   turn: number;
   /** How far a lug stands out of the wall, and how wide it is along it at its outer face. */
   height: number;
@@ -1198,10 +1226,14 @@ export type BayonetPlan = {
  * the body prints upright without support. The ledge under them slopes alike, the axial gap lower; with
  * BAYONET_MIN_LEDGE of it below, that is how far the cap must reach down at least. The gap may be at most half a lug's
  * height, so the ledge still reaches under the lugs by as much as it keeps from them.
- * The turn is `bayonetTurn`: the first lug at the front (the least y), the others evenly round. A lug is narrowed to
- * what the turn leaves past its slot (the slot's play, the rib with the gap before it, and BAYONET_LEDGE_MARGIN); one
- * narrower than MIN_LUG_WIDTH refuses the body for so many lugs. The stop after it is then always a few millimetres
- * long at least, for the turn is at most a third of the way to the next lug.
+ * The turn is `bayonetTurn` for the lugs: the first lug at the front (the least y), the others evenly round. A lug is
+ * narrowed to what the turn leaves past its slot (the slot's play, the rib with the gap before it, and
+ * BAYONET_LEDGE_MARGIN); one narrower than MIN_LUG_WIDTH refuses the body for so many lugs. The stop after it is then
+ * always a few millimetres long at least, for the turn is at most a third of the way to the next lug.
+ * A turn set by hand (`bayonetTurn` in the options) is held to what fits round this body, in whole degrees: at least
+ * what leaves a lug MIN_LUG_WIDTH wide, and at most what leaves BAYONET_MIN_STOP of the ring between the stop and the
+ * next lug's slot - each lug's slot, its turn, the lug and the stop's gap take the rest of the way to the next lug. So
+ * the slots never run into each other, and the rib and the stop go with the turn as they go with the lugs' own.
  */
 export function bayonetPlan(sliceAt: LidSlicer, options: LidOptions, top: number, bottom: number, rim: number): BayonetPlan | { error: LidError } {
   const depth = options.bayonetDepth;
@@ -1222,7 +1254,6 @@ export function bayonetPlan(sliceAt: LidSlicer, options: LidOptions, top: number
   const needed = top - (lugLow - options.bayonetAxialGap + gap - height - BAYONET_MIN_LEDGE);
   if (depth < needed - 1e-9) return { error: { code: "bayonetShallow", depth: Math.ceil(needed * 10 - 1e-6) / 10 } };
   const count = options.bayonetLugs;
-  const turn = bayonetTurn(count);
   // Round the axis, in radians: the lugs' outer faces at `outer`, the cap's ring from `inside` out to its rim's inner face.
   const outer = radius + height;
   const inside = radius + gap;
@@ -1238,9 +1269,21 @@ export function bayonetPlan(sliceAt: LidSlicer, options: LidOptions, top: number
     return { middle, behind, far: behind + Math.acos((rimInside ** 2 + middle ** 2 - DETENT_RADIUS ** 2) / (2 * rimInside * middle)) };
   })() : null;
   // A locked lug's back is the turn less its width and the slot's play past the slot; there lie the rib and the margin.
-  const width = Math.min(size.width, outer * ((turn * Math.PI) / 180 - entry - (rib?.far ?? 0)) - BAYONET_LEDGE_MARGIN);
-  if (width < MIN_LUG_WIDTH - 1e-9) return { error: { code: "bayonetNoRoom" } };
+  const lugWidth = (turn: number) => Math.min(size.width, outer * ((turn * Math.PI) / 180 - entry - (rib?.far ?? 0)) - BAYONET_LEDGE_MARGIN);
   const degrees = (radians: number) => (radians * 180) / Math.PI;
+  let turn = bayonetTurn(count);
+  if (options.bayonetTurn > 0) {
+    // What a turn leaves of the ring between the end of a lug's channel and the next lug's slot, where the ring is
+    // nearest the axis: the way to the next lug less the turn, the lug, the slot's play and the stop's gap.
+    const stopLength = (turn: number) => inside * ((2 * Math.PI) / count - (turn * Math.PI) / 180 - lugWidth(turn) / outer - entry - stop);
+    const least = Math.ceil(degrees(entry + (rib?.far ?? 0) + (MIN_LUG_WIDTH + BAYONET_LEDGE_MARGIN) / outer) - 1e-9);
+    let most = MAX_BAYONET_TURN;
+    while (most > least && stopLength(most) < BAYONET_MIN_STOP - 1e-9) most -= 1;
+    if (stopLength(most) < BAYONET_MIN_STOP - 1e-9) return { error: { code: "bayonetNoRoom" } };
+    turn = clamp(options.bayonetTurn, least, most);
+  }
+  const width = lugWidth(turn);
+  if (width < MIN_LUG_WIDTH - 1e-9) return { error: { code: "bayonetNoRoom" } };
   const half = degrees(width / 2 / outer);
   return {
     centre, radius, inner, reach: Math.min(SCREW_REACH, wall / 2), angles: Array.from({ length: count }, (_, index) => -90 + (360 * index) / count), turn,
