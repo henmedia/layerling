@@ -7117,8 +7117,9 @@ export function SurfaceTextureCard({
                   onChange={(value) => set({ axis: value as SurfaceTextureSettings["axis"] })}
                 />
               ) : null}
-              {/* Where it goes: every face, or only the faces clicked in the view (a text goes where it is put). */}
-              {placedHere || !onFacePick ? null : (
+              {/* Where it goes: every face, or only the faces clicked in the view (a text goes where it is put). An image
+                  once goes onto the picked faces too, its middle on them where Around and Height aim past them (#1206, #1462). */}
+              {text || !onFacePick ? null : (
                 <>
                   <p className={`cylinder-wrap-hint ${needsFaces ? "surface-layer-missing" : ""}`}>
                     {picked
