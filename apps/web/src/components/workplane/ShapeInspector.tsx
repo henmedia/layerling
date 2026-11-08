@@ -4140,7 +4140,7 @@ function getShapeProperties(shape: WorkplaneShape, onUpdate: ShapeInspectorUpdat
   if (customLimit === undefined) return properties;
   return properties.map((property) => {
     if (property.type === "text" || property.type === "select") return property;
-    if (["length", "width", "height", "threadLength"].includes(property.id)) return { ...property, max: customLimit };
+    if (["length", "width", "height", "diameter", "threadLength"].includes(property.id)) return { ...property, max: customLimit };
     if (["topRadius", "baseRadius"].includes(property.id)) return { ...property, max: customLimit / 2 };
     return property;
   });
@@ -7902,7 +7902,8 @@ function RangeProperty({
     window.clearTimeout(sliderReleaseTimerRef.current);
     sliderReleaseTimerRef.current = window.setTimeout(() => { draggingSliderRef.current = false; }, 120);
   };
-  const allowsAboveSliderMax = ["length", "width", "height", "outerDiameter", "innerDiameter", "starOuterSize", "starInnerSize", "crescentThickness", "honeycombCellSize", "honeycombWallThickness", "honeycombFrameWidth", "bentTubeSize", "bentTubeBendRadius"].includes(id) || id.endsWith("Length") || id.endsWith("Width");
+  // A cylinder's diameter and a cone's radii too (drucktipps3d forum: a cylinder of 198 mm was cut to 160).
+  const allowsAboveSliderMax = ["length", "width", "height", "diameter", "baseRadius", "topRadius", "outerDiameter", "innerDiameter", "starOuterSize", "starInnerSize", "crescentThickness", "honeycombCellSize", "honeycombWallThickness", "honeycombFrameWidth", "bentTubeSize", "bentTubeBendRadius"].includes(id) || id.endsWith("Length") || id.endsWith("Width");
   const isLength = propertyUsesLengthUnit(id);
   const accuracy = workspace.accuracy;
   // A position can be typed beyond the slider, on both sides (#425).
