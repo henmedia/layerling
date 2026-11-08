@@ -378,4 +378,35 @@ describe("hollowing a solid with the real OCCT kernel", () => {
     kernel.release(rebuilt!.solid);
     kernel.release(pieces);
   });
+
+  // #1521: a box rounded by 1 mm with 2 mm walls. The cavity's roundings would shrink below nothing;
+  // the kernel's offset came back turned inside out or in loose pieces. Inside such a wall the box
+  // is hollowed as if its edges were sharp, and the outside keeps its roundings.
+  it("hollows a box whose rounded edges are thinner than the wall, closed and open at the bottom", () => {
+    const box = kernel.makeBox(160, 50, 185);
+    const rounded = kernel.fillet(box, kernel.getSubShapes(box, "edge"), 1);
+    const outside = kernel.getVolume(rounded);
+    const closed = shellSolid(kernel, rounded, 2, "none");
+    expect(kernel.isValid(closed)).toBe(true);
+    expect(kernel.getVolume(closed)).toBeCloseTo(outside - 156 * 46 * 181, 0);
+    const open = shellSolid(kernel, rounded, 2, "bottom");
+    expect(kernel.isValid(open)).toBe(true);
+    expect(kernel.subShapeCount(open, "shell")).toBe(1);
+    expect(kernel.getVolume(open)).toBeCloseTo(outside - 156 * 48 * 181, 0);
+    [open, closed, rounded, box].forEach((handle) => kernel.release(handle));
+  });
+
+  it("hollows the enclosure from the report, with its groove and notch, open at the bottom", () => {
+    const box = kernel.makeBox(160, 50, 185);
+    const rounded = kernel.fillet(box, kernel.getSubShapes(box, "edge"), 1);
+    const groove = kernel.makeBoxFromCorners({ x: 60, y: 42, z: -1 }, { x: 100, y: 51, z: 186 });
+    const notch = kernel.makeBoxFromCorners({ x: 60, y: 22.5, z: 158 }, { x: 100, y: 51, z: 186 });
+    const grooved = kernel.cut(rounded, groove);
+    const body = kernel.cut(grooved, notch);
+    const open = shellSolid(kernel, body, 2, "bottom");
+    expect(kernel.isValid(open)).toBe(true);
+    expect(kernel.subShapeCount(open, "solid")).toBe(1);
+    expect(kernel.getVolume(open)).toBeLessThan(kernel.getVolume(body) * 0.2);
+    [open, body, grooved, notch, groove, rounded, box].forEach((handle) => kernel.release(handle));
+  });
 });
