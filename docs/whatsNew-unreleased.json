@@ -10,5 +10,113 @@
       "en": "The hole pattern has Slope through the wall: on a flat face it tips every hole by up to 60°. On a standing wall a positive slope puts the inner end higher, so rain runs back out.",
       "da": "Hulmønsteret har Hældning gennem væggen: på en plan flade vipper det alle huller op til 60°. På en stående væg ligger den indre ende højere ved positiv hældning, så regn løber ud igen."
     }
+  },
+  {
+    "title": {
+      "de": "Eigene Formen in der Befehlssuche",
+      "en": "Your custom shapes in the command search",
+      "da": "Egne former i kommandosøgningen"
+    },
+    "body": {
+      "de": "Strg+K findet jetzt auch die Formen, die du selbst unter „Eigene Formen“ gespeichert hast. Tippe einen Teil des Namens, und Enter oder ein Klick setzt die Form ein wie im Formen-Menü.",
+      "en": "Ctrl+K now also finds the shapes you saved yourself under Custom shapes. Type part of the name, and Enter or a click puts the shape in, as the shapes menu does.",
+      "da": "Ctrl+K finder nu også de former, du selv har gemt under Egne former. Skriv en del af navnet, og Enter eller et klik sætter formen ind som i formmenuen."
+    }
+  },
+  {
+    "title": {
+      "de": "Abbrechbarer Sockel für stehende Stifte",
+      "en": "Breakaway base for standing pins",
+      "da": "Afbrækkelig sokkel til stående stifter"
+    },
+    "body": {
+      "de": "Auf Druckern mit beweglichem Bett wackeln hohe, dünne Stifte. Der Stift der Passprobe (Einstellungen, „Spiel deines Druckers“) und die losen Dübel beim Teilen können jetzt auf einer dünnen Platte stehen, die nach dem Druck abbricht.",
+      "en": "On a printer whose bed moves, tall thin pins wobble. The fit test's pin (settings, printer play) and the loose dowels of the Split tool can now stand on a thin plate that snaps off once printed.",
+      "da": "På printere med bevægelig plade vakler høje, tynde stifter. Pasprøvens stift (indstillinger, printerens slør) og de løse dyvler fra Del-værktøjet kan nu stå på en tynd plade, der brækkes af efter print."
+    }
+  },
+  {
+    "title": {
+      "de": "Alt+D legt die Auswahl als Ganzes ab",
+      "en": "Alt+D drops the selection as one piece",
+      "da": "Alt+D lægger markeringen ned samlet"
+    },
+    "body": {
+      "de": "D legt jedes gewählte Teil einzeln auf die Ebene. Alt+D senkt alle zusammen ab, bis das unterste aufliegt, so behalten gestapelte Teile ihre Höhen zueinander.",
+      "en": "D drops every selected part on its own. Alt+D lowers them all together until the lowest one rests on the workplane, so stacked parts keep their heights to each other.",
+      "da": "D lægger hver valgt del ned for sig. Alt+D sænker dem alle sammen, til den nederste ligger på arbejdsplanet, så stablede dele beholder deres højder i forhold til hinanden."
+    }
+  },
+  {
+    "title": {
+      "de": "Deckel mit Normgewinde: passt der Hals?",
+      "en": "Lid with a standard thread: does the neck fit?",
+      "da": "Låg med standardgevind: passer halsen?"
+    },
+    "body": {
+      "de": "Das Deckel-Fenster misst jetzt vorher, wie breit der Körper oben ist, und sagt, ob er das Gewinde des Halses bekommt. Einen Zylinder, ein Rohr oder einen Ring passt der Knopf „Körper an den Hals anpassen“ gleich an.",
+      "en": "The Lid panel now measures beforehand how wide the body's top is and says whether it gets the neck's thread. A cylinder, tube or ring is resized to fit with the button Fit the body to the neck.",
+      "da": "Låg-panelet måler nu på forhånd, hvor bred kroppen er foroven, og siger, om den får halsens gevind. En cylinder, et rør eller en ring tilpasses med knappen Tilpas kroppen til halsen."
+    }
+  },
+  {
+    "title": {
+      "de": "Beim Export gleich den Namen tippen",
+      "en": "Type the export name right away",
+      "da": "Skriv eksportnavnet med det samme"
+    },
+    "body": {
+      "de": "Öffnet sich das Export-Fenster, ist der Dateiname schon markiert. Einfach lostippen, und der neue Name ersetzt ihn.",
+      "en": "When the export window opens, the file name is already selected. Just type, and the new name replaces it.",
+      "da": "Når eksportvinduet åbner, er filnavnet allerede markeret. Skriv bare, så erstatter det nye navn det."
+    }
+  },
+  {
+    "title": {
+      "de": "Speichern geht immer, notfalls als Download",
+      "en": "Saving always works, as a download if need be",
+      "da": "Gem virker altid, om nødvendigt som download"
+    },
+    "body": {
+      "de": "Auf manchen PCs gibt der Speichern-Dialog von Chrome und Edge keine Datei zurück. Die Meldung „Nichts gespeichert“ hat dann einen Knopf „Stattdessen herunterladen“, der den Entwurf in den Download-Ordner legt.",
+      "en": "On some PCs the save dialog of Chrome and Edge hands back no file. The message Nothing saved then has a button Download instead, which puts the design into the Downloads folder.",
+      "da": "På nogle pc'er giver gem-dialogen i Chrome og Edge ingen fil tilbage. Beskeden Intet gemt har så en knap Download i stedet, som lægger designet i mappen Overførsler."
+    }
+  },
+  {
+    "title": {
+      "de": "Verrundete Lochränder füllen kein Loch mehr",
+      "en": "Rounded hole rims no longer fill a hole",
+      "da": "Afrundede hulkanter fylder ikke længere et hul"
+    },
+    "body": {
+      "de": "Wer die oberen Ränder mehrerer runder Löcher nacheinander verrundete, verlor manchmal ein Loch ganz. Die Löcher bleiben jetzt echte Kreise, und eine Kantenbearbeitung, die eine fremde Fläche verschluckt, wird mit einem Hinweis abgelehnt.",
+      "en": "Rounding the top rims of several round holes one after another sometimes lost a hole completely. The holes now stay true circles, and an edge treatment that swallows a face it never touched is refused with a hint.",
+      "da": "Når man afrundede de øverste kanter af flere runde huller efter hinanden, forsvandt et hul nogle gange helt. Hullerne forbliver nu ægte cirkler, og en kantbehandling, der sluger en flade, den ikke rørte, afvises med en besked."
+    }
+  },
+  {
+    "title": {
+      "de": "Werkzeugleiste passt sich der Bediengröße an",
+      "en": "The toolbar follows the control size",
+      "da": "Værktøjslinjen følger kontrolstørrelsen"
+    },
+    "body": {
+      "de": "Nach dem Umschalten der Bediengröße in den Einstellungen ordnet sich die Werkzeugleiste sofort neu und bleibt eine Zeile, statt in zwei oder drei Reihen umzubrechen.",
+      "en": "After switching the control size in the settings, the toolbar fits itself again at once and stays one row, instead of breaking into two or three.",
+      "da": "Når kontrolstørrelsen skiftes i indstillingerne, tilpasser værktøjslinjen sig straks igen og forbliver én række i stedet for at bryde over i to eller tre."
+    }
+  },
+  {
+    "title": {
+      "de": "Keine zweite Druckplatte mehr",
+      "en": "No more second build plate",
+      "da": "Ingen anden byggeplade mere"
+    },
+    "body": {
+      "de": "Eine Arbeitsebene auf der leeren Platte trug den Druckernamen und sah aus wie eine zweite Platte neben der echten, grauen. Der Name steht jetzt nur auf der echten Platte. Alt+W legt die Arbeitsebene zurück.",
+      "en": "A workplane set on the empty plate carried the printer's name and looked like a second plate beside the real, grey one. The name now stays on the real plate. Alt+W puts the workplane back.",
+      "da": "Et arbejdsplan sat på den tomme plade bar printerens navn og lignede en anden plade ved siden af den rigtige, grå. Navnet står nu kun på den rigtige plade. Alt+W lægger arbejdsplanet tilbage."
+    }
   }
 ]
