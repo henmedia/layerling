@@ -4441,13 +4441,6 @@ export function ShapeInspector({
     taperKeepsProportions ? Math.min(taperDimensionMax, Math.max(MIN_SHAPE_SIZE, partner * (changed / Math.max(MIN_SHAPE_SIZE, before)))) : partner;
   const taperProperties: ShapePropertyConfig[] = shapeIgnoresTaper ? [] : [
     {
-      type: "toggle",
-      id: "taperKeepProportions",
-      label: t("inspector.keepProportions"),
-      value: taperKeepsProportions,
-      onChange: (keep) => onUpdate({ taperKeepProportions: keep || undefined }),
-    },
-    {
       id: "topLength",
       label: t("prop.topLength"),
       value: taper.topDepth,
@@ -4478,6 +4471,13 @@ export function ShapeInspector({
       min: MIN_SHAPE_SIZE,
       max: taperDimensionMax,
       onChange: (taperBottomWidth) => onUpdate({ taperBottomWidth, taperBottomDepth: taperPartner(taperBottomWidth, taper.bottomWidth, taper.bottomDepth), taperBottomScale: undefined }),
+    },
+    {
+      type: "toggle",
+      id: "taperKeepProportions",
+      label: t("inspector.keepProportions"),
+      value: taperKeepsProportions,
+      onChange: (keep) => onUpdate({ taperKeepProportions: keep || undefined }),
     },
   ];
   /*
@@ -4539,15 +4539,6 @@ export function ShapeInspector({
       onChange: (value) => onUpdate({ slopeSide: normalizeSlopeSide(shape.kind, value), slopeEnd: shape.slopeEnd ?? shape.height }),
     },
     {
-      type: "select",
-      id: "slopeFrom",
-      label: t("prop.slopeFrom"),
-      value: slopeFrom,
-      hint: slopeFrom === "arch" ? t("slope.fromArchHint") : t("slope.fromHint"),
-      options: [{ value: "end", label: t("slope.from.end") }, { value: "middle", label: t("slope.from.middle") }, { value: "arch", label: t("slope.from.arch") }],
-      onChange: (value) => onUpdate({ slopeFrom: normalizeSlopeFrom(value), slopeEnd: shape.slopeEnd ?? shape.height, slopeSide: shape.slopeSide ?? slopeSide }),
-    },
-    {
       id: "slopeEnd",
       label: t("prop.slopeEnd"),
       value: slopeEndValue,
@@ -4578,6 +4569,15 @@ export function ShapeInspector({
       step: 1,
       hint: t("slope.curveHint"),
       onChange: (percent) => onUpdate({ slopeCurve: normalizeSlopeCurve(percent / 100), slopeEnd: shape.slopeEnd ?? shape.height, slopeSide: shape.slopeSide ?? slopeSide }),
+    },
+    {
+      type: "select",
+      id: "slopeFrom",
+      label: t("prop.slopeFrom"),
+      value: slopeFrom,
+      hint: slopeFrom === "arch" ? t("slope.fromArchHint") : t("slope.fromHint"),
+      options: [{ value: "end", label: t("slope.from.end") }, { value: "middle", label: t("slope.from.middle") }, { value: "arch", label: t("slope.from.arch") }],
+      onChange: (value) => onUpdate({ slopeFrom: normalizeSlopeFrom(value), slopeEnd: shape.slopeEnd ?? shape.height, slopeSide: shape.slopeSide ?? slopeSide }),
     },
     {
       id: "sideDrop",
