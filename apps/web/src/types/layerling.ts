@@ -918,6 +918,7 @@ export type ParametricSource = {
   slopeEnd?: number;
   slopeSide?: "back" | "front" | "left" | "right";
   slopeCurve?: number;
+  slopeFrom?: "end" | "middle";
   narrowEnd?: number;
   narrowSide?: "back" | "front" | "left" | "right";
   narrowCurve?: number;
@@ -1049,6 +1050,8 @@ export type WorkplaneShape = {
   slopeSide?: "back" | "front" | "left" | "right";
   /** Slope along: -1 to 1, 0 a straight top, above 0 bulging up, below 0 sagging. */
   slopeCurve?: number;
+  /** Slope along: where the top line starts: at one end ("end", the default) or in the middle ("middle": both ends low, symmetric). */
+  slopeFrom?: "end" | "middle";
   /**
    * Narrow along: seen from above, the width of the narrow end in mm,
    * both long sides running in evenly. Missing or the full width means no narrowing.
