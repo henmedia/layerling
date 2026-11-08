@@ -207,91 +207,109 @@
       {
         "title": {
           "de": "Aushöhlen klappt bei mehr Formen",
-          "en": "Hollow works on more shapes"
+          "en": "Hollow works on more shapes",
+          "da": "Udhuling virker på flere former"
         },
         "body": {
           "de": "Ein Körper, der oben und unten flach ist und gerade Seiten hat, wird jetzt über seinen Umriss ausgehöhlt. So gehen auch Formen mit spitzen Ecken in einem runden Umriss und importierte STL-Dateien, an denen das Aushöhlen vorher scheiterte oder hängen blieb.",
-          "en": "A body that is flat at its top and bottom with upright sides is now hollowed through its outline. Shapes with a sharp corner in a round outline and imported STL files, where Hollow failed or got stuck before, now work."
+          "en": "A body that is flat at its top and bottom with upright sides is now hollowed through its outline. Shapes with a sharp corner in a round outline and imported STL files, where Hollow failed or got stuck before, now work.",
+          "da": "Et legeme, der er fladt i top og bund og har lodrette sider, udhules nu gennem sit omrids. Også former med et skarpt hjørne i et rundt omrids og importerede STL-filer, hvor udhulingen førhen fejlede eller hang, virker nu."
         }
       },
       {
         "title": {
           "de": "Abgerundeter Quader: mehr Freiheit",
-          "en": "Rounded box: more freedom"
+          "en": "Rounded box: more freedom",
+          "da": "Rundet kasse: mere frihed"
         },
         "body": {
           "de": "Ein Punkt auf der Oberkante zieht den Eckenradius, auch am normalen Quader. „Ecken einzeln“ gibt jeder Ecke ihren eigenen Radius, und „Oben/unten getrennt“ rundet oben und unten verschieden, etwa oben flach und unten rund.",
-          "en": "A dot on the top edge drags the corner radius, on a plain box too. \"Corners Separately\" gives each corner its own radius, and \"Top/Bottom Separately\" rounds the top and the bottom differently, say flat on top and round below."
+          "en": "A dot on the top edge drags the corner radius, on a plain box too. \"Corners Separately\" gives each corner its own radius, and \"Top/Bottom Separately\" rounds the top and the bottom differently, say flat on top and round below.",
+          "da": "En prik på overkanten trækker hjørneradius med, også på en almindelig kasse. „Hjørner hver for sig“ giver hvert hjørne sin egen radius, og „Top og bund hver for sig“ rounder toppen og bunden hver for sig, for eksempel fladt foroven og rundt forneden."
         }
       },
       {
         "title": {
           "de": "Neigung entlang: Mitte, Bogen und Seiten",
-          "en": "Slope along: middle, arch and sides"
+          "en": "Slope along: middle, arch and sides",
+          "da": "Hældning på langs: midt, buet og sider"
         },
         "body": {
           "de": "„Bogen beginnt bei“ lässt die Neigung auch aus der Mitte zu beiden Enden abfallen oder wölbt eine schräge Fläche gleichmäßig. „Seiten abgesenkt“ senkt die beiden langen Seiten ab, gerade oder gewölbt wie eine Kuppel.",
-          "en": "\"Curve Starts At\" can let the slope fall from the middle to both ends, or arch a slanted top evenly. \"Sides Lowered\" lowers the two long sides, straight or domed."
+          "en": "\"Curve Starts At\" can let the slope fall from the middle to both ends, or arch a slanted top evenly. \"Sides Lowered\" lowers the two long sides, straight or domed.",
+          "da": "„Kurven starter ved“ kan lade hældningen falde fra midten til begge ender, eller bu en skrå overside jævnt. „Sider sænket“ sænker de to lange sider, lige eller hvælvet."
         }
       },
       {
         "title": {
           "de": "Verrundung sagt, wo es klemmt",
-          "en": "Fillet says where it gets stuck"
+          "en": "Fillet says where it gets stuck",
+          "da": "Afrunding siger, hvor den klemmer"
         },
         "body": {
           "de": "Lässt sich eine gebogene Kante nicht verrunden, nennt layerling jetzt die engste Biegung und markiert die Kanten rot. Wähle dann einen kleineren Radius als diese Biegung.",
-          "en": "When a curved edge cannot be filleted, layerling now names its tightest bend and marks those edges red. Choose a radius smaller than that bend."
+          "en": "When a curved edge cannot be filleted, layerling now names its tightest bend and marks those edges red. Choose a radius smaller than that bend.",
+          "da": "Når en buet kant ikke kan afrundes, siger layerling nu, hvor den skarpeste bøjning er, og markerer de kanter rødt. Vælg en radius mindre end den bøjning."
         }
       },
       {
         "title": {
           "de": "Kegel bleibt rund",
-          "en": "Cone stays round"
+          "en": "Cone stays round",
+          "da": "Keglen forbliver rund"
         },
         "body": {
           "de": "Der Basisradius des Kegels ändert Breite und Länge zusammen, der Kegel wird also nicht mehr oval. Ist der obere Radius größer, sagt ein Hinweis, wie du einen oben breiteren Kegel baust.",
-          "en": "A cone's base radius now changes width and length together, so the cone no longer goes oval. When the top radius is the larger one, a hint says how to make a cone wider at the top."
+          "en": "A cone's base radius now changes width and length together, so the cone no longer goes oval. When the top radius is the larger one, a hint says how to make a cone wider at the top.",
+          "da": "En kegles grundradius ændrer nu bredde og længde sammen, så keglen ikke længere bliver oval. Når toppens radius er den største, siger et tip, hvordan du laver en kegle, der er bredere foroven."
         }
       },
       {
         "title": {
           "de": "Durchmesser über 160 mm",
-          "en": "Diameters past 160 mm"
+          "en": "Diameters past 160 mm",
+          "da": "Diameter over 160 mm"
         },
         "body": {
           "de": "Durchmesser und Radien von Zylinder und Kegel lassen sich jetzt größer eintippen, als der Schieberegler reicht, so wie Breite und Höhe.",
-          "en": "A cylinder's or cone's diameter and radius can now be typed larger than the slider goes, like width and height."
+          "en": "A cylinder's or cone's diameter and radius can now be typed larger than the slider goes, like width and height.",
+          "da": "En cylinders eller kegles diameter og radius kan nu skrives større, end skyderen rækker, ligesom bredde og højde."
         }
       },
       {
         "title": {
           "de": "Auf Platten verteilen geht wieder",
-          "en": "Arrange on plates works again"
+          "en": "Arrange on plates works again",
+          "da": "Fordeling på plader virker igen"
         },
         "body": {
           "de": "Der Knopf „Auf Platten verteilen“ in der Plattenleiste tat nichts. Jetzt verteilt er die Auswahl oder alle Teile wieder an.",
-          "en": "The \"Arrange on plates\" button in the plate bar did nothing. It now arranges the selection, or every part, again."
+          "en": "The \"Arrange on plates\" button in the plate bar did nothing. It now arranges the selection, or every part, again.",
+          "da": "Knappen „Fordel på plader“ i pladelinjen gjorde ingenting. Nu fordeler den igen markeringen, eller alle dele."
         }
       },
       {
         "title": {
           "de": "Speichern sagt, wenn nichts gespeichert wurde",
-          "en": "Saving says when nothing was saved"
+          "en": "Saving says when nothing was saved",
+          "da": "Gem siger, når intet blev gemt"
         },
         "body": {
           "de": "Schließt sich das Speicherfenster ohne gewählte Datei, sagt die Statuszeile jetzt „Nichts gespeichert“ bzw. „Keine Sicherung erstellt“, für Strg+S, Speichern unter und die Sicherungen.",
-          "en": "When the save window closes without a chosen file, the status line now says \"Nothing saved\" or \"No backup made\", for Ctrl+S, Save as and the backups."
+          "en": "When the save window closes without a chosen file, the status line now says \"Nothing saved\" or \"No backup made\", for Ctrl+S, Save as and the backups.",
+          "da": "Når gem-vinduet lukker uden en valgt fil, siger statuslinjen nu „Intet gemt“ eller „Ingen sikkerhedskopi lavet“, både for Ctrl+S, Gem som og sikkerhedskopierne."
         }
       },
       {
         "title": {
           "de": "KI kann das Projekt benennen",
-          "en": "The AI can name the project"
+          "en": "The AI can name the project",
+          "da": "AI’en kan navngive projektet"
         },
         "body": {
           "de": "Über MCP kann eine KI dem Projekt jetzt einen Namen geben, wie der Stift neben dem Projektnamen, statt es „Unbenannter Entwurf“ zu lassen.",
-          "en": "Through MCP an AI can now give the project a name, as the pencil beside its name does, instead of leaving it \"Untitled design\"."
+          "en": "Through MCP an AI can now give the project a name, as the pencil beside its name does, instead of leaving it \"Untitled design\".",
+          "da": "Via MCP kan en AI nu give projektet et navn, ligesom blyanten ved siden af navnet gør, i stedet for at det står som „Unavngivet design“."
         }
       }
     ]
