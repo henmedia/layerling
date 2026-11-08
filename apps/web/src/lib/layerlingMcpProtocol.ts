@@ -100,6 +100,7 @@ export type LayerlingMcpCommandName =
   | "list_objects"
   | "select_objects"
   | "hide_others"
+  | "rename_project"
   | "delete_objects"
   | "move_object"
   | "create_shape"

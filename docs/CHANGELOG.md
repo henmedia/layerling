@@ -6,6 +6,8 @@ code still carries it - so a lower number further down is older, not newer.
 
 ## Unreleased
 
+- **MCP: the AI can name the project (Discussion #1483):** An AI building a design through the MCP server gave every part a clear name, but the project kept "Untitled design 38", hard to find later in the project list. The new `layerling_rename_project` names it as the pencil beside the project name does (trimmed, at most 80 characters, never empty) and returns the old and the new name. `layerling_list_editors` and `layerling_read_scene` already report the project's name, so the AI can check which project a tab has open before it changes anything. Unit test `mcpRenameProject.test.ts`. Asked for by @danyvanimpe-lab.
+
 - **Cone: the base radius keeps it round (Issue #1476), and a hint for a wider top (Issue #1477):** Changing a cone's **Base Radius** in the settings changed only its width, so with Keep proportions off the cone went oval. Width and length now both follow the radius, and an oval cone becomes round again. Width and length count the base circle; once the **Top Radius** is the larger one, a hint under it says so and how to get a cone wider at the top: set the larger radius as Base Radius and turn the cone over. Panel test `coneRadiusPanel.e2e.ts`. Reported by @ddemtlapps.
 
 - **Build plates: the Arrange on plates button arranges again (Issue #1463):** A click on **Arrange on plates** in the plate bar did nothing, with or without a selection: the bar handed its click to the arrange function as the list of bodies to arrange, and it stopped with an error before moving one. The button now arranges the selection, or every body, as the guide says. The MCP action `layerling_build_plates` was not affected. Unit test `plateBarArrange.test.ts`.

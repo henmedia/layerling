@@ -82,6 +82,7 @@ AI pracuje tymi samymi funkcjami co Ty, tą samą drogą co Twoja praca w edytor
 | Narzędzie | Co robi |
 | --- | --- |
 | `layerling_list_editors` | wypisuje otwarte karty edytora |
+| `layerling_rename_project` | nadaje projektowi nazwę, jak ołówek obok nazwy projektu |
 | `layerling_open_editor` | otwiera nową kartę edytora w domyślnej przeglądarce i czeka, aż się połączy (tylko na Twoim własnym komputerze) |
 | `layerling_read_scene` | odczytuje scenę, zaznaczenie, jednostki i dokładne wymiary wszystkich obiektów |
 | `layerling_list_objects` | wypisuje wszystkie obiekty z wymiarami, pozycją, obrotem i identyfikatorem |

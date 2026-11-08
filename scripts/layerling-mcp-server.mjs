@@ -102,6 +102,8 @@ async function callTool(name, args) {
       return bridgeCommand("select_objects", args);
     case "layerling_hide_others":
       return bridgeCommand("hide_others", args);
+    case "layerling_rename_project":
+      return bridgeCommand("rename_project", args);
     case "layerling_delete_objects":
       return bridgeCommand("delete_objects", args);
     case "layerling_move_object":

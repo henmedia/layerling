@@ -82,6 +82,7 @@ La IA trabaja con las mismas funciones que tú, por el mismo camino que sigues c
 | Herramienta | Qué hace |
 | --- | --- |
 | `layerling_list_editors` | lista las pestañas abiertas del editor |
+| `layerling_rename_project` | da un nombre al proyecto, como el lápiz junto al nombre del proyecto |
 | `layerling_open_editor` | abre una pestaña nueva del editor en tu navegador predeterminado y espera a que se conecte (solo en tu propio ordenador) |
 | `layerling_read_scene` | lee la escena, la selección, las unidades y las medidas exactas de todos los objetos |
 | `layerling_list_objects` | lista todos los objetos con sus medidas, posición, giro e id |

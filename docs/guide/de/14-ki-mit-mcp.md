@@ -82,6 +82,7 @@ Die KI arbeitet mit denselben Funktionen wie du, sie läuft über denselben Weg 
 | Werkzeug | Was es tut |
 | --- | --- |
 | `layerling_list_editors` | listet die offenen Editor-Tabs auf |
+| `layerling_rename_project` | gibt dem Projekt einen Namen, wie der Stift neben dem Projektnamen |
 | `layerling_open_editor` | öffnet einen neuen Editor-Tab in deinem Standardbrowser und wartet, bis er verbunden ist (nur auf deinem eigenen Rechner) |
 | `layerling_read_scene` | liest Szene, Auswahl, Einheiten und die genauen Maße aller Objekte |
 | `layerling_list_objects` | listet alle Objekte mit Maßen, Lage, Drehung und Kennung |

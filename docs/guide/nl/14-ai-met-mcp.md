@@ -78,6 +78,7 @@ De AI werkt met dezelfde functies als jij, via dezelfde weg als jouw bediening i
 | Gereedschap | Wat het doet |
 | --- | --- |
 | `layerling_list_editors` | somt de geopende editortabbladen op |
+| `layerling_rename_project` | geeft het project een naam, zoals het potlood naast de projectnaam |
 | `layerling_open_editor` | opent een nieuw editortabblad in je standaardbrowser en wacht tot het verbonden is (alleen op je eigen computer) |
 | `layerling_read_scene` | leest scène, selectie, eenheden en de exacte maten van alle objecten |
 | `layerling_list_objects` | somt alle objecten op met maten, positie, rotatie en id |

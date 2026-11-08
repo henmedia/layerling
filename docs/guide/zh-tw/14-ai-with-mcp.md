@@ -82,6 +82,7 @@ AI 使用的是與你相同的功能，走的也是你在編輯器中操作時�
 | 工具 | 作用 |
 | --- | --- |
 | `layerling_list_editors` | 列出已開啟的編輯器分頁 |
+| `layerling_rename_project` | 為專案命名，和專案名稱旁邊的鉛筆一樣 |
 | `layerling_open_editor` | 在你的預設瀏覽器中開啟新的編輯器分頁，並等待它連線（僅限你自己的電腦） |
 | `layerling_read_scene` | 讀取場景、選取範圍、單位，以及所有物件的精確尺寸 |
 | `layerling_list_objects` | 列出所有物件及其尺寸、位置、旋轉與 id |

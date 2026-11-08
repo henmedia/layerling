@@ -82,6 +82,7 @@ curl -fsSL https://raw.githubusercontent.com/henmedia/layerling/main/scripts/mac
 | الأداة | ما تفعله |
 | --- | --- |
 | `layerling_list_editors` | تسرد تبويبات المحرر المفتوحة |
+| `layerling_rename_project` | يعطي المشروع اسمًا، كما يفعل القلم بجانب اسم المشروع |
 | `layerling_open_editor` | تفتح تبويب محرر جديدًا في متصفحك الافتراضي وتنتظر حتى يتصل (على كمبيوترك الخاص فقط) |
 | `layerling_read_scene` | تقرأ المشهد والتحديد والوحدات والأبعاد الدقيقة لجميع الأجسام |
 | `layerling_list_objects` | تسرد جميع الأجسام مع الأبعاد والموضع والتدوير والمعرّف (id) |

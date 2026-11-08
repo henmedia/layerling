@@ -78,6 +78,7 @@ L'IA fonctionne avec les mêmes fonctions que vous, via le même chemin que votr
 | Outil | Ce qu'il fait |
 | --- | --- |
 | `layerling_list_editors` | répertorie les onglets ouverts de l'éditeur |
+| `layerling_rename_project` | donne un nom au projet, comme le crayon à côté du nom du projet |
 | `layerling_open_editor` | ouvre un nouvel onglet d'éditeur dans votre navigateur par défaut et attend qu'il soit connecté (sur votre propre ordinateur uniquement) |
 | `layerling_read_scene` | lit la scène, la sélection, les unités et les dimensions exactes de tous les objets |
 | `layerling_list_objects` | répertorie tous les objets avec les dimensions, la position, la rotation et l'identifiant |

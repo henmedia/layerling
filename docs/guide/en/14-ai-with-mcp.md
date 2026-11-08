@@ -82,6 +82,7 @@ The AI works with the same functions as you, through the same path as your opera
 | Tool | What it does |
 | --- | --- |
 | `layerling_list_editors` | lists the open editor tabs |
+| `layerling_rename_project` | gives the project a name, as the pencil beside the project name does |
 | `layerling_open_editor` | opens a new editor tab in your default browser and waits until it has connected (on your own computer only) |
 | `layerling_read_scene` | reads scene, selection, units and the exact dimensions of all objects |
 | `layerling_list_objects` | lists all objects with dimensions, position, rotation and id |

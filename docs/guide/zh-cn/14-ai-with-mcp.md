@@ -82,6 +82,7 @@ AI 使用与你相同的功能，走的是与你在编辑器中的操作相同�
 | 工具 | 作用 |
 | --- | --- |
 | `layerling_list_editors` | 列出已打开的编辑器标签页 |
+| `layerling_rename_project` | 给项目命名，和项目名称旁边的铅笔一样 |
 | `layerling_open_editor` | 在你的默认浏览器中打开新的编辑器标签页，并等待它连接（仅限你自己的电脑） |
 | `layerling_read_scene` | 读取场景、选择、单位以及所有对象的精确尺寸 |
 | `layerling_list_objects` | 列出所有对象及其尺寸、位置、旋转和 id |

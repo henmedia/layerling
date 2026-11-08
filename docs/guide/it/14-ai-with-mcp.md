@@ -82,6 +82,7 @@ L’IA usa le stesse funzioni che hai a disposizione, attraverso lo stesso perco
 | Strumento | Funzione |
 | --- | --- |
 | `layerling_list_editors` | Elenca le schede degli editor aperte. |
+| `layerling_rename_project` | Dà un nome al progetto, come la matita accanto al nome del progetto. |
 | `layerling_open_editor` | Apre una nuova scheda dell’editor nel browser predefinito e attende che si colleghi (solo sul tuo computer). |
 | `layerling_read_scene` | Legge la scena, la selezione, le unità e le dimensioni esatte di tutti gli oggetti. |
 | `layerling_list_objects` | Elenca tutti gli oggetti con dimensioni, posizione, rotazione e ID. |

@@ -78,6 +78,7 @@ Az MI ugyanazokkal a funkciókkal dolgozik, mint te, ugyanazon az úton, mint a 
 | Eszköz | Mit csinál |
 | --- | --- |
 | `layerling_list_editors` | felsorolja a nyitott szerkesztőlapokat |
+| `layerling_rename_project` | nevet ad a projektnek, mint a projekt neve melletti ceruza |
 | `layerling_open_editor` | új szerkesztőlapot nyit az alapértelmezett böngésződben, és megvárja, amíg csatlakozik (csak a saját számítógépeden) |
 | `layerling_read_scene` | beolvassa a jelenetet, a kijelölést, a mértékegységeket és az összes objektum pontos méreteit |
 | `layerling_list_objects` | felsorolja az összes objektumot méretekkel, helyzettel, elforgatással és azonosítóval |

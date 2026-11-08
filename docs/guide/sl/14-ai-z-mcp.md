@@ -79,6 +79,7 @@ Umetna inteligenca dela z istimi funkcijami kot ti, teče po isti poti kot tvoje
 | --- | --- |
 | `layerling_open_editor` | odpre nov zavihek urejevalnika v privzetem brskalniku in počaka, da se poveže (samo na tvojem računalniku) |
 | `layerling_list_editors` | našteje odprte zavihke urejevalnika |
+| `layerling_rename_project` | projektu da ime, kot svinčnik ob imenu projekta |
 | `layerling_read_scene` | prebere prizor, izbor, enote in natančne mere vseh objektov |
 | `layerling_list_objects` | našteje vse objekte z merami, lego, zasukom in oznako |
 | `layerling_select_objects` | izbere objekte |

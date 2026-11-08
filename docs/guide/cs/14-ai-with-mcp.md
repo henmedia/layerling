@@ -78,6 +78,7 @@ AI používá stejné funkce a stejné zpracování příkazů jako ruční ovl�
 | Nástroj | Funkce |
 | --- | --- |
 | `layerling_list_editors` | vypíše otevřené editory |
+| `layerling_rename_project` | pojmenuje projekt, stejně jako tužka vedle názvu projektu |
 | `layerling_open_editor` | otevře editor ve výchozím prohlížeči a počká na připojení, pouze na místním počítači |
 | `layerling_read_scene` | přečte scénu, výběr, jednotky a přesné rozměry objektů |
 | `layerling_list_objects` | vypíše objekty s rozměry, polohou, natočením a identifikátorem |

@@ -390,6 +390,18 @@ export const tools = [
     inputSchema: { type: "object", properties: {} },
   },
   {
+    name: "layerling_rename_project",
+    description: "Give the editor's project a name, as the pencil beside the project name does (Discussion #1483), so a design is easy to find in the project list later, e.g. \"HDD case 5x WD Elements v3\". Leading and trailing spaces are dropped and the name is cut to 80 characters; an empty name is refused. Returns projectId, previousName and projectName. layerling_list_editors and layerling_read_scene report the project's name, so check it there before changing a design: it tells which project an editor tab has open.",
+    inputSchema: {
+      ...editorTargetSchema,
+      properties: {
+        ...editorTargetSchema.properties,
+        name: { type: "string", description: "The project's new name, at most 80 characters." },
+      },
+      required: ["name"],
+    },
+  },
+  {
     name: "layerling_open_editor",
     description: "Open a new Layerling editor tab in the user's default browser and wait (up to 45 s) until it has connected; returns it with its editorNumber. Only for a Layerling on this computer - for a copy on a NAS or server the browser is somewhere else and the user opens the editor. The other tools open an editor themselves when none is open (unless LAYERLING_MCP_OPEN_EDITOR=0 is set for the MCP server), so call this only to get another tab, for example for a second design.",
     inputSchema: { type: "object", properties: {} },
