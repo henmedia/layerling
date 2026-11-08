@@ -20,7 +20,7 @@ import {
 } from "@/lib/projectAttachments";
 import { normalizeQrSettings } from "@/lib/qrCode";
 import { MAX_SBC_BUTTON_REACH, MAX_SBC_CLEARANCE, MAX_SBC_REACH, MAX_SBC_UP_REACH, MIN_SBC_UP_REACH, SBC_BOARD_ORDER } from "@/lib/sbcBoards";
-import { importedShapeFromStl } from "@/lib/stlImport";
+import { importedShapeFromStl, stlReadBeforeZUp, type StlReadOptions } from "@/lib/stlImport";
 import { importedShapeFromSvg } from "@/lib/svgImport";
 import { importedShapeFrom3mf } from "@/lib/threemfImport";
 import { normalizeDesignView, normalizeSavedViews, readDesignView, readSavedViews, type DesignView, type SavedDesignViews } from "@/lib/designView";
@@ -330,7 +330,8 @@ export type LylProjectPackageSummary = {
   formatVersion: number;
 };
 
-export type LylSourceImporter = (asset: ProjectAsset) => Promise<NonNullable<WorkplaneShape["importedMesh"]>>;
+/** Reads an imported file again. `stl.yUp` reads an STL as it was read before 1.151.0 (Issue #1518). */
+export type LylSourceImporter = (asset: ProjectAsset, options?: { stl?: StlReadOptions }) => Promise<NonNullable<WorkplaneShape["importedMesh"]>>;
 
 export type ImportLylOptions = {
   sourceImporter?: LylSourceImporter;
@@ -2210,14 +2211,14 @@ function sharedImportedMesh(decoded: object, reference: string, create: () => Im
   return mesh;
 }
 
-async function defaultSourceImporter(asset: ProjectAsset) {
+async function defaultSourceImporter(asset: ProjectAsset, options: { stl?: StlReadOptions } = {}) {
   if (asset.sourceFormat === "stl") {
     // In the browser the file is read off the page (lib/geometryWorker.ts); the server reads it here.
     if (typeof window !== "undefined") {
       const { importedShapeFromStlOffThread } = await import("@/lib/geometryWorker");
-      return (await importedShapeFromStlOffThread(asset.name, exactArrayBuffer(asset.bytes))).importedMesh as NonNullable<WorkplaneShape["importedMesh"]>;
+      return (await importedShapeFromStlOffThread(asset.name, exactArrayBuffer(asset.bytes), options.stl)).importedMesh as NonNullable<WorkplaneShape["importedMesh"]>;
     }
-    return importedShapeFromStl(asset.name, exactArrayBuffer(asset.bytes)).importedMesh as NonNullable<WorkplaneShape["importedMesh"]>;
+    return importedShapeFromStl(asset.name, exactArrayBuffer(asset.bytes), options.stl).importedMesh as NonNullable<WorkplaneShape["importedMesh"]>;
   }
   if (asset.sourceFormat === "obj") return importedShapeFromObj(asset.name, strFromU8(asset.bytes), true).importedMesh as NonNullable<WorkplaneShape["importedMesh"]>;
   if (asset.sourceFormat === "svg") return importedShapeFromSvg(asset.name, strFromU8(asset.bytes)).importedMesh as NonNullable<WorkplaneShape["importedMesh"]>;
@@ -2288,8 +2289,20 @@ async function restoreShapeFromNode(
       promise = sourceImporter(sourceAsset);
       sourceMeshCache.set(sourceAsset.id, promise);
     }
-    const regenerated = await promise;
-    importedMesh = sharedImportedMesh(regenerated, sourceAsset.id, () => ({ ...regenerated, assetId: sourceAsset.id }));
+    let regenerated = await promise;
+    let meshKey = sourceAsset.id;
+    // An STL imported before 1.151.0 may have been read Y-up; read Z-up now, it would open turned and stretched (Issue #1518).
+    if (sourceAsset.sourceFormat === "stl" && stlReadBeforeZUp(regenerated, node.importedMesh, definition as { width?: number; depth?: number; height?: number })) {
+      meshKey = `${sourceAsset.id}#y-up`;
+      let legacy = sourceMeshCache.get(meshKey);
+      if (!legacy) {
+        legacy = sourceImporter(sourceAsset, { stl: { yUp: true } });
+        sourceMeshCache.set(meshKey, legacy);
+      }
+      regenerated = await legacy;
+    }
+    const mesh = regenerated;
+    importedMesh = sharedImportedMesh(mesh, meshKey, () => ({ ...mesh, assetId: sourceAsset.id }));
   } else if (node.importedMesh?.meshAssetId) {
     const meshRecord = assetById.get(node.importedMesh.meshAssetId);
     if (!meshRecord) throw new Error(`Object '${node.objectId}' is missing its derived mesh`);

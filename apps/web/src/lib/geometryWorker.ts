@@ -13,7 +13,7 @@ import type { ModelSplitPlane } from "@/lib/modelSplit";
 import type { SplitConnectorOptions } from "@/lib/splitConnectors";
 import { simplifyTrianglePositions, type SimplifiedMesh, type SimplifyOptions } from "@/lib/meshSimplify";
 import { importedShapesFromObj, type ObjImportResult } from "@/lib/objImport";
-import { importedShapeFromStl } from "@/lib/stlImport";
+import { importedShapeFromStl, type StlReadOptions } from "@/lib/stlImport";
 import { importedShapesFromStepFile, type StepFileImport } from "@/lib/stepFileImport";
 import type { StepExportResult } from "@/lib/stepExport";
 import type { WorkplaneShape } from "@/types/layerling";
@@ -332,8 +332,8 @@ export function lidTopOffThread(targets: readonly WorkplaneShape[], signal?: Abo
  * file held the page for over a second. The import window shows its own progress, so this says
  * nothing of its own.
  */
-export function importedShapeFromStlOffThread(fileName: string, buffer: ArrayBuffer): Promise<WorkplaneShape> {
-  return runGeometryTask("stl", { fileName, buffer }, async () => importedShapeFromStl(fileName, buffer), () => {
+export function importedShapeFromStlOffThread(fileName: string, buffer: ArrayBuffer, options: StlReadOptions = {}): Promise<WorkplaneShape> {
+  return runGeometryTask("stl", { fileName, buffer, options }, async () => importedShapeFromStl(fileName, buffer, options), () => {
     throw new Error(t("status.computeTimedOut"));
   }, undefined, true);
 }

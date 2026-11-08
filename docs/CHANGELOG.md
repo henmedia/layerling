@@ -6,6 +6,8 @@ code still carries it - so a lower number further down is older, not newer.
 
 ## Unreleased
 
+- **Imported STL parts open as they were saved again (Issue #1518):** A design keeps every imported STL as the file itself and reads it again when it opens. Since 1.151.0 every STL is read Z-up (Discussion #1450); before, a file that was thin in Y was taken for Y-up. Parts imported that way opened turned by 90 degrees and stretched to their old size, in every design that held one. A design now reads such a part the way it was imported, also when it was saved again after opening wrongly; parts imported since 1.151.0 stay as they are. Reported by @voltage3d.
+
 ## 1.153.0
 
 - **Hole pattern: holes slope through the wall (Discussion #942, PR #1510):** The hole pattern cut its holes straight into the face. **Slope through the wall** tips every hole of a pattern on a flat face by -60 to 60 degrees; on a standing wall a positive slope puts the inner end higher, so rain runs back out. The hole keeps its own cross-section and shows a little longer on the face, both ends keep the margin, and through holes stop at the back of the wall behind each hole. Not with a counterbore, countersink or own shape. `layerling_perforate_face` takes `holeTilt`. Asked for by @uggyuggy, built by @js9986.
