@@ -316,9 +316,10 @@ An optional editor profile changes the 3D ribbon and selected tool options for t
 LAYERLING_EDITOR_PROFILE="$(cat docs/examples/editor-profile.json)" npm run dev
 ```
 
-Open the editor, add a box, and select it. In the simple ribbon, **Print check** is visible and **Lid** and **Flexi joints** are hidden. Open **Fillet** to see a starting radius of 2 mm on a box large enough for it. The **Only visible edges** option is hidden and on.
+Open the editor, add a box, and select it. The simple ribbon uses the usual icon size. **Print check** is visible and **Lid** and **Flexi joints** are hidden. Open **Fillet** to see a starting radius of 2 mm on a box large enough for it. The **Only visible edges** option is hidden and on.
 
 - `version` must be `1`. An optional `base` of `simple` or `full` selects that layout for this page, ahead of the browser choice and the Node server default. Omit it to keep the ordinary mode switch.
+- Set `enlargeInSimpleMode: false` to use the same toolbar, shape menu and control sizing as in full mode. The browser’s toolbar size choice still applies.
 - Under `tools`, `visible: true` or `false` overrides the layout for tools in the clipboard, history, combine, modify and arrange sections of the 3D ribbon, as well as `import`. Use the tool's ID (the `data-layerling-tool` attribute on regular ribbon buttons). A visible tool still needs the usual selection. Unknown entries have no effect.
 - Under `tools.fillet.options`, `amount.default` is a radius in millimetres. A valid remembered radius takes precedence, and the tool's own starting value is used when neither fits the body. `onlyVisibleEdges` accepts `visible`, a boolean `default`, and `locked`. A lock requires a default and takes precedence over the remembered value.
 - Profiles affect the ribbon and the connected dialog options. Context menus, keyboard shortcuts, shapes and the camera retain their normal behavior. Use the host's authorization for access to projects.

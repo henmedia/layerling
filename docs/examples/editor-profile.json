@@ -1,6 +1,7 @@
 {
   "version": 1,
   "base": "simple",
+  "enlargeInSimpleMode": false,
   "tools": {
     "print-check": { "visible": true },
     "lid": { "visible": false },

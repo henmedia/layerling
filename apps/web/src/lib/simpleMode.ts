@@ -63,7 +63,10 @@ export const SIMPLE_MODE_BOOT_SCRIPT = `try {
   if (element?.type === "application/json" && element.textContent.length <= ${EDITOR_PROFILE_MAX_LENGTH}) {
     try {
       const profile = JSON.parse(element.textContent);
-      if (profile?.version === 1 && (profile.base === "simple" || profile.base === "full")) base = profile.base;
+      if (profile?.version === 1) {
+        if (profile.base === "simple" || profile.base === "full") base = profile.base;
+        if (profile.enlargeInSimpleMode === false) document.documentElement.dataset.simpleModeEnlarge = "off";
+      }
     } catch {}
   }
   const key = ${JSON.stringify(SIMPLE_MODE_STORAGE_KEY)};
@@ -97,8 +100,11 @@ let simple = typeof window !== "undefined" ? resolveSimpleMode(readStoredChoice(
 
 export function applySimpleMode(on: boolean) {
   if (typeof document === "undefined") return;
-  if (on) document.documentElement.dataset.simpleMode = "on";
-  else delete document.documentElement.dataset.simpleMode;
+  const { dataset } = document.documentElement;
+  if (on) dataset.simpleMode = "on";
+  else delete dataset.simpleMode;
+  if (getEditorProfile()?.enlargeInSimpleMode === false) dataset.simpleModeEnlarge = "off";
+  else delete dataset.simpleModeEnlarge;
 }
 
 function publish() {

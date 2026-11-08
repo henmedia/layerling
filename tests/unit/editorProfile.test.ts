@@ -8,9 +8,11 @@ describe("an editor profile", () => {
     const profile = parseEditorProfile(JSON.stringify({
       version: 1,
       base: "simple",
+      enlargeInSimpleMode: false,
       tools: { "print-check": { visible: true }, lid: { visible: false }, flexi: { visible: "false" } },
     }));
     expect(profile?.base).toBe("simple");
+    expect(profile?.enlargeInSimpleMode).toBe(false);
     const visible = (id: string) => profileToolVisible(profile, id, simpleModeKeepsTool(id));
     expect(visible("print-check")).toBe(true);
     expect(visible("lid")).toBe(false);
@@ -46,6 +48,7 @@ describe("starting with a host-selected layout", () => {
   afterEach(() => {
     document.getElementById(EDITOR_PROFILE_ELEMENT_ID)?.remove();
     delete document.documentElement.dataset.simpleMode;
+    delete document.documentElement.dataset.simpleModeEnlarge;
     window.history.replaceState(null, "", "/");
     window.localStorage.clear();
   });
@@ -73,11 +76,12 @@ describe("starting with a host-selected layout", () => {
       const script = document.createElement("script");
       script.type = "application/json";
       script.id = EDITOR_PROFILE_ELEMENT_ID;
-      script.textContent = '{"version":1,"base":"full"}';
+      script.textContent = '{"version":1,"base":"full","enlargeInSimpleMode":false}';
       document.head.appendChild(script);
       mode.setServerSimpleMode("always");
       mode.setSimpleMode(true);
       expect(mode.isSimpleModeFixed()).toBe(true);
+      expect(document.documentElement.dataset.simpleModeEnlarge).toBe("off");
       expect(mode.getSimpleMode()).toBe(false);
       expect(window.localStorage.getItem(SIMPLE_MODE_STORAGE_KEY)).toBeNull();
     } finally {
@@ -85,10 +89,22 @@ describe("starting with a host-selected layout", () => {
     }
   });
 
+  it("opts out of larger simple-mode controls before the page paints", () => {
+    const script = document.createElement("script");
+    script.type = "application/json";
+    script.id = EDITOR_PROFILE_ELEMENT_ID;
+    script.textContent = '{"version":1,"base":"simple","enlargeInSimpleMode":false}';
+    document.head.appendChild(script);
+    Function(SIMPLE_MODE_BOOT_SCRIPT)();
+    expect(document.documentElement.dataset.simpleMode).toBe("on");
+    expect(document.documentElement.dataset.simpleModeEnlarge).toBe("off");
+  });
+
   it("keeps the ordinary link behavior without a profile", () => {
     window.history.replaceState(null, "", "/?mode=simple");
     Function(SIMPLE_MODE_BOOT_SCRIPT)();
     expect(document.documentElement.dataset.simpleMode).toBe("on");
     expect(window.localStorage.getItem(SIMPLE_MODE_STORAGE_KEY)).toBe("on");
+    expect(document.documentElement.dataset.simpleModeEnlarge).toBeUndefined();
   });
 });

@@ -16,6 +16,7 @@ type ToolProfile = {
 type EditorProfile = {
   version: 1;
   base?: "simple" | "full";
+  enlargeInSimpleMode?: boolean;
   tools: Record<string, ToolProfile>;
 };
 
@@ -67,7 +68,7 @@ export function parseEditorProfile(text: string): EditorProfile | null {
   }
 
   const base = profile.base === "simple" || profile.base === "full" ? profile.base : undefined;
-  return { version: 1, base, tools };
+  return { version: 1, base, enlargeInSimpleMode: boolean(profile.enlargeInSimpleMode), tools };
 }
 
 // The host supplies one profile with the document. It is never copied into browser or project settings.
