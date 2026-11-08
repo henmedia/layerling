@@ -516,8 +516,10 @@ export function rebuildWorkplane(
       if (label) {
         group.add(label);
       }
-      // Only on the real plate, and hidden together with the design name.
-      const printer = muted || extraPlate || workspace.showPlateLabels === false ? null : printerPresetById(workspace.printer);
+      // Only on the real plate, and hidden together with the design name. A workplane set on a face or on the
+      // empty plate (the one with the normal marker) leaves it off: with the printer's name it looked like a
+      // second build plate beside the real, greyed one (Issue #1512).
+      const printer = muted || extraPlate || showMarker || workspace.showPlateLabels === false ? null : printerPresetById(workspace.printer);
       if (printer) {
         const printerLabel = createWorkplaneLabel(
           cornerWidth,
