@@ -36,6 +36,8 @@ Du sikkerhedskopierer et enkelt design i editoren: {{ui:editor.export}}, vælg f
 
 **Gem i din egen mappe (Chrome og Edge).** Der åbner knappen din systems gem-dialog, så du selv vælger mappen og navnet, og en eksisterende fil kan erstattes. Bagefter gemmer [[Ctrl]]+[[S]] designet i den samme fil igen, uden en dialog. Et design åbnet fra en `.lyl`-fil med {{ui:dashboard.importGeometry}} eller åbn-knappen i eksportvinduet gemmer også tilbage i den fil. Browseren kan spørge én gang om tilladelse til at ændre filen. Efter at siden er genindlæst glemmer designet sin fil, og næste [[Ctrl]]+[[S]] spørger igen; dialogen starter i den mappe du brugte sidst. Firefox og Safari lader ikke en side skrive til filer på denne måde. Der downloades filen til Downloads-mappen som før, og [[Ctrl]]+[[S]] downloader den igen; Firefox kan sættes til at spørge efter mappen hver gang under Indstillinger, Generelt, Downloads. Giver du filen et andet navn der, beholder designet sit eget, for en version eller en dato i filnavnet er ofte ment sådan; beskeden efter gemningen tilbyder så {{ui:status.renameDraftToFile}}.
 
+**Når gem-vinduet ikke gemmer noget.** Lukker vinduet uden en fil, siger meddelelsen øverst det og tilbyder {{ui:status.saveAsDownload}}: designet går så til mappen Overførsler som i Firefox. Browseren melder et vindue lukket med Annuller på samme måde som et, den ikke kunne bruge, så på en pc, hvor gem-vinduet fejler i alle mapper, er dette vejen til at blive ved med at gemme.
+
 ## Vedhæftninger
 
 Instruktioner, en deleliste, noter, et foto eller et datablad kan blive ved designet som filer. {{ui:editor.attachments}} i {{ui:editor.group.file}}-gruppen i båndet, papirklemmen, åbner listen; en lille prik på papirklemmen viser at designet har nogle.

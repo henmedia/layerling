@@ -2256,6 +2256,7 @@ export const MESSAGES_ZH_TW: Partial<Record<MessageKey, string>> = {
   "status.draftRenamedToFile": "設計已重新命名為 {name}",
   "status.saveFileFailed": "無法寫入 {name}。請使用「匯出 → 另存新檔」重新選擇檔案。",
   "status.fileNotWritable": "沒有變更 {name} 的權限。請使用「匯出 → 另存新檔」重新選擇檔案。",
+  "status.saveAsDownload": "改為下載",
   "status.saveProjectFailed": "無法儲存 layerling 設計",
   "status.importNoneFailed": "無法匯入所選 {total} 個檔案中的任何一個。{summary}",
   "status.sketchSelectedOne": "已選取 1 個草圖項目",

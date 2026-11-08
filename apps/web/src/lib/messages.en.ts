@@ -2300,6 +2300,7 @@ export const MESSAGES_EN = {
   "status.savedProject": "Saved editable layerling design (.lyl)",
   "status.savedToFile": "Saved to {name}",
   "status.saveNothingChosen": "Nothing saved: no file was chosen in the save window. If you did choose a folder, try another one, for example Documents.",
+  "status.saveAsDownload": "Download instead",
   "status.renameDraftToFile": "Name the design like this too",
   "status.draftRenamedToFile": "Design renamed to {name}",
   "status.saveFileFailed": "Could not write to {name}. Choose the file again with Export, Save as.",

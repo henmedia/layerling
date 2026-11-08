@@ -2384,6 +2384,7 @@ export const MESSAGES_CS: Record<MessageKey, string> = {
   "status.savedProject": "Uložen upravitelný projekt layerlingu (.lyl)",
   "status.savedToFile": "Uloženo do {name}",
   "status.saveNothingChosen": "Nic nebylo uloženo: v okně uložení nebyl vybrán žádný soubor. Pokud jste složku vybrali, zkuste jinou, například Dokumenty.",
+  "status.saveAsDownload": "Místo toho stáhnout",
   "status.renameDraftToFile": "Pojmenovat takto i projekt",
   "status.draftRenamedToFile": "Projekt přejmenován na {name}",
   "status.saveFileFailed": "Do {name} nelze zapisovat. Vyberte soubor znovu v Export → Uložit jako.",

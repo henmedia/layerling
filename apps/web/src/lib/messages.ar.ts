@@ -2301,6 +2301,7 @@ export const MESSAGES_AR: Partial<Record<MessageKey, string>> = {
   "status.draftRenamedToFile": "تمت إعادة تسمية التصميم إلى {name}",
   "status.saveFileFailed": "تعذر الكتابة إلى {name}. اختر الملف من جديد عبر تصدير ← حفظ باسم.",
   "status.fileNotWritable": "لا يوجد إذن بتغيير {name}. اختر الملف من جديد عبر تصدير ← حفظ باسم.",
+  "status.saveAsDownload": "تنزيل بدلاً من ذلك",
   "status.saveProjectFailed": "تعذر حفظ تصميم layerling",
   "status.importNoneFailed": "تعذر استيراد أي من الملفات المحددة ({total}).{summary}",
   "status.sketchSelectedOne": "تم تحديد عنصر رسم تخطيطي واحد",

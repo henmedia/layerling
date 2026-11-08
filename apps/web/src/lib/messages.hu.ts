@@ -1566,6 +1566,7 @@ export const MESSAGES_HU: Partial<Record<MessageKey, string>> = {
   "status.savedProject": "Szerkeszthető layerling terv mentve (.lyl)",
   "status.savedToFile": "Mentve ide: {name}",
   "status.saveNothingChosen": "Nem történt mentés: a mentési ablakban nem választottál fájlt. Ha választottál mappát, próbálj egy másikat, például a Dokumentumok mappát.",
+  "status.saveAsDownload": "Letöltés helyette",
   "status.renameDraftToFile": "A tervet is nevezd így",
   "status.draftRenamedToFile": "A terv új neve: {name}",
   "status.saveFileFailed": "Nem sikerült írni ebbe: {name}. Válaszd ki újra a fájlt az Exportálás, Mentés másként menüvel.",

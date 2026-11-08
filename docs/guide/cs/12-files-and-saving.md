@@ -36,6 +36,8 @@ Jeden projekt uložíte v editoru přes {{ui:editor.export}}, formát **LYL** a 
 
 **Ukládání do vlastní složky v Chrome a Edge.** Tlačítko otevře systémový dialog pro výběr složky a názvu, včetně přepsání souboru. Následné [[Ctrl]]+[[S]] ukládá do stejného souboru bez dialogu. Také projekt otevřený z `.lyl` přes {{ui:dashboard.importGeometry}} nebo tlačítko otevření v exportním okně se ukládá zpět do původního souboru. Prohlížeč může požádat o povolení zápisu. Po obnovení stránky se vazba na soubor zapomene a další [[Ctrl]]+[[S]] se zeptá znovu; dialog začíná v naposledy použité složce. Firefox a Safari takový zápis nepovolují. Soubor stáhnou do Stažených souborů a [[Ctrl]]+[[S]] jej stáhne znovu. Firefox lze v Nastavení → Obecné → Stahování nastavit, aby se na složku vždy zeptal. Pokud tam souboru dáte jiný název, projekt si ponechá svůj, protože verze nebo datum v názvu souboru bývá míněno právě tak; zpráva po uložení pak nabídne {{ui:status.renameDraftToFile}}.
 
+**Když okno pro uložení nic neuloží.** Zavře-li se okno bez souboru, hlášení nahoře to řekne a nabídne {{ui:status.saveAsDownload}}: návrh pak půjde do složky Stažené soubory jako ve Firefoxu. Prohlížeč hlásí okno zavřené tlačítkem Zrušit stejně jako okno, které nemohl použít, takže na počítači, kde okno pro uložení selže v každé složce, takto ukládáte dál.
+
 ## Přílohy
 
 Návod, seznam dílů, poznámky, fotka nebo katalogový list mohou zůstat u projektu jako soubory. {{ui:editor.attachments}} v liště {{ui:editor.group.file}}, sponka, otevře seznam; malá tečka na sponce ukazuje, že projekt nějaké má.

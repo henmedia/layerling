@@ -5096,6 +5096,7 @@ export const MESSAGES_SL: Partial<Record<MessageKey, string>> = {
   "status.historyCleared": "Zgodovina izbrisana – načrt ohrani trenutno stanje",
   "status.savedToFile": "Shranjeno v {name}",
   "status.saveNothingChosen": "Nič ni shranjeno: v oknu za shranjevanje ni bila izbrana nobena datoteka. Če ste mapo izbrali, poskusite drugo, na primer Dokumenti.",
+  "status.saveAsDownload": "Raje prenesi",
   "status.renameDraftToFile": "Tudi projekt poimenuj tako",
   "status.draftRenamedToFile": "Projekt preimenovan v {name}",
   "status.saveFileFailed": "V {name} ni bilo mogoče pisati. Datoteko znova izberi z Izvoz, Shrani kot.",

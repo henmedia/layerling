@@ -2848,6 +2848,7 @@ export const MESSAGES_DA: Partial<Record<MessageKey, string>> = {
   "status.savedProject": "Gemt redigerbart layerling-design (.lyl)",
   "status.savedToFile": "Gemt til {name}",
   "status.saveNothingChosen": "Intet gemt: der blev ikke valgt nogen fil i gemmevinduet. Hvis du valgte en mappe, så prøv en anden, for eksempel Dokumenter.",
+  "status.saveAsDownload": "Download i stedet",
   "status.renameDraftToFile": "Giv også designet dette navn",
   "status.draftRenamedToFile": "Designet er omdøbt til {name}",
   "status.saveFileFailed": "Kunne ikke skrive til {name}. Vælg filen igen med Eksportér, Gem som.",

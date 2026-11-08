@@ -2252,6 +2252,7 @@ export const MESSAGES_PT_PT: Partial<Record<MessageKey, string>> = {
   "status.savedProject": "Projeto editável do layerling (.lyl) guardado",
   "status.savedToFile": "Guardado em {name}",
   "status.saveNothingChosen": "Nada foi guardado: não foi escolhido nenhum ficheiro na janela de gravação. Se escolheste uma pasta, experimenta outra, como Documentos.",
+  "status.saveAsDownload": "Transferir em vez disso",
   "status.renameDraftToFile": "Dar também este nome ao projeto",
   "status.draftRenamedToFile": "Projeto renomeado para {name}",
   "status.saveFileFailed": "Não foi possível escrever em {name}. Escolhe novamente o ficheiro em Exportar, Guardar como.",

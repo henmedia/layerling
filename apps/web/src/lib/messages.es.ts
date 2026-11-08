@@ -2305,6 +2305,7 @@ export const MESSAGES_ES: Partial<Record<MessageKey, string>> = {
   "status.draftRenamedToFile": "Diseño renombrado a {name}",
   "status.saveFileFailed": "No se ha podido escribir en {name}. Vuelve a elegir el archivo con Exportar, Guardar como.",
   "status.fileNotWritable": "No tienes permiso para cambiar {name}. Vuelve a elegir el archivo con Exportar, Guardar como.",
+  "status.saveAsDownload": "Descargar en su lugar",
   "status.saveProjectFailed": "No se ha podido guardar el diseño de layerling",
   "status.importNoneFailed": "No se ha podido importar ninguno de los {total} archivos seleccionados.{summary}",
   "status.sketchSelectedOne": "1 elemento del boceto seleccionado",

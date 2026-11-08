@@ -2299,6 +2299,7 @@ export const MESSAGES_NL: Record<MessageKey, string> = {
   "status.savedProject": "Bewerkbaar layerling-ontwerp (.lyl) opgeslagen",
   "status.savedToFile": "Opgeslagen in {name}",
   "status.saveNothingChosen": "Niets opgeslagen: in het opslagvenster is geen bestand gekozen. Heb je wel een map gekozen, probeer dan een andere, bijvoorbeeld Documenten.",
+  "status.saveAsDownload": "In plaats daarvan downloaden",
   "status.renameDraftToFile": "Het ontwerp ook zo noemen",
   "status.draftRenamedToFile": "Ontwerp hernoemd naar {name}",
   "status.saveFileFailed": "Kon niet naar {name} schrijven. Kies het bestand opnieuw via Exporteren, Opslaan als.",

@@ -2287,6 +2287,7 @@ export const MESSAGES_FR: Partial<Record<MessageKey, string>> = {
   "status.savedProject": "Conception layerling modifiable enregistrée (.lyl)",
   "status.savedToFile": "Enregistré dans {name}",
   "status.saveNothingChosen": "Rien n'a été enregistré : aucun fichier n'a été choisi dans la fenêtre d'enregistrement. Si vous avez choisi un dossier, essayez-en un autre, par exemple Documents.",
+  "status.saveAsDownload": "Télécharger à la place",
   "status.renameDraftToFile": "Donner aussi ce nom à la conception",
   "status.draftRenamedToFile": "Conception renommée en {name}",
   "status.saveFileFailed": "Impossible d'écrire dans {name}. Choisissez à nouveau le fichier avec Exporter, Enregistrer sous.",

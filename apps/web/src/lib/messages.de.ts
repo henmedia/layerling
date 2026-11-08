@@ -2299,6 +2299,7 @@ export const MESSAGES_DE: Record<MessageKey, string> = {
   "status.savedProject": "Bearbeitbarer layerling-Entwurf (.lyl) gespeichert",
   "status.savedToFile": "In {name} gespeichert",
   "status.saveNothingChosen": "Nichts gespeichert: Im Speicherfenster wurde keine Datei gewählt. Falls du einen Ordner gewählt hast, probiere einen anderen, zum Beispiel Dokumente.",
+  "status.saveAsDownload": "Stattdessen herunterladen",
   "status.renameDraftToFile": "Entwurf auch so nennen",
   "status.draftRenamedToFile": "Entwurf in {name} umbenannt",
   "status.saveFileFailed": "In {name} konnte nicht geschrieben werden. Wähle die Datei unter Exportieren, Speichern unter neu.",

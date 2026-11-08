@@ -2294,6 +2294,7 @@ export const MESSAGES_RU: Partial<Record<MessageKey, string>> = {
   "status.savedProject": "Сохранён редактируемый проект layerling (.lyl)",
   "status.savedToFile": "Сохранено в {name}",
   "status.saveNothingChosen": "Ничего не сохранено: в окне сохранения не выбран файл. Если вы выбрали папку, попробуйте другую, например «Документы».",
+  "status.saveAsDownload": "Скачать вместо этого",
   "status.renameDraftToFile": "Назвать так и проект",
   "status.draftRenamedToFile": "Проект переименован в {name}",
   "status.saveFileFailed": "Не удалось записать в {name}. Выберите файл заново в окне «Экспорт» через «Сохранить как…».",

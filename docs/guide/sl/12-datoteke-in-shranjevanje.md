@@ -36,6 +36,8 @@ Posamezen načrt shraniš v urejevalniku: {{ui:editor.export}}, nato izberi obli
 
 **Shranjevanje v lastno mapo (Chrome in Edge).** Tam gumb odpre sistemsko okno za shranjevanje, tako da mapo in ime izbereš sam, obstoječo datoteko pa je mogoče nadomestiti. Potem [[Ctrl]]+[[S]] shrani načrt spet v isto datoteko, brez okna. Načrt, odprt iz datoteke `.lyl` z {{ui:dashboard.importGeometry}} ali z gumbom za odpiranje v oknu za izvoz, se shrani tudi nazaj vanjo. Brskalnik te lahko enkrat vpraša za dovoljenje za spreminjanje datoteke. Po ponovnem nalaganju strani načrt pozabi svojo datoteko in naslednji [[Ctrl]]+[[S]] jo spet vpraša; okno se odpre v mapi, ki si jo uporabil nazadnje. Firefox in Safari strani ne dovolita pisati v datoteke na ta način. Tam se datoteka kot prej prenese v mapo Prenosi, [[Ctrl]]+[[S]] jo prenese znova; v Firefoxu je mogoče pod Nastavitve, Splošno, Prenosi določiti, da vsakič vpraša za mapo. Če datoteki tam daš drugo ime, projekt obdrži svoje, saj je različica ali datum v imenu datoteke pogosto namenoma; sporočilo po shranjevanju nato ponudi {{ui:status.renameDraftToFile}}.
 
+**Ko okno za shranjevanje ne shrani ničesar.** Če se okno zapre brez datoteke, sporočilo zgoraj to pove in ponudi {{ui:status.saveAsDownload}}: zasnova gre takrat v mapo Prenosi, kot v Firefoxu. Brskalnik okno, zaprto s Prekliči, javi enako kot okno, ki ga ni mogel uporabiti, zato na računalniku, kjer okno za shranjevanje odpove v vsaki mapi, tako še naprej shranjuješ.
+
 ## Priloge
 
 Navodila, seznam delov, opombe, fotografija ali podatkovni list lahko ostanejo pri projektu kot datoteke. {{ui:editor.attachments}} v vrstici {{ui:editor.group.file}}, sponka, odpre seznam; majhna pika na sponki pokaže, da jih projekt ima.

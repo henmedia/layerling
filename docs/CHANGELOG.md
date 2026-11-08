@@ -6,6 +6,8 @@ code still carries it - so a lower number further down is older, not newer.
 
 ## Unreleased
 
+- **A save dialog that saves nothing offers a download (Discussion #1449):** On some PCs the save dialog of Chrome and Edge hands back no file for most folders, even after one was picked, and the browser reports that the same way as Cancel. layerling then said "Nothing saved", but in Chrome and Edge a design could only be saved through that dialog. The message now has a **Download instead** button, which saves the design as a normal download into the Downloads folder, as Firefox does. This covers Export > LYL, Ctrl+S and Save as.
+
 - **The toolbar fits again when the control size changes (Discussion #1502):** The toolbar folds the groups the window has no room for, but it only measured itself when the page loaded or the window changed width. Switching the control size under Workspace settings kept the folds of the size before: on **Large** the toolbar broke into two or three rows with room left over in the first, and on **Small** groups stayed folded that had room. It now fits again the moment the size changes, so it stays one row as long as folding allows.
 
 ## 1.152.1
