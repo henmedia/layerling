@@ -2857,6 +2857,7 @@ export const MESSAGES_RU: Partial<Record<MessageKey, string>> = {
   "prop.bevel": "Скос",
   "prop.topRadius": "Радиус верха",
   "prop.baseRadius": "Радиус основания",
+  "prop.coneTopRadiusHint": "Ширина и длина считаются по кругу основания. Для конуса, который шире сверху, задай больший радиус как радиус основания и переверни конус.",
   "prop.curvedConeTop": "Диаметр верха",
   "prop.curvedConeTopHint": "Поперёк плоского верха, не больше ширины основания; 0 сходится в точку. При изменении размера сохраняет долю от основания.",
   "prop.curvedConeBend": "Изгиб",

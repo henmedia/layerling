@@ -2824,6 +2824,7 @@ export const MESSAGES_PL: Partial<Record<MessageKey, string>> = {
   "prop.bevel": "Skos",
   "prop.topRadius": "Promień górny",
   "prop.baseRadius": "Promień podstawy",
+  "prop.coneTopRadiusHint": "Szerokość i długość liczą się według koła podstawy. Dla stożka szerszego u góry ustaw większy promień jako promień podstawy i odwróć stożek.",
   "prop.curvedConeTop": "Średnica góry",
   "prop.curvedConeTopHint": "W poprzek płaskiej góry, najwyżej szerokość podstawy; 0 kończy się szpicem. Przy zmianie rozmiaru zachowuje swój stosunek do podstawy.",
   "prop.curvedConeBend": "Wygięcie",

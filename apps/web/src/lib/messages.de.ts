@@ -2863,6 +2863,7 @@ export const MESSAGES_DE: Record<MessageKey, string> = {
   "prop.bevel": "Abschrägung",
   "prop.topRadius": "Radius oben",
   "prop.baseRadius": "Radius unten",
+  "prop.coneTopRadiusHint": "Breite und Länge zählen den Grundkreis. Für einen Kegel, der oben breiter ist, den größeren Radius als Grundradius eintragen und den Kegel umdrehen.",
   "prop.curvedConeTop": "Durchmesser oben",
   "prop.curvedConeTopHint": "Quer über die flache Oberseite, höchstens so breit wie unten; 0 läuft spitz zu. Beim Skalieren bleibt das Verhältnis zur Unterseite gleich.",
   "prop.curvedConeBend": "Biegung",

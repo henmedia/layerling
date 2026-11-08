@@ -2850,6 +2850,7 @@ export const MESSAGES_FR: Partial<Record<MessageKey, string>> = {
   "prop.bevel": "Biseau",
   "prop.topRadius": "Rayon supérieur",
   "prop.baseRadius": "Rayon de base",
+  "prop.coneTopRadiusHint": "La largeur et la longueur comptent le cercle de la base. Pour un cône plus large en haut, mets le plus grand rayon comme rayon de base et retourne le cône.",
   "prop.curvedConeTop": "Diamètre du haut",
   "prop.curvedConeTopHint": "En travers du dessus plat, au plus la largeur du bas ; 0 se termine en pointe. Il garde sa part du bas quand le cône est redimensionné.",
   "prop.curvedConeBend": "Courbure",

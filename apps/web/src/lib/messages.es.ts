@@ -2861,6 +2861,7 @@ export const MESSAGES_ES: Partial<Record<MessageKey, string>> = {
   "prop.bevel": "Bisel",
   "prop.topRadius": "Radio superior",
   "prop.baseRadius": "Radio inferior",
+  "prop.coneTopRadiusHint": "El ancho y el largo cuentan el círculo de la base. Para un cono más ancho arriba, pon el radio mayor como radio de la base y dale la vuelta al cono.",
   "prop.curvedConeTop": "Diámetro superior",
   "prop.curvedConeTopHint": "A lo ancho de la cara superior plana, como máximo el ancho de la base; 0 termina en punta. Conserva su proporción con la base al cambiar el tamaño del cono.",
   "prop.curvedConeBend": "Curvatura",

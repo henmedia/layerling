@@ -2810,6 +2810,7 @@ export const MESSAGES_ZH_CN: Partial<Record<MessageKey, string>> = {
   "prop.bevel": "斜角",
   "prop.topRadius": "顶部半径",
   "prop.baseRadius": "底部半径",
+  "prop.coneTopRadiusHint": "宽度和长度按底面圆计算。要做上宽下窄的圆锥，把较大的半径设为底面半径，再把圆锥翻转过来。",
   "prop.curvedConeTop": "顶部直径",
   "prop.curvedConeTopHint": "平顶的直径，最大为底部宽度；0 时收成尖顶。缩放圆锥时，它与底部的比例保持不变。",
   "prop.curvedConeBend": "弯曲",

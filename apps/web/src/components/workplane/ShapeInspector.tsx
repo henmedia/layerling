@@ -799,9 +799,10 @@ function getShapePropertiesWithAppLimits(shape: WorkplaneShape, onUpdate: ShapeI
     patch.depth = patch.width ?? value;
     onUpdate(patch, { resizeAxis: "width" });
   };
+  // A radius is a circle's: width and length both follow it (#1476); before, only the width did and the cone went oval.
   const setBaseRadius = (value: number) => {
     const diameter = value * 2;
-    onUpdate({ baseRadius: value, width: diameter, size: resizedShapeSize(diameter, baseDepth) }, { resizeAxis: "width" });
+    onUpdate({ baseRadius: value, width: diameter, depth: diameter, size: resizedShapeSize(diameter, diameter) }, { resizeAxis: "width" });
   };
   const setHeight = (height: number) => onUpdate({ height }, { resizeAxis: "height" });
 
@@ -2502,7 +2503,16 @@ function getShapePropertiesWithAppLimits(shape: WorkplaneShape, onUpdate: ShapeI
 
   if (shape.kind === "cone") {
     return [
-      { id: "topRadius", label: t("prop.topRadius"), value: shape.topRadius ?? 0, min: 0, max: 40, onChange: (topRadius) => onUpdate({ topRadius }) },
+      {
+        id: "topRadius",
+        label: t("prop.topRadius"),
+        value: shape.topRadius ?? 0,
+        min: 0,
+        max: 40,
+        onChange: (topRadius) => onUpdate({ topRadius }),
+        // Width and length are the base circle's; a top wider than the base reaches past them (#1477).
+        ...((shape.topRadius ?? 0) > (shape.baseRadius ?? baseWidth / 2) ? { hint: t("prop.coneTopRadiusHint") } : {}),
+      },
       { id: "baseRadius", label: t("prop.baseRadius"), value: shape.baseRadius ?? baseWidth / 2, min: MIN_SHAPE_SIZE, max: 80, onChange: setBaseRadius },
       { id: "length", label: t("prop.length"), value: depth, min: MIN_SHAPE_SIZE, max: 160, onChange: setDepth },
       { id: "width", label: t("prop.width"), value: width, min: MIN_SHAPE_SIZE, max: 160, onChange: setConeWidth },

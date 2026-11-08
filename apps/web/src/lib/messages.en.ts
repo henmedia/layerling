@@ -2864,6 +2864,7 @@ export const MESSAGES_EN = {
   "prop.bevel": "Bevel",
   "prop.topRadius": "Top Radius",
   "prop.baseRadius": "Base Radius",
+  "prop.coneTopRadiusHint": "Width and length count the base circle. For a cone wider at the top, set the larger radius as Base Radius and turn the cone over.",
   "prop.curvedConeTop": "Top diameter",
   "prop.curvedConeTopHint": "Across the flat top, at most the bottom's width; 0 runs to a point. It keeps its share of the bottom when the cone is resized.",
   "prop.curvedConeBend": "Bend",

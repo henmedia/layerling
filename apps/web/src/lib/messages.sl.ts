@@ -2229,6 +2229,7 @@ export const MESSAGES_SL: Partial<Record<MessageKey, string>> = {
   "prop.bevel": "Poševni rob",
   "prop.topRadius": "Zgornji polmer",
   "prop.baseRadius": "Polmer osnove",
+  "prop.coneTopRadiusHint": "Širina in dolžina štejeta krog osnove. Za stožec, ki je zgoraj širši, vpiši večji polmer kot polmer osnove in stožec obrni.",
   "prop.curvedConeTop": "Premer zgoraj",
   "prop.curvedConeTopHint": "Čez ravni vrh, največ širina spodnjega dela; 0 se konča v konici. Pri spreminjanju velikosti ohrani razmerje do spodnjega dela.",
   "prop.curvedConeBend": "Ukrivljenost",

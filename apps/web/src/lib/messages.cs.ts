@@ -2940,6 +2940,7 @@ export const MESSAGES_CS: Record<MessageKey, string> = {
   "prop.bevel": "Zkosení",
   "prop.topRadius": "Horní poloměr",
   "prop.baseRadius": "Poloměr základny",
+  "prop.coneTopRadiusHint": "Šířka a délka se počítají podle kruhu podstavy. Pro kužel, který je nahoře širší, zadej větší poloměr jako poloměr podstavy a kužel otoč.",
   "prop.curvedConeTop": "Horní průměr",
   "prop.curvedConeTopHint": "Přes plochý vršek, nejvýše šířka spodku; 0 končí špičkou. Při změně velikosti si zachová poměr ke spodku.",
   "prop.curvedConeBend": "Prohnutí",

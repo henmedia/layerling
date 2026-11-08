@@ -2864,6 +2864,7 @@ export const MESSAGES_NL: Record<MessageKey, string> = {
   "prop.bevel": "Afschuining",
   "prop.topRadius": "Straal boven",
   "prop.baseRadius": "Straal onder",
+  "prop.coneTopRadiusHint": "Breedte en lengte tellen de grondcirkel. Voor een kegel die boven breder is, zet je de grootste straal als basisstraal en draai je de kegel om.",
   "prop.curvedConeTop": "Diameter boven",
   "prop.curvedConeTopHint": "Over de platte bovenkant, hoogstens de breedte van de onderkant; 0 loopt uit in een punt. Bij het schalen blijft de verhouding tot de onderkant gelijk.",
   "prop.curvedConeBend": "Buiging",

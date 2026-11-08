@@ -2846,6 +2846,7 @@ export const MESSAGES_IT: Partial<Record<MessageKey, string>> = {
   "prop.bevel": "Smusso",
   "prop.topRadius": "Raggio superiore",
   "prop.baseRadius": "Raggio della base",
+  "prop.coneTopRadiusHint": "Larghezza e lunghezza contano il cerchio di base. Per un cono più largo in alto, imposta il raggio maggiore come raggio di base e capovolgi il cono.",
   "prop.curvedConeTop": "Diametro superiore",
   "prop.curvedConeTopHint": "Attraverso la sommità piatta, al massimo la larghezza della base; 0 finisce a punta. Mantiene la sua proporzione con la base quando il cono viene ridimensionato.",
   "prop.curvedConeBend": "Curvatura",

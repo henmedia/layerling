@@ -2867,6 +2867,7 @@ export const MESSAGES_AR: Partial<Record<MessageKey, string>> = {
   "prop.bevel": "حافة مائلة",
   "prop.topRadius": "نصف القطر العلوي",
   "prop.baseRadius": "نصف قطر القاعدة",
+  "prop.coneTopRadiusHint": "العرض والطول يقيسان دائرة القاعدة. لمخروط أعرض من الأعلى، اجعل نصف القطر الأكبر نصف قطر القاعدة واقلب المخروط.",
   "prop.curvedConeTop": "القطر العلوي",
   "prop.curvedConeTopHint": "عبر السطح العلوي المستوي، بحد أقصى عرض القاعدة؛ القيمة 0 تنتهي برأس مدبب. تبقى نسبته إلى القاعدة ثابتة عند تغيير حجم المخروط.",
   "prop.curvedConeBend": "الانحناء",

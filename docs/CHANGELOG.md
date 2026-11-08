@@ -6,6 +6,8 @@ code still carries it - so a lower number further down is older, not newer.
 
 ## Unreleased
 
+- **Cone: the base radius keeps it round (Issue #1476), and a hint for a wider top (Issue #1477):** Changing a cone's **Base Radius** in the settings changed only its width, so with Keep proportions off the cone went oval. Width and length now both follow the radius, and an oval cone becomes round again. Width and length count the base circle; once the **Top Radius** is the larger one, a hint under it says so and how to get a cone wider at the top: set the larger radius as Base Radius and turn the cone over. Panel test `coneRadiusPanel.e2e.ts`. Reported by @ddemtlapps.
+
 - **Build plates: the Arrange on plates button arranges again (Issue #1463):** A click on **Arrange on plates** in the plate bar did nothing, with or without a selection: the bar handed its click to the arrange function as the list of bodies to arrange, and it stopped with an error before moving one. The button now arranges the selection, or every body, as the guide says. The MCP action `layerling_build_plates` was not affected. Unit test `plateBarArrange.test.ts`.
 
 - **Rounded box and Box: a corner radius dot on the top edge (Discussion #1470):** A Rounded box has a dot on its top edge, at the back right corner, like the corner dot in Inkscape. Drag it along the edge and the corner radius follows; it moves with the radius, and stays clear of the resize handles on the screen, also when seen from above. A plain Box has the dot too: the first pull turns it into a Rounded box with flat top and bottom, the same size, and one undo turns it back into the Box. The Corner fillet field works as before. Bodies made before keep their shape.

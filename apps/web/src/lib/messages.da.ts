@@ -3288,6 +3288,7 @@ export const MESSAGES_DA: Partial<Record<MessageKey, string>> = {
   "prop.bevel": "Fas",
   "prop.topRadius": "Topradius",
   "prop.baseRadius": "Bundradius",
+  "prop.coneTopRadiusHint": "Bredde og længde regnes efter grundcirklen. Til en kegle, der er bredere foroven, skal du sætte den største radius som grundradius og vende keglen om.",
   "prop.curvedConeTop": "Diameter øverst",
   "prop.curvedConeTopHint": "Hen over den flade top, højst bundens bredde; 0 løber ud i en spids. Den beholder sit forhold til bunden, når keglen skaleres.",
   "prop.curvedConeBend": "Bue",
