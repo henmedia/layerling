@@ -104,6 +104,8 @@ Pro přiložení dvou dílů vyberte pohyblivý díl, spusťte {{ui:editor.tool.
 
 {{ui:editor.tool.dropToWorkplane}} ([[D]]) jednoduše položí výběr na pracovní rovinu, {{ui:editor.tool.centerOnWorkplane}} jej vystředí.
 
+[[Alt]]+[[D]] položí více dílů jako jeden celek: všechny klesnou o stejnou vzdálenost, takže si zachovají výšky vůči sobě, kdežto [[D]] položí každý díl zvlášť.
+
 [[C]] výběr zvedne, jako Cruise v Tinkercadu: sleduje ukazatel myši a lehne si na plochu jiného tělesa, nad kterou jste, i na šikmou. Kliknutí ho tam položí, [[Esc]] ho nechá, kde byl. Jeho spodek pak leží na ploše, zarovnaný s okraji plochy jako nový tvar; vlastní natočení kolem svislé osy si ponechá. Více dílů putuje spolu a zachová si rozestupy. Nad prázdnou podložkou [[C]] postaví nakloněný díl zpět svisle na pracovní rovinu. Podržíte-li při přenášení [[Shift]], díl se místo toho zanoří do plochy: zůstane svislý, jeho vršek zarovnaný s plochou a těleso pod ní, takto se do tělesa dostane kuželové nebo válcové zahloubení; nový tvar z knihovny se se [[Shift]] umístí stejně. [[Shift]]+[[D]] položí výběr na pracovní rovinu vrškem místo spodkem. Bez klávesnice má nabídka dlouhého podržení pro totéž {{ui:contextMenu.carry}}.
 
 [[C]] zvedne výběr k ukazateli podobně jako Cruise v Tinkercadu. Kopíruje orientaci plochy pod ním, i šikmé. Kliknutí potvrdí umístění, [[Esc]] obnoví původní. Spodek dosedne na plochu, osy se srovnají s jejími hranami a vlastní natočení kolem svislé osy se zachová. Více dílů cestuje společně bez změny rozestupů. Nad prázdnou podložkou se nakloněný díl opět postaví kolmo na pracovní rovinu.

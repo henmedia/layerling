@@ -1423,6 +1423,7 @@ export const MESSAGES_RU: Partial<Record<MessageKey, string>> = {
   "shortcuts.note": "Поставить заметку",
   "shortcuts.carryOntoFace": "Подхватить выделение и поставить его на грань (как Cruise в Tinkercad)",
   "shortcuts.dropToWorkplane": "Опустить выделение на рабочую плоскость",
+  "shortcuts.dropTogether": "Опустить выделение целиком, детали сохраняют высоту относительно друг друга",
   "shortcuts.nudge": "Сдвинуть на один шаг сетки с учётом поворота вида",
   "shortcuts.nudgeCoarse": "Сдвинуть на пять шагов сетки",
   "shortcuts.nudgeFine": "Сдвинуть на одну пятую шага сетки",

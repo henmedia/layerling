@@ -1382,6 +1382,7 @@ export const MESSAGES_PL: Partial<Record<MessageKey, string>> = {
   "shortcuts.note": "Umieść notatkę",
   "shortcuts.carryOntoFace": "Podnieś zaznaczenie i odłóż je na ścianę (jak Cruise w Tinkercadzie)",
   "shortcuts.dropToWorkplane": "Opuść zaznaczenie na płaszczyznę roboczą",
+  "shortcuts.dropTogether": "Opuść zaznaczenie jako całość, części zachowują wysokości względem siebie",
   "shortcuts.nudge": "Przesuń o jeden krok siatki, zgodnie z obrotem widoku",
   "shortcuts.nudgeCoarse": "Przesuń o pięć kroków siatki",
   "shortcuts.nudgeFine": "Przesuń o jedną piątą kroku siatki",

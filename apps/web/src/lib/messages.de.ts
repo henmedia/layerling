@@ -1426,6 +1426,7 @@ export const MESSAGES_DE: Record<MessageKey, string> = {
   "shortcuts.note": "Notiz setzen",
   "shortcuts.carryOntoFace": "Auswahl aufnehmen und auf eine Fläche setzen (wie Cruise in Tinkercad)",
   "shortcuts.dropToWorkplane": "Auswahl auf die Arbeitsebene absetzen",
+  "shortcuts.dropTogether": "Auswahl als Ganzes absetzen, die Teile behalten ihre Höhen zueinander",
   "shortcuts.nudge": "Um einen Rasterschritt bewegen, so wie die Ansicht steht",
   "shortcuts.nudgeCoarse": "Um fünf Rasterschritte bewegen",
   "shortcuts.nudgeFine": "Um ein Fünftel Rasterschritt bewegen",

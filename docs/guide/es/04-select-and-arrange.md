@@ -110,6 +110,8 @@ Con **un solo cuerpo** seleccionado, el punto de giro pertenece a ese cuerpo: se
 
 Igual de sencillos son {{ui:editor.tool.dropToWorkplane}} ([[D]]), que baja la selección hasta el plano de trabajo, y {{ui:editor.tool.centerOnWorkplane}}. Con el plano de trabajo sobre una cara, este último centra en el punto que elegiste con [[W]] y mueve la selección solo a lo largo de esa cara, así que lo que está apoyado en ella sigue apoyado.
 
+[[Alt]]+[[D]] baja varias piezas como una sola: todas bajan la misma distancia y conservan así sus alturas entre sí, mientras que [[D]] baja cada pieza por separado.
+
 [[C]] coge la selección, como Cruise en Tinkercad: la selección sigue al puntero del ratón y se posa sobre la cara del cuerpo que tengas debajo, también si es inclinada. Un clic la deja ahí, y [[Esc]] la deja donde estaba. Su base queda entonces apoyada en la cara, alineada con las aristas de la cara como lo estaría una forma nueva, y conserva su propio giro respecto a su eje vertical. Varias piezas viajan juntas y mantienen su separación. Sobre la placa vacía, [[C]] vuelve a poner de pie sobre el plano de trabajo una pieza inclinada. Sin teclado, el menú de la pulsación larga tiene {{ui:contextMenu.carry}} para lo mismo.
 
 ## Patrones: fila y círculo

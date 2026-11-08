@@ -110,6 +110,8 @@ Two parts should meet face to face, or line up flush? Select the part that shoul
 
 Just as simple are {{ui:editor.tool.dropToWorkplane}} ([[D]]), which drops the selection onto the workplane, and {{ui:editor.tool.centerOnWorkplane}}. With the workplane on a face, it centres on the point you picked with [[W]] and moves the selection only along that face, so what stands on it stays on it.
 
+[[Alt]]+[[D]] drops several parts as one piece: they all go down by the same distance and so keep their heights to each other, while [[D]] drops every part on its own.
+
 [[C]] picks the selection up, like Cruise in Tinkercad: it follows the mouse pointer and lies down on the face of another body you are over, sloped ones too. A click sets it down there, [[Esc]] leaves it where it was. Its underside then rests on the face, lined up with the face's edges as a new shape would be; it keeps its own turn about its up axis. Several parts travel together and keep their spacing. Over the empty plate, [[C]] stands a tilted part upright on the workplane again. Holding [[Shift]] while you carry sinks the part into the face instead: it stays upright, its top flush with the face and the body below it, which is how a countersink or a counterbore goes into a body; a new shape from the library is placed the same way with [[Shift]] held. [[Shift]]+[[D]] drops the selection with its top on the workplane instead of its base. Without a keyboard, the menu of a long press has {{ui:contextMenu.carry}} for the same.
 
 ## Patterns: row and circle

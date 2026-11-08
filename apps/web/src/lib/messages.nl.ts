@@ -1426,6 +1426,7 @@ export const MESSAGES_NL: Record<MessageKey, string> = {
   "shortcuts.note": "Notitie plaatsen",
   "shortcuts.carryOntoFace": "Selectie oppakken en op een vlak neerzetten (zoals Cruise in Tinkercad)",
   "shortcuts.dropToWorkplane": "Selectie op het werkvlak laten vallen",
+  "shortcuts.dropTogether": "Selectie als één geheel laten vallen, de delen houden hun hoogte ten opzichte van elkaar",
   "shortcuts.nudge": "Eén rasterstap verplaatsen, volgens de draaiing van de weergave",
   "shortcuts.nudgeCoarse": "Vijf rasterstappen verplaatsen",
   "shortcuts.nudgeFine": "Een vijfde rasterstap verplaatsen",

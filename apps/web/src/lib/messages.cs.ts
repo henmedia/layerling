@@ -1566,6 +1566,7 @@ export const MESSAGES_CS: Record<MessageKey, string> = {
   "shortcuts.note": "Umístit poznámku",
   "shortcuts.carryOntoFace": "Zvednout výběr a položit jej na plochu (jako Cruise v Tinkercadu)",
   "shortcuts.dropToWorkplane": "Položit výběr na pracovní rovinu",
+  "shortcuts.dropTogether": "Položit výběr jako jeden celek, díly si zachovají výšky vůči sobě",
   "shortcuts.nudge": "Posunout o krok mřížky podle směru pohledu",
   "shortcuts.nudgeCoarse": "Posunout o pět kroků mřížky",
   "shortcuts.nudgeFine": "Posunout o pětinu kroku mřížky",

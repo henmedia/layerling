@@ -1033,6 +1033,7 @@ export const MESSAGES_JA: Partial<Record<MessageKey, string>> = {
   "shortcuts.note": "メモを置く",
   "shortcuts.carryOntoFace": "選択を持ち上げて面の上に置く（TinkercadのCruiseと同様）",
   "shortcuts.dropToWorkplane": "選択を作業平面に落とす",
+  "shortcuts.dropTogether": "選択をひとまとまりで落とす（パーツ同士の高さはそのまま）",
   "shortcuts.nudge": "ビューの向きに合わせて1グリッド刻み移動",
   "shortcuts.nudgeCoarse": "5グリッド刻み移動",
   "shortcuts.nudgeFine": "グリッド刻みの5分の1だけ移動",

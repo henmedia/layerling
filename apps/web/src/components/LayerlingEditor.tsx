@@ -9677,7 +9677,7 @@ export function LayerlingEditor({
     [refuseLockedSelection, commitShapes, hasSelection, placementWorkplane, selectedIds],
   );
 
-  const dropSelectedToWorkplane = useCallback((modifiers?: { shift?: boolean }) => {
+  const dropSelectedToWorkplane = useCallback((modifiers?: { shift?: boolean; together?: boolean }) => {
     const top = modifiers?.shift === true;
     if (!hasSelection) {
       setNotice(t("status.selectShapeFirst"));
@@ -9685,14 +9685,16 @@ export function LayerlingEditor({
     }
     if (refuseLockedSelection()) return;
     const selected = new Set(selectedIds);
+    const vertices = (shape: WorkplaneShape) => meshForShape(shape).vertices.map(([x, y, z]) => ({ x, y, z }));
+    // Alt+D drops the selection as one piece, so the parts keep their heights to each other, as grouping, dropping and
+    // ungrouping did before (Discussion #1509); D drops every part on its own.
+    const shared = modifiers?.together === true
+      ? translationToWorkplane(placementWorkplane, shapes.filter((shape) => selected.has(shape.id) && !shape.locked).flatMap(vertices), top)
+      : null;
     commitShapes(
       shapes.map((shape) => {
         if (!selected.has(shape.id) || shape.locked) return shape;
-        const translation = translationToWorkplane(
-          placementWorkplane,
-          meshForShape(shape).vertices.map(([x, y, z]) => ({ x, y, z })),
-          top,
-        );
+        const translation = shared ?? translationToWorkplane(placementWorkplane, vertices(shape), top);
         return {
           ...shape,
           x: cleanNearZero(shape.x + translation.x),
@@ -17910,10 +17912,11 @@ export function LayerlingEditor({
       } else if (event.key === "ArrowDown") {
         event.preventDefault();
         nudge(0, step, 0);
-      } else if (key === "d" && hasSelection) {
+      } else if ((key === "d" || (event.altKey && event.code === "KeyD")) && hasSelection) {
         event.preventDefault();
-        // Shift+D drops the top of the selection to the workplane, the body below it (#940).
-        dropSelectedToWorkplane({ shift: event.shiftKey });
+        // Shift+D drops the top of the selection to the workplane, the body below it (#940); with Alt the selection
+        // drops as one piece (#1509). The key code catches Alt+D on a Mac, where Option turns the key into another letter.
+        dropSelectedToWorkplane({ shift: event.shiftKey, together: event.altKey });
       } else if (key === "h") {
         event.preventDefault();
         setSelectionHoleMode(true);

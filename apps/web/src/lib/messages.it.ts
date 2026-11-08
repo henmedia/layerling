@@ -1419,6 +1419,7 @@ export const MESSAGES_IT: Partial<Record<MessageKey, string>> = {
   "shortcuts.note": "Inserisci una nota",
   "shortcuts.carryOntoFace": "Solleva la selezione e posala su una faccia (come Cruise in Tinkercad)",
   "shortcuts.dropToWorkplane": "Posa la selezione sul piano di lavoro",
+  "shortcuts.dropTogether": "Posa la selezione come un pezzo unico, le parti mantengono le altezze tra loro",
   "shortcuts.nudge": "Sposta di un passo della griglia, seguendo l'orientamento della vista",
   "shortcuts.nudgeCoarse": "Sposta di cinque passi della griglia",
   "shortcuts.nudgeFine": "Sposta di 1/5 dell'intervallo della griglia",

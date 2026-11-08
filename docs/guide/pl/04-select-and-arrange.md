@@ -110,6 +110,8 @@ Dwie części mają się zetknąć ścianami albo stanąć na równo? Zaznacz cz
 
 Równie proste są {{ui:editor.tool.dropToWorkplane}} ([[D]]), który opuszcza zaznaczenie na płaszczyznę roboczą, i {{ui:editor.tool.centerOnWorkplane}}. Gdy płaszczyzna robocza leży na ścianie, wyśrodkowuje na punkcie wybranym klawiszem [[W]] i przesuwa zaznaczenie tylko wzdłuż tej ściany, więc to, co na niej stoi, na niej zostaje.
 
+[[Alt]]+[[D]] opuszcza kilka części jako całość: wszystkie przesuwają się w dół o tę samą odległość i zachowują wysokości względem siebie, a [[D]] opuszcza każdą część osobno.
+
 [[C]] podnosi zaznaczenie, jak Cruise w Tinkercadzie: podąża ono za wskaźnikiem myszy i kładzie się na ścianie innej bryły, nad którą jesteś, także na skośnej. Kliknięcie je tam odkłada, a [[Esc]] zostawia je tam, gdzie było. Jego spód opiera się wtedy na ścianie, ustawiony wzdłuż krawędzi ściany, tak jak nowy kształt. Własny obrót wokół osi pionowej zachowuje. Kilka części wędruje razem i zachowuje odstępy. Nad pustą płytą [[C]] stawia pochyloną część z powrotem pionowo na płaszczyźnie roboczej. Przytrzymanie [[Shift]] podczas przenoszenia zatapia część w ścianie: zostaje pionowo, jej góra jest równo ze ścianą, a bryła pod nią, i tak właśnie pogłębienie stożkowe albo walcowe wchodzi w bryłę. Nowy kształt z biblioteki z wciśniętym [[Shift]] jest stawiany tak samo. [[Shift]]+[[D]] opuszcza zaznaczenie górą na płaszczyznę roboczą zamiast spodem. Bez klawiatury to samo oferuje {{ui:contextMenu.carry}} w menu długiego przytrzymania.
 
 ## Szyki: rząd i okrąg

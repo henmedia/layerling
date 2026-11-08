@@ -104,6 +104,8 @@ Dva dela naj ležita ploskev ob ploskvi ali naj se končata poravnano? Izberi de
 
 Podobno preprosta sta {{ui:editor.tool.dropToWorkplane}} ([[D]]), ki izbor odloži na delovno ravnino, in {{ui:editor.tool.centerOnWorkplane}}.
 
+[[Alt]]+[[D]] spusti več delov kot celoto: vsi se pomaknejo navzdol za enako razdaljo in tako ohranijo višine med seboj, medtem ko [[D]] spusti vsak del posebej.
+
 [[C]] dvigne izbor, kot Cruise v Tinkercadu: sledi kazalcu miške in se uleže na ploskev drugega telesa, nad katero si, tudi na poševno. Klik ga tam odloži, [[Esc]] ga pusti, kjer je bil. Njegova spodnja stran potem leži na ploskvi, poravnana z robovi ploskve, kot bi bila nova oblika; svoj zasuk okoli navpične osi obdrži. Več delov potuje skupaj in ohrani razmike. Nad prazno ploščo [[C]] nagnjen del znova postavi pokonci na delovno ravnino. Če med prenašanjem držiš [[Shift]], se del namesto tega pogrezne v ploskev: ostane pokonci, z vrhom poravnanim s ploskvijo in telesom pod njo, tako pride v telo stožčasto ali valjasto ugrezanje; nova oblika iz knjižnice se s [[Shift]] postavi enako. [[Shift]]+[[D]] spusti izbor na delovno ravnino z vrhom namesto z dnom. Brez tipkovnice ima meni dolgega pritiska za isto {{ui:contextMenu.carry}}.
 
 S [[C]] poberi izbor, kot z Cruisom v Tinkercadu: visi na kazalcu in se položi na ploskev drugega telesa, nad katero si ravno, tudi na poševno. Klik ga tam odloži, [[Esc]] ga pusti, kjer je bil. Njegova spodnja stran potem leži na ploskvi in se ravna po njenih robovih kot nova oblika; lastni zasuk okoli navpične osi obdrži. Več delov se premika skupaj in ohrani razmik. Nad prazno ploščo [[C]] nagnjen del spet postavi pokonci na delovno ravnino.

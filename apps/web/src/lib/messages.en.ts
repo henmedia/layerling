@@ -1427,6 +1427,7 @@ export const MESSAGES_EN = {
   "shortcuts.note": "Place a note",
   "shortcuts.carryOntoFace": "Pick up the selection and set it down on a face (like Cruise in Tinkercad)",
   "shortcuts.dropToWorkplane": "Drop the selection onto the workplane",
+  "shortcuts.dropTogether": "Drop the selection as one piece, the parts keep their heights to each other",
   "shortcuts.nudge": "Move by one grid step, as the view is turned",
   "shortcuts.nudgeCoarse": "Move by five grid steps",
   "shortcuts.nudgeFine": "Move by a fifth of a grid step",

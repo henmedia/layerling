@@ -1383,6 +1383,7 @@ export const MESSAGES_ZH_CN: Partial<Record<MessageKey, string>> = {
   "shortcuts.note": "放置备注",
   "shortcuts.carryOntoFace": "拾起选中项并放到某个面上（类似 Tinkercad 的 Cruise）",
   "shortcuts.dropToWorkplane": "把选中项放到工作平面上",
+  "shortcuts.dropTogether": "把选中项作为整体放到工作平面上，各部件之间的高度保持不变",
   "shortcuts.nudge": "按当前视图方向移动一个网格步距",
   "shortcuts.nudgeCoarse": "移动五个网格步距",
   "shortcuts.nudgeFine": "移动五分之一个网格步距",

@@ -110,6 +110,8 @@ Zwei Teile sollen Fläche an Fläche liegen oder bündig abschließen? Wähle da
 
 Ähnlich einfach sind {{ui:editor.tool.dropToWorkplane}} ([[D]]), das die Auswahl auf die Arbeitsebene absetzt, und {{ui:editor.tool.centerOnWorkplane}}. Liegt die Arbeitsebene auf einer Fläche, zentriert es auf den Punkt, den du mit [[W]] angeklickt hast, und schiebt die Auswahl nur entlang der Fläche: Was darauf steht, bleibt darauf stehen.
 
+[[Alt]]+[[D]] setzt mehrere Teile als Ganzes ab: Alle wandern um dieselbe Strecke nach unten und behalten so ihre Höhen zueinander, während [[D]] jedes Teil für sich absetzt.
+
 Mit [[C]] nimmst du die Auswahl auf, wie mit Cruise in Tinkercad: Sie hängt am Mauszeiger und legt sich auf die Fläche eines anderen Körpers, über der du gerade bist, auch auf eine schräge. Ein Klick setzt sie dort ab, [[Esc]] lässt sie, wo sie war. Ihre Unterseite liegt dann auf der Fläche, und sie richtet sich nach deren Kanten aus wie eine neue Form; eine eigene Drehung um ihre Hochachse behält sie. Mehrere Teile wandern zusammen und behalten ihren Abstand. Über der leeren Platte stellt [[C]] ein gekipptes Teil wieder aufrecht auf die Arbeitsebene. Hältst du dabei [[Umschalt]] gedrückt, sinkt das Teil stattdessen in die Fläche: Es bleibt aufrecht, seine Oberseite schließt bündig mit der Fläche ab und der Körper liegt darunter, so wie eine Senkung oder Senkbohrung in einen Körper kommt; eine neue Form aus der Bibliothek setzt du ebenso mit gedrückter [[Umschalt]]-Taste. [[Umschalt]]+[[D]] setzt die Auswahl mit der Oberseite statt mit der Unterseite auf die Arbeitsebene. Ohne Tastatur steht dafür {{ui:contextMenu.carry}} im Menü des langen Drucks.
 
 ## Muster: Reihe und Kreis

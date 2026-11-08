@@ -831,6 +831,7 @@ export const MESSAGES_TR: Partial<Record<MessageKey, string>> = {
   "shortcuts.note": "Not yerleştir",
   "shortcuts.carryOntoFace": "Seçimi kaldır ve bir yüzeye koy (Tinkercad'deki Cruise gibi)",
   "shortcuts.dropToWorkplane": "Seçimi çalışma düzlemine indir",
+  "shortcuts.dropTogether": "Seçimi tek parça olarak indir, parçalar birbirine göre yüksekliklerini korur",
   "shortcuts.nudge": "Görünüm nasıl döndürülmüşse ona göre bir ızgara adımı taşı",
   "shortcuts.nudgeCoarse": "Beş ızgara adımı taşı",
   "shortcuts.raise": "Seçimi yükselt veya alçalt",

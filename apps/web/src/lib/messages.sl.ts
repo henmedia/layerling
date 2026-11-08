@@ -1160,6 +1160,7 @@ export const MESSAGES_SL: Partial<Record<MessageKey, string>> = {
   "shortcuts.alignSpread": "Na točki za enake razmike: vpiši razmik",
   "shortcuts.note": "Postavi opombo",
   "shortcuts.dropToWorkplane": "Spusti izbor na delovno ravnino",
+  "shortcuts.dropTogether": "Spusti izbor kot celoto, deli ohranijo višine med seboj",
   "shortcuts.nudge": "Premik za en korak mreže, glede na zavrten pogled",
   "shortcuts.nudgeCoarse": "Premik za pet korakov mreže",
   "shortcuts.nudgeFine": "Premik za petino koraka mreže",

@@ -1425,6 +1425,7 @@ export const MESSAGES_AR: Partial<Record<MessageKey, string>> = {
   "shortcuts.note": "وضع ملاحظة",
   "shortcuts.carryOntoFace": "التقاط التحديد ووضعه على وجه (مثل Cruise في Tinkercad)",
   "shortcuts.dropToWorkplane": "إسقاط التحديد على سطح العمل",
+  "shortcuts.dropTogether": "إسقاط التحديد كقطعة واحدة، فتبقى ارتفاعات الأجزاء كما هي بالنسبة لبعضها",
   "shortcuts.nudge": "التحريك بخطوة شبكة واحدة، بحسب اتجاه العرض",
   "shortcuts.nudgeCoarse": "التحريك بخمس خطوات شبكة",
   "shortcuts.nudgeFine": "التحريك بخُمس خطوة شبكة",

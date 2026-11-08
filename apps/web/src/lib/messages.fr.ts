@@ -1417,6 +1417,7 @@ export const MESSAGES_FR: Partial<Record<MessageKey, string>> = {
   "shortcuts.note": "Placer une note",
   "shortcuts.carryOntoFace": "Prenez la sélection et posez-la sur un visage (comme Cruise dans Tinkercad)",
   "shortcuts.dropToWorkplane": "Déposez la sélection sur le plan de travail",
+  "shortcuts.dropTogether": "Déposer la sélection d'un bloc, les pièces gardent leurs hauteurs les unes par rapport aux autres",
   "shortcuts.nudge": "Se déplacer d'un pas de grille lorsque la vue est tournée",
   "shortcuts.nudgeCoarse": "Se déplacer de cinq étapes de grille",
   "shortcuts.nudgeFine": "Se déplacer d'un cinquième d'étape de grille",

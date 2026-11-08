@@ -104,6 +104,8 @@ Vuoi unire due parti faccia a faccia o allinearle sullo stesso piano? Seleziona 
 
 Puoi anche usare {{ui:editor.tool.dropToWorkplane}} ([[D]]) per appoggiare la selezione sul piano di lavoro, oppure {{ui:editor.tool.centerOnWorkplane}}.
 
+[[Alt]]+[[D]] posa più parti come un pezzo unico: scendono tutte della stessa distanza e mantengono così le altezze tra loro, mentre [[D]] posa ogni parte per conto suo.
+
 [[C]] solleva la selezione, come Cruise in Tinkercad: la selezione segue il puntatore e si appoggia alla faccia del corpo su cui passi, anche se inclinata. Fai clic per posizionarla; [[Esc]] la lascia dov’era. Il lato inferiore si appoggia alla faccia e si allinea ai suoi spigoli come farebbe una nuova forma; la selezione mantiene la propria rotazione attorno all’asse verticale. Più parti si spostano insieme mantenendo la distanza reciproca. Sopra la piastra vuota, [[C]] rimette in verticale una parte inclinata. Se non hai una tastiera, il menu che appare tenendo premuto offre {{ui:contextMenu.carry}} per la stessa operazione.
 
 ## Schemi: righe e cerchi

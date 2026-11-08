@@ -112,6 +112,8 @@ To dele skal mødes flade mod flade, eller flugte? Vælg den del der skal flytte
 
 Lige så enkle er {{ui:editor.tool.dropToWorkplane}} ([[D]]), der lægger markeringen ned på arbejdsplanet, og {{ui:editor.tool.centerOnWorkplane}}. Med arbejdsplanet på en flade centrerer det på det punkt du valgte med [[W]] og flytter kun markeringen langs fladen, så det der står på den bliver stående.
 
+[[Alt]]+[[D]] lægger flere dele ned som ét stykke: de flyttes alle lige langt ned, så de beholder deres højder i forhold til hinanden, mens [[D]] lægger hver del ned for sig.
+
 [[C]] tager markeringen op, ligesom Cruise i Tinkercad: den følger musemarkøren og lægger sig ned på fladen af en anden form du er over, også skrå. Et klik sætter den ned der, [[Esc]] lader den stå hvor den var. Dens underside hviler så på fladen, justeret med fladens kanter som en ny form ville være; den beholder sin egen drejning omkring sin op-akse. Flere dele rejser sammen og bevarer deres afstand. Over den tomme plade stiller [[C]] en skrå del oprejst på arbejdsplanet igen. Holder du [[Shift]] nede undervejs, synker delen i stedet ned i fladen: den bliver stående opret, med oversiden i flugt med fladen og legemet under den, sådan som en undersænkning eller en forsænkning kommer ned i en legeme; en ny form fra biblioteket placeres på samme måde med [[Shift]] holdt nede. [[Shift]]+[[D]] lægger markeringen ned på arbejdsplanet med oversiden i stedet for undersiden.
 Uden et tastatur har menuen ved et langt tryk {{ui:contextMenu.carry}} til det samme.
 

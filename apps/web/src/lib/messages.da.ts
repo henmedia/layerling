@@ -2084,6 +2084,7 @@ export const MESSAGES_DA: Partial<Record<MessageKey, string>> = {
   "shortcuts.note": "Placér en note",
   "shortcuts.carryOntoFace": "Løft markeringen og sæt den ned på en flade (som Cruise i Tinkercad)",
   "shortcuts.dropToWorkplane": "Læg på arbejdsplan",
+  "shortcuts.dropTogether": "Læg markeringen ned som ét stykke, så delene beholder deres højder i forhold til hinanden",
   "shortcuts.nudge": "Flyt ét gittertrin, som visningen vender",
   "shortcuts.nudgeCoarse": "Flyt fem gittertrin",
   "shortcuts.nudgeFine": "Flyt en femtedel af et gittertrin",

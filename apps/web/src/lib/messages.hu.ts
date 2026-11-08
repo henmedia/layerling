@@ -845,6 +845,7 @@ export const MESSAGES_HU: Partial<Record<MessageKey, string>> = {
   "shortcuts.note": "Jegyzet elhelyezése",
   "shortcuts.carryOntoFace": "A kijelölés felemelése és letétele egy lapra (mint a Cruise a Tinkercadben)",
   "shortcuts.dropToWorkplane": "A kijelölés leejtése a munkasíkra",
+  "shortcuts.dropTogether": "A kijelölés leejtése egy darabként, az elemek megtartják egymáshoz viszonyított magasságukat",
   "shortcuts.nudge": "Mozgatás egy rácslépéssel, a nézet elforgatásához igazodva",
   "shortcuts.nudgeCoarse": "Mozgatás öt rácslépéssel",
   "shortcuts.raise": "A kijelölés emelése vagy süllyesztése",
