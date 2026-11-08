@@ -1779,6 +1779,7 @@ export const MESSAGES_EN = {
   "status.shapeLockOn": "Shape locked: it still moves, turns and groups, but keeps its size and settings",
   "status.shapeLockOff": "Shape unlocked",
   "status.objectLocked": "Object locked",
+  "status.groupLocked": "A locked part can't be grouped or bundled. Unlock it with Ctrl+L, or lock only its shape with Ctrl+Shift+L: that part can still be grouped",
   "status.shapeLockRefused": "The shape is locked: it can be moved and turned, but not changed (Ctrl+Shift+L unlocks it)",
   "status.shapeLockHeld": "\"{name}\" has its shape locked: its size, settings and name stay as they are",
   "status.selectionToHole": "Changed selection to hole",

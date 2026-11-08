@@ -1360,6 +1360,7 @@ export const MESSAGES_SL: Partial<Record<MessageKey, string>> = {
   "status.preparingEdges": "Priprava robov ({kind}) v delavcu CAD",
   "status.removedFeature": "Odstranjeno: {label}",
   "status.objectLocked": "Objekt zaklenjen",
+  "status.groupLocked": "Zaklenjenega dela ni mogoče združiti v skupino ali povezati. Odkleni ga s Ctrl+L ali zakleni samo njegovo obliko s Ctrl+Shift+L: tak del je še vedno mogoče združiti",
   "status.shapeLockRefused": "Oblika je zaklenjena: lahko jo premikaš in vrtiš, ne moreš pa je spremeniti (Ctrl+Shift+L jo odklene)",
   "status.shapeLockHeld": "»{name}« ima zaklenjeno obliko: velikost, nastavitve in ime ostanejo, kot so",
   "status.selectOneSolid": "Izberi eno trdno telo: {kind}",

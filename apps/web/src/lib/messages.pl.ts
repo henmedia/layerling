@@ -1740,6 +1740,7 @@ export const MESSAGES_PL: Partial<Record<MessageKey, string>> = {
   "status.shapeLockOn": "Kształt zablokowany: nadal można go przesuwać, obracać i grupować, ale zachowuje rozmiar i ustawienia",
   "status.shapeLockOff": "Kształt odblokowany",
   "status.objectLocked": "Obiekt zablokowany",
+  "status.groupLocked": "Zablokowanej części nie można grupować ani wiązać. Odblokuj ją skrótem Ctrl+L albo zablokuj tylko jej kształt skrótem Ctrl+Shift+L: taką część nadal można grupować",
   "status.shapeLockRefused": "Kształt jest zablokowany: można go przesuwać i obracać, ale nie zmieniać (Ctrl+Shift+L go odblokowuje)",
   "status.shapeLockHeld": "„{name}” ma zablokowany kształt: rozmiar, ustawienia i nazwa pozostają bez zmian",
   "status.selectionToHole": "Zaznaczenie zmienione w otwór",

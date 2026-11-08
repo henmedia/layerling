@@ -1768,6 +1768,7 @@ export const MESSAGES_FR: Partial<Record<MessageKey, string>> = {
   "status.shapeLockOn": "Forme verrouillée : elle se déplace, tourne et se groupe toujours, mais garde sa taille et ses réglages",
   "status.shapeLockOff": "Forme déverrouillée",
   "status.objectLocked": "Objet verrouillé",
+  "status.groupLocked": "Une pièce verrouillée ne peut pas être groupée ni liée. Déverrouillez-la avec Ctrl+L, ou verrouillez seulement sa forme avec Ctrl+Shift+L : cette pièce peut encore être groupée",
   "status.shapeLockRefused": "La forme est verrouillée : elle peut être déplacée et tournée, mais pas modifiée (Ctrl+Shift+L la déverrouille)",
   "status.shapeLockHeld": "La forme de « {name} » est verrouillée : sa taille, ses réglages et son nom restent tels quels",
   "status.selectionToHole": "Sélection modifiée en trou",

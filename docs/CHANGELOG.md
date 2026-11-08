@@ -6,6 +6,8 @@ code still carries it - so a lower number further down is older, not newer.
 
 ## Unreleased
 
+- **Grouping or bundling with a locked part says why it does not work (Facebook):** With a part locked by Ctrl+L in the selection, **Group** and **Bundle** only showed "Object locked", which did not say that the lock was the reason. The message now says that a locked part can't be grouped or bundled and names the two ways round it: unlock it with Ctrl+L, or lock only its shape with Ctrl+Shift+L, which a part can still be grouped with. In all 14 languages.
+
 - **Align faces: point to point (Discussion #1491):** Align faces has a fourth way, **Point to point**. Click a point of the part that moves - a corner, a spot on an edge, the centre of a round edge or a reference point - then a point of another part or a reference point, and **Align** moves the part straight there without turning it. A dot shows which point the pointer would take; the two picked points stay marked in orange and green. **Move along** switches X, Y and Z on or off: only X and Y puts one point straight above or below the other, only Z brings it to the same height. `layerling_mate_faces` takes `mode: "point"` with `point`, `targetPoint` and `axes`.
 
 - **Picking a face from below: the light-blue mark shows through the plate (Discussion #1492):** A face behind the plate, such as the underside of a part lifted off it, never lit up while the pointer moved over it in **Align faces**, **Lay flat** or the hole pattern, nor when picking faces to delete or for a texture. The plate is see-through but held the mark back. Now the mark shows over the plate at full strength, and a solid part standing in front of the face still hides it.
