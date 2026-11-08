@@ -4972,6 +4972,7 @@ export const MESSAGES_ZH_TW: Partial<Record<MessageKey, string>> = {
   "edge.errorPreviewTimeout": "邊預覽逾時。請取消工具後再試一次。",
   "edge.errorWorkerFailed": "CAD 引擎無法啟動。通常是 layerling 剛更新過：重新載入頁面即可繼續。如果還是不行，請更新瀏覽器。",
   "edge.errorFilletTogether": "所選邊在此尺寸下無法一起倒圓角。請縮小尺寸，或少選幾條相連的邊。",
+  "edge.errorTightBend": "這條邊向外彎曲得比此半徑更緊：最緊處的彎曲半徑為 {bend}。請選擇更小的半徑，或把這處彎曲畫得更圓。有此彎曲的邊以紅色顯示。",
   "edge.errorChamferTogether": "所選邊在此尺寸下無法一起倒角。請縮小尺寸，或少選幾條相連的邊。",
   "edge.errorKernelFailed": "CAD 核心無法完成此邊處理。",
   "error.unknown": "發生錯誤：{detail}",

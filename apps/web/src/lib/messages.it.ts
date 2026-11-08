@@ -4968,6 +4968,7 @@ export const MESSAGES_IT: Partial<Record<MessageKey, string>> = {
   "edge.errorPreviewTimeout": "Tempo scaduto durante l'anteprima degli spigoli. Annulla lo strumento e riprova.",
   "edge.errorWorkerFailed": "Impossibile avviare il motore CAD. Di solito succede subito dopo un aggiornamento di layerling: ricarica la pagina e riprendi. Se il problema persiste, aggiorna il browser.",
   "edge.errorFilletTogether": "Non è possibile arrotondare insieme gli spigoli selezionati con questo valore. Riduci il valore o seleziona meno spigoli collegati.",
+  "edge.errorTightBend": "Il bordo curva verso l'esterno più stretto di questo raggio: la sua curva più stretta ha un raggio di {bend}. Scegli un raggio più piccolo o disegna quella curva più ampia. I bordi con quella curva sono in rosso.",
   "edge.errorChamferTogether": "Non è possibile smussare insieme gli spigoli selezionati con questo valore. Riduci il valore o seleziona meno spigoli collegati.",
   "edge.errorKernelFailed": "Il kernel CAD non è riuscito a completare questa lavorazione degli spigoli.",
   "error.unknown": "Si è verificato un errore: {detail}",

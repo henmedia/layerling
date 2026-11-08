@@ -4990,6 +4990,7 @@ export const MESSAGES_ES: Partial<Record<MessageKey, string>> = {
   "edge.errorPreviewTimeout": "La vista previa de las aristas ha tardado demasiado. Cancela la herramienta y vuelve a intentarlo.",
   "edge.errorWorkerFailed": "El núcleo CAD no ha podido arrancar. Normalmente es porque layerling se acaba de actualizar: recarga la página y sigue. Si no se arregla, actualiza el navegador.",
   "edge.errorFilletTogether": "Las aristas seleccionadas no se pueden redondear juntas con este tamaño. Reduce el tamaño o selecciona menos aristas conectadas.",
+  "edge.errorTightBend": "El borde se curva hacia fuera más cerrado que este radio: su curva más cerrada tiene un radio de {bend}. Elige un radio menor o dibuja esa curva más abierta. Los bordes con esa curva se muestran en rojo.",
   "edge.errorChamferTogether": "Las aristas seleccionadas no se pueden achaflanar juntas con este tamaño. Reduce el tamaño o selecciona menos aristas conectadas.",
   "edge.errorKernelFailed": "El núcleo CAD no ha podido completar este tratamiento de aristas.",
   "error.unknown": "Algo ha fallado: {detail}",

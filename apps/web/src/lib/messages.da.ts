@@ -4738,6 +4738,7 @@ export const MESSAGES_DA: Partial<Record<MessageKey, string>> = {
   "edge.errorPreviewTimeout": "Kantforhåndsvisningen tog for lang tid. Annullér værktøjet og prøv igen.",
   "edge.errorWorkerFailed": "CAD-motoren kunne ikke starte. Normalt er layerling lige opdateret: genindlæs siden og fortsæt. Hvis det ikke hjælper, opdatér din browser.",
   "edge.errorFilletTogether": "De valgte kanter kan ikke rundes sammen ved denne størrelse. Mindsk størrelsen eller vælg færre forbundne kanter.",
+  "edge.errorTightBend": "Kanten bøjer udad tættere end denne radius: dens skarpeste bøjning har en radius på {bend}. Vælg en mindre radius, eller tegn bøjningen rundere. Kanterne med den bøjning er røde.",
   "edge.errorChamferTogether": "De valgte kanter kan ikke fases sammen ved denne størrelse. Mindsk størrelsen eller vælg færre forbundne kanter.",
   "edge.errorKernelFailed": "CAD-kernen kunne ikke fuldføre denne kantbehandling.",
   "error.unknown": "Noget gik galt: {detail}",

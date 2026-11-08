@@ -4989,6 +4989,7 @@ export const MESSAGES_EN = {
   "edge.errorPreviewTimeout": "The edge preview timed out. Please cancel the tool and try again.",
   "edge.errorWorkerFailed": "The CAD engine could not start. Usually layerling was just updated: reload the page and carry on. If that does not help, update your browser.",
   "edge.errorFilletTogether": "The selected edges cannot be filleted together at this size. Reduce the size or select fewer connected edges.",
+  "edge.errorTightBend": "The edge bends round the outside tighter than this radius: its tightest bend has a radius of {bend}. Choose a smaller radius, or draw that bend rounder. The edges with that bend are drawn in red.",
   "edge.errorChamferTogether": "The selected edges cannot be chamfered together at this size. Reduce the size or select fewer connected edges.",
   "edge.errorKernelFailed": "The CAD kernel could not complete this edge treatment.",
   "error.unknown": "Something went wrong: {detail}",

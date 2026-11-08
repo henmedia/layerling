@@ -4993,6 +4993,7 @@ export const MESSAGES_PL: Partial<Record<MessageKey, string>> = {
   "edge.errorPreviewTimeout": "Przekroczono czas podglądu krawędzi. Anuluj narzędzie i spróbuj ponownie.",
   "edge.errorWorkerFailed": "Nie udało się uruchomić silnika CAD. Zwykle layerling właśnie się zaktualizował: wczytaj stronę ponownie i pracuj dalej. Jeśli to nie pomoże, zaktualizuj przeglądarkę.",
   "edge.errorFilletTogether": "Zaznaczonych krawędzi nie da się zaokrąglić razem w tym rozmiarze. Zmniejsz rozmiar albo zaznacz mniej połączonych krawędzi.",
+  "edge.errorTightBend": "Krawędź wygina się na zewnątrz ciaśniej niż ten promień: jej najciaśniejsze wygięcie ma promień {bend}. Wybierz mniejszy promień albo narysuj to wygięcie łagodniej. Krawędzie z tym wygięciem są zaznaczone na czerwono.",
   "edge.errorChamferTogether": "Zaznaczonych krawędzi nie da się sfazować razem w tym rozmiarze. Zmniejsz rozmiar albo zaznacz mniej połączonych krawędzi.",
   "edge.errorKernelFailed": "Jądro CAD nie zdołało dokończyć tej obróbki krawędzi.",
   "error.unknown": "Coś poszło nie tak: {detail}",

@@ -4989,6 +4989,7 @@ export const MESSAGES_NL: Record<MessageKey, string> = {
   "edge.errorPreviewTimeout": "Het randvoorbeeld duurde te lang. Annuleer het gereedschap en probeer het opnieuw.",
   "edge.errorWorkerFailed": "De CAD-engine kon niet starten. Meestal is layerling net bijgewerkt: herlaad de pagina en ga verder. Helpt dat niet, werk dan je browser bij.",
   "edge.errorFilletTogether": "De geselecteerde randen kunnen niet samen worden afgerond met deze grootte. Verklein de grootte of selecteer minder verbonden randen.",
+  "edge.errorTightBend": "De rand buigt aan de buitenkant krapper dan deze straal: de krapste bocht heeft een straal van {bend}. Kies een kleinere straal of teken die bocht ronder. De randen met die bocht zijn rood.",
   "edge.errorChamferTogether": "De geselecteerde randen kunnen niet samen worden afgeschuind met deze grootte. Verklein de grootte of selecteer minder verbonden randen.",
   "edge.errorKernelFailed": "De CAD-kernel kon deze randbewerking niet voltooien.",
   "error.unknown": "Er ging iets mis: {detail}",

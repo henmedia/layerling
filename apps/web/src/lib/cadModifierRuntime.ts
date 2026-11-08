@@ -4,6 +4,7 @@ import { isKernelMemoryFault, isWasmMemoryFaultMessage } from "@/lib/kernelFault
 import { localizedError } from "@/lib/userErrors";
 import type { CadModifierDeflection, CadModifierEdge, CadModifierQuality } from "@/lib/cadModifierTypes";
 import type { OcctKernel, ShapeHandle } from "occt-wasm";
+import { tightBendFromMessage } from "@/lib/cadTightBends";
 
 const occtRuntimeVersion = process.env.NEXT_PUBLIC_OCCT_RUNTIME_VERSION;
 /** Where scripts/copy-occt-wasm.mjs stages the kernel: one folder per kernel version. */
@@ -430,6 +431,10 @@ export function cadModifierUserErrorMessage(rawError: string | null | undefined)
   }
   if (rawError.includes("The CAD worker did not return a body without the faces") || rawError.includes("Select at least one face")) {
     return t("deleteFace.errorFailed");
+  }
+  const tightBend = tightBendFromMessage(rawError);
+  if (tightBend !== null) {
+    return t("edge.errorTightBend", { bend: `${tightBend} mm` });
   }
   if (rawError.includes("cannot be filleted together")) {
     return t("edge.errorFilletTogether");

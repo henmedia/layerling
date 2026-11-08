@@ -29,6 +29,7 @@ import { cadFlatFaceMeshStraysFromOutline } from "@/lib/cadFaceOutline";
 import { buildMessage } from "@/lib/buildStamp";
 import { CAD_MODIFIER_KERNEL_RESTART_MESSAGE, CAD_MODIFIER_RUNTIME_BASE, VARIABLE_FILLET_ONE_EDGE_MESSAGE, cadModifierCappedDeflection, cadModifierTessellationDeflection, cadModifierTopologyEdgeIsSelectable, applyCadTransform, isCadModifierKernelExhausted, isCadModifierWasmMemoryFault } from "@/lib/cadModifierRuntime";
 import { isKernelMemoryFault } from "@/lib/kernelFault";
+import { tightBendMessage, tightestOutsideBend } from "@/lib/cadTightBends";
 
 const HASH_UPPER_BOUND = 2_147_483_647;
 const CAD_EDGE_WIREFRAME_DEFLECTION = 0.035;
@@ -1012,10 +1013,13 @@ function verwirfKernel(cad: OcctKernel | null) {
 const CULPRIT_SEARCH_BUDGET_MS = 1500;
 
 class EdgeTreatmentError extends Error {
-  constructor(message: string, readonly failedEdgeIds: number[]) {
+  constructor(message: string, readonly failedEdgeIds: number[], readonly tightestBend?: number) {
     super(message);
   }
 }
+
+// Measuring the picked curves for a bend tighter than the fillet (#1473) runs only once the fillet was refused.
+const TIGHT_BEND_BUDGET_MS = 1500;
 
 function treatEdges(cad: OcctKernel, solid: ShapeHandle, edges: ShapeHandle[], request: Extract<CadModifierWorkerRequest, { type: "preview" }>) {
   // A variable fillet (#687) runs from `amount` at the edge's start to `endAmount` at its end; the kernel takes one edge.
@@ -1231,6 +1235,11 @@ async function bearbeiteAnfrage(request: CadModifierWorkerRequest, halter: { cad
           const pastCorners = retried ? null : treatPastInnerCorners(activeCad, solid, componentEntries, request);
           if (!retried && !pastCorners) {
             const rawMessage = error instanceof Error ? error.message : String(error ?? "");
+            // A curve bending round the outside tighter than the radius is said with its number and marked (#1473).
+            const bend = request.kind === "fillet" && !request.concave
+              ? tightestOutsideBend(activeCad, solid, componentEntries, Math.min(request.amount, request.endAmount ?? request.amount), performance.now() + TIGHT_BEND_BUDGET_MS)
+              : null;
+            if (bend) throw new EdgeTreatmentError(tightBendMessage(bend.radius), bend.edgeIds, bend.radius);
             throw new EdgeTreatmentError(rawMessage, culpritEdgeIds(activeCad, solid, componentEntries, request, error));
           }
           if (retried) {
@@ -1368,6 +1377,10 @@ self.onmessage = async (event: MessageEvent<CadModifierWorkerRequest>) => {
         : `The selected edges cannot be ${request.kind === "fillet" ? "filleted" : "chamfered"} together at this size. Reduce the size or select fewer connected edges.`
     : rawMessage || "The CAD kernel could not complete this edge treatment";
   if (request.type === "prepare" && halter.cad) releaseSession(halter.cad);
+  if (request.type === "preview" && error instanceof EdgeTreatmentError && error.tightestBend !== undefined) {
+    post({ type: "error", requestId: request.requestId, message: rawMessage, failedEdgeIds: error.failedEdgeIds, tightestBend: error.tightestBend });
+    return;
+  }
   const failedEdgeIds = kernelRefused && error instanceof EdgeTreatmentError ? error.failedEdgeIds : undefined;
   post({ type: "error", requestId: request.requestId, message, ...(failedEdgeIds ? { failedEdgeIds } : {}) });
 };

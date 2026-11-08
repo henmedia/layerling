@@ -3944,6 +3944,7 @@ export const MESSAGES_SL: Partial<Record<MessageKey, string>> = {
   "edge.errorPreviewTimeout": "Predogled robov je potekel. Prekliči orodje in poskusi znova.",
   "edge.errorWorkerFailed": "Pogona CAD ni bilo mogoče zagnati. Običajno je bil Layerling pravkar posodobljen: znova naloži stran (Ctrl+R) in nadaljuj. Če ne pomaga, znova zaženi program.",
   "edge.errorFilletTogether": "Izbranih robov pri tej velikosti ni mogoče zaokrožiti skupaj. Zmanjšaj velikost ali izberi manj povezanih robov.",
+  "edge.errorTightBend": "Rob se navzven ukrivi tesneje, kot dopušča ta polmer: njegov najtesnejši zavoj ima polmer {bend}. Izberi manjši polmer ali nariši zavoj bolj zaobljeno. Robovi s tem zavojem so rdeči.",
   "edge.errorChamferTogether": "Izbranih robov pri tej velikosti ni mogoče posneti skupaj. Zmanjšaj velikost ali izberi manj povezanih robov.",
   "edge.errorKernelFailed": "Jedro CAD ni moglo dokončati te obdelave robov.",
   "error.unknown": "Nekaj je šlo narobe: {detail}",

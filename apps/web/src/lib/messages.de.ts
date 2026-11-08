@@ -4988,6 +4988,7 @@ export const MESSAGES_DE: Record<MessageKey, string> = {
   "edge.errorPreviewTimeout": "Die Vorschau-Berechnung hat das Zeitlimit überschritten. Bitte Werkzeug schließen und erneut versuchen.",
   "edge.errorWorkerFailed": "Der CAD-Rechenkern konnte nicht starten. Meist wurde layerling gerade aktualisiert: Lade die Seite neu, dann geht es weiter. Hilft das nicht, aktualisiere den Browser.",
   "edge.errorFilletTogether": "Die gewählten Kanten können bei dieser Größe nicht zusammen verrundet werden. Bitte die Größe verringern oder weniger verbundene Kanten wählen.",
+  "edge.errorTightBend": "Die Kante biegt außen enger, als dieser Radius erlaubt: Ihre engste Biegung hat einen Radius von {bend}. Wähle einen kleineren Radius oder zeichne die Biegung runder. Die Kanten mit dieser Biegung sind rot markiert.",
   "edge.errorChamferTogether": "Die gewählten Kanten können bei dieser Größe nicht zusammen angefast werden. Bitte die Größe verringern oder weniger verbundene Kanten wählen.",
   "edge.errorKernelFailed": "Der CAD-Rechenkern konnte diese Kantenbearbeitung nicht durchführen.",
   "error.unknown": "Es ist ein Fehler aufgetreten. Technische Angabe (englisch): {detail}",

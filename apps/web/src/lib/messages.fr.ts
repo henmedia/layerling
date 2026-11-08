@@ -4968,6 +4968,7 @@ export const MESSAGES_FR: Partial<Record<MessageKey, string>> = {
   "edge.errorPreviewTimeout": "L'aperçu des bords a expiré. Veuillez annuler l'outil et réessayer.",
   "edge.errorWorkerFailed": "Le moteur CAO n'a pas pu démarrer. Habituellement, layerling venait d'être mis à jour : rechargez la page et continuez. Si cela ne résout pas le problème, mettez à jour votre navigateur.",
   "edge.errorFilletTogether": "Les arêtes sélectionnées ne peuvent pas être arrondies ensemble à cette taille. Réduisez la taille ou sélectionnez moins d’arêtes connectées.",
+  "edge.errorTightBend": "Le bord tourne vers l'extérieur plus serré que ce rayon : son virage le plus serré a un rayon de {bend}. Choisissez un rayon plus petit ou dessinez ce virage plus arrondi. Les bords qui ont ce virage sont en rouge.",
   "edge.errorChamferTogether": "Les arêtes sélectionnées ne peuvent pas être chanfreinées ensemble à cette taille. Réduisez la taille ou sélectionnez moins d’arêtes connectées.",
   "edge.errorKernelFailed": "Le noyau CAO n'a pas pu effectuer ce traitement des bords.",
   "error.unknown": "Un problème s'est produit : {detail}",

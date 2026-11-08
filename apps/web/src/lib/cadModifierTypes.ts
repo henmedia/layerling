@@ -580,4 +580,5 @@ export type CadModifierWorkerResponse =
     }
   | { type: "disposed"; requestId: number }
   // failedEdgeIds: the selected edges the kernel could not treat together.
-  | { type: "error"; requestId: number; message: string; resetSession?: boolean; failedEdgeIds?: number[] };
+  // tightestBend: a fillet refused because a picked curve bends round the outside tighter than its radius, in mm (#1473).
+  | { type: "error"; requestId: number; message: string; resetSession?: boolean; failedEdgeIds?: number[]; tightestBend?: number };

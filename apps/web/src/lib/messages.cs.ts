@@ -4973,6 +4973,7 @@ export const MESSAGES_CS: Record<MessageKey, string> = {
   "edge.errorPreviewTimeout": "Výpočet náhledu hran překročil časový limit. Zavřete nástroj a zkuste to znovu.",
   "edge.errorWorkerFailed": "CAD výpočet nelze spustit. Obvykle se layerling právě aktualizoval: načtěte stránku znovu. Pokud to nepomůže, aktualizujte prohlížeč.",
   "edge.errorFilletTogether": "Vybrané hrany nelze při tomto rozměru společně zaoblit. Zmenšete hodnotu nebo vyberte méně propojených hran.",
+  "edge.errorTightBend": "Hrana se navenek ohýbá těsněji, než dovoluje tento poloměr: její nejtěsnější ohyb má poloměr {bend}. Zvolte menší poloměr nebo nakreslete ohyb oblejší. Hrany s tímto ohybem jsou červené.",
   "edge.errorChamferTogether": "Vybrané hrany nelze při tomto rozměru společně zkosit. Zmenšete hodnotu nebo vyberte méně propojených hran.",
   "edge.errorKernelFailed": "CAD jádro nedokázalo dokončit tuto úpravu hran.",
   "error.unknown": "Došlo k chybě: {detail}",
