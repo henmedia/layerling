@@ -162,7 +162,7 @@ describe("the surface texture card in a shape's settings", () => {
     expect(button(panel, "Load your own image…")).toBeDefined();
   });
 
-  it("presses an image on once where it is put, as a text: width, place and turn, and the projection and faces gone", async () => {
+  it("presses an image on once where it is put, as a text: width, place and turn, and the projection gone, faces to pick still there", async () => {
     const { panel, calls } = mount(cylinder);
     choosePattern(panel, "Image");
     expect(rangeNamed(panel, "Tile width")).toBeTruthy();
@@ -176,9 +176,9 @@ describe("the surface texture card in a shape's settings", () => {
     expect(rangeNamed(panel, "Around (°)")).toBeTruthy();
     expect(rangeNamed(panel, "Height (%)")).toBeTruthy();
     expect(rangeNamed(panel, "Turned (°)")).toBeTruthy();
-    // It goes where it is put: no projection, no faces to pick.
+    // It goes where it is put: no projection. Faces picked take it as they take a pattern all over (#1206, #1462).
     expect(selectWith(panel, "allRound")).toBeUndefined();
-    expect(button(panel, "Pick faces")).toBeUndefined();
+    expect(button(panel, "Pick faces")).toBeDefined();
     await act(async () => button(panel, "Apply texture")!.click());
     expect(calls.applied[0]).toMatchObject({ pattern: "image", imageTiling: "once", textAround: 0, textHeight: 50 });
   });
