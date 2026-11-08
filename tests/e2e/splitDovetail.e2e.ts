@@ -244,6 +244,29 @@ describe("round, narrowing and tilted bodies", () => {
     dispose(created);
   });
 
+  it("keeps the tongue's foot inside its own half on a box stood on its edge (Discussion #1451)", async () => {
+    // A 30 mm box turned 45 degrees about the front axis, standing on an edge, cut upright through its middle: below the
+    // cut face the minus half leans in towards the top and bottom corners, where the tongue's foot used to stand out.
+    const tilted = box(30, 30, 30, { x: 27, z: -20, elevation: 6.2132034355964265, rotationZ: 315 } as Partial<WorkplaneShape>);
+    const result = await splitShapeByPlane(tilted, { axis: "x", normal: [1, 0, 0], position: 27 }, dovetail);
+    expect(result.connectors?.placed).toBe(1);
+    const created: ManifoldSolid[] = [];
+    const whole = solidOf(tilted, created);
+    for (const part of result.parts!) {
+      const solid = solidOf(part, created);
+      const beyond = solid.subtract(whole);
+      created.push(beyond);
+      // Nothing of either half stands out of the box: no flap at the corners.
+      expect(beyond.volume(), part.name).toBeLessThan(1e-3);
+      expect(solid.decompose().length, part.name).toBe(1);
+    }
+    // The halves still slide apart along the tongue (upright here) and hold when pulled apart across the cut.
+    const [above, below] = result.parts!.map((part) => solidOf(part, created));
+    for (const along of [1, 10]) expect(overlapWhenMoved(below, above, [0, along, 0], created)).toBeLessThan(1e-3);
+    expect(overlapWhenMoved(below, above, [3, 0, 0], created)).toBeGreaterThan(5);
+    dispose(created);
+  });
+
   it("splits a mesh body as it splits a box", async () => {
     const source = box(50, 50, 40);
     const mesh = meshForShape(source);

@@ -386,7 +386,7 @@ function planSplitDovetails(runtime: ManifoldToplevel, positive: ManifoldSolid, 
 /**
  * A dovetail made: the tongues joined to the half on the minus side of the plane, and their grooves cut through the
  * other. A tongue's top is kept within the other half - where that half is narrower above the cut than the face, its ends
- * follow its surface. The groove runs straight through the other half along the tongue, but only through the part of it
+ * follow its surface - and its foot within its own half, where that one leans in below the face. The groove runs straight through the other half along the tongue, but only through the part of it
  * that holds the tongue: where a cut through two legs lines a tongue up with the other leg, that leg keeps its material,
  * as each stump slides on by itself. Only when both halves are one body each, and so must slide together, do the grooves
  * run through all of the other half.
@@ -401,6 +401,16 @@ function applySplitDovetails(runtime: ManifoldToplevel, positive: ManifoldSolid,
   created.push(above, outside);
   if (outside.volume() > 1e-6) {
     tongues = tongues.subtract(outside);
+    created.push(tongues);
+  }
+  // Its foot, below the plane, stays within its own half: where that half leans in under the face (a box stood on its
+  // edge, a chamfer), the foot's ends stood out of it as thin flaps at the ends of the face (Discussion #1451).
+  const framedNegative = negative.transform(toFrame);
+  const below = tongues.trimByPlane([0, 0, -1], -plan.position);
+  const outsideBelow = below.subtract(framedNegative);
+  created.push(framedNegative, below, outsideBelow);
+  if (outsideBelow.volume() > 1e-6) {
+    tongues = tongues.subtract(outsideBelow);
     created.push(tongues);
   }
   // The grooves through the whole other half, from one side of its box to the other along the tongues.
