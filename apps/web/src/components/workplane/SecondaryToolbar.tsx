@@ -773,10 +773,12 @@ export function SecondaryToolbar({
   const collapseBox = (label: string, Icon: ComponentType, tool?: ToolbarTool) => (
     <div className="toolbar-section-tools toolbar-collapse-box">
       {tool ? (
-        <>
+        // The tab hangs from the button, not from the frame, so it lines up with the other groups' tabs at every
+        // toolbar size (#1506).
+        <span className="toolbar-collapse-anchor">
           {toolButton(tool, true)}
           <button className="toolbar-collapse-trigger toolbar-collapse-tab" type="button" aria-label={t("editor.group.foldedHint", { group: label })} title={t("editor.group.foldedHint", { group: label })} aria-expanded={false} data-collapse-trigger />
-        </>
+        </span>
       ) : (
         <button className="toolbar-icon toolbar-collapse-trigger" type="button" aria-label={t("editor.group.foldedHint", { group: label })} title={t("editor.group.foldedHint", { group: label })} aria-expanded={false} data-collapse-trigger>
           <Icon />
