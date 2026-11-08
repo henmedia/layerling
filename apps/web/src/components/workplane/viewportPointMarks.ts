@@ -5,14 +5,16 @@ import { RENDER_LAYER_PREVIEWS } from "./viewportShapeObjects";
 /**
  * A point shown while "Point to point" picks (Discussion #1491): the one the
  * pointer would take, and the two already clicked - the one that moves and
- * the one it moves to.
+ * the one it moves to; for the second and third pair also the points the body
+ * turns about.
  */
-export type PointMark = { x: number; y: number; z: number; role: "hover" | "source" | "target" };
+export type PointMark = { x: number; y: number; z: number; role: "hover" | "source" | "target" | "pivot" };
 
 const MARK_COLORS: Record<PointMark["role"], string> = {
   hover: "#e0347c",
   source: "#f08c00",
   target: "#2f9e44",
+  pivot: "#1c7ed6",
 };
 const MARK_SIZE_PX = 14;
 

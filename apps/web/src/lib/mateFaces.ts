@@ -99,3 +99,49 @@ export function concentricMotion(source: Pick<RoundFaceAxis, "point" | "directio
   const translation = offset.addScaledVector(targetDirection, -offset.dot(targetDirection));
   return { rotation: turned ? rotation : null, pivot, translation };
 }
+
+/** Closer than this to the pivot or the axis, a point gives no direction to turn by. */
+const POINT_TURN_MIN_DISTANCE = 1e-4;
+
+/**
+ * "Point to point", second pair (Discussion #1491): the first point already
+ * lies where it should, at `pivot`. The body turns about it - the shortest
+ * turn - so the line from the pivot through `source` runs through `target`.
+ * Null when either point lies on the pivot and gives no direction.
+ */
+export function pointTurnAboutPivot(pivot: Vec, source: Vec, target: Vec): THREE.Quaternion | null {
+  const from = vector(source).sub(vector(pivot));
+  const to = vector(target).sub(vector(pivot));
+  if (from.length() < POINT_TURN_MIN_DISTANCE || to.length() < POINT_TURN_MIN_DISTANCE) return null;
+  return shortestTurn(from, to);
+}
+
+/**
+ * "Point to point", third pair: the first two pairs fixed a line, from `pivot`
+ * towards `axisPoint`. The body turns about that line only, so `source` comes
+ * into the plane through the line and `target` - on the same side. Null when
+ * either point lies on the line.
+ */
+export function pointTurnAboutAxis(pivot: Vec, axisPoint: Vec, source: Vec, target: Vec): THREE.Quaternion | null {
+  const origin = vector(pivot);
+  const axis = vector(axisPoint).sub(origin);
+  if (axis.length() < POINT_TURN_MIN_DISTANCE) return null;
+  axis.normalize();
+  const across = (value: Vec) => {
+    const offset = vector(value).sub(origin);
+    return offset.addScaledVector(axis, -offset.dot(axis));
+  };
+  const from = across(source);
+  const to = across(target);
+  if (from.length() < POINT_TURN_MIN_DISTANCE || to.length() < POINT_TURN_MIN_DISTANCE) return null;
+  from.normalize();
+  to.normalize();
+  const angle = Math.atan2(new THREE.Vector3().crossVectors(from, to).dot(axis), from.dot(to));
+  return new THREE.Quaternion().setFromAxisAngle(axis, angle);
+}
+
+/** Where a point lands when the body turns by `rotation` about `pivot`. */
+export function turnedAbout(point: Vec, rotation: THREE.Quaternion, pivot: Vec): THREE.Vector3 {
+  const origin = vector(pivot);
+  return vector(point).sub(origin).applyQuaternion(rotation).add(origin);
+}

@@ -71,7 +71,7 @@ import { FlexiPanel, type FlexiToolSettings } from "./workplane/FlexiPanel";
 import { LidPanel } from "./workplane/LidPanel";
 import { DeleteFacePanel } from "./workplane/DeleteFacePanel";
 import { MateFacesPanel } from "./workplane/MateFacesPanel";
-import { ALL_MATE_AXES, concentricMotion, mateMotion, pointMotion, type FacePick, type MateAxes, type MateMode, type PointPick } from "@/lib/mateFaces";
+import { ALL_MATE_AXES, concentricMotion, mateMotion, pointMotion, pointTurnAboutAxis, pointTurnAboutPivot, turnedAbout, type FacePick, type MateAxes, type MateMode, type PointPick } from "@/lib/mateFaces";
 import { roundFaceNear } from "@/lib/roundFaceAxis";
 import { carriedOntoFace } from "@/lib/carryOntoFace";
 import { HolePatternPanel } from "./workplane/HolePatternPanel";
@@ -1935,12 +1935,21 @@ function pointMatedShapes(shapes: WorkplaneShape[], shapeId: string, source: Poi
 }
 
 /**
+ * "Point to point", second or third pair (Discussion #1491): the body turns
+ * by `rotation` about `pivot`, the first point, which stays where it is.
+ */
+function pointTurnedShapes(shapes: WorkplaneShape[], shapeId: string, rotation: THREE.Quaternion, pivot: PointPick["point"]): WorkplaneShape[] {
+  const center = new THREE.Vector3(pivot.x, pivot.y, pivot.z);
+  return shapes.map((shape) => shape.id !== shapeId ? shape : canonicalizeShape({ ...shape, ...rotatedGeometryShapePatch(shape, rotation, center) }));
+}
+
+/**
  * "Align faces" switched to another way of meeting. Concentric needs round
  * faces: a flat face already clicked is asked for again. Points and faces are
  * picked apart, so switching to or from "Point to point" starts over.
  */
-function mateToolWithMode<T extends { step: "source" | "target" | "ready"; source: FacePick | null; target: FacePick | null; sourcePoint: PointPick | null; targetPoint: PointPick | null; mode: MateMode }>(tool: T, mode: MateMode): T {
-  if ((mode === "point") !== (tool.mode === "point")) return { ...tool, mode, step: "source", source: null, target: null, sourcePoint: null, targetPoint: null };
+function mateToolWithMode<T extends { step: "source" | "target" | "ready"; source: FacePick | null; target: FacePick | null; sourcePoint: PointPick | null; targetPoint: PointPick | null; mode: MateMode; pair: 1 | 2 | 3; pivot: PointPick["point"] | null; axisPoint: PointPick["point"] | null }>(tool: T, mode: MateMode): T {
+  if ((mode === "point") !== (tool.mode === "point")) return { ...tool, mode, step: "source", source: null, target: null, sourcePoint: null, targetPoint: null, pair: 1, pivot: null, axisPoint: null };
   if (mode !== "concentric") return { ...tool, mode };
   if (tool.source && !tool.source.axis) return { ...tool, mode, step: "source", source: null, target: null };
   if (tool.target && !tool.target.axis) return { ...tool, mode, step: "target", target: null };
@@ -3277,6 +3286,11 @@ export function LayerlingEditor({
     mode: MateMode;
     gap: number;
     axes: MateAxes;
+    // "Point to point" (Discussion #1491): pair 2 turns the body about `pivot`, the first point
+    // where it landed; pair 3 about the line from `pivot` to `axisPoint`, where the second landed.
+    pair: 1 | 2 | 3;
+    pivot: PointPick["point"] | null;
+    axisPoint: PointPick["point"] | null;
   } | null>(null);
   // "Hole pattern": a flat face or a round wall (#1393) of the selected body, then the holes that fit it (#223).
   const [holePatternTool, setHolePatternTool] = useState<{
@@ -9667,7 +9681,7 @@ export function LayerlingEditor({
     stopCruise();
     setPivotPickMode(false);
     setLayFlatPickMode(false);
-    setMateTool({ sourceId: source.id, step: "source", source: null, target: null, sourcePoint: null, targetPoint: null, mode: "against", gap: 0, axes: ALL_MATE_AXES });
+    setMateTool({ sourceId: source.id, step: "source", source: null, target: null, sourcePoint: null, targetPoint: null, mode: "against", gap: 0, axes: ALL_MATE_AXES, pair: 1, pivot: null, axisPoint: null });
     setNotice(t("status.mateStart"));
   }, [refuseLockedSelection, closeSplit, mateTool, selectedShapes, stopCruise]);
 
@@ -9706,7 +9720,7 @@ export function LayerlingEditor({
         return;
       }
       setMateTool({ ...mateTool, step: "target", sourcePoint: pick });
-      setNotice(t("status.matePointTarget"));
+      setNotice(t(mateTool.pair > 1 ? "status.matePointTurnTarget" : "status.matePointTarget"));
       return;
     }
     if (!pick || pick.shapeId === mateTool.sourceId) {
@@ -9719,10 +9733,33 @@ export function LayerlingEditor({
 
   const applyMateFaces = useCallback(() => {
     if (mateTool?.mode === "point") {
-      const { sourceId, sourcePoint, targetPoint, axes } = mateTool;
-      if (!sourcePoint || !targetPoint || !(axes.x || axes.y || axes.z)) return;
+      const { sourceId, sourcePoint, targetPoint, axes, pair, pivot, axisPoint } = mateTool;
+      if (!sourcePoint || !targetPoint) return;
+      const nextPair = { step: "source" as const, sourcePoint: null, targetPoint: null };
+      if (pair === 1) {
+        if (!(axes.x || axes.y || axes.z)) return;
+        // The tool stays open: a second pair may turn the body about the point that just landed.
+        const landed = new THREE.Vector3(sourcePoint.point.x, sourcePoint.point.y, sourcePoint.point.z).add(pointMotion(sourcePoint.point, targetPoint.point, axes));
+        commitShapes(pointMatedShapes(shapes, sourceId, sourcePoint.point, targetPoint.point, axes), [sourceId], t("status.matedPoint"));
+        setMateTool({ ...mateTool, ...nextPair, pair: 2, pivot: { x: landed.x, y: landed.y, z: landed.z } });
+        return;
+      }
+      if (!pivot) return;
+      const rotation = pair === 2
+        ? pointTurnAboutPivot(pivot, sourcePoint.point, targetPoint.point)
+        : axisPoint ? pointTurnAboutAxis(pivot, axisPoint, sourcePoint.point, targetPoint.point) : null;
+      if (!rotation) {
+        setMateTool({ ...mateTool, ...nextPair });
+        setNotice(t(pair === 2 ? "status.matePointOnPivot" : "status.matePointOnAxis"));
+        return;
+      }
+      commitShapes(pointTurnedShapes(shapes, sourceId, rotation, pivot), [sourceId], t("status.matePointTurned"));
+      if (pair === 2) {
+        // The third pair turns about the line the first two fixed: from the pivot through the second target.
+        setMateTool({ ...mateTool, ...nextPair, pair: 3, axisPoint: targetPoint.point });
+        return;
+      }
       setMateTool(null);
-      commitShapes(pointMatedShapes(shapes, sourceId, sourcePoint.point, targetPoint.point, axes), [sourceId], t("status.matedPoint"));
       return;
     }
     if (!mateTool?.source || !mateTool.target) return;
@@ -13349,13 +13386,37 @@ export function LayerlingEditor({
           throw new Error("mate_faces point axes must be some of x, z, elevation");
         }
         const axes: MateAxes = { x: named.includes("x"), y: named.includes("z"), z: named.includes("elevation") };
-        const nextShapes = pointMatedShapes(all, mover.id, source, goal, axes);
-        commitShapes(nextShapes, [mover.id], t("status.matedPoint"));
         const motion = pointMotion(source, goal, axes);
+        let nextShapes = pointMatedShapes(all, mover.id, source, goal, axes);
+        // A second and third pair turn the body after the move (Discussion #1491). Their points are
+        // given where they are now, before anything moves, and are carried along with the body.
+        const pivot = new THREE.Vector3(source.x, source.y, source.z).add(motion);
+        const carried: THREE.Quaternion[] = [];
+        const carry = (point: { x: number; y: number; z: number }) => carried.reduce(
+          (current, rotation) => turnedAbout(current, rotation, pivot),
+          new THREE.Vector3(point.x, point.y, point.z).add(motion),
+        );
+        const turns: { pair: number; degrees: number }[] = [];
+        let axisPoint: { x: number; y: number; z: number } | null = null;
+        const pairGiven = (pair: 2 | 3) => params[`point${pair}`] !== undefined || params[`targetPoint${pair}`] !== undefined;
+        if (pairGiven(3) && !pairGiven(2)) throw new Error("mate_faces point needs point2 and targetPoint2 before point3");
+        for (const pair of [2, 3] as const) {
+          if (!pairGiven(pair)) break;
+          const from = carry(positionOf(params[`point${pair}`], `point${pair}`));
+          const to = positionOf(params[`targetPoint${pair}`], `targetPoint${pair}`);
+          const rotation = pair === 2 ? pointTurnAboutPivot(pivot, from, to) : pointTurnAboutAxis(pivot, axisPoint!, from, to);
+          if (!rotation) throw new Error(pair === 2 ? "point2 and targetPoint2 must not lie on the first point" : "point3 and targetPoint3 must not lie on the line through the first two target points");
+          nextShapes = pointTurnedShapes(nextShapes, mover.id, rotation, pivot);
+          carried.push(rotation);
+          axisPoint = to;
+          turns.push({ pair, degrees: Number((2 * Math.acos(Math.min(1, Math.abs(rotation.w))) * 180 / Math.PI).toFixed(3)) });
+        }
+        commitShapes(nextShapes, [mover.id], t(turns.length ? "status.matePointTurned" : "status.matedPoint"));
         return {
           mode: "point",
           axes: named,
           moved: { x: Number(motion.x.toFixed(4)), z: Number(motion.z.toFixed(4)), elevation: Number(motion.y.toFixed(4)) },
+          ...(turns.length ? { turned: turns } : {}),
           object: mcpShapeSummary(nextShapes.find((shape) => shape.id === mover.id) as WorkplaneShape),
         };
       }
@@ -18550,6 +18611,8 @@ export function LayerlingEditor({
                 shapeIds: mateTool.step === "source" ? [mateTool.sourceId] : shapes.filter((shape) => shape.id !== mateTool.sourceId && !shape.hidden).map((shape) => shape.id),
                 picking: mateTool.step !== "ready",
                 marks: [
+                  ...(mateTool.pivot ? [{ ...mateTool.pivot, role: "pivot" as const }] : []),
+                  ...(mateTool.axisPoint ? [{ ...mateTool.axisPoint, role: "pivot" as const }] : []),
                   ...(mateTool.sourcePoint ? [{ ...mateTool.sourcePoint.point, role: "source" as const }] : []),
                   ...(mateTool.targetPoint ? [{ ...mateTool.targetPoint.point, role: "target" as const }] : []),
                 ],
@@ -18875,6 +18938,7 @@ export function LayerlingEditor({
           mode={mateTool.mode}
           gap={mateTool.gap}
           axes={mateTool.axes}
+          pair={mateTool.mode === "point" ? mateTool.pair : 1}
           workspace={workspaceSettings}
           onModeChange={(mode) => setMateTool((current) => (current ? mateToolWithMode(current, mode) : current))}
           onGapChange={(gap) => setMateTool((current) => (current ? { ...current, gap } : current))}

@@ -18,7 +18,8 @@ const MAX_GAP = 100;
  * face of another body, face to face or side by side, with a gap if wanted;
  * or a round face onto the axis of a round face of another body (#794);
  * or a point of it onto a point of another body, along the axes switched on
- * (Discussion #1491).
+ * (Discussion #1491). After the first pair of points, a second pair turns the
+ * body about the first point and a third about the line through both.
  */
 export function MateFacesPanel({
   targetName,
@@ -26,6 +27,7 @@ export function MateFacesPanel({
   mode,
   gap,
   axes,
+  pair = 1,
   workspace,
   onModeChange,
   onGapChange,
@@ -38,6 +40,8 @@ export function MateFacesPanel({
   mode: MateMode;
   gap: number;
   axes: MateAxes;
+  /** Which pair of points "Point to point" is at: 2 and 3 turn the body instead of moving it. */
+  pair?: 1 | 2 | 3;
   workspace: WorkplaneWorkspaceSettings;
   onModeChange: (value: MateMode) => void;
   onGapChange: (value: number) => void;
@@ -47,6 +51,9 @@ export function MateFacesPanel({
 }) {
   useLanguage();
   const title = t("mate.title");
+  // Pairs 2 and 3 of "Point to point" turn the body instead of moving it.
+  const turnPair = mode === "point" && pair !== 1 ? pair : null;
+  const turning = turnPair !== null;
   return (
     <MovableToolPanel className="edge-modifier-panel mate-panel" ariaLabel={title}>
       {(handleProps) => (<>
@@ -63,7 +70,7 @@ export function MateFacesPanel({
 
       <div className="edge-modifier-target">
         <strong>{targetName}</strong>
-        <span role="status">{t(mode === "concentric" ? `mate.stepRound.${step}` : mode === "point" ? `mate.stepPoint.${step}` : `mate.step.${step}`)}</span>
+        <span role="status">{t(mode === "concentric" ? `mate.stepRound.${step}` : mode === "point" ? (turnPair ? `mate.stepPoint${turnPair}.${step}` : `mate.stepPoint.${step}`) : `mate.step.${step}`)}</span>
       </div>
 
       <div className="edge-modifier-field shell-openings" role="radiogroup" aria-label={t("mate.mode")}>
@@ -84,7 +91,7 @@ export function MateFacesPanel({
         </div>
       </div>
 
-      {mode === "point" ? (
+      {turning ? null : mode === "point" ? (
         <div className="edge-modifier-field shell-openings" role="group" aria-label={t("mate.axes")}>
           <span>{t("mate.axes")}</span>
           <div className="shell-opening-options punch-axis-options">
@@ -118,13 +125,13 @@ export function MateFacesPanel({
         />
       )}
 
-      {mode === "point" ? <p className="edge-modifier-note" role="note">{t("mate.axesHint")}</p> : null}
+      {mode === "point" ? <p className="edge-modifier-note" role="note">{t(turnPair ? `mate.turnHint${turnPair}` : "mate.axesHint")}</p> : null}
 
       <div className="edge-modifier-footer">
-        <button type="button" className="secondary" onClick={onCancel}>{t("common.cancel")}</button>
+        <button type="button" className="secondary" onClick={onCancel}>{t(turning ? "mate.done" : "common.cancel")}</button>
         <button type="button" className="primary" disabled={step !== "ready" || (mode === "point" && !(axes.x || axes.y || axes.z))} onClick={onApply}>
           <Check size={17} />
-          {t("mate.apply")}
+          {t(turning ? "mate.turn" : "mate.apply")}
         </button>
       </div>
       </>)}
