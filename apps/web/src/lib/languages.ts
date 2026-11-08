@@ -753,7 +753,7 @@ export const LANGUAGE_INFO: Readonly<Record<Language, LanguageInfo>> = {
     },
   },
   // Japanese: written for upper primary school children and their teachers, with Tinkercad's
-  // Japanese terms where Tinkercad has one. The guide is not translated yet.
+  // Japanese terms where Tinkercad has one. The guide is not translated yet; the README is.
   ja: {
     name: "日本語",
     htmlLang: "ja",
@@ -761,8 +761,8 @@ export const LANGUAGE_INFO: Readonly<Record<Language, LanguageInfo>> = {
     quotes: ["「", "」"],
     guideDir: "guide-ja",
     communityUrl: GITHUB_DISCUSSIONS,
-    readme: "README.md",
-    quickstartAnchor: "windows-quickstart",
+    readme: "README.ja.md",
+    quickstartAnchor: "windows-クイックスタート",
     legal: { imprint: "運営者情報", privacy: "プライバシーポリシー" },
     keyNames: { Click: "クリック", RightClick: "右クリック", MiddleClick: "中クリック", Drag: "ドラッグ" },
     asciiUmlauts: false,
