@@ -12820,7 +12820,6 @@ export function LayerlingEditor({
   const noticeError = (error: unknown) => setNotice(error instanceof Error ? localizedError(error.message) : String(error));
 
   /**
-  /**
    * A custom shape put into the design, from the shapes panel or the command search: like the shapes of the library it
    * hangs on the pointer and sits down where you click, also on a face (#463). Without "click to place" it stays where
    * it was put.
@@ -12833,6 +12832,8 @@ export function LayerlingEditor({
       setNotice(t("status.carryPlace"));
     }).catch(noticeError);
   };
+
+  /**
    * Throws away every earlier step of the design: it keeps the state it has now, as its only one
    * (#246 - a file to share without its history, or a design to start the undo steps over).
    */
@@ -18433,11 +18434,11 @@ export function LayerlingEditor({
         }}
         objects={shapes.map((shape) => ({ id: shape.id, name: displayShapeName(shape), kind: shape.kind, hidden: Boolean(shape.hidden) }))}
         onSelectObject={(id) => selectShape(id)}
+        customShapeEntries={customShapeEntries}
+        onInsertCustomShape={insertCustomShapeAndCarry}
         onNotice={(text) => setNotice(text)}
         splitActive={Boolean(splitSession)}
         renderMyShapes={(close) => (
-        customShapeEntries={customShapeEntries}
-        onInsertCustomShape={insertCustomShapeAndCarry}
           <MyShapesSection
             shapes={customShapeEntries}
             folders={customShapeFolders}
