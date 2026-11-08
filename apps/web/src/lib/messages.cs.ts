@@ -1940,6 +1940,7 @@ export const MESSAGES_CS: Record<MessageKey, string> = {
   "status.nothingMeasurable": "Výběr nemá měřitelnou geometrii pro vystředění",
   "status.alreadyCentered": "Výběr už je na pracovní rovině vystředěn",
   "status.objectLocked": "Objekt je zamčen",
+  "status.groupLocked": "Zamčenou část nelze seskupit ani svázat. Odemkněte ji pomocí Ctrl+L, nebo zamkněte jen její tvar pomocí Ctrl+Shift+L: taková část jde dál seskupit",
   "status.shapeLockRefused": "Tvar je zamčený: lze ho posouvat a otáčet, ale ne měnit (Ctrl+Shift+L ho odemkne)",
   "status.shapeLockHeld": "„{name}“ má zamčený tvar: velikost, nastavení a název zůstávají beze změny",
   "status.sharedUnavailable": "Tato instalace neukládá projekty na serveru",

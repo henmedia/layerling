@@ -10865,6 +10865,11 @@ export function LayerlingEditor({
   }, []);
 
   const groupSelected = useCallback(async () => {
+    // A locked part says why it stays out of a group, and the way round it, in place of the bare "Object locked".
+    if (selectionLocked) {
+      setNotice(t("status.groupLocked"));
+      return;
+    }
     if (refuseLockedSelection()) return;
     if (selectedShapes.length < 2) {
       setNotice(t("status.selectTwoToGroup"));
@@ -10902,10 +10907,14 @@ export function LayerlingEditor({
       editableGroup.id,
       result.openGapEdges ? t("status.cutLeftOpen", { count: result.openGapEdges }) : result.mergeWarning ?? withClosedHolesNote(t("status.groupedMany", { count: selectedShapes.length }), result.closedHoles),
     );
-  }, [refuseLockedSelection, commitShapes, selectedIds, selectedShapes, activeRotationPivot]);
+  }, [selectionLocked, refuseLockedSelection, commitShapes, selectedIds, selectedShapes, activeRotationPivot]);
 
   /** the usual bundle (Ctrl+B): the parts move, turn and scale together and stay what they are. */
   const bundleSelected = useCallback(() => {
+    if (selectionLocked) {
+      setNotice(t("status.groupLocked"));
+      return;
+    }
     if (refuseLockedSelection()) return;
     if (selectedShapes.length < 2) {
       setNotice(t("status.selectTwoToBundle"));
@@ -10923,7 +10932,7 @@ export function LayerlingEditor({
     const selected = new Set(selectedIds);
     const bundle = withSelectionPivot(canonicalizeShape({ ...group, name: "Bundle", groupOperation: "bundle" }), activeRotationPivot);
     commitShapes([...shapesRef.current.filter((shape) => !selected.has(shape.id)), bundle], bundle.id, t("status.bundledMany", { count: selectedShapes.length }));
-  }, [refuseLockedSelection, commitShapes, selectedIds, selectedShapes, activeRotationPivot]);
+  }, [selectionLocked, refuseLockedSelection, commitShapes, selectedIds, selectedShapes, activeRotationPivot]);
 
   /**
    * A socket with screw holes (D-Sub 9) chosen for an opening: the opening takes it, and it and its

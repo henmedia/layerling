@@ -1786,6 +1786,7 @@ export const MESSAGES_IT: Partial<Record<MessageKey, string>> = {
   "status.shapeLockOn": "Forma bloccata: si sposta, ruota e raggruppa ancora, ma mantiene dimensioni e impostazioni",
   "status.shapeLockOff": "Forma sbloccata",
   "status.objectLocked": "Oggetto bloccato",
+  "status.groupLocked": "Un pezzo bloccato non può essere raggruppato né legato. Sbloccalo con Ctrl+L, oppure blocca solo la sua forma con Ctrl+Shift+L: quel pezzo si può ancora raggruppare",
   "status.shapeLockRefused": "La forma è bloccata: si può spostare e ruotare, ma non modificare (Ctrl+Shift+L la sblocca)",
   "status.shapeLockHeld": "«{name}» ha la forma bloccata: dimensioni, impostazioni e nome restano come sono",
   "status.selectionToHole": "Selezione convertita in foro",

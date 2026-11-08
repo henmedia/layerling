@@ -1750,6 +1750,7 @@ export const MESSAGES_ZH_TW: Partial<Record<MessageKey, string>> = {
   "status.shapeLockOn": "形狀已鎖定：仍可移動、旋轉和組成群組，但保持尺寸和設定不變",
   "status.shapeLockOff": "形狀已解鎖",
   "status.objectLocked": "物件已鎖定",
+  "status.groupLocked": "已鎖定的零件無法群組或綑綁。請用 Ctrl+L 解鎖，或用 Ctrl+Shift+L 僅鎖定其形狀：這樣的零件仍可群組",
   "status.shapeLockRefused": "形狀已鎖定：可以移動和旋轉，但不能變更（Ctrl+Shift+L 解鎖）",
   "status.shapeLockHeld": "「{name}」的形狀已鎖定：尺寸、設定和名稱保持不變",
   "status.selectionToHole": "已將選取項目改為孔",

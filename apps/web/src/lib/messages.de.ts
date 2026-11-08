@@ -1794,6 +1794,7 @@ export const MESSAGES_DE: Record<MessageKey, string> = {
   "status.shapeLockOn": "Form gesperrt: Sie lässt sich weiter verschieben, drehen und gruppieren, behält aber Größe und Einstellungen",
   "status.shapeLockOff": "Form entsperrt",
   "status.objectLocked": "Objekt gesperrt",
+  "status.groupLocked": "Ein gesperrtes Teil lässt sich nicht gruppieren oder bündeln. Entsperre es mit Strg+L oder sperre nur seine Form mit Strg+Umschalt+L: dieses Teil lässt sich weiter gruppieren",
   "status.shapeLockRefused": "Die Form ist gesperrt: Sie lässt sich verschieben und drehen, aber nicht ändern (Strg+Umschalt+L entsperrt sie)",
   "status.shapeLockHeld": "Bei „{name}“ ist die Form gesperrt: Größe, Einstellungen und Name bleiben, wie sie sind",
   "status.selectionToHole": "Auswahl ist jetzt eine Aussparung",
