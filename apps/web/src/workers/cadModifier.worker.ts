@@ -1019,7 +1019,7 @@ class EdgeTreatmentError extends Error {
 }
 
 // Measuring the picked curves for a bend tighter than the fillet (#1473) runs only once the fillet was refused.
-const TIGHT_BEND_BUDGET_MS = 1500;
+const TIGHT_BEND_BUDGET_MS = 3000;
 
 function treatEdges(cad: OcctKernel, solid: ShapeHandle, edges: ShapeHandle[], request: Extract<CadModifierWorkerRequest, { type: "preview" }>) {
   // A variable fillet (#687) runs from `amount` at the edge's start to `endAmount` at its end; the kernel takes one edge.

@@ -92,7 +92,7 @@ export function bendsRoundTheOutside(inside: (point: Vec3) => boolean, bend: Ben
   const u = unit(cross(bend.tangent, helper));
   if (!u) return false;
   const v = cross(bend.tangent, u);
-  const samples = 16;
+  const samples = 12;
   let material: Vec3 = { x: 0, y: 0, z: 0 };
   let hits = 0;
   for (let index = 0; index < samples; index += 1) {
@@ -123,7 +123,8 @@ export function tightestOutsideBend(cad: OcctKernel, solid: ShapeHandle, entries
       const range = cad.curveParameters(entry.edge);
       const curveLength = cad.curveLength(entry.edge);
       if (!(curveLength > 0)) continue;
-      const step = Math.max(0.005, Math.min(0.05, radius / 10));
+      // A tenth of the radius between samples finds a bend tighter than it to a few hundredths of a millimetre.
+      const step = Math.max(0.005, Math.min(0.1, radius / 10));
       const steps = Math.max(24, Math.min(800, Math.ceil(curveLength / step)));
       const closed = cad.curveIsClosed(entry.edge);
       const points: Vec3[] = [];
