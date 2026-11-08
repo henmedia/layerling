@@ -83,6 +83,7 @@ export function shapeWithParametricSource(shape: WorkplaneShape): WorkplaneShape
     slopeEnd: source.slopeEnd,
     slopeSide: source.slopeSide,
     slopeCurve: source.slopeCurve,
+    slopeFrom: source.slopeFrom,
     narrowEnd: source.narrowEnd,
     narrowSide: source.narrowSide,
     narrowCurve: source.narrowCurve,
@@ -733,6 +734,7 @@ export function workplaneShapesEqual(a: WorkplaneShape, b: WorkplaneShape) {
     a.slopeEnd === b.slopeEnd &&
     a.slopeSide === b.slopeSide &&
     a.slopeCurve === b.slopeCurve &&
+    a.slopeFrom === b.slopeFrom &&
     a.narrowEnd === b.narrowEnd &&
     a.narrowSide === b.narrowSide &&
     a.narrowCurve === b.narrowCurve &&

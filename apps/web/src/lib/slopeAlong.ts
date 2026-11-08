@@ -84,18 +84,34 @@ export type SlopeCurve = {
   end: number;
   /** The Bezier's control point, in (distance from the kept end, height). */
   control: { s: number; y: number };
+  /** From the middle (slopeFrom "middle"): the curve runs from the middle to each end, `length` is half the body's, `full` all of it. */
+  middle?: boolean;
+  full?: number;
 };
+
+/** Where the slope's top line starts: at one end (the other one low) or in the middle (both ends low, symmetric). */
+export type SlopeFrom = "end" | "middle";
+
+export function normalizeSlopeFrom(value: unknown): SlopeFrom {
+  return value === "middle" ? "middle" : "end";
+}
+
+/** A quadratic Bezier top line from (0, keep) to (length, end); `curve` -1 to 1 moves its control point as described above. */
+function topCurve(length: number, keep: number, end: number, curveValue: number): SlopeCurve {
+  const curve = normalizeSlopeCurve(curveValue);
+  const middle = { s: length / 2, y: (keep + end) / 2 };
+  const corner = curve >= 0 ? { s: length, y: keep } : { s: 0, y: end };
+  const share = Math.abs(curve);
+  return { length, keep, end, control: { s: middle.s + (corner.s - middle.s) * share, y: middle.y + (corner.y - middle.y) * share } };
+}
 
 export function slopeCurveForShape(shape: WorkplaneShape): SlopeCurve {
   const side = normalizeSlopeSide(shape.kind, shape.slopeSide);
   const length = slopeAlongWidth(side) ? (shape.width ?? shape.size) : (shape.depth ?? shape.size);
   const keep = shape.height;
   const end = slopeEndHeight(shape);
-  const curve = normalizeSlopeCurve(shape.slopeCurve);
-  const middle = { s: length / 2, y: (keep + end) / 2 };
-  const corner = curve >= 0 ? { s: length, y: keep } : { s: 0, y: end };
-  const share = Math.abs(curve);
-  return { length, keep, end, control: { s: middle.s + (corner.s - middle.s) * share, y: middle.y + (corner.y - middle.y) * share } };
+  if (normalizeSlopeFrom(shape.slopeFrom) === "middle") return { ...topCurve(length / 2, keep, end, shape.slopeCurve ?? 0), middle: true, full: length };
+  return topCurve(length, keep, end, shape.slopeCurve ?? 0);
 }
 
 /** The top's height (mm) at `s` mm from the kept end. */
@@ -120,6 +136,11 @@ export function slopeTopAt(curve: SlopeCurve, s: number) {
 /** The factor a point's height is scaled by: the top's height there over the body's height. */
 export function slopeScaleAt(curve: SlopeCurve, s: number) {
   return slopeTopAt(curve, s) / Math.max(1e-9, curve.keep);
+}
+
+/** `s` is the distance from the end the slope is measured from: from the middle it is folded onto the distance from the middle. */
+export function slopeTopAtDistance(curve: SlopeCurve, s: number) {
+  return slopeTopAt(curve, curve.middle ? Math.abs(s - (curve.full ?? 2 * curve.length) / 2) : s);
 }
 
 /**
@@ -192,6 +213,11 @@ export function shapeHasNarrow(shape: WorkplaneShape) {
 /** Either deformation along the length. */
 export function shapeHasAlongDeform(shape: WorkplaneShape) {
   return shapeHasSlope(shape) || shapeHasNarrow(shape);
+}
+
+/** A slope from the middle has no exact CAD body yet: it keeps its display mesh. */
+export function shapeHasSymmetricDeform(shape: WorkplaneShape) {
+  return shapeHasSlope(shape) && normalizeSlopeFrom(shape.slopeFrom) === "middle";
 }
 
 export type NarrowCurve = SlopeCurve & {
@@ -293,7 +319,20 @@ export function slopeMesh(vertices: readonly Vec3[], faces: readonly Face[], sha
   const slopeCurve = slope ? slopeCurveForShape(shape) : null;
   const narrowCurve = narrow ? narrowCurveForShape(shape) : null;
   const cuts: Record<0 | 2, number[]> = { 0: [], 2: [] };
-  if (slopeCurve) {
+  // From the middle the line is cut on both sides of it, and at the middle itself, where the two halves meet in a ridge.
+  const aroundMiddle = (axis: 0 | 2, curve: SlopeCurve) => {
+    const low = axis === 0 ? min.x : min.z;
+    const high = axis === 0 ? max.x : max.z;
+    const centre = (low + high) / 2;
+    const half = (high - low) / 2;
+    cuts[axis].push(centre);
+    alongLevels(curve.length, 0, curve, roof).forEach((s) => {
+      const offset = (s / Math.max(1e-9, curve.length)) * half;
+      cuts[axis].push(centre - offset, centre + offset);
+    });
+  };
+  if (slopeCurve?.middle) aroundMiddle(slopeAlongWidth(slopeSide) ? 0 : 2, slopeCurve);
+  else if (slopeCurve) {
     const axis = slopeAlongWidth(slopeSide) ? 0 : 2;
     alongLevels(slopeCurve.length, 0, slopeCurve, roof).forEach((s) => cuts[axis].push(coordinate(slopeSide, s, slopeCurve.length)));
   }
@@ -308,7 +347,7 @@ export function slopeMesh(vertices: readonly Vec3[], faces: readonly Face[], sha
     let nx = x;
     let ny = y;
     let nz = z;
-    if (slopeCurve) ny = min.y + (y - min.y) * slopeScaleAt(slopeCurve, slopeDistance(slopeSide, x, z, min, max, slopeCurve.length));
+    if (slopeCurve) ny = min.y + (y - min.y) * (slopeTopAtDistance(slopeCurve, slopeDistance(slopeSide, x, z, min, max, slopeCurve.full ?? slopeCurve.length)) / Math.max(1e-9, slopeCurve.keep));
     if (narrowCurve) {
       const factor = narrowHalfWidthAt(narrowCurve, slopeDistance(narrowSide, x, z, min, max, narrowCurve.total)) / Math.max(1e-9, narrowCurve.keep);
       if (slopeAlongWidth(narrowSide)) nz = centerZ + (z - centerZ) * factor;

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { narrowCurveForShape, narrowHalfWidthAt, normalizeSlopeSide, shapeHasNarrow, shapeHasSlope, slopeCurveForShape, slopeDistance, slopeEndHeight, slopeMesh, slopeTopAt } from "@/lib/slopeAlong";
+import { narrowCurveForShape, narrowHalfWidthAt, normalizeSlopeSide, shapeHasNarrow, shapeHasSlope, shapeHasSymmetricDeform, slopeCurveForShape, slopeDistance, slopeEndHeight, slopeMesh, slopeTopAt, slopeTopAtDistance } from "@/lib/slopeAlong";
 import type { WorkplaneShape } from "@/types/layerling";
 
 function shape(kind: WorkplaneShape["kind"], extra: Partial<WorkplaneShape> = {}): WorkplaneShape {
@@ -77,5 +77,102 @@ describe("slope along", () => {
         expect(narrowHalfWidthAt(curve, s)).toBeGreaterThanOrEqual(3 - 1e-9);
       }
     }
+  });
+});
+
+type Vec3 = [number, number, number];
+
+/** A closed box of 30 (x) by 40 (z) by 20, bottom on y = 0, as 12 triangles. */
+function boxMesh() {
+  const vertices: Vec3[] = [];
+  for (const y of [0, 20]) for (const z of [-20, 20]) for (const x of [-15, 15]) vertices.push([x, y, z]);
+  const quad = (a: number, b: number, c: number, d: number): Array<[number, number, number]> => [[a, b, c], [a, c, d]];
+  const faces = [
+    ...quad(0, 2, 3, 1), ...quad(4, 5, 7, 6),
+    ...quad(0, 1, 5, 4), ...quad(2, 6, 7, 3),
+    ...quad(0, 4, 6, 2), ...quad(1, 3, 7, 5),
+  ];
+  return { vertices, faces };
+}
+
+/** The highest y of the vertices that lie at x (or z) = value. */
+function topAt(vertices: Vec3[], axis: 0 | 2, value: number) {
+  const near = vertices.filter((vertex) => Math.abs(vertex[axis] - value) < 1e-6);
+  return near.length ? Math.max(...near.map((vertex) => vertex[1])) : null;
+}
+
+describe("slope from the middle", () => {
+  it("keeps the old slope exactly as it was when nothing new is set", () => {
+    const { vertices, faces } = boxMesh();
+    for (const extra of [{ slopeEnd: 6, slopeSide: "back" as const }, { slopeEnd: 4, slopeSide: "right" as const, slopeCurve: -0.6 }, { slopeEnd: 8, slopeCurve: 0.5 }]) {
+      const plain = slopeMesh(vertices, faces, shape("box", extra));
+      const explicit = slopeMesh(vertices, faces, shape("box", { ...extra, slopeFrom: "end" }));
+      expect(explicit).toEqual(plain);
+    }
+  });
+
+  it("holds the full height in the middle and the end height at both ends, the two halves mirror images", () => {
+    for (const slopeCurve of [0, 0.6, -0.6]) {
+      const source = shape("box", { slopeEnd: 6, slopeSide: "back", slopeFrom: "middle", slopeCurve });
+      const mesh = boxMesh();
+      const out = slopeMesh(mesh.vertices, mesh.faces, source).vertices;
+      expect(topAt(out, 2, 0)).toBeCloseTo(20, 9);
+      expect(topAt(out, 2, -20)).toBeCloseTo(6, 9);
+      expect(topAt(out, 2, 20)).toBeCloseTo(6, 9);
+      // The two halves are mirror images: where there are vertices on both sides at the same distance, they stand equally high.
+      let pairs = 0;
+      for (const z of new Set(out.map(([, , value]) => Math.round(value * 1e6) / 1e6))) {
+        if (z <= 0) continue;
+        const here = topAt(out, 2, z);
+        const there = topAt(out, 2, -z);
+        if (here === null || there === null) continue;
+        pairs += 1;
+        expect(here).toBeCloseTo(there, 6);
+      }
+      // A straight slope has few cuts (the two ends only); a curved one is cut often.
+      expect(pairs).toBeGreaterThan(slopeCurve === 0 ? 0 : 5);
+    }
+  });
+
+  it("runs across the width when the slope side is left or right", () => {
+    const mesh = boxMesh();
+    const out = slopeMesh(mesh.vertices, mesh.faces, shape("box", { slopeEnd: 8, slopeSide: "right", slopeFrom: "middle" })).vertices;
+    expect(topAt(out, 0, 0)).toBeCloseTo(20, 9);
+    expect(topAt(out, 0, -15)).toBeCloseTo(8, 9);
+    expect(topAt(out, 0, 15)).toBeCloseTo(8, 9);
+  });
+
+  it("stays a closed body: every edge belongs to two triangles", () => {
+    for (const slopeCurve of [0, 0.7, -0.7]) {
+      const mesh = boxMesh();
+      const out = slopeMesh(mesh.vertices, mesh.faces, shape("box", { slopeEnd: 5, slopeSide: "front", slopeFrom: "middle", slopeCurve }));
+      const key = (v: number) => out.vertices[v].map((c) => Math.round(c * 1e5)).join(",");
+      const edges = new Map<string, number>();
+      for (const face of out.faces) {
+        for (let i = 0; i < 3; i += 1) {
+          const a = key(face[i]);
+          const b = key(face[(i + 1) % 3]);
+          const edge = a < b ? `${a}|${b}` : `${b}|${a}`;
+          edges.set(edge, (edges.get(edge) ?? 0) + 1);
+        }
+      }
+      expect([...edges.values()].every((count) => count === 2)).toBe(true);
+    }
+  });
+
+  it("measures the top from the middle, symmetric about it", () => {
+    const curve = slopeCurveForShape(shape("box", { slopeEnd: 6, slopeSide: "back", slopeFrom: "middle", slopeCurve: 0.4 }));
+    expect(curve.middle).toBe(true);
+    expect(curve.length).toBe(20);
+    for (const offset of [0, 3, 9, 20]) {
+      expect(slopeTopAtDistance(curve, 20 + offset)).toBeCloseTo(slopeTopAtDistance(curve, 20 - offset), 9);
+    }
+    expect(slopeTopAtDistance(curve, 20)).toBeCloseTo(20, 9);
+    expect(slopeTopAtDistance(curve, 0)).toBeCloseTo(6, 9);
+  });
+
+  it("has no exact CAD body yet", () => {
+    expect(shapeHasSymmetricDeform(shape("box", { slopeEnd: 6, slopeFrom: "middle" }))).toBe(true);
+    expect(shapeHasSymmetricDeform(shape("box", { slopeEnd: 6 }))).toBe(false);
   });
 });
