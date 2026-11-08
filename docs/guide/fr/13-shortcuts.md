@@ -23,6 +23,7 @@ Le guide que vous lisez dispose également d'un champ de recherche, en haut de c
 - Le nom d'une forme ajoute cette forme au plan de travail, tout comme si vous cliquez dessus dans le menu des formes.
 - Avec un champ vide, la recherche répertorie les commandes que vous avez utilisées en dernier en haut.
 - Le nom d'un corps dans votre conception trouve ce corps et le sélectionne, ce qui facilite une conception comportant de nombreuses pièces. Les corps n'apparaissent qu'une fois que vous tapez.
+- Une forme personnalisée que vous avez enregistrée se trouve aussi par son nom dès que vous tapez, et un clic l'insère dans le motif comme dans le panneau des formes.
 - Cela fonctionne également en mode esquisse, avec les outils d'esquisse.
 
 ## Vos propres touches

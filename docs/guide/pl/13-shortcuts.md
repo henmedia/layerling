@@ -23,6 +23,7 @@ Instrukcja, którą czytasz, też ma pole wyszukiwania, na górze każdej strony
 - Nazwa kształtu dodaje ten kształt na płaszczyznę roboczą, tak jak kliknięcie go w menu kształtów.
 - Przy pustym polu wyszukiwanie pokazuje na górze ostatnio używane polecenia.
 - Nazwa bryły w Twoim projekcie znajduje tę bryłę i ją zaznacza, co pomaga w projekcie z wieloma częściami. Bryły pojawiają się dopiero, gdy zaczniesz pisać.
+- Zapisany własny kształt też można znaleźć po nazwie, gdy tylko zaczniesz pisać, a kliknięcie wstawia go do projektu jak w panelu kształtów.
 - Działa też w trybie szkicu, z narzędziami szkicu.
 
 ## Własne klawisze

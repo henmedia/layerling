@@ -24,6 +24,7 @@ Navodila, ki jih bereš, imajo tudi iskalno polje, na vrhu vsake strani: vpiši 
 - Ime oblike vstavi to obliko na delovno površino, popolnoma tako kot klik v meniju oblik.
 - Pri praznem polju so zadnje uporabljeni ukazi zgoraj.
 - Ime telesa v tvojem načrtu najde to telo in ga izbere, praktično pri načrtih z mnogimi deli. Telesa se pokažejo šele, ko začneš tipkati.
+- Shranjeno obliko po meri najdeš tudi po imenu, takoj ko začneš tipkati, klik pa jo vstavi v načrt kot v podoknu oblik.
 - Deluje tudi v skicirnem načinu, tam s skicirnimi orodji.
 
 ## Lastne tipke

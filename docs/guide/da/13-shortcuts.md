@@ -23,6 +23,7 @@ Vejledningen du læser har også en søgeboks, øverst på hver side: tast et or
 - En forms navn tilføjer den form til arbejdsplanet, ligesom at klikke den i formmenuen.
 - Med et tomt felt lister søgningen de kommandoer du brugte sidst øverst.
 - Navnet på en form i dit design finder den form og vælger den, hvilket hjælper i et design med mange dele. Former vises først når du taster.
+- En egen form, du har gemt, findes også på sit navn, så snart du skriver, og et klik sætter den ind i designet som i formpanelet.
 - Det virker også i skitsetilstand, med skitseværktøjerne.
 
 ## Dine egne taster

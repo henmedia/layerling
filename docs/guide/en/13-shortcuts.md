@@ -23,6 +23,7 @@ The guide you are reading has a search box too, at the top of every page: type a
 - A shape's name adds that shape to the workplane, just like clicking it in the shapes menu.
 - With an empty field the search lists the commands you used last at the top.
 - The name of a body in your design finds that body and selects it, which helps in a design with many parts. Bodies only appear once you type.
+- A custom shape you saved is found by its name too, once you type, and a click puts it into the design as in the shapes panel.
 - It works in sketch mode as well, with the sketch tools.
 
 ## Your own keys

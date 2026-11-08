@@ -24,6 +24,7 @@ Anche la guida che stai leggendo ha una casella di ricerca in cima a ogni pagina
 - Il nome di una forma la aggiunge al piano di lavoro, proprio come se la scegliessi dal menu delle forme.
 - Se il campo è vuoto, in cima compaiono i comandi usati più di recente.
 - Se cerchi il nome di un corpo del progetto, la ricerca lo trova e lo seleziona: è utile quando il progetto contiene molti pezzi. I corpi compaiono solo dopo che inizi a digitare.
+- Anche una forma personalizzata salvata si trova dal nome, appena digiti, e un clic la inserisce nel progetto come nel pannello delle forme.
 - La ricerca funziona anche in modalità schizzo, con gli strumenti per gli schizzi.
 
 ## I tuoi tasti

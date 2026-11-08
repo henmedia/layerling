@@ -263,6 +263,7 @@ export const MESSAGES_ZH_TW: Partial<Record<MessageKey, string>> = {
   "palette.disabled": "目前無法使用 – 通常是因為沒有選取任何內容。",
   "palette.hint": "↑ ↓ 選擇 · Enter 執行 · Esc 關閉",
   "palette.addShape": "新增形狀：{shape}",
+  "palette.addCustomShape": "新增自訂形狀：{shape}",
   "palette.group.mode": "模式",
   "palette.group.objects": "物件",
   "palette.selectObject": "選取實體：{name}",

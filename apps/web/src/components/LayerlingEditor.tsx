@@ -12820,6 +12820,19 @@ export function LayerlingEditor({
   const noticeError = (error: unknown) => setNotice(error instanceof Error ? localizedError(error.message) : String(error));
 
   /**
+  /**
+   * A custom shape put into the design, from the shapes panel or the command search: like the shapes of the library it
+   * hangs on the pointer and sits down where you click, also on a face (#463). Without "click to place" it stays where
+   * it was put.
+   */
+  const insertCustomShapeAndCarry = (id: string) => {
+    void insertMyShape(id).then((inserted) => {
+      if (!workspaceSettingsRef.current.clickToPlaceShapes || inserted.length === 0) return;
+      setCruiseAsset(null);
+      setCarryIds(inserted.map((shape) => shape.id));
+      setNotice(t("status.carryPlace"));
+    }).catch(noticeError);
+  };
    * Throws away every earlier step of the design: it keeps the state it has now, as its only one
    * (#246 - a file to share without its history, or a design to start the undo steps over).
    */
@@ -18423,6 +18436,8 @@ export function LayerlingEditor({
         onNotice={(text) => setNotice(text)}
         splitActive={Boolean(splitSession)}
         renderMyShapes={(close) => (
+        customShapeEntries={customShapeEntries}
+        onInsertCustomShape={insertCustomShapeAndCarry}
           <MyShapesSection
             shapes={customShapeEntries}
             folders={customShapeFolders}
@@ -18431,14 +18446,7 @@ export function LayerlingEditor({
             defaultName={selectedShapes.length === 1 ? displayShapeName(selectedShapes[0]) : t("myShapes.defaultName")}
             onInsert={(id) => {
               close();
-              void insertMyShape(id).then((inserted) => {
-                // Like the shapes of the library, it hangs on the pointer and sits down where you click, also on a
-                // face (#463). Without "click to place" it stays where it was put.
-                if (!workspaceSettingsRef.current.clickToPlaceShapes || inserted.length === 0) return;
-                setCruiseAsset(null);
-                setCarryIds(inserted.map((shape) => shape.id));
-                setNotice(t("status.carryPlace"));
-              }).catch(noticeError);
+              insertCustomShapeAndCarry(id);
             }}
             onSave={async (name, location, folderId) => {
               try {

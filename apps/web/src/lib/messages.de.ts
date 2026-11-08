@@ -262,6 +262,7 @@ export const MESSAGES_DE: Record<MessageKey, string> = {
   "palette.disabled": "Im Moment nicht verfügbar – oft fehlt eine Auswahl.",
   "palette.hint": "↑ ↓ wählen · Enter ausführen · Esc schließen",
   "palette.addShape": "Form hinzufügen: {shape}",
+  "palette.addCustomShape": "Eigene Form hinzufügen: {shape}",
   "palette.group.mode": "Modus",
   "palette.group.objects": "Objekte",
   "palette.selectObject": "Körper auswählen: {name}",

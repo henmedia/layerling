@@ -23,6 +23,7 @@ Auch diese Anleitung hat oben auf jeder Seite ein Suchfeld: Tippe ein oder zwei 
 - Der Name einer Form fügt diese Form auf die Arbeitsfläche ein, genau wie ein Klick im Formenmenü.
 - Bei leerem Feld stehen die zuletzt benutzten Befehle oben.
 - Der Name eines Körpers in deinem Entwurf findet diesen Körper und wählt ihn aus, praktisch bei Entwürfen mit vielen Teilen. Körper erscheinen erst, sobald du etwas tippst.
+- Eine selbst gespeicherte eigene Form findest du ebenfalls über ihren Namen, sobald du etwas tippst, und ein Klick fügt sie ein wie im Formenfenster.
 - Sie funktioniert auch im Skizzenmodus, dort mit den Skizzenwerkzeugen.
 
 ## Eigene Tasten

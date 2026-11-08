@@ -1386,6 +1386,7 @@ export const MESSAGES_DA: Partial<Record<MessageKey, string>> = {
   "palette.disabled": "Ikke tilgængelig lige nu – ofte fordi intet er valgt.",
   "palette.hint": "↑ ↓ vælg · Enter kør · Esc luk",
   "palette.addShape": "Tilføj form: {shape}",
+  "palette.addCustomShape": "Tilføj egen form: {shape}",
   "palette.group.mode": "Tilstand",
   "palette.group.objects": "Objekter",
   "palette.selectObject": "Vælg form: {name}",

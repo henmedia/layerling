@@ -23,6 +23,7 @@ O guia que você está lendo também tem uma caixa de pesquisa, no topo de cada 
 - O nome de uma forma adiciona essa forma ao plano de trabalho, como clicar nela no menu de formas.
 - Com o campo vazio, a pesquisa de comandos lista no topo os comandos que você usou por último.
 - O nome de um sólido do seu projeto encontra esse sólido e o seleciona, o que ajuda num projeto com muitas peças. Os sólidos só aparecem depois que você digita.
+- Uma forma personalizada que você salvou também é encontrada pelo nome assim que você digita, e um clique a insere no projeto como no painel de formas.
 - A pesquisa de comandos também funciona no modo de esboço, com as ferramentas de esboço.
 
 ## Suas próprias teclas

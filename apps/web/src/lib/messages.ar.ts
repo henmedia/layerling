@@ -261,6 +261,7 @@ export const MESSAGES_AR: Partial<Record<MessageKey, string>> = {
   "palette.disabled": "غير متاح حاليًا - غالبًا لم يتم تحديد أي شيء.",
   "palette.hint": "↑ ↓ للاختيار · Enter للتشغيل · Esc للإغلاق",
   "palette.addShape": "إضافة شكل: {shape}",
+  "palette.addCustomShape": "إضافة شكل مخصص: {shape}",
   "palette.group.mode": "الوضع",
   "palette.group.objects": "الأجسام",
   "palette.selectObject": "تحديد الجسم: {name}",

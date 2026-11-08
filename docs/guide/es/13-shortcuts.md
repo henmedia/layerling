@@ -23,6 +23,7 @@ La guía que estás leyendo también tiene un cuadro de búsqueda, arriba en cad
 - El nombre de una forma añade esa forma a la zona de trabajo, igual que si hicieras clic en ella en el menú de formas.
 - Con el campo vacío, la búsqueda muestra arriba los últimos comandos que has usado.
 - El nombre de un cuerpo de tu diseño encuentra ese cuerpo y lo selecciona, algo muy útil en un diseño con muchas piezas. Los cuerpos solo aparecen cuando empiezas a escribir.
+- Una forma personalizada que guardaste también se encuentra por su nombre en cuanto escribes, y un clic la inserta en el diseño como en el panel de formas.
 - También funciona en el modo de boceto, con las herramientas de boceto.
 
 ## Tus propias teclas

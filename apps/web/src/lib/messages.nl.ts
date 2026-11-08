@@ -262,6 +262,7 @@ export const MESSAGES_NL: Record<MessageKey, string> = {
   "palette.disabled": "Nu niet beschikbaar – vaak is er niets geselecteerd.",
   "palette.hint": "↑ ↓ kiezen · Enter uitvoeren · Esc sluiten",
   "palette.addShape": "Vorm toevoegen: {shape}",
+  "palette.addCustomShape": "Eigen vorm toevoegen: {shape}",
   "palette.group.mode": "Modus",
   "palette.group.objects": "Objecten",
   "palette.selectObject": "Lichaam selecteren: {name}",

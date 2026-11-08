@@ -244,6 +244,7 @@ export const MESSAGES_SL: Partial<Record<MessageKey, string>> = {
   "palette.disabled": "Trenutno ni na voljo – pogosto ni ničesar izbranega.",
   "palette.hint": "↑ ↓ izberi · Enter zaženi · Esc zapri",
   "palette.addShape": "Dodaj obliko: {shape}",
+  "palette.addCustomShape": "Dodaj obliko po meri: {shape}",
   "palette.group.mode": "Način",
   "palette.group.objects": "Objekti",
   "palette.selectObject": "Izberi telo: {name}",

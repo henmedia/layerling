@@ -266,6 +266,7 @@ export const MESSAGES_RU: Partial<Record<MessageKey, string>> = {
   "palette.disabled": "Сейчас недоступно — часто ничего не выделено.",
   "palette.hint": "↑ ↓ выбор · Enter запуск · Esc закрыть",
   "palette.addShape": "Добавить фигуру: {shape}",
+  "palette.addCustomShape": "Добавить собственную фигуру: {shape}",
   "palette.group.mode": "Режим",
   "palette.group.objects": "Объекты",
   "palette.selectObject": "Выбрать тело: {name}",

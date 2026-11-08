@@ -413,6 +413,7 @@ export const MESSAGES_CS: Record<MessageKey, string> = {
   "palette.disabled": "Nyní není dostupné; často proto, že nic není vybráno.",
   "palette.hint": "↑ ↓ výběr · Enter spustit · Esc zavřít",
   "palette.addShape": "Přidat tvar: {shape}",
+  "palette.addCustomShape": "Přidat vlastní tvar: {shape}",
   "palette.group.mode": "Režim",
   "palette.group.objects": "Objekty",
   "palette.selectObject": "Vybrat těleso: {name}",

@@ -259,6 +259,7 @@ export const MESSAGES_PL: Partial<Record<MessageKey, string>> = {
   "palette.disabled": "Teraz niedostępne. Często nic nie jest zaznaczone.",
   "palette.hint": "↑ ↓ wybór · Enter uruchom · Esc zamknij",
   "palette.addShape": "Dodaj kształt: {shape}",
+  "palette.addCustomShape": "Dodaj własny kształt: {shape}",
   "palette.group.mode": "Tryb",
   "palette.group.objects": "Obiekty",
   "palette.selectObject": "Zaznacz bryłę: {name}",

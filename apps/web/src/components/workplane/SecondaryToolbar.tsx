@@ -18,6 +18,7 @@ import { SketchBoltCircleIcon, SketchEllipseIcon, SketchHalfCircleIcon, SketchPi
   ToolbarCableChannelIcon, ToolbarCopyIcon, ToolbarDuplicateIcon, ToolbarDropToWorkplaneIcon, ToolbarBundleIcon, ToolbarGroupIcon, ToolbarGuideIcon, ToolbarHideSelectedIcon, ToolbarHomeIcon, ToolbarImportIcon, ToolbarIntersectionIcon,ToolbarClearanceIcon, ToolbarPrintCheckIcon, ToolbarHullIcon, ToolbarLoftSketchesIcon, ToolbarKeyboardIcon, ToolbarFilletIcon, ToolbarHistoryIcon, ToolbarHollowIcon, ToolbarOffsetIcon, ToolbarCutOutIcon, ToolbarPunchIcon, ToolbarDeleteFaceIcon, ToolbarSimplifyIcon, ToolbarMakeExactIcon, ToolbarSurfaceTextureIcon, ToolbarPaintIcon, ToolbarMirrorIcon, ToolbarRotationPivotIcon, ToolbarPatternIcon, ToolbarHolePatternIcon, ToolbarFaceToolIcon, ToolbarSupportRibIcon, ToolbarStencilBridgeIcon, ToolbarConstructionLineIcon, ToolbarMiddleLineIcon, ToolbarLayFlatIcon, ToolbarMateFacesIcon, ToolbarNoteIcon, ToolbarSplitIcon, ToolbarPasteIcon, ToolbarRedoIcon, ToolbarSnapGridIcon, ToolbarSettingsIcon, ToolbarShapeAddIcon, ToolbarTrashIcon, ToolbarUngroupIcon, ToolbarUndoIcon, ToolbarVectorExportIcon } from "../icons";
 import { type SketchPrimitive, type SketchTool } from "../SketchWorkspace";
 import { CommandPalette, type PaletteCommand } from "./CommandPalette";
+import { customShapeCommands } from "@/lib/customShapeCommands";
 import { COMMAND_KEYWORDS, COMMAND_SHORTCUTS, SHAPE_KEYWORDS } from "@/lib/commandKeywords";
 import { readCustomShortcuts, runCustomShortcutKey, setCustomShortcutCommandSource } from "@/lib/customShortcuts";
 import { LanguageSwitch } from "@/components/LanguageSwitch";
@@ -384,6 +385,8 @@ export function SecondaryToolbar({
   shapeCustomizations,
   objects,
   onSelectObject,
+  customShapeEntries,
+  onInsertCustomShape,
   onNotice,
   splitActive,
 }: {
@@ -583,6 +586,9 @@ export function SecondaryToolbar({
   /** The bodies of the design, so the command search can find them by name. */
   objects: ReadonlyArray<{ id: string; name: string; kind: string; hidden: boolean }>;
   onSelectObject: (id: string) => void;
+  /** The shapes the person saved (Custom shapes), found by name in the command search like the library's. */
+  customShapeEntries?: Array<{ id: string; name: string; thumbnail: string }>;
+  onInsertCustomShape?: (id: string) => void;
   /** Shows a line in the status bar - here: that a command on a key of your own cannot run right now. */
   onNotice?: (text: string) => void;
   /** While a body is being split the editor keeps every key; keys of your own wait too. */
@@ -1222,6 +1228,7 @@ export function SecondaryToolbar({
         () => addShapeFromMenu(shape),
         { image: shape.menuIcon, keywords: [shape.id, shape.name, ...(SHAPE_KEYWORDS[shape.id] ?? [])] },
       )),
+      ...(onInsertCustomShape ? customShapeCommands(customShapeEntries ?? [], shapesGroup, (name) => t("palette.addCustomShape", { shape: name }), onInsertCustomShape) : []),
       plain("shapes-panel", t("palette.openShapes"), shapesGroup, true, toggleShapesPanel, { icon: ToolbarShapeAddIcon, active: shapesOpen }),
       ...visibilityTools.map((tool) => fromTool(tool, visibilityGroup)),
       plain(

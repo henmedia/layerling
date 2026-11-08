@@ -23,6 +23,7 @@ Az útmutatónak, amelyet olvasol, szintén van keresőmezője, minden oldal tet
 - Egy alakzat nevével hozzáadod azt az alakzatot a munkasíkhoz, pont mintha az alakzatmenüben kattintanál rá.
 - Üres mezőnél a kereső felül az utoljára használt parancsokat sorolja fel.
 - A tervedben lévő test neve megtalálja és kijelöli azt a testet, ami sok részből álló tervben segít. A testek csak akkor jelennek meg, amikor gépelsz.
+- Az elmentett egyéni alakzatot is megtalálja a név alapján, amint gépelsz, és egy kattintás beteszi a tervbe, mint az alakzatpanelen.
 - Vázlatmódban is működik, a vázlateszközökkel.
 
 ## Saját billentyűk

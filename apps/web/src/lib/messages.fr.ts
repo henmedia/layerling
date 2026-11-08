@@ -257,6 +257,7 @@ export const MESSAGES_FR: Partial<Record<MessageKey, string>> = {
   "palette.disabled": "Non disponible pour le moment – souvent, rien n’est sélectionné.",
   "palette.hint": "↑ ↓ choisir · Entrer exécuter · Esc fermer",
   "palette.addShape": "Ajouter une forme : {shape}",
+  "palette.addCustomShape": "Ajouter une forme personnalisée : {shape}",
   "palette.group.mode": "Mode",
   "palette.group.objects": "Objets",
   "palette.selectObject": "Sélectionnez le corps : {name}",

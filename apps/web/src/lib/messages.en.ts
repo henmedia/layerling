@@ -263,6 +263,7 @@ export const MESSAGES_EN = {
   "palette.disabled": "Not available right now – often nothing is selected.",
   "palette.hint": "↑ ↓ choose · Enter run · Esc close",
   "palette.addShape": "Add shape: {shape}",
+  "palette.addCustomShape": "Add custom shape: {shape}",
   "palette.group.mode": "Mode",
   "palette.group.objects": "Objects",
   "palette.selectObject": "Select body: {name}",

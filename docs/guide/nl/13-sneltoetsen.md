@@ -23,6 +23,7 @@ Ook deze handleiding heeft een zoekveld, bovenaan elke pagina: typ een of twee w
 - De naam van een vorm zet die vorm op het werkvlak, net als een klik erop in het vormenmenu.
 - Met een leeg veld toont de zoekfunctie bovenaan de opdrachten die je het laatst hebt gebruikt.
 - De naam van een lichaam in je ontwerp vindt dat lichaam en selecteert het, handig in een ontwerp met veel onderdelen. Lichamen verschijnen pas zodra je iets typt.
+- Een eigen vorm die je hebt opgeslagen vind je ook op naam, zodra je iets typt, en een klik zet hem in het ontwerp zoals in het vormenpaneel.
 - Het werkt ook in de schetsmodus, met de schetsgereedschappen.
 
 ## Je eigen toetsen

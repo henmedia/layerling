@@ -23,6 +23,7 @@ Vyhledávací pole má i tato příručka, nahoře na každé stránce. Zadejte 
 - Zadání názvu tvaru jej přidá na pracovní rovinu stejně jako výběr v nabídce tvarů.
 - Prázdné pole nabízí nahoře naposledy použité příkazy.
 - Názvem tělesa vyhledáte a vyberete příslušný objekt v projektu. Pomůže to ve složitém modelu. Objekty se nabízejí až po zadání textu.
+- Vlastní tvar, který jste uložili, se najde také podle názvu, jakmile začnete psát, a kliknutí ho vloží do návrhu jako v panelu tvarů.
 - Vyhledávání funguje i v režimu náčrtu a nabízí jeho nástroje.
 
 ## Vlastní klávesy

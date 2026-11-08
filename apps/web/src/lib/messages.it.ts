@@ -259,6 +259,7 @@ export const MESSAGES_IT: Partial<Record<MessageKey, string>> = {
   "palette.disabled": "Non disponibile al momento: spesso non è selezionato alcun oggetto.",
   "palette.hint": "↑ ↓ scegli · Invio esegui · Esc chiudi",
   "palette.addShape": "Aggiungi forma: {shape}",
+  "palette.addCustomShape": "Aggiungi forma personalizzata: {shape}",
   "palette.group.mode": "Modalità",
   "palette.group.objects": "Oggetti",
   "palette.selectObject": "Seleziona solido: {name}",

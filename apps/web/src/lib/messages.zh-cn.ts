@@ -263,6 +263,7 @@ export const MESSAGES_ZH_CN: Partial<Record<MessageKey, string>> = {
   "palette.disabled": "当前不可用 – 通常是因为没有选中任何内容。",
   "palette.hint": "↑ ↓ 选择 · Enter 运行 · Esc 关闭",
   "palette.addShape": "添加形状：{shape}",
+  "palette.addCustomShape": "添加自定义形状：{shape}",
   "palette.group.mode": "模式",
   "palette.group.objects": "对象",
   "palette.selectObject": "选择实体：{name}",
