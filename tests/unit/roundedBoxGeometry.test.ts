@@ -8,6 +8,7 @@ import {
   createRoundedBoxGeometry,
   normalizeCornerFillets,
   normalizeCornerFillet,
+  normalizeEndFillets,
   normalizeTopBottomFillet,
   normalizeRoundedBoxQuality,
 } from "@/lib/roundedBoxGeometry";
@@ -328,5 +329,82 @@ describe("a plain box pulled into a rounded box", () => {
     }
     // each corner loses (1 - pi/4) r^2 of the outline, over the whole height
     expect(Math.abs(rounded.volume / (before.volume - 4 * (1 - Math.PI / 4) * 64 * 12) - 1)).toBeLessThan(2e-3);
+  });
+});
+
+describe("rounded box: top and bottom on their own", () => {
+  const build = (extra: Record<string, number | undefined>, quality = 8) => createRoundedBoxGeometry({
+    width: 40, depth: 30, height: 20, cornerFillet: 5, roundedBoxQuality: quality, ...extra,
+  });
+  const verticalExtent = (geometry: ReturnType<typeof build>, atY: number) => {
+    const position = geometry.getAttribute("position");
+    let min = Infinity;
+    let max = -Infinity;
+    for (let i = 0; i < position.count; i += 1) {
+      if (Math.abs(position.getY(i) - atY) > 1e-4) continue;
+      min = Math.min(min, position.getX(i));
+      max = Math.max(max, position.getX(i));
+    }
+    return max - min;
+  };
+
+  it("takes one radius for both ends as long as the bottom is not given", () => {
+    const shared = build({ topBottomFillet: 4 });
+    const same = build({ topBottomFillet: 4, bottomFillet: 4 });
+    expect(same.getAttribute("position").count).toBe(shared.getAttribute("position").count);
+    expect(signedVolume(same.getAttribute("position"))).toBeCloseTo(signedVolume(shared.getAttribute("position")), 6);
+    expect(normalizeEndFillets(4, undefined, 20)).toEqual([4, 4]);
+    expect(normalizeEndFillets(40, undefined, 20)).toEqual([10, 10]);
+  });
+
+  it("keeps a flat top over a rounded bottom, and the other way round", () => {
+    // (the edge is drawn as a quarter of an ellipse as wide as the corner radius, so the two are alike here)
+    const flatTop = build({ cornerFillet: 6, topBottomFillet: 0, bottomFillet: 6 });
+    const position = flatTop.getAttribute("position");
+    expect(signedVolume(position)).toBeGreaterThan(0);
+    expect([...edgeUseCounts(position).values()].every((uses) => uses === 2)).toBe(true);
+    expect(flatTop.boundingBox?.min.y).toBeCloseTo(0, 4);
+    expect(flatTop.boundingBox?.max.y).toBeCloseTo(20, 4);
+    // the top face reaches the full width, the bottom face is drawn in by the radius at each side
+    expect(verticalExtent(flatTop, 20)).toBeCloseTo(40, 3);
+    expect(verticalExtent(flatTop, 0)).toBeCloseTo(40 - 2 * 6, 3);
+
+    const flatBottom = build({ cornerFillet: 6, topBottomFillet: 6, bottomFillet: 0 });
+    expect(verticalExtent(flatBottom, 0)).toBeCloseTo(40, 3);
+    expect(verticalExtent(flatBottom, 20)).toBeCloseTo(40 - 2 * 6, 3);
+  });
+
+  it("is the mirror image when the two radii swap, and holds the box's size", () => {
+    const a = build({ topBottomFillet: 7, bottomFillet: 2 });
+    const b = build({ topBottomFillet: 2, bottomFillet: 7 });
+    expect(signedVolume(a.getAttribute("position"))).toBeCloseTo(signedVolume(b.getAttribute("position")), 2);
+    for (const geometry of [a, b]) {
+      expect(geometry.boundingBox?.min.y).toBeCloseTo(0, 4);
+      expect(geometry.boundingBox?.max.y).toBeCloseTo(20, 4);
+      expect((geometry.boundingBox?.max.x ?? 0) - (geometry.boundingBox?.min.x ?? 0)).toBeCloseTo(40, 3);
+      expect([...edgeUseCounts(geometry.getAttribute("position")).values()].every((uses) => uses === 2)).toBe(true);
+    }
+    // a top that is rounded more takes more away than one rounded less
+    expect(signedVolume(a.getAttribute("position"))).toBeLessThan(signedVolume(build({ topBottomFillet: 2, bottomFillet: 2 }).getAttribute("position")));
+    expect(signedVolume(a.getAttribute("position"))).toBeGreaterThan(signedVolume(build({ topBottomFillet: 7, bottomFillet: 7 }).getAttribute("position")));
+  });
+
+  it("lets one end take up all the height the other leaves, and no more", () => {
+    expect(normalizeEndFillets(18, 6, 20)).toEqual([14, 6]);
+    expect(normalizeEndFillets(3, 25, 20)).toEqual([0, 20]);
+    expect(normalizeEndFillets(-1, 2, 20)).toEqual([0, 2]);
+    expect(normalizeEndFillets(Number.NaN, 2, 20)[0]).toBeGreaterThanOrEqual(0);
+    // (with no wall left between the two the vertices of both rings coincide, as they do for a shared radius of half the height)
+    const full = build({ topBottomFillet: 13, bottomFillet: 6 });
+    expect([...edgeUseCounts(full.getAttribute("position")).values()].every((uses) => uses === 2)).toBe(true);
+  });
+
+  it("also holds with the flat chamfer of quality 1", () => {
+    const geometry = build({ topBottomFillet: 0, bottomFillet: 5 }, 1);
+    const position = geometry.getAttribute("position");
+    expect(signedVolume(position)).toBeGreaterThan(0);
+    expect([...edgeUseCounts(position).values()].every((uses) => uses === 2)).toBe(true);
+    expect(verticalExtent(geometry, 20)).toBeCloseTo(40, 3);
+    expect(verticalExtent(geometry, 0)).toBeLessThan(40 - 1);
   });
 });

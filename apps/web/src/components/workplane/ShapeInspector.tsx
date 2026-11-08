@@ -160,6 +160,7 @@ import {
   MAX_ROUNDED_BOX_QUALITY,
   normalizeCornerFillet,
   normalizeCornerFillets,
+  normalizeEndFillets,
   normalizeTopBottomFillet,
   normalizeRoundedBoxQuality,
 } from "@/lib/roundedBoxGeometry";
@@ -1099,6 +1100,39 @@ function getShapePropertiesWithAppLimits(shape: WorkplaneShape, onUpdate: ShapeI
     const roundedBoxQuality = shape.roundedBoxQuality ?? DEFAULT_ROUNDED_BOX_QUALITY;
     const maxCornerFillet = Math.max(1, Math.min(width, depth) / 2);
     const maxTopBottomFillet = Math.max(1, shape.height / 2);
+    // Top and bottom on their own: each can go as far as the other one leaves room for.
+    const endsSeparate = shape.bottomFillet !== undefined;
+    const [topFillet, bottomFillet] = normalizeEndFillets(topBottomFillet, shape.bottomFillet, shape.height);
+    const endRows: ShapePropertyConfig[] = endsSeparate
+      ? [
+          {
+            id: "topFillet",
+            label: t("prop.topFillet"),
+            value: topFillet,
+            min: 0,
+            max: Math.max(1, shape.height - bottomFillet),
+            step: 0.05,
+            onChange: (value) => onUpdate({ topBottomFillet: normalizeEndFillets(value, bottomFillet, shape.height)[0] }),
+          },
+          {
+            id: "bottomFillet",
+            label: t("prop.bottomFillet"),
+            value: bottomFillet,
+            min: 0,
+            max: Math.max(1, shape.height - topFillet),
+            step: 0.05,
+            onChange: (value) => onUpdate({ bottomFillet: normalizeEndFillets(topFillet, value, shape.height)[1] }),
+          },
+        ]
+      : [{
+          id: "topBottomFillet",
+          label: t("prop.topBottomFillet"),
+          value: topBottomFillet,
+          min: 0,
+          max: maxTopBottomFillet,
+          step: 0.05,
+          onChange: (value) => onUpdate({ topBottomFillet: normalizeTopBottomFillet(value, shape.height / 2) }),
+        }];
 
     // Own radii for each corner: with flat ends only (rounded ends round every corner alike).
     const flatEnds = topBottomFillet <= 1e-4;
@@ -1134,14 +1168,16 @@ function getShapePropertiesWithAppLimits(shape: WorkplaneShape, onUpdate: ShapeI
         disabled: !flatEnds,
         onChange: (separate) => onUpdate({ cornerFillets: separate ? [sharedRadius, sharedRadius, sharedRadius, sharedRadius] : undefined }),
       },
+      ...endRows,
       {
-        id: "topBottomFillet",
-        label: t("prop.topBottomFillet"),
-        value: topBottomFillet,
-        min: 0,
-        max: maxTopBottomFillet,
-        step: 0.05,
-        onChange: (value) => onUpdate({ topBottomFillet: normalizeTopBottomFillet(value, shape.height / 2) }),
+        type: "toggle" as const,
+        id: "endsSeparate",
+        label: t("prop.endsSeparate"),
+        value: endsSeparate,
+        // On, the bottom starts as the top was, so nothing changes shape; off, both take the top's radius again.
+        onChange: (value: boolean) => onUpdate(value
+          ? { bottomFillet: normalizeTopBottomFillet(topBottomFillet, shape.height / 2) }
+          : { topBottomFillet: normalizeTopBottomFillet(topFillet, shape.height / 2), bottomFillet: undefined }),
       },
       {
         id: "roundedBoxQuality",

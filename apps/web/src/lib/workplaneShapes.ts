@@ -930,6 +930,7 @@ export function workplaneShapesEqual(a: WorkplaneShape, b: WorkplaneShape) {
     a.cornerFillet === b.cornerFillet &&
     sameNumberList(a.cornerFillets, b.cornerFillets) &&
     a.topBottomFillet === b.topBottomFillet &&
+    a.bottomFillet === b.bottomFillet &&
     a.roundedBoxQuality === b.roundedBoxQuality &&
     a.bentTubeProfile === b.bentTubeProfile &&
     a.bentTubeInnerProfile === b.bentTubeInnerProfile &&

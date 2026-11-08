@@ -1977,6 +1977,10 @@ function validateShapeDefinition(definition: Record<string, unknown>, label: str
       const topBottomFillet = finiteNumber(definition.topBottomFillet, `${label}.topBottomFillet`);
       if (topBottomFillet < 0 || topBottomFillet > 1e6) throw new Error(`${label}.topBottomFillet is outside the supported range`);
     }
+    if (definition.bottomFillet !== undefined) {
+      const bottomFillet = finiteNumber(definition.bottomFillet, `${label}.bottomFillet`);
+      if (bottomFillet < 0 || bottomFillet > 1e6) throw new Error(`${label}.bottomFillet is outside the supported range`);
+    }
     if (definition.roundedBoxQuality !== undefined) {
       const roundedBoxQuality = finiteNumber(definition.roundedBoxQuality, `${label}.roundedBoxQuality`);
       if (!Number.isInteger(roundedBoxQuality) || roundedBoxQuality < 1 || roundedBoxQuality > 64) {

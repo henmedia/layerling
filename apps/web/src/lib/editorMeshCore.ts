@@ -690,6 +690,7 @@ function geometryMeshForShape(shape: WorkplaneShape): MeshData | null {
         cornerFillet: shape.cornerFillet,
         cornerFillets: shape.cornerFillets,
         topBottomFillet: shape.topBottomFillet,
+        bottomFillet: shape.bottomFillet,
         roundedBoxQuality: shape.roundedBoxQuality,
       });
       break;

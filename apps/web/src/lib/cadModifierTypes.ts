@@ -175,6 +175,11 @@ export type CadModifierProfilePart = {
   /** Extrusion only: round every edge of the two flat ends by this radius (a rounded box). */
   capFillet?: number;
   /**
+   * Extrusion only, with `capFillet`: the bottom end (y = 0) on its own. `capFillet` is then the top
+   * end alone (0 when it stays flat); without this the two ends share `capFillet`.
+   */
+  capFilletBottom?: number;
+  /**
    * Extrusion only, a GT2 pulley (Discussion #1319): `loops` is the toothed band alone, pushed up
    * from `teethBottom` to `teethTop`; the round discs (flanges, hub) on the y axis are joined to it
    * and the bore is cut through the whole height.

@@ -1026,14 +1026,28 @@ export function profileExtrusionSolid(cad: OcctKernel, profile: CadModifierProfi
     solid = repairedSolids[0];
   }
   if (!(cad.getVolume(solid) > 0)) throw new Error("The profile solid is inside out");
-  if (profile.capFillet && profile.capFillet > 1e-4 && profile.kind === "extrusion") {
-    // The flat ends of the extrusion: every edge lying in the plane y = 0 or y = height.
-    const edges = cad.getSubShapes(solid, "edge").filter((edge) => {
+  const topFillet = profile.capFillet ?? 0;
+  const bottomFillet = profile.capFilletBottom ?? topFillet;
+  if ((topFillet > 1e-4 || bottomFillet > 1e-4) && profile.kind === "extrusion") {
+    // The flat ends of the extrusion: every edge lying in the plane y = 0 (the bottom) or y = height (the top).
+    const endEdges = (body: typeof solid, atTop: boolean) => cad.getSubShapes(body, "edge").filter((edge) => {
       const box = cad.getBoundingBox(edge);
-      return Math.abs(box.ymax - box.ymin) < 1e-6 && (Math.abs(box.ymin) < 1e-6 || Math.abs(box.ymin - profile.height) < 1e-6);
+      return Math.abs(box.ymax - box.ymin) < 1e-6 && Math.abs(box.ymin - (atTop ? profile.height : 0)) < 1e-6;
     });
-    const rounded = cad.fillet(solid, edges, profile.capFillet);
-    if (!cad.isSolid(rounded) || !isValid(rounded) || !(cad.getVolume(rounded) > 0)) throw new Error("The rounded ends of the profile solid are not valid");
+    const roundEnd = (body: typeof solid, atTop: boolean, radius: number) => {
+      const rounded = cad.fillet(body, endEdges(body, atTop), radius);
+      if (!cad.isSolid(rounded) || !isValid(rounded) || !(cad.getVolume(rounded) > 0)) throw new Error("The rounded ends of the profile solid are not valid");
+      return rounded;
+    };
+    // One radius at both ends is one fillet; two radii are two, each end on its own and the other end left as it was.
+    if (Math.abs(topFillet - bottomFillet) < 1e-9) {
+      const rounded = cad.fillet(solid, [...endEdges(solid, true), ...endEdges(solid, false)], topFillet);
+      if (!cad.isSolid(rounded) || !isValid(rounded) || !(cad.getVolume(rounded) > 0)) throw new Error("The rounded ends of the profile solid are not valid");
+      return rounded;
+    }
+    let rounded = solid;
+    if (topFillet > 1e-4) rounded = roundEnd(rounded, true, topFillet);
+    if (bottomFillet > 1e-4) rounded = roundEnd(rounded, false, bottomFillet);
     return rounded;
   }
   if (profile.capChamfer && profile.capChamfer.size > 1e-4 && profile.kind === "extrusion") {

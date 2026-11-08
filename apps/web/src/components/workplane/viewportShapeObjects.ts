@@ -497,6 +497,7 @@ export function tapeShapeTopologyKey(shape: WorkplaneShape): string {
     cornerFillet: shape.cornerFillet,
     cornerFillets: shape.cornerFillets,
     topBottomFillet: shape.topBottomFillet,
+        bottomFillet: shape.bottomFillet,
     roundedBoxQuality: shape.roundedBoxQuality,
     bentTubeProfile: shape.bentTubeProfile,
     bentTubeInnerProfile: shape.bentTubeInnerProfile,
@@ -930,6 +931,7 @@ export function shapeGeometrySignature(shape: WorkplaneShape): string {
     cornerFillet: shape.cornerFillet,
     cornerFillets: shape.cornerFillets,
     topBottomFillet: shape.topBottomFillet,
+        bottomFillet: shape.bottomFillet,
     roundedBoxQuality: shape.roundedBoxQuality,
     bentTubeProfile: shape.bentTubeProfile,
     bentTubeInnerProfile: shape.bentTubeInnerProfile,
@@ -2399,6 +2401,7 @@ export function createShapeObject(
         cornerFillet: shape.cornerFillet,
         cornerFillets: shape.cornerFillets,
         topBottomFillet: shape.topBottomFillet,
+        bottomFillet: shape.bottomFillet,
         roundedBoxQuality: shape.roundedBoxQuality,
       })), material, shape);
       break;
