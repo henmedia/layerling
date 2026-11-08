@@ -16654,8 +16654,12 @@ export function LayerlingEditor({
             fileHandle = await pickLylFileToSave(projectExportFileName(exportName, "lyl"));
             pickedNewFile = true;
           }
-          // Closed without a choice: nothing to do.
-          if (!fileHandle) return;
+          // Closed without a choice: nothing is written, and the status line says so (a browser also reports a
+          // dialog it could not use as closed; staying silent left people wondering where the file went).
+          if (!fileHandle) {
+            setNotice(t("status.saveNothingChosen"));
+            return;
+          }
         } catch {
           // No dialog here (a frame, a policy): the download still works.
           fileHandle = null;

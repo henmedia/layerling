@@ -2337,7 +2337,10 @@ export default function Home() {
     // Where the backup goes is asked first, while the click still counts for the browser: reading the designs can
     // take a while. Chrome and Edge show a save dialog that remembers its folder; elsewhere it is a download.
     let target = designs.length > 0 ? await pickBackupTarget(suggestedName) : null;
-    if (designs.length > 0 && !target) return;
+    if (designs.length > 0 && !target) {
+      setDashboardNotice(t("notice.backupNothingChosen"));
+      return;
+    }
     const shapeEntries = scope ? [] : await customShapesBackupEntries().catch(() => []);
     const shapeCount = Math.max(0, shapeEntries.length - 1);
     if (designs.length === 0 && shapeCount === 0) {
@@ -2346,7 +2349,10 @@ export default function Home() {
     }
     // Only custom shapes: asked once they are read, which is quick.
     target ??= await pickBackupTarget(suggestedName);
-    if (!target) return;
+    if (!target) {
+      setDashboardNotice(t("notice.backupNothingChosen"));
+      return;
+    }
     try {
       // A design in a folder goes into the ZIP in that folder, so a restore puts it back there (#496).
       const names = backupEntryPaths(designs.map((project) => ({ name: project.name, folder: folderPathNames(designFolders, project.folderId) })), t("dashboard.backupFallbackName"));
@@ -2395,7 +2401,10 @@ export default function Home() {
   const backupAllServerDesigns = useCallback(async () => {
     // Asked before the designs are fetched, while the click still counts (see backupProjects).
     const target = await pickBackupTarget(backupFileName(new Date(), "layerling-server-backup"));
-    if (!target) return;
+    if (!target) {
+      setDashboardNotice(t("notice.backupNothingChosen"));
+      return;
+    }
     try {
       const writer = createBackupWriter();
       const { count, skipped } = await writeServerBackup(writer, t("dashboard.backupFallbackName"), (index, total, name) => {
