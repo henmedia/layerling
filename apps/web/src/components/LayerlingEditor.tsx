@@ -1153,6 +1153,8 @@ function parametricSourceForBake(shape: WorkplaneShape): ParametricSource | unde
     slopeSide: shape.slopeSide,
     slopeCurve: shape.slopeCurve,
     slopeFrom: shape.slopeFrom,
+    sideDrop: shape.sideDrop,
+    sideCurve: shape.sideCurve,
     narrowEnd: shape.narrowEnd,
     narrowSide: shape.narrowSide,
     narrowCurve: shape.narrowCurve,
@@ -1197,6 +1199,8 @@ function rebuiltParametricShape(shape: WorkplaneShape, patch: Partial<WorkplaneS
     slopeSide: source.slopeSide,
     slopeCurve: source.slopeCurve,
     slopeFrom: source.slopeFrom,
+    sideDrop: source.sideDrop,
+    sideCurve: source.sideCurve,
     narrowEnd: source.narrowEnd,
     narrowSide: source.narrowSide,
     narrowCurve: source.narrowCurve,
@@ -1311,6 +1315,8 @@ function bakeShapeTransformIntoMesh(shape: WorkplaneShape): WorkplaneShape {
     slopeSide: undefined,
     slopeCurve: undefined,
     slopeFrom: undefined,
+    sideDrop: undefined,
+    sideCurve: undefined,
     narrowEnd: undefined,
     narrowSide: undefined,
     narrowCurve: undefined,
@@ -2742,6 +2748,8 @@ function mcpSlopePatch(shape: WorkplaneShape, params: Record<string, unknown>): 
   if (typeof params.slopeCurve === "number") patch.slopeCurve = normalizeSlopeCurve(params.slopeCurve);
   if (typeof params.slopeEnd === "number" && Number.isFinite(params.slopeEnd)) patch.slopeEnd = Math.max(0, params.slopeEnd);
   if (typeof params.slopeFrom === "string") patch.slopeFrom = normalizeSlopeFrom(params.slopeFrom);
+  if (typeof params.sideDrop === "number" && Number.isFinite(params.sideDrop)) patch.sideDrop = Math.max(0, params.sideDrop);
+  if (typeof params.sideCurve === "number") patch.sideCurve = normalizeSlopeCurve(params.sideCurve);
   if (!shapeSupportsNarrow(shape)) return patch;
   if (typeof params.narrowSide === "string") patch.narrowSide = normalizeSlopeSide(shape.kind, params.narrowSide);
   if (typeof params.narrowCurve === "number") patch.narrowCurve = normalizeSlopeCurve(params.narrowCurve);

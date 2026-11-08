@@ -468,6 +468,8 @@ export function shapeFromCadMesh(
     slopeSide: undefined,
     slopeCurve: undefined,
     slopeFrom: undefined,
+    sideDrop: undefined,
+    sideCurve: undefined,
     narrowEnd: undefined,
     narrowSide: undefined,
     narrowCurve: undefined,

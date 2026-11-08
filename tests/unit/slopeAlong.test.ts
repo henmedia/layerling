@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { narrowCurveForShape, narrowHalfWidthAt, normalizeSlopeSide, shapeHasNarrow, shapeHasSlope, shapeHasSymmetricDeform, slopeCurveForShape, slopeDistance, slopeEndHeight, slopeMesh, slopeTopAt, slopeTopAtDistance } from "@/lib/slopeAlong";
+import { narrowCurveForShape, narrowHalfWidthAt, normalizeSlopeSide, shapeHasAlongDeform, shapeHasNarrow, shapeHasSideDrop, shapeHasSlope, shapeHasSymmetricDeform, sideDropCurveForShape, slopeCurveForShape, slopeDistance, slopeEndHeight, slopeMesh, slopeTopAt, slopeTopAtDistance } from "@/lib/slopeAlong";
 import type { WorkplaneShape } from "@/types/layerling";
 
 function shape(kind: WorkplaneShape["kind"], extra: Partial<WorkplaneShape> = {}): WorkplaneShape {
@@ -106,7 +106,7 @@ describe("slope from the middle", () => {
     const { vertices, faces } = boxMesh();
     for (const extra of [{ slopeEnd: 6, slopeSide: "back" as const }, { slopeEnd: 4, slopeSide: "right" as const, slopeCurve: -0.6 }, { slopeEnd: 8, slopeCurve: 0.5 }]) {
       const plain = slopeMesh(vertices, faces, shape("box", extra));
-      const explicit = slopeMesh(vertices, faces, shape("box", { ...extra, slopeFrom: "end" }));
+      const explicit = slopeMesh(vertices, faces, shape("box", { ...extra, slopeFrom: "end", sideDrop: 0, sideCurve: 0 }));
       expect(explicit).toEqual(plain);
     }
   });
@@ -174,5 +174,96 @@ describe("slope from the middle", () => {
   it("has no exact CAD body yet", () => {
     expect(shapeHasSymmetricDeform(shape("box", { slopeEnd: 6, slopeFrom: "middle" }))).toBe(true);
     expect(shapeHasSymmetricDeform(shape("box", { slopeEnd: 6 }))).toBe(false);
+  });
+});
+
+describe("side drop", () => {
+  it("is on only with a drop above zero, for the kinds a slope suits", () => {
+    expect(shapeHasSideDrop(shape("box", { sideDrop: 3 }))).toBe(true);
+    expect(shapeHasSideDrop(shape("box", { sideDrop: 0 }))).toBe(false);
+    expect(shapeHasSideDrop(shape("box"))).toBe(false);
+    expect(shapeHasSideDrop(shape("sphere", { sideDrop: 3 }))).toBe(false);
+    expect(shapeHasAlongDeform(shape("box", { sideDrop: 3 }))).toBe(true);
+  });
+
+  it("lowers the two longer sides evenly across the shorter way", () => {
+    const source = shape("box", { sideDrop: 5 });
+    const curve = sideDropCurveForShape(source);
+    // 30 wide, 40 deep: the long sides are the ones at x = +-15, so the line runs across the width
+    expect(curve.length).toBe(15);
+    const mesh = boxMesh();
+    const out = slopeMesh(mesh.vertices, mesh.faces, source).vertices;
+    expect(topAt(out, 0, 0)).toBeCloseTo(20, 9);
+    expect(topAt(out, 0, -15)).toBeCloseTo(15, 9);
+    expect(topAt(out, 0, 15)).toBeCloseTo(15, 9);
+  });
+
+  it("keeps the body's height above the floor for any curve, never above the full height", () => {
+    for (const sideCurve of [0, 1, -1, 0.5]) {
+      const source = shape("box", { sideDrop: 8, sideCurve });
+      const mesh = boxMesh();
+      const out = slopeMesh(mesh.vertices, mesh.faces, source).vertices;
+      for (const [, y] of out) {
+        expect(y).toBeGreaterThanOrEqual(-1e-9);
+        expect(y).toBeLessThanOrEqual(20 + 1e-9);
+      }
+      expect(topAt(out, 0, 0)).toBeCloseTo(20, 9);
+      expect(topAt(out, 0, 15)).toBeCloseTo(12, 9);
+    }
+  });
+
+  it("adds its drop to a slope's where both are set", () => {
+    const source = shape("box", { sideDrop: 4, slopeEnd: 10, slopeSide: "back" });
+    const mesh = boxMesh();
+    const out = slopeMesh(mesh.vertices, mesh.faces, source).vertices;
+    // the high end's middle keeps everything, its edge loses 4; the low end's middle loses 10, its edge 14
+    expect(out.some(([x, y, z]) => Math.abs(x - 15) < 1e-6 && Math.abs(z - 20) < 1e-6 && Math.abs(y - 16) < 1e-6)).toBe(true);
+    expect(out.some(([x, y, z]) => Math.abs(x - 15) < 1e-6 && Math.abs(z + 20) < 1e-6 && Math.abs(y - 6) < 1e-6)).toBe(true);
+    expect(out.some(([x, y, z]) => Math.abs(x) < 1e-6 && Math.abs(z + 20) < 1e-6 && Math.abs(y - 10) < 1e-6)).toBe(true);
+  });
+});
+
+describe("side drop: a closed body", () => {
+  it("stays closed: every edge belongs to two triangles, with and without a slope", () => {
+    for (const extra of [{ sideDrop: 5 }, { sideDrop: 6, sideCurve: 0.6 }, { sideDrop: 4, sideCurve: -0.6, slopeEnd: 8, slopeSide: "back" as const }]) {
+      const mesh = boxMesh();
+      const out = slopeMesh(mesh.vertices, mesh.faces, shape("box", extra));
+      const key = (v: number) => out.vertices[v].map((c) => Math.round(c * 1e5)).join(",");
+      const edges = new Map<string, number>();
+      for (const face of out.faces) {
+        for (let i = 0; i < 3; i += 1) {
+          const a = key(face[i]);
+          const b = key(face[(i + 1) % 3]);
+          const edge = a < b ? `${a}|${b}` : `${b}|${a}`;
+          edges.set(edge, (edges.get(edge) ?? 0) + 1);
+        }
+      }
+      expect([...edges.values()].every((count) => count === 2)).toBe(true);
+    }
+  });
+
+  it("has no exact CAD body: it stays its display mesh", () => {
+    expect(shapeHasSymmetricDeform(shape("box", { sideDrop: 3 }))).toBe(true);
+  });
+});
+
+describe("side drop on a body drawn at unit size", () => {
+  // The display builds a box one unit across and stretches it afterwards: the drop is still worked out in millimetres.
+  it("lowers the edges by the same share as on the body in millimetres", () => {
+    const unit = (sideCurve: number) => {
+      const vertices: Vec3[] = [];
+      for (const y of [0, 1]) for (const z of [-0.5, 0.5]) for (const x of [-0.5, 0.5]) vertices.push([x, y, z]);
+      const faces = boxMesh().faces;
+      return slopeMesh(vertices, faces, shape("box", { sideDrop: 5, sideCurve }));
+    };
+    for (const sideCurve of [0, 0.6, -0.6]) {
+      const mm = boxMesh();
+      const real = slopeMesh(mm.vertices, mm.faces, shape("box", { sideDrop: 5, sideCurve })).vertices;
+      const small = unit(sideCurve).vertices;
+      // the box is 30 wide and 40 deep: the long sides are at x = +-15, one unit box at x = +-0.5; heights as a share of 20 and of 1
+      expect(topAt(small, 0, 0)).toBeCloseTo(1, 9);
+      expect(topAt(small, 0, 0.5)).toBeCloseTo(topAt(real, 0, 15)! / 20, 9);
+      expect(topAt(small, 0, -0.5)).toBeCloseTo(topAt(real, 0, -15)! / 20, 9);
+    }
   });
 });
