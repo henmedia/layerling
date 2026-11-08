@@ -133,8 +133,7 @@ function shellByExtension(cad: OcctKernel, solid: ShapeHandle, open: ShapeHandle
  * body with sharp edges, grown over its open faces like shellByExtension, and cut from the body as it
  * is: the outside keeps its roundings.
  */
-function shellBySharpenedExtension(cad: OcctKernel, solid: ShapeHandle, openings: ShellOpenings, wall: number, tolerance: number, joinType: JoinType.Arc | JoinType.Intersection) {
-  const sharp = withoutSmallOutsideRounds(cad, solid, wall);
+function shellBySharpenedExtension(cad: OcctKernel, solid: ShapeHandle, sharp: ShapeHandle | null, openings: ShellOpenings, wall: number, tolerance: number, joinType: JoinType.Arc | JoinType.Intersection) {
   if (sharp === null) throw new Error("invalid shell");
   const faces = cad.getSubShapes(sharp, "face");
   try {
@@ -142,7 +141,7 @@ function shellBySharpenedExtension(cad: OcctKernel, solid: ShapeHandle, openings
     if (open.length === 0) throw new Error("invalid shell");
     return shellByExtension(cad, sharp, open, wall, tolerance, joinType, solid);
   } finally {
-    releaseAll(cad, [...faces, sharp]);
+    releaseAll(cad, faces);
   }
 }
 
@@ -181,6 +180,16 @@ function shellBody(cad: OcctKernel, solid: ShapeHandle, thickness: number, openi
     const solidVolume = cad.getVolume(solid);
     let lastError: unknown = null;
     const attempt = (wall: number): ShapeHandle | null => {
+      // The body without the rounded edges the wall swallows, worked out once for every try below.
+      let sharp: ShapeHandle | null | undefined;
+      const sharpened = () => (sharp === undefined ? (sharp = withoutSmallOutsideRounds(cad, solid, wall)) : sharp);
+      try {
+        return attemptWith(wall, sharpened);
+      } finally {
+        if (sharp) cad.release(sharp);
+      }
+    };
+    const attemptWith = (wall: number, sharpened: () => ShapeHandle | null): ShapeHandle | null => {
       for (const joinType of joinTypes) {
         for (const tolerance of [1e-6, 1e-3]) {
           // With faces to open, the thick solid first; where it fails (a face with a pocket in it), the
@@ -189,10 +198,10 @@ function shellBody(cad: OcctKernel, solid: ShapeHandle, thickness: number, openi
             ? [
               () => cad.shell(solid, open, wall, tolerance, joinType),
               () => shellByExtension(cad, solid, open, wall, tolerance, joinType),
-              () => shellBySharpenedExtension(cad, solid, openings, wall, tolerance, joinType),
+              () => shellBySharpenedExtension(cad, solid, sharpened(), openings, wall, tolerance, joinType),
             ]
             : [() => {
-              const cavity = hollowCavity(cad, solid, wall, tolerance, joinType);
+              const cavity = hollowCavity(cad, solid, wall, tolerance, joinType, sharpened);
               try {
                 return cad.cut(solid, cavity);
               } finally {
@@ -501,7 +510,7 @@ export function offsetSolid(cad: OcctKernel, solid: ShapeHandle, distance: numbe
  * The offset of a body, tried with each join and tolerance in turn and taken only when it is a closed
  * body where an offset can be; null when none is. Hollowing cuts its cavity with the same (#1521).
  */
-function checkedOffset(cad: OcctKernel, solid: ShapeHandle, distance: number, shrink: boolean, joinTypes: Array<JoinType.Arc | JoinType.Intersection>, tolerances: number[]) {
+function checkedOffset(cad: OcctKernel, solid: ShapeHandle, distance: number, shrink: boolean, joinTypes: Array<JoinType.Arc | JoinType.Intersection>, tolerances: number[], sharpenedOf?: () => ShapeHandle | null) {
   const baseVolume = cad.getVolume(solid);
   const baseBounds = cad.getBoundingBox(solid, false);
   const attempt = (body: ShapeHandle) => {
@@ -525,13 +534,14 @@ function checkedOffset(cad: OcctKernel, solid: ShapeHandle, distance: number, sh
     // Rounded outside edges no wider than the distance shrink to nothing, and the kernel cannot
     // take them away on its own (#1521: a box rounded by 1 mm shrunk by 2). Shrunk that far, a
     // rounded edge ends up sharp anyway, so it is taken off first and the body shrunk without it.
-    const sharpened = withoutSmallOutsideRounds(cad, solid, distance);
+    // A caller that tries several joins on one body hands in the sharpened body and releases it itself.
+    const sharpened = sharpenedOf ? sharpenedOf() : withoutSmallOutsideRounds(cad, solid, distance);
     if (sharpened !== null) {
       try {
         const result = attempt(sharpened);
         if (result) return result;
       } finally {
-        cad.release(sharpened);
+        if (!sharpenedOf) cad.release(sharpened);
       }
     }
   }
@@ -539,8 +549,8 @@ function checkedOffset(cad: OcctKernel, solid: ShapeHandle, distance: number, sh
 }
 
 /** The cavity of a hollowing: the body shrunk by the wall, checked like any offset (#1521). */
-function hollowCavity(cad: OcctKernel, body: ShapeHandle, wall: number, tolerance: number, joinType: JoinType.Arc | JoinType.Intersection) {
-  const cavity = checkedOffset(cad, body, wall, true, [joinType], [tolerance]);
+function hollowCavity(cad: OcctKernel, body: ShapeHandle, wall: number, tolerance: number, joinType: JoinType.Arc | JoinType.Intersection, sharpened?: () => ShapeHandle | null) {
+  const cavity = checkedOffset(cad, body, wall, true, [joinType], [tolerance], sharpened);
   if (!cavity) throw new Error("invalid shell");
   return cavity;
 }
@@ -601,7 +611,13 @@ function withoutSmallOutsideRounds(cad: OcctKernel, solid: ShapeHandle, distance
       if (!(bend > 0) || 1 / bend > distance * (1 + 1e-6)) return false;
       const middle = cad.pointOnSurface(face, u, v);
       // The chord across the bend: along u on a cylinder, along whichever direction bows more elsewhere.
-      const chords = [[cad.pointOnSurface(face, uMin, v), cad.pointOnSurface(face, uMax, v)], [cad.pointOnSurface(face, u, vMin), cad.pointOnSurface(face, u, vMax)]]
+      // It runs from a quarter to three quarters of the face, so on a face that goes all the way round,
+      // a round hole, it is a diameter whose middle lies on the axis rather than back on the face.
+      const at = (from: number, to: number, share: number) => from + (to - from) * share;
+      const chords = [
+        [cad.pointOnSurface(face, at(uMin, uMax, 0.25), v), cad.pointOnSurface(face, at(uMin, uMax, 0.75), v)],
+        [cad.pointOnSurface(face, u, at(vMin, vMax, 0.25)), cad.pointOnSurface(face, u, at(vMin, vMax, 0.75))],
+      ]
         .map(([a, b]) => ({ x: (a.x + b.x) / 2, y: (a.y + b.y) / 2, z: (a.z + b.z) / 2 }))
         .map((point) => ({ point, bow: Math.hypot(point.x - middle.x, point.y - middle.y, point.z - middle.z) }))
         .sort((a, b) => b.bow - a.bow);
