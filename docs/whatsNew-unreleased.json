@@ -1,14 +1,38 @@
 [
   {
     "title": {
-      "de": "Hülle mit offenen Löchern",
-      "en": "Hull with open holes",
-      "da": "Hylster med åbne huller"
+      "de": "Andere ausblenden, Auswahl umkehren",
+      "en": "Hide others, invert selection",
+      "da": "Skjul andre og inverter markeringen"
     },
     "body": {
-      "de": "Eine Hülle füllt alles, was in ihren Teilen hohl ist: ein Rohr, einen ausgehöhlten Zylinder, Löcher in einer Gruppe. Mit „Löcher der Teile behalten“ unter Eigenschaften bleiben sie offen, und die Hülle füllt nur den Raum zwischen den Teilen.",
-      "en": "A hull fills whatever is hollow in its parts: a tube, a hollowed cylinder, the holes in a group. With Keep the parts' holes under Properties they stay open, and the hull only fills the space between the parts.",
-      "da": "Et hylster fylder alt, hvad der er hult i dets dele: et rør, en udhulet cylinder, hullerne i en gruppe. Med „Bevar delenes huller“ under Egenskaber forbliver de åbne, og hylsteret fylder kun rummet mellem delene."
+      "de": "Wähle ein paar Teile aus und nimm „Andere ausblenden“ im Rechtsklick-Menü: Alles andere verschwindet, Strg+Z holt es zurück. „Auswahl umkehren“ wählt jedes andere sichtbare Teil aus.",
+      "en": "Select a few parts and choose \"Hide others\" in the right-click menu: everything else goes, Ctrl+Z brings it back. \"Invert selection\" selects every other visible part.",
+      "da": "Vælg nogle få dele og tag „Skjul andre“ i højrekliksmenuen: alt andet forsvinder, og Ctrl+Z bringer det tilbage. „Inverter markering“ vælger alle andre synlige dele."
+    }
+  },
+  {
+    "title": {
+      "de": "Farbige Ausrichten-Punkte",
+      "en": "Align dots in colour",
+      "da": "Justeringsprikker i farve"
+    },
+    "body": {
+      "de": "Die Punkte des Ausrichtens sind jetzt rot, grün und blau wie die Griffe beim Verschieben, so siehst du auch bei überlappenden Punkten, welcher was tut.",
+      "en": "The align dots are now red, green and blue like the move handles, so you can tell which does what even where they overlap.",
+      "da": "Justeringsprikkerne er nu røde, grønne og blå som de håndtag, der flytter formen, så du kan se, hvad der gør hvad, også hvor de lapper over hinanden."
+    }
+  },
+  {
+    "title": {
+      "de": "Texte bis 250 Zeichen",
+      "en": "Texts up to 250 characters",
+      "da": "Tekster på op til 250 tegn"
+    },
+    "body": {
+      "de": "Ein Text fasst jetzt 250 statt 24 Zeichen. Die Buchstaben behalten ihre Größe, und die Zeile wird so lang wie nötig. Abgerundete oder gefaste Buchstabenkanten gibt es bis 40 Zeichen.",
+      "en": "A text now takes 250 characters instead of 24. The letters keep their size and the line gets as long as it needs to be. A rounded or chamfered letter edge works up to 40 characters.",
+      "da": "En tekst kan nu have 250 tegn i stedet for 24. Bogstaverne beholder deres størrelse, og linjen bliver så lang, som den skal være. En afrundet eller affaset bogstavkant virker på en tekst på op til 40 tegn."
     }
   }
 ]
