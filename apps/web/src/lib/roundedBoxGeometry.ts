@@ -23,16 +23,40 @@ export function normalizeTopBottomFillet(val: unknown, maxFillet = 50): number {
 }
 
 /**
- * What a drag on the corner radius dot changes (the dot on the top's back right corner, like the corner dot in Inkscape).
- * `delta` is how far the dot was pulled along the top's back edge in mm, towards the corner (positive) or away from it.
+ * The four corners' own radii, seen from above in reading order: back left, back right, front right, front left
+ * (the back is the small z). Each is 0 up to half the shorter side, so any two neighbours always fit.
+ * Missing or malformed means the corners share cornerFillet.
+ */
+export type CornerFillets = [number, number, number, number];
+
+/** Where each of the four own radii's corners lies, as the sign of its x and z (the back is the small z): back left, back right, front right, front left. */
+export const CORNER_SIGNS = [{ sx: -1, sz: -1 }, { sx: 1, sz: -1 }, { sx: 1, sz: 1 }, { sx: -1, sz: 1 }] as const;
+
+export function normalizeCornerFillets(value: unknown, maxFillet = 50): CornerFillets | undefined {
+  if (!Array.isArray(value) || value.length !== 4) return undefined;
+  if (!value.every((entry) => typeof entry === "number" && Number.isFinite(entry))) return undefined;
+  return value.map((entry) => normalizeCornerFillet(entry, maxFillet)) as CornerFillets;
+}
+
+/**
+ * What a drag on a corner radius dot changes (the dot on the top's edge where a corner's rounding starts, like the corner dot in Inkscape).
+ * `delta` is how far the dot was pulled along the top's back edge in mm, in the direction of +x on the screen's frame.
+ * The shared radius has its dot on the back right corner, so pulling towards +x shrinks it. With own radii (flat top and bottom only)
+ * each corner has a dot, `index` its place (back left, back right, front right, front left); a left corner's radius grows when pulled towards +x.
  * A plain Box has no rounding to start from: its first pull turns it into a Rounded box with flat top and bottom,
  * so the body keeps its shape, only the corners round. Any other shape only changes its radius.
  */
 export function cornerRadiusDragPatch(
-  start: { kind: string; width?: number; depth?: number; size: number; cornerFillet?: number },
+  start: { kind: string; width?: number; depth?: number; size: number; cornerFillet?: number; cornerFillets?: unknown },
   delta: number,
-): { kind?: "roundedBox"; cornerFillet: number; topBottomFillet?: number } {
+  index?: number,
+): { kind?: "roundedBox"; cornerFillet?: number; cornerFillets?: CornerFillets; topBottomFillet?: number } {
   const largest = Math.min(start.width ?? start.size, start.depth ?? start.size) / 2;
+  const own = index === undefined ? undefined : normalizeCornerFillets(start.cornerFillets, largest);
+  if (own && index !== undefined && CORNER_SIGNS[index]) {
+    const next = Math.round(Math.max(0, Math.min(largest, own[index] - CORNER_SIGNS[index].sx * delta)) * 1e2) / 1e2;
+    return { cornerFillets: own.map((radius, at) => (at === index ? next : radius)) as CornerFillets };
+  }
   const plainBox = start.kind === "box";
   const startRadius = plainBox ? 0 : normalizeCornerFillet(start.cornerFillet ?? DEFAULT_ROUNDED_BOX_CORNER_FILLET, largest);
   const cornerFillet = Math.round(Math.max(0, Math.min(largest, startRadius - delta)) * 1e2) / 1e2;
@@ -49,6 +73,8 @@ export type RoundedBoxGeometryOptions = {
   depth: number;
   height: number;
   cornerFillet?: number;
+  /** Own radius for each corner (flat top and bottom only); wins over cornerFillet. */
+  cornerFillets?: CornerFillets;
   topBottomFillet?: number;
   roundedBoxQuality?: number;
 };
@@ -63,14 +89,18 @@ export function buildRoundedRectContour(
   depth: number,
   cornerFillet: number,
   quality: number,
+  cornerFillets?: CornerFillets,
 ): Point2D[] {
   const safeW = Math.max(0.01, width);
   const safeD = Math.max(0.01, depth);
   const maxR = Math.min(safeW / 2, safeD / 2);
   const r = Math.max(0, Math.min(maxR, cornerFillet));
   const q = Math.max(1, quality);
+  // Per corner, in the order of the quadrants below: front right (+x, +z), front left, back left, back right.
+  const own = cornerFillets ? normalizeCornerFillets(cornerFillets, maxR) : undefined;
+  const radii = own ? [own[2], own[3], own[0], own[1]] : [r, r, r, r];
 
-  if (r <= 1e-5) {
+  if (radii.every((radius) => radius <= 1e-5)) {
     const hw = safeW / 2;
     const hd = safeD / 2;
     return [
@@ -81,30 +111,18 @@ export function buildRoundedRectContour(
     ];
   }
 
-  const cx = safeW / 2 - r;
-  const cz = safeD / 2 - r;
   const pts: Point2D[] = [];
-
-  // Ecke 1: +X, -Z nach +X, +Z (im Gegenuhrzeigersinn von oben: 0° bis 90° etc.)
-  // Quadrant 1: X > 0, Z > 0 (Winkel 0 bis PI/2)
-  for (let i = 0; i <= q; i += 1) {
-    const a = (i / q) * (Math.PI / 2);
-    pts.push({ x: cx + r * Math.cos(a), z: cz + r * Math.sin(a) });
-  }
-  // Quadrant 2: X < 0, Z > 0 (Winkel PI/2 bis PI)
-  for (let i = 0; i <= q; i += 1) {
-    const a = Math.PI / 2 + (i / q) * (Math.PI / 2);
-    pts.push({ x: -cx + r * Math.cos(a), z: cz + r * Math.sin(a) });
-  }
-  // Quadrant 3: X < 0, Z < 0 (Winkel PI bis 3PI/2)
-  for (let i = 0; i <= q; i += 1) {
-    const a = Math.PI + (i / q) * (Math.PI / 2);
-    pts.push({ x: -cx + r * Math.cos(a), z: -cz + r * Math.sin(a) });
-  }
-  // Quadrant 4: X > 0, Z < 0 (Winkel 3PI/2 bis 2PI)
-  for (let i = 0; i <= q; i += 1) {
-    const a = 1.5 * Math.PI + (i / q) * (Math.PI / 2);
-    pts.push({ x: cx + r * Math.cos(a), z: -cz + r * Math.sin(a) });
+  // Quadrant k: the corner's arc from angle k * 90 to (k + 1) * 90 degrees around its own centre.
+  const signs = [{ x: 1, z: 1 }, { x: -1, z: 1 }, { x: -1, z: -1 }, { x: 1, z: -1 }];
+  for (let k = 0; k < 4; k += 1) {
+    const radius = radii[k];
+    const cx = signs[k].x * (safeW / 2 - radius);
+    const cz = signs[k].z * (safeD / 2 - radius);
+    for (let i = 0; i <= q; i += 1) {
+      // Written as the four quadrants were, so a box with one radius keeps its outline to the last digit.
+      const a = (Math.PI / 2) * k + (i / q) * (Math.PI / 2);
+      pts.push({ x: cx + radius * Math.cos(a), z: cz + radius * Math.sin(a) });
+    }
   }
 
   // Konsekutive Duplikate filtern
@@ -136,8 +154,9 @@ function createExtrudedRoundedBox(
   height: number,
   cornerFillet: number,
   quality: number,
+  cornerFillets?: CornerFillets,
 ): THREE.BufferGeometry {
-  const contour = buildRoundedRectContour(width, depth, cornerFillet, quality);
+  const contour = buildRoundedRectContour(width, depth, cornerFillet, quality, cornerFillets);
   const n = contour.length;
 
   const shapeVecs = contour.map((p) => new THREE.Vector2(p.x, p.z));
@@ -334,6 +353,7 @@ export function createRoundedBoxGeometry({
   depth,
   height,
   cornerFillet = DEFAULT_ROUNDED_BOX_CORNER_FILLET,
+  cornerFillets,
   topBottomFillet = DEFAULT_ROUNDED_BOX_TOP_BOTTOM_FILLET,
   roundedBoxQuality = DEFAULT_ROUNDED_BOX_QUALITY,
 }: RoundedBoxGeometryOptions): THREE.BufferGeometry {
@@ -349,7 +369,7 @@ export function createRoundedBoxGeometry({
   const q = normalizeRoundedBoxQuality(roundedBoxQuality);
 
   if (rtb <= 1e-4) {
-    return createExtrudedRoundedBox(safeW, safeD, safeH, rc, q);
+    return createExtrudedRoundedBox(safeW, safeD, safeH, rc, q, cornerFillets);
   }
 
   if (q === 1) {

@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import * as THREE from "three";
 import { syncTransformOverlay } from "@/components/workplane/viewportTransformOverlays";
 import { CORNER_DOT_MIN_SCREEN_DISTANCE, handleClearOfOthers } from "@/components/workplane/transformOverlayTypes";
-import { cornerRadiusDragPatch } from "@/lib/roundedBoxGeometry";
+import { cornerRadiusDragPatch, CORNER_SIGNS } from "@/lib/roundedBoxGeometry";
 import type { ThreeState } from "@/components/workplane/ViewportOverlays";
 import type { TransformOverlayState } from "@/components/workplane/TransformOverlay";
 import type { WorkplaneShape } from "@/types/layerling";
@@ -104,6 +104,61 @@ describe("the corner radius dot (Discussion #1470)", () => {
     for (const other of [shape({ kind: "cylinder" }), shape({ radius: 3 }), shape({ imagePlate: true } as Partial<WorkplaneShape>)]) {
       expect(handlesFor(other, [0, 150, 190]).some((handle) => handle.key === "corner-radius")).toBe(false);
     }
+  });
+});
+
+describe("a dot for each corner with own radii (Discussion #1470)", () => {
+  const own = (extra: Partial<WorkplaneShape> = {}) => shape({ kind: "roundedBox", cornerFillet: 5, topBottomFillet: 0, cornerFillets: [2, 4, 6, 8], ...extra });
+  const dotsOf = (source: WorkplaneShape, position: [number, number, number], up?: [number, number, number]) => handlesFor(source, position, up).filter((handle) => handle.key.startsWith("corner-radius"));
+
+  it("has four dots, one per corner, and none of the shared one", () => {
+    expect(dotsOf(own(), [0, 150, 190]).map((handle) => handle.key)).toEqual(["corner-radius-0", "corner-radius-1", "corner-radius-2", "corner-radius-3"]);
+  });
+
+  it("has the one shared dot when the corners share a radius or the ends are rounded", () => {
+    expect(dotsOf(own({ cornerFillets: undefined }), [0, 150, 190]).map((handle) => handle.key)).toEqual(["corner-radius"]);
+    expect(dotsOf(own({ topBottomFillet: 2 }), [0, 150, 190]).map((handle) => handle.key)).toEqual(["corner-radius"]);
+  });
+
+  it("changes only the radius of the corner that was pulled", () => {
+    const start = own();
+    // the back right corner (1) shrinks when pulled towards +x, the back left (0) grows
+    expect(cornerRadiusDragPatch(start, 1.5, 1)).toEqual({ cornerFillets: [2, 2.5, 6, 8] });
+    expect(cornerRadiusDragPatch(start, 1.5, 0)).toEqual({ cornerFillets: [3.5, 4, 6, 8] });
+    expect(cornerRadiusDragPatch(start, 1.5, 3)).toEqual({ cornerFillets: [2, 4, 6, 9.5] });
+    // never below 0 or past half the shorter side (15)
+    expect(cornerRadiusDragPatch(start, 99, 1)).toEqual({ cornerFillets: [2, 0, 6, 8] });
+    expect(cornerRadiusDragPatch(start, -99, 1)).toEqual({ cornerFillets: [2, 15, 6, 8] });
+  });
+
+  it("keeps the four corners' signs as the dots use them: left corners the small x, back corners the small z", () => {
+    expect(CORNER_SIGNS.map((corner) => [corner.sx, corner.sz])).toEqual([[-1, -1], [1, -1], [1, 1], [-1, 1]]);
+  });
+
+  it("keeps every dot clear of the size handles and of each other in six views", () => {
+    for (const [name, position, up] of VIEWS) {
+      for (const source of [own({ cornerFillets: [0, 0, 0, 0] }), own()]) {
+        const dots = dotsOf(source, position, up);
+        const others = handlesFor(source, position, up).filter((handle) => !handle.key.startsWith("corner-radius"));
+        for (const dot of dots) {
+          for (const other of others) {
+            expect(Math.hypot(other.x - dot.x, other.y - dot.y), `${name}: ${dot.key} near ${other.key}`).toBeGreaterThanOrEqual(CORNER_DOT_MIN_SCREEN_DISTANCE - 1e-6);
+          }
+        }
+        for (let a = 0; a < dots.length; a += 1) {
+          for (let b = a + 1; b < dots.length; b += 1) {
+            expect(Math.hypot(dots[a].x - dots[b].x, dots[a].y - dots[b].y), `${name}: ${dots[a].key} near ${dots[b].key}`).toBeGreaterThanOrEqual(CORNER_DOT_MIN_SCREEN_DISTANCE - 1e-6);
+          }
+        }
+      }
+    }
+  });
+
+  it("moves each dot along its own edge with its own radius", () => {
+    const at = (radii: [number, number, number, number], key: string) => dotsOf(own({ cornerFillets: radii }), [0, 150, 190]).find((handle) => handle.key === key)!;
+    // a left corner's dot moves right (+x on the screen) as its radius grows, a right corner's dot moves left
+    expect(at([12, 4, 6, 8], "corner-radius-0").x).toBeGreaterThan(at([2, 4, 6, 8], "corner-radius-0").x);
+    expect(at([2, 12, 6, 8], "corner-radius-1").x).toBeLessThan(at([2, 4, 6, 8], "corner-radius-1").x);
   });
 });
 

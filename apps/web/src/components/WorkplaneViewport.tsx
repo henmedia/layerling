@@ -2470,7 +2470,7 @@ export function WorkplaneViewport({
       return;
     }
     // The slope's dot changes no size: it leaves the anchor of the last resize as it was.
-    if (handleKey === "slope-end" || handleKey === "narrow-end" || handleKey === "corner-radius") return;
+    if (handleKey === "slope-end" || handleKey === "narrow-end" || handleKey.startsWith("corner-radius")) return;
     if (kind === "height") {
       lastResizeAnchorRef.current = {
         shapeId,
@@ -4298,7 +4298,7 @@ export function WorkplaneViewport({
       // The corner radius's dot runs along the top's back edge, the width's axis.
       const narrowAxis = handleKey === "narrow-end"
         ? (slopeAlongWidth(normalizeSlopeSide(shape.kind, shape.narrowSide)) ? frame.zAxis : frame.xAxis).clone().normalize()
-        : handleKey === "corner-radius" ? frame.xAxis.clone().normalize() : null;
+        : handleKey.startsWith("corner-radius") ? frame.xAxis.clone().normalize() : null;
       // An X or Y arrow (Discussion #1434) moves the selection along that axis of the workplane. The way is
       // measured on a plane through the axis that faces the camera, as for the lift arrow, so it follows the
       // pointer along a line and does not run off into the distance in a low view as a drag on the plane does.
@@ -4612,10 +4612,12 @@ export function WorkplaneViewport({
           onUpdateShape(start.id, { narrowEnd: Math.round(nextWidth * 1e4) / 1e4, narrowSide: normalizeSlopeSide(start.kind, start.narrowSide) });
           return true;
         }
-        // Corner radius: the dot on the top's back right corner; pulled towards the corner the radius shrinks, away from it it grows.
-        if (transform.handleKey === "corner-radius") {
+        // Corner radius: "corner-radius" is the dot of the shared radius, on the top's back right corner; "corner-radius-N" the Nth own
+        // radius's dot (back left, back right, front right, front left). Pulled towards its corner the radius shrinks, away from it it grows.
+        if (transform.handleKey.startsWith("corner-radius")) {
           const start = transform.startShape;
-          onUpdateShape(start.id, cornerRadiusDragPatch(start, snapValue(rawDelta, step)));
+          const index = transform.handleKey === "corner-radius" ? undefined : Number(transform.handleKey.slice("corner-radius-".length));
+          onUpdateShape(start.id, cornerRadiusDragPatch(start, snapValue(rawDelta, step), index));
           return true;
         }
         if (transform.handleKey === "slope-end") {

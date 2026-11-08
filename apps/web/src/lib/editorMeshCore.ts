@@ -688,6 +688,7 @@ function geometryMeshForShape(shape: WorkplaneShape): MeshData | null {
         depth,
         height,
         cornerFillet: shape.cornerFillet,
+        cornerFillets: shape.cornerFillets,
         topBottomFillet: shape.topBottomFillet,
         roundedBoxQuality: shape.roundedBoxQuality,
       });

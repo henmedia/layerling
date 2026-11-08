@@ -27,7 +27,7 @@ import { screwHoleProfile } from "@/lib/screwHoleGeometry";
 import { shapeDrillPointAngle, shapeDrillPointLength } from "@/lib/drillPoint";
 import { curvedConeSection } from "@/lib/curvedCone";
 import { finishingWasherMeasures } from "@/lib/finishingWasherGeometry";
-import { DEFAULT_ROUNDED_BOX_CORNER_FILLET, DEFAULT_ROUNDED_BOX_TOP_BOTTOM_FILLET, normalizeCornerFillet, normalizeRoundedBoxQuality, normalizeTopBottomFillet } from "@/lib/roundedBoxGeometry";
+import { DEFAULT_ROUNDED_BOX_CORNER_FILLET, DEFAULT_ROUNDED_BOX_TOP_BOTTOM_FILLET, normalizeCornerFillet, normalizeCornerFillets, normalizeRoundedBoxQuality, normalizeTopBottomFillet } from "@/lib/roundedBoxGeometry";
 import { textGlyphShapes, textKeyringOf } from "@/lib/textGeometry";
 import { normalizeSketchStroke } from "@/lib/sketchStroke";
 import { textHasEdge } from "@/lib/textEdge";
@@ -961,19 +961,23 @@ function upright(stretch = 1) {
 }
 
 /** A rectangle with all four corners rounded by `radius`, counter-clockwise from the lower right. */
-function roundedRectLoop(width: number, depth: number, radius: number): CadModifierProfileLoop {
+function roundedRectLoop(width: number, depth: number, radius: number, own?: readonly number[]): CadModifierProfileLoop {
   const hw = width / 2;
   const hd = depth / 2;
-  if (radius <= 1e-4) return polygonLoop([{ x: hw, z: -hd }, { x: hw, z: hd }, { x: -hw, z: hd }, { x: -hw, z: -hd }]);
-  const corner = (cx: number, cz: number, start: number): Corner => {
-    const arc: Arc = { cx, cz, rx: radius, rz: radius, start, end: start + Math.PI / 2 };
+  // Own radii come back left, back right, front right, front left; the loop runs back right, front right, front left, back left.
+  const radii = own ? [own[1], own[2], own[3], own[0]] : [radius, radius, radius, radius];
+  if (radii.every((value) => value <= 1e-4)) return polygonLoop([{ x: hw, z: -hd }, { x: hw, z: hd }, { x: -hw, z: hd }, { x: -hw, z: -hd }]);
+  const corner = (sx: number, sz: number, start: number, value: number): Corner => {
+    // A corner of no radius is a plain point.
+    if (value <= 1e-4) return { start: { x: sx * hw, z: sz * hd }, end: { x: sx * hw, z: sz * hd } };
+    const arc: Arc = { cx: sx * (hw - value), cz: sz * (hd - value), rx: value, rz: value, start, end: start + Math.PI / 2 };
     return { start: profileArcPoint(arc, arc.start), end: profileArcPoint(arc, arc.end), arc };
   };
   return loopFromCorners([
-    corner(hw - radius, -(hd - radius), -Math.PI / 2),
-    corner(hw - radius, hd - radius, 0),
-    corner(-(hw - radius), hd - radius, Math.PI / 2),
-    corner(-(hw - radius), -(hd - radius), Math.PI),
+    corner(1, -1, -Math.PI / 2, radii[0]),
+    corner(1, 1, 0, radii[1]),
+    corner(-1, 1, Math.PI / 2, radii[2]),
+    corner(-1, -1, Math.PI, radii[3]),
   ]);
 }
 
@@ -1203,9 +1207,11 @@ export function cadProfileForShapeKind(shape: WorkplaneShape, designedRound = fa
     case "roundedBox": {
       const corner = normalizeCornerFillet(shape.cornerFillet ?? DEFAULT_ROUNDED_BOX_CORNER_FILLET, Math.min(width, depth) / 2);
       const ends = normalizeTopBottomFillet(shape.topBottomFillet ?? DEFAULT_ROUNDED_BOX_TOP_BOTTOM_FILLET, shape.height / 2);
+      // Own radii for each corner count only with flat ends, as in the display.
+      const own = ends > 1e-4 ? undefined : normalizeCornerFillets(shape.cornerFillets, Math.min(width, depth) / 2);
       // Quality 1 is drawn as a flat chamfer (#239); the exact round would contradict what the view shows.
-      if (normalizeRoundedBoxQuality(shape.roundedBoxQuality) === 1 && (corner > 1e-4 || ends > 1e-4)) return null;
-      return { loops: [roundedRectLoop(width, depth, corner)], capFillet: ends > 1e-4 ? ends : undefined };
+      if (normalizeRoundedBoxQuality(shape.roundedBoxQuality) === 1 && (corner > 1e-4 || ends > 1e-4 || own?.some((value) => value > 1e-4))) return null;
+      return { loops: [roundedRectLoop(width, depth, corner, own)], capFillet: ends > 1e-4 ? ends : undefined };
     }
     case "counterbore":
     case "countersink":
