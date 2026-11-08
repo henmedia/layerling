@@ -6,6 +6,8 @@ code still carries it - so a lower number further down is older, not newer.
 
 ## Unreleased
 
+## 1.152.1
+
 - **STEP import: a file the kernel gets stuck on says so (Discussion #286):** A STEP file the CAD kernel could not read - a damaged one, written from a repaired STL - showed "Importing ..." for about half a minute and then nothing for two and a half minutes, until "The calculation took too long. Try fewer or simpler objects" came and went within seconds; whoever looked away saw nothing at all. The message of a STEP import now stays while the file is read, and when the kernel is stopped after 3 minutes it says that the file may be damaged and that importing the same model as STL usually works. A failed import's message stays until it is closed.
 
 - **Hover text follows a button's label (Discussion #1449):** With LYL picked, the Export button read **Save layerling design**, but its hover text still said "Export STL". A button without a hover text of its own gets its label as one, but only once, so it kept the first. Now the hover text follows the label as it changes, and a part of the label kept hidden for another format no longer runs into it.
