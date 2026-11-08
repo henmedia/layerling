@@ -95,6 +95,7 @@ import { pivotHeightRange, pivotPlateReach } from "@/lib/zoomPivot";
 import { pointerReach } from "@/lib/pointerReach";
 import type { PointPick } from "@/lib/mateFaces";
 import { syncPointMarks, type PointMark } from "@/components/workplane/viewportPointMarks";
+import { meshFeatureNear } from "@/components/workplane/viewportPointPick";
 import { boxSnapSpots, measurementMiddle, nearestReferenceOnScreen, type ReferencePosition } from "@/lib/referencePoints";
 import { type PivotPoint } from "@/lib/rotationPivot";
 import { pivotSnapCentre } from "@/lib/pivotSnap";
@@ -5898,11 +5899,13 @@ export function WorkplaneViewport({
     if (!state || !pick) return null;
     const rect = state.renderer.domElement.getBoundingClientRect();
     const ids = pick.shapeIds.filter((id) => shapesRef.current.some((shape) => shape.id === id && !shape.hidden));
-    const centres = ids.length ? tapeCentresNear(state, ids, clientX, clientY) : null;
-    const tape = ids.length ? pickModelTapeCandidate(state, ids, clientX, clientY, null, null, false, true, false, centres?.snap ?? null) : null;
-    const tapeShapeId = tape?.attachment?.shapeId ?? null;
+    const feature = ids.length ? meshFeatureNear(state, ids, clientX, clientY) : null;
+    const centre = ids.length ? tapeCentresNear(state, ids, clientX, clientY).snap?.candidate ?? null : null;
+    // A part inside a group reports itself; the pick belongs to the body asked for.
+    const ownerOf = (shapeId: string | undefined) => (shapeId && ids.includes(shapeId) ? shapeId : ids.length === 1 ? ids[0] : shapeId ?? null);
     const spots: Array<ReferencePosition & { shapeId: string | null }> = [];
-    if (tape && (tape.attachment?.kind === "vertex" || tape.centre)) spots.push({ x: tape.x, y: tape.y, z: tape.z, shapeId: tapeShapeId });
+    if (feature?.kind === "vertex") spots.push({ x: feature.point.x, y: feature.point.y, z: feature.point.z, shapeId: feature.shapeId });
+    if (centre) spots.push({ x: centre.x, y: centre.y, z: centre.z, shapeId: ownerOf(centre.attachment?.shapeId) });
     if (notesVisibleRef.current) referencePoints(notesRef.current).forEach((point) => spots.push({ x: point.x, y: point.y, z: point.z, shapeId: null }));
     const nearest = nearestReferenceOnScreen(
       spots,
@@ -5911,7 +5914,7 @@ export function WorkplaneViewport({
       pointerReach(10),
     );
     if (nearest) return { shapeId: nearest.shapeId, point: { x: nearest.x, y: nearest.y, z: nearest.z } };
-    return tape?.attachment?.kind === "edge" ? { shapeId: tapeShapeId, point: { x: tape.x, y: tape.y, z: tape.z } } : null;
+    return feature?.kind === "edge" ? { shapeId: feature.shapeId, point: { x: feature.point.x, y: feature.point.y, z: feature.point.z } } : null;
   }, []);
 
   const handleNotePinPointerMove = useCallback((event: ReactPointerEvent<HTMLButtonElement>, noteId: string) => {
