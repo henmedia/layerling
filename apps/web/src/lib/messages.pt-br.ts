@@ -3168,6 +3168,7 @@ export const MESSAGES_PT_BR: Partial<Record<MessageKey, string>> = {
   "holePattern.size.width": "Largura",
   "holePattern.size.height": "Altura",
   "holePattern.holeAngle": "Ângulo dos furos",
+  "holePattern.holeTilt": "Inclinação através da parede",
   "holePattern.spacing": "Espaçamento centro a centro",
   "holePattern.rowSpacing": "Espaçamento entre fileiras (centro a centro)",
   "holePattern.wall": "Parede entre os furos",

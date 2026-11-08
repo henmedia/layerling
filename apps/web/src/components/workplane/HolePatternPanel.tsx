@@ -13,11 +13,13 @@ import {
   HOLE_PATTERN_MAX_PERIMETER_COUNT,
   HOLE_PATTERN_MAX_SIZE,
   HOLE_PATTERN_MAX_HOLE_ANGLE,
+  HOLE_PATTERN_MAX_HOLE_TILT,
   HOLE_PATTERN_MAX_SPACING,
   HOLE_PATTERN_MIN_SIZE,
   HOLE_PATTERN_MIN_PERIMETER_COUNT,
   HOLE_PATTERN_MIN_WALL,
   holeHasHead,
+  holeTiltApplies,
   holeHeadDepth,
   holeHeadSize,
   holePatternHasRowSpacing,
@@ -25,6 +27,7 @@ import {
   holePatternMinSpacing,
   holePatternRowSpacing,
   holePatternWall,
+  withoutHoleTilt,
   type HoleArrangement,
   type HoleForm,
   type HolePatternSettings,
@@ -115,6 +118,8 @@ export function HolePatternPanel({
           : t(holeCount === 1 ? "holePattern.count.one" : "holePattern.count.many", { count: holeCount });
   const maxDepth = Math.max(1, Math.ceil(thickness * 2) / 2);
   // Round a wall the holes go in rows round it; a ring along the edge is a flat face's arrangement.
+  // The wall between holes is measured square to them; round a wall they stand straight for now.
+  const spaced = wall ? withoutHoleTilt(settings) : settings;
   const arrangements = wall ? ARRANGEMENTS.filter((option) => option !== "perimeter") : ARRANGEMENTS;
   const millimetres = (value: number) => (Math.round(value * 10) / 10).toLocaleString(numberLocale());
   const wallNote = wall
@@ -267,6 +272,21 @@ export function HolePatternPanel({
           onChange={(value) => onChange({ holeAngle: value })}
         />
       ) : null}
+      {/* Every hole sloping through the wall about the face's x, for vents that shed rain: positive puts the inner end
+          higher on a standing face. Flat faces only for now; screws with a head go in straight, an own shape stands as it is. */}
+      {!wall && holeTiltApplies(settings) ? (
+        <EdgeModifierSlider
+          label={t("holePattern.holeTilt")}
+          value={settings.holeTilt ?? 0}
+          min={-HOLE_PATTERN_MAX_HOLE_TILT}
+          max={HOLE_PATTERN_MAX_HOLE_TILT}
+          step={1}
+          decimals={1}
+          unit="°"
+          workspace={workspace}
+          onChange={(value) => onChange({ holeTilt: value })}
+        />
+      ) : null}
       {byCount ? null : (
         <EdgeModifierSlider
           label={t("holePattern.spacing")}
@@ -295,16 +315,16 @@ export function HolePatternPanel({
       {/* The same as the spacing, said as the wall left between two holes (#239): set one and the other follows. */}
       {byCount ? null : <EdgeModifierSlider
         label={t("holePattern.wall")}
-        value={Math.max(HOLE_PATTERN_MIN_WALL, holePatternWall(settings))}
+        value={Math.max(HOLE_PATTERN_MIN_WALL, holePatternWall(spaced))}
         min={HOLE_PATTERN_MIN_WALL}
         max={HOLE_PATTERN_MAX_SPACING / 2}
         step={0.1}
         workspace={workspace}
         length
         onChange={(value) => {
-          const spacing = holePatternMinSpacing(settings, value);
+          const spacing = holePatternMinSpacing(spaced, value);
           onChange(holePatternHasRowSpacing(settings.form)
-            ? { spacing, rowSpacing: holePatternMinRowSpacing({ ...settings, spacing }, value) }
+            ? { spacing, rowSpacing: holePatternMinRowSpacing({ ...spaced, spacing }, value) }
             : { spacing });
         }}
       />}
