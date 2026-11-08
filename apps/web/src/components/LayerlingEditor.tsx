@@ -26,7 +26,7 @@ import { limitedText } from "@/lib/textLength";
 import { NAME_TAG_LAYERS, NAME_TAG_LETTER_SIZE, textKerningPatch, textLetterSize, textLetterSizePatch, textShrinkPatch, textSpacingPatch } from "@/lib/nameTag";
 import { DEFAULT_ICON_TAG_WIDTH, ICON_TAG_LAYERS, MAX_ICON_TAG_WIDTH, MIN_ICON_TAG_WIDTH, isIconLayerBody, normalizeIconTagCount } from "@/lib/iconTag";
 import { automaticFlexiJoints, automaticFoldJoints, DEFAULT_FLEXI_FOLD, FLEXI_DEFAULTS, normalizeFlexiOptions, type FlexiOptions } from "@/lib/flexiJoints";
-import { LID_HINGE_TYPES, groupedWithMagnets, lidClickBumpsFit, lidDefaults, lidFlipTopFits, lidHandleFits, lidStandardThread, lidTakesExtras, lidTakesMagnets, lidTetherFits, magnetPocketDepth, normalizeLidOptions, type LidOptions, type LidThreadStandard } from "@/lib/lidTool";
+import { LID_HINGE_TYPES, groupedWithMagnets, lidClickBumpsFit, lidDefaults, lidFlipTopFits, lidHandleFits, lidNeckFit, lidNeckFitPatch, lidStandardThread, lidTakesExtras, lidTakesMagnets, lidTetherFits, magnetPocketDepth, normalizeLidOptions, type LidOptions, type LidThreadStandard } from "@/lib/lidTool";
 import { FIT_TEST_CLEARANCES, getPrinterPlay, MAX_PRINTER_PLAY, MIN_PRINTER_PLAY, normalizePrinterPlay, PRINTER_PLAY_SETTINGS, printerPlayPrinter, printerPlaySource, printerPlayStart, setPrinterPlay, setPrinterPlayPrinter, withPrinterPlay } from "@/lib/printerPlay";
 import { FIT_TEST_PIN_DIAMETER, fitTestHoles, fitTestShape, fitTestSpot } from "@/lib/fitTest";
 import { CABLE_DEFAULTS, cableChannelShapeFields, cableEndNear, cableGrid, findCableChannel, normalizeCableOptions, type CableChannelError, type CableChannelOptions, type CableChannelResult, type CableEnd, type CableGrid, type Vec3 as CableVec3 } from "@/lib/cableChannel";
@@ -252,7 +252,7 @@ import { FOOTPRINT_CUT_HEIGHT, footprintCutOffset, projectSectionPoint, SECTION_
 import type { AlignAxis, AlignHandleStatus, AlignSpread, AlignTarget, EdgeTreatmentFeature, GridSize, ParametricSource, ProjectAsset, ProjectAttachment, ShapeAsset, ShapeCustomization, ShapeKind, SketchImage, SketchOperation, SketchPoint, SketchProfile, SketchRevolveSettings, SketchSegment, ShellEdges, ShellOpenings, ShellSide, SweepAnchor, WorkplaneNote, WorkplaneShape, WorkplaneWorkspaceSettings } from "@/types/layerling";
 import { type MeshData, type Cuboid, type ShapeUpdatePatch, type ManifoldSolid, MIN_SHAPE_DIMENSION, resetManifoldRuntime, cleanModelDimension, getManifoldRuntime, meshForShape, meshReachAlong, formatTriangleCount, boundsForShapes, boundsForCuboids, meshAabb, boundsForPositions, quantizedPointKey, sameShapeApartFromPlacement } from "@/lib/editorMeshCore";
 import { meshPartCount } from "@/lib/meshPartCount";
-import { buildGroupedShapeOffThread, exportSolidVolumeOffThread, callOffFaceRead, faceReadInWorker, createFaceReadKeeper, faceReadPositionsOffThread, simplifyTrianglePositionsOffThread, splitShapesByPlaneOffThread, previewSplitConnectorsOffThread, articulateShapesOffThread, lidForShapesOffThread, checkClearanceOffThread, checkPrintOffThread, subscribeGeometryBusy, warmGeometryWorker } from "@/lib/geometryWorker";
+import { buildGroupedShapeOffThread, exportSolidVolumeOffThread, callOffFaceRead, faceReadInWorker, createFaceReadKeeper, faceReadPositionsOffThread, simplifyTrianglePositionsOffThread, splitShapesByPlaneOffThread, previewSplitConnectorsOffThread, articulateShapesOffThread, lidForShapesOffThread, lidTopOffThread, checkClearanceOffThread, checkPrintOffThread, subscribeGeometryBusy, warmGeometryWorker } from "@/lib/geometryWorker";
 import { roundedAlignedValue } from "@/lib/alignRounding";
 import { buildSketchLoftFromSelection, canSketchLoft } from "@/lib/sketchLoft";
 import { alignBounds, sizeAlignmentState, sizedShapesForSelection } from "@/lib/alignSize";
@@ -9066,6 +9066,34 @@ export function LayerlingEditor({
     return true;
   }, [appendHistoryEntry, syncProjectShapes]);
 
+  /**
+   * A hollowed body that has been resized, hollowed again from its state before the hollowing, brought to its new size,
+   * so its walls stay as thick as they were; fillets and chamfers laid after the hollowing go on again. `watched` is the
+   * body in the scene the result replaces: the stale body itself, or the body before "Fit the body to the neck" resized
+   * it (issue #1482). Null when its state before cannot be brought to that size.
+   */
+  const rehollowedShape = useCallback(async (stale: WorkplaneShape, watched: WorkplaneShape = stale): Promise<WorkplaneShape | null> => {
+    const entry = shellNeedingRebuild(stale);
+    if (!entry) return stale;
+    const { amount, openings, shellEdges } = entry.feature;
+    // Measured from where the last fillet after the hollowing left the body, if there is one (forum, 621472).
+    const reference = shellRebuildReference(stale, entry);
+    const stretch = hollowStretchSincePicture(stale, reference);
+    const width = entry.before.width * stretch.x;
+    const depth = entry.before.depth * stretch.z;
+    // A cylinder stays round; stretched unevenly it becomes the ellipse it now is.
+    const source = entry.before.kind === "cylinder" && Math.abs(width - depth) > 0.005
+      ? { ...reference, before: { ...entry.before, kind: "ellipse" as const } }
+      : reference;
+    const before = restoreShapeBeforeEdgeTreatment(stale, source);
+    if (Math.abs(shapeWidth(before) - width) > 0.05 || Math.abs(shapeDepth(before) - depth) > 0.05) return null;
+    // Fillets and chamfers laid after the hollowing go on again, on the same edges of the fresh walls.
+    const after = edgeTreatmentsAfterShell(stale) ?? [];
+    let rebuilt = await shellShape(before, amount, openings ?? "none", shellEdges ?? "round", watched);
+    for (const later of after) rebuilt = await relaidEdgeTreatment(rebuilt, later);
+    return rebuilt;
+  }, [relaidEdgeTreatment, shellShape]);
+
   const shellRebuildBusyRef = useRef(false);
   const shellRebuildFailedRef = useRef(new Set<string>());
   const [shellRebuildRound, setShellRebuildRound] = useState(0);
@@ -9077,33 +9105,15 @@ export function LayerlingEditor({
       const entry = shellNeedingRebuild(stale);
       if (!entry) return;
       const fingerprint = projectShapesFingerprint([stale]);
-      const { amount, openings, shellEdges } = entry.feature;
-      // Measured from where the last fillet after the hollowing left the body, if there is one (forum, 621472).
-      const reference = shellRebuildReference(stale, entry);
-      const stretch = hollowStretchSincePicture(stale, reference);
-      const width = entry.before.width * stretch.x;
-      const depth = entry.before.depth * stretch.z;
-      // A cylinder stays round; stretched unevenly it becomes the ellipse it now is.
-      const source = entry.before.kind === "cylinder" && Math.abs(width - depth) > 0.005
-        ? { ...reference, before: { ...entry.before, kind: "ellipse" as const } }
-        : reference;
-      const before = restoreShapeBeforeEdgeTreatment(stale, source);
-      if (Math.abs(shapeWidth(before) - width) > 0.05 || Math.abs(shapeDepth(before) - depth) > 0.05) {
-        shellRebuildFailedRef.current.add(fingerprint);
-        setNotice(t("status.shellRebuildFailed"), true);
-        setShellRebuildRound((round) => round + 1);
-        return;
-      }
+      const { amount } = entry.feature;
       shellRebuildBusyRef.current = true;
-      // Fillets and chamfers laid after the hollowing go on again, on the same edges of the fresh walls.
-      const after = edgeTreatmentsAfterShell(stale) ?? [];
-      void shellShape(before, amount, openings ?? "none", shellEdges ?? "round", stale)
-        .then(async (hollowed) => {
-          let rebuilt = hollowed;
-          for (const later of after) rebuilt = await relaidEdgeTreatment(rebuilt, later);
-          return rebuilt;
-        })
+      void rehollowedShape(stale)
         .then((rebuilt) => {
+          if (!rebuilt) {
+            shellRebuildFailedRef.current.add(fingerprint);
+            setNotice(t("status.shellRebuildFailed"), true);
+            return;
+          }
           if (replaceRebuiltShape(stale.id, fingerprint, rebuilt)) setNotice(t("status.shellRebuilt", { size: Number(amount.toFixed(2)) }));
         })
         .catch((error: unknown) => {
@@ -9119,7 +9129,75 @@ export function LayerlingEditor({
         });
     }, 250);
     return () => window.clearTimeout(timer);
-  }, [deleteFaceTool, edgeModifier, projectInteractionActive, relaidEdgeTreatment, replaceRebuiltShape, shapes, shellRebuildRound, shellShape, shellTool]);
+  }, [deleteFaceTool, edgeModifier, projectInteractionActive, rehollowedShape, replaceRebuiltShape, shapes, shellRebuildRound, shellTool]);
+
+  /**
+   * "Fit the body to the neck" (issue #1482): the body's top made as wide as a standard's neck under the thread
+   * (`lidNeckFitPatch`), its height kept, so that Make lid gives it the neck's thread. A hollowed body is hollowed again
+   * at its new size before it is put back, its walls as thick as they were, so the resize is one step to undo and the
+   * lid is never made for walls stretched in the meantime. The lid panel's button and the MCP action's `fitNeck` use it.
+   */
+  const fitBodyToNeck = useCallback(async (target: WorkplaneShape, standard: Exclude<LidThreadStandard, "own">) => {
+    const fail = (message: string) => {
+      setNotice(message);
+      return { ok: false as const, message };
+    };
+    const patch = lidNeckFitPatch(target, standard);
+    if (!patch) return fail(t("lid.error.neckFitShape"));
+    if (bodyLocked(target)) return fail(t("status.objectLocked"));
+    const sourceFingerprint = projectShapesFingerprint(shapesRef.current);
+    const sourceProjectId = projectInfoRef.current.projectId;
+    const changed = () => projectInfoRef.current.projectId !== sourceProjectId || projectShapesFingerprint(shapesRef.current) !== sourceFingerprint;
+    let fitted: WorkplaneShape | null = shapeWithInspectorPatch(target, patch);
+    if (shellNeedingRebuild(fitted)) {
+      try {
+        fitted = await rehollowedShape(fitted, target);
+      } catch (error) {
+        const message = error instanceof Error ? localizedError(error.message) : String(error);
+        return fail(/changed while/.test(message) ? t("lid.error.changed") : t("status.shellRebuildFailed"));
+      }
+      if (!fitted) return fail(t("status.shellRebuildFailed"));
+    }
+    if (changed()) return fail(t("lid.error.changed"));
+    const diameter = patch.width;
+    commitShapes(shapesRef.current.map((shape) => shape.id === target.id ? canonicalizeShape(fitted!) : shape), selectedIdsRef.current, t("status.lidNeckFitted", {
+      name: displayShapeName(target), diameter: diameter.toLocaleString(numberLocale()), standard: lidStandardThread(standard).name,
+    }));
+    return { ok: true as const, diameter };
+  }, [commitShapes, rehollowedShape]);
+
+  /**
+   * The lid panel's line on the body's top, for a standard's thread (issue #1482): measured off the page as Make lid
+   * measures it, again whenever the bodies change, and not while a resized hollow body waits to be hollowed again.
+   * `top` is undefined while it is measured, null for a top that is not round; no measurement at all (a body that is
+   * not closed) leaves the line out.
+   */
+  const [lidNeckTop, setLidNeckTop] = useState<{ key: string; top: { outer: number; inner: number } | null | undefined } | null>(null);
+  const [lidNeckFitting, setLidNeckFitting] = useState(false);
+  const lidNeckTargets = useMemo(() => lidTool ? shapes.filter((shape) => lidTool.targetIds.includes(shape.id)) : [], [lidTool, shapes]);
+  const lidNeckAsked = lidTool?.type === "screw" && lidTool.threadStandard !== "own";
+  const lidNeckKey = useMemo(() => lidNeckAsked && lidNeckTargets.length ? projectShapesFingerprint(lidNeckTargets) : null, [lidNeckAsked, lidNeckTargets]);
+  const lidNeckWaits = useMemo(() => lidNeckTargets.some((shape) => shellNeedingRebuild(shape)), [lidNeckTargets]);
+  useEffect(() => {
+    if (!lidNeckKey) {
+      setLidNeckTop(null);
+      return;
+    }
+    setLidNeckTop({ key: lidNeckKey, top: undefined });
+    if (lidNeckWaits) return;
+    const abort = new AbortController();
+    void lidTopOffThread(lidNeckTargets, abort.signal).then((measured) => {
+      if (!abort.signal.aborted) setLidNeckTop(measured ? { key: lidNeckKey, top: measured.round } : null);
+    });
+    return () => abort.abort();
+    // The bodies are in the key: measured again when they change, not when anything else does.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [lidNeckKey, lidNeckWaits]);
+  const fitLidNeck = useCallback(() => {
+    if (!lidTool || lidTool.threadStandard === "own" || lidNeckTargets.length !== 1 || lidNeckFitting) return;
+    setLidNeckFitting(true);
+    void fitBodyToNeck(lidNeckTargets[0], lidTool.threadStandard).finally(() => setLidNeckFitting(false));
+  }, [fitBodyToNeck, lidNeckFitting, lidNeckTargets, lidTool]);
 
   /*
    * Ein Skizzenkoerper, dessen Groesse geaendert wurde, wird aus seiner Skizze
@@ -14467,8 +14545,22 @@ export function LayerlingEditor({
 
       if (command.action === "make_lid") {
         const ids = new Set(mcpStringArray(params.ids));
-        const targets = currentShapes().filter((shape) => ids.has(shape.id));
+        let targets = currentShapes().filter((shape) => ids.has(shape.id));
         if (!targets.length) throw new Error("Pass the ids of the body to make a lid for");
+        // fitNeck (issue #1482): a body whose top is not a standard's neck is fitted to it first, as the panel's button does.
+        let fittedToNeck: number | null = null;
+        if (params.fitNeck === true) {
+          const { type, threadStandard } = normalizeLidOptions({ type: params.type, threadStandard: params.threadStandard });
+          if (type !== "screw" || threadStandard === "own") throw new Error("fitNeck goes with type screw and a threadStandard other than own");
+          const measured = await lidTopOffThread(targets);
+          if (!measured || lidNeckFit(threadStandard, measured.round)) {
+            if (targets.length !== 1) throw new Error(t("lid.error.neckFitShape"));
+            const fit = await fitBodyToNeck(targets[0], threadStandard);
+            if (!fit.ok) throw new Error(fit.message);
+            fittedToNeck = fit.diameter;
+            targets = currentShapes().filter((shape) => ids.has(shape.id));
+          }
+        }
         const result = await makeLid({
           type: params.type,
           thickness: params.thickness,
@@ -14505,9 +14597,10 @@ export function LayerlingEditor({
           flipTop: params.flipTop,
           flipTopOpening: params.flipTopOpening,
         }, targets);
-        if (!result.ok) throw new Error(result.message);
+        if (!result.ok) throw new Error(fittedToNeck !== null ? `${result.message} (The body was fitted to the neck first, ${fittedToNeck} mm across; undo takes that back.)` : result.message);
         const made = currentShapes().find((shape) => shape.id === result.id);
-        if (!("bodyId" in result)) return { object: made ? mcpShapeSummary(made) : { id: result.id }, type: result.type, ...(result.handle !== "none" ? { handle: result.handle } : {}), ...("screw" in result && result.screw ? { screw: result.screw } : {}) };
+        const fitted = fittedToNeck !== null ? { fittedToNeck } : {};
+        if (!("bodyId" in result)) return { object: made ? mcpShapeSummary(made) : { id: result.id }, type: result.type, ...(result.handle !== "none" ? { handle: result.handle } : {}), ...("screw" in result && result.screw ? { screw: result.screw } : {}), ...fitted };
         const body = currentShapes().find((shape) => shape.id === result.bodyId);
         const pin = "hinge" in result && result.hinge?.pinId ? currentShapes().find((shape) => shape.id === result.hinge!.pinId) : null;
         const plugs = "hinge" in result && result.hinge?.plugsId ? currentShapes().find((shape) => shape.id === result.hinge!.plugsId) : null;
@@ -14527,6 +14620,7 @@ export function LayerlingEditor({
             part: tether ? mcpShapeSummary(tether) : { id: result.tether.partId }, strapLength: result.tether.strap, neckRing: result.tether.neckRing, capRing: result.tether.capRing,
           } } : {}),
           ...("flipTop" in result && result.flipTop ? { flipTop: result.flipTop } : {}),
+          ...fitted,
         };
       }
 
@@ -16059,6 +16153,7 @@ export function LayerlingEditor({
     makeSwallowtailKeys,
     invertSelection,
     hideOthers,
+    fitBodyToNeck,
   ]);
 
   useEffect(() => {
@@ -18944,6 +19039,12 @@ export function LayerlingEditor({
           onChange={(patch) => setLidTool((current) => current ? { ...current, ...patch, error: null } : current)}
           onApply={applyLidTool}
           onCancel={() => setLidTool(null)}
+          neck={lidNeckTop && lidTool.type === "screw" && lidTool.threadStandard !== "own" ? {
+            top: lidNeckTop.top,
+            fit: lidNeckTargets.length === 1 ? lidNeckFitPatch(lidNeckTargets[0], lidTool.threadStandard)?.width ?? null : null,
+            fitting: lidNeckFitting,
+            onFit: fitLidNeck,
+          } : null}
         />
       ) : null}
       {cableTool ? (

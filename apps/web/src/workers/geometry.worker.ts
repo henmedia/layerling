@@ -3,7 +3,7 @@
 import { buildMessage } from "@/lib/buildStamp";
 import { checkClearance, type ClearanceOptions } from "@/lib/clearanceCheck";
 import { articulateShapes, type FlexiOptions } from "@/lib/flexiJoints";
-import { lidForShapes, type LidOptions } from "@/lib/lidTool";
+import { lidForShapes, lidTopForShapes, type LidOptions } from "@/lib/lidTool";
 import { checkPrint, type PrintCheckOptions } from "@/lib/printCheck";
 import { buildGroupedShapeFromSelection, exportSolidVolume, faceReadPositions, previewSplitConnectors, splitShapeIfCrossed } from "@/lib/editorBooleans";
 import { getManifoldRuntime, setManifoldAssetBase } from "@/lib/editorMeshCore";
@@ -60,6 +60,9 @@ self.onmessage = async (event: MessageEvent<GeometryWorkerRequest>) => {
     } else if (request.task === "lid") {
       const { targets, options } = args as { targets: WorkplaneShape[]; options: LidOptions };
       result = await lidForShapes(targets, options);
+    } else if (request.task === "lidTop") {
+      const { targets } = args as { targets: WorkplaneShape[] };
+      result = await lidTopForShapes(targets);
     } else if (request.task === "stl") {
       const { fileName, buffer } = args as { fileName: string; buffer: ArrayBuffer };
       result = importedShapeFromStl(fileName, buffer);
