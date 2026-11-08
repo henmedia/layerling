@@ -44,5 +44,85 @@
       "de": "Ein Körper, der oben und unten flach ist und gerade Seiten hat, wird jetzt über seinen Umriss ausgehöhlt. So gehen auch Formen mit spitzen Ecken in einem runden Umriss und importierte STL-Dateien, an denen das Aushöhlen vorher scheiterte oder hängen blieb.",
       "en": "A body that is flat at its top and bottom with upright sides is now hollowed through its outline. Shapes with a sharp corner in a round outline and imported STL files, where Hollow failed or got stuck before, now work."
     }
+  },
+  {
+    "title": {
+      "de": "Abgerundeter Quader: mehr Freiheit",
+      "en": "Rounded box: more freedom"
+    },
+    "body": {
+      "de": "Ein Punkt auf der Oberkante zieht den Eckenradius, auch am normalen Quader. „Ecken einzeln“ gibt jeder Ecke ihren eigenen Radius, und „Oben/unten getrennt“ rundet oben und unten verschieden, etwa oben flach und unten rund.",
+      "en": "A dot on the top edge drags the corner radius, on a plain box too. \"Corners Separately\" gives each corner its own radius, and \"Top/Bottom Separately\" rounds the top and the bottom differently, say flat on top and round below."
+    }
+  },
+  {
+    "title": {
+      "de": "Neigung entlang: Mitte, Bogen und Seiten",
+      "en": "Slope along: middle, arch and sides"
+    },
+    "body": {
+      "de": "„Bogen beginnt bei“ lässt die Neigung auch aus der Mitte zu beiden Enden abfallen oder wölbt eine schräge Fläche gleichmäßig. „Seiten abgesenkt“ senkt die beiden langen Seiten ab, gerade oder gewölbt wie eine Kuppel.",
+      "en": "\"Curve Starts At\" can let the slope fall from the middle to both ends, or arch a slanted top evenly. \"Sides Lowered\" lowers the two long sides, straight or domed."
+    }
+  },
+  {
+    "title": {
+      "de": "Verrundung sagt, wo es klemmt",
+      "en": "Fillet says where it gets stuck"
+    },
+    "body": {
+      "de": "Lässt sich eine gebogene Kante nicht verrunden, nennt layerling jetzt die engste Biegung und markiert die Kanten rot. Wähle dann einen kleineren Radius als diese Biegung.",
+      "en": "When a curved edge cannot be filleted, layerling now names its tightest bend and marks those edges red. Choose a radius smaller than that bend."
+    }
+  },
+  {
+    "title": {
+      "de": "Kegel bleibt rund",
+      "en": "Cone stays round"
+    },
+    "body": {
+      "de": "Der Basisradius des Kegels ändert Breite und Länge zusammen, der Kegel wird also nicht mehr oval. Ist der obere Radius größer, sagt ein Hinweis, wie du einen oben breiteren Kegel baust.",
+      "en": "A cone's base radius now changes width and length together, so the cone no longer goes oval. When the top radius is the larger one, a hint says how to make a cone wider at the top."
+    }
+  },
+  {
+    "title": {
+      "de": "Durchmesser über 160 mm",
+      "en": "Diameters past 160 mm"
+    },
+    "body": {
+      "de": "Durchmesser und Radien von Zylinder und Kegel lassen sich jetzt größer eintippen, als der Schieberegler reicht, so wie Breite und Höhe.",
+      "en": "A cylinder's or cone's diameter and radius can now be typed larger than the slider goes, like width and height."
+    }
+  },
+  {
+    "title": {
+      "de": "Auf Platten verteilen geht wieder",
+      "en": "Arrange on plates works again"
+    },
+    "body": {
+      "de": "Der Knopf „Auf Platten verteilen“ in der Plattenleiste tat nichts. Jetzt verteilt er die Auswahl oder alle Teile wieder an.",
+      "en": "The \"Arrange on plates\" button in the plate bar did nothing. It now arranges the selection, or every part, again."
+    }
+  },
+  {
+    "title": {
+      "de": "Speichern sagt, wenn nichts gespeichert wurde",
+      "en": "Saving says when nothing was saved"
+    },
+    "body": {
+      "de": "Schließt sich das Speicherfenster ohne gewählte Datei, sagt die Statuszeile jetzt „Nichts gespeichert“ bzw. „Keine Sicherung erstellt“, für Strg+S, Speichern unter und die Sicherungen.",
+      "en": "When the save window closes without a chosen file, the status line now says \"Nothing saved\" or \"No backup made\", for Ctrl+S, Save as and the backups."
+    }
+  },
+  {
+    "title": {
+      "de": "KI kann das Projekt benennen",
+      "en": "The AI can name the project"
+    },
+    "body": {
+      "de": "Über MCP kann eine KI dem Projekt jetzt einen Namen geben, wie der Stift neben dem Projektnamen, statt es „Unbenannter Entwurf“ zu lassen.",
+      "en": "Through MCP an AI can now give the project a name, as the pencil beside its name does, instead of leaving it \"Untitled design\"."
+    }
   }
 ]
