@@ -1,8 +1,12 @@
 import { describe, expect, it } from "vitest";
 import * as THREE from "three";
+import type { WorkplaneShape } from "@/types/layerling";
+import { meshForShape } from "@/lib/editorMeshCore";
 import { Brush, Evaluator, SUBTRACTION } from "three-bvh-csg";
 import {
+  buildRoundedRectContour,
   createRoundedBoxGeometry,
+  normalizeCornerFillets,
   normalizeCornerFillet,
   normalizeTopBottomFillet,
   normalizeRoundedBoxQuality,
@@ -245,5 +249,84 @@ describe("roundedBox chamfer (quality 1, #239)", () => {
       expect(signedVolume(position)).toBeGreaterThan(0);
       expect([...edgeUseCounts(position).values()].every((count) => count === 2)).toBe(true);
     }
+  });
+});
+
+describe("own radii for each corner", () => {
+  it("gives a box with four equal radii the very outline of one with a shared radius", () => {
+    for (const quality of [1, 4, 8]) {
+      for (const radius of [0, 3, 7.5, 15]) {
+        expect(buildRoundedRectContour(40, 30, 99, quality, [radius, radius, radius, radius])).toEqual(buildRoundedRectContour(40, 30, radius, quality));
+      }
+    }
+  });
+
+  it("keeps a corner of no radius a sharp point, and the others rounded", () => {
+    // back left, back right, front right, front left (the back is the small z)
+    const contour = buildRoundedRectContour(40, 30, 5, 8, [0, 6, 0, 10]);
+    const has = (x: number, z: number) => contour.some((point) => Math.hypot(point.x - x, point.z - z) < 1e-9);
+    expect(has(-20, -15)).toBe(true);
+    expect(has(20, 15)).toBe(true);
+    expect(has(20, -15)).toBe(false);
+    expect(has(-20, 15)).toBe(false);
+    // the back right arc starts and ends 6 mm from the corner, the front left 10 mm
+    expect(has(20, -15 + 6)).toBe(true);
+    expect(has(20 - 6, -15)).toBe(true);
+    expect(has(-20, 15 - 10)).toBe(true);
+    expect(has(-20 + 10, 15)).toBe(true);
+    for (const point of contour) {
+      expect(Math.abs(point.x)).toBeLessThanOrEqual(20 + 1e-9);
+      expect(Math.abs(point.z)).toBeLessThanOrEqual(15 + 1e-9);
+    }
+  });
+
+  it("limits every radius to half the shorter side, whatever is asked", () => {
+    expect(normalizeCornerFillets([0, 4, 99, -3], 15)).toEqual([0, 4, 15, 0]);
+    expect(normalizeCornerFillets([1, 2, 3], 15)).toBeUndefined();
+    expect(normalizeCornerFillets(["a", 2, 3, 4], 15)).toBeUndefined();
+    expect(normalizeCornerFillets(undefined, 15)).toBeUndefined();
+  });
+
+  it("builds a closed body from different radii, and ignores them once the top and bottom are rounded", () => {
+    const own = createRoundedBoxGeometry({ width: 40, depth: 30, height: 12, cornerFillet: 5, cornerFillets: [0, 6, 2, 10], topBottomFillet: 0, roundedBoxQuality: 6 });
+    const position = own.getAttribute("position");
+    expect([...edgeUseCounts(position).values()].every((count) => count === 2)).toBe(true);
+    expect(signedVolume(position)).toBeGreaterThan(0);
+    const rounded = createRoundedBoxGeometry({ width: 40, depth: 30, height: 12, cornerFillet: 5, topBottomFillet: 2, roundedBoxQuality: 6 });
+    const roundedWithOwn = createRoundedBoxGeometry({ width: 40, depth: 30, height: 12, cornerFillet: 5, cornerFillets: [0, 6, 2, 10], topBottomFillet: 2, roundedBoxQuality: 6 });
+    expect(Array.from(roundedWithOwn.getAttribute("position").array)).toEqual(Array.from(rounded.getAttribute("position").array));
+  });
+});
+
+describe("a plain box pulled into a rounded box", () => {
+  const box = { id: "b", name: "Box", kind: "box", x: 5, z: -3, elevation: 2, size: 40, width: 40, depth: 30, height: 12, rotation: 0, color: "#ff8800", radius: 0, steps: 10 } as WorkplaneShape;
+  const extent = (shape: WorkplaneShape) => {
+    const { vertices, faces } = meshForShape(shape);
+    const low = [Infinity, Infinity, Infinity];
+    const high = [-Infinity, -Infinity, -Infinity];
+    for (const vertex of vertices) for (let axis = 0; axis < 3; axis += 1) { low[axis] = Math.min(low[axis], vertex[axis]); high[axis] = Math.max(high[axis], vertex[axis]); }
+    let volume = 0;
+    for (const [a, b, c] of faces) {
+      const [p, q, r] = [vertices[a], vertices[b], vertices[c]];
+      volume += (p[0] * (q[1] * r[2] - q[2] * r[1]) - p[1] * (q[0] * r[2] - q[2] * r[0]) + p[2] * (q[0] * r[1] - q[1] * r[0])) / 6;
+    }
+    return { low, high, volume };
+  };
+
+  it("keeps its size, place and volume at radius 0, and loses exactly the corners at a radius", () => {
+    const before = extent(box);
+    const none = extent({ ...box, kind: "roundedBox", cornerFillet: 0, topBottomFillet: 0 });
+    for (let axis = 0; axis < 3; axis += 1) {
+      expect(none.low[axis]).toBeCloseTo(before.low[axis], 4);
+      expect(none.high[axis]).toBeCloseTo(before.high[axis], 4);
+    }
+    expect(none.volume).toBeCloseTo(before.volume, 3);
+    const rounded = extent({ ...box, kind: "roundedBox", cornerFillet: 8, topBottomFillet: 0, roundedBoxQuality: 24 });
+    for (let axis = 0; axis < 3; axis += 1) {
+      expect(rounded.low[axis]).toBeCloseTo(before.low[axis], 4);
+      expect(rounded.high[axis]).toBeCloseTo(before.high[axis], 4);
+    }
+    // each corner loses (1 - pi/4) r^2 of the outline, over the whole height
+    expect(Math.abs(rounded.volume / (before.volume - 4 * (1 - Math.PI / 4) * 64 * 12) - 1)).toBeLessThan(2e-3);
   });
 });

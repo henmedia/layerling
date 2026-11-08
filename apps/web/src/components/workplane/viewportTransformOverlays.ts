@@ -14,7 +14,7 @@ import { dimensionMarkNeedsScreenLayout, dimensionMarkScreenPush, isPointInsideT
 import { cuboidCorners, pointAlongAxes } from "@/lib/alignFrame";
 import type { AlignAxis, AlignHandleStatus, AlignTarget, MeasurementAccuracy, WorkplaneShape } from "@/types/layerling";
 import { outwardFaceNormal } from "@/lib/layFlat";
-import { DEFAULT_ROUNDED_BOX_CORNER_FILLET } from "@/lib/roundedBoxGeometry";
+import { CORNER_SIGNS, DEFAULT_ROUNDED_BOX_CORNER_FILLET, normalizeCornerFillets } from "@/lib/roundedBoxGeometry";
 import { narrowEndWidth, normalizeSlopeSide, shapeSupportsNarrow, shapeSupportsSlope, slopeEndHeight } from "@/lib/slopeAlong";
 import { JOINED_FACE_REACH, nearestFaceTriangle, planarFaceTriangles } from "@/lib/rotationPivot";
 import { roundFaceTriangles } from "@/lib/roundFaceAxis";
@@ -450,13 +450,24 @@ export function syncTransformOverlay(
   const cornerEntries = (() => {
     if (!cornerShape) return [];
     const largest = Math.min(frame.max.x - frame.min.x, frame.max.z - frame.min.z) / 2;
-    const radius = plainBox ? 0 : Math.min(Math.max(0, cornerShape.cornerFillet ?? DEFAULT_ROUNDED_BOX_CORNER_FILLET), largest);
-    const point = project(framePoint(frame, frame.max.x - radius, frame.max.y, frame.min.z));
-    // Along the edge, into the body: the way the dot may slide to leave room.
-    const inward = project(framePoint(frame, frame.max.x - radius - largest, frame.max.y, frame.min.z));
+    // With flat top and bottom a Rounded box may give each corner its own radius: then every corner has a dot.
+    const flat = (cornerShape.topBottomFillet ?? 0) <= 1e-4;
+    const own = flat ? normalizeCornerFillets(cornerShape.cornerFillets, largest) : undefined;
+    const corners = own
+      ? own.map((radius, index) => ({ key: `corner-radius-${index}`, radius, sx: CORNER_SIGNS[index].sx, sz: CORNER_SIGNS[index].sz }))
+      : [{ key: "corner-radius", radius: plainBox ? 0 : Math.min(Math.max(0, cornerShape.cornerFillet ?? DEFAULT_ROUNDED_BOX_CORNER_FILLET), largest), sx: 1, sz: -1 }];
     const others = [bottom.nearLeft, bottom.nearRight, bottom.farRight, bottom.farLeft, mid.near, mid.right, mid.far, mid.left, heightPoint, slopePoint, narrowPoint, liftPoint].filter((other) => other.visible);
-    const clear = handleClearOfOthers(point, { x: inward.x - point.x, y: inward.y - point.y }, others);
-    return [{ point: clear, handle: { key: "corner-radius", className: "height-top slope-end", kind: "height" as const, x: clear.x, y: clear.y, title: t("transform.cornerRadius") } }];
+    return corners.map(({ key, radius, sx, sz }) => {
+      const edgeX = sx > 0 ? frame.max.x - radius : frame.min.x + radius;
+      const edgeZ = sz > 0 ? frame.max.z : frame.min.z;
+      const point = project(framePoint(frame, edgeX, frame.max.y, edgeZ));
+      // Along the edge, into the body: the way the dot may slide to leave room.
+      const inward = project(framePoint(frame, edgeX - sx * largest, frame.max.y, edgeZ));
+      const clear = handleClearOfOthers(point, { x: inward.x - point.x, y: inward.y - point.y }, others);
+      // The next corner's dot keeps clear of this one too.
+      if (clear.visible) others.push(clear);
+      return { point: clear, handle: { key, className: "height-top slope-end", kind: "height" as const, x: clear.x, y: clear.y, title: t("transform.cornerRadius") } };
+    });
   })();
   const liftTargetAngle = THREE.MathUtils.radToDeg(
     Math.atan2(liftPoint.y - liftBasePoint.y, liftPoint.x - liftBasePoint.x),

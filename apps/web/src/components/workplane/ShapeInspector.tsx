@@ -159,6 +159,7 @@ import {
   MIN_ROUNDED_BOX_QUALITY,
   MAX_ROUNDED_BOX_QUALITY,
   normalizeCornerFillet,
+  normalizeCornerFillets,
   normalizeTopBottomFillet,
   normalizeRoundedBoxQuality,
 } from "@/lib/roundedBoxGeometry";
@@ -1099,15 +1100,39 @@ function getShapePropertiesWithAppLimits(shape: WorkplaneShape, onUpdate: ShapeI
     const maxCornerFillet = Math.max(1, Math.min(width, depth) / 2);
     const maxTopBottomFillet = Math.max(1, shape.height / 2);
 
+    // Own radii for each corner: with flat ends only (rounded ends round every corner alike).
+    const flatEnds = topBottomFillet <= 1e-4;
+    const ownCorners = flatEnds ? normalizeCornerFillets(shape.cornerFillets, Math.min(width, depth) / 2) : undefined;
+    const sharedRadius = normalizeCornerFillet(cornerFillet, Math.min(width, depth) / 2);
+    const cornerRows: ShapePropertyConfig[] = ownCorners
+      ? (["backLeft", "backRight", "frontRight", "frontLeft"] as const).map((name, index) => ({
+          id: `cornerFillet-${name}`,
+          label: t(`prop.corner.${name}`),
+          value: ownCorners[index],
+          min: 0,
+          max: maxCornerFillet,
+          step: 0.05,
+          onChange: (value: number) => onUpdate({ cornerFillets: ownCorners.map((radius, at) => (at === index ? normalizeCornerFillet(value, Math.min(width, depth) / 2) : radius)) as [number, number, number, number] }),
+        }))
+      : [{
+          id: "cornerFillet",
+          label: t("prop.cornerFillet"),
+          value: cornerFillet,
+          min: 0,
+          max: maxCornerFillet,
+          step: 0.05,
+          onChange: (value: number) => onUpdate({ cornerFillet: normalizeCornerFillet(value, Math.min(width, depth) / 2) }),
+        }];
+
     return [
+      ...cornerRows,
       {
-        id: "cornerFillet",
-        label: t("prop.cornerFillet"),
-        value: cornerFillet,
-        min: 0,
-        max: maxCornerFillet,
-        step: 0.05,
-        onChange: (value) => onUpdate({ cornerFillet: normalizeCornerFillet(value, Math.min(width, depth) / 2) }),
+        type: "toggle",
+        id: "cornerSeparate",
+        label: t("prop.cornerSeparate"),
+        value: Boolean(ownCorners),
+        disabled: !flatEnds,
+        onChange: (separate) => onUpdate({ cornerFillets: separate ? [sharedRadius, sharedRadius, sharedRadius, sharedRadius] : undefined }),
       },
       {
         id: "topBottomFillet",
