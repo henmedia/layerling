@@ -142,6 +142,7 @@ import { sectionMeasurement, sectionPointToWorld, snapSectionPoint } from "@/lib
 import { DEFAULT_INFILL_PERCENT, DEFAULT_WALLS, PRINT_MATERIAL_DENSITY, PRINT_MATERIALS, FILAMENT_DIAMETER_MM, normalizePrintMaterial, printEstimate, printEstimateWithInfill } from "@/lib/printEstimate";
 import { matchingEdgeIds } from "@/lib/edgeMatching";
 import { readEdgeModifierSettings, rememberEdgeModifierSetting, startingEdgeModifierAmount, type EdgeModifierSettings } from "@/lib/edgeModifierMemory";
+import { getEditorProfile, profileBooleanValue } from "@/lib/editorProfile";
 import { CAD_MODIFIER_MAX_SHARP_ANGLE, CAD_MODIFIER_REQUEST_TIMEOUT_MS, CAD_MODIFIER_PREPARE_TRIANGLE_LIMIT, cadModifierPrepareTimeoutMs, cadModifierTimeoutMessage, cadModifierUserErrorMessage, cadModifierWorkerFailureMessage, cadModifierCandidateEdge, cadModifierPresetValues, defaultCadModifierTangentChain, rescueSharpAngleForEdges, selectableCadModifierEdge, type CadModifierRequestPhase } from "@/lib/cadModifierRuntime";
 import { isThinFace, thinFacesWith } from "@/lib/cadThinFaces";
 import { createCadPreviewQueue } from "@/lib/cadPreviewQueue";
@@ -7839,11 +7840,16 @@ export function LayerlingEditor({
     }
     // The settings last chosen for this tool in this browser, so Apply, Undo and the next start keep them (#1342).
     const kept = readEdgeModifierSettings(kind);
+    const options = kind === "fillet" ? getEditorProfile()?.tools.fillet?.options : undefined;
+    const onlyVisibleEdges = profileBooleanValue(options?.onlyVisibleEdges, kept.onlyVisibleEdges);
     const largestDimension = Math.max(shapeWidth(selectedShape), shapeDepth(selectedShape), selectedShape.height);
+    const maxAmount = Math.max(MIN_EDGE_MODIFIER_AMOUNT, largestDimension * 0.99);
+    const defaultAmount = Math.max(MIN_EDGE_MODIFIER_AMOUNT, Math.min(1, shapeWidth(selectedShape) / 6, shapeDepth(selectedShape) / 6, selectedShape.height / 6));
+    const profileAmount = options?.amount?.default;
     const amount = startingEdgeModifierAmount(
       kept,
-      Math.max(MIN_EDGE_MODIFIER_AMOUNT, Math.min(1, shapeWidth(selectedShape) / 6, shapeDepth(selectedShape) / 6, selectedShape.height / 6)),
-      Math.max(MIN_EDGE_MODIFIER_AMOUNT, largestDimension * 0.99),
+      profileAmount !== undefined && profileAmount >= MIN_EDGE_MODIFIER_AMOUNT && profileAmount <= maxAmount ? profileAmount : defaultAmount,
+      maxAmount,
     );
     cadModifierBaseShapeRef.current = selectedShape;
     cadModifierBaseFingerprintRef.current = projectShapesFingerprint([selectedShape]);
@@ -7861,7 +7867,7 @@ export function LayerlingEditor({
       chamferAngle: kept.chamferAngle ?? 45,
       quality: kept.quality ?? "standard",
       tangentChain: defaultCadModifierTangentChain(appliedEdgeTreatmentCount),
-      ...(kept.onlyVisibleEdges !== undefined ? { onlyVisibleEdges: kept.onlyVisibleEdges } : {}),
+      ...(onlyVisibleEdges !== undefined ? { onlyVisibleEdges } : {}),
       ...(kind === "fillet" && kept.concave !== undefined ? { concave: kept.concave } : {}),
       preserveEdgeSize: selectedShape.edgeResizeMode === "preserve",
       busy: true,

@@ -308,6 +308,23 @@ Four things to know:
 - **A quick test on your own computer:** `npx serve apps/web/.next-export` and open the address it prints.
 - **Installing as an app and offline use need https.** The export holds the offline files (`sw.js`), but a browser uses them only on an `https://` address or on `localhost`, not on a plain `http://` address in your network.
 
+### Editor profiles
+
+An optional editor profile changes the 3D ribbon and selected tool options for this page. To try the [example profile](docs/examples/editor-profile.json) in a local checkout:
+
+```sh
+LAYERLING_EDITOR_PROFILE="$(cat docs/examples/editor-profile.json)" npm run dev
+```
+
+Open the editor, add a box, and select it. In the simple ribbon, **Print check** is visible and **Lid** and **Flexi joints** are hidden. Open **Fillet** to see a starting radius of 2 mm on a box large enough for it. The **Only visible edges** option is hidden and on.
+
+- `version` must be `1`. An optional `base` of `simple` or `full` selects that layout for this page, ahead of the browser choice and the Node server default. Omit it to keep the ordinary mode switch.
+- Under `tools`, `visible: true` or `false` overrides the layout for tools in the clipboard, history, combine, modify and arrange sections of the 3D ribbon, as well as `import`. Use the tool's ID (the `data-layerling-tool` attribute on regular ribbon buttons). A visible tool still needs the usual selection. Unknown entries have no effect.
+- Under `tools.fillet.options`, `amount.default` is a radius in millimetres. A valid remembered radius takes precedence, and the tool's own starting value is used when neither fits the body. `onlyVisibleEdges` accepts `visible`, a boolean `default`, and `locked`. A lock requires a default and takes precedence over the remembered value.
+- Profiles affect the ribbon and the connected dialog options. Context menus, keyboard shortcuts, shapes and the camera retain their normal behavior. Use the host's authorization for access to projects.
+
+`LAYERLING_EDITOR_PROFILE` is read by the layout when the HTML is generated. Set it before starting the development server or building production HTML, including a static export. Hosts that generate HTML themselves may instead provide one `<script type="application/json" id="layerling-editor-profile">…</script>` in the document head before Layerling's scripts. Escape literal `<` in the serialized JSON as `\u003c`. Profiles are independent of project files and browser settings and are read once per page load. For per-account profiles, serve the personalized HTML from a private, uncached page outside the static service worker’s offline cache, such as a PHP entry point.
+
 ### Shared Designs on a Network
 
 layerling itself is only files, so the shared folder needs something on the server that can write. There are two ways, and you need just one of them: **Node or Docker** (this section, with `LAYERLING_SHARED_PROJECTS_DIR`), or **a plain web server with PHP** (the `store` folder, further down). A web server that serves the files without either of them – `npx serve`, nginx or Apache without PHP – shows layerling fine, but has no server folder.

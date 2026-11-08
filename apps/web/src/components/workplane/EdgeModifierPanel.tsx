@@ -1,5 +1,6 @@
 "use client";
 
+import { getEditorProfile } from "@/lib/editorProfile";
 import { GuideHelpLink } from "@/components/GuideHelpLink";
 import { MovableToolPanel } from "@/components/workplane/MovableToolPanel";
 import { useEffect, useRef, useState, type CSSProperties } from "react";
@@ -407,6 +408,7 @@ export function EdgeModifierPanel({
   onApply: () => void;
   onCancel: () => void;
 }) {
+  const onlyVisibleEdgesOption = kind === "fillet" ? getEditorProfile()?.tools.fillet?.options?.onlyVisibleEdges : undefined;
   useLanguage();
   const title = kind === "fillet" ? t("edge.filletTitle") : kind === "chamfillet" ? t("edge.chamfilletTitle") : t("edge.chamferTitle");
   const amountMin = Math.min(MIN_EDGE_MODIFIER_AMOUNT, Math.max(Number.EPSILON, maxAmount));
@@ -547,10 +549,12 @@ export function EdgeModifierPanel({
 
       <EdgeModifierSlider label={t("edge.sharpThreshold")} value={sharpAngle} min={1} max={CAD_MODIFIER_MAX_SHARP_ANGLE} step={1} unit="°" workspace={workspace} disabled={!prepared} onChange={onSharpAngleChange} />
 
-      <label className="edge-modifier-check" title={t("edge.onlyVisibleEdgesHint")}>
-        <input type="checkbox" checked={onlyVisibleEdges} disabled={!prepared} onChange={(event) => onOnlyVisibleEdgesChange(event.currentTarget.checked)} />
-        <span>{t("edge.onlyVisibleEdges")}</span>
-      </label>
+      {onlyVisibleEdgesOption?.visible !== false ? (
+        <label className="edge-modifier-check" title={t("edge.onlyVisibleEdgesHint")}>
+          <input type="checkbox" checked={onlyVisibleEdges} disabled={!prepared || onlyVisibleEdgesOption?.locked} onChange={(event) => onOnlyVisibleEdgesChange(event.currentTarget.checked)} />
+          <span>{t("edge.onlyVisibleEdges")}</span>
+        </label>
+      ) : null}
 
       <label className="edge-modifier-check" title={t("edge.tangentChainsHint")}>
         <input type="checkbox" checked={tangentChain} disabled={!prepared} onChange={(event) => onTangentChainChange(event.currentTarget.checked)} />

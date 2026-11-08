@@ -1,0 +1,15 @@
+{
+  "version": 1,
+  "base": "simple",
+  "tools": {
+    "print-check": { "visible": true },
+    "lid": { "visible": false },
+    "flexi": { "visible": false },
+    "fillet": {
+      "options": {
+        "amount": { "default": 2 },
+        "onlyVisibleEdges": { "visible": false, "default": true, "locked": true }
+      }
+    }
+  }
+}
