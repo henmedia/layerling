@@ -193,6 +193,18 @@ function shellBody(cad: OcctKernel, solid: ShapeHandle, thickness: number, openi
       }
       return null;
     };
+    // An upright prism is hollowed through its outline first (shellByOutline): the same walls, and the
+    // kernel's thick solid is never asked, which on some outlines does not come back at all.
+    const outlined = shellByOutline(cad, solid, thickness, openings, edges);
+    if (outlined) return outlined;
+    const probe = Math.max(MIN_PROBE_WALL, Math.min(thickness / 4, PROBE_WALL));
+    if (outlined === null && thickness > probe * 1.01) {
+      const thin = shellByOutline(cad, solid, probe, openings, edges);
+      if (thin) {
+        cad.release(thin);
+        throw new Error(TOO_THICK_MESSAGE);
+      }
+    }
     const hollowed = attempt(thickness);
     if (hollowed) return hollowed;
     if (lastError instanceof Error && lastError.message.startsWith("This body")) throw lastError;
@@ -200,7 +212,6 @@ function shellBody(cad: OcctKernel, solid: ShapeHandle, thickness: number, openi
     // hollowed with a very thin wall is a body whose wall was too thick. A body that fails even
     // then is not clean for the kernel (forum 618422: an imported house whose door was cut down
     // to its bottom edge, so that the cutout touches the outline).
-    const probe = Math.max(MIN_PROBE_WALL, Math.min(thickness / 4, PROBE_WALL));
     if (thickness > probe * 1.01) {
       const thin = attempt(probe);
       if (thin) {
@@ -211,6 +222,192 @@ function shellBody(cad: OcctKernel, solid: ShapeHandle, thickness: number, openi
     throw new Error(CANNOT_HOLLOW_MESSAGE);
   } finally {
     releaseAll(cad, faces);
+  }
+}
+
+/**
+ * A face for the wire moved by `distance` outward (negative: inward), checked by its area; null when the kernel
+ * cannot. Which way a wire moves depends on how it runs, so the way whose area changes as it should is the one. The
+ * moved outline must lie where it should, too: a wire of many small arcs (an STL rebuilt with arcs) came back with
+ * arcs of no length in it, its face was "valid" and still bigger than its own area, and every cut with it failed.
+ */
+function movedOutlineFace(cad: OcctKernel, wire: ShapeHandle, distance: number, joinTypes: Array<JoinType.Arc | JoinType.Intersection>, keep: (handle: ShapeHandle) => ShapeHandle) {
+  const original = keep(cad.makeFace(wire));
+  const base = cad.getSurfaceArea(original);
+  for (const joinType of joinTypes) {
+    for (const sign of [1, -1]) {
+      try {
+        const face = keep(cad.makeFace(keep(cad.offsetWire2D(wire, sign * distance, joinType))));
+        const area = cad.getSurfaceArea(face);
+        if (!(area > 1e-9 && (distance > 0 ? area > base + 1e-9 : area < base - 1e-9))) continue;
+        // Moved inward, the face lies within the outline; moved outward, the outline lies within it.
+        const shared = cad.getSurfaceArea(keep(cad.common(original, face)));
+        const expected = distance > 0 ? base : area;
+        if (Math.abs(shared - expected) <= Math.max(1e-6, expected * 1e-4)) return face;
+      } catch (error) {
+        if (mustSurface(error)) throw error;
+        // The other way round, or nothing.
+      }
+    }
+  }
+  return null;
+}
+
+/**
+ * The wire as a closed outline of straight pieces, its curves sampled within `deflection`; null when the pieces do
+ * not join up. The kernel's 2D offset takes such an outline where it fails on a run of small arcs.
+ */
+function polygonWire(cad: OcctKernel, wire: ShapeHandle, deflection: number, keep: (handle: ShapeHandle) => ShapeHandle) {
+  const data = cad.wireframe(wire, { deflection });
+  const groups = Array.from({ length: data.edgeCount }, (_, index) => ({ start: data.edgeGroups[index * 3], count: data.edgeGroups[index * 3 + 1] }));
+  // The groups count points or floats; whichever adds up to all of them.
+  const byPoint = groups.reduce((sum, group) => sum + group.count, 0) * 3 === data.pointCount;
+  type Point = { x: number; y: number; z: number };
+  const pieces = groups.map(({ start, count }) => {
+    const points: Point[] = [];
+    const first = byPoint ? start * 3 : start;
+    const floats = byPoint ? count * 3 : count;
+    for (let at = first; at + 2 < first + floats; at += 3) points.push({ x: data.points[at], y: data.points[at + 1], z: data.points[at + 2] });
+    return points;
+  }).filter((points) => points.length >= 2);
+  if (pieces.length === 0) return null;
+  const near = (a: Point, b: Point) => Math.hypot(a.x - b.x, a.y - b.y, a.z - b.z) <= 1e-3;
+  const ring = [...pieces.shift()!];
+  while (pieces.length > 0) {
+    const last = ring[ring.length - 1];
+    const index = pieces.findIndex((piece) => near(piece[0], last) || near(piece[piece.length - 1], last));
+    if (index < 0) return null;
+    const [piece] = pieces.splice(index, 1);
+    ring.push(...(near(piece[0], last) ? piece : [...piece].reverse()).slice(1));
+  }
+  if (!near(ring[0], ring[ring.length - 1])) return null;
+  ring.pop();
+  const points = ring.filter((point, index) => index === 0 || Math.hypot(point.x - ring[index - 1].x, point.z - ring[index - 1].z) > 1e-6);
+  if (points.length < 3) return null;
+  return keep(cad.makeWire(points.map((point, index) => keep(cad.makeLineEdge(point, points[(index + 1) % points.length])))));
+}
+
+/** Whether a face's normal lies flat everywhere: sampled across its parameter range. */
+function standsUpright(cad: OcctKernel, face: ShapeHandle) {
+  const { uMin, uMax, vMin, vMax } = cad.uvBounds(face);
+  for (const s of [0.05, 0.5, 0.95]) {
+    for (const t of [0.05, 0.5, 0.95]) {
+      const normal = cad.surfaceNormal(face, uMin + (uMax - uMin) * s, vMin + (vMax - vMin) * t);
+      const length = Math.hypot(normal.x, normal.y, normal.z) || 1;
+      if (Math.abs(normal.y / length) > 1e-4) return false;
+    }
+  }
+  return true;
+}
+
+/** Sampled outlines run within this of the curves they stand for. */
+const OUTLINE_DEFLECTION = 0.01;
+
+/**
+ * Hollows an upright prism - flat at its bottom and top, every side standing straight - through its outline: the
+ * bottom face's outline moved inward by the wall (its holes outward) and pushed up into the cavity, which is cut
+ * from the prism. The kernel's thick solid cannot take a wall that makes faces of the side vanish, and on some
+ * outlines it does not come back at all (Making Layers, mail 08.11.2026: a box with an oval on it, cut off at the
+ * box's side, exported as an STL and imported again; as straight pieces the thick solid failed from a 1.5 mm wall
+ * on, rebuilt with arcs it never finished). The 2D offset lets pieces vanish as it should. The walls are the ones the
+ * thick solid builds for such a body: the inside corners upright as rounded or as sharp as asked, where walls meet
+ * the floor sharp. The outline is moved as it is first; where the kernel cannot move it cleanly, as straight pieces
+ * within 0.01 mm of it. Only for openings at the top and the bottom. Undefined when the body is no upright prism or
+ * the openings are on its sides, null when it is one but its outline cannot be moved.
+ */
+function shellByOutline(cad: OcctKernel, solid: ShapeHandle, thickness: number, openings: ShellOpenings, edges: ShellEdges): ShapeHandle | null | undefined {
+  const sides = shellOpenSides(openings);
+  if (sides.some((side) => side !== "top" && side !== "bottom")) return undefined;
+  const made: ShapeHandle[] = [];
+  const keep = (handle: ShapeHandle) => {
+    made.push(handle);
+    return handle;
+  };
+  try {
+    const bounds = cad.getBoundingBox(solid, false);
+    const flat = Math.max(1e-4, (bounds.ymax - bounds.ymin) * 1e-5);
+    const faces = cad.getSubShapes(solid, "face");
+    made.push(...faces);
+    const bottoms: ShapeHandle[] = [];
+    for (const face of faces) {
+      const center = cad.getSurfaceCenterOfMass(face);
+      const normal = orientedFaceNormal(cad, face, center);
+      if (cad.surfaceType(face) === "plane" && Math.abs(normal.y) > 0.999) {
+        if (normal.y < 0 && Math.abs(center.y - bounds.ymin) <= flat) bottoms.push(face);
+        else if (!(normal.y > 0 && Math.abs(center.y - bounds.ymax) <= flat)) return undefined;
+        continue;
+      }
+      // Every other face stands upright everywhere, not only at its middle (a bulging vase side is
+      // upright at its widest), and runs from the bottom to the top: the body is one layer.
+      if (!standsUpright(cad, face)) return undefined;
+      const box = cad.getBoundingBox(face, false);
+      if (box.ymin > bounds.ymin + flat || box.ymax < bounds.ymax - flat) return undefined;
+    }
+    if (bottoms.length !== 1) return undefined;
+    const wires = cad.getSubShapes(bottoms[0], "wire");
+    made.push(...wires);
+    const outlines = wires
+      .map((wire) => ({ wire, area: cad.getSurfaceArea(keep(cad.makeFace(wire))) }))
+      .sort((a, b) => b.area - a.area);
+    // Sharp joins first where they are asked for; an outline of many short pieces can defeat them in 2D too, and
+    // rounded joins only touch the corners that point into the cavity, so they are the way out.
+    const joinTypes: Array<JoinType.Arc | JoinType.Intersection> = edges === "sharp" ? [JoinType.Intersection, JoinType.Arc] : [JoinType.Arc, JoinType.Intersection];
+    const low = sides.includes("bottom") ? bounds.ymin - 1 : bounds.ymin + thickness;
+    const high = sides.includes("top") ? bounds.ymax + 1 : bounds.ymax - thickness;
+    if (high - low <= flat) return null;
+    const pushedUp = (face: ShapeHandle) => keep(cad.extrude(keep(cad.translate(face, 0, low - bounds.ymin, 0)), 0, high - low, 0));
+    // The outline is moved as it is; where the kernel cannot move it cleanly, as straight pieces. Then the body the
+    // cavity is cut from is that outline pushed up too: a prism of arcs and a cavity of straight pieces did not cut.
+    const polygons = new Map<ShapeHandle, ShapeHandle | null>();
+    const polygonOf = (wire: ShapeHandle) => {
+      if (!polygons.has(wire)) polygons.set(wire, polygonWire(cad, wire, OUTLINE_DEFLECTION, keep));
+      return polygons.get(wire) ?? null;
+    };
+    const build = (asPolygon: boolean) => {
+      const wireOf = (wire: ShapeHandle) => (asPolygon ? polygonOf(wire) : wire);
+      const outer = wireOf(outlines[0].wire);
+      const inside = outer ? movedOutlineFace(cad, outer, -thickness, joinTypes, keep) : null;
+      if (!inside) return null;
+      let cavity = pushedUp(inside);
+      for (const { wire } of outlines.slice(1)) {
+        const hole = wireOf(wire);
+        const around = hole ? movedOutlineFace(cad, hole, thickness, joinTypes, keep) : null;
+        if (!around) return null;
+        cavity = keep(cad.cut(cavity, pushedUp(around)));
+      }
+      // The prism to cut from: the body itself, then its bottom face (or its outline as straight pieces, with the
+      // holes taken out) pushed up again, built the same way as the cavity.
+      const bottom = asPolygon
+        ? outlines.slice(1).reduce((face, { wire }) => keep(cad.cut(face, keep(cad.makeFace(polygonOf(wire)!)))), keep(cad.makeFace(outer!)))
+        : bottoms[0];
+      const prisms = asPolygon ? [keep(cad.extrude(bottom, 0, bounds.ymax - bounds.ymin, 0))] : [solid, keep(cad.extrude(bottom, 0, bounds.ymax - bounds.ymin, 0))];
+      for (const prism of prisms) {
+        // The cut comes back as a compound around the one solid; the hollowed body is that solid.
+        const solids = cad.getSubShapes(keep(cad.cut(prism, cavity)), "solid");
+        made.push(...solids);
+        if (solids.length !== 1) continue;
+        const volume = shapeIsValid(cad, solids[0]) ? cad.getVolume(solids[0]) : 0;
+        if (volume > 0 && volume < cad.getVolume(solid) * (1 - 1e-6)) return solids[0];
+      }
+      return null;
+    };
+    const tried = (asPolygon: boolean) => {
+      try {
+        return build(asPolygon);
+      } catch (error) {
+        if (mustSurface(error)) throw error;
+        return null;
+      }
+    };
+    const result = tried(false) ?? tried(true);
+    if (!result) return null;
+    made.splice(made.indexOf(result), 1);
+    return result;
+  } catch (error) {
+    if (mustSurface(error)) throw error;
+    return null;
+  } finally {
+    releaseAll(cad, made);
   }
 }
 

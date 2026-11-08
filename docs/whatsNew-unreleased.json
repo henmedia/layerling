@@ -34,5 +34,15 @@
       "en": "A text now takes 250 characters instead of 24. The letters keep their size and the line gets as long as it needs to be. A rounded or chamfered letter edge works up to 40 characters.",
       "da": "En tekst kan nu have 250 tegn i stedet for 24. Bogstaverne beholder deres størrelse, og linjen bliver så lang, som den skal være. En afrundet eller affaset bogstavkant virker på en tekst på op til 40 tegn."
     }
+  },
+  {
+    "title": {
+      "de": "Aushöhlen klappt bei mehr Formen",
+      "en": "Hollow works on more shapes"
+    },
+    "body": {
+      "de": "Ein Körper, der oben und unten flach ist und gerade Seiten hat, wird jetzt über seinen Umriss ausgehöhlt. So gehen auch Formen mit spitzen Ecken in einem runden Umriss und importierte STL-Dateien, an denen das Aushöhlen vorher scheiterte oder hängen blieb.",
+      "en": "A body that is flat at its top and bottom with upright sides is now hollowed through its outline. Shapes with a sharp corner in a round outline and imported STL files, where Hollow failed or got stuck before, now work."
+    }
   }
 ]
