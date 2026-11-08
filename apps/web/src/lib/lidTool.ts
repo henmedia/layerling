@@ -6,7 +6,8 @@ import { createLocalId } from "@/lib/localIds";
 import { splitShapeFromWorldPositions } from "@/lib/modelSplit";
 import { printerPlayStart } from "@/lib/printerPlay";
 import { sceneShape } from "@/lib/shapeCatalog";
-import { canonicalizeShape, isNonSolidShape } from "@/lib/workplaneShapes";
+import { roundSideCount } from "@/lib/roundSideCount";
+import { canonicalizeShape, isNonSolidShape, shapeHasShapeDeform, shellRebuildEntry } from "@/lib/workplaneShapes";
 import type { WorkplaneShape } from "@/types/layerling";
 
 /**
@@ -824,6 +825,55 @@ export function lidNeckFit(standard: Exclude<LidThreadStandard, "own">, round: {
   const { neckFrom, neckTo } = lidStandardThread(standard);
   if (2 * round.inner >= neckFrom - 1e-9 && 2 * round.outer <= neckTo + 1e-9) return null;
   return { reason: "size", diameter: Math.round(20 * round.outer) / 10 };
+}
+
+/**
+ * The size "Fit the body to the neck" makes a body's top, across, in mm (issue #1482): the middle of what counts as the
+ * standard's neck (`neckFrom` to `neckTo`), 0.4 mm under the neck itself, so that a body a little off - a cylinder's
+ * flat sides, a hollowed body's walls rebuilt by the CAD kernel - still lies well inside it. Its thread's ring is then
+ * filled up to the neck's size, and the thread is the standard's all the same.
+ */
+export function lidNeckDiameter(standard: Exclude<LidThreadStandard, "own">) {
+  const { neckFrom, neckTo } = lidStandardThread(standard);
+  return Math.round(((neckFrom + neckTo) / 2) * 100) / 100;
+}
+
+/** The kinds "Fit the body to the neck" resizes: round across, as tall as they are, and sized by their width and depth. */
+const NECK_FIT_KINDS: readonly WorkplaneShape["kind"][] = ["cylinder", "ellipse", "tube", "ring"];
+
+/**
+ * Whether a body stands upright, its top where the workplane's top is: turned about the vertical only, or upside down.
+ */
+function standsUpright(shape: WorkplaneShape) {
+  return [shape.rotationX ?? 0, shape.rotationZ ?? 0].every((degrees) => Math.abs(Math.sin((degrees * Math.PI) / 180)) < 1e-6);
+}
+
+/** A round primitive the editor resizes exactly: not turned over on its side, not tapered, twisted or sloped. */
+function neckFitPrimitive(shape: WorkplaneShape) {
+  return NECK_FIT_KINDS.includes(shape.kind) && !shape.importedMesh && !shape.groupedShapes?.length && standsUpright(shape) && !shapeHasShapeDeform(shape);
+}
+
+/**
+ * How "Fit the body to the neck" resizes a body (issue #1482), so that Make lid gives it the standard's thread: its
+ * width and depth made the neck's (`lidNeckDiameter`), its height kept. Only a body the editor resizes exactly is
+ * fitted: a cylinder, an elliptic cylinder (which comes out round), a tube or a ring, standing upright and not
+ * tapered, or one of these hollowed with nothing else done to its edges, which the editor hollows again at its new size,
+ * the walls as thick as they were. Its sides must leave it round at that size, as `lidNeckFit` measures it (a cylinder
+ * of six sides is not). Null for anything else - a mesh, a group, a cone, a body with a fillet round its rim - which the
+ * panel only measures.
+ */
+export function lidNeckFitPatch(shape: WorkplaneShape, standard: Exclude<LidThreadStandard, "own">): { width: number; depth: number; size: number } | null {
+  if (shape.hole || isNonSolidShape(shape)) return null;
+  const history = shape.edgeTreatmentHistory ?? [];
+  const hollowed = shape.importedMesh && history.length === 1 && history[0].feature.kind === "shell" && shellRebuildEntry(shape) === history[0];
+  const source = hollowed ? history[0].before : shape;
+  if (!neckFitPrimitive(source) || (hollowed && (!standsUpright(shape) || shape.groupedShapes?.length)) || (!hollowed && history.length)) return null;
+  const diameter = lidNeckDiameter(standard);
+  // A polygon's corners lie on the circle, the middles of its sides inside it.
+  const sides = roundSideCount(source.sides, diameter, diameter);
+  const inner = (diameter / 2) * Math.cos(Math.PI / sides);
+  if (diameter / 2 - inner > SCREW_ROUND || lidNeckFit(standard, { outer: diameter / 2, inner })) return null;
+  return { width: diameter, depth: diameter, size: diameter };
 }
 
 /**
@@ -2838,6 +2888,30 @@ export type LidFlipTop = { opening: number; flap: number; hingeWidth: number; hi
 
 export type LidResult = { lid: ManifoldSolid; magnets?: LidMagnets; hinge?: LidHinge; clickBumps?: LidClickBumps; handle?: LidHandleResult; screw?: LidScrew; bayonet?: LidBayonet; slide?: LidSlide; tether?: LidTether; flipTop?: LidFlipTop } | { error: LidError };
 
+/** Where a lid cuts the body to find its top: just below the rim, so a rim that is a hair uneven still counts as the top. */
+function lidRimHeight(top: number, height: number) {
+  return top - Math.min(0.3, height * 0.02);
+}
+
+/**
+ * The top of `body` (in the scene's frame, y up) as a standard's screw lid measures it (`standardScrewPlan`), before the
+ * lid is made (issue #1482): cut where `lidForSolid` cuts it, below the rim, its outline with the openings filled, and
+ * `roundOutline` of that - how far it reaches from its middle at most (`outer`) and at least (`inner`) - or null when it
+ * is not round. `lidNeckFit` of it says whether Make lid gives the body the neck's thread.
+ */
+export function lidTopRound(runtime: ManifoldToplevel, body: ManifoldSolid): { outer: number; inner: number } | null {
+  const created: { delete?: () => void }[] = [];
+  try {
+    const up = keep(created, body.transform(SCENE_TO_UP));
+    const box = up.boundingBox();
+    const outline = filled(runtime, keep(created, up.slice(lidRimHeight(box.max[2], box.max[2] - box.min[2]))), created);
+    const round = roundOutline(outline.toPolygons() as Point[][]);
+    return round ? { outer: round.outer, inner: round.inner } : null;
+  } finally {
+    Array.from(new Set(created)).forEach((value) => value.delete?.());
+  }
+}
+
 /**
  * The lid for `body` (in the scene's frame, y up), lying turned over beside it: its plate on the workplane at the
  * height of the body's bottom, the lip or rim pointing up. With magnets, also the pockets the body needs, and the posts
@@ -2855,8 +2929,7 @@ export function lidForSolid(runtime: ManifoldToplevel, body: ManifoldSolid, give
     const box = up.boundingBox();
     const top = box.max[2];
     const height = top - box.min[2];
-    // Just below the rim, so a rim that is a hair uneven still counts as the top.
-    const rim = top - Math.min(0.3, height * 0.02);
+    const rim = lidRimHeight(top, height);
     let section = keep(created, up.slice(rim));
     const outline = filled(runtime, section, created);
     let opening = keep(created, outline.subtract(section));
@@ -3611,34 +3684,62 @@ export type LidShapeTether = { part: WorkplaneShape; bead: WorkplaneShape; strap
 export type LidShapeResult = { lid: WorkplaneShape; magnets?: LidShapeMagnets; hinge?: LidShapeHinge; clickBumps?: LidShapeClickBumps; handle?: LidShapeHandle; screw?: LidShapeScrew; bayonet?: LidShapeBayonet; slide?: LidShapeSlide; tether?: LidShapeTether; flipTop?: LidFlipTop } | { lid: null; error: string };
 
 /**
+ * The body a lid is made for, in the kernel: the solids among `targets` joined and the holes among them cut away. Null
+ * when one of them is not a closed solid. What it makes goes into `created`, to be let go with the rest.
+ */
+function lidBody(runtime: ManifoldToplevel, targets: readonly WorkplaneShape[], created: ManifoldSolid[]): ManifoldSolid | null {
+  const solids = targets.filter((shape) => !shape.hole && !isNonSolidShape(shape));
+  const holes = targets.filter((shape) => shape.hole);
+  const closed = (part: ManifoldSolid | null): part is ManifoldSolid => Boolean(part && part.status() === "NoError" && part.numTri() > 0);
+  const builtParts = solids.map((shape) => shapeToManifoldSolid(runtime, shape, created));
+  const builtCutters = holes.map((shape) => shapeToManifoldSolid(runtime, shape, created));
+  const parts = builtParts.filter(closed);
+  const cutters = builtCutters.filter(closed);
+  if (!parts.length || parts.length !== builtParts.length || cutters.length !== builtCutters.length) return null;
+  let body = parts.length === 1 ? parts[0] : runtime.Manifold.union(parts);
+  created.push(body);
+  if (cutters.length) {
+    // The holes joined into one are a body of their own in the kernel's memory, let go with the rest.
+    const holesTogether = runtime.Manifold.union(cutters);
+    created.push(holesTogether);
+    body = body.subtract(holesTogether);
+    created.push(body);
+  }
+  return body;
+}
+
+/**
+ * The top of the selected bodies as Make lid measures it for a standard's thread (`lidTopRound`), the solids joined and
+ * their holes cut away as `lidForShapes` does: the lid panel says with it, before the lid is made, whether the body gets
+ * the neck's thread (issue #1482). `round` is null for a top that is not round; null for no body, or one that is not closed.
+ */
+export async function lidTopForShapes(targets: readonly WorkplaneShape[]): Promise<{ round: { outer: number; inner: number } | null } | null> {
+  if (!targets.some((shape) => !shape.hole && !isNonSolidShape(shape))) return null;
+  const created: ManifoldSolid[] = [];
+  try {
+    const runtime = await getManifoldRuntime();
+    const body = lidBody(runtime, targets, created);
+    return body ? { round: lidTopRound(runtime, body) } : null;
+  } catch {
+    return null;
+  } finally {
+    Array.from(new Set(created)).forEach(disposeManifold);
+  }
+}
+
+/**
  * The lid for the selected bodies: the solids joined and the holes among them cut away, then the lid made for what is
  * left. It is a mesh named after the first body, in its colour. With magnets, the posts and pockets for the body come
  * with it, standing where they go: grouped with the bodies, they cut the pockets into them.
  */
 export async function lidForShapes(targets: readonly WorkplaneShape[], given: LidOptions): Promise<LidShapeResult> {
   const solids = targets.filter((shape) => !shape.hole && !isNonSolidShape(shape));
-  const holes = targets.filter((shape) => shape.hole);
   if (!solids.length) return { lid: null, error: t("lid.error.needsBody") };
   const created: ManifoldSolid[] = [];
   try {
     const runtime = await getManifoldRuntime();
-    const closed = (part: ManifoldSolid | null): part is ManifoldSolid => Boolean(part && part.status() === "NoError" && part.numTri() > 0);
-    const builtParts = solids.map((shape) => shapeToManifoldSolid(runtime, shape, created));
-    const builtCutters = holes.map((shape) => shapeToManifoldSolid(runtime, shape, created));
-    const parts = builtParts.filter(closed);
-    const cutters = builtCutters.filter(closed);
-    if (parts.length !== builtParts.length || cutters.length !== builtCutters.length) {
-      return { lid: null, error: lidErrorMessage({ code: "notClosed" }) };
-    }
-    let body = parts.length === 1 ? parts[0] : runtime.Manifold.union(parts);
-    created.push(body);
-    if (cutters.length) {
-      // The holes joined into one are a body of their own in the kernel's memory, let go with the rest.
-      const holesTogether = runtime.Manifold.union(cutters);
-      created.push(holesTogether);
-      body = body.subtract(holesTogether);
-      created.push(body);
-    }
+    const body = lidBody(runtime, targets, created);
+    if (!body) return { lid: null, error: lidErrorMessage({ code: "notClosed" }) };
     const result = lidForSolid(runtime, body, given);
     if ("error" in result) return { lid: null, error: lidErrorMessage(result.error) };
     created.push(result.lid);

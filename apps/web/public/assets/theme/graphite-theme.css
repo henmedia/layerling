@@ -1233,6 +1233,26 @@ html[data-theme="dark"]:where([data-palette="graphite"]) .shell-openings-summary
   accent-color: #d07313;
 }
 
+:where(html[data-theme="dark"][data-palette="graphite"]) .lid-neck-fit-button {
+  color: #9f5508;
+  background: #f0f0f0;
+  border: 1px solid #e08a2c;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .lid-neck-fit-button:hover:not(:disabled) {
+  background: #e1e1e1;
+}
+
+html[data-theme="dark"]:where([data-palette="graphite"]) .lid-neck-fit-button {
+  color: #f3a452;
+  background: #2d2d2d;
+  border-color: #b9741f;
+}
+
+html[data-theme="dark"]:where([data-palette="graphite"]) .lid-neck-fit-button:hover:not(:disabled) {
+  background: #353535;
+}
+
 :where(html[data-theme="dark"][data-palette="graphite"]) .cable-channel-picking {
   color: #b35f00;
 }

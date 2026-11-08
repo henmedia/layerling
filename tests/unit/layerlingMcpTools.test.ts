@@ -5,7 +5,7 @@ import { toolbarShapeAssets } from "@/lib/shapeCatalog";
 import { MCP_SHAPE_SETTING_KEYS } from "@/lib/mcpShapeSettings";
 import { THREAD_SIZES } from "@/lib/threadGeometry";
 import { THREAD_PROFILES } from "@/lib/threadProfiles";
-import { LID_DEFAULTS, LID_THREAD_STANDARDS, LID_TYPES } from "@/lib/lidTool";
+import { LID_DEFAULTS, LID_THREAD_STANDARDS, LID_TYPES, lidNeckDiameter } from "@/lib/lidTool";
 
 /*
  * Die Formenliste steht an zwei Stellen: im Katalog, aus dem das Formenmenü und
@@ -151,5 +151,14 @@ describe("the lid tool the MCP bridge offers", () => {
     const properties = toolByName("layerling_make_lid").inputSchema.properties ?? {};
     expect(Object.keys(LID_DEFAULTS).filter((key) => !(key in properties))).toEqual([]);
     expect(properties.tether).toMatchObject({ type: "boolean" });
+  });
+
+  it("can fit the body to a standard's neck first, as the panel's button does (issue #1482)", () => {
+    const properties = toolByName("layerling_make_lid").inputSchema.properties as Record<string, { type?: string; description?: string }>;
+    expect(properties.fitNeck).toMatchObject({ type: "boolean" });
+    // The sizes it names are the ones the button makes.
+    for (const standard of LID_THREAD_STANDARDS.filter((name) => name !== "own")) {
+      expect(properties.fitNeck.description).toContain(`${standard} ${lidNeckDiameter(standard).toString()}`);
+    }
   });
 });

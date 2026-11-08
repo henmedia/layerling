@@ -3,7 +3,7 @@ import { checkClearance, type ClearanceOptions, type ClearanceResult } from "@/l
 import { buildGroupedShapeFromSelection, exportSolidVolume, faceReadJoins, faceReadPositions, previewSplitConnectors, splitShapeIfCrossed, splitShapesByPlane, type ExportSolidVolume, type GroupBuildResult, type SplitConnectorPreview, type SplitShapesOutcome } from "@/lib/editorBooleans";
 import { packValue, packedTransfer, unpackValue } from "@/lib/geometryTransfer";
 import { articulateShapes, type FlexiOptions, type FlexiShapesResult } from "@/lib/flexiJoints";
-import { lidForShapes, type LidOptions, type LidShapeResult } from "@/lib/lidTool";
+import { lidForShapes, lidTopForShapes, type LidOptions, type LidShapeResult } from "@/lib/lidTool";
 import { checkPrint, type PrintCheckOptions, type PrintCheckResult } from "@/lib/printCheck";
 import { resultMeshes, type GeometryTask, type GeometryWorkerRequest, type GeometryWorkerResponse } from "@/lib/geometryWorkerTypes";
 import { gridfinityHasLabelText } from "@/lib/gridfinityGeometry";
@@ -314,6 +314,17 @@ export function lidForShapesOffThread(targets: readonly WorkplaneShape[], option
   const onPage = () => lidForShapes([...targets], options);
   if (containsText([...targets])) return onPage();
   return runGeometryTask<LidShapeResult>("lid", { targets: [...targets], options }, onPage, () => ({ lid: null, error: t("status.computeTimedOut") }), signal);
+}
+
+/**
+ * lidTopForShapes (lib/lidTool.ts) off the page: the body's top as a standard's screw lid measures it, which the lid
+ * panel shows while it is open (issue #1482). Quiet, as the warm-up is: the panel says it is measuring. A measurement the
+ * signal calls off (the body changed) never answers; one that times out is no measurement.
+ */
+export function lidTopOffThread(targets: readonly WorkplaneShape[], signal?: AbortSignal): ReturnType<typeof lidTopForShapes> {
+  const onPage = () => lidTopForShapes([...targets]);
+  if (containsText([...targets])) return onPage();
+  return runGeometryTask("lidTop", { targets: [...targets] }, onPage, () => null, signal, true);
 }
 
 /**

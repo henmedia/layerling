@@ -3404,6 +3404,42 @@ html[data-theme="dark"] .shell-openings-summary {
   font-weight: 700;
 }
 
+/* The lid panel's button that fits the body to a standard's neck (issue #1482), under the line that measures its top. */
+.lid-neck-fit-button {
+  display: inline-flex;
+  min-height: 32px;
+  align-items: center;
+  gap: 6px;
+  margin-top: 8px;
+  padding: 0 12px;
+  color: #9f5508;
+  background: #fff1e0;
+  border: 1px solid #e08a2c;
+  border-radius: 7px;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.lid-neck-fit-button:hover:not(:disabled) {
+  background: #fde3c4;
+}
+
+.lid-neck-fit-button:disabled {
+  cursor: default;
+  opacity: 0.6;
+}
+
+html[data-theme="dark"] .lid-neck-fit-button {
+  color: #f3a452;
+  background: #3a2c16;
+  border-color: #b9741f;
+}
+
+html[data-theme="dark"] .lid-neck-fit-button:hover:not(:disabled) {
+  background: #4a3719;
+}
+
 .cable-channel-picking {
   display: inline-flex;
   align-items: center;
