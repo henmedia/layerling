@@ -357,7 +357,7 @@ import {
 import { regularPolygonAspect } from "@/lib/regularPolygonFootprint";
 import { DEFAULT_TAPER_DIMENSION_MAX, MAX_HIGH_RESOLUTION_SIDES, MAX_HIGH_RESOLUTION_STEPS, POSITION_TYPED_LIMIT, RULER_MAX_LENGTH, customSnapGridLabel, positionReach, shapeDimensionLimit, snapGridStep } from "@/lib/workplaneSettings";
 import { printerPresetById } from "@/lib/printBed";
-import { narrowCrossWidth, narrowEndWidth, normalizeNarrowStart, normalizeSlopeCurve, normalizeSlopeFrom, normalizeSlopeSide, shapeSupportsNarrow, shapeSupportsSlope, SLOPE_MIN_END, slopeAlongWidth, slopeEndHeight, slopeSidesFor } from "@/lib/slopeAlong";
+import { maxSideDrop, narrowCrossWidth, narrowEndWidth, normalizeNarrowStart, normalizeSlopeCurve, normalizeSlopeFrom, normalizeSlopeSide, shapeSupportsNarrow, shapeSupportsSlope, SLOPE_MIN_END, slopeAlongWidth, slopeEndHeight, slopeSidesFor } from "@/lib/slopeAlong";
 import type { BentTubeInnerProfile, BentTubeProfile, CustomSnapGrid, GearType, GridfinityCompartmentLabel, GridfinityType, GridSize, MeasurementAccuracy, ShapeCustomization, SketchProfile, SketchStroke, SketchStrokeAlign, SketchStrokeJoin, ThreadDrive, ThreadHead, ThreadProfile, ThreadRole, WorkplaneShape, WorkplaneWorkspaceSettings } from "@/types/layerling";
 import { selectWholeValue } from "@/lib/numberField";
 import { formulaMatchesValue, formulaToRemember, withFieldFormula, type FieldFormulas } from "@/lib/fieldFormulas";
@@ -4451,8 +4451,28 @@ export function ShapeInspector({
       hint: t("slope.curveHint"),
       onChange: (percent) => onUpdate({ slopeCurve: normalizeSlopeCurve(percent / 100), slopeEnd: shape.slopeEnd ?? shape.height, slopeSide: shape.slopeSide ?? slopeSide }),
     },
+    {
+      id: "sideDrop",
+      label: t("prop.sideDrop"),
+      value: Math.min(maxSideDrop(shape.height), Math.max(0, shape.sideDrop ?? 0)),
+      min: 0,
+      max: Math.floor(maxSideDrop(shape.height) * 100) / 100,
+      step: 0.1,
+      hint: t("slope.sideDropHint"),
+      onChange: (sideDrop) => onUpdate({ sideDrop: Math.min(maxSideDrop(shape.height), Math.max(0, sideDrop)) }),
+    },
+    {
+      id: "sideCurve",
+      label: t("prop.sideCurve"),
+      value: Math.round(normalizeSlopeCurve(shape.sideCurve) * 100),
+      min: -100,
+      max: 100,
+      step: 1,
+      hint: t("slope.sideCurveHint"),
+      onChange: (percent) => onUpdate({ sideCurve: normalizeSlopeCurve(percent / 100) }),
+    },
   ];
-  const slopeDefaults: PropertyDefaultValues = new Map<string, number | string | boolean>([["slopeEnd", shape.height], ["slopeAngle", 0], ["slopeCurve", 0], ["slopeFrom", "end"]]);
+  const slopeDefaults: PropertyDefaultValues = new Map<string, number | string | boolean>([["slopeEnd", shape.height], ["slopeAngle", 0], ["slopeCurve", 0], ["sideDrop", 0], ["sideCurve", 0], ["slopeFrom", "end"]]);
   /*
    * Narrow along (slopeAlong.ts): seen from above, both long sides run in towards one
    * end - its width, where along the length it starts and how much the sides curve.

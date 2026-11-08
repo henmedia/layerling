@@ -171,6 +171,39 @@ export function slopeSectionCount(curve: SlopeCurve) {
 }
 
 /*
+ * Side drop (Oldalak leengedése): the two longer sides of the body run down from the full
+ * height in the middle to a lower one at both edges, evenly, across the shorter way. The top
+ * line is the same kind of Bezier as the slope's, from the middle (the full height) to the
+ * edge. Together with a slope the two drops add up.
+ */
+
+/** Most the edges may be lowered, in mm: the body keeps SLOPE_MIN_END of height. */
+export function maxSideDrop(height: number) {
+  return Math.max(0, height - Math.min(SLOPE_MIN_END, height));
+}
+
+/** Whether the lowered sides are across the width (the width is the shorter way) rather than across the depth. */
+export function sideDropAcrossWidth(shape: Pick<WorkplaneShape, "width" | "depth" | "size">) {
+  return (shape.width ?? shape.size) < (shape.depth ?? shape.size);
+}
+
+/** The edges' drop in mm, 0 to maxSideDrop. */
+export function sideDropAmount(shape: Pick<WorkplaneShape, "height" | "sideDrop">) {
+  const drop = typeof shape.sideDrop === "number" && Number.isFinite(shape.sideDrop) ? shape.sideDrop : 0;
+  return Math.min(maxSideDrop(shape.height), Math.max(0, drop));
+}
+
+export function shapeHasSideDrop(shape: WorkplaneShape) {
+  return shapeSupportsSlope(shape) && sideDropAmount(shape) > 1e-6;
+}
+
+/** The side drop's top line, from the middle (distance 0) to an edge (half the shorter way). */
+export function sideDropCurveForShape(shape: WorkplaneShape): SlopeCurve {
+  const across = sideDropAcrossWidth(shape) ? (shape.width ?? shape.size) : (shape.depth ?? shape.size);
+  return { ...topCurve(across / 2, shape.height, shape.height - sideDropAmount(shape), shape.sideCurve ?? 0), middle: true, full: across };
+}
+
+/*
  * Narrow along (Szűkülés hosszában): seen from above, the two long sides of a box
  * or a round roof run in towards one end, evenly from both sides, so that end
  * stays in the middle. The half-width follows the same kind of Bezier as the
@@ -212,12 +245,12 @@ export function shapeHasNarrow(shape: WorkplaneShape) {
 
 /** Either deformation along the length. */
 export function shapeHasAlongDeform(shape: WorkplaneShape) {
-  return shapeHasSlope(shape) || shapeHasNarrow(shape);
+  return shapeHasSlope(shape) || shapeHasNarrow(shape) || shapeHasSideDrop(shape);
 }
 
-/** A slope from the middle has no exact CAD body yet: it keeps its display mesh. */
+/** A slope from the middle or a side drop has no exact CAD body yet: it keeps its display mesh. */
 export function shapeHasSymmetricDeform(shape: WorkplaneShape) {
-  return shapeHasSlope(shape) && normalizeSlopeFrom(shape.slopeFrom) === "middle";
+  return shapeHasSideDrop(shape) || (shapeHasSlope(shape) && normalizeSlopeFrom(shape.slopeFrom) === "middle");
 }
 
 export type NarrowCurve = SlopeCurve & {
@@ -290,7 +323,8 @@ function sliceAlongAxis(vertices: readonly Vec3[], faces: readonly Face[], axis:
 export function slopeMesh(vertices: readonly Vec3[], faces: readonly Face[], shape: WorkplaneShape) {
   const slope = shapeHasSlope(shape);
   const narrow = shapeHasNarrow(shape);
-  if (!vertices.length || (!slope && !narrow)) return { vertices: vertices.slice() as Vec3[], faces: faces.slice() as Face[] };
+  const sides = shapeHasSideDrop(shape);
+  if (!vertices.length || (!slope && !narrow && !sides)) return { vertices: vertices.slice() as Vec3[], faces: faces.slice() as Face[] };
   const bounds = (list: readonly Vec3[]) => {
     const min = { x: Infinity, y: Infinity, z: Infinity };
     const max = { x: -Infinity, y: -Infinity, z: -Infinity };
@@ -318,6 +352,8 @@ export function slopeMesh(vertices: readonly Vec3[], faces: readonly Face[], sha
   const narrowSide = normalizeSlopeSide(shape.kind, shape.narrowSide);
   const slopeCurve = slope ? slopeCurveForShape(shape) : null;
   const narrowCurve = narrow ? narrowCurveForShape(shape) : null;
+  const sideCurve = sides ? sideDropCurveForShape(shape) : null;
+  const sideAxis: 0 | 2 = sideDropAcrossWidth(shape) ? 0 : 2;
   const cuts: Record<0 | 2, number[]> = { 0: [], 2: [] };
   // From the middle the line is cut on both sides of it, and at the middle itself, where the two halves meet in a ridge.
   const aroundMiddle = (axis: 0 | 2, curve: SlopeCurve) => {
@@ -336,18 +372,35 @@ export function slopeMesh(vertices: readonly Vec3[], faces: readonly Face[], sha
     const axis = slopeAlongWidth(slopeSide) ? 0 : 2;
     alongLevels(slopeCurve.length, 0, slopeCurve, roof).forEach((s) => cuts[axis].push(coordinate(slopeSide, s, slopeCurve.length)));
   }
+  if (sideCurve) aroundMiddle(sideAxis, sideCurve);
   if (narrowCurve) {
     const axis = slopeAlongWidth(narrowSide) ? 0 : 2;
     alongLevels(narrowCurve.total, narrowCurve.start, narrowCurve, roof).forEach((s) => cuts[axis].push(coordinate(narrowSide, s, narrowCurve.total)));
   }
-  for (const axis of [0, 2] as const) mesh = sliceAlongAxis(mesh.vertices, mesh.faces, axis, cuts[axis]);
+  // Two lines may ask for the same cut: it is made once.
+  for (const axis of [0, 2] as const) {
+    const sorted = cuts[axis].slice().sort((a, b) => a - b);
+    cuts[axis] = sorted.filter((value, index) => index === 0 || value - sorted[index - 1] > 1e-6);
+    mesh = sliceAlongAxis(mesh.vertices, mesh.faces, axis, cuts[axis]);
+  }
   const centerX = (min.x + max.x) / 2;
   const centerZ = (min.z + max.z) / 2;
   const out = mesh.vertices.map(([x, y, z]): Vec3 => {
     let nx = x;
     let ny = y;
     let nz = z;
-    if (slopeCurve) ny = min.y + (y - min.y) * (slopeTopAtDistance(slopeCurve, slopeDistance(slopeSide, x, z, min, max, slopeCurve.full ?? slopeCurve.length)) / Math.max(1e-9, slopeCurve.keep));
+    // A slope alone and a side drop alone scale the height by their top's share; both together add their drops.
+    const slopeTop = slopeCurve ? slopeTopAtDistance(slopeCurve, slopeDistance(slopeSide, x, z, min, max, slopeCurve.full ?? slopeCurve.length)) : null;
+    // The distance from the middle is taken as a share of half the way across, so a body drawn as a unit one (stretched afterwards) is judged as in millimetres.
+    const sideTop = sideCurve
+      ? slopeTopAt(sideCurve, Math.min(1, Math.abs(sideAxis === 0 ? x - centerX : z - centerZ) / Math.max(1e-9, ((sideAxis === 0 ? max.x - min.x : max.z - min.z) / 2))) * sideCurve.length)
+      : null;
+    if (slopeTop !== null && sideTop === null) ny = min.y + (y - min.y) * (slopeTop / Math.max(1e-9, slopeCurve!.keep));
+    else if (sideTop !== null) {
+      const keep = (slopeCurve ?? sideCurve)!.keep;
+      const top = Math.max(Math.min(SLOPE_MIN_END, keep), (slopeTop ?? keep) + sideTop - keep);
+      ny = min.y + (y - min.y) * (top / Math.max(1e-9, keep));
+    }
     if (narrowCurve) {
       const factor = narrowHalfWidthAt(narrowCurve, slopeDistance(narrowSide, x, z, min, max, narrowCurve.total)) / Math.max(1e-9, narrowCurve.keep);
       if (slopeAlongWidth(narrowSide)) nz = centerZ + (z - centerZ) * factor;

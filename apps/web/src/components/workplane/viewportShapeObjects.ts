@@ -308,6 +308,8 @@ export function tapeShapeTopologyKey(shape: WorkplaneShape): string {
     slopeSide: shape.slopeSide,
     slopeCurve: shape.slopeCurve,
     slopeFrom: shape.slopeFrom,
+    sideDrop: shape.sideDrop,
+    sideCurve: shape.sideCurve,
     narrowEnd: shape.narrowEnd,
     narrowSide: shape.narrowSide,
     narrowCurve: shape.narrowCurve,
@@ -624,7 +626,7 @@ export function shapeGeometrySignature(shape: WorkplaneShape): string {
   // before the twist stays on screen.
   // A slope along (slopeAlong.ts) rebuilds the mesh per vertex too, worked out in millimetres.
   const slope = shapeHasAlongDeform(shape)
-    ? { end: shape.slopeEnd, side: shape.slopeSide, curve: shape.slopeCurve, from: shape.slopeFrom, narrow: [shape.narrowEnd, shape.narrowSide, shape.narrowCurve, shape.narrowStart] }
+    ? { end: shape.slopeEnd, side: shape.slopeSide, curve: shape.slopeCurve, from: shape.slopeFrom, sides: [shape.sideDrop, shape.sideCurve], narrow: [shape.narrowEnd, shape.narrowSide, shape.narrowCurve, shape.narrowStart] }
     : null;
   const deform = shapeHasExtrudeDeform(shape) || slope
     ? { twist: shape.extrudeTwist, offsetX: shape.extrudeTopOffsetX, offsetZ: shape.extrudeTopOffsetZ, slope, pivot: extrudeTwistPivot(shape) }
@@ -736,6 +738,8 @@ export function shapeGeometrySignature(shape: WorkplaneShape): string {
     slopeSide: shape.slopeSide,
     slopeCurve: shape.slopeCurve,
     slopeFrom: shape.slopeFrom,
+    sideDrop: shape.sideDrop,
+    sideCurve: shape.sideCurve,
     narrowEnd: shape.narrowEnd,
     narrowSide: shape.narrowSide,
     narrowCurve: shape.narrowCurve,
@@ -1786,6 +1790,7 @@ function shapeWithoutDeform(shape: WorkplaneShape): WorkplaneShape {
     extrudeTopOffsetX: undefined,
     extrudeTopOffsetZ: undefined,
     slopeEnd: undefined,
+    sideDrop: undefined,
     narrowEnd: undefined,
   };
 }
