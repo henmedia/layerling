@@ -6,11 +6,13 @@
         "title": {
           "de": "Winkellineal so lang wie die Platte",
           "en": "A framing square as long as the plate",
+          "da": "Vinkelmåleren så lang som printpladen",
           "ar": "زاوية النجار بطول سرير الطباعة"
         },
         "body": {
           "de": "Die Arme des Winkellineals lassen sich jetzt an ihrem Ende länger oder kürzer ziehen. Ein Knopf unter dem Griff macht sie so lang wie die Druckplatte deines Druckers.",
           "en": "The framing square's arms can now be dragged longer or shorter at their ends. A button under the handle makes them as long as your printer's build plate.",
+          "da": "Vinkelmålerens arme kan nu trækkes længere eller kortere i deres ender. En knap under håndtaget gør dem lige så lange som printpladen på printeren.",
           "ar": "يمكن الآن سحب ذراعي زاوية النجار من الأطراف لتطويلهما أو تقصيرهما. ويتيح لك الزر الموجود أسفل المقبض ضبط طولهما ليكون مساويًا لطول سرير الطباعة في طابعتك."
         }
       },
@@ -18,11 +20,13 @@
         "title": {
           "de": "Deckel zum Einschrauben",
           "en": "A lid that screws in",
+          "da": "Et låg, der skrues ind",
           "ar": "غطاء يُلفّ إلى الداخل"
         },
         "body": {
           "de": "Das Deckel-Werkzeug hat eine neue Art „Eingeschraubt“: Der Körper bekommt das Gewinde innen in seiner Öffnung, der Deckel einen Gewindezapfen darunter. Außen bleibt der Körper glatt, etwa bei einem runden Stiftehalter. Beide Teile drucken ohne Stützen.",
           "en": "The Lid tool has a new kind, Screw in: the body gets the thread inside its opening and the lid a threaded plug below it. The outside of the body stays smooth, for a round pen holder, say. Both parts print without support.",
+          "da": "Lågværktøjet har en ny slags, Skrues i: legemet får gevindet inden i sin åbning, og låget en prop med gevind nedenunder. Legemets yderside bliver glat, som på et rundt penneglas. Begge dele printes uden støtte.",
           "ar": "لأداة «الغطاء» نوع جديد: «لولبي للداخل». يحصل الجسم على السن داخل فتحته، والغطاء على سدادة ملولبة تحته. ويبقى السطح الخارجي للجسم أملس، لحامل أقلام مستدير مثلًا. ويُطبع الجزءان دون دعامات."
         }
       },
@@ -30,11 +34,13 @@
         "title": {
           "de": "Gedrehte Langlöcher im Lochmuster",
           "en": "Turned slots in a hole pattern",
+          "da": "Drejede slidser i et hulmønster",
           "ar": "شقوق مُدارة في نمط الثقوب"
         },
         "body": {
           "de": "Langlöcher und Rechtecke im Lochmuster lassen sich jetzt drehen: Mit „Winkel der Löcher“ steht jedes Loch schräg, etwa Lüftungsschlitze auf 45°, und das Raster bleibt gerade. Die Wand zwischen den Löchern bleibt dabei erhalten.",
           "en": "Slots and rectangles in a hole pattern can now be turned: with Angle of the holes each hole stands at a slant, ventilation slots at 45° for example, while the grid stays straight. The wall between the holes is kept.",
+          "da": "Slidser og rektangler i et hulmønster kan nu drejes: med Vinkel på hullerne står hvert hul på skrå, ventilationsslidser for eksempel på 45°, mens rækkerne forbliver lige. Væggen mellem hullerne bevares.",
           "ar": "يمكن الآن تدوير الشقوق والمستطيلات في «نمط الثقوب»: مع «زاوية الثقوب» يقف كل ثقب مائلًا، كشقوق التهوية بزاوية 45° مثلًا، بينما تبقى الشبكة مستقيمة. ويبقى الجدار بين الثقوب محفوظًا."
         }
       },
@@ -56,11 +62,13 @@
         "title": {
           "de": "Einschub-Deckel",
           "en": "A slide-in lid",
+          "da": "Et låg, der skydes ind",
           "ar": "غطاء منزلق"
         },
         "body": {
           "de": "Das Deckel-Werkzeug hat eine neue Art „Einschub“, wie der Deckel einer Holz-Federmappe: Er gleitet mit Zungen in Nuten dreier Wände und wird durch die vierte hineingeschoben. Die Box druckt aufrecht, der Deckel umgedreht, beide ohne Stützen.",
           "en": "The Lid tool has a new kind, Slide-in, like a wooden pencil box's lid: it runs on tongues in grooves in three walls and slides in over the fourth. The box prints upright and the lid turned over, both without support.",
+          "da": "Lågværktøjet har en ny slags, Skydes ind, som låget på et penalhus af træ: det løber i noter i tre vægge og skydes ind over den fjerde. Kassen printes stående og låget med pladen ned, begge uden støtte.",
           "ar": "لأداة «الغطاء» نوع جديد: «منزلق»، كغطاء مقلمة خشبية: تجري حوافه في مجارٍ في ثلاثة جدران وينزلق إلى الداخل فوق الرابع. يُطبع الصندوق قائمًا والغطاء مقلوبًا، كلاهما دون دعامات."
         }
       },
@@ -68,11 +76,13 @@
         "title": {
           "de": "Klappdeckel und Halteband",
           "en": "Flip-top and tether",
+          "da": "Klaplåg og holdebånd",
           "ar": "غطاء قلّاب ورباط"
         },
         "body": {
           "de": "Schraub- und Bajonettdeckel können eine Ausgießöffnung mit angedruckter Klappe bekommen, wie bei einer Shampooflasche, und ein Halteband, das den Deckel am Körper hält. Beides druckt ohne Stützen.",
           "en": "Screw and bayonet caps can get a pouring opening with a printed flap, like a shampoo bottle's, and a tether that keeps the cap on the body. Both print without support.",
+          "da": "Skruelåg og bajonetlåg kan få en hældningsåbning med en printet klap, som på en flaske shampoo, og et holdebånd, der holder låget ved legemet. Begge dele printes uden støtte.",
           "ar": "يمكن أن تحصل الأغطية اللولبية وأغطية البايونيت على فتحة صبّ بلسان مطبوع، كما في قارورة الشامبو، وعلى رباط يُبقي الغطاء مع الجسم. ويُطبع كلاهما دون دعامات."
         }
       },
@@ -80,11 +90,13 @@
         "title": {
           "de": "Normgewinde für Flaschen und Gläser",
           "en": "Standard bottle and jar threads",
+          "da": "Standardgevind på flasker og glas",
           "ar": "أسنان قياسية للزجاجات والبرطمانات"
         },
         "body": {
           "de": "Der Schraubdeckel kann das Gewinde einer Norm bekommen (PCO 1881, PCO 1810, GL 45, Einmachglas), damit er auf eine gekaufte Flasche passt. Beim Bajonettdeckel lässt sich außerdem die Drehung einstellen, und ein abgerundeter Rand wird nicht mehr abgelehnt.",
           "en": "The screw lid can take a standard's thread (PCO 1881, PCO 1810, GL 45, mason jars) so it fits a bottle from the shop. The bayonet lid's turn can be set, and a rounded rim is no longer refused.",
+          "da": "Skruelåget kan tage gevindet på en standardflaske eller et standardglas (PCO 1881, PCO 1810, GL 45, Mason-glas), så det passer til en flaske fra butikken. Bajonetlågets drejning kan indstilles, og en afrundet kant afvises ikke længere.",
           "ar": "يمكن للغطاء اللولبي أن يأخذ سنّ معيار (PCO 1881 وPCO 1810 وGL 45 وبرطمانات Mason) فيناسب زجاجة من المتجر. ويمكن ضبط دوران غطاء البايونيت، ولم تعد الحافة المستديرة تُرفض."
         }
       },
@@ -92,11 +104,13 @@
         "title": {
           "de": "Bildtextur glatter",
           "en": "Smoother image textures",
+          "da": "Glattere billedteksturer",
           "ar": "أنسجة صور أنعم"
         },
         "body": {
           "de": "Ein Bild auf einer großen oder runden Vase kommt nicht mehr in Stufen des Rasters heraus, und „Fein“ ist wirklich feiner als „Mittel“.",
           "en": "A picture on a large or round vase no longer comes out in steps of the grid, and Fine is really finer than Medium.",
+          "da": "Et billede på en stor eller rund vase kommer ikke længere ud i trin af gitteret, og Fin er virkelig finere end Mellem.",
           "ar": "الصورة على مزهرية كبيرة أو مستديرة لم تعد تخرج بدرجات الشبكة، و«ناعم» أصبح فعلًا أنعم من «متوسط»."
         }
       }
