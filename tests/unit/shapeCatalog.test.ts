@@ -348,4 +348,17 @@ describe("the colour the library shows", () => {
     expect(makeShapeFromAsset(box).color).toBe(box.color);
     expect(makeShapeFromAsset(box, undefined, { color: "#123456" }).color).toBe("#123456");
   });
+
+  it("keeps a rounded box's bottom edge on its own only when one is given, and fits the two in the height", () => {
+    const asset: ShapeAsset = { id: "roundedBox", name: "Rounded Box", src: "roundedBox.png", kind: "roundedBox", color: "#e74c3c" };
+    const shared = makeShapeFromAsset(asset, undefined, { topBottomFillet: 4 });
+    expect(shared.topBottomFillet).toBe(4);
+    expect(shared.bottomFillet).toBeUndefined();
+    const apart = makeShapeFromAsset(asset, undefined, { height: 20, topBottomFillet: 15, bottomFillet: 9 });
+    expect([apart.topBottomFillet, apart.bottomFillet]).toEqual([11, 9]);
+    const flatTop = makeShapeFromAsset(asset, undefined, { topBottomFillet: 0, bottomFillet: 3 });
+    expect([flatTop.topBottomFillet, flatTop.bottomFillet]).toEqual([0, 3]);
+    // other shapes have neither
+    expect(makeShapeFromAsset({ ...asset, id: "box", kind: "box" }, undefined, { bottomFillet: 3 }).bottomFillet).toBeUndefined();
+  });
 });

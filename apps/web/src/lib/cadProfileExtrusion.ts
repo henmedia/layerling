@@ -27,7 +27,7 @@ import { screwHoleProfile } from "@/lib/screwHoleGeometry";
 import { shapeDrillPointAngle, shapeDrillPointLength } from "@/lib/drillPoint";
 import { curvedConeSection } from "@/lib/curvedCone";
 import { finishingWasherMeasures } from "@/lib/finishingWasherGeometry";
-import { DEFAULT_ROUNDED_BOX_CORNER_FILLET, DEFAULT_ROUNDED_BOX_TOP_BOTTOM_FILLET, normalizeCornerFillet, normalizeCornerFillets, normalizeRoundedBoxQuality, normalizeTopBottomFillet } from "@/lib/roundedBoxGeometry";
+import { DEFAULT_ROUNDED_BOX_CORNER_FILLET, DEFAULT_ROUNDED_BOX_TOP_BOTTOM_FILLET, normalizeCornerFillet, normalizeCornerFillets, normalizeEndFillets, normalizeRoundedBoxQuality } from "@/lib/roundedBoxGeometry";
 import { textGlyphShapes, textKeyringOf } from "@/lib/textGeometry";
 import { normalizeSketchStroke } from "@/lib/sketchStroke";
 import { textHasEdge } from "@/lib/textEdge";
@@ -1039,7 +1039,7 @@ function alongDepthFrame(depth: number): ProfileFrame {
   return { kind: "extrusion", height: depth, local: new THREE.Matrix4().set(1, 0, 0, 0, 0, 0, 1, 0, 0, -1, 0, depth / 2, 0, 0, 0, 1) };
 }
 
-export function cadProfileForShapeKind(shape: WorkplaneShape, designedRound = false): { loops: CadModifierProfileLoop[]; frame?: ProfileFrame; capFillet?: number; capChamfer?: { radius: number; size: number }; grow?: CadModifierProfilePart["grow"] } | null {
+export function cadProfileForShapeKind(shape: WorkplaneShape, designedRound = false): { loops: CadModifierProfileLoop[]; frame?: ProfileFrame; capFillet?: number; capFilletBottom?: number; capChamfer?: { radius: number; size: number }; grow?: CadModifierProfilePart["grow"] } | null {
   const width = shapeWidth(shape);
   const depth = shapeDepth(shape);
   switch (shape.kind) {
@@ -1206,12 +1206,16 @@ export function cadProfileForShapeKind(shape: WorkplaneShape, designedRound = fa
     }
     case "roundedBox": {
       const corner = normalizeCornerFillet(shape.cornerFillet ?? DEFAULT_ROUNDED_BOX_CORNER_FILLET, Math.min(width, depth) / 2);
-      const ends = normalizeTopBottomFillet(shape.topBottomFillet ?? DEFAULT_ROUNDED_BOX_TOP_BOTTOM_FILLET, shape.height / 2);
+      const [top, bottom] = normalizeEndFillets(shape.topBottomFillet ?? DEFAULT_ROUNDED_BOX_TOP_BOTTOM_FILLET, shape.bottomFillet, shape.height);
+      const anyEnd = top > 1e-4 || bottom > 1e-4;
       // Own radii for each corner count only with flat ends, as in the display.
-      const own = ends > 1e-4 ? undefined : normalizeCornerFillets(shape.cornerFillets, Math.min(width, depth) / 2);
+      const own = anyEnd ? undefined : normalizeCornerFillets(shape.cornerFillets, Math.min(width, depth) / 2);
       // Quality 1 is drawn as a flat chamfer (#239); the exact round would contradict what the view shows.
-      if (normalizeRoundedBoxQuality(shape.roundedBoxQuality) === 1 && (corner > 1e-4 || ends > 1e-4 || own?.some((value) => value > 1e-4))) return null;
-      return { loops: [roundedRectLoop(width, depth, corner, own)], capFillet: ends > 1e-4 ? ends : undefined };
+      if (normalizeRoundedBoxQuality(shape.roundedBoxQuality) === 1 && (corner > 1e-4 || anyEnd || own?.some((value) => value > 1e-4))) return null;
+      const loops = [roundedRectLoop(width, depth, corner, own)];
+      // Top and bottom on their own: the top radius is `capFillet` (0 when flat) and the bottom one `capFilletBottom`.
+      if (shape.bottomFillet !== undefined && shape.bottomFillet !== null) return { loops, ...(anyEnd ? { capFillet: top, capFilletBottom: bottom } : {}) };
+      return { loops, capFillet: top > 1e-4 ? top : undefined };
     }
     case "counterbore":
     case "countersink":
@@ -1341,7 +1345,7 @@ function deformedLoftProfile(shape: WorkplaneShape, width: number, depth: number
     // A round cylinder has no outline of its own (it is an analytic
     // primitive); as an ellipse it gets the same circle, or its drawn polygon.
     const base = cadProfileForShapeKind(shape.kind === "cylinder" ? { ...shape, kind: "ellipse" } : shape);
-    if (!base || base.frame || base.capFillet) return null;
+    if (!base || base.frame || base.capFillet || base.capFilletBottom !== undefined) return null;
     loops = base.loops;
     capChamfer = base.capChamfer;
   }
@@ -1425,7 +1429,7 @@ function slopedProfile(shape: WorkplaneShape, width: number, depth: number, desi
 function trimmedUprightProfile(shape: WorkplaneShape, width: number, depth: number, designedRound?: boolean): CadModifierProfilePart | null {
   // A round cylinder is an analytic primitive without an outline of its own: as an ellipse it gets the circle.
   const base = cadProfileForShapeKind(shape.kind === "cylinder" ? { ...shape, kind: "ellipse" } : shape, designedRound);
-  if (!base || base.frame || base.capFillet || base.capChamfer || base.grow) return null;
+  if (!base || base.frame || base.capFillet || base.capFilletBottom !== undefined || base.capChamfer || base.grow) return null;
   const side = normalizeSlopeSide(shape.kind, shape.slopeSide);
   const curve = slopeCurveForShape(shape);
   const alongWidth = slopeAlongWidth(side);
@@ -1613,6 +1617,7 @@ export function cadModifierProfileForShape(shape: WorkplaneShape, options: { des
     };
     if (profile.frame?.path) part.path = profile.frame.path;
     if (profile.capFillet) part.capFillet = profile.capFillet;
+    if (profile.capFilletBottom !== undefined) part.capFilletBottom = profile.capFilletBottom;
     if (profile.capChamfer) part.capChamfer = profile.capChamfer;
     if (profile.grow) part.grow = profile.grow;
     validateCadProfile(part);

@@ -578,6 +578,7 @@ export function normalizeShapeCustomizations(value: unknown, fallback: ShapeCust
     if (kind === "roundedBox") {
       entry.cornerFillet = optionalShapeNumber(source.cornerFillet, fallbackEntry?.cornerFillet, 0, MAX_CUSTOM_SHAPE_DIMENSION / 2);
       entry.topBottomFillet = optionalShapeNumber(source.topBottomFillet, fallbackEntry?.topBottomFillet, 0, MAX_CUSTOM_SHAPE_DIMENSION / 2);
+      entry.bottomFillet = optionalShapeNumber(source.bottomFillet, fallbackEntry?.bottomFillet, 0, MAX_CUSTOM_SHAPE_DIMENSION / 2);
       entry.roundedBoxQuality = optionalShapeNumber(source.roundedBoxQuality, fallbackEntry?.roundedBoxQuality, 1, 32, true);
     }
     if (kind === "bentTube") {

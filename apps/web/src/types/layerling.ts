@@ -128,6 +128,8 @@ export type ShapeCustomization = {
   /** Rounded box with flat top and bottom: an own radius for each corner (back left, back right, front right, front left); wins over cornerFillet. */
   cornerFillets?: [number, number, number, number];
   topBottomFillet?: number;
+  /** Rounded box only: the bottom edge on its own; left out, the bottom takes the top's radius. */
+  bottomFillet?: number;
   roundedBoxQuality?: number;
   steps?: number;
   sides?: number;
@@ -1386,6 +1388,7 @@ export type WorkplaneShape = {
   /** Rounded box with flat top and bottom: an own radius for each corner (back left, back right, front right, front left); wins over cornerFillet. */
   cornerFillets?: [number, number, number, number];
   topBottomFillet?: number;
+  bottomFillet?: number;
   roundedBoxQuality?: number;
   bentTubeProfile?: BentTubeProfile;
   bentTubeInnerProfile?: BentTubeInnerProfile;
