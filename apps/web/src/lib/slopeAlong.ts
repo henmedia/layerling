@@ -89,11 +89,14 @@ export type SlopeCurve = {
   full?: number;
 };
 
-/** Where the slope's top line starts: at one end (the other one low) or in the middle (both ends low, symmetric). */
-export type SlopeFrom = "end" | "middle";
+/**
+ * Where the slope's top line starts: at one end (the other one low), in the middle (both ends low,
+ * symmetric) or "arch": the slope stays as it is and the curve arches it evenly around its own middle.
+ */
+export type SlopeFrom = "end" | "middle" | "arch";
 
 export function normalizeSlopeFrom(value: unknown): SlopeFrom {
-  return value === "middle" ? "middle" : "end";
+  return value === "middle" || value === "arch" ? value : "end";
 }
 
 /** A quadratic Bezier top line from (0, keep) to (length, end); `curve` -1 to 1 moves its control point as described above. */
@@ -105,11 +108,23 @@ function topCurve(length: number, keep: number, end: number, curveValue: number)
   return { length, keep, end, control: { s: middle.s + (corner.s - middle.s) * share, y: middle.y + (corner.y - middle.y) * share } };
 }
 
+/**
+ * The slope's line from (0, keep) to (length, end), bent evenly about its middle: the control point stays
+ * above the middle and only moves up (`curve` above 0, a bulge) or down (below 0, a sag). At 1 and -1 the top
+ * runs level at the high or the low end, so it never leaves the range between the two end heights.
+ */
+function archCurve(length: number, keep: number, end: number, curveValue: number): SlopeCurve {
+  const curve = normalizeSlopeCurve(curveValue);
+  const middle = (keep + end) / 2;
+  return { length, keep, end, control: { s: length / 2, y: middle + (curve * (keep - end)) / 2 } };
+}
+
 export function slopeCurveForShape(shape: WorkplaneShape): SlopeCurve {
   const side = normalizeSlopeSide(shape.kind, shape.slopeSide);
   const length = slopeAlongWidth(side) ? (shape.width ?? shape.size) : (shape.depth ?? shape.size);
   const keep = shape.height;
   const end = slopeEndHeight(shape);
+  if (normalizeSlopeFrom(shape.slopeFrom) === "arch") return archCurve(length, keep, end, shape.slopeCurve ?? 0);
   if (normalizeSlopeFrom(shape.slopeFrom) === "middle") return { ...topCurve(length / 2, keep, end, shape.slopeCurve ?? 0), middle: true, full: length };
   return topCurve(length, keep, end, shape.slopeCurve ?? 0);
 }

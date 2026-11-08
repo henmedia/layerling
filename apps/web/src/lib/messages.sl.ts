@@ -2030,6 +2030,8 @@ export const MESSAGES_SL: Partial<Record<MessageKey, string>> = {
   "prop.sideCurve": "Lok stranic (%)",
   "slope.sideDropHint": "Obe daljši stranici enakomerno zniža, v mm; sredina ohrani polno višino.",
   "slope.sideCurveHint": "0 je ravna črta od sredine do robov. Nad 0 se izboči navzgor kot kupola, pod 0 se povesi.",
+  "slope.from.arch": "Obok iz sredine (naklon ostane)",
+  "slope.fromArchHint": "Naklon ostane; krivulja spodaj ga simetrično ukrivi iz njegove sredine.",
   "inspector.narrow": "Zoženje po dolžini",
   "prop.narrowSide": "Ožji konec",
   "prop.narrowEnd": "Širina konca",

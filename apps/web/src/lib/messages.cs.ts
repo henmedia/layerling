@@ -2733,6 +2733,8 @@ export const MESSAGES_CS: Record<MessageKey, string> = {
   "prop.sideCurve": "Oblouk boků (%)",
   "slope.sideDropHint": "Sníží oba delší boky stejnoměrně, v mm; střed si ponechá plnou výšku.",
   "slope.sideCurveHint": "0 je přímka od středu ke krajům. Nad 0 se vyklenuje nahoru jako kupole, pod 0 se prohýbá.",
+  "slope.from.arch": "Obloukem od středu (sklon zůstává)",
+  "slope.fromArchHint": "Sklon zůstane; oblouk níže ho souměrně prohne od jeho středu.",
   "inspector.narrow": "Zúžení po délce",
   "prop.narrowSide": "Užší konec",
   "prop.narrowEnd": "Šířka konce",

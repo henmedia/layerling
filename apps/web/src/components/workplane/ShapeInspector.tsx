@@ -4476,8 +4476,8 @@ export function ShapeInspector({
       id: "slopeFrom",
       label: t("prop.slopeFrom"),
       value: slopeFrom,
-      hint: t("slope.fromHint"),
-      options: [{ value: "end", label: t("slope.from.end") }, { value: "middle", label: t("slope.from.middle") }],
+      hint: slopeFrom === "arch" ? t("slope.fromArchHint") : t("slope.fromHint"),
+      options: [{ value: "end", label: t("slope.from.end") }, { value: "middle", label: t("slope.from.middle") }, { value: "arch", label: t("slope.from.arch") }],
       onChange: (value) => onUpdate({ slopeFrom: normalizeSlopeFrom(value), slopeEnd: shape.slopeEnd ?? shape.height, slopeSide: shape.slopeSide ?? slopeSide }),
     },
     {

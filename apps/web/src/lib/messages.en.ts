@@ -2655,6 +2655,8 @@ export const MESSAGES_EN = {
   "prop.sideCurve": "Sides Curve (%)",
   "slope.sideDropHint": "Lowers both longer sides evenly, in mm; the middle keeps the full height.",
   "slope.sideCurveHint": "0 is a straight line from the middle to the edges. Above 0 it bulges up like a dome, below 0 it sags.",
+  "slope.from.arch": "Arched from the middle (slope kept)",
+  "slope.fromArchHint": "The slope stays as it is; the curve below arches it evenly around its middle.",
   "inspector.narrow": "Narrow Along",
   "prop.narrowSide": "Narrow End",
   "prop.narrowEnd": "End Width",

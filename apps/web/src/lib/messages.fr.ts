@@ -2641,6 +2641,8 @@ export const MESSAGES_FR: Partial<Record<MessageKey, string>> = {
   "prop.sideCurve": "Courbe des côtés (%)",
   "slope.sideDropHint": "Abaisse également les deux côtés les plus longs, en mm ; le milieu garde toute la hauteur.",
   "slope.sideCurveHint": "0 est une droite du milieu aux bords. Au-dessus de 0 elle se bombe vers le haut comme un dôme, en dessous de 0 elle s'affaisse.",
+  "slope.from.arch": "Cintré depuis le milieu (la pente reste)",
+  "slope.fromArchHint": "La pente reste ; la courbe ci-dessous la cintre symétriquement depuis son milieu.",
   "inspector.narrow": "Rétrécissement en longueur",
   "prop.narrowSide": "Extrémité étroite",
   "prop.narrowEnd": "Largeur au bout",

@@ -2654,6 +2654,8 @@ export const MESSAGES_DE: Record<MessageKey, string> = {
   "prop.sideCurve": "Seitenbogen (%)",
   "slope.sideDropHint": "Senkt beide längeren Seiten gleichmäßig ab, in mm; die Mitte behält die volle Höhe.",
   "slope.sideCurveHint": "0 ist eine gerade Linie von der Mitte zu den Rändern. Über 0 wölbt sie sich wie eine Kuppel nach oben, unter 0 hängt sie durch.",
+  "slope.from.arch": "Gewölbt aus der Mitte (Neigung bleibt)",
+  "slope.fromArchHint": "Die Neigung bleibt; die Krümmung unten biegt sie symmetrisch von ihrer Mitte aus.",
   "inspector.narrow": "Zulaufen in der Länge",
   "prop.narrowSide": "Schmales Ende",
   "prop.narrowEnd": "Breite am Ende",

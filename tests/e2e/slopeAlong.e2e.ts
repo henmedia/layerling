@@ -151,6 +151,8 @@ describe("slope along: exact bodies", () => {
     ["down to the right, straight", { slopeEnd: 5, slopeSide: "right" }],
     ["down to the back, bulging up", { slopeEnd: 6, slopeSide: "back", slopeCurve: 0.7 }],
     ["down to the right, sagging", { slopeEnd: 4, slopeSide: "right", slopeCurve: -1 }],
+    ["down to the back, arched from its middle", { slopeEnd: 6, slopeSide: "back", slopeFrom: "arch", slopeCurve: 0.7 }],
+    ["down to the left, arched downwards from its middle", { slopeEnd: 5, slopeSide: "left", slopeFrom: "arch", slopeCurve: -0.8 }],
   ];
 
   it.each(boxes)("builds a box sloping %s: the hand-worked volume, where the mesh stands", (_name, extra) => {
@@ -238,6 +240,7 @@ describe("slope along: exact bodies", () => {
     // [name, shape, its footprint's width across at z (mm from the middle along the slope's axis)]
     ["a cylinder cut down to the back, straight", shape("cylinder", { width: 30, depth: 30, slopeEnd: 8, slopeSide: "back" }), (z) => 2 * Math.sqrt(Math.max(0, 225 - z * z))],
     ["an ellipse sloping to the right, bulging", shape("ellipse", { width: 40, depth: 24, slopeEnd: 6, slopeSide: "right", slopeCurve: 0.8 }), (x) => 2 * 12 * Math.sqrt(Math.max(0, 1 - (x / 20) ** 2))],
+    ["an ellipse sloping to the right, arched from the middle of the slope", shape("ellipse", { width: 57, depth: 26, height: 25, slopeEnd: 9, slopeSide: "right", slopeFrom: "arch", slopeCurve: 0.6 }), (x) => 2 * 13 * Math.sqrt(Math.max(0, 1 - (x / 28.5) ** 2))],
     ["a tube cut slanting like a mitre", shape("tube", { width: 30, depth: 30, bevel: 3, slopeEnd: 5, slopeSide: "front" }), (z) => 2 * Math.sqrt(Math.max(0, 225 - z * z)) - 2 * Math.sqrt(Math.max(0, 144 - z * z))],
   ];
 

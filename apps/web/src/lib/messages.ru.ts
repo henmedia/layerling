@@ -2648,6 +2648,8 @@ export const MESSAGES_RU: Partial<Record<MessageKey, string>> = {
   "prop.sideCurve": "Изгиб боков (%)",
   "slope.sideDropHint": "Равномерно опускает обе длинные стороны, в мм; середина сохраняет полную высоту.",
   "slope.sideCurveHint": "0 — прямая линия от середины к краям. Выше 0 она выгибается вверх, как купол, ниже 0 — прогибается.",
+  "slope.from.arch": "Дугой от середины (наклон сохраняется)",
+  "slope.fromArchHint": "Наклон сохраняется; кривая ниже изгибает его симметрично от середины.",
   "inspector.narrow": "Сужение по длине",
   "prop.narrowSide": "Узкий конец",
   "prop.narrowEnd": "Ширина конца",
