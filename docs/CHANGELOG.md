@@ -18,6 +18,16 @@ code still carries it - so a lower number further down is older, not newer.
 
 - **Lid, slide-in: a box set down turned takes one too (Discussion #1443, PR #1489):** The slide-in lid worked the opening out square to the workplane's axes, so a box standing turned on the workplane, or a straight box with a hole turned by even a fraction of a degree, was refused as not a box. The lid now finds how far the opening stands turned and is worked out with the box turned back square; a turned box gets the grooves and lid a square one gets, and **Slides in from** picks the wall facing most nearly that way.
 
+- **Lid, slide-in: a frame above the lid (Discussion #1443, PR #1497):** A slide-in lid always sat flush with the rim, and the wall it slid in through was cut down to the lid. The Lid panel now has **Frame above the lid** for **Slide-in**: at, say, 2 mm the lid and its grooves sit 2 mm below the rim, the walls keep their full height round it as a frame, and the wall it slides in through keeps its height too, with a slot just as tall as the lid that the lid's end fills flush with the outside. At 0 the lid is made as before. The box still prints upright, with only a short level bridge over the slot; the panel says when the frame leaves less than 1 mm of wall above it. Asked for by @mysskyn29, built by @marcus040473.
+
+- **Split, dovetail: no flaps on a part standing turned (Discussion #1451, PR #1494):** On a box standing on its edge, the dovetail's tongue reaches a little into its own half below the cut, and where that half narrows towards the corners the ends of this foot stuck out as thin flaps half a millimetre thick. The foot is now trimmed to the half, so nothing hangs out. Reported by @makinglayerschannel, fixed by @marcus040473.
+
+- **Surface texture: pick faces for an image pressed on once too (Issue #1462, PR #1495):** With **Image** as the texture and the picture pressed on once, the card hid the button for picking faces, although the image follows picked faces and the guide says so. The button is back. Reported by @MethylBromide, fixed by @marcus040473.
+
+- **European Portuguese: 2657 more texts (PR #1496):** The European Portuguese translation covers 2657 more texts, and existing wording was brought in line. Contributed by @jcpcustodio.
+
+- **Japanese README (PR #1500):** The project page has a Japanese README. Contributed by @eltociear.
+
 ## 1.152.0
 
 - **Fillet: a refusal at a tight curve says where and how tight (#1473):** A fillet along a curved edge, such as the outline of a sketch or an SVG, was refused with "cannot be filleted together at this size" and no hint where. Where the edge bends round the outside of the body tighter than the radius, the rounding cannot follow it: a refused fillet now measures the picked curves, says the radius of the tightest outside bend (say 0.53 mm) and draws the edges with such a bend in red. A notch bending the other way does not count, and when no bend is that tight the old message stands. The guide's edges chapter explains it, with the tip to round the top edges before a corner gets a small radius. Unit test `cadTightBends.test.ts`; reported by @MethylBromide.
