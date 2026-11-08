@@ -6,6 +6,8 @@ code still carries it - so a lower number further down is older, not newer.
 
 ## Unreleased
 
+- **Picking a face from below: the light-blue mark shows through the plate (Discussion #1492):** A face behind the plate, such as the underside of a part lifted off it, never lit up while the pointer moved over it in **Align faces**, **Lay flat** or the hole pattern, nor when picking faces to delete or for a texture. The plate is see-through but held the mark back. Now the mark shows over the plate at full strength, and a solid part standing in front of the face still hides it.
+
 - **Lid, slide-in: a box set down turned takes one too (Discussion #1443, PR #1489):** The slide-in lid worked the opening out square to the workplane's axes, so a box standing turned on the workplane, or a straight box with a hole turned by even a fraction of a degree, was refused as not a box. The lid now finds how far the opening stands turned and is worked out with the box turned back square; a turned box gets the grooves and lid a square one gets, and **Slides in from** picks the wall facing most nearly that way.
 
 ## 1.152.0
