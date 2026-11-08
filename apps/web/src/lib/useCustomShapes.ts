@@ -77,6 +77,8 @@ export interface CustomShapesOptions {
   snapGridRef: { current: LylExport["snapGrid"] };
   projectInfoRef: { current: { projectId: string | null } };
   placementWorkplaneRef: { current: PlacementWorkplane };
+  /** Where a shape put in without a spot lands: the middle of the active build plate (#1514). */
+  newShapeOrigin?: (workplane: PlacementWorkplane) => PlacementPoint;
 }
 
 /**
@@ -239,7 +241,7 @@ export function useCustomShapes(options: CustomShapesOptions) {
     const restored = await importLylProject(await readCustomShapePackage(id));
     if (projectInfoRef.current.projectId !== sourceProjectId) throw new Error(t("status.pasteCancelled"));
     if (restored.shapes.length === 0) throw new Error(t("status.insertDesignEmpty", { name }));
-    const placed = placeCustomShape(restored, point ?? placementWorkplaneRef.current.origin, notesRef.current);
+    const placed = placeCustomShape(restored, point ?? options.newShapeOrigin?.(placementWorkplaneRef.current) ?? placementWorkplaneRef.current.origin, notesRef.current);
     return addInsertedBodies(restored.assets, placed, t("status.myShapeInserted", { name }));
   }, [commitShapes]); // eslint-disable-line react-hooks/exhaustive-deps
 
