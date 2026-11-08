@@ -6,6 +6,8 @@ code still carries it - so a lower number further down is older, not newer.
 
 ## Unreleased
 
+- **Build plates: the Arrange on plates button arranges again (Issue #1463):** A click on **Arrange on plates** in the plate bar did nothing, with or without a selection: the bar handed its click to the arrange function as the list of bodies to arrange, and it stopped with an error before moving one. The button now arranges the selection, or every body, as the guide says. The MCP action `layerling_build_plates` was not affected. Unit test `plateBarArrange.test.ts`.
+
 - **Text: up to 250 characters, and no width limit (asked in the Layerling User Group on Facebook):** A text took 24 characters, a limit from the first version, when a text could only be one line; typing on past 260 mm made the letters smaller. A text, a name tag, a line of a text block and the default text in the settings now take 250 characters, the letters keep their size and the line gets as long as it needs to be. A rounded or chamfered letter edge works on a text of up to 40 characters: on a longer one its build took a minute or more. A longer text keeps the setting and shows plain letters, and the field says why. A Gridfinity label shelf keeps its 24 characters.
 
 - **Windows quickstart: runs on a PC that does not allow scripts:** On Windows 10 and 11, PowerShell runs no script files until they are allowed, and the one-line installer stopped at `npm install` with "npm.ps1 cannot be loaded because running scripts is disabled on this system". It now calls `npm.cmd`, which needs no permission, so the one line works on a fresh PC as the README says (reported in the drucktipps3d forum).
