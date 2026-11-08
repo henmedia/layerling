@@ -93,6 +93,8 @@ import type { AlignAxis, AlignHandleStatus, AlignSpread, AlignTarget, GridSize, 
 import { referencePoints } from "@/lib/workplaneNotes";
 import { pivotHeightRange, pivotPlateReach } from "@/lib/zoomPivot";
 import { pointerReach } from "@/lib/pointerReach";
+import type { PointPick } from "@/lib/mateFaces";
+import { syncPointMarks, type PointMark } from "@/components/workplane/viewportPointMarks";
 import { boxSnapSpots, measurementMiddle, nearestReferenceOnScreen, type ReferencePosition } from "@/lib/referencePoints";
 import { type PivotPoint } from "@/lib/rotationPivot";
 import { pivotSnapCentre } from "@/lib/pivotSnap";
@@ -304,6 +306,12 @@ type WorkplaneViewportProps = {
   /** "Align faces" waiting for a click on a face of one of these bodies; `round` lights up whole round faces, `joined` the group's parts joined, whose face is lit in place of the part's. */
   mateFacePick?: { shapeIds: string[]; round?: boolean | "either"; joined?: ArrayLike<number> | null } | null;
   onMateFacePick?: (pick: LayFlatPick | null) => void;
+  /**
+   * "Point to point" (Discussion #1491): while `picking`, a click takes a corner, a spot on an edge, the centre of a
+   * round edge of one of these bodies, or a reference point; `marks` are the points already picked.
+   */
+  matePointPick?: { shapeIds: string[]; picking: boolean; marks: PointMark[] } | null;
+  onMatePointPick?: (pick: PointPick | null) => void;
   /** The paint tool (paint.ts) on this body: a click paints where it lands; in lasso mode a shape drawn with the button held does. */
   paintPick?: { shapeId: string; mode: PaintMode } | null;
   onPaintPick?: (pick: LayFlatPick | null) => void;
@@ -1593,6 +1601,8 @@ export function WorkplaneViewport({
   onLayFlatPick,
   mateFacePick = null,
   onMateFacePick,
+  matePointPick = null,
+  onMatePointPick,
   paintPick = null,
   onPaintPick,
   onPaintLasso,
@@ -1952,7 +1962,7 @@ export function WorkplaneViewport({
     && !workplaneMode && !splitActive && !pickOnly
     && !alignMode && !mirrorMode
     && !tapeMode && !tapeDeleteMode && !tapeMoveMode && !cornerRulerMode && !protractorOpen
-    && !modifierActive && !pivotPickMode && !layFlatPickMode && !mateFacePick && !cadFacePick;
+    && !modifierActive && !pivotPickMode && !layFlatPickMode && !mateFacePick && !matePointPick?.picking && !cadFacePick;
   useEffect(() => {
     // A button that is not on the screen cannot be locked any more.
     if (!touchMultiSelectAvailable && touchMultiSelectActiveRef.current) endTouchMultiSelect();
@@ -1986,6 +1996,11 @@ export function WorkplaneViewport({
   const mateFacePickRef = useRef(mateFacePick);
   mateFacePickRef.current = mateFacePick;
   const mateFaceHoverRef = useRef<{ x: number; y: number } | null>(null);
+  const matePointPickRef = useRef(matePointPick);
+  matePointPickRef.current = matePointPick;
+  const onMatePointPickRef = useRef(onMatePointPick);
+  onMatePointPickRef.current = onMatePointPick;
+  const matePointHoverRef = useRef<PointMark | null>(null);
   const paintPickRef = useRef(paintPick);
   paintPickRef.current = paintPick;
   const onPaintPickRef = useRef(onPaintPick);
@@ -2902,6 +2917,15 @@ export function WorkplaneViewport({
     if (!layFlatPickMode && !mateFacePick) syncLayFlatHover(threeRef.current, [], resolvedThemeRef.current, null, null);
     if (!mateFacePick) mateFaceHoverRef.current = null;
   }, [layFlatPickMode, mateFacePick]);
+
+  // The points "Point to point" picked stay marked; the one under the pointer only while it picks.
+  const matePointMarksKey = matePointPick ? `${matePointPick.picking}:${matePointPick.marks.map((mark) => `${mark.role}${mark.x},${mark.y},${mark.z}`).join("|")}` : "";
+  useEffect(() => {
+    const pick = matePointPickRef.current;
+    if (!pick?.picking) matePointHoverRef.current = null;
+    const hover = matePointHoverRef.current;
+    syncPointMarks(threeRef.current, pick ? [...pick.marks, ...(hover ? [hover] : [])] : []);
+  }, [matePointMarksKey]);
 
   // A group's parts joined, or let go, after the pointer stopped on it: its face is lit again without another move.
   const mateFaceJoined = mateFacePick?.joined ?? null;
@@ -5825,6 +5849,13 @@ export function WorkplaneViewport({
       selectTapeCandidate({ x: pinned.x, y: pinned.y, z: pinned.z });
       return;
     }
+    // "Point to point" takes it too (Discussion #1491).
+    if (matePointPickRef.current?.picking && pinned?.kind === "point" && event.button === 0) {
+      event.preventDefault();
+      noteClickSuppressedRef.current = noteId;
+      onMatePointPickRef.current?.({ shapeId: null, point: { x: pinned.x, y: pinned.y, z: pinned.z } });
+      return;
+    }
     noteDragRef.current = { noteId, pointerId: event.pointerId, moved: false };
     capturePointer(event.currentTarget, event.pointerId);
   }, [selectTapeCandidate]);
@@ -5854,6 +5885,33 @@ export function WorkplaneViewport({
     );
     if (nearest) return nearest;
     return tape?.attachment?.kind === "edge" ? { x: tape.x, y: tape.y, z: tape.z } : null;
+  }, []);
+
+  /**
+   * The point "Point to point" takes under the pointer (Discussion #1491): the nearest corner, centre of a round
+   * edge or reference point within reach - corners and edges a body hides left out - and otherwise a spot on an
+   * edge near the pointer. A face alone is no point: null.
+   */
+  const resolveMatePoint = useCallback((clientX: number, clientY: number): PointPick | null => {
+    const state = threeRef.current;
+    const pick = matePointPickRef.current;
+    if (!state || !pick) return null;
+    const rect = state.renderer.domElement.getBoundingClientRect();
+    const ids = pick.shapeIds.filter((id) => shapesRef.current.some((shape) => shape.id === id && !shape.hidden));
+    const centres = ids.length ? tapeCentresNear(state, ids, clientX, clientY) : null;
+    const tape = ids.length ? pickModelTapeCandidate(state, ids, clientX, clientY, null, null, false, true, false, centres?.snap ?? null) : null;
+    const tapeShapeId = tape?.attachment?.shapeId ?? null;
+    const spots: Array<ReferencePosition & { shapeId: string | null }> = [];
+    if (tape && (tape.attachment?.kind === "vertex" || tape.centre)) spots.push({ x: tape.x, y: tape.y, z: tape.z, shapeId: tapeShapeId });
+    if (notesVisibleRef.current) referencePoints(notesRef.current).forEach((point) => spots.push({ x: point.x, y: point.y, z: point.z, shapeId: null }));
+    const nearest = nearestReferenceOnScreen(
+      spots,
+      (point) => projectToScreen(new THREE.Vector3(point.x, point.y, point.z), state),
+      { x: clientX - rect.left, y: clientY - rect.top },
+      pointerReach(10),
+    );
+    if (nearest) return { shapeId: nearest.shapeId, point: { x: nearest.x, y: nearest.y, z: nearest.z } };
+    return tape?.attachment?.kind === "edge" ? { shapeId: tapeShapeId, point: { x: tape.x, y: tape.y, z: tape.z } } : null;
   }, []);
 
   const handleNotePinPointerMove = useCallback((event: ReactPointerEvent<HTMLButtonElement>, noteId: string) => {
@@ -6671,6 +6729,12 @@ export function WorkplaneViewport({
         return;
       }
 
+      if (matePointPickRef.current?.picking) {
+        event.preventDefault();
+        onMatePointPickRef.current?.(resolveMatePoint(event.clientX, event.clientY));
+        return;
+      }
+
       if (paintPickRef.current) {
         event.preventDefault();
         const paint = paintPickRef.current;
@@ -7085,6 +7149,7 @@ export function WorkplaneViewport({
       beginLiftDuplicate,
       clearMoveDimensions,
       modifierActive,
+      resolveMatePoint,
       placeProtractorAt,
       onAlignAnchorChange,
       onDuplicateShapesMoved,
@@ -7193,6 +7258,12 @@ export function WorkplaneViewport({
         if (Math.hypot(point[0] - last[0], point[1] - last[1]) < 3) return;
         lasso.points.push(point);
         setPaintLassoPoints(lasso.points.map(([x, y]) => `${x.toFixed(1)},${y.toFixed(1)}`).join(" "));
+        return;
+      }
+      if (matePointPickRef.current?.picking) {
+        const found = resolveMatePoint(event.clientX, event.clientY);
+        matePointHoverRef.current = found ? { ...found.point, role: matePointPickRef.current.marks.some((mark) => mark.role === "source") ? "target" : "source" } : null;
+        syncPointMarks(threeRef.current, [...matePointPickRef.current.marks, ...(matePointHoverRef.current ? [matePointHoverRef.current] : [])]);
         return;
       }
       if (mateFacePickRef.current) {
@@ -7351,7 +7422,7 @@ export function WorkplaneViewport({
         threeRef.current.needsRender = true;
       }
     },
-    [pickPlacementSurface, setMarqueeFromState, toPlacementWorkplanePoint, toRawPlanePoint, moveCruiseGhost, updateModifierEdgeHover, updateProtractorHover, updateTapeHover, updateTransform],
+    [pickPlacementSurface, resolveMatePoint, setMarqueeFromState, toPlacementWorkplanePoint, toRawPlanePoint, moveCruiseGhost, updateModifierEdgeHover, updateProtractorHover, updateTapeHover, updateTransform],
   );
 
   useEffect(() => {
@@ -8914,7 +8985,7 @@ export function WorkplaneViewport({
         )}
       </div>
 
-      <section className={`workplane-wrap ${noteMode ? "note-mode" : ""} ${workplaneMode ? "placing-workplane" : ""} ${splitActive ? "split-mode" : ""} ${splitHandleState ? `split-handle-${splitHandleState}` : ""} ${splitSurfacePick ? "split-picking" : ""} ${splitSurfacePick && splitPickOverFace ? "split-pick-over-face" : ""} ${cruiseAsset || carryIds?.length ? "cruising" : ""} ${tapeMode ? "tape-mode" : ""} ${tapeDeleteMode ? "tape-delete-mode" : ""} ${tapeMoveMode ? "tape-move-mode" : ""} ${cornerRulerMode ? "corner-ruler-mode" : ""} ${protractorOpen ? "protractor-mode" : ""} ${pivotPickMode || layFlatPickMode || mateFacePick || cadFacePick || paintPick ? "pivot-pick-mode" : ""} ${modifierActive ? "modifier-edge-pick" : ""} ${sectionMeasureMode && sectionSettings.enabled ? "section-measure-mode" : ""} ${workspace.dimensionAxisColors ? "dimension-axis-colors" : ""}`} aria-label={t("aria.workplane")}>
+      <section className={`workplane-wrap ${noteMode ? "note-mode" : ""} ${workplaneMode ? "placing-workplane" : ""} ${splitActive ? "split-mode" : ""} ${splitHandleState ? `split-handle-${splitHandleState}` : ""} ${splitSurfacePick ? "split-picking" : ""} ${splitSurfacePick && splitPickOverFace ? "split-pick-over-face" : ""} ${cruiseAsset || carryIds?.length ? "cruising" : ""} ${tapeMode ? "tape-mode" : ""} ${tapeDeleteMode ? "tape-delete-mode" : ""} ${tapeMoveMode ? "tape-move-mode" : ""} ${cornerRulerMode ? "corner-ruler-mode" : ""} ${protractorOpen ? "protractor-mode" : ""} ${pivotPickMode || layFlatPickMode || mateFacePick || matePointPick?.picking || cadFacePick || paintPick ? "pivot-pick-mode" : ""} ${modifierActive ? "modifier-edge-pick" : ""} ${sectionMeasureMode && sectionSettings.enabled ? "section-measure-mode" : ""} ${workspace.dimensionAxisColors ? "dimension-axis-colors" : ""}`} aria-label={t("aria.workplane")}>
         <div className="workplane-plane">
           <div
             className="three-workplane-host"
@@ -8948,7 +9019,7 @@ export function WorkplaneViewport({
           {!workplaneMode && !splitActive && originDimensionsEnabled && !dimensionsHidden && originDimensionOverlay ? (
             <OriginDimensionOverlay overlay={originDimensionOverlay} />
           ) : null}
-          {!workplaneMode && !splitActive && !pivotPickMode && !layFlatPickMode && !mateFacePick && !cadFacePick && !paintPick && transformOverlay && !alignMode && !mirrorMode && !tapeMode && !tapeDeleteMode && !tapeMoveMode && !modifierActive ? (
+          {!workplaneMode && !splitActive && !pivotPickMode && !layFlatPickMode && !mateFacePick && !matePointPick?.picking && !cadFacePick && !paintPick && transformOverlay && !alignMode && !mirrorMode && !tapeMode && !tapeDeleteMode && !tapeMoveMode && !modifierActive ? (
             <TransformOverlay
               // Q leaves out what shows by itself; a handle pointed at still shows its size.
               box={dimensionsHidden ? { ...transformOverlay, alwaysVisibleDimensionKeys: [] } : transformOverlay}

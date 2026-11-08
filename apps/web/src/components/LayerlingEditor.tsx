@@ -70,7 +70,7 @@ import { FlexiPanel, type FlexiToolSettings } from "./workplane/FlexiPanel";
 import { LidPanel } from "./workplane/LidPanel";
 import { DeleteFacePanel } from "./workplane/DeleteFacePanel";
 import { MateFacesPanel } from "./workplane/MateFacesPanel";
-import { concentricMotion, mateMotion, type FacePick, type MateMode } from "@/lib/mateFaces";
+import { ALL_MATE_AXES, concentricMotion, mateMotion, pointMotion, type FacePick, type MateAxes, type MateMode, type PointPick } from "@/lib/mateFaces";
 import { roundFaceNear } from "@/lib/roundFaceAxis";
 import { carriedOntoFace } from "@/lib/carryOntoFace";
 import { HolePatternPanel } from "./workplane/HolePatternPanel";
@@ -1920,10 +1920,26 @@ function matedShapes(shapes: WorkplaneShape[], source: FacePick, target: FacePic
 }
 
 /**
- * "Align faces" switched to another way of meeting. Concentric needs round
- * faces: a flat face already clicked is asked for again.
+ * "Point to point" (Discussion #1491): the body moves straight, without
+ * turning, so its point lands on the other - along the axes switched on only.
  */
-function mateToolWithMode<T extends { step: "source" | "target" | "ready"; source: FacePick | null; target: FacePick | null; mode: MateMode }>(tool: T, mode: MateMode): T {
+function pointMatedShapes(shapes: WorkplaneShape[], shapeId: string, source: PointPick["point"], target: PointPick["point"], axes: MateAxes): WorkplaneShape[] {
+  const motion = pointMotion(source, target, axes);
+  return shapes.map((shape) => shape.id !== shapeId ? shape : canonicalizeShape({
+    ...shape,
+    x: cleanNearZero(shape.x + motion.x),
+    z: cleanNearZero(shape.z + motion.z),
+    elevation: cleanNearZero((shape.elevation ?? 0) + motion.y),
+  }));
+}
+
+/**
+ * "Align faces" switched to another way of meeting. Concentric needs round
+ * faces: a flat face already clicked is asked for again. Points and faces are
+ * picked apart, so switching to or from "Point to point" starts over.
+ */
+function mateToolWithMode<T extends { step: "source" | "target" | "ready"; source: FacePick | null; target: FacePick | null; sourcePoint: PointPick | null; targetPoint: PointPick | null; mode: MateMode }>(tool: T, mode: MateMode): T {
+  if ((mode === "point") !== (tool.mode === "point")) return { ...tool, mode, step: "source", source: null, target: null, sourcePoint: null, targetPoint: null };
   if (mode !== "concentric") return { ...tool, mode };
   if (tool.source && !tool.source.axis) return { ...tool, mode, step: "source", source: null, target: null };
   if (tool.target && !tool.target.axis) return { ...tool, mode, step: "target", target: null };
@@ -3255,8 +3271,11 @@ export function LayerlingEditor({
     step: "source" | "target" | "ready";
     source: FacePick | null;
     target: FacePick | null;
+    sourcePoint: PointPick | null;
+    targetPoint: PointPick | null;
     mode: MateMode;
     gap: number;
+    axes: MateAxes;
   } | null>(null);
   // "Hole pattern": a flat face or a round wall (#1393) of the selected body, then the holes that fit it (#223).
   const [holePatternTool, setHolePatternTool] = useState<{
@@ -9662,7 +9681,7 @@ export function LayerlingEditor({
     stopCruise();
     setPivotPickMode(false);
     setLayFlatPickMode(false);
-    setMateTool({ sourceId: source.id, step: "source", source: null, target: null, mode: "against", gap: 0 });
+    setMateTool({ sourceId: source.id, step: "source", source: null, target: null, sourcePoint: null, targetPoint: null, mode: "against", gap: 0, axes: ALL_MATE_AXES });
     setNotice(t("status.mateStart"));
   }, [refuseLockedSelection, closeSplit, mateTool, selectedShapes, stopCruise]);
 
@@ -9693,7 +9712,33 @@ export function LayerlingEditor({
     setNotice(t("status.mateReady"));
   }, [mateTool]);
 
+  const pickMatePoint = useCallback((pick: PointPick | null) => {
+    if (!mateTool || mateTool.mode !== "point" || mateTool.step === "ready") return;
+    if (mateTool.step === "source") {
+      if (!pick || (pick.shapeId !== null && pick.shapeId !== mateTool.sourceId)) {
+        setNotice(t("status.matePointMissedSource"));
+        return;
+      }
+      setMateTool({ ...mateTool, step: "target", sourcePoint: pick });
+      setNotice(t("status.matePointTarget"));
+      return;
+    }
+    if (!pick || pick.shapeId === mateTool.sourceId) {
+      setNotice(t("status.matePointMissedTarget"));
+      return;
+    }
+    setMateTool({ ...mateTool, step: "ready", targetPoint: pick });
+    setNotice(t("status.matePointReady"));
+  }, [mateTool]);
+
   const applyMateFaces = useCallback(() => {
+    if (mateTool?.mode === "point") {
+      const { sourceId, sourcePoint, targetPoint, axes } = mateTool;
+      if (!sourcePoint || !targetPoint || !(axes.x || axes.y || axes.z)) return;
+      setMateTool(null);
+      commitShapes(pointMatedShapes(shapes, sourceId, sourcePoint.point, targetPoint.point, axes), [sourceId], t("status.matedPoint"));
+      return;
+    }
     if (!mateTool?.source || !mateTool.target) return;
     const { source, target, mode, gap } = mateTool;
     setMateTool(null);
@@ -13296,6 +13341,37 @@ export function LayerlingEditor({
         // A group left with one part is gone: that part comes back in its place.
         const left = !group && outcome.partIds?.[1] ? findShape(outcome.partIds[1]) : null;
         return { message: outcome.message, object: part ? mcpShapeSummary(part) : null, group: group ? mcpShapeSummary(group) : null, ...(left ? { remainingPart: mcpShapeSummary(left) } : {}) };
+      }
+
+      if (command.action === "mate_faces" && params.mode === "point") {
+        // "Point to point" (Discussion #1491): the object moves straight so `point` lands on `targetPoint`.
+        const all = currentShapes();
+        const mover = all.find((shape) => shape.id === params.id);
+        if (!mover) throw new Error("mate_faces point needs id of an existing object");
+        if (mover.locked) throw new Error("Unlock the object before moving it");
+        const positionOf = (value: unknown, label: string) => {
+          const raw = value && typeof value === "object" ? value as Record<string, unknown> : null;
+          if (!raw || ![raw.x, raw.z, raw.elevation].every((entry) => typeof entry === "number" && Number.isFinite(entry))) {
+            throw new Error(`mate_faces point needs ${label} { x, z, elevation }`);
+          }
+          return { x: raw.x as number, y: raw.elevation as number, z: raw.z as number };
+        };
+        const source = positionOf(params.point, "point");
+        const goal = positionOf(params.targetPoint, "targetPoint");
+        const named = params.axes === undefined ? ["x", "z", "elevation"] : mcpStringArray(params.axes);
+        if (named.length === 0 || named.some((axis) => !["x", "z", "elevation"].includes(axis))) {
+          throw new Error("mate_faces point axes must be some of x, z, elevation");
+        }
+        const axes: MateAxes = { x: named.includes("x"), y: named.includes("z"), z: named.includes("elevation") };
+        const nextShapes = pointMatedShapes(all, mover.id, source, goal, axes);
+        commitShapes(nextShapes, [mover.id], t("status.matedPoint"));
+        const motion = pointMotion(source, goal, axes);
+        return {
+          mode: "point",
+          axes: named,
+          moved: { x: Number(motion.x.toFixed(4)), z: Number(motion.z.toFixed(4)), elevation: Number(motion.y.toFixed(4)) },
+          object: mcpShapeSummary(nextShapes.find((shape) => shape.id === mover.id) as WorkplaneShape),
+        };
       }
 
       if (command.action === "mate_faces") {
@@ -18471,7 +18547,7 @@ export function LayerlingEditor({
           onImageCalibrationPoint={addImageCalibrationPoint}
           layFlatPickMode={layFlatPickMode || Boolean(cableTool?.picking)}
           onLayFlatPick={cableTool?.picking ? pickCableEnd : layFlatOnFace}
-          mateFacePick={mateTool && mateTool.step !== "ready"
+          mateFacePick={mateTool && mateTool.mode !== "point" && mateTool.step !== "ready"
             ? { shapeIds: mateTool.step === "source" ? [mateTool.sourceId] : shapes.filter((shape) => shape.id !== mateTool.sourceId && !shape.hidden).map((shape) => shape.id), round: mateTool.mode === "concentric" }
             : holePatternTool?.step === "pick"
               ? { shapeIds: [holePatternTool.sourceId], joined: faceJoinPositions, round: "either" }
@@ -18480,6 +18556,17 @@ export function LayerlingEditor({
                 : supportRibTool?.step === "pick"
                   ? { shapeIds: [supportRibTool.sourceId], joined: faceJoinPositions }
                   : null}
+          matePointPick={mateTool?.mode === "point"
+            ? {
+                shapeIds: mateTool.step === "source" ? [mateTool.sourceId] : shapes.filter((shape) => shape.id !== mateTool.sourceId && !shape.hidden).map((shape) => shape.id),
+                picking: mateTool.step !== "ready",
+                marks: [
+                  ...(mateTool.sourcePoint ? [{ ...mateTool.sourcePoint.point, role: "source" as const }] : []),
+                  ...(mateTool.targetPoint ? [{ ...mateTool.targetPoint.point, role: "target" as const }] : []),
+                ],
+              }
+            : null}
+          onMatePointPick={pickMatePoint}
           onMateFacePick={mateTool ? pickMateFace : faceTool ? (pick) => void pickFaceToolFace(pick) : supportRibTool ? (pick) => void pickSupportRibFace(pick) : (pick) => void pickHolePatternFace(pick)}
           paintPick={paintTool && !historyViewState ? { shapeId: paintTool.sourceId, mode: paintTool.settings.mode } : null}
           onPaintPick={paintAtPick}
@@ -18798,9 +18885,11 @@ export function LayerlingEditor({
           step={mateTool.step}
           mode={mateTool.mode}
           gap={mateTool.gap}
+          axes={mateTool.axes}
           workspace={workspaceSettings}
           onModeChange={(mode) => setMateTool((current) => (current ? mateToolWithMode(current, mode) : current))}
           onGapChange={(gap) => setMateTool((current) => (current ? { ...current, gap } : current))}
+          onAxesChange={(axes) => setMateTool((current) => (current ? { ...current, axes } : current))}
           onApply={applyMateFaces}
           onCancel={() => {
             setMateTool(null);

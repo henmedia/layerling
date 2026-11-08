@@ -1,1 +1,14 @@
-[]
+[
+  {
+    "title": {
+      "de": "Punkt auf Punkt",
+      "en": "Point to point",
+      "da": "Punkt til punkt"
+    },
+    "body": {
+      "de": "„Flächen ausrichten“ hat eine vierte Art: Klicke eine Ecke, eine Kante oder einen Bezugspunkt des Teils an, dann einen Punkt eines anderen Teils, und es springt genau dorthin, ohne sich zu drehen. Mit nur X und Y landet es genau darüber.",
+      "en": "Align faces has a fourth way: click a corner, an edge or a reference point of the part, then a point of another part, and it moves straight there without turning. With only X and Y on, it lands straight above.",
+      "da": "Justér flader har en fjerde måde: klik på et hjørne, en kant eller et referencepunkt på delen og derefter et punkt på en anden del, så flytter den lige derhen uden at dreje. Med kun X og Y lander den lige ovenover."
+    }
+  }
+]

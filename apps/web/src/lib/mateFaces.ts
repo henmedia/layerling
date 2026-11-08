@@ -12,9 +12,39 @@ export type FacePick = { shapeId: string; normal: Vec; point: Vec; axis?: RoundF
 /**
  * How the moved face meets the other: "against" puts them face to face (back
  * to back, touching), "flush" lays them in one plane, side by side, and
- * "concentric" puts two round faces on one axis (#794).
+ * "concentric" puts two round faces on one axis (#794). "point" moves the body
+ * so a point on it - a corner, a spot on an edge, the centre of a round edge
+ * or a reference point - lands on a point of another body (Discussion #1491).
  */
-export type MateMode = "against" | "flush" | "concentric";
+export type MateMode = "against" | "flush" | "concentric" | "point";
+
+/**
+ * A point clicked for "Point to point": the body it lies on, or null for a
+ * reference point, and where it is in world space.
+ */
+export type PointPick = { shapeId: string | null; point: Vec };
+
+/**
+ * The axes "Point to point" moves along, named as the editor shows them: X and
+ * Y across the plate, Z up. Only X and Y on puts one point straight above or
+ * below the other.
+ */
+export type MateAxes = { x: boolean; y: boolean; z: boolean };
+
+export const ALL_MATE_AXES: MateAxes = { x: true, y: true, z: true };
+
+/**
+ * How far "Point to point" moves the body, in world space: the step from the
+ * source point to the target point, along the axes switched on only. The
+ * editor's Y runs along world z and its Z along world y, the height.
+ */
+export function pointMotion(source: Vec, target: Vec, axes: MateAxes) {
+  return new THREE.Vector3(
+    axes.x ? target.x - source.x : 0,
+    axes.z ? target.y - source.y : 0,
+    axes.y ? target.z - source.z : 0,
+  );
+}
 
 const vector = (value: Vec) => new THREE.Vector3(value.x, value.y, value.z);
 

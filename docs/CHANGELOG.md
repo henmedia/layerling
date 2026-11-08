@@ -6,6 +6,8 @@ code still carries it - so a lower number further down is older, not newer.
 
 ## Unreleased
 
+- **Align faces: point to point (Discussion #1491):** Align faces has a fourth way, **Point to point**. Click a point of the part that moves - a corner, a spot on an edge, the centre of a round edge or a reference point - then a point of another part or a reference point, and **Align** moves the part straight there without turning it. A dot shows which point the pointer would take; the two picked points stay marked in orange and green. **Move along** switches X, Y and Z on or off: only X and Y puts one point straight above or below the other, only Z brings it to the same height. `layerling_mate_faces` takes `mode: "point"` with `point`, `targetPoint` and `axes`.
+
 - **Picking a face from below: the light-blue mark shows through the plate (Discussion #1492):** A face behind the plate, such as the underside of a part lifted off it, never lit up while the pointer moved over it in **Align faces**, **Lay flat** or the hole pattern, nor when picking faces to delete or for a texture. The plate is see-through but held the mark back. Now the mark shows over the plate at full strength, and a solid part standing in front of the face still hides it.
 
 - **Lid, slide-in: a box set down turned takes one too (Discussion #1443, PR #1489):** The slide-in lid worked the opening out square to the workplane's axes, so a box standing turned on the workplane, or a straight box with a hole turned by even a fraction of a degree, was refused as not a box. The lid now finds how far the opening stands turned and is worked out with the box turned back square; a turned box gets the grooves and lid a square one gets, and **Slides in from** picks the wall facing most nearly that way.

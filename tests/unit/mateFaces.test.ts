@@ -1,6 +1,6 @@
 import * as THREE from "three";
 import { describe, expect, it } from "vitest";
-import { mateMotion, shortestTurn } from "@/lib/mateFaces";
+import { ALL_MATE_AXES, mateMotion, pointMotion, shortestTurn } from "@/lib/mateFaces";
 
 const v = (x: number, y: number, z: number) => ({ x, y, z });
 
@@ -46,5 +46,30 @@ describe("aligning one face with another", () => {
     expect(new THREE.Vector3(1, 0, 0).applyQuaternion(quarter).z).toBeCloseTo(1);
     const half = shortestTurn(v(0, 1, 0), v(0, -1, 0));
     expect(new THREE.Vector3(0, 1, 0).applyQuaternion(half).y).toBeCloseTo(-1);
+  });
+});
+
+describe("moving a point onto a point (Discussion #1491)", () => {
+  // World y is the height; the editor shows it as Z, and world z as Y.
+  const corner = v(10, 0.65, 4);
+  const goal = v(13, 2, -6);
+
+  it("moves the whole way along all three axes", () => {
+    const motion = pointMotion(corner, goal, ALL_MATE_AXES);
+    expect([motion.x, motion.y, motion.z]).toEqual([3, 1.35, -10].map((value) => expect.closeTo(value, 9)));
+  });
+
+  it("puts the point straight above the other with only X and Y on, keeping its height", () => {
+    const motion = pointMotion(corner, goal, { x: true, y: true, z: false });
+    expect(motion.x).toBeCloseTo(3, 9);
+    expect(motion.z).toBeCloseTo(-10, 9);
+    expect(motion.y).toBe(0);
+  });
+
+  it("only lifts it to the same height with only Z on", () => {
+    const motion = pointMotion(corner, goal, { x: false, y: false, z: true });
+    expect(motion.x).toBe(0);
+    expect(motion.z).toBe(0);
+    expect(motion.y).toBeCloseTo(1.35, 9);
   });
 });
