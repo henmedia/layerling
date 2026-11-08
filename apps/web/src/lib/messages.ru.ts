@@ -1922,6 +1922,8 @@ export const MESSAGES_RU: Partial<Record<MessageKey, string>> = {
   "status.importUnreadable": "Не удалось прочитать файл",
   "status.importingFile": "Импорт {index} из {total}: {name}{stepNote}",
   "status.stepKernelNote": "… первый импорт STEP загружает ядро OpenCascade (~22 МБ)",
+  "status.stepImportPatience": "Большой файл может обрабатываться несколько минут; если ядро зависнет, layerling остановит его и сообщит об этом.",
+  "status.importStepTimedOut": "Ядро CAD не смогло прочитать этот файл STEP за {minutes} мин. и было остановлено. Возможно, файл повреждён; импорт той же модели в формате STL обычно работает.",
   "status.edgeNoUndoHistory": "У этой обработки кромки нет сохранённой истории отмен",
   "status.noEdgeFeature": "Нет обработки кромки для удаления",
   "status.editingProfile": "Изменение профиля эскиза",

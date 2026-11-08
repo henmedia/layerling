@@ -1392,6 +1392,8 @@ export const MESSAGES_SL: Partial<Record<MessageKey, string>> = {
   "status.importUnreadable": "Datoteke ni bilo mogoče prebrati",
   "status.importingFile": "Uvoz {index} od {total}: {name}{stepNote}",
   "status.stepKernelNote": "… prvi uvoz STEP naloži jedro OpenCascade (~22 MB)",
+  "status.stepImportPatience": "Velika datoteka lahko traja nekaj minut; če se jedro zatakne, ga layerling ustavi in to sporoči.",
+  "status.importStepTimedOut": "Jedro CAD te datoteke STEP ni moglo prebrati v {minutes} minutah in je bilo ustavljeno. Datoteka je morda poškodovana; uvoz istega modela kot STL običajno deluje.",
   "status.edgeNoUndoHistory": "Ta obdelava roba nima shranjene zgodovine razveljavitev",
   "status.noEdgeFeature": "Ni obdelave roba za odstranitev",
   "status.editingProfile": "Urejanje profila skice",

@@ -1882,6 +1882,8 @@ export const MESSAGES_PL: Partial<Record<MessageKey, string>> = {
   "status.importUnreadable": "Nie udało się odczytać pliku",
   "status.importingFile": "Importowanie {index} z {total}: {name}{stepNote}",
   "status.stepKernelNote": "… pierwszy import STEP wczytuje jądro OpenCascade (~22 MB)",
+  "status.stepImportPatience": "Duży plik może potrwać kilka minut; jeśli jądro się zawiesi, layerling je zatrzyma i o tym powie.",
+  "status.importStepTimedOut": "Jądro CAD nie zdołało odczytać tego pliku STEP w ciągu {minutes} minut i zostało zatrzymane. Plik może być uszkodzony; import tego samego modelu jako STL zwykle działa.",
 
   "status.edgeNoUndoHistory": "Ta obróbka krawędzi nie ma zapisanej historii cofania",
   "status.noEdgeFeature": "Brak obróbki krawędzi do usunięcia",

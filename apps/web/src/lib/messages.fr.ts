@@ -1915,6 +1915,8 @@ export const MESSAGES_FR: Partial<Record<MessageKey, string>> = {
   "status.importUnreadable": "Le fichier n'a pas pu être lu",
   "status.importingFile": "Importation de {index} sur {total} : {name}{stepNote}",
   "status.stepKernelNote": "… la première importation STEP charge le noyau OpenCascade (~22 Mo)",
+  "status.stepImportPatience": "Un gros fichier peut prendre quelques minutes ; si le noyau se bloque, layerling l'arrête et le signale.",
+  "status.importStepTimedOut": "Le noyau CAO n'a pas pu lire ce fichier STEP en {minutes} minutes et a été arrêté. Le fichier est peut-être endommagé ; importer le même modèle en STL fonctionne en général.",
   "status.edgeNoUndoHistory": "Cette fonctionnalité Edge n'a pas d'historique d'annulation stocké",
   "status.noEdgeFeature": "Aucune fonctionnalité de bord à supprimer",
   "status.editingProfile": "Modification du profil d'esquisse",

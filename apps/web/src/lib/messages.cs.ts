@@ -2049,6 +2049,8 @@ export const MESSAGES_CS: Record<MessageKey, string> = {
   "status.importUnreadable": "Soubor se nepodařilo přečíst",
   "status.importingFile": "Import {index} z {total}: {name}{stepNote}",
   "status.stepKernelNote": "… první import STEP načte jádro OpenCascade (~22 MB)",
+  "status.stepImportPatience": "Velký soubor může trvat několik minut; pokud se jádro zasekne, layerling ho zastaví a oznámí to.",
+  "status.importStepTimedOut": "Jádro CAD tento soubor STEP nedokázalo přečíst do {minutes} minut a bylo zastaveno. Soubor může být poškozený; import stejného modelu jako STL obvykle funguje.",
 
   "status.edgeNoUndoHistory": "Tato úprava hrany nemá uloženou historii pro vrácení",
   "status.noEdgeFeature": "Žádná úprava hrany k odstranění",

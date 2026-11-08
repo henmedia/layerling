@@ -1927,6 +1927,8 @@ export const MESSAGES_EN = {
   "status.importUnreadable": "The file could not be read",
   "status.importingFile": "Importing {index} of {total}: {name}{stepNote}",
   "status.stepKernelNote": "… first STEP import loads the OpenCascade kernel (~22 MB)",
+  "status.stepImportPatience": "A large file can take a few minutes; if the kernel gets stuck, layerling stops it and says so.",
+  "status.importStepTimedOut": "The CAD kernel could not read this STEP file within {minutes} minutes and was stopped. The file may be damaged; importing the same model as STL usually works.",
 
   "status.edgeNoUndoHistory": "This edge feature has no stored undo history",
   "status.noEdgeFeature": "No edge feature to remove",

@@ -10,5 +10,17 @@
       "en": "Align faces has a fourth way: click a corner, an edge or a reference point of the part, then a point of another part, and it moves straight there without turning. With only X and Y on, it lands straight above.",
       "da": "Justér flader har en fjerde måde: klik på et hjørne, en kant eller et referencepunkt på delen og derefter et punkt på en anden del, så flytter den lige derhen uden at dreje. Med kun X og Y lander den lige ovenover."
     }
+  },
+  {
+    "title": {
+      "de": "STEP-Import sagt, was los ist",
+      "en": "STEP import says what is going on",
+      "da": "STEP-import siger, hvad der sker"
+    },
+    "body": {
+      "de": "Solange eine STEP-Datei eingelesen wird, bleibt die Meldung stehen. Bleibt der CAD-Kern an einer Datei hängen, bricht layerling nach 3 Minuten ab und sagt, dass die Datei wohl beschädigt ist und der Import als STL meist klappt; die Meldung bleibt, bis du sie schließt.",
+      "en": "While a STEP file is being read, its message stays. If the CAD kernel gets stuck on a file, layerling stops after 3 minutes and says the file is probably damaged and that importing it as STL usually works; the message stays until you close it.",
+      "da": "Mens en STEP-fil læses ind, bliver beskeden stående. Hvis CAD-kernen sidder fast i en fil, stopper layerling efter 3 minutter og siger, at filen nok er beskadiget, og at import som STL plejer at virke; beskeden bliver, til du lukker den."
+    }
   }
 ]

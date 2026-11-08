@@ -1929,6 +1929,8 @@ export const MESSAGES_ES: Partial<Record<MessageKey, string>> = {
   "status.importUnreadable": "No se ha podido leer el archivo",
   "status.importingFile": "Importando {index} de {total}: {name}{stepNote}",
   "status.stepKernelNote": "… la primera importación STEP carga el núcleo OpenCascade (~22 MB)",
+  "status.stepImportPatience": "Un archivo grande puede tardar unos minutos; si el núcleo se atasca, layerling lo detiene y lo avisa.",
+  "status.importStepTimedOut": "El núcleo CAD no pudo leer este archivo STEP en {minutes} minutos y se detuvo. Puede que el archivo esté dañado; importar el mismo modelo como STL suele funcionar.",
 
   "status.edgeNoUndoHistory": "Esta operación de aristas no tiene guardado ningún historial para deshacer",
   "status.noEdgeFeature": "No hay ninguna operación de aristas que quitar",

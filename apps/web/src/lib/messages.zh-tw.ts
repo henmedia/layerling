@@ -1881,6 +1881,8 @@ export const MESSAGES_ZH_TW: Partial<Record<MessageKey, string>> = {
   "status.importUnreadable": "無法讀取此檔案",
   "status.importingFile": "正在匯入 {index}/{total}：{name}{stepNote}",
   "status.stepKernelNote": "… 首次匯入 STEP 會載入 OpenCascade 核心（約 22 MB）",
+  "status.stepImportPatience": "大型檔案可能需要幾分鐘；如果核心卡住，layerling 會停止它並提示。",
+  "status.importStepTimedOut": "CAD 核心未能在 {minutes} 分鐘內讀取此 STEP 檔案，已被停止。檔案可能已損壞；以 STL 格式匯入同一模型通常可行。",
   "status.edgeNoUndoHistory": "此邊特徵沒有已儲存的復原記錄",
   "status.noEdgeFeature": "沒有可移除的邊特徵",
   "status.editingProfile": "正在編輯草圖輪廓",

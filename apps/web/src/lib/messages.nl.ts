@@ -1926,6 +1926,8 @@ export const MESSAGES_NL: Record<MessageKey, string> = {
   "status.importUnreadable": "Het bestand kon niet worden gelezen",
   "status.importingFile": "{index} van {total} importeren: {name}{stepNote}",
   "status.stepKernelNote": "… de eerste STEP-import laadt de OpenCascade-kernel (~22 MB)",
+  "status.stepImportPatience": "Een groot bestand kan een paar minuten duren; loopt de kernel vast, dan stopt layerling hem en meldt dat.",
+  "status.importStepTimedOut": "De CAD-kernel kon dit STEP-bestand niet binnen {minutes} minuten lezen en is gestopt. Het bestand is misschien beschadigd; hetzelfde model als STL importeren lukt meestal wel.",
 
   "status.edgeNoUndoHistory": "Deze randbewerking heeft geen opgeslagen ongedaan-maakgeschiedenis",
   "status.noEdgeFeature": "Geen randbewerking om te verwijderen",

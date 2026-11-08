@@ -1925,6 +1925,8 @@ export const MESSAGES_AR: Partial<Record<MessageKey, string>> = {
   "status.importUnreadable": "تعذر قراءة الملف",
   "status.importingFile": "جارٍ استيراد {index} من {total}: {name}{stepNote}",
   "status.stepKernelNote": "… أول استيراد لـ STEP يحمل نواة OpenCascade (~22 ميجابايت)",
+  "status.stepImportPatience": "قد يستغرق الملف الكبير بضع دقائق؛ إذا علِقت النواة، يوقفها layerling ويخبرك بذلك.",
+  "status.importStepTimedOut": "تعذّر على نواة CAD قراءة ملف STEP هذا خلال {minutes} دقائق فأُوقفت. ربما الملف تالف؛ استيراد النموذج نفسه بصيغة STL ينجح عادةً.",
 
   "status.edgeNoUndoHistory": "معالجة الحافة هذه ليس لها سجل تراجع محفوظ",
   "status.noEdgeFeature": "لا توجد معالجة حافة لإزالتها",

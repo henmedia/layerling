@@ -2487,6 +2487,8 @@ export const MESSAGES_DA: Partial<Record<MessageKey, string>> = {
   "status.importUnreadable": "Filen kunne ikke læses",
   "status.importingFile": "Importerer {index} af {total}: {name}{stepNote}",
   "status.stepKernelNote": "… første STEP-import indlæser OpenCascade-kernen (~22 MB)",
+  "status.stepImportPatience": "En stor fil kan tage et par minutter; hvis kernen sidder fast, stopper layerling den og siger det.",
+  "status.importStepTimedOut": "CAD-kernen kunne ikke læse denne STEP-fil inden for {minutes} minutter og blev stoppet. Filen kan være beskadiget; at importere samme model som STL plejer at virke.",
   "status.edgeNoUndoHistory": "Denne kantfunktion har ingen gemt fortrydelseshistorik",
   "status.noEdgeFeature": "Ingen kantfunktion at fjerne",
   "status.editingProfile": "Redigerer skitseprofilen",

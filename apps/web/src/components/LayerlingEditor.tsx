@@ -17149,12 +17149,13 @@ export function LayerlingEditor({
         if (!svgSketchMatchesMesh(built, mesh)) return null;
         return canonicalizeShape({ ...built, name: mesh.name, color: mesh.color, x: mesh.x, z: mesh.z });
       },
+      // A STEP file can keep the kernel busy for minutes: its message stays until the import ends (#286).
       onProgress: (index, total, file, isStep) => setNotice(t("status.importingFile", {
         index: index + 1,
         total,
         name: file.name,
-        stepNote: isStep ? t("status.stepKernelNote") : "",
-      }), true),
+        stepNote: isStep ? `${t("status.stepKernelNote")} ${t("status.stepImportPatience")}` : "",
+      }), isStep ? "stay" : true),
     });
     if (!result) {
       setNotice(t("status.importCancelled", { count: selected.length }));
@@ -17168,9 +17169,10 @@ export function LayerlingEditor({
     const failureSummary = importFailureSummary(failures);
 
     if (!importedShapes.length) {
+      // Nothing came in: the reason stays until it is closed, so it is still there for whoever looked away during a long import (#286).
       setNotice(failures.length === 1 && files.length <= 1
         ? importFailureReason(failures[0])
-        : t("status.importNoneFailed", { total: Math.max(files.length, failures.length), summary: failureSummary }), true);
+        : t("status.importNoneFailed", { total: Math.max(files.length, failures.length), summary: failureSummary }), "stay");
       return { importedIds: [], failures };
     }
 

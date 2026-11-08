@@ -1917,6 +1917,8 @@ export const MESSAGES_IT: Partial<Record<MessageKey, string>> = {
   "status.importUnreadable": "Impossibile leggere il file",
   "status.importingFile": "Importazione {index} di {total}: {name}{stepNote}",
   "status.stepKernelNote": "… la prima importazione STEP carica il kernel OpenCascade (~22 MB)",
+  "status.stepImportPatience": "Un file grande può richiedere qualche minuto; se il kernel si blocca, layerling lo ferma e lo segnala.",
+  "status.importStepTimedOut": "Il kernel CAD non è riuscito a leggere questo file STEP entro {minutes} minuti ed è stato fermato. Il file potrebbe essere danneggiato; importare lo stesso modello come STL di solito funziona.",
   "status.edgeNoUndoHistory": "Questa lavorazione degli spigoli non dispone di una cronologia di annullamento salvata",
   "status.noEdgeFeature": "Nessuna lavorazione degli spigoli da rimuovere",
   "status.editingProfile": "Modifica del profilo dello schizzo",

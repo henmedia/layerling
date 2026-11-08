@@ -1926,6 +1926,8 @@ export const MESSAGES_DE: Record<MessageKey, string> = {
   "status.importUnreadable": "Die Datei ließ sich nicht lesen",
   "status.importingFile": "Importiere {index} von {total}: {name}{stepNote}",
   "status.stepKernelNote": " … der erste STEP-Import lädt den OpenCascade-Kern (~22 MB)",
+  "status.stepImportPatience": "Eine große Datei kann ein paar Minuten dauern; bleibt der Kern hängen, bricht layerling ab und sagt es.",
+  "status.importStepTimedOut": "Der CAD-Kern konnte diese STEP-Datei in {minutes} Minuten nicht lesen und wurde gestoppt. Die Datei ist vielleicht beschädigt; dasselbe Modell als STL zu importieren klappt meist.",
 
   "status.edgeNoUndoHistory": "Für diese Kantenbearbeitung ist kein Verlauf gespeichert",
   "status.noEdgeFeature": "Keine Kantenbearbeitung zum Entfernen",
