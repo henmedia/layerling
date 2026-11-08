@@ -986,6 +986,7 @@ export const MESSAGES_HU: Partial<Record<MessageKey, string>> = {
   "holePattern.size.width": "Szélesség",
   "holePattern.size.height": "Magasság",
   "holePattern.holeAngle": "Lyukak szöge",
+  "holePattern.holeTilt": "Dőlés a falon át",
   "holePattern.spacing": "Osztás (középtől középig)",
   "holePattern.wall": "Fal a lyukak között",
   "holePattern.arrangement": "Elrendezés",

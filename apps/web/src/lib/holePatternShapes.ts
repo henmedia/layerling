@@ -9,8 +9,11 @@ import {
   holeHeadDepth,
   holeHeadSize,
   holePatternCenters,
+  holeCrossSection,
+  holeTiltRadians,
   holeTurn,
   roundWallCenters,
+  withoutHoleTilt,
   type FaceOutline,
   type HolePatternSettings,
   type Point2,
@@ -36,6 +39,13 @@ export type PerforableFace = {
   outline: FaceOutline;
   /** How thick the body is behind the face, along the face's normal. */
   thickness: number;
+  /**
+   * How thick the wall is behind the point picked, straight in to the next surface of the body: on a hollow box the
+   * wall itself, not the whole box. Holes sloping through the wall are fitted and cut with it.
+   */
+  wall?: number;
+  /** The body's world triangles, nine numbers each, to find where each sloping hole leaves the wall. */
+  body?: Float64Array;
 };
 
 export type FaceReadResult =
@@ -83,7 +93,11 @@ export function readPerforableFace(positions: ArrayLike<number>, point: Vec, nor
   for (let index = 0; index < positions.length; index += 3) {
     lowest = Math.min(lowest, n.x * positions[index] + n.y * positions[index + 1] + n.z * positions[index + 2]);
   }
-  return { ok: true, face: { workplane, outline, thickness: Math.max(0, planeOffset - lowest) } };
+  const thickness = Math.max(0, planeOffset - lowest);
+  const body = positions instanceof Float64Array ? positions : Float64Array.from(positions);
+  const behind = nearestRayHit(body, origin, n.clone().negate());
+  const wall = behind === null ? thickness : Math.min(thickness, behind);
+  return { ok: true, face: { workplane, outline, thickness, wall, body } };
 }
 
 /**
@@ -385,6 +399,47 @@ function turnedWorkplane(workplane: PlacementWorkplane, turn: number): Placement
   };
 }
 
+/**
+ * A hole's frame tipped through the wall by `tilt` radians about the face's x axis: the frame's normal (the hole's axis,
+ * out of the wall) goes from the face's normal towards the face's z, so the hole's inner end rises on a standing face
+ * (whose z points down). The frame's x and z go along, staying square to the axis.
+ */
+function tiltedWorkplane(frame: PlacementWorkplane, face: PlacementWorkplane, tilt: number): PlacementWorkplane {
+  const u = new THREE.Vector3(face.xAxis.x, face.xAxis.y, face.xAxis.z).normalize();
+  const n = new THREE.Vector3(face.normal.x, face.normal.y, face.normal.z);
+  const z = new THREE.Vector3(face.zAxis.x, face.zAxis.y, face.zAxis.z);
+  // Turning by a about u takes n to n cos a + (u x n) sin a: pick the way round that leans n towards z.
+  const way = u.clone().cross(n).dot(z) >= 0 ? 1 : -1;
+  const turn = (value: Vec) => vec(new THREE.Vector3(value.x, value.y, value.z).applyAxisAngle(u, way * tilt));
+  return { ...frame, normal: turn(frame.normal), xAxis: turn(frame.xAxis), zAxis: turn(frame.zAxis) };
+}
+
+/** Above this many ray tests a pattern measures the wall once, where it was picked, instead of at every hole. */
+const SLOPED_RAY_BUDGET = 20_000_000;
+
+/**
+ * How far a hole sloping through the wall reaches. `cap` is how far its square end stands out past the face (or past
+ * the back of the wall) along the axis so that no part of its slanted meeting with the face is left as skin; `inside`
+ * is the length of the axis within the wall, from the face to where it comes out, or to the depth asked for (measured
+ * straight in, as for a straight hole).
+ */
+function slopedHoleReach(face: PerforableFace, settings: HolePatternSettings, tilt: number, wall: number, count: number) {
+  const cos = Math.cos(tilt);
+  let halfAcross = 0;
+  for (const point of holeCrossSection(settings)) halfAcross = Math.max(halfAcross, Math.abs(point.v));
+  const cap = halfAcross * Math.tan(Math.abs(tilt)) + HOLE_OVERSHOOT / cos;
+  const body = face.body;
+  const perHole = body && count * (body.length / 9) <= SLOPED_RAY_BUDGET;
+  const inside = (onFace: THREE.Vector3, out: THREE.Vector3) => {
+    if (settings.depth !== null) return settings.depth / cos;
+    if (!perHole || !body) return wall / cos;
+    const into = out.clone().negate();
+    const hit = nearestRayHit(body, onFace, into);
+    return hit === null ? wall / cos : hit;
+  };
+  return { cap, inside };
+}
+
 /** The depth the holes actually get: the body's thickness plus a skin's worth, or what was asked for. */
 export function holeDepth(face: Pick<PerforableFace, "thickness">, settings: Pick<HolePatternSettings, "depth">) {
   return settings.depth === null ? face.thickness + HOLE_OVERSHOOT : settings.depth;
@@ -464,9 +519,12 @@ export function holePatternShapes(
   /** Own shape (#1235): the shape from the scene that is repeated in place of a hole. */
   custom?: WorkplaneShape | null,
 ): HolePatternPlan {
-  if (isRoundWallFace(face)) return roundWallHoleShapes(face, settings, namePrefix, previewIdPrefix, custom);
+  // Sloping through the wall is for flat faces for now.
+  if (isRoundWallFace(face)) return roundWallHoleShapes(face, withoutHoleTilt(settings), namePrefix, previewIdPrefix, custom);
   if (settings.form === "custom" && !custom) return { holes: [], tooMany: false };
-  const { centers, tooMany, ring } = holePatternCenters(face.outline, settings);
+  const tilt = holeTiltRadians(settings);
+  const wall = face.wall ?? face.thickness;
+  const { centers, tooMany, ring } = holePatternCenters(face.outline, settings, tilt === 0 ? 0 : wall);
   if (tooMany || centers.length === 0) return { holes: [], tooMany, ...(ring ? { ring } : {}) };
 
   if (settings.form === "custom" && custom) {
@@ -518,23 +576,39 @@ export function holePatternShapes(
   const xAxis = new THREE.Vector3(workplane.xAxis.x, workplane.xAxis.y, workplane.xAxis.z);
   const zAxis = new THREE.Vector3(workplane.zAxis.x, workplane.zAxis.y, workplane.zAxis.z);
   // A turned rectangle or slot stands turned in the face as its outline was when the holes were fitted.
-  const holeFrame = turnedWorkplane(workplane, holeTurn(settings));
+  const turnedFrame = turnedWorkplane(workplane, holeTurn(settings));
+  // A hole sloping through the wall stands in that frame tipped about the face's x; `out` is its axis, out of the wall.
+  const holeFrame = tilt === 0 ? turnedFrame : tiltedWorkplane(turnedFrame, workplane, tilt);
+  const out = new THREE.Vector3(holeFrame.normal.x, holeFrame.normal.y, holeFrame.normal.z);
+  const sloped = tilt === 0 ? null : slopedHoleReach(face, settings, tilt, wall, centers.length);
 
   const holes = centers.map((center, index) => {
-    const top = origin.clone().addScaledVector(xAxis, center.u).addScaledVector(zAxis, center.v).addScaledVector(normal, HOLE_OVERSHOOT);
-    const base = top.clone().addScaledVector(normal, -height);
+    const onFace = origin.clone().addScaledVector(xAxis, center.u).addScaledVector(zAxis, center.v);
+    let top: THREE.Vector3;
+    let base: THREE.Vector3;
+    let length = height;
+    if (sloped) {
+      // From a little out of the face, past the whole slanted end, to where it comes out of the wall (or the depth asked).
+      const inside = sloped.inside(onFace, out);
+      top = onFace.clone().addScaledVector(out, sloped.cap);
+      base = onFace.clone().addScaledVector(out, -(inside + (settings.depth === null ? sloped.cap : 0)));
+      length = top.distanceTo(base);
+    } else {
+      top = onFace.clone().addScaledVector(normal, HOLE_OVERSHOOT);
+      base = top.clone().addScaledVector(normal, -height);
+    }
     const made = makeShapeFromAsset(
       { ...asset, name: `${namePrefix} ${index + 1}` },
       { x: 0, z: 0, elevation: 0 },
       {
         width: size.width,
         depth: size.height,
-        height,
+        height: length,
         sides: settings.form === "hexagon" ? 6 : undefined,
         ...(head ? { screwHoleShaft: head.screwHoleShaft, screwHoleHeadDepth: head.screwHoleHeadDepth, screwHoleAngle: head.screwHoleAngle } : {}),
       },
     );
-    const sized = { ...made, width: size.width, depth: size.height, height, size: Math.max(size.width, size.height) };
+    const sized = { ...made, width: size.width, depth: size.height, height: length, size: Math.max(size.width, size.height) };
     const placed = { ...sized, ...placementPatchForNewShape(sized, holeFrame, base), ...(previewIdPrefix ? { id: `${previewIdPrefix}-${index}` } : {}) };
     return canonicalizeShape(withHoleMode(placed, true));
   });

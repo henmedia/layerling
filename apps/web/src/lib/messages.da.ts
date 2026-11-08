@@ -2234,6 +2234,7 @@ export const MESSAGES_DA: Partial<Record<MessageKey, string>> = {
   "holePattern.size.width": "Bredde",
   "holePattern.size.height": "Højde",
   "holePattern.holeAngle": "Vinkel på hullerne",
+  "holePattern.holeTilt": "Hældning gennem væggen",
   "holePattern.spacing": "Afstand",
   "holePattern.rowSpacing": "Rækkeafstand",
   "holePattern.wall": "Væg mellem hullerne",
