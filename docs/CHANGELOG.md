@@ -6,6 +6,8 @@ code still carries it - so a lower number further down is older, not newer.
 
 ## Unreleased
 
+- **Lid, slide-in: a box set down turned takes one too (Discussion #1443, PR #1489):** The slide-in lid worked the opening out square to the workplane's axes, so a box standing turned on the workplane, or a straight box with a hole turned by even a fraction of a degree, was refused as not a box. The lid now finds how far the opening stands turned and is worked out with the box turned back square; a turned box gets the grooves and lid a square one gets, and **Slides in from** picks the wall facing most nearly that way.
+
 ## 1.152.0
 
 - **Fillet: a refusal at a tight curve says where and how tight (#1473):** A fillet along a curved edge, such as the outline of a sketch or an SVG, was refused with "cannot be filleted together at this size" and no hint where. Where the edge bends round the outside of the body tighter than the radius, the rounding cannot follow it: a refused fillet now measures the picked curves, says the radius of the tightest outside bend (say 0.53 mm) and draws the edges with such a bend in red. A notch bending the other way does not count, and when no bend is that tight the old message stands. The guide's edges chapter explains it, with the tip to round the top edges before a corner gets a small radius. Unit test `cadTightBends.test.ts`; reported by @MethylBromide.
