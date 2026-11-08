@@ -35,7 +35,7 @@ export function hoverTipFor(pointerType: string, place: { appleTouch: boolean; i
   return false;
 }
 
-const HELD_TITLE = "data-hover-title";
+export const HELD_TITLE = "data-hover-title";
 
 /** The title of a control, also while the bubble holds it back. */
 export function hoverTitleOf(element: Element) {
