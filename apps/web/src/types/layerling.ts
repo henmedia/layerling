@@ -920,7 +920,7 @@ export type ParametricSource = {
   slopeEnd?: number;
   slopeSide?: "back" | "front" | "left" | "right";
   slopeCurve?: number;
-  slopeFrom?: "end" | "middle";
+  slopeFrom?: "end" | "middle" | "arch";
   sideDrop?: number;
   sideCurve?: number;
   narrowEnd?: number;
@@ -1055,7 +1055,7 @@ export type WorkplaneShape = {
   /** Slope along: -1 to 1, 0 a straight top, above 0 bulging up, below 0 sagging. */
   slopeCurve?: number;
   /** Slope along: where the top line starts: at one end ("end", the default) or in the middle ("middle": both ends low, symmetric). */
-  slopeFrom?: "end" | "middle";
+  slopeFrom?: "end" | "middle" | "arch";
   /** Side drop: how many mm the two longer sides are lowered at their edges, evenly; missing or 0 means none. */
   sideDrop?: number;
   /** Side drop: -1 to 1, 0 a straight line from the middle to the edge, above 0 bulging up, below 0 sagging. */

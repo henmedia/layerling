@@ -2654,6 +2654,8 @@ export const MESSAGES_NL: Record<MessageKey, string> = {
   "prop.sideCurve": "Zijkantboog (%)",
   "slope.sideDropHint": "Verlaagt beide langere zijkanten gelijkmatig, in mm; het midden behoudt de volle hoogte.",
   "slope.sideCurveHint": "0 is een rechte lijn van het midden naar de randen. Boven 0 bolt hij omhoog als een koepel, onder 0 zakt hij door.",
+  "slope.from.arch": "Gewelfd vanuit het midden (helling blijft)",
+  "slope.fromArchHint": "De helling blijft; de kromming hieronder buigt haar symmetrisch vanuit het midden.",
   "inspector.narrow": "Versmalling in de lengte",
   "prop.narrowSide": "Smal uiteinde",
   "prop.narrowEnd": "Breedte aan het eind",

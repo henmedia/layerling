@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { narrowCurveForShape, narrowHalfWidthAt, normalizeSlopeSide, shapeHasAlongDeform, shapeHasNarrow, shapeHasSideDrop, shapeHasSlope, shapeHasSymmetricDeform, sideDropCurveForShape, slopeCurveForShape, slopeDistance, slopeEndHeight, slopeMesh, slopeTopAt, slopeTopAtDistance } from "@/lib/slopeAlong";
+import { narrowCurveForShape, narrowHalfWidthAt, normalizeSlopeFrom, normalizeSlopeSide, shapeHasAlongDeform, shapeHasNarrow, shapeHasSideDrop, shapeHasSlope, shapeHasSymmetricDeform, sideDropCurveForShape, slopeCurveForShape, slopeDistance, slopeEndHeight, slopeMesh, slopeTopAt, slopeTopAtDistance } from "@/lib/slopeAlong";
 import type { WorkplaneShape } from "@/types/layerling";
 
 function shape(kind: WorkplaneShape["kind"], extra: Partial<WorkplaneShape> = {}): WorkplaneShape {
@@ -267,3 +267,60 @@ describe("side drop on a body drawn at unit size", () => {
     }
   });
 });
+
+describe("slope arched from its middle", () => {
+  const arch = (slopeCurve: number, extra: Partial<WorkplaneShape> = {}) => shape("box", { slopeEnd: 8, slopeSide: "back", slopeFrom: "arch", slopeCurve, ...extra });
+
+  it("is the plain straight slope when the curve is 0", () => {
+    const { vertices, faces } = boxMesh();
+    const straight = slopeMesh(vertices, faces, shape("box", { slopeEnd: 8, slopeSide: "back" }));
+    expect(slopeMesh(vertices, faces, arch(0))).toEqual(straight);
+  });
+
+  it("keeps the two end heights and bends the line evenly about its middle", () => {
+    for (const slopeCurve of [0.3, 0.6, 1, -0.3, -0.6, -1]) {
+      const curve = slopeCurveForShape(arch(slopeCurve));
+      expect(curve.middle).toBeUndefined();
+      expect(slopeTopAt(curve, 0)).toBeCloseTo(20, 9);
+      expect(slopeTopAt(curve, 40)).toBeCloseTo(8, 9);
+      // the line lifts or sags by the same amount, mirrored, at equal distances either side of its middle
+      const line = (s: number) => 20 - (12 * s) / 40;
+      for (const offset of [4, 10, 17]) {
+        const before = slopeTopAt(curve, 20 - offset) - line(20 - offset);
+        const after = slopeTopAt(curve, 20 + offset) - line(20 + offset);
+        expect(before).toBeCloseTo(after, 9);
+        expect(Math.sign(before)).toBe(Math.sign(slopeCurve));
+      }
+      // never above the body or below the lower end
+      for (let s = 0; s <= 40; s += 0.5) {
+        const top = slopeTopAt(curve, s);
+        expect(top).toBeLessThanOrEqual(20 + 1e-9);
+        expect(top).toBeGreaterThanOrEqual(8 - 1e-9);
+      }
+    }
+  });
+
+  it("reaches a quarter of the drop above the straight line in the middle at full curve, and goes level at the high end", () => {
+    const curve = slopeCurveForShape(arch(1));
+    expect(slopeTopAt(curve, 20) - 14).toBeCloseTo((20 - 8) / 4, 9);
+    expect(slopeTopAt(curve, 0) - slopeTopAt(curve, 0.5)).toBeLessThan(0.01);
+  });
+
+  it("is cut often enough along the mesh to follow the arch", () => {
+    const mesh = boxMesh();
+    const out = slopeMesh(mesh.vertices, mesh.faces, arch(0.8)).vertices;
+    const zs = new Set(out.map(([, , z]) => Math.round(z * 1e6) / 1e6));
+    expect(zs.size).toBeGreaterThan(8);
+    expect(topAt(out, 2, 20)).toBeCloseTo(20, 9);
+    expect(topAt(out, 2, -20)).toBeCloseTo(8, 9);
+  });
+
+  it("is not a symmetric deformation, and is read from a saved value only when valid", () => {
+    expect(shapeHasSymmetricDeform(arch(0.5))).toBe(false);
+    expect(normalizeSlopeFrom("arch")).toBe("arch");
+    expect(normalizeSlopeFrom("middle")).toBe("middle");
+    expect(normalizeSlopeFrom("nonsense")).toBe("end");
+    expect(normalizeSlopeFrom(undefined)).toBe("end");
+  });
+});
+

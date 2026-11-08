@@ -1792,6 +1792,8 @@ export const MESSAGES_HU: Partial<Record<MessageKey, string>> = {
   "prop.sideCurve": "Oldalak íve (%)",
   "slope.sideDropHint": "A két hosszabb oldalt egyformán engedi le, mm-ben; a közepe megtartja a teljes magasságot.",
   "slope.sideCurveHint": "0: egyenes vonal a közepétől a szélekig. 0 fölött kupolaszerűen felfelé domborodik, 0 alatt behajlik.",
+  "slope.from.arch": "Ívelve a lejtő közepéről",
+  "slope.fromArchHint": "A lejtő megmarad; az alábbi ív a közepéből indulva, szimmetrikusan hajlítja meg.",
   "inspector.narrow": "Szűkülés hosszában",
   "prop.narrowSide": "Szűkülő vég",
   "prop.narrowEnd": "Vég szélessége",
