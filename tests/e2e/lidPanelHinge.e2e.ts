@@ -581,4 +581,34 @@ describe("the lid's panel with a slide-in lid (Discussion #1443)", () => {
     act(() => root?.unmount());
     expect(texts(mount({ type: "slide", handle: "tab" }).panel)).toContain("A tab as thick as the plate, 6 mm out from the lid's end at the cut wall, to pull it out by.");
   });
+
+  it("asks how far below the rim the lid sits, framed by the walls, 0 to begin with, says what changes and how low a frame is too low", () => {
+    const { panel, changes } = mount({ type: "slide" });
+    const frame = slider(panel, "Frame above the lid")!;
+    expect(frame).not.toBeNull();
+    expect(frame.value).toBe("0");
+    expect(frame.max).toBe("5");
+    expect(texts(panel)).toContain("How far the lid sits below the rim, with the walls standing round it as a frame. 0: the lid is flush with the rim.");
+    expect(texts(panel)).toContain("the fourth is cut down to the lid's underside");
+    act(() => {
+      Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, "value")!.set!.call(frame, "2");
+      frame.dispatchEvent(new Event("input", { bubbles: true }));
+    });
+    expect(changes.at(-1)).toEqual({ slideFrame: 2 });
+    act(() => root?.unmount());
+    const framed = mount({ type: "slide", slideFrame: 2 }).panel;
+    expect(texts(framed)).toContain("it slides in through a slot in the fourth, which keeps its full height above it");
+    expect(texts(framed)).not.toContain("the fourth is cut down to the lid's underside");
+    expect(texts(framed)).not.toContain("The frame is too low");
+    act(() => root?.unmount());
+    // The gap and the click bump's height over the lid, and 1 mm of wall above them.
+    const low = mount({ type: "slide", slideFrame: 1.4, clickBumps: true }).panel;
+    expect([...low.querySelectorAll('[role="status"]')].map((node) => node.textContent)).toContain("The frame is too low to keep the wall whole above the slot: set it to at least 1.6 mm, or to 0.");
+    act(() => root?.unmount());
+    // Only a slide-in lid has one.
+    for (const type of ["plug", "cap", "flat", "screw", "bayonet"] as const) {
+      expect(slider(mount({ type, slideFrame: 2 }).panel, "Frame above the lid"), type).toBeNull();
+      act(() => root?.unmount());
+    }
+  });
 });
