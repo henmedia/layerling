@@ -6,6 +6,8 @@ code still carries it - so a lower number further down is older, not newer.
 
 ## Unreleased
 
+- **Rounded box and Box: a corner radius dot on the top edge (Discussion #1470):** A Rounded box has a dot on its top edge, at the back right corner, like the corner dot in Inkscape. Drag it along the edge and the corner radius follows; it moves with the radius, and stays clear of the resize handles on the screen, also when seen from above. A plain Box has the dot too: the first pull turns it into a Rounded box with flat top and bottom, the same size, and one undo turns it back into the Box. The Corner fillet field works as before. Bodies made before keep their shape.
+
 - **Text: up to 250 characters, and no width limit (asked in the Layerling User Group on Facebook):** A text took 24 characters, a limit from the first version, when a text could only be one line; typing on past 260 mm made the letters smaller. A text, a name tag, a line of a text block and the default text in the settings now take 250 characters, the letters keep their size and the line gets as long as it needs to be. A rounded or chamfered letter edge works on a text of up to 40 characters: on a longer one its build took a minute or more. A longer text keeps the setting and shows plain letters, and the field says why. A Gridfinity label shelf keeps its 24 characters.
 
 - **Windows quickstart: runs on a PC that does not allow scripts:** On Windows 10 and 11, PowerShell runs no script files until they are allowed, and the one-line installer stopped at `npm install` with "npm.ps1 cannot be loaded because running scripts is disabled on this system". It now calls `npm.cmd`, which needs no permission, so the one line works on a fresh PC as the README says (reported in the drucktipps3d forum).

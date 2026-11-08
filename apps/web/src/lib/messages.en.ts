@@ -1406,6 +1406,7 @@ export const MESSAGES_EN = {
   "transform.height": "Height",
   "transform.slope": "Height of the lower end",
   "transform.narrow": "Width of the narrow end",
+  "transform.cornerRadius": "Corner radius",
   "transform.lift": "Lift",
   "transform.slideX": "Move along X only",
   "transform.slideY": "Move along Y only",
