@@ -34,7 +34,8 @@ export const SPLIT_CONNECTOR_KINDS: readonly SplitConnectorKind[] = ["none", "do
  * tongues take `count` and `clearance` as well, and their own measures: `dovetailWidth` where the tongue leaves the cut
  * face, `dovetailDepth` how far it stands out of it into the other half, both in mm, `dovetailAngle` how far each flank
  * leans out from square to the face, and `dovetailTurn` how far the tongues are turned from the cut face's long way,
- * both in degrees.
+ * both in degrees. `dowelBase` stands the loose dowels on a breakaway base (breakawayBase.ts), for a printer whose bed
+ * moves.
  */
 export type SplitConnectorOptions = {
   kind: SplitConnectorKind;
@@ -46,6 +47,7 @@ export type SplitConnectorOptions = {
   dovetailDepth: number;
   dovetailAngle: number;
   dovetailTurn: number;
+  dowelBase: boolean;
 };
 
 export const SPLIT_CONNECTOR_DEFAULTS: SplitConnectorOptions = {
@@ -58,6 +60,7 @@ export const SPLIT_CONNECTOR_DEFAULTS: SplitConnectorOptions = {
   dovetailDepth: 4,
   dovetailAngle: 15,
   dovetailTurn: 0,
+  dowelBase: false,
 };
 export const MIN_CONNECTOR_DIAMETER = 2;
 export const MAX_CONNECTOR_DIAMETER = 20;
@@ -149,6 +152,7 @@ export function normalizeSplitConnectorOptions(value?: Partial<Record<keyof Spli
   if (angle !== null) result.dovetailAngle = clamp(angle, MIN_DOVETAIL_ANGLE, MAX_DOVETAIL_ANGLE);
   const turn = finiteNumber(value?.dovetailTurn);
   if (turn !== null) result.dovetailTurn = clamp(turn, -MAX_DOVETAIL_TURN, MAX_DOVETAIL_TURN);
+  if (typeof value?.dowelBase === "boolean") result.dowelBase = value.dowelBase;
   return result;
 }
 

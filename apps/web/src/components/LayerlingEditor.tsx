@@ -30,6 +30,7 @@ import { automaticFlexiJoints, automaticFoldJoints, DEFAULT_FLEXI_FOLD, FLEXI_DE
 import { LID_HINGE_TYPES, groupedWithMagnets, lidClickBumpsFit, lidDefaults, lidFlipTopFits, lidHandleFits, lidNeckFit, lidNeckFitPatch, lidStandardThread, lidTakesExtras, lidTakesMagnets, lidTetherFits, magnetPocketDepth, normalizeLidOptions, type LidOptions, type LidThreadStandard } from "@/lib/lidTool";
 import { FIT_TEST_CLEARANCES, getPrinterPlay, MAX_PRINTER_PLAY, MIN_PRINTER_PLAY, normalizePrinterPlay, PRINTER_PLAY_SETTINGS, printerPlayPrinter, printerPlaySource, printerPlayStart, setPrinterPlay, setPrinterPlayPrinter, withPrinterPlay } from "@/lib/printerPlay";
 import { FIT_TEST_PIN_DIAMETER, fitTestHoles, fitTestShape, fitTestSpot } from "@/lib/fitTest";
+import { fitTestPinBaseChosen } from "@/lib/breakawayBase";
 import { CABLE_DEFAULTS, cableChannelShapeFields, cableEndNear, cableGrid, findCableChannel, normalizeCableOptions, type CableChannelError, type CableChannelOptions, type CableChannelResult, type CableEnd, type CableGrid, type Vec3 as CableVec3 } from "@/lib/cableChannel";
 import { CableChannelPanel, type CableChannelEndName, type CableChannelPanelResult } from "./workplane/CableChannelPanel";
 import type { CadLidRequest } from "@/lib/cadLid";
@@ -12427,10 +12428,10 @@ export function LayerlingEditor({
    * there already when its middle is taken, selected. The settings window's button and the MCP tool place it; it returns
    * the new bundle, or why it could not be made, as the notice says it.
    */
-  const placeFitTest = useCallback(async (): Promise<{ shape: WorkplaneShape } | { error: string }> => {
+  const placeFitTest = useCallback(async (pinBase?: boolean): Promise<{ shape: WorkplaneShape } | { error: string }> => {
     setNotice(t("fitTest.building"), true);
     try {
-      const built = await fitTestShape(workspaceSettingsRef.current.booleanTriangleLimit);
+      const built = await fitTestShape(workspaceSettingsRef.current.booleanTriangleLimit, undefined, { base: pinBase ?? fitTestPinBaseChosen() });
       // Always on the plate, never on a face the workplane was set on: it is printed as it lies.
       const base = horizontalPlacementWorkplane();
       const origin = buildPlates.newShapeOrigin(base);
@@ -12818,7 +12819,6 @@ export function LayerlingEditor({
     shapesRef, selectedIdsRef, notesRef, historyViewStateRef, projectAssetsRef, workspaceSettingsRef, snapGridRef, projectInfoRef, placementWorkplaneRef,
   });
   const noticeError = (error: unknown) => setNotice(error instanceof Error ? localizedError(error.message) : String(error));
-
   /**
    * A custom shape put into the design, from the shapes panel or the command search: like the shapes of the library it
    * hangs on the pointer and sits down where you click, also on a face (#463). Without "click to place" it stays where
@@ -14459,7 +14459,7 @@ export function LayerlingEditor({
       if (command.action === "printer_play") {
         // The printer's play as the settings window keeps it (printerPlay.ts): read, set or forgotten, and the fit test
         // that measures it placed as the window's button places it.
-        for (const key of ["clear", "makeFitTest"] as const) {
+        for (const key of ["clear", "makeFitTest", "pinBase"] as const) {
           if (params[key] !== undefined && typeof params[key] !== "boolean") throw new Error(`${key} must be true or false`);
         }
         if (params.play !== undefined) {
@@ -14471,8 +14471,10 @@ export function LayerlingEditor({
           setPrinterPlay(null);
         }
         let fitTest: Record<string, unknown> | null = null;
+        if (params.pinBase !== undefined && params.makeFitTest !== true) throw new Error("pinBase goes with makeFitTest");
         if (params.makeFitTest === true) {
-          const made = await placeFitTest();
+          // The pin on its breakaway base as asked, or as the settings window's box last had it (breakawayBase.ts).
+          const made = await placeFitTest(params.pinBase === undefined ? undefined : params.pinBase === true);
           if ("error" in made) throw new Error(made.error);
           const placed = made.shape;
           const [plate, pin] = placed.groupedShapes ?? [];
@@ -14481,6 +14483,7 @@ export function LayerlingEditor({
             plateId: plate?.id ?? null,
             pinId: pin?.id ?? null,
             pinDiameter: FIT_TEST_PIN_DIAMETER,
+            pinBase: params.pinBase === undefined ? fitTestPinBaseChosen() : params.pinBase === true,
             holes: fitTestHoles().map(({ clearance, diameter, label }) => ({ clearance, diameter, label })),
           };
         }
@@ -15049,7 +15052,10 @@ export function LayerlingEditor({
         if (connectorKind !== "dovetail" && dovetailFields.some((field) => params[field] !== undefined)) {
           throw new Error("dovetailWidth, dovetailDepth, dovetailAngle and dovetailDirection go with connectors dovetail");
         }
+        if (params.dowelBase !== undefined && typeof params.dowelBase !== "boolean") throw new Error("dowelBase must be true or false");
+        if (params.dowelBase !== undefined && connectorKind !== "dowels") throw new Error("dowelBase goes with connectors dowels");
         const connectors = normalizeSplitConnectorOptions({
+          dowelBase: params.dowelBase,
           kind: connectorKind,
           count: params.connectorCount,
           diameter: params.connectorDiameter,
@@ -15120,6 +15126,7 @@ export function LayerlingEditor({
               ...(connectors.kind === "dovetail"
                 ? { width: connectors.dovetailWidth, depth: connectors.dovetailDepth, angle: connectors.dovetailAngle, direction: connectors.dovetailTurn }
                 : { diameter: connectors.diameter, depth: connectors.depth }),
+              ...(connectors.kind === "dowels" ? { dowelBase: connectors.dowelBase } : {}),
               clearance: connectors.clearance,
               ...(outcome.connectors ?? { placed: 0, faces: 0, tooSmall: 0, tooThin: 0 }),
             },

@@ -72,6 +72,8 @@ The rib is a mesh body: to change it, delete it and make it again. Each click ma
 
 Every printer prints holes a little smaller and pins a little thicker than they are drawn, each by its own amount, so the clearance two printed parts need is a guess at first. Measure it once instead. In the settings under {{ui:workspace.workplane}}, {{ui:workspace.fitTestMake}} puts a fit test on the plate: a 60 × 20 × 4 mm plate with seven holes for one 5 mm pin, each drawn 5 mm plus twice 0.05, 0.10, 0.15, 0.20, 0.25, 0.30 or 0.40 mm, the value raised beside it, and the 5 mm pin itself, standing beside the plate with a small chamfer on top. It is made of ordinary shapes, so it prints with the rest of the plate, without supports.
 
+On a printer whose bed moves back and forth, the tall, thin pin can wobble loose or come out wavy at its foot, brim or not. Tick {{ui:workspace.fitTestBase}} before you make the fit test: the pin then stands on a small 10 mm plate that holds on to the bed. It does not touch the plate's socket but rests on a small nub in its floor; once printed, bend the pin to and fro and it snaps off.
+
 Print it as it lies, then push the pin, chamfered end first, into the holes from the tightest on. **The snuggest hole the pin still turns in** gives your printer's play. Type its number under {{ui:workspace.printerPlay}}, or click it among the values below the field. The play is per side, in millimetres, and the browser keeps it for every design; an empty field means not measured.
 With several printers, choose the one you print on under {{ui:workspace.printer}} first: each printer keeps a play of its own, and new uses start from the play of the printer the design is set to. A printer without one uses the play set while no printer was chosen.
 

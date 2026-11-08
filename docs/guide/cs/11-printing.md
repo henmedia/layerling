@@ -70,6 +70,8 @@ Díl tištěný šikmo na hraně, třeba pod 45°, často žádné podpěry nepo
 
 Každá tiskárna tiskne otvory o něco menší a čepy o něco silnější, než jsou nakreslené, každá o jinou hodnotu. Vůle, kterou dva vytištěné díly potřebují, je proto zpočátku odhad. Změřte ji raději jednou: v nastavení v části {{ui:workspace.workplane}} položí {{ui:workspace.fitTestMake}} na podložku test vůle. Je to destička 60 × 20 × 4 mm se sedmi otvory pro jeden čep 5 mm, každý nakreslený jako 5 mm plus dvakrát 0,05, 0,10, 0,15, 0,20, 0,25, 0,30 nebo 0,40 mm, s vystouplou hodnotou vedle, a k tomu samotný čep 5 mm, který stojí vedle destičky a nahoře má malé sražení. Skládá se z běžných tvarů, takže se tiskne se zbytkem podložky, bez podpěr.
 
+Na tiskárně, jejíž podložka jezdí dopředu a dozadu, se vysoký tenký čep může rozkývat, uvolnit nebo vyjít dole zvlněný, s límcem i bez. Před vytvořením zkoušky lícování zaškrtněte {{ui:workspace.fitTestBase}}: čep pak stojí na malé 10mm destičce, která drží na podložce. Stěny jejího lůžka se nedotýká, stojí na malém výstupku v jeho dně; po tisku čepem zakývejte a odlomí se.
+
 Vytiskněte ho tak, jak leží, a pak zasouvejte čep sraženým koncem napřed do otvorů, od nejužšího. **Nejužší otvor, ve kterém se čep ještě otáčí,** udává vůli vaší tiskárny. Zadejte jeho číslo do pole {{ui:workspace.printerPlay}} nebo ho klikněte mezi hodnotami pod polem. Vůle platí na stranu, v milimetrech, a prohlížeč si ji pamatuje pro všechny projekty; prázdné pole znamená neměřeno.
 S více tiskárnami nejprve v {{ui:workspace.printer}} vyberte tu, na které tisknete: každá tiskárna si pamatuje vlastní vůli a nová použití vycházejí z vůle tiskárny nastavené pro návrh. Tiskárna bez vlastní vůle použije vůli nastavenou, když nebyla vybrána žádná tiskárna.
 

@@ -6,6 +6,7 @@ import { meshForShape } from "@/lib/editorMeshCore";
 import { rememberManifoldRuntime } from "@/lib/manifoldHandle";
 import type { ManifoldSolid } from "@/lib/manifoldSplit";
 import { modelSplitPlane } from "@/lib/modelSplit";
+import { BREAKAWAY_BASE, breakawayNubSize, breakawayPlateSize, breakawaySocketDiameter } from "@/lib/breakawayBase";
 import { CONNECTOR_END_PLAY, connectorHoleRadius, dowelLength, normalizeSplitConnectorOptions, plugHeight, SPLIT_CONNECTOR_DEFAULTS, type SplitConnectorOptions } from "@/lib/splitConnectors";
 
 /*
@@ -294,5 +295,43 @@ describe("when no connector fits", () => {
     const none = await splitShapeByPlane(shape, plane, options({ kind: "none" }));
     expect(none.parts?.map((part) => part.importedMesh?.positions)).toEqual(plain.parts?.map((part) => part.importedMesh?.positions));
     expect("connectors" in none).toBe(false);
+  });
+});
+
+describe("dowels on a breakaway base (a mail from Michael Celotto)", () => {
+  const shape = box(60, 30, 40);
+  const plane = { axis: "y" as const, normal: [0, 1, 0] as Vec3, position: 20 };
+
+  it("stands all the loose pins on one plate, raised onto their nubs, one closed body with it", async () => {
+    const plain = await splitShapeByPlane(shape, plane, options({ kind: "dowels" }));
+    const based = await splitShapeByPlane(shape, plane, options({ kind: "dowels", dowelBase: true }));
+    expect(based.parts).toHaveLength(3);
+    expect(based.connectors).toEqual(plain.connectors);
+    const pins = based.parts![2];
+    const created: ManifoldSolid[] = [];
+    const solid = solidOf(pins, created);
+    const plainSolid = solidOf(plain.parts![2], created);
+    expect(solid.status()).toBe("NoError");
+    // The two pins and the base are one body now, to be broken apart once printed.
+    expect(solid.decompose().length).toBe(1);
+    expect(pins.elevation).toBeCloseTo(0, 6);
+    expect(pins.height).toBeCloseTo(dowelLength(SPLIT_CONNECTOR_DEFAULTS) + BREAKAWAY_BASE.lift, 3);
+    // The base stays clear of the halves.
+    expect(pins.x - pins.width / 2).toBeGreaterThan(30 + 2);
+    // The plate under both pins, less a socket each, and a nub each: no pin touches its socket's wall.
+    const { height, floor, lift } = BREAKAWAY_BASE;
+    const reach = breakawayPlateSize(5);
+    const pitch = 5 + 3;
+    const nub = breakawayNubSize(5, 0.5);
+    const socketArea = (48 / 2) * (breakawaySocketDiameter(5) / 2) ** 2 * Math.sin((2 * Math.PI) / 48);
+    const base = (reach + pitch) * reach * height - 2 * socketArea * (height - floor) + 2 * nub ** 2 * (lift - floor);
+    expect(solid.volume()).toBeCloseTo(plainSolid.volume() + base, 0);
+    dispose(created);
+  });
+
+  it("is off unless asked for, and leaves plugs and dovetails as they are", () => {
+    expect(SPLIT_CONNECTOR_DEFAULTS.dowelBase).toBe(false);
+    expect(options({ kind: "dowels", dowelBase: true }).dowelBase).toBe(true);
+    expect(normalizeSplitConnectorOptions({ kind: "dowels", dowelBase: "yes" }).dowelBase).toBe(false);
   });
 });

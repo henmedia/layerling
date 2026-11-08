@@ -12275,7 +12275,8 @@ html[data-theme="dark"] .pattern-picker-empty {
   border-color: #cf710f;
 }
 
-.workspace-printer-play-make {
+.workspace-printer-play-make,
+.workspace-printer-play-base {
   grid-column: 2;
 }
 

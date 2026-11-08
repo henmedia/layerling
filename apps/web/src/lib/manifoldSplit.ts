@@ -1,4 +1,5 @@
 import type { ManifoldToplevel, Mat4 } from "manifold-3d";
+import { BREAKAWAY_BASE, breakawayNubSize, breakawayNubSpan, breakawayPlateSize, breakawaySocketDiameter } from "@/lib/breakawayBase";
 import {
   CONNECTOR_FLOOR_SKIN,
   CONNECTOR_WALL,
@@ -505,15 +506,54 @@ export function applySplitConnectors(
   created.push(pin);
   const radius = options.diameter / 2;
   const pitch = options.diameter + PIN_GAP;
-  const pins = plan.points.map((_, index) => {
-    const placed = pin.translate([
-      beside.max[0] + PIN_SPACING + radius + (index % PINS_PER_ROW) * pitch,
-      beside.min[1],
-      beside.min[2] + radius + Math.floor(index / PINS_PER_ROW) * pitch,
-    ]);
+  const lift = options.dowelBase ? BREAKAWAY_BASE.lift : 0;
+  const spots = plan.points.map((_, index): [number, number] => [
+    beside.max[0] + PIN_SPACING + radius + (index % PINS_PER_ROW) * pitch,
+    beside.min[2] + radius + Math.floor(index / PINS_PER_ROW) * pitch,
+  ]);
+  const pins = spots.map(([x, z]) => {
+    const placed = pin.translate([x, beside.min[1] + lift, z]);
     created.push(placed);
     return placed;
   });
+  if (options.dowelBase) pins.push(dowelBreakawayBase(runtime, options, spots, beside.min[1], created));
   const allPins = unionOf(runtime, pins, created);
   return { positive: cutPositive, negative: cutNegative, pins: allPins };
+}
+
+/**
+ * The loose dowels' breakaway base (breakawayBase.ts), on the floor at `floorY` under the dowels standing at `spots`
+ * (x and z): one plate under all of them, as close as they stand their own plates would run into each other, with a
+ * socket round each dowel's foot and the nub it stands on, reaching into the socket's floor and into the dowel. The
+ * dowels go up by the base's lift; with them it is one body.
+ */
+function dowelBreakawayBase(runtime: ManifoldToplevel, options: SplitConnectorOptions, spots: ReadonlyArray<readonly [number, number]>, floorY: number, created: Disposable[]) {
+  const { height, floor } = BREAKAWAY_BASE;
+  const reach = breakawayPlateSize(options.diameter) / 2;
+  const xs = spots.map(([x]) => x);
+  const zs = spots.map(([, z]) => z);
+  const minX = Math.min(...xs) - reach;
+  const minZ = Math.min(...zs) - reach;
+  const plate = runtime.Manifold.cube([Math.max(...xs) + reach - minX, height, Math.max(...zs) + reach - minZ]).translate([minX, floorY, minZ]);
+  created.push(plate);
+  const socketRadius = breakawaySocketDiameter(options.diameter) / 2;
+  const socket = revolved(runtime, [[0, floor], [socketRadius, floor], [socketRadius, height + CONNECTOR_OVERLAP], [0, height + CONNECTOR_OVERLAP]], created).transform(PIN_UPRIGHT);
+  created.push(socket);
+  const sockets = spots.map(([x, z]) => {
+    const placed = socket.translate([x, floorY, z]);
+    created.push(placed);
+    return placed;
+  });
+  const cut = plate.subtract(unionOf(runtime, sockets, created));
+  created.push(cut);
+  const nubSize = breakawayNubSize(options.diameter, connectorChamfer(options.diameter));
+  const span = breakawayNubSpan();
+  const nub = runtime.Manifold.cube([nubSize, span.top - span.bottom, nubSize], true);
+  created.push(nub);
+  const nubs = spots.map(([x, z]) => {
+    const placed = nub.translate([x, floorY + (span.top + span.bottom) / 2, z]);
+    created.push(placed);
+    return placed;
+  });
+  return unionOf(runtime, [cut, ...nubs], created);
 }

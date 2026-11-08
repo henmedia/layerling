@@ -384,6 +384,13 @@ export function SplitPanel({
             disabled={busy}
             onChange={(value) => onConnectorsChange({ depth: value })}
           />
+          {connectors.kind === "dowels" ? (
+            // For a printer whose bed moves, where the standing dowels wobble loose (breakawayBase.ts).
+            <label className="edge-modifier-check" title={t("split.dowelBaseHint")}>
+              <input type="checkbox" checked={connectors.dowelBase} disabled={busy} onChange={(event) => onConnectorsChange({ dowelBase: event.currentTarget.checked })} />
+              <span>{t("split.dowelBase")}</span>
+            </label>
+          ) : null}
         </>)}
         <EdgeModifierSlider
           label={t("split.connectorClearance")}

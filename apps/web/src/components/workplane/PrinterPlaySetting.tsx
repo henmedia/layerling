@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { chooseFitTestPinBase, fitTestPinBaseChosen } from "@/lib/breakawayBase";
 import { fitTestLabel } from "@/lib/fitTest";
 import { numberLocale, t } from "@/lib/i18n";
 import { FIT_TEST_CLEARANCES, normalizePrinterPlay, setPrinterPlayFor } from "@/lib/printerPlay";
@@ -15,6 +16,7 @@ export function PrinterPlaySetting({ onMakeFitTest, printer = "", printerName = 
   const { play, source } = usePrinterPlayFor(printer);
   // What is typed, until the field is left; then it is read, or what was there before comes back.
   const [draft, setDraft] = useState<string | null>(null);
+  const [pinBase, setPinBase] = useState(fitTestPinBaseChosen);
   const shown = draft ?? (play === null ? "" : play.toLocaleString(numberLocale(), { maximumFractionDigits: 3 }));
   const commit = (text: string) => {
     setDraft(null);
@@ -69,11 +71,24 @@ export function PrinterPlaySetting({ onMakeFitTest, printer = "", printerName = 
           );
         })}
       </div>
-      {onMakeFitTest ? (
+      {onMakeFitTest ? (<>
+        {/* For a printer whose bed moves, where the standing pin wobbles loose (breakawayBase.ts); set before making it. */}
+        <label className="edge-modifier-check workspace-printer-play-base" title={t("workspace.fitTestBaseHint")}>
+          <input
+            type="checkbox"
+            checked={pinBase}
+            onChange={(event) => {
+              const on = event.currentTarget.checked;
+              setPinBase(on);
+              chooseFitTestPinBase(on);
+            }}
+          />
+          <span>{t("workspace.fitTestBase")}</span>
+        </label>
         <button type="button" className="workspace-custom-snap-add workspace-printer-play-make" onClick={onMakeFitTest}>
           {t("workspace.fitTestMake")}
         </button>
-      ) : null}
+      </>) : null}
       <small className="workspace-printer-play-whose">{whose}</small>
       <small>{t(play === null ? "workspace.printerPlayHint" : "workspace.printerPlaySetHint")}</small>
     </div>
