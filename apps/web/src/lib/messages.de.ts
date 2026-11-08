@@ -1405,6 +1405,7 @@ export const MESSAGES_DE: Record<MessageKey, string> = {
   "transform.height": "Höhe",
   "transform.slope": "Höhe des tieferen Endes",
   "transform.narrow": "Breite des schmalen Endes",
+  "transform.cornerRadius": "Eckenradius",
   "transform.lift": "Anheben",
   "transform.slideX": "Nur entlang X verschieben",
   "transform.slideY": "Nur entlang Y verschieben",

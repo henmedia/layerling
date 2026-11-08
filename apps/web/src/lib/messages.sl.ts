@@ -1156,6 +1156,7 @@ export const MESSAGES_SL: Partial<Record<MessageKey, string>> = {
   "transform.height": "Višina",
   "transform.slope": "Višina nižjega konca",
   "transform.narrow": "Širina ožjega konca",
+  "transform.cornerRadius": "Polmer vogala",
   "transform.lift": "Dvig",
   "transform.slideX": "Premakni samo vzdolž X",
   "transform.slideY": "Premakni samo vzdolž Y",

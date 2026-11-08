@@ -1402,6 +1402,7 @@ export const MESSAGES_RU: Partial<Record<MessageKey, string>> = {
   "transform.height": "Высота",
   "transform.slope": "Высота нижнего конца",
   "transform.narrow": "Ширина узкого конца",
+  "transform.cornerRadius": "Радиус угла",
   "transform.lift": "Подъём",
   "transform.slideX": "Двигать только по X",
   "transform.slideY": "Двигать только по Y",

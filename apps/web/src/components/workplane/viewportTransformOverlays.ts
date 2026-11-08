@@ -8,12 +8,13 @@ import { type ResolvedAppTheme } from "@/lib/appTheme";
 import { t } from "@/lib/i18n";
 import { horizontalPlacementWorkplane, type PlacementWorkplane } from "@/lib/placementWorkplane";
 import { liftGeometryForFrame, type SelectionFrame } from "@/lib/liftGeometry";
-import { liftHandleScreenPoint } from "@/components/workplane/transformOverlayTypes";
+import { handleClearOfOthers, liftHandleScreenPoint } from "@/components/workplane/transformOverlayTypes";
 import { SLIDE_AXES, SLIDE_HANDLE_KEYS, slideArrowLayout, slideAxisVector } from "@/lib/slideArrows";
 import { dimensionMarkNeedsScreenLayout, dimensionMarkScreenPush, isPointInsideTransformBounds, screenSpaceDimensionMark, rotateHandleArrow, rotationPlaneDirectionSign, transformBoundsIntersectClipVolume, transformOverlayScreenPoint, type DimensionMark, type RotationAxis, type RotationPlaneView, type TransformOverlayState } from "@/components/workplane/TransformOverlay";
 import { cuboidCorners, pointAlongAxes } from "@/lib/alignFrame";
 import type { AlignAxis, AlignHandleStatus, AlignTarget, MeasurementAccuracy, WorkplaneShape } from "@/types/layerling";
 import { outwardFaceNormal } from "@/lib/layFlat";
+import { DEFAULT_ROUNDED_BOX_CORNER_FILLET } from "@/lib/roundedBoxGeometry";
 import { narrowEndWidth, normalizeSlopeSide, shapeSupportsNarrow, shapeSupportsSlope, slopeEndHeight } from "@/lib/slopeAlong";
 import { JOINED_FACE_REACH, nearestFaceTriangle, planarFaceTriangles } from "@/lib/rotationPivot";
 import { roundFaceTriangles } from "@/lib/roundFaceAxis";
@@ -441,6 +442,22 @@ export function syncTransformOverlay(
   const liftBasePoint = project(liftBaseWorld);
   // A thin body puts the arrow a few pixels from the height handle; it keeps its distance on the screen.
   const liftPoint = liftHandleScreenPoint(liftBasePoint, project(liftHandle), showLowerLiftHandle);
+  // Corner radius (like the corner dot in Inkscape): on the top's back edge, where the rounding of the back right corner starts;
+  // dragged along the edge, the radius follows. A plain Box has it too, with no radius yet: the first pull turns it into
+  // a Rounded box with flat top and bottom. The dot keeps clear of the other handles on the screen.
+  const plainBox = frame.singleShape?.kind === "box" && !frame.singleShape.imagePlate && !((frame.singleShape.radius ?? 0) > 0);
+  const cornerShape = frame.singleShape?.kind === "roundedBox" || plainBox ? frame.singleShape : null;
+  const cornerEntries = (() => {
+    if (!cornerShape) return [];
+    const largest = Math.min(frame.max.x - frame.min.x, frame.max.z - frame.min.z) / 2;
+    const radius = plainBox ? 0 : Math.min(Math.max(0, cornerShape.cornerFillet ?? DEFAULT_ROUNDED_BOX_CORNER_FILLET), largest);
+    const point = project(framePoint(frame, frame.max.x - radius, frame.max.y, frame.min.z));
+    // Along the edge, into the body: the way the dot may slide to leave room.
+    const inward = project(framePoint(frame, frame.max.x - radius - largest, frame.max.y, frame.min.z));
+    const others = [bottom.nearLeft, bottom.nearRight, bottom.farRight, bottom.farLeft, mid.near, mid.right, mid.far, mid.left, heightPoint, slopePoint, narrowPoint, liftPoint].filter((other) => other.visible);
+    const clear = handleClearOfOthers(point, { x: inward.x - point.x, y: inward.y - point.y }, others);
+    return [{ point: clear, handle: { key: "corner-radius", className: "height-top slope-end", kind: "height" as const, x: clear.x, y: clear.y, title: t("transform.cornerRadius") } }];
+  })();
   const liftTargetAngle = THREE.MathUtils.radToDeg(
     Math.atan2(liftPoint.y - liftBasePoint.y, liftPoint.x - liftBasePoint.x),
   );
@@ -622,6 +639,7 @@ export function syncTransformOverlay(
     { point: heightPoint, handle: { key: heightHandleKey, className: "height-top axis-z", kind: "height" as const, x: heightPoint.x, y: heightPoint.y, title: t("transform.height") } },
     { point: slopePoint, handle: { key: "slope-end", className: "height-top slope-end", kind: "height" as const, x: slopePoint.x, y: slopePoint.y, title: t("transform.slope") } },
     { point: narrowPoint, handle: { key: "narrow-end", className: "height-top slope-end", kind: "height" as const, x: narrowPoint.x, y: narrowPoint.y, title: t("transform.narrow") } },
+    ...cornerEntries,
     { point: liftPoint, handle: { key: liftHandleKey, className: showLowerLiftHandle ? "height-lift lower" : "height-lift", kind: "lift" as const, x: liftPoint.x, y: liftPoint.y, title: t("transform.lift"), angle: liftHandleAngle } },
   ].filter(({ point }) => point.visible).map(({ handle }) => handle);
   const rotationChromeVisible = !cameraInsideSelection && centerPoint.visible;

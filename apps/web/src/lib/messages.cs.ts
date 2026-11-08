@@ -1545,6 +1545,7 @@ export const MESSAGES_CS: Record<MessageKey, string> = {
   "transform.height": "Výška",
   "transform.slope": "Výška nižšího konce",
   "transform.narrow": "Šířka užšího konce",
+  "transform.cornerRadius": "Poloměr rohu",
   "transform.lift": "Zvednout",
   "transform.slideX": "Posunout jen ve směru X",
   "transform.slideY": "Posunout jen ve směru Y",
