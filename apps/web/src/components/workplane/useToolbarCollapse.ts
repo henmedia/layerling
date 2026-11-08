@@ -1,5 +1,6 @@
 import { useEffect, useLayoutEffect, useRef, type RefObject } from "react";
 import { groupsToCollapse } from "@/lib/toolbarCollapse";
+import { subscribeToToolbarSize } from "@/lib/toolbarSize";
 
 /** How long the pointer rests on a folded group before it opens, and how long it may be away before it closes, in ms. */
 const OPEN_DELAY = 120;
@@ -45,6 +46,9 @@ export function useToolbarCollapse(contentRef: RefObject<HTMLElement | null>, en
       refit();
     });
     observer?.observe(content);
+    // A new control size makes every group wider or narrower while the window stays as it is: fit again at once, or the
+    // bar keeps the folds of the size before - two rows on Large, groups folded for nothing on Small (Discussion #1502).
+    const stopSizeChange = subscribeToToolbarSize(refit);
     // The labels are measured in the font they are drawn in.
     void document.fonts?.ready.then(refit);
 
@@ -123,6 +127,7 @@ export function useToolbarCollapse(contentRef: RefObject<HTMLElement | null>, en
     window.addEventListener("keydown", onKey);
     return () => {
       observer?.disconnect();
+      stopSizeChange();
       timers.forEach((timer) => window.clearTimeout(timer));
       content.removeEventListener("pointerover", onPointerOver);
       content.removeEventListener("pointerout", onPointerOut);

@@ -6,6 +6,8 @@ code still carries it - so a lower number further down is older, not newer.
 
 ## Unreleased
 
+- **The toolbar fits again when the control size changes (Discussion #1502):** The toolbar folds the groups the window has no room for, but it only measured itself when the page loaded or the window changed width. Switching the control size under Workspace settings kept the folds of the size before: on **Large** the toolbar broke into two or three rows with room left over in the first, and on **Small** groups stayed folded that had room. It now fits again the moment the size changes, so it stays one row as long as folding allows.
+
 ## 1.152.1
 
 - **STEP import: a file the kernel gets stuck on says so (Discussion #286):** A STEP file the CAD kernel could not read - a damaged one, written from a repaired STL - showed "Importing ..." for about half a minute and then nothing for two and a half minutes, until "The calculation took too long. Try fewer or simpler objects" came and went within seconds; whoever looked away saw nothing at all. The message of a STEP import now stays while the file is read, and when the kernel is stopped after 3 minutes it says that the file may be damaged and that importing the same model as STL usually works. A failed import's message stays until it is closed.
