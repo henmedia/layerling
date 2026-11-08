@@ -1,1 +1,14 @@
-[]
+[
+  {
+    "title": {
+      "de": "Löcher schräg durch die Wand",
+      "en": "Holes that slope through the wall",
+      "da": "Huller skråt gennem væggen"
+    },
+    "body": {
+      "de": "Das Lochmuster hat „Neigung durch die Wand“: Auf einer ebenen Fläche kippt es alle Löcher um bis zu 60°. An einer stehenden Wand liegt das innere Ende bei positiver Neigung höher, so läuft Regen wieder hinaus.",
+      "en": "The hole pattern has Slope through the wall: on a flat face it tips every hole by up to 60°. On a standing wall a positive slope puts the inner end higher, so rain runs back out.",
+      "da": "Hulmønsteret har Hældning gennem væggen: på en plan flade vipper det alle huller op til 60°. På en stående væg ligger den indre ende højere ved positiv hældning, så regn løber ud igen."
+    }
+  }
+]
