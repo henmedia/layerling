@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { BAYONET_MIN_WALL, HINGE_PIN_GRIP, HINGE_PRINTED_PIN_GRIP, LID_DEFAULTS, LID_THREAD_STANDARD_SPECS, LID_THREAD_STANDARDS, LID_TYPES, NECK_LARGER, NECK_SMALLER, MAX_BAYONET_AXIAL_GAP, MAX_BAYONET_DEPTH, MAX_BAYONET_DETENT, MAX_BAYONET_LUGS, MAX_BAYONET_TURN, MIN_BAYONET_AXIAL_GAP, MIN_BAYONET_DEPTH, MIN_BAYONET_LUGS, MIN_BAYONET_TURN, MAX_CLICK_BUMP_HEIGHT, MAX_HINGE_PIN, MAX_HINGE_PIN_PLAY, MAX_LID_GAP, MAX_LID_THICKNESS, MAX_LID_THREAD_PITCH, MAX_LID_THREAD_TURNS, MAX_MAGNET_GAP, MIN_CLICK_BUMP_HEIGHT, MIN_HINGE_PIN, MIN_HINGE_PIN_PLAY, MIN_LID_THREAD_PITCH, MIN_LID_THREAD_TURNS, MIN_LID_WALL, MIN_MAGNET_DIAMETER, SCREW_MIN_WALL, bayonetLugSize, bayonetPlan, bayonetTurn, clickBumpPlaces, cornerKnucklePlan, endPlugPlan, hingeKnuckleRadius, hingePinGrip, hingePinHoles, lidClickBumpsFit, lidHandleFits, lidNeckFit, lidStandardThread, lidTakesExtras, lidTakesMagnets, lidThicknessForMagnets, lidThread, magnetPlaces, magnetPocketDepth, normalizeLidOptions, roundOutline, screwPlan, lidTetherFits, tetherPlan, FLIP_HINGE_LENGTH, FLIP_HINGE_THICKNESS, MAX_FLIP_TOP_OPENING, MIN_FLIP_TOP_OPENING, flipTopPlan, flipTopThickness, lidFlipTopFits, screwInPlan, LID_HINGE_TYPES, SLIDE_EDGE, SLIDE_LIP, SLIDE_MAX_GROOVE, SLIDE_MIN_HOLD, SLIDE_WALL_KEEP, slidePlan, slideWall } from "@/lib/lidTool";
+import { BAYONET_MIN_WALL, HINGE_PIN_GRIP, HINGE_PRINTED_PIN_GRIP, LID_DEFAULTS, LID_THREAD_STANDARD_SPECS, LID_THREAD_STANDARDS, LID_TYPES, NECK_LARGER, NECK_SMALLER, MAX_BAYONET_AXIAL_GAP, MAX_BAYONET_DEPTH, MAX_BAYONET_DETENT, MAX_BAYONET_LUGS, MAX_BAYONET_TURN, MIN_BAYONET_AXIAL_GAP, MIN_BAYONET_DEPTH, MIN_BAYONET_LUGS, MIN_BAYONET_TURN, MAX_CLICK_BUMP_HEIGHT, MAX_HINGE_PIN, MAX_HINGE_PIN_PLAY, MAX_LID_GAP, MAX_LID_THICKNESS, MAX_LID_THREAD_PITCH, MAX_LID_THREAD_TURNS, MAX_MAGNET_GAP, MIN_CLICK_BUMP_HEIGHT, MIN_HINGE_PIN, MIN_HINGE_PIN_PLAY, MIN_LID_THREAD_PITCH, MIN_LID_THREAD_TURNS, MIN_LID_WALL, MIN_MAGNET_DIAMETER, SCREW_MIN_WALL, bayonetLugSize, bayonetPlan, bayonetTurn, clickBumpPlaces, cornerKnucklePlan, endPlugPlan, hingeKnuckleRadius, hingePinGrip, hingePinHoles, lidClickBumpsFit, lidHandleFits, lidNeckFit, lidStandardThread, lidTakesExtras, lidTakesMagnets, lidThicknessForMagnets, lidThread, magnetPlaces, magnetPocketDepth, normalizeLidOptions, roundOutline, screwPlan, lidTetherFits, tetherPlan, FLIP_HINGE_LENGTH, FLIP_HINGE_THICKNESS, MAX_FLIP_TOP_OPENING, MIN_FLIP_TOP_OPENING, flipTopPlan, flipTopThickness, lidFlipTopFits, screwInPlan, LID_HINGE_TYPES, SLIDE_EDGE, SLIDE_LIP, SLIDE_MAX_GROOVE, SLIDE_MIN_HOLD, SLIDE_WALL_KEEP, slideBoxTurn, slidePlan, slideWall } from "@/lib/lidTool";
 import { threadSize } from "@/lib/vase/vase-geometry.mjs";
 
 describe("lid options (#1009)", () => {
@@ -1050,6 +1050,33 @@ describe("where a slide-in lid's grooves go (Discussion #1443)", () => {
     expect("error" in slidePlan(box(undefined, undefined, 27.7), options(), 30, 29.7)).toBe(false);
     expect(slidePlan(box(undefined, undefined, 26.8), options({ thickness: 3 }), 30, 29.7)).toEqual({ error: { code: "slideShallow", depth: 3.3 } });
     expect(slidePlan(() => ({ outline: [rectangle(-30, -20, 30, 20)], opening: [] }), options(), 30, 29.7)).toEqual({ error: { code: "notOpen" } });
+  });
+
+  it("finds how far a box stands turned on the plate from its opening, to the nearest wall either way", () => {
+    const turned = (polygon: [number, number][], degrees: number): [number, number][] => {
+      const angle = (degrees * Math.PI) / 180;
+      return polygon.map(([x, y]) => [x * Math.cos(angle) - y * Math.sin(angle), x * Math.sin(angle) + y * Math.cos(angle)]);
+    };
+    const opening = rectangle(-28, -18, 28, 18);
+    expect(slideBoxTurn([opening])).toBe(0);
+    for (const degrees of [0.5, 5, 30, 44, -0.5, -30]) expect(slideBoxTurn([turned(opening, degrees)]), `${degrees}`).toBeCloseTo(degrees, 9);
+    // A quarter turn on is the same box: a wall faces each way again.
+    expect(slideBoxTurn([turned(opening, 90)])).toBeCloseTo(0, 9);
+    expect(slideBoxTurn([turned(opening, 60)])).toBeCloseTo(-30, 9);
+    expect(slideBoxTurn([turned(opening, 120)])).toBeCloseTo(30, 9);
+    // Rounded corners do not count: the straight walls set the turn.
+    const rounded: [number, number][] = [];
+    for (const [cx, cy, from] of [[23, -13, -90], [23, 13, 0], [-23, 13, 90], [-23, -13, 180]] as const) {
+      for (let step = 0; step <= 16; step += 1) {
+        const angle = ((from + (90 * step) / 16) * Math.PI) / 180;
+        rounded.push([cx + 5 * Math.cos(angle), cy + 5 * Math.sin(angle)]);
+      }
+    }
+    expect(slideBoxTurn([rounded])).toBe(0);
+    expect(slideBoxTurn([turned(rounded, 20)])).toBeCloseTo(20, 9);
+    // Walls inside the box lie within its convex hull and change nothing.
+    expect(slideBoxTurn([turned(rectangle(-28, -18, -1, 18), 12), turned(rectangle(1, -18, 28, 18), 12)])).toBeCloseTo(12, 9);
+    expect(slideBoxTurn([[[0, 0], [1, 1]]])).toBe(0);
   });
 });
 

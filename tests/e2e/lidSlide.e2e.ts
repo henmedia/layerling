@@ -212,6 +212,65 @@ describe("a slide-in lid for a box (real Manifold kernel, Discussion #1443)", ()
     }
   });
 
+  it("takes a box set down turned on the plate: the grooves and the lid follow its walls, through the wall facing most nearly the side picked", async () => {
+    const kernel = await runtime();
+    const created: Solid[] = [];
+    try {
+      const square = openBox(kernel, created);
+      const madeFor = (side: LidHingeSide) => made(kernel, square, { slideSide: side }, created);
+      // Turned 60 degrees about the up axis, the box's left wall faces most nearly the front.
+      for (const [degrees, wall] of [[0.5, "front"], [5, "front"], [30, "front"], [-40, "front"], [60, "left"]] as const) {
+        const body = square.rotate([0, degrees, 0]);
+        created.push(body);
+        const { lid, slide, cut } = made(kernel, body, { slideSide: "front" }, created);
+        expect(slide.side, `${degrees}`).toBe("front");
+        const expected = madeFor(wall);
+        // Turned back square, the box takes the cut a square box takes through that wall, and as large a lid.
+        const cutsBack = slide.cuts.rotate([0, -degrees, 0]);
+        created.push(cutsBack);
+        expect(cutsBack.subtract(expected.slide.cuts).volume(), `${degrees}`).toBeLessThan(1e-3);
+        expect(expected.slide.cuts.subtract(cutsBack).volume(), `${degrees}`).toBeLessThan(1e-3);
+        expect(lid.volume(), `${degrees}`).toBeCloseTo(expected.lid.volume(), 3);
+        expect(slide.depth, `${degrees}`).toBeCloseTo(expected.slide.depth, 6);
+        // And the lid, turned back with it, slides into the cut body as on the square box: lying turned over beside it,
+        // the lid is turned the other way.
+        const lidBack = lid.rotate([0, degrees, 0]);
+        const cutBack = cut.rotate([0, -degrees, 0]);
+        created.push(lidBack, cutBack);
+        const closed = closing(square, lidBack, wall, created);
+        expect(shared(closed, cutBack, created), `${degrees}`).toBeLessThan(1e-4);
+        const [x, z] = OUT[wall];
+        for (const out of [1, 30]) expect(shared(moved(closed, [x * out, 0, z * out], created), cutBack, created), `${degrees}, ${out} mm out`).toBeLessThan(1e-4);
+        expect(shared(moved(closed, [0, 0.4, 0], created), cutBack, created), `${degrees}, lifted`).toBeGreaterThan(0.01);
+      }
+    } finally {
+      dispose(created);
+    }
+  });
+
+  it("takes a square box whose hole stands turned a little, too little to see: the lid follows the hole", async () => {
+    const kernel = await runtime();
+    const created: Solid[] = [];
+    try {
+      // A box 60 x 50 with its hole off the middle, as in the Discussion's picture; the hole straight, then turned 0.3 degrees.
+      const outer = kernel.Manifold.cube([60, 30, 50], true).translate([0, 15, 0]);
+      const straightHole = kernel.Manifold.cube([36, 30, 36], true).translate([-8, 17, -5]);
+      const turnedHole = kernel.Manifold.cube([36, 30, 36], true).rotate([0, 0.3, 0]).translate([-8, 17, -5]);
+      const straight = outer.subtract(straightHole);
+      const turned = outer.subtract(turnedHole);
+      created.push(outer, straightHole, turnedHole, straight, turned);
+      const expected = made(kernel, straight, {}, created);
+      const { lid, slide, cut } = made(kernel, turned, {}, created);
+      expect(slide.side).toBe("front");
+      expect(lid.decompose().length).toBe(1);
+      expect(cut.decompose().length).toBe(1);
+      expect(lid.volume()).toBeCloseTo(expected.lid.volume(), 0);
+      expect(slide.depth).toBeCloseTo(expected.slide.depth, 2);
+    } finally {
+      dispose(created);
+    }
+  });
+
   it("prints without support: the body upright, the lid turned over on its top, with its bump and grip too", async () => {
     const kernel = await runtime();
     const created: Solid[] = [];
