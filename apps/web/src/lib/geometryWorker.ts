@@ -344,7 +344,8 @@ export function importedShapeFromStlOffThread(fileName: string, buffer: ArrayBuf
  */
 export function importedShapesFromStepOffThread(fileName: string, buffer: ArrayBuffer): Promise<StepFileImport> {
   return runGeometryTask("step", { fileName, buffer }, async () => importedShapesFromStepFile(fileName, buffer), () => {
-    throw new Error(t("status.computeTimedOut"));
+    // A file the kernel gets stuck on (a damaged one, #286) says so, not "fewer or simpler objects".
+    throw new Error(t("status.importStepTimedOut", { minutes: Math.round(GEOMETRY_WORKER_TIMEOUT_MS / 60_000) }));
   }, undefined, true);
 }
 

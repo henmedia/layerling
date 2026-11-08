@@ -10,7 +10,7 @@ type SpriteRect = {
 };
 
 const toolbarSprite = "assets/editor/toolbar-sprite.svg?v=2";
-const vectorToolbarSprite = "assets/editor/vector-toolbar-icons.svg?v=1";
+const vectorToolbarSprite = "assets/editor/vector-toolbar-icons.svg?v=2";
 
 // The drawn height of a sprite icon comes from --sprite-icon-size (35px unless
 // a stylesheet sets it), so the toolbar size setting can scale it from CSS.
@@ -66,8 +66,9 @@ function VectorToolbarSpriteIcon({ rect, className, style }: IconProps & { rect:
   );
 }
 
+// A plain cube: the plus beside it went when the button got the chevron tab of the other menus (Discussion #1506).
 export function ToolbarShapeAddIcon(props: IconProps) {
-  return <VectorToolbarSpriteIcon rect={{ x: 104, y: 0, width: 29, height: 27 }} {...props} />;
+  return <VectorToolbarSpriteIcon rect={{ x: 104, y: 0, width: 24, height: 27 }} {...props} />;
 }
 
 export function ToolbarHideSelectedIcon(props: IconProps) {

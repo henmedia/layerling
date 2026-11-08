@@ -4459,15 +4459,16 @@ html[data-theme="dark"] .toolbar-title-help .action-icon-button.active {
 
 /* History's folded button is Undo itself (#1148): the tab is then a button of its own under it, a little larger than it
    looks so it is easy to hit, and only it opens the group. */
-.toolbar-collapse-box:has(.toolbar-collapse-tab) {
+.toolbar-collapse-anchor {
   position: relative;
+  display: flex;
 }
 
 /* It stays above the opened tools, whose frame it touches, so a second click on it closes them; it ends above the first
-   tool's top edge. */
+   tool's top edge. It hangs from Undo's bottom edge like the other tabs from their buttons (#1506). */
 .toolbar-section[data-collapsed] .toolbar-collapse-tab {
   position: absolute;
-  bottom: -9px;
+  bottom: -14px;
   left: 50%;
   z-index: 71;
   width: 30px;
@@ -4479,8 +4480,9 @@ html[data-theme="dark"] .toolbar-title-help .action-icon-button.active {
   transform: translateX(-50%);
 }
 
+/* The chevron starts 2px above the hit area, a pixel above Undo's bottom edge, where the other groups' tabs start. */
 .toolbar-section[data-collapsed] .toolbar-collapse-tab::before {
-  top: 1px;
+  top: -2px;
   bottom: auto;
 }
 
@@ -4808,6 +4810,30 @@ html[data-theme="dark"] .toolbar-title-help .action-icon-button.active {
 .shape-menu-trigger .vector-toolbar-sprite-icon {
   width: var(--toolbar-icon-size);
   height: var(--toolbar-icon-size);
+}
+
+/* The shapes button opens a menu like a folded group, so it carries the same tab with a chevron in the group's colour
+   under it, turned up while the menu is open (Discussion #1506). It lies above the cube, which would hide its top, and
+   a pixel lower than there for the button's 1px border, so it meets the frame where the folded groups' tabs do. */
+.shape-menu-trigger::before {
+  position: absolute;
+  z-index: 1;
+  bottom: -11px;
+  left: 50%;
+  width: 18px;
+  height: 11px;
+  content: "";
+  background-color: var(--group-color);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 18 11'%3E%3Cpath d='M5.5 3.5 9 7l3.5-3.5' fill='none' stroke='white' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+  border-radius: 0 0 6px 6px;
+  transform: translateX(-50%);
+  transition: transform 0.15s ease;
+}
+
+.shape-menu-trigger.active::before {
+  transform: translateX(-50%) scaleY(-1);
 }
 
 .shape-menu-dropdown {

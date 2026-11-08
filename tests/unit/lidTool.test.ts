@@ -1,11 +1,11 @@
 import { describe, expect, it } from "vitest";
-import { BAYONET_MIN_WALL, HINGE_PIN_GRIP, HINGE_PRINTED_PIN_GRIP, LID_DEFAULTS, LID_THREAD_STANDARD_SPECS, LID_THREAD_STANDARDS, LID_TYPES, NECK_LARGER, NECK_SMALLER, MAX_BAYONET_AXIAL_GAP, MAX_BAYONET_DEPTH, MAX_BAYONET_DETENT, MAX_BAYONET_LUGS, MAX_BAYONET_TURN, MIN_BAYONET_AXIAL_GAP, MIN_BAYONET_DEPTH, MIN_BAYONET_LUGS, MIN_BAYONET_TURN, MAX_CLICK_BUMP_HEIGHT, MAX_HINGE_PIN, MAX_HINGE_PIN_PLAY, MAX_LID_GAP, MAX_LID_THICKNESS, MAX_LID_THREAD_PITCH, MAX_LID_THREAD_TURNS, MAX_MAGNET_GAP, MIN_CLICK_BUMP_HEIGHT, MIN_HINGE_PIN, MIN_HINGE_PIN_PLAY, MIN_LID_THREAD_PITCH, MIN_LID_THREAD_TURNS, MIN_LID_WALL, MIN_MAGNET_DIAMETER, SCREW_MIN_WALL, bayonetLugSize, bayonetPlan, bayonetTurn, clickBumpPlaces, cornerKnucklePlan, endPlugPlan, hingeKnuckleRadius, hingePinGrip, hingePinHoles, lidClickBumpsFit, lidHandleFits, lidNeckFit, lidStandardThread, lidTakesExtras, lidTakesMagnets, lidThicknessForMagnets, lidThread, magnetPlaces, magnetPocketDepth, normalizeLidOptions, roundOutline, screwPlan, lidTetherFits, tetherPlan, FLIP_HINGE_LENGTH, FLIP_HINGE_THICKNESS, MAX_FLIP_TOP_OPENING, MIN_FLIP_TOP_OPENING, flipTopPlan, flipTopThickness, lidFlipTopFits, screwInPlan, LID_HINGE_TYPES, SLIDE_EDGE, SLIDE_LIP, SLIDE_MAX_GROOVE, SLIDE_MIN_HOLD, SLIDE_WALL_KEEP, slideBoxTurn, slidePlan, slideWall } from "@/lib/lidTool";
+import { BAYONET_MIN_WALL, HINGE_PIN_GRIP, HINGE_PRINTED_PIN_GRIP, LID_DEFAULTS, LID_THREAD_STANDARD_SPECS, LID_THREAD_STANDARDS, LID_TYPES, NECK_LARGER, NECK_SMALLER, MAX_BAYONET_AXIAL_GAP, MAX_BAYONET_DEPTH, MAX_BAYONET_DETENT, MAX_BAYONET_LUGS, MAX_BAYONET_TURN, MIN_BAYONET_AXIAL_GAP, MIN_BAYONET_DEPTH, MIN_BAYONET_LUGS, MIN_BAYONET_TURN, MAX_CLICK_BUMP_HEIGHT, MAX_HINGE_PIN, MAX_HINGE_PIN_PLAY, MAX_LID_GAP, MAX_LID_THICKNESS, MAX_LID_THREAD_PITCH, MAX_LID_THREAD_TURNS, MAX_MAGNET_GAP, MIN_CLICK_BUMP_HEIGHT, MIN_HINGE_PIN, MIN_HINGE_PIN_PLAY, MIN_LID_THREAD_PITCH, MIN_LID_THREAD_TURNS, MIN_LID_WALL, MIN_MAGNET_DIAMETER, SCREW_MIN_WALL, bayonetLugSize, bayonetPlan, bayonetTurn, clickBumpPlaces, cornerKnucklePlan, endPlugPlan, hingeKnuckleRadius, hingePinGrip, hingePinHoles, lidClickBumpsFit, lidHandleFits, lidNeckFit, lidStandardThread, lidTakesExtras, lidTakesMagnets, lidThicknessForMagnets, lidThread, magnetPlaces, magnetPocketDepth, normalizeLidOptions, roundOutline, screwPlan, lidTetherFits, tetherPlan, FLIP_HINGE_LENGTH, FLIP_HINGE_THICKNESS, MAX_FLIP_TOP_OPENING, MIN_FLIP_TOP_OPENING, flipTopPlan, flipTopThickness, lidFlipTopFits, screwInPlan, LID_HINGE_TYPES, SLIDE_EDGE, SLIDE_LIP, SLIDE_MAX_GROOVE, SLIDE_MIN_HOLD, SLIDE_WALL_KEEP, slideBoxTurn, slidePlan, slideWall, MAX_SLIDE_FRAME, SLIDE_FRAME_KEEP, slideFrameNeeded, slideSlotRoom } from "@/lib/lidTool";
 import { threadSize } from "@/lib/vase/vase-geometry.mjs";
 
 describe("lid options (#1009)", () => {
   it("starts from a push-in lid with a normal fit", () => {
     expect(normalizeLidOptions()).toEqual(LID_DEFAULTS);
-    expect(LID_DEFAULTS).toEqual({ type: "plug", thickness: 2, gap: 0.2, depth: 4, wall: 1.6, magnets: false, magnetDiameter: 6, magnetHeight: 2, magnetGap: 0.1, hinge: false, hingePin: 1.75, hingeGap: 0.3, hingePinPlay: 0.2, hingeKnuckles: 0, hingePrintPin: false, hingeSide: "back", hingeTeardrop: true, hingeStyle: "outside", hingeEndPlugs: false, clickBumps: false, clickBumpHeight: 0.4, handle: "none", threadPitch: 3, threadTurns: 2, threadStandard: "own", bayonetLugs: 3, bayonetDepth: 8, bayonetAxialGap: 0.3, bayonetDetent: 0.3, bayonetTurn: 0, tether: false, flipTop: false, flipTopOpening: 8, slideSide: "front" });
+    expect(LID_DEFAULTS).toEqual({ type: "plug", thickness: 2, gap: 0.2, depth: 4, wall: 1.6, magnets: false, magnetDiameter: 6, magnetHeight: 2, magnetGap: 0.1, hinge: false, hingePin: 1.75, hingeGap: 0.3, hingePinPlay: 0.2, hingeKnuckles: 0, hingePrintPin: false, hingeSide: "back", hingeTeardrop: true, hingeStyle: "outside", hingeEndPlugs: false, clickBumps: false, clickBumpHeight: 0.4, handle: "none", threadPitch: 3, threadTurns: 2, threadStandard: "own", bayonetLugs: 3, bayonetDepth: 8, bayonetAxialGap: 0.3, bayonetDetent: 0.3, bayonetTurn: 0, tether: false, flipTop: false, flipTopOpening: 8, slideSide: "front", slideFrame: 0 });
   });
 
   it("takes the kind in any case and keeps the default for an unknown one", () => {
@@ -927,6 +927,28 @@ describe("a slide-in lid (Discussion #1443)", () => {
     expect(normalizeLidOptions({ slideSide: "right" }).hingeSide).toBe("back");
   });
 
+  it("sits flush with the rim unless a frame is set, from 0 to 5 mm below it", () => {
+    expect(LID_DEFAULTS.slideFrame).toBe(0);
+    expect(MAX_SLIDE_FRAME).toBe(5);
+    expect(normalizeLidOptions({ slideFrame: 2 }).slideFrame).toBe(2);
+    expect(normalizeLidOptions({ slideFrame: "1.6" }).slideFrame).toBe(1.6);
+    expect(normalizeLidOptions({ slideFrame: 12 }).slideFrame).toBe(MAX_SLIDE_FRAME);
+    expect(normalizeLidOptions({ slideFrame: -1 }).slideFrame).toBe(0);
+    expect(normalizeLidOptions({ slideFrame: "deep" }).slideFrame).toBe(0);
+    expect(normalizeLidOptions({ slideFrame: Number.NaN }).slideFrame).toBe(0);
+  });
+
+  it("keeps the gap over the lid in the slot, with click bumps their height too, and 1 mm of wall above it", () => {
+    expect(SLIDE_FRAME_KEEP).toBe(1);
+    expect(slideSlotRoom(normalizeLidOptions({ type: "slide" }))).toBeCloseTo(0.2, 12);
+    expect(slideSlotRoom(normalizeLidOptions({ type: "slide", clickBumps: true, clickBumpHeight: 0.6 }))).toBeCloseTo(0.8, 12);
+    // A bump height left over from another lid counts only with the bumps on.
+    expect(slideSlotRoom(normalizeLidOptions({ type: "slide", clickBumpHeight: 0.6 }))).toBeCloseTo(0.2, 12);
+    expect(slideFrameNeeded(normalizeLidOptions({ type: "slide" }))).toBe(1.2);
+    expect(slideFrameNeeded(normalizeLidOptions({ type: "slide", gap: 0.25 }))).toBe(1.3);
+    expect(slideFrameNeeded(normalizeLidOptions({ type: "slide", clickBumps: true }))).toBe(1.6);
+  });
+
   it("takes click bumps and a handle, but neither magnets nor a hinge", () => {
     const slide = normalizeLidOptions({ type: "slide" });
     expect(lidTakesExtras(slide)).toBe(true);
@@ -1050,6 +1072,40 @@ describe("where a slide-in lid's grooves go (Discussion #1443)", () => {
     expect("error" in slidePlan(box(undefined, undefined, 27.7), options(), 30, 29.7)).toBe(false);
     expect(slidePlan(box(undefined, undefined, 26.8), options({ thickness: 3 }), 30, 29.7)).toEqual({ error: { code: "slideShallow", depth: 3.3 } });
     expect(slidePlan(() => ({ outline: [rectangle(-30, -20, 30, 20)], opening: [] }), options(), 30, 29.7)).toEqual({ error: { code: "notOpen" } });
+  });
+
+  it("with a frame, sets the lid, its grooves and their floor that much lower, the rim and the walls as they are", () => {
+    const flush = slidePlan(box(), options(), 30, 29.7);
+    const framed = slidePlan(box(), options({ slideFrame: 2.4 }), 30, 29.7);
+    if ("error" in flush || "error" in framed) throw new Error("refused");
+    expect([flush.lidTop, flush.frame, flush.underside, flush.floor]).toEqual([30, 0, 28, flush.floor]);
+    expect(framed.lidTop).toBeCloseTo(27.6, 12);
+    expect(framed.frame).toBe(2.4);
+    expect(framed.underside).toBeCloseTo(25.6, 12);
+    expect(framed.floor).toBeCloseTo(25.4, 12);
+    // The same grooves in the same walls, the opening and outline taken at the rim.
+    expect(framed.depth).toBeCloseTo(flush.depth, 12);
+    expect(framed.wall).toBeCloseTo(flush.wall, 12);
+    expect(framed.opening).toEqual(flush.opening);
+    expect(framed.outline).toEqual(flush.outline);
+    // A thicker plate goes lower still.
+    const thick = slidePlan(box(), options({ slideFrame: 2, thickness: 3 }), 30, 29.7);
+    if ("error" in thick) throw new Error(thick.error.code);
+    expect(thick.underside).toBeCloseTo(25, 12);
+    expect(thick.floor).toBeCloseTo(24.8, 12);
+  });
+
+  it("refuses a frame too low for the wall above the slot, and a box too shallow for the lid that far down, saying what is needed", () => {
+    expect(slidePlan(box(), options({ slideFrame: 1 }), 30, 29.7)).toEqual({ error: { code: "slideThinFrame", frame: 1.2 } });
+    expect("error" in slidePlan(box(), options({ slideFrame: 1.2 }), 30, 29.7)).toBe(false);
+    expect(slidePlan(box(), options({ slideFrame: 1.2, gap: 0.3 }), 30, 29.7)).toEqual({ error: { code: "slideThinFrame", frame: 1.3 } });
+    expect(slidePlan(box(), options({ slideFrame: 1.4, clickBumps: true }), 30, 29.7)).toEqual({ error: { code: "slideThinFrame", frame: 1.6 } });
+    expect("error" in slidePlan(box(), options({ slideFrame: 1.6, clickBumps: true }), 30, 29.7)).toBe(false);
+    // Down to the floor 2 mm lower: 4.3 mm with a 2 mm frame and plate; without the frame the same box takes the lid.
+    expect(slidePlan(box(undefined, undefined, 25.8), options({ slideFrame: 2 }), 30, 29.7)).toEqual({ error: { code: "slideFrameShallow", depth: 4.3 } });
+    expect("error" in slidePlan(box(undefined, undefined, 25.7), options({ slideFrame: 2 }), 30, 29.7)).toBe(false);
+    expect("error" in slidePlan(box(undefined, undefined, 25.8), options(), 30, 29.7)).toBe(false);
+    expect(slidePlan(box(undefined, undefined, 22), options({ slideFrame: 5, thickness: 3 }), 30, 29.7)).toEqual({ error: { code: "slideFrameShallow", depth: 8.3 } });
   });
 
   it("finds how far a box stands turned on the plate from its opening, to the nearest wall either way", () => {

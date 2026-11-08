@@ -36,6 +36,7 @@ import {
   MAX_MAGNET_DIAMETER,
   MAX_MAGNET_GAP,
   MAX_MAGNET_HEIGHT,
+  MAX_SLIDE_FRAME,
   MIN_BAYONET_AXIAL_GAP,
   MIN_BAYONET_DEPTH,
   MIN_BAYONET_LUGS,
@@ -67,6 +68,7 @@ import {
   lidThicknessForMagnets,
   lidThread,
   normalizeLidOptions,
+  slideFrameNeeded,
   type LidOptions,
 } from "@/lib/lidTool";
 import { numberLocale, t } from "@/lib/i18n";
@@ -88,7 +90,7 @@ import type { WorkplaneWorkspaceSettings } from "@/types/layerling";
  * which the panel says how to make. A screw-in lid (Discussion #1432) is the other way round: a plate with a threaded plug below it that screws into the same thread inside the body's opening. A bayonet lid (Discussion #1424) is a cap
  * for a round body too, with an L-shaped slot inside its rim for each of the lugs on the outside of the body's top: pushed
  * down and turned, it locks, as far as its lugs give or as far as set, up to a quarter turn. A slide-in lid (Discussion #1443) is a plate for a box that slides in through the wall picked,
- * its edges in grooves in the other three, like a pencil box's; its click bump and finger grip are its own. A screw or bayonet lid can have a tether that keeps the cap with the body when it is off (asked in the
+ * its edges in grooves in the other three, like a pencil box's; its click bump and finger grip are its own; with a frame it sits lower, the walls round it at their full height, and goes in through a slot. A screw or bayonet lid can have a tether that keeps the cap with the body when it is off (asked in the
  * Layerling User Group on Facebook), or be a flip-top: a flap in its plate opens a round opening to pour from.
  */
 export function LidPanel({
@@ -159,6 +161,8 @@ export function LidPanel({
   // Whether the body's top is the standard's neck, said before the lid is made, as Make lid will find it (lidNeckFit).
   const neckTop = neckStandard && neck ? neck.top : undefined;
   const neckMiss = neckStandard && neckTop !== undefined ? lidNeckFit(neckStandard, neckTop) : null;
+  // A slide-in lid's frame must leave the wall whole above the slot: thinner, it says how much is needed.
+  const frameNeeds = slideFrameNeeded(settings);
   return (
     <MovableToolPanel className="edge-modifier-panel shell-panel offset-panel lid-panel" ariaLabel={title}>
       {(handleProps) => (<>
@@ -393,7 +397,22 @@ export function LidPanel({
               ))}
             </div>
           </div>
-          <span className="shell-openings-summary">{t("lid.slideHint")}</span>
+          <span className="shell-openings-summary">{t(settings.slideFrame > 0 ? "lid.slideHintFrame" : "lid.slideHint")}</span>
+          {/* How far below the rim the lid sits, framed by the walls (Discussion #1443): 0 is flush, the wall cut down. */}
+          <EdgeModifierSlider
+            label={t("lid.slideFrame")}
+            value={settings.slideFrame}
+            min={0}
+            max={MAX_SLIDE_FRAME}
+            step={0.2}
+            workspace={workspace}
+            length
+            disabled={busy}
+            onChange={(value) => onChange({ slideFrame: value })}
+          />
+          {settings.slideFrame > 0 && settings.slideFrame < frameNeeds - 1e-9 ? (
+            <span className="shell-openings-summary" role="status">{t("lid.error.slideThinFrame", { frame: millimetres(frameNeeds) })}</span>
+          ) : <span className="shell-openings-summary">{t("lid.slideFrameHint")}</span>}
         </>) : (
           <EdgeModifierSlider
             label={t(settings.type === "cap" ? "lid.depthCap" : settings.type === "both" ? "lid.depthBoth" : "lid.depth")}
