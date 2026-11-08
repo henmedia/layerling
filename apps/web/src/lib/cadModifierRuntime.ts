@@ -1,4 +1,5 @@
 import { CONCAVE_FILLET_STRAIGHT_MESSAGE } from "@/lib/cadConcaveFillet";
+import { TREATMENT_LOST_FACES_MESSAGE } from "@/lib/cadLostFaces";
 import { t } from "@/lib/i18n";
 import { isKernelMemoryFault, isWasmMemoryFaultMessage } from "@/lib/kernelFault";
 import { localizedError } from "@/lib/userErrors";
@@ -347,6 +348,9 @@ export function cadModifierUserErrorMessage(rawError: string | null | undefined)
   if (!rawError) return null;
   if (rawError.includes("creates invalid or overlapping edge geometry")) {
     return t("edge.errorOverlappingGeometry");
+  }
+  if (rawError.includes(TREATMENT_LOST_FACES_MESSAGE)) {
+    return t("edge.errorLostFaces");
   }
   if (rawError.includes("The group has no solid body to modify")) {
     return t("edge.errorNoSolidBody");

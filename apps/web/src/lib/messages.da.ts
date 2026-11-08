@@ -4782,6 +4782,7 @@ export const MESSAGES_DA: Partial<Record<MessageKey, string>> = {
   "edge.fine": "Fin",
   "edge.apply": "Anvend",
   "edge.errorOverlappingGeometry": "Den valgte størrelse er for stor til denne kant og skærer tilstødende flader. Vælg en mindre værdi.",
+  "edge.errorLostFaces": "Ved denne størrelse ville CAD-kernen miste en del af legemet (et hul eller en flade ville forsvinde). Prøv en lidt mindre eller større værdi.",
   "edge.errorNoSolidBody": "Den valgte gruppe indeholder ingen solid form der kan modificeres.",
   "edge.errorPrepareTimeout": "Klargøring af kanter tog for lang tid. Dette mesh er for detaljeret til interaktiv behandling.",
   "edge.errorPreviewTimeout": "Kantforhåndsvisningen tog for lang tid. Annullér værktøjet og prøv igen.",

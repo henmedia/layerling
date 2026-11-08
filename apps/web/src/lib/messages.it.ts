@@ -5012,6 +5012,7 @@ export const MESSAGES_IT: Partial<Record<MessageKey, string>> = {
   "edge.fine": "Fine",
   "edge.apply": "Applica",
   "edge.errorOverlappingGeometry": "Il valore scelto è troppo grande per questo spigolo e interseca le facce adiacenti. Scegli un valore più piccolo.",
+  "edge.errorLostFaces": "Con questa misura il kernel CAD perderebbe una parte del corpo (sparirebbe un foro o una faccia). Prova un valore un po' più piccolo o più grande.",
   "edge.errorNoSolidBody": "Il gruppo selezionato non contiene alcun corpo solido modificabile.",
   "edge.errorPrepareTimeout": "Tempo scaduto durante la preparazione degli spigoli. Questa mesh è troppo dettagliata per essere elaborata interattivamente.",
   "edge.errorPreviewTimeout": "Tempo scaduto durante l'anteprima degli spigoli. Annulla lo strumento e riprova.",

@@ -1,6 +1,7 @@
 /// <reference lib="webworker" />
 
 import { cadHasSolidBody } from "@/lib/cadSolidBody";
+import { cadTreatmentLostFaces, TREATMENT_LOST_FACES_MESSAGE } from "@/lib/cadLostFaces";
 import { cadFaultyEdgeIds } from "@/lib/cadFaultyEdges";
 import { cornerEdgeCandidates, edgesTouchingEnds } from "@/lib/cadCornerEdges";
 import { innerCornerEdges, treatAfterInnerCorners } from "@/lib/cadInnerCorners";
@@ -1217,6 +1218,8 @@ async function bearbeiteAnfrage(request: CadModifierWorkerRequest, halter: { cad
       const componentEntries = selected.filter((entry) => entry.owner === owner);
       const componentEdges = componentEntries.map((entry) => entry.edge);
       let component: ShapeHandle;
+      // The edges a plain chamfer or fillet went over, for the check on faces it had no business with (#1503).
+      let treatedEdges: ShapeHandle[] | null = null;
       if (request.kind === "shell") {
         component = shellSolid(activeCad, solid, request.amount, request.shellOpenings ?? "none", request.shellEdges);
       } else if (request.kind === "offset") {
@@ -1229,6 +1232,7 @@ async function bearbeiteAnfrage(request: CadModifierWorkerRequest, halter: { cad
       } else {
         try {
           component = treatEdges(activeCad, solid, componentEdges, request);
+          treatedEdges = componentEdges;
         } catch (error) {
           if (isFatalKernelFault(error)) throw error;
           const retried = treatWithCornerEdges(activeCad, solid, componentEntries, request);
@@ -1245,6 +1249,7 @@ async function bearbeiteAnfrage(request: CadModifierWorkerRequest, halter: { cad
           if (retried) {
             component = retried.component;
             cornerEdgeIds.push(...retried.edgeIds);
+            treatedEdges = [...componentEdges, ...retried.edgeIds.map((id) => edgeHandles[id])];
           } else {
             component = pastCorners!.component;
             innerCorners.count += pastCorners!.count;
@@ -1259,6 +1264,13 @@ async function bearbeiteAnfrage(request: CadModifierWorkerRequest, halter: { cad
         // (andymai/occt-wasm#420); this still guards the other treatments.
         releaseHandles(activeCad, [component]);
         throw new Error("The chosen size does not leave a closed solid");
+      }
+      // On faceted holes from a mesh boolean the kernel can hand back a "valid" solid with a whole hole filled in
+      // (#1503): a face far from every treated edge is gone. Refused like any other size the kernel cannot do.
+      const plainTreatment = request.kind === "chamfer" || (request.kind === "fillet" && !request.concave);
+      if (plainTreatment && treatedEdges && cadTreatmentLostFaces(activeCad, solid, treatedEdges, component) > 0) {
+        releaseHandles(activeCad, [component]);
+        throw new Error(TREATMENT_LOST_FACES_MESSAGE);
       }
       componentResults.push(component);
     }

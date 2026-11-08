@@ -5017,6 +5017,7 @@ export const MESSAGES_CS: Record<MessageKey, string> = {
   "edge.fine": "Jemný",
   "edge.apply": "Použít",
   "edge.errorOverlappingGeometry": "Zvolený rozměr je pro hranu příliš velký a protíná sousední plochy. Zvolte menší hodnotu.",
+  "edge.errorLostFaces": "Při této velikosti by jádro CAD ztratilo část tělesa (zmizel by otvor nebo plocha). Zkuste prosím o něco menší nebo větší hodnotu.",
   "edge.errorNoSolidBody": "Vybrané sloučení neobsahuje plné těleso, které lze upravit.",
   "edge.errorPrepareTimeout": "Příprava hran překročila časový limit. Síť je pro interaktivní zpracování příliš podrobná.",
   "edge.errorPreviewTimeout": "Výpočet náhledu hran překročil časový limit. Zavřete nástroj a zkuste to znovu.",

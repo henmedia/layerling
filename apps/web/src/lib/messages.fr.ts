@@ -5012,6 +5012,7 @@ export const MESSAGES_FR: Partial<Record<MessageKey, string>> = {
   "edge.fine": "Très bien",
   "edge.apply": "Appliquer",
   "edge.errorOverlappingGeometry": "La taille choisie est trop grande pour cette arête et coupe des faces adjacentes. Veuillez choisir une valeur plus petite.",
+  "edge.errorLostFaces": "À cette taille, le noyau CAO perdrait une partie du corps (un trou ou une face disparaîtrait). Essayez une valeur un peu plus petite ou plus grande.",
   "edge.errorNoSolidBody": "Le groupe sélectionné ne contient aucun corps solide pouvant être modifié.",
   "edge.errorPrepareTimeout": "Le délai de préparation des bords a expiré. Ce maillage est trop détaillé pour un traitement interactif.",
   "edge.errorPreviewTimeout": "L'aperçu des bords a expiré. Veuillez annuler l'outil et réessayer.",

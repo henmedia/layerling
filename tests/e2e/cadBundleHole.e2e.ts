@@ -90,4 +90,34 @@ describe("a bundle with a hole in the edge tool's worker (#1164)", () => {
     // With the hole filled it would be 80 mm^3 more.
     expect(volume).toBeLessThan(20 * 20 * 16 - ring + Math.PI * 12.25 * 1 + 25);
   });
+
+  it("opens a bundle of nothing but holes, so its round holes stay round (#1503)", async () => {
+    const { groupedShape, restoreGroupedChildrenForEdges } = await import("@/lib/editorBooleans");
+    const { cadModifierPrimitiveForBakedShape, cadModifierPrimitiveForAnalyticShape } = await import("@/lib/cadBakeMetadata");
+
+    // Two holes bundled, grouped with a box: the bundle went as its mesh, each hole a polygon of 96 flat strips.
+    const base = { color: "#fff", z: 0, size: 20, rotation: 0, locked: false, hidden: false } as const;
+    const box = { ...base, id: "box", name: "Box", kind: "box", x: 0, elevation: 0, width: 40, depth: 20, height: 16 } as WorkplaneShape;
+    const holes = [-10, 10].map((x, index) => ({ ...base, id: `hole-${index}`, name: "Hole", kind: "cylinder", x, elevation: 4, width: 10, depth: 10, height: 20, hole: true }) as WorkplaneShape);
+    const holesBundled = groupedShape(holes);
+    if (!holesBundled) throw new Error("no bundle");
+    const group = groupedShape([box, { ...holesBundled, name: "Bundle", groupOperation: "bundle" } as WorkplaneShape]);
+    if (!group) throw new Error("no group");
+
+    const restored = restoreGroupedChildrenForEdges(group);
+    expect(restored.map(({ shape }) => shape.kind)).toEqual(["box", "cylinder", "cylinder"]);
+    const parts = restored.map(({ shape, scope }) => {
+      const primitive = cadModifierPrimitiveForBakedShape(shape) ?? cadModifierPrimitiveForAnalyticShape(shape);
+      if (!primitive) throw new Error(`no exact part for ${shape.kind}`);
+      return { primitive, hole: Boolean(shape.hole), ...(scope.length ? { scope } : {}) } as CadModifierMeshPart;
+    });
+
+    const ready = await ask({ type: "prepare", parts, sharpAngle: 25 });
+    if (ready.type !== "ready") throw new Error("not ready");
+    // The rim of the left hole on the top face: a circle, not 96 short straight edges.
+    const rim = ready.edges.filter((edge) => edge.points.length >= 6
+      && edge.points.every((value, i) => (i % 3 === 1 ? Math.abs(value - 16) < 1e-3 : i % 3 === 0 ? value > -16 && value < -4 : true)));
+    expect(rim.length).toBeGreaterThan(0);
+    expect(rim.length).toBeLessThanOrEqual(2);
+  });
 });

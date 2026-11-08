@@ -5037,6 +5037,7 @@ export const MESSAGES_PL: Partial<Record<MessageKey, string>> = {
   "edge.fine": "Dokładna",
   "edge.apply": "Zastosuj",
   "edge.errorOverlappingGeometry": "Wybrany rozmiar jest za duży dla tej krawędzi i przecina sąsiednie ściany. Wybierz mniejszą wartość.",
+  "edge.errorLostFaces": "Przy tym rozmiarze jądro CAD utraciłoby część bryły (zniknąłby otwór lub ściana). Spróbuj nieco mniejszej lub większej wartości.",
   "edge.errorNoSolidBody": "Zaznaczona grupa nie zawiera bryły, którą można zmienić.",
   "edge.errorPrepareTimeout": "Przekroczono czas przygotowania krawędzi. Ta siatka jest zbyt szczegółowa do interaktywnej obróbki.",
   "edge.errorPreviewTimeout": "Przekroczono czas podglądu krawędzi. Anuluj narzędzie i spróbuj ponownie.",

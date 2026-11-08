@@ -5040,6 +5040,7 @@ export const MESSAGES_AR: Partial<Record<MessageKey, string>> = {
   "edge.fine": "دقيق",
   "edge.apply": "تطبيق",
   "edge.errorOverlappingGeometry": "الحجم المختار كبير جدًا لهذه الحافة ويتقاطع مع الأوجه المجاورة. يرجى اختيار قيمة أصغر.",
+  "edge.errorLostFaces": "بهذا الحجم ستفقد نواة CAD جزءًا من الجسم (سيختفي ثقب أو وجه). يُرجى تجربة قيمة أصغر أو أكبر قليلًا.",
   "edge.errorNoSolidBody": "المجموعة المحددة لا تحتوي على جسم صلب يمكن تعديله.",
   "edge.errorPrepareTimeout": "انتهت مهلة تجهيز الحواف. هذه الشبكة مفصلة جدًا للمعالجة التفاعلية.",
   "edge.errorPreviewTimeout": "انتهت مهلة معاينة الحافة. يرجى إلغاء الأداة والمحاولة مرة أخرى.",

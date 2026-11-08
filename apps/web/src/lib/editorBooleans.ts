@@ -2702,17 +2702,20 @@ export function restoreGroupedChildrenForEdges(group: WorkplaneShape, scope: num
     const grandChildren = child.groupedShapes ?? [];
     // Only while its mesh is still nothing but its parts. Every computed group carries its mesh, so that alone says
     // nothing; baking an edge treatment, a deform or a simplification drops the parts, and texture, wrap or vase stay out.
-    const plainGroup = grandChildren.length > 0
+    const plainParts = grandChildren.length > 0
       && !shapeHasShapeDeform(child)
-      && (child.groupOperation === undefined || child.groupOperation === "group")
       && !child.edgeTreatments?.length
       && !child.cadBrep
       && !child.surfaceTexture
       && !child.cylinderWrap
       && !child.vase;
-    const opensCleanly = plainGroup
+    const plainGroup = plainParts && (child.groupOperation === undefined || child.groupOperation === "group");
+    // A bundle of nothing but holes cuts what it is grouped with, as its holes would one by one. Left closed it went as
+    // its mesh, each round hole a polygon of 96 flat strips, and filleting their rims lost a whole hole (#1503).
+    const holeBundle = plainParts && child.groupOperation === "bundle" && Boolean(child.hole) && grandChildren.every((part) => part.hole);
+    const opensCleanly = holeBundle || (plainGroup
       && (grandChildren.every((part) => part.hole) || grandChildren.every((part) => !part.hole))
-      && (child.hole || grandChildren.every((part) => !part.hole));
+      && (child.hole || grandChildren.every((part) => !part.hole)));
     // Opened into the same level, so it numbers the scopes inside it on with that level's count.
     if (opensCleanly) return restoreGroupedChildrenForEdges(child, scope, nestedScopes);
     const opensInOwnScope = plainGroup
