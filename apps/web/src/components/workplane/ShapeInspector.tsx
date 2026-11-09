@@ -5,7 +5,7 @@ import { GuideHelpLink } from "@/components/GuideHelpLink";
 import { SnapGridMenuItems } from "@/components/workplane/SnapGridMenu";
 import { guideChapterForShape, guideSectionForShape } from "@/lib/guideLinks";
 import { useInspectorCard } from "@/lib/inspectorCards";
-import { AlignCenter, ChevronDown, ChevronUp, Cylinder, Eraser, Eye, EyeOff, FolderOpen, Grid3x3, ImageUp, Layers, Link2, Lock, Minus, MousePointerClick, Pencil, Plus, RefreshCw, RotateCcw, Ruler, Shield, ShieldCheck, Split, Tags, Trash2, Unlock, Waves } from "lucide-react";
+import { AlignCenter, Cone, ChevronDown, ChevronUp, Cylinder, Eraser, Eye, EyeOff, FolderOpen, Grid3x3, ImageUp, Layers, Link2, Lock, Minus, Move3d, MousePointerClick, Pencil, Plus, RefreshCw, RotateCcw, Rotate3d, Ruler, Shield, ShieldCheck, Shrink, SlidersHorizontal, Spline, Split, Tags, Trash2, TrendingDown, Unlock, Waves } from "lucide-react";
 import { holdsShapeLock } from "@/lib/shapeLock";
 import { createPortal } from "react-dom";
 import { Fragment, createContext, useCallback, useContext, useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperties, type PointerEvent as ReactPointerEvent, type Dispatch, type ReactNode, type SetStateAction } from "react";
@@ -545,6 +545,8 @@ type TogglePropertyConfig = {
   layout?: "sides";
   /** Its place in that layout, named rather than counted: the row takes the class check-property-{area}. */
   area?: GridfinityWall;
+  /** A switch that belongs to the slider just above it: drawn a little in, with a small connecting line. */
+  sub?: boolean;
   onChange: (value: boolean) => void;
 };
 
@@ -1178,6 +1180,7 @@ function getShapePropertiesWithAppLimits(shape: WorkplaneShape, onUpdate: ShapeI
       {
         type: "toggle",
         id: "cornerSeparate",
+        sub: true,
         label: t("prop.cornerSeparate"),
         value: Boolean(ownCorners),
         disabled: !flatEnds,
@@ -1187,6 +1190,7 @@ function getShapePropertiesWithAppLimits(shape: WorkplaneShape, onUpdate: ShapeI
       {
         type: "toggle" as const,
         id: "endsSeparate",
+        sub: true,
         label: t("prop.endsSeparate"),
         value: endsSeparate,
         // On, the bottom starts as the top was, so nothing changes shape; off, both take the top's radius again.
@@ -5136,7 +5140,7 @@ export function ShapeInspector({
           aria-controls={`properties-${shape.id}`}
           onClick={() => setPropertiesOpen((open) => !open)}
         >
-          <span>{t("inspector.properties")}</span>
+          <span className="property-card-title"><SlidersHorizontal size={20} strokeWidth={2.4} aria-hidden="true" />{t("inspector.properties")}</span>
           <ChevronUp className={propertiesOpen ? "" : "collapsed"} size={25} strokeWidth={2.8} />
         </button>
         {propertiesOpen ? (
@@ -5294,7 +5298,7 @@ export function ShapeInspector({
           aria-controls={`position-${shape.id}`}
           onClick={() => setPositionOpen((open) => !open)}
         >
-          <span>{t("inspector.position")}</span>
+          <span className="property-card-title"><Move3d size={20} strokeWidth={2.4} aria-hidden="true" />{t("inspector.position")}</span>
           <ChevronUp className={positionOpen ? "" : "collapsed"} size={25} strokeWidth={2.8} />
         </button>
         {positionOpen ? (
@@ -5331,7 +5335,7 @@ export function ShapeInspector({
           aria-controls={`rotation-${shape.id}`}
           onClick={() => setRotationOpen((open) => !open)}
         >
-          <span>{t("inspector.rotation")}</span>
+          <span className="property-card-title"><Rotate3d size={20} strokeWidth={2.4} aria-hidden="true" />{t("inspector.rotation")}</span>
           <ChevronUp className={rotationOpen ? "" : "collapsed"} size={25} strokeWidth={2.8} />
         </button>
         {rotationOpen ? (
@@ -5359,7 +5363,7 @@ export function ShapeInspector({
             aria-controls={`taper-${shape.id}`}
             onClick={() => setTaperOpen((open) => !open)}
           >
-            <span>{t("inspector.taper")}</span>
+            <span className="property-card-title"><Cone size={20} strokeWidth={2.4} aria-hidden="true" />{t("inspector.taper")}</span>
             <ChevronUp className={taperOpen ? "" : "collapsed"} size={25} strokeWidth={2.8} />
           </button>
           {taperOpen ? (
@@ -5378,7 +5382,7 @@ export function ShapeInspector({
             aria-controls={`twist-${shape.id}`}
             onClick={() => setTwistOpen((open) => !open)}
           >
-            <span>{t("inspector.twist")}</span>
+            <span className="property-card-title"><Spline size={20} strokeWidth={2.4} aria-hidden="true" />{t("inspector.twist")}</span>
             <ChevronUp className={twistOpen ? "" : "collapsed"} size={25} strokeWidth={2.8} />
           </button>
           {twistOpen ? (
@@ -5397,7 +5401,7 @@ export function ShapeInspector({
             aria-controls={`slope-${shape.id}`}
             onClick={() => setSlopeOpen((open) => !open)}
           >
-            <span>{t("inspector.slope")}</span>
+            <span className="property-card-title"><TrendingDown size={20} strokeWidth={2.4} aria-hidden="true" />{t("inspector.slope")}</span>
             <ChevronUp className={slopeOpen ? "" : "collapsed"} size={25} strokeWidth={2.8} />
           </button>
           {slopeOpen ? (
@@ -5416,7 +5420,7 @@ export function ShapeInspector({
             aria-controls={`narrow-${shape.id}`}
             onClick={() => setNarrowOpen((open) => !open)}
           >
-            <span>{t("inspector.narrow")}</span>
+            <span className="property-card-title"><Shrink size={20} strokeWidth={2.4} aria-hidden="true" />{t("inspector.narrow")}</span>
             <ChevronUp className={narrowOpen ? "" : "collapsed"} size={25} strokeWidth={2.8} />
           </button>
           {narrowOpen ? (
@@ -8377,10 +8381,10 @@ function ColorProperty({ label, value, hint, disabled, onChange, onReset, onInte
   );
 }
 
-function ToggleProperty({ label, value, area, disabled, onChange, onReset }: Omit<TogglePropertyConfig, "id" | "type"> & { disabled?: boolean; onReset?: () => void }) {
+function ToggleProperty({ label, value, area, sub, disabled, onChange, onReset }: Omit<TogglePropertyConfig, "id" | "type"> & { disabled?: boolean; onReset?: () => void }) {
   return (
-    <label className={area ? `check-property check-property-${area}` : "check-property"}>
-      <input type="checkbox" checked={value} disabled={disabled} onChange={(event) => onChange(event.currentTarget.checked)} />
+    <label className={`${area ? `check-property check-property-${area}` : "check-property"}${sub ? " check-property-sub" : ""}`}>
+      <input type="checkbox" role="switch" checked={value} disabled={disabled} onChange={(event) => onChange(event.currentTarget.checked)} />
       <span>{label}{onReset ? <PropertyResetButton onClick={onReset} /> : null}</span>
     </label>
   );
