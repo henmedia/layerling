@@ -80,7 +80,7 @@ Pro nápis na boční stěně nejprve položte pracovní rovinu na tuto plochu, 
 Když se text prořízne deskou, písmena jako O, A a B ztratí střed: leží volně v písmenu a vypadne. {{ui:stencilBridges.title}} ho přidrží k desce malými můstky, jako u šablony.
 
 1. Přepněte text na {{ui:inspector.hole}}, nechte ho projít deskou a vyberte obojí, seskupené nebo ne.
-2. Klikněte na {{ui:stencilBridges.title}} ve skupině {{ui:editor.group.modify}} na pásu, klikněte pravým tlačítkem na výběr nebo to najděte přes [[Ctrl]]+[[K]]. Můstky se oranžově ukážou tam, kam přijdou.
+2. Klikněte na {{ui:stencilBridges.title}} ve skupině {{ui:editor.section.splitShape}} na pásu, klikněte pravým tlačítkem na výběr nebo to najděte přes [[Ctrl]]+[[K]]. Můstky se oranžově ukážou tam, kam přijdou.
 3. Nastavte {{ui:stencilBridges.width}} a {{ui:stencilBridges.count}}. {{ui:stencilBridges.height}} začíná na tloušťce desky; nižší můstky leží zarovnané se spodkem, uprostřed nebo zarovnané s vrchem desky, podle {{ui:stencilBridges.position}}. U šablony na sprej nechají můstky nahoře pod sebou místo pro barvu.
 4. {{ui:stencilBridges.apply}} seskupí můstky s deskou.
 

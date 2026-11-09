@@ -19,7 +19,7 @@ layerling 是一款直接在浏览器里运行的 3D 打印设计程序。你用
 
 ![标注了各区域的编辑器：上方是功能区，左侧是视图立方体，其下是视图栏，旁边是状态消息和对象列表，右侧是所选形状的属性。](shot:editor-areas)
 
-- **上方**是**功能区**。它按任务分类：{{ui:editor.group.clipboard}}、{{ui:editor.group.history}}、{{ui:editor.group.shapes}}、{{ui:editor.group.visibility}}、{{ui:editor.group.combine}}、{{ui:editor.group.modify}}、{{ui:editor.group.arrange}} 和 {{ui:editor.group.file}}；{{ui:editor.group.help}} 位于其上方的标题行，选项卡旁的小房子图标可回到起始页。窗口太窄、放不下所有组时，最少用的组会收进一个写着组名的按钮，下方挂着一个组颜色的小箭头：指向或点按它，它的工具就在下方展开。收起的 {{ui:editor.group.history}} 是例外：它的按钮就是 {{ui:editor.tool.undo}} 本身，只有下方的箭头才会打开 {{ui:editor.tool.redo}} 和其余工具。右上角放大镜左边的图钉则让所有组保持展开。把鼠标停在图标上就能看到名称，灰色的也一样；{{ui:interactiveHelp.title}}（{{ui:editor.group.help}} 下的问号，或 Shift+F1）点一下就能解释任何图标，并带你到本指南中对应的小节。凡是看到小问号的地方，比如形状的设置里、形状库中或工具窗口里，它都会直接带你到本指南对应的章节。{{ui:editor.group.modify}} 组分为四个部分，各自的名称写在工具上方：{{ui:editor.section.mirrorPattern}}、{{ui:editor.section.splitShape}}、{{ui:editor.section.edgesWalls}} 和 {{ui:editor.section.surface}}。灰色的图标还会说明它在等什么，例如 {{ui:editor.needs.oneBody}} 或 {{ui:editor.needs.locked}}。找不到某个工具？按 [[Ctrl]]+[[K]] 并输入它的名称；空白设计会在视图底部提醒你。
+- **上方**是**功能区**。它按任务分类：{{ui:editor.group.clipboard}}、{{ui:editor.group.history}}、{{ui:editor.group.shapes}}、{{ui:editor.group.visibility}}、{{ui:editor.group.combine}}、{{ui:editor.section.mirrorPattern}}、{{ui:editor.section.splitShape}}、{{ui:editor.section.edgesWalls}}、{{ui:editor.section.surface}}、{{ui:editor.group.arrange}} 和 {{ui:editor.group.file}}；{{ui:editor.group.help}} 位于其上方的标题行，选项卡旁的小房子图标可回到起始页。窗口太窄、放不下所有组时，最少用的组会收进一个写着组名的按钮，下方挂着一个组颜色的小箭头：指向或点按它，它的工具就在下方展开。收起的 {{ui:editor.group.history}} 是例外：它的按钮就是 {{ui:editor.tool.undo}} 本身，只有下方的箭头才会打开 {{ui:editor.tool.redo}} 和其余工具。右上角放大镜左边的图钉则让所有组保持展开。把鼠标停在图标上就能看到名称，灰色的也一样；{{ui:interactiveHelp.title}}（{{ui:editor.group.help}} 下的问号，或 Shift+F1）点一下就能解释任何图标，并带你到本指南中对应的小节。凡是看到小问号的地方，比如形状的设置里、形状库中或工具窗口里，它都会直接带你到本指南对应的章节。灰色的图标还会说明它在等什么，例如 {{ui:editor.needs.oneBody}} 或 {{ui:editor.needs.locked}}。找不到某个工具？按 [[Ctrl]]+[[K]] 并输入它的名称；空白设计会在视图底部提醒你。
 - **中间**是工作平面。你在这里放置形状、把它们拉成想要的形状，并看到结果。
 - **右侧**显示所选形状的**属性**：颜色、尺寸、位置以及组成该形状的其他内容。输入数字比拖动更精确。
 - **左侧**是视图栏，上方是视图立方体。它们带你在这个场景中移动，详见[视图与工作平面](chapter:view-and-workplane)。
@@ -87,6 +87,10 @@ layerling 是一款直接在浏览器里运行的 3D 打印设计程序。你用
 ### 页脚
 
 在窗口底部：{{ui:dashboard.sponsor}} 通往可以支持本项目的页面；{{ui:dashboard.userGuide}} 打开本指南；{{ui:dashboard.forum}} 通往提问、提想法和报告错误的地方（GitHub 上的讨论区，德语用户则为 drucktipps3d 论坛）；{{ui:editor.bugReport}} 生成一个用于错误报告的 ZIP 文件；{{ui:dashboard.projectOnGitHub}} 通往 GitHub 上的项目，版本号则打开发行说明。法律声明和隐私政策的链接属于你所使用的那份 layerling 的运营者。
+
+### 专注模式
+
+在小屏幕上，{{ui:focusMode.enter}}把标题栏和页脚让给工作区：右上角带两个向外箭头的按钮、[[Ctrl]]+[[Shift]]+[[F]] 或命令搜索都可以开启它。功能区上移，视图一直延伸到窗口边缘。功能区下方的小工具条保留了返回起始页的房子图标、{{ui:editor.modeGeometry}} 和 {{ui:editor.modeSketch}} 选项卡、放大镜、设置以及带两个向内箭头的按钮（用于退出专注模式）；拖动小工具条的手柄可以把它移到别处，双击手柄可放回原位。layerling 会在此浏览器中记住这个选择；当浏览器占满整个屏幕（F11）时，会自动进入专注模式。
 
 ## 你的第一个零件
 

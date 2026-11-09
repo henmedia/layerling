@@ -6,6 +6,7 @@ import { t } from "@/lib/i18n";
 import { ribbonGroupKey, ribbonLayout, setRibbonEntryShown, useRibbonHidden, writeRibbonHidden } from "@/lib/ribbonHidden";
 import { isDefaultRibbonOrder, moveRibbonGroupPast, readRibbonOrder, type RibbonGroupName, useRibbonOrder, writeRibbonOrder } from "@/lib/ribbonOrder";
 import { moveRibbonTool, readRibbonToolOrder, useRibbonToolOrder, withRibbonToolOrder, writeRibbonToolOrder } from "@/lib/ribbonToolOrder";
+import { readRibbonFold, ribbonFoldOf, ribbonGroupFolds, type RibbonFold, useRibbonFold, withRibbonFold, writeRibbonFold } from "@/lib/ribbonFold";
 
 /**
  * "Buttons in the ribbon" in the settings window (Discussion #1519, #1087, #1502): every group of the 3D ribbon folds open to
@@ -16,6 +17,7 @@ export function RibbonButtonsSetting() {
   const hidden = useRibbonHidden();
   const order = useRibbonOrder();
   const toolOrder = useRibbonToolOrder();
+  const folds = useRibbonFold();
   const layout = ribbonLayout();
   if (layout.length === 0) return null;
   return (
@@ -31,7 +33,7 @@ export function RibbonButtonsSetting() {
           <button type="button" className="make-default-button" disabled={hidden.size === 0} onClick={() => writeRibbonHidden([])}>
             {t("workspace.ribbonShowAll")}
           </button>
-          <button type="button" className="make-default-button" disabled={isDefaultRibbonOrder(order) && Object.keys(toolOrder).length === 0} onClick={() => { writeRibbonOrder([]); writeRibbonToolOrder({}); }}>
+          <button type="button" className="make-default-button" disabled={isDefaultRibbonOrder(order) && Object.keys(toolOrder).length === 0 && Object.keys(folds).length === 0} onClick={() => { writeRibbonOrder([]); writeRibbonToolOrder({}); writeRibbonFold({}); }}>
             {t("workspace.ribbonResetOrder")}
           </button>
         </span>
@@ -47,6 +49,9 @@ export function RibbonButtonsSetting() {
                 {groupShown
                   ? t("workspace.ribbonGroupCount", { shown, total: group.tools.length })
                   : t("workspace.ribbonGroupHidden")}
+                {groupShown && ribbonFoldOf(folds, group.group) !== "auto"
+                  ? ` · ${t(ribbonFoldOf(folds, group.group) === "always" ? "workspace.ribbonFoldAlways" : "workspace.ribbonFoldKeep")}`
+                  : null}
               </small>
               {[-1, 1].map((step) => {
                 const neighbour = layout[index + step];
@@ -80,6 +85,21 @@ export function RibbonButtonsSetting() {
                 onChange={(event) => setRibbonEntryShown(ribbonGroupKey(group.group), event.currentTarget.checked)}
               />
             </label>
+            {ribbonGroupFolds(group.group) ? (
+              // How the group folds when the window is short of room (Discussion #1551).
+              <label className="workspace-select ribbon-fold-row">
+                <span>{t("workspace.ribbonFold")}</span>
+                <select
+                  value={ribbonFoldOf(folds, group.group)}
+                  disabled={!groupShown}
+                  onChange={(event) => writeRibbonFold(withRibbonFold(readRibbonFold(), group.group, event.currentTarget.value as RibbonFold))}
+                >
+                  <option value="auto">{t("workspace.ribbonFoldAuto")}</option>
+                  <option value="always">{t("workspace.ribbonFoldAlways")}</option>
+                  <option value="keep">{t("workspace.ribbonFoldKeep")}</option>
+                </select>
+              </label>
+            ) : null}
             <div className="ribbon-buttons-tools" aria-disabled={!groupShown}>
               {group.tools.map((tool, toolIndex) => (
                 <label className={`workspace-toggle ribbon-buttons-row${groupShown ? "" : " is-disabled"}`} key={tool.id}>

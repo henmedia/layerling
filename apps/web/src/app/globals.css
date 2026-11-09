@@ -4219,7 +4219,11 @@ html[data-theme="dark"] .toolbar-title-help .action-icon-button.active {
 .toolbar-section[data-group="shapes"] { --group-color: var(--group-shapes); }
 .toolbar-section[data-group="visibility"] { --group-color: var(--group-visibility); }
 .toolbar-section[data-group="combine"] { --group-color: var(--group-combine); }
-.toolbar-section[data-group="modify"] { --group-color: var(--group-modify); }
+/* Modify's four groups (#1551) keep its colour: they belong together. */
+.toolbar-section[data-group="mirrorPattern"],
+.toolbar-section[data-group="splitShape"],
+.toolbar-section[data-group="edgesWalls"],
+.toolbar-section[data-group="surface"] { --group-color: var(--group-modify); }
 .toolbar-section[data-group="arrange"] { --group-color: var(--group-arrange); }
 .toolbar-section[data-group="manage"] { --group-color: var(--group-manage); }
 .toolbar-section[data-group="help"] { --group-color: var(--group-help); }
@@ -4349,61 +4353,6 @@ html[data-theme="dark"] .toolbar-title-help .action-icon-button.active {
   background: color-mix(in srgb, var(--group-color) 7%, var(--toolbar-tile));
   border: 2px solid var(--group-color);
   border-radius: 11px;
-}
-
-/* "Modify" is cut into named sections (MODIFY_SECTIONS, Stefan 31.10.2026): a fine line in the group's colour between
-   them, and each section's name in the label row above it instead of the group's, which stays on the folded button. */
-.toolbar-subgroup {
-  position: relative;
-  display: flex;
-  align-self: stretch;
-  align-items: center;
-}
-
-.toolbar-subgroup + .toolbar-subgroup {
-  margin-left: 4px;
-  padding-left: 5px;
-}
-
-.toolbar-subgroup + .toolbar-subgroup::before {
-  position: absolute;
-  top: 7px;
-  bottom: 7px;
-  left: 0;
-  width: 1px;
-  content: "";
-  background: color-mix(in srgb, var(--group-color) 55%, transparent);
-}
-
-.toolbar-subgroup-label {
-  position: absolute;
-  bottom: calc(100% + 2px);
-  left: 50%;
-  color: var(--group-color);
-  font-family: Arial, Helvetica, sans-serif;
-  font-size: 10px;
-  font-weight: 600;
-  line-height: 16px;
-  text-transform: uppercase;
-  white-space: nowrap;
-  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.86);
-  transform: translateX(-50%);
-  pointer-events: none;
-  user-select: none;
-}
-
-.toolbar-section:not([data-collapsed]):has(.toolbar-subgroup-label) > .toolbar-section-label {
-  visibility: hidden;
-}
-
-/* Opened from the folded button, the tools hang below it: the section names go inside, above their tools. */
-.toolbar-section[data-collapsed][data-open] > .toolbar-section-tools:not(.toolbar-collapse-box):has(.toolbar-subgroup) {
-  padding-top: 18px;
-}
-
-.toolbar-section[data-collapsed][data-open] .toolbar-subgroup-label {
-  bottom: auto;
-  top: -16px;
 }
 
 /* A group the window has no room for folds into one button under its name (useToolbarCollapse, Stefan 29.10.2026):
@@ -14728,8 +14677,7 @@ html[data-theme="dark"] .toolbar-section {
   border-color: #645546;
 }
 
-html[data-theme="dark"] .toolbar-section-label,
-html[data-theme="dark"] .toolbar-subgroup-label {
+html[data-theme="dark"] .toolbar-section-label {
   color: #d4c6b7;
   text-shadow: 0 1px 1px rgba(0, 0, 0, 0.72);
 }
@@ -17485,4 +17433,401 @@ html[data-theme="dark"] .plate-bar-separator {
   width: 32px;
   height: 32px;
   color: inherit;
+}
+
+/* Tinted tiles for the inspector cards: each fold-away section keeps its own colour, in both themes. */
+.property-card:has(> .property-card-header[aria-controls^="properties-"]) {
+  background: rgba(217, 118, 28, 0.13);
+  box-shadow: inset 0 0 0 1px rgba(217, 118, 28, 0.45);
+}
+.property-card:has(> .property-card-header[aria-controls^="properties-"]) > .property-card-header {
+  color: #9A520F;
+  font-weight: 650;
+}
+.property-card:has(> .property-card-header[aria-controls^="properties-"]) > .property-card-header:hover {
+  filter: brightness(1.2);
+}
+.property-card:has(> .property-card-header[aria-controls^="properties-"]) .range-control input[type="range"]::-webkit-slider-runnable-track {
+  background: linear-gradient(to right, rgb(217, 118, 28) 0 var(--slider-pos), rgba(217, 118, 28, 0.24) var(--slider-pos) 100%);
+}
+.property-card:has(> .property-card-header[aria-controls^="properties-"]) .range-control input[type="range"]::-webkit-slider-thumb {
+  border-color: rgb(217, 118, 28);
+}
+.property-card:has(> .property-card-header[aria-controls^="properties-"]) .range-control input[type="range"]::-moz-range-track {
+  background: rgba(217, 118, 28, 0.24);
+}
+.property-card:has(> .property-card-header[aria-controls^="properties-"]) .range-control input[type="range"]::-moz-range-progress {
+  background: rgb(217, 118, 28);
+}
+.property-card:has(> .property-card-header[aria-controls^="properties-"]) .range-control input[type="range"]::-moz-range-thumb {
+  border-color: rgb(217, 118, 28);
+}
+.property-card:has(> .property-card-header[aria-controls^="properties-"]) .check-property input {
+  accent-color: rgb(217, 118, 28);
+  --sw: rgb(217, 118, 28);
+}
+html[data-theme="dark"] .property-card:has(> .property-card-header[aria-controls^="properties-"]) {
+  background: rgba(217, 118, 28, 0.17);
+  box-shadow: inset 0 0 0 1px rgba(217, 118, 28, 0.5);
+}
+html[data-theme="dark"] .property-card:has(> .property-card-header[aria-controls^="properties-"]) > .property-card-header {
+  color: #F2A453;
+}
+html[data-theme="dark"] .property-card:has(> .property-card-header[aria-controls^="properties-"]) .range-control input[type="range"]::-webkit-slider-runnable-track {
+  background: linear-gradient(to right, rgb(217, 118, 28) 0 var(--slider-pos), rgba(255, 255, 255, 0.16) var(--slider-pos) 100%);
+}
+html[data-theme="dark"] .property-card:has(> .property-card-header[aria-controls^="properties-"]) .range-control input[type="range"]::-moz-range-track {
+  background: rgba(255, 255, 255, 0.16);
+}
+.property-card:has(> .property-card-header[aria-controls^="position-"]) {
+  background: rgba(70, 130, 200, 0.13);
+  box-shadow: inset 0 0 0 1px rgba(70, 130, 200, 0.45);
+}
+.property-card:has(> .property-card-header[aria-controls^="position-"]) > .property-card-header {
+  color: #245C99;
+  font-weight: 650;
+}
+.property-card:has(> .property-card-header[aria-controls^="position-"]) > .property-card-header:hover {
+  filter: brightness(1.2);
+}
+.property-card:has(> .property-card-header[aria-controls^="position-"]) .range-control input[type="range"]::-webkit-slider-runnable-track {
+  background: linear-gradient(to right, rgb(70, 130, 200) 0 var(--slider-pos), rgba(70, 130, 200, 0.24) var(--slider-pos) 100%);
+}
+.property-card:has(> .property-card-header[aria-controls^="position-"]) .range-control input[type="range"]::-webkit-slider-thumb {
+  border-color: rgb(70, 130, 200);
+}
+.property-card:has(> .property-card-header[aria-controls^="position-"]) .range-control input[type="range"]::-moz-range-track {
+  background: rgba(70, 130, 200, 0.24);
+}
+.property-card:has(> .property-card-header[aria-controls^="position-"]) .range-control input[type="range"]::-moz-range-progress {
+  background: rgb(70, 130, 200);
+}
+.property-card:has(> .property-card-header[aria-controls^="position-"]) .range-control input[type="range"]::-moz-range-thumb {
+  border-color: rgb(70, 130, 200);
+}
+.property-card:has(> .property-card-header[aria-controls^="position-"]) .check-property input {
+  accent-color: rgb(70, 130, 200);
+  --sw: rgb(70, 130, 200);
+}
+html[data-theme="dark"] .property-card:has(> .property-card-header[aria-controls^="position-"]) {
+  background: rgba(70, 130, 200, 0.17);
+  box-shadow: inset 0 0 0 1px rgba(70, 130, 200, 0.5);
+}
+html[data-theme="dark"] .property-card:has(> .property-card-header[aria-controls^="position-"]) > .property-card-header {
+  color: #9CC4F2;
+}
+html[data-theme="dark"] .property-card:has(> .property-card-header[aria-controls^="position-"]) .range-control input[type="range"]::-webkit-slider-runnable-track {
+  background: linear-gradient(to right, rgb(70, 130, 200) 0 var(--slider-pos), rgba(255, 255, 255, 0.16) var(--slider-pos) 100%);
+}
+html[data-theme="dark"] .property-card:has(> .property-card-header[aria-controls^="position-"]) .range-control input[type="range"]::-moz-range-track {
+  background: rgba(255, 255, 255, 0.16);
+}
+.property-card:has(> .property-card-header[aria-controls^="rotation-"]) {
+  background: rgba(40, 170, 140, 0.13);
+  box-shadow: inset 0 0 0 1px rgba(40, 170, 140, 0.45);
+}
+.property-card:has(> .property-card-header[aria-controls^="rotation-"]) > .property-card-header {
+  color: #17705D;
+  font-weight: 650;
+}
+.property-card:has(> .property-card-header[aria-controls^="rotation-"]) > .property-card-header:hover {
+  filter: brightness(1.2);
+}
+.property-card:has(> .property-card-header[aria-controls^="rotation-"]) .range-control input[type="range"]::-webkit-slider-runnable-track {
+  background: linear-gradient(to right, rgb(40, 170, 140) 0 var(--slider-pos), rgba(40, 170, 140, 0.24) var(--slider-pos) 100%);
+}
+.property-card:has(> .property-card-header[aria-controls^="rotation-"]) .range-control input[type="range"]::-webkit-slider-thumb {
+  border-color: rgb(40, 170, 140);
+}
+.property-card:has(> .property-card-header[aria-controls^="rotation-"]) .range-control input[type="range"]::-moz-range-track {
+  background: rgba(40, 170, 140, 0.24);
+}
+.property-card:has(> .property-card-header[aria-controls^="rotation-"]) .range-control input[type="range"]::-moz-range-progress {
+  background: rgb(40, 170, 140);
+}
+.property-card:has(> .property-card-header[aria-controls^="rotation-"]) .range-control input[type="range"]::-moz-range-thumb {
+  border-color: rgb(40, 170, 140);
+}
+.property-card:has(> .property-card-header[aria-controls^="rotation-"]) .check-property input {
+  accent-color: rgb(40, 170, 140);
+  --sw: rgb(40, 170, 140);
+}
+html[data-theme="dark"] .property-card:has(> .property-card-header[aria-controls^="rotation-"]) {
+  background: rgba(40, 170, 140, 0.17);
+  box-shadow: inset 0 0 0 1px rgba(40, 170, 140, 0.5);
+}
+html[data-theme="dark"] .property-card:has(> .property-card-header[aria-controls^="rotation-"]) > .property-card-header {
+  color: #7FDEC6;
+}
+html[data-theme="dark"] .property-card:has(> .property-card-header[aria-controls^="rotation-"]) .range-control input[type="range"]::-webkit-slider-runnable-track {
+  background: linear-gradient(to right, rgb(40, 170, 140) 0 var(--slider-pos), rgba(255, 255, 255, 0.16) var(--slider-pos) 100%);
+}
+html[data-theme="dark"] .property-card:has(> .property-card-header[aria-controls^="rotation-"]) .range-control input[type="range"]::-moz-range-track {
+  background: rgba(255, 255, 255, 0.16);
+}
+.property-card:has(> .property-card-header[aria-controls^="taper-"]) {
+  background: rgba(140, 110, 210, 0.13);
+  box-shadow: inset 0 0 0 1px rgba(140, 110, 210, 0.45);
+}
+.property-card:has(> .property-card-header[aria-controls^="taper-"]) > .property-card-header {
+  color: #5B3FA8;
+  font-weight: 650;
+}
+.property-card:has(> .property-card-header[aria-controls^="taper-"]) > .property-card-header:hover {
+  filter: brightness(1.2);
+}
+.property-card:has(> .property-card-header[aria-controls^="taper-"]) .range-control input[type="range"]::-webkit-slider-runnable-track {
+  background: linear-gradient(to right, rgb(140, 110, 210) 0 var(--slider-pos), rgba(140, 110, 210, 0.24) var(--slider-pos) 100%);
+}
+.property-card:has(> .property-card-header[aria-controls^="taper-"]) .range-control input[type="range"]::-webkit-slider-thumb {
+  border-color: rgb(140, 110, 210);
+}
+.property-card:has(> .property-card-header[aria-controls^="taper-"]) .range-control input[type="range"]::-moz-range-track {
+  background: rgba(140, 110, 210, 0.24);
+}
+.property-card:has(> .property-card-header[aria-controls^="taper-"]) .range-control input[type="range"]::-moz-range-progress {
+  background: rgb(140, 110, 210);
+}
+.property-card:has(> .property-card-header[aria-controls^="taper-"]) .range-control input[type="range"]::-moz-range-thumb {
+  border-color: rgb(140, 110, 210);
+}
+.property-card:has(> .property-card-header[aria-controls^="taper-"]) .check-property input {
+  accent-color: rgb(140, 110, 210);
+  --sw: rgb(140, 110, 210);
+}
+html[data-theme="dark"] .property-card:has(> .property-card-header[aria-controls^="taper-"]) {
+  background: rgba(140, 110, 210, 0.17);
+  box-shadow: inset 0 0 0 1px rgba(140, 110, 210, 0.5);
+}
+html[data-theme="dark"] .property-card:has(> .property-card-header[aria-controls^="taper-"]) > .property-card-header {
+  color: #C3AFF2;
+}
+html[data-theme="dark"] .property-card:has(> .property-card-header[aria-controls^="taper-"]) .range-control input[type="range"]::-webkit-slider-runnable-track {
+  background: linear-gradient(to right, rgb(140, 110, 210) 0 var(--slider-pos), rgba(255, 255, 255, 0.16) var(--slider-pos) 100%);
+}
+html[data-theme="dark"] .property-card:has(> .property-card-header[aria-controls^="taper-"]) .range-control input[type="range"]::-moz-range-track {
+  background: rgba(255, 255, 255, 0.16);
+}
+.property-card:has(> .property-card-header[aria-controls^="twist-"]) {
+  background: rgba(210, 90, 120, 0.13);
+  box-shadow: inset 0 0 0 1px rgba(210, 90, 120, 0.45);
+}
+.property-card:has(> .property-card-header[aria-controls^="twist-"]) > .property-card-header {
+  color: #A02B52;
+  font-weight: 650;
+}
+.property-card:has(> .property-card-header[aria-controls^="twist-"]) > .property-card-header:hover {
+  filter: brightness(1.2);
+}
+.property-card:has(> .property-card-header[aria-controls^="twist-"]) .range-control input[type="range"]::-webkit-slider-runnable-track {
+  background: linear-gradient(to right, rgb(210, 90, 120) 0 var(--slider-pos), rgba(210, 90, 120, 0.24) var(--slider-pos) 100%);
+}
+.property-card:has(> .property-card-header[aria-controls^="twist-"]) .range-control input[type="range"]::-webkit-slider-thumb {
+  border-color: rgb(210, 90, 120);
+}
+.property-card:has(> .property-card-header[aria-controls^="twist-"]) .range-control input[type="range"]::-moz-range-track {
+  background: rgba(210, 90, 120, 0.24);
+}
+.property-card:has(> .property-card-header[aria-controls^="twist-"]) .range-control input[type="range"]::-moz-range-progress {
+  background: rgb(210, 90, 120);
+}
+.property-card:has(> .property-card-header[aria-controls^="twist-"]) .range-control input[type="range"]::-moz-range-thumb {
+  border-color: rgb(210, 90, 120);
+}
+.property-card:has(> .property-card-header[aria-controls^="twist-"]) .check-property input {
+  accent-color: rgb(210, 90, 120);
+  --sw: rgb(210, 90, 120);
+}
+html[data-theme="dark"] .property-card:has(> .property-card-header[aria-controls^="twist-"]) {
+  background: rgba(210, 90, 120, 0.17);
+  box-shadow: inset 0 0 0 1px rgba(210, 90, 120, 0.5);
+}
+html[data-theme="dark"] .property-card:has(> .property-card-header[aria-controls^="twist-"]) > .property-card-header {
+  color: #F29DB4;
+}
+html[data-theme="dark"] .property-card:has(> .property-card-header[aria-controls^="twist-"]) .range-control input[type="range"]::-webkit-slider-runnable-track {
+  background: linear-gradient(to right, rgb(210, 90, 120) 0 var(--slider-pos), rgba(255, 255, 255, 0.16) var(--slider-pos) 100%);
+}
+html[data-theme="dark"] .property-card:has(> .property-card-header[aria-controls^="twist-"]) .range-control input[type="range"]::-moz-range-track {
+  background: rgba(255, 255, 255, 0.16);
+}
+.property-card:has(> .property-card-header[aria-controls^="slope-"]) {
+  background: rgba(130, 170, 50, 0.13);
+  box-shadow: inset 0 0 0 1px rgba(130, 170, 50, 0.45);
+}
+.property-card:has(> .property-card-header[aria-controls^="slope-"]) > .property-card-header {
+  color: #4F6B12;
+  font-weight: 650;
+}
+.property-card:has(> .property-card-header[aria-controls^="slope-"]) > .property-card-header:hover {
+  filter: brightness(1.2);
+}
+.property-card:has(> .property-card-header[aria-controls^="slope-"]) .range-control input[type="range"]::-webkit-slider-runnable-track {
+  background: linear-gradient(to right, rgb(130, 170, 50) 0 var(--slider-pos), rgba(130, 170, 50, 0.24) var(--slider-pos) 100%);
+}
+.property-card:has(> .property-card-header[aria-controls^="slope-"]) .range-control input[type="range"]::-webkit-slider-thumb {
+  border-color: rgb(130, 170, 50);
+}
+.property-card:has(> .property-card-header[aria-controls^="slope-"]) .range-control input[type="range"]::-moz-range-track {
+  background: rgba(130, 170, 50, 0.24);
+}
+.property-card:has(> .property-card-header[aria-controls^="slope-"]) .range-control input[type="range"]::-moz-range-progress {
+  background: rgb(130, 170, 50);
+}
+.property-card:has(> .property-card-header[aria-controls^="slope-"]) .range-control input[type="range"]::-moz-range-thumb {
+  border-color: rgb(130, 170, 50);
+}
+.property-card:has(> .property-card-header[aria-controls^="slope-"]) .check-property input {
+  accent-color: rgb(130, 170, 50);
+  --sw: rgb(130, 170, 50);
+}
+html[data-theme="dark"] .property-card:has(> .property-card-header[aria-controls^="slope-"]) {
+  background: rgba(130, 170, 50, 0.17);
+  box-shadow: inset 0 0 0 1px rgba(130, 170, 50, 0.5);
+}
+html[data-theme="dark"] .property-card:has(> .property-card-header[aria-controls^="slope-"]) > .property-card-header {
+  color: #BFE070;
+}
+html[data-theme="dark"] .property-card:has(> .property-card-header[aria-controls^="slope-"]) .range-control input[type="range"]::-webkit-slider-runnable-track {
+  background: linear-gradient(to right, rgb(130, 170, 50) 0 var(--slider-pos), rgba(255, 255, 255, 0.16) var(--slider-pos) 100%);
+}
+html[data-theme="dark"] .property-card:has(> .property-card-header[aria-controls^="slope-"]) .range-control input[type="range"]::-moz-range-track {
+  background: rgba(255, 255, 255, 0.16);
+}
+.property-card:has(> .property-card-header[aria-controls^="narrow-"]) {
+  background: rgba(196, 150, 30, 0.13);
+  box-shadow: inset 0 0 0 1px rgba(196, 150, 30, 0.45);
+}
+.property-card:has(> .property-card-header[aria-controls^="narrow-"]) > .property-card-header {
+  color: #7A5C06;
+  font-weight: 650;
+}
+.property-card:has(> .property-card-header[aria-controls^="narrow-"]) > .property-card-header:hover {
+  filter: brightness(1.2);
+}
+.property-card:has(> .property-card-header[aria-controls^="narrow-"]) .range-control input[type="range"]::-webkit-slider-runnable-track {
+  background: linear-gradient(to right, rgb(196, 150, 30) 0 var(--slider-pos), rgba(196, 150, 30, 0.24) var(--slider-pos) 100%);
+}
+.property-card:has(> .property-card-header[aria-controls^="narrow-"]) .range-control input[type="range"]::-webkit-slider-thumb {
+  border-color: rgb(196, 150, 30);
+}
+.property-card:has(> .property-card-header[aria-controls^="narrow-"]) .range-control input[type="range"]::-moz-range-track {
+  background: rgba(196, 150, 30, 0.24);
+}
+.property-card:has(> .property-card-header[aria-controls^="narrow-"]) .range-control input[type="range"]::-moz-range-progress {
+  background: rgb(196, 150, 30);
+}
+.property-card:has(> .property-card-header[aria-controls^="narrow-"]) .range-control input[type="range"]::-moz-range-thumb {
+  border-color: rgb(196, 150, 30);
+}
+.property-card:has(> .property-card-header[aria-controls^="narrow-"]) .check-property input {
+  accent-color: rgb(196, 150, 30);
+  --sw: rgb(196, 150, 30);
+}
+html[data-theme="dark"] .property-card:has(> .property-card-header[aria-controls^="narrow-"]) {
+  background: rgba(196, 150, 30, 0.17);
+  box-shadow: inset 0 0 0 1px rgba(196, 150, 30, 0.5);
+}
+html[data-theme="dark"] .property-card:has(> .property-card-header[aria-controls^="narrow-"]) > .property-card-header {
+  color: #E8C660;
+}
+html[data-theme="dark"] .property-card:has(> .property-card-header[aria-controls^="narrow-"]) .range-control input[type="range"]::-webkit-slider-runnable-track {
+  background: linear-gradient(to right, rgb(196, 150, 30) 0 var(--slider-pos), rgba(255, 255, 255, 0.16) var(--slider-pos) 100%);
+}
+html[data-theme="dark"] .property-card:has(> .property-card-header[aria-controls^="narrow-"]) .range-control input[type="range"]::-moz-range-track {
+  background: rgba(255, 255, 255, 0.16);
+}
+
+/* A symbol before each section title, so the sections are told apart by more than their colour. */
+.property-card-title {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+.property-card-title svg {
+  flex: 0 0 auto;
+}
+
+/* A switch that belongs to the slider above it: a little in, with a small line up to that slider. */
+.check-property-sub {
+  position: relative;
+  margin-left: 6px;
+  padding-left: 24px;
+}
+.check-property-sub::before {
+  content: "";
+  position: absolute;
+  left: 7px;
+  top: -12px;
+  width: 11px;
+  height: 21px;
+  border-left: 2px solid currentColor;
+  border-bottom: 2px solid currentColor;
+  border-bottom-left-radius: 4px;
+  opacity: 0.45;
+  pointer-events: none;
+}
+
+/* Sliding switches instead of tick boxes inside the inspector cards: the label on the left, the switch on the right, in the colour of its section. */
+.property-card .check-property {
+  flex-direction: row-reverse;
+  justify-content: space-between;
+}
+.property-card .check-property > span {
+  flex: 1 1 auto;
+}
+.property-card .check-property input[type="checkbox"] {
+  -webkit-appearance: none;
+  appearance: none;
+  position: relative;
+  flex: none;
+  box-sizing: border-box;
+  width: 40px;
+  height: 22px;
+  margin: 0;
+  border: 1.5px solid #8a7b6a;
+  border-radius: 11px;
+  background: rgba(0, 0, 0, 0.06);
+  transition: background-color 0.15s, border-color 0.15s, box-shadow 0.15s;
+}
+.property-card .check-property input[type="checkbox"]::after {
+  content: "";
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 13px;
+  height: 13px;
+  border-radius: 50%;
+  background: #8a7b6a;
+  transition: left 0.15s, background-color 0.15s;
+}
+.property-card .check-property input[type="checkbox"]:checked {
+  border-color: var(--sw, #b3711f);
+  background: var(--sw, #b3711f);
+}
+.property-card .check-property input[type="checkbox"]:checked::after {
+  left: 21px;
+  background: #fff;
+}
+.property-card .check-property input[type="checkbox"]:focus-visible {
+  outline: 2px solid var(--sw, #b3711f);
+  outline-offset: 2px;
+}
+.property-card .check-property input[type="checkbox"]:disabled {
+  opacity: 0.5;
+}
+html[data-theme="dark"] .property-card .check-property input[type="checkbox"] {
+  border-color: #7d7d7d;
+  background: rgba(0, 0, 0, 0.25);
+}
+html[data-theme="dark"] .property-card .check-property input[type="checkbox"]::after {
+  background: #989898;
+}
+html[data-theme="dark"] .property-card .check-property input[type="checkbox"]:checked {
+  border-color: var(--sw, #b3711f);
+  background: color-mix(in srgb, var(--sw, #b3711f) 22%, #0a0a0a);
+  box-shadow: 0 0 6px color-mix(in srgb, var(--sw, #b3711f) 50%, transparent);
+}
+html[data-theme="dark"] .property-card .check-property input[type="checkbox"]:checked::after {
+  background: color-mix(in srgb, var(--sw, #b3711f) 65%, white);
 }

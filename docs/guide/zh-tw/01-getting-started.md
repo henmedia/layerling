@@ -19,7 +19,7 @@ layerling 是一款直接在瀏覽器中執行的 3D 列印設計程式。你用
 
 ![標示了各區域的編輯器：上方是功能區，左側是視圖立方體，其下是檢視列，旁邊是狀態訊息與物件清單，右側是所選形狀的屬性。](shot:editor-areas)
 
-- **上方**是**功能區**。它依任務分類：{{ui:editor.group.clipboard}}、{{ui:editor.group.history}}、{{ui:editor.group.shapes}}、{{ui:editor.group.visibility}}、{{ui:editor.group.combine}}、{{ui:editor.group.modify}}、{{ui:editor.group.arrange}} 與 {{ui:editor.group.file}}；{{ui:editor.group.help}} 位於其上方的標題列，分頁旁的小房子圖示可回到起始頁。視窗太窄、放不下所有群組時，最少用的群組會收進一個寫著群組名稱的按鈕，下方掛著一個群組顏色的小箭頭：指向或點按它，它的工具就在下方展開。收起的 {{ui:editor.group.history}} 是例外：它的按鈕就是 {{ui:editor.tool.undo}} 本身，只有下方的箭頭才會開啟 {{ui:editor.tool.redo}} 與其餘工具。右上角放大鏡左邊的圖釘則讓所有群組保持展開。將滑鼠移到圖示上就能看到名稱，灰色的也一樣；{{ui:interactiveHelp.title}}（{{ui:editor.group.help}} 下的問號，或 Shift+F1）點一下就能解釋任何圖示，並帶你到本指南中對應的小節。凡是看到小問號的地方，例如形狀的設定裡、形狀庫中或工具視窗裡，它都會直接帶你到本指南對應的章節。{{ui:editor.group.modify}} 群組分為四個部分，各自的名稱寫在工具上方：{{ui:editor.section.mirrorPattern}}、{{ui:editor.section.splitShape}}、{{ui:editor.section.edgesWalls}} 與 {{ui:editor.section.surface}}。灰色的圖示還會說明它在等什麼，例如 {{ui:editor.needs.oneBody}} 或 {{ui:editor.needs.locked}}。找不到某個工具？按 [[Ctrl]]+[[K]] 並輸入它的名稱；空白設計會在檢視底部提醒你。
+- **上方**是**功能區**。它依任務分類：{{ui:editor.group.clipboard}}、{{ui:editor.group.history}}、{{ui:editor.group.shapes}}、{{ui:editor.group.visibility}}、{{ui:editor.group.combine}}、{{ui:editor.section.mirrorPattern}}、{{ui:editor.section.splitShape}}、{{ui:editor.section.edgesWalls}}、{{ui:editor.section.surface}}、{{ui:editor.group.arrange}} 與 {{ui:editor.group.file}}；{{ui:editor.group.help}} 位於其上方的標題列，分頁旁的小房子圖示可回到起始頁。視窗太窄、放不下所有群組時，最少用的群組會收進一個寫著群組名稱的按鈕，下方掛著一個群組顏色的小箭頭：指向或點按它，它的工具就在下方展開。收起的 {{ui:editor.group.history}} 是例外：它的按鈕就是 {{ui:editor.tool.undo}} 本身，只有下方的箭頭才會開啟 {{ui:editor.tool.redo}} 與其餘工具。右上角放大鏡左邊的圖釘則讓所有群組保持展開。將滑鼠移到圖示上就能看到名稱，灰色的也一樣；{{ui:interactiveHelp.title}}（{{ui:editor.group.help}} 下的問號，或 Shift+F1）點一下就能解釋任何圖示，並帶你到本指南中對應的小節。凡是看到小問號的地方，例如形狀的設定裡、形狀庫中或工具視窗裡，它都會直接帶你到本指南對應的章節。灰色的圖示還會說明它在等什麼，例如 {{ui:editor.needs.oneBody}} 或 {{ui:editor.needs.locked}}。找不到某個工具？按 [[Ctrl]]+[[K]] 並輸入它的名稱；空白設計會在檢視底部提醒你。
 - **中間**是工作平面。你在這裡放置形狀、把它們拉成想要的樣子，並看到結果。
 - **右側**會顯示所選形狀的**屬性**：顏色、尺寸、位置，以及構成該形狀的其他內容。輸入數字比拖曳更精確。
 - **左側**是檢視列，上方是視圖立方體。它們帶你在場景中移動，詳見[視圖與工作平面](chapter:view-and-workplane)。
@@ -87,6 +87,10 @@ layerling 是一款直接在瀏覽器中執行的 3D 列印設計程式。你用
 ### 頁尾
 
 視窗底部：{{ui:dashboard.sponsor}} 通往可以贊助本專案的頁面；{{ui:dashboard.userGuide}} 開啟本指南；{{ui:dashboard.forum}} 通往提問、分享想法與回報錯誤的地方（GitHub 上的討論區，德語使用者則是 drucktipps3d 論壇）；{{ui:editor.bugReport}} 會產生一份回報錯誤用的 ZIP；{{ui:dashboard.projectOnGitHub}} 通往 GitHub 上的專案，版本號則會開啟版本說明。法律聲明與隱私權政策的連結，屬於你所使用的那份 layerling 的營運者。
+
+### 專注模式
+
+在小螢幕上，{{ui:focusMode.enter}}把標題列和頁尾讓給工作區：右上角帶兩個向外箭頭的按鈕、[[Ctrl]]+[[Shift]]+[[F]] 或指令搜尋都可以開啟它。功能區上移，檢視一直延伸到視窗邊緣。功能區下方的小工具列保留了返回起始頁的房子圖示、{{ui:editor.modeGeometry}} 和 {{ui:editor.modeSketch}} 分頁、放大鏡、設定以及帶兩個向內箭頭的按鈕（用於退出專注模式）；拖動小工具列的把手可以把它移到別處，雙擊把手可放回原位。layerling 會在此瀏覽器中記住這個選擇；當瀏覽器佔滿整個螢幕（F11）時，會自動進入專注模式。
 
 ## 你的第一個零件
 

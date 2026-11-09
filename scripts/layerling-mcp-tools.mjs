@@ -1991,6 +1991,17 @@ export const tools = [
     },
   },
   {
+    name: "layerling_focus_mode",
+    description: "Focus mode of the editor, as the button beside the ribbon pin or Ctrl+Shift+F: on hides the title row (logo, tabs, project name, help, theme, language, settings) and the footer, so the 3D view and the sketch get their height on a small screen, and a small movable bar over the view keeps Home, the 3D editor and Sketch tabs, the command search, the settings and the way back. off brings them back. The choice is kept in this browser; while the browser fills the screen (F11) the mode comes by itself. Only the editor's frame changes, nothing in the design. Call without on to read the state. Returns on.",
+    inputSchema: {
+      ...editorTargetSchema,
+      properties: {
+        ...editorTargetSchema.properties,
+        on: { type: "boolean", description: "true switches focus mode on, false off. Left out it stays as it is." },
+      },
+    },
+  },
+  {
     name: "layerling_measurements",
     description: "The measurements of the editor's tape measure: what is measured and whether they are shown. Call with nothing to read them: visible and measurements, each with its id and its length in millimetres (a measured edge counts along the edge). visible true shows the measurements, false hides them, like the eye among the tape measure's buttons; hidden measurements stay in the design. The measurements belong to the design: they stay in the browser and travel in a .lyl file, never in the undo history, and hiding is kept too. dimensions false hides the sizes and distances the editor shows around the selection by itself (the size marks, the movement dimensions while dragging, the distances to the origin and the angle badge), like the key Q; true shows them again. Only the view changes, for this editor until it is reloaded; a handle pointed at still shows its size. The answer has dimensions too. Combine with layerling_capture_image to see them (or not) in the picture. A measurement between two points with a body at one of them also has moves, the id of the body a typed length moves. id with length types a length for that measurement, as a click on its number in the editor does: the body at the second point moves along the measured line until the two points are length millimetres apart (a negative length takes it that far past the other point); the body at the first point moves instead when only that one is selected, or when the second point is on the workplane. With axis (x, y or z, y up, as the positions) it moves along that axis only, until the points are length apart on it, on the side it was on. The points stay on the body, so the measurement follows. A locked body, two points on one body or on none, a whole edge, or points level on that axis are refused. One step of the undo history; the answer has moved (the body's id, name and how far it went in millimetres) and the measurements as they are after the move. Not available while a sketch is open.",
     inputSchema: {

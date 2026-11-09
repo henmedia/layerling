@@ -133,7 +133,7 @@ Bejelölt {{ui:array.groupCopies}} mellett a(z) {{ui:array.apply}} ugyanabban a 
 
 ## Lyukminta egy lapon
 
-Szellőzőkhöz, hangszórórácsokhoz, kosarakhoz és dobozokhoz a {{ui:holePattern.title}} egyenletesen elosztja a lyukakat egy sík lapon. Többé nem kell egy lyukat elkészítened, megismételned és a falra tenned. Jelölj ki pontosan egy testet, és kattints a szalag {{ui:editor.group.modify}} csoportjában az ismétlés melletti {{ui:holePattern.title}} gombra. Jobb kattintással is elérheted a testen, vagy megkeresheted a [[Ctrl]]+[[K]] billentyűvel.
+Szellőzőkhöz, hangszórórácsokhoz, kosarakhoz és dobozokhoz a {{ui:holePattern.title}} egyenletesen elosztja a lyukakat egy sík lapon. Többé nem kell egy lyukat elkészítened, megismételned és a falra tenned. Jelölj ki pontosan egy testet, és kattints a szalag {{ui:editor.section.mirrorPattern}} csoportjában az ismétlés melletti {{ui:holePattern.title}} gombra. Jobb kattintással is elérheted a testen, vagy megkeresheted a [[Ctrl]]+[[K]] billentyűvel.
 
 1. Kattints a test egyik sík lapjára. A kattintás körüli teljes sík lap számít, nem csak a mutató alatti háromszög. Egy henger, cső vagy furat kerek fala is működik, lásd lent; más görbe lap nem: kapsz egy figyelmeztetést, és helyette egy sík lapra kattintasz.
 2. Az ablakban állítsd be, milyenek legyenek a lyukak, és hogyan helyezkedjenek el:
@@ -161,7 +161,7 @@ Egy MI ugyanezt az MCP-hídon keresztül is meg tudja tenni a `layerling_perfora
 
 ## Lap kitolása vagy benyomása
 
-Vastagabb falhoz, egy lapra emelt párnához vagy egy belevágott zsebhez a {{ui:faceTool.title}} eszköz egyetlen sík lapon dolgozik. Importált STL-en is működik, ahol nincs módosítható vázlat. Jelölj ki pontosan egy testet, és kattints a szalag {{ui:editor.group.modify}} csoportjában a {{ui:faceTool.title}} gombra, a lyukminta mellett. A testre jobb gombbal is kattinthatsz, vagy megkeresheted a [[Ctrl]]+[[K]] billentyűkkel.
+Vastagabb falhoz, egy lapra emelt párnához vagy egy belevágott zsebhez a {{ui:faceTool.title}} eszköz egyetlen sík lapon dolgozik. Importált STL-en is működik, ahol nincs módosítható vázlat. Jelölj ki pontosan egy testet, és kattints a szalag {{ui:editor.section.mirrorPattern}} csoportjában a {{ui:faceTool.title}} gombra, a lyukminta mellett. A testre jobb gombbal is kattinthatsz, vagy megkeresheted a [[Ctrl]]+[[K]] billentyűkkel.
 
 1. Kattints a test egy sík lapjára. A lyukmintához hasonlóan a kattintás körüli teljes sík lap számít; görbe lap itt nem működik, kerek fal sem. Csoporton vagy kötegen a lap átfut az összeérő részeken, mint a lyukmintánál.
 2. Az ablakban:

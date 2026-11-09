@@ -16,7 +16,7 @@ Z miško:
 | drži [[Ctrl]] / [[Cmd]] in vleci z levim gumbom | prav tako premikanje |
 | dvojni klik na prazno mesto delovne ravnine ali ob ploščo | premakne pogled, da je to mesto na sredini; pogled se nato vrti okoli njega |
 
-Hitrost zumiranja s kolescem nastaviš z {{ui:workspace.zoomSpeed}} v nastavitvah, pod {{ui:workspace.appearance}}: drsnik od 1 do 14, na začetku 5; nad 10 se pospeši le kolešček.
+Hitrost zumiranja s kolescem nastaviš z {{ui:workspace.zoomSpeed}} v nastavitvah, pod {{ui:workspace.appearance}}: drsnik od 1 do 14, na začetku 5; nad 10 se pospeši le kolešček. Tik pod njim {{ui:workspace.panSpeed}} nastavi, kako hitro pogled sledi miški, ko ga premikaš: drsnik od 1 do 9; pri 5, kjer začne, ostane točka, ki jo primeš, pod kazalcem.
 
 **Gumbi miške kot v rezalniku.** Če si vajen Bambu Studia ali OrcaSlicerja, v nastavitvah, pod {{ui:workspace.appearance}}, nastavi {{ui:workspace.mouseScheme}} na {{ui:workspace.mouseSchemeSlicer}}. Vlečenje z levim gumbom po praznem mestu potem vrti pogled, desni gumb ga premika kot srednji, Shift z vlečenjem z levim pa riše izbirni okvir. Vlečenje telesa ga še vedno premakne in kratek desni klik še vedno odpre meni. V skici pogled premika tudi desni gumb.
 
@@ -135,7 +135,9 @@ Zobnik v naslovni vrstici ({{ui:editor.workspaceSettings}}) odpre nastavitve. Le
 
 {{ui:workspace.ribbonButtons}} odstrani iz orodne vrstice skupine in gumbe, ki jih nikoli ne uporabljaš. Klikni skupino, da odpreš njen seznam: {{ui:workspace.ribbonGroupShown}} odstrani celo skupino, kljukica ob gumbu samo ta gumb. {{ui:workspace.ribbonShowAll}} vrne vse nazaj. Skupina brez gumbov izgine, druge se pomaknejo naprej, tako da v eno vrsto gre več orodne vrstice.
 
-Kar odstraniš, manjka samo v orodni vrstici: iskanje ukazov ([[Ctrl]]+[[K]]) to še najde in njegova tipka to še zažene. Puščici ob skupini jo premakneta po seznamu navzgor ali navzdol in tako po orodni vrstici; {{ui:workspace.ribbonResetOrder}} povrne prvotni vrstni red. Puščici ob gumbu ga enako premakneta znotraj skupine; v skupini {{ui:editor.group.modify}} ostane v svojem poimenovanem razdelku. Pomoč ostane vedno. Skupino Oblike lahko premikaš in odstraniš kot vsako drugo; njeno ploščo še vedno odpre iskanje ukazov. Izbiro si zapomni ta brskalnik in gre tudi v datoteko iz {{ui:workspace.exportSettings}}. Velja za 3D-urejevalnik; skica ima svojo vrstico.
+Kar odstraniš, manjka samo v orodni vrstici: iskanje ukazov ([[Ctrl]]+[[K]]) to še najde in njegova tipka to še zažene. Puščici ob skupini jo premakneta po seznamu navzgor ali navzdol in tako po orodni vrstici; {{ui:workspace.ribbonResetOrder}} povrne prvotni vrstni red. Puščici ob gumbu ga enako premakneta znotraj skupine. Pomoč ostane vedno. Skupino Oblike lahko premikaš in odstraniš kot vsako drugo; njeno ploščo še vedno odpre iskanje ukazov. Izbiro si zapomni ta brskalnik in gre tudi v datoteko iz {{ui:workspace.exportSettings}}. Velja za 3D-urejevalnik; skica ima svojo vrstico.
+
+{{ui:workspace.ribbonFold}} pod {{ui:workspace.ribbonGroupShown}} na seznamu skupine določa, kaj skupina naredi, ko okno nima prostora za vse. {{ui:workspace.ribbonFoldAuto}} je privzeto: najmanj uporabljene skupine se zložijo prve. {{ui:workspace.ribbonFoldAlways}} drži skupino zloženo v en sam gumb tudi v širokem oknu, tako da zavzame malo prostora in je vseeno pri roki. {{ui:workspace.ribbonFoldKeep}} jo zloži šele za vsemi drugimi. {{ui:workspace.ribbonResetOrder}} ponastavi tudi to izbiro. {{ui:editor.section.mirrorPattern}}, {{ui:editor.section.splitShape}}, {{ui:editor.section.edgesWalls}} in {{ui:editor.section.surface}} so štiri samostojne skupine: vsako lahko premikaš, zložiš in odstraniš posebej.
 
 ### Videz: hitri način
 
@@ -187,9 +189,11 @@ Skicirni pogled ima lastne barve: {{ui:workspace.sketchBackground}} za okno okol
 
 {{ui:workspace.startWithScrollbars}}: načrt se potem odpre z drsniki pogleda. Nastavitev se shrani z načrtom in z {{ui:workspace.makeDefault}}.
 
+{{ui:workspace.viewBarOpensOnHover}}: zložena vrstica pogleda se odpre, ko je miška nad njeno puščico, in se kmalu potem, ko jo miška zapusti, spet zloži, razen če je v uporabi eno od njenih orodij. Klik na puščico, ko je tako odprta, jo pusti odprto. Velja samo za miško; na zaslonu na dotik vrstico kot doslej odpre dotik.
+
 {{ui:workspace.startView}} določa kot, pod katerim se odpre nov načrt in na katerega se vrne {{ui:camera.home}}. Zavrti in približaj pogled, kot ti je všeč, nato klikni {{ui:workspace.startViewUseCurrent}}; {{ui:workspace.startViewStandard}} vrne običajni pogled od spredaj desno. Velja za vsak načrt v tem brskalniku. Načrt, ki ga znova odpreš, se še vedno odpre tako, kot si ga zapustil.
 
-{{ui:workspace.zoomSpeed}} je drsnik od počasi do hitro: kako hitro približujeta kolesce in sledilna ploščica; gumbi in tipke za povečavo obdržijo svoje majhne korake. {{ui:workspace.cameraInertia}}: ko spustiš miško, se pogled še malo vrti in nežno zavira. Izklopljeno pomeni, da se takoj ustavi, kot v Tinkercadu in Fusion 360.
+{{ui:workspace.zoomSpeed}} je drsnik od počasi do hitro: kako hitro približujeta kolesce in sledilna ploščica; gumbi in tipke za povečavo obdržijo svoje majhne korake. {{ui:workspace.panSpeed}} je prav tako drsnik od počasi do hitro: kako hitro pogled sledi miški, ko ga premikaš; na sredini ostane točka, ki jo primeš, pod kazalcem. {{ui:workspace.cameraInertia}}: ko spustiš miško, se pogled še malo vrti ali premika in nežno zavira. Izklopljeno pomeni, da se takoj ustavi, kot v Tinkercadu in Fusion 360.
 
 {{ui:workspace.overhangAngle}} je kot, od katerega ploskev velja za previs, ko v meniju vidnosti vklopiš prikaz previsov: take ploskve so šrafirane rdeče in belo. 30° je previdno, 70° računa na dobro hlajenje tiska; 45° je običajen začetek. Dokler so prikazani, vrstica pod pogledom navede najstrmejši previs in koliko cm² potrebuje podporo.
 

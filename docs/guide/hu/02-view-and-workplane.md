@@ -16,7 +16,7 @@ Egérrel:
 | [[Ctrl]] / [[Cmd]] nyomva tartása és húzás bal gombbal | szintén a nézetet mozgatja |
 | dupla kattintás a munkasík egy üres pontjára vagy a tárgyasztal mellé | úgy mozgatja a nézetet, hogy az a pont középre kerüljön; a nézet ezután körülötte forog |
 
-Hogy a görgő milyen gyorsan nagyít, azt a beállításokban a {{ui:workspace.appearance}} alatt a {{ui:workspace.zoomSpeed}} adja meg: egy csúszka 1-től 14-ig, kezdetben 5-ön; 10 fölött csak a görgő gyorsul.
+Hogy a görgő milyen gyorsan nagyít, azt a beállításokban a {{ui:workspace.appearance}} alatt a {{ui:workspace.zoomSpeed}} adja meg: egy csúszka 1-től 14-ig, kezdetben 5-ön; 10 fölött csak a görgő gyorsul. Közvetlenül alatta a(z) {{ui:workspace.panSpeed}} adja meg, milyen gyorsan követi a nézet az egeret eltoláskor: csúszka 1-től 9-ig; az induló 5-ön a megfogott pont a kurzor alatt marad.
 
 **Egérgombok, mint a szeletelőben.** Ha a Bambu Studióhoz vagy az OrcaSlicerhez szoktál, a beállításokban, a(z) {{ui:workspace.appearance}} alatt állítsd a(z) {{ui:workspace.mouseScheme}} értékét erre: {{ui:workspace.mouseSchemeSlicer}}. A bal gombbal üres helyen húzva ilyenkor a nézet forog, a jobb gomb a középsőhöz hasonlóan eltolja, a Shift és a bal gombos húzás pedig kijelölőkeretet rajzol. Egy test húzása továbbra is mozgatja, és egy rövid jobb kattintás továbbra is megnyitja a menüt. Vázlatban a jobb gomb is eltolja a nézetet.
 
@@ -133,7 +133,9 @@ A {{ui:workspace.viewCubePosition}} a {{ui:workspace.appearance}} alatt a nézet
 
 A {{ui:workspace.ribbonButtons}} kiveszi a szalagról azokat a csoportokat és gombokat, amelyeket sosem használsz. Egy csoportra kattintva megnyílik a listája: a {{ui:workspace.ribbonGroupShown}} az egész csoportot veszi ki, egy gomb melletti pipa csak azt a gombot. Az {{ui:workspace.ribbonShowAll}} mindent visszahoz. A gomb nélkül maradt csoport eltűnik, a többi előrébb lép, így a szalagból több fér el egy sorban.
 
-Amit kiveszel, az csak a szalagról hiányzik: a parancskereső ([[Ctrl]]+[[K]]) továbbra is megtalálja, és a billentyűje továbbra is elindítja. A csoport melletti nyilak a listában felfelé vagy lefelé, így a szalagon is odébb viszik; a {{ui:workspace.ribbonResetOrder}} visszaállítja az eredeti sorrendet. A gomb melletti nyilak ugyanígy mozgatják a gombot a csoportján belül; az {{ui:editor.group.modify}} csoportban a megnevezett szakaszán belül marad. A Súgó mindig megmarad. Az Alakzatok csoport a többihez hasonlóan mozgatható és kivehető; a panelje a parancskeresőből továbbra is megnyílik. A választást ez a böngésző jegyzi meg, és bekerül a {{ui:workspace.exportSettings}} fájljába is. A 3D-szerkesztőre vonatkozik; a vázlatnak saját sávja van.
+Amit kiveszel, az csak a szalagról hiányzik: a parancskereső ([[Ctrl]]+[[K]]) továbbra is megtalálja, és a billentyűje továbbra is elindítja. A csoport melletti nyilak a listában felfelé vagy lefelé, így a szalagon is odébb viszik; a {{ui:workspace.ribbonResetOrder}} visszaállítja az eredeti sorrendet. A gomb melletti nyilak ugyanígy mozgatják a gombot a csoportján belül. A Súgó mindig megmarad. Az Alakzatok csoport a többihez hasonlóan mozgatható és kivehető; a panelje a parancskeresőből továbbra is megnyílik. A választást ez a böngésző jegyzi meg, és bekerül a {{ui:workspace.exportSettings}} fájljába is. A 3D-szerkesztőre vonatkozik; a vázlatnak saját sávja van.
+
+A(z) {{ui:workspace.ribbonFold}} egy csoport listájában, a(z) {{ui:workspace.ribbonGroupShown}} alatt azt adja meg, mit tegyen a csoport, ha az ablakban nincs hely mindegyiknek. A(z) {{ui:workspace.ribbonFoldAuto}} az alapbeállítás: a legritkábban használt csoportok csukódnak össze először. A(z) {{ui:workspace.ribbonFoldAlways}} széles ablakban is egyetlen gombbá csukva tartja a csoportot, így kevés helyet foglal, mégis kéznél van. A(z) {{ui:workspace.ribbonFoldKeep}} csak az összes többi után csukja össze. A(z) {{ui:workspace.ribbonResetOrder}} ezt a választást is visszaállítja. A(z) {{ui:editor.section.mirrorPattern}}, {{ui:editor.section.splitShape}}, {{ui:editor.section.edgesWalls}} és {{ui:editor.section.surface}} négy önálló csoport: mindegyik külön mozgatható, összecsukható és kivehető.
 
 ### Megjelenés: gyors mód
 
@@ -185,9 +187,11 @@ A(z) {{ui:workspace.objectSnap}} húzás közben más alakzatokhoz illeszti egy 
 
 {{ui:workspace.startWithScrollbars}}: a terv ilyenkor a nézet görgetősávjaival nyílik meg. A beállítás a tervvel és a {{ui:workspace.makeDefault}} gombbal is mentődik.
 
+{{ui:workspace.viewBarOpensOnHover}}: a becsukott nézetsáv kinyílik, amíg az egér a nyila fölött van, és nem sokkal azután, hogy az egér elhagyta, újra becsukódik, hacsak valamelyik eszköze nincs használatban. Ha így nyitva van, egy kattintás a nyílra nyitva tartja. Csak egérrel működik; érintőképernyőn egy koppintás nyitja ki a sávot, mint eddig.
+
 A(z) {{ui:workspace.startView}} azt a szöget adja meg, amelyben egy új terv megnyílik, és amelyhez a(z) {{ui:camera.home}} visszatér. Forgasd és nagyítsd a nézetet, ahogy tetszik, majd kattints a(z) {{ui:workspace.startViewUseCurrent}} gombra; a(z) {{ui:workspace.startViewStandard}} visszahozza a szokásos elölről-jobbról nézetet. Ebben a böngészőben minden tervre érvényes. Egy újra megnyitott terv továbbra is úgy nyílik meg, ahogy otthagytad.
 
-A(z) {{ui:workspace.zoomSpeed}} egy csúszka lassútól gyorsig: milyen gyorsan nagyít a görgő és az érintőpad; a nagyítás gombjai és billentyűi megtartják a saját kis lépéseiket. {{ui:workspace.cameraInertia}}: ha elengeded az egeret, a nézet még egy pillanatig forog, és finoman lelassul. Kikapcsolva azonnal megáll, mint a Tinkercadben és a Fusion 360-ban.
+A(z) {{ui:workspace.zoomSpeed}} egy csúszka lassútól gyorsig: milyen gyorsan nagyít a görgő és az érintőpad; a nagyítás gombjai és billentyűi megtartják a saját kis lépéseiket. A(z) {{ui:workspace.panSpeed}} szintén csúszka lassútól gyorsig: milyen gyorsan követi a nézet az egeret eltoláskor; középen a megfogott pont a kurzor alatt marad. {{ui:workspace.cameraInertia}}: ha elengeded az egeret, a nézet még egy pillanatig forog vagy csúszik, és finoman lelassul. Kikapcsolva azonnal megáll, mint a Tinkercadben és a Fusion 360-ban.
 
 A(z) {{ui:workspace.overhangAngle}} az a szög, amelytől egy lap túlnyúlásnak számít, ha a láthatósági menüben bekapcsolod a túlnyúlások megjelenítését: az ilyen lapok piros-fehér sraffozást kapnak. A 30° óvatos, a 70° jó nyomtatási hűtéssel számol; a 45° a szokásos kiindulás. Amíg látszanak, a nézet alatti sor megadja a legmeredekebb túlnyúlást, és hogy hány cm² igényel támaszt.
 

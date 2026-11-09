@@ -85,7 +85,7 @@ For lettering on a side face, first put the workplane on that face, see [View an
 Cut through a plate, letters like O, A and B lose their middle: it lies loose inside the letter and falls out. {{ui:stencilBridges.title}} holds it to the plate with small bridges, as on a stencil.
 
 1. Switch the text to {{ui:inspector.hole}}, let it reach through the plate and select both, grouped or not.
-2. Click {{ui:stencilBridges.title}} in the {{ui:editor.group.modify}} group of the ribbon, right-click the selection, or find it with [[Ctrl]]+[[K]]. The bridges show in orange where they will go.
+2. Click {{ui:stencilBridges.title}} in the {{ui:editor.section.splitShape}} group of the ribbon, right-click the selection, or find it with [[Ctrl]]+[[K]]. The bridges show in orange where they will go.
 3. Set {{ui:stencilBridges.width}} and {{ui:stencilBridges.count}}. {{ui:stencilBridges.height}} starts at the plate's thickness; lower bridges sit flush with the bottom, in the middle or flush with the top of the plate, as {{ui:stencilBridges.position}} says. On a spray stencil, bridges at the top leave room under them for the paint.
 4. {{ui:stencilBridges.apply}} groups the bridges with the plate.
 

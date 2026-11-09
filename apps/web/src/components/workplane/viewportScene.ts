@@ -13,7 +13,7 @@ import { CAMERA_FOV, CAMERA_MAX_DISTANCE, CAMERA_MIN_DISTANCE, CAMERA_TARGET, up
 import { horizontalPlacementWorkplane, placementWorkplaneIsBase, placementWorkplaneLiesOnBase, placementWorkplaneQuaternion, type PlacementWorkplane } from "@/lib/placementWorkplane";
 import { printerPresetById } from "@/lib/printBed";
 import { plateCenterX, plateCount } from "@/lib/buildPlates";
-import { DEFAULT_WORKPLANE_WORKSPACE, effectiveViewSettings, viewPixelRatio, orbitControlsZoomSpeed } from "@/lib/workplaneSettings";
+import { DEFAULT_WORKPLANE_WORKSPACE, effectiveViewSettings, viewPixelRatio, orbitControlsZoomSpeed, orbitControlsPanSpeed } from "@/lib/workplaneSettings";
 import { workplaneGridBandWidths, AXIS_ARROW_COLORS, axisArrowLayout, fillLightPosition, keyLightPosition, sceneLightLevels, shadowBlurRadius, softSceneLightLevels, workplaneGridLayout, workplaneGridLines, workplaneGridPalette, workplaneLabelLayout, workplaneThemePalette, WORKPLANE_LABEL_ASPECT, WORKPLANE_LINE_ELEVATION, type WorkplaneGridLayout } from "@/lib/workplaneGrid";
 import type { WorkplaneWorkspaceSettings } from "@/types/layerling";
 import { pivotKeptAhead, ZOOM_PIVOT_REACH_MM } from "@/lib/zoomPivot";
@@ -96,7 +96,7 @@ export function createThreeScene(host: HTMLDivElement): ThreeState {
   controls.dampingFactor = CAMERA_DAMPING_PER_60HZ_FRAME;
   controls.rotateSpeed = 0.58;
   controls.zoomSpeed = orbitControlsZoomSpeed(DEFAULT_WORKPLANE_WORKSPACE.zoomSpeed);
-  controls.panSpeed = 0.65;
+  controls.panSpeed = orbitControlsPanSpeed(DEFAULT_WORKPLANE_WORKSPACE.panSpeed);
   controls.screenSpacePanning = true;
   controls.zoomToCursor = true;
   controls.mouseButtons = {
@@ -431,6 +431,7 @@ export function rebuildWorkplane(
   state.lights.fill.position.set(fillPosition.x, fillPosition.y, fillPosition.z);
   state.needsRender = true;
   state.controls.zoomSpeed = orbitControlsZoomSpeed(workspace.zoomSpeed);
+  state.controls.panSpeed = orbitControlsPanSpeed(workspace.panSpeed);
   state.mouseScheme = workspace.mouseScheme;
   Object.assign(state.controls.mouseButtons, cameraButtonsFor(workspace.mouseScheme));
 

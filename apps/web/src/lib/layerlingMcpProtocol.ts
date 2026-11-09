@@ -176,6 +176,7 @@ export type LayerlingMcpCommandName =
   | "restore_from_history"
   | "clear_history"
   | "show_workplane"
+  | "focus_mode"
   | "saved_view"
   | "build_plates"
   | "measurements"

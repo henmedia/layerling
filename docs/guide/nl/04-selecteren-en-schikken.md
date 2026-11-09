@@ -133,7 +133,7 @@ Met {{ui:array.groupCopies}} aangevinkt groepeert {{ui:array.apply}} het origine
 
 ## Gatenpatroon op een vlak
 
-Voor ventilatieopeningen, luidsprekerroosters, mandjes en behuizingen verdeelt het {{ui:holePattern.title}} gaten gelijkmatig over een plat vlak. Je hoeft niet meer één gat te maken, het te herhalen en op de wand te zetten. Selecteer precies één lichaam en klik op {{ui:holePattern.title}} in de groep {{ui:editor.group.modify}} van het lint, naast het patroon. Je kunt ook met rechts op het lichaam klikken, of het vinden met [[Ctrl]]+[[K]].
+Voor ventilatieopeningen, luidsprekerroosters, mandjes en behuizingen verdeelt het {{ui:holePattern.title}} gaten gelijkmatig over een plat vlak. Je hoeft niet meer één gat te maken, het te herhalen en op de wand te zetten. Selecteer precies één lichaam en klik op {{ui:holePattern.title}} in de groep {{ui:editor.section.mirrorPattern}} van het lint, naast het patroon. Je kunt ook met rechts op het lichaam klikken, of het vinden met [[Ctrl]]+[[K]].
 
 1. Klik op een plat vlak van het lichaam. Het hele platte vlak rond je klik telt, niet alleen de driehoek onder de aanwijzer. De ronde wand van een cilinder, buis of boring werkt ook, zie verderop; een ander gebogen vlak niet: je krijgt een hint en klikt in plaats daarvan op een plat vlak. Bij een groep of een bundel loopt een vlak door over onderdelen die elkaar raken, zoals bij één lichaam; bij een bundel alleen als er geen gat bij zit. De onderdelen worden kort nadat je het gereedschap opent als één lichaam gelezen; tot dan licht onder de aanwijzer alleen het vlak van één onderdeel op, en een klik wacht daarop. Bij een groep of bundel met tekst licht alleen het vlak van één onderdeel op, en pas de klik leest de onderdelen als één lichaam.
 2. Stel in het venster in hoe de gaten eruitzien en liggen:
@@ -161,7 +161,7 @@ Een AI kan hetzelfde via de MCP-brug met `layerling_perforate_face` (zie het hoo
 
 ## Een vlak naar buiten of naar binnen trekken
 
-Voor een dikkere wand, een verhoogd plateau op een vlak of een kamer erin werkt het gereedschap {{ui:faceTool.title}} op één plat vlak. Het werkt ook op een geïmporteerde STL, waar geen schets is om te veranderen. Selecteer precies één lichaam en klik op {{ui:faceTool.title}} in de groep {{ui:editor.group.modify}} van het lint, naast het gatenpatroon. Je kunt ook met rechts op het lichaam klikken, of het vinden met [[Ctrl]]+[[K]].
+Voor een dikkere wand, een verhoogd plateau op een vlak of een kamer erin werkt het gereedschap {{ui:faceTool.title}} op één plat vlak. Het werkt ook op een geïmporteerde STL, waar geen schets is om te veranderen. Selecteer precies één lichaam en klik op {{ui:faceTool.title}} in de groep {{ui:editor.section.mirrorPattern}} van het lint, naast het gatenpatroon. Je kunt ook met rechts op het lichaam klikken, of het vinden met [[Ctrl]]+[[K]].
 
 1. Klik op een plat vlak van het lichaam. Net als bij het gatenpatroon telt het hele platte vlak rond je klik; een gebogen vlak werkt hier niet, ook geen ronde wand. Bij een groep of een bundel loopt het vlak door over onderdelen die elkaar raken, zoals bij het gatenpatroon.
 2. In het venster:

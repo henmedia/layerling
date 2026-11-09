@@ -25,7 +25,9 @@ export function useToolbarCollapse(contentRef: RefObject<HTMLElement | null>, en
     const content = contentRef.current;
     if (!content) return;
     const root = document.documentElement;
-    const signature = [enabled, content.clientWidth, content.querySelectorAll("button").length, root.lang, root.dataset.toolbarSize ?? ""].join("|");
+    // The folding chosen for each group (#1551) counts too: it changes in the settings while the bar stays as wide.
+    const folds = [...content.querySelectorAll<HTMLElement>(".toolbar-section[data-group]")].map((section) => `${section.dataset.group}:${section.dataset.collapse ?? ""}:${section.dataset.fold ?? ""}`).join(",");
+    const signature = [enabled, content.clientWidth, content.querySelectorAll("button").length, root.lang, root.dataset.toolbarSize ?? "", folds].join("|");
     if (signature === signatureRef.current) return;
     signatureRef.current = signature;
     fitToolbar(content, enabled);
@@ -138,19 +140,23 @@ export function useToolbarCollapse(contentRef: RefObject<HTMLElement | null>, en
   }, [contentRef]);
 }
 
-/** Opens every group, measures the bar and folds what does not fit. */
+/**
+ * Opens every group, measures the bar and folds what does not fit. A group set to stay folded (`data-fold="always"`,
+ * Discussion #1551) folds before the bar is measured, also while the pin keeps the others open: it was asked for.
+ */
 function fitToolbar(content: HTMLElement, enabled: boolean) {
   const sections = [...content.querySelectorAll<HTMLElement>(".toolbar-section")];
   sections.forEach((section) => {
-    section.removeAttribute("data-collapsed");
     section.removeAttribute("data-open");
+    if (section.dataset.fold === "always" && section.dataset.collapse) section.setAttribute("data-collapsed", "");
+    else section.removeAttribute("data-collapsed");
   });
   if (!enabled || content.clientWidth === 0) return;
   const groups = sections
     .filter((section) => section.getClientRects().length > 0)
     .map((section, index) => {
       const style = getComputedStyle(section);
-      const priority = Number(section.dataset.collapse);
+      const priority = section.hasAttribute("data-collapsed") ? Number.NaN : Number(section.dataset.collapse);
       return {
         key: String(index),
         width: section.getBoundingClientRect().width + (parseFloat(style.marginLeft) || 0) + (parseFloat(style.marginRight) || 0),
@@ -160,6 +166,7 @@ function fitToolbar(content: HTMLElement, enabled: boolean) {
     });
   const fold = new Set(groupsToCollapse(groups, content.clientWidth - SLACK));
   groups.forEach((group) => {
+    if (group.section.hasAttribute("data-collapsed")) return;
     if (fold.has(group.key)) group.section.setAttribute("data-collapsed", "");
   });
 }

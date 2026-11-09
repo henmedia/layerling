@@ -21,6 +21,12 @@
   white-space: nowrap;
 }
 
+/* How a group folds (#1551): the window's own select row, under the group's tick. */
+.ribbon-buttons-group > .ribbon-fold-row {
+  padding: 2px 0 10px;
+  font-size: 14px;
+}
+
 .ribbon-buttons-group > summary {
   display: flex;
   align-items: baseline;

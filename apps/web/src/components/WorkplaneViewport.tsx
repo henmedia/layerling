@@ -18,7 +18,7 @@ import { FramingSquareIcon } from "@/components/FramingSquareIcon";
 import { ProtractorIcon } from "@/components/ProtractorIcon";
 import { GridEyeIcon } from "@/components/GridEyeIcon";
 import { ToolbarNoteIcon } from "@/components/toolbarIcons";
-import { CAMERA_BAR_PANEL, CameraBarHandle } from "@/components/workplane/CameraBarHandle";
+import { CAMERA_BAR_PANEL, CameraBarHandle, useCameraBarPeek } from "@/components/workplane/CameraBarHandle";
 import { AlignOverlay, MirrorOverlay, type AlignOverlayState, type MirrorOverlayState } from "@/components/workplane/ActionOverlays";
 import { ALIGN_PLATE_ID } from "@/lib/alignDistribute";
 import { MoveDimensionOverlay } from "@/components/workplane/MoveDimensionOverlay";
@@ -8003,6 +8003,15 @@ export function WorkplaneViewport({
     setProtractorActive(false);
   }, [setProtractorActive, setTapeActive]);
 
+  // A folded view bar opened by the mouse over its arrow folds again when the mouse leaves it, unless a tool of it is in use (#1552).
+  const cameraBarPeek = useCameraBarPeek({
+    enabled: workspace.viewBarOpensOnHover,
+    collapsed: cameraControlsCollapsed,
+    onOpen: () => setCameraControlsCollapsed(false),
+    onFold: () => setCameraControlsCollapsed(true),
+    keepOpen: () => cameraBarMove.dragging || tapeModeRef.current || protractorOpenRef.current || tapeToolsOpen || sectionViewOpen,
+  });
+
   const syncSectionClippingState = useCallback((settings: SectionPlaneSettings) => {
     const state = threeRef.current;
     if (!state) return;
@@ -8429,8 +8438,9 @@ export function WorkplaneViewport({
         style={cameraBarMove.style}
         aria-label={t("camera.controls")}
         data-help-section="cameraBar"
+        {...cameraBarPeek.barProps}
       >
-        <CameraBarHandle move={cameraBarMove} collapsed={cameraControlsCollapsed} onToggle={() => (cameraControlsCollapsed ? setCameraControlsCollapsed(false) : collapseCameraControls())} />
+        <CameraBarHandle move={cameraBarMove} collapsed={cameraControlsCollapsed || cameraBarPeek.peeking} onToggle={() => cameraBarPeek.toggle(() => (cameraControlsCollapsed ? setCameraControlsCollapsed(false) : collapseCameraControls()))} />
         {cameraControlsCollapsed ? null : (
           <>
             <div className="camera-group">

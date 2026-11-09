@@ -163,6 +163,7 @@ AI'en arbejder med de samme funktioner som dig, gennem den samme vej som din han
 | `layerling_insert_custom_shape` | indsætter en egen form i det åbne design, evt. på en position x/z |
 | `layerling_delete_custom_shape` | fjerner en egen form; indsatte former bevares |
 | `layerling_show_workplane` | skjuler og viser pladen med sit gitter, for et billede af undersiden for eksempel (kun visningen) |
+| `layerling_focus_mode` | slår fokustilstand til og fra: skjuler titellinjen og sidefoden for mere plads (kun editorens ramme) |
 | `layerling_set_section_view` | skærer visningen op langs et plan for at kigge indeni (kun visningen, intet skæres fra hinanden) |
 | `layerling_measurements` | viser eller skjuler målebåndets målinger og viser dem med deres længder, og skjuler eller viser målene omkring markeringen som [[Q]], og skriver en længde for en af dem, som flytter legemet i dens ende som et klik på tallet |
 | `layerling_measure_angle` | måler en vinkel som gradskiven: i hjørnet af tre punkter eller mellem to plane flader, og viser den i visningen |

@@ -1614,7 +1614,10 @@ html[data-theme="dark"]:where([data-palette="graphite"]) .toolbar-title-help .ac
   --group-color: var(--group-combine);
 }
 
-:where(html[data-theme="dark"][data-palette="graphite"]) .toolbar-section[data-group="modify"] {
+:where(html[data-theme="dark"][data-palette="graphite"]) .toolbar-section[data-group="mirrorPattern"],
+:where(html[data-theme="dark"][data-palette="graphite"]) .toolbar-section[data-group="splitShape"],
+:where(html[data-theme="dark"][data-palette="graphite"]) .toolbar-section[data-group="edgesWalls"],
+:where(html[data-theme="dark"][data-palette="graphite"]) .toolbar-section[data-group="surface"] {
   --group-color: var(--group-modify);
 }
 
@@ -1686,15 +1689,6 @@ html[data-theme="dark"]:where([data-palette="graphite"]) .toolbar-title-help .ac
 :where(html[data-theme="dark"][data-palette="graphite"]) .toolbar-section-tools {
   background: color-mix(in srgb, var(--group-color) 7%, var(--toolbar-tile));
   border: 2px solid var(--group-color);
-}
-
-:where(html[data-theme="dark"][data-palette="graphite"]) .toolbar-subgroup + .toolbar-subgroup::before {
-  background: color-mix(in srgb, var(--group-color) 55%, transparent);
-}
-
-:where(html[data-theme="dark"][data-palette="graphite"]) .toolbar-subgroup-label {
-  color: var(--group-color);
-  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.86);
 }
 
 :where(html[data-theme="dark"][data-palette="graphite"]) .toolbar-section[data-collapsed] .toolbar-collapse-trigger::before {
@@ -6822,8 +6816,7 @@ html[data-theme="dark"]:where([data-palette="graphite"]) .toolbar-section {
   border-color: #555555;
 }
 
-html[data-theme="dark"]:where([data-palette="graphite"]) .toolbar-section-label,
-html[data-theme="dark"]:where([data-palette="graphite"]) .toolbar-subgroup-label {
+html[data-theme="dark"]:where([data-palette="graphite"]) .toolbar-section-label {
   color: #c6c6c6;
   text-shadow: 0 1px 1px rgba(0, 0, 0, 0.72);
 }
@@ -8194,6 +8187,437 @@ html[data-theme="dark"]:where([data-palette="graphite"]) .plate-bar-separator {
 
 :where(html[data-theme="dark"][data-palette="graphite"]) .plate-bar-help {
   color: inherit;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .property-card:has(> .property-card-header[aria-controls^="properties-"]) {
+  background: rgba(217, 118, 28, 0.13);
+  box-shadow: inset 0 0 0 1px rgba(217, 118, 28, 0.45);
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .property-card:has(> .property-card-header[aria-controls^="properties-"]) > .property-card-header {
+  color: #9A520F;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .property-card:has(> .property-card-header[aria-controls^="properties-"]) > .property-card-header:hover {
+  filter: brightness(1.2);
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .property-card:has(> .property-card-header[aria-controls^="properties-"]) .range-control input[type="range"]::-webkit-slider-runnable-track {
+  background: linear-gradient(to right, rgb(217, 118, 28) 0 var(--slider-pos), rgba(217, 118, 28, 0.24) var(--slider-pos) 100%);
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .property-card:has(> .property-card-header[aria-controls^="properties-"]) .range-control input[type="range"]::-webkit-slider-thumb {
+  border-color: rgb(217, 118, 28);
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .property-card:has(> .property-card-header[aria-controls^="properties-"]) .range-control input[type="range"]::-moz-range-track {
+  background: rgba(217, 118, 28, 0.24);
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .property-card:has(> .property-card-header[aria-controls^="properties-"]) .range-control input[type="range"]::-moz-range-progress {
+  background: rgb(217, 118, 28);
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .property-card:has(> .property-card-header[aria-controls^="properties-"]) .range-control input[type="range"]::-moz-range-thumb {
+  border-color: rgb(217, 118, 28);
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .property-card:has(> .property-card-header[aria-controls^="properties-"]) .check-property input {
+  accent-color: rgb(217, 118, 28);
+  --sw: rgb(217, 118, 28);
+}
+
+html[data-theme="dark"]:where([data-palette="graphite"]) .property-card:has(> .property-card-header[aria-controls^="properties-"]) {
+  background: rgba(217, 118, 28, 0.17);
+  box-shadow: inset 0 0 0 1px rgba(217, 118, 28, 0.5);
+}
+
+html[data-theme="dark"]:where([data-palette="graphite"]) .property-card:has(> .property-card-header[aria-controls^="properties-"]) > .property-card-header {
+  color: #F2A453;
+}
+
+html[data-theme="dark"]:where([data-palette="graphite"]) .property-card:has(> .property-card-header[aria-controls^="properties-"]) .range-control input[type="range"]::-webkit-slider-runnable-track {
+  background: linear-gradient(to right, rgb(217, 118, 28) 0 var(--slider-pos), rgba(255, 255, 255, 0.16) var(--slider-pos) 100%);
+}
+
+html[data-theme="dark"]:where([data-palette="graphite"]) .property-card:has(> .property-card-header[aria-controls^="properties-"]) .range-control input[type="range"]::-moz-range-track {
+  background: rgba(255, 255, 255, 0.16);
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .property-card:has(> .property-card-header[aria-controls^="position-"]) {
+  background: rgba(70, 130, 200, 0.13);
+  box-shadow: inset 0 0 0 1px rgba(70, 130, 200, 0.45);
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .property-card:has(> .property-card-header[aria-controls^="position-"]) > .property-card-header {
+  color: #245C99;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .property-card:has(> .property-card-header[aria-controls^="position-"]) > .property-card-header:hover {
+  filter: brightness(1.2);
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .property-card:has(> .property-card-header[aria-controls^="position-"]) .range-control input[type="range"]::-webkit-slider-runnable-track {
+  background: linear-gradient(to right, rgb(70, 130, 200) 0 var(--slider-pos), rgba(70, 130, 200, 0.24) var(--slider-pos) 100%);
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .property-card:has(> .property-card-header[aria-controls^="position-"]) .range-control input[type="range"]::-webkit-slider-thumb {
+  border-color: rgb(70, 130, 200);
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .property-card:has(> .property-card-header[aria-controls^="position-"]) .range-control input[type="range"]::-moz-range-track {
+  background: rgba(70, 130, 200, 0.24);
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .property-card:has(> .property-card-header[aria-controls^="position-"]) .range-control input[type="range"]::-moz-range-progress {
+  background: rgb(70, 130, 200);
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .property-card:has(> .property-card-header[aria-controls^="position-"]) .range-control input[type="range"]::-moz-range-thumb {
+  border-color: rgb(70, 130, 200);
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .property-card:has(> .property-card-header[aria-controls^="position-"]) .check-property input {
+  accent-color: rgb(70, 130, 200);
+  --sw: rgb(70, 130, 200);
+}
+
+html[data-theme="dark"]:where([data-palette="graphite"]) .property-card:has(> .property-card-header[aria-controls^="position-"]) {
+  background: rgba(70, 130, 200, 0.17);
+  box-shadow: inset 0 0 0 1px rgba(70, 130, 200, 0.5);
+}
+
+html[data-theme="dark"]:where([data-palette="graphite"]) .property-card:has(> .property-card-header[aria-controls^="position-"]) > .property-card-header {
+  color: #9CC4F2;
+}
+
+html[data-theme="dark"]:where([data-palette="graphite"]) .property-card:has(> .property-card-header[aria-controls^="position-"]) .range-control input[type="range"]::-webkit-slider-runnable-track {
+  background: linear-gradient(to right, rgb(70, 130, 200) 0 var(--slider-pos), rgba(255, 255, 255, 0.16) var(--slider-pos) 100%);
+}
+
+html[data-theme="dark"]:where([data-palette="graphite"]) .property-card:has(> .property-card-header[aria-controls^="position-"]) .range-control input[type="range"]::-moz-range-track {
+  background: rgba(255, 255, 255, 0.16);
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .property-card:has(> .property-card-header[aria-controls^="rotation-"]) {
+  background: rgba(40, 170, 140, 0.13);
+  box-shadow: inset 0 0 0 1px rgba(40, 170, 140, 0.45);
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .property-card:has(> .property-card-header[aria-controls^="rotation-"]) > .property-card-header {
+  color: #17705D;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .property-card:has(> .property-card-header[aria-controls^="rotation-"]) > .property-card-header:hover {
+  filter: brightness(1.2);
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .property-card:has(> .property-card-header[aria-controls^="rotation-"]) .range-control input[type="range"]::-webkit-slider-runnable-track {
+  background: linear-gradient(to right, rgb(40, 170, 140) 0 var(--slider-pos), rgba(40, 170, 140, 0.24) var(--slider-pos) 100%);
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .property-card:has(> .property-card-header[aria-controls^="rotation-"]) .range-control input[type="range"]::-webkit-slider-thumb {
+  border-color: rgb(40, 170, 140);
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .property-card:has(> .property-card-header[aria-controls^="rotation-"]) .range-control input[type="range"]::-moz-range-track {
+  background: rgba(40, 170, 140, 0.24);
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .property-card:has(> .property-card-header[aria-controls^="rotation-"]) .range-control input[type="range"]::-moz-range-progress {
+  background: rgb(40, 170, 140);
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .property-card:has(> .property-card-header[aria-controls^="rotation-"]) .range-control input[type="range"]::-moz-range-thumb {
+  border-color: rgb(40, 170, 140);
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .property-card:has(> .property-card-header[aria-controls^="rotation-"]) .check-property input {
+  accent-color: rgb(40, 170, 140);
+  --sw: rgb(40, 170, 140);
+}
+
+html[data-theme="dark"]:where([data-palette="graphite"]) .property-card:has(> .property-card-header[aria-controls^="rotation-"]) {
+  background: rgba(40, 170, 140, 0.17);
+  box-shadow: inset 0 0 0 1px rgba(40, 170, 140, 0.5);
+}
+
+html[data-theme="dark"]:where([data-palette="graphite"]) .property-card:has(> .property-card-header[aria-controls^="rotation-"]) > .property-card-header {
+  color: #7FDEC6;
+}
+
+html[data-theme="dark"]:where([data-palette="graphite"]) .property-card:has(> .property-card-header[aria-controls^="rotation-"]) .range-control input[type="range"]::-webkit-slider-runnable-track {
+  background: linear-gradient(to right, rgb(40, 170, 140) 0 var(--slider-pos), rgba(255, 255, 255, 0.16) var(--slider-pos) 100%);
+}
+
+html[data-theme="dark"]:where([data-palette="graphite"]) .property-card:has(> .property-card-header[aria-controls^="rotation-"]) .range-control input[type="range"]::-moz-range-track {
+  background: rgba(255, 255, 255, 0.16);
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .property-card:has(> .property-card-header[aria-controls^="taper-"]) {
+  background: rgba(140, 110, 210, 0.13);
+  box-shadow: inset 0 0 0 1px rgba(140, 110, 210, 0.45);
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .property-card:has(> .property-card-header[aria-controls^="taper-"]) > .property-card-header {
+  color: #5B3FA8;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .property-card:has(> .property-card-header[aria-controls^="taper-"]) > .property-card-header:hover {
+  filter: brightness(1.2);
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .property-card:has(> .property-card-header[aria-controls^="taper-"]) .range-control input[type="range"]::-webkit-slider-runnable-track {
+  background: linear-gradient(to right, rgb(140, 110, 210) 0 var(--slider-pos), rgba(140, 110, 210, 0.24) var(--slider-pos) 100%);
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .property-card:has(> .property-card-header[aria-controls^="taper-"]) .range-control input[type="range"]::-webkit-slider-thumb {
+  border-color: rgb(140, 110, 210);
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .property-card:has(> .property-card-header[aria-controls^="taper-"]) .range-control input[type="range"]::-moz-range-track {
+  background: rgba(140, 110, 210, 0.24);
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .property-card:has(> .property-card-header[aria-controls^="taper-"]) .range-control input[type="range"]::-moz-range-progress {
+  background: rgb(140, 110, 210);
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .property-card:has(> .property-card-header[aria-controls^="taper-"]) .range-control input[type="range"]::-moz-range-thumb {
+  border-color: rgb(140, 110, 210);
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .property-card:has(> .property-card-header[aria-controls^="taper-"]) .check-property input {
+  accent-color: rgb(140, 110, 210);
+  --sw: rgb(140, 110, 210);
+}
+
+html[data-theme="dark"]:where([data-palette="graphite"]) .property-card:has(> .property-card-header[aria-controls^="taper-"]) {
+  background: rgba(140, 110, 210, 0.17);
+  box-shadow: inset 0 0 0 1px rgba(140, 110, 210, 0.5);
+}
+
+html[data-theme="dark"]:where([data-palette="graphite"]) .property-card:has(> .property-card-header[aria-controls^="taper-"]) > .property-card-header {
+  color: #C3AFF2;
+}
+
+html[data-theme="dark"]:where([data-palette="graphite"]) .property-card:has(> .property-card-header[aria-controls^="taper-"]) .range-control input[type="range"]::-webkit-slider-runnable-track {
+  background: linear-gradient(to right, rgb(140, 110, 210) 0 var(--slider-pos), rgba(255, 255, 255, 0.16) var(--slider-pos) 100%);
+}
+
+html[data-theme="dark"]:where([data-palette="graphite"]) .property-card:has(> .property-card-header[aria-controls^="taper-"]) .range-control input[type="range"]::-moz-range-track {
+  background: rgba(255, 255, 255, 0.16);
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .property-card:has(> .property-card-header[aria-controls^="twist-"]) {
+  background: rgba(210, 90, 120, 0.13);
+  box-shadow: inset 0 0 0 1px rgba(210, 90, 120, 0.45);
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .property-card:has(> .property-card-header[aria-controls^="twist-"]) > .property-card-header {
+  color: #A02B52;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .property-card:has(> .property-card-header[aria-controls^="twist-"]) > .property-card-header:hover {
+  filter: brightness(1.2);
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .property-card:has(> .property-card-header[aria-controls^="twist-"]) .range-control input[type="range"]::-webkit-slider-runnable-track {
+  background: linear-gradient(to right, rgb(210, 90, 120) 0 var(--slider-pos), rgba(210, 90, 120, 0.24) var(--slider-pos) 100%);
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .property-card:has(> .property-card-header[aria-controls^="twist-"]) .range-control input[type="range"]::-webkit-slider-thumb {
+  border-color: rgb(210, 90, 120);
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .property-card:has(> .property-card-header[aria-controls^="twist-"]) .range-control input[type="range"]::-moz-range-track {
+  background: rgba(210, 90, 120, 0.24);
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .property-card:has(> .property-card-header[aria-controls^="twist-"]) .range-control input[type="range"]::-moz-range-progress {
+  background: rgb(210, 90, 120);
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .property-card:has(> .property-card-header[aria-controls^="twist-"]) .range-control input[type="range"]::-moz-range-thumb {
+  border-color: rgb(210, 90, 120);
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .property-card:has(> .property-card-header[aria-controls^="twist-"]) .check-property input {
+  accent-color: rgb(210, 90, 120);
+  --sw: rgb(210, 90, 120);
+}
+
+html[data-theme="dark"]:where([data-palette="graphite"]) .property-card:has(> .property-card-header[aria-controls^="twist-"]) {
+  background: rgba(210, 90, 120, 0.17);
+  box-shadow: inset 0 0 0 1px rgba(210, 90, 120, 0.5);
+}
+
+html[data-theme="dark"]:where([data-palette="graphite"]) .property-card:has(> .property-card-header[aria-controls^="twist-"]) > .property-card-header {
+  color: #F29DB4;
+}
+
+html[data-theme="dark"]:where([data-palette="graphite"]) .property-card:has(> .property-card-header[aria-controls^="twist-"]) .range-control input[type="range"]::-webkit-slider-runnable-track {
+  background: linear-gradient(to right, rgb(210, 90, 120) 0 var(--slider-pos), rgba(255, 255, 255, 0.16) var(--slider-pos) 100%);
+}
+
+html[data-theme="dark"]:where([data-palette="graphite"]) .property-card:has(> .property-card-header[aria-controls^="twist-"]) .range-control input[type="range"]::-moz-range-track {
+  background: rgba(255, 255, 255, 0.16);
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .property-card:has(> .property-card-header[aria-controls^="slope-"]) {
+  background: rgba(130, 170, 50, 0.13);
+  box-shadow: inset 0 0 0 1px rgba(130, 170, 50, 0.45);
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .property-card:has(> .property-card-header[aria-controls^="slope-"]) > .property-card-header {
+  color: #4F6B12;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .property-card:has(> .property-card-header[aria-controls^="slope-"]) > .property-card-header:hover {
+  filter: brightness(1.2);
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .property-card:has(> .property-card-header[aria-controls^="slope-"]) .range-control input[type="range"]::-webkit-slider-runnable-track {
+  background: linear-gradient(to right, rgb(130, 170, 50) 0 var(--slider-pos), rgba(130, 170, 50, 0.24) var(--slider-pos) 100%);
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .property-card:has(> .property-card-header[aria-controls^="slope-"]) .range-control input[type="range"]::-webkit-slider-thumb {
+  border-color: rgb(130, 170, 50);
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .property-card:has(> .property-card-header[aria-controls^="slope-"]) .range-control input[type="range"]::-moz-range-track {
+  background: rgba(130, 170, 50, 0.24);
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .property-card:has(> .property-card-header[aria-controls^="slope-"]) .range-control input[type="range"]::-moz-range-progress {
+  background: rgb(130, 170, 50);
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .property-card:has(> .property-card-header[aria-controls^="slope-"]) .range-control input[type="range"]::-moz-range-thumb {
+  border-color: rgb(130, 170, 50);
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .property-card:has(> .property-card-header[aria-controls^="slope-"]) .check-property input {
+  accent-color: rgb(130, 170, 50);
+  --sw: rgb(130, 170, 50);
+}
+
+html[data-theme="dark"]:where([data-palette="graphite"]) .property-card:has(> .property-card-header[aria-controls^="slope-"]) {
+  background: rgba(130, 170, 50, 0.17);
+  box-shadow: inset 0 0 0 1px rgba(130, 170, 50, 0.5);
+}
+
+html[data-theme="dark"]:where([data-palette="graphite"]) .property-card:has(> .property-card-header[aria-controls^="slope-"]) > .property-card-header {
+  color: #BFE070;
+}
+
+html[data-theme="dark"]:where([data-palette="graphite"]) .property-card:has(> .property-card-header[aria-controls^="slope-"]) .range-control input[type="range"]::-webkit-slider-runnable-track {
+  background: linear-gradient(to right, rgb(130, 170, 50) 0 var(--slider-pos), rgba(255, 255, 255, 0.16) var(--slider-pos) 100%);
+}
+
+html[data-theme="dark"]:where([data-palette="graphite"]) .property-card:has(> .property-card-header[aria-controls^="slope-"]) .range-control input[type="range"]::-moz-range-track {
+  background: rgba(255, 255, 255, 0.16);
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .property-card:has(> .property-card-header[aria-controls^="narrow-"]) {
+  background: rgba(196, 150, 30, 0.13);
+  box-shadow: inset 0 0 0 1px rgba(196, 150, 30, 0.45);
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .property-card:has(> .property-card-header[aria-controls^="narrow-"]) > .property-card-header {
+  color: #7A5C06;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .property-card:has(> .property-card-header[aria-controls^="narrow-"]) > .property-card-header:hover {
+  filter: brightness(1.2);
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .property-card:has(> .property-card-header[aria-controls^="narrow-"]) .range-control input[type="range"]::-webkit-slider-runnable-track {
+  background: linear-gradient(to right, rgb(196, 150, 30) 0 var(--slider-pos), rgba(196, 150, 30, 0.24) var(--slider-pos) 100%);
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .property-card:has(> .property-card-header[aria-controls^="narrow-"]) .range-control input[type="range"]::-webkit-slider-thumb {
+  border-color: rgb(196, 150, 30);
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .property-card:has(> .property-card-header[aria-controls^="narrow-"]) .range-control input[type="range"]::-moz-range-track {
+  background: rgba(196, 150, 30, 0.24);
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .property-card:has(> .property-card-header[aria-controls^="narrow-"]) .range-control input[type="range"]::-moz-range-progress {
+  background: rgb(196, 150, 30);
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .property-card:has(> .property-card-header[aria-controls^="narrow-"]) .range-control input[type="range"]::-moz-range-thumb {
+  border-color: rgb(196, 150, 30);
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .property-card:has(> .property-card-header[aria-controls^="narrow-"]) .check-property input {
+  accent-color: rgb(196, 150, 30);
+  --sw: rgb(196, 150, 30);
+}
+
+html[data-theme="dark"]:where([data-palette="graphite"]) .property-card:has(> .property-card-header[aria-controls^="narrow-"]) {
+  background: rgba(196, 150, 30, 0.17);
+  box-shadow: inset 0 0 0 1px rgba(196, 150, 30, 0.5);
+}
+
+html[data-theme="dark"]:where([data-palette="graphite"]) .property-card:has(> .property-card-header[aria-controls^="narrow-"]) > .property-card-header {
+  color: #E8C660;
+}
+
+html[data-theme="dark"]:where([data-palette="graphite"]) .property-card:has(> .property-card-header[aria-controls^="narrow-"]) .range-control input[type="range"]::-webkit-slider-runnable-track {
+  background: linear-gradient(to right, rgb(196, 150, 30) 0 var(--slider-pos), rgba(255, 255, 255, 0.16) var(--slider-pos) 100%);
+}
+
+html[data-theme="dark"]:where([data-palette="graphite"]) .property-card:has(> .property-card-header[aria-controls^="narrow-"]) .range-control input[type="range"]::-moz-range-track {
+  background: rgba(255, 255, 255, 0.16);
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .check-property-sub::before {
+  border-left: 2px solid currentColor;
+  border-bottom: 2px solid currentColor;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .property-card .check-property input[type="checkbox"] {
+  border: 1.5px solid #6b6b6b;
+  background: rgba(0, 0, 0, 0.06);
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .property-card .check-property input[type="checkbox"]::after {
+  background: #6b6b6b;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .property-card .check-property input[type="checkbox"]:checked {
+  border-color: var(--sw, #b3711f);
+  background: var(--sw, #b3711f);
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .property-card .check-property input[type="checkbox"]:checked::after {
+  background: #fff;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .property-card .check-property input[type="checkbox"]:focus-visible {
+  outline: 2px solid var(--sw, #b3711f);
+}
+
+html[data-theme="dark"]:where([data-palette="graphite"]) .property-card .check-property input[type="checkbox"] {
+  border-color: #7d7d7d;
+  background: rgba(0, 0, 0, 0.25);
+}
+
+html[data-theme="dark"]:where([data-palette="graphite"]) .property-card .check-property input[type="checkbox"]::after {
+  background: #989898;
+}
+
+html[data-theme="dark"]:where([data-palette="graphite"]) .property-card .check-property input[type="checkbox"]:checked {
+  border-color: var(--sw, #b3711f);
+  background: color-mix(in srgb, var(--sw, #b3711f) 22%, #0a0a0a);
+  box-shadow: 0 0 6px color-mix(in srgb, var(--sw, #b3711f) 50%, transparent);
+}
+
+html[data-theme="dark"]:where([data-palette="graphite"]) .property-card .check-property input[type="checkbox"]:checked::after {
+  background: color-mix(in srgb, var(--sw, #b3711f) 65%, white);
 }
 
 :where(html[data-theme="dark"][data-palette="graphite"]) .dashboard-welcome-hide {

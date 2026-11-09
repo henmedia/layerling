@@ -174,7 +174,7 @@ layerling 里的每个零件都从一个形状开始。用这些形状，你可�
 
 ## 表面纹理
 
-在实体上加凹槽、滚花、蜂窝或凸点，让它更好握或更好看：在形状设置中打开 {{ui:inspector.surfaceTexture}}。顶部 {{ui:editor.group.modify}} 组里的 {{ui:inspector.surfaceTexture}} 按钮作用相同：它为选中的实体打开或关闭这张卡片，卡片打开时按钮保持高亮。
+在实体上加凹槽、滚花、蜂窝或凸点，让它更好握或更好看：在形状设置中打开 {{ui:inspector.surfaceTexture}}。顶部 {{ui:editor.section.surface}} 组里的 {{ui:inspector.surfaceTexture}} 按钮作用相同：它为选中的实体打开或关闭这张卡片，卡片打开时按钮保持高亮。
 
 1. 选择 {{ui:inspector.surfacePattern}}、它的 {{ui:inspector.surfaceSpacing}} 和 {{ui:inspector.surfaceDepth}}。{{ui:inspector.surfaceDirection}} 决定纹理是压进实体还是凸出实体。对于 {{ui:surfaceTexture.bumps}}，{{ui:inspector.surfaceBumpShape}} 可在 {{ui:surfaceTexture.bumpDome}}、{{ui:surfaceTexture.bumpCone}}、{{ui:surfaceTexture.bumpSoft}} 和 {{ui:surfaceTexture.bumpFlat}} 之间选择。在 {{ui:inspector.surfaceBumpGrid}} 下，它们可以 {{ui:surfaceTexture.bumpGridStaggered}}（每隔一行错开半个间距），或排成 {{ui:surfaceTexture.bumpGridStraight}}。
 2. 在 {{ui:inspector.surfaceProjection}} 下，杯子、旋钮或把手等圆形实体选 {{ui:surfaceTexture.cylinder}}。图案绕 {{ui:inspector.surfaceAxis}} 一圈，间距会略作取整，使一圈正好是整数个凹槽或单元：图案闭合，没有接缝。{{ui:surfaceTexture.allRound}} 适合不是圆形的实体，{{ui:surfaceTexture.flatProjection}} 适合从上方看的盖子或平板。保持 {{ui:surfaceTexture.auto}}，Layerling 会替你选择：圆形实体以及像盒子这样直立的棱角实体用 {{ui:surfaceTexture.cylinder}}（图案随外轮廓走，无接缝地绕过棱边，凸起的图案会顺着棱边弯过去），其他棱角实体用 {{ui:surfaceTexture.allRound}}。
@@ -210,7 +210,7 @@ layerling 里的每个零件都从一个形状开始。用这些形状，你可�
 
 ## 多色上色
 
-为了多色打印，{{ui:paint.title}} 直接在设计中给实体的部分表面上色：一个面、一圈圆柱壁、孔的内壁、一个圆斑，或者你圈出的一块区域。它和切片软件里的上色工具类似，但颜色随设计一起保存。选择一个实体，在 {{ui:editor.group.modify}} 组中点击 {{ui:paint.title}}（在 {{ui:inspector.surfaceTexture}} 旁边）。面板会列出设计中用到的颜色，{{ui:paint.customColor}} 可以调出自己的颜色。然后在视图中用三种工具之一上色：
+为了多色打印，{{ui:paint.title}} 直接在设计中给实体的部分表面上色：一个面、一圈圆柱壁、孔的内壁、一个圆斑，或者你圈出的一块区域。它和切片软件里的上色工具类似，但颜色随设计一起保存。选择一个实体，在 {{ui:editor.section.surface}} 组中点击 {{ui:paint.title}}（在 {{ui:inspector.surfaceTexture}} 旁边）。面板会列出设计中用到的颜色，{{ui:paint.customColor}} 可以调出自己的颜色。然后在视图中用三种工具之一上色：
 
 - {{ui:paint.mode.fill}}：点击一下，把面一直填充到它的锐利边缘，就像画图软件里的油漆桶：长方体的顶面、圆柱的侧壁、凹槽的底面或孔的内壁，各点一下即可。{{ui:paint.angle}} 决定边缘要多锐利才会让填充停下；设为 90° 时会越过长方体的棱边。
 - {{ui:paint.mode.circle}}：点击一下，在表面上放一个设定 {{ui:paint.diameter}} 的圆斑，圆心就在点击处，曲面上也可以。它会在实体的锐利边缘停下，也不会透到壁的背面。

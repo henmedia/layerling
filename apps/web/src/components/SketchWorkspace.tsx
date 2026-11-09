@@ -14,7 +14,7 @@ import { SketchLockBadge, SketchRotateHandles, SketchTurnRing } from "@/componen
 import { lockBadgeSpot, rotateHandleSpots } from "@/lib/sketchHandleSpots";
 import { SKETCH_DOUBLE_CLICK_PIXELS, useSketchViewSlide } from "@/lib/useSketchViewSlide";
 import { ToolbarConstructionLineIcon, ToolbarNoteIcon } from "@/components/toolbarIcons";
-import { CAMERA_BAR_PANEL, CameraBarHandle } from "@/components/workplane/CameraBarHandle";
+import { CAMERA_BAR_PANEL, CameraBarHandle, useCameraBarPeek } from "@/components/workplane/CameraBarHandle";
 import { constructionCrossings } from "@/lib/sketchConstruction";
 import { movingSelectionCentre, outlineSideMiddles, selectionSnapTargets, sketchSnapPoints, snappedSelectionTarget } from "@/lib/sketchSnapPoints";
 import { openEndPoints } from "@/lib/sketchPointJoin";
@@ -819,6 +819,14 @@ export function SketchWorkspace({
   const cameraBarMove = useMovablePanel<HTMLDivElement>("layerling.sketch.cameraBarPosition", CAMERA_BAR_PANEL);
   const [cameraBarCollapsed, setCameraBarCollapsed] = useState(false);
   const workspace = useMemo(() => normalizeWorkspaceSettings(initialWorkspace, DEFAULT_WORKPLANE_WORKSPACE), [initialWorkspace]);
+  // The same "Open the view bar on hover" as in the 3D view (Discussion #1552).
+  const cameraBarPeek = useCameraBarPeek({
+    enabled: workspace.viewBarOpensOnHover,
+    collapsed: cameraBarCollapsed,
+    onOpen: () => setCameraBarCollapsed(false),
+    onFold: () => setCameraBarCollapsed(true),
+    keepOpen: () => cameraBarMove.dragging,
+  });
   setLengthUnit(workspace);
   const unitLabel = lengthDisplayUnit(workspace).label;
   const [snap, setSnap] = useState<GridSize>(() => normalizeSnapGrid(initialSnap, DEFAULT_SNAP_GRID));
@@ -2394,8 +2402,9 @@ export function SketchWorkspace({
         style={cameraBarMove.style}
         aria-label={t("sketch.viewControls")}
         data-help-section="cameraBar"
+        {...cameraBarPeek.barProps}
       >
-        <CameraBarHandle move={cameraBarMove} collapsed={cameraBarCollapsed} onToggle={() => setCameraBarCollapsed((folded) => !folded)} />
+        <CameraBarHandle move={cameraBarMove} collapsed={cameraBarCollapsed || cameraBarPeek.peeking} onToggle={() => cameraBarPeek.toggle(() => setCameraBarCollapsed((folded) => !folded))} />
         {cameraBarCollapsed ? null : (<>
         <div className="camera-group">
           <button aria-label={t("sketch.resetView")} aria-keyshortcuts="Home" title={t("camera.shortcut", { label: t("sketch.resetView"), keys: "Home" })} onClick={resetView}><Home size={24} strokeWidth={2.25} /></button>

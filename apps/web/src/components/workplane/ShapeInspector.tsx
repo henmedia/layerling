@@ -5,7 +5,7 @@ import { GuideHelpLink } from "@/components/GuideHelpLink";
 import { SnapGridMenuItems } from "@/components/workplane/SnapGridMenu";
 import { guideChapterForShape, guideSectionForShape } from "@/lib/guideLinks";
 import { useInspectorCard } from "@/lib/inspectorCards";
-import { AlignCenter, ChevronDown, ChevronUp, Cylinder, Eraser, Eye, EyeOff, FolderOpen, Grid3x3, ImageUp, Layers, Link2, Lock, Minus, MousePointerClick, Pencil, Plus, RefreshCw, RotateCcw, Ruler, Shield, ShieldCheck, Split, Tags, Trash2, Unlock, Waves } from "lucide-react";
+import { AlignCenter, Cone, ChevronDown, ChevronUp, Cylinder, Eraser, Eye, EyeOff, FolderOpen, Grid3x3, ImageUp, Layers, Link2, Lock, Minus, Move3d, MousePointerClick, Pencil, Plus, RefreshCw, RotateCcw, Rotate3d, Ruler, Shield, ShieldCheck, Shrink, SlidersHorizontal, Spline, Split, Tags, Trash2, TrendingDown, Unlock, Waves } from "lucide-react";
 import { holdsShapeLock } from "@/lib/shapeLock";
 import { createPortal } from "react-dom";
 import { Fragment, createContext, useCallback, useContext, useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperties, type PointerEvent as ReactPointerEvent, type Dispatch, type ReactNode, type SetStateAction } from "react";
@@ -551,6 +551,8 @@ type TogglePropertyConfig = {
   layout?: "sides";
   /** Its place in that layout, named rather than counted: the row takes the class check-property-{area}. */
   area?: GridfinityWall;
+  /** A switch that belongs to the slider just above it: drawn a little in, with a small connecting line. */
+  sub?: boolean;
   onChange: (value: boolean) => void;
 };
 
@@ -1184,6 +1186,7 @@ function getShapePropertiesWithAppLimits(shape: WorkplaneShape, onUpdate: ShapeI
       {
         type: "toggle",
         id: "cornerSeparate",
+        sub: true,
         label: t("prop.cornerSeparate"),
         value: Boolean(ownCorners),
         disabled: !flatEnds,
@@ -1193,6 +1196,7 @@ function getShapePropertiesWithAppLimits(shape: WorkplaneShape, onUpdate: ShapeI
       {
         type: "toggle" as const,
         id: "endsSeparate",
+        sub: true,
         label: t("prop.endsSeparate"),
         value: endsSeparate,
         // On, the bottom starts as the top was, so nothing changes shape; off, both take the top's radius again.
@@ -2290,11 +2294,11 @@ function getShapePropertiesWithAppLimits(shape: WorkplaneShape, onUpdate: ShapeI
       { id: "loftOffsetZ", label: t("prop.loftOffsetZ"), value: m.offsetZ, min: -150, max: 150, step: 0.5, onChange: (value) => change({ offsetZ: value }) },
       { id: "loftWall", label: t("prop.loftWall"), value: m.wall, min: 0, max: Math.max(0.1, maxLoftWall(m)), step: 0.1, onChange: (value) => change({ wall: value }) },
       ...turns,
+      ...tilts,
       // How finely a circle or a rounded corner is drawn in the view and in the exports (#755); a polygon has its own sides.
       ...(rounded
         ? [{ id: "loftSegments", label: t("prop.loftSegments"), value: m.segments, min: MIN_LOFT_SEGMENTS, max: MAX_LOFT_SEGMENTS, step: 1, hint: t("loft.segmentsHint"), onChange: (value: number) => change({ segments: value }) }]
         : []),
-      ...tilts,
     ];
   }
 
@@ -4461,6 +4465,9 @@ export function ShapeInspector({
   // A text's fill (#215): the list and the line width in view, the rest under "More" right below them.
   const textFillMore = shape.kind === "text" ? properties.filter((property) => TEXT_FILL_MORE_IDS.has(property.id)) : [];
   const textFillEnd = primaryProperties.reduce((end, property, index) => (TEXT_FILL_IN_VIEW_IDS.has(property.id) ? index + 1 : end), 0);
+  // Keep proportions goes right under the last size slider it governs, not above the whole list.
+  const showKeepProportions = Boolean(onProportionLockChange) && primaryProperties.some((property) => property.id === "height") && primaryProperties.some((property) => ["width", "length", "diameter", "outerDiameter"].includes(property.id));
+  const keepProportionsAfter = primaryProperties.reduce((last, property, index) => (["height", "width", "length", "diameter", "outerDiameter"].includes(property.id) ? index : last), -1) + 1;
   const threadProperties = isThread
     ? properties.filter((property) => ["pitch", "threadsPerInch", "threadStarts", "threadHand", "threadProfile", "threadTaper", "threadFlankAngle", "threadDepth", "threadCoreDiameter", "clearance", "axialClearance", "boltClearance", "chamfer", "chamferBottom", "quality"].includes(property.id))
     : [];
@@ -4478,13 +4485,6 @@ export function ShapeInspector({
   const taperPartner = (changed: number, before: number, partner: number) =>
     taperKeepsProportions ? Math.min(taperDimensionMax, Math.max(MIN_SHAPE_SIZE, partner * (changed / Math.max(MIN_SHAPE_SIZE, before)))) : partner;
   const taperProperties: ShapePropertyConfig[] = shapeIgnoresTaper ? [] : [
-    {
-      type: "toggle",
-      id: "taperKeepProportions",
-      label: t("inspector.keepProportions"),
-      value: taperKeepsProportions,
-      onChange: (keep) => onUpdate({ taperKeepProportions: keep || undefined }),
-    },
     {
       id: "topLength",
       label: t("prop.topLength"),
@@ -4516,6 +4516,13 @@ export function ShapeInspector({
       min: MIN_SHAPE_SIZE,
       max: taperDimensionMax,
       onChange: (taperBottomWidth) => onUpdate({ taperBottomWidth, taperBottomDepth: taperPartner(taperBottomWidth, taper.bottomWidth, taper.bottomDepth), taperBottomScale: undefined }),
+    },
+    {
+      type: "toggle",
+      id: "taperKeepProportions",
+      label: t("inspector.keepProportions"),
+      value: taperKeepsProportions,
+      onChange: (keep) => onUpdate({ taperKeepProportions: keep || undefined }),
     },
   ];
   /*
@@ -4577,15 +4584,6 @@ export function ShapeInspector({
       onChange: (value) => onUpdate({ slopeSide: normalizeSlopeSide(shape.kind, value), slopeEnd: shape.slopeEnd ?? shape.height }),
     },
     {
-      type: "select",
-      id: "slopeFrom",
-      label: t("prop.slopeFrom"),
-      value: slopeFrom,
-      hint: slopeFrom === "arch" ? t("slope.fromArchHint") : t("slope.fromHint"),
-      options: [{ value: "end", label: t("slope.from.end") }, { value: "middle", label: t("slope.from.middle") }, { value: "arch", label: t("slope.from.arch") }],
-      onChange: (value) => onUpdate({ slopeFrom: normalizeSlopeFrom(value), slopeEnd: shape.slopeEnd ?? shape.height, slopeSide: shape.slopeSide ?? slopeSide }),
-    },
-    {
       id: "slopeEnd",
       label: t("prop.slopeEnd"),
       value: slopeEndValue,
@@ -4616,6 +4614,15 @@ export function ShapeInspector({
       step: 1,
       hint: t("slope.curveHint"),
       onChange: (percent) => onUpdate({ slopeCurve: normalizeSlopeCurve(percent / 100), slopeEnd: shape.slopeEnd ?? shape.height, slopeSide: shape.slopeSide ?? slopeSide }),
+    },
+    {
+      type: "select",
+      id: "slopeFrom",
+      label: t("prop.slopeFrom"),
+      value: slopeFrom,
+      hint: slopeFrom === "arch" ? t("slope.fromArchHint") : t("slope.fromHint"),
+      options: [{ value: "end", label: t("slope.from.end") }, { value: "middle", label: t("slope.from.middle") }, { value: "arch", label: t("slope.from.arch") }],
+      onChange: (value) => onUpdate({ slopeFrom: normalizeSlopeFrom(value), slopeEnd: shape.slopeEnd ?? shape.height, slopeSide: shape.slopeSide ?? slopeSide }),
     },
     {
       id: "sideDrop",
@@ -5174,7 +5181,7 @@ export function ShapeInspector({
           aria-controls={`properties-${shape.id}`}
           onClick={() => setPropertiesOpen((open) => !open)}
         >
-          <span>{t("inspector.properties")}</span>
+          <span className="property-card-title"><SlidersHorizontal size={20} strokeWidth={2.4} aria-hidden="true" />{t("inspector.properties")}</span>
           <ChevronUp className={propertiesOpen ? "" : "collapsed"} size={25} strokeWidth={2.8} />
         </button>
         {propertiesOpen ? (
@@ -5270,14 +5277,6 @@ export function ShapeInspector({
                 onChange={threadDriveProperty.onChange}
               />
             ) : null}
-            {onProportionLockChange && primaryProperties.some((property) => property.id === "height") && primaryProperties.some((property) => ["width", "length", "diameter", "outerDiameter"].includes(property.id)) ? (
-              <ToggleProperty
-                label={t("inspector.keepProportions")}
-                value={proportionLock}
-                disabled={frozen}
-                onChange={onProportionLockChange}
-              />
-            ) : null}
             {textFillMore.length ? (
               <>
                 <ShapePropertyRows formulas={shape.formulas} onFormula={noteFormula} properties={primaryProperties.slice(0, textFillEnd)} defaults={propertyDefaults?.main} workspace={workspace} disabled={frozen} onInteractionActiveChange={onInteractionActiveChange} />
@@ -5292,8 +5291,21 @@ export function ShapeInspector({
                 <ShapePropertyRows formulas={shape.formulas} onFormula={noteFormula} properties={primaryProperties.slice(textFillEnd)} defaults={propertyDefaults?.main} workspace={workspace} disabled={frozen} onInteractionActiveChange={onInteractionActiveChange} />
               </>
             ) : (
-              <ShapePropertyRows formulas={shape.formulas} onFormula={noteFormula} properties={primaryProperties} defaults={propertyDefaults?.main} workspace={workspace} disabled={frozen} onInteractionActiveChange={onInteractionActiveChange} />
+              <>
+                <ShapePropertyRows formulas={shape.formulas} onFormula={noteFormula} properties={showKeepProportions ? primaryProperties.slice(0, keepProportionsAfter) : primaryProperties} defaults={propertyDefaults?.main} workspace={workspace} disabled={frozen} onInteractionActiveChange={onInteractionActiveChange} />
+                {showKeepProportions ? (
+                  <>
+                    <ToggleProperty label={t("inspector.keepProportions")} value={proportionLock} disabled={frozen} onChange={onProportionLockChange!} />
+                    {keepProportionsAfter < primaryProperties.length ? (
+                      <ShapePropertyRows formulas={shape.formulas} onFormula={noteFormula} properties={primaryProperties.slice(keepProportionsAfter)} defaults={propertyDefaults?.main} workspace={workspace} disabled={frozen} onInteractionActiveChange={onInteractionActiveChange} />
+                    ) : null}
+                  </>
+                ) : null}
+              </>
             )}
+            {textFillMore.length && showKeepProportions ? (
+              <ToggleProperty label={t("inspector.keepProportions")} value={proportionLock} disabled={frozen} onChange={onProportionLockChange!} />
+            ) : null}
             {tiltedMeasures && primaryProperties.some((property) => ["width", "length", "height"].includes(property.id)) ? (
               <p className="cylinder-wrap-hint">{t("prop.tiltedMeasures")}</p>
             ) : null}
@@ -5332,7 +5344,7 @@ export function ShapeInspector({
           aria-controls={`position-${shape.id}`}
           onClick={() => setPositionOpen((open) => !open)}
         >
-          <span>{t("inspector.position")}</span>
+          <span className="property-card-title"><Move3d size={20} strokeWidth={2.4} aria-hidden="true" />{t("inspector.position")}</span>
           <ChevronUp className={positionOpen ? "" : "collapsed"} size={25} strokeWidth={2.8} />
         </button>
         {positionOpen ? (
@@ -5369,7 +5381,7 @@ export function ShapeInspector({
           aria-controls={`rotation-${shape.id}`}
           onClick={() => setRotationOpen((open) => !open)}
         >
-          <span>{t("inspector.rotation")}</span>
+          <span className="property-card-title"><Rotate3d size={20} strokeWidth={2.4} aria-hidden="true" />{t("inspector.rotation")}</span>
           <ChevronUp className={rotationOpen ? "" : "collapsed"} size={25} strokeWidth={2.8} />
         </button>
         {rotationOpen ? (
@@ -5397,7 +5409,7 @@ export function ShapeInspector({
             aria-controls={`taper-${shape.id}`}
             onClick={() => setTaperOpen((open) => !open)}
           >
-            <span>{t("inspector.taper")}</span>
+            <span className="property-card-title"><Cone size={20} strokeWidth={2.4} aria-hidden="true" />{t("inspector.taper")}</span>
             <ChevronUp className={taperOpen ? "" : "collapsed"} size={25} strokeWidth={2.8} />
           </button>
           {taperOpen ? (
@@ -5416,7 +5428,7 @@ export function ShapeInspector({
             aria-controls={`twist-${shape.id}`}
             onClick={() => setTwistOpen((open) => !open)}
           >
-            <span>{t("inspector.twist")}</span>
+            <span className="property-card-title"><Spline size={20} strokeWidth={2.4} aria-hidden="true" />{t("inspector.twist")}</span>
             <ChevronUp className={twistOpen ? "" : "collapsed"} size={25} strokeWidth={2.8} />
           </button>
           {twistOpen ? (
@@ -5435,7 +5447,7 @@ export function ShapeInspector({
             aria-controls={`slope-${shape.id}`}
             onClick={() => setSlopeOpen((open) => !open)}
           >
-            <span>{t("inspector.slope")}</span>
+            <span className="property-card-title"><TrendingDown size={20} strokeWidth={2.4} aria-hidden="true" />{t("inspector.slope")}</span>
             <ChevronUp className={slopeOpen ? "" : "collapsed"} size={25} strokeWidth={2.8} />
           </button>
           {slopeOpen ? (
@@ -5454,7 +5466,7 @@ export function ShapeInspector({
             aria-controls={`narrow-${shape.id}`}
             onClick={() => setNarrowOpen((open) => !open)}
           >
-            <span>{t("inspector.narrow")}</span>
+            <span className="property-card-title"><Shrink size={20} strokeWidth={2.4} aria-hidden="true" />{t("inspector.narrow")}</span>
             <ChevronUp className={narrowOpen ? "" : "collapsed"} size={25} strokeWidth={2.8} />
           </button>
           {narrowOpen ? (
@@ -7189,6 +7201,17 @@ export function SurfaceTextureCard({
                   onChange={(value) => set({ projection: value as SurfaceTextureSettings["projection"] })}
                 />
               )}
+              {/* A board's pith runs along its longest side: only a log asks for its axis. */}
+              {!grain && !(wood && settings.woodCut !== "log") && (cracks || placedHere || wood || settings.projection !== "allRound") ? (
+                <SelectProperty
+                  type="select"
+                  label={t("inspector.surfaceAxis")}
+                  value={settings.axis}
+                  options={options(SURFACE_TEXTURE_AXES, (value) => value.toUpperCase())}
+                  disabled={disabled || busy}
+                  onChange={(value) => set({ axis: value as SurfaceTextureSettings["axis"] })}
+                />
+              ) : null}
               {/* The pattern as a part of its own, in a colour of its own: a bundle of the body and the pattern. */}
               <ToggleProperty
                 label={t("inspector.surfacePatternPart")}
@@ -7210,17 +7233,6 @@ export function SurfaceTextureCard({
                     {t(patternWay === "outward" ? "inspector.surfacePatternRaisedHint" : patternWay === "inward" ? "inspector.surfacePatternCutHint" : "inspector.surfacePatternWayHint")}
                   </p>
                 </>
-              ) : null}
-              {/* A board's pith runs along its longest side: only a log asks for its axis. */}
-              {!grain && !(wood && settings.woodCut !== "log") && (cracks || placedHere || wood || settings.projection !== "allRound") ? (
-                <SelectProperty
-                  type="select"
-                  label={t("inspector.surfaceAxis")}
-                  value={settings.axis}
-                  options={options(SURFACE_TEXTURE_AXES, (value) => value.toUpperCase())}
-                  disabled={disabled || busy}
-                  onChange={(value) => set({ axis: value as SurfaceTextureSettings["axis"] })}
-                />
               ) : null}
               {/* Where it goes: every face, or only the faces clicked in the view (a text goes where it is put). An image
                   once goes onto the picked faces too, its middle on them where Around and Height aim past them (#1206, #1462). */}
@@ -8415,10 +8427,10 @@ function ColorProperty({ label, value, hint, disabled, onChange, onReset, onInte
   );
 }
 
-function ToggleProperty({ label, value, area, disabled, onChange, onReset }: Omit<TogglePropertyConfig, "id" | "type"> & { disabled?: boolean; onReset?: () => void }) {
+function ToggleProperty({ label, value, area, sub, disabled, onChange, onReset }: Omit<TogglePropertyConfig, "id" | "type"> & { disabled?: boolean; onReset?: () => void }) {
   return (
-    <label className={area ? `check-property check-property-${area}` : "check-property"}>
-      <input type="checkbox" checked={value} disabled={disabled} onChange={(event) => onChange(event.currentTarget.checked)} />
+    <label className={`${area ? `check-property check-property-${area}` : "check-property"}${sub ? " check-property-sub" : ""}`}>
+      <input type="checkbox" role="switch" checked={value} disabled={disabled} onChange={(event) => onChange(event.currentTarget.checked)} />
       <span>{label}{onReset ? <PropertyResetButton onClick={onReset} /> : null}</span>
     </label>
   );

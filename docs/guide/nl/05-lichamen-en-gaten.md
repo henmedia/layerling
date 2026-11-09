@@ -94,7 +94,7 @@ Let op: afrondingen en afschuiningen die je op de **hele** groep had gezet, gaan
 
 ## Splitsen
 
-{{ui:editor.tool.split}} in het gebied {{ui:editor.group.modify}} snijdt de selectie met een vlak in tweeën, bijvoorbeeld een onderdeel dat te groot is voor het printbed, of een waarvan je de binnenkant wilt zien. Selecteer een of meer lichamen of gaten en klik erop. Een doorschijnend vlak laat precies zien waar de snede komt; er verandert niets tot je het toepast.
+{{ui:editor.tool.split}} in het gebied {{ui:editor.section.splitShape}} snijdt de selectie met een vlak in tweeën, bijvoorbeeld een onderdeel dat te groot is voor het printbed, of een waarvan je de binnenkant wilt zien. Selecteer een of meer lichamen of gaten en klik erop. Een doorschijnend vlak laat precies zien waar de snede komt; er verandert niets tot je het toepast.
 
 - {{ui:split.orientation}}: **X** maakt een staande snede tussen links en rechts, **Y** tussen voor en achter, **Z** een liggende snede tussen boven en onder. De assen heten zoals op de kaart Positie, met Z omhoog; Z is waar het vlak begint.
 - {{ui:split.workplane}}: {{ui:split.workplaneParallel}} legt het vlak evenwijdig aan het werkvlak, {{ui:split.workplaneAcrossX}} en {{ui:split.workplaneAcrossY}} zetten het er haaks op, dwars op de X- of Y-richting. Snijdt de oorsprong van het werkvlak de selectie, dan gaat het vlak erdoor, anders door het midden. Zo zet je het werkvlak met [[W]] op een schuin vlak en snijd je precies daar, zonder aan de draairegelaars te draaien.

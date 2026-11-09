@@ -94,7 +94,7 @@ Egy megjegyzés: az **egész** csoportra tett lekerekítések és élletörések
 
 ## Kettévágás
 
-A {{ui:editor.group.modify}} területen lévő {{ui:editor.tool.split}} egy síkkal kettévágja a kijelölést – mondjuk egy alkatrészt, amely túl nagy a tárgyasztalhoz, vagy amelynek a belsejét látni szeretnéd. Jelölj ki egy vagy több tömör testet vagy lyukat, és kattints rá. Egy áttetsző sík pontosan mutatja, hová kerül a vágás; semmi sem változik, amíg nem alkalmazod.
+A {{ui:editor.section.splitShape}} területen lévő {{ui:editor.tool.split}} egy síkkal kettévágja a kijelölést – mondjuk egy alkatrészt, amely túl nagy a tárgyasztalhoz, vagy amelynek a belsejét látni szeretnéd. Jelölj ki egy vagy több tömör testet vagy lyukat, és kattints rá. Egy áttetsző sík pontosan mutatja, hová kerül a vágás; semmi sem változik, amíg nem alkalmazod.
 
 - {{ui:split.orientation}}: az **X** függőleges vágást ad bal és jobb között, az **Y** elöl és hátul között, a **Z** vízszintes vágást felül és alul között. A tengelyek ugyanúgy vannak elnevezve, mint a Helyzet kártyán, a Z felfelé mutat; a sík a Z-n indul.
 - {{ui:split.workplane}}: a {{ui:split.workplaneParallel}} a munkasíkkal párhuzamosan fekteti a síkot, a {{ui:split.workplaneAcrossX}} és a {{ui:split.workplaneAcrossY}} merőlegesen állítja rá, keresztben az X vagy Y irányára. Ha a munkasík origója átmegy a kijelölésen, a sík rajta halad át, különben a közepén. Így a [[W]] billentyűvel egy ferde lapra teszed a munkasíkot, és pontosan ott vágsz, a forgatócsúszkák állítása nélkül.

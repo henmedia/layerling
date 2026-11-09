@@ -163,6 +163,7 @@ L’IA usa le stesse funzioni che hai a disposizione, attraverso lo stesso perco
 | `layerling_insert_custom_shape` | Inserisce una forma personalizzata nel progetto aperto, anche in una posizione x/z specifica. |
 | `layerling_delete_custom_shape` | Elimina una forma personalizzata; i corpi già inseriti restano nel progetto. |
 | `layerling_show_workplane` | Nasconde o mostra il piano con la griglia, per esempio per fotografare la parte inferiore (modifica solo la vista). |
+| `layerling_focus_mode` | attiva e disattiva la modalità concentrazione: nasconde la riga del titolo e il piè di pagina per avere più spazio (solo la cornice dell’editor) |
 | `layerling_set_section_view` | Apre la vista lungo un piano di sezione per mostrare l’interno; non taglia realmente il pezzo (modifica solo la vista). |
 | `layerling_measurements` | mostra o nasconde le misurazioni del metro a nastro e le elenca con le loro lunghezze, e nasconde o mostra le misure attorno alla selezione come [[Q]], e digita una lunghezza per una di esse, che sposta il corpo alla sua estremità come un clic sul numero |
 | `layerling_measure_angle` | misura un angolo come il goniometro: al vertice di tre punti o tra due facce piane, e lo mostra nella vista |
