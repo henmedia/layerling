@@ -816,6 +816,7 @@ export const MESSAGES_ZH_CN: Partial<Record<MessageKey, string>> = {
   "lid.error.needsBody": "请先选择要为其做盖子的实体。",
   "lid.error.notClosed": "实体不是封闭的，无法为它做盖子。请先封闭或修复它。",
   "lid.error.notOpen": "实体顶部没有开口。请先把它挖空并让顶部开口，或者做一个平盖。",
+  "lid.error.rimNotLevel": "边沿是倾斜的。盖子需要水平的边沿。若要盖子顺着斜面，请用“封闭（内腔）”挖空实体，再用“分割”在盖子应分开的位置沿倾斜平面切开。",
   "lid.error.tooSmall": "开口太小，这个间隙下放不下唇边。请减小间隙或改用平盖。",
   "lid.error.tooShallow": "唇边或扣沿伸入的深度超过了实体的高度。请把它做短一些。",
   "lid.error.empty": "盖子会是空的。",

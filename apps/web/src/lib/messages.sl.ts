@@ -729,6 +729,7 @@ export const MESSAGES_SL: Partial<Record<MessageKey, string>> = {
   "lid.error.needsBody": "Najprej izberi telo, za katerega naj bo pokrov.",
   "lid.error.notClosed": "Telo ni zaprto, zato zanj ni mogoče narediti pokrova. Najprej ga zapri ali popravi.",
   "lid.error.notOpen": "Telo zgoraj nima odprtine. Najprej ga izdolbi z odprto zgornjo stranjo ali naredi raven pokrov.",
+  "lid.error.rimNotLevel": "Rob je poševen. Pokrov potrebuje vodoraven rob. Za pokrov, ki sledi naklonu, izdolbi telo kot „Zaprto (votlina znotraj)“ in uporabi „Razdeli“ z nagnjeno ravnino tam, kjer naj se pokrov loči.",
   "lid.error.tooSmall": "Odprtina je premajhna za ustnico s to režo. Vzemi manjšo režo ali raven pokrov.",
   "lid.error.tooShallow": "Ustnica ali rob seže globlje, kot je telo visoko. Skrajšaj ju.",
   "lid.error.empty": "Pokrov bi bil prazen.",

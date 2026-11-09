@@ -850,6 +850,7 @@ export const MESSAGES_FR: Partial<Record<MessageKey, string>> = {
   "lid.error.needsBody": "Sélectionne d'abord le corps pour lequel créer un couvercle.",
   "lid.error.notClosed": "Le corps n'est pas fermé, aucun couvercle ne peut être créé. Ferme-le ou répare-le d'abord.",
   "lid.error.notOpen": "Le corps n'a pas d'ouverture en haut. Évide-le d'abord avec le dessus ouvert, ou crée un couvercle plat.",
+  "lid.error.rimNotLevel": "Le bord est en pente. Un couvercle a besoin d'un bord horizontal. Pour un couvercle qui suit la pente, évide le corps en « Fermé (cavité intérieure) » puis utilise « Diviser » avec un plan incliné là où le couvercle doit se détacher.",
   "lid.error.tooSmall": "L'ouverture est trop petite pour une lèvre avec ce jeu. Prends un jeu plus petit ou un couvercle plat.",
   "lid.error.tooShallow": "La lèvre ou le rebord descend plus bas que la hauteur du corps. Raccourcis-le.",
   "lid.error.empty": "Le couvercle serait vide.",
