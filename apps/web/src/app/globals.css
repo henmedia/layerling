@@ -9635,6 +9635,9 @@ html[data-theme="dark"] .rotation-angle-badge {
   width: 320px;
   max-height: none;
   overflow-y: auto;
+  /* The snap dock sticks to the bottom and covers the last ~55px of the view; the browser counts a field behind it
+     as visible and does not scroll to it on Tab. This keeps a focused field above the dock (Issue #1547). */
+  scroll-padding-bottom: 64px;
   /* A thin bar that shows: on a laptop's touchpad the panel is easier to scroll by its bar. */
   scrollbar-color: #cdbfa9 transparent;
   scrollbar-width: thin;
