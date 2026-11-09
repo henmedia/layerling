@@ -1,6 +1,18 @@
 [
   {
     "title": {
+      "de": "Übergang: Wandstärke oben",
+      "en": "Transition: wall at the top",
+      "da": "Overgang: vægtykkelse foroven"
+    },
+    "body": {
+      "de": "Ein Übergang mit Wand hat unter Eigenschaften jetzt auch „Wandstärke oben“: eine Düse, unten am Rechteck 3 mm dick, die oben am Rund mit 1 mm endet. Dazwischen ändert sich die Wand gleichmäßig; ohne eigenen Wert ist sie oben so dick wie unten.",
+      "en": "A transition with a wall now also has Wall Thickness at the Top under Properties: a nozzle 3 mm thick on the rectangle at the bottom that ends 1 mm thin on the round top. In between the wall changes evenly; without a value of its own the top is as thick as the bottom.",
+      "da": "En overgang med væg har nu også Vægtykkelse foroven under Egenskaber: en dyse, 3 mm tyk ved rektanglet forneden, som ender 1 mm tynd ved den runde top. Imellem ændrer væggen sig jævnt; uden egen værdi er toppen lige så tyk som bunden."
+    }
+  },
+  {
+    "title": {
       "de": "Löcher durchsichtiger einstellen",
       "en": "Set how see-through holes are",
       "da": "Indstil, hvor gennemsigtige huller er"
