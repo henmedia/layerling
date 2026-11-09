@@ -111,7 +111,7 @@ Sådan laves borehuller, slidser og lommer. Kapitlet [Solider og huller](chapter
 
 ## Nyt siden dit seneste besøg
 
-Når du åbner layerling igen efter en opdatering, viser et kort på startsiden hvad der er tilføjet siden du var her sidst: hver version siden da, den nyeste først. Efter et langt fravær scroller du ned i kortet. Nedenunder tilføjer {{ui:whatsNew.earlier}} også versionerne fra før dit seneste besøg. Luk det med {{ui:whatsNew.dismiss}} og det forbliver væk indtil næste opdatering. {{ui:whatsNew.footerLink}} i sidefoden på startsiden viser de seneste tilføjelser igen til enhver tid. Browseren husker den seneste version du så, og intet om dig forlader den.
+Når du åbner layerling igen efter en opdatering, viser et kort på startsiden hvad der er tilføjet siden du var her sidst: hver version siden da, den nyeste først. Efter et langt fravær scroller du ned i kortet. Nedenunder tilføjer {{ui:whatsNew.earlier}} også versionerne fra før dit seneste besøg. Luk det med {{ui:whatsNew.dismiss}} og det forbliver væk indtil næste opdatering. {{ui:whatsNew.footerLink}} i sidefoden på startsiden viser de seneste tilføjelser igen til enhver tid. I editoren åbner knappen {{ui:whatsNew.footerLink}} ved siden af {{ui:editor.guide}} øverst til højre den samme liste, og det gør kommandosøgningen også; den bliver åben ved siden af dit design, mens du prøver det nye. Browseren husker den seneste version du så, og intet om dig forlader den.
 
 På en kopi af layerling på din egen computer eller server har meddelelsen "Opdatering tilgængelig" en knap, {{ui:update.previewShow}}, der viser hvad opdateringen bringer før du installerer den. Listen hentes fra GitHub først når du trykker på knappen.
 

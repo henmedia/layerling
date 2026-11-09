@@ -110,7 +110,7 @@ Tak powstają otwory, rowki i kieszenie. Szczegółowo wyjaśnia to rozdział [B
 
 ## Nowości od ostatniej wizyty
 
-Gdy po aktualizacji znów otworzysz layerling, karta na stronie startowej pokaże, co dodano od Twojej ostatniej wizyty: każdą wersję od tamtego czasu, od najnowszej. Po długiej przerwie przewiniesz listę wewnątrz karty. Pod nimi {{ui:whatsNew.earlier}} dokłada też wersje sprzed Twojej ostatniej wizyty. Zamknij kartę przyciskiem {{ui:whatsNew.dismiss}}, a nie pojawi się do następnej aktualizacji. {{ui:whatsNew.footerLink}} w stopce strony startowej w każdej chwili znów pokaże najnowsze zmiany. Przeglądarka zapamiętuje ostatnią wersję, którą widziałeś, i nic o Tobie jej nie opuszcza.
+Gdy po aktualizacji znów otworzysz layerling, karta na stronie startowej pokaże, co dodano od Twojej ostatniej wizyty: każdą wersję od tamtego czasu, od najnowszej. Po długiej przerwie przewiniesz listę wewnątrz karty. Pod nimi {{ui:whatsNew.earlier}} dokłada też wersje sprzed Twojej ostatniej wizyty. Zamknij kartę przyciskiem {{ui:whatsNew.dismiss}}, a nie pojawi się do następnej aktualizacji. {{ui:whatsNew.footerLink}} w stopce strony startowej w każdej chwili znów pokaże najnowsze zmiany. W edytorze tę samą listę otwiera przycisk {{ui:whatsNew.footerLink}} obok {{ui:editor.guide}} w prawym górnym rogu albo wyszukiwarka poleceń; zostaje otwarta obok projektu, gdy wypróbowujesz nowości. Przeglądarka zapamiętuje ostatnią wersję, którą widziałeś, i nic o Tobie jej nie opuszcza.
 
 W kopii layerling na Twoim własnym komputerze lub serwerze komunikat „Dostępna aktualizacja” ma przycisk {{ui:update.previewShow}}, który przed instalacją pokazuje, co aktualizacja przynosi. Lista jest pobierana z GitHuba dopiero po naciśnięciu przycisku.
 

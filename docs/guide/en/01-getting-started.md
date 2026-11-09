@@ -110,7 +110,7 @@ This is how bores, slots and pockets are made. The chapter [Solids and holes](ch
 
 ## New since your last visit
 
-When you open layerling again after an update, a card on the start page lists what has been added since you were last here: every version since then, the newest first. After a long absence you scroll down inside the card. Below them, {{ui:whatsNew.earlier}} adds the versions from before your last visit too. Close it with {{ui:whatsNew.dismiss}} and it stays away until the next update. {{ui:whatsNew.footerLink}} in the footer of the start page shows the latest additions again at any time. The browser remembers the last version you saw, and nothing about you leaves it.
+When you open layerling again after an update, a card on the start page lists what has been added since you were last here: every version since then, the newest first. After a long absence you scroll down inside the card. Below them, {{ui:whatsNew.earlier}} adds the versions from before your last visit too. Close it with {{ui:whatsNew.dismiss}} and it stays away until the next update. {{ui:whatsNew.footerLink}} in the footer of the start page shows the latest additions again at any time. In the editor, the {{ui:whatsNew.footerLink}} button next to {{ui:editor.guide}} at the top right, or the command search, opens the same list; it stays open beside your design while you try out what is new. The browser remembers the last version you saw, and nothing about you leaves it.
 
 On a copy of layerling on your own computer or server, the notice "Update available" has a button, {{ui:update.previewShow}}, that lists what the update brings before you install it. The list is fetched from GitHub only when you press the button.
 

@@ -1,6 +1,18 @@
 [
   {
     "title": {
+      "de": "Was ist neu? auch im Editor",
+      "en": "What's new, also in the editor",
+      "da": "Hvad er nyt? også i editoren"
+    },
+    "body": {
+      "de": "Der Knopf mit den Funkeln neben der Kurzanleitung oben rechts (oder die Befehlssuche) öffnet diese Liste auch im Editor. Sie bleibt neben dem Entwurf offen, während du das Neue ausprobierst.",
+      "en": "The button with the sparkles beside the quick guide at the top right (or the command search) opens this list in the editor too. It stays open beside the design while you try out what is new.",
+      "da": "Knappen med gnisterne ved siden af hurtigguiden øverst til højre (eller kommandosøgningen) åbner også denne liste i editoren. Den bliver åben ved siden af designet, mens du prøver det nye."
+    }
+  },
+  {
+    "title": {
       "de": "Klarere Hinweise bei großen und offenen Netzen",
       "en": "Clearer hints for dense and open meshes",
       "da": "Tydeligere hints ved tætte og åbne mesh"

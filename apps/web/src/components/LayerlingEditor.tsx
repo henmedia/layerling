@@ -124,6 +124,7 @@ import { GuideModal } from "./workplane/GuideModal";
 import { HistoryViewOverlay, historyStateNameSuffix } from "./workplane/HistoryViewOverlay";
 import { useHistoryViewPicking } from "./workplane/useHistoryViewPicking";
 import { ShortcutsModal } from "./workplane/ShortcutsModal";
+import { WhatsNewWindow } from "./workplane/WhatsNewWindow";
 import { InteractiveHelp } from "./InteractiveHelp";
 import { ShapeContextMenu, type ShapeContextMenuItem } from "./workplane/ShapeContextMenu";
 import { nextSelectionTransparency } from "@/lib/selectionTransparency";
@@ -3203,6 +3204,8 @@ export function LayerlingEditor({
   const [iconTagPanelOpen, setIconTagPanelOpen] = useState(false);
   const [qrCodePanelOpen, setQrCodePanelOpen] = useState(false);
   const [shortcutsOpen, setShortcutsOpen] = useState(false);
+  // The list of updates over the design (#1530), so it can be read while a new tool is tried.
+  const [whatsNewOpen, setWhatsNewOpen] = useState(false);
   // Interactive Help: while on, a click asks the guide about the element instead of using it.
   const [interactiveHelp, setInteractiveHelp] = useState(false);
   const toggleInteractiveHelp = useCallback(() => {
@@ -18540,6 +18543,7 @@ export function LayerlingEditor({
         onUngroup={ungroupSelected}
         onUndo={undo}
         onShortcuts={() => setShortcutsOpen(true)}
+        onWhatsNew={() => setWhatsNewOpen(true)}
         onInteractiveHelp={toggleInteractiveHelp}
         interactiveHelpActive={interactiveHelp}
         onGuide={() => setGuideOpen(true)}
@@ -19608,6 +19612,7 @@ export function LayerlingEditor({
       {shortcutsOpen ? (
         <ShortcutsModal sketchMode={toolbarMode === "sketch"} onClose={() => setShortcutsOpen(false)} />
       ) : null}
+      {whatsNewOpen ? <WhatsNewWindow onClose={() => setWhatsNewOpen(false)} /> : null}
       {interactiveHelp ? <InteractiveHelp onExit={toggleInteractiveHelp} /> : null}
       {viewedAttachment ? <AttachmentViewer attachment={viewedAttachment} onClose={() => setViewedAttachmentId(null)} /> : null}
       {guideOpen ? <GuideModal sharedStore={sharedProjectsEnabled} sketchMode={toolbarMode === "sketch"} onClose={() => setGuideOpen(false)} /> : null}

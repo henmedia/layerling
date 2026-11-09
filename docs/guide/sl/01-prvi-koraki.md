@@ -110,7 +110,7 @@ Natanko tako nastanejo izvrtine, utori in žepi. Poglavje [Telesa in luknje](cha
 
 ## Novo od tvojega zadnjega obiska
 
-Ko po posodobitvi spet odpreš layerling, ti kartica na začetni strani pokaže, kaj je prišlo zraven od tvojega zadnjega obiska: vsako različico od takrat, najnovejšo na vrhu. Če te dolgo ni bilo, se v kartici pomakni navzdol. Pod njo {{ui:whatsNew.earlier}} doda tudi različice izpred tvojega zadnjega obiska. Z {{ui:whatsNew.dismiss}} jo zapreš in ostane skrita do naslednje posodobitve. {{ui:whatsNew.footerLink}} v nogi začetne strani vedno znova pokaže zadnje novosti. Brskalnik si zapomni nazadnje videno različico in nič o tebi ne zapusti brskalnika.
+Ko po posodobitvi spet odpreš layerling, ti kartica na začetni strani pokaže, kaj je prišlo zraven od tvojega zadnjega obiska: vsako različico od takrat, najnovejšo na vrhu. Če te dolgo ni bilo, se v kartici pomakni navzdol. Pod njo {{ui:whatsNew.earlier}} doda tudi različice izpred tvojega zadnjega obiska. Z {{ui:whatsNew.dismiss}} jo zapreš in ostane skrita do naslednje posodobitve. {{ui:whatsNew.footerLink}} v nogi začetne strani vedno znova pokaže zadnje novosti. V urejevalniku isti seznam odpre gumb {{ui:whatsNew.footerLink}} poleg {{ui:editor.guide}} zgoraj desno ali iskanje ukazov; ostane odprt ob tvojem modelu, medtem ko preizkušaš novosti. Brskalnik si zapomni nazadnje videno različico in nič o tebi ne zapusti brskalnika.
 
 Pri kopiji programa layerling na tvojem računalniku ali strežniku ima obvestilo »Na voljo je posodobitev« gumb {{ui:update.previewShow}}, ki našteje, kaj posodobitev prinaša, preden jo namestiš. Seznam se z GitHuba prenese šele, ko pritisneš gumb.
 

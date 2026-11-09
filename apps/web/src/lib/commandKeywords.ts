@@ -65,6 +65,7 @@ export const COMMAND_KEYWORDS: Readonly<Record<string, readonly string[]>> = {
   "look-onto-workplane": ["look at", "normal to", "perpendicular", "square", "top view", "plan view", "face on", "camera", "senkrecht", "draufsicht", "kamera", "ansicht", "arbeitsebene"],
   "interactive-help": ["help", "interactive", "what is this", "explain", "question mark", "hilfe", "interaktiv", "was ist das", "erklaeren", "erklären", "fragezeichen"],
   guide: ["guide", "help", "manual", "tutorial", "anleitung", "hilfe", "kurzanleitung"],
+  "whats-new": ["what's new", "whats new", "news", "updates", "update", "changes", "changelog", "release notes", "new features", "was ist neu", "neuerungen", "neu", "aenderungen", "änderungen", "neue funktionen"],
   shortcuts: ["shortcuts", "keys", "keyboard", "tastenkuerzel", "tastenkürzel", "tastatur", "hotkeys", "own keys", "custom keys", "eigene tasten", "taste festlegen"],
   "shapes-panel": ["shapes", "add shape", "basic shapes", "shape library", "panel", "formen", "form hinzufügen", "grundformen", "formenauswahl", "bibliothek"],
   "mode-geometry": ["3d", "editor", "geometry", "bodies", "koerper", "körper"],
