@@ -142,6 +142,8 @@ Více těles zachová vzájemné rozmístění a každé lze vybírat samostatn�
 
 Vlastní tvary jsou v tomto prohlížeči odděleně od projektů a zůstanou i po dalším spuštění. {{ui:dashboard.backupAll}} zálohuje obojí a otevření zálohy obnoví obojí. Pro přenos samotných tvarů použijte {{ui:myShapes.backup}}, šipku dolů, která vytvoří ZIP, a {{ui:myShapes.load}}, šipku nahoru. Načíst lze i jednotlivé `.lyl`; každý se stane vlastním tvarem. Shodné existující tvary se nepřidávají znovu.
 
+Vyhledávání v knihovně tvarů najde i vaše vlastní tvary podle názvu, také ty ve složkách; zobrazí se nad nálezy knihovny. Tlačítko se šipkou a písmeny A až Z vedle tlačítka složek seřadí vlastní tvary podle názvu místo podle dne uložení; druhé kliknutí vrátí původní pořadí a prohlížeč si volbu pamatuje.
+
 ### Složky
 
 Mnoho vlastních tvarů se lépe třídí do složek. {{ui:myShapes.newFolder}} (složka s plusem vedle {{ui:myShapes.saveSelection}}) se zeptá na název a vytvoří složku nahoře; složka s plusem u složky, {{ui:myShapes.newSubfolder}}, vytvoří složku uvnitř ní. Složky mají nejvýše tři úrovně: složka na třetí úrovni pojme tvary, ale už žádné další složky. Složky stojí nad tvary, které nejsou v žádné, seřazené podle názvu, a otevírají a zavírají se šipkou; číslo u složky počítá tvary v ní i ve složkách pod ní. Při ukládání zvolte složku v seznamu vedle názvu; s {{ui:myShapes.noFolder}} zůstane tvar nahoře.

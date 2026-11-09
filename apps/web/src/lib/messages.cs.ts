@@ -2962,6 +2962,8 @@ export const MESSAGES_CS: Record<MessageKey, string> = {
   "myShapes.backupHint": "Zálohovat vlastní tvary z tohoto prohlížeče do jednoho ZIP pro jiný prohlížeč či počítač",
   "myShapes.load": "Načíst tvary",
   "myShapes.loadHint": "Načíst tvary do tohoto prohlížeče ze záložního ZIP nebo projektů .lyl",
+  "myShapes.sortByName": "Seřadit vlastní tvary podle názvu od A do Z",
+  "myShapes.sortBySaved": "Seřadit vlastní tvary podle dne uložení",
   "myShapes.onServer": "Na serveru",
   "myShapes.inBrowser": "V tomto prohlížeči",
   "myShapes.locationLabel": "Umístění",

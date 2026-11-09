@@ -2879,6 +2879,8 @@ export const MESSAGES_RU: Partial<Record<MessageKey, string>> = {
   "myShapes.backupHint": "Сохраняет собственные фигуры из этого браузера — все в одном ZIP-файле — для другого браузера или компьютера",
   "myShapes.load": "Загрузить фигуры",
   "myShapes.loadHint": "Загружает фигуры в этот браузер: из ZIP-архива резервной копии или из проектов .lyl",
+  "myShapes.sortByName": "Сортировать собственные фигуры по названию, от А до Я",
+  "myShapes.sortBySaved": "Сортировать собственные фигуры по дню сохранения",
   "myShapes.onServer": "На сервере",
   "myShapes.inBrowser": "В этом браузере",
   "myShapes.locationLabel": "Хранить",

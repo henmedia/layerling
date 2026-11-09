@@ -146,6 +146,8 @@ Several bodies come back together, placed as they stood to each other, and stay 
 
 The {{ui:myShapes.title}} live in this browser, apart from the designs, and are there again the next time you start. {{ui:dashboard.backupAll}} on the start page backs them up with the designs, and opening the backup brings both back. To take only the shapes to another browser, {{ui:myShapes.backup}} (the arrow pointing down) saves them as a ZIP file and {{ui:myShapes.load}} (the arrow pointing up) brings them back there. {{ui:myShapes.load}} also takes single `.lyl` designs; each one becomes a shape. Shapes already there are not added twice.
 
+Typing in the search of the shape library finds your custom shapes by their name too, also those inside folders; they show above the library's own matches. The button with the arrow and the letters A to Z, beside the folder button, puts the custom shapes in order by name instead of by the day they were saved; a second click brings the old order back, and the browser remembers the choice.
+
 ### Folders
 
 Many custom shapes sort better into folders. {{ui:myShapes.newFolder}} (the folder with the plus, next to {{ui:myShapes.saveSelection}}) asks for a name and makes a folder at the top; the folder with the plus on a folder, {{ui:myShapes.newSubfolder}}, makes one inside it. Folders go three levels deep: a folder on the third level holds shapes but no further folders. Folders sit above the shapes that are in none, in the order of their names, and open and close with their arrow; the number on a folder counts the shapes in it and in the folders inside it. When saving, choose the folder in the list next to the name; {{ui:myShapes.noFolder}} keeps the shape at the top.

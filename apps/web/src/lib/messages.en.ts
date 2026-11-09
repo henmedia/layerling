@@ -2886,6 +2886,8 @@ export const MESSAGES_EN = {
   "myShapes.backupHint": "Back up the custom shapes in this browser: all in one ZIP file, for another browser or computer",
   "myShapes.load": "Load shapes",
   "myShapes.loadHint": "Load shapes into this browser: from a backup ZIP or from .lyl designs",
+  "myShapes.sortByName": "Sort the custom shapes by name, A to Z",
+  "myShapes.sortBySaved": "Sort the custom shapes by the day they were saved",
   "myShapes.onServer": "On the server",
   "myShapes.inBrowser": "In this browser",
   "myShapes.locationLabel": "Keep it",

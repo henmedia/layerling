@@ -147,6 +147,8 @@ Mehrere Körper kommen zusammen wieder heraus, so wie sie zueinander standen, un
 
 Die {{ui:myShapes.title}} liegen in diesem Browser, getrennt von den Entwürfen, und sind beim nächsten Start sofort wieder da. {{ui:dashboard.backupAll}} auf der Startseite sichert sie mit den Entwürfen, und beim Öffnen der Sicherung kommen beide zurück. Nur die Formen sicherst du mit {{ui:myShapes.backup}} (der Pfeil nach unten) als ZIP-Datei und holst sie mit {{ui:myShapes.load}} (der Pfeil nach oben) in einen anderen Browser. {{ui:myShapes.load}} nimmt auch einzelne `.lyl`-Entwürfe, jeder wird dann zu einer Form. Was schon da ist, wird nicht doppelt angelegt.
 
+Die Suche in der Formenbibliothek findet auch deine eigenen Formen nach ihrem Namen, ebenso die in Ordnern; sie erscheinen über den Treffern der Bibliothek. Der Knopf mit dem Pfeil und den Buchstaben A bis Z neben dem Ordnerknopf ordnet die eigenen Formen nach Namen statt nach dem Tag des Speicherns; ein zweiter Klick bringt die alte Reihenfolge zurück, und der Browser merkt sich die Wahl.
+
 ### Ordner
 
 Viele eigene Formen lassen sich in Ordnern sortieren. {{ui:myShapes.newFolder}} (der Ordner mit dem Plus, neben {{ui:myShapes.saveSelection}}) fragt nach einem Namen und legt einen Ordner oben an; der Ordner mit dem Plus an einem Ordner, {{ui:myShapes.newSubfolder}}, legt einen darin an. Ordner gehen drei Ebenen tief: Ein Ordner auf der dritten Ebene nimmt Formen auf, aber keine weiteren Ordner. Ordner stehen über den Formen, die in keinem liegen, nach Namen geordnet, und klappen mit ihrem Pfeil auf und zu; die Zahl an einem Ordner zählt die Formen darin und in den Ordnern darunter. Beim Speichern wählst du den Ordner in der Liste neben dem Namen; mit {{ui:myShapes.noFolder}} bleibt die Form oben.

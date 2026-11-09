@@ -150,6 +150,8 @@ Flere former kommer tilbage sammen, placeret som de stod i forhold til hinanden,
 
 {{ui:myShapes.title}} lever i denne browser, adskilt fra designsene, og er der igen næste gang du starter. {{ui:dashboard.backupAll}} på startsiden sikkerhedskopierer dem med designsene, og åbning af sikkerhedskopien bringer begge tilbage. For kun at tage formerne til en anden browser, {{ui:myShapes.backup}} (pil ned) gemmer dem som en ZIP-fil og {{ui:myShapes.load}} (pil op) bringer dem tilbage der. {{ui:myShapes.load}} tager også enkelte `.lyl`-designs; hver bliver til en form. Former der allerede er der, tilføjes ikke to gange.
 
+Søgningen i formbiblioteket finder også dine egne former på deres navn, også dem i mapper; de står over bibliotekets egne træffere. Knappen med pilen og bogstaverne A til Å ved siden af mappeknappen sorterer de egne former efter navn i stedet for efter den dag, de blev gemt; endnu et klik bringer den gamle rækkefølge tilbage, og browseren husker valget.
+
 ### Mapper
 
 Mange egne former sorteres bedre i mapper. {{ui:myShapes.newFolder}} (mappen med plus ved siden af {{ui:myShapes.saveSelection}}) beder om et navn og laver en mappe øverst; mappen med plus på en mappe, {{ui:myShapes.newSubfolder}}, laver en mappe inden i den. Mapper går tre niveauer ned: En mappe på tredje niveau rummer former, men ikke flere mapper. Mapper står over de former, der ikke ligger i nogen mappe, sorteret efter navn, og foldes ud og sammen med deres pil; tallet ved en mappe tæller formerne i den og i mapperne under den. Når du gemmer, vælger du mappen i listen ved siden af navnet; med {{ui:myShapes.noFolder}} bliver formen øverst.

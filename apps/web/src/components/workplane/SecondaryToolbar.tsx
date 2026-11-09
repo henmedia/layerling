@@ -385,6 +385,7 @@ export function SecondaryToolbar({
   overhangAngle,
   onToggleOverhangs,
   renderMyShapes,
+  countMyShapeMatches,
   shapeCustomizations,
   objects,
   onSelectObject,
@@ -583,7 +584,9 @@ export function SecondaryToolbar({
   overhangAngle: number;
   onToggleOverhangs: () => void;
   /** Custom shapes above the library; gets the way to close the menu. */
-  renderMyShapes?: (close: () => void) => ReactNode;
+  renderMyShapes?: (close: () => void, query?: string) => ReactNode;
+  /** How many custom shapes match a search in the shapes window (#1537). */
+  countMyShapeMatches?: (query: string) => number;
   /** The shape defaults, so each library entry can show the colour it will be added in. */
   shapeCustomizations: WorkplaneWorkspaceSettings["shapeCustomizations"];
   /** The bodies of the design, so the command search can find them by name. */
@@ -1403,7 +1406,8 @@ export function SecondaryToolbar({
                   shapes={shownShapeAssets}
                   label={(shape) => shapeAssetMenuLabel(shape).replace(/\s+/g, " ")}
                   renderTile={shapeTile}
-                  customShapes={renderMyShapes ? renderMyShapes(closeShapesAfterPick) : null}
+                  customShapes={renderMyShapes ? (query: string) => renderMyShapes(closeShapesAfterPick, query) : null}
+                  countCustomMatches={countMyShapeMatches}
                 />
               )}
               </div>

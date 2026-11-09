@@ -2886,6 +2886,8 @@ export const MESSAGES_NL: Record<MessageKey, string> = {
   "myShapes.backupHint": "Maak een back-up van de eigen vormen in deze browser: alles in één ZIP-bestand, voor een andere browser of computer",
   "myShapes.load": "Vormen laden",
   "myShapes.loadHint": "Laad vormen in deze browser: uit een back-up-ZIP of uit .lyl-ontwerpen",
+  "myShapes.sortByName": "Eigen vormen op naam sorteren, van A tot Z",
+  "myShapes.sortBySaved": "Eigen vormen sorteren op de dag waarop ze zijn opgeslagen",
   "myShapes.onServer": "Op de server",
   "myShapes.inBrowser": "In deze browser",
   "myShapes.locationLabel": "Bewaren",

@@ -142,6 +142,8 @@ Meerdere lichamen komen samen terug, geplaatst zoals ze ten opzichte van elkaar 
 
 De {{ui:myShapes.title}} staan in deze browser, los van de ontwerpen, en zijn er bij de volgende start weer. {{ui:dashboard.backupAll}} op de startpagina maakt er samen met de ontwerpen een back-up van, en het openen van de back-up brengt beide terug. Om alleen de vormen naar een andere browser mee te nemen, bewaart {{ui:myShapes.backup}} (het pijltje naar beneden) ze als ZIP-bestand en brengt {{ui:myShapes.load}} (het pijltje naar boven) ze daar terug. {{ui:myShapes.load}} neemt ook losse `.lyl`-ontwerpen aan; elk ervan wordt een vorm. Vormen die er al zijn, worden niet dubbel toegevoegd.
 
+Het zoeken in de vormenbibliotheek vindt ook je eigen vormen op naam, ook die in mappen; ze staan boven de treffers van de bibliotheek. De knop met de pijl en de letters A tot Z, naast de mapknop, sorteert de eigen vormen op naam in plaats van op de dag waarop ze zijn opgeslagen; een tweede klik brengt de oude volgorde terug en de browser onthoudt de keuze.
+
 ### Mappen
 
 Veel eigen vormen zijn beter te ordenen in mappen. {{ui:myShapes.newFolder}} (de map met het plusteken, naast {{ui:myShapes.saveSelection}}) vraagt om een naam en maakt een map bovenaan; de map met het plusteken op een map, {{ui:myShapes.newSubfolder}}, maakt er een in die map. Mappen gaan drie niveaus diep: een map op het derde niveau bevat vormen, maar geen verdere mappen. Mappen staan boven de vormen die in geen map zitten, op naam gesorteerd, en klappen open en dicht met hun pijltje; het getal bij een map telt de vormen erin en in de mappen daaronder. Kies bij het opslaan de map in de lijst naast de naam; met {{ui:myShapes.noFolder}} blijft de vorm bovenaan.

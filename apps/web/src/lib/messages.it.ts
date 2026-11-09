@@ -2872,6 +2872,8 @@ export const MESSAGES_IT: Partial<Record<MessageKey, string>> = {
   "myShapes.backupHint": "Crea un backup delle forme personalizzate presenti in questo browser, tutte in un unico file ZIP, da usare in un altro browser o computer",
   "myShapes.load": "Carica forme",
   "myShapes.loadHint": "Carica forme in questo browser da un backup ZIP o da progetti .lyl",
+  "myShapes.sortByName": "Ordina le forme personalizzate per nome, dalla A alla Z",
+  "myShapes.sortBySaved": "Ordina le forme personalizzate per giorno di salvataggio",
   "myShapes.onServer": "Sul server",
   "myShapes.inBrowser": "In questo browser",
   "myShapes.locationLabel": "Conserva in",

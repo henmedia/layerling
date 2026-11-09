@@ -3315,6 +3315,8 @@ export const MESSAGES_DA: Partial<Record<MessageKey, string>> = {
   "myShapes.backupHint": "Sikkerhedskopiér de egne former i denne browser: alle i én ZIP-fil, til en anden browser eller computer",
   "myShapes.load": "Indlæs former",
   "myShapes.loadHint": "Indlæs former i denne browser: fra en sikkerhedskopi-ZIP eller fra .lyl-designs",
+  "myShapes.sortByName": "Sortér de egne former efter navn, A til Å",
+  "myShapes.sortBySaved": "Sortér de egne former efter den dag, de blev gemt",
   "myShapes.onServer": "På serveren",
   "myShapes.inBrowser": "I denne browser",
   "myShapes.locationLabel": "Behold den",

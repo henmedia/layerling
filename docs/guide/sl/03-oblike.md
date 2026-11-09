@@ -137,6 +137,8 @@ Več teles pride ven skupaj, tako kot so stala drugo glede na drugo, in ostanejo
 
 {{ui:myShapes.title}} so v tem brskalniku, ločeno od načrtov, in so ob naslednjem zagonu takoj spet tam. {{ui:dashboard.backupAll}} na začetni strani jih shrani skupaj z načrti, ob odpiranju varnostne kopije se vrnejo oboje. Samo oblike shraniš z {{ui:myShapes.backup}} (puščica navzdol) kot datoteko ZIP in jih z {{ui:myShapes.load}} (puščica navzgor) prineseš v drug brskalnik. {{ui:myShapes.load}} sprejme tudi posamezne načrte `.lyl`, vsak potem postane oblika. Kar je že tam, se ne ustvari dvakrat.
 
+Iskanje v knjižnici oblik najde tudi vaše lastne oblike po imenu, tudi tiste v mapah; prikažejo se nad zadetki knjižnice. Gumb s puščico in črkami od A do Ž ob gumbu za mape uredi lastne oblike po imenu namesto po dnevu shranjevanja; drugi klik vrne prejšnji vrstni red, brskalnik pa si izbiro zapomni.
+
 ### Mape
 
 Veliko oblik po meri je laže razvrstiti v mape. {{ui:myShapes.newFolder}} (mapa s plusom poleg {{ui:myShapes.saveSelection}}) vpraša za ime in ustvari mapo na vrhu; mapa s plusom pri mapi, {{ui:myShapes.newSubfolder}}, ustvari mapo v njej. Mape segajo tri ravni globoko: mapa na tretji ravni sprejme oblike, ne pa novih map. Mape stojijo nad oblikami, ki niso v nobeni mapi, urejene po imenu, in se odpirajo in zapirajo s puščico; število pri mapi šteje oblike v njej in v mapah pod njo. Pri shranjevanju izberi mapo na seznamu poleg imena; z {{ui:myShapes.noFolder}} oblika ostane na vrhu.

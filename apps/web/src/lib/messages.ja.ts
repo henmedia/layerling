@@ -2268,6 +2268,8 @@ export const MESSAGES_JA: Partial<Record<MessageKey, string>> = {
   "myShapes.backupHint": "このブラウザーのカスタムシェイプを1つのZIPファイルにまとめてバックアップし、別のブラウザーやコンピューターで使えるようにします",
   "myShapes.load": "シェイプを読み込む",
   "myShapes.loadHint": "バックアップのZIPまたは.lylデザインから、このブラウザーにシェイプを読み込みます",
+  "myShapes.sortByName": "カスタムシェイプを名前順（A〜Z）に並べる",
+  "myShapes.sortBySaved": "カスタムシェイプを保存した日の順に並べる",
   "myShapes.onServer": "サーバー上",
   "myShapes.inBrowser": "このブラウザー内",
   "myShapes.locationLabel": "保管場所",

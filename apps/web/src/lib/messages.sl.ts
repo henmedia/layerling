@@ -2223,6 +2223,8 @@ export const MESSAGES_SL: Partial<Record<MessageKey, string>> = {
   "myShapes.backupHint": "Varnostno kopiraj oblike po meri v tem programu: vse v eni datoteki ZIP, za drug računalnik",
   "myShapes.load": "Naloži oblike",
   "myShapes.loadHint": "Naloži oblike v ta program: iz varnostne kopije ZIP ali iz projektov .lyl",
+  "myShapes.sortByName": "Razvrsti lastne oblike po imenu, od A do Ž",
+  "myShapes.sortBySaved": "Razvrsti lastne oblike po dnevu shranjevanja",
   "myShapes.onServer": "Na strežniku",
   "myShapes.inBrowser": "V tem programu",
   "myShapes.locationLabel": "Shrani",

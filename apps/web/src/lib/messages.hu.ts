@@ -1940,6 +1940,8 @@ export const MESSAGES_HU: Partial<Record<MessageKey, string>> = {
   "myShapes.backupHint": "Az ebben a böngészőben lévő saját alakzatok biztonsági mentése: mind egy ZIP-fájlba, másik böngészőhöz vagy számítógéphez",
   "myShapes.load": "Alakzatok betöltése",
   "myShapes.loadHint": "Alakzatok betöltése ebbe a böngészőbe: biztonsági mentés ZIP-fájlból vagy .lyl tervekből",
+  "myShapes.sortByName": "Saját alakzatok rendezése név szerint, A-tól Z-ig",
+  "myShapes.sortBySaved": "Saját alakzatok rendezése a mentés napja szerint",
   "myShapes.onServer": "A szerveren",
   "myShapes.inBrowser": "Ebben a böngészőben",
   "myShapes.locationLabel": "Hová kerüljön",

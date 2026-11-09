@@ -136,6 +136,8 @@ Több test együtt tér vissza, úgy elhelyezve, ahogy egymáshoz képest állta
 
 A {{ui:myShapes.title}} ebben a böngészőben élnek, a tervektől külön, és a következő indításkor is megvannak. A kezdőlapon a {{ui:dashboard.backupAll}} a tervekkel együtt menti őket, a mentés megnyitása pedig mindkettőt visszahozza. Ha csak az alakzatokat vinnéd át egy másik böngészőbe, a {{ui:myShapes.backup}} (a lefelé mutató nyíl) ZIP-fájlba menti őket, az {{ui:myShapes.load}} (a felfelé mutató nyíl) pedig ott visszahozza őket. Az {{ui:myShapes.load}} egyes `.lyl` terveket is elfogad; mindegyikből egy alakzat lesz. A már meglévő alakzatok nem kerülnek be kétszer.
 
+Az alakzattár keresője a saját alakzatokat is megtalálja a nevük alapján, a mappákban lévőket is; a tár saját találatai fölött jelennek meg. A mappagomb melletti, nyilat és A–Z betűket mutató gomb a saját alakzatokat név szerint rendezi a mentés napja helyett; a második kattintás visszaadja a régi sorrendet, a böngésző pedig megjegyzi a választást.
+
 ### Mappák
 
 Sok saját alakzatot könnyebb mappákba rendezni. Az {{ui:myShapes.newFolder}} (a pluszos mappa a {{ui:myShapes.saveSelection}} mellett) nevet kér, és mappát hoz létre legfelül; egy mappa pluszos mappa gombja, az {{ui:myShapes.newSubfolder}}, abban hoz létre egyet. A mappák három szint mélyek lehetnek: a harmadik szinten lévő mappa alakzatokat tárol, de további mappákat nem. A mappák azok fölött az alakzatok fölött állnak, amelyek egyik mappában sincsenek, név szerint rendezve, és a nyilukkal nyithatók és csukhatók; a mappa melletti szám a benne és az alatta lévő mappákban lévő alakzatokat számolja. Mentéskor a név melletti listában választod ki a mappát; a {{ui:myShapes.noFolder}} lehetőséggel az alakzat legfelül marad.

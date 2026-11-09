@@ -1913,6 +1913,8 @@ export const MESSAGES_TR: Partial<Record<MessageKey, string>> = {
   "myShapes.backupHint": "Bu tarayıcıdaki özel şekilleri yedekle: hepsi tek bir ZIP dosyasında, başka bir tarayıcı veya bilgisayar için",
   "myShapes.load": "Şekilleri yükle",
   "myShapes.loadHint": "Şekilleri bu tarayıcıya yükle: bir yedek ZIP'ten veya .lyl tasarımlarından",
+  "myShapes.sortByName": "Özel şekilleri ada göre sırala, A'dan Z'ye",
+  "myShapes.sortBySaved": "Özel şekilleri kaydedildikleri güne göre sırala",
   "myShapes.onServer": "Sunucuda",
   "myShapes.inBrowser": "Bu tarayıcıda",
   "myShapes.locationLabel": "Nerede tutulsun",

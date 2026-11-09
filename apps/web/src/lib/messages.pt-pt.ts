@@ -2828,6 +2828,8 @@ export const MESSAGES_PT_PT: Partial<Record<MessageKey, string>> = {
   "myShapes.backupHint": "Guarda uma cópia de segurança das formas personalizadas deste navegador num único ficheiro ZIP, para usar noutro navegador ou computador",
   "myShapes.load": "Carregar formas",
   "myShapes.loadHint": "Carrega formas neste navegador a partir de um ZIP de cópia de segurança ou de projetos .lyl",
+  "myShapes.sortByName": "Ordenar as formas personalizadas por nome, de A a Z",
+  "myShapes.sortBySaved": "Ordenar as formas personalizadas pelo dia em que foram guardadas",
   "myShapes.onServer": "No servidor",
   "myShapes.inBrowser": "Neste navegador",
   "myShapes.locationLabel": "Guardar em",

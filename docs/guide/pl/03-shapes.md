@@ -146,6 +146,8 @@ Kilka brył wraca razem, ustawionych względem siebie tak jak wcześniej, i każ
 
 {{ui:myShapes.title}} mieszkają w tej przeglądarce, osobno od projektów, i są dostępne przy następnym uruchomieniu. {{ui:dashboard.backupAll}} na stronie startowej zapisuje je w kopii zapasowej razem z projektami, a otwarcie kopii przywraca jedno i drugie. Aby przenieść do innej przeglądarki tylko kształty, {{ui:myShapes.backup}} (strzałka w dół) zapisuje je jako plik ZIP, a {{ui:myShapes.load}} (strzałka w górę) przywraca je tam. {{ui:myShapes.load}} przyjmuje też pojedyncze projekty `.lyl`, z których każdy staje się kształtem. Kształty, które już są, nie są dodawane drugi raz.
 
+Wyszukiwanie w bibliotece kształtów znajduje także Twoje własne kształty według nazwy, również te w folderach; pojawiają się nad wynikami biblioteki. Przycisk ze strzałką i literami od A do Z, obok przycisku folderu, układa własne kształty według nazwy zamiast według dnia zapisania; drugie kliknięcie przywraca dawną kolejność, a przeglądarka zapamiętuje wybór.
+
 ### Foldery
 
 Wiele własnych kształtów łatwiej uporządkować w folderach. {{ui:myShapes.newFolder}} (folder z plusem obok {{ui:myShapes.saveSelection}}) pyta o nazwę i tworzy folder na górze; folder z plusem przy folderze, {{ui:myShapes.newSubfolder}}, tworzy folder w jego wnętrzu. Foldery sięgają trzech poziomów: folder na trzecim poziomie mieści kształty, ale już nie kolejne foldery. Foldery stoją nad kształtami, które nie leżą w żadnym folderze, w kolejności nazw, i rozwijają się i zwijają strzałką; liczba przy folderze liczy kształty w nim i w folderach poniżej. Przy zapisie wybierz folder z listy obok nazwy; z {{ui:myShapes.noFolder}} kształt zostaje na górze.

@@ -2893,6 +2893,8 @@ export const MESSAGES_AR: Partial<Record<MessageKey, string>> = {
   "myShapes.backupHint": "نسخ احتياطي للأشكال المخصصة في هذا المتصفح: كلها في ملف ZIP واحد، لمتصفح أو كمبيوتر آخر",
   "myShapes.load": "تحميل الأشكال",
   "myShapes.loadHint": "تحميل الأشكال إلى هذا المتصفح: من ملف ZIP احتياطي أو من تصاميم .lyl",
+  "myShapes.sortByName": "ترتيب الأشكال المخصصة حسب الاسم، من أ إلى ي",
+  "myShapes.sortBySaved": "ترتيب الأشكال المخصصة حسب يوم الحفظ",
   "myShapes.onServer": "على الخادم",
   "myShapes.inBrowser": "في هذا المتصفح",
   "myShapes.locationLabel": "مكان الحفظ",

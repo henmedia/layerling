@@ -2850,6 +2850,8 @@ export const MESSAGES_PL: Partial<Record<MessageKey, string>> = {
   "myShapes.backupHint": "Zrób kopię zapasową własnych kształtów z tej przeglądarki: wszystkie w jednym pliku ZIP, dla innej przeglądarki lub komputera",
   "myShapes.load": "Wczytaj kształty",
   "myShapes.loadHint": "Wczytaj kształty do tej przeglądarki: z kopii zapasowej ZIP albo z projektów .lyl",
+  "myShapes.sortByName": "Sortuj własne kształty według nazwy, od A do Z",
+  "myShapes.sortBySaved": "Sortuj własne kształty według dnia zapisania",
   "myShapes.onServer": "Na serwerze",
   "myShapes.inBrowser": "W tej przeglądarce",
   "myShapes.locationLabel": "Przechowuj",

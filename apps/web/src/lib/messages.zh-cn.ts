@@ -2836,6 +2836,8 @@ export const MESSAGES_ZH_CN: Partial<Record<MessageKey, string>> = {
   "myShapes.backupHint": "备份此浏览器中的自定义形状：全部存入一个 ZIP 文件，供其他浏览器或电脑使用",
   "myShapes.load": "载入形状",
   "myShapes.loadHint": "将形状载入此浏览器：从备份 ZIP 或 .lyl 设计载入",
+  "myShapes.sortByName": "按名称排列自定义形状，A 到 Z",
+  "myShapes.sortBySaved": "按保存日期排列自定义形状",
   "myShapes.onServer": "服务器上",
   "myShapes.inBrowser": "此浏览器中",
   "myShapes.locationLabel": "保存在",
