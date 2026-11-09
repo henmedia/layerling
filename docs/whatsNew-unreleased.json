@@ -22,5 +22,17 @@
       "en": "Settings > Appearance has a switch, Save designs as a download: Export > LYL, Ctrl+S and Save as then put the design into the Downloads folder without the save dialog. That helps on PCs where the save dialog of Chrome and Edge hands back no file. An STL export that fails there now offers Download instead as well.",
       "da": "Under Indstillinger > Udseende er der en kontakt, Gem designs som download: Eksport > LYL, Ctrl+S og Gem som lægger så designet i mappen Overførsler uden gem-vinduet. Det hjælper på pc'er, hvor gem-vinduet i Chrome og Edge ikke giver en fil tilbage. En STL-eksport, der fejler der, tilbyder nu også Download i stedet."
     }
+  },
+  {
+    "title": {
+      "de": "Senkbohrung tiefer versenkt",
+      "en": "Recessed countersinks",
+      "da": "Nedsænkede undersænkninger"
+    },
+    "body": {
+      "de": "Senkbohrung und Doppelsenkung haben ein Feld „Versenkung“: Über dem Kegel sitzt dann eine gerade Senkung in Kopfbreite, sodass der Schraubenkopf so viele Millimeter unter der Oberfläche liegt statt bündig.",
+      "en": "The countersink and the double countersink have a field, Recess: a straight pocket as wide as the head then sits above the cone, so the screw head ends that many millimetres below the face instead of flush.",
+      "da": "Undersænkning og dobbelt forsænkning har et felt, Nedsænkning: Over keglen sidder der så en lige lomme i hovedets bredde, så skruehovedet ligger så mange millimeter under overfladen i stedet for at flugte."
+    }
   }
 ]

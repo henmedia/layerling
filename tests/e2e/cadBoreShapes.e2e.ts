@@ -357,6 +357,17 @@ describe("exact bodies for the bore shapes with the real OCCT kernel", () => {
     expect(cad.isValid(cad.chamfer(solid, rim, 0.3))).toBe(true);
   });
 
+  it("recessed countersink: a cylinder as wide as the head above the cone, and on both ends of a double one (Discussion #1531)", () => {
+    const { solid } = exactAgainstMesh(shape("countersink", { width: 6.6, depth: 6.6, height: 12, hole: true, screwHoleShaft: 3.4, screwHoleAngle: 90, screwHoleRecess: 4 }));
+    const cone = (Math.PI * 1.6 / 3) * (1.7 ** 2 + 1.7 * 3.3 + 3.3 ** 2);
+    expect(cad.getVolume(solid)).toBeCloseTo(Math.PI * 1.7 ** 2 * 6.4 + cone + Math.PI * 3.3 ** 2 * 4, 2);
+    expect(surfaceTypes(solid).filter((type) => type === "cylinder").length).toBe(2);
+    const double = exactAgainstMesh(shape("doubleCountersink", { width: 6.6, depth: 6.6, height: 12, hole: true, screwHoleShaft: 3.4, screwHoleAngle: 90, screwHoleRecess: 2 })).solid;
+    expect(cad.getVolume(double)).toBeCloseTo(Math.PI * 1.7 ** 2 * 4.8 + 2 * cone + 2 * Math.PI * 3.3 ** 2 * 2, 2);
+    const slotted = exactAgainstMesh(shape("countersink", { width: 14, depth: 6.6, height: 12, hole: true, screwHoleShaft: 3.4, screwHoleAngle: 90, screwHoleSlot: true, screwHoleRecess: 4 })).solid;
+    expect(cad.isValid(slotted)).toBe(true);
+  });
+
   it("slotted counterbore along the depth and slotted double countersink: valid bodies where their meshes are (Discussion #1531)", () => {
     const counterbore = exactAgainstMesh(shape("counterbore", { width: 6.4, depth: 10, height: 12, hole: true, screwHoleShaft: 3.4, screwHoleHeadDepth: 3.2, screwHoleSlot: true, rotation: 30 })).solid;
     const round = Math.PI * 1.7 ** 2 * 8.8 + Math.PI * 3.2 ** 2 * 3.2;

@@ -3259,6 +3259,8 @@ export const MESSAGES_SL: Partial<Record<MessageKey, string>> = {
   "prop.screwHoleSlot": "Podolžna luknja",
   "prop.screwHoleSlotLength": "Dolžina podolžne luknje",
   "prop.screwHoleSlotLengthHint": "Za koliko se luknja podaljša vzdolž daljše stranice, da lahko del še premaknete, preden privijete vijak. Za usmeritev luknjo zavrtite.",
+  "prop.screwHoleRecess": "Pogreznitev",
+  "prop.screwHoleRecessHint": "Kako globoko pod površino sedi glava vijaka: raven vgrez v širini glave nad stožcem. Pri 0 je poravnana s površino; dvojni vgrez ga ima na obeh koncih.",
   "prop.screwHoleLength": "Skupna dolžina",
   "prop.holeBottom": "Dno",
   "holeBottom.flat": "Ravno",

@@ -4174,6 +4174,8 @@ export const MESSAGES_FR: Partial<Record<MessageKey, string>> = {
   "prop.screwHoleSlot": "Oblong",
   "prop.screwHoleSlotLength": "Longueur du trou oblong",
   "prop.screwHoleSlotLengthHint": "De combien le trou s’allonge le long de son grand côté, pour pouvoir encore déplacer la pièce avant de serrer la vis. Tournez le trou pour orienter la fente.",
+  "prop.screwHoleRecess": "Noyage",
+  "prop.screwHoleRecessHint": "La profondeur à laquelle la tête de vis se trouve sous la surface : un logement droit de la largeur de la tête au-dessus du cône. À 0, elle affleure ; le double fraisage l’a aux deux extrémités.",
   "prop.screwHoleLength": "Longueur totale",
   "prop.holeBottom": "Fond",
   "holeBottom.flat": "Plat",

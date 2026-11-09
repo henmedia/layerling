@@ -246,6 +246,8 @@ microSD 卡槽也是左邊緣的接頭，位於電路板下方（Zero 2 W 上在
 
 長孔讓零件在鎖緊螺絲前仍能稍微移動，方便對齊（Discussion #1531）。在{{ui:shape.counterbore}}、{{ui:shape.countersink}}或{{ui:shape.doubleCountersink}}上開啟{{ui:prop.screwHoleSlot}}：沉頭孔或錐面以及孔身會繞過長孔的兩端，並沿其兩側筆直延伸。{{ui:prop.screwHoleSlotLength}}決定延伸多長；起初與頭部一樣寬，沿寬度方向——要換方向就旋轉該孔。{{ui:prop.screwHoleHead}}和{{ui:prop.screwHoleSize}}只改變頭部，長孔保持不變。長孔沒有鑽尖，和圓孔一樣是精確實體。
 
+沉頭螺絲的頭部與表面齊平。若要沉得更深，可在{{ui:shape.countersink}}上設定{{ui:prop.screwHoleRecess}}（Discussion #1531）：錐面上方會多出一段與頭部同寬的直孔，深度為所設公釐數，{{ui:prop.screwHoleLength}}也包含這一段。{{ui:shape.doubleCountersink}}兩端都有這段直孔。設為 0 時頭部仍與表面齊平；長孔同樣適用，且仍是精確實體。
+
 {{ui:shape.finishingWasher}}（一種裝飾墊圈，Discussion #1131）是放在沉頭或半沉頭螺絲下面的拱形墊圈，用於在木頭或蓋板上顯得整潔。它是實心件，底面平；從較低的邊緣起，拱頂升到座面，座面是承托螺絲頭的錐面，下面是孔。在 {{ui:prop.screwHoleSize}} 下選擇 M2 到 M20：孔是該規格的過孔，座面是該規格的沉頭孔，{{ui:prop.diameter}} 與 {{ui:prop.height}} 由此得出（M3：10.3 × 2.95 mm，M6：16.6 × 4.5 mm）。你也可以自己設定 {{ui:prop.diameter}}、{{ui:prop.height}}、{{ui:prop.centerHole}}、座面頂部的 {{ui:prop.screwHoleHead}} 及其 {{ui:prop.screwHoleAngle}}。它保持圓形，並且是精確實體，因此邊緣工具與 STEP 都能處理它。
 
 ## 螺絲柱

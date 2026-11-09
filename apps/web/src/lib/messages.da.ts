@@ -3991,6 +3991,8 @@ export const MESSAGES_DA: Partial<Record<MessageKey, string>> = {
   "prop.screwHoleSlot": "Langhul",
   "prop.screwHoleSlotLength": "Langhullængde",
   "prop.screwHoleSlotLengthHint": "Så langt løber hullet langs sin længste side, så delen stadig kan flyttes, før skruen spændes. Drej hullet for at rette langhullet ind.",
+  "prop.screwHoleRecess": "Nedsænkning",
+  "prop.screwHoleRecessHint": "Så langt under overfladen sidder skruehovedet: en lige lomme i hovedets bredde over keglen. Ved 0 flugter det; den dobbelte forsænkning har den i begge ender.",
   "prop.screwHoleLength": "Total længde",
   "prop.holeBottom": "Bund",
   "holeBottom.flat": "Flad",

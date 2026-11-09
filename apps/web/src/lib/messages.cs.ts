@@ -4245,6 +4245,8 @@ export const MESSAGES_CS: Record<MessageKey, string> = {
   "prop.screwHoleSlot": "Podélná drážka",
   "prop.screwHoleSlotLength": "Délka drážky",
   "prop.screwHoleSlotLengthHint": "O kolik se otvor protáhne podél delší strany, aby šlo díl před utažením šroubu ještě posunout. Natočením otvoru drážku nasměrujete.",
+  "prop.screwHoleRecess": "Zapuštění",
+  "prop.screwHoleRecessHint": "Jak hluboko pod povrchem hlava šroubu sedí: rovné vybrání v šířce hlavy nad kuželem. Při 0 lícuje s povrchem; dvojité zahloubení ho má na obou koncích.",
   "prop.screwHoleLength": "Celková délka",
   "prop.holeBottom": "Dno",
   "holeBottom.flat": "Rovné",

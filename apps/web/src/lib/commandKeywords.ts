@@ -97,7 +97,7 @@ export const SHAPE_KEYWORDS: Readonly<Record<string, readonly string[]>> = {
   dovetail: ["queue d'aronde", "schwalbenschwanz", "trapezoid", "trapèze"],
   bentTube: ["tube courbé", "tube plié", "gebogenes rohr", "rohrbogen"],
   counterbore: ["lamage", "senkbohrung", "zylindersenkung", "drill point", "bohrerspitze", "slotted hole", "langloch"],
-  countersink: ["fraisage", "kegelsenkung", "senkkopf", "double countersink", "both sides", "double fraisage", "doppelsenkung", "beidseitig", "drill point", "bohrerspitze", "slotted hole", "langloch"],
+  countersink: ["fraisage", "kegelsenkung", "senkkopf", "double countersink", "both sides", "double fraisage", "doppelsenkung", "beidseitig", "drill point", "bohrerspitze", "slotted hole", "langloch", "recessed", "versenkt", "tiefer"],
   finishingWasher: ["rosette", "cup washer", "screw cup", "countersunk washer", "trim washer", "washer", "rondelle", "senkscheibe", "zierscheibe", "unterlegscheibe"],
   knurl: ["moletage", "moleté", "rändel", "rändelung"],
   teardrop: ["trou de larme", "tropfenbohrung", "larme"],

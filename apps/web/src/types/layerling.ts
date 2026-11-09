@@ -1397,6 +1397,11 @@ export type WorkplaneShape = {
    * Missing or false: the round hole, stretched into an oval when width and depth differ, as always.
    */
   screwHoleSlot?: boolean;
+  /**
+   * Countersink and double countersink: how far in mm the screw head sits below the face (Discussion #1531) - a
+   * straight pocket as wide as the head above the cone, on the double countersink at both ends. Missing or 0: flush.
+   */
+  screwHoleRecess?: number;
   /** Port opening: rounded corners, or the lower ones cut off as on an HDMI or DisplayPort socket. */
   portProfile?: PortProfile;
   /** Port opening: extra room in mm on every side on top of the preset's, already in width and height; it lets the preset be recognised. */

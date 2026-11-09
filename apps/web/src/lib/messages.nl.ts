@@ -4188,6 +4188,8 @@ export const MESSAGES_NL: Record<MessageKey, string> = {
   "prop.screwHoleSlot": "Slobgat",
   "prop.screwHoleSlotLength": "Lengte slobgat",
   "prop.screwHoleSlotLengthHint": "Zo ver loopt het gat langs zijn langste zijde, zodat het onderdeel nog te verschuiven is voordat de schroef vastzit. Draai het gat om het slobgat te richten.",
+  "prop.screwHoleRecess": "Verdieping",
+  "prop.screwHoleRecessHint": "Zo diep zit de schroefkop onder het oppervlak: een rechte kamer zo breed als de kop boven de kegel. Bij 0 ligt hij vlak; de dubbele verzinking heeft hem aan beide uiteinden.",
   "prop.screwHoleLength": "Totale lengte",
   "prop.holeBottom": "Bodem",
   "holeBottom.flat": "Vlak",

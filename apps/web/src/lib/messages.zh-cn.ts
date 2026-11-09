@@ -4110,6 +4110,8 @@ export const MESSAGES_ZH_CN: Partial<Record<MessageKey, string>> = {
   "prop.screwHoleSlot": "长孔",
   "prop.screwHoleSlotLength": "长孔长度",
   "prop.screwHoleSlotLengthHint": "孔沿较长一侧延伸的长度，便于拧紧螺丝前仍可移动零件。旋转孔即可调整长孔方向。",
+  "prop.screwHoleRecess": "下沉深度",
+  "prop.screwHoleRecessHint": "螺丝头低于表面的深度：在锥面上方加一段与头部同宽的直孔。为 0 时与表面齐平；双面沉孔两端都有。",
   "prop.screwHoleLength": "总长度",
   "prop.holeBottom": "孔底",
   "holeBottom.flat": "平底",

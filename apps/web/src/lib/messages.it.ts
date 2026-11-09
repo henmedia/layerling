@@ -4174,6 +4174,8 @@ export const MESSAGES_IT: Partial<Record<MessageKey, string>> = {
   "prop.screwHoleSlot": "Asolato",
   "prop.screwHoleSlotLength": "Lunghezza dell’asola",
   "prop.screwHoleSlotLengthHint": "Di quanto il foro si allunga sul lato più lungo, così il pezzo si può ancora spostare prima di serrare la vite. Ruota il foro per orientare l’asola.",
+  "prop.screwHoleRecess": "Incasso",
+  "prop.screwHoleRecessHint": "Di quanto la testa della vite resta sotto la superficie: una sede diritta larga quanto la testa sopra il cono. A 0 resta a filo; la doppia svasatura ce l’ha a entrambe le estremità.",
   "prop.screwHoleLength": "Lunghezza totale",
   "prop.holeBottom": "Fondo",
   "holeBottom.flat": "Piatto",

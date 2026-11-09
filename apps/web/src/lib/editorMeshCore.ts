@@ -510,7 +510,7 @@ function geometryMeshForShape(shape: WorkplaneShape): MeshData | null {
     case "counterbore":
     case "countersink":
     case "doubleCountersink":
-      geometry = createScrewHoleGeometry({ kind: shape.kind, width, depth, height, screwHoleShaft: shape.screwHoleShaft, screwHoleHeadDepth: shape.screwHoleHeadDepth, screwHoleAngle: shape.screwHoleAngle, drillPointAngle: shapeDrillPointAngle(shape), slot: shape.screwHoleSlot, sides: roundSideCount(shape.sides, width, depth) });
+      geometry = createScrewHoleGeometry({ kind: shape.kind, width, depth, height, screwHoleShaft: shape.screwHoleShaft, screwHoleHeadDepth: shape.screwHoleHeadDepth, screwHoleAngle: shape.screwHoleAngle, screwHoleRecess: shape.screwHoleRecess, drillPointAngle: shapeDrillPointAngle(shape), slot: shape.screwHoleSlot, sides: roundSideCount(shape.sides, width, depth) });
       break;
     case "finishingWasher":
       geometry = createFinishingWasherGeometry({ width, depth, height, screwHoleShaft: shape.screwHoleShaft, screwHoleHeadDepth: shape.screwHoleHeadDepth, screwHoleAngle: shape.screwHoleAngle, sides: roundSideCount(shape.sides, width, depth) });

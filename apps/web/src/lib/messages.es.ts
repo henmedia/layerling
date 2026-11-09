@@ -4189,6 +4189,8 @@ export const MESSAGES_ES: Partial<Record<MessageKey, string>> = {
   "prop.screwHoleSlot": "Ranurado",
   "prop.screwHoleSlotLength": "Longitud de la ranura",
   "prop.screwHoleSlotLengthHint": "Cuánto se alarga el agujero por su lado más largo, para poder mover la pieza antes de apretar el tornillo. Gira el agujero para orientar la ranura.",
+  "prop.screwHoleRecess": "Rebaje",
+  "prop.screwHoleRecessHint": "Cuánto queda la cabeza del tornillo por debajo de la superficie: un alojamiento recto del ancho de la cabeza sobre el cono. Con 0 queda a ras; el avellanado doble lo tiene en ambos extremos.",
   "prop.screwHoleLength": "Longitud total",
   "prop.holeBottom": "Fondo",
   "holeBottom.flat": "Plano",

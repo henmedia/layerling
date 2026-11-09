@@ -4188,6 +4188,8 @@ export const MESSAGES_EN = {
   "prop.screwHoleSlot": "Slotted",
   "prop.screwHoleSlotLength": "Slot length",
   "prop.screwHoleSlotLengthHint": "How far the hole runs along its longer side, so the part can still be moved before the screw is tightened. Turn the hole to point the slot.",
+  "prop.screwHoleRecess": "Recess",
+  "prop.screwHoleRecessHint": "How far the screw head sits below the face: a straight pocket as wide as the head above the cone. 0 leaves it flush; the double countersink has it at both ends.",
   "prop.screwHoleLength": "Total length",
   "prop.holeBottom": "Bottom",
   "holeBottom.flat": "Flat",

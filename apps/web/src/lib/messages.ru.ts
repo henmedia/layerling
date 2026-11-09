@@ -4181,6 +4181,8 @@ export const MESSAGES_RU: Partial<Record<MessageKey, string>> = {
   "prop.screwHoleSlot": "Паз",
   "prop.screwHoleSlotLength": "Длина паза",
   "prop.screwHoleSlotLengthHint": "Насколько отверстие вытянуто вдоль длинной стороны, чтобы деталь можно было сдвинуть до затяжки винта. Поверните отверстие, чтобы направить паз.",
+  "prop.screwHoleRecess": "Утопление",
+  "prop.screwHoleRecessHint": "Насколько головка винта утоплена под поверхность: прямое гнездо шириной с головку над конусом. При 0 она вровень с поверхностью; у двусторонней зенковки оно с обоих концов.",
   "prop.screwHoleLength": "Общая длина",
   "prop.holeBottom": "Дно",
   "holeBottom.flat": "Плоское",

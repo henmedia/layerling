@@ -25,6 +25,9 @@ import { toCreasedNormals } from "@/lib/creasedNormals";
  *
  * Any of the three may be slotted (Discussion #1531): the same profile, as wide as the head, runs round the two ends
  * of a slot and straight along its sides, for a screw that leaves the part room to be lined up.
+ *
+ * A countersink may be recessed (Discussion #1531): a straight pocket as wide as the head sits above the cone, so
+ * the screw head ends that far below the face instead of flush with it. The double countersink has it at both ends.
  */
 
 export type ScrewHoleKind = "counterbore" | "countersink" | "doubleCountersink";
@@ -61,6 +64,21 @@ export function normalizeScrewHoleHeadDepth(value: number | undefined, height: n
   return clamp(requested, 0.1, Math.max(0.1, height - MIN_SHAFT_LENGTH));
 }
 
+/**
+ * How far a countersink's head sits below the face (Discussion #1531), 0 for flush. It leaves the cone and some
+ * shaft room: at most the length less a little shaft, on the double countersink half of that at each end.
+ */
+export function maxScrewHoleRecess(height: number, kind: ScrewHoleKind = "countersink") {
+  if (kind === "counterbore") return 0;
+  const room = Math.max(0, height - 2 * MIN_SHAFT_LENGTH);
+  return kind === "doubleCountersink" ? room / 2 : room;
+}
+
+export function normalizeScrewHoleRecess(value: number | undefined, height: number, kind: ScrewHoleKind = "countersink") {
+  if (!Number.isFinite(value)) return 0;
+  return clamp(value as number, 0, maxScrewHoleRecess(height, kind));
+}
+
 export function normalizeScrewHoleAngle(value: number | undefined) {
   return clamp(Number.isFinite(value) ? (value as number) : DEFAULT_SCREW_HOLE_ANGLE, MIN_SCREW_HOLE_ANGLE, MAX_SCREW_HOLE_ANGLE);
 }
@@ -80,6 +98,8 @@ export type ScrewHoleGeometryOptions = {
   screwHoleShaft?: number;
   screwHoleHeadDepth?: number;
   screwHoleAngle?: number;
+  /** Countersink and double countersink: how far the head sits below the face (Discussion #1531), 0 or left out for flush. */
+  screwHoleRecess?: number;
   /** The drill point's angle in degrees (shapeDrillPointAngle), or left out for a flat bottom; the double countersink has none. */
   drillPointAngle?: number;
   /** Corners around the axis; the automatic count for the diameter when left out. */
@@ -109,7 +129,21 @@ export function screwHoleProfile(options: Omit<ScrewHoleGeometryOptions, "depth"
   return [{ r: 0, y: -countersinkDepth(profile[0].r * 2, 0, options.drillPointAngle) }, ...profile];
 }
 
-function flatScrewHoleProfile({ kind, width, height, screwHoleShaft, screwHoleHeadDepth, screwHoleAngle }: Omit<ScrewHoleGeometryOptions, "depth">): ProfilePoint[] {
+function flatScrewHoleProfile(options: Omit<ScrewHoleGeometryOptions, "depth">): ProfilePoint[] {
+  const height = Math.max(0.01, options.height);
+  const recess = normalizeScrewHoleRecess(options.screwHoleRecess, height, options.kind);
+  if (recess <= 0) return flushScrewHoleProfile(options);
+  // A recessed countersink (Discussion #1531): the flush profile in the shorter length, with a straight pocket as wide
+  // as the head above it - and on the double countersink below it too.
+  const headRadius = Math.max(0.005, options.width / 2);
+  if (options.kind === "doubleCountersink") {
+    const inner = flushScrewHoleProfile({ ...options, height: height - 2 * recess }).map(({ r, y }) => ({ r, y: y + recess }));
+    return [{ r: headRadius, y: 0 }, ...inner, { r: headRadius, y: height }];
+  }
+  return [...flushScrewHoleProfile({ ...options, height: height - recess }), { r: headRadius, y: height }];
+}
+
+function flushScrewHoleProfile({ kind, width, height, screwHoleShaft, screwHoleHeadDepth, screwHoleAngle }: Omit<ScrewHoleGeometryOptions, "depth">): ProfilePoint[] {
   const safeHeight = Math.max(0.01, height);
   const headRadius = Math.max(0.005, width / 2);
   const shaftRadius = normalizeScrewHoleShaft(screwHoleShaft, width) / 2;

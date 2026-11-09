@@ -4187,6 +4187,8 @@ export const MESSAGES_DE: Record<MessageKey, string> = {
   "prop.screwHoleSlot": "Langloch",
   "prop.screwHoleSlotLength": "Langlochlänge",
   "prop.screwHoleSlotLengthHint": "So weit läuft das Loch an seiner längeren Seite entlang, damit sich das Teil vor dem Festziehen noch verschieben lässt. Zum Ausrichten das Loch drehen.",
+  "prop.screwHoleRecess": "Versenkung",
+  "prop.screwHoleRecessHint": "So tief sitzt der Schraubenkopf unter der Oberfläche: eine gerade Senkung in Kopfbreite über dem Kegel. Bei 0 schließt er bündig ab; die Doppelsenkung hat sie an beiden Enden.",
   "prop.screwHoleLength": "Gesamtlänge",
   "prop.holeBottom": "Boden",
   "holeBottom.flat": "Flach",

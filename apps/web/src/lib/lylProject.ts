@@ -1738,7 +1738,7 @@ function validateShapeDefinition(definition: Record<string, unknown>, label: str
   }
   if (kind === "counterbore" || kind === "countersink" || kind === "doubleCountersink" || kind === "finishingWasher") {
     // Lenient on purpose: the geometry clamps the values itself; only nonsense is refused.
-    for (const key of ["screwHoleShaft", "screwHoleHeadDepth", "screwHoleAngle"] as const) {
+    for (const key of ["screwHoleShaft", "screwHoleHeadDepth", "screwHoleAngle", "screwHoleRecess"] as const) {
       if (definition[key] === undefined) continue;
       const value = finiteNumber(definition[key], `${label}.${key}`);
       if (value < 0 || value > 1e6) throw new Error(`${label}.${key} is outside the supported range`);

@@ -3376,6 +3376,8 @@ export const MESSAGES_JA: Partial<Record<MessageKey, string>> = {
   "prop.screwHoleSlot": "長穴",
   "prop.screwHoleSlotLength": "長穴の長さ",
   "prop.screwHoleSlotLengthHint": "ねじを締める前に部品を動かせるよう、穴を長い方の辺に沿って伸ばす長さです。穴を回転させると長穴の向きが変わります。",
+  "prop.screwHoleRecess": "沈め深さ",
+  "prop.screwHoleRecessHint": "ねじ頭を表面からどれだけ沈めるか：円錐の上に頭と同じ幅のまっすぐな穴を加えます。0 なら面一になります。両面皿穴では両端に付きます。",
   "prop.screwHoleLength": "全長",
   "prop.teardropDiameter": "直径（丸い部分）",
   "prop.teardropLength": "穴の長さ",

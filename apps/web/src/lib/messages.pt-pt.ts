@@ -4125,6 +4125,8 @@ export const MESSAGES_PT_PT: Partial<Record<MessageKey, string>> = {
   "prop.screwHoleSlot": "Oblongo",
   "prop.screwHoleSlotLength": "Comprimento do rasgo",
   "prop.screwHoleSlotLengthHint": "Quanto o furo se estende ao longo do lado mais comprido, para que a peça ainda possa ser deslocada antes de apertar o parafuso. Rode o furo para orientar o rasgo.",
+  "prop.screwHoleRecess": "Rebaixo",
+  "prop.screwHoleRecessHint": "Quanto a cabeça do parafuso fica abaixo da superfície: um alojamento reto da largura da cabeça acima do cone. Com 0 fica rente; o escareado duplo tem-no nas duas extremidades.",
   "prop.screwHoleLength": "Comprimento total",
   "prop.holeBottom": "Fundo",
   "holeBottom.flat": "Plano",
