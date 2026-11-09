@@ -203,7 +203,7 @@ import { withStencilBridges } from "@/lib/stencilBridgeSection";
 import type { CrossSection } from "manifold-3d";
 import { DrawingTooComplexError } from "@/lib/drawingProjection";
 import { DEFAULT_TAPER_DIMENSION_MAX, keyboardNudgeCoarseFactor, keyboardNudgeStep, normalizeShapeCustomizations, normalizeSnapGrid, normalizeWorkspaceSettings, shapeDimensionLimit, workplaneSettingsFingerprint } from "@/lib/workplaneSettings";
-import { mcpGridfinityOutlinePatch, mcpGridfinityPatch, mcpGridfinityPaddingPatch, mcpThreadSizeParams } from "@/lib/mcpShapeSettings";
+import { mcpGridfinityOutlinePatch, mcpGridfinityOverhangPatch, mcpGridfinityPatch, mcpGridfinityPaddingPatch, mcpThreadSizeParams } from "@/lib/mcpShapeSettings";
 import { createNoteId, normalizeNotes, NOTE_COUNT_LIMIT, NOTE_TEXT_LIMIT, referencePoints } from "@/lib/workplaneNotes";
 import { findShapeInHistoryState } from "@/lib/historyRestore";
 import { noteAnchorFromWorld, notesAfterShapeChange, notesPinnedTo, notesPutBack } from "@/lib/noteAnchoring";
@@ -13288,6 +13288,8 @@ export function LayerlingEditor({
         if (target.kind === "gridfinity" && params.gridfinityLabelFont !== undefined) patch.gridfinityLabelFont = mcpGridfinityLabelFont(params.gridfinityLabelFont);
         // A padding given without a size keeps a baseplate's units (#455).
         Object.assign(patch, mcpGridfinityPaddingPatch(target, patch, params));
+        // An overhang (bins only) moves the bin so its feet stay where they are, as the settings panel does.
+        Object.assign(patch, mcpGridfinityOverhangPatch(target, patch, params));
         // An outline (#1061) sets the plate's box and place after everything else that sizes it.
         Object.assign(patch, mcpGridfinityOutlinePatch({ ...target, ...patch }, params));
         if (target.kind === "bentTube" && MCP_BENT_TUBE_KEYS.some((key) => params[key] !== undefined)) {

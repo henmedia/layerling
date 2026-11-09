@@ -390,6 +390,20 @@ export type ShapeCustomization = {
   gridfinityPaddingLeft?: number;
   /** Gridfinity baseplate: the border along the right. */
   gridfinityPaddingRight?: number;
+  /** Gridfinity bin: how far its body above the feet reaches out beyond the grid at the back, in mm from the grid line, over a baseplate's padding; missing is none, at most 41. The feet stay on the grid. */
+  gridfinityOverhangBack?: number;
+  /** Gridfinity bin: the overhang at the front. */
+  gridfinityOverhangFront?: number;
+  /** Gridfinity bin: the overhang on the left. */
+  gridfinityOverhangLeft?: number;
+  /** Gridfinity bin: the overhang on the right. */
+  gridfinityOverhangRight?: number;
+  /** Gridfinity bin: the height in mm the overhang's underside rises to at the outer wall, sloping straight up to it from the grid line so it prints without supports; missing or 0 leaves it flat on the padding. */
+  gridfinityOverhangChamfer?: number;
+  /** Gridfinity bin: the overhang is solid, and the inside stays on the grid; missing is hollow, the inside reaching out into it. */
+  gridfinityOverhangSolid?: boolean;
+  /** Gridfinity bin: the stacking lip stays on the grid, and the overhang is solid with a flat top at the lip's foot; missing is the lip on the wider outline. */
+  gridfinityOverhangLipOnGrid?: boolean;
   /** Gridfinity baseplate: the radius of its four outer corners in mm; missing is the specification's 4, at least 0 (square), at most 4; the sockets keep theirs (#856). */
   gridfinityCornerRadius?: number;
   /** Gridfinity bin: the radius of its outer corners above the feet in mm; missing is the specification's 3.75, at least 0 (square), at most 3.75; the feet, the inside and the lip's slopes keep theirs (#856). */
@@ -1304,6 +1318,20 @@ export type WorkplaneShape = {
   gridfinityPaddingLeft?: number;
   /** Gridfinity baseplate: the border along the right. */
   gridfinityPaddingRight?: number;
+  /** Gridfinity bin: how far its body above the feet reaches out beyond the grid at the back, in mm from the grid line, over a baseplate's padding; missing is none, at most 41. The feet stay on the grid. */
+  gridfinityOverhangBack?: number;
+  /** Gridfinity bin: the overhang at the front. */
+  gridfinityOverhangFront?: number;
+  /** Gridfinity bin: the overhang on the left. */
+  gridfinityOverhangLeft?: number;
+  /** Gridfinity bin: the overhang on the right. */
+  gridfinityOverhangRight?: number;
+  /** Gridfinity bin: the height in mm the overhang's underside rises to at the outer wall, sloping straight up to it from the grid line so it prints without supports; missing or 0 leaves it flat on the padding. */
+  gridfinityOverhangChamfer?: number;
+  /** Gridfinity bin: the overhang is solid, and the inside stays on the grid; missing is hollow, the inside reaching out into it. */
+  gridfinityOverhangSolid?: boolean;
+  /** Gridfinity bin: the stacking lip stays on the grid, and the overhang is solid with a flat top at the lip's foot; missing is the lip on the wider outline. */
+  gridfinityOverhangLipOnGrid?: boolean;
   /** Gridfinity baseplate: the radius of its four outer corners in mm; missing is the specification's 4, at least 0 (square), at most 4; the sockets keep theirs (#856). */
   gridfinityCornerRadius?: number;
   /** Gridfinity bin: the radius of its outer corners above the feet in mm; missing is the specification's 3.75, at least 0 (square), at most 3.75; the feet, the inside and the lip's slopes keep theirs (#856). */

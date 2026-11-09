@@ -1,7 +1,8 @@
 import type { ThreadProfile, WorkplaneShape } from "@/types/layerling";
 import { isThreadProfile } from "@/lib/threadProfiles";
 import { normalizeHexColor } from "@/lib/coloredImport";
-import { GRIDFINITY_PADDING_KEYS, gridfinityLabelTextPatch, gridfinityListPatch, gridfinityOutlineFit, gridfinityOutlineLimit, gridfinityOutlineNeedsLargePlate, gridfinityOutlineRemovalPatch, gridfinityPaddingPatch, gridfinityPlateToWorld, gridfinityShapePatch, normalizeGridfinityOutline, normalizeGridfinityType, type GridfinityWall } from "@/lib/gridfinityGeometry";
+import { GRIDFINITY_OVERHANG_KEYS, GRIDFINITY_PADDING_KEYS, gridfinityLabelTextPatch, gridfinityListPatch, gridfinityOverhangPatch, gridfinityOutlineFit, gridfinityOutlineLimit, gridfinityOutlineNeedsLargePlate, gridfinityOutlineRemovalPatch, gridfinityPaddingPatch, gridfinityPlateToWorld, gridfinityShapePatch, normalizeGridfinityOutline, normalizeGridfinityType, type GridfinityWall } from "@/lib/gridfinityGeometry";
+import { resizedShapeSize, shapeLocalOffset } from "@/lib/workplaneShapes";
 import { normalizeThreadProfile, THREAD_SIZES, threadSettings, threadSizeById, threadSizeFor, threadSizeSettings, threadStandardSize } from "@/lib/threadGeometry";
 
 /**
@@ -41,7 +42,7 @@ export const MCP_SHAPE_SETTING_KEYS = [
   "gridfinityType", "gridfinityLip", "gridfinityMagnets", "gridfinityHalfGrid", "gridfinityLargePlate", "gridfinitySwallowtail", "gridfinitySwallowtailClearance",
   "gridfinityLabelBack", "gridfinityLabelFront", "gridfinityLabelLeft", "gridfinityLabelRight", "gridfinityLabelBackWidth", "gridfinityLabelBackLength", "gridfinityLabelBackOffset", "gridfinityLabelFrontWidth", "gridfinityLabelFrontLength", "gridfinityLabelFrontOffset", "gridfinityLabelLeftWidth", "gridfinityLabelLeftLength", "gridfinityLabelLeftOffset", "gridfinityLabelRightWidth", "gridfinityLabelRightLength", "gridfinityLabelRightOffset", "gridfinityLabelCorner", "gridfinityLabelCornerSize",
   "gridfinityLabelBackText", "gridfinityLabelFrontText", "gridfinityLabelLeftText", "gridfinityLabelRightText", "gridfinityLabelFont", "gridfinityLabelColor", "gridfinityLabelTextSize",
-  "gridfinityScoopBack", "gridfinityScoopFront", "gridfinityScoopLeft", "gridfinityScoopRight", "gridfinityScoopRadius", "gridfinityFloorHeight", "gridfinityOpenBack", "gridfinityOpenFront", "gridfinityOpenLeft", "gridfinityOpenRight", "gridfinityLipChamfer", "gridfinityWallThickness", "gridfinityPaddingBack", "gridfinityPaddingFront", "gridfinityPaddingLeft", "gridfinityPaddingRight", "gridfinityCornerRadius", "gridfinityBinCornerRadius",
+  "gridfinityScoopBack", "gridfinityScoopFront", "gridfinityScoopLeft", "gridfinityScoopRight", "gridfinityScoopRadius", "gridfinityFloorHeight", "gridfinityOpenBack", "gridfinityOpenFront", "gridfinityOpenLeft", "gridfinityOpenRight", "gridfinityLipChamfer", "gridfinityWallThickness", "gridfinityPaddingBack", "gridfinityPaddingFront", "gridfinityPaddingLeft", "gridfinityPaddingRight", "gridfinityOverhangBack", "gridfinityOverhangFront", "gridfinityOverhangLeft", "gridfinityOverhangRight", "gridfinityOverhangChamfer", "gridfinityOverhangSolid", "gridfinityOverhangLipOnGrid", "gridfinityCornerRadius", "gridfinityBinCornerRadius",
   "gridfinityCompartmentsX", "gridfinityCompartmentsZ", "gridfinityDividerThickness", "gridfinityDividerPositionsX", "gridfinityDividerPositionsZ", "gridfinityCompartmentLabels", "gridfinityOpenings", "gridfinityOpeningCorner", "gridfinityOpeningCornerSize", "gridfinityOutline",
   "knurlPattern", "knurlCount", "knurlDepth", "knurlAngle", "knurlChamfer",
   "dovetailNeckWidth", "dovetailClearance",
@@ -128,6 +129,27 @@ export function mcpGridfinityPaddingPatch(target: WorkplaneShape, patch: Partial
   // A size given is the whole plate on its own axis.
   if (number(params.width)) delete sized.width;
   if (number(params.depth)) delete sized.depth;
+  return sized;
+}
+
+/**
+ * What an update writes for a bin given an overhang, as the settings panel writes it: the box of the same units with
+ * the new overhang, and the bin moved by half the change in its own turned frame, so its feet stay where they are.
+ * Nothing for anything but a bin, nor for an overhang that is no number; a size given is the whole bin on its axis.
+ */
+export function mcpGridfinityOverhangPatch(target: WorkplaneShape, patch: Partial<WorkplaneShape>, params: Record<string, unknown>): Partial<WorkplaneShape> {
+  if (target.kind !== "gridfinity") return {};
+  if (normalizeGridfinityType(patch.gridfinityType ?? target.gridfinityType) !== "bin" || normalizeGridfinityType(target.gridfinityType) !== "bin") return {};
+  const number = (value: unknown) => typeof value === "number" && Number.isFinite(value);
+  const given = (Object.keys(GRIDFINITY_OVERHANG_KEYS) as GridfinityWall[]).filter((wall) => number(params[GRIDFINITY_OVERHANG_KEYS[wall]]));
+  if (!given.length) return {};
+  const overhang = gridfinityOverhangPatch(target, Object.fromEntries(given.map((wall) => [wall, params[GRIDFINITY_OVERHANG_KEYS[wall]]])));
+  const move = shapeLocalOffset(target, overhang.shift.x, overhang.shift.z);
+  const sized: Partial<WorkplaneShape> = { width: overhang.width, depth: overhang.depth, size: resizedShapeSize(overhang.width, overhang.depth), x: target.x + move.x, z: target.z + move.z };
+  if (number(params.width)) delete sized.width;
+  if (number(params.depth)) delete sized.depth;
+  if (number(params.x)) delete sized.x;
+  if (number(params.z)) delete sized.z;
   return sized;
 }
 

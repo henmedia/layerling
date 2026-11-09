@@ -298,6 +298,12 @@ import {
   gridfinityOutlineNeedsLargePlate,
   gridfinityOutlineRemovalPatch,
   gridfinityPaddingPatch,
+  GRIDFINITY_OVERHANG_KEYS,
+  gridfinityOverhangChamfer,
+  gridfinityOverhangChamferMax,
+ 
+  gridfinityOverhangPatch,
+  gridfinityOverhangSupportSides,
   gridfinityPlan,
   gridfinityScoopFits,
   gridfinityScoopMaxRadius,
@@ -319,7 +325,7 @@ import { useMovablePanel, type MovablePanelOptions } from "@/lib/useMovablePanel
 import { meshAabb } from "@/lib/editorMeshCore";
 import { undersideOffset } from "@/lib/positionUnderside";
 import { plateOffsetOfShape } from "@/lib/buildPlates";
-import { isNonSolidShape, normalizeGroupResize, resizedShapeSize, shapeDepth, shapeHasTaper, shapeOverallFootprintDimensions, shapeSupportsTaper, shapeTaperDimensions, shapeWidth } from "@/lib/workplaneShapes";
+import { isNonSolidShape, normalizeGroupResize, resizedShapeSize, shapeDepth, shapeHasTaper, shapeLocalOffset, shapeOverallFootprintDimensions, shapeSupportsTaper, shapeTaperDimensions, shapeWidth } from "@/lib/workplaneShapes";
 import { tubeBeforeEdgeTreatments } from "@/lib/edgeTreatmentHistory";
 import { MAX_SKETCH_REVOLVE_TURNS, normalizeSketchRevolveSettings } from "@/lib/sketchRevolve";
 import { roundSideCount } from "@/lib/roundSideCount";
@@ -1795,6 +1801,38 @@ function getShapePropertiesWithAppLimits(shape: WorkplaneShape, onUpdate: ShapeI
       // The outer corners above the feet (#856), down to square; no row where open sides leave every corner square.
       if (gridfinityBinCornerFits({ ...shape, depth })) {
         properties.push({ id: "gridfinityBinCornerRadius", label: t("prop.gridfinityCornerRadius"), value: gridfinityBinCornerRadius({ ...shape, depth }), min: 0, max: GRIDFINITY_BIN_RADIUS, step: 0.1, hint: t("gridfinity.binCornerRadiusHint"), onChange: (value) => onUpdate({ gridfinityBinCornerRadius: clamp(value, 0, GRIDFINITY_BIN_RADIUS) }) });
+      }
+      // Overhang: the body above the feet reaching out beyond the grid on a side, over a baseplate's padding to the
+      // drawer's wall. The box grows on that side and the bin moves by half of it, so its feet stay where they are.
+      const overhang = plan.overhang;
+      const overhangSides = [
+        { wall: "back", label: "prop.gridfinityOverhangBack" },
+        { wall: "front", label: "prop.gridfinityOverhangFront" },
+        { wall: "left", label: "prop.gridfinityOverhangLeft" },
+        { wall: "right", label: "prop.gridfinityOverhangRight" },
+      ] as const;
+      overhangSides.forEach(({ wall, label }, k) => {
+        const update = (value: number) => {
+          const patch = gridfinityOverhangPatch({ ...shape, depth }, { [wall]: value });
+          const move = shapeLocalOffset(shape, patch.shift.x, patch.shift.z);
+          onUpdate({ ...patch.fields, width: patch.width, depth: patch.depth, size: resizedShapeSize(patch.width, patch.depth), x: shape.x + move.x, z: shape.z + move.z });
+        };
+        // A partial opening is cut in the bin's own wall only: on a side with a solid overhang (ring) it stays closed.
+        const closedOpening = overhang?.mode === "ring" && plan.notches.some((notch) => overhang.growth[notch.side] > 0);
+        const hint = k === 0 ? [t("gridfinity.overhangHint"), ...(overhang ? [t("gridfinity.overhangOptionsHint")] : []), ...(closedOpening ? [t("gridfinity.overhangOpeningHint")] : [])].join(" ") : undefined;
+        properties.push({ id: GRIDFINITY_OVERHANG_KEYS[wall], label: t(label), value: overhang?.sides[wall] ?? 0, min: 0, max: MAX_GRIDFINITY_PADDING, step: 0.1, hint, onChange: update });
+      });
+      if (overhang) {
+        const fields = { ...shape, depth };
+        const maxChamfer = gridfinityOverhangChamferMax(fields);
+        const steep = gridfinityOverhangSupportSides(fields);
+        const sideName = { back: t("gridfinity.sideBack"), front: t("gridfinity.sideFront"), left: t("gridfinity.sideLeft"), right: t("gridfinity.sideRight") };
+        const chamferHint = [t("gridfinity.overhangChamferHint"), ...(steep.length > 0 ? [t("gridfinity.overhangSupportsHint", { sides: steep.map((wall) => sideName[wall]).join(", ") })] : [])].join(" ");
+        properties.push(
+          { id: "gridfinityOverhangChamfer", label: t("prop.gridfinityOverhangChamfer"), value: gridfinityOverhangChamfer(fields), min: 0, max: maxChamfer, step: 0.1, hint: chamferHint, onChange: (value) => onUpdate({ gridfinityOverhangChamfer: clamp(value, 0, maxChamfer) }) },
+          { type: "toggle", id: "gridfinityOverhangSolid", label: t("prop.gridfinityOverhangSolid"), value: shape.gridfinityOverhangSolid === true, disabled: shape.gridfinityOverhangLipOnGrid === true, onChange: (value) => onUpdate({ gridfinityOverhangSolid: value }) },
+          { type: "toggle", id: "gridfinityOverhangLipOnGrid", label: t("prop.gridfinityOverhangLipOnGrid"), value: shape.gridfinityOverhangLipOnGrid === true, onChange: (value) => onUpdate({ gridfinityOverhangLipOnGrid: value }) },
+        );
       }
     }
     const fields = { ...shape, depth };
