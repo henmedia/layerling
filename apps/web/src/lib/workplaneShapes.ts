@@ -637,6 +637,8 @@ export function canonicalizeShape(unrepaired: WorkplaneShape): WorkplaneShape {
       sides: shape.sketchRevolve.sides,
       quality: shape.sketchRevolve.quality,
       ...(shape.sketchRevolve.pitch ? { pitch: shape.sketchRevolve.pitch } : {}),
+      // Kept with the body, or a revolve set smoother came back as standard in its panel and lost it on saving (Discussion #1426).
+      ...(shape.sketchRevolve.smoothness === "fine" || shape.sketchRevolve.smoothness === "extraFine" ? { smoothness: shape.sketchRevolve.smoothness } : {}),
     };
   }
   if (shape.edgeTreatmentHistory) {
