@@ -1,6 +1,18 @@
 [
   {
     "title": {
+      "de": "Löcher durchsichtiger einstellen",
+      "en": "Set how see-through holes are",
+      "da": "Indstil, hvor gennemsigtige huller er"
+    },
+    "body": {
+      "de": "Unter Einstellungen > Darstellung stellt „Deckkraft der Löcher“ ein, wie dicht Löcher gezeichnet werden. Weniger zeigt besser, wo ein Loch einen Körper berührt; zusammen mit „Löcher deutlicher zeigen“ werden Löcher dunkel und gut durchsichtig.",
+      "en": "Hole opacity in Settings > Appearance sets how solid holes are drawn. Lower shows better where a hole touches a body; together with Show holes more clearly, holes become dark and well see-through.",
+      "da": "Hullers dækkevne under Indstillinger > Udseende bestemmer, hvor tæt huller tegnes. Lavere viser bedre, hvor et hul rører et legeme; sammen med Vis huller tydeligere bliver huller mørke og godt gennemsigtige."
+    }
+  },
+  {
+    "title": {
       "de": "Was ist neu? auch im Editor",
       "en": "What's new, also in the editor",
       "da": "Hvad er nyt? også i editoren"

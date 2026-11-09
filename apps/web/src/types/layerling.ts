@@ -526,6 +526,11 @@ export type WorkplaneWorkspaceSettings = {
   edgeColor: string;
   /** Holes drawn darker and denser, with a line round them, so they stand out among see-through bodies (#662). */
   strongHoles: boolean;
+  /**
+   * How solid holes are drawn, 10 to 90 percent, so one can see better where a hole meets a body (#1566).
+   * 0 is automatic: 52 %, or 72 % with Show holes more clearly, as before the slider.
+   */
+  holeOpacity: number;
   showShadows: boolean;
   /** The camera keeps turning for a moment after you let go, and slows down. */
   cameraInertia: boolean;

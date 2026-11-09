@@ -163,6 +163,8 @@ X 和 [[Esc]] 会关闭窗口；如果正在测量，[[Esc]] 会先结束测量�
 
 {{ui:workspace.strongHoles}} 把孔画成更深的灰色、更不透明，并在周围加一条深色线。当孔在透明实体中难以找到时很有帮助。与边线不同，它在快速模式下仍然开启。
 
+下方的{{ui:workspace.holeOpacity}}设置孔绘制得有多实，范围为 10% 到 90%。数值越低，越容易看出孔与实体相接的位置。默认为自动：52%，开启{{ui:workspace.strongHoles}}时为 72%；双击滑块即可恢复。
+
 ### 外观：光照与阴影
 
 {{ui:workspace.showShadows}} 打开或关闭投射阴影。两个滑块设定实体的受光方式。{{ui:workspace.shadowStrength}} 决定投射阴影的深浅，{{ui:workspace.shadeContrast}} 把光从均匀的环境光转向主光：偏向“强烈”时，背光面更暗、阴影更明显；偏向“柔和”时，整体更平。对比度拉到最高会非常强，背光面和阴影会变得很暗。{{ui:workspace.shadowSoftness}} 让阴影边缘变柔和而不是锐利。{{ui:workspace.lightAzimuth}} 让主光绕平台旋转（0° 从前方，90° 从右方），{{ui:workspace.lightElevation}} 把它抬高；90° 时它像 Tinkercad 那样位于平台正上方，阴影正好落在实体下方。{{ui:workspace.softLighting}} 让大部分光线来自你观察的方向，并随视图转动：没有哪个面会留在暗处，朝上的深色面也不再被照得发白。主光仍保留一点用于阴影，对比度滑块依然有效。如果光线放低后仍能看到明亮的反光，把 {{ui:workspace.lightElevation}} 抬到 90°：这时看起来就像 Tinkercad。{{ui:workspace.lightReset}} 恢复全部设置。

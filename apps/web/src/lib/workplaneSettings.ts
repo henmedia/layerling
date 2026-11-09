@@ -48,6 +48,18 @@ export function booleanTriangleLimitPreset(limit: number): BooleanTriangleLimitP
   return BOOLEAN_TRIANGLE_LIMIT_PRESETS.find((preset) => preset.limit === limit)?.id ?? null;
 }
 
+/** The hole opacity slider's range in percent (#1566); 0 stands for automatic. */
+export const HOLE_OPACITY_MIN = 10;
+export const HOLE_OPACITY_MAX = 90;
+/** What automatic means: holes as they were drawn before the slider, plain and with Show holes more clearly. */
+export const HOLE_OPACITY_AUTO = 52;
+export const HOLE_OPACITY_AUTO_STRONG = 72;
+
+/** The hole opacity in percent the view uses, with automatic resolved. */
+export function effectiveHoleOpacity(workspace: Pick<WorkplaneWorkspaceSettings, "holeOpacity" | "strongHoles">) {
+  return workspace.holeOpacity || (workspace.strongHoles ? HOLE_OPACITY_AUTO_STRONG : HOLE_OPACITY_AUTO);
+}
+
 export const DEFAULT_WORKPLANE_WORKSPACE: WorkplaneWorkspaceSettings = {
   width: 200,
   depth: 200,
@@ -66,6 +78,7 @@ export const DEFAULT_WORKPLANE_WORKSPACE: WorkplaneWorkspaceSettings = {
   edgeLines: false,
   edgeColor: DEFAULT_EDGE_LINE_COLOR,
   strongHoles: false,
+  holeOpacity: 0,
   showShadows: true,
   cameraInertia: true,
   fastMode: false,
@@ -325,6 +338,12 @@ const customizableShapeKinds: ShapeKind[] = [
 
 function numberOrDefault(value: unknown, fallback: number) {
   return typeof value === "number" && Number.isFinite(value) ? value : fallback;
+}
+
+/** A hole's opacity in percent, 10 to 90, or 0 for automatic (#1566). */
+function holeOpacityOrAuto(value: unknown, fallback: number) {
+  const percent = Math.round(numberOrDefault(value, fallback));
+  return percent <= 0 ? 0 : Math.max(HOLE_OPACITY_MIN, Math.min(HOLE_OPACITY_MAX, percent));
 }
 
 function stringOrDefault(value: unknown, fallback: string) {
@@ -870,6 +889,7 @@ export function normalizeWorkspaceSettings(value: unknown, fallback: WorkplaneWo
     edgeLines: booleanOrDefault(candidate.edgeLines, fallback.edgeLines),
     edgeColor: colorOrDefault(candidate.edgeColor, fallback.edgeColor),
     strongHoles: booleanOrDefault(candidate.strongHoles, fallback.strongHoles),
+    holeOpacity: holeOpacityOrAuto(candidate.holeOpacity, fallback.holeOpacity),
     showShadows: booleanOrDefault(candidate.showShadows, fallback.showShadows),
     cameraInertia: booleanOrDefault(candidate.cameraInertia, fallback.cameraInertia),
     fastMode: booleanOrDefault(candidate.fastMode, fallback.fastMode),

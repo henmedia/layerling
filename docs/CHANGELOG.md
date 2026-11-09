@@ -6,6 +6,8 @@ code still carries it - so a lower number further down is older, not newer.
 
 ## Unreleased
 
+- **Hole opacity slider (Discussion #1566):** Holes were drawn at a fixed 52% opacity (72% with Show holes more clearly), so it was hard to see where a hole touches a body. **Workspace settings > Appearance** now has a **Hole opacity** slider below Show holes more clearly, from 10 to 90%. It starts on automatic, which keeps the old look; a double-click on the slider goes back to it. Together with Show holes more clearly it gives dark, well see-through holes, as in Tinkercad. Imported meshes used as holes stay a little lighter, as they were before.
+
 - **What's new in the editor (Discussion #1530):** The list of updates was only on the start page, so reading about a new tool and trying it meant leaving the design and opening it again, over and over. A new button with sparkles beside the quick guide at the top right (or the command search) opens the same list in the editor: the newest versions first, the earlier ones behind a button. It is not modal, so it stays open beside the design while the new tools are tried, and it moves by its title bar.
 
 - **Clearer messages for dense and open meshes (Issue #1562):** Offset, Hollow and the other tools that turn a mesh into a solid said "Edge treatment handles 4,000" and "Repair it before treating edges", although there is no repair tool and Offset is no edge treatment. The messages now speak of "this tool"; a mesh with too many triangles is pointed to **Simplify mesh** in the right-click menu, and an open or non-manifold mesh to undoing Simplify mesh and trying more triangles, or to repairing an imported mesh in the slicer or the program it comes from.

@@ -214,15 +214,19 @@ export let edgeLineStyle = { enabled: false, color: DEFAULT_EDGE_LINE_COLOR };
 /** "Show holes more clearly" (#662): darker, denser holes with a line round them, handed over like the edge lines. */
 export let strongHoles = false;
 
+/** The hole opacity slider (#1566) in percent, 10 to 90; 0 is automatic and follows strongHoles. */
+export let holeOpacitySetting = 0;
+
 export function setEdgeLineStyle(enabled: boolean, color: string) {
   const changed = edgeLineStyle.enabled !== enabled || (enabled && edgeLineStyle.color !== color);
   edgeLineStyle = { enabled, color };
   return changed;
 }
 
-export function setStrongHoles(enabled: boolean) {
-  const changed = strongHoles !== enabled;
+export function setStrongHoles(enabled: boolean, opacityPercent = 0) {
+  const changed = strongHoles !== enabled || holeOpacitySetting !== opacityPercent;
   strongHoles = enabled;
+  holeOpacitySetting = opacityPercent;
   return changed;
 }
 export const STRONG_HOLE_COLOR = "#5b6670";
@@ -585,7 +589,7 @@ export function shapeMaterialSignature(shape: WorkplaneShape): string {
     color: shape.color,
     // A bin's letters in a colour of their own (#1308) are drawn in a second material; the mesh stays as it is.
     letterColor: gridfinityLabelColor(shape),
-    hole: shape.hole ? (strongHoles ? "strong" : true) : false,
+    hole: shape.hole ? `${strongHoles ? "strong" : "plain"}:${holeOpacitySetting}` : false,
     transparent: Boolean(shape.transparent),
     multicolor: shape.groupedShapes?.length ? groupShowsPartColors(shape) : undefined,
     // A group turned into a bundle (or back) changes the colour of its selection outline.
@@ -1775,6 +1779,8 @@ export function groupChildAppearance(group: WorkplaneShape, child: WorkplaneShap
 export const TRANSPARENT_SOLID_OPACITY = 0.4;
 
 export function holeOpacity(shape: WorkplaneShape) {
+  // A chosen opacity: an imported mesh a little lighter, as in the automatic values, since its inner faces add up.
+  if (holeOpacitySetting > 0) return (holeOpacitySetting / 100) * (shape.importedMesh ? 0.75 : 1);
   if (strongHoles) return shape.importedMesh ? 0.6 : 0.72;
   return shape.importedMesh ? 0.34 : 0.52;
 }
