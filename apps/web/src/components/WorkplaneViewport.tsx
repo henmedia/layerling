@@ -7185,11 +7185,22 @@ export function WorkplaneViewport({
     ],
   );
 
+  const finishDragRef = useRef<((event: ReactPointerEvent<HTMLDivElement>) => void) | null>(null);
   const handlePointerMove = useCallback(
     (event: ReactPointerEvent<HTMLDivElement>) => {
       // Gehoert die Flaeche gerade der Kamera, hat hier niemand etwas zu
       // schweben oder zu ziehen - die Finger bewegen die Ansicht.
       if (cameraTouchRef.current) return;
+      // A mouse that moves with no button held cannot be dragging: its release never reached us (a Magic Mouse
+      // does that now and then, #1540). End the move, handle drag, box or lasso where it is, as the release would.
+      if (
+        event.pointerType === "mouse" &&
+        event.buttons === 0 &&
+        (dragRef.current || transformRef.current || marqueeRef.current || paintLassoRef.current)
+      ) {
+        finishDragRef.current?.(event);
+        return;
+      }
       cruiseFreeRef.current = event.altKey;
       cruiseSinkRef.current = event.shiftKey;
       carryPointerRef.current = { x: event.clientX, y: event.clientY };
@@ -7792,6 +7803,7 @@ export function WorkplaneViewport({
     },
     [cancelGestureForCamera, clearMoveDimensions, onAlignAnchorChange, onDuplicateShapesMoved, onInteractionActiveChange, onSelectShape, onUpdateShape, rememberResizeAnchor, setMarqueeFromState, settleSlide, shapesInMarquee, suppressCornerEditAfterDrag, suppressLiftEditAfterDrag, onShapeContextMenu, pickShape, shapeStackAt, faceCentreAt, insideSelectionFrame],
   );
+  finishDragRef.current = finishDrag;
 
   const handleDrop = useCallback(
     (event: DragEvent<HTMLDivElement>) => {
