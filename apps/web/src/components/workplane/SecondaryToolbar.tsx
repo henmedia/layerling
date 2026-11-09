@@ -13,6 +13,7 @@ import { t, type MessageKey } from "@/lib/i18n";
 import { useLanguage } from "@/lib/useLanguage";
 import { useSimpleMode } from "@/lib/useSimpleMode";
 import { simpleModeKeepsShape, simpleModeKeepsTool } from "@/lib/simpleMode";
+import { ribbonGroupShown, setRibbonLayout, shownInRibbon, useRibbonHidden } from "@/lib/ribbonHidden";
 import { normalizePolygonSides, normalizeStarInnerPercent, SKETCH_POLYGON_MAX_SIDES, SKETCH_POLYGON_MIN_SIDES, SKETCH_STAR_MAX_INNER_PERCENT, SKETCH_STAR_MIN_INNER_PERCENT } from "@/lib/sketchPrimitives";
 import { SketchBoltCircleIcon, SketchEllipseIcon, SketchHalfCircleIcon, SketchPieSliceIcon, ToolbarAlignIcon, ToolbarAttachmentsIcon, ToolbarBuildPlatesIcon, ToolbarCenterOnWorkplaneIcon, ToolbarChamferIcon, ToolbarCaretDownIcon, ToolbarCookieCutterIcon, ToolbarFlexiIcon, ToolbarLidIcon,
   ToolbarCableChannelIcon, ToolbarCopyIcon, ToolbarDuplicateIcon, ToolbarDropToWorkplaneIcon, ToolbarBundleIcon, ToolbarGroupIcon, ToolbarGuideIcon, ToolbarHideSelectedIcon, ToolbarHomeIcon, ToolbarImportIcon, ToolbarIntersectionIcon,ToolbarClearanceIcon, ToolbarPrintCheckIcon, ToolbarHullIcon, ToolbarLoftSketchesIcon, ToolbarKeyboardIcon, ToolbarFilletIcon, ToolbarHistoryIcon, ToolbarHollowIcon, ToolbarOffsetIcon, ToolbarCutOutIcon, ToolbarPunchIcon, ToolbarDeleteFaceIcon, ToolbarSimplifyIcon, ToolbarMakeExactIcon, ToolbarSurfaceTextureIcon, ToolbarPaintIcon, ToolbarMirrorIcon, ToolbarRotationPivotIcon, ToolbarPatternIcon, ToolbarHolePatternIcon, ToolbarFaceToolIcon, ToolbarSupportRibIcon, ToolbarStencilBridgeIcon, ToolbarConstructionLineIcon, ToolbarMiddleLineIcon, ToolbarLayFlatIcon, ToolbarMateFacesIcon, ToolbarNoteIcon, ToolbarSplitIcon, ToolbarPasteIcon, ToolbarRedoIcon, ToolbarSnapGridIcon, ToolbarSettingsIcon, ToolbarShapeAddIcon, ToolbarTrashIcon, ToolbarUngroupIcon, ToolbarUndoIcon, ToolbarVectorExportIcon } from "../icons";
@@ -751,6 +752,8 @@ export function SecondaryToolbar({
     setVisibilityOpen(false);
   }, [historyViewActive]);
   const simpleMode = useSimpleMode();
+  // Buttons and groups taken out of the ribbon in the settings (#1519); the command search and the keys still have them.
+  const ribbonHidden = useRibbonHidden();
   // Groups the window has no room for fold into one button that opens on hover or a tap (Stefan, 29.10.2026). The simple
   // mode keeps every tool in sight, as it always did, and so does the pin in the title row, for whoever wants it so.
   const [ribbonPinned, setRibbonPinned] = useState(false);
@@ -909,7 +912,7 @@ export function SecondaryToolbar({
   // falls sie spaeter einmal memoisiert wird.
   useLanguage();
   // The simple mode (#695) shows the tools of a workshop only; the others stay in the lists the command search and the keys read.
-  const inSimpleMode = <T extends { id: string }>(tools: T[]) => (simpleMode ? tools.filter((tool) => simpleModeKeepsTool(tool.id)) : tools);
+  const inSimpleMode = <T extends { id: string }>(tools: T[]) => shownInRibbon(simpleMode ? tools.filter((tool) => simpleModeKeepsTool(tool.id)) : tools, ribbonHidden);
   const shownShapeAssets = simpleMode ? libraryShapeAssets.filter((shape) => simpleModeKeepsShape(shape.id)) : libraryShapeAssets;
   const leftTools = [
     { id: "copy", label: t("editor.tool.copy"), icon: ToolbarCopyIcon, action: onCopy, enabled: hasSelection, needs: need("selection") },
@@ -1268,6 +1271,36 @@ export function SecondaryToolbar({
   };
   buildPaletteCommandsRef.current = buildPaletteCommands;
 
+  // What the ribbon shows of each group (#1519): the simple mode's cut first, then what was taken out in the settings.
+  const clipboardShown = shownInRibbon(leftTools.slice(0, 4), ribbonHidden);
+  const historyShown = inSimpleMode(leftTools.slice(4));
+  const visibilityShown = shownInRibbon(visibilityTools, ribbonHidden);
+  const combineShown = inSimpleMode(combineTools);
+  const modifyShown = inSimpleMode(modifyTools);
+  const arrangeShown = inSimpleMode(arrangeTools);
+  const fileTools = [
+    ...(simpleMode ? [] : [{ id: "import", label: t("editor.import") }]),
+    { id: "export", label: t("editor.export") },
+    { id: "attachments", label: t("editor.attachments") },
+  ];
+  const fileShown = shownInRibbon(fileTools, ribbonHidden);
+  const fileHas = (id: string) => fileShown.some((tool) => tool.id === id);
+  // The settings window lists the groups and buttons from here, named as on the buttons. The Shapes group and Help stay:
+  // without them a design could not grow, and the settings could not be found again.
+  // In the simple mode it lists what that mode keeps: a tick on a button the mode leaves out anyway would change nothing.
+  const pick = (tools: readonly { id: string; label: string }[], cut = true) => tools
+    .filter((tool) => !cut || !simpleMode || simpleModeKeepsTool(tool.id))
+    .map(({ id, label }) => ({ id, label }));
+  setRibbonLayout([
+    { group: "clipboard", label: t("editor.group.clipboard"), tools: pick(leftTools.slice(0, 4), false) },
+    { group: "history", label: t("editor.group.history"), tools: pick(leftTools.slice(4)) },
+    ...(simpleMode ? [] : [{ group: "visibility", label: t("editor.group.visibility"), tools: pick(visibilityTools, false) }]),
+    { group: "combine", label: t("editor.group.combine"), tools: pick(combineTools) },
+    { group: "modify", label: t("editor.group.modify"), tools: pick(modifyTools) },
+    { group: "arrange", label: t("editor.group.arrange"), tools: pick(arrangeTools) },
+    { group: "manage", label: t("editor.group.file"), tools: pick(fileTools, false) },
+  ].filter((group) => group.tools.length > 0));
+
   return (
     <div className="secondary-toolbar">
       {paletteOpen ? <CommandPalette commands={buildPaletteCommands()} onClose={() => setPaletteOpen(false)} /> : null}
@@ -1275,16 +1308,20 @@ export function SecondaryToolbar({
         {toolbarMode === "geometry" ? (
           <>
       <div className="tool-group left">
+        {ribbonGroupShown("clipboard", ribbonHidden, clipboardShown) ? (
         <div className="toolbar-section" data-group="clipboard" data-collapse="2" inert={historyViewActive}>
           <div className="toolbar-section-label">{t("editor.group.clipboard")}</div>
           {collapseBox(t("editor.group.clipboard"), ToolbarPasteIcon)}
-          <div className="toolbar-section-tools">{leftTools.slice(0, 4).map(renderToolButton)}</div>
+          <div className="toolbar-section-tools">{clipboardShown.map(renderToolButton)}</div>
         </div>
+        ) : null}
+        {ribbonGroupShown("history", ribbonHidden, historyShown) ? (
         <div className="toolbar-section" data-group="history" data-collapse="3">
           <div className="toolbar-section-label">{t("editor.group.history")}</div>
-          {collapseBox(t("editor.group.history"), ToolbarUndoIcon, leftTools.find((tool) => tool.id === "undo"))}
-          <div className="toolbar-section-tools">{inSimpleMode(leftTools.slice(4)).map(renderToolButton)}</div>
+          {collapseBox(t("editor.group.history"), ToolbarUndoIcon, historyShown.find((tool) => tool.id === "undo"))}
+          <div className="toolbar-section-tools">{historyShown.map(renderToolButton)}</div>
         </div>
+        ) : null}
         <div className="toolbar-section toolbar-shapes-section" data-group="shapes" ref={shapesMenuRef} inert={historyViewActive}>
           <div className="toolbar-section-label">{t("editor.group.shapes")}</div>
           <div className="toolbar-section-tools">
@@ -1328,12 +1365,12 @@ export function SecondaryToolbar({
       </div>
       <div className="toolbar-spacer" />
       <div className="tool-group right" inert={historyViewActive}>
-        {simpleMode ? null : (
+        {simpleMode || !ribbonGroupShown("visibility", ribbonHidden) ? null : (
         <div className="toolbar-section compact toolbar-visibility-section" data-group="visibility" data-collapse="5" ref={visibilityMenuRef}>
           <div className="toolbar-section-label">{t("editor.group.visibility")}</div>
           {collapseBox(t("editor.group.visibility"), ToolbarHideSelectedIcon)}
           <div className="toolbar-section-tools">
-            {visibilityTools.map(renderToolButton)}
+            {visibilityShown.map(renderToolButton)}
             <span className="visibility-trigger-wrap">
               <button
                 className={`toolbar-icon visibility-menu-trigger ${visibilityOpen ? "active" : ""}`}
@@ -1445,34 +1482,41 @@ export function SecondaryToolbar({
           ) : null}
         </div>
         )}
+        {ribbonGroupShown("combine", ribbonHidden, combineShown) ? (
         <div className="toolbar-section" data-group="combine" data-collapse="6">
           <div className="toolbar-section-label">{t("editor.group.combine")}</div>
           {collapseBox(t("editor.group.combine"), ToolbarGroupIcon)}
-          <div className="toolbar-section-tools">{inSimpleMode(combineTools).map(renderToolButton)}</div>
+          <div className="toolbar-section-tools">{combineShown.map(renderToolButton)}</div>
         </div>
+        ) : null}
+        {ribbonGroupShown("modify", ribbonHidden, modifyShown) ? (
         <div className="toolbar-section" data-group="modify" data-collapse="7">
           <div className="toolbar-section-label">{t("editor.group.modify")}</div>
           {collapseBox(t("editor.group.modify"), ToolbarFilletIcon)}
-          <div className="toolbar-section-tools">{toolSections(inSimpleMode(modifyTools))}</div>
+          <div className="toolbar-section-tools">{toolSections(modifyShown)}</div>
         </div>
+        ) : null}
+        {ribbonGroupShown("arrange", ribbonHidden, arrangeShown) ? (
         <div className="toolbar-section" data-group="arrange" data-collapse="4">
           <div className="toolbar-section-label">{t("editor.group.arrange")}</div>
           {collapseBox(t("editor.group.arrange"), ToolbarAlignIcon)}
-          <div className="toolbar-section-tools">{inSimpleMode(arrangeTools).map(renderToolButton)}</div>
+          <div className="toolbar-section-tools">{arrangeShown.map(renderToolButton)}</div>
         </div>
+        ) : null}
       </div>
+      {ribbonGroupShown("manage", ribbonHidden, fileShown) ? (
       <div className="toolbar-section toolbar-actions-section" data-group="manage" data-collapse="1">
         <div className="toolbar-section-label">{t("editor.group.file")}</div>
         {collapseBox(t("editor.group.file"), ToolbarVectorExportIcon)}
         <div className="action-buttons">
-          {simpleMode ? null : <button className="action-icon-button" aria-label={t("editor.import")} title={`${t("editor.import")} (${COMMAND_SHORTCUTS.import})`} onClick={() => onTopPanel("import")} disabled={historyViewActive}>
+          {fileHas("import") ? <button className="action-icon-button" aria-label={t("editor.import")} title={`${t("editor.import")} (${COMMAND_SHORTCUTS.import})`} onClick={() => onTopPanel("import")} disabled={historyViewActive}>
             <ToolbarImportIcon />
-          </button>}
-          <button className="action-icon-button" aria-label={t("editor.export")} title={`${t("editor.export")} (${COMMAND_SHORTCUTS.export})`} onClick={() => onTopPanel("export")}>
+          </button> : null}
+          {fileHas("export") ? <button className="action-icon-button" aria-label={t("editor.export")} title={`${t("editor.export")} (${COMMAND_SHORTCUTS.export})`} onClick={() => onTopPanel("export")}>
             <ToolbarVectorExportIcon />
-          </button>
+          </button> : null}
           {/* The dot says there is something attached without opening the panel, as the badge on the visibility button says there is something hidden. */}
-          <button
+          {fileHas("attachments") ? <button
             className={`action-icon-button ${attachmentCount > 0 ? "has-attachments" : ""}`}
             aria-label={attachmentsLabel}
             title={attachmentsLabel}
@@ -1480,9 +1524,10 @@ export function SecondaryToolbar({
           >
             <ToolbarAttachmentsIcon />
             {attachmentCount > 0 ? <span className="attachments-indicator" aria-hidden="true" /> : null}
-          </button>
+          </button> : null}
         </div>
       </div>
+      ) : null}
           </>
         ) : (
           <div className="sketch-toolbar-ribbon" aria-label={t("sketch.toolbar")}>

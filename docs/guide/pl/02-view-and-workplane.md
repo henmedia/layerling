@@ -132,6 +132,12 @@ Koło zębate w wierszu tytułu ({{ui:editor.workspaceSettings}}) otwiera ustawi
 
 {{ui:workspace.viewCubePosition}} przenosi kostkę widoku w inny róg obszaru roboczego: {{ui:workspace.viewCubePositionTopLeft}} (jak zawsze), {{ui:workspace.viewCubePositionTopRight}}, {{ui:workspace.viewCubePositionBottomLeft}} albo {{ui:workspace.viewCubePositionBottomRight}}. W każdym rogu poza lewym górnym pasek widoku przesuwa się w górę, na miejsce zwolnione przez kostkę. W prawym dolnym rogu kostka stoi tuż nad przełącznikiem {{ui:inspector.snapGrid}}. Dopóki po prawej są otwarte właściwości kształtu, kostka po prawej stronie odsuwa się na lewo od nich. Róg zapamiętuje ta przeglądarka i obowiązuje on w każdym projekcie. W wąskim oknie, na przykład na telefonie, ustawienie jest ukryte, a kostka zostaje w lewym górnym rogu.
 
+### Wygląd: przyciski na wstążce
+
+{{ui:workspace.ribbonButtons}} usuwa ze wstążki grupy i przyciski, których nigdy nie używasz. Kliknij grupę, aby otworzyć jej listę: {{ui:workspace.ribbonGroupShown}} usuwa całą grupę, znacznik przy przycisku tylko ten przycisk. {{ui:workspace.ribbonShowAll}} przywraca wszystko. Grupa bez przycisków znika, a pozostałe się przesuwają, więc w jednym rzędzie mieści się więcej wstążki.
+
+To, co usuniesz, znika tylko ze wstążki: wyszukiwanie poleceń ([[Ctrl]]+[[K]]) nadal to znajduje, a klawisz nadal to uruchamia. Kolejność grup się nie zmienia, a grupa Kształty i Pomoc zostają zawsze. Wybór zapamiętuje ta przeglądarka i trafia on też do pliku z {{ui:workspace.exportSettings}}. Dotyczy edytora 3D; szkic ma własny pasek.
+
 ### Wygląd: tryb szybki
 
 {{ui:workspace.fastMode}} jest dla wolniejszych komputerów. Wyłącza cienie, linie krawędzi na wszystkich bryłach i bezwładność kamery, a widok rysuje tylko w rozdzielczości ekranu. Twoje własne ustawienia zostają zachowane na później, a przełączniki, które nadpisuje, pokazują {{ui:workspace.offInFastMode}}, dopóki jest włączony. Więcej o tym, co pomaga na wolnym komputerze, jest niżej w części „Gdy layerling działa wolno”.

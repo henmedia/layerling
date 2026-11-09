@@ -131,6 +131,12 @@ Zobnik v naslovni vrstici ({{ui:editor.workspaceSettings}}) odpre nastavitve. Le
 
 {{ui:workspace.viewCubePosition}} pod {{ui:workspace.appearance}} postavi kocko za usmerjanje pogleda v drug kot delovne površine: {{ui:workspace.viewCubePositionTopLeft}} (kot doslej), {{ui:workspace.viewCubePositionTopRight}}, {{ui:workspace.viewCubePositionBottomLeft}} ali {{ui:workspace.viewCubePositionBottomRight}}. V vsakem kotu razen zgoraj levo se vrstica pogleda pomakne navzgor na mesto, ki ga je kocka izpraznila. Spodaj desno stoji kocka tik nad gumbom {{ui:inspector.snapGrid}}. Dokler so desno odprte lastnosti oblike, se kocka na desni strani umakne levo od njih. Kot si zapomni ta brskalnik in velja za vsak načrt. V ozkem oknu, na primer na telefonu, je nastavitev skrita in kocka ostane zgoraj levo.
 
+### Videz: gumbi v orodni vrstici
+
+{{ui:workspace.ribbonButtons}} odstrani iz orodne vrstice skupine in gumbe, ki jih nikoli ne uporabljaš. Klikni skupino, da odpreš njen seznam: {{ui:workspace.ribbonGroupShown}} odstrani celo skupino, kljukica ob gumbu samo ta gumb. {{ui:workspace.ribbonShowAll}} vrne vse nazaj. Skupina brez gumbov izgine, druge se pomaknejo naprej, tako da v eno vrsto gre več orodne vrstice.
+
+Kar odstraniš, manjka samo v orodni vrstici: iskanje ukazov ([[Ctrl]]+[[K]]) to še najde in njegova tipka to še zažene. Vrstni red skupin ostane enak, skupina Oblike in Pomoč pa ostaneta vedno. Izbiro si zapomni ta brskalnik in gre tudi v datoteko iz {{ui:workspace.exportSettings}}. Velja za 3D-urejevalnik; skica ima svojo vrstico.
+
 ### Videz: hitri način
 
 {{ui:workspace.fastMode}} je za počasnejše računalnike. Izklopi sence, robne črte na vseh telesih in dohitevanje kamere ter pogled riše samo v ločljivosti zaslona. Tvoje lastne nastavitve ostanejo shranjene za pozneje, stikala, ki jih prevzame, pa kažejo {{ui:workspace.offInFastMode}}, dokler je vklopljen. Kaj še pomaga na počasnem računalniku, najdeš spodaj pod »Kadar se layerling zdi počasen«.

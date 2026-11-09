@@ -131,6 +131,12 @@ Het tandwiel in de titelregel ({{ui:editor.workspaceSettings}}) opent de instell
 
 {{ui:workspace.viewCubePosition}} onder {{ui:workspace.appearance}} zet de richtingskubus in een andere hoek van het werkvlak: {{ui:workspace.viewCubePositionTopLeft}} (zoals het altijd was), {{ui:workspace.viewCubePositionTopRight}}, {{ui:workspace.viewCubePositionBottomLeft}} of {{ui:workspace.viewCubePositionBottomRight}}. In elke hoek behalve linksboven schuift de weergavebalk omhoog naar de plek die de kubus vrijliet. Rechtsonder staat de kubus net boven de {{ui:inspector.snapGrid}}-knop. Zolang rechts de eigenschappen van een vorm open zijn, wijkt een kubus aan de rechterkant links ervan uit. De hoek wordt in deze browser bewaard en geldt voor elk ontwerp. In een smal venster, zoals op een telefoon, is de instelling verborgen en blijft de kubus linksboven.
 
+### Weergave: knoppen in het lint
+
+{{ui:workspace.ribbonButtons}} haalt de groepen en knoppen die je nooit gebruikt uit het lint. Klik op een groep om de lijst te openen: {{ui:workspace.ribbonGroupShown}} haalt de hele groep weg, het vinkje naast een knop alleen die knop. {{ui:workspace.ribbonShowAll}} zet alles terug. Een groep zonder knoppen verdwijnt en de andere schuiven op, zodat er meer van het lint op één rij past.
+
+Wat je weghaalt, ontbreekt alleen in het lint: het zoeken naar opdrachten ([[Ctrl]]+[[K]]) vindt het nog en de toets voert het nog uit. De volgorde van de groepen blijft gelijk, en de groep Vormen en Help blijven altijd. Deze browser onthoudt de keuze, en ze gaat mee in het bestand van {{ui:workspace.exportSettings}}. Ze geldt voor de 3D-editor; de schets heeft een eigen balk.
+
 ### Weergave: snelle modus
 
 {{ui:workspace.fastMode}} is voor tragere computers. Het zet schaduwen, randlijnen op alle lichamen en de naloop van de camera uit en tekent de weergave alleen op schermresolutie. Je eigen instellingen blijven bewaard voor later, en de schakelaars die het overneemt, zeggen {{ui:workspace.offInFastMode}} zolang het aan staat. Wat verder helpt op een trage computer, staat hieronder bij "Als layerling traag aanvoelt".

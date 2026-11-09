@@ -131,6 +131,12 @@ La rueda dentada de la fila del título ({{ui:editor.workspaceSettings}}) abre l
 
 {{ui:workspace.viewCubePosition}} lleva el cubo de vista a otra esquina del plano de trabajo: {{ui:workspace.viewCubePositionTopLeft}} (como ha sido siempre), {{ui:workspace.viewCubePositionTopRight}}, {{ui:workspace.viewCubePositionBottomLeft}} o {{ui:workspace.viewCubePositionBottomRight}}. En cualquier esquina que no sea la de arriba a la izquierda, la barra de vista sube al hueco que deja el cubo. Abajo a la derecha, el cubo queda justo encima del control {{ui:inspector.snapGrid}}. Mientras las propiedades de una forma están abiertas a la derecha, un cubo situado a la derecha se aparta a su izquierda. La esquina se guarda en este navegador y vale para todos los diseños. En una ventana estrecha, como la de un móvil, el ajuste no aparece y el cubo se queda arriba a la izquierda.
 
+### Aspecto: botones de la cinta
+
+{{ui:workspace.ribbonButtons}} quita de la cinta los grupos y botones que nunca usas. Haz clic en un grupo para abrir su lista: {{ui:workspace.ribbonGroupShown}} quita el grupo entero, la marca junto a un botón solo ese botón. {{ui:workspace.ribbonShowAll}} lo devuelve todo. Un grupo sin botones desaparece y los demás se adelantan, así cabe más cinta en una fila.
+
+Lo que quitas solo falta en la cinta: la búsqueda de comandos ([[Ctrl]]+[[K]]) lo sigue encontrando y su tecla lo sigue ejecutando. El orden de los grupos no cambia, y el grupo Formas y la Ayuda se quedan siempre. Este navegador recuerda la elección, y entra en el archivo de {{ui:workspace.exportSettings}}. Vale para el editor 3D; el boceto tiene su propia barra.
+
 ### Aspecto: modo rápido
 
 {{ui:workspace.fastMode}} es para ordenadores más lentos. Desactiva las sombras, las líneas de arista en todos los cuerpos y la inercia de la cámara, y dibuja la vista solo a la resolución de la pantalla. Tus propios ajustes se guardan para más adelante, y mientras está activado, los interruptores que anula indican {{ui:workspace.offInFastMode}}. Más cosas que ayudan en un ordenador lento, en «Cuando layerling va lento», más abajo.

@@ -131,6 +131,12 @@ Ozubené kolo v titulním řádku ({{ui:editor.workspaceSettings}}) otevře nast
 
 {{ui:workspace.viewCubePosition}} v {{ui:workspace.appearance}} přesune orientační krychli do jiného rohu pracovní plochy: {{ui:workspace.viewCubePositionTopLeft}} (jako dosud), {{ui:workspace.viewCubePositionTopRight}}, {{ui:workspace.viewCubePositionBottomLeft}} nebo {{ui:workspace.viewCubePositionBottomRight}}. V každém rohu kromě levého horního se lišta pohledu posune nahoru na místo, které krychle uvolnila. Vpravo dole stojí krychle těsně nad ovládáním {{ui:inspector.snapGrid}}. Dokud jsou vpravo otevřené vlastnosti tvaru, krychle na pravé straně uhne vlevo od nich. Roh se uchovává v tomto prohlížeči pro všechny projekty. V úzkém okně, třeba na telefonu, je nastavení skryté a krychle zůstává vlevo nahoře.
 
+### Vzhled: tlačítka na pásu nástrojů
+
+{{ui:workspace.ribbonButtons}} odebere z pásu nástrojů skupiny a tlačítka, které nikdy nepoužíváte. Kliknutím na skupinu otevřete její seznam: {{ui:workspace.ribbonGroupShown}} odebere celou skupinu, zaškrtnutí u tlačítka jen to tlačítko. {{ui:workspace.ribbonShowAll}} vrátí vše zpět. Skupina bez tlačítek zmizí a ostatní se posunou, takže se do jednoho řádku vejde víc pásu.
+
+Co odeberete, chybí jen na pásu: vyhledávání příkazů ([[Ctrl]]+[[K]]) to dál najde a jeho klávesa to dál spustí. Pořadí skupin zůstane stejné a skupina Tvary a Nápověda zůstanou vždy. Volbu si pamatuje tento prohlížeč a jde i do souboru z {{ui:workspace.exportSettings}}. Platí pro 3D editor; náčrt má vlastní lištu.
+
 ### Vzhled: rychlý režim
 
 {{ui:workspace.fastMode}} je pro pomalejší počítače. Vypne stíny, obrysy na všech tělesech a setrvačnost kamery a vykresluje pohled jen v rozlišení obrazovky. Vaše vlastní nastavení zůstanou uložená na později a přepínače, které přebírá, ukazují {{ui:workspace.offInFastMode}}, dokud je zapnutý. Co dalšího pomáhá na pomalém počítači, najdete níže v části „Když je Layerling pomalý“.

@@ -11,6 +11,7 @@ import "./viewCube.css";
 import "./secondView.css";
 import "./viewScrollbars.css";
 import "./shortcuts.css";
+import "./ribbonButtons.css";
 import "./sketchImage.css";
 import "./sketchLock.css";
 import "./dashboardSelect.css";

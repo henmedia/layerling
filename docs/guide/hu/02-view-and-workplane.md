@@ -129,6 +129,12 @@ A(z) {{ui:workspace.shapeColors}} az alakzattár képein azt a színt mutatja, a
 
 A {{ui:workspace.viewCubePosition}} a {{ui:workspace.appearance}} alatt a nézetkockát a munkaterület egy másik sarkába teszi: {{ui:workspace.viewCubePositionTopLeft}} (ahogy mindig is volt), {{ui:workspace.viewCubePositionTopRight}}, {{ui:workspace.viewCubePositionBottomLeft}} vagy {{ui:workspace.viewCubePositionBottomRight}}. A bal felső sarkon kívül minden sarokban a nézetsáv feljebb kerül, a kocka által szabadon hagyott helyre. Jobb alul a kocka közvetlenül a {{ui:inspector.snapGrid}} vezérlő fölött áll. Amíg jobb oldalon egy alakzat tulajdonságai nyitva vannak, a jobb oldali kocka balra kitér előlük. A sarok ebben a böngészőben megmarad, és minden tervre érvényes. Keskeny ablakban, például telefonon, a beállítás rejtve van, és a kocka a bal felső sarokban marad.
 
+### Megjelenés: gombok a szalagon
+
+A {{ui:workspace.ribbonButtons}} kiveszi a szalagról azokat a csoportokat és gombokat, amelyeket sosem használsz. Egy csoportra kattintva megnyílik a listája: a {{ui:workspace.ribbonGroupShown}} az egész csoportot veszi ki, egy gomb melletti pipa csak azt a gombot. Az {{ui:workspace.ribbonShowAll}} mindent visszahoz. A gomb nélkül maradt csoport eltűnik, a többi előrébb lép, így a szalagból több fér el egy sorban.
+
+Amit kiveszel, az csak a szalagról hiányzik: a parancskereső ([[Ctrl]]+[[K]]) továbbra is megtalálja, és a billentyűje továbbra is elindítja. A csoportok sorrendje nem változik, az Alakzatok csoport és a Súgó pedig mindig megmarad. A választást ez a böngésző jegyzi meg, és bekerül a {{ui:workspace.exportSettings}} fájljába is. A 3D-szerkesztőre vonatkozik; a vázlatnak saját sávja van.
+
 ### Megjelenés: gyors mód
 
 A(z) {{ui:workspace.fastMode}} lassabb számítógépekhez való. Kikapcsolja az árnyékokat, az élvonalakat minden testen és a kamera tehetetlenségét, és a nézetet csak a képernyő felbontásában rajzolja. A saját beállításaid későbbre elmentve maradnak, az általa átvett kapcsolók pedig a(z) {{ui:workspace.offInFastMode}} feliratot mutatják, amíg be van kapcsolva. Hogy mi segít még egy lassú gépen, azt lent, „Ha a layerling lassúnak tűnik” alatt találod.

@@ -131,6 +131,12 @@ Das Zahnrad in der Titelzeile ({{ui:editor.workspaceSettings}}) öffnet die Eins
 
 {{ui:workspace.viewCubePosition}} stellt den Ansichtswürfel in eine andere Ecke der Arbeitsfläche: {{ui:workspace.viewCubePositionTopLeft}} (wie bisher), {{ui:workspace.viewCubePositionTopRight}}, {{ui:workspace.viewCubePositionBottomLeft}} oder {{ui:workspace.viewCubePositionBottomRight}}. In jeder Ecke außer oben links rückt die Ansichtsleiste nach oben an den Platz, den der Würfel frei gemacht hat. Unten rechts steht der Würfel knapp über der Auswahl {{ui:inspector.snapGrid}}. Solange rechts die Eigenschaften einer Form offen sind, weicht ein Würfel auf der rechten Seite links daneben aus. Die Ecke merkt sich dieser Browser, sie gilt für jedes Design. In einem schmalen Fenster, etwa auf dem Handy, ist die Einstellung ausgeblendet und der Würfel bleibt oben links.
 
+### Darstellung: Knöpfe im Menüband
+
+{{ui:workspace.ribbonButtons}} nimmt Gruppen und Knöpfe, die du nie brauchst, aus dem Menüband. Ein Klick auf eine Gruppe öffnet ihre Liste: {{ui:workspace.ribbonGroupShown}} nimmt die ganze Gruppe heraus, das Häkchen neben einem Knopf nur diesen Knopf. {{ui:workspace.ribbonShowAll}} holt alles zurück. Eine Gruppe ohne Knopf verschwindet, und die anderen rücken auf, so passt mehr vom Menüband in eine Zeile.
+
+Was du herausnimmst, fehlt nur im Menüband: Die Befehlssuche ([[Strg]]+[[K]]) findet es weiter, und seine Taste führt es weiter aus. Die Reihenfolge der Gruppen bleibt gleich, und die Gruppe Formen und die Hilfe bleiben immer. Die Wahl merkt sich dieser Browser, und sie geht mit in die Datei von {{ui:workspace.exportSettings}}. Sie gilt für den 3D-Editor; die Skizze hat eine eigene Leiste.
+
 ### Darstellung: Schnellmodus
 
 {{ui:workspace.fastMode}} ist für langsamere Rechner. Er schaltet Schatten, Kantenlinien an allen Körpern und das Nachlaufen der Kamera aus und zeichnet die Ansicht nur in Bildschirmauflösung. Deine eigenen Einstellungen bleiben für später erhalten, und die Schalter, die er überstimmt, zeigen {{ui:workspace.offInFastMode}}, solange er an ist. Was sonst auf einem langsamen Rechner hilft, steht unten unter „Wenn sich layerling langsam anfühlt“.

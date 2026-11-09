@@ -130,6 +130,12 @@ L’ingranaggio nella riga del titolo ({{ui:editor.workspaceSettings}}) apre le 
 
 {{ui:workspace.viewCubePosition}} sposta il cubo di visualizzazione in un altro angolo del piano di lavoro: {{ui:workspace.viewCubePositionTopLeft}} (la posizione abituale), {{ui:workspace.viewCubePositionTopRight}}, {{ui:workspace.viewCubePositionBottomLeft}} o {{ui:workspace.viewCubePositionBottomRight}}. Se lo sposti in un angolo diverso da quello in alto a sinistra, la barra della vista occupa lo spazio lasciato libero. In basso a destra, il cubo si trova appena sopra il controllo {{ui:inspector.snapGrid}}. Quando a destra è aperto il pannello delle proprietà di una forma, il cubo sul lato destro si sposta alla sua sinistra. La posizione viene memorizzata in questo browser ed è la stessa per tutti i progetti. Nelle finestre strette, per esempio su un telefono, l’impostazione è nascosta e il cubo resta in alto a sinistra.
 
+### Aspetto: pulsanti della barra multifunzione
+
+{{ui:workspace.ribbonButtons}} toglie dalla barra multifunzione i gruppi e i pulsanti che non usi mai. Fai clic su un gruppo per aprire il suo elenco: {{ui:workspace.ribbonGroupShown}} toglie tutto il gruppo, la spunta accanto a un pulsante solo quel pulsante. {{ui:workspace.ribbonShowAll}} rimette tutto. Un gruppo senza pulsanti scompare e gli altri avanzano, così una riga contiene più barra.
+
+Ciò che togli manca solo dalla barra: la ricerca comandi ([[Ctrl]]+[[K]]) lo trova ancora e il suo tasto lo esegue ancora. L'ordine dei gruppi resta lo stesso, e il gruppo Forme e la Guida restano sempre. Questo browser ricorda la scelta, che finisce anche nel file di {{ui:workspace.exportSettings}}. Vale per l'editor 3D; lo schizzo ha una barra sua.
+
 ### Aspetto: modalità veloce
 
 {{ui:workspace.fastMode}} è pensata per i computer più lenti. Disattiva le ombre, i contorni di tutti i corpi e l’inerzia della telecamera, e disegna la vista soltanto alla risoluzione dello schermo. Le tue impostazioni vengono conservate; mentre la modalità è attiva, gli interruttori che la modalità veloce disabilita mostrano {{ui:workspace.offInFastMode}}. Per altri suggerimenti sui computer lenti, vedi “Quando layerling è lento” qui sotto.

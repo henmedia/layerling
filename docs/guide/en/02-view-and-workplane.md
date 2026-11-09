@@ -131,6 +131,12 @@ The cogwheel in the title row ({{ui:editor.workspaceSettings}}) opens the settin
 
 {{ui:workspace.viewCubePosition}} puts the view cube in another corner of the workplane: {{ui:workspace.viewCubePositionTopLeft}} (as it always was), {{ui:workspace.viewCubePositionTopRight}}, {{ui:workspace.viewCubePositionBottomLeft}} or {{ui:workspace.viewCubePositionBottomRight}}. In any corner but the top left, the view bar moves up into the spot the cube left. In the bottom right the cube stands just above the {{ui:inspector.snapGrid}} control. While the properties of a shape are open on the right, a cube on the right steps to the left of them. The corner is kept in this browser and holds for every design. On a narrow window, such as a phone, the setting is hidden and the cube stays in the top left.
 
+### Appearance: buttons in the ribbon
+
+{{ui:workspace.ribbonButtons}} takes the groups and buttons you never use out of the ribbon. Click a group to open its list: {{ui:workspace.ribbonGroupShown}} takes the whole group out, the tick next to a button just that button. {{ui:workspace.ribbonShowAll}} brings everything back. A group with no button left disappears and the others move up, so more of the ribbon fits in one row.
+
+What you take out only leaves the ribbon: the command search ([[Ctrl]]+[[K]]) still finds it, and its key still runs it. The order of the groups stays the same, and the Shapes group and Help always stay. The choice is kept in this browser and goes into the file of {{ui:workspace.exportSettings}}. It applies to the 3D editor; the sketch has a bar of its own.
+
 ### Appearance: fast mode
 
 {{ui:workspace.fastMode}} is for slower computers. It turns off shadows, edge lines on all bodies and the camera's inertia, and draws the view at screen resolution only. Your own settings are kept for later, and the switches it overrides say {{ui:workspace.offInFastMode}} while it is on. More about what helps on a slow computer is under "When layerling feels slow" below.

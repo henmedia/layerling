@@ -25,6 +25,7 @@ describe("settings file (Discussion #1407)", () => {
       "layerling.shapeColors": "off",
       "layerling.printerPlays": JSON.stringify({ "some-printer": 0.15, broken: "x" }),
       "layerling.customShortcuts": JSON.stringify({ center: { combo: "Shift+C", label: "Center on workplane" }, "object-1": { combo: "J", label: "a body" } }),
+      "layerling.ribbonHidden": JSON.stringify(["cookieCutter", "group:visibility", 7]),
     }));
     expect(browser).toEqual({
       theme: "dark",
@@ -33,6 +34,7 @@ describe("settings file (Discussion #1407)", () => {
       shapeColors: false,
       printerPlays: { "some-printer": 0.15 },
       customShortcuts: { center: { combo: "Shift+C", label: "Center on workplane" } },
+      ribbonHidden: ["cookieCutter", "group:visibility"],
     });
     const parsed = parseSettingsFile(settingsFileText(buildSettingsFile(workspace, "2.0 mm", browser, NOW)));
     expect(parsed).not.toBeNull();
@@ -50,6 +52,7 @@ describe("settings file (Discussion #1407)", () => {
       shapeColors: true,
       printerPlays: {},
       customShortcuts: {},
+      ribbonHidden: [],
     });
     expect(readBrowserSettings(null).shapeColors).toBe(true);
   });
@@ -98,6 +101,18 @@ describe("settings file (Discussion #1407)", () => {
     expect(sound!.browser.customShortcuts).toEqual({ "shapes-panel": { combo: "Ctrl+Shift+K", label: "Shapes" } });
     const older = parseSettingsFile(JSON.stringify({ format: SETTINGS_FILE_FORMAT, version: 1, workspace: {}, browser: { theme: "dark" } }));
     expect(older!.browser.customShortcuts).toBeUndefined();
+  });
+
+  it("carries the buttons taken out of the ribbon (Discussion #1519), and a file from before them leaves them alone", () => {
+    const withHidden = parseSettingsFile(JSON.stringify({
+      format: SETTINGS_FILE_FORMAT,
+      version: 1,
+      workspace: {},
+      browser: { ribbonHidden: ["paint", "paint", "", 3, "group:modify"] },
+    }));
+    expect(withHidden!.browser.ribbonHidden).toEqual(["group:modify", "paint"]);
+    const older = parseSettingsFile(JSON.stringify({ format: SETTINGS_FILE_FORMAT, version: 1, workspace: {}, browser: { theme: "dark" } }));
+    expect(older!.browser.ribbonHidden).toBeUndefined();
   });
 
   it("names the download after the day", () => {

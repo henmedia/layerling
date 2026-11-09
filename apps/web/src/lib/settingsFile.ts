@@ -1,6 +1,7 @@
 import { normalizeAppThemePreference, type AppThemePreference } from "@/lib/appTheme";
 import { CUSTOM_SHORTCUTS_STORAGE_KEY, normalizeCustomShortcuts, type CustomShortcuts } from "@/lib/customShortcuts";
 import { normalizePrinterPlay, PRINTER_PLAYS_STORAGE_KEY } from "@/lib/printerPlay";
+import { normalizeRibbonHidden, RIBBON_HIDDEN_STORAGE_KEY } from "@/lib/ribbonHidden";
 import { normalizeShapeColors, SHAPE_COLORS_STORAGE_KEY } from "@/lib/shapeColors";
 import { normalizeToolbarSize, TOOLBAR_SIZE_STORAGE_KEY, type ToolbarSize } from "@/lib/toolbarSize";
 import { normalizeViewCubePosition, VIEW_CUBE_POSITION_STORAGE_KEY, type ViewCubePosition } from "@/lib/viewCubePosition";
@@ -31,6 +32,8 @@ export type BrowserSettings = {
    * saved before they existed leaves the keys of this browser alone.
    */
   customShortcuts?: CustomShortcuts;
+  /** Groups and buttons taken out of the ribbon (Discussion #1519); like the keys, read only from a file that has them. */
+  ribbonHidden?: string[];
 };
 
 export type SettingsFile = {
@@ -79,6 +82,12 @@ export function readBrowserSettings(storage: Pick<Storage, "getItem"> | null): B
   } catch {
     customShortcuts = {};
   }
+  let ribbonHidden: string[] = [];
+  try {
+    ribbonHidden = normalizeRibbonHidden(JSON.parse(readText(storage, RIBBON_HIDDEN_STORAGE_KEY) ?? "[]"));
+  } catch {
+    ribbonHidden = [];
+  }
   return {
     theme: normalizeAppThemePreference(readText(storage, APP_THEME_STORAGE_KEY)),
     toolbarSize: normalizeToolbarSize(readText(storage, TOOLBAR_SIZE_STORAGE_KEY)),
@@ -86,6 +95,7 @@ export function readBrowserSettings(storage: Pick<Storage, "getItem"> | null): B
     shapeColors: normalizeShapeColors(readText(storage, SHAPE_COLORS_STORAGE_KEY)),
     printerPlays,
     customShortcuts,
+    ribbonHidden,
   };
 }
 
@@ -141,6 +151,7 @@ export function parseSettingsFile(text: string): SettingsFile | null {
       shapeColors: typeof browser.shapeColors === "boolean" ? browser.shapeColors : true,
       printerPlays: normalizePrinterPlays(browser.printerPlays),
       ...("customShortcuts" in browser ? { customShortcuts: normalizeCustomShortcuts(browser.customShortcuts) } : {}),
+      ...("ribbonHidden" in browser ? { ribbonHidden: normalizeRibbonHidden(browser.ribbonHidden) } : {}),
     },
   };
 }
