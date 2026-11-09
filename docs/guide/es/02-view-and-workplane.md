@@ -125,7 +125,7 @@ La rueda dentada de la fila del título ({{ui:editor.workspaceSettings}}) abre l
 
 {{ui:workspace.theme}} elige la combinación de colores de todo el programa: {{ui:workspace.themeSystem}} sigue la de tu ordenador, y las demás son {{ui:workspace.themeLight}}, {{ui:workspace.themeDark}} y {{ui:workspace.themeGraphite}}. También puedes cambiarla arriba a la derecha del editor.
 
-{{ui:workspace.toolbarSize}} hace más pequeños o más grandes los botones de la cinta de arriba, su menú de formas, la barra de vista de la izquierda y el panel de propiedades de la derecha: {{ui:workspace.toolbarSizeSmall}}, {{ui:workspace.toolbarSizeMedium}} (como ha sido siempre) o {{ui:workspace.toolbarSizeLarge}}. El tamaño pequeño deja más sitio al plano de trabajo en un portátil; el grande es más fácil de acertar en una pantalla grande o con el dedo. Con botones grandes, los grupos de la cinta pasan a una segunda fila cuando la ventana se queda estrecha. El tamaño se guarda en este navegador y vale para todos los diseños.
+{{ui:workspace.toolbarSize}} hace más pequeños o más grandes los botones de la cinta de arriba, su menú de formas, la barra de vista de la izquierda y el panel de propiedades de la derecha: {{ui:workspace.toolbarSizeSmall}}, {{ui:workspace.toolbarSizeMedium}} (como ha sido siempre) o {{ui:workspace.toolbarSizeLarge}}. El tamaño pequeño deja más sitio al plano de trabajo en un portátil; el grande es más fácil de acertar en una pantalla grande o con el dedo. Con botones grandes, los grupos de la cinta pasan a una segunda fila cuando la ventana se queda estrecha. El tamaño está en la pestaña {{ui:workspace.ribbon}} de los ajustes, se guarda en este navegador y vale para todos los diseños.
 
 {{ui:workspace.shapeColors}} pone en las imágenes de la biblioteca de formas el color con el que empieza una forma nueva (el de su tipo, o el que guardaste con {{ui:inspector.saveDefaults}}). Desactívalo si prefieres las imágenes en gris; el navegador recuerda lo que elijas.
 
@@ -135,7 +135,7 @@ La rueda dentada de la fila del título ({{ui:editor.workspaceSettings}}) abre l
 
 {{ui:workspace.ribbonButtons}} quita de la cinta los grupos y botones que nunca usas. Haz clic en un grupo para abrir su lista: {{ui:workspace.ribbonGroupShown}} quita el grupo entero, la marca junto a un botón solo ese botón. {{ui:workspace.ribbonShowAll}} lo devuelve todo. Un grupo sin botones desaparece y los demás se adelantan, así cabe más cinta en una fila.
 
-Lo que quitas solo falta en la cinta: la búsqueda de comandos ([[Ctrl]]+[[K]]) lo sigue encontrando y su tecla lo sigue ejecutando. El orden de los grupos no cambia, y el grupo Formas y la Ayuda se quedan siempre. Este navegador recuerda la elección, y entra en el archivo de {{ui:workspace.exportSettings}}. Vale para el editor 3D; el boceto tiene su propia barra.
+Lo que quitas solo falta en la cinta: la búsqueda de comandos ([[Ctrl]]+[[K]]) lo sigue encontrando y su tecla lo sigue ejecutando. Las flechas junto a un grupo lo suben o bajan en la lista y, con ello, a lo largo de la cinta; {{ui:workspace.ribbonResetOrder}} devuelve el orden original. El grupo Formas y la Ayuda se quedan siempre, y Formas conserva su sitio tras los dos primeros grupos. Este navegador recuerda la elección, y entra en el archivo de {{ui:workspace.exportSettings}}. Vale para el editor 3D; el boceto tiene su propia barra.
 
 ### Aspecto: modo rápido
 

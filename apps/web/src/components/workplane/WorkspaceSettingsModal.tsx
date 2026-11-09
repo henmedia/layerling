@@ -4,7 +4,7 @@ import { GuideHelpLink } from "@/components/GuideHelpLink";
 import { RibbonButtonsSetting } from "@/components/workplane/RibbonButtonsSetting";
 import type { GuideSection } from "@/lib/guideLinks";
 import { MAX_OVERHANG_ANGLE, MIN_OVERHANG_ANGLE } from "@/lib/overhangLimits";
-import { Box as BoxIcon, ChevronDown, Grid3X3, History, Palette, Plus, RotateCcw, Ruler, Trash2, X } from "lucide-react";
+import { Box as BoxIcon, ChevronDown, Grid3X3, History, Palette, PanelTop, Plus, RotateCcw, Ruler, Trash2, X } from "lucide-react";
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { useMovablePanel } from "@/lib/useMovablePanel";
 import { SpaceMouseSetting } from "@/components/workplane/SpaceMouseSetting";
@@ -106,10 +106,11 @@ import { MAX_TEXT_LENGTH } from "@/lib/textLength";
 import { DEFAULT_HIRTH_BORE, DEFAULT_HIRTH_TEETH, MAX_HIRTH_TEETH, MIN_HIRTH_TEETH, MIN_HIRTH_TOOTH_HEIGHT, hirthBoreLimit, hirthToothHeightLimit } from "@/lib/hirthGeometry";
 
 type WorkspaceSettings = WorkplaneWorkspaceSettings;
-type WorkspaceSettingsSection = "appearance" | "measurement" | "workplane" | "shapes" | "history";
+type WorkspaceSettingsSection = "appearance" | "ribbon" | "measurement" | "workplane" | "shapes" | "history";
 // The question mark of each tab opens that tab's own part of the guide.
 const SETTINGS_HELP_SECTION: Record<WorkspaceSettingsSection, GuideSection> = {
   appearance: "settingsAppearance",
+  ribbon: "ribbonButtons",
   measurement: "settingsMeasurement",
   workplane: "settingsWorkplane",
   shapes: "shapeSettings",
@@ -800,6 +801,10 @@ export function WorkspaceSettingsModal({
               <Palette size={18} />
               <span>{t("workspace.appearance")}</span>
             </button>
+            <button className={activeSection === "ribbon" ? "active" : ""} data-help={t("workspace.ribbon")} aria-current={activeSection === "ribbon" ? "page" : undefined} onClick={() => setActiveSection("ribbon")}>
+              <PanelTop size={18} />
+              <span>{t("workspace.ribbon")}</span>
+            </button>
             <button className={activeSection === "measurement" ? "active" : ""} aria-current={activeSection === "measurement" ? "page" : undefined} onClick={() => setActiveSection("measurement")}>
               <Ruler size={18} />
               <span>{t("workspace.measurement")}</span>
@@ -846,20 +851,6 @@ export function WorkspaceSettingsModal({
                       ))}
                     </select>
                   </label>
-                  <label className="workspace-select" data-help={t("workspace.toolbarSize")}>
-                    <span>{t("workspace.toolbarSize")}</span>
-                    <select
-                      value={toolbarSize}
-                      onChange={(event) => setToolbarSize(event.currentTarget.value as ToolbarSize)}
-                    >
-                      {TOOLBAR_SIZE_OPTIONS.map((size) => (
-                        <option key={size} value={size}>
-                          {t(TOOLBAR_SIZE_LABEL_KEYS[size])}
-                        </option>
-                      ))}
-                    </select>
-                  </label>
-                  <RibbonButtonsSetting />
                   <WorkspaceToggle
                     label={t("workspace.shapeColors")}
                     description={t("workspace.shapeColorsHint")}
@@ -1254,6 +1245,28 @@ export function WorkspaceSettingsModal({
                 </>
               ) : null}
 
+              {activeSection === "ribbon" ? (
+                <>
+                  <div className="workspace-section-heading">
+                    <strong>{t("workspace.ribbon")}</strong>
+                    <span>{t("workspace.ribbonHint")}</span>
+                  </div>
+                  <label className="workspace-select" data-help={t("workspace.toolbarSize")}>
+                    <span>{t("workspace.toolbarSize")}</span>
+                    <select
+                      value={toolbarSize}
+                      onChange={(event) => setToolbarSize(event.currentTarget.value as ToolbarSize)}
+                    >
+                      {TOOLBAR_SIZE_OPTIONS.map((size) => (
+                        <option key={size} value={size}>
+                          {t(TOOLBAR_SIZE_LABEL_KEYS[size])}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+                  <RibbonButtonsSetting />
+                </>
+              ) : null}
               {activeSection === "measurement" ? (
                 <>
                   <div className="workspace-section-heading">

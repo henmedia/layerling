@@ -123,7 +123,7 @@ A címsorban lévő fogaskerék ({{ui:editor.workspaceSettings}}) megnyitja a be
 
 A(z) {{ui:workspace.theme}} az egész program színsémáját választja ki: a(z) {{ui:workspace.themeSystem}} a számítógépet követi, ezenkívül van {{ui:workspace.themeLight}}, {{ui:workspace.themeDark}} és {{ui:workspace.themeGraphite}}. A szerkesztő jobb felső sarkában is átállíthatod.
 
-Az {{ui:workspace.toolbarSize}} a {{ui:workspace.appearance}} alatt kisebbé vagy nagyobbá teszi a felső szalag gombjait, az alakzatmenüjét, a bal oldali nézetsávot és a jobb oldali tulajdonságpanelt: {{ui:workspace.toolbarSizeSmall}}, {{ui:workspace.toolbarSizeMedium}} (ahogy mindig is volt) vagy {{ui:workspace.toolbarSizeLarge}}. A kicsi laptopon több helyet hagy a munkasíknak; a nagyot könnyebb eltalálni nagy képernyőn vagy ujjal. Nagy gombokkal a szalag csoportjai egy második sorba kerülnek, ha az ablak túl keskeny hozzájuk. A méret ebben a böngészőben megmarad, és minden tervre érvényes.
+Az {{ui:workspace.toolbarSize}} a {{ui:workspace.appearance}} alatt kisebbé vagy nagyobbá teszi a felső szalag gombjait, az alakzatmenüjét, a bal oldali nézetsávot és a jobb oldali tulajdonságpanelt: {{ui:workspace.toolbarSizeSmall}}, {{ui:workspace.toolbarSizeMedium}} (ahogy mindig is volt) vagy {{ui:workspace.toolbarSizeLarge}}. A kicsi laptopon több helyet hagy a munkasíknak; a nagyot könnyebb eltalálni nagy képernyőn vagy ujjal. Nagy gombokkal a szalag csoportjai egy második sorba kerülnek, ha az ablak túl keskeny hozzájuk. A méret a beállítások {{ui:workspace.ribbon}} lapján van, ebben a böngészőben megmarad, és minden tervre érvényes.
 
 A(z) {{ui:workspace.shapeColors}} az alakzattár képein azt a színt mutatja, amellyel egy új alakzat indul (a fajtája színét, vagy azt, amelyet a(z) {{ui:inspector.saveDefaults}} gombbal mentettél). Ha inkább szürke képeket szeretnél, kapcsold ki; a böngésző megjegyzi a választásodat.
 
@@ -133,7 +133,7 @@ A {{ui:workspace.viewCubePosition}} a {{ui:workspace.appearance}} alatt a nézet
 
 A {{ui:workspace.ribbonButtons}} kiveszi a szalagról azokat a csoportokat és gombokat, amelyeket sosem használsz. Egy csoportra kattintva megnyílik a listája: a {{ui:workspace.ribbonGroupShown}} az egész csoportot veszi ki, egy gomb melletti pipa csak azt a gombot. Az {{ui:workspace.ribbonShowAll}} mindent visszahoz. A gomb nélkül maradt csoport eltűnik, a többi előrébb lép, így a szalagból több fér el egy sorban.
 
-Amit kiveszel, az csak a szalagról hiányzik: a parancskereső ([[Ctrl]]+[[K]]) továbbra is megtalálja, és a billentyűje továbbra is elindítja. A csoportok sorrendje nem változik, az Alakzatok csoport és a Súgó pedig mindig megmarad. A választást ez a böngésző jegyzi meg, és bekerül a {{ui:workspace.exportSettings}} fájljába is. A 3D-szerkesztőre vonatkozik; a vázlatnak saját sávja van.
+Amit kiveszel, az csak a szalagról hiányzik: a parancskereső ([[Ctrl]]+[[K]]) továbbra is megtalálja, és a billentyűje továbbra is elindítja. A csoport melletti nyilak a listában felfelé vagy lefelé, így a szalagon is odébb viszik; a {{ui:workspace.ribbonResetOrder}} visszaállítja az eredeti sorrendet. Az Alakzatok csoport és a Súgó mindig megmarad, az Alakzatok pedig az első két csoport után tartja a helyét. A választást ez a böngésző jegyzi meg, és bekerül a {{ui:workspace.exportSettings}} fájljába is. A 3D-szerkesztőre vonatkozik; a vázlatnak saját sávja van.
 
 ### Megjelenés: gyors mód
 

@@ -125,7 +125,7 @@ The cogwheel in the title row ({{ui:editor.workspaceSettings}}) opens the settin
 
 {{ui:workspace.theme}} sets the colour scheme of the whole program: {{ui:workspace.themeSystem}} follows your computer, the others are {{ui:workspace.themeLight}}, {{ui:workspace.themeDark}} and {{ui:workspace.themeGraphite}}. You can also change it at the top right of the editor.
 
-{{ui:workspace.toolbarSize}} makes the buttons of the ribbon on top, its shape menu, the view bar on the left and the properties panel on the right smaller or larger: {{ui:workspace.toolbarSizeSmall}}, {{ui:workspace.toolbarSizeMedium}} (as it always was) or {{ui:workspace.toolbarSizeLarge}}. Small leaves more room for the workplane on a laptop; large is easier to hit on a big screen or with a finger. With large buttons the groups of the ribbon go onto a second row when the window is too narrow for them. The size is kept in this browser and holds for every design.
+{{ui:workspace.toolbarSize}} makes the buttons of the ribbon on top, its shape menu, the view bar on the left and the properties panel on the right smaller or larger: {{ui:workspace.toolbarSizeSmall}}, {{ui:workspace.toolbarSizeMedium}} (as it always was) or {{ui:workspace.toolbarSizeLarge}}. Small leaves more room for the workplane on a laptop; large is easier to hit on a big screen or with a finger. With large buttons the groups of the ribbon go onto a second row when the window is too narrow for them. The size sits in the {{ui:workspace.ribbon}} tab of the settings, is kept in this browser and holds for every design.
 
 {{ui:workspace.shapeColors}} puts the colour a new shape starts with on the pictures of the shape library (the colour of its kind, or the one you saved with {{ui:inspector.saveDefaults}}). Switch it off if you prefer grey pictures; your browser remembers the choice.
 
@@ -135,7 +135,7 @@ The cogwheel in the title row ({{ui:editor.workspaceSettings}}) opens the settin
 
 {{ui:workspace.ribbonButtons}} takes the groups and buttons you never use out of the ribbon. Click a group to open its list: {{ui:workspace.ribbonGroupShown}} takes the whole group out, the tick next to a button just that button. {{ui:workspace.ribbonShowAll}} brings everything back. A group with no button left disappears and the others move up, so more of the ribbon fits in one row.
 
-What you take out only leaves the ribbon: the command search ([[Ctrl]]+[[K]]) still finds it, and its key still runs it. The order of the groups stays the same, and the Shapes group and Help always stay. The choice is kept in this browser and goes into the file of {{ui:workspace.exportSettings}}. It applies to the 3D editor; the sketch has a bar of its own.
+What you take out only leaves the ribbon: the command search ([[Ctrl]]+[[K]]) still finds it, and its key still runs it. The arrows next to a group move it up or down the list, and so along the ribbon; {{ui:workspace.ribbonResetOrder}} brings back the order it came with. The Shapes group and Help always stay, and Shapes keeps its place after the first two groups. The choice is kept in this browser and goes into the file of {{ui:workspace.exportSettings}}. It applies to the 3D editor; the sketch has a bar of its own.
 
 ### Appearance: fast mode
 

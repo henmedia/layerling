@@ -123,7 +123,7 @@ X 和 [[Esc]] 会关闭窗口；如果正在测量，[[Esc]] 会先结束测量�
 
 {{ui:workspace.theme}} 设定整个程序的配色：{{ui:workspace.themeSystem}} 跟随电脑，其余为 {{ui:workspace.themeLight}}、{{ui:workspace.themeDark}} 和 {{ui:workspace.themeGraphite}}。也可以在编辑器右上角更改。
 
-{{ui:workspace.toolbarSize}} 让顶部功能区的按钮、其形状菜单、左侧视图栏和右侧属性面板变小或变大：{{ui:workspace.toolbarSizeSmall}}、{{ui:workspace.toolbarSizeMedium}}（一直以来的样子）或 {{ui:workspace.toolbarSizeLarge}}。小尺寸在笔记本电脑上给工作平面留出更多空间；大尺寸在大屏幕上或用手点击时更容易命中。使用大按钮时，如果窗口太窄，功能区的各组会排到第二行。尺寸保存在这个浏览器中，对所有设计生效。
+{{ui:workspace.toolbarSize}} 让顶部功能区的按钮、其形状菜单、左侧视图栏和右侧属性面板变小或变大：{{ui:workspace.toolbarSizeSmall}}、{{ui:workspace.toolbarSizeMedium}}（一直以来的样子）或 {{ui:workspace.toolbarSizeLarge}}。小尺寸在笔记本电脑上给工作平面留出更多空间；大尺寸在大屏幕上或用手点击时更容易命中。使用大按钮时，如果窗口太窄，功能区的各组会排到第二行。尺寸在设置的“{{ui:workspace.ribbon}}”标签页中，保存在这个浏览器中，对所有设计生效。
 
 {{ui:workspace.shapeColors}} 会把新形状的初始颜色（其类型的颜色，或你用 {{ui:inspector.saveDefaults}} 保存的颜色）显示在形状库的图片上。如果你更喜欢灰色图片，就把它关掉；浏览器会记住你的选择。
 
@@ -133,7 +133,7 @@ X 和 [[Esc]] 会关闭窗口；如果正在测量，[[Esc]] 会先结束测量�
 
 {{ui:workspace.ribbonButtons}} 把你从不使用的组和按钮从功能区中移除。点击一个组打开它的列表：{{ui:workspace.ribbonGroupShown}} 移除整个组，按钮旁的勾选框只移除这一个按钮。{{ui:workspace.ribbonShowAll}} 把一切恢复。没有按钮的组会消失，其他组随之前移，一行就能放下更多功能区。
 
-移除的内容只是不在功能区中：命令搜索（[[Ctrl]]+[[K]]）仍能找到它，它的快捷键仍能运行它。组的顺序保持不变，“形状”组和“帮助”始终保留。这个浏览器会记住你的选择，它也会写入 {{ui:workspace.exportSettings}} 的文件。它适用于 3D 编辑器；草图有自己的工具栏。
+移除的内容只是不在功能区中：命令搜索（[[Ctrl]]+[[K]]）仍能找到它，它的快捷键仍能运行它。组旁边的箭头把它在列表中上移或下移，也就是在功能区中移动；{{ui:workspace.ribbonResetOrder}}会恢复原来的顺序。“形状”组和“帮助”始终保留，“形状”组固定在前两个组之后。这个浏览器会记住你的选择，它也会写入 {{ui:workspace.exportSettings}} 的文件。它适用于 3D 编辑器；草图有自己的工具栏。
 
 ### 外观：快速模式
 

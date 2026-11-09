@@ -126,7 +126,7 @@ Koło zębate w wierszu tytułu ({{ui:editor.workspaceSettings}}) otwiera ustawi
 
 {{ui:workspace.theme}} ustawia kolory całego programu: {{ui:workspace.themeSystem}} podąża za komputerem, pozostałe to {{ui:workspace.themeLight}}, {{ui:workspace.themeDark}} i {{ui:workspace.themeGraphite}}. Możesz go też zmienić w prawym górnym rogu edytora.
 
-{{ui:workspace.toolbarSize}} zmniejsza lub powiększa przyciski wstążki na górze, jej menu kształtów, pasek widoku po lewej i panel właściwości po prawej: {{ui:workspace.toolbarSizeSmall}}, {{ui:workspace.toolbarSizeMedium}} (jak zawsze) albo {{ui:workspace.toolbarSizeLarge}}. Mały zostawia na laptopie więcej miejsca na płaszczyznę roboczą, duży łatwiej trafić na dużym ekranie albo palcem. Przy dużych przyciskach grupy wstążki przechodzą do drugiego rzędu, gdy okno jest dla nich za wąskie. Rozmiar zapamiętuje ta przeglądarka i obowiązuje on w każdym projekcie.
+{{ui:workspace.toolbarSize}} zmniejsza lub powiększa przyciski wstążki na górze, jej menu kształtów, pasek widoku po lewej i panel właściwości po prawej: {{ui:workspace.toolbarSizeSmall}}, {{ui:workspace.toolbarSizeMedium}} (jak zawsze) albo {{ui:workspace.toolbarSizeLarge}}. Mały zostawia na laptopie więcej miejsca na płaszczyznę roboczą, duży łatwiej trafić na dużym ekranie albo palcem. Przy dużych przyciskach grupy wstążki przechodzą do drugiego rzędu, gdy okno jest dla nich za wąskie. Rozmiar jest na karcie {{ui:workspace.ribbon}} w ustawieniach; zapamiętuje go ta przeglądarka i obowiązuje on w każdym projekcie.
 
 {{ui:workspace.shapeColors}} pokazuje na obrazkach biblioteki kształtów kolor, z jakim startuje nowy kształt (kolor jego rodzaju albo ten, który zapisałeś przyciskiem {{ui:inspector.saveDefaults}}). Wyłącz to, jeśli wolisz szare obrazki. Przeglądarka zapamiętuje ten wybór.
 
@@ -136,7 +136,7 @@ Koło zębate w wierszu tytułu ({{ui:editor.workspaceSettings}}) otwiera ustawi
 
 {{ui:workspace.ribbonButtons}} usuwa ze wstążki grupy i przyciski, których nigdy nie używasz. Kliknij grupę, aby otworzyć jej listę: {{ui:workspace.ribbonGroupShown}} usuwa całą grupę, znacznik przy przycisku tylko ten przycisk. {{ui:workspace.ribbonShowAll}} przywraca wszystko. Grupa bez przycisków znika, a pozostałe się przesuwają, więc w jednym rzędzie mieści się więcej wstążki.
 
-To, co usuniesz, znika tylko ze wstążki: wyszukiwanie poleceń ([[Ctrl]]+[[K]]) nadal to znajduje, a klawisz nadal to uruchamia. Kolejność grup się nie zmienia, a grupa Kształty i Pomoc zostają zawsze. Wybór zapamiętuje ta przeglądarka i trafia on też do pliku z {{ui:workspace.exportSettings}}. Dotyczy edytora 3D; szkic ma własny pasek.
+To, co usuniesz, znika tylko ze wstążki: wyszukiwanie poleceń ([[Ctrl]]+[[K]]) nadal to znajduje, a klawisz nadal to uruchamia. Strzałki przy grupie przesuwają ją na liście w górę lub w dół, a tym samym wzdłuż wstążki; {{ui:workspace.ribbonResetOrder}} przywraca kolejność fabryczną. Grupa Kształty i Pomoc zostają zawsze, a Kształty zachowują swoje miejsce po pierwszych dwóch grupach. Wybór zapamiętuje ta przeglądarka i trafia on też do pliku z {{ui:workspace.exportSettings}}. Dotyczy edytora 3D; szkic ma własny pasek.
 
 ### Wygląd: tryb szybki
 

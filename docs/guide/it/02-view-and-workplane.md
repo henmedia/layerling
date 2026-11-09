@@ -124,7 +124,7 @@ L’ingranaggio nella riga del titolo ({{ui:editor.workspaceSettings}}) apre le 
 
 {{ui:workspace.theme}} imposta la combinazione di colori dell’intero programma: {{ui:workspace.themeSystem}} segue le impostazioni del computer; le altre opzioni sono {{ui:workspace.themeLight}}, {{ui:workspace.themeDark}} e {{ui:workspace.themeGraphite}}. Puoi cambiare tema anche in alto a destra nell’editor.
 
-{{ui:workspace.toolbarSize}} ridimensiona i pulsanti della barra multifunzione in alto, il relativo menu delle forme, la barra della vista a sinistra e il pannello delle proprietà a destra: {{ui:workspace.toolbarSizeSmall}}, {{ui:workspace.toolbarSizeMedium}} (la dimensione abituale) o {{ui:workspace.toolbarSizeLarge}}. La dimensione piccola lascia più spazio al piano di lavoro sul portatile; quella grande è più facile da premere su uno schermo ampio o con un dito. Se la finestra è troppo stretta per i pulsanti grandi, i gruppi della barra multifunzione passano a una seconda riga. La dimensione viene memorizzata in questo browser ed è la stessa per tutti i progetti.
+{{ui:workspace.toolbarSize}} ridimensiona i pulsanti della barra multifunzione in alto, il relativo menu delle forme, la barra della vista a sinistra e il pannello delle proprietà a destra: {{ui:workspace.toolbarSizeSmall}}, {{ui:workspace.toolbarSizeMedium}} (la dimensione abituale) o {{ui:workspace.toolbarSizeLarge}}. La dimensione piccola lascia più spazio al piano di lavoro sul portatile; quella grande è più facile da premere su uno schermo ampio o con un dito. Se la finestra è troppo stretta per i pulsanti grandi, i gruppi della barra multifunzione passano a una seconda riga. La dimensione si trova nella scheda {{ui:workspace.ribbon}} delle impostazioni, viene memorizzata in questo browser ed è la stessa per tutti i progetti.
 
 {{ui:workspace.shapeColors}} mostra nelle anteprime della libreria delle forme il colore iniziale di ogni nuova forma (quello predefinito per il suo tipo oppure quello salvato con {{ui:inspector.saveDefaults}}). Disattivalo se preferisci anteprime grigie; il browser ricorda la scelta.
 
@@ -134,7 +134,7 @@ L’ingranaggio nella riga del titolo ({{ui:editor.workspaceSettings}}) apre le 
 
 {{ui:workspace.ribbonButtons}} toglie dalla barra multifunzione i gruppi e i pulsanti che non usi mai. Fai clic su un gruppo per aprire il suo elenco: {{ui:workspace.ribbonGroupShown}} toglie tutto il gruppo, la spunta accanto a un pulsante solo quel pulsante. {{ui:workspace.ribbonShowAll}} rimette tutto. Un gruppo senza pulsanti scompare e gli altri avanzano, così una riga contiene più barra.
 
-Ciò che togli manca solo dalla barra: la ricerca comandi ([[Ctrl]]+[[K]]) lo trova ancora e il suo tasto lo esegue ancora. L'ordine dei gruppi resta lo stesso, e il gruppo Forme e la Guida restano sempre. Questo browser ricorda la scelta, che finisce anche nel file di {{ui:workspace.exportSettings}}. Vale per l'editor 3D; lo schizzo ha una barra sua.
+Ciò che togli manca solo dalla barra: la ricerca comandi ([[Ctrl]]+[[K]]) lo trova ancora e il suo tasto lo esegue ancora. Le frecce accanto a un gruppo lo spostano su o giù nell'elenco e quindi lungo la barra; {{ui:workspace.ribbonResetOrder}} riporta l'ordine originale. Il gruppo Forme e la Guida restano sempre, e Forme tiene il suo posto dopo i primi due gruppi. Questo browser ricorda la scelta, che finisce anche nel file di {{ui:workspace.exportSettings}}. Vale per l'editor 3D; lo schizzo ha una barra sua.
 
 ### Aspetto: modalità veloce
 

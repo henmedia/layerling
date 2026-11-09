@@ -26,6 +26,7 @@ describe("settings file (Discussion #1407)", () => {
       "layerling.printerPlays": JSON.stringify({ "some-printer": 0.15, broken: "x" }),
       "layerling.customShortcuts": JSON.stringify({ center: { combo: "Shift+C", label: "Center on workplane" }, "object-1": { combo: "J", label: "a body" } }),
       "layerling.ribbonHidden": JSON.stringify(["cookieCutter", "group:visibility", 7]),
+      "layerling.ribbonOrder": JSON.stringify(["arrange", "combine", "bogus"]),
     }));
     expect(browser).toEqual({
       theme: "dark",
@@ -35,6 +36,7 @@ describe("settings file (Discussion #1407)", () => {
       printerPlays: { "some-printer": 0.15 },
       customShortcuts: { center: { combo: "Shift+C", label: "Center on workplane" } },
       ribbonHidden: ["cookieCutter", "group:visibility"],
+      ribbonOrder: ["arrange", "combine", "clipboard", "history", "visibility", "modify", "manage"],
     });
     const parsed = parseSettingsFile(settingsFileText(buildSettingsFile(workspace, "2.0 mm", browser, NOW)));
     expect(parsed).not.toBeNull();
@@ -53,6 +55,7 @@ describe("settings file (Discussion #1407)", () => {
       printerPlays: {},
       customShortcuts: {},
       ribbonHidden: [],
+      ribbonOrder: ["clipboard", "history", "visibility", "combine", "modify", "arrange", "manage"],
     });
     expect(readBrowserSettings(null).shapeColors).toBe(true);
   });
@@ -113,6 +116,18 @@ describe("settings file (Discussion #1407)", () => {
     expect(withHidden!.browser.ribbonHidden).toEqual(["group:modify", "paint"]);
     const older = parseSettingsFile(JSON.stringify({ format: SETTINGS_FILE_FORMAT, version: 1, workspace: {}, browser: { theme: "dark" } }));
     expect(older!.browser.ribbonHidden).toBeUndefined();
+  });
+
+  it("carries the order of the ribbon's groups (Discussion #1519, #1502), and a file from before it leaves it alone", () => {
+    const withOrder = parseSettingsFile(JSON.stringify({
+      format: SETTINGS_FILE_FORMAT,
+      version: 1,
+      workspace: {},
+      browser: { ribbonOrder: ["arrange", "arrange", "nonsense", "combine"] },
+    }));
+    expect(withOrder!.browser.ribbonOrder).toEqual(["arrange", "combine", "clipboard", "history", "visibility", "modify", "manage"]);
+    const older = parseSettingsFile(JSON.stringify({ format: SETTINGS_FILE_FORMAT, version: 1, workspace: {}, browser: { theme: "dark" } }));
+    expect(older!.browser.ribbonOrder).toBeUndefined();
   });
 
   it("names the download after the day", () => {

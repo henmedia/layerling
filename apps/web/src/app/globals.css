@@ -15134,6 +15134,13 @@ html[data-theme="dark"] .grid-settings {
   }
 }
 
+/* The 3D ribbon's two wrappers of groups lay their sections out as if they were not there, at every width: each section
+   carries its own CSS order (the order set in the settings, lib/ribbonOrder.ts), and a group may stand in either wrapper's
+   place. */
+.toolbar-mode-content.geometry .tool-group {
+  display: contents;
+}
+
 /* Die Kurzanleitung teilt sich die Karte mit der Kuerzelliste; nur die
    Aufzaehlung ist ihre eigene. */
 .guide-section ul {

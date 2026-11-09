@@ -123,7 +123,7 @@ X 與 [[Esc]] 會關閉視窗；若正在量測，[[Esc]] 會先結束量測。�
 
 {{ui:workspace.theme}} 設定整個程式的配色方案：{{ui:workspace.themeSystem}} 跟隨你的電腦，其餘為 {{ui:workspace.themeLight}}、{{ui:workspace.themeDark}} 與 {{ui:workspace.themeGraphite}}。也可以在編輯器右上角變更。
 
-{{ui:workspace.toolbarSize}} 會讓頂部功能區的按鈕、其形狀選單、左側的檢視列與右側的屬性面板變小或變大：{{ui:workspace.toolbarSizeSmall}}、{{ui:workspace.toolbarSizeMedium}}（一直以來的樣子）或 {{ui:workspace.toolbarSizeLarge}}。小尺寸在筆記型電腦上能為工作平面留出更多空間；大尺寸在大螢幕上或用手點按時更容易命中。使用大按鈕時，若視窗太窄，功能區的各群組會排到第二列。尺寸會儲存在這個瀏覽器中，並套用於所有設計。
+{{ui:workspace.toolbarSize}} 會讓頂部功能區的按鈕、其形狀選單、左側的檢視列與右側的屬性面板變小或變大：{{ui:workspace.toolbarSizeSmall}}、{{ui:workspace.toolbarSizeMedium}}（一直以來的樣子）或 {{ui:workspace.toolbarSizeLarge}}。小尺寸在筆記型電腦上能為工作平面留出更多空間；大尺寸在大螢幕上或用手點按時更容易命中。使用大按鈕時，若視窗太窄，功能區的各群組會排到第二列。尺寸位於設定的「{{ui:workspace.ribbon}}」分頁，會儲存在這個瀏覽器中，並套用於所有設計。
 
 {{ui:workspace.shapeColors}} 會把新形狀的初始顏色（其類型的顏色，或你用 {{ui:inspector.saveDefaults}} 儲存的顏色）顯示在形狀庫的圖片上。如果你比較喜歡灰色圖片，就把它關掉；瀏覽器會記住你的選擇。
 
@@ -133,7 +133,7 @@ X 與 [[Esc]] 會關閉視窗；若正在量測，[[Esc]] 會先結束量測。�
 
 {{ui:workspace.ribbonButtons}} 把你從不使用的群組和按鈕從功能區中移除。按一下群組開啟它的清單：{{ui:workspace.ribbonGroupShown}} 移除整個群組，按鈕旁的勾選框只移除這一個按鈕。{{ui:workspace.ribbonShowAll}} 把一切恢復。沒有按鈕的群組會消失，其他群組隨之前移，一列就能放下更多功能區。
 
-移除的內容只是不在功能區中：命令搜尋（[[Ctrl]]+[[K]]）仍能找到它，它的快速鍵仍能執行它。群組的順序保持不變，「形狀」群組和「說明」始終保留。這個瀏覽器會記住你的選擇，它也會寫入 {{ui:workspace.exportSettings}} 的檔案。它適用於 3D 編輯器；草圖有自己的工具列。
+移除的內容只是不在功能區中：命令搜尋（[[Ctrl]]+[[K]]）仍能找到它，它的快速鍵仍能執行它。群組旁邊的箭頭會把它在清單中上移或下移，也就是在功能區中移動；{{ui:workspace.ribbonResetOrder}}會恢復原來的順序。「形狀」群組和「說明」始終保留，「形狀」群組固定在前兩個群組之後。這個瀏覽器會記住你的選擇，它也會寫入 {{ui:workspace.exportSettings}} 的檔案。它適用於 3D 編輯器；草圖有自己的工具列。
 
 ### 外觀：快速模式
 

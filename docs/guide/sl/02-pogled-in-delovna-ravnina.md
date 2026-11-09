@@ -125,7 +125,7 @@ Zobnik v naslovni vrstici ({{ui:editor.workspaceSettings}}) odpre nastavitve. Le
 
 {{ui:workspace.theme}} izbere barvno shemo celotnega programa: {{ui:workspace.themeSystem}} sledi računalniku, poleg tega so {{ui:workspace.themeLight}}, {{ui:workspace.themeDark}} in {{ui:workspace.themeGraphite}}. Zamenjaš jo lahko tudi zgoraj desno v urejevalniku.
 
-{{ui:workspace.toolbarSize}} pod {{ui:workspace.appearance}} naredi gumbe vrstice zgoraj, njen meni oblik, vrstico pogleda levo in ploščo lastnosti desno manjše ali večje: {{ui:workspace.toolbarSizeSmall}}, {{ui:workspace.toolbarSizeMedium}} (kot doslej) ali {{ui:workspace.toolbarSizeLarge}}. Majhna pusti na prenosniku več prostora za delovno ravnino, velika je lažje zadeti na velikem zaslonu ali s prstom. Z velikimi gumbi gredo skupine vrstice v drugo vrstico, če je okno zanje preozko. Velikost si zapomni ta brskalnik in velja za vsak načrt.
+{{ui:workspace.toolbarSize}} pod {{ui:workspace.appearance}} naredi gumbe vrstice zgoraj, njen meni oblik, vrstico pogleda levo in ploščo lastnosti desno manjše ali večje: {{ui:workspace.toolbarSizeSmall}}, {{ui:workspace.toolbarSizeMedium}} (kot doslej) ali {{ui:workspace.toolbarSizeLarge}}. Majhna pusti na prenosniku več prostora za delovno ravnino, velika je lažje zadeti na velikem zaslonu ali s prstom. Z velikimi gumbi gredo skupine vrstice v drugo vrstico, če je okno zanje preozko. Velikost je na zavihku {{ui:workspace.ribbon}} v nastavitvah; zapomni si jo ta brskalnik in velja za vsak načrt.
 
 {{ui:workspace.shapeColors}} na slikah knjižnice oblik pokaže barvo, s katero začne nova oblika (barvo njene vrste ali tisto, ki si jo shranil z {{ui:inspector.saveDefaults}}). Če imaš raje sive slike, to izklopi; brskalnik si izbiro zapomni.
 
@@ -135,7 +135,7 @@ Zobnik v naslovni vrstici ({{ui:editor.workspaceSettings}}) odpre nastavitve. Le
 
 {{ui:workspace.ribbonButtons}} odstrani iz orodne vrstice skupine in gumbe, ki jih nikoli ne uporabljaš. Klikni skupino, da odpreš njen seznam: {{ui:workspace.ribbonGroupShown}} odstrani celo skupino, kljukica ob gumbu samo ta gumb. {{ui:workspace.ribbonShowAll}} vrne vse nazaj. Skupina brez gumbov izgine, druge se pomaknejo naprej, tako da v eno vrsto gre več orodne vrstice.
 
-Kar odstraniš, manjka samo v orodni vrstici: iskanje ukazov ([[Ctrl]]+[[K]]) to še najde in njegova tipka to še zažene. Vrstni red skupin ostane enak, skupina Oblike in Pomoč pa ostaneta vedno. Izbiro si zapomni ta brskalnik in gre tudi v datoteko iz {{ui:workspace.exportSettings}}. Velja za 3D-urejevalnik; skica ima svojo vrstico.
+Kar odstraniš, manjka samo v orodni vrstici: iskanje ukazov ([[Ctrl]]+[[K]]) to še najde in njegova tipka to še zažene. Puščici ob skupini jo premakneta po seznamu navzgor ali navzdol in tako po orodni vrstici; {{ui:workspace.ribbonResetOrder}} povrne prvotni vrstni red. Skupina Oblike in Pomoč ostaneta vedno, Oblike pa obdržijo svoje mesto za prvima dvema skupinama. Izbiro si zapomni ta brskalnik in gre tudi v datoteko iz {{ui:workspace.exportSettings}}. Velja za 3D-urejevalnik; skica ima svojo vrstico.
 
 ### Videz: hitri način
 

@@ -125,7 +125,7 @@ Het tandwiel in de titelregel ({{ui:editor.workspaceSettings}}) opent de instell
 
 {{ui:workspace.theme}} bepaalt het kleurenschema van het hele programma: {{ui:workspace.themeSystem}} volgt je computer, de andere zijn {{ui:workspace.themeLight}}, {{ui:workspace.themeDark}} en {{ui:workspace.themeGraphite}}. Je kunt het ook rechtsboven in de editor wisselen.
 
-{{ui:workspace.toolbarSize}} onder {{ui:workspace.appearance}} maakt de knoppen van het lint bovenaan, het vormenmenu daarvan, de weergavebalk links en het eigenschappenpaneel rechts kleiner of groter: {{ui:workspace.toolbarSizeSmall}}, {{ui:workspace.toolbarSizeMedium}} (zoals het altijd was) of {{ui:workspace.toolbarSizeLarge}}. Klein laat op een laptop meer ruimte voor het werkvlak; groot is makkelijker te raken op een groot scherm of met een vinger. Met grote knoppen gaan de groepen van het lint naar een tweede rij als het venster er te smal voor is. De grootte wordt in deze browser bewaard en geldt voor elk ontwerp.
+{{ui:workspace.toolbarSize}} onder {{ui:workspace.appearance}} maakt de knoppen van het lint bovenaan, het vormenmenu daarvan, de weergavebalk links en het eigenschappenpaneel rechts kleiner of groter: {{ui:workspace.toolbarSizeSmall}}, {{ui:workspace.toolbarSizeMedium}} (zoals het altijd was) of {{ui:workspace.toolbarSizeLarge}}. Klein laat op een laptop meer ruimte voor het werkvlak; groot is makkelijker te raken op een groot scherm of met een vinger. Met grote knoppen gaan de groepen van het lint naar een tweede rij als het venster er te smal voor is. De grootte staat op het tabblad {{ui:workspace.ribbon}} van de instellingen, wordt in deze browser bewaard en geldt voor elk ontwerp.
 
 {{ui:workspace.shapeColors}} zet de kleur waarmee een nieuwe vorm begint op de plaatjes van de vormenbibliotheek (de kleur van zijn soort, of die je met {{ui:inspector.saveDefaults}} bewaarde). Zet het uit als je liever grijze plaatjes hebt; je browser onthoudt de keuze.
 
@@ -135,7 +135,7 @@ Het tandwiel in de titelregel ({{ui:editor.workspaceSettings}}) opent de instell
 
 {{ui:workspace.ribbonButtons}} haalt de groepen en knoppen die je nooit gebruikt uit het lint. Klik op een groep om de lijst te openen: {{ui:workspace.ribbonGroupShown}} haalt de hele groep weg, het vinkje naast een knop alleen die knop. {{ui:workspace.ribbonShowAll}} zet alles terug. Een groep zonder knoppen verdwijnt en de andere schuiven op, zodat er meer van het lint op één rij past.
 
-Wat je weghaalt, ontbreekt alleen in het lint: het zoeken naar opdrachten ([[Ctrl]]+[[K]]) vindt het nog en de toets voert het nog uit. De volgorde van de groepen blijft gelijk, en de groep Vormen en Help blijven altijd. Deze browser onthoudt de keuze, en ze gaat mee in het bestand van {{ui:workspace.exportSettings}}. Ze geldt voor de 3D-editor; de schets heeft een eigen balk.
+Wat je weghaalt, ontbreekt alleen in het lint: het zoeken naar opdrachten ([[Ctrl]]+[[K]]) vindt het nog en de toets voert het nog uit. De pijlen naast een groep schuiven hem in de lijst omhoog of omlaag en dus langs het lint; {{ui:workspace.ribbonResetOrder}} brengt de oorspronkelijke volgorde terug. De groep Vormen en Help blijven altijd, en Vormen houdt zijn plek na de eerste twee groepen. Deze browser onthoudt de keuze, en ze gaat mee in het bestand van {{ui:workspace.exportSettings}}. Ze geldt voor de 3D-editor; de schets heeft een eigen balk.
 
 ### Weergave: snelle modus
 

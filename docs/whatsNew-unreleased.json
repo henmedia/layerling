@@ -1,6 +1,18 @@
 [
   {
     "title": {
+      "de": "Gruppen im Menüband verschieben",
+      "en": "Move the ribbon's groups",
+      "da": "Flyt båndets grupper"
+    },
+    "body": {
+      "de": "In den Einstellungen gibt es einen eigenen Reiter „Menüband“: Dort stehen die Größe der Bedienelemente und die Knöpfe, die du herausnehmen kannst, und neben jeder Gruppe zwei Pfeile. Damit rückt „Anordnen“ etwa gleich hinter „Kombinieren“. Nur die Gruppe Formen behält ihren Platz.",
+      "en": "The settings have a tab of their own, Ribbon: it holds the control size and the buttons you can take out, and two arrows beside every group. With them Arrange can stand right after Combine, say. Only the Shapes group keeps its place.",
+      "da": "Indstillingerne har en fane for sig, Bånd: Den rummer størrelsen på betjeningselementerne og de knapper, du kan tage ud, og to pile ved hver gruppe. Med dem kan Ordn for eksempel stå lige efter Kombiner. Kun gruppen Former beholder sin plads."
+    }
+  },
+  {
+    "title": {
       "de": "Angeheftetes Formen-Fenster bleibt unter dem Menüband",
       "en": "The pinned Shapes panel stays below the toolbar",
       "da": "Det fastgjorte formvindue bliver under båndet"

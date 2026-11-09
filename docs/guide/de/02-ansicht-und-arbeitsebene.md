@@ -125,7 +125,7 @@ Das Zahnrad in der Titelzeile ({{ui:editor.workspaceSettings}}) öffnet die Eins
 
 {{ui:workspace.theme}} legt das Farbschema des ganzen Programms fest: {{ui:workspace.themeSystem}} folgt deinem Rechner, dazu kommen {{ui:workspace.themeLight}}, {{ui:workspace.themeDark}} und {{ui:workspace.themeGraphite}}. Du kannst es auch oben rechts im Editor ändern.
 
-{{ui:workspace.toolbarSize}} macht die Knöpfe des Menübands, sein Formenmenü, die Ansichtsleiste links und die Eigenschaften rechts kleiner oder größer: {{ui:workspace.toolbarSizeSmall}}, {{ui:workspace.toolbarSizeMedium}} (wie bisher) oder {{ui:workspace.toolbarSizeLarge}}. Klein lässt auf einem Laptop mehr Platz für die Arbeitsebene, groß trifft sich leichter auf einem großen Bildschirm oder mit dem Finger. Mit großen Knöpfen gehen die Gruppen des Menübands in eine zweite Zeile, wenn das Fenster für sie zu schmal ist. Die Größe merkt sich dieser Browser, sie gilt für jedes Design.
+{{ui:workspace.toolbarSize}} macht die Knöpfe des Menübands, sein Formenmenü, die Ansichtsleiste links und die Eigenschaften rechts kleiner oder größer: {{ui:workspace.toolbarSizeSmall}}, {{ui:workspace.toolbarSizeMedium}} (wie bisher) oder {{ui:workspace.toolbarSizeLarge}}. Klein lässt auf einem Laptop mehr Platz für die Arbeitsebene, groß trifft sich leichter auf einem großen Bildschirm oder mit dem Finger. Mit großen Knöpfen gehen die Gruppen des Menübands in eine zweite Zeile, wenn das Fenster für sie zu schmal ist. Die Größe steht im Reiter {{ui:workspace.ribbon}} der Einstellungen; sie merkt sich dieser Browser, und sie gilt für jedes Design.
 
 {{ui:workspace.shapeColors}} zeigt auf den Bildern der Formenbibliothek die Farbe, in der eine neue Form beginnt (die Farbe ihrer Art oder die, die du mit {{ui:inspector.saveDefaults}} gespeichert hast). Schalte es aus, wenn dir graue Bilder lieber sind; dein Browser merkt sich die Wahl.
 
@@ -135,7 +135,7 @@ Das Zahnrad in der Titelzeile ({{ui:editor.workspaceSettings}}) öffnet die Eins
 
 {{ui:workspace.ribbonButtons}} nimmt Gruppen und Knöpfe, die du nie brauchst, aus dem Menüband. Ein Klick auf eine Gruppe öffnet ihre Liste: {{ui:workspace.ribbonGroupShown}} nimmt die ganze Gruppe heraus, das Häkchen neben einem Knopf nur diesen Knopf. {{ui:workspace.ribbonShowAll}} holt alles zurück. Eine Gruppe ohne Knopf verschwindet, und die anderen rücken auf, so passt mehr vom Menüband in eine Zeile.
 
-Was du herausnimmst, fehlt nur im Menüband: Die Befehlssuche ([[Strg]]+[[K]]) findet es weiter, und seine Taste führt es weiter aus. Die Reihenfolge der Gruppen bleibt gleich, und die Gruppe Formen und die Hilfe bleiben immer. Die Wahl merkt sich dieser Browser, und sie geht mit in die Datei von {{ui:workspace.exportSettings}}. Sie gilt für den 3D-Editor; die Skizze hat eine eigene Leiste.
+Was du herausnimmst, fehlt nur im Menüband: Die Befehlssuche ([[Strg]]+[[K]]) findet es weiter, und seine Taste führt es weiter aus. Die Pfeile neben einer Gruppe schieben sie in der Liste nach oben oder unten und damit im Menüband nach links oder rechts; {{ui:workspace.ribbonResetOrder}} stellt die Reihenfolge von Anfang an wieder her. Die Gruppe Formen und die Hilfe bleiben immer, und Formen behält ihren Platz nach den ersten beiden Gruppen. Die Wahl merkt sich dieser Browser, und sie geht mit in die Datei von {{ui:workspace.exportSettings}}. Sie gilt für den 3D-Editor; die Skizze hat eine eigene Leiste.
 
 ### Darstellung: Schnellmodus
 

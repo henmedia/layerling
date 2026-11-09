@@ -125,7 +125,7 @@ Ozubené kolo v titulním řádku ({{ui:editor.workspaceSettings}}) otevře nast
 
 {{ui:workspace.theme}} určuje barevné schéma celého programu: {{ui:workspace.themeSystem}} se řídí počítačem, další jsou {{ui:workspace.themeLight}}, {{ui:workspace.themeDark}} a {{ui:workspace.themeGraphite}}. Změnit ho lze i vpravo nahoře v editoru.
 
-{{ui:workspace.toolbarSize}} v {{ui:workspace.appearance}} mění velikost pásu nástrojů, nabídky tvarů, lišty pohledu vlevo a panelu vlastností vpravo: {{ui:workspace.toolbarSizeSmall}}, {{ui:workspace.toolbarSizeMedium}} nebo {{ui:workspace.toolbarSizeLarge}}. Malé ovládání nechá více místa na notebooku, velké usnadňuje dotyk i použití na velké obrazovce. Nevejdou-li se velká tlačítka, skupiny pásu se zalomí do dalšího řádku. Nastavení se uchovává v tomto prohlížeči pro všechny projekty.
+{{ui:workspace.toolbarSize}} v {{ui:workspace.appearance}} mění velikost pásu nástrojů, nabídky tvarů, lišty pohledu vlevo a panelu vlastností vpravo: {{ui:workspace.toolbarSizeSmall}}, {{ui:workspace.toolbarSizeMedium}} nebo {{ui:workspace.toolbarSizeLarge}}. Malé ovládání nechá více místa na notebooku, velké usnadňuje dotyk i použití na velké obrazovce. Nevejdou-li se velká tlačítka, skupiny pásu se zalomí do dalšího řádku. Nastavení je na kartě {{ui:workspace.ribbon}} v nastavení, uchovává se v tomto prohlížeči a platí pro všechny projekty.
 
 {{ui:workspace.shapeColors}} zobrazí na obrázcích knihovny tvarů barvu, se kterou nový tvar začíná (barvu jeho druhu, nebo tu, kterou jste uložili přes {{ui:inspector.saveDefaults}}). Pokud dáváte přednost šedým obrázkům, vypněte to; prohlížeč si volbu zapamatuje.
 
@@ -135,7 +135,7 @@ Ozubené kolo v titulním řádku ({{ui:editor.workspaceSettings}}) otevře nast
 
 {{ui:workspace.ribbonButtons}} odebere z pásu nástrojů skupiny a tlačítka, které nikdy nepoužíváte. Kliknutím na skupinu otevřete její seznam: {{ui:workspace.ribbonGroupShown}} odebere celou skupinu, zaškrtnutí u tlačítka jen to tlačítko. {{ui:workspace.ribbonShowAll}} vrátí vše zpět. Skupina bez tlačítek zmizí a ostatní se posunou, takže se do jednoho řádku vejde víc pásu.
 
-Co odeberete, chybí jen na pásu: vyhledávání příkazů ([[Ctrl]]+[[K]]) to dál najde a jeho klávesa to dál spustí. Pořadí skupin zůstane stejné a skupina Tvary a Nápověda zůstanou vždy. Volbu si pamatuje tento prohlížeč a jde i do souboru z {{ui:workspace.exportSettings}}. Platí pro 3D editor; náčrt má vlastní lištu.
+Co odeberete, chybí jen na pásu: vyhledávání příkazů ([[Ctrl]]+[[K]]) to dál najde a jeho klávesa to dál spustí. Šipky u skupiny ji posouvají v seznamu nahoru nebo dolů, a tím i po pásu; {{ui:workspace.ribbonResetOrder}} vrátí pořadí z výroby. Skupina Tvary a Nápověda zůstanou vždy a Tvary si drží místo za prvními dvěma skupinami. Volbu si pamatuje tento prohlížeč a jde i do souboru z {{ui:workspace.exportSettings}}. Platí pro 3D editor; náčrt má vlastní lištu.
 
 ### Vzhled: rychlý režim
 

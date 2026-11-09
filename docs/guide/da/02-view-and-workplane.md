@@ -127,7 +127,7 @@ Tandhjulet i titellinjen ({{ui:editor.workspaceSettings}}) åbner indstillingern
 
 {{ui:workspace.theme}} sætter farveskemaet for hele programmet: {{ui:workspace.themeSystem}} følger din computer, de andre er {{ui:workspace.themeLight}}, {{ui:workspace.themeDark}} og {{ui:workspace.themeGraphite}}. Du kan også ændre det øverst til højre i editoren.
 
-{{ui:workspace.toolbarSize}} gør knapperne i båndet øverst, dets formmenu, visningsbjælken til venstre og egenskabspanelet til højre mindre eller større: {{ui:workspace.toolbarSizeSmall}}, {{ui:workspace.toolbarSizeMedium}} (som det altid var) eller {{ui:workspace.toolbarSizeLarge}}. Små efterlader mere plads til arbejdsplanet på en bærbar; store er lettere at ramme på en stor skærm eller med en finger. Med store knapper går båndets grupper på en anden række når vinduet er for smalt til dem. Størrelsen gemmes i denne browser og holder for hvert design.
+{{ui:workspace.toolbarSize}} gør knapperne i båndet øverst, dets formmenu, visningsbjælken til venstre og egenskabspanelet til højre mindre eller større: {{ui:workspace.toolbarSizeSmall}}, {{ui:workspace.toolbarSizeMedium}} (som det altid var) eller {{ui:workspace.toolbarSizeLarge}}. Små efterlader mere plads til arbejdsplanet på en bærbar; store er lettere at ramme på en stor skærm eller med en finger. Med store knapper går båndets grupper på en anden række når vinduet er for smalt til dem. Størrelsen står under fanen {{ui:workspace.ribbon}} i indstillingerne, gemmes i denne browser og holder for hvert design.
 
 {{ui:workspace.shapeColors}} sætter den farve, en ny form starter med, på billederne i formbiblioteket (farven for sin art, eller den du gemte med {{ui:inspector.saveDefaults}}). Slå det fra, hvis du foretrækker grå billeder; din browser husker valget.
 
@@ -137,7 +137,7 @@ Tandhjulet i titellinjen ({{ui:editor.workspaceSettings}}) åbner indstillingern
 
 {{ui:workspace.ribbonButtons}} tager de grupper og knapper ud af båndet, som du aldrig bruger. Klik på en gruppe for at åbne dens liste: {{ui:workspace.ribbonGroupShown}} tager hele gruppen ud, fluebenet ved en knap kun den knap. {{ui:workspace.ribbonShowAll}} henter det hele tilbage. En gruppe uden knapper forsvinder, og de andre rykker op, så mere af båndet kan stå på én række.
 
-Det, du tager ud, mangler kun i båndet: kommandosøgningen ([[Ctrl]]+[[K]]) finder det stadig, og dets tast kører det stadig. Gruppernes rækkefølge forbliver den samme, og gruppen Former og Hjælp bliver altid. Valget gemmes i denne browser og kommer med i filen fra {{ui:workspace.exportSettings}}. Det gælder 3D-editoren; skitsen har sin egen bjælke.
+Det, du tager ud, mangler kun i båndet: kommandosøgningen ([[Ctrl]]+[[K]]) finder det stadig, og dets tast kører det stadig. Pilene ved en gruppe flytter den op eller ned på listen og dermed langs båndet; {{ui:workspace.ribbonResetOrder}} bringer den oprindelige rækkefølge tilbage. Gruppen Former og Hjælp bliver altid, og Former beholder sin plads efter de to første grupper. Valget gemmes i denne browser og kommer med i filen fra {{ui:workspace.exportSettings}}. Det gælder 3D-editoren; skitsen har sin egen bjælke.
 
 ### Udseende: hurtig tilstand
 
