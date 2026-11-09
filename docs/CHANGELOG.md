@@ -20,6 +20,10 @@ code still carries it - so a lower number further down is older, not newer.
 
 - **A move no longer sticks to the pointer when the mouse button's release gets lost (Discussion #1540):** Now and then, with a Magic Mouse for one, the release of the button never reaches the browser, so layerling kept waiting for it and the part, or a handle or box being dragged, followed the pointer with no button held. A mouse that moves with no button held now ends the move, the handle drag, the selection box or the paint lasso where it is, as the release would have. Touch and pen are left as they were. Reported by @MartinShake in Discussion #1540.
 
+- **A loft between sketches has no hole where a rounded frame meets a ring:** The inner side of a rounded frame had lost its rounds and had as many pieces as the circle it was lofted to, so the kernel joined them side to quarter and turned the inner wall through the outer one, which left a hole. Outlines with as many pieces whose corners do not face each other now get corners in the same directions first.
+
+- **Danish (PR #1532):** Nine fixes in the release notes and the guide (runder, bue, spillerum, mesh). By @Henrikth12.
+
 ## 1.154.1
 
 - **Move the groups and the buttons of the ribbon, in a Ribbon tab of its own (Discussion #1519, #1502):** The settings get a tab **Ribbon**. It holds what concerned the ribbon before: the control size and **Buttons in the ribbon**. Beside every group of that list are two arrows that move it up or down, and so left or right along the ribbon, and the same beside every button, which moves inside its group (in Modify within its named section), so Arrange can stand right after Combine, say; **Reset order** brings back the order of the groups and the buttons it came with. Every group can move except Shapes, which keeps its place after the first two, and Help stays. The order is kept in the browser and goes into the settings file. The ribbon's two wrappers of groups now lay their sections out as one row at every width, which is what lets a group stand in the other's place.
