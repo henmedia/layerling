@@ -32,6 +32,8 @@ code still carries it - so a lower number further down is older, not newer.
 
 - **Tab shows the next field in a long panel (Issue #1547):** Tabbing down the properties of a long shape, a Gridfinity baseplate for one, now and then put the focus on a field nobody could see, so a value could be typed into it unseen. The Snap Grid bar sticks to the bottom of the panel and covered that field, and the browser took it as visible and did not scroll. The panel now keeps the focused field above the bar. Reported by @ddemtlapps.
 
+- **Danish (PR #1555):** Guide chapter 6 now has the two paragraphs on a sloping top in Danish too. By @Henrikth12.
+
 ## 1.155.0
 
 - **The ribbon fits the window again (Discussion #1533):** The two widths at which the toolbar icons shrink (2215 and 1897 px) were measured when the ribbon was narrower. Between about 1900 and 2050 px the ribbon was wider than the window, so groups such as Surface or Mirror & Pattern slipped under their neighbours; the same, a little less, between 2215 and 2375 px. Measured anew: the full size needs 2369 px, the middle step 2045 px, and the thresholds are 2375 and 2050 px.
