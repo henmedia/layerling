@@ -2961,7 +2961,9 @@ export async function buildGroupedShapeFromSelection(selected: WorkplaneShape[],
   const groupable = withMulticolorGroupsOpened(selected);
   const booleanSelection = expandGroupsForBoolean(selected);
   const hasSolid = booleanSelection.some((shape) => !shape.hole);
-  const hasHole = booleanSelection.some((shape) => shape.hole);
+  // A bundle's hole can sit in a bundle inside it, one level deeper than the selection is opened here: then the group
+  // was made as a plain one and cut nothing, while a second bundle with its hole on top made the same group cut (#1528).
+  const hasHole = booleanSelection.some((shape) => shape.hole) || selected.some(isBundleWithHole);
   const hasImportedMesh = booleanSelection.some((shape) => Boolean(shape.importedMesh));
   const boxBooleanSelection = hasSolid && hasHole ? expandGroupsForBoxBoolean(selected) : [];
   // Der Boolesche Kern rechnet auf der geflachten Auswahl, aber das Ergebnis

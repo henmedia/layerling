@@ -6,6 +6,8 @@ code still carries it - so a lower number further down is older, not newer.
 
 ## Unreleased
 
+- **A bundle whose hole sits in a bundle inside it cuts again (Issue #1528):** A peg standing in its hole, bundled, then bundled again with another part and grouped with a body, made a plain group that cut nothing; the same group cut when a second bundle with its hole on top was in it too, so it looked random. Grouping now looks for the hole in bundles inside bundles as well. A group made before keeps its old body: take it apart and group it again.
+
 - **Rounding a group's edges no longer turns one of its holes into a solid cylinder (Discussion #1523):** A roller-skate plate with two tilted holes, bundled and grouped with the plate, showed a solid cylinder sticking out of one boss as soon as six of its edges were rounded. The plate also held two nearly identical holes in one spot; cutting the second of them left the exact body that the edge tool works on invalid, and a later hole cut into that body came back as material instead of a hole. Every hole cut is now checked: the body must stay valid, must not grow and must not lose more than the hole holds. When the usual cut fails that check, the plain cut, a looser one and a repaired one are tried; when none passes, the edge tool says so and suggests moving that hole a little or removing a hole that lies on top of another, instead of showing a wrong body. The message is in 14 languages.
 
 ## 1.154.0
