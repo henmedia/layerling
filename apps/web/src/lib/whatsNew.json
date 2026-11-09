@@ -1,5 +1,46 @@
 [
   {
+    "version": "1.154.1",
+    "items": [
+      {
+        "title": {
+          "de": "Gruppen und Knöpfe im Menüband verschieben",
+          "en": "Move the ribbon's groups and buttons",
+          "da": "Flyt båndets grupper og knapper"
+        },
+        "body": {
+          "de": "In den Einstellungen gibt es einen eigenen Reiter „Menüband“: Dort stehen die Größe der Bedienelemente und die Knöpfe, die du herausnehmen kannst. Neben jeder Gruppe und jedem Knopf sitzen zwei Pfeile. Damit rückt „Anordnen“ etwa gleich hinter „Kombinieren“, und ein Knopf wandert an den Anfang seiner Gruppe. Nur die Gruppe Formen behält ihren Platz.",
+          "en": "The settings have a tab of their own, Ribbon: it holds the control size and the buttons you can take out. Beside every group and every button are two arrows. With them Arrange can stand right after Combine, say, and a button can move to the front of its group. Only the Shapes group keeps its place.",
+          "da": "Indstillingerne har en fane for sig, Bånd: Den rummer størrelsen på betjeningselementerne og de knapper, du kan tage ud. Ved hver gruppe og hver knap sidder to pile. Med dem kan Ordn for eksempel stå lige efter Kombiner, og en knap kan flytte forrest i sin gruppe. Kun gruppen Former beholder sin plads."
+        }
+      },
+      {
+        "title": {
+          "de": "Angeheftetes Formen-Fenster bleibt unter dem Menüband",
+          "en": "The pinned Shapes panel stays below the toolbar",
+          "da": "Det fastgjorte formvindue bliver under båndet"
+        },
+        "body": {
+          "de": "Ein verschobenes oder größer gezogenes Formen-Fenster rutschte nach dem Anheften mit Titelzeile und Suche unter das Menüband. Jetzt öffnet es dort, wo du es gelassen hast, und folgt dem Menüband, wenn es höher oder niedriger wird.",
+          "en": "A Shapes panel that had been moved or pulled larger slipped under the toolbar with its title bar and search once pinned. Now it opens where you left it, and follows the toolbar when it grows or shrinks.",
+          "da": "Et formvindue, der var flyttet eller trukket større, gled ind under båndet med titellinje og søgning, når det blev fastgjort. Nu åbner det, hvor du lod det være, og følger båndet, når det bliver højere eller lavere."
+        }
+      },
+      {
+        "title": {
+          "de": "Schraubenlöcher als Langloch",
+          "en": "Slotted screw holes",
+          "da": "Skruehuller som langhul"
+        },
+        "body": {
+          "de": "Stufenbohrung, Senkbohrung und Doppelsenkung haben einen Schalter „Langloch“: Kopf und Schaft laufen dann entlang eines Langlochs, sodass sich das Teil vor dem Festziehen der Schraube noch ausrichten lässt. Die Länge stellst du darunter ein.",
+          "en": "The counterbore, the countersink and the double countersink have a switch, Slotted: the head and the shaft then run along a slot, so the part can still be lined up before the screw is tightened. Set its length just below.",
+          "da": "Forsænkning, undersænkning og dobbelt forsænkning har en kontakt, Langhul: Hoved og skaft løber så langs et langhul, så delen stadig kan rettes ind, før skruen spændes. Længden indstiller du lige under."
+        }
+      }
+    ]
+  },
+  {
     "version": "1.154.0",
     "items": [
       {
