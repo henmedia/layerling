@@ -819,8 +819,23 @@ function getShapePropertiesWithAppLimits(shape: WorkplaneShape, onUpdate: ShapeI
         ? [{ id: "turns", label: t("prop.turns"), value: settings.sweepAngle / 360, min: -MAX_SKETCH_REVOLVE_TURNS, max: MAX_SKETCH_REVOLVE_TURNS, step: 0.25, onChange: (turns: number) => updateRevolve({ sweepAngle: turns * 360 }) }]
         : [{ id: "sweep", label: t("prop.sweep"), value: settings.sweepAngle, min: -360, max: 360, step: 1, onChange: (sweepAngle: number) => updateRevolve({ sweepAngle }) }]),
       { id: "pitch", label: t("prop.pitch"), value: settings.pitch ?? 0, min: 0, max: 100, step: 0.05, onChange: (pitch: number) => updateRevolve({ pitch, sweepAngle: pitch > 0 ? settings.sweepAngle : Math.max(-360, Math.min(360, settings.sweepAngle)) }) },
-      // An exact revolved body is round at any size; the side count only shapes the mesh of an older one.
-      ...(shape.cadBrep ? [] : [{ id: "sides", label: t("prop.sides"), value: settings.sides, min: 3, max: MAX_HIGH_RESOLUTION_SIDES, step: 1, onChange: (sides: number) => updateRevolve({ sides }) }]),
+      // An exact revolved body is round at any size; the side count only shapes the mesh of an older one. The exact
+      // one is cut into facets as finely as its smoothness asks (Discussion #1426).
+      ...(shape.cadBrep
+        ? [{
+            type: "select" as const,
+            id: "revolveSmoothness",
+            label: t("prop.revolveSmoothness"),
+            value: settings.smoothness ?? "standard",
+            options: [
+              { value: "standard", label: t("prop.revolveSmoothnessStandard") },
+              { value: "fine", label: t("prop.revolveSmoothnessFine") },
+              { value: "extraFine", label: t("prop.revolveSmoothnessExtraFine") },
+            ],
+            hint: t("prop.revolveSmoothnessHint"),
+            onChange: (value: string) => updateRevolve({ smoothness: value === "fine" || value === "extraFine" ? value : undefined }),
+          }]
+        : [{ id: "sides", label: t("prop.sides"), value: settings.sides, min: 3, max: MAX_HIGH_RESOLUTION_SIDES, step: 1, onChange: (sides: number) => updateRevolve({ sides }) }]),
       { id: "length", label: t("prop.length"), value: depth, min: MIN_SHAPE_SIZE, max: 160, onChange: setDepth },
       { id: "width", label: t("prop.width"), value: width, min: MIN_SHAPE_SIZE, max: 160, onChange: setWidth },
       { id: "height", label: t("prop.height"), value: shape.height, min: MIN_SHAPE_SIZE, max: 160, onChange: setHeight },

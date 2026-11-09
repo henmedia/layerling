@@ -1,6 +1,6 @@
 import type { CadModifierDeflection } from "@/lib/cadModifierTypes";
 import type { SketchLoftSection } from "@/lib/cadSketchLoft";
-import type { SketchInset, SketchProfile, SketchStroke } from "@/types/layerling";
+import type { SketchInset, SketchProfile, SketchRevolveSmoothness, SketchStroke } from "@/types/layerling";
 
 /**
  * A stored body cut into facets again, at `deflection` (`capped` where the mesh would stray from a torus face, as the
@@ -20,7 +20,7 @@ export type SketchCadBuildRequest = SketchCadRemeshRequest | {
   profile: SketchProfile;
   height: number;
   /** Set for a revolve: the sketch is turned about the vertical axis instead of pulled up by `height`. */
-  revolve?: { startAngle: number; sweepAngle: number };
+  revolve?: { startAngle: number; sweepAngle: number; smoothness?: SketchRevolveSmoothness };
   /** Set for a sweep (#400): the outlines are the cross-section, the construction line is the path they are pulled along. */
   sweep?: true;
   /** Set for a stroked or widened sketch: the kernel moves the outlines itself (cadSketchStroke.ts). */
