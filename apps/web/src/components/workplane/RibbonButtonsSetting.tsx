@@ -65,7 +65,7 @@ export function RibbonButtonsSetting() {
                       if (neighbour) writeRibbonOrder(moveRibbonGroupPast(readRibbonOrder(), group.group as RibbonGroupName, neighbour.group as RibbonGroupName, step as -1 | 1));
                     }}
                   >
-                    {step === -1 ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+                    {step === -1 ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
                   </button>
                 );
               })}
@@ -109,7 +109,7 @@ export function RibbonButtonsSetting() {
                             writeRibbonToolOrder(withRibbonToolOrder(readRibbonToolOrder(), group.group, moved, group.shipped ?? moved));
                           }}
                         >
-                          {step === -1 ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
+                          {step === -1 ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
                         </button>
                       );
                     })}
