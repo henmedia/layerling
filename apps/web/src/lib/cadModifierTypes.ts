@@ -123,6 +123,12 @@ export type CadModifierProfilePart = {
    * also lays the extrusion on its side).
    */
   kind: "extrusion" | "revolution" | "sweep" | "loft";
+  /**
+   * Revolution only: a slotted screw hole (Discussion #1531). The half-section is turned whole at each end of a slot
+   * `length` long, and the whole section, both halves, is pushed along the slot between them. The slot runs along
+   * the local y axis, or along x with `alongX`, centred on the axis.
+   */
+  slot?: { length: number; alongX: boolean };
   /** Sweep only: the centre line, piece by piece. */
   path?: CadModifierSweepPiece[];
   /** Loft only: the section at the top, loop for loop and piece for piece the partner of `loops`. */

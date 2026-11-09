@@ -960,6 +960,36 @@ export function grownProfileSolid(cad: OcctKernel, profile: CadModifierProfilePa
   return solid;
 }
 
+/**
+ * A slotted screw hole (Discussion #1531): the half-section turned whole at each end of the slot, and the whole
+ * section - the half-section and its mirror image across the axis - pushed along the slot from one end to the
+ * other, fused into one body and its faces that continue each other merged, so each half cone or half cylinder
+ * at an end meets the flat side along the slot in one tangent seam. The slot runs along y, or along x with
+ * `alongX`; the profile's transform then stands it in the shape.
+ */
+function slottedRevolutionSolid(cad: OcctKernel, profile: CadModifierProfilePart, tolerance: number) {
+  const slot = profile.slot;
+  const loop = profile.loops[0];
+  if (!slot || profile.loops.length !== 1 || loop.segments.some((segment) => segment.kind !== "line")) throw new Error("A slotted hole needs one section of straight lines");
+  const points = [{ x: loop.x, z: loop.z }, ...loop.segments.map((segment) => ({ x: segment.x, z: segment.z }))];
+  // The section's corners off the axis, bottom to top; the mirror image runs back down on the other side.
+  const side = points.filter((point) => point.x > tolerance);
+  if (side.length < 2) throw new Error("A slotted hole's section has no width");
+  const whole = [...side, ...side.slice().reverse().map((point) => ({ x: -point.x, z: point.z }))];
+  const wholeLoop: CadModifierProfileLoop = { x: whole[0].x, z: whole[0].z, segments: [...whole.slice(1), whole[0]].map((point) => ({ kind: "line" as const, x: point.x, z: point.z })) };
+  const turned = cad.revolve(cad.makeFace(loopWire(cad, loop, tolerance)), { point: ORIGIN, direction: { x: 0, y: 0, z: 1 } }, TWO_PI);
+  const half = slot.length / 2;
+  const middle = cad.translate(faceSolid(cad, cad.makeFace(loopWire(cad, wholeLoop, tolerance)), slot.length), 0, -half, 0);
+  const fused = cad.fuse(cad.fuse(cad.translate(turned, 0, half, 0), middle), cad.translate(turned, 0, -half, 0));
+  let solid = cad.unifySameDomain(fused);
+  const solids = cad.isSolid(solid) ? [solid] : cad.getSubShapes(solid, "solid");
+  if (solids.length !== 1) throw new Error("The slotted hole did not become one solid");
+  // Along x: a quarter turn about the axis takes the slot from y to x.
+  solid = slot.alongX ? cad.transform(solids[0], [0, -1, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0]) : solids[0];
+  if (!cad.isValid(solid) || !(cad.getVolume(solid) > 0)) throw new Error("The slotted hole is not a valid solid");
+  return solid;
+}
+
 export function profileExtrusionSolid(cad: OcctKernel, profile: CadModifierProfilePart): ShapeHandle {
   if (profile.trim && profile.kind === "extrusion") {
     // Slope along: the plain body, and what of it lies inside the side outline pushed across.
@@ -989,6 +1019,7 @@ export function profileExtrusionSolid(cad: OcctKernel, profile: CadModifierProfi
     if (!(cad.getVolume(solid) > 0)) throw new Error("The lofted profile solid is inside out");
     return profile.capChamfer && profile.capChamfer.size > 1e-4 ? chamferedLoft(cad, solid, profile) : solid;
   }
+  if (profile.kind === "revolution" && profile.slot && profile.slot.length > 0) return slottedRevolutionSolid(cad, profile, tolerance);
   const [outer, ...holes] = profile.loops;
   let face = cad.makeFace(loopWire(cad, outer, tolerance));
   if (holes.length > 0) face = cad.addHolesInFace(face, holes.map((hole) => loopWire(cad, hole, tolerance)));

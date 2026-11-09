@@ -244,6 +244,8 @@ microSD 卡槽也是左边缘的接口，位于电路板下方（Zero 2 W 上在
 
 钻出的盲孔底部不是平的，而是钻头尖端留下的锥形（Discussion #621）。{{ui:shape.counterbore}}、{{ui:shape.countersink}}以及设为孔的{{ui:shape.cylinder}}都可以这样收尾：在{{ui:prop.holeBottom}}中选择 90°、118°（常见麻花钻）或 135° 的钻尖，或选{{ui:holeBottom.drillPointOther}}，再在{{ui:prop.drillPointAngle}}中输入 60° 到 150° 之间的角度。与图纸相同，深度——圆柱体的{{ui:prop.height}}、螺钉孔的{{ui:prop.screwHoleLength}}——只算到锥形开始的台阶处；尖端在它下方，118° 时约为直径的 0.3 倍，角度下方的一行会写出具体多深。锥形与孔一样宽，螺钉孔则与杆部一样宽。{{ui:holeBottom.flat}}让孔底保持原样。实体圆柱体保留平的端面，贯通的双面锥形沉孔也一样。
 
+长孔让零件在拧紧螺丝前仍能稍作移动，便于对齐（Discussion #1531）。在{{ui:shape.counterbore}}、{{ui:shape.countersink}}或{{ui:shape.doubleCountersink}}上打开{{ui:prop.screwHoleSlot}}：沉头孔或锥面以及孔身会绕过长孔的两端，并沿其两侧笔直延伸。{{ui:prop.screwHoleSlotLength}}决定延伸多长；起初与头部一样宽，沿宽度方向——要换方向就旋转该孔。{{ui:prop.screwHoleHead}}和{{ui:prop.screwHoleSize}}只改变头部，长孔保持不变。长孔没有钻尖，和圆孔一样是精确实体。
+
 {{ui:shape.finishingWasher}}（一种装饰垫圈，Discussion #1131）是放在沉头或半沉头螺钉下面的拱形垫圈，用于在木头或盖板上显得整洁。它是实心件，底面平；从较低的边缘起，拱顶升到座面，座面是承托螺钉头的锥面，下面是孔。在 {{ui:prop.screwHoleSize}} 下选择 M2 到 M20：孔是该规格的过孔，座面是该规格的沉头孔，{{ui:prop.diameter}} 和 {{ui:prop.height}} 由此得出（M3：10.3 × 2.95 mm，M6：16.6 × 4.5 mm）。你也可以自己设定 {{ui:prop.diameter}}、{{ui:prop.height}}、{{ui:prop.centerHole}}、座面顶部的 {{ui:prop.screwHoleHead}} 及其 {{ui:prop.screwHoleAngle}}。它保持圆形，并且是精确实体，因此边工具和 STEP 都能处理它。
 
 ## 螺丝柱

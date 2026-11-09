@@ -489,6 +489,7 @@ export function tapeShapeTopologyKey(shape: WorkplaneShape): string {
     screwHoleShaft: shape.screwHoleShaft,
     screwHoleHeadDepth: shape.screwHoleHeadDepth,
     screwHoleAngle: shape.screwHoleAngle,
+    screwHoleSlot: shape.screwHoleSlot,
     // The drill point as built: a solid, the double countersink and a tapered body keep a flat end (drillPoint.ts).
     drillPoint: shapeDrillPointAngle(shape),
     portProfile: shape.portProfile,
@@ -923,6 +924,7 @@ export function shapeGeometrySignature(shape: WorkplaneShape): string {
     screwHoleShaft: shape.screwHoleShaft,
     screwHoleHeadDepth: shape.screwHoleHeadDepth,
     screwHoleAngle: shape.screwHoleAngle,
+    screwHoleSlot: shape.screwHoleSlot,
     // The drill point as built: a solid, the double countersink and a tapered body keep a flat end (drillPoint.ts).
     drillPoint: shapeDrillPointAngle(shape),
     portProfile: shape.portProfile,
@@ -2133,7 +2135,7 @@ export function createShapeObject(
     case "counterbore":
     case "countersink":
     case "doubleCountersink":
-      addMesh(group, sharedShapeGeometry(geometryCacheKey, () => createScrewHoleGeometry({ kind: shape.kind as "counterbore" | "countersink" | "doubleCountersink", width, depth, height, screwHoleShaft: shape.screwHoleShaft, screwHoleHeadDepth: shape.screwHoleHeadDepth, screwHoleAngle: shape.screwHoleAngle, drillPointAngle: shapeDrillPointAngle(shape), sides: roundSideCount(shape.sides, width, depth) })), material, shape);
+      addMesh(group, sharedShapeGeometry(geometryCacheKey, () => createScrewHoleGeometry({ kind: shape.kind as "counterbore" | "countersink" | "doubleCountersink", width, depth, height, screwHoleShaft: shape.screwHoleShaft, screwHoleHeadDepth: shape.screwHoleHeadDepth, screwHoleAngle: shape.screwHoleAngle, drillPointAngle: shapeDrillPointAngle(shape), slot: shape.screwHoleSlot, sides: roundSideCount(shape.sides, width, depth) })), material, shape);
       break;
     case "finishingWasher":
       addMesh(group, sharedShapeGeometry(geometryCacheKey, () => createFinishingWasherGeometry({ width, depth, height, screwHoleShaft: shape.screwHoleShaft, screwHoleHeadDepth: shape.screwHoleHeadDepth, screwHoleAngle: shape.screwHoleAngle, sides: roundSideCount(shape.sides, width, depth) })), material, shape);

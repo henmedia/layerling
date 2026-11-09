@@ -1388,6 +1388,13 @@ export type WorkplaneShape = {
    * countersink take it while they are holes. The height still counts to the shoulder, the tip lies below it.
    */
   drillPointAngle?: number;
+  /**
+   * Counterbore, countersink and double countersink: a slotted hole (Discussion #1531). The head and the shaft run
+   * along a slot instead of standing round, so the part can still be moved a little before the screw is tightened.
+   * The shorter of width and depth is the head's diameter, the difference the slot's length, along the longer one.
+   * Missing or false: the round hole, stretched into an oval when width and depth differ, as always.
+   */
+  screwHoleSlot?: boolean;
   /** Port opening: rounded corners, or the lower ones cut off as on an HDMI or DisplayPort socket. */
   portProfile?: PortProfile;
   /** Port opening: extra room in mm on every side on top of the preset's, already in width and height; it lets the preset be recognised. */

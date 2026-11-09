@@ -22,5 +22,17 @@
       "en": "A Shapes panel that had been moved or pulled larger slipped under the toolbar with its title bar and search once pinned. Now it opens where you left it, and follows the toolbar when it grows or shrinks.",
       "da": "Et formvindue, der var flyttet eller trukket større, gled ind under båndet med titellinje og søgning, når det blev fastgjort. Nu åbner det, hvor du lod det være, og følger båndet, når det bliver højere eller lavere."
     }
+  },
+  {
+    "title": {
+      "de": "Schraubenlöcher als Langloch",
+      "en": "Slotted screw holes",
+      "da": "Skruehuller som langhul"
+    },
+    "body": {
+      "de": "Stufenbohrung, Senkbohrung und Doppelsenkung haben einen Schalter „Langloch“: Kopf und Schaft laufen dann entlang eines Langlochs, sodass sich das Teil vor dem Festziehen der Schraube noch ausrichten lässt. Die Länge stellst du darunter ein.",
+      "en": "The counterbore, the countersink and the double countersink have a switch, Slotted: the head and the shaft then run along a slot, so the part can still be lined up before the screw is tightened. Set its length just below.",
+      "da": "Forsænkning, undersænkning og dobbelt forsænkning har en kontakt, Langhul: Hoved og skaft løber så langs et langhul, så delen stadig kan rettes ind, før skruen spændes. Længden indstiller du lige under."
+    }
   }
 ]

@@ -1744,6 +1744,10 @@ function validateShapeDefinition(definition: Record<string, unknown>, label: str
       if (value < 0 || value > 1e6) throw new Error(`${label}.${key} is outside the supported range`);
     }
   }
+  if ((kind === "counterbore" || kind === "countersink" || kind === "doubleCountersink") && definition.screwHoleSlot !== undefined && typeof definition.screwHoleSlot !== "boolean") {
+    // A slotted screw hole (Discussion #1531): on or off.
+    throw new Error(`${label}.screwHoleSlot must be true or false`);
+  }
   if ((kind === "cylinder" || kind === "counterbore" || kind === "countersink" || kind === "doubleCountersink") && definition.drillPointAngle !== undefined) {
     // The drill point (Discussion #621). Lenient on purpose: 0 is a flat bottom and the geometry clamps the rest.
     const drillPointAngle = finiteNumber(definition.drillPointAngle, `${label}.drillPointAngle`);

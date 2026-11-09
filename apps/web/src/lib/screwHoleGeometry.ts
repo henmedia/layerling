@@ -22,6 +22,9 @@ import { toCreasedNormals } from "@/lib/creasedNormals";
  * A counterbore or countersink that ends blind may end in a drill point (Discussion #621,
  * drillPoint.ts): the cone of the drill's tip, as wide as the shaft, below y = 0. The
  * height still counts to the shoulder, so the tip is all the profile adds.
+ *
+ * Any of the three may be slotted (Discussion #1531): the same profile, as wide as the head, runs round the two ends
+ * of a slot and straight along its sides, for a screw that leaves the part room to be lined up.
  */
 
 export type ScrewHoleKind = "counterbore" | "countersink" | "doubleCountersink";
@@ -81,7 +84,19 @@ export type ScrewHoleGeometryOptions = {
   drillPointAngle?: number;
   /** Corners around the axis; the automatic count for the diameter when left out. */
   sides?: number;
+  /** A slotted hole (Discussion #1531, screwHoleSlotMeasures): the profile runs round the two ends of a slot. */
+  slot?: boolean;
 };
+
+/**
+ * A slotted screw hole (Discussion #1531): the shorter of width and depth is the head's diameter, and the hole runs
+ * by the difference along the longer one - a slot for a screw that leaves the part room to be lined up. `alongX` when
+ * the slot runs along the width (x), else along the depth (z).
+ */
+export function screwHoleSlotMeasures(width: number, depth: number) {
+  const head = Math.max(0.01, Math.min(width, depth));
+  return { head, length: Math.abs(width - depth), alongX: width >= depth };
+}
 
 /**
  * Radius and height of each corner of the outline, from the bottom of the shaft up to the rim of the head. With a
@@ -140,20 +155,36 @@ function flatScrewHoleProfile({ kind, width, height, screwHoleShaft, screwHoleHe
  * point's tip is the middle of the bottom cap, so the cap is its cone.
  */
 export function createScrewHoleGeometry(options: ScrewHoleGeometryOptions): THREE.BufferGeometry {
-  const outline = screwHoleProfile(options);
+  const slot = options.slot ? screwHoleSlotMeasures(options.width, options.depth) : null;
+  // A slotted hole (Discussion #1531) has the profile of a round one as wide as its head, and no drill point.
+  const outline = slot ? screwHoleProfile({ ...options, width: slot.head, drillPointAngle: undefined }) : screwHoleProfile(options);
   const tip = outline[0].r <= 0 ? outline[0] : null;
   const profile = tip ? outline.slice(1) : outline;
   const rings = profile.length;
-  const SEGMENTS = Math.max(3, Math.round(options.sides ?? DEFAULT_SEGMENTS));
+  const segments = Math.max(3, Math.round(options.sides ?? DEFAULT_SEGMENTS));
   // Width and depth may differ: the round body is stretched along z.
-  const stretch = Math.max(0.01, options.depth) / Math.max(0.01, options.width);
+  const stretch = slot ? 1 : Math.max(0.01, options.depth) / Math.max(0.01, options.width);
+  // Each ring, counter-clockwise from above as the angle grows. A slot's ring is its two half circles, each with both
+  // of its ends, so the quads between them are the straight walls along the slot.
+  const half = Math.max(2, Math.ceil(segments / 2));
+  const ringPoints = (r: number): Array<[number, number]> => {
+    if (!slot) return Array.from({ length: segments }, (_, s) => [r * Math.cos((s / segments) * Math.PI * 2), r * Math.sin((s / segments) * Math.PI * 2) * stretch]);
+    const start = slot.alongX ? -Math.PI / 2 : 0;
+    const [dx, dz] = slot.alongX ? [slot.length / 2, 0] : [0, slot.length / 2];
+    const points: Array<[number, number]> = [];
+    for (const side of [1, -1]) {
+      for (let s = 0; s <= half; s += 1) {
+        const angle = start + (side === 1 ? 0 : Math.PI) + (s / half) * Math.PI;
+        points.push([side * dx + r * Math.cos(angle), side * dz + r * Math.sin(angle)]);
+      }
+    }
+    return points;
+  };
+  const SEGMENTS = slot ? 2 * (half + 1) : segments;
   const positions: number[] = [];
   const indices: number[] = [];
   profile.forEach(({ r, y }) => {
-    for (let s = 0; s < SEGMENTS; s += 1) {
-      const angle = (s / SEGMENTS) * Math.PI * 2;
-      positions.push(r * Math.cos(angle), y, r * Math.sin(angle) * stretch);
-    }
+    for (const [x, z] of ringPoints(r)) positions.push(x, y, z);
   });
   const bottomCentre = rings * SEGMENTS;
   const topCentre = bottomCentre + 1;
