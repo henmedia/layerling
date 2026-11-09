@@ -6,6 +6,8 @@ code still carries it - so a lower number further down is older, not newer.
 
 ## Unreleased
 
+- **Ctrl+V pastes straight away in Firefox (Issue #1548):** Each paste read the system clipboard itself, so that a copy from another tab or browser came along, and Firefox (and Zen, built on it) confirms each such read with a small Paste menu of its own; whatever one did with it, the copy was pasted after it. Ctrl+V now takes the clipboard from the browser's own paste that follows the key, which every browser hands over without asking. The Paste button and the context menu still ask. A copy in the system clipboard on Windows, where its first line ends in \r\n, is now recognised as layerling's.
+
 - **A bent tube bent upwards keeps its opening when grouped (Discussion #1545):** With **Bore cuts as a hole when grouped**, a bent tube made to stand by the **Roll** of a bend, not by turning it, had its opening placed 0.75 mm too low in a group: it stopped short of the top, closed the upright end and thinned the wall below. The opening is now placed from where the tube starts, as its path runs, so it reaches both ends whichever way the tube is bent, turned or mirrored.
 
 - **Tab shows the next field in a long panel (Issue #1547):** Tabbing down the properties of a long shape, a Gridfinity baseplate for one, now and then put the focus on a field nobody could see, so a value could be typed into it unseen. The Snap Grid bar sticks to the bottom of the panel and covered that field, and the browser took it as visible and did not scroll. The panel now keeps the focused field above the bar. Reported by @ddemtlapps.
