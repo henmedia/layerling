@@ -4648,7 +4648,7 @@ export const MESSAGES_RU: Partial<Record<MessageKey, string>> = {
   "workspace.themeGraphite": "Графит (нейтральная тёмная)",
   "workspace.toolbarSize": "Размер элементов управления",
   "workspace.ribbonButtons": "Кнопки на ленте",
-  "workspace.ribbonButtonsHint": "Уберите группы и кнопки, которыми не пользуетесь, и перемещайте группу её стрелками: первая в списке стоит в ленте первой. Убранное остаётся в поиске команд (Ctrl+K) и на своих клавишах.",
+  "workspace.ribbonButtonsHint": "Уберите группы и кнопки, которыми не пользуетесь, и перемещайте группы и кнопки их стрелками: первый в списке стоит в ленте первым. Убранное остаётся в поиске команд (Ctrl+K) и на своих клавишах.",
   "workspace.ribbonShowAll": "Показать все",
   "workspace.ribbonGroupShown": "Показывать эту группу",
   "workspace.ribbonGroupCount": "Показано {shown} из {total}",

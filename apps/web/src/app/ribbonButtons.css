@@ -83,3 +83,34 @@
   cursor: default;
   opacity: 0.25;
 }
+
+/* The arrows of a button row sit just before its tick, smaller than a group's, and need no push to the right. */
+.ribbon-buttons-tool-moves {
+  display: inline-flex;
+  flex: 0 0 auto;
+  gap: 2px;
+  margin-left: auto;
+  margin-right: 8px;
+}
+
+.ribbon-buttons-tools .ribbon-buttons-move {
+  display: inline-grid;
+  width: 22px;
+  height: 20px;
+  place-items: center;
+  padding: 0;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+}
+
+.ribbon-buttons-tools .ribbon-buttons-move:hover:not(:disabled) {
+  border-color: currentColor;
+}
+
+.ribbon-buttons-tools .ribbon-buttons-move:disabled {
+  cursor: default;
+  opacity: 0.25;
+}

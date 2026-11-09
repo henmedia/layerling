@@ -5009,7 +5009,7 @@ export const MESSAGES_SL: Partial<Record<MessageKey, string>> = {
   "shortcuts.chamfer": "Orodje za posnetje izbranega telesa (še enkrat: zapre ga)",
   "workspace.toolbarSize": "Velikost kontrolnikov",
   "workspace.ribbonButtons": "Gumbi v orodni vrstici",
-  "workspace.ribbonButtonsHint": "Odstrani skupine in gumbe, ki jih ne uporabljaš, in skupino premakni z njenima puščicama: prva na seznamu stoji v orodni vrstici prva. Odstranjeno ostane v iskanju ukazov (Ctrl+K) in na svojih tipkah.",
+  "workspace.ribbonButtonsHint": "Odstrani skupine in gumbe, ki jih ne uporabljaš, in skupine ter gumbe premikaj z njihovimi puščicami: prvi na seznamu stoji v orodni vrstici prvi. Odstranjeno ostane v iskanju ukazov (Ctrl+K) in na svojih tipkah.",
   "workspace.ribbonShowAll": "Pokaži vse",
   "workspace.ribbonGroupShown": "Pokaži to skupino",
   "workspace.ribbonGroupCount": "Vidnih {shown} od {total}",

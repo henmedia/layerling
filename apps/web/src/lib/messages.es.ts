@@ -4658,7 +4658,7 @@ export const MESSAGES_ES: Partial<Record<MessageKey, string>> = {
   "workspace.themeGraphite": "Grafito (oscuro neutro)",
   "workspace.toolbarSize": "Tamaño de los controles",
   "workspace.ribbonButtons": "Botones de la cinta",
-  "workspace.ribbonButtonsHint": "Quita los grupos y botones que no uses y mueve un grupo con sus flechas: el primero de la lista aparece primero en la cinta. Lo que quitas sigue en la búsqueda de comandos (Ctrl+K) y en sus teclas.",
+  "workspace.ribbonButtonsHint": "Quita los grupos y botones que no uses y mueve grupos y botones con sus flechas: el primero de una lista aparece primero en la cinta. Lo que quitas sigue en la búsqueda de comandos (Ctrl+K) y en sus teclas.",
   "workspace.ribbonShowAll": "Mostrar todo",
   "workspace.ribbonGroupShown": "Mostrar este grupo",
   "workspace.ribbonGroupCount": "{shown} de {total} visibles",

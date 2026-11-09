@@ -4657,7 +4657,7 @@ export const MESSAGES_EN = {
   "workspace.themeGraphite": "Graphite (neutral dark)",
   "workspace.toolbarSize": "Control size",
   "workspace.ribbonButtons": "Buttons in the ribbon",
-  "workspace.ribbonButtonsHint": "Take out the groups and buttons you don't use, and move a group with its arrows: the first in the list stands first in the ribbon. What is taken out stays in the command search (Ctrl+K) and on its keys.",
+  "workspace.ribbonButtonsHint": "Take out the groups and buttons you don't use, and move groups and buttons with their arrows: the first in a list stands first in the ribbon. What is taken out stays in the command search (Ctrl+K) and on its keys.",
   "workspace.ribbonShowAll": "Show all",
   "workspace.ribbonGroupShown": "Show this group",
   "workspace.ribbonGroupCount": "{shown} of {total} shown",

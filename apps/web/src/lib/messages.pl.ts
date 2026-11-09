@@ -4661,7 +4661,7 @@ export const MESSAGES_PL: Partial<Record<MessageKey, string>> = {
   "workspace.themeGraphite": "Grafitowy (neutralny ciemny)",
   "workspace.toolbarSize": "Rozmiar elementów sterujących",
   "workspace.ribbonButtons": "Przyciski na wstążce",
-  "workspace.ribbonButtonsHint": "Usuń grupy i przyciski, których nie używasz, i przesuń grupę jej strzałkami: pierwsza na liście stoi we wstążce na początku. To, co usuniesz, zostaje w wyszukiwaniu poleceń (Ctrl+K) i na swoich klawiszach.",
+  "workspace.ribbonButtonsHint": "Usuń grupy i przyciski, których nie używasz, i przesuwaj grupy oraz przyciski ich strzałkami: pierwszy na liście stoi we wstążce na początku. To, co usuniesz, zostaje w wyszukiwaniu poleceń (Ctrl+K) i na swoich klawiszach.",
   "workspace.ribbonShowAll": "Pokaż wszystko",
   "workspace.ribbonGroupShown": "Pokaż tę grupę",
   "workspace.ribbonGroupCount": "Widoczne: {shown} z {total}",

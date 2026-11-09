@@ -27,6 +27,7 @@ describe("settings file (Discussion #1407)", () => {
       "layerling.customShortcuts": JSON.stringify({ center: { combo: "Shift+C", label: "Center on workplane" }, "object-1": { combo: "J", label: "a body" } }),
       "layerling.ribbonHidden": JSON.stringify(["cookieCutter", "group:visibility", 7]),
       "layerling.ribbonOrder": JSON.stringify(["arrange", "combine", "bogus"]),
+      "layerling.ribbonToolOrder": JSON.stringify({ combine: ["bundle", "group"], bogus: ["x"] }),
     }));
     expect(browser).toEqual({
       theme: "dark",
@@ -37,6 +38,7 @@ describe("settings file (Discussion #1407)", () => {
       customShortcuts: { center: { combo: "Shift+C", label: "Center on workplane" } },
       ribbonHidden: ["cookieCutter", "group:visibility"],
       ribbonOrder: ["arrange", "combine", "clipboard", "history", "visibility", "modify", "manage"],
+      ribbonToolOrder: { combine: ["bundle", "group"] },
     });
     const parsed = parseSettingsFile(settingsFileText(buildSettingsFile(workspace, "2.0 mm", browser, NOW)));
     expect(parsed).not.toBeNull();
@@ -56,6 +58,7 @@ describe("settings file (Discussion #1407)", () => {
       customShortcuts: {},
       ribbonHidden: [],
       ribbonOrder: ["clipboard", "history", "visibility", "combine", "modify", "arrange", "manage"],
+      ribbonToolOrder: {},
     });
     expect(readBrowserSettings(null).shapeColors).toBe(true);
   });
@@ -128,6 +131,18 @@ describe("settings file (Discussion #1407)", () => {
     expect(withOrder!.browser.ribbonOrder).toEqual(["arrange", "combine", "clipboard", "history", "visibility", "modify", "manage"]);
     const older = parseSettingsFile(JSON.stringify({ format: SETTINGS_FILE_FORMAT, version: 1, workspace: {}, browser: { theme: "dark" } }));
     expect(older!.browser.ribbonOrder).toBeUndefined();
+  });
+
+  it("carries the order of the buttons inside the groups (Discussion #1519), and a file from before it leaves it alone", () => {
+    const withOrder = parseSettingsFile(JSON.stringify({
+      format: SETTINGS_FILE_FORMAT,
+      version: 1,
+      workspace: {},
+      browser: { ribbonToolOrder: { arrange: ["snap", "snap", "align"], nonsense: ["x"] } },
+    }));
+    expect(withOrder!.browser.ribbonToolOrder).toEqual({ arrange: ["snap", "align"] });
+    const older = parseSettingsFile(JSON.stringify({ format: SETTINGS_FILE_FORMAT, version: 1, workspace: {}, browser: { theme: "dark" } }));
+    expect(older!.browser.ribbonToolOrder).toBeUndefined();
   });
 
   it("names the download after the day", () => {

@@ -1,14 +1,14 @@
 [
   {
     "title": {
-      "de": "Gruppen im Menüband verschieben",
-      "en": "Move the ribbon's groups",
-      "da": "Flyt båndets grupper"
+      "de": "Gruppen und Knöpfe im Menüband verschieben",
+      "en": "Move the ribbon's groups and buttons",
+      "da": "Flyt båndets grupper og knapper"
     },
     "body": {
-      "de": "In den Einstellungen gibt es einen eigenen Reiter „Menüband“: Dort stehen die Größe der Bedienelemente und die Knöpfe, die du herausnehmen kannst, und neben jeder Gruppe zwei Pfeile. Damit rückt „Anordnen“ etwa gleich hinter „Kombinieren“. Nur die Gruppe Formen behält ihren Platz.",
-      "en": "The settings have a tab of their own, Ribbon: it holds the control size and the buttons you can take out, and two arrows beside every group. With them Arrange can stand right after Combine, say. Only the Shapes group keeps its place.",
-      "da": "Indstillingerne har en fane for sig, Bånd: Den rummer størrelsen på betjeningselementerne og de knapper, du kan tage ud, og to pile ved hver gruppe. Med dem kan Ordn for eksempel stå lige efter Kombiner. Kun gruppen Former beholder sin plads."
+      "de": "In den Einstellungen gibt es einen eigenen Reiter „Menüband“: Dort stehen die Größe der Bedienelemente und die Knöpfe, die du herausnehmen kannst. Neben jeder Gruppe und jedem Knopf sitzen zwei Pfeile. Damit rückt „Anordnen“ etwa gleich hinter „Kombinieren“, und ein Knopf wandert an den Anfang seiner Gruppe. Nur die Gruppe Formen behält ihren Platz.",
+      "en": "The settings have a tab of their own, Ribbon: it holds the control size and the buttons you can take out. Beside every group and every button are two arrows. With them Arrange can stand right after Combine, say, and a button can move to the front of its group. Only the Shapes group keeps its place.",
+      "da": "Indstillingerne har en fane for sig, Bånd: Den rummer størrelsen på betjeningselementerne og de knapper, du kan tage ud. Ved hver gruppe og hver knap sidder to pile. Med dem kan Ordn for eksempel stå lige efter Kombiner, og en knap kan flytte forrest i sin gruppe. Kun gruppen Former beholder sin plads."
     }
   },
   {

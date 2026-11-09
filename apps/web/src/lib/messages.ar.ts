@@ -4664,7 +4664,7 @@ export const MESSAGES_AR: Partial<Record<MessageKey, string>> = {
   "workspace.themeGraphite": "غرافيت (داكن محايد)",
   "workspace.toolbarSize": "حجم عناصر التحكم",
   "workspace.ribbonButtons": "الأزرار في الشريط",
-  "workspace.ribbonButtonsHint": "أزل المجموعات والأزرار التي لا تستخدمها، وحرّك المجموعة بسهميها: أول مجموعة في القائمة تظهر أولًا في الشريط. ما تُزيله يبقى في بحث الأوامر (Ctrl+K) وعلى مفاتيحه.",
+  "workspace.ribbonButtonsHint": "أزل المجموعات والأزرار التي لا تستخدمها، وحرّك المجموعات والأزرار بأسهمها: أول عنصر في القائمة يظهر أولًا في الشريط. ما تُزيله يبقى في بحث الأوامر (Ctrl+K) وعلى مفاتيحه.",
   "workspace.ribbonShowAll": "إظهار الكل",
   "workspace.ribbonGroupShown": "إظهار هذه المجموعة",
   "workspace.ribbonGroupCount": "{shown} من {total} ظاهرة",

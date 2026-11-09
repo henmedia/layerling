@@ -4645,7 +4645,7 @@ export const MESSAGES_ZH_TW: Partial<Record<MessageKey, string>> = {
   "workspace.themeGraphite": "石墨（中性深色）",
   "workspace.toolbarSize": "控制項大小",
   "workspace.ribbonButtons": "功能區中的按鈕",
-  "workspace.ribbonButtonsHint": "移除你不用的群組和按鈕，並用箭頭移動群組：清單中的第一個群組排在功能區最前面。移除的內容仍在命令搜尋（Ctrl+K）中和各自的快速鍵上。",
+  "workspace.ribbonButtonsHint": "移除你不用的群組和按鈕，並用箭頭移動群組和按鈕：清單中的第一項排在功能區最前面。移除的內容仍在命令搜尋（Ctrl+K）中和各自的快速鍵上。",
   "workspace.ribbonShowAll": "全部顯示",
   "workspace.ribbonGroupShown": "顯示此群組",
   "workspace.ribbonGroupCount": "顯示 {shown} / {total}",

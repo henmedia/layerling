@@ -4657,7 +4657,7 @@ export const MESSAGES_NL: Record<MessageKey, string> = {
   "workspace.themeGraphite": "Grafiet (neutraal donker)",
   "workspace.toolbarSize": "Grootte van de bedieningselementen",
   "workspace.ribbonButtons": "Knoppen in het lint",
-  "workspace.ribbonButtonsHint": "Haal de groepen en knoppen weg die je niet gebruikt en verplaats een groep met zijn pijlen: de eerste in de lijst staat vooraan in het lint. Wat je weghaalt, blijft in het zoeken naar opdrachten (Ctrl+K) en op zijn toetsen.",
+  "workspace.ribbonButtonsHint": "Haal de groepen en knoppen weg die je niet gebruikt en verplaats groepen en knoppen met hun pijlen: de eerste in een lijst staat vooraan in het lint. Wat je weghaalt, blijft in het zoeken naar opdrachten (Ctrl+K) en op zijn toetsen.",
   "workspace.ribbonShowAll": "Alles tonen",
   "workspace.ribbonGroupShown": "Deze groep tonen",
   "workspace.ribbonGroupCount": "{shown} van {total} zichtbaar",

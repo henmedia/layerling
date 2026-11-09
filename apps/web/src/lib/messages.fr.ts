@@ -4641,7 +4641,7 @@ export const MESSAGES_FR: Partial<Record<MessageKey, string>> = {
   "workspace.themeGraphite": "Graphite (neutre foncé)",
   "workspace.toolbarSize": "Taille des commandes",
   "workspace.ribbonButtons": "Boutons du ruban",
-  "workspace.ribbonButtonsHint": "Retirez les groupes et boutons que vous n'utilisez pas et déplacez un groupe avec ses flèches : le premier de la liste est le premier dans le ruban. Ce que vous retirez reste dans la recherche de commandes (Ctrl+K) et sur ses touches.",
+  "workspace.ribbonButtonsHint": "Retirez les groupes et boutons que vous n'utilisez pas et déplacez groupes et boutons avec leurs flèches : le premier d'une liste est le premier dans le ruban. Ce que vous retirez reste dans la recherche de commandes (Ctrl+K) et sur ses touches.",
   "workspace.ribbonShowAll": "Tout afficher",
   "workspace.ribbonGroupShown": "Afficher ce groupe",
   "workspace.ribbonGroupCount": "{shown} sur {total} affichés",

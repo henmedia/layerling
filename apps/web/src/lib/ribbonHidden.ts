@@ -4,8 +4,8 @@ import { useSyncExternalStore } from "react";
 
 /**
  * Buttons and groups of the 3D ribbon a person has taken out of it (Discussion #1519, #1087): kept in this browser, like
- * your own keys. Only the ribbon leaves them out; the command search (Ctrl+K) and the keys still run them, and the order
- * of the groups stays as it is, so the guide and the help still point at the same places. A group is stored as
+ * your own keys. Only the ribbon leaves them out; the command search (Ctrl+K) and the keys still run them. The order of the
+ * groups and of the buttons in them is kept elsewhere (`ribbonOrder.ts`, `ribbonToolOrder.ts`). A group is stored as
  * "group:<name>", a button by its id in the ribbon.
  */
 export const RIBBON_HIDDEN_STORAGE_KEY = "layerling.ribbonHidden";
@@ -109,7 +109,7 @@ export function useRibbonHidden(): ReadonlySet<string> {
  * What the ribbon holds, group by group, as the toolbar last drew it, for the list in the settings window: the names
  * there are the ones on the buttons, in the language shown, and a new tool turns up in the list by itself.
  */
-export type RibbonLayoutGroup = { group: string; label: string; tools: { id: string; label: string }[] };
+export type RibbonLayoutGroup = { group: string; label: string; /** The ids of its buttons in the order the ribbon ships them. */ shipped?: string[]; tools: { id: string; label: string; /** The named section of the group a button stands in; a button moves only among the ones of its own. */ section?: string }[] };
 let layout: RibbonLayoutGroup[] = [];
 export function setRibbonLayout(next: RibbonLayoutGroup[]) {
   layout = next;

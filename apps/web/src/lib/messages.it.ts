@@ -4641,7 +4641,7 @@ export const MESSAGES_IT: Partial<Record<MessageKey, string>> = {
   "workspace.themeGraphite": "Grafite (scuro neutro)",
   "workspace.toolbarSize": "Dimensione dei controlli",
   "workspace.ribbonButtons": "Pulsanti della barra multifunzione",
-  "workspace.ribbonButtonsHint": "Togli i gruppi e i pulsanti che non usi e sposta un gruppo con le sue frecce: il primo dell'elenco sta per primo nella barra. Ciò che togli resta nella ricerca comandi (Ctrl+K) e sui suoi tasti.",
+  "workspace.ribbonButtonsHint": "Togli i gruppi e i pulsanti che non usi e sposta gruppi e pulsanti con le loro frecce: il primo di un elenco sta per primo nella barra. Ciò che togli resta nella ricerca comandi (Ctrl+K) e sui suoi tasti.",
   "workspace.ribbonShowAll": "Mostra tutto",
   "workspace.ribbonGroupShown": "Mostra questo gruppo",
   "workspace.ribbonGroupCount": "{shown} di {total} visibili",

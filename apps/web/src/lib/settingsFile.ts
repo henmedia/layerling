@@ -3,6 +3,7 @@ import { CUSTOM_SHORTCUTS_STORAGE_KEY, normalizeCustomShortcuts, type CustomShor
 import { normalizePrinterPlay, PRINTER_PLAYS_STORAGE_KEY } from "@/lib/printerPlay";
 import { normalizeRibbonHidden, RIBBON_HIDDEN_STORAGE_KEY } from "@/lib/ribbonHidden";
 import { normalizeRibbonOrder, RIBBON_ORDER_STORAGE_KEY } from "@/lib/ribbonOrder";
+import { normalizeRibbonToolOrder, RIBBON_TOOL_ORDER_STORAGE_KEY, type RibbonToolOrder } from "@/lib/ribbonToolOrder";
 import { normalizeShapeColors, SHAPE_COLORS_STORAGE_KEY } from "@/lib/shapeColors";
 import { normalizeToolbarSize, TOOLBAR_SIZE_STORAGE_KEY, type ToolbarSize } from "@/lib/toolbarSize";
 import { normalizeViewCubePosition, VIEW_CUBE_POSITION_STORAGE_KEY, type ViewCubePosition } from "@/lib/viewCubePosition";
@@ -37,6 +38,8 @@ export type BrowserSettings = {
   ribbonHidden?: string[];
   /** The order of the ribbon's groups (Discussion #1519, #1502); read only from a file that has it. */
   ribbonOrder?: string[];
+  /** The order of the buttons inside each group (Discussion #1519); read only from a file that has it. */
+  ribbonToolOrder?: Record<string, string[]>;
 };
 
 export type SettingsFile = {
@@ -97,6 +100,12 @@ export function readBrowserSettings(storage: Pick<Storage, "getItem"> | null): B
   } catch {
     ribbonOrder = normalizeRibbonOrder([]);
   }
+  let ribbonToolOrder: RibbonToolOrder = {};
+  try {
+    ribbonToolOrder = normalizeRibbonToolOrder(JSON.parse(readText(storage, RIBBON_TOOL_ORDER_STORAGE_KEY) ?? "{}"));
+  } catch {
+    ribbonToolOrder = {};
+  }
   return {
     theme: normalizeAppThemePreference(readText(storage, APP_THEME_STORAGE_KEY)),
     toolbarSize: normalizeToolbarSize(readText(storage, TOOLBAR_SIZE_STORAGE_KEY)),
@@ -106,6 +115,7 @@ export function readBrowserSettings(storage: Pick<Storage, "getItem"> | null): B
     customShortcuts,
     ribbonHidden,
     ribbonOrder,
+    ribbonToolOrder: { ...ribbonToolOrder } as Record<string, string[]>,
   };
 }
 
@@ -163,6 +173,7 @@ export function parseSettingsFile(text: string): SettingsFile | null {
       ...("customShortcuts" in browser ? { customShortcuts: normalizeCustomShortcuts(browser.customShortcuts) } : {}),
       ...("ribbonHidden" in browser ? { ribbonHidden: normalizeRibbonHidden(browser.ribbonHidden) } : {}),
       ...("ribbonOrder" in browser ? { ribbonOrder: normalizeRibbonOrder(browser.ribbonOrder) } : {}),
+      ...("ribbonToolOrder" in browser ? { ribbonToolOrder: { ...normalizeRibbonToolOrder(browser.ribbonToolOrder) } as Record<string, string[]> } : {}),
     },
   };
 }

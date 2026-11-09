@@ -134,7 +134,7 @@ L’ingranaggio nella riga del titolo ({{ui:editor.workspaceSettings}}) apre le 
 
 {{ui:workspace.ribbonButtons}} toglie dalla barra multifunzione i gruppi e i pulsanti che non usi mai. Fai clic su un gruppo per aprire il suo elenco: {{ui:workspace.ribbonGroupShown}} toglie tutto il gruppo, la spunta accanto a un pulsante solo quel pulsante. {{ui:workspace.ribbonShowAll}} rimette tutto. Un gruppo senza pulsanti scompare e gli altri avanzano, così una riga contiene più barra.
 
-Ciò che togli manca solo dalla barra: la ricerca comandi ([[Ctrl]]+[[K]]) lo trova ancora e il suo tasto lo esegue ancora. Le frecce accanto a un gruppo lo spostano su o giù nell'elenco e quindi lungo la barra; {{ui:workspace.ribbonResetOrder}} riporta l'ordine originale. Il gruppo Forme e la Guida restano sempre, e Forme tiene il suo posto dopo i primi due gruppi. Questo browser ricorda la scelta, che finisce anche nel file di {{ui:workspace.exportSettings}}. Vale per l'editor 3D; lo schizzo ha una barra sua.
+Ciò che togli manca solo dalla barra: la ricerca comandi ([[Ctrl]]+[[K]]) lo trova ancora e il suo tasto lo esegue ancora. Le frecce accanto a un gruppo lo spostano su o giù nell'elenco e quindi lungo la barra; {{ui:workspace.ribbonResetOrder}} riporta l'ordine originale. Le frecce accanto a un pulsante lo spostano allo stesso modo nel suo gruppo; in {{ui:editor.group.modify}} resta nella sua sezione con nome. Il gruppo Forme e la Guida restano sempre, e Forme tiene il suo posto dopo i primi due gruppi. Questo browser ricorda la scelta, che finisce anche nel file di {{ui:workspace.exportSettings}}. Vale per l'editor 3D; lo schizzo ha una barra sua.
 
 ### Aspetto: modalità veloce
 

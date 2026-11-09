@@ -4656,7 +4656,7 @@ export const MESSAGES_DE: Record<MessageKey, string> = {
   "workspace.themeGraphite": "Graphit (neutral dunkel)",
   "workspace.toolbarSize": "Größe der Bedienelemente",
   "workspace.ribbonButtons": "Knöpfe im Menüband",
-  "workspace.ribbonButtonsHint": "Nimm Gruppen und Knöpfe heraus, die du nicht brauchst, und verschiebe eine Gruppe mit ihren Pfeilen: die erste in der Liste steht im Menüband ganz vorn. Was herausgenommen ist, bleibt in der Befehlssuche (Strg+K) und auf seinen Tasten.",
+  "workspace.ribbonButtonsHint": "Nimm Gruppen und Knöpfe heraus, die du nicht brauchst, und verschiebe Gruppen und Knöpfe mit ihren Pfeilen: der erste in einer Liste steht im Menüband ganz vorn. Was herausgenommen ist, bleibt in der Befehlssuche (Strg+K) und auf seinen Tasten.",
   "workspace.ribbonShowAll": "Alle zeigen",
   "workspace.ribbonGroupShown": "Diese Gruppe zeigen",
   "workspace.ribbonGroupCount": "{shown} von {total} sichtbar",

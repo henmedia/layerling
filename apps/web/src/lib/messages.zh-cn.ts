@@ -4645,7 +4645,7 @@ export const MESSAGES_ZH_CN: Partial<Record<MessageKey, string>> = {
   "workspace.themeGraphite": "石墨",
   "workspace.toolbarSize": "控件大小",
   "workspace.ribbonButtons": "功能区中的按钮",
-  "workspace.ribbonButtonsHint": "移除你不用的组和按钮，并用箭头移动组：列表中的第一个组排在功能区最前面。移除的内容仍在命令搜索（Ctrl+K）中和各自的快捷键上。",
+  "workspace.ribbonButtonsHint": "移除你不用的组和按钮，并用箭头移动组和按钮：列表中的第一项排在功能区最前面。移除的内容仍在命令搜索（Ctrl+K）中和各自的快捷键上。",
   "workspace.ribbonShowAll": "全部显示",
   "workspace.ribbonGroupShown": "显示此组",
   "workspace.ribbonGroupCount": "显示 {shown} / {total}",

@@ -4647,7 +4647,7 @@ export const MESSAGES_CS: Record<MessageKey, string> = {
   "workspace.themeGraphite": "Grafitový (neutrální tmavý)",
   "workspace.toolbarSize": "Velikost ovládacích prvků",
   "workspace.ribbonButtons": "Tlačítka na pásu nástrojů",
-  "workspace.ribbonButtonsHint": "Odeberte skupiny a tlačítka, které nepoužíváte, a skupinu přesuňte jejími šipkami: první v seznamu stojí v pásu nástrojů jako první. Co odeberete, zůstane ve vyhledávání příkazů (Ctrl+K) a na svých klávesách.",
+  "workspace.ribbonButtonsHint": "Odeberte skupiny a tlačítka, které nepoužíváte, a skupiny i tlačítka přesouvejte jejich šipkami: první v seznamu stojí v pásu nástrojů jako první. Co odeberete, zůstane ve vyhledávání příkazů (Ctrl+K) a na svých klávesách.",
   "workspace.ribbonShowAll": "Zobrazit vše",
   "workspace.ribbonGroupShown": "Zobrazit tuto skupinu",
   "workspace.ribbonGroupCount": "Zobrazeno {shown} z {total}",

@@ -5,6 +5,7 @@ import { GuideHelpLink } from "@/components/GuideHelpLink";
 import { t } from "@/lib/i18n";
 import { ribbonGroupKey, ribbonLayout, setRibbonEntryShown, useRibbonHidden, writeRibbonHidden } from "@/lib/ribbonHidden";
 import { isDefaultRibbonOrder, moveRibbonGroupPast, readRibbonOrder, type RibbonGroupName, useRibbonOrder, writeRibbonOrder } from "@/lib/ribbonOrder";
+import { moveRibbonTool, readRibbonToolOrder, useRibbonToolOrder, withRibbonToolOrder, writeRibbonToolOrder } from "@/lib/ribbonToolOrder";
 
 /**
  * "Buttons in the ribbon" in the settings window (Discussion #1519, #1087, #1502): every group of the 3D ribbon folds open to
@@ -14,6 +15,7 @@ import { isDefaultRibbonOrder, moveRibbonGroupPast, readRibbonOrder, type Ribbon
 export function RibbonButtonsSetting() {
   const hidden = useRibbonHidden();
   const order = useRibbonOrder();
+  const toolOrder = useRibbonToolOrder();
   const layout = ribbonLayout();
   if (layout.length === 0) return null;
   return (
@@ -29,7 +31,7 @@ export function RibbonButtonsSetting() {
           <button type="button" className="make-default-button" disabled={hidden.size === 0} onClick={() => writeRibbonHidden([])}>
             {t("workspace.ribbonShowAll")}
           </button>
-          <button type="button" className="make-default-button" disabled={isDefaultRibbonOrder(order)} onClick={() => writeRibbonOrder([])}>
+          <button type="button" className="make-default-button" disabled={isDefaultRibbonOrder(order) && Object.keys(toolOrder).length === 0} onClick={() => { writeRibbonOrder([]); writeRibbonToolOrder({}); }}>
             {t("workspace.ribbonResetOrder")}
           </button>
         </span>
@@ -79,10 +81,38 @@ export function RibbonButtonsSetting() {
               />
             </label>
             <div className="ribbon-buttons-tools" aria-disabled={!groupShown}>
-              {group.tools.map((tool) => (
+              {group.tools.map((tool, toolIndex) => (
                 <label className={`workspace-toggle ribbon-buttons-row${groupShown ? "" : " is-disabled"}`} key={tool.id}>
                   <span className="workspace-toggle-copy">
                     <span>{tool.label}</span>
+                  </span>
+                  <span className="ribbon-buttons-tool-moves">
+                    {[-1, 1].map((step) => {
+                      // A button moves past the next one of its own section (Modify has named sections), never out of it.
+                      const candidates = step === -1 ? group.tools.slice(0, toolIndex).reverse() : group.tools.slice(toolIndex + 1);
+                      const neighbour = candidates.find((other) => other.section === tool.section);
+                      const label = t(step === -1 ? "workspace.ribbonMoveUp" : "workspace.ribbonMoveDown", { group: tool.label });
+                      return (
+                        <button
+                          type="button"
+                          key={step}
+                          className="ribbon-buttons-move"
+                          disabled={!neighbour}
+                          aria-label={label}
+                          title={label}
+                          onClick={(event) => {
+                            // The arrows sit in a label: a click on them must not tick the box.
+                            event.preventDefault();
+                            event.stopPropagation();
+                            if (!neighbour) return;
+                            const moved = moveRibbonTool(group.tools.map((entry) => entry.id), tool.id, neighbour.id, step as -1 | 1);
+                            writeRibbonToolOrder(withRibbonToolOrder(readRibbonToolOrder(), group.group, moved, group.shipped ?? moved));
+                          }}
+                        >
+                          {step === -1 ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
+                        </button>
+                      );
+                    })}
                   </span>
                   <input
                     type="checkbox"

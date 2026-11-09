@@ -4452,7 +4452,7 @@ export const MESSAGES_DA: Partial<Record<MessageKey, string>> = {
   "workspace.themeGraphite": "Grafit (neutral mørk)",
   "workspace.toolbarSize": "Størrelse på betjeningselementer",
   "workspace.ribbonButtons": "Knapper i båndet",
-  "workspace.ribbonButtonsHint": "Tag de grupper og knapper ud, du ikke bruger, og flyt en gruppe med dens pile: den første på listen står først i båndet. Det, du tager ud, bliver i kommandosøgningen (Ctrl+K) og på sine taster.",
+  "workspace.ribbonButtonsHint": "Tag de grupper og knapper ud, du ikke bruger, og flyt grupper og knapper med deres pile: den første på en liste står først i båndet. Det, du tager ud, bliver i kommandosøgningen (Ctrl+K) og på sine taster.",
   "workspace.ribbonShowAll": "Vis alle",
   "workspace.ribbonGroupShown": "Vis denne gruppe",
   "workspace.ribbonGroupCount": "{shown} af {total} vist",

@@ -15,6 +15,7 @@ import { useSimpleMode } from "@/lib/useSimpleMode";
 import { simpleModeKeepsShape, simpleModeKeepsTool } from "@/lib/simpleMode";
 import { ribbonGroupShown, setRibbonLayout, shownInRibbon, useRibbonHidden } from "@/lib/ribbonHidden";
 import { ribbonSectionOrders, useRibbonOrder } from "@/lib/ribbonOrder";
+import { sortByRibbonToolOrder, useRibbonToolOrder } from "@/lib/ribbonToolOrder";
 import { normalizePolygonSides, normalizeStarInnerPercent, SKETCH_POLYGON_MAX_SIDES, SKETCH_POLYGON_MIN_SIDES, SKETCH_STAR_MAX_INNER_PERCENT, SKETCH_STAR_MIN_INNER_PERCENT } from "@/lib/sketchPrimitives";
 import { SketchBoltCircleIcon, SketchEllipseIcon, SketchHalfCircleIcon, SketchPieSliceIcon, ToolbarAlignIcon, ToolbarAttachmentsIcon, ToolbarBuildPlatesIcon, ToolbarCenterOnWorkplaneIcon, ToolbarChamferIcon, ToolbarCaretDownIcon, ToolbarCookieCutterIcon, ToolbarFlexiIcon, ToolbarLidIcon,
   ToolbarCableChannelIcon, ToolbarCopyIcon, ToolbarDuplicateIcon, ToolbarDropToWorkplaneIcon, ToolbarBundleIcon, ToolbarGroupIcon, ToolbarGuideIcon, ToolbarHideSelectedIcon, ToolbarHomeIcon, ToolbarImportIcon, ToolbarIntersectionIcon,ToolbarClearanceIcon, ToolbarPrintCheckIcon, ToolbarHullIcon, ToolbarLoftSketchesIcon, ToolbarKeyboardIcon, ToolbarFilletIcon, ToolbarHistoryIcon, ToolbarHollowIcon, ToolbarOffsetIcon, ToolbarCutOutIcon, ToolbarPunchIcon, ToolbarDeleteFaceIcon, ToolbarSimplifyIcon, ToolbarMakeExactIcon, ToolbarSurfaceTextureIcon, ToolbarPaintIcon, ToolbarMirrorIcon, ToolbarRotationPivotIcon, ToolbarPatternIcon, ToolbarHolePatternIcon, ToolbarFaceToolIcon, ToolbarSupportRibIcon, ToolbarStencilBridgeIcon, ToolbarConstructionLineIcon, ToolbarMiddleLineIcon, ToolbarLayFlatIcon, ToolbarMateFacesIcon, ToolbarNoteIcon, ToolbarSplitIcon, ToolbarPasteIcon, ToolbarRedoIcon, ToolbarSnapGridIcon, ToolbarSettingsIcon, ToolbarShapeAddIcon, ToolbarTrashIcon, ToolbarUngroupIcon, ToolbarUndoIcon, ToolbarVectorExportIcon } from "../icons";
@@ -759,6 +760,10 @@ export function SecondaryToolbar({
   // wrappers of the groups lay their sections out as if they were not there (globals.css), so a group can move anywhere.
   const ribbonOrder = useRibbonOrder();
   const sectionOrder = ribbonSectionOrders(ribbonOrder);
+  // The order of the buttons inside each group, set in the same place (#1519): a group's buttons are sorted by it before the
+  // ribbon draws them and the settings list them.
+  const toolOrder = useRibbonToolOrder();
+  const ordered = <T extends { id: string }>(group: string, tools: readonly T[]) => sortByRibbonToolOrder(tools, toolOrder[group]);
   // Groups the window has no room for fold into one button that opens on hover or a tap (Stefan, 29.10.2026). The simple
   // mode keeps every tool in sight, as it always did, and so does the pin in the title row, for whoever wants it so.
   const [ribbonPinned, setRibbonPinned] = useState(false);
@@ -1277,33 +1282,70 @@ export function SecondaryToolbar({
   buildPaletteCommandsRef.current = buildPaletteCommands;
 
   // What the ribbon shows of each group (#1519): the simple mode's cut first, then what was taken out in the settings.
-  const clipboardShown = shownInRibbon(leftTools.slice(0, 4), ribbonHidden);
-  const historyShown = inSimpleMode(leftTools.slice(4));
-  const visibilityShown = shownInRibbon(visibilityTools, ribbonHidden);
-  const combineShown = inSimpleMode(combineTools);
-  const modifyShown = inSimpleMode(modifyTools);
-  const arrangeShown = inSimpleMode(arrangeTools);
-  const fileTools = [
+  const clipboardShown = shownInRibbon(ordered("clipboard", leftTools.slice(0, 4)), ribbonHidden);
+  const historyShown = inSimpleMode(ordered("history", leftTools.slice(4)));
+  const visibilityShown = shownInRibbon(ordered("visibility", visibilityTools), ribbonHidden);
+  const combineShown = inSimpleMode(ordered("combine", combineTools));
+  const modifyShown = inSimpleMode(ordered("modify", modifyTools));
+  const arrangeShown = inSimpleMode(ordered("arrange", arrangeTools));
+  const fileToolsShipped = [
     ...(simpleMode ? [] : [{ id: "import", label: t("editor.import") }]),
     { id: "export", label: t("editor.export") },
     { id: "attachments", label: t("editor.attachments") },
   ];
+  const fileTools = ordered("manage", fileToolsShipped);
   const fileShown = shownInRibbon(fileTools, ribbonHidden);
-  const fileHas = (id: string) => fileShown.some((tool) => tool.id === id);
+  // The File group's three buttons, in the order set for the group (#1519).
+  const renderFileButton = (tool: { id: string }) => {
+    if (tool.id === "import") {
+      return (
+        <button key="import" className="action-icon-button" aria-label={t("editor.import")} title={`${t("editor.import")} (${COMMAND_SHORTCUTS.import})`} onClick={() => onTopPanel("import")} disabled={historyViewActive}>
+            <ToolbarImportIcon />
+          </button>
+      );
+    }
+    if (tool.id === "export") {
+      return (
+        <button key="export" className="action-icon-button" aria-label={t("editor.export")} title={`${t("editor.export")} (${COMMAND_SHORTCUTS.export})`} onClick={() => onTopPanel("export")}>
+            <ToolbarVectorExportIcon />
+          </button>
+      );
+    }
+    // The dot says there is something attached without opening the panel, as the badge on the visibility button says there is something hidden.
+    return (
+      <button
+            key="attachments"
+            className={`action-icon-button ${attachmentCount > 0 ? "has-attachments" : ""}`}
+            aria-label={attachmentsLabel}
+            title={attachmentsLabel}
+            onClick={() => onTopPanel("attachments")}
+          >
+            <ToolbarAttachmentsIcon />
+            {attachmentCount > 0 ? <span className="attachments-indicator" aria-hidden="true" /> : null}
+          </button>
+    );
+  };
   // The settings window lists the groups and buttons from here, named as on the buttons. The Shapes group and Help stay:
   // without them a design could not grow, and the settings could not be found again.
   // In the simple mode it lists what that mode keeps: a tick on a button the mode leaves out anyway would change nothing.
-  const pick = (tools: readonly { id: string; label: string }[], cut = true) => tools
+  const pick = (tools: readonly { id: string; label: string; section?: string }[], cut = true) => tools
     .filter((tool) => !cut || !simpleMode || simpleModeKeepsTool(tool.id))
-    .map(({ id, label }) => ({ id, label }));
+    .map(({ id, label, section }) => ({ id, label, ...(section ? { section } : {}) }));
+  // A group as the settings list it: its buttons in the order set for it, and the ids in the order the ribbon ships them.
+  const layoutGroup = (group: string, label: string, tools: readonly { id: string; label: string; section?: string }[], cut = true) => ({
+    group,
+    label,
+    shipped: pick(tools, cut).map((tool) => tool.id),
+    tools: pick(ordered(group, tools), cut),
+  });
   const layoutGroups = [
-    { group: "clipboard", label: t("editor.group.clipboard"), tools: pick(leftTools.slice(0, 4), false) },
-    { group: "history", label: t("editor.group.history"), tools: pick(leftTools.slice(4)) },
-    ...(simpleMode ? [] : [{ group: "visibility", label: t("editor.group.visibility"), tools: pick(visibilityTools, false) }]),
-    { group: "combine", label: t("editor.group.combine"), tools: pick(combineTools) },
-    { group: "modify", label: t("editor.group.modify"), tools: pick(modifyTools) },
-    { group: "arrange", label: t("editor.group.arrange"), tools: pick(arrangeTools) },
-    { group: "manage", label: t("editor.group.file"), tools: pick(fileTools, false) },
+    layoutGroup("clipboard", t("editor.group.clipboard"), leftTools.slice(0, 4), false),
+    layoutGroup("history", t("editor.group.history"), leftTools.slice(4)),
+    ...(simpleMode ? [] : [layoutGroup("visibility", t("editor.group.visibility"), visibilityTools, false)]),
+    layoutGroup("combine", t("editor.group.combine"), combineTools),
+    layoutGroup("modify", t("editor.group.modify"), modifyTools),
+    layoutGroup("arrange", t("editor.group.arrange"), arrangeTools),
+    layoutGroup("manage", t("editor.group.file"), fileToolsShipped, false),
   ].filter((group) => group.tools.length > 0);
   setRibbonLayout(layoutGroups.sort((one, other) => ribbonOrder.indexOf(one.group as (typeof ribbonOrder)[number]) - ribbonOrder.indexOf(other.group as (typeof ribbonOrder)[number])));
 
@@ -1515,22 +1557,7 @@ export function SecondaryToolbar({
         <div className="toolbar-section-label">{t("editor.group.file")}</div>
         {collapseBox(t("editor.group.file"), ToolbarVectorExportIcon)}
         <div className="action-buttons">
-          {fileHas("import") ? <button className="action-icon-button" aria-label={t("editor.import")} title={`${t("editor.import")} (${COMMAND_SHORTCUTS.import})`} onClick={() => onTopPanel("import")} disabled={historyViewActive}>
-            <ToolbarImportIcon />
-          </button> : null}
-          {fileHas("export") ? <button className="action-icon-button" aria-label={t("editor.export")} title={`${t("editor.export")} (${COMMAND_SHORTCUTS.export})`} onClick={() => onTopPanel("export")}>
-            <ToolbarVectorExportIcon />
-          </button> : null}
-          {/* The dot says there is something attached without opening the panel, as the badge on the visibility button says there is something hidden. */}
-          {fileHas("attachments") ? <button
-            className={`action-icon-button ${attachmentCount > 0 ? "has-attachments" : ""}`}
-            aria-label={attachmentsLabel}
-            title={attachmentsLabel}
-            onClick={() => onTopPanel("attachments")}
-          >
-            <ToolbarAttachmentsIcon />
-            {attachmentCount > 0 ? <span className="attachments-indicator" aria-hidden="true" /> : null}
-          </button> : null}
+          {fileShown.map(renderFileButton)}
         </div>
       </div>
       ) : null}

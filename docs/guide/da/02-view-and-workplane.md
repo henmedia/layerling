@@ -137,7 +137,7 @@ Tandhjulet i titellinjen ({{ui:editor.workspaceSettings}}) åbner indstillingern
 
 {{ui:workspace.ribbonButtons}} tager de grupper og knapper ud af båndet, som du aldrig bruger. Klik på en gruppe for at åbne dens liste: {{ui:workspace.ribbonGroupShown}} tager hele gruppen ud, fluebenet ved en knap kun den knap. {{ui:workspace.ribbonShowAll}} henter det hele tilbage. En gruppe uden knapper forsvinder, og de andre rykker op, så mere af båndet kan stå på én række.
 
-Det, du tager ud, mangler kun i båndet: kommandosøgningen ([[Ctrl]]+[[K]]) finder det stadig, og dets tast kører det stadig. Pilene ved en gruppe flytter den op eller ned på listen og dermed langs båndet; {{ui:workspace.ribbonResetOrder}} bringer den oprindelige rækkefølge tilbage. Gruppen Former og Hjælp bliver altid, og Former beholder sin plads efter de to første grupper. Valget gemmes i denne browser og kommer med i filen fra {{ui:workspace.exportSettings}}. Det gælder 3D-editoren; skitsen har sin egen bjælke.
+Det, du tager ud, mangler kun i båndet: kommandosøgningen ([[Ctrl]]+[[K]]) finder det stadig, og dets tast kører det stadig. Pilene ved en gruppe flytter den op eller ned på listen og dermed langs båndet; {{ui:workspace.ribbonResetOrder}} bringer den oprindelige rækkefølge tilbage. Pilene ved en knap flytter den på samme måde inden for dens gruppe; i {{ui:editor.group.modify}} bliver den i sin navngivne sektion. Gruppen Former og Hjælp bliver altid, og Former beholder sin plads efter de to første grupper. Valget gemmes i denne browser og kommer med i filen fra {{ui:workspace.exportSettings}}. Det gælder 3D-editoren; skitsen har sin egen bjælke.
 
 ### Udseende: hurtig tilstand
 
