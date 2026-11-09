@@ -5038,6 +5038,7 @@ export const MESSAGES_ZH_CN: Partial<Record<MessageKey, string>> = {
   "edge.apply": "应用",
   "edge.errorOverlappingGeometry": "所选尺寸对此边过大，与相邻面相交。请选择更小的值。",
   "edge.errorLostFaces": "在此尺寸下，CAD 内核会丢失实体的一部分（某个孔或面会消失）。请尝试稍小或稍大的数值。",
+  "edge.errorHoleCut": "此组中的一个孔无法干净地切入其精确实体，因此无法处理它的边。通常把这个孔稍微移动或改变大小，或删除与另一个孔完全重叠的孔，就能解决。",
   "edge.errorNoSolidBody": "所选分组中没有可修改的实体。",
   "edge.errorPrepareTimeout": "边准备超时。此网格细节过多，无法进行交互处理。",
   "edge.errorPreviewTimeout": "边预览超时。请取消工具后重试。",

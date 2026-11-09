@@ -3976,6 +3976,7 @@ export const MESSAGES_SL: Partial<Record<MessageKey, string>> = {
   "edge.apply": "Uporabi",
   "edge.errorOverlappingGeometry": "Izbrana velikost je za ta rob prevelika in seka sosednje ploskve. Izberi manjšo vrednost.",
   "edge.errorLostFaces": "Pri tej velikosti bi jedro CAD izgubilo del telesa (izginila bi luknja ali ploskev). Poskusite nekoliko manjšo ali večjo vrednost.",
+  "edge.errorHoleCut": "Luknje te skupine ni bilo mogoče čisto izrezati v njeno natančno telo, zato njenih robov ni mogoče obdelati. Običajno pomaga, če luknjo malo premakneš ali ji spremeniš velikost ali odstraniš luknjo, ki leži točno na drugi.",
   "edge.errorNoSolidBody": "Izbrana skupina ne vsebuje trdnega telesa, ki bi ga bilo mogoče spremeniti.",
   "edge.errorPrepareTimeout": "Priprava robov je potekla. Ta mreža je za interaktivno obdelavo preveč podrobna.",
   "edge.errorPreviewTimeout": "Predogled robov je potekel. Prekliči orodje in poskusi znova.",

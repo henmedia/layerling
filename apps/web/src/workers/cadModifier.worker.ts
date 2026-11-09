@@ -19,7 +19,7 @@ import { importedStepBody } from "@/lib/cadImportedStep";
 import { threadPartSolid } from "@/lib/threadSolid";
 import { springPartSolid } from "@/lib/springSolid";
 import { gridfinityPartSolid } from "@/lib/gridfinitySolid";
-import { fuzzyCut, tidiedIfValid } from "@/lib/cadFuzzyCut";
+import { checkedHoleCut, tidiedIfValid } from "@/lib/cadFuzzyCut";
 import { helicalGearPartSolid } from "@/lib/gearSolid";
 import { hirthPartSolid } from "@/lib/hirthSolid";
 import { ENCLOSURE_PART_NAMES, enclosurePartSolid } from "@/lib/enclosureSolid";
@@ -777,12 +777,10 @@ function combinedScope(cad: OcctKernel, parts: CadModifierMeshPart[], depth: num
   };
   let result: ShapeHandle | null = solids.length ? fused(solids) : null;
   if (result !== null) {
-    for (const hole of bundleHoles) result = tidiedIfValid(cad, fuzzyCut(cad, result, hole), cadShapeIsValid);
+    for (const hole of bundleHoles) result = checkedHoleCut(cad, result, hole, cadShapeIsValid);
   }
   if (bundleSolids.length) result = fused(result === null ? bundleSolids : [result, ...bundleSolids]);
-  for (const hole of holes) {
-    result = tidiedIfValid(cad, fuzzyCut(cad, result as ShapeHandle, hole), cadShapeIsValid);
-  }
+  for (const hole of holes) result = checkedHoleCut(cad, result as ShapeHandle, hole, cadShapeIsValid);
   return result;
 }
 

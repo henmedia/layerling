@@ -6,6 +6,8 @@ code still carries it - so a lower number further down is older, not newer.
 
 ## Unreleased
 
+- **Rounding a group's edges no longer turns one of its holes into a solid cylinder (Discussion #1523):** A roller-skate plate with two tilted holes, bundled and grouped with the plate, showed a solid cylinder sticking out of one boss as soon as six of its edges were rounded. The plate also held two nearly identical holes in one spot; cutting the second of them left the exact body that the edge tool works on invalid, and a later hole cut into that body came back as material instead of a hole. Every hole cut is now checked: the body must stay valid, must not grow and must not lose more than the hole holds. When the usual cut fails that check, the plain cut, a looser one and a repaired one are tried; when none passes, the edge tool says so and suggests moving that hole a little or removing a hole that lies on top of another, instead of showing a wrong body. The message is in 14 languages.
+
 ## 1.154.0
 
 - **Take buttons you never use out of the ribbon (Discussion #1519, #1087, #1051, #447, #695, #1502):** Settings, Appearance, **Buttons in the ribbon** lists every group of the 3D ribbon with its buttons. A tick takes one button out, **Show this group** a whole group, and **Show all** brings everything back. What is taken out only leaves the ribbon: the command search (Ctrl+K) and your own keys still run it, and the order of the groups stays the same, so the guide and the help keep pointing at the same places. A group with no button left disappears and the rest of the ribbon moves up, so fewer groups fold. The Shapes group and Help always stay. The choice is kept in the browser and goes into the settings file.

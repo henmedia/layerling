@@ -5055,6 +5055,7 @@ export const MESSAGES_EN = {
   "edge.apply": "Apply",
   "edge.errorOverlappingGeometry": "The chosen size is too large for this edge and intersects adjacent faces. Please choose a smaller value.",
   "edge.errorLostFaces": "At this size the CAD kernel would lose part of the body (a hole or a face would disappear). Please try a slightly smaller or larger value.",
+  "edge.errorHoleCut": "A hole of this group could not be cut cleanly into its exact body, so its edges cannot be treated. Moving or resizing that hole slightly, or removing a hole that lies on top of another, usually helps.",
   "edge.errorNoSolidBody": "The selected group contains no solid body that can be modified.",
   "edge.errorPrepareTimeout": "Edge preparation timed out. This mesh is too detailed for interactive processing.",
   "edge.errorPreviewTimeout": "The edge preview timed out. Please cancel the tool and try again.",

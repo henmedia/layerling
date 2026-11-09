@@ -5054,6 +5054,7 @@ export const MESSAGES_DE: Record<MessageKey, string> = {
   "edge.apply": "Anwenden",
   "edge.errorOverlappingGeometry": "Der gewählte Wert ist zu groß für diese Kante und schneidet angrenzende Flächen. Bitte einen kleineren Wert (z. B. 1,5 mm) wählen.",
   "edge.errorLostFaces": "Bei diesem Wert würde der CAD-Kern einen Teil des Körpers verlieren (ein Loch oder eine Fläche würde verschwinden). Bitte einen etwas kleineren oder größeren Wert versuchen.",
+  "edge.errorHoleCut": "Ein Loch dieser Gruppe ließ sich nicht sauber in ihren exakten Körper schneiden, deshalb lassen sich ihre Kanten nicht bearbeiten. Meist hilft es, das Loch ein wenig zu verschieben oder in der Größe zu ändern oder ein Loch zu entfernen, das genau auf einem anderen liegt.",
   "edge.errorNoSolidBody": "Die ausgewählte Gruppe enthält keinen festen Körper, der bearbeitet werden kann.",
   "edge.errorPrepareTimeout": "Die Vorbereitung der Kanten hat das Zeitlimit überschritten. Das Netz ist zu detailliert für interaktives Bearbeiten.",
   "edge.errorPreviewTimeout": "Die Vorschau-Berechnung hat das Zeitlimit überschritten. Bitte Werkzeug schließen und erneut versuchen.",

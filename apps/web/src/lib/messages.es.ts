@@ -5056,6 +5056,7 @@ export const MESSAGES_ES: Partial<Record<MessageKey, string>> = {
   "edge.apply": "Aplicar",
   "edge.errorOverlappingGeometry": "El tamaño elegido es demasiado grande para esta arista y corta las caras contiguas. Elige un valor más pequeño.",
   "edge.errorLostFaces": "Con este tamaño el núcleo CAD perdería parte del cuerpo (desaparecería un agujero o una cara). Prueba con un valor algo menor o mayor.",
+  "edge.errorHoleCut": "Un agujero de este grupo no se pudo cortar limpiamente en su cuerpo exacto, por eso no se pueden tratar sus bordes. Suele ayudar mover un poco ese agujero o cambiar su tamaño, o quitar un agujero que esté justo encima de otro.",
   "edge.errorNoSolidBody": "El grupo seleccionado no contiene ningún cuerpo sólido que se pueda modificar.",
   "edge.errorPrepareTimeout": "La preparación de las aristas ha tardado demasiado. Esta malla es demasiado detallada para procesarla de forma interactiva.",
   "edge.errorPreviewTimeout": "La vista previa de las aristas ha tardado demasiado. Cancela la herramienta y vuelve a intentarlo.",

@@ -5055,6 +5055,7 @@ export const MESSAGES_NL: Record<MessageKey, string> = {
   "edge.apply": "Toepassen",
   "edge.errorOverlappingGeometry": "De gekozen grootte is te groot voor deze rand en snijdt aangrenzende vlakken. Kies een kleinere waarde.",
   "edge.errorLostFaces": "Bij deze maat zou de CAD-kernel een deel van het lichaam verliezen (een gat of vlak zou verdwijnen). Probeer een iets kleinere of grotere waarde.",
+  "edge.errorHoleCut": "Een gat van deze groep kon niet netjes in het exacte lichaam worden gesneden, daarom kunnen de randen niet worden bewerkt. Meestal helpt het om dat gat een beetje te verschuiven of te vergroten of verkleinen, of een gat weg te halen dat precies op een ander ligt.",
   "edge.errorNoSolidBody": "De geselecteerde groep bevat geen massief lichaam dat aangepast kan worden.",
   "edge.errorPrepareTimeout": "Het voorbereiden van de randen duurde te lang. Deze mesh is te gedetailleerd voor interactieve verwerking.",
   "edge.errorPreviewTimeout": "Het randvoorbeeld duurde te lang. Annuleer het gereedschap en probeer het opnieuw.",

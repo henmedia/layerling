@@ -5038,6 +5038,7 @@ export const MESSAGES_ZH_TW: Partial<Record<MessageKey, string>> = {
   "edge.apply": "套用",
   "edge.errorOverlappingGeometry": "所選尺寸對此邊過大，會與相鄰面相交。請選擇較小的值。",
   "edge.errorLostFaces": "在此尺寸下，CAD 核心會遺失實體的一部分（某個孔或面會消失）。請嘗試稍小或稍大的數值。",
+  "edge.errorHoleCut": "此群組中的一個孔無法乾淨地切入其精確實體，因此無法處理它的邊。通常把這個孔稍微移動或改變大小，或刪除與另一個孔完全重疊的孔，就能解決。",
   "edge.errorNoSolidBody": "所選群組中沒有可修改的實體。",
   "edge.errorPrepareTimeout": "邊準備逾時。此網格細節過多，無法進行互動處理。",
   "edge.errorPreviewTimeout": "邊預覽逾時。請取消工具後再試一次。",
