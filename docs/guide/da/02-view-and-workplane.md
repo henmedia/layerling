@@ -103,7 +103,7 @@ Vil du se lige ind på arbejdsplanet, så tryk [[P]] eller klik på {{ui:camera.
 Når et design rummer mere, end én plade kan printe, for eksempel en æske med låg og indsatser, kan det få flere byggeplader. Klik på {{ui:editor.tool.buildPlates}} i gruppen {{ui:editor.group.arrange}}, eller vælg {{ui:plates.moveTo}} i menuen ved et højreklik på et legeme. Nederst i visningen kommer en linje med én knap pr. plade; tallet på den siger, hvor mange legemer der står på pladen.
 
 - Hver plade er lige så stor som arbejdsfladen, og pladerne ligger side om side til højre for den første, 20 mm fra hinanden. Et legeme hører til den plade, midten af dets grundflade står på, så trækker man det over, står det på den anden plade. Et design har op til 12 plader.
-- Et klik på en plade i linjen viser den, og nye former lander så på den. {{ui:plates.showAll}} viser dem alle. Et dobbeltklik på en plade eller {{ui:plates.rename}} giver den et navn som "Låg", der står skrevet på pladen.
+- Et klik på en plade i linjen viser den, og nye former og importerede filer lander så på den. {{ui:plates.showAll}} viser dem alle. Et dobbeltklik på en plade eller {{ui:plates.rename}} giver den et navn som "Låg", der står skrevet på pladen.
 - {{ui:plates.moveLeft}} og {{ui:plates.moveRight}} ændrer rækkefølgen, og legemerne følger med deres plade. {{ui:plates.remove}} fjerner den aktive plade; dens legemer kommer på den første plade samme sted.
 - {{ui:plates.arrange}} lægger de markerede legemer, eller alle, ud række for række på pladerne, de største først, 5 mm fra hinanden, og tilføjer plader, så længe der er brug for dem. Et legeme, der er større end en plade, bliver stående.
 - Med en valgt printer kontrolleres hvert legeme mod sin egen plade, og byggehøjden regnes fra det laveste legeme på den plade. En plade med et legeme, der ikke passer, viser sit tal med rødt.
@@ -114,21 +114,30 @@ Eksportvinduet tilbyder så {{ui:export.plates}}: alle plader i én fil, side om
 ## Gitter og snap
 
 Gitteret viser pladens størrelse. Nederst til højre er **snap-trinnet**: flytning og skalering snapper i trin af den størrelse, for eksempel 1 mm. Gør det mindre til fint arbejde og større til grov arrangering. {{ui:editor.tool.snapToGrid}} i båndet flytter de valgte former bagefter hen på det nærmeste gitterkryds. Mens der flyttes, snapper former også til andre former, se [Valg og arrangering](chapter:select-and-arrange). Uden musen: [[Alt]]+[[1]] til [[Alt]]+[[0]] vælger den post i menuen med det nummer ([[Alt]]+[[1]] slår snapping fra), og [[,]] og [[.]] gør trinnet ét trin finere eller grovere. Det virker i en skitse også.
+Et kort klik med den midterste museknap, uden at flytte musen, åbner menuen med snap-trin lige ved markøren, også i en skitse; træk med den midterste knap holdt nede flytter stadig visningen.
 
 > **Tip:** Stop med at dreje visningen når du sætter dele helt præcist sammen. Brug taltasterne til at gå til den lige visning fra top eller for og tryk [[O]] for den flade visning. Så ser du straks om to kanter virkelig flugter.
 ### Indstillingsvinduet
 
 Tandhjulet i titellinjen ({{ui:editor.workspaceSettings}}) åbner indstillingerne. Til venstre er fem områder: {{ui:workspace.appearance}}, {{ui:workspace.measurement}}, {{ui:workspace.workplane}}, {{ui:workspace.shapeDefaults}} og {{ui:workspace.history}}. En ændring gælder med det samme. {{ui:workspace.makeDefault}} nederst gemmer de aktuelle indstillinger som standard, så et nyt design starter med dem. En fil du åbner bringer sine egne indstillinger med; {{ui:workspace.useMyDefault}} ved siden af den lægger dine gemte farver, dit gitter og resten på det åbne design, mens enhederne bliver som de er. Står der en printer i din standard, kommer den med sin pladestørrelse; ellers beholder designet sin plade og sin printer. {{ui:workspace.close}} øverst til højre lukker vinduet. Det her gennemgår indstillingerne én for én.
 
+{{ui:workspace.exportSettings}} gemmer vinduets indstillinger i en fil (layerling-settings-<dato>.json): farver, gitter, skygger, kamera og standardværdier for former sammen med tema, værktøjslinjens størrelse, visningskubens hjørne, formfarver og hver printers spillerum. På en anden computer eller efter datatab i browseren læser {{ui:workspace.importSettings}} filen igen: den bliver din standard for nye designs og lægges på det åbne design som {{ui:workspace.useMyDefault}}. Dine egne taster fra tastaturgenvejene kommer også med.
+
 ### Udseende: tema, værktøjsbjælke og visningskube
 
 {{ui:workspace.theme}} sætter farveskemaet for hele programmet: {{ui:workspace.themeSystem}} følger din computer, de andre er {{ui:workspace.themeLight}}, {{ui:workspace.themeDark}} og {{ui:workspace.themeGraphite}}. Du kan også ændre det øverst til højre i editoren.
 
-{{ui:workspace.toolbarSize}} gør knapperne i båndet øverst, dets formmenu, visningsbjælken til venstre og egenskabspanelet til højre mindre eller større: {{ui:workspace.toolbarSizeSmall}}, {{ui:workspace.toolbarSizeMedium}} (som det altid var) eller {{ui:workspace.toolbarSizeLarge}}. Små efterlader mere plads til arbejdsplanet på en bærbar; store er lettere at ramme på en stor skærm eller med en finger. Med store knapper går båndets grupper på en anden række når vinduet er for smalt til dem. Størrelsen gemmes i denne browser og holder for hvert design.
+{{ui:workspace.toolbarSize}} gør knapperne i båndet øverst, dets formmenu, visningsbjælken til venstre og egenskabspanelet til højre mindre eller større: {{ui:workspace.toolbarSizeSmall}}, {{ui:workspace.toolbarSizeMedium}} (som det altid var) eller {{ui:workspace.toolbarSizeLarge}}. Små efterlader mere plads til arbejdsplanet på en bærbar; store er lettere at ramme på en stor skærm eller med en finger. Med store knapper går båndets grupper på en anden række når vinduet er for smalt til dem. Størrelsen står under fanen {{ui:workspace.ribbon}} i indstillingerne, gemmes i denne browser og holder for hvert design.
 
 {{ui:workspace.shapeColors}} sætter den farve, en ny form starter med, på billederne i formbiblioteket (farven for sin art, eller den du gemte med {{ui:inspector.saveDefaults}}). Slå det fra, hvis du foretrækker grå billeder; din browser husker valget.
 
 {{ui:workspace.viewCubePosition}} sætter visningskuben i et andet hjørne af arbejdsplanet: {{ui:workspace.viewCubePositionTopLeft}} (som det altid var), {{ui:workspace.viewCubePositionTopRight}}, {{ui:workspace.viewCubePositionBottomLeft}} eller {{ui:workspace.viewCubePositionBottomRight}}. I alle hjørner undtagen øverst til venstre rykker visningsbjælken op på den plads, kuben forlod. Nederst til højre står kuben lige over {{ui:inspector.snapGrid}}-kontrollen. Mens en forms egenskaber er åbne til højre, viger en kube i højre side til venstre for dem. Hjørnet gemmes i denne browser og holder for hvert design. I et smalt vindue, som på en telefon, er indstillingen skjult, og kuben bliver øverst til venstre.
+
+### Udseende: knapper i båndet
+
+{{ui:workspace.ribbonButtons}} tager de grupper og knapper ud af båndet, som du aldrig bruger. Klik på en gruppe for at åbne dens liste: {{ui:workspace.ribbonGroupShown}} tager hele gruppen ud, fluebenet ved en knap kun den knap. {{ui:workspace.ribbonShowAll}} henter det hele tilbage. En gruppe uden knapper forsvinder, og de andre rykker op, så mere af båndet kan stå på én række.
+
+Det, du tager ud, mangler kun i båndet: kommandosøgningen ([[Ctrl]]+[[K]]) finder det stadig, og dets tast kører det stadig. Pilene ved en gruppe flytter den op eller ned på listen og dermed langs båndet; {{ui:workspace.ribbonResetOrder}} bringer den oprindelige rækkefølge tilbage. Pilene ved en knap flytter den på samme måde inden for dens gruppe; i {{ui:editor.group.modify}} bliver den i sin navngivne sektion. Gruppen Former og Hjælp bliver altid, og Former beholder sin plads efter de to første grupper. Valget gemmes i denne browser og kommer med i filen fra {{ui:workspace.exportSettings}}. Det gælder 3D-editoren; skitsen har sin egen bjælke.
 
 ### Udseende: hurtig tilstand
 
