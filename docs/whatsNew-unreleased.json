@@ -1,1 +1,14 @@
-[]
+[
+  {
+    "title": {
+      "de": "Angeheftetes Formen-Fenster bleibt unter dem Menüband",
+      "en": "The pinned Shapes panel stays below the toolbar",
+      "da": "Det fastgjorte formvindue bliver under båndet"
+    },
+    "body": {
+      "de": "Ein verschobenes oder größer gezogenes Formen-Fenster rutschte nach dem Anheften mit Titelzeile und Suche unter das Menüband. Jetzt öffnet es dort, wo du es gelassen hast, und folgt dem Menüband, wenn es höher oder niedriger wird.",
+      "en": "A Shapes panel that had been moved or pulled larger slipped under the toolbar with its title bar and search once pinned. Now it opens where you left it, and follows the toolbar when it grows or shrinks.",
+      "da": "Et formvindue, der var flyttet eller trukket større, gled ind under båndet med titellinje og søgning, når det blev fastgjort. Nu åbner det, hvor du lod det være, og følger båndet, når det bliver højere eller lavere."
+    }
+  }
+]

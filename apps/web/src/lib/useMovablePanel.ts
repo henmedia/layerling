@@ -64,6 +64,12 @@ export function useMovablePanel<T extends HTMLElement = HTMLDivElement>(storageK
   areaRef.current = area;
   const belowRef = useRef(below);
   belowRef.current = below;
+  /**
+   * Where the panel was put - remembered, dropped or moved to - before it was pulled into the window or below the bar.
+   * A window or bar that changes size places it again from here, not from where the last change pushed it: the
+   * toolbar grows for a moment while it fits itself again, and a panel pushed down under it then stayed down (#1525).
+   */
+  const wantedRef = useRef<PanelPosition | null>(null);
 
   /**
    * The area, where the panel stands in it, and where the corner its own
@@ -90,10 +96,17 @@ export function useMovablePanel<T extends HTMLElement = HTMLDivElement>(storageK
     const ownZoom = Number.parseFloat(computed.zoom);
     const scale = (parent && parentRect && parent.offsetWidth > 0 ? parentRect.width / parent.offsetWidth || 1 : 1) * (Number.isFinite(ownZoom) && ownZoom > 0 ? ownZoom : 1);
     const areaRect = areaElement.getBoundingClientRect();
-    const current = {
-      left: base.left + panel.offsetLeft * scale - (areaRect.left + areaElement.clientLeft),
-      top: base.top + panel.offsetTop * scale - (areaRect.top + areaElement.clientTop),
-    };
+    // A fixed panel is measured by its screen box. The pinned shape library is fixed inside the workplane, which is a
+    // size container: the browser names the workplane as its offset parent and gives an offset of 0, yet places it
+    // from the window. Counted from the workplane, the remembered spot came out by the toolbar's height, and the
+    // library opened under the toolbar, out of reach (#1525). It has no opening animation to throw the box off.
+    const fixedBox = computed.position === "fixed" ? panel.getBoundingClientRect() : null;
+    const current = fixedBox
+      ? { left: fixedBox.left - (areaRect.left + areaElement.clientLeft), top: fixedBox.top - (areaRect.top + areaElement.clientTop) }
+      : {
+          left: base.left + panel.offsetLeft * scale - (areaRect.left + areaElement.clientLeft),
+          top: base.top + panel.offsetTop * scale - (areaRect.top + areaElement.clientTop),
+        };
     // Floating, the panel is placed absolutely: its left/top count from the offset parent's corner.
     // A panel the stylesheet only sets in the flow - the settings window is centred by its
     // container and is `position: relative` - stands somewhere else when docked, and taking that
@@ -141,16 +154,25 @@ export function useMovablePanel<T extends HTMLElement = HTMLDivElement>(storageK
     } catch {
       stored = null;
     }
+    wantedRef.current = stored;
     if (stored) setPlacement(place(stored));
   }, [place, storageKey]);
 
-  // A smaller window pulls the panel back in.
+  // A smaller window pulls the panel back in, and so does a bar above it that grows - the toolbar after a change of
+  // the control size, or when its groups no longer fold - so the title bar stays below it (#1525).
   useEffect(() => {
     const onResize = () => {
-      if (placementRef.current) setPlacement(place(placementRef.current.position));
+      if (placementRef.current) setPlacement(place(wantedRef.current ?? placementRef.current.position));
     };
     window.addEventListener("resize", onResize);
-    return () => window.removeEventListener("resize", onResize);
+    const panel = panelRef.current;
+    const bar = panel ? belowRef.current?.(panel) : null;
+    const observer = bar && typeof ResizeObserver !== "undefined" ? new ResizeObserver(onResize) : null;
+    if (bar) observer?.observe(bar);
+    return () => {
+      window.removeEventListener("resize", onResize);
+      observer?.disconnect();
+    };
   }, [place]);
 
   /**
@@ -165,7 +187,10 @@ export function useMovablePanel<T extends HTMLElement = HTMLDivElement>(storageK
   /** Puts the panel at `next` as if it had been dragged there; `screenWidth` is the width it is about to have. */
   const moveTo = useCallback((next: PanelPosition, screenWidth?: number) => {
     const placed = place(next, screenWidth);
-    if (placed) setPlacement(placed);
+    if (placed) {
+      wantedRef.current = placed.position;
+      setPlacement(placed);
+    }
     return placed?.position ?? null;
   }, [place]);
 
@@ -206,15 +231,18 @@ export function useMovablePanel<T extends HTMLElement = HTMLDivElement>(storageK
       ? dockedAt({ width: measured.area.clientWidth, height: measured.area.clientHeight }, { width: measured.panel.offsetWidth * measured.scale })
       : dockRef.current;
     if (dock && isNearDock(dropped, dock)) {
+      wantedRef.current = null;
       setPlacement(null);
       store(null);
       return;
     }
+    wantedRef.current = dropped;
     store(dropped);
   }, [dockedAt, measure, store]);
 
   const onDoubleClick = useCallback((event: MouseEvent<HTMLElement>) => {
     if (event.target instanceof Element && event.target.closest(handleIgnores)) return;
+    wantedRef.current = null;
     setPlacement(null);
     store(null);
   }, [store, handleIgnores]);
