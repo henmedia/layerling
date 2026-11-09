@@ -2374,7 +2374,7 @@ export const MESSAGES_SL: Partial<Record<MessageKey, string>> = {
   "prop.washerSizeHint": "Nastavi zunanji in notranji premer ter debelino podložke za to velikost vijaka po ISO 7089.",
   "prop.screwHoleSize": "Velikost vijaka",
   "prop.screwHoleSizeCounterboreHint": "Nastavi steblo, premer in globino glave za vijak s cilindrično glavo te velikosti: prehodna luknja po ISO 273, srednja, poglobitev po DIN 974-1. Dolžina ostane.",
-  "prop.screwHoleSizeCountersinkHint": "Nastavi steblo in premer glave za vijak z ugreznjeno glavo te velikosti: prehodna luknja po ISO 273, srednja, poglobitev po ISO 15065 pod 90°. Dolžina ostane.",
+  "prop.screwHoleSizeCountersinkHint": "Nastavi steblo in premer glave za vijak z ugreznjeno glavo te velikosti: prehodna luknja po ISO 273, srednja, poglobitev po ISO 15065 pod 90°. Palčne velikosti od #2 do #14 po ASME B18.6.1 pod 82°; ustrezajo tudi avstralskim gauge (6-gauge = #6). Dolžina ostane.",
   "prop.nutPocketSize": "Žep za matico",
   "prop.nutPocketSizeHint": "Iz šesterokotnika naredi žep za šestrobo matico te velikosti vijaka (ISO 4032), 0,4 mm širši in višji od matice. Kot luknja izreže žep.",
   "prop.rimChamfer": "Posnetje roba",

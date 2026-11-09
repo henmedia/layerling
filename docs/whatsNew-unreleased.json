@@ -1,6 +1,18 @@
 [
   {
     "title": {
+      "de": "Zollgrößen für Senkbohrungen",
+      "en": "Inch sizes for countersinks",
+      "da": "Tommestørrelser til forsænkninger"
+    },
+    "body": {
+      "de": "Unter „Schraubengröße“ bietet die Senkbohrung jetzt auch #2 bis #14 nach ASME B18.6.1: Kegel 82°, Kopf und Schaft passend zur Schraube. Das sind auch die australischen Gauges (eine 6-gauge ist eine #6). Doppelsenkung und Lochmuster kennen sie ebenfalls.",
+      "en": "Under Screw size, the countersink now also offers #2 to #14 to ASME B18.6.1: a cone of 82°, head and shaft to fit the screw. These are the Australian gauges too (a 6-gauge is a #6). The double countersink and the hole pattern have them as well.",
+      "da": "Under Skruestørrelse tilbyder forsænkningen nu også #2 til #14 efter ASME B18.6.1: kegle på 82°, hoved og skaft, der passer til skruen. Det er også de australske gauges (en 6-gauge er en #6). Dobbelt forsænkning og hulmønsteret har dem også."
+    }
+  },
+  {
+    "title": {
       "de": "Entwürfe immer als Download speichern",
       "en": "Always save designs as a download",
       "da": "Gem altid designs som download"

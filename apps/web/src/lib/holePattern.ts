@@ -48,8 +48,10 @@ export type HolePatternSettings = {
   holeType?: HoleType;
   /** Diameter of the counterbore or countersink at the face; `size` is then the shaft. */
   headSize?: number;
-  /** How deep the counterbore reaches into the face (a countersink's depth follows from its 90 degrees). */
+  /** How deep the counterbore reaches into the face (a countersink's depth follows from its angle). */
   headDepth?: number;
+  /** The countersink's angle: 90 degrees unless an inch screw size set 82 (Discussion #1534). */
+  headAngle?: number;
   /** Perimeter only: whether the holes keep to `spacing` or come to `perimeterCount`. */
   perimeterBy?: HolePerimeterBy;
   /** Perimeter only: how many holes go round the edge. */
@@ -112,6 +114,13 @@ export function holeHeadSize(settings: Pick<HolePatternSettings, "size"> & Parti
 }
 
 /** How deep a counterbore is: the shaft's diameter unless set (a cap screw's head is about as high as it is thick). */
+/** A countersink's angle as the settings have it: 90 degrees unless set (Discussion #1534). */
+export const DEFAULT_HOLE_HEAD_ANGLE = 90;
+export function holeHeadAngle(settings: Partial<Pick<HolePatternSettings, "headAngle">>) {
+  const angle = settings.headAngle;
+  return typeof angle === "number" && Number.isFinite(angle) ? Math.min(120, Math.max(60, angle)) : DEFAULT_HOLE_HEAD_ANGLE;
+}
+
 export function holeHeadDepth(settings: Pick<HolePatternSettings, "size"> & Partial<Pick<HolePatternSettings, "headDepth">>) {
   const depth = typeof settings.headDepth === "number" && Number.isFinite(settings.headDepth) ? settings.headDepth : Math.max(HOLE_PATTERN_MIN_SIZE, settings.size);
   return Math.min(HOLE_PATTERN_MAX_SIZE, Math.max(0.2, depth));
@@ -1172,7 +1181,11 @@ export function normalizeHolePattern(input: Partial<HolePatternSettings>): HoleP
     ...(typeof input.customDepth === "number" && Number.isFinite(input.customDepth) ? { customDepth: Math.max(HOLE_PATTERN_MIN_SIZE, input.customDepth) } : {}),
     ...(input.customRound === true ? { customRound: true } : {}),
   };
-  const head = { headSize: holeHeadSize({ size, headSize: input.headSize }), headDepth: holeHeadDepth({ size, headDepth: input.headDepth }) };
+  const head = {
+    headSize: holeHeadSize({ size, headSize: input.headSize }),
+    headDepth: holeHeadDepth({ size, headDepth: input.headDepth }),
+    ...(holeHeadAngle(input) !== DEFAULT_HOLE_HEAD_ANGLE ? { headAngle: holeHeadAngle(input) } : {}),
+  };
   const holeAngle = normalizeHoleAngle(input.holeAngle);
   const holeTilt = normalizeHoleTilt(input.holeTilt);
   // Holes that overlap would only merge into one wide cut.

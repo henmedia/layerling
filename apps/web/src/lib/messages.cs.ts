@@ -3358,7 +3358,7 @@ export const MESSAGES_CS: Record<MessageKey, string> = {
   "prop.washerSizeHint": "Nastaví vnější a vnitřní průměr a tloušťku podložky pro tuto velikost šroubu podle ISO 7089.",
   "prop.screwHoleSize": "Velikost šroubu",
   "prop.screwHoleSizeCounterboreHint": "Nastaví dřík, průměr a hloubku hlavy pro šroub s válcovou hlavou této velikosti: průchozí díra podle ISO 273, střední, zahloubení podle DIN 974-1. Délka zůstane.",
-  "prop.screwHoleSizeCountersinkHint": "Nastaví dřík a průměr hlavy pro zápustný šroub této velikosti: průchozí díra podle ISO 273, střední, zahloubení podle ISO 15065 pod 90°. Délka zůstane.",
+  "prop.screwHoleSizeCountersinkHint": "Nastaví dřík a průměr hlavy pro zápustný šroub této velikosti: průchozí díra podle ISO 273, střední, zahloubení podle ISO 15065 pod 90°. Palcové velikosti #2 až #14 podle ASME B18.6.1 pod 82°; odpovídají i australským gauge (6-gauge = #6). Délka zůstane.",
   "prop.nutPocketSize": "Kapsa na matici",
   "prop.nutPocketSizeHint": "Udělá ze šestihranu kapsu pro šestihrannou matici této velikosti šroubu (ISO 4032), o 0,4 mm širší a vyšší než matice. Jako díra kapsu vyřízne.",
   "prop.rimChamfer": "Zkosení okraje",

@@ -3251,7 +3251,7 @@ export const MESSAGES_ZH_TW: Partial<Record<MessageKey, string>> = {
   "prop.washerSizeHint": "依 ISO 7089 為此螺絲規格設定墊圈的外徑、內徑和厚度。",
   "prop.screwHoleSize": "螺絲規格",
   "prop.screwHoleSizeCounterboreHint": "依此規格的內六角圓柱頭螺絲設定軸徑、頭部直徑和深度：通孔依 ISO 273 中等，沉孔依 DIN 974-1。長度不變。",
-  "prop.screwHoleSizeCountersinkHint": "依此規格的沉頭螺絲設定軸徑和頭部直徑：通孔依 ISO 273 中等，錐形沉孔依 ISO 15065、90°。長度不變。",
+  "prop.screwHoleSizeCountersinkHint": "依此規格的沉頭螺絲設定軸徑和頭部直徑：通孔依 ISO 273 中等，錐形沉孔依 ISO 15065、90°。英制規格 #2 至 #14 依 ASME B18.6.1、82°，也對應澳洲的 gauge 規格（6-gauge = #6）。長度不變。",
   "prop.nutPocketSize": "螺帽槽",
   "prop.nutPocketSizeHint": "把六角柱變成此螺絲規格六角螺帽（ISO 4032）的槽，比螺帽寬和高 0.4 mm。設為孔即可切出螺帽槽。",
   "prop.rimChamfer": "邊緣倒角",

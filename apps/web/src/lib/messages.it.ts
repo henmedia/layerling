@@ -3287,7 +3287,7 @@ export const MESSAGES_IT: Partial<Record<MessageKey, string>> = {
   "prop.washerSizeHint": "Imposta diametro esterno e interno e spessore della rondella per questa misura di vite, secondo ISO 7089.",
   "prop.screwHoleSize": "Misura della vite",
   "prop.screwHoleSizeCounterboreHint": "Imposta diametro del gambo, diametro e profondità della testa per una vite a brugola di questa misura: foro di passaggio medio secondo ISO 273, lamatura secondo DIN 974-1. La lunghezza resta invariata.",
-  "prop.screwHoleSizeCountersinkHint": "Imposta diametro del gambo e della testa per una vite svasata di questa misura: foro di passaggio medio secondo ISO 273, svasatura a 90° secondo ISO 15065. La lunghezza resta invariata.",
+  "prop.screwHoleSizeCountersinkHint": "Imposta diametro del gambo e della testa per una vite svasata di questa misura: foro di passaggio medio secondo ISO 273, svasatura a 90° secondo ISO 15065. Misure in pollici da #2 a #14 secondo ASME B18.6.1 a 82°, che corrispondono anche ai gauge australiani (6-gauge = #6). La lunghezza resta invariata.",
   "prop.nutPocketSize": "Sede del dado",
   "prop.nutPocketSizeHint": "Crea una sede esagonale per un dado di questa misura (ISO 4032), più larga e profonda di 0,4 mm rispetto al dado. Cambia la forma in foro per tagliare la sede.",
   "prop.rimChamfer": "Smusso del bordo",

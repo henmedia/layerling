@@ -13769,6 +13769,7 @@ export function LayerlingEditor({
           holeType,
           headSize: mcpOptionalNumber(params.headSize) ?? screw?.headSize,
           headDepth: mcpOptionalNumber(params.headDepth) ?? screw?.headDepth,
+          headAngle: screw?.headAngle,
           perimeterBy: count !== undefined ? "count" : "spacing",
           perimeterCount: count,
           perimeterCorners: params.corners !== false,

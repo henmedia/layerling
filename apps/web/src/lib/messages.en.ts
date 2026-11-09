@@ -3301,7 +3301,7 @@ export const MESSAGES_EN = {
   "prop.washerSizeHint": "Sets the outer and inner diameter and the thickness of a washer for this screw size, to ISO 7089.",
   "prop.screwHoleSize": "Screw size",
   "prop.screwHoleSizeCounterboreHint": "Sets shaft, head diameter and depth for a socket head cap screw of this size: clearance hole to ISO 273, medium, counterbore to DIN 974-1. The length stays.",
-  "prop.screwHoleSizeCountersinkHint": "Sets shaft and head diameter for a countersunk screw of this size: clearance hole to ISO 273, medium, countersink to ISO 15065 at 90°. The length stays.",
+  "prop.screwHoleSizeCountersinkHint": "Sets shaft and head diameter for a countersunk screw of this size: clearance hole to ISO 273, medium, countersink to ISO 15065 at 90°. Inch sizes #2 to #14 to ASME B18.6.1 at 82°; they are also the Australian gauges (6-gauge = #6). The length stays.",
   "prop.nutPocketSize": "Nut pocket",
   "prop.nutPocketSizeHint": "Makes the hexagon the pocket for a hex nut of this screw size (ISO 4032), 0.4 mm wider and higher than the nut. Switch it to a hole to cut the pocket.",
   "prop.rimChamfer": "Rim chamfer",

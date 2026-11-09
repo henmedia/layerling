@@ -3702,7 +3702,7 @@ export const MESSAGES_DA: Partial<Record<MessageKey, string>> = {
   "prop.washerSizeHint": "Sætter yder- og inderdiameter og tykkelse på en spændeskive til denne skruestørrelse efter ISO 7089.",
   "prop.screwHoleSize": "Skruestørrelse",
   "prop.screwHoleSizeCounterboreHint": "Sætter skaft, hoveddiameter og dybde til en unbrakoskrue i denne størrelse: frigangshul efter ISO 273, middel, forsænkning efter DIN 974-1. Længden bliver.",
-  "prop.screwHoleSizeCountersinkHint": "Sætter skaft og hoveddiameter til en undersænket skrue i denne størrelse: frigangshul efter ISO 273, middel, forsænkning efter ISO 15065 med 90°. Længden bliver.",
+  "prop.screwHoleSizeCountersinkHint": "Sætter skaft og hoveddiameter til en undersænket skrue i denne størrelse: frigangshul efter ISO 273, middel, forsænkning efter ISO 15065 med 90°. Tommestørrelser #2 til #14 efter ASME B18.6.1 med 82°; de svarer også til de australske gauges (6-gauge = #6). Længden bliver.",
   "prop.nutPocketSize": "Møtriklomme",
   "prop.nutPocketSizeHint": "Gør sekskanten til lommen for en sekskantmøtrik i denne skruestørrelse (ISO 4032), 0,4 mm bredere og højere end møtrikken. Som hul skærer den lommen ud.",
   "prop.rimChamfer": "Kantfas",

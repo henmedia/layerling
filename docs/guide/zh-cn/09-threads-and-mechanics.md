@@ -240,7 +240,7 @@ microSD 卡槽也是左边缘的接口，位于电路板下方（Zero 2 W 上在
 
 {{ui:shape.doubleCountersink}} 是两面都倒角的孔，用于正面和背面都要整洁的板件。它在形状库里没有单独的条目：取用 {{ui:shape.countersink}}，并在其属性中开启 {{ui:prop.screwHoleBothSides}}（本身就是双面锥形沉孔的实体已显示该开关开启）：两端各有一个锥面张开到 {{ui:prop.screwHoleHead}}，中间是 {{ui:prop.screwHoleShaft}}。你照旧设置 {{ui:prop.screwHoleAngle}} 和 {{ui:prop.screwHoleLength}}。如果孔太短，容不下两个完整的锥面，它们会以该角度在中间相接，杆部会比你设置的更宽：10 mm 的头部、6 mm 的杆部、90° 和 2 mm 的长度会形成两个从 10 mm 收窄到 8 mm 的锥面。作为孔，它像其他孔一样被推穿零件。
 
-把形状设为孔，并与零件分组。让它的顶端略高于头部应贴合的表面，使沉孔开口干净。要给六角螺母做沉孔，就用六边的 {{ui:shape.polygon}} 作为孔。 在{{ui:prop.screwHoleSize}}中可选 M2 到 M30（锥形沉孔到 M20），轴径（ISO 273 中等通孔）、头部直径以及深度或角度即按标准设置（DIN 974-1、ISO 15065），长度不变。对于六棱柱，{{ui:prop.nutPocketSize}}按 ISO 4032 设置螺母的对边宽度和高度，并留 0.4 mm 打印余量。
+把形状设为孔，并与零件分组。让它的顶端略高于头部应贴合的表面，使沉孔开口干净。要给六角螺母做沉孔，就用六边的 {{ui:shape.polygon}} 作为孔。 在{{ui:prop.screwHoleSize}}中可选 M2 到 M30（锥形沉孔到 M20），轴径（ISO 273 中等通孔）、头部直径以及深度或角度即按标准设置（DIN 974-1、ISO 15065），长度不变。对于六棱柱，{{ui:prop.nutPocketSize}}按 ISO 4032 设置螺母的对边宽度和高度，并留 0.4 mm 打印余量。 锥形沉孔还提供 ASME B18.6.1 的英制规格 #2 至 #14：它们的头部为 82°，澳大利亚木螺钉出售时所用的 gauge 规格也是同样的编号（6-gauge 就是 #6）。
 
 钻出的盲孔底部不是平的，而是钻头尖端留下的锥形（Discussion #621）。{{ui:shape.counterbore}}、{{ui:shape.countersink}}以及设为孔的{{ui:shape.cylinder}}都可以这样收尾：在{{ui:prop.holeBottom}}中选择 90°、118°（常见麻花钻）或 135° 的钻尖，或选{{ui:holeBottom.drillPointOther}}，再在{{ui:prop.drillPointAngle}}中输入 60° 到 150° 之间的角度。与图纸相同，深度——圆柱体的{{ui:prop.height}}、螺钉孔的{{ui:prop.screwHoleLength}}——只算到锥形开始的台阶处；尖端在它下方，118° 时约为直径的 0.3 倍，角度下方的一行会写出具体多深。锥形与孔一样宽，螺钉孔则与杆部一样宽。{{ui:holeBottom.flat}}让孔底保持原样。实体圆柱体保留平的端面，贯通的双面锥形沉孔也一样。
 

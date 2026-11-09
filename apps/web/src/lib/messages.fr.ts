@@ -3287,7 +3287,7 @@ export const MESSAGES_FR: Partial<Record<MessageKey, string>> = {
   "prop.washerSizeHint": "Règle les diamètres extérieur et intérieur et l'épaisseur d'une rondelle pour cette taille de vis, selon ISO 7089.",
   "prop.screwHoleSize": "Taille de vis",
   "prop.screwHoleSizeCounterboreHint": "Règle le fût, le diamètre et la profondeur de la tête pour une vis à tête cylindrique de cette taille : trou de passage ISO 273, moyen, lamage DIN 974-1. La longueur reste.",
-  "prop.screwHoleSizeCountersinkHint": "Règle le fût et le diamètre de la tête pour une vis à tête fraisée de cette taille : trou de passage ISO 273, moyen, fraisure ISO 15065 à 90°. La longueur reste.",
+  "prop.screwHoleSizeCountersinkHint": "Règle le fût et le diamètre de la tête pour une vis à tête fraisée de cette taille : trou de passage ISO 273, moyen, fraisure ISO 15065 à 90°. Tailles en pouces #2 à #14 selon ASME B18.6.1 à 82° ; elles correspondent aussi aux gauges australiens (6-gauge = #6). La longueur reste.",
   "prop.nutPocketSize": "Logement d'écrou",
   "prop.nutPocketSizeHint": "Fait de l'hexagone le logement d'un écrou hexagonal de cette taille de vis (ISO 4032), 0,4 mm plus large et plus haut que l'écrou. En trou, il creuse le logement.",
   "prop.rimChamfer": "Chanfrein de jante",

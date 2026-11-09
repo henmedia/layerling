@@ -3302,7 +3302,7 @@ export const MESSAGES_ES: Partial<Record<MessageKey, string>> = {
   "prop.washerSizeHint": "Ajusta el diámetro exterior, el interior y el grosor de una arandela para este tamaño de tornillo, según ISO 7089.",
   "prop.screwHoleSize": "Tamaño de tornillo",
   "prop.screwHoleSizeCounterboreHint": "Ajusta el vástago, el diámetro y la profundidad de la cabeza para un tornillo de cabeza cilíndrica de este tamaño: agujero pasante ISO 273, medio, avellanado cilíndrico DIN 974-1. La longitud se mantiene.",
-  "prop.screwHoleSizeCountersinkHint": "Ajusta el vástago y el diámetro de la cabeza para un tornillo avellanado de este tamaño: agujero pasante ISO 273, medio, avellanado ISO 15065 a 90°. La longitud se mantiene.",
+  "prop.screwHoleSizeCountersinkHint": "Ajusta el vástago y el diámetro de la cabeza para un tornillo avellanado de este tamaño: agujero pasante ISO 273, medio, avellanado ISO 15065 a 90°. Tamaños en pulgadas #2 a #14 según ASME B18.6.1 a 82°; equivalen también a los gauges australianos (6-gauge = #6). La longitud se mantiene.",
   "prop.nutPocketSize": "Alojamiento de tuerca",
   "prop.nutPocketSizeHint": "Convierte el hexágono en el alojamiento de una tuerca hexagonal de este tamaño de tornillo (ISO 4032), 0,4 mm más ancho y alto que la tuerca. Como agujero, recorta el alojamiento.",
   "prop.rimChamfer": "Chaflán del borde",

@@ -3265,7 +3265,7 @@ export const MESSAGES_PL: Partial<Record<MessageKey, string>> = {
   "prop.washerSizeHint": "Ustawia średnicę zewnętrzną, wewnętrzną i grubość podkładki dla tego rozmiaru śruby według ISO 7089.",
   "prop.screwHoleSize": "Rozmiar śruby",
   "prop.screwHoleSizeCounterboreHint": "Ustawia trzpień, średnicę i głębokość łba dla śruby z łbem walcowym tego rozmiaru: otwór przelotowy wg ISO 273, średni, pogłębienie wg DIN 974-1. Długość zostaje.",
-  "prop.screwHoleSizeCountersinkHint": "Ustawia trzpień i średnicę łba dla śruby z łbem stożkowym tego rozmiaru: otwór przelotowy wg ISO 273, średni, pogłębienie wg ISO 15065 pod kątem 90°. Długość zostaje.",
+  "prop.screwHoleSizeCountersinkHint": "Ustawia trzpień i średnicę łba dla śruby z łbem stożkowym tego rozmiaru: otwór przelotowy wg ISO 273, średni, pogłębienie wg ISO 15065 pod kątem 90°. Rozmiary calowe od #2 do #14 wg ASME B18.6.1 pod kątem 82°; odpowiadają też australijskim gauge (6-gauge = #6). Długość zostaje.",
   "prop.nutPocketSize": "Gniazdo nakrętki",
   "prop.nutPocketSizeHint": "Zmienia sześciokąt w gniazdo nakrętki sześciokątnej tego rozmiaru śruby (ISO 4032), o 0,4 mm szersze i wyższe niż nakrętka. Jako otwór wycina gniazdo.",
   "prop.rimChamfer": "Fazka obrzeża",

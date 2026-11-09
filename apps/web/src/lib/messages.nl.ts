@@ -3301,7 +3301,7 @@ export const MESSAGES_NL: Record<MessageKey, string> = {
   "prop.washerSizeHint": "Zet buiten- en binnendiameter en dikte van een sluitring voor deze schroefmaat volgens ISO 7089.",
   "prop.screwHoleSize": "Schroefmaat",
   "prop.screwHoleSizeCounterboreHint": "Zet schacht, kopdiameter en diepte voor een cilinderkopschroef van deze maat: doorlaatgat ISO 273, middel, verzinking DIN 974-1. De lengte blijft.",
-  "prop.screwHoleSizeCountersinkHint": "Zet schacht en kopdiameter voor een verzonken schroef van deze maat: doorlaatgat ISO 273, middel, verzinking ISO 15065 onder 90°. De lengte blijft.",
+  "prop.screwHoleSizeCountersinkHint": "Zet schacht en kopdiameter voor een verzonken schroef van deze maat: doorlaatgat ISO 273, middel, verzinking ISO 15065 onder 90°. Inchmaten #2 tot #14 volgens ASME B18.6.1 onder 82°; ze komen ook overeen met de Australische gauges (6-gauge = #6). De lengte blijft.",
   "prop.nutPocketSize": "Moeruitsparing",
   "prop.nutPocketSizeHint": "Maakt van de zeshoek de uitsparing voor een zeskantmoer van deze schroefmaat (ISO 4032), 0,4 mm breder en hoger dan de moer. Als gat snijdt hij de uitsparing uit.",
   "prop.rimChamfer": "Afschuining rand",

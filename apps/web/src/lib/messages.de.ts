@@ -3300,7 +3300,7 @@ export const MESSAGES_DE: Record<MessageKey, string> = {
   "prop.washerSizeHint": "Setzt Außen- und Innendurchmesser und Dicke einer Unterlegscheibe für diese Schraubengröße nach ISO 7089.",
   "prop.screwHoleSize": "Schraubengröße",
   "prop.screwHoleSizeCounterboreHint": "Setzt Schaft, Kopfdurchmesser und Tiefe für eine Zylinderkopfschraube dieser Größe: Durchgangsbohrung nach ISO 273, mittel, Senkung nach DIN 974-1. Die Länge bleibt.",
-  "prop.screwHoleSizeCountersinkHint": "Setzt Schaft und Kopfdurchmesser für eine Senkkopfschraube dieser Größe: Durchgangsbohrung nach ISO 273, mittel, Senkung nach ISO 15065 mit 90°. Die Länge bleibt.",
+  "prop.screwHoleSizeCountersinkHint": "Setzt Schaft und Kopfdurchmesser für eine Senkkopfschraube dieser Größe: Durchgangsbohrung nach ISO 273, mittel, Senkung nach ISO 15065 mit 90°. Zollgrößen #2 bis #14 nach ASME B18.6.1 mit 82°; sie entsprechen auch den australischen Gauges (6-gauge = #6). Die Länge bleibt.",
   "prop.nutPocketSize": "Mutternaussparung",
   "prop.nutPocketSizeHint": "Macht den Sechskant zur Aussparung für eine Sechskantmutter dieser Schraubengröße (ISO 4032), 0,4 mm breiter und höher als die Mutter. Als Loch schneidet er die Aussparung aus.",
   "prop.rimChamfer": "Außenfase",
