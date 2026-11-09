@@ -3200,14 +3200,15 @@ html[data-theme="dark"] .shell-openings-summary {
   color: #a8957f;
 }
 
-.offset-copy {
+/* Both classes: .edge-modifier-field comes later and would turn the row back into a block, so the box sat against its label (#1536). */
+.edge-modifier-field.offset-copy {
   display: flex;
   align-items: flex-start;
   gap: 8px;
   font-weight: 600;
 }
 
-.offset-copy input {
+.edge-modifier-field.offset-copy input {
   flex: none;
   margin-top: 2px;
 }
