@@ -186,6 +186,8 @@ Con {{ui:workspace.startInPerspective}} l’editor si apre nella vista prospetti
 
 Con {{ui:workspace.startWithScrollbars}} un progetto si apre con le barre di scorrimento della vista. L’impostazione si salva con il progetto e con {{ui:workspace.makeDefault}}.
 
+{{ui:workspace.viewBarOpensOnHover}}: una barra della vista chiusa si apre mentre il mouse è sulla sua freccia e si richiude poco dopo che il mouse l'ha lasciata, a meno che uno dei suoi strumenti sia in uso. Un clic sulla freccia mentre è aperta così la tiene aperta. Vale solo per il mouse; su uno schermo touch un tocco apre la barra come prima.
+
 {{ui:workspace.startView}} fissa l'angolo da cui si apre un nuovo progetto e a cui torna {{ui:camera.home}}. Ruota e ingrandisci la vista come ti piace, poi fai clic su {{ui:workspace.startViewUseCurrent}}; {{ui:workspace.startViewStandard}} riporta la vista consueta da davanti a destra. Vale per ogni progetto in questo browser. Un progetto che riapri si apre comunque come lo hai lasciato.
 
 {{ui:workspace.zoomSpeed}} è un cursore da lento a veloce e regola la velocità dello zoom con rotellina e trackpad; i pulsanti e i tasti dello zoom mantengono i propri piccoli incrementi. Anche {{ui:workspace.panSpeed}} è un cursore da lento a veloce: regola quanto velocemente la vista segue il mouse quando la sposti; al centro il punto che afferri resta sotto il puntatore. Con {{ui:workspace.cameraInertia}}, dopo che rilasci il mouse la vista continua a ruotare o a spostarsi per un momento e poi rallenta gradualmente. Se disattivi l’opzione, si ferma subito, come in Tinkercad e Fusion 360.

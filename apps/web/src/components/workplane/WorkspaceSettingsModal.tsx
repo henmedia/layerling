@@ -979,6 +979,12 @@ export function WorkspaceSettingsModal({
                     checked={workspace.startWithScrollbars}
                     onChange={(startWithScrollbars) => patchWorkspace({ startWithScrollbars })}
                   />
+                  <WorkspaceToggle
+                    label={t("workspace.viewBarOpensOnHover")}
+                    description={t("workspace.viewBarOpensOnHoverHint")}
+                    checked={workspace.viewBarOpensOnHover}
+                    onChange={(viewBarOpensOnHover) => patchWorkspace({ viewBarOpensOnHover })}
+                  />
                   <div className="workspace-reset-row" data-help={t("workspace.startViewHint")}>
                     <span>{t("workspace.startView")}</span>
                     <div className="property-defaults-actions">

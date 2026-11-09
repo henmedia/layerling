@@ -187,6 +187,8 @@ Die Skizzenansicht hat eigene Farben: {{ui:workspace.sketchBackground}} für das
 
 {{ui:workspace.startWithScrollbars}}: Ein Entwurf öffnet dann mit den Bildlaufleisten der Ansicht. Die Einstellung wird mit dem Entwurf und mit {{ui:workspace.makeDefault}} gespeichert.
 
+{{ui:workspace.viewBarOpensOnHover}}: Eine eingeklappte Ansichtsleiste klappt auf, solange die Maus über ihrem Pfeil ist, und kurz nachdem die Maus sie verlassen hat wieder zu, außer eines ihrer Werkzeuge ist in Gebrauch. Ein Klick auf den Pfeil, während sie so offen ist, lässt sie offen. Das gilt nur für die Maus; auf einem Touchscreen öffnet ein Tippen die Leiste wie bisher.
+
 {{ui:workspace.startView}} legt den Blickwinkel fest, in dem ein neuer Entwurf öffnet und zu dem {{ui:camera.home}} zurückkehrt. Dreh und zoome die Ansicht, wie du sie magst, und klicke dann {{ui:workspace.startViewUseCurrent}}; {{ui:workspace.startViewStandard}} bringt den gewohnten Blick von vorne rechts zurück. Das gilt für alle Entwürfe in diesem Browser. Ein Entwurf, den du wieder öffnest, öffnet weiter so, wie du ihn verlassen hast.
 
 {{ui:workspace.zoomSpeed}} ist ein Regler von langsam bis schnell: wie schnell Rad und Trackpad zoomen; die Zoomknöpfe und -tasten behalten ihre eigenen kleinen Schritte. {{ui:workspace.panSpeed}} ist ebenfalls ein Regler von langsam bis schnell: wie schnell die Ansicht beim Verschieben der Maus folgt; in der Mitte bleibt der gegriffene Punkt unter dem Mauszeiger. {{ui:workspace.cameraInertia}}: Lässt du die Maus nach dem Drehen oder Verschieben los, läuft die Ansicht noch kurz weiter und bremst sanft ab. Ausgeschaltet bleibt sie sofort stehen, wie in Tinkercad und Fusion 360.

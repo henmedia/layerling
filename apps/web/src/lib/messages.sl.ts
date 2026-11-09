@@ -3663,6 +3663,8 @@ export const MESSAGES_SL: Partial<Record<MessageKey, string>> = {
   "workspace.startWithCornerRuler": "Nove osnutke začni s kotnikom v izhodišču",
   "workspace.startWithCornerRulerHint": "Velja za vsak nov osnutek v tem brskalniku. Obstoječi osnutki ostanejo, kot so.",
   "workspace.startWithScrollbars": "Zaženi urejevalnik z drsniki",
+  "workspace.viewBarOpensOnHover": "Odpri vrstico pogleda ob premiku miške nanjo",
+  "workspace.viewBarOpensOnHoverHint": "Zložena vrstica pogleda se odpre, ko je miška nad njeno puščico, in se spet zloži, ko jo miška zapusti. Klik na puščico jo pusti odprto.",
   "workspace.startView": "Začetni pogled",
   "workspace.startViewHint": "Kot, v katerem se odprejo novi osnutki in kamor se vrne Domov. Zasukajte pogled po svoje in nato uporabite trenutni pogled. Velja za vse osnutke v tem brskalniku.",
   "workspace.startViewUseCurrent": "Uporabi trenutni pogled",

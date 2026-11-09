@@ -187,6 +187,8 @@ Skicirni pogled ima lastne barve: {{ui:workspace.sketchBackground}} za okno okol
 
 {{ui:workspace.startWithScrollbars}}: načrt se potem odpre z drsniki pogleda. Nastavitev se shrani z načrtom in z {{ui:workspace.makeDefault}}.
 
+{{ui:workspace.viewBarOpensOnHover}}: zložena vrstica pogleda se odpre, ko je miška nad njeno puščico, in se kmalu potem, ko jo miška zapusti, spet zloži, razen če je v uporabi eno od njenih orodij. Klik na puščico, ko je tako odprta, jo pusti odprto. Velja samo za miško; na zaslonu na dotik vrstico kot doslej odpre dotik.
+
 {{ui:workspace.startView}} določa kot, pod katerim se odpre nov načrt in na katerega se vrne {{ui:camera.home}}. Zavrti in približaj pogled, kot ti je všeč, nato klikni {{ui:workspace.startViewUseCurrent}}; {{ui:workspace.startViewStandard}} vrne običajni pogled od spredaj desno. Velja za vsak načrt v tem brskalniku. Načrt, ki ga znova odpreš, se še vedno odpre tako, kot si ga zapustil.
 
 {{ui:workspace.zoomSpeed}} je drsnik od počasi do hitro: kako hitro približujeta kolesce in sledilna ploščica; gumbi in tipke za povečavo obdržijo svoje majhne korake. {{ui:workspace.panSpeed}} je prav tako drsnik od počasi do hitro: kako hitro pogled sledi miški, ko ga premikaš; na sredini ostane točka, ki jo primeš, pod kazalcem. {{ui:workspace.cameraInertia}}: ko spustiš miško, se pogled še malo vrti ali premika in nežno zavira. Izklopljeno pomeni, da se takoj ustavi, kot v Tinkercadu in Fusion 360.

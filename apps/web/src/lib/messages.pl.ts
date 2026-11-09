@@ -4697,6 +4697,8 @@ export const MESSAGES_PL: Partial<Record<MessageKey, string>> = {
   "workspace.startWithCornerRuler": "Zaczynaj nowe projekty z kątownikiem w początku układu",
   "workspace.startWithCornerRulerHint": "Dotyczy każdego nowego projektu w tej przeglądarce. Istniejące projekty pozostają bez zmian.",
   "workspace.startWithScrollbars": "Uruchamiaj edytor z paskami przewijania",
+  "workspace.viewBarOpensOnHover": "Otwieraj pasek widoku po najechaniu myszą",
+  "workspace.viewBarOpensOnHoverHint": "Zwinięty pasek widoku otwiera się, gdy mysz jest nad jego strzałką, i zwija się ponownie, gdy mysz go opuści. Kliknięcie strzałki pozostawia go otwartym.",
   "workspace.startView": "Widok startowy",
   "workspace.startViewHint": "Kąt, w jakim otwierają się nowe projekty i do którego wraca Widok początkowy. Obróć widok tak, jak lubisz, a potem użyj bieżącego widoku. Dotyczy wszystkich projektów w tej przeglądarce.",
   "workspace.startViewUseCurrent": "Użyj bieżącego widoku",

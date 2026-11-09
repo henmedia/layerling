@@ -189,6 +189,8 @@ Skitsevisningen har sine egne farver: {{ui:workspace.sketchBackground}} for vind
 
 {{ui:workspace.startWithScrollbars}}: et design åbner så med visningens rullepaneler. Indstillingen gemmes med designet og med {{ui:workspace.makeDefault}}.
 
+{{ui:workspace.viewBarOpensOnHover}}: en foldet visningsbjælke åbner, mens musen er over dens pil, og folder sammen igen kort efter, at musen har forladt den, medmindre et af dens værktøjer er i brug. Et klik på pilen, mens den er åben på denne måde, holder den åben. Det gælder kun musen; på en berøringsskærm åbner et tryk bjælken som før.
+
 {{ui:workspace.startView}} bestemmer den vinkel, et nyt design åbner i, og som {{ui:camera.home}} vender tilbage til. Drej og zoom visningen, som du kan lide den, og klik så {{ui:workspace.startViewUseCurrent}}; {{ui:workspace.startViewStandard}} giver den sædvanlige visning forfra til højre igen. Det gælder alle designs i denne browser. Et design, du åbner igen, åbner stadig, som du forlod det.
 
 {{ui:workspace.zoomSpeed}} er en skyder fra langsom til hurtig: hvor hurtigt hjulet og trackpad'en zoomer; zoomknapperne og tasterne beholder deres egne små trin. {{ui:workspace.panSpeed}} er også en skyder fra langsom til hurtig: hvor hurtigt visningen følger musen, når du flytter den; i midten bliver det punkt, du griber, under markøren. {{ui:workspace.cameraInertia}}: når du slipper musen, drejer eller flytter visningen sig videre et øjeblik og falder blødt af. Slået fra stopper den med det samme, som i Tinkercad og Fusion 360.

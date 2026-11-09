@@ -581,6 +581,8 @@ export type WorkplaneWorkspaceSettings = {
   showRotationAngles: boolean;
   /** The editor opens a design with the view's scrollbars shown (Discussion #1241); the view bar still switches them. */
   startWithScrollbars: boolean;
+  /** A folded view bar opens while the mouse is over its arrow and folds again once the mouse has left it (Discussion #1552). */
+  viewBarOpensOnHover: boolean;
   zoomSpeed: number;
   /** How fast shifting the 3D view follows the mouse, a slider from 1 to 9; at 5 the grabbed point stays under the cursor (#1553). */
   panSpeed: number;

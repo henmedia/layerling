@@ -187,6 +187,8 @@ The sketch view has its own colours: {{ui:workspace.sketchBackground}} for the w
 
 {{ui:workspace.startWithScrollbars}}: a design then opens with the view's scrollbars shown. It is saved with the design and with {{ui:workspace.makeDefault}}.
 
+{{ui:workspace.viewBarOpensOnHover}}: a view bar folded away opens while the mouse is over its arrow and folds again shortly after the mouse has left it, unless one of its tools is in use. A click on the arrow while it is open like this keeps it open. It works with the mouse only; on a touch screen a tap opens the bar as before.
+
 {{ui:workspace.startView}} sets the angle a new design opens in and {{ui:camera.home}} goes back to. Turn and zoom the view the way you like it, then click {{ui:workspace.startViewUseCurrent}}; {{ui:workspace.startViewStandard}} brings back the usual view from the front right. It holds for every design in this browser. A design you open again still opens the way you left it.
 
 {{ui:workspace.zoomSpeed}} is a slider from slow to fast: how fast the wheel and the trackpad zoom; the zoom buttons and keys keep their own small steps. {{ui:workspace.panSpeed}} is a slider from slow to fast too: how fast the view follows the mouse when you shift it; in the middle the point you grab stays under the cursor. {{ui:workspace.cameraInertia}}: after you let go of the mouse the view turns or shifts on for a moment and slows down gently. Switched off, it stops at once, as in Tinkercad and Fusion 360.

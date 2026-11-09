@@ -4683,6 +4683,8 @@ export const MESSAGES_CS: Record<MessageKey, string> = {
   "workspace.startWithCornerRuler": "Začínat nové návrhy s úhelníkem v počátku souřadnic",
   "workspace.startWithCornerRulerHint": "Platí pro každý nový návrh v tomto prohlížeči. Stávající návrhy zůstanou, jak jsou.",
   "workspace.startWithScrollbars": "Spouštět editor s posuvníky",
+  "workspace.viewBarOpensOnHover": "Otevřít lištu pohledu při najetí myší",
+  "workspace.viewBarOpensOnHoverHint": "Sbalená lišta pohledu se otevře, když je myš nad její šipkou, a znovu se sbalí, když ji myš opustí. Klik na šipku ji nechá otevřenou.",
   "workspace.startView": "Úvodní pohled",
   "workspace.startViewHint": "Úhel, ve kterém se otevírají nové návrhy a na který se vrací Domů. Natočte pohled podle sebe a pak použijte aktuální pohled. Platí pro všechny návrhy v tomto prohlížeči.",
   "workspace.startViewUseCurrent": "Použít aktuální pohled",

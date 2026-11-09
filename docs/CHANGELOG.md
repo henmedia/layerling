@@ -6,6 +6,8 @@ code still carries it - so a lower number further down is older, not newer.
 
 ## Unreleased
 
+- **The view bar can open on hover (Discussion #1552):** **Workspace settings > Appearance** has a switch **Open the view bar on hover**, off until you switch it on. A folded view bar then opens while the mouse is over its arrow and folds again shortly after the mouse has left it, unless one of its tools (tape measure, protractor, section view) is in use; a click on the arrow meanwhile keeps it open. In the 3D view and in a sketch alike, with the mouse only; on a touch screen a tap opens it as before. Asked for by @minig0d.
+
 - **Pan speed, and shifting keeps up with the mouse (Issue #1553):** Shifting the 3D view moved it at 65% of the mouse, so one had to move the mouse a long way to shift it a little. **Workspace settings > Appearance** now has a **Pan speed** slider below Zoom speed, from half to twice the default, and at the default the point you grab stays under the cursor. The hint of **Camera keeps turning** now says it also stops the view gliding on after a shift.
 
 - **Shapes moves in the ribbon like any group (Issue #1550):** In **Workspace settings > Ribbon** the Shapes group was missing from the list and stayed fixed after the first two groups, whatever was moved around it. It is now in the list with its arrows and its tick: it can stand anywhere in the ribbon or be taken out. Taken out, the shapes panel still opens from the command search (Ctrl+K) and its key. An order kept before keeps Shapes third, where the ribbon showed it.

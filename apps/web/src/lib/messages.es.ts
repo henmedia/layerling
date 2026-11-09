@@ -4694,6 +4694,8 @@ export const MESSAGES_ES: Partial<Record<MessageKey, string>> = {
   "workspace.startWithCornerRuler": "Empezar los diseños nuevos con una escuadra en el origen",
   "workspace.startWithCornerRulerHint": "Vale para cada diseño nuevo de este navegador. Los diseños que ya existen se quedan como están.",
   "workspace.startWithScrollbars": "Abrir el editor con barras de desplazamiento",
+  "workspace.viewBarOpensOnHover": "Abrir la barra de vista al pasar el ratón",
+  "workspace.viewBarOpensOnHoverHint": "Una barra de vista plegada se abre mientras el ratón está sobre su flecha y se vuelve a plegar cuando el ratón sale de ella. Un clic en la flecha la deja abierta.",
   "workspace.startView": "Vista de arranque",
   "workspace.startViewHint": "El ángulo en que se abren los diseños nuevos y al que vuelve Vista inicial. Gira la vista como te guste y luego usa la vista actual. Vale para todos los diseños de este navegador.",
   "workspace.startViewUseCurrent": "Usar la vista actual",

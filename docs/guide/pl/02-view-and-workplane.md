@@ -188,6 +188,8 @@ Widok szkicu ma własne kolory: {{ui:workspace.sketchBackground}} dla okna wokó
 
 {{ui:workspace.startWithScrollbars}}: projekt otwiera się wtedy z paskami przewijania widoku. Ustawienie zapisuje się z projektem i przez {{ui:workspace.makeDefault}}.
 
+{{ui:workspace.viewBarOpensOnHover}}: zwinięty pasek widoku otwiera się, gdy mysz jest nad jego strzałką, i zwija się ponownie chwilę po tym, jak mysz go opuści, chyba że używasz jednego z jego narzędzi. Kliknięcie strzałki, gdy jest tak otwarty, pozostawia go otwartym. Działa tylko z myszą; na ekranie dotykowym pasek otwiera stuknięcie, jak dotąd.
+
 {{ui:workspace.startView}} ustawia kąt, pod jakim otwiera się nowy projekt i do którego wraca {{ui:camera.home}}. Obróć i przybliż widok tak, jak lubisz, a potem kliknij {{ui:workspace.startViewUseCurrent}}. {{ui:workspace.startViewStandard}} przywraca zwykły widok z prawego przodu. Obowiązuje dla każdego projektu w tej przeglądarce. Projekt otwierany ponownie nadal otwiera się tak, jak go zostawiłeś.
 
 {{ui:workspace.zoomSpeed}} to suwak od wolno do szybko: jak szybko przybliżają kółko i touchpad. Przyciski i klawisze przybliżania zachowują własne małe kroki. {{ui:workspace.panSpeed}} to też suwak od wolno do szybko: jak szybko widok podąża za myszą przy przesuwaniu; w środku chwycony punkt zostaje pod kursorem. {{ui:workspace.cameraInertia}}: gdy puścisz mysz, widok jeszcze przez chwilę się obraca lub przesuwa i łagodnie zwalnia. Po wyłączeniu zatrzymuje się od razu, jak w Tinkercadzie i Fusion 360.

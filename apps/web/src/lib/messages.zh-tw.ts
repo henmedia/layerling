@@ -4681,6 +4681,8 @@ export const MESSAGES_ZH_TW: Partial<Record<MessageKey, string>> = {
   "workspace.startWithCornerRuler": "新設計在原點自帶角尺",
   "workspace.startWithCornerRulerHint": "適用於此瀏覽器中的每個新設計。既有的設計保持不變。",
   "workspace.startWithScrollbars": "編輯器啟動時顯示捲軸",
+  "workspace.viewBarOpensOnHover": "滑鼠停留時開啟視圖列",
+  "workspace.viewBarOpensOnHoverHint": "收合的視圖列在滑鼠停在其箭頭上時展開，滑鼠離開後再次收合。按一下箭頭可使其保持展開。",
   "workspace.startView": "起始視圖",
   "workspace.startViewHint": "新設計開啟時的角度，也是「回到預設視角」返回的角度。先把視圖轉到你喜歡的樣子，再使用目前視圖。適用於此瀏覽器中的所有設計。",
   "workspace.startViewUseCurrent": "使用目前視圖",

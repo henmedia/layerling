@@ -4692,6 +4692,8 @@ export const MESSAGES_DE: Record<MessageKey, string> = {
   "workspace.startWithCornerRuler": "Neue Entwürfe mit Winkellineal im Nullpunkt beginnen",
   "workspace.startWithCornerRulerHint": "Gilt für jeden neuen Entwurf in diesem Browser. Vorhandene Entwürfe bleiben, wie sie sind.",
   "workspace.startWithScrollbars": "Editor mit Bildlaufleisten starten",
+  "workspace.viewBarOpensOnHover": "Ansichtsleiste beim Darüberfahren öffnen",
+  "workspace.viewBarOpensOnHoverHint": "Eine eingeklappte Ansichtsleiste klappt auf, solange die Maus über ihrem Pfeil ist, und wieder zu, wenn die Maus sie verlässt. Ein Klick auf den Pfeil lässt sie offen.",
   "workspace.startView": "Startansicht",
   "workspace.startViewHint": "Der Blickwinkel, in dem neue Entwürfe öffnen und zu dem die Ausgangsansicht zurückkehrt. Dreh die Ansicht, wie du sie magst, und übernimm dann die aktuelle Ansicht. Gilt für alle Entwürfe in diesem Browser.",
   "workspace.startViewUseCurrent": "Aktuelle Ansicht nehmen",

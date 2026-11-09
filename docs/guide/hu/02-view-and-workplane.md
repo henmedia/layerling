@@ -185,6 +185,8 @@ A(z) {{ui:workspace.objectSnap}} húzás közben más alakzatokhoz illeszti egy 
 
 {{ui:workspace.startWithScrollbars}}: a terv ilyenkor a nézet görgetősávjaival nyílik meg. A beállítás a tervvel és a {{ui:workspace.makeDefault}} gombbal is mentődik.
 
+{{ui:workspace.viewBarOpensOnHover}}: a becsukott nézetsáv kinyílik, amíg az egér a nyila fölött van, és nem sokkal azután, hogy az egér elhagyta, újra becsukódik, hacsak valamelyik eszköze nincs használatban. Ha így nyitva van, egy kattintás a nyílra nyitva tartja. Csak egérrel működik; érintőképernyőn egy koppintás nyitja ki a sávot, mint eddig.
+
 A(z) {{ui:workspace.startView}} azt a szöget adja meg, amelyben egy új terv megnyílik, és amelyhez a(z) {{ui:camera.home}} visszatér. Forgasd és nagyítsd a nézetet, ahogy tetszik, majd kattints a(z) {{ui:workspace.startViewUseCurrent}} gombra; a(z) {{ui:workspace.startViewStandard}} visszahozza a szokásos elölről-jobbról nézetet. Ebben a böngészőben minden tervre érvényes. Egy újra megnyitott terv továbbra is úgy nyílik meg, ahogy otthagytad.
 
 A(z) {{ui:workspace.zoomSpeed}} egy csúszka lassútól gyorsig: milyen gyorsan nagyít a görgő és az érintőpad; a nagyítás gombjai és billentyűi megtartják a saját kis lépéseiket. A(z) {{ui:workspace.panSpeed}} szintén csúszka lassútól gyorsig: milyen gyorsan követi a nézet az egeret eltoláskor; középen a megfogott pont a kurzor alatt marad. {{ui:workspace.cameraInertia}}: ha elengeded az egeret, a nézet még egy pillanatig forog vagy csúszik, és finoman lelassul. Kikapcsolva azonnal megáll, mint a Tinkercadben és a Fusion 360-ban.

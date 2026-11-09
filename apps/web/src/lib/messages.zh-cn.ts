@@ -4681,6 +4681,8 @@ export const MESSAGES_ZH_CN: Partial<Record<MessageKey, string>> = {
   "workspace.startWithCornerRuler": "新设计在原点自带直角尺",
   "workspace.startWithCornerRulerHint": "适用于此浏览器中的每个新设计。已有的设计保持不变。",
   "workspace.startWithScrollbars": "编辑器启动时显示滚动条",
+  "workspace.viewBarOpensOnHover": "鼠标悬停时打开视图栏",
+  "workspace.viewBarOpensOnHoverHint": "折叠的视图栏在鼠标停在其箭头上时展开，鼠标离开后再次折叠。点击箭头可使其保持展开。",
   "workspace.startView": "起始视图",
   "workspace.startViewHint": "新设计打开时的角度，也是“复位”返回的角度。先把视图转到你喜欢的样子，再使用当前视图。适用于此浏览器中的所有设计。",
   "workspace.startViewUseCurrent": "使用当前视图",

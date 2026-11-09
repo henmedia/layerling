@@ -4677,6 +4677,8 @@ export const MESSAGES_IT: Partial<Record<MessageKey, string>> = {
   "workspace.startWithCornerRuler": "Avvia i nuovi progetti con una squadra all’origine",
   "workspace.startWithCornerRulerHint": "Vale per ogni nuovo progetto in questo browser. I progetti che esistono già restano come sono.",
   "workspace.startWithScrollbars": "Avvia l'editor con le barre di scorrimento",
+  "workspace.viewBarOpensOnHover": "Apri la barra della vista al passaggio del mouse",
+  "workspace.viewBarOpensOnHoverHint": "Una barra della vista chiusa si apre mentre il mouse è sulla sua freccia e si richiude quando il mouse la lascia. Un clic sulla freccia la tiene aperta.",
   "workspace.startView": "Vista di avvio",
   "workspace.startViewHint": "L’angolazione in cui si aprono i nuovi progetti e a cui torna Vista iniziale. Ruota la vista come preferisci, poi usa la vista attuale. Vale per tutti i progetti in questo browser.",
   "workspace.startViewUseCurrent": "Usa la vista attuale",

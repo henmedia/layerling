@@ -4677,6 +4677,8 @@ export const MESSAGES_FR: Partial<Record<MessageKey, string>> = {
   "workspace.startWithCornerRuler": "Commencer les nouveaux designs avec un carré de charpente à l’origine",
   "workspace.startWithCornerRulerHint": "Vaut pour chaque nouveau design de ce navigateur. Les designs existants restent tels quels.",
   "workspace.startWithScrollbars": "Démarrer l'éditeur avec les barres de défilement",
+  "workspace.viewBarOpensOnHover": "Ouvrir la barre de vue au survol",
+  "workspace.viewBarOpensOnHoverHint": "Une barre de vue repliée s'ouvre tant que la souris est sur sa flèche et se replie quand la souris la quitte. Un clic sur la flèche la garde ouverte.",
   "workspace.startView": "Vue de départ",
   "workspace.startViewHint": "L’angle dans lequel s’ouvrent les nouveaux designs et auquel revient Accueil. Tournez la vue comme vous l’aimez, puis prenez la vue actuelle. Vaut pour tous les designs de ce navigateur.",
   "workspace.startViewUseCurrent": "Prendre la vue actuelle",

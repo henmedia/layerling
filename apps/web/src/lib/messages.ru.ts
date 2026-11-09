@@ -4684,6 +4684,8 @@ export const MESSAGES_RU: Partial<Record<MessageKey, string>> = {
   "workspace.startWithCornerRuler": "Начинать новые проекты с угольником в начале координат",
   "workspace.startWithCornerRulerHint": "Действует для каждого нового проекта в этом браузере. Уже существующие проекты остаются как есть.",
   "workspace.startWithScrollbars": "Открывать редактор с полосами прокрутки",
+  "workspace.viewBarOpensOnHover": "Открывать панель вида при наведении",
+  "workspace.viewBarOpensOnHoverHint": "Свёрнутая панель вида открывается, пока мышь над её стрелкой, и снова сворачивается, когда мышь её покидает. Щелчок по стрелке оставляет её открытой.",
   "workspace.startView": "Начальный вид",
   "workspace.startViewHint": "Ракурс, в котором открываются новые проекты и к которому возвращает «Домой». Поверните вид как вам нравится и возьмите текущий вид. Действует для всех проектов в этом браузере.",
   "workspace.startViewUseCurrent": "Взять текущий вид",

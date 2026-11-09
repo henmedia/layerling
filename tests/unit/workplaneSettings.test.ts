@@ -82,6 +82,10 @@ describe("workplane settings helpers", () => {
     expect(DEFAULT_WORKPLANE_WORKSPACE.startWithScrollbars).toBe(false);
     expect(normalizeWorkspaceSettings({ startWithScrollbars: true }).startWithScrollbars).toBe(true);
     expect(normalizeWorkspaceSettings({ startWithScrollbars: "yes" }).startWithScrollbars).toBe(false);
+    // Opening the view bar on hover is off until switched on (Discussion #1552).
+    expect(DEFAULT_WORKPLANE_WORKSPACE.viewBarOpensOnHover).toBe(false);
+    expect(normalizeWorkspaceSettings({ viewBarOpensOnHover: true }).viewBarOpensOnHover).toBe(true);
+    expect(normalizeWorkspaceSettings({ viewBarOpensOnHover: "yes" }).viewBarOpensOnHover).toBe(false);
     expect(DEFAULT_WORKPLANE_WORKSPACE.clickToPlaceShapes).toBe(true);
     expect(normalizeWorkspaceSettings({}).clickToPlaceShapes).toBe(true);
     expect(normalizeWorkspaceSettings({ clickToPlaceShapes: false }).clickToPlaceShapes).toBe(false);

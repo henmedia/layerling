@@ -4700,6 +4700,8 @@ export const MESSAGES_AR: Partial<Record<MessageKey, string>> = {
   "workspace.startWithCornerRuler": "بدء التصاميم الجديدة مع زاوية النجار عند نقطة الأصل",
   "workspace.startWithCornerRulerHint": "ينطبق على كل تصميم جديد في هذا المتصفح. تبقى التصاميم الموجودة كما هي.",
   "workspace.startWithScrollbars": "بدء المحرر مع أشرطة التمرير",
+  "workspace.viewBarOpensOnHover": "فتح شريط العرض عند المرور بالمؤشر",
+  "workspace.viewBarOpensOnHoverHint": "يُفتح شريط العرض المطوي ما دام المؤشر فوق سهمه، ويُطوى مجددًا عندما يغادره المؤشر. النقر على السهم يبقيه مفتوحًا.",
   "workspace.startView": "عرض البداية",
   "workspace.startViewHint": "الزاوية التي تُفتح بها التصاميم الجديدة ويعود إليها زر «المشهد كاملًا». أدِر العرض كما تحب ثم استخدم العرض الحالي. ينطبق على كل التصاميم في هذا المتصفح.",
   "workspace.startViewUseCurrent": "استخدام العرض الحالي",

@@ -4488,6 +4488,8 @@ export const MESSAGES_DA: Partial<Record<MessageKey, string>> = {
   "workspace.startWithCornerRuler": "Start nye designs med vinkelmåler i nulpunktet",
   "workspace.startWithCornerRulerHint": "Gælder hvert nyt design i denne browser. Eksisterende designs forbliver, som de er.",
   "workspace.startWithScrollbars": "Start editoren med rullebjælker",
+  "workspace.viewBarOpensOnHover": "Åbn visningsbjælken, når musen holdes over den",
+  "workspace.viewBarOpensOnHoverHint": "En foldet visningsbjælke åbner, mens musen er over dens pil, og folder sammen igen, når musen forlader den. Et klik på pilen holder den åben.",
   "workspace.startView": "Startvisning",
   "workspace.startViewHint": "Den vinkel nye designs åbner i, og som Hjem vender tilbage til. Drej visningen, som du kan lide den, og brug så den aktuelle visning. Gælder alle designs i denne browser.",
   "workspace.startViewUseCurrent": "Brug aktuel visning",

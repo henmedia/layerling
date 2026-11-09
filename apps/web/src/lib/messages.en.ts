@@ -4693,6 +4693,8 @@ export const MESSAGES_EN = {
   "workspace.startWithCornerRuler": "Start new designs with a framing square at the origin",
   "workspace.startWithCornerRulerHint": "Applies to every new design in this browser. Designs you already have stay as they are.",
   "workspace.startWithScrollbars": "Start editor with scrollbars",
+  "workspace.viewBarOpensOnHover": "Open the view bar on hover",
+  "workspace.viewBarOpensOnHoverHint": "A folded view bar opens while the mouse is over its arrow and folds again when the mouse leaves it. A click on the arrow keeps it open.",
   "workspace.startView": "Start view",
   "workspace.startViewHint": "The angle new designs open in and Home goes back to. Turn the view the way you like it, then use the current view. Applies to every design in this browser.",
   "workspace.startViewUseCurrent": "Use current view",
