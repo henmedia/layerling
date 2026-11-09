@@ -52,7 +52,7 @@
         "body": {
           "de": "Im Deckelfenster rundet oder fast „Obere Kante“ den oberen Rand einer Schraub- oder Bajonettkappe, gleich beim Erzeugen. Danach ginge es nicht mehr: Kappe und Gewinde sind ein Netz mit viel zu vielen Dreiecken für die Kantenbearbeitung.",
           "en": "In the lid window, Top edge rounds or chamfers the top rim of a screw or bayonet cap as it is made. Afterwards it could not be done: cap and thread are one mesh with far too many triangles for the edge tool.",
-          "da": "I lågvinduet afrunder eller affaser Øverste kant den øverste kant på en skrue- eller bajonethætte, når den laves. Bagefter kan det ikke lade sig gøre: hætte og gevind er ét net med alt for mange trekanter til kantværktøjet."
+          "da": "I lågvinduet afrunder eller affaser Øverste kant den øverste kant på en skrue- eller bajonethætte, når den laves. Bagefter kan det ikke lade sig gøre: hætte og gevind er ét mesh med alt for mange trekanter til kantværktøjet."
         }
       },
       {
@@ -153,7 +153,7 @@
         "body": {
           "de": "Auf Druckern mit beweglichem Bett wackeln hohe, dünne Stifte. Der Stift der Passprobe (Einstellungen, „Spiel deines Druckers“) und die losen Dübel beim Teilen können jetzt auf einer dünnen Platte stehen, die nach dem Druck abbricht.",
           "en": "On a printer whose bed moves, tall thin pins wobble. The fit test's pin (settings, printer play) and the loose dowels of the Split tool can now stand on a thin plate that snaps off once printed.",
-          "da": "På printere med bevægelig plade vakler høje, tynde stifter. Pasprøvens stift (indstillinger, printerens slør) og de løse dyvler fra Del-værktøjet kan nu stå på en tynd plade, der brækkes af efter print."
+          "da": "På printere med bevægelig plade vakler høje, tynde stifter. Pasprøvens stift (indstillinger, printerens spillerum) og de løse dyvler fra Del-værktøjet kan nu stå på en tynd plade, der brækkes af efter print."
         }
       },
       {
@@ -343,7 +343,7 @@
         "body": {
           "de": "Ein Punkt auf der Oberkante zieht den Eckenradius, auch am normalen Quader. „Ecken einzeln“ gibt jeder Ecke ihren eigenen Radius, und „Oben/unten getrennt“ rundet oben und unten verschieden, etwa oben flach und unten rund.",
           "en": "A dot on the top edge drags the corner radius, on a plain box too. \"Corners Separately\" gives each corner its own radius, and \"Top/Bottom Separately\" rounds the top and the bottom differently, say flat on top and round below.",
-          "da": "En prik på overkanten trækker hjørneradius med, også på en almindelig kasse. „Hjørner hver for sig“ giver hvert hjørne sin egen radius, og „Top og bund hver for sig“ rounder toppen og bunden hver for sig, for eksempel fladt foroven og rundt forneden."
+          "da": "En prik på overkanten trækker hjørneradius med, også på en almindelig kasse. „Hjørner hver for sig“ giver hvert hjørne sin egen radius, og „Top og bund hver for sig“ runder toppen og bunden forskelligt, for eksempel fladt foroven og rundt forneden."
         }
       },
       {
@@ -355,7 +355,7 @@
         "body": {
           "de": "„Bogen beginnt bei“ lässt die Neigung auch aus der Mitte zu beiden Enden abfallen oder wölbt eine schräge Fläche gleichmäßig. „Seiten abgesenkt“ senkt die beiden langen Seiten ab, gerade oder gewölbt wie eine Kuppel.",
           "en": "\"Curve Starts At\" can let the slope fall from the middle to both ends, or arch a slanted top evenly. \"Sides Lowered\" lowers the two long sides, straight or domed.",
-          "da": "„Kurven starter ved“ kan lade hældningen falde fra midten til begge ender, eller bu en skrå overside jævnt. „Sider sænket“ sænker de to lange sider, lige eller hvælvet."
+          "da": "„Kurven starter ved“ kan lade hældningen falde fra midten til begge ender, eller bue en skrå overside jævnt. „Sider sænket“ sænker de to lange sider, lige eller hvælvet."
         }
       },
       {
