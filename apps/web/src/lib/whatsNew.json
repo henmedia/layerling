@@ -1,5 +1,94 @@
 [
   {
+    "version": "1.156.0",
+    "items": [
+      {
+        "title": {
+          "de": "Übergang: Wandstärke oben",
+          "en": "Transition: wall at the top",
+          "da": "Overgang: vægtykkelse foroven"
+        },
+        "body": {
+          "de": "Ein Übergang mit Wand hat unter Eigenschaften jetzt auch „Wandstärke oben“: eine Düse, unten am Rechteck 3 mm dick, die oben am Rund mit 1 mm endet. Dazwischen ändert sich die Wand gleichmäßig; ohne eigenen Wert ist sie oben so dick wie unten.",
+          "en": "A transition with a wall now also has Wall Thickness at the Top under Properties: a nozzle 3 mm thick on the rectangle at the bottom that ends 1 mm thin on the round top. In between the wall changes evenly; without a value of its own the top is as thick as the bottom.",
+          "da": "En overgang med væg har nu også Vægtykkelse foroven under Egenskaber: en dyse, 3 mm tyk ved rektanglet forneden, som ender 1 mm tynd ved den runde top. Imellem ændrer væggen sig jævnt; uden egen værdi er toppen lige så tyk som bunden."
+        }
+      },
+      {
+        "title": {
+          "de": "Löcher durchsichtiger einstellen",
+          "en": "Set how see-through holes are",
+          "da": "Indstil, hvor gennemsigtige huller er"
+        },
+        "body": {
+          "de": "Unter Einstellungen > Darstellung stellt „Deckkraft der Löcher“ ein, wie dicht Löcher gezeichnet werden. Weniger zeigt besser, wo ein Loch einen Körper berührt; zusammen mit „Löcher deutlicher zeigen“ werden Löcher dunkel und gut durchsichtig.",
+          "en": "Hole opacity in Settings > Appearance sets how solid holes are drawn. Lower shows better where a hole touches a body; together with Show holes more clearly, holes become dark and well see-through.",
+          "da": "Hullers dækkevne under Indstillinger > Udseende bestemmer, hvor tæt huller tegnes. Lavere viser bedre, hvor et hul rører et legeme; sammen med Vis huller tydeligere bliver huller mørke og godt gennemsigtige."
+        }
+      },
+      {
+        "title": {
+          "de": "Was ist neu? auch im Editor",
+          "en": "What's new, also in the editor",
+          "da": "Hvad er nyt? også i editoren"
+        },
+        "body": {
+          "de": "Der Knopf mit den Funkeln neben der Kurzanleitung oben rechts (oder die Befehlssuche) öffnet diese Liste auch im Editor. Sie bleibt neben dem Entwurf offen, während du das Neue ausprobierst.",
+          "en": "The button with the sparkles beside the quick guide at the top right (or the command search) opens this list in the editor too. It stays open beside the design while you try out what is new.",
+          "da": "Knappen med gnisterne ved siden af hurtigguiden øverst til højre (eller kommandosøgningen) åbner også denne liste i editoren. Den bliver åben ved siden af designet, mens du prøver det nye."
+        }
+      },
+      {
+        "title": {
+          "de": "Klarere Hinweise bei großen und offenen Netzen",
+          "en": "Clearer hints for dense and open meshes",
+          "da": "Tydeligere hints ved tætte og åbne mesh"
+        },
+        "body": {
+          "de": "Versetzen, Aushöhlen und die Kantenbearbeitung sagen jetzt, was weiterhilft: Hat ein Netz zu viele Dreiecke, verweisen sie auf „Netz vereinfachen“ im Rechtsklickmenü. Ist es offen, raten sie, das Vereinfachen rückgängig zu machen oder ein importiertes Netz im Slicer zu reparieren, statt auf ein Reparaturwerkzeug zu verweisen, das es nicht gibt.",
+          "en": "Offset, Hollow and edge treatment now say what helps: when a mesh has too many triangles, they point to Simplify mesh in the right-click menu. When it is open, they suggest undoing the simplify step or repairing an imported mesh in your slicer, instead of a repair tool that does not exist.",
+          "da": "Forskyd legeme, Hul form og kantbehandling siger nu, hvad der hjælper: har et mesh for mange trekanter, henviser de til Forenkl mesh i højrekliksmenuen. Er det åbent, foreslår de at fortryde forenklingen eller reparere et importeret mesh i din slicer i stedet for at henvise til et reparationsværktøj, der ikke findes."
+        }
+      },
+      {
+        "title": {
+          "de": "Fokusmodus: mehr Platz auf kleinen Bildschirmen",
+          "en": "Focus mode: more room on small screens",
+          "da": "Fokustilstand: mere plads på små skærme"
+        },
+        "body": {
+          "de": "Der Knopf mit den zwei Pfeilen oben rechts (oder Strg+Umschalt+F) blendet Titelzeile und Fußzeile aus, und Menüband und Ansicht bekommen ihren Platz. Eine kleine verschiebbare Leiste unter dem Menüband behält Startseite, 3D-Editor und Skizze, Befehlssuche und Einstellungen. Im Browser-Vollbild (F11) kommt der Fokusmodus von selbst.",
+          "en": "The button with the two arrows at the top right (or Ctrl+Shift+F) hides the title row and the footer, and the ribbon and the view get their room. A small movable bar below the ribbon keeps Home, 3D editor and Sketch, the command search and the settings. In the browser's full screen (F11) focus mode comes by itself.",
+          "da": "Knappen med de to pile øverst til højre (eller Ctrl+Shift+F) skjuler titellinjen og sidefoden, så båndet og visningen får pladsen. En lille bjælke, der kan flyttes, under båndet beholder Hjem, 3D-editor og Skitse, kommandosøgningen og indstillingerne. I browserens fuldskærm (F11) kommer fokustilstanden af sig selv."
+        }
+      },
+      {
+        "title": {
+          "de": "Ansicht schneller verschieben",
+          "en": "Shift the view faster",
+          "da": "Flyt visningen hurtigere"
+        },
+        "body": {
+          "de": "Die Ansicht folgt beim Verschieben jetzt der Maus: der gegriffene Punkt bleibt unter dem Mauszeiger, vorher lief sie langsamer mit. Unter Einstellungen > Darstellung stellt „Verschiebetempo“ das langsamer oder schneller ein. Wer keinen Nachlauf möchte, schaltet dort „Kamera läuft nach“ aus; das gilt fürs Drehen und Verschieben.",
+          "en": "Shifting the view now keeps up with the mouse: the point you grab stays under the cursor, where it used to lag behind. Pan speed in Settings > Appearance makes it slower or faster. To have the view stop at once when you let go, turn off Camera keeps turning there; it covers turning and shifting.",
+          "da": "Når du flytter visningen, følger den nu musen: det punkt, du griber, bliver under markøren, hvor den før haltede bagefter. Flyttehastighed under Indstillinger > Udseende gør det langsommere eller hurtigere. Vil du have, at visningen stopper med det samme, når du slipper, så slå Kameraet bliver ved med at dreje fra der; det gælder både drejning og flytning."
+        }
+      },
+      {
+        "title": {
+          "de": "Menüband: vier Gruppen statt Anpassen, Einklappen nach Wahl",
+          "en": "Ribbon: four groups instead of Modify, folding your way",
+          "da": "Bånd: fire grupper i stedet for Tilpas, sammenfoldning efter valg"
+        },
+        "body": {
+          "de": "Spiegeln & Muster, Teilen & Formen, Kanten & Wände und Oberfläche sind jetzt eigene Gruppen: Jede lässt sich verschieben, einklappen und herausnehmen. Unter Einstellungen > Menüband legt „Einklappen“ für jede Gruppe fest, ob sie bei Platzmangel einklappt, immer eingeklappt bleibt oder als letzte einklappt.",
+          "en": "Mirror & pattern, Split & shape, Edges & walls and Surface are groups of their own now: each moves, folds and can be taken out by itself. In Settings > Ribbon, Folding sets for each group whether it folds when there is no room, stays folded or folds last.",
+          "da": "Spejl og mønster, Del og form, Kanter og vægge og Overflade er nu selvstændige grupper: hver kan flyttes, foldes sammen og tages ud for sig. Under Indstillinger > Bånd bestemmer Sammenfoldning for hver gruppe, om den foldes sammen ved pladsmangel, altid er foldet sammen eller foldes sammen sidst."
+        }
+      }
+    ]
+  },
+  {
     "version": "1.155.0",
     "items": [
       {
