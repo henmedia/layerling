@@ -859,6 +859,7 @@ export const MESSAGES_NL: Record<MessageKey, string> = {
   "lid.error.needsBody": "Selecteer eerst de vorm waarvoor het deksel is.",
   "lid.error.notClosed": "De vorm is niet gesloten, er kan geen deksel voor gemaakt worden. Sluit of repareer hem eerst.",
   "lid.error.notOpen": "De vorm heeft bovenaan geen opening. Hol hem eerst uit met de bovenkant open, of maak een plat deksel.",
+  "lid.error.rimNotLevel": "De rand loopt schuin. Een deksel heeft een horizontale rand nodig. Voor een deksel dat de schuinte volgt: hol de vorm uit als “Gesloten (holte binnenin)” en gebruik “Splitsen” met een gekanteld vlak waar het deksel los moet komen.",
   "lid.error.tooSmall": "De opening is te klein voor een lip met deze speling. Neem minder speling of een plat deksel.",
   "lid.error.tooShallow": "De lip of rand reikt dieper dan de vorm hoog is. Maak hem korter.",
   "lid.error.empty": "Het deksel zou leeg zijn.",

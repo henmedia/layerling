@@ -38,6 +38,12 @@ export type MovablePanelOptions = {
    * pulled back below the bar when the panel opens.
    */
   below?: (panel: HTMLElement) => HTMLElement | null;
+  /**
+   * The panel's usual spot, where the stylesheet hangs it, is pulled into the area when it runs past the edge, without
+   * being remembered. The shape library hangs from the Shapes group, which can stand at the right end of the ribbon
+   * (#1550); from there it ran off the window.
+   */
+  fitUsualSpot?: boolean;
 };
 
 /** Where the panel stands in its area, and what that means for its own offset parent. */
@@ -51,7 +57,7 @@ type Placement = { position: PanelPosition; origin: PanelPosition; scale: number
  * docks it again. Spread `handleProps` on the title bar, put `panelRef` and
  * `style` on the panel.
  */
-export function useMovablePanel<T extends HTMLElement = HTMLDivElement>(storageKey: string, { floatingStyle, dockedAt, area, handleIgnores = NOT_A_HANDLE, keepInside = false, below }: MovablePanelOptions = {}) {
+export function useMovablePanel<T extends HTMLElement = HTMLDivElement>(storageKey: string, { floatingStyle, dockedAt, area, handleIgnores = NOT_A_HANDLE, keepInside = false, below, fitUsualSpot = false }: MovablePanelOptions = {}) {
   const panelRef = useRef<T>(null);
   const [placement, setPlacement] = useState<Placement | null>(null);
   const placementRef = useRef(placement);
@@ -155,8 +161,14 @@ export function useMovablePanel<T extends HTMLElement = HTMLDivElement>(storageK
       stored = null;
     }
     wantedRef.current = stored;
-    if (stored) setPlacement(place(stored));
-  }, [place, storageKey]);
+    if (stored) {
+      setPlacement(place(stored));
+      return;
+    }
+    if (!fitUsualSpot) return;
+    const measured = measure();
+    if (measured && measured.current.left + measured.panel.getBoundingClientRect().width > measured.area.clientWidth + 1) setPlacement(place(measured.current));
+  }, [place, measure, storageKey, fitUsualSpot]);
 
   // A smaller window pulls the panel back in, and so does a bar above it that grows - the toolbar after a change of
   // the control size, or when its groups no longer fold - so the title bar stays below it (#1525).

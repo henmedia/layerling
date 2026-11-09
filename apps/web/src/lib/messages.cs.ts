@@ -1003,6 +1003,7 @@ export const MESSAGES_CS: Record<MessageKey, string> = {
   "lid.error.needsBody": "Nejdřív vyber těleso, pro které má víko být.",
   "lid.error.notClosed": "Těleso není uzavřené, víko pro něj nejde vytvořit. Nejdřív ho uzavři nebo oprav.",
   "lid.error.notOpen": "Těleso nemá nahoře otvor. Nejdřív ho vydlab s otevřenou horní stranou, nebo zvol ploché víko.",
+  "lid.error.rimNotLevel": "Okraj je šikmý. Víko potřebuje vodorovný okraj. Pro víko, které sleduje sklon, vydlab těleso jako „Uzavřené (dutina uvnitř)“ a použij „Rozdělení“ se skloněnou rovinou tam, kde se má víko oddělit.",
   "lid.error.tooSmall": "Otvor je pro límec s touto vůlí příliš malý. Zvol menší vůli nebo ploché víko.",
   "lid.error.tooShallow": "Límec nebo okraj sahá hlouběji, než je těleso vysoké. Zkrať ho.",
   "lid.error.empty": "Víko by bylo prázdné.",

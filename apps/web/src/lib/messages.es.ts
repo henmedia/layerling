@@ -862,6 +862,7 @@ export const MESSAGES_ES: Partial<Record<MessageKey, string>> = {
   "lid.error.needsBody": "Selecciona primero el cuerpo para el que quieres la tapa.",
   "lid.error.notClosed": "El cuerpo no está cerrado, así que no se le puede hacer una tapa. Ciérralo o repáralo primero.",
   "lid.error.notOpen": "El cuerpo no tiene ninguna abertura arriba. Vacíalo primero con la parte de arriba abierta o haz una tapa plana.",
+  "lid.error.rimNotLevel": "El borde está inclinado. Una tapa necesita un borde horizontal. Para una tapa que siga la inclinación, vacía el cuerpo con «Cerrado (cavidad interior)» y usa «Dividir» con un plano inclinado donde deba separarse la tapa.",
   "lid.error.tooSmall": "La abertura es demasiado pequeña para un labio con esta holgura. Elige una holgura menor o una tapa plana.",
   "lid.error.tooShallow": "El labio o el borde baja más de lo que mide de alto el cuerpo. Hazlo más corto.",
   "lid.error.empty": "La tapa quedaría vacía.",

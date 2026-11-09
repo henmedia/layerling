@@ -146,6 +146,33 @@ describe("hollowing a solid with the real OCCT kernel", () => {
     kernel.release(solid);
   });
 
+  it("leaves a top cut off at an angle open (Discussion #1544)", () => {
+    // The box 40 x 20 x 30 with a wedge taken off its top: 20 mm high at x = 0, 12 mm at x = 40.
+    const wedgeCut = kernel.makeBox(80, 60, 80);
+    const tilted = kernel.translate(kernel.rotate(wedgeCut, { point: { x: 0, y: 0, z: 0 }, direction: { x: 0, y: 0, z: 1 } }, -Math.atan2(8, 40)), -20, 24, -40);
+    const solid = kernel.cut(box(), tilted);
+    const open = shellSolid(kernel, solid, 1, "top");
+    const closed = shellSolid(kernel, solid, 1, "none");
+    expect(kernel.isValid(open)).toBe(true);
+    // Open, it lacks the sloping lid the sealed one keeps: about 40 x 30 x 1 mm, a little more along the slope.
+    const lidVolume = kernel.getVolume(closed) - kernel.getVolume(open);
+    expect(lidVolume).toBeGreaterThan(38 * 28 * 1);
+    expect(lidVolume).toBeLessThan(41 * 30 * 1.05);
+    // The walls stay where they were.
+    const bounds = kernel.getBoundingBox(open, false);
+    expect(bounds.xmax - bounds.xmin).toBeCloseTo(40, 4);
+    expect(bounds.ymax - bounds.ymin).toBeCloseTo(20, 4);
+    [open, closed, solid].forEach((shape) => kernel.release(shape));
+  });
+
+  it("takes the sloping face of a roof as its top only while it leans no more than 60 degrees", () => {
+    // What is left of the box below a face running down at 70 degrees from its top left edge: too steep to be a top.
+    const steep = kernel.rotate(kernel.makeBox(80, 80, 80), { point: { x: 0, y: 0, z: 0 }, direction: { x: 0, y: 0, z: 1 } }, -(70 * Math.PI) / 180);
+    const solid = kernel.cut(box(), kernel.translate(steep, -5, 20 + 5 * Math.tan((70 * Math.PI) / 180), -40));
+    expect(() => shellSolid(kernel, solid, 1, "top")).toThrow(/no flat top face/);
+    kernel.release(solid);
+  });
+
   it("explains when there is no flat face to open", () => {
     const solid = kernel.makeSphere(10);
     expect(() => shellSolid(kernel, solid, 1, "top")).toThrow(/no flat top face/);

@@ -852,6 +852,7 @@ export const MESSAGES_IT: Partial<Record<MessageKey, string>> = {
   "lid.error.needsBody": "Seleziona prima il corpo per cui creare il coperchio.",
   "lid.error.notClosed": "Il corpo non è chiuso e non è possibile crearne il coperchio. Chiudilo o correggilo prima di procedere.",
   "lid.error.notOpen": "Il corpo non presenta un'apertura nella parte superiore. Crealo cavo e aperto nella parte superiore oppure realizza un coperchio piatto.",
+  "lid.error.rimNotLevel": "Il bordo è inclinato. Un coperchio richiede un bordo orizzontale. Per un coperchio che segua l'inclinazione, svuota il corpo con «Chiuso (cavità interna)» e usa «Dividi» con un piano inclinato dove il coperchio deve staccarsi.",
   "lid.error.tooSmall": "L'apertura è troppo piccola per un bordo di inserimento con questo gioco. Riduci il gioco oppure scegli un coperchio piatto.",
   "lid.error.tooShallow": "Il bordo di inserimento o di sovrapposizione è più profondo dell'altezza del corpo. Riducine la profondità.",
   "lid.error.empty": "Il coperchio risulterebbe vuoto.",

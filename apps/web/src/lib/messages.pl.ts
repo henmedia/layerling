@@ -815,6 +815,7 @@ export const MESSAGES_PL: Partial<Record<MessageKey, string>> = {
   "lid.error.needsBody": "Najpierw zaznacz bryłę, do której ma powstać pokrywka.",
   "lid.error.notClosed": "Bryła nie jest zamknięta, więc nie da się zrobić do niej pokrywki. Najpierw ją zamknij albo napraw.",
   "lid.error.notOpen": "Bryła nie ma otworu u góry. Najpierw wydrąż ją z otwartą górą albo zrób płaską pokrywkę.",
+  "lid.error.rimNotLevel": "Krawędź jest pochylona. Pokrywka wymaga poziomej krawędzi. Aby pokrywka podążała za pochyleniem, wydrąż bryłę jako „Zamknięte (pustka w środku)” i użyj „Podziel” z pochyloną płaszczyzną tam, gdzie pokrywka ma się oddzielić.",
   "lid.error.tooSmall": "Otwór jest za mały na kołnierz z tą szczeliną. Weź mniejszą szczelinę albo płaską pokrywkę.",
   "lid.error.tooShallow": "Kołnierz albo obrzeże sięga głębiej, niż bryła jest wysoka. Skróć go.",
   "lid.error.empty": "Pokrywka byłaby pusta.",

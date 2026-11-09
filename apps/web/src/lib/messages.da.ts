@@ -226,6 +226,7 @@ export const MESSAGES_DA: Partial<Record<MessageKey, string>> = {
   "lid.error.needsBody": "Vælg først det legeme, du vil lave et låg til.",
   "lid.error.notClosed": "Legemet er ikke lukket, så der kan ikke laves et låg til det. Luk eller reparér det først.",
   "lid.error.notOpen": "Legemet har ingen åbning i toppen. Udhul det med toppen åben først, eller lav et fladt låg.",
+  "lid.error.rimNotLevel": "Kanten skråner. Et låg kræver en vandret kant. For et låg, der følger skråningen, udhul legemet som “Lukket (hulrum indeni)” og brug “Del form” med et skråt plan, hvor låget skal skilles fra.",
   "lid.error.tooSmall": "Åbningen er for lille til en læbe med dette spillerum. Tag et mindre spillerum eller et fladt låg.",
   "lid.error.tooShallow": "Læben eller kanten rækker dybere ned end legemet er højt. Lav den kortere.",
   "lid.error.empty": "Låget ville blive tomt.",

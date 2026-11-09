@@ -4787,6 +4787,13 @@ html[data-theme="dark"] .toolbar-title-help .action-icon-button.active {
   min-width: 82px;
 }
 
+/* Shapes taken out of the ribbon (#1550): the section stays, without width, so its panel still opens from the command
+   search at the spot where the group would stand. */
+.toolbar-shapes-section.out-of-ribbon {
+  min-width: 0;
+  width: 0;
+}
+
 .shape-menu-trigger {
   position: relative;
   display: grid;
@@ -9635,6 +9642,9 @@ html[data-theme="dark"] .rotation-angle-badge {
   width: 320px;
   max-height: none;
   overflow-y: auto;
+  /* The snap dock sticks to the bottom and covers the last ~55px of the view; the browser counts a field behind it
+     as visible and does not scroll to it on Tab. This keeps a focused field above the dock (Issue #1547). */
+  scroll-padding-bottom: 64px;
   /* A thin bar that shows: on a laptop's touchpad the panel is easier to scroll by its bar. */
   scrollbar-color: #cdbfa9 transparent;
   scrollbar-width: thin;

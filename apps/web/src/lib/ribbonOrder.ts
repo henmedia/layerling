@@ -4,18 +4,15 @@ import { useSyncExternalStore } from "react";
 
 /**
  * The order of the 3D ribbon's groups a person set (Discussion #1519, #1502): kept in this browser, like the buttons they
- * took out. Every group but Shapes can stand anywhere; Shapes keeps its place after the first two groups, because it is
- * where a design grows and must be found again. The order is a list of the group names; a name the list lacks (a group a
- * later version adds) stands at its usual place, a name it no longer knows is dropped.
+ * took out. Every group can stand anywhere, Shapes too (Issue #1550). The order is a list of the group names; a name the
+ * list lacks (a group a later version adds, or Shapes in an order kept before it could move) stands at its usual place,
+ * a name it no longer knows is dropped.
  */
 export const RIBBON_ORDER_STORAGE_KEY = "layerling.ribbonOrder";
 
-/** The groups a person can move, in the order the ribbon ships them. */
-export const RIBBON_GROUP_ORDER = ["clipboard", "history", "visibility", "combine", "modify", "arrange", "manage"] as const;
+/** The groups of the ribbon, in the order it ships them. */
+export const RIBBON_GROUP_ORDER = ["clipboard", "history", "shapes", "visibility", "combine", "modify", "arrange", "manage"] as const;
 export type RibbonGroupName = (typeof RIBBON_GROUP_ORDER)[number];
-
-/** Where Shapes stands among the groups as shipped: after the first two, before the rest. */
-const SHAPES_SLOT = 2;
 
 export function normalizeRibbonOrder(value: unknown): RibbonGroupName[] {
   const known = new Set<string>(RIBBON_GROUP_ORDER);
@@ -28,7 +25,11 @@ export function normalizeRibbonOrder(value: unknown): RibbonGroupName[] {
       order.push(entry as RibbonGroupName);
     }
   }
-  for (const group of RIBBON_GROUP_ORDER) if (!seen.has(group)) order.push(group);
+  // A missing group goes back to the place it ships at: an order kept while Shapes stood fixed as the third group
+  // gets Shapes third again, where the ribbon showed it.
+  RIBBON_GROUP_ORDER.forEach((group, index) => {
+    if (!seen.has(group)) order.splice(Math.min(index, order.length), 0, group);
+  });
   return order;
 }
 
@@ -36,18 +37,12 @@ export function isDefaultRibbonOrder(order: readonly string[]) {
   return order.length === RIBBON_GROUP_ORDER.length && order.every((group, index) => group === RIBBON_GROUP_ORDER[index]);
 }
 
-/**
- * The CSS `order` of every section of the ribbon: the movable groups take the places the shipped ribbon has, one after
- * the other, and Shapes keeps the one between the second and the third.
- */
-export function ribbonSectionOrders(order: readonly RibbonGroupName[]): Record<RibbonGroupName | "shapes", number> {
-  const orders = { shapes: SHAPES_SLOT } as Record<RibbonGroupName | "shapes", number>;
-  let slot = 0;
-  for (const group of order) {
-    if (slot === SHAPES_SLOT) slot += 1;
+/** The CSS `order` of every section of the ribbon: its place in the order. */
+export function ribbonSectionOrders(order: readonly RibbonGroupName[]): Record<RibbonGroupName, number> {
+  const orders = {} as Record<RibbonGroupName, number>;
+  order.forEach((group, slot) => {
     orders[group] = slot;
-    slot += 1;
-  }
+  });
   return orders;
 }
 

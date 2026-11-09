@@ -1298,6 +1298,10 @@ export function SecondaryToolbar({
   ];
   const fileTools = ordered("manage", fileToolsShipped);
   const fileShown = shownInRibbon(fileTools, ribbonHidden);
+  // Shapes is a group like the others (#1550): it moves and can be taken out. Taken out, its panel still opens from the
+  // command search and its key, from the spot where the group would stand.
+  const shapesTools = [{ id: "shapes-panel", label: t("editor.addShape") }];
+  const shapesInRibbon = ribbonGroupShown("shapes", ribbonHidden, shownInRibbon(shapesTools, ribbonHidden));
   // The File group's three buttons, in the order set for the group (#1519).
   const renderFileButton = (tool: { id: string }) => {
     if (tool.id === "import") {
@@ -1328,8 +1332,8 @@ export function SecondaryToolbar({
           </button>
     );
   };
-  // The settings window lists the groups and buttons from here, named as on the buttons. The Shapes group and Help stay:
-  // without them a design could not grow, and the settings could not be found again.
+  // The settings window lists the groups and buttons from here, named as on the buttons. Help stays: without it the
+  // settings could not be found again.
   // In the simple mode it lists what that mode keeps: a tick on a button the mode leaves out anyway would change nothing.
   const pick = (tools: readonly { id: string; label: string; section?: string }[], cut = true) => tools
     .filter((tool) => !cut || !simpleMode || simpleModeKeepsTool(tool.id))
@@ -1344,6 +1348,7 @@ export function SecondaryToolbar({
   const layoutGroups = [
     layoutGroup("clipboard", t("editor.group.clipboard"), leftTools.slice(0, 4), false),
     layoutGroup("history", t("editor.group.history"), leftTools.slice(4)),
+    layoutGroup("shapes", t("editor.group.shapes"), shapesTools, false),
     ...(simpleMode ? [] : [layoutGroup("visibility", t("editor.group.visibility"), visibilityTools, false)]),
     layoutGroup("combine", t("editor.group.combine"), combineTools),
     layoutGroup("modify", t("editor.group.modify"), modifyTools),
@@ -1373,7 +1378,9 @@ export function SecondaryToolbar({
           <div className="toolbar-section-tools">{historyShown.map(renderToolButton)}</div>
         </div>
         ) : null}
-        <div className="toolbar-section toolbar-shapes-section" data-group="shapes" style={{ order: sectionOrder.shapes }} ref={shapesMenuRef} inert={historyViewActive}>
+        <div className={`toolbar-section toolbar-shapes-section${shapesInRibbon ? "" : " out-of-ribbon"}`} data-group="shapes" style={{ order: sectionOrder.shapes }} ref={shapesMenuRef} inert={historyViewActive}>
+          {shapesInRibbon ? (
+          <>
           <div className="toolbar-section-label">{t("editor.group.shapes")}</div>
           <div className="toolbar-section-tools">
             <button
@@ -1388,6 +1395,8 @@ export function SecondaryToolbar({
               <ToolbarShapeAddIcon />
             </button>
           </div>
+          </>
+          ) : null}
           {shapesOpen ? inPinnedShapesHome(
             <ShapeMenuPanel
               title={t("shape.basicShapes")}

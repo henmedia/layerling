@@ -97,6 +97,7 @@ export function ShapeMenuPanel({
   const movable = useMovablePanel<HTMLDivElement>(scope === "sketch" ? "layerling.sketch.shapeMenuPosition" : "layerling.editor.shapeMenuPosition", {
     area: (panel) => panel.closest<HTMLElement>(".layerling-editor"),
     below: (panel) => panel.closest(".layerling-editor")?.querySelector<HTMLElement>(".secondary-toolbar") ?? null,
+    fitUsualSpot: true,
   });
   const PinIcon = pinned ? PinOff : Pin;
 
