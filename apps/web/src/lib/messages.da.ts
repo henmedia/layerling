@@ -4499,6 +4499,8 @@ export const MESSAGES_DA: Partial<Record<MessageKey, string>> = {
   "workspace.objectSnap": "Snap til andre former mens du flytter",
   "workspace.stlAsDownload": "Gem STL som download",
   "workspace.stlAsDownloadHint": "Chrome og Edge skriver en STL ind i den samme fil hver gang. Slå dette til for at få en almindelig download i stedet: browseren nummerer så filerne, navn (1).stl, navn (2).stl.",
+  "workspace.lylAsDownload": "Gem designs som download",
+  "workspace.lylAsDownloadHint": "På nogle pc'er giver gem-vinduet i Chrome og Edge ingen fil tilbage. Slå dette til for at springe det over: Eksport > LYL, Ctrl+S og Gem som lægger så altid designet i mappen Overførsler.",
   "workspace.confirmTabClose": "Spørg før fanen lukkes",
   "workspace.confirmTabCloseHint": "Når et design er åbent, viser din browser sit eget spørgsmål, når du lukker fanen eller genindlæser den: \"Vil du forlade denne side?\". Dine designs gemmes alligevel efter hver ændring, så spørgsmålet er blot en påmindelse. Formuleringen er browserens.",
   "workspace.softLightingHint": "Det meste af lyset kommer fra den retning, du ser i, og drejer sig med synet, så ingen flade bliver mørk, og ingen flade brændes ud til hvidt. Skyggerne bliver dog.",

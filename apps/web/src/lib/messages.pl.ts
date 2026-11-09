@@ -4708,6 +4708,8 @@ export const MESSAGES_PL: Partial<Record<MessageKey, string>> = {
   "workspace.objectSnap": "Przyciągaj do innych kształtów podczas przesuwania",
   "workspace.stlAsDownload": "Zapisuj STL jako pobranie",
   "workspace.stlAsDownloadHint": "Chrome i Edge za każdym razem zapisują STL do tego samego pliku. Włącz to, aby zamiast tego dostać zwykłe pobranie: przeglądarka numeruje wtedy pliki, nazwa (1).stl, nazwa (2).stl.",
+  "workspace.lylAsDownload": "Zapisuj projekty jako pobranie",
+  "workspace.lylAsDownloadHint": "Na niektórych komputerach okno zapisu w Chrome i Edge nie zwraca żadnego pliku. Włącz to, aby je pominąć: Eksport > LYL, Ctrl+S i Zapisz jako zapisują wtedy projekt zawsze w folderze Pobrane.",
   "workspace.confirmTabClose": "Pytaj przed zamknięciem karty",
   "workspace.confirmTabCloseHint": "Gdy projekt jest otwarty, zamknięcie albo przeładowanie karty wywołuje pytanie przeglądarki „Opuścić stronę?”. Projekty i tak zapisują się po każdej zmianie, więc to pytanie jest tylko przypomnieniem. Treść pytania pochodzi od przeglądarki.",
   "workspace.softLighting": "Miękkie światło",

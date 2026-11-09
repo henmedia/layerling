@@ -4711,6 +4711,8 @@ export const MESSAGES_AR: Partial<Record<MessageKey, string>> = {
   "workspace.objectSnap": "الالتقاط إلى الأشكال الأخرى أثناء التحريك",
   "workspace.stlAsDownload": "حفظ STL كتنزيل",
   "workspace.stlAsDownloadHint": "يكتب Chrome وEdge ملف STL في الملف نفسه كل مرة. شغّل هذا للحصول على تنزيل عادي بدلًا من ذلك: يرقّم المتصفح الملفات عندها، name (1).stl وname (2).stl.",
+  "workspace.lylAsDownload": "حفظ التصاميم كتنزيل",
+  "workspace.lylAsDownloadHint": "على بعض الحواسيب لا تعيد نافذة الحفظ في Chrome وEdge أي ملف. شغّل هذا لتخطيها: عندها يضع Export > LYL وCtrl+S و«حفظ باسم» التصميمَ دائمًا في مجلد التنزيلات.",
   "workspace.confirmTabClose": "السؤال قبل إغلاق علامة التبويب",
   "workspace.confirmTabCloseHint": "عندما يكون تصميم مفتوحًا، يُظهر إغلاق علامة التبويب أو إعادة تحميلها سؤال متصفحك الخاص \"Leave site?\". تُحفظ تصاميمك بعد كل تغيير في الحالتين، فالسؤال مجرد تذكير. وصياغته من المتصفح.",
   "workspace.softLighting": "ضوء ناعم",

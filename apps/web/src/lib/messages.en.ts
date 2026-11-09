@@ -4704,6 +4704,8 @@ export const MESSAGES_EN = {
   "workspace.objectSnap": "Snap to other shapes while moving",
   "workspace.stlAsDownload": "Save STL as a download",
   "workspace.stlAsDownloadHint": "Chrome and Edge write an STL into the same file each time. Switch this on to get a plain download instead: the browser then numbers the files, name (1).stl, name (2).stl.",
+  "workspace.lylAsDownload": "Save designs as a download",
+  "workspace.lylAsDownloadHint": "On some PCs the save dialog of Chrome and Edge hands back no file. Switch this on to leave it out: Export > LYL, Ctrl+S and Save as then always put the design into the Downloads folder.",
   "workspace.confirmTabClose": "Ask before closing the tab",
   "workspace.confirmTabCloseHint": "When a design is open, closing or reloading the tab brings up your browser's own question \"Leave site?\". Your designs are saved after every change either way, so the question is only a reminder. The wording is the browser's.",
   "workspace.softLighting": "Soft light",

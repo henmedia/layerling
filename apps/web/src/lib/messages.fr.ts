@@ -4688,6 +4688,8 @@ export const MESSAGES_FR: Partial<Record<MessageKey, string>> = {
   "workspace.objectSnap": "Accrochez-vous à d'autres formes tout en vous déplaçant",
   "workspace.stlAsDownload": "Enregistrer le STL comme téléchargement",
   "workspace.stlAsDownloadHint": "Chrome et Edge écrivent un STL à chaque fois dans le même fichier. Activez ceci pour obtenir un téléchargement ordinaire : le navigateur numérote alors les fichiers, nom (1).stl, nom (2).stl.",
+  "workspace.lylAsDownload": "Enregistrer les designs comme téléchargement",
+  "workspace.lylAsDownloadHint": "Sur certains PC, la fenêtre d'enregistrement de Chrome et Edge ne rend aucun fichier. Activez ceci pour vous en passer : Exporter > LYL, Ctrl+S et Enregistrer sous mettent alors toujours le design dans le dossier Téléchargements.",
   "workspace.confirmTabClose": "Demander avant de fermer l'onglet",
   "workspace.confirmTabCloseHint": "Quand une conception est ouverte, le navigateur pose sa propre question « Quitter le site ? » à la fermeture ou au rechargement de l'onglet. Vos conceptions sont de toute façon enregistrées après chaque modification ; la question n'est qu'un rappel. Le texte est celui du navigateur.",
   "workspace.softLighting": "Lumière douce",

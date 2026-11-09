@@ -1,1 +1,14 @@
-[]
+[
+  {
+    "title": {
+      "de": "Entwürfe immer als Download speichern",
+      "en": "Always save designs as a download",
+      "da": "Gem altid designs som download"
+    },
+    "body": {
+      "de": "Unter Einstellungen > Darstellung gibt es den Schalter „Entwürfe als Download speichern“: Export > LYL, Strg+S und Speichern unter legen den Entwurf dann ohne Speicherfenster in den Download-Ordner. Das hilft auf PCs, auf denen das Speicherfenster von Chrome und Edge keine Datei zurückgibt. Ein STL-Export, der dort scheitert, bietet jetzt ebenfalls „Stattdessen herunterladen“ an.",
+      "en": "Settings > Appearance has a switch, Save designs as a download: Export > LYL, Ctrl+S and Save as then put the design into the Downloads folder without the save dialog. That helps on PCs where the save dialog of Chrome and Edge hands back no file. An STL export that fails there now offers Download instead as well.",
+      "da": "Under Indstillinger > Udseende er der en kontakt, Gem designs som download: Eksport > LYL, Ctrl+S og Gem som lægger så designet i mappen Overførsler uden gem-vinduet. Det hjælper på pc'er, hvor gem-vinduet i Chrome og Edge ikke giver en fil tilbage. En STL-eksport, der fejler der, tilbyder nu også Download i stedet."
+    }
+  }
+]

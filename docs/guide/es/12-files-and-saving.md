@@ -38,6 +38,8 @@ Para hacer una copia de un solo diseño, ve al editor: haz clic en {{ui:editor.e
 
 **Cuando la ventana de guardar no guarda nada.** Si la ventana se cierra sin archivo, el mensaje de arriba lo dice y ofrece {{ui:status.saveAsDownload}}: el diseño va entonces a la carpeta Descargas, como en Firefox. El navegador informa de una ventana cerrada con Cancelar igual que de una que no pudo usar, así que en un PC donde la ventana de guardar falla en todas las carpetas, así sigues guardando.
 
+Una exportación STL cuya ventana no devuelve ningún archivo recibe el mismo mensaje y el mismo botón. Para prescindir del todo de la ventana de guardar, activa {{ui:workspace.lylAsDownload}} en los ajustes, en {{ui:workspace.appearance}}: {{ui:export.saveProject}} y [[Ctrl]]+[[S]] guardan entonces siempre el diseño como descarga, y {{ui:workspace.stlAsDownload}} hace lo mismo con el STL.
+
 ## Archivos adjuntos
 
 Instrucciones, una lista de piezas, notas, una foto o una hoja de datos pueden quedarse con el diseño como archivos. {{ui:editor.attachments}}, el clip del grupo {{ui:editor.group.file}} de la cinta, abre la lista; un puntito en el clip indica que el diseño tiene alguno.

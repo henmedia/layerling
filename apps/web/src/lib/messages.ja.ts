@@ -3816,6 +3816,8 @@ export const MESSAGES_JA: Partial<Record<MessageKey, string>> = {
   "workspace.objectSnap": "移動中に他のシェイプにスナップ",
   "workspace.stlAsDownload": "STLを上書きせずにダウンロードする",
   "workspace.stlAsDownloadHint": "ChromeとEdgeでは、STLを毎回同じファイルに書き込みます。これをオンにすると、ふつうのダウンロードになり、ブラウザーがファイルに名前 (1).stl、名前 (2).stl のように番号を付けます。",
+  "workspace.lylAsDownload": "デザインを保存ダイアログなしでダウンロードする",
+  "workspace.lylAsDownloadHint": "一部のPCでは、ChromeとEdgeの保存ダイアログがファイルを返しません。これをオンにするとダイアログを使わず、エクスポート > LYL、Ctrl+S、名前を付けて保存でデザインが常にダウンロードフォルダーに入ります。",
   "workspace.confirmTabClose": "タブを閉じる前にたずねる",
   "workspace.confirmTabCloseHint": "デザインを開いているときにタブを閉じたり再読み込みしたりすると、ブラウザーが「このサイトを離れますか？」とたずねます。デザインはどちらにしても変更のたびに保存されるので、この質問は確認のためだけです。文はブラウザーが決めています。",
   "workspace.softLighting": "やわらかい光",

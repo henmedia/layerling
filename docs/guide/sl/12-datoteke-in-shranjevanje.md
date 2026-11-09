@@ -38,6 +38,8 @@ Posamezen načrt shraniš v urejevalniku: {{ui:editor.export}}, nato izberi obli
 
 **Ko okno za shranjevanje ne shrani ničesar.** Če se okno zapre brez datoteke, sporočilo zgoraj to pove in ponudi {{ui:status.saveAsDownload}}: zasnova gre takrat v mapo Prenosi, kot v Firefoxu. Brskalnik okno, zaprto s Prekliči, javi enako kot okno, ki ga ni mogel uporabiti, zato na računalniku, kjer okno za shranjevanje odpove v vsaki mapi, tako še naprej shranjuješ.
 
+Izvoz STL, katerega okno ne vrne datoteke, dobi isto sporočilo in gumb. Če želiš okno za shranjevanje povsem izpustiti, v nastavitvah pod {{ui:workspace.appearance}} vklopi {{ui:workspace.lylAsDownload}}: {{ui:export.saveProject}} in [[Ctrl]]+[[S]] nato zasnovo vedno shranita kot prenos, {{ui:workspace.stlAsDownload}} pa naredi isto za STL.
+
 ## Priloge
 
 Navodila, seznam delov, opombe, fotografija ali podatkovni list lahko ostanejo pri projektu kot datoteke. {{ui:editor.attachments}} v vrstici {{ui:editor.group.file}}, sponka, odpre seznam; majhna pika na sponki pokaže, da jih projekt ima.

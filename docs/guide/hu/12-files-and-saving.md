@@ -38,6 +38,8 @@ Egy tervről a szerkesztőben készítesz biztonsági mentést: {{ui:editor.expo
 
 **Ha a mentési ablak nem ment semmit.** Ha az ablak fájl nélkül záródik be, a fenti üzenet jelzi ezt, és felajánlja a(z) {{ui:status.saveAsDownload}} lehetőséget: a terv ekkor a Letöltések mappába kerül, mint a Firefoxban. A böngésző a Mégse gombbal bezárt ablakot ugyanúgy jelzi, mint azt, amelyet nem tudott használni, így olyan gépen, ahol a mentési ablak minden mappában hibázik, így menthetsz tovább.
 
+Az az STL-export, amelynek ablaka nem ad vissza fájlt, ugyanezt az üzenetet és gombot kapja. Ha teljesen ki akarod hagyni a mentési ablakot, kapcsold be a(z) {{ui:workspace.lylAsDownload}} lehetőséget a beállításokban, a(z) {{ui:workspace.appearance}} alatt: ekkor a(z) {{ui:export.saveProject}} és a [[Ctrl]]+[[S]] mindig letöltésként menti a tervet, a(z) {{ui:workspace.stlAsDownload}} pedig ugyanezt teszi az STL-lel.
+
 ## Mellékletek
 
 Útmutató, alkatrészlista, jegyzetek, egy fénykép vagy egy adatlap fájlként a tervvel maradhat. A szalag {{ui:editor.group.file}} csoportjának {{ui:editor.attachments}} gombja, a gemkapocs, megnyitja a listát; a gemkapcson egy kis pont jelzi, hogy a tervnek van melléklete.

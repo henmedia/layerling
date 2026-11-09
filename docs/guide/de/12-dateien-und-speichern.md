@@ -38,6 +38,8 @@ Einen einzelnen Entwurf sicherst du im Editor: {{ui:editor.export}}, dann das Fo
 
 **Wenn das Speicherfenster nichts speichert.** Schließt sich das Fenster ohne Datei, sagt die Meldung oben das und bietet {{ui:status.saveAsDownload}} an: Der Entwurf landet dann wie in Firefox im Download-Ordner. Der Browser meldet ein mit Abbrechen geschlossenes Fenster genauso wie eines, das er nicht verwenden konnte. Auf einem PC, auf dem das Speicherfenster in jedem Ordner scheitert, speicherst du so trotzdem weiter.
 
+Ein STL-Export, dessen Fenster keine Datei zurückgibt, bekommt dieselbe Meldung mit dem Knopf. Willst du das Speicherfenster ganz weglassen, schalte in den Einstellungen unter {{ui:workspace.appearance}} {{ui:workspace.lylAsDownload}} ein: {{ui:export.saveProject}} und [[Strg]]+[[S]] speichern den Entwurf dann immer als Download, und {{ui:workspace.stlAsDownload}} tut dasselbe für STL.
+
 ## Anhänge
 
 Eine Anleitung, eine Teileliste, Notizen, ein Foto oder ein Datenblatt können als Dateien beim Entwurf bleiben. {{ui:editor.attachments}} in der Gruppe {{ui:editor.group.file}} des Menübands, die Büroklammer, öffnet die Liste; ein kleiner Punkt an der Büroklammer zeigt, dass der Entwurf welche hat.

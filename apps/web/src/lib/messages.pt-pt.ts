@@ -4634,6 +4634,8 @@ export const MESSAGES_PT_PT: Partial<Record<MessageKey, string>> = {
   "workspace.objectSnap": "Ajustar a outras formas ao mover",
   "workspace.stlAsDownload": "Guardar STL através de descarga",
   "workspace.stlAsDownloadHint": "O Chrome e o Edge guardam o STL no mesmo ficheiro em cada exportação. Ativa esta opção para uma descarga normal: o navegador numera os ficheiros, nome (1).stl, nome (2).stl.",
+  "workspace.lylAsDownload": "Guardar designs através de descarga",
+  "workspace.lylAsDownloadHint": "Em alguns PCs, a janela de guardar do Chrome e do Edge não devolve nenhum ficheiro. Ativa esta opção para a saltar: Exportar > LYL, Ctrl+S e Guardar como colocam então o design sempre na pasta Transferências.",
   "workspace.confirmTabClose": "Pedir confirmação antes de fechar o separador",
   "workspace.confirmTabCloseHint": "Quando há um projeto aberto, fechar ou recarregar o separador apresenta a pergunta do próprio navegador \"Sair do site?\". Os projetos são guardados após cada alteração em qualquer dos casos, pelo que a pergunta serve apenas de lembrete. O texto é definido pelo navegador.",
   "workspace.softLighting": "Luz suave",

@@ -38,6 +38,8 @@ Puoi fare una copia di un singolo progetto dall’editor: scegli {{ui:editor.exp
 
 **Quando la finestra di salvataggio non salva nulla.** Se la finestra si chiude senza un file, il messaggio in alto lo dice e offre {{ui:status.saveAsDownload}}: il progetto va allora nella cartella Download, come in Firefox. Il browser segnala una finestra chiusa con Annulla allo stesso modo di una che non ha potuto usare, quindi su un PC dove la finestra di salvataggio fallisce in ogni cartella è così che continui a salvare.
 
+Un'esportazione STL la cui finestra non restituisce alcun file riceve lo stesso messaggio e lo stesso pulsante. Per fare del tutto a meno della finestra di salvataggio, attiva {{ui:workspace.lylAsDownload}} nelle impostazioni, sotto {{ui:workspace.appearance}}: {{ui:export.saveProject}} e [[Ctrl]]+[[S]] salvano allora sempre il progetto come download, e {{ui:workspace.stlAsDownload}} fa lo stesso per l'STL.
+
 ## Allegati
 
 Istruzioni, una distinta dei pezzi, appunti, una foto o una scheda tecnica possono restare con il progetto come file. {{ui:editor.attachments}} nella barra {{ui:editor.group.file}}, la graffetta, apre l'elenco; un puntino sulla graffetta indica che il progetto ne ha.

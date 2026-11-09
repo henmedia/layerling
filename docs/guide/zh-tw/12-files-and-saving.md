@@ -38,6 +38,8 @@ layerling 把所有東西都儲存在你電腦的瀏覽器裡。不需要帳號�
 
 **儲存視窗什麼也沒儲存時。** 如果視窗關閉時沒有選定檔案，頂部訊息會說明並提供 {{ui:status.saveAsDownload}}：設計會像在 Firefox 中一樣進入「下載」資料夾。瀏覽器對按「取消」關閉的視窗和無法使用的視窗回報方式相同，所以在儲存視窗對每個資料夾都失敗的電腦上，可以用這種方式繼續儲存。
 
+如果 STL 匯出的視窗沒有傳回檔案，也會顯示同樣的訊息與按鈕。想完全跳過儲存視窗，請在設定的 {{ui:workspace.appearance}} 下開啟 {{ui:workspace.lylAsDownload}}：這樣 {{ui:export.saveProject}} 與 [[Ctrl]]+[[S]] 一律把設計儲存為下載，{{ui:workspace.stlAsDownload}} 對 STL 也是一樣。
+
 ## 附件
 
 說明書、零件清單、筆記、照片或規格表都可以作為檔案跟設計放在一起。功能區 {{ui:editor.group.file}} 群組中的 {{ui:editor.attachments}}（迴紋針）開啟清單；迴紋針上的小圓點表示設計裡有附件。

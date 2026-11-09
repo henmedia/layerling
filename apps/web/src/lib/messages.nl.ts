@@ -4704,6 +4704,8 @@ export const MESSAGES_NL: Record<MessageKey, string> = {
   "workspace.objectSnap": "Bij verplaatsen uitlijnen op andere vormen",
   "workspace.stlAsDownload": "STL opslaan als download",
   "workspace.stlAsDownloadHint": "Chrome en Edge schrijven een STL elke keer naar hetzelfde bestand. Zet dit aan voor een gewone download: de browser nummert de bestanden dan, naam (1).stl, naam (2).stl.",
+  "workspace.lylAsDownload": "Ontwerpen opslaan als download",
+  "workspace.lylAsDownloadHint": "Op sommige pc's geeft het opslagvenster van Chrome en Edge geen bestand terug. Zet dit aan om het over te slaan: Exporteren > LYL, Ctrl+S en Opslaan als zetten het ontwerp dan altijd in de map Downloads.",
   "workspace.confirmTabClose": "Vragen voor het sluiten van het tabblad",
   "workspace.confirmTabCloseHint": "Is er een ontwerp open, dan stelt de browser bij het sluiten of herladen van het tabblad zijn eigen vraag \"Site verlaten?\". Je ontwerpen worden na elke wijziging toch opgeslagen, de vraag is alleen een herinnering. De tekst bepaalt de browser.",
   "workspace.softLighting": "Zacht licht",

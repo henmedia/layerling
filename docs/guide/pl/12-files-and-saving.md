@@ -38,6 +38,8 @@ Pojedynczy projekt zapisujesz w edytorze: {{ui:editor.export}}, wybierz format *
 
 **Gdy okno zapisu nic nie zapisuje.** Jeśli okno zamknie się bez pliku, komunikat u góry to powie i zaproponuje {{ui:status.saveAsDownload}}: projekt trafi wtedy do folderu Pobrane, jak w Firefoksie. Przeglądarka zgłasza okno zamknięte przyciskiem Anuluj tak samo jak okno, którego nie mogła użyć, więc na komputerze, na którym okno zapisu zawodzi w każdym folderze, w ten sposób nadal zapiszesz.
 
+Eksport STL, którego okno nie zwraca pliku, dostaje ten sam komunikat i przycisk. Aby całkiem pominąć okno zapisu, włącz {{ui:workspace.lylAsDownload}} w ustawieniach pod {{ui:workspace.appearance}}: {{ui:export.saveProject}} i [[Ctrl]]+[[S]] zapisują wtedy projekt zawsze jako pobranie, a {{ui:workspace.stlAsDownload}} robi to samo dla STL.
+
 ## Załączniki
 
 Instrukcja, lista części, notatki, zdjęcie albo karta katalogowa mogą zostać przy projekcie jako pliki. {{ui:editor.attachments}} w grupie {{ui:editor.group.file}} na wstążce, spinacz, otwiera listę. Mała kropka na spinaczu pokazuje, że projekt jakieś ma.

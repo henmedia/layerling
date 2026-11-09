@@ -566,6 +566,8 @@ export type WorkplaneWorkspaceSettings = {
   objectSnap: boolean;
   /** An STL leaves as a plain download each time, which the browser numbers (name (1).stl), instead of writing into one linked file (#731). */
   stlAsDownload: boolean;
+  /** Export > LYL, Ctrl+S and Save as leave as a plain download, without the browser's save dialog (Discussion #1449). */
+  lylAsDownload: boolean;
   /** The browser asks "Leave site?" when a design is open and the tab is closed or reloaded; off by default (#683 mail). */
   confirmTabClose: boolean;
   dimensionsAlwaysVisible: boolean;

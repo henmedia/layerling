@@ -4688,6 +4688,8 @@ export const MESSAGES_IT: Partial<Record<MessageKey, string>> = {
   "workspace.objectSnap": "Aggancia alle altre forme durante lo spostamento",
   "workspace.stlAsDownload": "Scarica STL come file",
   "workspace.stlAsDownloadHint": "Chrome ed Edge salvano ogni STL sovrascrivendo lo stesso file. Attiva questa opzione per scaricarlo normalmente: il browser aggiungerà un numero ai file, come nome (1).stl e nome (2).stl.",
+  "workspace.lylAsDownload": "Scarica i progetti come file",
+  "workspace.lylAsDownloadHint": "Su alcuni PC la finestra di salvataggio di Chrome ed Edge non restituisce alcun file. Attiva questa opzione per saltarla: Esporta > LYL, Ctrl+S e Salva con nome mettono allora sempre il progetto nella cartella Download.",
   "workspace.confirmTabClose": "Chiedi prima di chiudere la scheda",
   "workspace.confirmTabCloseHint": "Con un progetto aperto, il browser fa la sua domanda «Lasciare il sito?» quando chiudi o ricarichi la scheda. I progetti vengono comunque salvati dopo ogni modifica, la domanda è solo un promemoria. Il testo lo decide il browser.",
   "workspace.softLighting": "Illuminazione uniforme",

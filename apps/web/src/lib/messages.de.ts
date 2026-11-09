@@ -4703,6 +4703,8 @@ export const MESSAGES_DE: Record<MessageKey, string> = {
   "workspace.objectSnap": "Beim Verschieben an anderen Formen fangen",
   "workspace.stlAsDownload": "STL als Download speichern",
   "workspace.stlAsDownloadHint": "Chrome und Edge schreiben eine STL jedes Mal in dieselbe Datei. Mit diesem Schalter kommt stattdessen ein normaler Download: Der Browser nummeriert dann die Dateien, name (1).stl, name (2).stl.",
+  "workspace.lylAsDownload": "Entwürfe als Download speichern",
+  "workspace.lylAsDownloadHint": "Auf manchen PCs gibt das Speicherfenster von Chrome und Edge keine Datei zurück. Mit diesem Schalter fällt es weg: Export > LYL, Strg+S und Speichern unter legen den Entwurf dann immer in den Download-Ordner.",
   "workspace.confirmTabClose": "Vor dem Schließen des Tabs nachfragen",
   "workspace.confirmTabCloseHint": "Ist ein Entwurf offen, fragt der Browser beim Schließen oder Neuladen des Tabs mit seiner eigenen Frage „Seite verlassen?“ nach. Deine Entwürfe sind nach jeder Änderung ohnehin gespeichert, die Frage ist nur eine Gedächtnisstütze. Den Wortlaut bestimmt der Browser.",
   "workspace.softLighting": "Weiches Licht",

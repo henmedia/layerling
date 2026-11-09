@@ -38,6 +38,8 @@ You back up a single design in the editor: {{ui:editor.export}}, choose the form
 
 **When the save dialog saves nothing.** If the dialog closes without a file, the message at the top says so and offers {{ui:status.saveAsDownload}}: the design then goes to the Downloads folder like in Firefox. The browser reports a dialog closed with Cancel the same way as one it could not use, so on a PC where the save dialog fails for every folder this is the way to keep saving.
 
+An STL export whose dialog hands back no file gets the same message and button. To leave the save dialog out altogether, switch on {{ui:workspace.lylAsDownload}} in the settings under {{ui:workspace.appearance}}: {{ui:export.saveProject}} and [[Ctrl]]+[[S]] then always save the design as a download, and {{ui:workspace.stlAsDownload}} does the same for STL.
+
 ## Attachments
 
 Instructions, a parts list, notes, a photo or a datasheet can stay with the design as files. {{ui:editor.attachments}} in the {{ui:editor.group.file}} group of the ribbon, the paperclip, opens the list; a small dot on the paperclip shows that the design has some.

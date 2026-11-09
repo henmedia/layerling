@@ -38,6 +38,8 @@ Vous sauvegardez un seul dessin dans l'éditeur : {{ui:editor.export}}, choisiss
 
 **Quand la fenêtre d'enregistrement n'enregistre rien.** Si la fenêtre se ferme sans fichier, le message en haut le dit et propose {{ui:status.saveAsDownload}} : le design va alors dans le dossier Téléchargements, comme dans Firefox. Le navigateur signale une fenêtre fermée avec Annuler de la même façon qu'une fenêtre qu'il n'a pas pu utiliser ; sur un PC où la fenêtre d'enregistrement échoue dans tous les dossiers, c'est ainsi qu'on continue d'enregistrer.
 
+Un export STL dont la fenêtre ne rend aucun fichier reçoit le même message et le même bouton. Pour vous passer complètement de la fenêtre d'enregistrement, activez {{ui:workspace.lylAsDownload}} dans les paramètres, sous {{ui:workspace.appearance}} : {{ui:export.saveProject}} et [[Ctrl]]+[[S]] enregistrent alors toujours le design comme téléchargement, et {{ui:workspace.stlAsDownload}} fait de même pour le STL.
+
 ## Pièces jointes
 
 Des instructions, une liste de pièces, des notes, une photo ou une fiche technique peuvent rester avec la création sous forme de fichiers. {{ui:editor.attachments}} dans la barre {{ui:editor.group.file}}, le trombone, ouvre la liste ; un petit point sur le trombone indique que la création en a.

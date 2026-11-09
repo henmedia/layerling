@@ -1035,6 +1035,12 @@ export function WorkspaceSettingsModal({
                     onChange={(stlAsDownload) => patchWorkspace({ stlAsDownload })}
                   />
                   <WorkspaceToggle
+                    label={t("workspace.lylAsDownload")}
+                    description={t("workspace.lylAsDownloadHint")}
+                    checked={workspace.lylAsDownload}
+                    onChange={(lylAsDownload) => patchWorkspace({ lylAsDownload })}
+                  />
+                  <WorkspaceToggle
                     label={t("workspace.confirmTabClose")}
                     description={t("workspace.confirmTabCloseHint")}
                     checked={workspace.confirmTabClose}

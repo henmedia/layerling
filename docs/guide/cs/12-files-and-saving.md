@@ -38,6 +38,8 @@ Jeden projekt uložíte v editoru přes {{ui:editor.export}}, formát **LYL** a 
 
 **Když okno pro uložení nic neuloží.** Zavře-li se okno bez souboru, hlášení nahoře to řekne a nabídne {{ui:status.saveAsDownload}}: návrh pak půjde do složky Stažené soubory jako ve Firefoxu. Prohlížeč hlásí okno zavřené tlačítkem Zrušit stejně jako okno, které nemohl použít, takže na počítači, kde okno pro uložení selže v každé složce, takto ukládáte dál.
 
+Export STL, jehož okno nevrátí žádný soubor, dostane stejné hlášení i tlačítko. Chcete-li okno pro uložení vynechat úplně, zapněte v nastavení pod {{ui:workspace.appearance}} volbu {{ui:workspace.lylAsDownload}}: {{ui:export.saveProject}} a [[Ctrl]]+[[S]] pak návrh vždy uloží jako stažení a {{ui:workspace.stlAsDownload}} dělá totéž pro STL.
+
 ## Přílohy
 
 Návod, seznam dílů, poznámky, fotka nebo katalogový list mohou zůstat u projektu jako soubory. {{ui:editor.attachments}} v liště {{ui:editor.group.file}}, sponka, otevře seznam; malá tečka na sponce ukazuje, že projekt nějaké má.

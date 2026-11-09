@@ -38,6 +38,8 @@ Een losse back-up van één ontwerp maak je in de editor: {{ui:editor.export}}, 
 
 **Als het opslagvenster niets opslaat.** Sluit het venster zonder bestand, dan zegt de melding bovenaan dat en biedt {{ui:status.saveAsDownload}} aan: het ontwerp gaat dan naar de map Downloads, zoals in Firefox. De browser meldt een venster dat met Annuleren is gesloten op dezelfde manier als een venster dat hij niet kon gebruiken; op een pc waar het opslagvenster in elke map mislukt, blijf je zo toch opslaan.
 
+Een STL-export waarvan het venster geen bestand teruggeeft, krijgt dezelfde melding en knop. Wil je het opslagvenster helemaal overslaan, zet dan in de instellingen onder {{ui:workspace.appearance}} {{ui:workspace.lylAsDownload}} aan: {{ui:export.saveProject}} en [[Ctrl]]+[[S]] slaan het ontwerp dan altijd op als download, en {{ui:workspace.stlAsDownload}} doet hetzelfde voor STL.
+
 ## Bijlagen
 
 Een instructie, een onderdelenlijst, notities, een foto of een datasheet kunnen als bestanden bij het ontwerp blijven. {{ui:editor.attachments}} in de balk {{ui:editor.group.file}}, de paperclip, opent de lijst; een klein stipje op de paperclip laat zien dat het ontwerp er heeft.

@@ -4692,6 +4692,8 @@ export const MESSAGES_ZH_TW: Partial<Record<MessageKey, string>> = {
   "workspace.objectSnap": "移動時吸附到其他形狀",
   "workspace.stlAsDownload": "將 STL 另存為下載",
   "workspace.stlAsDownloadHint": "Chrome 和 Edge 每次都會把 STL 寫入同一個檔案。開啟此選項則改為一般下載：瀏覽器會為檔案編號，name (1).stl、name (2).stl。",
+  "workspace.lylAsDownload": "將設計另存為下載",
+  "workspace.lylAsDownloadHint": "在某些電腦上，Chrome 和 Edge 的儲存視窗不會傳回檔案。開啟此選項即可跳過它：匯出 > LYL、Ctrl+S 和另存新檔都會把設計直接放進下載資料夾。",
   "workspace.confirmTabClose": "關閉分頁前詢問",
   "workspace.confirmTabCloseHint": "設計開啟時，關閉或重新整理分頁會彈出瀏覽器自己的「離開網站？」問題。無論哪種方式，你的設計都會在每次變更後儲存，所以這個問題只是提醒。措辭由瀏覽器決定。",
   "workspace.softLighting": "柔和光照",

@@ -38,6 +38,8 @@ Du sikkerhedskopierer et enkelt design i editoren: {{ui:editor.export}}, vælg f
 
 **Når gem-vinduet ikke gemmer noget.** Lukker vinduet uden en fil, siger meddelelsen øverst det og tilbyder {{ui:status.saveAsDownload}}: designet går så til mappen Overførsler som i Firefox. Browseren melder et vindue lukket med Annuller på samme måde som et, den ikke kunne bruge, så på en pc, hvor gem-vinduet fejler i alle mapper, er dette vejen til at blive ved med at gemme.
 
+En STL-eksport, hvis vindue ikke giver en fil tilbage, får samme meddelelse og knap. Vil du helt springe gem-vinduet over, så slå {{ui:workspace.lylAsDownload}} til i indstillingerne under {{ui:workspace.appearance}}: {{ui:export.saveProject}} og [[Ctrl]]+[[S]] gemmer så altid designet som download, og {{ui:workspace.stlAsDownload}} gør det samme for STL.
+
 ## Vedhæftninger
 
 Instruktioner, en deleliste, noter, et foto eller et datablad kan blive ved designet som filer. {{ui:editor.attachments}} i {{ui:editor.group.file}}-gruppen i båndet, papirklemmen, åbner listen; en lille prik på papirklemmen viser at designet har nogle.

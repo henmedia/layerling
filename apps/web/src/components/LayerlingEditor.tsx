@@ -16615,11 +16615,14 @@ export function LayerlingEditor({
     return { shapes: hasSelection ? selectedShapes : shapes, selection: hasSelection };
   }, [buildPlates.count, buildPlates.exportPlate, hasSelection, selectedShapes, shapes]);
 
-  /** `chooseFile` asks for a new STL even when the design already has one (Save as). `svgView` picks what an SVG shows (#692). */
+  /**
+   * `chooseFile` asks for a new STL even when the design already has one (Save as); "download" skips the save dialog
+   * for this one export (the Download instead button, Discussion #1449). `svgView` picks what an SVG shows (#692).
+   */
   const exportDesign = useCallback(async (
     format: DirectExportFormat,
     exportName: string,
-    chooseFile = false,
+    chooseFile: boolean | "download" = false,
     svgView: SvgExportView = "silhouette",
     toServer = false,
     bridges: StencilBridgeOptions | null = null,
@@ -16767,18 +16770,25 @@ export function LayerlingEditor({
     const designId = projectId ?? "";
     let target: LylFileHandle | "download" = "download";
     // With "Save STL as a download" the browser hands out the files, and numbers them (#731).
-    if (format === "stl" && !toServer && !plateRun && lylFileAccessSupported() && !workspaceSettingsRef.current.stlAsDownload) {
+    if (format === "stl" && !toServer && !plateRun && chooseFile !== "download" && lylFileAccessSupported() && !workspaceSettingsRef.current.stlAsDownload) {
       try {
         const linkedBefore = linkedStlFile(designId);
         // A name typed in the window that is not the linked file's asks for a file of its own (reported by mail, 15.10.2026).
-        const linked = chooseFile || stlNameAsksForNewFile(exportName, projectName, linkedBefore?.name) ? null : linkedBefore;
+        const linked = chooseFile === true || stlNameAsksForNewFile(exportName, projectName, linkedBefore?.name) ? null : linkedBefore;
         if (linked && !(await ensureLylFileWritable(linked))) {
           setNotice(t("status.fileNotWritable", { name: linked.name }), true);
           return;
         }
         const picked = linked ?? await pickStlFileToSave(projectExportFileName(exportName, "stl"));
-        // Closed without a choice: nothing to do.
-        if (!picked) return;
+        // Closed without a choice: nothing is written, and the status line says so. The browser reports a folder it
+        // would not hand over the same way, and on some PCs that is every folder: a download still works (Discussion #1449).
+        if (!picked) {
+          setNotice(t("status.saveNothingChosen"), true, {
+            label: t("status.saveAsDownload"),
+            run: () => void exportDesignRef.current?.("stl", exportName, "download", svgView, toServer, bridges),
+          });
+          return;
+        }
         target = picked;
       } catch {
         target = "download";
@@ -16935,7 +16945,8 @@ export function LayerlingEditor({
     let fileHandle: LylFileHandle | null = null;
     let pickedNewFile = false;
     if (target === "file" || target === "fileAs") {
-      if (!lylFileAccessSupported()) {
+      // "Save designs as a download" skips the save dialog every time (Discussion #1449).
+      if (!lylFileAccessSupported() || workspaceSettingsRef.current.lylAsDownload) {
         target = "download";
       } else {
         try {
