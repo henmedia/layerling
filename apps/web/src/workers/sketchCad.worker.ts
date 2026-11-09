@@ -2,7 +2,7 @@
 
 import { OcctKernel, type OcctModuleFactory, type ShapeHandle } from "occt-wasm";
 import { CAD_MODIFIER_RUNTIME_BASE } from "@/lib/cadModifierRuntime";
-import { sketchCadDeflection } from "@/lib/sketchCadDeflection";
+import { sketchCadDeflection, sketchRevolveCadDeflection } from "@/lib/sketchCadDeflection";
 import { cadSketchRegions } from "@/lib/sketchCadProfile";
 import { buildRevolvedSketchSolid } from "@/lib/cadSketchRevolve";
 import { buildStrokedSketchSolid, chamferTopEdges } from "@/lib/cadSketchStroke";
@@ -94,7 +94,7 @@ self.onmessage = async (event: MessageEvent<SketchCadBuildRequest>) => {
       if (!chamfered) throw new Error(SKETCH_EDGE_FAILED);
       result = chamfered;
     }
-    const deflection = sketchCadDeflection(request.profile);
+    const deflection = request.revolve ? sketchRevolveCadDeflection(request.profile, request.revolve.smoothness) : sketchCadDeflection(request.profile);
     const mesh = cad.tessellate(result, { linearDeflection: deflection.linear, angularDeflection: deflection.angular });
     const positions = new Float32Array(mesh.positions);
     const normals = new Float32Array(mesh.normals);

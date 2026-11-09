@@ -80,6 +80,8 @@ export type LidHingeStyle = "outside" | "flush" | "pivot";
  * as thick as the plate; `notch` a finger recess in the body's outer wall just below the lid's edge.
  */
 export type LidHandle = "none" | "tab" | "notch";
+/** How the top rim of a screw or bayonet cap ends: square, rounded or chamfered (Discussion #1426). */
+export type LidTopEdge = "square" | "round" | "chamfer";
 
 /**
  * The kind of lid; the plate's thickness, the gap per side, how deep the lip or rim reaches down and how thick its wall
@@ -115,6 +117,8 @@ export type LidHandle = "none" | "tab" | "notch";
  * With `tether`, a screw or bayonet cap comes with a tether that keeps it on the body (see `tetherPlan`).
  * With `flipTop`, a screw or bayonet cap's plate has a round opening `flipTopOpening` mm across, closed by a flap printed
  * in it, the gap round it, and joined to the plate by a thin strip that bends as a hinge.
+ * `topEdge` rounds or chamfers the outer top rim of a screw or bayonet cap by `topEdgeSize` mm, at most the plate's
+ * thickness (Discussion #1426): the cap is one mesh with its thread, far too many triangles for the edge tool afterwards.
  */
 export type LidOptions = {
   type: LidType;
@@ -150,6 +154,8 @@ export type LidOptions = {
   tether: boolean;
   flipTop: boolean;
   flipTopOpening: number;
+  topEdge: LidTopEdge;
+  topEdgeSize: number;
   slideSide: LidHingeSide;
   slideFrame: number;
 };
@@ -160,7 +166,7 @@ export const LID_DEFAULTS: LidOptions = {
   hinge: false, hingePin: 1.75, hingeGap: 0.3, hingePinPlay: 0.2, hingeKnuckles: 0, hingePrintPin: false, hingeSide: "back", hingeTeardrop: true, hingeStyle: "outside", hingeEndPlugs: false,
   clickBumps: false, clickBumpHeight: 0.4, handle: "none", threadPitch: 3, threadTurns: 2, threadStandard: "own",
   bayonetLugs: 3, bayonetDepth: 8, bayonetAxialGap: 0.3, bayonetDetent: 0.3, bayonetTurn: 0, tether: false,
-  flipTop: false, flipTopOpening: 8, slideSide: "front", slideFrame: 0,
+  flipTop: false, flipTopOpening: 8, topEdge: "square", topEdgeSize: 1, slideSide: "front", slideFrame: 0,
 };
 /**
  * What a lid starts from with this printer's play (printerPlay.ts): the gap per side and the hinge pin's play take it,
@@ -263,6 +269,7 @@ const END_PLUG_DEPTH = 4;
 const MIN_END_PLUG_DEPTH = 2;
 const END_PLUG_KEEP = 1.5;
 export const LID_HANDLES: readonly LidHandle[] = ["none", "tab", "notch"];
+export const LID_TOP_EDGES: readonly LidTopEdge[] = ["square", "round", "chamfer"];
 /** A click bump's radius, in mm: a piece of a ball standing out of the lip's or the rim's face. */
 const BUMP_RADIUS = 1.5;
 /**
@@ -601,6 +608,9 @@ const TETHER_SLACK = 3;
  */
 export const MIN_FLIP_TOP_OPENING = 4;
 export const MAX_FLIP_TOP_OPENING = 40;
+/** A cap's rounded or chamfered top rim, in mm (Discussion #1426); it is held to the plate's thickness when the cap is made. */
+export const MIN_LID_TOP_EDGE = 0.2;
+export const MAX_LID_TOP_EDGE = 5;
 /**
  * How deep the flap's seat reaches into the plate, in mm: the flap narrows at 45 degrees from the plate's top down to the
  * opening, the plate's edge round it alike the gap further out, so pressed down it rests there and cannot be pushed in.
@@ -734,6 +744,10 @@ export function normalizeLidOptions(value?: Partial<Record<keyof LidOptions, unk
   if (value?.flipTop === true || value?.flipTop === "true") result.flipTop = true;
   const flipTopOpening = finiteNumber(value?.flipTopOpening);
   if (flipTopOpening !== null) result.flipTopOpening = clamp(flipTopOpening, MIN_FLIP_TOP_OPENING, MAX_FLIP_TOP_OPENING);
+  const topEdge = typeof value?.topEdge === "string" ? value.topEdge.trim().toLowerCase() : "";
+  if ((LID_TOP_EDGES as readonly string[]).includes(topEdge)) result.topEdge = topEdge as LidTopEdge;
+  const topEdgeSize = finiteNumber(value?.topEdgeSize);
+  if (topEdgeSize !== null) result.topEdgeSize = clamp(topEdgeSize, MIN_LID_TOP_EDGE, MAX_LID_TOP_EDGE);
   return result;
 }
 
@@ -759,6 +773,41 @@ export function lidTakesMagnets(options: Pick<LidOptions, "type">) {
   return lidTakesExtras(options) && options.type !== "slide";
 }
 
+
+/** Whether the top rim can be rounded or chamfered: a screw or bayonet cap, round as it is (Discussion #1426). */
+export function lidTopEdgeFits(options: Pick<LidOptions, "type">) {
+  return options.type === "screw" || options.type === "bayonet";
+}
+
+/** How far a cap's top rim is rounded or chamfered: the size asked for, at most the plate's thickness so the rim stays whole. */
+export function lidTopEdgeSize(options: Pick<LidOptions, "topEdgeSize" | "thickness">) {
+  return Math.min(options.topEdgeSize, options.thickness);
+}
+
+/**
+ * A screw or bayonet cap with its outer top rim rounded or chamfered (`topEdge`, Discussion #1426), in the frame where z
+ * is up and the plate's top is `plateTop`: a ring turned about the cap's axis cuts the corner away, `size` down the side
+ * and in across the top. It reaches no deeper than the plate, so the cap's thread and rim are left as they are; turned
+ * over to print, that rim lies on the plate, where a chamfer prints cleanly and a small rounding does too.
+ */
+function capWithTopEdge(runtime: ManifoldToplevel, cap: ManifoldSolid, centre: Point, capRadius: number, plateTop: number, options: LidOptions, created: { delete?: () => void }[]) {
+  if (options.topEdge === "square") return cap;
+  const size = lidTopEdgeSize(options);
+  if (!(size > 0)) return cap;
+  const sides = Math.min(512, Math.max(96, 4 * Math.ceil((2 * Math.PI * capRadius) / SCREW_STEP / 4)));
+  const out = capRadius + 1;
+  // From the plate's top, round the corner and down the side, in (distance from the axis, height).
+  const corner: [number, number][] = options.topEdge === "chamfer"
+    ? [[capRadius, plateTop - size], [capRadius - size, plateTop]]
+    : Array.from({ length: 17 }, (_unused, index): [number, number] => {
+        const angle = (index / 16) * (Math.PI / 2);
+        return [capRadius - size + size * Math.cos(angle), plateTop - size + size * Math.sin(angle)];
+      });
+  const points: [number, number][] = [[capRadius - size, plateTop + 1], [out, plateTop + 1], [out, plateTop - size], ...corner];
+  const profile = keep(created, new runtime.CrossSection([points], "NonZero"));
+  const ring = keep(created, keep(created, profile.revolve(sides)).translate([centre[0], centre[1], 0]));
+  return keep(created, cap.subtract(ring));
+}
 
 /**
  * Whether a flip-top goes with this kind of lid: a cap that stays on while the flap in its plate opens, a screw lid's or
@@ -3049,7 +3098,7 @@ export function lidForSolid(runtime: ManifoldToplevel, body: ManifoldSolid, give
       const plan = screwPlan(sliceAt, options, top, box.min[2], rim);
       if ("error" in plan) return { error: plan.error };
       const solids = screwSolids(runtime, plan, options, top, created);
-      parts.push(solids.cap);
+      parts.push(capWithTopEdge(runtime, solids.cap, plan.centre, plan.capRadius, top + options.thickness, options, created));
       screw = { plan, thread: solids.thread };
     } else if (options.type === "screwIn") {
       const plan = screwInPlan(sliceAt, options, top, box.min[2], rim);
@@ -3061,7 +3110,7 @@ export function lidForSolid(runtime: ManifoldToplevel, body: ManifoldSolid, give
       const plan = bayonetPlan(sliceAt, options, top, box.min[2], rim);
       if ("error" in plan) return { error: plan.error };
       const solids = bayonetSolids(runtime, plan, options, top, created);
-      parts.push(solids.cap);
+      parts.push(capWithTopEdge(runtime, solids.cap, plan.centre, plan.capRadius, top + options.thickness, options, created));
       bayonet = { plan, lugs: solids.lugs };
     } else if (options.type === "slide") {
       // Worked out with the box turned back square, if it stands turned on the plate (`slideBoxTurn`), and the wall it

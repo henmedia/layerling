@@ -22,7 +22,10 @@ import {
   MAX_BAYONET_LUGS,
   MAX_BAYONET_TURN,
   MAX_CLICK_BUMP_HEIGHT,
+  LID_TOP_EDGES,
   MAX_FLIP_TOP_OPENING,
+  MAX_LID_TOP_EDGE,
+  MIN_LID_TOP_EDGE,
   MAX_HINGE_GAP,
   MAX_HINGE_KNUCKLES,
   MAX_HINGE_PIN,
@@ -67,6 +70,8 @@ import {
   lidTetherFits,
   lidThicknessForMagnets,
   lidThread,
+  lidTopEdgeFits,
+  lidTopEdgeSize,
   normalizeLidOptions,
   slideFrameNeeded,
   type LidOptions,
@@ -500,6 +505,44 @@ export function LidPanel({
               <span className="shell-openings-summary" role="status">{t("lid.error.flipTopThin", { thickness: millimetres(flipTopNeeds) })}</span>
             ) : null}
             <span className="shell-openings-summary">{t("lid.flipTopHint")}</span>
+          </>) : null}
+        </>) : null}
+        {/* A cap's top rim rounded or chamfered as it is made: afterwards it is one mesh with its thread, too large for the edge tool (Discussion #1426). */}
+        {lidTopEdgeFits(settings) ? (<>
+          <div className="edge-modifier-field shell-openings" role="radiogroup" aria-label={t("lid.topEdge")}>
+            <span>{t("lid.topEdge")}</span>
+            <div className="shell-opening-options">
+              {LID_TOP_EDGES.map((option) => (
+                <button
+                  key={option}
+                  type="button"
+                  role="radio"
+                  aria-checked={settings.topEdge === option}
+                  className={settings.topEdge === option ? "active" : ""}
+                  disabled={busy}
+                  onClick={() => onChange({ topEdge: option })}
+                >
+                  {t(`lid.topEdge.${option}`)}
+                </button>
+              ))}
+            </div>
+          </div>
+          {settings.topEdge !== "square" ? (<>
+            <EdgeModifierSlider
+              label={t("lid.topEdgeSize")}
+              value={settings.topEdgeSize}
+              min={MIN_LID_TOP_EDGE}
+              max={MAX_LID_TOP_EDGE}
+              step={0.1}
+              workspace={workspace}
+              length
+              disabled={busy}
+              onChange={(value) => onChange({ topEdgeSize: value })}
+            />
+            {lidTopEdgeSize(settings) < settings.topEdgeSize - 1e-9 ? (
+              <span className="shell-openings-summary" role="status">{t("lid.topEdgeThin", { size: millimetres(lidTopEdgeSize(settings)) })}</span>
+            ) : null}
+            <span className="shell-openings-summary">{t("lid.topEdgeHint")}</span>
           </>) : null}
         </>) : null}
       </>)}

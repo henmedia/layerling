@@ -1,1 +1,26 @@
-[]
+[
+  {
+    "title": {
+      "de": "Schraubkappe mit runder oder gefaster Oberkante",
+      "en": "Screw caps with a rounded or chamfered top edge",
+      "da": "Skruehætter med afrundet eller affaset øverste kant"
+    },
+    "body": {
+      "de": "Im Deckelfenster rundet oder fast „Obere Kante“ den oberen Rand einer Schraub- oder Bajonettkappe, gleich beim Erzeugen. Danach ginge es nicht mehr: Kappe und Gewinde sind ein Netz mit viel zu vielen Dreiecken für die Kantenbearbeitung.",
+      "en": "In the lid window, Top edge rounds or chamfers the top rim of a screw or bayonet cap as it is made. Afterwards it could not be done: cap and thread are one mesh with far too many triangles for the edge tool.",
+      "da": "I lågvinduet afrunder eller affaser Øverste kant den øverste kant på en skrue- eller bajonethætte, når den laves. Bagefter kan det ikke lade sig gøre: hætte og gevind er ét net med alt for mange trekanter til kantværktøjet."
+    }
+  },
+  {
+    "title": {
+      "de": "Glattere Drehkörper",
+      "en": "Smoother revolved bodies",
+      "da": "Glattere drejede legemer"
+    },
+    "body": {
+      "de": "Ein gedrehter Skizzenkörper hat in den Eigenschaften „Glätte“: Fein und Sehr fein teilen die runden Flächen in kleinere Facetten, damit sie an einem großen Topf im Druck nicht mehr zu sehen sind.",
+      "en": "A revolved sketch body has Smoothness in its properties: Fine and Extra fine cut the round faces into smaller facets, so they no longer show on the print of a large pot.",
+      "da": "Et drejet skitselegeme har Glathed i egenskaberne: Fin og Meget fin deler de runde flader i mindre facetter, så de ikke længere ses på printet af en stor krukke."
+    }
+  }
+]

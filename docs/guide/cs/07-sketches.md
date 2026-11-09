@@ -102,6 +102,8 @@ Nakreslete polovinu průřezu **nalevo od zobrazené osy**. Vedle náčrtu uvid�
 
 Rotační těleso má přesnou geometrii stejně jako vysunuté. Podporuje zaoblení, zkosení a dutiny pro nádoby či vázy. Starší verze vytvářely síť; otevřením {{ui:inspector.editSketch}} a opětovným dokončením získáte přesné těleso. Profil přesahující přes osu zůstává sítí, protože jej nelze přesně sestavit.
 
+**Hladší kulaté plochy: {{ui:prop.revolveSmoothness}}.** Přesné rotační těleso se pro zobrazení, export a tisk dělí na malé rovné fazety a na velkém květináči mohou být na výtisku vidět. Vyberte těleso a v panelu vlastností nastavte {{ui:prop.revolveSmoothness}} na {{ui:prop.revolveSmoothnessFine}} nebo {{ui:prop.revolveSmoothnessExtraFine}}: kulaté plochy se dělí jemněji, za cenu více trojúhelníků a pomalejšího návrhu. Šroubovice nebo rotace ze sítě má k tomu {{ui:prop.sides}}.
+
 **Jedno souvislé vlákno: {{ui:prop.pitch}}.** Rotace udělá z obrysu uzavřené prstence. Vyberte rotační těleso a v panelu vlastností mu nastavte {{ui:prop.pitch}} větší než 0, tedy o kolik stoupne za jednu otáčku, a obrys se navine do šroubovice: jedno souvislé vlákno jako filament na cívce nebo pružina. Z {{ui:prop.sweep}} se pak stane {{ui:prop.turns}}, až 200; záporné číslo navíjí doleva. Závity bližší, než je výška obrysu, splynou v jedno těleso, takže funguje i plné jádro s jemnou roztečí. Šroubovice se staví jako síť, zaoblení, zkosení ani dutina na ni nefungují; při mnoha závitech držte {{ui:prop.sides}} nízko. Rozteč 0 dělá opět prstence.
 
 ## Protažení podél dráhy

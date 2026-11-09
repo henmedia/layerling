@@ -98,6 +98,8 @@ Forgatásnál a keresztmetszet felét **a vázlatban látható tengelytől balra
 
 A forgatott test pontos test, mint a kihúzott: fogadja az élletörést és a lekerekítést, és kiüregelheted, egy pohárhoz vagy vázához. Egy régebbi layerlinggel forgatott test háló; nyisd meg a {{ui:inspector.editSketch}} gombbal, és fejezd be újra, hogy pontos legyen. Egy tengelyen átnyúló profil nem építhető fel pontosan, és háló lesz belőle, mint korábban.
 
+**Simább kerek felületek: {{ui:prop.revolveSmoothness}}.** A pontos forgástestet a nézethez, az exporthoz és a nyomtatáshoz kis sík lapokra bontja a program, és egy nagy cserépen ezek látszhatnak a nyomaton. Jelöld ki a testet, és a tulajdonságpanelen állítsd a {{ui:prop.revolveSmoothness}} értékét {{ui:prop.revolveSmoothnessFine}} vagy {{ui:prop.revolveSmoothnessExtraFine}} fokozatra: a kerek felületek finomabban oszlanak fel, több háromszög és lassabb terv árán. Csavarvonalnál vagy hálós forgatásnál erre a {{ui:prop.sides}} szolgál.
+
 **Egyetlen folytonos szál: {{ui:prop.pitch}}.** A forgatás a körvonalból zárt gyűrűket készít. Jelöld ki a forgatott testet, és a tulajdonságpanelen adj neki 0-nál nagyobb {{ui:prop.pitch}} értéket, vagyis hogy fordulatonként mennyit emelkedik, és a körvonal csavarvonalba tekeredik: egyetlen folytonos szál, mint a filament az orsón vagy egy rugó. A {{ui:prop.sweep}} helyén ekkor {{ui:prop.turns}} áll, legfeljebb 200; a negatív szám balos tekercselést ad. A körvonal magasságánál sűrűbb menetek egyetlen testté olvadnak össze, így egy tömör mag finom menetemelkedéssel is működik. A csavarvonal hálóként épül, így lekerekítés, élletörés és kiüregelés nem működik rajta; sok menetnél tartsd alacsonyan a {{ui:prop.sides}} értékét. A 0 menetemelkedés ismét gyűrűket ad.
 
 ## Végighúzás egy pályán

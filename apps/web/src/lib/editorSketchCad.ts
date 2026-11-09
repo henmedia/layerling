@@ -295,7 +295,7 @@ async function cadShapeFromSketchRevolve(
       type: "build",
       profile: cloneSketchProfile(profile),
       height: MIN_SHAPE_DIMENSION,
-      revolve: { startAngle: settings.startAngle, sweepAngle: settings.sweepAngle },
+      revolve: { startAngle: settings.startAngle, sweepAngle: settings.sweepAngle, ...(settings.smoothness ? { smoothness: settings.smoothness } : {}) },
     });
     if (response.type === "error") return null;
     const source = canonicalizeShape({
