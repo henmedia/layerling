@@ -1361,7 +1361,7 @@ export function lidThicknessForMagnets(options: Pick<LidOptions, "magnetHeight">
 }
 
 export type LidError =
-  | { code: "notClosed" | "notOpen" | "tooSmall" | "tooShallow" | "empty" | "magnetsNoRoom" | "hingeLidType" | "hingeNoBack" | "hingeTooLow" | "hingeStyleStraight" | "hingeStyleMagnets" | "pivotNoSides" }
+  | { code: "notClosed" | "notOpen" | "rimNotLevel" | "tooSmall" | "tooShallow" | "empty" | "magnetsNoRoom" | "hingeLidType" | "hingeNoBack" | "hingeTooLow" | "hingeStyleStraight" | "hingeStyleMagnets" | "pivotNoSides" }
   | { code: "endPlugsFlush" | "endPlugsShort" }
   | { code: "clickBumpsNoLip" | "clickBumpsNoRoom" | "handlePivot" | "handleSideShort" | "handleNotchNoRoom" }
   | { code: "screwExtras" | "screwNotRound" | "screwThinWall" }
@@ -2985,7 +2985,12 @@ export function lidForSolid(runtime: ManifoldToplevel, body: ManifoldSolid, give
     const hasOpening = opening.area() >= MIN_OPENING_AREA;
     // A standard's cap is made to the standard whatever the body: a stand-in for a bottle from the shop may be solid.
     const standardCap = options.type === "screw" && options.threadStandard !== "own";
-    if (options.type !== "flat" && !hasOpening && !standardCap) return { error: { code: "notOpen" } };
+    if (options.type !== "flat" && !hasOpening && !standardCap) {
+      // Open lower down, under a rim that slopes (a top cut off at an angle, Discussion #1544): a lid follows a level rim.
+      const middle = keep(created, up.slice(box.min[2] + height / 2));
+      const openBelow = keep(created, filled(runtime, middle, created).subtract(middle)).area() >= MIN_OPENING_AREA;
+      return { error: { code: openBelow ? "rimNotLevel" : "notOpen" } };
+    }
     // A screw lid's rim and a screw-in lid's plug reach down as far as their thread does, a bayonet's by its own depth, not by `depth`; a slide-in lid has neither lip nor rim.
     if (options.type !== "flat" && options.type !== "screw" && options.type !== "screwIn" && options.type !== "bayonet" && options.type !== "slide" && options.depth >= height) return { error: { code: "tooShallow" } };
     // A screw lid holds by its thread alone, screwed on or in, and a bayonet lid by its lugs, all turned to close.
@@ -3567,6 +3572,8 @@ export function lidErrorMessage(error: LidError) {
       return t("lid.error.notClosed");
     case "notOpen":
       return t("lid.error.notOpen");
+    case "rimNotLevel":
+      return t("lid.error.rimNotLevel");
     case "tooSmall":
       return t("lid.error.tooSmall");
     case "tooShallow":

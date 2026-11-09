@@ -859,6 +859,7 @@ export const MESSAGES_DE: Record<MessageKey, string> = {
   "lid.error.needsBody": "Wähle zuerst den Körper, für den der Deckel sein soll.",
   "lid.error.notClosed": "Der Körper ist nicht geschlossen, dafür lässt sich kein Deckel machen. Schließe oder repariere ihn zuerst.",
   "lid.error.notOpen": "Der Körper hat oben keine Öffnung. Höhle ihn zuerst mit offener Oberseite aus, oder nimm einen flachen Deckel.",
+  "lid.error.rimNotLevel": "Der Rand ist schräg. Ein Deckel braucht einen waagerechten Rand. Für einen Deckel, der der Schräge folgt, den Körper geschlossen aushöhlen und mit „Teilen“ an einer geneigten Ebene dort trennen, wo der Deckel abgehen soll.",
   "lid.error.tooSmall": "Die Öffnung ist für eine Lippe mit diesem Spalt zu klein. Nimm einen kleineren Spalt oder einen flachen Deckel.",
   "lid.error.tooShallow": "Lippe oder Rand reichen tiefer, als der Körper hoch ist. Mach sie kürzer.",
   "lid.error.empty": "Der Deckel wäre leer.",

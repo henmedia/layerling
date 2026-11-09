@@ -82,8 +82,33 @@ export function shellOpeningFacesBySide(cad: OcctKernel, solid: ShapeHandle, fac
       if (facesOut && atEdge) found.get(side)?.push(face);
     });
   });
+  // No flat face square to a side, as on a box whose top was cut off at an angle (Discussion #1544): the flat face
+  // that leans that way most and reaches furthest out on it is that side's opening - the sloping top.
+  sides.forEach((side) => {
+    if ((found.get(side)?.length ?? 0) > 0) return;
+    const { axis, sign } = SIDE_AXES[side];
+    const [min, max] = extent[axis];
+    const tolerance = Math.max(1e-4, (max - min) * 1e-4);
+    const candidates = faces.flatMap((face) => {
+      if (cad.surfaceType(face) !== "plane") return [];
+      const normal = orientedFaceNormal(cad, face, cad.getSurfaceCenterOfMass(face));
+      if (normal[axis] * sign < SLANTED_OPENING_MIN_COSINE) return [];
+      const box = cad.getBoundingBox(face, false);
+      const reach = sign > 0 ? box[`${axis}max`] : -box[`${axis}min`];
+      return [{ face, reach, area: cad.getSurfaceArea(face) }];
+    });
+    if (candidates.length === 0) return;
+    const furthest = Math.max(...candidates.map((candidate) => candidate.reach));
+    const reaching = candidates.filter((candidate) => candidate.reach >= furthest - tolerance);
+    // Faces the slope was cut into (a groove across it) all lie in one plane; the largest one stands for it.
+    const largest = reaching.reduce((best, candidate) => (candidate.area > best.area ? candidate : best));
+    found.get(side)?.push(largest.face);
+  });
   return found;
 }
+
+/** A sloping face counts as a side's opening while it leans no more than 60 degrees away from facing that side. */
+const SLANTED_OPENING_MIN_COSINE = 0.5;
 
 /**
  * An inward offset of a body with an inner corner comes back as a closed shell
@@ -229,6 +254,13 @@ function shellBody(cad: OcctKernel, solid: ShapeHandle, thickness: number, openi
     // kernel's thick solid is never asked, which on some outlines does not come back at all.
     const outlined = shellByOutline(cad, solid, thickness, openings, edges);
     if (outlined) return outlined;
+    // A top cut off at an angle and left open: through the walls' outline as well (Discussion #1544).
+    const slopedTop = open.length > 0 && shellOpenSides(openings).every((side) => side === "top")
+      && open.some((face) => orientedFaceNormal(cad, face, cad.getSurfaceCenterOfMass(face)).y < 0.999);
+    if (slopedTop) {
+      const below = shellBelowSlopedTop(cad, solid, thickness, open, edges);
+      if (below) return below;
+    }
     const probe = Math.max(MIN_PROBE_WALL, Math.min(thickness / 4, PROBE_WALL));
     if (outlined === null && thickness > probe * 1.01) {
       const thin = shellByOutline(cad, solid, probe, openings, edges);
@@ -376,71 +408,143 @@ function shellByOutline(cad: OcctKernel, solid: ShapeHandle, thickness: number, 
       if (box.ymin > bounds.ymin + flat || box.ymax < bounds.ymax - flat) return undefined;
     }
     if (bottoms.length !== 1) return undefined;
-    const wires = cad.getSubShapes(bottoms[0], "wire");
-    made.push(...wires);
-    const outlines = wires
-      .map((wire) => ({ wire, area: cad.getSurfaceArea(keep(cad.makeFace(wire))) }))
-      .sort((a, b) => b.area - a.area);
-    // Sharp joins first where they are asked for; an outline of many short pieces can defeat them in 2D too, and
-    // rounded joins only touch the corners that point into the cavity, so they are the way out.
-    const joinTypes: Array<JoinType.Arc | JoinType.Intersection> = edges === "sharp" ? [JoinType.Intersection, JoinType.Arc] : [JoinType.Arc, JoinType.Intersection];
-    const low = sides.includes("bottom") ? bounds.ymin - 1 : bounds.ymin + thickness;
-    const high = sides.includes("top") ? bounds.ymax + 1 : bounds.ymax - thickness;
-    if (high - low <= flat) return null;
-    const pushedUp = (face: ShapeHandle) => keep(cad.extrude(keep(cad.translate(face, 0, low - bounds.ymin, 0)), 0, high - low, 0));
-    // The outline is moved as it is; where the kernel cannot move it cleanly, as straight pieces. Then the body the
-    // cavity is cut from is that outline pushed up too: a prism of arcs and a cavity of straight pieces did not cut.
-    const polygons = new Map<ShapeHandle, ShapeHandle | null>();
-    const polygonOf = (wire: ShapeHandle) => {
-      if (!polygons.has(wire)) polygons.set(wire, polygonWire(cad, wire, OUTLINE_DEFLECTION, keep));
-      return polygons.get(wire) ?? null;
-    };
-    const build = (asPolygon: boolean) => {
-      const wireOf = (wire: ShapeHandle) => (asPolygon ? polygonOf(wire) : wire);
-      const outer = wireOf(outlines[0].wire);
-      const inside = outer ? movedOutlineFace(cad, outer, -thickness, joinTypes, keep) : null;
-      if (!inside) return null;
-      let cavity = pushedUp(inside);
-      for (const { wire } of outlines.slice(1)) {
-        const hole = wireOf(wire);
-        const around = hole ? movedOutlineFace(cad, hole, thickness, joinTypes, keep) : null;
-        if (!around) return null;
-        cavity = keep(cad.cut(cavity, pushedUp(around)));
-      }
-      // The prism to cut from: the body itself, then its bottom face (or its outline as straight pieces, with the
-      // holes taken out) pushed up again, built the same way as the cavity.
-      const bottom = asPolygon
-        ? outlines.slice(1).reduce((face, { wire }) => keep(cad.cut(face, keep(cad.makeFace(polygonOf(wire)!)))), keep(cad.makeFace(outer!)))
-        : bottoms[0];
-      const prisms = asPolygon ? [keep(cad.extrude(bottom, 0, bounds.ymax - bounds.ymin, 0))] : [solid, keep(cad.extrude(bottom, 0, bounds.ymax - bounds.ymin, 0))];
-      for (const prism of prisms) {
-        // The cut comes back as a compound around the one solid; the hollowed body is that solid.
-        const solids = cad.getSubShapes(keep(cad.cut(prism, cavity)), "solid");
-        made.push(...solids);
-        if (solids.length !== 1) continue;
-        const volume = shapeIsValid(cad, solids[0]) ? cad.getVolume(solids[0]) : 0;
-        if (volume > 0 && volume < cad.getVolume(solid) * (1 - 1e-6)) return solids[0];
-      }
-      return null;
-    };
-    const tried = (asPolygon: boolean) => {
-      try {
-        return build(asPolygon);
-      } catch (error) {
-        if (mustSurface(error)) throw error;
-        return null;
-      }
-    };
-    const result = tried(false) ?? tried(true);
-    if (!result) return null;
-    made.splice(made.indexOf(result), 1);
-    return result;
+    return hollowedThroughOutline(cad, solid, bottoms[0], bounds, thickness, sides, edges, made, keep, true);
   } catch (error) {
     if (mustSurface(error)) throw error;
     return null;
   } finally {
     releaseAll(cad, made);
   }
+}
+
+/**
+ * A body standing straight up to a top cut off at an angle (Discussion #1544), with that top open: its outline,
+ * taken across halfway up, moved inward by the wall and pushed from the floor up through the sloping top, cut from
+ * the body. The kernel's thick solid and the offsets cannot take the round where a rounded box's walls meet its
+ * sloping top; they gave the body back untouched or did not finish at all. Undefined when the walls do not stand
+ * straight between the floor and the lowest point of the opening, null when the outline cannot be moved.
+ */
+function shellBelowSlopedTop(cad: OcctKernel, solid: ShapeHandle, thickness: number, open: ShapeHandle[], edges: ShellEdges): ShapeHandle | null | undefined {
+  const made: ShapeHandle[] = [];
+  const keep = (handle: ShapeHandle) => {
+    made.push(handle);
+    return handle;
+  };
+  try {
+    const bounds = cad.getBoundingBox(solid, false);
+    const flat = Math.max(1e-4, (bounds.ymax - bounds.ymin) * 1e-5);
+    const openLow = Math.min(...open.map((face) => cad.getBoundingBox(face, false).ymin));
+    const floor = bounds.ymin + thickness;
+    if (!(openLow - floor > thickness)) return undefined;
+    // The body cut across at a height: the face its slice lies on there, looking down.
+    const across = (height: number) => {
+      const slab = keep(cad.translate(keep(cad.makeBox(bounds.xmax - bounds.xmin + 2, 0.01, bounds.zmax - bounds.zmin + 2)), bounds.xmin - 1, height, bounds.zmin - 1));
+      const faces = cad.getSubShapes(keep(cad.common(solid, slab)), "face");
+      made.push(...faces);
+      const below = faces.filter((face) => {
+        if (cad.surfaceType(face) !== "plane") return false;
+        const center = cad.getSurfaceCenterOfMass(face);
+        return Math.abs(center.y - height) <= flat && orientedFaceNormal(cad, face, center).y < -0.999;
+      });
+      return below.length === 1 ? below[0] : null;
+    };
+    const lower = floor + (openLow - floor) * 0.25;
+    const upper = floor + (openLow - floor) * 0.75;
+    const low = across(lower);
+    const high = across(upper);
+    if (!low || !high) return undefined;
+    // Straight walls: the same outline low and high.
+    const lowArea = cad.getSurfaceArea(low);
+    if (!(Math.abs(cad.getSurfaceArea(high) - lowArea) <= lowArea * 1e-4)) return undefined;
+    const bottom = keep(cad.translate(low, 0, bounds.ymin - lower, 0));
+    return hollowedThroughOutline(cad, solid, bottom, bounds, thickness, ["top"], edges, made, keep, false);
+  } catch (error) {
+    if (mustSurface(error)) throw error;
+    return null;
+  } finally {
+    releaseAll(cad, made);
+  }
+}
+
+/**
+ * The cavity of shellByOutline: `bottom`'s outline moved inward by the wall (its holes outward), pushed up from the
+ * floor (or from below a bottom left open) to under the top (or above a top left open), cut from the body. With
+ * `rebuildPrism` the bottom pushed up stands in for a body the cut does not take. The result is taken out of `made`.
+ */
+function hollowedThroughOutline(
+  cad: OcctKernel,
+  solid: ShapeHandle,
+  bottom: ShapeHandle,
+  bounds: BoundingBox,
+  thickness: number,
+  sides: ShellSide[],
+  edges: ShellEdges,
+  made: ShapeHandle[],
+  keep: (handle: ShapeHandle) => ShapeHandle,
+  rebuildPrism: boolean,
+): ShapeHandle | null {
+  const flat = Math.max(1e-4, (bounds.ymax - bounds.ymin) * 1e-5);
+  const wires = cad.getSubShapes(bottom, "wire");
+  made.push(...wires);
+  const outlines = wires
+    .map((wire) => ({ wire, area: cad.getSurfaceArea(keep(cad.makeFace(wire))) }))
+    .sort((a, b) => b.area - a.area);
+  // Sharp joins first where they are asked for; an outline of many short pieces can defeat them in 2D too, and
+  // rounded joins only touch the corners that point into the cavity, so they are the way out.
+  const joinTypes: Array<JoinType.Arc | JoinType.Intersection> = edges === "sharp" ? [JoinType.Intersection, JoinType.Arc] : [JoinType.Arc, JoinType.Intersection];
+  const low = sides.includes("bottom") ? bounds.ymin - 1 : bounds.ymin + thickness;
+  const high = sides.includes("top") ? bounds.ymax + 1 : bounds.ymax - thickness;
+  if (high - low <= flat) return null;
+  const pushedUp = (face: ShapeHandle) => keep(cad.extrude(keep(cad.translate(face, 0, low - bounds.ymin, 0)), 0, high - low, 0));
+  // The outline is moved as it is; where the kernel cannot move it cleanly, as straight pieces. Then the body the
+  // cavity is cut from is that outline pushed up too: a prism of arcs and a cavity of straight pieces did not cut.
+  const polygons = new Map<ShapeHandle, ShapeHandle | null>();
+  const polygonOf = (wire: ShapeHandle) => {
+    if (!polygons.has(wire)) polygons.set(wire, polygonWire(cad, wire, OUTLINE_DEFLECTION, keep));
+    return polygons.get(wire) ?? null;
+  };
+  const build = (asPolygon: boolean) => {
+    const wireOf = (wire: ShapeHandle) => (asPolygon ? polygonOf(wire) : wire);
+    const outer = wireOf(outlines[0].wire);
+    const inside = outer ? movedOutlineFace(cad, outer, -thickness, joinTypes, keep) : null;
+    if (!inside) return null;
+    let cavity = pushedUp(inside);
+    for (const { wire } of outlines.slice(1)) {
+      const hole = wireOf(wire);
+      const around = hole ? movedOutlineFace(cad, hole, thickness, joinTypes, keep) : null;
+      if (!around) return null;
+      cavity = keep(cad.cut(cavity, pushedUp(around)));
+    }
+    // The prism to cut from: the body itself, then its bottom face (or its outline as straight pieces, with the
+    // holes taken out) pushed up again, built the same way as the cavity.
+    // A body that is no prism (its top cut at an angle) is only ever the body itself.
+    const base = asPolygon
+      ? outlines.slice(1).reduce((face, { wire }) => keep(cad.cut(face, keep(cad.makeFace(polygonOf(wire)!)))), keep(cad.makeFace(outer!)))
+      : bottom;
+    const rebuilt = rebuildPrism ? [keep(cad.extrude(base, 0, bounds.ymax - bounds.ymin, 0))] : [];
+    const prisms = asPolygon ? (rebuildPrism ? rebuilt : [solid]) : [solid, ...rebuilt];
+    for (const prism of prisms) {
+      // The cut comes back as a compound around the one solid; the hollowed body is that solid.
+      const solids = cad.getSubShapes(keep(cad.cut(prism, cavity)), "solid");
+      made.push(...solids);
+      if (solids.length !== 1) continue;
+      const volume = shapeIsValid(cad, solids[0]) ? cad.getVolume(solids[0]) : 0;
+      if (volume > 0 && volume < cad.getVolume(solid) * (1 - 1e-6)) return solids[0];
+    }
+    return null;
+  };
+  const tried = (asPolygon: boolean) => {
+    try {
+      return build(asPolygon);
+    } catch (error) {
+      if (mustSurface(error)) throw error;
+      return null;
+    }
+  };
+  const result = tried(false) ?? tried(true);
+  if (!result) return null;
+  made.splice(made.indexOf(result), 1);
+  return result;
 }
 
 /** A face smaller than this has no area worth the name; the kernel's own tolerance is far below it. */

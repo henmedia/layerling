@@ -990,17 +990,47 @@ function slottedRevolutionSolid(cad: OcctKernel, profile: CadModifierProfilePart
   return solid;
 }
 
+/**
+ * A sloped rounded box's ends rounded after its top was cut (Discussion #1544): the bottom's edges lie in y = 0,
+ * the top's are every other edge but the upright lines where the walls meet their rounded corners.
+ */
+function roundedTrimmedEnds(cad: OcctKernel, solid: ShapeHandle, top: number, bottom: number): ShapeHandle {
+  if (!(top > 1e-4) && !(bottom > 1e-4)) return solid;
+  const atBottom = (edge: ShapeHandle) => {
+    const box = cad.getBoundingBox(edge);
+    return Math.abs(box.ymax) < 1e-6 && Math.abs(box.ymin) < 1e-6;
+  };
+  const upright = (edge: ShapeHandle) => {
+    const box = cad.getBoundingBox(edge);
+    return Math.abs(box.xmax - box.xmin) < 1e-6 && Math.abs(box.zmax - box.zmin) < 1e-6;
+  };
+  const round = (body: ShapeHandle, edges: ShapeHandle[], radius: number) => {
+    if (edges.length === 0) throw new Error("The sloped profile solid has no edges to round");
+    const rounded = cad.fillet(body, edges, radius);
+    if (!cad.isSolid(rounded) || !cad.isValid(rounded) || !(cad.getVolume(rounded) > 0)) throw new Error("The rounded ends of the sloped profile solid are not valid");
+    return rounded;
+  };
+  const edges = cad.getSubShapes(solid, "edge");
+  const bottomEdges = edges.filter(atBottom);
+  const topEdges = edges.filter((edge) => !atBottom(edge) && !upright(edge));
+  if (Math.abs(top - bottom) < 1e-9) return round(solid, [...topEdges, ...bottomEdges], top);
+  let rounded = top > 1e-4 ? round(solid, topEdges, top) : solid;
+  if (bottom > 1e-4) rounded = round(rounded, cad.getSubShapes(rounded, "edge").filter(atBottom), bottom);
+  return rounded;
+}
+
 export function profileExtrusionSolid(cad: OcctKernel, profile: CadModifierProfilePart): ShapeHandle {
   if (profile.trim && profile.kind === "extrusion") {
     // Slope along: the plain body, and what of it lies inside the side outline pushed across.
-    const base = profileExtrusionSolid(cad, { ...profile, trim: undefined });
+    // A rounded box's rounded ends are rounded after the cut, so the top's round follows the slope (Discussion #1544).
+    const base = profileExtrusionSolid(cad, { ...profile, trim: undefined, capFillet: undefined, capFilletBottom: undefined });
     const trim = profile.trim;
     const face = cad.makeFace(loopWire(cad, trim.loops[0], profileExtent(profile) * 1e-6));
     const prism = cad.transform(cad.extrude(face, 0, trim.height, 0), trim.frame);
     const kept = cad.common(base, prism);
     const solids = cad.isSolid(kept) ? [kept] : cad.getSubShapes(kept, "solid");
     if (solids.length !== 1 || !cad.isValid(solids[0]) || !(cad.getVolume(solids[0]) > 0)) throw new Error("The trimmed profile solid is not valid");
-    return solids[0];
+    return roundedTrimmedEnds(cad, solids[0], profile.capFillet ?? 0, profile.capFilletBottom ?? profile.capFillet ?? 0);
   }
   validateCadProfile(profile);
   if (profile.kind === "extrusion" && profile.pulley) return pulleySolid(cad, profile, profile.pulley);

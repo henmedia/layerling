@@ -860,6 +860,7 @@ export const MESSAGES_EN = {
   "lid.error.needsBody": "Select the body to make a lid for first.",
   "lid.error.notClosed": "The body is not closed, so no lid can be made for it. Close or repair it first.",
   "lid.error.notOpen": "The body has no opening at the top. Hollow it with its top open first, or make a flat lid.",
+  "lid.error.rimNotLevel": "The rim slopes. A lid needs a level rim. For a lid that follows the slope, hollow the body Closed and use Split with a tilted plane where the lid should come off.",
   "lid.error.tooSmall": "The opening is too small for a lip with this gap. Take a smaller gap or a flat lid.",
   "lid.error.tooShallow": "The lip or rim reaches deeper than the body is high. Make it shorter.",
   "lid.error.empty": "The lid would be empty.",
