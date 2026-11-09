@@ -6,6 +6,8 @@ code still carries it - so a lower number further down is older, not newer.
 
 ## Unreleased
 
+## 1.154.0
+
 - **Take buttons you never use out of the ribbon (Discussion #1519, #1087, #1051, #447, #695, #1502):** Settings, Appearance, **Buttons in the ribbon** lists every group of the 3D ribbon with its buttons. A tick takes one button out, **Show this group** a whole group, and **Show all** brings everything back. What is taken out only leaves the ribbon: the command search (Ctrl+K) and your own keys still run it, and the order of the groups stays the same, so the guide and the help keep pointing at the same places. A group with no button left disappears and the rest of the ribbon moves up, so fewer groups fold. The Shapes group and Help always stay. The choice is kept in the browser and goes into the settings file.
 
 - **Screw and bayonet caps with a rounded or chamfered top edge (Discussion #1426):** A screw lid printed top down could not get a rounded rim: cap and thread are one mesh of about 29,000 triangles, and the edge tool stops at 4,000. The lid window now has **Top edge** for screw and bayonet caps: **Rounded** or **Chamfer**, with **Edge size** (1 mm to begin with, at most the plate's thickness), made with the cap. The cap prints turned over, so this edge lies on the bed. `layerling_make_lid` takes `topEdge` and `topEdgeSize`. Asked for by @3wheeltom.
