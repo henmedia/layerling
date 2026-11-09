@@ -2252,11 +2252,11 @@ function getShapePropertiesWithAppLimits(shape: WorkplaneShape, onUpdate: ShapeI
       { id: "loftOffsetZ", label: t("prop.loftOffsetZ"), value: m.offsetZ, min: -150, max: 150, step: 0.5, onChange: (value) => change({ offsetZ: value }) },
       { id: "loftWall", label: t("prop.loftWall"), value: m.wall, min: 0, max: Math.max(0.1, maxLoftWall(m)), step: 0.1, onChange: (value) => change({ wall: value }) },
       ...turns,
+      ...tilts,
       // How finely a circle or a rounded corner is drawn in the view and in the exports (#755); a polygon has its own sides.
       ...(rounded
         ? [{ id: "loftSegments", label: t("prop.loftSegments"), value: m.segments, min: MIN_LOFT_SEGMENTS, max: MAX_LOFT_SEGMENTS, step: 1, hint: t("loft.segmentsHint"), onChange: (value: number) => change({ segments: value }) }]
         : []),
-      ...tilts,
     ];
   }
 
@@ -7159,6 +7159,17 @@ export function SurfaceTextureCard({
                   onChange={(value) => set({ projection: value as SurfaceTextureSettings["projection"] })}
                 />
               )}
+              {/* A board's pith runs along its longest side: only a log asks for its axis. */}
+              {!grain && !(wood && settings.woodCut !== "log") && (cracks || placedHere || wood || settings.projection !== "allRound") ? (
+                <SelectProperty
+                  type="select"
+                  label={t("inspector.surfaceAxis")}
+                  value={settings.axis}
+                  options={options(SURFACE_TEXTURE_AXES, (value) => value.toUpperCase())}
+                  disabled={disabled || busy}
+                  onChange={(value) => set({ axis: value as SurfaceTextureSettings["axis"] })}
+                />
+              ) : null}
               {/* The pattern as a part of its own, in a colour of its own: a bundle of the body and the pattern. */}
               <ToggleProperty
                 label={t("inspector.surfacePatternPart")}
@@ -7180,17 +7191,6 @@ export function SurfaceTextureCard({
                     {t(patternWay === "outward" ? "inspector.surfacePatternRaisedHint" : patternWay === "inward" ? "inspector.surfacePatternCutHint" : "inspector.surfacePatternWayHint")}
                   </p>
                 </>
-              ) : null}
-              {/* A board's pith runs along its longest side: only a log asks for its axis. */}
-              {!grain && !(wood && settings.woodCut !== "log") && (cracks || placedHere || wood || settings.projection !== "allRound") ? (
-                <SelectProperty
-                  type="select"
-                  label={t("inspector.surfaceAxis")}
-                  value={settings.axis}
-                  options={options(SURFACE_TEXTURE_AXES, (value) => value.toUpperCase())}
-                  disabled={disabled || busy}
-                  onChange={(value) => set({ axis: value as SurfaceTextureSettings["axis"] })}
-                />
               ) : null}
               {/* Where it goes: every face, or only the faces clicked in the view (a text goes where it is put). An image
                   once goes onto the picked faces too, its middle on them where Around and Height aim past them (#1206, #1462). */}
