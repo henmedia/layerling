@@ -88,6 +88,10 @@ layerling 是一款直接在浏览器里运行的 3D 打印设计程序。你用
 
 在窗口底部：{{ui:dashboard.sponsor}} 通往可以支持本项目的页面；{{ui:dashboard.userGuide}} 打开本指南；{{ui:dashboard.forum}} 通往提问、提想法和报告错误的地方（GitHub 上的讨论区，德语用户则为 drucktipps3d 论坛）；{{ui:editor.bugReport}} 生成一个用于错误报告的 ZIP 文件；{{ui:dashboard.projectOnGitHub}} 通往 GitHub 上的项目，版本号则打开发行说明。法律声明和隐私政策的链接属于你所使用的那份 layerling 的运营者。
 
+### 专注模式
+
+在小屏幕上，{{ui:focusMode.enter}}把标题栏和页脚让给工作区：右上角带两个向外箭头的按钮、[[Ctrl]]+[[Shift]]+[[F]] 或命令搜索都可以开启它。功能区上移，视图一直延伸到窗口边缘。功能区下方的小工具条保留了返回起始页的房子图标、{{ui:editor.modeGeometry}} 和 {{ui:editor.modeSketch}} 选项卡、放大镜、设置以及带两个向内箭头的按钮（用于退出专注模式）；拖动小工具条的手柄可以把它移到别处，双击手柄可放回原位。layerling 会在此浏览器中记住这个选择；当浏览器占满整个屏幕（F11）时，会自动进入专注模式。
+
 ## 你的第一个零件
 
 举个例子，我们做一个带孔的立方体。

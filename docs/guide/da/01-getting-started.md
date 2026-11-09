@@ -89,6 +89,10 @@ Kontakten **mm | in** ved siden af {{ui:inspector.snapGrid}} ændrer enheden, pl
 
 Nederst i vinduet: {{ui:dashboard.sponsor}} fører til siden, hvor du kan støtte projektet; {{ui:dashboard.userGuide}} åbner denne vejledning; {{ui:dashboard.forum}} fører til stedet for spørgsmål, idéer og fejlrapporter (diskussionerne på GitHub, på tysk forummet hos drucktipps3d); {{ui:editor.bugReport}} laver en ZIP til en fejlrapport; {{ui:dashboard.projectOnGitHub}} fører til projektet på GitHub, og versionsnummeret åbner udgivelsesnoterne. Linkene til impressum og privatlivspolitik hører til den, der driver den kopi af layerling, du bruger.
 
+### Fokustilstand
+
+På en lille skærm giver {{ui:focusMode.enter}} titellinjen og sidefoden til arbejdet: knappen med de to pile, der peger udad, øverst til højre, [[Ctrl]]+[[Shift]]+[[F]] eller kommandosøgningen slår den til. Båndet rykker op, og visningen når ned til vinduets kant. En lille bjælke under båndet beholder huset til startsiden, fanerne {{ui:editor.modeGeometry}} og {{ui:editor.modeSketch}}, forstørrelsesglasset, indstillingerne og knappen med de to pile, der peger indad, som afslutter fokustilstanden; træk bjælken i dens greb et andet sted hen, et dobbeltklik på grebet sætter den tilbage. layerling husker valget i denne browser, og mens browseren fylder hele skærmen (F11), skifter den selv til fokustilstand.
+
 ## Din første del
 
 Som eksempel bygger vi en kasse med et hul.

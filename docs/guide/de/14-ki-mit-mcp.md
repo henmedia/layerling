@@ -163,6 +163,7 @@ Die KI arbeitet mit denselben Funktionen wie du, sie läuft über denselben Weg 
 | `layerling_insert_custom_shape` | setzt eine eigene Form in den offenen Entwurf, wahlweise an eine Stelle x/z |
 | `layerling_delete_custom_shape` | entfernt eine eigene Form; eingesetzte Körper bleiben |
 | `layerling_show_workplane` | blendet die Platte mit ihrem Gitter aus und wieder ein, etwa für ein Bild der Unterseite (nur die Ansicht) |
+| `layerling_focus_mode` | schaltet den Fokusmodus ein und aus: blendet Titel- und Fußzeile für mehr Platz aus (nur der Rahmen des Editors) |
 | `layerling_set_section_view` | schneidet die Ansicht entlang einer Ebene auf, um ins Innere zu sehen (nur die Ansicht, nichts wird zerteilt) |
 | `layerling_measurements` | blendet die Messungen des Maßbands ein oder aus und listet sie mit ihren Längen auf; dazu die Maße um die Auswahl, wie [[Q]]; tippt auch eine Länge für eine Messung ein, die den Körper an ihrem Ende verschiebt wie ein Klick auf ihre Zahl |
 | `layerling_measure_angle` | misst einen Winkel wie der Winkelmesser: an der Ecke von drei Punkten oder zwischen zwei ebenen Flächen, und zeigt ihn in der Ansicht |

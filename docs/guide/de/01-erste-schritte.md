@@ -88,6 +88,10 @@ Der Schalter **mm | in** neben {{ui:inspector.snapGrid}} ändert die Einheit, da
 
 Am Fuß des Fensters: {{ui:dashboard.sponsor}} führt zur Seite, auf der du das Projekt unterstützen kannst; {{ui:dashboard.userGuide}} öffnet diese Anleitung; {{ui:dashboard.forum}} führt zum Ort für Fragen, Ideen und Fehlermeldungen (die Diskussionen auf GitHub, auf Deutsch das Forum von drucktipps3d); {{ui:editor.bugReport}} macht ein ZIP für eine Fehlermeldung; {{ui:dashboard.projectOnGitHub}} führt zum Projekt auf GitHub, und die Versionsnummer öffnet die Versionshinweise. Die Links zu Impressum und Datenschutz gehören dem, der die Kopie von layerling betreibt, die du benutzt.
 
+### Fokusmodus
+
+Auf einem kleinen Bildschirm gibt der {{ui:focusMode.enter}} die Titelzeile und die Fußzeile an die Arbeit ab: Der Knopf mit den zwei nach außen zeigenden Pfeilen oben rechts, [[Strg]]+[[Umschalt]]+[[F]] oder die Befehlssuche schalten ihn ein. Das Menüband rückt nach oben, und die Ansicht reicht bis an den unteren Fensterrand. Eine kleine Leiste unter dem Menüband behält das Haus zur Startseite, die Reiter {{ui:editor.modeGeometry}} und {{ui:editor.modeSketch}}, die Lupe, die Einstellungen und den Knopf mit den zwei nach innen zeigenden Pfeilen, der den Fokusmodus beendet; am Griff lässt sich die Leiste an eine andere Stelle ziehen, ein Doppelklick auf den Griff stellt sie zurück. layerling merkt sich die Wahl in diesem Browser, und solange der Browser den ganzen Bildschirm füllt (F11), schaltet es von selbst in den Fokusmodus.
+
 ## Dein erstes Teil
 
 Als Beispiel bauen wir einen Würfel mit einer Bohrung.

@@ -88,6 +88,10 @@ Přepínač **mm | in** vedle {{ui:inspector.snapGrid}} mění jednotku, mříž
 
 Dole v okně: {{ui:dashboard.sponsor}} vede na stránku, kde můžete projekt podpořit; {{ui:dashboard.userGuide}} otevře tuto příručku; {{ui:dashboard.forum}} vede na místo pro otázky, nápady a hlášení chyb (diskuse na GitHubu, v němčině fórum drucktipps3d); {{ui:editor.bugReport}} vytvoří ZIP pro hlášení chyby; {{ui:dashboard.projectOnGitHub}} vede na projekt na GitHubu a číslo verze otevře poznámky k vydání. Odkazy na provozovatele a ochranu osobních údajů patří tomu, kdo provozuje kopii layerlingu, kterou používáte.
 
+### Režim soustředění
+
+Na malé obrazovce {{ui:focusMode.enter}} přenechá titulní řádek a zápatí práci: zapne ho tlačítko se dvěma šipkami ven vpravo nahoře, [[Ctrl]]+[[Shift]]+[[F]] nebo hledání příkazů. Pás nástrojů se posune nahoru a pohled sahá až k okraji okna. Malá lišta pod pásem ponechá domeček na úvodní stránku, karty {{ui:editor.modeGeometry}} a {{ui:editor.modeSketch}}, lupu, nastavení a tlačítko se dvěma šipkami dovnitř, které režim ukončí; za úchyt lištu přetáhnete jinam, dvojklik na úchyt ji vrátí. layerling si volbu pamatuje v tomto prohlížeči a dokud prohlížeč vyplňuje celou obrazovku (F11), přepne se do režimu soustředění sám.
+
 ## První díl
 
 Jako příklad vytvoříme kvádr s otvorem.

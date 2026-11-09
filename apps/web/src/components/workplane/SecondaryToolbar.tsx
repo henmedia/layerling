@@ -1,9 +1,11 @@
 "use client";
 
 import { GuideHelpLink } from "@/components/GuideHelpLink";
+import { FocusModeBar } from "@/components/workplane/FocusModeBar";
+import { FOCUS_MODE_CHANGE_EVENT, FOCUS_MODE_SHORTCUT } from "@/lib/focusMode";
 import { ShapeMenuPanel } from "@/components/workplane/ShapeMenuPanel";
 import { ShapeLibraryList } from "@/components/workplane/ShapeLibraryList";
-import { AlertTriangle, ArrowDownToLine, ArrowLeftRight, ArrowUpFromLine, Check, CircleHelp, Percent, Circle as CircleIcon, Eye, EyeOff, Hexagon as HexagonIcon, ListTree, Pencil, Pentagon as PentagonIcon, Pin, PinOff, Rotate3d, Route as RouteIcon, ScanEye, Search, Square as SquareIcon, Star as StarIcon, Triangle as TriangleIcon, X } from "lucide-react";
+import { AlertTriangle, ArrowDownToLine, ArrowLeftRight, ArrowUpFromLine, Check, CircleHelp, Percent, Circle as CircleIcon, Eye, EyeOff, Hexagon as HexagonIcon, ListTree, Maximize2, Minimize2, Pencil, Pentagon as PentagonIcon, Pin, PinOff, Rotate3d, Route as RouteIcon, ScanEye, Search, Square as SquareIcon, Star as StarIcon, Triangle as TriangleIcon, X } from "lucide-react";
 import { useEffect, useLayoutEffect, useRef, useState, type CSSProperties } from "react";
 import { createPortal } from "react-dom";
 import { useWheelField } from "@/lib/useWheelField";
@@ -301,6 +303,8 @@ export function SecondaryToolbar({
   onSketchFinish,
   onSketchCancel,
   onHome,
+  focusMode = false,
+  onFocusModeChange,
   onAlign,
   onChamfer,
   onCopy,
@@ -485,6 +489,9 @@ export function SecondaryToolbar({
   onSketchFinish: () => void;
   onSketchCancel: () => void;
   onHome?: () => void;
+  /** Focus mode (Discussion #1554): the title row gives way to a small bar over the view. */
+  focusMode?: boolean;
+  onFocusModeChange?: (on: boolean) => void;
   onAlign: () => void;
   onChamfer: () => void;
   onCopy: () => void;
@@ -658,7 +665,9 @@ export function SecondaryToolbar({
     const root = document.documentElement;
     const apply = () => {
       const styles = getComputedStyle(root);
-      const title = parseFloat(styles.getPropertyValue("--editor-toolbar-title-height")) || 44;
+      // Focus mode sets the title row to 0, which is a height and no missing value (#1554).
+      const titleValue = parseFloat(styles.getPropertyValue("--editor-toolbar-title-height"));
+      const title = Number.isFinite(titleValue) ? titleValue : 44;
       const minimum = parseFloat(styles.getPropertyValue("--editor-toolbar-tools-height")) || 76;
       const tools = content.offsetHeight;
       // A hidden editor measures nothing; it keeps the one-row height.
@@ -667,8 +676,11 @@ export function SecondaryToolbar({
     apply();
     const observer = new ResizeObserver(apply);
     observer.observe(content);
+    // The title row comes and goes with focus mode, and the tools keep their size meanwhile.
+    window.addEventListener(FOCUS_MODE_CHANGE_EVENT, apply);
     return () => {
       observer.disconnect();
+      window.removeEventListener(FOCUS_MODE_CHANGE_EVENT, apply);
       root.style.removeProperty("--editor-toolbar-height");
     };
   }, []);
@@ -1278,6 +1290,7 @@ export function SecondaryToolbar({
       plain("export", t("editor.export"), fileGroup, true, () => onTopPanel("export"), { icon: ToolbarVectorExportIcon }),
       plain("attachments", t("editor.attachments"), fileGroup, true, () => onTopPanel("attachments"), { icon: ToolbarAttachmentsIcon, keywords: ["attachment", "file", "notes", "instructions", "readme", "anhang", "datei"] }),
       plain("settings", t("editor.workspaceSettings"), t("editor.group.help"), true, () => window.dispatchEvent(new Event("layerling:open-workspace-settings")), { icon: ToolbarSettingsIcon }),
+      plain("focus-mode", focusMode ? t("focusMode.leave") : t("focusMode.enter"), t("shortcuts.group.view"), Boolean(onFocusModeChange), () => onFocusModeChange?.(!focusMode), { icon: focusMode ? Minimize2 : Maximize2, active: focusMode }),
       plain("mode-sketch", t("palette.switchSketch"), t("palette.group.mode"), true, () => selectToolbarMode("sketch")),
       ...helpCommands,
       ...objects.map((object) => plain(
@@ -1899,6 +1912,19 @@ export function SecondaryToolbar({
           </label>
         </div>
         <div className="toolbar-title-row-actions">
+          {/* Focus mode (Discussion #1554): this row and the footer make room, a small bar over the view keeps the tabs. */}
+          {onFocusModeChange ? (
+            <button
+              className="action-icon-button toolbar-focus-mode"
+              type="button"
+              aria-label={t("focusMode.enter")}
+              title={`${t("focusMode.enter")} (${FOCUS_MODE_SHORTCUT}) - ${t("focusMode.enterHint")}`}
+              data-layerling-tool="focus-mode"
+              onClick={() => onFocusModeChange(true)}
+            >
+              <Maximize2 size={17} aria-hidden="true" />
+            </button>
+          ) : null}
           {simpleMode ? null : (
             <button
               className={`toolbar-ribbon-pin ${ribbonPinned ? "active" : ""}`}
@@ -1937,6 +1963,19 @@ export function SecondaryToolbar({
           </button>
         </div>
       </div>
+      {focusMode && onFocusModeChange ? (
+        <FocusModeBar
+          toolbarMode={toolbarMode === "sketch" ? "sketch" : "geometry"}
+          sketchDisabled={historyViewActive}
+          onSelectMode={selectToolbarMode}
+          onHome={onHome}
+          homeDisabled={toolbarMode !== "geometry"}
+          onSearch={openPalette}
+          onSettings={() => window.dispatchEvent(new Event("layerling:open-workspace-settings"))}
+          onLeave={() => onFocusModeChange(false)}
+          showSearch={!simpleMode}
+        />
+      ) : null}
     </div>
   );
 }

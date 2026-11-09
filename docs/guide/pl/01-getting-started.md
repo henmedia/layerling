@@ -88,6 +88,10 @@ Przełącznik **mm | in** obok {{ui:inspector.snapGrid}} zmienia dla tego projek
 
 Na dole okna: {{ui:dashboard.sponsor}} prowadzi do strony, na której możesz wesprzeć projekt; {{ui:dashboard.userGuide}} otwiera tę instrukcję; {{ui:dashboard.forum}} prowadzi do miejsca na pytania, pomysły i zgłoszenia błędów (dyskusje na GitHubie, a po niemiecku forum drucktipps3d); {{ui:editor.bugReport}} tworzy plik ZIP do zgłoszenia błędu; {{ui:dashboard.projectOnGitHub}} prowadzi do projektu na GitHubie, a numer wersji otwiera listę zmian. Odnośniki do noty prawnej i polityki prywatności należą do tego, kto prowadzi używaną przez Ciebie kopię layerling.
 
+### Tryb skupienia
+
+Na małym ekranie {{ui:focusMode.enter}} oddaje pracy wiersz tytułu i stopkę: włącza go przycisk z dwiema strzałkami skierowanymi na zewnątrz w prawym górnym rogu, [[Ctrl]]+[[Shift]]+[[F]] lub wyszukiwanie poleceń. Wstążka przesuwa się w górę, a widok sięga do krawędzi okna. Mały pasek pod wstążką zachowuje domek do strony startowej, karty {{ui:editor.modeGeometry}} i {{ui:editor.modeSketch}}, lupę, ustawienia i przycisk z dwiema strzałkami skierowanymi do środka, który kończy tryb; pasek można przeciągnąć za uchwyt w inne miejsce, a dwuklik na uchwycie przywraca go. layerling zapamiętuje wybór w tej przeglądarce, a gdy przeglądarka wypełnia cały ekran (F11), sam przechodzi w tryb skupienia.
+
 ## Twoja pierwsza część
 
 Jako przykład zbudujemy sześcian z otworem.

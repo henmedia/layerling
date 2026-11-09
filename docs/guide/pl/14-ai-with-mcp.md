@@ -163,6 +163,7 @@ AI pracuje tymi samymi funkcjami co Ty, tą samą drogą co Twoja praca w edytor
 | `layerling_insert_custom_shape` | wstawia własny kształt do otwartego projektu, jeśli chcesz, w miejscu x/z |
 | `layerling_delete_custom_shape` | usuwa własny kształt. Wstawione bryły zostają |
 | `layerling_show_workplane` | ukrywa i pokazuje płytę z siatką, na przykład do zdjęcia spodu (tylko widok) |
+| `layerling_focus_mode` | włącza i wyłącza tryb skupienia: ukrywa wiersz tytułu i stopkę, by zyskać miejsce (tylko ramka edytora) |
 | `layerling_set_section_view` | rozcina widok wzdłuż płaszczyzny, żeby zajrzeć do środka (tylko widok, nic nie jest cięte) |
 | `layerling_measurements` | pokazuje lub ukrywa pomiary narzędzia Zmierz i wypisuje je z ich długościami, oraz ukrywa lub pokazuje wymiary wokół zaznaczenia jak [[Q]], a także wpisuje długość dla jednego z nich, co przesuwa bryłę na jego końcu jak kliknięcie liczby |
 | `layerling_measure_angle` | mierzy kąt jak kątomierz: w wierzchołku z trzech punktów lub między dwiema płaskimi ścianami, i pokazuje go w widoku |

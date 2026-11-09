@@ -163,6 +163,7 @@ La IA trabaja con las mismas funciones que tú, por el mismo camino que sigues c
 | `layerling_insert_custom_shape` | inserta una forma personalizada en el diseño abierto, en un punto x/z si quieres |
 | `layerling_delete_custom_shape` | elimina una forma personalizada; los cuerpos ya insertados se quedan |
 | `layerling_show_workplane` | oculta y muestra la placa con su cuadrícula, por ejemplo para una captura de la parte de abajo (solo la vista) |
+| `layerling_focus_mode` | activa y desactiva el modo concentración: oculta la fila del título y el pie de página para tener más espacio (solo el marco del editor) |
 | `layerling_set_section_view` | abre la vista en corte por un plano para mirar dentro (solo la vista: no se corta nada) |
 | `layerling_measurements` | muestra u oculta las mediciones de la cinta métrica y las lista con sus longitudes, y oculta o muestra las medidas alrededor de la selección como [[Q]], y escribe una longitud para una de ellas, que mueve el cuerpo de su extremo como un clic en su número |
 | `layerling_measure_angle` | mide un ángulo como el transportador: en el vértice de tres puntos o entre dos caras planas, y lo muestra en la vista |

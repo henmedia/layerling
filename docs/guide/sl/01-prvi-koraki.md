@@ -88,6 +88,10 @@ Stikalo **mm | in** ob {{ui:inspector.snapGrid}} spremeni enoto, mrežo plošče
 
 Na dnu okna: {{ui:dashboard.sponsor}} vodi na stran, kjer lahko podprete projekt; {{ui:dashboard.userGuide}} odpre ta priročnik; {{ui:dashboard.forum}} vodi na mesto za vprašanja, zamisli in poročila o napakah (razprave na GitHubu, v nemščini forum drucktipps3d); {{ui:editor.bugReport}} naredi ZIP za poročilo o napaki; {{ui:dashboard.projectOnGitHub}} vodi do projekta na GitHubu, številka različice pa odpre opombe ob izdaji. Povezavi na podatke o ponudniku in na varstvo zasebnosti pripadata tistemu, ki upravlja kopijo layerlinga, ki jo uporabljate.
 
+### Način osredotočenja
+
+Na majhnem zaslonu {{ui:focusMode.enter}} prepusti naslovno vrstico in nogo delu: vklopi ga gumb z dvema puščicama navzven zgoraj desno, [[Ctrl]]+[[Shift]]+[[F]] ali iskanje ukazov. Trak se pomakne navzgor, pogled pa sega do roba okna. Majhna vrstica pod trakom obdrži hišico za začetno stran, zavihka {{ui:editor.modeGeometry}} in {{ui:editor.modeSketch}}, lupo, nastavitve in gumb z dvema puščicama navznoter, ki način konča; vrstico za ročaj povlecite drugam, dvoklik na ročaj jo vrne. layerling si izbiro zapomni v tem brskalniku, in dokler brskalnik zapolnjuje cel zaslon (F11), sam preklopi v način osredotočenja.
+
 ## Tvoj prvi del
 
 Za primer zgradimo kocko z izvrtino.

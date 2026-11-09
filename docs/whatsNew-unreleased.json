@@ -1,6 +1,18 @@
 [
   {
     "title": {
+      "de": "Fokusmodus: mehr Platz auf kleinen Bildschirmen",
+      "en": "Focus mode: more room on small screens",
+      "da": "Fokustilstand: mere plads på små skærme"
+    },
+    "body": {
+      "de": "Der Knopf mit den zwei Pfeilen oben rechts (oder Strg+Umschalt+F) blendet Titelzeile und Fußzeile aus, und Menüband und Ansicht bekommen ihren Platz. Eine kleine verschiebbare Leiste unter dem Menüband behält Startseite, 3D-Editor und Skizze, Befehlssuche und Einstellungen. Im Browser-Vollbild (F11) kommt der Fokusmodus von selbst.",
+      "en": "The button with the two arrows at the top right (or Ctrl+Shift+F) hides the title row and the footer, and the ribbon and the view get their room. A small movable bar below the ribbon keeps Home, 3D editor and Sketch, the command search and the settings. In the browser's full screen (F11) focus mode comes by itself.",
+      "da": "Knappen med de to pile øverst til højre (eller Ctrl+Shift+F) skjuler titellinjen og sidefoden, så båndet og visningen får pladsen. En lille bjælke, der kan flyttes, under båndet beholder Hjem, 3D-editor og Skitse, kommandosøgningen og indstillingerne. I browserens fuldskærm (F11) kommer fokustilstanden af sig selv."
+    }
+  },
+  {
+    "title": {
       "de": "Ansicht schneller verschieben",
       "en": "Shift the view faster",
       "da": "Flyt visningen hurtigere"

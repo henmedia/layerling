@@ -274,6 +274,7 @@ import { drawingLabelsInLanguage } from "@/lib/drawingLabels";
 import { DEFAULT_TEXT_BLOCK_GAP, offersTextBlock, TEXT_BLOCK_ALIGNS, textBlockFor, textBlockLines, type TextBlockAlign, type TextBlockOptions } from "@/lib/textBlock";
 import { offersTextLayers, textLayerStack, layeredTextShape, nameTagSource, nameTagsFor, offersIconLayers, iconLayerStack, iconTagArea, layeredIconShape, iconTagCopies, svgIconArea, iconTagFromSvg, keyringTabShape, keyringTabTag, keyringTabAt, keyringTabPlace, textFreeKeyring, textFreeKeyringPlace, iconFreeKeyring, iconFreeKeyringPlace } from "@/lib/editorTextTags";
 import { isNonTextControl, isTypingTarget } from "@/lib/editorKeyTargets";
+import { isFocusModeKey, useFocusMode } from "@/lib/focusMode";
 import { DEFAULT_KEYRING_DIAMETER } from "@/lib/textGeometry";
 import { TopPanel, DirectExportFormat, SvgExportView, DxfExportView, ViewImageOptions, LylHistoryLimit, LylExportTarget, TopActionPanel } from "./workplane/TopActionPanel";
 import { ToolbarMode, SketchShapeOptions, SecondaryToolbar } from "./workplane/SecondaryToolbar";
@@ -297,6 +298,7 @@ const HISTORY_VIEW_MCP_ACTIONS = new Set([
   "measure_section",
   "set_section_view",
   "show_workplane",
+  "focus_mode",
   "measurements",
   "saved_view",
   "export_section_svg",
@@ -3525,6 +3527,23 @@ export function LayerlingEditor({
   const interactionHistoryTimerRef = useRef<number | null>(null);
   const [projectInteractionActive, setProjectInteractionActive] = useState(false);
   const [toolbarMode, setToolbarMode] = useState<ToolbarMode>("geometry");
+  // Focus mode (Discussion #1554): the title row and the footer make room for the work.
+  const focusMode = useFocusMode();
+  const setFocusModeRef = useRef(focusMode.set);
+  setFocusModeRef.current = focusMode.set;
+  const focusModeActiveRef = useRef(focusMode.active);
+  focusModeActiveRef.current = focusMode.active;
+  useEffect(() => {
+    // Ctrl+Shift+F, before the view's own F (which looks at the selection) and also in a field, where it types nothing.
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.defaultPrevented || event.repeat || !isFocusModeKey(event)) return;
+      event.preventDefault();
+      event.stopPropagation();
+      setFocusModeRef.current();
+    };
+    window.addEventListener("keydown", onKeyDown, true);
+    return () => window.removeEventListener("keydown", onKeyDown, true);
+  }, []);
   const [sketchActive, setSketchActive] = useState(false);
   const [activeSketchWorkplane, setActiveSketchWorkplane] = useState<PlacementWorkplane>(
     () => normalizePlacementWorkplane(initialPlacementWorkplane, initialPlacementElevation),
@@ -15736,6 +15755,12 @@ export function LayerlingEditor({
         };
       }
 
+      if (command.action === "focus_mode") {
+        if (params.on !== undefined && typeof params.on !== "boolean") throw new Error("on must be true or false");
+        const on = typeof params.on === "boolean" ? setFocusModeRef.current(params.on) : focusModeActiveRef.current;
+        return { on };
+      }
+
       if (command.action === "show_workplane") {
         if (!window.layerlingWorkplaneDisplay) throw new Error("The workplane display is not available in this editor");
         if (params.visible !== undefined && typeof params.visible !== "boolean") throw new Error("visible must be true or false");
@@ -18341,7 +18366,7 @@ export function LayerlingEditor({
   };
 
   return (
-    <div className={`layerling-editor ${historyViewState ? "history-view-active" : ""}`}>
+    <div className={`layerling-editor ${historyViewState ? "history-view-active" : ""} ${focusMode.active ? "focus-mode" : ""}`}>
       <SecondaryToolbar
         toolbarMode={toolbarMode}
         projectName={projectName}
@@ -18432,6 +18457,8 @@ export function LayerlingEditor({
         onSketchFinish={finishSketch}
         onSketchCancel={cancelSketch}
         onHome={onHome ? leaveToDashboard : undefined}
+        focusMode={focusMode.active}
+        onFocusModeChange={(on) => focusMode.set(on)}
         onAlign={toggleAlignMode}
         onChamfer={() => edgeModifier?.kind === "chamfer" || edgeModifier?.kind === "chamfillet" ? cancelEdgeModifier() : startEdgeModifier("chamfer")}
         onCopy={copySelected}

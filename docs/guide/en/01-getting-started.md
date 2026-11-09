@@ -88,6 +88,10 @@ The switch **mm | in** beside {{ui:inspector.snapGrid}} changes the unit, the pl
 
 At the foot of the window: {{ui:dashboard.sponsor}} leads to the page where you can support the project; {{ui:dashboard.userGuide}} opens this guide; {{ui:dashboard.forum}} leads to the place for questions, ideas and bug reports (the discussions on GitHub, in German the forum of drucktipps3d); {{ui:editor.bugReport}} makes a ZIP for a bug report; {{ui:dashboard.projectOnGitHub}} leads to the project on GitHub, and the version number opens the release notes. The links to the imprint and the privacy policy belong to whoever runs the copy of layerling you use.
 
+### Focus mode
+
+On a small screen, {{ui:focusMode.enter}} gives the title row and the footer to the work: the button with the two arrows pointing outwards at the top right, [[Ctrl]]+[[Shift]]+[[F]] or the command search switch it on. The ribbon moves up and the view reaches down to the edge of the window. A small bar below the ribbon keeps the house for the start page, the tabs {{ui:editor.modeGeometry}} and {{ui:editor.modeSketch}}, the magnifying glass, the settings and the button with the two arrows pointing inwards, which ends focus mode; drag the bar by its grip to another spot, a double click on the grip puts it back. layerling remembers the choice in this browser, and while the browser fills the whole screen (F11) it switches to focus mode by itself.
+
 ## Your first part
 
 As an example, we build a cube with a hole.

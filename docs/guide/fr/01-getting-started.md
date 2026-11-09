@@ -88,6 +88,10 @@ Le commutateur **mm | in** à côté de {{ui:inspector.snapGrid}} change l'unit�
 
 En bas de la fenêtre : {{ui:dashboard.sponsor}} mène à la page où vous pouvez soutenir le projet ; {{ui:dashboard.userGuide}} ouvre ce guide ; {{ui:dashboard.forum}} mène à l'endroit des questions, des idées et des rapports de bogue (les discussions sur GitHub, en allemand le forum de drucktipps3d) ; {{ui:editor.bugReport}} crée un ZIP pour un rapport de bogue ; {{ui:dashboard.projectOnGitHub}} mène au projet sur GitHub, et le numéro de version ouvre les notes de version. Les liens vers les mentions légales et la politique de confidentialité appartiennent à celui qui exploite la copie de layerling que vous utilisez.
 
+### Mode concentration
+
+Sur un petit écran, le {{ui:focusMode.enter}} laisse la ligne de titre et le pied de page au travail : le bouton aux deux flèches tournées vers l’extérieur en haut à droite, [[Ctrl]]+[[Shift]]+[[F]] ou la recherche de commandes l’activent. Le ruban remonte et la vue descend jusqu’au bord de la fenêtre. Une petite barre sous le ruban garde la maison vers la page d’accueil, les onglets {{ui:editor.modeGeometry}} et {{ui:editor.modeSketch}}, la loupe, les réglages et le bouton aux deux flèches tournées vers l’intérieur, qui quitte le mode ; faites glisser la barre par sa poignée ailleurs, un double-clic sur la poignée la remet en place. layerling retient ce choix dans ce navigateur et, tant que le navigateur remplit tout l’écran (F11), passe de lui-même en mode concentration.
+
 ## Votre première pièce
 
 À titre d'exemple, nous allons créer un cube percé d'un trou.

@@ -88,6 +88,10 @@ O seletor **mm | in**, junto de {{ui:inspector.snapGrid}}, altera a unidade, a g
 
 No fundo da janela: {{ui:dashboard.sponsor}} abre a página onde podes apoiar o projeto; {{ui:dashboard.userGuide}} abre este guia; {{ui:dashboard.forum}} leva ao espaço para perguntas, ideias e comunicação de erros (as discussões no GitHub ou, em alemão, o fórum do drucktipps3d); {{ui:editor.bugReport}} cria um ZIP para comunicar um erro; {{ui:dashboard.projectOnGitHub}} abre o projeto no GitHub; e o número da versão abre as notas da versão. As ligações para as informações legais e a política de privacidade dizem respeito à entidade responsável pela cópia do layerling que utilizas.
 
+### Modo foco
+
+Num ecrã pequeno, o {{ui:focusMode.enter}} deixa a linha do título e o rodapé para o trabalho: o botão com as duas setas para fora no canto superior direito, [[Ctrl]]+[[Shift]]+[[F]] ou a pesquisa de comandos ativam-no. O friso sobe e a vista chega até ao limite da janela. Uma pequena barra por baixo do friso mantém a casinha para a página inicial, os separadores {{ui:editor.modeGeometry}} e {{ui:editor.modeSketch}}, a lupa, as definições e o botão com as duas setas para dentro, que termina o modo; arraste a barra pela pega para outro sítio, e um duplo clique na pega volta a colocá-la no lugar. O layerling lembra a escolha neste navegador e, enquanto o navegador ocupa o ecrã inteiro (F11), passa sozinho para o modo foco.
+
 ## A tua primeira peça
 
 Como exemplo, vamos criar um bloco com um furo.

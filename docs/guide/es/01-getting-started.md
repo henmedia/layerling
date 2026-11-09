@@ -88,6 +88,10 @@ El interruptor **mm | in**, junto a {{ui:inspector.snapGrid}}, cambia en este di
 
 En la parte de abajo de la ventana: {{ui:dashboard.sponsor}} lleva a la página donde puedes apoyar el proyecto; {{ui:dashboard.userGuide}} abre esta guía; {{ui:dashboard.forum}} lleva al sitio para preguntas, ideas e informes de errores (las discusiones de GitHub; en alemán, el foro de drucktipps3d); {{ui:editor.bugReport}} genera un ZIP para un informe de error; {{ui:dashboard.projectOnGitHub}} lleva al proyecto en GitHub, y el número de versión abre las notas de la versión. Los enlaces al aviso legal y a la política de privacidad son responsabilidad de quien gestiona la copia de layerling que usas.
 
+### Modo concentración
+
+En una pantalla pequeña, {{ui:focusMode.enter}} cede la fila del título y el pie de página al trabajo: lo activan el botón con las dos flechas hacia fuera arriba a la derecha, [[Ctrl]]+[[Shift]]+[[F]] o la búsqueda de comandos. La cinta sube y la vista llega hasta el borde de la ventana. Una pequeña barra bajo la cinta conserva la casa para la página de inicio, las pestañas {{ui:editor.modeGeometry}} y {{ui:editor.modeSketch}}, la lupa, los ajustes y el botón con las dos flechas hacia dentro, que termina el modo; arrastra la barra por su asa a otro sitio, y un doble clic en el asa la devuelve. layerling recuerda la elección en este navegador y, mientras el navegador ocupa toda la pantalla (F11), pasa solo al modo concentración.
+
 ## Tu primera pieza
 
 Como ejemplo, vamos a construir un cubo con un orificio.

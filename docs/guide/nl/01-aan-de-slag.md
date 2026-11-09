@@ -88,6 +88,10 @@ De schakelaar **mm | in** naast {{ui:inspector.snapGrid}} verandert de eenheid, 
 
 Onderaan het venster: {{ui:dashboard.sponsor}} leidt naar de pagina waar je het project kunt steunen; {{ui:dashboard.userGuide}} opent deze handleiding; {{ui:dashboard.forum}} leidt naar de plek voor vragen, ideeën en foutmeldingen (de discussies op GitHub, in het Duits het forum van drucktipps3d); {{ui:editor.bugReport}} maakt een ZIP voor een foutmelding; {{ui:dashboard.projectOnGitHub}} leidt naar het project op GitHub, en het versienummer opent de versienotities. De links naar het impressum en het privacybeleid horen bij wie de kopie van layerling beheert die je gebruikt.
 
+### Focusmodus
+
+Op een klein scherm geeft de {{ui:focusMode.enter}} de titelregel en de voettekst aan het werk: de knop met de twee naar buiten wijzende pijlen rechtsboven, [[Ctrl]]+[[Shift]]+[[F]] of het zoeken naar opdrachten zet hem aan. Het lint schuift omhoog en de weergave reikt tot de rand van het venster. Een kleine balk onder het lint houdt het huisje naar de startpagina, de tabbladen {{ui:editor.modeGeometry}} en {{ui:editor.modeSketch}}, het vergrootglas, de instellingen en de knop met de twee naar binnen wijzende pijlen, die de modus beëindigt; sleep de balk aan zijn greep naar een andere plek, een dubbelklik op de greep zet hem terug. layerling onthoudt de keuze in deze browser, en zolang de browser het hele scherm vult (F11), schakelt het vanzelf naar de focusmodus.
+
 ## Je eerste onderdeel
 
 Als voorbeeld bouwen we een blok met een gat.
