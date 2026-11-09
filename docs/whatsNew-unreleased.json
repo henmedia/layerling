@@ -1,6 +1,18 @@
 [
   {
     "title": {
+      "de": "Klarere Hinweise bei großen und offenen Netzen",
+      "en": "Clearer hints for dense and open meshes",
+      "da": "Tydeligere hints ved tætte og åbne mesh"
+    },
+    "body": {
+      "de": "Versetzen, Aushöhlen und die Kantenbearbeitung sagen jetzt, was weiterhilft: Hat ein Netz zu viele Dreiecke, verweisen sie auf „Netz vereinfachen“ im Rechtsklickmenü. Ist es offen, raten sie, das Vereinfachen rückgängig zu machen oder ein importiertes Netz im Slicer zu reparieren, statt auf ein Reparaturwerkzeug zu verweisen, das es nicht gibt.",
+      "en": "Offset, Hollow and edge treatment now say what helps: when a mesh has too many triangles, they point to Simplify mesh in the right-click menu. When it is open, they suggest undoing the simplify step or repairing an imported mesh in your slicer, instead of a repair tool that does not exist.",
+      "da": "Forskyd legeme, Hul form og kantbehandling siger nu, hvad der hjælper: har et mesh for mange trekanter, henviser de til Forenkl mesh i højrekliksmenuen. Er det åbent, foreslår de at fortryde forenklingen eller reparere et importeret mesh i din slicer i stedet for at henvise til et reparationsværktøj, der ikke findes."
+    }
+  },
+  {
+    "title": {
       "de": "Fokusmodus: mehr Platz auf kleinen Bildschirmen",
       "en": "Focus mode: more room on small screens",
       "da": "Fokustilstand: mere plads på små skærme"
