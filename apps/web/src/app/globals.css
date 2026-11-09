@@ -15077,8 +15077,11 @@ html[data-theme="dark"] .grid-settings {
    "Huelle" passten 2081, 1765 und 1615 px. Ohne "Flaeche loeschen" waren es
    2038, 1728 und 1582 px, ohne den Knopf der Interaktiven Hilfe 1990, 1688
    und 1544 px: Jeder neue Knopf verschiebt alle drei Schwellen um das, was
-   er braucht - neu messen. */
-@media (max-width: 2215px) {
+   er braucht - neu messen.
+   Neu gemessen am 09.11.2026 (1.154.1, #1533): voll 2369 px, mittel 2045 px,
+   klein 1732 px; die alten Schwellen 2215/1897 lagen so tief, dass bei 1898 bis
+   2045 px die Gruppe Flaeche vom Band daneben verdeckt wurde. */
+@media (max-width: 2375px) {
   :root {
     --toolbar-icon-size: calc(37px * var(--toolbar-scale));
   }
@@ -15099,7 +15102,7 @@ html[data-theme="dark"] .grid-settings {
   }
 }
 
-@media (max-width: 1897px) {
+@media (max-width: 2050px) {
   :root {
     --toolbar-icon-size: calc(34px * var(--toolbar-scale));
   }
