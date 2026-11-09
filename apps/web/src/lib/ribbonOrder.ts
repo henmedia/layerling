@@ -10,19 +10,32 @@ import { useSyncExternalStore } from "react";
  */
 export const RIBBON_ORDER_STORAGE_KEY = "layerling.ribbonOrder";
 
+/**
+ * The four groups that were one, "Modify", with named sections until Discussion #1551: each now moves, folds and can be
+ * taken out on its own. Kept orders, hidden groups and button orders that name "modify" stand for all four.
+ */
+export const MODIFY_GROUPS = ["mirrorPattern", "splitShape", "edgesWalls", "surface"] as const;
+export const LEGACY_MODIFY_GROUP = "modify";
+
 /** The groups of the ribbon, in the order it ships them. */
-export const RIBBON_GROUP_ORDER = ["clipboard", "history", "shapes", "visibility", "combine", "modify", "arrange", "manage"] as const;
+export const RIBBON_GROUP_ORDER = ["clipboard", "history", "shapes", "visibility", "combine", ...MODIFY_GROUPS, "arrange", "manage"] as const;
 export type RibbonGroupName = (typeof RIBBON_GROUP_ORDER)[number];
 
 export function normalizeRibbonOrder(value: unknown): RibbonGroupName[] {
   const known = new Set<string>(RIBBON_GROUP_ORDER);
   const seen = new Set<string>();
   const order: RibbonGroupName[] = [];
+  const add = (entry: string) => {
+    if (!known.has(entry) || seen.has(entry)) return;
+    seen.add(entry);
+    order.push(entry as RibbonGroupName);
+  };
   if (Array.isArray(value)) {
     for (const entry of value) {
-      if (typeof entry !== "string" || !known.has(entry) || seen.has(entry)) continue;
-      seen.add(entry);
-      order.push(entry as RibbonGroupName);
+      if (typeof entry !== "string") continue;
+      // An order kept while Modify was one group gets its four groups where it stood (#1551).
+      if (entry === LEGACY_MODIFY_GROUP) MODIFY_GROUPS.forEach(add);
+      else add(entry);
     }
   }
   // A missing group goes back to the place it ships at: an order kept while Shapes stood fixed as the third group

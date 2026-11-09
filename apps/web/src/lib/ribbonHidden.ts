@@ -1,6 +1,7 @@
 "use client";
 
 import { useSyncExternalStore } from "react";
+import { LEGACY_MODIFY_GROUP, MODIFY_GROUPS } from "@/lib/ribbonOrder";
 
 /**
  * Buttons and groups of the 3D ribbon a person has taken out of it (Discussion #1519, #1087): kept in this browser, like
@@ -19,7 +20,9 @@ export function normalizeRibbonHidden(value: unknown): string[] {
   for (const entry of value) {
     if (typeof entry !== "string") continue;
     const id = entry.trim();
-    if (id.length > 0 && id.length <= 80) ids.add(id);
+    // Modify taken out while it was one group takes out the four groups it became (#1551).
+    if (id === ribbonGroupKey(LEGACY_MODIFY_GROUP)) MODIFY_GROUPS.forEach((group) => ids.add(ribbonGroupKey(group)));
+    else if (id.length > 0 && id.length <= 80) ids.add(id);
     if (ids.size >= MAX_HIDDEN) break;
   }
   return [...ids].sort();

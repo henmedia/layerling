@@ -10,5 +10,17 @@
       "en": "Shifting the view now keeps up with the mouse: the point you grab stays under the cursor, where it used to lag behind. Pan speed in Settings > Appearance makes it slower or faster. To have the view stop at once when you let go, turn off Camera keeps turning there; it covers turning and shifting.",
       "da": "Når du flytter visningen, følger den nu musen: det punkt, du griber, bliver under markøren, hvor den før haltede bagefter. Flyttehastighed under Indstillinger > Udseende gør det langsommere eller hurtigere. Vil du have, at visningen stopper med det samme, når du slipper, så slå Kameraet bliver ved med at dreje fra der; det gælder både drejning og flytning."
     }
+  },
+  {
+    "title": {
+      "de": "Menüband: vier Gruppen statt Anpassen, Einklappen nach Wahl",
+      "en": "Ribbon: four groups instead of Modify, folding your way",
+      "da": "Bånd: fire grupper i stedet for Tilpas, sammenfoldning efter valg"
+    },
+    "body": {
+      "de": "Spiegeln & Muster, Teilen & Formen, Kanten & Wände und Oberfläche sind jetzt eigene Gruppen: Jede lässt sich verschieben, einklappen und herausnehmen. Unter Einstellungen > Menüband legt „Einklappen“ für jede Gruppe fest, ob sie bei Platzmangel einklappt, immer eingeklappt bleibt oder als letzte einklappt.",
+      "en": "Mirror & pattern, Split & shape, Edges & walls and Surface are groups of their own now: each moves, folds and can be taken out by itself. In Settings > Ribbon, Folding sets for each group whether it folds when there is no room, stays folded or folds last.",
+      "da": "Spejl og mønster, Del og form, Kanter og vægge og Overflade er nu selvstændige grupper: hver kan flyttes, foldes sammen og tages ud for sig. Under Indstillinger > Bånd bestemmer Sammenfoldning for hver gruppe, om den foldes sammen ved pladsmangel, altid er foldet sammen eller foldes sammen sidst."
+    }
   }
 ]

@@ -15,7 +15,8 @@ import { useSimpleMode } from "@/lib/useSimpleMode";
 import { simpleModeKeepsShape, simpleModeKeepsTool } from "@/lib/simpleMode";
 import { ribbonGroupShown, setRibbonLayout, shownInRibbon, useRibbonHidden } from "@/lib/ribbonHidden";
 import { ribbonSectionOrders, useRibbonOrder } from "@/lib/ribbonOrder";
-import { sortByRibbonToolOrder, useRibbonToolOrder } from "@/lib/ribbonToolOrder";
+import { ribbonToolOrderFor, sortByRibbonToolOrder, useRibbonToolOrder } from "@/lib/ribbonToolOrder";
+import { ribbonCollapsePriority, ribbonFoldOf, useRibbonFold } from "@/lib/ribbonFold";
 import { normalizePolygonSides, normalizeStarInnerPercent, SKETCH_POLYGON_MAX_SIDES, SKETCH_POLYGON_MIN_SIDES, SKETCH_STAR_MAX_INNER_PERCENT, SKETCH_STAR_MIN_INNER_PERCENT } from "@/lib/sketchPrimitives";
 import { SketchBoltCircleIcon, SketchEllipseIcon, SketchHalfCircleIcon, SketchPieSliceIcon, ToolbarAlignIcon, ToolbarAttachmentsIcon, ToolbarBuildPlatesIcon, ToolbarCenterOnWorkplaneIcon, ToolbarChamferIcon, ToolbarCaretDownIcon, ToolbarCookieCutterIcon, ToolbarFlexiIcon, ToolbarLidIcon,
   ToolbarCableChannelIcon, ToolbarCopyIcon, ToolbarDuplicateIcon, ToolbarDropToWorkplaneIcon, ToolbarBundleIcon, ToolbarGroupIcon, ToolbarGuideIcon, ToolbarHideSelectedIcon, ToolbarHomeIcon, ToolbarImportIcon, ToolbarIntersectionIcon,ToolbarClearanceIcon, ToolbarPrintCheckIcon, ToolbarHullIcon, ToolbarLoftSketchesIcon, ToolbarKeyboardIcon, ToolbarFilletIcon, ToolbarHistoryIcon, ToolbarHollowIcon, ToolbarOffsetIcon, ToolbarCutOutIcon, ToolbarPunchIcon, ToolbarDeleteFaceIcon, ToolbarSimplifyIcon, ToolbarMakeExactIcon, ToolbarSurfaceTextureIcon, ToolbarPaintIcon, ToolbarMirrorIcon, ToolbarRotationPivotIcon, ToolbarPatternIcon, ToolbarHolePatternIcon, ToolbarFaceToolIcon, ToolbarSupportRibIcon, ToolbarStencilBridgeIcon, ToolbarConstructionLineIcon, ToolbarMiddleLineIcon, ToolbarLayFlatIcon, ToolbarMateFacesIcon, ToolbarNoteIcon, ToolbarSplitIcon, ToolbarPasteIcon, ToolbarRedoIcon, ToolbarSnapGridIcon, ToolbarSettingsIcon, ToolbarShapeAddIcon, ToolbarTrashIcon, ToolbarUngroupIcon, ToolbarUndoIcon, ToolbarVectorExportIcon } from "../icons";
@@ -149,14 +150,26 @@ export const SKETCH_PALETTE_ICONS = {
   erase: sketchPaletteIcon("erase"),
 };
 
-/** The sections of the "Modify" group, in the order of its tools, with the name each shows above itself. */
+/**
+ * The four groups the tools that change a body stand in, in the order of their tools: once the named sections of one
+ * group, "Modify" (Stefan 31.10.2026), groups of their own since Discussion #1551, so each moves, folds and can be taken
+ * out by itself. Each with its section of the tools, its group in the ribbon, its name, the icon of its folded button
+ * and its place in the folding order (lower folds first; Edges & walls, the one used most, last).
+ */
 export const MODIFY_SECTIONS = [
-  ["pattern", "editor.section.mirrorPattern"],
-  ["shape", "editor.section.splitShape"],
-  ["edges", "editor.section.edgesWalls"],
-  ["surface", "editor.section.surface"],
-] as const satisfies readonly (readonly [string, MessageKey])[];
+  ["pattern", "mirrorPattern", "editor.section.mirrorPattern", 9],
+  ["shape", "splitShape", "editor.section.splitShape", 8],
+  ["edges", "edgesWalls", "editor.section.edgesWalls", 10],
+  ["surface", "surface", "editor.section.surface", 7],
+] as const satisfies readonly (readonly [string, string, MessageKey, number])[];
 type ModifySection = (typeof MODIFY_SECTIONS)[number][0];
+const MODIFY_SECTION_ICONS: Record<ModifySection, ComponentType> = {
+  pattern: ToolbarMirrorIcon,
+  shape: ToolbarSplitIcon,
+  edges: ToolbarFilletIcon,
+  surface: ToolbarSurfaceTextureIcon,
+};
+const modifySectionLabel = (section: string) => MODIFY_SECTIONS.find(([key]) => key === section)?.[2] ?? "editor.group.modify";
 
 /** What a greyed-out tool waits for; its tooltip says so. */
 export type ToolNeed =
@@ -766,7 +779,14 @@ export function SecondaryToolbar({
   // The order of the buttons inside each group, set in the same place (#1519): a group's buttons are sorted by it before the
   // ribbon draws them and the settings list them.
   const toolOrder = useRibbonToolOrder();
-  const ordered = <T extends { id: string }>(group: string, tools: readonly T[]) => sortByRibbonToolOrder(tools, toolOrder[group]);
+  const ordered = <T extends { id: string }>(group: string, tools: readonly T[]) => sortByRibbonToolOrder(tools, ribbonToolOrderFor(toolOrder, group));
+  // How each group folds (#1551): its place in the folding order, and whether it stays folded. The simple mode folds as it
+  // always did, so a choice made for the full ribbon does not fold a group that is one or two buttons there.
+  const ribbonFold = useRibbonFold();
+  const foldProps = (group: string, priority: number) => {
+    const fold = simpleMode ? "auto" : ribbonFoldOf(ribbonFold, group);
+    return { "data-collapse": String(ribbonCollapsePriority(priority, fold)), "data-fold": fold === "always" ? "always" : undefined };
+  };
   // Groups the window has no room for fold into one button that opens on hover or a tap (Stefan, 29.10.2026). The simple
   // mode keeps every tool in sight, as it always did, and so does the pin in the title row, for whoever wants it so.
   const [ribbonPinned, setRibbonPinned] = useState(false);
@@ -1004,18 +1024,6 @@ export function SecondaryToolbar({
     { id: "center", label: t("editor.tool.centerOnWorkplane"), icon: ToolbarCenterOnWorkplaneIcon, action: onCenterOnWorkplane, enabled: canModifySelection, needs: need("selection") },
     ...(onBuildPlates ? [{ id: "buildPlates", label: t("editor.tool.buildPlates"), icon: ToolbarBuildPlatesIcon, action: onBuildPlates, enabled: true, active: Boolean(buildPlatesActive) }] : []),
   ];
-  // "Modify" holds some 16 tools; named sections with a fine line between them let one be found by what it does
-  // (Stefan 31.10.2026). Their names stand in the label row above them, the group's name only on the folded button.
-  const toolSections = (tools: typeof modifyTools) => MODIFY_SECTIONS.map(([section, labelKey]) => {
-    const inSection = tools.filter((tool) => tool.section === section);
-    if (!inSection.length) return null;
-    return (
-      <div className="toolbar-subgroup" role="group" aria-label={t(labelKey)} key={section}>
-        <span className="toolbar-subgroup-label" aria-hidden="true">{t(labelKey)}</span>
-        {inSection.map(renderToolButton)}
-      </div>
-    );
-  });
   const sketchClipboardTools = [
     { id: "sketch-copy", label: t("editor.tool.copy"), icon: ToolbarCopyIcon, action: onSketchCopy, enabled: sketchHasSelection, hint: sketchHasSelection ? null : t("editor.needs.sketchSelection") },
     { id: "sketch-paste", label: t("editor.tool.paste"), icon: ToolbarPasteIcon, action: onSketchPaste, enabled: sketchHasClipboard, hint: sketchHasClipboard ? null : t("editor.needs.clipboard") },
@@ -1261,7 +1269,7 @@ export function SecondaryToolbar({
       plain("overhangs", t("visibility.overhangs", { angle: overhangAngle }), visibilityGroup, true, onToggleOverhangs, { icon: AlertTriangle, active: overhangsVisible }),
       plain("look-onto-workplane", t("camera.lookOntoWorkplane"), t("shortcuts.group.view"), true, () => window.dispatchEvent(new Event("layerling:look-onto-workplane")), { icon: ScanEye }),
       ...combineTools.map((tool) => fromTool(tool, t("editor.group.combine"))),
-      ...modifyTools.map((tool) => fromTool(tool, t("editor.group.modify"))),
+      ...modifyTools.map((tool) => fromTool(tool, t(modifySectionLabel(tool.section)))),
       plain("carry", t("contextMenu.carry"), t("editor.group.arrange"), canModifySelection, onCarryOntoFace, { icon: ArrowDownToLine }),
       plain("scalePercent", t("scalePercent.title"), t("editor.group.modify"), canModifySelection, onScalePercent, { icon: Percent, active: scalePercentActive }),
       ...arrangeTools.map((tool) => fromTool(tool, t("editor.group.arrange"))),
@@ -1289,7 +1297,11 @@ export function SecondaryToolbar({
   const historyShown = inSimpleMode(ordered("history", leftTools.slice(4)));
   const visibilityShown = shownInRibbon(ordered("visibility", visibilityTools), ribbonHidden);
   const combineShown = inSimpleMode(ordered("combine", combineTools));
-  const modifyShown = inSimpleMode(ordered("modify", modifyTools));
+  // Modify's four groups (#1551), each with the tools of its section.
+  const modifyGroups = MODIFY_SECTIONS.map(([section, group, labelKey, priority]) => {
+    const tools = modifyTools.filter((tool) => tool.section === section);
+    return { section, group, label: t(labelKey), priority, tools, shown: inSimpleMode(ordered(group, tools)) };
+  });
   const arrangeShown = inSimpleMode(ordered("arrange", arrangeTools));
   const fileToolsShipped = [
     ...(simpleMode ? [] : [{ id: "import", label: t("editor.import") }]),
@@ -1351,7 +1363,7 @@ export function SecondaryToolbar({
     layoutGroup("shapes", t("editor.group.shapes"), shapesTools, false),
     ...(simpleMode ? [] : [layoutGroup("visibility", t("editor.group.visibility"), visibilityTools, false)]),
     layoutGroup("combine", t("editor.group.combine"), combineTools),
-    layoutGroup("modify", t("editor.group.modify"), modifyTools),
+    ...modifyGroups.map((entry) => layoutGroup(entry.group, entry.label, entry.tools)),
     layoutGroup("arrange", t("editor.group.arrange"), arrangeTools),
     layoutGroup("manage", t("editor.group.file"), fileToolsShipped, false),
   ].filter((group) => group.tools.length > 0);
@@ -1365,14 +1377,14 @@ export function SecondaryToolbar({
           <>
       <div className="tool-group left">
         {ribbonGroupShown("clipboard", ribbonHidden, clipboardShown) ? (
-        <div className="toolbar-section" data-group="clipboard" data-collapse="2" style={{ order: sectionOrder.clipboard }} inert={historyViewActive}>
+        <div className="toolbar-section" data-group="clipboard" {...foldProps("clipboard", 2)} style={{ order: sectionOrder.clipboard }} inert={historyViewActive}>
           <div className="toolbar-section-label">{t("editor.group.clipboard")}</div>
           {collapseBox(t("editor.group.clipboard"), ToolbarPasteIcon)}
           <div className="toolbar-section-tools">{clipboardShown.map(renderToolButton)}</div>
         </div>
         ) : null}
         {ribbonGroupShown("history", ribbonHidden, historyShown) ? (
-        <div className="toolbar-section" data-group="history" data-collapse="3" style={{ order: sectionOrder.history }}>
+        <div className="toolbar-section" data-group="history" {...foldProps("history", 3)} style={{ order: sectionOrder.history }}>
           <div className="toolbar-section-label">{t("editor.group.history")}</div>
           {collapseBox(t("editor.group.history"), ToolbarUndoIcon, historyShown.find((tool) => tool.id === "undo"))}
           <div className="toolbar-section-tools">{historyShown.map(renderToolButton)}</div>
@@ -1427,7 +1439,7 @@ export function SecondaryToolbar({
       <div className="toolbar-spacer" />
       <div className="tool-group right" inert={historyViewActive}>
         {simpleMode || !ribbonGroupShown("visibility", ribbonHidden) ? null : (
-        <div className="toolbar-section compact toolbar-visibility-section" data-group="visibility" data-collapse="5" style={{ order: sectionOrder.visibility }} ref={visibilityMenuRef}>
+        <div className="toolbar-section compact toolbar-visibility-section" data-group="visibility" {...foldProps("visibility", 5)} style={{ order: sectionOrder.visibility }} ref={visibilityMenuRef}>
           <div className="toolbar-section-label">{t("editor.group.visibility")}</div>
           {collapseBox(t("editor.group.visibility"), ToolbarHideSelectedIcon)}
           <div className="toolbar-section-tools">
@@ -1544,21 +1556,21 @@ export function SecondaryToolbar({
         </div>
         )}
         {ribbonGroupShown("combine", ribbonHidden, combineShown) ? (
-        <div className="toolbar-section" data-group="combine" data-collapse="6" style={{ order: sectionOrder.combine }}>
+        <div className="toolbar-section" data-group="combine" {...foldProps("combine", 6)} style={{ order: sectionOrder.combine }}>
           <div className="toolbar-section-label">{t("editor.group.combine")}</div>
           {collapseBox(t("editor.group.combine"), ToolbarGroupIcon)}
           <div className="toolbar-section-tools">{combineShown.map(renderToolButton)}</div>
         </div>
         ) : null}
-        {ribbonGroupShown("modify", ribbonHidden, modifyShown) ? (
-        <div className="toolbar-section" data-group="modify" data-collapse="7" style={{ order: sectionOrder.modify }}>
-          <div className="toolbar-section-label">{t("editor.group.modify")}</div>
-          {collapseBox(t("editor.group.modify"), ToolbarFilletIcon)}
-          <div className="toolbar-section-tools">{toolSections(modifyShown)}</div>
+        {modifyGroups.map((entry) => ribbonGroupShown(entry.group, ribbonHidden, entry.shown) ? (
+        <div key={entry.group} className="toolbar-section" data-group={entry.group} data-collapse={foldProps(entry.group, entry.priority)["data-collapse"]} data-fold={foldProps(entry.group, entry.priority)["data-fold"]} style={{ order: sectionOrder[entry.group] }}>
+          <div className="toolbar-section-label">{entry.label}</div>
+          {collapseBox(entry.label, MODIFY_SECTION_ICONS[entry.section])}
+          <div className="toolbar-section-tools">{entry.shown.map(renderToolButton)}</div>
         </div>
-        ) : null}
+        ) : null)}
         {ribbonGroupShown("arrange", ribbonHidden, arrangeShown) ? (
-        <div className="toolbar-section" data-group="arrange" data-collapse="4" style={{ order: sectionOrder.arrange }}>
+        <div className="toolbar-section" data-group="arrange" {...foldProps("arrange", 4)} style={{ order: sectionOrder.arrange }}>
           <div className="toolbar-section-label">{t("editor.group.arrange")}</div>
           {collapseBox(t("editor.group.arrange"), ToolbarAlignIcon)}
           <div className="toolbar-section-tools">{arrangeShown.map(renderToolButton)}</div>
@@ -1566,7 +1578,7 @@ export function SecondaryToolbar({
         ) : null}
       </div>
       {ribbonGroupShown("manage", ribbonHidden, fileShown) ? (
-      <div className="toolbar-section toolbar-actions-section" data-group="manage" data-collapse="1" style={{ order: sectionOrder.manage }}>
+      <div className="toolbar-section toolbar-actions-section" data-group="manage" {...foldProps("manage", 1)} style={{ order: sectionOrder.manage }}>
         <div className="toolbar-section-label">{t("editor.group.file")}</div>
         {collapseBox(t("editor.group.file"), ToolbarVectorExportIcon)}
         <div className="action-buttons">

@@ -98,7 +98,7 @@ Uma observação: arredondamentos e chanfros que você aplicou no grupo de uniã
 
 ## Dividindo
 
-{{ui:editor.tool.split}}, na área {{ui:editor.group.modify}}, corta a seleção em duas com um plano, por exemplo uma peça grande demais para a mesa de impressão, ou uma cujo interior você quer ver. Selecione um ou mais sólidos ou buracos e clique em {{ui:editor.tool.split}}. Um plano translúcido mostra exatamente onde o corte vai passar, e uma linha branca o marca nos próprios sólidos, onde o plano os encontra; nada muda até você aplicar.
+{{ui:editor.tool.split}}, na área {{ui:editor.section.splitShape}}, corta a seleção em duas com um plano, por exemplo uma peça grande demais para a mesa de impressão, ou uma cujo interior você quer ver. Selecione um ou mais sólidos ou buracos e clique em {{ui:editor.tool.split}}. Um plano translúcido mostra exatamente onde o corte vai passar, e uma linha branca o marca nos próprios sólidos, onde o plano os encontra; nada muda até você aplicar.
 
 - {{ui:split.orientation}}: **X** faz um corte vertical entre esquerda e direita, **Y** entre frente e trás, **Z** um corte horizontal entre cima e baixo. Os eixos têm os mesmos nomes do cartão Posição, com Z para cima. O plano começa paralelo ao plano de trabalho, então na mesa com Z.
 - {{ui:split.workplane}}: {{ui:split.workplaneParallel}} deita o plano paralelo ao plano de trabalho, {{ui:split.workplaneAcrossX}} e {{ui:split.workplaneAcrossY}} o deixam em pé, perpendicular a ele, atravessando a direção X ou Y dele. Onde a origem do plano de trabalho cruza a seleção, o plano passa por essa origem; senão, pelo meio. Assim você coloca o plano de trabalho numa face inclinada com [[W]] e corta bem ali, sem mexer nos controles deslizantes.

@@ -8,6 +8,7 @@ import { setPrinterPlayFor } from "@/lib/printerPlay";
 import { writeRibbonHidden } from "@/lib/ribbonHidden";
 import { writeRibbonOrder } from "@/lib/ribbonOrder";
 import { writeRibbonToolOrder } from "@/lib/ribbonToolOrder";
+import { writeRibbonFold } from "@/lib/ribbonFold";
 import {
   buildSettingsFile,
   parseSettingsFile,
@@ -74,6 +75,7 @@ export function SettingsFileButtons({
     if (parsed.browser.ribbonHidden) writeRibbonHidden(parsed.browser.ribbonHidden);
     if (parsed.browser.ribbonOrder) writeRibbonOrder(parsed.browser.ribbonOrder);
     if (parsed.browser.ribbonToolOrder) writeRibbonToolOrder(parsed.browser.ribbonToolOrder);
+    if (parsed.browser.ribbonFold) writeRibbonFold(parsed.browser.ribbonFold);
     setMessage(t("workspace.importSettingsDone"));
   };
 

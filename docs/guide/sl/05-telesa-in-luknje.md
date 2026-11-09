@@ -94,7 +94,7 @@ Opomba: posnetja in zaokrožitve, ki si jih položil na **celotno** skupino, se 
 
 ## Rezanje
 
-{{ui:editor.tool.split}} v področju {{ui:editor.group.modify}} razreže izbor z ravnino na dva dela – na primer del, ki je prevelik za tiskalno posteljo, ali takega, v katerega želiš pogledati. Označi eno ali več teles ali lukenj in klikni nanj. Prosojna ravnina kaže natanko, kje je rez; spremeni se šele, ko ga uporabiš.
+{{ui:editor.tool.split}} v področju {{ui:editor.section.splitShape}} razreže izbor z ravnino na dva dela – na primer del, ki je prevelik za tiskalno posteljo, ali takega, v katerega želiš pogledati. Označi eno ali več teles ali lukenj in klikni nanj. Prosojna ravnina kaže natanko, kje je rez; spremeni se šele, ko ga uporabiš.
 
 - {{ui:split.orientation}}: **X** reže navpično med levo in desno, **Y** med spredaj in zadaj, **Z** vodoravno med zgoraj in spodaj. Osi se imenujejo kot v kartici lege, Z kaže navzgor; ravnina se začne z Z.
 - {{ui:split.workplane}}: {{ui:split.workplaneParallel}} položi ravnino vzporedno z delovno ravnino, {{ui:split.workplaneAcrossX}} in {{ui:split.workplaneAcrossY}} jo postavita pravokotno nanjo, prečno na njeno smer X ali Y. Če izhodišče delovne ravnine seka izbor, gre ravnina skozenj, sicer skozi sredino. Tako z [[W]] postaviš delovno ravnino na poševno ploskev in režeš natanko tam, brez vrtenja drsnikov.

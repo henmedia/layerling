@@ -178,7 +178,7 @@ summary: مكتبة الأشكال، الأبعاد بالأرقام وبالم�
 
 ## نسيج السطح (A surface texture)
 
-أخاديد أو تخريش أو خلايا نحل أو نتوءات على جسم، لقبضة أفضل أو للمظهر: افتح {{ui:inspector.surfaceTexture}} في إعدادات الشكل. الزر {{ui:inspector.surfaceTexture}} في مجموعة {{ui:editor.group.modify}} في الأعلى يفعل الشيء نفسه: يفتح البطاقة للجسم المحدد ويغلقها، ويبقى مضاءً ما دامت البطاقة مفتوحة.
+أخاديد أو تخريش أو خلايا نحل أو نتوءات على جسم، لقبضة أفضل أو للمظهر: افتح {{ui:inspector.surfaceTexture}} في إعدادات الشكل. الزر {{ui:inspector.surfaceTexture}} في مجموعة {{ui:editor.section.surface}} في الأعلى يفعل الشيء نفسه: يفتح البطاقة للجسم المحدد ويغلقها، ويبقى مضاءً ما دامت البطاقة مفتوحة.
 
 1. اختر {{ui:inspector.surfacePattern}} و{{ui:inspector.surfaceSpacing}} و{{ui:inspector.surfaceDepth}}. يحدد {{ui:inspector.surfaceDirection}} هل يدخل النقش في الجسم أم يبرز منه. لـ{{ui:surfaceTexture.bumps}} يختار {{ui:inspector.surfaceBumpShape}} بين {{ui:surfaceTexture.bumpDome}} و{{ui:surfaceTexture.bumpCone}} و{{ui:surfaceTexture.bumpSoft}} و{{ui:surfaceTexture.bumpFlat}}. وتحت {{ui:inspector.surfaceBumpGrid}} تكون {{ui:surfaceTexture.bumpGridStaggered}}، كل صف ثانٍ مزاح بنصف مسافة، أو في {{ui:surfaceTexture.bumpGridStraight}}.
 2. تحت {{ui:inspector.surfaceProjection}} خذ {{ui:surfaceTexture.cylinder}} للأجسام المستديرة مثل كوب أو مقبض دوّار أو يد. يدور النقش حول {{ui:inspector.surfaceAxis}}، وتُقرّب المسافة قليلًا كي يدور عدد صحيح من الأخاديد أو الخلايا: فينغلق النقش دون درز. يناسب {{ui:surfaceTexture.allRound}} الأجسام غير المستديرة، و{{ui:surfaceTexture.flatProjection}} غطاءً أو لوحًا يُرى من الأعلى. اتركه على {{ui:surfaceTexture.auto}} فيختار Layerling عنك: {{ui:surfaceTexture.cylinder}} على الأجسام المستديرة وعلى الأجسام ذات الزوايا القائمة مثل صندوق (يتبع النقش عندئذ المحيط ويلتف حول الحواف دون درز، والنقش البارز ينثني حولها)، و{{ui:surfaceTexture.allRound}} على الأجسام ذات الزوايا الأخرى.
@@ -214,7 +214,7 @@ summary: مكتبة الأشكال، الأبعاد بالأرقام وبالم�
 
 ## التلوين بعدة ألوان (Painting in several colours)
 
-للطباعة بعدة ألوان، تلوّن {{ui:paint.title}} أجزاءً من الجسم داخل التصميم مباشرة: وجهًا، أو جدارًا دائريًا، أو باطن ثقب، أو بقعة دائرية، أو منطقة ترسم حولها. تعمل مثل أدوات التلوين في برامج التقطيع، لكن اللون يُحفظ مع التصميم. حدد جسمًا واحدًا وانقر على {{ui:paint.title}} في مجموعة {{ui:editor.group.modify}}، بجانب {{ui:inspector.surfaceTexture}}. تعرض اللوحة ألوان تصميمك، و{{ui:paint.customColor}} يمزج لونًا خاصًا بك. ثم لوّن في العرض بإحدى ثلاث أدوات:
+للطباعة بعدة ألوان، تلوّن {{ui:paint.title}} أجزاءً من الجسم داخل التصميم مباشرة: وجهًا، أو جدارًا دائريًا، أو باطن ثقب، أو بقعة دائرية، أو منطقة ترسم حولها. تعمل مثل أدوات التلوين في برامج التقطيع، لكن اللون يُحفظ مع التصميم. حدد جسمًا واحدًا وانقر على {{ui:paint.title}} في مجموعة {{ui:editor.section.surface}}، بجانب {{ui:inspector.surfaceTexture}}. تعرض اللوحة ألوان تصميمك، و{{ui:paint.customColor}} يمزج لونًا خاصًا بك. ثم لوّن في العرض بإحدى ثلاث أدوات:
 
 - {{ui:paint.mode.fill}}: نقرة تملأ الوجه حتى حوافه الحادة، مثل دلو الطلاء في برامج الرسم: أعلى متوازي مستطيلات، أو جدار أسطوانة، أو قاع جيب، أو باطن ثقب، كلٌّ بنقرة واحدة. يحدد {{ui:paint.angle}} مدى حدة الحافة اللازمة لإيقاف التعبئة؛ وعند 90° تعبر حواف متوازي المستطيلات.
 - {{ui:paint.mode.circle}}: نقرة تضع على السطح بقعة دائرية بالـ{{ui:paint.diameter}} المحدد، مركزها حيث تنقر، حتى على سطح منحنٍ. تتوقف عند حواف الجسم الحادة ولا تنفذ أبدًا إلى ظهر الجدار.

@@ -133,7 +133,9 @@ X 與 [[Esc]] 會關閉視窗；若正在量測，[[Esc]] 會先結束量測。�
 
 {{ui:workspace.ribbonButtons}} 把你從不使用的群組和按鈕從功能區中移除。按一下群組開啟它的清單：{{ui:workspace.ribbonGroupShown}} 移除整個群組，按鈕旁的勾選框只移除這一個按鈕。{{ui:workspace.ribbonShowAll}} 把一切恢復。沒有按鈕的群組會消失，其他群組隨之前移，一列就能放下更多功能區。
 
-移除的內容只是不在功能區中：命令搜尋（[[Ctrl]]+[[K]]）仍能找到它，它的快速鍵仍能執行它。群組旁邊的箭頭會把它在清單中上移或下移，也就是在功能區中移動；{{ui:workspace.ribbonResetOrder}}會恢復原來的順序。按鈕旁邊的箭頭以同樣方式在其群組內移動它；在「{{ui:editor.group.modify}}」群組中，它仍留在自己的命名分區內。「說明」始終保留。「形狀」群組可以像其他群組一樣移動和移除；移除後，它的面板仍可從命令搜尋開啟。這個瀏覽器會記住你的選擇，它也會寫入 {{ui:workspace.exportSettings}} 的檔案。它適用於 3D 編輯器；草圖有自己的工具列。
+移除的內容只是不在功能區中：命令搜尋（[[Ctrl]]+[[K]]）仍能找到它，它的快速鍵仍能執行它。群組旁邊的箭頭會把它在清單中上移或下移，也就是在功能區中移動；{{ui:workspace.ribbonResetOrder}}會恢復原來的順序。按鈕旁邊的箭頭以同樣方式在其群組內移動它。「說明」始終保留。「形狀」群組可以像其他群組一樣移動和移除；移除後，它的面板仍可從命令搜尋開啟。這個瀏覽器會記住你的選擇，它也會寫入 {{ui:workspace.exportSettings}} 的檔案。它適用於 3D 編輯器；草圖有自己的工具列。
+
+群組清單中 {{ui:workspace.ribbonGroupShown}} 下方的 {{ui:workspace.ribbonFold}} 決定視窗放不下所有群組時這個群組怎麼做。{{ui:workspace.ribbonFoldAuto}} 是預設設定：最少用到的群組先摺疊。{{ui:workspace.ribbonFoldAlways}} 讓這個群組即使在寬視窗中也摺疊成一個按鈕，佔用空間很少，又隨手可用。{{ui:workspace.ribbonFoldKeep}} 讓它在其他所有群組之後才摺疊。{{ui:workspace.ribbonResetOrder}} 也會恢復這項選擇。{{ui:editor.section.mirrorPattern}}、{{ui:editor.section.splitShape}}、{{ui:editor.section.edgesWalls}} 與 {{ui:editor.section.surface}} 是四個獨立的群組：每個都可以單獨移動、摺疊和移除。
 
 ### 外觀：快速模式
 

@@ -137,7 +137,7 @@ With {{ui:array.groupCopies}} ticked, {{ui:array.apply}} groups the original and
 
 ## Hole pattern on a face
 
-For vents, speaker grilles, baskets and enclosures the {{ui:holePattern.title}} spreads holes evenly over a flat face or round the wall of a cylinder. You no longer have to make one hole, repeat it and set it onto the wall. Select exactly one body and click {{ui:holePattern.title}} in the {{ui:editor.group.modify}} group of the ribbon, next to the pattern. You can also right-click the body, or find it with [[Ctrl]]+[[K]].
+For vents, speaker grilles, baskets and enclosures the {{ui:holePattern.title}} spreads holes evenly over a flat face or round the wall of a cylinder. You no longer have to make one hole, repeat it and set it onto the wall. Select exactly one body and click {{ui:holePattern.title}} in the {{ui:editor.section.mirrorPattern}} group of the ribbon, next to the pattern. You can also right-click the body, or find it with [[Ctrl]]+[[K]].
 
 1. Click a flat face of the body. The whole flat face around your click counts, not just the triangle under the pointer. The round wall of a cylinder, a tube or a bore works too, see below; any other curved face does not: you get a hint and click a flat one instead. On a group or a bundle a face runs on across parts that meet, as on one body; on a bundle only when no hole is among them. The parts are joined shortly after the tool opens; until then only one part's face lights up under the pointer, and a click waits for the join. On a group or bundle with text in it, only one part's face lights up, and the click joins the parts.
 2. In the window, set how the holes look and lie:
@@ -165,7 +165,7 @@ An AI can do the same through the MCP bridge with `layerling_perforate_face` (se
 
 ## Pushing a face out or in
 
-For a thicker wall, a raised pad on a face or a pocket cut into it, the {{ui:faceTool.title}} tool works on one flat face. It works on an imported STL too, where there is no sketch to change. Select exactly one body and click {{ui:faceTool.title}} in the {{ui:editor.group.modify}} group of the ribbon, next to the hole pattern. You can also right-click the body, or find it with [[Ctrl]]+[[K]].
+For a thicker wall, a raised pad on a face or a pocket cut into it, the {{ui:faceTool.title}} tool works on one flat face. It works on an imported STL too, where there is no sketch to change. Select exactly one body and click {{ui:faceTool.title}} in the {{ui:editor.section.mirrorPattern}} group of the ribbon, next to the hole pattern. You can also right-click the body, or find it with [[Ctrl]]+[[K]].
 
 1. Click a flat face of the body. As with the hole pattern, the whole flat face around your click counts; a curved face does not work here, a round wall neither. On a group or a bundle the face runs on across parts that meet, as with the hole pattern.
 2. In the window:

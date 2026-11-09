@@ -1,6 +1,7 @@
 "use client";
 
 import { useSyncExternalStore } from "react";
+import { LEGACY_MODIFY_GROUP, MODIFY_GROUPS } from "@/lib/ribbonOrder";
 
 /**
  * The order of the buttons inside each group of the 3D ribbon a person set (Discussion #1519): kept in this browser, like the
@@ -13,7 +14,14 @@ const MAX_TOOLS_PER_GROUP = 80;
 
 export type RibbonToolOrder = Readonly<Record<string, readonly string[]>>;
 
-const GROUPS = ["clipboard", "history", "visibility", "combine", "modify", "arrange", "manage"] as const;
+// "modify" is the one list of the four groups Modify became (#1551), kept as it was saved: each of them takes its
+// buttons' order from it until it gets a list of its own (`ribbonToolOrderFor`).
+const GROUPS = ["clipboard", "history", "visibility", "combine", ...MODIFY_GROUPS, LEGACY_MODIFY_GROUP, "arrange", "manage"] as const;
+
+/** The saved order of a group's buttons; one of Modify's four groups falls back to the list Modify had. */
+export function ribbonToolOrderFor(order: RibbonToolOrder, group: string): readonly string[] | undefined {
+  return order[group] ?? ((MODIFY_GROUPS as readonly string[]).includes(group) ? order[LEGACY_MODIFY_GROUP] : undefined);
+}
 
 export function normalizeRibbonToolOrder(value: unknown): RibbonToolOrder {
   const order: Record<string, string[]> = {};

@@ -1614,7 +1614,10 @@ html[data-theme="dark"]:where([data-palette="graphite"]) .toolbar-title-help .ac
   --group-color: var(--group-combine);
 }
 
-:where(html[data-theme="dark"][data-palette="graphite"]) .toolbar-section[data-group="modify"] {
+:where(html[data-theme="dark"][data-palette="graphite"]) .toolbar-section[data-group="mirrorPattern"],
+:where(html[data-theme="dark"][data-palette="graphite"]) .toolbar-section[data-group="splitShape"],
+:where(html[data-theme="dark"][data-palette="graphite"]) .toolbar-section[data-group="edgesWalls"],
+:where(html[data-theme="dark"][data-palette="graphite"]) .toolbar-section[data-group="surface"] {
   --group-color: var(--group-modify);
 }
 
@@ -1686,15 +1689,6 @@ html[data-theme="dark"]:where([data-palette="graphite"]) .toolbar-title-help .ac
 :where(html[data-theme="dark"][data-palette="graphite"]) .toolbar-section-tools {
   background: color-mix(in srgb, var(--group-color) 7%, var(--toolbar-tile));
   border: 2px solid var(--group-color);
-}
-
-:where(html[data-theme="dark"][data-palette="graphite"]) .toolbar-subgroup + .toolbar-subgroup::before {
-  background: color-mix(in srgb, var(--group-color) 55%, transparent);
-}
-
-:where(html[data-theme="dark"][data-palette="graphite"]) .toolbar-subgroup-label {
-  color: var(--group-color);
-  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.86);
 }
 
 :where(html[data-theme="dark"][data-palette="graphite"]) .toolbar-section[data-collapsed] .toolbar-collapse-trigger::before {
@@ -6822,8 +6816,7 @@ html[data-theme="dark"]:where([data-palette="graphite"]) .toolbar-section {
   border-color: #555555;
 }
 
-html[data-theme="dark"]:where([data-palette="graphite"]) .toolbar-section-label,
-html[data-theme="dark"]:where([data-palette="graphite"]) .toolbar-subgroup-label {
+html[data-theme="dark"]:where([data-palette="graphite"]) .toolbar-section-label {
   color: #c6c6c6;
   text-shadow: 0 1px 1px rgba(0, 0, 0, 0.72);
 }

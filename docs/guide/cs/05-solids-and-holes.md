@@ -94,7 +94,7 @@ Upozornění: zkosení a zaoblení provedená na **celém** sloučeném tělese 
 
 ## Rozdělení
 
-{{ui:editor.tool.split}} v části {{ui:editor.group.modify}} rozdělí výběr rovinou na dvě části. Hodí se pro díl přesahující tiskovou podložku nebo pro prohlédnutí jeho vnitřku. Vyberte jedno či více plných těles nebo výřezů a spusťte nástroj. Průsvitná rovina ukazuje místo řezu; do potvrzení se nic nemění.
+{{ui:editor.tool.split}} v části {{ui:editor.section.splitShape}} rozdělí výběr rovinou na dvě části. Hodí se pro díl přesahující tiskovou podložku nebo pro prohlédnutí jeho vnitřku. Vyberte jedno či více plných těles nebo výřezů a spusťte nástroj. Průsvitná rovina ukazuje místo řezu; do potvrzení se nic nemění.
 
 - {{ui:split.orientation}}: **X** znamená svislý řez mezi levou a pravou stranou, **Y** mezi přední a zadní stranou a **Z** vodorovný řez mezi horní a spodní částí. Osy odpovídají panelu polohy, Z míří vzhůru. Výchozí řez je v ose Z.
 - {{ui:split.workplane}}: {{ui:split.workplaneParallel}} položí rovinu rovnoběžně s pracovní rovinou, {{ui:split.workplaneAcrossX}} a {{ui:split.workplaneAcrossY}} ji postaví kolmo k ní, napříč jejím směrem X nebo Y. Protíná-li počátek pracovní roviny výběr, vede rovina přes něj, jinak středem. Tak položíš pracovní rovinu pomocí [[W]] na šikmou plochu a řízneš přesně tam, bez otáčení posuvníků.

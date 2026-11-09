@@ -98,7 +98,7 @@ A note: fillets and chamfers you had put on the **whole** group are lost on rebu
 
 ## Splitting
 
-{{ui:editor.tool.split}} in the {{ui:editor.group.modify}} area cuts the selection in two with a plane - a part too big for the print bed, say, or one you want to see the inside of. Select one or more solids or holes and click it. A translucent plane shows exactly where the cut will go, and a white line marks it on the bodies themselves, where the plane meets them; nothing changes until you apply it.
+{{ui:editor.tool.split}} in the {{ui:editor.section.splitShape}} area cuts the selection in two with a plane - a part too big for the print bed, say, or one you want to see the inside of. Select one or more solids or holes and click it. A translucent plane shows exactly where the cut will go, and a white line marks it on the bodies themselves, where the plane meets them; nothing changes until you apply it.
 
 - {{ui:split.orientation}}: **X** makes an upright cut between left and right, **Y** between front and back, **Z** a horizontal cut between top and bottom. The axes are named as on the Position card, with Z up. The plane starts parallel to the workplane, so on the base plate with Z.
 - {{ui:split.workplane}}: {{ui:split.workplaneParallel}} lays the plane parallel to the workplane, {{ui:split.workplaneAcrossX}} and {{ui:split.workplaneAcrossY}} stand it square to it, across its X or Y direction. Where the workplane's origin crosses the selection the plane goes through it, otherwise through the middle. So you put the workplane on a sloped face with [[W]] and cut right there, without turning the sliders.

@@ -30,6 +30,10 @@ describe("buttons taken out of the ribbon (Discussion #1519)", () => {
     expect(normalizeRibbonHidden("paint")).toEqual([]);
   });
 
+  it("takes out Modify's four groups where Modify was taken out before it was split (#1551)", () => {
+    expect(normalizeRibbonHidden(["group:modify", "paint"])).toEqual(["group:edgesWalls", "group:mirrorPattern", "group:splitShape", "group:surface", "paint"]);
+  });
+
   it("leaves out what is hidden and keeps the order of the rest", () => {
     const tools = [{ id: "mirror" }, { id: "cookieCutter" }, { id: "fillet" }];
     expect(shownInRibbon(tools, new Set(["cookieCutter"])).map((tool) => tool.id)).toEqual(["mirror", "fillet"]);

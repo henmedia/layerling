@@ -137,7 +137,7 @@ Gdy zaznaczone jest {{ui:array.groupCopies}}, {{ui:array.apply}} w tym samym kro
 
 ## Wzór otworów na ścianie
 
-Do kratek wentylacyjnych, maskownic głośników, koszyków i obudów {{ui:holePattern.title}} rozkłada otwory równomiernie na płaskiej ścianie. Nie musisz już robić jednego otworu, powielać go i ustawiać na ściance. Zaznacz dokładnie jedną bryłę i kliknij {{ui:holePattern.title}} w grupie {{ui:editor.group.modify}} paska narzędzi, obok szyku. Możesz też kliknąć bryłę prawym przyciskiem albo znaleźć narzędzie przez [[Ctrl]]+[[K]].
+Do kratek wentylacyjnych, maskownic głośników, koszyków i obudów {{ui:holePattern.title}} rozkłada otwory równomiernie na płaskiej ścianie. Nie musisz już robić jednego otworu, powielać go i ustawiać na ściance. Zaznacz dokładnie jedną bryłę i kliknij {{ui:holePattern.title}} w grupie {{ui:editor.section.mirrorPattern}} paska narzędzi, obok szyku. Możesz też kliknąć bryłę prawym przyciskiem albo znaleźć narzędzie przez [[Ctrl]]+[[K]].
 
 1. Kliknij płaską ścianę bryły. Liczy się cała płaska ściana wokół kliknięcia, a nie tylko trójkąt pod wskaźnikiem. Działa też okrągła ścianka walca, rury lub otworu, zobacz niżej; inna zakrzywiona ściana nie: dostaniesz podpowiedź i klikniesz płaską. Na grupie albo zestawie ściana przechodzi przez stykające się części jak na jednej bryle, na zestawie tylko wtedy, gdy nie ma wśród nich otworu. Części są łączone chwilę po otwarciu narzędzia. Do tego czasu pod wskaźnikiem podświetla się tylko ściana jednej części, a kliknięcie czeka na połączenie. Na grupie albo zestawie z tekstem podświetla się tylko ściana jednej części, a kliknięcie łączy części.
 2. W oknie ustaw, jak otwory wyglądają i jak leżą:
@@ -165,7 +165,7 @@ AI może zrobić to samo przez most MCP poleceniem `layerling_perforate_face` (z
 
 ## Wypychanie ściany na zewnątrz lub do środka
 
-Do grubszej ścianki, wypukłej podkładki na ścianie albo wyciętej w niej kieszeni służy narzędzie {{ui:faceTool.title}}, które działa na jednej płaskiej ścianie. Działa też na zaimportowanym STL, gdzie nie ma szkicu do zmiany. Zaznacz dokładnie jedną bryłę i kliknij {{ui:faceTool.title}} w grupie {{ui:editor.group.modify}} paska narzędzi, obok wzoru otworów. Możesz też kliknąć bryłę prawym przyciskiem albo znaleźć narzędzie przez [[Ctrl]]+[[K]].
+Do grubszej ścianki, wypukłej podkładki na ścianie albo wyciętej w niej kieszeni służy narzędzie {{ui:faceTool.title}}, które działa na jednej płaskiej ścianie. Działa też na zaimportowanym STL, gdzie nie ma szkicu do zmiany. Zaznacz dokładnie jedną bryłę i kliknij {{ui:faceTool.title}} w grupie {{ui:editor.section.mirrorPattern}} paska narzędzi, obok wzoru otworów. Możesz też kliknąć bryłę prawym przyciskiem albo znaleźć narzędzie przez [[Ctrl]]+[[K]].
 
 1. Kliknij płaską ścianę bryły. Jak przy wzorze otworów liczy się cała płaska ściana wokół kliknięcia, a zakrzywiona ściana, także okrągła ścianka, tu nie działa. Na grupie albo zestawie ściana przechodzi przez stykające się części, jak przy wzorze otworów.
 2. W oknie:

@@ -28,6 +28,7 @@ describe("settings file (Discussion #1407)", () => {
       "layerling.ribbonHidden": JSON.stringify(["cookieCutter", "group:visibility", 7]),
       "layerling.ribbonOrder": JSON.stringify(["arrange", "combine", "clipboard", "history", "visibility", "modify", "manage", "bogus"]),
       "layerling.ribbonToolOrder": JSON.stringify({ combine: ["bundle", "group"], bogus: ["x"] }),
+      "layerling.ribbonFold": JSON.stringify({ surface: "always", shapes: "keep", bogus: "always", arrange: "sometimes" }),
     }));
     expect(browser).toEqual({
       theme: "dark",
@@ -37,8 +38,9 @@ describe("settings file (Discussion #1407)", () => {
       printerPlays: { "some-printer": 0.15 },
       customShortcuts: { center: { combo: "Shift+C", label: "Center on workplane" } },
       ribbonHidden: ["cookieCutter", "group:visibility"],
-      ribbonOrder: ["arrange", "combine", "shapes", "clipboard", "history", "visibility", "modify", "manage"],
+      ribbonOrder: ["arrange", "combine", "shapes", "clipboard", "history", "visibility", "mirrorPattern", "splitShape", "edgesWalls", "surface", "manage"],
       ribbonToolOrder: { combine: ["bundle", "group"] },
+      ribbonFold: { surface: "always" },
     });
     const parsed = parseSettingsFile(settingsFileText(buildSettingsFile(workspace, "2.0 mm", browser, NOW)));
     expect(parsed).not.toBeNull();
@@ -57,8 +59,9 @@ describe("settings file (Discussion #1407)", () => {
       printerPlays: {},
       customShortcuts: {},
       ribbonHidden: [],
-      ribbonOrder: ["clipboard", "history", "shapes", "visibility", "combine", "modify", "arrange", "manage"],
+      ribbonOrder: ["clipboard", "history", "shapes", "visibility", "combine", "mirrorPattern", "splitShape", "edgesWalls", "surface", "arrange", "manage"],
       ribbonToolOrder: {},
+      ribbonFold: {},
     });
     expect(readBrowserSettings(null).shapeColors).toBe(true);
   });
@@ -116,7 +119,7 @@ describe("settings file (Discussion #1407)", () => {
       workspace: {},
       browser: { ribbonHidden: ["paint", "paint", "", 3, "group:modify"] },
     }));
-    expect(withHidden!.browser.ribbonHidden).toEqual(["group:modify", "paint"]);
+    expect(withHidden!.browser.ribbonHidden).toEqual(["group:edgesWalls", "group:mirrorPattern", "group:splitShape", "group:surface", "paint"]);
     const older = parseSettingsFile(JSON.stringify({ format: SETTINGS_FILE_FORMAT, version: 1, workspace: {}, browser: { theme: "dark" } }));
     expect(older!.browser.ribbonHidden).toBeUndefined();
   });
@@ -128,7 +131,7 @@ describe("settings file (Discussion #1407)", () => {
       workspace: {},
       browser: { ribbonOrder: ["arrange", "arrange", "nonsense", "combine", "clipboard", "history", "visibility", "modify", "manage"] },
     }));
-    expect(withOrder!.browser.ribbonOrder).toEqual(["arrange", "combine", "shapes", "clipboard", "history", "visibility", "modify", "manage"]);
+    expect(withOrder!.browser.ribbonOrder).toEqual(["arrange", "combine", "shapes", "clipboard", "history", "visibility", "mirrorPattern", "splitShape", "edgesWalls", "surface", "manage"]);
     const older = parseSettingsFile(JSON.stringify({ format: SETTINGS_FILE_FORMAT, version: 1, workspace: {}, browser: { theme: "dark" } }));
     expect(older!.browser.ribbonOrder).toBeUndefined();
   });

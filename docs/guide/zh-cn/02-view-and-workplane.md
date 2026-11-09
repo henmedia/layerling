@@ -133,7 +133,9 @@ X 和 [[Esc]] 会关闭窗口；如果正在测量，[[Esc]] 会先结束测量�
 
 {{ui:workspace.ribbonButtons}} 把你从不使用的组和按钮从功能区中移除。点击一个组打开它的列表：{{ui:workspace.ribbonGroupShown}} 移除整个组，按钮旁的勾选框只移除这一个按钮。{{ui:workspace.ribbonShowAll}} 把一切恢复。没有按钮的组会消失，其他组随之前移，一行就能放下更多功能区。
 
-移除的内容只是不在功能区中：命令搜索（[[Ctrl]]+[[K]]）仍能找到它，它的快捷键仍能运行它。组旁边的箭头把它在列表中上移或下移，也就是在功能区中移动；{{ui:workspace.ribbonResetOrder}}会恢复原来的顺序。按钮旁边的箭头以同样方式在其组内移动它；在“{{ui:editor.group.modify}}”组中，它仍留在自己的命名分区内。“帮助”始终保留。“形状”组可以像其他组一样移动和移除；移除后，它的面板仍可从命令搜索打开。这个浏览器会记住你的选择，它也会写入 {{ui:workspace.exportSettings}} 的文件。它适用于 3D 编辑器；草图有自己的工具栏。
+移除的内容只是不在功能区中：命令搜索（[[Ctrl]]+[[K]]）仍能找到它，它的快捷键仍能运行它。组旁边的箭头把它在列表中上移或下移，也就是在功能区中移动；{{ui:workspace.ribbonResetOrder}}会恢复原来的顺序。按钮旁边的箭头以同样方式在其组内移动它。“帮助”始终保留。“形状”组可以像其他组一样移动和移除；移除后，它的面板仍可从命令搜索打开。这个浏览器会记住你的选择，它也会写入 {{ui:workspace.exportSettings}} 的文件。它适用于 3D 编辑器；草图有自己的工具栏。
+
+组列表中 {{ui:workspace.ribbonGroupShown}} 下方的 {{ui:workspace.ribbonFold}} 决定窗口放不下所有组时这个组怎么做。{{ui:workspace.ribbonFoldAuto}} 是默认设置：最少用到的组先折叠。{{ui:workspace.ribbonFoldAlways}} 让这个组即使在宽窗口中也折叠成一个按钮，占地很少，又随手可用。{{ui:workspace.ribbonFoldKeep}} 让它在其他所有组之后才折叠。{{ui:workspace.ribbonResetOrder}} 也会恢复这项选择。{{ui:editor.section.mirrorPattern}}、{{ui:editor.section.splitShape}}、{{ui:editor.section.edgesWalls}} 和 {{ui:editor.section.surface}} 是四个独立的组：每个都可以单独移动、折叠和移除。
 
 ### 外观：快速模式
 

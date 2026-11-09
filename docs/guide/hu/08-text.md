@@ -82,7 +82,7 @@ Egy oldallapon lévő felirathoz előbb tedd a munkasíkot arra a lapra, lásd a
 Ha a szöveg átvágja a lemezt, az olyan betűk, mint az O, A és B, elveszítik a közepüket: lazán fekszik a betűben, és kiesik. A {{ui:stencilBridges.title}} kis hidakkal a lemezhez rögzíti, mint egy sablonon.
 
 1. Állítsd a szöveget {{ui:inspector.hole}} módba, vezesd át a lemezen, és jelöld ki mindkettőt, csoportosítva vagy anélkül.
-2. Kattints a {{ui:stencilBridges.title}} gombra a szalag {{ui:editor.group.modify}} csoportjában, kattints jobb gombbal a kijelölésre, vagy keresd meg a [[Ctrl]]+[[K]] billentyűkkel. A hidak narancssárgán jelennek meg ott, ahová kerülnek.
+2. Kattints a {{ui:stencilBridges.title}} gombra a szalag {{ui:editor.section.splitShape}} csoportjában, kattints jobb gombbal a kijelölésre, vagy keresd meg a [[Ctrl]]+[[K]] billentyűkkel. A hidak narancssárgán jelennek meg ott, ahová kerülnek.
 3. Állítsd be a {{ui:stencilBridges.width}} és a {{ui:stencilBridges.count}} értékét. A {{ui:stencilBridges.height}} a lemez vastagságáról indul; az alacsonyabb hidak az alsó lappal egy síkban, középen vagy a felső lappal egy síkban ülnek, ahogy a {{ui:stencilBridges.position}} mondja. Festékszórós sablonon a felül lévő hidak alatt marad hely a festéknek.
 4. A {{ui:stencilBridges.apply}} csoportosítja a hidakat a lemezzel.
 
