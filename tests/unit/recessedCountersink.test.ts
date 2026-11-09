@@ -5,7 +5,8 @@ import { shapeGeometrySignature } from "@/components/workplane/viewportShapeObje
 import { analyzeTriangleSoup } from "@/lib/svgImport";
 import { editorHistoryEntry } from "@/lib/editorHistory";
 import { exportLylProject, importLylProject } from "@/lib/lylProject";
-import { DEFAULT_SNAP_GRID, DEFAULT_WORKPLANE_WORKSPACE } from "@/lib/workplaneSettings";
+import { DEFAULT_SNAP_GRID, DEFAULT_WORKPLANE_WORKSPACE, normalizeShapeCustomizations } from "@/lib/workplaneSettings";
+import { makeShapeFromAsset, toolbarShapeAssets } from "@/lib/shapeCatalog";
 import { workplaneShapesEqual } from "@/lib/workplaneShapes";
 import type { WorkplaneShape } from "@/types/layerling";
 
@@ -97,5 +98,31 @@ describe("a recessed countersink's mesh", () => {
     expect(meshForShape(restored)).toEqual(meshForShape(recessed));
     const broken = [{ ...recessed, screwHoleRecess: "deep" }] as unknown as WorkplaneShape[];
     await expect(importLylProject(await project(broken))).rejects.toThrow(/screwHoleRecess/);
+  });
+});
+
+describe("a screw hole made from its settings, as the AI bridge makes it", () => {
+  // layerling_create_shape and layerling_update_object pass their settings through the shape defaults: the slot and
+  // the recess have to come through there, or a hole made that way loses them.
+  const make = (kind: WorkplaneShape["kind"], params: Record<string, unknown>) => {
+    const asset = toolbarShapeAssets.find((entry) => entry.kind === kind)!;
+    const settings = normalizeShapeCustomizations({ [kind]: params })[kind] ?? {};
+    return makeShapeFromAsset(asset, { x: 0, z: 0 }, { ...settings, width: 14, depth: 6.6, height: 12 });
+  };
+
+  it("keeps the recess and the slot", () => {
+    const made = make("countersink", { screwHoleRecess: 4, screwHoleSlot: true });
+    expect(made.screwHoleRecess).toBe(4);
+    expect(made.screwHoleSlot).toBe(true);
+    expect(make("doubleCountersink", { screwHoleRecess: 2 }).screwHoleRecess).toBe(2);
+    expect(make("counterbore", { screwHoleSlot: true }).screwHoleSlot).toBe(true);
+  });
+
+  it("leaves them out when off, and the counterbore takes no recess", () => {
+    const plain = make("countersink", {});
+    expect(plain.screwHoleRecess).toBeUndefined();
+    expect(plain.screwHoleSlot).toBeUndefined();
+    expect(make("countersink", { screwHoleRecess: 0, screwHoleSlot: false }).screwHoleRecess).toBeUndefined();
+    expect(make("counterbore", { screwHoleRecess: 4 }).screwHoleRecess).toBeUndefined();
   });
 });
