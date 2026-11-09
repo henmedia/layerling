@@ -135,7 +135,7 @@ Ozubené kolo v titulním řádku ({{ui:editor.workspaceSettings}}) otevře nast
 
 {{ui:workspace.ribbonButtons}} odebere z pásu nástrojů skupiny a tlačítka, které nikdy nepoužíváte. Kliknutím na skupinu otevřete její seznam: {{ui:workspace.ribbonGroupShown}} odebere celou skupinu, zaškrtnutí u tlačítka jen to tlačítko. {{ui:workspace.ribbonShowAll}} vrátí vše zpět. Skupina bez tlačítek zmizí a ostatní se posunou, takže se do jednoho řádku vejde víc pásu.
 
-Co odeberete, chybí jen na pásu: vyhledávání příkazů ([[Ctrl]]+[[K]]) to dál najde a jeho klávesa to dál spustí. Šipky u skupiny ji posouvají v seznamu nahoru nebo dolů, a tím i po pásu; {{ui:workspace.ribbonResetOrder}} vrátí pořadí z výroby. Šipky u tlačítka ho posouvají stejně uvnitř jeho skupiny; ve skupině {{ui:editor.group.modify}} zůstane ve svém pojmenovaném oddílu. Skupina Tvary a Nápověda zůstanou vždy a Tvary si drží místo za prvními dvěma skupinami. Volbu si pamatuje tento prohlížeč a jde i do souboru z {{ui:workspace.exportSettings}}. Platí pro 3D editor; náčrt má vlastní lištu.
+Co odeberete, chybí jen na pásu: vyhledávání příkazů ([[Ctrl]]+[[K]]) to dál najde a jeho klávesa to dál spustí. Šipky u skupiny ji posouvají v seznamu nahoru nebo dolů, a tím i po pásu; {{ui:workspace.ribbonResetOrder}} vrátí pořadí z výroby. Šipky u tlačítka ho posouvají stejně uvnitř jeho skupiny; ve skupině {{ui:editor.group.modify}} zůstane ve svém pojmenovaném oddílu. Nápověda zůstane vždy. Skupinu Tvary lze posouvat a odebrat jako každou jinou; její panel se dál otevře z vyhledávání příkazů. Volbu si pamatuje tento prohlížeč a jde i do souboru z {{ui:workspace.exportSettings}}. Platí pro 3D editor; náčrt má vlastní lištu.
 
 ### Vzhled: rychlý režim
 

@@ -4787,6 +4787,13 @@ html[data-theme="dark"] .toolbar-title-help .action-icon-button.active {
   min-width: 82px;
 }
 
+/* Shapes taken out of the ribbon (#1550): the section stays, without width, so its panel still opens from the command
+   search at the spot where the group would stand. */
+.toolbar-shapes-section.out-of-ribbon {
+  min-width: 0;
+  width: 0;
+}
+
 .shape-menu-trigger {
   position: relative;
   display: grid;
