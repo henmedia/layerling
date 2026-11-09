@@ -6,6 +6,8 @@ code still carries it - so a lower number further down is older, not newer.
 
 ## Unreleased
 
+## 1.155.0
+
 - **The ribbon fits the window again (Discussion #1533):** The two widths at which the toolbar icons shrink (2215 and 1897 px) were measured when the ribbon was narrower. Between about 1900 and 2050 px the ribbon was wider than the window, so groups such as Surface or Mirror & Pattern slipped under their neighbours; the same, a little less, between 2215 and 2375 px. Measured anew: the full size needs 2369 px, the middle step 2045 px, and the thresholds are 2375 and 2050 px.
 
 - **Checkboxes keep their space to the text (Discussion #1536):** In the Lid, Offset, Flexi and cookie cutter windows the box sat against its text. The rule that gives the row its gap (`.offset-copy`) was overruled by `.edge-modifier-field`, which comes later in the stylesheet; it now names both classes.
