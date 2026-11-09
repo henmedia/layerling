@@ -6,6 +6,8 @@ code still carries it - so a lower number further down is older, not newer.
 
 ## Unreleased
 
+- **A bent tube bent upwards keeps its opening when grouped (Discussion #1545):** With **Bore cuts as a hole when grouped**, a bent tube made to stand by the **Roll** of a bend, not by turning it, had its opening placed 0.75 mm too low in a group: it stopped short of the top, closed the upright end and thinned the wall below. The opening is now placed from where the tube starts, as its path runs, so it reaches both ends whichever way the tube is bent, turned or mirrored.
+
 ## 1.155.0
 
 - **The ribbon fits the window again (Discussion #1533):** The two widths at which the toolbar icons shrink (2215 and 1897 px) were measured when the ribbon was narrower. Between about 1900 and 2050 px the ribbon was wider than the window, so groups such as Surface or Mirror & Pattern slipped under their neighbours; the same, a little less, between 2215 and 2375 px. Measured anew: the full size needs 2369 px, the middle step 2045 px, and the thresholds are 2375 and 2050 px.
