@@ -1,1 +1,14 @@
-[]
+[
+  {
+    "title": {
+      "de": "Ansicht schneller verschieben",
+      "en": "Shift the view faster",
+      "da": "Flyt visningen hurtigere"
+    },
+    "body": {
+      "de": "Die Ansicht folgt beim Verschieben jetzt der Maus: der gegriffene Punkt bleibt unter dem Mauszeiger, vorher lief sie langsamer mit. Unter Einstellungen > Darstellung stellt „Verschiebetempo“ das langsamer oder schneller ein. Wer keinen Nachlauf möchte, schaltet dort „Kamera läuft nach“ aus; das gilt fürs Drehen und Verschieben.",
+      "en": "Shifting the view now keeps up with the mouse: the point you grab stays under the cursor, where it used to lag behind. Pan speed in Settings > Appearance makes it slower or faster. To have the view stop at once when you let go, turn off Camera keeps turning there; it covers turning and shifting.",
+      "da": "Når du flytter visningen, følger den nu musen: det punkt, du griber, bliver under markøren, hvor den før haltede bagefter. Flyttehastighed under Indstillinger > Udseende gør det langsommere eller hurtigere. Vil du have, at visningen stopper med det samme, når du slipper, så slå Kameraet bliver ved med at dreje fra der; det gælder både drejning og flytning."
+    }
+  }
+]

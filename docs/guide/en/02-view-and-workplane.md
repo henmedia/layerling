@@ -16,7 +16,7 @@ With the mouse:
 | hold [[Ctrl]] / [[Cmd]] and drag with the left button | also moves the view (on a MacBook trackpad: hold [[Cmd]], press and drag); on a Mac, holding Control instead turns the view, as Control-click is the Mac's right click |
 | double-click on empty workplane or beside the plate | moves the view so that the spot comes to the middle; the view then turns around it |
 
-How fast the wheel zooms is set with {{ui:workspace.zoomSpeed}} in the settings, under {{ui:workspace.appearance}}: a slider from 1 to 14, 5 to begin with. It sets the wheel and the trackpad only: the buttons and the keys [[+]] and [[−]] always zoom in the same small steps. One notch of a mouse wheel zooms alike in every browser, a trackpad zooms with how far you stroke.
+How fast the wheel zooms is set with {{ui:workspace.zoomSpeed}} in the settings, under {{ui:workspace.appearance}}: a slider from 1 to 14, 5 to begin with. It sets the wheel and the trackpad only: the buttons and the keys [[+]] and [[−]] always zoom in the same small steps. One notch of a mouse wheel zooms alike in every browser, a trackpad zooms with how far you stroke. {{ui:workspace.panSpeed}} below it sets how fast the view follows the mouse when you shift it, a slider from 1 to 9: at 5, where it begins, the point you grab stays under the cursor.
 
 **Mouse buttons as in your slicer.** If you are used to Bambu Studio or OrcaSlicer, set {{ui:workspace.mouseScheme}} in the settings, under {{ui:workspace.appearance}}, to {{ui:workspace.mouseSchemeSlicer}}. A left drag on empty space then turns the view, the right button shifts it as the middle one does, and Shift with a left drag draws the selection box. A drag on a body still moves it, and a short right click still opens the menu. In a sketch the right button shifts the view too.
 
@@ -189,7 +189,7 @@ The sketch view has its own colours: {{ui:workspace.sketchBackground}} for the w
 
 {{ui:workspace.startView}} sets the angle a new design opens in and {{ui:camera.home}} goes back to. Turn and zoom the view the way you like it, then click {{ui:workspace.startViewUseCurrent}}; {{ui:workspace.startViewStandard}} brings back the usual view from the front right. It holds for every design in this browser. A design you open again still opens the way you left it.
 
-{{ui:workspace.zoomSpeed}} is a slider from slow to fast: how fast the wheel and the trackpad zoom; the zoom buttons and keys keep their own small steps. {{ui:workspace.cameraInertia}}: after you let go of the mouse the view turns on for a moment and slows down gently. Switched off, it stops at once, as in Tinkercad and Fusion 360.
+{{ui:workspace.zoomSpeed}} is a slider from slow to fast: how fast the wheel and the trackpad zoom; the zoom buttons and keys keep their own small steps. {{ui:workspace.panSpeed}} is a slider from slow to fast too: how fast the view follows the mouse when you shift it; in the middle the point you grab stays under the cursor. {{ui:workspace.cameraInertia}}: after you let go of the mouse the view turns or shifts on for a moment and slows down gently. Switched off, it stops at once, as in Tinkercad and Fusion 360.
 
 {{ui:workspace.overhangAngle}} is the angle from which a face counts as an overhang when you switch on Show overhangs in the visibility menu: those faces are hatched red and white. 30° is careful, 70° counts on good cooling of the print; 45° is the usual start. While they are shown, a line under the view says the steepest overhang and how many cm² need supports.
 

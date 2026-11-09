@@ -16,7 +16,7 @@ Met de muis:
 | [[Ctrl]] / [[Cmd]] ingedrukt houden en slepen met de linkerknop | verschuift ook de weergave |
 | dubbelklik op een lege plek van het werkvlak of naast de plaat | verschuift de weergave tot die plek in het midden ligt; de weergave draait daarna om die plek |
 
-Hoe snel het muiswiel zoomt, stel je in bij de instellingen onder {{ui:workspace.appearance}} met {{ui:workspace.zoomSpeed}}: een schuifregelaar van 1 tot 14, eerst 5; boven 10 wordt alleen het wiel sneller.
+Hoe snel het muiswiel zoomt, stel je in bij de instellingen onder {{ui:workspace.appearance}} met {{ui:workspace.zoomSpeed}}: een schuifregelaar van 1 tot 14, eerst 5; boven 10 wordt alleen het wiel sneller. Daaronder stelt {{ui:workspace.panSpeed}} in hoe snel de weergave de muis volgt als je hem verschuift: een schuifregelaar van 1 tot 9; bij 5, waar hij begint, blijft het punt dat je pakt onder de cursor.
 
 **Muisknoppen zoals in je slicer.** Ben je Bambu Studio of OrcaSlicer gewend, zet dan {{ui:workspace.mouseScheme}} in de instellingen, onder {{ui:workspace.appearance}}, op {{ui:workspace.mouseSchemeSlicer}}. Links slepen in een lege ruimte draait dan de weergave, de rechterknop verschuift hem zoals de middelste, en Shift met links slepen tekent het selectiekader. Slepen aan een lichaam verplaatst het nog steeds, en een korte rechtsklik opent nog steeds het menu. In een schets verschuift de rechterknop de weergave ook.
 
@@ -189,7 +189,7 @@ De schetsweergave heeft eigen kleuren: {{ui:workspace.sketchBackground}} voor he
 
 {{ui:workspace.startView}} bepaalt de hoek waarin een nieuw ontwerp opent en waarnaar {{ui:camera.home}} teruggaat. Draai en zoom de weergave zoals je hem graag hebt en klik dan op {{ui:workspace.startViewUseCurrent}}; {{ui:workspace.startViewStandard}} brengt het gewone aanzicht van rechtsvoor terug. Het geldt voor elk ontwerp in deze browser. Een ontwerp dat je opnieuw opent, opent nog steeds zoals je het achterliet.
 
-{{ui:workspace.zoomSpeed}} is een schuifregelaar van langzaam naar snel: hoe snel het wieltje en het trackpad zoomen; de zoomknoppen en -toetsen houden hun eigen kleine stappen. {{ui:workspace.cameraInertia}}: als je de muis loslaat, draait de weergave nog even door en remt zacht af. Uitgeschakeld stopt hij meteen, zoals in Tinkercad en Fusion 360.
+{{ui:workspace.zoomSpeed}} is een schuifregelaar van langzaam naar snel: hoe snel het wieltje en het trackpad zoomen; de zoomknoppen en -toetsen houden hun eigen kleine stappen. {{ui:workspace.panSpeed}} is ook een schuifregelaar van langzaam naar snel: hoe snel de weergave de muis volgt als je hem verschuift; in het midden blijft het punt dat je pakt onder de cursor. {{ui:workspace.cameraInertia}}: als je de muis loslaat, draait of verschuift de weergave nog even door en remt zacht af. Uitgeschakeld stopt hij meteen, zoals in Tinkercad en Fusion 360.
 
 {{ui:workspace.overhangAngle}} is de hoek vanaf welke een vlak als overhang telt als je Overhangen tonen in het zichtbaarheidsmenu aanzet: die vlakken worden rood-wit gearceerd. 30° is voorzichtig, 70° rekent op goede koeling van de print; 45° is het gebruikelijke begin. Zolang ze getoond worden, zegt een regel onder de weergave wat de steilste overhang is en hoeveel cm² steun nodig heeft.
 

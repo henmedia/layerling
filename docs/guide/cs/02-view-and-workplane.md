@@ -16,7 +16,7 @@ Ovládání myší:
 | [[Ctrl]] / [[Cmd]] a tažení levým tlačítkem | také posun pohledu |
 | dvojklik na prázdné místo pracovní roviny nebo mimo podložku | posune pohled tak, aby to místo bylo uprostřed; pohled se pak otáčí kolem něj |
 
-Rychlost přiblížení nastavuje {{ui:workspace.zoomSpeed}} v části {{ui:workspace.appearance}}. Posuvník má rozsah 1 až 14, výchozí je 5; nad 10 se zrychluje jen kolečko.
+Rychlost přiblížení nastavuje {{ui:workspace.zoomSpeed}} v části {{ui:workspace.appearance}}. Posuvník má rozsah 1 až 14, výchozí je 5; nad 10 se zrychluje jen kolečko. Hned pod ním {{ui:workspace.panSpeed}} nastavuje, jak rychle pohled při posouvání sleduje myš: posuvník od 1 do 9; na výchozí hodnotě 5 zůstává uchopený bod pod kurzorem.
 
 **Tlačítka myši jako ve sliceru.** Pokud jste zvyklí na Bambu Studio nebo OrcaSlicer, nastavte v nastavení, v {{ui:workspace.appearance}}, {{ui:workspace.mouseScheme}} na {{ui:workspace.mouseSchemeSlicer}}. Tažení levým tlačítkem po prázdném místě pak otáčí pohled, pravé tlačítko ho posouvá jako prostřední a Shift s tažením levým kreslí výběrový rámeček. Tažení tělesa ho stále posouvá a krátké kliknutí pravým stále otevře nabídku. V náčrtu posouvá pohled i pravé tlačítko.
 
@@ -189,7 +189,7 @@ Pohled náčrtu má vlastní barvy: {{ui:workspace.sketchBackground}} pro okno k
 
 {{ui:workspace.startView}} určuje úhel, ve kterém se otevře nový projekt a ke kterému se vrací {{ui:camera.home}}. Otočte a přibližte pohled, jak se vám líbí, a pak klikněte na {{ui:workspace.startViewUseCurrent}}; {{ui:workspace.startViewStandard}} vrátí obvyklý pohled zepředu zprava. Platí pro každý projekt v tomto prohlížeči. Projekt, který znovu otevřete, se stále otevře tak, jak jste ho opustili.
 
-{{ui:workspace.zoomSpeed}} je posuvník od pomalého po rychlé: jak rychle přibližuje kolečko a touchpad; tlačítka a klávesy přiblížení si ponechávají vlastní malé kroky. {{ui:workspace.cameraInertia}}: po puštění myši se pohled ještě chvíli otáčí a jemně zpomalí. Vypnuté znamená, že se zastaví hned, jako v Tinkercadu a Fusion 360.
+{{ui:workspace.zoomSpeed}} je posuvník od pomalého po rychlé: jak rychle přibližuje kolečko a touchpad; tlačítka a klávesy přiblížení si ponechávají vlastní malé kroky. {{ui:workspace.panSpeed}} je také posuvník od pomalého po rychlé: jak rychle pohled při posouvání sleduje myš; uprostřed zůstává uchopený bod pod kurzorem. {{ui:workspace.cameraInertia}}: po puštění myši se pohled ještě chvíli otáčí nebo posouvá a jemně zpomalí. Vypnuté znamená, že se zastaví hned, jako v Tinkercadu a Fusion 360.
 
 {{ui:workspace.overhangAngle}} je úhel, od kterého plocha platí za převis, když v nabídce viditelnosti zapnete zobrazení převisů: takové plochy jsou šrafované červeně a bíle. 30° je opatrné, 70° počítá s dobrým chlazením tisku; 45° je obvyklý začátek. Dokud se zobrazují, řádek pod pohledem uvádí nejstrmější převis a kolik cm² potřebuje podpěry.
 

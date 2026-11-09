@@ -16,7 +16,7 @@ Avec la souris :
 | maintenez [[Ctrl]] / [[Cmd]] et faites glisser avec le bouton gauche | déplace également la vue |
 | double-clic sur un endroit vide du plan de travail ou à côté de la plaque | déplace la vue pour amener cet endroit au milieu ; la vue tourne ensuite autour de lui |
 
-La vitesse de zoom de la molette se règle avec {{ui:workspace.zoomSpeed}} dans les paramètres, sous {{ui:workspace.appearance}} : un curseur de 1 à 14, réglé sur 5 au départ ; au-dessus de 10, seule la molette devient plus rapide.
+La vitesse de zoom de la molette se règle avec {{ui:workspace.zoomSpeed}} dans les paramètres, sous {{ui:workspace.appearance}} : un curseur de 1 à 14, réglé sur 5 au départ ; au-dessus de 10, seule la molette devient plus rapide. Juste en dessous, {{ui:workspace.panSpeed}} règle la vitesse à laquelle la vue suit la souris quand vous la décalez : un curseur de 1 à 9 ; à 5, sa valeur de départ, le point saisi reste sous le pointeur.
 
 **Boutons de la souris comme dans votre trancheur.** Si vous êtes habitué à Bambu Studio ou OrcaSlicer, réglez {{ui:workspace.mouseScheme}} dans les réglages, sous {{ui:workspace.appearance}}, sur {{ui:workspace.mouseSchemeSlicer}}. Un glissement gauche dans le vide fait alors tourner la vue, le bouton droit la décale comme le bouton du milieu, et Maj avec un glissement gauche trace le cadre de sélection. Un glissement sur un corps le déplace toujours, et un clic droit bref ouvre toujours le menu. Dans une esquisse, le bouton droit décale aussi la vue.
 
@@ -187,7 +187,7 @@ La vue d'esquisse a ses propres couleurs : {{ui:workspace.sketchBackground}} pou
 
 {{ui:workspace.startView}} définit l'angle sous lequel s'ouvre une nouvelle conception et auquel revient {{ui:camera.home}}. Tournez et zoomez la vue comme vous l'aimez, puis cliquez sur {{ui:workspace.startViewUseCurrent}} ; {{ui:workspace.startViewStandard}} ramène la vue habituelle de l'avant droit. Cela vaut pour chaque conception de ce navigateur. Une conception que vous rouvrez s'ouvre toujours comme vous l'avez laissée.
 
-{{ui:workspace.zoomSpeed}} est un curseur de lent à rapide : la vitesse de zoom de la molette et du pavé tactile ; les boutons et les touches de zoom gardent leurs petits pas. {{ui:workspace.cameraInertia}} : après avoir lâché la souris, la vue continue de tourner un instant et ralentit doucement. Désactivée, elle s'arrête aussitôt, comme dans Tinkercad et Fusion 360.
+{{ui:workspace.zoomSpeed}} est un curseur de lent à rapide : la vitesse de zoom de la molette et du pavé tactile ; les boutons et les touches de zoom gardent leurs petits pas. {{ui:workspace.panSpeed}} est aussi un curseur de lent à rapide : la vitesse à laquelle la vue suit la souris quand vous la décalez ; au milieu, le point saisi reste sous le pointeur. {{ui:workspace.cameraInertia}} : après avoir lâché la souris, la vue continue de tourner ou de se décaler un instant et ralentit doucement. Désactivée, elle s'arrête aussitôt, comme dans Tinkercad et Fusion 360.
 
 {{ui:workspace.overhangAngle}} est l'angle à partir duquel une face compte comme un porte-à-faux quand vous activez Afficher les porte-à-faux dans le menu de visibilité : ces faces sont hachurées de rouge et de blanc. 30° est prudent, 70° compte sur un bon refroidissement de l'impression ; 45° est le départ habituel. Tant qu'ils sont affichés, une ligne sous la vue indique le porte-à-faux le plus raide et combien de cm² ont besoin de supports.
 
