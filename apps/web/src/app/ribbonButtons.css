@@ -1,0 +1,51 @@
+/*
+ * "Buttons in the ribbon" in the settings window (#1519). Only the layout lives here: the rows are the window's own
+ * toggles (.workspace-toggle), so their colours follow the light, dark and Graphite themes without a copy of them.
+ */
+.ribbon-buttons-setting {
+  display: grid;
+  gap: 6px;
+}
+
+.ribbon-buttons-head {
+  align-items: center;
+}
+
+.ribbon-buttons-head .make-default-button {
+  white-space: nowrap;
+}
+
+.ribbon-buttons-group > summary {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  padding: 4px 0;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 650;
+}
+
+.ribbon-buttons-group > summary small {
+  font-weight: 600;
+  opacity: 0.7;
+}
+
+.ribbon-buttons-group[open] > summary {
+  margin-bottom: 8px;
+}
+
+.ribbon-buttons-group .ribbon-buttons-row {
+  margin: 0;
+  padding: 4px 0 6px;
+}
+
+.ribbon-buttons-tools {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+  column-gap: 20px;
+  margin: 4px 0 8px 16px;
+}
+
+.ribbon-buttons-tools .ribbon-buttons-row {
+  border-bottom: 0;
+}

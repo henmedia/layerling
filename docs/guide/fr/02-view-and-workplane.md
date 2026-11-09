@@ -129,6 +129,12 @@ La roue dentée dans la ligne du titre ({{ui:editor.workspaceSettings}}) ouvre l
 
 {{ui:workspace.viewCubePosition}} sous {{ui:workspace.appearance}} place le cube d'orientation dans un autre coin de l'espace de travail : {{ui:workspace.viewCubePositionTopLeft}} (comme toujours), {{ui:workspace.viewCubePositionTopRight}}, {{ui:workspace.viewCubePositionBottomLeft}} ou {{ui:workspace.viewCubePositionBottomRight}}. Dans tout autre coin qu'en haut à gauche, la barre de vue remonte à la place libérée par le cube. En bas à droite, le cube se tient juste au-dessus de la commande {{ui:inspector.snapGrid}}. Tant que les propriétés d'une forme sont ouvertes à droite, un cube placé à droite se décale à leur gauche. Le coin est conservé dans ce navigateur et s'applique à chaque conception. Dans une fenêtre étroite, comme sur un téléphone, le réglage est masqué et le cube reste en haut à gauche.
 
+### Apparence : boutons du ruban
+
+{{ui:workspace.ribbonButtons}} retire du ruban les groupes et les boutons que vous n'utilisez jamais. Cliquez sur un groupe pour ouvrir sa liste : {{ui:workspace.ribbonGroupShown}} retire tout le groupe, la coche à côté d'un bouton seulement ce bouton. {{ui:workspace.ribbonShowAll}} remet tout. Un groupe sans bouton disparaît et les autres se resserrent, si bien qu'une plus grande partie du ruban tient sur une ligne.
+
+Ce que vous retirez ne manque que dans le ruban : la recherche de commandes ([[Ctrl]]+[[K]]) le trouve toujours et sa touche le lance toujours. L'ordre des groupes ne change pas, et le groupe Formes et l'Aide restent toujours. Ce navigateur retient le choix, qui entre aussi dans le fichier de {{ui:workspace.exportSettings}}. Il vaut pour l'éditeur 3D ; l'esquisse a sa propre barre.
+
 ### Apparence : mode rapide
 
 {{ui:workspace.fastMode}} est fait pour les ordinateurs plus lents. Il désactive les ombres, les lignes de bord sur tous les corps et l'inertie de la caméra, et ne dessine la vue qu'à la résolution de l'écran. Vos propres réglages sont gardés pour plus tard, et les commutateurs qu'il remplace indiquent {{ui:workspace.offInFastMode}} tant qu'il est actif. Ce qui aide d'autre sur un ordinateur lent figure plus bas sous « Quand layerling semble lent ».

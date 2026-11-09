@@ -1,6 +1,7 @@
 "use client";
 
 import { GuideHelpLink } from "@/components/GuideHelpLink";
+import { RibbonButtonsSetting } from "@/components/workplane/RibbonButtonsSetting";
 import type { GuideSection } from "@/lib/guideLinks";
 import { MAX_OVERHANG_ANGLE, MIN_OVERHANG_ANGLE } from "@/lib/overhangLimits";
 import { Box as BoxIcon, ChevronDown, Grid3X3, History, Palette, Plus, RotateCcw, Ruler, Trash2, X } from "lucide-react";
@@ -858,6 +859,7 @@ export function WorkspaceSettingsModal({
                       ))}
                     </select>
                   </label>
+                  <RibbonButtonsSetting />
                   <WorkspaceToggle
                     label={t("workspace.shapeColors")}
                     description={t("workspace.shapeColorsHint")}

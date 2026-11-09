@@ -133,6 +133,12 @@ Tandhjulet i titellinjen ({{ui:editor.workspaceSettings}}) åbner indstillingern
 
 {{ui:workspace.viewCubePosition}} sætter visningskuben i et andet hjørne af arbejdsplanet: {{ui:workspace.viewCubePositionTopLeft}} (som det altid var), {{ui:workspace.viewCubePositionTopRight}}, {{ui:workspace.viewCubePositionBottomLeft}} eller {{ui:workspace.viewCubePositionBottomRight}}. I alle hjørner undtagen øverst til venstre rykker visningsbjælken op på den plads, kuben forlod. Nederst til højre står kuben lige over {{ui:inspector.snapGrid}}-kontrollen. Mens en forms egenskaber er åbne til højre, viger en kube i højre side til venstre for dem. Hjørnet gemmes i denne browser og holder for hvert design. I et smalt vindue, som på en telefon, er indstillingen skjult, og kuben bliver øverst til venstre.
 
+### Udseende: knapper i båndet
+
+{{ui:workspace.ribbonButtons}} tager de grupper og knapper ud af båndet, som du aldrig bruger. Klik på en gruppe for at åbne dens liste: {{ui:workspace.ribbonGroupShown}} tager hele gruppen ud, fluebenet ved en knap kun den knap. {{ui:workspace.ribbonShowAll}} henter det hele tilbage. En gruppe uden knapper forsvinder, og de andre rykker op, så mere af båndet kan stå på én række.
+
+Det, du tager ud, mangler kun i båndet: kommandosøgningen ([[Ctrl]]+[[K]]) finder det stadig, og dets tast kører det stadig. Gruppernes rækkefølge forbliver den samme, og gruppen Former og Hjælp bliver altid. Valget gemmes i denne browser og kommer med i filen fra {{ui:workspace.exportSettings}}. Det gælder 3D-editoren; skitsen har sin egen bjælke.
+
 ### Udseende: hurtig tilstand
 
 {{ui:workspace.fastMode}} er til langsommere computere. Den slår skygger, kantlinjer på alle former og kameraets inerti fra og tegner kun visningen i skærmopløsning. Dine egne indstillinger gemmes til senere, og de kontakter den overskriver siger {{ui:workspace.offInFastMode}}, mens den er slået til. Mere om hvad der hjælper på en langsom computer står under "Når layerling føles langsom" nedenfor.

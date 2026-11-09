@@ -129,6 +129,12 @@ X 與 [[Esc]] 會關閉視窗；若正在量測，[[Esc]] 會先結束量測。�
 
 {{ui:workspace.viewCubePosition}} 會將視圖立方體放到工作平面的另一個角：{{ui:workspace.viewCubePositionTopLeft}}（一直以來的位置）、{{ui:workspace.viewCubePositionTopRight}}、{{ui:workspace.viewCubePositionBottomLeft}} 或 {{ui:workspace.viewCubePositionBottomRight}}。除了左上角以外，檢視列都會上移到立方體讓出的位置。在右下角時，立方體會正好位於 {{ui:inspector.snapGrid}} 控制項上方。右側開啟形狀屬性時，位於右側的立方體會讓到屬性面板左邊。這個角會儲存在瀏覽器中，並套用於所有設計。視窗較窄時（例如手機），此設定會隱藏，立方體則留在左上角。
 
+### 外觀：功能區中的按鈕
+
+{{ui:workspace.ribbonButtons}} 把你從不使用的群組和按鈕從功能區中移除。按一下群組開啟它的清單：{{ui:workspace.ribbonGroupShown}} 移除整個群組，按鈕旁的勾選框只移除這一個按鈕。{{ui:workspace.ribbonShowAll}} 把一切恢復。沒有按鈕的群組會消失，其他群組隨之前移，一列就能放下更多功能區。
+
+移除的內容只是不在功能區中：命令搜尋（[[Ctrl]]+[[K]]）仍能找到它，它的快速鍵仍能執行它。群組的順序保持不變，「形狀」群組和「說明」始終保留。這個瀏覽器會記住你的選擇，它也會寫入 {{ui:workspace.exportSettings}} 的檔案。它適用於 3D 編輯器；草圖有自己的工具列。
+
 ### 外觀：快速模式
 
 {{ui:workspace.fastMode}} 適用於較慢的電腦。它會關閉陰影、所有實體的邊線與相機慣性，並且只以螢幕解析度繪製檢視。你自己的設定會保留供日後使用，開啟期間被它覆寫的開關會顯示 {{ui:workspace.offInFastMode}}。更多有助於慢速電腦的說明，請見下文「layerling 感覺很慢的時候」。
