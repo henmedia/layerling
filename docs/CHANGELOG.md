@@ -6,6 +6,10 @@ code still carries it - so a lower number further down is older, not newer.
 
 ## Unreleased
 
+- **Face tool: a face pushed out no longer leaves a rim (#1577):** Pushed out, the new part started 0.2 mm inside the body, so it would surely join it. Where the side walls lean in over the face, as on a cylinder narrower at the top whose bottom is pushed down, that part stood out of the walls as a flat rim, and the new part was 0.2 mm taller than its depth. It now starts on the face and is exactly as tall as the depth; the body and the new part still join into one piece. A pocket keeps its little reach out of the face. Reported by @MethylBromide in #1577.
+
+- **Revolve sketch: no ghost shape when editing (Discussion #1575):** A revolved body opened again with Sketch > Edit opens on a workplane at the height where it starts. When that was above the plate, the sketch drew where this level plane cut the bodies around it, so a filled outline seen from above (an octagon with a round hole, in the report) lay behind the side view, although a revolve sketch shows the bodies from the front. The level cuts are now left out of a revolve sketch, as a new revolve sketch on the plate never had them; the body itself was never affected. Reported by @Cowski4444 in #1575.
+
 ## 1.156.1
 
 - **Focus mode: the view reaches the bottom, and the bar's icons are one size (Discussion #1554):** Switched on by its button, or by F11 where it comes after the browser's own resize, focus mode left the 3D view at its old height, so an empty band stayed at the bottom with the snap grid in it. The view now follows the size of its area, whatever changes it. In the small focus bar the house, the magnifier and the cog came out at the ribbon's size beside a small question mark and arrows; all of them are now drawn at one size.

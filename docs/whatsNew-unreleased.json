@@ -1,1 +1,14 @@
-[]
+[
+  {
+    "title": {
+      "de": "Drehskizze: keine Geisterform beim Bearbeiten",
+      "en": "Revolve sketch: no ghost shape when editing",
+      "da": "Drejeskitse: ingen spøgelsesform ved redigering"
+    },
+    "body": {
+      "de": "Wurde ein Drehkörper, der über der Platte beginnt, wieder bearbeitet, lag hinter der Seitenansicht eine gefüllte Form: der waagrechte Schnitt durch die Teile daneben, wie von oben gesehen. Er bleibt jetzt weg; der Körper selbst war nie betroffen.",
+      "en": "Editing a revolved body that starts above the plate showed a filled shape behind the side view: the level cut through the parts beside it, as seen from above. It stays away now; the body itself was never affected.",
+      "da": "Når et drejet legeme, der begynder over pladen, blev redigeret igen, lå der en udfyldt form bag sidevisningen: det vandrette snit gennem delene ved siden af, set ovenfra. Den bliver nu væk; selve legemet var aldrig berørt."
+    }
+  }
+]

@@ -4487,10 +4487,11 @@ export function LayerlingEditor({
   }, [activeSketchWorkplane, editingSketchShapeId, revolveSketchFront, shapes, sketchActive, sketchMirrorAbout]);
   // A workplane inside a body cuts it: the sketch view shows the outline of the cut (a hollow body
   // gives a ring), where a workplane on a face shows that face. Per body, as an SVG path in the
-  // workplane's own coordinates.
+  // workplane's own coordinates. A revolve sketch is a side view: a body opened again to edit it stands on a
+  // workplane at its own height, and the cut through the bodies there was drawn as a ghost from above (Discussion #1575).
   const sketchReferenceSlices = useMemo(() => {
     const slices: Record<string, string> = {};
-    if (!sketchActive || placementWorkplaneIsBase(activeSketchWorkplane)) return slices;
+    if (!sketchActive || revolveSketchFront || placementWorkplaneIsBase(activeSketchWorkplane)) return slices;
     shapes.forEach((shape) => {
       if (shape.hidden || shape.id === editingSketchShapeId) return;
       const mesh = meshForShape(shape);
