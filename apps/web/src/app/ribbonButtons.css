@@ -1,0 +1,134 @@
+/*
+ * "Buttons in the ribbon" in the settings window (#1519). Only the layout lives here: the rows are the window's own
+ * toggles (.workspace-toggle), so their colours follow the light, dark and Graphite themes without a copy of them.
+ */
+.ribbon-buttons-setting {
+  display: grid;
+  gap: 6px;
+}
+
+.ribbon-buttons-head {
+  align-items: center;
+}
+
+.ribbon-buttons-head-actions {
+  display: grid;
+  flex: 0 0 auto;
+  gap: 6px;
+}
+
+.ribbon-buttons-head .make-default-button {
+  white-space: nowrap;
+}
+
+/* How a group folds (#1551): the window's own select row, under the group's tick. */
+.ribbon-buttons-group > .ribbon-fold-row {
+  padding: 2px 0 10px;
+  font-size: 14px;
+}
+
+.ribbon-buttons-group > summary {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  padding: 6px 0;
+  cursor: pointer;
+  font-size: 15px;
+  font-weight: 650;
+}
+
+.ribbon-buttons-group > summary small {
+  font-size: 13px;
+  font-weight: 600;
+  opacity: 0.7;
+}
+
+.ribbon-buttons-group[open] > summary {
+  margin-bottom: 8px;
+}
+
+.ribbon-buttons-group .ribbon-buttons-row {
+  margin: 0;
+  padding: 4px 0 6px;
+}
+
+.ribbon-buttons-group > .ribbon-buttons-row .workspace-toggle-copy {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+/* One button to a line: its name, the two arrows and the tick (the window's toggle has two columns, this row three). */
+.ribbon-buttons-tools {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  margin: 4px 0 8px 16px;
+}
+
+.ribbon-buttons-tools .ribbon-buttons-row {
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  align-items: center;
+  column-gap: 8px;
+  border-bottom: 0;
+}
+
+.ribbon-buttons-tools .ribbon-buttons-row .workspace-toggle-copy {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+/* The two arrows that move a group up or down the ribbon: the first pushes them to the right edge of the row. */
+.ribbon-buttons-group > summary .ribbon-buttons-move {
+  display: inline-grid;
+  width: 32px;
+  height: 28px;
+  place-items: center;
+  align-self: center;
+  padding: 0;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+}
+
+.ribbon-buttons-group > summary .ribbon-buttons-move:first-of-type {
+  margin-left: auto;
+}
+
+.ribbon-buttons-group > summary .ribbon-buttons-move:hover:not(:disabled) {
+  border-color: currentColor;
+}
+
+.ribbon-buttons-group > summary .ribbon-buttons-move:disabled {
+  cursor: default;
+  opacity: 0.25;
+}
+
+/* The arrows of a button row sit just before its tick, smaller than a group's, and need no push to the right. */
+.ribbon-buttons-tool-moves {
+  display: inline-flex;
+  flex: 0 0 auto;
+  gap: 2px;
+}
+
+.ribbon-buttons-tools .ribbon-buttons-move {
+  display: inline-grid;
+  width: 32px;
+  height: 28px;
+  place-items: center;
+  padding: 0;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+}
+
+.ribbon-buttons-tools .ribbon-buttons-move:hover:not(:disabled) {
+  border-color: currentColor;
+}
+
+.ribbon-buttons-tools .ribbon-buttons-move:disabled {
+  cursor: default;
+  opacity: 0.25;
+}

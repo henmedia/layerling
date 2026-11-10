@@ -47,11 +47,36 @@
  *   `estimated`, but the UNO's female headers, which the file names 8.5 mm high (8x1F-H8.5). Both
  *   keep the file's own view: USB at the left end. The Nano's parts under the board (USB chip,
  *   regulator) and its headers, which hang under it, are not drawn.
+ * - Arduino MEGA 2560 Rev3: Arduino's own Eagle PCB file (A000067-cad-files.zip, MEGA2560_Rev3e.brd), read
+ *   as the UNO's: the outline (101.6 x 53.34 mm, the same stepped right edge), the six holes, the parts'
+ *   places and sizes; the female headers 8.5 mm high as the file names them, all other heights `estimated`.
+ *   It keeps the file's own view, USB at the left end, as on Arduino's top picture turned half round.
  * - LOLIN (WEMOS) D1 mini V4.0.0: Wemos's dimension drawing (dim_d1_mini_v4.0.0.pdf, wemos.cc): the outline
  *   (25.4 x 34.3 mm, the antenna end's corners 4 mm round, the notch at the RESET button) and the pins'
  *   pads; laid with its USB-C at the left end. The drawing's two holes beside the antenna are left out.
  *   The parts' places come from their pads, their sizes and heights are `estimated`. Wemos gives no
  *   drawing for the older V3.0.0.
+ * - Raspberry Pi Pico, Pico W and Pico 2: Raspberry Pi's own STEP models (pip.raspberrypi.com: RP-008311-DS
+ *   Pico-R3.step, RP-008318-DS PicoW.stp, RP-009061-CA rpi_pico2.step): the outline (51 x 21 mm), the four
+ *   2.1 mm holes, the pins, every part's box and height, turned a quarter so USB is at the left end. The
+ *   Pico 2 W has no model of its own: its official pinout drawing shows the Pico W's layout, so it takes
+ *   the Pico W's parts, all `estimated`.
+ * - ESP32-CAM (AI-Thinker) on the ESP32-CAM-MB programmer board: AI-Thinker gives only the size (27 x 40.5
+ *   x 4.5 mm) and no drawing; the MB has no maker at all. The parts' places and heights come from the
+ *   published model "ESP32-CAM 3D object with exact dimensions" (goth2k, printables.com/model/525641),
+ *   the gap to the MB and its micro-USB from the inside of the published case "ESP32_CAM_RUGGED"
+ *   (Craicek, makerworld.com/en/models/2107280). The MB hangs under the camera board; its RESET button,
+ *   pressed from the side at the front edge by the USB end, is placed from photos of the pair. All of it is
+ *   `estimated`. The camera's lens can open up through a lid (`lensUp`), as on the ESP32-S3-CAM.
+ * - nulllab ESP32-S3-CAM: nulllab's size drawing (esp32s3_cam_size.png, github.com/nulllaborg/esp32s3-cam):
+ *   38.4 x 30.4 mm, the four holes 32 x 24 mm apart, 3.2 mm from the edges, and the pins' pads; the
+ *   parts' places read off that drawing and nulllab's photo, their sizes and heights `estimated`.
+ * - Espressif ESP32-DevKitC V4 (38 pins): Espressif's dimension drawing (dl.espressif.com, esp32_devkitc_v4_dimensions.dxf):
+ *   48.26 x 27.94 mm, 1 mm corners, no holes, the pins' and the parts' pads; the ESP32-WROOM-32E's size from
+ *   Espressif's datasheet (18 x 25.5 x 3.1 mm), its antenna 6.04 mm past the board's end. The other heights `estimated`.
+ * - ESP32 DevKit V1 (DOIT, 30 pins): sold unbranded, no maker's drawing. From the published true-size drawing
+ *   (mischianti.org, DOIT-ESP32-DevKit-v1.svg; 28.2 x 51.8 mm, four 2.8 mm holes, as a real board was measured
+ *   in the Fritzing forum); all of it `estimated`.
  * Every board was checked against the maker's own picture of its top, so none is a mirror image.
  * A value the maker does not give is marked `estimated`. A board without mounting holes has `holes: []`.
  *
@@ -109,6 +134,8 @@ export type SbcPart = {
   ribbon?: boolean;
   /** The GPIO header: it can reach up through a lid. */
   gpio?: boolean;
+  /** A camera's lens: it can reach up through a lid. */
+  lens?: boolean;
   /** The edge a ribbon cable's way out goes to, where the nearer one would cross other connectors. */
   ribbonExit?: "left" | "right" | "front" | "back";
 };
@@ -466,6 +493,52 @@ export const SBC_BOARDS: Record<SbcBoardType, SbcBoard> = {
       { name: "LED (RX)", x0: 27.315, x1: 28.565, y0: 33.29, y1: 35.29, height: 0.8, kind: "chip", estimated: true },
     ],
   },
+  arduinoMega: {
+    type: "arduinoMega",
+    name: "Arduino MEGA 2560 Rev3",
+    width: 101.6,
+    depth: 53.34,
+    thickness: 1.6,
+    cornerRadius: 1,
+    holeDiameter: 3.2,
+    holes: [[13.97, 2.54], [15.24, 50.8], [66.04, 7.62], [66.04, 35.56], [90.17, 50.8], [96.52, 2.54]],
+    color: "#00878f",
+    estimated: ["thickness"],
+    // From Arduino's PCB file (MEGA2560_Rev3e.brd): the board 99.06 mm wide, its right edge out to 101.6
+    // between y = 5.08 and 37.846, the same steps and back right corner cut at 45° as the UNO.
+    outline: {
+      plateWidth: 99.06,
+      add: [{ x: 100.33, y: 21.463, width: 2.54, depth: 37.846 }],
+      cut: [diamond(101.6, 2.54, 2.54), diamond(101.6, 40.386, 2.54), diamond(99.06, 53.34, 1.524)],
+    },
+    // USB-B and the power jack at the left end, the UNO's headers at the back and front, the double row
+    // (digital 22 to 53) at the right end.
+    parts: [
+      { name: "USB-B", x0: -6.34, x1: 9.41, y0: 32.2, y1: 44.0, height: 11.0, kind: "connector", estimated: true },
+      { name: "power jack", x0: -1.8, x1: 11.68, y0: 3.3, y1: 12.29, height: 11.0, kind: "connector", estimated: true },
+      // Female headers 8.5 mm high, as the PCB file names them (FH254-1xxDF08500V, 18x2F-H8.5).
+      { name: "header (digital 0 to 7)", x0: 17.53, x1: 42.93, y0: 49.53, y1: 52.07, height: 8.5, kind: "header", pins: [10, 1] },
+      { name: "header (PWM)", x0: 44.45, x1: 64.77, y0: 49.53, y1: 52.07, height: 8.5, kind: "header", pins: [8, 1] },
+      { name: "header (communication)", x0: 67.31, x1: 87.63, y0: 49.53, y1: 52.07, height: 8.5, kind: "header", pins: [8, 1] },
+      { name: "header (power)", x0: 26.67, x1: 46.99, y0: 1.27, y1: 3.81, height: 8.5, kind: "header", pins: [8, 1] },
+      { name: "header (analog 0 to 7)", x0: 49.53, x1: 69.85, y0: 1.27, y1: 3.81, height: 8.5, kind: "header", pins: [8, 1] },
+      { name: "header (analog 8 to 15)", x0: 72.39, x1: 92.71, y0: 1.27, y1: 3.81, height: 8.5, kind: "header", pins: [8, 1] },
+      { name: "header (digital 22 to 53)", x0: 92.71, x1: 97.79, y0: 6.35, y1: 52.07, height: 8.5, kind: "header", pins: [18, 2] },
+      { name: "ICSP header", x0: 62.36, x1: 67.44, y0: 24.13, y1: 31.75, height: 8.5, kind: "header", pins: [3, 2], estimated: true },
+      { name: "ICSP header (USB chip)", x0: 14.48, x1: 22.1, y0: 43.69, y1: 48.77, height: 8.5, kind: "header", pins: [3, 2], estimated: true },
+      { name: "ATmega2560", x0: 42.6, x1: 59.0, y0: 20.15, y1: 36.55, height: 1.2, kind: "chip", estimated: true },
+      { name: "ATmega16U2", x0: 17.44, x1: 22.44, y0: 32.3, y1: 37.3, height: 1.0, kind: "chip", estimated: true },
+      { name: "crystal", x0: 14.99, x1: 21.84, y0: 23.75, y1: 28.32, height: 3.5, kind: "chip", estimated: true },
+      { name: "capacitor", x0: 22.28, x1: 28.78, y0: 5.49, y1: 12.79, height: 5.8, kind: "chip", estimated: true },
+      { name: "capacitor", x0: 15.16, x1: 21.66, y0: 5.49, y1: 12.79, height: 5.8, kind: "chip", estimated: true },
+      { name: "voltage regulator", x0: 4.98, x1: 12.29, y0: 14.5, y1: 21.06, height: 1.8, kind: "chip", estimated: true },
+      { name: "RESET button", x0: 3.12, x1: 9.22, y0: 45.77, y1: 51.77, height: 2.5, kind: "button", estimated: true },
+      { name: "LED (ON)", x0: 75.575, x1: 76.825, y0: 35.83, y1: 37.83, height: 0.8, kind: "chip", estimated: true },
+      { name: "LED (L)", x0: 27.315, x1: 28.565, y0: 41.16, y1: 43.16, height: 0.8, kind: "chip", estimated: true },
+      { name: "LED (TX)", x0: 27.315, x1: 28.565, y0: 35.58, y1: 37.58, height: 0.8, kind: "chip", estimated: true },
+      { name: "LED (RX)", x0: 27.315, x1: 28.565, y0: 33.29, y1: 35.29, height: 0.8, kind: "chip", estimated: true },
+    ],
+  },
   wemosD1Mini: {
     type: "wemosD1Mini",
     name: "LOLIN (WEMOS) D1 mini V4.0.0",
@@ -524,10 +597,217 @@ export const SBC_BOARDS: Record<SbcBoardType, SbcBoard> = {
       { name: "pins (back row)", x0: 2.54, x1: 40.64, y0: 15.71, y1: 17.31, height: 0.05, kind: "header", pins: [15, 1], estimated: true },
       { name: "ICSP pads", x0: 38.0, x1: 43.08, y0: 5.08, y1: 12.7, height: 0.05, kind: "header", pins: [3, 2], estimated: true },
     ],
+  },  pico: {
+    type: "pico",
+    name: "Raspberry Pi Pico",
+    width: 51,
+    depth: 21,
+    thickness: 1.0,
+    cornerRadius: 0,
+    holeDiameter: 2.1,
+    holes: [[2, 4.8], [2, 16.2], [49, 4.8], [49, 16.2]],
+    color: "#127a3e",
+    // USB at the left end; BOOTSEL and pin 1 (GP0) at the front, by the USB end.
+    parts: [
+      { name: "micro-USB", x0: -0.7, x1: 4.3, y0: 6.71, y1: 14.29, height: 2.52, kind: "connector", profile: "microUsb" },
+      { name: "BOOTSEL button", x0: 9.875, x1: 14.125, y0: 5.4, y1: 8.6, height: 2.5, kind: "button" },
+      { name: "RP2040", x0: 22.5, x1: 29.5, y0: 7, y1: 14, height: 0.9, kind: "chip" },
+      { name: "LED", x0: 4.4, x1: 5.2, y0: 4.0, y1: 5.6, height: 0.6, kind: "chip" },
+      // The pins' pads, 20 a side, 2.54 mm apart and 17.78 mm across; the headers come loose.
+      { name: "pins (GP0 to GP15)", x0: 0.1, x1: 50.9, y0: 0.81, y1: 2.41, height: 0.05, kind: "header", pins: [20, 1], estimated: true },
+      { name: "pins (VBUS to GP16)", x0: 0.1, x1: 50.9, y0: 18.59, y1: 20.19, height: 0.05, kind: "header", pins: [20, 1], estimated: true },
+    ],
   },
+  picoW: {
+    type: "picoW",
+    name: "Raspberry Pi Pico W",
+    width: 51,
+    depth: 21,
+    thickness: 0.97,
+    cornerRadius: 0,
+    holeDiameter: 2.1,
+    holes: [[2, 4.8], [2, 16.2], [49, 4.8], [49, 16.2]],
+    color: "#127a3e",
+    // USB at the left end; BOOTSEL and pin 1 (GP0) at the front, by the USB end.
+    parts: [
+      { name: "micro-USB", x0: -1.35, x1: 4.706, y0: 6.505, y1: 14.495, height: 2.695, kind: "connector", profile: "microUsb" },
+      { name: "BOOTSEL button", x0: 9.875, x1: 14.125, y0: 5.4, y1: 8.6, height: 2.5, kind: "button" },
+      { name: "RP2040", x0: 20.45, x1: 27.45, y0: 7, y1: 14, height: 0.95, kind: "chip" },
+      { name: "Wi-Fi module", x0: 32.8, x1: 42.8, y0: 4.5, y1: 16.5, height: 1.7, kind: "shield" },
+      { name: "LED", x0: 4.443, x1: 5.168, y0: 3.995, y1: 5.595, height: 0.68, kind: "chip" },
+      // The pins' pads, 20 a side, 2.54 mm apart and 17.78 mm across; the headers come loose.
+      { name: "pins (GP0 to GP15)", x0: 0.1, x1: 50.9, y0: 0.81, y1: 2.41, height: 0.05, kind: "header", pins: [20, 1], estimated: true },
+      { name: "pins (VBUS to GP16)", x0: 0.1, x1: 50.9, y0: 18.59, y1: 20.19, height: 0.05, kind: "header", pins: [20, 1], estimated: true },
+    ],
+  },
+  pico2: {
+    type: "pico2",
+    name: "Raspberry Pi Pico 2",
+    width: 51,
+    depth: 21,
+    thickness: 1.0,
+    cornerRadius: 0,
+    holeDiameter: 2.1,
+    holes: [[2, 4.8], [2, 16.2], [49, 4.8], [49, 16.2]],
+    color: "#127a3e",
+    // USB at the left end; BOOTSEL and pin 1 (GP0) at the front, by the USB end.
+    parts: [
+      { name: "micro-USB", x0: -1.3, x1: 4.775, y0: 6.5, y1: 14.5, height: 2.695, kind: "connector", profile: "microUsb" },
+      { name: "BOOTSEL button", x0: 9.9, x1: 14.1, y0: 5.3, y1: 8.7, height: 2.5, kind: "button" },
+      { name: "RP2350", x0: 22.5, x1: 29.5, y0: 7, y1: 14, height: 0.85, kind: "chip" },
+      // The pins' pads, 20 a side, 2.54 mm apart and 17.78 mm across; the headers come loose.
+      { name: "pins (GP0 to GP15)", x0: 0.1, x1: 50.9, y0: 0.81, y1: 2.41, height: 0.05, kind: "header", pins: [20, 1], estimated: true },
+      { name: "pins (VBUS to GP16)", x0: 0.1, x1: 50.9, y0: 18.59, y1: 20.19, height: 0.05, kind: "header", pins: [20, 1], estimated: true },
+    ],
+  },
+  pico2W: {
+    type: "pico2W",
+    name: "Raspberry Pi Pico 2 W",
+    width: 51,
+    depth: 21,
+    thickness: 0.97,
+    cornerRadius: 0,
+    holeDiameter: 2.1,
+    holes: [[2, 4.8], [2, 16.2], [49, 4.8], [49, 16.2]],
+    color: "#127a3e",
+    estimated: ["thickness"],
+    // USB at the left end; BOOTSEL and pin 1 (GP0) at the front, by the USB end.
+    parts: [
+      { name: "micro-USB", x0: -1.35, x1: 4.706, y0: 6.505, y1: 14.495, height: 2.695, kind: "connector", profile: "microUsb", estimated: true },
+      { name: "BOOTSEL button", x0: 9.875, x1: 14.125, y0: 5.4, y1: 8.6, height: 2.5, kind: "button", estimated: true },
+      { name: "RP2350", x0: 20.45, x1: 27.45, y0: 7, y1: 14, height: 0.85, kind: "chip", estimated: true },
+      { name: "Wi-Fi module", x0: 32.8, x1: 42.8, y0: 4.5, y1: 16.5, height: 1.7, kind: "shield", estimated: true },
+      // The pins' pads, 20 a side, 2.54 mm apart and 17.78 mm across; the headers come loose.
+      { name: "pins (GP0 to GP15)", x0: 0.1, x1: 50.9, y0: 0.81, y1: 2.41, height: 0.05, kind: "header", pins: [20, 1], estimated: true },
+      { name: "pins (VBUS to GP16)", x0: 0.1, x1: 50.9, y0: 18.59, y1: 20.19, height: 0.05, kind: "header", pins: [20, 1], estimated: true },
+    ],
+  },
+  esp32CamMb: {
+    type: "esp32CamMb",
+    name: "ESP32-CAM (AI-Thinker) on ESP32-CAM-MB",
+    width: 40.5,
+    depth: 27,
+    thickness: 1.5,
+    cornerRadius: 1,
+    holeDiameter: 0,
+    holes: [],
+    color: "#1a1a1a",
+    estimated: ["thickness", "cornerRadius"],
+    // The camera board turned a quarter: the MB's micro-USB at the left end, the card slot at the right end.
+    parts: [
+      // The microSD card slot, a flat box 2 mm high, the card going in at the right end; the camera (8.5 mm
+      // square, the lens 8 mm over the board) stuck on it, so the slot is drawn in pieces round the camera.
+      { name: "microSD card slot", x0: 35.19, x1: 40.5, y0: 6.1, y1: 20.9, height: 2.0, kind: "connector", estimated: true },
+      { name: "microSD card slot (left of the camera)", x0: 25.18, x1: 26.69, y0: 6.1, y1: 20.9, height: 2.0, kind: "chip", estimated: true },
+      { name: "microSD card slot (front of the camera)", x0: 26.69, x1: 35.19, y0: 6.1, y1: 9.25, height: 2.0, kind: "chip", estimated: true },
+      { name: "microSD card slot (back of the camera)", x0: 26.69, x1: 35.19, y0: 17.75, y1: 20.9, height: 2.0, kind: "chip", estimated: true },
+      // Its lens can open up through a lid (Lens up, by Reach up).
+      { name: "camera", x0: 26.69, x1: 35.19, y0: 9.25, y1: 17.75, height: 8.01, kind: "chip", lens: true, estimated: true },
+      { name: "camera connector", x0: 12.3, x1: 17.6, y0: 5.2, y1: 21.8, height: 2.0, kind: "chip", estimated: true },
+      { name: "flash LED", x0: 9.1, x1: 12.3, y0: 0.5, y1: 3.7, height: 1.0, kind: "chip", estimated: true },
+      // Under it: the MB programmer board on the camera board's pins, its micro-USB facing up between the two.
+      // Its RESET button at the front edge by the USB end, pressed from the side (as in photos of the pair);
+      // the MB is drawn in pieces round it and the USB.
+      { name: "RESET button (MB)", x0: 2.5, x1: 6.5, y0: 0, y1: 2.5, height: 4.7, kind: "button", press: "front", underside: true, estimated: true },
+      { name: "ESP32-CAM-MB", x0: 6.5, x1: 40.5, y0: 0, y1: 27, height: 6.3, kind: "shield", underside: true, estimated: true },
+      { name: "ESP32-CAM-MB (by the button)", x0: 0, x1: 2.5, y0: 0, y1: 2.5, height: 6.3, kind: "shield", underside: true, estimated: true },
+      { name: "ESP32-CAM-MB (front of the USB)", x0: 0, x1: 6.5, y0: 2.5, y1: 9.7, height: 6.3, kind: "shield", underside: true, estimated: true },
+      { name: "ESP32-CAM-MB (beside the USB)", x0: 4.3, x1: 6.5, y0: 9.7, y1: 17.3, height: 6.3, kind: "shield", underside: true, estimated: true },
+      { name: "ESP32-CAM-MB (back of the USB)", x0: 0, x1: 6.5, y0: 17.3, y1: 27, height: 6.3, kind: "shield", underside: true, estimated: true },
+      { name: "micro-USB (MB)", x0: -0.7, x1: 4.3, y0: 9.7, y1: 17.3, height: 4.7, kind: "connector", underside: true, estimated: true },
+    ],
+  },
+  esp32s3Cam: {
+    type: "esp32s3Cam",
+    name: "nulllab ESP32-S3-CAM",
+    width: 38.4,
+    depth: 30.4,
+    thickness: 1.6,
+    cornerRadius: 2,
+    holeDiameter: 3.2,
+    holes: [[3.2, 3.2], [35.2, 3.2], [3.2, 27.2], [35.2, 27.2]],
+    color: "#1a1a1a",
+    estimated: ["thickness", "cornerRadius", "holeDiameter"],
+    // nulllab's size drawing as it is: USB-C at the left end, BOOT at the back and RESET at the front beside it.
+    parts: [
+      { name: "USB-C", x0: -0.85, x1: 6.5, y0: 10.74, y1: 19.68, height: 3.26, kind: "connector", profile: "usbC", estimated: true },
+      { name: "BOOT button", x0: 3.55, x1: 8.05, y0: 21.05, y1: 24.35, height: 2.5, kind: "button", estimated: true },
+      { name: "RESET button", x0: 3.55, x1: 8.05, y0: 5.65, y1: 8.95, height: 2.5, kind: "button", estimated: true },
+      { name: "camera connector", x0: 11.0, x1: 16.9, y0: 7.2, y1: 23.2, height: 2.0, kind: "chip", estimated: true },
+      // The camera (8.5 mm square) lies over part of the ESP32-S3; the chip is drawn where it shows.
+      { name: "ESP32-S3", x0: 22.2, x1: 24.75, y0: 8.9, y1: 16.3, height: 0.9, kind: "chip", estimated: true },
+      { name: "ESP32-S3 (front of the camera)", x0: 24.75, x1: 29.7, y0: 8.9, y1: 10.75, height: 0.9, kind: "chip", estimated: true },
+      { name: "camera", x0: 24.75, x1: 33.25, y0: 10.75, y1: 19.25, height: 6.0, kind: "chip", lens: true, estimated: true },
+      // Its socket stops short of the pins at the back edge, so the card stands out over them.
+      { name: "microSD card slot", x0: 21.5, x1: 32.7, y0: 22.7, y1: 28.2, height: 1.8, kind: "chip", estimated: true },
+      { name: "flash LED (front)", x0: 30.4, x1: 33.7, y0: 7.0, y1: 8.7, height: 0.8, kind: "chip", estimated: true },
+      { name: "flash LED (back)", x0: 30.4, x1: 33.7, y0: 20.3, y1: 22.0, height: 0.8, kind: "chip", estimated: true },
+      { name: "antenna", x0: 35.4, x1: 38.2, y0: 9.9, y1: 19.0, height: 1.0, kind: "chip", estimated: true },
+      { name: "antenna socket (IPEX)", x0: 34.7, x1: 37.3, y0: 5.5, y1: 8.1, height: 1.25, kind: "chip", estimated: true },
+      // The pins' pads, 8 a side, 2.54 mm apart; the headers come loose.
+      { name: "pins (GPIO0 to 5V)", x0: 7.37, x1: 26.75, y0: 28.38, y1: 29.98, height: 0.05, kind: "header", pins: [8, 1], estimated: true },
+      { name: "pins (RST to 3V3)", x0: 7.37, x1: 26.75, y0: 0.42, y1: 2.02, height: 0.05, kind: "header", pins: [8, 1], estimated: true },
+    ],
+  },
+  esp32DevKitC: {
+    type: "esp32DevKitC",
+    name: "Espressif ESP32-DevKitC V4 (38 pins)",
+    width: 48.26,
+    depth: 27.94,
+    thickness: 1.6,
+    cornerRadius: 1,
+    holeDiameter: 0,
+    holes: [],
+    color: "#1a1a1a",
+    estimated: ["thickness"],
+    // Espressif's dimension drawing (esp32_devkitc_v4_dimensions.dxf) turned a quarter, as Espressif's own
+    // photo shows it: micro-USB at the left end, EN behind and Boot in front of it, the module's antenna
+    // 6.04 mm out past the right end.
+    parts: [
+      { name: "micro-USB", x0: -0.6, x1: 5.0, y0: 10.25, y1: 17.75, height: 2.7, kind: "connector", profile: "microUsb", estimated: true },
+      { name: "EN button", x0: 1.36, x1: 6.36, y0: 20.19, y1: 23.69, height: 2.0, kind: "button", estimated: true },
+      { name: "Boot button", x0: 1.36, x1: 6.36, y0: 4.25, y1: 7.75, height: 2.0, kind: "button", estimated: true },
+      { name: "LED (5V)", x0: 12.0, x1: 14.2, y0: 21.3, y1: 22.1, height: 0.6, kind: "chip", estimated: true },
+      { name: "USB chip (CP2102N)", x0: 9.75, x1: 14.75, y0: 11.44, y1: 16.44, height: 0.9, kind: "chip", estimated: true },
+      { name: "voltage regulator", x0: 15.93, x1: 22.43, y0: 12.09, y1: 15.59, height: 1.8, kind: "chip", estimated: true },
+      // The ESP32-WROOM-32E: 18 x 25.5 x 3.1 mm (Espressif's datasheet).
+      { name: "ESP32-WROOM-32E", x0: 28.8, x1: 54.3, y0: 4.97, y1: 22.97, height: 3.1, kind: "shield" },
+      // The pins' pads, 19 a side, 25.4 mm apart; the headers point down.
+      { name: "pins (CLK to GND)", x0: 0.49, x1: 47.81, y0: 0.5, y1: 2.1, height: 0.05, kind: "header", pins: [19, 1], estimated: true },
+      { name: "pins (5V to 3V3)", x0: 0.49, x1: 47.81, y0: 25.9, y1: 27.5, height: 0.05, kind: "header", pins: [19, 1], estimated: true },
+    ],
+  },
+  esp32DevKitV1: {
+    type: "esp32DevKitV1",
+    name: "ESP32 DevKit V1 (DOIT, 30 pins)",
+    width: 51.8,
+    depth: 28.2,
+    thickness: 1.6,
+    cornerRadius: 1.1,
+    holeDiameter: 2.8,
+    holes: [[2.2, 2.2], [2.2, 26.0], [49.6, 2.2], [49.6, 26.0]],
+    color: "#2b2b2b",
+    estimated: ["thickness", "cornerRadius", "holeDiameter"],
+    // No maker's drawing: from the published true-size drawing (mischianti.org, DOIT-ESP32-DevKit-v1.svg),
+    // which matches a board measured in the Fritzing forum, turned a quarter: micro-USB at the left end,
+    // EN behind and BOOT in front of it, the module at the right end.
+    parts: [
+      { name: "micro-USB", x0: -0.6, x1: 5.32, y0: 10.74, y1: 17.52, height: 2.7, kind: "connector", profile: "microUsb", estimated: true },
+      { name: "EN button", x0: 1.64, x1: 5.47, y0: 20.86, y1: 23.8, height: 2.0, kind: "button", estimated: true },
+      { name: "BOOT button", x0: 1.64, x1: 5.47, y0: 4.31, y1: 7.25, height: 2.0, kind: "button", estimated: true },
+      { name: "USB chip (CP2102)", x0: 7.6, x1: 12.58, y0: 11.62, y1: 16.69, height: 0.9, kind: "chip", estimated: true },
+      { name: "voltage regulator", x0: 15.14, x1: 21.18, y0: 6.89, y1: 11.77, height: 1.8, kind: "chip", estimated: true },
+      { name: "capacitor", x0: 17.14, x1: 20.44, y0: 14.79, y1: 17.45, height: 2.0, kind: "chip", estimated: true },
+      { name: "ESP32-WROOM-32", x0: 25.55, x1: 50.93, y0: 4.92, y1: 23.29, height: 3.1, kind: "shield", estimated: true },
+      // The pins' pads, 15 a side, 25.4 mm apart; the headers point down.
+      { name: "pins (D23 to 3V3)", x0: 9.41, x1: 46.57, y0: 0.61, y1: 2.21, height: 0.05, kind: "header", pins: [15, 1], estimated: true },
+      { name: "pins (EN to VIN)", x0: 9.41, x1: 46.57, y0: 26.0, y1: 27.6, height: 0.05, kind: "header", pins: [15, 1], estimated: true },
+    ],
+  },
+
 };
 
-export const SBC_BOARD_ORDER: SbcBoardType[] = ["pi5", "pi4", "pi3bPlus", "zero2w", "bttPi12", "xiaoEsp32c6", "esp32c3SuperMini", "esp32c6SuperMini", "featherEsp32s3", "arduinoUno", "arduinoNano", "wemosD1Mini"];
+export const SBC_BOARD_ORDER: SbcBoardType[] = ["pi5", "pi4", "pi3bPlus", "zero2w", "bttPi12", "xiaoEsp32c6", "esp32c3SuperMini", "esp32c6SuperMini", "featherEsp32s3", "arduinoUno", "arduinoMega", "arduinoNano", "wemosD1Mini", "pico", "picoW", "pico2", "pico2W", "esp32CamMb", "esp32s3Cam", "esp32DevKitC", "esp32DevKitV1"];
 export const DEFAULT_SBC_BOARD: SbcBoardType = "pi5";
 /** Extra room for the connectors at the edge, so a case wall cut with the board leaves them a gap: 0 to 2 mm. */
 export const MAX_SBC_CLEARANCE = 2;
@@ -562,7 +842,7 @@ export function normalizeSbcButtonReach(value: unknown) {
  * The openings asked for besides the connectors at the edge: ribbon cables up or out, the GPIO header up, and how far
  * up; the buttons, the way they are pressed, by `buttonReach`.
  */
-export type SbcPassages = { ribbonUp?: boolean; ribbonSide?: boolean; gpioUp?: boolean; upReach?: number; buttonReach?: number };
+export type SbcPassages = { ribbonUp?: boolean; ribbonSide?: boolean; gpioUp?: boolean; lensUp?: boolean; upReach?: number; buttonReach?: number };
 
 /** The stored settings made safe, or null when they name no known board. Openings not asked for are left out. */
 export function normalizeSbcBoardSettings(input: unknown): SbcBoardSettings | null {
@@ -576,6 +856,7 @@ export function normalizeSbcBoardSettings(input: unknown): SbcBoardSettings | nu
     ...(raw.ribbonUp === true ? { ribbonUp: true } : {}),
     ...(raw.ribbonSide === true ? { ribbonSide: true } : {}),
     ...(raw.gpioUp === true ? { gpioUp: true } : {}),
+    ...(raw.lensUp === true ? { lensUp: true } : {}),
     ...(raw.upReach !== undefined ? { upReach: normalizeSbcUpReach(raw.upReach) } : {}),
     ...(normalizeSbcButtonReach(raw.buttonReach) > 0 ? { buttonReach: normalizeSbcButtonReach(raw.buttonReach) } : {}),
   };
@@ -587,6 +868,10 @@ export function sbcBoardHasRibbon(board: SbcBoard) {
 }
 export function sbcBoardHasGpio(board: SbcBoard) {
   return board.parts.some((part) => part.gpio);
+}
+/** The board has a camera lens: whether the card offers its opening up. */
+export function sbcBoardHasLens(board: SbcBoard) {
+  return board.parts.some((part) => part.lens);
 }
 /** The board has buttons: whether the card offers their reach. */
 export function sbcBoardHasButtons(board: SbcBoard) {
@@ -622,9 +907,9 @@ export type SbcBlock = SbcPart & {
   top: number;
 };
 
-/** The part opens up through a lid with these openings: a ribbon cable's connector or the GPIO header asked for. */
+/** The part opens up through a lid with these openings: a ribbon cable's connector, the GPIO header or a camera's lens asked for. */
 function opensUp(part: SbcPart, passages: SbcPassages) {
-  return (part.ribbon && passages.ribbonUp === true) || (part.gpio && passages.gpioUp === true);
+  return (part.ribbon && passages.ribbonUp === true) || (part.gpio && passages.gpioUp === true) || (part.lens && passages.lensUp === true);
 }
 
 /**

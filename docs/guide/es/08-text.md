@@ -12,6 +12,7 @@ Elige {{ui:shape.text}} en la biblioteca de formas y colócalo. En el campo {{ui
 - **{{ui:prop.height}}:** Cuánto sobresalen las letras de la superficie.
 - **{{ui:prop.bevel}}:** Redondea las aristas de las letras para que se vean más suaves. Con {{ui:prop.segments}} decides en cuántos pasos.
 - **{{ui:nameTag.letterEdge}}:** redondea o achaflana la arista superior de las letras, como en una placa con nombre: {{ui:nameTag.edge.none}}, {{ui:nameTag.edge.round}} o {{ui:nameTag.edge.chamfer}}, con el {{ui:nameTag.letterEdgeSize}} (0,4 mm para empezar, como mucho la altura del texto). Llega más lejos que el {{ui:prop.bevel}}, pero solo hasta donde lo permite la anchura de los trazos: donde un trazo es más fino que el doble de ese tamaño, la arista termina en una cara superior más estrecha. La parte de abajo queda plana, así que después se pueden pegar letras sueltas. Mientras haya una arista elegida, sustituye al {{ui:prop.bevel}}.
+- **Longitud:** Un texto admite hasta 250 caracteres. Las letras conservan su tamaño y la línea se alarga lo que haga falta; para acortarla, haz las letras más pequeñas. {{ui:nameTag.letterEdge}} funciona en textos de hasta 40 caracteres, porque en uno más largo tardaría minutos en calcularse.
 - **Tamaño:** La longitud y la anchura de la línea de texto se ajustan como en cualquier forma. Arrastra los tiradores o escribe las medidas.
 - **{{ui:prop.textSpacing}}:** El espacio entre letras que se suma al que ya trae la fuente, en porcentaje del tamaño de letra: 0 lo deja como lo hizo la fuente; por encima, las letras quedan más separadas, y por debajo (hasta -50), más juntas, algo que una fuente propia necesita a menudo. Las letras conservan su tamaño y el recuadro se adapta a la línea, tanto en texto recto como curvado. El espaciado no se aplica al árabe ni al hebreo, cuyas letras van unidas.
 - **{{ui:prop.textStretch}}:** Al principio está desactivado: las letras conservan sus proporciones y se colocan en el centro del marco, así que un marco estirado más ancho o más profundo de lo que necesita la palabra sigue siendo más grande que las letras. Si lo activas, las letras se estiran hasta llenar todo el marco en las dos direcciones: una mayúscula puede quedar más baja o más estrecha, como en Tinkercad. Es para texto recto; el texto curvado tiene su propio tamaño de letra.
@@ -78,6 +79,17 @@ Por tanto:
 - **Grabado:** Cambia el texto a {{ui:inspector.hole}}, haz que se meta un poco en la superficie y agrúpalo con el cuerpo. Las letras quedan grabadas.
 
 Para rotular una cara lateral, coloca antes el plano de trabajo sobre esa cara: consulta [Vista y plano de trabajo](chapter:view-and-workplane).
+
+## Plantillas: puentes para el centro de las letras
+
+Recortadas a través de una placa, letras como O, A y B pierden su centro: queda suelto dentro de la letra y se cae. {{ui:stencilBridges.title}} lo sujeta a la placa con pequeños puentes, como en una plantilla.
+
+1. Cambia el texto a {{ui:inspector.hole}}, haz que atraviese la placa y selecciona ambos, agrupados o no.
+2. Haz clic en {{ui:stencilBridges.title}} en el grupo {{ui:editor.section.splitShape}} de la cinta, haz clic derecho en la selección o búscalo con [[Ctrl]]+[[K]]. Los puentes aparecen en naranja donde irán.
+3. Ajusta {{ui:stencilBridges.width}} y {{ui:stencilBridges.count}}. {{ui:stencilBridges.height}} empieza en el grosor de la placa; los puentes más bajos quedan a ras de la cara inferior, en medio o a ras de la cara superior, según {{ui:stencilBridges.position}}. En una plantilla para pintura en spray, los puentes arriba dejan pasar la pintura por debajo.
+4. {{ui:stencilBridges.apply}} agrupa los puentes con la placa.
+
+Cada puente es una caja normal: abre el grupo para mover uno, borrar uno o añadir uno propio. Si cambias el texto más tarde, selecciona el grupo y haz clic de nuevo en {{ui:stencilBridges.title}}; los puentes nuevos sustituyen a los antiguos. Un texto solo grabado, que no atraviesa, no recibe puentes, porque ahí no se cae nada. Para un láser o un plóter, la exportación DXF y SVG añade los mismos puentes, consulta [Archivos: guardar y compartir](chapter:files-and-saving).
 
 ## Contorno, silueta y más ancho
 

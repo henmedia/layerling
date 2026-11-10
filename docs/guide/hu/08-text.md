@@ -12,6 +12,7 @@ Válaszd az alakzattárban a {{ui:shape.text}} alakzatot, és helyezd el. Jobbra
 - **{{ui:prop.height}}:** Milyen messze áll ki a felirat a felületből.
 - **{{ui:prop.bevel}}:** Lekerekíti a betűk éleit, hogy lágyabbnak tűnjenek. A {{ui:prop.segments}} értékkel döntöd el, hány lépésben.
 - **{{ui:nameTag.letterEdge}}:** lekerekíti vagy letöri a betűk felső élét, ahogy egy névtáblán: {{ui:nameTag.edge.none}}, {{ui:nameTag.edge.round}} vagy {{ui:nameTag.edge.chamfer}}, a {{ui:nameTag.letterEdgeSize}} értékkel (kezdetben 0,4 mm, legfeljebb olyan magas, mint a szöveg). Tovább megy, mint a {{ui:prop.bevel}}, de csak addig, amíg a vonások szélesek: ahol egy vonás vékonyabb a méret kétszeresénél, az él keskenyebb tetőben végződik. Az alja lapos marad, így az egyes betűk utólag felragaszthatók. Amíg egy él ki van választva, az a {{ui:prop.bevel}} helyét veszi át.
+- **Hossz:** Egy szöveg legfeljebb 250 karakteres lehet. A betűk megtartják a méretüket, a sor pedig olyan hosszú lesz, amilyen kell; rövidebbre kisebb betűkkel teheted. A {{ui:nameTag.letterEdge}} legfeljebb 40 karakteres szövegnél működik, mert hosszabbnál percekig tartana a számítás.
 - **{{ui:prop.textSpacing}}:** A betűk közötti hely azon felül, amit a betűtípus ad, a betűméret százalékában: a 0 úgy hagyja, ahogy a betűtípus megalkotta, fölötte a betűk távolabb állnak egymástól, alatta (-50-ig) szorosabban, amire egy saját betűtípusnak gyakran szüksége van. A betűk megtartják a méretüket, a doboz pedig követi a sort, egyenes és íves szövegnél is. Az arab és héber írásra, amelynek betűi összekapcsolódnak, a betűköz nem vonatkozik.
 - **{{ui:prop.textKerning}}:** Közelebb tolja azokat a betűpárokat, amelyek között túl sok hely marad, például AY, AV, LT vagy To, a betűk formája alapján mérve, minden betűtípusban, a sajátjaidban is. Az új szövegekben be van kapcsolva; a korábban készült szövegekben ki, hogy egy mentett tervben semmi ne mozduljon el. A betűk megtartják a méretüket, a keret követi őket. Egyenes és ívelt szövegnél működik, függőleges szövegnél, arab, héber és japán írásnál nem.
 - **{{ui:prop.textVertical}}:** Fentről lefelé rakja egymás alá a betűket, mindegyiket egy függőleges sor közepére, egy ajtókeretre kerülő felirathoz vagy egy tollon lefutó névhez. A doboz függőlegesre fordul, a betűk megtartják a méretüket; a(z) {{ui:prop.textSpacing}} a köztük lévő hézagot állítja. Íves szövegnél a betűk oszlopot alkotnak a kör bal oldalán, mindegyik egyenesen áll; a(z) {{ui:prop.textInwardColumn}} az oszlopot a jobb oldalra teszi.
@@ -75,6 +76,17 @@ Tehát:
 - **Bemélyített:** Állítsd a szöveget {{ui:inspector.hole}} típusúra, hagyd, hogy kicsit belenyúljon a felületbe, és csoportosítsd a testtel. A betűk ekkor bemélyednek.
 
 Egy oldallapon lévő felirathoz előbb tedd a munkasíkot arra a lapra, lásd a [Nézet és munkasík](chapter:view-and-workplane) fejezetet.
+
+## Sablonok: hidak a betűk közepéhez
+
+Ha a szöveg átvágja a lemezt, az olyan betűk, mint az O, A és B, elveszítik a közepüket: lazán fekszik a betűben, és kiesik. A {{ui:stencilBridges.title}} kis hidakkal a lemezhez rögzíti, mint egy sablonon.
+
+1. Állítsd a szöveget {{ui:inspector.hole}} módba, vezesd át a lemezen, és jelöld ki mindkettőt, csoportosítva vagy anélkül.
+2. Kattints a {{ui:stencilBridges.title}} gombra a szalag {{ui:editor.section.splitShape}} csoportjában, kattints jobb gombbal a kijelölésre, vagy keresd meg a [[Ctrl]]+[[K]] billentyűkkel. A hidak narancssárgán jelennek meg ott, ahová kerülnek.
+3. Állítsd be a {{ui:stencilBridges.width}} és a {{ui:stencilBridges.count}} értékét. A {{ui:stencilBridges.height}} a lemez vastagságáról indul; az alacsonyabb hidak az alsó lappal egy síkban, középen vagy a felső lappal egy síkban ülnek, ahogy a {{ui:stencilBridges.position}} mondja. Festékszórós sablonon a felül lévő hidak alatt marad hely a festéknek.
+4. A {{ui:stencilBridges.apply}} csoportosítja a hidakat a lemezzel.
+
+Minden híd egy közönséges téglatest: nyisd meg a csoportot, ha egyet áthelyeznél, törölnél, vagy sajátot adnál hozzá. Ha később módosítod a szöveget, jelöld ki a csoportot, és kattints újra a {{ui:stencilBridges.title}} gombra; az új hidak a régiek helyére kerülnek. A csak bevésett, át nem menő szöveg nem kap hidat, mert ott semmi sem esik ki. Lézerhez vagy plotterhez a DXF- és SVG-export ugyanilyen hidakat ad, lásd [Fájlok, mentés és megosztás](chapter:files-and-saving).
 
 ## Körvonal, sziluett és szélesebb
 

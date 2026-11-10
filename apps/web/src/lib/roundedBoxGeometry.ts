@@ -22,6 +22,63 @@ export function normalizeTopBottomFillet(val: unknown, maxFillet = 50): number {
   return Math.max(0, Math.min(maxFillet, Math.round(n * 100) / 100));
 }
 
+/**
+ * The four corners' own radii, seen from above in reading order: back left, back right, front right, front left
+ * (the back is the small z). Each is 0 up to half the shorter side, so any two neighbours always fit.
+ * Missing or malformed means the corners share cornerFillet.
+ */
+export type CornerFillets = [number, number, number, number];
+
+/** Where each of the four own radii's corners lies, as the sign of its x and z (the back is the small z): back left, back right, front right, front left. */
+export const CORNER_SIGNS = [{ sx: -1, sz: -1 }, { sx: 1, sz: -1 }, { sx: 1, sz: 1 }, { sx: -1, sz: 1 }] as const;
+
+export function normalizeCornerFillets(value: unknown, maxFillet = 50): CornerFillets | undefined {
+  if (!Array.isArray(value) || value.length !== 4) return undefined;
+  if (!value.every((entry) => typeof entry === "number" && Number.isFinite(entry))) return undefined;
+  return value.map((entry) => normalizeCornerFillet(entry, maxFillet)) as CornerFillets;
+}
+
+/**
+ * What a drag on a corner radius dot changes (the dot on the top's edge where a corner's rounding starts, like the corner dot in Inkscape).
+ * `delta` is how far the dot was pulled along the top's back edge in mm, in the direction of +x on the screen's frame.
+ * The shared radius has its dot on the back right corner, so pulling towards +x shrinks it. With own radii (flat top and bottom only)
+ * each corner has a dot, `index` its place (back left, back right, front right, front left); a left corner's radius grows when pulled towards +x.
+ * A plain Box has no rounding to start from: its first pull turns it into a Rounded box with flat top and bottom,
+ * so the body keeps its shape, only the corners round. Any other shape only changes its radius.
+ */
+export function cornerRadiusDragPatch(
+  start: { kind: string; width?: number; depth?: number; size: number; cornerFillet?: number; cornerFillets?: unknown },
+  delta: number,
+  index?: number,
+): { kind?: "roundedBox"; cornerFillet?: number; cornerFillets?: CornerFillets; topBottomFillet?: number } {
+  const largest = Math.min(start.width ?? start.size, start.depth ?? start.size) / 2;
+  const own = index === undefined ? undefined : normalizeCornerFillets(start.cornerFillets, largest);
+  if (own && index !== undefined && CORNER_SIGNS[index]) {
+    const next = Math.round(Math.max(0, Math.min(largest, own[index] - CORNER_SIGNS[index].sx * delta)) * 1e2) / 1e2;
+    return { cornerFillets: own.map((radius, at) => (at === index ? next : radius)) as CornerFillets };
+  }
+  const plainBox = start.kind === "box";
+  const startRadius = plainBox ? 0 : normalizeCornerFillet(start.cornerFillet ?? DEFAULT_ROUNDED_BOX_CORNER_FILLET, largest);
+  const cornerFillet = Math.round(Math.max(0, Math.min(largest, startRadius - delta)) * 1e2) / 1e2;
+  return plainBox ? { kind: "roundedBox", cornerFillet, topBottomFillet: 0 } : { cornerFillet };
+}
+
+/**
+ * The rounding of the top and of the bottom edges, in mm: `[top, bottom]`. A missing `bottomFillet` means the bottom
+ * is rounded like the top (one shared value, each up to half the height, as it always was). With an own bottom the
+ * two may not meet: the top is at most the height less the bottom, so one end can be rounded far more than the other.
+ */
+export function normalizeEndFillets(topBottomFillet: unknown, bottomFillet: unknown, height: number): [number, number] {
+  const safeHeight = Math.max(0, height);
+  if (bottomFillet === undefined || bottomFillet === null) {
+    const shared = normalizeTopBottomFillet(topBottomFillet, safeHeight / 2);
+    return [shared, shared];
+  }
+  const bottom = normalizeTopBottomFillet(bottomFillet, safeHeight);
+  const top = normalizeTopBottomFillet(topBottomFillet, Math.max(0, safeHeight - bottom));
+  return [top, bottom];
+}
+
 export function normalizeRoundedBoxQuality(val: unknown): number {
   const n = typeof val === "number" && Number.isFinite(val) ? Math.round(val) : DEFAULT_ROUNDED_BOX_QUALITY;
   return Math.max(MIN_ROUNDED_BOX_QUALITY, Math.min(MAX_ROUNDED_BOX_QUALITY, n));
@@ -32,7 +89,11 @@ export type RoundedBoxGeometryOptions = {
   depth: number;
   height: number;
   cornerFillet?: number;
+  /** Own radius for each corner (flat top and bottom only); wins over cornerFillet. */
+  cornerFillets?: CornerFillets;
   topBottomFillet?: number;
+  /** Own rounding of the bottom edges; missing means the same as topBottomFillet. */
+  bottomFillet?: number;
   roundedBoxQuality?: number;
 };
 
@@ -46,14 +107,18 @@ export function buildRoundedRectContour(
   depth: number,
   cornerFillet: number,
   quality: number,
+  cornerFillets?: CornerFillets,
 ): Point2D[] {
   const safeW = Math.max(0.01, width);
   const safeD = Math.max(0.01, depth);
   const maxR = Math.min(safeW / 2, safeD / 2);
   const r = Math.max(0, Math.min(maxR, cornerFillet));
   const q = Math.max(1, quality);
+  // Per corner, in the order of the quadrants below: front right (+x, +z), front left, back left, back right.
+  const own = cornerFillets ? normalizeCornerFillets(cornerFillets, maxR) : undefined;
+  const radii = own ? [own[2], own[3], own[0], own[1]] : [r, r, r, r];
 
-  if (r <= 1e-5) {
+  if (radii.every((radius) => radius <= 1e-5)) {
     const hw = safeW / 2;
     const hd = safeD / 2;
     return [
@@ -64,30 +129,18 @@ export function buildRoundedRectContour(
     ];
   }
 
-  const cx = safeW / 2 - r;
-  const cz = safeD / 2 - r;
   const pts: Point2D[] = [];
-
-  // Ecke 1: +X, -Z nach +X, +Z (im Gegenuhrzeigersinn von oben: 0° bis 90° etc.)
-  // Quadrant 1: X > 0, Z > 0 (Winkel 0 bis PI/2)
-  for (let i = 0; i <= q; i += 1) {
-    const a = (i / q) * (Math.PI / 2);
-    pts.push({ x: cx + r * Math.cos(a), z: cz + r * Math.sin(a) });
-  }
-  // Quadrant 2: X < 0, Z > 0 (Winkel PI/2 bis PI)
-  for (let i = 0; i <= q; i += 1) {
-    const a = Math.PI / 2 + (i / q) * (Math.PI / 2);
-    pts.push({ x: -cx + r * Math.cos(a), z: cz + r * Math.sin(a) });
-  }
-  // Quadrant 3: X < 0, Z < 0 (Winkel PI bis 3PI/2)
-  for (let i = 0; i <= q; i += 1) {
-    const a = Math.PI + (i / q) * (Math.PI / 2);
-    pts.push({ x: -cx + r * Math.cos(a), z: -cz + r * Math.sin(a) });
-  }
-  // Quadrant 4: X > 0, Z < 0 (Winkel 3PI/2 bis 2PI)
-  for (let i = 0; i <= q; i += 1) {
-    const a = 1.5 * Math.PI + (i / q) * (Math.PI / 2);
-    pts.push({ x: cx + r * Math.cos(a), z: -cz + r * Math.sin(a) });
+  // Quadrant k: the corner's arc from angle k * 90 to (k + 1) * 90 degrees around its own centre.
+  const signs = [{ x: 1, z: 1 }, { x: -1, z: 1 }, { x: -1, z: -1 }, { x: 1, z: -1 }];
+  for (let k = 0; k < 4; k += 1) {
+    const radius = radii[k];
+    const cx = signs[k].x * (safeW / 2 - radius);
+    const cz = signs[k].z * (safeD / 2 - radius);
+    for (let i = 0; i <= q; i += 1) {
+      // Written as the four quadrants were, so a box with one radius keeps its outline to the last digit.
+      const a = (Math.PI / 2) * k + (i / q) * (Math.PI / 2);
+      pts.push({ x: cx + radius * Math.cos(a), z: cz + radius * Math.sin(a) });
+    }
   }
 
   // Konsekutive Duplikate filtern
@@ -119,8 +172,9 @@ function createExtrudedRoundedBox(
   height: number,
   cornerFillet: number,
   quality: number,
+  cornerFillets?: CornerFillets,
 ): THREE.BufferGeometry {
-  const contour = buildRoundedRectContour(width, depth, cornerFillet, quality);
+  const contour = buildRoundedRectContour(width, depth, cornerFillet, quality, cornerFillets);
   const n = contour.length;
 
   const shapeVecs = contour.map((p) => new THREE.Vector2(p.x, p.z));
@@ -190,14 +244,14 @@ function createExtrudedRoundedBox(
  * the axes leave it (A along x, B along y, C along z), joined by a triangle across each corner,
  * a quad along each edge and a quad on each face.
  */
-function createChamferedBox(width: number, depth: number, height: number, rc: number, rtb: number): THREE.BufferGeometry {
+function createChamferedBox(width: number, depth: number, height: number, rc: number, rtop: number, rbottom: number): THREE.BufferGeometry {
   const innerX = width / 2 - rc;
-  const innerY = height / 2 - rtb;
   const innerZ = depth / 2 - rc;
   const signs = [1, -1];
   const point = (kind: "A" | "B" | "C", sx: number, sy: number, sz: number) => new THREE.Vector3(
     (innerX + (kind === "A" ? rc : 0)) * sx,
-    (innerY + (kind === "B" ? rtb : 0)) * sy + height / 2,
+    // The top's core corner lies rtop below the top, the bottom's rbottom above the bottom.
+    sy > 0 ? height - rtop + (kind === "B" ? rtop : 0) : rbottom - (kind === "B" ? rbottom : 0),
     (innerZ + (kind === "C" ? rc : 0)) * sz,
   );
 
@@ -256,7 +310,8 @@ function createFullRoundedBox(
   depth: number,
   height: number,
   rc: number,
-  rtb: number,
+  rtop: number,
+  rbottom: number,
   q: number,
 ): THREE.BufferGeometry {
   const segX = q * 2 + 1;
@@ -270,7 +325,6 @@ function createFullRoundedBox(
   const pos = nonIndexed.attributes.position.array;
 
   const innerX = width / 2 - rc;
-  const innerY = height / 2 - rtb;
   const innerZ = depth / 2 - rc;
 
   const halfSegX = 0.5 / segX;
@@ -290,7 +344,8 @@ function createFullRoundedBox(
     normal.normalize();
 
     pos[i] = innerX * Math.sign(v.x) + normal.x * rc;
-    pos[i + 1] = innerY * Math.sign(v.y) + normal.y * rtb + height / 2;
+    // The top's rounding starts rtop below the top, the bottom's rbottom above the bottom; a flat end has radius 0 and lies in its plane.
+    pos[i + 1] = v.y > 0 ? height - rtop + normal.y * rtop : rbottom + normal.y * rbottom;
     pos[i + 2] = innerZ * Math.sign(v.z) + normal.z * rc;
   }
 
@@ -317,7 +372,9 @@ export function createRoundedBoxGeometry({
   depth,
   height,
   cornerFillet = DEFAULT_ROUNDED_BOX_CORNER_FILLET,
+  cornerFillets,
   topBottomFillet = DEFAULT_ROUNDED_BOX_TOP_BOTTOM_FILLET,
+  bottomFillet,
   roundedBoxQuality = DEFAULT_ROUNDED_BOX_QUALITY,
 }: RoundedBoxGeometryOptions): THREE.BufferGeometry {
   const safeW = Math.max(0.01, width);
@@ -325,19 +382,18 @@ export function createRoundedBoxGeometry({
   const safeH = Math.max(0.01, height);
 
   const maxCorner = Math.min(safeW / 2, safeD / 2);
-  const maxTopBottom = safeH / 2;
 
   const rc = Math.max(0, Math.min(maxCorner, cornerFillet));
-  const rtb = Math.max(0, Math.min(maxTopBottom, topBottomFillet));
+  const [rtop, rbottom] = normalizeEndFillets(topBottomFillet, bottomFillet, safeH);
   const q = normalizeRoundedBoxQuality(roundedBoxQuality);
 
-  if (rtb <= 1e-4) {
-    return createExtrudedRoundedBox(safeW, safeD, safeH, rc, q);
+  if (rtop <= 1e-4 && rbottom <= 1e-4) {
+    return createExtrudedRoundedBox(safeW, safeD, safeH, rc, q, cornerFillets);
   }
 
   if (q === 1) {
-    return createChamferedBox(safeW, safeD, safeH, rc, rtb);
+    return createChamferedBox(safeW, safeD, safeH, rc, rtop, rbottom);
   }
 
-  return createFullRoundedBox(safeW, safeD, safeH, rc, rtb, q);
+  return createFullRoundedBox(safeW, safeD, safeH, rc, rtop, rbottom, q);
 }

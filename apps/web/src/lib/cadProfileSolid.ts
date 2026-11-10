@@ -960,17 +960,77 @@ export function grownProfileSolid(cad: OcctKernel, profile: CadModifierProfilePa
   return solid;
 }
 
+/**
+ * A slotted screw hole (Discussion #1531): the half-section turned whole at each end of the slot, and the whole
+ * section - the half-section and its mirror image across the axis - pushed along the slot from one end to the
+ * other, fused into one body and its faces that continue each other merged, so each half cone or half cylinder
+ * at an end meets the flat side along the slot in one tangent seam. The slot runs along y, or along x with
+ * `alongX`; the profile's transform then stands it in the shape.
+ */
+function slottedRevolutionSolid(cad: OcctKernel, profile: CadModifierProfilePart, tolerance: number) {
+  const slot = profile.slot;
+  const loop = profile.loops[0];
+  if (!slot || profile.loops.length !== 1 || loop.segments.some((segment) => segment.kind !== "line")) throw new Error("A slotted hole needs one section of straight lines");
+  const points = [{ x: loop.x, z: loop.z }, ...loop.segments.map((segment) => ({ x: segment.x, z: segment.z }))];
+  // The section's corners off the axis, bottom to top; the mirror image runs back down on the other side.
+  const side = points.filter((point) => point.x > tolerance);
+  if (side.length < 2) throw new Error("A slotted hole's section has no width");
+  const whole = [...side, ...side.slice().reverse().map((point) => ({ x: -point.x, z: point.z }))];
+  const wholeLoop: CadModifierProfileLoop = { x: whole[0].x, z: whole[0].z, segments: [...whole.slice(1), whole[0]].map((point) => ({ kind: "line" as const, x: point.x, z: point.z })) };
+  const turned = cad.revolve(cad.makeFace(loopWire(cad, loop, tolerance)), { point: ORIGIN, direction: { x: 0, y: 0, z: 1 } }, TWO_PI);
+  const half = slot.length / 2;
+  const middle = cad.translate(faceSolid(cad, cad.makeFace(loopWire(cad, wholeLoop, tolerance)), slot.length), 0, -half, 0);
+  const fused = cad.fuse(cad.fuse(cad.translate(turned, 0, half, 0), middle), cad.translate(turned, 0, -half, 0));
+  let solid = cad.unifySameDomain(fused);
+  const solids = cad.isSolid(solid) ? [solid] : cad.getSubShapes(solid, "solid");
+  if (solids.length !== 1) throw new Error("The slotted hole did not become one solid");
+  // Along x: a quarter turn about the axis takes the slot from y to x.
+  solid = slot.alongX ? cad.transform(solids[0], [0, -1, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0]) : solids[0];
+  if (!cad.isValid(solid) || !(cad.getVolume(solid) > 0)) throw new Error("The slotted hole is not a valid solid");
+  return solid;
+}
+
+/**
+ * A sloped rounded box's ends rounded after its top was cut (Discussion #1544): the bottom's edges lie in y = 0,
+ * the top's are every other edge but the upright lines where the walls meet their rounded corners.
+ */
+function roundedTrimmedEnds(cad: OcctKernel, solid: ShapeHandle, top: number, bottom: number): ShapeHandle {
+  if (!(top > 1e-4) && !(bottom > 1e-4)) return solid;
+  const atBottom = (edge: ShapeHandle) => {
+    const box = cad.getBoundingBox(edge);
+    return Math.abs(box.ymax) < 1e-6 && Math.abs(box.ymin) < 1e-6;
+  };
+  const upright = (edge: ShapeHandle) => {
+    const box = cad.getBoundingBox(edge);
+    return Math.abs(box.xmax - box.xmin) < 1e-6 && Math.abs(box.zmax - box.zmin) < 1e-6;
+  };
+  const round = (body: ShapeHandle, edges: ShapeHandle[], radius: number) => {
+    if (edges.length === 0) throw new Error("The sloped profile solid has no edges to round");
+    const rounded = cad.fillet(body, edges, radius);
+    if (!cad.isSolid(rounded) || !cad.isValid(rounded) || !(cad.getVolume(rounded) > 0)) throw new Error("The rounded ends of the sloped profile solid are not valid");
+    return rounded;
+  };
+  const edges = cad.getSubShapes(solid, "edge");
+  const bottomEdges = edges.filter(atBottom);
+  const topEdges = edges.filter((edge) => !atBottom(edge) && !upright(edge));
+  if (Math.abs(top - bottom) < 1e-9) return round(solid, [...topEdges, ...bottomEdges], top);
+  let rounded = top > 1e-4 ? round(solid, topEdges, top) : solid;
+  if (bottom > 1e-4) rounded = round(rounded, cad.getSubShapes(rounded, "edge").filter(atBottom), bottom);
+  return rounded;
+}
+
 export function profileExtrusionSolid(cad: OcctKernel, profile: CadModifierProfilePart): ShapeHandle {
   if (profile.trim && profile.kind === "extrusion") {
     // Slope along: the plain body, and what of it lies inside the side outline pushed across.
-    const base = profileExtrusionSolid(cad, { ...profile, trim: undefined });
+    // A rounded box's rounded ends are rounded after the cut, so the top's round follows the slope (Discussion #1544).
+    const base = profileExtrusionSolid(cad, { ...profile, trim: undefined, capFillet: undefined, capFilletBottom: undefined });
     const trim = profile.trim;
     const face = cad.makeFace(loopWire(cad, trim.loops[0], profileExtent(profile) * 1e-6));
     const prism = cad.transform(cad.extrude(face, 0, trim.height, 0), trim.frame);
     const kept = cad.common(base, prism);
     const solids = cad.isSolid(kept) ? [kept] : cad.getSubShapes(kept, "solid");
     if (solids.length !== 1 || !cad.isValid(solids[0]) || !(cad.getVolume(solids[0]) > 0)) throw new Error("The trimmed profile solid is not valid");
-    return solids[0];
+    return roundedTrimmedEnds(cad, solids[0], profile.capFillet ?? 0, profile.capFilletBottom ?? profile.capFillet ?? 0);
   }
   validateCadProfile(profile);
   if (profile.kind === "extrusion" && profile.pulley) return pulleySolid(cad, profile, profile.pulley);
@@ -989,6 +1049,7 @@ export function profileExtrusionSolid(cad: OcctKernel, profile: CadModifierProfi
     if (!(cad.getVolume(solid) > 0)) throw new Error("The lofted profile solid is inside out");
     return profile.capChamfer && profile.capChamfer.size > 1e-4 ? chamferedLoft(cad, solid, profile) : solid;
   }
+  if (profile.kind === "revolution" && profile.slot && profile.slot.length > 0) return slottedRevolutionSolid(cad, profile, tolerance);
   const [outer, ...holes] = profile.loops;
   let face = cad.makeFace(loopWire(cad, outer, tolerance));
   if (holes.length > 0) face = cad.addHolesInFace(face, holes.map((hole) => loopWire(cad, hole, tolerance)));
@@ -1026,14 +1087,28 @@ export function profileExtrusionSolid(cad: OcctKernel, profile: CadModifierProfi
     solid = repairedSolids[0];
   }
   if (!(cad.getVolume(solid) > 0)) throw new Error("The profile solid is inside out");
-  if (profile.capFillet && profile.capFillet > 1e-4 && profile.kind === "extrusion") {
-    // The flat ends of the extrusion: every edge lying in the plane y = 0 or y = height.
-    const edges = cad.getSubShapes(solid, "edge").filter((edge) => {
+  const topFillet = profile.capFillet ?? 0;
+  const bottomFillet = profile.capFilletBottom ?? topFillet;
+  if ((topFillet > 1e-4 || bottomFillet > 1e-4) && profile.kind === "extrusion") {
+    // The flat ends of the extrusion: every edge lying in the plane y = 0 (the bottom) or y = height (the top).
+    const endEdges = (body: typeof solid, atTop: boolean) => cad.getSubShapes(body, "edge").filter((edge) => {
       const box = cad.getBoundingBox(edge);
-      return Math.abs(box.ymax - box.ymin) < 1e-6 && (Math.abs(box.ymin) < 1e-6 || Math.abs(box.ymin - profile.height) < 1e-6);
+      return Math.abs(box.ymax - box.ymin) < 1e-6 && Math.abs(box.ymin - (atTop ? profile.height : 0)) < 1e-6;
     });
-    const rounded = cad.fillet(solid, edges, profile.capFillet);
-    if (!cad.isSolid(rounded) || !isValid(rounded) || !(cad.getVolume(rounded) > 0)) throw new Error("The rounded ends of the profile solid are not valid");
+    const roundEnd = (body: typeof solid, atTop: boolean, radius: number) => {
+      const rounded = cad.fillet(body, endEdges(body, atTop), radius);
+      if (!cad.isSolid(rounded) || !isValid(rounded) || !(cad.getVolume(rounded) > 0)) throw new Error("The rounded ends of the profile solid are not valid");
+      return rounded;
+    };
+    // One radius at both ends is one fillet; two radii are two, each end on its own and the other end left as it was.
+    if (Math.abs(topFillet - bottomFillet) < 1e-9) {
+      const rounded = cad.fillet(solid, [...endEdges(solid, true), ...endEdges(solid, false)], topFillet);
+      if (!cad.isSolid(rounded) || !isValid(rounded) || !(cad.getVolume(rounded) > 0)) throw new Error("The rounded ends of the profile solid are not valid");
+      return rounded;
+    }
+    let rounded = solid;
+    if (topFillet > 1e-4) rounded = roundEnd(rounded, true, topFillet);
+    if (bottomFillet > 1e-4) rounded = roundEnd(rounded, false, bottomFillet);
     return rounded;
   }
   if (profile.capChamfer && profile.capChamfer.size > 1e-4 && profile.kind === "extrusion") {

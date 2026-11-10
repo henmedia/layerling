@@ -3102,6 +3102,72 @@ html[data-theme="dark"] .edge-modifier-quick-actions button.active {
   grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
+/* Paint: fill, circle and lasso side by side. */
+.paint-panel .shell-opening-options {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+/* The colours to paint with, a colour of one's own under them, and the eraser beside it. */
+.paint-color-row {
+  display: grid;
+  gap: 8px;
+  margin-top: 7px;
+}
+
+.paint-color-row .color-grid {
+  grid-template-columns: repeat(auto-fill, minmax(24px, 1fr));
+  gap: 6px;
+}
+
+.paint-color-row .custom-color {
+  grid-column: auto;
+  justify-self: start;
+}
+
+.paint-eraser {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 30px;
+  margin-top: 8px;
+  padding: 0 10px;
+  color: #6d5133;
+  font-size: 12px;
+  font-weight: 700;
+  background: #fbf8f4;
+  border: 1px solid #d8c8b7;
+  border-radius: 7px;
+  cursor: pointer;
+}
+
+.paint-eraser.active {
+  color: #9f5508;
+  background: #fff1e0;
+  border-color: #e08a2c;
+}
+
+.paint-panel .paint-count {
+  margin-top: 8px;
+}
+
+/* The shape a lasso of the paint tool is drawing, over the view. */
+.paint-lasso-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  pointer-events: none;
+}
+
+.paint-lasso-overlay polygon {
+  fill: rgba(211, 113, 12, 0.16);
+  stroke: #d3710c;
+  stroke-width: 2;
+  stroke-linejoin: round;
+}
+
 .shell-opening-options button.active {
   color: #9f5508;
   background: #fff1e0;
@@ -3134,14 +3200,15 @@ html[data-theme="dark"] .shell-openings-summary {
   color: #a8957f;
 }
 
-.offset-copy {
+/* Both classes: .edge-modifier-field comes later and would turn the row back into a block, so the box sat against its label (#1536). */
+.edge-modifier-field.offset-copy {
   display: flex;
   align-items: flex-start;
   gap: 8px;
   font-weight: 600;
 }
 
-.offset-copy input {
+.edge-modifier-field.offset-copy input {
   flex: none;
   margin-top: 2px;
 }
@@ -3336,6 +3403,42 @@ html[data-theme="dark"] .shell-openings-summary {
   gap: 6px;
   padding: 0 12px;
   font-weight: 700;
+}
+
+/* The lid panel's button that fits the body to a standard's neck (issue #1482), under the line that measures its top. */
+.lid-neck-fit-button {
+  display: inline-flex;
+  min-height: 32px;
+  align-items: center;
+  gap: 6px;
+  margin-top: 8px;
+  padding: 0 12px;
+  color: #9f5508;
+  background: #fff1e0;
+  border: 1px solid #e08a2c;
+  border-radius: 7px;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.lid-neck-fit-button:hover:not(:disabled) {
+  background: #fde3c4;
+}
+
+.lid-neck-fit-button:disabled {
+  cursor: default;
+  opacity: 0.6;
+}
+
+html[data-theme="dark"] .lid-neck-fit-button {
+  color: #f3a452;
+  background: #3a2c16;
+  border-color: #b9741f;
+}
+
+html[data-theme="dark"] .lid-neck-fit-button:hover:not(:disabled) {
+  background: #4a3719;
 }
 
 .cable-channel-picking {
@@ -3546,6 +3649,12 @@ html[data-theme="dark"] .cable-channel-status.warning {
   border-color: #b35f07;
 }
 
+/* Four kinds of connector, two to a row, so "Schwalbenschwanz" and the like fit (Discussion #832); Split and Stretch side by side. */
+.split-connector-control > div,
+.split-mode-control > div {
+  grid-template-columns: repeat(2, 1fr);
+}
+
 .split-position-control {
   display: grid;
   gap: 8px;
@@ -3612,6 +3721,21 @@ html[data-theme="dark"] .cable-channel-status.warning {
 .split-panel-help {
   margin: 11px 0 0;
   color: #867360;
+}
+
+/* Under the connectors' settings: how many fit, and why a cut face got none (Discussion #832). */
+.split-connector-summary {
+  display: grid;
+  gap: 3px;
+  margin-top: 10px;
+  color: #6d5133;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.split-connector-summary:empty {
+  display: none;
 }
 
 .split-panel-error {
@@ -4096,7 +4220,11 @@ html[data-theme="dark"] .toolbar-title-help .action-icon-button.active {
 .toolbar-section[data-group="shapes"] { --group-color: var(--group-shapes); }
 .toolbar-section[data-group="visibility"] { --group-color: var(--group-visibility); }
 .toolbar-section[data-group="combine"] { --group-color: var(--group-combine); }
-.toolbar-section[data-group="modify"] { --group-color: var(--group-modify); }
+/* Modify's four groups (#1551) keep its colour: they belong together. */
+.toolbar-section[data-group="mirrorPattern"],
+.toolbar-section[data-group="splitShape"],
+.toolbar-section[data-group="edgesWalls"],
+.toolbar-section[data-group="surface"] { --group-color: var(--group-modify); }
 .toolbar-section[data-group="arrange"] { --group-color: var(--group-arrange); }
 .toolbar-section[data-group="manage"] { --group-color: var(--group-manage); }
 .toolbar-section[data-group="help"] { --group-color: var(--group-help); }
@@ -4228,61 +4356,6 @@ html[data-theme="dark"] .toolbar-title-help .action-icon-button.active {
   border-radius: 11px;
 }
 
-/* "Modify" is cut into named sections (MODIFY_SECTIONS, Stefan 31.10.2026): a fine line in the group's colour between
-   them, and each section's name in the label row above it instead of the group's, which stays on the folded button. */
-.toolbar-subgroup {
-  position: relative;
-  display: flex;
-  align-self: stretch;
-  align-items: center;
-}
-
-.toolbar-subgroup + .toolbar-subgroup {
-  margin-left: 4px;
-  padding-left: 5px;
-}
-
-.toolbar-subgroup + .toolbar-subgroup::before {
-  position: absolute;
-  top: 7px;
-  bottom: 7px;
-  left: 0;
-  width: 1px;
-  content: "";
-  background: color-mix(in srgb, var(--group-color) 55%, transparent);
-}
-
-.toolbar-subgroup-label {
-  position: absolute;
-  bottom: calc(100% + 2px);
-  left: 50%;
-  color: var(--group-color);
-  font-family: Arial, Helvetica, sans-serif;
-  font-size: 10px;
-  font-weight: 600;
-  line-height: 16px;
-  text-transform: uppercase;
-  white-space: nowrap;
-  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.86);
-  transform: translateX(-50%);
-  pointer-events: none;
-  user-select: none;
-}
-
-.toolbar-section:not([data-collapsed]):has(.toolbar-subgroup-label) > .toolbar-section-label {
-  visibility: hidden;
-}
-
-/* Opened from the folded button, the tools hang below it: the section names go inside, above their tools. */
-.toolbar-section[data-collapsed][data-open] > .toolbar-section-tools:not(.toolbar-collapse-box):has(.toolbar-subgroup) {
-  padding-top: 18px;
-}
-
-.toolbar-section[data-collapsed][data-open] .toolbar-subgroup-label {
-  bottom: auto;
-  top: -16px;
-}
-
 /* A group the window has no room for folds into one button under its name (useToolbarCollapse, Stefan 29.10.2026):
    resting the pointer on it, or a tap, opens its tools beneath it, over the workplane. */
 .toolbar-collapse-box {
@@ -4337,15 +4410,16 @@ html[data-theme="dark"] .toolbar-title-help .action-icon-button.active {
 
 /* History's folded button is Undo itself (#1148): the tab is then a button of its own under it, a little larger than it
    looks so it is easy to hit, and only it opens the group. */
-.toolbar-collapse-box:has(.toolbar-collapse-tab) {
+.toolbar-collapse-anchor {
   position: relative;
+  display: flex;
 }
 
 /* It stays above the opened tools, whose frame it touches, so a second click on it closes them; it ends above the first
-   tool's top edge. */
+   tool's top edge. It hangs from Undo's bottom edge like the other tabs from their buttons (#1506). */
 .toolbar-section[data-collapsed] .toolbar-collapse-tab {
   position: absolute;
-  bottom: -9px;
+  bottom: -14px;
   left: 50%;
   z-index: 71;
   width: 30px;
@@ -4357,8 +4431,9 @@ html[data-theme="dark"] .toolbar-title-help .action-icon-button.active {
   transform: translateX(-50%);
 }
 
+/* The chevron starts 2px above the hit area, a pixel above Undo's bottom edge, where the other groups' tabs start. */
 .toolbar-section[data-collapsed] .toolbar-collapse-tab::before {
-  top: 1px;
+  top: -2px;
   bottom: auto;
 }
 
@@ -4662,6 +4737,13 @@ html[data-theme="dark"] .toolbar-title-help .action-icon-button.active {
   min-width: 82px;
 }
 
+/* Shapes taken out of the ribbon (#1550): the section stays, without width, so its panel still opens from the command
+   search at the spot where the group would stand. */
+.toolbar-shapes-section.out-of-ribbon {
+  min-width: 0;
+  width: 0;
+}
+
 .shape-menu-trigger {
   position: relative;
   display: grid;
@@ -4686,6 +4768,30 @@ html[data-theme="dark"] .toolbar-title-help .action-icon-button.active {
 .shape-menu-trigger .vector-toolbar-sprite-icon {
   width: var(--toolbar-icon-size);
   height: var(--toolbar-icon-size);
+}
+
+/* The shapes button opens a menu like a folded group, so it carries the same tab with a chevron in the group's colour
+   under it, turned up while the menu is open (Discussion #1506). It lies above the cube, which would hide its top, and
+   a pixel lower than there for the button's 1px border, so it meets the frame where the folded groups' tabs do. */
+.shape-menu-trigger::before {
+  position: absolute;
+  z-index: 1;
+  bottom: -11px;
+  left: 50%;
+  width: 18px;
+  height: 11px;
+  content: "";
+  background-color: var(--group-color);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 18 11'%3E%3Cpath d='M5.5 3.5 9 7l3.5-3.5' fill='none' stroke='white' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+  border-radius: 0 0 6px 6px;
+  transform: translateX(-50%);
+  transition: transform 0.15s ease;
+}
+
+.shape-menu-trigger.active::before {
+  transform: translateX(-50%) scaleY(-1);
 }
 
 .shape-menu-dropdown {
@@ -8281,6 +8387,21 @@ html[data-theme="dark"] .touch-multi-select {
   filter: drop-shadow(0 0 4px rgba(129, 67, 0, 0.4));
 }
 
+/* An arm's end, dragged to make the arm longer or shorter (Discussion #1469): smaller than the corner's handle. */
+.corner-ruler-end-handle {
+  fill: #ffffff;
+  stroke: #b66108;
+  stroke-width: 2;
+  vector-effect: non-scaling-stroke;
+  pointer-events: all;
+  cursor: ew-resize;
+}
+
+.corner-ruler-end-handle:active {
+  fill: #f6f1e8;
+  filter: drop-shadow(0 0 4px rgba(129, 67, 0, 0.4));
+}
+
 .corner-ruler-tick-label {
   position: absolute;
   z-index: 2;
@@ -8389,7 +8510,8 @@ html[data-theme="dark"] .touch-multi-select {
 
 /* The ruler's lines stay in view over bodies (the eye is open) or hide behind them. */
 .corner-ruler-occlude-toggle,
-.corner-ruler-selected-toggle {
+.corner-ruler-selected-toggle,
+.corner-ruler-plate-toggle {
   color: #6b5b46;
   background: rgba(255, 255, 255, 0.96);
   border-color: rgba(182, 97, 8, 0.45);
@@ -8568,7 +8690,8 @@ html[data-theme="dark"] .touch-multi-select {
 .transform-overlay.hide-selection-chrome .transform-guides,
 .transform-overlay.hide-selection-chrome .dimension-label,
 .transform-overlay.hide-selection-chrome .transform-handle,
-.transform-overlay.hide-selection-chrome .rotate-handle {
+.transform-overlay.hide-selection-chrome .rotate-handle,
+.transform-overlay.hide-selection-chrome .slide-handle {
   opacity: 0;
 }
 
@@ -8617,6 +8740,16 @@ html[data-theme="dark"] .touch-multi-select {
   pointer-events: auto;
   transform: translate(-50%, -50%);
 }
+
+/* The dots and the equal-gaps pills in the colours of their axis, as the move and size handles (Discussion #1472):
+   the align axis y is the height (blue), z the depth (green). The dark theme only changes the variable, so hover
+   and disabled below still win there too. */
+.align-dot.axis-x, .align-spread.axis-x { --align-axis-color: #d6363c; background: var(--align-axis-color); }
+.align-dot.axis-y, .align-spread.axis-y { --align-axis-color: #2f6fe0; background: var(--align-axis-color); }
+.align-dot.axis-z, .align-spread.axis-z { --align-axis-color: #2f9a4b; background: var(--align-axis-color); }
+html[data-theme="dark"] .align-dot.axis-x, html[data-theme="dark"] .align-spread.axis-x { --align-axis-color: #ff6b70; }
+html[data-theme="dark"] .align-dot.axis-y, html[data-theme="dark"] .align-spread.axis-y { --align-axis-color: #6aa0ff; }
+html[data-theme="dark"] .align-dot.axis-z, html[data-theme="dark"] .align-spread.axis-z { --align-axis-color: #5fd47c; }
 
 /* For a finger or a rubber-tip stylus the dots keep their look and catch from further away, a finger's width round them (#854). */
 @media (pointer: coarse) {
@@ -9259,6 +9392,78 @@ html[data-theme="dark"] .touch-multi-select {
   stroke-linejoin: round;
 }
 
+/* The X and Y arrows beside the lift arrow (Discussion #1434): pulled, the selection moves along that axis only.
+   The button is the grab area along the arrow, turned to where the axis runs on the screen. */
+.slide-handle {
+  position: absolute;
+  left: 0;
+  top: 0;
+  z-index: 4;
+  width: 34px;
+  height: 18px;
+  padding: 0;
+  --slide-handle-axis: #433629;
+  --slide-handle-halo: rgba(255, 252, 247, 0.95);
+  color: var(--slide-handle-axis);
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  cursor: inherit;
+  pointer-events: auto;
+  touch-action: none;
+  transform: translate3d(var(--overlay-x, 0), var(--overlay-y, 0), 0) translate(-50%, -50%) rotate(var(--slide-handle-angle, 0deg));
+  will-change: transform;
+}
+
+.slide-handle.axis-x { --slide-handle-axis: #d6363c; }
+.slide-handle.axis-y { --slide-handle-axis: #2f9a4b; }
+
+.slide-handle-icon {
+  display: block;
+  width: 32px;
+  height: 16px;
+  margin: 1px;
+  overflow: visible;
+}
+
+/* The arrows stand on the body: a rim in the halo colour keeps the red one readable on a red body. */
+.slide-arrow-rim {
+  fill: var(--slide-handle-halo);
+  stroke: var(--slide-handle-halo);
+  stroke-width: 5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.slide-arrow-shaft {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.4;
+  stroke-linecap: round;
+}
+
+.slide-arrow-head {
+  fill: currentColor;
+  stroke: currentColor;
+  stroke-width: 0.8;
+  stroke-linejoin: round;
+}
+
+/* Hovered, the arrow gets heavier. */
+.slide-handle:hover .slide-arrow-shaft {
+  stroke-width: 3.2;
+}
+
+/* For a finger or a rubber-tip stylus the arrows catch from further away, as the other handles do. */
+@media (pointer: coarse) {
+  .slide-handle::before {
+    position: absolute;
+    inset: -10px;
+    content: "";
+  }
+}
+
 .rotation-edit {
   position: absolute;
   left: 0;
@@ -9387,6 +9592,9 @@ html[data-theme="dark"] .rotation-angle-badge {
   width: 320px;
   max-height: none;
   overflow-y: auto;
+  /* The snap dock sticks to the bottom and covers the last ~55px of the view; the browser counts a field behind it
+     as visible and does not scroll to it on Tab. This keeps a focused field above the dock (Issue #1547). */
+  scroll-padding-bottom: 64px;
   /* A thin bar that shows: on a laptop's touchpad the panel is easier to scroll by its bar. */
   scrollbar-color: #cdbfa9 transparent;
   scrollbar-width: thin;
@@ -11785,6 +11993,28 @@ html[data-theme="dark"] .pattern-picker-empty {
   margin: 0;
 }
 
+/* The snap menu a short middle click opens at the pointer (Discussion #1439): over every panel, inside the window. */
+.snap-menu.snap-menu-at-pointer {
+  position: fixed;
+  right: auto;
+  bottom: auto;
+  z-index: 90;
+  max-height: calc(100vh - 16px);
+}
+
+.snap-menu-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 4px;
+  padding: 3px 9px 6px;
+  color: #725a42;
+  font-size: 12px;
+  font-weight: 600;
+  border-bottom: 1px solid var(--border);
+}
+
 .workspace-modal {
   position: absolute;
   inset: 0;
@@ -12006,7 +12236,8 @@ html[data-theme="dark"] .pattern-picker-empty {
   border-color: #cf710f;
 }
 
-.workspace-printer-play-make {
+.workspace-printer-play-make,
+.workspace-printer-play-base {
   grid-column: 2;
 }
 
@@ -13768,6 +13999,18 @@ html[data-theme="dark"] .shell-opening-options button.active {
   border-color: #c7772a;
 }
 
+html[data-theme="dark"] .paint-eraser {
+  color: #ddccb9;
+  background: #35281b;
+  border-color: #5a4633;
+}
+
+html[data-theme="dark"] .paint-eraser.active {
+  color: #ffb866;
+  background: #4a3217;
+  border-color: #c7772a;
+}
+
 html[data-theme="dark"] .clearance-status {
   color: #d3bfa8;
 }
@@ -13875,6 +14118,10 @@ html[data-theme="dark"] .split-panel-target {
   border-color: #53412f;
 }
 
+html[data-theme="dark"] .split-connector-summary {
+  color: #e7c896;
+}
+
 html[data-theme="dark"] .split-axis-control button.active,
 html[data-theme="dark"] .split-panel-footer .primary {
   color: #fff;
@@ -13940,6 +14187,7 @@ html[data-theme="dark"] .shape-menu-item .sketch-shape-menu-icon {
 html[data-theme="dark"] .camera-controls button,
 html[data-theme="dark"] .snap-menu button,
 html[data-theme="dark"] .snap-object-toggle,
+html[data-theme="dark"] .snap-menu-title,
 html[data-theme="dark"] .snap-row {
   color: #d5c4b3;
 }
@@ -14187,6 +14435,9 @@ html[data-theme="dark"] .rotate-handle {
 
 html[data-theme="dark"] .rotate-handle.axis-x { --rotate-handle-axis: #ff6b70; }
 html[data-theme="dark"] .rotate-handle.axis-y { --rotate-handle-axis: #5fd47c; }
+html[data-theme="dark"] .slide-handle { --slide-handle-halo: rgba(28, 24, 20, 0.9); }
+html[data-theme="dark"] .slide-handle.axis-x { --slide-handle-axis: #ff6b70; }
+html[data-theme="dark"] .slide-handle.axis-y { --slide-handle-axis: #5fd47c; }
 html[data-theme="dark"] .rotate-handle.axis-z { --rotate-handle-axis: #6aa0ff; }
 html[data-theme="dark"] .transform-handle.axis-x { background: #ff6b70; border-color: #7d1a1e; }
 html[data-theme="dark"] .transform-handle.axis-y { background: #5fd47c; border-color: #17542a; }
@@ -14427,8 +14678,7 @@ html[data-theme="dark"] .toolbar-section {
   border-color: #645546;
 }
 
-html[data-theme="dark"] .toolbar-section-label,
-html[data-theme="dark"] .toolbar-subgroup-label {
+html[data-theme="dark"] .toolbar-section-label {
   color: #d4c6b7;
   text-shadow: 0 1px 1px rgba(0, 0, 0, 0.72);
 }
@@ -14787,8 +15037,11 @@ html[data-theme="dark"] .grid-settings {
    "Huelle" passten 2081, 1765 und 1615 px. Ohne "Flaeche loeschen" waren es
    2038, 1728 und 1582 px, ohne den Knopf der Interaktiven Hilfe 1990, 1688
    und 1544 px: Jeder neue Knopf verschiebt alle drei Schwellen um das, was
-   er braucht - neu messen. */
-@media (max-width: 2215px) {
+   er braucht - neu messen.
+   Neu gemessen am 09.11.2026 (1.154.1, #1533): voll 2369 px, mittel 2045 px,
+   klein 1732 px; die alten Schwellen 2215/1897 lagen so tief, dass bei 1898 bis
+   2045 px die Gruppe Flaeche vom Band daneben verdeckt wurde. */
+@media (max-width: 2375px) {
   :root {
     --toolbar-icon-size: calc(37px * var(--toolbar-scale));
   }
@@ -14809,7 +15062,7 @@ html[data-theme="dark"] .grid-settings {
   }
 }
 
-@media (max-width: 1897px) {
+@media (max-width: 2050px) {
   :root {
     --toolbar-icon-size: calc(34px * var(--toolbar-scale));
   }
@@ -14842,6 +15095,13 @@ html[data-theme="dark"] .grid-settings {
   .toolbar-mode-content .tool-group {
     display: contents;
   }
+}
+
+/* The 3D ribbon's two wrappers of groups lay their sections out as if they were not there, at every width: each section
+   carries its own CSS order (the order set in the settings, lib/ribbonOrder.ts), and a group may stand in either wrapper's
+   place. */
+.toolbar-mode-content.geometry .tool-group {
+  display: contents;
 }
 
 /* Die Kurzanleitung teilt sich die Karte mit der Kuerzelliste; nur die
@@ -17174,4 +17434,427 @@ html[data-theme="dark"] .plate-bar-separator {
   width: 32px;
   height: 32px;
   color: inherit;
+}
+
+/* Tinted tiles for the inspector cards: each fold-away section keeps its own colour, in both themes. */
+.property-card:has(> .property-card-header[aria-controls^="properties-"]) {
+  background: rgba(217, 118, 28, 0.13);
+  box-shadow: inset 0 0 0 1px rgba(217, 118, 28, 0.45);
+}
+.property-card:has(> .property-card-header[aria-controls^="properties-"]) > .property-card-header {
+  color: #9A520F;
+  font-weight: 650;
+}
+.property-card:has(> .property-card-header[aria-controls^="properties-"]) > .property-card-header:hover {
+  filter: brightness(1.2);
+}
+.property-card:has(> .property-card-header[aria-controls^="properties-"]) .range-control input[type="range"]::-webkit-slider-runnable-track {
+  background: linear-gradient(to right, rgb(217, 118, 28) 0 var(--slider-pos), rgba(217, 118, 28, 0.24) var(--slider-pos) 100%);
+}
+.property-card:has(> .property-card-header[aria-controls^="properties-"]) .range-control input[type="range"]::-webkit-slider-thumb {
+  border-color: rgb(217, 118, 28);
+}
+.property-card:has(> .property-card-header[aria-controls^="properties-"]) .range-control input[type="range"]::-moz-range-track {
+  background: rgba(217, 118, 28, 0.24);
+}
+.property-card:has(> .property-card-header[aria-controls^="properties-"]) .range-control input[type="range"]::-moz-range-progress {
+  background: rgb(217, 118, 28);
+}
+.property-card:has(> .property-card-header[aria-controls^="properties-"]) .range-control input[type="range"]::-moz-range-thumb {
+  border-color: rgb(217, 118, 28);
+}
+.property-card:has(> .property-card-header[aria-controls^="properties-"]) .check-property input {
+  accent-color: rgb(217, 118, 28);
+  --sw: rgb(217, 118, 28);
+}
+html[data-theme="dark"] .property-card:has(> .property-card-header[aria-controls^="properties-"]) {
+  background: rgba(217, 118, 28, 0.17);
+  box-shadow: inset 0 0 0 1px rgba(217, 118, 28, 0.5);
+}
+html[data-theme="dark"] .property-card:has(> .property-card-header[aria-controls^="properties-"]) > .property-card-header {
+  color: #F2A453;
+}
+html[data-theme="dark"] .property-card:has(> .property-card-header[aria-controls^="properties-"]) .range-control input[type="range"]::-webkit-slider-runnable-track {
+  background: linear-gradient(to right, rgb(217, 118, 28) 0 var(--slider-pos), rgba(255, 255, 255, 0.16) var(--slider-pos) 100%);
+}
+html[data-theme="dark"] .property-card:has(> .property-card-header[aria-controls^="properties-"]) .range-control input[type="range"]::-moz-range-track {
+  background: rgba(255, 255, 255, 0.16);
+}
+.property-card:has(> .property-card-header[aria-controls^="position-"]) {
+  background: rgba(70, 130, 200, 0.13);
+  box-shadow: inset 0 0 0 1px rgba(70, 130, 200, 0.45);
+}
+.property-card:has(> .property-card-header[aria-controls^="position-"]) > .property-card-header {
+  color: #245C99;
+  font-weight: 650;
+}
+.property-card:has(> .property-card-header[aria-controls^="position-"]) > .property-card-header:hover {
+  filter: brightness(1.2);
+}
+.property-card:has(> .property-card-header[aria-controls^="position-"]) .range-control input[type="range"]::-webkit-slider-runnable-track {
+  background: linear-gradient(to right, rgb(70, 130, 200) 0 var(--slider-pos), rgba(70, 130, 200, 0.24) var(--slider-pos) 100%);
+}
+.property-card:has(> .property-card-header[aria-controls^="position-"]) .range-control input[type="range"]::-webkit-slider-thumb {
+  border-color: rgb(70, 130, 200);
+}
+.property-card:has(> .property-card-header[aria-controls^="position-"]) .range-control input[type="range"]::-moz-range-track {
+  background: rgba(70, 130, 200, 0.24);
+}
+.property-card:has(> .property-card-header[aria-controls^="position-"]) .range-control input[type="range"]::-moz-range-progress {
+  background: rgb(70, 130, 200);
+}
+.property-card:has(> .property-card-header[aria-controls^="position-"]) .range-control input[type="range"]::-moz-range-thumb {
+  border-color: rgb(70, 130, 200);
+}
+.property-card:has(> .property-card-header[aria-controls^="position-"]) .check-property input {
+  accent-color: rgb(70, 130, 200);
+  --sw: rgb(70, 130, 200);
+}
+html[data-theme="dark"] .property-card:has(> .property-card-header[aria-controls^="position-"]) {
+  background: rgba(70, 130, 200, 0.17);
+  box-shadow: inset 0 0 0 1px rgba(70, 130, 200, 0.5);
+}
+html[data-theme="dark"] .property-card:has(> .property-card-header[aria-controls^="position-"]) > .property-card-header {
+  color: #9CC4F2;
+}
+html[data-theme="dark"] .property-card:has(> .property-card-header[aria-controls^="position-"]) .range-control input[type="range"]::-webkit-slider-runnable-track {
+  background: linear-gradient(to right, rgb(70, 130, 200) 0 var(--slider-pos), rgba(255, 255, 255, 0.16) var(--slider-pos) 100%);
+}
+html[data-theme="dark"] .property-card:has(> .property-card-header[aria-controls^="position-"]) .range-control input[type="range"]::-moz-range-track {
+  background: rgba(255, 255, 255, 0.16);
+}
+.property-card:has(> .property-card-header[aria-controls^="rotation-"]) {
+  background: rgba(40, 170, 140, 0.13);
+  box-shadow: inset 0 0 0 1px rgba(40, 170, 140, 0.45);
+}
+.property-card:has(> .property-card-header[aria-controls^="rotation-"]) > .property-card-header {
+  color: #17705D;
+  font-weight: 650;
+}
+.property-card:has(> .property-card-header[aria-controls^="rotation-"]) > .property-card-header:hover {
+  filter: brightness(1.2);
+}
+.property-card:has(> .property-card-header[aria-controls^="rotation-"]) .range-control input[type="range"]::-webkit-slider-runnable-track {
+  background: linear-gradient(to right, rgb(40, 170, 140) 0 var(--slider-pos), rgba(40, 170, 140, 0.24) var(--slider-pos) 100%);
+}
+.property-card:has(> .property-card-header[aria-controls^="rotation-"]) .range-control input[type="range"]::-webkit-slider-thumb {
+  border-color: rgb(40, 170, 140);
+}
+.property-card:has(> .property-card-header[aria-controls^="rotation-"]) .range-control input[type="range"]::-moz-range-track {
+  background: rgba(40, 170, 140, 0.24);
+}
+.property-card:has(> .property-card-header[aria-controls^="rotation-"]) .range-control input[type="range"]::-moz-range-progress {
+  background: rgb(40, 170, 140);
+}
+.property-card:has(> .property-card-header[aria-controls^="rotation-"]) .range-control input[type="range"]::-moz-range-thumb {
+  border-color: rgb(40, 170, 140);
+}
+.property-card:has(> .property-card-header[aria-controls^="rotation-"]) .check-property input {
+  accent-color: rgb(40, 170, 140);
+  --sw: rgb(40, 170, 140);
+}
+html[data-theme="dark"] .property-card:has(> .property-card-header[aria-controls^="rotation-"]) {
+  background: rgba(40, 170, 140, 0.17);
+  box-shadow: inset 0 0 0 1px rgba(40, 170, 140, 0.5);
+}
+html[data-theme="dark"] .property-card:has(> .property-card-header[aria-controls^="rotation-"]) > .property-card-header {
+  color: #7FDEC6;
+}
+html[data-theme="dark"] .property-card:has(> .property-card-header[aria-controls^="rotation-"]) .range-control input[type="range"]::-webkit-slider-runnable-track {
+  background: linear-gradient(to right, rgb(40, 170, 140) 0 var(--slider-pos), rgba(255, 255, 255, 0.16) var(--slider-pos) 100%);
+}
+html[data-theme="dark"] .property-card:has(> .property-card-header[aria-controls^="rotation-"]) .range-control input[type="range"]::-moz-range-track {
+  background: rgba(255, 255, 255, 0.16);
+}
+.property-card:has(> .property-card-header[aria-controls^="taper-"]) {
+  background: rgba(140, 110, 210, 0.13);
+  box-shadow: inset 0 0 0 1px rgba(140, 110, 210, 0.45);
+}
+.property-card:has(> .property-card-header[aria-controls^="taper-"]) > .property-card-header {
+  color: #5B3FA8;
+  font-weight: 650;
+}
+.property-card:has(> .property-card-header[aria-controls^="taper-"]) > .property-card-header:hover {
+  filter: brightness(1.2);
+}
+.property-card:has(> .property-card-header[aria-controls^="taper-"]) .range-control input[type="range"]::-webkit-slider-runnable-track {
+  background: linear-gradient(to right, rgb(140, 110, 210) 0 var(--slider-pos), rgba(140, 110, 210, 0.24) var(--slider-pos) 100%);
+}
+.property-card:has(> .property-card-header[aria-controls^="taper-"]) .range-control input[type="range"]::-webkit-slider-thumb {
+  border-color: rgb(140, 110, 210);
+}
+.property-card:has(> .property-card-header[aria-controls^="taper-"]) .range-control input[type="range"]::-moz-range-track {
+  background: rgba(140, 110, 210, 0.24);
+}
+.property-card:has(> .property-card-header[aria-controls^="taper-"]) .range-control input[type="range"]::-moz-range-progress {
+  background: rgb(140, 110, 210);
+}
+.property-card:has(> .property-card-header[aria-controls^="taper-"]) .range-control input[type="range"]::-moz-range-thumb {
+  border-color: rgb(140, 110, 210);
+}
+.property-card:has(> .property-card-header[aria-controls^="taper-"]) .check-property input {
+  accent-color: rgb(140, 110, 210);
+  --sw: rgb(140, 110, 210);
+}
+html[data-theme="dark"] .property-card:has(> .property-card-header[aria-controls^="taper-"]) {
+  background: rgba(140, 110, 210, 0.17);
+  box-shadow: inset 0 0 0 1px rgba(140, 110, 210, 0.5);
+}
+html[data-theme="dark"] .property-card:has(> .property-card-header[aria-controls^="taper-"]) > .property-card-header {
+  color: #C3AFF2;
+}
+html[data-theme="dark"] .property-card:has(> .property-card-header[aria-controls^="taper-"]) .range-control input[type="range"]::-webkit-slider-runnable-track {
+  background: linear-gradient(to right, rgb(140, 110, 210) 0 var(--slider-pos), rgba(255, 255, 255, 0.16) var(--slider-pos) 100%);
+}
+html[data-theme="dark"] .property-card:has(> .property-card-header[aria-controls^="taper-"]) .range-control input[type="range"]::-moz-range-track {
+  background: rgba(255, 255, 255, 0.16);
+}
+.property-card:has(> .property-card-header[aria-controls^="twist-"]) {
+  background: rgba(210, 90, 120, 0.13);
+  box-shadow: inset 0 0 0 1px rgba(210, 90, 120, 0.45);
+}
+.property-card:has(> .property-card-header[aria-controls^="twist-"]) > .property-card-header {
+  color: #A02B52;
+  font-weight: 650;
+}
+.property-card:has(> .property-card-header[aria-controls^="twist-"]) > .property-card-header:hover {
+  filter: brightness(1.2);
+}
+.property-card:has(> .property-card-header[aria-controls^="twist-"]) .range-control input[type="range"]::-webkit-slider-runnable-track {
+  background: linear-gradient(to right, rgb(210, 90, 120) 0 var(--slider-pos), rgba(210, 90, 120, 0.24) var(--slider-pos) 100%);
+}
+.property-card:has(> .property-card-header[aria-controls^="twist-"]) .range-control input[type="range"]::-webkit-slider-thumb {
+  border-color: rgb(210, 90, 120);
+}
+.property-card:has(> .property-card-header[aria-controls^="twist-"]) .range-control input[type="range"]::-moz-range-track {
+  background: rgba(210, 90, 120, 0.24);
+}
+.property-card:has(> .property-card-header[aria-controls^="twist-"]) .range-control input[type="range"]::-moz-range-progress {
+  background: rgb(210, 90, 120);
+}
+.property-card:has(> .property-card-header[aria-controls^="twist-"]) .range-control input[type="range"]::-moz-range-thumb {
+  border-color: rgb(210, 90, 120);
+}
+.property-card:has(> .property-card-header[aria-controls^="twist-"]) .check-property input {
+  accent-color: rgb(210, 90, 120);
+  --sw: rgb(210, 90, 120);
+}
+html[data-theme="dark"] .property-card:has(> .property-card-header[aria-controls^="twist-"]) {
+  background: rgba(210, 90, 120, 0.17);
+  box-shadow: inset 0 0 0 1px rgba(210, 90, 120, 0.5);
+}
+html[data-theme="dark"] .property-card:has(> .property-card-header[aria-controls^="twist-"]) > .property-card-header {
+  color: #F29DB4;
+}
+html[data-theme="dark"] .property-card:has(> .property-card-header[aria-controls^="twist-"]) .range-control input[type="range"]::-webkit-slider-runnable-track {
+  background: linear-gradient(to right, rgb(210, 90, 120) 0 var(--slider-pos), rgba(255, 255, 255, 0.16) var(--slider-pos) 100%);
+}
+html[data-theme="dark"] .property-card:has(> .property-card-header[aria-controls^="twist-"]) .range-control input[type="range"]::-moz-range-track {
+  background: rgba(255, 255, 255, 0.16);
+}
+.property-card:has(> .property-card-header[aria-controls^="slope-"]) {
+  background: rgba(130, 170, 50, 0.13);
+  box-shadow: inset 0 0 0 1px rgba(130, 170, 50, 0.45);
+}
+.property-card:has(> .property-card-header[aria-controls^="slope-"]) > .property-card-header {
+  color: #4F6B12;
+  font-weight: 650;
+}
+.property-card:has(> .property-card-header[aria-controls^="slope-"]) > .property-card-header:hover {
+  filter: brightness(1.2);
+}
+.property-card:has(> .property-card-header[aria-controls^="slope-"]) .range-control input[type="range"]::-webkit-slider-runnable-track {
+  background: linear-gradient(to right, rgb(130, 170, 50) 0 var(--slider-pos), rgba(130, 170, 50, 0.24) var(--slider-pos) 100%);
+}
+.property-card:has(> .property-card-header[aria-controls^="slope-"]) .range-control input[type="range"]::-webkit-slider-thumb {
+  border-color: rgb(130, 170, 50);
+}
+.property-card:has(> .property-card-header[aria-controls^="slope-"]) .range-control input[type="range"]::-moz-range-track {
+  background: rgba(130, 170, 50, 0.24);
+}
+.property-card:has(> .property-card-header[aria-controls^="slope-"]) .range-control input[type="range"]::-moz-range-progress {
+  background: rgb(130, 170, 50);
+}
+.property-card:has(> .property-card-header[aria-controls^="slope-"]) .range-control input[type="range"]::-moz-range-thumb {
+  border-color: rgb(130, 170, 50);
+}
+.property-card:has(> .property-card-header[aria-controls^="slope-"]) .check-property input {
+  accent-color: rgb(130, 170, 50);
+  --sw: rgb(130, 170, 50);
+}
+html[data-theme="dark"] .property-card:has(> .property-card-header[aria-controls^="slope-"]) {
+  background: rgba(130, 170, 50, 0.17);
+  box-shadow: inset 0 0 0 1px rgba(130, 170, 50, 0.5);
+}
+html[data-theme="dark"] .property-card:has(> .property-card-header[aria-controls^="slope-"]) > .property-card-header {
+  color: #BFE070;
+}
+html[data-theme="dark"] .property-card:has(> .property-card-header[aria-controls^="slope-"]) .range-control input[type="range"]::-webkit-slider-runnable-track {
+  background: linear-gradient(to right, rgb(130, 170, 50) 0 var(--slider-pos), rgba(255, 255, 255, 0.16) var(--slider-pos) 100%);
+}
+html[data-theme="dark"] .property-card:has(> .property-card-header[aria-controls^="slope-"]) .range-control input[type="range"]::-moz-range-track {
+  background: rgba(255, 255, 255, 0.16);
+}
+.property-card:has(> .property-card-header[aria-controls^="narrow-"]) {
+  background: rgba(196, 150, 30, 0.13);
+  box-shadow: inset 0 0 0 1px rgba(196, 150, 30, 0.45);
+}
+.property-card:has(> .property-card-header[aria-controls^="narrow-"]) > .property-card-header {
+  color: #7A5C06;
+  font-weight: 650;
+}
+.property-card:has(> .property-card-header[aria-controls^="narrow-"]) > .property-card-header:hover {
+  filter: brightness(1.2);
+}
+.property-card:has(> .property-card-header[aria-controls^="narrow-"]) .range-control input[type="range"]::-webkit-slider-runnable-track {
+  background: linear-gradient(to right, rgb(196, 150, 30) 0 var(--slider-pos), rgba(196, 150, 30, 0.24) var(--slider-pos) 100%);
+}
+.property-card:has(> .property-card-header[aria-controls^="narrow-"]) .range-control input[type="range"]::-webkit-slider-thumb {
+  border-color: rgb(196, 150, 30);
+}
+.property-card:has(> .property-card-header[aria-controls^="narrow-"]) .range-control input[type="range"]::-moz-range-track {
+  background: rgba(196, 150, 30, 0.24);
+}
+.property-card:has(> .property-card-header[aria-controls^="narrow-"]) .range-control input[type="range"]::-moz-range-progress {
+  background: rgb(196, 150, 30);
+}
+.property-card:has(> .property-card-header[aria-controls^="narrow-"]) .range-control input[type="range"]::-moz-range-thumb {
+  border-color: rgb(196, 150, 30);
+}
+.property-card:has(> .property-card-header[aria-controls^="narrow-"]) .check-property input {
+  accent-color: rgb(196, 150, 30);
+  --sw: rgb(196, 150, 30);
+}
+html[data-theme="dark"] .property-card:has(> .property-card-header[aria-controls^="narrow-"]) {
+  background: rgba(196, 150, 30, 0.17);
+  box-shadow: inset 0 0 0 1px rgba(196, 150, 30, 0.5);
+}
+html[data-theme="dark"] .property-card:has(> .property-card-header[aria-controls^="narrow-"]) > .property-card-header {
+  color: #E8C660;
+}
+html[data-theme="dark"] .property-card:has(> .property-card-header[aria-controls^="narrow-"]) .range-control input[type="range"]::-webkit-slider-runnable-track {
+  background: linear-gradient(to right, rgb(196, 150, 30) 0 var(--slider-pos), rgba(255, 255, 255, 0.16) var(--slider-pos) 100%);
+}
+html[data-theme="dark"] .property-card:has(> .property-card-header[aria-controls^="narrow-"]) .range-control input[type="range"]::-moz-range-track {
+  background: rgba(255, 255, 255, 0.16);
+}
+
+/* A symbol before each section title, so the sections are told apart by more than their colour. */
+.property-card-title {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+.property-card-title svg {
+  flex: 0 0 auto;
+}
+
+/* A switch that belongs to the slider above it: a little in, with a small line up to that slider. */
+.check-property-sub {
+  position: relative;
+  margin-left: 6px;
+  padding-left: 24px;
+}
+.check-property-sub::before {
+  content: "";
+  position: absolute;
+  left: 7px;
+  top: -12px;
+  width: 11px;
+  height: 21px;
+  border-left: 2px solid currentColor;
+  border-bottom: 2px solid currentColor;
+  border-bottom-left-radius: 4px;
+  opacity: 0.45;
+  pointer-events: none;
+}
+
+/* Sliding switches instead of tick boxes inside the inspector cards: the label on the left, the switch on the right, in the colour of its section. */
+.property-card .check-property {
+  flex-direction: row-reverse;
+  justify-content: space-between;
+}
+.property-card .check-property > span {
+  flex: 1 1 auto;
+}
+.property-card .check-property input[type="checkbox"] {
+  -webkit-appearance: none;
+  appearance: none;
+  position: relative;
+  flex: none;
+  box-sizing: border-box;
+  width: 40px;
+  height: 22px;
+  margin: 0;
+  border: 1.5px solid #8a7b6a;
+  border-radius: 11px;
+  background: rgba(0, 0, 0, 0.06);
+  transition: background-color 0.15s, border-color 0.15s, box-shadow 0.15s;
+}
+.property-card .check-property input[type="checkbox"]::after {
+  content: "";
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 13px;
+  height: 13px;
+  border-radius: 50%;
+  background: #8a7b6a;
+  transition: left 0.15s, background-color 0.15s;
+}
+.property-card .check-property input[type="checkbox"]:checked {
+  border-color: var(--sw, #b3711f);
+  background: var(--sw, #b3711f);
+}
+.property-card .check-property input[type="checkbox"]:checked::after {
+  left: 21px;
+  background: #fff;
+}
+.property-card .check-property input[type="checkbox"]:focus-visible {
+  outline: 2px solid var(--sw, #b3711f);
+  outline-offset: 2px;
+}
+.property-card .check-property input[type="checkbox"]:disabled {
+  opacity: 0.5;
+}
+html[data-theme="dark"] .property-card .check-property input[type="checkbox"] {
+  border-color: #7d7d7d;
+  background: rgba(0, 0, 0, 0.25);
+}
+html[data-theme="dark"] .property-card .check-property input[type="checkbox"]::after {
+  background: #989898;
+}
+html[data-theme="dark"] .property-card .check-property input[type="checkbox"]:checked {
+  border-color: var(--sw, #b3711f);
+  background: color-mix(in srgb, var(--sw, #b3711f) 22%, #0a0a0a);
+  box-shadow: 0 0 6px color-mix(in srgb, var(--sw, #b3711f) 50%, transparent);
+}
+html[data-theme="dark"] .property-card .check-property input[type="checkbox"]:checked::after {
+  background: color-mix(in srgb, var(--sw, #b3711f) 65%, white);
+}
+
+/* The other cards of the inspector (Wrap around a cylinder, Surface texture, ...) are tiles of the same shape in a
+   neutral colour, so that the colours stay the signs of the object's own sections. The coloured sections above are
+   more specific and keep theirs. */
+.property-card {
+  background: rgba(93, 71, 49, 0.07);
+  box-shadow: inset 0 0 0 1px rgba(93, 71, 49, 0.24);
+}
+html[data-theme="dark"] .property-card {
+  background: rgba(255, 255, 255, 0.06);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.2);
+}
+
+/* Choice fields in the dark theme: the closed field is dark like the number fields beside it. The list that opens
+   keeps the light colour scheme (see .select-property select above, the Chrome-on-Linux hover fix), and its
+   options say their colours outright, dark text on a light ground, so the row under the pointer stays readable. */
+html[data-theme="dark"] .select-property select {
+  color: #f1eee9;
+  background-color: rgba(0, 0, 0, 0.35);
+  border-color: rgba(255, 255, 255, 0.22);
+  box-shadow: none;
+}
+html[data-theme="dark"] .select-property select option {
+  color: #3b2f22;
+  background-color: #fff;
 }

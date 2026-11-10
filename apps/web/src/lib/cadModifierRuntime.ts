@@ -1,9 +1,14 @@
 import { CONCAVE_FILLET_STRAIGHT_MESSAGE } from "@/lib/cadConcaveFillet";
+import { TREATMENT_LOST_FACES_MESSAGE } from "@/lib/cadLostFaces";
 import { t } from "@/lib/i18n";
 import { isKernelMemoryFault, isWasmMemoryFaultMessage } from "@/lib/kernelFault";
 import { localizedError } from "@/lib/userErrors";
 import type { CadModifierDeflection, CadModifierEdge, CadModifierQuality } from "@/lib/cadModifierTypes";
 import type { OcctKernel, ShapeHandle } from "occt-wasm";
+import { tightBendFromMessage } from "@/lib/cadTightBends";
+
+/** The worker's error when no way of cutting a hole of a group came out right (Discussion #1523). */
+export const HOLE_CUT_FAILED_MESSAGE = "A hole of the group could not be cut cleanly";
 
 const occtRuntimeVersion = process.env.NEXT_PUBLIC_OCCT_RUNTIME_VERSION;
 /** Where scripts/copy-occt-wasm.mjs stages the kernel: one folder per kernel version. */
@@ -347,6 +352,12 @@ export function cadModifierUserErrorMessage(rawError: string | null | undefined)
   if (rawError.includes("creates invalid or overlapping edge geometry")) {
     return t("edge.errorOverlappingGeometry");
   }
+  if (rawError.includes(TREATMENT_LOST_FACES_MESSAGE)) {
+    return t("edge.errorLostFaces");
+  }
+  if (rawError.includes(HOLE_CUT_FAILED_MESSAGE)) {
+    return t("edge.errorHoleCut");
+  }
   if (rawError.includes("The group has no solid body to modify")) {
     return t("edge.errorNoSolidBody");
   }
@@ -430,6 +441,10 @@ export function cadModifierUserErrorMessage(rawError: string | null | undefined)
   }
   if (rawError.includes("The CAD worker did not return a body without the faces") || rawError.includes("Select at least one face")) {
     return t("deleteFace.errorFailed");
+  }
+  const tightBend = tightBendFromMessage(rawError);
+  if (tightBend !== null) {
+    return t("edge.errorTightBend", { bend: `${tightBend} mm` });
   }
   if (rawError.includes("cannot be filleted together")) {
     return t("edge.errorFilletTogether");

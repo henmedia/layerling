@@ -18,9 +18,22 @@ export function normalizeTextEdge(value: unknown): TextEdge | undefined {
   return { kind, size: Math.round(Math.min(MAX_TEXT_EDGE, Math.max(MIN_TEXT_EDGE, width)) * 1000) / 1000 };
 }
 
+/**
+ * The longest text whose letters still get a rounded or chamfered top edge. The edge is built letter outline by
+ * letter outline in several steps, and its time grows faster than the text: measured on 08.11.2026 in Sans,
+ * 24 characters 3 s, 40 characters 5 s, 250 characters a full minute (Script nearly two). Since a text takes
+ * 250 characters (MAX_TEXT_LENGTH), a longer one keeps its edge setting but is built with plain letters.
+ */
+export const MAX_EDGED_TEXT_LENGTH = 40;
+
+/** Whether a text is short enough for its letters to take a top edge: up to MAX_EDGED_TEXT_LENGTH characters. */
+export function textAllowsEdge(shape: Pick<WorkplaneShape, "text">) {
+  return Array.from(shape.text ?? "").length <= MAX_EDGED_TEXT_LENGTH;
+}
+
 /** Whether the letters of this text get their top edge rounded or chamfered. */
-export function textHasEdge(shape: Pick<WorkplaneShape, "kind" | "textEdge">) {
-  return shape.kind === "text" && Boolean(normalizeTextEdge(shape.textEdge));
+export function textHasEdge(shape: Pick<WorkplaneShape, "kind" | "textEdge" | "text">) {
+  return shape.kind === "text" && Boolean(normalizeTextEdge(shape.textEdge)) && textAllowsEdge(shape);
 }
 
 /**

@@ -1,14 +1,26 @@
 [
   {
     "title": {
-      "de": "Hülle mit offenen Löchern",
-      "en": "Hull with open holes",
-      "da": "Hylster med åbne huller"
+      "de": "Strecken: ein Teil an einer Stelle länger machen",
+      "en": "Stretch: make a part longer in one place",
+      "da": "Stræk: gør en del længere ét sted"
     },
     "body": {
-      "de": "Eine Hülle füllt alles, was in ihren Teilen hohl ist: ein Rohr, einen ausgehöhlten Zylinder, Löcher in einer Gruppe. Mit „Löcher der Teile behalten“ unter Eigenschaften bleiben sie offen, und die Hülle füllt nur den Raum zwischen den Teilen.",
-      "en": "A hull fills whatever is hollow in its parts: a tube, a hollowed cylinder, the holes in a group. With Keep the parts' holes under Properties they stay open, and the hull only fills the space between the parts.",
-      "da": "Et hylster fylder alt, hvad der er hult i dets dele: et rør, en udhulet cylinder, hullerne i en gruppe. Med „Bevar delenes huller“ under Egenskaber forbliver de åbne, og hylsteret fylder kun rummet mellem delene."
+      "de": "Im Teilen-Werkzeug gibt es neben „In zwei teilen“ jetzt „Strecken“: Ebene setzen, Länge eintippen, und der Körper wird genau dort länger, der Schnitt an der Ebene füllt die Lücke. So wächst ein heruntergeladenes Gehäuse durch seine geraden Wände, und Fächer und Rundungen bleiben, wie sie waren. Ein Minuswert macht es kürzer.",
+      "en": "The Split tool now has Stretch beside Split in two: place the plane, type a length, and the body gets longer right there, the cut at the plane filling the gap. A downloaded case grows through its straight walls while compartments and rounded corners stay as they were. A minus value makes it shorter.",
+      "da": "Del-værktøjet har nu Stræk ved siden af Del i to: placer planet, skriv en længde, og formen bliver længere netop dér, mens snittet ved planet fylder hullet. En hentet kasse vokser gennem sine lige vægge, mens rum og afrundinger forbliver, som de var. En negativ værdi gør den kortere."
+    }
+  },
+  {
+    "title": {
+      "de": "Drehskizze: keine Geisterform beim Bearbeiten",
+      "en": "Revolve sketch: no ghost shape when editing",
+      "da": "Drejeskitse: ingen spøgelsesform ved redigering"
+    },
+    "body": {
+      "de": "Wurde ein Drehkörper, der über der Platte beginnt, wieder bearbeitet, lag hinter der Seitenansicht eine gefüllte Form: der waagrechte Schnitt durch die Teile daneben, wie von oben gesehen. Er bleibt jetzt weg; der Körper selbst war nie betroffen.",
+      "en": "Editing a revolved body that starts above the plate showed a filled shape behind the side view: the level cut through the parts beside it, as seen from above. It stays away now; the body itself was never affected.",
+      "da": "Når et drejet legeme, der begynder over pladen, blev redigeret igen, lå der en udfyldt form bag sidevisningen: det vandrette snit gennem delene ved siden af, set ovenfra. Den bliver nu væk; selve legemet var aldrig berørt."
     }
   }
 ]

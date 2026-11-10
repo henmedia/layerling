@@ -78,10 +78,12 @@ L'IA fonctionne avec les mêmes fonctions que vous, via le même chemin que votr
 | Outil | Ce qu'il fait |
 | --- | --- |
 | `layerling_list_editors` | répertorie les onglets ouverts de l'éditeur |
+| `layerling_rename_project` | donne un nom au projet, comme le crayon à côté du nom du projet |
 | `layerling_open_editor` | ouvre un nouvel onglet d'éditeur dans votre navigateur par défaut et attend qu'il soit connecté (sur votre propre ordinateur uniquement) |
 | `layerling_read_scene` | lit la scène, la sélection, les unités et les dimensions exactes de tous les objets |
 | `layerling_list_objects` | répertorie tous les objets avec les dimensions, la position, la rotation et l'identifiant |
 | `layerling_select_objects` | sélectionne des objets |
+| `layerling_hide_others` | masque tout sauf la sélection ou les objets indiqués, en une seule étape d'annulation |
 | `layerling_delete_objects` | supprime des objets |
 | `layerling_move_object` | déplace un objet à un autre endroit de la liste des objets |
 | `layerling_create_shape` | crée une forme : boîte, cylindre, texte (également courbé), fil, engrenage, corps d'esquisse et tous les autres |
@@ -94,9 +96,12 @@ L'IA fonctionne avec les mêmes fonctions que vous, via le même chemin que votr
 | `layerling_scale_objects` | met à l'échelle les objets selon un pourcentage, ensemble ou chacun en place |
 | `layerling_lay_flat` | pose un objet avec une face sur la plaque |
 | `layerling_place_on_face` | pose des objets sur une face d'une autre, également inclinée, comme la touche C |
-| `layerling_perforate_face` | découpe un motif de trous dans une face plate ; les trous restent groupés avec le corps |
+| `layerling_perforate_face` | découpe un motif de trous dans une face plate ou autour de la paroi d'un cylindre, d'un tube ou d'un alésage ; les trous restent groupés avec le corps |
 | `layerling_sweep_sketch` | tire une section rectangulaire ou ronde le long d'un chemin de points, comme un seul corps exact ; un chemin fermé donne un anneau |
 | `layerling_push_face` | tire une face plane vers l'extérieur ou y creuse une poche, avec un retrait depuis le bord et un rayon des coins ; la nouvelle pièce est un corps d'esquisse regroupé avec le corps |
+| `layerling_paint` | peint des parties d'un corps dans leurs propres couleurs pour une impression en plusieurs couleurs (Peindre) : remplir une face jusqu'à ses arêtes vives, une tache ronde ou un lasso tracé dans une vue à plat ; gommer, tout retirer ; enregistré avec le corps et écrit dans un 3MF sous forme de faces peintes |
+| `layerling_support_rib` | place une fine nervure de support sous la face inférieure d'une pièce imprimée inclinée sur une arête, avec des ponts d'une couche de haut (Nervure de support) |
+| `layerling_stencil_bridges` | retient les parties d'une plaque traversée par un texte qui tomberaient, avec des ponts regroupés avec la plaque, aussi larges et hauts que demandé (Ponts de pochoir) |
 | `layerling_mate_faces` | amène la face d'un objet contre la face d'un autre, face à face ou à fleur |
 | `layerling_open_group` | ouvre un groupe pour que ses parties puissent être modifiées une par une, également un groupe à l'intérieur d'un groupe ouvert |
 | `layerling_close_group` | le referme ("Terminé") ou annule |
@@ -154,6 +159,7 @@ L'IA fonctionne avec les mêmes fonctions que vous, via le même chemin que votr
 | `layerling_insert_custom_shape` | insère une forme personnalisée dans le design ouvert, à un endroit x/z si vous le souhaitez |
 | `layerling_delete_custom_shape` | supprime une forme personnalisée ; les corps insérés restent |
 | `layerling_show_workplane` | cache et affiche la plaque avec sa grille, pour une photo du dessous par exemple (uniquement la vue) |
+| `layerling_focus_mode` | active et désactive le mode concentration : masque la ligne de titre et le pied de page pour plus de place (seulement le cadre de l’éditeur) |
 | `layerling_set_section_view` | coupe la vue ouverte le long d'un plan pour regarder à l'intérieur (seulement la vue, rien n'est coupé) |
 | `layerling_measurements` | affiche ou masque les mesures du ruban à mesurer et les liste avec leurs longueurs, et masque ou affiche les cotes autour de la sélection comme [[Q]], et saisit une longueur pour l'une d'elles, ce qui déplace le corps à son extrémité comme un clic sur son nombre |
 | `layerling_measure_angle` | mesure un angle comme le rapporteur : au sommet de trois points ou entre deux faces planes, et l'affiche dans la vue |

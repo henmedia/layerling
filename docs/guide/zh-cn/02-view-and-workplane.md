@@ -16,7 +16,7 @@ summary: 在场景中移动、正对着观察，以及把新形状放到任意�
 | 按住 [[Ctrl]] / [[Cmd]] 并用左键拖动 | 也可平移视图（在 MacBook 触控板上：按住 [[Cmd]]，按下并拖动） |
 | 双击工作平面上的空白处或平台旁边 | 平移视图，使该处位于中央；之后视图绕该处旋转 |
 
-滚轮缩放的速度在设置的 {{ui:workspace.appearance}} 下用 {{ui:workspace.zoomSpeed}} 设定：滑块范围 1 到 14，初始为 5。它只作用于滚轮和触控板：按钮以及 [[+]] 和 [[−]] 键始终按同样的小步距缩放。鼠标滚轮的一格在任何浏览器里缩放幅度都相同，触控板则按你滑过的距离缩放。
+滚轮缩放的速度在设置的 {{ui:workspace.appearance}} 下用 {{ui:workspace.zoomSpeed}} 设定：滑块范围 1 到 14，初始为 5。它只作用于滚轮和触控板：按钮以及 [[+]] 和 [[−]] 键始终按同样的小步距缩放。鼠标滚轮的一格在任何浏览器里缩放幅度都相同，触控板则按你滑过的距离缩放。其下方的 {{ui:workspace.panSpeed}} 设定平移时视图跟随鼠标的速度：滑块范围 1 到 9，初始为 5，此时你抓住的点会一直停在光标下。
 
 **与切片软件一致的鼠标按键。** 如果你习惯了 Bambu Studio 或 OrcaSlicer，在设置的 {{ui:workspace.appearance}} 下把 {{ui:workspace.mouseScheme}} 设为 {{ui:workspace.mouseSchemeSlicer}}。这样在空白处左键拖动会旋转视图，右键像中键一样平移视图，Shift 加左键拖动会画出选择框。拖动实体仍会移动它，短按右键仍会打开菜单。在草图中右键同样平移视图。
 
@@ -98,7 +98,7 @@ X 和 [[Esc]] 会关闭窗口；如果正在测量，[[Esc]] 会先结束测量�
 当一个设计的内容超出一个打印板所能打印的范围时，例如一个盒子连同盖子和内衬，它可以有多个打印板。点击 {{ui:editor.group.arrange}} 组中的 {{ui:editor.tool.buildPlates}}，或在物体的右键菜单中选择 {{ui:plates.moveTo}}。视图底部会出现一个栏，每个打印板一个按钮；按钮上的数字表示该打印板上有多少个物体。
 
 - 每个打印板与工作平面一样大，打印板并排排列在第一个打印板的右侧，相距 20 毫米。物体属于其底面中心所在的打印板，因此把它拖到另一边就会放到另一个打印板上。一个设计最多有 12 个打印板。
-- 在栏中点击一个打印板会显示它，之后新形状会放在它上面。{{ui:plates.showAll}} 显示全部。双击打印板或使用 {{ui:plates.rename}} 可以给它起一个名字，例如“盖子”，名字会写在打印板上。
+- 在栏中点击一个打印板会显示它，之后新形状和导入的文件会放在它上面。{{ui:plates.showAll}} 显示全部。双击打印板或使用 {{ui:plates.rename}} 可以给它起一个名字，例如“盖子”，名字会写在打印板上。
 - {{ui:plates.moveLeft}} 和 {{ui:plates.moveRight}} 改变顺序，物体随其打印板一起移动。{{ui:plates.remove}} 删除当前打印板；其上的物体会移到第一个打印板的相同位置。
 - {{ui:plates.arrange}} 将所选物体（或全部物体）逐行排列到打印板上，先放最大的，间距 5 毫米，并在需要时添加打印板。比打印板大的物体会留在原处。
 - 选择打印机后，每个物体都按自己的打印板检查，打印高度从该打印板上最低的物体算起。有物体放不下的打印板，其数字显示为红色。
@@ -109,6 +109,7 @@ X 和 [[Esc]] 会关闭窗口；如果正在测量，[[Esc]] 会先结束测量�
 ## 网格与吸附
 
 网格显示平台的大小。右下角是**吸附步距**：移动和缩放按这个步距吸附，例如 1 mm。精细作业时调小，粗略摆放时调大。功能区中的 {{ui:editor.tool.snapToGrid}} 会在之后把选中的形状移到最近的网格交叉点。移动时，形状还会吸附到其他形状，见[选择与排列](chapter:select-and-arrange)。
+不移动鼠标、用鼠标中键短按一下，会在指针处直接打开吸附步长菜单，在草图中也一样；按住中键拖动仍然平移视图。
 
 > **提示：** 精确拼合零件时，不要一边转着视图。用数字键转到俯视或正视，再按 [[O]] 切换到平面显示。这样一眼就能看出两条边是否真的齐平。
 
@@ -116,15 +117,25 @@ X 和 [[Esc]] 会关闭窗口；如果正在测量，[[Esc]] 会先结束测量�
 
 标题行中的齿轮（{{ui:editor.workspaceSettings}}）打开设置。左侧有五个区域：{{ui:workspace.appearance}}、{{ui:workspace.measurement}}、{{ui:workspace.workplane}}、{{ui:workspace.shapeDefaults}} 和 {{ui:workspace.history}}。改动立即生效。底部的 {{ui:workspace.makeDefault}} 把当前设置保存为默认值，让新设计从这些设置开始。打开的文件会带着它自己的设置；旁边的 {{ui:workspace.useMyDefault}} 会把你保存的颜色、网格等应用到打开的设计上，同时保留它的单位。如果你的默认设置里有打印机，这台打印机连同它的平台尺寸也会一起带过来；没有的话，设计保留原有的平台和打印机。右上角的 {{ui:workspace.close}} 关闭窗口。本节逐项介绍这些设置。
 
+{{ui:workspace.exportSettings}} 把窗口的设置保存为文件（layerling-settings-<日期>.json）：颜色、网格、阴影、相机和形状默认值，以及主题、工具栏大小、视图立方体的角落、形状颜色和每台打印机的间隙。在另一台电脑上或浏览器数据丢失后，{{ui:workspace.importSettings}} 会再次读取该文件：它成为新设计的默认值，并像 {{ui:workspace.useMyDefault}} 一样应用到已打开的设计。你在键盘快捷键中设定的自定义按键也会一起保存。
+
 ### 外观：主题、工具栏与视图立方体
 
 {{ui:workspace.theme}} 设定整个程序的配色：{{ui:workspace.themeSystem}} 跟随电脑，其余为 {{ui:workspace.themeLight}}、{{ui:workspace.themeDark}} 和 {{ui:workspace.themeGraphite}}。也可以在编辑器右上角更改。
 
-{{ui:workspace.toolbarSize}} 让顶部功能区的按钮、其形状菜单、左侧视图栏和右侧属性面板变小或变大：{{ui:workspace.toolbarSizeSmall}}、{{ui:workspace.toolbarSizeMedium}}（一直以来的样子）或 {{ui:workspace.toolbarSizeLarge}}。小尺寸在笔记本电脑上给工作平面留出更多空间；大尺寸在大屏幕上或用手点击时更容易命中。使用大按钮时，如果窗口太窄，功能区的各组会排到第二行。尺寸保存在这个浏览器中，对所有设计生效。
+{{ui:workspace.toolbarSize}} 让顶部功能区的按钮、其形状菜单、左侧视图栏和右侧属性面板变小或变大：{{ui:workspace.toolbarSizeSmall}}、{{ui:workspace.toolbarSizeMedium}}（一直以来的样子）或 {{ui:workspace.toolbarSizeLarge}}。小尺寸在笔记本电脑上给工作平面留出更多空间；大尺寸在大屏幕上或用手点击时更容易命中。使用大按钮时，如果窗口太窄，功能区的各组会排到第二行。尺寸在设置的“{{ui:workspace.ribbon}}”标签页中，保存在这个浏览器中，对所有设计生效。
 
 {{ui:workspace.shapeColors}} 会把新形状的初始颜色（其类型的颜色，或你用 {{ui:inspector.saveDefaults}} 保存的颜色）显示在形状库的图片上。如果你更喜欢灰色图片，就把它关掉；浏览器会记住你的选择。
 
 {{ui:workspace.viewCubePosition}} 把视图立方体放到工作平面的另一个角：{{ui:workspace.viewCubePositionTopLeft}}（一直以来的位置）、{{ui:workspace.viewCubePositionTopRight}}、{{ui:workspace.viewCubePositionBottomLeft}} 或 {{ui:workspace.viewCubePositionBottomRight}}。除了左上角，视图栏都会上移到立方体让出的位置。在右下角时，立方体正好位于 {{ui:inspector.snapGrid}} 控件上方。右侧打开形状属性时，右侧的立方体会让到属性面板左边。这个角保存在浏览器中，对所有设计生效。窗口很窄时（例如手机上），该设置会隐藏，立方体留在左上角。
+
+### 外观：功能区中的按钮
+
+{{ui:workspace.ribbonButtons}} 把你从不使用的组和按钮从功能区中移除。点击一个组打开它的列表：{{ui:workspace.ribbonGroupShown}} 移除整个组，按钮旁的勾选框只移除这一个按钮。{{ui:workspace.ribbonShowAll}} 把一切恢复。没有按钮的组会消失，其他组随之前移，一行就能放下更多功能区。
+
+移除的内容只是不在功能区中：命令搜索（[[Ctrl]]+[[K]]）仍能找到它，它的快捷键仍能运行它。组旁边的箭头把它在列表中上移或下移，也就是在功能区中移动；{{ui:workspace.ribbonResetOrder}}会恢复原来的顺序。按钮旁边的箭头以同样方式在其组内移动它。“帮助”始终保留。“形状”组可以像其他组一样移动和移除；移除后，它的面板仍可从命令搜索打开。这个浏览器会记住你的选择，它也会写入 {{ui:workspace.exportSettings}} 的文件。它适用于 3D 编辑器；草图有自己的工具栏。
+
+组列表中 {{ui:workspace.ribbonGroupShown}} 下方的 {{ui:workspace.ribbonFold}} 决定窗口放不下所有组时这个组怎么做。{{ui:workspace.ribbonFoldAuto}} 是默认设置：最少用到的组先折叠。{{ui:workspace.ribbonFoldAlways}} 让这个组即使在宽窗口中也折叠成一个按钮，占地很少，又随手可用。{{ui:workspace.ribbonFoldKeep}} 让它在其他所有组之后才折叠。{{ui:workspace.ribbonResetOrder}} 也会恢复这项选择。{{ui:editor.section.mirrorPattern}}、{{ui:editor.section.splitShape}}、{{ui:editor.section.edgesWalls}} 和 {{ui:editor.section.surface}} 是四个独立的组：每个都可以单独移动、折叠和移除。
 
 ### 外观：快速模式
 
@@ -152,6 +163,8 @@ X 和 [[Esc]] 会关闭窗口；如果正在测量，[[Esc]] 会先结束测量�
 
 {{ui:workspace.strongHoles}} 把孔画成更深的灰色、更不透明，并在周围加一条深色线。当孔在透明实体中难以找到时很有帮助。与边线不同，它在快速模式下仍然开启。
 
+下方的{{ui:workspace.holeOpacity}}设置孔绘制得有多实，范围为 10% 到 90%。数值越低，越容易看出孔与实体相接的位置。默认为自动：52%，开启{{ui:workspace.strongHoles}}时为 72%；双击滑块即可恢复。
+
 ### 外观：光照与阴影
 
 {{ui:workspace.showShadows}} 打开或关闭投射阴影。两个滑块设定实体的受光方式。{{ui:workspace.shadowStrength}} 决定投射阴影的深浅，{{ui:workspace.shadeContrast}} 把光从均匀的环境光转向主光：偏向“强烈”时，背光面更暗、阴影更明显；偏向“柔和”时，整体更平。对比度拉到最高会非常强，背光面和阴影会变得很暗。{{ui:workspace.shadowSoftness}} 让阴影边缘变柔和而不是锐利。{{ui:workspace.lightAzimuth}} 让主光绕平台旋转（0° 从前方，90° 从右方），{{ui:workspace.lightElevation}} 把它抬高；90° 时它像 Tinkercad 那样位于平台正上方，阴影正好落在实体下方。{{ui:workspace.softLighting}} 让大部分光线来自你观察的方向，并随视图转动：没有哪个面会留在暗处，朝上的深色面也不再被照得发白。主光仍保留一点用于阴影，对比度滑块依然有效。如果光线放低后仍能看到明亮的反光，把 {{ui:workspace.lightElevation}} 抬到 90°：这时看起来就像 Tinkercad。{{ui:workspace.lightReset}} 恢复全部设置。
@@ -178,7 +191,9 @@ X 和 [[Esc]] 会关闭窗口；如果正在测量，[[Esc]] 会先结束测量�
 
 {{ui:workspace.startWithScrollbars}}：设计打开时即显示视图的滚动条。此设置随设计一起保存，也会随 {{ui:workspace.makeDefault}} 保存。
 
-{{ui:workspace.zoomSpeed}} 是一个从慢到快的滑块：滚轮和触控板缩放的速度；缩放按钮和按键仍保持自己的小步距。{{ui:workspace.cameraInertia}}：松开鼠标后，视图会继续转一小会儿并平缓减速。关闭后它会立刻停住，与 Tinkercad 和 Fusion 360 相同。
+{{ui:workspace.viewBarOpensOnHover}}：折叠的视图栏在鼠标停在其箭头上时展开，鼠标离开后不久再次折叠，除非正在使用它的某个工具。以这种方式展开时点击箭头，可使其保持展开。仅适用于鼠标；在触摸屏上，仍像以前一样轻点即可打开视图栏。
+
+{{ui:workspace.zoomSpeed}} 是一个从慢到快的滑块：滚轮和触控板缩放的速度；缩放按钮和按键仍保持自己的小步距。{{ui:workspace.panSpeed}} 同样是一个从慢到快的滑块：平移时视图跟随鼠标的速度；居中时你抓住的点会一直停在光标下。{{ui:workspace.cameraInertia}}：松开鼠标后，视图会继续转动或平移一小会儿并平缓减速。关闭后它会立刻停住，与 Tinkercad 和 Fusion 360 相同。
 
 {{ui:workspace.overhangAngle}} 是在可见性菜单中打开“显示悬垂”时，一个面被视为悬垂的起始角度：这些面会以红白斜线标示。30° 偏保守，70° 依赖良好的打印冷却；45° 是常用的起点。显示时，视图下方的一行会写出最陡的悬垂，以及有多少 cm² 需要支撑。
 

@@ -200,6 +200,7 @@ import {
   DEFAULT_ROUNDED_BOX_TOP_BOTTOM_FILLET,
   DEFAULT_ROUNDED_BOX_QUALITY,
   normalizeCornerFillet,
+  normalizeEndFillets,
   normalizeTopBottomFillet,
   normalizeRoundedBoxQuality,
 } from "@/lib/roundedBoxGeometry";
@@ -927,6 +928,7 @@ export function sceneShape(shape: Partial<WorkplaneShape> & Pick<WorkplaneShape,
     loftOffsetX: shape.loftOffsetX,
     loftOffsetZ: shape.loftOffsetZ,
     loftWall: shape.loftWall,
+    loftTopWall: shape.loftTopWall,
     loftTwist: shape.loftTwist,
     loftSmooth: shape.loftSmooth,
     loftSegments: shape.loftSegments,
@@ -938,10 +940,14 @@ export function sceneShape(shape: Partial<WorkplaneShape> & Pick<WorkplaneShape,
     screwHoleHeadDepth: shape.screwHoleHeadDepth,
     screwHoleAngle: shape.screwHoleAngle,
     drillPointAngle: shape.drillPointAngle,
+    screwHoleSlot: shape.screwHoleSlot,
+    screwHoleRecess: shape.screwHoleRecess,
     portProfile: shape.portProfile,
     portClearance: shape.portClearance,
     cornerFillet: shape.cornerFillet,
+    cornerFillets: shape.cornerFillets,
     topBottomFillet: shape.topBottomFillet,
+    bottomFillet: shape.bottomFillet,
     roundedBoxQuality: shape.roundedBoxQuality,
     bentTubeProfile: shape.bentTubeProfile,
     bentTubeInnerProfile: shape.bentTubeInnerProfile,
@@ -961,6 +967,7 @@ export function sceneShape(shape: Partial<WorkplaneShape> & Pick<WorkplaneShape,
     surfaceTextureLayers: shape.surfaceTextureLayers,
     surfaceTextureMask: shape.surfaceTextureMask,
     surfaceFillOf: shape.surfaceFillOf,
+    paint: shape.paint,
     vase: shape.vase,
     vasePartOf: shape.vasePartOf,
     gridfinityKeyOf: shape.gridfinityKeyOf,
@@ -1060,6 +1067,7 @@ export function makeShapeFromAsset(
     offsetX: customization.loftOffsetX,
     offsetZ: customization.loftOffsetZ,
     wall: customization.loftWall,
+    topWall: customization.loftTopWall,
     twist: customization.loftTwist,
     smooth: customization.loftSmooth,
     segments: customization.loftSegments,
@@ -1355,11 +1363,20 @@ export function makeShapeFromAsset(
     screwHoleAngle: asset.kind === "countersink" || asset.kind === "doubleCountersink" || asset.kind === "finishingWasher" ? normalizeScrewHoleAngle(customization.screwHoleAngle ?? DEFAULT_SCREW_HOLE_ANGLE) : undefined,
     // A drill point saved with the defaults (Discussion #621); a new cylinder is solid and takes it once it is a hole.
     drillPointAngle: asset.kind === "cylinder" || asset.kind === "counterbore" || asset.kind === "countersink" ? normalizeDrillPointAngle(customization.drillPointAngle) : undefined,
+    // A slotted hole and a recessed head (Discussion #1531); left out when off, as the editor leaves them.
+    screwHoleSlot: (asset.kind === "counterbore" || asset.kind === "countersink" || asset.kind === "doubleCountersink") && customization.screwHoleSlot ? true : undefined,
+    screwHoleRecess: (asset.kind === "countersink" || asset.kind === "doubleCountersink") && (customization.screwHoleRecess ?? 0) > 0 ? customization.screwHoleRecess : undefined,
     cornerFillet: asset.kind === "roundedBox" ? normalizeCornerFillet(customization.cornerFillet ?? DEFAULT_ROUNDED_BOX_CORNER_FILLET, Math.min(width, depth) / 2)
       : asset.kind === "port" ? normalizePortCorner(customization.cornerFillet, width, height, customization.portProfile) : undefined,
     portProfile: asset.kind === "port" ? normalizePortProfile(customization.portProfile) : undefined,
     portClearance: asset.kind === "port" && normalizePortClearance(customization.portClearance) > 0 ? normalizePortClearance(customization.portClearance) : undefined,
-    topBottomFillet: asset.kind === "roundedBox" ? normalizeTopBottomFillet(customization.topBottomFillet ?? DEFAULT_ROUNDED_BOX_TOP_BOTTOM_FILLET, height / 2) : undefined,
+    ...(asset.kind === "roundedBox"
+      ? (() => {
+          // Top and bottom on their own: the two have to fit in the height together.
+          const [top, bottom] = normalizeEndFillets(customization.topBottomFillet ?? DEFAULT_ROUNDED_BOX_TOP_BOTTOM_FILLET, customization.bottomFillet, height);
+          return { topBottomFillet: top, bottomFillet: customization.bottomFillet === undefined ? undefined : bottom };
+        })()
+      : { topBottomFillet: undefined, bottomFillet: undefined }),
     roundedBoxQuality: asset.kind === "roundedBox" ? normalizeRoundedBoxQuality(customization.roundedBoxQuality ?? DEFAULT_ROUNDED_BOX_QUALITY) : undefined,
     ...(bentTube ?? {}),
     ...(loftMeasures ? loftFieldsFromMeasures(loftMeasures) : {}),

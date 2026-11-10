@@ -106,6 +106,8 @@ Ved revolvering tegner du den halve tværsnit **til venstre for aksen** der vise
 
 En revolvet form er en eksakt form, ligesom en ekstruderet: den tager fas og rund, og du kan hule den ud, til et krus eller en vase. En form revolveret med en ældre layerling er et mesh; åbn {{ui:inspector.editSketch}} og afslut den igen for at gøre den eksakt. En profil der når hen over aksen kan ikke bygges eksakt og bliver til et mesh, som før.
 
+**Glattere runde flader: {{ui:prop.revolveSmoothness}}.** Et eksakt drejet legeme deles i små flade facetter til visning, eksport og print, og på en stor krukke kan de ses på printet. Vælg legemet og sæt {{ui:prop.revolveSmoothness}} i egenskabspanelet til {{ui:prop.revolveSmoothnessFine}} eller {{ui:prop.revolveSmoothnessExtraFine}}: de runde flader deles finere, mod flere trekanter og et langsommere design. En helix eller en mesh-drejning har {{ui:prop.sides}} til dette i stedet.
+
 **Én sammenhængende streng: {{ui:prop.pitch}}.** En revolve gør omridset til lukkede ringe. Vælg den revolverede form og giv den i egenskabspanelet en {{ui:prop.pitch}} over 0, den højde den stiger pr. omgang, så vikler omridset sig op som en skruelinje: én sammenhængende streng som filament på en spole eller en fjeder. {{ui:prop.sweep}} bliver så til {{ui:prop.turns}}, op til 200; et negativt tal vikler venstre om. Omgange, der ligger tættere end omridset er højt, smelter sammen til én form, så en massiv kerne med fin stigning virker også. En skruelinje bygges som et mesh, så rund, fas og udhuling virker ikke på den; hold {{ui:prop.sides}} lavt ved mange omgange. En stigning på 0 giver ringe igen.
 
 ## Træk omridset langs en sti

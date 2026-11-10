@@ -82,10 +82,12 @@ AI pracuje tymi samymi funkcjami co Ty, tą samą drogą co Twoja praca w edytor
 | Narzędzie | Co robi |
 | --- | --- |
 | `layerling_list_editors` | wypisuje otwarte karty edytora |
+| `layerling_rename_project` | nadaje projektowi nazwę, jak ołówek obok nazwy projektu |
 | `layerling_open_editor` | otwiera nową kartę edytora w domyślnej przeglądarce i czeka, aż się połączy (tylko na Twoim własnym komputerze) |
 | `layerling_read_scene` | odczytuje scenę, zaznaczenie, jednostki i dokładne wymiary wszystkich obiektów |
 | `layerling_list_objects` | wypisuje wszystkie obiekty z wymiarami, pozycją, obrotem i identyfikatorem |
 | `layerling_select_objects` | zaznacza obiekty |
+| `layerling_hide_others` | ukrywa wszystko poza zaznaczeniem lub podanymi obiektami, w jednym kroku cofania |
 | `layerling_delete_objects` | usuwa obiekty |
 | `layerling_move_object` | przenosi obiekt w inne miejsce na liście obiektów |
 | `layerling_create_shape` | tworzy kształt: prostopadłościan, walec, tekst (także na łuku), gwint, koło zębate, bryłę ze szkicu i wszystkie pozostałe |
@@ -98,9 +100,12 @@ AI pracuje tymi samymi funkcjami co Ty, tą samą drogą co Twoja praca w edytor
 | `layerling_scale_objects` | skaluje obiekty o procent, razem albo każdy w miejscu |
 | `layerling_lay_flat` | kładzie obiekt jedną ścianą na płycie |
 | `layerling_place_on_face` | odkłada obiekty na ścianę innego, także skośną, jak klawisz C |
-| `layerling_perforate_face` | wycina wzór otworów w płaskiej ścianie. Otwory zostają otworami zgrupowanymi z bryłą |
+| `layerling_perforate_face` | wycina wzór otworów w płaskiej ścianie albo dookoła ścianki walca, rury lub otworu. Otwory zostają otworami zgrupowanymi z bryłą |
 | `layerling_sweep_sketch` | prowadzi prostokątny albo okrągły przekrój wzdłuż ścieżki z punktów jako jedną dokładną bryłę. Zamknięta ścieżka daje pierścień |
 | `layerling_push_face` | wypycha płaską ścianę na zewnątrz albo wycina w niej kieszeń, z odsunięciem od krawędzi i promieniem narożników. Nowa część to bryła ze szkicu zgrupowana z bryłą albo, z `separate`, osobna wolna bryła |
+| `layerling_paint` | maluje części bryły własnymi kolorami do druku w wielu kolorach (Malowanie): wypełnienie ściany do ostrych krawędzi, okrągła plama albo lasso w płaskim widoku; gumka, usuń wszystko; zapisywane z bryłą i zapisywane w 3MF jako pomalowane ściany |
+| `layerling_support_rib` | stawia cienkie żebro podporowe pod dolną ścianą części drukowanej pochyloną na krawędzi, z mostkami o wysokości jednej warstwy (Żebro podporowe) |
+| `layerling_stencil_bridges` | utrzymuje części płyty z tekstem wyciętym na wylot, które by wypadły, mostkami zgrupowanymi z płytą, o podanej szerokości i wysokości (Mostki szablonu) |
 | `layerling_mate_faces` | przykłada ścianę jednego obiektu do ściany drugiego, ściana do ściany, na równo albo dwie okrągłe ściany na jednej osi |
 | `layerling_open_group` | otwiera grupę, żeby zmieniać jej części po kolei, także grupę wewnątrz otwartej |
 | `layerling_close_group` | zamyka ją z powrotem („Gotowe”) albo anuluje |
@@ -158,6 +163,7 @@ AI pracuje tymi samymi funkcjami co Ty, tą samą drogą co Twoja praca w edytor
 | `layerling_insert_custom_shape` | wstawia własny kształt do otwartego projektu, jeśli chcesz, w miejscu x/z |
 | `layerling_delete_custom_shape` | usuwa własny kształt. Wstawione bryły zostają |
 | `layerling_show_workplane` | ukrywa i pokazuje płytę z siatką, na przykład do zdjęcia spodu (tylko widok) |
+| `layerling_focus_mode` | włącza i wyłącza tryb skupienia: ukrywa wiersz tytułu i stopkę, by zyskać miejsce (tylko ramka edytora) |
 | `layerling_set_section_view` | rozcina widok wzdłuż płaszczyzny, żeby zajrzeć do środka (tylko widok, nic nie jest cięte) |
 | `layerling_measurements` | pokazuje lub ukrywa pomiary narzędzia Zmierz i wypisuje je z ich długościami, oraz ukrywa lub pokazuje wymiary wokół zaznaczenia jak [[Q]], a także wpisuje długość dla jednego z nich, co przesuwa bryłę na jego końcu jak kliknięcie liczby |
 | `layerling_measure_angle` | mierzy kąt jak kątomierz: w wierzchołku z trzech punktów lub między dwiema płaskimi ścianami, i pokazuje go w widoku |

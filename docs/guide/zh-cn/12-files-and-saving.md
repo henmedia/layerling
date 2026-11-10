@@ -28,11 +28,17 @@ layerling 把所有内容保存在你电脑的浏览器里。没有账号，也�
 
 只备份部分设计：点击 {{ui:dashboard.select}} 后，{{ui:dashboard.backupSelected}} 只把所选设计连同其文件夹打包成一个 ZIP 文件；文件夹菜单中的 {{ui:dashboard.backupSelected}} 会打包该文件夹及其中所有设计和文件夹。两者都不包含自定义形状，{{ui:dashboard.restoreBackup}} 可以像完整备份一样恢复它们。这适用于此浏览器中的设计。
 
+备份保存到哪里：在 Chrome 和 Edge 中，保存对话框会询问文件夹和名称，并为下一次备份记住该文件夹。这样备份就能直接存入你自己的文件夹，例如云盘。{{ui:myShapes.backup}} 也是如此。其他浏览器会把文件放进它们的下载文件夹；具体是哪个文件夹，可在浏览器设置中更改。
+
 如果某个设计打开很慢或根本打不开，通常是因为它的撤销步骤历史记录变得非常大，请在开始页面该设计的菜单中选择 {{ui:dashboard.openWithoutHistory}}。layerling 随后只读取当前状态，永久删除所有更早的步骤并打开设计；由于无法撤销，会先询问一次。若想保留这些步骤，请先用 {{ui:dashboard.backupSelected}} 备份该设计。
 
 在编辑器里备份单个设计：{{ui:editor.export}}，选择 **LYL** 格式，然后点击 {{ui:export.saveProject}}。LYL 文件是 layerling 自己的设计格式，包含所有内容：形状、分组、草图、CAD 数据、导入的源文件和历史记录，也就是撤销步骤。在 {{ui:export.historyTitle}} 下选择带上前多少步；初始值取自设置（功能区里的齿轮）中 {{ui:workspace.history}} 保留的步数。最后一档 {{ui:export.historyNone}} 只保存设计的当前状态——这是分享不带撤销步骤的文件的办法。导出的是副本，文件名由你在 {{ui:export.fileName}} 中指定；浏览器里的设计仍保留自己的历史记录。旧版本留下的 `.skf` 文件仍可打开，打开后会存成 `.lyl`。
 
 **保存到自己的文件夹（Chrome 和 Edge）。** 在这些浏览器里，按钮会打开系统的保存对话框，你可以自己选择文件夹和文件名，也可以替换已有文件。之后按 [[Ctrl]]+[[S]] 会把设计再次保存到同一个文件，不再弹出对话框。用 {{ui:dashboard.importGeometry}} 或导出窗口的打开按钮从 `.lyl` 文件打开的设计，也会保存回该文件。浏览器可能会询问一次修改文件的权限。页面重新加载后，设计会忘记自己的文件，下次 [[Ctrl]]+[[S]] 时会再次询问；对话框会从你上次使用的文件夹开始。Firefox 和 Safari 不允许网页这样写入文件。在那里，文件仍会下载到“下载”文件夹，[[Ctrl]]+[[S]] 会再次下载；Firefox 可以在“设置 > 常规 > 下载”里设为每次都询问文件夹。如果你在那里给文件起了别的名字，设计会保留自己的名称，因为文件名中的版本号或日期往往是有意为之；保存后的提示会提供 {{ui:status.renameDraftToFile}}。
+
+**保存窗口什么也没保存时。** 如果窗口关闭时没有选定文件，顶部消息会说明并提供 {{ui:status.saveAsDownload}}：设计会像在 Firefox 中一样进入“下载”文件夹。浏览器对点“取消”关闭的窗口和无法使用的窗口报告方式相同，所以在保存窗口对每个文件夹都失败的电脑上，可以用这种方式继续保存。
+
+如果 STL 导出的窗口没有返回文件，也会显示同样的消息和按钮。想完全跳过保存窗口，请在设置的 {{ui:workspace.appearance}} 下打开 {{ui:workspace.lylAsDownload}}：这样 {{ui:export.saveProject}} 和 [[Ctrl]]+[[S]] 总是把设计保存为下载，{{ui:workspace.stlAsDownload}} 对 STL 也是一样。
 
 ## 附件
 
@@ -118,7 +124,7 @@ layerling 按第一角投影绘制主视图、俯视图和右视图（右视图�
 
 ## 将导入的网格转为精确实体
 
-STL、OBJ 或 3MF 文件只包含三角形，即使零件是在 CAD 中用平面和圆孔画出来的。“{{ui:editor.group.modify}}”区域中的{{ui:editor.tool.makeExact}}（或物体右键菜单中的同名命令）会在这些三角形中找出构成它们的平面、圆柱面、圆锥面、球面和圆环面，并用它们把物体重建为精确的 CAD 实体：一个孔会变成一个带圆形边缘的真正圆柱面，而不是上百条窄条。之后，{{ui:editor.tool.fillet}}和{{ui:editor.tool.chamfer}}沿一条干净的边进行，{{ui:editor.tool.deleteFace}}可去掉整个圆角或孔壁，STEP 导出也会带上真正的面。状态栏会显示找到了什么，例如“平面：9、圆柱面：4”。
+STL、OBJ 或 3MF 文件只包含三角形，即使零件是在 CAD 中用平面和圆孔画出来的。“{{ui:editor.section.surface}}”区域中的{{ui:editor.tool.makeExact}}（或物体右键菜单中的同名命令）会在这些三角形中找出构成它们的平面、圆柱面、圆锥面、球面和圆环面，并用它们把物体重建为精确的 CAD 实体：一个孔会变成一个带圆形边缘的真正圆柱面，而不是上百条窄条。之后，{{ui:editor.tool.fillet}}和{{ui:editor.tool.chamfer}}沿一条干净的边进行，{{ui:editor.tool.deleteFace}}可去掉整个圆角或孔壁，STEP 导出也会带上真正的面。状态栏会显示找到了什么，例如“平面：9、圆柱面：4”。
 
 与这些曲面都不吻合的部分会保留为小平面片，消息会说明它们占表面的多少。大部分为自由曲面的物体（如人偶或雕塑造型）仍保持为网格；有缺口或墙面相互交叉、无法闭合成实体的网格也一样。最多可处理 400,000 个三角形，大型网格可能需要几分钟。更大的网格可先用{{ui:simplify.title}}并开启{{ui:simplify.keepEdges}}降到这个数量以下；否则请直接使用原样的网格，这样结果最干净。撤销一步即可恢复网格。
 

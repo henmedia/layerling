@@ -16,7 +16,7 @@ With the mouse:
 | hold [[Ctrl]] / [[Cmd]] and drag with the left button | also moves the view (on a MacBook trackpad: hold [[Cmd]], press and drag); on a Mac, holding Control instead turns the view, as Control-click is the Mac's right click |
 | double-click on empty workplane or beside the plate | moves the view so that the spot comes to the middle; the view then turns around it |
 
-How fast the wheel zooms is set with {{ui:workspace.zoomSpeed}} in the settings, under {{ui:workspace.appearance}}: a slider from 1 to 14, 5 to begin with. It sets the wheel and the trackpad only: the buttons and the keys [[+]] and [[−]] always zoom in the same small steps. One notch of a mouse wheel zooms alike in every browser, a trackpad zooms with how far you stroke.
+How fast the wheel zooms is set with {{ui:workspace.zoomSpeed}} in the settings, under {{ui:workspace.appearance}}: a slider from 1 to 14, 5 to begin with. It sets the wheel and the trackpad only: the buttons and the keys [[+]] and [[−]] always zoom in the same small steps. One notch of a mouse wheel zooms alike in every browser, a trackpad zooms with how far you stroke. {{ui:workspace.panSpeed}} below it sets how fast the view follows the mouse when you shift it, a slider from 1 to 9: at 5, where it begins, the point you grab stays under the cursor.
 
 **Mouse buttons as in your slicer.** If you are used to Bambu Studio or OrcaSlicer, set {{ui:workspace.mouseScheme}} in the settings, under {{ui:workspace.appearance}}, to {{ui:workspace.mouseSchemeSlicer}}. A left drag on empty space then turns the view, the right button shifts it as the middle one does, and Shift with a left drag draws the selection box. A drag on a body still moves it, and a short right click still opens the menu. In a sketch the right button shifts the view too.
 
@@ -100,7 +100,7 @@ To look straight at the workplane, press [[P]] or click {{ui:camera.lookOntoWork
 When a design holds more than one plate can print, a box with its lid and inserts for example, it can have several build plates. Click {{ui:editor.tool.buildPlates}} in the {{ui:editor.group.arrange}} group, or choose {{ui:plates.moveTo}} in the menu of a right click on a body. A bar appears at the foot of the view with one button per plate; the number on it says how many bodies stand on the plate.
 
 - Every plate is as large as the workplane, and the plates lie side by side to the right of the first one, 20 mm apart. A body belongs to the plate the middle of its footprint stands on, so dragging it across puts it on the other plate. A design holds up to 12 plates.
-- A click on a plate in the bar looks at it, and new shapes then land on it. {{ui:plates.showAll}} looks at all of them. A double click on a plate, or {{ui:plates.rename}}, gives it a name such as "Lid", which is written on the plate.
+- A click on a plate in the bar looks at it, and new shapes and imported files then land on it. {{ui:plates.showAll}} looks at all of them. A double click on a plate, or {{ui:plates.rename}}, gives it a name such as "Lid", which is written on the plate.
 - {{ui:plates.moveLeft}} and {{ui:plates.moveRight}} change the order, the bodies moving with their plate. {{ui:plates.remove}} takes the active plate away; its bodies go onto the first plate at the same spot.
 - {{ui:plates.arrange}} lays the selected bodies, or all of them, out row by row on the plates, the largest first, 5 mm apart, and adds plates while they are needed. A body larger than a plate stays where it is.
 - With a printer chosen, every body is checked against its own plate, and the build height counts from the lowest body on that plate. A plate with a body that does not fit shows its number in red.
@@ -111,6 +111,7 @@ The export window then offers {{ui:export.plates}}: all plates in one file, side
 ## Grid and snapping
 
 The grid shows the size of the plate. At the bottom right is the **snap step**: moving and scaling snap in steps of that size, for example 1 mm. Make it smaller for fine work and larger for rough arranging. {{ui:editor.tool.snapToGrid}} in the ribbon moves the selected shapes afterwards onto the nearest grid crossing. While moving, shapes also snap to other shapes, see [Selecting and arranging](chapter:select-and-arrange). Without the mouse: [[Alt]]+[[1]] to [[Alt]]+[[0]] pick that entry of the menu ([[Alt]]+[[1]] turns snapping off), and [[,]] and [[.]] make the step one size finer or coarser. This works in a sketch too.
+A short click with the middle mouse button, without moving the mouse, opens the snap step menu right at the pointer, in a sketch too; holding the middle button and dragging still moves the view.
 
 > **Tip:** Stop rotating the view when you fit parts together exactly. Use the number keys to go to the straight view from top or front and press [[O]] for the flat display. Then you see at once whether two edges are really flush.
 
@@ -118,15 +119,25 @@ The grid shows the size of the plate. At the bottom right is the **snap step**: 
 
 The cogwheel in the title row ({{ui:editor.workspaceSettings}}) opens the settings. On the left are five areas: {{ui:workspace.appearance}}, {{ui:workspace.measurement}}, {{ui:workspace.workplane}}, {{ui:workspace.shapeDefaults}} and {{ui:workspace.history}}. A change counts at once. {{ui:workspace.makeDefault}} at the bottom saves the current settings as the default, so that a new design starts with them. A file you open brings its own settings; {{ui:workspace.useMyDefault}} next to it puts your saved colours, grid and the rest on the open design, keeping its units. If your default has a printer, that printer comes along with its plate size; without one the design keeps its plate and printer. {{ui:workspace.close}} at the top right closes the window. This part goes through the settings one by one.
 
+{{ui:workspace.exportSettings}} next to it saves the settings of the window in a file (layerling-settings-<date>.json): the colours, grid, shadows, camera and shape defaults, together with the theme, toolbar size, view cube corner, shape colours and the play of each printer. On another computer, or after the browser lost its data, {{ui:workspace.importSettings}} reads the file again: it becomes your default for new designs and goes onto the open design like {{ui:workspace.useMyDefault}}. Your own keys from the keyboard shortcuts go along too.
+
 ### Appearance: theme, toolbar and view cube
 
 {{ui:workspace.theme}} sets the colour scheme of the whole program: {{ui:workspace.themeSystem}} follows your computer, the others are {{ui:workspace.themeLight}}, {{ui:workspace.themeDark}} and {{ui:workspace.themeGraphite}}. You can also change it at the top right of the editor.
 
-{{ui:workspace.toolbarSize}} makes the buttons of the ribbon on top, its shape menu, the view bar on the left and the properties panel on the right smaller or larger: {{ui:workspace.toolbarSizeSmall}}, {{ui:workspace.toolbarSizeMedium}} (as it always was) or {{ui:workspace.toolbarSizeLarge}}. Small leaves more room for the workplane on a laptop; large is easier to hit on a big screen or with a finger. With large buttons the groups of the ribbon go onto a second row when the window is too narrow for them. The size is kept in this browser and holds for every design.
+{{ui:workspace.toolbarSize}} makes the buttons of the ribbon on top, its shape menu, the view bar on the left and the properties panel on the right smaller or larger: {{ui:workspace.toolbarSizeSmall}}, {{ui:workspace.toolbarSizeMedium}} (as it always was) or {{ui:workspace.toolbarSizeLarge}}. Small leaves more room for the workplane on a laptop; large is easier to hit on a big screen or with a finger. With large buttons the groups of the ribbon go onto a second row when the window is too narrow for them. The size sits in the {{ui:workspace.ribbon}} tab of the settings, is kept in this browser and holds for every design.
 
 {{ui:workspace.shapeColors}} puts the colour a new shape starts with on the pictures of the shape library (the colour of its kind, or the one you saved with {{ui:inspector.saveDefaults}}). Switch it off if you prefer grey pictures; your browser remembers the choice.
 
 {{ui:workspace.viewCubePosition}} puts the view cube in another corner of the workplane: {{ui:workspace.viewCubePositionTopLeft}} (as it always was), {{ui:workspace.viewCubePositionTopRight}}, {{ui:workspace.viewCubePositionBottomLeft}} or {{ui:workspace.viewCubePositionBottomRight}}. In any corner but the top left, the view bar moves up into the spot the cube left. In the bottom right the cube stands just above the {{ui:inspector.snapGrid}} control. While the properties of a shape are open on the right, a cube on the right steps to the left of them. The corner is kept in this browser and holds for every design. On a narrow window, such as a phone, the setting is hidden and the cube stays in the top left.
+
+### Appearance: buttons in the ribbon
+
+{{ui:workspace.ribbonButtons}} takes the groups and buttons you never use out of the ribbon. Click a group to open its list: {{ui:workspace.ribbonGroupShown}} takes the whole group out, the tick next to a button just that button. {{ui:workspace.ribbonShowAll}} brings everything back. A group with no button left disappears and the others move up, so more of the ribbon fits in one row.
+
+What you take out only leaves the ribbon: the command search ([[Ctrl]]+[[K]]) still finds it, and its key still runs it. The arrows next to a group move it up or down the list, and so along the ribbon; {{ui:workspace.ribbonResetOrder}} brings back the order it came with. The arrows beside a button move it the same way inside its group. Help always stays. The Shapes group moves and can be taken out like any other; its panel still opens from the command search. The choice is kept in this browser and goes into the file of {{ui:workspace.exportSettings}}. It applies to the 3D editor; the sketch has a bar of its own.
+
+{{ui:workspace.ribbonFold}}, below {{ui:workspace.ribbonGroupShown}} in a group's list, sets what the group does when the window has no room for all of them. {{ui:workspace.ribbonFoldAuto}} is how it comes: the groups used least fold first. {{ui:workspace.ribbonFoldAlways}} keeps the group folded into its one button even in a wide window, so it takes little room and is still at hand. {{ui:workspace.ribbonFoldKeep}} lets it fold only after all the others. {{ui:workspace.ribbonResetOrder}} brings back this choice too. {{ui:editor.section.mirrorPattern}}, {{ui:editor.section.splitShape}}, {{ui:editor.section.edgesWalls}} and {{ui:editor.section.surface}} are four groups of their own: each moves, folds and can be taken out by itself.
 
 ### Appearance: fast mode
 
@@ -154,6 +165,8 @@ The sketch view has its own colours: {{ui:workspace.sketchBackground}} for the w
 
 {{ui:workspace.strongHoles}} draws holes in a darker grey, less see-through and with a dark line round them. It helps when a hole is hard to find among see-through bodies. Unlike the edge lines it stays on in fast mode.
 
+{{ui:workspace.holeOpacity}} below it sets how solid holes are drawn, from 10 to 90 percent. Lower lets you see better where a hole meets a body. At first it is automatic: 52 percent, or 72 with {{ui:workspace.strongHoles}}; a double-click on the slider goes back to that.
+
 ### Appearance: light and shadows
 
 {{ui:workspace.showShadows}} switches the cast shadows on and off. Two sliders set how the bodies are lit. {{ui:workspace.shadowStrength}} says how dark the cast shadows are, and {{ui:workspace.shadeContrast}} moves light from the even ambient light to the main light: towards "punchy" the shaded sides get darker and the shadows show more, towards "soft" everything gets flatter. At the top end the contrast gets very strong, so shaded sides and shadows turn really dark. {{ui:workspace.shadowSoftness}} makes the edges of the shadows soft instead of crisp. {{ui:workspace.lightAzimuth}} turns the main light round the plate (0° from the front, 90° from the right), and {{ui:workspace.lightElevation}} lifts it; at 90° it stands straight above the plate as in Tinkercad, and the shadows fall right under the bodies. {{ui:workspace.softLighting}} brings most of the light from where you look, turning with the view: no face is left dark, and a face of a dark colour that points up is no longer burnt out to white. The main light stays a little for the shadows, and the contrast slider still works. If a bright reflection still shows with the light set low, lift {{ui:workspace.lightElevation}} to 90°: it then looks like Tinkercad. {{ui:workspace.lightReset}} puts everything back.
@@ -178,9 +191,11 @@ The sketch view has its own colours: {{ui:workspace.sketchBackground}} for the w
 
 {{ui:workspace.startWithScrollbars}}: a design then opens with the view's scrollbars shown. It is saved with the design and with {{ui:workspace.makeDefault}}.
 
+{{ui:workspace.viewBarOpensOnHover}}: a view bar folded away opens while the mouse is over its arrow and folds again shortly after the mouse has left it, unless one of its tools is in use. A click on the arrow while it is open like this keeps it open. It works with the mouse only; on a touch screen a tap opens the bar as before.
+
 {{ui:workspace.startView}} sets the angle a new design opens in and {{ui:camera.home}} goes back to. Turn and zoom the view the way you like it, then click {{ui:workspace.startViewUseCurrent}}; {{ui:workspace.startViewStandard}} brings back the usual view from the front right. It holds for every design in this browser. A design you open again still opens the way you left it.
 
-{{ui:workspace.zoomSpeed}} is a slider from slow to fast: how fast the wheel and the trackpad zoom; the zoom buttons and keys keep their own small steps. {{ui:workspace.cameraInertia}}: after you let go of the mouse the view turns on for a moment and slows down gently. Switched off, it stops at once, as in Tinkercad and Fusion 360.
+{{ui:workspace.zoomSpeed}} is a slider from slow to fast: how fast the wheel and the trackpad zoom; the zoom buttons and keys keep their own small steps. {{ui:workspace.panSpeed}} is a slider from slow to fast too: how fast the view follows the mouse when you shift it; in the middle the point you grab stays under the cursor. {{ui:workspace.cameraInertia}}: after you let go of the mouse the view turns or shifts on for a moment and slows down gently. Switched off, it stops at once, as in Tinkercad and Fusion 360.
 
 {{ui:workspace.overhangAngle}} is the angle from which a face counts as an overhang when you switch on Show overhangs in the visibility menu: those faces are hatched red and white. 30° is careful, 70° counts on good cooling of the print; 45° is the usual start. While they are shown, a line under the view says the steepest overhang and how many cm² need supports.
 

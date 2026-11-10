@@ -79,6 +79,9 @@ export type VaseMesh = {
   extent: { min: number[]; max: number[] } | null;
 };
 
+/** The screw lid's thread: its pitch and how deep it is, in mm (the lid tool's screw lid takes the same, lidThread). */
+export function threadSize(p: { threadPitch: number }): { pitch: number; depth: number };
+
 export function buildVase(input?: unknown): VaseMesh;
 export function vaseChecks(input?: unknown): string[];
 export function describeVase(input?: unknown): { name: string; slug: string };

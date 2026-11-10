@@ -1,4 +1,5 @@
 
+import { paintColors } from "@/lib/paint";
 import { loftMeasures } from "@/lib/loftGeometry";
 import { roundSideCount } from "@/lib/roundSideCount";
 import { customFontList } from "@/lib/textFonts";
@@ -157,6 +158,8 @@ export function mcpShapeSummary(shape: WorkplaneShape): LayerlingMcpShapeSummary
     groupedCount: shape.groupedShapes?.length ?? 0,
     // What a group does with its parts when it is resized (Discussion #526).
     ...(offersGroupResize(shape) ? { groupResize: shape.groupResize ?? "stretch" } : {}),
+    // A hull: whether its parts' own holes stay open (Discussion #1440).
+    ...(shape.groupOperation === "hull" ? { keepHoles: Boolean(shape.hullKeepHoles) } : {}),
     importedTriangles: shape.importedMesh?.triangleCount ?? 0,
     cadDisplayEdgeCount: shape.cadDisplayEdges?.length ?? null,
     sketchPointCount: shape.sketchProfile?.points.length ?? 0,
@@ -176,6 +179,8 @@ export function mcpShapeSummary(shape: WorkplaneShape): LayerlingMcpShapeSummary
     // A surface texture: its settings, the masks as a count, and whether the body under it is kept to change or remove it.
     ...(shape.surfaceTexture ? { surfaceTexture: { ...shape.surfaceTexture, masks: shape.surfaceTexture.masks.length, changeable: Boolean(surfaceTextureEntry(shape)) } } : {}),
     ...(shape.surfaceTextureLayers?.length ? { surfaceTextureLayers: shape.surfaceTextureLayers.map((layer) => ({ pattern: layer.pattern, faces: layer.faces.length })) } : {}),
+    // Paint (paint.ts): how many strokes the body carries and the colours they show.
+    ...(shape.paint?.length ? { paint: { strokes: shape.paint.length, colors: paintColors(shape) } } : {}),
     children: shape.groupedShapes?.map(mcpShapeSummary),
   };
 }
@@ -230,7 +235,7 @@ function mcpLoftSettings(shape: WorkplaneShape): Record<string, string | number>
     loftBottomOutline: m.bottomOutline, loftTopOutline: m.topOutline,
     loftBottomWidth: m.bottomWidth, loftBottomDepth: m.bottomDepth, loftTopWidth: m.topWidth, loftTopDepth: m.topDepth,
     loftBottomCorner: m.bottomCorner, loftTopCorner: m.topCorner, loftBottomSides: m.bottomSides, loftTopSides: m.topSides,
-    loftOffsetX: m.offsetX, loftOffsetZ: m.offsetZ, loftWall: m.wall,
+    loftOffsetX: m.offsetX, loftOffsetZ: m.offsetZ, loftWall: m.wall, loftTopWall: m.topWall,
     loftTwist: m.twist, loftTiltX: m.tiltX, loftTiltZ: m.tiltZ, loftSmooth: m.smooth, loftSegments: m.segments,
     // Sections between the ends (#1034) go out as JSON text, as the flat answer has no lists; it is taken back as such.
     ...(m.middles.length ? { loftSections: JSON.stringify(m.middles), loftThrough: m.through } : {}),

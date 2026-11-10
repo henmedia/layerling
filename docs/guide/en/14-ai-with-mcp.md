@@ -82,10 +82,12 @@ The AI works with the same functions as you, through the same path as your opera
 | Tool | What it does |
 | --- | --- |
 | `layerling_list_editors` | lists the open editor tabs |
+| `layerling_rename_project` | gives the project a name, as the pencil beside the project name does |
 | `layerling_open_editor` | opens a new editor tab in your default browser and waits until it has connected (on your own computer only) |
 | `layerling_read_scene` | reads scene, selection, units and the exact dimensions of all objects |
 | `layerling_list_objects` | lists all objects with dimensions, position, rotation and id |
 | `layerling_select_objects` | selects objects |
+| `layerling_hide_others` | hides everything but the selection or the given objects, in one undo step |
 | `layerling_delete_objects` | deletes objects |
 | `layerling_move_object` | moves an object to another place in the object list |
 | `layerling_create_shape` | creates a shape: box, cylinder, text (also curved), thread, gear, sketch body and all the others |
@@ -98,9 +100,12 @@ The AI works with the same functions as you, through the same path as your opera
 | `layerling_scale_objects` | scales objects by a percentage, together or each in place |
 | `layerling_lay_flat` | lays an object with one face on the plate |
 | `layerling_place_on_face` | sets objects down on a face of another, sloped ones too, like the C key |
-| `layerling_perforate_face` | cuts a hole pattern into a flat face; the holes stay as holes grouped with the body |
+| `layerling_perforate_face` | cuts a hole pattern into a flat face or round the wall of a cylinder, tube or bore; the holes stay as holes grouped with the body |
 | `layerling_sweep_sketch` | pulls a rectangular or round cross-section along a path of points as one exact body; a closed path makes a ring |
 | `layerling_push_face` | pushes a flat face out or cuts a pocket into it, with an inset from the edge and a corner radius; the new part is a sketch body grouped with the body, or a free body of its own with `separate` |
+| `layerling_paint` | paints parts of a body in colours of their own for printing in several colours (Paint): fill a face up to its sharp edges, a round patch, or a lasso drawn in a flat view; erase, clear; saved with the body and written to a 3MF as painted faces |
+| `layerling_support_rib` | stands a thin support rib under the lower face of a part printed tilted on one edge, with bridges one layer high (Support rib) |
+| `layerling_stencil_bridges` | holds the parts of a plate with text cut through that would fall out, with bridges grouped with the plate, as wide and high as set (Stencil bridges) |
 | `layerling_mate_faces` | brings a face of one object against a face of another, face to face or flush, or puts two round faces on one axis |
 | `layerling_open_group` | opens a group so its parts can be changed one by one, also a group inside an open one |
 | `layerling_close_group` | closes it again ("Done") or cancels |
@@ -158,6 +163,7 @@ The AI works with the same functions as you, through the same path as your opera
 | `layerling_insert_custom_shape` | inserts a custom shape into the open design, at a spot x/z if you like |
 | `layerling_delete_custom_shape` | removes a custom shape; inserted bodies stay |
 | `layerling_show_workplane` | hides and shows the plate with its grid, for a picture of the underside for example (only the view) |
+| `layerling_focus_mode` | switches focus mode on and off: hides the title row and the footer for more room (only the editor's frame) |
 | `layerling_set_section_view` | cuts the view open along a plane to look inside (only the view, nothing is cut apart) |
 | `layerling_measurements` | shows or hides the measurements of the tape measure and lists them with their lengths, hides or shows the sizes around the selection like [[Q]], and types a length for one of them, which moves the body at its end like a click on its number |
 | `layerling_measure_angle` | measures an angle like the protractor: at the corner of three points or between two flat faces, and shows it in the view |

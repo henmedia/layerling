@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import type { WorkplaneWorkspaceSettings } from "@/types/layerling";
 import { formatMeasurementNumber, lengthDisplayUnit, millimetersToDisplay, normalizeScaleForUnits, parseMeasurementInput, resolveMeasurementInput, scaleOptionsForUnits } from "@/lib/measurementUnits";
-import { booleanTriangleLimitPreset, canBeginShapeDrag, customSnapGridDivisors, customSnapGridLabel, normalizeCustomSnapGrids, DEFAULT_ORBIT_ZOOM_SPEED, DEFAULT_SNAP_GRID, DEFAULT_WORKPLANE_WORKSPACE, keyboardNudgeStep, normalizeShapeCustomizations, snapGridForShortcut, snapGridForUnits, snapGridOptions, snapGridStep, normalizeSnapGrid, normalizeWorkspaceSettings, orbitControlsZoomSpeed, shapeDimensionLimit, workplaneSettingsFingerprint, ZOOM_SPEED_SLIDER_MAX, workspaceHydrationSyncDecision, zoomDistanceScale, standardGridSettings, resetGridInSavedDefault, readWorkspaceDefault, saveWorkspaceDefault } from "@/lib/workplaneSettings";
+import { booleanTriangleLimitPreset, canBeginShapeDrag, customSnapGridDivisors, customSnapGridLabel, normalizeCustomSnapGrids, DEFAULT_ORBIT_ZOOM_SPEED, DEFAULT_SNAP_GRID, DEFAULT_WORKPLANE_WORKSPACE, keyboardNudgeStep, normalizeShapeCustomizations, snapGridForShortcut, snapGridForUnits, snapGridOptions, snapGridStep, normalizeSnapGrid, normalizeWorkspaceSettings, orbitControlsPanSpeed, orbitControlsZoomSpeed, PAN_SPEED_SLIDER_MAX, shapeDimensionLimit, workplaneSettingsFingerprint, ZOOM_SPEED_SLIDER_MAX, workspaceHydrationSyncDecision, zoomDistanceScale, standardGridSettings, resetGridInSavedDefault, readWorkspaceDefault, saveWorkspaceDefault } from "@/lib/workplaneSettings";
 import { toolbarShapeAssets } from "@/lib/shapeCatalog";
 
 describe("workplane settings helpers", () => {
@@ -82,6 +82,10 @@ describe("workplane settings helpers", () => {
     expect(DEFAULT_WORKPLANE_WORKSPACE.startWithScrollbars).toBe(false);
     expect(normalizeWorkspaceSettings({ startWithScrollbars: true }).startWithScrollbars).toBe(true);
     expect(normalizeWorkspaceSettings({ startWithScrollbars: "yes" }).startWithScrollbars).toBe(false);
+    // Opening the view bar on hover is off until switched on (Discussion #1552).
+    expect(DEFAULT_WORKPLANE_WORKSPACE.viewBarOpensOnHover).toBe(false);
+    expect(normalizeWorkspaceSettings({ viewBarOpensOnHover: true }).viewBarOpensOnHover).toBe(true);
+    expect(normalizeWorkspaceSettings({ viewBarOpensOnHover: "yes" }).viewBarOpensOnHover).toBe(false);
     expect(DEFAULT_WORKPLANE_WORKSPACE.clickToPlaceShapes).toBe(true);
     expect(normalizeWorkspaceSettings({}).clickToPlaceShapes).toBe(true);
     expect(normalizeWorkspaceSettings({ clickToPlaceShapes: false }).clickToPlaceShapes).toBe(false);
@@ -106,6 +110,19 @@ describe("workplane settings helpers", () => {
 
     // The buttons and keys +/- always step at the default rate, whatever the slider says.
     expect(zoomDistanceScale(0.7)).toBeCloseTo(0.7);
+  });
+
+  it("lets the grabbed point follow the cursor at the default pan speed (#1553)", () => {
+    expect(DEFAULT_WORKPLANE_WORKSPACE.panSpeed).toBe(5);
+    // OrbitControls moves the view by panSpeed times the mouse at the target's depth: 1 keeps up with it.
+    expect(orbitControlsPanSpeed(DEFAULT_WORKPLANE_WORKSPACE.panSpeed)).toBeCloseTo(1);
+    expect(orbitControlsPanSpeed(1)).toBeCloseTo(0.5);
+    expect(orbitControlsPanSpeed(PAN_SPEED_SLIDER_MAX)).toBeCloseTo(2);
+    expect(orbitControlsPanSpeed(40)).toBeCloseTo(2);
+    expect(orbitControlsPanSpeed(Number.NaN)).toBeCloseTo(1);
+    expect(normalizeWorkspaceSettings({}).panSpeed).toBe(5);
+    expect(normalizeWorkspaceSettings({ panSpeed: 8 }).panSpeed).toBe(8);
+    expect(normalizeWorkspaceSettings({ panSpeed: "fast" }).panSpeed).toBe(5);
   });
 
   it("keeps app limits until a shape receives an explicit customization", () => {
@@ -133,7 +150,7 @@ describe("workplane settings helpers", () => {
         roundRoof: { sides: 900 },
         sphere: { steps: 2 },
         cone: { topRadius: -4, baseRadius: 9000, sides: 40 },
-        text: { text: "A custom label that is much too long", font: "Serif", bevel: 12, segments: 9.6 },
+        text: { text: "A custom label that is much too long ".repeat(8).trim(), font: "Serif", bevel: 12, segments: 9.6 },
         gear: { gearType: "helical", teeth: 23.7, toothSize: 3, centerHoleSize: -5, helixAngle: 90, helixQuality: 3 },
       },
     });
@@ -143,7 +160,7 @@ describe("workplane settings helpers", () => {
     expect(customized.shapeCustomizations.roundRoof).toEqual({ sides: 512 });
     expect(customized.shapeCustomizations.sphere).toEqual({ steps: 6 });
     expect(customized.shapeCustomizations.cone).toEqual({ topRadius: 0, baseRadius: 1000, sides: 40 });
-    expect(customized.shapeCustomizations.text).toEqual({ text: "A custom label that is m", font: "Serif", bevel: 8, segments: 10 });
+    expect(customized.shapeCustomizations.text).toEqual({ text: "A custom label that is much too long ".repeat(8).trim().slice(0, 250), font: "Serif", bevel: 8, segments: 10 });
     expect(customized.shapeCustomizations.gear).toEqual({ gearType: "helical", teeth: 24, toothSize: 3, centerHoleSize: 0, helixAngle: 45, helixQuality: 4 });
   });
 

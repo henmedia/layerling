@@ -50,6 +50,7 @@ export function normalizeSketchRevolveSettings(settings?: Partial<SketchRevolveS
     quality: Math.round(clamp(finiteOr(settings?.quality, DEFAULT_SKETCH_REVOLVE_SETTINGS.quality), 1, 10)),
     // Only a helix carries a pitch, so rings keep the settings they always had.
     ...(pitch > 0 ? { pitch } : {}),
+    ...(settings?.smoothness === "fine" || settings?.smoothness === "extraFine" ? { smoothness: settings.smoothness } : {}),
   };
 }
 

@@ -8,14 +8,17 @@ import { type ResolvedAppTheme } from "@/lib/appTheme";
 import { t } from "@/lib/i18n";
 import { horizontalPlacementWorkplane, type PlacementWorkplane } from "@/lib/placementWorkplane";
 import { liftGeometryForFrame, type SelectionFrame } from "@/lib/liftGeometry";
-import { liftHandleScreenPoint } from "@/components/workplane/transformOverlayTypes";
+import { handleClearOfOthers, liftHandleScreenPoint } from "@/components/workplane/transformOverlayTypes";
+import { SLIDE_AXES, SLIDE_HANDLE_KEYS, slideArrowLayout, slideAxisVector } from "@/lib/slideArrows";
 import { dimensionMarkNeedsScreenLayout, dimensionMarkScreenPush, isPointInsideTransformBounds, screenSpaceDimensionMark, rotateHandleArrow, rotationPlaneDirectionSign, transformBoundsIntersectClipVolume, transformOverlayScreenPoint, type DimensionMark, type RotationAxis, type RotationPlaneView, type TransformOverlayState } from "@/components/workplane/TransformOverlay";
 import { cuboidCorners, pointAlongAxes } from "@/lib/alignFrame";
 import type { AlignAxis, AlignHandleStatus, AlignTarget, MeasurementAccuracy, WorkplaneShape } from "@/types/layerling";
 import { outwardFaceNormal } from "@/lib/layFlat";
+import { CORNER_SIGNS, DEFAULT_ROUNDED_BOX_CORNER_FILLET, normalizeCornerFillets } from "@/lib/roundedBoxGeometry";
 import { narrowEndWidth, normalizeSlopeSide, shapeSupportsNarrow, shapeSupportsSlope, slopeEndHeight } from "@/lib/slopeAlong";
 import { JOINED_FACE_REACH, nearestFaceTriangle, planarFaceTriangles } from "@/lib/rotationPivot";
 import { roundFaceTriangles } from "@/lib/roundFaceAxis";
+import { flatOrRoundFaceTriangles } from "@/lib/holePatternShapes";
 import { isReferenceImage, referenceImageFacingAxis } from "@/lib/referenceImage";
 import { aimPickRay, firstShapeHit, RENDER_LAYER_SHAPES } from "@/components/workplane/viewportPicking";
 import { type ThreeState, type RotationHandleSide, type RotationHandleSides, syncTransformGuideWorldLines, formatMeasure, findShapeObject, disposeChildren } from "@/components/workplane/ViewportOverlays";
@@ -286,6 +289,16 @@ export function updateTransformOverlayDom(state: ThreeState, next: TransformOver
     element.querySelector(".rotate-arrow-arc")?.setAttribute("d", handle.arc);
     element.querySelector(".rotate-arrow-heads")?.setAttribute("d", handle.heads);
   });
+  const slideHandles = root.querySelectorAll<HTMLElement>(".transform-overlay .slide-handle");
+  next.slideHandles.forEach((handle, index) => {
+    const element = slideHandles[index];
+    if (!element) {
+      return;
+    }
+    element.style.setProperty("--overlay-x", `${handle.x}px`);
+    element.style.setProperty("--overlay-y", `${handle.y}px`);
+    element.style.setProperty("--slide-handle-angle", `${handle.angle}deg`);
+  });
 }
 
 export function syncTransformOverlay(
@@ -429,6 +442,33 @@ export function syncTransformOverlay(
   const liftBasePoint = project(liftBaseWorld);
   // A thin body puts the arrow a few pixels from the height handle; it keeps its distance on the screen.
   const liftPoint = liftHandleScreenPoint(liftBasePoint, project(liftHandle), showLowerLiftHandle);
+  // Corner radius (like the corner dot in Inkscape): on the top's back edge, where the rounding of the back right corner starts;
+  // dragged along the edge, the radius follows. A plain Box has it too, with no radius yet: the first pull turns it into
+  // a Rounded box with flat top and bottom. The dot keeps clear of the other handles on the screen.
+  const plainBox = frame.singleShape?.kind === "box" && !frame.singleShape.imagePlate && !((frame.singleShape.radius ?? 0) > 0);
+  const cornerShape = frame.singleShape?.kind === "roundedBox" || plainBox ? frame.singleShape : null;
+  const cornerEntries = (() => {
+    if (!cornerShape) return [];
+    const largest = Math.min(frame.max.x - frame.min.x, frame.max.z - frame.min.z) / 2;
+    // With flat top and bottom a Rounded box may give each corner its own radius: then every corner has a dot.
+    const flat = (cornerShape.topBottomFillet ?? 0) <= 1e-4;
+    const own = flat ? normalizeCornerFillets(cornerShape.cornerFillets, largest) : undefined;
+    const corners = own
+      ? own.map((radius, index) => ({ key: `corner-radius-${index}`, radius, sx: CORNER_SIGNS[index].sx, sz: CORNER_SIGNS[index].sz }))
+      : [{ key: "corner-radius", radius: plainBox ? 0 : Math.min(Math.max(0, cornerShape.cornerFillet ?? DEFAULT_ROUNDED_BOX_CORNER_FILLET), largest), sx: 1, sz: -1 }];
+    const others = [bottom.nearLeft, bottom.nearRight, bottom.farRight, bottom.farLeft, mid.near, mid.right, mid.far, mid.left, heightPoint, slopePoint, narrowPoint, liftPoint].filter((other) => other.visible);
+    return corners.map(({ key, radius, sx, sz }) => {
+      const edgeX = sx > 0 ? frame.max.x - radius : frame.min.x + radius;
+      const edgeZ = sz > 0 ? frame.max.z : frame.min.z;
+      const point = project(framePoint(frame, edgeX, frame.max.y, edgeZ));
+      // Along the edge, into the body: the way the dot may slide to leave room.
+      const inward = project(framePoint(frame, edgeX - sx * largest, frame.max.y, edgeZ));
+      const clear = handleClearOfOthers(point, { x: inward.x - point.x, y: inward.y - point.y }, others);
+      // The next corner's dot keeps clear of this one too.
+      if (clear.visible) others.push(clear);
+      return { point: clear, handle: { key, className: "height-top slope-end", kind: "height" as const, x: clear.x, y: clear.y, title: t("transform.cornerRadius") } };
+    });
+  })();
   const liftTargetAngle = THREE.MathUtils.radToDeg(
     Math.atan2(liftPoint.y - liftBasePoint.y, liftPoint.x - liftBasePoint.x),
   );
@@ -610,6 +650,7 @@ export function syncTransformOverlay(
     { point: heightPoint, handle: { key: heightHandleKey, className: "height-top axis-z", kind: "height" as const, x: heightPoint.x, y: heightPoint.y, title: t("transform.height") } },
     { point: slopePoint, handle: { key: "slope-end", className: "height-top slope-end", kind: "height" as const, x: slopePoint.x, y: slopePoint.y, title: t("transform.slope") } },
     { point: narrowPoint, handle: { key: "narrow-end", className: "height-top slope-end", kind: "height" as const, x: narrowPoint.x, y: narrowPoint.y, title: t("transform.narrow") } },
+    ...cornerEntries,
     { point: liftPoint, handle: { key: liftHandleKey, className: showLowerLiftHandle ? "height-lift lower" : "height-lift", kind: "lift" as const, x: liftPoint.x, y: liftPoint.y, title: t("transform.lift"), angle: liftHandleAngle } },
   ].filter(({ point }) => point.visible).map(({ handle }) => handle);
   const rotationChromeVisible = !cameraInsideSelection && centerPoint.visible;
@@ -656,14 +697,41 @@ export function syncTransformOverlay(
     rotateRightSource.visible ? rotateArrowHandle("rotate-right", "screen-right axis-y", zFootAxis, zFaceCenter, sidePoint(rotationSides.z, frame.max.y), yFootAxis) : null,
     rotateBottomSource.visible ? rotateArrowHandle("rotate-bottom", "screen-bottom axis-z", yFootAxis, yFaceCenter, sidePoint(rotationSides.y, footprintY), xFootAxis) : null,
   ].filter((handle): handle is NonNullable<typeof handle> => Boolean(handle)) : [];
+  // The X and Y arrows (Discussion #1434) stand round the middle of the top, where the lift arrow starts.
+  // Each axis is measured against a step across the view: one seen end on gets no arrow.
+  const liftBaseScreen = liftBasePoint;
+  const cameraRight = new THREE.Vector3(1, 0, 0).applyQuaternion(state.camera.quaternion);
+  const acrossScreen = project(liftBaseWorld.clone().addScaledVector(cameraRight, planeWorldStep));
+  const acrossLength = Math.hypot(acrossScreen.x - liftBaseScreen.x, acrossScreen.y - liftBaseScreen.y);
+  const slideHandles = rotationChromeVisible && liftBaseScreen.visible && acrossLength > 1e-6
+    ? slideArrowLayout(
+        liftBaseScreen,
+        SLIDE_AXES.map((axis) => {
+          const vector = slideAxisVector(activeWorkplane, axis);
+          const tip = project(liftBaseWorld.clone().add(new THREE.Vector3(vector.x, vector.y, vector.z).multiplyScalar(planeWorldStep)));
+          const dx = tip.x - liftBaseScreen.x;
+          const dy = tip.y - liftBaseScreen.y;
+          return { axis, dx, dy, foreshortening: tip.visible ? Math.hypot(dx, dy) / acrossLength : 0 };
+        }),
+        liftPoint.visible ? { x: liftPoint.x - liftBasePoint.x, y: liftPoint.y - liftBasePoint.y } : null,
+      ).map((placement) => ({
+        key: SLIDE_HANDLE_KEYS[placement.axis],
+        className: `axis-${placement.axis}`,
+        x: placement.x,
+        y: placement.y,
+        angle: placement.angle,
+        title: t(placement.axis === "x" ? "transform.slideX" : "transform.slideY"),
+      }))
+    : [];
 
   // Which mid-edge handle sits on the side of the shape currently facing the
   // camera - same sign convention as showLowerHandles above, so always-visible
-  // dimension labels for a lone selection land on a readable, visible face.
+  // dimension labels land on a readable, visible face. A selection of several bodies shows its
+  // box's marks too, as a group of them does (#1574).
   const cameraView = state.camera.position.clone().sub(frame.center);
   const widthMidHandleKey = cameraView.dot(xFootAxis) >= 0 ? "right-mid" : "left-mid";
   const depthMidHandleKey = cameraView.dot(zFootAxis) >= 0 ? "near-mid" : "far-mid";
-  const alwaysVisibleDimensionKeys = dimensionsAlwaysVisible && frame.singleShape
+  const alwaysVisibleDimensionKeys = dimensionsAlwaysVisible
     ? alwaysVisibleDimensionKeysFor(isCircularFootprint, lift.elevation, { width: widthMidHandleKey, depth: depthMidHandleKey, height: heightHandleKey, lift: liftHandleKey })
     : [];
 
@@ -674,6 +742,7 @@ export function syncTransformOverlay(
     guides: [],
     handles,
     rotateHandles,
+    slideHandles,
     dimensions: dimensionMarks,
     alwaysVisibleDimensionKeys,
     rotationWheel: rotationWheels.y,
@@ -1020,7 +1089,8 @@ export function syncLayFlatHover(
   theme: ResolvedAppTheme,
   clientX: number | null,
   clientY: number | null,
-  round = false,
+  /** A round face (a hole's wall) instead of a flat one; "either" lights a round wall or a flat face, as the hole pattern picks (#1393). */
+  round: boolean | "either" = false,
   joined: ArrayLike<number> | null = null,
 ) {
   if (!state) return;
@@ -1068,7 +1138,7 @@ export function syncLayFlatHover(
   let positions: ArrayLike<number>;
   // With a group's parts joined, the face runs on across them; where the joined body has no face there, the part's is lit.
   let joinedTriangle = -1;
-  if (joined && !round && joined.length / 3 <= 600000) {
+  if (joined && round !== true && joined.length / 3 <= 600000) {
     const faceIndex = hit.faceIndex;
     const [a, b, c] = [0, 1, 2].map((offset) => worldCorner(faceIndex * 3 + offset).clone());
     const normal = outwardFaceNormal(a, b, c, state.raycaster.ray.direction);
@@ -1082,7 +1152,7 @@ export function syncLayFlatHover(
   }
   if (joined && joinedTriangle >= 0) {
     positions = joined;
-    triangles = planarFaceTriangles(joined, joinedTriangle)?.triangles ?? [joinedTriangle];
+    triangles = (round === "either" ? flatOrRoundFaceTriangles(joined, joinedTriangle) : planarFaceTriangles(joined, joinedTriangle))?.triangles ?? [joinedTriangle];
   } else if (cornerCount <= 600000) {
     const world = new Float64Array(cornerCount * 3);
     for (let offset = 0; offset < cornerCount; offset += 1) {
@@ -1092,7 +1162,9 @@ export function syncLayFlatHover(
       world[offset * 3 + 2] = corner.z;
     }
     positions = world;
-    triangles = (round ? roundFaceTriangles(world, hit.faceIndex) : planarFaceTriangles(world, hit.faceIndex))?.triangles ?? triangles;
+    triangles = (round === "either"
+      ? flatOrRoundFaceTriangles(world, hit.faceIndex)
+      : round ? roundFaceTriangles(world, hit.faceIndex) : planarFaceTriangles(world, hit.faceIndex))?.triangles ?? triangles;
   } else {
     // A very dense mesh is too slow to search on every move: show the one facet.
     const world = new Float64Array(9);

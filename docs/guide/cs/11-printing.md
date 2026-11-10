@@ -46,6 +46,20 @@ V nabídce vedle oka v části {{ui:editor.group.visibility}} zapněte **zobraze
 
 Mezní úhel nastavíte v části {{ui:workspace.appearance}}, od 30° pro opatrnější tisk po 70° pro tiskárny s dobrým chlazením výtisku. Plocha podepřená jiným tělesem se stále označuje, protože Layerling posuzuje pouze samotnou plochu.
 
+## Podpěrná žebra pro šikmý díl
+
+Díl tištěný šikmo na hraně, třeba pod 45°, často žádné podpěry nepotřebuje: jeho plochy jsou dost strmé. Stojí ale na úzké hraně a může se převrhnout. {{ui:supportRib.title}} ho drží: pod jeho spodní plochou stojí s malou mezerou tenké žebro na oválné patce a drobné můstky díl přidržují. Díl nejdřív otočte na hranu a nechte ho stát na podložce.
+
+1. Vyberte díl a klikněte na {{ui:supportRib.title}} ve skupině {{ui:editor.section.splitShape}} na pásu, klikněte na díl pravým tlačítkem nebo nástroj najděte přes [[Ctrl]]+[[K]].
+2. Klikněte na spodní plochu tam, kde má žebro stát. Plocha musí mířit dolů, být skloněná mezi 15° a 75° a sahat až na podložku; žebro vede od místa kliknutí rovně dolů po ploše. Je-li spodní hrana dílu zaoblená nebo sražená, smí plocha končit až 3 mm nad podložkou: klikněte na rovnou plochu nad zaoblením.
+3. Nastavte {{ui:supportRib.nozzle}}, {{ui:supportRib.layerHeight}} a {{ui:supportRib.firstLayer}} jako ve svém sliceru. Žebro je silné dvě dráhy trysky, mezera k dílu půl dráhy; každý můstek je široký jednu dráhu a vysoký přesně jednu vrstvu a leží na vrstvě tisku, takže ho slicer vytiskne jako jednu tenkou dráhu, která se čistě odlomí. {{ui:supportRib.height}} udává, jak vysoko žebro sahá po ploše (zpočátku do poloviny), {{ui:supportRib.bridgeSpacing}}, jak daleko od sebe jsou můstky, v celých vrstvách.
+4. V {{ui:supportRib.more}} lze ručně nastavit tloušťku, mezeru, šířku můstků a tloušťku patky (do té doby se řídí tryskou a vrstvami), a také šířku patky a zaoblení u patky a nahoře.
+5. {{ui:supportRib.apply}} žebro přidá. S {{ui:supportRib.bundle}} (zpočátku zapnuto) jsou žebro a díl sdružené: pohybují se spolu a jdou do sliceru jako dvě tělesa vedle sebe, při tisku spojená můstky.
+
+Žebro je síťové těleso: chcete-li ho změnit, smažte ho a vytvořte znovu. Každé kliknutí vytvoří jedno žebro; pro další klikněte na {{ui:supportRib.repick}} nebo ho opakujte pomocí {{ui:editor.tool.array}}. Žebro nesmí nikde vniknout do dílu a díl musí stát na podložce - jinak okno řekne proč. Nastavení si tento prohlížeč pamatuje pro další žebro.
+
+{{ui:clearance.title}} a {{ui:printCheck.title}} žebro znají: to, že jeho můstky zasahují do dílu a že žebro i můstky jsou tenké a leží jednu vrstvu vysoko přes mezeru, je záměr a nehlásí se. Žebro vytvořené v layerling 1.148.0 toto označení ještě nemá; vytvořte ho znovu a kontroly ho vynechají.
+
 ## Tloušťka stěn, vůle a zkosení
 
 - Stěna by měla mít nejméně dvě šířky extruzní čáry, tedy přibližně 0,8 mm při trysce 0,4 mm. Pevnější díly potřebují 1,2 až 2 mm.
@@ -56,9 +70,12 @@ Mezní úhel nastavíte v části {{ui:workspace.appearance}}, od 30° pro opatr
 
 Každá tiskárna tiskne otvory o něco menší a čepy o něco silnější, než jsou nakreslené, každá o jinou hodnotu. Vůle, kterou dva vytištěné díly potřebují, je proto zpočátku odhad. Změřte ji raději jednou: v nastavení v části {{ui:workspace.workplane}} položí {{ui:workspace.fitTestMake}} na podložku test vůle. Je to destička 60 × 20 × 4 mm se sedmi otvory pro jeden čep 5 mm, každý nakreslený jako 5 mm plus dvakrát 0,05, 0,10, 0,15, 0,20, 0,25, 0,30 nebo 0,40 mm, s vystouplou hodnotou vedle, a k tomu samotný čep 5 mm, který stojí vedle destičky a nahoře má malé sražení. Skládá se z běžných tvarů, takže se tiskne se zbytkem podložky, bez podpěr.
 
-Vytiskněte ho tak, jak leží, a pak zasouvejte čep sraženým koncem napřed do otvorů, od nejužšího. **Nejužší otvor, ve kterém se čep ještě otáčí,** udává vůli vaší tiskárny. Zadejte jeho číslo do pole {{ui:workspace.printerPlay}} nebo ho klikněte mezi hodnotami pod polem. Vůle platí na stranu, v milimetrech, a prohlížeč si ji pamatuje pro všechny projekty; prázdné pole znamená neměřeno.
+Na tiskárně, jejíž podložka jezdí dopředu a dozadu, se vysoký tenký čep může rozkývat, uvolnit nebo vyjít dole zvlněný, s límcem i bez. Před vytvořením zkoušky lícování zaškrtněte {{ui:workspace.fitTestBase}}: čep pak stojí na malé 10mm destičce, která drží na podložce. Stěny jejího lůžka se nedotýká, stojí na malém výstupku v jeho dně; po tisku čepem zakývejte a odlomí se.
 
-Od té chvíle začínají nová použití s vůlí místo vestavěné hodnoty: {{ui:lid.gap}} a {{ui:lid.hingePinPlay}} v nástroji {{ui:editor.tool.lid}}, vůle nových tvarů {{ui:shape.dovetail}} a {{ui:shape.snapFit}}, {{ui:prop.clearance}} nové matice nebo závitového otvoru – dvojnásobek vůle, protože jde o místo přes celý průměr – a {{ui:clearance.threshold}} v nástroji {{ui:editor.tool.clearance}}. Dokud takové pole tuto hodnotu drží, říká „{{ui:printerPlay.fromFitTest}}“ vedle něj, odkud číslo pochází. Pant tištěný vcelku a klouby nástroje {{ui:editor.tool.flexi}} si nechávají svých 0,4 mm: při tisku v jednom kuse musí jejich mezery zůstat otevřené i mezi vrstvami, a to čep vytištěný zvlášť neměří. Místo pro zalisování magnetu nebo klíče Gridfinity a místo pro koupenou zásuvku či desku si také nechávají své vlastní hodnoty. Tělesa, která už v projektu jsou, se nikdy nezmění, a stejně tak projekt, který otevřete.
+Vytiskněte ho tak, jak leží, a pak zasouvejte čep sraženým koncem napřed do otvorů, od nejužšího. **Nejužší otvor, ve kterém se čep ještě otáčí,** udává vůli vaší tiskárny. Zadejte jeho číslo do pole {{ui:workspace.printerPlay}} nebo ho klikněte mezi hodnotami pod polem. Vůle platí na stranu, v milimetrech, a prohlížeč si ji pamatuje pro všechny projekty; prázdné pole znamená neměřeno.
+S více tiskárnami nejprve v {{ui:workspace.printer}} vyberte tu, na které tisknete: každá tiskárna si pamatuje vlastní vůli a nová použití vycházejí z vůle tiskárny nastavené pro návrh. Tiskárna bez vlastní vůle použije vůli nastavenou, když nebyla vybrána žádná tiskárna.
+
+Od té chvíle začínají nová použití s vůlí místo vestavěné hodnoty: {{ui:lid.gap}} a {{ui:lid.hingePinPlay}} v nástroji {{ui:editor.tool.lid}}, vůle nových tvarů {{ui:shape.dovetail}} a {{ui:shape.snapFit}}, {{ui:prop.clearance}} nové matice nebo závitového otvoru – dvojnásobek vůle, protože jde o místo přes celý průměr – a {{ui:clearance.threshold}} v nástroji {{ui:editor.tool.clearance}}. Stejně tak {{ui:split.connectorClearance}} kolíků, čepů a rybin v nástroji {{ui:editor.tool.split}}. Dokud takové pole tuto hodnotu drží, říká „{{ui:printerPlay.fromFitTest}}“ vedle něj, odkud číslo pochází. Pant tištěný vcelku a klouby nástroje {{ui:editor.tool.flexi}} si nechávají svých 0,4 mm: při tisku v jednom kuse musí jejich mezery zůstat otevřené i mezi vrstvami, a to čep vytištěný zvlášť neměří. Místo pro zalisování magnetu nebo klíče Gridfinity a místo pro koupenou zásuvku či desku si také nechávají své vlastní hodnoty. Tělesa, která už v projektu jsou, se nikdy nezmění, a stejně tak projekt, který otevřete.
 
 ## Kontrola tisku
 

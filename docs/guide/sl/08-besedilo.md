@@ -12,6 +12,7 @@ V knjižnici oblik izberi {{ui:shape.text}} in ga odloži. V polje {{ui:prop.tex
 - **{{ui:prop.height}}:** Kako visoko pisava štrli iz ploskve.
 - **{{ui:prop.bevel}}:** Zaobli robove črk, da delujejo mehkeje. Z {{ui:prop.segments}} določiš, v koliko stopnjah.
 - **{{ui:nameTag.letterEdge}}:** zaobli ali posname zgornji rob črk, kakor pri imenski tablici: {{ui:nameTag.edge.none}}, {{ui:nameTag.edge.round}} ali {{ui:nameTag.edge.chamfer}}, z velikostjo {{ui:nameTag.letterEdgeSize}} (na začetku 0,4 mm, največ tako visoka kot besedilo). Gre dlje kot {{ui:prop.bevel}}, a le toliko, kolikor so črte široke: kjer je črta tanjša od dvakratne velikosti, se rob konča z ožjo zgornjo ploskvijo. Spodnja stran ostane ravna, zato lahko posamezne črke pozneje prilepiš. Dokler je rob izbran, nadomesti {{ui:prop.bevel}}.
+- **Dolžina:** Besedilo ima lahko do 250 znakov. Črke ohranijo velikost, vrstica pa postane tako dolga, kot je treba; krajšo naredite z manjšimi črkami. {{ui:nameTag.letterEdge}} deluje pri besedilu do 40 znakov, ker bi se pri daljšem računal več minut.
 - **{{ui:prop.textSpacing}}:** Prostor med črkami poleg tistega, ki ga ima pisava, v odstotkih velikosti črk: 0 ga pusti, kot ga je naredila pisava, nad tem stojijo črke bolj narazen, pod tem (do -50) tesneje, kar lastna pisava pogosto potrebuje. Črke obdržijo velikost in okvir sledi vrstici, pri ravnem in ukrivljenem besedilu. Razmik se ne uporabi za arabščino in hebrejščino, katerih črke se povezujejo.
 - **Velikost:** Dolžino in širino vrstice nastaviš kot pri vsaki obliki. Povleci ročice ali vpiši mere.
 - **{{ui:prop.textStretch}}:** Na začetku izklopljeno: črke obdržijo razmerja in stojijo na sredini okvirja, zato okvir, ki je razvlečen širše ali globlje, kot besedilo potrebuje, ostane večji od črk. Če vklopiš, se črke raztegnejo v obe smeri čez ves okvir: veliko črko lahko narediš nižjo ali ožjo, kot v Tinkercadu. Velja za ravno besedilo; ukrivljeno besedilo ima svojo velikost črk.
@@ -76,6 +77,17 @@ Iz tega sledi:
 - **Vdolbeno:** Besedilo preklopi na {{ui:inspector.hole}}, pusti, da malo sega v ploskev, in ga združi v skupino s telesom. Črke so potem vgravirane.
 
 Za napise na stranski ploskvi najprej položi delovno ravnino na to ploskev, glej [Pogled in delovna ravnina](chapter:pogled-in-delovna-ravnina).
+
+## Šablone: mostički za sredino črk
+
+Ko besedilo izrežeš skozi ploščo, črke, kot so O, A in B, izgubijo sredino: ohlapno leži v črki in izpade. {{ui:stencilBridges.title}} jo z majhnimi mostički drži na plošči, kot pri šabloni.
+
+1. Besedilo preklopi na {{ui:inspector.hole}}, naj gre skozi ploščo, in izberi oboje, združeno ali ne.
+2. Klikni {{ui:stencilBridges.title}} v skupini {{ui:editor.section.splitShape}} na traku, desno klikni izbor ali ga poišči z [[Ctrl]]+[[K]]. Mostički se oranžno pokažejo tam, kamor pridejo.
+3. Nastavi {{ui:stencilBridges.width}} in {{ui:stencilBridges.count}}. {{ui:stencilBridges.height}} se začne pri debelini plošče; nižji mostički so poravnani s spodnjo stranjo, na sredini ali poravnani z zgornjo stranjo plošče, kot pove {{ui:stencilBridges.position}}. Pri šabloni za razpršilno barvo mostički zgoraj pod seboj pustijo prostor za barvo.
+4. {{ui:stencilBridges.apply}} združi mostičke s ploščo.
+
+Vsak mostiček je navaden kvader: odpri skupino, da enega premakneš, izbrišeš ali dodaš svojega. Če besedilo pozneje spremeniš, izberi skupino in znova klikni {{ui:stencilBridges.title}}; novi mostički nadomestijo stare. Besedilo, ki je le vgravirano in ne gre skozi, ne dobi mostičkov, saj tam nič ne izpade. Za laser ali risalnik izvoz DXF in SVG doda enake mostičke, glej [Datoteke, shranjevanje in deljenje](chapter:datoteke-in-shranjevanje).
 
 ## Kontura, silhueta in širše
 

@@ -23,7 +23,23 @@ O guia que você está lendo também tem uma caixa de pesquisa, no topo de cada 
 - O nome de uma forma adiciona essa forma ao plano de trabalho, como clicar nela no menu de formas.
 - Com o campo vazio, a pesquisa de comandos lista no topo os comandos que você usou por último.
 - O nome de um sólido do seu projeto encontra esse sólido e o seleciona, o que ajuda num projeto com muitas peças. Os sólidos só aparecem depois que você digita.
+- Uma forma personalizada que você salvou também é encontrada pelo nome assim que você digita, e um clique a insere no projeto como no painel de formas.
 - A pesquisa de comandos também funciona no modo de esboço, com as ferramentas de esboço.
+
+## Suas próprias teclas
+
+Qualquer comando da pesquisa de comandos pode ir para uma tecla sua: uma ferramenta que você usa o tempo todo, uma forma, {{ui:editor.tool.centerOnWorkplane}} ou {{ui:palette.openShapes}}.
+
+1. Abra {{ui:editor.keyboardShortcuts}} e clique em {{ui:customKeys.add}} sob {{ui:customKeys.title}}, no alto da janela.
+2. Digite algumas letras do comando e clique nele, ou pressione [[Enter]] para o primeiro.
+3. Pressione a tecla que quiser, sozinha ou com [[Ctrl]], [[Alt]] ou [[Shift]]. Letras, números e F1 a F12 podem receber um comando.
+
+Uma tecla que o editor já usa, uma que o navegador guarda para si (como [[Ctrl]]+[[W]]) ou uma das suas próprias teclas é recusada, e a janela diz para que ela serve. Clique numa tecla da lista para trocá-la, no X ao lado para removê-la, ou em {{ui:customKeys.removeAll}} para recomeçar.
+
+- A tecla executa o comando exatamente como a pesquisa de comandos. Se agora ele não puder ser executado, quase sempre porque nada está selecionado, a barra de status avisa.
+- Suas teclas aparecem ao lado dos comandos na pesquisa de comandos e na lista impressa.
+- Elas ficam neste navegador, como o tema. Uma tecla para uma ferramenta de esboço funciona no modo de esboço, uma para o editor 3D fora dele.
+- Enquanto você digita num campo, suas teclas ficam de lado, como todas as outras.
 
 ## Ajuda interativa
 

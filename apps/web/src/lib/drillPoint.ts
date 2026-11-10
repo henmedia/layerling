@@ -47,7 +47,8 @@ export function drillPointLength(diameter: number, angle: number) {
  * its mesh already (after a fillet, or put together from others) carries whatever end it had then.
  */
 export function shapeTakesDrillPoint(shape: WorkplaneShape) {
-  return DRILL_POINT_KINDS.has(shape.kind) && Boolean(shape.hole) && !shape.importedMesh && !shape.groupedShapes?.length && !shapeHasShapeDeform(shape);
+  // A slotted screw hole (Discussion #1531) keeps a flat bottom: a drill leaves no slot.
+  return DRILL_POINT_KINDS.has(shape.kind) && Boolean(shape.hole) && !(shape.kind !== "cylinder" && shape.screwHoleSlot) && !shape.importedMesh && !shape.groupedShapes?.length && !shapeHasShapeDeform(shape);
 }
 
 /** The point angle the shape is built with, or undefined while its bottom is flat. */

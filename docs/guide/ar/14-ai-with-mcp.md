@@ -82,10 +82,12 @@ curl -fsSL https://raw.githubusercontent.com/henmedia/layerling/main/scripts/mac
 | الأداة | ما تفعله |
 | --- | --- |
 | `layerling_list_editors` | تسرد تبويبات المحرر المفتوحة |
+| `layerling_rename_project` | يعطي المشروع اسمًا، كما يفعل القلم بجانب اسم المشروع |
 | `layerling_open_editor` | تفتح تبويب محرر جديدًا في متصفحك الافتراضي وتنتظر حتى يتصل (على كمبيوترك الخاص فقط) |
 | `layerling_read_scene` | تقرأ المشهد والتحديد والوحدات والأبعاد الدقيقة لجميع الأجسام |
 | `layerling_list_objects` | تسرد جميع الأجسام مع الأبعاد والموضع والتدوير والمعرّف (id) |
 | `layerling_select_objects` | تحدد أجسامًا |
+| `layerling_hide_others` | تخفي كل شيء ما عدا التحديد أو الأجسام المذكورة، في خطوة تراجع واحدة |
 | `layerling_delete_objects` | تحذف أجسامًا |
 | `layerling_move_object` | تنقل جسمًا إلى مكان آخر في قائمة الأجسام |
 | `layerling_create_shape` | تنشئ شكلًا: صندوقًا، أسطوانة، نصًا (منحنيًا أيضًا)، سنًا لولبيًا، ترسًا، جسم رسم تخطيطي وكل الأشكال الأخرى |
@@ -98,24 +100,27 @@ curl -fsSL https://raw.githubusercontent.com/henmedia/layerling/main/scripts/mac
 | `layerling_scale_objects` | تغيّر حجم الأجسام بنسبة مئوية، معًا أو كلًّا في مكانه |
 | `layerling_lay_flat` | تضع جسمًا بأحد أوجهه على اللوحة |
 | `layerling_place_on_face` | تضع أجسامًا على وجه جسم آخر، حتى المائل منها، كالمفتاح C |
-| `layerling_perforate_face` | تقطع نمط ثقوب في وجه مستوٍ؛ وتبقى الثقوب ثقوبًا مجمّعة مع الجسم |
+| `layerling_perforate_face` | تقطع نمط ثقوب في وجه مستوٍ أو حول جدار أسطوانة أو أنبوب أو ثقب؛ وتبقى الثقوب ثقوبًا مجمّعة مع الجسم |
 | `layerling_sweep_sketch` | تسحب مقطعًا مستطيلًا أو دائريًا على طول مسار من النقاط كجسم دقيق واحد؛ والمسار المغلق يصنع حلقة |
 | `layerling_push_face` | تدفع وجهًا مستويًا للخارج أو تقطع فيه جيبًا، مع إزاحة للداخل من الحافة ونصف قطر للزوايا؛ والجزء الجديد جسم رسم تخطيطي مجمّع مع الجسم، أو جسم حر مستقل مع `separate` |
+| `layerling_paint` | تلوّن أجزاء من الجسم بألوان خاصة بها للطباعة بعدة ألوان (التلوين): تعبئة وجه حتى حوافه الحادة، أو بقعة دائرية، أو لاسو يُرسم في عرض مسطح؛ الممحاة وإزالة الكل؛ يُحفظ مع الجسم ويُكتب في 3MF وجوهًا ملوّنة |
+| `layerling_support_rib` | يضع ضلع دعم رفيعًا تحت الوجه السفلي لقطعة تُطبع مائلة على إحدى حوافها، مع جسور بارتفاع طبقة واحدة (ضلع دعم) |
+| `layerling_stencil_bridges` | يثبّت أجزاء لوح يخترقه نص التي كانت ستسقط بجسور مجمّعة مع اللوح، بالعرض والارتفاع المحددين (جسور الاستنسل) |
 | `layerling_mate_faces` | تضع وجه جسم مقابل وجه جسم آخر، وجهًا لوجه أو على استواء واحد، أو تضع وجهين دائريين على محور واحد |
 | `layerling_open_group` | تفتح مجموعة حتى يمكن تغيير أجزائها واحدًا واحدًا، وكذلك مجموعة داخل مجموعة مفتوحة |
 | `layerling_close_group` | تغلقها مجددًا ("تم") أو تلغي |
-| `layerling_add_to_group` | يضع كائنات منفردة في مجموعة دون فتحها |
+| `layerling_add_to_group` | يضع أجسامًا منفردة في مجموعة دون فتحها |
 | `layerling_take_out_of_group` | يُخرج جزءًا واحدًا من مجموعة دون فتحها |
 | `layerling_group_objects` | تجمّع أجسامًا |
 | `layerling_ungroup_objects` | تفكّ المجموعات |
 | `layerling_boolean_cut` | تقطع الأجسام الصلبة بالثقوب |
 | `layerling_intersect_objects` | تحتفظ فقط بالجزء المشترك بين الأجسام (التقاطع) |
 | `layerling_hull_objects` | تلف الأجسام في جسم واحد محدب، كأنها مغلفة بغشاء (الغلاف) |
-| `layerling_cookie_cutter` | makes a cookie cutter from the objects: a wall and a rim round the outline (Cookie cutter) |
-| `layerling_flexi_joints` | cuts a flat body into links with joints printed in place that swing to the sides (Flexi joints) |
-| `layerling_make_lid` | makes a lid for a body open at the top: pushed in, over the top or flat, with the fit you choose and magnets if you like (Lid) |
-| `layerling_make_cable_channel` | runs a round channel for a cable through a body from an entry to an exit, finding the way itself with gentle bends (Cable channel) |
-| `layerling_loft_sketches` | joins two sketch bodies into a loft from one outline to the other (Loft sketches) |
+| `layerling_cookie_cutter` | تصنع قطّاعة كعك من الأجسام: جدارًا بحافة قاطعة وإطارًا حول الحد الخارجي المعكوس (قطّاعة الكعك) |
+| `layerling_flexi_joints` | تقطع جسمًا مسطحًا إلى حلقات بمفاصل تُطبع في مكانها وتتأرجح إلى الجانبين (المفاصل المرنة) |
+| `layerling_make_lid` | تصنع غطاءً لجسم مفتوح من الأعلى: مُدخَلًا أو فوق الحافة أو مسطحًا، بالإحكام الذي تختاره ومع مغناطيسات إن أردت (الغطاء) |
+| `layerling_make_cable_channel` | تمدّ قناة دائرية لكابل عبر جسم من مدخل إلى مخرج، وتجد الطريق بنفسها بانحناءات لطيفة (قناة كابل) |
+| `layerling_loft_sketches` | تصل جسمي رسم تخطيطي بانتقال من حد خارجي إلى الآخر (انتقال بين رسمين) |
 | `layerling_separate_parts` | تفصل شكلًا إلى أجزائه المنفصلة، وجسم الرسم التخطيطي إلى جسم لكل حد خارجي |
 | `layerling_split_objects` | تقطع أجسامًا صلبة أو ثقوبًا إلى قسمين بمستوى |
 | `layerling_list_edges` | تسرد حواف CAD الحقيقية لجسم |
@@ -145,7 +150,7 @@ curl -fsSL https://raw.githubusercontent.com/henmedia/layerling/main/scripts/mac
 | `layerling_remove_reference_points` | تحذف نقاطًا مرجعية حسب المعرّف، أو كلها |
 | `layerling_list_notes` | يقرأ ملاحظات المستخدم مع نصها والجسم المثبتة عليه كل واحدة وهل هي طلب للذكاء الاصطناعي |
 | `layerling_wait_for_notes` | ينتظر حتى تضع علامة {{ui:note.forAi}} على ملاحظة، ثم يسلّم الطلب فورًا |
-| `layerling_add_note` | يضع ملاحظة على النموذج، مثبتة على كائن أو حرة على اللوحة |
+| `layerling_add_note` | يضع ملاحظة على النموذج، مثبتة على جسم أو حرة على اللوحة |
 | `layerling_update_note` | يعدّل ملاحظة أو يرد عليها؛ الرد يغلق الطلب |
 | `layerling_remove_notes` | يحذف ملاحظات بحسب المعرّف |
 | `layerling_inspect_errors` | تعرض آخر رسالة وآخر خطأ، إضافة إلى رسائل الجلسة وأخطائها |
@@ -158,11 +163,12 @@ curl -fsSL https://raw.githubusercontent.com/henmedia/layerling/main/scripts/mac
 | `layerling_insert_custom_shape` | تدرج شكلًا مخصصًا في التصميم المفتوح، في موضع x/z إذا أردت |
 | `layerling_delete_custom_shape` | تزيل شكلًا مخصصًا؛ وتبقى الأجسام المُدرجة |
 | `layerling_show_workplane` | تخفي اللوحة بشبكتها وتظهرها، لالتقاط صورة للجانب السفلي مثلًا (العرض فقط) |
+| `layerling_focus_mode` | تشغّل وضع التركيز وتوقفه: تخفي شريط العنوان والتذييل لمساحة أكبر (إطار المحرر فقط) |
 | `layerling_set_section_view` | تفتح العرض بقطعه على طول مستوى للنظر إلى الداخل (العرض فقط، لا يُقطع شيء فعليًا) |
 | `layerling_measurements` | يُظهر قياسات شريط القياس أو يخفيها ويسردها مع أطوالها، ويخفي الأبعاد حول التحديد أو يظهرها مثل [[Q]]، ويكتب طولاً لأحدها فيحرك الجسم عند طرفه كما يفعل النقر على رقمه |
 | `layerling_measure_angle` | يقيس زاوية مثل المنقلة: عند ركن ثلاث نقاط أو بين وجهين مستويين، ويعرضها في العرض |
 | `layerling_saved_view` | يحفظ العرض الحالي تحت المفتاح 7 أو 8 أو 9 أو 0 ويعود إليه، مثل Shift+المفتاح والمفتاح وحده (العرض فقط)؛ ويضبط أيضًا عرض البداية للتصاميم الجديدة |
-| `layerling_build_plates` | يعرض ألواح الطباعة ويضيفها ويسمّيها ويرتّبها ويزيلها، وينقل الكائنات إلى لوح ويوزّعها على الألواح، مثل شريط الألواح |
+| `layerling_build_plates` | يعرض ألواح الطباعة ويضيفها ويسمّيها ويرتّبها ويزيلها، وينقل الأجسام إلى لوح ويوزّعها على الألواح، مثل شريط الألواح |
 | `layerling_clear_history` | تحذف كل خطوات التراجع نهائيًا، كما يفعل زر "حذف السجل" في عرض السجل؛ وتحتاج `confirm: true` |
 | `layerling_set_history_view` | تعرض حالة سابقة للمشروع، كعرض السجل (يبقى التصميم الحقيقي دون تغيير؛ وتنتظر الأدوات التي تغيّر التصميم حتى يُغلق) |
 | `layerling_restore_from_history` | تعيد أجسامًا (وأجزاء داخل المجموعات أيضًا) من حالة سابقة إلى التصميم كنسخ، كزر الإعادة إلى التصميم في عرض السجل - خطوة واحدة يعيدها التراجع |
