@@ -10,5 +10,17 @@
       "en": "Hollow, Fillet, Chamfer and the other tools that use the CAD kernel load it (21 MB) the first time they need it. Their time limit counted that download: on a slow connection it ran out, the download began again, and every tool timed out. Now the editor loads the kernel ahead once it is ready, and the time limit starts only when the kernel is loaded.",
       "da": "Hul, Rund, Fas og de andre værktøjer med CAD-kernen henter kernen (21 MB), første gang de skal bruge den. Ventetiden talte den download med: På en langsom forbindelse løb den ud, downloaden begyndte forfra, og hvert værktøj meldte timeout. Nu henter editoren kernen på forhånd, så snart den er klar, og ventetiden begynder først, når kernen er hentet."
     }
+  },
+  {
+    "title": {
+      "de": "Auswahlfelder: ganze Wahl lesbar, Hinweis über die ganze Breite",
+      "en": "Drop-downs: the whole choice shows, the note runs full width",
+      "da": "Rullelister: hele valget kan ses, noten går i fuld bredde"
+    },
+    "body": {
+      "de": "Bei einer langen Beschriftung wie „Durch die Querschnitte“ im Loft war das Auswahlfeld so schmal, dass „Gerade“ abgeschnitten wurde, und der Hinweis darunter stand in einer schmalen Spalte. Jetzt bricht eine lange Beschriftung um und lässt dem Feld Platz, und Hinweise unter Auswahlfeldern nutzen die ganze Breite wie unter den Zahlenfeldern.",
+      "en": "With a long label like “Through the Sections” in the loft, the drop-down was so narrow that “Straight” was cut off, and the note below it ran in a narrow column. Now a long label wraps and leaves the field room, and notes under drop-downs use the whole width, as under the number fields.",
+      "da": "Med en lang etiket som „Gennem sektionerne“ i loftet var rullelisten så smal, at „Lige“ blev skåret af, og noten under den stod i en smal kolonne. Nu brydes en lang etiket om og giver feltet plads, og noter under rullelister bruger hele bredden ligesom under talfelterne."
+    }
   }
 ]

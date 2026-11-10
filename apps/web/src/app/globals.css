@@ -10464,13 +10464,20 @@ html[data-theme="dark"] .property-defaults-actions button {
 
 .select-property {
   display: grid;
-  /* A long label (German "Buchstabenkanten") takes the room it needs instead of running under the field. */
-  grid-template-columns: minmax(92px, max-content) minmax(0, 1fr);
+  /* A long label (German "Buchstabenkanten") takes the room it needs instead of running under the field,
+     but at most a little over half the row: past that it wraps, and the field keeps room for its choice
+     ("Through the Sections" left "Straight" cut off, Discussion #1614). */
+  grid-template-columns: fit-content(55%) minmax(0, 1fr);
   align-items: center;
   gap: 10px;
   color: #867563;
   font-size: 15px;
   font-weight: 650;
+}
+
+/* Short labels still start their fields at the same place. */
+.select-property > span:first-child {
+  min-width: 92px;
 }
 
 /* The board's number fields keep their width and a long label wraps instead: "Reach through the wall (mm)" squeezed its field until the last digit was cut off (#1344). */
@@ -11362,8 +11369,9 @@ html[data-theme="dark"] .shape-inspector .name-tag-start .name-tag-start-button:
   border-color: #f0a65a;
 }
 
+/* Across the whole row, as under the number fields: under the field alone it was a narrow column (Discussion #1614). */
 .select-property-hint {
-  grid-column: 2;
+  grid-column: 1 / -1;
   margin-top: -5px;
   color: #8d7b68;
   font-size: 12px;
