@@ -236,7 +236,7 @@ export function TransformOverlay({
       ))}
       {editingDimension ? (
         <input
-          className="dimension-input"
+          className="dimension-input" autoComplete="off"
           data-axis={sizeDimensionAxis(editingDimension.axis)}
           style={overlayPoint(keepVisible, editingDimension.x, editingDimension.y)}
           value={editingDimension.value}
@@ -263,7 +263,7 @@ export function TransformOverlay({
       {editingCorner?.entries.map((entry, index) => (
         <input
           key={entry.key}
-          className="dimension-input"
+          className="dimension-input" autoComplete="off"
           data-corner-input="true"
           data-axis={sizeDimensionAxis(entry.axis)}
           style={overlayPoint(keepVisible, entry.x, entry.y)}

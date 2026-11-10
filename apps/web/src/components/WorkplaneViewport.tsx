@@ -9179,7 +9179,7 @@ export function WorkplaneViewport({
           ) : null}
           {rulerDimensionEditing ? (
             <input
-              className="dimension-input"
+              className="dimension-input" autoComplete="off"
               style={{ "--overlay-x": `${rulerDimensionEditing.x}px`, "--overlay-y": `${rulerDimensionEditing.y}px` } as CSSProperties}
               value={rulerDimensionEditing.value}
               autoFocus
@@ -9196,7 +9196,7 @@ export function WorkplaneViewport({
           ) : null}
           {rulerDuplicateEditing ? (
             <input
-              className="dimension-input"
+              className="dimension-input" autoComplete="off"
               style={{ "--overlay-x": `${rulerDuplicateEditing.x}px`, "--overlay-y": `${rulerDuplicateEditing.y}px` } as CSSProperties}
               value={rulerDuplicateEditing.value}
               autoFocus
@@ -9213,7 +9213,7 @@ export function WorkplaneViewport({
           ) : null}
           {rulerCoordinateEditing ? (
             <input
-              className="dimension-input ruler-coordinate-input"
+              className="dimension-input ruler-coordinate-input" autoComplete="off"
               style={{ "--overlay-x": `${rulerCoordinateEditing.x}px`, "--overlay-y": `${rulerCoordinateEditing.y}px` } as CSSProperties}
               value={rulerCoordinateEditing.value}
               autoFocus
