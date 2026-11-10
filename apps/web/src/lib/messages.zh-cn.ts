@@ -126,6 +126,8 @@ export const MESSAGES_ZH_CN: Partial<Record<MessageKey, string>> = {
   "dashboard.downloadAllServerTitle": "将服务器上的所有设计连同其文件夹保存到一个 ZIP 文件——“恢复备份”可将它们导入浏览器，在另一台电脑上也可以",
   "dashboard.dragHintServerTab": "拖到某个文件夹或“服务器”标签上即可将此设计移到那里",
   "storageNotice.line": "这些设计只保存在此浏览器中。浏览器崩溃或更新可能会删除它们。使用上方的“{button}”可将它们全部保存到一个文件中。",
+  "storageNotice.changed": "上次备份：{when}。此后新建或更改的：{count} 个，它们只在此浏览器中。使用上方的“{button}”可再次备份。",
+  "storageNotice.current": "所有设计都已备份（上次备份：{when}）。设计在此浏览器中，备份在你的文件里。",
   "welcome.hide": "隐藏欢迎指南——页脚中的链接可让它重新显示",
   "dashboard.newOnServer": "服务器上的新设计",
   "dashboard.newOnServerTitle": "新设计从服务器文件夹开始，因此从第一次修改起就保存在那里。此浏览器中的设计保持不变。",

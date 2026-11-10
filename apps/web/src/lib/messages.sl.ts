@@ -119,6 +119,8 @@ export const MESSAGES_SL: Partial<Record<MessageKey, string>> = {
   "dashboard.downloadAllServerTitle": "Shrani vse projekte s strežnika, z njihovimi mapami, v eno datoteko ZIP – „Obnovi varnostno kopijo“ jih prenese v brskalnik, tudi na drugem računalniku",
   "dashboard.dragHintServerTab": "Povlecite na mapo ali na zavihek Strežnik, da projekt premaknete tja",
   "storageNotice.line": "Ti projekti so shranjeni samo v tem brskalniku. Sesutje ali posodobitev brskalnika jih lahko izbriše. Z gumbom „{button}“ zgoraj jih vse shraniš v eno datoteko.",
+  "storageNotice.changed": "Zadnja varnostna kopija: {when}. Od takrat novih ali spremenjenih: {count}, ti pa so samo v tem brskalniku. Z gumbom „{button}“ zgoraj jih znova shraniš.",
+  "storageNotice.current": "Vsi projekti so varnostno kopirani (zadnja kopija: {when}). So v tem brskalniku, kopija v tvoji datoteki.",
   "welcome.hide": "Skrij uvodni vodnik – povezava v nogi ga vrne",
   "dashboard.backupAllTitle": "Shrani vse projekte tega brskalnika in lastne oblike v eno datoteko ZIP – „Obnovi varnostno kopijo“ jih vse vrne, tudi na drugem računalniku",
   "dashboard.backupSelected": "Varnostna kopija",

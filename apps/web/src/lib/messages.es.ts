@@ -128,6 +128,8 @@ export const MESSAGES_ES: Partial<Record<MessageKey, string>> = {
   "dashboard.downloadAllServerTitle": "Guardar todos los diseños del servidor, con sus carpetas, en un solo archivo ZIP: «Restaurar copia de seguridad» los lleva a un navegador, también en otro ordenador",
   "dashboard.dragHintServerTab": "Arrástralo sobre una carpeta o sobre la pestaña Servidor para mover allí este diseño",
   "storageNotice.line": "Estos diseños solo están guardados en este navegador. Un fallo o una actualización del navegador puede borrarlos. Usa «{button}» arriba para guardarlos todos en un archivo.",
+  "storageNotice.changed": "Última copia: {when}. Nuevos o cambiados desde entonces: {count}, y esos solo están en este navegador. Usa «{button}» arriba para volver a guardarlos.",
+  "storageNotice.current": "Todos los diseños tienen copia (última: {when}). Están en este navegador y la copia, en tu archivo.",
   "welcome.hide": "Ocultar la guía de bienvenida: un enlace en el pie de página la vuelve a mostrar",
   "dashboard.newOnServer": "Diseños nuevos en el servidor",
   "dashboard.newOnServerTitle": "Los diseños nuevos empiezan en la carpeta del servidor, así que se guardan allí desde el primer cambio. Los diseños de este navegador se quedan como están.",

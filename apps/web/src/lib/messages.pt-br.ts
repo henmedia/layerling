@@ -126,6 +126,8 @@ export const MESSAGES_PT_BR: Partial<Record<MessageKey, string>> = {
   "dashboard.downloadAllServerTitle": "Salva todos os projetos do servidor, com suas pastas, em um arquivo ZIP - \"Restaurar backup\" os traz para um navegador, também em outro computador",
   "dashboard.dragHintServerTab": "Arraste para uma pasta ou para a aba Servidor para mover este projeto para lá",
   "storageNotice.line": "Estes projetos ficam guardados só neste navegador. Uma falha ou uma atualização do navegador pode apagá-los. Use \"{button}\", acima, para salvar todos em um arquivo.",
+  "storageNotice.changed": "Último backup: {when}. Novos ou alterados desde então: {count}, e esses ficam só neste navegador. Use \"{button}\", acima, para salvá-los de novo.",
+  "storageNotice.current": "Todos os projetos têm backup (último: {when}). Eles ficam neste navegador, o backup no seu arquivo.",
   "welcome.hide": "Ocultar o guia de boas-vindas - um link no rodapé o traz de volta",
   "dashboard.newOnServer": "Novos projetos no servidor",
   "dashboard.newOnServerTitle": "Novos projetos começam na pasta do servidor, então são salvos lá desde a primeira alteração. Os projetos deste navegador continuam como estão.",

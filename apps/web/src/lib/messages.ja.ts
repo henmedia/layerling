@@ -128,6 +128,8 @@ export const MESSAGES_JA: Partial<Record<MessageKey, string>> = {
   "dashboard.downloadAllServerTitle": "サーバー上のすべてのデザインをフォルダーごと1つのZIPファイルに保存します。「バックアップを戻す」でブラウザーに戻せます。別のコンピューターでも使えます",
   "dashboard.dragHintServerTab": "フォルダーまたは「サーバー」タブにドラッグすると、このデザインをそこへ移動します",
   "storageNotice.line": "これらのデザインはこのブラウザーにしか保存されていないため、クラッシュやブラウザーの更新で失われることがあります。「{button}」ですべてを1つのファイルに保存できます。",
+  "storageNotice.changed": "前回のバックアップ: {when}。それ以降の新規・変更: {count}件。これらはこのブラウザーにしかありません。「{button}」でもう一度バックアップできます。",
+  "storageNotice.current": "すべてのデザインがバックアップ済みです(前回: {when})。デザインはこのブラウザーに、バックアップはあなたのファイルにあります。",
   "welcome.hide": "ようこそガイドを隠します。フッターのリンクで再表示できます",
   "dashboard.newOnServer": "新しいデザインはサーバーに",
   "dashboard.newOnServerTitle": "新しいデザインはサーバーフォルダーで始まるので、最初の変更からそこに保存されます。このブラウザーのデザインはそのままです。",

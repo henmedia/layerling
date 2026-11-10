@@ -125,6 +125,8 @@ export const MESSAGES_NL: Record<MessageKey, string> = {
   "dashboard.downloadAllServerTitle": "Alle ontwerpen op de server, in hun mappen, in één ZIP-bestand opslaan - \"Back-up terugzetten\" haalt ze in een browser, ook op een andere computer",
   "dashboard.dragHintServerTab": "Sleep naar een map of naar het tabblad Server om dit ontwerp daarheen te verplaatsen",
   "storageNotice.line": "Deze ontwerpen staan alleen in deze browser. Een crash of een browserupdate kan ze wissen. Gebruik “{button}” hierboven om ze allemaal in één bestand op te slaan.",
+  "storageNotice.changed": "Laatste back-up: {when}. Sindsdien nieuw of gewijzigd: {count}, en die staan alleen in deze browser. Gebruik “{button}” hierboven om ze opnieuw op te slaan.",
+  "storageNotice.current": "Alle ontwerpen zijn geback-upt (laatste back-up: {when}). Ze staan in deze browser, de back-up in je bestand.",
   "welcome.hide": "Welkomstgids verbergen - een link in de voettekst haalt hem terug",
   "dashboard.newOnServer": "Nieuwe ontwerpen op de server",
   "dashboard.newOnServerTitle": "Nieuwe ontwerpen beginnen in de servermap en worden daar vanaf de eerste wijziging opgeslagen. Ontwerpen van deze browser blijven zoals ze zijn.",

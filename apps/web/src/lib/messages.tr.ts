@@ -95,6 +95,8 @@ export const MESSAGES_TR: Partial<Record<MessageKey, string>> = {
   "dashboard.downloadAllServerTitle": "Sunucudaki tüm tasarımları klasörleriyle birlikte tek bir ZIP dosyasına kaydet - \"Yedeği geri yükle\" onları bir tarayıcıya getirir, başka bir bilgisayarda da",
   "dashboard.dragHintServerTab": "Bu tasarımı taşımak için bir klasörün veya Sunucu sekmesinin üzerine sürükle",
   "storageNotice.line": "Bu tasarımlar yalnızca bu tarayıcıda saklanıyor; bir çökme veya tarayıcı güncellemesi onları kaybettirebilir. \"{button}\" hepsini tek bir dosyaya kaydeder.",
+  "storageNotice.changed": "Son yedek: {when}. O zamandan beri yeni veya değişen: {count}; bunlar yalnızca bu tarayıcıda. \"{button}\" onları yeniden yedekler.",
+  "storageNotice.current": "Tüm tasarımların yedeği var (son yedek: {when}). Tasarımlar bu tarayıcıda, yedek ise dosyanızda.",
   "welcome.hide": "Karşılama rehberini gizle - alt bilgideki bir bağlantı onu geri getirir",
   "dashboard.newOnServer": "Yeni tasarımlar sunucuda",
   "dashboard.newOnServerTitle": "Yeni tasarımlar sunucu klasöründe başlar, böylece ilk değişiklikten itibaren orada kaydedilir. Bu tarayıcıdaki tasarımlar olduğu gibi kalır.",

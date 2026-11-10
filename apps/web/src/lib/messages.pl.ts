@@ -132,6 +132,8 @@ export const MESSAGES_PL: Partial<Record<MessageKey, string>> = {
   "dashboard.downloadAllServerTitle": "Zapisz wszystkie projekty z serwera wraz z folderami w jednym pliku ZIP. „Przywróć kopię zapasową” wczytuje je do przeglądarki, także na innym komputerze",
   "dashboard.dragHintServerTab": "Przeciągnij na folder lub na kartę Serwer, aby przenieść tam ten projekt",
   "storageNotice.line": "Te projekty są zapisane tylko w tej przeglądarce. Awaria lub aktualizacja przeglądarki może je usunąć. Użyj „{button}” powyżej, aby zapisać je wszystkie w jednym pliku.",
+  "storageNotice.changed": "Ostatnia kopia: {when}. Nowe lub zmienione od tego czasu: {count}, a te są tylko w tej przeglądarce. Użyj „{button}” powyżej, aby zapisać je ponownie.",
+  "storageNotice.current": "Wszystkie projekty mają kopię (ostatnia: {when}). Są w tej przeglądarce, kopia w twoim pliku.",
   "welcome.hide": "Ukryj przewodnik powitalny – link w stopce go przywraca",
   "dashboard.newOnServer": "Nowe projekty na serwerze",
   "dashboard.newOnServerTitle": "Nowe projekty zaczynają się w folderze serwera, więc zapisują się tam od pierwszej zmiany. Projekty z tej przeglądarki zostają bez zmian.",

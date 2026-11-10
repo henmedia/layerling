@@ -120,6 +120,8 @@ export const MESSAGES_FR: Partial<Record<MessageKey, string>> = {
   "dashboard.downloadAllServerTitle": "Enregistrez chaque motif du serveur, dans ses dossiers, dans un seul fichier ZIP - « Restaurer la sauvegarde » les ramène dans un navigateur, aussi sur un autre ordinateur",
   "dashboard.dragHintServerTab": "Faites glisser sur un dossier, ou sur l'onglet Serveur, pour y déplacer ce motif",
   "storageNotice.line": "Ces motifs ne sont gardés que dans ce navigateur. Un plantage ou une mise à jour du navigateur peut les effacer. Utilisez « {button} » ci-dessus pour les enregistrer tous dans un seul fichier.",
+  "storageNotice.changed": "Dernière sauvegarde : {when}. Nouveaux ou modifiés depuis : {count}, et ceux-ci ne sont que dans ce navigateur. Utilisez « {button} » ci-dessus pour les sauvegarder de nouveau.",
+  "storageNotice.current": "Tous les motifs sont sauvegardés (dernière sauvegarde : {when}). Ils sont dans ce navigateur, la sauvegarde dans votre fichier.",
   "welcome.hide": "Masquer le guide de bienvenue - un lien dans le pied de page le fait revenir",
   "dashboard.newOnServer": "Nouveaux designs sur le serveur",
   "dashboard.newOnServerTitle": "Les nouvelles conceptions démarrent dans le dossier du serveur et y sont donc enregistrées dès la première modification. Les conceptions de ce navigateur restent telles quelles.",

@@ -8894,6 +8894,26 @@ html[data-theme="dark"]:where([data-palette="graphite"]) .browser-backup-note > 
   color: #f3a452;
 }
 
+:where(html[data-theme="dark"][data-palette="graphite"]) .browser-backup-note.backed-up {
+  color: #4b4f55;
+  background: #f3f4f5;
+  border-color: #d5d8dc;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .browser-backup-note.backed-up > svg {
+  color: #3f8a55;
+}
+
+html[data-theme="dark"]:where([data-palette="graphite"]) .browser-backup-note.backed-up {
+  color: #c9ccd1;
+  background: #24272b;
+  border-color: #3b4046;
+}
+
+html[data-theme="dark"]:where([data-palette="graphite"]) .browser-backup-note.backed-up > svg {
+  color: #7cc48f;
+}
+
 :where(html[data-theme="dark"][data-palette="graphite"]) .history-view-bar {
   color: #424242;
   background: rgba(252, 252, 252, 0.98);

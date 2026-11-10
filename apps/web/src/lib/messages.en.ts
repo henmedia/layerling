@@ -126,6 +126,8 @@ export const MESSAGES_EN = {
   "dashboard.downloadAllServerTitle": "Save every design on the server, in its folders, in one ZIP file - \"Restore backup\" brings them into a browser, also on another computer",
   "dashboard.dragHintServerTab": "Drag onto a folder, or onto the Server tab, to move this design there",
   "storageNotice.line": "These designs are stored only in this browser. A crash or browser update can erase them. Use “{button}” above to save them all in one file.",
+  "storageNotice.changed": "Last backup: {when}. New or changed since: {count}, and those are only in this browser. “{button}” above backs them up again.",
+  "storageNotice.current": "All designs are backed up (last backup: {when}). They live in this browser, the backup in your file.",
   "welcome.hide": "Hide the welcome guide - a link in the footer brings it back",
   "dashboard.newOnServer": "New designs on the server",
   "dashboard.newOnServerTitle": "New designs start in the server folder, so they are saved there from the first change on. Designs of this browser stay as they are.",

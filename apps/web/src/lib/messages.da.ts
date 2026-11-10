@@ -1269,6 +1269,8 @@ export const MESSAGES_DA: Partial<Record<MessageKey, string>> = {
   "dashboard.downloadAllServerTitle": "Gem alle designs på serveren med deres mapper i én ZIP-fil – \"Gendan sikkerhedskopi\" henter dem ind i en browser, også på en anden computer",
   "dashboard.dragHintServerTab": "Træk til en mappe eller til fanen Server for at flytte dette design derhen",
   "storageNotice.line": "Disse designs gemmes kun i denne browser. Et nedbrud eller en browseropdatering kan slette dem. Brug \"{button}\" ovenfor for at gemme dem alle i én fil.",
+  "storageNotice.changed": "Seneste sikkerhedskopi: {when}. Nye eller ændrede siden: {count}, og de ligger kun i denne browser. Brug \"{button}\" ovenfor for at gemme dem igen.",
+  "storageNotice.current": "Alle designs er sikkerhedskopieret (seneste: {when}). De ligger i denne browser, kopien i din fil.",
   "welcome.hide": "Skjul velkomstguiden – et link nederst på siden henter den tilbage",
   "dashboard.newOnServer": "Nye designs på serveren",
   "dashboard.newOnServerTitle": "Nye designs starter i servermappen, så de gemmes der fra den første ændring. Designs i denne browser forbliver som de er.",

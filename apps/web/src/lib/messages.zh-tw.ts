@@ -126,6 +126,8 @@ export const MESSAGES_ZH_TW: Partial<Record<MessageKey, string>> = {
   "dashboard.downloadAllServerTitle": "將伺服器上的所有設計連同資料夾儲存到一個 ZIP 檔案——「還原備份」可將它們匯入瀏覽器，在另一台電腦上也可以",
   "dashboard.dragHintServerTab": "拖曳到資料夾或「伺服器」分頁上，即可將此設計移到該處",
   "storageNotice.line": "這些設計只儲存在這個瀏覽器中。瀏覽器當機或更新可能會刪除它們。使用上方的「{button}」可將它們全部儲存到一個檔案。",
+  "storageNotice.changed": "上次備份：{when}。此後新增或變更的：{count} 個，它們只在這個瀏覽器中。使用上方的「{button}」可再次備份。",
+  "storageNotice.current": "所有設計都已備份（上次備份：{when}）。設計在這個瀏覽器中，備份在你的檔案裡。",
   "welcome.hide": "隱藏歡迎指南——頁尾的連結可讓它重新顯示",
   "dashboard.newOnServer": "伺服器上的新設計",
   "dashboard.newOnServerTitle": "新設計會從伺服器資料夾開始，因此從第一次修改起就儲存在那裡。此瀏覽器中的設計維持不變。",

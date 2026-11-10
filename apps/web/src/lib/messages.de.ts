@@ -125,6 +125,8 @@ export const MESSAGES_DE: Record<MessageKey, string> = {
   "dashboard.downloadAllServerTitle": "Alle Entwürfe auf dem Server mit ihren Ordnern als eine ZIP-Datei sichern - „Sicherung wiederherstellen“ holt sie in einen Browser, auch auf einem anderen Rechner",
   "dashboard.dragHintServerTab": "Auf einen Ordner oder auf den Reiter Server ziehen, um den Entwurf dorthin zu verschieben",
   "storageNotice.line": "Diese Entwürfe liegen nur in diesem Browser. Ein Absturz oder ein Browser-Update kann sie löschen. Mit „{button}“ oben sicherst du sie alle in einer Datei.",
+  "storageNotice.changed": "Letzte Sicherung: {when}. Seitdem neu oder geändert: {count}, und die liegen nur in diesem Browser. Mit „{button}“ oben sicherst du sie wieder.",
+  "storageNotice.current": "Alle Entwürfe sind gesichert (letzte Sicherung: {when}). Sie liegen in diesem Browser, die Sicherung in deiner Datei.",
   "welcome.hide": "Willkommensanleitung ausblenden - ein Link in der Fußzeile holt sie zurück",
   "dashboard.newOnServer": "Neue Entwürfe auf dem Server",
   "dashboard.newOnServerTitle": "Neue Entwürfe starten im Serverordner und sichern sich dort ab der ersten Änderung. Entwürfe dieses Browsers bleiben, wie sie sind.",

@@ -118,6 +118,8 @@ export const MESSAGES_PT_PT: Partial<Record<MessageKey, string>> = {
   "dashboard.downloadAllServerTitle": "Guarda todos os projetos do servidor, com as respetivas pastas, num único ficheiro ZIP. \"Restaurar cópia de segurança\" trá-los para um navegador, mesmo noutro computador",
   "dashboard.dragHintServerTab": "Arrasta este projeto para uma pasta ou para o separador Servidor para o moveres para lá",
   "storageNotice.line": "Estes projetos estão guardados apenas neste navegador, e uma falha ou uma atualização do navegador pode fazer com que se percam. \"{button}\" guarda-os todos num único ficheiro.",
+  "storageNotice.changed": "Última cópia de segurança: {when}. Novos ou alterados desde então: {count}, e esses estão apenas neste navegador. \"{button}\" guarda-os de novo.",
+  "storageNotice.current": "Todos os projetos têm cópia de segurança (última: {when}). Estão neste navegador, a cópia no seu ficheiro.",
   "welcome.hide": "Ocultar o guia de boas-vindas - uma ligação no rodapé volta a mostrá-lo",
   "dashboard.newOnServer": "Novos projetos no servidor",
   "dashboard.newOnServerTitle": "Os novos projetos são criados na pasta do servidor e ficam guardados aí desde a primeira alteração. Os projetos deste navegador mantêm-se como estão.",

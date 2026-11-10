@@ -282,6 +282,8 @@ export const MESSAGES_CS: Record<MessageKey, string> = {
   "dashboard.downloadAllServerTitle": "Uložit všechny projekty ze serveru i s jejich složkami do jednoho souboru ZIP; „Obnovit ze zálohy“ je přenese do prohlížeče, i na jiném počítači",
   "dashboard.dragHintServerTab": "Přetáhněte na složku nebo na kartu Server a projekt se tam přesune",
   "storageNotice.line": "Tyto projekty jsou uložené jen v tomto prohlížeči a pád nebo aktualizace prohlížeče je může smazat. Tlačítkem „{button}“ nahoře je všechny uložíte do jednoho souboru.",
+  "storageNotice.changed": "Poslední záloha: {when}. Od té doby nové nebo změněné: {count}, a ty jsou jen v tomto prohlížeči. Tlačítkem „{button}“ nahoře je zálohujete znovu.",
+  "storageNotice.current": "Všechny projekty jsou zálohované (poslední záloha: {when}). Jsou v tomto prohlížeči, záloha ve vašem souboru.",
   "welcome.hide": "Skrýt uvítacího průvodce; odkaz v patičce ho vrátí",
   "dashboard.backupAllTitle": "Uložit všechny projekty tohoto prohlížeče a vlastní tvary do jednoho souboru ZIP; „Obnovit ze zálohy“ vše vrátí, i na jiném počítači",
   "dashboard.backupSelected": "Zálohovat",

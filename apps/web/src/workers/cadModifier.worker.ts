@@ -1033,6 +1033,33 @@ function treatEdges(cad: OcctKernel, solid: ShapeHandle, edges: ShapeHandle[], r
     : cad.chamferDistAngle(solid, edges, request.amount, request.chamferAngle);
 }
 
+/*
+ * A fillet or chamfer exactly as large as the face beside it would take that face away whole: a 2 mm fillet on the top
+ * edge of a 2 mm high cylinder, or 1 mm on both its edges. The kernel refuses that very size, yet takes 0.0001 mm less,
+ * a sliver far below anything a printer makes. So a refused size is tried once at that, then 0.005 mm less, for a body
+ * a few thousandths too low from scaling or an import; still under the two decimals the fields show, so what they
+ * say stays true. Further than that the size is really too large and the refusal stands (Jürgen Keller, 10.11.2026).
+ */
+const NEAR_LIMIT_SHRINKS = [0.0001, 0.005] as const;
+
+function treatEdgesNearLimit(cad: OcctKernel, solid: ShapeHandle, edges: ShapeHandle[], request: Extract<CadModifierWorkerRequest, { type: "preview" }>) {
+  if (request.kind !== "fillet" && request.kind !== "chamfer" && request.kind !== "chamfillet") return null;
+  if (request.kind === "fillet" && request.concave) return null;
+  for (const shrink of NEAR_LIMIT_SHRINKS) {
+    const amount = request.amount - shrink;
+    const endAmount = request.endAmount === undefined ? undefined : request.endAmount - shrink;
+    if (amount <= shrink || (endAmount !== undefined && endAmount <= shrink)) return null;
+    try {
+      const component = treatEdges(cad, solid, edges, { ...request, amount, endAmount });
+      if (cadHasSolidBody(cad, component)) return component;
+      releaseHandles(cad, [component]);
+    } catch (error) {
+      if (isFatalKernelFault(error)) throw error;
+    }
+  }
+  return null;
+}
+
 function failsAlone(cad: OcctKernel, solid: ShapeHandle, edge: ShapeHandle, request: Extract<CadModifierWorkerRequest, { type: "preview" }>) {
   try {
     const single = treatEdges(cad, solid, [edge], request);
@@ -1233,9 +1260,13 @@ async function bearbeiteAnfrage(request: CadModifierWorkerRequest, halter: { cad
           treatedEdges = componentEdges;
         } catch (error) {
           if (isFatalKernelFault(error)) throw error;
-          const retried = treatWithCornerEdges(activeCad, solid, componentEntries, request);
-          const pastCorners = retried ? null : treatPastInnerCorners(activeCad, solid, componentEntries, request);
-          if (!retried && !pastCorners) {
+          const nearLimit = treatEdgesNearLimit(activeCad, solid, componentEdges, request);
+          const retried = nearLimit ? null : treatWithCornerEdges(activeCad, solid, componentEntries, request);
+          const pastCorners = nearLimit || retried ? null : treatPastInnerCorners(activeCad, solid, componentEntries, request);
+          if (nearLimit) {
+            component = nearLimit;
+            treatedEdges = componentEdges;
+          } else if (!retried && !pastCorners) {
             const rawMessage = error instanceof Error ? error.message : String(error ?? "");
             // A curve bending round the outside tighter than the radius is said with its number and marked (#1473).
             const bend = request.kind === "fillet" && !request.concave
@@ -1243,8 +1274,7 @@ async function bearbeiteAnfrage(request: CadModifierWorkerRequest, halter: { cad
               : null;
             if (bend) throw new EdgeTreatmentError(tightBendMessage(bend.radius), bend.edgeIds, bend.radius);
             throw new EdgeTreatmentError(rawMessage, culpritEdgeIds(activeCad, solid, componentEntries, request, error));
-          }
-          if (retried) {
+          } else if (retried) {
             component = retried.component;
             cornerEdgeIds.push(...retried.edgeIds);
             treatedEdges = [...componentEdges, ...retried.edgeIds.map((id) => edgeHandles[id])];

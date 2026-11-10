@@ -101,6 +101,8 @@ export const MESSAGES_HU: Partial<Record<MessageKey, string>> = {
   "dashboard.downloadAllServerTitle": "A szerver összes tervének mentése a mappáikkal együtt egyetlen ZIP-fájlba – a „Mentés visszaállítása” egy böngészőbe hozza őket, másik számítógépen is",
   "dashboard.dragHintServerTab": "Húzd egy mappára vagy a Szerver fülre, hogy oda kerüljön ez a terv",
   "storageNotice.line": "Ezek a tervek csak ebben a böngészőben vannak, és egy összeomlás vagy egy böngészőfrissítés elveszítheti őket. A „{button}” mindet egy fájlba menti.",
+  "storageNotice.changed": "Utolsó mentés: {when}. Azóta új vagy módosított: {count}, és ezek csak ebben a böngészőben vannak. A „{button}” újra elmenti őket.",
+  "storageNotice.current": "Minden terv mentve van (utolsó mentés: {when}). Ebben a böngészőben vannak, a mentés a fájlodban.",
   "welcome.hide": "Az üdvözlő útmutató elrejtése – a lábléc egy hivatkozása visszahozza",
   "dashboard.newOnServer": "Új tervek a szerveren",
   "dashboard.newOnServerTitle": "Az új tervek a szerver mappájában indulnak, így az első változtatástól ott mentődnek. A böngésző tervei maradnak, ahol vannak.",
