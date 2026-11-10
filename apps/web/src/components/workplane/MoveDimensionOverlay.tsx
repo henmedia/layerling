@@ -62,7 +62,7 @@ export function MoveDimensionOverlay({
           return (
             <input
               key={`edit-${line.axis}`}
-              className="dimension-input move-dimension-input"
+              className="dimension-input move-dimension-input" autoComplete="off"
               data-axis={sceneDimensionAxis(line.axis)}
               aria-label={t("aria.axisMovement", { axis: moveDimensionAxisName(line.axis) })}
               value={editing.value}

@@ -11,38 +11,62 @@
   },
   {
     "title": {
-      "de": "Fokusmodus: mehr Platz auf kleinen Bildschirmen",
-      "en": "Focus mode: more room on small screens",
-      "da": "Fokustilstand: mere plads på små skærme"
+      "de": "Teilen: „Quer zu X/Y“ schneidet durch die Mitte des Teils",
+      "en": "Split: Across X/Y cut through the middle of the part",
+      "da": "Del: „På tværs af X/Y“ skærer gennem delens midte"
     },
     "body": {
-      "de": "Der Knopf mit den zwei Pfeilen oben rechts (oder Strg+Umschalt+F) blendet Titelzeile und Fußzeile aus, und Menüband und Ansicht bekommen ihren Platz. Eine kleine verschiebbare Leiste unter dem Menüband behält Startseite, 3D-Editor und Skizze, Befehlssuche und Einstellungen. Im Browser-Vollbild (F11) kommt der Fokusmodus von selbst.",
-      "en": "The button with the two arrows at the top right (or Ctrl+Shift+F) hides the title row and the footer, and the ribbon and the view get their room. A small movable bar below the ribbon keeps Home, 3D editor and Sketch, the command search and the settings. In the browser's full screen (F11) focus mode comes by itself.",
-      "da": "Knappen med de to pile øverst til højre (eller Ctrl+Shift+F) skjuler titellinjen og sidefoden, så båndet og visningen får pladsen. En lille bjælke, der kan flyttes, under båndet beholder Hjem, 3D-editor og Skitse, kommandosøgningen og indstillingerne. I browserens fuldskærm (F11) kommer fokustilstanden af sig selv."
+      "de": "Auf der Grundplatte legten „Quer zu X“ und „Quer zu Y“ die Teilungsebene durch die Mitte der Platte, bei einem Teil abseits davon also neben seine Mitte. Jetzt gehen sie durch die Mitte der Auswahl. Auf einer Arbeitsebene, die auf einer Fläche liegt, schneiden sie weiter durch deren Ursprung.",
+      "en": "On the base plate, Across X and Across Y put the split plane through the middle of the plate, so a part standing away from it was cut off-centre. They now go through the middle of the selection. On a workplane laid on a face they still cut through its origin.",
+      "da": "På grundpladen lagde „På tværs af X“ og „På tværs af Y“ delingsplanet gennem pladens midte, så en del, der stod væk fra den, blev skåret ved siden af sin midte. Nu går de gennem markeringens midte. På et arbejdsplan, der ligger på en flade, skærer de stadig gennem dets origo."
     }
   },
   {
     "title": {
-      "de": "Ansicht schneller verschieben",
-      "en": "Shift the view faster",
-      "da": "Flyt visningen hurtigere"
+      "de": "Verrunden und Fasen bis an die Grenze",
+      "en": "Fillets and chamfers right up to the limit",
+      "da": "Afrunding og affasning helt op til grænsen"
     },
     "body": {
-      "de": "Die Ansicht folgt beim Verschieben jetzt der Maus: der gegriffene Punkt bleibt unter dem Mauszeiger, vorher lief sie langsamer mit. Unter Einstellungen > Darstellung stellt „Verschiebetempo“ das langsamer oder schneller ein. Wer keinen Nachlauf möchte, schaltet dort „Kamera läuft nach“ aus; das gilt fürs Drehen und Verschieben.",
-      "en": "Shifting the view now keeps up with the mouse: the point you grab stays under the cursor, where it used to lag behind. Pan speed in Settings > Appearance makes it slower or faster. To have the view stop at once when you let go, turn off Camera keeps turning there; it covers turning and shifting.",
-      "da": "Når du flytter visningen, følger den nu musen: det punkt, du griber, bliver under markøren, hvor den før haltede bagefter. Flyttehastighed under Indstillinger > Udseende gør det langsommere eller hurtigere. Vil du have, at visningen stopper med det samme, når du slipper, så slå Kameraet bliver ved med at dreje fra der; det gælder både drejning og flytning."
+      "de": "Eine Verrundung oder Fase genau so groß wie die Fläche daneben, etwa 2 mm an einem 2 mm hohen Zylinder, wurde abgelehnt, während 1,99 mm ging. Jetzt geht auch der volle Wert. Ist er wirklich zu groß, kommt die Meldung wie bisher.",
+      "en": "A fillet or chamfer exactly as large as the face beside it, say 2 mm on a cylinder 2 mm high, was refused while 1.99 mm went through. The full size works now. A size that is really too large is still refused as before.",
+      "da": "En afrunding eller affasning præcis så stor som fladen ved siden af, f.eks. 2 mm på en cylinder, der er 2 mm høj, blev afvist, mens 1,99 mm gik. Nu virker den fulde værdi også. Er den virkelig for stor, kommer meldingen som før."
     }
   },
   {
     "title": {
-      "de": "Menüband: vier Gruppen statt Anpassen, Einklappen nach Wahl",
-      "en": "Ribbon: four groups instead of Modify, folding your way",
-      "da": "Bånd: fire grupper i stedet for Tilpas, sammenfoldning efter valg"
+      "de": "Die Startseite sagt, ob deine Entwürfe gesichert sind",
+      "en": "The start page says whether your designs are backed up",
+      "da": "Startsiden fortæller, om dine designs er sikkerhedskopieret"
     },
     "body": {
-      "de": "Spiegeln & Muster, Teilen & Formen, Kanten & Wände und Oberfläche sind jetzt eigene Gruppen: Jede lässt sich verschieben, einklappen und herausnehmen. Unter Einstellungen > Menüband legt „Einklappen“ für jede Gruppe fest, ob sie bei Platzmangel einklappt, immer eingeklappt bleibt oder als letzte einklappt.",
-      "en": "Mirror & pattern, Split & shape, Edges & walls and Surface are groups of their own now: each moves, folds and can be taken out by itself. In Settings > Ribbon, Folding sets for each group whether it folds when there is no room, stays folded or folds last.",
-      "da": "Spejl og mønster, Del og form, Kanter og vægge og Overflade er nu selvstændige grupper: hver kan flyttes, foldes sammen og tages ud for sig. Under Indstillinger > Bånd bestemmer Sammenfoldning for hver gruppe, om den foldes sammen ved pladsmangel, altid er foldet sammen eller foldes sammen sidst."
+      "de": "Statt jedes Mal derselben Warnung zeigt die Zeile über den Entwürfen dieses Browsers jetzt den Stand: noch nie gesichert, seit der letzten Sicherung mit „Alle sichern“ neu oder geändert (mit Datum und Anzahl) oder alles gesichert, dann als ruhige graue Zeile.",
+      "en": "Instead of the same warning every time, the line over this browser's designs now says where they stand: not backed up yet, added or changed since the last “Back up all” (with the date and how many), or all backed up, then as a calm grey line.",
+      "da": "I stedet for den samme advarsel hver gang viser linjen over denne browsers designs nu, hvordan de står: endnu ikke sikkerhedskopieret, nye eller ændrede siden sidste „Sikkerhedskopiér alle“ (med dato og antal), eller alle sikkerhedskopieret, så som en rolig grå linje."
+    }
+  },
+  {
+    "title": {
+      "de": "Menüband: „Alle Gruppen offen halten“ bricht sauber um",
+      "en": "Ribbon: “Keep all groups open” wraps cleanly",
+      "da": "Båndet: „Hold alle grupper åbne“ ombrydes pænt"
+    },
+    "body": {
+      "de": "Mit gesetzter Stecknadel wurden die Gruppen bei manchen Fensterbreiten zusammengedrückt, etwa mit der Tab-Leiste links in Safari: Die Knöpfe von „Sichtbarkeit“ ragten in „Formen“, und der Name war abgeschnitten. Jetzt rücken die Gruppen in eine weitere Zeile, sobald sie nicht passen.",
+      "en": "With the pin set, the groups were squeezed at some window widths, for example with Safari's tab bar on the left: Visibility's buttons spilled over Shapes and its name was cut off. The groups now move onto a further row whenever they do not fit.",
+      "da": "Med nålen sat blev grupperne klemt sammen ved nogle vinduesbredder, f.eks. med Safaris fanelinje til venstre: knapperne i „Synlighed“ stak ind i „Former“, og navnet blev skåret af. Nu rykker grupperne ned på en ekstra linje, så snart de ikke passer."
+    }
+  },
+  {
+    "title": {
+      "de": "Startskript findet ein frisch installiertes Node.js",
+      "en": "The start script finds a freshly installed Node.js",
+      "da": "Startscriptet finder et nyinstalleret Node.js"
+    },
+    "body": {
+      "de": "„Start layerling“ brach mit „npm wurde nicht gefunden“ ab, wenn Node.js gerade erst installiert war und das Fenster schon vorher offen stand. Es liest den Suchpfad jetzt neu ein, wie ein neues Fenster, und sagt deutlich, wenn Node.js wirklich fehlt.",
+      "en": "Start layerling stopped at “npm was not found” when Node.js had only just been installed and the window was open from before. It now reads the search path afresh, as a new window would, and says clearly when Node.js is really missing.",
+      "da": "„Start layerling“ stoppede ved „npm blev ikke fundet“, når Node.js lige var installeret, og vinduet allerede var åbent fra før. Det læser nu søgestien på ny, som et nyt vindue ville, og siger tydeligt, når Node.js virkelig mangler."
     }
   }
 ]

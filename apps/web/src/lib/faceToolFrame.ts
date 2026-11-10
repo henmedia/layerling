@@ -48,8 +48,8 @@ export function sketchBodyFrame(shape: WorkplaneShape): PlacementWorkplane | nul
 
 /**
  * When the picked face is the top or the bottom of a plain sketch body, the plane the new body
- * stands on in that body's sketch frame: moved along its normal so that a body going out starts a
- * little inside, and a pocket starts at its bottom and reaches a little out. The normal stays the
+ * stands on in that body's sketch frame: moved along its normal so that a body going out starts on
+ * the face, and a pocket starts at its bottom and reaches a little out. The normal stays the
  * frame's, so the outline is not mirrored; on the bottom the new body reaches down from below.
  * Null on any other face.
  */
@@ -64,7 +64,7 @@ export function sketchCapWorkplane(source: WorkplaneShape, face: Pick<Perforable
   const bottom = facing < 0 && Math.abs(level) < 1e-3;
   if (!top && !bottom) return null;
   const out = settings.direction === "out";
-  const shift = top ? (out ? source.height - FACE_TOOL_OVERLAP : source.height - settings.depth) : (out ? -settings.depth : -FACE_TOOL_OVERLAP);
+  const shift = top ? (out ? source.height : source.height - settings.depth) : (out ? -settings.depth : -FACE_TOOL_OVERLAP);
   return { ...frame, origin: { x: frame.origin.x + n.x * shift, y: frame.origin.y + n.y * shift, z: frame.origin.z + n.z * shift } };
 }
 

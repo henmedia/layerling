@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { SPLIT_AXIS_DISPLAY_ORDER, modelSplitPlane, splitAxisFromLabel, splitAxisLabel, splitPlaneIntersectsPoints, snapSplitPositionToVertices, splitOrientationForNormal, splitRotationAxes, splitShapeFromWorldPositions } from "@/lib/modelSplit";
+import { SPLIT_AXIS_DISPLAY_ORDER, modelSplitPlane, splitAxisFromLabel, splitAxisLabel, splitPlaneIntersectsPoints, snapSplitPositionToVertices, splitOrientationForNormal, splitPositionAlongWorkplane, splitRotationAxes, splitShapeFromWorldPositions } from "@/lib/modelSplit";
 import type { WorkplaneShape } from "@/types/layerling";
 
 const source: WorkplaneShape = {
@@ -111,6 +111,22 @@ describe("model split helpers", () => {
     const points: Array<[number, number, number]> = [[0, 0, 0], [0, 10, 0], [5, 20, 0]];
     expect(snapSplitPositionToVertices(points, [0, 1, 0], 10 - 3e-7)).toBe(10);
     expect(snapSplitPositionToVertices(points, [0, 1, 0], 10.4)).toBe(10.4);
+  });
+
+  it("aligns through the workplane's origin, but across the base plate through the parts' middle (#1590)", () => {
+    // A tube standing from x 20 to 60, away from the middle of the plate.
+    const points: Array<[number, number, number]> = [[20, 0, -20], [60, 30, 20]];
+    const across = modelSplitPlane(points, "x")!;
+    expect(across.position).toBe(40);
+    // Across the base plate the origin (x 0) only marks the plate's middle: the plane goes through the tube's middle.
+    expect(splitPositionAlongWorkplane(points, across, [0, 0, 0], false)).toBe(40);
+    expect(splitPositionAlongWorkplane(points, across, [25, 0, 0], false)).toBe(40);
+    // A workplane laid on the part cuts through its origin where that crosses the part, snapped onto a vertex...
+    expect(splitPositionAlongWorkplane(points, across, [25, 30, 0], true)).toBe(25);
+    const withStep: Array<[number, number, number]> = [...points, [32, 10, 0]];
+    expect(splitPositionAlongWorkplane(withStep, across, [32 - 3e-4, 30, 0], true)).toBe(32);
+    // ...and through the middle where it misses the part.
+    expect(splitPositionAlongWorkplane(points, across, [80, 30, 0], true)).toBe(40);
   });
 
   it("only reports a cut when vertices exist on both sides", () => {

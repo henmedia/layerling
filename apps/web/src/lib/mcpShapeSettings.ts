@@ -46,7 +46,7 @@ export const MCP_SHAPE_SETTING_KEYS = [
   "gridfinityCompartmentsX", "gridfinityCompartmentsZ", "gridfinityDividerThickness", "gridfinityDividerPositionsX", "gridfinityDividerPositionsZ", "gridfinityCompartmentLabels", "gridfinityOpenings", "gridfinityOpeningCorner", "gridfinityOpeningCornerSize", "gridfinityOutline",
   "knurlPattern", "knurlCount", "knurlDepth", "knurlAngle", "knurlChamfer",
   "dovetailNeckWidth", "dovetailClearance",
-  "loftBottomOutline", "loftTopOutline", "loftBottomWidth", "loftBottomDepth", "loftTopWidth", "loftTopDepth", "loftBottomCorner", "loftTopCorner", "loftBottomSides", "loftTopSides", "loftOffsetX", "loftOffsetZ", "loftWall", "loftTwist", "loftTiltX", "loftTiltZ", "loftSmooth", "loftSegments", "loftSections", "loftThrough", "slotEndRatio", "torusTubeRatio",
+  "loftBottomOutline", "loftTopOutline", "loftBottomWidth", "loftBottomDepth", "loftTopWidth", "loftTopDepth", "loftBottomCorner", "loftTopCorner", "loftBottomSides", "loftTopSides", "loftOffsetX", "loftOffsetZ", "loftWall", "loftTopWall", "loftTwist", "loftTiltX", "loftTiltZ", "loftSmooth", "loftSegments", "loftSections", "loftThrough", "slotEndRatio", "torusTubeRatio",
   "screwHoleShaft", "screwHoleHeadDepth", "screwHoleAngle", "drillPointAngle", "screwHoleSlot", "screwHoleRecess", "portProfile", "portClearance",
   "cornerFillet", "topBottomFillet", "bottomFillet", "roundedBoxQuality",
   "bentTubeProfile", "bentTubeInnerProfile", "bentTubeSize", "bentTubeWall", "bentTubeQuality", "bentTubeSegments",

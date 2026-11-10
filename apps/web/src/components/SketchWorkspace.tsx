@@ -3412,7 +3412,7 @@ export function SketchWorkspace({
           if (!overlayPos) return null;
           return (
             <input
-              className="dimension-input sketch-dimension-input"
+              className="dimension-input sketch-dimension-input" autoComplete="off"
               style={{
                 "--overlay-x": `${overlayPos.x}px`,
                 "--overlay-y": `${overlayPos.y}px`,
@@ -3453,7 +3453,7 @@ export function SketchWorkspace({
           if (!overlayPos) return null;
           return (
             <input
-              className="dimension-input sketch-dimension-input"
+              className="dimension-input sketch-dimension-input" autoComplete="off"
               style={{ "--overlay-x": `${overlayPos.x}px`, "--overlay-y": `${overlayPos.y}px` } as CSSProperties}
               value={editingBoxSize.value}
               autoFocus
@@ -3482,7 +3482,7 @@ export function SketchWorkspace({
           if (!overlayPos) return null;
           return (
             <input
-              className="dimension-input sketch-dimension-input"
+              className="dimension-input sketch-dimension-input" autoComplete="off"
               style={{
                 "--overlay-x": `${overlayPos.x}px`,
                 "--overlay-y": `${overlayPos.y}px`,

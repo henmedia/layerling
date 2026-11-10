@@ -9,6 +9,7 @@ import { loadedManifoldRuntime } from "@/lib/manifoldHandle";
 import { ADDITION, Brush, Evaluator, HOLLOW_INTERSECTION, HOLLOW_SUBTRACTION, INTERSECTION, SUBTRACTION, type CSGOperation } from "three-bvh-csg";
 import * as THREE from "three";
 import { numberLocale, t } from "@/lib/i18n";
+import { currentLengthUnitLabel, formatLengthMm } from "@/lib/measurementUnits";
 import { sphereTessellation } from "@/lib/sphereTessellation";
 import { groupDisplayMergeable, groupShowsPartColors } from "@/lib/groupColors";
 import { gridfinityLabelColor, gridfinityLetterMeshes } from "@/lib/gridfinityLetterColor";
@@ -943,6 +944,125 @@ export async function splitShapeByPlane(shape: WorkplaneShape, plane: SplitPlane
   }
 }
 
+/** Longest a body is made longer or shorter in one stretch (Discussions #506, #1569), in mm. */
+export const MAX_STRETCH_LENGTH = 1000;
+/**
+ * How far the pieces of a stretch reach into each other, in mm. Laid exactly face to face, Manifold's union can keep
+ * them as separate shells where a tilted cut leaves its faces a rounding apart, or where the filler meets a floor over
+ * only part of its face; this much overlap joins them for sure and is far below what a printer shows.
+ */
+const STRETCH_OVERLAP = 1e-3;
+
+/** What the Split panel's Stretch starts with, in mm. */
+export const DEFAULT_STRETCH_LENGTH = 10;
+
+/** A stretch's length for the status line, in the workspace's unit, without trailing zeros: "20 mm", "12.5 mm", "1⅝ in". */
+export function stretchLengthLabel(length: number) {
+  const shown = formatLengthMm(Math.abs(length), 2);
+  return `${/^\d+\.\d+$/.test(shown) ? String(Number(shown)) : shown} ${currentLengthUnitLabel()}`;
+}
+
+/** The status line after a stretch: how many objects got how much longer or shorter. */
+export function stretchNotice(length: number, count: number, lengthLabel: string) {
+  const key = length > 0
+    ? count === 1 ? "status.stretchLongerOne" : "status.stretchLongerMany"
+    : count === 1 ? "status.stretchShorterOne" : "status.stretchShorterMany";
+  return t(key, { count, length: lengthLabel });
+}
+
+/**
+ * The rotation that turns `unit` onto +z, and its inverse, as Manifold's column-major matrices: the rows of the rotation
+ * are two directions square to the normal and the normal itself, so it keeps the hand of the space.
+ */
+function rotationOntoZ(unit: Vec3) {
+  const helper: Vec3 = Math.abs(unit[2]) < 0.9 ? [0, 0, 1] : [1, 0, 0];
+  const dot = helper[0] * unit[0] + helper[1] * unit[1] + helper[2] * unit[2];
+  const rawU: Vec3 = [helper[0] - dot * unit[0], helper[1] - dot * unit[1], helper[2] - dot * unit[2]];
+  const lengthU = Math.hypot(...rawU);
+  const u: Vec3 = [rawU[0] / lengthU, rawU[1] / lengthU, rawU[2] / lengthU];
+  const v: Vec3 = [unit[1] * u[2] - unit[2] * u[1], unit[2] * u[0] - unit[0] * u[2], unit[0] * u[1] - unit[1] * u[0]];
+  type Mat4 = Parameters<ManifoldSolid["transform"]>[0];
+  const onto = [u[0], v[0], unit[0], 0, u[1], v[1], unit[1], 0, u[2], v[2], unit[2], 0, 0, 0, 0, 1] as Mat4;
+  const back = [u[0], u[1], u[2], 0, v[0], v[1], v[2], 0, unit[0], unit[1], unit[2], 0, 0, 0, 0, 1] as Mat4;
+  return { onto, back };
+}
+
+/**
+ * Makes a shape longer at the plane (Discussions #506, #1569): the part on the side the plane's normal points to moves
+ * `length` mm along it, and the cut through the body at the plane, drawn out over that length, fills the gap - so a case
+ * gets longer through its straight walls while the compartments and rounded corners on either side keep their size. A
+ * negative length shortens it instead: a slice that thick comes out on that side of the plane, and the part beyond moves
+ * back to close the gap. One body comes back, a mesh, under the shape's name.
+ */
+export async function stretchShapeByPlane(
+  shape: WorkplaneShape,
+  plane: SplitPlaneArgs,
+  length: number,
+): Promise<{ parts: WorkplaneShape[]; closedHoles: number; connectors?: SplitConnectorTally } | { parts: null; error: string }> {
+  const created: ManifoldSolid[] = [];
+  takeHoleFillTally();
+  try {
+    if (!Number.isFinite(length) || Math.abs(length) < 0.001) return { parts: null, error: t("split.error.stretchZero") };
+    const halves = await splitShapeHalves(shape, plane, created);
+    if ("error" in halves) return { parts: null, error: halves.error ?? t("split.error.failedDefault") };
+    const { runtime, solid, negative, positive, closedHoles } = halves;
+    const normalLength = Math.hypot(...plane.normal);
+    const unit: Vec3 = [plane.normal[0] / normalLength, plane.normal[1] / normalLength, plane.normal[2] / normalLength];
+    const keep = (made: ManifoldSolid) => {
+      created.push(made);
+      return made;
+    };
+    // The cut a hair past `at` on the side that moves, clear of a face lying there (a pocket's floor laid on with a
+    // picked face), drawn out along the normal from `from` over `over` mm and turned back into place.
+    const { onto, back } = rotationOntoZ(unit);
+    const turned = keep(solid.transform(onto));
+    const drawnOut = (at: number, from: number, over: number) => {
+      const section = turned.slice(at + 1e-3);
+      try {
+        if (section.isEmpty() || section.area() <= 1e-9) return null;
+        return keep(keep(keep(section.extrude(over)).translate([0, 0, from])).transform(back));
+      } finally {
+        section.delete();
+      }
+    };
+    let joined: ManifoldSolid;
+    if (length > 0) {
+      const filler = drawnOut(plane.position, plane.position - STRETCH_OVERLAP, length + 2 * STRETCH_OVERLAP);
+      if (!filler) return { parts: null, error: t("split.error.emptyHalf") };
+      const moved = keep(positive.translate([unit[0] * length, unit[1] * length, unit[2] * length]));
+      joined = keep(runtime.Manifold.union([negative, filler, moved]));
+    } else {
+      // Shorter: what lies beyond the slice comes back onto the plane, joined by a hair-thin piece of its own cut face.
+      const cut = -length;
+      const [beyond, slice] = splitByPlaneClearOfFaces(solid, unit, plane.position + cut);
+      keep(beyond);
+      keep(slice);
+      const trimmed = dropSplitSlivers(runtime, beyond);
+      created.push(...trimmed.created);
+      if (!trimmed.solid || trimmed.solid.status() !== "NoError" || trimmed.solid.numTri() < 1) {
+        return { parts: null, error: t("split.error.stretchTooShort") };
+      }
+      const moved = keep(trimmed.solid.translate([-unit[0] * cut, -unit[1] * cut, -unit[2] * cut]));
+      const joint = drawnOut(plane.position + cut, plane.position - STRETCH_OVERLAP, 2 * STRETCH_OVERLAP);
+      joined = keep(runtime.Manifold.union(joint ? [negative, joint, moved] : [negative, moved]));
+    }
+    if (joined.status() !== "NoError" || joined.numTri() < 1) return { parts: null, error: t("split.error.emptyHalf") };
+    const mesh = joined.getMesh();
+    try {
+      const stretched = splitShapeFromWorldPositions(shape, manifoldMeshToPositions(mesh), createLocalId(`${shape.id}-stretched`), shape.name);
+      if (!stretched) return { parts: null, error: t("split.error.store") };
+      return { parts: [canonicalizeShape(stretched)], closedHoles };
+    } finally {
+      disposeManifold(mesh);
+    }
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error ?? "");
+    return { parts: null, error: openHolesError() ?? (message ? t("split.error.kernel", { message }) : t("split.error.kernelUnknown")) };
+  } finally {
+    Array.from(new Set(created)).forEach(disposeManifold);
+  }
+}
+
 /**
  * Where the connectors would go, for the Split panel to show before the cut: what they come to, and their middles in the
  * world - or, for a dovetail, the outlines of its tongues on the plane.
@@ -1028,9 +1148,10 @@ export type SplitShapesOutcome =
     connectors?: SplitConnectorTally;
   };
 
-/** The cut of one target, or `missed` when the plane does not go through it. */
-export async function splitShapeIfCrossed(shape: WorkplaneShape, plane: SplitPlaneArgs, connectors?: SplitConnectorOptions) {
+/** The cut of one target - or with `stretch` the target made that much longer there -, or `missed` when the plane does not go through it. */
+export async function splitShapeIfCrossed(shape: WorkplaneShape, plane: SplitPlaneArgs, connectors?: SplitConnectorOptions, stretch?: number) {
   if (!splitPlaneIntersectsPoints(meshForShape(shape).vertices, plane.normal, plane.position)) return { missed: true as const };
+  if (stretch !== undefined) return stretchShapeByPlane(shape, plane, stretch);
   return splitShapeByPlane(shape, plane, connectors);
 }
 
@@ -1045,14 +1166,16 @@ export async function splitShapesByPlane(
   stillCurrent: () => boolean,
   splitOne: typeof splitShapeIfCrossed = splitShapeIfCrossed,
   connectors?: SplitConnectorOptions,
+  stretch?: number,
 ): Promise<SplitShapesOutcome> {
   const replacements = new Map<string, WorkplaneShape[]>();
   let splitCount = 0;
   let closedHoles = 0;
-  const asked = connectors && connectors.kind !== "none" ? connectors : undefined;
+  // A stretch keeps each body whole, so it takes no connectors.
+  const asked = stretch === undefined && connectors && connectors.kind !== "none" ? connectors : undefined;
   let tally: SplitConnectorTally | undefined = asked ? NO_CONNECTORS : undefined;
   for (const shape of targets) {
-    const result = await splitOne(shape, plane, asked);
+    const result = await splitOne(shape, plane, asked, stretch);
     if ("missed" in result) continue;
     if (!stillCurrent()) return { status: "stale" };
     if (!result.parts) return { status: "failed", shape, error: result.error ?? t("split.error.failedDefault") };

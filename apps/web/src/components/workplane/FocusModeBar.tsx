@@ -1,6 +1,7 @@
 "use client";
 
 import { GripVertical, Minimize2, Search } from "lucide-react";
+import { GuideHelpLink } from "@/components/GuideHelpLink";
 import { t } from "@/lib/i18n";
 import { FOCUS_MODE_SHORTCUT } from "@/lib/focusMode";
 import { useMovablePanel, type MovablePanelOptions } from "@/lib/useMovablePanel";
@@ -95,6 +96,7 @@ export function FocusModeBar({
       <button className="action-icon-button" type="button" aria-label={t("editor.workspaceSettings")} title={t("editor.workspaceSettings")} onClick={onSettings}>
         <ToolbarSettingsIcon />
       </button>
+      <GuideHelpLink section="focusMode" iconSize={17} />
       <button
         className="action-icon-button focus-mode-leave"
         type="button"

@@ -177,6 +177,19 @@ export function snapSplitPositionToVertices(points: readonly Point3[], normal: P
   return snapped;
 }
 
+/**
+ * Where "Align to workplane" puts the plane (#644): through the workplane's origin where that crosses the parts, so a
+ * workplane laid on a face cuts right there; otherwise through their middle. Across the base plate its origin is only
+ * the middle of the plate and says nothing about the parts, so the caller passes `throughOrigin` false there and the
+ * plane goes through their middle (Discussion #1590); the plate's surface is a real level, so Parallel keeps it.
+ */
+export function splitPositionAlongWorkplane(points: readonly Point3[], centered: ModelSplitPlane, workplaneOrigin: Point3, throughOrigin: boolean) {
+  if (!throughOrigin) return centered.position;
+  const through = pointProjection(workplaneOrigin, centered.normal);
+  const crosses = through > centered.min + 1e-6 && through < centered.max - 1e-6;
+  return crosses ? snapSplitPositionToVertices(points, centered.normal, through) : centered.position;
+}
+
 export function splitPlaneIntersectsPoints(points: readonly Point3[], normal: Point3, position: number, tolerance = 1e-5) {
   let below = false;
   let above = false;

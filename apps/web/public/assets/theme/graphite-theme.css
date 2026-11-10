@@ -8620,6 +8620,28 @@ html[data-theme="dark"]:where([data-palette="graphite"]) .property-card .check-p
   background: color-mix(in srgb, var(--sw, #b3711f) 65%, white);
 }
 
+:where(html[data-theme="dark"][data-palette="graphite"]) .property-card {
+  background: rgba(73, 73, 73, 0.07);
+  box-shadow: inset 0 0 0 1px rgba(73, 73, 73, 0.24);
+}
+
+html[data-theme="dark"]:where([data-palette="graphite"]) .property-card {
+  background: rgba(255, 255, 255, 0.06);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.2);
+}
+
+html[data-theme="dark"]:where([data-palette="graphite"]) .select-property select {
+  color: #ededed;
+  background-color: rgba(0, 0, 0, 0.35);
+  border-color: rgba(255, 255, 255, 0.22);
+  box-shadow: none;
+}
+
+html[data-theme="dark"]:where([data-palette="graphite"]) .select-property select option {
+  color: #333333;
+  background-color: #fff;
+}
+
 :where(html[data-theme="dark"][data-palette="graphite"]) .dashboard-welcome-hide {
   color: #717171;
   background: transparent;
@@ -8870,6 +8892,26 @@ html[data-theme="dark"]:where([data-palette="graphite"]) .browser-backup-note {
 
 html[data-theme="dark"]:where([data-palette="graphite"]) .browser-backup-note > svg {
   color: #f3a452;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .browser-backup-note.backed-up {
+  color: #4b4f55;
+  background: #f3f4f5;
+  border-color: #d5d8dc;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .browser-backup-note.backed-up > svg {
+  color: #3f8a55;
+}
+
+html[data-theme="dark"]:where([data-palette="graphite"]) .browser-backup-note.backed-up {
+  color: #c9ccd1;
+  background: #24272b;
+  border-color: #3b4046;
+}
+
+html[data-theme="dark"]:where([data-palette="graphite"]) .browser-backup-note.backed-up > svg {
+  color: #7cc48f;
 }
 
 :where(html[data-theme="dark"][data-palette="graphite"]) .history-view-bar {

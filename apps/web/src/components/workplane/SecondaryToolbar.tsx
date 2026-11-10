@@ -5,7 +5,7 @@ import { FocusModeBar } from "@/components/workplane/FocusModeBar";
 import { FOCUS_MODE_CHANGE_EVENT, FOCUS_MODE_SHORTCUT } from "@/lib/focusMode";
 import { ShapeMenuPanel } from "@/components/workplane/ShapeMenuPanel";
 import { ShapeLibraryList } from "@/components/workplane/ShapeLibraryList";
-import { AlertTriangle, ArrowDownToLine, ArrowLeftRight, ArrowUpFromLine, Check, CircleHelp, Percent, Circle as CircleIcon, Eye, EyeOff, Hexagon as HexagonIcon, ListTree, Maximize2, Minimize2, Pencil, Pentagon as PentagonIcon, Pin, PinOff, Rotate3d, Route as RouteIcon, ScanEye, Search, Square as SquareIcon, Star as StarIcon, Triangle as TriangleIcon, X } from "lucide-react";
+import { AlertTriangle, ArrowDownToLine, ArrowLeftRight, ArrowUpFromLine, Check, CircleHelp, Percent, Circle as CircleIcon, Eye, EyeOff, Hexagon as HexagonIcon, ListTree, Maximize2, Minimize2, Pencil, Pentagon as PentagonIcon, Pin, PinOff, Rotate3d, Route as RouteIcon, ScanEye, Search, Sparkles, Square as SquareIcon, Star as StarIcon, Triangle as TriangleIcon, X } from "lucide-react";
 import { useEffect, useLayoutEffect, useRef, useState, type CSSProperties } from "react";
 import { createPortal } from "react-dom";
 import { useWheelField } from "@/lib/useWheelField";
@@ -389,6 +389,7 @@ export function SecondaryToolbar({
   onTopPanel,
   onAddShape,
   onShortcuts,
+  onWhatsNew,
   onInteractiveHelp,
   interactiveHelpActive,
   onGuide,
@@ -590,6 +591,8 @@ export function SecondaryToolbar({
   onTopPanel: (panel: TopPanel) => void;
   onAddShape: (shape: ShapeAsset) => void;
   onShortcuts: () => void;
+  /** Opens the list of updates over the design (#1530); without it the button and the command are left out. */
+  onWhatsNew?: () => void;
   onInteractiveHelp: () => void;
   interactiveHelpActive: boolean;
   onGuide: () => void;
@@ -1196,6 +1199,7 @@ export function SecondaryToolbar({
     const helpCommands = [
       plain("guide", t("editor.guide"), helpGroup, true, onGuide, { icon: ToolbarGuideIcon }),
       plain("shortcuts", t("editor.keyboardShortcuts"), helpGroup, true, onShortcuts, { icon: ToolbarKeyboardIcon }),
+      ...(onWhatsNew ? [plain("whats-new", t("whatsNew.footerLink"), helpGroup, true, onWhatsNew, { icon: Sparkles })] : []),
       plain("interactive-help", t("interactiveHelp.title"), helpGroup, true, onInteractiveHelp, { icon: CircleHelp, active: interactiveHelpActive }),
     ];
     if (toolbarMode === "sketch") {
@@ -1385,7 +1389,7 @@ export function SecondaryToolbar({
   return (
     <div className="secondary-toolbar">
       {paletteOpen ? <CommandPalette commands={buildPaletteCommands()} onClose={() => setPaletteOpen(false)} /> : null}
-      <div ref={toolbarContentRef} className={`toolbar-mode-content ${toolbarMode}`}>
+      <div ref={toolbarContentRef} className={`toolbar-mode-content ${toolbarMode}${ribbonPinned && !simpleMode ? " ribbon-pinned" : ""}`}>
         {toolbarMode === "geometry" ? (
           <>
       <div className="tool-group left">
@@ -1947,6 +1951,12 @@ export function SecondaryToolbar({
               <button className="action-icon-button" type="button" aria-label={t("editor.guide")} title={t("editor.guide")} onClick={onGuide}>
                 <ToolbarGuideIcon />
               </button>
+              {/* What's new (#1530) beside the guide, so the list of updates can be read without leaving the design. */}
+              {onWhatsNew ? (
+                <button className="action-icon-button" type="button" aria-label={t("whatsNew.footerLink")} title={t("whatsNew.footerLink")} data-layerling-tool="whats-new" onClick={onWhatsNew}>
+                  <Sparkles className="toolbar-search-icon" aria-hidden="true" />
+                </button>
+              ) : null}
               <button className="action-icon-button" type="button" aria-label={t("editor.keyboardShortcuts")} title={t("editor.keyboardShortcuts")} onClick={onShortcuts}>
                 <ToolbarKeyboardIcon />
               </button>

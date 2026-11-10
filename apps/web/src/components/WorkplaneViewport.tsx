@@ -3043,7 +3043,7 @@ export function WorkplaneViewport({
     setMeasureUnit(workspace);
     if (threeRef.current) threeRef.current.palette = appThemePalette(themePreference);
     // Edge lines on all bodies: shapes already built have to take the setting up.
-    const holesChanged = setStrongHoles(workspace.strongHoles);
+    const holesChanged = setStrongHoles(workspace.strongHoles, workspace.holeOpacity);
     if (setEdgeLineStyle(effectiveViewSettings(workspace).edgeLines, workspace.edgeColor) || holesChanged) {
       rebuildShapes(threeRef.current, shapesRef.current, shapeOutlineIds(), modifierActiveRef.current, placementWorkplaneRef.current);
     }
@@ -3340,11 +3340,17 @@ export function WorkplaneViewport({
 
     animate();
     window.addEventListener("resize", state.resize);
+    // The view also changes size without the window doing so: focus mode takes the title row and the footer away
+    // after the browser's resize has passed (F11), or by its button with no resize at all, and the canvas kept its
+    // old height, leaving an empty band at the bottom with the snap grid in it (#1554).
+    const hostObserver = typeof ResizeObserver !== "undefined" ? new ResizeObserver(() => state.resize()) : null;
+    hostObserver?.observe(host);
 
     return () => {
       rememberCameraView(projectIdRef.current, state);
       window.cancelAnimationFrame(state.animationId);
       window.removeEventListener("resize", state.resize);
+      hostObserver?.disconnect();
       state.disposeInteractionListeners();
       state.controls.dispose();
       disposeChildren(state.workplaneLayer);
@@ -9173,7 +9179,7 @@ export function WorkplaneViewport({
           ) : null}
           {rulerDimensionEditing ? (
             <input
-              className="dimension-input"
+              className="dimension-input" autoComplete="off"
               style={{ "--overlay-x": `${rulerDimensionEditing.x}px`, "--overlay-y": `${rulerDimensionEditing.y}px` } as CSSProperties}
               value={rulerDimensionEditing.value}
               autoFocus
@@ -9190,7 +9196,7 @@ export function WorkplaneViewport({
           ) : null}
           {rulerDuplicateEditing ? (
             <input
-              className="dimension-input"
+              className="dimension-input" autoComplete="off"
               style={{ "--overlay-x": `${rulerDuplicateEditing.x}px`, "--overlay-y": `${rulerDuplicateEditing.y}px` } as CSSProperties}
               value={rulerDuplicateEditing.value}
               autoFocus
@@ -9207,7 +9213,7 @@ export function WorkplaneViewport({
           ) : null}
           {rulerCoordinateEditing ? (
             <input
-              className="dimension-input ruler-coordinate-input"
+              className="dimension-input ruler-coordinate-input" autoComplete="off"
               style={{ "--overlay-x": `${rulerCoordinateEditing.x}px`, "--overlay-y": `${rulerCoordinateEditing.y}px` } as CSSProperties}
               value={rulerCoordinateEditing.value}
               autoFocus

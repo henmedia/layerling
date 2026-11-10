@@ -3649,8 +3649,9 @@ html[data-theme="dark"] .cable-channel-status.warning {
   border-color: #b35f07;
 }
 
-/* Four kinds of connector, two to a row, so "Schwalbenschwanz" and the like fit (Discussion #832). */
-.split-connector-control > div {
+/* Four kinds of connector, two to a row, so "Schwalbenschwanz" and the like fit (Discussion #832); Split and Stretch side by side. */
+.split-connector-control > div,
+.split-mode-control > div {
   grid-template-columns: repeat(2, 1fr);
 }
 
@@ -15096,6 +15097,15 @@ html[data-theme="dark"] .grid-settings {
   }
 }
 
+/* "Keep all groups open" folds nothing, so the widths above, worked out for a ribbon that folds, do not hold: between
+   them and the width the open groups need, the browser squeezed the groups below their buttons instead, and Visibility's
+   buttons spilled over Shapes with its name cut off (Jürgen Keller by mail, 10.11.2026, in Safari with its tab bar on
+   the left). Pinned, the groups wrap onto a further row whenever they do not fit, at any width. */
+.toolbar-mode-content.ribbon-pinned {
+  flex-wrap: wrap;
+  height: auto;
+}
+
 /* The 3D ribbon's two wrappers of groups lay their sections out as if they were not there, at every width: each section
    carries its own CSS order (the order set in the settings, lib/ribbonOrder.ts), and a group may stand in either wrapper's
    place. */
@@ -17830,4 +17840,30 @@ html[data-theme="dark"] .property-card .check-property input[type="checkbox"]:ch
 }
 html[data-theme="dark"] .property-card .check-property input[type="checkbox"]:checked::after {
   background: color-mix(in srgb, var(--sw, #b3711f) 65%, white);
+}
+
+/* The other cards of the inspector (Wrap around a cylinder, Surface texture, ...) are tiles of the same shape in a
+   neutral colour, so that the colours stay the signs of the object's own sections. The coloured sections above are
+   more specific and keep theirs. */
+.property-card {
+  background: rgba(93, 71, 49, 0.07);
+  box-shadow: inset 0 0 0 1px rgba(93, 71, 49, 0.24);
+}
+html[data-theme="dark"] .property-card {
+  background: rgba(255, 255, 255, 0.06);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.2);
+}
+
+/* Choice fields in the dark theme: the closed field is dark like the number fields beside it. The list that opens
+   keeps the light colour scheme (see .select-property select above, the Chrome-on-Linux hover fix), and its
+   options say their colours outright, dark text on a light ground, so the row under the pointer stays readable. */
+html[data-theme="dark"] .select-property select {
+  color: #f1eee9;
+  background-color: rgba(0, 0, 0, 0.35);
+  border-color: rgba(255, 255, 255, 0.22);
+  box-shadow: none;
+}
+html[data-theme="dark"] .select-property select option {
+  color: #3b2f22;
+  background-color: #fff;
 }

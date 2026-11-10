@@ -79,6 +79,7 @@ import { exportLylProject, importLylProject, inspectLylProjectPackage, LYL_CREAT
 import { relieveOverFineCadMeshes, type RemeshCadBrep } from "@/lib/cadMeshRelief";
 import { backupDesignAlreadyThere, backupEntryPaths, backupFileName, backupFolderPaths, backupNamePrefix, backupThumbnailPath, unpackBackupFolders, isBackupFileName, createBackupWriter, unpackBackup, zipHoldsDesigns } from "@/lib/projectBackup";
 import { CUSTOM_SHAPES_FOLDER } from "@/lib/customShapesServer";
+import { backupNoteState, readLastFullBackup, rememberFullBackup } from "@/lib/backupState";
 import { downloadBackup, pngDataUrl, projectThumbnailBlob, projectThumbnailPngBytes, serverCustomShapesBackupEntries, writeServerBackup } from "@/lib/backupDownload";
 import { customShapesBackupEntries, restoreCustomShapesFromBackup } from "@/lib/myShapes";
 import { SHARED_PROJECTS_ENDPOINT } from "@/lib/sharedProjectsEndpoint";
@@ -330,6 +331,12 @@ function formatUpdated(timestamp: number, language: Language) {
   if (age < 3_600_000) return t("dashboard.minutesAgo", { count: Math.max(1, Math.round(age / 60_000)) });
   if (age < 86_400_000) return t("dashboard.today");
   return new Intl.DateTimeFormat(language, { month: "short", day: "numeric" }).format(new Date(timestamp));
+}
+
+/** The last backup's time for the notice over the designs: day and clock, the year only when it is another one. */
+function formatBackupTime(timestamp: number, language: Language) {
+  const sameYear = new Date(timestamp).getFullYear() === new Date().getFullYear();
+  return new Intl.DateTimeFormat(language, { year: sameYear ? undefined : "numeric", month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" }).format(new Date(timestamp));
 }
 
 function projectShapeCacheEntry(
@@ -988,6 +995,9 @@ export default function Home() {
   const [themePreference, setThemePreference] = useState<AppThemePreference>("system");
   const [resolvedTheme, setResolvedTheme] = useState<ResolvedAppTheme>("light");
   const [dashboardNotice, setDashboardNotice] = useState("");
+  // When "Back up all" last took every design of this browser, for the notice over them; read once on the page.
+  const [lastFullBackup, setLastFullBackup] = useState<number | null>(null);
+  useEffect(() => setLastFullBackup(readLastFullBackup()), []);
   // A design left with nothing in it, waiting for an answer on whether it stays.
   const [emptyProjectPromptId, setEmptyProjectPromptId] = useState<string | null>(null);
   const [sharedProjects, setSharedProjects] = useState<SharedProject[]>([]);
@@ -2330,6 +2340,8 @@ export default function Home() {
     const single = scope && "designIds" in scope && designs.length === 1 ? designs[0] : undefined;
     const named = folder?.name ?? single?.name;
     const suggestedName = backupFileName(new Date(), named ? backupNamePrefix(named) : undefined);
+    // A design changed while the backup runs may not be in it, so the backup counts from when it began.
+    const startedAt = Date.now();
     if (scope && designs.length === 0) {
       setDashboardNotice(t("notice.backupEmpty"));
       return;
@@ -2385,6 +2397,10 @@ export default function Home() {
       const fileName = target.fileName;
       writeBackupProgress(null);
       const saved = designs.length - skipped.length;
+      if (!scope && skipped.length === 0 && designs.length > 0) {
+        rememberFullBackup(startedAt);
+        setLastFullBackup(startedAt);
+      }
       const done = shapeCount
         ? t("notice.backupDoneWithShapes", { count: saved, shapes: shapeCount, name: fileName })
         : t("notice.backupDone", { count: saved, name: fileName });
@@ -2952,6 +2968,7 @@ export default function Home() {
           visibleFolders={visibleFolders}
           openFolderId={openFolderId}
           localDesigns={localDesigns}
+          lastFullBackup={lastFullBackup}
           onOpenFolder={(folderId) => {
             setOpenFolderId(folderId);
             setDashboardNotice("");
@@ -3180,6 +3197,7 @@ function Dashboard({
   visibleFolders,
   openFolderId,
   localDesigns,
+  lastFullBackup,
   onOpenFolder,
   onCreateFolder,
   onRenameFolder,
@@ -3245,6 +3263,8 @@ function Dashboard({
   openFolderId: string | null;
   /** The designs a folder counts. */
   localDesigns: DashboardProject[];
+  /** When "Back up all" last took all of them, or null. */
+  lastFullBackup: number | null;
   onOpenFolder: (folderId: string | null) => void;
   onCreateFolder: (name: string) => void;
   onRenameFolder: (folderId: string, name: string) => void;
@@ -3307,6 +3327,7 @@ function Dashboard({
   const language = useLanguage();
   // Without a server there are only the browser's designs. When every new design must go to the server and this
   // browser holds none of its own, there are only the server's.
+  const backupNote = useMemo(() => backupNoteState(localDesigns, lastFullBackup), [localDesigns, lastFullBackup]);
   const showBrowserTab = !sharedProjectsEnabled || !newDesignsOnServerLocked || localDesigns.length > 0;
   const activeSection: DashboardSection = !sharedProjectsEnabled ? "home" : showBrowserTab ? dashboardSection : "shared";
   const offlineOk = useOfflineAvailable();
@@ -4113,7 +4134,7 @@ function Dashboard({
             </>
           ) : (
             <>
-              {localDesigns.length > 0 ? <BrowserBackupNote /> : null}
+              {localDesigns.length > 0 ? <BrowserBackupNote state={backupNote} when={backupNote.kind === "never" ? "" : formatBackupTime(backupNote.at, language)} /> : null}
               <div className="design-tab-trail">
                 {/* Inside a folder the line under the tabs is the way back: every step a
                     button, and a place to drop a design or a folder on (#496). */}
