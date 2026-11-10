@@ -28,6 +28,7 @@ import { planarMeshFaces } from "@/lib/cadPlanarMesh";
 import { EXACT_MESH_FAILED_MESSAGE, exactMeshFreeformShare, exactSolidFromMesh, type ExactMeshReport } from "@/lib/cadMeshExact";
 import { cadFlatFaceMeshStraysFromOutline } from "@/lib/cadFaceOutline";
 import { buildMessage } from "@/lib/buildStamp";
+import { announceKernel, isWarmKernelMessage, kernelStatusMessage } from "@/lib/cadKernelGate";
 import { CAD_MODIFIER_KERNEL_RESTART_MESSAGE, CAD_MODIFIER_RUNTIME_BASE, VARIABLE_FILLET_ONE_EDGE_MESSAGE, cadModifierCappedDeflection, cadModifierTessellationDeflection, cadModifierTopologyEdgeIsSelectable, applyCadTransform, isCadModifierKernelExhausted, isCadModifierWasmMemoryFault } from "@/lib/cadModifierRuntime";
 import { isKernelMemoryFault } from "@/lib/kernelFault";
 import { tightBendMessage, tightestOutsideBend } from "@/lib/cadTightBends";
@@ -68,13 +69,14 @@ function kernel() {
   // fetching the 22 MB wasm) can be retried on the next call instead of
   // poisoning edge treatment for the rest of the session - same fix as
   // brepKernel.ts's loadBrepWithOcct.
-  kernelPromise ??= import(/* webpackIgnore: true */ moduleUrl).then((imported: { default: OcctModuleFactory }) => OcctKernel.init({
+  // The page starts the clock for its requests only once this says the kernel is loaded (#1612).
+  kernelPromise ??= announceKernel(import(/* webpackIgnore: true */ moduleUrl).then((imported: { default: OcctModuleFactory }) => OcctKernel.init({
     createModule: imported.default,
     wasm: `${CAD_MODIFIER_RUNTIME_BASE}/occt-wasm.wasm`,
   })).catch((error) => {
     kernelPromise = null;
     throw error;
-  });
+  }), (message) => self.postMessage(message));
   return kernelPromise;
 }
 
@@ -1361,6 +1363,16 @@ async function bearbeiteAnfrage(request: CadModifierWorkerRequest, halter: { cad
 }
 
 self.onmessage = async (event: MessageEvent<CadModifierWorkerRequest>) => {
+  // Loaded ahead, so the first tool does not wait for the 21 MB download (#1612).
+  if (isWarmKernelMessage(event.data)) {
+    try {
+      await kernel();
+    } catch {
+      // Without WebAssembly SIMD kernel() throws before it starts loading; the page must still hear it.
+      self.postMessage(kernelStatusMessage("failed"));
+    }
+    return;
+  }
   const request = event.data;
   const halter: { cad: OcctKernel | null } = { cad: null };
   let error: unknown = null;

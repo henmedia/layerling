@@ -1,6 +1,7 @@
 
 import { t } from "@/lib/i18n";
 import { isBuildMessage, reportWorkerBuild } from "@/lib/buildStamp";
+import { createKernelGate, isKernelStatusMessage, type KernelGate } from "@/lib/cadKernelGate";
 import { cloneSketchProfile } from "@/lib/sketchSmoothHandles";
 import { canonicalizeShape, cleanNearZero, shapeDepth, shapeWidth } from "@/lib/workplaneShapes";
 import { SKETCH_CAD_DEFLECTION } from "@/lib/cadModifierRuntime";
@@ -26,40 +27,49 @@ export function emptySketchProfile(): SketchProfile {
 }
 
 let sketchCadWorker: Worker | null = null;
+let sketchCadGate: KernelGate | null = null;
 
 let sketchCadRequestId = 0;
 
 const sketchCadPending = new Map<number, {
   resolve: (response: SketchCadBuildResponse) => void;
   reject: (error: Error) => void;
-  timer: number;
+  cancelTimer: () => void;
 }>();
 
 function ensureSketchCadWorker() {
   if (sketchCadWorker) return sketchCadWorker;
   const worker = new Worker(new URL("../workers/sketchCad.worker.ts", import.meta.url), { type: "module" });
+  const gate = createKernelGate();
   worker.onmessage = (event: MessageEvent<SketchCadBuildResponse>) => {
     if (isBuildMessage(event.data)) {
       reportWorkerBuild(event.data);
       return;
     }
+    if (isKernelStatusMessage(event.data)) {
+      gate.open();
+      return;
+    }
     const pending = sketchCadPending.get(event.data.requestId);
     if (!pending) return;
-    window.clearTimeout(pending.timer);
+    pending.cancelTimer();
     sketchCadPending.delete(event.data.requestId);
     pending.resolve(event.data);
   };
   worker.onerror = () => {
     sketchCadPending.forEach((pending) => {
-      window.clearTimeout(pending.timer);
+      pending.cancelTimer();
       // Most often the page outlived an update and its worker file is gone.
       pending.reject(new Error(t("edge.errorWorkerFailed")));
     });
     sketchCadPending.clear();
     worker.terminate();
+    gate.dispose();
     sketchCadWorker = null;
+    sketchCadGate = null;
   };
   sketchCadWorker = worker;
+  sketchCadGate = gate;
   return worker;
 }
 
@@ -71,22 +81,32 @@ const SKETCH_SWEEP_TIMEOUT_MS = 120_000;
  * One build on the sketch worker. When it takes too long the worker is stopped, not left to finish: it
  * worked on in the background, and the next try waited behind it and timed out as well (#884). Every
  * build still waiting on it is answered with the same message; the next one starts a fresh worker.
+ * The time counts from when the worker's kernel is loaded, not from its download (#1612).
  */
 function requestSketchCad(message: Record<string, unknown>, timeoutMs = SKETCH_CAD_TIMEOUT_MS) {
   const worker = ensureSketchCadWorker();
+  const gate = sketchCadGate;
   const requestId = ++sketchCadRequestId;
   return new Promise<SketchCadBuildResponse>((resolve, reject) => {
-    const timer = window.setTimeout(() => {
+    const giveUp = () => {
       const error = new Error(t("sketch.cadTimedOut"));
       sketchCadPending.forEach((pending) => {
-        window.clearTimeout(pending.timer);
+        pending.cancelTimer();
         pending.reject(error);
       });
       sketchCadPending.clear();
       worker.terminate();
-      if (sketchCadWorker === worker) sketchCadWorker = null;
-    }, timeoutMs);
-    sketchCadPending.set(requestId, { resolve, reject, timer });
+      gate?.dispose();
+      if (sketchCadWorker === worker) {
+        sketchCadWorker = null;
+        sketchCadGate = null;
+      }
+    };
+    const cancelTimer = gate ? gate.timeout(giveUp, timeoutMs) : (() => {
+      const timer = window.setTimeout(giveUp, timeoutMs);
+      return () => window.clearTimeout(timer);
+    })();
+    sketchCadPending.set(requestId, { resolve, reject, cancelTimer });
     worker.postMessage({ ...message, requestId });
   });
 }
