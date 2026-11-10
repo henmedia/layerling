@@ -268,8 +268,10 @@ export type ShapeCustomization = {
   hingeKnuckleWidth?: number;
   /** Hinge, cone style: the diameter of the cones at their root in mm; left out, the largest that fits (#907). */
   hingeConeSize?: number;
-  /** Hinge: "pin" (default) or "cone": cones on every other knuckle that nest into the others, printing without bridges (#907). */
-  hingeStyle?: "pin" | "pinless" | "cone" | "liftOff";
+  /** Hinge: "pin" (default) or "cone": cones on every other knuckle that nest into the others, printing without bridges (#907); "snap": B's knuckles are open clips that snap over A's pin (#1520). */
+  hingeStyle?: "pin" | "pinless" | "cone" | "liftOff" | "snap";
+  /** Hinge, snap style: how much narrower the clips' opening is than the pin in mm; left out, 0.3 (#1520). */
+  hingeSnapGrip?: number;
   /** Hinge: diameter of the pin in mm; the other part's bore is wider by the clearance. */
   hingePinDiameter?: number;
   /** Hinge: thickness of the two leaves in mm. */
@@ -1189,8 +1191,10 @@ export type WorkplaneShape = {
   hingeKnuckleWidth?: number;
   /** Hinge, cone style: the diameter of the cones at their root in mm; left out, the largest that fits (#907). */
   hingeConeSize?: number;
-  /** Hinge: "pin" (default) or "cone": cones on every other knuckle that nest into the others, printing without bridges (#907). */
-  hingeStyle?: "pin" | "pinless" | "cone" | "liftOff";
+  /** Hinge: "pin" (default) or "cone": cones on every other knuckle that nest into the others, printing without bridges (#907); "snap": B's knuckles are open clips that snap over A's pin (#1520). */
+  hingeStyle?: "pin" | "pinless" | "cone" | "liftOff" | "snap";
+  /** Hinge, snap style: how much narrower the clips' opening is than the pin in mm; left out, 0.3 (#1520). */
+  hingeSnapGrip?: number;
   /** Hinge: diameter of the pin in mm; the other part's bore is wider by the clearance. */
   hingePinDiameter?: number;
   /** Hinge: thickness of the two leaves in mm. */
