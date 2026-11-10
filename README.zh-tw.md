@@ -280,7 +280,7 @@ docker run -d --name layerling -p 3000:3000 -v layerling-thumbnails:/app/.codex/
 要在網路上安裝並離線使用，請透過 https 提供靜態匯出；要在容器前面加上一個 https 位址，可使用 Caddy 或帶憑證
 （例如來自 mkcert）的 nginx 之類反向代理。
 
-該映像在正式模式下執行 `next start`，所以除非你開啟它，MCP 橋接在那裡是關閉的（見[讓 AI 用戶端存取 NAS 或伺服器上的副本](#讓-ai-用戶端存取-nas-或伺服器上的副本)）。要提供共用專案資料夾，請綁定一個可寫入的目錄，
+該映像在正式模式下執行 `node apps/web/server.js`，所以除非你開啟它，MCP 橋接在那裡是關閉的（見[讓 AI 用戶端存取 NAS 或伺服器上的副本](#讓-ai-用戶端存取-nas-或伺服器上的副本)）。要提供共用專案資料夾，請綁定一個可寫入的目錄，
 並在 `compose.yml` 中把 `LAYERLING_SHARED_PROJECTS_DIR` 設為它在容器內的掛載路徑，例如 `./shared-projects:/shared-projects`
 搭配 `LAYERLING_SHARED_PROJECTS_DIR: "/shared-projects"`（見[網路上的共用設計](#網路上的共用設計)）。容器以 UID 999 的身分執行，所以必須允許該使用者寫入這個資料夾：`sudo chown 999:999 ./shared-projects`，或給服務加上
 `user: "1000:1000"`（換成你自己的使用者和群組編號，`id -u` 和 `id -g` 可查看），讓容器以你的身分執行。不加的話，
