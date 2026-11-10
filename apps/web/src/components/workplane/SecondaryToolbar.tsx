@@ -963,7 +963,7 @@ export function SecondaryToolbar({
   // The simple mode (#695) shows the tools of a workshop only; the others stay in the lists the command search and the keys read.
   const profile = getEditorProfile();
   const availableInRibbon = (id: string) => profileToolVisible(profile, id, !simpleMode || simpleModeKeepsTool(id));
-  const inSimpleMode = <T extends { id: string }>(tools: T[]) => shownInRibbon(tools.filter(({ id }) => availableInRibbon(id)), ribbonHidden);
+  const shownLayoutTools = <T extends { id: string }>(tools: T[]) => shownInRibbon(tools.filter(({ id }) => availableInRibbon(id)), ribbonHidden);
   const shownShapeAssets = simpleMode ? libraryShapeAssets.filter((shape) => simpleModeKeepsShape(shape.id)) : libraryShapeAssets;
   const leftTools = [
     { id: "copy", label: t("editor.tool.copy"), icon: ToolbarCopyIcon, action: onCopy, enabled: hasSelection, needs: need("selection") },
@@ -1315,15 +1315,15 @@ export function SecondaryToolbar({
   // The profile and the mode define the available tools. Personal ribbon settings can hide or reorder those tools.
   const clipboardTools = leftTools.slice(0, 4).filter(({ id }) => profileToolVisible(profile, id, true));
   const clipboardShown = shownInRibbon(ordered("clipboard", clipboardTools), ribbonHidden);
-  const historyShown = inSimpleMode(ordered("history", leftTools.slice(4)));
+  const historyShown = shownLayoutTools(ordered("history", leftTools.slice(4)));
   const visibilityShown = shownInRibbon(ordered("visibility", visibilityTools), ribbonHidden);
-  const combineShown = inSimpleMode(ordered("combine", combineTools));
+  const combineShown = shownLayoutTools(ordered("combine", combineTools));
   // Modify's four groups (#1551), each with the tools of its section.
   const modifyGroups = MODIFY_SECTIONS.map(([section, group, labelKey, priority]) => {
     const tools = modifyTools.filter((tool) => tool.section === section);
-    return { section, group, label: t(labelKey), priority, tools, shown: inSimpleMode(ordered(group, tools)) };
+    return { section, group, label: t(labelKey), priority, tools, shown: shownLayoutTools(ordered(group, tools)) };
   });
-  const arrangeShown = inSimpleMode(ordered("arrange", arrangeTools));
+  const arrangeShown = shownLayoutTools(ordered("arrange", arrangeTools));
   const fileToolsShipped = [
     ...(profileToolVisible(profile, "import", !simpleMode) ? [{ id: "import", label: t("editor.import") }] : []),
     { id: "export", label: t("editor.export") },
