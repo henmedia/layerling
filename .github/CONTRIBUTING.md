@@ -25,6 +25,12 @@ The app runs at `http://127.0.0.1:3000/` by default.
 - Include screenshots or short recordings for UI changes when possible.
 - Call out changes to storage, import, export, grouping, or undo/redo behavior.
 
+## Editor Profiles for Tools
+
+If a host needs to tailor a tool for a workshop or a similar setting, the tool can expose its
+settings through an [editor profile](../README.md#editor-profiles). See
+[Fillet in the example profile](../docs/examples/editor-profile.json) for a working example.
+
 ## Areas That Need Care
 
 - STL import/export
