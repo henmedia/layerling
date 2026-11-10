@@ -415,11 +415,11 @@ export type TransformOverlayState = {
   slideHandles: Array<{ key: string; className: string; x: number; y: number; angle: number; title: string }>;
   dimensions: Record<string, DimensionMark[]>;
   /**
-   * Handle keys whose dimension marks stay on screen for a single selected
-   * shape as soon as it is selected. Filled when the workspace setting
+   * Handle keys whose dimension marks stay on screen as soon as a shape, or
+   * several of them, is selected. Filled when the workspace setting
    * dimensionsAlwaysVisible is on: width, depth and height (diameter and
-   * height for a cylinder), each on the side of the shape facing the camera.
-   * Empty when that setting is off, or when more than one shape is selected.
+   * height for a cylinder), each on the side of the selection facing the
+   * camera. Empty when that setting is off.
    */
   alwaysVisibleDimensionKeys: string[];
   rotationWheel: RotationWheelView | null;

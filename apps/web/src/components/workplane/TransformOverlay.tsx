@@ -99,7 +99,7 @@ export function TransformOverlay({
   onCommitRotationEdit,
   onCancelRotationEdit,
 }: TransformOverlayProps) {
-  // With no handle hovered or pinned, a lone selection shows the marks listed
+  // With no handle hovered or pinned, the selection shows the marks listed
   // in alwaysVisibleDimensionKeys. That list is filled when "Dimensions always
   // visible" is on, so the marks appear as soon as the shape is selected.
   const rootRef = useRef<HTMLDivElement>(null);

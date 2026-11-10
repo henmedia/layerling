@@ -726,11 +726,12 @@ export function syncTransformOverlay(
 
   // Which mid-edge handle sits on the side of the shape currently facing the
   // camera - same sign convention as showLowerHandles above, so always-visible
-  // dimension labels for a lone selection land on a readable, visible face.
+  // dimension labels land on a readable, visible face. A selection of several bodies shows its
+  // box's marks too, as a group of them does (#1574).
   const cameraView = state.camera.position.clone().sub(frame.center);
   const widthMidHandleKey = cameraView.dot(xFootAxis) >= 0 ? "right-mid" : "left-mid";
   const depthMidHandleKey = cameraView.dot(zFootAxis) >= 0 ? "near-mid" : "far-mid";
-  const alwaysVisibleDimensionKeys = dimensionsAlwaysVisible && frame.singleShape
+  const alwaysVisibleDimensionKeys = dimensionsAlwaysVisible
     ? alwaysVisibleDimensionKeysFor(isCircularFootprint, lift.elevation, { width: widthMidHandleKey, depth: depthMidHandleKey, height: heightHandleKey, lift: liftHandleKey })
     : [];
 

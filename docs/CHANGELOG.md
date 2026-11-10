@@ -6,6 +6,8 @@ code still carries it - so a lower number further down is older, not newer.
 
 ## Unreleased
 
+- **Dimensions always visible: also for several selected parts (Discussion #1574):** With the setting on, the width, depth and height stood beside the selection only when it was a single part or a group; for several parts selected together they showed only while a handle was hovered. They now stand there for those too, and can be clicked and typed in as before. Suggested by @christievans-pixel in #1574.
+
 - **Face tool: a face pushed out no longer leaves a rim (#1577):** Pushed out, the new part started 0.2 mm inside the body, so it would surely join it. Where the side walls lean in over the face, as on a cylinder narrower at the top whose bottom is pushed down, that part stood out of the walls as a flat rim, and the new part was 0.2 mm taller than its depth. It now starts on the face and is exactly as tall as the depth; the body and the new part still join into one piece. A pocket keeps its little reach out of the face. Reported by @MethylBromide in #1577.
 
 - **Revolve sketch: no ghost shape when editing (Discussion #1575):** A revolved body opened again with Sketch > Edit opens on a workplane at the height where it starts. When that was above the plate, the sketch drew where this level plane cut the bodies around it, so a filled outline seen from above (an octagon with a round hole, in the report) lay behind the side view, although a revolve sketch shows the bodies from the front. The level cuts are now left out of a revolve sketch, as a new revolve sketch on the plate never had them; the body itself was never affected. Reported by @Cowski4444 in #1575.
