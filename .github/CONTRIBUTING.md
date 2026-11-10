@@ -25,6 +25,24 @@ The app runs at `http://127.0.0.1:3000/` by default.
 - Include screenshots or short recordings for UI changes when possible.
 - Call out changes to storage, import, export, grouping, or undo/redo behavior.
 
+## Editor Profiles for Tools
+
+When adding a tool or a tool option, make it individually configurable through the versioned
+[editor profile](../README.md#editor-profiles). Existing tools can adopt the same rules one at a time.
+
+- Give each tool a stable ID and let the profile show or hide its editor controls independently.
+  A visible tool still follows the usual selection and availability rules.
+- Give each user-facing dialog option a stable ID under its tool. Support hiding the option and,
+  for options with a value, a typed starting value. Validate profile values with the same rules
+  the tool uses for its own inputs.
+- Document how profile defaults interact with remembered settings. If an option supports a lock,
+  require a valid explicit value and let the lock take precedence over the remembered setting.
+- Keep the existing behavior when the profile omits the tool or option. Test the normal workflow
+  without a profile, the profile override, and any interaction with remembered settings.
+
+See [Fillet in the example profile](../docs/examples/editor-profile.json) and the
+[profile tests](../tests/unit/editorProfile.test.ts) for the current pattern.
+
 ## Areas That Need Care
 
 - STL import/export

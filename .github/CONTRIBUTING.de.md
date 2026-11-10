@@ -25,6 +25,28 @@ Die App läuft standardmäßig unter `http://127.0.0.1:3000/`.
 - Füge bei Änderungen an der Oberfläche nach Möglichkeit Bildschirmfotos oder kurze Aufnahmen bei.
 - Weise auf Änderungen an Speicherung, Import, Export, Gruppierung oder Rückgängig/Wiederholen ausdrücklich hin.
 
+## Editor-Profile für Werkzeuge
+
+Jedes neue Werkzeug und jede neue Werkzeugoption muss sich einzeln über das versionierte
+[Editor-Profil](../README.md#editor-profiles) konfigurieren lassen. Bestehende Werkzeuge können
+diese Regeln nach und nach übernehmen.
+
+- Gib jedem Werkzeug eine stabile ID. Seine Bedienelemente sollen sich per Profil einzeln ein-
+  und ausblenden lassen. Für sichtbare Werkzeuge gelten weiterhin die üblichen Voraussetzungen,
+  etwa eine passende Auswahl.
+- Gib jeder Option im Werkzeugdialog eine stabile ID unter ihrem Werkzeug. Die Option soll sich
+  ausblenden lassen. Hat sie einen Wert, soll sich ein typgeprüfter Startwert vorgeben lassen.
+  Prüfe Profilwerte nach denselben Regeln wie Eingaben im Werkzeug.
+- Dokumentiere, wie Profilvorgaben mit gemerkten Einstellungen zusammenspielen. Lässt sich
+  eine Option sperren, braucht die Sperre einen ausdrücklich gesetzten gültigen Wert und hat
+  Vorrang vor der gemerkten Einstellung.
+- Wenn das Profil ein Werkzeug oder eine Option auslässt, bleibt das bisherige Verhalten erhalten.
+  Teste den normalen Ablauf ohne Profil, die Profilvorgabe und gegebenenfalls das Zusammenspiel
+  mit gemerkten Einstellungen.
+
+Als Vorlage dienen [Abrunden im Beispielprofil](../docs/examples/editor-profile.json) und die
+[Profil-Tests](../tests/unit/editorProfile.test.ts).
+
 ## Bereiche, die Sorgfalt verlangen
 
 - STL-Import und -Export
