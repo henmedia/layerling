@@ -284,7 +284,7 @@ docker run -d --name layerling -p 3000:3000 -v layerling-thumbnails:/app/.codex/
 要在网络上安装并离线使用，请通过 https 提供静态导出；要给容器前置一个 https 地址，可使用 Caddy 或带证书
 （例如来自 mkcert）的 nginx 之类反向代理。
 
-该镜像在生产模式下运行 `next start`，所以除非你打开它，MCP 桥接在那里是关闭的（见[让 AI 客户端访问 NAS 或服务器上的副本](#让-ai-客户端访问-nas-或服务器上的副本)）。要提供共享项目文件夹，请绑定一个可写目录，
+该镜像在生产模式下运行 `node apps/web/server.js`，所以除非你打开它，MCP 桥接在那里是关闭的（见[让 AI 客户端访问 NAS 或服务器上的副本](#让-ai-客户端访问-nas-或服务器上的副本)）。要提供共享项目文件夹，请绑定一个可写目录，
 并在 `compose.yml` 中把 `LAYERLING_SHARED_PROJECTS_DIR` 设为它在容器内的挂载路径，例如 `./shared-projects:/shared-projects`
 搭配 `LAYERLING_SHARED_PROJECTS_DIR: "/shared-projects"`（见[网络上的共享设计](#网络上的共享设计)）。容器以编号 999
 的用户运行，所以必须允许该用户写入这个文件夹：`sudo chown 999:999 ./shared-projects`，或者给服务加上

@@ -279,7 +279,7 @@ Befehle im Alltag:
 - **Wieder starten:** `docker compose -f docker/compose.yml up -d`
 - **Aktualisieren** (nach `git pull` oder neuem ZIP): `docker compose -f docker/compose.yml up -d --build`; mit dem fertigen Image `docker compose -f docker/compose.yml pull` und danach `up -d`
 
-Das Image führt `next start` im Produktionsmodus aus, die MCP-Brücke ist dort also aus, solange du sie nicht einschaltest (siehe [Eine KI an eine Kopie auf NAS oder Server lassen](#eine-ki-an-eine-kopie-auf-nas-oder-server-lassen)). Für einen
+Das Image führt `node apps/web/server.js` im Produktionsmodus aus, die MCP-Brücke ist dort also aus, solange du sie nicht einschaltest (siehe [Eine KI an eine Kopie auf NAS oder Server lassen](#eine-ki-an-eine-kopie-auf-nas-oder-server-lassen)). Für einen
 gemeinsamen Projektordner ein beschreibbares Verzeichnis einbinden und in `compose.yml` `LAYERLING_SHARED_PROJECTS_DIR`
 auf den Pfad im Container setzen, an dem es eingebunden ist, etwa `./shared-projects:/shared-projects` mit
 `LAYERLING_SHARED_PROJECTS_DIR: "/shared-projects"` (siehe [Gemeinsame Entwürfe im Netz](#gemeinsame-entwürfe-im-netz)).
