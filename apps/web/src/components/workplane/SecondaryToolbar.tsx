@@ -1389,7 +1389,7 @@ export function SecondaryToolbar({
   return (
     <div className="secondary-toolbar">
       {paletteOpen ? <CommandPalette commands={buildPaletteCommands()} onClose={() => setPaletteOpen(false)} /> : null}
-      <div ref={toolbarContentRef} className={`toolbar-mode-content ${toolbarMode}`}>
+      <div ref={toolbarContentRef} className={`toolbar-mode-content ${toolbarMode}${ribbonPinned && !simpleMode ? " ribbon-pinned" : ""}`}>
         {toolbarMode === "geometry" ? (
           <>
       <div className="tool-group left">
