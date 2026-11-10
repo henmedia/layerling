@@ -1699,15 +1699,14 @@ export function syncCornerRulerToolOverlay(
 
       const labels: CornerRulerLabelScreen[] = [];
       const buildTicks = (axisDir: THREE.Vector3, acrossDir: THREE.Vector3, length: number) => {
-        cornerRulerTicks(length).forEach((tick) => {
+        cornerRulerTicks(length, currentLengthUnitLabel()).forEach((tick) => {
           const base = corner.clone().addScaledVector(axisDir, tick.offset);
-          const tickHeight = armWidth * (tick.isTen ? 0.62 : tick.isFive ? 0.42 : 0.26);
-          pushSegment(lines.ticks, base, base.clone().addScaledVector(acrossDir, tickHeight));
-          if (tick.isTen && tick.offset > 0) {
+          pushSegment(lines.ticks, base, base.clone().addScaledVector(acrossDir, armWidth * tick.height));
+          if (tick.label) {
             const labelWorld = base.clone().addScaledVector(acrossDir, armWidth * 0.95);
             if (depthInFrontOfCamera(labelWorld, state) > 0) {
               const labelScreen = projectToScreen(labelWorld, state);
-              labels.push({ x: labelScreen.x, y: labelScreen.y, text: String(tick.offset), hidden: occlude && worldPointHidden(labelWorld, state) });
+              labels.push({ x: labelScreen.x, y: labelScreen.y, text: tick.label, hidden: occlude && worldPointHidden(labelWorld, state) });
             }
           }
         });
