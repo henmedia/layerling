@@ -6,6 +6,8 @@ code still carries it - so a lower number further down is older, not newer.
 
 ## Unreleased
 
+- **Start script: finds Node.js right after it was installed (Discussion #1546):** Started from a window that was open before Node.js was installed - by winget, or by an AI setting layerling up - `Start layerling` stopped at "npm was not found", because that window did not know the new PATH yet. It now reads the PATH afresh from the system and user settings, as a new window would, and says so clearly if Node.js is really missing. Reported by @uninteressant2026 in #1546.
+
 ## 1.156.2
 
 - **Stretch: make a part longer in one place (Discussions #506, #1569):** The Split tool has a second mode beside Split in two. Place the plane as for a split, through the part that may grow, and type how much longer it should get: the part on the side the arrow points to moves that far away, and the cut through the body at the plane, drawn out over that length, fills the gap. So a case downloaded without its CAD file gets a longer compartment through its straight walls, while the other compartments, rounded corners and holes keep their size - before, that took two splits, scaling the middle piece and grouping again. A minus value makes it shorter: a slice that thick comes out on the arrow's side and the rest moves back. Every object the plane crosses stays one closed body under its own name, a mesh like the halves of a split, in one undo step. `layerling_split_objects` takes it as `stretch`. Asked for by @ckotchey in #506 and @minig0d in #1569.
