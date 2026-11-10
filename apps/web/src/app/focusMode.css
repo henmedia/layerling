@@ -79,6 +79,36 @@ html[data-theme="dark"] .toolbar-focus-mode.action-icon-button:hover {
   color: inherit;
 }
 
+/* One size for every mark in the bar. The title row sizes its icons by rules of its own (.toolbar-title-home,
+   .toolbar-title-help), which do not reach here, so the house, the magnifier and the cog came out at the ribbon's
+   size beside a small question mark and arrows. */
+.focus-mode-bar .action-icon-button svg,
+.focus-mode-bar .guide-help-link svg {
+  width: 20px;
+  height: 20px;
+}
+
+.focus-mode-bar .editor-home-control svg {
+  width: 22px;
+  height: 22px;
+}
+
+.focus-mode-bar .guide-help-link {
+  width: 32px;
+  height: 30px;
+  align-self: center;
+  color: #634729;
+  opacity: 1;
+}
+
+.focus-mode-bar .guide-help-link:hover {
+  color: var(--group-help);
+}
+
+html[data-theme="dark"] .focus-mode-bar .guide-help-link {
+  color: #e3d3c0;
+}
+
 .focus-mode-bar .action-icon-button:hover:not(:disabled) {
   color: var(--group-help);
 }

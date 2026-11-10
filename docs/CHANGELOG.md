@@ -6,6 +6,8 @@ code still carries it - so a lower number further down is older, not newer.
 
 ## Unreleased
 
+- **Focus mode: the view reaches the bottom, and the bar's icons are one size (Discussion #1554):** Switched on by its button, or by F11 where it comes after the browser's own resize, focus mode left the 3D view at its old height, so an empty band stayed at the bottom with the snap grid in it. The view now follows the size of its area, whatever changes it. In the small focus bar the house, the magnifier and the cog came out at the ribbon's size beside a small question mark and arrows; all of them are now drawn at one size.
+
 ## 1.156.0
 
 - **Transition: a wall of its own at the top (Forum drucktipps3d, post 624069):** A transition with a wall was equally thick at both ends, so a vacuum nozzle 3 mm thick on the rectangle could not end 1 mm thin on the round top. Under **Properties**, a transition with a wall now has **Wall Thickness at the Top**. Until a value of its own is typed it follows the wall, and a wall changed later takes it along; set apart it keeps its value. In between the wall changes evenly, and on a transition through more sections each section takes the wall that suits its height. The display mesh and the exact body (STEP, edges) take it alike, `layerling_create_shape` and `layerling_update_object` take `loftTopWall`, and the guide (chapter 9) describes it.
