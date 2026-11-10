@@ -128,6 +128,8 @@ Til printning lægger du halvdelen med noten på sin snitflade og printer halvde
 
 Former, der er huller, deles uden samling.
 
+{{ui:split.modeStretch}} øverst i panelet, ved siden af {{ui:split.modeSplit}}, gør markeringen længere ved planet i stedet for at skære den i to - for eksempel en kasse, du har hentet uden CAD-fil, hvor et rum skal være længere. Placer planet som ved en deling, gennem den del, der må vokse, og skriv {{ui:split.stretchLength}}: Delen på den side, pilen peger mod, flyttes så langt væk, og snittet gennem formen ved planet, trukket ud over den længde, fylder hullet. Lige vægge og bunde bliver længere; rum, afrundinger og huller på begge sider beholder deres størrelse. En negativ værdi gør den kortere: En skive så tyk fjernes på pilens side, og resten rykker tilbage. {{ui:split.stretchApply}} anvender det; hvert objekt, planet skærer, forbliver én lukket form med sit navn, et mesh som halvdelene ved en deling. Går planet gennem en skrå eller rund del, trækkes snittet lige ud; placer det derfor, hvor formen løber lige.
+
 Halvdelene er almindelige meshes: indstillinger som en cylinders sider eller en teksts bogstaver er væk, så sæt dem først. [[Ctrl]]+[[Z]] bringer originalen tilbage i ét skridt. Låste og skjulte objekter kan ikke deles.
 
 Et importeret mesh skal have en lukket overflade for at blive delt, grupperet eller skåret. Har det åbninger, som øjnene på en figur der er ladt åbne, eller en revne i et scan, lukker layerling dem først med et fladt låg og siger hvor mange den lukkede. Den lukker små åbninger og flade åbninger af enhver størrelse; en stor åbning hvis kant bøjer, overlader den til dig, og beskeden siger det. Luk den i det program modellen kommer fra, eller med et mesh-reparationsværktøj, og importer den igen.

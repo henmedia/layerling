@@ -178,7 +178,7 @@ export const MESSAGES_PT_BR: Partial<Record<MessageKey, string>> = {
   "welcome.moreDeleteFaceTitle": "Excluir face",
   "welcome.moreDeleteFaceBody": "clique nas faces de um arredondamento, de um furo ou de um ressalto e exclua-as - as faces ao redor crescem para fechar o vão, e o sólido continua exato para mais arredondamentos e para a exportação STEP.",
   "welcome.moreSplitTitle": "Dividir",
-  "welcome.moreSplitBody": "corte um sólido ou um buraco em dois com um plano que você move e inclina para um corte em ângulo - útil para peças grandes demais para a mesa de impressão.",
+  "welcome.moreSplitBody": "corte um sólido ou um buraco em dois com um plano que você move e inclina para um corte em ângulo - útil para peças grandes demais para a mesa de impressão. Com Stretch, o corpo fica mais longo ou mais curto no plano, e uma caixa baixada cresce sem mudar o tamanho dos compartimentos.",
   "welcome.moreHullTitle": "Envoltória",
   "welcome.moreHullBody": "envolve as formas selecionadas em um único sólido convexo, como se fossem embaladas a vácuo: uma meia esfera sobre um cilindro vira uma cúpula sem degrau, e quatro colunas nos cantos viram uma caixa de cantos arredondados. Os buracos da seleção são recortados da envoltória depois, e Editar grupo a abre de novo.",
   "welcome.moreLoftSketchesTitle": "Transição entre esboços",

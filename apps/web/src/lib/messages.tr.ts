@@ -147,7 +147,7 @@ export const MESSAGES_TR: Partial<Record<MessageKey, string>> = {
   "welcome.moreDeleteFaceTitle": "Yüzey sil",
   "welcome.moreDeleteFaceBody": "bir yuvarlatmanın, deliğin veya çıkıntının yüzeylerine tıklayıp sil - çevredeki yüzeyler boşluğu kapatacak şekilde uzar ve gövde başka yuvarlatmalar ve STEP dışa aktarımı için tam kalır.",
   "welcome.moreSplitTitle": "Böl",
-  "welcome.moreSplitBody": "bir gövdeyi veya deliği, hareket ettirip açılı kesim için eğebildiğin bir düzlemle ikiye kes - baskı tablasına sığmayacak kadar büyük parçalar için kullanışlı.",
+  "welcome.moreSplitBody": "bir gövdeyi veya deliği, hareket ettirip açılı kesim için eğebildiğin bir düzlemle ikiye kes - baskı tablasına sığmayacak kadar büyük parçalar için kullanışlı. Stretch ise gövdeyi düzlemde uzatır ya da kısaltır; indirilen bir kutu büyür, bölmeleri boyutunu korur.",
   "welcome.moreSketchTitle": "Eskizler",
   "welcome.moreSketchBody": "dış hatlar çiz, kalem ya da parmakla serbest çiz ve düzenlenebilir birkaç nokta al, düz kenarları kavisli yap (gövdeye çift tık eskizini yeniden açar), çizerken çizginin uzunluğunu ve açısını yaz (\"50<30\") veya 15°'lik adımlarla yakala, çizgileri tam uzunluğa ve köşeleri tam açıya getir, köşeleri yuvarlat veya pah kır, noktaların yapıştığı yardımcı çizgiler çiz ve bunları uzat veya bir eksen etrafında döndür - ya da sadece çizgiyi bir genişlikle, çerçeve veya şerit olarak oluştur. Eskizin altındaki bir resim tek tıkla çizgilere dönüştürülür.",
   "welcome.moreLibraryTitle": "Şekil kitaplığı",

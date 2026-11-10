@@ -170,7 +170,7 @@ export const MESSAGES_PT_PT: Partial<Record<MessageKey, string>> = {
   "welcome.moreDeleteFaceTitle": "Eliminar face",
   "welcome.moreDeleteFaceBody": "clicar nas faces de um arredondamento, de um furo ou de uma saliência e eliminá-las. As faces adjacentes prolongam-se para preencher o espaço, mantendo a geometria exata do sólido para novos arredondamentos e para exportação em STEP.",
   "welcome.moreSplitTitle": "Dividir",
-  "welcome.moreSplitBody": "dividir um sólido ou uma forma de corte em dois com um plano que podes mover e inclinar para fazer um corte oblíquo. Útil para peças demasiado grandes para a base de impressão.",
+  "welcome.moreSplitBody": "dividir um sólido ou uma forma de corte em dois com um plano que podes mover e inclinar para fazer um corte oblíquo. Útil para peças demasiado grandes para a base de impressão. Com Stretch, o corpo fica mais comprido ou mais curto no plano, e uma caixa descarregada cresce sem mudar o tamanho dos compartimentos.",
   "welcome.moreHullTitle": "Envolvente convexa",
   "welcome.moreHullBody": "envolve as formas selecionadas num único sólido convexo, como uma película que encolhe à volta delas: uma semiesfera sobre um cilindro torna-se uma cúpula sem degrau; quatro pilares nos cantos tornam-se uma caixa com cantos arredondados. As formas de corte da seleção são subtraídas à envolvente no final, e Editar grupo permite voltar a editá-la.",
   "welcome.moreLoftSketchesTitle": "Transição entre perfis",

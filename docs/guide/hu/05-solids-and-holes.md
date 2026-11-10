@@ -123,6 +123,8 @@ Nyomtatáshoz a horonyos felet fektesd a vágott lapjára, a lécest pedig ford�
 
 A lyukak összekötők nélkül válnak ketté.
 
+A panel tetején, a {{ui:split.modeSplit}} mellett a {{ui:split.modeStretch}} a kijelölést a síknál meghosszabbítja ahelyett, hogy kettévágná - például egy CAD-fájl nélkül letöltött dobozt, amelynek egyik rekesze legyen hosszabb. Helyezd el a síkot úgy, mint a kettévágásnál, azon a részen át, amely nőhet, és add meg: {{ui:split.stretchLength}}. A nyíl felőli rész ennyivel eltávolodik, a test síkbeli metszete pedig erre a hosszra kihúzva kitölti a rést. Az egyenes falak és aljak hosszabbak lesznek; a rekeszek, lekerekítések és lyukak mindkét oldalon megtartják a méretüket. Negatív érték rövidít: a nyíl felőli oldalon egy ilyen vastag szelet kimarad, a többi visszacsúszik. A {{ui:split.stretchApply}} alkalmazza; minden objektum, amelyet a sík átvág, egyetlen zárt test marad a saját nevével, háló, mint a kettévágás felei. Ha a sík ferde vagy kerek részen halad át, a metszete egyenesen húzódik tovább, ezért oda tedd, ahol a test egyenesen fut.
+
 A felek egyszerű hálók: az olyan beállítások, mint egy henger oldalszáma vagy egy szöveg betűi, elvesznek, ezért ezeket előbb állítsd be. A [[Ctrl]]+[[Z]] egy lépésben visszahozza az eredetit. Zárolt és elrejtett objektumok nem vághatók ketté.
 
 ## Részek szétválasztása

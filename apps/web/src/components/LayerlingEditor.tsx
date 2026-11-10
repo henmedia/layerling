@@ -116,7 +116,7 @@ import { MAX_BUILD_PLATES, PLATE_GAP, plateCenterX, plateIndexAt, plateName, pla
 import { plateDisplayLabel, useBuildPlates } from "@/components/workplane/useBuildPlates";
 import { zipSync } from "fflate";
 import { PlateBar } from "@/components/workplane/PlateBar";
-import { SplitPanel, type SplitConnectorPreviewState, type SplitWorkplaneDirection } from "./workplane/SplitPanel";
+import { SplitPanel, type SplitConnectorPreviewState, type SplitMode, type SplitWorkplaneDirection } from "./workplane/SplitPanel";
 import { NO_SPLIT_ROTATION, modelSplitPlane, snapSplitPositionToVertices, splitOrientationForNormal, splitAxisFromLabel, splitAxisLabel, splitRotationAxes, type SplitRotation } from "@/lib/modelSplit";
 import { connectorHoleRadius, normalizeSplitConnectorOptions, splitConnectorDefaults, SPLIT_CONNECTOR_KINDS, type SplitConnectorOptions } from "@/lib/splitConnectors";
 import { AttachmentViewer } from "./workplane/AttachmentViewer";
@@ -261,7 +261,7 @@ import { roundedAlignedValue } from "@/lib/alignRounding";
 import { buildSketchLoftFromSelection, canSketchLoft } from "@/lib/sketchLoft";
 import { alignBounds, sizeAlignmentState, sizedShapesForSelection } from "@/lib/alignSize";
 import { ALIGN_PLATE_ID, alignPlateShape, distributedShapesForSelection, distributionState, type DistributeProblem, type DistributeResult } from "@/lib/alignDistribute";
-import { cloneAsGroupChild, meshDataToManifoldMesh, shapeToManifoldSolid, withClosedHolesNote, withConnectorsNote, unionOverlappingExportMeshes, exportBodiesWithLooseHoles, formatSectionOffset, SECTION_SEEN_FROM_KEYS, visibleExportShapes, multicolorExportSolids, exportFaceColors, colorSeparatedExportMeshes, disposeManifold, canIntersectShapes, buildIntersectionShapeFromSelection, canHullShapes, buildHullShapeFromSelection, groupedShape, quaternionForShape, rotationFromQuaternion, cleanShapePatch, restoreGroupedChildren, restoreGroupedChildrenForEdges } from "@/lib/editorBooleans";
+import { cloneAsGroupChild, meshDataToManifoldMesh, shapeToManifoldSolid, withClosedHolesNote, withConnectorsNote, stretchNotice, stretchLengthLabel, MAX_STRETCH_LENGTH, DEFAULT_STRETCH_LENGTH, unionOverlappingExportMeshes, exportBodiesWithLooseHoles, formatSectionOffset, SECTION_SEEN_FROM_KEYS, visibleExportShapes, multicolorExportSolids, exportFaceColors, colorSeparatedExportMeshes, disposeManifold, canIntersectShapes, buildIntersectionShapeFromSelection, canHullShapes, buildHullShapeFromSelection, groupedShape, quaternionForShape, rotationFromQuaternion, cleanShapePatch, restoreGroupedChildren, restoreGroupedChildrenForEdges } from "@/lib/editorBooleans";
 import { handleViewArrowKey } from "@/lib/viewArrowKeys";
 import { createKeyRepeatBatch } from "@/lib/keyRepeatBatch";
 import { escapeWasHandled } from "@/lib/escapeHandled";
@@ -413,6 +413,9 @@ type SplitSession = {
   picking: boolean;
   /** Dowels, plugs or a dovetail to line the halves up again, or none (Discussion #832); each opening starts from none. */
   connectors: SplitConnectorOptions;
+  /** Cut in two, or make each body longer at the plane by `stretch` mm (Discussions #506, #1569; minus: shorter). */
+  mode: SplitMode;
+  stretch: number;
 };
 
 type EdgeModifierComponentPreview = {
@@ -7443,6 +7446,8 @@ export function LayerlingEditor({
       error: null,
       picking: false,
       connectors: splitConnectorDefaults(getPrinterPlay()),
+      mode: "split",
+      stretch: DEFAULT_STRETCH_LENGTH,
     });
     setNotice(t("status.splitReady"));
   }, [refuseLockedSelection, cancelSplit, canSplitSelection, invalidateCadModifierSession, selectedShapes, splitSession, refuseBodyLockedSelection]);
@@ -7523,7 +7528,7 @@ export function LayerlingEditor({
    */
   const [splitConnectorPreview, setSplitConnectorPreview] = useState<SplitConnectorPreviewState>({ state: "idle" });
   const splitConnectorAbortRef = useRef<AbortController | null>(null);
-  const splitConnectorQuestion = splitSession && !splitSession.busy && splitSession.connectors.kind !== "none" && splitPlane
+  const splitConnectorQuestion = splitSession && !splitSession.busy && splitSession.mode === "split" && splitSession.connectors.kind !== "none" && splitPlane
     ? JSON.stringify([splitSession.connectors, splitPlane.normal, splitPlane.position, splitSession.targetIds, splitSession.sourceFingerprint])
     : "";
   useEffect(() => {
@@ -7600,8 +7605,9 @@ export function LayerlingEditor({
     splitConnectorAbortRef.current?.abort();
     const splitAbort = new AbortController();
     splitAbortRef.current = splitAbort;
-    const connectors = session.connectors.kind === "none" ? undefined : session.connectors;
-    const outcome = await splitShapesByPlaneOffThread(splitTargetShapes, plane, () => splitRunRef.current === runId && sourceContextIsCurrent(), splitAbort.signal, connectors);
+    const stretch = session.mode === "stretch" ? session.stretch : undefined;
+    const connectors = stretch !== undefined || session.connectors.kind === "none" ? undefined : session.connectors;
+    const outcome = await splitShapesByPlaneOffThread(splitTargetShapes, plane, () => splitRunRef.current === runId && sourceContextIsCurrent(), splitAbort.signal, connectors, stretch);
     if (splitRunRef.current !== runId) return;
     if (outcome.status === "stale" || !sourceContextIsCurrent()) {
       splitRunRef.current += 1;
@@ -7614,9 +7620,9 @@ export function LayerlingEditor({
       setSplitSession((current) => current ? {
         ...current,
         busy: false,
-        error: t("split.error.failed", { name: shape.name, detail: error }),
+        error: t(stretch === undefined ? "split.error.failed" : "split.error.stretchFailed", { name: shape.name, detail: error }),
       } : current);
-      setNotice(t("status.splitFailed", { name: shape.name }));
+      setNotice(t(stretch === undefined ? "status.splitFailed" : "status.stretchFailed", { name: shape.name }));
       return;
     }
     const { replacements, splitCount, closedHoles } = outcome;
@@ -7629,6 +7635,10 @@ export function LayerlingEditor({
     const nextShapes = shapesRef.current.flatMap((shape) => replacements.get(shape.id) ?? [shape]);
     const nextSelection = [...replacements.values()].flat().map((shape) => shape.id);
     setSplitSession(null);
+    if (stretch !== undefined) {
+      commitShapes(nextShapes, nextSelection, withClosedHolesNote(stretchNotice(stretch, splitCount, stretchLengthLabel(stretch)), closedHoles));
+      return;
+    }
     commitShapes(
       nextShapes,
       nextSelection,
@@ -15142,6 +15152,11 @@ export function LayerlingEditor({
         }
         if (params.dowelBase !== undefined && typeof params.dowelBase !== "boolean") throw new Error("dowelBase must be true or false");
         if (params.dowelBase !== undefined && connectorKind !== "dowels") throw new Error("dowelBase goes with connectors dowels");
+        // Longer or shorter at the plane instead of in two (Discussions #506, #1569), as the panel's Stretch.
+        if (params.stretch !== undefined && !(typeof params.stretch === "number" && Number.isFinite(params.stretch))) throw new Error("stretch must be a number of millimetres");
+        const stretch = params.stretch === undefined ? undefined : params.stretch as number;
+        if (stretch !== undefined && (Math.abs(stretch) < 0.001 || Math.abs(stretch) > MAX_STRETCH_LENGTH)) throw new Error(`stretch must be between -${MAX_STRETCH_LENGTH} and ${MAX_STRETCH_LENGTH} mm, and not 0`);
+        if (stretch !== undefined && connectorKind !== "none") throw new Error("A stretch keeps each body whole and takes no connectors - leave out connectors");
         const connectors = normalizeSplitConnectorOptions({
           dowelBase: params.dowelBase,
           kind: connectorKind,
@@ -15187,11 +15202,30 @@ export function LayerlingEditor({
           () => projectInfoRef.current.projectId === sourceProjectId && projectShapesFingerprint(currentShapes()) === sourceFingerprint,
           geometryAbortRef.current?.signal,
           connectors.kind === "none" ? undefined : connectors,
+          stretch,
         );
         if (outcome.status === "stale") throw new Error("The scene changed while splitting; run the command again");
-        if (outcome.status === "failed") throw new Error(t("split.error.failed", { name: outcome.shape.name, detail: outcome.error }));
+        if (outcome.status === "failed") throw new Error(t(stretch === undefined ? "split.error.failed" : "split.error.stretchFailed", { name: outcome.shape.name, detail: outcome.error }));
         if (outcome.splitCount === 0) throw new Error("The plane does not cut through any of the objects - move it with position");
         const parts = [...outcome.replacements.values()].flat();
+        if (stretch !== undefined) {
+          commitShapes(
+            currentShapes().flatMap((shape) => outcome.replacements.get(shape.id) ?? [shape]),
+            parts.map((shape) => shape.id),
+            withClosedHolesNote(stretchNotice(stretch, outcome.splitCount, stretchLengthLabel(stretch)), outcome.closedHoles),
+          );
+          return {
+            axis: splitAxisLabel(axis).toLowerCase(),
+            ...Object.fromEntries(rotationAxes.map((rotationAxis, index) => [`rotation${splitAxisLabel(rotationAxis)}`, rotation[index]])),
+            position: plane.position,
+            min: plane.min,
+            max: plane.max,
+            stretch,
+            stretchedIds: [...outcome.replacements.keys()],
+            ...(outcome.closedHoles ? { closedHoles: outcome.closedHoles } : {}),
+            objects: parts.map(mcpShapeSummary),
+          };
+        }
         commitShapes(
           currentShapes().flatMap((shape) => outcome.replacements.get(shape.id) ?? [shape]),
           parts.map((shape) => shape.id),
@@ -19394,6 +19428,10 @@ export function LayerlingEditor({
           picking={splitSession.picking}
           connectors={splitSession.connectors}
           connectorPreview={splitConnectorPreview}
+          mode={splitSession.mode}
+          stretch={splitSession.stretch}
+          onModeChange={(mode) => setSplitSession((current) => current && !current.busy ? { ...current, mode, error: null } : current)}
+          onStretchChange={(value) => setSplitSession((current) => current && !current.busy ? { ...current, stretch: Math.max(-MAX_STRETCH_LENGTH, Math.min(MAX_STRETCH_LENGTH, value)), error: null } : current)}
           onPickToggle={toggleSplitPick}
           onAxisChange={changeSplitAxis}
           onAlignToWorkplane={alignSplitToWorkplane}

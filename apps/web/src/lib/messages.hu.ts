@@ -153,7 +153,7 @@ export const MESSAGES_HU: Partial<Record<MessageKey, string>> = {
   "welcome.moreDeleteFaceTitle": "Lap törlése",
   "welcome.moreDeleteFaceBody": "kattints egy lekerekítés, egy furat vagy egy kiemelkedés lapjaira, és töröld őket - a környező lapok bezárják a rést, a test pedig pontos marad további lekerekítésekhez és a STEP-exporthoz.",
   "welcome.moreSplitTitle": "Kettévágás",
-  "welcome.moreSplitBody": "egy testet vagy lyukat kettévág egy síkkal, amelyet ferde vágáshoz mozgathatsz és dönthetsz – hasznos a tárgyasztalhoz túl nagy alkatrészeknél.",
+  "welcome.moreSplitBody": "egy testet vagy lyukat kettévág egy síkkal, amelyet ferde vágáshoz mozgathatsz és dönthetsz – hasznos a tárgyasztalhoz túl nagy alkatrészeknél. A Stretch ehelyett meghosszabbítja vagy megrövidíti a testet a síknál, így egy letöltött doboz nő, a rekeszei pedig megtartják a méretüket.",
   "welcome.moreSketchTitle": "Vázlatok",
   "welcome.moreSketchBody": "körvonalak rajzolása, szabadkézi rajz tollal vagy ujjal, néhány szerkeszthető ponttá alakítva, bármelyik egyenes oldal meghajlítása (a testre duplán kattintva újra megnyílik a vázlata), a vonal hosszának és szögének begépelése rajzolás közben („50<30”) vagy 15°-os lépésekre illesztése, vonalak pontos hosszra és sarkok pontos szögre állítása, sarkok lekerekítése vagy letörése, segédvonalak rajzolása, amelyekhez a pontok illeszkednek, majd kihúzás vagy tengely körüli forgatás – vagy csak a vonal felépítése adott szélességgel, keretként vagy csíkként. A vázlat alá tett kép egy kattintással vonalakká rajzolható körbe.",
   "welcome.moreLibraryTitle": "Alakzattár",

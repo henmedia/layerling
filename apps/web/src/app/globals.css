@@ -3649,8 +3649,9 @@ html[data-theme="dark"] .cable-channel-status.warning {
   border-color: #b35f07;
 }
 
-/* Four kinds of connector, two to a row, so "Schwalbenschwanz" and the like fit (Discussion #832). */
-.split-connector-control > div {
+/* Four kinds of connector, two to a row, so "Schwalbenschwanz" and the like fit (Discussion #832); Split and Stretch side by side. */
+.split-connector-control > div,
+.split-mode-control > div {
   grid-template-columns: repeat(2, 1fr);
 }
 

@@ -255,15 +255,18 @@ export function buildGroupedShapeOffThread(selected: WorkplaneShape[], triangleL
 
 type SplitPlane = Pick<ModelSplitPlane, "axis" | "normal" | "position">;
 
-function splitShapeOffThread(shape: WorkplaneShape, plane: SplitPlane, connectors: SplitConnectorOptions | undefined, signal?: AbortSignal) {
-  const onPage = () => splitShapeIfCrossed(shape, plane, connectors);
+function splitShapeOffThread(shape: WorkplaneShape, plane: SplitPlane, connectors: SplitConnectorOptions | undefined, stretch: number | undefined, signal?: AbortSignal) {
+  const onPage = () => splitShapeIfCrossed(shape, plane, connectors, stretch);
   if (containsText([shape])) return onPage();
-  return runGeometryTask<Awaited<ReturnType<typeof splitShapeIfCrossed>>>("split", { shape, plane, ...(connectors ? { connectors } : {}) }, onPage, () => ({ parts: null, error: t("status.computeTimedOut") }), signal);
+  return runGeometryTask<Awaited<ReturnType<typeof splitShapeIfCrossed>>>("split", { shape, plane, ...(connectors ? { connectors } : {}), ...(stretch !== undefined ? { stretch } : {}) }, onPage, () => ({ parts: null, error: t("status.computeTimedOut") }), signal);
 }
 
-/** splitShapesByPlane (lib/editorBooleans.ts) with each cut made off the page, with connectors when they are asked for. */
-export function splitShapesByPlaneOffThread(targets: readonly WorkplaneShape[], plane: SplitPlane, stillCurrent: () => boolean, signal?: AbortSignal, connectors?: SplitConnectorOptions): Promise<SplitShapesOutcome> {
-  return splitShapesByPlane(targets, plane, stillCurrent, (shape, shapePlane, asked) => splitShapeOffThread(shape, shapePlane, asked, signal), connectors);
+/**
+ * splitShapesByPlane (lib/editorBooleans.ts) with each cut made off the page, with connectors when they are asked for - or,
+ * with `stretch`, each body made that much longer at the plane (Discussions #506, #1569).
+ */
+export function splitShapesByPlaneOffThread(targets: readonly WorkplaneShape[], plane: SplitPlane, stillCurrent: () => boolean, signal?: AbortSignal, connectors?: SplitConnectorOptions, stretch?: number): Promise<SplitShapesOutcome> {
+  return splitShapesByPlane(targets, plane, stillCurrent, (shape, shapePlane, asked, length) => splitShapeOffThread(shape, shapePlane, asked, length, signal), connectors, stretch);
 }
 
 /**

@@ -127,6 +127,8 @@ For printing, lay the half with the groove on its cut face, and print the half w
 
 Holes are split without connectors.
 
+{{ui:split.modeStretch}} at the top of the panel, beside {{ui:split.modeSplit}}, makes the selection longer at the plane instead of cutting it in two - a case downloaded without its CAD file whose compartment should be longer, say. Place the plane as for a split, through the part that may grow, and type {{ui:split.stretchLength}}: the part on the side the arrow points to moves that far away, and the cut through the body at the plane, drawn out over that length, fills the gap. Straight walls and floors get longer; compartments, rounded corners and holes on either side keep their size. A minus value makes it shorter: a slice that thick comes out on the arrow's side and the rest moves back. {{ui:split.stretchApply}} applies it; every object the plane crosses stays one closed body under its own name, a mesh like the halves of a split. Where the plane runs through a slanted or round part, its cut is drawn out straight, so place it where the body runs straight.
+
 The halves are plain meshes: settings such as a cylinder's sides or a text's lettering are gone, so set those first. [[Ctrl]]+[[Z]] brings the original back in one step. Locked and hidden objects cannot be split.
 
 An imported mesh needs a closed surface to be split, grouped or cut. If it has openings, such as the eyes of a figure left open or a crack in a scan, layerling closes them with a flat cap first and says how many it closed. It closes small openings and flat ones of any size; a large opening whose rim bends is left to you, and the message says so. Close it in the program the model comes from, or with a mesh repair tool, and import it again.

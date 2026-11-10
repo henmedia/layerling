@@ -180,7 +180,7 @@ export const MESSAGES_JA: Partial<Record<MessageKey, string>> = {
   "welcome.moreDeleteFaceTitle": "面を削除",
   "welcome.moreDeleteFaceBody": "フィレット、穴、出っぱりの面をクリックして削除します。まわりの面が広がってすき間をふさぎ、ボディは正確なままなので、あとでフィレットをかけたりSTEPにエクスポートしたりできます。",
   "welcome.moreSplitTitle": "分割",
-  "welcome.moreSplitBody": "ボディや穴を平面で2つに切ります。平面を動かしたり傾けたりして斜めに切ることもできます。プリントベッドに収まらない大きなパーツに便利です。",
+  "welcome.moreSplitBody": "ボディや穴を平面で2つに切ります。平面を動かしたり傾けたりして斜めに切ることもできます。プリントベッドに収まらない大きなパーツに便利です。「Stretch」を使うと、代わりに平面の位置でボディを長くしたり短くしたりできます。ダウンロードしたケースを、仕切りの大きさはそのままに伸ばせます。",
   "welcome.moreHullTitle": "凸包",
   "welcome.moreHullBody": "選んだシェイプを、ラップでぴったり包んだように、1つのふくらんだボディでつつみます。円柱にのせた半球は段差のないドームに、角に立てた4本の柱は角の丸い箱になります。選んだものの中の穴は、あとから凸包から切り抜かれます。「グループを編集」でまた開けます。",
   "welcome.moreLoftSketchesTitle": "スケッチ間のロフト",

@@ -123,6 +123,8 @@ Pour l'impression, posez la moitié à rainure sur sa face de coupe, et imprimez
 
 Les formes en mode Trou sont divisées sans connecteurs.
 
+{{ui:split.modeStretch}}, en haut du panneau à côté de {{ui:split.modeSplit}}, allonge la sélection au niveau du plan au lieu de la couper en deux - par exemple un boîtier téléchargé sans son fichier CAO dont un compartiment doit être plus long. Placez le plan comme pour une découpe, à travers la partie qui peut grandir, et saisissez {{ui:split.stretchLength}} : la partie du côté où pointe la flèche s'écarte d'autant, et la coupe du corps au niveau du plan, étirée sur cette longueur, comble l'espace. Les parois droites et les fonds s'allongent ; les compartiments, les arrondis et les trous de part et d'autre gardent leur taille. Une valeur négative le raccourcit : une tranche de cette épaisseur disparaît du côté de la flèche et le reste se rapproche. {{ui:split.stretchApply}} l'applique ; chaque objet traversé par le plan reste un seul corps fermé sous son nom, un maillage comme les moitiés d'une découpe. Si le plan passe par une partie inclinée ou ronde, sa coupe est prolongée droite ; placez-le donc là où le corps est droit.
+
 Les moitiés sont des maillages simples : les paramètres tels que les côtés d'un cylindre ou le lettrage d'un texte ont disparu, alors définissez-les en premier. [[Ctrl]]+[[Z]] ramène l'original en une seule étape. Les objets verrouillés et masqués ne peuvent pas être divisés.
 
 ## Séparation des pièces

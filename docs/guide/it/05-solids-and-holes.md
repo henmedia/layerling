@@ -125,6 +125,8 @@ Per la stampa appoggia la metà con la scanalatura sulla sua faccia di taglio e 
 
 Gli oggetti foro si dividono senza connettori.
 
+{{ui:split.modeStretch}}, in alto nel pannello accanto a {{ui:split.modeSplit}}, allunga la selezione sul piano invece di tagliarla in due: per esempio una scatola scaricata senza il suo file CAD in cui uno scomparto deve essere più lungo. Posiziona il piano come per una divisione, attraverso la parte che può crescere, e inserisci {{ui:split.stretchLength}}: la parte sul lato verso cui punta la freccia si sposta di tanto, e la sezione del corpo sul piano, prolungata per quella lunghezza, riempie lo spazio. Le pareti dritte e i fondi si allungano; scomparti, raccordi e fori su entrambi i lati mantengono le loro misure. Un valore negativo lo accorcia: sul lato della freccia viene tolta una fetta di quello spessore e il resto si riavvicina. {{ui:split.stretchApply}} lo applica; ogni oggetto attraversato dal piano resta un unico corpo chiuso con il suo nome, una mesh come le metà di una divisione. Se il piano passa per una parte inclinata o rotonda, la sua sezione viene prolungata dritta, quindi posizionalo dove il corpo è dritto.
+
 Le metà sono mesh semplici: impostazioni come il numero di lati di un cilindro o le caratteristiche di un testo vengono perse, quindi regolale prima di dividere. [[Ctrl]]+[[Z]] ripristina l’originale in un solo passaggio. Gli oggetti bloccati o nascosti non possono essere divisi.
 
 ## Separare le parti
