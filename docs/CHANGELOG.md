@@ -6,6 +6,7 @@ code still carries it - so a lower number further down is older, not newer.
 
 ## Unreleased
 
+- **Split: Across X and Across Y cut through the middle of the part on the base plate (Discussion #1590):** "Align to workplane" puts the split plane through the workplane's origin where that crosses the parts. On the base plate that origin is just the middle of the plate, so a part standing away from it was cut off-centre, and the plane position read 0. On the base plate, Across X and Across Y now go through the middle of the selection, like the X, Y and Z buttons. Parallel still cuts at the plate's level, and a workplane laid on a face still cuts through its origin. The same holds for `alongWorkplane` in the MCP action `layerling_split_objects`; the guide says so in every language. Reported by @PabloJonesUK in #1590.
 - **Start script: finds Node.js right after it was installed (Discussion #1546):** Started from a window that was open before Node.js was installed - by winget, or by an AI setting layerling up - `Start layerling` stopped at "npm was not found", because that window did not know the new PATH yet. It now reads the PATH afresh from the system and user settings, as a new window would, and says so clearly if Node.js is really missing. Reported by @uninteressant2026 in #1546.
 
 ## 1.156.2
