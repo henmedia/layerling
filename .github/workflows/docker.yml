@@ -28,7 +28,6 @@ concurrency:
   cancel-in-progress: false
 
 env:
-  IMAGE: ghcr.io/${{ github.repository }}
   TAG: ${{ github.event.release.tag_name || inputs.tag }}
 
 jobs:
@@ -44,6 +43,10 @@ jobs:
             runner: ubuntu-24.04-arm
     runs-on: ${{ matrix.runner }}
     steps:
+      # Docker refuses capitals in an image name, and an owner like LudaThomas keeps them in github.repository.
+      - name: Lowercase the image name
+        run: echo "IMAGE=ghcr.io/${GITHUB_REPOSITORY,,}" >> "$GITHUB_ENV"
+
       - name: Checkout the release
         uses: actions/checkout@v7
         with:
@@ -96,6 +99,9 @@ jobs:
     env:
       DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
     steps:
+      - name: Lowercase the image name
+        run: echo "IMAGE=ghcr.io/${GITHUB_REPOSITORY,,}" >> "$GITHUB_ENV"
+
       - name: Collect the digests
         uses: actions/download-artifact@v8
         with:
