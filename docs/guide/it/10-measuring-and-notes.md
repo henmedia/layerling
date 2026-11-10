@@ -34,6 +34,7 @@ La squadra poggia sul piano di lavoro. Se questo si trova sul lato di un corpo, 
 - **Trascina la maniglia** per spostare la squadra.
 - **Fai un clic breve sulla maniglia** per ruotarla di 90°.
 - **Fai clic sulla ×** accanto alla maniglia per rimuoverla.
+- **Trascinare il cerchietto all'estremità di un braccio** lo allunga o lo accorcia, a millimetri interi. Il pulsante più in basso sotto la maniglia, {{ui:ruler.armsToPlate}}, rende i due bracci lunghi quanto il piatto della stampante scelta nelle impostazioni è largo e profondo. La squadra conserva la lunghezza dei bracci con il progetto, e una squadra posata di nuovo la riprende.
 - **Il pulsante piccolo a sinistra della maniglia** cambia il riferimento della misura: il bordo esterno del corpo (estremità, icona con linee) oppure il suo centro (punto medio, mirino). Un pulsante dello stesso tipo accanto a ciascun numero verde imposta il riferimento solo per quella misura: per un cilindro verticale, il centro sui due bracci e il fondo per l’altezza; per un cilindro coricato, il centro in larghezza e un’estremità in lunghezza. Quando tutte e tre le misure usano lo stesso riferimento, il pulsante sulla maniglia mostra la modalità comune.
 
 Se i corpi sono posizionati accanto a uno dei bracci, la squadra ne mostra automaticamente le dimensioni. Funziona solo sulla piastra di base, non sul lato di un corpo. Il pulsante con la freccia sotto la maniglia della squadra lo disattiva, così solo i corpi selezionati mostrano le misure; viene salvato con il progetto.

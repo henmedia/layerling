@@ -1,6 +1,7 @@
 import type { PointerEvent as ReactPointerEvent, WheelEvent as ReactWheelEvent } from "react";
 
-export type TransformHandleKind = "scale" | "height" | "lift" | "rotate";
+/** "slide": the red and green arrows that move the selection along X or Y only (Discussion #1434). */
+export type TransformHandleKind = "scale" | "height" | "lift" | "rotate" | "slide";
 export type RotationAxis = "x" | "y" | "z";
 export type RotationWheelView = { x: number; y: number; radius: number };
 
@@ -85,6 +86,33 @@ export function liftHandleScreenPoint<T extends { x: number; y: number }>(base: 
   const unitX = length > 1e-6 ? dx / length : 0;
   const unitY = length > 1e-6 ? dy / length : below ? 1 : -1;
   return { ...lifted, x: base.x + unitX * LIFT_HANDLE_MIN_SCREEN_DISTANCE, y: base.y + unitY * LIFT_HANDLE_MIN_SCREEN_DISTANCE };
+}
+
+/** The corner radius dot keeps at least this far (px) from every other handle. */
+export const CORNER_DOT_MIN_SCREEN_DISTANCE = 22;
+
+/**
+ * Moves a handle along `along` (a direction on the screen) until it is `min` px clear of all the `others`.
+ * A plain Box has its corner radius dot right on a corner, and seen from above that corner is where a
+ * resize handle lies too; the dot slides along the edge so both can be taken. Only where the dot is drawn
+ * changes: a drag measures how far the pointer moved, not where the dot was.
+ */
+export function handleClearOfOthers<T extends { x: number; y: number }>(
+  point: T,
+  along: { x: number; y: number },
+  others: ReadonlyArray<{ x: number; y: number }>,
+  min = CORNER_DOT_MIN_SCREEN_DISTANCE,
+): T {
+  const length = Math.hypot(along.x, along.y);
+  // Straight along the view the edge has no direction on the screen: up.
+  const unitX = length > 1e-6 ? along.x / length : 0;
+  const unitY = length > 1e-6 ? along.y / length : -1;
+  for (let step = 0; step <= 40; step += 1) {
+    const x = point.x + unitX * step * 2;
+    const y = point.y + unitY * step * 2;
+    if (others.every((other) => Math.hypot(other.x - x, other.y - y) >= min)) return step === 0 ? point : { ...point, x, y };
+  }
+  return point;
 }
 
 /** Inside the wheel the turn snaps to the drawn ticks, one every 22.5°; Shift halves the step. */
@@ -383,13 +411,15 @@ export type TransformOverlayState = {
   handles: Array<{ key: string; className: string; kind: TransformHandleKind; x: number; y: number; title: string; angle?: number }>;
   /** arc/heads: the arrow's SVG paths, relative to x/y (see rotateHandleArrow). */
   rotateHandles: Array<{ key: string; className: string; x: number; y: number; arc: string; heads: string }>;
+  /** The X and Y arrows beside the lift arrow (Discussion #1434); angle: where the tip points on the screen, in degrees. */
+  slideHandles: Array<{ key: string; className: string; x: number; y: number; angle: number; title: string }>;
   dimensions: Record<string, DimensionMark[]>;
   /**
-   * Handle keys whose dimension marks stay on screen for a single selected
-   * shape as soon as it is selected. Filled when the workspace setting
+   * Handle keys whose dimension marks stay on screen as soon as a shape, or
+   * several of them, is selected. Filled when the workspace setting
    * dimensionsAlwaysVisible is on: width, depth and height (diameter and
-   * height for a cylinder), each on the side of the shape facing the camera.
-   * Empty when that setting is off, or when more than one shape is selected.
+   * height for a cylinder), each on the side of the selection facing the
+   * camera. Empty when that setting is off.
    */
   alwaysVisibleDimensionKeys: string[];
   rotationWheel: RotationWheelView | null;

@@ -59,17 +59,18 @@ function solidVolume(solid: SbcSolid) {
 }
 
 /**
- * The board's outline, without its holes: the rounded rectangle, or for the UNO its rounded plate
+ * The board's outline, without its holes: the rounded rectangle, or for the UNO and the MEGA the rounded plate
  * (three corners round, the cut one sharp before it is cut) with the step and the cut corner, as
  * Arduino's PCB file draws them.
  */
 function plateArea(board: SbcBoard) {
   if (!board.outline) return board.width * board.depth - (4 - Math.PI) * board.cornerRadius ** 2;
   if (board.type === "wemosD1Mini") return d1MiniArea();
-  expect(board.type).toBe("arduinoUno");
-  // 66.04 x 53.34 with three corners round, the back right one cut 1.524 mm at 45°; the step from
-  // (66.04, 2.54) over (68.58, 5.08) and (68.58, 37.846) to (66.04, 40.386).
-  return 66.04 * 53.34 - 3 * (1 - Math.PI / 4) - 1.524 ** 2 / 2 + 2.54 * ((40.386 - 2.54) + (37.846 - 5.08)) / 2;
+  expect(["arduinoUno", "arduinoMega"]).toContain(board.type);
+  // 66.04 x 53.34 (the MEGA 99.06 x 53.34) with three corners round, the back right one cut 1.524 mm
+  // at 45°; the step from (66.04, 2.54) over (68.58, 5.08) and (68.58, 37.846) to (66.04, 40.386), on the MEGA 33.02 further right.
+  const plate = board.outline.plateWidth!;
+  return plate * 53.34 - 3 * (1 - Math.PI / 4) - 1.524 ** 2 / 2 + 2.54 * ((40.386 - 2.54) + (37.846 - 5.08)) / 2;
 }
 
 /**

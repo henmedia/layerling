@@ -10,7 +10,7 @@ import { SURFACE_TEXTURE_PATTERNS, type SurfaceTexturePattern } from "@/lib/surf
 export const surfacePatternThumbnail = (pattern: SurfaceTexturePattern) => `assets/editor/surface-patterns/${pattern}.png`;
 
 /**
- * The surface texture's pattern, chosen by its picture: eighteen names alone are hard to tell apart. The field shows
+ * The surface texture's pattern, chosen by its picture: twenty names alone are hard to tell apart. The field shows
  * the chosen one; opened, a grid of all of them with a search above. Arrow keys move through the grid, Enter takes one,
  * Escape closes it. It stands in the card where the plain select of names stood.
  */

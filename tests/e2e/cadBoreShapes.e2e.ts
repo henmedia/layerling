@@ -335,4 +335,45 @@ describe("exact bodies for the bore shapes with the real OCCT kernel", () => {
     expect(cad.getVolume(countersink)).toBeCloseTo(Math.PI * 1.7 ** 2 * 6.4 + cone + tipVolume, 2);
     expect(cad.getBoundingBox(countersink).ymin).toBeCloseTo(-tip, 4);
   });
+
+  it("slotted countersink: two half cones joined by flat flanks along the slot, as its mesh draws it (Discussion #1531)", () => {
+    const source = shape("countersink", { x: 4, z: -2, width: 14, depth: 6.6, height: 8, hole: true, screwHoleShaft: 3.4, screwHoleAngle: 90, screwHoleSlot: true });
+    const { solid } = exactAgainstMesh(source);
+    const cone = (Math.PI * 1.6 / 3) * (1.7 ** 2 + 1.7 * 3.3 + 3.3 ** 2);
+    const section = 3.4 * 6.4 + ((3.4 + 6.6) / 2) * 1.6;
+    expect(cad.getVolume(solid)).toBeCloseTo(Math.PI * 1.7 ** 2 * 6.4 + cone + section * 7.4, 2);
+    const box = cad.getBoundingBox(solid);
+    expect([box.xmin, box.xmax, box.ymin, box.ymax, box.zmin, box.zmax].map((value) => Number(value.toFixed(4)) + 0)).toEqual([-3, 11, 0, 8, -5.3, 1.3]);
+    // Real cones and cylinders at the ends, no facets: the edge tool and STEP get the curved faces.
+    const types = surfaceTypes(solid);
+    expect(types.filter((type) => type === "cone").length).toBeGreaterThan(0);
+    expect(types.filter((type) => type === "cylinder").length).toBeGreaterThan(0);
+    expect(types.every((type) => type === "cone" || type === "cylinder" || type === "plane")).toBe(true);
+    const rim = cad.getSubShapes(solid, "edge").filter((edge) => {
+      const edgeBox = cad.getBoundingBox(edge);
+      return Math.abs(edgeBox.ymin - 8) < 1e-6 && Math.abs(edgeBox.ymax - 8) < 1e-6;
+    });
+    expect(rim.length).toBeGreaterThan(0);
+    expect(cad.isValid(cad.chamfer(solid, rim, 0.3))).toBe(true);
+  });
+
+  it("recessed countersink: a cylinder as wide as the head above the cone, and on both ends of a double one (Discussion #1531)", () => {
+    const { solid } = exactAgainstMesh(shape("countersink", { width: 6.6, depth: 6.6, height: 12, hole: true, screwHoleShaft: 3.4, screwHoleAngle: 90, screwHoleRecess: 4 }));
+    const cone = (Math.PI * 1.6 / 3) * (1.7 ** 2 + 1.7 * 3.3 + 3.3 ** 2);
+    expect(cad.getVolume(solid)).toBeCloseTo(Math.PI * 1.7 ** 2 * 6.4 + cone + Math.PI * 3.3 ** 2 * 4, 2);
+    expect(surfaceTypes(solid).filter((type) => type === "cylinder").length).toBe(2);
+    const double = exactAgainstMesh(shape("doubleCountersink", { width: 6.6, depth: 6.6, height: 12, hole: true, screwHoleShaft: 3.4, screwHoleAngle: 90, screwHoleRecess: 2 })).solid;
+    expect(cad.getVolume(double)).toBeCloseTo(Math.PI * 1.7 ** 2 * 4.8 + 2 * cone + 2 * Math.PI * 3.3 ** 2 * 2, 2);
+    const slotted = exactAgainstMesh(shape("countersink", { width: 14, depth: 6.6, height: 12, hole: true, screwHoleShaft: 3.4, screwHoleAngle: 90, screwHoleSlot: true, screwHoleRecess: 4 })).solid;
+    expect(cad.isValid(slotted)).toBe(true);
+  });
+
+  it("slotted counterbore along the depth and slotted double countersink: valid bodies where their meshes are (Discussion #1531)", () => {
+    const counterbore = exactAgainstMesh(shape("counterbore", { width: 6.4, depth: 10, height: 12, hole: true, screwHoleShaft: 3.4, screwHoleHeadDepth: 3.2, screwHoleSlot: true, rotation: 30 })).solid;
+    const round = Math.PI * 1.7 ** 2 * 8.8 + Math.PI * 3.2 ** 2 * 3.2;
+    expect(cad.getVolume(counterbore)).toBeCloseTo(round + (3.4 * 8.8 + 6.4 * 3.2) * 3.6, 2);
+    const double = exactAgainstMesh(shape("doubleCountersink", { width: 12, depth: 6.6, height: 6, hole: true, screwHoleShaft: 3.4, screwHoleAngle: 90, screwHoleSlot: true })).solid;
+    expect(cad.isValid(double)).toBe(true);
+    expect(cad.getBoundingBox(double).xmax).toBeCloseTo(6, 4);
+  });
 });

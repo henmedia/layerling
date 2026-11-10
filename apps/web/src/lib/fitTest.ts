@@ -1,3 +1,4 @@
+import { BREAKAWAY_BASE, breakawayNubSize, breakawayNubSpan, breakawayPlateSize, breakawaySocketDiameter } from "@/lib/breakawayBase";
 import { buildGroupedShapeFromSelection, groupedShape } from "@/lib/editorBooleans";
 import { numberLocale, t } from "@/lib/i18n";
 import { createLocalId } from "@/lib/localIds";
@@ -21,7 +22,8 @@ import type { ShapeKind, WorkplaneShape } from "@/types/layerling";
  *
  * Everything prints without supports: the holes and the pin stand upright, so both are round in the layers, as the
  * fit between them is. The pin's chamfer is the end that goes into a hole first; its other end, on the plate, may have
- * spread a little in the first layer.
+ * spread a little in the first layer. On a printer whose bed moves, the pin can stand on a breakaway base instead
+ * (breakawayBase.ts), a plate it snaps off once printed; it is then one body with the base.
  */
 
 export const FIT_TEST_PIN_DIAMETER = 5;
@@ -81,11 +83,36 @@ function asset(kind: ShapeKind) {
   return found;
 }
 
+/** How the fit test is made: `base` stands the pin on a breakaway base (breakawayBase.ts), for a printer whose bed moves. */
+export type FitTestOptions = { base?: boolean };
+
+/**
+ * The pin's breakaway base, its middle under the pin at `pinX`: the plate and the socket cut into it (a hole), and the
+ * nub the pin stands on, reaching into the socket's floor and into the pin.
+ */
+function fitTestPinBase(pinX: number, color: string) {
+  const { height, floor } = BREAKAWAY_BASE;
+  const plateSize = breakawayPlateSize(FIT_TEST_PIN_DIAMETER);
+  const socketSize = breakawaySocketDiameter(FIT_TEST_PIN_DIAMETER);
+  const plate = { ...makeShapeFromAsset(asset("box"), { x: pinX, z: 0 }, { width: plateSize, depth: plateSize, height }), name: t("fitTest.pinBase"), color };
+  const socket = {
+    ...makeShapeFromAsset(asset("cylinder"), { x: pinX, z: 0, elevation: floor }, { width: socketSize, depth: socketSize, height: height - floor + HOLE_OVERSHOOT, sides: ROUND_SIDES }),
+    name: t("fitTest.pinBase"),
+    hole: true,
+    color,
+  };
+  const nubSize = breakawayNubSize(FIT_TEST_PIN_DIAMETER);
+  const span = breakawayNubSpan();
+  const nub = { ...makeShapeFromAsset(asset("box"), { x: pinX, z: 0, elevation: span.bottom }, { width: nubSize, depth: nubSize, height: span.top - span.bottom }), name: t("fitTest.pinBase"), color };
+  return { plate, socket, nub };
+}
+
 /**
  * The shapes the fit test is made of, before they are cut and joined, the plate's middle at the origin on the plate:
- * the box, the holes, the numbers, and the pin's cylinder and chamfer. The text typefaces must be loaded.
+ * the box, the holes, the numbers, and the pin's cylinder and chamfer - with `base`, the pin raised onto its breakaway
+ * base, whose parts come along as `pinBase`. The text typefaces must be loaded.
  */
-export function fitTestParts(locale = numberLocale()) {
+export function fitTestParts(locale = numberLocale(), options: FitTestOptions = {}) {
   const color = shapeAssetColor(asset("box"));
   const { width, depth, height } = FIT_TEST_PLATE;
   const plate = { ...makeShapeFromAsset(asset("box"), { x: 0, z: 0 }, { width, depth, height }), name: t("fitTest.plate"), color };
@@ -109,8 +136,9 @@ export function fitTestParts(locale = numberLocale()) {
     return canonicalizeShape({ ...sized, z: hole.front ? along : -along });
   });
   const pinX = width / 2 + PIN_SPACING + FIT_TEST_PIN_DIAMETER / 2;
+  const lift = options.base ? BREAKAWAY_BASE.lift : 0;
   const pin = {
-    ...makeShapeFromAsset(asset("cylinder"), { x: pinX, z: 0 }, {
+    ...makeShapeFromAsset(asset("cylinder"), { x: pinX, z: 0, elevation: lift }, {
       width: FIT_TEST_PIN_DIAMETER,
       depth: FIT_TEST_PIN_DIAMETER,
       height: FIT_TEST_PIN_LENGTH - FIT_TEST_PIN_CHAMFER,
@@ -120,7 +148,7 @@ export function fitTestParts(locale = numberLocale()) {
     color,
   };
   const chamfer = {
-    ...makeShapeFromAsset(asset("cone"), { x: pinX, z: 0, elevation: FIT_TEST_PIN_LENGTH - FIT_TEST_PIN_CHAMFER }, {
+    ...makeShapeFromAsset(asset("cone"), { x: pinX, z: 0, elevation: lift + FIT_TEST_PIN_LENGTH - FIT_TEST_PIN_CHAMFER }, {
       width: FIT_TEST_PIN_DIAMETER,
       depth: FIT_TEST_PIN_DIAMETER,
       height: FIT_TEST_PIN_CHAMFER,
@@ -131,19 +159,25 @@ export function fitTestParts(locale = numberLocale()) {
     name: t("fitTest.pinChamfer"),
     color,
   };
-  return { plate, holes: holeShapes, labels, pin, chamfer };
+  return { plate, holes: holeShapes, labels, pin, chamfer, pinBase: options.base ? fitTestPinBase(pinX, color) : null };
 }
 
 /**
  * The fit test as one new shape: a bundle of the plate, its holes cut and its numbers joined, and the pin with its
  * chamfer, standing on the plate with the plate's middle at the origin. Placed and named by the caller's language.
  */
-export async function fitTestShape(triangleLimit: number, locale = numberLocale()): Promise<WorkplaneShape> {
+export async function fitTestShape(triangleLimit: number, locale = numberLocale(), options: FitTestOptions = {}): Promise<WorkplaneShape> {
   await loadTextFonts();
-  const parts = fitTestParts(locale);
+  const parts = fitTestParts(locale, options);
   const plate = await buildGroupedShapeFromSelection([parts.plate, ...parts.holes, ...parts.labels], triangleLimit);
   if (!plate.group) throw new Error(plate.failureNotice || t("fitTest.failed"));
-  const pin = await buildGroupedShapeFromSelection([parts.pin, parts.chamfer], triangleLimit);
+  // With a base, its plate and socket are cut first, so the socket leaves the nub and the pin standing in it whole.
+  const base = parts.pinBase ? await buildGroupedShapeFromSelection([parts.pinBase.plate, parts.pinBase.socket], triangleLimit) : null;
+  if (base && !base.group) throw new Error(base.failureNotice || t("fitTest.failed"));
+  const pinParts = base?.group && parts.pinBase
+    ? [canonicalizeShape({ ...base.group, color: parts.pin.color, groupOperation: "group" }), parts.pinBase.nub, parts.pin, parts.chamfer]
+    : [parts.pin, parts.chamfer];
+  const pin = await buildGroupedShapeFromSelection(pinParts, triangleLimit);
   if (!pin.group) throw new Error(pin.failureNotice || t("fitTest.failed"));
   const bundle = groupedShape([
     canonicalizeShape({ ...plate.group, id: createLocalId("fit-test-plate"), name: t("fitTest.plate"), color: parts.plate.color, groupOperation: "group" }),

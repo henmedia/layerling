@@ -1,0 +1,150 @@
+/* Focus mode (Discussion #1554). The title row and the footer leave the editor; with their heights at 0 the ribbon
+   moves up and the 3D view and the sketch reach down to the window's edge, as everything below the bar is laid out
+   against these variables. The toolbar measures its height again when the mode changes. */
+html[data-focus-mode="on"] {
+  --editor-toolbar-title-height: 0px;
+  --editor-footer-height: 0px;
+}
+
+html[data-focus-mode="on"] .layerling-editor .toolbar-title-row,
+html[data-focus-mode="on"] .layerling-editor .dashboard-legal.editor-legal {
+  display: none;
+}
+
+/* The button that switches it on, beside the ribbon pin. */
+.toolbar-focus-mode.action-icon-button {
+  width: 30px;
+  height: 30px;
+  color: #634729;
+}
+
+.toolbar-focus-mode.action-icon-button:hover {
+  color: var(--group-help);
+}
+
+html[data-theme="dark"] .toolbar-focus-mode.action-icon-button {
+  color: #e3d3c0;
+}
+
+html[data-theme="dark"] .toolbar-focus-mode.action-icon-button:hover {
+  color: #f7f2ea;
+}
+
+/* The small bar that keeps what the title row held, hung below the ribbon in the middle of the window. It is centred
+   by its margins, not shifted by a transform: the move hook reads the layout offset, and a shifted bar jumped by half
+   its width when grabbed. Moved, it stands where it was dropped (the hook sets left and top, right and margin go). */
+.focus-mode-bar {
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  left: 0;
+  z-index: 3;
+  width: max-content;
+  margin: 0 auto;
+  display: flex;
+  height: 38px;
+  padding: 0 4px 0 2px;
+  align-items: stretch;
+  gap: 2px;
+  background: var(--toolbar-bg);
+  border: 1px solid var(--toolbar-edge);
+  border-radius: 10px;
+  box-shadow: 0 6px 18px rgba(72, 53, 32, 0.16);
+}
+
+.focus-mode-bar-grip {
+  display: flex;
+  width: 18px;
+  align-items: center;
+  justify-content: center;
+  color: #a08a72;
+  cursor: grab;
+  touch-action: none;
+}
+
+.focus-mode-bar.moving,
+.focus-mode-bar.moving .focus-mode-bar-grip {
+  cursor: grabbing;
+}
+
+.focus-mode-bar .action-icon-button {
+  width: 32px;
+  height: 30px;
+  align-self: center;
+  color: #634729;
+}
+
+.focus-mode-bar .action-icon-button .toolbar-search-icon,
+.focus-mode-bar .action-icon-button .toolbar-vector-art-icon {
+  color: inherit;
+}
+
+/* One size for every mark in the bar. The title row sizes its icons by rules of its own (.toolbar-title-home,
+   .toolbar-title-help), which do not reach here, so the house, the magnifier and the cog came out at the ribbon's
+   size beside a small question mark and arrows. */
+.focus-mode-bar .action-icon-button svg,
+.focus-mode-bar .guide-help-link svg {
+  width: 20px;
+  height: 20px;
+}
+
+.focus-mode-bar .editor-home-control svg {
+  width: 22px;
+  height: 22px;
+}
+
+.focus-mode-bar .guide-help-link {
+  width: 32px;
+  height: 30px;
+  align-self: center;
+  color: #634729;
+  opacity: 1;
+}
+
+.focus-mode-bar .guide-help-link:hover {
+  color: var(--group-help);
+}
+
+html[data-theme="dark"] .focus-mode-bar .guide-help-link {
+  color: #e3d3c0;
+}
+
+.focus-mode-bar .action-icon-button:hover:not(:disabled) {
+  color: var(--group-help);
+}
+
+.focus-mode-bar .action-icon-button:disabled {
+  opacity: 0.45;
+}
+
+/* The tabs as in the title row, only lower and with a little rounding where they meet the bar's edge. */
+.focus-mode-bar .focus-mode-bar-tabs {
+  height: 100%;
+  margin: 0 2px;
+}
+
+.focus-mode-bar .focus-mode-bar-tabs button {
+  padding: 0 12px;
+  font-size: 11px;
+}
+
+.focus-mode-bar .focus-mode-bar-tabs button:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+html[data-theme="dark"] .focus-mode-bar {
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.45);
+}
+
+html[data-theme="dark"] .focus-mode-bar-grip {
+  color: #8f7a63;
+}
+
+html[data-theme="dark"] .focus-mode-bar .action-icon-button {
+  color: #e3d3c0;
+}
+
+html[data-theme="dark"] .focus-mode-bar .action-icon-button:hover:not(:disabled) {
+  color: #f7f2ea;
+}

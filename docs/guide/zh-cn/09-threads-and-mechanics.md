@@ -120,6 +120,8 @@ G 规格是符合 ISO 228-1 的平行惠氏管螺纹，常见于水、燃气、�
 
 {{ui:prop.loftWall}} 把实体变成上下开口的管。两端开口的横向尺寸都比外形小一个壁厚；壁倾斜处会略薄一些。把框架拖大，两端也随之扩大，而圆角半径和壁厚保持不变。
 
+{{ui:prop.loftTopWall}} 在有壁厚时为顶端设置单独的壁厚：例如一个喷嘴，底部矩形处厚 3 毫米，顶部圆形处以 1 毫米结束。在你输入自己的数值之前，它跟随底部的壁厚。两端之间壁厚均匀变化；在经过多个截面的过渡中，每个截面取与其高度相应的壁厚。
+
 {{ui:prop.loftSmooth}} 让过渡变得平滑。为 0 时，侧面从底部到顶部笔直延伸，像圆锥一样。为 100 时，两侧从两端笔直出发，在中间沿 S 曲线改变尺寸：软管接头从窄管平滑地扩到宽管，而不是像漏斗那样直斜。中间的数值在两者之间混合。平滑过渡可与 {{ui:prop.loftWall}}、扭转、倾斜和侧向偏移一起使用；带壁的管两端仍保持开口。它和直边放样一样是精确实体，所以其边可以倒角和倒圆，但它由多个截面构成，计算会稍慢。
 
 {{ui:prop.loftSegments}} 设定圆和圆角绘制得有多精细：一个整圆在视图以及 STL、OBJ 和 3MF 中由多少段直线组成。初始值为 96，对大多数零件已足够平滑；对于想看起来没有小平面的大圆端，可调高到 360。段数越多文件越大。多边形保持你设定的 {{ui:prop.loftBottomSides}}。当某端是圆形或带圆角时会显示该字段。
@@ -240,9 +242,13 @@ microSD 卡槽也是左边缘的接口，位于电路板下方（Zero 2 W 上在
 
 {{ui:shape.doubleCountersink}} 是两面都倒角的孔，用于正面和背面都要整洁的板件。它在形状库里没有单独的条目：取用 {{ui:shape.countersink}}，并在其属性中开启 {{ui:prop.screwHoleBothSides}}（本身就是双面锥形沉孔的实体已显示该开关开启）：两端各有一个锥面张开到 {{ui:prop.screwHoleHead}}，中间是 {{ui:prop.screwHoleShaft}}。你照旧设置 {{ui:prop.screwHoleAngle}} 和 {{ui:prop.screwHoleLength}}。如果孔太短，容不下两个完整的锥面，它们会以该角度在中间相接，杆部会比你设置的更宽：10 mm 的头部、6 mm 的杆部、90° 和 2 mm 的长度会形成两个从 10 mm 收窄到 8 mm 的锥面。作为孔，它像其他孔一样被推穿零件。
 
-把形状设为孔，并与零件分组。让它的顶端略高于头部应贴合的表面，使沉孔开口干净。要给六角螺母做沉孔，就用六边的 {{ui:shape.polygon}} 作为孔。 在{{ui:prop.screwHoleSize}}中可选 M2 到 M30（锥形沉孔到 M20），轴径（ISO 273 中等通孔）、头部直径以及深度或角度即按标准设置（DIN 974-1、ISO 15065），长度不变。对于六棱柱，{{ui:prop.nutPocketSize}}按 ISO 4032 设置螺母的对边宽度和高度，并留 0.4 mm 打印余量。
+把形状设为孔，并与零件分组。让它的顶端略高于头部应贴合的表面，使沉孔开口干净。要给六角螺母做沉孔，就用六边的 {{ui:shape.polygon}} 作为孔。 在{{ui:prop.screwHoleSize}}中可选 M2 到 M30（锥形沉孔到 M20），轴径（ISO 273 中等通孔）、头部直径以及深度或角度即按标准设置（DIN 974-1、ISO 15065），长度不变。对于六棱柱，{{ui:prop.nutPocketSize}}按 ISO 4032 设置螺母的对边宽度和高度，并留 0.4 mm 打印余量。 锥形沉孔还提供 ASME B18.6.1 的英制规格 #2 至 #14：它们的头部为 82°，澳大利亚木螺钉出售时所用的 gauge 规格也是同样的编号（6-gauge 就是 #6）。
 
 钻出的盲孔底部不是平的，而是钻头尖端留下的锥形（Discussion #621）。{{ui:shape.counterbore}}、{{ui:shape.countersink}}以及设为孔的{{ui:shape.cylinder}}都可以这样收尾：在{{ui:prop.holeBottom}}中选择 90°、118°（常见麻花钻）或 135° 的钻尖，或选{{ui:holeBottom.drillPointOther}}，再在{{ui:prop.drillPointAngle}}中输入 60° 到 150° 之间的角度。与图纸相同，深度——圆柱体的{{ui:prop.height}}、螺钉孔的{{ui:prop.screwHoleLength}}——只算到锥形开始的台阶处；尖端在它下方，118° 时约为直径的 0.3 倍，角度下方的一行会写出具体多深。锥形与孔一样宽，螺钉孔则与杆部一样宽。{{ui:holeBottom.flat}}让孔底保持原样。实体圆柱体保留平的端面，贯通的双面锥形沉孔也一样。
+
+长孔让零件在拧紧螺丝前仍能稍作移动，便于对齐（Discussion #1531）。在{{ui:shape.counterbore}}、{{ui:shape.countersink}}或{{ui:shape.doubleCountersink}}上打开{{ui:prop.screwHoleSlot}}：沉头孔或锥面以及孔身会绕过长孔的两端，并沿其两侧笔直延伸。{{ui:prop.screwHoleSlotLength}}决定延伸多长；起初与头部一样宽，沿宽度方向——要换方向就旋转该孔。{{ui:prop.screwHoleHead}}和{{ui:prop.screwHoleSize}}只改变头部，长孔保持不变。长孔没有钻尖，和圆孔一样是精确实体。
+
+沉头螺丝的头部与表面齐平。若要沉得更深，可在{{ui:shape.countersink}}上设置{{ui:prop.screwHoleRecess}}（Discussion #1531）：锥面上方会多出一段与头部同宽的直孔，深度为所设毫米数，{{ui:prop.screwHoleLength}}也包含这一段。{{ui:shape.doubleCountersink}}两端都有这段直孔。设为 0 时头部仍与表面齐平；长孔同样适用，且仍是精确实体。
 
 {{ui:shape.finishingWasher}}（一种装饰垫圈，Discussion #1131）是放在沉头或半沉头螺钉下面的拱形垫圈，用于在木头或盖板上显得整洁。它是实心件，底面平；从较低的边缘起，拱顶升到座面，座面是承托螺钉头的锥面，下面是孔。在 {{ui:prop.screwHoleSize}} 下选择 M2 到 M20：孔是该规格的过孔，座面是该规格的沉头孔，{{ui:prop.diameter}} 和 {{ui:prop.height}} 由此得出（M3：10.3 × 2.95 mm，M6：16.6 × 4.5 mm）。你也可以自己设定 {{ui:prop.diameter}}、{{ui:prop.height}}、{{ui:prop.centerHole}}、座面顶部的 {{ui:prop.screwHoleHead}} 及其 {{ui:prop.screwHoleAngle}}。它保持圆形，并且是精确实体，因此边工具和 STEP 都能处理它。
 

@@ -37,12 +37,12 @@ function guideSections(sharedStore: boolean): GuideSection[] {
     {
       title: "guide.group.shapes",
       chapter: "shapes",
-      lines: ["guide.shapes.add", "guide.shapes.text", "guide.shapes.inspector", "guide.shapes.handles", "guide.shapes.wrap", "guide.shapes.myShapes"],
+      lines: ["guide.shapes.add", "guide.shapes.text", "guide.shapes.stencilBridges","guide.shapes.inspector", "guide.shapes.handles", "guide.shapes.wrap", "guide.shapes.myShapes"],
     },
     {
       title: "guide.group.select",
       chapter: "select",
-      lines: ["guide.select.click", "guide.select.position", "guide.select.group", "guide.select.align", "guide.select.pivot", "guide.select.layFlat", "guide.select.carry", "guide.select.mateFaces", "guide.select.holePattern", "guide.select.faceTool", "guide.select.overhangs", "guide.select.pattern", "guide.select.notes", "guide.select.history"],
+      lines: ["guide.select.click", "guide.select.position", "guide.select.group", "guide.select.align", "guide.select.pivot", "guide.select.layFlat", "guide.select.carry", "guide.select.mateFaces", "guide.select.matePoint", "guide.select.holePattern", "guide.select.faceTool", "guide.select.supportRib", "guide.select.overhangs", "guide.select.pattern", "guide.select.notes", "guide.select.history"],
     },
     {
       title: "guide.group.measure",
@@ -79,7 +79,7 @@ function guideSections(sharedStore: boolean): GuideSection[] {
     {
       title: "guide.group.search",
       chapter: "shortcuts",
-      lines: ["guide.search.palette"],
+      lines: ["guide.search.palette", "guide.search.ownKeys"],
     },
     {
       title: "guide.group.settings",

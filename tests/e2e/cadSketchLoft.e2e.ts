@@ -3,6 +3,7 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { OcctKernel } from "occt-wasm";
 import { buildSketchLoftSolid, SKETCH_LOFT_HOLES, SKETCH_LOFT_OUTLINES, SKETCH_LOFT_STROKE_UNSUPPORTED, type SketchLoftPlace } from "@/lib/cadSketchLoft";
+import { applySketchFillet } from "@/lib/sketchFilletChamfer";
 import type { SketchPoint, SketchProfile, SketchSegment, SketchStroke } from "@/types/layerling";
 
 const K = 0.5522847498;
@@ -132,6 +133,27 @@ describe("a loft between two sketches with the real OCCT kernel", () => {
       expect(volume).toBeLessThan(2 * Math.max(area(wide), area(narrow)) * 1.1);
       expect(kernel.getBoundingBox(solid, true).ymax).toBeCloseTo(2, 4);
     }
+  });
+
+  it("keeps the inner wall inside when a rounded rectangle's line goes into a ring, rounds as big as the line is wide", () => {
+    // As in a video of the tool: a frame 89 x 38 built as a 3 mm line inside, its corners rounded by 3 mm, under a
+    // circle built as a 3 mm line on the middle, 137 mm up. The inner side of the frame loses its rounds and has four
+    // pieces like the circle; lofted piece to piece it turned by 45 degrees and came out through the outer wall.
+    let frame = rectangle(89, 38);
+    let next = 0;
+    for (const corner of ["r0", "r1", "r2", "r3"]) {
+      frame = applySketchFillet(frame, corner, 3, (prefix) => `${prefix}-${(next += 1)}`)!.profile;
+    }
+    const inside: SketchStroke = { width: 3, align: "inside", join: "miter", cap: "flat" };
+    const middle: SketchStroke = { width: 3, align: "center", join: "miter", cap: "flat" };
+    const solid = buildSketchLoftSolid(kernel, { profile: frame, stroke: inside, place: at(0) }, { profile: circle(30.25), stroke: middle, place: at(137) });
+    expect(kernel.isValid(solid)).toBe(true);
+    // The wall is what lies between the outer loft and the inner one, which must not reach out of it.
+    const outer = loft(kernel, frame, circle(31.75), at(0), at(137));
+    const inner = loft(kernel, rectangle(83, 32), circle(28.75), at(0), at(137));
+    expect(kernel.getVolume(kernel.cut(inner, outer))).toBeLessThan(1);
+    const wall = kernel.getVolume(outer) - kernel.getVolume(inner);
+    expect(Math.abs(kernel.getVolume(solid) - wall) / wall).toBeLessThan(0.002);
   });
 
   it("refuses sketches with more than one outline, or with holes that do not match", () => {

@@ -12,9 +12,39 @@ export type FacePick = { shapeId: string; normal: Vec; point: Vec; axis?: RoundF
 /**
  * How the moved face meets the other: "against" puts them face to face (back
  * to back, touching), "flush" lays them in one plane, side by side, and
- * "concentric" puts two round faces on one axis (#794).
+ * "concentric" puts two round faces on one axis (#794). "point" moves the body
+ * so a point on it - a corner, a spot on an edge, the centre of a round edge
+ * or a reference point - lands on a point of another body (Discussion #1491).
  */
-export type MateMode = "against" | "flush" | "concentric";
+export type MateMode = "against" | "flush" | "concentric" | "point";
+
+/**
+ * A point clicked for "Point to point": the body it lies on, or null for a
+ * reference point, and where it is in world space.
+ */
+export type PointPick = { shapeId: string | null; point: Vec };
+
+/**
+ * The axes "Point to point" moves along, named as the editor shows them: X and
+ * Y across the plate, Z up. Only X and Y on puts one point straight above or
+ * below the other.
+ */
+export type MateAxes = { x: boolean; y: boolean; z: boolean };
+
+export const ALL_MATE_AXES: MateAxes = { x: true, y: true, z: true };
+
+/**
+ * How far "Point to point" moves the body, in world space: the step from the
+ * source point to the target point, along the axes switched on only. The
+ * editor's Y runs along world z and its Z along world y, the height.
+ */
+export function pointMotion(source: Vec, target: Vec, axes: MateAxes) {
+  return new THREE.Vector3(
+    axes.x ? target.x - source.x : 0,
+    axes.z ? target.y - source.y : 0,
+    axes.y ? target.z - source.z : 0,
+  );
+}
 
 const vector = (value: Vec) => new THREE.Vector3(value.x, value.y, value.z);
 
@@ -68,4 +98,50 @@ export function concentricMotion(source: Pick<RoundFaceAxis, "point" | "directio
   const offset = vector(target.point).sub(pivot);
   const translation = offset.addScaledVector(targetDirection, -offset.dot(targetDirection));
   return { rotation: turned ? rotation : null, pivot, translation };
+}
+
+/** Closer than this to the pivot or the axis, a point gives no direction to turn by. */
+const POINT_TURN_MIN_DISTANCE = 1e-4;
+
+/**
+ * "Point to point", second pair (Discussion #1491): the first point already
+ * lies where it should, at `pivot`. The body turns about it - the shortest
+ * turn - so the line from the pivot through `source` runs through `target`.
+ * Null when either point lies on the pivot and gives no direction.
+ */
+export function pointTurnAboutPivot(pivot: Vec, source: Vec, target: Vec): THREE.Quaternion | null {
+  const from = vector(source).sub(vector(pivot));
+  const to = vector(target).sub(vector(pivot));
+  if (from.length() < POINT_TURN_MIN_DISTANCE || to.length() < POINT_TURN_MIN_DISTANCE) return null;
+  return shortestTurn(from, to);
+}
+
+/**
+ * "Point to point", third pair: the first two pairs fixed a line, from `pivot`
+ * towards `axisPoint`. The body turns about that line only, so `source` comes
+ * into the plane through the line and `target` - on the same side. Null when
+ * either point lies on the line.
+ */
+export function pointTurnAboutAxis(pivot: Vec, axisPoint: Vec, source: Vec, target: Vec): THREE.Quaternion | null {
+  const origin = vector(pivot);
+  const axis = vector(axisPoint).sub(origin);
+  if (axis.length() < POINT_TURN_MIN_DISTANCE) return null;
+  axis.normalize();
+  const across = (value: Vec) => {
+    const offset = vector(value).sub(origin);
+    return offset.addScaledVector(axis, -offset.dot(axis));
+  };
+  const from = across(source);
+  const to = across(target);
+  if (from.length() < POINT_TURN_MIN_DISTANCE || to.length() < POINT_TURN_MIN_DISTANCE) return null;
+  from.normalize();
+  to.normalize();
+  const angle = Math.atan2(new THREE.Vector3().crossVectors(from, to).dot(axis), from.dot(to));
+  return new THREE.Quaternion().setFromAxisAngle(axis, angle);
+}
+
+/** Where a point lands when the body turns by `rotation` about `pivot`. */
+export function turnedAbout(point: Vec, rotation: THREE.Quaternion, pivot: Vec): THREE.Vector3 {
+  const origin = vector(pivot);
+  return vector(point).sub(origin).applyQuaternion(rotation).add(origin);
 }

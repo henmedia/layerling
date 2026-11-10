@@ -46,7 +46,7 @@ import { rememberManifoldRuntime, setManifoldLoader } from "@/lib/manifoldHandle
 import { meshForTwist, twistBandCount } from "@/lib/heightSlices";
 import { groupedContentScale, groupedPartSizeScale, scaleGroupedVertices } from "@/lib/groupScale";
 import { quaternionForShape } from "@/lib/geometryRotation";
-import { canonicalizeShape, deformsAboutOrigin, meshYawDegrees, mirroredAxisCount, mirrorSign, resizedImportedMeshPositions, resizedShapeSize, shapeDepth, shapeExtrudeDeformAt, shapeHasExtrudeDeform, shapeHasTaper, shapeTaperScaleAt, shapeWidth } from "@/lib/workplaneShapes";
+import { canonicalizeShape, deformsAboutOrigin, extrudeTwistPivot, meshYawDegrees, mirroredAxisCount, mirrorSign, resizedImportedMeshPositions, resizedShapeSize, shapeDepth, shapeExtrudeDeformAt, shapeHasExtrudeDeform, shapeHasTaper, shapeTaperScaleAt, shapeWidth } from "@/lib/workplaneShapes";
 import type { WorkplaneShape } from "@/types/layerling";
 
 export type Vec3 = [number, number, number];
@@ -183,6 +183,11 @@ export function transformMesh(mesh: MeshData, shape: WorkplaneShape): MeshData {
   const mirrorY = mirrorSign(shape.mirrorY);
   const mirrorZ = mirrorSign(shape.mirrorZ);
   const reversedWinding = mirroredAxisCount(shape) % 2 === 1;
+  // A body with a rotation pivot of its own twists about the vertical through it, not about its middle.
+  // Relative to the middle the taper works about, like localX and localZ below.
+  const twistPivot = deformed ? extrudeTwistPivot(shape) : undefined;
+  const pivotX = twistPivot ? twistPivot.x - deformCenterX : 0;
+  const pivotZ = twistPivot ? twistPivot.z - deformCenterZ : 0;
   const local = mesh.vertices.map(([x, y, z]) => {
     const normalizedHeight = (y - minLocalY) / taperHeight;
     const widthScale = tapered ? shapeTaperScaleAt(shape, normalizedHeight, "width") : 1;
@@ -193,8 +198,10 @@ export function transformMesh(mesh: MeshData, shape: WorkplaneShape): MeshData {
       const deform = shapeExtrudeDeformAt(shape, normalizedHeight);
       const cos = Math.cos(deform.twistRadians);
       const sin = Math.sin(deform.twistRadians);
-      const twistedX = localX * cos - localZ * sin;
-      const twistedZ = localX * sin + localZ * cos;
+      const aboutX = localX - pivotX;
+      const aboutZ = localZ - pivotZ;
+      const twistedX = pivotX + aboutX * cos - aboutZ * sin;
+      const twistedZ = pivotZ + aboutX * sin + aboutZ * cos;
       localX = twistedX + deform.offsetX;
       localZ = twistedZ + deform.offsetZ;
     }
@@ -503,7 +510,7 @@ function geometryMeshForShape(shape: WorkplaneShape): MeshData | null {
     case "counterbore":
     case "countersink":
     case "doubleCountersink":
-      geometry = createScrewHoleGeometry({ kind: shape.kind, width, depth, height, screwHoleShaft: shape.screwHoleShaft, screwHoleHeadDepth: shape.screwHoleHeadDepth, screwHoleAngle: shape.screwHoleAngle, drillPointAngle: shapeDrillPointAngle(shape), sides: roundSideCount(shape.sides, width, depth) });
+      geometry = createScrewHoleGeometry({ kind: shape.kind, width, depth, height, screwHoleShaft: shape.screwHoleShaft, screwHoleHeadDepth: shape.screwHoleHeadDepth, screwHoleAngle: shape.screwHoleAngle, screwHoleRecess: shape.screwHoleRecess, drillPointAngle: shapeDrillPointAngle(shape), slot: shape.screwHoleSlot, sides: roundSideCount(shape.sides, width, depth) });
       break;
     case "finishingWasher":
       geometry = createFinishingWasherGeometry({ width, depth, height, screwHoleShaft: shape.screwHoleShaft, screwHoleHeadDepth: shape.screwHoleHeadDepth, screwHoleAngle: shape.screwHoleAngle, sides: roundSideCount(shape.sides, width, depth) });
@@ -681,7 +688,9 @@ function geometryMeshForShape(shape: WorkplaneShape): MeshData | null {
         depth,
         height,
         cornerFillet: shape.cornerFillet,
+        cornerFillets: shape.cornerFillets,
         topBottomFillet: shape.topBottomFillet,
+        bottomFillet: shape.bottomFillet,
         roundedBoxQuality: shape.roundedBoxQuality,
       });
       break;
@@ -840,8 +849,8 @@ export function meshForShape(shape: WorkplaneShape): MeshData {
 // Moving or turning a spring built it again from scratch, about 300 ms each time it was aligned,
 // exported or split. The mesh before transformMesh does not depend on where the shape stands, so
 // the last ones are kept and found by the other fields. Text is left out: it builds a stand-in
-// until its font has loaded.
-const PLACEMENT_FIELDS = new Set(["id", "name", "color", "gridfinityLabelColor", "x", "z", "elevation", "rotation", "rotationX", "rotationZ"]);
+// until its font has loaded. Paint (paint.ts) lies on the mesh and does not change it.
+const PLACEMENT_FIELDS = new Set(["id", "name", "color", "gridfinityLabelColor", "paint", "x", "z", "elevation", "rotation", "rotationX", "rotationZ"]);
 const MAX_UNPLACED_MESHES = 24;
 const MAX_UNPLACED_MESH_VERTICES = 1_500_000;
 const unplacedMeshCache: Array<{ shape: WorkplaneShape; mesh: MeshData; fontRevision: number }> = [];

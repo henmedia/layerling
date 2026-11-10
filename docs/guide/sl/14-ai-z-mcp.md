@@ -79,9 +79,11 @@ Umetna inteligenca dela z istimi funkcijami kot ti, teče po isti poti kot tvoje
 | --- | --- |
 | `layerling_open_editor` | odpre nov zavihek urejevalnika v privzetem brskalniku in počaka, da se poveže (samo na tvojem računalniku) |
 | `layerling_list_editors` | našteje odprte zavihke urejevalnika |
+| `layerling_rename_project` | projektu da ime, kot svinčnik ob imenu projekta |
 | `layerling_read_scene` | prebere prizor, izbor, enote in natančne mere vseh objektov |
 | `layerling_list_objects` | našteje vse objekte z merami, lego, zasukom in oznako |
 | `layerling_select_objects` | izbere objekte |
+| `layerling_hide_others` | skrije vse razen izbora ali navedenih objektov, v enem koraku razveljavitve |
 | `layerling_delete_objects` | izbriše objekte |
 | `layerling_move_object` | premakne objekt na drugo mesto na seznamu objektov |
 | `layerling_create_shape` | ustvari obliko: kvader, valj, besedilo (tudi ukrivljeno), navoj, zobnik, skicirano telo in vse druge |
@@ -94,9 +96,12 @@ Umetna inteligenca dela z istimi funkcijami kot ti, teče po isti poti kot tvoje
 | `layerling_scale_objects` | poveča objekte za odstotno vrednost, skupaj ali vsak zase |
 | `layerling_lay_flat` | položi objekt s ploskvijo na ploščo |
 | `layerling_place_on_face` | postavi objekte na ploskev drugega, tudi poševno, kot tipka C |
-| `layerling_perforate_face` | vreže vzorec lukenj v ravno ploskev, luknje ostanejo kot luknje, združene v skupino s telesom |
+| `layerling_perforate_face` | vreže vzorec lukenj v ravno ploskev ali okrog stene valja, cevi ali izvrtine, luknje ostanejo kot luknje, združene v skupino s telesom |
 | `layerling_sweep_sketch` | povleče pravokoten ali okrogel prerez vzdolž poti iz točk kot eno natančno telo; sklenjena pot da obroč |
 | `layerling_push_face` | ravno ploskev potegne navzven ali vanjo izreže žep, z odmikom od roba in polmerom vogalov; nov del je telo iz skice, združeno v skupino s telesom |
+| `layerling_paint` | pobarva dele telesa v lastnih barvah za tisk v več barvah (Barvanje): zapolni ploskev do ostrih robov, okrogla lisa ali laso v ravnem pogledu; radiranje, odstrani vse; shrani se s telesom in se v 3MF zapiše kot pobarvane ploskve |
+| `layerling_support_rib` | postavi tanko podporno rebro pod spodnjo ploskev dela, natisnjenega poševno na robu, z mostički, visokimi eno plast (Podporno rebro) |
+| `layerling_stencil_bridges` | drži dele plošče z besedilom, izrezanim skoznjo, ki bi izpadli, z mostički, združenimi s ploščo, v podani širini in višini (Mostički šablone) |
 | `layerling_mate_faces` | položi ploskev enega objekta na ploskev drugega, drugo proti drugemu ali poravnano |
 | `layerling_open_group` | odpre skupino, da so njeni deli posamezno spremenljivi, tudi skupino v odprti |
 | `layerling_close_group` | jo spet zapre (»Končano«) ali prekine |
@@ -154,6 +159,7 @@ Umetna inteligenca dela z istimi funkcijami kot ti, teče po isti poti kot tvoje
 | `layerling_insert_custom_shape` | vstavi lastno obliko v odprti načrt, po želji na mesto x/z |
 | `layerling_delete_custom_shape` | odstrani lastno obliko; vstavljena telesa ostanejo |
 | `layerling_show_workplane` | skrije ploščo z njeno mrežo in jo spet prikaže, na primer za sliko spodnje strani (samo pogled) |
+| `layerling_focus_mode` | vklopi in izklopi način osredotočenja: skrije naslovno vrstico in nogo za več prostora (le okvir urejevalnika) |
 | `layerling_set_section_view` | prereže pogled vzdolž ravnine, da se vidi notranjost (samo pogled, nič se ne razreže) |
 | `layerling_measurements` | prikaže ali skrije meritve merilnega traku in jih našteje z njihovimi dolžinami, ter skrije ali prikaže mere okoli izbora kot [[Q]], in vnese dolžino za eno od njih, kar premakne telo na njenem koncu kot klik na število |
 | `layerling_measure_angle` | izmeri kot, kakor kotomer: v oglišču treh točk ali med dvema ravnima ploskvama, in ga pokaže v pogledu |

@@ -49,11 +49,13 @@ import { groundFootprintForFrame, type SelectionFrame } from "@/lib/liftGeometry
 import { regularPolygonFootprintScale } from "@/lib/regularPolygonFootprint";
 import { roundSideCount } from "@/lib/roundSideCount";
 import { createPyramidGeometry } from "@/lib/pyramidGeometry";
-import { positionsForTwist, twistBandCount } from "@/lib/heightSlices";
+import { bandLevels, positionsForTwist, twistBandCount, twistEdgeLength } from "@/lib/heightSlices";
 import { toCreasedNormals } from "@/lib/creasedNormals";
+import { canPaintShape } from "@/lib/paint";
+import { paintedBodyMesh } from "@/lib/paintMesh";
 import { shapeHasAlongDeform, slopePositions } from "@/lib/slopeAlong";
 import { DEFAULT_EDGE_LINE_COLOR } from "@/lib/workplaneGrid";
-import { deformsAboutOrigin, mirroredAxisCount, mirrorSign, preservesEdgeTreatmentSize, resizedImportedCoordinates, resizedImportedMeshPositions, shapeDepth, shapeExtrudeDeformAt, shapeHasExtrudeDeform, shapeHasShapeDeform, shapeHasTaper, shapeSupportsTaper, shapeTaperDimensions, shapeTaperScaleAt, shapeWidth } from "@/lib/workplaneShapes";
+import { deformsAboutOrigin, extrudeTwistPivot, mirroredAxisCount, mirrorSign, preservesEdgeTreatmentSize, resizedImportedCoordinates, resizedImportedMeshPositions, shapeDepth, shapeExtrudeDeformAt, shapeHasExtrudeDeform, shapeHasShapeDeform, shapeHasTaper, shapeSupportsTaper, shapeTaperDimensions, shapeTaperScaleAt, shapeWidth } from "@/lib/workplaneShapes";
 import { sphereTessellation } from "@/lib/sphereTessellation";
 import { torusTessellation } from "@/lib/torusTessellation";
 import { torusRadii, torusTubeRatio } from "@/lib/torusShape";
@@ -212,15 +214,19 @@ export let edgeLineStyle = { enabled: false, color: DEFAULT_EDGE_LINE_COLOR };
 /** "Show holes more clearly" (#662): darker, denser holes with a line round them, handed over like the edge lines. */
 export let strongHoles = false;
 
+/** The hole opacity slider (#1566) in percent, 10 to 90; 0 is automatic and follows strongHoles. */
+export let holeOpacitySetting = 0;
+
 export function setEdgeLineStyle(enabled: boolean, color: string) {
   const changed = edgeLineStyle.enabled !== enabled || (enabled && edgeLineStyle.color !== color);
   edgeLineStyle = { enabled, color };
   return changed;
 }
 
-export function setStrongHoles(enabled: boolean) {
-  const changed = strongHoles !== enabled;
+export function setStrongHoles(enabled: boolean, opacityPercent = 0) {
+  const changed = strongHoles !== enabled || holeOpacitySetting !== opacityPercent;
   strongHoles = enabled;
+  holeOpacitySetting = opacityPercent;
   return changed;
 }
 export const STRONG_HOLE_COLOR = "#5b6670";
@@ -305,6 +311,9 @@ export function tapeShapeTopologyKey(shape: WorkplaneShape): string {
     slopeEnd: shape.slopeEnd,
     slopeSide: shape.slopeSide,
     slopeCurve: shape.slopeCurve,
+    slopeFrom: shape.slopeFrom,
+    sideDrop: shape.sideDrop,
+    sideCurve: shape.sideCurve,
     narrowEnd: shape.narrowEnd,
     narrowSide: shape.narrowSide,
     narrowCurve: shape.narrowCurve,
@@ -473,6 +482,7 @@ export function tapeShapeTopologyKey(shape: WorkplaneShape): string {
     loftOffsetX: shape.loftOffsetX,
     loftOffsetZ: shape.loftOffsetZ,
     loftWall: shape.loftWall,
+    loftTopWall: shape.loftTopWall,
     loftTwist: shape.loftTwist,
     loftSmooth: shape.loftSmooth,
     loftSegments: shape.loftSegments,
@@ -484,13 +494,17 @@ export function tapeShapeTopologyKey(shape: WorkplaneShape): string {
     screwHoleShaft: shape.screwHoleShaft,
     screwHoleHeadDepth: shape.screwHoleHeadDepth,
     screwHoleAngle: shape.screwHoleAngle,
+    screwHoleSlot: shape.screwHoleSlot,
+    screwHoleRecess: shape.screwHoleRecess,
     // The drill point as built: a solid, the double countersink and a tapered body keep a flat end (drillPoint.ts).
     drillPoint: shapeDrillPointAngle(shape),
     portProfile: shape.portProfile,
     // A dovetail cut-out grows by its clearance, so body and socket differ.
     dovetailHole: shape.kind === "dovetail" ? Boolean(shape.hole) : undefined,
     cornerFillet: shape.cornerFillet,
+    cornerFillets: shape.cornerFillets,
     topBottomFillet: shape.topBottomFillet,
+        bottomFillet: shape.bottomFillet,
     roundedBoxQuality: shape.roundedBoxQuality,
     bentTubeProfile: shape.bentTubeProfile,
     bentTubeInnerProfile: shape.bentTubeInnerProfile,
@@ -576,7 +590,7 @@ export function shapeMaterialSignature(shape: WorkplaneShape): string {
     color: shape.color,
     // A bin's letters in a colour of their own (#1308) are drawn in a second material; the mesh stays as it is.
     letterColor: gridfinityLabelColor(shape),
-    hole: shape.hole ? (strongHoles ? "strong" : true) : false,
+    hole: shape.hole ? `${strongHoles ? "strong" : "plain"}:${holeOpacitySetting}` : false,
     transparent: Boolean(shape.transparent),
     multicolor: shape.groupedShapes?.length ? groupShowsPartColors(shape) : undefined,
     // A group turned into a bundle (or back) changes the colour of its selection outline.
@@ -603,6 +617,16 @@ export function polygonSidesForShape(shape: WorkplaneShape) {
 }
 
 export function shapeGeometrySignature(shape: WorkplaneShape): string {
+  // A painted body is drawn from its mesh with the paint cut in, in millimetres (paintedBodyGeometry): its strokes,
+  // its size and whether the kernel was there to cut them are part of it too.
+  if (shapeShowsPaint(shape)) {
+    return JSON.stringify({
+      painted: shapeGeometrySignature({ ...shape, paint: undefined }),
+      size: [shapeWidth(shape), shape.height, shapeDepth(shape)],
+      strokes: shapeResourceId(shape.paint),
+      kernel: manifoldRevision(),
+    });
+  }
   const taper = !shapeSupportsTaper(shape.kind) || !shapeHasTaper(shape)
     ? null
     : { ...shapeTaperDimensions(shape), baseWidth: shapeWidth(shape), baseDepth: shapeDepth(shape) };
@@ -611,10 +635,10 @@ export function shapeGeometrySignature(shape: WorkplaneShape): string {
   // before the twist stays on screen.
   // A slope along (slopeAlong.ts) rebuilds the mesh per vertex too, worked out in millimetres.
   const slope = shapeHasAlongDeform(shape)
-    ? { end: shape.slopeEnd, side: shape.slopeSide, curve: shape.slopeCurve, narrow: [shape.narrowEnd, shape.narrowSide, shape.narrowCurve, shape.narrowStart] }
+    ? { end: shape.slopeEnd, side: shape.slopeSide, curve: shape.slopeCurve, from: shape.slopeFrom, sides: [shape.sideDrop, shape.sideCurve], narrow: [shape.narrowEnd, shape.narrowSide, shape.narrowCurve, shape.narrowStart] }
     : null;
   const deform = shapeHasExtrudeDeform(shape) || slope
-    ? { twist: shape.extrudeTwist, offsetX: shape.extrudeTopOffsetX, offsetZ: shape.extrudeTopOffsetZ, slope }
+    ? { twist: shape.extrudeTwist, offsetX: shape.extrudeTopOffsetX, offsetZ: shape.extrudeTopOffsetZ, slope, pivot: extrudeTwistPivot(shape) }
     : null;
   if (shape.groupedShapes?.length && !shape.importedMesh) {
     return JSON.stringify({
@@ -716,11 +740,15 @@ export function shapeGeometrySignature(shape: WorkplaneShape): string {
     taperTopScale: shape.taperTopScale,
     taperBottomScale: shape.taperBottomScale,
     extrudeTwist: shape.extrudeTwist,
+    twistPivot: extrudeTwistPivot(shape),
     extrudeTopOffsetX: shape.extrudeTopOffsetX,
     extrudeTopOffsetZ: shape.extrudeTopOffsetZ,
     slopeEnd: shape.slopeEnd,
     slopeSide: shape.slopeSide,
     slopeCurve: shape.slopeCurve,
+    slopeFrom: shape.slopeFrom,
+    sideDrop: shape.sideDrop,
+    sideCurve: shape.sideCurve,
     narrowEnd: shape.narrowEnd,
     narrowSide: shape.narrowSide,
     narrowCurve: shape.narrowCurve,
@@ -891,6 +919,7 @@ export function shapeGeometrySignature(shape: WorkplaneShape): string {
     loftOffsetX: shape.loftOffsetX,
     loftOffsetZ: shape.loftOffsetZ,
     loftWall: shape.loftWall,
+    loftTopWall: shape.loftTopWall,
     loftTwist: shape.loftTwist,
     loftSmooth: shape.loftSmooth,
     loftSegments: shape.loftSegments,
@@ -902,13 +931,17 @@ export function shapeGeometrySignature(shape: WorkplaneShape): string {
     screwHoleShaft: shape.screwHoleShaft,
     screwHoleHeadDepth: shape.screwHoleHeadDepth,
     screwHoleAngle: shape.screwHoleAngle,
+    screwHoleSlot: shape.screwHoleSlot,
+    screwHoleRecess: shape.screwHoleRecess,
     // The drill point as built: a solid, the double countersink and a tapered body keep a flat end (drillPoint.ts).
     drillPoint: shapeDrillPointAngle(shape),
     portProfile: shape.portProfile,
     // A dovetail cut-out grows by its clearance, so body and socket differ.
     dovetailHole: shape.kind === "dovetail" ? Boolean(shape.hole) : undefined,
     cornerFillet: shape.cornerFillet,
+    cornerFillets: shape.cornerFillets,
     topBottomFillet: shape.topBottomFillet,
+        bottomFillet: shape.bottomFillet,
     roundedBoxQuality: shape.roundedBoxQuality,
     bentTubeProfile: shape.bentTubeProfile,
     bentTubeInnerProfile: shape.bentTubeInnerProfile,
@@ -1083,7 +1116,8 @@ export function syncShapeObjectDimensions(object: THREE.Group, shape: WorkplaneS
   object.userData.tapeDimensions = [shapeWidth(shape), shape.height, shapeDepth(shape)] satisfies [number, number, number];
   object.userData.tapeTopologyKey = tapeShapeTopologyKey(shape);
   const surface = object.children.find((child): child is THREE.Mesh => child instanceof THREE.Mesh && Boolean(child.userData.shapeSurface));
-  if (!surface) return;
+  // A painted body's mesh is built at its size (paintedBodyGeometry): it is no unit body to stretch.
+  if (!surface || surface.geometry.userData.paintColors) return;
   const width = shapeWidth(shape);
   const depth = shapeDepth(shape);
   let scale: THREE.Vector3 | null = null;
@@ -1174,7 +1208,8 @@ export function syncShapeObjectAppearance(
     const material = sharedShapeMaterial(shape, Boolean(surface.geometry.getAttribute("color")) && !shape.hole);
     const nextMaterial = shape.kind === "box" && shape.imagePlate && !shape.hole
       ? createImagePlateMaterials(shape, material, onTextureReady)
-      : shape.kind === "gridfinity" ? gridfinityMaterials(shape, material, surface.geometry) : material;
+      : surface.geometry.userData.paintColors ? paintMaterials(shape, material, surface.geometry)
+        : shape.kind === "gridfinity" ? gridfinityMaterials(shape, material, surface.geometry) : material;
     const currentMaterials = Array.isArray(surface.material) ? surface.material : null;
     const sameMaterial = Array.isArray(nextMaterial)
       ? Boolean(currentMaterials && nextMaterial.every((entry, index) => currentMaterials[index] === entry))
@@ -1733,7 +1768,9 @@ export function retainSharedShapeGeometry(mesh: THREE.Mesh, geometry: THREE.Buff
 export function groupChildAppearance(group: WorkplaneShape, child: WorkplaneShape): WorkplaneShape {
   if (group.hole) return { ...child, hole: true, color: "#b8c2cc" };
   // One colour for the whole group, nested groups included.
-  const tinted = groupShowsPartColors(group) ? child : { ...child, color: group.color, multicolor: false, gridfinityLabelColor: undefined };
+  // A part's paint shows where the part stays a body of its own, in a bundle; a group's own paint is the group's (paint.ts).
+  const ownPaint = group.groupOperation === "bundle" ? child.paint : undefined;
+  const tinted = groupShowsPartColors(group) ? { ...child, paint: ownPaint } : { ...child, color: group.color, multicolor: false, gridfinityLabelColor: undefined, paint: undefined };
   if (group.transparent) return { ...tinted, transparent: true };
   return tinted;
 }
@@ -1744,8 +1781,74 @@ export function groupChildAppearance(group: WorkplaneShape, child: WorkplaneShap
 export const TRANSPARENT_SOLID_OPACITY = 0.4;
 
 export function holeOpacity(shape: WorkplaneShape) {
+  // A chosen opacity: an imported mesh a little lighter, as in the automatic values, since its inner faces add up.
+  if (holeOpacitySetting > 0) return (holeOpacitySetting / 100) * (shape.importedMesh ? 0.75 : 1);
   if (strongHoles) return shape.importedMesh ? 0.6 : 0.72;
   return shape.importedMesh ? 0.34 : 0.52;
+}
+
+/** Whether a body is drawn with its paint (paint.ts): a solid body of its own with strokes; a hole shows none. */
+export function shapeShowsPaint(shape: WorkplaneShape) {
+  return Boolean(shape.paint?.length) && canPaintShape(shape);
+}
+
+/** The body as addMesh and the edge lines take it once its mesh already carries its taper, twist and slope. */
+function shapeWithoutDeform(shape: WorkplaneShape): WorkplaneShape {
+  return {
+    ...shape,
+    taperTopWidth: undefined,
+    taperTopDepth: undefined,
+    taperBottomWidth: undefined,
+    taperBottomDepth: undefined,
+    taperTopScale: undefined,
+    taperBottomScale: undefined,
+    extrudeTwist: undefined,
+    extrudeTopOffsetX: undefined,
+    extrudeTopOffsetZ: undefined,
+    slopeEnd: undefined,
+    sideDrop: undefined,
+    narrowEnd: undefined,
+  };
+}
+
+/** A painted body's materials: its own for the faces without paint, then one per colour of the paint, for the groups of paintedBodyGeometry. */
+function paintMaterials(shape: WorkplaneShape, material: THREE.MeshStandardMaterial, geometry: THREE.BufferGeometry) {
+  const colors = geometry.userData.paintColors as string[] | undefined;
+  return colors?.length ? [material, ...colors.map((color) => sharedShapeMaterial({ ...shape, color }))] : material;
+}
+
+/**
+ * A painted body's geometry, in the frame of its object as addMesh sets it: the faces of its painted mesh
+ * (paintMesh.ts) in one group per colour, the body's own colour first, its normals creased at 30° as a
+ * plain body's are smooth round a cylinder and sharp at a box's edges. Null when there is nothing to draw.
+ */
+function paintedBodyGeometry(shape: WorkplaneShape): THREE.BufferGeometry | null {
+  const painted = paintedBodyMesh(shape);
+  if (!painted || painted.faces.length === 0) return null;
+  const colors: string[] = [];
+  painted.colors.forEach((color) => {
+    if (color && !colors.includes(color)) colors.push(color);
+  });
+  const positions = new Float32Array(painted.vertices.length * 3);
+  painted.vertices.forEach(([x, y, z], index) => positions.set([x, y, z], index * 3));
+  const index: number[] = [];
+  const indexed = new THREE.BufferGeometry();
+  indexed.setAttribute("position", new THREE.BufferAttribute(positions, 3));
+  [null, ...colors].forEach((color, materialIndex) => {
+    const start = index.length;
+    painted.faces.forEach((face, faceIndex) => {
+      if ((painted.colors[faceIndex] ?? null) === color) index.push(face[0], face[1], face[2]);
+    });
+    if (index.length > start) indexed.addGroup(start, index.length - start, materialIndex);
+  });
+  indexed.setIndex(index);
+  const geometry = toCreasedNormals(indexed, Math.PI / 6);
+  if (geometry !== indexed) indexed.dispose();
+  geometry.computeBoundingBox();
+  geometry.computeBoundingSphere();
+  geometry.userData.paintColors = colors;
+  geometry.userData.cached = true;
+  return geometry;
 }
 
 /** A bin's material, and a second one in its letters' colour when they have one of their own (#1308), for the second group of its mesh, which holds their faces. */
@@ -1969,6 +2072,21 @@ export function createShapeObject(
   const height = shape.height;
   const geometryCacheKey = shapeGeometrySignature(shape);
 
+  // A painted body (paint.ts) is drawn from its mesh with the paint cut in, already tapered and twisted and in
+  // millimetres: it is not stretched by the object, nor tapered once more by addMesh.
+  if (shapeShowsPaint(shape)) {
+    const painted = sharedShapeGeometry(geometryCacheKey, () => paintedBodyGeometry(shape) ?? new THREE.BufferGeometry());
+    if (painted.getAttribute("position")) {
+      addMesh(group, painted, paintMaterials(shape, material, painted), shapeWithoutDeform(shape));
+      group.traverse((child) => {
+        child.userData.shapeId = shape.id;
+      });
+      setObjectRenderLayer(group, RENDER_LAYER_SHAPES);
+      freezeStaticObjectMatrices(group);
+      return group;
+    }
+  }
+
   switch (shape.kind) {
     case "box":
       addMesh(
@@ -2027,7 +2145,7 @@ export function createShapeObject(
     case "counterbore":
     case "countersink":
     case "doubleCountersink":
-      addMesh(group, sharedShapeGeometry(geometryCacheKey, () => createScrewHoleGeometry({ kind: shape.kind as "counterbore" | "countersink" | "doubleCountersink", width, depth, height, screwHoleShaft: shape.screwHoleShaft, screwHoleHeadDepth: shape.screwHoleHeadDepth, screwHoleAngle: shape.screwHoleAngle, drillPointAngle: shapeDrillPointAngle(shape), sides: roundSideCount(shape.sides, width, depth) })), material, shape);
+      addMesh(group, sharedShapeGeometry(geometryCacheKey, () => createScrewHoleGeometry({ kind: shape.kind as "counterbore" | "countersink" | "doubleCountersink", width, depth, height, screwHoleShaft: shape.screwHoleShaft, screwHoleHeadDepth: shape.screwHoleHeadDepth, screwHoleAngle: shape.screwHoleAngle, screwHoleRecess: shape.screwHoleRecess, drillPointAngle: shapeDrillPointAngle(shape), slot: shape.screwHoleSlot, sides: roundSideCount(shape.sides, width, depth) })), material, shape);
       break;
     case "finishingWasher":
       addMesh(group, sharedShapeGeometry(geometryCacheKey, () => createFinishingWasherGeometry({ width, depth, height, screwHoleShaft: shape.screwHoleShaft, screwHoleHeadDepth: shape.screwHoleHeadDepth, screwHoleAngle: shape.screwHoleAngle, sides: roundSideCount(shape.sides, width, depth) })), material, shape);
@@ -2293,7 +2411,9 @@ export function createShapeObject(
         depth,
         height,
         cornerFillet: shape.cornerFillet,
+        cornerFillets: shape.cornerFillets,
         topBottomFillet: shape.topBottomFillet,
+        bottomFillet: shape.bottomFillet,
         roundedBoxQuality: shape.roundedBoxQuality,
       })), material, shape);
       break;
@@ -2555,6 +2675,12 @@ export function taperGeometryForShape(geometry: THREE.BufferGeometry, shape: Wor
   const scaleX = stretch(shapeWidth(shape), box.max.x - box.min.x);
   const scaleZ = stretch(shapeDepth(shape), box.max.z - box.min.z);
   const unit = scaleX !== 1 || scaleZ !== 1;
+  // A body with a rotation pivot of its own twists about the vertical through it, not about its middle.
+  // The pivot is in millimetres; the drawn body may be a unit one stretched afterwards, so it is brought back into
+  // the geometry's own units, where the taper above and the turn below both work.
+  const twistPivot = deformed ? extrudeTwistPivot(shape) : undefined;
+  const twistX = twistPivot ? twistPivot.x / scaleX : centerX;
+  const twistZ = twistPivot ? twistPivot.z / scaleZ : centerZ;
   for (let index = 0; index < position.count; index += 1) {
     const y = position.getY(index);
     const normalizedHeight = (y - box.min.y) / height;
@@ -2566,10 +2692,10 @@ export function taperGeometryForShape(geometry: THREE.BufferGeometry, shape: Wor
       const deform = shapeExtrudeDeformAt(shape, normalizedHeight);
       const cos = Math.cos(deform.twistRadians);
       const sin = Math.sin(deform.twistRadians);
-      const relativeX = (localX - centerX) * scaleX;
-      const relativeZ = (localZ - centerZ) * scaleZ;
-      localX = centerX + (relativeX * cos - relativeZ * sin + deform.offsetX) / scaleX;
-      localZ = centerZ + (relativeX * sin + relativeZ * cos + deform.offsetZ) / scaleZ;
+      const relativeX = (localX - twistX) * scaleX;
+      const relativeZ = (localZ - twistZ) * scaleZ;
+      localX = twistX + (relativeX * cos - relativeZ * sin + deform.offsetX) / scaleX;
+      localZ = twistZ + (relativeX * sin + relativeZ * cos + deform.offsetZ) / scaleZ;
     }
     position.setXYZ(index, localX, y, localZ);
   }
@@ -2607,6 +2733,45 @@ export function applyGroupedContentTaper(content: THREE.Group, shape: WorkplaneS
   const centerX = (baseBounds.min.x + baseBounds.max.x) / 2;
   const centerZ = (baseBounds.min.z + baseBounds.max.z) / 2;
   const deformed = shapeHasExtrudeDeform(shape);
+  // A group with a rotation pivot of its own twists about the vertical through it, not about its middle. The
+  // content is stretched to the group's size (content.scale) and the twist works in its own units, so the
+  // pivot, in millimetres, is brought back by that stretch.
+  const twistPivot = deformed ? extrudeTwistPivot(shape) : undefined;
+  const twistX = twistPivot ? twistPivot.x / Math.max(1e-6, content.scale.x) : centerX;
+  const twistZ = twistPivot ? twistPivot.z / Math.max(1e-6, content.scale.z) : centerZ;
+  const deformPoint = (point: THREE.Vector3) => {
+    const normalizedHeight = (point.y - baseBounds.min.y) / height;
+    const widthScale = shapeTaperScaleAt(shape, normalizedHeight, "width");
+    const depthScale = shapeTaperScaleAt(shape, normalizedHeight, "depth");
+    point.x = centerX + (point.x - centerX) * widthScale;
+    point.z = centerZ + (point.z - centerZ) * depthScale;
+    if (deformed) {
+      const deform = shapeExtrudeDeformAt(shape, normalizedHeight);
+      const cos = Math.cos(deform.twistRadians);
+      const sin = Math.sin(deform.twistRadians);
+      const relativeX = point.x - twistX;
+      const relativeZ = point.z - twistZ;
+      point.x = twistX + relativeX * cos - relativeZ * sin + deform.offsetX;
+      point.z = twistZ + relativeX * sin + relativeZ * cos + deform.offsetZ;
+    }
+  };
+  // A twist needs vertices partway up to turn, as on a single body (#184): the parts are cut into
+  // the same bands as the group's mesh (meshForShape). Turned at their ends only, the legs of a
+  // twisted bundle stayed straight bars, the bundle was drawn narrower than it is, and grouped
+  // with plates the plates were stretched to fill its true width (#1419).
+  const twist = deformed ? shape.extrudeTwist ?? 0 : 0;
+  const bands = twistBandCount(twist);
+  const twistBands: GroupedTwistBands | null = bands > 1
+    ? {
+        minY: baseBounds.min.y,
+        maxY: baseBounds.max.y,
+        twist,
+        levels: bandLevels(baseBounds.min.y, baseBounds.max.y, bands),
+        // Lengths across are judged in millimetres: the content is stretched to the group's size.
+        mm: [content.scale.x, content.scale.y, content.scale.z],
+        edgeLength: twistEdgeLength(twist, height * content.scale.y),
+      }
+    : null;
   content.updateMatrixWorld(true);
   const contentWorldInverse = content.matrixWorld.clone().invert();
   content.traverse((object) => {
@@ -2620,32 +2785,34 @@ export function applyGroupedContentTaper(content: THREE.Group, shape: WorkplaneS
     if (object instanceof THREE.Mesh) {
       releaseSharedShapeGeometry(object);
     }
-    const nextGeometry = object.geometry.clone();
-    nextGeometry.userData = {};
-    const position = nextGeometry.getAttribute("position");
-    const point = new THREE.Vector3();
-    for (let index = 0; index < position.count; index += 1) {
-      point.fromBufferAttribute(position, index).applyMatrix4(localToContent);
-      const normalizedHeight = (point.y - baseBounds.min.y) / height;
-      const widthScale = shapeTaperScaleAt(shape, normalizedHeight, "width");
-      const depthScale = shapeTaperScaleAt(shape, normalizedHeight, "depth");
-      point.x = centerX + (point.x - centerX) * widthScale;
-      point.z = centerZ + (point.z - centerZ) * depthScale;
-      if (deformed) {
-        const deform = shapeExtrudeDeformAt(shape, normalizedHeight);
-        const cos = Math.cos(deform.twistRadians);
-        const sin = Math.sin(deform.twistRadians);
-        const relativeX = point.x - centerX;
-        const relativeZ = point.z - centerZ;
-        point.x = centerX + relativeX * cos - relativeZ * sin + deform.offsetX;
-        point.z = centerZ + relativeX * sin + relativeZ * cos + deform.offsetZ;
+    // A picture keeps its texture coordinates and a part-coloured body the colours of its corners,
+    // which the bands do not carry; a fat line is drawn from one template quad. They are turned at
+    // their own vertices as before.
+    const banded = twistBands !== null
+      && !(object.geometry instanceof THREE.InstancedBufferGeometry)
+      && sourcePosition.itemSize === 3
+      && !object.geometry.getAttribute("color")
+      && !(object instanceof THREE.Mesh && object.geometry.getAttribute("uv") && materialHasMap(object.material));
+    let nextGeometry: THREE.BufferGeometry;
+    if (banded && object instanceof THREE.Mesh) {
+      nextGeometry = bandedMeshGeometry(object.geometry, localToContent, contentToLocal, twistBands, deformPoint);
+    } else if (banded && object instanceof THREE.Line) {
+      nextGeometry = bandedLineGeometry(object.geometry, object, localToContent, contentToLocal, twistBands, deformPoint);
+    } else {
+      nextGeometry = object.geometry.clone();
+      nextGeometry.userData = {};
+      const position = nextGeometry.getAttribute("position");
+      const point = new THREE.Vector3();
+      for (let index = 0; index < position.count; index += 1) {
+        point.fromBufferAttribute(position, index).applyMatrix4(localToContent);
+        deformPoint(point);
+        point.applyMatrix4(contentToLocal);
+        position.setXYZ(index, point.x, point.y, point.z);
       }
-      point.applyMatrix4(contentToLocal);
-      position.setXYZ(index, point.x, point.y, point.z);
-    }
-    position.needsUpdate = true;
-    if (object instanceof THREE.Mesh) {
-      nextGeometry.computeVertexNormals();
+      position.needsUpdate = true;
+      if (object instanceof THREE.Mesh) {
+        nextGeometry.computeVertexNormals();
+      }
     }
     nextGeometry.computeBoundingBox();
     nextGeometry.computeBoundingSphere();
@@ -2654,6 +2821,138 @@ export function applyGroupedContentTaper(content: THREE.Group, shape: WorkplaneS
       enableAcceleratedMeshPicking(object, nextGeometry, Boolean(shape.importedMesh));
     }
   });
+}
+
+type GroupedTwistBands = {
+  minY: number;
+  maxY: number;
+  twist: number;
+  levels: number[];
+  mm: [number, number, number];
+  edgeLength: number;
+};
+
+function materialHasMap(material: THREE.Material | THREE.Material[]) {
+  return (Array.isArray(material) ? material : [material]).some((entry) => Boolean((entry as THREE.MeshStandardMaterial).map));
+}
+
+/** A part's mesh cut into the group's twist bands in the group's space, turned there, and handed back in the part's own space. */
+function bandedMeshGeometry(
+  source: THREE.BufferGeometry,
+  localToContent: THREE.Matrix4,
+  contentToLocal: THREE.Matrix4,
+  bands: GroupedTwistBands,
+  deformPoint: (point: THREE.Vector3) => void,
+) {
+  const flat = source.index ? source.toNonIndexed() : source;
+  const position = flat.getAttribute("position");
+  const point = new THREE.Vector3();
+  const inContent = new Float32Array(position.count * 3);
+  for (let index = 0; index < position.count; index += 1) {
+    point.fromBufferAttribute(position, index).applyMatrix4(localToContent);
+    inContent[index * 3] = point.x;
+    inContent[index * 3 + 1] = point.y;
+    inContent[index * 3 + 2] = point.z;
+  }
+  // Each material group is cut on its own, so a part of several colours keeps them.
+  const ranges = flat.groups.length ? flat.groups : [{ start: 0, count: position.count, materialIndex: 0 }];
+  const pieces: Float32Array[] = [];
+  const groups: Array<{ start: number; count: number; materialIndex: number }> = [];
+  let total = 0;
+  ranges.forEach((range) => {
+    const end = Math.min(position.count, range.start + range.count);
+    const piece = positionsForTwist(inContent.subarray(range.start * 3, end * 3), bands.minY, bands.maxY, bands.twist, bands.mm);
+    pieces.push(piece);
+    groups.push({ start: total, count: piece.length / 3, materialIndex: range.materialIndex ?? 0 });
+    total += piece.length / 3;
+  });
+  const keepGroups = flat.groups.length > 0;
+  if (flat !== source) flat.dispose();
+  const positions = new Float32Array(total * 3);
+  let offset = 0;
+  pieces.forEach((piece) => {
+    positions.set(piece, offset);
+    offset += piece.length;
+  });
+  for (let index = 0; index < total; index += 1) {
+    point.set(positions[index * 3], positions[index * 3 + 1], positions[index * 3 + 2]);
+    deformPoint(point);
+    positions[index * 3] = point.x;
+    positions[index * 3 + 1] = point.y;
+    positions[index * 3 + 2] = point.z;
+  }
+  const turned = new THREE.BufferGeometry();
+  turned.setAttribute("position", new THREE.BufferAttribute(positions, 3));
+  if (keepGroups) groups.forEach((group) => turned.addGroup(group.start, group.count, group.materialIndex));
+  // Smooth across the small folds between the bands, sharp at the parts' own edges - judged in the
+  // group's space, where a part drawn as a stretched unit body has its true proportions.
+  const normals = toCreasedNormals(turned, Math.PI / 6);
+  // A mirrored part's corners run the other way round in the group's space.
+  if (localToContent.determinant() < 0) {
+    const normal = normals.getAttribute("normal");
+    for (let index = 0; index < normal.count; index += 1) normal.setXYZ(index, -normal.getX(index), -normal.getY(index), -normal.getZ(index));
+  }
+  normals.applyMatrix4(contentToLocal);
+  // Its sides fold a little at every band: lines drawn from it later (when it is selected) take
+  // only its real edges, as on a twisted body of its own.
+  normals.userData.twistBanded = true;
+  return normals;
+}
+
+/** A part's edge lines cut at the same bands (and as short across) as its mesh, so they follow the turned sides. */
+function bandedLineGeometry(
+  source: THREE.BufferGeometry,
+  line: THREE.Line,
+  localToContent: THREE.Matrix4,
+  contentToLocal: THREE.Matrix4,
+  bands: GroupedTwistBands,
+  deformPoint: (point: THREE.Vector3) => void,
+) {
+  const flat = source.index ? source.toNonIndexed() : source;
+  const position = flat.getAttribute("position");
+  const points: THREE.Vector3[] = [];
+  for (let index = 0; index < position.count; index += 1) points.push(new THREE.Vector3().fromBufferAttribute(position, index).applyMatrix4(localToContent));
+  if (flat !== source) flat.dispose();
+  // The points along a-b where it crosses a band or runs too far across, a and b included.
+  const along = (a: THREE.Vector3, b: THREE.Vector3) => {
+    const cuts = [0, 1];
+    bands.levels.forEach((level) => {
+      if ((a.y - level) * (b.y - level) < 0) cuts.push((level - a.y) / (b.y - a.y));
+    });
+    cuts.sort((left, right) => left - right);
+    const result: THREE.Vector3[] = [a.clone()];
+    for (let index = 1; index < cuts.length; index += 1) {
+      const from = new THREE.Vector3().lerpVectors(a, b, cuts[index - 1]);
+      const to = new THREE.Vector3().lerpVectors(a, b, cuts[index]);
+      const across = Math.hypot((to.x - from.x) * bands.mm[0], (to.z - from.z) * bands.mm[2]);
+      const steps = Math.min(64, Math.max(1, Math.ceil(across / bands.edgeLength)));
+      for (let step = 1; step <= steps; step += 1) result.push(new THREE.Vector3().lerpVectors(from, to, step / steps));
+    }
+    return result;
+  };
+  const out: THREE.Vector3[] = [];
+  if (line instanceof THREE.LineSegments) {
+    for (let index = 0; index + 1 < points.length; index += 2) {
+      const run = along(points[index], points[index + 1]);
+      for (let step = 1; step < run.length; step += 1) out.push(run[step - 1], run[step]);
+    }
+  } else if (points.length) {
+    out.push(points[0]);
+    for (let index = 1; index < points.length; index += 1) out.push(...along(points[index - 1], points[index]).slice(1));
+    // A loop closes itself from its last point back to its first: that stretch is cut too.
+    if (line instanceof THREE.LineLoop && points.length > 2) out.push(...along(points[points.length - 1], points[0]).slice(1, -1));
+  }
+  const positions = new Float32Array(out.length * 3);
+  out.forEach((point, index) => {
+    deformPoint(point);
+    point.applyMatrix4(contentToLocal);
+    positions[index * 3] = point.x;
+    positions[index * 3 + 1] = point.y;
+    positions[index * 3 + 2] = point.z;
+  });
+  const turned = new THREE.BufferGeometry();
+  turned.setAttribute("position", new THREE.BufferAttribute(positions, 3));
+  return turned;
 }
 
 export function addMesh(
@@ -2724,7 +3023,8 @@ export function addShapeEdgeDecorations(group: THREE.Group, mesh: THREE.Mesh, pr
       // deshalb nur seine echten Kanten, etwa Deckel- und Bodenrand.
       // A twisted side folds a little at every band (#184): only its real edges get a line, as on a thread.
       // A slope along folds its curved top in short pieces the same way.
-      const twisted = Math.abs(shape.extrudeTwist ?? 0) > 1e-6 || shapeHasAlongDeform(shape);
+      // A part of a twisted group or bundle is cut into the group's bands (applyGroupedContentTaper) and folds the same way.
+      const twisted = Math.abs(shape.extrudeTwist ?? 0) > 1e-6 || shapeHasAlongDeform(shape) || Boolean(prepared.userData.twistBanded);
       const selectedThreshold = shape.importedMesh ? NORMAL_IMPORTED_SELECTION_EDGE_ANGLE : shape.kind === "thread" || twisted || (shape.transparent && !shape.hole) ? 25 : 1;
       // A part-coloured group's surface can carry extra corners for its colour boundaries; its lines follow the plain mesh.
       const edgeSource = (prepared.userData.edgesSource as THREE.BufferGeometry | undefined) ?? prepared;
@@ -3186,7 +3486,8 @@ export function lowestY(positions: ArrayLike<number>) {
 }
 
 export function getEdgesGeometry(shape: WorkplaneShape, geometry: THREE.BufferGeometry, threshold: number) {
-  const importedCache = shape.importedMesh && !preservesEdgeTreatmentSize(shape) && !shapeHasShapeDeform(shape)
+  // A painted body is drawn from a mesh of its own, not the import's (paintedBodyGeometry): its edges are worked out from it.
+  const importedCache = shape.importedMesh && !geometry.userData.paintColors && !preservesEdgeTreatmentSize(shape) && !shapeHasShapeDeform(shape)
     ? getImportedMeshCache(shape.importedMesh).edges
     : null;
   let cache = importedCache ?? sharedEdgesGeometryCache.get(geometry);

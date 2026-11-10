@@ -12,6 +12,7 @@ Choose {{ui:shape.text}} in the shape library and place it. In the {{ui:prop.tex
 - **{{ui:prop.height}}:** How far the lettering stands out from the surface.
 - **{{ui:prop.bevel}}:** Rounds the letter edges so they look softer. With {{ui:prop.segments}} you decide in how many steps.
 - **{{ui:nameTag.letterEdge}}:** rounds or chamfers the top edge of the letters, as on a name tag: {{ui:nameTag.edge.none}}, {{ui:nameTag.edge.round}} or {{ui:nameTag.edge.chamfer}}, with the {{ui:nameTag.letterEdgeSize}} (0.4 mm to start with, at most as high as the text). It goes further than the {{ui:prop.bevel}}, but only as far as the strokes are wide: where a stroke is thinner than twice the size, the edge ends in a narrower top. The underside stays flat, so single letters can be glued on afterwards. While an edge is chosen it takes the place of {{ui:prop.bevel}}.
+- **Length:** A text takes up to 250 characters. The letters keep their size and the line gets as long as it needs to be; to make it shorter, make the letters smaller. The {{ui:nameTag.letterEdge}} works on a text of up to 40 characters, because on a longer one it would take minutes to build.
 - **Size:** You set the length and width of the line as with any shape. Drag the handles or type the dimensions.
 - **{{ui:prop.textSpacing}}:** The space between the letters on top of the one the font has, in per cent of the letter size: 0 leaves it as the font made it, above it the letters stand further apart, below it (down to -50) tighter, which a font of your own often needs. The letters keep their size and the box follows the line, on straight and on curved text. The spacing is not applied to Arabic and Hebrew, whose letters join up.
 - **{{ui:prop.textStretch}}:** Off at first: the letters keep their proportions and sit in the middle of the frame, so a frame pulled wider or deeper than the word needs stays larger than the letters. Switch it on and the letters are stretched to fill the whole frame in both directions: a capital can be made lower or narrower, as in Tinkercad. It is for straight text; curved text has its own letter size.
@@ -78,6 +79,17 @@ So:
 - **Engraved:** Switch the text to {{ui:inspector.hole}}, let it reach a little into the surface and group it with the body. The letters are then engraved.
 
 For lettering on a side face, first put the workplane on that face, see [View and workplane](chapter:view-and-workplane).
+
+## Stencils: bridges for the middle of letters
+
+Cut through a plate, letters like O, A and B lose their middle: it lies loose inside the letter and falls out. {{ui:stencilBridges.title}} holds it to the plate with small bridges, as on a stencil.
+
+1. Switch the text to {{ui:inspector.hole}}, let it reach through the plate and select both, grouped or not.
+2. Click {{ui:stencilBridges.title}} in the {{ui:editor.section.splitShape}} group of the ribbon, right-click the selection, or find it with [[Ctrl]]+[[K]]. The bridges show in orange where they will go.
+3. Set {{ui:stencilBridges.width}} and {{ui:stencilBridges.count}}. {{ui:stencilBridges.height}} starts at the plate's thickness; lower bridges sit flush with the bottom, in the middle or flush with the top of the plate, as {{ui:stencilBridges.position}} says. On a spray stencil, bridges at the top leave room under them for the paint.
+4. {{ui:stencilBridges.apply}} groups the bridges with the plate.
+
+Each bridge is an ordinary box: open the group to move one, delete one or add one of your own. If you change the text later, select the group and click {{ui:stencilBridges.title}} again; new bridges take the place of the old ones. A text that is engraved and does not go through gets no bridges, as nothing falls out there. For a laser or a plotter, the DXF and SVG export add the same bridges, see [Files, saving and sharing](chapter:files-and-saving).
 
 ## Outline, silhouette and wider
 

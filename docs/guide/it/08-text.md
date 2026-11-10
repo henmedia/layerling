@@ -12,6 +12,7 @@ Scegli {{ui:shape.text}} nella libreria delle forme e posizionalo. Nel campo {{u
 - **{{ui:prop.height}}:** quanto il testo sporge dalla superficie.
 - **{{ui:prop.bevel}}:** arrotonda i bordi delle lettere per renderli più morbidi. Con {{ui:prop.segments}} scegli il numero di passaggi.
 - **{{ui:nameTag.letterEdge}}:** arrotonda o smussa il bordo superiore delle lettere, come su un cartellino: {{ui:nameTag.edge.none}}, {{ui:nameTag.edge.round}} o {{ui:nameTag.edge.chamfer}}, con {{ui:nameTag.letterEdgeSize}} (inizialmente 0,4 mm, al massimo pari all’altezza del testo). Può arrivare più lontano di {{ui:prop.bevel}}, ma solo fino alla larghezza dei tratti: dove un tratto è più sottile del doppio della misura, il bordo termina con una sommità più stretta. La parte inferiore resta piatta, così puoi incollare le singole lettere in seguito. Quando scegli un trattamento del bordo, questo sostituisce {{ui:prop.bevel}}.
+- **Lunghezza:** Un testo può avere fino a 250 caratteri. Le lettere mantengono la loro dimensione e la riga diventa lunga quanto serve; per accorciarla, rimpicciolisci le lettere. {{ui:nameTag.letterEdge}} funziona su un testo fino a 40 caratteri, perché su uno più lungo il calcolo richiederebbe minuti.
 - **Dimensioni:** imposta lunghezza e larghezza come per qualsiasi altra forma, trascinando le maniglie o digitando i valori.
 - **{{ui:prop.textSpacing}}:** distanza aggiuntiva tra le lettere, espressa in percentuale della dimensione delle lettere. 0 mantiene la spaziatura del carattere tipografico; un valore positivo allontana le lettere, mentre un valore negativo (fino a -50) le avvicina, cosa spesso necessaria con un carattere personalizzato. Le lettere mantengono la propria dimensione e il riquadro segue il testo, sia diritto sia curvo. La spaziatura non si applica all’arabo e all’ebraico, perché le lettere si uniscono tra loro.
 - **{{ui:prop.textStretch}}:** inizialmente disattivato; le lettere mantengono le proporzioni e restano al centro del riquadro, che può quindi essere più largo o profondo della parola. Se lo attivi, le lettere vengono allungate in entrambe le direzioni per riempire tutto il riquadro: puoi rendere le maiuscole più basse o più strette, come in Tinkercad. Si applica al testo diritto; il testo curvo ha una propria impostazione per la dimensione delle lettere.
@@ -76,6 +77,17 @@ Di conseguenza:
 - **Inciso:** imposta il testo come {{ui:inspector.hole}}, fallo penetrare leggermente nella superficie e raggruppalo con il corpo. Le lettere vengono incise.
 
 Per scrivere su una faccia laterale, prima posiziona il piano di lavoro su quella faccia; vedi [Vista e piano di lavoro](chapter:view-and-workplane).
+
+## Stencil: ponticelli per il centro delle lettere
+
+Tagliate attraverso una piastra, lettere come O, A e B perdono il loro centro: resta libero dentro la lettera e cade. {{ui:stencilBridges.title}} lo trattiene alla piastra con piccoli ponticelli, come su uno stencil.
+
+1. Imposta il testo su {{ui:inspector.hole}}, fallo passare attraverso la piastra e seleziona entrambi, raggruppati o no.
+2. Fai clic su {{ui:stencilBridges.title}} nel gruppo {{ui:editor.section.splitShape}} della barra, fai clic destro sulla selezione o cercalo con [[Ctrl]]+[[K]]. I ponticelli appaiono in arancione dove andranno.
+3. Imposta {{ui:stencilBridges.width}} e {{ui:stencilBridges.count}}. {{ui:stencilBridges.height}} parte dallo spessore della piastra; i ponticelli più bassi stanno a filo con il fondo, al centro o a filo con la cima della piastra, come indica {{ui:stencilBridges.position}}. Su uno stencil per vernice spray, i ponticelli in alto lasciano passare la vernice sotto.
+4. {{ui:stencilBridges.apply}} raggruppa i ponticelli con la piastra.
+
+Ogni ponticello è un normale parallelepipedo: apri il gruppo per spostarne uno, eliminarne uno o aggiungerne uno tuo. Se in seguito cambi il testo, seleziona il gruppo e fai di nuovo clic su {{ui:stencilBridges.title}}; i nuovi ponticelli prendono il posto dei vecchi. Un testo solo inciso, che non attraversa, non riceve ponticelli, perché lì non cade nulla. Per un laser o un plotter, l'esportazione DXF e SVG aggiunge gli stessi ponticelli, vedi [File, salvataggio e condivisione](chapter:files-and-saving).
 
 ## Contorno, sagoma e spessore
 

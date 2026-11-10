@@ -10,6 +10,7 @@ import { overhangFigures, type OverhangFigures } from "@/lib/overhangFigures";
 import { DEFAULT_OVERHANG_ANGLE, normalizeOverhangAngle, OVERHANG_PLATE_TOLERANCE } from "@/lib/overhangLimits";
 import { displayShapeName } from "@/lib/shapeCatalog";
 import { surfaceMeshReport } from "@/lib/surfaceTextureMesh";
+import { isSupportRib } from "@/lib/supportRibMark";
 import type { WorkplaneShape } from "@/types/layerling";
 
 /*
@@ -138,7 +139,7 @@ export function measureThinWalls(
   positions: ArrayLike<number>,
   indices: ArrayLike<number>,
   minimumWall: number,
-  options: { owners?: ArrayLike<number>; minArea?: number; rayBudget?: number } = {},
+  options: { owners?: ArrayLike<number>; minArea?: number; rayBudget?: number; skipOwners?: ReadonlySet<number> } = {},
 ): ThinWallMeasurement {
   const minArea = options.minArea ?? PRINT_CHECK_MIN_THIN_AREA_MM2;
   const budget = options.rayBudget ?? PRINT_CHECK_RAY_BUDGET;
@@ -171,11 +172,13 @@ export function measureThinWalls(
 
   // Pieces about a wall across, fewer and larger when there would be more rays than the budget.
   const splits = new Uint8Array(triangles);
+  // Triangles of an owner that is thin on purpose (a support rib) get no rays: they are never a thin place.
+  const skipped = (tri: number) => Boolean(options.skipOwners?.size && options.owners && options.skipOwners.has(Number(options.owners[tri])));
   let target = minimumWall;
   for (let attempt = 0; attempt < 8; attempt += 1) {
     let total = 0;
     for (let tri = 0; tri < triangles; tri += 1) {
-      const n = areas[tri] > 0 ? Math.min(MAX_SPLIT, Math.max(1, Math.ceil(longest[tri] / target))) : 0;
+      const n = areas[tri] > 0 && !skipped(tri) ? Math.min(MAX_SPLIT, Math.max(1, Math.ceil(longest[tri] / target))) : 0;
       splits[tri] = n;
       total += n * n;
     }
@@ -425,7 +428,8 @@ export async function checkPrint(source: readonly WorkplaneShape[], given: Parti
     pieces: [],
     thinWalls: { places: [], positions: [], rays: 0 },
     wallTriangles: 0,
-    overhang: overhangFigures(shapes, options.overhangAngle),
+    // A support rib's bridges are overhangs on purpose, a layer high across a small gap (Discussion #1385).
+    overhang: overhangFigures(shapes.filter((shape) => !isSupportRib(shape)), options.overhangAngle),
     openMeshes: printCheckOpenMeshes(shapes),
     unchecked: [],
     joined: true,
@@ -471,7 +475,9 @@ export async function checkPrint(source: readonly WorkplaneShape[], given: Parti
         for (let vertex = 0; vertex < positions.length / 3; vertex += 1) {
           for (let axis = 0; axis < 3; axis += 1) positions[vertex * 3 + axis] = mesh.vertProperties[vertex * mesh.numProp + axis];
         }
-        const measured = measureThinWalls(positions, mesh.triVerts, result.minimumWallMm, { owners: triangleOwners(mesh, ownerOf) });
+        // A support rib is two lines thick and its bridges one line wide, on purpose (Discussion #1385).
+        const ribs = new Set(owners.flatMap((shape, index) => (isSupportRib(shape) ? [index] : [])));
+        const measured = measureThinWalls(positions, mesh.triVerts, result.minimumWallMm, { owners: triangleOwners(mesh, ownerOf), skipOwners: ribs });
         result.thinWalls = {
           places: measured.places.map((place) => {
             const shape = owners[place.owner];

@@ -34,6 +34,7 @@ The framing square lies on the workplane. If that sits on the side of a body, th
 - **Dragging the handle** moves it.
 - **A short click on the handle** turns it by 90°.
 - **The ×** beside it removes it.
+- **Dragging the small circle at the end of an arm** makes that arm longer or shorter, in whole millimetres. The lowest button under the handle, {{ui:ruler.armsToPlate}}, makes both arms as long as the build plate is wide and deep, for the printer set in the settings. The square keeps its arms' lengths with the design, and a square set again takes them over.
 - **The small button left of the handle** switches what is measured from: the outside of a body (endpoint, an icon with lines) or its middle (midpoint, a crosshair). A small switch of the same kind sits beside each green number and sets that number alone: for a standing cylinder the middle in the two arms and the bottom in height, for a lying one the middle across and an end along. When all three agree again, the button at the handle shows the common mode.
 
 If bodies stand at one of the arms, the framing square shows their dimensions automatically, selected or not: bodies inside the square, beside an arm or across it. A body outside it, behind the corner or beside an arm from the outside, gets none. That works on the base plate only, not on the side of a body. The button with the arrow under the square's handle switches that off, so that only the selected bodies show their dimensions; it is kept with the design.

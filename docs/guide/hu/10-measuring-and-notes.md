@@ -34,6 +34,7 @@ A derékszögvonalzó a munkasíkon fekszik. Ha az egy test oldalán van, a der�
 - **A fogantyú húzása** mozgatja.
 - **Egy rövid kattintás a fogantyúra** 90°-kal elforgatja.
 - **A mellette lévő ×** eltávolítja.
+- **A szár végén lévő kis kör húzásával** a szár hosszabb vagy rövidebb lesz, egész milliméterenként. A fogantyú alatti legalsó gomb, a {{ui:ruler.armsToPlate}}, mindkét szárat olyan hosszúra állítja, amilyen széles és mély a beállításokban választott nyomtató asztala. A derékszög a terv mellett megőrzi a szárak hosszát, és az újra lerakott átveszi azt.
 - **A fogantyútól balra lévő kis gomb** azt váltja, honnan mér: egy test külső oldalától (végpont, vonalas ikon) vagy a közepétől (középpont, célkereszt). Minden zöld szám mellett egy ugyanilyen kis kapcsoló van, amely csak azt a számot állítja: egy álló hengernél a két szárban a közepet, magasságban az alját, egy fekvőnél keresztben a közepet, hosszában az egyik végét. Ha mindhárom újra egyezik, a fogantyúnál lévő gomb a közös módot mutatja.
 
 Ha testek állnak valamelyik szárnál, a derékszögvonalzó automatikusan mutatja a méreteiket. Ez csak az alaplapon működik, egy test oldalán nem. A derékszögvonalzó fogantyúja alatti nyilas gomb ezt kikapcsolja, így csak a kijelölt testek mutatják a méreteiket; a tervvel együtt mentődik.

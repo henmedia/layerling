@@ -23,6 +23,17 @@ export type HolePatternSettings = {
   size: number;
   /** Rectangle and slot: height (along the frame's z). The other forms follow `size`. */
   height: number;
+  /**
+   * Rectangle and slot: how far every hole is turned in the face, in degrees, counter-clockwise as seen looking at the
+   * face; 0 lays its width along the frame's x. Both look the same half a turn on, so -90 to 90 covers every direction.
+   */
+  holeAngle?: number;
+  /**
+   * Flat faces only: how far every hole slopes through the wall, in degrees, about the face's x axis (level on a
+   * standing face). Positive puts the inner end higher on a standing face, so rain runs back out. The hole keeps its
+   * size square to its own axis, so it shows longer on the face. Not for holes with a head or an own shape.
+   */
+  holeTilt?: number;
   /** Centre to centre of neighbouring holes; for a rectangle or slot, of the holes along a row. */
   spacing: number;
   /**
@@ -37,8 +48,10 @@ export type HolePatternSettings = {
   holeType?: HoleType;
   /** Diameter of the counterbore or countersink at the face; `size` is then the shaft. */
   headSize?: number;
-  /** How deep the counterbore reaches into the face (a countersink's depth follows from its 90 degrees). */
+  /** How deep the counterbore reaches into the face (a countersink's depth follows from its angle). */
   headDepth?: number;
+  /** The countersink's angle: 90 degrees unless an inch screw size set 82 (Discussion #1534). */
+  headAngle?: number;
   /** Perimeter only: whether the holes keep to `spacing` or come to `perimeterCount`. */
   perimeterBy?: HolePerimeterBy;
   /** Perimeter only: how many holes go round the edge. */
@@ -69,6 +82,10 @@ export const HOLE_PATTERN_MAX_MARGIN = 100;
 export const HOLE_PATTERN_MIN_PERIMETER_COUNT = 2;
 export const HOLE_PATTERN_MAX_PERIMETER_COUNT = 200;
 export const HOLE_PATTERN_MAX_PERIMETER_START = 2000;
+/** A rectangle or slot turned beyond a quarter turn either way looks like one turned the other way. */
+export const HOLE_PATTERN_MAX_HOLE_ANGLE = 90;
+/** The steepest slope through the wall: there a hole is twice as long on the face as it is wide. */
+export const HOLE_PATTERN_MAX_HOLE_TILT = 60;
 /** The turn at which a bend of the edge counts as a corner that gets its own hole; a circle's facets turn far less. */
 const PERIMETER_CORNER_TURN = (25 * Math.PI) / 180;
 /** How much wider than the shaft a screw's head is at least. */
@@ -97,9 +114,64 @@ export function holeHeadSize(settings: Pick<HolePatternSettings, "size"> & Parti
 }
 
 /** How deep a counterbore is: the shaft's diameter unless set (a cap screw's head is about as high as it is thick). */
+/** A countersink's angle as the settings have it: 90 degrees unless set (Discussion #1534). */
+export const DEFAULT_HOLE_HEAD_ANGLE = 90;
+export function holeHeadAngle(settings: Partial<Pick<HolePatternSettings, "headAngle">>) {
+  const angle = settings.headAngle;
+  return typeof angle === "number" && Number.isFinite(angle) ? Math.min(120, Math.max(60, angle)) : DEFAULT_HOLE_HEAD_ANGLE;
+}
+
 export function holeHeadDepth(settings: Pick<HolePatternSettings, "size"> & Partial<Pick<HolePatternSettings, "headDepth">>) {
   const depth = typeof settings.headDepth === "number" && Number.isFinite(settings.headDepth) ? settings.headDepth : Math.max(HOLE_PATTERN_MIN_SIZE, settings.size);
   return Math.min(HOLE_PATTERN_MAX_SIZE, Math.max(0.2, depth));
+}
+
+/** Any angle in degrees as the same hole direction, from just over -90 up to 90 (-90 is 90): a rectangle or slot repeats every half turn. */
+export function normalizeHoleAngle(value: unknown): number {
+  if (typeof value !== "number" || !Number.isFinite(value)) return 0;
+  const half = HOLE_PATTERN_MAX_HOLE_ANGLE * 2;
+  let angle = ((value % half) + half) % half;
+  if (angle > HOLE_PATTERN_MAX_HOLE_ANGLE + 1e-9) angle -= half;
+  // Rounded off so float noise does not count as a turn; -0 comes out as 0.
+  angle = Math.round(angle * 1e6) / 1e6;
+  return angle === 0 ? 0 : angle;
+}
+
+/**
+ * The turn of every hole in the face's frame, in radians from `u` towards `v`: a rectangle's or slot's angle, else none. The frame
+ * runs `u` to `v` clockwise as seen looking at the face (x cross z points into it), so a counter-clockwise angle is a
+ * negative turn here.
+ */
+export function holeTurn(settings: Pick<HolePatternSettings, "form"> & Partial<Pick<HolePatternSettings, "holeAngle">>) {
+  if (!holePatternHasRowSpacing(settings.form)) return 0;
+  const angle = normalizeHoleAngle(settings.holeAngle);
+  return angle === 0 ? 0 : -(angle * Math.PI) / 180;
+}
+
+/** A slope through the wall as the tool keeps it: -60 to 60 degrees, float noise rounded off, -0 as 0. */
+export function normalizeHoleTilt(value: unknown): number {
+  if (typeof value !== "number" || !Number.isFinite(value)) return 0;
+  const tilt = Math.round(Math.min(HOLE_PATTERN_MAX_HOLE_TILT, Math.max(-HOLE_PATTERN_MAX_HOLE_TILT, value)) * 1e6) / 1e6;
+  return tilt === 0 ? 0 : tilt;
+}
+
+/** Whether the holes can slope through the wall: not with a screw's head (screws go in straight) or an own shape. */
+export function holeTiltApplies(settings: Pick<HolePatternSettings, "form"> & Partial<Pick<HolePatternSettings, "holeType">>) {
+  return settings.form !== "custom" && !holeHasHead(settings);
+}
+
+/** The slope of every hole through the wall in radians, or 0 where it does not apply. */
+export function holeTiltRadians(settings: Pick<HolePatternSettings, "form"> & Partial<Pick<HolePatternSettings, "holeType" | "holeTilt">>) {
+  if (!holeTiltApplies(settings)) return 0;
+  const tilt = normalizeHoleTilt(settings.holeTilt);
+  return tilt === 0 ? 0 : (tilt * Math.PI) / 180;
+}
+
+/** The settings with the holes straight through the wall: where sloping does not apply yet (round walls). */
+export function withoutHoleTilt<T extends Partial<Pick<HolePatternSettings, "holeTilt">>>(settings: T): T {
+  if (settings.holeTilt === undefined) return settings;
+  const { holeTilt: _tilt, ...rest } = settings;
+  return rest as T;
 }
 
 /** Across-flats width of a hexagon whose corners point along v, as a share of the corner-to-corner size. */
@@ -125,7 +197,7 @@ const MAX_CANDIDATES = 60000;
 const EPSILON = 1e-7;
 
 type FootprintSettings = Pick<HolePatternSettings, "form" | "size" | "height">
-  & Partial<Pick<HolePatternSettings, "holeType" | "headSize" | "customWidth" | "customDepth" | "customRound">>;
+  & Partial<Pick<HolePatternSettings, "holeAngle" | "holeTilt" | "holeType" | "headSize" | "customWidth" | "customDepth" | "customRound">>;
 
 /** The room a hole takes on the face: a hole with a head takes its head's, an own shape its width and depth. */
 export function holeFootprintSize(settings: FootprintSettings): { width: number; height: number } {
@@ -149,17 +221,92 @@ export function holeFootprintSize(settings: FootprintSettings): { width: number;
   }
 }
 
-/** The outline of one hole around its centre, as a convex polygon. */
+/**
+ * The outline of one hole square to its own axis, as a convex polygon, turned as the hole is turned in the face: `u`
+ * along the face's x, `v` square to both that and the hole's axis. For a straight hole that is its outline on the face.
+ */
+export function holeCrossSection(settings: FootprintSettings): Point2[] {
+  // Sloping holes meet their neighbours at any direction, not only at the polygon's corners: fit them with a polygon
+  // that holds the whole round outline, so the cut (a much finer polygon) keeps the wall too.
+  const outline = unturnedFootprintPolygon(settings, holeTiltRadians(settings) !== 0);
+  const turn = holeTurn(settings);
+  if (turn === 0) return outline;
+  const cos = Math.cos(turn);
+  const sin = Math.sin(turn);
+  return outline.map((point) => ({ u: point.u * cos - point.v * sin, v: point.u * sin + point.v * cos }));
+}
+
+/**
+ * How much shorter a hole's room is square to its axis than on the face, along `v`: cos of the slope. Distances along
+ * `v` on the face times this are the distances between the (parallel) holes themselves.
+ */
+function tiltSquash(settings: Parameters<typeof holeTiltRadians>[0]) {
+  return Math.cos(holeTiltRadians(settings));
+}
+
+/**
+ * The outline of one hole where it meets the face, as a convex polygon: its cross-section, turned in the face, and for
+ * a hole sloping through the wall stretched along `v` by 1 / cos of the slope.
+ */
 export function holeFootprintPolygon(settings: FootprintSettings): Point2[] {
+  const section = holeCrossSection(settings);
+  const squash = tiltSquash(settings);
+  return squash === 1 ? section : section.map((point) => ({ u: point.u, v: point.v / squash }));
+}
+
+/**
+ * Where a hole sloping through the wall comes out at the back of a wall `wall` thick (measured along the face's
+ * normal), relative to where it goes in, in the face's frame: up the face for a positive slope, which is `-v`.
+ */
+export function holeExitShift(settings: Parameters<typeof holeTiltRadians>[0], wall: number): Point2 {
+  const tilt = holeTiltRadians(settings);
+  return { u: 0, v: tilt === 0 ? 0 : -Math.max(0, wall) * Math.tan(tilt) };
+}
+
+/** The convex hull of some points (monotone chain), counter-clockwise. */
+function convexHull(points: readonly Point2[]): Point2[] {
+  const sorted = [...points].sort((a, b) => a.u - b.u || a.v - b.v);
+  if (sorted.length < 3) return sorted;
+  const cross = (o: Point2, a: Point2, b: Point2) => (a.u - o.u) * (b.v - o.v) - (a.v - o.v) * (b.u - o.u);
+  const lower: Point2[] = [];
+  for (const point of sorted) {
+    while (lower.length >= 2 && cross(lower[lower.length - 2], lower[lower.length - 1], point) <= 0) lower.pop();
+    lower.push(point);
+  }
+  const upper: Point2[] = [];
+  for (let i = sorted.length - 1; i >= 0; i -= 1) {
+    const point = sorted[i];
+    while (upper.length >= 2 && cross(upper[upper.length - 2], upper[upper.length - 1], point) <= 0) upper.pop();
+    upper.push(point);
+  }
+  return [...lower.slice(0, -1), ...upper.slice(0, -1)];
+}
+
+/**
+ * The room a hole takes on the face when it is fitted: its outline on the face and, for a hole sloping through a wall
+ * `wall` thick, the same outline where it comes out at the back, and all between (Discussion 942: the margin counts the
+ * shift of wall thickness times tan of the slope). A straight hole takes its outline.
+ */
+export function holeFitPolygon(settings: FootprintSettings, wall = 0): Point2[] {
+  const footprint = holeFootprintPolygon(settings);
+  const shift = holeExitShift(settings, wall);
+  if (shift.v === 0) return footprint;
+  return convexHull([...footprint, ...footprint.map((point) => ({ u: point.u + shift.u, v: point.v + shift.v }))]);
+}
+
+/** The outline of one hole with its width along `u` and its height along `v`. */
+function unturnedFootprintPolygon(settings: FootprintSettings, enclose = false): Point2[] {
   const { width, height } = holeFootprintSize(settings);
   const halfW = width / 2;
   const halfH = height / 2;
+  // A polygon with its corners on a circle cuts inside it by up to 1 - cos(half a step); `enclose` puts it all outside.
+  const out = (steps: number) => (enclose ? 1 / Math.cos(Math.PI / steps) : 1);
   switch (settings.form === "custom" ? (settings.customRound ? "round" : "square") : settings.form) {
     case "round": {
       const count = 24;
       return Array.from({ length: count }, (_, index) => {
         const angle = (index / count) * Math.PI * 2;
-        return { u: Math.cos(angle) * halfW, v: Math.sin(angle) * halfH };
+        return { u: Math.cos(angle) * halfW * out(count), v: Math.sin(angle) * halfH * out(count) };
       });
     }
     case "hexagon":
@@ -179,7 +326,7 @@ export function holeFootprintPolygon(settings: FootprintSettings): Point2[] {
         const sign = end === 0 ? 1 : -1;
         for (let step = 0; step <= steps; step += 1) {
           const angle = -Math.PI / 2 + (step / steps) * Math.PI;
-          const bulge = { a: Math.cos(angle) * radius, b: Math.sin(angle) * radius };
+          const bulge = { a: Math.cos(angle) * radius * out(steps * 2), b: Math.sin(angle) * radius * out(steps * 2) };
           const point = along === "u"
             ? { u: sign * (reach + bulge.a), v: sign * bulge.b }
             : { u: -sign * bulge.b, v: sign * (reach + bulge.a) };
@@ -378,37 +525,17 @@ export type HolePatternResult = {
  * wins. A staggered pattern shifts every second row by half a spacing and
  * packs the rows closer, so each hole has neighbours one spacing away.
  */
-export function holePatternCenters(outline: FaceOutline, settings: HolePatternSettings): HolePatternResult {
-  const empty: HolePatternResult = { centers: [], tooMany: false, rows: 0 };
-  const footprint = holeFootprintPolygon(settings);
-  const size = holeFootprintSize(settings);
-  const spacing = Math.max(HOLE_PATTERN_MIN_SIZE, settings.spacing);
-  const margin = Math.max(0, settings.margin);
-  const staggered = settings.arrangement === "staggered";
-  const pitchU = spacing;
-  const pitchV = holePatternRowSpacing(settings);
-
-  const loops = outline.loops.filter((loop) => loop.length >= 3);
-  if (loops.length === 0) return empty;
-  let minU = Infinity;
-  let maxU = -Infinity;
-  let minV = Infinity;
-  let maxV = -Infinity;
-  for (const loop of loops) {
-    for (const point of loop) {
-      minU = Math.min(minU, point.u);
-      maxU = Math.max(maxU, point.u);
-      minV = Math.min(minV, point.v);
-      maxV = Math.max(maxV, point.v);
-    }
-  }
-  const segments = loopSegments(loops);
-  const reach = Math.max(size.width, size.height) / 2 + margin;
-
-  const fits = (c: Point2) => {
-    if (!insideRegion(loops, c)) return false;
+/**
+ * Whether a hole of this outline, centred on a point, lies wholly inside the face and keeps the margin to its edges:
+ * `inside` says whether a point lies on the face, `segments` are its edges.
+ */
+function holeFitter(inside: (point: Point2) => boolean, segments: readonly Segment[], footprint: readonly Point2[], margin: number) {
+  let reach = margin;
+  for (const corner of footprint) reach = Math.max(reach, Math.hypot(corner.u, corner.v) + margin);
+  return (c: Point2) => {
+    if (!inside(c)) return false;
     for (const corner of footprint) {
-      if (!insideRegion(loops, { u: c.u + corner.u, v: c.v + corner.v })) return false;
+      if (!inside({ u: c.u + corner.u, v: c.v + corner.v })) return false;
     }
     const placed = footprint.map((corner) => ({ u: c.u + corner.u, v: c.v + corner.v }));
     for (const segment of segments) {
@@ -420,26 +547,24 @@ export function holePatternCenters(outline: FaceOutline, settings: HolePatternSe
     }
     return true;
   };
+}
 
-  if (settings.arrangement === "perimeter") {
-    const runtime = loadedManifoldRuntime();
-    if (!runtime) {
-      // The ring is laid on the edge set in by the kernel; the editor has it loaded long before a face is picked.
-      requestManifoldRuntime();
-      return empty;
-    }
-    const ring = perimeterRing(runtime, loops, settings);
-    if (ring.tooMany) return { ...empty, tooMany: true };
-    const centers = ring.centers.filter(fits);
-    return { centers, tooMany: false, rows: centers.length ? 1 : 0, ring: { length: ring.length, onCorners: ring.onCorners } };
-  }
-
-  const centerU = (minU + maxU) / 2;
-  const centerV = (minV + maxV) / 2;
-  const halfSpanU = Math.ceil((maxU - minU) / 2 / pitchU) + 1;
-  const halfSpanV = Math.ceil((maxV - minV) / 2 / pitchV) + 1;
-  if ((halfSpanU * 2 + 1) * (halfSpanV * 2 + 1) > MAX_CANDIDATES) return { ...empty, tooMany: true };
-
+/**
+ * The best of the four ways to centre a lattice on a box of the face (on a hole or between holes, along each axis):
+ * the one that fits most holes. A staggered lattice shifts every second row by half a step.
+ */
+function bestLattice(
+  bounds: { minU: number; maxU: number; minV: number; maxV: number },
+  pitchU: number,
+  pitchV: number,
+  staggered: boolean,
+  fits: (c: Point2) => boolean,
+): { centers: Point2[]; rows: number } | null {
+  const centerU = (bounds.minU + bounds.maxU) / 2;
+  const centerV = (bounds.minV + bounds.maxV) / 2;
+  const halfSpanU = Math.ceil((bounds.maxU - bounds.minU) / 2 / pitchU) + 1;
+  const halfSpanV = Math.ceil((bounds.maxV - bounds.minV) / 2 / pitchV) + 1;
+  if ((halfSpanU * 2 + 1) * (halfSpanV * 2 + 1) > MAX_CANDIDATES) return null;
   let best: Point2[] = [];
   let bestRows = 0;
   const offsets = [
@@ -466,9 +591,197 @@ export function holePatternCenters(outline: FaceOutline, settings: HolePatternSe
       bestRows = rowsUsed.size;
     }
   }
+  return { centers: best, rows: bestRows };
+}
 
-  if (best.length > (settings.allowMany ? HOLE_PATTERN_MANY_HOLES : HOLE_PATTERN_MAX_HOLES)) return { centers: [], tooMany: true, rows: 0 };
-  return { centers: best, tooMany: false, rows: bestRows };
+export function holePatternCenters(
+  outline: FaceOutline,
+  settings: HolePatternSettings,
+  /** How thick the wall is behind the face, along its normal: where a hole sloping through it comes out. */
+  wall = 0,
+): HolePatternResult {
+  const empty: HolePatternResult = { centers: [], tooMany: false, rows: 0 };
+  const footprint = holeFitPolygon(settings, wall);
+  const spacing = Math.max(HOLE_PATTERN_MIN_SIZE, settings.spacing);
+  const margin = Math.max(0, settings.margin);
+  const staggered = settings.arrangement === "staggered";
+  const pitchU = spacing;
+  const pitchV = holePatternRowSpacing(settings);
+
+  const loops = outline.loops.filter((loop) => loop.length >= 3);
+  if (loops.length === 0) return empty;
+  let minU = Infinity;
+  let maxU = -Infinity;
+  let minV = Infinity;
+  let maxV = -Infinity;
+  for (const loop of loops) {
+    for (const point of loop) {
+      minU = Math.min(minU, point.u);
+      maxU = Math.max(maxU, point.u);
+      minV = Math.min(minV, point.v);
+      maxV = Math.max(maxV, point.v);
+    }
+  }
+  const segments = loopSegments(loops);
+  const fits = holeFitter((point) => insideRegion(loops, point), segments, footprint, margin);
+
+  if (settings.arrangement === "perimeter") {
+    const runtime = loadedManifoldRuntime();
+    if (!runtime) {
+      // The ring is laid on the edge set in by the kernel; the editor has it loaded long before a face is picked.
+      requestManifoldRuntime();
+      return empty;
+    }
+    const ring = perimeterRing(runtime, loops, settings, wall);
+    if (ring.tooMany) return { ...empty, tooMany: true };
+    const centers = ring.centers.filter(fits);
+    return { centers, tooMany: false, rows: centers.length ? 1 : 0, ring: { length: ring.length, onCorners: ring.onCorners } };
+  }
+
+  const lattice = bestLattice({ minU, maxU, minV, maxV }, pitchU, pitchV, staggered, fits);
+  if (!lattice) return { ...empty, tooMany: true };
+  if (lattice.centers.length > (settings.allowMany ? HOLE_PATTERN_MANY_HOLES : HOLE_PATTERN_MAX_HOLES)) return { centers: [], tooMany: true, rows: 0 };
+  return { centers: lattice.centers, tooMany: false, rows: lattice.rows };
+}
+
+/**
+ * A round wall laid flat (#1393): the wall of a cylinder, a tube or a bore, `u` the way round it as a length on the
+ * face, `v` along its axis. A wall that goes all the way round wraps: `u` and `u + circumference` are one place.
+ */
+export type RoundWallOutline = {
+  /** The radius of the face. */
+  radius: number;
+  /** Once round the face, 2 pi times the radius. */
+  circumference: number;
+  /** The face goes all the way round, without an edge along its axis. */
+  closed: boolean;
+  /** The facets of the face laid flat, three corners each. */
+  triangles: Point2[][];
+  /** The edges of the face that border nothing of it: its rims and the edges of any openings. */
+  edges: [Point2, Point2][];
+};
+
+export type RoundWallResult = HolePatternResult & {
+  /** Round a closed wall: how many holes go round in a row, and the step between them that closes the ring. */
+  columns?: number;
+  spacing?: number;
+};
+
+/** How many slices of the way round a wall's facets are filed into, to find the facets under a point quickly. */
+const ROUND_WALL_BINS = 720;
+
+/**
+ * The centres of a hole pattern on a round wall (#1393), in the wall's flat frame. On a wall that goes all the way
+ * round, every row holds a whole number of holes evenly round it, never closer than the spacing asks, so the ring
+ * closes with no gap; the margin then holds only to the rims and to openings. A part of a wall (a rounded edge, a half
+ * cylinder) is filled like a flat face. A hole's room is measured round the wall as the straight hole meets it.
+ * Along the edge is a flat face's arrangement: on a wall it is laid out as a grid.
+ */
+export function roundWallCenters(wall: RoundWallOutline, sloped: HolePatternSettings): RoundWallResult {
+  const empty: RoundWallResult = { centers: [], tooMany: false, rows: 0 };
+  // Sloping through the wall is for flat faces for now: on a round wall every hole points at the axis.
+  const settings = withoutHoleTilt(sloped);
+  const radius = wall.radius;
+  if (!(radius > 0) || wall.triangles.length === 0) return empty;
+  const margin = Math.max(0, settings.margin);
+  const staggered = settings.arrangement === "staggered";
+  const spacing = Math.max(HOLE_PATTERN_MIN_SIZE, settings.spacing);
+  const pitchV = holePatternRowSpacing({ ...settings, arrangement: staggered ? "staggered" : "grid" });
+  // A straight hole meets the wall further round than its half width: at the angle whose sine is that width over the radius.
+  const flat = holeFootprintPolygon(settings);
+  if (flat.some((corner) => Math.abs(corner.u) >= radius * 0.98)) return empty;
+  const footprint = flat.map((corner) => ({ u: radius * Math.asin(corner.u / radius), v: corner.v }));
+
+  const circumference = wall.circumference;
+  const shifts = wall.closed ? [-circumference, 0, circumference] : [0];
+  let minU = Infinity;
+  let maxU = -Infinity;
+  let minV = Infinity;
+  let maxV = -Infinity;
+  for (const triangle of wall.triangles) {
+    for (const point of triangle) {
+      minU = Math.min(minU, point.u);
+      maxU = Math.max(maxU, point.u);
+      minV = Math.min(minV, point.v);
+      maxV = Math.max(maxV, point.v);
+    }
+  }
+  // The facets filed by where they lie round the wall, with a copy one round before and after on a closed wall.
+  const binLow = minU - (wall.closed ? circumference : 0);
+  const binHigh = maxU + (wall.closed ? circumference : 0);
+  const binWidth = Math.max(EPSILON, (binHigh - binLow) / ROUND_WALL_BINS);
+  const bins: Point2[][][] = Array.from({ length: ROUND_WALL_BINS }, () => []);
+  const binOf = (u: number) => Math.min(ROUND_WALL_BINS - 1, Math.max(0, Math.floor((u - binLow) / binWidth)));
+  for (const triangle of wall.triangles) {
+    for (const shift of shifts) {
+      const moved = shift ? triangle.map((point) => ({ u: point.u + shift, v: point.v })) : triangle;
+      const low = binOf(Math.min(moved[0].u, moved[1].u, moved[2].u));
+      const high = binOf(Math.max(moved[0].u, moved[1].u, moved[2].u));
+      for (let bin = low; bin <= high; bin += 1) bins[bin].push(moved);
+    }
+  }
+  const inTriangle = (triangle: Point2[], point: Point2) => {
+    const [a, b, c] = triangle;
+    const d1 = (b.u - a.u) * (point.v - a.v) - (b.v - a.v) * (point.u - a.u);
+    const d2 = (c.u - b.u) * (point.v - b.v) - (c.v - b.v) * (point.u - b.u);
+    const d3 = (a.u - c.u) * (point.v - c.v) - (a.v - c.v) * (point.u - c.u);
+    const tolerance = 1e-9 * Math.max(1, radius * radius);
+    const negative = d1 < -tolerance || d2 < -tolerance || d3 < -tolerance;
+    const positive = d1 > tolerance || d2 > tolerance || d3 > tolerance;
+    return !(negative && positive);
+  };
+  const inside = (point: Point2) => {
+    if (point.u < binLow || point.u > binHigh) return false;
+    return bins[binOf(point.u)].some((triangle) => inTriangle(triangle, point));
+  };
+  const segments: Segment[] = [];
+  for (const [a, b] of wall.edges) {
+    for (const shift of shifts) {
+      const p = { u: a.u + shift, v: a.v };
+      const q = { u: b.u + shift, v: b.v };
+      segments.push({ a: p, b: q, minU: Math.min(p.u, q.u), maxU: Math.max(p.u, q.u), minV: Math.min(p.v, q.v), maxV: Math.max(p.v, q.v) });
+    }
+  }
+  const fits = holeFitter(inside, segments, footprint, margin);
+  const limit = settings.allowMany ? HOLE_PATTERN_MANY_HOLES : HOLE_PATTERN_MAX_HOLES;
+
+  if (!wall.closed) {
+    const lattice = bestLattice({ minU, maxU, minV, maxV }, spacing, pitchV, staggered, fits);
+    if (!lattice) return { ...empty, tooMany: true };
+    if (lattice.centers.length > limit) return { ...empty, tooMany: true };
+    return { centers: lattice.centers, tooMany: false, rows: lattice.rows };
+  }
+
+  // All the way round: a whole number of holes per row, the step evened out upward so neighbours keep the spacing.
+  const columns = Math.max(1, Math.floor(circumference / spacing + 1e-9));
+  const pitchU = circumference / columns;
+  const halfSpanV = Math.ceil((maxV - minV) / 2 / pitchV) + 1;
+  if (columns * (halfSpanV * 2 + 1) > MAX_CANDIDATES) return { ...empty, tooMany: true, columns, spacing: pitchU };
+  const centerV = (minV + maxV) / 2;
+  // Into the window of one round, centred on u = 0 where the wall was picked.
+  const wrap = (u: number) => ((((u + circumference / 2) % circumference) + circumference) % circumference) - circumference / 2;
+  let best: Point2[] = [];
+  let bestRows = 0;
+  for (const offset of [{ u: 0, v: 0 }, { u: 0, v: pitchV / 2 }, { u: pitchU / 2, v: 0 }, { u: pitchU / 2, v: pitchV / 2 }]) {
+    const found: Point2[] = [];
+    const rowsUsed = new Set<number>();
+    for (let row = -halfSpanV; row <= halfSpanV; row += 1) {
+      const shift = staggered && Math.abs(row) % 2 === 1 ? pitchU / 2 : 0;
+      for (let column = 0; column < columns; column += 1) {
+        const c = { u: wrap(offset.u + shift + column * pitchU), v: centerV + offset.v + row * pitchV };
+        if (fits(c)) {
+          found.push(c);
+          rowsUsed.add(row);
+        }
+      }
+    }
+    if (found.length > best.length) {
+      best = found;
+      bestRows = rowsUsed.size;
+    }
+  }
+  if (best.length > limit) return { ...empty, tooMany: true, columns, spacing: pitchU };
+  return { centers: best, tooMany: false, rows: bestRows, columns, spacing: pitchU };
 }
 
 function loopArea(loop: readonly Point2[]) {
@@ -525,11 +838,16 @@ function perimeterRing(
   runtime: ManifoldToplevel,
   loops: readonly Point2[][],
   settings: HolePatternSettings,
+  /** How thick the wall is behind the face: where a hole sloping through it comes out. */
+  wall: number,
 ): { centers: Point2[]; tooMany: boolean; length: number; onCorners: boolean } {
   const none = { centers: [], tooMany: false, length: 0, onCorners: false };
   const outer = loops.reduce((best, loop) => (Math.abs(loopArea(loop)) > Math.abs(loopArea(best)) ? loop : best));
   const size = holeFootprintSize(settings);
-  const inset = Math.max(0, settings.margin) + Math.max(size.width, size.height) / 2;
+  // A hole sloping through the wall is longer on the face and comes out shifted; the ring keeps clear of both ends.
+  const squash = tiltSquash(settings);
+  const shift = Math.abs(holeExitShift(settings, wall).v);
+  const inset = Math.max(0, settings.margin) + Math.max(size.width, size.height / squash) / 2 + shift;
   const made: { delete(): void }[] = [];
   let polygons: Point2[][];
   try {
@@ -654,6 +972,108 @@ function leastClearDistance(polygon: readonly Point2[], gap: number, high: numbe
   return high;
 }
 
+/** The clear distance between a hole's outline and a copy of it moved by (dU, dV); 0 where they overlap. */
+function footprintGap(polygon: readonly Point2[], dU: number, dV: number) {
+  const moved = polygon.map((point) => ({ u: point.u + dU, v: point.v + dV }));
+  if (moved.some((point) => insideConvex(polygon, point)) || polygon.some((point) => insideConvex(moved, point))) return 0;
+  let nearest = Infinity;
+  for (let i = 0; i < polygon.length; i += 1) {
+    for (let j = 0; j < moved.length; j += 1) {
+      nearest = Math.min(nearest, segmentSegmentDistance(polygon[i], polygon[(i + 1) % polygon.length], moved[j], moved[(j + 1) % moved.length]));
+    }
+  }
+  return nearest;
+}
+
+/** How far apart two copies of the outline can stand along u and along v and still come within `gap` of each other. */
+function footprintReach(polygon: readonly Point2[], gap: number) {
+  let u = 0;
+  let v = 0;
+  for (const point of polygon) {
+    u = Math.max(u, Math.abs(point.u));
+    v = Math.max(v, Math.abs(point.v));
+  }
+  return { u: u * 2 + gap, v: v * 2 + gap };
+}
+
+/** The most rows above a hole that are looked at for a turned hole; one reaching further is beyond the size limit. */
+const TURNED_MAX_ROWS = 800;
+
+/**
+ * Where the neighbours of a turned rectangle or slot sit that can come within `gap` of it: along its row and in the rows above (the
+ * rows below are the same pairs seen from the other hole). A turned hole has no mirror line along the frame, so the
+ * nearest one can be a diagonal neighbour or one several rows up, not just the next in the row or the row above.
+ */
+function turnedNeighbourOffsets(polygon: readonly Point2[], spacing: number, row: number, staggered: boolean, gap: number): Point2[] {
+  const reach = footprintReach(polygon, gap);
+  const offsets: Point2[] = [{ u: spacing, v: 0 }];
+  for (let k = 2; k * spacing < reach.u; k += 1) offsets.push({ u: k * spacing, v: 0 });
+  for (let j = 1; j <= TURNED_MAX_ROWS && (j === 1 || j * row < reach.v); j += 1) {
+    const shift = staggered && j % 2 === 1 ? spacing / 2 : 0;
+    for (let k = Math.ceil((-reach.u - shift) / spacing); k * spacing + shift < reach.u; k += 1) offsets.push({ u: k * spacing + shift, v: j * row });
+  }
+  return offsets;
+}
+
+/**
+ * How high above a hole, straight up from (u, 0), a copy of it must stand to keep `gap` clear: the top of the zone where
+ * the two come closer, or null if a copy on that line never does. The clear distance changes convexly along the line,
+ * so its lowest point is found by thirds and the top edge of the zone by halving above it.
+ */
+function clearHeightAbove(polygon: readonly Point2[], gap: number, u: number, high: number): number | null {
+  let low = -high;
+  let top = high;
+  for (let step = 0; step < 60; step += 1) {
+    const a = low + (top - low) / 3;
+    const b = top - (top - low) / 3;
+    if (footprintGap(polygon, u, a) <= footprintGap(polygon, u, b)) top = b;
+    else low = a;
+  }
+  let inside = (low + top) / 2;
+  if (footprintGap(polygon, u, inside) >= gap) return null;
+  let clear = high;
+  for (let step = 0; step < 40; step += 1) {
+    const middle = (inside + clear) / 2;
+    if (footprintGap(polygon, u, middle) < gap) inside = middle;
+    else clear = middle;
+  }
+  return clear;
+}
+
+/**
+ * The least row spacing for a turned rectangle or slot at this spacing along the row: every row above has to clear every hole of
+ * the row below that it can reach, which a single halving cannot find, so each such pair gives the height it needs
+ * and the rows are raised until all of them are met.
+ */
+function turnedMinRowSpacing(polygon: readonly Point2[], gap: number, spacing: number, staggered: boolean) {
+  const reach = footprintReach(polygon, gap);
+  const needFromRow = (j: number) => {
+    const shift = staggered && j % 2 === 1 ? spacing / 2 : 0;
+    let need = 0;
+    for (let k = Math.ceil((-reach.u - shift) / spacing); k * spacing + shift < reach.u; k += 1) {
+      const height = clearHeightAbove(polygon, gap, k * spacing + shift, reach.v);
+      if (height !== null) need = Math.max(need, height / j);
+    }
+    return need;
+  };
+  let row = Math.max(HOLE_PATTERN_MIN_SIZE, needFromRow(1));
+  const checked = new Map<number, number>([[1, row]]);
+  for (let pass = 0; pass < 20; pass += 1) {
+    let raised = row;
+    for (let j = 2; j <= TURNED_MAX_ROWS && j * row < reach.v; j += 1) {
+      let need = checked.get(j);
+      if (need === undefined) {
+        need = needFromRow(j);
+        checked.set(j, need);
+      }
+      raised = Math.max(raised, need);
+    }
+    if (raised <= row + EPSILON) break;
+    row = raised;
+  }
+  return row;
+}
+
 /**
  * The smallest spacing at which neighbouring holes of this shape keep a wall of `wall`
  * (default `HOLE_PATTERN_MIN_WALL`): a grid compares along both axes, a staggered
@@ -665,7 +1085,10 @@ export function holePatternMinSpacing(
   settings: FootprintSettings & Pick<HolePatternSettings, "arrangement">,
   wall = HOLE_PATTERN_MIN_WALL,
 ) {
-  const polygon = holeFootprintPolygon(settings);
+  // Holes sloping through the wall are parallel: the wall between them is measured square to them, where a step of dv
+  // on the face is dv times cos of the slope.
+  const polygon = holeCrossSection(settings);
+  const squash = tiltSquash(settings);
   const gap = Math.max(HOLE_PATTERN_MIN_WALL, wall);
   const high = (holeFootprintSize(settings).width + holeFootprintSize(settings).height) * 2 + gap;
   if (holePatternHasRowSpacing(settings.form)) {
@@ -676,7 +1099,7 @@ export function holePatternMinSpacing(
     : [{ u: 1, v: 0 }, { u: 0, v: 1 }];
   let needed = HOLE_PATTERN_MIN_SIZE;
   for (const direction of directions) {
-    needed = Math.max(needed, leastClearDistance(polygon, gap, high, (distance) => ({ u: direction.u * distance, v: direction.v * distance })));
+    needed = Math.max(needed, leastClearDistance(polygon, gap, high / squash, (distance) => ({ u: direction.u * distance, v: direction.v * distance * squash })));
   }
   return needed;
 }
@@ -689,14 +1112,19 @@ export function holePatternMinRowSpacing(
   settings: FootprintSettings & Pick<HolePatternSettings, "arrangement" | "spacing">,
   wall = HOLE_PATTERN_MIN_WALL,
 ) {
-  const polygon = holeFootprintPolygon(settings);
+  // Worked out square to the holes, where the rows stand cos(slope) times closer than on the face (see holePatternMinSpacing).
+  const polygon = holeCrossSection(settings);
+  const squash = tiltSquash(settings);
   const gap = Math.max(HOLE_PATTERN_MIN_WALL, wall);
+  if (holeTurn(settings) !== 0) {
+    return Math.max(HOLE_PATTERN_MIN_SIZE, turnedMinRowSpacing(polygon, gap, Math.max(HOLE_PATTERN_MIN_SIZE, settings.spacing), settings.arrangement === "staggered") / squash);
+  }
   const high = (holeFootprintSize(settings).width + holeFootprintSize(settings).height) * 2 + gap;
   const over = settings.arrangement === "staggered" ? Math.max(HOLE_PATTERN_MIN_SIZE, settings.spacing) / 2 : 0;
   const next = leastClearDistance(polygon, gap, high, (distance) => ({ u: over, v: distance }));
   // Two rows up stands straight above again.
   const twoUp = over ? leastClearDistance(polygon, gap, high, (distance) => ({ u: 0, v: distance })) / 2 : 0;
-  return Math.max(HOLE_PATTERN_MIN_SIZE, next, twoUp);
+  return Math.max(HOLE_PATTERN_MIN_SIZE, next / squash, twoUp / squash);
 }
 
 /**
@@ -707,10 +1135,25 @@ export function holePatternMinRowSpacing(
  * `holePatternMinRowSpacing` the row spacing of a rectangle or slot).
  */
 export function holePatternWall(settings: FootprintSettings & Pick<HolePatternSettings, "arrangement" | "spacing" | "rowSpacing">) {
-  const polygon = holeFootprintPolygon(settings);
+  // Square to the holes: for holes sloping through the wall the rows stand cos(slope) times closer than on the face.
+  const polygon = holeCrossSection(settings);
+  const squash = tiltSquash(settings);
+  if (holeTurn(settings) !== 0 && settings.arrangement !== "perimeter") {
+    const spacing = Math.max(HOLE_PATTERN_MIN_SIZE, settings.spacing);
+    const row = holePatternRowSpacing(settings) * squash;
+    const staggered = settings.arrangement === "staggered";
+    // The next one in the row and in the row above bound the wall; the others that could come closer lie within that much.
+    const first = Math.min(footprintGap(polygon, spacing, 0), footprintGap(polygon, staggered ? spacing / 2 : 0, row));
+    let nearest = first;
+    for (const offset of turnedNeighbourOffsets(polygon, spacing, row, staggered, first)) {
+      nearest = Math.min(nearest, footprintGap(polygon, offset.u, offset.v));
+      if (nearest === 0) return 0;
+    }
+    return Number.isFinite(nearest) ? nearest : 0;
+  }
   let wall = Infinity;
   for (const offset of neighbourOffsets(settings)) {
-    const moved = polygon.map((point) => ({ u: point.u + offset.u, v: point.v + offset.v }));
+    const moved = polygon.map((point) => ({ u: point.u + offset.u, v: point.v + offset.v * squash }));
     if (moved.some((point) => insideConvex(polygon, point)) || polygon.some((point) => insideConvex(moved, point))) return 0;
     for (let i = 0; i < polygon.length; i += 1) {
       for (let j = 0; j < moved.length; j += 1) {
@@ -738,14 +1181,20 @@ export function normalizeHolePattern(input: Partial<HolePatternSettings>): HoleP
     ...(typeof input.customDepth === "number" && Number.isFinite(input.customDepth) ? { customDepth: Math.max(HOLE_PATTERN_MIN_SIZE, input.customDepth) } : {}),
     ...(input.customRound === true ? { customRound: true } : {}),
   };
-  const head = { headSize: holeHeadSize({ size, headSize: input.headSize }), headDepth: holeHeadDepth({ size, headDepth: input.headDepth }) };
+  const head = {
+    headSize: holeHeadSize({ size, headSize: input.headSize }),
+    headDepth: holeHeadDepth({ size, headDepth: input.headDepth }),
+    ...(holeHeadAngle(input) !== DEFAULT_HOLE_HEAD_ANGLE ? { headAngle: holeHeadAngle(input) } : {}),
+  };
+  const holeAngle = normalizeHoleAngle(input.holeAngle);
+  const holeTilt = normalizeHoleTilt(input.holeTilt);
   // Holes that overlap would only merge into one wide cut.
-  const minSpacing = holePatternMinSpacing({ form, size, height, arrangement, holeType, ...head, ...custom });
+  const minSpacing = holePatternMinSpacing({ form, size, height, holeAngle, holeTilt, arrangement, holeType, ...head, ...custom });
   const spacing = Math.max(minSpacing, number(input.spacing, base.spacing, HOLE_PATTERN_MIN_SIZE, HOLE_PATTERN_MAX_SPACING));
   // A rectangle or slot without a row spacing of its own (saved before #975) keeps the rows where its spacing put them.
   const rowSpacing = holePatternHasRowSpacing(form)
     ? Math.max(
-        holePatternMinRowSpacing({ form, size, height, arrangement, spacing }),
+        holePatternMinRowSpacing({ form, size, height, holeAngle, holeTilt, arrangement, spacing }),
         number(input.rowSpacing, holePatternRowSpacing({ form, arrangement, spacing }), HOLE_PATTERN_MIN_SIZE, HOLE_PATTERN_MAX_SPACING),
       )
     : undefined;
@@ -753,6 +1202,10 @@ export function normalizeHolePattern(input: Partial<HolePatternSettings>): HoleP
     form,
     size,
     height,
+    // Kept while another form is chosen, like the hole type, so going back to a rectangle or slot finds it turned as it was.
+    ...(holeAngle !== 0 ? { holeAngle } : {}),
+    // Kept while a head or an own shape is chosen, which stand straight, so going back finds the holes sloped as they were.
+    ...(holeTilt !== 0 ? { holeTilt } : {}),
     spacing,
     ...(rowSpacing !== undefined ? { rowSpacing } : {}),
     arrangement,

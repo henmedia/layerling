@@ -7,6 +7,7 @@ import { starSettingsForSize } from "@/lib/starGeometry";
 import { gridfinityFootprintPatch } from "@/lib/gridfinityGeometry";
 import { pulleyFootprint, pulleyFromSize, pulleySizedPatch } from "@/lib/pulleyGeometry";
 import { type SelectionFrame } from "@/lib/liftGeometry";
+import type { SnapBox } from "@/lib/objectSnap";
 import { scaledHorizontalShapePatch } from "@/lib/scaleByPercent";
 import { POSITION_TYPED_LIMIT } from "@/lib/workplaneSettings";
 import { heightPatchKeepingBase, shapeIsTurned } from "@/lib/rotationPivot";
@@ -52,6 +53,8 @@ export type TransformDragState = {
   liftStartValue?: number;
   /** Alt was held when a lift began: the shapes stand in for a copy that is made on release (#865). */
   duplicate?: { standIns: THREE.Object3D[] };
+  /** An X or Y arrow on the flat workplane (Discussion #1434): the footprints it snaps to, as a drag does; guideY: where its lines are drawn. */
+  slideSnap?: { moving: SnapBox; targets: SnapBox[]; guideY: number };
   rotationAxisVector?: THREE.Vector3;
   rotationPivot?: THREE.Vector3;
   /** A pivot the user set; the shapes then move around it instead of spinning in place. */
@@ -674,8 +677,11 @@ export function scaleSelectionItems(
       .add(frame.xAxis.clone().multiplyScalar(localCenter.x * nextX.scale))
       .add(frame.yAxis.clone().multiplyScalar(localCenter.y))
       .add(frame.zAxis.clone().multiplyScalar(localCenter.z * nextZ.scale));
-    const width = snapDimension(shapeWidth(item.startShape) * Math.abs(nextX.scale), step, MIN_SHAPE_SIZE, maxSize);
-    const depth = snapDimension(shapeDepth(item.startShape) * Math.abs(nextZ.scale), step, MIN_SHAPE_SIZE, maxSize);
+    // Only the selection as a whole lies on the grid. A body of several is not snapped on its own: each would round
+    // to a different factor and the layers of an imported drawing no longer fitted into one another (Discussion #1416).
+    const sized = (size: number) => (items.length === 1 ? snapDimension(size, step, MIN_SHAPE_SIZE, maxSize) : clamp(size, MIN_SHAPE_SIZE, maxSize));
+    const width = sized(shapeWidth(item.startShape) * Math.abs(nextX.scale));
+    const depth = sized(shapeDepth(item.startShape) * Math.abs(nextZ.scale));
     const actualScaleX = width / Math.max(MIN_SHAPE_SIZE, shapeWidth(item.startShape));
     const actualScaleZ = depth / Math.max(MIN_SHAPE_SIZE, shapeDepth(item.startShape));
     const patch = {

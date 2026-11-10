@@ -7,10 +7,11 @@ import {
   normalizeSurfaceTexture,
   surfaceTexturePositions,
   surfaceTextureValueAt,
+  SURFACE_TEXTURE_MAX_TRIANGLES,
   type SurfaceTexturePattern,
   type SurfaceTextureResult,
 } from "@/lib/surfaceTexture";
-import { base64ToBytes, normalizeSurfaceTextureOwnImage, surfaceTextureOwnImage, SURFACE_TEXTURE_IMAGE_TILE } from "@/lib/surfaceTextureImages";
+import { base64ToBytes, bytesToBase64, normalizeSurfaceTextureOwnImage, surfaceTextureOwnImage, SURFACE_TEXTURE_IMAGE_TILE } from "@/lib/surfaceTextureImages";
 import { prepareSurfaceBase, surfaceMeshReport } from "@/lib/surfaceTextureMesh";
 import { analyzeTriangleSoup } from "@/lib/svgImport";
 
@@ -232,6 +233,75 @@ describe("an image as the pattern", () => {
     expect(at(1, 15)).toBeLessThan(0.1);
     expect(at(39, 15, { ...s, imageInvert: true })).toBeLessThan(0.1);
   });
+
+  /**
+   * One's own picture with sharp outlines at every slant, as a logo has: a five-pointed star in a ring, light on dark,
+   * 256 points wide.
+   */
+  function starPicture() {
+    const n = 256;
+    const grey = new Uint8Array(n * n);
+    for (let y = 0; y < n; y += 1) {
+      for (let x = 0; x < n; x += 1) {
+        const dx = x - n / 2 + 0.5, dy = n / 2 - y - 0.5, r = Math.hypot(dx, dy);
+        const k = ((Math.atan2(dy, dx) + Math.PI / 2) / ((2 * Math.PI) / 5)) % 1;
+        const point = Math.abs(((k + 1) % 1) - 0.5) * 2;
+        const inStar = r < n * (0.17 + 0.25 * point);
+        grey[y * n + x] = inStar || (r > 0.45 * n && r < 0.49 * n) ? 255 : 0;
+      }
+    }
+    return { width: n, height: n, data: bytesToBase64(grey) };
+  }
+
+  /**
+   * How a picture pressed 1 mm into a cup's wall (`radius` outside, `height` tall) comes out: of the wall's edges along
+   * which the depth changes (the picture's outlines), how many step by most of the depth from one end to the other - a
+   * step of the grid, which the view shows as a pixel and a printer prints.
+   */
+  function stepsOnTheWall(result: SurfaceTextureResult, radius: number, height: number) {
+    const v = result.vertices, I = result.indices;
+    const depth = (i: number) => radius - Math.hypot(v[i * 3], v[i * 3 + 2]);
+    let outlines = 0, steps = 0;
+    for (let t = 0; t < I.length; t += 3) {
+      for (const [a, b] of [[I[t], I[t + 1]], [I[t + 1], I[t + 2]], [I[t + 2], I[t]]]) {
+        // The outer wall only, away from its rims.
+        if (depth(a) > 2 || depth(b) > 2 || Math.min(v[a * 3 + 1], v[b * 3 + 1]) < 5 || Math.max(v[a * 3 + 1], v[b * 3 + 1]) > height - 5) continue;
+        const jump = Math.abs(depth(a) - depth(b));
+        if (jump > 0.1) outlines += 1;
+        if (jump > 0.7) steps += 1;
+      }
+    }
+    return { outlines, steps };
+  }
+
+  it("is softened to the grid the budget leaves, not to the one asked for: no outline in steps of the grid (Discussion #1347)", () => {
+    // A cup 100 mm across and as tall, in the long strips CAD gives a round wall, its picture laid all round: halving the
+    // strips cost so many triangles that the grid came out several times coarser than asked. The picture was softened
+    // for the grid asked for, and a third of its outlines stepped by the whole depth over one edge of the grid made.
+    const s = { pattern: "image", image: "own", imageOwn: starPicture(), spacing: 40, depth: 1, direction: "inward", projection: "allRound" };
+    const session = createSurfaceTextureSession(tube(50, 45, 100));
+    const result = session.apply(s);
+    expect(result.stats.limited).toBe(true);
+    const { outlines, steps } = stepsOnTheWall(result, 50, 100);
+    expect(outlines).toBeGreaterThan(20_000);
+    expect(steps).toBeLessThan(0.002 * outlines);
+    // Made again on the grid kept from before (only the depth changed), it is softened as much.
+    const again = session.apply({ ...s, depth: 1.0001 });
+    expect(stepsOnTheWall(again, 50, 100).steps).toBe(steps);
+  }, 60_000);
+
+  it("round a cylinder cuts CAD's long strips across first: as fine as asked, the budget not spent on slivers (Discussion #1347)", () => {
+    // A cup 50 mm across and as tall, in 160 strips 50 mm long, its picture round its axis: halved in their own shape,
+    // the strips spent the budget on slivers, the grid came out twice as coarse as asked (made coarser, the status line
+    // said), and Fine was no finer than Medium.
+    const s = { pattern: "image", image: "own", imageOwn: starPicture(), spacing: 40, depth: 1, direction: "inward", projection: "cylinder" };
+    const result = applySurfaceTexture(tube(25, 20, 50, 160), s);
+    expect(result.stats.limited).toBe(false);
+    expect(result.stats.triangles).toBeLessThan(0.75 * SURFACE_TEXTURE_MAX_TRIANGLES);
+    const { outlines, steps } = stepsOnTheWall(result, 25, 50);
+    expect(outlines).toBeGreaterThan(10_000);
+    expect(steps).toBe(0);
+  }, 60_000);
 
   it("repeats, mirrors or staggers its tiles", () => {
     const s = normalizeSurfaceTexture({ pattern: "image", image: "rosettes", projection: "flat", axis: "z", spacing: 30 });

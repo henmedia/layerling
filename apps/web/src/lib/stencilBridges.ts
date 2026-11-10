@@ -292,6 +292,8 @@ export type StencilBridgeResult = {
   rects: Rect[];
   /** Parts that would fall out and no bridge could hold: too narrow a way to anything, every way blocked. */
   unheld: number;
+  /** Parts that would fall out, held or not. */
+  parts: number;
 };
 
 /** The bridges for every part of the outline that would fall out. */
@@ -308,7 +310,9 @@ export function stencilBridges(loops: readonly Loop[], options: StencilBridgeOpt
     const hole = parent[index];
     holes.set(hole, [...(holes.get(hole) ?? []), index]);
   });
+  let partCount = 0;
   for (const [hole, parts] of holes) {
+    partCount += parts.length;
     // What a bridge can reach: the hole's edge and the other parts in the same hole.
     const reachable = [hole, ...parts];
     // Which parts already hang together, and whether with the hole's edge.
@@ -361,5 +365,5 @@ export function stencilBridges(loops: readonly Loop[], options: StencilBridgeOpt
       join(best.from, best.bridge.target);
     }
   }
-  return { rects, unheld };
+  return { rects, unheld, parts: partCount };
 }

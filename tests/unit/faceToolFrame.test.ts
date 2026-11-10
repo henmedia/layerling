@@ -40,9 +40,9 @@ describe("face tool on a sketch body's top or bottom", () => {
     expect(frame?.normal.y).toBeCloseTo(1, 9);
   });
 
-  it("stands a body going out a little inside the top, and starts a pocket at its depth", () => {
+  it("stands a body going out on the top, and starts a pocket at its depth", () => {
     const top = face([25, 6, 38], [0, 1, 0]);
-    expect(sketchCapWorkplane(body(), top, { direction: "out", depth: 3 })?.origin.y).toBeCloseTo(6 - FACE_TOOL_OVERLAP, 9);
+    expect(sketchCapWorkplane(body(), top, { direction: "out", depth: 3 })?.origin.y).toBeCloseTo(6, 9);
     expect(sketchCapWorkplane(body(), top, { direction: "in", depth: 3 })?.origin.y).toBeCloseTo(3, 9);
   });
 
@@ -107,8 +107,15 @@ describe("what the face tool builds on a face", () => {
     const plan = faceToolPlan(runtime, body(), top, { direction: "out", inset: 2, radius: 1, depth: 3 })!;
     expect(plan.profile.points.map((point) => [point.x, point.z])).toEqual([[0, 0], [20, 0], [20, 10], [0, 10]]);
     expect(plan.profile.inset).toEqual({ distance: 2, radius: 1 });
-    expect(plan.height).toBeCloseTo(3 + FACE_TOOL_OVERLAP, 9);
-    expect(plan.workplane.origin.y).toBeCloseTo(6 - FACE_TOOL_OVERLAP, 9);
+    expect(plan.height).toBeCloseTo(3, 9);
+    expect(plan.workplane.origin.y).toBeCloseTo(6, 9);
+  });
+
+  it("reaches from the bottom exactly as far as the depth, not into the body (#1577)", () => {
+    const bottom = { ...top, workplane: { ...top.workplane, origin: { x: 30, y: 0, z: 40 }, normal: { x: 0, y: -1, z: 0 } } };
+    const plan = faceToolPlan(runtime, body(), bottom, { direction: "out", inset: 0, radius: 0, depth: 3 })!;
+    expect(plan.workplane.origin.y).toBeCloseTo(-3, 9);
+    expect(plan.height).toBeCloseTo(3, 9);
   });
 
   it("keeps no inset when there is nothing to set in", () => {

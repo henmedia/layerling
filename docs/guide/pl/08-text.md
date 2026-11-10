@@ -12,6 +12,7 @@ Wybierz {{ui:shape.text}} w bibliotece kształtów i umieść go. W polu {{ui:pr
 - **{{ui:prop.height}}:** jak daleko napis wystaje z powierzchni.
 - **{{ui:prop.bevel}}:** zaokrągla krawędzie liter, żeby wyglądały łagodniej. {{ui:prop.segments}} decydują, w ilu krokach.
 - **{{ui:nameTag.letterEdge}}:** zaokrągla albo fazuje górną krawędź liter, jak na plakietce z imieniem: {{ui:nameTag.edge.none}}, {{ui:nameTag.edge.round}} albo {{ui:nameTag.edge.chamfer}}, z {{ui:nameTag.letterEdgeSize}} (na początek 0,4 mm, najwyżej tyle, ile wysokość tekstu). Sięga dalej niż {{ui:prop.bevel}}, ale tylko na szerokość kresek: tam, gdzie kreska jest cieńsza niż dwa razy rozmiar, krawędź kończy się węższą górą. Spód zostaje płaski, więc pojedyncze litery można potem przykleić. Gdy krawędź jest wybrana, zastępuje {{ui:prop.bevel}}.
+- **Długość:** Tekst może mieć do 250 znaków. Litery zachowują swój rozmiar, a wiersz staje się tak długi, jak trzeba; aby go skrócić, zmniejsz litery. {{ui:nameTag.letterEdge}} działa dla tekstu do 40 znaków, bo przy dłuższym obliczenia trwałyby minuty.
 - **Rozmiar:** długość i szerokość wiersza ustawiasz jak przy każdym kształcie. Przeciągnij uchwyty albo wpisz wymiary.
 - **{{ui:prop.textSpacing}}:** odstęp między literami ponad ten, który ma czcionka, w procentach wielkości liter: 0 zostawia go tak, jak zrobiła go czcionka, powyżej litery stoją dalej od siebie, poniżej (do -50) ciaśniej, czego często potrzebuje własna czcionka. Litery zachowują rozmiar, a ramka podąża za wierszem, w tekście prostym i na łuku. Odstęp nie jest stosowany do arabskiego i hebrajskiego, których litery się łączą.
 - **{{ui:prop.textKerning}}:** przysuwa do siebie pary liter, między którymi zostaje za dużo miejsca, jak AY, AV, LT czy To, mierząc kształty samych liter, w każdej czcionce, także we własnych. Nowe teksty mają go włączonego; teksty utworzone wcześniej mają go wyłączonego, żeby w zapisanym projekcie nic się nie przesunęło. Litery zachowują swoją wielkość, a ramka się dopasowuje. Działa przy tekście prostym i wygiętym, nie przy tekście pionowym, arabskim, hebrajskim ani japońskim.
@@ -78,6 +79,17 @@ Zatem:
 - **Grawerowany:** przełącz tekst na {{ui:inspector.hole}}, wsuń go trochę w powierzchnię i zgrupuj z bryłą. Litery zostaną wtedy wygrawerowane.
 
 Aby umieścić napis na bocznej ścianie, najpierw połóż na niej płaszczyznę roboczą, zobacz [Widok i płaszczyzna robocza](chapter:view-and-workplane).
+
+## Szablony: mostki dla środka liter
+
+Po przecięciu płyty litery takie jak O, A i B tracą środek: leży luźno w literze i wypada. {{ui:stencilBridges.title}} utrzymuje go przy płycie małymi mostkami, jak w szablonie.
+
+1. Przełącz tekst na {{ui:inspector.hole}}, niech przechodzi przez płytę, i zaznacz oba obiekty, zgrupowane lub nie.
+2. Kliknij {{ui:stencilBridges.title}} w grupie {{ui:editor.section.splitShape}} na wstążce, kliknij prawym przyciskiem zaznaczenie albo znajdź to przez [[Ctrl]]+[[K]]. Mostki pojawiają się na pomarańczowo tam, gdzie będą.
+3. Ustaw {{ui:stencilBridges.width}} i {{ui:stencilBridges.count}}. {{ui:stencilBridges.height}} zaczyna się od grubości płyty; niższe mostki leżą równo z dołem, pośrodku albo równo z górą płyty, zgodnie z {{ui:stencilBridges.position}}. W szablonie do malowania sprayem mostki u góry zostawiają pod sobą miejsce na farbę.
+4. {{ui:stencilBridges.apply}} grupuje mostki z płytą.
+
+Każdy mostek to zwykły prostopadłościan: otwórz grupę, aby jakiś przesunąć, usunąć albo dodać własny. Jeśli później zmienisz tekst, zaznacz grupę i kliknij ponownie {{ui:stencilBridges.title}}; nowe mostki zajmą miejsce starych. Tekst tylko grawerowany, który nie przechodzi na wylot, nie dostaje mostków, bo nic tam nie wypada. Dla lasera lub plotera eksport DXF i SVG dodaje te same mostki, zobacz [Pliki, zapis i udostępnianie](chapter:files-and-saving).
 
 ## Kontur, sylwetka i poszerzenie
 

@@ -15,26 +15,191 @@ At the top, switch from {{ui:editor.modeGeometry}} to {{ui:editor.modeSketch}}. 
 
 The editor then shows a sheet with a grid. That is your drawing surface.
 
+The sketch lies on the workplane. To draw on a face of a body, for an outline that should start higher up, say, first put the workplane on that face with [[W]] (see [View and workplane](chapter:view-and-workplane)), then start the sketch.
+
 ## Drawing
 
-The ribbon in sketch mode is divided into areas:
+The ribbon in sketch mode is divided into areas. Below, each tool has a card of its own: what you do, one step to a line, and after an arrow what happens then. The key on the right of a card picks the tool.
 
-- **Draw:** {{ui:sketch.line}} makes straight sections: click points one after another; holding [[Shift]] snaps the new line in 15° steps, horizontal and vertical included. The length and angle of the new line show at the pointer. You can also type how long it should be, see [Lines by numbers](#lines-by-numbers). {{ui:sketch.arc}} draws a true circular arc through three points: click its two ends first, then a third point the arc runs through; until that third click a preview follows the pointer, and the message names the radius. An end clicked on an existing point joins it, so an arc can close an outline. [[Esc]] drops the points clicked so far and goes back to {{ui:sketch.select}}. After that the arc is ordinary geometry made of points and curves: move, cut or erase it like any other line. The {{ui:sketch.bezier}} is shaped with its handles: click a point and drag in the direction the line should carry on, as with the pen tool in Illustrator or Inkscape. The further you drag, the more it bends; the stretch to the new point bends along while you drag, so you see what you get. Dragging while you place a point bends the curve; if you come from Tinkercad and just want to click points, take the {{ui:sketch.smooth}}. The {{ui:sketch.smooth}} lays a flowing path through the points you click. To close the outline, click the first point again at the end. To end the chain of lines without closing the outline, right-click without moving the pointer, or double-click the last point.
-- **{{ui:sketch.freehand}}:** draw with the pen, a finger or the mouse, as on paper. When you lift it, the line becomes ordinary points: a corner where it turned sharply, smooth points in between, only as many as the shape needs, so each can be dragged afterwards. Zoom in for fine detail: the closer you look, the more closely the line follows your hand. A line that ends where it began closes into an outline that can become a body; an open one stays a line, for {{ui:sketch.stroke}} or as a path to sweep along. It also starts on lines and on a template picture, so a picture can be traced by hand. A stroke that begins or ends at an open end carries that line on, so a shape can be drawn in several strokes.
-- **Shapes:** {{ui:sketch.addShape}} offers ready-made outlines: {{ui:sketch.rectangle}}, {{ui:sketch.circle}}, {{ui:sketch.ellipse}}, {{ui:sketch.halfCircle}}, {{ui:sketch.pieSlice}}, {{ui:sketch.boltCircle}} (a disc with holes), {{ui:sketch.triangle}}, {{ui:sketch.hexagon}}, a {{ui:sketch.polygon}} and a {{ui:sketch.star}}. Click one to put it at the origin of the sketch, or drag it from the menu to where you want it. At the bottom of the menu, {{ui:sketch.polygonSides}} sets the number of sides of the polygon and of points of the star, and {{ui:sketch.starInner}} how deep the star's valleys reach in towards the middle (10 to 90 percent of the outer radius); both apply to the next shape you add. Like every sketch shape they are ordinary corner points afterwards, so you can move, round or chamfer them one by one. The rectangle starts with the width and depth set for the box under {{ui:workspace.shapeDefaults}} in the settings, the circle and the ellipse with the width of the cylinder there; without a default of your own, and for the other shapes, they start 20 mm across.
-- **Overlapping:** Push two closed outlines over each other and they stay two bodies, which merge in the 3D editor; the overlap is not a hole. A hole only comes from an outline lying wholly inside another. Moving does not join the lines where they cross, so you can pull the shapes apart again. If you draw a line across others, though, layerling puts a point at every crossing.
-- **Selection:** {{ui:sketch.select}} moves points and lines. A click inside a closed outline selects the whole outline, so you can drag or resize it straight away; inside a hole it picks the hole. The frame around the selection has eight handles: the corners change width and height together, keeping the proportions while you hold [[Shift]]. The ones on the sides change one direction only. {{ui:sketch.keepProportions}} in the bar that appears keeps the proportions without [[Shift]]: the corners and sides then stretch both ways alike, and a typed width or height changes the other one too. layerling remembers the switch. {{ui:sketch.lockOutline}} next to it locks the selected outline, like a locked body in the 3D editor ([[Ctrl]]+[[L]] does the same): it can no longer be moved, resized, turned or changed, its lines turn paler and its points grey, and the frame's handles turn grey and no longer respond. While it is selected, a padlock in its corner unlocks it with a click. Lines may still start at its corners. {{ui:sketch.unlockOutline}} or [[Ctrl]]+[[L]] again frees it. The curved arrows beyond the corners of the frame turn the whole selection about its middle: the figure over the pointer shows the angle, and with [[Shift]] held it moves in steps of 15°. While you turn, a ring appears: with the pointer inside it the turn snaps to 22.5°, outside it goes in whole degrees, whatever the grid. [[R]] turns a whole closed outline by 45° at each press. Click the width or height pill to type a new size, also as a sum ("60+12.5") or in percent ("150%"). The X and Y fields in the bar above the sketch show where the middle of the selection lies, in mm from the sketch's origin; type a value to move it there, for a hole exactly 12 mm from the middle, say. Y counts upwards, as in the 3D editor. With [[Shift]] held, a click on a point or line adds it to the selection or takes it away again, so you can pick several and move them together. Drag a box over empty space to select everything in it. With two or more outlines selected, the bar also lines them up: left, centred or right, and top, centred or bottom, on the frame round all of them. Each outline moves as a whole and keeps its shape; centred both ways, two circles become a ring. A locked outline stays where it is, and the others line up on it. A line can be dragged too (it moves by its two ends, or all of the selection if it is part of one). The arrow keys move the selection by one grid step, [[Shift]] with them by a larger one, and [[Shift]] held while you drag keeps the move on one axis. {{ui:sketch.refine}}: a click on a section adds a point, a click on a point removes it. Also there are {{ui:sketch.erase}} (a click on a point or line takes it away, a window dragged over several takes away everything inside it, and with something selected the button erases the selection) and inserting a template image ({{ui:sketch.addImage}}). When you remove a point, layerling joins its two neighbours so the outline stays closed. To close a gap, for example after erasing one side of a hexagon, drag one open end onto the other: it snaps there and the two become one point, so the outline is closed again. At a crossing, such as where a line cuts a circle, the sides that run straight on are joined: arc with arc, line with line, and the circle stays round. To get rid of only a piece of a circle, for a rounded corner say, click exactly that piece of arc between two points with the eraser; the rest stays.
-- **Clipboard:** {{ui:editor.tool.copy}}, {{ui:editor.tool.paste}}, {{ui:editor.tool.duplicate}} and {{ui:editor.tool.delete}} work on the selected points, lines and images, as in the 3D editor; [[Ctrl]]+[[X]] cuts. Pasted and duplicated geometry lands next to the original with a 10 mm gap, on a free spot where it touches no existing line, so it never gets joined to what is already there. It stays selected, so you can drag it straight into place.
-- **History:** {{ui:sketch.undo}} and {{ui:sketch.redo}}.
-- **{{ui:sketch.viewControls}}:** {{ui:editor.tool.note}} (or [[N]]) puts a note on the sketch, as in the 3D editor: the next click places it, anywhere, on a line too. Drag the pin to move it; a click on the pin folds the card away. The notes of a sketch belong to its body: in the 3D view they sit on top of an extruded or swept body and on the drawn profile of a revolved one, and they move with it. Opening the sketch again shows all of the body's notes, those placed in 3D too. {{ui:sketch.undo}} takes back a note like a line, and {{ui:sketch.cancel}} discards what changed in the notes. More in the chapter Measuring and notes.
-- **View:** Pan it with the middle mouse button or with [[Shift]] or [[Ctrl]] plus the right mouse button, as in the 3D editor. With nothing selected, [[Ctrl]] and the arrow keys slide it too: a tenth of the view a press, half with [[Shift]] as well; the sketch moves the way they point. [[Home]] fits the whole sketch in the view, [[F]] zooms to the selection (with nothing selected, to the whole sketch), and [[+]] and [[−]] zoom in and out, as in the 3D editor. With nothing selected, a double-click on an empty spot slides the view so that the spot comes to the middle, as in the 3D editor; {{ui:workspace.doubleClickCentersView}} in the settings switches that off. The {{ui:camera.tapeTools}} on the sketch toolbar measures the distance between two points. The sketch also shows dimensions as soon as you click something: the length of a line, or for a point the lengths of the lines that meet there. The {{ui:sketch.showMeasurements}} button on the sketch toolbar hides and shows these dimensions when they get in the way, for example while shaping curves; the tape measure keeps working. On a straight line you can click the dimension pill and type the length in millimetres; [[Enter]] applies it, [[Esc]] cancels. The line keeps its direction, its start point stays where it is, and the lines at the other end follow. With an end point selected, that one moves. [[Alt]]+[[Enter]] grows the line to both sides around its middle. On curves the pill only shows the length.
+### Drawing tools
 
-A body comes only from a **closed** outline.
+::: icon=line {{ui:sketch.line}} | [[1]]
+Click points one after another.
+Hold [[Shift]] to snap the new line in 15° steps, horizontal and vertical included.
+=> The length and angle of the new line show at the pointer.
+To type how long it should be, see [Lines by numbers](#lines-by-numbers).
+> Every point you click lands on the snap grid set under {{ui:inspector.snapGrid}}. With [[Shift]] held the 15° step comes first: the length still goes in grid steps, but the end can lie between the grid lines.
+:::
+
+::: icon=arc {{ui:sketch.arc}}
+Click the two ends of the arc.
+Click a third point the arc runs through.
+=> Until that third click a preview follows the pointer, and the message names the radius.
+=> An end clicked on an existing point joins it, so an arc can close an outline.
+[[Esc]] drops the points clicked so far and goes back to {{ui:sketch.select}}.
+> Once drawn, the arc is ordinary geometry made of points and curves: move, cut or erase it like any other line.
+:::
+
+::: icon=bezier {{ui:sketch.bezier}} | [[2]]
+Click a point and drag in the direction the line should carry on, as with the pen tool in Illustrator or Inkscape.
+=> The further you drag, the more it bends.
+=> The stretch to the new point bends along while you drag, so you see what you get.
+> Coming from Tinkercad and just want to click points? Take the {{ui:sketch.smooth}}.
+> The first stretch only bends at its start if you drag at the first point too. Just clicked, the line leaves that point straight; to bend it later, select the point with {{ui:sketch.select}} and drag its handle.
+:::
+
+::: icon=smooth {{ui:sketch.smooth}} | [[3]]
+Click points one after another.
+=> It lays a flowing path through the points you click.
+> At the two ends of an open line the curve heads straight for the next point, so the first and the last stretch bend less than the others. To bend one more, select its end point with {{ui:sketch.select}} and drag its handle. In a closed outline every point bends alike.
+:::
+
+::: Closing or ending a line
+To close the outline, click the first point again at the end.
+To end the chain of lines without closing the outline, right-click without moving the pointer, or double-click the last point.
+=> A body comes only from a **closed** outline.
+:::
+
+::: icon=freehand {{ui:sketch.freehand}} | [[5]]
+Draw with the pen, a finger or the mouse, as on paper.
+=> When you lift it, the line becomes ordinary points: a corner where it turned sharply, smooth points in between, only as many as the shape needs, so each can be dragged afterwards.
+Zoom in for fine detail: the closer you look, the more closely the line follows your hand.
+=> A line that ends where it began closes into an outline that can become a body; an open one stays a line, for {{ui:sketch.stroke}} or as a path to sweep along.
+Start on lines or on a template picture to trace a picture by hand.
+Begin or end a stroke at an open end to carry that line on, so a shape can be drawn in several strokes.
+> The stroke does not keep to the snap grid, so that it follows your hand. A point you drag afterwards does snap to it, unless {{ui:inspector.snapGrid}} is switched off.
+:::
+
+> The digits pick a tool as long as no line is being drawn; while one is, they are its length (see below). With {{ui:sketch.select}} and lines or points selected, the same keys change them instead: [[1]] makes lines straight and points corners, [[2]] turns lines into curves and [[3]] makes points smooth. With nothing selected they pick the tool as before.
+
+### Shapes
+
+::: {{ui:sketch.addShape}}
+Pick a ready-made outline: {{ui:sketch.rectangle}}, {{ui:sketch.circle}}, {{ui:sketch.ellipse}}, {{ui:sketch.halfCircle}}, {{ui:sketch.pieSlice}}, {{ui:sketch.boltCircle}} (a disc with holes), {{ui:sketch.triangle}}, {{ui:sketch.hexagon}}, a {{ui:sketch.polygon}} or a {{ui:sketch.star}}.
+Click it to put it at the origin of the sketch, or drag it from the menu to where you want it.
+At the bottom of the menu, {{ui:sketch.polygonSides}} sets the number of sides of the polygon and of points of the star, and {{ui:sketch.starInner}} how deep the star's valleys reach in towards the middle (10 to 90 percent of the outer radius).
+=> Both apply to the next shape you add.
+=> Like every sketch shape they are ordinary corner points afterwards, so you can move, round or chamfer them one by one.
+> The rectangle starts with the width and depth set for the box under {{ui:workspace.shapeDefaults}} in the settings, the circle and the ellipse with the width of the cylinder there; without a default of your own, and for the other shapes, they start 20 mm across.
+:::
+
+::: Overlapping outlines
+Push two closed outlines over each other.
+=> They stay two bodies, which merge in the 3D editor; the overlap is not a hole.
+=> Moving does not join the lines where they cross, so you can pull the shapes apart again.
+Draw a line across others instead, and layerling puts a point at every crossing.
+> A hole only comes from an outline lying wholly inside another.
+:::
+
+### Select and change
+
+::: icon=select {{ui:sketch.select}}
+Click a point or a line and drag it to move it.
+Click inside a closed outline to select the whole outline; inside a hole it picks the hole.
+=> You can drag or resize it straight away.
+Hold [[Shift]] and click to add a point or line to the selection or take it away again, so you can move several together.
+Drag a box over empty space to select everything in it.
+Drag a line to move it by its two ends, or all of the selection if it is part of one.
+The arrow keys move the selection by one grid step, [[Shift]] with them by a larger one.
+Hold [[Shift]] while you drag to keep the move on one axis.
+:::
+
+::: The frame round the selection
+Drag a corner handle to change width and height together; hold [[Shift]] to keep the proportions.
+Drag a side handle to change one direction only.
+Click the width or height pill to type a new size, also as a sum ("60+12.5") or in percent ("150%").
+Drag the curved arrows beyond the corners to turn the whole selection about its middle.
+=> The figure over the pointer shows the angle; with [[Shift]] held it moves in steps of 15°.
+=> While you turn, a ring appears: with the pointer inside it the turn snaps to 22.5°, outside it goes in whole degrees, whatever the grid.
+[[R]] turns a whole closed outline by 45° at each press.
+:::
+
+::: The bar above the sketch
+{{ui:sketch.keepProportions}} keeps the proportions without [[Shift]]: the corners and sides then stretch both ways alike, and a typed width or height changes the other one too.
+=> layerling remembers the switch.
+The X and Y fields show where the middle of the selection lies, in mm from the sketch's origin. Type a value to move it there, for a hole exactly 12 mm from the middle, say. Y counts upwards, as in the 3D editor.
+With two or more outlines selected, the bar lines them up: left, centred or right, and top, centred or bottom, on the frame round all of them.
+=> Each outline moves as a whole and keeps its shape; centred both ways, two circles become a ring.
+:::
+
+::: Locking an outline | [[Ctrl]]+[[L]]
+Click {{ui:sketch.lockOutline}} in the bar to lock the selected outline, like a locked body in the 3D editor.
+=> It can no longer be moved, resized, turned or changed. Its lines turn paler, its points grey, and the frame's handles turn grey and no longer respond.
+=> Lines may still start at its corners.
+=> When outlines are lined up, a locked one stays where it is and the others line up on it.
+To free it, click the padlock in its corner while it is selected, or click {{ui:sketch.unlockOutline}}.
+:::
+
+::: icon=refine {{ui:sketch.refine}} | [[4]]
+Click a section to add a point.
+Click a point to remove it.
+=> layerling joins its two neighbours, so the outline stays closed.
+:::
+
+::: icon=erase {{ui:sketch.erase}}
+Click a point or a line to take it away.
+Drag a window over several to take away everything inside it.
+With something selected, the button erases the selection.
+To get rid of only a piece of a circle, for a rounded corner say, click exactly that piece of arc between two points.
+=> The rest stays.
+:::
+
+::: Closing a gap
+Drag one open end onto the other, for example after erasing one side of a hexagon.
+=> It snaps there and the two become one point, so the outline is closed again.
+=> At a crossing, such as where a line cuts a circle, the sides that run straight on are joined: arc with arc, line with line, and the circle stays round.
+:::
+
+::: icon=image {{ui:sketch.addImage}}
+Put a template picture under the sketch to trace it, see [A picture as template](#a-picture-as-template).
+:::
+
+### Clipboard and history
+
+::: Copy, paste, duplicate, delete
+{{ui:editor.tool.copy}}, {{ui:editor.tool.paste}}, {{ui:editor.tool.duplicate}} and {{ui:editor.tool.delete}} work on the selected points, lines and images, as in the 3D editor; [[Ctrl]]+[[X]] cuts.
+=> Pasted and duplicated geometry lands next to the original with a 10 mm gap, on a free spot where it touches no existing line, so it never gets joined to what is already there.
+=> It stays selected, so you can drag it straight into place.
+{{ui:sketch.undo}} and {{ui:sketch.redo}} take a step back and forward again.
+:::
+
+### Notes
+
+::: {{ui:editor.tool.note}} | [[N]]
+Click {{ui:editor.tool.note}} under {{ui:sketch.viewControls}}, then click where the note should go: anywhere, on a line too.
+Drag the pin to move it; a click on the pin folds the card away.
+=> The notes of a sketch belong to its body: in the 3D view they sit on top of an extruded or swept body and on the drawn profile of a revolved one, and they move with it.
+=> Opening the sketch again shows all of the body's notes, those placed in 3D too.
+{{ui:sketch.undo}} takes back a note like a line, and {{ui:sketch.cancel}} discards what changed in the notes.
+> More in the chapter [Measuring and notes](chapter:measuring-and-notes).
+:::
+
+### View and dimensions
+
+::: Moving the view
+Pan with the middle mouse button, or with [[Shift]] or [[Ctrl]] plus the right mouse button, as in the 3D editor.
+With nothing selected, [[Ctrl]] and the arrow keys slide it too: a tenth of the view a press, half with [[Shift]] as well; the sketch moves the way they point.
+[[Home]] fits the whole sketch in the view, [[F]] zooms to the selection (with nothing selected, to the whole sketch), and [[+]] and [[−]] zoom in and out, as in the 3D editor.
+With nothing selected, double-click an empty spot to slide it to the middle of the view.
+> {{ui:workspace.doubleClickCentersView}} in the settings switches the double-click off.
+:::
+
+::: Dimensions
+Click a line or a point.
+=> The sketch shows the length of the line, or for a point the lengths of the lines that meet there.
+{{ui:sketch.showMeasurements}} on the sketch toolbar hides and shows these dimensions when they get in the way, for example while shaping curves.
+The {{ui:camera.tapeTools}} on the sketch toolbar measures the distance between two points; it keeps working with the dimensions hidden.
+:::
 
 ![An L-shaped outline. At the selected corner point, top left, the lengths of the two lines are shown in millimetres, and the angle between them in degrees.](shot:sketch-outline)
 
-The keys [[1]] to [[4]] pick the drawing tools, in the order of the bar: {{ui:sketch.line}}, {{ui:sketch.bezier}}, {{ui:sketch.smooth}} and {{ui:sketch.refine}}. They work as long as no line is being drawn; while one is, the digits are its length (see below). With the {{ui:sketch.select}} tool and lines or points selected, the same keys change them instead: [[1]] makes lines straight and points corners, [[2]] turns lines into curves and [[3]] makes points smooth. With nothing selected they pick the tool as before.
-[[5]] picks {{ui:sketch.freehand}}.
+::: Typing a length
+Click the dimension pill of a straight line and type the length in millimetres.
+[[Enter]] applies it, [[Esc]] cancels.
+=> The line keeps its direction, its start point stays where it is, and the lines at the other end follow. With an end point selected, that one moves.
+[[Alt]]+[[Enter]] grows the line to both sides around its middle instead.
+=> On curves the pill only shows the length.
+:::
 
 ## Lines by numbers
 
@@ -103,6 +268,8 @@ A sketch with several outlines makes one body, and outlines that overlap merge i
 When revolving, you draw half the cross-section **to the left of the axis** shown in the sketch. Next to it you see a 3D preview of the revolve. It shows at once what the body will look like. You can turn, shift and zoom it with the mouse; the small button in its top right corner, or a double click on it, brings back the first view. The outline must be closed, or you build an open line as a stroke, see below. At the end click {{ui:sketch.finishRevolve}}. The other bodies of the design are shown from the front, in the same view as the profile, with the axis standing at the middle: draw the profile next to them or above them. The body stands where you drew it, and the horizontal line through the middle of the sketch is the ground: a profile drawn above it gives a body that stands higher, and its lowest point is the foot of the body. For a bigger radius, move the profile further from the axis, past the edge of the plate if need be: the plate grows with the sketch, its grid follows when you let go, and the minus button zooms out until all of it fits.
 
 A revolved body is an exact body, like an extruded one: it takes chamfers and fillets, and you can hollow it, for a cup or a vase. A body revolved with an older layerling is a mesh; open {{ui:inspector.editSketch}} and finish it again to make it exact. A profile that reaches across the axis cannot be built exactly and becomes a mesh, as before.
+
+**Smoother round faces: {{ui:prop.revolveSmoothness}}.** An exact revolved body is cut into small flat facets for the view, the export and the print, and on a large pot they can show on the print. Select the body and set {{ui:prop.revolveSmoothness}} in the properties panel to {{ui:prop.revolveSmoothnessFine}} or {{ui:prop.revolveSmoothnessExtraFine}}: the round faces are cut finer, at the cost of more triangles and a slower design. A helix or a mesh revolve has {{ui:prop.sides}} for this instead.
 
 **One continuous strand: {{ui:prop.pitch}}.** A revolve turns its outline into closed rings. Select the revolved body and give it a {{ui:prop.pitch}} above 0 in the properties panel, the distance it climbs per turn, and the outline winds up as a helix instead: one continuous strand, like filament on a spool or a coil. {{ui:prop.sweep}} then becomes {{ui:prop.turns}}, up to 200; a negative number winds left-handed. Turns closer than the outline is high melt into one body, so a solid core with a fine pitch works too. A helix is built as a mesh, so fillet, chamfer and hollow do not work on it; keep {{ui:prop.sides}} low on many turns. A pitch of 0 makes rings again.
 

@@ -23,7 +23,23 @@ Ook deze handleiding heeft een zoekveld, bovenaan elke pagina: typ een of twee w
 - De naam van een vorm zet die vorm op het werkvlak, net als een klik erop in het vormenmenu.
 - Met een leeg veld toont de zoekfunctie bovenaan de opdrachten die je het laatst hebt gebruikt.
 - De naam van een lichaam in je ontwerp vindt dat lichaam en selecteert het, handig in een ontwerp met veel onderdelen. Lichamen verschijnen pas zodra je iets typt.
+- Een eigen vorm die je hebt opgeslagen vind je ook op naam, zodra je iets typt, en een klik zet hem in het ontwerp zoals in het vormenpaneel.
 - Het werkt ook in de schetsmodus, met de schetsgereedschappen.
+
+## Je eigen toetsen
+
+Elke opdracht uit Opdrachten zoeken kan op een eigen toets: een gereedschap dat je steeds gebruikt, een vorm, {{ui:editor.tool.centerOnWorkplane}} of {{ui:palette.openShapes}}.
+
+1. Open {{ui:editor.keyboardShortcuts}} en klik bovenaan het venster onder {{ui:customKeys.title}} op {{ui:customKeys.add}}.
+2. Typ een paar letters van de opdracht en klik erop, of druk op [[Enter]] voor de eerste.
+3. Druk op de toets die je wilt, alleen of met [[Ctrl]], [[Alt]] of [[Shift]]. Letters, cijfers en F1 tot F12 kunnen een opdracht dragen.
+
+Een toets die de editor al gebruikt, een die de browser voor zichzelf houdt (zoals [[Ctrl]]+[[W]]) of een van je eigen toetsen wordt geweigerd, en het venster zegt waarvoor hij al dient. Klik op een toets in de lijst om hem te wijzigen, op de X ernaast om hem te verwijderen, of op {{ui:customKeys.removeAll}} om opnieuw te beginnen.
+
+- De toets start de opdracht net zoals Opdrachten zoeken. Kan die nu niet, meestal omdat er niets geselecteerd is, dan zegt de statusbalk dat.
+- Je toetsen staan naast hun opdrachten in Opdrachten zoeken en op de afgedrukte lijst.
+- Ze blijven in deze browser, net als het thema. Een toets voor een schetsgereedschap werkt in de schetsmodus, een voor de 3D-editor daarbuiten.
+- Terwijl je in een veld typt, houden je toetsen zich afzijdig, net als alle andere.
 
 ## Interactieve hulp
 

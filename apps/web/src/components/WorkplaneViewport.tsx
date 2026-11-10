@@ -18,11 +18,12 @@ import { FramingSquareIcon } from "@/components/FramingSquareIcon";
 import { ProtractorIcon } from "@/components/ProtractorIcon";
 import { GridEyeIcon } from "@/components/GridEyeIcon";
 import { ToolbarNoteIcon } from "@/components/toolbarIcons";
-import { CAMERA_BAR_PANEL, CameraBarHandle } from "@/components/workplane/CameraBarHandle";
+import { CAMERA_BAR_PANEL, CameraBarHandle, useCameraBarPeek } from "@/components/workplane/CameraBarHandle";
 import { AlignOverlay, MirrorOverlay, type AlignOverlayState, type MirrorOverlayState } from "@/components/workplane/ActionOverlays";
 import { ALIGN_PLATE_ID } from "@/lib/alignDistribute";
 import { MoveDimensionOverlay } from "@/components/workplane/MoveDimensionOverlay";
 import { OriginDimensionOverlay } from "@/components/workplane/OriginDimensionOverlay";
+import { SnapGridPointerMenu } from "@/components/workplane/SnapGridMenu";
 import { SelectionInspector, ShapeInspector, SnapGridControl, type IconTagControls, type QrCodeControls, type ReferenceImageControls, type SbcBoardControls, type ShapeInspectorUpdateOptions, type TextLayerPatch } from "@/components/workplane/ShapeInspector";
 import type { NameTagStack } from "@/lib/nameTag";
 import { WorkspaceSettingsModal } from "@/components/workplane/WorkspaceSettingsModal";
@@ -43,6 +44,8 @@ import { useWheelField } from "@/lib/useWheelField";
 import { wheelBaseStep, wheelNextValue } from "@/lib/wheelValueStep";
 import { createLatestRunner, type LatestRunner } from "@/lib/latestRunner";
 import { onManifoldReady } from "@/lib/manifoldHandle";
+import type { PaintMode } from "@/lib/paint";
+import type { PaintLassoView } from "@/lib/paintMesh";
 import { onCustomFontsChanged } from "@/lib/textFonts";
 import { readSavedViews, readStartView, SAVED_VIEW_KEYS, savedViewForKey, writeStartView } from "@/lib/designView";
 import { readCornerRulers, writeCornerRulers } from "@/lib/cornerRulerStore";
@@ -53,15 +56,17 @@ import { fitCameraDepthRange, frameBounds, resetCamera, selectionBounds, startVi
 import { disposeCutPreviewResources, renderFrame } from "@/components/workplane/renderFrame";
 import { DIMENSION_FORMULA_FIELDS, formulaMatchesMillimeters, formulaToRemember, withFieldFormula } from "@/lib/fieldFormulas";
 import { displayToMillimeters, formatLengthMm, lengthDisplayUnit, measurementOptionLabel, millimetersToDisplay, parseLengthMm, parseMeasurementInput, resolveLengthMm, setLengthUnit } from "@/lib/measurementUnits";
-import { computeCornerRulerRelativeCoordinates, cornerRulerAxisModes, cornerRulerFrameForWorkplane, cornerRulerShiftVector, pointAlongRuler, rotateCornerRulerFrame, rulerDimensionMatch, toggledCornerRulerAxis, toggledCornerRulerMode, type CornerRulerAxis, type RulerDimensionField } from "@/lib/rulerDimensions";
+import { computeCornerRulerRelativeCoordinates, cornerRulerArmLength, cornerRulerAxisModes, cornerRulerPlateArms, cornerRulerFrameForWorkplane, cornerRulerShiftVector, pointAlongRuler, rotateCornerRulerFrame, rulerDimensionMatch, toggledCornerRulerAxis, toggledCornerRulerMode, type CornerRulerAxis, type RulerDimensionField } from "@/lib/rulerDimensions";
 import { createMoveDimensionOverlay, type MoveDimensionAxis, type MoveDimensionOverlayData } from "@/lib/moveDimensionLines";
 import { computeOriginAxisDistance, createOriginDimensionOverlay, type OriginDimensionOverlayData } from "@/lib/originDimensionLines";
 import { horizontalPlacementWorkplane, placementPatchForNewShape, placementWorkplaneCoordinates, placementWorkplaneFromSurface, placementWorkplaneIsBase, placementWorkplanePoint, snapPlacementWorkplaneOrigin, type PlacementPoint, type PlacementWorkplane } from "@/lib/placementWorkplane";
 import { capturePointer } from "@/lib/pointerCapture";
+import { useMiddleClick } from "@/lib/middleClick";
 import { printerPresetById } from "@/lib/printBed";
 import { plateCenterX, plateCount, plateName, platesExtentX } from "@/lib/buildPlates";
 import { GuideHelpLink } from "@/components/GuideHelpLink";
 import { heightWithFaceOnGrid, liftDeltaOnGrid, liftGeometryForFrame, type SelectionFrame } from "@/lib/liftGeometry";
+import { slideAxisForHandle, slideAxisVector } from "@/lib/slideArrows";
 import { projectThumbnailDimensions } from "@/lib/projectThumbnail";
 import { displayShapeName, makeShapeFromAsset, parseDroppedShapeAsset } from "@/lib/shapeCatalog";
 import { getPrinterPlay, withPrinterPlay } from "@/lib/printerPlay";
@@ -80,6 +85,7 @@ import { ownSideForMark } from "@/lib/dimensionSides";
 import { SelectionCounter } from "@/components/workplane/SelectionCounter";
 import { TouchMultiSelectButton } from "@/components/workplane/TouchMultiSelectButton";
 import { showsTouchMultiSelect } from "@/lib/touchMultiSelect";
+import { cornerRadiusDragPatch } from "@/lib/roundedBoxGeometry";
 import { narrowCrossWidth, narrowEndWidth, normalizeSlopeSide, SLOPE_MIN_END, slopeAlongWidth, slopeEndHeight } from "@/lib/slopeAlong";
 import { TransformOverlay, continuousSnappedWheelRotation, getElevationMeasureKey, measureKeyForHandle, ROTATION_WHEEL_SHIFT_SNAP_DEGREES, ROTATION_WHEEL_SNAP_DEGREES, snappedRotationDelta, snappedWheelRotation, type DimensionMark, type EditingCorner, type EditingDimension, type EditingRotation, type PinnedRotationWheelView, type RotationAxis, type RotationPlaneView, type RotationReadout, type TransformHandleKind, type TransformOverlayState } from "@/components/workplane/TransformOverlay";
 import { type AlignAxes, type FrameCuboid } from "@/lib/alignFrame";
@@ -87,6 +93,9 @@ import type { AlignAxis, AlignHandleStatus, AlignSpread, AlignTarget, GridSize, 
 import { referencePoints } from "@/lib/workplaneNotes";
 import { pivotHeightRange, pivotPlateReach } from "@/lib/zoomPivot";
 import { pointerReach } from "@/lib/pointerReach";
+import type { PointPick } from "@/lib/mateFaces";
+import { syncPointMarks, type PointMark } from "@/components/workplane/viewportPointMarks";
+import { meshFeatureNear } from "@/components/workplane/viewportPointPick";
 import { boxSnapSpots, measurementMiddle, nearestReferenceOnScreen, type ReferencePosition } from "@/lib/referencePoints";
 import { type PivotPoint } from "@/lib/rotationPivot";
 import { pivotSnapCentre } from "@/lib/pivotSnap";
@@ -96,6 +105,7 @@ import type { CadModifierEdge } from "@/lib/cadModifierTypes";
 import { type CadFacePick } from "@/lib/cadFacePick";
 import { disposeCadFacePickMesh } from "@/lib/cadFacePickMesh";
 import { latchedDragAxis, type DragAxis } from "@/lib/dragAxisLatch";
+import { dragHasStarted } from "@/lib/dragStart";
 import { axisLockedPoint, circleOfEdgePoints, perpendicularFootOnSegment, pointAcrossCircle, pointOnCircle, tapeAxisLengthShift, tapeLengthShift } from "@/lib/tapeCircle";
 import { TAPE_SCENE_AXIS, tapeLengthMcpRefusal, type TapeAxis, type TapeLengthTypedRefusal, type TapeMeasurementsAnswer, type TapeMeasurementsRequest } from "@/lib/tapeLengthEdit";
 import { tapeAxisSpans, tapeDeltaAxes } from "@/lib/tapeLabels";
@@ -104,11 +114,11 @@ import { syncHistoryPickHighlight, syncPickHighlight } from "@/components/workpl
 import { orbitViewBy, panViewBy } from "@/lib/viewArrowKeys";
 import { useViewportKeyboardHooks } from "@/components/workplane/viewportKeyboard";
 import { useViewportDoubleClick } from "@/components/workplane/useViewportDoubleClick";
-import { aimPickRay, firstShapeHit, pickImagePoint, pickLayFlatFace, pickMateFace, pickFaceCentre, pickRotationPivot, pickShapeAt, pointerRayFor, shapesUnderPointer, rayPointOnRotationPlane, RENDER_LAYER_SHAPES, splitAxisParameter, usePickOnlyPointer, worldTrianglePositions, type LayFlatPick, type PickOnlySelection } from "@/components/workplane/viewportPicking";
+import { aimPickRay, firstShapeHit, paintLassoInView, pickImagePoint, pickLayFlatFace, pickMateFace, pickPaintFace, pickFaceCentre, pickRotationPivot, pickShapeAt, pointerRayFor, shapesUnderPointer, rayPointOnRotationPlane, RENDER_LAYER_SHAPES, splitAxisParameter, usePickOnlyPointer, worldTrianglePositions, type LayFlatPick, type PickOnlySelection } from "@/components/workplane/viewportPicking";
 import { fastEdgesGeometry } from "@/lib/fastEdgesGeometry";
 import { RENDER_LAYER_HELPERS, type PointCardOffset, type ThreeState, type MoveDimensionSession, type NoteOverlayState, type TapePoint, type TapeAttachment, type TapeEdgeAttachment, type TapeModel, type TapeOverlayState, type TapeCandidate, type DragItem, quaternionForShape, projectToScreen, syncMoveDimensionWorldLines, tapeShapeDimensions, tapePointWorld, tapeEdgeWorldPoints, tapeSegmentWorldPoints, tapeLengthMoverOf, tapeLengthRefusalText, syncTapeOverlay, tapeSegmentLengths, syncNoteOverlay, NoteOverlay, TapeOverlay, type RulerDimensionOverlayItem, type RulerDimensionOverlayState, syncRulerDimensionOverlay, RulerDimensionOverlay, type CornerRulerInstance, type CornerRulerOverlayState, syncCornerRulerToolOverlay, CornerRulerToolOverlay, syncOriginDimensionWorldLines, shapeCenter, shapeLocalExtents, projectShapeExtent, projectShapesExtent, type OriginDimensionFrame, formatMeasure, findShapeObject, releaseSharedShapeMaterials, disposeChildren, disposeObject } from "@/components/workplane/ViewportOverlays";
 import { MIN_SHAPE_SIZE, RENDER_LAYER_PREVIEWS, overhangUniforms, setEdgeLineStyle, setStrongHoles, setRulerInchScale, MODIFIER_EDGE_DEPTH_PULL, clamp, selectionFrameForShapes, refreshFrozenObjectMatrix, updateShapeObjectTransform, applySectionClipping, rebuildShapes, rebuildModifierEdges, setModifierEdgeHover, rebuildSelectionHelpers, cadFacePickLayerMesh, syncCadFaceLayer, syncBentTubeSegment, TRANSPARENT_SOLID_OPACITY, createShapeObject, onGroupDisplayReady } from "./workplane/viewportShapeObjects";
-import { movePivotToDepthUnder, WorkspaceSettings, createThreeScene, rebuildWorkplane, syncWorkplaneHoverPreview, updateSectionPlaneHelper, syncSplitPlane } from "./workplane/viewportScene";
+import { movePivotToDepthUnder, WorkspaceSettings, createThreeScene, rebuildWorkplane, syncWorkplaneHoverPreview, updateSectionPlaneHelper, syncSplitPlane, type SplitConnectorMarks } from "./workplane/viewportScene";
 import { pointInsideOutline } from "@/lib/screenHull";
 import { isTypingTarget } from "@/lib/editorKeyTargets";
 import { liftHandleOffset, screenAngle, framePoint, selectionFrameCorners, workplaneFootprintY, syncTransformOverlay, syncAlignOverlay, syncMirrorOverlay, syncLayFlatHover } from "./workplane/viewportTransformOverlays";
@@ -138,9 +148,6 @@ const LONG_PRESS_SLOP_PX = 8;
 const CAMERA_MIN_TARGET_Y = -70;
 const CAMERA_MAX_TARGET_Y = 120;
 const ROTATION_PROTRACTOR_OUTER_RADIUS = 94;
-/** How far the pointer goes before a pressed shape starts to move, in screen pixels - as the marquee. */
-const DRAG_START_PIXELS = 5;
-
 const MODIFIER_EDGE_PICK_RADIUS_PX = 14;
 
 type WorkplaneViewportProps = {
@@ -164,6 +171,8 @@ type WorkplaneViewportProps = {
   /** With `splitActive`: objects can still be picked and show the selection outline, but nothing can be edited (History view). */
   pickOnly?: PickOnlySelection | null;
   splitPlane?: ModelSplitPlane | null;
+  /** Where the split's connectors would go, as rings of the holes' size on the plane, or a dovetail's tongues as their outlines (Discussion #832). */
+  splitConnectorMarks?: SplitConnectorMarks | null;
   /** Dragging the plane's arrow head moves the plane along its normal. */
   onSplitPositionChange?: (position: number) => void;
   /** The next click on a face sets the split plane there; a blue plane follows the faces under the pointer. */
@@ -216,6 +225,8 @@ type WorkplaneViewportProps = {
   onCancelInteraction?: () => void;
   onEditSketch?: () => void;
   onOpenGroup?: (id: string) => void;
+  /** A hull built again with its parts' holes kept open or filled (Discussion #1440). */
+  onHullKeepHolesChange?: (id: string, keepHoles: boolean) => void;
   canSeparateParts?: boolean;
   onSeparateParts?: () => void;
   /** Several parts selected (#183): solid or hole, a colour and locking for all of them. */
@@ -294,8 +305,19 @@ type WorkplaneViewportProps = {
   layFlatPickMode?: boolean;
   onLayFlatPick?: (pick: LayFlatPick | null) => void;
   /** "Align faces" waiting for a click on a face of one of these bodies; `round` lights up whole round faces, `joined` the group's parts joined, whose face is lit in place of the part's. */
-  mateFacePick?: { shapeIds: string[]; round?: boolean; joined?: ArrayLike<number> | null } | null;
+  mateFacePick?: { shapeIds: string[]; round?: boolean | "either"; joined?: ArrayLike<number> | null } | null;
   onMateFacePick?: (pick: LayFlatPick | null) => void;
+  /**
+   * "Point to point" (Discussion #1491): while `picking`, a click takes a corner, a spot on an edge, the centre of a
+   * round edge of one of these bodies, or a reference point; `marks` are the points already picked.
+   */
+  matePointPick?: { shapeIds: string[]; picking: boolean; marks: PointMark[] } | null;
+  onMatePointPick?: (pick: PointPick | null) => void;
+  /** The paint tool (paint.ts) on this body: a click paints where it lands; in lasso mode a shape drawn with the button held does. */
+  paintPick?: { shapeId: string; mode: PaintMode } | null;
+  onPaintPick?: (pick: LayFlatPick | null) => void;
+  /** A lasso drawn for the paint tool: the view it was drawn in, and the shape in that view (see PaintStroke.outline). */
+  onPaintLasso?: (view: PaintLassoView, outline: Array<[number, number]>) => void;
   /** "Delete face" waiting for clicks on faces of the prepared body; a click toggles the face. */
   cadFacePick?: CadFacePick | null;
   onCadFacePick?: (faceId: number) => void;
@@ -1010,6 +1032,26 @@ function dragWorkplaneAtGrab(state: ThreeState, clientX: number, clientY: number
   return { ...workplane, origin: { x: origin.x, y: origin.y, z: origin.z } };
 }
 
+/** A workplane that lies flat with its axes along X and Y: the only one snapping and the move dimensions work on. */
+function isWorldHorizontalWorkplane(workplane: PlacementWorkplane) {
+  return Math.abs(workplane.normal.y - 1) < 1e-6
+    && Math.abs(workplane.xAxis.x - 1) < 1e-6
+    && Math.abs(workplane.zAxis.z - 1) < 1e-6;
+}
+
+/**
+ * What a moved selection snaps to: every other body that shows, the reference points while the notes
+ * show, and the middle of the workplane, so a part can be put in its centre along X, Y or both (Discussion #1266).
+ */
+function moveSnapTargets(shapes: WorkplaneShape[], moved: Set<string>, points: Array<{ x: number; z: number }>, workplane: PlacementWorkplane): SnapBox[] {
+  return [
+    ...shapes.filter((entry) => !moved.has(entry.id) && !entry.hidden).map(worldSnapBox),
+    // A reference point is a box with no size: its edges and centre are one line.
+    ...points.map((point) => ({ minX: point.x, maxX: point.x, minZ: point.z, maxZ: point.z })),
+    { minX: workplane.origin.x, maxX: workplane.origin.x, minZ: workplane.origin.z, maxZ: workplane.origin.z },
+  ];
+}
+
 function unionSnapBox(boxes: SnapBox[]): SnapBox | null {
   if (boxes.length === 0) return null;
   return boxes.reduce((all, box) => ({
@@ -1474,6 +1516,7 @@ export function WorkplaneViewport({
   splitActive = false,
   pickOnly = null,
   splitPlane = null,
+  splitConnectorMarks = null,
   onSplitPositionChange,
   splitSurfacePick = false,
   onSplitSurfacePick,
@@ -1509,6 +1552,7 @@ export function WorkplaneViewport({
   onCancelInteraction,
   onEditSketch,
   onOpenGroup,
+  onHullKeepHolesChange,
   canSeparateParts = false,
   onSeparateParts,
   onSelectionHole,
@@ -1558,6 +1602,11 @@ export function WorkplaneViewport({
   onLayFlatPick,
   mateFacePick = null,
   onMateFacePick,
+  matePointPick = null,
+  onMatePointPick,
+  paintPick = null,
+  onPaintPick,
+  onPaintLasso,
   cadFacePick = null,
   onCadFacePick,
   onNoteAdd,
@@ -1589,6 +1638,9 @@ export function WorkplaneViewport({
   onSectionBodies,
 }: WorkplaneViewportProps) {
   const [snapOpen, setSnapOpen] = useState(false);
+  // The snap menu a short middle click opens at the pointer (Discussion #1439).
+  const [snapMenuAt, setSnapMenuAt] = useState<{ x: number; y: number } | null>(null);
+  const closeSnapMenuAt = useCallback(() => setSnapMenuAt(null), []);
   // The inspector hands the snap grid control back to the workplane while collapsed or floating.
   const [inspectorSnapGridAway, setInspectorSnapGridAway] = useState(false);
   // The panel for several selected parts carries the snap grid at its foot (#601).
@@ -1764,6 +1816,12 @@ export function WorkplaneViewport({
   });
   const sectionFineDraggingRef = useRef(false);
   const hostRef = useRef<HTMLDivElement | null>(null);
+  // A middle drag moves the view; a short middle click opens the snap menu where it happened (Discussion #1439).
+  // The History view edits nothing, so it has no use for it.
+  useMiddleClick(hostRef, (x, y) => {
+    setSnapOpen(false);
+    setSnapMenuAt({ x, y });
+  }, !pickOnly);
   const threeRef = useRef<ThreeState | null>(null);
   // A 3D mouse the site may use steers this view (#1013).
   useSpaceMouse(threeRef);
@@ -1905,7 +1963,7 @@ export function WorkplaneViewport({
     && !workplaneMode && !splitActive && !pickOnly
     && !alignMode && !mirrorMode
     && !tapeMode && !tapeDeleteMode && !tapeMoveMode && !cornerRulerMode && !protractorOpen
-    && !modifierActive && !pivotPickMode && !layFlatPickMode && !mateFacePick && !cadFacePick;
+    && !modifierActive && !pivotPickMode && !layFlatPickMode && !mateFacePick && !matePointPick?.picking && !cadFacePick;
   useEffect(() => {
     // A button that is not on the screen cannot be locked any more.
     if (!touchMultiSelectAvailable && touchMultiSelectActiveRef.current) endTouchMultiSelect();
@@ -1939,6 +1997,28 @@ export function WorkplaneViewport({
   const mateFacePickRef = useRef(mateFacePick);
   mateFacePickRef.current = mateFacePick;
   const mateFaceHoverRef = useRef<{ x: number; y: number } | null>(null);
+  const matePointPickRef = useRef(matePointPick);
+  matePointPickRef.current = matePointPick;
+  const onMatePointPickRef = useRef(onMatePointPick);
+  onMatePointPickRef.current = onMatePointPick;
+  const matePointHoverRef = useRef<PointMark | null>(null);
+  const paintPickRef = useRef(paintPick);
+  paintPickRef.current = paintPick;
+  const onPaintPickRef = useRef(onPaintPick);
+  onPaintPickRef.current = onPaintPick;
+  const onPaintLassoRef = useRef(onPaintLasso);
+  onPaintLassoRef.current = onPaintLasso;
+  // A lasso being drawn for the paint tool: its points in the view, from the press to where the pointer is.
+  const paintLassoRef = useRef<{ pointerId: number; points: Array<[number, number]> } | null>(null);
+  const [paintLassoPoints, setPaintLassoPoints] = useState<string | null>(null);
+  // The tool closed or turned to another mode: a lasso half drawn goes with it.
+  useEffect(() => {
+    if (paintPick?.mode === "lasso" || !paintLassoRef.current) return;
+    paintLassoRef.current = null;
+    setPaintLassoPoints(null);
+    const state = threeRef.current;
+    if (state) state.controls.enabled = true;
+  }, [paintPick?.mode]);
   const cadFacePickRef = useRef(cadFacePick);
   cadFacePickRef.current = cadFacePick;
   const cadFaceHoverRef = useRef<number | null>(null);
@@ -1962,6 +2042,7 @@ export function WorkplaneViewport({
   const cornerRulerOverlayRef = useRef<CornerRulerOverlayState | null>(null);
   const cornerRulerIdRef = useRef(toolMemory?.current.cornerRulerId ?? storedCornerRulers.current.length);
   const cornerRulerDragRef = useRef<{ id: string; pointerId: number; moved: boolean } | null>(null);
+  const cornerRulerArmDragRef = useRef<{ id: string; arm: "x" | "z"; pointerId: number } | null>(null);
   const protractorOpenRef = useRef(false);
   const protractorModelRef = useRef<ProtractorModel>(EMPTY_PROTRACTOR);
   const protractorOverlayRef = useRef<ProtractorOverlayState | null>(null);
@@ -2030,6 +2111,8 @@ export function WorkplaneViewport({
   const pickOnlyRef = useRef(pickOnly);
   pickOnlyRef.current = pickOnly;
   splitPlaneRef.current = splitPlane;
+  const splitConnectorMarksRef = useRef(splitConnectorMarks);
+  splitConnectorMarksRef.current = splitConnectorMarks;
   const onSplitPositionChangeRef = useRef(onSplitPositionChange);
   onSplitPositionChangeRef.current = onSplitPositionChange;
   const splitSurfacePickRef = useRef(splitSurfacePick);
@@ -2403,7 +2486,7 @@ export function WorkplaneViewport({
       return;
     }
     // The slope's dot changes no size: it leaves the anchor of the last resize as it was.
-    if (handleKey === "slope-end" || handleKey === "narrow-end") return;
+    if (handleKey === "slope-end" || handleKey === "narrow-end" || handleKey.startsWith("corner-radius")) return;
     if (kind === "height") {
       lastResizeAnchorRef.current = {
         shapeId,
@@ -2836,6 +2919,15 @@ export function WorkplaneViewport({
     if (!mateFacePick) mateFaceHoverRef.current = null;
   }, [layFlatPickMode, mateFacePick]);
 
+  // The points "Point to point" picked stay marked; the one under the pointer only while it picks.
+  const matePointMarksKey = matePointPick ? `${matePointPick.picking}:${matePointPick.marks.map((mark) => `${mark.role}${mark.x},${mark.y},${mark.z}`).join("|")}` : "";
+  useEffect(() => {
+    const pick = matePointPickRef.current;
+    if (!pick?.picking) matePointHoverRef.current = null;
+    const hover = matePointHoverRef.current;
+    syncPointMarks(threeRef.current, pick ? [...pick.marks, ...(hover ? [hover] : [])] : []);
+  }, [matePointMarksKey]);
+
   // A group's parts joined, or let go, after the pointer stopped on it: its face is lit again without another move.
   const mateFaceJoined = mateFacePick?.joined ?? null;
   useEffect(() => {
@@ -2941,8 +3033,8 @@ export function WorkplaneViewport({
   }, [splitSurfacePick]);
 
   useEffect(() => {
-    syncSplitPlane(threeRef.current, splitPlane, splitHandleState !== null, selectedIds);
-  }, [splitHandleState, splitPlane, selectedIds]);
+    syncSplitPlane(threeRef.current, splitPlane, splitHandleState !== null, selectedIds, splitConnectorMarks);
+  }, [splitHandleState, splitPlane, selectedIds, splitConnectorMarks]);
 
   useLayoutEffect(() => {
     // The plane label carries the project name, so a rename has to redraw it.
@@ -2951,7 +3043,7 @@ export function WorkplaneViewport({
     setMeasureUnit(workspace);
     if (threeRef.current) threeRef.current.palette = appThemePalette(themePreference);
     // Edge lines on all bodies: shapes already built have to take the setting up.
-    const holesChanged = setStrongHoles(workspace.strongHoles);
+    const holesChanged = setStrongHoles(workspace.strongHoles, workspace.holeOpacity);
     if (setEdgeLineStyle(effectiveViewSettings(workspace).edgeLines, workspace.edgeColor) || holesChanged) {
       rebuildShapes(threeRef.current, shapesRef.current, shapeOutlineIds(), modifierActiveRef.current, placementWorkplaneRef.current);
     }
@@ -3158,7 +3250,7 @@ export function WorkplaneViewport({
     perfRef.current.lastSample = performance.now();
     resetCamera(state);
     rebuildShapes(state, shapesRef.current, shapeOutlineIds(), false, placementWorkplaneRef.current);
-    syncSplitPlane(state, splitPlaneRef.current, false, selectedIdsRef.current);
+    syncSplitPlane(state, splitPlaneRef.current, false, selectedIdsRef.current, splitConnectorMarksRef.current);
 
     // The camera's glide brakes by the time since the last frame, not per frame (Discussion #1143).
     let lastFrameAt = performance.now();
@@ -3248,11 +3340,17 @@ export function WorkplaneViewport({
 
     animate();
     window.addEventListener("resize", state.resize);
+    // The view also changes size without the window doing so: focus mode takes the title row and the footer away
+    // after the browser's resize has passed (F11), or by its button with no resize at all, and the canvas kept its
+    // old height, leaving an empty band at the bottom with the snap grid in it (#1554).
+    const hostObserver = typeof ResizeObserver !== "undefined" ? new ResizeObserver(() => state.resize()) : null;
+    hostObserver?.observe(host);
 
     return () => {
       rememberCameraView(projectIdRef.current, state);
       window.cancelAnimationFrame(state.animationId);
       window.removeEventListener("resize", state.resize);
+      hostObserver?.disconnect();
       state.disposeInteractionListeners();
       state.controls.dispose();
       disposeChildren(state.workplaneLayer);
@@ -4228,14 +4326,28 @@ export function WorkplaneViewport({
       const scaleSigns = kind === "scale" ? resizeSignsForHandle(resizeHandleKey) : undefined;
       const scaleAnchorPoint = kind === "scale" && scaleSigns ? resizeAnchorPointForFrame(frame, scaleSigns) : undefined;
       // The narrowing's dot moves across the body, along the axis its end's width runs on.
+      // The corner radius's dot runs along the top's back edge, the width's axis.
       const narrowAxis = handleKey === "narrow-end"
         ? (slopeAlongWidth(normalizeSlopeSide(shape.kind, shape.narrowSide)) ? frame.zAxis : frame.xAxis).clone().normalize()
-        : null;
-      const liftAxis = kind === "lift" ? lift.axis : narrowAxis ?? (kind === "height" ? frame.yAxis.clone().normalize() : undefined);
+        : handleKey.startsWith("corner-radius") ? frame.xAxis.clone().normalize() : null;
+      // An X or Y arrow (Discussion #1434) moves the selection along that axis of the workplane. The way is
+      // measured on a plane through the axis that faces the camera, as for the lift arrow, so it follows the
+      // pointer along a line and does not run off into the distance in a low view as a drag on the plane does.
+      const slideAxis = kind === "slide" ? slideAxisForHandle(handleKey) : null;
+      const slideVector = slideAxis ? slideAxisVector(activeWorkplane, slideAxis) : null;
+      if (kind === "slide" && !slideVector) {
+        return;
+      }
+      const slideFromBelow = Boolean(state && state.camera.position.clone().sub(frame.center).dot(lift.axis) < 0);
+      const liftAxis = slideVector
+        ? new THREE.Vector3(slideVector.x, slideVector.y, slideVector.z).normalize()
+        : kind === "lift" ? lift.axis : narrowAxis ?? (kind === "height" ? frame.yAxis.clone().normalize() : undefined);
       const liftHandlePoint = liftAxis
-        ? (kind === "lift"
-            ? lift.pointAt(handlesLowerSide ? lift.low : lift.high).addScaledVector(liftAxis, liftOffset)
-            : framePoint(frame, 0, handlesLowerSide ? frame.min.y : frame.max.y, 0).addScaledVector(liftAxis, liftOffset))
+        ? (kind === "slide"
+            ? lift.pointAt(slideFromBelow ? lift.low : lift.high)
+            : kind === "lift"
+              ? lift.pointAt(handlesLowerSide ? lift.low : lift.high).addScaledVector(liftAxis, liftOffset)
+              : framePoint(frame, 0, handlesLowerSide ? frame.min.y : frame.max.y, 0).addScaledVector(liftAxis, liftOffset))
         : undefined;
       const liftPlane = state && liftAxis && liftHandlePoint
         ? axisDragPlaneForCamera(state, liftAxis, liftHandlePoint)
@@ -4247,9 +4359,24 @@ export function WorkplaneViewport({
       if (kind === "scale" && !scaleStartPoint) {
         return;
       }
-      if ((kind === "lift" || kind === "height") && !liftStartPoint) {
+      if ((kind === "lift" || kind === "height" || kind === "slide") && !liftStartPoint) {
         return;
       }
+      // On the flat workplane an arrow snaps to the edges and middles of other bodies as a drag does.
+      const slideFlat = kind === "slide" && isWorldHorizontalWorkplane(activeWorkplane);
+      const slideMoving = slideFlat && workspaceRef.current.objectSnap
+        ? unionSnapBox(frame.ids.flatMap((id) => {
+            const entry = shapesRef.current.find((candidate) => candidate.id === id);
+            return entry ? [worldSnapBox(entry)] : [];
+          }))
+        : null;
+      const slideSnap = slideMoving
+        ? {
+            moving: slideMoving,
+            targets: moveSnapTargets(shapesRef.current, new Set(frame.ids), notesVisibleRef.current ? referencePoints(notesRef.current) : [], activeWorkplane),
+            guideY: activeWorkplane.origin.y,
+          }
+        : undefined;
       rememberResizeAnchor(shape.id, kind, resizeHandleKey);
       event.preventDefault();
       event.stopPropagation();
@@ -4301,6 +4428,7 @@ export function WorkplaneViewport({
         liftHandlePoint,
         liftStartValue,
         duplicate: kind === "lift" && event.altKey && state ? beginLiftDuplicate(state, frame.ids) : undefined,
+        slideSnap,
         rotationAxisVector: kind === "rotate" ? axisVector : undefined,
         rotationPivot: kind === "rotate" ? pivot : undefined,
         customPivot: kind === "rotate" && Boolean(rotationPivotRef.current),
@@ -4331,6 +4459,22 @@ export function WorkplaneViewport({
         });
       } else {
         setRotationReadout(null);
+      }
+      // The way an arrow moves shows in the move dimensions as for a drag, and can be typed after it.
+      if (slideFlat && state && moveDimensionsEnabledRef.current) {
+        const anchor = moveDimensionAnchorForCamera(state, frame);
+        moveDimensionSessionRef.current = {
+          active: true,
+          originX: anchor.x,
+          originZ: anchor.z,
+          planeY: anchor.y,
+          deltaX: 0,
+          deltaZ: 0,
+          items: frame.ids.flatMap((id) => {
+            const entry = shapesRef.current.find((candidate) => candidate.id === id);
+            return entry ? [{ id, startX: entry.x, startZ: entry.z }] : [];
+          }),
+        };
       }
       if (state) {
         state.needsRender = true;
@@ -4472,7 +4616,11 @@ export function WorkplaneViewport({
       if (!transform) {
         return false;
       }
-      if (Math.hypot(clientX - transform.startClientX, clientY - transform.startClientY) > 3) {
+      // A handle acts once the pointer has really travelled, as a dragged part does (#150): a click on a size,
+      // height, lift, turn or arrow handle with a slightly shaky hand leaves the part as it was. Past that, the
+      // handle follows the pointer from where it was pressed.
+      if (!transform.hasMoved) {
+        if (!dragHasStarted(transform.startClientX, transform.startClientY, clientX, clientY)) return false;
         transform.hasMoved = true;
       }
 
@@ -4493,6 +4641,14 @@ export function WorkplaneViewport({
           const full = narrowCrossWidth(start);
           const nextWidth = clamp(startWidth + 2 * snapValue(rawDelta, step), 0, full);
           onUpdateShape(start.id, { narrowEnd: Math.round(nextWidth * 1e4) / 1e4, narrowSide: normalizeSlopeSide(start.kind, start.narrowSide) });
+          return true;
+        }
+        // Corner radius: "corner-radius" is the dot of the shared radius, on the top's back right corner; "corner-radius-N" the Nth own
+        // radius's dot (back left, back right, front right, front left). Pulled towards its corner the radius shrinks, away from it it grows.
+        if (transform.handleKey.startsWith("corner-radius")) {
+          const start = transform.startShape;
+          const index = transform.handleKey === "corner-radius" ? undefined : Number(transform.handleKey.slice("corner-radius-".length));
+          onUpdateShape(start.id, cornerRadiusDragPatch(start, snapValue(rawDelta, step), index));
           return true;
         }
         if (transform.handleKey === "slope-end") {
@@ -4572,6 +4728,75 @@ export function WorkplaneViewport({
             x: readoutPoint.x + 28,
             y: readoutPoint.y - 30,
             text: formatMeasure((transform.liftStartValue ?? 0) + delta, workspaceRef.current.accuracy),
+          });
+        }
+        return true;
+      }
+
+      if (transform.kind === "slide") {
+        const state = threeRef.current;
+        const axis = (transform.liftAxis ?? transform.selectionFrame.xAxis).clone().normalize();
+        const currentPoint = transform.liftPlane
+          ? toRawPlanePoint(clientX, clientY, transform.liftPlane)
+          : null;
+        const rawDelta = currentPoint && transform.liftStartPoint
+          ? currentPoint.clone().sub(transform.liftStartPoint).dot(axis)
+          : 0;
+        // Whole grid steps from where it started, as a drag moves.
+        let delta = snapValue(rawDelta, step);
+        const snap = transform.slideSnap;
+        if (snap && state) {
+          // As in a drag, an edge or the middle that comes near one of another body is pulled onto it;
+          // Alt lets the selection go free. On the flat workplane the axis is X or minus Z of the scene.
+          const alongX = Math.abs(axis.x) >= Math.abs(axis.z);
+          let guides: ObjectSnapGuide[] = [];
+          if (!altKey) {
+            const pull = objectSnapOffset(
+              shiftSnapBox(snap.moving, axis.x * rawDelta, axis.z * rawDelta),
+              snap.targets,
+              objectSnapThreshold(state, currentPoint ?? transform.selectionFrame.center),
+            );
+            const extra = alongX ? pull.dx : pull.dz;
+            if (extra !== null) {
+              delta = rawDelta + extra / (alongX ? axis.x : axis.z);
+              guides = objectSnapOffset(shiftSnapBox(snap.moving, axis.x * delta, axis.z * delta), snap.targets, 1e-4)
+                .guides.filter((guide) => guide.axis === (alongX ? "x" : "z"));
+            }
+          }
+          syncObjectSnapGuides(state, guides, snap.guideY + 0.06);
+        }
+        // On a flat workplane the height is not touched, so it does not pick up a rounding rest.
+        const rises = Math.abs(axis.y) > 1e-9;
+        transform.items.forEach((item) => {
+          const nextCenter = item.startCenter.clone().addScaledVector(axis, delta);
+          onUpdateShape(item.id, {
+            x: cleanNearZero(nextCenter.x, 0.0005),
+            z: cleanNearZero(nextCenter.z, 0.0005),
+            ...(rises
+              ? { elevation: cleanNearZero(clamp(nextCenter.y - item.startShape.height / 2, MIN_ELEVATION, MAX_ELEVATION), 0.0005) }
+              : {}),
+          });
+        });
+        const session = moveDimensionSessionRef.current;
+        if (state && session && !session.lift && !session.keyboard) {
+          session.deltaX = axis.x * delta;
+          session.deltaZ = axis.z * delta;
+          session.active = true;
+          syncMoveDimensionOverlay(
+            state,
+            session,
+            moveDimensionOverlayRef,
+            setMoveDimensionOverlay,
+            workspaceRef.current.accuracy,
+            resolvedThemeRef.current,
+          );
+        } else if (state) {
+          // Off the flat workplane there are no move dimensions: the way stands at the pointer.
+          const readoutPoint = projectToScreen((transform.liftHandlePoint ?? transform.selectionFrame.center).clone().addScaledVector(axis, delta), state);
+          setRotationReadout({
+            x: readoutPoint.x + 28,
+            y: readoutPoint.y - 30,
+            text: formatMeasure(delta, workspaceRef.current.accuracy),
           });
         }
         return true;
@@ -4730,6 +4955,31 @@ export function WorkplaneViewport({
     }
   }, [clearMoveDimensions]);
 
+  /**
+   * After an X or Y arrow (Discussion #1434) the way stays shown at the body and can be typed, as after a
+   * drag; an arrow that went nowhere shows none. The snap lines go.
+   */
+  const settleSlide = useCallback(() => {
+    const session = moveDimensionSessionRef.current;
+    if (session && !session.lift && (Math.abs(session.deltaX) > 1e-9 || Math.abs(session.deltaZ) > 1e-9)) {
+      session.active = false;
+    } else {
+      clearMoveDimensions();
+    }
+    const state = threeRef.current;
+    if (state) {
+      syncObjectSnapGuides(state, [], 0);
+      syncMoveDimensionOverlay(
+        state,
+        moveDimensionSessionRef.current,
+        moveDimensionOverlayRef,
+        setMoveDimensionOverlay,
+        workspaceRef.current.accuracy,
+        resolvedThemeRef.current,
+      );
+    }
+  }, [clearMoveDimensions]);
+
   const finishTransform = useCallback((event: ReactPointerEvent<Element>) => {
     const transform = transformRef.current;
     if (!transform) {
@@ -4762,6 +5012,10 @@ export function WorkplaneViewport({
       setPinnedMeasureKey(getElevationMeasureKey(transformOverlayRef.current));
       settleLiftMoveDimension();
     }
+    if (transform.kind === "slide") {
+      setPinnedMeasureKey(null);
+      settleSlide();
+    }
     if (transform.kind === "lift" && transform.hasMoved) {
       suppressLiftEditAfterDrag();
     }
@@ -4786,7 +5040,7 @@ export function WorkplaneViewport({
     }
     onInteractionActiveChange?.(false);
     bakeRotatedShapes.forEach((id) => onUpdateShape(id, { bakeTransform: true }));
-  }, [onDuplicateShapesMoved, onInteractionActiveChange, onUpdateShape, settleLiftMoveDimension, suppressCornerEditAfterDrag, suppressLiftEditAfterDrag]);
+  }, [onDuplicateShapesMoved, onInteractionActiveChange, onUpdateShape, settleLiftMoveDimension, settleSlide, suppressCornerEditAfterDrag, suppressLiftEditAfterDrag]);
 
   // The calculation a box was last set from (#180), while it still gives the body's size; the
   // box then opens on the formula instead of the number, as the Properties field does.
@@ -5602,6 +5856,13 @@ export function WorkplaneViewport({
       selectTapeCandidate({ x: pinned.x, y: pinned.y, z: pinned.z });
       return;
     }
+    // "Point to point" takes it too (Discussion #1491).
+    if (matePointPickRef.current?.picking && pinned?.kind === "point" && event.button === 0) {
+      event.preventDefault();
+      noteClickSuppressedRef.current = noteId;
+      onMatePointPickRef.current?.({ shapeId: null, point: { x: pinned.x, y: pinned.y, z: pinned.z } });
+      return;
+    }
     noteDragRef.current = { noteId, pointerId: event.pointerId, moved: false };
     capturePointer(event.currentTarget, event.pointerId);
   }, [selectTapeCandidate]);
@@ -5631,6 +5892,35 @@ export function WorkplaneViewport({
     );
     if (nearest) return nearest;
     return tape?.attachment?.kind === "edge" ? { x: tape.x, y: tape.y, z: tape.z } : null;
+  }, []);
+
+  /**
+   * The point "Point to point" takes under the pointer (Discussion #1491): the nearest corner, centre of a round
+   * edge or reference point within reach - corners and edges a body hides left out - and otherwise a spot on an
+   * edge near the pointer. A face alone is no point: null.
+   */
+  const resolveMatePoint = useCallback((clientX: number, clientY: number): PointPick | null => {
+    const state = threeRef.current;
+    const pick = matePointPickRef.current;
+    if (!state || !pick) return null;
+    const rect = state.renderer.domElement.getBoundingClientRect();
+    const ids = pick.shapeIds.filter((id) => shapesRef.current.some((shape) => shape.id === id && !shape.hidden));
+    const feature = ids.length ? meshFeatureNear(state, ids, clientX, clientY) : null;
+    const centre = ids.length ? tapeCentresNear(state, ids, clientX, clientY).snap?.candidate ?? null : null;
+    // A part inside a group reports itself; the pick belongs to the body asked for.
+    const ownerOf = (shapeId: string | undefined) => (shapeId && ids.includes(shapeId) ? shapeId : ids.length === 1 ? ids[0] : shapeId ?? null);
+    const spots: Array<ReferencePosition & { shapeId: string | null }> = [];
+    if (feature?.kind === "vertex") spots.push({ x: feature.point.x, y: feature.point.y, z: feature.point.z, shapeId: feature.shapeId });
+    if (centre) spots.push({ x: centre.x, y: centre.y, z: centre.z, shapeId: ownerOf(centre.attachment?.shapeId) });
+    if (notesVisibleRef.current) referencePoints(notesRef.current).forEach((point) => spots.push({ x: point.x, y: point.y, z: point.z, shapeId: null }));
+    const nearest = nearestReferenceOnScreen(
+      spots,
+      (point) => projectToScreen(new THREE.Vector3(point.x, point.y, point.z), state),
+      { x: clientX - rect.left, y: clientY - rect.top },
+      pointerReach(10),
+    );
+    if (nearest) return { shapeId: nearest.shapeId, point: { x: nearest.x, y: nearest.y, z: nearest.z } };
+    return feature?.kind === "edge" ? { shapeId: feature.shapeId, point: { x: feature.point.x, y: feature.point.y, z: feature.point.z } } : null;
   }, []);
 
   const handleNotePinPointerMove = useCallback((event: ReactPointerEvent<HTMLButtonElement>, noteId: string) => {
@@ -5723,13 +6013,15 @@ export function WorkplaneViewport({
     const existingAxisModes = cornerRulerModelRef.current[0]?.axisModes;
     const stayInView = cornerRulerModelRef.current[0]?.occlude === false;
     const measuresOfSelection = cornerRulerModelRef.current[0]?.selectedOnly === true;
+    // A square set again keeps the arms it had, made longer or shorter (Discussion #1469).
+    const previous = cornerRulerModelRef.current[0];
     const instance: CornerRulerInstance = {
       id: `corner-ruler-${++cornerRulerIdRef.current}`,
       corner: point,
       workplane,
       frame: cornerRulerFrameForWorkplane(workplane),
-      armLengthX: CORNER_RULER_DEFAULT_ARM_X,
-      armLengthZ: CORNER_RULER_DEFAULT_ARM_Z,
+      armLengthX: previous?.armLengthX ?? CORNER_RULER_DEFAULT_ARM_X,
+      armLengthZ: previous?.armLengthZ ?? CORNER_RULER_DEFAULT_ARM_Z,
       mode: existingMode,
       ...(existingAxisModes ? { axisModes: existingAxisModes } : {}),
       ...(stayInView ? { occlude: false } : {}),
@@ -6132,6 +6424,44 @@ export function WorkplaneViewport({
     storeCornerRulerModel(cornerRulerModelRef.current.map((ruler) => ruler.id === id ? { ...ruler, frame: rotateCornerRulerFrame(ruler.frame) } : ruler));
   }, [storeCornerRulerModel]);
 
+  /** Dragging an arm's end makes the arm as long as the pointer is far from the corner along it, in whole millimetres (Discussion #1469). */
+  const handleCornerRulerArmPointerDown = useCallback((event: ReactPointerEvent<SVGCircleElement>, id: string, arm: "x" | "z") => {
+    event.preventDefault();
+    event.stopPropagation();
+    cornerRulerArmDragRef.current = { id, arm, pointerId: event.pointerId };
+    capturePointer(event.currentTarget, event.pointerId);
+  }, []);
+
+  const handleCornerRulerArmPointerMove = useCallback((event: ReactPointerEvent<SVGCircleElement>, id: string, arm: "x" | "z") => {
+    const drag = cornerRulerArmDragRef.current;
+    if (!drag || drag.id !== id || drag.arm !== arm || drag.pointerId !== event.pointerId) return;
+    event.preventDefault();
+    event.stopPropagation();
+    const current = cornerRulerModelRef.current.find((ruler) => ruler.id === id);
+    if (!current) return;
+    const point = resolveCornerRulerPoint(event.clientX, event.clientY, current.workplane);
+    if (!point) return;
+    const length = cornerRulerArmLength(current, arm, point);
+    const key = arm === "x" ? "armLengthX" : "armLengthZ";
+    if (current[key] === length) return;
+    storeCornerRulerModel(cornerRulerModelRef.current.map((ruler) => ruler.id === id ? { ...ruler, [key]: length } : ruler));
+  }, [resolveCornerRulerPoint, storeCornerRulerModel]);
+
+  const handleCornerRulerArmPointerUp = useCallback((event: ReactPointerEvent<SVGCircleElement>, id: string, arm: "x" | "z") => {
+    const drag = cornerRulerArmDragRef.current;
+    if (!drag || drag.id !== id || drag.arm !== arm) return;
+    cornerRulerArmDragRef.current = null;
+    if (event.currentTarget.hasPointerCapture(event.pointerId)) {
+      event.currentTarget.releasePointerCapture(event.pointerId);
+    }
+  }, []);
+
+  /** Both arms as long as the build plate: the arm that runs along its width gets the width, the other its depth (Discussion #1469). */
+  const cornerRulerArmsToPlate = useCallback((id: string) => {
+    const { width, depth } = workspaceRef.current;
+    storeCornerRulerModel(cornerRulerModelRef.current.map((ruler) => ruler.id === id ? { ...ruler, ...cornerRulerPlateArms(ruler.frame, width, depth) } : ruler));
+  }, [storeCornerRulerModel]);
+
   const toggleNoteCard = useCallback((noteId: string) => {
     if (noteClickSuppressedRef.current === noteId) {
       noteClickSuppressedRef.current = null;
@@ -6405,6 +6735,28 @@ export function WorkplaneViewport({
       if (mateFacePickRef.current) {
         event.preventDefault();
         onMateFacePick?.(pickMateFace(state, event.clientX, event.clientY));
+        return;
+      }
+
+      if (matePointPickRef.current?.picking) {
+        event.preventDefault();
+        onMatePointPickRef.current?.(resolveMatePoint(event.clientX, event.clientY));
+        return;
+      }
+
+      if (paintPickRef.current) {
+        event.preventDefault();
+        const paint = paintPickRef.current;
+        if (paint.mode === "lasso") {
+          // The shape is drawn while the button is held; the view stays where it is meanwhile.
+          capturePointer(event.currentTarget, event.pointerId);
+          paintLassoRef.current = { pointerId: event.pointerId, points: [[event.clientX - rect.left, event.clientY - rect.top]] };
+          setPaintLassoPoints(null);
+          state.controls.enabled = false;
+          onInteractionActiveChange?.(true);
+          return;
+        }
+        onPaintPickRef.current?.(pickPaintFace(state, paint.shapeId, event.clientX, event.clientY));
         return;
       }
 
@@ -6768,9 +7120,7 @@ export function WorkplaneViewport({
             }
           : undefined,
       };
-      const usesWorldHorizontalAxes = Math.abs(activeWorkplane.normal.y - 1) < 1e-6
-        && Math.abs(activeWorkplane.xAxis.x - 1) < 1e-6
-        && Math.abs(activeWorkplane.zAxis.z - 1) < 1e-6;
+      const usesWorldHorizontalAxes = isWorldHorizontalWorkplane(activeWorkplane);
       if (workspaceRef.current.objectSnap && usesWorldHorizontalAxes && dragRef.current) {
         const dragged = new Set(items.map((item) => item.id));
         const shapeById = new Map(shapesRef.current.map((entry) => [entry.id, entry]));
@@ -6778,17 +7128,12 @@ export function WorkplaneViewport({
           const entry = shapeById.get(item.id);
           return entry ? [worldSnapBox(entry)] : [];
         }));
-        dragRef.current.snapTargets = [
-          ...shapesRef.current
-            .filter((entry) => !dragged.has(entry.id) && !entry.hidden)
-            .map(worldSnapBox),
-          // A reference point is a box with no size: its edges and centre are one line.
-          ...(notesVisibleRef.current
-            ? referencePoints(notesRef.current).map((point) => ({ minX: point.x, maxX: point.x, minZ: point.z, maxZ: point.z }))
-            : []),
-          // The middle of the workplane, so a part can be put in its centre along X, Z or both (Discussion #1266).
-          { minX: activeWorkplane.origin.x, maxX: activeWorkplane.origin.x, minZ: activeWorkplane.origin.z, maxZ: activeWorkplane.origin.z },
-        ];
+        dragRef.current.snapTargets = moveSnapTargets(
+          shapesRef.current,
+          dragged,
+          notesVisibleRef.current ? referencePoints(notesRef.current) : [],
+          activeWorkplane,
+        );
       }
       if (moveDimensionsEnabledRef.current && usesWorldHorizontalAxes) {
         const dragFrame = selectionFrameForShapes(shapesRef.current, items.map((item) => item.id));
@@ -6813,6 +7158,7 @@ export function WorkplaneViewport({
       beginLiftDuplicate,
       clearMoveDimensions,
       modifierActive,
+      resolveMatePoint,
       placeProtractorAt,
       onAlignAnchorChange,
       onDuplicateShapesMoved,
@@ -6845,11 +7191,22 @@ export function WorkplaneViewport({
     ],
   );
 
+  const finishDragRef = useRef<((event: ReactPointerEvent<HTMLDivElement>) => void) | null>(null);
   const handlePointerMove = useCallback(
     (event: ReactPointerEvent<HTMLDivElement>) => {
       // Gehoert die Flaeche gerade der Kamera, hat hier niemand etwas zu
       // schweben oder zu ziehen - die Finger bewegen die Ansicht.
       if (cameraTouchRef.current) return;
+      // A mouse that moves with no button held cannot be dragging: its release never reached us (a Magic Mouse
+      // does that now and then, #1540). End the move, handle drag, box or lasso where it is, as the release would.
+      if (
+        event.pointerType === "mouse" &&
+        event.buttons === 0 &&
+        (dragRef.current || transformRef.current || marqueeRef.current || paintLassoRef.current)
+      ) {
+        finishDragRef.current?.(event);
+        return;
+      }
       cruiseFreeRef.current = event.altKey;
       cruiseSinkRef.current = event.shiftKey;
       carryPointerRef.current = { x: event.clientX, y: event.clientY };
@@ -6909,6 +7266,24 @@ export function WorkplaneViewport({
       }
       if (layFlatPickModeRef.current) {
         syncLayFlatHover(threeRef.current, selectedIdsRef.current, resolvedThemeRef.current, event.clientX, event.clientY);
+        return;
+      }
+      const lasso = paintLassoRef.current;
+      if (lasso) {
+        if (lasso.pointerId !== event.pointerId || !threeRef.current) return;
+        const rect = threeRef.current.renderer.domElement.getBoundingClientRect();
+        const point: [number, number] = [event.clientX - rect.left, event.clientY - rect.top];
+        const last = lasso.points[lasso.points.length - 1];
+        // A point every 3 px is close enough to the hand and keeps the outline short.
+        if (Math.hypot(point[0] - last[0], point[1] - last[1]) < 3) return;
+        lasso.points.push(point);
+        setPaintLassoPoints(lasso.points.map(([x, y]) => `${x.toFixed(1)},${y.toFixed(1)}`).join(" "));
+        return;
+      }
+      if (matePointPickRef.current?.picking) {
+        const found = resolveMatePoint(event.clientX, event.clientY);
+        matePointHoverRef.current = found ? { ...found.point, role: matePointPickRef.current.marks.some((mark) => mark.role === "source") ? "target" : "source" } : null;
+        syncPointMarks(threeRef.current, [...matePointPickRef.current.marks, ...(matePointHoverRef.current ? [matePointHoverRef.current] : [])]);
         return;
       }
       if (mateFacePickRef.current) {
@@ -6976,7 +7351,7 @@ export function WorkplaneViewport({
       // A shaky click or double click must not nudge the part: it moves once the pointer has
       // gone a few pixels, and then follows it from where the drag began (#150).
       if (!drag.started) {
-        if (Math.hypot(event.clientX - drag.startClient.x, event.clientY - drag.startClient.y) < DRAG_START_PIXELS) return;
+        if (!dragHasStarted(drag.startClient.x, drag.startClient.y, event.clientX, event.clientY)) return;
         drag.started = true;
       }
 
@@ -7067,7 +7442,7 @@ export function WorkplaneViewport({
         threeRef.current.needsRender = true;
       }
     },
-    [pickPlacementSurface, setMarqueeFromState, toPlacementWorkplanePoint, toRawPlanePoint, moveCruiseGhost, updateModifierEdgeHover, updateProtractorHover, updateTapeHover, updateTransform],
+    [pickPlacementSurface, resolveMatePoint, setMarqueeFromState, toPlacementWorkplanePoint, toRawPlanePoint, moveCruiseGhost, updateModifierEdgeHover, updateProtractorHover, updateTapeHover, updateTransform],
   );
 
   useEffect(() => {
@@ -7207,6 +7582,25 @@ export function WorkplaneViewport({
 
   const finishDrag = useCallback(
     (event: ReactPointerEvent<HTMLDivElement>) => {
+      const lasso = paintLassoRef.current;
+      if (lasso && lasso.pointerId === event.pointerId) {
+        paintLassoRef.current = null;
+        setPaintLassoPoints(null);
+        if (event.currentTarget.hasPointerCapture(event.pointerId)) event.currentTarget.releasePointerCapture(event.pointerId);
+        const state = threeRef.current;
+        if (state) {
+          state.controls.enabled = true;
+          // Three points that span a few pixels make a shape; a click without a drag paints nothing.
+          const xs = lasso.points.map(([x]) => x);
+          const ys = lasso.points.map(([, y]) => y);
+          if (lasso.points.length >= 3 && Math.max(...xs) - Math.min(...xs) + Math.max(...ys) - Math.min(...ys) > 6) {
+            const drawn = paintLassoInView(state, lasso.points);
+            if (drawn) onPaintLassoRef.current?.(drawn.view, drawn.outline);
+          }
+        }
+        onInteractionActiveChange?.(false);
+        return;
+      }
       const rightPress = rightPressRef.current;
       if (event.button === 2 && rightPress) {
         rightPressRef.current = null;
@@ -7270,6 +7664,9 @@ export function WorkplaneViewport({
         if (transform.kind === "lift") {
           setPinnedMeasureKey(getElevationMeasureKey(transformOverlayRef.current));
           settleLiftMoveDimension();
+        } else if (transform.kind === "slide") {
+          setPinnedMeasureKey(null);
+          settleSlide();
         } else if (transform.kind === "height") {
           setPinnedMeasureKey(null);
           setHoverMeasureKey(null);
@@ -7410,8 +7807,9 @@ export function WorkplaneViewport({
       }
       onInteractionActiveChange?.(false);
     },
-    [cancelGestureForCamera, clearMoveDimensions, onAlignAnchorChange, onDuplicateShapesMoved, onInteractionActiveChange, onSelectShape, onUpdateShape, rememberResizeAnchor, setMarqueeFromState, shapesInMarquee, suppressCornerEditAfterDrag, suppressLiftEditAfterDrag, onShapeContextMenu, pickShape, shapeStackAt, faceCentreAt, insideSelectionFrame],
+    [cancelGestureForCamera, clearMoveDimensions, onAlignAnchorChange, onDuplicateShapesMoved, onInteractionActiveChange, onSelectShape, onUpdateShape, rememberResizeAnchor, setMarqueeFromState, settleSlide, shapesInMarquee, suppressCornerEditAfterDrag, suppressLiftEditAfterDrag, onShapeContextMenu, pickShape, shapeStackAt, faceCentreAt, insideSelectionFrame],
   );
+  finishDragRef.current = finishDrag;
 
   const handleDrop = useCallback(
     (event: DragEvent<HTMLDivElement>) => {
@@ -7610,6 +8008,15 @@ export function WorkplaneViewport({
     tapePointDragRef.current = null;
     setProtractorActive(false);
   }, [setProtractorActive, setTapeActive]);
+
+  // A folded view bar opened by the mouse over its arrow folds again when the mouse leaves it, unless a tool of it is in use (#1552).
+  const cameraBarPeek = useCameraBarPeek({
+    enabled: workspace.viewBarOpensOnHover,
+    collapsed: cameraControlsCollapsed,
+    onOpen: () => setCameraControlsCollapsed(false),
+    onFold: () => setCameraControlsCollapsed(true),
+    keepOpen: () => cameraBarMove.dragging || tapeModeRef.current || protractorOpenRef.current || tapeToolsOpen || sectionViewOpen,
+  });
 
   const syncSectionClippingState = useCallback((settings: SectionPlaneSettings) => {
     const state = threeRef.current;
@@ -8037,8 +8444,9 @@ export function WorkplaneViewport({
         style={cameraBarMove.style}
         aria-label={t("camera.controls")}
         data-help-section="cameraBar"
+        {...cameraBarPeek.barProps}
       >
-        <CameraBarHandle move={cameraBarMove} collapsed={cameraControlsCollapsed} onToggle={() => (cameraControlsCollapsed ? setCameraControlsCollapsed(false) : collapseCameraControls())} />
+        <CameraBarHandle move={cameraBarMove} collapsed={cameraControlsCollapsed || cameraBarPeek.peeking} onToggle={() => cameraBarPeek.toggle(() => (cameraControlsCollapsed ? setCameraControlsCollapsed(false) : collapseCameraControls()))} />
         {cameraControlsCollapsed ? null : (
           <>
             <div className="camera-group">
@@ -8608,7 +9016,7 @@ export function WorkplaneViewport({
         )}
       </div>
 
-      <section className={`workplane-wrap ${noteMode ? "note-mode" : ""} ${workplaneMode ? "placing-workplane" : ""} ${splitActive ? "split-mode" : ""} ${splitHandleState ? `split-handle-${splitHandleState}` : ""} ${splitSurfacePick ? "split-picking" : ""} ${splitSurfacePick && splitPickOverFace ? "split-pick-over-face" : ""} ${cruiseAsset || carryIds?.length ? "cruising" : ""} ${tapeMode ? "tape-mode" : ""} ${tapeDeleteMode ? "tape-delete-mode" : ""} ${tapeMoveMode ? "tape-move-mode" : ""} ${cornerRulerMode ? "corner-ruler-mode" : ""} ${protractorOpen ? "protractor-mode" : ""} ${pivotPickMode || layFlatPickMode || mateFacePick || cadFacePick ? "pivot-pick-mode" : ""} ${modifierActive ? "modifier-edge-pick" : ""} ${sectionMeasureMode && sectionSettings.enabled ? "section-measure-mode" : ""} ${workspace.dimensionAxisColors ? "dimension-axis-colors" : ""}`} aria-label={t("aria.workplane")}>
+      <section className={`workplane-wrap ${noteMode ? "note-mode" : ""} ${workplaneMode ? "placing-workplane" : ""} ${splitActive ? "split-mode" : ""} ${splitHandleState ? `split-handle-${splitHandleState}` : ""} ${splitSurfacePick ? "split-picking" : ""} ${splitSurfacePick && splitPickOverFace ? "split-pick-over-face" : ""} ${cruiseAsset || carryIds?.length ? "cruising" : ""} ${tapeMode ? "tape-mode" : ""} ${tapeDeleteMode ? "tape-delete-mode" : ""} ${tapeMoveMode ? "tape-move-mode" : ""} ${cornerRulerMode ? "corner-ruler-mode" : ""} ${protractorOpen ? "protractor-mode" : ""} ${pivotPickMode || layFlatPickMode || mateFacePick || matePointPick?.picking || cadFacePick || paintPick ? "pivot-pick-mode" : ""} ${modifierActive ? "modifier-edge-pick" : ""} ${sectionMeasureMode && sectionSettings.enabled ? "section-measure-mode" : ""} ${workspace.dimensionAxisColors ? "dimension-axis-colors" : ""}`} aria-label={t("aria.workplane")}>
         <div className="workplane-plane">
           <div
             className="three-workplane-host"
@@ -8627,6 +9035,11 @@ export function WorkplaneViewport({
           {!workplaneMode && !splitActive ? <SelectionCounter count={selectedIds.length} hostRef={hostRef} /> : null}
           {!workplaneMode && !splitActive && !pickOnly ? plateBar : null}
           {!workplaneMode && !splitActive && marqueeRect ? <div className={marqueeTouching ? "selection-marquee touching" : "selection-marquee"} style={marqueeRect} /> : null}
+          {paintPick && paintLassoPoints ? (
+            <svg className="paint-lasso-overlay" aria-hidden="true">
+              <polygon points={paintLassoPoints} />
+            </svg>
+          ) : null}
           {!workplaneMode && !splitActive && moveDimensionsEnabled && !dimensionsHidden && moveDimensionOverlay ? (
             <MoveDimensionOverlay
               overlay={moveDimensionOverlay}
@@ -8637,7 +9050,7 @@ export function WorkplaneViewport({
           {!workplaneMode && !splitActive && originDimensionsEnabled && !dimensionsHidden && originDimensionOverlay ? (
             <OriginDimensionOverlay overlay={originDimensionOverlay} />
           ) : null}
-          {!workplaneMode && !splitActive && !pivotPickMode && !layFlatPickMode && !mateFacePick && !cadFacePick && transformOverlay && !alignMode && !mirrorMode && !tapeMode && !tapeDeleteMode && !tapeMoveMode && !modifierActive ? (
+          {!workplaneMode && !splitActive && !pivotPickMode && !layFlatPickMode && !mateFacePick && !matePointPick?.picking && !cadFacePick && !paintPick && transformOverlay && !alignMode && !mirrorMode && !tapeMode && !tapeDeleteMode && !tapeMoveMode && !modifierActive ? (
             <TransformOverlay
               // Q leaves out what shows by itself; a handle pointed at still shows its size.
               box={dimensionsHidden ? { ...transformOverlay, alwaysVisibleDimensionKeys: [] } : transformOverlay}
@@ -8757,12 +9170,16 @@ export function WorkplaneViewport({
               onToggleAxisMode={toggleCornerRulerAxisMode}
               onToggleOcclude={toggleCornerRulerOcclude}
               onToggleSelectedOnly={toggleCornerRulerSelectedOnly}
+              onArmEndPointerDown={handleCornerRulerArmPointerDown}
+              onArmEndPointerMove={handleCornerRulerArmPointerMove}
+              onArmEndPointerUp={handleCornerRulerArmPointerUp}
+              onArmsToPlate={cornerRulerArmsToPlate}
               onCoordinateClick={beginRulerCoordinateEdit}
             />
           ) : null}
           {rulerDimensionEditing ? (
             <input
-              className="dimension-input"
+              className="dimension-input" autoComplete="off"
               style={{ "--overlay-x": `${rulerDimensionEditing.x}px`, "--overlay-y": `${rulerDimensionEditing.y}px` } as CSSProperties}
               value={rulerDimensionEditing.value}
               autoFocus
@@ -8779,7 +9196,7 @@ export function WorkplaneViewport({
           ) : null}
           {rulerDuplicateEditing ? (
             <input
-              className="dimension-input"
+              className="dimension-input" autoComplete="off"
               style={{ "--overlay-x": `${rulerDuplicateEditing.x}px`, "--overlay-y": `${rulerDuplicateEditing.y}px` } as CSSProperties}
               value={rulerDuplicateEditing.value}
               autoFocus
@@ -8796,7 +9213,7 @@ export function WorkplaneViewport({
           ) : null}
           {rulerCoordinateEditing ? (
             <input
-              className="dimension-input ruler-coordinate-input"
+              className="dimension-input ruler-coordinate-input" autoComplete="off"
               style={{ "--overlay-x": `${rulerCoordinateEditing.x}px`, "--overlay-y": `${rulerCoordinateEditing.y}px` } as CSSProperties}
               value={rulerCoordinateEditing.value}
               autoFocus
@@ -8858,6 +9275,7 @@ export function WorkplaneViewport({
           onObjectSnapChange={changeObjectSnap}
           onEditSketch={selectedShape.sketchProfile ? onEditSketch : undefined}
           onOpenGroup={selectedShape.groupedShapes?.length && onOpenGroup ? () => onOpenGroup(selectedShape.id) : undefined}
+          onHullKeepHolesChange={selectedShape.groupOperation === "hull" && onHullKeepHolesChange ? (keepHoles) => onHullKeepHolesChange(selectedShape.id, keepHoles) : undefined}
           canSeparateParts={canSeparateParts}
           onSeparateParts={onSeparateParts}
           onWrapAroundCylinder={onWrapAroundCylinder}
@@ -8920,6 +9338,20 @@ export function WorkplaneViewport({
             onObjectSnapChange={changeObjectSnap}
           />
         </div>
+      ) : null}
+
+      {snapMenuAt ? (
+        <SnapGridPointerMenu
+          x={snapMenuAt.x}
+          y={snapMenuAt.y}
+          units={workspace.units}
+          customGrids={workspace.customSnapGrids}
+          snap={snap}
+          onSnapChange={chooseSnapGrid}
+          objectSnap={workspace.objectSnap}
+          onObjectSnapChange={changeObjectSnap}
+          onClose={closeSnapMenuAt}
+        />
       ) : null}
 
       {settingsOpen ? (

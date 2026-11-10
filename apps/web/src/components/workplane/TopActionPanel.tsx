@@ -129,6 +129,18 @@ export function TopActionPanel({
   const suggestedName = ownObjectName && exportFormat !== "lyl" ? ownObjectName : projectName;
   const [exportName, setExportName] = useState(suggestedName);
   const previousSuggestedNameRef = useRef(suggestedName);
+  // Ready to type a new name when Export opens: the field takes the focus with the name selected, so typing replaces it
+  // (Discussion #1507) - except on a touch screen, where focusing it would pop up the keyboard. The name is selected here
+  // too, as the field's focus handler does not run while the window itself is not focused.
+  const exportNameRef = useRef<HTMLInputElement>(null);
+  useEffect(() => {
+    if (panel !== "export") return;
+    const touch = typeof window.matchMedia === "function" && window.matchMedia("(pointer: coarse)").matches;
+    const field = exportNameRef.current;
+    if (touch || !field) return;
+    field.focus({ preventScroll: true });
+    field.select();
+  }, [panel]);
   // Starts at the history setting from the workspace settings, so a project
   // file carries what the editor keeps unless it is changed here.
   const [lylHistoryLimit, setLylHistoryLimit] = useState<LylHistoryLimit>(workspaceHistoryLimit);
@@ -407,6 +419,7 @@ export function TopActionPanel({
             <label htmlFor="export-file-name">{t("export.fileName")}</label>
             <div className="export-file-input-wrap">
               <input
+                ref={exportNameRef}
                 id="export-file-name"
                 className="export-file-input"
                 value={exportName}

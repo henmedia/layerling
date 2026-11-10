@@ -12,6 +12,7 @@ Vælg {{ui:shape.text}} i formbiblioteket og placér den. I feltet {{ui:prop.tex
 - **{{ui:prop.height}}:** Hvor langt bogstaverne stikker ud fra overfladen.
 - **{{ui:prop.bevel}}:** Rund bogstavkanterne så de ser blødere ud. Med {{ui:prop.segments}} bestemmer du i hvor mange trin.
 - **{{ui:nameTag.letterEdge}}:** runder eller affaser bogstavernes overkant, som på et navneskilt: {{ui:nameTag.edge.none}}, {{ui:nameTag.edge.round}} eller {{ui:nameTag.edge.chamfer}}, med {{ui:nameTag.letterEdgeSize}} (først 0,4 mm, højst lige så høj som teksten). Den går længere end {{ui:prop.bevel}}, men kun så langt, som stregerne er brede: hvor en streg er tyndere end to gange størrelsen, ender kanten i en smallere top. Undersiden forbliver flad, så enkelte bogstaver kan limes på bagefter. Så længe en kant er valgt, træder den i stedet for {{ui:prop.bevel}}.
+- **Længde:** En tekst kan have op til 250 tegn. Bogstaverne beholder deres størrelse, og linjen bliver så lang, som den skal være; gør bogstaverne mindre for at gøre den kortere. {{ui:nameTag.letterEdge}} virker på en tekst på op til 40 tegn, fordi den på en længere ville tage minutter at beregne.
 - **Størrelse:** Du sætter længden og bredden som med enhver form. Træk håndtagene eller tast dimensionerne.
 - **{{ui:prop.textSpacing}}:** Mellemrummet mellem bogstaverne ud over det, skriften selv giver, i procent af bogstavstørrelsen: 0 lader det være som skriften gjorde det, over står bogstaverne længere fra hinanden, under (ned til -50) tættere, hvilket ofte er nødvendigt for en font du selv har. Bogstaverne beholder deres størrelse, og boksen følger linjen, både på lige og på buet tekst. Mellemrummet anvendes ikke på arabisk og hebraisk, hvor bogstaverne binder sammen.
 - **{{ui:prop.textStretch}}:** Fra starten er den slået fra: bogstaverne beholder deres proportioner og sidder midt i rammen, så en ramme der trækkes bredere eller dybere end ordet kræver, bliver større end bogstaverne. Slår du den til, strækkes bogstaverne, så de fylder hele rammen i begge retninger: et stort bogstav kan gøres lavere eller smallere, som i Tinkercad. Den er til lige tekst; buet tekst har sin egen bogstavstørrelse.
@@ -78,6 +79,17 @@ Så:
 - **Graveret:** Skift teksten til {{ui:inspector.hole}}, lad den nå lidt ind i overfladen og gruppér den med formen. Bogstaverne bliver så graveret.
 
 Til bogstaver på en sidevæg, læg først arbejdsplanet på den væg, se [Visning og arbejdsplan](chapter:view-and-workplane).
+
+## Stenciler: broer til midten af bogstaver
+
+Skåret gennem en plade mister bogstaver som O, A og B deres midte: den ligger løst inde i bogstavet og falder ud. {{ui:stencilBridges.title}} holder den fast til pladen med små broer, som på en stencil.
+
+1. Skift teksten til {{ui:inspector.hole}}, lad den gå gennem pladen, og vælg begge, grupperet eller ej.
+2. Klik på {{ui:stencilBridges.title}} i gruppen {{ui:editor.section.splitShape}} i båndet, højreklik på markeringen, eller find det med [[Ctrl]]+[[K]]. Broerne vises i orange, hvor de kommer til at sidde.
+3. Indstil {{ui:stencilBridges.width}} og {{ui:stencilBridges.count}}. {{ui:stencilBridges.height}} starter ved pladens tykkelse; lavere broer sidder i flugt med bunden, i midten eller i flugt med toppen af pladen, som {{ui:stencilBridges.position}} angiver. På en sprøjtestencil giver broer øverst plads til malingen under dem.
+4. {{ui:stencilBridges.apply}} grupperer broerne med pladen.
+
+Hver bro er en almindelig kasse: åbn gruppen for at flytte en, slette en eller tilføje din egen. Ændrer du teksten senere, så vælg gruppen og klik på {{ui:stencilBridges.title}} igen; nye broer træder i stedet for de gamle. En tekst, der kun er graveret og ikke går igennem, får ingen broer, for der falder intet ud. Til en laser eller en plotter tilføjer DXF- og SVG-eksporten de samme broer, se [Filer, lagring og deling](chapter:files-and-saving).
 
 ## Omrids, silhuet og bredere
 

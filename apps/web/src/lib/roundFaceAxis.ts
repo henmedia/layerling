@@ -138,7 +138,47 @@ export function roundFaceTriangles(positions: ArrayLike<number>, hitTriangle: nu
   }
   const circle = fitCircle(positions, triangles, axis);
   if (!circle) return null;
+  if (widestFacetSpan(positions, normals, triangles, circle) > MAX_FACET_SPAN) return null;
   return { triangles, axis: circle };
+}
+
+/**
+ * How far round the axis a facet of a round face may reach. A facet of a cylinder spans as much as its normal turns to
+ * the next one, at most MAX_FACET_TURN; a flat face beside a 45-degree chamfer spans far more (Discussion #1385: the
+ * two faces of a tilted cube and the chamfer of its bottom edge have four corners on one circle, as every isosceles
+ * trapezoid has, and were taken for a round wall).
+ */
+const MAX_FACET_SPAN = (60 * Math.PI) / 180;
+
+/** The widest angle round the axis that one flat strip of the face covers, its triangles taken together. */
+function widestFacetSpan(positions: ArrayLike<number>, normals: Float64Array, triangles: number[], axis: RoundFaceAxis) {
+  const d = axis.direction;
+  const strips: Array<{ normal: Vec; out: Vec; side: Vec; low: number; high: number }> = [];
+  const fromAxis = (triangle: number, corner: number) => {
+    const o = triangle * 9 + corner;
+    return { x: positions[o] - axis.point.x, y: positions[o + 1] - axis.point.y, z: positions[o + 2] - axis.point.z };
+  };
+  for (const triangle of triangles) {
+    const normal = normalAt(normals, triangle);
+    let strip = strips.find((entry) => entry.normal.x * normal.x + entry.normal.y * normal.y + entry.normal.z * normal.z >= SAME_FACET);
+    if (!strip) {
+      // Angles round the axis measured from the way out to the strip (along its normal on a pin, against it in a
+      // bore), so a strip never wraps across the seam.
+      const first = fromAxis(triangle, 0);
+      const sign = first.x * normal.x + first.y * normal.y + first.z * normal.z >= 0 ? 1 : -1;
+      const out = { x: normal.x * sign, y: normal.y * sign, z: normal.z * sign };
+      strip = { normal, out, side: cross(d, out), low: Infinity, high: -Infinity };
+      strips.push(strip);
+    }
+    const { out, side } = strip;
+    for (let corner = 0; corner < 9; corner += 3) {
+      const { x: dx, y: dy, z: dz } = fromAxis(triangle, corner);
+      const angle = Math.atan2(dx * side.x + dy * side.y + dz * side.z, dx * out.x + dy * out.y + dz * out.z);
+      strip.low = Math.min(strip.low, angle);
+      strip.high = Math.max(strip.high, angle);
+    }
+  }
+  return strips.reduce((widest, strip) => Math.max(widest, strip.high - strip.low), 0);
 }
 
 function normalAt(normals: Float64Array, triangle: number): Vec {

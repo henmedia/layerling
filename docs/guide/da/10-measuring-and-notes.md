@@ -37,6 +37,7 @@ Vinkelmåleren ligger på arbejdsplanet. Ligger det på siden af en form, ligger
 - **At trække håndtaget** flytter den.
 - **Et kort klik på håndtaget** drejer den 90°.
 - **×** ved siden af fjerner den.
+- **Træk i den lille cirkel for enden af en arm** for at gøre armen længere eller kortere, i hele millimeter. Den nederste knap under håndtaget, {{ui:ruler.armsToPlate}}, gør begge arme lige så lange, som printpladen på printeren fra indstillingerne er bred og dyb. Vinklen gemmer armenes længder med designet, og en vinkel, der sættes igen, overtager dem.
 - **Den lille knap til venstre for håndtaget** skifter hvad der måles fra: ydersiden af en form (endepunkt, et ikon med streger) eller dens midte (midtpunkt, et sigtekorn).
   En lille kontakt af samme slags sidder ved siden af hvert grønt tal og sætter kun det tal: for en stående cylinder er det midten i de to arme og bunden i højden, for en liggende midten på tværs og en ende i længden. Når alle tre igen er enige, viser knappen ved håndtaget den fælles tilstand.
 
@@ -108,7 +109,7 @@ Noter gemmes i designet, optræder i ingen eksport og kan vises eller skjules me
 
 Et referencepunkt er et bart mærke i rummet, som en blyantsmarkering eller et layout-punkt i et værksted: det hører til ingen form, printes aldrig, og andre ting snapper til det. Højreklik en form og vælg {{ui:contextMenu.markCenter}}, {{ui:contextMenu.markCorners}} eller {{ui:contextMenu.markMidpoints}}: punkterne dukker op på formens øverste flade (af hele markeringen, hvis du valgte flere). {{ui:contextMenu.markFaceCenter}} sætter i stedet ét i midten af den flade du højreklikkede på, for eksempel på en side eller en ende. Er der sat et drejepunkt, sætter {{ui:contextMenu.markPivot}} et punkt præcis på det, så midten af en anden del fanges i det punkt, markeringen drejer om.
 
-- Træk et punkt for at flytte det, eller klik det for at se dets koordinater og taste nye; de bruger den enhed du har sat. Kortet kan trækkes væk i dets titellinje hvis det dækker noget, og et dobbeltklik på titellinjen sætter det tilbage. {{ui:common.delete}} fjerner det.
+- Træk et punkt for at flytte det: det snapper til hjørnerne, til midterne af legemernes kanter og flader, til deres rigtige hjørner og til andre punkter; hold [[Alt]] nede, så bliver det frit. Eller klik det for at se dets koordinater og taste nye; de bruger den enhed du har sat. Kortet kan trækkes væk i dets titellinje hvis det dækker noget, og et dobbeltklik på titellinjen sætter det tilbage. {{ui:common.delete}} fjerner det.
   Hvert kort kan trækkes væk alene, så de andre kort bliver hvor de er. Det kort du rørte sidst ligger foran de andre. **Slet alle** i et kort, eller **Slet alle referencepunkter** i højreklikmenuen (på en form eller på et tomt sted i 3D-visningen), sletter alle punkter på én gang.
 - Målebåndet kan også markere et punkt: {{ui:camera.tapeMarkMiddle}}, det halvt udfyldte mærke midt på et mål, sætter et i dets midte, for eksempel i midten af et rundt hul.
   Og det måler fra et punkt: båndet snapper til referencepunkter som til hjørner.

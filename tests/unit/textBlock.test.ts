@@ -28,7 +28,8 @@ describe("the text block (#1207)", () => {
 
   it("takes one line per line of the field, without blank ones, cut to a text's length", () => {
     expect(textBlockLines("LAYERLING\n\n  IS THE \r\nBest")).toEqual(["LAYERLING", "IS THE", "Best"]);
-    expect(textBlockLines("x".repeat(40))[0]).toHaveLength(24);
+    expect(textBlockLines("x".repeat(40))[0]).toHaveLength(40);
+    expect(textBlockLines("x".repeat(300))[0]).toHaveLength(250);
     expect(textBlockLines(Array.from({ length: 30 }, (_, i) => `L${i}`).join("\n"))).toHaveLength(20);
   });
 
