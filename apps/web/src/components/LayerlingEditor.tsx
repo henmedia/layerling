@@ -3899,7 +3899,8 @@ export function LayerlingEditor({
     cadModifierRequestRef.current = requestId;
     cadModifierLatestPreviewRef.current = requestId;
     cadModifierPrepareRef.current = requestId;
-    if (hadInFlightRequest) {
+    // A worker still loading its kernel is only downloading: stopped, it would begin the 21 MB again from nothing (#1612).
+    if (hadInFlightRequest && cadModifierKernelGateRef.current?.isOpen !== false) {
       cadModifierWorkerRef.current?.terminate();
       cadModifierWorkerRef.current = null;
       cadModifierWorkerRestartRef.current();
