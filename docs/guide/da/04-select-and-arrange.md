@@ -140,7 +140,7 @@ Med {{ui:array.groupCopies}} sat i kryds grupperer {{ui:array.apply}} originalen
 
 ## Hulmønster på en flade
 
-Til udluftninger, højttalergitre, kurve og kabinetter spreder {{ui:holePattern.title}} huller jævnt over en flad flade. Du behøver ikke længere lave ét hul, gentage det og sætte det på væggen. Vælg præcis én form og klik på {{ui:holePattern.title}} i {{ui:editor.section.mirrorPattern}}-gruppen i båndet, ved siden af mønsteret. Du kan også højreklikke på formen, eller finde den med [[Ctrl]]+[[K]].
+Til udluftninger, højttalergitre, kurve og kabinetter spreder {{ui:holePattern.title}} huller jævnt over en flad flade eller rundt om væggen på en cylinder. Du behøver ikke længere lave ét hul, gentage det og sætte det på væggen. Vælg præcis én form og klik på {{ui:holePattern.title}} i {{ui:editor.section.mirrorPattern}}-gruppen i båndet, ved siden af mønsteret. Du kan også højreklikke på formen, eller finde den med [[Ctrl]]+[[K]].
 
 1. Klik en flad flade af formen. Hele den flade flade omkring dit klik tæller, ikke kun trekanten under markøren. Den runde væg på en cylinder, et rør eller en boring virker også, se nedenfor; andre krumme flader virker ikke: du får et tip og klikker en flad i stedet. På en gruppe eller et bundt løber fladen videre på tværs af de dele der mødes, som på én form; på et bundt kun når der ikke er et hul blandt delene. Delene lægges sammen kort efter at værktøjet er åbnet; indtil da lyser kun én dels flade op under markøren, og et klik venter på at delene er lagt sammen. På en gruppe eller et bundt med tekst i lyser kun én dels flade op, og klikket lægger delene sammen.
 2. I vinduet sæt du hvordan hullerne ser ud og ligger:
