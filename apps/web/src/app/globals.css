@@ -3253,7 +3253,9 @@ html[data-theme="dark"] .shell-openings-summary {
   cursor: not-allowed;
 }
 
-.edge-modifier-history-actions span {
+/* Only the note beside the toggle: the labels inside the buttons keep the button's size and colour,
+   so "Undo an edge feature" no longer looks small and greyed out like a disabled button (#1600). */
+.edge-modifier-history-actions > span {
   color: #7a6851;
   font-size: 10px;
   line-height: 1.35;
@@ -3331,12 +3333,12 @@ html[data-theme="dark"] .shell-openings-summary {
 
 .edge-modifier-history-item strong {
   color: #6d4310;
-  font-size: 11px;
+  font-size: 12px;
 }
 
 .edge-modifier-history-item small {
   color: #7a6851;
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 700;
 }
 
@@ -14151,7 +14153,7 @@ html[data-theme="dark"] .edge-modifier-history-edit:hover {
   background: #3f301f;
 }
 
-html[data-theme="dark"] .edge-modifier-history-actions span,
+html[data-theme="dark"] .edge-modifier-history-actions > span,
 html[data-theme="dark"] .edge-modifier-history-hint,
 html[data-theme="dark"] .edge-modifier-history-item small {
   color: #a79078;

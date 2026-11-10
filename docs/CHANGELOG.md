@@ -6,6 +6,7 @@ code still carries it - so a lower number further down is older, not newer.
 
 ## Unreleased
 
+- **Fillet / Chamfer: "Undo an edge feature" no longer looks unavailable (Discussion #1600):** The label inside the button picked up the small grey style of the note beside it, so the button read as 10 px grey text, like a disabled one. It now has the size and colour of the other buttons in the panel, and so does "Edit" in the list; the list entries are a little larger too (12 and 11 px instead of 11 and 10 px).
 - **Flat view: a part follows the mouse past an invisible line again (Discussion #1558):** The flat (orthographic) view also draws what lies in front of its camera, since the camera often stands closer than the parts. But the pointer's ray still started at the camera, so where it met the workplane only in front of the camera, it found no point: a part dragged towards the front stopped at a line across the screen and stood still while the mouse went on. The ray now starts where the picture starts, so dragging, clicking a part and the tape measure reach everything the flat view shows. Reported by @RuneWinse.
 
 ## 1.156.3
