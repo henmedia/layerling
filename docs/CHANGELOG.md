@@ -6,6 +6,8 @@ code still carries it - so a lower number further down is older, not newer.
 
 ## Unreleased
 
+## 1.156.2
+
 - **Stretch: make a part longer in one place (Discussions #506, #1569):** The Split tool has a second mode beside Split in two. Place the plane as for a split, through the part that may grow, and type how much longer it should get: the part on the side the arrow points to moves that far away, and the cut through the body at the plane, drawn out over that length, fills the gap. So a case downloaded without its CAD file gets a longer compartment through its straight walls, while the other compartments, rounded corners and holes keep their size - before, that took two splits, scaling the middle piece and grouping again. A minus value makes it shorter: a slice that thick comes out on the arrow's side and the rest moves back. Every object the plane crosses stays one closed body under its own name, a mesh like the halves of a split, in one undo step. `layerling_split_objects` takes it as `stretch`. Asked for by @ckotchey in #506 and @minig0d in #1569.
 
 - **Dimensions always visible: also for several selected parts (Discussion #1574):** With the setting on, the width, depth and height stood beside the selection only when it was a single part or a group; for several parts selected together they showed only while a handle was hovered. They now stand there for those too, and can be clicked and typed in as before. Suggested by @christievans-pixel in #1574.
