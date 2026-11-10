@@ -1185,7 +1185,7 @@ html[data-theme="dark"]:where([data-palette="graphite"]) .shell-openings-summary
   border-color: #dddddd;
 }
 
-:where(html[data-theme="dark"][data-palette="graphite"]) .edge-modifier-history-actions span {
+:where(html[data-theme="dark"][data-palette="graphite"]) .edge-modifier-history-actions > span {
   color: #595959;
 }
 
@@ -6266,7 +6266,7 @@ html[data-theme="dark"]:where([data-palette="graphite"]) .edge-modifier-history-
   background: #333333;
 }
 
-html[data-theme="dark"]:where([data-palette="graphite"]) .edge-modifier-history-actions span,
+html[data-theme="dark"]:where([data-palette="graphite"]) .edge-modifier-history-actions > span,
 html[data-theme="dark"]:where([data-palette="graphite"]) .edge-modifier-history-hint,
 html[data-theme="dark"]:where([data-palette="graphite"]) .edge-modifier-history-item small {
   color: #7e7e7e;
