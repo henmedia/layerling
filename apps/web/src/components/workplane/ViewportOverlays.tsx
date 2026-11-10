@@ -1249,7 +1249,8 @@ export function TapeOverlay({
   onPointPointerDown: (event: ReactPointerEvent<SVGCircleElement>, pointId: string) => void;
   onPointPointerMove: (event: ReactPointerEvent<SVGCircleElement>, pointId: string) => void;
   onPointPointerUp: (event: ReactPointerEvent<SVGCircleElement>, pointId: string) => void;
-  onSegmentPointerDown: (event: ReactPointerEvent<SVGElement>, segmentId: string) => void;
+  /** The line, and while deleting the label too: on a hole the line is its small, often hidden rim (#1613). */
+  onSegmentPointerDown: (event: ReactPointerEvent<Element>, segmentId: string) => void;
   /** Puts a reference point in the middle of a measurement (#323). */
   onMarkMiddle?: (segmentId: string) => void;
   /** Opens the field to type a length, which moves the body at one end (#823). */
@@ -1341,7 +1342,14 @@ export function TapeOverlay({
             style={{ left: segment.labelX, top: segment.labelY }}
             title={hint}
             aria-label={t("camera.tapeDistance", { length: `${segment.label} ${currentLengthUnitLabel()}` })}
-            onPointerDown={(event) => event.stopPropagation()}
+            onPointerDown={(event) => {
+              // Shift or Ctrl/Cmd held in Add measurement deletes the measurement here as on its line (#1613).
+              if (quickDelete) {
+                onSegmentPointerDown(event, segment.id);
+                return;
+              }
+              event.stopPropagation();
+            }}
             onClick={() => onEditLength(segment.id)}
             {...hoverSegment(segment.id, true)}
           >
@@ -1349,11 +1357,14 @@ export function TapeOverlay({
           </button>
         ) : (
           // A label that cannot be typed says why when it is pointed at, so it catches the pointer like one with a tip.
+          // While deleting, the label takes the click as its line does: on a hole the line is the rim, small and often
+          // hidden in the hole, and the number is what one clicks (#1613).
           <span
             key={`${segment.id}-label`}
-            className={`tape-label ${hoverClass(segment)} ${segment.deltas ? "has-deltas" : ""} ${hint ? "has-hint" : ""}`}
+            className={`tape-label ${hoverClass(segment)} ${segment.deltas ? "has-deltas" : ""} ${hint ? "has-hint" : ""} ${deleteMode || quickDelete ? "deletable" : ""}`}
             style={{ left: segment.labelX, top: segment.labelY }}
             title={hint || undefined}
+            onPointerDown={deleteMode || quickDelete ? (event) => onSegmentPointerDown(event, segment.id) : undefined}
             {...hoverSegment(segment.id, true)}
           >
             {content}

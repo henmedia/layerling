@@ -9271,7 +9271,9 @@ html[data-theme="dark"]:where([data-palette="graphite"]) .history-view-inside {
 }
 
 :where(html[data-theme="dark"][data-palette="graphite"]) .tape-overlay.delete-mode .tape-segment-group:hover .tape-segment,
-:where(html[data-theme="dark"][data-palette="graphite"]) .tape-overlay.quick-delete .tape-segment-group:hover .tape-segment {
+:where(html[data-theme="dark"][data-palette="graphite"]) .tape-overlay.quick-delete .tape-segment-group:hover .tape-segment,
+:where(html[data-theme="dark"][data-palette="graphite"]) .tape-overlay.delete-mode .tape-segment-group.hovered .tape-segment,
+:where(html[data-theme="dark"][data-palette="graphite"]) .tape-overlay.quick-delete .tape-segment-group.hovered .tape-segment {
   stroke: var(--hover-accent-color);
   filter: drop-shadow(0 0 2px rgba(220, 63, 54, 0.3));
 }
@@ -9323,6 +9325,12 @@ html[data-theme="dark"]:where([data-palette="graphite"]) .history-view-inside {
   background: rgba(255, 255, 255, 0.96);
   border: 1px solid rgba(207, 207, 207, 0.96);
   box-shadow: 0 1px 4px rgba(44, 44, 44, 0.12);
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .tape-label.deletable:hover,
+:where(html[data-theme="dark"][data-palette="graphite"]) .tape-label.deletable.hovered {
+  color: var(--hover-accent-color);
+  border-color: var(--hover-accent-color);
 }
 
 :where(html[data-theme="dark"][data-palette="graphite"]) .tape-label-axes {

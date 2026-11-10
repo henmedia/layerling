@@ -6,6 +6,8 @@ code still carries it - so a lower number further down is older, not newer.
 
 ## Unreleased
 
+- **Tape measure: a click on the number deletes the measurement too (Discussion #1613):** With Delete measurement part on, only the line or a point of a measurement took the click, the number did not. On a hole measured as a whole edge, the line is the rim of the hole, small and often hidden in it, so the measurement seemed impossible to delete. Now the number deletes it as well, in Delete measurement part and with Shift or Ctrl/Cmd held in Add measurement, and lights up red together with its line before the click.
+
 ## 1.156.4
 
 - **Split: the translucent plane fits the part (#1606):** The preview of the split plane was always a square as large as the part's whole diagonal, set on its middle. Cut in X or Y, on a flat part like a 180 mm grid it stood about 140 mm above and below the plate, and seen from above that tall half seemed to drift away from the white cut line and to come out short or off-centre. The plane is now drawn as a rectangle that covers what the part fills on the plane, with a margin, upright for a standing plane, and at least a tenth as tall as it is wide so a flat part's plane still reads as one. Reported by @minig0d.

@@ -8299,7 +8299,7 @@ export function WorkplaneViewport({
   );
 
   const handleTapeSegmentPointerDown = useCallback(
-    (event: ReactPointerEvent<SVGElement>, segmentId: string) => {
+    (event: ReactPointerEvent<Element>, segmentId: string) => {
       if (event.button !== 0) {
         return;
       }
