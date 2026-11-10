@@ -15,7 +15,7 @@ Dzieją się trzy rzeczy:
 - W narożniku płaszczyzny roboczej pojawiają się nazwa drukarki i jej przestrzeń robocza. Jeśli napis przeszkadza, wyłącz go przez {{ui:workspace.showPlateLabels}} w sekcji {{ui:workspace.workplane}}. Dotyczy to też nazwy projektu z przodu po lewej.
 - layerling **ostrzega**, gdy coś się nie mieści.
 
-Profile drukarek pochodzą z OrcaSlicera, więc są takie same, jakie zna Twój slicer. Jeśli wolisz pracować bez drukarki, wybierz {{ui:workspace.printerNone}}. Rozmiar płaszczyzny roboczej możesz też ustawić ręcznie.
+Większość profili drukarek pochodzi z OrcaSlicera. Jeśli wolisz pracować bez drukarki, wybierz {{ui:workspace.printerNone}}. Rozmiar płaszczyzny roboczej możesz też ustawić ręcznie.
 
 Drukarki delta, takie jak FLSun, SeeMeCNC czy Anycubic Predator, drukują na okrągłym stole. Przy jednej z nich płaszczyzna robocza też jest okrągła i tak szeroka jak stół, a bryła jest za duża, gdy tylko wystaje poza krawędź. Okrągłą bryłę mierzy się po jej własnym obrysie, a nie po otaczającym ją prostopadłościanie, więc zmieści się nawet walec prawie tak szeroki jak stół.
 

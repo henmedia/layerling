@@ -15,7 +15,7 @@ Três coisas acontecem:
 - No canto do plano de trabalho aparecem o nome da impressora e o volume de impressão dela. Se o texto atrapalhar, desligue-o com {{ui:workspace.showPlateLabels}} em {{ui:workspace.workplane}}; isso vale também para o nome do projeto, na frente à esquerda.
 - layerling **avisa** quando algo não cabe.
 
-Os perfis de impressora vêm do OrcaSlicer, então são os mesmos que o seu fatiador conhece. Se preferir trabalhar sem impressora, escolha {{ui:workspace.printerNone}}. Você também pode definir o tamanho do plano de trabalho à mão.
+A maioria dos perfis de impressora vem do OrcaSlicer. Se preferir trabalhar sem impressora, escolha {{ui:workspace.printerNone}}. Você também pode definir o tamanho do plano de trabalho à mão.
 
 Impressoras delta, como as da FLSun ou da SeeMeCNC ou a Anycubic Predator, imprimem sobre uma mesa redonda. Com uma delas, o plano de trabalho também fica redondo e tão largo quanto a mesa, e um sólido é grande demais assim que passa da borda. Um sólido redondo é medido pelo próprio contorno, não pela caixa em volta dele, então cabe até um cilindro quase tão largo quanto a mesa.
 

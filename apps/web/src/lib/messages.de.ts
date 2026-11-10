@@ -4786,7 +4786,7 @@ export const MESSAGES_DE: Record<MessageKey, string> = {
   "workspace.printer": "Drucker",
   "workspace.printerNone": "Kein Drucker – freie Größe",
   "workspace.printerHint": "Wähle deinen Drucker, dann bekommt die Arbeitsfläche die Größe seines Druckbetts. Körper, die darüber hinausragen, werden markiert.",
-  "workspace.printerInfo": "Druckbett {width} × {depth} mm, max. Druckhöhe {height} mm (aus dem OrcaSlicer-Profil).",
+  "workspace.printerInfo": "Druckbett {width} × {depth} mm, max. Druckhöhe {height} mm.",
   "workspace.printerInfoRound": "Rundes Druckbett Ø {diameter} mm, max. Druckhöhe {height} mm (aus dem OrcaSlicer-Profil).",
   "fitTest.name": "Passprobe",
   "fitTest.plate": "Lochplatte",

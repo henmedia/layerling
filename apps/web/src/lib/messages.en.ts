@@ -4787,7 +4787,7 @@ export const MESSAGES_EN = {
   "workspace.printer": "Printer",
   "workspace.printerNone": "No printer - free size",
   "workspace.printerHint": "Choose your printer to size the workplane to its build plate. Bodies that reach past it are flagged.",
-  "workspace.printerInfo": "Build plate {width} × {depth} mm, max. print height {height} mm (from the OrcaSlicer profile).",
+  "workspace.printerInfo": "Build plate {width} × {depth} mm, max. print height {height} mm.",
   "workspace.printerInfoRound": "Round build plate Ø {diameter} mm, max. print height {height} mm (from the OrcaSlicer profile).",
   "fitTest.name": "Fit test",
   "fitTest.plate": "Hole plate",

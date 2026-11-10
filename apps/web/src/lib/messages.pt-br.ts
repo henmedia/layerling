@@ -2114,7 +2114,7 @@ export const MESSAGES_PT_BR: Partial<Record<MessageKey, string>> = {
   "workspace.printer": "Impressora",
   "workspace.printerNone": "Sem impressora - tamanho livre",
   "workspace.printerHint": "Escolha sua impressora para dimensionar o plano de trabalho pela mesa de impressão dela. Sólidos que passam dela são sinalizados.",
-  "workspace.printerInfo": "Mesa de impressão {width} × {depth} mm, altura máx. de impressão {height} mm (do perfil do OrcaSlicer).",
+  "workspace.printerInfo": "Mesa de impressão {width} × {depth} mm, altura máx. de impressão {height} mm.",
   "workspace.printerInfoRound": "Mesa de impressão redonda Ø {diameter} mm, altura máx. de impressão {height} mm (do perfil do OrcaSlicer).",
   "status.bedOverhangOne": "\"{name}\" não cabe no volume de impressão da {printer} ({sides})",
   "status.bedOverhangMany": "{count} sólidos não cabem no volume de impressão da {printer}",

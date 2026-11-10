@@ -15,7 +15,7 @@ Damit passiert dreierlei:
 - In der Ecke der Arbeitsfläche stehen der Name des Druckers und sein Bauraum. Wen die Beschriftung stört, schaltet sie unter {{ui:workspace.workplane}} mit {{ui:workspace.showPlateLabels}} ab; das gilt auch für den Namen des Entwurfs vorne links.
 - layerling **warnt**, wenn etwas nicht passt.
 
-Die Druckerprofile stammen aus OrcaSlicer, sie sind also dieselben, die auch dein Slicer kennt. Möchtest du ohne Drucker arbeiten, wählst du {{ui:workspace.printerNone}}. Die Größe der Arbeitsebene kannst du auch von Hand einstellen.
+Die meisten Druckerprofile stammen aus OrcaSlicer. Möchtest du ohne Drucker arbeiten, wählst du {{ui:workspace.printerNone}}. Die Größe der Arbeitsebene kannst du auch von Hand einstellen.
 
 Delta-Drucker wie die von FLSun oder SeeMeCNC oder der Anycubic Predator drucken auf einer runden Platte. Mit einem von ihnen ist auch die Arbeitsfläche rund, so breit wie die Platte, und ein Körper ist zu groß, sobald er über den Rand ragt. Ein runder Körper wird an seinem eigenen Umriss gemessen, nicht an dem Kasten um ihn, so passt auch ein Zylinder, der fast so breit ist wie die Platte.
 

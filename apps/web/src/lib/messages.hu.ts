@@ -2968,7 +2968,7 @@ export const MESSAGES_HU: Partial<Record<MessageKey, string>> = {
   "workspace.printer": "Nyomtató",
   "workspace.printerNone": "Nincs nyomtató – szabad méret",
   "workspace.printerHint": "Válaszd ki a nyomtatódat, hogy a munkasík a tárgyasztala méretére igazodjon. A túllógó testek jelölést kapnak.",
-  "workspace.printerInfo": "Tárgyasztal: {width} × {depth} mm, max. nyomtatási magasság {height} mm (az OrcaSlicer profilja alapján).",
+  "workspace.printerInfo": "Tárgyasztal: {width} × {depth} mm, max. nyomtatási magasság {height} mm.",
   "workspace.printerInfoRound": "Kerek tárgyasztal: Ø {diameter} mm, max. nyomtatási magasság {height} mm (az OrcaSlicer profilja alapján).",
   "status.bedOverhangOne": "„{name}” nem fér el a nyomtatási térben ({printer}): {sides}",
   "status.bedOverhangMany": "{count} test nem fér el a nyomtatási térben ({printer})",

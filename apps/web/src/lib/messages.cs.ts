@@ -4776,7 +4776,7 @@ export const MESSAGES_CS: Record<MessageKey, string> = {
   "workspace.printer": "Tiskárna",
   "workspace.printerNone": "Bez tiskárny – vlastní rozměry",
   "workspace.printerHint": "Výběrem tiskárny nastavíte pracovní rovinu podle její podložky. Tělesa přesahující podložku budou označena.",
-  "workspace.printerInfo": "Tisková podložka {width} × {depth} mm, maximální výška {height} mm (z profilu OrcaSliceru).",
+  "workspace.printerInfo": "Tisková podložka {width} × {depth} mm, maximální výška {height} mm.",
   "workspace.printerInfoRound": "Kulatá tisková podložka o průměru {diameter} mm, maximální výška {height} mm (z profilu OrcaSliceru).",
   "fitTest.name": "Test vůle",
   "fitTest.plate": "Deska s otvory",

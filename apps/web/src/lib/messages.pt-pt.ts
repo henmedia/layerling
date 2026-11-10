@@ -4696,7 +4696,7 @@ export const MESSAGES_PT_PT: Partial<Record<MessageKey, string>> = {
   "workspace.printer": "Impressora",
   "workspace.printerNone": "Sem impressora: tamanho livre",
   "workspace.printerHint": "Escolhe a tua impressora para adaptar o plano de trabalho à respetiva plataforma de impressão. Os sólidos que ultrapassam os limites são assinalados.",
-  "workspace.printerInfo": "Plataforma de impressão de {width} × {depth} mm, altura máxima de impressão de {height} mm (do perfil do OrcaSlicer).",
+  "workspace.printerInfo": "Plataforma de impressão de {width} × {depth} mm, altura máxima de impressão de {height} mm.",
   "workspace.printerInfoRound": "Base de impressão circular com Ø {diameter} mm e altura máxima de impressão de {height} mm (do perfil do OrcaSlicer).",
   "fitTest.name": "Teste de encaixe",
   "fitTest.plate": "Placa de furos",

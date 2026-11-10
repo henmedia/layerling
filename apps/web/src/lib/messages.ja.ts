@@ -3872,7 +3872,7 @@ export const MESSAGES_JA: Partial<Record<MessageKey, string>> = {
   "workspace.printer": "プリンター",
   "workspace.printerNone": "プリンターなし - 自由なサイズ",
   "workspace.printerHint": "プリンターを選ぶと、作業平面がそのプリントベッドのサイズになります。はみ出すボディには印が付きます。",
-  "workspace.printerInfo": "プリントベッド {width} × {depth} mm、最大プリント高さ {height} mm（OrcaSlicerのプロファイルより）。",
+  "workspace.printerInfo": "プリントベッド {width} × {depth} mm、最大プリント高さ {height} mm。",
   "workspace.printerInfoRound": "円形プリントベッド 直径 {diameter} mm、最大プリント高さ {height} mm（OrcaSlicerのプロファイルより）。",
   "status.bedOverhangOne": "「{name}」は{printer}の造形領域に入りません（{sides}）",
   "status.bedOverhangMany": "{count}個のボディが{printer}の造形領域に入りません",
