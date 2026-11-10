@@ -6,6 +6,8 @@ code still carries it - so a lower number further down is older, not newer.
 
 ## Unreleased
 
+- **Flat view: a part follows the mouse past an invisible line again (Discussion #1558):** The flat (orthographic) view also draws what lies in front of its camera, since the camera often stands closer than the parts. But the pointer's ray still started at the camera, so where it met the workplane only in front of the camera, it found no point: a part dragged towards the front stopped at a line across the screen and stood still while the mouse went on. The ray now starts where the picture starts, so dragging, clicking a part and the tape measure reach everything the flat view shows. Reported by @RuneWinse.
+
 ## 1.156.3
 
 - **Ribbon with "Keep all groups open" wraps instead of squeezing:** The ribbon wraps onto a second row only below 1737 px and above that counts on groups folding. With the pin "Keep all groups open" nothing folds, so between 1737 px and the width the open groups need (about 1960 px) the browser squeezed them below their buttons: Visibility's buttons spilled over Shapes and its name was cut off. Pinned, the groups now wrap onto a further row whenever they do not fit, at any width. Seen in Safari with its tab bar on the left, which takes width away; reported by mail by Jürgen Keller.

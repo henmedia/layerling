@@ -27,6 +27,7 @@ import { placeTapeLabel, screenPolylineMiddle, tapeAxisSpans, tapeAxisTag, tapeD
 import { roundEdgeMeasure } from "@/lib/tapeCircle";
 import { tapeLengthMover, type TapeLengthMover, type TapeLengthRefusal } from "@/lib/tapeLengthEdit";
 import { displayShapeName } from "@/lib/shapeCatalog";
+import { setPickRayFromCamera } from "@/lib/cameraRay";
 
 /** Light-blue chrome for origin-distance lines, matching `.origin-dimension-value`. */
 const ORIGIN_DIMENSION_LINE_COLOR = { light: "#6ec4e8", dark: "#8fd4f0" } as const;
@@ -1883,7 +1884,7 @@ export function worldPointHidden(point: THREE.Vector3, state: ThreeState, ignore
   if (!Number.isFinite(ndc.x) || !Number.isFinite(ndc.y) || Math.abs(ndc.x) > 1.2 || Math.abs(ndc.y) > 1.2) return false;
   const raycaster = state.raycaster;
   const previousLayers = raycaster.layers.mask;
-  raycaster.setFromCamera(new THREE.Vector2(ndc.x, ndc.y), state.camera);
+  setPickRayFromCamera(raycaster, new THREE.Vector2(ndc.x, ndc.y), state.camera);
   raycaster.layers.set(RENDER_LAYER_SHAPES);
   const along = point.clone().sub(raycaster.ray.origin).dot(raycaster.ray.direction);
   const savedFar = raycaster.far;
