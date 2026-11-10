@@ -6,6 +6,8 @@ code still carries it - so a lower number further down is older, not newer.
 
 ## Unreleased
 
+## 1.156.1
+
 - **Focus mode: the view reaches the bottom, and the bar's icons are one size (Discussion #1554):** Switched on by its button, or by F11 where it comes after the browser's own resize, focus mode left the 3D view at its old height, so an empty band stayed at the bottom with the snap grid in it. The view now follows the size of its area, whatever changes it. In the small focus bar the house, the magnifier and the cog came out at the ribbon's size beside a small question mark and arrows; all of them are now drawn at one size.
 
 ## 1.156.0

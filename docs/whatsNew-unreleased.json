@@ -1,14 +1,1 @@
-[
-  {
-    "title": {
-      "de": "Fokusmodus: Ansicht bis ganz unten",
-      "en": "Focus mode: the view reaches the bottom",
-      "da": "Fokustilstand: visningen når helt ned"
-    },
-    "body": {
-      "de": "Im Fokusmodus reicht die 3D-Ansicht jetzt bis an den unteren Fensterrand, auch nach F11; das Raster liegt wieder in der Ansicht statt in einem eigenen Streifen. Die Symbole der kleinen Leiste sind gleich groß.",
-      "en": "In focus mode the 3D view now reaches the bottom edge of the window, also after F11; the snap grid lies in the view again instead of in a band of its own. The icons of the small bar are all one size.",
-      "da": "I fokustilstand når 3D-visningen nu helt ned til vinduets nederste kant, også efter F11; gitteret ligger igen i visningen i stedet for i sin egen stribe. Ikonerne i den lille bjælke har alle samme størrelse."
-    }
-  }
-]
+[]
