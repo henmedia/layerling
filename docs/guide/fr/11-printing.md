@@ -15,7 +15,7 @@ Trois choses se produisent :
 - Dans le coin du plan de travail apparaissent le nom de l'imprimante et son volume de fabrication. Si l'écriture gêne, désactivez-la avec {{ui:workspace.showPlateLabels}} sous {{ui:workspace.workplane}} ; cela vaut également pour le nom du design à l’avant gauche.
 - layerling **avertit** quand quelque chose ne rentre pas.
 
-Les profils d'imprimante proviennent d'OrcaSlicer, ce sont donc les mêmes que ceux que votre slicer connaît. Si vous préférez travailler sans imprimante, choisissez {{ui:workspace.printerNone}}. Vous pouvez également définir manuellement la taille du plan de travail.
+La plupart des profils d’imprimante proviennent d’OrcaSlicer. Si vous préférez travailler sans imprimante, choisissez {{ui:workspace.printerNone}}. Vous pouvez également définir manuellement la taille du plan de travail.
 
 Les imprimantes delta, comme celles de FLSun ou de SeeMeCNC ou l'Anycubic Predator, impriment sur un plateau rond. Avec l'une d'elles, le plan de travail est rond lui aussi, aussi large que le plateau, et un corps est trop grand dès qu'il dépasse le bord. Un corps rond est mesuré sur son propre contour, pas sur la boîte qui l'entoure : un cylindre presque aussi large que le plateau y tient encore.
 

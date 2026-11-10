@@ -2881,7 +2881,7 @@ export const MESSAGES_TR: Partial<Record<MessageKey, string>> = {
   "workspace.printer": "Yazıcı",
   "workspace.printerNone": "Yazıcı yok - serbest boyut",
   "workspace.printerHint": "Çalışma düzlemini baskı tablasının boyutuna getirmek için yazıcını seç. Dışarı taşan gövdeler işaretlenir.",
-  "workspace.printerInfo": "Baskı tablası {width} × {depth} mm, maks. baskı yüksekliği {height} mm (OrcaSlicer profilinden).",
+  "workspace.printerInfo": "Baskı tablası {width} × {depth} mm, maks. baskı yüksekliği {height} mm.",
   "workspace.printerInfoRound": "Yuvarlak baskı tablası Ø {diameter} mm, maks. baskı yüksekliği {height} mm (OrcaSlicer profilinden).",
   "status.bedOverhangOne": "\"{name}\" {printer} baskı hacmine sığmıyor ({sides})",
   "status.bedOverhangMany": "{count} gövde {printer} baskı hacmine sığmıyor",

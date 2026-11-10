@@ -15,7 +15,7 @@ summary: 选择自己的打印机，在部件放不下时收到警告，并正�
 - 工作平面的角落会显示打印机名称及其构建体积。如果这些文字碍事，可以用 {{ui:workspace.showPlateLabels}} 将其关闭，该开关在 {{ui:workspace.workplane}} 下；位于左前方的设计名称也一样。
 - 部件放不下时，layerling 会**警告**。
 
-打印机配置来自 OrcaSlicer，因此与你的切片软件所知的完全相同。如果不想使用打印机，选择 {{ui:workspace.printerNone}}。也可以手动设置工作平面的尺寸。
+大多数打印机配置来自 OrcaSlicer。如果不想使用打印机，选择 {{ui:workspace.printerNone}}。也可以手动设置工作平面的尺寸。
 
 FLSun、SeeMeCNC 等品牌的三角洲（Delta）打印机以及 Anycubic Predator 使用圆形打印平台。选择这类打印机后，工作平面也变成圆形，宽度与平台相同；物体一旦超出边缘就算太大。圆形物体按自身轮廓测量，而不是按包围它的方框，所以几乎和平台一样宽的圆柱体也能放下。
 

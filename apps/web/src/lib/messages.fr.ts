@@ -4771,7 +4771,7 @@ export const MESSAGES_FR: Partial<Record<MessageKey, string>> = {
   "workspace.printer": "Imprimante",
   "workspace.printerNone": "Pas d'imprimante - taille libre",
   "workspace.printerHint": "Choisissez votre imprimante pour dimensionner le plan de travail en fonction de son plateau de construction. Les corps qui dépassent sont signalés.",
-  "workspace.printerInfo": "Plateau d'impression {width} × {depth} mm, hauteur d'impression max. {height} mm (issu du profil OrcaSlicer).",
+  "workspace.printerInfo": "Plateau d'impression {width} × {depth} mm, hauteur d'impression max. {height} mm.",
   "workspace.printerInfoRound": "Plateau d'impression rond Ø {diameter} mm, hauteur d'impression max. {height} mm (issu du profil OrcaSlicer).",
   "fitTest.name": "Test d'ajustement",
   "fitTest.plate": "Plaque à trous",

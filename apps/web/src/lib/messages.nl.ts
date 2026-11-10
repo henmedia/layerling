@@ -4787,7 +4787,7 @@ export const MESSAGES_NL: Record<MessageKey, string> = {
   "workspace.printer": "Printer",
   "workspace.printerNone": "Geen printer - vrije grootte",
   "workspace.printerHint": "Kies je printer om het werkvlak de maat van het printbed te geven. Lichamen die erbuiten steken worden gemarkeerd.",
-  "workspace.printerInfo": "Printbed {width} × {depth} mm, max. printhoogte {height} mm (uit het OrcaSlicer-profiel).",
+  "workspace.printerInfo": "Printbed {width} × {depth} mm, max. printhoogte {height} mm.",
   "workspace.printerInfoRound": "Rond printbed Ø {diameter} mm, max. printhoogte {height} mm (uit het OrcaSlicer-profiel).",
   "fitTest.name": "Pastest",
   "fitTest.plate": "Gatenplaat",

@@ -15,7 +15,7 @@ Tre ting sker:
 - I arbejdsplanets hjørne vises printerens navn og dens byggevolumen. Hvis teksten er i vejen, så slå den fra med {{ui:workspace.showPlateLabels}} under {{ui:workspace.workplane}}; det gælder også designets navn forrest til venstre.
 - layerling **advarer** når noget ikke passer.
 
-Printerprofilerne kommer fra OrcaSlicer, så de er de samme som din slicer kender. Hvis du hellere vil arbejde uden en printer, vælg {{ui:workspace.printerNone}}. Du kan også sætte arbejdsplanets størrelse i hånden.
+De fleste printerprofiler kommer fra OrcaSlicer. Hvis du hellere vil arbejde uden en printer, vælg {{ui:workspace.printerNone}}. Du kan også sætte arbejdsplanets størrelse i hånden.
 
 Deltaprintere som dem fra FLSun eller SeeMeCNC eller Anycubic Predator printer på en rund plade. Med en af dem er arbejdsfladen også rund, lige så bred som pladen, og et legeme er for stort, så snart det rækker ud over kanten. Et rundt legeme måles efter sit eget omrids, ikke efter kassen omkring det, så en cylinder næsten lige så bred som pladen passer stadig.
 

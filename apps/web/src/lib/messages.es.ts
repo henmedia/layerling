@@ -4788,7 +4788,7 @@ export const MESSAGES_ES: Partial<Record<MessageKey, string>> = {
   "workspace.printer": "Impresora",
   "workspace.printerNone": "Sin impresora: tamaño libre",
   "workspace.printerHint": "Elige tu impresora para que el plano de trabajo tenga el tamaño de su cama. Se marcan los cuerpos que se salgan de ella.",
-  "workspace.printerInfo": "Cama de {width} × {depth} mm, altura máx. de impresión {height} mm (del perfil de OrcaSlicer).",
+  "workspace.printerInfo": "Cama de {width} × {depth} mm, altura máx. de impresión {height} mm.",
   "workspace.printerInfoRound": "Cama redonda de Ø {diameter} mm, altura máx. de impresión {height} mm (del perfil de OrcaSlicer).",
   "fitTest.name": "Prueba de ajuste",
   "fitTest.plate": "Placa de agujeros",

@@ -15,7 +15,7 @@ Er gebeuren drie dingen:
 - In de hoek van het werkvlak verschijnen de naam van de printer en zijn printvolume. Zit de tekst in de weg, zet hem dan uit met {{ui:workspace.showPlateLabels}} onder {{ui:workspace.workplane}}; dat geldt ook voor de naam van het ontwerp linksvoor.
 - layerling **waarschuwt** als iets niet past.
 
-De printerprofielen komen uit OrcaSlicer, dus het zijn dezelfde die je slicer kent. Werk je liever zonder printer, kies dan {{ui:workspace.printerNone}}. Je kunt de maat van het werkvlak ook met de hand instellen.
+De meeste printerprofielen komen uit OrcaSlicer. Werk je liever zonder printer, kies dan {{ui:workspace.printerNone}}. Je kunt de maat van het werkvlak ook met de hand instellen.
 
 Deltaprinters zoals die van FLSun of SeeMeCNC of de Anycubic Predator printen op een rond bed. Met een van hen is het werkvlak ook rond, even breed als het bed, en een lichaam is te groot zodra het over de rand steekt. Een rond lichaam wordt gemeten aan zijn eigen omtrek, niet aan de doos eromheen, dus een cilinder die bijna zo breed is als het bed past nog.
 

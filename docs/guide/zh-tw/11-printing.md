@@ -15,7 +15,7 @@ summary: 選擇自己的印表機、在零件放不下時收到警告，以及�
 - 工作平面的角落會顯示印表機名稱與其建構體積。如果這些文字擋住視線，可以用 {{ui:workspace.showPlateLabels}} 關閉（在 {{ui:workspace.workplane}} 下）；左前方的設計名稱也一樣。
 - 零件放不下時，layerling 會**警告**。
 
-印表機設定來自 OrcaSlicer，因此和你的切片軟體所認得的完全相同。如果不想使用印表機，選擇 {{ui:workspace.printerNone}}。也可以手動設定工作平面的尺寸。
+大多數印表機設定來自 OrcaSlicer。如果不想使用印表機，選擇 {{ui:workspace.printerNone}}。也可以手動設定工作平面的尺寸。
 
 FLSun、SeeMeCNC 等品牌的三角洲（Delta）印表機以及 Anycubic Predator 使用圓形列印平台。選擇這類印表機後，工作平面也會變成圓形，寬度與平台相同；物件一旦超出邊緣就算太大。圓形物件依自身輪廓測量，而不是依包圍它的方框，所以幾乎和平台一樣寬的圓柱體也放得下。
 

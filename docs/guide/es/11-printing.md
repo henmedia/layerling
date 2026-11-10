@@ -15,7 +15,7 @@ Pasan tres cosas:
 - En la esquina del plano de trabajo aparecen el nombre de la impresora y su volumen de impresión. Si el texto te estorba, desactívalo con {{ui:workspace.showPlateLabels}}, en {{ui:workspace.workplane}}; eso vale también para el nombre del diseño, delante a la izquierda.
 - layerling te **avisa** cuando algo no cabe.
 
-Los perfiles de impresora vienen de OrcaSlicer, así que son los mismos que conoce tu laminador (*slicer*). Si prefieres trabajar sin impresora, elige {{ui:workspace.printerNone}}. También puedes fijar a mano el tamaño del plano de trabajo.
+La mayoría de los perfiles de impresora provienen de OrcaSlicer. Si prefieres trabajar sin impresora, elige {{ui:workspace.printerNone}}. También puedes fijar a mano el tamaño del plano de trabajo.
 
 Las impresoras delta, como las de FLSun o SeeMeCNC o la Anycubic Predator, imprimen sobre una cama redonda. Con una de ellas, el plano de trabajo también es redondo y tan ancho como la cama, y un cuerpo es demasiado grande en cuanto sobresale del borde. Un cuerpo redondo se mide por su propio contorno y no por la caja que lo rodea, así que cabe incluso un cilindro casi tan ancho como la cama.
 

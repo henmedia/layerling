@@ -4771,7 +4771,7 @@ export const MESSAGES_IT: Partial<Record<MessageKey, string>> = {
   "workspace.printer": "Stampante",
   "workspace.printerNone": "Nessuna stampante: dimensioni libere",
   "workspace.printerHint": "Scegli la tua stampante per adattare il piano di lavoro alle dimensioni della sua piastra. I corpi che la superano vengono segnalati.",
-  "workspace.printerInfo": "Piastra di stampa {width} × {depth} mm, altezza massima di stampa {height} mm (dal profilo OrcaSlicer).",
+  "workspace.printerInfo": "Piastra di stampa {width} × {depth} mm, altezza massima di stampa {height} mm.",
   "workspace.printerInfoRound": "Piano di stampa circolare Ø {diameter} mm, altezza massima di stampa {height} mm (dal profilo OrcaSlicer).",
   "fitTest.name": "Prova di accoppiamento",
   "fitTest.plate": "Piastra con fori",

@@ -3742,7 +3742,7 @@ export const MESSAGES_SL: Partial<Record<MessageKey, string>> = {
   "workspace.printer": "Tiskalnik",
   "workspace.printerNone": "Brez tiskalnika – poljubna velikost",
   "workspace.printerHint": "Izberi tiskalnik, da se delovna ravnina prilagodi njegovi tiskalni plošči. Telesa, ki segajo čez, so označena.",
-  "workspace.printerInfo": "Tiskalna plošča {width} × {depth} mm, največja višina tiska {height} mm (iz profila OrcaSlicer).",
+  "workspace.printerInfo": "Tiskalna plošča {width} × {depth} mm, največja višina tiska {height} mm.",
   "workspace.printerInfoRound": "Okrogla tiskalna plošča Ø {diameter} mm, največja višina tiska {height} mm (iz profila OrcaSlicer).",
   "fitTest.name": "Preizkus ujemanja",
   "fitTest.plate": "Plošča z luknjami",

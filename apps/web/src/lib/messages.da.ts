@@ -4564,7 +4564,7 @@ export const MESSAGES_DA: Partial<Record<MessageKey, string>> = {
   "workspace.printer": "Printer",
   "workspace.printerNone": "Ingen printer – fri størrelse",
   "workspace.printerHint": "Vælg din printer for at indstille arbejdsplanet til dens byggeplade. Former der når ud over den markeres.",
-  "workspace.printerInfo": "Byggeplade {width} × {depth} mm, maks. printhøjde {height} mm (fra OrcaSlicer-profilen).",
+  "workspace.printerInfo": "Byggeplade {width} × {depth} mm, maks. printhøjde {height} mm.",
   "workspace.printerInfoRound": "Rund byggeplade Ø {diameter} mm, maks. printhøjde {height} mm (fra OrcaSlicer-profilen).",
   "fitTest.name": "Pasprøve",
   "fitTest.plate": "Hulplade",

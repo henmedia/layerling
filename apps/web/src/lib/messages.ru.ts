@@ -4778,7 +4778,7 @@ export const MESSAGES_RU: Partial<Record<MessageKey, string>> = {
   "workspace.printer": "Принтер",
   "workspace.printerNone": "Без принтера — свободный размер",
   "workspace.printerHint": "Выберите свой принтер, чтобы подогнать размер рабочей плоскости под его стол печати. Тела, выходящие за него, отмечаются.",
-  "workspace.printerInfo": "Стол печати {width} × {depth} мм, макс. высота печати {height} мм (из профиля OrcaSlicer).",
+  "workspace.printerInfo": "Стол печати {width} × {depth} мм, макс. высота печати {height} мм.",
   "workspace.printerInfoRound": "Круглый стол печати Ø {diameter} мм, макс. высота печати {height} мм (из профиля OrcaSlicer).",
   "fitTest.name": "Тест посадки",
   "fitTest.plate": "Пластина с отверстиями",

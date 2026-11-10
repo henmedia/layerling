@@ -4775,7 +4775,7 @@ export const MESSAGES_ZH_TW: Partial<Record<MessageKey, string>> = {
   "workspace.printer": "印表機",
   "workspace.printerNone": "無印表機，自由尺寸",
   "workspace.printerHint": "選擇你的印表機，讓工作平面對應其列印平台尺寸。超出平台的實體會標示出來。",
-  "workspace.printerInfo": "列印平台 {width} × {depth} mm，最大列印高度 {height} mm（來自 OrcaSlicer 設定檔）。",
+  "workspace.printerInfo": "列印平台 {width} × {depth} mm，最大列印高度 {height} mm。",
   "workspace.printerInfoRound": "圓形列印平台 直徑 {diameter} mm，最大列印高度 {height} mm（來自 OrcaSlicer 設定檔）。",
   "fitTest.name": "配合測試",
   "fitTest.plate": "孔板",

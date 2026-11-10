@@ -4791,7 +4791,7 @@ export const MESSAGES_PL: Partial<Record<MessageKey, string>> = {
   "workspace.printer": "Drukarka",
   "workspace.printerNone": "Bez drukarki - dowolny rozmiar",
   "workspace.printerHint": "Wybierz swoją drukarkę, aby dopasować płaszczyznę roboczą do jej stołu. Bryły, które wystają poza niego, zostaną oznaczone.",
-  "workspace.printerInfo": "Stół {width} × {depth} mm, maks. wysokość wydruku {height} mm (z profilu OrcaSlicer).",
+  "workspace.printerInfo": "Stół {width} × {depth} mm, maks. wysokość wydruku {height} mm.",
   "workspace.printerInfoRound": "Okrągły stół Ø {diameter} mm, maks. wysokość wydruku {height} mm (z profilu OrcaSlicer).",
   "fitTest.name": "Test pasowania",
   "fitTest.plate": "Płytka z otworami",

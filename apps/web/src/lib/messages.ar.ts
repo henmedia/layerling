@@ -4794,7 +4794,7 @@ export const MESSAGES_AR: Partial<Record<MessageKey, string>> = {
   "workspace.printer": "الطابعة",
   "workspace.printerNone": "بدون طابعة - حجم حر",
   "workspace.printerHint": "اختر طابعتك لضبط حجم سطح العمل على سرير طباعتها. وتُعلَّم الأجسام التي تتجاوزه بتحذير.",
-  "workspace.printerInfo": "سرير الطباعة {width} × {depth} مم، أقصى ارتفاع للطباعة {height} مم (من ملف تعريف OrcaSlicer).",
+  "workspace.printerInfo": "سرير الطباعة {width} × {depth} مم، أقصى ارتفاع للطباعة {height} مم.",
   "workspace.printerInfoRound": "سرير طباعة دائري بقطر {diameter} مم، أقصى ارتفاع للطباعة {height} مم (من ملف تعريف OrcaSlicer).",
   "fitTest.name": "اختبار الملاءمة",
   "fitTest.plate": "لوح الثقوب",

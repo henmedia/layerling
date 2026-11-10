@@ -15,7 +15,7 @@ S tem se zgodijo tri stvari:
 - V kotu delovne površine stojita ime tiskalnika in njegov delovni prostor. Komur napis moti, ga izklopi pod {{ui:workspace.workplane}} z {{ui:workspace.showPlateLabels}}; to velja tudi za ime načrta spredaj levo.
 - layerling **opozori**, če kaj ne ustreza.
 
-Profili tiskalnikov izvirajo iz OrcaSlicerja, torej so enaki, kot jih pozna tudi tvoj rezalnik. Če želiš delati brez tiskalnika, izberi {{ui:workspace.printerNone}}. Velikost delovne ravnine lahko nastaviš tudi ročno.
+Večina profilov tiskalnikov izvira iz OrcaSlicerja. Če želiš delati brez tiskalnika, izberi {{ui:workspace.printerNone}}. Velikost delovne ravnine lahko nastaviš tudi ročno.
 
 Delta tiskalniki, na primer FLSun ali SeeMeCNC ali Anycubic Predator, tiskajo na okroglo ploščo. Z enim od njih je tudi delovna ploskev okrogla in široka kot plošča, telo pa je preveliko, takoj ko sega čez rob. Okroglo telo se meri po lastnem obrisu, ne po škatli okoli njega, zato se prilega tudi valj, ki je skoraj tako širok kot plošča.
 
