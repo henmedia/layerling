@@ -6,6 +6,8 @@ code still carries it - so a lower number further down is older, not newer.
 
 ## Unreleased
 
+## 1.156.4
+
 - **Split: the translucent plane fits the part (#1606):** The preview of the split plane was always a square as large as the part's whole diagonal, set on its middle. Cut in X or Y, on a flat part like a 180 mm grid it stood about 140 mm above and below the plate, and seen from above that tall half seemed to drift away from the white cut line and to come out short or off-centre. The plane is now drawn as a rectangle that covers what the part fills on the plane, with a margin, upright for a standing plane, and at least a tenth as tall as it is wide so a flat part's plane still reads as one. Reported by @minig0d.
 - **Fillet / Chamfer: "Undo an edge feature" no longer looks unavailable (Discussion #1600):** The label inside the button picked up the small grey style of the note beside it, so the button read as 10 px grey text, like a disabled one. It now has the size and colour of the other buttons in the panel, and so does "Edit" in the list; the list entries are a little larger too (12 and 11 px instead of 11 and 10 px). Reported by @KimA998.
 - **Flat view: a part follows the mouse past an invisible line again (Discussion #1558):** The flat (orthographic) view also draws what lies in front of its camera, since the camera often stands closer than the parts. But the pointer's ray still started at the camera, so where it met the workplane only in front of the camera, it found no point: a part dragged towards the front stopped at a line across the screen and stood still while the mouse went on. The ray now starts where the picture starts, so dragging, clicking a part and the tape measure reach everything the flat view shows. Reported by @RuneWinse.

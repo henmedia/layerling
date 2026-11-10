@@ -1,5 +1,82 @@
 [
   {
+    "version": "1.156.4",
+    "items": [
+      {
+        "title": {
+          "de": "Druckervorlage UltiMaker S3",
+          "en": "UltiMaker S3 printer preset",
+          "da": "Printerskabelon UltiMaker S3"
+        },
+        "body": {
+          "de": "Unter Arbeitsbereich-Einstellungen > Arbeitsebene > Drucker steht jetzt auch der UltiMaker S3. Die Arbeitsebene und die Prüfung, ob ein Teil auf den Drucker passt, nehmen dann seinen Bauraum von 230 × 190 × 200 mm.",
+          "en": "Workspace settings > Workplane > Printer now offers the UltiMaker S3. The workplane and the check whether a part fits the printer then use its build volume of 230 × 190 × 200 mm.",
+          "da": "Under Arbejdsområdeindstillinger > Arbejdsplan > Printer findes nu også UltiMaker S3. Arbejdsplanet og kontrollen af, om en del passer til printeren, bruger så dens byggevolumen på 230 × 190 × 200 mm."
+        }
+      },
+      {
+        "title": {
+          "de": "Editor-Profile für Kurse und Workshops",
+          "en": "Editor profiles for classes and workshops",
+          "da": "Editorprofiler til kurser og workshops"
+        },
+        "body": {
+          "de": "Wer layerling selbst betreibt, etwa für eine Schulklasse, kann ein Profil hinterlegen: Es wählt das einfache oder volle Layout und zeigt nur die Werkzeuge im Menüband, die der Kurs braucht. Die eigenen Menüband-Einstellungen gelten weiter für das, was das Profil lässt. Wie es geht, steht in der Doku.",
+          "en": "Whoever hosts layerling, for example for a class, can set a profile: it chooses the Simple or Full layout and shows only the ribbon tools the class needs. Each person's own Ribbon settings still apply to what the profile leaves. The docs say how.",
+          "da": "Den, der selv driver layerling, f.eks. til en skoleklasse, kan lægge en profil ind: Den vælger det enkle eller fulde layout og viser kun de værktøjer i båndet, som kurset har brug for. Ens egne båndindstillinger gælder stadig for det, profilen lader stå. Dokumentationen viser hvordan."
+        }
+      },
+      {
+        "title": {
+          "de": "Docker: ein viel kleineres Image",
+          "en": "Docker: a much smaller image",
+          "da": "Docker: et meget mindre image"
+        },
+        "body": {
+          "de": "Das Docker-Image ist von etwa 570 MB auf etwa 110 MB geschrumpft, für amd64 und arm64. Es startet jetzt mit „node apps/web/server.js“; wer den Container wie bisher startet, muss nichts ändern.",
+          "en": "The Docker image has shrunk from about 570 MB to about 110 MB, for amd64 and arm64. It now starts with “node apps/web/server.js”; if you start the container as before, nothing changes for you.",
+          "da": "Docker-imaget er skrumpet fra ca. 570 MB til ca. 110 MB, til amd64 og arm64. Det starter nu med „node apps/web/server.js“; starter du containeren som før, skal du ikke ændre noget."
+        }
+      },
+      {
+        "title": {
+          "de": "Teilen: Die durchscheinende Ebene passt zum Teil",
+          "en": "Split: the translucent plane fits the part",
+          "da": "Del: Det gennemsigtige plan passer til delen"
+        },
+        "body": {
+          "de": "Die Vorschau der Teilungsebene war immer ein Quadrat so groß wie die Diagonale des Teils. Bei einem flachen Teil ragte sie quer zu X oder Y weit über und unter die Platte und schien neben dem weißen Schnitt zu liegen. Jetzt deckt sie nur ab, was das Teil auf der Ebene einnimmt, mit etwas Rand.",
+          "en": "The split plane's preview was always a square as large as the part's diagonal. Across X or Y on a flat part it stood far above and below the plate and seemed to lie beside the white cut line. It now covers only what the part fills on the plane, with a small margin.",
+          "da": "Forhåndsvisningen af delingsplanet var altid et kvadrat så stort som delens diagonal. På tværs af X eller Y stod det ved en flad del langt over og under pladen og syntes at ligge ved siden af den hvide snitlinje. Nu dækker det kun det, delen fylder på planet, med lidt margen."
+        }
+      },
+      {
+        "title": {
+          "de": "Verrunden/Fasen: „Kantenbearbeitung zurücknehmen“ sieht nicht mehr abgeschaltet aus",
+          "en": "Fillet / Chamfer: “Undo an edge feature” no longer looks unavailable",
+          "da": "Afrunding/affasning: „Fortryd en kantfunktion“ ser ikke længere deaktiveret ud"
+        },
+        "body": {
+          "de": "Die Schrift in diesem Knopf war klein und grau wie bei einem gesperrten Knopf. Jetzt sieht er aus wie die anderen Knöpfe im Panel, und die Einträge der Liste darunter sind etwas größer.",
+          "en": "The label in this button was small and grey, like a disabled button. It now looks like the other buttons in the panel, and the entries of the list below are a little larger.",
+          "da": "Teksten i denne knap var lille og grå som på en deaktiveret knap. Nu ser den ud som de andre knapper i panelet, og posterne i listen nedenunder er lidt større."
+        }
+      },
+      {
+        "title": {
+          "de": "Orthografische Ansicht: Ein Teil folgt der Maus wieder überallhin",
+          "en": "Orthographic view: a part follows the mouse everywhere again",
+          "da": "Ortografisk visning: En del følger musen overalt igen"
+        },
+        "body": {
+          "de": "In der orthografischen Ansicht blieb ein gezogenes Teil manchmal an einer unsichtbaren Linie quer über den Bildschirm stehen, während die Maus weiterlief. Jetzt reichen Ziehen, Anklicken und das Maßband bis an alles, was die Ansicht zeigt.",
+          "en": "In the orthographic view a dragged part sometimes stopped at an invisible line across the screen while the mouse went on. Dragging, clicking and the tape measure now reach everything the view shows.",
+          "da": "I den ortografiske visning stoppede en trukket del nogle gange ved en usynlig linje på tværs af skærmen, mens musen fortsatte. Nu når træk, klik og målebåndet alt, hvad visningen viser."
+        }
+      }
+    ]
+  },
+  {
     "version": "1.156.3",
     "items": [
       {
