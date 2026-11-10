@@ -1,1 +1,62 @@
-[]
+[
+  {
+    "title": {
+      "de": "Teilen: „Quer zu X/Y“ schneidet durch die Mitte des Teils",
+      "en": "Split: Across X/Y cut through the middle of the part",
+      "da": "Del: „På tværs af X/Y“ skærer gennem delens midte"
+    },
+    "body": {
+      "de": "Auf der Grundplatte legten „Quer zu X“ und „Quer zu Y“ die Teilungsebene durch die Mitte der Platte, bei einem Teil abseits davon also neben seine Mitte. Jetzt gehen sie durch die Mitte der Auswahl. Auf einer Arbeitsebene, die auf einer Fläche liegt, schneiden sie weiter durch deren Ursprung.",
+      "en": "On the base plate, Across X and Across Y put the split plane through the middle of the plate, so a part standing away from it was cut off-centre. They now go through the middle of the selection. On a workplane laid on a face they still cut through its origin.",
+      "da": "På grundpladen lagde „På tværs af X“ og „På tværs af Y“ delingsplanet gennem pladens midte, så en del, der stod væk fra den, blev skåret ved siden af sin midte. Nu går de gennem markeringens midte. På et arbejdsplan, der ligger på en flade, skærer de stadig gennem dets origo."
+    }
+  },
+  {
+    "title": {
+      "de": "Verrunden und Fasen bis an die Grenze",
+      "en": "Fillets and chamfers right up to the limit",
+      "da": "Afrunding og affasning helt op til grænsen"
+    },
+    "body": {
+      "de": "Eine Verrundung oder Fase genau so groß wie die Fläche daneben, etwa 2 mm an einem 2 mm hohen Zylinder, wurde abgelehnt, während 1,99 mm ging. Jetzt geht auch der volle Wert. Ist er wirklich zu groß, kommt die Meldung wie bisher.",
+      "en": "A fillet or chamfer exactly as large as the face beside it, say 2 mm on a cylinder 2 mm high, was refused while 1.99 mm went through. The full size works now. A size that is really too large is still refused as before.",
+      "da": "En afrunding eller affasning præcis så stor som fladen ved siden af, f.eks. 2 mm på en cylinder, der er 2 mm høj, blev afvist, mens 1,99 mm gik. Nu virker den fulde værdi også. Er den virkelig for stor, kommer meldingen som før."
+    }
+  },
+  {
+    "title": {
+      "de": "Die Startseite sagt, ob deine Entwürfe gesichert sind",
+      "en": "The start page says whether your designs are backed up",
+      "da": "Startsiden fortæller, om dine designs er sikkerhedskopieret"
+    },
+    "body": {
+      "de": "Statt jedes Mal derselben Warnung zeigt die Zeile über den Entwürfen dieses Browsers jetzt den Stand: noch nie gesichert, seit der letzten Sicherung mit „Alle sichern“ neu oder geändert (mit Datum und Anzahl) oder alles gesichert, dann als ruhige graue Zeile.",
+      "en": "Instead of the same warning every time, the line over this browser's designs now says where they stand: not backed up yet, added or changed since the last “Back up all” (with the date and how many), or all backed up, then as a calm grey line.",
+      "da": "I stedet for den samme advarsel hver gang viser linjen over denne browsers designs nu, hvordan de står: endnu ikke sikkerhedskopieret, nye eller ændrede siden sidste „Sikkerhedskopiér alle“ (med dato og antal), eller alle sikkerhedskopieret, så som en rolig grå linje."
+    }
+  },
+  {
+    "title": {
+      "de": "Menüband: „Alle Gruppen offen halten“ bricht sauber um",
+      "en": "Ribbon: “Keep all groups open” wraps cleanly",
+      "da": "Båndet: „Hold alle grupper åbne“ ombrydes pænt"
+    },
+    "body": {
+      "de": "Mit gesetzter Stecknadel wurden die Gruppen bei manchen Fensterbreiten zusammengedrückt, etwa mit der Tab-Leiste links in Safari: Die Knöpfe von „Sichtbarkeit“ ragten in „Formen“, und der Name war abgeschnitten. Jetzt rücken die Gruppen in eine weitere Zeile, sobald sie nicht passen.",
+      "en": "With the pin set, the groups were squeezed at some window widths, for example with Safari's tab bar on the left: Visibility's buttons spilled over Shapes and its name was cut off. The groups now move onto a further row whenever they do not fit.",
+      "da": "Med nålen sat blev grupperne klemt sammen ved nogle vinduesbredder, f.eks. med Safaris fanelinje til venstre: knapperne i „Synlighed“ stak ind i „Former“, og navnet blev skåret af. Nu rykker grupperne ned på en ekstra linje, så snart de ikke passer."
+    }
+  },
+  {
+    "title": {
+      "de": "Startskript findet ein frisch installiertes Node.js",
+      "en": "The start script finds a freshly installed Node.js",
+      "da": "Startscriptet finder et nyinstalleret Node.js"
+    },
+    "body": {
+      "de": "„Start layerling“ brach mit „npm wurde nicht gefunden“ ab, wenn Node.js gerade erst installiert war und das Fenster schon vorher offen stand. Es liest den Suchpfad jetzt neu ein, wie ein neues Fenster, und sagt deutlich, wenn Node.js wirklich fehlt.",
+      "en": "Start layerling stopped at “npm was not found” when Node.js had only just been installed and the window was open from before. It now reads the search path afresh, as a new window would, and says clearly when Node.js is really missing.",
+      "da": "„Start layerling“ stoppede ved „npm blev ikke fundet“, når Node.js lige var installeret, og vinduet allerede var åbent fra før. Det læser nu søgestien på ny, som et nyt vindue ville, og siger tydeligt, når Node.js virkelig mangler."
+    }
+  }
+]
