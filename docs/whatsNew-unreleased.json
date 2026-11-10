@@ -1,1 +1,14 @@
-[]
+[
+  {
+    "title": {
+      "de": "Werkzeuge mit CAD-Kern laufen auch bei langsamer Leitung",
+      "en": "CAD tools work on a slow connection too",
+      "da": "CAD-værktøjer virker også på en langsom forbindelse"
+    },
+    "body": {
+      "de": "Aushöhlen, Verrundung, Fase und die anderen Werkzeuge mit CAD-Kern laden den Kern (21 MB) beim ersten Gebrauch. Die Wartezeit zählte diesen Download mit: Bei langsamer Leitung lief sie ab, der Download begann von vorn, und jedes Werkzeug meldete eine Zeitüberschreitung. Jetzt lädt der Editor den Kern vorab, sobald er bereit ist, und die Wartezeit beginnt erst, wenn der Kern geladen ist.",
+      "en": "Hollow, Fillet, Chamfer and the other tools that use the CAD kernel load it (21 MB) the first time they need it. Their time limit counted that download: on a slow connection it ran out, the download began again, and every tool timed out. Now the editor loads the kernel ahead once it is ready, and the time limit starts only when the kernel is loaded.",
+      "da": "Hul, Rund, Fas og de andre værktøjer med CAD-kernen henter kernen (21 MB), første gang de skal bruge den. Ventetiden talte den download med: På en langsom forbindelse løb den ud, downloaden begyndte forfra, og hvert værktøj meldte timeout. Nu henter editoren kernen på forhånd, så snart den er klar, og ventetiden begynder først, når kernen er hentet."
+    }
+  }
+]

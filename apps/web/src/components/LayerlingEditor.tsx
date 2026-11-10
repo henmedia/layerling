@@ -185,6 +185,7 @@ import { useFileAccept } from "@/lib/fileAccept";
 import { exportLylProject, LYL_CREATED_WITH_VERSION, LYL_MEDIA_TYPE, lylThumbnailFiles } from "@/lib/lylProject";
 import { projectThumbnailPngBytes } from "@/lib/backupDownload";
 import { isBuildMessage, reportWorkerBuild } from "@/lib/buildStamp";
+import { createKernelGate, isKernelStatusMessage, warmKernelMessage, type KernelGate } from "@/lib/cadKernelGate";
 import { ensureLylFileWritable, forgetLylFile, forgetStlFile, linkedLylFile, linkedStlFile, lylFileAccessSupported, pickLylFileToOpen, pickLylFileToSave, pickStlFileToSave, rememberLylFile, rememberStlFile, writeLylFile, type LylFileHandle } from "@/lib/lylFileAccess";
 import { copyNamePatterns, shapeNamesIn, withCopyName } from "@/lib/shapeCopyName";
 import { clipboardShape, displayShapeName, hasOwnShapeName, iconTagAsset, qrCodeAsset, makeShapeFromAsset, nameTagAsset, sbcBoardAsset, shapeAssetLabel, toolbarShapeAssets } from "@/lib/shapeCatalog";
@@ -3636,7 +3637,7 @@ export function LayerlingEditor({
   const cadModifierPendingRef = useRef(new Map<number, {
     resolve: (message: CadModifierWorkerResponse) => void;
     reject: (error: Error) => void;
-    timer: number;
+    cancelTimer: () => void;
   }>());
   const cadModifierRequestRef = useRef(0);
   const cadModifierPrepareRef = useRef(0);
@@ -3644,7 +3645,9 @@ export function LayerlingEditor({
   const cadModifierBaseShapeRef = useRef<WorkplaneShape | null>(null);
   const cadModifierBaseFingerprintRef = useRef("");
   const cadModifierSourcePartsRef = useRef<WorkplaneShape[]>([]);
-  const cadModifierWatchdogRef = useRef<{ requestId: number; phase: CadModifierRequestPhase; timer: number } | null>(null);
+  const cadModifierWatchdogRef = useRef<{ requestId: number; phase: CadModifierRequestPhase; cancelTimer: () => void } | null>(null);
+  // The edge worker's kernel: its time limits count only once it is loaded (lib/cadKernelGate.ts, #1612).
+  const cadModifierKernelGateRef = useRef<KernelGate | null>(null);
   const cadPreviewSendRef = useRef<(payload: CadPreviewPayload) => number | null>(() => null);
   const cadPreviewQueueRef = useRef(createCadPreviewQueue<CadPreviewPayload>((payload) => cadPreviewSendRef.current(payload)));
   const cadModifierWorkerRestartRef = useRef<() => Worker | null>(() => null);
@@ -3654,13 +3657,21 @@ export function LayerlingEditor({
   const clearCadModifierWatchdog = useCallback((requestId?: number) => {
     const active = cadModifierWatchdogRef.current;
     if (!active || (requestId !== undefined && active.requestId !== requestId)) return;
-    window.clearTimeout(active.timer);
+    active.cancelTimer();
     cadModifierWatchdogRef.current = null;
+  }, []);
+
+  /** setTimeout for a request to the edge worker, counting from when its kernel is loaded (#1612). */
+  const cadModifierTimeout = useCallback((callback: () => void, timeoutMs: number) => {
+    const gate = cadModifierKernelGateRef.current;
+    if (gate) return gate.timeout(callback, timeoutMs);
+    const timer = window.setTimeout(callback, timeoutMs);
+    return () => window.clearTimeout(timer);
   }, []);
 
   const armCadModifierWatchdog = useCallback((requestId: number, phase: CadModifierRequestPhase, timeoutMs = CAD_MODIFIER_REQUEST_TIMEOUT_MS) => {
     clearCadModifierWatchdog();
-    const timer = window.setTimeout(() => {
+    const cancelTimer = cadModifierTimeout(() => {
       const active = cadModifierWatchdogRef.current;
       if (!active || active.requestId !== requestId) return;
       cadModifierWatchdogRef.current = null;
@@ -3678,14 +3689,14 @@ export function LayerlingEditor({
       } : current);
       setNotice(message);
     }, timeoutMs);
-    cadModifierWatchdogRef.current = { requestId, phase, timer };
-  }, [clearCadModifierWatchdog]);
+    cadModifierWatchdogRef.current = { requestId, phase, cancelTimer };
+  }, [cadModifierTimeout, clearCadModifierWatchdog]);
 
   useEffect(() => {
     let disposed = false;
     const rejectPendingRequests = (message: string) => {
       cadModifierPendingRef.current.forEach((pending) => {
-        window.clearTimeout(pending.timer);
+        pending.cancelTimer();
         pending.reject(new Error(message));
       });
       cadModifierPendingRef.current.clear();
@@ -3707,13 +3718,22 @@ export function LayerlingEditor({
         setNotice(message);
       }
     };
-    const createWorker = () => {
+    const createWorker = (warm: boolean) => {
       if (disposed) return null;
       cadModifierWorkerRef.current?.terminate();
+      cadModifierKernelGateRef.current?.dispose();
+      cadModifierKernelGateRef.current = null;
       try {
         const worker = new Worker(new URL("../workers/cadModifier.worker.ts", import.meta.url), { type: "module" });
+        const gate = createKernelGate();
         cadModifierWorkerRef.current = worker;
-        worker.onmessage = handleWorkerMessage;
+        cadModifierKernelGateRef.current = gate;
+        worker.onmessage = (event: MessageEvent<CadModifierWorkerResponse>) => {
+          if (isKernelStatusMessage(event.data)) gate.open();
+          else handleWorkerMessage(event);
+        };
+        // A worker started again after a timeout loads its kernel at once; the first one when the editor is idle.
+        if (warm) worker.postMessage(warmKernelMessage());
         worker.onerror = (event) => {
           event.preventDefault();
           reportWorkerFailure(worker);
@@ -3734,7 +3754,7 @@ export function LayerlingEditor({
       clearCadModifierWatchdog(message.requestId);
       const pending = cadModifierPendingRef.current.get(message.requestId);
       if (pending) {
-        window.clearTimeout(pending.timer);
+        pending.cancelTimer();
         cadModifierPendingRef.current.delete(message.requestId);
         if (message.type === "error") {
           pending.reject(new Error(message.message));
@@ -3855,8 +3875,8 @@ export function LayerlingEditor({
         }
       }
     }
-    cadModifierWorkerRestartRef.current = createWorker;
-    createWorker();
+    cadModifierWorkerRestartRef.current = () => createWorker(true);
+    createWorker(false);
     return () => {
       disposed = true;
       clearCadModifierWatchdog();
@@ -3864,6 +3884,8 @@ export function LayerlingEditor({
       rejectPendingRequests("The CAD worker was closed");
       cadModifierWorkerRef.current?.terminate();
       cadModifierWorkerRef.current = null;
+      cadModifierKernelGateRef.current?.dispose();
+      cadModifierKernelGateRef.current = null;
     };
   }, [clearCadModifierWatchdog]);
 
@@ -3877,7 +3899,8 @@ export function LayerlingEditor({
     cadModifierRequestRef.current = requestId;
     cadModifierLatestPreviewRef.current = requestId;
     cadModifierPrepareRef.current = requestId;
-    if (hadInFlightRequest) {
+    // A worker still loading its kernel is only downloading: stopped, it would begin the 21 MB again from nothing (#1612).
+    if (hadInFlightRequest && cadModifierKernelGateRef.current?.isOpen !== false) {
       cadModifierWorkerRef.current?.terminate();
       cadModifierWorkerRef.current = null;
       cadModifierWorkerRestartRef.current();
@@ -3898,6 +3921,8 @@ export function LayerlingEditor({
         resetManifoldRuntime();
       });
       warmGeometryWorker();
+      // The CAD kernel is 21 MB; loaded now, the first edge tool, Hollow or Split need not wait for it (#1612).
+      cadModifierWorkerRef.current?.postMessage(warmKernelMessage());
     };
     if ("requestIdleCallback" in window) {
       const idleId = window.requestIdleCallback(warmBooleanRuntime, { timeout: 1500 });
@@ -7697,11 +7722,11 @@ export function LayerlingEditor({
     const requestId = cadModifierRequestRef.current + 1;
     cadModifierRequestRef.current = requestId;
     return new Promise<CadModifierWorkerResponse>((resolve, reject) => {
-      const timer = window.setTimeout(() => {
+      const cancelTimer = cadModifierTimeout(() => {
         if (!cadModifierPendingRef.current.has(requestId)) return;
         const pendingRequests = [...cadModifierPendingRef.current.values()];
         cadModifierPendingRef.current.clear();
-        pendingRequests.forEach((pending) => window.clearTimeout(pending.timer));
+        pendingRequests.forEach((pending) => pending.cancelTimer());
         cadModifierWorkerRef.current?.terminate();
         cadModifierWorkerRef.current = null;
         cadPreviewQueueRef.current.reset();
@@ -7716,16 +7741,16 @@ export function LayerlingEditor({
         cadModifierWorkerRestartRef.current();
         pendingRequests.forEach((pending) => pending.reject(new Error("Timed out waiting for the CAD worker; the worker was restarted")));
       }, timeoutMs);
-      cadModifierPendingRef.current.set(requestId, { resolve, reject, timer });
+      cadModifierPendingRef.current.set(requestId, { resolve, reject, cancelTimer });
       try {
         worker.postMessage({ ...request, requestId } as CadModifierWorkerRequest, transfer);
       } catch (error) {
-        window.clearTimeout(timer);
+        cancelTimer();
         cadModifierPendingRef.current.delete(requestId);
         reject(error instanceof Error ? error : new Error("The CAD worker rejected the request"));
       }
     });
-  }, []);
+  }, [cadModifierTimeout]);
 
   const cancelEdgeModifier = useCallback(() => {
     invalidateCadModifierSession();
