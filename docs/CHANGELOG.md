@@ -7,6 +7,7 @@ code still carries it - so a lower number further down is older, not newer.
 ## Unreleased
 
 - **Tape measure: a click on the number deletes the measurement too (Discussion #1613):** With Delete measurement part on, only the line or a point of a measurement took the click, the number did not. On a hole measured as a whole edge, the line is the rim of the hole, small and often hidden in it, so the measurement seemed impossible to delete. Now the number deletes it as well, in Delete measurement part and with Shift or Ctrl/Cmd held in Add measurement, and lights up red together with its line before the click.
+- **Surface texture: Show picked faces (Discussion #1607):** After picking faces, the card only said "Picked faces: 5" and the faces were lit only while picking. A new button **Show picked faces** under Pick faces lights the faces of the shown layer in the view again for a look: nothing changes, a click in the view neither picks nor releases a face, and it works for each layer on its own. Hide picked faces, Esc, Apply and Every face again end it. Texts in English, German, Dutch, French, Russian, Czech and Slovenian, guide chapter 3 in English and German, unit tests
 
 ## 1.156.4
 
