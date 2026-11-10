@@ -468,7 +468,7 @@ html[data-toolbar-size="small"] {
 }
 
 html[data-toolbar-size="large"],
-html[data-simple-mode="on"]:not([data-toolbar-size]) {
+html[data-simple-mode="on"]:not([data-toolbar-size], [data-simple-mode-enlarge="off"]) {
   --toolbar-scale: 1.25;
   --editor-toolbar-tools-height: 87px;
   --editor-toolbar-height: 131px;
@@ -478,8 +478,8 @@ html[data-simple-mode="on"]:not([data-toolbar-size]) {
    so the groups wrap onto a further row at any width rather than being cut off. */
 html[data-toolbar-size="large"] .toolbar-mode-content,
 html[data-toolbar-size="large"] .sketch-toolbar-ribbon,
-html[data-simple-mode="on"]:not([data-toolbar-size]) .toolbar-mode-content,
-html[data-simple-mode="on"]:not([data-toolbar-size]) .sketch-toolbar-ribbon {
+html[data-simple-mode="on"]:not([data-toolbar-size], [data-simple-mode-enlarge="off"]) .toolbar-mode-content,
+html[data-simple-mode="on"]:not([data-toolbar-size], [data-simple-mode-enlarge="off"]) .sketch-toolbar-ribbon {
   flex-wrap: wrap;
   height: auto;
 }
@@ -4964,7 +4964,7 @@ html[data-toolbar-size="small"] .shape-menu-dropdown:not(.sketch-shape-menu-drop
 }
 
 html[data-toolbar-size="large"] .shape-menu-dropdown:not(.sketch-shape-menu-dropdown),
-html[data-simple-mode="on"]:not([data-toolbar-size]) .shape-menu-dropdown:not(.sketch-shape-menu-dropdown) {
+html[data-simple-mode="on"]:not([data-toolbar-size], [data-simple-mode-enlarge="off"]) .shape-menu-dropdown:not(.sketch-shape-menu-dropdown) {
   --shape-menu-columns: 3;
 }
 
