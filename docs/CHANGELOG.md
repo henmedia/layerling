@@ -6,6 +6,8 @@ code still carries it - so a lower number further down is older, not newer.
 
 ## Unreleased
 
+- **The loading screen's cubes look like cubes:** While the 3D editor loads, the view cube's placeholder and the box in the middle are drawn as three faces. Their edges did not run at the same slope, so the gaps between the faces were wedges, wide at the outer corners, and on the small cube the top overlapped the sides; the side faces also had two rounded corners each and the top none. Both are now drawn as true isometric cubes with even seams and sharp corners, and the placeholder stands 10 px from the edge like the real cube instead of 28 px, so it no longer jumps when the editor appears.
+
 - **Tape measure: a click on the number deletes the measurement too (Discussion #1613):** With Delete measurement part on, only the line or a point of a measurement took the click, the number did not. On a hole measured as a whole edge, the line is the rim of the hole, small and often hidden in it, so the measurement seemed impossible to delete. Now the number deletes it as well, in Delete measurement part and with Shift or Ctrl/Cmd held in Add measurement, and lights up red together with its line before the click.
 
 ## 1.156.4
