@@ -8199,7 +8199,7 @@ html[data-theme="dark"]:where([data-palette="graphite"]) .plate-bar-separator {
 }
 
 :where(html[data-theme="dark"][data-palette="graphite"]) .property-card:has(> .property-card-header[aria-controls^="properties-"]) > .property-card-header:hover {
-  filter: brightness(1.2);
+  background: rgba(217, 118, 28, 0.2);
 }
 
 :where(html[data-theme="dark"][data-palette="graphite"]) .property-card:has(> .property-card-header[aria-controls^="properties-"]) .range-control input[type="range"]::-webkit-slider-runnable-track {
@@ -8254,7 +8254,7 @@ html[data-theme="dark"]:where([data-palette="graphite"]) .property-card:has(> .p
 }
 
 :where(html[data-theme="dark"][data-palette="graphite"]) .property-card:has(> .property-card-header[aria-controls^="position-"]) > .property-card-header:hover {
-  filter: brightness(1.2);
+  background: rgba(70, 130, 200, 0.2);
 }
 
 :where(html[data-theme="dark"][data-palette="graphite"]) .property-card:has(> .property-card-header[aria-controls^="position-"]) .range-control input[type="range"]::-webkit-slider-runnable-track {
@@ -8309,7 +8309,7 @@ html[data-theme="dark"]:where([data-palette="graphite"]) .property-card:has(> .p
 }
 
 :where(html[data-theme="dark"][data-palette="graphite"]) .property-card:has(> .property-card-header[aria-controls^="rotation-"]) > .property-card-header:hover {
-  filter: brightness(1.2);
+  background: rgba(40, 170, 140, 0.2);
 }
 
 :where(html[data-theme="dark"][data-palette="graphite"]) .property-card:has(> .property-card-header[aria-controls^="rotation-"]) .range-control input[type="range"]::-webkit-slider-runnable-track {
@@ -8364,7 +8364,7 @@ html[data-theme="dark"]:where([data-palette="graphite"]) .property-card:has(> .p
 }
 
 :where(html[data-theme="dark"][data-palette="graphite"]) .property-card:has(> .property-card-header[aria-controls^="taper-"]) > .property-card-header:hover {
-  filter: brightness(1.2);
+  background: rgba(140, 110, 210, 0.2);
 }
 
 :where(html[data-theme="dark"][data-palette="graphite"]) .property-card:has(> .property-card-header[aria-controls^="taper-"]) .range-control input[type="range"]::-webkit-slider-runnable-track {
@@ -8419,7 +8419,7 @@ html[data-theme="dark"]:where([data-palette="graphite"]) .property-card:has(> .p
 }
 
 :where(html[data-theme="dark"][data-palette="graphite"]) .property-card:has(> .property-card-header[aria-controls^="twist-"]) > .property-card-header:hover {
-  filter: brightness(1.2);
+  background: rgba(210, 90, 120, 0.2);
 }
 
 :where(html[data-theme="dark"][data-palette="graphite"]) .property-card:has(> .property-card-header[aria-controls^="twist-"]) .range-control input[type="range"]::-webkit-slider-runnable-track {
@@ -8474,7 +8474,7 @@ html[data-theme="dark"]:where([data-palette="graphite"]) .property-card:has(> .p
 }
 
 :where(html[data-theme="dark"][data-palette="graphite"]) .property-card:has(> .property-card-header[aria-controls^="slope-"]) > .property-card-header:hover {
-  filter: brightness(1.2);
+  background: rgba(130, 170, 50, 0.2);
 }
 
 :where(html[data-theme="dark"][data-palette="graphite"]) .property-card:has(> .property-card-header[aria-controls^="slope-"]) .range-control input[type="range"]::-webkit-slider-runnable-track {
@@ -8529,7 +8529,7 @@ html[data-theme="dark"]:where([data-palette="graphite"]) .property-card:has(> .p
 }
 
 :where(html[data-theme="dark"][data-palette="graphite"]) .property-card:has(> .property-card-header[aria-controls^="narrow-"]) > .property-card-header:hover {
-  filter: brightness(1.2);
+  background: rgba(196, 150, 30, 0.2);
 }
 
 :where(html[data-theme="dark"][data-palette="graphite"]) .property-card:has(> .property-card-header[aria-controls^="narrow-"]) .range-control input[type="range"]::-webkit-slider-runnable-track {
@@ -8640,6 +8640,14 @@ html[data-theme="dark"]:where([data-palette="graphite"]) .select-property select
 html[data-theme="dark"]:where([data-palette="graphite"]) .select-property select option {
   color: #333333;
   background-color: #fff;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .property-card > button.property-card-header:hover {
+  background: rgba(73, 73, 73, 0.1);
+}
+
+html[data-theme="dark"]:where([data-palette="graphite"]) .property-card > button.property-card-header:hover {
+  background: rgba(255, 255, 255, 0.1);
 }
 
 :where(html[data-theme="dark"][data-palette="graphite"]) .dashboard-welcome-hide {

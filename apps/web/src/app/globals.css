@@ -17457,7 +17457,7 @@ html[data-theme="dark"] .plate-bar-separator {
   font-weight: 650;
 }
 .property-card:has(> .property-card-header[aria-controls^="properties-"]) > .property-card-header:hover {
-  filter: brightness(1.2);
+  background: rgba(217, 118, 28, 0.2);
 }
 .property-card:has(> .property-card-header[aria-controls^="properties-"]) .range-control input[type="range"]::-webkit-slider-runnable-track {
   background: linear-gradient(to right, rgb(217, 118, 28) 0 var(--slider-pos), rgba(217, 118, 28, 0.24) var(--slider-pos) 100%);
@@ -17500,7 +17500,7 @@ html[data-theme="dark"] .property-card:has(> .property-card-header[aria-controls
   font-weight: 650;
 }
 .property-card:has(> .property-card-header[aria-controls^="position-"]) > .property-card-header:hover {
-  filter: brightness(1.2);
+  background: rgba(70, 130, 200, 0.2);
 }
 .property-card:has(> .property-card-header[aria-controls^="position-"]) .range-control input[type="range"]::-webkit-slider-runnable-track {
   background: linear-gradient(to right, rgb(70, 130, 200) 0 var(--slider-pos), rgba(70, 130, 200, 0.24) var(--slider-pos) 100%);
@@ -17543,7 +17543,7 @@ html[data-theme="dark"] .property-card:has(> .property-card-header[aria-controls
   font-weight: 650;
 }
 .property-card:has(> .property-card-header[aria-controls^="rotation-"]) > .property-card-header:hover {
-  filter: brightness(1.2);
+  background: rgba(40, 170, 140, 0.2);
 }
 .property-card:has(> .property-card-header[aria-controls^="rotation-"]) .range-control input[type="range"]::-webkit-slider-runnable-track {
   background: linear-gradient(to right, rgb(40, 170, 140) 0 var(--slider-pos), rgba(40, 170, 140, 0.24) var(--slider-pos) 100%);
@@ -17586,7 +17586,7 @@ html[data-theme="dark"] .property-card:has(> .property-card-header[aria-controls
   font-weight: 650;
 }
 .property-card:has(> .property-card-header[aria-controls^="taper-"]) > .property-card-header:hover {
-  filter: brightness(1.2);
+  background: rgba(140, 110, 210, 0.2);
 }
 .property-card:has(> .property-card-header[aria-controls^="taper-"]) .range-control input[type="range"]::-webkit-slider-runnable-track {
   background: linear-gradient(to right, rgb(140, 110, 210) 0 var(--slider-pos), rgba(140, 110, 210, 0.24) var(--slider-pos) 100%);
@@ -17629,7 +17629,7 @@ html[data-theme="dark"] .property-card:has(> .property-card-header[aria-controls
   font-weight: 650;
 }
 .property-card:has(> .property-card-header[aria-controls^="twist-"]) > .property-card-header:hover {
-  filter: brightness(1.2);
+  background: rgba(210, 90, 120, 0.2);
 }
 .property-card:has(> .property-card-header[aria-controls^="twist-"]) .range-control input[type="range"]::-webkit-slider-runnable-track {
   background: linear-gradient(to right, rgb(210, 90, 120) 0 var(--slider-pos), rgba(210, 90, 120, 0.24) var(--slider-pos) 100%);
@@ -17672,7 +17672,7 @@ html[data-theme="dark"] .property-card:has(> .property-card-header[aria-controls
   font-weight: 650;
 }
 .property-card:has(> .property-card-header[aria-controls^="slope-"]) > .property-card-header:hover {
-  filter: brightness(1.2);
+  background: rgba(130, 170, 50, 0.2);
 }
 .property-card:has(> .property-card-header[aria-controls^="slope-"]) .range-control input[type="range"]::-webkit-slider-runnable-track {
   background: linear-gradient(to right, rgb(130, 170, 50) 0 var(--slider-pos), rgba(130, 170, 50, 0.24) var(--slider-pos) 100%);
@@ -17715,7 +17715,7 @@ html[data-theme="dark"] .property-card:has(> .property-card-header[aria-controls
   font-weight: 650;
 }
 .property-card:has(> .property-card-header[aria-controls^="narrow-"]) > .property-card-header:hover {
-  filter: brightness(1.2);
+  background: rgba(196, 150, 30, 0.2);
 }
 .property-card:has(> .property-card-header[aria-controls^="narrow-"]) .range-control input[type="range"]::-webkit-slider-runnable-track {
   background: linear-gradient(to right, rgb(196, 150, 30) 0 var(--slider-pos), rgba(196, 150, 30, 0.24) var(--slider-pos) 100%);
@@ -17868,4 +17868,22 @@ html[data-theme="dark"] .select-property select {
 html[data-theme="dark"] .select-property select option {
   color: #3b2f22;
   background-color: #fff;
+}
+
+/* The title bar of a card reaches the edges of its tile, so the shade under the pointer fills the whole bar. The shade
+   is a lighter touch of the tile's own colour (coloured sections above), or a neutral one for the other cards. */
+.property-card > button.property-card-header {
+  width: calc(100% + 28px);
+  margin: 0 -14px;
+  padding: 0 14px;
+  border-radius: 8px 8px 0 0;
+}
+.property-card.collapsed > button.property-card-header {
+  border-radius: 8px;
+}
+.property-card > button.property-card-header:hover {
+  background: rgba(93, 71, 49, 0.1);
+}
+html[data-theme="dark"] .property-card > button.property-card-header:hover {
+  background: rgba(255, 255, 255, 0.1);
 }
