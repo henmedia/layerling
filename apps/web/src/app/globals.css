@@ -17843,3 +17843,17 @@ html[data-theme="dark"] .property-card {
   background: rgba(255, 255, 255, 0.06);
   box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.2);
 }
+
+/* Choice fields in the dark theme: the closed field is dark like the number fields beside it. The list that opens
+   keeps the light colour scheme (see .select-property select above, the Chrome-on-Linux hover fix), and its
+   options say their colours outright, dark text on a light ground, so the row under the pointer stays readable. */
+html[data-theme="dark"] .select-property select {
+  color: #f1eee9;
+  background-color: rgba(0, 0, 0, 0.35);
+  border-color: rgba(255, 255, 255, 0.22);
+  box-shadow: none;
+}
+html[data-theme="dark"] .select-property select option {
+  color: #3b2f22;
+  background-color: #fff;
+}

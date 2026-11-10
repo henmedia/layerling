@@ -8630,6 +8630,18 @@ html[data-theme="dark"]:where([data-palette="graphite"]) .property-card {
   box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.2);
 }
 
+html[data-theme="dark"]:where([data-palette="graphite"]) .select-property select {
+  color: #ededed;
+  background-color: rgba(0, 0, 0, 0.35);
+  border-color: rgba(255, 255, 255, 0.22);
+  box-shadow: none;
+}
+
+html[data-theme="dark"]:where([data-palette="graphite"]) .select-property select option {
+  color: #333333;
+  background-color: #fff;
+}
+
 :where(html[data-theme="dark"][data-palette="graphite"]) .dashboard-welcome-hide {
   color: #717171;
   background: transparent;
