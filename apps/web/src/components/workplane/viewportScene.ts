@@ -1120,12 +1120,18 @@ export function syncSplitPlane(state: ThreeState | null, plane: ModelSplitPlane 
   }
 
   const size = Math.max(10, plane.size);
+  // The rectangle fits the part on the plane (Issue #1606); its middle carries the arrow.
+  const { center, u, v, width, height } = plane.preview;
   const root = new THREE.Group();
-  root.position.set(...plane.origin);
-  root.quaternion.setFromUnitVectors(new THREE.Vector3(0, 0, 1), new THREE.Vector3(...plane.normal).normalize());
+  root.position.set(...center);
+  root.quaternion.setFromRotationMatrix(new THREE.Matrix4().makeBasis(
+    new THREE.Vector3(...u),
+    new THREE.Vector3(...v),
+    new THREE.Vector3(...plane.normal).normalize(),
+  ));
 
   const surface = new THREE.Mesh(
-    new THREE.PlaneGeometry(size, size),
+    new THREE.PlaneGeometry(width, height),
     new THREE.MeshBasicMaterial({
       color: "#d07313",
       transparent: true,
@@ -1146,8 +1152,8 @@ export function syncSplitPlane(state: ThreeState | null, plane: ModelSplitPlane 
   root.add(border);
 
   const crossGeometry = new THREE.BufferGeometry().setFromPoints([
-    new THREE.Vector3(-size / 2, 0, 0), new THREE.Vector3(size / 2, 0, 0),
-    new THREE.Vector3(0, -size / 2, 0), new THREE.Vector3(0, size / 2, 0),
+    new THREE.Vector3(-width / 2, 0, 0), new THREE.Vector3(width / 2, 0, 0),
+    new THREE.Vector3(0, -height / 2, 0), new THREE.Vector3(0, height / 2, 0),
   ]);
   const cross = new THREE.LineSegments(
     crossGeometry,
