@@ -6,6 +6,7 @@ code still carries it - so a lower number further down is older, not newer.
 
 ## Unreleased
 
+- **Split: the part hides the plane behind it, and the cut line is bright only where it can be seen (#1606):** The translucent plane, its lines and the white cut line were drawn over everything. Close up and looking almost along the plane, as when lining a cut up between two grooves, they piled up into a jumble, and the cut line on the far side of the part was as bright as the near one, so it could not be told where the cut would be. Now the part hides the plane where it lies behind or inside it, as in a slicer's cut tool, and the cut line is bright where it can be seen and faint where it runs behind the part; the plane's outline and the arrow still show through.
 - **Tape measure: a click on the number deletes the measurement too (Discussion #1613):** With Delete measurement part on, only the line or a point of a measurement took the click, the number did not. On a hole measured as a whole edge, the line is the rim of the hole, small and often hidden in it, so the measurement seemed impossible to delete. Now the number deletes it as well, in Delete measurement part and with Shift or Ctrl/Cmd held in Add measurement, and lights up red together with its line before the click.
 
 ## 1.156.4
