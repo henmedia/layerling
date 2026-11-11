@@ -606,7 +606,7 @@ export const LANGUAGE_INFO: Readonly<Record<Language, LanguageInfo>> = {
       Drag: "Dra",
     },
     asciiUmlauts: false,
-    complete: false,
+    complete: true,
     guide: {
       site: "layerling användarhandbok",
       home: "Användarhandbok",
