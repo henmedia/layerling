@@ -140,7 +140,9 @@ function shellByExtension(cad: OcctKernel, solid: ShapeHandle, open: ShapeHandle
       const reach = wall * 2 + 1e-3;
       const slab = cad.extrude(face, normal.x * reach, normal.y * reach, normal.z * reach);
       handles.push(slab);
-      const fused = cad.unifySameDomain(cad.fuse(grown, slab));
+      const joined = cad.fuse(grown, slab);
+      handles.push(joined);
+      const fused = cad.unifySameDomain(joined);
       handles.push(fused);
       grown = fused;
     }
@@ -848,10 +850,18 @@ export function offsetSolidSideways(cad: OcctKernel, solid: ShapeHandle, distanc
     if (layers.length === 0) throw new Error(CANNOT_OFFSET_MESSAGE);
     const joined = layers.length === 1 ? cad.copy(layers[0]) : keep(cad.fuseAll(layers));
     const result = layers.length === 1 ? joined : cad.unifySameDomain(joined);
-    const baseVolume = cad.getVolume(solid);
-    const volume = shapeIsValid(cad, result) ? cad.getVolume(result) : 0;
-    if (volume > 0 && (shrink ? volume < baseVolume * (1 - 1e-6) : volume > baseVolume * (1 + 1e-6))) return result;
-    cad.release(result);
+    // Freed unless it is handed on, also when a check below throws.
+    let handedOn = false;
+    try {
+      const baseVolume = cad.getVolume(solid);
+      const volume = shapeIsValid(cad, result) ? cad.getVolume(result) : 0;
+      if (volume > 0 && (shrink ? volume < baseVolume * (1 - 1e-6) : volume > baseVolume * (1 + 1e-6))) {
+        handedOn = true;
+        return result;
+      }
+    } finally {
+      if (!handedOn) cad.release(result);
+    }
     throw new Error(CANNOT_OFFSET_MESSAGE);
   } catch (error) {
     if (mustSurface(error)) throw error;

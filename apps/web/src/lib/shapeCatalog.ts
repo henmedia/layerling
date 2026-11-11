@@ -33,6 +33,7 @@ import {
   normalizeGearToothWidth,
   normalizeGearType,
   normalizeRingRackHelixAngle,
+  normalizeBevelHelixAngle,
   rackToothHeight,
 } from "@/lib/gearGeometry";
 import {
@@ -203,7 +204,6 @@ import {
   DEFAULT_ROUNDED_BOX_QUALITY,
   normalizeCornerFillet,
   normalizeEndFillets,
-  normalizeTopBottomFillet,
   normalizeRoundedBoxQuality,
 } from "@/lib/roundedBoxGeometry";
 import {
@@ -1239,6 +1239,8 @@ export function makeShapeFromAsset(
     ringRackHelixAngle: asset.kind === "gear" && gearTypeIsModular(gearType) && normalizeRingRackHelixAngle(customization.ringRackHelixAngle) !== 0 ? normalizeRingRackHelixAngle(customization.ringRackHelixAngle) : undefined,
     ringRackHerringbone: asset.kind === "gear" && gearTypeIsModular(gearType) && normalizeRingRackHelixAngle(customization.ringRackHelixAngle) !== 0 && customization.ringRackHerringbone === true ? true : undefined,
     helixQuality: asset.kind === "gear" ? normalizeGearHelixQuality(customization.helixQuality ?? DEFAULT_GEAR_HELIX_QUALITY) : undefined,
+    // A spiral bevel gear; a straight one keeps no angle, as the inspector leaves it.
+    bevelHelixAngle: asset.kind === "gear" && gearType === "bevel" && normalizeBevelHelixAngle(customization.bevelHelixAngle) !== 0 ? normalizeBevelHelixAngle(customization.bevelHelixAngle) : undefined,
     gearProfile,
     gearPressureAngle: gearProfile === "involute" ? normalizeGearPressureAngle(customization.gearPressureAngle) : undefined,
     gearBacklash: gearUsesModule(gearProfile) ? Math.max(0, Math.min(MAX_GEAR_BACKLASH, customization.gearBacklash ?? DEFAULT_GEAR_BACKLASH)) : undefined,

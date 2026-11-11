@@ -1,4 +1,5 @@
 import type { OcctKernel, ShapeHandle, Vec3 } from "occt-wasm";
+import { isKernelMemoryFault } from "@/lib/kernelFault";
 
 const HASH_UPPER_BOUND = 2_147_483_647;
 // Two edges that meet at no more than this angle run on smoothly: the kernel takes the one with the other (#1591).
@@ -43,7 +44,9 @@ function tangentAtEnd(cad: OcctKernel, edge: ShapeHandle, at: Vec3) {
     const first = cad.curvePointAtParam(edge, range.first);
     const last = cad.curvePointAtParam(edge, range.last);
     return unit(cad.curveTangent(edge, distanceSquared(first, at) <= distanceSquared(last, at) ? range.first : range.last));
-  } catch {
+  } catch (error) {
+    // A kernel out of memory is no degenerate edge: it has to reach the caller, which starts the kernel afresh.
+    if (isKernelMemoryFault(error)) throw error;
     return null;
   }
 }

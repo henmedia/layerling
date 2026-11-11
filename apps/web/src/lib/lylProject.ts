@@ -1413,6 +1413,11 @@ function validateShapeDefinition(definition: Record<string, unknown>, label: str
       throw new Error(`${label}.paint must be a list of at most ${PAINT_MAX_STROKES} paint strokes`);
     }
   }
+  // Marks and switches the editor writes as true or false, and the id of the body a rib was made for (lib/supportRib).
+  for (const field of ["breakawayBase", "stencilBridge", "hullKeepHoles", "multicolor", "shapeLocked"] as const) {
+    if (definition[field] !== undefined && typeof definition[field] !== "boolean") throw new Error(`${label}.${field} must be true or false`);
+  }
+  if (definition.supportRibFor !== undefined && typeof definition.supportRibFor !== "string") throw new Error(`${label}.supportRibFor must be an id`);
   // What a group does with its parts when it is resized (Discussion #526).
   if (definition.groupResize !== undefined && definition.groupResize !== "stretch" && definition.groupResize !== "keepParts") {
     throw new Error(`${label}.groupResize must be stretch or keepParts`);

@@ -63,6 +63,9 @@ export const ERROR_RULES: ErrorRule[] = [
   { pattern: /Drawing source contains/i, key: "error.drawingNoGeometry" },
   // Profiles turned, swept, lofted, trimmed or with rounded or chamfered ends (cadProfileSolid.ts), and lofts.
   { pattern: /profile solid (is not valid|is inside out|are not valid|does not keep)|A loft through its sections did not become one solid/i, key: "error.solidNotValid" },
+  // A slotted hole's straight section and a sloped profile's rounded rims (cadProfileSolid.ts).
+  { pattern: /A slotted hole's section has no width/i, key: "error.measuresOutOfRange" },
+  { pattern: /A slotted hole needs one section of straight lines|The slotted hole (did not become one solid|is not a valid solid)|The sloped profile solid has no edges to round/i, key: "error.solidNotValid" },
   { pattern: /thread's chamfer reaches its axis/i, key: "error.threadChamferAxis" },
   { pattern: /gear's centre hole reaches its teeth/i, key: "error.gearHoleTeeth" },
   { pattern: /crescent horn rounding does not fit/i, key: "error.crescentRounding" },

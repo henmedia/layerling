@@ -1009,6 +1009,10 @@ export function workplaneShapesEqual(a: WorkplaneShape, b: WorkplaneShape) {
     a.multicolor === b.multicolor &&
     a.groupResize === b.groupResize &&
     Boolean(a.hullKeepHoles) === Boolean(b.hullKeepHoles) &&
+    // A rib's body, a stencil bridge and a breakaway base are marked for the print check (#1633): a change there is a change.
+    a.supportRibFor === b.supportRibFor &&
+    Boolean(a.stencilBridge) === Boolean(b.stencilBridge) &&
+    Boolean(a.breakawayBase) === Boolean(b.breakawayBase) &&
     a.rotationPivot === b.rotationPivot &&
     fieldFormulasEqual(a.formulas, b.formulas) &&
     a.locked === b.locked &&

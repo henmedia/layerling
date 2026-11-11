@@ -534,7 +534,9 @@ function dowelBreakawayBase(runtime: ManifoldToplevel, options: SplitConnectorOp
   const zs = spots.map(([, z]) => z);
   const minX = Math.min(...xs) - reach;
   const minZ = Math.min(...zs) - reach;
-  const plate = runtime.Manifold.cube([Math.max(...xs) + reach - minX, height, Math.max(...zs) + reach - minZ]).translate([minX, floorY, minZ]);
+  const box = runtime.Manifold.cube([Math.max(...xs) + reach - minX, height, Math.max(...zs) + reach - minZ]);
+  created.push(box);
+  const plate = box.translate([minX, floorY, minZ]);
   created.push(plate);
   const socketRadius = breakawaySocketDiameter(options.diameter) / 2;
   const socket = revolved(runtime, [[0, floor], [socketRadius, floor], [socketRadius, height + CONNECTOR_OVERLAP], [0, height + CONNECTOR_OVERLAP]], created).transform(PIN_UPRIGHT);

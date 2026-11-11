@@ -659,6 +659,8 @@ export function normalizeShapeCustomizations(value: unknown, fallback: ShapeCust
       entry.textCurved = typeof source.textCurved === "boolean" ? source.textCurved : fallbackEntry?.textCurved;
       entry.textInward = typeof source.textInward === "boolean" ? source.textInward : fallbackEntry?.textInward;
       entry.textFlipped = typeof source.textFlipped === "boolean" ? source.textFlipped : fallbackEntry?.textFlipped;
+      // Kerning (#1297): new texts have it on, so only an "off" saved as a default means anything; true and false are both kept.
+      entry.textKerning = typeof source.textKerning === "boolean" ? source.textKerning : fallbackEntry?.textKerning;
       entry.textRadius = optionalShapeNumber(source.textRadius, fallbackEntry?.textRadius, 5, 500);
       entry.textSize = optionalShapeNumber(source.textSize, fallbackEntry?.textSize, 0.5, 200);
     }
@@ -713,6 +715,16 @@ export function normalizeShapeCustomizations(value: unknown, fallback: ShapeCust
         : ["hex", "torx", "phillips", "slot", "robertson", "none"].includes(source.threadDrive)
           ? source.threadDrive
           : fallbackEntry?.threadDrive;
+      // makeShapeFromAsset reads these too, but they were dropped here, so the AI bridge and the shape defaults never
+      // got a tapered thread, a head of its own size, a drive or a collar through (same ranges as the .lyl check).
+      // false is kept, so a change through the AI bridge can switch the taper off again.
+      entry.threadTaper = typeof source.threadTaper === "boolean" ? source.threadTaper : fallbackEntry?.threadTaper;
+      entry.threadHeadHeight = optionalShapeNumber(source.threadHeadHeight, fallbackEntry?.threadHeadHeight, 0, 480);
+      entry.threadHeadDiameter = optionalShapeNumber(source.threadHeadDiameter, fallbackEntry?.threadHeadDiameter, 0, 640);
+      entry.threadDriveSize = optionalShapeNumber(source.threadDriveSize, fallbackEntry?.threadDriveSize, 0, 640);
+      entry.threadDriveDepth = optionalShapeNumber(source.threadDriveDepth, fallbackEntry?.threadDriveDepth, 0, 640);
+      entry.threadCollarHeight = optionalShapeNumber(source.threadCollarHeight, fallbackEntry?.threadCollarHeight, 0, 640);
+      entry.threadCollarDiameter = optionalShapeNumber(source.threadCollarDiameter, fallbackEntry?.threadCollarDiameter, 0, 640);
     }
     if (kind === "gear") {
       entry.teeth = optionalShapeNumber(source.teeth, fallbackEntry?.teeth, MIN_GEAR_TEETH, MAX_GEAR_TEETH, true);
@@ -734,6 +746,8 @@ export function normalizeShapeCustomizations(value: unknown, fallback: ShapeCust
       entry.ringRackHelixAngle = optionalShapeNumber(source.ringRackHelixAngle, fallbackEntry?.ringRackHelixAngle, -45, 45);
       // false is kept, so a change through the AI bridge can switch the herringbone teeth off again.
       entry.ringRackHerringbone = typeof source.ringRackHerringbone === "boolean" ? source.ringRackHerringbone : fallbackEntry?.ringRackHerringbone;
+      // A spiral bevel gear's angle, as the inspector and the .lyl check take it.
+      entry.bevelHelixAngle = optionalShapeNumber(source.bevelHelixAngle, fallbackEntry?.bevelHelixAngle, -45, 45);
     }
     if (kind === "hirth") {
       entry.teeth = optionalShapeNumber(source.teeth, fallbackEntry?.teeth, MIN_HIRTH_TEETH, MAX_HIRTH_TEETH, true);
