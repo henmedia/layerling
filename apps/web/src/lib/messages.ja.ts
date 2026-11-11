@@ -2250,7 +2250,7 @@ export const MESSAGES_JA: Partial<Record<MessageKey, string>> = {
   "shape.ruler": "定規",
   "shape.group": "グループ",
   "shape.bundle": "バンドル",
-  "inspector.bundleNote": "バンドルはパーツをまとめて保持するだけです。各パーツは色と種類を保ち、穴は何も切り抜かず、エクスポート時には各パーツが独立したボディになります。Eで開いて編集、Ctrl+Shift+Gでばらします。",
+  "inspector.bundleNote": "バンドルはパーツをまとめて保持するだけです。各パーツは色と種類を保ち、穴は自分のパーツを切り抜かず（後でグループにしても同じで、切り抜くのはほかのパーツだけです）、エクスポート時には各パーツが独立したボディになります。Eで開いて編集、Ctrl+Shift+Gでばらします。",
   "shape.intersection": "交差",
   "shape.importedMesh": "読み込んだメッシュ",
   "shape.mesh": "メッシュ",

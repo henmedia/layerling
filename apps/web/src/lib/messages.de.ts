@@ -2864,7 +2864,7 @@ export const MESSAGES_DE: Record<MessageKey, string> = {
   "shape.ruler": "Lineal",
   "shape.group": "Gruppe",
   "shape.bundle": "Bündel",
-  "inspector.bundleNote": "Ein Bündel hält seine Teile nur zusammen: Jedes behält Farbe und Art, Aussparungen schneiden nicht, und im Export ist jedes Teil ein eigener Körper. E öffnet es zum Bearbeiten, Strg+Umschalt+G löst es auf.",
+  "inspector.bundleNote": "Ein Bündel hält seine Teile nur zusammen: Jedes behält Farbe und Art, seine Aussparungen schneiden nie die eigenen Teile, auch nicht später in einer Gruppe (dort schneiden sie nur die anderen Teile), und im Export ist jedes Teil ein eigener Körper. E öffnet es zum Bearbeiten, Strg+Umschalt+G löst es auf.",
   "shape.intersection": "Schnittmenge",
   "shape.importedMesh": "Importiertes Netz",
   "shape.mesh": "Netz",

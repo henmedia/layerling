@@ -2865,7 +2865,7 @@ export const MESSAGES_NL: Record<MessageKey, string> = {
   "shape.ruler": "Liniaal",
   "shape.group": "Groep",
   "shape.bundle": "Bundel",
-  "inspector.bundleNote": "Een bundel houdt alleen de delen bij elkaar: elk deel houdt zijn kleur en soort, gaten snijden niets weg, en bij exporteren is elk deel een eigen lichaam. E opent de bundel om te bewerken, Ctrl+Shift+G haalt hem uit elkaar.",
+  "inspector.bundleNote": "Een bundel houdt alleen de delen bij elkaar: elk deel houdt zijn kleur en soort, de gaten snijden nooit in de eigen delen, ook later in een groep niet (daar snijden ze alleen in de andere delen), en bij exporteren is elk deel een eigen lichaam. E opent de bundel om te bewerken, Ctrl+Shift+G haalt hem uit elkaar.",
   "shape.intersection": "Doorsnijding",
   "shape.importedMesh": "Geïmporteerde mesh",
   "shape.mesh": "Mesh",
