@@ -474,6 +474,8 @@ export type TransformOverlayProps = {
   locked?: boolean;
   /** Lock shape (#1277): the size handles and size labels are left out; moving and turning stay. */
   sizeLocked?: boolean;
+  /** The red and green arrows that move the selection along X or Y; off in the settings, they are left out. */
+  showSlideArrows?: boolean;
   showRotationWheel: boolean;
   hideSelectionChrome: boolean;
   hideDimensionMarks: boolean;

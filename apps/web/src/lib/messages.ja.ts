@@ -3806,6 +3806,8 @@ export const MESSAGES_JA: Partial<Record<MessageKey, string>> = {
   "workspace.showOriginDimensions": "原点からの距離を表示",
   "workspace.dimensionsAlwaysVisible": "寸法を常に表示",
   "workspace.showRotationAngles": "回転したボディの角度を表示",
+  "workspace.showSlideArrows": "赤と緑の移動矢印を表示",
+  "workspace.showSlideArrowsHint": "選択範囲の上にある、X または Y 方向にだけ移動させる矢印です。邪魔なときはオフにします。回転矢印と持ち上げ矢印は残ります。",
   "workspace.startInPerspective": "エディターを透視投影表示で開始",
   "workspace.startWithCornerRuler": "新しいデザインを原点に角定規を置いて開始",
   "workspace.startWithCornerRulerHint": "このブラウザーで作るすべての新しいデザインに適用されます。既存のデザインはそのままです。",

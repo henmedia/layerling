@@ -2836,6 +2836,8 @@ export const MESSAGES_TR: Partial<Record<MessageKey, string>> = {
   "workspace.showOriginDimensions": "Orijin uzaklıklarını göster",
   "workspace.dimensionsAlwaysVisible": "Ölçüler her zaman görünür",
   "workspace.showRotationAngles": "Döndürülmüş gövdelerin açılarını göster",
+  "workspace.showSlideArrows": "Kırmızı ve yeşil taşıma oklarını göster",
+  "workspace.showSlideArrowsHint": "Seçimin üstünde, onu yalnızca X veya Y boyunca taşıyan oklar. Engel olduklarında kapatın; döndürme okları ve kaldırma oku kalır.",
   "workspace.startInPerspective": "Editörü perspektif görünümde başlat",
   "workspace.startWithCornerRuler": "Yeni tasarımlara orijinde bir gönyeyle başla",
   "workspace.startWithCornerRulerHint": "Bu tarayıcıdaki her yeni tasarım için geçerlidir. Mevcut tasarımlar olduğu gibi kalır.",

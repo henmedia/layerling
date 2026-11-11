@@ -4695,6 +4695,8 @@ export const MESSAGES_FR: Partial<Record<MessageKey, string>> = {
   "workspace.dimensionAxisColors": "Cases de cotes aux couleurs des axes",
   "workspace.dimensionAxisColorsHint": "Chaque case de valeur près de la sélection prend la couleur de son axe : X rouge, Y vert, Z bleu.",
   "workspace.showRotationAngles": "Afficher les angles des corps tournés",
+  "workspace.showSlideArrows": "Afficher les flèches de déplacement rouge et verte",
+  "workspace.showSlideArrowsHint": "Les flèches en haut de la sélection qui la déplacent uniquement le long de X ou Y. Désactivez-les si elles gênent ; les flèches de rotation et la flèche de levée restent.",
   "workspace.startInPerspective": "Démarrer l'éditeur en vue perspective",
   "workspace.startWithCornerRuler": "Commencer les nouveaux designs avec un carré de charpente à l’origine",
   "workspace.startWithCornerRulerHint": "Vaut pour chaque nouveau design de ce navigateur. Les designs existants restent tels quels.",

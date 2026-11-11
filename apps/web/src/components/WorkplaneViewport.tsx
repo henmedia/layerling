@@ -9062,6 +9062,7 @@ export function WorkplaneViewport({
               rotationReadout={rotationReadout}
               angleBadge={dimensionsHidden ? null : angleBadge}
               locked={selectionLocked}
+              showSlideArrows={workspace.showSlideArrows}
               sizeLocked={selectionSizeLocked}
               showRotationWheel={activeRotationWheel}
               hideSelectionChrome={activeTransformKind === "rotate"}

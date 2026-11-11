@@ -4710,6 +4710,8 @@ export const MESSAGES_DE: Record<MessageKey, string> = {
   "workspace.dimensionAxisColors": "Maßkästchen in Achsenfarben",
   "workspace.dimensionAxisColorsHint": "Jedes Maßkästchen neben der Auswahl bekommt die Farbe seiner Achse: X rot, Y grün, Z blau.",
   "workspace.showRotationAngles": "Drehwinkel gedrehter Körper anzeigen",
+  "workspace.showSlideArrows": "Rote und grüne Verschiebepfeile anzeigen",
+  "workspace.showSlideArrowsHint": "Die Pfeile oben an der Auswahl, die sie nur entlang X oder Y verschieben. Ausschalten, wenn sie stören; die Drehpfeile und der Hebepfeil bleiben.",
   "workspace.startInPerspective": "Editor in perspektivischer Ansicht starten",
   "workspace.startWithCornerRuler": "Neue Entwürfe mit Winkellineal im Nullpunkt beginnen",
   "workspace.startWithCornerRulerHint": "Gilt für jeden neuen Entwurf in diesem Browser. Vorhandene Entwürfe bleiben, wie sie sind.",

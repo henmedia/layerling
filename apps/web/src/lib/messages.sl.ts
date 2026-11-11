@@ -4381,6 +4381,8 @@ export const MESSAGES_SL: Partial<Record<MessageKey, string>> = {
   "prop.rotateY": "Okoli Y",
   "prop.rotateZ": "Okoli Z (višina)",
   "workspace.showRotationAngles": "Prikaži kote zasukanih teles",
+  "workspace.showSlideArrows": "Prikaži rdečo in zeleno puščico za premik",
+  "workspace.showSlideArrowsHint": "Puščici na vrhu izbire, ki jo premikata samo vzdolž X ali Y. Izklopi ju, če sta v napoto; puščice za vrtenje in puščica za dvig ostanejo.",
   "sketch.segmentActions": "Dejanja črte",
   "sketch.curveLine": "Ukrivi črto",
   "sketch.curveLineHint": "Ukrivi to ravno stranico v krivuljo; z vlečenjem obeh ročajev ji oblikuješ obliko",

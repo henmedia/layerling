@@ -4696,6 +4696,8 @@ export const MESSAGES_IT: Partial<Record<MessageKey, string>> = {
   "workspace.dimensionAxisColors": "Caselle delle quote nei colori degli assi",
   "workspace.dimensionAxisColorsHint": "Ogni casella di valore accanto alla selezione prende il colore del suo asse: X rosso, Y verde, Z blu.",
   "workspace.showRotationAngles": "Mostra gli angoli di rotazione dei corpi",
+  "workspace.showSlideArrows": "Mostra le frecce di spostamento rossa e verde",
+  "workspace.showSlideArrowsHint": "Le frecce sopra la selezione che la spostano solo lungo X o Y. Disattivale se danno fastidio; le frecce di rotazione e quella di sollevamento restano.",
   "workspace.startInPerspective": "Avvia l'editor in vista prospettica",
   "workspace.startWithCornerRuler": "Avvia i nuovi progetti con una squadra all’origine",
   "workspace.startWithCornerRulerHint": "Vale per ogni nuovo progetto in questo browser. I progetti che esistono già restano come sono.",

@@ -988,6 +988,12 @@ export function WorkspaceSettingsModal({
                     onChange={(showRotationAngles) => patchWorkspace({ showRotationAngles })}
                   />
                   <WorkspaceToggle
+                    label={t("workspace.showSlideArrows")}
+                    description={t("workspace.showSlideArrowsHint")}
+                    checked={workspace.showSlideArrows}
+                    onChange={(showSlideArrows) => patchWorkspace({ showSlideArrows })}
+                  />
+                  <WorkspaceToggle
                     label={t("workspace.startInPerspective")}
                     checked={startInPerspective}
                     onChange={onStartInPerspectiveChange}

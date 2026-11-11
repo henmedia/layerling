@@ -4711,6 +4711,8 @@ export const MESSAGES_NL: Record<MessageKey, string> = {
   "workspace.dimensionAxisColors": "Maatvakjes in askleuren",
   "workspace.dimensionAxisColorsHint": "Elk waardevakje naast de selectie krijgt de kleur van zijn as: X rood, Y groen, Z blauw.",
   "workspace.showRotationAngles": "Hoeken van gedraaide lichamen tonen",
+  "workspace.showSlideArrows": "Rode en groene verplaatspijlen tonen",
+  "workspace.showSlideArrowsHint": "De pijlen boven aan de selectie die haar alleen langs X of Y verplaatsen. Zet ze uit als ze in de weg zitten; de draaipijlen en de optilpijl blijven.",
   "workspace.startInPerspective": "Editor starten in perspectiefweergave",
   "workspace.startWithCornerRuler": "Nieuwe ontwerpen starten met een winkelhaak in de oorsprong",
   "workspace.startWithCornerRulerHint": "Geldt voor elk nieuw ontwerp in deze browser. Bestaande ontwerpen blijven zoals ze zijn.",

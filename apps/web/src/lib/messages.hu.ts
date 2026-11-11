@@ -2921,6 +2921,8 @@ export const MESSAGES_HU: Partial<Record<MessageKey, string>> = {
   "workspace.showOriginDimensions": "Origótól mért távolságok mutatása",
   "workspace.dimensionsAlwaysVisible": "Méretek mindig láthatók",
   "workspace.showRotationAngles": "Elforgatott testek szögeinek mutatása",
+  "workspace.showSlideArrows": "Piros és zöld mozgató nyilak mutatása",
+  "workspace.showSlideArrowsHint": "A kijelölés tetején lévő nyilak, amelyek csak X vagy Y mentén mozgatják. Kapcsold ki, ha útban vannak; a forgató nyilak és az emelő nyíl megmaradnak.",
   "workspace.startInPerspective": "A szerkesztő perspektivikus nézetben induljon",
   "workspace.startWithCornerRuler": "Az új tervek derékszögvonalzóval induljanak az origóban",
   "workspace.startWithCornerRulerHint": "Minden új tervre érvényes ebben a böngészőben. A meglévő tervek változatlanok maradnak.",

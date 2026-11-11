@@ -4506,6 +4506,8 @@ export const MESSAGES_DA: Partial<Record<MessageKey, string>> = {
   "workspace.dimensionAxisColors": "Målfelter i aksefarver",
   "workspace.dimensionAxisColorsHint": "Hvert værdifelt ved markeringen får farven på sin akse: X rød, Y grøn, Z blå.",
   "workspace.showRotationAngles": "Vis vinkler på vendte former",
+  "workspace.showSlideArrows": "Vis de røde og grønne flyttepile",
+  "workspace.showSlideArrowsHint": "Pilene øverst ved markeringen, der kun flytter den langs X eller Y. Slå dem fra, når de er i vejen; drejepilene og løftepilen bliver.",
   "workspace.startInPerspective": "Start editoren i perspektivvisning",
   "workspace.startWithCornerRuler": "Start nye designs med vinkelmåler i nulpunktet",
   "workspace.startWithCornerRulerHint": "Gælder hvert nyt design i denne browser. Eksisterende designs forbliver, som de er.",

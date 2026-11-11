@@ -4711,6 +4711,8 @@ export const MESSAGES_EN = {
   "workspace.dimensionAxisColors": "Dimension boxes in axis colours",
   "workspace.dimensionAxisColorsHint": "Each value box beside a selection takes the colour of its axis: red X, green Y, blue Z.",
   "workspace.showRotationAngles": "Show the angles of turned bodies",
+  "workspace.showSlideArrows": "Show the red and green move arrows",
+  "workspace.showSlideArrowsHint": "The arrows round the top of a selection that move it along X or Y only. Switch off when they get in the way; the turn arrows and the lift arrow stay.",
   "workspace.startInPerspective": "Start editor in perspective view",
   "workspace.startWithCornerRuler": "Start new designs with a framing square at the origin",
   "workspace.startWithCornerRulerHint": "Applies to every new design in this browser. Designs you already have stay as they are.",

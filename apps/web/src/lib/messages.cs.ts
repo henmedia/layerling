@@ -4701,6 +4701,8 @@ export const MESSAGES_CS: Record<MessageKey, string> = {
   "workspace.dimensionAxisColors": "Políčka rozměrů v barvách os",
   "workspace.dimensionAxisColorsHint": "Každé políčko s hodnotou u výběru dostane barvu své osy: X červeně, Y zeleně, Z modře.",
   "workspace.showRotationAngles": "Zobrazit úhly natočených těles",
+  "workspace.showSlideArrows": "Zobrazit červenou a zelenou šipku posunu",
+  "workspace.showSlideArrowsHint": "Šipky nahoře u výběru, které ho posouvají jen ve směru X nebo Y. Vypněte je, když překážejí; šipky otáčení a šipka zvednutí zůstanou.",
   "workspace.startInPerspective": "Spouštět editor v perspektivním pohledu",
   "workspace.startWithCornerRuler": "Začínat nové návrhy s úhelníkem v počátku souřadnic",
   "workspace.startWithCornerRulerHint": "Platí pro každý nový návrh v tomto prohlížeči. Stávající návrhy zůstanou, jak jsou.",

@@ -4700,6 +4700,8 @@ export const MESSAGES_ZH_TW: Partial<Record<MessageKey, string>> = {
   "workspace.dimensionAxisColors": "尺寸框使用座標軸顏色",
   "workspace.dimensionAxisColorsHint": "選取範圍旁的每個數值框使用其座標軸的顏色：X 紅色、Y 綠色、Z 藍色。",
   "workspace.showRotationAngles": "顯示旋轉後實體的角度",
+  "workspace.showSlideArrows": "顯示紅色和綠色移動箭頭",
+  "workspace.showSlideArrowsHint": "選取範圍頂部那兩個只沿 X 或 Y 移動它的箭頭。礙事時可關閉；旋轉箭頭和抬升箭頭仍會保留。",
   "workspace.startInPerspective": "編輯器以透視視圖啟動",
   "workspace.startWithCornerRuler": "新設計在原點自帶角尺",
   "workspace.startWithCornerRulerHint": "適用於此瀏覽器中的每個新設計。既有的設計保持不變。",

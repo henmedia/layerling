@@ -4624,6 +4624,8 @@ export const MESSAGES_PT_PT: Partial<Record<MessageKey, string>> = {
   "workspace.dimensionAxisColors": "Caixas de dimensões com as cores dos eixos",
   "workspace.dimensionAxisColorsHint": "Cada caixa de valor junto à seleção usa a cor do respetivo eixo: X vermelho, Y verde e Z azul.",
   "workspace.showRotationAngles": "Mostrar os ângulos dos sólidos rodados",
+  "workspace.showSlideArrows": "Mostrar as setas de mover vermelha e verde",
+  "workspace.showSlideArrowsHint": "As setas no topo da seleção que a movem só ao longo de X ou Y. Desligue-as quando atrapalharem; as setas de rodar e a seta de levantar mantêm-se.",
   "workspace.startInPerspective": "Iniciar o editor na vista em perspetiva",
   "workspace.startWithCornerRuler": "Começar os novos projetos com um esquadro na origem",
   "workspace.startWithCornerRulerHint": "Aplica-se a cada projeto novo deste navegador. Os projetos que já existem ficam como estão.",

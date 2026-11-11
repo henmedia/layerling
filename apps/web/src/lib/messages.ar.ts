@@ -4719,6 +4719,8 @@ export const MESSAGES_AR: Partial<Record<MessageKey, string>> = {
   "workspace.dimensionAxisColors": "مربعات الأبعاد بألوان المحاور",
   "workspace.dimensionAxisColorsHint": "يأخذ كل مربع قيمة بجانب التحديد لون محوره: X أحمر، وY أخضر، وZ أزرق.",
   "workspace.showRotationAngles": "إظهار زوايا الأجسام المدارة",
+  "workspace.showSlideArrows": "إظهار أسهم التحريك الحمراء والخضراء",
+  "workspace.showSlideArrowsHint": "الأسهم أعلى التحديد التي تحرّكه على X أو Y فقط. أوقفها إن كانت تعيق العمل؛ تبقى أسهم التدوير وسهم الرفع.",
   "workspace.startInPerspective": "بدء المحرر في عرض المنظور (Perspective)",
   "workspace.startWithCornerRuler": "بدء التصاميم الجديدة مع زاوية النجار عند نقطة الأصل",
   "workspace.startWithCornerRulerHint": "ينطبق على كل تصميم جديد في هذا المتصفح. تبقى التصاميم الموجودة كما هي.",

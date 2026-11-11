@@ -4713,6 +4713,8 @@ export const MESSAGES_ES: Partial<Record<MessageKey, string>> = {
   "workspace.dimensionAxisColors": "Casillas de medidas con los colores de los ejes",
   "workspace.dimensionAxisColorsHint": "Cada casilla de valor junto a la selección toma el color de su eje: X rojo, Y verde, Z azul.",
   "workspace.showRotationAngles": "Mostrar los ángulos de los cuerpos girados",
+  "workspace.showSlideArrows": "Mostrar las flechas de mover roja y verde",
+  "workspace.showSlideArrowsHint": "Las flechas en la parte superior de la selección que la mueven solo a lo largo de X o Y. Desactívalas si estorban; las flechas de girar y la de elevar se quedan.",
   "workspace.startInPerspective": "Abrir el editor en vista en perspectiva",
   "workspace.startWithCornerRuler": "Empezar los diseños nuevos con una escuadra en el origen",
   "workspace.startWithCornerRulerHint": "Vale para cada diseño nuevo de este navegador. Los diseños que ya existen se quedan como están.",

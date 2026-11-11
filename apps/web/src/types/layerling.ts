@@ -592,6 +592,8 @@ export type WorkplaneWorkspaceSettings = {
   dimensionAxisColors: boolean;
   /** A turned body shows its angles about X, Y and Z beside it while it is selected. */
   showRotationAngles: boolean;
+  /** The red X and green Y arrows round the top of a selection that move it along one axis (Discussion #1434); on by default. */
+  showSlideArrows: boolean;
   /** The editor opens a design with the view's scrollbars shown (Discussion #1241); the view bar still switches them. */
   startWithScrollbars: boolean;
   /** A folded view bar opens while the mouse is over its arrow and folds again once the mouse has left it (Discussion #1552). */

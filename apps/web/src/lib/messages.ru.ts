@@ -4702,6 +4702,8 @@ export const MESSAGES_RU: Partial<Record<MessageKey, string>> = {
   "workspace.dimensionAxisColors": "Поля размеров в цветах осей",
   "workspace.dimensionAxisColorsHint": "Каждое поле значения рядом с выделением получает цвет своей оси: X красный, Y зелёный, Z синий.",
   "workspace.showRotationAngles": "Показывать углы повёрнутых тел",
+  "workspace.showSlideArrows": "Показывать красную и зелёную стрелки перемещения",
+  "workspace.showSlideArrowsHint": "Стрелки сверху выделения, которые двигают его только по X или Y. Выключите, если мешают; стрелки поворота и стрелка подъёма остаются.",
   "workspace.startInPerspective": "Открывать редактор в перспективном виде",
   "workspace.startWithCornerRuler": "Начинать новые проекты с угольником в начале координат",
   "workspace.startWithCornerRulerHint": "Действует для каждого нового проекта в этом браузере. Уже существующие проекты остаются как есть.",

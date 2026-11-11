@@ -2038,6 +2038,8 @@ export const MESSAGES_PT_BR: Partial<Record<MessageKey, string>> = {
   "workspace.showOriginDimensions": "Mostrar distâncias até a origem",
   "workspace.dimensionsAlwaysVisible": "Dimensões sempre visíveis",
   "workspace.showRotationAngles": "Mostrar os ângulos de sólidos girados",
+  "workspace.showSlideArrows": "Mostrar as setas de mover vermelha e verde",
+  "workspace.showSlideArrowsHint": "As setas no topo da seleção que a movem só ao longo de X ou Y. Desligue quando atrapalharem; as setas de girar e a seta de levantar continuam.",
   "workspace.startInPerspective": "Abrir o editor na vista em perspectiva",
   "workspace.startWithCornerRuler": "Começar novos projetos com um esquadro na origem",
   "workspace.startWithCornerRulerHint": "Vale para cada projeto novo deste navegador. Os projetos que já existem ficam como estão.",
