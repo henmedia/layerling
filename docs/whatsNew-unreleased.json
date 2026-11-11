@@ -22,5 +22,17 @@
       "en": "With designs of many steps and large bodies, the list of steps in the History view took up to half a minute to show. Now it is there at once, also when you open it again.",
       "da": "Ved designs med mange trin og store legemer tog listen over trin i historikken op til et halvt minut at vise. Nu er den der straks, også når du åbner den igen."
     }
+  },
+  {
+    "title": {
+      "de": "Ordner kommen mit auf den Server",
+      "en": "Folders come along onto the server",
+      "da": "Mapper kommer med på serveren"
+    },
+    "body": {
+      "de": "„Alle auf den Server legen“ behält jetzt deine Ordner: Jeder Entwurf landet auf dem Server im selben Ordner wie im Browser. Auch ein einzelner Ordner kommt mit allem darin auf den Server, über „Auf den Server legen“ in seinem Menü oder indem du ihn auf den Reiter Server ziehst.",
+      "en": "\"Put all on the server\" now keeps your folders: each design ends up on the server in the same folder as in the browser. A single folder goes onto the server with everything in it too, with \"Put on the server\" in its menu or by dragging it onto the Server tab.",
+      "da": "\"Læg alle på serveren\" beholder nu dine mapper: hvert design havner på serveren i samme mappe som i browseren. En enkelt mappe kommer også på serveren med alt indhold, med \"Læg på serveren\" i dens menu eller ved at trække den til fanen Server."
+    }
   }
 ]

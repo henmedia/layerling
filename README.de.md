@@ -350,11 +350,12 @@ Entwürfe dieses Browsers. Ist der Reiter Server offen, legt **Neuen 3D-Entwurf 
 an, in dem du bist, **Neuer Ordner** einen Unterordner, und die Pfadzeile unter den Reitern sagt, wo du bist, und führt
 wieder hinaus. Entwürfe wandern per Ziehen auf einen Ordner oder auf einen Schritt der Pfadzeile – oder über
 **Verschieben nach …** in ihrem Menü. Ein Entwurf aus dem Browser kommt auf den Server, indem du seine Kachel auf den
-Reiter Server ziehst, oder mit **Auf den Server legen** in seinem Menü. Zurück geht es mit **In diesen Browser holen** im
+Reiter Server ziehst, oder mit **Auf den Server legen** in seinem Menü; ein Ordner kommt genauso hin, mit allem darin, und
+bleibt auf dem Server ein Ordner. Zurück geht es mit **In diesen Browser holen** im
 Menü eines Serverentwurfs oder indem du seine Kachel auf den Reiter Browser ziehst: Der Entwurf liegt dann nur noch in
 diesem Browser und verschwindet aus dem Serverordner, auch für die anderen.
 
-Zwei Schaltflächen auf der Startseite ersparen das Verschieben von Hand: **Alle auf den Server legen** legt alle Entwürfe dieses Browsers auf einmal in den Serverordner, und der Haken **Neue Entwürfe auf dem Server** lässt jeden neuen Entwurf gleich im Serverordner beginnen, sodass er sich dort ab der ersten Änderung sichert. Ein Entwurf, dessen Name auf dem Server schon vergeben ist, bleibt im Browser.
+Zwei Schaltflächen auf der Startseite ersparen das Verschieben von Hand: **Alle auf den Server legen** legt alle Entwürfe dieses Browsers auf einmal in den Serverordner, in dieselben Ordner, und der Haken **Neue Entwürfe auf dem Server** lässt jeden neuen Entwurf gleich im Serverordner beginnen, sodass er sich dort ab der ersten Änderung sichert. Ein Entwurf, dessen Name auf dem Server schon vergeben ist, bleibt im Browser.
 
 Das Suchfeld oben durchsucht den **ganzen** Serverordner, nicht nur den, in dem du gerade stehst. Jeder Treffer sagt,
 in welchem Ordner er liegt, und dieser Ordner ist ein Knopf: ein Klick, und du bist dort, die Suche ist beendet.

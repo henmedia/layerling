@@ -343,11 +343,12 @@ The start page then shows the designs in two tabs, **Server** for the shared fol
 this browser. With the Server tab open, **Create new 3D design** starts a design in the server folder you are in, **New
 folder** makes a subfolder, and a trail under the tabs says where you are and leads back out. Designs move by dragging
 them onto a folder or onto a step of the trail – or through **Move to …** in their menu. A design from your browser goes
-onto the server by dragging its card onto the Server tab, or with **Put on the server** in its menu. The way back is
+onto the server by dragging its card onto the Server tab, or with **Put on the server** in its menu; a folder goes the
+same way, with everything in it, and stays a folder on the server. The way back is
 **Put in this browser** in the menu of a server design, or dragging its card onto the Browser tab: the design then lives
 only in this browser and leaves the server folder, also for the others.
 
-Two buttons on the start page save the trouble of moving designs one by one: **Put all on the server** moves every design of this browser into the server folder in one go, and the tick **New designs on the server** makes each new design start in the server folder, so it is saved there from the first change on. A design whose name is already taken on the server stays in the browser.
+Two buttons on the start page save the trouble of moving designs one by one: **Put all on the server** moves every design of this browser into the server folder in one go, in the same folders, and the tick **New designs on the server** makes each new design start in the server folder, so it is saved there from the first change on. A design whose name is already taken on the server stays in the browser.
 
 The search box at the top searches the whole server folder, not just the one you are standing in. Every hit says
 which folder holds it, and that folder is a button: one click and you are there, with the search cleared. Folders are
