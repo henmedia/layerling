@@ -6,6 +6,8 @@ code still carries it - so a lower number further down is older, not newer.
 
 ## Unreleased
 
+- **Turned parts scale along with the others (#1645):** With several parts selected, a cylinder laid on its side stayed as long as it was when the selection was stretched along its length, and it was squeezed out of shape when the selection was stretched across. Each turned part now grows along its own sizes as far as the selection grows along them: the cylinder gets longer with the handles at its ends and thicker, still round, with those at its side, and it stays on the plate.
+
 - **The note of a bundle says where its holes cut (#1643):** The note in a bundle's settings said only that its holes cut nothing. It now says that they never cut the bundle's own parts, not even later in a group, where they cut only the other parts; a hole bundled with the box it sits in seemed to vanish when that bundle was grouped. Texts in 19 languages; the guide (chapter 5) said so already.
 
 ## 1.157.2
