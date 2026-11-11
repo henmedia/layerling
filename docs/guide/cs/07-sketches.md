@@ -136,7 +136,7 @@ Obrys nastavíte i bez otevření náčrtu: ve vlastnostech tělesa z náčrtu v
 
 {{ui:prop.sketchSilhouette}} vynechá všechny vnitřní obrysy, tedy otvory i prvky uvnitř nich, a zachová jen vnější siluetu. S {{ui:prop.sketchFill.outside}} vytvoří vykrajovátko: importujte SVG dvakrát, jednou jako vyplněnou siluetu pro základnu a podruhé jako siluetu s vnější čárou 1 až 2 mm pro stěnu. Přepínač je i v okně {{ui:sketch.stroke}} v náčrtu.
 
-Přestavění tělesa zruší předchozí zkosení a zaoblení hran stejně jako úprava samotného náčrtu.
+Přestavění tělesa zruší předchozí zkosení a zaoblení hran stejně jako úprava samotného náčrtu. {{ui:inspector.taper}} a {{ui:inspector.twist}} zůstávají; zúžení se zvětší nebo zmenší spolu s obrysem.
 
 ## Šikmé stěny pro razítka
 

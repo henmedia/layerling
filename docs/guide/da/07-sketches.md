@@ -140,7 +140,7 @@ Du kan sætte stregen uden at åbne skitsen også: i egenskaberne for en skitsef
 
 {{ui:prop.sketchSilhouette}} udelader hvert omrids der ligger inden i et andet: huller og hvad der ligger i dem. Kun det ydre omrids bevares. Sammen med {{ui:prop.sketchFill.outside}} laver det en småkageudstikker: importér en SVG to gange, én med silhuetten som areal til basen og én med silhuetten og 1 til 2 mm streg udenpå som væggen. Kontakten er også i {{ui:sketch.stroke}}-vinduet i skitsetilstand.
 
-Fas og rund på kanterne forsvinder når formen bygges igen, som når skitsen redigeres.
+Fas og rund på kanterne forsvinder når formen bygges igen, som når skitsen redigeres. {{ui:inspector.taper}} og {{ui:inspector.twist}} bliver; en tilspidsning vokser eller skrumper med omridset.
 
 ## Skrå vægge, til stempler
 

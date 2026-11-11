@@ -138,7 +138,7 @@ Je kunt de lijn ook instellen zonder de schets te openen: kies in de eigenschapp
 
 {{ui:prop.sketchSilhouette}} laat elke omtrek weg die binnen een andere ligt: gaten en wat erin ligt. Alleen de buitenste omtrek blijft over. Samen met {{ui:prop.sketchFill.outside}} maakt het een koekjesvorm: importeer een SVG twee keer, een keer met het silhouet als vlak voor de basis en een keer met het silhouet en 1 tot 2 mm lijn buiten als wand. De schakelaar zit ook in het venster {{ui:sketch.stroke}} in de schetsmodus.
 
-Afrondingen en afschuiningen op de randen verdwijnen wanneer het lichaam opnieuw wordt opgebouwd, net als bij het bewerken van de schets.
+Afrondingen en afschuiningen op de randen verdwijnen wanneer het lichaam opnieuw wordt opgebouwd, net als bij het bewerken van de schets. {{ui:inspector.taper}} en {{ui:inspector.twist}} blijven; een tapsheid groeit of krimpt mee met de omtrek.
 
 ## Schuine wanden, voor stempels
 
