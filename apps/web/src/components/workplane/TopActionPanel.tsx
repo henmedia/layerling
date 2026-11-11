@@ -151,14 +151,15 @@ export function TopActionPanel({
     setExportName((current) => current === previousSuggestedName ? suggestedName : current);
     previousSuggestedNameRef.current = suggestedName;
   }, [suggestedName]);
-  // A custom number from the settings joins the usual stops in its place; the last stop, None,
+  // A custom number from the settings joins the usual stops in its place; the first stop, None,
   // saves the design with its current state only, for sharing a file without its undo steps (#246).
+  // More history lies to the right, as on the slider in the workspace settings (#1631).
   const lylHistoryLimits = useMemo<readonly LylHistoryLimit[]>(() => {
-    const presets: number[] = [100, 50, 30];
+    const presets: number[] = [30, 50, 100];
     const numbers = typeof workspaceHistoryLimit === "number" && !presets.includes(workspaceHistoryLimit)
-      ? [...presets, workspaceHistoryLimit].sort((a, b) => b - a)
+      ? [...presets, workspaceHistoryLimit].sort((a, b) => a - b)
       : presets;
-    return ["unlimited", ...numbers, 0];
+    return [0, ...numbers, "unlimited"];
   }, [workspaceHistoryLimit]);
   const lylHistoryLimitIndex = Math.max(0, lylHistoryLimits.indexOf(lylHistoryLimit));
   const [printMaterial, setPrintMaterial] = useState<PrintMaterial>(() => {
