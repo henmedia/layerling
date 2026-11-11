@@ -8,7 +8,7 @@ import { gridfinityFootprintPatch } from "@/lib/gridfinityGeometry";
 import { pulleyFootprint, pulleyFromSize, pulleySizedPatch } from "@/lib/pulleyGeometry";
 import { type SelectionFrame } from "@/lib/liftGeometry";
 import type { SnapBox } from "@/lib/objectSnap";
-import { scaledHorizontalShapePatch } from "@/lib/scaleByPercent";
+import { scaledHorizontalShapePatch, worldBoxOfShapes } from "@/lib/scaleByPercent";
 import { POSITION_TYPED_LIMIT } from "@/lib/workplaneSettings";
 import { heightPatchKeepingBase, shapeIsTurned } from "@/lib/rotationPivot";
 import { cleanNearZero, proportionalResizeScale, resizedImportedMeshPositions, resizedShapeSize, shapeDepth, shapeHasTaper, shapeWidth } from "@/lib/workplaneShapes";
@@ -680,6 +680,14 @@ export function scaleSelectionItems(
     // Only the selection as a whole lies on the grid. A body of several is not snapped on its own: each would round
     // to a different factor and the layers of an imported drawing no longer fitted into one another (Discussion #1416).
     const sized = (size: number) => (items.length === 1 ? snapDimension(size, step, MIN_SHAPE_SIZE, maxSize) : clamp(size, MIN_SHAPE_SIZE, maxSize));
+    // A turned body (a cylinder laid on its side) grows along its own axes as far as the selection grows along them,
+    // or the stretch along X went to its own width while its length ran along X (#1645).
+    if (shapeIsTurned(item.startShape)) {
+      return {
+        id: item.id,
+        patch: turnedItemScalePatch(item.startShape, frame, Math.abs(nextX.scale), Math.abs(nextZ.scale), uniformScale, nextItemCenter, heightAnchorY, sized),
+      };
+    }
     const width = sized(shapeWidth(item.startShape) * Math.abs(nextX.scale));
     const depth = sized(shapeDepth(item.startShape) * Math.abs(nextZ.scale));
     const actualScaleX = width / Math.max(MIN_SHAPE_SIZE, shapeWidth(item.startShape));
@@ -695,4 +703,61 @@ export function scaleSelectionItems(
       patch: patchWithUniformHeightScale(item.startShape, patch, uniformScale, heightAnchorY),
     };
   });
+}
+
+/** Bodies that are round across: their width and depth are one diameter, so they never become an oval. */
+function keepsRoundFootprint(shape: WorkplaneShape) {
+  if (shape.kind === "gear") return shape.gearType !== "rack" && (shape.gearProfile === "involute" || shape.gearProfile === "round");
+  return shape.kind === "cylinder" || shape.kind === "star" || shape.kind === "knurl" || shape.kind === "hirth" || shape.kind === "pulley" || shape.kind === "finishingWasher";
+}
+
+/**
+ * A turned body of a selection that is stretched along the selection's sideways axes (#1645). Each of its own sizes
+ * grows by as much as the stretch lengthens the axis it runs along: a cylinder laid along X grows longer with the
+ * handles on X and thicker with those on Z. A body turned at a slant gets the nearest it can: a slanting stretch
+ * would be a shear, which no size of its own can show. It keeps its bottom where it was, so nothing sinks into the plate;
+ * with Shift (`uniformScale`) the selection grows in height too and its bottom moves with it.
+ */
+export function turnedItemScalePatch(
+  shape: WorkplaneShape,
+  frame: SelectionFrame,
+  scaleX: number,
+  scaleZ: number,
+  uniformScale: number,
+  center: THREE.Vector3,
+  heightAnchorY: number,
+  sized: (size: number) => number,
+): Partial<WorkplaneShape> {
+  const turn = quaternionForShape(shape);
+  const stretch = (own: THREE.Vector3) => {
+    const axis = own.applyQuaternion(turn);
+    return Math.hypot(axis.dot(frame.xAxis) * scaleX, axis.dot(frame.yAxis) * uniformScale, axis.dot(frame.zAxis) * scaleZ);
+  };
+  let widthScale = stretch(new THREE.Vector3(1, 0, 0));
+  const heightScale = stretch(new THREE.Vector3(0, 1, 0));
+  let depthScale = stretch(new THREE.Vector3(0, 0, 1));
+  if (keepsRoundFootprint(shape)) {
+    // The diameter takes the side that changes the most; the other one, across the stretch, keeps its size otherwise.
+    const diameterScale = Math.abs(Math.log(widthScale)) >= Math.abs(Math.log(depthScale)) ? widthScale : depthScale;
+    widthScale = depthScale = diameterScale;
+  }
+  const width = sized(shapeWidth(shape) * widthScale);
+  const depth = sized(shapeDepth(shape) * depthScale);
+  const height = Math.abs(heightScale - 1) < 1e-9 ? shape.height : sized(shape.height * heightScale);
+  const patch: Partial<WorkplaneShape> = {
+    ...scaledHorizontalShapePatch(shape, width / Math.max(MIN_SHAPE_SIZE, shapeWidth(shape)), depth / Math.max(MIN_SHAPE_SIZE, shapeDepth(shape))),
+    ...(height !== shape.height ? { height } : {}),
+    x: center.x,
+    z: center.z,
+    elevation: center.y - height / 2,
+  };
+  const startBottom = worldBoxOfShapes([shape]).min.y;
+  const wantedBottom = heightAnchorY + (startBottom - heightAnchorY) * uniformScale;
+  const delta = wantedBottom - worldBoxOfShapes([{ ...shape, ...patch } as WorkplaneShape]).min.y;
+  return {
+    ...patch,
+    x: cleanNearZero(center.x, 0.0005),
+    z: cleanNearZero(center.z, 0.0005),
+    elevation: cleanNearZero(clamp((patch.elevation ?? 0) + delta, MIN_ELEVATION, MAX_ELEVATION), 0.0005),
+  };
 }
