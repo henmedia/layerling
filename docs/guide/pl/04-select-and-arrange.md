@@ -22,7 +22,7 @@ Przy wielu częściach łatwo zgubić się w widoku. Lista obiektów ({{ui:edito
 ![Lista obiektów: grupa „Group” z dwiema częściami i kula obok niej. Ikona folderu otwiera grupę.](shot:object-list)
 
 - Kliknięcie wpisu zaznacza kształt, także części wewnątrz grupy. Z wciśniętym [[Shift]] dodajesz kolejne wpisy albo je odznaczasz, tak jak w widoku. Strzałki rozwijają i zwijają grupy.
-- Etykieta pokazuje, czy część jest {{ui:outliner.solid}}, czy {{ui:outliner.hole}}.
+- Litera za nazwą pokazuje, czy część jest {{ui:outliner.solid}}, czy {{ui:outliner.hole}}: to pierwsza litera słowa, a całe słowo pojawia się po najechaniu myszą.
 - Pod nazwą widać, jaki to kształt. Bryła, która nie jest już prostym kształtem (zaokrąglona, wydrążona lub zaimportowana), pokazuje {{ui:shape.exactBody}}, gdy eksport STEP zapisuje ją dokładnie, i {{ui:shape.mesh}}, gdy składa się tylko z trójkątów i trafia do STL. Zwężenie, pochylenie lub skręt dodane dopiero po zaokrągleniu lub wydrążeniu bryły wyginają tylko jej siatkę, więc wtedy pokazuje {{ui:shape.mesh}}.
 - Kłódka i oko blokują i ukrywają pojedyncze części.
 - {{ui:outliner.rename}} nadaje części własną nazwę. Ołówek obok nazwy na górze ustawień robi to samo dla zaznaczonego kształtu. Sensowne nazwy bardzo pomagają w większych projektach.
@@ -32,7 +32,7 @@ Przy wielu częściach łatwo zgubić się w widoku. Lista obiektów ({{ui:edito
 - Pole wyszukiwania znajduje kształty po nazwie i po rodzaju, więc także „walec” albo „otwór”. Zagląda też do wnętrza grup, niezależnie od głębokości zagnieżdżenia: grupa zawierająca trafienie zostaje na liście i rozwija się, pokazując pasujące części i grupy, które do nich prowadzą. Grupa znaleziona po własnej nazwie po otwarciu pokazuje wszystkie swoje części.
 - Strzałka po lewej stronie paska tytułu zwija listę do samego paska i z powrotem.
 
-Lista jest zadokowana tuż na prawo od kostki widoku. Przeciągnij ją za pasek tytułu, aby położyć ją w dowolnym miejscu na płaszczyźnie roboczej. Przechodzi pod kostką widoku i paskiem widoku. Upuść ją z powrotem obok kostki widoku albo kliknij dwukrotnie pasek tytułu, a znów się zadokuje. Przeglądarka zapamiętuje, gdzie była i czy była zwinięta.
+Lista jest zadokowana tuż na prawo od kostki widoku. Przeciągnij ją za pasek tytułu, aby położyć ją w dowolnym miejscu na płaszczyźnie roboczej. Przechodzi pod kostką widoku i paskiem widoku. Upuść ją z powrotem obok kostki widoku albo kliknij dwukrotnie pasek tytułu, a znów się zadokuje. Przeglądarka zapamiętuje, gdzie była i czy była zwinięta. Aby poszerzyć lub zwęzić listę, przeciągnij jej prawy dolny róg, od 240 do 600 pikseli; przeglądarka zapamiętuje także szerokość.
 
 ## Wpisywanie pozycji
 

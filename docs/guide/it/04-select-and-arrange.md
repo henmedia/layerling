@@ -22,7 +22,7 @@ Quando ci sono molte parti, è facile perderne qualcuna nella vista. L’elenco 
 ![L’elenco degli oggetti: il gruppo “Gruppo” contiene due parti e accanto c’è una sfera. L’icona della cartella apre il gruppo.](shot:object-list)
 
 - Fai clic su una voce per selezionare la forma, anche se si trova dentro un gruppo. Tieni premuto [[Shift]] per aggiungere o rimuovere altre voci, proprio come nella vista. Le frecce aprono e chiudono i gruppi.
-- L’etichetta indica se una parte è {{ui:outliner.solid}} oppure {{ui:outliner.hole}}.
+- La lettera dopo il nome indica se una parte è {{ui:outliner.solid}} o {{ui:outliner.hole}}: è l'iniziale della parola, e la parola intera compare tenendoci sopra il mouse.
 - Sotto il nome compare il tipo di forma. Un corpo che non è più una forma semplice (arrotondato, svuotato o importato) mostra {{ui:shape.exactBody}} quando l'esportazione STEP lo scrive in modo esatto, e {{ui:shape.mesh}} quando è fatto solo di triangoli e va esportato come STL. Una rastremazione, un'inclinazione o una torsione aggiunte dopo aver arrotondato o svuotato un corpo piegano solo la sua mesh, quindi allora mostra {{ui:shape.mesh}}.
 - Il lucchetto e l’occhio bloccano o nascondono le singole parti.
 - {{ui:outliner.rename}} assegna un nome alla parte; la matita accanto al nome in cima alle impostazioni rinomina allo stesso modo la forma selezionata. In un progetto grande, nomi chiari sono di grande aiuto.
@@ -32,7 +32,7 @@ Quando ci sono molte parti, è facile perderne qualcuna nella vista. L’elenco 
 - Il campo di ricerca trova le forme per nome e per tipo, per esempio “cilindro” o “foro”. Cerca anche all’interno dei gruppi, a qualsiasi livello: se un gruppo contiene una corrispondenza, resta nell’elenco e si apre mostrando le parti trovate e i gruppi che conducono a esse. Se invece il nome del gruppo stesso corrisponde alla ricerca, aprendolo vedrai tutte le sue parti.
 - La freccia all’estrema sinistra della barra del titolo comprime l’elenco nella sola barra e lo riapre.
 
-L’elenco è ancorato subito a destra del cubo di visualizzazione. Trascinalo dalla barra del titolo per posizionarlo ovunque sul piano di lavoro; può sovrapporsi al cubo e alla barra della vista. Riportalo accanto al cubo o fai doppio clic sulla barra del titolo per ancorarlo di nuovo. In questo browser vengono ricordati posizione e stato aperto o compresso.
+L’elenco è ancorato subito a destra del cubo di visualizzazione. Trascinalo dalla barra del titolo per posizionarlo ovunque sul piano di lavoro; può sovrapporsi al cubo e alla barra della vista. Riportalo accanto al cubo o fai doppio clic sulla barra del titolo per ancorarlo di nuovo. In questo browser vengono ricordati posizione e stato aperto o compresso. Per allargare o restringere l'elenco trascina il suo angolo in basso a destra, da 240 a 600 pixel; anche la larghezza viene ricordata dal browser.
 
 ## Digitare una posizione
 

@@ -27,7 +27,7 @@ import { limitedText } from "@/lib/textLength";
 import { NAME_TAG_LAYERS, NAME_TAG_LETTER_SIZE, textKerningPatch, textLetterSize, textLetterSizePatch, textShrinkPatch, textSpacingPatch } from "@/lib/nameTag";
 import { DEFAULT_ICON_TAG_WIDTH, ICON_TAG_LAYERS, MAX_ICON_TAG_WIDTH, MIN_ICON_TAG_WIDTH, isIconLayerBody, normalizeIconTagCount } from "@/lib/iconTag";
 import { automaticFlexiJoints, automaticFoldJoints, DEFAULT_FLEXI_FOLD, FLEXI_DEFAULTS, normalizeFlexiOptions, type FlexiOptions } from "@/lib/flexiJoints";
-import { LID_HINGE_TYPES, groupedWithMagnets, lidClickBumpsFit, lidDefaults, lidFlipTopFits, lidHandleFits, lidNeckFit, lidNeckFitPatch, lidStandardThread, lidTakesExtras, lidTakesMagnets, lidTetherFits, lidTopEdgeFits, magnetPocketDepth, normalizeLidOptions, type LidOptions, type LidThreadStandard } from "@/lib/lidTool";
+import { LID_HINGE_TYPES, groupedWithMagnets, lidClickBumpsFit, lidDefaults, lidFlipTopFits, lidHandleFits, lidNeckFit, lidNeckFitPatch, lidStandardThread, lidTakesMagnets, lidTetherFits, lidTopEdgeFits, magnetPocketDepth, normalizeLidOptions, type LidOptions, type LidThreadStandard } from "@/lib/lidTool";
 import { FIT_TEST_CLEARANCES, getPrinterPlay, MAX_PRINTER_PLAY, MIN_PRINTER_PLAY, normalizePrinterPlay, PRINTER_PLAY_SETTINGS, printerPlayPrinter, printerPlaySource, printerPlayStart, setPrinterPlay, setPrinterPlayPrinter, withPrinterPlay } from "@/lib/printerPlay";
 import { FIT_TEST_PIN_DIAMETER, fitTestHoles, fitTestShape, fitTestSpot } from "@/lib/fitTest";
 import { fitTestPinBaseChosen } from "@/lib/breakawayBase";
@@ -142,7 +142,8 @@ import { sectionMeasurement, sectionPointToWorld, snapSectionPoint } from "@/lib
 import { DEFAULT_INFILL_PERCENT, DEFAULT_WALLS, PRINT_MATERIAL_DENSITY, PRINT_MATERIALS, FILAMENT_DIAMETER_MM, normalizePrintMaterial, printEstimate, printEstimateWithInfill } from "@/lib/printEstimate";
 import { matchingEdgeIds } from "@/lib/edgeMatching";
 import { readEdgeModifierSettings, rememberEdgeModifierSetting, startingEdgeModifierAmount, type EdgeModifierSettings } from "@/lib/edgeModifierMemory";
-import { CAD_MODIFIER_MAX_SHARP_ANGLE, CAD_MODIFIER_REQUEST_TIMEOUT_MS, CAD_MODIFIER_PREPARE_TRIANGLE_LIMIT, cadModifierPrepareTimeoutMs, cadModifierTimeoutMessage, cadModifierUserErrorMessage, cadModifierWorkerFailureMessage, cadModifierCandidateEdge, cadModifierPresetValues, defaultCadModifierTangentChain, rescueSharpAngleForEdges, selectableCadModifierEdge, type CadModifierRequestPhase } from "@/lib/cadModifierRuntime";
+import { getEditorProfile, profileBooleanValue } from "@/lib/editorProfile";
+import { CAD_MODIFIER_MAX_SHARP_ANGLE, CAD_MODIFIER_REQUEST_TIMEOUT_MS, CAD_MODIFIER_PREPARE_TRIANGLE_LIMIT, cadModifierPrepareTimeoutMs, cadModifierTimeoutMessage, cadModifierSizeRefusal, cadModifierUserErrorMessage, cadModifierWorkerFailureMessage, cadModifierCandidateEdge, cadModifierPresetValues, defaultCadModifierTangentChain, rescueSharpAngleForEdges, selectableCadModifierEdge, type CadModifierRequestPhase } from "@/lib/cadModifierRuntime";
 import { isThinFace, thinFacesWith } from "@/lib/cadThinFaces";
 import { createCadPreviewQueue } from "@/lib/cadPreviewQueue";
 import { cloneWorkplaneShapeSnapshot, compactEdgeTreatmentHistory, edgeTreatmentAppliedFrame, groupBeforeEdgeTreatments, restoreShapeBeforeEdgeTreatment, tubeBeforeEdgeTreatments, wasGroupBeforeEdgeTreatments } from "@/lib/edgeTreatmentHistory";
@@ -184,6 +185,7 @@ import { useFileAccept } from "@/lib/fileAccept";
 import { exportLylProject, LYL_CREATED_WITH_VERSION, LYL_MEDIA_TYPE, lylThumbnailFiles } from "@/lib/lylProject";
 import { projectThumbnailPngBytes } from "@/lib/backupDownload";
 import { isBuildMessage, reportWorkerBuild } from "@/lib/buildStamp";
+import { createKernelGate, isKernelStatusMessage, warmKernelMessage, type KernelGate } from "@/lib/cadKernelGate";
 import { ensureLylFileWritable, forgetLylFile, forgetStlFile, linkedLylFile, linkedStlFile, lylFileAccessSupported, pickLylFileToOpen, pickLylFileToSave, pickStlFileToSave, rememberLylFile, rememberStlFile, writeLylFile, type LylFileHandle } from "@/lib/lylFileAccess";
 import { copyNamePatterns, shapeNamesIn, withCopyName } from "@/lib/shapeCopyName";
 import { clipboardShape, displayShapeName, hasOwnShapeName, iconTagAsset, qrCodeAsset, makeShapeFromAsset, nameTagAsset, sbcBoardAsset, shapeAssetLabel, toolbarShapeAssets } from "@/lib/shapeCatalog";
@@ -241,7 +243,7 @@ import { wrapMeshAroundCylinder, type CylinderWrapError } from "@/lib/cylinderWr
 import { normalizeSurfaceTexture, SURFACE_TEXTURE_AXES, SURFACE_TEXTURE_CAP_EDGES, SURFACE_TEXTURE_CAP_STYLES, SURFACE_TEXTURE_CARBON_WEAVES, SURFACE_TEXTURE_BARK_TYPES, SURFACE_TEXTURE_BRICK_BONDS, SURFACE_TEXTURE_TIMBER_BRACINGS, SURFACE_TEXTURE_BUMP_GRIDS, SURFACE_TEXTURE_CRACK_STARTS, SURFACE_TEXTURE_CRACK_STYLES, SURFACE_TEXTURE_DETAILS, SURFACE_TEXTURE_DIRECTIONS, SURFACE_TEXTURE_IMAGES, SURFACE_TEXTURE_LIMITS, SURFACE_TEXTURE_PATTERNS, SURFACE_TEXTURE_PROFILES, SURFACE_TEXTURE_PROJECTIONS, SURFACE_TEXTURE_TILINGS, SURFACE_TEXTURE_FACE_NAMES, normalizeSurfaceTextureFaces, surfaceTextureFacePick, surfaceTexturePickedFaceIds, toggleSurfaceTexturePickedFace, type SurfaceTextureFace, type SurfaceTextureFacePick, SURFACE_TEXTURE_WOOD_CUTS, SURFACE_TEXTURE_WOOD_TYPES, type SurfaceTextureMask, type SurfaceTextureSettings } from "@/lib/surfaceTexture";
 import { normalizeSurfaceTextureOwnImage, SURFACE_TEXTURE_OWN_IMAGE_SIZE } from "@/lib/surfaceTextureImages";
 import { SURFACE_TEXT_FONTS, surfaceTextOutline } from "@/lib/surfaceTextOutline";
-import { useInspectorCard } from "@/lib/inspectorCards";
+import { surfaceTextureCardStaysOpen } from "@/lib/inspectorCards";
 import { canChangeSurfaceTexture, canTextureSurface, isSurfacePatternBundle, offersSurfaceTexture, offersSurfaceTextureMask, rememberPatternColor, sceneWithSurfaceBody, shapeUnderSurfaceTexture, surfaceTextureEntry, surfaceTextureGoldShape, surfacePatternLabel, surfacePatternPartOf, surfacePatternPartWay, surfaceTextureResultShape, surfaceTextureInput, surfaceTextureMaskOf, surfaceTextureMasksFor, surfaceTextureLayersToMake, surfaceTextureLayerPlaced, mergedSurfaceTextureOutcome, textureSurfaceOffThread } from "@/lib/surfaceTextureShape";
 import { normalizeVaseSettings, parseVaseSettingsInput } from "@/lib/vaseSettings";
 import { sceneWithVaseAccessories, vaseAccessoryKindName, vaseAccessoryName, vaseShapePatch } from "@/lib/vaseShape";
@@ -376,6 +378,10 @@ type EdgeModifierSession = {
   workingEdgeIds?: number[];
   // The edge(s) whose selection broke a working treatment; drawn red while that error stands.
   failedEdgeIds?: number[];
+  // The error shown when the size was refused, to offer the search for the largest size that fits while it stands (#1635).
+  sizeRefusedError?: string | null;
+  // That search is running.
+  searchingLargest?: boolean;
   preview: WorkplaneShape | null;
   componentPreviews: EdgeModifierComponentPreview[];
 };
@@ -488,6 +494,9 @@ const PROJECT_SYNC_HELD_MAX_MS = 2000;
 const MAX_SKETCH_HISTORY_ENTRIES = 100;
 const NORMAL_SELECTION_CAD_EDGE_MIN_ANGLE = 60;
 const MIN_EDGE_MODIFIER_AMOUNT = 0.001;
+// The worker gives up its search for the largest size after 15 s with the best one so far; a single heavy run of the
+// kernel can go past that, and a timeout here restarts the worker and closes the tool.
+const LARGEST_EDGE_AMOUNT_TIMEOUT_MS = 90_000;
 const SEPARATE_PARTS_VERTEX_TOLERANCE = 0.0005;
 
 
@@ -3635,7 +3644,7 @@ export function LayerlingEditor({
   const cadModifierPendingRef = useRef(new Map<number, {
     resolve: (message: CadModifierWorkerResponse) => void;
     reject: (error: Error) => void;
-    timer: number;
+    cancelTimer: () => void;
   }>());
   const cadModifierRequestRef = useRef(0);
   const cadModifierPrepareRef = useRef(0);
@@ -3643,7 +3652,9 @@ export function LayerlingEditor({
   const cadModifierBaseShapeRef = useRef<WorkplaneShape | null>(null);
   const cadModifierBaseFingerprintRef = useRef("");
   const cadModifierSourcePartsRef = useRef<WorkplaneShape[]>([]);
-  const cadModifierWatchdogRef = useRef<{ requestId: number; phase: CadModifierRequestPhase; timer: number } | null>(null);
+  const cadModifierWatchdogRef = useRef<{ requestId: number; phase: CadModifierRequestPhase; cancelTimer: () => void } | null>(null);
+  // The edge worker's kernel: its time limits count only once it is loaded (lib/cadKernelGate.ts, #1612).
+  const cadModifierKernelGateRef = useRef<KernelGate | null>(null);
   const cadPreviewSendRef = useRef<(payload: CadPreviewPayload) => number | null>(() => null);
   const cadPreviewQueueRef = useRef(createCadPreviewQueue<CadPreviewPayload>((payload) => cadPreviewSendRef.current(payload)));
   const cadModifierWorkerRestartRef = useRef<() => Worker | null>(() => null);
@@ -3653,13 +3664,21 @@ export function LayerlingEditor({
   const clearCadModifierWatchdog = useCallback((requestId?: number) => {
     const active = cadModifierWatchdogRef.current;
     if (!active || (requestId !== undefined && active.requestId !== requestId)) return;
-    window.clearTimeout(active.timer);
+    active.cancelTimer();
     cadModifierWatchdogRef.current = null;
+  }, []);
+
+  /** setTimeout for a request to the edge worker, counting from when its kernel is loaded (#1612). */
+  const cadModifierTimeout = useCallback((callback: () => void, timeoutMs: number) => {
+    const gate = cadModifierKernelGateRef.current;
+    if (gate) return gate.timeout(callback, timeoutMs);
+    const timer = window.setTimeout(callback, timeoutMs);
+    return () => window.clearTimeout(timer);
   }, []);
 
   const armCadModifierWatchdog = useCallback((requestId: number, phase: CadModifierRequestPhase, timeoutMs = CAD_MODIFIER_REQUEST_TIMEOUT_MS) => {
     clearCadModifierWatchdog();
-    const timer = window.setTimeout(() => {
+    const cancelTimer = cadModifierTimeout(() => {
       const active = cadModifierWatchdogRef.current;
       if (!active || active.requestId !== requestId) return;
       cadModifierWatchdogRef.current = null;
@@ -3677,14 +3696,14 @@ export function LayerlingEditor({
       } : current);
       setNotice(message);
     }, timeoutMs);
-    cadModifierWatchdogRef.current = { requestId, phase, timer };
-  }, [clearCadModifierWatchdog]);
+    cadModifierWatchdogRef.current = { requestId, phase, cancelTimer };
+  }, [cadModifierTimeout, clearCadModifierWatchdog]);
 
   useEffect(() => {
     let disposed = false;
     const rejectPendingRequests = (message: string) => {
       cadModifierPendingRef.current.forEach((pending) => {
-        window.clearTimeout(pending.timer);
+        pending.cancelTimer();
         pending.reject(new Error(message));
       });
       cadModifierPendingRef.current.clear();
@@ -3706,13 +3725,22 @@ export function LayerlingEditor({
         setNotice(message);
       }
     };
-    const createWorker = () => {
+    const createWorker = (warm: boolean) => {
       if (disposed) return null;
       cadModifierWorkerRef.current?.terminate();
+      cadModifierKernelGateRef.current?.dispose();
+      cadModifierKernelGateRef.current = null;
       try {
         const worker = new Worker(new URL("../workers/cadModifier.worker.ts", import.meta.url), { type: "module" });
+        const gate = createKernelGate();
         cadModifierWorkerRef.current = worker;
-        worker.onmessage = handleWorkerMessage;
+        cadModifierKernelGateRef.current = gate;
+        worker.onmessage = (event: MessageEvent<CadModifierWorkerResponse>) => {
+          if (isKernelStatusMessage(event.data)) gate.open();
+          else handleWorkerMessage(event);
+        };
+        // A worker started again after a timeout loads its kernel at once; the first one when the editor is idle.
+        if (warm) worker.postMessage(warmKernelMessage());
         worker.onerror = (event) => {
           event.preventDefault();
           reportWorkerFailure(worker);
@@ -3733,7 +3761,7 @@ export function LayerlingEditor({
       clearCadModifierWatchdog(message.requestId);
       const pending = cadModifierPendingRef.current.get(message.requestId);
       if (pending) {
-        window.clearTimeout(pending.timer);
+        pending.cancelTimer();
         cadModifierPendingRef.current.delete(message.requestId);
         if (message.type === "error") {
           pending.reject(new Error(message.message));
@@ -3836,13 +3864,16 @@ export function LayerlingEditor({
           setNotice(cadModifierUserErrorMessage(message.message) ?? message.message);
           return;
         }
+        const shownError = message.tightestBend !== undefined
+          ? tightBendError(message.tightestBend, workspaceSettingsRef.current)
+          : cadModifierUserErrorMessage(message.message) ?? message.message;
         setEdgeModifier((current) => current ? {
           ...current,
           busy: false,
           preview: null,
-          error: message.tightestBend !== undefined
-            ? tightBendError(message.tightestBend, workspaceSettingsRef.current)
-            : cadModifierUserErrorMessage(message.message) ?? message.message,
+          error: shownError,
+          // A refusal for the size offers the search for the largest one that fits (Discussion #1635).
+          sizeRefusedError: message.tightestBend !== undefined || cadModifierSizeRefusal(message.message) ? shownError : null,
           // The edges with the tight bend are the cause, whichever edge was picked last.
           failedEdgeIds: message.tightestBend !== undefined
             ? message.failedEdgeIds ?? []
@@ -3854,8 +3885,8 @@ export function LayerlingEditor({
         }
       }
     }
-    cadModifierWorkerRestartRef.current = createWorker;
-    createWorker();
+    cadModifierWorkerRestartRef.current = () => createWorker(true);
+    createWorker(false);
     return () => {
       disposed = true;
       clearCadModifierWatchdog();
@@ -3863,6 +3894,8 @@ export function LayerlingEditor({
       rejectPendingRequests("The CAD worker was closed");
       cadModifierWorkerRef.current?.terminate();
       cadModifierWorkerRef.current = null;
+      cadModifierKernelGateRef.current?.dispose();
+      cadModifierKernelGateRef.current = null;
     };
   }, [clearCadModifierWatchdog]);
 
@@ -3876,7 +3909,8 @@ export function LayerlingEditor({
     cadModifierRequestRef.current = requestId;
     cadModifierLatestPreviewRef.current = requestId;
     cadModifierPrepareRef.current = requestId;
-    if (hadInFlightRequest) {
+    // A worker still loading its kernel is only downloading: stopped, it would begin the 21 MB again from nothing (#1612).
+    if (hadInFlightRequest && cadModifierKernelGateRef.current?.isOpen !== false) {
       cadModifierWorkerRef.current?.terminate();
       cadModifierWorkerRef.current = null;
       cadModifierWorkerRestartRef.current();
@@ -3897,6 +3931,8 @@ export function LayerlingEditor({
         resetManifoldRuntime();
       });
       warmGeometryWorker();
+      // The CAD kernel is 21 MB; loaded now, the first edge tool, Hollow or Split need not wait for it (#1612).
+      cadModifierWorkerRef.current?.postMessage(warmKernelMessage());
     };
     if ("requestIdleCallback" in window) {
       const idleId = window.requestIdleCallback(warmBooleanRuntime, { timeout: 1500 });
@@ -7696,11 +7732,11 @@ export function LayerlingEditor({
     const requestId = cadModifierRequestRef.current + 1;
     cadModifierRequestRef.current = requestId;
     return new Promise<CadModifierWorkerResponse>((resolve, reject) => {
-      const timer = window.setTimeout(() => {
+      const cancelTimer = cadModifierTimeout(() => {
         if (!cadModifierPendingRef.current.has(requestId)) return;
         const pendingRequests = [...cadModifierPendingRef.current.values()];
         cadModifierPendingRef.current.clear();
-        pendingRequests.forEach((pending) => window.clearTimeout(pending.timer));
+        pendingRequests.forEach((pending) => pending.cancelTimer());
         cadModifierWorkerRef.current?.terminate();
         cadModifierWorkerRef.current = null;
         cadPreviewQueueRef.current.reset();
@@ -7715,16 +7751,16 @@ export function LayerlingEditor({
         cadModifierWorkerRestartRef.current();
         pendingRequests.forEach((pending) => pending.reject(new Error("Timed out waiting for the CAD worker; the worker was restarted")));
       }, timeoutMs);
-      cadModifierPendingRef.current.set(requestId, { resolve, reject, timer });
+      cadModifierPendingRef.current.set(requestId, { resolve, reject, cancelTimer });
       try {
         worker.postMessage({ ...request, requestId } as CadModifierWorkerRequest, transfer);
       } catch (error) {
-        window.clearTimeout(timer);
+        cancelTimer();
         cadModifierPendingRef.current.delete(requestId);
         reject(error instanceof Error ? error : new Error("The CAD worker rejected the request"));
       }
     });
-  }, []);
+  }, [cadModifierTimeout]);
 
   const cancelEdgeModifier = useCallback(() => {
     invalidateCadModifierSession();
@@ -7839,11 +7875,16 @@ export function LayerlingEditor({
     }
     // The settings last chosen for this tool in this browser, so Apply, Undo and the next start keep them (#1342).
     const kept = readEdgeModifierSettings(kind);
+    const options = kind === "fillet" ? getEditorProfile()?.tools.fillet?.options : undefined;
+    const onlyVisibleEdges = profileBooleanValue(options?.onlyVisibleEdges, kept.onlyVisibleEdges);
     const largestDimension = Math.max(shapeWidth(selectedShape), shapeDepth(selectedShape), selectedShape.height);
+    const maxAmount = Math.max(MIN_EDGE_MODIFIER_AMOUNT, largestDimension * 0.99);
+    const defaultAmount = Math.max(MIN_EDGE_MODIFIER_AMOUNT, Math.min(1, shapeWidth(selectedShape) / 6, shapeDepth(selectedShape) / 6, selectedShape.height / 6));
+    const profileAmount = options?.amount?.default;
     const amount = startingEdgeModifierAmount(
       kept,
-      Math.max(MIN_EDGE_MODIFIER_AMOUNT, Math.min(1, shapeWidth(selectedShape) / 6, shapeDepth(selectedShape) / 6, selectedShape.height / 6)),
-      Math.max(MIN_EDGE_MODIFIER_AMOUNT, largestDimension * 0.99),
+      profileAmount !== undefined && profileAmount >= MIN_EDGE_MODIFIER_AMOUNT && profileAmount <= maxAmount ? profileAmount : defaultAmount,
+      maxAmount,
     );
     cadModifierBaseShapeRef.current = selectedShape;
     cadModifierBaseFingerprintRef.current = projectShapesFingerprint([selectedShape]);
@@ -7861,7 +7902,7 @@ export function LayerlingEditor({
       chamferAngle: kept.chamferAngle ?? 45,
       quality: kept.quality ?? "standard",
       tangentChain: defaultCadModifierTangentChain(appliedEdgeTreatmentCount),
-      ...(kept.onlyVisibleEdges !== undefined ? { onlyVisibleEdges: kept.onlyVisibleEdges } : {}),
+      ...(onlyVisibleEdges !== undefined ? { onlyVisibleEdges } : {}),
       ...(kind === "fillet" && kept.concave !== undefined ? { concave: kept.concave } : {}),
       preserveEdgeSize: selectedShape.edgeResizeMode === "preserve",
       busy: true,
@@ -8042,7 +8083,9 @@ export function LayerlingEditor({
     const sourceProjectId = projectInfoRef.current.projectId;
     const kind: CadModifierKind = params.kind === "fillet" ? "fillet" : params.kind === "chamfillet" ? "chamfillet" : "chamfer";
     const sharpAngle = Math.max(1, Math.min(CAD_MODIFIER_MAX_SHARP_ANGLE, mcpNumber(params.sharpAngle, 25)));
-    const amount = Math.max(MIN_EDGE_MODIFIER_AMOUNT, mcpNumber(params.amount, 1));
+    // "largest": the largest size the picked edges take, searched as the panel's button does (Discussion #1635).
+    const largest = params.amount === "largest";
+    let amount = largest ? 0 : Math.max(MIN_EDGE_MODIFIER_AMOUNT, mcpNumber(params.amount, 1));
     const chamferAngle = Math.max(kind === "chamfillet" ? 15 : 5, Math.min(kind === "chamfillet" ? 75 : 85, mcpNumber(params.chamferAngle, 45)));
     const quality: CadModifierQuality = params.quality === "draft" || params.quality === "fine" ? params.quality : "standard";
     const preserveEdgeSize = typeof params.preserveEdgeSize === "boolean" ? params.preserveEdgeSize : shape.edgeResizeMode === "preserve";
@@ -8075,6 +8118,22 @@ export function LayerlingEditor({
     }
     if (endAmount !== undefined && selectedEdgeIds.length !== 1) {
       throw new Error("endAmount (a variable radius) works on exactly one edge id");
+    }
+    if (largest) {
+      if (endAmount !== undefined) throw new Error("amount \"largest\" does not go with endAmount (a variable radius)");
+      // Searched below maxAmount, or below the body's largest measure, the most the panel's field takes.
+      const upper = Math.max(MIN_EDGE_MODIFIER_AMOUNT * 2, mcpNumber(params.maxAmount, Math.max(shapeWidth(shape), shapeDepth(shape), shape.height) * 0.99));
+      const search = await postCadModifierRequestAsync({
+        type: "largest",
+        kind,
+        edgeIds: selectedEdgeIds,
+        amount: upper,
+        chamferAngle,
+        ...(concave ? { concave } : {}),
+      }, [], LARGEST_EDGE_AMOUNT_TIMEOUT_MS);
+      if (search.type !== "largest") throw new Error("The CAD worker did not return a size");
+      if (search.amount === null) throw new Error("No size of this chamfer or fillet fits the chosen edges, not even a very small one: the size is not what stands in the way");
+      amount = search.amount;
     }
     const previewResponse = await postCadModifierRequestAsync({
       type: "preview",
@@ -8159,6 +8218,7 @@ export function LayerlingEditor({
     );
     return {
       object: mcpShapeSummary(modifiedShape),
+      ...(largest ? { amount } : {}),
       selectedEdgeIds,
       ...(cornerEdgeIds.length ? { cornerEdgeIds } : {}),
       // The sharp inner corners at the picked edges' ends, rounded or chamfered first at this size so they went through.
@@ -8913,7 +8973,6 @@ export function LayerlingEditor({
     setLidTool((current) => current ? { ...current, busy: true, error: null } : current);
     // Click bumps, a handle and end plugs the panel does not show (a flat lid, a pivot lid, a hinge not flush)
     // are not asked for, nor magnets and a hinge with a screw lid or a bayonet lid, nor a tether without one, nor a flip-top with another lid; nor magnets and a hinge with a slide-in lid.
-    const extras = lidTakesExtras(lidTool);
     void makeLid({
       type, thickness, gap, depth, wall, magnets: magnets && lidTakesMagnets(lidTool), magnetDiameter, magnetHeight, magnetGap, hinge: hinge && LID_HINGE_TYPES.includes(type), hingePin, hingeGap, hingePinPlay, hingeKnuckles, hingePrintPin, hingeSide, hingeTeardrop, hingeStyle,
       hingeEndPlugs: hingeEndPlugs && hingeStyle === "flush",
@@ -9381,6 +9440,69 @@ export function LayerlingEditor({
     };
     setEdgeEditRound((round) => round + 1);
   }, [commitShapes, edgeModifier, invalidateCadModifierSession, shapes]);
+
+  /*
+   * The largest size up to the refused one that the picked edges still take (Discussion #1635). On a click only, never by
+   * itself: a size typed in is what the person wants, and the search costs a dozen runs of the kernel. The size found goes
+   * into the field like a typed one and is previewed as usual. Nothing changes when the edges, the size or the kind
+   * changed meanwhile.
+   */
+  const findLargestEdgeAmount = useCallback(async () => {
+    const session = edgeModifierRef.current;
+    if (!session?.prepared || session.searchingLargest || session.selectedEdgeIds.length === 0) return;
+    if (session.kind !== "fillet" && session.kind !== "chamfer" && session.kind !== "chamfillet") return;
+    const kind = session.kind;
+    const searchKey = (candidate: EdgeModifierSession) => JSON.stringify([candidate.kind, candidate.amount, candidate.endAmount ?? null, candidate.concave === true, candidate.chamferAngle, candidate.selectedEdgeIds]);
+    const key = searchKey(session);
+    const prepareId = cadModifierPrepareRef.current;
+    const stopSearching = () => setEdgeModifier((current) => current?.searchingLargest ? { ...current, searchingLargest: false } : current);
+    setEdgeModifier((current) => current ? { ...current, searchingLargest: true } : current);
+    setNotice(t("status.edgeLargestSearching"), true);
+    let found: { amount: number | null; endAmount?: number };
+    try {
+      const response = await postCadModifierRequestAsync({
+        type: "largest",
+        kind,
+        edgeIds: session.selectedEdgeIds,
+        amount: session.amount,
+        chamferAngle: session.chamferAngle,
+        ...(kind === "fillet" && session.endAmount != null ? { endAmount: session.endAmount } : {}),
+        ...(kind === "fillet" && session.concave ? { concave: true } : {}),
+      }, [], LARGEST_EDGE_AMOUNT_TIMEOUT_MS);
+      if (response.type !== "largest") throw new Error("The CAD worker did not return a size");
+      found = response;
+    } catch (error) {
+      stopSearching();
+      const raw = error instanceof Error ? error.message : String(error ?? "");
+      setNotice(cadModifierUserErrorMessage(raw) ?? raw);
+      return;
+    }
+    const current = edgeModifierRef.current;
+    if (!current || cadModifierPrepareRef.current !== prepareId || searchKey(current) !== key) {
+      stopSearching();
+      return;
+    }
+    if (found.amount === null) {
+      stopSearching();
+      setNotice(t("status.edgeLargestNone"), true);
+      return;
+    }
+    const amount = Math.max(MIN_EDGE_MODIFIER_AMOUNT, Math.min(edgeModifierMaxAmount, found.amount));
+    const endAmount = found.endAmount !== undefined ? Math.max(MIN_EDGE_MODIFIER_AMOUNT, Math.min(edgeModifierMaxAmount, found.endAmount)) : undefined;
+    keepEdgeSetting({ amount });
+    setEdgeModifier((latest) => latest ? {
+      ...latest,
+      amount,
+      ...(endAmount !== undefined ? { endAmount } : {}),
+      searchingLargest: false,
+      preview: null,
+      busy: latest.selectedEdgeIds.length > 0,
+      error: null,
+      sizeRefusedError: null,
+    } : latest);
+    const workspace = workspaceSettingsRef.current;
+    setNotice(t("status.edgeLargestFound", { size: `${formatLengthMm(amount, workspace.accuracy)} ${lengthDisplayUnit(workspace).label}` }), true);
+  }, [edgeModifierMaxAmount, keepEdgeSetting, postCadModifierRequestAsync]);
 
   useEffect(() => {
     if (!edgeModifier) return;
@@ -12625,9 +12747,16 @@ export function LayerlingEditor({
     };
   }, [commitShapes, historyViewState, imageCalibration, selectedReferenceImage]);
 
-  // The surface texture card, opened and closed by the button under "Modify" as by its own header; like the other
-  // cards it stays open for the next body until it is closed.
-  const [surfaceTextureOpen, setSurfaceTextureOpen] = useInspectorCard("surfaceTexture", false);
+  // The surface texture card, opened and closed by the button under "Modify" as by its own header. Unlike the other
+  // cards it is not kept: it starts closed and closes when another body or none is chosen (surfaceTextureCardStaysOpen).
+  const [surfaceTextureOpen, setSurfaceTextureOpen] = useState(false);
+  const surfaceTextureBody = selectedIds.length === 1 ? selectedIds[0] : null;
+  const surfaceTextureBodyRef = useRef(surfaceTextureBody);
+  useEffect(() => {
+    const before = surfaceTextureBodyRef.current;
+    surfaceTextureBodyRef.current = surfaceTextureBody;
+    if (!surfaceTextureCardStaysOpen(before, surfaceTextureBody, (id) => shapesRef.current.some((shape) => shape.id === id))) setSurfaceTextureOpen(false);
+  }, [surfaceTextureBody]);
   // Picking faces ends with the card closed, another selection, or the body changed (moved, resized, textured).
   useEffect(() => {
     if (!surfaceFacePick) return;
@@ -19465,6 +19594,9 @@ export function LayerlingEditor({
           busy={edgeModifier.busy}
           prepared={edgeModifier.prepared}
           error={edgeModifier.error}
+          sizeRefused={edgeModifier.error !== null && edgeModifier.error === edgeModifier.sizeRefusedError}
+          searchingLargest={edgeModifier.searchingLargest === true}
+          onFindLargest={() => void findLargestEdgeAmount()}
           // The same value again changes nothing: dropping the preview for it left Apply
           // waiting on a computation nobody started (#204).
           onAmountChange={(value) => { keepEdgeSetting({ amount: value }); setEdgeModifier((current) => {

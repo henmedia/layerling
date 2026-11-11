@@ -104,7 +104,7 @@ Ein vollständiges CAD-Paket ist es nicht: Es gibt keine parametrische Zeitleist
 
 ### Bearbeiten
 
-- **Kanten fasen und verrunden** – jede Kante eines Körpers brechen oder abrunden, eine gerade Kante auch konkav als Hohlkehle ausschneiden wie die ausgehöhlten Ecken einer Box, und später wieder zurücknehmen oder ändern.
+- **Kanten fasen und verrunden** – jede Kante eines Körpers brechen oder abrunden, eine gerade Kante auch konkav als Hohlkehle ausschneiden wie die ausgehöhlten Ecken einer Box, und später wieder zurücknehmen oder ändern; ist eine Größe zu groß für die Kante, findet ein Klick die größte passende.
 - **Skizzen** – Umrisse aus Linien, Kurven und fertigen Formen zeichnen, mit Stift, Finger oder Maus freihand zeichnen (die Linie wird zu wenigen Punkten, die sich bearbeiten lassen), Linien schon beim Zeichnen nach Länge und Winkel setzen („50<30“, Umschalt rastet in 15°-Schritten ein), Längen, Winkel, Größen und die Lage eines ausgewählten Umrisses, Punkts oder Kurvengriffs eintippen (Rechnungen wie „60+12,5“ gehen in jedem Zahlenfeld), Ecken runden oder fasen, an den Umrissen anderer Körper einrasten, Hilfslinien zum Einrasten ziehen und daraus exakte Körper ziehen, drehen oder an einem Pfad entlangziehen. Eine Drehung mit Steigung windet den Umriss als einen durchgehenden Strang zur Schraubenlinie statt zu Ringen, wie Filament auf einer Spule. Eine Skizze lässt sich auch als Kontur bauen: Ein geschlossener Umriss wird ein Rahmen, innen, außen oder mittig auf der Linie, eine offene Linie ein Streifen mit flachen, eckigen oder runden Enden. Eine Zeichnung oder ein Foto unter der Skizze wird mit einem Klick zu Skizzenlinien nachgezeichnet, der dunkle oder der helle Teil, bei einer Schwelle, die du einstellst.
 - **Aushöhlen** – aus einem Körper Wände gleicher Stärke machen, auf jeder gewünschten Seite offen (oben, unten, vorne, hinten, links, rechts, beliebig kombiniert) oder ganz geschlossen – für Dosen, Becher und Gehäuse.
 - **Gefälle und Zulaufen in der Länge** – die Oberseite von Quader, Zylinder, Vieleck, Rohr, Keil oder rundem Dach zu einem Ende hin abfallen lassen oder die Seiten aller außer dem Rohr zu einem Ende hin zusammenlaufen lassen, gerade oder gewölbt, per Zahl oder mit einem Punkt am Ende: ein Dach, das in der Länge abfällt, eine Rampe, ein schräg abgeschnittenes Rohrende, ein Bootsbug. Ein Gefälle bleibt exakt für Fasen, Verrundungen und STEP, ebenso ein zulaufender Quader, Keil oder rundes Dach. Von @plazmabokor.
@@ -239,6 +239,8 @@ Dieselbe Zeile später noch einmal ausführen **aktualisiert**: Der vorhandene O
 
 Um layerling auf einem Rechner, NAS (Synology, Unraid usw.) oder Heimserver ohne Node.js zu betreiben, nimmst du das fertige Image **`henmedia/layerling`** auf Docker Hub (auch unter **`ghcr.io/henmedia/layerling`**, dasselbe Image). Jedes Release veröffentlicht es für amd64 und arm64 (Raspberry Pi, ARM-NAS), unter seiner Versionsnummer und als `latest`. Die App lauscht auf Port **3000**.
 
+Noch nie mit Docker gearbeitet? [layerling in Docker, Schritt für Schritt](docs/docker/de/docker-schritt-fuer-schritt.md) fängt unter Windows, macOS oder Linux bei null an: Docker installieren, layerling starten und die Entwürfe als Dateien in einem Ordner auf dem Rechner speichern.
+
 Am schnellsten geht es mit einem einzigen Befehl:
 
 ```bash
@@ -279,7 +281,7 @@ Befehle im Alltag:
 - **Wieder starten:** `docker compose -f docker/compose.yml up -d`
 - **Aktualisieren** (nach `git pull` oder neuem ZIP): `docker compose -f docker/compose.yml up -d --build`; mit dem fertigen Image `docker compose -f docker/compose.yml pull` und danach `up -d`
 
-Das Image führt `next start` im Produktionsmodus aus, die MCP-Brücke ist dort also aus, solange du sie nicht einschaltest (siehe [Eine KI an eine Kopie auf NAS oder Server lassen](#eine-ki-an-eine-kopie-auf-nas-oder-server-lassen)). Für einen
+Das Image führt `node apps/web/server.js` im Produktionsmodus aus, die MCP-Brücke ist dort also aus, solange du sie nicht einschaltest (siehe [Eine KI an eine Kopie auf NAS oder Server lassen](#eine-ki-an-eine-kopie-auf-nas-oder-server-lassen)). Für einen
 gemeinsamen Projektordner ein beschreibbares Verzeichnis einbinden und in `compose.yml` `LAYERLING_SHARED_PROJECTS_DIR`
 auf den Pfad im Container setzen, an dem es eingebunden ist, etwa `./shared-projects:/shared-projects` mit
 `LAYERLING_SHARED_PROJECTS_DIR: "/shared-projects"` (siehe [Gemeinsame Entwürfe im Netz](#gemeinsame-entwürfe-im-netz)).
@@ -312,6 +314,24 @@ Vier Dinge zu wissen:
 - **Ein schneller Test auf dem eigenen Rechner:** `npx serve apps/web/.next-export` und die angezeigte Adresse öffnen.
 - **Als App installieren und offline nutzen geht nur mit https.** Der Export enthält die Offline-Dateien (`sw.js`), aber ein Browser nutzt sie nur unter einer `https://`-Adresse oder auf `localhost`, nicht unter einer einfachen `http://`-Adresse im eigenen Netz.
 
+### Editor-Profile
+
+Ein optionales Editor-Profil ändert das 3D-Menüband und ausgewählte Werkzeugoptionen für diese Seite. So probierst du das [Beispielprofil](docs/examples/editor-profile.json) in einem lokalen Checkout aus:
+
+```sh
+LAYERLING_EDITOR_PROFILE="$(cat docs/examples/editor-profile.json)" npm run dev
+```
+
+Öffne den Editor, füge einen Quader hinzu und wähle ihn aus. Das einfache Menüband nutzt die übliche Symbolgröße. **Druck prüfen** ist sichtbar, **Deckel** und **Flexi-Gelenke** sind ausgeblendet. Öffne **Verrundung**: Auf einem Quader, der groß genug dafür ist, steht der Startradius auf 2 mm. Die Option **Nur sichtbare Kanten** ist ausgeblendet und eingeschaltet.
+
+- `version` muss `1` sein. Ein optionales `base` mit `simple` oder `full` wählt dieses Layout für diese Seite, vor der Wahl im Browser und der Voreinstellung des Node-Servers. Lässt du es weg, bleibt der gewohnte Umschalter für den Modus.
+- Mit `enlargeInSimpleMode: false` haben Werkzeugleiste, Formenmenü und Bedienelemente dieselbe Größe wie im vollen Modus. Die im Browser gewählte Größe der Werkzeugleiste gilt weiter.
+- Unter `tools` überschreibt `visible: true` oder `false` das Layout für die Werkzeuge in den Bereichen Zwischenablage, Verlauf, Kombinieren, Ändern und Anordnen des 3D-Menübands sowie für `import`. Nimm die ID des Werkzeugs (das Attribut `data-layerling-tool` an den normalen Knöpfen des Menübands). Die Menüband-Einstellungen können die Werkzeuge, die das aktive Profil anbietet, weiterhin ausblenden oder umsortieren. Ein sichtbares Werkzeug braucht weiterhin die übliche Auswahl. Unbekannte Einträge wirken nicht.
+- Unter `tools.fillet.options` ist `amount.default` ein Radius in Millimetern. Ein gültiger gemerkter Radius hat Vorrang, und der eigene Startwert des Werkzeugs gilt, wenn keiner von beiden zum Körper passt. `onlyVisibleEdges` nimmt `visible`, einen booleschen `default` und `locked`. Eine Sperre braucht einen `default` und hat Vorrang vor dem gemerkten Wert.
+- Profile wirken auf das Menüband und die zugehörigen Optionen in den Dialogen. Kontextmenüs, Tastenkürzel, Formen und die Kamera verhalten sich wie gewohnt. Den Zugriff auf Projekte regelst du über die Berechtigungen des Hosts.
+
+`LAYERLING_EDITOR_PROFILE` wird vom Layout gelesen, wenn das HTML erzeugt wird. Setze es, bevor du den Entwicklungsserver startest oder das Produktions-HTML baust, auch für einen statischen Export. Hosts, die das HTML selbst erzeugen, können stattdessen ein einzelnes `<script type="application/json" id="layerling-editor-profile">…</script>` in den Kopf des Dokuments setzen, vor die Skripte von layerling. Schreibe ein wörtliches `<` im serialisierten JSON als `\u003c`. Profile sind unabhängig von Projektdateien und Browsereinstellungen und werden einmal je Seitenaufruf gelesen. Für Profile je Konto liefere das persönliche HTML von einer privaten, nicht zwischengespeicherten Seite außerhalb des Offline-Caches des statischen Service Workers aus, etwa über einen PHP-Einstiegspunkt.
+
 ### Gemeinsame Entwürfe im Netz
 
 layerling selbst besteht nur aus Dateien, der gemeinsame Ordner braucht also etwas auf dem Server, das schreiben kann. Es gibt zwei Wege, und du brauchst nur einen: **Node oder Docker** (dieser Abschnitt, mit `LAYERLING_SHARED_PROJECTS_DIR`) oder **ein gewöhnlicher Webserver mit PHP** (der Ordner `store`, weiter unten). Ein Webserver, der die Dateien nur ausliefert – `npx serve`, nginx oder Apache ohne PHP –, zeigt layerling ganz normal, hat aber keinen Serverordner.
@@ -325,13 +345,17 @@ layerling startet (ein Ordner unter `/srv` gehört oft root, lege einen eigenen 
 LAYERLING_SHARED_PROJECTS_DIR=/srv/layerling-projekte npm run start
 ```
 
-Auf der Startseite steht dann neben deinen Browser-Entwürfen der Ordner **Auf dem Server**. Öffnest du ihn, bist du in
-diesem Ordner: **Neuer Entwurf** legt einen darin an, **Neuer Ordner** einen Unterordner, und die Pfadzeile unter der
-Überschrift sagt, wo du bist. Eine `..`-Kachel führt wieder hinaus, und **Zurück zu den Entwürfen in diesem Browser** links neben den Knöpfen bringt dich zu den Entwürfen dieses Browsers zurück. Entwürfe wandern per Ziehen auf einen Ordner, auf
-diese Kachel oder auf einen Schritt der Pfadzeile – oder über **Verschieben nach …** in ihrem Menü. Ein Entwurf aus dem
-Browser kommt genauso auf den Server: seine Kachel auf den Serverordner ziehen.
+Auf der Startseite stehen die Entwürfe dann in zwei Reitern, **Server** für den gemeinsamen Ordner und **Browser** für die
+Entwürfe dieses Browsers. Ist der Reiter Server offen, legt **Neuen 3D-Entwurf anlegen** den Entwurf in dem Serverordner
+an, in dem du bist, **Neuer Ordner** einen Unterordner, und die Pfadzeile unter den Reitern sagt, wo du bist, und führt
+wieder hinaus. Entwürfe wandern per Ziehen auf einen Ordner oder auf einen Schritt der Pfadzeile – oder über
+**Verschieben nach …** in ihrem Menü. Ein Entwurf aus dem Browser kommt auf den Server, indem du seine Kachel auf den
+Reiter Server ziehst, oder mit **Auf den Server legen** in seinem Menü; ein Ordner kommt genauso hin, mit allem darin, und
+bleibt auf dem Server ein Ordner. Zurück geht es mit **In diesen Browser holen** im
+Menü eines Serverentwurfs oder indem du seine Kachel auf den Reiter Browser ziehst: Der Entwurf liegt dann nur noch in
+diesem Browser und verschwindet aus dem Serverordner, auch für die anderen.
 
-Zwei Schaltflächen auf der Startseite ersparen das Verschieben von Hand: **Alle auf den Server legen** legt alle Entwürfe dieses Browsers auf einmal in den Serverordner, und der Haken **Neue Entwürfe auf dem Server** lässt jeden neuen Entwurf gleich im Serverordner beginnen, sodass er sich dort ab der ersten Änderung sichert. Ein Entwurf, dessen Name auf dem Server schon vergeben ist, bleibt im Browser.
+Zwei Schaltflächen auf der Startseite ersparen das Verschieben von Hand: **Alle auf den Server legen** legt alle Entwürfe dieses Browsers auf einmal in den Serverordner, in dieselben Ordner, und der Haken **Neue Entwürfe auf dem Server** lässt jeden neuen Entwurf gleich im Serverordner beginnen, sodass er sich dort ab der ersten Änderung sichert. Ein Entwurf, dessen Name auf dem Server schon vergeben ist, bleibt im Browser.
 
 Das Suchfeld oben durchsucht den **ganzen** Serverordner, nicht nur den, in dem du gerade stehst. Jeder Treffer sagt,
 in welchem Ordner er liegt, und dieser Ordner ist ein Knopf: ein Klick, und du bist dort, die Suche ist beendet.

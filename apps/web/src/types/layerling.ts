@@ -200,6 +200,10 @@ export type ShapeCustomization = {
   helixQuality?: number;
   /** A bevel gear's helix angle (Discussion #1299): its teeth turn while they taper, a spiral bevel gear; missing or 0 keeps them straight. */
   bevelHelixAngle?: number;
+  /** A ring gear's or a rack's helix angle (Discussion #1627): its teeth run at a slant; missing or 0 keeps them straight. */
+  ringRackHelixAngle?: number;
+  /** A ring gear or a rack with a helix angle: its teeth turn back at half the height, herringbone teeth (Discussion #1627). */
+  ringRackHerringbone?: boolean;
   /** Involute teeth (#201) or the straight ones every gear had before; missing means straight. */
   gearProfile?: GearProfile;
   /** Involute teeth: pressure angle in degrees (20 by default). */
@@ -478,6 +482,8 @@ export type ShapeCustomization = {
   screwHoleSlot?: boolean;
   /** Countersink and double countersink: how far in mm the head sits below the face (Discussion #1531), as on the shape. */
   screwHoleRecess?: number;
+  /** Counterbore: a 45-degree chamfer in mm at the rim of the pocket (Discussion #1632), as on the shape. */
+  screwHoleChamfer?: number;
   /** Port opening: rounded corners, or the lower ones cut off as on an HDMI or DisplayPort socket. */
   portProfile?: PortProfile;
   /** Port opening: extra room in mm on every side on top of the preset's, already in width and height; it lets the preset be recognised. */
@@ -600,6 +606,8 @@ export type WorkplaneWorkspaceSettings = {
   dimensionAxisColors: boolean;
   /** A turned body shows its angles about X, Y and Z beside it while it is selected. */
   showRotationAngles: boolean;
+  /** The red X and green Y arrows round the top of a selection that move it along one axis (Discussion #1434); on by default. */
+  showSlideArrows: boolean;
   /** The editor opens a design with the view's scrollbars shown (Discussion #1241); the view bar still switches them. */
   startWithScrollbars: boolean;
   /** A folded view bar opens while the mouse is over its arrow and folds again once the mouse has left it (Discussion #1552). */
@@ -1135,6 +1143,10 @@ export type WorkplaneShape = {
   helixQuality?: number;
   /** A bevel gear's helix angle (Discussion #1299): its teeth turn while they taper, a spiral bevel gear; missing or 0 keeps them straight. */
   bevelHelixAngle?: number;
+  /** A ring gear's or a rack's helix angle (Discussion #1627): its teeth run at a slant; missing or 0 keeps them straight. */
+  ringRackHelixAngle?: number;
+  /** A ring gear or a rack with a helix angle: its teeth turn back at half the height, herringbone teeth (Discussion #1627). */
+  ringRackHerringbone?: boolean;
   /** Involute teeth (#201) or the straight ones every gear had before; missing means straight. */
   gearProfile?: GearProfile;
   /** Involute teeth: pressure angle in degrees (20 by default). */
@@ -1447,6 +1459,11 @@ export type WorkplaneShape = {
    * straight pocket as wide as the head above the cone, on the double countersink at both ends. Missing or 0: flush.
    */
   screwHoleRecess?: number;
+  /**
+   * Counterbore: a 45-degree chamfer in mm at the rim of the pocket (Discussion #1632). The rim opens by that much
+   * outside the head's diameter, so the pocket keeps its width; it stays shallower than the pocket. Missing or 0: none.
+   */
+  screwHoleChamfer?: number;
   /** Port opening: rounded corners, or the lower ones cut off as on an HDMI or DisplayPort socket. */
   portProfile?: PortProfile;
   /** Port opening: extra room in mm on every side on top of the preset's, already in width and height; it lets the preset be recognised. */
@@ -1657,6 +1674,12 @@ export type WorkplaneShape = {
    * lib/stencilBridgeTool.
    */
   stencilBridge?: boolean;
+  /**
+   * The body stands on a breakaway base (lib/breakawayBase), as the fit test's pin and the Split tool's loose dowels can:
+   * the pin's foot hangs a little over the socket's floor and that floor is one layer thick, on purpose, so the print
+   * check leaves both out (#1633).
+   */
+  breakawayBase?: boolean;
   /**
    * The point this body turns about, kept with the body: a fraction of its
    * width, height and depth from its centre, in its own frame, so it moves,

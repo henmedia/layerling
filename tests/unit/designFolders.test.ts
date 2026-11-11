@@ -6,8 +6,10 @@ import {
   designFolderNameProblem,
   ensureFolderPath,
   folderAndDescendants,
+  foldersEmptiedByMove,
   folderContents,
   folderOfDesign,
+  folderPathFrom,
   folderPathNames,
   folderTrail,
   moveDesignFolder,
@@ -205,5 +207,40 @@ describe("folders in a backup", () => {
 
   it("makes a path safe however a folder is called", () => {
     expect(backupEntryPaths([{ name: "A", folder: ["x:y", ".hidden", ""] }])).toEqual(["Folders/x-y/hidden/folder/A.lyl"]);
+  });
+});
+
+describe("design folders onto the server (Discussion #1572)", () => {
+  const folders: DesignFolder[] = [
+    { id: "alice", name: "Alice", parentId: null, createdAt: 1 },
+    { id: "tmnt", name: "TMNT", parentId: null, createdAt: 1 },
+    { id: "boxes", name: "Boxes", parentId: "tmnt", createdAt: 1 },
+    { id: "empty", name: "Empty", parentId: "tmnt", createdAt: 1 },
+  ];
+
+  it("takes the whole way for all designs, and starts at the folder put on the server", () => {
+    expect(folderPathFrom(folders, "boxes", null)).toEqual(["TMNT", "Boxes"]);
+    expect(folderPathFrom(folders, null, null)).toEqual([]);
+    expect(folderPathFrom(folders, "boxes", "tmnt")).toEqual(["TMNT", "Boxes"]);
+    expect(folderPathFrom(folders, "boxes", "boxes")).toEqual(["Boxes"]);
+    expect(folderPathFrom(folders, "alice", "tmnt")).toEqual([]);
+    expect(folderPathFrom(folders, "gone", null)).toEqual([]);
+  });
+
+  it("leaves every folder of the scope empty when all went, empty ones too", () => {
+    expect([...foldersEmptiedByMove(folders, [], new Set(folders.map((folder) => folder.id)))].sort()).toEqual(["alice", "boxes", "empty", "tmnt"]);
+  });
+
+  it("keeps a folder with a design that could not go, and the folders on the way to it", () => {
+    const staying = [{ id: "d1", folderId: "boxes" }];
+    expect([...foldersEmptiedByMove(folders, staying, new Set(folders.map((folder) => folder.id)))].sort()).toEqual(["alice", "empty"]);
+  });
+
+  it("only counts the folders of the scope", () => {
+    expect([...foldersEmptiedByMove(folders, [{ id: "d1", folderId: null }], folderAndDescendants(folders, "tmnt"))].sort()).toEqual(["boxes", "empty", "tmnt"]);
+  });
+
+  it("counts a design in a folder that is gone as at the top level", () => {
+    expect([...foldersEmptiedByMove(folders, [{ id: "d1", folderId: "gone" }], new Set(["alice"]))]).toEqual(["alice"]);
   });
 });

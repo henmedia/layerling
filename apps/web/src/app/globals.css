@@ -468,7 +468,7 @@ html[data-toolbar-size="small"] {
 }
 
 html[data-toolbar-size="large"],
-html[data-simple-mode="on"]:not([data-toolbar-size]) {
+html[data-simple-mode="on"]:not([data-toolbar-size], [data-simple-mode-enlarge="off"]) {
   --toolbar-scale: 1.25;
   --editor-toolbar-tools-height: 87px;
   --editor-toolbar-height: 131px;
@@ -478,8 +478,8 @@ html[data-simple-mode="on"]:not([data-toolbar-size]) {
    so the groups wrap onto a further row at any width rather than being cut off. */
 html[data-toolbar-size="large"] .toolbar-mode-content,
 html[data-toolbar-size="large"] .sketch-toolbar-ribbon,
-html[data-simple-mode="on"]:not([data-toolbar-size]) .toolbar-mode-content,
-html[data-simple-mode="on"]:not([data-toolbar-size]) .sketch-toolbar-ribbon {
+html[data-simple-mode="on"]:not([data-toolbar-size], [data-simple-mode-enlarge="off"]) .toolbar-mode-content,
+html[data-simple-mode="on"]:not([data-toolbar-size], [data-simple-mode-enlarge="off"]) .sketch-toolbar-ribbon {
   flex-wrap: wrap;
   height: auto;
 }
@@ -710,34 +710,36 @@ button {
   transform: translate(-50%, -50%);
 }
 
+/* No rounding: the shimmer's radius only showed on the corners the faces share with their boxes, not on the top. */
 .editor-loading-model span {
   position: absolute;
-  border-radius: 8px;
+  border-radius: 0;
   box-shadow: 0 10px 24px rgba(94, 72, 48, 0.08);
 }
 
+/* A 2:1 isometric box, 66 px from its middle to each side, the faces 6 px apart with even seams. */
 .editor-loading-model-top {
-  top: 9px;
+  top: 10px;
   left: 24px;
   width: 132px;
   height: 66px;
-  clip-path: polygon(50% 0, 100% 44%, 50% 100%, 0 44%);
+  clip-path: polygon(66px 0, 132px 33px, 66px 66px, 0 33px);
 }
 
 .editor-loading-model-front {
-  top: 66px;
+  top: 49px;
   left: 24px;
-  width: 66px;
-  height: 78px;
-  clip-path: polygon(0 0, 100% 27%, 100% 100%, 0 72%);
+  width: 63px;
+  height: 103.5px;
+  clip-path: polygon(0 0, 63px 31.5px, 63px 103.5px, 0 72px);
 }
 
 .editor-loading-model-side {
-  top: 66px;
-  left: 90px;
-  width: 66px;
-  height: 78px;
-  clip-path: polygon(0 27%, 100% 0, 100% 72%, 0 100%);
+  top: 49px;
+  left: 93px;
+  width: 63px;
+  height: 103.5px;
+  clip-path: polygon(0 31.5px, 63px 0, 63px 72px, 0 103.5px);
 }
 
 .editor-loading-viewport-controls {
@@ -3253,7 +3255,9 @@ html[data-theme="dark"] .shell-openings-summary {
   cursor: not-allowed;
 }
 
-.edge-modifier-history-actions span {
+/* Only the note beside the toggle: the labels inside the buttons keep the button's size and colour,
+   so "Undo an edge feature" no longer looks small and greyed out like a disabled button (#1600). */
+.edge-modifier-history-actions > span {
   color: #7a6851;
   font-size: 10px;
   line-height: 1.35;
@@ -3331,12 +3335,12 @@ html[data-theme="dark"] .shell-openings-summary {
 
 .edge-modifier-history-item strong {
   color: #6d4310;
-  font-size: 11px;
+  font-size: 12px;
 }
 
 .edge-modifier-history-item small {
   color: #7a6851;
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 700;
 }
 
@@ -4128,8 +4132,7 @@ html[data-theme="dark"] .toolbar-ribbon-pin:hover {
   color: inherit;
 }
 
-.toolbar-title-help .action-icon-button:hover,
-.toolbar-title-help .action-icon-button.active {
+.toolbar-title-help .action-icon-button:hover {
   color: var(--group-color);
 }
 
@@ -4137,9 +4140,34 @@ html[data-theme="dark"] .toolbar-title-help .action-icon-button {
   color: #e3d3c0;
 }
 
-html[data-theme="dark"] .toolbar-title-help .action-icon-button:hover,
-html[data-theme="dark"] .toolbar-title-help .action-icon-button.active {
+html[data-theme="dark"] .toolbar-title-help .action-icon-button:hover {
   color: #f7f2ea;
+}
+
+/* Interactive Help, while it is on: its circle is filled orange with the question mark light in it. Only a change of
+   colour of the question mark looked like the other help buttons, and it was taken for off (Discussion #1640). The
+   circle itself is filled, not the button: the button is wider than the icon, and a filled button stood square and
+   to one side of the round icon. */
+.toolbar-title-help .action-icon-button.active,
+.toolbar-title-help .action-icon-button.active:hover {
+  color: #d07415;
+}
+
+.toolbar-title-help .action-icon-button.active svg circle {
+  fill: currentColor;
+}
+
+.toolbar-title-help .action-icon-button.active svg path {
+  stroke: #fff;
+}
+
+html[data-theme="dark"] .toolbar-title-help .action-icon-button.active,
+html[data-theme="dark"] .toolbar-title-help .action-icon-button.active:hover {
+  color: #f29a45;
+}
+
+html[data-theme="dark"] .toolbar-title-help .action-icon-button.active svg path {
+  stroke: #2a2017;
 }
 
 /* On a narrow window - a tablet held upright - the name of the design needs the room: the colour scheme keeps its
@@ -4964,7 +4992,7 @@ html[data-toolbar-size="small"] .shape-menu-dropdown:not(.sketch-shape-menu-drop
 }
 
 html[data-toolbar-size="large"] .shape-menu-dropdown:not(.sketch-shape-menu-dropdown),
-html[data-simple-mode="on"]:not([data-toolbar-size]) .shape-menu-dropdown:not(.sketch-shape-menu-dropdown) {
+html[data-simple-mode="on"]:not([data-toolbar-size], [data-simple-mode-enlarge="off"]) .shape-menu-dropdown:not(.sketch-shape-menu-dropdown) {
   --shape-menu-columns: 3;
 }
 
@@ -10462,13 +10490,20 @@ html[data-theme="dark"] .property-defaults-actions button {
 
 .select-property {
   display: grid;
-  /* A long label (German "Buchstabenkanten") takes the room it needs instead of running under the field. */
-  grid-template-columns: minmax(92px, max-content) minmax(0, 1fr);
+  /* A long label (German "Buchstabenkanten") takes the room it needs instead of running under the field,
+     but at most a little over half the row: past that it wraps, and the field keeps room for its choice
+     ("Through the Sections" left "Straight" cut off, Discussion #1614). */
+  grid-template-columns: fit-content(55%) minmax(0, 1fr);
   align-items: center;
   gap: 10px;
   color: #867563;
   font-size: 15px;
   font-weight: 650;
+}
+
+/* Short labels still start their fields at the same place. */
+.select-property > span:first-child {
+  min-width: 92px;
 }
 
 /* The board's number fields keep their width and a long label wraps instead: "Reach through the wall (mm)" squeezed its field until the last digit was cut off (#1344). */
@@ -11360,8 +11395,9 @@ html[data-theme="dark"] .shape-inspector .name-tag-start .name-tag-start-button:
   border-color: #f0a65a;
 }
 
+/* Across the whole row, as under the number fields: under the field alone it was a narrow column (Discussion #1614). */
 .select-property-hint {
-  grid-column: 2;
+  grid-column: 1 / -1;
   margin-top: -5px;
   color: #8d7b68;
   font-size: 12px;
@@ -14151,7 +14187,7 @@ html[data-theme="dark"] .edge-modifier-history-edit:hover {
   background: #3f301f;
 }
 
-html[data-theme="dark"] .edge-modifier-history-actions span,
+html[data-theme="dark"] .edge-modifier-history-actions > span,
 html[data-theme="dark"] .edge-modifier-history-hint,
 html[data-theme="dark"] .edge-modifier-history-item small {
   color: #a79078;
@@ -15282,7 +15318,10 @@ html[data-theme="dark"] .theme-check {
   display: flex;
   flex-direction: column;
   width: 300px;
-  max-width: calc(100vw - 120px);
+  /* Wider or narrower at the lower right corner (Discussion #1636); MIN/MAX_PANEL_WIDTH in ObjectListPanel.tsx. */
+  min-width: min(240px, calc(100vw - 120px));
+  max-width: min(600px, calc(100vw - 120px));
+  resize: horizontal;
   max-height: calc(100% - 96px);
   background: rgba(254, 253, 252, 0.96);
   backdrop-filter: blur(12px);
@@ -15647,14 +15686,18 @@ html[data-theme="dark"] .theme-check {
   flex: none;
 }
 
+/* One letter for Solid or Hole, the word as its tooltip (Discussion #1636). */
 .outliner-badge {
   display: inline-block;
-  padding: 1px 6px;
+  min-width: 18px;
+  padding: 1px 4px;
   font-size: 10px;
   font-weight: 700;
+  line-height: 14px;
+  text-align: center;
   border-radius: 4px;
   text-transform: uppercase;
-  letter-spacing: 0.02em;
+  cursor: default;
 }
 
 .outliner-badge.badge-solid {
@@ -15670,8 +15713,10 @@ html[data-theme="dark"] .theme-check {
 }
 
 .outliner-badge.small {
-  padding: 0 4px;
+  min-width: 15px;
+  padding: 0 3px;
   font-size: 9px;
+  line-height: 12px;
 }
 
 .outliner-row-actions {
@@ -16178,6 +16223,11 @@ html[data-theme="dark"] .shape-menu-pin.active {
 /* Collapsed: the title bar alone, without the line that separates it from the list. */
 .outliner-panel.collapsed .outliner-header {
   border-bottom: none;
+}
+
+/* The title bar alone has no corner to drag the width at. */
+.outliner-panel.collapsed {
+  resize: none;
 }
 
 .guide-modal h3 {
@@ -17455,7 +17505,7 @@ html[data-theme="dark"] .plate-bar-separator {
   font-weight: 650;
 }
 .property-card:has(> .property-card-header[aria-controls^="properties-"]) > .property-card-header:hover {
-  filter: brightness(1.2);
+  background: rgba(217, 118, 28, 0.2);
 }
 .property-card:has(> .property-card-header[aria-controls^="properties-"]) .range-control input[type="range"]::-webkit-slider-runnable-track {
   background: linear-gradient(to right, rgb(217, 118, 28) 0 var(--slider-pos), rgba(217, 118, 28, 0.24) var(--slider-pos) 100%);
@@ -17498,7 +17548,7 @@ html[data-theme="dark"] .property-card:has(> .property-card-header[aria-controls
   font-weight: 650;
 }
 .property-card:has(> .property-card-header[aria-controls^="position-"]) > .property-card-header:hover {
-  filter: brightness(1.2);
+  background: rgba(70, 130, 200, 0.2);
 }
 .property-card:has(> .property-card-header[aria-controls^="position-"]) .range-control input[type="range"]::-webkit-slider-runnable-track {
   background: linear-gradient(to right, rgb(70, 130, 200) 0 var(--slider-pos), rgba(70, 130, 200, 0.24) var(--slider-pos) 100%);
@@ -17541,7 +17591,7 @@ html[data-theme="dark"] .property-card:has(> .property-card-header[aria-controls
   font-weight: 650;
 }
 .property-card:has(> .property-card-header[aria-controls^="rotation-"]) > .property-card-header:hover {
-  filter: brightness(1.2);
+  background: rgba(40, 170, 140, 0.2);
 }
 .property-card:has(> .property-card-header[aria-controls^="rotation-"]) .range-control input[type="range"]::-webkit-slider-runnable-track {
   background: linear-gradient(to right, rgb(40, 170, 140) 0 var(--slider-pos), rgba(40, 170, 140, 0.24) var(--slider-pos) 100%);
@@ -17584,7 +17634,7 @@ html[data-theme="dark"] .property-card:has(> .property-card-header[aria-controls
   font-weight: 650;
 }
 .property-card:has(> .property-card-header[aria-controls^="taper-"]) > .property-card-header:hover {
-  filter: brightness(1.2);
+  background: rgba(140, 110, 210, 0.2);
 }
 .property-card:has(> .property-card-header[aria-controls^="taper-"]) .range-control input[type="range"]::-webkit-slider-runnable-track {
   background: linear-gradient(to right, rgb(140, 110, 210) 0 var(--slider-pos), rgba(140, 110, 210, 0.24) var(--slider-pos) 100%);
@@ -17627,7 +17677,7 @@ html[data-theme="dark"] .property-card:has(> .property-card-header[aria-controls
   font-weight: 650;
 }
 .property-card:has(> .property-card-header[aria-controls^="twist-"]) > .property-card-header:hover {
-  filter: brightness(1.2);
+  background: rgba(210, 90, 120, 0.2);
 }
 .property-card:has(> .property-card-header[aria-controls^="twist-"]) .range-control input[type="range"]::-webkit-slider-runnable-track {
   background: linear-gradient(to right, rgb(210, 90, 120) 0 var(--slider-pos), rgba(210, 90, 120, 0.24) var(--slider-pos) 100%);
@@ -17670,7 +17720,7 @@ html[data-theme="dark"] .property-card:has(> .property-card-header[aria-controls
   font-weight: 650;
 }
 .property-card:has(> .property-card-header[aria-controls^="slope-"]) > .property-card-header:hover {
-  filter: brightness(1.2);
+  background: rgba(130, 170, 50, 0.2);
 }
 .property-card:has(> .property-card-header[aria-controls^="slope-"]) .range-control input[type="range"]::-webkit-slider-runnable-track {
   background: linear-gradient(to right, rgb(130, 170, 50) 0 var(--slider-pos), rgba(130, 170, 50, 0.24) var(--slider-pos) 100%);
@@ -17713,7 +17763,7 @@ html[data-theme="dark"] .property-card:has(> .property-card-header[aria-controls
   font-weight: 650;
 }
 .property-card:has(> .property-card-header[aria-controls^="narrow-"]) > .property-card-header:hover {
-  filter: brightness(1.2);
+  background: rgba(196, 150, 30, 0.2);
 }
 .property-card:has(> .property-card-header[aria-controls^="narrow-"]) .range-control input[type="range"]::-webkit-slider-runnable-track {
   background: linear-gradient(to right, rgb(196, 150, 30) 0 var(--slider-pos), rgba(196, 150, 30, 0.24) var(--slider-pos) 100%);
@@ -17866,4 +17916,22 @@ html[data-theme="dark"] .select-property select {
 html[data-theme="dark"] .select-property select option {
   color: #3b2f22;
   background-color: #fff;
+}
+
+/* The title bar of a card reaches the edges of its tile, so the shade under the pointer fills the whole bar. The shade
+   is a lighter touch of the tile's own colour (coloured sections above), or a neutral one for the other cards. */
+.property-card > button.property-card-header {
+  width: calc(100% + 28px);
+  margin: 0 -14px;
+  padding: 0 14px;
+  border-radius: 8px 8px 0 0;
+}
+.property-card.collapsed > button.property-card-header {
+  border-radius: 8px;
+}
+.property-card > button.property-card-header:hover {
+  background: rgba(93, 71, 49, 0.1);
+}
+html[data-theme="dark"] .property-card > button.property-card-header:hover {
+  background: rgba(255, 255, 255, 0.1);
 }

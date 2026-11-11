@@ -20,7 +20,7 @@ import { useToolbarSize } from "@/lib/useToolbarSize";
 import { useSimpleMode } from "@/lib/useSimpleMode";
 import { useShapeColors } from "@/lib/useShapeColors";
 import { setShapeColors } from "@/lib/shapeColors";
-import { isSimpleModeFixedByServer, setSimpleMode } from "@/lib/simpleMode";
+import { isSimpleModeFixed, setSimpleMode } from "@/lib/simpleMode";
 import { useViewCubePosition } from "@/lib/useViewCubePosition";
 import { setViewCubePosition, VIEW_CUBE_POSITION_OPTIONS, type ViewCubePosition } from "@/lib/viewCubePosition";
 import { gearCenterHoleLimits, gearToothPitch, gearTypeHasHelix, MAX_GEAR_TEETH, MIN_GEAR_TEETH } from "@/lib/gearGeometry";
@@ -986,6 +986,12 @@ export function WorkspaceSettingsModal({
                     label={t("workspace.showRotationAngles")}
                     checked={workspace.showRotationAngles}
                     onChange={(showRotationAngles) => patchWorkspace({ showRotationAngles })}
+                  />
+                  <WorkspaceToggle
+                    label={t("workspace.showSlideArrows")}
+                    description={t("workspace.showSlideArrowsHint")}
+                    checked={workspace.showSlideArrows}
+                    onChange={(showSlideArrows) => patchWorkspace({ showSlideArrows })}
                   />
                   <WorkspaceToggle
                     label={t("workspace.startInPerspective")}
@@ -2115,7 +2121,7 @@ function SimpleModeSetting() {
     }, SIMPLE_MODE_HOLD_MS);
   };
   useEffect(() => cancel, []);
-  if (isSimpleModeFixedByServer()) return null;
+  if (isSimpleModeFixed()) return null;
   if (!simple) {
     return <WorkspaceToggle label={t("workspace.simpleMode")} description={t("workspace.simpleModeHint")} checked={false} onChange={() => setSimpleMode(true)} />;
   }

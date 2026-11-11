@@ -105,7 +105,7 @@ It is not a full CAD package: there is no parametric timeline and no assemblies.
 
 ### Refining
 
-- **Chamfer and fillet** – break or round any edge of a solid, or scoop a straight edge out as a concave fillet, like the notched corners of a box, and remove or change the treatment again later.
+- **Chamfer and fillet** – break or round any edge of a solid, or scoop a straight edge out as a concave fillet, like the notched corners of a box, and remove or change the treatment again later; when a size is too large for the edge, one click finds the largest that fits.
 - **Sketches** – draw outlines with lines, curves and ready-made shapes, draw freehand with a pen, a finger or the mouse (the line becomes a few points you can edit), set lines by length and angle as you draw ("50<30", Shift snaps in 15° steps), type lengths, angles, sizes and the position of a selected outline, point or curve handle (sums like "60+12.5" work in every number field), round or chamfer corners, snap to the outlines of other bodies, draw construction lines to snap to, and extrude, revolve or sweep them along a path into exact bodies. A revolve with a pitch winds the outline up as one continuous helical strand instead of rings, like filament on a spool. A sketch can also be built as a stroke: a closed outline becomes a frame, inside, outside or centred on the line, and an open line a stripe with flat, square or round ends. A drawing or photo laid under the sketch is traced into sketch lines with one click, its dark or its light part, at a threshold you set.
 - **Hollowing** – turn a body into walls of one thickness, open on any sides you choose (top, bottom, front, back, left, right, in any combination) or closed – for boxes, cups and cases.
 - **Slope and narrow along** – run the top of a box, cylinder, polygon, tube, wedge or round roof down to one end, or the sides of all but the tube in towards one end, straight or curved, by number or with a dot on the end: a roof sloping along its length, a ramp, a slanted pipe end, a boat's bow. A slope stays exact for chamfers, fillets and STEP, and so does a narrowed box, wedge or round roof. By @plazmabokor.
@@ -236,6 +236,8 @@ Run the same line again whenever you want to **update**: the existing folder is 
 
 To run layerling on a computer, NAS (Synology, Unraid, etc.) or home server without installing Node.js, use the ready-made image **`henmedia/layerling`** on Docker Hub (also at **`ghcr.io/henmedia/layerling`**, the same image). Every release publishes it for amd64 and arm64 (Raspberry Pi, ARM NAS) under its version number and as `latest`. The app listens on port **3000**.
 
+New to Docker? [Running layerling in Docker, step by step](docs/docker/en/docker-step-by-step.md) starts from nothing on Windows, macOS or Linux: it installs Docker, starts layerling and saves your designs as files in a folder on your computer.
+
 The quickest way is a single command:
 
 ```bash
@@ -278,7 +280,7 @@ Everyday commands:
 
 **Installing as an app and offline use need https, and the static export.** A browser installs an app and keeps it for offline use only on `https://` or on `localhost`; on a plain `http://192.168.x.x:3000` address it offers neither (layerling hides its install hint there). Even with https, the offline files (`sw.js`) are written only into the static export (see [Static Hosting](#static-hosting-plain-files-on-a-web-server)), not into this image, which runs the server version. For installing and offline use on a network, serve the static export over https; for an https address in front of the container, use a reverse proxy such as Caddy or nginx with a certificate (for example from mkcert).
 
-The image runs `next start` in production mode, so the MCP bridge is off there unless you switch it on (see [Letting an AI client reach a copy on a NAS or server](#letting-an-ai-client-reach-a-copy-on-a-nas-or-server)). To offer a shared project folder, bind a writable directory and set `LAYERLING_SHARED_PROJECTS_DIR` in `compose.yml` to the path inside the container where it is mounted, for example `./shared-projects:/shared-projects` with `LAYERLING_SHARED_PROJECTS_DIR: "/shared-projects"` (see [Shared Designs on a Network](#shared-designs-on-a-network)). The container runs as the user with the number 999, so that user must be allowed to write to the folder: `sudo chown 999:999 ./shared-projects`, or add `user: "1000:1000"` to the service (your own user and group numbers, `id -u` and `id -g` show them) so that the container runs as you. Without it the folder shows up on the start page but nothing can be saved there. After changing it, run `docker compose up -d`: `docker compose restart` keeps the old setting. `docker exec <container> printenv LAYERLING_SHARED_PROJECTS_DIR` shows the one in use.
+The image runs `node apps/web/server.js` in production mode, so the MCP bridge is off there unless you switch it on (see [Letting an AI client reach a copy on a NAS or server](#letting-an-ai-client-reach-a-copy-on-a-nas-or-server)). To offer a shared project folder, bind a writable directory and set `LAYERLING_SHARED_PROJECTS_DIR` in `compose.yml` to the path inside the container where it is mounted, for example `./shared-projects:/shared-projects` with `LAYERLING_SHARED_PROJECTS_DIR: "/shared-projects"` (see [Shared Designs on a Network](#shared-designs-on-a-network)). The container runs as the user with the number 999, so that user must be allowed to write to the folder: `sudo chown 999:999 ./shared-projects`, or add `user: "1000:1000"` to the service (your own user and group numbers, `id -u` and `id -g` show them) so that the container runs as you. Without it the folder shows up on the start page but nothing can be saved there. After changing it, run `docker compose up -d`: `docker compose restart` keeps the old setting. `docker exec <container> printenv LAYERLING_SHARED_PROJECTS_DIR` shows the one in use.
 
 To keep every design in that folder and none in the browser, there is a complete guide in English and German with its own compose file and an update script that checks the configuration, backs up the folder and rolls back a failed update: [docs/docker](docs/docker/README.md), written by Jürgen Keller. With `LAYERLING_NEW_DESIGNS_ON_SERVER: "always"`, everything that makes a design goes to the server folder: the tile, opening or importing a file, restoring a backup (with its folders), duplicating and a state taken from the history, and New folder on the start page makes a server folder.
 
@@ -308,6 +310,24 @@ Four things to know:
 - **A quick test on your own computer:** `npx serve apps/web/.next-export` and open the address it prints.
 - **Installing as an app and offline use need https.** The export holds the offline files (`sw.js`), but a browser uses them only on an `https://` address or on `localhost`, not on a plain `http://` address in your network.
 
+### Editor profiles
+
+An optional editor profile changes the 3D ribbon and selected tool options for this page. To try the [example profile](docs/examples/editor-profile.json) in a local checkout:
+
+```sh
+LAYERLING_EDITOR_PROFILE="$(cat docs/examples/editor-profile.json)" npm run dev
+```
+
+Open the editor, add a box, and select it. The simple ribbon uses the usual icon size. **Print check** is visible and **Lid** and **Flexi joints** are hidden. Open **Fillet** to see a starting radius of 2 mm on a box large enough for it. The **Only visible edges** option is hidden and on.
+
+- `version` must be `1`. An optional `base` of `simple` or `full` selects that layout for this page, ahead of the browser choice and the Node server default. Omit it to keep the ordinary mode switch.
+- Set `enlargeInSimpleMode: false` to use the same toolbar, shape menu and control sizing as in full mode. The browser’s toolbar size choice still applies.
+- Under `tools`, `visible: true` or `false` overrides the layout for tools in the clipboard, history, combine, modify and arrange sections of the 3D ribbon, as well as `import`. Use the tool's ID (the `data-layerling-tool` attribute on regular ribbon buttons). The Ribbon settings can still hide or reorder the tools available in the active profile. A visible tool still needs the usual selection. Unknown entries have no effect.
+- Under `tools.fillet.options`, `amount.default` is a radius in millimetres. A valid remembered radius takes precedence, and the tool's own starting value is used when neither fits the body. `onlyVisibleEdges` accepts `visible`, a boolean `default`, and `locked`. A lock requires a default and takes precedence over the remembered value.
+- Profiles affect the ribbon and the connected dialog options. Context menus, keyboard shortcuts, shapes and the camera retain their normal behavior. Use the host's authorization for access to projects.
+
+`LAYERLING_EDITOR_PROFILE` is read by the layout when the HTML is generated. Set it before starting the development server or building production HTML, including a static export. Hosts that generate HTML themselves may instead provide one `<script type="application/json" id="layerling-editor-profile">…</script>` in the document head before Layerling's scripts. Escape literal `<` in the serialized JSON as `\u003c`. Profiles are independent of project files and browser settings and are read once per page load. For per-account profiles, serve the personalized HTML from a private, uncached page outside the static service worker’s offline cache, such as a PHP entry point.
+
 ### Shared Designs on a Network
 
 layerling itself is only files, so the shared folder needs something on the server that can write. There are two ways, and you need just one of them: **Node or Docker** (this section, with `LAYERLING_SHARED_PROJECTS_DIR`), or **a plain web server with PHP** (the `store` folder, further down). A web server that serves the files without either of them – `npx serve`, nginx or Apache without PHP – shows layerling fine, but has no server folder.
@@ -319,13 +339,16 @@ shared folder for `.lyl` designs. `npm run start` serves what `npm run build` ma
 LAYERLING_SHARED_PROJECTS_DIR=/srv/layerling-projects npm run start
 ```
 
-The start page then shows a folder named **On the server** beside your browser designs. Open it and you are in that
-folder: **New design** starts one right there, **New folder** makes a subfolder, and a trail under the heading says where
-you are. A `..` tile leads back out, and **Back to designs in this browser** at the left of the buttons returns to the designs of this browser. Designs move by dragging them onto a folder, onto that tile or onto a step of the
-trail – or through **Move to …** in their menu. A design from your browser goes onto the server the same way: drag its
-card onto the server folder.
+The start page then shows the designs in two tabs, **Server** for the shared folder and **Browser** for the designs of
+this browser. With the Server tab open, **Create new 3D design** starts a design in the server folder you are in, **New
+folder** makes a subfolder, and a trail under the tabs says where you are and leads back out. Designs move by dragging
+them onto a folder or onto a step of the trail – or through **Move to …** in their menu. A design from your browser goes
+onto the server by dragging its card onto the Server tab, or with **Put on the server** in its menu; a folder goes the
+same way, with everything in it, and stays a folder on the server. The way back is
+**Put in this browser** in the menu of a server design, or dragging its card onto the Browser tab: the design then lives
+only in this browser and leaves the server folder, also for the others.
 
-Two buttons on the start page save the trouble of moving designs one by one: **Put all on the server** moves every design of this browser into the server folder in one go, and the tick **New designs on the server** makes each new design start in the server folder, so it is saved there from the first change on. A design whose name is already taken on the server stays in the browser.
+Two buttons on the start page save the trouble of moving designs one by one: **Put all on the server** moves every design of this browser into the server folder in one go, in the same folders, and the tick **New designs on the server** makes each new design start in the server folder, so it is saved there from the first change on. A design whose name is already taken on the server stays in the browser.
 
 The search box at the top searches the whole server folder, not just the one you are standing in. Every hit says
 which folder holds it, and that folder is a button: one click and you are there, with the search cleared. Folders are

@@ -15,7 +15,7 @@ Három dolog történik:
 - A munkasík sarkában megjelenik a nyomtató neve és a nyomtatási tere. Ha a felirat zavar, kapcsold ki a {{ui:workspace.workplane}} alatt a {{ui:workspace.showPlateLabels}} kapcsolóval; ez a terv bal elöl lévő nevére is vonatkozik.
 - A layerling **figyelmeztet**, ha valami nem fér el.
 
-A nyomtatóprofilok az OrcaSlicerből származnak, így ugyanazok, amelyeket a szeletelőd is ismer. Ha inkább nyomtató nélkül dolgoznál, válaszd a {{ui:workspace.printerNone}} lehetőséget. A munkasík méretét kézzel is beállíthatod.
+A nyomtatóprofilok többsége az OrcaSlicerből származik. Ha inkább nyomtató nélkül dolgoznál, válaszd a {{ui:workspace.printerNone}} lehetőséget. A munkasík méretét kézzel is beállíthatod.
 
 A delta nyomtatók, például az FLSun vagy a SeeMeCNC gépei vagy az Anycubic Predator, kerek tárgyasztalra nyomtatnak. Ezekkel a munkafelület is kerek, olyan széles, mint a tárgyasztal, és egy test túl nagy, amint túlnyúlik a peremen. Egy kerek testet a saját körvonala alapján mér a program, nem a köré írt doboz alapján, így egy majdnem asztalnyi széles henger is elfér.
 

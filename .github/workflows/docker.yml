@@ -28,7 +28,6 @@ concurrency:
   cancel-in-progress: false
 
 env:
-  IMAGE: ghcr.io/${{ github.repository }}
   TAG: ${{ github.event.release.tag_name || inputs.tag }}
 
 jobs:
@@ -44,6 +43,10 @@ jobs:
             runner: ubuntu-24.04-arm
     runs-on: ${{ matrix.runner }}
     steps:
+      # Docker refuses capitals in an image name, and an owner like LudaThomas keeps them in github.repository.
+      - name: Lowercase the image name
+        run: echo "IMAGE=ghcr.io/${GITHUB_REPOSITORY,,}" >> "$GITHUB_ENV"
+
       - name: Checkout the release
         uses: actions/checkout@v7
         with:
@@ -76,6 +79,34 @@ jobs:
           cache-from: type=gha,scope=${{ matrix.platform }}
           cache-to: type=gha,scope=${{ matrix.platform }},mode=max
 
+      # The Dockerfile removes packages the tracer picked up but the server should not need. If a later Next
+      # version needs one of them after all, the server breaks here: the digest is not kept, and the publish
+      # job neither tags the version nor moves latest.
+      - name: Start the image and fetch the start page, the CAD kernel and an API route
+        env:
+          DIGEST: ${{ steps.build.outputs.digest }}
+        run: |
+          occt=$(jq -r '.packages["node_modules/occt-wasm"].version' package-lock.json)
+          docker run -d --name layerling-smoke -p 3000:3000 "$IMAGE@$DIGEST"
+          trap 'docker logs layerling-smoke; docker rm -f layerling-smoke >/dev/null' EXIT
+          check() {
+            for _ in $(seq 1 30); do
+              if result=$(curl -sS -o /dev/null -w '%{http_code} %{content_type}' "http://127.0.0.1:3000$1" 2>/dev/null); then
+                case "$result" in
+                  "200 $2"*) echo "$1: $result"; return 0 ;;
+                  *) echo "::error::$1 answered $result"; return 1 ;;
+                esac
+              fi
+              sleep 1
+            done
+            echo "::error::$1 did not answer within 30 s"
+            return 1
+          }
+          check / text/html
+          check "/occt/$occt/occt-wasm.wasm" application/wasm
+          # The start page is prerendered; a route handler also runs the server's own code.
+          check /api/shared-projects application/json
+
       - name: Keep the digest
         run: |
           mkdir -p "$RUNNER_TEMP/digests"
@@ -96,6 +127,9 @@ jobs:
     env:
       DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
     steps:
+      - name: Lowercase the image name
+        run: echo "IMAGE=ghcr.io/${GITHUB_REPOSITORY,,}" >> "$GITHUB_ENV"
+
       - name: Collect the digests
         uses: actions/download-artifact@v8
         with:

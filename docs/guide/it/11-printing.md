@@ -15,7 +15,7 @@ Succedono tre cose:
 - In un angolo del piano di lavoro compaiono il nome della stampante e il suo volume di stampa. Se le scritte sono d’intralcio, disattivale con {{ui:workspace.showPlateLabels}} nella sezione {{ui:workspace.workplane}}; puoi nascondere anche il nome del progetto, che appare davanti a sinistra.
 - layerling **mostra un avviso** se qualcosa non entra.
 
-I profili delle stampanti provengono da OrcaSlicer, quindi sono gli stessi disponibili nel tuo slicer. Se preferisci lavorare senza una stampante selezionata, scegli {{ui:workspace.printerNone}}. Puoi anche impostare manualmente le dimensioni del piano di lavoro.
+La maggior parte dei profili delle stampanti proviene da OrcaSlicer. Se preferisci lavorare senza una stampante selezionata, scegli {{ui:workspace.printerNone}}. Puoi anche impostare manualmente le dimensioni del piano di lavoro.
 
 Le stampanti delta, come quelle di FLSun o SeeMeCNC o la Anycubic Predator, stampano su una piastra rotonda. Con una di queste anche il piano di lavoro è rotondo e largo quanto la piastra, e un corpo è troppo grande appena supera il bordo. Un corpo rotondo viene misurato sul proprio contorno e non sul riquadro che lo racchiude, quindi ci sta anche un cilindro largo quasi quanto la piastra.
 

@@ -37,9 +37,13 @@ export const CUSTOM_SHAPES_BACKUP_FOLDER = "Custom shapes";
 export const CUSTOM_SHAPES_MANIFEST = "custom-shapes.json";
 const inCustomShapesFolder = (path: string) => path.startsWith(`${CUSTOM_SHAPES_BACKUP_FOLDER}/`);
 
+/**
+ * The day and the time (hours and minutes), so each backup gets a name of its own: the save dialog of Chrome, Edge
+ * and the desktop app replaces a file of the same name instead of adding (2) as a download does (Discussion #1621).
+ */
 export function backupFileName(date: Date, prefix = "layerling-backup") {
   const pad = (value: number) => String(value).padStart(2, "0");
-  return `${prefix}-${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}.zip`;
+  return `${prefix}-${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}-${pad(date.getHours())}${pad(date.getMinutes())}.zip`;
 }
 
 /**

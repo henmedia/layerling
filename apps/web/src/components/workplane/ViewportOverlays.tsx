@@ -27,6 +27,7 @@ import { placeTapeLabel, screenPolylineMiddle, tapeAxisSpans, tapeAxisTag, tapeD
 import { roundEdgeMeasure } from "@/lib/tapeCircle";
 import { tapeLengthMover, type TapeLengthMover, type TapeLengthRefusal } from "@/lib/tapeLengthEdit";
 import { displayShapeName } from "@/lib/shapeCatalog";
+import { setPickRayFromCamera } from "@/lib/cameraRay";
 
 /** Light-blue chrome for origin-distance lines, matching `.origin-dimension-value`. */
 const ORIGIN_DIMENSION_LINE_COLOR = { light: "#6ec4e8", dark: "#8fd4f0" } as const;
@@ -1248,7 +1249,8 @@ export function TapeOverlay({
   onPointPointerDown: (event: ReactPointerEvent<SVGCircleElement>, pointId: string) => void;
   onPointPointerMove: (event: ReactPointerEvent<SVGCircleElement>, pointId: string) => void;
   onPointPointerUp: (event: ReactPointerEvent<SVGCircleElement>, pointId: string) => void;
-  onSegmentPointerDown: (event: ReactPointerEvent<SVGElement>, segmentId: string) => void;
+  /** The line, and while deleting the label too: on a hole the line is its small, often hidden rim (#1613). */
+  onSegmentPointerDown: (event: ReactPointerEvent<Element>, segmentId: string) => void;
   /** Puts a reference point in the middle of a measurement (#323). */
   onMarkMiddle?: (segmentId: string) => void;
   /** Opens the field to type a length, which moves the body at one end (#823). */
@@ -1340,7 +1342,14 @@ export function TapeOverlay({
             style={{ left: segment.labelX, top: segment.labelY }}
             title={hint}
             aria-label={t("camera.tapeDistance", { length: `${segment.label} ${currentLengthUnitLabel()}` })}
-            onPointerDown={(event) => event.stopPropagation()}
+            onPointerDown={(event) => {
+              // Shift or Ctrl/Cmd held in Add measurement deletes the measurement here as on its line (#1613).
+              if (quickDelete) {
+                onSegmentPointerDown(event, segment.id);
+                return;
+              }
+              event.stopPropagation();
+            }}
             onClick={() => onEditLength(segment.id)}
             {...hoverSegment(segment.id, true)}
           >
@@ -1348,11 +1357,14 @@ export function TapeOverlay({
           </button>
         ) : (
           // A label that cannot be typed says why when it is pointed at, so it catches the pointer like one with a tip.
+          // While deleting, the label takes the click as its line does: on a hole the line is the rim, small and often
+          // hidden in the hole, and the number is what one clicks (#1613).
           <span
             key={`${segment.id}-label`}
-            className={`tape-label ${hoverClass(segment)} ${segment.deltas ? "has-deltas" : ""} ${hint ? "has-hint" : ""}`}
+            className={`tape-label ${hoverClass(segment)} ${segment.deltas ? "has-deltas" : ""} ${hint ? "has-hint" : ""} ${deleteMode || quickDelete ? "deletable" : ""}`}
             style={{ left: segment.labelX, top: segment.labelY }}
             title={hint || undefined}
+            onPointerDown={deleteMode || quickDelete ? (event) => onSegmentPointerDown(event, segment.id) : undefined}
             {...hoverSegment(segment.id, true)}
           >
             {content}
@@ -1687,15 +1699,14 @@ export function syncCornerRulerToolOverlay(
 
       const labels: CornerRulerLabelScreen[] = [];
       const buildTicks = (axisDir: THREE.Vector3, acrossDir: THREE.Vector3, length: number) => {
-        cornerRulerTicks(length).forEach((tick) => {
+        cornerRulerTicks(length, currentLengthUnitLabel()).forEach((tick) => {
           const base = corner.clone().addScaledVector(axisDir, tick.offset);
-          const tickHeight = armWidth * (tick.isTen ? 0.62 : tick.isFive ? 0.42 : 0.26);
-          pushSegment(lines.ticks, base, base.clone().addScaledVector(acrossDir, tickHeight));
-          if (tick.isTen && tick.offset > 0) {
+          pushSegment(lines.ticks, base, base.clone().addScaledVector(acrossDir, armWidth * tick.height));
+          if (tick.label) {
             const labelWorld = base.clone().addScaledVector(acrossDir, armWidth * 0.95);
             if (depthInFrontOfCamera(labelWorld, state) > 0) {
               const labelScreen = projectToScreen(labelWorld, state);
-              labels.push({ x: labelScreen.x, y: labelScreen.y, text: String(tick.offset), hidden: occlude && worldPointHidden(labelWorld, state) });
+              labels.push({ x: labelScreen.x, y: labelScreen.y, text: tick.label, hidden: occlude && worldPointHidden(labelWorld, state) });
             }
           }
         });
@@ -1883,7 +1894,7 @@ export function worldPointHidden(point: THREE.Vector3, state: ThreeState, ignore
   if (!Number.isFinite(ndc.x) || !Number.isFinite(ndc.y) || Math.abs(ndc.x) > 1.2 || Math.abs(ndc.y) > 1.2) return false;
   const raycaster = state.raycaster;
   const previousLayers = raycaster.layers.mask;
-  raycaster.setFromCamera(new THREE.Vector2(ndc.x, ndc.y), state.camera);
+  setPickRayFromCamera(raycaster, new THREE.Vector2(ndc.x, ndc.y), state.camera);
   raycaster.layers.set(RENDER_LAYER_SHAPES);
   const along = point.clone().sub(raycaster.ray.origin).dot(raycaster.ray.direction);
   const savedFar = raycaster.far;

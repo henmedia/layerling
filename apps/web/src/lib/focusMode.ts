@@ -13,7 +13,6 @@ import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react
 export const FOCUS_MODE_STORAGE_KEY = "layerling.editor.focusMode";
 /** Tells the toolbar to measure its height again: the title row it counts in comes and goes. */
 export const FOCUS_MODE_CHANGE_EVENT = "layerling:focus-mode-change";
-export const FOCUS_MODE_TOGGLE_EVENT = "layerling:toggle-focus-mode";
 export const FOCUS_MODE_SHORTCUT = "Ctrl+Shift+F";
 
 /** Whether the key is the focus mode's: Ctrl+Shift+F, or Cmd+Shift+F on a Mac. */

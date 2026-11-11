@@ -22,7 +22,7 @@ Met veel onderdelen raak je in de weergave makkelijk het overzicht kwijt. De obj
 ![De objectlijst: de groep "Groep" met twee onderdelen en een bol ernaast. Een mappictogram opent de groep.](shot:object-list)
 
 - Een klik op een regel selecteert de vorm, ook onderdelen binnen een groep. Met [[Shift]] ingedrukt voeg je meer regels toe of haal je ze weer weg, net als in de weergave. De pijltjes klappen groepen open en dicht.
-- Het label laat zien of een onderdeel {{ui:outliner.solid}} of {{ui:outliner.hole}} is.
+- De letter achter de naam laat zien of een onderdeel {{ui:outliner.solid}} of {{ui:outliner.hole}} is: het is de eerste letter van het woord, en met de muis erboven verschijnt het hele woord.
 - Onder de naam staat wat voor vorm het is. Een lichaam dat geen eenvoudige vorm meer is (afgerond, uitgehold of geïmporteerd), toont {{ui:shape.exactBody}} als de STEP-export het exact schrijft, en {{ui:shape.mesh}} als het alleen uit driehoeken bestaat en als STL meegaat. Een versmalling, helling of draaiing die pas na het afronden of uithollen komt, buigt alleen de mesh; dan staat er {{ui:shape.mesh}}.
 - Hangslot en oog vergrendelen en verbergen afzonderlijke onderdelen.
 - {{ui:outliner.rename}} geeft een onderdeel een eigen naam; het potlood naast de naam bovenaan in de instellingen doet hetzelfde voor de geselecteerde vorm. Zinnige namen helpen enorm in grotere ontwerpen.
@@ -32,7 +32,7 @@ Met veel onderdelen raak je in de weergave makkelijk het overzicht kwijt. De obj
 - Het zoekveld vindt vormen op naam en op soort, dus ook "cilinder" of "gat". Het zoekt ook binnen groepen, hoe diep ook genest: een groep met een treffer blijft in de lijst staan en klapt open om de gevonden onderdelen te tonen en de groepen die ernaartoe leiden. Een groep die op zijn eigen naam gevonden is, toont al zijn onderdelen als je hem opent.
 - Het pijltje helemaal links in de titelbalk klapt de lijst in tot alleen de titelbalk, en weer terug.
 
-De lijst zit vastgezet net rechts van de weergavekubus. Sleep hem aan zijn titelbalk om hem ergens op het werkvlak neer te zetten; hij schuift onder de weergavekubus en de weergavebalk door. Laat hem weer naast de weergavekubus los, of dubbelklik op de titelbalk, en hij zit weer vast. Waar hij stond en of hij ingeklapt was, onthoudt deze browser.
+De lijst zit vastgezet net rechts van de weergavekubus. Sleep hem aan zijn titelbalk om hem ergens op het werkvlak neer te zetten; hij schuift onder de weergavekubus en de weergavebalk door. Laat hem weer naast de weergavekubus los, of dubbelklik op de titelbalk, en hij zit weer vast. Waar hij stond en of hij ingeklapt was, onthoudt deze browser. De lijst maak je breder of smaller door de rechteronderhoek te slepen, van 240 tot 600 pixels; ook de breedte onthoudt de browser.
 
 ## Een positie typen
 

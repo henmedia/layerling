@@ -22,7 +22,7 @@ With many parts it is easy to lose track in the view. The object list ({{ui:edit
 ![The object list: the group "Group" with two parts and a sphere beside it. A folder icon opens the group.](shot:object-list)
 
 - A click on an entry selects the shape, including parts inside a group. With [[Shift]] held you add more entries or take them away again, just as in the view. The arrows fold groups open and shut.
-- The label shows whether a part is {{ui:outliner.solid}} or {{ui:outliner.hole}}.
+- The letter after the name says whether a part is {{ui:outliner.solid}} or {{ui:outliner.hole}}: it is the first letter of the word, and the word shows when you hold the mouse over it.
 - Under the name stands what kind of shape it is. A body that is no longer a plain shape (rounded, hollowed or imported) says {{ui:shape.exactBody}} when the STEP export writes it exactly, and {{ui:shape.mesh}} when it is only triangles and goes as STL. A taper, lean or twist set after rounding or hollowing a body bends only its mesh, so it then says {{ui:shape.mesh}}.
 - Padlock and eye lock and hide single parts.
 - {{ui:outliner.rename}} gives a part a name of its own; the pencil beside the name at the top of the settings does the same for the selected shape. Sensible names help enormously in larger designs.
@@ -32,7 +32,7 @@ With many parts it is easy to lose track in the view. The object list ({{ui:edit
 - The search field finds shapes by name and by kind, so also "cylinder" or "hole". It also looks inside groups, however deeply nested: a group holding a match stays in the list and folds open to show the matching parts and the groups that lead to them. A group found by its own name shows all its parts when you open it.
 - The arrow on the far left of the title bar folds the list down to its title bar and back.
 
-The list sits docked just right of the view cube. Drag it by its title bar to put it anywhere on the workplane; it passes underneath the view cube and the view bar. Drop it back beside the view cube, or double-click the title bar, and it docks again. Where it was and whether it was folded are remembered in this browser.
+The list sits docked just right of the view cube. Drag it by its title bar to put it anywhere on the workplane; it passes underneath the view cube and the view bar. Drop it back beside the view cube, or double-click the title bar, and it docks again. Where it was and whether it was folded are remembered in this browser. To make the list wider or narrower, drag its lower right corner, from 240 to 600 pixels; the width is remembered in this browser as well.
 
 ## Typing a position
 

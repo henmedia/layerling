@@ -15,7 +15,7 @@ Projeví se tři změny:
 - V jejím rohu se zobrazí název tiskárny a tiskový prostor. Pokud popisky překážejí, vypněte {{ui:workspace.showPlateLabels}} v části {{ui:workspace.workplane}}. Platí to i pro název projektu vlevo vpředu.
 - Layerling **upozorní**, když se díl nevejde.
 
-Profily tiskáren pocházejí z OrcaSliceru, takže odpovídají profilům známým ze sliceru. Pro práci bez konkrétní tiskárny zvolte {{ui:workspace.printerNone}}. Velikost pracovní roviny lze zadat i ručně.
+Většina profilů tiskáren pochází z OrcaSliceru. Pro práci bez konkrétní tiskárny zvolte {{ui:workspace.printerNone}}. Velikost pracovní roviny lze zadat i ručně.
 
 Delta tiskárny, například od FLSun nebo SeeMeCNC či Anycubic Predator, tisknou na kulatou podložku. S některou z nich je kulatá i pracovní plocha, stejně široká jako podložka, a těleso je příliš velké, jakmile přesahuje okraj. Kulaté těleso se měří podle vlastního obrysu, ne podle kvádru kolem něj, takže se vejde i válec skoro tak široký jako podložka.
 

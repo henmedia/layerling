@@ -181,7 +181,7 @@ export async function fitTestShape(triangleLimit: number, locale = numberLocale(
   if (!pin.group) throw new Error(pin.failureNotice || t("fitTest.failed"));
   const bundle = groupedShape([
     canonicalizeShape({ ...plate.group, id: createLocalId("fit-test-plate"), name: t("fitTest.plate"), color: parts.plate.color, groupOperation: "group" }),
-    canonicalizeShape({ ...pin.group, id: createLocalId("fit-test-pin"), name: t("fitTest.pin"), color: parts.pin.color, groupOperation: "group" }),
+    canonicalizeShape({ ...pin.group, id: createLocalId("fit-test-pin"), name: t("fitTest.pin"), color: parts.pin.color, groupOperation: "group", ...(base ? { breakawayBase: true } : {}) }),
   ]);
   if (!bundle) throw new Error(t("fitTest.failed"));
   return canonicalizeShape({ ...bundle, id: createLocalId("fit-test"), name: t("fitTest.name"), color: parts.plate.color, groupOperation: "bundle", elevation: 0 });

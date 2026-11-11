@@ -21,6 +21,8 @@ import {
   gearCenterHoleLimits,
   normalizeGearHelixAngle,
   normalizeBevelHelixAngle,
+  normalizeRingRackHelixAngle,
+  ringRackIsHelical,
   normalizeGearHelixQuality,
   normalizeGearCenterHoleSize,
   normalizeGearToothSize,
@@ -194,7 +196,7 @@ import { VasePrintReport } from "@/components/workplane/VasePrintReport";
 import { shapeDefaultsAsset, shapeDefaultsFromShape } from "@/lib/shapeDefaults";
 import { fromPrinterPlay, printerPlayShapeRows, withPrinterPlay } from "@/lib/printerPlay";
 import { usePrinterPlay } from "@/lib/usePrinterPlay";
-import { MAX_SCREW_HOLE_ANGLE, MIN_SCREW_HOLE_ANGLE, maxScrewHoleRecess, normalizeScrewHoleAngle, normalizeScrewHoleHeadDepth, normalizeScrewHoleRecess, normalizeScrewHoleShaft, screwHoleSlotMeasures } from "@/lib/screwHoleGeometry";
+import { MAX_SCREW_HOLE_ANGLE, MIN_SCREW_HOLE_ANGLE, maxScrewHoleChamfer, maxScrewHoleRecess, normalizeScrewHoleAngle, normalizeScrewHoleChamfer, normalizeScrewHoleHeadDepth, normalizeScrewHoleRecess, normalizeScrewHoleShaft, screwHoleSlotMeasures } from "@/lib/screwHoleGeometry";
 import { DEFAULT_DRILL_POINT_ANGLE, DRILL_POINT_ANGLES, MAX_DRILL_POINT_ANGLE, MIN_DRILL_POINT_ANGLE, normalizeDrillPointAngle, shapeDrillPointLength, shapeTakesDrillPoint } from "@/lib/drillPoint";
 import { MAX_TEARDROP_TIP_ANGLE, MIN_TEARDROP_TIP_ANGLE, normalizeTeardropTipAngle, teardropHeightForTipAngle, teardropTipAngle } from "@/lib/teardropGeometry";
 import { MAX_PORT_CLEARANCE, maxPortCorner, normalizePortClearance, normalizePortCorner, PORT_PRESET_ORDER, PORT_PRESETS, portPresetFor, portPresetSize, type PortPreset } from "@/lib/portGeometry";
@@ -375,7 +377,7 @@ import { canToggleGroupColors, groupShowsPartColors } from "@/lib/groupColors";
 import { groupCanKeepParts, offersGroupResize } from "@/lib/groupScale";
 import { shapePivotFromWorld, shapePivotWorld } from "@/lib/rotationPivot";
 import { signedDegrees } from "@/lib/geometryRotation";
-import { orientedMeasures, withOrientedMeasures } from "@/lib/orientedMeasures";
+import { isPlainMeasure, orientedMeasures, withOrientedMeasures } from "@/lib/orientedMeasures";
 import { tubeAfterInner, tubeAfterOuter, tubeInnerDiameter } from "@/lib/tubeDiameters";
 import { WASHER_SIZE_ORDER, isWasherSize, washerSizeFor, washerTubeFields } from "@/lib/washerSizes";
 import { finishingWasherFields, finishingWasherSizeFor, finishingWasherSizes, isFinishingWasherSize, isScrewHoleSize, screwHoleFields, screwHoleSizeFor, screwHoleSizesFor } from "@/lib/screwHoleSizes";
@@ -635,7 +637,7 @@ function scrollingAncestor(element: HTMLElement): HTMLElement | null {
 }
 
 function propertyUsesLengthUnit(key: string) {
-  return ["textLineWidth", "textBlockGap", "textEdgeSize", "letterSize", "iconWidth", "keyringDiameter", "keyringAlong", "positionX", "positionY", "positionZ", "pivotX", "pivotY", "pivotZ", "radius", "length", "width", "height", "bevel", "topRadius", "baseRadius", "curvedConeTop", "thickness", "outerDiameter", "innerDiameter", "textRadius", "extrudeTopOffsetX", "extrudeTopOffsetZ", "toothSize", "toothWidth", "gearBacklash", "centerHole", "slotSmallEnd", "slotCentreDistance", "torusTube", "sketchLineWidth", "sketchCuttingEdge", "topLength", "topWidth", "bottomLength", "bottomWidth", "diameter", "pitch", "clearance", "axialClearance", "boltClearance", "threadDepth", "threadCoreDiameter", "threadLength", "headHeight", "headDiameter", "collarHeight", "collarDiameter", "driveSize", "driveDepth", "chamfer", "chamferBottom", "headChamfer", "wire", "starOuterSize", "starInnerSize", "starOuterFillet", "starInnerFillet", "heartTipFillet", "crescentThickness", "crescentTipFillet", "honeycombCellSize", "honeycombWallThickness", "honeycombFrameWidth", "cornerFillet", "topBottomFillet", "bentTubeSize", "bentTubeWall", "bentTubeSegmentLength", "bentTubeBendRadius", "dovetailNeckWidth", "dovetailClearance", "screwBossHole", "screwBossHoleDepth", "screwBossDiameter", "screwBossGussetHeight", "screwBossGussetThickness", "screwBossReach", "snapFitThickness", "snapFitUndercut", "snapFitClearance", "snapFitFoot", "ribLength", "ribThickness", "ribFootThickness", "portClearance", "hingePinDiameter", "hingeLeafThickness", "hingeClearance", "hingeCornerRadius", "hingeScrewDiameter", "hingeScrewSpacing", "hingeScrewAcross", "hingeNutWidth", "screwHoleShaft", "screwHoleHeadDepth", "screwHoleSlotLength", "screwHoleRecess", "knurlDepth", "knurlChamfer", "loftBottomWidth", "loftBottomDepth", "loftTopWidth", "loftTopDepth", "loftBottomCorner", "loftTopCorner", "loftOffsetX", "loftOffsetZ", "loftWall", "loftTopWall", "loftSectionHeight", "loftSectionWidth", "loftSectionDepth", "loftSectionCorner", "loftSectionOffsetX", "loftSectionOffsetZ", "gridfinityLabelBackLength", "gridfinityLabelBackOffset", "gridfinityLabelBackWidth", "gridfinityLabelCornerSize", "gridfinityLabelTextSize", "gridfinityLabelFrontLength", "gridfinityLabelFrontOffset", "gridfinityLabelFrontWidth", "gridfinityLabelLeftLength", "gridfinityLabelLeftOffset", "gridfinityLabelLeftWidth", "gridfinityLabelRightLength", "gridfinityLabelRightOffset", "gridfinityLabelRightWidth", "gridfinityScoopRadius", "gridfinityFloorHeight", "gridfinityLipChamfer", "gridfinityWallThickness", "gridfinityDrawerWidth", "gridfinityDrawerDepth", "gridfinityPaddingBack", "gridfinityPaddingFront", "gridfinityPaddingLeft", "gridfinityPaddingRight", "gridfinityCornerRadius", "gridfinityBinCornerRadius", "gridfinitySwallowtailClearance", "gridfinityDividerThickness", "gridfinityDividerPositionX", "gridfinityDividerPositionZ", "gridfinityCompartmentLabelWidth", "gridfinityOpeningCornerSize", "gridfinityOpeningDepthBack", "gridfinityOpeningDepthFront", "gridfinityOpeningDepthLeft", "gridfinityOpeningDepthRight", "gridfinityOpeningWidthBack", "gridfinityOpeningWidthFront", "gridfinityOpeningWidthLeft", "gridfinityOpeningWidthRight", "gridfinityOpeningDistanceBack", "gridfinityOpeningDistanceFront", "gridfinityOpeningDistanceLeft", "gridfinityOpeningDistanceRight", "surfaceSpacing", "surfaceDepth", "surfaceFade", "surfaceCrackWidth", "surfaceCrackRecess", "surfaceTextSize", "surfaceCarbonCross", "surfaceBrickHeight", "surfaceBrickJoint", "surfaceTimberHeight", "surfaceTimberBeam", "surfaceStoneJoint", "surfaceTileGap", "surfaceRingWidth", "surfaceTileHeight", "vase.wall", "vase.bottom", "vase.ribDepth", "vase.stripeDepth", "vase.voronoiCell", "vase.voronoiGap", "vase.voronoiDepth", "vase.waveAmplitude", "vaseFloor.drainDiameter", "vaseFloor.floorSlope", "vaseFloor.footHeight", "vaseFloor.rubberFootDiameter", "vaseFloor.rubberFootDepth", "vaseFloor.cutoutSize", "vaseFloor.cutoutWeb", "vaseFloor.lampHole", "vaseFloor.puckDiameter", "vaseFloor.lampNotch", "vaseFloor.lampNotchHeight", "vaseFloor.reinforceDepth", "vaseFloor.slitWidth", "vaseFloor.lineWidth", "vasePrint.lineWidth", "vaseParts.legHeight", "vaseParts.legDiameter", "vaseParts.saucerHeight", "vaseParts.saucerGap", "vaseParts.saucerWall", "vaseParts.insertWall", "vaseParts.insertStandoff", "vaseParts.reservoirHeight", "vaseParts.frogHole", "vaseParts.tubeDiameter", "vaseParts.lidClearance", "vaseParts.lidThickness", "vaseParts.lidDepth", "vaseParts.lidHeight", "vaseParts.lidJoint", "vaseParts.threadPitch", "vaseParts.fitClearance"].includes(key);
+  return ["textLineWidth", "textBlockGap", "textEdgeSize", "letterSize", "iconWidth", "keyringDiameter", "keyringAlong", "positionX", "positionY", "positionZ", "pivotX", "pivotY", "pivotZ", "radius", "length", "width", "height", "bevel", "topRadius", "baseRadius", "curvedConeTop", "thickness", "outerDiameter", "innerDiameter", "textRadius", "extrudeTopOffsetX", "extrudeTopOffsetZ", "toothSize", "toothWidth", "gearBacklash", "centerHole", "slotSmallEnd", "slotCentreDistance", "torusTube", "sketchLineWidth", "sketchCuttingEdge", "topLength", "topWidth", "bottomLength", "bottomWidth", "diameter", "pitch", "clearance", "axialClearance", "boltClearance", "threadDepth", "threadCoreDiameter", "threadLength", "headHeight", "headDiameter", "collarHeight", "collarDiameter", "driveSize", "driveDepth", "chamfer", "chamferBottom", "headChamfer", "wire", "starOuterSize", "starInnerSize", "starOuterFillet", "starInnerFillet", "heartTipFillet", "crescentThickness", "crescentTipFillet", "honeycombCellSize", "honeycombWallThickness", "honeycombFrameWidth", "cornerFillet", "topBottomFillet", "bentTubeSize", "bentTubeWall", "bentTubeSegmentLength", "bentTubeBendRadius", "dovetailNeckWidth", "dovetailClearance", "screwBossHole", "screwBossHoleDepth", "screwBossDiameter", "screwBossGussetHeight", "screwBossGussetThickness", "screwBossReach", "snapFitThickness", "snapFitUndercut", "snapFitClearance", "snapFitFoot", "ribLength", "ribThickness", "ribFootThickness", "portClearance", "hingePinDiameter", "hingeLeafThickness", "hingeClearance", "hingeCornerRadius", "hingeScrewDiameter", "hingeScrewSpacing", "hingeScrewAcross", "hingeNutWidth", "screwHoleShaft", "screwHoleHeadDepth", "screwHoleSlotLength", "screwHoleRecess", "screwHoleChamfer", "knurlDepth", "knurlChamfer", "loftBottomWidth", "loftBottomDepth", "loftTopWidth", "loftTopDepth", "loftBottomCorner", "loftTopCorner", "loftOffsetX", "loftOffsetZ", "loftWall", "loftTopWall", "loftSectionHeight", "loftSectionWidth", "loftSectionDepth", "loftSectionCorner", "loftSectionOffsetX", "loftSectionOffsetZ", "gridfinityLabelBackLength", "gridfinityLabelBackOffset", "gridfinityLabelBackWidth", "gridfinityLabelCornerSize", "gridfinityLabelTextSize", "gridfinityLabelFrontLength", "gridfinityLabelFrontOffset", "gridfinityLabelFrontWidth", "gridfinityLabelLeftLength", "gridfinityLabelLeftOffset", "gridfinityLabelLeftWidth", "gridfinityLabelRightLength", "gridfinityLabelRightOffset", "gridfinityLabelRightWidth", "gridfinityScoopRadius", "gridfinityFloorHeight", "gridfinityLipChamfer", "gridfinityWallThickness", "gridfinityDrawerWidth", "gridfinityDrawerDepth", "gridfinityPaddingBack", "gridfinityPaddingFront", "gridfinityPaddingLeft", "gridfinityPaddingRight", "gridfinityCornerRadius", "gridfinityBinCornerRadius", "gridfinitySwallowtailClearance", "gridfinityDividerThickness", "gridfinityDividerPositionX", "gridfinityDividerPositionZ", "gridfinityCompartmentLabelWidth", "gridfinityOpeningCornerSize", "gridfinityOpeningDepthBack", "gridfinityOpeningDepthFront", "gridfinityOpeningDepthLeft", "gridfinityOpeningDepthRight", "gridfinityOpeningWidthBack", "gridfinityOpeningWidthFront", "gridfinityOpeningWidthLeft", "gridfinityOpeningWidthRight", "gridfinityOpeningDistanceBack", "gridfinityOpeningDistanceFront", "gridfinityOpeningDistanceLeft", "gridfinityOpeningDistanceRight", "surfaceSpacing", "surfaceDepth", "surfaceFade", "surfaceCrackWidth", "surfaceCrackRecess", "surfaceTextSize", "surfaceCarbonCross", "surfaceBrickHeight", "surfaceBrickJoint", "surfaceTimberHeight", "surfaceTimberBeam", "surfaceStoneJoint", "surfaceTileGap", "surfaceRingWidth", "surfaceTileHeight", "vase.wall", "vase.bottom", "vase.ribDepth", "vase.stripeDepth", "vase.voronoiCell", "vase.voronoiGap", "vase.voronoiDepth", "vase.waveAmplitude", "vaseFloor.drainDiameter", "vaseFloor.floorSlope", "vaseFloor.footHeight", "vaseFloor.rubberFootDiameter", "vaseFloor.rubberFootDepth", "vaseFloor.cutoutSize", "vaseFloor.cutoutWeb", "vaseFloor.lampHole", "vaseFloor.puckDiameter", "vaseFloor.lampNotch", "vaseFloor.lampNotchHeight", "vaseFloor.reinforceDepth", "vaseFloor.slitWidth", "vaseFloor.lineWidth", "vasePrint.lineWidth", "vaseParts.legHeight", "vaseParts.legDiameter", "vaseParts.saucerHeight", "vaseParts.saucerGap", "vaseParts.saucerWall", "vaseParts.insertWall", "vaseParts.insertStandoff", "vaseParts.reservoirHeight", "vaseParts.frogHole", "vaseParts.tubeDiameter", "vaseParts.lidClearance", "vaseParts.lidThickness", "vaseParts.lidDepth", "vaseParts.lidHeight", "vaseParts.lidJoint", "vaseParts.threadPitch", "vaseParts.fitClearance"].includes(key);
 }
 
 /**
@@ -1291,9 +1293,18 @@ function getShapePropertiesWithAppLimits(shape: WorkplaneShape, onUpdate: ShapeI
             step: 1,
             onChange: (value) => onUpdate({ screwHoleAngle: normalizeScrewHoleAngle(value) }),
           },
-      // A recessed countersink (Discussion #1531): the head sits this far below the face, 0 leaves it flush.
+      // A counterbore's rim may be chamfered (Discussion #1632), a countersink's head recessed (Discussion #1531).
       ...(shape.kind === "counterbore"
-        ? []
+        ? [{
+            id: "screwHoleChamfer",
+            label: t("prop.screwHoleChamfer"),
+            value: normalizeScrewHoleChamfer(shape.screwHoleChamfer, shape.height, shape.screwHoleHeadDepth, holeKind),
+            min: 0,
+            max: maxScrewHoleChamfer(shape.height, shape.screwHoleHeadDepth, holeKind),
+            step: 0.1,
+            hint: t("prop.screwHoleChamferHint"),
+            onChange: (value: number) => onUpdate({ screwHoleChamfer: normalizeScrewHoleChamfer(value, shape.height, shape.screwHoleHeadDepth, holeKind) || undefined }),
+          }]
         : [{
             id: "screwHoleRecess",
             label: t("prop.screwHoleRecess"),
@@ -3875,7 +3886,29 @@ function getShapePropertiesWithAppLimits(shape: WorkplaneShape, onUpdate: ShapeI
         onChange: (bevelHelixAngle) => onUpdate({ bevelHelixAngle: bevelHelixAngle || undefined }),
       });
     }
-    if (gearTypeHasHelix(shape.gearType) || (normalizeGearType(shape.gearType) === "bevel" && bevelGearIsSpiral(shape.bevelHelixAngle))) {
+    // A ring gear's or a rack's teeth can run at a slant, to run with a helical or herringbone gear (Discussion #1627);
+    // 0 keeps them straight.
+    if (modular) {
+      properties.push({
+        id: "ringRackHelixAngle",
+        label: t("prop.helixAngle"),
+        value: normalizeRingRackHelixAngle(shape.ringRackHelixAngle),
+        min: MIN_GEAR_HELIX_ANGLE,
+        max: MAX_GEAR_HELIX_ANGLE,
+        step: 1,
+        hint: t("inspector.ringRackHelixHint"),
+        onChange: (ringRackHelixAngle) => onUpdate({ ringRackHelixAngle: ringRackHelixAngle || undefined }),
+      });
+      if (ringRackIsHelical(shape)) properties.push({
+        type: "toggle",
+        id: "ringRackHerringbone",
+        label: t("prop.ringRackHerringbone"),
+        value: shape.ringRackHerringbone === true,
+        onChange: (ringRackHerringbone) => onUpdate({ ringRackHerringbone: ringRackHerringbone || undefined }),
+      });
+    }
+    // The ring gear's turn is drawn in steps like a helical gear's; the rack's slant needs none.
+    if (gearTypeHasHelix(shape.gearType) || (normalizeGearType(shape.gearType) === "bevel" && bevelGearIsSpiral(shape.bevelHelixAngle)) || (gearType === "internal" && ringRackIsHelical(shape))) {
       properties.push({
         id: "quality",
       label: t("prop.quality"),
@@ -4280,12 +4313,15 @@ function surfaceTextFontOptions(current: string): SelectPropertyOption[] {
   return options;
 }
 
+/** The wording of the three plain measures, in the language shown now. */
+const MEASURE_LABELS = () => ({ width: t("prop.width"), height: t("prop.height"), length: t("prop.length") });
+
 function getShapeProperties(shape: WorkplaneShape, onUpdate: ShapeInspectorUpdate, workspace: WorkplaneWorkspaceSettings, view: ShapePropertyView = NO_PROPERTY_VIEW): ShapePropertyConfig[] {
   const customLimit = workspace.shapeCustomizations[shape.kind]?.maxDimension;
   // A body turned by right angles names its measures by the way they run now (#230).
   const oriented = orientedMeasures(shape);
   const own = getShapePropertiesWithAppLimits(shape, onUpdate, view);
-  const properties = withOrientedMeasures(own, oriented, { width: t("prop.width"), height: t("prop.height"), length: t("prop.length") });
+  const properties = withOrientedMeasures(own, oriented, MEASURE_LABELS());
   if (customLimit === undefined) return properties;
   return properties.map((property) => {
     if (property.type === "text" || property.type === "select") return property;
@@ -4479,7 +4515,7 @@ export function ShapeInspector({
     ? properties.filter((property) => ["gearProfile", "teeth", "gearModule", "gearPressureAngle", "gearBacklash", "gearRim", "toothSize", "toothWidth"].includes(property.id))
     : [];
   const gearHelixProperties = shape.kind === "gear"
-    ? properties.filter((property) => ["helixAngle", "bevelHelixAngle", "quality"].includes(property.id))
+    ? properties.filter((property) => ["helixAngle", "bevelHelixAngle", "ringRackHelixAngle", "ringRackHerringbone", "quality"].includes(property.id))
     : [];
   const taper = shapeTaperDimensions(shape);
   const taperDimensionMax = shapeDimensionLimit(workspace, shape.kind, DEFAULT_TAPER_DIMENSION_MAX);
@@ -5310,7 +5346,8 @@ export function ShapeInspector({
             {textFillMore.length && showKeepProportions ? (
               <ToggleProperty label={t("inspector.keepProportions")} value={proportionLock} disabled={frozen} onChange={onProportionLockChange!} />
             ) : null}
-            {tiltedMeasures && primaryProperties.some((property) => ["width", "length", "height"].includes(property.id)) ? (
+            {/* Only the plain Length, Width and Height need the note; a Head diameter means the same at any angle (#1634). */}
+            {tiltedMeasures && primaryProperties.some((property) => isPlainMeasure(property, MEASURE_LABELS())) ? (
               <p className="cylinder-wrap-hint">{t("prop.tiltedMeasures")}</p>
             ) : null}
             {shape.kind === "gridfinity" && gridfinityPlan({ ...shape, depth: shapeDepth(shape) }).swallowtail ? (

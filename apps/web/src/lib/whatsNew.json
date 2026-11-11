@@ -1,5 +1,253 @@
 [
   {
+    "version": "1.157.2",
+    "items": [
+      {
+        "title": {
+          "de": "Entwürfe vom Server zurück in den Browser",
+          "en": "Designs from the server back into the browser",
+          "da": "Designs fra serveren tilbage i browseren"
+        },
+        "body": {
+          "de": "Im Menü eines Entwurfs auf dem Reiter Server steht jetzt „In diesen Browser holen“, als Gegenstück zu „Auf den Server legen“. Seine Karte auf den Reiter Browser zu ziehen geht auch. Der Entwurf liegt danach nur noch in diesem Browser und nicht mehr im Serverordner.",
+          "en": "The menu of a design on the Server tab now has \"Put in this browser\", the way back from \"Put on the server\". Dragging its card onto the Browser tab works too. The design then lives only in this browser and no longer in the server folder.",
+          "da": "Menuen for et design under fanen Server har nu \"Læg i denne browser\", vejen tilbage fra \"Læg på serveren\". Det virker også at trække kortet til fanen Browser. Designet ligger derefter kun i denne browser og ikke længere i servermappen."
+        }
+      },
+      {
+        "title": {
+          "de": "Die Schrittliste im Verlauf erscheint wieder sofort",
+          "en": "The list of steps in the History view shows at once again",
+          "da": "Listen over trin i historikken vises straks igen"
+        },
+        "body": {
+          "de": "Bei Entwürfen mit vielen Schritten und großen Körpern brauchte die Liste der Schritte in der Verlaufsansicht bis zu einer halben Minute. Jetzt steht sie sofort da, auch beim erneuten Öffnen.",
+          "en": "With designs of many steps and large bodies, the list of steps in the History view took up to half a minute to show. Now it is there at once, also when you open it again.",
+          "da": "Ved designs med mange trin og store legemer tog listen over trin i historikken op til et halvt minut at vise. Nu er den der straks, også når du åbner den igen."
+        }
+      },
+      {
+        "title": {
+          "de": "Ordner kommen mit auf den Server",
+          "en": "Folders come along onto the server",
+          "da": "Mapper kommer med på serveren"
+        },
+        "body": {
+          "de": "„Alle auf den Server legen“ behält jetzt deine Ordner: Jeder Entwurf landet auf dem Server im selben Ordner wie im Browser. Auch ein einzelner Ordner kommt mit allem darin auf den Server, über „Auf den Server legen“ in seinem Menü oder indem du ihn auf den Reiter Server ziehst.",
+          "en": "\"Put all on the server\" now keeps your folders: each design ends up on the server in the same folder as in the browser. A single folder goes onto the server with everything in it too, with \"Put on the server\" in its menu or by dragging it onto the Server tab.",
+          "da": "\"Læg alle på serveren\" beholder nu dine mapper: hvert design havner på serveren i samme mappe som i browseren. En enkelt mappe kommer også på serveren med alt indhold, med \"Læg på serveren\" i dens menu eller ved at trække den til fanen Server."
+        }
+      }
+    ]
+  },
+  {
+    "version": "1.157.1",
+    "items": [
+      {
+        "title": {
+          "de": "Mehr Platz für die Namen in der Objektliste",
+          "en": "More room for the names in the object list",
+          "da": "Mere plads til navnene i objektlisten"
+        },
+        "body": {
+          "de": "Ob ein Teil Körper oder Aussparung ist, zeigt die Objektliste jetzt mit einem Buchstaben statt mit dem ganzen Wort; mit der Maus darüber steht das Wort da. Und an ihrer rechten unteren Ecke lässt sich die Liste breiter ziehen, bis 600 Pixel; der Browser merkt sich die Breite.",
+          "en": "The object list now shows whether a part is a solid or a hole with one letter instead of the whole word; hold the mouse over it to see the word. And you can drag the list wider at its lower right corner, up to 600 pixels; the browser remembers the width.",
+          "da": "Objektlisten viser nu med ét bogstav i stedet for hele ordet, om en del er massiv eller et hul; hold musen over det for at se ordet. Og listen kan trækkes bredere i sit nederste højre hjørne, op til 600 pixel; browseren husker bredden."
+        }
+      },
+      {
+        "title": {
+          "de": "Fase und Rundung: die größte passende Größe",
+          "en": "Chamfer and fillet: the largest size that fits",
+          "da": "Fas og afrunding: den største størrelse, der passer"
+        },
+        "body": {
+          "de": "Ist eine Fase oder Rundung zu groß für die gewählten Kanten, steht unter der Meldung jetzt „Größte passende Größe suchen“. Ein Klick probiert kleinere Größen und trägt die größte ein, die durchgeht, auf ein Hundertstel Millimeter genau.",
+          "en": "When a chamfer or fillet is too large for the picked edges, \"Find the largest size that fits\" now shows under the message. One click tries smaller sizes and puts in the largest that goes through, to a hundredth of a millimetre.",
+          "da": "Er en fas eller afrunding for stor til de valgte kanter, står der nu \"Find den største størrelse, der passer\" under meddelelsen. Ét klik prøver mindre størrelser og skriver den største, der går igennem, ind, på en hundrededel millimeter."
+        }
+      },
+      {
+        "title": {
+          "de": "Rote und grüne Verschiebepfeile abschaltbar",
+          "en": "The red and green move arrows can be switched off",
+          "da": "De røde og grønne flyttepile kan slås fra"
+        },
+        "body": {
+          "de": "Unter Einstellungen → Darstellung → „Rote und grüne Verschiebepfeile anzeigen“. Ausgeschaltet behält die Auswahl ihre Drehpfeile und den Hebepfeil; die beiden Pfeile, die sie nur entlang X oder Y schieben, sitzen bei kleinen Körpern nicht mehr im Weg.",
+          "en": "Under Settings → Appearance → \"Show the red and green move arrows\". Switched off, the selection keeps its turn arrows and the lift arrow; the two arrows that only slide it along X or Y no longer get in the way on small bodies.",
+          "da": "Under Indstillinger → Udseende → \"Vis de røde og grønne flyttepile\". Slået fra beholder markeringen sine drejepile og løftepilen; de to pile, der kun skubber den langs X eller Y, er ikke længere i vejen på små legemer."
+        }
+      },
+      {
+        "title": {
+          "de": "Gedrehte Senkung behält ihre Feldnamen",
+          "en": "A turned countersink keeps the names of its fields",
+          "da": "En drejet undersænkning beholder navnene på sine felter"
+        },
+        "body": {
+          "de": "Um 90° gedreht hieß der Kopfdurchmesser einer Senkung plötzlich „Höhe“ und die Gesamtlänge „Breite“. Jetzt folgen nur die schlichten Felder Länge, Breite und Höhe der Drehung; Felder mit eigenem Namen behalten ihn.",
+          "en": "Turned by 90°, a countersink's head diameter was suddenly called Height and its total length Width. Now only the plain Length, Width and Height fields follow the turn; fields with a name of their own keep it.",
+          "da": "Drejet 90° hed en undersænknings hoveddiameter pludselig Højde og dens samlede længde Bredde. Nu følger kun de enkle felter Længde, Bredde og Højde drejningen; felter med deres eget navn beholder det."
+        }
+      },
+      {
+        "title": {
+          "de": "„Als Vorgabe speichern“ merkt sich alle Felder",
+          "en": "Save as default keeps every field",
+          "da": "Gem som standard husker alle felter"
+        },
+        "body": {
+          "de": "„Als Vorgabe speichern“ ließ neuere Felder aus, etwa die Fase am Rand einer Stufenbohrung, Langloch und Vertiefung einer Schraubenbohrung oder Kopf, Antrieb und Bund eines Gewindes. Jetzt kommen sie bei neuen Formen so wieder, wie du sie gespeichert hast.",
+          "en": "Save as default left out the newer fields, such as a counterbore's rim chamfer, a screw hole's slot and recess, or a thread's head, drive and collar. Now new shapes get them back as you saved them.",
+          "da": "Gem som standard udelod de nyere felter, f.eks. affasningen ved kanten af en forsænkning, en skruehuls langhul og fordybning eller et gevinds hoved, drev og krave. Nu får nye former dem igen, som du gemte dem."
+        }
+      }
+    ]
+  },
+  {
+    "version": "1.157.0",
+    "items": [
+      {
+        "title": {
+          "de": "Stufenbohrung mit Fase am Rand",
+          "en": "Counterbore with a chamfer at the rim",
+          "da": "Forsænkning med affasning ved kanten"
+        },
+        "body": {
+          "de": "Die Stufenbohrung hat jetzt das Feld „Fase am Rand“: Es setzt eine 45°-Fase an die Oberkante der Senkung, damit die Kante nicht scharf bleibt und die Schraube leichter hineinfindet. Die Fase liegt außerhalb des Kopfdurchmessers, der Schraubenkopf passt also weiter, und sie bleibt ein exakter Körper, auch im Langloch.",
+          "en": "The counterbore now has a Rim chamfer field: it puts a 45° chamfer on the top edge of the pocket, so the edge is not sharp and the screw finds its way in more easily. The chamfer lies outside the head diameter, so the screw head still fits, and it stays an exact body, in a slotted hole too.",
+          "da": "Forsænkningen har nu feltet „Affasning af kanten“: Det sætter en affasning på 45° på lommens øverste kant, så kanten ikke er skarp, og skruen lettere finder vej ind. Affasningen ligger uden for hoveddiameteren, så skruehovedet stadig passer, og den forbliver et eksakt legeme, også i et langhul."
+        }
+      },
+      {
+        "title": {
+          "de": "Aushöhlen: importierte flache Figuren mit leicht schrägen Seiten",
+          "en": "Hollow: imported flat figures with sides that lean a hair",
+          "da": "Hul: importerede flade figurer med en anelse skrå sider"
+        },
+        "body": {
+          "de": "Ein STL, dessen Ober- und Unterseite getrennt abgetastet wurden, hat Seiten aus vielen einzelnen, ganz leicht geneigten Dreiecken. Aushöhlen gab bei so einer Figur bei jeder Wandstärke auf. Jetzt höhlt es sie über ihren Umriss aus, wie einen geraden Körper, und die Außenseite bleibt, wie sie ist.",
+          "en": "An STL whose top and bottom were sampled apart has sides of many single triangles, each leaning a tiny bit. Hollow gave up on such a figure at any wall thickness. Now it hollows it through its outline, as it does an upright body, and the outside stays as it is.",
+          "da": "En STL, hvis top og bund er samplet hver for sig, har sider af mange enkelte trekanter, der hver hælder en lille smule. Hul gav op over for sådan en figur ved enhver vægtykkelse. Nu udhuler det den gennem dens omrids, som en lodret krop, og ydersiden forbliver, som den er."
+        }
+      },
+      {
+        "title": {
+          "de": "Werkzeuge mit CAD-Kern laufen auch bei langsamer Leitung",
+          "en": "CAD tools work on a slow connection too",
+          "da": "CAD-værktøjer virker også på en langsom forbindelse"
+        },
+        "body": {
+          "de": "Aushöhlen, Verrundung, Fase und die anderen Werkzeuge mit CAD-Kern laden den Kern (21 MB) beim ersten Gebrauch. Die Wartezeit zählte diesen Download mit: Bei langsamer Leitung lief sie ab, der Download begann von vorn, und jedes Werkzeug meldete eine Zeitüberschreitung. Jetzt lädt der Editor den Kern vorab, sobald er bereit ist, und die Wartezeit beginnt erst, wenn der Kern geladen ist.",
+          "en": "Hollow, Fillet, Chamfer and the other tools that use the CAD kernel load it (21 MB) the first time they need it. Their time limit counted that download: on a slow connection it ran out, the download began again, and every tool timed out. Now the editor loads the kernel ahead once it is ready, and the time limit starts only when the kernel is loaded.",
+          "da": "Hul, Rund, Fas og de andre værktøjer med CAD-kernen henter kernen (21 MB), første gang de skal bruge den. Ventetiden talte den download med: På en langsom forbindelse løb den ud, downloaden begyndte forfra, og hvert værktøj meldte timeout. Nu henter editoren kernen på forhånd, så snart den er klar, og ventetiden begynder først, når kernen er hentet."
+        }
+      },
+      {
+        "title": {
+          "de": "Auswahlfelder: ganze Wahl lesbar, Hinweis über die ganze Breite",
+          "en": "Drop-downs: the whole choice shows, the note runs full width",
+          "da": "Rullelister: hele valget kan ses, noten går i fuld bredde"
+        },
+        "body": {
+          "de": "Bei einer langen Beschriftung wie „Durch die Querschnitte“ im Loft war das Auswahlfeld so schmal, dass „Gerade“ abgeschnitten wurde, und der Hinweis darunter stand in einer schmalen Spalte. Jetzt bricht eine lange Beschriftung um und lässt dem Feld Platz, und Hinweise unter Auswahlfeldern nutzen die ganze Breite wie unter den Zahlenfeldern.",
+          "en": "With a long label like “Through the Sections” in the loft, the drop-down was so narrow that “Straight” was cut off, and the note below it ran in a narrow column. Now a long label wraps and leaves the field room, and notes under drop-downs use the whole width, as under the number fields.",
+          "da": "Med en lang etiket som „Gennem sektionerne“ i loftet var rullelisten så smal, at „Lige“ blev skåret af, og noten under den stod i en smal kolonne. Nu brydes en lang etiket om og giver feltet plads, og noter under rullelister bruger hele bredden ligesom under talfelterne."
+        }
+      },
+      {
+        "title": {
+          "de": "Hohlrad und Zahnstange auch schräg- und pfeilverzahnt",
+          "en": "Helical and herringbone ring gears and racks",
+          "da": "Skrå- og sildebensfortandede indvendige tandhjul og tandstænger"
+        },
+        "body": {
+          "de": "Hohlrad und Zahnstange haben jetzt einen Schrägungswinkel und die Wahl Pfeilverzahnung, damit sie mit einem Schräg- oder Pfeilzahnrad laufen. Sie bekommen denselben Winkel wie das Zahnrad, das mit ihnen läuft. Die Zahnstange behält ihre Länge, ihre schrägen Zähne werden an den Enden gerade abgeschnitten, und beide gehen als exakte Körper in den STEP-Export.",
+          "en": "Ring gears and racks now take a helix angle and herringbone teeth, so they run with a helical or herringbone gear. Give them the same angle as the gear that runs with them. The rack keeps its length, its slanted teeth cut off square at the ends, and both go to the STEP export as exact bodies.",
+          "da": "Indvendige tandhjul og tandstænger har nu en skråvinkel og valget sildebensfortanding, så de kan køre med et skrå- eller sildebenstandhjul. De får samme vinkel som det tandhjul, der kører med dem. Tandstangen beholder sin længde, dens skrå tænder skæres lige af i enderne, og begge går til STEP-eksporten som eksakte legemer."
+        }
+      }
+    ]
+  },
+  {
+    "version": "1.156.4",
+    "items": [
+      {
+        "title": {
+          "de": "Druckervorlage UltiMaker S3",
+          "en": "UltiMaker S3 printer preset",
+          "da": "Printerskabelon UltiMaker S3"
+        },
+        "body": {
+          "de": "Unter Arbeitsbereich-Einstellungen > Arbeitsebene > Drucker steht jetzt auch der UltiMaker S3. Die Arbeitsebene und die Prüfung, ob ein Teil auf den Drucker passt, nehmen dann seinen Bauraum von 230 × 190 × 200 mm.",
+          "en": "Workspace settings > Workplane > Printer now offers the UltiMaker S3. The workplane and the check whether a part fits the printer then use its build volume of 230 × 190 × 200 mm.",
+          "da": "Under Arbejdsområdeindstillinger > Arbejdsplan > Printer findes nu også UltiMaker S3. Arbejdsplanet og kontrollen af, om en del passer til printeren, bruger så dens byggevolumen på 230 × 190 × 200 mm."
+        }
+      },
+      {
+        "title": {
+          "de": "Editor-Profile für Kurse und Workshops",
+          "en": "Editor profiles for classes and workshops",
+          "da": "Editorprofiler til kurser og workshops"
+        },
+        "body": {
+          "de": "Wer layerling selbst betreibt, etwa für eine Schulklasse, kann ein Profil hinterlegen: Es wählt das einfache oder volle Layout und zeigt nur die Werkzeuge im Menüband, die der Kurs braucht. Die eigenen Menüband-Einstellungen gelten weiter für das, was das Profil lässt. Wie es geht, steht in der Doku.",
+          "en": "Whoever hosts layerling, for example for a class, can set a profile: it chooses the Simple or Full layout and shows only the ribbon tools the class needs. Each person's own Ribbon settings still apply to what the profile leaves. The docs say how.",
+          "da": "Den, der selv driver layerling, f.eks. til en skoleklasse, kan lægge en profil ind: Den vælger det enkle eller fulde layout og viser kun de værktøjer i båndet, som kurset har brug for. Ens egne båndindstillinger gælder stadig for det, profilen lader stå. Dokumentationen viser hvordan."
+        }
+      },
+      {
+        "title": {
+          "de": "Docker: ein viel kleineres Image",
+          "en": "Docker: a much smaller image",
+          "da": "Docker: et meget mindre image"
+        },
+        "body": {
+          "de": "Das Docker-Image ist von etwa 570 MB auf etwa 110 MB geschrumpft, für amd64 und arm64. Es startet jetzt mit „node apps/web/server.js“; wer den Container wie bisher startet, muss nichts ändern.",
+          "en": "The Docker image has shrunk from about 570 MB to about 110 MB, for amd64 and arm64. It now starts with “node apps/web/server.js”; if you start the container as before, nothing changes for you.",
+          "da": "Docker-imaget er skrumpet fra ca. 570 MB til ca. 110 MB, til amd64 og arm64. Det starter nu med „node apps/web/server.js“; starter du containeren som før, skal du ikke ændre noget."
+        }
+      },
+      {
+        "title": {
+          "de": "Teilen: Die durchscheinende Ebene passt zum Teil",
+          "en": "Split: the translucent plane fits the part",
+          "da": "Del: Det gennemsigtige plan passer til delen"
+        },
+        "body": {
+          "de": "Die Vorschau der Teilungsebene war immer ein Quadrat so groß wie die Diagonale des Teils. Bei einem flachen Teil ragte sie quer zu X oder Y weit über und unter die Platte und schien neben dem weißen Schnitt zu liegen. Jetzt deckt sie nur ab, was das Teil auf der Ebene einnimmt, mit etwas Rand.",
+          "en": "The split plane's preview was always a square as large as the part's diagonal. Across X or Y on a flat part it stood far above and below the plate and seemed to lie beside the white cut line. It now covers only what the part fills on the plane, with a small margin.",
+          "da": "Forhåndsvisningen af delingsplanet var altid et kvadrat så stort som delens diagonal. På tværs af X eller Y stod det ved en flad del langt over og under pladen og syntes at ligge ved siden af den hvide snitlinje. Nu dækker det kun det, delen fylder på planet, med lidt margen."
+        }
+      },
+      {
+        "title": {
+          "de": "Verrunden/Fasen: „Kantenbearbeitung zurücknehmen“ sieht nicht mehr abgeschaltet aus",
+          "en": "Fillet / Chamfer: “Undo an edge feature” no longer looks unavailable",
+          "da": "Afrunding/affasning: „Fortryd en kantfunktion“ ser ikke længere deaktiveret ud"
+        },
+        "body": {
+          "de": "Die Schrift in diesem Knopf war klein und grau wie bei einem gesperrten Knopf. Jetzt sieht er aus wie die anderen Knöpfe im Panel, und die Einträge der Liste darunter sind etwas größer.",
+          "en": "The label in this button was small and grey, like a disabled button. It now looks like the other buttons in the panel, and the entries of the list below are a little larger.",
+          "da": "Teksten i denne knap var lille og grå som på en deaktiveret knap. Nu ser den ud som de andre knapper i panelet, og posterne i listen nedenunder er lidt større."
+        }
+      },
+      {
+        "title": {
+          "de": "Orthografische Ansicht: Ein Teil folgt der Maus wieder überallhin",
+          "en": "Orthographic view: a part follows the mouse everywhere again",
+          "da": "Ortografisk visning: En del følger musen overalt igen"
+        },
+        "body": {
+          "de": "In der orthografischen Ansicht blieb ein gezogenes Teil manchmal an einer unsichtbaren Linie quer über den Bildschirm stehen, während die Maus weiterlief. Jetzt reichen Ziehen, Anklicken und das Maßband bis an alles, was die Ansicht zeigt.",
+          "en": "In the orthographic view a dragged part sometimes stopped at an invisible line across the screen while the mouse went on. Dragging, clicking and the tape measure now reach everything the view shows.",
+          "da": "I den ortografiske visning stoppede en trukket del nogle gange ved en usynlig linje på tværs af skærmen, mens musen fortsatte. Nu når træk, klik og målebåndet alt, hvad visningen viser."
+        }
+      }
+    ]
+  },
+  {
     "version": "1.156.3",
     "items": [
       {

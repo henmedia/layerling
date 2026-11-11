@@ -24,7 +24,7 @@ Den bliver åben eller lukket, som du lod den være, for hvert design, indtil du
 ![Objektlisten: gruppen "Gruppe" med to dele og en kugle ved siden af. Et mappeikon åbner gruppen.](shot:object-list)
 
 - Et klik på en post vælger formen, inklusive dele inde i en gruppe. Med [[Shift]] holdt tilføjer du flere poster eller tager dem væk igen, ligesom i visningen. Pilene folder grupper åbne og i.
-- Etiketten viser om en del er {{ui:outliner.solid}} eller {{ui:outliner.hole}}.
+- Bogstavet efter navnet viser, om en del er {{ui:outliner.solid}} eller {{ui:outliner.hole}}: det er ordets første bogstav, og hele ordet vises, når du holder musen over det.
 - Under navnet står, hvilken slags form det er. En form, der ikke længere er en simpel form (afrundet, udhulet eller importeret), viser {{ui:shape.exactBody}}, når STEP-eksporten skriver den eksakt, og {{ui:shape.mesh}}, når den kun består af trekanter og går ud som STL. En tilspidsning, hældning eller vridning, der først kommer til efter afrunding eller udhuling, bøjer kun dens mesh, så viser den {{ui:shape.mesh}}.
 - Hængelås og øje låser og skjuler enkelte dele.
 - {{ui:outliner.rename}} giver en del sit eget navn; blyanten ved siden af navnet øverst i indstillingerne gør det samme for den valgte form. Fornuftige navne hjælper enormt i større designs.
@@ -34,7 +34,7 @@ Den bliver åben eller lukket, som du lod den være, for hvert design, indtil du
 - Søgefeltet finder former på navn og type, så også "cylinder" eller "hul". Det kigger også inden i grupper, uanset hvor dybt: en gruppe der indeholder et match bliver i listen og folder sig åben for at vise de matchende dele og de grupper der fører til dem. En gruppe fundet på sit eget navn viser alle sine dele når du åbner den.
 - Pilen yderst til venstre på titellinjen folder listen ned til dens titellinje og tilbage igen.
 
-Listen sidder docket lige til højre for visningskuben. Træk den i dens titellinje for at placere den hvor som helst på arbejdsplanet; den passerer under visningskuben og visningsbjælken. Slip den tilbage ved siden af visningskuben, eller dobbeltklik titellinjen, og den docker igen. Hvor den var og om den var foldet huskes i denne browser.
+Listen sidder docket lige til højre for visningskuben. Træk den i dens titellinje for at placere den hvor som helst på arbejdsplanet; den passerer under visningskuben og visningsbjælken. Slip den tilbage ved siden af visningskuben, eller dobbeltklik titellinjen, og den docker igen. Hvor den var og om den var foldet huskes i denne browser. Gør listen bredere eller smallere ved at trække i dens nederste højre hjørne, fra 240 til 600 pixel; også bredden huskes i browseren.
 
 ## Tast en position
 
