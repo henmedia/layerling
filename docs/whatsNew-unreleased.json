@@ -22,5 +22,41 @@
       "en": "When a chamfer or fillet is too large for the picked edges, \"Find the largest size that fits\" now shows under the message. One click tries smaller sizes and puts in the largest that goes through, to a hundredth of a millimetre.",
       "da": "Er en fas eller afrunding for stor til de valgte kanter, står der nu \"Find den største størrelse, der passer\" under meddelelsen. Ét klik prøver mindre størrelser og skriver den største, der går igennem, ind, på en hundrededel millimeter."
     }
+  },
+  {
+    "title": {
+      "de": "Rote und grüne Verschiebepfeile abschaltbar",
+      "en": "The red and green move arrows can be switched off",
+      "da": "De røde og grønne flyttepile kan slås fra"
+    },
+    "body": {
+      "de": "Unter Einstellungen → Darstellung → „Rote und grüne Verschiebepfeile anzeigen“. Ausgeschaltet behält die Auswahl ihre Drehpfeile und den Hebepfeil; die beiden Pfeile, die sie nur entlang X oder Y schieben, sitzen bei kleinen Körpern nicht mehr im Weg.",
+      "en": "Under Settings → Appearance → \"Show the red and green move arrows\". Switched off, the selection keeps its turn arrows and the lift arrow; the two arrows that only slide it along X or Y no longer get in the way on small bodies.",
+      "da": "Under Indstillinger → Udseende → \"Vis de røde og grønne flyttepile\". Slået fra beholder markeringen sine drejepile og løftepilen; de to pile, der kun skubber den langs X eller Y, er ikke længere i vejen på små legemer."
+    }
+  },
+  {
+    "title": {
+      "de": "Gedrehte Senkung behält ihre Feldnamen",
+      "en": "A turned countersink keeps the names of its fields",
+      "da": "En drejet undersænkning beholder navnene på sine felter"
+    },
+    "body": {
+      "de": "Um 90° gedreht hieß der Kopfdurchmesser einer Senkung plötzlich „Höhe“ und die Gesamtlänge „Breite“. Jetzt folgen nur die schlichten Felder Länge, Breite und Höhe der Drehung; Felder mit eigenem Namen behalten ihn.",
+      "en": "Turned by 90°, a countersink's head diameter was suddenly called Height and its total length Width. Now only the plain Length, Width and Height fields follow the turn; fields with a name of their own keep it.",
+      "da": "Drejet 90° hed en undersænknings hoveddiameter pludselig Højde og dens samlede længde Bredde. Nu følger kun de enkle felter Længde, Bredde og Højde drejningen; felter med deres eget navn beholder det."
+    }
+  },
+  {
+    "title": {
+      "de": "„Als Vorgabe speichern“ merkt sich alle Felder",
+      "en": "Save as default keeps every field",
+      "da": "Gem som standard husker alle felter"
+    },
+    "body": {
+      "de": "„Als Vorgabe speichern“ ließ neuere Felder aus, etwa die Fase am Rand einer Stufenbohrung, Langloch und Vertiefung einer Schraubenbohrung oder Kopf, Antrieb und Bund eines Gewindes. Jetzt kommen sie bei neuen Formen so wieder, wie du sie gespeichert hast.",
+      "en": "Save as default left out the newer fields, such as a counterbore's rim chamfer, a screw hole's slot and recess, or a thread's head, drive and collar. Now new shapes get them back as you saved them.",
+      "da": "Gem som standard udelod de nyere felter, f.eks. affasningen ved kanten af en forsænkning, en skruehuls langhul og fordybning eller et gevinds hoved, drev og krave. Nu får nye former dem igen, som du gemte dem."
+    }
   }
 ]
