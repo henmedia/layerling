@@ -1,5 +1,79 @@
 [
   {
+    "version": "1.159.1",
+    "items": [
+      {
+        "title": {
+          "de": "Skizze auf der aktiven Druckplatte",
+          "en": "Sketches on the active build plate"
+        },
+        "body": {
+          "de": "Mit mehreren Druckplatten öffnete sich eine neue Skizze immer über Platte 1, und Platte 2 war von dort aus nicht zu erreichen. Jetzt beginnt die Skizze auf der Platte, die gerade aktiv ist: Du siehst die Körper darauf, und der fertige Körper steht dort.",
+          "en": "With several build plates, a new sketch always opened over plate 1, and plate 2 could not be reached from there. Now the sketch starts on the plate that is active: you see the bodies on it, and the finished body stands there."
+        },
+        "guide": {
+          "section": "buildPlates"
+        }
+      },
+      {
+        "title": {
+          "de": "Prusa CORE One INDX",
+          "en": "Prusa CORE One INDX"
+        },
+        "body": {
+          "de": "Die Druckerliste in den Einstellungen kennt jetzt auch den CORE One mit dem INDX-Werkzeugwechsler, mit seiner kleineren Platte von 248 × 205 mm.",
+          "en": "The printer list in the settings now has the CORE One with the INDX tool changer too, with its smaller 248 × 205 mm plate."
+        }
+      },
+      {
+        "title": {
+          "de": "Duplizieren wiederholt die Verschiebung auch für mehrere Teile",
+          "en": "Duplicate repeats the move for several parts too"
+        },
+        "body": {
+          "de": "Strg+D wiederholte bisher nur bei einem einzelnen Teil, wie die Kopie verschoben, gedreht oder in der Größe geändert wurde. Jetzt geht das auch mit einer Auswahl: Lage duplizieren, die Kopie anheben, und jedes weitere Strg+D setzt die nächste Lage im gleichen Abstand obendrauf.",
+          "en": "Ctrl+D used to repeat how a copy was moved, turned or resized only for a single part. Now it works for a selection too: duplicate a layer, lift the copy, and every further Ctrl+D puts the next layer on top at the same distance."
+        }
+      },
+      {
+        "title": {
+          "de": "Skizze: Punkte ohne Einrasten",
+          "en": "Sketch: points without snapping"
+        },
+        "body": {
+          "de": "Ein Punkt nahe an einer Ecke eines Körpers darunter, an einer Linienmitte oder einer Kreuzung rastete dort immer ein. Hältst du beim Setzen oder Ziehen Alt gedrückt, geht er jetzt nur aufs Raster, so zeichnest du auch dicht neben einer Ecke nach.",
+          "en": "A point near a corner of a body underneath, the middle of a line or a crossing always snapped there. Hold Alt while you set or drag it and it keeps to the grid only, so you can trace just beside a corner."
+        },
+        "guide": {
+          "section": "sketchDrawing"
+        }
+      },
+      {
+        "title": {
+          "de": "SVG-Vorlagen in Firefox",
+          "en": "SVG templates in Firefox"
+        },
+        "body": {
+          "de": "Ein SVG-Bild als Vorlage unter einer Skizze ließ sich in Firefox nicht lesen. Jetzt klappt das auch dort.",
+          "en": "An SVG picture added as a template under a sketch could not be read in Firefox. Now it works there too."
+        },
+        "guide": {
+          "section": "sketchImage"
+        }
+      },
+      {
+        "title": {
+          "de": "Docker: Container starten wieder",
+          "en": "Docker: containers start again"
+        },
+        "body": {
+          "de": "Wer layerling per Docker auf einem NAS betreibt und den Container mit Portainer oder dem Container Manager von Synology neu erstellt, bekam mit 1.159.0 einen Container, der nicht startete. Das Image bringt das alte Startskript wieder mit, und solche Container laufen wie vorher.",
+          "en": "If you run layerling with Docker on a NAS and recreate the container with Portainer or Synology's Container Manager, the container did not start with 1.159.0. The image has the old start script again, and such containers run as before."
+        }
+      }
+    ]
+  },
+  {
     "version": "1.159.0",
     "items": [
       {

@@ -6,6 +6,8 @@ code still carries it - so a lower number further down is older, not newer.
 
 ## Unreleased
 
+## 1.159.1
+
 - **Prusa CORE One INDX in the printer list (Discussion #1648):** The CORE One with Prusa's INDX tool changer has a smaller plate than the CORE One, 248 × 205 mm and 270 mm high, as its owner gave it. It is not in OrcaSlicer's profiles yet, so the preset generator adds it next to the other CORE One models, as it does the UltiMaker S3; should OrcaSlicer bring it, its own entry wins. Unit test for the preset
 
 - **A new sketch starts on the active build plate (Discussion #1660):** New shapes and imported files land on the plate that is active (#1514), but a sketch started on the plate always opened around the first plate's middle, and its area did not reach the others, so a body could not be sketched onto plate 2. A new sketch on the plate now lies on the plate's own plane moved to the active plate's middle (placementWorkplanePlateShift): the sketch area shows that plate with its bodies, and the finished body stands there. A revolve, drawn from the front, is moved onto the active plate when finished; a sketch opened for a body, or on a workplane placed by hand, stays as it was. Checked in the editor through headless Edge (two plates, plate 2 active with a box on it: the sketch view showed the box, the rectangle drawn in its middle became a body at x = 220, the middle of plate 2; with plate 1 active the same at x = 0); unit tests for the plate shift; guide chapter 2 in 16 languages
