@@ -345,11 +345,14 @@ layerling startet (ein Ordner unter `/srv` gehört oft root, lege einen eigenen 
 LAYERLING_SHARED_PROJECTS_DIR=/srv/layerling-projekte npm run start
 ```
 
-Auf der Startseite steht dann neben deinen Browser-Entwürfen der Ordner **Auf dem Server**. Öffnest du ihn, bist du in
-diesem Ordner: **Neuer Entwurf** legt einen darin an, **Neuer Ordner** einen Unterordner, und die Pfadzeile unter der
-Überschrift sagt, wo du bist. Eine `..`-Kachel führt wieder hinaus, und **Zurück zu den Entwürfen in diesem Browser** links neben den Knöpfen bringt dich zu den Entwürfen dieses Browsers zurück. Entwürfe wandern per Ziehen auf einen Ordner, auf
-diese Kachel oder auf einen Schritt der Pfadzeile – oder über **Verschieben nach …** in ihrem Menü. Ein Entwurf aus dem
-Browser kommt genauso auf den Server: seine Kachel auf den Serverordner ziehen.
+Auf der Startseite stehen die Entwürfe dann in zwei Reitern, **Server** für den gemeinsamen Ordner und **Browser** für die
+Entwürfe dieses Browsers. Ist der Reiter Server offen, legt **Neuen 3D-Entwurf anlegen** den Entwurf in dem Serverordner
+an, in dem du bist, **Neuer Ordner** einen Unterordner, und die Pfadzeile unter den Reitern sagt, wo du bist, und führt
+wieder hinaus. Entwürfe wandern per Ziehen auf einen Ordner oder auf einen Schritt der Pfadzeile – oder über
+**Verschieben nach …** in ihrem Menü. Ein Entwurf aus dem Browser kommt auf den Server, indem du seine Kachel auf den
+Reiter Server ziehst, oder mit **Auf den Server legen** in seinem Menü. Zurück geht es mit **In diesen Browser holen** im
+Menü eines Serverentwurfs oder indem du seine Kachel auf den Reiter Browser ziehst: Der Entwurf liegt dann nur noch in
+diesem Browser und verschwindet aus dem Serverordner, auch für die anderen.
 
 Zwei Schaltflächen auf der Startseite ersparen das Verschieben von Hand: **Alle auf den Server legen** legt alle Entwürfe dieses Browsers auf einmal in den Serverordner, und der Haken **Neue Entwürfe auf dem Server** lässt jeden neuen Entwurf gleich im Serverordner beginnen, sodass er sich dort ab der ersten Änderung sichert. Ein Entwurf, dessen Name auf dem Server schon vergeben ist, bleibt im Browser.
 

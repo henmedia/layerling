@@ -1,1 +1,14 @@
-[]
+[
+  {
+    "title": {
+      "de": "Entwürfe vom Server zurück in den Browser",
+      "en": "Designs from the server back into the browser",
+      "da": "Designs fra serveren tilbage i browseren"
+    },
+    "body": {
+      "de": "Im Menü eines Entwurfs auf dem Reiter Server steht jetzt „In diesen Browser holen“, als Gegenstück zu „Auf den Server legen“. Seine Karte auf den Reiter Browser zu ziehen geht auch. Der Entwurf liegt danach nur noch in diesem Browser und nicht mehr im Serverordner.",
+      "en": "The menu of a design on the Server tab now has \"Put in this browser\", the way back from \"Put on the server\". Dragging its card onto the Browser tab works too. The design then lives only in this browser and no longer in the server folder.",
+      "da": "Menuen for et design under fanen Server har nu \"Læg i denne browser\", vejen tilbage fra \"Læg på serveren\". Det virker også at trække kortet til fanen Browser. Designet ligger derefter kun i denne browser og ikke længere i servermappen."
+    }
+  }
+]

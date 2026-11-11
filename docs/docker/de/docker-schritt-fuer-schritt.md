@@ -228,7 +228,7 @@ Es sollte `/shared-projects` ausgeben. Kommt nichts, wird die Einstellung nicht 
 ### 3.5 In layerling benutzen
 
 1. Lade `http://localhost:3000` neu. Die Startseite hat jetzt neben den Entwürfen aus dem Browser einen Reiter **Server**.
-2. Um alle Entwürfe aus dem Browser zu verschieben, klicke auf **Alle auf den Server legen**. Für einen einzelnen nimmst du **Auf den Server legen** in seinem Menü oder ziehst seine Kachel auf den Reiter Server.
+2. Um alle Entwürfe aus dem Browser zu verschieben, klicke auf **Alle auf den Server legen**. Für einen einzelnen nimmst du **Auf den Server legen** in seinem Menü oder ziehst seine Kachel auf den Reiter Server. Zurück holst du einen mit **In diesen Browser holen** in seinem Menü auf dem Reiter Server oder ziehst seine Kachel auf den Reiter Browser.
 3. Hake **Neue Entwürfe auf dem Server** an, damit neue Entwürfe ab der ersten Änderung dort gespeichert werden.
 4. Öffne den Ordner `projects` im Explorer, im Finder oder in deinem Dateimanager: Deine Entwürfe liegen dort als `.lyl`-Dateien. Sichere diesen Ordner wie jeden anderen.
 

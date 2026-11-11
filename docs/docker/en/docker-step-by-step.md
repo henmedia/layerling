@@ -228,7 +228,7 @@ It should print `/shared-projects`. If it prints nothing, the setting is not bei
 ### 3.5 Use it in layerling
 
 1. Reload `http://localhost:3000`. The start page now has a **Server** tab next to your designs from the browser.
-2. To move all designs from the browser, click **Put all on the server**. To move one, use **Put on the server** in its menu, or drag its tile onto the Server tab.
+2. To move all designs from the browser, click **Put all on the server**. To move one, use **Put on the server** in its menu, or drag its tile onto the Server tab. To take one back, use **Put in this browser** in its menu on the Server tab, or drag its tile onto the Browser tab.
 3. Tick **New designs on the server**, so new designs are saved there from the first change on.
 4. Open the `projects` folder in File Explorer, Finder or your file manager: your designs are there as `.lyl` files. Back up this folder like any other.
 

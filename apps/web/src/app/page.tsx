@@ -3,7 +3,7 @@
 import { requestPersistentStorage } from "@/lib/persistentStorage";
 import { clearDesignOpening, forgetDesignOpening, markDesignOpening, takeUnfinishedOpening } from "@/lib/openingDesignGuard";
 import { keepShownSelection, localDesignKey, selectionHasStale, serverDesignKey, toggleDesignSelection } from "@/lib/designSelection";
-import { Archive, ArchiveRestore, Check, CheckSquare, Clock3, Copy, EllipsisVertical, Folder, FolderInput, FolderKanban, FolderPlus, FolderUp, Grid3X3, List, LoaderCircle, Pencil, Plus, RefreshCw, Search, Server, Shapes, SlidersHorizontal, Sparkles, Trash2, X } from "lucide-react";
+import { Archive, ArchiveRestore, Check, CheckSquare, Clock3, Copy, EllipsisVertical, Folder, FolderInput, FolderKanban, FolderPlus, FolderUp, Grid3X3, List, LoaderCircle, MonitorDown, Pencil, Plus, RefreshCw, Search, Server, Shapes, SlidersHorizontal, Sparkles, Trash2, X } from "lucide-react";
 import { Fragment, useCallback, useEffect, useMemo, useRef, useState, type DragEvent } from "react";
 import { AppFooter } from "@/components/AppFooter";
 import { LanguageSwitch } from "@/components/LanguageSwitch";
@@ -1993,6 +1993,78 @@ export default function Home() {
     }
   }, [refreshSharedProjects, sharedProjects]);
 
+  /**
+   * A design of the server folder, taken into this browser: the way back from "Put on the server" (#1572).
+   * The file is fetched as it is on the server now and becomes a design of this browser, at its top level; a
+   * working copy that is already here becomes that design, so its view and picture stay. Only once it is stored
+   * here is the file deleted on the server. If that fails - somebody changed the file meanwhile, or the server
+   * went away - the design is in both places, and the notice says so.
+   */
+  const takeSharedProjectIntoBrowser = useCallback(async (sharedProject: SharedProject) => {
+    const where = sharedProject.path ?? "";
+    const existing = projects.find((project) => project.sharedProject?.fileName === sharedProject.fileName && (project.sharedProject?.path ?? "") === where);
+    setDashboardNotice(t("notice.takingIntoBrowser", { name: sharedProject.name }));
+    try {
+      // A save of the working copy still on its way to the server goes first, so the file fetched is the newest.
+      if (existing) await sharedSavesRef.current[existing.id]?.catch(() => undefined);
+      const response = await fetch(`${SHARED_PROJECTS_ENDPOINT}?${storeQuery(where, sharedProject.fileName)}`, { cache: "no-store" });
+      if (!response.ok) {
+        const payload = await response.json().catch(() => ({})) as { error?: string };
+        throw new Error(payload.error ?? t("notice.openSharedFailed"));
+      }
+      const revision = response.headers.get("etag")?.replace(/^W\//, "").replace(/^"|"$/g, "") || sharedProject.revision;
+      const restored = (await relieveOverFineCadMeshes(await importLylProject(await response.arrayBuffer()), remeshCadBrepLater)).project;
+      // The picture lives beside the file on the server and goes with it, so this browser keeps a copy of its own.
+      const kept = existing?.thumbnailUrl;
+      const picture = isInlineThumbnail(kept) ? kept : await projectThumbnailDataUrl(sharedProject.thumbnailUrl).catch(() => null);
+      const now = Date.now();
+      const project: DashboardProject = {
+        ...(existing ?? newProject(sharedProject.name, projects.length, restored.shapes.length, null)),
+        createdAt: restored.createdAt,
+        updatedAt: now,
+        revision: now,
+        shapes: restored.shapes.length,
+        workspace: restored.workspace,
+        snapGrid: restored.snapGrid,
+        placementElevation: restored.placementElevation,
+        placementWorkplane: restored.placementWorkplane,
+        sketchPlacementWorkplane: restored.sketchPlacementWorkplane,
+        thumbnailUrl: picture,
+        folderId: null,
+        sharedProject: undefined,
+      };
+      const entry = projectShapeCacheEntry(now, restored.shapes, restored.history, restored.historyIndex, restored.assets, restored.attachments);
+      await saveProjectShapes(project.id, entry, projectShapeSaveContext(project));
+      if (!existing) {
+        if (restored.view) writeDesignView(project.id, restored.view);
+        if (restored.savedViews) writeSavedViews(project.id, restored.savedViews);
+        if (restored.cornerRulers) writeCornerRulers(project.id, restored.cornerRulers);
+        if (restored.tapeMeasurements) writeTape(project.id, restored.tapeMeasurements);
+      }
+      setProjectShapesById((current) => ({ ...current, [project.id]: entry }));
+      setProjects((current) => existing
+        ? current.map((candidate) => (candidate.id === project.id ? project : candidate))
+        : [project, ...current]);
+      // Stored here: now the file on the server can go, but only the one that was fetched.
+      const removal = await fetch(`${SHARED_PROJECTS_ENDPOINT}?${storeQuery(where, sharedProject.fileName)}`, {
+        method: "DELETE",
+        headers: { "If-Match": `"${revision}"` },
+      }).catch(() => null);
+      if (!removal?.ok) {
+        const payload = removal ? await removal.json().catch(() => ({})) as { error?: string } : {};
+        const reason = payload.error ? localizedError(payload.error) : t("notice.deleteSharedFailed");
+        setDashboardNotice(`${t("notice.takenIntoBrowserKept", { name: sharedProject.name })} ${reason}`);
+        await refreshSharedProjects();
+        return;
+      }
+      setSharedProjects((current) => current.filter((candidate) => !(candidate.fileName === sharedProject.fileName && (candidate.path ?? "") === where)));
+      setSharedTotal((total) => (total === null ? null : Math.max(0, total - 1)));
+      setDashboardNotice(t("notice.takenIntoBrowser", { name: sharedProject.name }));
+    } catch (error) {
+      setDashboardNotice(error instanceof Error ? localizedError(error.message) : t("notice.takeIntoBrowserFailed"));
+    }
+  }, [projects, refreshSharedProjects]);
+
   const saveActiveProjectToShared = useCallback(async ({ exportName, bytes, thumbnailDataUrl, targetFileName }: { exportName: string; bytes: Uint8Array; thumbnailDataUrl: string; targetFileName?: string }) => {
     const activeProject = projects.find((project) => project.id === activeProjectId);
     if (!activeProject) throw new Error(t("status.sharedNoProject"));
@@ -2988,6 +3060,7 @@ export default function Home() {
           onOpenStoreFolder={openStoreFolder}
           onMoveSharedProject={(project, targetPath) => void moveSharedProject(project, targetPath)}
           onSendProjectToServer={(projectId) => void sendProjectToServer(projectId)}
+          onTakeSharedProjectIntoBrowser={(project) => void takeSharedProjectIntoBrowser(project)}
           sharedProjectsEnabled={sharedProjectsEnabled}
           sharedProjectsLoading={sharedProjectsLoading}
           sharedSearch={sharedSearch}
@@ -3214,6 +3287,7 @@ function Dashboard({
   onOpenStoreFolder,
   onMoveSharedProject,
   onSendProjectToServer,
+  onTakeSharedProjectIntoBrowser,
   sharedProjectsEnabled,
   sharedProjectsLoading,
   sharedSearch,
@@ -3281,6 +3355,7 @@ function Dashboard({
   onOpenStoreFolder: (path: string) => void;
   onMoveSharedProject: (project: SharedProject, targetPath: string) => void;
   onSendProjectToServer: (projectId: string) => void;
+  onTakeSharedProjectIntoBrowser: (project: SharedProject) => void;
   sharedProjectsEnabled: boolean;
   sharedProjectsLoading: boolean;
   sharedSearch: SharedSearchResult | null;
@@ -3339,6 +3414,8 @@ function Dashboard({
   const [projectPendingDeleteId, setProjectPendingDeleteId] = useState<string | null>(null);
   const [projectPendingHistoryCutId, setProjectPendingHistoryCutId] = useState<string | null>(null);
   const [sharedProjectPendingDeleteKey, setSharedProjectPendingDeleteKey] = useState<string | null>(null);
+  // A design of the server about to come into this browser (#1572): it leaves the server for everybody, so it asks first.
+  const [sharedProjectPendingTake, setSharedProjectPendingTake] = useState<SharedProject | null>(null);
   // Choosing several designs to delete them together (#886): the keys of what is chosen (designSelection.ts).
   const [selecting, setSelecting] = useState(false);
   const [selectedKeys, setSelectedKeys] = useState<Set<string>>(() => new Set());
@@ -3480,6 +3557,12 @@ function Dashboard({
     if (!projectPendingDelete) return;
     onDeleteProject(projectPendingDelete.id);
     setProjectPendingDeleteId(null);
+  };
+
+  const confirmSharedProjectTake = () => {
+    if (!sharedProjectPendingTake) return;
+    onTakeSharedProjectIntoBrowser(sharedProjectPendingTake);
+    setSharedProjectPendingTake(null);
   };
 
   const confirmSharedProjectDelete = () => {
@@ -3648,7 +3731,31 @@ function Dashboard({
   // The counts are of the whole place, or of what the search found there.
   const browserCount = localSearch ? projects.length : localDesigns.length;
   const serverCount = searchResults ? searchResults.projects.length : sharedTotal ?? sharedProjects.length;
-  const browserTab: DesignTab<DashboardSection> = { id: "home", label: t("dashboard.tabBrowser", { count: browserCount }), count: browserCount };
+  // A design of the server can come back into this browser (#1572), unless the server wants every design kept there.
+  const canTakeIntoBrowser = sharedProjectsEnabled && !newDesignsOnServerLocked;
+  const browserTab: DesignTab<DashboardSection> = {
+    id: "home",
+    label: t("dashboard.tabBrowser", { count: browserCount }),
+    count: browserCount,
+    // A design of the server dropped on the browser's tab comes into this browser. ":" is not allowed in a folder's name.
+    dropTarget: dropFolderPath === ":browser",
+    dropProps: {
+      onDragOver: (event) => {
+        if (!draggedSharedKey || !canTakeIntoBrowser) return;
+        event.preventDefault();
+        event.dataTransfer.dropEffect = "move";
+        setDropFolderPath(":browser");
+      },
+      onDragLeave: () => setDropFolderPath((current) => (current === ":browser" ? null : current)),
+      onDrop: (event) => {
+        event.preventDefault();
+        const dragged = sharedProjects.find((project) => sharedProjectKey(project) === draggedSharedKey);
+        setDraggedSharedKey(null);
+        setDropFolderPath(null);
+        if (dragged && canTakeIntoBrowser) setSharedProjectPendingTake(dragged);
+      },
+    },
+  };
   const serverTab: DesignTab<DashboardSection> = {
     id: "shared",
     label: t("dashboard.tabServer", { count: serverCount }),
@@ -4002,7 +4109,7 @@ function Dashboard({
                       className={`project-card shared-project-card${isOpening ? " is-opening" : ""}${draggedSharedKey === key ? " dragging" : ""}${selecting ? " selectable" : ""}${selecting && selectedKeys.has(serverDesignKey(key)) ? " selected" : ""}`}
                       key={key}
                       draggable={!searchResults && !selecting && !isOpening}
-                      title={searchResults ? undefined : t("shared.dragHint")}
+                      title={searchResults ? undefined : t(canTakeIntoBrowser ? "shared.dragHintBrowserTab" : "shared.dragHint")}
                       onDragStart={(event) => {
                         if (isOpening) return;
                         event.dataTransfer.effectAllowed = "move";
@@ -4104,6 +4211,20 @@ function Dashboard({
                             <Copy size={16} />
                             <span>{t("common.duplicate")}</span>
                           </button>
+                          {canTakeIntoBrowser ? (
+                            <button
+                              type="button"
+                              role="menuitem"
+                              title={t("dashboard.takeIntoBrowserTitle")}
+                              onClick={() => {
+                                setOpenSharedProjectMenuKey(null);
+                                setSharedProjectPendingTake(project);
+                              }}
+                            >
+                              <MonitorDown size={16} />
+                              <span>{t("dashboard.takeIntoBrowser")}</span>
+                            </button>
+                          ) : null}
                           <button
                             className="delete"
                             type="button"
@@ -4497,6 +4618,28 @@ function Dashboard({
               </button>
               <button className="dashboard-confirm-delete" type="button" onClick={confirmProjectDelete}>
                 {t("confirm.delete")}
+              </button>
+            </div>
+          </div>
+        </section>
+      ) : null}
+
+      {sharedProjectPendingTake ? (
+        <section className="dashboard-confirm-overlay" role="dialog" aria-modal="true" aria-labelledby="take-shared-project-title">
+          <div className="dashboard-confirm-dialog">
+            <header>
+              <strong id="take-shared-project-title">{t("confirm.takeIntoBrowserTitle")}</strong>
+              <button type="button" aria-label={t("confirm.takeIntoBrowserCancel")} onClick={() => setSharedProjectPendingTake(null)}>
+                <X size={18} />
+              </button>
+            </header>
+            <p>{t("confirm.takeIntoBrowserBody", { name: sharedProjectPendingTake.name })}</p>
+            <div className="dashboard-confirm-actions">
+              <button className="dashboard-confirm-cancel" type="button" onClick={() => setSharedProjectPendingTake(null)}>
+                {t("confirm.cancel")}
+              </button>
+              <button className="dashboard-confirm-save" type="button" autoFocus onClick={confirmSharedProjectTake}>
+                {t("dashboard.takeIntoBrowser")}
               </button>
             </div>
           </div>
