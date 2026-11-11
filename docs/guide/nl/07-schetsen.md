@@ -188,6 +188,7 @@ De boom naast een huis, een figuur voor een drukke achtergrond – waar geen kle
 | [[Ctrl]]+[[A]] | alle punten en lijnen selecteren |
 | [[Ctrl]]+[[I]] | {{ui:sketch.addImage}} |
 | [[Shift]] | tijdens tekenen: lijn vastklikken in stappen van 15°; tijdens slepen: beweging op één as houden |
+| [[Alt]] | bij het zetten of slepen van een punt: alleen op het raster, zonder vast te klikken op hoeken en middens |
 | cijfer, [[<]], [[Tab]], [[Enter]] | tijdens tekenen: lengte en hoek van de volgende lijn intypen en vastleggen |
 | [[R]] | gesloten schets 45° draaien |
 | [[Ctrl]]+[[L]] | sjabloonafbeelding vergrendelen of ontgrendelen |

@@ -879,7 +879,7 @@ export function SketchWorkspace({
   useEffect(() => {
     setSelectedHandle(null);
   }, [selected, tool]);
-  const lastPointerRef = useRef<{ clientX: number; clientY: number } | null>(null);
+  const lastPointerRef = useRef<{ clientX: number; clientY: number; altKey?: boolean } | null>(null);
   const [refinePreview, setRefinePreview] = useState<{ segmentId: string; placement: SketchSegmentPlacement } | null>(null);
   const [pointerAction, setPointerAction] = useState<PointerAction | null>(null);
   // A freehand stroke (#1280) in progress: its samples in a ref, not in state, so no move of a fast pen is lost
@@ -1463,13 +1463,14 @@ export function SketchWorkspace({
   const constrainDrawing = (origin: { x: number; z: number }, point: { x: number; z: number }) =>
     constrainToAngle(origin, point, 15, snapStep(snap));
 
-  const pointFromEvent = (event: { clientX: number; clientY: number }) => {
+  const pointFromEvent = (event: { clientX: number; clientY: number; altKey?: boolean }) => {
     const local = unsnappedPointFromEvent(event);
     if (!local) return null;
     // Near a corner of another body shown underneath, a drawn or dragged point takes that
     // corner instead of the grid (#189). Not while a whole selection moves: its grip is
-    // wherever it was taken, so the corner would only make it jump.
-    if (!pointerAction || pointerAction.kind === "move-point") {
+    // wherever it was taken, so the corner would only make it jump. Alt keeps the point on the
+    // grid only, for tracing just beside a corner (Discussion #1659), as Alt does for a moved selection.
+    if (!event.altKey && (!pointerAction || pointerAction.kind === "move-point")) {
       const reach = REFERENCE_SNAP_PX * screenUnit;
       let nearest: { x: number; z: number } | null = null;
       let nearestDistance = reach;
@@ -1681,7 +1682,7 @@ export function SketchWorkspace({
   };
 
   const handlePointerMove = (event: ReactPointerEvent<SVGSVGElement>) => {
-    lastPointerRef.current = { clientX: event.clientX, clientY: event.clientY };
+    lastPointerRef.current = { clientX: event.clientX, clientY: event.clientY, altKey: event.altKey };
     if (extendFreehand(event)) return;
     if (pointerAction?.kind === "pan") {
       const matrix = svgRef.current?.getScreenCTM();

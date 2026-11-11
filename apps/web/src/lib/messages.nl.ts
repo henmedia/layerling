@@ -1577,6 +1577,7 @@ export const MESSAGES_NL: Record<MessageKey, string> = {
   "shortcuts.sketchTools": "Tekengereedschap kiezen: 1 Lijn, 2 Bézierkromme, 3 Vloeiende kromme, 4 Punten toevoegen of verwijderen, 5 Uit de vrije hand (zolang er geen lijn wordt getekend)",
   "shortcuts.sketchHandleNudge": "Een aangeklikte krommegreep één rasterstap verplaatsen (Shift: grotere stap, Alt: een vijfde ervan)",
   "shortcuts.sketchAxisLock": "Tijdens slepen: op één as blijven",
+  "shortcuts.sketchGridOnly": "Bij het zetten of slepen van een punt: alleen op het raster, zonder vast te klikken op hoeken en middens",
   "shortcuts.sketchAngleSnap": "Tijdens tekenen: de nieuwe lijn in stappen van 15° laten snappen",
   "shortcuts.sketchTypedLine": "Tijdens tekenen: typ de lengte, ‘<’ of Tab voor de hoek, Enter zet het punt",
   "shortcuts.sketchDimensionSymmetric": "In het lengteveld van een lijn: naar beide kanten groeien",

@@ -1463,6 +1463,7 @@ export const MESSAGES_PT_PT: Partial<Record<MessageKey, string>> = {
   "shortcuts.sketchTools": "Escolher uma ferramenta de desenho: 1 Linha, 2 Curva de Bézier, 3 Curva suave, 4 Adicionar ou remover pontos, 5 Mão livre (quando não está a ser desenhada nenhuma linha)",
   "shortcuts.sketchHandleNudge": "Mover o controlo de curva em que clicaste um passo da grelha (Shift: um passo maior; Alt: um quinto do passo)",
   "shortcuts.sketchAxisLock": "Ao arrastar: limitar o movimento a um eixo",
+  "shortcuts.sketchGridOnly": "Ao colocar ou arrastar um ponto: só na grelha, sem encaixar em cantos e pontos médios",
   "shortcuts.sketchAngleSnap": "Ao desenhar: ajustar a nova linha em incrementos de 15°",
   "shortcuts.sketchTypedLine": "Ao desenhar: introduzir o comprimento, \"<\" ou Tab para o ângulo; Enter define o ponto",
   "shortcuts.sketchDimensionSymmetric": "No campo de comprimento de uma linha: redimensionar para ambos os lados",

@@ -903,6 +903,7 @@ export const MESSAGES_TR: Partial<Record<MessageKey, string>> = {
   "shortcuts.sketchTools": "Bir çizim aracı seç: 1 Çizgi, 2 Bezier eğrisi, 3 Yumuşak eğri, 4 Nokta ekle veya kaldır, 5 Serbest el (çizgi çizilmiyorken)",
   "shortcuts.sketchHandleNudge": "Tıklanan bir eğri tutamağını bir ızgara adımı taşı (Shift: daha büyük adım)",
   "shortcuts.sketchAxisLock": "Sürüklerken: hareketi tek eksende tut",
+  "shortcuts.sketchGridOnly": "Nokta koyarken veya sürüklerken: yalnızca ızgaraya, köşelere ve orta noktalara yapışmadan",
   "shortcuts.sketchAngleSnap": "Çizerken: yeni çizgiyi 15°'lik adımlarla yakala",
   "shortcuts.sketchTypedLine": "Çizerken: uzunluğu yaz, açı için \"<\" veya Tab, Enter noktayı koyar",
   "shortcuts.sketchDimensionSymmetric": "Bir çizginin uzunluk alanında: iki yöne büyüt",

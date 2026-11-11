@@ -1578,6 +1578,7 @@ export const MESSAGES_EN = {
   "shortcuts.sketchTools": "Pick a drawing tool: 1 Line, 2 Bezier Curve, 3 Smooth Curve, 4 Add or Remove Points, 5 Freehand (while no line is being drawn)",
   "shortcuts.sketchHandleNudge": "Move a clicked curve handle by one grid step (Shift: a larger step, Alt: a fifth of it)",
   "shortcuts.sketchAxisLock": "While dragging: keep the move on one axis",
+  "shortcuts.sketchGridOnly": "While setting or dragging a point: on the grid only, no snapping to corners and middles",
   "shortcuts.sketchAngleSnap": "While drawing: snap the new line in 15° steps",
   "shortcuts.sketchTypedLine": "While drawing: type the length, \"<\" or Tab for the angle, Enter sets the point",
   "shortcuts.sketchDimensionSymmetric": "In a line's length field: grow to both sides",

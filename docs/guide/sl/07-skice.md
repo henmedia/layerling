@@ -188,6 +188,7 @@ Drevo ob hiši, figura pred nemirnim ozadjem – kjer nobena barva ne loči obli
 | [[Ctrl]]+[[A]] | izberi vse točke in črte |
 | [[Ctrl]]+[[I]] | {{ui:sketch.addImage}} |
 | [[Shift]] | pri risanju: črta se zaskoči v korakih po 15°; pri vlečenju: gibanje omejeno na eno os |
+| [[Alt]] | pri postavljanju ali vlečenju točke: samo na mrežo, brez pripenjanja na vogale in sredine |
 | številka, [[<]], [[Tab]], [[Enter]] | pri risanju: vpiši dolžino in kot naslednje črte in jo postavi |
 | [[R]] | zavrti sklenjeno skico za 45° |
 | [[Ctrl]]+[[L]] | zakleni ali odkleni sliko predloge |

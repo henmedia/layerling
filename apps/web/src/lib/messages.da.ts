@@ -2227,6 +2227,7 @@ export const MESSAGES_DA: Partial<Record<MessageKey, string>> = {
   "shortcuts.sketchZoom": "Zoom ind eller ud af skitsen",
   "shortcuts.sketchNudge": "Flyt de valgte punkter, linjer eller billede ét gittertrin (Shift: et større trin, Alt: en femtedel af det)",
   "shortcuts.sketchAxisLock": "Under træk: hold flytningen på én akse",
+  "shortcuts.sketchGridOnly": "Når du sætter eller trækker et punkt: kun på gitteret, uden at fange hjørner og midtpunkter",
   "shortcuts.sketchAngleSnap": "Under tegning: snap den nye linje i 15°-trin",
   "shortcuts.sketchTypedLine": "Under tegning: tast længden, \"<\" eller Tab for vinklen, Enter sætter punktet",
   "shortcuts.sketchDimensionSymmetric": "I en linjes længdefelt: voks til begge sider",

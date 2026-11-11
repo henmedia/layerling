@@ -353,6 +353,7 @@ The tree beside a house, a figure before a busy background – where no colour t
 | [[Ctrl]]+[[A]] | select every point and line |
 | [[Ctrl]]+[[I]] | {{ui:sketch.addImage}} |
 | [[Shift]] | while drawing: snap the line in 15° steps; while dragging: keep movement on one axis |
+| [[Alt]] | while setting or dragging a point: on the grid only, no snapping to corners and middles |
 | digit, [[<]], [[Tab]], [[Enter]] | while drawing: type and set the length and angle of the next line |
 | [[R]] | rotate the closed sketch by 45° |
 | [[Ctrl]]+[[L]] | lock or unlock the selected outline, or the template image |

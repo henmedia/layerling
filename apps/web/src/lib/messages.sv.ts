@@ -1572,6 +1572,7 @@ export const MESSAGES_SV: Partial<Record<MessageKey, string>> = {
   "shortcuts.sketchTools": "Välj ett ritverktyg: 1 Linje, 2 Bézierkurva, 3 Mjuk kurva, 4 Lägg till eller ta bort punkter, 5 Frihand (medan ingen linje ritas)",
   "shortcuts.sketchHandleNudge": "Flytta ett klickat kurvhandtag ett rutnätssteg (Skift: ett större steg, Alt: en femtedel)",
   "shortcuts.sketchAxisLock": "Medan du drar: håll rörelsen längs en axel",
+  "shortcuts.sketchGridOnly": "När du sätter eller drar en punkt: bara på rutnätet, utan att fästa mot hörn och mittpunkter",
   "shortcuts.sketchAngleSnap": "Medan du ritar: fäst den nya linjen i steg om 15°",
   "shortcuts.sketchTypedLine": "Medan du ritar: skriv längden, ”<” eller Tab för vinkeln, Enter sätter punkten",
   "shortcuts.sketchDimensionSymmetric": "I ett längdfält för en linje: väx åt båda håll",

@@ -188,6 +188,7 @@ El árbol junto a una casa, una figura ante un fondo recargado: donde ningún co
 | [[Ctrl]]+[[A]] | seleccionar todos los puntos y líneas |
 | [[Ctrl]]+[[I]] | {{ui:sketch.addImage}} |
 | [[Mayús]] | al dibujar: ajustar la línea en pasos de 15°; al arrastrar: limitar el movimiento a un eje |
+| [[Alt]] | al poner o arrastrar un punto: solo en la cuadrícula, sin ajustarse a esquinas ni puntos medios |
 | cifra, [[<]], [[Tab]], [[Intro]] | al dibujar: escribir y fijar la longitud y el ángulo de la línea siguiente |
 | [[R]] | girar 45° el boceto cerrado |
 | [[Ctrl]]+[[L]] | bloquear o desbloquear el contorno seleccionado o la imagen de plantilla |

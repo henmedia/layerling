@@ -182,6 +182,7 @@ Fa egy ház mellett, alak egy zsúfolt háttér előtt – ahol semmilyen szín 
 | [[Ctrl]]+[[A]] | minden pont és vonal kijelölése |
 | [[Ctrl]]+[[I]] | {{ui:sketch.addImage}} |
 | [[Shift]] | rajzolás közben: a vonal 15°-os lépésekben illeszkedik; húzás közben: a mozgás egy tengelyen marad |
+| [[Alt]] | pont lerakásakor vagy húzásakor: csak a rácsra, sarkokhoz és felezőpontokhoz igazítás nélkül |
 | számjegy, [[<]], [[Tab]], [[Enter]] | rajzolás közben: a következő vonal hosszának és szögének begépelése és letétele |
 | [[R]] | a zárt vázlat elforgatása 45°-kal |
 | [[Ctrl]]+[[L]] | a mintakép zárolása vagy feloldása |

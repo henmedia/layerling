@@ -186,6 +186,7 @@ Strom vedle domu, postava před neklidným pozadím – kde žádná barva neodd
 | [[Ctrl]]+[[A]] | výběr všech bodů a čar |
 | [[Ctrl]]+[[I]] | {{ui:sketch.addImage}} |
 | [[Shift]] | kreslení po 15°, při přesunu omezení na jednu osu |
+| [[Alt]] | při kladení nebo tažení bodu: jen na mřížku, bez přichycení k rohům a středům |
 | číslice, [[<]], [[Tab]], [[Enter]] | zadání a potvrzení délky a úhlu další úsečky |
 | [[R]] | otočení uzavřeného náčrtu o 45° |
 | [[Ctrl]]+[[L]] | zamknutí nebo odemknutí podkladu |

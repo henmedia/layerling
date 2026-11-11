@@ -919,6 +919,7 @@ export const MESSAGES_HU: Partial<Record<MessageKey, string>> = {
   "shortcuts.sketchZoom": "A vázlat nagyítása vagy kicsinyítése",
   "shortcuts.sketchNudge": "A kijelölt pontok, vonalak vagy a kép mozgatása egy rácslépéssel (Shift: nagyobb lépés)",
   "shortcuts.sketchAxisLock": "Húzás közben: a mozgás egy tengelyen marad",
+  "shortcuts.sketchGridOnly": "Pont lerakásakor vagy húzásakor: csak a rácsra, sarkokhoz és felezőpontokhoz igazítás nélkül",
   "shortcuts.sketchAngleSnap": "Rajzolás közben: az új vonal 15°-os lépésekben illeszkedik",
   "shortcuts.sketchTypedLine": "Rajzolás közben: írd be a hosszt, „<” vagy Tab a szöghöz, az Enter leteszi a pontot",
   "shortcuts.sketchDimensionSymmetric": "Egy vonal hosszmezőjében: mindkét irányba nő",

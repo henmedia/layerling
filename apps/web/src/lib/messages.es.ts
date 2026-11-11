@@ -1580,6 +1580,7 @@ export const MESSAGES_ES: Partial<Record<MessageKey, string>> = {
   "shortcuts.sketchTools": "Elegir herramienta de dibujo: 1 Línea, 2 Curva de Bézier, 3 Curva suave, 4 Añadir o quitar puntos, 5 Mano alzada (mientras no se esté dibujando una línea)",
   "shortcuts.sketchHandleNudge": "Mover un paso de cuadrícula el tirador de curva en el que has hecho clic (Mayús: un paso mayor; Alt: la quinta parte)",
   "shortcuts.sketchAxisLock": "Al arrastrar: mantener el movimiento en un solo eje",
+  "shortcuts.sketchGridOnly": "Al poner o arrastrar un punto: solo en la cuadrícula, sin ajustarse a esquinas ni puntos medios",
   "shortcuts.sketchAngleSnap": "Al dibujar: ajustar la nueva línea en pasos de 15°",
   "shortcuts.sketchTypedLine": "Al dibujar: escribir la longitud, «<» o Tab para el ángulo; Intro fija el punto",
   "shortcuts.sketchDimensionSymmetric": "En el campo de longitud de una línea: crecer hacia los dos lados",

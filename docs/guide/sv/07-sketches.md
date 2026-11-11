@@ -353,6 +353,7 @@ Trädet bredvid ett hus, en figur framför en rörig bakgrund – där ingen fä
 | [[Ctrl]]+[[A]] | markera alla punkter och linjer |
 | [[Ctrl]]+[[I]] | {{ui:sketch.addImage}} |
 | [[Shift]] | medan du ritar: fäst linjen i steg om 15°; medan du drar: håll flytten längs en axel |
+| [[Alt]] | när du sätter eller drar en punkt: bara på rutnätet, utan att fästa mot hörn och mittpunkter |
 | siffra, [[<]], [[Tab]], [[Enter]] | medan du ritar: skriv in och ange längd och vinkel för nästa linje |
 | [[R]] | vrid den slutna skissen 45° |
 | [[Ctrl]]+[[L]] | lås eller lås upp den markerade konturen eller mallbilden |

@@ -1533,6 +1533,7 @@ export const MESSAGES_PL: Partial<Record<MessageKey, string>> = {
   "shortcuts.sketchTools": "Wybierz narzędzie rysowania: 1 Linia, 2 Krzywa Béziera, 3 Gładka krzywa, 4 Dodaj lub usuń punkty, 5 Odręcznie (gdy żadna linia nie jest rysowana)",
   "shortcuts.sketchHandleNudge": "Przesuń kliknięty uchwyt krzywej o jeden krok siatki (Shift: większy krok, Alt: jego jedna piąta)",
   "shortcuts.sketchAxisLock": "Podczas przeciągania: trzymaj ruch w jednej osi",
+  "shortcuts.sketchGridOnly": "Przy stawianiu lub przeciąganiu punktu: tylko na siatkę, bez przyciągania do narożników i środków",
   "shortcuts.sketchAngleSnap": "Podczas rysowania: przyciągaj nową linię co 15°",
   "shortcuts.sketchTypedLine": "Podczas rysowania: wpisz długość, „<” lub Tab dla kąta, Enter stawia punkt",
   "shortcuts.sketchDimensionSymmetric": "W polu długości linii: wydłuż w obie strony",

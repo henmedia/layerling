@@ -186,6 +186,7 @@ L'arbre à côté d'une maison, une figure devant un fond chargé – là où au
 | [[Ctrl]]+[[A]] | sélectionner tous les points et toutes les lignes |
 | [[Ctrl]]+[[I]] | {{ui:sketch.addImage}} |
 | [[Shift]] | pendant le dessin : tracez la ligne par pas de 15° ; tout en faisant glisser : conserver le mouvement sur un axe |
+| [[Alt]] | en posant ou en faisant glisser un point : uniquement sur la grille, sans accrochage aux coins et aux milieux |
 | chiffre, [[<]], [[Tab]], [[Enter]] | pendant le dessin : tapez et définissez la longueur et l'angle de la ligne suivante |
 | [[R]] | faire pivoter l'esquisse fermée de 45° |
 | [[Ctrl]]+[[L]] | verrouiller ou déverrouiller l'image du modèle |

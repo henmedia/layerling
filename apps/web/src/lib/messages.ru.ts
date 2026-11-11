@@ -1575,6 +1575,7 @@ export const MESSAGES_RU: Partial<Record<MessageKey, string>> = {
   "shortcuts.sketchTools": "Выбрать инструмент рисования: 1 Линия, 2 Кривая Безье, 3 Гладкая кривая, 4 Добавить или удалить точки, 5 От руки (пока не рисуется линия)",
   "shortcuts.sketchHandleNudge": "Сдвинуть выбранный щелчком маркер кривой на один шаг сетки (Shift: больший шаг, Alt: пятая часть шага)",
   "shortcuts.sketchAxisLock": "При перетаскивании: зафиксировать движение по одной оси",
+  "shortcuts.sketchGridOnly": "При установке или перетаскивании точки: только по сетке, без привязки к углам и серединам",
   "shortcuts.sketchAngleSnap": "При рисовании: привязка новой линии к шагу 15°",
   "shortcuts.sketchTypedLine": "При рисовании: введите длину, «<» или Tab для угла, Enter для фиксации точки",
   "shortcuts.sketchDimensionSymmetric": "В поле длины линии: удлинять в обе стороны",

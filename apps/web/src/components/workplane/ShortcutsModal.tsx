@@ -204,6 +204,7 @@ const SHORTCUT_GROUPS: ShortcutGroup[] = [
       { combos: ["1", "2", "3", "4", "5"], label: "shortcuts.sketchTools" },
       { combos: ["Shift"], label: "shortcuts.sketchAngleSnap" },
       { combos: ["Shift"], label: "shortcuts.sketchAxisLock" },
+      { combos: ["Alt"], label: "shortcuts.sketchGridOnly" },
       { combos: ["0-9", "<", "Tab", "Enter"], label: "shortcuts.sketchTypedLine" },
     ],
   },

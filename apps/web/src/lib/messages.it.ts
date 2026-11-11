@@ -1570,6 +1570,7 @@ export const MESSAGES_IT: Partial<Record<MessageKey, string>> = {
   "shortcuts.sketchTools": "Scegli uno strumento di disegno: 1 Linea, 2 Curva di Bézier, 3 Curva uniforme, 4 Aggiungi o rimuovi punti, 5 Mano libera (quando non stai disegnando una linea)",
   "shortcuts.sketchHandleNudge": "Sposta di un passo della griglia il punto di controllo della curva selezionato (Maiusc: passo più ampio)",
   "shortcuts.sketchAxisLock": "Durante il trascinamento: vincola lo spostamento a un solo asse",
+  "shortcuts.sketchGridOnly": "Mentre metti o trascini un punto: solo sulla griglia, senza agganciarsi ad angoli e punti medi",
   "shortcuts.sketchAngleSnap": "Durante il disegno: aggancia la nuova linea a incrementi di 15°",
   "shortcuts.sketchTypedLine": "Durante il disegno: digita la lunghezza, « < » o Tab per l'angolo; Invio conferma il punto",
   "shortcuts.sketchDimensionSymmetric": "Nel campo della lunghezza di una linea: estendi in entrambe le direzioni",

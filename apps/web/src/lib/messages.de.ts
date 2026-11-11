@@ -1577,6 +1577,7 @@ export const MESSAGES_DE: Record<MessageKey, string> = {
   "shortcuts.sketchTools": "Zeichenwerkzeug wählen: 1 Linie, 2 Bézier-Kurve, 3 Weiche Kurve, 4 Punkte setzen oder entfernen, 5 Freihand (solange keine Linie gezeichnet wird)",
   "shortcuts.sketchHandleNudge": "Einen angeklickten Kurvengriff um einen Rasterschritt verschieben (Umschalt: größerer Schritt, Alt: ein Fünftel davon)",
   "shortcuts.sketchAxisLock": "Beim Ziehen: die Bewegung auf einer Achse halten",
+  "shortcuts.sketchGridOnly": "Beim Setzen oder Ziehen eines Punkts: nur aufs Raster, ohne Einrasten an Ecken und Mitten",
   "shortcuts.sketchAngleSnap": "Beim Zeichnen: die neue Linie in 15°-Schritten einrasten",
   "shortcuts.sketchTypedLine": "Beim Zeichnen: Länge eintippen, „<“ oder Tab für den Winkel, Enter setzt den Punkt",
   "shortcuts.sketchDimensionSymmetric": "Im Längenfeld einer Linie: zu beiden Seiten verlängern",

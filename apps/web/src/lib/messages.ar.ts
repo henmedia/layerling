@@ -1576,6 +1576,7 @@ export const MESSAGES_AR: Partial<Record<MessageKey, string>> = {
   "shortcuts.sketchTools": "اختر أداة رسم: 1 خط، 2 منحنى بيزيه، 3 منحنى سلس، 4 إضافة أو إزالة نقاط، 5 رسم حر (أثناء عدم رسم خط)",
   "shortcuts.sketchHandleNudge": "تحريك مقبض المنحنى الذي نقرت عليه بخطوة شبكة واحدة (Shift: خطوة أكبر، Alt: خُمسها)",
   "shortcuts.sketchAxisLock": "أثناء السحب: إبقاء الحركة على محور واحد",
+  "shortcuts.sketchGridOnly": "عند وضع نقطة أو سحبها: على الشبكة فقط، دون الالتقاط على الزوايا والمنتصفات",
   "shortcuts.sketchAngleSnap": "أثناء الرسم: التقاط الخط الجديد بخطوات 15°",
   "shortcuts.sketchTypedLine": "أثناء الرسم: اكتب الطول، ثم \"<\" أو Tab للزاوية، وEnter يثبّت النقطة",
   "shortcuts.sketchDimensionSymmetric": "في حقل طول الخط: النمو على الجانبين",

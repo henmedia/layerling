@@ -353,6 +353,7 @@ Den Baum neben einem Haus, eine Figur vor unruhigem Hintergrund – wo keine Far
 | [[Strg]]+[[A]] | alle Punkte und Linien auswählen |
 | [[Strg]]+[[I]] | {{ui:sketch.addImage}} |
 | [[Umschalt]] | beim Zeichnen: Linie in 15°-Schritten einrasten; beim Ziehen: Bewegung auf eine Achse beschränken |
+| [[Alt]] | beim Setzen oder Ziehen eines Punkts: nur aufs Raster, ohne Einrasten an Ecken und Mitten |
 | Ziffer, [[<]], [[Tab]], [[Enter]] | beim Zeichnen: Länge und Winkel der nächsten Linie eintippen und setzen |
 | [[R]] | geschlossene Skizze um 45° drehen |
 | [[Strg]]+[[L]] | gewählten Umriss oder das Vorlagenbild sperren oder entsperren |

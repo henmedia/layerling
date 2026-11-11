@@ -189,6 +189,7 @@ L'albero accanto a una casa, una figura davanti a uno sfondo affollato – dove 
 | [[Ctrl]]+[[A]] | seleziona tutti i punti e le linee |
 | [[Ctrl]]+[[I]] | {{ui:sketch.addImage}} |
 | [[Shift]] | durante il disegno: aggancia la linea a incrementi di 15°; durante il trascinamento: vincola il movimento a un asse |
+| [[Alt]] | mentre metti o trascini un punto: solo sulla griglia, senza agganciarsi ad angoli e punti medi |
 | cifra, [[<]], [[Tab]], [[Enter]] | durante il disegno: inserisce e conferma lunghezza e angolo della linea successiva |
 | [[R]] | ruota lo schizzo chiuso di 45° |
 | [[Ctrl]]+[[L]] | blocca o sblocca il contorno selezionato o l’immagine di riferimento |

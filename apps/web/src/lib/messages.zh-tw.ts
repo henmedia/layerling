@@ -1534,6 +1534,7 @@ export const MESSAGES_ZH_TW: Partial<Record<MessageKey, string>> = {
   "shortcuts.sketchTools": "選擇繪製工具：1 直線，2 貝茲曲線，3 平滑曲線，4 新增或移除點，5 手繪（未在繪製線條時）",
   "shortcuts.sketchHandleNudge": "將點擊的曲線控制點移動一個網格步距（Shift：較大步距，Alt：五分之一步距）",
   "shortcuts.sketchAxisLock": "拖曳時：讓移動只沿一個軸向",
+  "shortcuts.sketchGridOnly": "放置或拖曳點時：只對齊格線，不吸附到角點和中點",
   "shortcuts.sketchAngleSnap": "繪製時：以 15° 為間隔吸附新線條",
   "shortcuts.sketchTypedLine": "繪製時：輸入長度，按「<」或 Tab 輸入角度，Enter 確定該點",
   "shortcuts.sketchDimensionSymmetric": "在線條的長度欄位中：向兩側擴展",

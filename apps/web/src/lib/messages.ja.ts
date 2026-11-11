@@ -1106,6 +1106,7 @@ export const MESSAGES_JA: Partial<Record<MessageKey, string>> = {
   "shortcuts.sketchTools": "描画ツールを選ぶ: 1 直線、2 ベジェ曲線、3 スムーズ曲線、4 点を追加または削除、5 フリーハンド（線を描いていないとき）",
   "shortcuts.sketchHandleNudge": "クリックした曲線のハンドルを1グリッド刻み動かす（Shift: 大きく動かす）",
   "shortcuts.sketchAxisLock": "ドラッグ中: 移動を1軸に固定",
+  "shortcuts.sketchGridOnly": "点を置く・ドラッグするとき：グリッドのみに合わせ、角や中点にはスナップしない",
   "shortcuts.sketchAngleSnap": "描画中: 新しい線を15°刻みにスナップ",
   "shortcuts.sketchTypedLine": "描画中: 長さを入力し、「<」またはTabで角度、Enterで点を確定",
   "shortcuts.sketchDimensionSymmetric": "線の長さ入力欄で: 両側に伸ばす",

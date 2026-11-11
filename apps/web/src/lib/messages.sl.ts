@@ -1309,6 +1309,7 @@ export const MESSAGES_SL: Partial<Record<MessageKey, string>> = {
   "shortcuts.sketchTools": "Izberi orodje za risanje: 1 Daljica, 2 Bézierova krivulja, 3 Gladka krivulja, 4 Dodaj ali odstrani točke, 5 Prostoročno (dokler se ne riše črta)",
   "shortcuts.sketchHandleNudge": "Premakni kliknjeni ročaj krivulje za en korak mreže (Shift: večji korak, Alt: petina koraka)",
   "shortcuts.sketchAxisLock": "Med vlečenjem: omeji premik na eno os",
+  "shortcuts.sketchGridOnly": "Pri postavljanju ali vlečenju točke: samo na mrežo, brez pripenjanja na vogale in sredine",
   "shortcuts.sketchDimensionSymmetric": "V polju dolžine črte: raste na obe strani",
   "shortcuts.edgeApply": "Uveljavi predogled",
   "shortcuts.edgeCancel": "Zavrzi predogled",

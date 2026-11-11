@@ -190,6 +190,7 @@ Træet ved siden af et hus, en figur foran en urolig baggrund – hvor ingen far
 | [[Ctrl]]+[[A]] | vælg alle punkter og linjer |
 | [[Ctrl]]+[[I]] | {{ui:sketch.addImage}} |
 | [[Shift]] | mens du tegner: snap linjen i 15°-trin; mens du trækker: hold flytningen på én akse |
+| [[Alt]] | når du sætter eller trækker et punkt: kun på gitteret, uden at fange hjørner og midtpunkter |
 | ciffer, [[<]], [[Tab]], [[Enter]] | mens du tegner: tast og sæt længden og vinklen på den næste linje |
 | [[R]] | drej den lukkede skitse 45° |
 | [[Ctrl]]+[[L]] | lås eller lås op for skabelonbilledet, eller det valgte omrids |

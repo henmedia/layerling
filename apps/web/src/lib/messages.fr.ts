@@ -1568,6 +1568,7 @@ export const MESSAGES_FR: Partial<Record<MessageKey, string>> = {
   "shortcuts.sketchTools": "Choisir un outil de dessin : 1 Ligne, 2 Courbe de Bézier, 3 Courbe douce, 4 Ajouter ou supprimer des points, 5 Main levée (tant qu'aucune ligne n'est en cours)",
   "shortcuts.sketchHandleNudge": "Déplacer d'un pas de grille une poignée de courbe cliquée (Shift : un pas plus grand, Alt : un cinquième)",
   "shortcuts.sketchAxisLock": "Tout en faisant glisser : gardez le mouvement sur un axe",
+  "shortcuts.sketchGridOnly": "En posant ou en faisant glisser un point : uniquement sur la grille, sans accrochage aux coins et aux milieux",
   "shortcuts.sketchAngleSnap": "Pendant le dessin : capturez la nouvelle ligne par pas de 15 °",
   "shortcuts.sketchTypedLine": "Pendant le dessin : tapez la longueur, \"<\" ou Tab pour l'angle, Entrée définit le point",
   "shortcuts.sketchDimensionSymmetric": "Dans le champ de longueur d'une ligne : agrandir des deux côtés",

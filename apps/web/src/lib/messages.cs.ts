@@ -1717,6 +1717,7 @@ export const MESSAGES_CS: Record<MessageKey, string> = {
   "shortcuts.sketchTools": "Zvolit kreslicí nástroj: 1 Úsečka, 2 Bézierova křivka, 3 Hladká křivka, 4 Přidat nebo odebrat body, 5 Volná ruka (dokud se nekreslí úsečka)",
   "shortcuts.sketchHandleNudge": "Posunout kliknutý úchyt křivky o krok mřížky (Shift: větší krok, Alt: jeho pětina)",
   "shortcuts.sketchAxisLock": "Při tažení omezit posun na jednu osu",
+  "shortcuts.sketchGridOnly": "Při kladení nebo tažení bodu: jen na mřížku, bez přichycení k rohům a středům",
   "shortcuts.sketchAngleSnap": "Při kreslení přichytávat novou úsečku po 15°",
   "shortcuts.sketchTypedLine": "Při kreslení zadat délku, „<“ nebo Tab pro úhel, Enter umístí bod",
   "shortcuts.sketchDimensionSymmetric": "V poli délky úsečky: prodlužovat na obě strany",
