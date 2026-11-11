@@ -238,7 +238,7 @@ import { formatLengthMm, lengthDisplayUnit } from "@/lib/measurementUnits";
 import { tightBendShown } from "@/lib/cadTightBends";
 import { angleAtVertex, angleBetweenFaces, formatFaceAngles, formatProtractorAngle } from "@/lib/protractor";
 import { wrapMeshAroundCylinder, type CylinderWrapError } from "@/lib/cylinderWrap";
-import { normalizeSurfaceTexture, SURFACE_TEXTURE_AXES, SURFACE_TEXTURE_CAP_EDGES, SURFACE_TEXTURE_CAP_STYLES, SURFACE_TEXTURE_CARBON_WEAVES, SURFACE_TEXTURE_BARK_TYPES, SURFACE_TEXTURE_BRICK_BONDS, SURFACE_TEXTURE_TIMBER_BRACINGS, SURFACE_TEXTURE_BUMP_GRIDS, SURFACE_TEXTURE_CRACK_STARTS, SURFACE_TEXTURE_CRACK_STYLES, SURFACE_TEXTURE_DETAILS, SURFACE_TEXTURE_DIRECTIONS, SURFACE_TEXTURE_IMAGES, SURFACE_TEXTURE_LIMITS, SURFACE_TEXTURE_PATTERNS, SURFACE_TEXTURE_PROFILES, SURFACE_TEXTURE_PROJECTIONS, SURFACE_TEXTURE_TILINGS, SURFACE_TEXTURE_FACE_NAMES, normalizeSurfaceTextureFaces, surfaceTextureFacePick, surfaceTexturePickedFaceIds, toggleSurfaceTexturePickedFace, type SurfaceTextureFace, type SurfaceTextureFacePick, SURFACE_TEXTURE_WOOD_CUTS, SURFACE_TEXTURE_WOOD_TYPES, type SurfaceTextureMask, type SurfaceTextureSettings } from "@/lib/surfaceTexture";
+import { normalizeSurfaceTexture, SURFACE_TEXTURE_AXES, SURFACE_TEXTURE_CAP_EDGES, SURFACE_TEXTURE_CAP_STYLES, SURFACE_TEXTURE_CARBON_WEAVES, SURFACE_TEXTURE_BARK_TYPES, SURFACE_TEXTURE_BRICK_BONDS, SURFACE_TEXTURE_TIMBER_BRACINGS, SURFACE_TEXTURE_BUMP_GRIDS, SURFACE_TEXTURE_CRACK_STARTS, SURFACE_TEXTURE_CRACK_STYLES, SURFACE_TEXTURE_DETAILS, SURFACE_TEXTURE_DIRECTIONS, SURFACE_TEXTURE_IMAGES, SURFACE_TEXTURE_LIMITS, SURFACE_TEXTURE_PATTERNS, SURFACE_TEXTURE_PROFILES, SURFACE_TEXTURE_PROJECTIONS, SURFACE_TEXTURE_TILINGS, SURFACE_TEXTURE_FACE_NAMES, normalizeSurfaceTextureFaces, normalizeSurfaceTextureRegion, SURFACE_TEXTURE_MAX_REGION_POINTS, surfaceTextureFacePick, surfaceTexturePickedFaceIds, surfaceTextureRegionFromLasso, toggleSurfaceTexturePickedFace, type SurfaceTextureFace, type SurfaceTextureFacePick, type SurfaceTextureRegion, SURFACE_TEXTURE_WOOD_CUTS, SURFACE_TEXTURE_WOOD_TYPES, type SurfaceTextureMask, type SurfaceTextureSettings } from "@/lib/surfaceTexture";
 import { normalizeSurfaceTextureOwnImage, SURFACE_TEXTURE_OWN_IMAGE_SIZE } from "@/lib/surfaceTextureImages";
 import { SURFACE_TEXT_FONTS, surfaceTextOutline } from "@/lib/surfaceTextOutline";
 import { useInspectorCard } from "@/lib/inspectorCards";
@@ -3378,6 +3378,10 @@ export function LayerlingEditor({
   // Faces of the selected body picked for its texture with clicks (the texture card holds the other settings): the
   // body's faces as the texture finds them, on the body under a texture there is, and the faces picked so far.
   const [surfaceFacePick, setSurfaceFacePick] = useState<{ shapeId: string; shape: WorkplaneShape; edgeAngle: number; pick: SurfaceTextureFacePick; faces: SurfaceTextureFace[] } | null>(null);
+  // A region drawn on the selected body for its texture with a lasso (Discussion #1579): the body, its triangles under a
+  // texture there is, and the region drawn last, which the texture card takes for the layer it was drawn for.
+  const [surfaceRegionDraw, setSurfaceRegionDraw] = useState<{ shapeId: string; shape: WorkplaneShape; positions: Float64Array } | null>(null);
+  const [surfaceDrawnRegion, setSurfaceDrawnRegion] = useState<{ region: SurfaceTextureRegion } | null>(null);
   const [cruiseAsset, setCruiseAsset] = useState<ShapeAsset | null>(null);
   const cruiseAssetRef = useRef<ShapeAsset | null>(null);
   cruiseAssetRef.current = cruiseAsset;
@@ -10856,6 +10860,7 @@ export function LayerlingEditor({
       return;
     }
     if (selectedShapes.length !== 1 || !selectedShape) return;
+    setSurfaceRegionDraw(null);
     const current = selectedShape;
     if (surfaceFacePick?.shapeId === current.id && surfaceFacePick.edgeAngle === edgeAngle) {
       setSurfaceFacePick({ ...surfaceFacePick, faces });
@@ -10874,6 +10879,39 @@ export function LayerlingEditor({
   const toggleSurfaceFace = useCallback((faceId: number) => {
     setSurfaceFacePick((current) => current && { ...current, faces: toggleSurfaceTexturePickedFace(current.pick, current.faces, faceId) });
   }, []);
+
+  // Drawing a region for the texture (Discussion #1579): on the body the texture is made on - under a texture there is -
+  // where the selected body stands, with a lasso in the view. Picking faces stops: the region takes their place.
+  const drawSurfaceRegion = useCallback((drawing: boolean) => {
+    if (!drawing) {
+      setSurfaceRegionDraw(null);
+      return;
+    }
+    if (selectedShapes.length !== 1 || !selectedShape) return;
+    const current = selectedShape;
+    const source = canChangeSurfaceTexture(current) ? shapeUnderSurfaceTexture(current) : canTextureSurface(current) ? current : null;
+    if (!source) {
+      setNotice(t(current.locked ? "status.objectLocked" : current.surfaceTexture ? "status.alreadyTextured" : "status.selectOneToTexture"));
+      return;
+    }
+    if (deleteFaceTool && !deleteFaceTool.busy) setDeleteFaceTool(null);
+    setSurfaceFacePick(null);
+    setSurfaceRegionDraw({ shapeId: current.id, shape: current, positions: surfaceTextureInput(source) });
+    setNotice(t("status.surfaceRegionDraw"));
+  }, [deleteFaceTool, selectedShape, selectedShapes.length]);
+
+  // A lasso drawn round a place on the body: the region it makes goes to the texture card, and drawing ends.
+  const surfaceRegionLasso = useCallback((start: LayFlatPick, view: PaintLassoView, outline: Array<[number, number]>) => {
+    if (!surfaceRegionDraw) return;
+    const region = surfaceTextureRegionFromLasso(surfaceRegionDraw.positions, start, view, outline);
+    if (!region) {
+      setNotice(t("status.surfaceRegionMissed"));
+      return;
+    }
+    setSurfaceDrawnRegion({ region });
+    setSurfaceRegionDraw(null);
+    setNotice(t("status.surfaceRegionDrawn", { count: region.points.length }));
+  }, [surfaceRegionDraw]);
 
   // The Honeycomb is gone as a shape (#223): one in an older design becomes a box with hexagonal holes, grouped, as the
   // hole pattern makes it. Each is converted once - Undo may bring the old one back, and it then stays as it was.
@@ -12628,12 +12666,18 @@ export function LayerlingEditor({
   // The surface texture card, opened and closed by the button under "Modify" as by its own header; like the other
   // cards it stays open for the next body until it is closed.
   const [surfaceTextureOpen, setSurfaceTextureOpen] = useInspectorCard("surfaceTexture", false);
-  // Picking faces ends with the card closed, another selection, or the body changed (moved, resized, textured).
+  // Picking faces ends with the card closed, another selection, or the body changed (moved, resized, textured) - and so
+  // does drawing a region.
   useEffect(() => {
     if (!surfaceFacePick) return;
     const body = shapes.find((shape) => shape.id === surfaceFacePick.shapeId);
     if (!surfaceTextureOpen || selectedIds.length !== 1 || selectedIds[0] !== surfaceFacePick.shapeId || body !== surfaceFacePick.shape) setSurfaceFacePick(null);
   }, [selectedIds, shapes, surfaceFacePick, surfaceTextureOpen]);
+  useEffect(() => {
+    if (!surfaceRegionDraw) return;
+    const body = shapes.find((shape) => shape.id === surfaceRegionDraw.shapeId);
+    if (!surfaceTextureOpen || selectedIds.length !== 1 || selectedIds[0] !== surfaceRegionDraw.shapeId || body !== surfaceRegionDraw.shape) setSurfaceRegionDraw(null);
+  }, [selectedIds, shapes, surfaceRegionDraw, surfaceTextureOpen]);
   const canSurfaceTexture = selectedShapes.length === 1 && offersSurfaceTexture(selectedShape) && !bodyLocked(selectedShape);
   const toggleSurfaceTextureTool = useCallback(() => setSurfaceTextureOpen((open) => !open), [setSurfaceTextureOpen]);
 
@@ -14961,6 +15005,13 @@ export function LayerlingEditor({
             if (typeof face === "string" ? !(SURFACE_TEXTURE_FACE_NAMES as readonly string[]).includes(face) : !normalizeSurfaceTextureFaces([face]).length) throw new Error(named);
           });
         }
+        // A region drawn on a face (Discussion #1579) instead of faces: refused when it is no outline, or given with faces.
+        const regionError = (given: Record<string, unknown>, where: string) => {
+          if (given.region === undefined || given.region === null) return;
+          if (!normalizeSurfaceTextureRegion(given.region)) throw new Error(`${where}region must be { face, points }: face one of ${SURFACE_TEXTURE_FACE_NAMES.join(", ")} (default top) or a normal [x, y, z], and points 3 to ${SURFACE_TEXTURE_MAX_REGION_POINTS} [x, y] in mm with an area`);
+          if (Array.isArray(given.faces) && given.faces.length) throw new Error(`${where}region takes the place of faces: give one or the other`);
+        };
+        regionError(params, "");
         // Masks: the bodies named in `masks`, or else the bodies marked as masks that reach into this one.
         let masks: SurfaceTextureMask[];
         if (params.masks !== undefined) {
@@ -14976,8 +15027,8 @@ export function LayerlingEditor({
             return mask;
           });
         } else masks = surfaceTextureMasksFor(source, currentShapes());
-        // A change keeps the settings it does not name.
-        const settings = { ...normalizeSurfaceTexture({ ...(under ? target.surfaceTexture : {}), ...params }), masks };
+        // A change keeps the settings it does not name - faces named anew without a region take the region's place.
+        const settings = { ...normalizeSurfaceTexture({ ...(under ? target.surfaceTexture : {}), ...(params.faces !== undefined && params.region === undefined ? { region: null } : {}), ...params }), masks };
         if (settings.pattern === "text") {
           // A font of one's own may be named by its name as well as by its id; a name nobody knows is refused.
           const font = mcpTextFont(settings.textFont) ?? settings.textFont;
@@ -14998,8 +15049,9 @@ export function LayerlingEditor({
             if (given.faces !== undefined && (!Array.isArray(given.faces) || given.faces.some((face) => (typeof face === "string" ? !(SURFACE_TEXTURE_FACE_NAMES as readonly string[]).includes(face) : !normalizeSurfaceTextureFaces([face]).length)))) {
               throw new Error(`layers[${index}].faces must be a list of ${SURFACE_TEXTURE_FACE_NAMES.join(", ")}, or faces picked in the editor ({ at, normal })`);
             }
+            regionError(given, `layers[${index}].`);
             const layer = { ...normalizeSurfaceTexture(given), masks };
-            if (!surfaceTextureLayerPlaced(layer)) throw new Error(`layers[${index}] needs faces of its own (by name or as picked), or a text: without them it would cover the first layer`);
+            if (!surfaceTextureLayerPlaced(layer)) throw new Error(`layers[${index}] needs faces of its own (by name or as picked), a region, or a text: without them it would cover the first layer`);
             if (layer.pattern === "text") {
               layer.textFont = mcpTextFont(layer.textFont) ?? layer.textFont;
               layer.textOutline = await surfaceTextOutline({ content: layer.textContent, font: layer.textFont, size: layer.textSize, vertical: layer.textVertical });
@@ -15045,7 +15097,7 @@ export function LayerlingEditor({
           ...(patternPart ? { parts: (textured.groupedShapes ?? []).map((part) => ({ name: part.name, color: part.color })) } : {}),
           changed: Boolean(under),
           settings: shown,
-          layers: layerSettings.map((layer) => ({ pattern: layer.pattern, faces: layer.faces.length })),
+          layers: layerSettings.map((layer) => ({ pattern: layer.pattern, faces: layer.faces.length, ...(layer.region ? { region: layer.region } : {}) })),
           masks: masks.length,
           texture: { triangles, projection, around, spacing, limited, tooDeep, bedClamped, ...(cracks ? { cracks } : {}), ...(text ? { text } : {}), ...(bricks ? { bricks } : {}), ...(tiles ? { tiles } : {}), ...(timber ? { timber } : {}) },
         };
@@ -17894,6 +17946,11 @@ export function LayerlingEditor({
           setSurfaceFacePick(null);
           return;
         }
+        // A region half drawn is let go; the one the layer has stays.
+        if (surfaceRegionDraw) {
+          setSurfaceRegionDraw(null);
+          return;
+        }
         if (arrayTool) {
           setArrayTool(null);
           setNotice(t("status.arrayCancelled"));
@@ -18197,6 +18254,7 @@ export function LayerlingEditor({
     deleteFaceTool,
     applyDeleteFaceTool,
     surfaceFacePick,
+    surfaceRegionDraw,
     scalePercentTool,
     selectedShapes,
     shapes,
@@ -18851,6 +18909,10 @@ export function LayerlingEditor({
           surfaceFacePicking={Boolean(surfaceFacePick)}
           surfacePickedFaces={surfaceFacePick?.faces ?? null}
           onSurfaceFacePick={selectedShapes.length === 1 && offersSurfaceTexture(selectedShape) ? pickSurfaceFaces : undefined}
+          surfaceRegionDrawing={Boolean(surfaceRegionDraw)}
+          surfaceDrawnRegion={surfaceDrawnRegion}
+          onSurfaceRegionDraw={selectedShapes.length === 1 && offersSurfaceTexture(selectedShape) ? drawSurfaceRegion : undefined}
+          onSurfaceRegionLasso={surfaceRegionLasso}
           onVaseAccessories={selectedShapes.length === 1 && selectedShape?.kind === "vase" && !bodyLocked(selectedShape) ? () => layOutVaseAccessories(selectedShape.id) : undefined}
           onGridfinityKeys={selectedShapes.length === 1 && selectedShape?.kind === "gridfinity" && selectedShape.gridfinitySwallowtail === true && !historyViewState ? () => void makeSwallowtailKeys(selectedShape.id) : undefined}
           onLayerText={selectedShapes.length === 1 && offersTextLayers(selectedShape) ? layerSelectedText : undefined}
