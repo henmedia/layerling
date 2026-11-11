@@ -929,7 +929,9 @@ export async function splitShapeByPlane(shape: WorkplaneShape, plane: SplitPlane
       if (!positiveShape || !negativeShape || (pinsMesh && !pinsShape)) {
         return { parts: null, error: t("split.error.store") };
       }
-      const parts: WorkplaneShape[] = [canonicalizeShape(positiveShape), canonicalizeShape(negativeShape), ...(pinsShape ? [canonicalizeShape(pinsShape)] : [])];
+      // Dowels on a breakaway base say so, for the print check (#1633).
+      const dowels = pinsShape && connectors?.kind === "dowels" && connectors.dowelBase ? { ...pinsShape, breakawayBase: true } : pinsShape;
+      const parts: WorkplaneShape[] = [canonicalizeShape(positiveShape), canonicalizeShape(negativeShape), ...(dowels ? [canonicalizeShape(dowels)] : [])];
       return { parts, closedHoles, ...(tally ? { connectors: tally } : {}) };
     } finally {
       disposeManifold(positiveMesh);

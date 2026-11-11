@@ -1638,6 +1638,12 @@ export type WorkplaneShape = {
    */
   stencilBridge?: boolean;
   /**
+   * The body stands on a breakaway base (lib/breakawayBase), as the fit test's pin and the Split tool's loose dowels can:
+   * the pin's foot hangs a little over the socket's floor and that floor is one layer thick, on purpose, so the print
+   * check leaves both out (#1633).
+   */
+  breakawayBase?: boolean;
+  /**
    * The point this body turns about, kept with the body: a fraction of its
    * width, height and depth from its centre, in its own frame, so it moves,
    * turns and scales with it. See lib/rotationPivot.
