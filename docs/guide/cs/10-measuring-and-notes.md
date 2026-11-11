@@ -58,7 +58,7 @@ Další kliknutí po hotovém úhlu začne nový a {{ui:camera.protractorClear}}
 
 V nastavení {{ui:workspace.appearance}} jsou dva přepínače průběžného kótování:
 
-- {{ui:workspace.showMoveDimensions}} zobrazuje posunutí během tažení. Patří sem i zvedání černou šipkou nad tělesem, měřené podél jeho přední hrany. Po puštění klikni na takové číslo a napiš přesnou vzdálenost; záporná hodnota jde dolů.
+- {{ui:workspace.showMoveDimensions}} zobrazuje posunutí během tažení. Patří sem i zvedání modrou šipkou nad tělesem, měřené podél jeho přední hrany. Po puštění klikni na takové číslo a napiš přesnou vzdálenost; záporná hodnota jde dolů.
 - {{ui:workspace.showOriginDimensions}} zobrazuje vzdálenosti výběru od počátku podložky, i při výběru více těles.
 
 {{ui:workspace.dimensionsAlwaysVisible}} ponechá rozměry zobrazené trvale. Když těleso nestojí na pracovní rovině, zobrazí se i jeho výška nad ní; kliknutím na číslo zadáš novou.

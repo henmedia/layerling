@@ -60,7 +60,7 @@ Następne kliknięcie po gotowym kącie zaczyna nowy, a {{ui:camera.protractorCl
 
 W ustawieniach w sekcji {{ui:workspace.appearance}} są dwa przełączniki wymiarów na żywo:
 
-- {{ui:workspace.showMoveDimensions}} pokazuje podczas przeciągania, o ile przesuwasz. Dotyczy to też podnoszenia czarną strzałką nad bryłą; droga pokazuje się przy jej przednim narożniku. Klawisze strzałek też pokazują swoją drogę: naciśnięcia sumują się, dopóki nie zaznaczysz czegoś innego albo nie zaczniesz przeciągać, a [[Ctrl]]+[[↑]] i [[Ctrl]]+[[↓]] pokazują drogę w górę albo w dół. Po puszczeniu kliknij taką liczbę i wpisz dokładną odległość; wartość ujemna idzie w dół.
+- {{ui:workspace.showMoveDimensions}} pokazuje podczas przeciągania, o ile przesuwasz. Dotyczy to też podnoszenia niebieską strzałką nad bryłą; droga pokazuje się przy jej przednim narożniku. Klawisze strzałek też pokazują swoją drogę: naciśnięcia sumują się, dopóki nie zaznaczysz czegoś innego albo nie zaczniesz przeciągać, a [[Ctrl]]+[[↑]] i [[Ctrl]]+[[↓]] pokazują drogę w górę albo w dół. Po puszczeniu kliknij taką liczbę i wpisz dokładną odległość; wartość ujemna idzie w dół.
 - {{ui:workspace.showOriginDimensions}} pokazuje odległości zaznaczenia od początku układu płyty, także przy kilku zaznaczonych bryłach.
 
 Z {{ui:workspace.dimensionsAlwaysVisible}} wymiary są widoczne cały czas. Bryła, która nie stoi na płaszczyźnie roboczej, pokazuje też swoją wysokość nad nią; kliknij liczbę, by wpisać nową.

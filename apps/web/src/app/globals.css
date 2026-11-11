@@ -9270,6 +9270,7 @@ html[data-theme="dark"] .align-dot.axis-z, html[data-theme="dark"] .align-spread
     border-color: var(--hover-accent-border-color);
 }
 
+/* The lift arrow moves along Z, so it is blue like the Z turn arrow and the Z axis arrow on the plate (Facebook group). */
 .transform-handle.height-lift {
   border: 0;
   width: 0;
@@ -9277,13 +9278,13 @@ html[data-theme="dark"] .align-dot.axis-z, html[data-theme="dark"] .align-spread
   background: transparent;
   border-left: 6px solid transparent;
   border-right: 6px solid transparent;
-  border-bottom: 13px solid #433629;
+  border-bottom: 13px solid #2f6fe0;
   box-shadow: none;
 }
 
 .transform-handle.height-lift.lower {
   border-bottom: 0;
-  border-top: 13px solid #433629;
+  border-top: 13px solid #2f6fe0;
 }
 
 .transform-handle.height-lift:hover {
@@ -14480,11 +14481,11 @@ html[data-theme="dark"] .transform-handle.axis-y { background: #5fd47c; border-c
 html[data-theme="dark"] .transform-handle.axis-z { background: #6aa0ff; border-color: #163f86; }
 
 html[data-theme="dark"] .transform-handle.height-lift {
-  border-bottom-color: #ffffff;
+  border-bottom-color: #6aa0ff;
 }
 
 html[data-theme="dark"] .transform-handle.height-lift.lower {
-  border-top-color: #ffffff;
+  border-top-color: #6aa0ff;
 }
 
 html[data-theme="dark"] .transform-handle.height-lift:hover {
