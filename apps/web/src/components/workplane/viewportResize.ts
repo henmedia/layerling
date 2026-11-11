@@ -7,7 +7,7 @@ import { starSettingsForSize } from "@/lib/starGeometry";
 import { gridfinityFootprintPatch } from "@/lib/gridfinityGeometry";
 import { pulleyFootprint, pulleyFromSize, pulleySizedPatch } from "@/lib/pulleyGeometry";
 import { type SelectionFrame } from "@/lib/liftGeometry";
-import type { SnapBox } from "@/lib/objectSnap";
+import type { EdgeSnapTarget, SnapBox } from "@/lib/objectSnap";
 import { scaledHorizontalShapePatch, worldBoxOfShapes } from "@/lib/scaleByPercent";
 import { POSITION_TYPED_LIMIT } from "@/lib/workplaneSettings";
 import { heightPatchKeepingBase, shapeIsTurned } from "@/lib/rotationPivot";
@@ -55,6 +55,21 @@ export type TransformDragState = {
   duplicate?: { standIns: THREE.Object3D[] };
   /** An X or Y arrow on the flat workplane (Discussion #1434): the footprints it snaps to, as a drag does; guideY: where its lines are drawn. */
   slideSnap?: { moving: SnapBox; targets: SnapBox[]; guideY: number };
+  /**
+   * A side handle on the flat workplane (Discussion #1647): the dragged side stops at the edges and middles of other
+   * bodies and at the walls it runs into. `frameAxis` is the selection's own axis the handle pulls along, `worldAxis`
+   * the scene axis it lies on and `worldDirection` the way the dragged side moves along it as the body grows;
+   * `movingFrom`/`movingTo` its stretch across, for the guide line.
+   */
+  resizeSnap?: {
+    frameAxis: "x" | "z";
+    worldAxis: "x" | "z";
+    worldDirection: 1 | -1;
+    targets: EdgeSnapTarget[];
+    movingFrom: number;
+    movingTo: number;
+    guideY: number;
+  };
   rotationAxisVector?: THREE.Vector3;
   rotationPivot?: THREE.Vector3;
   /** A pivot the user set; the shapes then move around it instead of spinning in place. */
@@ -274,9 +289,10 @@ export function resizeShapeFromFrameHandle(
   altKey: boolean,
   step: number,
   maxSize: number,
+  freeAxis?: "x" | "z",
 ): Partial<WorkplaneShape> {
   // A GT2 pulley (Discussion #1319) takes the size as teeth and belt width.
-  return pulleySizedPatch(transform.startShape, resizeShapeFromFrameHandleBox(transform, point, handleKey, shiftKey, altKey, step, maxSize));
+  return pulleySizedPatch(transform.startShape, resizeShapeFromFrameHandleBox(transform, point, handleKey, shiftKey, altKey, step, maxSize, freeAxis));
 }
 
 function resizeShapeFromFrameHandleBox(
@@ -287,6 +303,7 @@ function resizeShapeFromFrameHandleBox(
   altKey: boolean,
   step: number,
   maxSize: number,
+  freeAxis?: "x" | "z",
 ): Partial<WorkplaneShape> {
   const shape = transform.startShape;
   const frame = transform.selectionFrame;
@@ -297,16 +314,17 @@ function resizeShapeFromFrameHandleBox(
   const signs = transform.scaleSigns ?? resizeSignsForHandle(handleKey);
   // A handle dragged past the opposite side keeps growing there, as in Tinkercad: the size is the
   // distance from that side and the body stands on the other side of it.
-  const axisResize = (current: number, delta: number, sign: number) => {
+  // A side that snapped to another body (Discussion #1647) keeps that size off the grid.
+  const axisResize = (current: number, delta: number, sign: number, free: boolean) => {
     if (!sign) {
       return { size: current, flipped: false };
     }
     const raw = current + sign * delta * (altKey ? 2 : 1);
-    return { size: snapDimension(Math.abs(raw), step, MIN_SHAPE_SIZE, maxSize), flipped: raw < 0 && !altKey };
+    return { size: snapDimension(Math.abs(raw), free ? 0 : step, MIN_SHAPE_SIZE, maxSize), flipped: raw < 0 && !altKey };
   };
 
-  const resizedX = axisResize(width, localDelta.x, signs.x);
-  const resizedZ = axisResize(depth, localDelta.z, signs.z);
+  const resizedX = axisResize(width, localDelta.x, signs.x, freeAxis === "x");
+  const resizedZ = axisResize(depth, localDelta.z, signs.z, freeAxis === "z");
   let nextWidth = resizedX.size;
   let nextDepth = resizedZ.size;
   let flipX = resizedX.flipped;
@@ -601,22 +619,25 @@ export function resizeSelectionFromHandle(
   altKey: boolean,
   step: number,
   maxSize: number,
+  freeAxis?: "x" | "z",
 ) {
   const frame = transform.selectionFrame;
   const localDelta = transform.scaleStartPoint ? frameLocalDelta(frame, transform.scaleStartPoint, point) : new THREE.Vector3();
   const signs = transform.scaleSigns ?? resizeSignsForHandle(handleKey);
   // Past the opposite side the selection keeps growing there, mirrored: its scale is negative then
   // and the bodies in it change sides with it.
-  const axisResize = (current: number, delta: number, sign: number) => {
+  const axisResize = (current: number, delta: number, sign: number, free: boolean) => {
     if (!sign) {
       return { size: current, scale: 1, flipped: false };
     }
+    // A side that snapped to another body (Discussion #1647) keeps that size off the grid.
+    const grid = free ? 0 : step;
     if (altKey) {
-      const size = snapDimension(Math.abs(current + sign * delta * 2), step, MIN_SHAPE_SIZE, maxSize);
+      const size = snapDimension(Math.abs(current + sign * delta * 2), grid, MIN_SHAPE_SIZE, maxSize);
       return { size, scale: size / Math.max(MIN_SHAPE_SIZE, current), flipped: false };
     }
     const rawSize = current + sign * delta;
-    const size = snapDimension(Math.abs(rawSize), step, MIN_SHAPE_SIZE, maxSize);
+    const size = snapDimension(Math.abs(rawSize), grid, MIN_SHAPE_SIZE, maxSize);
     const flipped = rawSize < 0;
     return {
       size,
@@ -625,8 +646,8 @@ export function resizeSelectionFromHandle(
     };
   };
 
-  let nextX = axisResize(frame.width, localDelta.x, signs.x);
-  let nextZ = axisResize(frame.depth, localDelta.z, signs.z);
+  let nextX = axisResize(frame.width, localDelta.x, signs.x, freeAxis === "x");
+  let nextZ = axisResize(frame.depth, localDelta.z, signs.z, freeAxis === "z");
   let uniformScale = 1;
   if (shiftKey && signs.x && signs.z) {
     const scale = proportionalResizeScale(frame.width, frame.depth, nextX.size, nextZ.size);

@@ -1,1 +1,14 @@
-[]
+[
+  {
+    "title": {
+      "de": "Größe ziehen bis an die Wand",
+      "en": "Resize right up to the wall",
+      "da": "Træk størrelsen helt hen til væggen"
+    },
+    "body": {
+      "de": "Ziehst du eine Form an einem Seitengriff größer, hält die Seite jetzt an den Kanten anderer Formen und an der Wand, auf die sie trifft, auch an der Innenwand eines Kastens oder Gehäuses. So füllt ein Teil einen Kasten genau von Wand zu Wand, ohne dass du nachmessen musst.",
+      "en": "When you drag a side handle to make a shape bigger, the side now stops at the edges of other shapes and at the wall it runs into, the inside wall of a box or case as well. So a part fills a box exactly from wall to wall, without measuring.",
+      "da": "Når du trækker i et sidehåndtag for at gøre en form større, stopper siden nu ved kanterne af andre former og ved den væg, den løber ind i, også indervæggen i en kasse eller et kabinet. Så fylder en del en kasse præcist fra væg til væg, uden at du skal måle."
+    }
+  }
+]

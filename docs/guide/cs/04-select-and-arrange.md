@@ -46,6 +46,8 @@ Tvar lze odtáhnout za okraj, přibližně o jednu šířku podložky na každou
 
 Při tažení po pracovní rovině se levý, pravý, přední a zadní okraj i střed přichytávají na odpovídající okraje či středy jiných tvarů. Růžová vodicí čára ukazuje místo přichycení. Bez zadávání čísel tak díly položíte těsně vedle sebe nebo je vystředíte. Funguje to i při vypnuté mřížce. Počítá se i střed pracovní roviny: růžové čáry ukážou, kdy tvar sedí uprostřed desky ve směru X, Y nebo v obou.
 
+Přichytávání funguje i při změně velikosti: když táhneš za boční úchyt, ta strana se zastaví u hran a středů jiných tvarů a u stěny, na kterou narazí, také u vnitřní stěny krabice, vydutého tělesa nebo importovaného pouzdra, a růžová čára ukáže kde. Tento rozměr zůstane přesně takový, mimo mřížku. Tak díl vyplní pouzdro od stěny ke stěně: přilož ho k jedné stěně a jeho druhou stranu přetáhni k protější. S [[Alt]] tvar roste od středu a tažená strana se přichytí stejně; s [[Shift]] si zachová proporce a nepřichytává se. Platí to na rovné pracovní rovině pro tvary, které stojí rovně a mají strany podél X a Y, a {{ui:workspace.objectSnap}} to vypne spolu s přichytáváním při posunu.
+
 [[Shift]] během tažení omezí posun na osu X nebo Y podle toho, v kterém směru jste táhli více. Druhá souřadnice se zachová. Klávesu stiskněte nejlépe až po zahájení pohybu, protože Shift+klik na nevybraný tvar jej pouze přidá do výběru.
 
 Nebo táhněte za červenou či zelenou šipku nahoře na výběru: posouvá jen ve směru X nebo jen ve směru Y a tvar sleduje myš po této přímce i v pohledu z nízkého úhlu, kde volné tažení uteče daleko. Šipky se přichytávají jako při tažení, [[Alt]] přichytávání vypne a ujetou vzdálenost pak můžete kliknout a zadat přesně.
