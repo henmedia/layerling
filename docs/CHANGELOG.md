@@ -6,7 +6,7 @@ code still carries it - so a lower number further down is older, not newer.
 
 ## Unreleased
 
-- **Interactive Help shows that it is on:** While it is on, its question mark in the title row is filled in the help colour, in light and dark mode. Before, only the colour of the question mark changed, a shade from its neighbours, and it was easily taken for off (Discussion #1640).
+- **Interactive Help shows that it is on:** While it is on, the circle of its question mark in the title row is filled orange with the question mark light in it, in light and dark mode. Before, only the colour of the question mark changed, a shade from its neighbours, and it was easily taken for off (Discussion #1640).
 
 - **History view: the list of steps shows at once again (Discussion #1637):** With a design of about 100 steps whose group carries its parts' CAD data, the list of steps in the History view took 9 to 25 seconds to show, and as long again each time it opened. Reading a step compared every field of every body as JSON text, so the group's data was written out in full for each step. The fields are now compared by their structure, stopping at the first difference, and a step once read is kept for as long as its history entries exist. Measured with the design from the report: the list showed after 25.8 s before and 0.03 s now, opened again 0.1 s; all 101 step texts are the same as before.
 

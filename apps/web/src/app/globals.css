@@ -4144,14 +4144,30 @@ html[data-theme="dark"] .toolbar-title-help .action-icon-button:hover {
   color: #f7f2ea;
 }
 
-/* A button that stays on, such as Interactive Help, is filled while it is on: only a change of colour of the question
-   mark looked like the other help buttons, and it was taken for off (Discussion #1640). */
+/* Interactive Help, while it is on: its circle is filled orange with the question mark light in it. Only a change of
+   colour of the question mark looked like the other help buttons, and it was taken for off (Discussion #1640). The
+   circle itself is filled, not the button: the button is wider than the icon, and a filled button stood square and
+   to one side of the round icon. */
 .toolbar-title-help .action-icon-button.active,
-.toolbar-title-help .action-icon-button.active:hover,
+.toolbar-title-help .action-icon-button.active:hover {
+  color: #d07415;
+}
+
+.toolbar-title-help .action-icon-button.active svg circle {
+  fill: currentColor;
+}
+
+.toolbar-title-help .action-icon-button.active svg path {
+  stroke: #fff;
+}
+
 html[data-theme="dark"] .toolbar-title-help .action-icon-button.active,
 html[data-theme="dark"] .toolbar-title-help .action-icon-button.active:hover {
-  color: #fff;
-  background: var(--group-color);
+  color: #f29a45;
+}
+
+html[data-theme="dark"] .toolbar-title-help .action-icon-button.active svg path {
+  stroke: #2a2017;
 }
 
 /* On a narrow window - a tablet held upright - the name of the design needs the room: the colour scheme keeps its
