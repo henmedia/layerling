@@ -138,7 +138,7 @@ Konturo nastaviš tudi, ne da bi odprl skico: v lastnostih skiciranega telesa po
 
 {{ui:prop.sketchSilhouette}} izpusti vse obrise, ki ležijo v drugem: luknje in kar je v njih. Ostane samo zunanji obris. Skupaj z {{ui:prop.sketchFill.outside}} iz tega nastane modelček za izrezovanje: uvozi SVG dvakrat, enkrat s silhueto kot ploskev za dno in enkrat s silhueto in 1 do 2 mm konture zunaj kot steno. Stikalo je tudi v oknu {{ui:sketch.stroke}} v skicirnem načinu.
 
-Zaokrožitve in posnetja na robovih se pri ponovni gradnji izgubijo, kot pri urejanju skice.
+Zaokrožitve in posnetja na robovih se pri ponovni gradnji izgubijo, kot pri urejanju skice. {{ui:inspector.taper}} in {{ui:inspector.twist}} ostaneta; zožitev se poveča ali zmanjša skupaj z obrisom.
 
 ## Poševne stene, za štampiljke
 
