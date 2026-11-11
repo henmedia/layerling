@@ -70,7 +70,7 @@ describe("the corner ruler with the camera hovering above it", () => {
       overlay = typeof next === "function" ? next(overlay) : next;
     }, "0.01" as never);
     const item = overlay!.items[0];
-    const allLabels = [100, 80].reduce((sum, length) => sum + cornerRulerTicks(length).filter((tick) => tick.isTen && tick.offset > 0).length, 0);
+    const allLabels = [100, 80].reduce((sum, length) => sum + cornerRulerTicks(length).filter((tick) => tick.label).length, 0);
     expect(item.labels.length).toBeGreaterThan(0);
     // The part of the z arm behind the camera (z > 40) has no numbers.
     expect(item.labels.length).toBeLessThan(allLabels);

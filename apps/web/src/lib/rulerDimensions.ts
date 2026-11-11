@@ -207,22 +207,37 @@ export function cornerRulerDimensionMatchesFromCorner(
 const CORNER_RULER_SIDE_TOLERANCE = 0.01;
 
 /**
- * Teilstriche fuer einen Arm des Winkellineal-Werkzeugs, einer je Millimeter -
- * dieselbe Dichte wie die verworfene Tick-Textur (`createRulerTickTexture`),
- * nur als reine Zahlenliste statt als Zeichnung, damit die Bildschirm-Anzeige
- * jeden Strich einzeln ueber `projectToScreen` platzieren kann.
+ * Teilstriche fuer einen Arm des Winkellineal-Werkzeugs, als reine Zahlenliste,
+ * damit die Bildschirm-Anzeige jeden Strich einzeln ueber `projectToScreen`
+ * platzieren kann. Metrisch einer je Millimeter mit Zahl alle 10 mm; mit Zoll
+ * (oder Fuss) eingestellt einer je 1/16" mit Zahl an jedem ganzen Zoll, wie auf
+ * einem echten Winkel (Discussion #1618: vorher immer Millimeter).
+ * `offset` ist immer in Millimetern, `height` der Anteil der Armbreite.
  */
 export type CornerRulerTick = {
   offset: number;
-  isTen: boolean;
-  isFive: boolean;
+  height: number;
+  label?: string;
 };
 
-export function cornerRulerTicks(length: number): CornerRulerTick[] {
+const CORNER_RULER_INCH_STEPS = 16;
+
+export function cornerRulerTicks(length: number, unitLabel = "mm"): CornerRulerTick[] {
   const ticks: CornerRulerTick[] = [];
+  if (unitLabel === "in" || unitLabel === "ft") {
+    const step = 25.4 / CORNER_RULER_INCH_STEPS;
+    const last = Math.max(0, Math.floor(length / step + 1e-6));
+    for (let index = 0; index <= last; index += 1) {
+      const height = index % 16 === 0 ? 0.62 : index % 8 === 0 ? 0.48 : index % 4 === 0 ? 0.38 : index % 2 === 0 ? 0.3 : 0.22;
+      const inches = index / CORNER_RULER_INCH_STEPS;
+      ticks.push({ offset: index * step, height, label: index > 0 && index % 16 === 0 ? (unitLabel === "ft" ? `${inches}"` : String(inches)) : undefined });
+    }
+    return ticks;
+  }
   const last = Math.max(0, Math.floor(length));
   for (let value = 0; value <= last; value += 1) {
-    ticks.push({ offset: value, isTen: value % 10 === 0, isFive: value % 5 === 0 });
+    const isTen = value % 10 === 0;
+    ticks.push({ offset: value, height: isTen ? 0.62 : value % 5 === 0 ? 0.42 : 0.26, label: isTen && value > 0 ? String(value) : undefined });
   }
   return ticks;
 }
