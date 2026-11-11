@@ -1,6 +1,18 @@
 [
   {
     "title": {
+      "de": "Aushöhlen: importierte flache Figuren mit leicht schrägen Seiten",
+      "en": "Hollow: imported flat figures with sides that lean a hair",
+      "da": "Hul: importerede flade figurer med en anelse skrå sider"
+    },
+    "body": {
+      "de": "Ein STL, dessen Ober- und Unterseite getrennt abgetastet wurden, hat Seiten aus vielen einzelnen, ganz leicht geneigten Dreiecken. Aushöhlen gab bei so einer Figur bei jeder Wandstärke auf. Jetzt höhlt es sie über ihren Umriss aus, wie einen geraden Körper, und die Außenseite bleibt, wie sie ist.",
+      "en": "An STL whose top and bottom were sampled apart has sides of many single triangles, each leaning a tiny bit. Hollow gave up on such a figure at any wall thickness. Now it hollows it through its outline, as it does an upright body, and the outside stays as it is.",
+      "da": "En STL, hvis top og bund er samplet hver for sig, har sider af mange enkelte trekanter, der hver hælder en lille smule. Hul gav op over for sådan en figur ved enhver vægtykkelse. Nu udhuler det den gennem dens omrids, som en lodret krop, og ydersiden forbliver, som den er."
+    }
+  },
+  {
+    "title": {
       "de": "Werkzeuge mit CAD-Kern laufen auch bei langsamer Leitung",
       "en": "CAD tools work on a slow connection too",
       "da": "CAD-værktøjer virker også på en langsom forbindelse"

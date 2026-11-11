@@ -364,6 +364,20 @@ function standsUpright(cad: OcctKernel, face: ShapeHandle) {
   return true;
 }
 
+/** How far a flat side leans from upright: the sine of its tilt, or null when the face is not flat. */
+function flatSideLean(cad: OcctKernel, face: ShapeHandle) {
+  if (cad.surfaceType(face) !== "plane") return null;
+  const { uMin, uMax, vMin, vMax } = cad.uvBounds(face);
+  const normal = cad.surfaceNormal(face, (uMin + uMax) / 2, (vMin + vMax) / 2);
+  return Math.abs(normal.y) / (Math.hypot(normal.x, normal.y, normal.z) || 1);
+}
+
+/**
+ * How far the top of a leaning side may stand from its bottom, at most, for the body to be hollowed through its
+ * bottom outline all the same: a hair against the wall. The wall is then that much thinner or thicker at the top.
+ */
+const MAX_LEAN_DRIFT = 0.1;
+
 /** Sampled outlines run within this of the curves they stand for. */
 const OUTLINE_DEFLECTION = 0.01;
 
@@ -378,6 +392,12 @@ const OUTLINE_DEFLECTION = 0.01;
  * the floor sharp. The outline is moved as it is first; where the kernel cannot move it cleanly, as straight pieces
  * within 0.01 mm of it. Only for openings at the top and the bottom. Undefined when the body is no upright prism or
  * the openings are on its sides, null when it is one but its outline cannot be moved.
+ *
+ * An STL whose top and bottom outlines were sampled apart (Discussion #1615: a flat figure, 470 points on top and 414
+ * below) has sides of single triangles, each leaning a little, up to 0.4 degrees; the thick solid gives up on them
+ * at any wall. Flat sides that lean so little that the top of the body stands at most MAX_LEAN_DRIFT (and a quarter
+ * of the wall) off its bottom count as upright: the cavity follows the bottom outline and is cut from the body as it
+ * is, so the outside stays.
  */
 function shellByOutline(cad: OcctKernel, solid: ShapeHandle, thickness: number, openings: ShellOpenings, edges: ShellEdges): ShapeHandle | null | undefined {
   const sides = shellOpenSides(openings);
@@ -393,6 +413,8 @@ function shellByOutline(cad: OcctKernel, solid: ShapeHandle, thickness: number, 
     const faces = cad.getSubShapes(solid, "face");
     made.push(...faces);
     const bottoms: ShapeHandle[] = [];
+    // The sine of the steepest lean of a flat side that does not stand quite upright (#1615).
+    let lean = 0;
     for (const face of faces) {
       const center = cad.getSurfaceCenterOfMass(face);
       const normal = orientedFaceNormal(cad, face, center);
@@ -403,12 +425,21 @@ function shellByOutline(cad: OcctKernel, solid: ShapeHandle, thickness: number, 
       }
       // Every other face stands upright everywhere, not only at its middle (a bulging vase side is
       // upright at its widest), and runs from the bottom to the top: the body is one layer.
-      if (!standsUpright(cad, face)) return undefined;
+      if (!standsUpright(cad, face)) {
+        const sideLean = flatSideLean(cad, face);
+        if (sideLean === null) return undefined;
+        lean = Math.max(lean, sideLean);
+      }
       const box = cad.getBoundingBox(face, false);
       if (box.ymin > bounds.ymin + flat || box.ymax < bounds.ymax - flat) return undefined;
     }
     if (bottoms.length !== 1) return undefined;
-    return hollowedThroughOutline(cad, solid, bottoms[0], bounds, thickness, sides, edges, made, keep, true);
+    if (lean > 0) {
+      const drift = ((bounds.ymax - bounds.ymin) * lean) / Math.sqrt(Math.max(1e-12, 1 - lean * lean));
+      if (drift > Math.min(MAX_LEAN_DRIFT, thickness / 4)) return undefined;
+    }
+    // A leaning body is cut as it is, never rebuilt from its bottom: that would stand its sides up.
+    return hollowedThroughOutline(cad, solid, bottoms[0], bounds, thickness, sides, edges, made, keep, lean === 0);
   } catch (error) {
     if (mustSurface(error)) throw error;
     return null;
@@ -585,6 +616,11 @@ function withoutSliverFaces(cad: OcctKernel, solid: ShapeHandle): ShapeHandle | 
 }
 
 export function shellSolid(cad: OcctKernel, solid: ShapeHandle, thickness: number, openings: ShellOpenings, edges: ShellEdges = "round") {
+  // An upright prism goes through its outline as it is, slivers and all: the 2D offset lets them vanish. Taking
+  // them off first took 7 s on the figure of Discussion #1615 and left one side a thousandth of a millimetre short
+  // of the top, so the body no longer counted as one layer and went to the thick solid, which gave up after a minute.
+  const outlined = shellByOutline(cad, solid, thickness, openings, edges);
+  if (outlined) return outlined;
   const cleaned = withoutSliverFaces(cad, solid);
   try {
     return shellBody(cad, cleaned ?? solid, thickness, openings, edges);
