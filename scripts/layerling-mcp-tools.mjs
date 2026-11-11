@@ -2138,6 +2138,29 @@ export const tools = [
     },
   },
   {
+    name: "layerling_list_backups",
+    description: "List the automatic backups (\"Earlier versions\"): the file as it was before Save wrote over it (kind \"overwrite\") and a state of the design taken every few minutes while it was worked on (kind \"snapshot\"). By default those of the open design - its snapshots and the earlier versions of the file it is tied to; with `all: true` every backup kept in this browser. Newest first, each with id, kind, createdAt (ISO time), name, fileName, projectId and size in bytes. The backups live in this browser (and a backup folder, when one is chosen), not on another drive: they do not replace \"Back up all\".",
+    inputSchema: {
+      ...editorTargetSchema,
+      properties: {
+        ...editorTargetSchema.properties,
+        all: { type: "boolean", description: "Every backup of this browser instead of the open design's." },
+      },
+    },
+  },
+  {
+    name: "layerling_open_backup",
+    description: "Open a backup from layerling_list_backups as a new design, as \"Open\" in Earlier versions does: the design open now is never replaced, and the new one is not tied to the original file, so saving it never writes over that file. The editor switches to the new design, named after the backup and its time. Returns the name it opened under.",
+    inputSchema: {
+      ...editorTargetSchema,
+      required: ["id"],
+      properties: {
+        ...editorTargetSchema.properties,
+        id: { type: "string", description: "The backup's id from layerling_list_backups." },
+      },
+    },
+  },
+  {
     name: "layerling_export_section_svg",
     description: "Cut the design with a plane and return the outlines as an SVG at 1:1 in millimetres - the editor's \"Section as SVG\". Same bodies as the export: visible solids only, holes already taken off, groups combined, bodies of one colour joined; one unfilled path per body in its colour. An x cut is seen from the right, y from above, z from the front (seenFrom). axis and offset (an x position, a height or a z position, like layerling_set_section_view) default to the current section view, or the middle of the design on that axis; the section view itself is left as it is. Without axis and offset it follows a section view turned to the workplane or the view (orientation in layerling_set_section_view). Returns svg, loops, openLoops (should be 0), widthMm, heightMm and hiddenSkipped. Fails with a message when the plane misses every visible solid.",
     inputSchema: {

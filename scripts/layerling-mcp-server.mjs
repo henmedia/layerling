@@ -212,6 +212,10 @@ async function callTool(name, args) {
       return bridgeCommand("text_block", args, 30000);
     case "layerling_clear_history":
       return bridgeCommand("clear_history", args);
+    case "layerling_list_backups":
+      return bridgeCommand("list_backups", args);
+    case "layerling_open_backup":
+      return bridgeCommand("open_backup", args, 60000);
     case "layerling_layer_icon":
       return bridgeCommand("layer_icon", args, 60000);
     case "layerling_reference_image":

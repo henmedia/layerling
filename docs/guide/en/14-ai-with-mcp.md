@@ -170,6 +170,8 @@ The AI works with the same functions as you, through the same path as your opera
 | `layerling_saved_view` | saves the current view under the key 7, 8, 9 or 0 and goes back to it, like Shift+key and the key (only the view); also sets the start view of new designs |
 | `layerling_build_plates` | lists, adds, names, orders and removes the build plates, moves objects onto a plate and arranges them on the plates, like the plate bar |
 | `layerling_clear_history` | deletes every undo step for good, as the History view's "Delete history" button does; needs `confirm: true` |
+| `layerling_list_backups` | lists the automatic backups (Earlier versions) of the open design, or with `all: true` of every design in this browser |
+| `layerling_open_backup` | opens a backup by its `id` as a new design, never tied to the original file |
 | `layerling_set_history_view` | looks back at an earlier state of the project, like the History view (the real design stays untouched; changing tools wait until it is closed) |
 | `layerling_restore_from_history` | brings objects (also parts inside groups) back from an earlier state into the design as copies, as the History view's Bring into design does - one step that undo takes back |
 | `layerling_export_section_svg` | returns the outlines on a cutting plane as an SVG at 1:1, from the same bodies as the export |

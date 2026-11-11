@@ -11,6 +11,27 @@ Se torni alla pagina iniziale da un progetto vuoto, layerling ti chiede se vuoi 
 
 Questo sistema ha un inconveniente: chi cancella i dati del browser o passa a un altro computer perde i progetti. **Fai quindi una copia di sicurezza dei lavori importanti in un file.**
 
+## I tuoi progetti, il tuo backup
+
+I tuoi progetti sono in questo browser, sul tuo computer. Come per tutti i dati, è al sicuro solo ciò che esiste una seconda volta in un altro posto: un disco che si guasta, un nuovo PC, i dati del browser cancellati o un errore del programma, e senza backup il lavoro è perso. Quel backup spetta a te; nessun programma può farlo al posto tuo. layerling lo rende facile: {{ui:dashboard.backupAll}} nella pagina iniziale mette tutti i progetti in un unico file con un clic (vedi sotto). Conserva quel file su una chiavetta USB, in una cartella cloud o su un NAS, dopo ogni sessione importante.
+
+layerling te lo ricorda. La riga sopra i progetti di questo browser si fa più evidente quanto più l'ultimo {{ui:dashboard.backupAll}} è lontano: con il pulsante {{ui:backups.backUpNow}} appena supera i giorni impostati in {{ui:backups.reminderDays}} (7 all'inizio) e da allora i progetti sono cambiati, e in rosso se ci sono più di tre progetti senza alcun backup, o nessuno da 30 giorni. L'editor te lo ricorda una volta al giorno nella riga di stato, con lo stesso pulsante. I backup automatici qui sotto non contano: sono sullo stesso computer.
+
+## Versioni precedenti
+
+layerling conserva inoltre da solo due tipi di backup:
+
+- **Prima di sovrascrivere un file.** Quando [[Ctrl]]+[[S]] o {{ui:export.saveProject}} scrive in un file `.lyl` che esiste già (Chrome ed Edge, vedi sotto), prima viene conservato il file com'era. Un file che non è cambiato dal suo ultimo backup non viene conservato due volte.
+- **Stati durante il lavoro.** Mentre lavori a un progetto, ne viene conservato uno stato ogni 10 minuti, ma solo se qualcosa è cambiato; di ogni progetto restano gli ultimi sei.
+
+{{ui:backups.title}} li elenca: nell'editor, nella finestra di esportazione sotto **LYL** e nella ricerca comandi; nella pagina iniziale, accanto a {{ui:dashboard.restoreBackup}}, per tutti i progetti; e nel menu di un progetto per quello. Ognuno mostra immagine, ora, tipo, nome e dimensione. {{ui:backups.open}} apre la versione come nuovo progetto: il progetto aperto resta com'è e quello nuovo non è legato al file originale, quindi salvarlo non sovrascrive mai quel file. Il pulsante di download salva la versione come file `.lyl`, il cestino la elimina.
+
+Nelle impostazioni (l'ingranaggio nella barra multifunzione), la pagina {{ui:backups.settingsTitle}} stabilisce quante versioni precedenti di un file restano (nessuna fino a 20, 5 all'inizio), ogni quanto resta uno stato (mai, ogni 10 o ogni 30 minuti) e da quando iniziano i promemoria. Queste impostazioni appartengono a questo browser, non a un progetto. Tutti i backup insieme occupano al massimo 500 MB; oltre, se ne vanno per primi gli stati più vecchi.
+
+**Cartella di backup (Chrome ed Edge).** In {{ui:backups.folder}} puoi scegliere una cartella sul tuo computer. Ogni backup va allora anche lì come file `.lyl` con il nome del progetto e l'ora, per esempio `Staffa 2026-11-11 20-31-05.lyl`, uno stato con ` auto` prima dell'estensione. I vecchi se ne vanno lì come nel browser; nient'altro nella cartella viene toccato. Dopo un ricaricamento il browser chiede di nuovo il permesso al primo salvataggio; uno stato conservato prima resta nel browser e il messaggio offre {{ui:backups.allowFolder}}. Una cartella sincronizzata con il cloud o su un altro disco è anch'essa un secondo posto.
+
+I backup nel browser se ne vanno con i dati del browser. Per questo non sostituiscono {{ui:dashboard.backupAll}}.
+
 ## Cartelle per i progetti
 
 Quando i progetti diventano tanti, un unico elenco non basta. Nella pagina iniziale, {{ui:shared.newFolder}} crea una cartella per i progetti salvati in questo browser; fai clic sulla cartella per aprirla. Le cartelle possono contenere altre cartelle.

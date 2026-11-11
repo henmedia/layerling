@@ -4,7 +4,7 @@ import { GuideHelpLink } from "@/components/GuideHelpLink";
 import { RibbonButtonsSetting } from "@/components/workplane/RibbonButtonsSetting";
 import type { GuideSection } from "@/lib/guideLinks";
 import { MAX_OVERHANG_ANGLE, MIN_OVERHANG_ANGLE } from "@/lib/overhangLimits";
-import { Box as BoxIcon, ChevronDown, Grid3X3, History, Palette, PanelTop, Plus, RotateCcw, Ruler, Trash2, X } from "lucide-react";
+import { ArchiveRestore, Box as BoxIcon, ChevronDown, Grid3X3, History, Palette, PanelTop, Plus, RotateCcw, Ruler, Trash2, X } from "lucide-react";
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { useMovablePanel } from "@/lib/useMovablePanel";
 import { SpaceMouseSetting } from "@/components/workplane/SpaceMouseSetting";
@@ -12,6 +12,7 @@ import { printerPlayShapeStart } from "@/lib/printerPlay";
 import { usePrinterPlayFor } from "@/lib/usePrinterPlay";
 import { PrinterPlaySetting } from "@/components/workplane/PrinterPlaySetting";
 import { SettingsFileButtons } from "@/components/workplane/SettingsFileButtons";
+import { FileBackupSettingsSection } from "@/components/workplane/FileBackupSettingsSection";
 import { createPortal } from "react-dom";
 import { HexColorInput, HexColorPicker } from "react-colorful";
 import { APP_THEME_OPTIONS, type AppThemePreference } from "@/lib/appTheme";
@@ -106,7 +107,7 @@ import { MAX_TEXT_LENGTH } from "@/lib/textLength";
 import { DEFAULT_HIRTH_BORE, DEFAULT_HIRTH_TEETH, MAX_HIRTH_TEETH, MIN_HIRTH_TEETH, MIN_HIRTH_TOOTH_HEIGHT, hirthBoreLimit, hirthToothHeightLimit } from "@/lib/hirthGeometry";
 
 type WorkspaceSettings = WorkplaneWorkspaceSettings;
-type WorkspaceSettingsSection = "appearance" | "ribbon" | "measurement" | "workplane" | "shapes" | "history";
+type WorkspaceSettingsSection = "appearance" | "ribbon" | "measurement" | "workplane" | "shapes" | "history" | "backups";
 // The question mark of each tab opens that tab's own part of the guide.
 const SETTINGS_HELP_SECTION: Record<WorkspaceSettingsSection, GuideSection> = {
   appearance: "settingsAppearance",
@@ -115,6 +116,7 @@ const SETTINGS_HELP_SECTION: Record<WorkspaceSettingsSection, GuideSection> = {
   workplane: "settingsWorkplane",
   shapes: "shapeSettings",
   history: "backingUp",
+  backups: "fileBackups",
 };
 
 const MIN_WORKSPACE_SIZE = 60;
@@ -820,6 +822,10 @@ export function WorkspaceSettingsModal({
             <button className={activeSection === "history" ? "active" : ""} data-help={t("workspace.savedHistory")} aria-current={activeSection === "history" ? "page" : undefined} onClick={() => setActiveSection("history")}>
               <History size={18} />
               <span>{t("workspace.history")}</span>
+            </button>
+            <button className={activeSection === "backups" ? "active" : ""} data-help={t("backups.settingsTitle")} aria-current={activeSection === "backups" ? "page" : undefined} onClick={() => setActiveSection("backups")}>
+              <ArchiveRestore size={18} />
+              <span>{t("backups.settingsTitle")}</span>
             </button>
           </nav>
 
@@ -1676,6 +1682,8 @@ export function WorkspaceSettingsModal({
                   </div>
                 </>
               ) : null}
+
+              {activeSection === "backups" ? <FileBackupSettingsSection /> : null}
 
               {activeSection === "history" ? (
                 <>

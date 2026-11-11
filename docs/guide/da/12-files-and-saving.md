@@ -11,6 +11,27 @@ Hvis du går tilbage til startsiden fra et design der ikke har noget i sig, spø
 
 Det har en ulempe: den der rydder browserens lager eller skifter til en anden computer mister designsene. **Så sikkerhedskopiér vigtigt arbejde i en fil.**
 
+## Dine designs, din sikkerhedskopi
+
+Dine designs ligger i denne browser på din computer. Som med alle data er kun det sikkert, der findes en gang til et andet sted: et defekt drev, en ny pc, slettede browserdata eller en fejl i programmet, og uden sikkerhedskopi er arbejdet væk. Den sikkerhedskopi er dit ansvar; intet program kan tage den fra dig. layerling gør det nemt: {{ui:dashboard.backupAll}} på startsiden lægger med ét klik alle designs i én fil (se nedenfor). Gem filen på en USB-nøgle, i en skymappe eller på en NAS efter hver større session.
+
+layerling minder dig om det. Linjen over designene i denne browser bliver tydeligere, jo længere den seneste {{ui:dashboard.backupAll}} ligger tilbage: med knappen {{ui:backups.backUpNow}}, så snart den er ældre end dagene under {{ui:backups.reminderDays}} (7 til at begynde med), og designs er ændret siden, og i rødt, når der er mere end tre designs og slet ingen sikkerhedskopi, eller ingen i 30 dage. Editoren minder dig om det én gang om dagen i statuslinjen med samme knap. De automatiske sikkerhedskopier nedenfor tæller ikke her: de ligger på samme computer.
+
+## Tidligere versioner
+
+layerling laver desuden selv to slags sikkerhedskopier:
+
+- **Før en fil overskrives.** Når [[Ctrl]]+[[S]] eller {{ui:export.saveProject}} skriver i en `.lyl`-fil, der findes i forvejen (Chrome og Edge, se nedenfor), gemmes filen først, som den var. En fil, der ikke er ændret siden sin seneste sikkerhedskopi, gemmes ikke to gange.
+- **Mellemstande mens du arbejder.** Mens du arbejder på et design, gemmes en stand af det hvert 10. minut, men kun når noget er ændret; de seneste seks af hvert design bliver.
+
+{{ui:backups.title}} viser dem: i editoren i eksportvinduet under **LYL** og i kommandosøgningen, på startsiden ved siden af {{ui:dashboard.restoreBackup}} for alle designs og i et designs menu for det ene. Hver viser billede, tid, art, navn og størrelse. {{ui:backups.open}} åbner versionen som et nyt design: det åbne design forbliver, som det er, og det nye er ikke knyttet til den oprindelige fil, så det overskriver aldrig den fil, når det gemmes. Download-knappen gemmer versionen som en `.lyl`-fil, skraldespanden sletter den.
+
+I indstillingerne (tandhjulet i båndet) fastlægger siden {{ui:backups.settingsTitle}}, hvor mange tidligere versioner af en fil der gemmes (ingen til 20, 5 til at begynde med), hvor ofte en stand gemmes (aldrig, hvert 10. eller hvert 30. minut), og hvornår påmindelserne begynder. Indstillingerne hører til denne browser, ikke til et design. Alle sikkerhedskopier fylder tilsammen højst 500 MB; derover forsvinder de ældste mellemstande først.
+
+**Mappe til sikkerhedskopier (Chrome og Edge).** Under {{ui:backups.folder}} kan du vælge en mappe på din computer. Hver sikkerhedskopi lægges så også der som en `.lyl`-fil med designets navn og tidspunktet, for eksempel `Holder 2026-11-11 20-31-05.lyl`, en mellemstand med ` auto` før endelsen. Gamle forsvinder der som i browseren; intet andet i mappen røres. Efter en genindlæsning beder browseren om tilladelse igen første gang, du gemmer; en mellemstand fra før bliver i browseren, og meddelelsen tilbyder {{ui:backups.allowFolder}}. En mappe, der synkroniseres med skyen eller ligger på et andet drev, er også et andet sted.
+
+Sikkerhedskopierne i browseren forsvinder med browserens data. Derfor erstatter de ikke {{ui:dashboard.backupAll}}.
+
 ## Mapper til dine designs
 
 Med snesevis af designs er én liste ikke nok. På startsiden laver {{ui:shared.newFolder}} en mappe til denne browsers designs; et klik på mappen åbner den. Mapper kan indeholde mapper.

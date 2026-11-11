@@ -11,6 +11,27 @@ If you go back to the start page from a design with nothing in it, layerling ask
 
 That has a downside: whoever clears the browser storage or switches to another computer loses the designs. **So back up important work into a file.**
 
+## Your designs, your backup
+
+Your designs live in this browser on your computer. As with all data, only what exists a second time in another place is safe: a failing drive, a new PC, cleared browser data or a bug, and without a backup the work is gone. Keeping that backup is up to you; no software can do it for you. layerling makes it easy: {{ui:dashboard.backupAll}} on the start page puts every design into one file in a single click (see below). Keep that file on a USB stick, in a cloud folder or on a NAS, after every bigger session.
+
+layerling reminds you. The line above the designs of this browser grows louder the longer the last {{ui:dashboard.backupAll}} lies back: with the button {{ui:backups.backUpNow}} once it is older than the days set under {{ui:backups.reminderDays}} (7 to begin with) and designs changed since, and in red when there are more than three designs and no backup at all, or none for 30 days. The editor reminds you once a day in the status line, with the same button. The automatic backups below do not count here: they are on the same computer.
+
+## Earlier versions
+
+layerling also keeps two kinds of backup by itself:
+
+- **Before saving over a file.** When [[Ctrl]]+[[S]] or {{ui:export.saveProject}} writes into a `.lyl` file that is already there (Chrome and Edge, see below), the file as it was is kept first. A file that has not changed since its last backup is not kept twice.
+- **States while working.** While you work on a design, a state of it is kept every 10 minutes, but only when something changed; the last six of each design stay.
+
+{{ui:backups.title}} lists them: in the editor in the export window under **LYL** and in the command search, on the start page beside {{ui:dashboard.restoreBackup}} for every design, and in the menu of a design for that one. Each shows its picture, time, kind, name and size. {{ui:backups.open}} opens the version as a new design: the design you have open stays as it is, and the new one is not tied to the original file, so saving it never writes over that file. The download button saves the version as a `.lyl` file, the bin deletes it.
+
+In the settings (the cogwheel in the ribbon), the page {{ui:backups.settingsTitle}} sets how many earlier versions of a file are kept (none up to 20, 5 to begin with), how often a state is kept (never, every 10 or every 30 minutes) and when the reminders start. These settings belong to this browser, not to a design. All backups together take at most 500 MB; above that the oldest states go first.
+
+**Backup folder (Chrome and Edge).** Under {{ui:backups.folder}} you can choose a folder on your computer. Each backup then also goes there as a `.lyl` file named after the design and the time, for example `Bracket 2026-11-11 20-31-05.lyl`, a state with ` auto` before the ending. Old ones go there as they do in the browser; nothing else in the folder is touched. After a reload the browser asks once more for permission the first time you save; a state kept before that stays in the browser, and the message offers {{ui:backups.allowFolder}}. A folder that syncs with the cloud or lies on another drive is a second place too.
+
+The backups in the browser go when the browser's data is cleared. That is why they do not replace {{ui:dashboard.backupAll}}.
+
 ## Folders for your designs
 
 With dozens of designs a single list is not enough. On the start page, {{ui:shared.newFolder}} makes a folder for the designs of this browser; a click on the folder opens it. Folders can hold folders.

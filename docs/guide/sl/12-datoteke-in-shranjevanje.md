@@ -11,6 +11,27 @@ layerling vse shranjuje v brskalniku na tvojem računalniku. Računa ni in nič 
 
 To ima svojo slabo stran: kdor izbriše pomnilnik brskalnika ali preide na drug računalnik, izgubi načrte. **Zato pomembna dela shrani v datoteko.**
 
+## Vaši projekti, vaša varnostna kopija
+
+Vaši projekti so v tem brskalniku na vašem računalniku. Kot pri vseh podatkih je varno samo tisto, kar obstaja drugič na drugem mestu: pokvarjen disk, nov računalnik, izbrisani podatki brskalnika ali napaka v programu in brez varnostne kopije je delo izgubljeno. Za to kopijo poskrbite sami; nobena programska oprema tega ne more narediti namesto vas. layerling to olajša: {{ui:dashboard.backupAll}} na začetni strani z enim klikom shrani vse projekte v eno datoteko (glej spodaj). To datoteko hranite na ključku USB, v mapi v oblaku ali na NAS, po vsakem večjem delu.
+
+layerling vas opomni. Vrstica nad projekti tega brskalnika postaja izrazitejša, čim dlje je bil zadnji {{ui:dashboard.backupAll}}: z gumbom {{ui:backups.backUpNow}}, ko je starejši od dni, nastavljenih pod {{ui:backups.reminderDays}} (na začetku 7), in so se projekti od takrat spremenili, ter rdeča, ko so več kot trije projekti brez vsake varnostne kopije ali je ni že 30 dni. Urejevalnik opomni enkrat na dan v vrstici stanja z istim gumbom. Samodejne varnostne kopije spodaj tu ne štejejo: so na istem računalniku.
+
+## Prejšnje različice
+
+layerling poleg tega sam ustvarja dve vrsti varnostnih kopij:
+
+- **Pred prepisom datoteke.** Ko [[Ctrl]]+[[S]] ali {{ui:export.saveProject}} piše v datoteko `.lyl`, ki že obstaja (Chrome in Edge, glej spodaj), se najprej ohrani datoteka, kakršna je bila. Datoteka, ki se od zadnje varnostne kopije ni spremenila, se ne ohrani dvakrat.
+- **Vmesna stanja med delom.** Med delom na projektu se vsakih 10 minut ohrani njegovo stanje, a samo če se je kaj spremenilo; pri vsakem projektu ostane zadnjih šest.
+
+{{ui:backups.title}} jih navede: v urejevalniku v oknu za izvoz pod **LYL** in v iskanju ukazov, na začetni strani poleg {{ui:dashboard.restoreBackup}} za vse projekte in v meniju projekta za tega. Vsaka pokaže sliko, čas, vrsto, ime in velikost. {{ui:backups.open}} odpre različico kot nov projekt: odprti projekt ostane, kakršen je, novi pa ni vezan na izvirno datoteko, zato je shranjevanje nikoli ne prepiše. Gumb za prenos shrani različico kot datoteko `.lyl`, koš jo izbriše.
+
+V nastavitvah (zobnik na traku) stran {{ui:backups.settingsTitle}} določa, koliko prejšnjih različic datoteke ostane (nobena do 20, na začetku 5), kako pogosto se ohrani stanje (nikoli, vsakih 10 ali 30 minut) in od kdaj opominja. Te nastavitve pripadajo temu brskalniku, ne projektu. Vse varnostne kopije skupaj zasedejo največ 500 MB; nad tem najprej odpadejo najstarejša stanja.
+
+**Mapa varnostnih kopij (Chrome in Edge).** Pod {{ui:backups.folder}} lahko izberete mapo na računalniku. Vsaka varnostna kopija gre potem tudi tja kot datoteka `.lyl` z imenom projekta in časom, na primer `Nosilec 2026-11-11 20-31-05.lyl`, stanje z ` auto` pred končnico. Stare tam odpadejo kot v brskalniku; ničesar drugega v mapi se ne dotakne. Po ponovnem nalaganju brskalnik ob prvem shranjevanju znova vpraša za dovoljenje; stanje, ohranjeno pred tem, ostane v brskalniku, sporočilo pa ponudi {{ui:backups.allowFolder}}. Mapa, ki se usklajuje z oblakom ali je na drugem pogonu, je tudi drugo mesto.
+
+Varnostne kopije v brskalniku izginejo s podatki brskalnika. Zato ne nadomeščajo {{ui:dashboard.backupAll}}.
+
 ## Mape za tvoje projekte
 
 Pri desetinah projektov en seznam ni dovolj. Na začetni strani {{ui:shared.newFolder}} ustvari mapo za projekte tega brskalnika; klik na mapo jo odpre. Mape lahko vsebujejo mape.

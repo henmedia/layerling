@@ -3,7 +3,7 @@
 import { requestPersistentStorage } from "@/lib/persistentStorage";
 import { clearDesignOpening, forgetDesignOpening, markDesignOpening, takeUnfinishedOpening } from "@/lib/openingDesignGuard";
 import { keepShownSelection, localDesignKey, selectionHasStale, serverDesignKey, toggleDesignSelection } from "@/lib/designSelection";
-import { Archive, ArchiveRestore, Check, CheckSquare, Clock3, Copy, EllipsisVertical, Folder, FolderInput, FolderKanban, FolderPlus, FolderUp, Grid3X3, List, LoaderCircle, MonitorDown, Pencil, Plus, RefreshCw, Search, Server, Shapes, SlidersHorizontal, Sparkles, Trash2, X } from "lucide-react";
+import { Archive, ArchiveRestore, Check, History, CheckSquare, Clock3, Copy, EllipsisVertical, Folder, FolderInput, FolderKanban, FolderPlus, FolderUp, Grid3X3, List, LoaderCircle, MonitorDown, Pencil, Plus, RefreshCw, Search, Server, Shapes, SlidersHorizontal, Sparkles, Trash2, X } from "lucide-react";
 import { Fragment, useCallback, useEffect, useMemo, useRef, useState, type DragEvent } from "react";
 import { AppFooter } from "@/components/AppFooter";
 import { LanguageSwitch } from "@/components/LanguageSwitch";
@@ -47,7 +47,7 @@ import { historyTrimSteps, isProjectTooLargeError, isStorageFullError, trimHisto
 import { GuideHelpLink } from "@/components/GuideHelpLink";
 import { WelcomeGuideBody } from "@/components/WelcomeGuide";
 import { DashboardWelcome, useWelcomeHidden } from "@/components/DashboardWelcome";
-import { BrowserBackupNote, DesignTabs, type DesignTab } from "@/components/DesignTabs";
+import { BrowserBackupNote, DesignTabs, YourBackupCard, type DesignTab } from "@/components/DesignTabs";
 import { useOfflineAvailable } from "@/lib/offlineSupport";
 import { InstallAppHint } from "@/components/InstallAppHint";
 import { TabletHint } from "@/components/TabletHint";
@@ -76,12 +76,15 @@ import { writeDesignView, writeSavedViews } from "@/lib/designView";
 import { seedStartCornerRuler, writeCornerRulers } from "@/lib/cornerRulerStore";
 import { readTape, writeTape } from "@/lib/tapeStore";
 import { useFileAccept } from "@/lib/fileAccept";
-import { dropBackupTarget, lylFileAccessSupported, onLylFilesLaunched, pickBackupTarget, pickFilesToImport, rememberLylFile, writeBackupTarget, type LylFileHandle } from "@/lib/lylFileAccess";
+import { dropBackupTarget, linkedLylFile, lylFileAccessSupported, onLylFilesLaunched, pickBackupTarget, pickFilesToImport, rememberLylFile, writeBackupTarget, type LylFileHandle } from "@/lib/lylFileAccess";
 import { exportLylProject, importLylProject, inspectLylProjectPackage, LYL_CREATED_WITH_VERSION, LYL_MEDIA_TYPE, withLylProjectName, withLylThumbnail } from "@/lib/lylProject";
 import { relieveOverFineCadMeshes, type RemeshCadBrep } from "@/lib/cadMeshRelief";
 import { backupDesignAlreadyThere, backupEntryPaths, backupFileName, backupFolderPaths, backupNamePrefix, backupThumbnailPath, unpackBackupFolders, isBackupFileName, createBackupWriter, unpackBackup, zipHoldsDesigns } from "@/lib/projectBackup";
 import { CUSTOM_SHAPES_FOLDER } from "@/lib/customShapesServer";
 import { backupNoteState, readLastFullBackup, rememberFullBackup } from "@/lib/backupState";
+import { FileBackupsDialog, type FileBackupsScope } from "@/components/FileBackupsDialog";
+import { FILE_BACKUP_SETTINGS_EVENT, readFileBackupSettings } from "@/lib/fileBackups";
+import { backupUrgency, daysBetween, DEFAULT_FILE_BACKUP_SETTINGS } from "@/lib/fileBackupRules";
 import { downloadBackup, pngDataUrl, projectThumbnailBlob, projectThumbnailPngBytes, serverCustomShapesBackupEntries, writeServerBackup } from "@/lib/backupDownload";
 import { customShapesBackupEntries, restoreCustomShapesFromBackup } from "@/lib/myShapes";
 import { SHARED_PROJECTS_ENDPOINT } from "@/lib/sharedProjectsEndpoint";
@@ -1000,6 +1003,16 @@ export default function Home() {
   // When "Back up all" last took every design of this browser, for the notice over them; read once on the page.
   const [lastFullBackup, setLastFullBackup] = useState<number | null>(null);
   useEffect(() => setLastFullBackup(readLastFullBackup()), []);
+  // The automatic backups' settings, for how loud the notice over the designs grows; they belong to the browser.
+  const [fileBackupSettings, setFileBackupSettings] = useState(DEFAULT_FILE_BACKUP_SETTINGS);
+  useEffect(() => {
+    setFileBackupSettings(readFileBackupSettings());
+    const follow = () => setFileBackupSettings(readFileBackupSettings());
+    window.addEventListener(FILE_BACKUP_SETTINGS_EVENT, follow);
+    return () => window.removeEventListener(FILE_BACKUP_SETTINGS_EVENT, follow);
+  }, []);
+  // "Earlier versions" open: of one design, or (null) of every design; undefined while closed.
+  const [backupsScope, setBackupsScope] = useState<FileBackupsScope | undefined>(undefined);
   // A design left with nothing in it, waiting for an answer on whether it stays.
   const [emptyProjectPromptId, setEmptyProjectPromptId] = useState<string | null>(null);
   const [sharedProjects, setSharedProjects] = useState<SharedProject[]>([]);
@@ -1776,7 +1789,7 @@ export default function Home() {
     openEditor(project.id, { allowMissingFromStorage: true });
   };
 
-  const openLylProjectFromFile = useCallback(async (file: File, sharedProject?: SharedProject, fileHandle?: LylFileHandle) => {
+  const openLylProjectFromFile = useCallback(async (file: File, sharedProject?: SharedProject, fileHandle?: LylFileHandle, options?: { name?: string }) => {
     setDashboardNotice(t("notice.validatingFile", { name: file.name }));
     try {
       const restored = (await relieveOverFineCadMeshes(await importLylProject(await file.arrayBuffer()), remeshCadBrepLater)).project;
@@ -1791,7 +1804,8 @@ export default function Home() {
         // Der Dateiname sticht den Namen im Paket: Auf der Karte steht der
         // Dateiname, und eine Kopie traegt den des Originals im Paket, bis der
         // erste Speicherlauf ihn nachzieht.
-        ...(existing ?? newProject(sharedProject?.name ?? restored.projectName, projects.length, restored.shapes.length, sharedProject ? null : openFolderId)),
+        // A backup opened from "Earlier versions" comes with a name that says which one it is.
+        ...(existing ?? newProject(sharedProject?.name ?? options?.name ?? restored.projectName, projects.length, restored.shapes.length, sharedProject ? null : openFolderId)),
         createdAt: restored.createdAt,
         updatedAt: now,
         revision: now,
@@ -3100,6 +3114,8 @@ export default function Home() {
           openFolderId={openFolderId}
           localDesigns={localDesigns}
           lastFullBackup={lastFullBackup}
+          backupReminderDays={fileBackupSettings.reminderDays}
+          onShowBackups={setBackupsScope}
           onOpenFolder={(folderId) => {
             setOpenFolderId(folderId);
             setDashboardNotice("");
@@ -3166,6 +3182,13 @@ export default function Home() {
           latestThumbnailUrl={[...projects].sort((a, b) => b.updatedAt - a.updatedAt)[0]?.thumbnailUrl ?? null}
         />
       ) : null}
+      {backupsScope !== undefined ? (
+        <FileBackupsDialog
+          scope={backupsScope}
+          onOpen={(file, name) => openLylProjectFromFile(file, undefined, undefined, { name })}
+          onClose={() => setBackupsScope(undefined)}
+        />
+      ) : null}
       {emptyProjectPrompt ? (
         <section
           className="dashboard-confirm-overlay"
@@ -3220,6 +3243,11 @@ export default function Home() {
               initialPlacementWorkplane={activeProject?.placementWorkplane}
               onHome={openDashboard}
               onOpenLylProjectFile={openLylProjectFromFile}
+              onBackUpAllDesigns={() => {
+                // The save dialog comes first, while the click still counts; the start page then shows how it goes.
+                void backupAllProjects();
+                openDashboard();
+              }}
               onSaveSharedProject={saveActiveProjectToShared}
               onSaveExportFile={saveExportFileToShared}
               serverFileName={activeProject?.sharedProject?.fileName ?? null}
@@ -3331,6 +3359,8 @@ function Dashboard({
   openFolderId,
   localDesigns,
   lastFullBackup,
+  backupReminderDays,
+  onShowBackups,
   onOpenFolder,
   onCreateFolder,
   onRenameFolder,
@@ -3400,6 +3430,10 @@ function Dashboard({
   localDesigns: DashboardProject[];
   /** When "Back up all" last took all of them, or null. */
   lastFullBackup: number | null;
+  /** Days without "Back up all" before the notice grows louder; 0 never. */
+  backupReminderDays: number;
+  /** Opens "Earlier versions" of one design, or of every design with null. */
+  onShowBackups: (scope: FileBackupsScope) => void;
   onOpenFolder: (folderId: string | null) => void;
   onCreateFolder: (name: string) => void;
   onRenameFolder: (folderId: string, name: string) => void;
@@ -3465,6 +3499,10 @@ function Dashboard({
   // Without a server there are only the browser's designs. When every new design must go to the server and this
   // browser holds none of its own, there are only the server's.
   const backupNote = useMemo(() => backupNoteState(localDesigns, lastFullBackup), [localDesigns, lastFullBackup]);
+  const backupLevel = useMemo(
+    () => backupUrgency({ lastFullBackup, designs: localDesigns, now: Date.now(), reminderDays: backupReminderDays }),
+    [localDesigns, lastFullBackup, backupReminderDays],
+  );
   const showBrowserTab = !sharedProjectsEnabled || !newDesignsOnServerLocked || localDesigns.length > 0;
   const activeSection: DashboardSection = !sharedProjectsEnabled ? "home" : showBrowserTab ? dashboardSection : "shared";
   const offlineOk = useOfflineAvailable();
@@ -4002,6 +4040,10 @@ function Dashboard({
               <ArchiveRestore size={17} />
               <span>{t("dashboard.restoreBackup")}</span>
             </button>
+            <button className="dashboard-select dashboard-backup-button" type="button" title={t("backups.allTitle")} onClick={() => onShowBackups(null)}>
+              <History size={17} />
+              <span>{t("backups.title")}</span>
+            </button>
             <label className="dashboard-select">
               <SlidersHorizontal size={17} />
               <select value={sortMode} onChange={(event) => onSortModeChange(event.currentTarget.value)} aria-label={t("dashboard.sortLabel")}>
@@ -4319,7 +4361,17 @@ function Dashboard({
             </>
           ) : (
             <>
-              {localDesigns.length > 0 ? <BrowserBackupNote state={backupNote} when={backupNote.kind === "never" ? "" : formatBackupTime(backupNote.at, language)} /> : null}
+              {localDesigns.length > 0 ? <YourBackupCard onBackUpNow={onBackupAll} /> : null}
+              {localDesigns.length > 0 ? (
+                <BrowserBackupNote
+                  state={backupNote}
+                  when={backupNote.kind === "never" ? "" : formatBackupTime(backupNote.at, language)}
+                  urgency={backupLevel}
+                  days={backupNote.kind === "never" ? 0 : daysBetween(backupNote.at, Date.now())}
+                  count={localDesigns.length}
+                  onBackUpNow={onBackupAll}
+                />
+              ) : null}
               <div className="design-tab-trail">
                 {/* Inside a folder the line under the tabs is the way back: every step a
                     button, and a place to drop a design or a folder on (#496). */}
@@ -4574,6 +4626,18 @@ function Dashboard({
                           >
                             <ToolbarHistoryIcon width={16} height={16} />
                             <span>{t("dashboard.openWithoutHistory")}</span>
+                          </button>
+                          <button
+                            type="button"
+                            role="menuitem"
+                            title={t("backups.openTitle")}
+                            onClick={() => {
+                              setOpenProjectMenuId(null);
+                              onShowBackups({ projectId: project.id, fileHandle: linkedLylFile(project.id), name: project.name });
+                            }}
+                          >
+                            <History size={16} />
+                            <span>{t("backups.title")}</span>
                           </button>
                           <button
                             type="button"

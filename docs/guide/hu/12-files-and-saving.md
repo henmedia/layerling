@@ -11,6 +11,27 @@ Ha egy üres tervből mész vissza a kezdőlapra, a layerling megkérdezi, megta
 
 Ennek van egy hátulütője: aki törli a böngésző tárolóját, vagy másik számítógépre vált, elveszíti a terveket. **A fontos munkáidról ezért készíts biztonsági mentést egy fájlba.**
 
+## A terveid, a te biztonsági mentésed
+
+A terveid ebben a böngészőben vannak, a számítógépeden. Mint minden adatnál, csak az van biztonságban, ami egy másik helyen is megvan: egy tönkrement lemez, egy új gép, törölt böngészőadatok vagy egy programhiba, és mentés nélkül a munka elvész. Erről a mentésről neked kell gondoskodnod; ezt egy program sem tudja helyetted megtenni. A layerling megkönnyíti: a kezdőoldalon a {{ui:dashboard.backupAll}} egy kattintással minden tervet egyetlen fájlba tesz (lásd lent). Ezt a fájlt minden nagyobb munka után tedd pendrive-ra, felhőmappába vagy NAS-ra.
+
+A layerling emlékeztet rá. A böngésző tervei fölötti sor annál feltűnőbb, minél régebben volt az utolsó {{ui:dashboard.backupAll}}: a {{ui:backups.backUpNow}} gombbal, amint régebbi, mint a {{ui:backups.reminderDays}} alatt beállított napok (kezdetben 7), és azóta változtak tervek, pirosan pedig, ha háromnál több terv van és egyáltalán nincs mentés, vagy 30 napja nincs. A szerkesztő naponta egyszer emlékeztet az állapotsorban, ugyanazzal a gombbal. A lenti automatikus mentések itt nem számítanak: ugyanazon a gépen vannak.
+
+## Korábbi változatok
+
+A layerling ezenkívül magától kétféle mentést készít:
+
+- **Felülírás előtt.** Ha a [[Ctrl]]+[[S]] vagy a {{ui:export.saveProject}} egy már meglévő `.lyl` fájlba ír (Chrome és Edge, lásd lent), előbb megmarad a fájl úgy, ahogy volt. Az utolsó mentése óta változatlan fájl nem marad meg kétszer.
+- **Munka közbeni állapotok.** Amíg egy terven dolgozol, 10 percenként megmarad egy állapota, de csak ha valami változott; tervenként az utolsó hat marad.
+
+A {{ui:backups.title}} felsorolja őket: a szerkesztőben az exportálás ablakában a **LYL** alatt és a parancskeresőben, a kezdőoldalon a {{ui:dashboard.restoreBackup}} mellett az összes tervre, és egy terv menüjében arra az egyre. Mindegyiknél látszik a kép, az idő, a fajta, a név és a méret. A {{ui:backups.open}} új tervként nyitja meg a változatot: a megnyitott terv változatlan marad, az új pedig nincs az eredeti fájlhoz kötve, így mentése sosem írja felül azt a fájlt. A letöltés gomb `.lyl` fájlként menti a változatot, a kuka törli.
+
+A beállításokban (fogaskerék a szalagon) a {{ui:backups.settingsTitle}} oldal adja meg, hány korábbi változat marad meg egy fájlból (egy sem–20, kezdetben 5), milyen gyakran marad meg egy állapot (soha, 10 vagy 30 percenként), és mikortól jönnek az emlékeztetők. Ezek a beállítások ehhez a böngészőhöz tartoznak, nem egy tervhez. Az összes mentés együtt legfeljebb 500 MB-ot foglal; e fölött először a legrégebbi állapotok tűnnek el.
+
+**Mentési mappa (Chrome és Edge).** A {{ui:backups.folder}} alatt kiválaszthatsz egy mappát a gépeden. Ekkor minden mentés oda is bekerül `.lyl` fájlként a terv nevével és az idővel, például `Tartó 2026-11-11 20-31-05.lyl`, egy állapot ` auto` taggal a kiterjesztés előtt. A régiek ott is eltűnnek, mint a böngészőben; a mappában semmi máshoz nem nyúl. Újratöltés után a böngésző az első mentéskor újra engedélyt kér; az addigi állapot a böngészőben marad, és az üzenet felajánlja a {{ui:backups.allowFolder}} lehetőséget. A felhővel szinkronizált vagy másik lemezen lévő mappa szintén második hely.
+
+A böngészőben lévő mentések a böngésző adataival együtt elvesznek. Ezért nem helyettesítik a {{ui:dashboard.backupAll}} gombot.
+
 ## Mappák a terveidhez
 
 Több tucat tervnél egyetlen lista már nem elég. A kezdőlapon a {{ui:shared.newFolder}} mappát készít ennek a böngészőnek a terveihez; a mappára kattintva megnyílik. A mappák mappákat is tartalmazhatnak.

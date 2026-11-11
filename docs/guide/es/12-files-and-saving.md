@@ -11,6 +11,27 @@ Si vuelves a la página de inicio desde un diseño vacío, layerling te pregunta
 
 Esto tiene un inconveniente: si borras los datos del navegador o te cambias a otro ordenador, pierdes los diseños. **Así que haz copias de seguridad de tus trabajos importantes en un archivo.**
 
+## Tus diseños, tu copia de seguridad
+
+Tus diseños están en este navegador, en tu ordenador. Como con todos los datos, solo está a salvo lo que existe una segunda vez en otro lugar: un disco que falla, un PC nuevo, datos del navegador borrados o un fallo del programa, y sin copia el trabajo se pierde. Esa copia depende de ti; ningún programa puede hacerla por ti. layerling lo pone fácil: {{ui:dashboard.backupAll}} en la página de inicio guarda todos los diseños en un solo archivo con un clic (ver más abajo). Guarda ese archivo en una memoria USB, en una carpeta en la nube o en un NAS, después de cada sesión importante.
+
+layerling te lo recuerda. La línea sobre los diseños de este navegador se hace más visible cuanto más atrás queda el último {{ui:dashboard.backupAll}}: con el botón {{ui:backups.backUpNow}} en cuanto supera los días ajustados en {{ui:backups.reminderDays}} (7 al principio) y han cambiado diseños desde entonces, y en rojo si hay más de tres diseños sin ninguna copia, o ninguna en 30 días. El editor te lo recuerda una vez al día en la línea de estado, con el mismo botón. Las copias automáticas de abajo no cuentan aquí: están en el mismo ordenador.
+
+## Versiones anteriores
+
+layerling además guarda por sí solo dos tipos de copias:
+
+- **Antes de sobrescribir un archivo.** Cuando [[Ctrl]]+[[S]] o {{ui:export.saveProject}} escribe en un archivo `.lyl` que ya existe (Chrome y Edge, ver más abajo), primero se conserva el archivo tal como era. Un archivo que no ha cambiado desde su última copia no se guarda dos veces.
+- **Estados mientras trabajas.** Mientras trabajas en un diseño, se guarda un estado cada 10 minutos, pero solo si algo cambió; de cada diseño quedan los seis últimos.
+
+{{ui:backups.title}} los muestra: en el editor, en la ventana de exportación bajo **LYL** y en la búsqueda de comandos; en la página de inicio, junto a {{ui:dashboard.restoreBackup}}, para todos los diseños; y en el menú de un diseño para ese. Cada una muestra imagen, hora, tipo, nombre y tamaño. {{ui:backups.open}} abre la versión como un diseño nuevo: el diseño abierto se queda como está y el nuevo no está ligado al archivo original, así que guardarlo nunca sobrescribe ese archivo. El botón de descarga guarda la versión como archivo `.lyl` y la papelera la elimina.
+
+En los ajustes (la rueda dentada de la cinta), la página {{ui:backups.settingsTitle}} fija cuántas versiones anteriores de un archivo se conservan (ninguna hasta 20, 5 al principio), cada cuánto se guarda un estado (nunca, cada 10 o cada 30 minutos) y cuándo empiezan los recordatorios. Estos ajustes son de este navegador, no de un diseño. Todas las copias juntas ocupan como mucho 500 MB; por encima se van primero los estados más antiguos.
+
+**Carpeta de copias (Chrome y Edge).** En {{ui:backups.folder}} puedes elegir una carpeta de tu ordenador. Cada copia va entonces también allí como archivo `.lyl` con el nombre del diseño y la hora, por ejemplo `Soporte 2026-11-11 20-31-05.lyl`, un estado con ` auto` antes de la extensión. Las antiguas se van allí como en el navegador; nada más de la carpeta se toca. Tras recargar la página, el navegador vuelve a pedir permiso la primera vez que guardas; un estado guardado antes se queda en el navegador y el mensaje ofrece {{ui:backups.allowFolder}}. Una carpeta sincronizada con la nube o en otra unidad también es un segundo lugar.
+
+Las copias del navegador se pierden con los datos del navegador. Por eso no sustituyen a {{ui:dashboard.backupAll}}.
+
 ## Carpetas para tus diseños
 
 Cuando tienes decenas de diseños, una sola lista no basta. En la página de inicio, {{ui:shared.newFolder}} crea una carpeta para los diseños de este navegador; al hacer clic en la carpeta, se abre. Las carpetas pueden contener otras carpetas.

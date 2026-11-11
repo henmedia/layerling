@@ -11,6 +11,27 @@ Jeśli wracasz na stronę startową z projektu, w którym nic nie ma, layerling 
 
 Ma to swoją wadę: kto wyczyści pamięć przeglądarki albo przesiądzie się na inny komputer, traci projekty. **Dlatego ważną pracę zapisuj w kopii zapasowej do pliku.**
 
+## Twoje projekty, twoja kopia
+
+Twoje projekty są w tej przeglądarce na twoim komputerze. Jak w przypadku wszystkich danych bezpieczne jest tylko to, co istnieje drugi raz w innym miejscu: awaria dysku, nowy komputer, wyczyszczone dane przeglądarki lub błąd programu i bez kopii praca przepada. O tę kopię dbasz sam; żaden program nie zrobi tego za ciebie. layerling to ułatwia: {{ui:dashboard.backupAll}} na stronie startowej jednym kliknięciem zapisuje wszystkie projekty w jednym pliku (zobacz niżej). Trzymaj ten plik na pendrivie, w folderze w chmurze lub na NAS, po każdej większej sesji.
+
+layerling o tym przypomina. Wiersz nad projektami tej przeglądarki staje się wyraźniejszy, im dawniej było ostatnie {{ui:dashboard.backupAll}}: z przyciskiem {{ui:backups.backUpNow}}, gdy jest starsze niż dni ustawione w {{ui:backups.reminderDays}} (na początek 7), a projekty od tego czasu się zmieniły, oraz na czerwono, gdy jest więcej niż trzy projekty i żadnej kopii albo żadnej od 30 dni. Edytor przypomina raz dziennie w wierszu stanu, z tym samym przyciskiem. Automatyczne kopie opisane niżej się tu nie liczą: są na tym samym komputerze.
+
+## Wcześniejsze wersje
+
+layerling sam tworzy też dwa rodzaje kopii:
+
+- **Przed nadpisaniem pliku.** Gdy [[Ctrl]]+[[S]] lub {{ui:export.saveProject}} zapisuje do istniejącego pliku `.lyl` (Chrome i Edge, zobacz niżej), najpierw zachowywany jest plik w poprzedniej postaci. Plik, który nie zmienił się od ostatniej kopii, nie jest zachowywany dwa razy.
+- **Stany podczas pracy.** Podczas pracy nad projektem co 10 minut zachowywany jest jego stan, ale tylko gdy coś się zmieniło; z każdego projektu zostaje sześć ostatnich.
+
+{{ui:backups.title}} pokazuje je: w edytorze w oknie eksportu pod **LYL** i w wyszukiwaniu poleceń, na stronie startowej obok {{ui:dashboard.restoreBackup}} dla wszystkich projektów oraz w menu projektu dla niego. Każda pokazuje obraz, czas, rodzaj, nazwę i rozmiar. {{ui:backups.open}} otwiera wersję jako nowy projekt: otwarty projekt pozostaje bez zmian, a nowy nie jest powiązany z oryginalnym plikiem, więc zapisanie go nigdy nie nadpisze tego pliku. Przycisk pobierania zapisuje wersję jako plik `.lyl`, kosz ją usuwa.
+
+W ustawieniach (koło zębate na wstążce) strona {{ui:backups.settingsTitle}} określa, ile wcześniejszych wersji pliku zostaje (od żadnej do 20, na początek 5), jak często zachowywany jest stan (nigdy, co 10 lub co 30 minut) i od kiedy pojawiają się przypomnienia. Te ustawienia należą do tej przeglądarki, nie do projektu. Wszystkie kopie razem zajmują najwyżej 500 MB; powyżej najpierw znikają najstarsze stany.
+
+**Folder kopii (Chrome i Edge).** W {{ui:backups.folder}} możesz wybrać folder na swoim komputerze. Każda kopia trafia wtedy też tam jako plik `.lyl` z nazwą projektu i godziną, na przykład `Uchwyt 2026-11-11 20-31-05.lyl`, stan z ` auto` przed rozszerzeniem. Stare znikają tam tak jak w przeglądarce; niczego innego w folderze to nie dotyka. Po przeładowaniu przeglądarka przy pierwszym zapisie ponownie prosi o zgodę; stan zachowany wcześniej zostaje w przeglądarce, a komunikat proponuje {{ui:backups.allowFolder}}. Folder synchronizowany z chmurą lub na innym dysku też jest drugim miejscem.
+
+Kopie w przeglądarce znikają razem z jej danymi. Dlatego nie zastępują {{ui:dashboard.backupAll}}.
+
 ## Foldery na projekty
 
 Przy kilkudziesięciu projektach jedna lista nie wystarcza. Na stronie startowej {{ui:shared.newFolder}} tworzy folder na projekty z tej przeglądarki, a kliknięcie folderu go otwiera. Foldery mogą zawierać foldery.

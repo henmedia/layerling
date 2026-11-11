@@ -70,6 +70,7 @@ function guideSections(sharedStore: boolean): GuideSection[] {
       lines: [
         "guide.files.autosave",
         "guide.files.project",
+        "guide.files.earlierVersions",
         "guide.files.export",
         "guide.files.import",
         "guide.files.bugReport",
