@@ -3861,13 +3861,13 @@ html[data-theme="dark"]:where([data-palette="graphite"]) .align-spread.axis-z {
   background: transparent;
   border-left: 6px solid transparent;
   border-right: 6px solid transparent;
-  border-bottom: 13px solid #3a3a3a;
+  border-bottom: 13px solid #2f6fe0;
   box-shadow: none;
 }
 
 :where(html[data-theme="dark"][data-palette="graphite"]) .transform-handle.height-lift.lower {
   border-bottom: 0;
-  border-top: 13px solid #3a3a3a;
+  border-top: 13px solid #2f6fe0;
 }
 
 :where(html[data-theme="dark"][data-palette="graphite"]) .transform-handle.height-lift:hover {
@@ -6608,11 +6608,11 @@ html[data-theme="dark"]:where([data-palette="graphite"]) .transform-handle.axis-
 }
 
 html[data-theme="dark"]:where([data-palette="graphite"]) .transform-handle.height-lift {
-  border-bottom-color: #ffffff;
+  border-bottom-color: #6aa0ff;
 }
 
 html[data-theme="dark"]:where([data-palette="graphite"]) .transform-handle.height-lift.lower {
-  border-top-color: #ffffff;
+  border-top-color: #6aa0ff;
 }
 
 html[data-theme="dark"]:where([data-palette="graphite"]) .transform-handle.height-lift:hover {

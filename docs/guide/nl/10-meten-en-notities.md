@@ -58,7 +58,7 @@ De volgende klik na een afgemaakte hoek begint een nieuwe, en {{ui:camera.protra
 
 In de instellingen onder {{ui:workspace.appearance}} staan twee schakelaars voor live maten:
 
-- {{ui:workspace.showMoveDimensions}} toont hoeveel je verplaatst tijdens het slepen. Dat geldt ook bij het optillen met de zwarte pijl boven een lichaam; de afstand staat dan bij de voorste hoek. Na het loslaten klik je op zo'n getal en typ je de precieze afstand; een min gaat omlaag.
+- {{ui:workspace.showMoveDimensions}} toont hoeveel je verplaatst tijdens het slepen. Dat geldt ook bij het optillen met de blauwe pijl boven een lichaam; de afstand staat dan bij de voorste hoek. Na het loslaten klik je op zo'n getal en typ je de precieze afstand; een min gaat omlaag.
 - {{ui:workspace.showOriginDimensions}} toont de afstanden van de selectie tot de oorsprong van de plaat, ook bij meerdere geselecteerde lichamen.
 
 Met {{ui:workspace.dimensionsAlwaysVisible}} blijven de maten altijd zichtbaar. Staat een lichaam niet op het werkvlak, dan staat ook zijn hoogte erboven erbij; klik op het getal om een nieuwe waarde te typen.

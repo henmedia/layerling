@@ -60,7 +60,7 @@ Il clic successivo a un angolo completato ne inizia uno nuovo, e {{ui:camera.pro
 
 Nelle impostazioni, sotto {{ui:workspace.appearance}}, trovi due interruttori per visualizzare le misure in tempo reale:
 
-- {{ui:workspace.showMoveDimensions}} mostra di quanto si sposta il corpo mentre lo trascini. Vale anche per il sollevamento con la freccia nera sopra il corpo; lo spostamento appare al suo angolo anteriore. Dopo aver rilasciato, fai clic su quel numero e digita la distanza esatta; un valore negativo scende.
+- {{ui:workspace.showMoveDimensions}} mostra di quanto si sposta il corpo mentre lo trascini. Vale anche per il sollevamento con la freccia blu sopra il corpo; lo spostamento appare al suo angolo anteriore. Dopo aver rilasciato, fai clic su quel numero e digita la distanza esatta; un valore negativo scende.
 - {{ui:workspace.showOriginDimensions}} mostra la distanza della selezione dall’origine della piastra, anche quando sono selezionati più corpi.
 
 Con {{ui:workspace.dimensionsAlwaysVisible}} le misure restano sempre visibili. Un corpo che non poggia sul piano di lavoro mostra anche la sua altezza sopra di esso; fai clic sul numero per scriverne una nuova.

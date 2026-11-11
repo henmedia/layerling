@@ -10,6 +10,8 @@ code still carries it - so a lower number further down is older, not newer.
 
 - **The note of a bundle says where its holes cut (#1643):** The note in a bundle's settings said only that its holes cut nothing. It now says that they never cut the bundle's own parts, not even later in a group, where they cut only the other parts; a hole bundled with the box it sits in seemed to vanish when that bundle was grouped. Texts in 19 languages; the guide (chapter 5) said so already.
 
+- **The lift arrow is blue (Facebook group):** The arrow above a selection that lifts it was nearly black. It moves along Z, so it is now blue like the Z turn arrow and the Z axis arrow on the plate, next to the red and green move arrows; in the dark theme it is a lighter blue. The guide (chapters 3 and 10) says blue arrow in every language.
+
 ## 1.157.2
 
 - **Interactive Help shows that it is on:** While it is on, the circle of its question mark in the title row is filled orange with the question mark light in it, in light and dark mode. Before, only the colour of the question mark changed, a shade from its neighbours, and it was easily taken for off (Discussion #1640).

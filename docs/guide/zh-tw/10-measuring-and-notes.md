@@ -60,7 +60,7 @@ summary: 捲尺、標尺與角尺，到原點的距離，附著在零件上的�
 
 在設定的 {{ui:workspace.appearance}} 底下，有兩個用於即時尺寸的開關：
 
-- {{ui:workspace.showMoveDimensions}} 顯示拖曳時移動了多少。用物體上方的黑色箭頭抬起時也會顯示，距離標在它的前角。放開後，點擊這樣的數字即可輸入確切的距離；負數表示向下。
+- {{ui:workspace.showMoveDimensions}} 顯示拖曳時移動了多少。用物體上方的藍色箭頭抬起時也會顯示，距離標在它的前角。放開後，點擊這樣的數字即可輸入確切的距離；負數表示向下。
 - {{ui:workspace.showOriginDimensions}} 顯示選取物件到平台原點的距離，選取多個實體時同樣有效。
 
 啟用 {{ui:workspace.dimensionsAlwaysVisible}} 後，尺寸會一直可見。不在工作平面上的實體還會顯示它離平面的高度；點擊該數字即可輸入新值。
