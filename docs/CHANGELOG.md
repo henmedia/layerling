@@ -6,6 +6,8 @@ code still carries it - so a lower number further down is older, not newer.
 
 ## Unreleased
 
+## 1.157.2
+
 - **Interactive Help shows that it is on:** While it is on, the circle of its question mark in the title row is filled orange with the question mark light in it, in light and dark mode. Before, only the colour of the question mark changed, a shade from its neighbours, and it was easily taken for off (Discussion #1640).
 
 - **Designs keep their folders on the server (Discussion #1572):** "Put all on the server" put every design of this browser straight into the server folder that was open, so the folders they were in were lost there, and the folders stayed behind in the browser, empty. Now each folder is made below that server folder, empty ones too, each design goes into its own, and the folders left empty in the browser go. A folder of this browser has "Put on the server" in its menu too, and can be dragged onto the Server tab: it goes onto the server with every design and folder in it and becomes a folder there. A design that cannot go (its name is taken there) stays in the browser in its folder. Restoring a backup whose designs were put on the server said they were "already here", while the Browser tab showed only empty folders; the message now says they are on the server (Server tab). Unit tests for the folder paths and the folders left empty; texts in 19 languages, guide chapter 12 in 15 languages, both READMEs, the Docker step-by-step guides.
