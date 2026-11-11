@@ -2867,7 +2867,7 @@ export const MESSAGES_ES: Partial<Record<MessageKey, string>> = {
   "shape.ruler": "Regla",
   "shape.group": "Grupo",
   "shape.bundle": "Conjunto",
-  "inspector.bundleNote": "Un conjunto solo mantiene unidas sus piezas: cada una conserva su color y su tipo, los orificios no cortan nada y, al exportar, cada pieza es un cuerpo independiente. E lo abre para editarlo; Ctrl+Mayús+G lo deshace.",
+  "inspector.bundleNote": "Un conjunto solo mantiene unidas sus piezas: cada una conserva su color y su tipo, sus orificios nunca cortan sus propias piezas, tampoco después en un grupo (allí solo cortan las demás piezas) y, al exportar, cada pieza es un cuerpo independiente. E lo abre para editarlo; Ctrl+Mayús+G lo deshace.",
   "shape.intersection": "Intersección",
   "shape.importedMesh": "Malla importada",
   "shape.mesh": "Malla",

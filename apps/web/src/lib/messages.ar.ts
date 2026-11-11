@@ -2873,7 +2873,7 @@ export const MESSAGES_AR: Partial<Record<MessageKey, string>> = {
   "shape.ruler": "مسطرة",
   "shape.group": "مجموعة",
   "shape.bundle": "حزمة",
-  "inspector.bundleNote": "الحزمة تمسك أجزاءها معًا فقط: يحتفظ كل جزء بلونه ونوعه، والثقوب لا تقطع شيئًا، وفي التصدير يكون كل جزء جسمًا مستقلًا. E يفتحها للتعديل، وCtrl+Shift+G يفككها.",
+  "inspector.bundleNote": "الحزمة تمسك أجزاءها معًا فقط: يحتفظ كل جزء بلونه ونوعه، وثقوبها لا تقطع أجزاءها أبدًا، ولا حتى لاحقًا داخل مجموعة (هناك تقطع الأجزاء الأخرى فقط)، وفي التصدير يكون كل جزء جسمًا مستقلًا. E يفتحها للتعديل، وCtrl+Shift+G يفككها.",
   "shape.intersection": "تقاطع",
   "shape.importedMesh": "شبكة مستوردة",
   "shape.mesh": "شبكة",

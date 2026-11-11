@@ -6,6 +6,8 @@ code still carries it - so a lower number further down is older, not newer.
 
 ## Unreleased
 
+- **The note of a bundle says where its holes cut (#1643):** The note in a bundle's settings said only that its holes cut nothing. It now says that they never cut the bundle's own parts, not even later in a group, where they cut only the other parts; a hole bundled with the box it sits in seemed to vanish when that bundle was grouped. Texts in 19 languages; the guide (chapter 5) said so already.
+
 ## 1.157.2
 
 - **Interactive Help shows that it is on:** While it is on, the circle of its question mark in the title row is filled orange with the question mark light in it, in light and dark mode. Before, only the colour of the question mark changed, a shade from its neighbours, and it was easily taken for off (Discussion #1640).

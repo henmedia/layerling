@@ -2865,7 +2865,7 @@ export const MESSAGES_EN = {
   "shape.ruler": "Ruler",
   "shape.group": "Group",
   "shape.bundle": "Bundle",
-  "inspector.bundleNote": "A bundle only holds its parts together: each keeps its colour and kind, holes cut nothing, and in an export every part is a body of its own. E opens it for editing, Ctrl+Shift+G takes it apart.",
+  "inspector.bundleNote": "A bundle only holds its parts together: each keeps its colour and kind, its holes never cut its own parts, not even later in a group (there they cut only the other parts), and in an export every part is a body of its own. E opens it for editing, Ctrl+Shift+G takes it apart.",
   "shape.intersection": "Intersection",
   "shape.importedMesh": "Imported Mesh",
   "shape.mesh": "Mesh",

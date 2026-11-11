@@ -1897,7 +1897,7 @@ export const MESSAGES_TR: Partial<Record<MessageKey, string>> = {
   "shape.ruler": "Cetvel",
   "shape.group": "Grup",
   "shape.bundle": "Paket",
-  "inspector.bundleNote": "Bir paket sadece parçalarını bir arada tutar: her biri rengini ve türünü korur, delikler hiçbir şeyi kesmez ve dışa aktarımda her parça ayrı bir gövdedir. E onu düzenlemek için açar, Ctrl+Shift+G onu dağıtır.",
+  "inspector.bundleNote": "Bir paket sadece parçalarını bir arada tutar: her biri rengini ve türünü korur, delikleri kendi parçalarını asla kesmez, sonradan bir grupta da (orada yalnızca diğer parçaları keser) ve dışa aktarımda her parça ayrı bir gövdedir. E onu düzenlemek için açar, Ctrl+Shift+G onu dağıtır.",
   "shape.intersection": "Kesişim",
   "shape.importedMesh": "İçe aktarılmış ağ",
   "shape.mesh": "Ağ",

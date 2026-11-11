@@ -3294,7 +3294,7 @@ export const MESSAGES_DA: Partial<Record<MessageKey, string>> = {
   "shape.ruler": "Lineal",
   "shape.group": "Gruppe",
   "shape.bundle": "Bundt",
-  "inspector.bundleNote": "Et bundt holder kun dets dele sammen: hver bevarer sin farve og slags, huller skærer intet, og i en eksport er hver del sin egen form. E åbner det for redigering, Ctrl+Shift+G skiller det ad.",
+  "inspector.bundleNote": "Et bundt holder kun dets dele sammen: hver bevarer sin farve og slags, dets huller skærer aldrig i dets egne dele, heller ikke senere i en gruppe (der skærer de kun i de andre dele), og i en eksport er hver del sin egen form. E åbner det for redigering, Ctrl+Shift+G skiller det ad.",
   "shape.intersection": "Fælles",
   "shape.importedMesh": "Importeret mesh",
   "shape.mesh": "Mesh",

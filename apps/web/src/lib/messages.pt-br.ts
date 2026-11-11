@@ -782,7 +782,7 @@ export const MESSAGES_PT_BR: Partial<Record<MessageKey, string>> = {
   "inspector.threadMakeTappedHole": "Transformar em furo roscado",
   "inspector.threadHead": "Cabeça",
   "inspector.thread": "Rosca",
-  "inspector.bundleNote": "Um conjunto apenas mantém as peças juntas: cada uma conserva sua cor e seu tipo, os buracos não removem material, e cada peça é exportada como um sólido separado. A tecla E abre o conjunto para edição; Ctrl+Shift+G o desfaz.",
+  "inspector.bundleNote": "Um conjunto apenas mantém as peças juntas: cada uma conserva sua cor e seu tipo, os buracos nunca cortam as próprias peças, nem depois em um grupo (lá cortam apenas as outras peças), e cada peça é exportada como um sólido separado. A tecla E abre o conjunto para edição; Ctrl+Shift+G o desfaz.",
   "inspector.more": "Mais",
   "inspector.less": "Menos",
   "inspector.bentTubeSegments": "Segmentos",

@@ -2942,7 +2942,7 @@ export const MESSAGES_CS: Record<MessageKey, string> = {
   "shape.ruler": "Pravítko",
   "shape.group": "Sloučené těleso",
   "shape.bundle": "Seskupení",
-  "inspector.bundleNote": "Seskupení drží části pohromadě. Každá zachovává barvu i typ, výřezy nic neodečítají a při exportu zůstává každý díl samostatným tělesem. E otevře úpravy, Ctrl+Shift+G seskupení rozdělí.",
+  "inspector.bundleNote": "Seskupení drží části pohromadě. Každá zachovává barvu i typ, výřezy nikdy neodečítají jeho vlastní části, ani později ve skupině (tam odečítají jen ostatní části) a při exportu zůstává každý díl samostatným tělesem. E otevře úpravy, Ctrl+Shift+G seskupení rozdělí.",
   "shape.intersection": "Průnik",
   "shape.importedMesh": "Importovaná polygonová síť",
   "shape.mesh": "Polygonová síť",

@@ -2816,7 +2816,7 @@ export const MESSAGES_ZH_TW: Partial<Record<MessageKey, string>> = {
   "shape.ruler": "標尺",
   "shape.group": "群組",
   "shape.bundle": "綁定",
-  "inspector.bundleNote": "綁定只是把部件固定在一起：每個部件各自保留顏色與類型，孔不會挖除任何材料，匯出時每個部件都是獨立實體。按 E 可開啟編輯，Ctrl+Shift+G 可取消綁定。",
+  "inspector.bundleNote": "綁定只是把部件固定在一起：每個部件各自保留顏色與類型，孔永遠不會挖除自己的部件，之後放進群組也一樣（在群組中只挖除其他部件），匯出時每個部件都是獨立實體。按 E 可開啟編輯，Ctrl+Shift+G 可取消綁定。",
   "shape.intersection": "交集",
   "shape.importedMesh": "匯入的網格",
   "shape.mesh": "網格",

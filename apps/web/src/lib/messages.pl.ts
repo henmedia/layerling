@@ -2830,7 +2830,7 @@ export const MESSAGES_PL: Partial<Record<MessageKey, string>> = {
   "shape.ruler": "Linijka",
   "shape.group": "Grupa",
   "shape.bundle": "Zestaw",
-  "inspector.bundleNote": "Zestaw tylko trzyma swoje części razem: każda zachowuje swój kolor i rodzaj, otwory niczego nie wycinają, a w eksporcie każda część jest osobną bryłą. E otwiera go do edycji, Ctrl+Shift+G rozdziela go.",
+  "inspector.bundleNote": "Zestaw tylko trzyma swoje części razem: każda zachowuje swój kolor i rodzaj, jego otwory nigdy nie wycinają jego własnych części, także później w grupie (tam wycinają tylko pozostałe części), a w eksporcie każda część jest osobną bryłą. E otwiera go do edycji, Ctrl+Shift+G rozdziela go.",
   "shape.intersection": "Część wspólna",
   "shape.importedMesh": "Zaimportowana siatka",
   "shape.mesh": "Siatka",
