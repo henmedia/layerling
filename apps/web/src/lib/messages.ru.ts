@@ -2962,6 +2962,8 @@ export const MESSAGES_RU: Partial<Record<MessageKey, string>> = {
   "prop.gearPressureAngle": "Угол зацепления",
   "prop.gearBacklash": "Люфт",
   "prop.gearRim": "Обод",
+  "prop.ringRackHerringbone": "Шевронные зубья",
+  "inspector.ringRackHelixHint": "Тот же угол, что у косозубого колеса, которое с ним работает. 0 оставляет зубья прямыми.",
   "prop.centerHole": "Центральное отверстие",
   "prop.topLength": "Длина верха",
   "prop.loftBottomOutline": "Нижний контур",

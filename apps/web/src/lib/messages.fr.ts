@@ -2955,6 +2955,8 @@ export const MESSAGES_FR: Partial<Record<MessageKey, string>> = {
   "prop.gearPressureAngle": "Angle de pression",
   "prop.gearBacklash": "Contrecoup",
   "prop.gearRim": "Jante",
+  "prop.ringRackHerringbone": "Denture à chevrons",
+  "inspector.ringRackHelixHint": "Le même angle que l'engrenage hélicoïdal qui tourne avec. 0 garde les dents droites.",
   "prop.centerHole": "Trou central",
   "prop.topLength": "Longueur supérieure",
   "prop.loftBottomOutline": "Contour inférieur",

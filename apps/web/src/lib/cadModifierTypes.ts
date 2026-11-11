@@ -330,6 +330,18 @@ export type CadModifierHelicalGearPart = {
   stretch: { x: number; z: number };
   /** 0 for none. */
   boreRadius: number;
+  /**
+   * A ring gear with slanted teeth (Discussion #1627): the corners are its teeth, turning inside a round rim of
+   * this radius (before the stretch); it has no bore.
+   */
+  ringRadius?: number;
+  /**
+   * A rack with slanted teeth (#1627) instead of a turning ring: the outline of a straight rack longer than this
+   * one (x along it, teeth towards +z, counter-clockwise), drawn out upwards while its teeth move `travel` along it
+   * (half of it up to the middle and back for herringbone teeth), then cut off square at x = +-length / 2.
+   * `corners` and `twist` are not used.
+   */
+  rack?: { outline: Array<{ x: number; z: number }>; length: number; backZ: number; tipZ: number; travel: number };
   transform?: number[];
   expected?: { bounds: number[]; volume: number };
 };

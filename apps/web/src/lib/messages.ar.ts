@@ -2976,6 +2976,8 @@ export const MESSAGES_AR: Partial<Record<MessageKey, string>> = {
   "prop.gearPressureAngle": "زاوية الضغط",
   "prop.gearBacklash": "الخلوص بين الأسنان (Backlash)",
   "prop.gearRim": "الطوق",
+  "prop.ringRackHerringbone": "أسنان على شكل عظم السمكة",
+  "inspector.ringRackHelixHint": "اضبطه على نفس زاوية الترس الحلزوني الذي يعمل معه. القيمة 0 تُبقي الأسنان مستقيمة.",
   "prop.centerHole": "الثقب المركزي",
   "prop.topLength": "الطول العلوي",
   "prop.loftBottomOutline": "الحد الخارجي السفلي",

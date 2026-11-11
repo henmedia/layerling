@@ -22,5 +22,17 @@
       "en": "With a long label like “Through the Sections” in the loft, the drop-down was so narrow that “Straight” was cut off, and the note below it ran in a narrow column. Now a long label wraps and leaves the field room, and notes under drop-downs use the whole width, as under the number fields.",
       "da": "Med en lang etiket som „Gennem sektionerne“ i loftet var rullelisten så smal, at „Lige“ blev skåret af, og noten under den stod i en smal kolonne. Nu brydes en lang etiket om og giver feltet plads, og noter under rullelister bruger hele bredden ligesom under talfelterne."
     }
+  },
+  {
+    "title": {
+      "de": "Hohlrad und Zahnstange auch schräg- und pfeilverzahnt",
+      "en": "Helical and herringbone ring gears and racks",
+      "da": "Skrå- og sildebensfortandede indvendige tandhjul og tandstænger"
+    },
+    "body": {
+      "de": "Hohlrad und Zahnstange haben jetzt einen Schrägungswinkel und die Wahl Pfeilverzahnung, damit sie mit einem Schräg- oder Pfeilzahnrad laufen. Sie bekommen denselben Winkel wie das Zahnrad, das mit ihnen läuft. Die Zahnstange behält ihre Länge, ihre schrägen Zähne werden an den Enden gerade abgeschnitten, und beide gehen als exakte Körper in den STEP-Export.",
+      "en": "Ring gears and racks now take a helix angle and herringbone teeth, so they run with a helical or herringbone gear. Give them the same angle as the gear that runs with them. The rack keeps its length, its slanted teeth cut off square at the ends, and both go to the STEP export as exact bodies.",
+      "da": "Indvendige tandhjul og tandstænger har nu en skråvinkel og valget sildebensfortanding, så de kan køre med et skrå- eller sildebenstandhjul. De får samme vinkel som det tandhjul, der kører med dem. Tandstangen beholder sin længde, dens skrå tænder skæres lige af i enderne, og begge går til STEP-eksporten som eksakte legemer."
+    }
   }
 ]

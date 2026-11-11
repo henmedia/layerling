@@ -3384,6 +3384,8 @@ export const MESSAGES_DA: Partial<Record<MessageKey, string>> = {
   "prop.gearPressureAngle": "Trykvinkel",
   "prop.gearBacklash": "Spil",
   "prop.gearRim": "Kant",
+  "prop.ringRackHerringbone": "Sildebensfortanding",
+  "inspector.ringRackHelixHint": "Giv den samme vinkel som det skrå tandhjul, der kører med den. 0 holder tænderne lige.",
   "prop.centerHole": "Centerhul",
   "prop.topLength": "Toplængde",
   "prop.loftBottomOutline": "Bundomrids",

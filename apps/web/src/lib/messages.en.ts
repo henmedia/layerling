@@ -2969,6 +2969,8 @@ export const MESSAGES_EN = {
   "prop.gearPressureAngle": "Pressure Angle",
   "prop.gearBacklash": "Backlash",
   "prop.gearRim": "Rim",
+  "prop.ringRackHerringbone": "Herringbone teeth",
+  "inspector.ringRackHelixHint": "Give it the same angle as the helical gear that runs with it. 0 keeps the teeth straight.",
   "prop.centerHole": "Center Hole",
   "prop.topLength": "Top Length",
   "prop.loftBottomOutline": "Bottom Outline",

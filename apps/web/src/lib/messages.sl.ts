@@ -4651,6 +4651,8 @@ export const MESSAGES_SL: Partial<Record<MessageKey, string>> = {
   "gear.rackHint": "Korak {pitchLength} mm na zob; dolžina je zobje × korak. Po njej se kotali zobnik z modulom {module}: njegovo središče stoji njegovi zobje × modul / 2 pred delilno črto, ki leži {offset} mm za vrhovi zob.",
   "gear.rackRoundHint": "Okrogli zobje, korak {pitchLength} mm na zob; dolžina je zobje × korak. Po njej se kotali okrogli zobnik z modulom {module}: njegovo središče stoji njegovi zobje × modul / 2 pred delilno črto, ki leži {offset} mm za vrhovi zob.",
   "prop.gearRim": "Venec",
+  "prop.ringRackHerringbone": "Puščično ozobje",
+  "inspector.ringRackHelixHint": "Enak kot, kot ga ima poševni zobnik, ki teče z njim. 0 pusti zobe ravne.",
   "prop.sketchFill.grow": "Širše",
   "prop.sketchFill.growHint": "Zapolnjena oblika, razširjena za širino črte na vse strani: podlaga pod besedilom ali logotipom za večbarvni tisk.",
   "prop.sketchFill.shrink": "Ožje",

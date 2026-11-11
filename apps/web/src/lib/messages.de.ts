@@ -2968,6 +2968,8 @@ export const MESSAGES_DE: Record<MessageKey, string> = {
   "prop.gearPressureAngle": "Eingriffswinkel",
   "prop.gearBacklash": "Spiel",
   "prop.gearRim": "Kranz",
+  "prop.ringRackHerringbone": "Pfeilverzahnung",
+  "inspector.ringRackHelixHint": "Denselben Winkel wie das Schrägrad, das damit läuft. 0 lässt die Zähne gerade.",
   "prop.centerHole": "Mittelbohrung",
   "prop.topLength": "Länge oben",
   "prop.loftBottomOutline": "Umriss unten",

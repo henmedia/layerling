@@ -2919,6 +2919,8 @@ export const MESSAGES_ZH_TW: Partial<Record<MessageKey, string>> = {
   "prop.gearPressureAngle": "壓力角",
   "prop.gearBacklash": "齒隙",
   "prop.gearRim": "輪緣",
+  "prop.ringRackHerringbone": "人字齒",
+  "inspector.ringRackHelixHint": "與和它嚙合的斜齒輪取相同角度。0 表示直齒。",
   "prop.centerHole": "中心孔",
   "prop.topLength": "頂部長度",
   "prop.loftBottomOutline": "底部輪廓",

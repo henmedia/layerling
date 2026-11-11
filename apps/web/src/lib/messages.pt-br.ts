@@ -873,6 +873,8 @@ export const MESSAGES_PT_BR: Partial<Record<MessageKey, string>> = {
   "prop.gearPressureAngle": "Ângulo de pressão",
   "prop.gearBacklash": "Folga entre dentes",
   "prop.gearRim": "Aro",
+  "prop.ringRackHerringbone": "Dentes espinha de peixe",
+  "inspector.ringRackHelixHint": "O mesmo ângulo da engrenagem helicoidal que trabalha com ela. 0 deixa os dentes retos.",
   "prop.centerHole": "Furo central",
   "prop.topLength": "Comprimento superior",
   "prop.loftBottomOutline": "Contorno inferior",

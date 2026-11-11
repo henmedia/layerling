@@ -2969,6 +2969,8 @@ export const MESSAGES_NL: Record<MessageKey, string> = {
   "prop.gearPressureAngle": "Aangrijpingshoek",
   "prop.gearBacklash": "Speling",
   "prop.gearRim": "Velg",
+  "prop.ringRackHerringbone": "Visgraatvertanding",
+  "inspector.ringRackHelixHint": "Dezelfde hoek als het schuine tandwiel dat ermee draait. 0 houdt de tanden recht.",
   "prop.centerHole": "Middengat",
   "prop.topLength": "Lengte boven",
   "prop.loftBottomOutline": "Omtrek onder",

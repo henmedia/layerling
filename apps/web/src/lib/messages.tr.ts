@@ -1969,6 +1969,8 @@ export const MESSAGES_TR: Partial<Record<MessageKey, string>> = {
   "prop.gearPressureAngle": "Kavrama açısı",
   "prop.gearBacklash": "Boşluk",
   "prop.gearRim": "Çember",
+  "prop.ringRackHerringbone": "Balıksırtı dişler",
+  "inspector.ringRackHelixHint": "Onunla çalışan helisel dişliyle aynı açıyı verin. 0 dişleri düz bırakır.",
   "prop.centerHole": "Merkez deliği",
   "prop.topLength": "Üst uzunluk",
   "prop.loftBottomOutline": "Alt dış hat",

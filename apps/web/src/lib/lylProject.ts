@@ -1666,6 +1666,13 @@ function validateShapeDefinition(definition: Record<string, unknown>, label: str
       const bevelHelixAngle = finiteNumber(definition.bevelHelixAngle, `${label}.bevelHelixAngle`);
       if (bevelHelixAngle < -45 || bevelHelixAngle > 45) throw new Error(`${label}.bevelHelixAngle is outside the supported range`);
     }
+    if (definition.ringRackHelixAngle !== undefined) {
+      const ringRackHelixAngle = finiteNumber(definition.ringRackHelixAngle, `${label}.ringRackHelixAngle`);
+      if (ringRackHelixAngle < -45 || ringRackHelixAngle > 45) throw new Error(`${label}.ringRackHelixAngle is outside the supported range`);
+    }
+    if (definition.ringRackHerringbone !== undefined && typeof definition.ringRackHerringbone !== "boolean") {
+      throw new Error(`${label}.ringRackHerringbone must be a boolean`);
+    }
     if (definition.helixQuality !== undefined) {
       const helixQuality = finiteNumber(definition.helixQuality, `${label}.helixQuality`);
       if (!Number.isInteger(helixQuality) || helixQuality < 4 || helixQuality > 32) {

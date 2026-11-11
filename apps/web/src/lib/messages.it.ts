@@ -2955,6 +2955,8 @@ export const MESSAGES_IT: Partial<Record<MessageKey, string>> = {
   "prop.gearPressureAngle": "Angolo di pressione",
   "prop.gearBacklash": "Gioco",
   "prop.gearRim": "Corona",
+  "prop.ringRackHerringbone": "Denti a spina di pesce",
+  "inspector.ringRackHelixHint": "Lo stesso angolo dell'ingranaggio elicoidale che lavora con esso. 0 lascia i denti dritti.",
   "prop.centerHole": "Foro centrale",
   "prop.topLength": "Lunghezza superiore",
   "prop.loftBottomOutline": "Contorno inferiore",

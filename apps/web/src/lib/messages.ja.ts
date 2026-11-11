@@ -2329,6 +2329,8 @@ export const MESSAGES_JA: Partial<Record<MessageKey, string>> = {
   "prop.gearPressureAngle": "圧力角",
   "prop.gearBacklash": "バックラッシ",
   "prop.gearRim": "リム",
+  "prop.ringRackHerringbone": "やまば歯",
+  "inspector.ringRackHelixHint": "かみ合うはすば歯車と同じ角度にします。0 で歯はまっすぐのままです。",
   "prop.centerHole": "中心穴",
   "prop.topLength": "上面の長さ",
   "prop.loftBottomOutline": "底面の輪郭",

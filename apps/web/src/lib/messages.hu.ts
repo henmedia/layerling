@@ -1996,6 +1996,8 @@ export const MESSAGES_HU: Partial<Record<MessageKey, string>> = {
   "prop.gearPressureAngle": "Kapcsolószög",
   "prop.gearBacklash": "Foghézag",
   "prop.gearRim": "Koszorú",
+  "prop.ringRackHerringbone": "Nyílfogazás",
+  "inspector.ringRackHelixHint": "Ugyanaz a szög, mint a vele kapcsolódó ferde fogú keréké. 0 esetén a fogak egyenesek maradnak.",
   "prop.centerHole": "Középfurat",
   "prop.topLength": "Felső hosszúság",
   "prop.loftBottomOutline": "Alsó körvonal",

@@ -3046,6 +3046,8 @@ export const MESSAGES_CS: Record<MessageKey, string> = {
   "prop.gearPressureAngle": "Úhel záběru",
   "prop.gearBacklash": "Boční vůle",
   "prop.gearRim": "Tloušťka věnce",
+  "prop.ringRackHerringbone": "Šípové ozubení",
+  "inspector.ringRackHelixHint": "Nastavte stejný úhel jako u šikmého kola, které s ním zabírá. 0 ponechá zuby rovné.",
   "prop.centerHole": "Středový otvor",
   "prop.topLength": "Horní délka",
   "prop.loftBottomOutline": "Spodní profil",

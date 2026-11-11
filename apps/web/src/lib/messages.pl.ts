@@ -2933,6 +2933,8 @@ export const MESSAGES_PL: Partial<Record<MessageKey, string>> = {
   "prop.gearPressureAngle": "Kąt przyporu",
   "prop.gearBacklash": "Luz międzyzębny",
   "prop.gearRim": "Wieniec",
+  "prop.ringRackHerringbone": "Uzębienie daszkowe",
+  "inspector.ringRackHelixHint": "Ten sam kąt co koło śrubowe, które z nim współpracuje. 0 zostawia proste zęby.",
   "prop.centerHole": "Otwór środkowy",
   "prop.topLength": "Długość górna",
   "prop.loftBottomOutline": "Kontur dolny",

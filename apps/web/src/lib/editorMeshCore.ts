@@ -647,6 +647,8 @@ function geometryMeshForShape(shape: WorkplaneShape): MeshData | null {
         gearRim: shape.gearRim,
         helixAngle: shape.helixAngle,
         bevelHelixAngle: shape.bevelHelixAngle,
+        ringRackHelixAngle: shape.ringRackHelixAngle,
+        ringRackHerringbone: shape.ringRackHerringbone,
         helixQuality: shape.helixQuality,
         gearProfile: shape.gearProfile,
         gearPressureAngle: shape.gearPressureAngle,
