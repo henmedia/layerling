@@ -1,0 +1,307 @@
+/* The automatic backups: "Earlier versions", the louder backup notice and the card about whose job a backup is. */
+
+.file-backups-card {
+  width: 640px;
+  height: auto;
+  max-height: min(560px, 100%);
+}
+
+.file-backups-card .workspace-modal-header strong {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.file-backups-body {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  overflow-y: auto;
+}
+
+.file-backups-intro,
+.file-backups-empty {
+  margin: 0;
+  line-height: 1.5;
+}
+
+.file-backups-problem {
+  margin: 0;
+  color: #b3261e;
+  font-weight: 700;
+}
+
+.file-backups-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.file-backup-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px;
+  background: var(--tile);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+
+.file-backup-picture {
+  flex: none;
+  width: 56px;
+  height: 42px;
+  object-fit: contain;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+}
+
+.file-backup-text {
+  display: flex;
+  flex: 1;
+  min-width: 0;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.file-backup-text > span {
+  overflow: hidden;
+  color: var(--muted-strong);
+  font-size: 13px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.file-backup-actions {
+  display: flex;
+  flex: none;
+  gap: 4px;
+}
+
+.file-backup-actions button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 32px;
+  padding: 0 8px;
+  color: var(--foreground);
+  background: var(--panel);
+  border: 1px solid var(--border-strong);
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.file-backup-actions button:hover:not(:disabled),
+.file-backup-actions button:focus-visible {
+  border-color: var(--primary);
+}
+
+.file-backup-actions .file-backup-open {
+  color: #ffffff;
+  background: var(--primary);
+  border-color: var(--primary);
+}
+
+.file-backup-actions button:disabled {
+  opacity: 0.55;
+  cursor: default;
+}
+
+.file-backups-settings-hint {
+  color: var(--muted-strong);
+}
+
+@media (max-width: 560px) {
+  .file-backup-open > span {
+    display: none;
+  }
+}
+
+/* The notice over the browser's designs, louder the longer the last full backup lies back. */
+.browser-backup-note.overdue {
+  color: #4a2a00;
+  background: #ffe2b8;
+  border-color: #d9730d;
+  border-width: 3px;
+}
+
+.browser-backup-note.urgent {
+  color: #5c1210;
+  background: #ffe0dd;
+  border-color: #c62828;
+  border-width: 3px;
+}
+
+.browser-backup-note.urgent > svg {
+  color: #c62828;
+}
+
+.browser-backup-now {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: 6px;
+  min-height: 34px;
+  padding: 0 12px;
+  color: #ffffff;
+  font: inherit;
+  font-size: 14px;
+  background: #d9730d;
+  border: 0;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.browser-backup-note.urgent .browser-backup-now {
+  background: #c62828;
+}
+
+.browser-backup-now:hover,
+.browser-backup-now:focus-visible {
+  filter: brightness(1.08);
+}
+
+html[data-theme="dark"] .browser-backup-note.overdue {
+  color: #ffd9a8;
+  background: #3d2a12;
+  border-color: #f0923a;
+}
+
+html[data-theme="dark"] .browser-backup-note.urgent {
+  color: #ffd2cd;
+  background: #42181a;
+  border-color: #ef5350;
+}
+
+html[data-theme="dark"] .browser-backup-note.urgent > svg {
+  color: #ef5350;
+}
+
+/* "Your designs, your backup": said once, kindly, until it is understood. */
+.your-backup-card {
+  display: flex;
+  gap: 14px;
+  margin: 0 0 16px;
+  padding: 16px 18px;
+  color: var(--foreground);
+  background: var(--tile);
+  border: 2px solid var(--primary);
+  border-radius: 12px;
+}
+
+.your-backup-card > svg {
+  flex: none;
+  color: var(--primary);
+}
+
+.your-backup-card strong {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 17px;
+}
+
+.your-backup-card p {
+  margin: 6px 0 10px;
+  line-height: 1.55;
+}
+
+.your-backup-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.your-backup-actions button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 34px;
+  padding: 0 14px;
+  color: var(--foreground);
+  font: inherit;
+  background: var(--panel);
+  border: 1px solid var(--border-strong);
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.your-backup-actions .your-backup-now {
+  color: #ffffff;
+  background: var(--primary);
+  border-color: var(--primary);
+}
+
+/* The Backups page in the settings. */
+.workspace-backup-settings {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.workspace-backup-hint {
+  margin: -2px 0 8px;
+  color: var(--muted-strong);
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.workspace-backup-folder,
+.workspace-backup-usage {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 10px 0 0;
+  border-top: 1px solid var(--border);
+}
+
+.workspace-backup-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.workspace-backup-buttons button {
+  min-height: 32px;
+  padding: 0 12px;
+  color: var(--foreground);
+  background: var(--panel);
+  border: 1px solid var(--border-strong);
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.workspace-backup-buttons button:disabled {
+  opacity: 0.55;
+  cursor: default;
+}
+
+/* On a phone the text keeps the full width and the button goes below it. */
+@media (max-width: 600px) {
+  .browser-backup-note.overdue,
+  .browser-backup-note.urgent {
+    flex-wrap: wrap;
+  }
+
+  .browser-backup-note.overdue > span,
+  .browser-backup-note.urgent > span {
+    flex-basis: calc(100% - 40px);
+  }
+
+  .browser-backup-now {
+    margin-left: 36px;
+  }
+
+  .your-backup-card {
+    padding: 14px;
+  }
+}

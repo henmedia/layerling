@@ -11,6 +11,27 @@ Si vous revenez à la page de démarrage à partir d'un dessin ne contenant rien
 
 Cela a un inconvénient : quiconque efface l'espace de stockage du navigateur ou passe à un autre ordinateur perd les dessins. **Alors sauvegardez le travail important dans un fichier.**
 
+## Vos dessins, votre sauvegarde
+
+Vos dessins sont dans ce navigateur, sur votre ordinateur. Comme pour toutes les données, seul ce qui existe une seconde fois à un autre endroit est en sécurité : un disque qui lâche, un nouveau PC, des données du navigateur effacées ou un bug, et sans sauvegarde le travail est perdu. Cette sauvegarde vous revient ; aucun logiciel ne peut la faire à votre place. layerling la rend facile : {{ui:dashboard.backupAll}} sur la page d'accueil met tous les dessins dans un seul fichier en un clic (voir plus bas). Gardez ce fichier sur une clé USB, dans un dossier cloud ou sur un NAS, après chaque séance importante.
+
+layerling vous le rappelle. La ligne au-dessus des dessins de ce navigateur devient plus visible à mesure que le dernier {{ui:dashboard.backupAll}} s'éloigne : avec le bouton {{ui:backups.backUpNow}} dès qu'il dépasse les jours réglés sous {{ui:backups.reminderDays}} (7 au départ) et que des dessins ont changé depuis, et en rouge s'il y a plus de trois dessins sans aucune sauvegarde, ou aucune depuis 30 jours. L'éditeur le rappelle une fois par jour dans la ligne d'état, avec le même bouton. Les sauvegardes automatiques ci-dessous ne comptent pas ici : elles sont sur le même ordinateur.
+
+## Versions précédentes
+
+layerling garde aussi de lui-même deux sortes de sauvegardes :
+
+- **Avant d'écraser un fichier.** Quand [[Ctrl]]+[[S]] ou {{ui:export.saveProject}} écrit dans un fichier `.lyl` qui existe déjà (Chrome et Edge, voir plus bas), le fichier tel qu'il était est d'abord gardé. Un fichier inchangé depuis sa dernière sauvegarde n'est pas gardé deux fois.
+- **États pendant le travail.** Pendant que vous travaillez sur un dessin, un état en est gardé toutes les 10 minutes, mais seulement si quelque chose a changé ; les six derniers de chaque dessin restent.
+
+{{ui:backups.title}} les liste : dans l'éditeur, dans la fenêtre d'export sous **LYL** et dans la recherche de commandes ; sur la page d'accueil, à côté de {{ui:dashboard.restoreBackup}}, pour tous les dessins ; et dans le menu d'un dessin pour celui-ci. Chacune montre son image, l'heure, le type, le nom et la taille. {{ui:backups.open}} ouvre la version comme nouveau dessin : le dessin ouvert reste tel quel, et le nouveau n'est pas lié au fichier d'origine, donc l'enregistrer n'écrase jamais ce fichier. Le bouton de téléchargement enregistre la version comme fichier `.lyl`, la corbeille la supprime.
+
+Dans les réglages (la roue dentée du ruban), la page {{ui:backups.settingsTitle}} règle combien de versions précédentes d'un fichier sont gardées (aucune à 20, 5 au départ), à quelle fréquence un état est gardé (jamais, toutes les 10 ou toutes les 30 minutes) et quand les rappels commencent. Ces réglages appartiennent à ce navigateur, pas à un dessin. Toutes les sauvegardes ensemble occupent au plus 500 Mo ; au-delà, les états les plus anciens partent en premier.
+
+**Dossier de sauvegarde (Chrome et Edge).** Sous {{ui:backups.folder}}, vous pouvez choisir un dossier sur votre ordinateur. Chaque sauvegarde y va alors aussi comme fichier `.lyl` nommé d'après le dessin et l'heure, par exemple `Support 2026-11-11 20-31-05.lyl`, un état avec ` auto` avant l'extension. Les anciennes y disparaissent comme dans le navigateur ; rien d'autre dans le dossier n'est touché. Après un rechargement, le navigateur redemande l'autorisation au premier enregistrement ; un état gardé avant reste dans le navigateur, et le message propose {{ui:backups.allowFolder}}. Un dossier synchronisé avec le cloud ou sur un autre disque est aussi un second endroit.
+
+Les sauvegardes du navigateur disparaissent avec les données du navigateur. C'est pourquoi elles ne remplacent pas {{ui:dashboard.backupAll}}.
+
 ## Des dossiers pour vos dessins
 
 Avec des dizaines de dessins, une seule liste ne suffit plus. Sur la page d'accueil, {{ui:shared.newFolder}} crée un dossier pour les dessins de ce navigateur ; un clic sur le dossier l'ouvre. Un dossier peut contenir des dossiers.

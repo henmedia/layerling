@@ -11,6 +11,27 @@ Gehst du von einem Entwurf, in dem nichts liegt, zurück zur Startseite, fragt l
 
 Das hat eine Kehrseite: Wer den Browserspeicher löscht oder auf einen anderen Rechner wechselt, verliert die Entwürfe. **Sichere deshalb wichtige Arbeiten in eine Datei.**
 
+## Deine Daten, deine Sicherung
+
+Deine Entwürfe liegen in diesem Browser auf deinem Rechner. Wie bei allen Daten gilt: Sicher ist nur, was es ein zweites Mal an einem anderen Ort gibt. Eine defekte Festplatte, ein neuer PC, gelöschte Browserdaten oder ein Fehler im Programm, und ohne Sicherung ist die Arbeit weg. Um diese Sicherung kümmerst du dich selbst, das kann dir keine Software abnehmen. layerling macht es dir leicht: {{ui:dashboard.backupAll}} auf der Startseite packt mit einem Klick alle Entwürfe in eine Datei (siehe unten). Leg sie am besten auf einen USB-Stick, in einen Cloud-Ordner oder auf ein NAS, nach jeder größeren Sitzung.
+
+layerling erinnert dich daran. Die Zeile über den Entwürfen dieses Browsers wird deutlicher, je länger das letzte {{ui:dashboard.backupAll}} zurückliegt: mit dem Knopf {{ui:backups.backUpNow}}, sobald es älter ist als die Tage unter {{ui:backups.reminderDays}} (anfangs 7) und sich seitdem Entwürfe geändert haben, und in Rot, wenn es bei mehr als drei Entwürfen noch gar keine Sicherung gibt oder 30 Tage lang keine. Der Editor erinnert einmal am Tag in der Statuszeile, mit demselben Knopf. Die automatischen Sicherungen unten zählen hier nicht: Sie liegen auf demselben Rechner.
+
+## Frühere Fassungen
+
+layerling legt außerdem von selbst zwei Arten von Sicherungen an:
+
+- **Vor dem Überschreiben.** Schreibt [[Ctrl]]+[[S]] oder {{ui:export.saveProject}} in eine `.lyl`-Datei, die es schon gibt (Chrome und Edge, siehe unten), bleibt die Datei vorher so, wie sie war. Eine Datei, die sich seit ihrer letzten Sicherung nicht geändert hat, wird nicht doppelt behalten.
+- **Zwischenstände beim Arbeiten.** Während du an einem Entwurf arbeitest, bleibt alle 10 Minuten ein Stand davon, aber nur, wenn sich etwas geändert hat; je Entwurf bleiben die letzten sechs.
+
+{{ui:backups.title}} listet sie auf: im Editor im Exportfenster unter **LYL** und in der Befehlssuche, auf der Startseite neben {{ui:dashboard.restoreBackup}} für alle Entwürfe und im Menü eines Entwurfs für diesen. Jede zeigt Bild, Zeit, Art, Name und Größe. {{ui:backups.open}} öffnet die Fassung als neuen Entwurf: Der geöffnete Entwurf bleibt, wie er ist, und der neue hängt nicht an der ursprünglichen Datei, Speichern überschreibt sie also nie. Der Download-Knopf speichert die Fassung als `.lyl`-Datei, der Papierkorb löscht sie.
+
+In den Einstellungen (das Zahnrad im Menüband) legt die Seite {{ui:backups.settingsTitle}} fest, wie viele frühere Fassungen einer Datei bleiben (keine bis 20, anfangs 5), wie oft ein Zwischenstand bleibt (nie, alle 10 oder alle 30 Minuten) und ab wann erinnert wird. Diese Einstellungen gehören zu diesem Browser, nicht zu einem Entwurf. Alle Sicherungen zusammen belegen höchstens 500 MB; darüber fallen zuerst die ältesten Zwischenstände weg.
+
+**Sicherungsordner (Chrome und Edge).** Unter {{ui:backups.folder}} wählst du einen Ordner auf deinem Rechner. Jede Sicherung landet dann zusätzlich dort als `.lyl`-Datei mit dem Namen des Entwurfs und der Uhrzeit, etwa `Halter 2026-11-11 20-31-05.lyl`, ein Zwischenstand mit ` auto` vor der Endung. Alte fallen dort weg wie im Browser; alles andere im Ordner bleibt unberührt. Nach dem Neuladen fragt der Browser beim ersten Speichern noch einmal nach der Erlaubnis; ein Zwischenstand davor bleibt im Browser, und die Meldung bietet {{ui:backups.allowFolder}} an. Ein Ordner, der mit der Cloud abgeglichen wird oder auf einem anderen Laufwerk liegt, ist ebenfalls ein zweiter Ort.
+
+Die Sicherungen im Browser gehen mit den Browserdaten verloren. Darum ersetzen sie {{ui:dashboard.backupAll}} nicht.
+
 ## Ordner für deine Entwürfe
 
 Bei Dutzenden Entwürfen reicht eine Liste nicht mehr. Auf der Startseite legt {{ui:shared.newFolder}} einen Ordner für die Entwürfe dieses Browsers an; ein Klick auf den Ordner öffnet ihn. Ordner können Ordner enthalten.

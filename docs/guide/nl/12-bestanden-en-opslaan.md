@@ -11,6 +11,27 @@ Ga je terug naar de startpagina vanuit een ontwerp waar niets in staat, dan vraa
 
 Dat heeft een keerzijde: wie de browseropslag wist of op een andere computer verdergaat, is de ontwerpen kwijt. **Maak van belangrijk werk dus een back-up in een bestand.**
 
+## Jouw ontwerpen, jouw back-up
+
+Je ontwerpen staan in deze browser op je computer. Zoals bij alle gegevens is alleen veilig wat een tweede keer op een andere plek bestaat: een kapotte schijf, een nieuwe pc, gewiste browsergegevens of een fout in het programma, en zonder back-up is het werk weg. Die back-up is jouw zaak; geen programma kan dat voor je doen. layerling maakt het makkelijk: {{ui:dashboard.backupAll}} op de startpagina zet met één klik alle ontwerpen in één bestand (zie hieronder). Bewaar dat bestand op een usb-stick, in een cloudmap of op een NAS, na elke grotere sessie.
+
+layerling herinnert je eraan. De regel boven de ontwerpen van deze browser wordt nadrukkelijker naarmate de laatste {{ui:dashboard.backupAll}} langer geleden is: met de knop {{ui:backups.backUpNow}} zodra die ouder is dan de dagen onder {{ui:backups.reminderDays}} (eerst 7) en er sindsdien ontwerpen zijn veranderd, en in rood als er meer dan drie ontwerpen zijn zonder enige back-up, of 30 dagen geen. De editor herinnert je eens per dag in de statusregel, met dezelfde knop. De automatische back-ups hieronder tellen hier niet: ze staan op dezelfde computer.
+
+## Eerdere versies
+
+layerling maakt daarnaast vanzelf twee soorten back-ups:
+
+- **Vóór het overschrijven.** Als [[Ctrl]]+[[S]] of {{ui:export.saveProject}} in een `.lyl`-bestand schrijft dat er al is (Chrome en Edge, zie hieronder), blijft eerst het bestand bewaard zoals het was. Een bestand dat sinds zijn laatste back-up niet veranderd is, wordt niet twee keer bewaard.
+- **Tussenstanden tijdens het werken.** Terwijl je aan een ontwerp werkt, blijft er elke 10 minuten een stand van bewaard, maar alleen als er iets veranderd is; per ontwerp blijven de laatste zes.
+
+{{ui:backups.title}} toont ze: in de editor in het exportvenster onder **LYL** en in het zoeken naar opdrachten, op de startpagina naast {{ui:dashboard.restoreBackup}} voor alle ontwerpen, en in het menu van een ontwerp voor dat ene. Elke versie toont afbeelding, tijd, soort, naam en grootte. {{ui:backups.open}} opent de versie als nieuw ontwerp: het geopende ontwerp blijft zoals het is, en het nieuwe hangt niet aan het oorspronkelijke bestand, dus opslaan overschrijft dat bestand nooit. De downloadknop slaat de versie op als `.lyl`-bestand, de prullenbak verwijdert haar.
+
+In de instellingen (het tandwiel in het lint) legt de pagina {{ui:backups.settingsTitle}} vast hoeveel eerdere versies van een bestand blijven (geen tot 20, eerst 5), hoe vaak een tussenstand blijft (nooit, elke 10 of elke 30 minuten) en wanneer de herinneringen beginnen. Deze instellingen horen bij deze browser, niet bij een ontwerp. Alle back-ups samen nemen hoogstens 500 MB in beslag; daarboven gaan eerst de oudste tussenstanden weg.
+
+**Back-upmap (Chrome en Edge).** Onder {{ui:backups.folder}} kies je een map op je computer. Elke back-up komt daar dan ook als `.lyl`-bestand met de naam van het ontwerp en de tijd, bijvoorbeeld `Houder 2026-11-11 20-31-05.lyl`, een tussenstand met ` auto` voor de extensie. Oude verdwijnen daar net als in de browser; verder blijft alles in de map onaangeroerd. Na het herladen vraagt de browser bij de eerste keer opslaan opnieuw om toestemming; een tussenstand daarvoor blijft in de browser, en de melding biedt {{ui:backups.allowFolder}} aan. Een map die met de cloud wordt gesynchroniseerd of op een andere schijf staat, is ook een tweede plek.
+
+De back-ups in de browser verdwijnen met de browsergegevens. Daarom vervangen ze {{ui:dashboard.backupAll}} niet.
+
 ## Mappen voor je ontwerpen
 
 Met tientallen ontwerpen is één lijst niet genoeg. Op de startpagina maakt {{ui:shared.newFolder}} een map voor de ontwerpen in deze browser; een klik op de map opent haar. Mappen kunnen mappen bevatten.

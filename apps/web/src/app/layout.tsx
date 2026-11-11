@@ -16,6 +16,7 @@ import "./sketchImage.css";
 import "./sketchLock.css";
 import "./dashboardSelect.css";
 import "./focusMode.css";
+import "./fileBackups.css";
 import { DiagnoseStrip } from "@/components/DiagnoseStrip";
 import { HtmlSettingsRestore } from "@/components/HtmlSettingsRestore";
 import { NewVersionNotice } from "@/components/NewVersionNotice";

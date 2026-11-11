@@ -1,1 +1,12 @@
-[]
+[
+  {
+    "title": {
+      "de": "Frühere Fassungen und deine Sicherung",
+      "en": "Earlier versions, and your backup"
+    },
+    "body": {
+      "de": "Bevor Speichern eine .lyl-Datei überschreibt, behält layerling jetzt die Datei, wie sie war, und beim Arbeiten alle paar Minuten einen Zwischenstand. Unter „Frühere Fassungen“ öffnest du jede wieder als neuen Entwurf, und in den Einstellungen unter „Sicherungen“ legst du fest, wie viele bleiben und ob sie auch in einen eigenen Ordner gehen. Sie liegen aber auf demselben Rechner: Sichere deine Entwürfe weiter mit „Alle sichern“ und bewahre die Datei an einem zweiten Ort auf. Daran erinnert dich layerling jetzt deutlicher.",
+      "en": "Before Save writes over a .lyl file, layerling now keeps the file as it was, and while you work a state every few minutes. Under “Earlier versions” each opens again as a new design, and in the settings under “Backups” you choose how many stay and whether they also go into a folder of your own. They are on the same computer, though: keep backing up your designs with “Back up all” and store the file in a second place. layerling now reminds you of that more clearly."
+    }
+  }
+]

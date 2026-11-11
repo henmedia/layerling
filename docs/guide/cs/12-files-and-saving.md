@@ -11,6 +11,27 @@ Při návratu z prázdného projektu se program zeptá, zda jej ponechat. {{ui:c
 
 Nevýhodou je ztráta projektů při vymazání úložiště prohlížeče nebo přechodu na jiný počítač. **Důležitou práci proto zálohujte do souboru.**
 
+## Vaše návrhy, vaše záloha
+
+Vaše návrhy jsou v tomto prohlížeči ve vašem počítači. Jako u všech dat platí: v bezpečí je jen to, co existuje podruhé na jiném místě. Vadný disk, nový počítač, smazaná data prohlížeče nebo chyba programu a bez zálohy je práce pryč. O tuto zálohu se staráte sami; žádný program to za vás neudělá. layerling to usnadňuje: {{ui:dashboard.backupAll}} na úvodní stránce jedním kliknutím uloží všechny návrhy do jednoho souboru (viz níže). Ten soubor uchovávejte na flash disku, ve složce v cloudu nebo na NAS, po každé větší práci.
+
+layerling vám to připomene. Řádek nad návrhy tohoto prohlížeče je tím výraznější, čím déle je poslední {{ui:dashboard.backupAll}}: s tlačítkem {{ui:backups.backUpNow}}, jakmile je starší než dny nastavené v {{ui:backups.reminderDays}} (zpočátku 7) a návrhy se od té doby změnily, a červeně, když jsou víc než tři návrhy bez jakékoli zálohy nebo 30 dní žádná. Editor připomíná jednou denně ve stavovém řádku se stejným tlačítkem. Automatické zálohy níže se tu nepočítají: jsou na stejném počítači.
+
+## Dřívější verze
+
+layerling navíc sám vytváří dva druhy záloh:
+
+- **Před přepsáním souboru.** Když [[Ctrl]]+[[S]] nebo {{ui:export.saveProject}} zapisuje do souboru `.lyl`, který už existuje (Chrome a Edge, viz níže), nejprve se ponechá soubor, jak byl. Soubor, který se od poslední zálohy nezměnil, se neponechává dvakrát.
+- **Průběžné stavy při práci.** Při práci na návrhu se každých 10 minut ponechá jeho stav, ale jen když se něco změnilo; u každého návrhu zůstane posledních šest.
+
+{{ui:backups.title}} je vypíše: v editoru v okně exportu pod **LYL** a ve vyhledávání příkazů, na úvodní stránce vedle {{ui:dashboard.restoreBackup}} pro všechny návrhy a v nabídce návrhu pro ten jeden. Každá ukazuje obrázek, čas, druh, název a velikost. {{ui:backups.open}} otevře verzi jako nový návrh: otevřený návrh zůstane, jak je, a nový není svázaný s původním souborem, takže jeho uložení ten soubor nikdy nepřepíše. Tlačítko stažení uloží verzi jako soubor `.lyl`, koš ji smaže.
+
+V nastavení (ozubené kolo na pásu karet) stránka {{ui:backups.settingsTitle}} určuje, kolik dřívějších verzí souboru zůstane (žádná až 20, zpočátku 5), jak často se ponechá stav (nikdy, každých 10 nebo 30 minut) a odkdy připomínat. Tato nastavení patří tomuto prohlížeči, ne návrhu. Všechny zálohy dohromady zaberou nejvýš 500 MB; nad tím odpadají nejdřív nejstarší stavy.
+
+**Složka záloh (Chrome a Edge).** V {{ui:backups.folder}} můžete zvolit složku ve svém počítači. Každá záloha pak jde také tam jako soubor `.lyl` s názvem návrhu a časem, například `Držák 2026-11-11 20-31-05.lyl`, stav s ` auto` před příponou. Staré tam odpadají jako v prohlížeči; ničeho jiného ve složce se to nedotkne. Po znovunačtení se prohlížeč při prvním uložení znovu zeptá na povolení; stav ponechaný předtím zůstane v prohlížeči a zpráva nabídne {{ui:backups.allowFolder}}. Složka synchronizovaná s cloudem nebo na jiném disku je také druhé místo.
+
+Zálohy v prohlížeči zmizí s daty prohlížeče. Proto nenahrazují {{ui:dashboard.backupAll}}.
+
 ## Složky pro projekty
 
 Při desítkách projektů jeden seznam nestačí. Na úvodní stránce vytvoří {{ui:shared.newFolder}} složku pro projekty tohoto prohlížeče; kliknutím na složku ji otevřete. Složky mohou obsahovat další složky.

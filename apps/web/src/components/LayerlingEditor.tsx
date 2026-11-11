@@ -121,6 +121,7 @@ import { NO_SPLIT_ROTATION, modelSplitPlane, snapSplitPositionToVertices, splitO
 import { connectorHoleRadius, normalizeSplitConnectorOptions, splitConnectorDefaults, SPLIT_CONNECTOR_KINDS, type SplitConnectorOptions } from "@/lib/splitConnectors";
 import { AttachmentViewer } from "./workplane/AttachmentViewer";
 import { GuideModal } from "./workplane/GuideModal";
+import { FileBackupsDialog, fileBackupName } from "@/components/FileBackupsDialog";
 import { HistoryViewOverlay, historyStateNameSuffix } from "./workplane/HistoryViewOverlay";
 import { useHistoryViewPicking } from "./workplane/useHistoryViewPicking";
 import { ShortcutsModal } from "./workplane/ShortcutsModal";
@@ -187,6 +188,8 @@ import { projectThumbnailPngBytes } from "@/lib/backupDownload";
 import { isBuildMessage, reportWorkerBuild } from "@/lib/buildStamp";
 import { createKernelGate, isKernelStatusMessage, warmKernelMessage, type KernelGate } from "@/lib/cadKernelGate";
 import { ensureLylFileWritable, forgetLylFile, forgetStlFile, linkedLylFile, linkedStlFile, lylFileAccessSupported, pickLylFileToOpen, pickLylFileToSave, pickStlFileToSave, rememberLylFile, rememberStlFile, writeLylFile, type LylFileHandle } from "@/lib/lylFileAccess";
+import { addFileBackup, allowBackupFolder, fileBackupsOfDesign, listFileBackups, OPEN_FILE_BACKUPS_EVENT, readFileBackupBytes, readFileBackupSettings } from "@/lib/fileBackups";
+import { backupFileBeforeOverwrite, takeEditorBackupReminder } from "@/components/workplane/fileBackupEditor";
 import { copyNamePatterns, shapeNamesIn, withCopyName } from "@/lib/shapeCopyName";
 import { clipboardShape, displayShapeName, hasOwnShapeName, iconTagAsset, qrCodeAsset, makeShapeFromAsset, nameTagAsset, sbcBoardAsset, shapeAssetLabel, toolbarShapeAssets } from "@/lib/shapeCatalog";
 import { storeRecentShape } from "@/lib/shapeLibrarySections";
@@ -312,6 +315,7 @@ const HISTORY_VIEW_MCP_ACTIONS = new Set([
   "set_history_view",
   "restore_from_history",
   "clear_history",
+  "list_backups",
   // Reading a design's files, as Download in the attachments panel still works there (#820).
   ...ATTACHMENT_MCP_READ_ACTIONS,
 ]);
@@ -3040,6 +3044,7 @@ export function LayerlingEditor({
   initialPlacementWorkplane,
   onHome,
   onOpenLylProjectFile,
+  onBackUpAllDesigns,
   onSaveSharedProject,
   onSaveExportFile,
   serverFileName = null,
@@ -3072,7 +3077,9 @@ export function LayerlingEditor({
   initialPlacementElevation?: number;
   initialPlacementWorkplane?: PlacementWorkplane;
   onHome?: (leaving: { itemCount: number }) => void;
-  onOpenLylProjectFile?: (file: File, shared?: undefined, fileHandle?: LylFileHandle) => Promise<{ ok: boolean; message: string } | void> | { ok: boolean; message: string } | void;
+  onOpenLylProjectFile?: (file: File, shared?: undefined, fileHandle?: LylFileHandle, options?: { name?: string }) => Promise<{ ok: boolean; message: string } | void> | { ok: boolean; message: string } | void;
+  /** "Back up all" of the start page, for the reminder in the status line; it starts with the save dialog. */
+  onBackUpAllDesigns?: () => void;
   onSaveSharedProject?: (request: { exportName: string; bytes: Uint8Array; thumbnailDataUrl: string; targetFileName?: string }) => Promise<string>;
   /** An export file put into the server folder instead of the downloads (#779). Resolves to the notice; a file that is there already rejects with `exists`. */
   onSaveExportFile?: (request: { fileName: string; blob: Blob; overwrite?: boolean }) => Promise<string>;
@@ -3241,6 +3248,13 @@ export function LayerlingEditor({
     if (!editorOpen) setInteractiveHelp(false);
   }, [editorOpen]);
   const [guideOpen, setGuideOpen] = useState(false);
+  // "Earlier versions": the automatic backups of this design, from the export window, the command search or a notice.
+  const [backupsOpen, setBackupsOpen] = useState(false);
+  useEffect(() => {
+    const show = () => setBackupsOpen(true);
+    window.addEventListener(OPEN_FILE_BACKUPS_EVENT, show);
+    return () => window.removeEventListener(OPEN_FILE_BACKUPS_EVENT, show);
+  }, []);
   /**
    * The attachment open in the viewer (#820), by id. The viewer is drawn from the attachment that has
    * this id now, so it shows a replaced file's new content and goes away when the file does.
@@ -13129,6 +13143,38 @@ export function LayerlingEditor({
         return { selectedIds: validIds, objects: currentShapes().filter((shape) => validIds.includes(shape.id)).map(mcpShapeSummary) };
       }
 
+      if (command.action === "list_backups") {
+        // "Earlier versions": the open design's backups, or every one of this browser with all: true.
+        const openId = projectInfoRef.current.projectId ?? null;
+        const backups = params.all === true ? await listFileBackups() : await fileBackupsOfDesign(openId, linkedLylFile(openId ?? ""));
+        return {
+          scope: params.all === true ? "all" : "design",
+          backups: backups.map((backup) => ({
+            id: backup.id,
+            kind: backup.kind,
+            createdAt: new Date(backup.createdAt).toISOString(),
+            name: fileBackupName(backup),
+            fileName: backup.fileName,
+            projectId: backup.projectId,
+            size: backup.size,
+          })),
+        };
+      }
+
+      if (command.action === "open_backup") {
+        // As Open in Earlier versions: a new design, never tied to the original file.
+        const id = typeof params.id === "string" ? params.id : "";
+        const backup = (await listFileBackups()).find((entry) => entry.id === id);
+        if (!backup) throw new Error("There is no backup with this id; layerling_list_backups lists them");
+        const bytes = await readFileBackupBytes(backup.id);
+        if (!bytes) throw new Error("The backup's file is missing from this browser");
+        if (!onOpenLylProjectFile) throw new Error(t("status.lylUnavailable"));
+        const name = t("backups.openedName", { name: fileBackupName(backup), when: new Date(backup.createdAt).toLocaleString(undefined, { dateStyle: "medium", timeStyle: "short" }) });
+        const result = await onOpenLylProjectFile(new File([bytes as unknown as ArrayBuffer], `${name}.lyl`, { type: LYL_MEDIA_TYPE }), undefined, undefined, { name });
+        if (result && result.ok === false) throw new Error(result.message);
+        return { opened: name, kind: backup.kind, createdAt: new Date(backup.createdAt).toISOString() };
+      }
+
       if (command.action === "rename_project") {
         // As the pencil beside the project name does (Discussion #1483): trimmed, at most 80 characters, never empty.
         const name = typeof params.name === "string" ? params.name.trim().slice(0, 80) : "";
@@ -17187,6 +17233,9 @@ export function LayerlingEditor({
             fileHandle = await pickLylFileToSave(projectExportFileName(exportName, "lyl"));
             pickedNewFile = true;
           }
+          // The backup folder may need the browser's permission again after a reload, and it is asked only while
+          // the key press or click still counts: now, before anything slow.
+          if (fileHandle && readFileBackupSettings().overwriteCount > 0) await allowBackupFolder().catch(() => false);
           // Closed without a choice: nothing is written, and the status line says so (a browser also reports a
           // dialog it could not use as closed; staying silent left people wondering where the file went).
           // The browser cannot tell a closed dialog from a file it would not hand over, and on some PCs the
@@ -17243,6 +17292,9 @@ export function LayerlingEditor({
       if (target === "shared" && onSaveSharedProject) {
         setNotice(await onSaveSharedProject({ exportName: exportName.trim() || projectName, bytes, thumbnailDataUrl }));
       } else if (fileHandle) {
+        // The file as it is on the disk stays as a backup before it is written over; a backup that fails does not
+        // stop the save.
+        const backup = await backupFileBeforeOverwrite(fileHandle, { projectId: projectId || null, projectName });
         try {
           await writeLylFile(fileHandle, bytes);
         } catch {
@@ -17256,14 +17308,28 @@ export function LayerlingEditor({
         const fileStem = fileHandle.name.replace(/\.(lyl|skf)$/i, "").trim();
         const offerRename = pickedNewFile && onProjectNameChange && fileStem
           && fileHandle.name !== projectExportFileName(projectName, "lyl");
+        const backupNote = backup.failed
+          ? t("status.previousVersionNotKept")
+          : backup.kept
+            ? t("status.previousVersionKept", { button: t("backups.title") })
+            : "";
+        const folderNote = backup.folder === "noPermission"
+          ? t("status.backupFolderNeedsPermission")
+          : backup.folder === "failed" ? t("status.backupFolderFailed") : "";
+        const savedText = [t("status.savedToFile", { name: fileHandle.name }), backupNote, folderNote].filter(Boolean).join(" ");
         setNotice(
-          t("status.savedToFile", { name: fileHandle.name }),
-          Boolean(offerRename),
+          savedText,
+          Boolean(offerRename) || Boolean(folderNote),
           offerRename ? {
             label: t("status.renameDraftToFile"),
             run: () => {
               onProjectNameChange(fileStem);
               setNotice(t("status.draftRenamedToFile", { name: fileStem }));
+            },
+          } : backup.folder === "noPermission" ? {
+            label: t("backups.allowFolder"),
+            run: () => {
+              void allowBackupFolder().then((allowed) => setNotice(t(allowed ? "backups.folderAllowed" : "backups.folderNotAllowed")));
             },
           } : null,
         );
@@ -17285,6 +17351,92 @@ export function LayerlingEditor({
   saveDesignRef.current = () => {
     void exportLylDesign(projectName, workspaceSettingsRef.current.historyLimit, lylFileAccessSupported() ? "file" : "download");
   };
+
+  /**
+   * A state of the design every few minutes while it is worked on, among the automatic backups ("Earlier versions"):
+   * taken only when something changed since the last one, never during a drag, a save or in the History view, and
+   * when the browser is idle. One that fails is tried again on the next round. The same change asks, once a day at
+   * most, to back up all designs into a file (the backups here are in the same browser, not a second place).
+   */
+  const lylExportingRef = useRef(lylExporting);
+  lylExportingRef.current = lylExporting;
+  const snapshotSourceRef = useRef<{ shapes: unknown; notes: unknown } | null>(null);
+  const snapshotAtRef = useRef(0);
+  const snapshotRunningRef = useRef(false);
+  const backupFolderAskedRef = useRef(false);
+  const onBackUpAllDesignsRef = useRef(onBackUpAllDesigns);
+  onBackUpAllDesignsRef.current = onBackUpAllDesigns;
+  const takeSnapshotRef = useRef<() => Promise<void>>(async () => undefined);
+  takeSnapshotRef.current = async () => {
+    const snapshotProjectId = projectInfoRef.current.projectId;
+    if (!snapshotProjectId) return;
+    const exportedHistory = editorHistoryForExport(historyRef.current, historyIndexRef.current, workspaceSettingsRef.current.historyLimit);
+    const bytes = await exportLylProject({
+      projectId: snapshotProjectId,
+      projectName,
+      createdAt: projectCreatedAt,
+      modifiedAt: Date.now(),
+      extraFiles: lylThumbnailFiles(await projectThumbnailPngBytes(await capturedDesignPicture())),
+      shapes: shapesRef.current,
+      notes: notesRef.current,
+      history: exportedHistory.entries,
+      historyIndex: exportedHistory.index,
+      assets: projectAssetsRef.current,
+      attachments: projectAttachmentsRef.current,
+      workspace: workspaceSettingsRef.current,
+      snapGrid,
+      placementElevation,
+      placementWorkplane,
+      sketchPlacementWorkplane: placementWorkplane,
+    });
+    const result = await addFileBackup({ kind: "snapshot", bytes, projectId: snapshotProjectId, projectName });
+    // The folder wants its permission again: asked once per session, with a button, since only a click may grant it.
+    if (result.folder === "noPermission" && !backupFolderAskedRef.current) {
+      backupFolderAskedRef.current = true;
+      setNotice(t("status.backupFolderNeedsPermission"), "stay", {
+        label: t("backups.allowFolder"),
+        run: () => void allowBackupFolder().then((allowed) => setNotice(t(allowed ? "backups.folderAllowed" : "backups.folderNotAllowed"))),
+      });
+    }
+  };
+  useEffect(() => {
+    if (!editorOpen) return;
+    // The design as it opened is no change; the first snapshot comes after the first minutes of work.
+    snapshotSourceRef.current = { shapes: shapesRef.current, notes: notesRef.current };
+    snapshotAtRef.current = Date.now();
+    const timer = window.setInterval(() => {
+      const source = { shapes: shapesRef.current, notes: notesRef.current };
+      const previous = snapshotSourceRef.current;
+      if (previous && previous.shapes === source.shapes && previous.notes === source.notes) return;
+      if (projectInteractionActiveRef.current || lylExportingRef.current || historyViewStateRef.current) return;
+      const reminder = takeEditorBackupReminder();
+      if (reminder) {
+        const backUpAll = onBackUpAllDesignsRef.current;
+        setNotice(
+          reminder.never ? t("backups.reminderNever") : t("backups.reminderAfterDays", { days: reminder.days }),
+          "stay",
+          backUpAll ? { label: t("backups.backUpNow"), run: backUpAll } : null,
+        );
+      }
+      const minutes = readFileBackupSettings().snapshotMinutes;
+      if (minutes <= 0 || snapshotRunningRef.current || Date.now() - snapshotAtRef.current < minutes * 60_000) return;
+      snapshotRunningRef.current = true;
+      const run = () => {
+        void takeSnapshotRef.current()
+          .then(() => {
+            snapshotSourceRef.current = source;
+            snapshotAtRef.current = Date.now();
+          })
+          .catch(() => undefined)
+          .finally(() => {
+            snapshotRunningRef.current = false;
+          });
+      };
+      if (typeof window.requestIdleCallback === "function") window.requestIdleCallback(run, { timeout: 10_000 });
+      else run();
+    }, 30_000);
+    return () => window.clearInterval(timer);
+  }, [editorOpen, projectId, setNotice]);
 
   /** The open button of the export dialog: a file dialog where there is one, the usual file field elsewhere. */
   const pickProjectFile = useCallback(async () => {
@@ -19787,6 +19939,13 @@ export function LayerlingEditor({
       {interactiveHelp ? <InteractiveHelp onExit={toggleInteractiveHelp} /> : null}
       {viewedAttachment ? <AttachmentViewer attachment={viewedAttachment} onClose={() => setViewedAttachmentId(null)} /> : null}
       {guideOpen ? <GuideModal sharedStore={sharedProjectsEnabled} sketchMode={toolbarMode === "sketch"} onClose={() => setGuideOpen(false)} /> : null}
+      {backupsOpen ? (
+        <FileBackupsDialog
+          scope={{ projectId: projectInfoRef.current.projectId ?? null, fileHandle: linkedLylFile(projectInfoRef.current.projectId ?? ""), name: projectName }}
+          onOpen={(file, name) => onOpenLylProjectFile?.(file, undefined, undefined, { name })}
+          onClose={() => setBackupsOpen(false)}
+        />
+      ) : null}
       {notice ? (
         <p className="editor-status" role="status" aria-live="polite" onMouseEnter={holdNotice} onMouseLeave={releaseNotice}>
           <span className="editor-status-text">{notice}</span>
