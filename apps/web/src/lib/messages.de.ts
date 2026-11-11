@@ -385,7 +385,7 @@ export const MESSAGES_DE: Record<MessageKey, string> = {
   "installHint.ios": "In Safari: Teilen-Symbol → „Zum Home-Bildschirm“.",
   "installHint.firefox": "Firefox kann keine Apps installieren – offline startet layerling hier trotzdem im Tab.",
   "welcome.moreLanguagesTitle": "Deine Sprache",
-  "welcome.moreLanguagesBody": "das Programm und seine Anleitung gibt es auf Englisch, Deutsch und in 17 weiteren Sprachen; die Sprachliste steht ganz oben rechts und in den Einstellungen auf der Startseite.",
+  "welcome.moreLanguagesBody": "das Programm und seine Anleitung gibt es auf Englisch, Deutsch und in 18 weiteren Sprachen; die Sprachliste steht ganz oben rechts und in den Einstellungen auf der Startseite.",
   "welcome.moreOfflineTitle": "Ohne Internet",
   "welcome.moreOfflineBody": "nach dem ersten Besuch startet layerling auch offline - installiert wie ein normales Programm, die Entwürfe bleiben auf deinem Rechner.",
   "welcome.moreAiTitle": "Mit KI bauen",

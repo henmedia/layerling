@@ -386,7 +386,7 @@ export const MESSAGES_EN = {
   "installHint.ios": "In Safari: Share icon → “Add to Home Screen”.",
   "installHint.firefox": "Firefox cannot install apps – layerling still starts offline here in the tab.",
   "welcome.moreLanguagesTitle": "Your language",
-  "welcome.moreLanguagesBody": "the program and its guide speak English, German and 17 more languages; the language list is at the very top right, and in the settings on the start page.",
+  "welcome.moreLanguagesBody": "the program and its guide speak English, German and 18 more languages; the language list is at the very top right, and in the settings on the start page.",
   "welcome.moreOfflineTitle": "Works offline",
   "welcome.moreOfflineBody": "after the first visit layerling also starts without internet - install it like a normal program, your designs stay on your computer.",
   "welcome.moreAiTitle": "Build with AI",

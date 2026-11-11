@@ -380,7 +380,7 @@ export const MESSAGES_FR: Partial<Record<MessageKey, string>> = {
   "installHint.ios": "Dans Safari : icône Partager → « Ajouter à l'écran d'accueil ».",
   "installHint.firefox": "Firefox ne peut pas installer d'applications – le layering démarre toujours hors ligne ici dans l'onglet.",
   "welcome.moreLanguagesTitle": "Votre langue",
-  "welcome.moreLanguagesBody": "le programme et son guide parlent anglais, allemand et 17 autres langues ; la liste des langues se trouve tout en haut à droite et dans les réglages de la page d'accueil.",
+  "welcome.moreLanguagesBody": "le programme et son guide parlent anglais, allemand et 18 autres langues ; la liste des langues se trouve tout en haut à droite et dans les réglages de la page d'accueil.",
   "welcome.moreOfflineTitle": "Fonctionne hors ligne",
   "welcome.moreOfflineBody": "après la première visite, le layerling démarre également sans Internet - installez-le comme un programme normal, vos créations restent sur votre ordinateur.",
   "welcome.moreAiTitle": "Construire avec l'IA",

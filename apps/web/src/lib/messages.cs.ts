@@ -537,7 +537,7 @@ export const MESSAGES_CS: Record<MessageKey, string> = {
   "installHint.ios": "V Safari: ikona Sdílet → „Přidat na plochu“.",
   "installHint.firefox": "Firefox neumí instalovat aplikace. Layerling zde přesto funguje bez internetu v kartě.",
   "welcome.moreLanguagesTitle": "Jazyk",
-  "welcome.moreLanguagesBody": "program i jeho návod mluví anglicky, německy a dalšími 17 jazyky; seznam jazyků je úplně vpravo nahoře a v nastavení na úvodní stránce.",
+  "welcome.moreLanguagesBody": "program i jeho návod mluví anglicky, německy a dalšími 18 jazyky; seznam jazyků je úplně vpravo nahoře a v nastavení na úvodní stránce.",
   "welcome.moreOfflineTitle": "Funguje bez internetu",
   "welcome.moreOfflineBody": "po první návštěvě se layerling spustí i bez internetu. Nainstalujte jej jako běžný program; projekty zůstávají na vašem počítači.",
   "welcome.moreAiTitle": "Modelování s AI",

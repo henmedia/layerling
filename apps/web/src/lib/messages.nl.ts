@@ -385,7 +385,7 @@ export const MESSAGES_NL: Record<MessageKey, string> = {
   "installHint.ios": "In Safari: deelknop → “Zet op beginscherm”.",
   "installHint.firefox": "Firefox kan geen apps installeren – layerling start hier in het tabblad toch offline.",
   "welcome.moreLanguagesTitle": "Jouw taal",
-  "welcome.moreLanguagesBody": "het programma en de handleiding spreken Engels, Duits en 17 andere talen; de taallijst staat helemaal rechtsboven en in de instellingen op de startpagina.",
+  "welcome.moreLanguagesBody": "het programma en de handleiding spreken Engels, Duits en 18 andere talen; de taallijst staat helemaal rechtsboven en in de instellingen op de startpagina.",
   "welcome.moreOfflineTitle": "Werkt offline",
   "welcome.moreOfflineBody": "na het eerste bezoek start layerling ook zonder internet - installeer het als een gewoon programma, je ontwerpen blijven op je computer.",
   "welcome.moreAiTitle": "Bouwen met AI",

@@ -326,7 +326,7 @@ export const MESSAGES_PT_BR: Partial<Record<MessageKey, string>> = {
   "installHint.ios": "No Safari: ícone Compartilhar → “Adicionar à Tela de Início”.",
   "installHint.firefox": "O Firefox não instala apps – mas aqui na aba layerling também abre offline.",
   "welcome.moreLanguagesTitle": "Seu idioma",
-  "welcome.moreLanguagesBody": "o programa e o guia falam inglês, alemão e mais 17 idiomas; a lista de idiomas fica bem no alto, à direita, e também nas configurações da página inicial.",
+  "welcome.moreLanguagesBody": "o programa e o guia falam inglês, alemão e mais 18 idiomas; a lista de idiomas fica bem no alto, à direita, e também nas configurações da página inicial.",
   "welcome.moreOfflineTitle": "Funciona offline",
   "welcome.moreOfflineBody": "depois da primeira visita, abre também sem internet - instale como um programa normal, e seus projetos ficam no seu computador.",
   "welcome.moreAiTitle": "Construa com IA",

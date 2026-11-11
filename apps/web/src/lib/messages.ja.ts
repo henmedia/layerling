@@ -307,7 +307,7 @@ export const MESSAGES_JA: Partial<Record<MessageKey, string>> = {
   "installHint.ios": "Safariの場合: 共有アイコン → 「ホーム画面に追加」。",
   "installHint.firefox": "Firefoxではアプリをインストールできません。それでもlayerlingはこのタブでオフラインでも起動します。",
   "welcome.moreLanguagesTitle": "あなたの言葉で",
-  "welcome.moreLanguagesBody": "このプログラムとガイドは、英語、ドイツ語、ほか17の言葉で使えます。言葉の一覧は、画面のいちばん右上と、スタートページの設定にあります。",
+  "welcome.moreLanguagesBody": "このプログラムとガイドは、英語、ドイツ語、ほか18の言葉で使えます。言葉の一覧は、画面のいちばん右上と、スタートページの設定にあります。",
   "welcome.moreOfflineTitle": "オフラインで動作",
   "welcome.moreOfflineBody": "最初の訪問の後は、インターネットがなくてもlayerlingは起動します。通常のプログラムのようにインストールでき、デザインはあなたのコンピューターに残ります。",
   "welcome.moreAiTitle": "AIと一緒に作る",

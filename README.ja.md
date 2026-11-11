@@ -21,7 +21,7 @@
     <a href="#layerling-mcp-スキル"><img alt="AI で操作可能" src="https://img.shields.io/badge/AI--drivable-MCP%20server-16c0d4"></a>
   </p>
 
-  <p><a href="README.md">English</a> · <a href="README.de.md">Deutsch</a> · <a href="README.es.md">Español</a> · <a href="README.nl.md">Nederlands</a> · <a href="README.ar.md">العربية</a> · <strong>日本語</strong> · <a href="README.zh-cn.md">简体中文</a> · <a href="README.zh-tw.md">繁體中文</a></p>
+  <p><a href="README.md">English</a> · <a href="README.de.md">Deutsch</a> · <a href="README.es.md">Español</a> · <a href="README.nl.md">Nederlands</a> · <a href="README.sv.md">Svenska</a> · <a href="README.ar.md">العربية</a> · <strong>日本語</strong> · <a href="README.zh-cn.md">简体中文</a> · <a href="README.zh-tw.md">繁體中文</a></p>
 </div>
 
 <p align="center">
@@ -142,7 +142,7 @@ layerling は、Tinkercad から Fusion 360 のほうへ一歩進んだところ
 - **デザインごとに 4 つの保存したビュー** – **Shift+7**、**8**、**9**、**0** で表示をそのまま（角度、パン、ズーム）保存し、キーだけを押すとその表示に戻ります。デザインごとに独自のビューを持ち、保存した `.lyl` ファイルにもいっしょに入ります。
 - **作業平面を真上から見る** – **P** キーか、ビューバーの「作業平面を配置」の隣にあるボタンで、傾いた面の上でも、原点を中央にして作業平面に正対した表示になります。
 - **ビュー方向キューブを好きな角に** – 設定 > 外観 > **「ビュー方向キューブの位置」**で、キューブを左上、右上、左下、右下のいずれかに置けます。左上以外の角にすると、ビューバーがその場所へ上がります。
-- **あなたの言語で** – プログラムとユーザーガイドは、英語、ドイツ語ほか 17 の言語で使えます。言語の一覧は右上の端にあります。
+- **あなたの言語で** – プログラムとユーザーガイドは、英語、ドイツ語ほか 18 の言語で使えます。言語の一覧は右上の端にあります。
 - **下から見る** – ビューバーにあるグリッドの上の目のアイコンでプレートを隠せるので、プレートにじゃまされずにデザインの底面を見られます。
 - **別のウィンドウで 2 つ目の表示** – ビューバーのボタンで 2 つ目のウィンドウを開くと、独自のカメラ、ビュー方向キューブ、ビューバーで同じデザインを表示し、すべての変更に追従します。前回閉じた場所に開きます。
 - **パネルを好きな場所に** – オブジェクトリスト、設定、断面表示、メジャー、そしてエッジ、中空化、パターンのツールのパネルは、タイトルバーで動かせ、次もそこに開きます。ダブルクリックでドッキングします。

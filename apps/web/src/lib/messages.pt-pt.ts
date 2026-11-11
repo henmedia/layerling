@@ -319,7 +319,7 @@ export const MESSAGES_PT_PT: Partial<Record<MessageKey, string>> = {
   "installHint.ios": "No Safari: ícone de partilha → «Adicionar ao ecrã principal».",
   "installHint.firefox": "O Firefox não permite instalar aplicações, mas o layerling continua a abrir sem internet neste separador.",
   "welcome.moreLanguagesTitle": "O teu idioma",
-  "welcome.moreLanguagesBody": "o programa e o respetivo guia estão disponíveis em inglês, alemão e mais 17 idiomas. A lista de idiomas encontra-se no canto superior direito e nas definições da página inicial.",
+  "welcome.moreLanguagesBody": "o programa e o respetivo guia estão disponíveis em inglês, alemão e mais 18 idiomas. A lista de idiomas encontra-se no canto superior direito e nas definições da página inicial.",
   "welcome.moreOfflineTitle": "Funciona sem internet",
   "welcome.moreOfflineBody": "após a primeira visita, o layerling também abre sem internet. Instala-o como um programa normal; os teus projetos ficam no teu computador.",
   "welcome.moreAiTitle": "Modelar com IA",

@@ -21,7 +21,7 @@
     <a href="#layerling-mcp-skill"><img alt="Von einer KI steuerbar" src="https://img.shields.io/badge/KI--steuerbar-MCP--Server-16c0d4"></a>
   </p>
 
-  <p><a href="README.md">English</a> · <strong>Deutsch</strong> · <a href="README.es.md">Español</a> · <a href="README.nl.md">Nederlands</a> · <a href="README.ar.md">العربية</a> · <a href="README.ja.md">日本語</a> · <a href="README.zh-cn.md">简体中文</a> · <a href="README.zh-tw.md">繁體中文</a></p>
+  <p><a href="README.md">English</a> · <strong>Deutsch</strong> · <a href="README.es.md">Español</a> · <a href="README.nl.md">Nederlands</a> · <a href="README.sv.md">Svenska</a> · <a href="README.ar.md">العربية</a> · <a href="README.ja.md">日本語</a> · <a href="README.zh-cn.md">简体中文</a> · <a href="README.zh-tw.md">繁體中文</a></p>
 </div>
 
 <p align="center">
@@ -144,7 +144,7 @@ Ein vollständiges CAD-Paket ist es nicht: Es gibt keine parametrische Zeitleist
 - **Vier gespeicherte Ansichten je Entwurf** – **Umschalt+7**, **8**, **9** oder **0** speichert die Ansicht genau so, wie sie ist (Blickwinkel, Ausschnitt, Zoom), und die Taste allein holt sie zurück. Jeder Entwurf hat seine eigenen, und eine gespeicherte `.lyl`-Datei nimmt sie mit.
 - **Gerade auf die Arbeitsebene schauen** – **P** oder der Knopf neben „Arbeitsebene setzen“ in der Ansichtsleiste dreht die Ansicht gerade auf die Arbeitsebene, auch auf einer schrägen Fläche, mit ihrem Ursprung in der Mitte.
 - **Der Ansichtswürfel in jeder Ecke** – Einstellungen > Darstellung > **Position des Ansichtswürfels** stellt den Würfel oben links, oben rechts, unten links oder unten rechts hin; in jeder Ecke außer oben links rückt die Ansichtsleiste an seinen Platz nach oben.
-- **In deiner Sprache** – das Programm und seine Anleitung gibt es auf Englisch, Deutsch und in 17 weiteren Sprachen; die Sprachliste steht ganz oben rechts.
+- **In deiner Sprache** – das Programm und seine Anleitung gibt es auf Englisch, Deutsch und in 18 weiteren Sprachen; die Sprachliste steht ganz oben rechts.
 - **Von unten schauen** – das Auge über dem Gitter in der Ansichtsleiste blendet die Platte aus, damit die Unterseite eines Entwurfs frei zu sehen ist.
 - **Eine zweite Ansicht im eigenen Fenster** – ein Knopf in der Ansichtsleiste öffnet ein zweites Fenster, das denselben Entwurf durch eine eigene Kamera zeigt, mit eigenem Ansichtswürfel und eigener Ansichtsleiste, und folgt jeder Änderung. Es öffnet sich dort, wo du es zuletzt gelassen hast.
 - **Fenster nach Wunsch** – Objektliste, Einstellungen, Schnittansicht, Maßband und die Werkzeugfenster für Kanten, Aushöhlen und Muster lassen sich an ihrer Titelleiste frei verschieben und öffnen sich dort wieder; ein Doppelklick dockt sie an.

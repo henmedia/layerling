@@ -386,7 +386,7 @@ export const MESSAGES_ZH_TW: Partial<Record<MessageKey, string>> = {
   "installHint.ios": "在 Safari 中：分享圖示 →「加入主畫面」。",
   "installHint.firefox": "Firefox 無法安裝應用程式 – layerling 仍可在此分頁中離線啟動。",
   "welcome.moreLanguagesTitle": "你的語言",
-  "welcome.moreLanguagesBody": "程式和它的使用指南會說英語、德語以及另外 17 種語言；語言清單在最右上角，也在首頁的設定中。",
+  "welcome.moreLanguagesBody": "程式和它的使用指南會說英語、德語以及另外 18 種語言；語言清單在最右上角，也在首頁的設定中。",
   "welcome.moreOfflineTitle": "可離線使用",
   "welcome.moreOfflineBody": "首次造訪之後，layerling 沒有網路也能啟動 - 像一般程式一樣安裝，設計就留在你自己的電腦上。",
   "welcome.moreAiTitle": "用 AI 建模",

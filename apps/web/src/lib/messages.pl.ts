@@ -382,7 +382,7 @@ export const MESSAGES_PL: Partial<Record<MessageKey, string>> = {
   "installHint.ios": "W Safari: ikona Udostępnij → „Do ekranu początkowego”.",
   "installHint.firefox": "Firefox nie instaluje aplikacji, ale layerling i tak uruchomi się tu offline w karcie.",
   "welcome.moreLanguagesTitle": "Twój język",
-  "welcome.moreLanguagesBody": "program i jego instrukcja mówią po angielsku, niemiecku i w 17 innych językach. Lista języków jest w prawym górnym rogu oraz w ustawieniach na stronie startowej.",
+  "welcome.moreLanguagesBody": "program i jego instrukcja mówią po angielsku, niemiecku i w 18 innych językach. Lista języków jest w prawym górnym rogu oraz w ustawieniach na stronie startowej.",
   "welcome.moreOfflineTitle": "Działa offline",
   "welcome.moreOfflineBody": "po pierwszej wizycie layerling uruchamia się także bez internetu. Zainstaluj go jak zwykły program, a projekty zostaną na Twoim komputerze.",
   "welcome.moreAiTitle": "Budowanie z AI",
