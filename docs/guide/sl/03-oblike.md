@@ -121,7 +121,7 @@ Korak mreže je spodaj desno v urejevalniku in ga lahko kadarkoli spremeniš.
 
 ## Kopiranje in podvajanje
 
-{{ui:editor.tool.copy}}, {{ui:editor.tool.paste}} in {{ui:editor.tool.duplicate}} so v orodni vrstici ({{ui:editor.group.clipboard}}). Z [[Ctrl]]+[[D]] podvojiš izbor. layerling si pri tem zapomni, kako si kopijo nazadnje premaknil ali zavrtel, in isto uporabi ob naslednjem podvajanju. Tako z nekaj pritiski tipk nastane vrsta lukenj ali stopnic. Za pravilne razporeditve je poleg tega polje, ki je opisano v poglavju [Izbiranje in razporejanje](chapter:izbiranje-in-razporejanje). Če si kopiji spremenil tudi velikost, se vsaka naslednja kopija znova spremeni za enak faktor, kot v Tinkercadu.
+{{ui:editor.tool.copy}}, {{ui:editor.tool.paste}} in {{ui:editor.tool.duplicate}} so v orodni vrstici ({{ui:editor.group.clipboard}}). Z [[Ctrl]]+[[D]] podvojiš izbor. layerling si pri tem zapomni, kako si kopijo nazadnje premaknil ali zavrtel, in isto uporabi ob naslednjem podvajanju. Tako z nekaj pritiski tipk nastane vrsta lukenj ali stopnic. To deluje tudi z več deli hkrati: podvoji celo plast, dvigni kopijo in vsak naslednji [[Ctrl]]+[[D]] naloži naslednjo plast v enakem razmiku. Za pravilne razporeditve je poleg tega polje, ki je opisano v poglavju [Izbiranje in razporejanje](chapter:izbiranje-in-razporejanje). Če si kopiji spremenil tudi velikost, se vsaka naslednja kopija znova spremeni za enak faktor, kot v Tinkercadu.
 
 > **Namig:** Če oblika ne zavzame želene velikosti, je razlog pogosto v mejah za nove oblike. Pod {{ui:workspace.shapeDefaults}} v nastavitvah določiš, kako se vsaka oblika začne in kako velika lahko največ postane.
 

@@ -6906,29 +6906,38 @@ export function LayerlingEditor({
    * ausgewaehlte Kopie seit ihrer Entstehung nicht, wird der zuletzt
    * angewandte Versatz erneut benutzt, statt auf Null zurueckzufallen -
    * genau das erlaubt das blosse wiederholte Druecken.
+   *
+   * Seit #1662 gilt das auch fuer eine Mehrfachauswahl: die Kette merkt sich
+   * jede Kopie mit ihrem eigenen Stand, und sie geht weiter, solange genau
+   * diese Kopien ausgewaehlt sind. Jede neue Kopie bekommt den Versatz ihrer
+   * Vorlage; hat sich keine bewegt, wiederholt jede ihren letzten Versatz -
+   * eine ganze Lage Teile stapelt sich so Lage fuer Lage.
    */
-  const smartDuplicateRef = useRef<{ chainId: string; baseline: ShapeTransformSnapshot; delta: ShapeMoveDelta } | null>(null);
+  const smartDuplicateRef = useRef<{ id: string; baseline: ShapeTransformSnapshot; delta: ShapeMoveDelta }[] | null>(null);
 
   const duplicateSelected = useCallback(() => {
     if (!hasSelection) {
       setNotice(t("status.selectShapeFirst"));
       return;
     }
-    if (selectedShapes.length === 1) {
-      const shape = selectedShapes[0];
-      const chain = smartDuplicateRef.current;
-      const continuing = chain?.chainId === shape.id;
-      const movedSinceCreation = continuing ? shapeMoveDeltaBetween(chain.baseline, shapeTransformSnapshot(shape)) : ZERO_MOVE_DELTA;
-      const delta = continuing && isZeroMoveDelta(movedSinceCreation) ? chain.delta : movedSinceCreation;
-      const duplicate = applyShapeMoveDelta(withCopyName(cloneWorkplaneShapeTreeWithFreshIds(shape, "copy"), shapeNamesIn(shapes), copyNamePatterns()), delta);
-      commitShapes([...shapes, duplicate], [duplicate.id], t("status.duplicatedOne"));
-      smartDuplicateRef.current = { chainId: duplicate.id, baseline: shapeTransformSnapshot(duplicate), delta };
-      return;
-    }
-    smartDuplicateRef.current = null;
+    const chain = smartDuplicateRef.current;
+    const links = new Map((chain ?? []).map((link) => [link.id, link]));
+    const continuing = chain !== null && chain.length === selectedShapes.length && selectedShapes.every((shape) => links.has(shape.id));
+    const moved = selectedShapes.map((shape) => {
+      const link = continuing ? links.get(shape.id) : undefined;
+      return link ? shapeMoveDeltaBetween(link.baseline, shapeTransformSnapshot(shape)) : ZERO_MOVE_DELTA;
+    });
+    const repeatLast = continuing && moved.every(isZeroMoveDelta);
     const takenNames = shapeNamesIn(shapes);
-    const duplicates = selectedShapes.map((shape) => withCopyName(cloneWorkplaneShapeTreeWithFreshIds(shape, "copy"), takenNames, copyNamePatterns()));
-    commitShapes([...shapes, ...duplicates], duplicates.map((shape) => shape.id), t("status.duplicatedMany", { count: duplicates.length }));
+    const deltas = selectedShapes.map((shape, index) => (repeatLast ? links.get(shape.id)?.delta ?? ZERO_MOVE_DELTA : moved[index]));
+    const duplicates = selectedShapes.map((shape, index) =>
+      applyShapeMoveDelta(withCopyName(cloneWorkplaneShapeTreeWithFreshIds(shape, "copy"), takenNames, copyNamePatterns()), deltas[index]));
+    commitShapes(
+      [...shapes, ...duplicates],
+      duplicates.map((shape) => shape.id),
+      duplicates.length === 1 ? t("status.duplicatedOne") : t("status.duplicatedMany", { count: duplicates.length }),
+    );
+    smartDuplicateRef.current = duplicates.map((duplicate, index) => ({ id: duplicate.id, baseline: shapeTransformSnapshot(duplicate), delta: deltas[index] }));
   }, [commitShapes, hasSelection, selectedShapes, shapes]);
 
   /** Scales the selection by a percentage (#179); the same code the MCP action uses. */
