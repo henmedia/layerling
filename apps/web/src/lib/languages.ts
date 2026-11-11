@@ -589,7 +589,7 @@ export const LANGUAGE_INFO: Readonly<Record<Language, LanguageInfo>> = {
     communityUrl: GITHUB_DISCUSSIONS,
     readme: "README.sv.md",
     quickstartAnchor: "snabbstart-i-windows",
-    legal: { imprint: "Kolofon", privacy: "Integritetspolicy" },
+    legal: { imprint: "Juridisk information", privacy: "Integritetspolicy" },
     keyNames: {
       Ctrl: "Ctrl",
       Shift: "Skift",
