@@ -4195,6 +4195,8 @@ export const MESSAGES_IT: Partial<Record<MessageKey, string>> = {
   "prop.screwHoleSlotLengthHint": "Di quanto il foro si allunga sul lato più lungo, così il pezzo si può ancora spostare prima di serrare la vite. Ruota il foro per orientare l’asola.",
   "prop.screwHoleRecess": "Incasso",
   "prop.screwHoleRecessHint": "Di quanto la testa della vite resta sotto la superficie: una sede diritta larga quanto la testa sopra il cono. A 0 resta a filo; la doppia svasatura ce l’ha a entrambe le estremità.",
+  "prop.screwHoleChamfer": "Smusso del bordo",
+  "prop.screwHoleChamferHint": "Uno smusso a 45° sul bordo superiore della sede, profondo così. Si apre fuori dal diametro della testa, quindi la testa della vite entra ancora; 0 lascia lo spigolo vivo.",
   "prop.screwHoleLength": "Lunghezza totale",
   "prop.holeBottom": "Fondo",
   "holeBottom.flat": "Piatto",

@@ -468,6 +468,8 @@ export type ShapeCustomization = {
   screwHoleSlot?: boolean;
   /** Countersink and double countersink: how far in mm the head sits below the face (Discussion #1531), as on the shape. */
   screwHoleRecess?: number;
+  /** Counterbore: a 45-degree chamfer in mm at the rim of the pocket (Discussion #1632), as on the shape. */
+  screwHoleChamfer?: number;
   /** Port opening: rounded corners, or the lower ones cut off as on an HDMI or DisplayPort socket. */
   portProfile?: PortProfile;
   /** Port opening: extra room in mm on every side on top of the preset's, already in width and height; it lets the preset be recognised. */
@@ -1427,6 +1429,11 @@ export type WorkplaneShape = {
    * straight pocket as wide as the head above the cone, on the double countersink at both ends. Missing or 0: flush.
    */
   screwHoleRecess?: number;
+  /**
+   * Counterbore: a 45-degree chamfer in mm at the rim of the pocket (Discussion #1632). The rim opens by that much
+   * outside the head's diameter, so the pocket keeps its width; it stays shallower than the pocket. Missing or 0: none.
+   */
+  screwHoleChamfer?: number;
   /** Port opening: rounded corners, or the lower ones cut off as on an HDMI or DisplayPort socket. */
   portProfile?: PortProfile;
   /** Port opening: extra room in mm on every side on top of the preset's, already in width and height; it lets the preset be recognised. */

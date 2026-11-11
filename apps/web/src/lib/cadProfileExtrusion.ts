@@ -1225,7 +1225,7 @@ export function cadProfileForShapeKind(shape: WorkplaneShape, designedRound = fa
       const slot = shape.screwHoleSlot ? screwHoleSlotMeasures(width, depth) : null;
       // Only a round hole is a body of revolution; stretched along z it stays a mesh.
       if (!slot && Math.abs(width - depth) > 1e-6) return null;
-      const points = screwHoleProfile({ kind: shape.kind, width: slot ? slot.head : width, height: shape.height, screwHoleShaft: shape.screwHoleShaft, screwHoleHeadDepth: shape.screwHoleHeadDepth, screwHoleAngle: shape.screwHoleAngle, screwHoleRecess: shape.screwHoleRecess, drillPointAngle: shapeDrillPointAngle(shape) })
+      const points = screwHoleProfile({ kind: shape.kind, width: slot ? slot.head : width, height: shape.height, screwHoleShaft: shape.screwHoleShaft, screwHoleHeadDepth: shape.screwHoleHeadDepth, screwHoleAngle: shape.screwHoleAngle, screwHoleRecess: shape.screwHoleRecess, screwHoleChamfer: shape.screwHoleChamfer, drillPointAngle: shapeDrillPointAngle(shape) })
         .map(({ r, y }) => ({ x: r, z: y }));
       // A drill point's tip (Discussion #621) lies on the axis already; the loop leaves out the edge of no length to it.
       const section = [{ x: 0, z: points[0].z }, ...points, { x: 0, z: points[points.length - 1].z }];

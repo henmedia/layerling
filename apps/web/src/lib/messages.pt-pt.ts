@@ -4133,6 +4133,8 @@ export const MESSAGES_PT_PT: Partial<Record<MessageKey, string>> = {
   "prop.screwHoleSlotLengthHint": "Quanto o furo se estende ao longo do lado mais comprido, para que a peça ainda possa ser deslocada antes de apertar o parafuso. Rode o furo para orientar o rasgo.",
   "prop.screwHoleRecess": "Rebaixo",
   "prop.screwHoleRecessHint": "Quanto a cabeça do parafuso fica abaixo da superfície: um alojamento reto da largura da cabeça acima do cone. Com 0 fica rente; o escareado duplo tem-no nas duas extremidades.",
+  "prop.screwHoleChamfer": "Chanfro do bordo",
+  "prop.screwHoleChamferHint": "Um chanfro de 45° no bordo superior do rebaixo, com esta profundidade. Abre-se fora do diâmetro da cabeça, por isso a cabeça do parafuso continua a caber; 0 deixa o bordo vivo.",
   "prop.screwHoleLength": "Comprimento total",
   "prop.holeBottom": "Fundo",
   "holeBottom.flat": "Plano",

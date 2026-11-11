@@ -4145,6 +4145,8 @@ export const MESSAGES_PL: Partial<Record<MessageKey, string>> = {
   "prop.screwHoleSlotLengthHint": "O ile otwór wydłuża się wzdłuż dłuższego boku, by część dało się jeszcze przesunąć przed dokręceniem śruby. Obróć otwór, aby ustawić kierunek.",
   "prop.screwHoleRecess": "Zagłębienie",
   "prop.screwHoleRecessHint": "Jak głęboko łeb śruby siedzi pod powierzchnią: proste gniazdo o szerokości łba nad stożkiem. Przy 0 jest równo z powierzchnią; podwójne pogłębienie ma je na obu końcach.",
+  "prop.screwHoleChamfer": "Fazka krawędzi",
+  "prop.screwHoleChamferHint": "Fazka 45° na górnej krawędzi pogłębienia, o tej głębokości. Otwiera się poza średnicą łba, więc łeb śruby nadal się mieści; 0 zostawia ostrą krawędź.",
   "prop.screwHoleLength": "Długość całkowita",
   "prop.holeBottom": "Dno",
   "holeBottom.flat": "Płaskie",

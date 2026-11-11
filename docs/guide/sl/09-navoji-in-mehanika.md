@@ -254,6 +254,8 @@ Podolžna luknja delu pusti zračnost, da ga lahko pred privijanjem vijaka še n
 
 Glava ugreznjenega vijaka je poravnana s površino. Če naj sedi globlje, pri {{ui:shape.countersink}} nastavite {{ui:prop.screwHoleRecess}} (Discussion #1531): nad stožcem je potem raven vgrez v širini glave, toliko milimetrov globok, in {{ui:prop.screwHoleLength}} ga vključuje. Pri {{ui:shape.doubleCountersink}} je vgrez na obeh koncih. Pri 0 ostane glava poravnana kot doslej; podolžna luknja ga sprejme prav tako, telo pa ostane natančno.
 
+Če želiš odstraniti oster rob na robu poglobitve, nastavi {{ui:prop.screwHoleChamfer}} pri {{ui:shape.counterbore}} (Discussion #1632): vrh poglobitve se tedaj odpre pod 45 stopinjami za toliko milimetrov. Posnetje leži zunaj {{ui:prop.screwHoleHead}}, zato glava vijaka še vedno pade vanjo, in ostane plitvejše od {{ui:prop.screwHoleHeadDepth}}. Pri 0 ostane rob oster kot doslej; podolgovata luknja ga prav tako sprejme in ostane natančno telo.
+
 {{ui:shape.finishingWasher}} (rozeta, Discussion #1131) je izbočena podložka pod ugreznim ali lečastim ugreznim vijakom, za čist videz na lesu ali pokrovu. Je poln del, spodaj raven; iz nizkega roba se kupola dviga do sedeža, stožca za glavo vijaka, z izvrtino pod njim. Pod {{ui:prop.screwHoleSize}} izbereš M2 do M20: izvrtina je prehodna luknja, sedež pa ugrezanje te velikosti, {{ui:prop.diameter}} in {{ui:prop.height}} sledita iz njiju (M3: 10,3 × 2,95 mm, M6: 16,6 × 4,5 mm). {{ui:prop.diameter}}, {{ui:prop.height}}, {{ui:prop.centerHole}}, {{ui:prop.screwHoleHead}} na vrhu sedeža in njegov {{ui:prop.screwHoleAngle}} lahko nastaviš tudi sam. Ostane okrogla in je natančno telo, zato na njej delujeta orodje za robove in STEP.
 
 ## Vijačni steber

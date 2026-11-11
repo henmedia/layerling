@@ -472,6 +472,10 @@ export function normalizeShapeCustomizations(value: unknown, fallback: ShapeCust
     if (kind === "countersink" || kind === "doubleCountersink") {
       entry.screwHoleRecess = optionalShapeNumber(source.screwHoleRecess, fallbackEntry?.screwHoleRecess, 0, MAX_CUSTOM_SHAPE_DIMENSION);
     }
+    if (kind === "counterbore") {
+      // A chamfer at the rim of the pocket (Discussion #1632), so a counterbore made through the AI bridge keeps it.
+      entry.screwHoleChamfer = optionalShapeNumber(source.screwHoleChamfer, fallbackEntry?.screwHoleChamfer, 0, MAX_CUSTOM_SHAPE_DIMENSION);
+    }
     if (kind === "cylinder" || kind === "counterbore" || kind === "countersink") {
       // A drill point at the bottom of a blind hole (Discussion #621); 0 or less stands for a flat bottom, so a patch can switch it back.
       entry.drillPointAngle = typeof source.drillPointAngle === "number" && source.drillPointAngle <= 0

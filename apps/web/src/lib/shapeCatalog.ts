@@ -946,6 +946,7 @@ export function sceneShape(shape: Partial<WorkplaneShape> & Pick<WorkplaneShape,
     drillPointAngle: shape.drillPointAngle,
     screwHoleSlot: shape.screwHoleSlot,
     screwHoleRecess: shape.screwHoleRecess,
+    screwHoleChamfer: shape.screwHoleChamfer,
     portProfile: shape.portProfile,
     portClearance: shape.portClearance,
     cornerFillet: shape.cornerFillet,
@@ -1373,6 +1374,8 @@ export function makeShapeFromAsset(
     // A slotted hole and a recessed head (Discussion #1531); left out when off, as the editor leaves them.
     screwHoleSlot: (asset.kind === "counterbore" || asset.kind === "countersink" || asset.kind === "doubleCountersink") && customization.screwHoleSlot ? true : undefined,
     screwHoleRecess: (asset.kind === "countersink" || asset.kind === "doubleCountersink") && (customization.screwHoleRecess ?? 0) > 0 ? customization.screwHoleRecess : undefined,
+    // A chamfer at the rim of a counterbore (Discussion #1632); left out when off, as the editor leaves it.
+    screwHoleChamfer: asset.kind === "counterbore" && (customization.screwHoleChamfer ?? 0) > 0 ? customization.screwHoleChamfer : undefined,
     cornerFillet: asset.kind === "roundedBox" ? normalizeCornerFillet(customization.cornerFillet ?? DEFAULT_ROUNDED_BOX_CORNER_FILLET, Math.min(width, depth) / 2)
       : asset.kind === "port" ? normalizePortCorner(customization.cornerFillet, width, height, customization.portProfile) : undefined,
     portProfile: asset.kind === "port" ? normalizePortProfile(customization.portProfile) : undefined,

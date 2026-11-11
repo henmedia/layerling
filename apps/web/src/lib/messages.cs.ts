@@ -4266,6 +4266,8 @@ export const MESSAGES_CS: Record<MessageKey, string> = {
   "prop.screwHoleSlotLengthHint": "O kolik se otvor protáhne podél delší strany, aby šlo díl před utažením šroubu ještě posunout. Natočením otvoru drážku nasměrujete.",
   "prop.screwHoleRecess": "Zapuštění",
   "prop.screwHoleRecessHint": "Jak hluboko pod povrchem hlava šroubu sedí: rovné vybrání v šířce hlavy nad kuželem. Při 0 lícuje s povrchem; dvojité zahloubení ho má na obou koncích.",
+  "prop.screwHoleChamfer": "Zkosení okraje",
+  "prop.screwHoleChamferHint": "Zkosení 45° na horní hraně zahloubení, takto hluboké. Otevírá se vně průměru hlavy, takže hlava šroubu stále pasuje; 0 nechá hranu ostrou.",
   "prop.screwHoleLength": "Celková délka",
   "prop.holeBottom": "Dno",
   "holeBottom.flat": "Rovné",

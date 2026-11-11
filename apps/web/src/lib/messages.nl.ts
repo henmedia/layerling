@@ -4209,6 +4209,8 @@ export const MESSAGES_NL: Record<MessageKey, string> = {
   "prop.screwHoleSlotLengthHint": "Zo ver loopt het gat langs zijn langste zijde, zodat het onderdeel nog te verschuiven is voordat de schroef vastzit. Draai het gat om het slobgat te richten.",
   "prop.screwHoleRecess": "Verdieping",
   "prop.screwHoleRecessHint": "Zo diep zit de schroefkop onder het oppervlak: een rechte kamer zo breed als de kop boven de kegel. Bij 0 ligt hij vlak; de dubbele verzinking heeft hem aan beide uiteinden.",
+  "prop.screwHoleChamfer": "Afschuining van de rand",
+  "prop.screwHoleChamferHint": "Een afschuining van 45° aan de bovenrand van de verzinking, zo diep. Ze opent buiten de kopdiameter, dus de schroefkop past nog; 0 laat de rand scherp.",
   "prop.screwHoleLength": "Totale lengte",
   "prop.holeBottom": "Bodem",
   "holeBottom.flat": "Vlak",

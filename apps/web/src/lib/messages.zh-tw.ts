@@ -4131,6 +4131,8 @@ export const MESSAGES_ZH_TW: Partial<Record<MessageKey, string>> = {
   "prop.screwHoleSlotLengthHint": "孔沿較長一側延伸的長度，方便鎖緊螺絲前仍可移動零件。旋轉孔即可調整長孔方向。",
   "prop.screwHoleRecess": "下沉深度",
   "prop.screwHoleRecessHint": "螺絲頭低於表面的深度：在錐面上方加一段與頭部同寬的直孔。為 0 時與表面齊平；雙面沉頭孔兩端都有。",
+  "prop.screwHoleChamfer": "邊緣倒角",
+  "prop.screwHoleChamferHint": "在沉孔上緣加一個這麼深的45°倒角。它向頭部直徑之外展開，螺絲頭仍然放得下；0 保留銳邊。",
   "prop.screwHoleLength": "總長度",
   "prop.holeBottom": "孔底",
   "holeBottom.flat": "平底",

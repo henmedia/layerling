@@ -3842,6 +3842,8 @@ export const MESSAGES_AR: Partial<Record<MessageKey, string>> = {
   "prop.screwHoleSlotLengthHint": "المسافة التي يمتد بها الثقب على طول جانبه الأطول، ليبقى بالإمكان تحريك القطعة قبل شدّ البرغي. أدِر الثقب لتوجيهه.",
   "prop.screwHoleRecess": "غمر الرأس",
   "prop.screwHoleRecessHint": "مقدار انغمار رأس البرغي تحت السطح: تجويف مستقيم بعرض الرأس فوق المخروط. عند 0 يكون مستويًا مع السطح؛ والثقب الغاطس المزدوج له ذلك من الطرفين.",
+  "prop.screwHoleChamfer": "شطف الحافة",
+  "prop.screwHoleChamferHint": "شطف بزاوية 45° عند الحافة العلوية للتجويف بهذا العمق. ينفتح خارج قطر الرأس، فيبقى رأس البرغي مناسبًا؛ القيمة 0 تترك الحافة حادة.",
   "prop.screwHoleLength": "الطول الإجمالي",
   "prop.holeBottom": "القاع",
   "holeBottom.flat": "مستوٍ",
