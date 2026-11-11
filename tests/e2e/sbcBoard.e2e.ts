@@ -3,6 +3,7 @@ import { resolve } from "node:path";
 import { describe, expect, it } from "vitest";
 // The exact kernel (Manifold) loads its files relative to the page; in node they are the public folder.
 (globalThis as unknown as { window: unknown }).window = { location: { href: pathToFileURL(resolve("apps/web/public") + "/").href } };
+import * as THREE from "three";
 import { buildGroupedShapeFromSelection } from "@/lib/editorBooleans";
 import { stepSourceForShape } from "@/lib/stepExport";
 import { regeneratedSbcBoardShape, sbcBoardOf, sbcBoardShape } from "@/lib/editorSbcBoard";
@@ -185,6 +186,54 @@ describe("the SBC board as a group", () => {
     const renamed = await regeneratedSbcBoardShape({ ...placed, name: "Printer Pi" }, { board: "zero2w", clearance: 0 }, LIMIT);
     expect(renamed.name).toBe("Printer Pi");
   });
+
+  it("keeps every board on its mounting holes when any setting changes, only the connectors grow", async () => {
+    /** The leaves of a shape with their places in it: a group's parts are kept from its middle across, from its bottom up. */
+    type Placed = { leaf: WorkplaneShape; x: number; z: number; elevation: number };
+    const leavesOf = (shape: WorkplaneShape, x = 0, z = 0, elevation = 0): Placed[] => (shape.groupedShapes?.length
+      ? shape.groupedShapes.flatMap((child) => leavesOf(child, x + child.x, z + child.z, elevation + (child.elevation ?? 0)))
+      : [{ leaf: shape, x, z, elevation }]);
+    /**
+     * The world places that pin the board down, read off the built group itself: each mounting hole's
+     * middle on the board's top face, or for a board without holes the middle of the board. The group
+     * stands as the editor draws it: turned about the middle of its box (x, elevation + height / 2, z).
+     */
+    const pins = (shape: WorkplaneShape) => {
+      const pcb = shape.groupedShapes![0];
+      const thickness = SBC_BOARDS[sbcBoardOf(shape)!.board].thickness;
+      const holes = leavesOf(pcb, pcb.x, pcb.z, pcb.elevation ?? 0).filter(({ leaf }) => leaf.hole && leaf.kind === "cylinder");
+      // A hole stands 0.5 mm below the board, through it: the board's top face is its own bottom plus the thickness.
+      const marks = holes.length > 0 ? holes.map((hole) => ({ ...hole, elevation: pcb.elevation ?? 0 })) : [{ leaf: pcb, x: pcb.x, z: pcb.z, elevation: pcb.elevation ?? 0 }];
+      const turn = new THREE.Quaternion().setFromEuler(new THREE.Euler(
+        THREE.MathUtils.degToRad(shape.rotationX ?? 0), THREE.MathUtils.degToRad(shape.rotation ?? 0), THREE.MathUtils.degToRad(shape.rotationZ ?? 0), "XYZ",
+      ));
+      const middle = new THREE.Vector3(shape.x, (shape.elevation ?? 0) + shape.height / 2, shape.z);
+      return marks.map((mark) => new THREE.Vector3(mark.x, mark.elevation + thickness - shape.height / 2, mark.z).applyQuaternion(turn).add(middle));
+    };
+    const most = { clearance: 2, reach: 10, buttonReach: 100, lensUp: true, ribbonUp: true, ribbonSide: true, gpioUp: true, upReach: 100 };
+    const turns = [{ rotation: 0 }, { rotation: 90 }, { rotation: 37, rotationX: 20, rotationZ: -15 }];
+    for (const type of SBC_BOARD_ORDER) {
+      const first = await sbcBoardShape({ board: type, clearance: 0 }, LIMIT);
+      for (const turn of turns) {
+        const placed: WorkplaneShape = { ...first, x: 40, z: -25, elevation: 6, ...turn, locked: false };
+        const before = pins(placed);
+        // Every setting at its most, then one at a time, then all back to nothing: the holes never move.
+        let current = placed;
+        for (const settings of [most, { clearance: 0.4 }, { clearance: 0, reach: 3 }, { clearance: 0, buttonReach: 12 }, { clearance: 0, ribbonSide: true, reach: 5 }, { clearance: 0 }]) {
+          current = await regeneratedSbcBoardShape(current, { board: type, ...settings }, LIMIT);
+          const after = pins(current);
+          expect(after.length, `${type}`).toBe(before.length);
+          after.forEach((point, index) => {
+            const label = `${type} turned ${JSON.stringify(turn)} with ${JSON.stringify(settings)}, hole ${index}`;
+            // Within 0.1 µm: the bodies are kept in 32-bit floats, nothing more.
+            expect(point.distanceTo(before[index]), label).toBeLessThan(1e-4);
+          });
+        }
+        // Back to nothing it stands exactly where it was put.
+        expect([current.x, current.z, current.elevation], `${type} ${JSON.stringify(turn)}`).toEqual([expect.closeTo(40, 6), expect.closeTo(-25, 6), expect.closeTo(6, 6)]);
+      }
+    }
+  }, 600_000);
 
   it("cuts a case wall when it is a hole", async () => {
     const board = await sbcBoardShape({ board: "pi5", clearance: 0.3 }, LIMIT);
