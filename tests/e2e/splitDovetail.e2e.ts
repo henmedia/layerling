@@ -244,6 +244,46 @@ describe("round, narrowing and tilted bodies", () => {
     dispose(created);
   });
 
+  it("carries the tongue on up the slope of a ramp cut across it, so no step is left in the slope (Discussion #1658)", async () => {
+    // A wedge rising to +x, 80 mm over 60 mm, cut upright in its middle: the cut face is 40 mm high and 30 mm deep, so the
+    // tongue runs up it, and the upper half rises on above the face's top edge.
+    const ramp = box(60, 30, 80, { id: "ramp", name: "Wedge", kind: "wedge" } as Partial<WorkplaneShape>);
+    const across = { axis: "x" as const, normal: [1, 0, 0] as Vec3, position: 0 };
+    const result = await splitShapeByPlane(ramp, across, dovetail);
+    expect(result.connectors?.placed).toBe(1);
+    const created: ManifoldSolid[] = [];
+    const whole = solidOf(ramp, created);
+    const [above, below] = result.parts!.map((part) => solidOf(part, created));
+    [above, below].forEach((solid) => {
+      expect(solid.status()).toBe("NoError");
+      expect(solid.decompose().length).toBe(1);
+      const beyond = solid.subtract(whole);
+      created.push(beyond);
+      expect(beyond.volume()).toBeLessThan(1e-3);
+    });
+    const material = (solid: ManifoldSolid, min: Vec3, max: Vec3) => {
+      const cube = runtime.Manifold.cube([max[0] - min[0], max[1] - min[1], max[2] - min[2]]).translate(min);
+      const inside = solid.intersect(cube);
+      created.push(cube, inside);
+      return inside.volume() / cube.volume();
+    };
+    // Just under the slope above the face's top edge (40 mm), where the groove runs on up: the tongue fills it.
+    expect(material(below, [1, 40.2, -0.5], [2, 41.2, 0.5])).toBeCloseTo(1, 6);
+    expect(material(above, [1, 40.2, -0.5], [2, 41.2, 0.5])).toBeLessThan(1e-6);
+    // At the foot of the face, on the plate, the tongue's end keeps its chamfer.
+    const top = dovetail.dovetailDepth;
+    expect(material(below, [top - 0.2, 0, -1], [top - 0.1, 0.1, 1])).toBeLessThan(1e-6);
+    expect(material(below, [top - 0.2, 5, -1], [top - 0.1, 6, 1])).toBeCloseTo(1, 6);
+    // Put together they do not touch; they slide apart along the tongue, up or down, and hold across the cut.
+    expect(overlapWhenMoved(below, above, [0, 0, 0], created)).toBeLessThan(1e-3);
+    for (const along of [1, 10, 45, 90]) {
+      expect(overlapWhenMoved(below, above, [0, along, 0], created)).toBeLessThan(1e-3);
+      expect(overlapWhenMoved(below, above, [0, -along, 0], created)).toBeLessThan(1e-3);
+    }
+    expect(overlapWhenMoved(below, above, [2, 0, 0], created)).toBeGreaterThan(1);
+    dispose(created);
+  });
+
   it("keeps the tongue's foot inside its own half on a box stood on its edge (Discussion #1451)", async () => {
     // A 30 mm box turned 45 degrees about the front axis, standing on an edge, cut upright through its middle: below the
     // cut face the minus half leans in towards the top and bottom corners, where the tongue's foot used to stand out.

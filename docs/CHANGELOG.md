@@ -6,6 +6,8 @@ code still carries it - so a lower number further down is older, not newer.
 
 ## Unreleased
 
+- **Split with a dovetail: the tongue follows a slope (Discussion #1658):** A ramp cut upright across its slope rises on above the cut face. The dovetail's groove ran on up through the slope, but the tongue ended square at the top edge of the cut face, so put together the slope had a step above each tongue, as deep as the tongue reaches over the slope. Where the other half goes on past the end of a tongue, the tongue now goes on with it and is trimmed to its groove, so its end follows the slope; where the other half ends at the cut face, as at the side of a box, or leans in, the end stays as before with its chamfer. Checked in the editor through headless Edge (a wedge rising 80 mm over 60 mm, split upright in its middle: the half with the tongue is now 45.3 mm high, the cut face's 40 mm and the tongue's 4 mm along the slope; seen from the front, the tongue's top runs on along the slope); e2e test with the kernel (the groove under the slope filled, the chamfer on the plate kept, nothing outside the wedge, the halves slide apart and hold)
+
 ## 1.158.0
 
 - **New SBC boards: the Cheap Yellow Display (Discussion #1644):** The ESP32-2432S028R "CYD" with micro-USB and with micro-USB plus USB-C, laid screen up with every connector on the back under the board. Buttons under a board now reach down through the floor. Added by @plazmabokor in #1651.
