@@ -14180,6 +14180,7 @@ export function LayerlingEditor({
           thickness: given("thickness") ?? null,
           gap: given("gap") ?? null,
           bridgeWidth: given("bridgeWidth") ?? null,
+          ...(given("bridgeGap") !== undefined ? { bridgeGap: given("bridgeGap") } : {}),
           footThickness: given("footThickness") ?? null,
           bundle: params.bundle !== false,
         });
@@ -14189,6 +14190,7 @@ export function LayerlingEditor({
           tooSteep: "That face is almost upright and needs no rib",
           offBed: "That face does not reach down to the bed straight down its slope from the point, nor stop within 3 mm of it at a rounded or chamfered bottom edge; the part must stand tilted on one edge",
           tooLow: "The rib would be too low; give a greater height",
+          bridgeGapTooWide: "With this bridgeGap the bridges would end inside the rib; give a wider gap or a smaller bridgeGap",
           collides: "The rib would run into the part; pick another point on the face or a lower height",
           partOffBed: "The part does not stand on the bed; drop it onto the workplane first so the bridges meet their layers",
           failed: "The rib could not be built there",

@@ -815,6 +815,7 @@ export const tools = [
         thickness: { type: "number", minimum: 0.2, maximum: 20, description: "Rib thickness in mm (default two nozzle widths)." },
         gap: { type: "number", minimum: 0.05, maximum: 5, description: "Gap between rib and face in mm, measured square to the face (default half a nozzle width)." },
         bridgeWidth: { type: "number", minimum: 0.1, maximum: 5, description: "Width of each bridge in mm (default one nozzle width)." },
+        bridgeGap: { type: "number", minimum: 0, maximum: 2, description: "How far each bridge stops short of the part, mm, measured in its layer (default 0: the bridges reach into the part). About half a nozzle width makes the slicer print each bridge as a path of its own; it must stay below the gap across the layer (gap / sine of the face's angle), so widen gap with it." },
         footThickness: { type: "number", minimum: 0.1, maximum: 10, description: "Thickness of the oval foot plate in mm (default first layer plus one layer)." },
         footWidth: { type: "number", minimum: 1, maximum: 200, description: "Width of the oval foot plate across the rib in mm (default 8)." },
         filletRadius: { type: "number", minimum: 0, maximum: 20, description: "Rounding where the rib meets the foot, mm (default 1.5; 0 for none)." },
