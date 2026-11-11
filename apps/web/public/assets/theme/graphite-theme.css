@@ -8993,6 +8993,31 @@ html[data-theme="dark"]:where([data-palette="graphite"]) .browser-backup-note.ba
   color: #7cc48f;
 }
 
+:where(html[data-theme="dark"][data-palette="graphite"]) .whats-new-version .whats-new-points li {
+  color: #595959;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .whats-new-guide-link {
+  color: #bf6508;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .whats-new-guide-link:hover,
+:where(html[data-theme="dark"][data-palette="graphite"]) .whats-new-guide-link:focus-visible {
+  text-decoration: underline;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .dashboard-update-preview .whats-new-version .whats-new-points li {
+  color: inherit;
+}
+
+html[data-theme="dark"]:where([data-palette="graphite"]) .whats-new-version .whats-new-points li {
+  color: #929292;
+}
+
+html[data-theme="dark"]:where([data-palette="graphite"]) .whats-new-guide-link {
+  color: #f3a452;
+}
+
 :where(html[data-theme="dark"][data-palette="graphite"]) .history-view-bar {
   color: #424242;
   background: rgba(252, 252, 252, 0.98);
@@ -10815,6 +10840,129 @@ html[data-theme="dark"]:where([data-palette="graphite"]) .focus-mode-bar .action
 
 html[data-theme="dark"]:where([data-palette="graphite"]) .focus-mode-bar .action-icon-button:hover:not(:disabled) {
   color: #f1f1f1;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .file-backups-problem {
+  color: #b3261e;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .file-backup-row {
+  background: var(--tile);
+  border: 1px solid var(--border);
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .file-backup-picture {
+  background: var(--panel);
+  border: 1px solid var(--border);
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .file-backup-text > span {
+  color: var(--muted-strong);
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .file-backup-actions button {
+  color: var(--foreground);
+  background: var(--panel);
+  border: 1px solid var(--border-strong);
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .file-backup-actions button:hover:not(:disabled),
+:where(html[data-theme="dark"][data-palette="graphite"]) .file-backup-actions button:focus-visible {
+  border-color: var(--primary);
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .file-backup-actions .file-backup-open {
+  color: #ffffff;
+  background: var(--primary);
+  border-color: var(--primary);
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .file-backups-settings-hint {
+  color: var(--muted-strong);
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .browser-backup-note.overdue {
+  color: #2a2a2a;
+  background: #dcdcdc;
+  border-color: #d9730d;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .browser-backup-note.urgent {
+  color: #5c1210;
+  background: #ffe0dd;
+  border-color: #c62828;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .browser-backup-note.urgent > svg {
+  color: #c62828;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .browser-backup-now {
+  color: #ffffff;
+  background: #d9730d;
+  border: 0;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .browser-backup-note.urgent .browser-backup-now {
+  background: #c62828;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .browser-backup-now:hover,
+:where(html[data-theme="dark"][data-palette="graphite"]) .browser-backup-now:focus-visible {
+  filter: brightness(1.08);
+}
+
+html[data-theme="dark"]:where([data-palette="graphite"]) .browser-backup-note.overdue {
+  color: #ffd9a8;
+  background: #2c2c2c;
+  border-color: #f0923a;
+}
+
+html[data-theme="dark"]:where([data-palette="graphite"]) .browser-backup-note.urgent {
+  color: #ffd2cd;
+  background: #42181a;
+  border-color: #ef5350;
+}
+
+html[data-theme="dark"]:where([data-palette="graphite"]) .browser-backup-note.urgent > svg {
+  color: #ef5350;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .your-backup-card {
+  color: var(--foreground);
+  background: var(--tile);
+  border: 2px solid var(--primary);
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .your-backup-card > svg {
+  color: var(--primary);
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .your-backup-actions button {
+  color: var(--foreground);
+  background: var(--panel);
+  border: 1px solid var(--border-strong);
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .your-backup-actions .your-backup-now {
+  color: #ffffff;
+  background: var(--primary);
+  border-color: var(--primary);
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .workspace-backup-hint {
+  color: var(--muted-strong);
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .workspace-backup-folder,
+:where(html[data-theme="dark"][data-palette="graphite"]) .workspace-backup-usage {
+  border-top: 1px solid var(--border);
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .workspace-backup-buttons button {
+  color: var(--foreground);
+  background: var(--panel);
+  border: 1px solid var(--border-strong);
 }
 
 :where(html[data-theme="dark"][data-palette="graphite"]) .toolbar-section-tools,
