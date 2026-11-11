@@ -10,5 +10,17 @@
       "en": "The menu of a design on the Server tab now has \"Put in this browser\", the way back from \"Put on the server\". Dragging its card onto the Browser tab works too. The design then lives only in this browser and no longer in the server folder.",
       "da": "Menuen for et design under fanen Server har nu \"Læg i denne browser\", vejen tilbage fra \"Læg på serveren\". Det virker også at trække kortet til fanen Browser. Designet ligger derefter kun i denne browser og ikke længere i servermappen."
     }
+  },
+  {
+    "title": {
+      "de": "Die Schrittliste im Verlauf erscheint wieder sofort",
+      "en": "The list of steps in the History view shows at once again",
+      "da": "Listen over trin i historikken vises straks igen"
+    },
+    "body": {
+      "de": "Bei Entwürfen mit vielen Schritten und großen Körpern brauchte die Liste der Schritte in der Verlaufsansicht bis zu einer halben Minute. Jetzt steht sie sofort da, auch beim erneuten Öffnen.",
+      "en": "With designs of many steps and large bodies, the list of steps in the History view took up to half a minute to show. Now it is there at once, also when you open it again.",
+      "da": "Ved designs med mange trin og store legemer tog listen over trin i historikken op til et halvt minut at vise. Nu er den der straks, også når du åbner den igen."
+    }
   }
 ]
