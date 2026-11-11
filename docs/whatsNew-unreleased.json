@@ -24,5 +24,27 @@
         }
       }
     ]
+  },
+  {
+    "title": {
+      "de": "layerling auf Schwedisch",
+      "en": "layerling in Swedish",
+      "sv": "layerling på svenska"
+    },
+    "body": {
+      "de": "Programm und Anleitung gibt es jetzt auch auf Schwedisch, alle 17 Kapitel. Ein Browser auf Schwedisch startet gleich darin, sonst wählst du es oben rechts in der Sprachliste.",
+      "en": "The program and its user guide now speak Swedish too, all 17 chapters. A browser set to Swedish starts in it; otherwise pick it in the language list at the top right.",
+      "sv": "Programmet och användarhandboken finns nu även på svenska, alla 17 kapitel. En webbläsare inställd på svenska startar direkt på svenska; annars väljer du det i språklistan uppe till höger."
+    }
+  },
+  {
+    "title": {
+      "de": "Schwalbenschwanz folgt der Schräge",
+      "en": "The dovetail follows a slope"
+    },
+    "body": {
+      "de": "Teilst du eine Rampe oder einen Keil quer zur Schräge mit Schwalbenschwanz, endete die Zunge bisher gerade an der Schnittfläche, und zusammengesteckt blieb über jeder Zunge eine Stufe in der Schräge. Jetzt läuft die Zunge mit der Schräge weiter, die Oberfläche ist glatt.",
+      "en": "Split a ramp or wedge across its slope with a dovetail, and the tongue used to end square at the cut face, leaving a step in the slope above each tongue once put together. Now the tongue runs on with the slope, and the surface is smooth."
+    }
   }
 ]
