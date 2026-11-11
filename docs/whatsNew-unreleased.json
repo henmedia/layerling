@@ -11,5 +11,15 @@
     "guide": {
       "section": "buildPlates"
     }
+  },
+  {
+    "title": {
+      "de": "Prusa CORE One INDX",
+      "en": "Prusa CORE One INDX"
+    },
+    "body": {
+      "de": "Die Druckerliste in den Einstellungen kennt jetzt auch den CORE One mit dem INDX-Werkzeugwechsler, mit seiner kleineren Platte von 248 × 205 mm.",
+      "en": "The printer list in the settings now has the CORE One with the INDX tool changer too, with its smaller 248 × 205 mm plate."
+    }
   }
 ]
