@@ -52,7 +52,7 @@ Both the tape measure and the framing square stay where they are while you sketc
 
 Click {{ui:camera.protractor}} in the view bar to measure an angle. A row of buttons opens beside it, and until you click the button again or press [[Esc]], a click in the view measures with the protractor. Like the tape measure, it snaps to the corners and edges of bodies; beside the bodies it sets a point on the plate.
 
-- {{ui:camera.protractorPoints}}: click the corner of the angle first, then a point on each side. While you place the last point, the angle shows already; after the third click it stays, with an arc between the sides. It is the angle at the corner, from 0° to 180°.
+- {{ui:camera.protractorPoints}}: click the corner of the angle first, then a point on each side. While you place the last point, the angle shows already; after the third click it stays, with an arc between the sides. It is the angle at the corner, from 0° to 180°. Seen straight from the top, the front or a side, it measures the angle as it shows there: a top corner and the bottom corner right below it are the same spot. In a tilted view it is the angle in space.
 - {{ui:camera.protractorFaces}}: click two flat faces. A short blue line on each shows which way it faces, and the label gives both angles the faces make, the smaller first: a 45° chamfer against the top reads 45° · 135°, two sides of a box just 90°. A curved face has no single direction, so the protractor asks for a flat one.
 
 The next click after a finished angle starts a new one, and {{ui:camera.protractorClear}} removes it. The angle follows the bodies when they move or turn. Nothing of it is saved or goes into the history: it is gone when you put the protractor away.

@@ -52,7 +52,7 @@ Il metro a nastro e la squadra restano al loro posto mentre lavori nello schizzo
 
 Fai clic su {{ui:camera.protractor}} nella barra della vista per misurare un angolo. Accanto si apre una fila di pulsanti e, finché non fai di nuovo clic sul pulsante o premi [[Esc]], ogni clic nella vista misura con il goniometro. Come il metro, si aggancia a vertici e spigoli dei corpi; accanto ai corpi mette un punto sul piano.
 
-- {{ui:camera.protractorPoints}}: fai clic prima sul vertice dell'angolo, poi su un punto di ciascun lato. Mentre posizioni l'ultimo punto l'angolo è già visibile; dopo il terzo clic resta, con un arco tra i lati. È l'angolo al vertice, da 0° a 180°.
+- {{ui:camera.protractorPoints}}: fai clic prima sul vertice dell'angolo, poi su un punto di ciascun lato. Mentre posizioni l'ultimo punto l'angolo è già visibile; dopo il terzo clic resta, con un arco tra i lati. È l'angolo al vertice, da 0° a 180°. Visto dritto dall'alto, di fronte o di lato, misura l'angolo così come appare: un angolo in alto e quello in basso proprio sotto sono lo stesso punto. In una vista inclinata è l'angolo nello spazio.
 - {{ui:camera.protractorFaces}}: fai clic su due facce piane. Un breve tratto blu su ciascuna mostra verso dove è rivolta, e l'etichetta riporta entrambi gli angoli che formano le facce, prima il minore: uno smusso di 45° rispetto alla faccia superiore dà 45° · 135°, due lati di un parallelepipedo solo 90°. Una faccia curva non ha un'unica direzione, quindi il goniometro ne chiede una piana.
 
 Il clic successivo a un angolo completato ne inizia uno nuovo, e {{ui:camera.protractorClear}} lo rimuove. L'angolo segue i corpi quando vengono spostati o ruotati. Nulla viene salvato né entra nella cronologia: sparisce quando chiudi il goniometro.

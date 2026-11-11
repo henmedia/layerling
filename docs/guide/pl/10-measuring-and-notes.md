@@ -52,7 +52,7 @@ Zarówno narzędzie Zmierz, jak i kątownik zostają tam, gdzie są, gdy szkicuj
 
 Kliknij {{ui:camera.protractor}} na pasku widoku, aby zmierzyć kąt. Obok otworzy się rząd przycisków i dopóki nie klikniesz przycisku ponownie albo nie naciśniesz [[Esc]], każde kliknięcie w widoku mierzy kątomierzem. Podobnie jak narzędzie Zmierz przyciąga się do narożników i krawędzi brył; obok brył stawia punkt na płycie.
 
-- {{ui:camera.protractorPoints}}: najpierw kliknij wierzchołek kąta, potem punkt na każdym ramieniu. Podczas stawiania ostatniego punktu kąt już widać; po trzecim kliknięciu zostaje, z łukiem między ramionami. To kąt w wierzchołku, od 0° do 180°.
+- {{ui:camera.protractorPoints}}: najpierw kliknij wierzchołek kąta, potem punkt na każdym ramieniu. Podczas stawiania ostatniego punktu kąt już widać; po trzecim kliknięciu zostaje, z łukiem między ramionami. To kąt w wierzchołku, od 0° do 180°. Patrząc prosto z góry, z przodu lub z boku, mierzy kąt tak, jak go tam widać: górny narożnik i dolny tuż pod nim to ten sam punkt. W widoku pochylonym jest to kąt w przestrzeni.
 - {{ui:camera.protractorFaces}}: kliknij dwie płaskie ściany. Krótka niebieska kreska na każdej pokazuje, w którą stronę jest zwrócona, a etykieta podaje oba kąty, jakie tworzą ściany, najpierw mniejszy: fazka 45° względem góry daje 45° · 135°, dwa boki prostopadłościanu tylko 90°. Zakrzywiona ściana nie ma jednego kierunku, dlatego kątomierz prosi o płaską.
 
 Następne kliknięcie po gotowym kącie zaczyna nowy, a {{ui:camera.protractorClear}} go usuwa. Kąt podąża za bryłami, gdy się je przesuwa lub obraca. Nic z niego nie jest zapisywane ani nie trafia do historii: znika, gdy odłożysz kątomierz.

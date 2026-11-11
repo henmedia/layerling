@@ -50,7 +50,7 @@ A mérőszalag és a derékszögvonalzó is a helyén marad, amíg vázlatot ké
 
 Szöget a nézetsáv {{ui:camera.protractor}} gombjával mérsz. Mellette gombsor nyílik, és amíg újra rá nem kattintasz a gombra, vagy meg nem nyomod az [[Esc]] billentyűt, a nézetbe kattintva a szögmérővel mérsz. A mérőszalaghoz hasonlóan a testek sarkaihoz és éleihez illeszkedik; a testek mellett pontot tesz a lapra.
 
-- {{ui:camera.protractorPoints}}: először a szög csúcsára kattints, aztán mindkét szárán egy-egy pontra. Az utolsó pont elhelyezése közben a szög már látszik; a harmadik kattintás után megmarad, a szárak közti ívvel. Ez a csúcsnál lévő szög, 0° és 180° között.
+- {{ui:camera.protractorPoints}}: először a szög csúcsára kattints, aztán mindkét szárán egy-egy pontra. Az utolsó pont elhelyezése közben a szög már látszik; a harmadik kattintás után megmarad, a szárak közti ívvel. Ez a csúcsnál lévő szög, 0° és 180° között. Egyenesen felülről, elölről vagy oldalról nézve úgy méri a szöget, ahogy ott látszik: egy felső sarok és a közvetlenül alatta lévő alsó sarok ugyanaz a pont. Ferde nézetben a térbeli szöget méri.
 - {{ui:camera.protractorFaces}}: kattints két sík lapra. Mindegyiken egy rövid kék vonal mutatja, merre néz, a felirat pedig mindkét szöget megadja, amelyet a lapok bezárnak, a kisebbet elöl: egy 45°-os letörés a felső laphoz képest 45° · 135°, egy hasáb két oldala csak 90°. Egy ívelt lapnak nincs egyetlen iránya, ezért a szögmérő sík lapot kér.
 
 Egy kész szög utáni következő kattintás újat kezd, a {{ui:camera.protractorClear}} pedig eltávolítja. A szög követi a testeket, ha elmozdulnak vagy elfordulnak. Semmi sem mentődik belőle, és az előzményekbe sem kerül: eltűnik, amikor elteszed a szögmérőt.

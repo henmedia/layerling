@@ -33,9 +33,58 @@ function angleOfDirections(a: ProtractorVector, b: ProtractorVector) {
   return toDegrees(Math.atan2(lengthOf(cross), dot));
 }
 
-/** The angle at `vertex` between the legs to `a` and to `b`, 0 to 180 degrees; null when a leg has no length. */
-export function angleAtVertex(vertex: ProtractorVector, a: ProtractorVector, b: ProtractorVector) {
-  return angleOfDirections(between(vertex, a), between(vertex, b));
+/** A straight view a measurement was begun in: the axis it looked along, and the camera's place when it has a perspective. */
+export type ProtractorView = { normal: ProtractorVector; eye?: ProtractorVector | null };
+
+/**
+ * The angle at `vertex` between the legs to `a` and to `b`, 0 to 180 degrees; null when a leg has no length.
+ * With `view`, the angle as that view shows it: both side points first moved to where they appear on the
+ * plane through the corner square to the view (pointAsSeen).
+ */
+export function angleAtVertex(vertex: ProtractorVector, a: ProtractorVector, b: ProtractorVector, view?: ProtractorView | null) {
+  const seenA = view ? pointAsSeen(vertex, a, view) : a;
+  const seenB = view ? pointAsSeen(vertex, b, view) : b;
+  return angleOfDirections(between(vertex, seenA), between(vertex, seenB));
+}
+
+const dotOf = (a: ProtractorVector, b: ProtractorVector) => a.x * b.x + a.y * b.y + a.z * b.z;
+
+/** `point` moved along the unit `normal` onto the plane through `vertex` square to it. */
+export function flattenOntoPlane(vertex: ProtractorVector, point: ProtractorVector, normal: ProtractorVector): ProtractorVector {
+  const off = dotOf(between(vertex, point), normal);
+  return { x: point.x - normal.x * off, y: point.y - normal.y * off, z: point.z - normal.z * off };
+}
+
+/**
+ * Where `point` appears on the plane through `vertex` square to the view: along the sight line from the eye
+ * in a perspective, straight along the axis without one. A bottom corner seen behind a top corner lands on it.
+ */
+export function pointAsSeen(vertex: ProtractorVector, point: ProtractorVector, view: ProtractorView): ProtractorVector {
+  const { normal, eye } = view;
+  if (!eye) return flattenOntoPlane(vertex, point, normal);
+  const sight = between(eye, point);
+  const across = dotOf(sight, normal);
+  if (Math.abs(across) < PROTRACTOR_MIN_LENGTH) return flattenOntoPlane(vertex, point, normal);
+  const t = dotOf(between(eye, vertex), normal) / across;
+  return { x: eye.x + sight.x * t, y: eye.y + sight.y * t, z: eye.z + sight.z * t };
+}
+
+/** Within this many degrees of an axis a view counts as straight: from the top, the front or a side. */
+const STRAIGHT_VIEW_DEGREES = 1;
+
+/**
+ * The axis a view looks straight along, as a unit vector, or null for a tilted view (#1650). Seen straight
+ * from the top, a top corner and the bottom corner below it are one spot on the screen, so the protractor
+ * measures there on the plane of the screen: the angle that is seen, not the one in space it may have caught.
+ */
+export function straightViewAxis(direction: ProtractorVector): ProtractorVector | null {
+  const length = lengthOf(direction);
+  if (length < PROTRACTOR_MIN_LENGTH) return null;
+  const straight = Math.cos((STRAIGHT_VIEW_DEGREES * Math.PI) / 180);
+  if (Math.abs(direction.x) / length >= straight) return { x: 1, y: 0, z: 0 };
+  if (Math.abs(direction.y) / length >= straight) return { x: 0, y: 1, z: 0 };
+  if (Math.abs(direction.z) / length >= straight) return { x: 0, y: 0, z: 1 };
+  return null;
 }
 
 /**
