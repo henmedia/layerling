@@ -16,6 +16,8 @@ code still carries it - so a lower number further down is older, not newer.
 
 - **Duplicate repeats the move for several parts too (#1662):** Ctrl+D repeated how a copy was moved, turned or resized only for a single part; a selection of several parts was copied in place every time, so a whole layer had to be lifted again by hand for each copy. The copies of a selection now carry on the same way: duplicate a layer, lift the copy, and every further Ctrl+D puts the next layer on top at the same distance, each part with the move of its own original. Checked in the editor through headless Edge (three boxes, the copies lifted by 8 mm, then Ctrl+D twice: four layers at 0, 8, 16 and 24 mm); guide chapter 3 in 16 languages
 
+- **Tracing an SVG picture in Firefox (#1661):** The trace read a picture through a browser function that Firefox does not offer for SVG files, so "The picture could not be read" appeared for an SVG added to the sketch; the picture is now read through an image element when that fails
+
 ## 1.159.0
 
 - **layerling in Swedish:** The interface, all 17 chapters of the user guide (under /handbok) and a Swedish README (README.sv.md); a browser set to Swedish starts in it, and the language list has it between Slovenščina and Türkçe. Prepared with Antigravity, taken over and checked here (5490 of 5490 sentences, the guide and language tests); the link to the imprint reads "Juridisk information". The step-by-step Docker guide is now linked from every README.
