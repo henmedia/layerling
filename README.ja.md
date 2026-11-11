@@ -237,6 +237,8 @@ Git と Node.js 22.18 以降が必要です。どちらかが足りなければ�
 
 Node.js をインストールせずに、コンピューター、NAS（Synology、Unraid など）、ホームサーバーで layerling を動かすには、Docker Hub にある既製のイメージ **`henmedia/layerling`** を使ってください（**`ghcr.io/henmedia/layerling`** にも同じイメージがあります）。リリースのたびに、amd64 と arm64（Raspberry Pi、ARM の NAS）向けに、バージョン番号と `latest` のタグで公開しています。アプリはポート **3000** で待ち受けます。
 
+Docker が初めてなら、[Docker で layerling を動かす手順（英語）](docs/docker/en/docker-step-by-step.md) が Windows、macOS、Linux でゼロから案内します。Docker のインストール、layerling の起動、デザインをパソコンのフォルダーにファイルとして保存するところまでです。
+
 いちばん手早いのは、コマンド 1 つで済ませる方法です：
 
 ```bash

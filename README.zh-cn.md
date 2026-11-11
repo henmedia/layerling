@@ -236,6 +236,8 @@ curl -fsSL https://raw.githubusercontent.com/henmedia/layerling/main/scripts/mac
 **`henmedia/layerling`**（**`ghcr.io/henmedia/layerling`** 也是同一个镜像）。每个版本都会以版本号和 `latest` 发布
 amd64 与 arm64（树莓派、ARM NAS）镜像。应用监听 **3000** 端口。
 
+第一次用 Docker？[一步步在 Docker 中运行 layerling（英文）](docs/docker/en/docker-step-by-step.md) 从零开始，适用于 Windows、macOS 和 Linux：安装 Docker、启动 layerling，并把设计作为文件保存在电脑上的一个文件夹里。
+
 最快的方式是一条命令：
 
 ```bash

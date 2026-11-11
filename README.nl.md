@@ -238,6 +238,8 @@ Voer dezelfde regel opnieuw uit wanneer je wilt **bijwerken**: de bestaande map 
 
 Om layerling op een computer, NAS (Synology, Unraid, enz.) of thuisserver te draaien zonder Node.js te installeren, gebruik je de kant-en-klare image **`henmedia/layerling`** op Docker Hub (ook te vinden als **`ghcr.io/henmedia/layerling`**, dezelfde image). Elke release publiceert die voor amd64 en arm64 (Raspberry Pi, ARM-NAS) onder het versienummer en als `latest`. De app luistert op poort **3000**.
 
+Nieuw met Docker? [layerling in Docker, stap voor stap (in het Engels)](docs/docker/en/docker-step-by-step.md) begint bij nul op Windows, macOS of Linux: Docker installeren, layerling starten en je ontwerpen als bestanden in een map op je computer bewaren.
+
 De snelste manier is één enkel commando:
 
 ```bash

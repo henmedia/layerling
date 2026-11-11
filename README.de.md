@@ -240,7 +240,7 @@ Dieselbe Zeile später noch einmal ausführen **aktualisiert**: Der vorhandene O
 
 Um layerling auf einem Rechner, NAS (Synology, Unraid usw.) oder Heimserver ohne Node.js zu betreiben, nimmst du das fertige Image **`henmedia/layerling`** auf Docker Hub (auch unter **`ghcr.io/henmedia/layerling`**, dasselbe Image). Jedes Release veröffentlicht es für amd64 und arm64 (Raspberry Pi, ARM-NAS), unter seiner Versionsnummer und als `latest`. Die App lauscht auf Port **3000**.
 
-Noch nie mit Docker gearbeitet? [layerling in Docker, Schritt für Schritt](docs/docker/de/docker-schritt-fuer-schritt.md) fängt unter Windows, macOS oder Linux bei null an: Docker installieren, layerling starten und die Entwürfe als Dateien in einem Ordner auf dem Rechner speichern.
+Noch nie mit Docker gearbeitet? [layerling in Docker, Schritt für Schritt](docs/docker/de/docker-schritt-fuer-schritt.md) fängt unter Windows, macOS oder Linux bei null an: Docker installieren, layerling starten und die Entwürfe als Dateien in einem Ordner auf dem Rechner speichern. Auf Englisch: [step by step](docs/docker/en/docker-step-by-step.md).
 
 Am schnellsten geht es mit einem einzigen Befehl:
 

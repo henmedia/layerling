@@ -237,6 +237,8 @@ curl -fsSL https://raw.githubusercontent.com/henmedia/layerling/main/scripts/mac
 
 لتشغيل layerling على حاسوب أو NAS ‏(Synology وUnraid وغيرهما) أو خادم منزلي دون تثبيت Node.js، استخدم الصورة الجاهزة **`henmedia/layerling`** على Docker Hub (وهي أيضًا على **`ghcr.io/henmedia/layerling`**، الصورة نفسها). كل إصدار ينشرها لـamd64 وarm64 ‏(Raspberry Pi، وأجهزة NAS بمعالج ARM) تحت رقم إصداره وباسم `latest`. يستمع التطبيق على المنفذ **3000**.
 
+جديد على Docker؟ [تشغيل layerling في Docker خطوة بخطوة (بالإنجليزية)](docs/docker/en/docker-step-by-step.md) يبدأ من الصفر على Windows أو macOS أو Linux: يثبّت Docker ويشغّل layerling ويحفظ تصاميمك كملفات في مجلد على حاسوبك.
+
 أسرع طريقة هي أمر واحد:
 
 ```bash
