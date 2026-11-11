@@ -1,1 +1,14 @@
-[]
+[
+  {
+    "title": {
+      "de": "Mehr Platz für die Namen in der Objektliste",
+      "en": "More room for the names in the object list",
+      "da": "Mere plads til navnene i objektlisten"
+    },
+    "body": {
+      "de": "Ob ein Teil Körper oder Aussparung ist, zeigt die Objektliste jetzt mit einem Buchstaben statt mit dem ganzen Wort; mit der Maus darüber steht das Wort da. Und an ihrer rechten unteren Ecke lässt sich die Liste breiter ziehen, bis 600 Pixel; der Browser merkt sich die Breite.",
+      "en": "The object list now shows whether a part is a solid or a hole with one letter instead of the whole word; hold the mouse over it to see the word. And you can drag the list wider at its lower right corner, up to 600 pixels; the browser remembers the width.",
+      "da": "Objektlisten viser nu med ét bogstav i stedet for hele ordet, om en del er massiv eller et hul; hold musen over det for at se ordet. Og listen kan trækkes bredere i sit nederste højre hjørne, op til 600 pixel; browseren husker bredden."
+    }
+  }
+]

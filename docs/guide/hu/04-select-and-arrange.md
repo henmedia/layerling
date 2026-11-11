@@ -22,7 +22,7 @@ Sok résznél a nézetben könnyű elveszíteni a fonalat. Az objektumlista ({{u
 ![Az objektumlista: a „Group” csoport két résszel, mellette egy gömb. Egy mappa ikon megnyitja a csoportot.](shot:object-list)
 
 - Egy bejegyzésre kattintva kijelölöd az alakzatot, a csoporton belüli részeket is. Nyomva tartott [[Shift]] billentyűvel további bejegyzéseket adsz hozzá vagy veszel el, mint a nézetben. A nyilak kinyitják és összecsukják a csoportokat.
-- A címke mutatja, hogy egy rész {{ui:outliner.solid}} vagy {{ui:outliner.hole}}.
+- A név utáni betű mutatja, hogy egy rész {{ui:outliner.solid}} vagy {{ui:outliner.hole}}: ez a szó kezdőbetűje, és ha fölé viszed az egeret, megjelenik a teljes szó.
 - A név alatt az áll, milyen alakzatról van szó. Az a test, amely már nem egyszerű alakzat (lekerekített, kiüregelt vagy importált), {{ui:shape.exactBody}} feliratot kap, ha a STEP-export pontosan kiírja, és {{ui:shape.mesh}} feliratot, ha csak háromszögekből áll, és STL-ként megy ki. A lekerekítés vagy kiüregelés után hozzáadott szűkítés, döntés vagy csavarás csak a hálóját hajlítja meg, ezért ekkor {{ui:shape.mesh}} áll ott.
 - A lakat és a szem egyes részeket zárol és rejt el.
 - Az {{ui:outliner.rename}} saját nevet ad egy résznek; a beállítások tetején a név melletti ceruza ugyanezt teszi a kijelölt alakzattal. Nagyobb terveknél az értelmes nevek rengeteget segítenek.
@@ -32,7 +32,7 @@ Sok résznél a nézetben könnyű elveszíteni a fonalat. Az objektumlista ({{u
 - A keresőmező név és fajta szerint is megtalálja az alakzatokat, így a „henger” vagy a „lyuk” szóra is. A csoportokon belül is keres, akármilyen mélyen vannak egymásba ágyazva: egy találatot tartalmazó csoport a listában marad, és kinyílik, hogy megmutassa az egyező részeket és a hozzájuk vezető csoportokat. A saját neve alapján megtalált csoport megnyitáskor az összes részét mutatja.
 - A címsor bal szélén lévő nyíl a címsoráig összecsukja a listát, majd újra kinyitja.
 
-A lista a nézetkockától közvetlenül jobbra van rögzítve. A címsoránál fogva húzd bárhová a munkasíkon; a nézetkocka és a nézetsáv alatt halad el. Ejtsd vissza a nézetkocka mellé, vagy kattints duplán a címsorra, és újra rögzül. Hogy hol volt, és hogy össze volt-e csukva, ebben a böngészőben megmarad.
+A lista a nézetkockától közvetlenül jobbra van rögzítve. A címsoránál fogva húzd bárhová a munkasíkon; a nézetkocka és a nézetsáv alatt halad el. Ejtsd vissza a nézetkocka mellé, vagy kattints duplán a címsorra, és újra rögzül. Hogy hol volt, és hogy össze volt-e csukva, ebben a böngészőben megmarad. A listát a jobb alsó sarkánál húzva teheted szélesebbé vagy keskenyebbé, 240 és 600 képpont között; a böngésző a szélességet is megjegyzi.
 
 ## Helyzet begépelése
 

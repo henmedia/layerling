@@ -15294,7 +15294,10 @@ html[data-theme="dark"] .theme-check {
   display: flex;
   flex-direction: column;
   width: 300px;
-  max-width: calc(100vw - 120px);
+  /* Wider or narrower at the lower right corner (Discussion #1636); MIN/MAX_PANEL_WIDTH in ObjectListPanel.tsx. */
+  min-width: min(240px, calc(100vw - 120px));
+  max-width: min(600px, calc(100vw - 120px));
+  resize: horizontal;
   max-height: calc(100% - 96px);
   background: rgba(254, 253, 252, 0.96);
   backdrop-filter: blur(12px);
@@ -15659,14 +15662,18 @@ html[data-theme="dark"] .theme-check {
   flex: none;
 }
 
+/* One letter for Solid or Hole, the word as its tooltip (Discussion #1636). */
 .outliner-badge {
   display: inline-block;
-  padding: 1px 6px;
+  min-width: 18px;
+  padding: 1px 4px;
   font-size: 10px;
   font-weight: 700;
+  line-height: 14px;
+  text-align: center;
   border-radius: 4px;
   text-transform: uppercase;
-  letter-spacing: 0.02em;
+  cursor: default;
 }
 
 .outliner-badge.badge-solid {
@@ -15682,8 +15689,10 @@ html[data-theme="dark"] .theme-check {
 }
 
 .outliner-badge.small {
-  padding: 0 4px;
+  min-width: 15px;
+  padding: 0 3px;
   font-size: 9px;
+  line-height: 12px;
 }
 
 .outliner-row-actions {
@@ -16190,6 +16199,11 @@ html[data-theme="dark"] .shape-menu-pin.active {
 /* Collapsed: the title bar alone, without the line that separates it from the list. */
 .outliner-panel.collapsed .outliner-header {
   border-bottom: none;
+}
+
+/* The title bar alone has no corner to drag the width at. */
+.outliner-panel.collapsed {
+  resize: none;
 }
 
 .guide-modal h3 {
