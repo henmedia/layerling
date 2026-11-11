@@ -132,7 +132,7 @@ A vonalat a vázlat megnyitása nélkül is beállíthatod: egy vázlattest tula
 
 A {{ui:prop.sketchSilhouette}} kihagy minden olyan körvonalat, amely egy másikon belül fekszik: a lyukakat és mindent, ami bennük van. Csak a külső körvonal marad. A {{ui:prop.sketchFill.outside}} beállítással együtt sütikiszúrót ad: importálj egy SVG-t kétszer, egyszer a sziluettel felületként az alaphoz, egyszer pedig a sziluettel és 1–2 mm-es külső vonallal a falhoz. A kapcsoló vázlatmódban a {{ui:sketch.stroke}} ablakban is megtalálható.
 
-Az éleken lévő lekerekítések és élletörések elvesznek, amikor a test újraépül, mint a vázlat szerkesztésekor.
+Az éleken lévő lekerekítések és élletörések elvesznek, amikor a test újraépül, mint a vázlat szerkesztésekor. A(z) {{ui:inspector.taper}} és a(z) {{ui:inspector.twist}} megmarad; a kúposítás a körvonallal együtt nő vagy csökken.
 
 ## Ferde falak, bélyegzőkhöz
 

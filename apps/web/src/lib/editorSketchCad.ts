@@ -198,13 +198,39 @@ export async function cadShapeFromSketchProfile(profile: SketchProfile, height: 
   if (stepped) {
     const mesh = shapeFromCadMesh(source, stepped.positions, new Float32Array(0), stepped.indices, "");
     if (!mesh) throw new Error(t("sketch.edgeFailed"));
-    return { ...mesh, cadBrep: undefined, cadBrepFrame: undefined, cadMeshDeflection: undefined, sketchProfile: cloneSketchProfile(profile), sketchOperation: "extrude" as const, sketchPose: undefined };
+    return withExtrudeDeformsKept({ ...mesh, cadBrep: undefined, cadBrepFrame: undefined, cadMeshDeflection: undefined, sketchProfile: cloneSketchProfile(profile), sketchOperation: "extrude" as const, sketchPose: undefined }, existing);
   }
   if (response.type === "error") throw new Error(response.message);
   const shape = shapeFromCadMesh(source, response.positions, response.normals, response.indices, response.brep, response.deflection ?? SKETCH_CAD_DEFLECTION);
   if (!shape) throw new Error("OpenCascade returned an empty sketch solid");
   // Built in the sketch's own coordinates, not baked where a body stands: no pose to keep.
-  return { ...shape, sketchProfile: cloneSketchProfile(profile), sketchOperation: "extrude" as const, sketchPose: undefined };
+  return withExtrudeDeformsKept({ ...shape, sketchProfile: cloneSketchProfile(profile), sketchOperation: "extrude" as const, sketchPose: undefined }, existing);
+}
+
+/**
+ * A sketch body built again after its sketch was edited keeps its taper, twist and lean (Federico Garcia, Facebook,
+ * 11.11.2026). They are settings on top of the extruded outline, not part of it: shapeFromCadMesh drops them because a
+ * mesh it is given usually has them in it already, but a freshly extruded sketch never has. A taper is kept in
+ * proportion: an outline drawn wider gets an end as much wider. Fillets and chamfers still go, their edges are new.
+ */
+export function withExtrudeDeformsKept(rebuilt: WorkplaneShape, existing?: WorkplaneShape | null): WorkplaneShape {
+  if (!existing || (existing.sketchOperation && existing.sketchOperation !== "extrude")) return rebuilt;
+  const widthScale = shapeWidth(rebuilt) / Math.max(MIN_SHAPE_DIMENSION, shapeWidth(existing));
+  const depthScale = shapeDepth(rebuilt) / Math.max(MIN_SHAPE_DIMENSION, shapeDepth(existing));
+  const scaled = (value: number | undefined, scale: number) => (typeof value === "number" && Number.isFinite(value) ? cleanModelDimension(value * scale) : undefined);
+  const kept: Partial<WorkplaneShape> = {
+    taperTopWidth: scaled(existing.taperTopWidth, widthScale),
+    taperTopDepth: scaled(existing.taperTopDepth, depthScale),
+    taperBottomWidth: scaled(existing.taperBottomWidth, widthScale),
+    taperBottomDepth: scaled(existing.taperBottomDepth, depthScale),
+    taperTopScale: existing.taperTopScale,
+    taperBottomScale: existing.taperBottomScale,
+    extrudeTwist: existing.extrudeTwist,
+    extrudeTopOffsetX: existing.extrudeTopOffsetX,
+    extrudeTopOffsetZ: existing.extrudeTopOffsetZ,
+  };
+  const present = Object.fromEntries(Object.entries(kept).filter(([, value]) => value !== undefined));
+  return Object.keys(present).length ? canonicalizeShape({ ...rebuilt, ...present }) : rebuilt;
 }
 
 /**

@@ -60,7 +60,7 @@ El siguiente clic tras un ángulo terminado empieza uno nuevo, y {{ui:camera.pro
 
 En los ajustes, en {{ui:workspace.appearance}}, hay dos interruptores para ver medidas en directo:
 
-- {{ui:workspace.showMoveDimensions}} muestra cuánto te desplazas mientras arrastras. También al levantar con la flecha negra sobre un cuerpo; el recorrido aparece en su esquina delantera. Al soltar, haz clic en ese número y escribe la distancia exacta; un valor negativo baja.
+- {{ui:workspace.showMoveDimensions}} muestra cuánto te desplazas mientras arrastras. También al levantar con la flecha azul sobre un cuerpo; el recorrido aparece en su esquina delantera. Al soltar, haz clic en ese número y escribe la distancia exacta; un valor negativo baja.
 - {{ui:workspace.showOriginDimensions}} muestra las distancias de la selección al origen de la placa, también con varios cuerpos seleccionados.
 
 Con {{ui:workspace.dimensionsAlwaysVisible}}, las medidas se ven siempre. Un cuerpo que no está sobre el plano de trabajo muestra también su altura sobre él; haz clic en el número para escribir otra.

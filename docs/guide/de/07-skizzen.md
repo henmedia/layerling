@@ -303,7 +303,7 @@ Die Kontur stellst du auch ein, ohne die Skizze zu öffnen: In den Eigenschaften
 
 {{ui:prop.sketchSilhouette}} lässt alle Umrisse weg, die in einem anderen liegen: Löcher und was in ihnen liegt. Übrig bleibt nur der äußere Umriss. Zusammen mit {{ui:prop.sketchFill.outside}} wird daraus ein Ausstecher: Importiere ein SVG zweimal, einmal mit Silhouette als Fläche für den Boden und einmal mit Silhouette und 1 bis 2 mm Kontur außen als Wand. Den Schalter gibt es auch im Fenster {{ui:sketch.stroke}} im Skizzenmodus.
 
-Verrundungen und Fasen an den Kanten gehen beim Neubau verloren, wie beim Bearbeiten der Skizze.
+Verrundungen und Fasen an den Kanten gehen beim Neubau verloren, wie beim Bearbeiten der Skizze. {{ui:inspector.taper}} und {{ui:inspector.twist}} bleiben; eine Verjüngung wächst oder schrumpft mit dem Umriss.
 
 ## Schräge Wände, für Stempel
 
