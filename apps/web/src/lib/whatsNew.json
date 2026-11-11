@@ -1,5 +1,58 @@
 [
   {
+    "version": "1.159.0",
+    "items": [
+      {
+        "title": {
+          "de": "Frühere Fassungen – und warum du trotzdem selbst sichern musst",
+          "en": "Earlier versions – and why you still need your own backup"
+        },
+        "body": {
+          "de": "Deine Entwürfe liegen in diesem Browser auf deinem Rechner. Wie bei allen Daten gilt: Sicher ist nur, was es ein zweites Mal an einem anderen Ort gibt. Eine defekte Festplatte, ein neuer PC, gelöschte Browserdaten oder ein Fehler im Programm, und ohne Sicherung ist die Arbeit weg. Um diese Sicherung kümmerst du dich selbst, das kann dir keine Software abnehmen.\n\nWas du tun solltest: Klicke nach jeder größeren Sitzung auf der Startseite auf „Alle sichern“. Das packt alle Entwürfe samt Ordnern und eigenen Formen in eine einzige Datei. Leg sie auf einen USB-Stick, in einen Cloud-Ordner oder auf ein NAS, also nicht nur auf denselben Rechner. „Sicherung wiederherstellen“ holt alles zurück, auch auf einem anderen Computer.\n\nWas layerling jetzt zusätzlich von selbst tut: Bevor Speichern (Strg+S) eine .lyl-Datei überschreibt, behält layerling die Datei, wie sie war. Und während du arbeitest, legt es alle 10 Minuten einen Zwischenstand ab, wenn sich etwas geändert hat. Das hilft, wenn du versehentlich etwas überschrieben oder kaputtgemacht hast.\n\nSo kommst du an frühere Fassungen: im Editor über Export → LYL → „Frühere Fassungen“ oder über die Befehlssuche, auf der Startseite neben „Sicherung wiederherstellen“ für alle Entwürfe und im Menü einer Entwurfskarte für diesen einen. Jede Fassung zeigt Bild, Zeit und Größe. „Öffnen“ legt sie als neuen Entwurf an, dein aktueller Entwurf bleibt unverändert. Du kannst sie auch als Datei speichern oder löschen.\n\nWas du einstellen kannst (Zahnrad im Menüband → Sicherungen):\n– wie viele frühere Fassungen je Datei bleiben (aus bis 20, anfangs 5),\n– wie oft ein Zwischenstand entsteht (aus, alle 10 oder alle 30 Minuten; je Entwurf bleiben die letzten sechs),\n– ab wann layerling an „Alle sichern“ erinnert (nach 3, 7 oder 14 Tagen oder nie),\n– in Chrome und Edge einen Sicherungsordner auf deinem Rechner, in den jede Sicherung zusätzlich als .lyl-Datei mit Name und Uhrzeit wandert. Liegt dieser Ordner in der Cloud oder auf einem anderen Laufwerk, ist er ein zweiter Ort.\n\nWoran du merkst, dass es Zeit wird: Der Hinweis über deinen Entwürfen wird deutlicher, je länger die letzte Sicherung her ist. Nach 7 Tagen mit Änderungen erscheint ein Knopf „Jetzt sichern“, nach 30 Tagen oder bei mehreren Entwürfen ganz ohne Sicherung wird er rot. Im Editor erinnert dich die Statuszeile höchstens einmal am Tag.\n\nWichtig: Die früheren Fassungen liegen im selben Browser wie deine Entwürfe. Löschst du die Browserdaten oder geht der Rechner kaputt, sind sie mit weg. Sie ersetzen „Alle sichern“ also nicht, sie ergänzen es.",
+          "en": "Your designs live in this browser on your computer. As with all data, only what exists a second time in another place is safe. A failing drive, a new PC, cleared browser data or a bug, and without a backup the work is gone. Keeping that backup is up to you; no software can do it for you.\n\nWhat you should do: after every bigger session, click “Back up all” on the start page. It puts every design, with its folders and your custom shapes, into a single file. Keep it on a USB stick, in a cloud folder or on a NAS, not only on the same computer. “Restore backup” brings everything back, on another computer too.\n\nWhat layerling now also does by itself: before Save (Ctrl+S) writes over a .lyl file, layerling keeps the file as it was. And while you work, it keeps a state of the design every 10 minutes when something changed. That helps when you saved over something or broke it by mistake.\n\nWhere to find earlier versions: in the editor under Export → LYL → “Earlier versions” or in the command search, on the start page beside “Restore backup” for every design, and in a design card's menu for that one. Each shows its picture, time and size. “Open” makes it a new design; the design you have open stays as it is. You can also save it as a file or delete it.\n\nWhat you can set (cogwheel in the ribbon → Backups):\n– how many earlier versions of a file stay (off up to 20, 5 to begin with),\n– how often a state is kept (off, every 10 or every 30 minutes; the last six of each design stay),\n– when layerling reminds you of “Back up all” (after 3, 7 or 14 days, or never),\n– in Chrome and Edge, a backup folder on your computer that also gets every backup as a .lyl file named after the design and the time. A folder in the cloud or on another drive is a second place.\n\nHow you know it is time: the notice above your designs grows louder the longer the last backup lies back. After 7 days with changes it gets a “Back up now” button; after 30 days, or with several designs and no backup at all, it turns red. In the editor the status line reminds you once a day at most.\n\nImportant: the earlier versions live in the same browser as your designs. Clear the browser data or lose the computer, and they are gone too. So they do not replace “Back up all”; they add to it."
+        },
+        "guide": [
+          {
+            "section": "yourBackup",
+            "label": {
+              "de": "Anleitung: Deine Daten, deine Sicherung",
+              "en": "Guide: Your designs, your backup"
+            }
+          },
+          {
+            "section": "fileBackups",
+            "label": {
+              "de": "Anleitung: Frühere Fassungen",
+              "en": "Guide: Earlier versions"
+            }
+          }
+        ]
+      },
+      {
+        "title": {
+          "de": "layerling auf Schwedisch",
+          "en": "layerling in Swedish",
+          "sv": "layerling på svenska"
+        },
+        "body": {
+          "de": "Programm und Anleitung gibt es jetzt auch auf Schwedisch, alle 17 Kapitel. Ein Browser auf Schwedisch startet gleich darin, sonst wählst du es oben rechts in der Sprachliste.",
+          "en": "The program and its user guide now speak Swedish too, all 17 chapters. A browser set to Swedish starts in it; otherwise pick it in the language list at the top right.",
+          "sv": "Programmet och användarhandboken finns nu även på svenska, alla 17 kapitel. En webbläsare inställd på svenska startar direkt på svenska; annars väljer du det i språklistan uppe till höger."
+        }
+      },
+      {
+        "title": {
+          "de": "Schwalbenschwanz folgt der Schräge",
+          "en": "The dovetail follows a slope"
+        },
+        "body": {
+          "de": "Teilst du eine Rampe oder einen Keil quer zur Schräge mit Schwalbenschwanz, endete die Zunge bisher gerade an der Schnittfläche, und zusammengesteckt blieb über jeder Zunge eine Stufe in der Schräge. Jetzt läuft die Zunge mit der Schräge weiter, die Oberfläche ist glatt.",
+          "en": "Split a ramp or wedge across its slope with a dovetail, and the tongue used to end square at the cut face, leaving a step in the slope above each tongue once put together. Now the tongue runs on with the slope, and the surface is smooth."
+        }
+      }
+    ]
+  },
+  {
     "version": "1.158.0",
     "items": [
       {
