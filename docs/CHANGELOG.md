@@ -6,6 +6,8 @@ code still carries it - so a lower number further down is older, not newer.
 
 ## Unreleased
 
+## 1.158.0
+
 - **New SBC boards: the Cheap Yellow Display (Discussion #1644):** The ESP32-2432S028R "CYD" with micro-USB and with micro-USB plus USB-C, laid screen up with every connector on the back under the board. Buttons under a board now reach down through the floor. Added by @plazmabokor in #1651.
 
 - **Slide-in lid: neutral hints for the click bump, the grip and the tab (#1642):** With a frame, the wall the lid slides in through keeps its height and has a slot, so the hints now say "the wall it slides in through" instead of "the cut wall", in every language that has them.

@@ -1,5 +1,130 @@
 [
   {
+    "version": "1.158.0",
+    "items": [
+      {
+        "title": {
+          "de": "Größe ziehen bis an die Wand",
+          "en": "Resize right up to the wall",
+          "da": "Træk størrelsen helt hen til væggen"
+        },
+        "body": {
+          "de": "Ziehst du eine Form an einem Seitengriff größer, hält die Seite jetzt an den Kanten anderer Formen und an der Wand, auf die sie trifft, auch an der Innenwand eines Kastens oder Gehäuses. So füllt ein Teil einen Kasten genau von Wand zu Wand, ohne dass du nachmessen musst.",
+          "en": "When you drag a side handle to make a shape bigger, the side now stops at the edges of other shapes and at the wall it runs into, the inside wall of a box or case as well. So a part fills a box exactly from wall to wall, without measuring.",
+          "da": "Når du trækker i et sidehåndtag for at gøre en form større, stopper siden nu ved kanterne af andre former og ved den væg, den løber ind i, også indervæggen i en kasse eller et kabinet. Så fylder en del en kasse præcist fra væg til væg, uden at du skal måle."
+        }
+      },
+      {
+        "title": {
+          "de": "Winkellineal mit drittem Arm nach oben",
+          "en": "A third arm on the framing square, pointing up",
+          "da": "En tredje arm på vinkelmåleren, der peger op"
+        },
+        "body": {
+          "de": "Das Winkellineal hat einen dritten Arm, der an der Ecke senkrecht nach oben steht, mit eigenen Teilstrichen, für Zylinder und alles, was du in die Höhe baust. Der neue Knopf mit drei Achsen unter dem Griff schaltet jeden Arm ein oder aus.",
+          "en": "The framing square has a third arm that stands straight up from its corner, with its own ticks, for cylinders and anything you build upwards. The new button with three axes under its handle switches each arm on or off.",
+          "da": "Vinkelmåleren har en tredje arm, der står lodret op fra hjørnet med sine egne streger, til cylindre og alt, hvad du bygger i højden. Den nye knap med tre akser under håndtaget tænder eller slukker hver arm."
+        }
+      },
+      {
+        "title": {
+          "de": "Änderungen gehen nicht mehr verloren",
+          "en": "Edits are no longer lost",
+          "da": "Ændringer går ikke længere tabt"
+        },
+        "body": {
+          "de": "Lag die gespeicherte Zeit eines Entwurfs vor der Uhr deines Rechners, etwa nach einer zurückgestellten Uhr, wurde nach dem Neuladen keine Änderung mehr gespeichert, und ein Wechsel des Rasters holte den alten Stand zurück. Jetzt wird jede Änderung gespeichert, die erste bringt einen solchen Entwurf wieder in Ordnung.",
+          "en": "If the stored time of a design was ahead of your computer's clock, for example after the clock was set back, no edit was saved after a reload, and changing the snap step brought the old state back. Now every edit is saved, and the first one puts such a design right again.",
+          "da": "Hvis den gemte tid for et design lå foran din computers ur, for eksempel efter at uret var stillet tilbage, blev ingen ændring gemt efter en genindlæsning, og et skift af gitteret hentede den gamle tilstand tilbage. Nu gemmes hver ændring, og den første bringer sådan et design i orden igen."
+        }
+      },
+      {
+        "title": {
+          "de": "Winkelmesser misst, was die gerade Ansicht zeigt",
+          "en": "The protractor measures what a straight view shows",
+          "da": "Vinkelmåleren måler det, en lige visning viser"
+        },
+        "body": {
+          "de": "Von oben, vorn oder von der Seite gesehen misst der Winkelmesser jetzt den Winkel, den du siehst: Die Diagonale eines Würfels von oben ergibt 45° statt 54,7°. Das bleibt so, auch wenn du die Ansicht danach drehst.",
+          "en": "Seen straight from the top, the front or a side, the protractor now measures the angle you see: the diagonal of a cube seen from the top gives 45° instead of 54.7°. It stays so when you turn the view afterwards.",
+          "da": "Set lige ovenfra, forfra eller fra siden måler vinkelmåleren nu den vinkel, du ser: diagonalen i en terning set ovenfra giver 45° i stedet for 54,7°. Det bliver sådan, også når du drejer visningen bagefter."
+        }
+      },
+      {
+        "title": {
+          "de": "Stützrippe: Brücken mit Abstand zum Teil",
+          "en": "Support rib: bridges with a gap to the part",
+          "da": "Støtteribbe: broer med afstand til delen"
+        },
+        "body": {
+          "de": "Unter Weitere Einstellungen lässt „Abstand der Brückenenden“ jede Brücke kurz vor dem Teil enden. So druckt der Slicer die Brücke als eigene Bahn, und die Stütze lässt sich leichter abbrechen. Ein halber Strang, etwa 0,2 mm bei einer 0,4-mm-Düse, ist ein guter Anfang.",
+          "en": "Under More settings, \"Gap at the bridge ends\" lets each bridge end just before the part. The slicer then prints the bridge as a path of its own, and the support breaks away more easily. Half a line, about 0.2 mm for a 0.4 mm nozzle, is a good start.",
+          "da": "Under Flere indstillinger lader \"Afstand ved broernes ender\" hver bro slutte lige før delen. Så printer sliceren broen som sin egen bane, og støtten brækker lettere af. En halv streng, cirka 0,2 mm med en 0,4 mm dyse, er en god start."
+        }
+      },
+      {
+        "title": {
+          "de": "Neue Boards: Cheap Yellow Display",
+          "en": "New boards: Cheap Yellow Display",
+          "da": "Nye boards: Cheap Yellow Display"
+        },
+        "body": {
+          "de": "Bei den SBC-Boards gibt es das ESP32-2432S028R („CYD“) mit Micro-USB und mit Micro-USB und USB-C, mit dem Bildschirm nach oben und allen Anschlüssen auf der Rückseite. Knöpfe unter einem Board reichen jetzt durch den Boden.",
+          "en": "The SBC boards now include the ESP32-2432S028R (\"CYD\") with micro-USB and with micro-USB plus USB-C, screen up, with every connector on the back. Buttons under a board now reach down through the floor.",
+          "da": "Blandt SBC-boardene findes nu ESP32-2432S028R (\"CYD\") med micro-USB og med micro-USB plus USB-C, med skærmen opad og alle stik på bagsiden. Knapper under et board når nu ned gennem bunden."
+        }
+      },
+      {
+        "title": {
+          "de": "SBC-Board bleibt auf seinen Befestigungslöchern",
+          "en": "An SBC board stays on its mounting holes",
+          "da": "Et SBC-board bliver på sine monteringshuller"
+        },
+        "body": {
+          "de": "Änderst du Abstand, Durchreichen durch die Wand oder Öffnungen eines Boards, bleibt das Board an seinem Platz, auch gedreht oder gekippt. Vorher konnte es sich dabei mitsamt seinen Löchern verschieben.",
+          "en": "When you change an SBC board's clearance, its reach through the wall or its openings, the board now keeps its place, also turned or tilted. Before, it could move along with its holes.",
+          "da": "Når du ændrer et SBC-boards afstand, gennemføring gennem væggen eller åbninger, bliver boardet nu på sin plads, også drejet eller vippet. Før kunne det flytte sig sammen med sine huller."
+        }
+      },
+      {
+        "title": {
+          "de": "Skizzenkörper behält Verjüngung, Verdrehung und Neigung",
+          "en": "A sketch body keeps its taper, twist and lean",
+          "da": "Et skitselegeme beholder tilspidsning, drejning og hældning"
+        },
+        "body": {
+          "de": "Bearbeitest du die Skizze eines Skizzenkörpers oder änderst seine Füllung, bleiben Verjüngung, Verdrehung und Neigung jetzt erhalten. Die Verjüngung wächst mit dem Umriss mit.",
+          "en": "When you edit the sketch of a sketch body or change its fill, its taper, twist and lean now stay. The taper grows or shrinks with the outline.",
+          "da": "Når du redigerer skitsen til et skitselegeme eller ændrer dets fyld, bliver tilspidsning, drejning og hældning nu bevaret. Tilspidsningen vokser og skrumper med omridset."
+        }
+      },
+      {
+        "title": {
+          "de": "Liegende Teile skalieren mit",
+          "en": "Parts lying on their side scale along",
+          "da": "Liggende dele skalerer med"
+        },
+        "body": {
+          "de": "Ziehst du mehrere ausgewählte Teile größer, wächst ein liegender Zylinder jetzt mit: länger an den Griffen an seinen Enden, dicker und weiter rund an denen an seiner Seite.",
+          "en": "When you stretch several selected parts, a cylinder lying on its side now grows along: longer with the handles at its ends, thicker and still round with those at its side.",
+          "da": "Når du trækker flere valgte dele større, vokser en liggende cylinder nu med: længere med håndtagene ved enderne, tykkere og stadig rund med dem på siden."
+        }
+      },
+      {
+        "title": {
+          "de": "Bündel: wo seine Löcher schneiden",
+          "en": "Bundles: where their holes cut",
+          "da": "Bundter: hvor deres huller skærer"
+        },
+        "body": {
+          "de": "Der Hinweis in den Einstellungen eines Bündels sagt jetzt, dass seine Löcher nie die eigenen Teile schneiden, auch nicht später in einer Gruppe, sondern nur die anderen Teile.",
+          "en": "The note in a bundle's settings now says that its holes never cut the bundle's own parts, not even later in a group, only the other parts.",
+          "da": "Noten i et bundts indstillinger siger nu, at dets huller aldrig skærer bundtets egne dele, heller ikke senere i en gruppe, kun de andre dele."
+        }
+      }
+    ]
+  },
+  {
     "version": "1.157.2",
     "items": [
       {
