@@ -325,7 +325,7 @@ export const MESSAGES_IT: Partial<Record<MessageKey, string>> = {
   "installHint.ios": "In Safari: icona Condividi → «Aggiungi alla schermata Home».",
   "installHint.firefox": "Firefox non consente di installare app, ma layerling continua a funzionare offline anche in questa scheda.",
   "welcome.moreLanguagesTitle": "La tua lingua",
-  "welcome.moreLanguagesBody": "Il programma e la relativa guida sono disponibili in inglese, tedesco e altre 17 lingue. Puoi scegliere la lingua dal menu in alto a destra oppure dalle impostazioni nella schermata iniziale.",
+  "welcome.moreLanguagesBody": "Il programma e la relativa guida sono disponibili in inglese, tedesco e altre 18 lingue. Puoi scegliere la lingua dal menu in alto a destra oppure dalle impostazioni nella schermata iniziale.",
   "welcome.moreOfflineTitle": "Funziona anche offline",
   "welcome.moreOfflineBody": "Dopo la prima visita, layerling si avvia anche senza Internet. Installalo come un normale programma: i tuoi progetti rimangono sul computer.",
   "welcome.moreAiTitle": "Crea con l'intelligenza artificiale",

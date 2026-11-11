@@ -21,7 +21,7 @@
     <a href="#layerling-mcp-skill"><img alt="可由 AI 驅動" src="https://img.shields.io/badge/AI--drivable-MCP%20server-16c0d4"></a>
   </p>
 
-  <p><a href="README.md">English</a> · <a href="README.de.md">Deutsch</a> · <a href="README.es.md">Español</a> · <a href="README.nl.md">Nederlands</a> · <a href="README.ar.md">العربية</a> · <a href="README.ja.md">日本語</a> · <a href="README.zh-cn.md">简体中文</a> · <strong>繁體中文</strong></p>
+  <p><a href="README.md">English</a> · <a href="README.de.md">Deutsch</a> · <a href="README.es.md">Español</a> · <a href="README.nl.md">Nederlands</a> · <a href="README.sv.md">Svenska</a> · <a href="README.ar.md">العربية</a> · <a href="README.ja.md">日本語</a> · <a href="README.zh-cn.md">简体中文</a> · <strong>繁體中文</strong></p>
 </div>
 
 <p align="center">
@@ -139,7 +139,7 @@ layerling 比 Tinkercad 再往 Fusion 360 靠近一步：操作方式相同，�
 - **每個設計四個儲存的視圖**——**Shift+7**、**8**、**9** 或 **0** 會按目前樣子儲存視圖（角度、平移、縮放），單獨按對應鍵即可還原。每個設計各有自己的視圖，儲存的 `.lyl` 檔也會帶上它們。
 - **正視工作平面**——按 **P**，或點視圖列中「放置工作平面」旁的按鈕，視圖會正對工作平面，斜面上也可以，原點位於中央。
 - **視圖立方體可放在任何角落**——設定 > 外觀 > **視圖立方體位置** 可把立方體放到左上、右上、左下或右下；只要不是左上角，相機控制項就會上移填補它的位置。
-- **使用你的語言** – 程式和使用手冊提供英語、德語以及另外 17 種語言；語言清單在右上角最頂端。
+- **使用你的語言** – 程式和使用手冊提供英語、德語以及另外 18 種語言；語言清單在右上角最頂端。
 - **從下方觀察**——相機列中網格上的眼睛圖示會隱藏平台，這樣就能看到設計的底面，而不會被平台擋住。
 - **獨立視窗中的第二檢視** – 相機列中的按鈕開啟第二個視窗，用自己的相機、檢視方塊和相機列顯示同一個設計，並跟隨每一次更改。它會在你上次放置的位置開啟。
 - **把面板放到想要的位置**——物件清單、設定、剖視圖、捲尺，以及邊、抽殼和陣列的工具面板都可以拖曳標題列移動，並在那裡再次開啟；雙擊即可停靠。

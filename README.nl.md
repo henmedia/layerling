@@ -21,7 +21,7 @@
     <a href="#layerling-mcp-skill"><img alt="Door AI te besturen" src="https://img.shields.io/badge/AI--drivable-MCP%20server-16c0d4"></a>
   </p>
 
-  <p><a href="README.md">English</a> · <a href="README.de.md">Deutsch</a> · <a href="README.es.md">Español</a> · <strong>Nederlands</strong> · <a href="README.ar.md">العربية</a> · <a href="README.ja.md">日本語</a> · <a href="README.zh-cn.md">简体中文</a> · <a href="README.zh-tw.md">繁體中文</a></p>
+  <p><a href="README.md">English</a> · <a href="README.de.md">Deutsch</a> · <a href="README.es.md">Español</a> · <strong>Nederlands</strong> · <a href="README.sv.md">Svenska</a> · <a href="README.ar.md">العربية</a> · <a href="README.ja.md">日本語</a> · <a href="README.zh-cn.md">简体中文</a> · <a href="README.zh-tw.md">繁體中文</a></p>
 </div>
 
 <p align="center">
@@ -143,7 +143,7 @@ Het is geen volledig CAD-pakket: er is geen parametrische tijdlijn en er zijn ge
 - **Vier opgeslagen weergaven per ontwerp** – **Shift+7**, **8**, **9** of **0** slaat de weergave precies op zoals ze is (hoek, positie, zoom), en de toets alleen brengt haar terug. Elk ontwerp heeft zijn eigen, en een opgeslagen `.lyl`-bestand neemt ze mee.
 - **Recht op het werkvlak kijken** – **P**, of de knop naast Werkvlak plaatsen in de weergavebalk, draait de weergave recht op het werkvlak, ook op een schuin vlak, met zijn oorsprong in het midden.
 - **De richtingskubus in elke hoek** – Instellingen > Weergave > **Positie van de richtingskubus** zet de kubus linksboven, rechtsboven, linksonder of rechtsonder; in elke hoek behalve linksboven schuift de camerabediening omhoog naar zijn plek.
-- **In jouw taal** – het programma en de handleiding zijn er in het Engels, Duits en 17 andere talen; de taalkeuze staat helemaal rechtsboven.
+- **In jouw taal** – het programma en de handleiding zijn er in het Engels, Duits en 18 andere talen; de taalkeuze staat helemaal rechtsboven.
 - **Van onderen kijken** – het oog boven een raster in de camerabalk verbergt het printbed, zodat je de onderkant van een ontwerp kunt zien zonder dat het in de weg zit.
 - **Een tweede weergave in een eigen venster** – een knop in de camerabalk opent een tweede venster dat hetzelfde ontwerp door een eigen camera toont, met een eigen weergavekubus en camerabalk, en volgt elke wijziging. Het opent waar je het het laatst liet.
 - **Panelen waar jij ze wilt** – de objectenlijst, de instellingen, de doorsnede, het meetlint en de gereedschapspanelen voor randen, uithollen en patronen verplaats je aan hun titelbalk en openen daar weer; dubbelklikken dockt ze.

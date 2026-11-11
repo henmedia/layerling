@@ -327,7 +327,7 @@ export const MESSAGES_AR: Partial<Record<MessageKey, string>> = {
   "installHint.ios": "في Safari: أيقونة المشاركة ← “إضافة إلى الشاشة الرئيسية”.",
   "installHint.firefox": "لا يستطيع Firefox تثبيت التطبيقات – لكن layerling يبدأ هنا في التبويب بدون إنترنت أيضًا.",
   "welcome.moreLanguagesTitle": "لغتك",
-  "welcome.moreLanguagesBody": "يتحدث البرنامج ودليله الإنجليزية والألمانية و17 لغة أخرى؛ قائمة اللغات في أعلى اليمين تمامًا، وفي الإعدادات على صفحة البداية.",
+  "welcome.moreLanguagesBody": "يتحدث البرنامج ودليله الإنجليزية والألمانية و18 لغة أخرى؛ قائمة اللغات في أعلى اليمين تمامًا، وفي الإعدادات على صفحة البداية.",
   "welcome.moreOfflineTitle": "يعمل بدون إنترنت",
   "welcome.moreOfflineBody": "بعد الزيارة الأولى، يبدأ layerling أيضًا بدون إنترنت - قم بتثبيته مثل أي برنامج عادي، وتبقى تصاميمك على جهازك.",
   "welcome.moreAiTitle": "البناء باستخدام الذكاء الاصطناعي",

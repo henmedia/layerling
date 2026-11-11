@@ -21,7 +21,7 @@
     <a href="#skill-mcp-de-layerling"><img alt="Manejable por una IA" src="https://img.shields.io/badge/manejable%20por%20IA-servidor%20MCP-16c0d4"></a>
   </p>
 
-  <p><a href="README.md">English</a> · <a href="README.de.md">Deutsch</a> · <strong>Español</strong> · <a href="README.nl.md">Nederlands</a> · <a href="README.ar.md">العربية</a> · <a href="README.ja.md">日本語</a> · <a href="README.zh-cn.md">简体中文</a> · <a href="README.zh-tw.md">繁體中文</a></p>
+  <p><a href="README.md">English</a> · <a href="README.de.md">Deutsch</a> · <strong>Español</strong> · <a href="README.nl.md">Nederlands</a> · <a href="README.sv.md">Svenska</a> · <a href="README.ar.md">العربية</a> · <a href="README.ja.md">日本語</a> · <a href="README.zh-cn.md">简体中文</a> · <a href="README.zh-tw.md">繁體中文</a></p>
 </div>
 
 <p align="center">
@@ -142,7 +142,7 @@ No es un paquete de CAD completo: no tiene línea de tiempo paramétrica ni ensa
 - **Cuatro vistas guardadas por diseño**: **Mayús+7**, **8**, **9** o **0** guarda la vista tal como está (ángulo, desplazamiento, zoom), y la tecla sola la recupera. Cada diseño guarda las suyas, y un archivo `.lyl` guardado se las lleva consigo.
 - **Mirar de frente al plano de trabajo**: **P**, o el botón junto a Colocar plano de trabajo en la barra de vista, gira la vista de frente al plano de trabajo, también sobre una cara inclinada, con su origen en el centro.
 - **El cubo de vista en cualquier esquina**: **Ajustes > Aspecto > Posición del cubo** pone el cubo arriba a la izquierda, arriba a la derecha, abajo a la izquierda o abajo a la derecha; en cualquier esquina que no sea la de arriba a la izquierda, la barra de vista sube a su sitio.
-- **En tu idioma**: el programa y su guía de usuario están en inglés, alemán y otros 17 idiomas; la lista de idiomas está arriba del todo a la derecha.
+- **En tu idioma**: el programa y su guía de usuario están en inglés, alemán y otros 18 idiomas; la lista de idiomas está arriba del todo a la derecha.
 - **Mirar desde abajo**: el ojo sobre una cuadrícula de la barra de vista oculta la placa, para ver la parte de abajo de un diseño sin que estorbe.
 - **Una segunda vista en su propia ventana**: un botón de la barra de vista abre una segunda ventana que muestra el mismo diseño a través de una cámara propia, con su propio cubo de vista y su propia barra de vista, y sigue cada cambio. Se abre donde la dejaste la última vez.
 - **Los paneles donde quieras**: la lista de objetos, los ajustes, la vista de sección, la cinta métrica y los paneles de las herramientas de aristas, vaciado y patrones se mueven por su barra de título y vuelven a abrirse ahí; un doble clic los acopla.
