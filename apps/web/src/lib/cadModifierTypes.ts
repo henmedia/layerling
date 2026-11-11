@@ -573,6 +573,18 @@ export type CadModifierWorkerRequest =
       // the worker does not search for one.
       addedEdgeIds?: number[];
     }
+  // The largest size up to `amount` at which the picked edges still take the chamfer or fillet (Discussion #1635):
+  // `amount` is the refused one. A variable fillet keeps the ratio of its two ends.
+  | {
+      type: "largest";
+      requestId: number;
+      kind: "chamfer" | "chamfillet" | "fillet";
+      edgeIds: number[];
+      amount: number;
+      chamferAngle: number;
+      endAmount?: number;
+      concave?: boolean;
+    }
   | { type: "dispose"; requestId: number };
 
 export type CadModifierWorkerResponse =
@@ -597,6 +609,8 @@ export type CadModifierWorkerResponse =
       innerCorners?: { count: number; amount: number };
     }
   | { type: "disposed"; requestId: number }
+  // amount: the largest size that went through, null when none did; endAmount goes with it for a variable fillet.
+  | { type: "largest"; requestId: number; amount: number | null; endAmount?: number }
   // failedEdgeIds: the selected edges the kernel could not treat together.
   // tightestBend: a fillet refused because a picked curve bends round the outside tighter than its radius, in mm (#1473).
   | { type: "error"; requestId: number; message: string; resetSession?: boolean; failedEdgeIds?: number[]; tightestBend?: number };

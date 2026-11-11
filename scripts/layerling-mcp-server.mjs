@@ -201,7 +201,7 @@ async function callTool(name, args) {
     case "layerling_array_objects":
       return bridgeCommand("array_objects", args, 30000);
     case "layerling_apply_edge_treatment":
-      return bridgeCommand("apply_edge_treatment", args, 60000);
+      return bridgeCommand("apply_edge_treatment", args, 120000);
     case "layerling_inspect_errors":
       return bridgeCommand("inspect_errors", args);
     case "layerling_bundle_objects":

@@ -343,6 +343,23 @@ export function cadModifierWorkerFailureMessage() {
 }
 
 /**
+ * Whether the worker refused a chamfer or fillet because of its size, so that a search for the largest size that fits
+ * can help (Discussion #1635). Read from the raw message: the panel only has the translated one.
+ */
+export function cadModifierSizeRefusal(rawError: string | null | undefined) {
+  if (!rawError) return false;
+  return (
+    rawError.includes("creates invalid or overlapping edge geometry") ||
+    rawError.includes(TREATMENT_LOST_FACES_MESSAGE) ||
+    rawError.includes("cannot be filleted together") ||
+    rawError.includes("cannot be chamfered together") ||
+    rawError.includes("The CAD kernel could not complete this edge treatment") ||
+    rawError.includes("does not leave a closed solid") ||
+    tightBendFromMessage(rawError) !== null
+  );
+}
+
+/**
  * Wandelt rohe Fehlermeldungen des CAD-Workers (z. B. geometrische Kollisionen
  * bei OpenCASCADE, Timeouts oder Worker-Ausfälle) in verständliche, lokalisierte
  * Hinweistexte für die Benutzeroberfläche um.

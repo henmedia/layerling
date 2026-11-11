@@ -1543,7 +1543,11 @@ export const tools = [
           ],
         },
         allEdges: { type: "boolean" },
-        amount: { type: "number" },
+        amount: {
+          anyOf: [{ type: "number" }, { type: "string", enum: ["largest"] }],
+          description: "The size in mm, or \"largest\": the largest size the picked edges still take, searched below maxAmount (Discussion #1635); the result says which it found as amount. Not with endAmount.",
+        },
+        maxAmount: { type: "number", description: "With amount \"largest\": search below this size in mm. Default: the body's largest measure." },
         endAmount: { type: "number", description: "Fillet of one edge only: the radius at the edge's other end, for a radius that changes along it (#687)." },
         concave: { type: "boolean", description: "Fillet only: scoop the straight edges out (a cylinder of radius amount on each edge) instead of rounding them (#1160)." },
         chamferAngle: { type: "number" },

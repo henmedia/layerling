@@ -10,5 +10,17 @@
       "en": "The object list now shows whether a part is a solid or a hole with one letter instead of the whole word; hold the mouse over it to see the word. And you can drag the list wider at its lower right corner, up to 600 pixels; the browser remembers the width.",
       "da": "Objektlisten viser nu med ét bogstav i stedet for hele ordet, om en del er massiv eller et hul; hold musen over det for at se ordet. Og listen kan trækkes bredere i sit nederste højre hjørne, op til 600 pixel; browseren husker bredden."
     }
+  },
+  {
+    "title": {
+      "de": "Fase und Rundung: die größte passende Größe",
+      "en": "Chamfer and fillet: the largest size that fits",
+      "da": "Fas og afrunding: den største størrelse, der passer"
+    },
+    "body": {
+      "de": "Ist eine Fase oder Rundung zu groß für die gewählten Kanten, steht unter der Meldung jetzt „Größte passende Größe suchen“. Ein Klick probiert kleinere Größen und trägt die größte ein, die durchgeht, auf ein Hundertstel Millimeter genau.",
+      "en": "When a chamfer or fillet is too large for the picked edges, \"Find the largest size that fits\" now shows under the message. One click tries smaller sizes and puts in the largest that goes through, to a hundredth of a millimetre.",
+      "da": "Er en fas eller afrunding for stor til de valgte kanter, står der nu \"Find den største størrelse, der passer\" under meddelelsen. Ét klik prøver mindre størrelser og skriver den største, der går igennem, ind, på en hundrededel millimeter."
+    }
   }
 ]

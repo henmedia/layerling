@@ -143,7 +143,7 @@ import { DEFAULT_INFILL_PERCENT, DEFAULT_WALLS, PRINT_MATERIAL_DENSITY, PRINT_MA
 import { matchingEdgeIds } from "@/lib/edgeMatching";
 import { readEdgeModifierSettings, rememberEdgeModifierSetting, startingEdgeModifierAmount, type EdgeModifierSettings } from "@/lib/edgeModifierMemory";
 import { getEditorProfile, profileBooleanValue } from "@/lib/editorProfile";
-import { CAD_MODIFIER_MAX_SHARP_ANGLE, CAD_MODIFIER_REQUEST_TIMEOUT_MS, CAD_MODIFIER_PREPARE_TRIANGLE_LIMIT, cadModifierPrepareTimeoutMs, cadModifierTimeoutMessage, cadModifierUserErrorMessage, cadModifierWorkerFailureMessage, cadModifierCandidateEdge, cadModifierPresetValues, defaultCadModifierTangentChain, rescueSharpAngleForEdges, selectableCadModifierEdge, type CadModifierRequestPhase } from "@/lib/cadModifierRuntime";
+import { CAD_MODIFIER_MAX_SHARP_ANGLE, CAD_MODIFIER_REQUEST_TIMEOUT_MS, CAD_MODIFIER_PREPARE_TRIANGLE_LIMIT, cadModifierPrepareTimeoutMs, cadModifierTimeoutMessage, cadModifierSizeRefusal, cadModifierUserErrorMessage, cadModifierWorkerFailureMessage, cadModifierCandidateEdge, cadModifierPresetValues, defaultCadModifierTangentChain, rescueSharpAngleForEdges, selectableCadModifierEdge, type CadModifierRequestPhase } from "@/lib/cadModifierRuntime";
 import { isThinFace, thinFacesWith } from "@/lib/cadThinFaces";
 import { createCadPreviewQueue } from "@/lib/cadPreviewQueue";
 import { cloneWorkplaneShapeSnapshot, compactEdgeTreatmentHistory, edgeTreatmentAppliedFrame, groupBeforeEdgeTreatments, restoreShapeBeforeEdgeTreatment, tubeBeforeEdgeTreatments, wasGroupBeforeEdgeTreatments } from "@/lib/edgeTreatmentHistory";
@@ -378,6 +378,10 @@ type EdgeModifierSession = {
   workingEdgeIds?: number[];
   // The edge(s) whose selection broke a working treatment; drawn red while that error stands.
   failedEdgeIds?: number[];
+  // The error shown when the size was refused, to offer the search for the largest size that fits while it stands (#1635).
+  sizeRefusedError?: string | null;
+  // That search is running.
+  searchingLargest?: boolean;
   preview: WorkplaneShape | null;
   componentPreviews: EdgeModifierComponentPreview[];
 };
@@ -490,6 +494,9 @@ const PROJECT_SYNC_HELD_MAX_MS = 2000;
 const MAX_SKETCH_HISTORY_ENTRIES = 100;
 const NORMAL_SELECTION_CAD_EDGE_MIN_ANGLE = 60;
 const MIN_EDGE_MODIFIER_AMOUNT = 0.001;
+// The worker gives up its search for the largest size after 15 s with the best one so far; a single heavy run of the
+// kernel can go past that, and a timeout here restarts the worker and closes the tool.
+const LARGEST_EDGE_AMOUNT_TIMEOUT_MS = 90_000;
 const SEPARATE_PARTS_VERTEX_TOLERANCE = 0.0005;
 
 
@@ -3857,13 +3864,16 @@ export function LayerlingEditor({
           setNotice(cadModifierUserErrorMessage(message.message) ?? message.message);
           return;
         }
+        const shownError = message.tightestBend !== undefined
+          ? tightBendError(message.tightestBend, workspaceSettingsRef.current)
+          : cadModifierUserErrorMessage(message.message) ?? message.message;
         setEdgeModifier((current) => current ? {
           ...current,
           busy: false,
           preview: null,
-          error: message.tightestBend !== undefined
-            ? tightBendError(message.tightestBend, workspaceSettingsRef.current)
-            : cadModifierUserErrorMessage(message.message) ?? message.message,
+          error: shownError,
+          // A refusal for the size offers the search for the largest one that fits (Discussion #1635).
+          sizeRefusedError: message.tightestBend !== undefined || cadModifierSizeRefusal(message.message) ? shownError : null,
           // The edges with the tight bend are the cause, whichever edge was picked last.
           failedEdgeIds: message.tightestBend !== undefined
             ? message.failedEdgeIds ?? []
@@ -8073,7 +8083,9 @@ export function LayerlingEditor({
     const sourceProjectId = projectInfoRef.current.projectId;
     const kind: CadModifierKind = params.kind === "fillet" ? "fillet" : params.kind === "chamfillet" ? "chamfillet" : "chamfer";
     const sharpAngle = Math.max(1, Math.min(CAD_MODIFIER_MAX_SHARP_ANGLE, mcpNumber(params.sharpAngle, 25)));
-    const amount = Math.max(MIN_EDGE_MODIFIER_AMOUNT, mcpNumber(params.amount, 1));
+    // "largest": the largest size the picked edges take, searched as the panel's button does (Discussion #1635).
+    const largest = params.amount === "largest";
+    let amount = largest ? 0 : Math.max(MIN_EDGE_MODIFIER_AMOUNT, mcpNumber(params.amount, 1));
     const chamferAngle = Math.max(kind === "chamfillet" ? 15 : 5, Math.min(kind === "chamfillet" ? 75 : 85, mcpNumber(params.chamferAngle, 45)));
     const quality: CadModifierQuality = params.quality === "draft" || params.quality === "fine" ? params.quality : "standard";
     const preserveEdgeSize = typeof params.preserveEdgeSize === "boolean" ? params.preserveEdgeSize : shape.edgeResizeMode === "preserve";
@@ -8106,6 +8118,22 @@ export function LayerlingEditor({
     }
     if (endAmount !== undefined && selectedEdgeIds.length !== 1) {
       throw new Error("endAmount (a variable radius) works on exactly one edge id");
+    }
+    if (largest) {
+      if (endAmount !== undefined) throw new Error("amount \"largest\" does not go with endAmount (a variable radius)");
+      // Searched below maxAmount, or below the body's largest measure, the most the panel's field takes.
+      const upper = Math.max(MIN_EDGE_MODIFIER_AMOUNT * 2, mcpNumber(params.maxAmount, Math.max(shapeWidth(shape), shapeDepth(shape), shape.height) * 0.99));
+      const search = await postCadModifierRequestAsync({
+        type: "largest",
+        kind,
+        edgeIds: selectedEdgeIds,
+        amount: upper,
+        chamferAngle,
+        ...(concave ? { concave } : {}),
+      }, [], LARGEST_EDGE_AMOUNT_TIMEOUT_MS);
+      if (search.type !== "largest") throw new Error("The CAD worker did not return a size");
+      if (search.amount === null) throw new Error("No size of this chamfer or fillet fits the chosen edges, not even a very small one: the size is not what stands in the way");
+      amount = search.amount;
     }
     const previewResponse = await postCadModifierRequestAsync({
       type: "preview",
@@ -8190,6 +8218,7 @@ export function LayerlingEditor({
     );
     return {
       object: mcpShapeSummary(modifiedShape),
+      ...(largest ? { amount } : {}),
       selectedEdgeIds,
       ...(cornerEdgeIds.length ? { cornerEdgeIds } : {}),
       // The sharp inner corners at the picked edges' ends, rounded or chamfered first at this size so they went through.
@@ -9411,6 +9440,69 @@ export function LayerlingEditor({
     };
     setEdgeEditRound((round) => round + 1);
   }, [commitShapes, edgeModifier, invalidateCadModifierSession, shapes]);
+
+  /*
+   * The largest size up to the refused one that the picked edges still take (Discussion #1635). On a click only, never by
+   * itself: a size typed in is what the person wants, and the search costs a dozen runs of the kernel. The size found goes
+   * into the field like a typed one and is previewed as usual. Nothing changes when the edges, the size or the kind
+   * changed meanwhile.
+   */
+  const findLargestEdgeAmount = useCallback(async () => {
+    const session = edgeModifierRef.current;
+    if (!session?.prepared || session.searchingLargest || session.selectedEdgeIds.length === 0) return;
+    if (session.kind !== "fillet" && session.kind !== "chamfer" && session.kind !== "chamfillet") return;
+    const kind = session.kind;
+    const searchKey = (candidate: EdgeModifierSession) => JSON.stringify([candidate.kind, candidate.amount, candidate.endAmount ?? null, candidate.concave === true, candidate.chamferAngle, candidate.selectedEdgeIds]);
+    const key = searchKey(session);
+    const prepareId = cadModifierPrepareRef.current;
+    const stopSearching = () => setEdgeModifier((current) => current?.searchingLargest ? { ...current, searchingLargest: false } : current);
+    setEdgeModifier((current) => current ? { ...current, searchingLargest: true } : current);
+    setNotice(t("status.edgeLargestSearching"), true);
+    let found: { amount: number | null; endAmount?: number };
+    try {
+      const response = await postCadModifierRequestAsync({
+        type: "largest",
+        kind,
+        edgeIds: session.selectedEdgeIds,
+        amount: session.amount,
+        chamferAngle: session.chamferAngle,
+        ...(kind === "fillet" && session.endAmount != null ? { endAmount: session.endAmount } : {}),
+        ...(kind === "fillet" && session.concave ? { concave: true } : {}),
+      }, [], LARGEST_EDGE_AMOUNT_TIMEOUT_MS);
+      if (response.type !== "largest") throw new Error("The CAD worker did not return a size");
+      found = response;
+    } catch (error) {
+      stopSearching();
+      const raw = error instanceof Error ? error.message : String(error ?? "");
+      setNotice(cadModifierUserErrorMessage(raw) ?? raw);
+      return;
+    }
+    const current = edgeModifierRef.current;
+    if (!current || cadModifierPrepareRef.current !== prepareId || searchKey(current) !== key) {
+      stopSearching();
+      return;
+    }
+    if (found.amount === null) {
+      stopSearching();
+      setNotice(t("status.edgeLargestNone"), true);
+      return;
+    }
+    const amount = Math.max(MIN_EDGE_MODIFIER_AMOUNT, Math.min(edgeModifierMaxAmount, found.amount));
+    const endAmount = found.endAmount !== undefined ? Math.max(MIN_EDGE_MODIFIER_AMOUNT, Math.min(edgeModifierMaxAmount, found.endAmount)) : undefined;
+    keepEdgeSetting({ amount });
+    setEdgeModifier((latest) => latest ? {
+      ...latest,
+      amount,
+      ...(endAmount !== undefined ? { endAmount } : {}),
+      searchingLargest: false,
+      preview: null,
+      busy: latest.selectedEdgeIds.length > 0,
+      error: null,
+      sizeRefusedError: null,
+    } : latest);
+    const workspace = workspaceSettingsRef.current;
+    setNotice(t("status.edgeLargestFound", { size: `${formatLengthMm(amount, workspace.accuracy)} ${lengthDisplayUnit(workspace).label}` }), true);
+  }, [edgeModifierMaxAmount, keepEdgeSetting, postCadModifierRequestAsync]);
 
   useEffect(() => {
     if (!edgeModifier) return;
@@ -19500,6 +19592,9 @@ export function LayerlingEditor({
           busy={edgeModifier.busy}
           prepared={edgeModifier.prepared}
           error={edgeModifier.error}
+          sizeRefused={edgeModifier.error !== null && edgeModifier.error === edgeModifier.sizeRefusedError}
+          searchingLargest={edgeModifier.searchingLargest === true}
+          onFindLargest={() => void findLargestEdgeAmount()}
           // The same value again changes nothing: dropping the preview for it left Apply
           // waiting on a computation nobody started (#204).
           onAmountChange={(value) => { keepEdgeSetting({ amount: value }); setEdgeModifier((current) => {
