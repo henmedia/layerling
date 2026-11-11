@@ -3,12 +3,13 @@ import { describe, expect, it } from "vitest";
 import { backupDesignAlreadyThere, backupEntryNames, backupFileName, backupNamePrefix, backupThumbnailPath, createBackupWriter, packBackup, unpackBackup, unpackBackupFolders } from "@/lib/projectBackup";
 
 describe("backing up all designs", () => {
-  it("names the backup after the day", () => {
-    expect(backupFileName(new Date(2026, 8, 28, 23, 59))).toBe("layerling-backup-2026-09-28.zip");
+  it("names the backup after the day and the time, so two backups of one day do not replace each other (Discussion #1621)", () => {
+    expect(backupFileName(new Date(2026, 8, 28, 23, 59))).toBe("layerling-backup-2026-09-28-2359.zip");
+    expect(backupFileName(new Date(2026, 10, 11, 7, 5))).toBe("layerling-backup-2026-11-11-0705.zip");
   });
 
   it("names the backup of a folder or of one chosen design after it, safe for every system (Discussion #1317)", () => {
-    expect(backupFileName(new Date(2026, 10, 5), backupNamePrefix("Lantern"))).toBe("layerling-Lantern-2026-11-05.zip");
+    expect(backupFileName(new Date(2026, 10, 5), backupNamePrefix("Lantern"))).toBe("layerling-Lantern-2026-11-05-0000.zip");
     expect(backupNamePrefix("My lantern: v2/final?")).toBe("layerling-My-lantern-v2-final");
     expect(backupNamePrefix("  ..hidden  ")).toBe("layerling-hidden");
     expect(backupNamePrefix(" /?* ")).toBe("layerling-backup");
