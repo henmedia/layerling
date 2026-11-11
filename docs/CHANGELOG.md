@@ -6,6 +6,8 @@ code still carries it - so a lower number further down is older, not newer.
 
 ## Unreleased
 
+- **CAD kernel occt-wasm 5.17.1 (from 5.15.0):** The kernel's own fixes come along: a loft over a closed outline lines its sections up so they cannot twist against each other, a union that lost one of its bodies is rebuilt with a small tolerance, and merging faces of the same surface works on a copy and keeps the pieces of a split face on one surface. layerling already used the returned body everywhere, so nothing else changes. A low-severity issue in fast-xml-parser (only in manifold-3d's 3MF import helper, which layerling does not load) is updated away with it.
+
 ## 1.157.0
 
 - **Counterbore: a chamfer at the rim (Discussion #1632):** The counterbore has a new field Rim chamfer. It puts a 45° chamfer that many millimetres deep on the top edge of the pocket, so the edge is no longer sharp and a screw finds its way in. The chamfer opens outside the head diameter, so the pocket keeps the width the screw head needs and the screw size (M3, M4, ...) is still recognised; it stays shallower than the pocket. At 0 the counterbore is the same as before, point for point. The profile carries it, so the mesh, the slotted hole, the drill point, the exact CAD body and the STEP export all follow. Through .lyl, the AI bridge (`screwHoleChamfer`) and the three SKILL.md, search words, texts in 17 languages, guide chapter 9 in 15 languages.
