@@ -1,1 +1,14 @@
-[]
+[
+  {
+    "title": {
+      "de": "Winkellineal mit drittem Arm nach oben",
+      "en": "A third arm on the framing square, pointing up",
+      "da": "En tredje arm på vinkelmåleren, der peger op"
+    },
+    "body": {
+      "de": "Das Winkellineal hat einen dritten Arm, der an der Ecke senkrecht nach oben steht, mit eigenen Teilstrichen, für Zylinder und alles, was du in die Höhe baust. Der neue Knopf mit drei Achsen unter dem Griff schaltet jeden Arm ein oder aus.",
+      "en": "The framing square has a third arm that stands straight up from its corner, with its own ticks, for cylinders and anything you build upwards. The new button with three axes under its handle switches each arm on or off.",
+      "da": "Vinkelmåleren har en tredje arm, der står lodret op fra hjørnet med sine egne streger, til cylindre og alt, hvad du bygger i højden. Den nye knap med tre akser under håndtaget tænder eller slukker hver arm."
+    }
+  }
+]

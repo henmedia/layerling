@@ -8539,15 +8539,46 @@ html[data-theme="dark"] .touch-multi-select {
 /* The ruler's lines stay in view over bodies (the eye is open) or hide behind them. */
 .corner-ruler-occlude-toggle,
 .corner-ruler-selected-toggle,
-.corner-ruler-plate-toggle {
+.corner-ruler-plate-toggle,
+.corner-ruler-arms-toggle {
   color: #6b5b46;
   background: rgba(255, 255, 255, 0.96);
   border-color: rgba(182, 97, 8, 0.45);
 }
 
 .corner-ruler-occlude-toggle.active,
-.corner-ruler-selected-toggle.active {
+.corner-ruler-selected-toggle.active,
+.corner-ruler-arms-toggle.active {
   color: #b66108;
+}
+
+/* The switch of one arm (Discussion #1649): its axis letter, filled in the axis colour while the arm is shown. */
+.corner-ruler-arm-toggle {
+  --corner-ruler-arm-axis: #6b5b46;
+  width: 18px;
+  height: 18px;
+  color: var(--corner-ruler-arm-axis);
+  background: rgba(255, 255, 255, 0.96);
+  border: 1px dashed var(--corner-ruler-arm-axis);
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.corner-ruler-arm-toggle.axis-x { --corner-ruler-arm-axis: #d6363c; }
+.corner-ruler-arm-toggle.axis-y { --corner-ruler-arm-axis: #2f9a4b; }
+.corner-ruler-arm-toggle.axis-z { --corner-ruler-arm-axis: #2f6fe0; }
+
+.corner-ruler-arm-toggle.active,
+.corner-ruler-arm-toggle.active:hover {
+  color: #ffffff;
+  background: var(--corner-ruler-arm-axis);
+  border-style: solid;
+}
+
+/* The last arm shown cannot be switched off. */
+.corner-ruler-arm-toggle:disabled {
+  cursor: default;
 }
 
 .corner-ruler-tick-label.hidden,
@@ -8603,6 +8634,22 @@ html[data-theme="dark"] .touch-multi-select {
 [data-theme="dark"] .corner-ruler-mode-toggle:hover {
   background: rgba(46, 125, 50, 0.35);
   border-color: #81c784;
+}
+
+[data-theme="dark"] .corner-ruler-arm-toggle.axis-x { --corner-ruler-arm-axis: #ff6b70; }
+[data-theme="dark"] .corner-ruler-arm-toggle.axis-y { --corner-ruler-arm-axis: #5fd47c; }
+[data-theme="dark"] .corner-ruler-arm-toggle.axis-z { --corner-ruler-arm-axis: #6aa0ff; }
+
+[data-theme="dark"] .corner-ruler-arm-toggle {
+  color: var(--corner-ruler-arm-axis);
+  border-color: var(--corner-ruler-arm-axis);
+}
+
+[data-theme="dark"] .corner-ruler-arm-toggle.active,
+[data-theme="dark"] .corner-ruler-arm-toggle.active:hover {
+  color: #14110e;
+  background: var(--corner-ruler-arm-axis);
+  border-color: var(--corner-ruler-arm-axis);
 }
 
 [data-theme="dark"] .ruler-coordinate-badge {

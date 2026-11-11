@@ -330,6 +330,64 @@ export function cornerRulerArmLength(ruler: { corner: CornerRulerVector; frame: 
   return Math.min(CORNER_RULER_MAX_ARM, Math.max(CORNER_RULER_MIN_ARM, Math.round(along)));
 }
 
+/** How long the third arm, the one standing up from the corner along the square's normal, is to begin with (Discussion #1649). */
+export const CORNER_RULER_DEFAULT_ARM_ELEVATION = 50;
+
+/** Which arms a framing square shows when it says nothing: the two in its plane, not the third (Discussion #1649). */
+const CORNER_RULER_ARMS_DEFAULT: Record<CornerRulerAxis, boolean> = { x: true, z: true, elevation: false };
+
+/** Which of its three arms a framing square shows: the two in its plane unless switched off, the third only when switched on. */
+export function cornerRulerArmsShown(arms?: Partial<Record<CornerRulerAxis, boolean>>): Record<CornerRulerAxis, boolean> {
+  return {
+    x: typeof arms?.x === "boolean" ? arms.x : CORNER_RULER_ARMS_DEFAULT.x,
+    z: typeof arms?.z === "boolean" ? arms.z : CORNER_RULER_ARMS_DEFAULT.z,
+    elevation: typeof arms?.elevation === "boolean" ? arms.elevation : CORNER_RULER_ARMS_DEFAULT.elevation,
+  };
+}
+
+/**
+ * One arm switched on or off, the others as they were (Discussion #1649). The last arm shown stays on. What is kept
+ * names only the arms that differ from the start, so a square as it always was keeps nothing (undefined).
+ */
+export function toggledCornerRulerArms(arms: Partial<Record<CornerRulerAxis, boolean>> | undefined, arm: CornerRulerAxis): Partial<Record<CornerRulerAxis, boolean>> | undefined {
+  const shown = cornerRulerArmsShown(arms);
+  const next = { ...shown, [arm]: !shown[arm] };
+  return keptCornerRulerArms(CORNER_RULER_AXES.some((entry) => next[entry]) ? next : shown);
+}
+
+/**
+ * What is kept of the arms a square shows: only those that differ from the start, undefined when none does. Arms
+ * with none shown are no square's: they keep nothing, so the square shows its two arms again.
+ */
+export function keptCornerRulerArms(arms: Partial<Record<CornerRulerAxis, boolean>> | undefined): Partial<Record<CornerRulerAxis, boolean>> | undefined {
+  const shown = cornerRulerArmsShown(arms);
+  if (!CORNER_RULER_AXES.some((entry) => shown[entry])) return undefined;
+  const result: Partial<Record<CornerRulerAxis, boolean>> = {};
+  CORNER_RULER_AXES.forEach((entry) => { if (shown[entry] !== CORNER_RULER_ARMS_DEFAULT[entry]) result[entry] = shown[entry]; });
+  return Object.keys(result).length ? result : undefined;
+}
+
+/**
+ * How long the third arm becomes when its end is dragged (Discussion #1649): the arm stands out of the square's
+ * plane, so the pointer's ray is taken, and the point of the arm's line closest to that ray. Whole millimetres,
+ * between CORNER_RULER_MIN_ARM and CORNER_RULER_MAX_ARM. Null when the ray runs almost along the arm, as when looking
+ * straight down onto a square on the plate: then the place along it cannot be told.
+ */
+export function cornerRulerElevationArmLength(
+  ruler: { corner: CornerRulerVector; frame: CornerRulerFrame },
+  ray: { origin: CornerRulerVector; direction: CornerRulerVector },
+): number | null {
+  const arm = toVector(ruler.frame.normal).normalize();
+  const along = toVector(ray.direction).normalize();
+  const offset = toVector(ruler.corner).sub(toVector(ray.origin));
+  const b = arm.dot(along);
+  const denominator = 1 - b * b;
+  // Less than about 3 degrees between the ray and the arm.
+  if (denominator < 0.0025) return null;
+  const t = (b * along.dot(offset) - arm.dot(offset)) / denominator;
+  return Math.min(CORNER_RULER_MAX_ARM, Math.max(CORNER_RULER_MIN_ARM, Math.round(t)));
+}
+
 /**
  * Both arms as long as the build plate: the arm that runs more along the plate's width (x) gets the width, the other
  * its depth, so a square turned a quarter still spans the plate (Discussion #1469).

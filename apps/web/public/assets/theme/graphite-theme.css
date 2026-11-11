@@ -3453,15 +3453,42 @@ html[data-theme="dark"]:where([data-palette="graphite"]) .touch-multi-select {
 
 :where(html[data-theme="dark"][data-palette="graphite"]) .corner-ruler-occlude-toggle,
 :where(html[data-theme="dark"][data-palette="graphite"]) .corner-ruler-selected-toggle,
-:where(html[data-theme="dark"][data-palette="graphite"]) .corner-ruler-plate-toggle {
+:where(html[data-theme="dark"][data-palette="graphite"]) .corner-ruler-plate-toggle,
+:where(html[data-theme="dark"][data-palette="graphite"]) .corner-ruler-arms-toggle {
   color: #595959;
   background: rgba(255, 255, 255, 0.96);
   border-color: rgba(182, 97, 8, 0.45);
 }
 
 :where(html[data-theme="dark"][data-palette="graphite"]) .corner-ruler-occlude-toggle.active,
-:where(html[data-theme="dark"][data-palette="graphite"]) .corner-ruler-selected-toggle.active {
+:where(html[data-theme="dark"][data-palette="graphite"]) .corner-ruler-selected-toggle.active,
+:where(html[data-theme="dark"][data-palette="graphite"]) .corner-ruler-arms-toggle.active {
   color: #b66108;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .corner-ruler-arm-toggle {
+  --corner-ruler-arm-axis: #595959;
+  color: var(--corner-ruler-arm-axis);
+  background: rgba(255, 255, 255, 0.96);
+  border: 1px dashed var(--corner-ruler-arm-axis);
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .corner-ruler-arm-toggle.axis-x {
+  --corner-ruler-arm-axis: #d6363c;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .corner-ruler-arm-toggle.axis-y {
+  --corner-ruler-arm-axis: #2f9a4b;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .corner-ruler-arm-toggle.axis-z {
+  --corner-ruler-arm-axis: #2f6fe0;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .corner-ruler-arm-toggle.active,
+:where(html[data-theme="dark"][data-palette="graphite"]) .corner-ruler-arm-toggle.active:hover {
+  color: #ffffff;
+  background: var(--corner-ruler-arm-axis);
 }
 
 :where(html[data-theme="dark"][data-palette="graphite"]) .corner-ruler-mode-toggle:hover {
@@ -3499,6 +3526,30 @@ html[data-theme="dark"]:where([data-palette="graphite"]) .touch-multi-select {
 :where(html[data-theme="dark"][data-palette="graphite"]) [data-theme="dark"] .corner-ruler-mode-toggle:hover {
   background: rgba(46, 125, 50, 0.35);
   border-color: #81c784;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) [data-theme="dark"] .corner-ruler-arm-toggle.axis-x {
+  --corner-ruler-arm-axis: #ff6b70;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) [data-theme="dark"] .corner-ruler-arm-toggle.axis-y {
+  --corner-ruler-arm-axis: #5fd47c;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) [data-theme="dark"] .corner-ruler-arm-toggle.axis-z {
+  --corner-ruler-arm-axis: #6aa0ff;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) [data-theme="dark"] .corner-ruler-arm-toggle {
+  color: var(--corner-ruler-arm-axis);
+  border-color: var(--corner-ruler-arm-axis);
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) [data-theme="dark"] .corner-ruler-arm-toggle.active,
+:where(html[data-theme="dark"][data-palette="graphite"]) [data-theme="dark"] .corner-ruler-arm-toggle.active:hover {
+  color: #181818;
+  background: var(--corner-ruler-arm-axis);
+  border-color: var(--corner-ruler-arm-axis);
 }
 
 :where(html[data-theme="dark"][data-palette="graphite"]) [data-theme="dark"] .ruler-coordinate-badge {

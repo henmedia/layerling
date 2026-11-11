@@ -70,6 +70,18 @@ describe("the framing square a design keeps (#829)", () => {
     expect(savedCornerRuler({ ...square, selectedOnly: true, id: "x" }).selectedOnly).toBe(true);
   });
 
+  it("keeps the third arm and the arms switched off, and nothing of them while they are as at the start (Discussion #1649)", async () => {
+    const upright: SavedCornerRuler = { ...square, armLengthElevation: 120, arms: { elevation: true, z: false } };
+    expect((await importLylProject(await pack([upright]))).cornerRulers).toEqual([upright]);
+    expect(savedCornerRuler({ ...upright, id: "corner-ruler-2" })).toEqual(upright);
+    // A square from before has neither field and gets none.
+    expect((await importLylProject(await pack([square]))).cornerRulers).toEqual([square]);
+    expect(savedCornerRuler({ ...square, armLengthElevation: 50, arms: { x: true, z: true, elevation: false } })).toEqual(square);
+    // All three arms off is no square's: it shows its two arms again.
+    expect(normalizeSavedCornerRulers([{ ...square, arms: { x: false, z: false, elevation: false } }])).toEqual([square]);
+    expect(normalizeSavedCornerRulers([{ ...square, armLengthElevation: -4, arms: { x: "no", elevation: true } }])).toEqual([{ ...square, arms: { elevation: true } }]);
+  });
+
   it("is simply absent from a file saved without one", async () => {
     expect((await importLylProject(await pack(null))).cornerRulers).toBeUndefined();
   });

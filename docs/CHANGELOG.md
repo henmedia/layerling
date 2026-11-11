@@ -14,6 +14,8 @@ code still carries it - so a lower number further down is older, not newer.
 
 - **The lift arrow is blue (Facebook group):** The arrow above a selection that lifts it was nearly black. It moves along Z, so it is now blue like the Z turn arrow and the Z axis arrow on the plate, next to the red and green move arrows; in the dark theme it is a lighter blue. The guide (chapters 3 and 10) says blue arrow in every language.
 
+- **A third arm on the framing square (Discussion #1649):** Besides its two arms in the plane, the framing square has a third that stands up from the corner, square to the workplane: on the plate it points up along Z, with its own ticks, for a cylinder or anything built upwards. A new button with three axes under the handle (above the one for the plate's size) opens a switch for each arm, named and coloured after its axis: the third arm is off to begin with, and the arms in the plane can be switched off when they get in the way; the last one shown stays. The third arm's end is dragged like the others, along the pointer's ray. The green numbers of a selected body stay whichever arms are shown; the arms and the third arm's length are kept with the design and in a .lyl file, and a square from before looks as it did. Unit and e2e tests; texts in 19 languages, guide chapter 10 in 15 languages.
+
 ## 1.157.2
 
 - **Interactive Help shows that it is on:** While it is on, the circle of its question mark in the title row is filled orange with the question mark light in it, in light and dark mode. Before, only the colour of the question mark changed, a shade from its neighbours, and it was easily taken for off (Discussion #1640).

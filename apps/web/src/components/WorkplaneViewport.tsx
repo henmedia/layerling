@@ -56,7 +56,7 @@ import { fitCameraDepthRange, frameBounds, resetCamera, selectionBounds, startVi
 import { disposeCutPreviewResources, renderFrame } from "@/components/workplane/renderFrame";
 import { DIMENSION_FORMULA_FIELDS, formulaMatchesMillimeters, formulaToRemember, withFieldFormula } from "@/lib/fieldFormulas";
 import { displayToMillimeters, formatLengthMm, lengthDisplayUnit, measurementOptionLabel, millimetersToDisplay, parseLengthMm, parseMeasurementInput, resolveLengthMm, setLengthUnit } from "@/lib/measurementUnits";
-import { computeCornerRulerRelativeCoordinates, cornerRulerArmLength, cornerRulerAxisModes, cornerRulerPlateArms, cornerRulerFrameForWorkplane, cornerRulerShiftVector, pointAlongRuler, rotateCornerRulerFrame, rulerDimensionMatch, toggledCornerRulerAxis, toggledCornerRulerMode, type CornerRulerAxis, type RulerDimensionField } from "@/lib/rulerDimensions";
+import { computeCornerRulerRelativeCoordinates, cornerRulerArmLength, cornerRulerElevationArmLength, toggledCornerRulerArms, cornerRulerAxisModes, cornerRulerPlateArms, cornerRulerFrameForWorkplane, cornerRulerShiftVector, pointAlongRuler, rotateCornerRulerFrame, rulerDimensionMatch, toggledCornerRulerAxis, toggledCornerRulerMode, type CornerRulerAxis, type RulerDimensionField } from "@/lib/rulerDimensions";
 import { createMoveDimensionOverlay, type MoveDimensionAxis, type MoveDimensionOverlayData } from "@/lib/moveDimensionLines";
 import { computeOriginAxisDistance, createOriginDimensionOverlay, type OriginDimensionOverlayData } from "@/lib/originDimensionLines";
 import { horizontalPlacementWorkplane, placementPatchForNewShape, placementWorkplaneCoordinates, placementWorkplaneFromSurface, placementWorkplaneIsBase, placementWorkplanePoint, snapPlacementWorkplaneOrigin, type PlacementPoint, type PlacementWorkplane } from "@/lib/placementWorkplane";
@@ -2043,7 +2043,7 @@ export function WorkplaneViewport({
   const cornerRulerOverlayRef = useRef<CornerRulerOverlayState | null>(null);
   const cornerRulerIdRef = useRef(toolMemory?.current.cornerRulerId ?? storedCornerRulers.current.length);
   const cornerRulerDragRef = useRef<{ id: string; pointerId: number; moved: boolean } | null>(null);
-  const cornerRulerArmDragRef = useRef<{ id: string; arm: "x" | "z"; pointerId: number } | null>(null);
+  const cornerRulerArmDragRef = useRef<{ id: string; arm: CornerRulerAxis; pointerId: number } | null>(null);
   const protractorOpenRef = useRef(false);
   const protractorModelRef = useRef<ProtractorModel>(EMPTY_PROTRACTOR);
   const protractorOverlayRef = useRef<ProtractorOverlayState | null>(null);
@@ -6023,6 +6023,9 @@ export function WorkplaneViewport({
       frame: cornerRulerFrameForWorkplane(workplane),
       armLengthX: previous?.armLengthX ?? CORNER_RULER_DEFAULT_ARM_X,
       armLengthZ: previous?.armLengthZ ?? CORNER_RULER_DEFAULT_ARM_Z,
+      // The third arm and the arms switched off come along too (Discussion #1649).
+      ...(previous?.armLengthElevation !== undefined ? { armLengthElevation: previous.armLengthElevation } : {}),
+      ...(previous?.arms ? { arms: previous.arms } : {}),
       mode: existingMode,
       ...(existingAxisModes ? { axisModes: existingAxisModes } : {}),
       ...(stayInView ? { occlude: false } : {}),
@@ -6426,20 +6429,34 @@ export function WorkplaneViewport({
   }, [storeCornerRulerModel]);
 
   /** Dragging an arm's end makes the arm as long as the pointer is far from the corner along it, in whole millimetres (Discussion #1469). */
-  const handleCornerRulerArmPointerDown = useCallback((event: ReactPointerEvent<SVGCircleElement>, id: string, arm: "x" | "z") => {
+  const handleCornerRulerArmPointerDown = useCallback((event: ReactPointerEvent<SVGCircleElement>, id: string, arm: CornerRulerAxis) => {
     event.preventDefault();
     event.stopPropagation();
     cornerRulerArmDragRef.current = { id, arm, pointerId: event.pointerId };
     capturePointer(event.currentTarget, event.pointerId);
   }, []);
 
-  const handleCornerRulerArmPointerMove = useCallback((event: ReactPointerEvent<SVGCircleElement>, id: string, arm: "x" | "z") => {
+  const handleCornerRulerArmPointerMove = useCallback((event: ReactPointerEvent<SVGCircleElement>, id: string, arm: CornerRulerAxis) => {
     const drag = cornerRulerArmDragRef.current;
     if (!drag || drag.id !== id || drag.arm !== arm || drag.pointerId !== event.pointerId) return;
     event.preventDefault();
     event.stopPropagation();
     const current = cornerRulerModelRef.current.find((ruler) => ruler.id === id);
     if (!current) return;
+    if (arm === "elevation") {
+      // The third arm stands out of the workplane: its length comes from the pointer's ray, not from a point in the
+      // plane (Discussion #1649).
+      const state = threeRef.current;
+      if (!state) return;
+      const rect = state.renderer.domElement.getBoundingClientRect();
+      const ndc = new THREE.Vector2(((event.clientX - rect.left) / rect.width) * 2 - 1, -((event.clientY - rect.top) / rect.height) * 2 + 1);
+      const ray = new THREE.Raycaster();
+      setPickRayFromCamera(ray, ndc, state.camera);
+      const length = cornerRulerElevationArmLength(current, { origin: ray.ray.origin, direction: ray.ray.direction });
+      if (length === null || current.armLengthElevation === length) return;
+      storeCornerRulerModel(cornerRulerModelRef.current.map((ruler) => ruler.id === id ? { ...ruler, armLengthElevation: length } : ruler));
+      return;
+    }
     const point = resolveCornerRulerPoint(event.clientX, event.clientY, current.workplane);
     if (!point) return;
     const length = cornerRulerArmLength(current, arm, point);
@@ -6448,7 +6465,19 @@ export function WorkplaneViewport({
     storeCornerRulerModel(cornerRulerModelRef.current.map((ruler) => ruler.id === id ? { ...ruler, [key]: length } : ruler));
   }, [resolveCornerRulerPoint, storeCornerRulerModel]);
 
-  const handleCornerRulerArmPointerUp = useCallback((event: ReactPointerEvent<SVGCircleElement>, id: string, arm: "x" | "z") => {
+  /** One of the three arms shown or hidden; the last one shown stays (Discussion #1649). */
+  const toggleCornerRulerArm = useCallback((id: string, arm: CornerRulerAxis) => {
+    storeCornerRulerModel(
+      cornerRulerModelRef.current.map((ruler) => {
+        if (ruler.id !== id) return ruler;
+        const { arms: _was, ...rest } = ruler;
+        const arms = toggledCornerRulerArms(ruler.arms, arm);
+        return arms ? { ...rest, arms } : rest;
+      })
+    );
+  }, [storeCornerRulerModel]);
+
+  const handleCornerRulerArmPointerUp = useCallback((event: ReactPointerEvent<SVGCircleElement>, id: string, arm: CornerRulerAxis) => {
     const drag = cornerRulerArmDragRef.current;
     if (!drag || drag.id !== id || drag.arm !== arm) return;
     cornerRulerArmDragRef.current = null;
@@ -9176,6 +9205,7 @@ export function WorkplaneViewport({
               onArmEndPointerMove={handleCornerRulerArmPointerMove}
               onArmEndPointerUp={handleCornerRulerArmPointerUp}
               onArmsToPlate={cornerRulerArmsToPlate}
+              onToggleArm={toggleCornerRulerArm}
               onCoordinateClick={beginRulerCoordinateEdit}
             />
           ) : null}
