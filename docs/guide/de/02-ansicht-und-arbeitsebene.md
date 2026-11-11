@@ -101,6 +101,7 @@ Passt ein Entwurf nicht auf eine Platte, etwa eine Dose mit Deckel und Einsätze
 
 - Jede Platte ist so groß wie die Arbeitsfläche, die Platten liegen rechts neben der ersten, 20 mm auseinander. Ein Körper gehört zu der Platte, auf der die Mitte seiner Grundfläche steht; zieht man ihn hinüber, steht er auf der anderen Platte. Ein Entwurf hat bis zu 12 Platten.
 - Ein Klick auf eine Platte in der Leiste zeigt sie, und neue Formen und importierte Dateien landen dann auf ihr. {{ui:plates.showAll}} zeigt alle. Ein Doppelklick auf eine Platte oder {{ui:plates.rename}} gibt ihr einen Namen wie „Deckel“, der auf der Platte steht.
+- Auch eine neue Skizze auf der Platte beginnt auf der aktiven Platte: Die Skizzenfläche zeigt diese Platte mit den Körpern darauf, und der fertige Körper steht dort.
 - {{ui:plates.moveLeft}} und {{ui:plates.moveRight}} ändern die Reihenfolge, die Körper wandern mit ihrer Platte. {{ui:plates.remove}} nimmt die aktive Platte weg; ihre Körper kommen an derselben Stelle auf die erste Platte.
 - {{ui:plates.arrange}} legt die ausgewählten Körper, oder alle, Reihe für Reihe auf die Platten, die größten zuerst, 5 mm auseinander, und fügt Platten hinzu, solange sie gebraucht werden. Ein Körper, der größer als eine Platte ist, bleibt stehen.
 - Mit gewähltem Drucker wird jeder Körper gegen seine eigene Platte geprüft, und die Bauhöhe zählt ab dem tiefsten Körper dieser Platte. Eine Platte mit einem Körper, der nicht passt, zeigt ihre Zahl rot.

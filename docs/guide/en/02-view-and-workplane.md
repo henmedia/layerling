@@ -101,6 +101,7 @@ When a design holds more than one plate can print, a box with its lid and insert
 
 - Every plate is as large as the workplane, and the plates lie side by side to the right of the first one, 20 mm apart. A body belongs to the plate the middle of its footprint stands on, so dragging it across puts it on the other plate. A design holds up to 12 plates.
 - A click on a plate in the bar looks at it, and new shapes and imported files then land on it. {{ui:plates.showAll}} looks at all of them. A double click on a plate, or {{ui:plates.rename}}, gives it a name such as "Lid", which is written on the plate.
+- A new sketch on the plate starts on the active plate too: the sketch area shows that plate with the bodies on it, and the finished body stands there.
 - {{ui:plates.moveLeft}} and {{ui:plates.moveRight}} change the order, the bodies moving with their plate. {{ui:plates.remove}} takes the active plate away; its bodies go onto the first plate at the same spot.
 - {{ui:plates.arrange}} lays the selected bodies, or all of them, out row by row on the plates, the largest first, 5 mm apart, and adds plates while they are needed. A body larger than a plate stays where it is.
 - With a printer chosen, every body is checked against its own plate, and the build height counts from the lowest body on that plate. A plate with a body that does not fit shows its number in red.

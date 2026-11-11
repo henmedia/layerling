@@ -101,6 +101,7 @@ När en design innehåller mer än en enda byggplatta rymmer – till exempel en
 
 - Varje platta är lika stor som arbetsytan, och plattorna ligger bredvid varandra till höger om den första med 20 mm mellanrum. En kropp hör till den platta där mitten av dess fotavtryck står, så att dra över den flyttar den till den andra plattan. En design rymmer upp till 12 plattor.
 - Ett klick på en platta i listen centrerar vyn på den, och nya former och importerade filer landar då på den. {{ui:plates.showAll}} visar alla på en gång. Ett dubbelklick på en platta, eller {{ui:plates.rename}}, ger den ett namn som ”Lock”, vilket skrivs ut på plattan.
+- En ny skiss på plattan börjar också på den aktiva plattan: skissytan visar den plattan med kropparna på den, och den färdiga kroppen hamnar där.
 - {{ui:plates.moveLeft}} och {{ui:plates.moveRight}} ändrar ordningen så att kropparna följer med sin platta. {{ui:plates.remove}} tar bort den aktiva plattan; dess kroppar flyttas till första plattan på motsvarande ställe.
 - {{ui:plates.arrange}} lägger ut de markerade kropparna, eller alla kroppar, rad för rad på plattorna med de största först och 5 mm mellanrum, och skapar fler plattor vid behov. En kropp som är större än en platta står kvar där den är.
 - Med en skrivare vald kontrolleras varje kropp mot sin egen platta, och utskriftshöjden räknas från den lägsta kroppen på den plattan. En platta med en kropp som inte får plats får sin siffra i rött.

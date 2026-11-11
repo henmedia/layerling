@@ -1,1 +1,15 @@
-[]
+[
+  {
+    "title": {
+      "de": "Skizze auf der aktiven Druckplatte",
+      "en": "Sketches on the active build plate"
+    },
+    "body": {
+      "de": "Mit mehreren Druckplatten öffnete sich eine neue Skizze immer über Platte 1, und Platte 2 war von dort aus nicht zu erreichen. Jetzt beginnt die Skizze auf der Platte, die gerade aktiv ist: Du siehst die Körper darauf, und der fertige Körper steht dort.",
+      "en": "With several build plates, a new sketch always opened over plate 1, and plate 2 could not be reached from there. Now the sketch starts on the plate that is active: you see the bodies on it, and the finished body stands there."
+    },
+    "guide": {
+      "section": "buildPlates"
+    }
+  }
+]

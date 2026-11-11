@@ -112,7 +112,7 @@ import { disposeBoundsTree } from "three-mesh-bvh";
 import { SHELL_SIDES, shellMaxThickness, shellOpeningsFor, shellOpenSides } from "@/lib/shellLimits";
 import { arrayCirclePivot, arrayFitGap, arrayFitShift, arrayFollowingPivot, arrayGridSize, arrayGroupsCopies, arrayWithFit, circleStepDegrees, clampArrayCount, gridOffsets, moveAlongRadius, rotateAroundVertical, rowOffset, singleAxisSpacing, type ArraySettings } from "@/lib/shapeArray";
 import { keepDismissedOverhangs, printerPresetById, shapeBedFootprint, type BedOverhang } from "@/lib/printBed";
-import { MAX_BUILD_PLATES, PLATE_GAP, plateCenterX, plateIndexAt, plateName, plateOfShape, plateOverhangs, shapesOnPlateFrame, shapesAfterPlateResize, platePitch, plateCount as buildPlateCount } from "@/lib/buildPlates";
+import { MAX_BUILD_PLATES, PLATE_GAP, plateCenterX, plateIndexAt, plateName, plateOfShape, plateOverhangs, shapesOnPlateFrame, shapesAfterPlateResize, platePitch, plateCount as buildPlateCount, shapeMovedAlongX } from "@/lib/buildPlates";
 import { plateDisplayLabel, useBuildPlates } from "@/components/workplane/useBuildPlates";
 import { zipSync } from "fflate";
 import { PlateBar } from "@/components/workplane/PlateBar";
@@ -215,7 +215,7 @@ import { findShapeInHistoryState } from "@/lib/historyRestore";
 import { noteAnchorFromWorld, notesAfterShapeChange, notesPinnedTo, notesPutBack } from "@/lib/noteAnchoring";
 import { noticeReportsLastChange } from "@/lib/noticeTiming";
 import { referencePointsForBox, unionReferenceBoxes, type ReferencePointSpot, type ReferencePosition } from "@/lib/referencePoints";
-import { normalizePlacementWorkplane, placementPatchForNewShape, placementWorkplaneCoordinates, placementWorkplaneFingerprint, placementWorkplaneFromSurface, placementWorkplaneIsBase, placementWorkplanePoint, horizontalPlacementWorkplane, translationToWorkplane, type PlacementPoint, REVOLVE_REFERENCE_WORKPLANE, revolveBodyStandsUpright, type PlacementWorkplane } from "@/lib/placementWorkplane";
+import { normalizePlacementWorkplane, placementPatchForNewShape, placementWorkplaneCoordinates, placementWorkplaneFingerprint, placementWorkplaneFromSurface, placementWorkplaneIsBase, placementWorkplanePlateShift, placementWorkplanePoint, horizontalPlacementWorkplane, translationToWorkplane, type PlacementPoint, REVOLVE_REFERENCE_WORKPLANE, revolveBodyStandsUpright, type PlacementWorkplane } from "@/lib/placementWorkplane";
 import { localizedError } from "@/lib/userErrors";
 import { alignNaturalCenter, type AlignPoint } from "@/lib/alignCenter";
 import { cylinderToEllipsePatch } from "@/lib/cylinderToEllipse";
@@ -4524,7 +4524,11 @@ export function LayerlingEditor({
         ? shape
         : sketchReferenceShapeOnWorkplane(shape, REVOLVE_REFERENCE_WORKPLANE));
     }
-    const onBase = placementWorkplaneIsBase(activeSketchWorkplane);
+    // A sketch started on another build plate lies on the plate's own plane, moved to that plate's middle (#1660): the
+    // bodies are shown as on the base plate, only moved by as much.
+    const plateShift = placementWorkplanePlateShift(activeSketchWorkplane);
+    const onBase = plateShift !== null;
+    const onPlate = (shape: WorkplaneShape) => (plateShift ? shapeMovedAlongX(shape, -plateShift) : shape);
     if (sketchMirrorAbout) {
       return shapes.map((shape) => shape.hidden || shape.id === editingSketchShapeId || isNonSolidShape(shape)
         ? shape
@@ -4533,9 +4537,9 @@ export function LayerlingEditor({
     // On the base plate a body that only stands turned about the vertical keeps its plain outline;
     // one that lies tilted (laid flat, stood on an edge) shows as it sits there, not as it was made (#231).
     const tilted = (shape: WorkplaneShape) => Boolean(shape.rotationX || shape.rotationZ);
-    if (onBase && !shapes.some(tilted)) return shapes;
+    if (onBase && !shapes.some(tilted)) return plateShift ? shapes.map(onPlate) : shapes;
     return shapes.map((shape) => shape.hidden || shape.id === editingSketchShapeId || (onBase && !tilted(shape))
-      ? shape
+      ? onPlate(shape)
       : sketchReferenceShapeOnWorkplane(shape, activeSketchWorkplane, !onBase));
   }, [activeSketchWorkplane, editingSketchShapeId, revolveSketchFront, shapes, sketchActive, sketchMirrorAbout]);
   // A workplane inside a body cuts it: the sketch view shows the outline of the cut (a hollow body
@@ -4544,7 +4548,7 @@ export function LayerlingEditor({
   // workplane at its own height, and the cut through the bodies there was drawn as a ghost from above (Discussion #1575).
   const sketchReferenceSlices = useMemo(() => {
     const slices: Record<string, string> = {};
-    if (!sketchActive || revolveSketchFront || placementWorkplaneIsBase(activeSketchWorkplane)) return slices;
+    if (!sketchActive || revolveSketchFront || placementWorkplanePlateShift(activeSketchWorkplane) !== null) return slices;
     shapes.forEach((shape) => {
       if (shape.hidden || shape.id === editingSketchShapeId) return;
       const mesh = meshForShape(shape);
@@ -5473,6 +5477,19 @@ export function LayerlingEditor({
    */
   const sketchOperationSwitchRef = useRef<{ operation: SketchOperation; workplane: PlacementWorkplane } | null>(null);
 
+  /**
+   * Where a new sketch lies (#1660): started on the base plate while another build plate is active, on that plate - the
+   * plate's own plane, moved to its middle, as a new shape lands there - so the sketch view shows that plate and reaches
+   * across it. A revolve is drawn from the front and moved onto the plate once it is finished; a sketch opened for a
+   * body, or on a workplane placed by hand, stays where it is.
+   */
+  const { newShapeOrigin } = buildPlates;
+  const sketchWorkplaneOnActivePlate = useCallback((workplane: PlacementWorkplane, operation: SketchOperation, fixed: boolean): PlacementWorkplane => {
+    if (fixed || operation === "revolve" || !placementWorkplaneIsBase(workplane)) return workplane;
+    const origin = newShapeOrigin(workplane);
+    return Math.abs(origin.x - workplane.origin.x) < 1e-9 ? workplane : { ...workplane, origin };
+  }, [newShapeOrigin]);
+
   const beginSketch = useCallback((
     operation: SketchOperation,
     profile?: SketchProfile,
@@ -5490,7 +5507,7 @@ export function LayerlingEditor({
     setCruiseAsset(null);
     setNoteMode(false);
     setWorkplaneMode(false);
-    setActiveSketchWorkplane(normalizePlacementWorkplane(workplaneOverride ?? placementWorkplaneRef.current));
+    setActiveSketchWorkplane(sketchWorkplaneOnActivePlate(normalizePlacementWorkplane(workplaneOverride ?? placementWorkplaneRef.current), operation, Boolean(workplaneOverride || editingId)));
     setToolbarMode("sketch");
     setSketchActive(true);
     setSketchOperation(operation);
@@ -5515,7 +5532,7 @@ export function LayerlingEditor({
         ? t("status.editingInsetProfile", { distance: Number(initial.inset.distance.toFixed(2)), radius: Number(initial.inset.radius.toFixed(2)) })
         : t(operation === "revolve" ? "status.editingRevolveProfile" : operation === "sweep" ? "status.editingSweepProfile" : "status.editingProfile")
       : operation === "revolve" ? t("status.revolveStarted") : operation === "sweep" ? t("status.sweepStarted") : t("status.sketchStarted"));
-  }, []);
+  }, [sketchWorkplaneOnActivePlate]);
 
   const beginSketchEdit = useCallback(() => {
     if (selectedShapes.length !== 1 || !selectedShape?.sketchProfile) {
@@ -5693,6 +5710,12 @@ export function LayerlingEditor({
         sketchOperationSwitchRef.current = switched;
         setActiveSketchWorkplane(horizontalPlacementWorkplane());
       }
+    } else {
+      // A new sketch on another build plate (#1660): a revolve is drawn from the front on the base plate and moved onto
+      // that plate when finished, so it goes back there; an extrusion or a sweep lies on the plate again.
+      const plateShift = placementWorkplanePlateShift(activeSketchWorkplane);
+      if (next === "revolve" && plateShift) setActiveSketchWorkplane(horizontalPlacementWorkplane());
+      else if (sketchOperation === "revolve") setActiveSketchWorkplane(sketchWorkplaneOnActivePlate(activeSketchWorkplane, next, false));
     }
     setSketchOperation(next);
     setSketchRevolvePreview(null);
@@ -5702,7 +5725,7 @@ export function LayerlingEditor({
       if (leftOfAxis !== sketchProfile) commitSketchProfile(leftOfAxis);
     }
     setNotice(t("status.sketchOperationChanged", { operation: t(next === "revolve" ? "sketch.modeBadgeRevolve" : next === "sweep" ? "sketch.modeBadgeSweep" : "sketch.modeBadgeExtrude") }));
-  }, [activeSketchWorkplane, commitSketchProfile, editingSketchShapeId, sketchOperation, sketchProfile]);
+  }, [activeSketchWorkplane, commitSketchProfile, editingSketchShapeId, sketchOperation, sketchProfile, sketchWorkplaneOnActivePlate]);
 
   // Which edge of a swept section runs along the path; centre is what a sketch without the field has (#732).
   const setSketchSweepAnchor = useCallback((anchor: SweepAnchor) => {
@@ -6421,6 +6444,8 @@ export function LayerlingEditor({
           const runtime = await getManifoldRuntime();
           const outline = sketchOutlineBounds(revolveBuildProfile(runtime, drawnProfile));
           if (outline) resolved = canonicalizeShape({ ...resolved, elevation: (resolved.elevation ?? 0) - outline.maxZ });
+          // Drawn from the front, around the first plate's middle: onto the plate that is active, as a new shape (#1660).
+          if (resolved) resolved = ontoActivePlate([resolved])[0];
         }
         if (existing?.sketchProfile && resolved) {
           // The rebuilt body is centred on its outline again: keep its axis where it was.
@@ -6488,7 +6513,7 @@ export function LayerlingEditor({
     sketchEditTurnRef.current = null;
     sketchOperationSwitchRef.current = null;
     setToolbarMode("geometry");
-  }, [activeSketchWorkplane, commitShapes, editingSketchShapeId, shapes, sketchOperation, sketchProfile, sketchRevolveSettings]);
+  }, [activeSketchWorkplane, commitShapes, editingSketchShapeId, ontoActivePlate, shapes, sketchOperation, sketchProfile, sketchRevolveSettings]);
 
   useEffect(() => {
     if (!projectId) {
