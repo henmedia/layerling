@@ -371,7 +371,7 @@ import { canToggleGroupColors, groupShowsPartColors } from "@/lib/groupColors";
 import { groupCanKeepParts, offersGroupResize } from "@/lib/groupScale";
 import { shapePivotFromWorld, shapePivotWorld } from "@/lib/rotationPivot";
 import { signedDegrees } from "@/lib/geometryRotation";
-import { orientedMeasures, withOrientedMeasures } from "@/lib/orientedMeasures";
+import { isPlainMeasure, orientedMeasures, withOrientedMeasures } from "@/lib/orientedMeasures";
 import { tubeAfterInner, tubeAfterOuter, tubeInnerDiameter } from "@/lib/tubeDiameters";
 import { WASHER_SIZE_ORDER, isWasherSize, washerSizeFor, washerTubeFields } from "@/lib/washerSizes";
 import { finishingWasherFields, finishingWasherSizeFor, finishingWasherSizes, isFinishingWasherSize, isScrewHoleSize, screwHoleFields, screwHoleSizeFor, screwHoleSizesFor } from "@/lib/screwHoleSizes";
@@ -4275,12 +4275,15 @@ function surfaceTextFontOptions(current: string): SelectPropertyOption[] {
   return options;
 }
 
+/** The wording of the three plain measures, in the language shown now. */
+const MEASURE_LABELS = () => ({ width: t("prop.width"), height: t("prop.height"), length: t("prop.length") });
+
 function getShapeProperties(shape: WorkplaneShape, onUpdate: ShapeInspectorUpdate, workspace: WorkplaneWorkspaceSettings, view: ShapePropertyView = NO_PROPERTY_VIEW): ShapePropertyConfig[] {
   const customLimit = workspace.shapeCustomizations[shape.kind]?.maxDimension;
   // A body turned by right angles names its measures by the way they run now (#230).
   const oriented = orientedMeasures(shape);
   const own = getShapePropertiesWithAppLimits(shape, onUpdate, view);
-  const properties = withOrientedMeasures(own, oriented, { width: t("prop.width"), height: t("prop.height"), length: t("prop.length") });
+  const properties = withOrientedMeasures(own, oriented, MEASURE_LABELS());
   if (customLimit === undefined) return properties;
   return properties.map((property) => {
     if (property.type === "text" || property.type === "select") return property;
@@ -5305,7 +5308,8 @@ export function ShapeInspector({
             {textFillMore.length && showKeepProportions ? (
               <ToggleProperty label={t("inspector.keepProportions")} value={proportionLock} disabled={frozen} onChange={onProportionLockChange!} />
             ) : null}
-            {tiltedMeasures && primaryProperties.some((property) => ["width", "length", "height"].includes(property.id)) ? (
+            {/* Only the plain Length, Width and Height need the note; a Head diameter means the same at any angle (#1634). */}
+            {tiltedMeasures && primaryProperties.some((property) => isPlainMeasure(property, MEASURE_LABELS())) ? (
               <p className="cylinder-wrap-hint">{t("prop.tiltedMeasures")}</p>
             ) : null}
             {shape.kind === "gridfinity" && gridfinityPlan({ ...shape, depth: shapeDepth(shape) }).swallowtail ? (
