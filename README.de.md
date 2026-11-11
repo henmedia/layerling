@@ -312,6 +312,24 @@ Vier Dinge zu wissen:
 - **Ein schneller Test auf dem eigenen Rechner:** `npx serve apps/web/.next-export` und die angezeigte Adresse öffnen.
 - **Als App installieren und offline nutzen geht nur mit https.** Der Export enthält die Offline-Dateien (`sw.js`), aber ein Browser nutzt sie nur unter einer `https://`-Adresse oder auf `localhost`, nicht unter einer einfachen `http://`-Adresse im eigenen Netz.
 
+### Editor-Profile
+
+Ein optionales Editor-Profil ändert das 3D-Menüband und ausgewählte Werkzeugoptionen für diese Seite. So probierst du das [Beispielprofil](docs/examples/editor-profile.json) in einem lokalen Checkout aus:
+
+```sh
+LAYERLING_EDITOR_PROFILE="$(cat docs/examples/editor-profile.json)" npm run dev
+```
+
+Öffne den Editor, füge einen Quader hinzu und wähle ihn aus. Das einfache Menüband nutzt die übliche Symbolgröße. **Druck prüfen** ist sichtbar, **Deckel** und **Flexi-Gelenke** sind ausgeblendet. Öffne **Verrundung**: Auf einem Quader, der groß genug dafür ist, steht der Startradius auf 2 mm. Die Option **Nur sichtbare Kanten** ist ausgeblendet und eingeschaltet.
+
+- `version` muss `1` sein. Ein optionales `base` mit `simple` oder `full` wählt dieses Layout für diese Seite, vor der Wahl im Browser und der Voreinstellung des Node-Servers. Lässt du es weg, bleibt der gewohnte Umschalter für den Modus.
+- Mit `enlargeInSimpleMode: false` haben Werkzeugleiste, Formenmenü und Bedienelemente dieselbe Größe wie im vollen Modus. Die im Browser gewählte Größe der Werkzeugleiste gilt weiter.
+- Unter `tools` überschreibt `visible: true` oder `false` das Layout für die Werkzeuge in den Bereichen Zwischenablage, Verlauf, Kombinieren, Ändern und Anordnen des 3D-Menübands sowie für `import`. Nimm die ID des Werkzeugs (das Attribut `data-layerling-tool` an den normalen Knöpfen des Menübands). Die Menüband-Einstellungen können die Werkzeuge, die das aktive Profil anbietet, weiterhin ausblenden oder umsortieren. Ein sichtbares Werkzeug braucht weiterhin die übliche Auswahl. Unbekannte Einträge wirken nicht.
+- Unter `tools.fillet.options` ist `amount.default` ein Radius in Millimetern. Ein gültiger gemerkter Radius hat Vorrang, und der eigene Startwert des Werkzeugs gilt, wenn keiner von beiden zum Körper passt. `onlyVisibleEdges` nimmt `visible`, einen booleschen `default` und `locked`. Eine Sperre braucht einen `default` und hat Vorrang vor dem gemerkten Wert.
+- Profile wirken auf das Menüband und die zugehörigen Optionen in den Dialogen. Kontextmenüs, Tastenkürzel, Formen und die Kamera verhalten sich wie gewohnt. Den Zugriff auf Projekte regelst du über die Berechtigungen des Hosts.
+
+`LAYERLING_EDITOR_PROFILE` wird vom Layout gelesen, wenn das HTML erzeugt wird. Setze es, bevor du den Entwicklungsserver startest oder das Produktions-HTML baust, auch für einen statischen Export. Hosts, die das HTML selbst erzeugen, können stattdessen ein einzelnes `<script type="application/json" id="layerling-editor-profile">…</script>` in den Kopf des Dokuments setzen, vor die Skripte von layerling. Schreibe ein wörtliches `<` im serialisierten JSON als `\u003c`. Profile sind unabhängig von Projektdateien und Browsereinstellungen und werden einmal je Seitenaufruf gelesen. Für Profile je Konto liefere das persönliche HTML von einer privaten, nicht zwischengespeicherten Seite außerhalb des Offline-Caches des statischen Service Workers aus, etwa über einen PHP-Einstiegspunkt.
+
 ### Gemeinsame Entwürfe im Netz
 
 layerling selbst besteht nur aus Dateien, der gemeinsame Ordner braucht also etwas auf dem Server, das schreiben kann. Es gibt zwei Wege, und du brauchst nur einen: **Node oder Docker** (dieser Abschnitt, mit `LAYERLING_SHARED_PROJECTS_DIR`) oder **ein gewöhnlicher Webserver mit PHP** (der Ordner `store`, weiter unten). Ein Webserver, der die Dateien nur ausliefert – `npx serve`, nginx oder Apache ohne PHP –, zeigt layerling ganz normal, hat aber keinen Serverordner.

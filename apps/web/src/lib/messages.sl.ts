@@ -323,7 +323,7 @@ export const MESSAGES_SL: Partial<Record<MessageKey, string>> = {
   "welcome.moreTabletTitle": "Na tablici",
   "welcome.moreTabletBody": "en prst dela z modelom kot levi gumb miške, dva prsta povečujeta in premikata pogled; tipkovnica Bluetooth prinese bližnjice.",
   "welcome.moreHistoryBody": "s drsnikom si oglej katero koli prejšnje stanje projekta, ne da bi karkoli spremenil – izvozi to stanje, iz njega začni nov projekt ali iz njega vrni posamezne predmete. Razveljavi in Uveljavi poimenujeta korak, ki ga vrneta, z njegovo mero, seznam pa našteje vsak korak, na katerega lahko skočiš.",
-  "welcome.moreSearchBody": "Pritisni Ctrl+K in vnesi ime orodja, oblike ali ukaza, da skočiš naravnost nanj – v angleščini ali nemščini, ob vsakem s prikazano bližnjico. Telesa v projektu se najdejo tudi po imenu. Vsakega lahko daš tudi na svojo tipko.",
+  "welcome.moreSearchBody": "Pritisni Ctrl+K in vnesi ime orodja, oblike ali ukaza, da skočiš naravnost nanj – v angleščini ali nemščini, ob vsakem s prikazano bližnjico. Telesa v projektu se najdejo tudi po imenu. Vsakega lahko daš tudi na svojo tipko. Gumbe, ki jih nikoli ne uporabljaš, lahko v nastavitvah umakneš s traku – iskanje jih še vedno najde.",
   "welcome.moreHelpTitle": "Interaktivna pomoč",
   "welcome.moreHelpBody": "pritisni Shift+F1 ali vprašaj, nato klikni katerikoli gumb, polje ali okno: majhno okno pokaže del navodil o njem.",
   "welcome.morePointsBody": "z desnim klikom na telo označi njegovo središče, oglišča ali sredine robov s točkami, ki se ne natisnejo in na katere se oblike pripenjajo – nato postavi luknjo natančno na središče drugega dela.",

@@ -80,7 +80,7 @@ Stene rastejo navznoter. Zunaj ostane vse, kot je.
 
 ![Isti kvader, odprt samo na sprednji strani: reža za predal.](shot:hollow-sides)
 
-Za vsako odprto stran telo potrebuje čisto na zunaj na tej strani ravno ploskev. Krogel in prostih oblik zato na ta način ni mogoče izdolbiti. Če je stena predebela za telo, layerling to javi in prosi za tanjšo. Tak primer je zaobljena škatla, ki ima zaobljene tudi zgornje in spodnje robove: njena stena mora biti jasno tanjša od tega zaobljenja, ali pa zaobljenje prej nastavi na 0.
+Za vsako odprto stran telo potrebuje čisto na zunaj na tej strani ravno ploskev. Šteje tudi poševno odrezana zgornja stran: škatla z naklonom ali škatla, združena s poševno luknjo, ki ji odreže vrh, ostane odprta vzdolž svoje poševne zgornje strani, dokler se ta ne nagiba za več kot 60° od vodoravnice. Krogel in prostih oblik zato na ta način ni mogoče izdolbiti. Če je stena predebela za telo, layerling to javi in prosi za tanjšo. Tak primer je zaobljena škatla, ki ima zaobljene tudi zgornje in spodnje robove: njena stena mora biti jasno tanjša od tega zaobljenja, ali pa zaobljenje prej nastavi na 0.
 
 Izdolbiš lahko tudi telo z žepom, na primer kvader z luknjo, ki ne gre skozi do konca in je narejen z združitvijo škatle z dvignjeno luknjo, in sicer z odprtim vrhom: izdolbejo se tudi stene okoli žepa, tako da med zunanjo steno in žepom ostane obroč votline, zgoraj odprt, pod dnom žepa pa tanka votlina.
 
@@ -103,7 +103,7 @@ Izdolbiš lahko tudi telo z žepom, na primer kvader z luknjo, ki ne gre skozi d
 - {{ui:lid.type.bayonet}}: vrtljivo zapiralo za okroglo telo, pokrov, ki se natakne čez zatiče in zasuka; več spodaj.
 - {{ui:lid.type.slide}}: plošča, ki se v škatlo potisne skozi eno steno, kot pokrov lesenega peresnika; več o tem spodaj.
 
-Nato nastaviš {{ui:lid.thickness}}, {{ui:lid.fit}} ({{ui:lid.gap}} med pokrovom in telesom: 0,1 mm tesen, 0,2 mm običajen, 0,3 mm ohlapen ali katera koli vrednost do 1 mm) ter kako globoko seže ustnica ali rob in kako debela je njuna stena. Klikni {{ui:lid.apply}}: pokrov leži poleg telesa, obrnjen s ploščo navzdol, zato se natisne brez podpor. Telo ostane, kakršno je. Pokrov sledi vsakemu obrisu, okroglemu ali oglatemu, ker je vzet s telesa samega tik pod njegovim robom. Telo brez odprtine zgoraj dobi samo raven pokrov; za druge vrste ga najprej izdolbi z odprto zgornjo stranjo.
+Nato nastaviš {{ui:lid.thickness}}, {{ui:lid.fit}} ({{ui:lid.gap}} med pokrovom in telesom: 0,1 mm tesen, 0,2 mm običajen, 0,3 mm ohlapen ali katera koli vrednost do 1 mm) ter kako globoko seže ustnica ali rob in kako debela je njuna stena. Klikni {{ui:lid.apply}}: pokrov leži poleg telesa, obrnjen s ploščo navzdol, zato se natisne brez podpor. Telo ostane, kakršno je. Pokrov sledi vsakemu obrisu, okroglemu ali oglatemu, ker je vzet s telesa samega tik pod njegovim robom. Telo brez odprtine zgoraj dobi samo raven pokrov; za druge vrste ga najprej izdolbi z odprto zgornjo stranjo. Rob mora biti vodoraven: telo s poševno zgornjo stranjo izdolbi z {{ui:shell.side.closed}} in ga razreži z {{ui:split.title}} vzdolž nagnjene ravnine tam, kjer naj se pokrov sname; del zgoraj je pokrov, že s svojimi stenami.
 
 > **Namig:** Kako tesno sede pokrov, je odvisno od tiskalnika. Najprej natisni majhno škatlo s pokrovom; če je pretesen, izberi naslednji ohlapnejši ujem.
 

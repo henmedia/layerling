@@ -28,6 +28,7 @@ Klikaj punkty jeden po drugim.
 Przytrzymaj [[Shift]], aby nowa linia przyciągała się co 15°, także poziomo i pionowo.
 => Długość i kąt nowej linii widać przy wskaźniku.
 Jak wpisać, jak długa ma być, opisuje część [Linie liczbami](#linie-liczbami).
+> Każdy kliknięty punkt trafia na siatkę ustawioną w {{ui:inspector.snapGrid}}. Z przytrzymanym [[Shift]] pierwszeństwo ma krok 15°: długość nadal rośnie krokami siatki, ale koniec może leżeć między liniami siatki.
 :::
 
 ::: icon=arc {{ui:sketch.arc}}
@@ -44,11 +45,13 @@ Kliknij punkt i przeciągnij w kierunku, w którym linia ma biec dalej, jak narz
 => Im dalej przeciągniesz, tym mocniej się wygina.
 => Odcinek do nowego punktu wygina się w trakcie przeciągania, więc widzisz, co dostaniesz.
 > Przychodzisz z Tinkercada i chcesz tylko klikać punkty? Weź {{ui:sketch.smooth}}.
+> Pierwszy odcinek wygina się na początku tylko wtedy, gdy przeciągasz też przy pierwszym punkcie. Tylko kliknięta linia wychodzi z niego prosto; aby wygiąć ją później, zaznacz punkt narzędziem {{ui:sketch.select}} i przeciągnij jego uchwyt.
 :::
 
 ::: icon=smooth {{ui:sketch.smooth}} | [[3]]
 Klikaj punkty jeden po drugim.
 => Przez klikane punkty prowadzi płynną ścieżkę.
+> Na obu końcach otwartej linii krzywa biegnie prosto do następnego punktu, więc pierwszy i ostatni odcinek wyginają się mniej niż pozostałe. Aby któryś wygiąć mocniej, zaznacz jego punkt końcowy narzędziem {{ui:sketch.select}} i przeciągnij jego uchwyt. W zamkniętym konturze wszystkie punkty wyginają się jednakowo.
 :::
 
 ::: Zamykanie albo kończenie linii
@@ -64,6 +67,7 @@ Przybliż widok dla drobnych szczegółów: im bliżej patrzysz, tym wierniej li
 => Linia, która kończy się tam, gdzie się zaczęła, zamyka się w kontur, z którego może powstać bryła. Otwarta zostaje linią, dla {{ui:sketch.stroke}} albo jako ścieżka do przeciągania profilu.
 Zacznij na liniach albo na obrazie wzorcowym, aby odrysować obraz ręcznie.
 Zacznij albo zakończ pociągnięcie na otwartym końcu, aby przedłużyć tę linię, więc kształt można narysować kilkoma pociągnięciami.
+> Pociągnięcie nie trzyma się siatki, żeby podążało za ręką. Punkt, który przeciągniesz potem, przyciąga się do niej, chyba że {{ui:inspector.snapGrid}} jest wyłączona.
 :::
 
 > Cyfry wybierają narzędzie, dopóki nie jest rysowana żadna linia. W trakcie rysowania są jej długością (zobacz niżej). Gdy aktywne jest {{ui:sketch.select}} i zaznaczone są linie lub punkty, te same klawisze je zmieniają: [[1]] prostuje linie i robi z punktów narożniki, [[2]] zamienia linie w krzywe, a [[3]] wygładza punkty. Gdy nic nie jest zaznaczone, wybierają narzędzie jak wcześniej.

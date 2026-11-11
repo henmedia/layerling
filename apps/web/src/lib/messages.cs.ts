@@ -487,7 +487,7 @@ export const MESSAGES_CS: Record<MessageKey, string> = {
   "welcome.moreTabletTitle": "Na tabletu",
   "welcome.moreTabletBody": "jeden prst pracuje s projektem jako levé tlačítko myši, dva prsty přibližují a posouvají pohled; klávesnice Bluetooth přidá klávesové zkratky.",
   "welcome.moreHistoryBody": "posuvníkem prohlížejte předchozí stavy projektu beze změny současného modelu. Vybraný stav můžete exportovat, vytvořit z něj nový projekt nebo z něj vrátit jednotlivé objekty. Zpět a Znovu pojmenují krok, který vracejí, i s jeho mírou, a seznam vyjmenuje každý krok, na který lze skočit.",
-  "welcome.moreSearchBody": "Stiskněte Ctrl+K a zadejte název nástroje, tvaru nebo příkazu. Vyhledávání rozumí českým názvům i anglickým a německým výrazům a zobrazuje klávesové zkratky. Najde také tělesa podle názvu. Každý z nich můžete dát i na vlastní klávesu.",
+  "welcome.moreSearchBody": "Stiskněte Ctrl+K a zadejte název nástroje, tvaru nebo příkazu. Vyhledávání rozumí českým názvům i anglickým a německým výrazům a zobrazuje klávesové zkratky. Najde také tělesa podle názvu. Každý z nich můžete dát i na vlastní klávesu. Tlačítka, která nikdy nepoužíváte, můžete v nastavení odebrat z pásu nástrojů – vyhledávání je najde dál.",
   "welcome.moreHelpTitle": "Interaktivní nápověda",
   "welcome.moreHelpBody": "stiskněte Shift+F1 nebo otazník a klikněte na libovolné tlačítko, pole či okno: malé okno ukáže část příručky, která se ho týká.",
   "welcome.morePointsBody": "pravým tlačítkem na tělese označte jeho střed, rohy nebo středy hran referenčními body, které se netisknou. Tvary se k nim přichytávají, takže například otvor umístíte přesně do středu jiného dílu.",
