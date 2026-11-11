@@ -236,6 +236,8 @@ Run the same line again whenever you want to **update**: the existing folder is 
 
 To run layerling on a computer, NAS (Synology, Unraid, etc.) or home server without installing Node.js, use the ready-made image **`henmedia/layerling`** on Docker Hub (also at **`ghcr.io/henmedia/layerling`**, the same image). Every release publishes it for amd64 and arm64 (Raspberry Pi, ARM NAS) under its version number and as `latest`. The app listens on port **3000**.
 
+New to Docker? [Running layerling in Docker, step by step](docs/docker/en/docker-step-by-step.md) starts from nothing on Windows, macOS or Linux: it installs Docker, starts layerling and saves your designs as files in a folder on your computer.
+
 The quickest way is a single command:
 
 ```bash
