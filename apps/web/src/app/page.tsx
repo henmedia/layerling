@@ -3245,7 +3245,9 @@ export default function Home() {
             if (event.key === "Escape") setEmptyProjectPromptId(null);
           }}
         >
-          <div className="dashboard-confirm-dialog">
+          {/* Its own look (Discussion #1669): the question larger and centred, Keep in green beside the red Delete,
+              so the two answers tell themselves apart at a glance. */}
+          <div className="dashboard-confirm-dialog empty-project-dialog">
             <header>
               <strong id="empty-project-title">{t("confirm.emptyProjectTitle")}</strong>
             </header>

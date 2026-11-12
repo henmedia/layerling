@@ -953,6 +953,11 @@ html[data-theme="dark"]:where([data-palette="graphite"]) .whats-new-earlier:hove
   background: #a85f14;
 }
 
+:where(html[data-theme="dark"][data-palette="graphite"]) .empty-project-dialog .dashboard-confirm-save {
+  border-color: #2e7d32;
+  background: #2e7d32;
+}
+
 :where(html[data-theme="dark"][data-palette="graphite"]) .dashboard-rename-dialog > label {
   color: #565656;
 }

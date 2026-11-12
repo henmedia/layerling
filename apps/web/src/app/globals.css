@@ -2666,6 +2666,30 @@ html[data-theme="dark"] .whats-new-earlier:hover {
   opacity: 0.45;
 }
 
+/* "Keep empty design?" (Discussion #1669): the question larger and centred,
+   Keep in green beside the red Delete, so the answers tell themselves apart. */
+.empty-project-dialog header {
+  justify-content: center;
+  text-align: center;
+}
+
+.empty-project-dialog header strong {
+  font-size: 18px;
+}
+
+.empty-project-dialog p {
+  text-align: center;
+}
+
+.empty-project-dialog .dashboard-confirm-actions {
+  justify-content: center;
+}
+
+.empty-project-dialog .dashboard-confirm-save {
+  border-color: #2e7d32;
+  background: #2e7d32;
+}
+
 .dashboard-rename-dialog > label {
   display: grid;
   gap: 7px;
