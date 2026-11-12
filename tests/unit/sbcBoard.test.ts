@@ -591,6 +591,17 @@ describe("the small ESP32 boards", () => {
     expect(part("esp32c3SuperMini", "ESP32-C3").kind).toBe("chip");
     expect(part("esp32c6SuperMini", "ESP32-C6").kind).toBe("chip");
     expect(part("esp32c6SuperMini", "RGB LED (WS2812)")).toBeDefined();
+    // BOOT by the TX/RX pins (the back row), RESET by the 5V/GND/3V3 pins (the front row), as the board's silkscreen says.
+    expect(part("esp32c6SuperMini", "BOOT button").y0).toBeGreaterThan(SBC_BOARDS.esp32c6SuperMini.depth / 2);
+    expect(part("esp32c6SuperMini", "RESET button").y1).toBeLessThan(SBC_BOARDS.esp32c6SuperMini.depth / 2);
+  });
+
+  it("names every button by what it does, never only by where it sits", () => {
+    for (const type of SBC_BOARD_ORDER) {
+      for (const button of SBC_BOARDS[type].parts.filter((entry) => entry.kind === "button")) {
+        expect(button.name, `${type}: ${button.name}`).toMatch(/RESET|BOOT|Boot|EN|power/);
+      }
+    }
   });
 
   it("show their castellated pins as dots, 2.54 mm apart, in two rows 15.24 mm apart", () => {

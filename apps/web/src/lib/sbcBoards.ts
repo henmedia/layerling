@@ -34,8 +34,9 @@
  *   it is drawn 8.94 mm wide in its place. It has no LEDs, so none are drawn. All of it is `estimated`.
  * - ESP32-C6 Super Mini: no maker's drawing either. From the published community model "ESP32-C6
  *   SuperMini.step" (SolidWorks, github.com/mistic100/Nixie-Clock-IN2): 18 x 26 x 1.15 mm, square
- *   corners, 2 x 10 pins, each part's box read from it. All of it is `estimated`; the model does not
- *   say which button is BOOT and which RESET.
+ *   corners, 2 x 10 pins, each part's box read from it. All of it is `estimated`. The model does not
+ *   say which button is BOOT and which RESET: the silkscreen on the board's photo (MakerGO, mischianti.org's
+ *   pinout) does, BOOT on the side of the TX and RX pins, RST on the side of the 5V, GND and 3V3 pins.
  * - Adafruit ESP32-S3 Feather (PIDs 5323, 5477 and 5885 share one board): the outline, the holes and the pins
  *   from Adafruit's EagleCAD PCB file ("Adafruit ESP32-S3 8MB No PSRAM.brd", github.com/adafruit/Adafruit-Feather-ESP32-S3-PCB),
  *   every part's box and height from Adafruit's own 3D model ("5323 Feather ESP32-S3.step/.stl",
@@ -448,8 +449,8 @@ export const SBC_BOARDS: Record<SbcBoardType, SbcBoard> = {
       { name: "USB-C", x0: 20.57, x1: 27.97, y0: 4.53, y1: 13.47, height: 3.38, kind: "connector", profile: "usbC", estimated: true },
       { name: "pins (5V to GPIO8)", x0: 0.77, x1: 25.23, y0: 0.59, y1: 2.19, height: 0.1, kind: "header", pins: [10, 1], estimated: true },
       { name: "pins (TX to GPIO7)", x0: 0.77, x1: 25.23, y0: 15.83, y1: 17.43, height: 0.1, kind: "header", pins: [10, 1], estimated: true },
-      { name: "button (front)", x0: 15.37, x1: 18.37, y0: 2.63, y1: 6.63, height: 1.93, kind: "button", estimated: true },
-      { name: "button (back)", x0: 15.37, x1: 18.37, y0: 11.38, y1: 15.38, height: 1.93, kind: "button", estimated: true },
+      { name: "RESET button", x0: 15.37, x1: 18.37, y0: 2.63, y1: 6.63, height: 1.93, kind: "button", estimated: true },
+      { name: "BOOT button", x0: 15.37, x1: 18.37, y0: 11.38, y1: 15.38, height: 1.93, kind: "button", estimated: true },
       { name: "LED (front)", x0: 24.39, x1: 25.39, y0: 2.67, y1: 3.17, height: 0.35, kind: "chip", estimated: true },
       { name: "LED (back)", x0: 24.39, x1: 25.39, y0: 14.92, y1: 15.42, height: 0.35, kind: "chip", estimated: true },
       { name: "RGB LED (WS2812)", x0: 9.78, x1: 11.78, y0: 13.22, y1: 15.42, height: 0.87, kind: "chip", estimated: true },
