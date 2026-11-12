@@ -22,5 +22,17 @@
       "en": "Zoomed out, the cross through the middle of the plate became as thin as the other grid lines and got lost among them. It now always stays at least three pixels wide; close up it looks as before.",
       "da": "Når man zoomede ud, blev krydset gennem pladens midte lige så tyndt som de andre gitterlinjer og forsvandt imellem dem. Nu er det altid mindst tre pixel bredt; tæt på ser det ud som før."
     }
+  },
+  {
+    "title": {
+      "de": "Ein Entwurf, der sich nicht lesen lässt, öffnet nicht mehr leer",
+      "en": "A design that cannot be read no longer opens empty",
+      "da": "Et design, der ikke kan læses, åbner ikke længere tomt"
+    },
+    "body": {
+      "de": "Ließ sich ein gespeicherter Entwurf nicht lesen, öffnete er leer, und schon die erste Änderung konnte ihn so überschreiben. Jetzt bleibt er unverändert auf der Startseite stehen, und eine Meldung nennt den Grund. „Alle sichern“ sagt außerdem, zu welchen Entwürfen der Browser keinen Inhalt hat, und dauert das Öffnen einer .lyl-Datei ungewöhnlich lange, steht da, bei welchem Schritt es ist.",
+      "en": "When a stored design could not be read, it opened empty, and the first change could save it that way. Now it stays on the start page untouched, with a message that gives the reason. “Back up all” also tells you which designs the browser holds no content for, and when opening a .lyl file takes unusually long, it says which step it is on.",
+      "da": "Når et gemt design ikke kunne læses, åbnede det tomt, og den første ændring kunne gemme det sådan. Nu bliver det urørt på startsiden med en besked, der giver grunden. “Sikkerhedskopiér alle” fortæller også, hvilke designs browseren ikke har indhold til, og når det tager usædvanligt lang tid at åbne en .lyl-fil, står der, hvilket trin det er nået til."
+    }
   }
 ]
