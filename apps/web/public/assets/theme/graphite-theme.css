@@ -7696,6 +7696,12 @@ html[data-theme="dark"]:where([data-palette="graphite"]) .export-holes-only-warn
   color: #ffa447;
 }
 
+:where(html[data-theme="dark"][data-palette="graphite"]) .unsaved-design-banner {
+  color: #fff;
+  background: #c82031;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.25);
+}
+
 :where(html[data-theme="dark"][data-palette="graphite"]) .open-group-banner {
   color: #404040;
   background: #f9f9f9;
