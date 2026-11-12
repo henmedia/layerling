@@ -35,5 +35,18 @@
       "en": "When you grabbed the turning arrow a little beside its middle, the small needle on the dial started beside the zero by just as much, although the readout said 0°. Now it always starts on the zero and points at the tick the readout names.",
       "da": "Når man greb drejepilen lidt ved siden af midten, startede den lille viser på skalaen lige så meget ved siden af nul, selv om visningen sagde 0°. Nu starter den altid på nul og peger på den streg, visningen nævner."
     }
+  },
+  {
+    "title": {
+      "de": "Farbcode direkt eintippen",
+      "en": "Type a colour code",
+      "da": "Skriv en farvekode direkte"
+    },
+    "body": {
+      "de": "Der Hex-Wert oben in der Farbkarte ist jetzt ein Eingabefeld. Klick darauf, tippe oder füge einen Code wie #5EBDDB ein und drück Enter: Der Körper bekommt genau diese Farbe, bei mehreren ausgewählten Körpern alle. Der Umweg über Rot, Grün und Blau entfällt.",
+      "en": "The hex value at the top of the colour card is now a field. Click it, type or paste a code such as #5EBDDB and press Enter: the body takes exactly that colour, and with several bodies selected all of them do. No more detour through red, green and blue.",
+      "da": "Hexværdien øverst i farvekortet er nu et felt. Klik på det, skriv eller indsæt en kode som #5EBDDB, og tryk Enter: formen får præcis den farve, og er flere former valgt, får de den alle. Ingen omvej over rød, grøn og blå længere."
+    },
+    "guide": { "section": "colorCard" }
   }
 ]

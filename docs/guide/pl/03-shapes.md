@@ -72,7 +72,7 @@ Wpisywanie jest dokładniejsze niż przeciąganie. Wszystkie pola liczbowe przyj
 
 ### Wybieranie kolorów
 
-Kliknięcie {{ui:inspector.solid}} we właściwościach bryły otwiera kartę kolorów z nagłówkiem {{ui:inspector.shapeColor}}. Na górze pokazuje wartość szesnastkową koloru, który bryła ma teraz. Pod nią są gotowe kolory palety. Kliknięcie jednego z nich koloruje bryłę i zamyka kartę.
+Kliknięcie {{ui:inspector.solid}} we właściwościach bryły otwiera kartę kolorów z nagłówkiem {{ui:inspector.shapeColor}}. Na górze pokazuje wartość szesnastkową koloru, który bryła ma teraz. Po kliknięciu w nią możesz wpisać lub wkleić kod koloru, np. #5EBDDB (działa też 5ebddb i krótkie #5bd), i nacisnąć [[Enter]]: bryła dostaje ten kolor, a przy kilku zaznaczonych bryłach dostają go wszystkie. [[Esc]] zostawia stary kolor. Pod nią są gotowe kolory palety. Kliknięcie jednego z nich koloruje bryłę i zamyka kartę.
 
 {{ui:inspector.custom}} otwiera wybór koloru w przeglądarce, do własnego koloru. To, co oferuje, zależy od przeglądarki: w Chrome i Edge ma pole koloru, suwak odcienia, pipetę, która bierze kolor z dowolnego miejsca na ekranie, oraz wartość jako HEX, RGB albo HSL, przełączaną strzałkami obok. Kolor obowiązuje, gdy zamkniesz wybór albo klikniesz poza nim.
 

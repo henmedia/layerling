@@ -68,7 +68,7 @@ Digitare è più preciso che trascinare. Tutti i campi numerici accettano millim
 
 ### Scegliere i colori
 
-Facendo clic su {{ui:inspector.solid}} nelle proprietà di un corpo si apre il riquadro dei colori, intitolato {{ui:inspector.shapeColor}}. In alto mostra il valore esadecimale del colore corrente. Sotto trovi i colori predefiniti della palette: facendo clic su uno, il corpo cambia colore e il riquadro si chiude.
+Facendo clic su {{ui:inspector.solid}} nelle proprietà di un corpo si apre il riquadro dei colori, intitolato {{ui:inspector.shapeColor}}. In alto mostra il valore esadecimale del colore corrente. Facendoci clic puoi scrivere o incollare un codice colore come #5EBDDB (vanno bene anche 5ebddb e la forma breve #5bd) e premere [[Enter]]: il corpo prende quel colore, e con più corpi selezionati lo prendono tutti. [[Esc]] mantiene il colore precedente. Sotto trovi i colori predefiniti della palette: facendo clic su uno, il corpo cambia colore e il riquadro si chiude.
 
 {{ui:inspector.custom}} apre il selettore di colori del browser, per scegliere un colore personalizzato. Le opzioni dipendono dal browser: Chrome ed Edge offrono un campo colore, un cursore per la tonalità, un contagocce per prelevare un colore da qualsiasi punto dello schermo e il valore in formato HEX, RGB o HSL, selezionabile con le frecce accanto. Il colore viene applicato quando chiudi il selettore o fai clic al di fuori.
 

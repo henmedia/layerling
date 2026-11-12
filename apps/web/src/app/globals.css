@@ -10009,6 +10009,34 @@ html[data-theme="dark"] .rotation-angle-badge {
   font-weight: 600;
 }
 
+/* The colour code in the header of the colour card, to type in (Discussion #1674): text until pointed at. */
+.color-hex-input {
+  width: 92px;
+  min-width: 0;
+  padding: 3px 6px;
+  border: 1px solid transparent;
+  border-radius: 5px;
+  background: transparent;
+  font-family: inherit;
+  text-align: right;
+}
+
+.color-hex-input:hover:not(:disabled),
+.color-hex-input:focus {
+  border-color: rgba(152, 132, 111, 0.55);
+}
+
+.color-hex-input:focus {
+  outline: none;
+  background: rgba(152, 132, 111, 0.1);
+  text-align: left;
+}
+
+.color-hex-input::placeholder {
+  color: inherit;
+  opacity: 1;
+}
+
 .color-grid {
   display: grid;
   grid-template-columns: repeat(7, 1fr);

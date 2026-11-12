@@ -72,7 +72,7 @@ Typing is more exact than dragging. All number fields take millimetres, but also
 
 ### Choosing colours
 
-A click on {{ui:inspector.solid}} in the properties of a body opens the colour card, headed {{ui:inspector.shapeColor}}. On top it shows the hex value of the colour the body has now. Under it are the ready colours of the palette; a click on one colours the body and closes the card.
+A click on {{ui:inspector.solid}} in the properties of a body opens the colour card, headed {{ui:inspector.shapeColor}}. On top it shows the hex value of the colour the body has now. Click it to type or paste a colour code such as #5EBDDB (5ebddb and the short #5bd work too) and press [[Enter]]: the body takes that colour, and with several bodies selected all of them do. [[Esc]] keeps the old colour. Under it are the ready colours of the palette; a click on one colours the body and closes the card.
 
 {{ui:inspector.custom}} opens the colour picker of your browser, for a colour of your own. What it offers depends on the browser: in Chrome and Edge it has a colour field, a slider for the hue, an eyedropper that takes a colour from anywhere on the screen, and the value as HEX, RGB or HSL, which you switch with the arrows beside it. The colour counts when you close the picker or click outside it.
 

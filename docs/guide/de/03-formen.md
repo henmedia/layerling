@@ -73,7 +73,7 @@ Tippen ist genauer als Ziehen. Alle Zahlenfelder nehmen Millimeter, aber auch Pr
 
 ### Farben wählen
 
-Ein Klick auf {{ui:inspector.solid}} in den Eigenschaften eines Körpers öffnet die Farbkarte mit der Überschrift {{ui:inspector.shapeColor}}. Oben zeigt sie den Hex-Wert der Farbe, die der Körper jetzt hat. Darunter liegen die fertigen Farben der Palette; ein Klick auf eine färbt den Körper und schließt die Karte.
+Ein Klick auf {{ui:inspector.solid}} in den Eigenschaften eines Körpers öffnet die Farbkarte mit der Überschrift {{ui:inspector.shapeColor}}. Oben zeigt sie den Hex-Wert der Farbe, die der Körper jetzt hat. Ein Klick darauf, und du kannst einen Farbcode wie #5EBDDB eintippen oder einfügen (5ebddb und das kurze #5bd gehen auch); mit [[Enter]] bekommt der Körper diese Farbe, bei mehreren ausgewählten Körpern alle. [[Esc]] behält die alte Farbe. Darunter liegen die fertigen Farben der Palette; ein Klick auf eine färbt den Körper und schließt die Karte.
 
 {{ui:inspector.custom}} öffnet den Farbwähler deines Browsers, für eine Farbe nach eigenem Geschmack. Was er bietet, hängt vom Browser ab: In Chrome und Edge hat er ein Farbfeld, einen Regler für den Farbton, eine Pipette, die eine Farbe von irgendwo auf dem Bildschirm aufnimmt, und den Wert als HEX, RGB oder HSL, zwischen denen du mit den Pfeilen daneben wechselst. Die Farbe gilt, wenn du den Farbwähler schließt oder außerhalb klickst.
 

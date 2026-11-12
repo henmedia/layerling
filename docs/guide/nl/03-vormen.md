@@ -68,7 +68,7 @@ Typen is nauwkeuriger dan slepen. Alle getalvelden nemen millimeters, maar ook p
 
 ### Kleuren kiezen
 
-Een klik op {{ui:inspector.solid}} in de eigenschappen van een lichaam opent de kleurenkaart met de kop {{ui:inspector.shapeColor}}. Bovenaan staat de hexwaarde van de kleur die het lichaam nu heeft. Eronder staan de kant-en-klare kleuren van het palet; een klik op een kleur kleurt het lichaam en sluit de kaart.
+Een klik op {{ui:inspector.solid}} in de eigenschappen van een lichaam opent de kleurenkaart met de kop {{ui:inspector.shapeColor}}. Bovenaan staat de hexwaarde van de kleur die het lichaam nu heeft. Klik erop om een kleurcode zoals #5EBDDB te typen of te plakken (5ebddb en de korte #5bd werken ook) en druk op [[Enter]]: het lichaam krijgt die kleur, en met meerdere lichamen geselecteerd krijgen ze die allemaal. [[Esc]] houdt de oude kleur. Eronder staan de kant-en-klare kleuren van het palet; een klik op een kleur kleurt het lichaam en sluit de kaart.
 
 {{ui:inspector.custom}} opent de kleurkiezer van je browser, voor een eigen kleur. Wat die biedt, hangt van de browser af: in Chrome en Edge heeft hij een kleurvlak, een schuifregelaar voor de tint, een pipet die een kleur van ergens op het scherm overneemt en de waarde als HEX, RGB of HSL, waartussen je met de pijltjes ernaast wisselt. De kleur telt zodra je de kiezer sluit of ernaast klikt.
 

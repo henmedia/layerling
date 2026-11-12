@@ -4212,6 +4212,25 @@ html[data-theme="dark"]:where([data-palette="graphite"]) .rotation-angle-badge {
   color: #747474;
 }
 
+:where(html[data-theme="dark"][data-palette="graphite"]) .color-hex-input {
+  border: 1px solid transparent;
+  background: transparent;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .color-hex-input:hover:not(:disabled),
+:where(html[data-theme="dark"][data-palette="graphite"]) .color-hex-input:focus {
+  border-color: rgba(116, 116, 116, 0.55);
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .color-hex-input:focus {
+  outline: none;
+  background: rgba(116, 116, 116, 0.1);
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .color-hex-input::placeholder {
+  color: inherit;
+}
+
 :where(html[data-theme="dark"][data-palette="graphite"]) .color-grid button {
   background: var(--shape-swatch);
   border: 1px solid rgba(53, 53, 53, 0.22);

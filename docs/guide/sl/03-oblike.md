@@ -63,7 +63,7 @@ Zožanje in zasuk imajo skoraj vse oblike. Samo zobnik, navoj, vzmet, Gridfinity
 
 {{ui:inspector.saveDefaults}} si zapomni, kar ste spremenili na tej obliki, kot začetek vsake nove oblike te vrste: mere, nastavitve oblike in njeno barvo. Valj pobarvajte zeleno in pritisnite gumb, vsak valj, ki ga dodate potem, bo zelen; druge vrste obdržijo svoje barve. {{ui:inspector.resetDefaults}} vrne vrsto na to, s čimer jo začne program. Katere vrste imajo lastne privzete vrednosti, je označeno v nastavitvah pod {{ui:workspace.shapeDefaults}}. Z njimi se začne tudi nov načrt, ki ga začneš na začetni strani; vrednosti si zapomni ta brskalnik.
 
-Klik na {{ui:inspector.solid}} v lastnostih telesa odpre barvno kartico z naslovom {{ui:inspector.shapeColor}}. Zgoraj pokaže šestnajstiško vrednost barve, ki jo ima telo zdaj. Pod njo so pripravljene barve palete; klik na eno pobarva telo in zapre kartico.
+Klik na {{ui:inspector.solid}} v lastnostih telesa odpre barvno kartico z naslovom {{ui:inspector.shapeColor}}. Zgoraj pokaže šestnajstiško vrednost barve, ki jo ima telo zdaj. S klikom nanjo lahko vtipkate ali prilepite kodo barve, na primer #5EBDDB (delujeta tudi 5ebddb in kratka #5bd), in pritisnete [[Enter]]: telo dobi to barvo, ob več izbranih telesih pa jo dobijo vsa. [[Esc]] ohrani staro barvo. Pod njo so pripravljene barve palete; klik na eno pobarva telo in zapre kartico.
 
 {{ui:inspector.custom}} odpre izbirnik barv tvojega brskalnika, za lastno barvo. Kaj ponuja, je odvisno od brskalnika: v Chromu in Edgeu ima barvno polje, drsnik za odtenek, kapalko, ki vzame barvo s katerega koli mesta na zaslonu, in vrednost kot HEX, RGB ali HSL, med katerimi preklapljaš s puščicami ob njej. Barva velja, ko zapreš izbirnik ali klikneš zunaj njega.
 
