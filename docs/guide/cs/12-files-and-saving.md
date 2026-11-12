@@ -52,6 +52,8 @@ Jen některé návrhy: po {{ui:dashboard.select}} zabalí {{ui:dashboard.backupS
 
 Kam se záloha uloží: v Chrome a Edge se dialog pro uložení zeptá na složku a název a složku si zapamatuje pro další zálohu. Zálohy tak jdou rovnou do vaší vlastní složky, třeba na cloudový disk. Totéž platí pro {{ui:myShapes.backup}}. Ostatní prohlížeče ukládají soubor do své složky stažených souborů; o kterou složku jde, se nastavuje v nastavení prohlížeče.
 
+Chcete-li něco vyzkoušet a projekt přitom nezměnit, zvolte v jeho nabídce na úvodní stránce {{ui:dashboard.openCopy}}. layerling vytvoří kopii jako {{ui:common.duplicate}} a hned ji otevře; originál zůstane tak, jak byl, ať v kopii uděláte cokoli. Na serveru leží kopie vedle originálu.
+
 Pokud se projekt otevírá velmi pomalu nebo vůbec, obvykle proto, že jeho historie kroků Zpět příliš narostla, zvol v jeho nabídce na úvodní stránce {{ui:dashboard.openWithoutHistory}}. layerling pak načte jen aktuální stav, trvale smaže všechny předchozí kroky a projekt otevře; nejdřív se zeptá, protože to nejde vrátit. Chceš-li kroky zachovat, nejdřív projekt zálohuj pomocí {{ui:dashboard.backupSelected}}.
 
 Jeden projekt uložíte v editoru přes {{ui:editor.export}}, formát **LYL** a {{ui:export.saveProject}}. LYL je vlastní formát Layerlingu a obsahuje tvary, sloučení, náčrty, CAD data, importované podklady i historii kroků zpět. V {{ui:export.historyTitle}} určíte počet přenášených posledních kroků. Výchozí odpovídá nastavení {{ui:workspace.history}}. Krajní volba {{ui:export.historyNone}} uloží jen současný stav, například pro sdílení bez historie. Export vytvoří kopii pod názvem {{ui:export.fileName}}; historie v prohlížeči zůstává zachovaná. Starší `.skf` lze stále otevřít, ale další uložení používá `.lyl`.

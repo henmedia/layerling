@@ -124,6 +124,8 @@ export const MESSAGES_SV: Partial<Record<MessageKey, string>> = {
   "dashboard.selectDesign": "Välj {name}",
   "dashboard.openWithoutHistory": "Öppna utan historik",
   "dashboard.openWithoutHistoryTitle": "Öppna bara det aktuella läget och ta bort ångrastegen – för en design som öppnas mycket långsamt eller inte alls",
+  "dashboard.openCopy": "Öppna en kopia",
+  "dashboard.openCopyTitle": "Gör en kopia av den här designen och öppna den; originalet förblir som det är – för att prova något",
   "dashboard.backupAll": "Säkerhetskopiera alla",
   "dashboard.tabBrowser": "Webbläsare ({count})",
   "dashboard.tabServer": "Server ({count})",

@@ -361,6 +361,9 @@ under a free name, picture and all – nothing is repacked, so the copy carries 
 your browser the copy becomes a design of its own, with the same shapes, the same history and its own preview picture,
 and it belongs to nobody on the server.
 
+**Open a copy** in the same menu does the same and opens the copy right away, for trying something out: the original
+stays as it was, whatever you do in the copy.
+
 A design that lives on the server saves itself back there, five seconds after the last change and when you leave the
 editor. Thumbnails land beside the files in `.thumbnails`. Designs that are only in your browser stay there, untouched.
 

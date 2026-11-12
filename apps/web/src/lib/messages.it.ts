@@ -125,6 +125,8 @@ export const MESSAGES_IT: Partial<Record<MessageKey, string>> = {
   "dashboard.selectDesign": "Seleziona {name}",
   "dashboard.openWithoutHistory": "Apri senza cronologia",
   "dashboard.openWithoutHistoryTitle": "Apri solo lo stato attuale ed elimina i passaggi di Annulla: per un progetto che si apre molto lentamente o non si apre più",
+  "dashboard.openCopy": "Apri una copia",
+  "dashboard.openCopyTitle": "Crea una copia di questo progetto e aprila; l'originale resta com'è: per provare qualcosa",
   "dashboard.backupAll": "Crea un backup di sicurezza di tutti",
   "dashboard.tabBrowser": "Browser ({count})",
   "dashboard.tabServer": "Server ({count})",

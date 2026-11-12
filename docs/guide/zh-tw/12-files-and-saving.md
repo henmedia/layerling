@@ -52,6 +52,8 @@ layerling 會提醒你。上一次 {{ui:dashboard.backupAll}} 越久遠，此瀏
 
 備份存到哪裡：在 Chrome 和 Edge 中，儲存對話框會詢問資料夾和名稱，並為下一次備份記住該資料夾。這樣備份就能直接存入你自己的資料夾，例如雲端硬碟。{{ui:myShapes.backup}} 也是如此。其他瀏覽器會把檔案放進它們的下載資料夾；是哪個資料夾，可在瀏覽器設定中更改。
 
+想嘗試一些東西又不改動某個設計時，在開始頁上該設計的選單中選擇{{ui:dashboard.openCopy}}。layerling 會像{{ui:common.duplicate}}一樣複製一份，並立即開啟副本；無論你在副本中做什麼，原設計都保持原樣。在伺服器上，副本就放在原設計旁邊。
+
 如果某個設計開啟很慢或根本打不開，通常是因為它的復原步驟歷史記錄變得非常大，請在開始頁面該設計的選單中選擇 {{ui:dashboard.openWithoutHistory}}。layerling 隨後只讀取目前狀態，永久刪除所有更早的步驟並開啟設計；由於無法復原，會先詢問一次。若想保留這些步驟，請先用 {{ui:dashboard.backupSelected}} 備份該設計。
 
 在編輯器中備份單一設計：{{ui:editor.export}}，選擇 **LYL** 格式，然後點擊 {{ui:export.saveProject}}。LYL 檔案是 layerling 自己的設計格式，包含所有內容：形狀、群組、草圖、CAD 資料、匯入的原始檔，以及歷史記錄，也就是復原步驟。在 {{ui:export.historyTitle}} 底下可以選擇要帶上最近多少個步驟；初始值沿用設定（功能區裡的齒輪）在 {{ui:workspace.history}} 保留的步數。最後一檔 {{ui:export.historyNone}} 只儲存設計目前的狀態——這是分享不帶復原步驟的檔案的方法。匯出的是副本，檔名由你在 {{ui:export.fileName}} 中指定；瀏覽器裡的設計仍保有自己的歷史記錄。舊版本留下的 `.skf` 檔案仍可開啟，開啟後會存成 `.lyl`。

@@ -137,6 +137,8 @@ export const MESSAGES_AR: Partial<Record<MessageKey, string>> = {
   "dashboard.selectDesign": "اختيار {name}",
   "dashboard.openWithoutHistory": "فتح بدون السجل",
   "dashboard.openWithoutHistoryTitle": "فتح الحالة الحالية فقط وحذف خطوات التراجع - لتصميم يُفتح ببطء شديد أو لا يُفتح أبدًا",
+  "dashboard.openCopy": "فتح نسخة",
+  "dashboard.openCopyTitle": "إنشاء نسخة من هذا التصميم وفتحها، ويبقى الأصل كما هو - لتجربة شيء ما",
   "dashboard.backupAll": "نسخ احتياطي للكل",
   "dashboard.tabBrowser": "المتصفح ({count})",
   "dashboard.tabServer": "الخادم ({count})",

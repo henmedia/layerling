@@ -21,6 +21,19 @@
   },
   {
     "title": {
+      "de": "Kopie öffnen: ausprobieren, ohne das Original anzutasten",
+      "en": "Open a copy: try things out, the original stays as it was"
+    },
+    "body": {
+      "de": "Im Menü eines Entwurfs auf der Startseite steht jetzt „Kopie öffnen“. Es legt eine Kopie an wie Duplizieren und öffnet sie gleich. Was du in der Kopie auch tust, das Original bleibt, wie es war. Das geht auch mit Entwürfen auf einem Server.",
+      "en": "A design's menu on the start page now has \"Open a copy\". It makes a copy, as Duplicate does, and opens it right away. Whatever you do in the copy, the original stays as it was. This works for designs on a server too."
+    },
+    "guide": {
+      "section": "backingUp"
+    }
+  },
+  {
+    "title": {
       "de": "Glatte Seiten an ausgezogenen Kurven",
       "en": "Smooth sides on extruded curves"
     },

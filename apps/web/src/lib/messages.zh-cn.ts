@@ -129,6 +129,8 @@ export const MESSAGES_ZH_CN: Partial<Record<MessageKey, string>> = {
   "dashboard.selectDesign": "选择 {name}",
   "dashboard.openWithoutHistory": "不带历史记录打开",
   "dashboard.openWithoutHistoryTitle": "只打开当前状态并删除撤销步骤——用于打开很慢或根本打不开的设计",
+  "dashboard.openCopy": "打开副本",
+  "dashboard.openCopyTitle": "复制此设计并打开副本，原设计保持不变——用于尝试",
   "dashboard.backupAll": "全部备份",
   "dashboard.tabBrowser": "浏览器 ({count})",
   "dashboard.tabServer": "服务器 ({count})",

@@ -128,6 +128,8 @@ export const MESSAGES_NL: Record<MessageKey, string> = {
   "dashboard.selectDesign": "{name} selecteren",
   "dashboard.openWithoutHistory": "Openen zonder geschiedenis",
   "dashboard.openWithoutHistoryTitle": "Alleen de huidige stand openen en de stappen voor Ongedaan maken verwijderen - voor een ontwerp dat heel traag of helemaal niet opent",
+  "dashboard.openCopy": "Kopie openen",
+  "dashboard.openCopyTitle": "Een kopie van dit ontwerp maken en openen; het origineel blijft zoals het is - om iets uit te proberen",
   "dashboard.backupAll": "Alles back-uppen",
   "dashboard.tabBrowser": "Browser ({count})",
   "dashboard.tabServer": "Server ({count})",

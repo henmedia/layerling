@@ -3,7 +3,7 @@
 import { requestPersistentStorage } from "@/lib/persistentStorage";
 import { clearDesignOpening, forgetDesignOpening, markDesignOpening, takeUnfinishedOpening } from "@/lib/openingDesignGuard";
 import { keepShownSelection, localDesignKey, selectionHasStale, serverDesignKey, toggleDesignSelection } from "@/lib/designSelection";
-import { Archive, ArchiveRestore, Check, History, CheckSquare, Clock3, Copy, EllipsisVertical, Folder, FolderInput, FolderKanban, FolderPlus, FolderUp, Grid3X3, List, LoaderCircle, MonitorDown, Pencil, Plus, RefreshCw, Search, Server, Shapes, SlidersHorizontal, Sparkles, Trash2, X } from "lucide-react";
+import { Archive, ArchiveRestore, Check, History, CheckSquare, Clock3, Copy, CopyPlus, EllipsisVertical, Folder, FolderInput, FolderKanban, FolderPlus, FolderUp, Grid3X3, List, LoaderCircle, MonitorDown, Pencil, Plus, RefreshCw, Search, Server, Shapes, SlidersHorizontal, Sparkles, Trash2, X } from "lucide-react";
 import { Fragment, useCallback, useEffect, useMemo, useRef, useState, type DragEvent } from "react";
 import { AppFooter } from "@/components/AppFooter";
 import { LanguageSwitch } from "@/components/LanguageSwitch";
@@ -2072,7 +2072,8 @@ export default function Home() {
    * aus der Liste, die er ohnehin vor sich hat; ist er in der Zwischenzeit
    * vergeben, weist der Server ihn ab, statt etwas zu ueberschreiben.
    */
-  const duplicateSharedProject = useCallback(async (sharedProject: SharedProject) => {
+  /** With `open`, the copy opens in the editor right away and the original stays as it is ("Open a copy"). */
+  const duplicateSharedProject = useCallback(async (sharedProject: SharedProject, open = false) => {
     const name = duplicateName(
       sharedProject.name,
       sharedProjects.map((project) => project.name),
@@ -2097,11 +2098,12 @@ export default function Home() {
       const copy = payload.project;
       await refreshSharedProjects();
       setDashboardNotice(t("notice.duplicated", { name: copy.name }));
+      if (open) await openSharedProject(copy);
     } catch (error) {
       setDashboardNotice(error instanceof Error ? localizedError(error.message) : t("notice.duplicateFailed"));
       await refreshSharedProjects();
     }
-  }, [refreshSharedProjects, sharedProjects]);
+  }, [openSharedProject, refreshSharedProjects, sharedProjects]);
 
   /**
    * A design of the server folder, taken into this browser: the way back from "Put on the server" (#1572).
@@ -3055,7 +3057,8 @@ export default function Home() {
     }
   };
 
-  const duplicateProject = async (projectId: string) => {
+  /** With `open`, the copy opens in the editor right away and the original stays as it is ("Open a copy"). */
+  const duplicateProject = async (projectId: string, open = false) => {
     const source = projects.find((project) => project.id === projectId);
     if (!source) return;
     setDashboardNotice(t("notice.duplicating", { name: source.name }));
@@ -3083,6 +3086,7 @@ export default function Home() {
       setProjectShapesById((current) => ({ ...current, [placed.id]: entry }));
       setProjects((current) => [placed, ...current]);
       if (placed.sharedProject) void refreshSharedProjects();
+      if (open) openEditor(placed.id, { allowMissingFromStorage: true });
       const picture = await projectThumbnailDataUrl(source.thumbnailUrl);
       // Das Bild ist Beiwerk: Bleibt es aus, steht die Kopie eben mit der
       // Ersatzflaeche da, statt dass das Duplizieren als gescheitert gilt.
@@ -3284,9 +3288,9 @@ export default function Home() {
           onDeleteProjects={deleteProjects}
           onDeleteSharedProject={(project) => void deleteSharedProject(project)}
           onDeleteSharedProjects={(sharedList) => void deleteSharedProjectsInTurn(sharedList)}
-          onDuplicateProject={(projectId) => void duplicateProject(projectId)}
+          onDuplicateProject={(projectId, open) => void duplicateProject(projectId, open)}
           onOpenProjectWithoutHistory={(projectId) => void openProjectWithoutHistory(projectId)}
-          onDuplicateSharedProject={(project) => void duplicateSharedProject(project)}
+          onDuplicateSharedProject={(project, open) => void duplicateSharedProject(project, open)}
           onImportFile={() => void pickDashboardImport()}
           onBackupAll={() => void backupAllProjects()}
           onBackupProjects={(designIds) => void backupProjects({ designIds })}
@@ -3630,10 +3634,11 @@ function Dashboard({
   onDeleteProjects: (projectIds: string[]) => void;
   onDeleteSharedProject: (project: SharedProject) => void;
   onDeleteSharedProjects: (projects: SharedProject[]) => void;
-  onDuplicateProject: (projectId: string) => void;
+  /** With `open`, the copy opens right away ("Open a copy", the original stays as it is). */
+  onDuplicateProject: (projectId: string, open?: boolean) => void;
   /** Opens a design with only its current state, without the undo history (#1157). */
   onOpenProjectWithoutHistory: (projectId: string) => void;
-  onDuplicateSharedProject: (project: SharedProject) => void;
+  onDuplicateSharedProject: (project: SharedProject, open?: boolean) => void;
   onImportFile: () => void;
   onBackupAll: () => void;
   onBackupProjects: (designIds: string[]) => void;
@@ -4487,6 +4492,18 @@ function Dashboard({
                             <Copy size={16} />
                             <span>{t("common.duplicate")}</span>
                           </button>
+                          <button
+                            type="button"
+                            role="menuitem"
+                            title={t("dashboard.openCopyTitle")}
+                            onClick={() => {
+                              setOpenSharedProjectMenuKey(null);
+                              onDuplicateSharedProject(project, true);
+                            }}
+                          >
+                            <CopyPlus size={16} />
+                            <span>{t("dashboard.openCopy")}</span>
+                          </button>
                           {canTakeIntoBrowser ? (
                             <button
                               type="button"
@@ -4784,6 +4801,18 @@ function Dashboard({
                           >
                             <Copy size={16} />
                             <span>{t("common.duplicate")}</span>
+                          </button>
+                          <button
+                            type="button"
+                            role="menuitem"
+                            title={t("dashboard.openCopyTitle")}
+                            onClick={() => {
+                              setOpenProjectMenuId(null);
+                              onDuplicateProject(project.id, true);
+                            }}
+                          >
+                            <CopyPlus size={16} />
+                            <span>{t("dashboard.openCopy")}</span>
                           </button>
                           <button
                             type="button"

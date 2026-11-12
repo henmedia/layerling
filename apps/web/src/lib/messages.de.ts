@@ -128,6 +128,8 @@ export const MESSAGES_DE: Record<MessageKey, string> = {
   "dashboard.selectDesign": "{name} auswählen",
   "dashboard.openWithoutHistory": "Ohne Verlauf öffnen",
   "dashboard.openWithoutHistoryTitle": "Nur den aktuellen Stand öffnen und die Rückgängig-Schritte löschen - für einen Entwurf, der sehr langsam oder gar nicht mehr aufgeht",
+  "dashboard.openCopy": "Kopie öffnen",
+  "dashboard.openCopyTitle": "Eine Kopie dieses Entwurfs anlegen und öffnen; das Original bleibt, wie es ist - zum Ausprobieren",
   "dashboard.backupAll": "Alle sichern",
   "dashboard.tabBrowser": "Browser ({count})",
   "dashboard.tabServer": "Server ({count})",

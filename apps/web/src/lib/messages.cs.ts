@@ -286,6 +286,8 @@ export const MESSAGES_CS: Record<MessageKey, string> = {
   "dashboard.selectDesign": "Vybrat {name}",
   "dashboard.openWithoutHistory": "Otevřít bez historie",
   "dashboard.openWithoutHistoryTitle": "Otevřít jen aktuální stav a smazat kroky Zpět - pro projekt, který se otevírá velmi pomalu nebo vůbec",
+  "dashboard.openCopy": "Otevřít kopii",
+  "dashboard.openCopyTitle": "Vytvořit kopii tohoto projektu a otevřít ji; originál zůstane beze změny - pro zkoušení",
   "dashboard.backupAll": "Zálohovat vše",
   "dashboard.tabBrowser": "Prohlížeč ({count})",
   "dashboard.tabServer": "Server ({count})",

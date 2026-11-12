@@ -129,6 +129,8 @@ export const MESSAGES_EN = {
   "dashboard.selectDesign": "Choose {name}",
   "dashboard.openWithoutHistory": "Open without history",
   "dashboard.openWithoutHistoryTitle": "Open only the current state and delete the undo steps - for a design that opens very slowly or not at all",
+  "dashboard.openCopy": "Open a copy",
+  "dashboard.openCopyTitle": "Make a copy of this design and open it; the original stays as it is - for trying something out",
   "dashboard.backupAll": "Back up all",
   "dashboard.tabBrowser": "Browser ({count})",
   "dashboard.tabServer": "Server ({count})",

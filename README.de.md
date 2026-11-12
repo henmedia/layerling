@@ -368,6 +368,9 @@ Original und unter einem freien Namen, das Vorschaubild inbegriffen – es wird 
 genau die Geometrie des Originals. Im Browser entsteht ein eigener Entwurf mit denselben Formen, demselben Verlauf und
 einem eigenen Vorschaubild, und er gehört niemandem auf dem Server.
 
+**Kopie öffnen** im selben Menü tut dasselbe und öffnet gleich die Kopie, zum Ausprobieren: Das Original bleibt, wie
+es war, was du in der Kopie auch tust.
+
 Ein Entwurf, der auf dem Server liegt, sichert sich von selbst dorthin zurück – fünf Sekunden nach der letzten Änderung
 und beim Verlassen des Editors. Vorschaubilder landen daneben in `.thumbnails`. Was nur im Browser liegt, bleibt dort
 unberührt.

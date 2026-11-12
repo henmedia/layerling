@@ -113,6 +113,8 @@ export const MESSAGES_SL: Partial<Record<MessageKey, string>> = {
   "dashboard.selectDesign": "Izberi {name}",
   "dashboard.openWithoutHistory": "Odpri brez zgodovine",
   "dashboard.openWithoutHistoryTitle": "Odpri samo trenutno stanje in izbriši korake razveljavitve – za načrt, ki se odpira zelo počasi ali sploh ne",
+  "dashboard.openCopy": "Odpri kopijo",
+  "dashboard.openCopyTitle": "Naredi kopijo tega načrta in jo odpri; izvirnik ostane, kot je – za preizkušanje",
   "dashboard.newOnServer": "Novi načrti na strežniku",
   "dashboard.newOnServerTitle": "Novi načrti se začnejo v mapi na strežniku, zato se tam shranjujejo od prve spremembe naprej. Načrti tega brskalnika ostanejo, kakor so.",
   "dashboard.newOnServerLockedTitle": "Določil strežnik: vsak nov načrt se začne v mapi na strežniku.",
