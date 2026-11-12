@@ -35,11 +35,11 @@ import { canonicalizeShape, workplaneShapesEqual } from "@/lib/workplaneShapes";
 import type { SbcBoardSettings, SbcBoardType, WorkplaneShape } from "@/types/layerling";
 
 /** The small ESP32 boards: no mounting holes, USB-C at the right end, castellated pins. */
-const ESP32_BOARDS: SbcBoardType[] = ["xiaoEsp32c6", "esp32c3SuperMini", "esp32c6SuperMini"];
+const ESP32_BOARDS: SbcBoardType[] = ["xiaoEsp32c6", "esp32c3SuperMini", "esp32c6SuperMini", "waveshareEsp32s3Zero"];
 /** The microcontroller boards: no microSD card slot, no ribbon cables, no GPIO header to open up. */
 /** The camera boards: their microSD card slot is on top, by the camera. */
 const CAMERA_BOARDS: SbcBoardType[] = ["esp32CamMb", "esp32s3Cam"];
-const MICRO_BOARDS: SbcBoardType[] = [...ESP32_BOARDS, "featherEsp32s3", "arduinoUno", "arduinoMega", "arduinoNano", "wemosD1Mini", "pico", "picoW", "pico2", "pico2W", "esp32CamMb", "esp32s3Cam", "esp32DevKitC", "esp32DevKitV1", "cyd", "cyd2usb"];
+const MICRO_BOARDS: SbcBoardType[] = [...ESP32_BOARDS, "featherEsp32s3", "arduinoUno", "arduinoMega", "arduinoNano", "arduinoProMini", "wemosD1Mini", "pico", "picoW", "pico2", "pico2W", "esp32CamMb", "esp32s3Cam", "esp32DevKitC", "esp32DevKitV1", "cyd", "cyd2usb"];
 
 /** A body carrying board settings; what carries them does not matter to the project file. */
 function boardBody(id: string, sbcBoard: SbcBoardSettings = { board: "pi4", clearance: 0.3 }): WorkplaneShape {
@@ -73,7 +73,7 @@ async function withDefinition(patch: Record<string, unknown>) {
 
 describe("SBC board data (#1098)", () => {
   it("has every board in the list, the Raspberry Pi 5 first", () => {
-    expect(SBC_BOARD_ORDER).toEqual(["pi5", "pi4", "pi3bPlus", "zero2w", "bttPi12", "xiaoEsp32c6", "esp32c3SuperMini", "esp32c6SuperMini", "featherEsp32s3", "arduinoUno", "arduinoMega", "arduinoNano", "wemosD1Mini", "pico", "picoW", "pico2", "pico2W", "esp32CamMb", "esp32s3Cam", "esp32DevKitC", "esp32DevKitV1", "cyd", "cyd2usb"]);
+    expect(SBC_BOARD_ORDER).toEqual(["pi5", "pi4", "pi3bPlus", "zero2w", "bttPi12", "xiaoEsp32c6", "esp32c3SuperMini", "esp32c6SuperMini", "waveshareEsp32s3Zero", "featherEsp32s3", "arduinoUno", "arduinoMega", "arduinoNano", "arduinoProMini", "wemosD1Mini", "pico", "picoW", "pico2", "pico2W", "esp32CamMb", "esp32s3Cam", "esp32DevKitC", "esp32DevKitV1", "cyd", "cyd2usb"]);
     expect(DEFAULT_SBC_BOARD).toBe("pi5");
     for (const type of SBC_BOARD_ORDER) expect(SBC_BOARDS[type].type).toBe(type);
   });
@@ -591,10 +591,21 @@ describe("the small ESP32 boards", () => {
     expect(part("esp32c3SuperMini", "ESP32-C3").kind).toBe("chip");
     expect(part("esp32c6SuperMini", "ESP32-C6").kind).toBe("chip");
     expect(part("esp32c6SuperMini", "RGB LED (WS2812)")).toBeDefined();
+    // BOOT by the TX/RX pins (the back row), RESET by the 5V/GND/3V3 pins (the front row), as the board's silkscreen says.
+    expect(part("esp32c6SuperMini", "BOOT button").y0).toBeGreaterThan(SBC_BOARDS.esp32c6SuperMini.depth / 2);
+    expect(part("esp32c6SuperMini", "RESET button").y1).toBeLessThan(SBC_BOARDS.esp32c6SuperMini.depth / 2);
+  });
+
+  it("names every button by what it does, never only by where it sits", () => {
+    for (const type of SBC_BOARD_ORDER) {
+      for (const button of SBC_BOARDS[type].parts.filter((entry) => entry.kind === "button")) {
+        expect(button.name, `${type}: ${button.name}`).toMatch(/RESET|BOOT|Boot|EN|power/);
+      }
+    }
   });
 
   it("show their castellated pins as dots, 2.54 mm apart, in two rows 15.24 mm apart", () => {
-    for (const [type, perSide] of [["xiaoEsp32c6", 7], ["esp32c3SuperMini", 8], ["esp32c6SuperMini", 10]] as const) {
+    for (const [type, perSide] of [["xiaoEsp32c6", 7], ["esp32c3SuperMini", 8], ["esp32c6SuperMini", 10], ["waveshareEsp32s3Zero", 9]] as const) {
       const solids = sbcBoardSolids(SBC_BOARDS[type], 0, 0);
       const dots = solids.filter((solid) => solid.role === "pin");
       expect(dots, type).toHaveLength(2 * perSide);
@@ -772,6 +783,42 @@ describe("the Adafruit ESP32-S3 Feather, the Arduino UNO R3, the Arduino Nano an
     expect(reset.top).toBe(0);
     expect(reset.bottom).toBeCloseTo(-(2.0 + 0.3 + 8), 9);
     expect(sbcBoardHasButtons(board)).toBe(true);
+  });
+
+  it("give the Waveshare ESP32-S3-Zero the pins of Waveshare's model: 2 x 9, 2.54 mm apart, the first 1.59 mm from the end", () => {
+    const board = SBC_BOARDS.waveshareEsp32s3Zero;
+    expect(board).toMatchObject({ width: 23.5, depth: 18, thickness: 1.6, holes: [] });
+    const dots = sbcBoardSolids(board, 0, 0).filter((solid) => solid.role === "pin");
+    const xs = [...new Set(dots.map((dot) => Math.round(((dot.x0 + dot.x1) / 2) * 1000) / 1000))].sort((a, b) => a - b);
+    const ys = [...new Set(dots.map((dot) => Math.round(((dot.y0 + dot.y1) / 2) * 1000) / 1000))].sort((a, b) => a - b);
+    expect(xs[0]).toBeCloseTo(1.59, 3);
+    expect(xs[8]).toBeCloseTo(21.91, 3);
+    expect(ys).toEqual([expect.closeTo(1.371, 3), expect.closeTo(16.611, 3)]);
+    // The USB-C stands 1.23 mm over the right end, as the model has it.
+    expect(part("waveshareEsp32s3Zero", "USB-C").x1 - board.width).toBeCloseTo(1.23, 6);
+    // Waveshare's drawing: R 1.00 corners; BOOT on the side of the 5V pins, where the antenna is, RESET on the TX/RX side.
+    expect(board).toMatchObject({ cornerRadius: 1, estimated: [] });
+    expect(part("waveshareEsp32s3Zero", "BOOT button").y0).toBeGreaterThan(board.depth / 2);
+    expect(part("waveshareEsp32s3Zero", "RESET button").y1).toBeLessThan(board.depth / 2);
+    expect(part("waveshareEsp32s3Zero", "ceramic antenna").y1).toBeGreaterThan(board.depth / 2);
+  });
+
+  it("give the Arduino Pro Mini SparkFun's outline and pins: 12 + 12 down the long edges, 6 FTDI pins at the right end", () => {
+    const board = SBC_BOARDS.arduinoProMini;
+    expect(board).toMatchObject({ width: 33.02, depth: 17.78, thickness: 0.8, holes: [] });
+    const dots = sbcBoardSolids(board, 0, 0).filter((solid) => solid.role === "pin");
+    expect(dots).toHaveLength(12 + 12 + 6 + 2 + 2);
+    const at = (name: string) => sbcBoardSolids(board, 0, 0).filter((solid) => solid.role === "pin" && solid.name.startsWith(name));
+    const middle = (dot: { x0: number; x1: number; y0: number; y1: number }) => [(dot.x0 + dot.x1) / 2, (dot.y0 + dot.y1) / 2];
+    // The long rows 16.51 mm apart, 1.27 mm in; their pins 2.54 mm apart from 1.27 mm to 29.21 mm.
+    for (const [name, y] of [["pins (D10 to RAW)", 1.27], ["pins (D9 to TXO)", 16.51]] as const) {
+      const row = at(name).map(middle).sort((a, b) => a[0] - b[0]);
+      expect(row, name).toHaveLength(12);
+      row.forEach(([x, rowY], i) => { expect(x, name).toBeCloseTo(1.27 + 2.54 * i, 6); expect(rowY, name).toBeCloseTo(y, 6); });
+    }
+    const ftdi = at("FTDI pins").map(middle).sort((a, b) => a[1] - b[1]);
+    ftdi.forEach(([x, y], i) => { expect(x).toBeCloseTo(31.75, 6); expect(y).toBeCloseTo(2.54 + 2.54 * i, 6); });
+    expect(board.parts.some((entry) => entry.kind === "connector")).toBe(false);
   });
 
   it("give the CYD with two USB ports the same plate and screen, its USB-C between the power socket and the micro-USB", () => {
