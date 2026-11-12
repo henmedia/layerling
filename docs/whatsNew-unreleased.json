@@ -1,6 +1,16 @@
 [
   {
     "title": {
+      "de": "Glatte Seiten an ausgezogenen Kurven",
+      "en": "Smooth sides on extruded curves"
+    },
+    "body": {
+      "de": "Eine Skizze mit einer weichen Kurve bekam beim Ausziehen eine verknitterte Seite, in der Ansicht wie in der STL-Datei und im Slicer. Jetzt wird so eine Seite in geraden Streifen vom Boden bis oben vernetzt und bleibt glatt, mit weniger Dreiecken.",
+      "en": "A sketch with a smooth curve got a crumpled side when extruded, in the view as in the STL file and the slicer. Now such a side is meshed in straight strips from the bottom to the top and stays smooth, with fewer triangles."
+    }
+  },
+  {
+    "title": {
       "de": "Geschrägte Rohre: die Bohrung folgt der Schräge",
       "en": "Sloped tubes: the bore follows the slope"
     },
