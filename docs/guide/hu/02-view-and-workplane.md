@@ -99,6 +99,7 @@ Ha egy terv több alkatrészt tartalmaz, mint amennyi egy tálcára fér, péld�
 
 - Minden tálca akkora, mint a munkasík, és a tálcák egymás mellett fekszenek az első jobb oldalán, 20 mm-re egymástól. Egy test ahhoz a tálcához tartozik, amelyen az alapterülete közepe áll, így áthúzva a másik tálcára kerül. Egy tervnek legfeljebb 12 tálcája lehet.
 - A sávban egy tálcára kattintva az megjelenik, és az új alakzatok és az importált fájlok ezután rá kerülnek. A {{ui:plates.showAll}} mindet megmutatja. Dupla kattintás egy tálcán vagy a {{ui:plates.rename}} nevet ad neki, például „Fedél”, ami a tálcára is kiíródik.
+- Egy új vázlat a tálcán szintén az aktív tálcán kezdődik: a vázlatterület azt a tálcát mutatja a rajta lévő testekkel, és a kész test oda kerül.
 - A {{ui:plates.moveLeft}} és a {{ui:plates.moveRight}} a sorrendet változtatja, a testek a tálcájukkal mozognak. A {{ui:plates.remove}} eltávolítja az aktív tálcát; a testei ugyanarra a helyre kerülnek az első tálcán.
 - Az {{ui:plates.arrange}} a kijelölt testeket, vagy mindet, sorról sorra a tálcákra rakja, a legnagyobbat először, 5 mm-re egymástól, és tálcákat ad hozzá, amíg kell. A tálcánál nagyobb test a helyén marad.
 - Kiválasztott nyomtatóval minden test a saját tálcájához mérve ellenőrződik, és a nyomtatási magasság a tálca legalsó testétől számít. Az a tálca, amelyen egy test nem fér el, pirosan mutatja a számát.

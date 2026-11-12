@@ -140,7 +140,7 @@ Du kan sætte stregen uden at åbne skitsen også: i egenskaberne for en skitsef
 
 {{ui:prop.sketchSilhouette}} udelader hvert omrids der ligger inden i et andet: huller og hvad der ligger i dem. Kun det ydre omrids bevares. Sammen med {{ui:prop.sketchFill.outside}} laver det en småkageudstikker: importér en SVG to gange, én med silhuetten som areal til basen og én med silhuetten og 1 til 2 mm streg udenpå som væggen. Kontakten er også i {{ui:sketch.stroke}}-vinduet i skitsetilstand.
 
-Fas og rund på kanterne forsvinder når formen bygges igen, som når skitsen redigeres.
+Fas og rund på kanterne forsvinder når formen bygges igen, som når skitsen redigeres. {{ui:inspector.taper}} og {{ui:inspector.twist}} bliver; en tilspidsning vokser eller skrumper med omridset.
 
 ## Skrå vægge, til stempler
 
@@ -190,6 +190,7 @@ Træet ved siden af et hus, en figur foran en urolig baggrund – hvor ingen far
 | [[Ctrl]]+[[A]] | vælg alle punkter og linjer |
 | [[Ctrl]]+[[I]] | {{ui:sketch.addImage}} |
 | [[Shift]] | mens du tegner: snap linjen i 15°-trin; mens du trækker: hold flytningen på én akse |
+| [[Alt]] | når du sætter eller trækker et punkt: kun på gitteret, uden at fange hjørner og midtpunkter |
 | ciffer, [[<]], [[Tab]], [[Enter]] | mens du tegner: tast og sæt længden og vinklen på den næste linje |
 | [[R]] | drej den lukkede skitse 45° |
 | [[Ctrl]]+[[L]] | lås eller lås op for skabelonbilledet, eller det valgte omrids |

@@ -28,6 +28,10 @@ import { toCreasedNormals } from "@/lib/creasedNormals";
  *
  * A countersink may be recessed (Discussion #1531): a straight pocket as wide as the head sits above the cone, so
  * the screw head ends that far below the face instead of flush with it. The double countersink has it at both ends.
+ *
+ * A counterbore may have a chamfer at its rim (Discussion #1632): the top of the pocket opens at 45 degrees by that
+ * many millimetres, outside the head's diameter, so the pocket keeps the width the screw head needs. The chamfer stays
+ * shallower than the pocket.
  */
 
 export type ScrewHoleKind = "counterbore" | "countersink" | "doubleCountersink";
@@ -79,6 +83,23 @@ export function normalizeScrewHoleRecess(value: number | undefined, height: numb
   return clamp(value as number, 0, maxScrewHoleRecess(height, kind));
 }
 
+/** A counterbore's rim chamfer (Discussion #1632) leaves at least this much straight pocket wall below it. */
+const MIN_POCKET_WALL = 0.1;
+
+/**
+ * How deep (and wide) a counterbore's rim chamfer may be (Discussion #1632): shallower than its pocket, so a straight
+ * wall stays for the screw head. 0 for the other screw holes.
+ */
+export function maxScrewHoleChamfer(height: number, screwHoleHeadDepth: number | undefined, kind: ScrewHoleKind = "counterbore") {
+  if (kind !== "counterbore") return 0;
+  return Math.max(0, normalizeScrewHoleHeadDepth(screwHoleHeadDepth, Math.max(0.01, height)) - MIN_POCKET_WALL);
+}
+
+export function normalizeScrewHoleChamfer(value: number | undefined, height: number, screwHoleHeadDepth: number | undefined, kind: ScrewHoleKind = "counterbore") {
+  if (!Number.isFinite(value)) return 0;
+  return clamp(value as number, 0, maxScrewHoleChamfer(height, screwHoleHeadDepth, kind));
+}
+
 export function normalizeScrewHoleAngle(value: number | undefined) {
   return clamp(Number.isFinite(value) ? (value as number) : DEFAULT_SCREW_HOLE_ANGLE, MIN_SCREW_HOLE_ANGLE, MAX_SCREW_HOLE_ANGLE);
 }
@@ -100,6 +121,8 @@ export type ScrewHoleGeometryOptions = {
   screwHoleAngle?: number;
   /** Countersink and double countersink: how far the head sits below the face (Discussion #1531), 0 or left out for flush. */
   screwHoleRecess?: number;
+  /** Counterbore: a 45-degree chamfer this deep at the rim of the pocket (Discussion #1632), 0 or left out for none. */
+  screwHoleChamfer?: number;
   /** The drill point's angle in degrees (shapeDrillPointAngle), or left out for a flat bottom; the double countersink has none. */
   drillPointAngle?: number;
   /** Corners around the axis; the automatic count for the diameter when left out. */
@@ -131,6 +154,13 @@ export function screwHoleProfile(options: Omit<ScrewHoleGeometryOptions, "depth"
 
 function flatScrewHoleProfile(options: Omit<ScrewHoleGeometryOptions, "depth">): ProfilePoint[] {
   const height = Math.max(0.01, options.height);
+  const chamfer = normalizeScrewHoleChamfer(options.screwHoleChamfer, height, options.screwHoleHeadDepth, options.kind);
+  if (chamfer > 0) {
+    // A chamfered counterbore (Discussion #1632): the rim, the last corner, opens outwards at 45 degrees.
+    const profile = flushScrewHoleProfile(options);
+    const rim = profile[profile.length - 1];
+    return [...profile.slice(0, -1), { r: rim.r, y: rim.y - chamfer }, { r: rim.r + chamfer, y: rim.y }];
+  }
   const recess = normalizeScrewHoleRecess(options.screwHoleRecess, height, options.kind);
   if (recess <= 0) return flushScrewHoleProfile(options);
   // A recessed countersink (Discussion #1531): the flush profile in the shorter length, with a straight pocket as wide

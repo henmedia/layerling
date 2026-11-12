@@ -207,22 +207,37 @@ export function cornerRulerDimensionMatchesFromCorner(
 const CORNER_RULER_SIDE_TOLERANCE = 0.01;
 
 /**
- * Teilstriche fuer einen Arm des Winkellineal-Werkzeugs, einer je Millimeter -
- * dieselbe Dichte wie die verworfene Tick-Textur (`createRulerTickTexture`),
- * nur als reine Zahlenliste statt als Zeichnung, damit die Bildschirm-Anzeige
- * jeden Strich einzeln ueber `projectToScreen` platzieren kann.
+ * Teilstriche fuer einen Arm des Winkellineal-Werkzeugs, als reine Zahlenliste,
+ * damit die Bildschirm-Anzeige jeden Strich einzeln ueber `projectToScreen`
+ * platzieren kann. Metrisch einer je Millimeter mit Zahl alle 10 mm; mit Zoll
+ * (oder Fuss) eingestellt einer je 1/16" mit Zahl an jedem ganzen Zoll, wie auf
+ * einem echten Winkel (Discussion #1618: vorher immer Millimeter).
+ * `offset` ist immer in Millimetern, `height` der Anteil der Armbreite.
  */
 export type CornerRulerTick = {
   offset: number;
-  isTen: boolean;
-  isFive: boolean;
+  height: number;
+  label?: string;
 };
 
-export function cornerRulerTicks(length: number): CornerRulerTick[] {
+const CORNER_RULER_INCH_STEPS = 16;
+
+export function cornerRulerTicks(length: number, unitLabel = "mm"): CornerRulerTick[] {
   const ticks: CornerRulerTick[] = [];
+  if (unitLabel === "in" || unitLabel === "ft") {
+    const step = 25.4 / CORNER_RULER_INCH_STEPS;
+    const last = Math.max(0, Math.floor(length / step + 1e-6));
+    for (let index = 0; index <= last; index += 1) {
+      const height = index % 16 === 0 ? 0.62 : index % 8 === 0 ? 0.48 : index % 4 === 0 ? 0.38 : index % 2 === 0 ? 0.3 : 0.22;
+      const inches = index / CORNER_RULER_INCH_STEPS;
+      ticks.push({ offset: index * step, height, label: index > 0 && index % 16 === 0 ? (unitLabel === "ft" ? `${inches}"` : String(inches)) : undefined });
+    }
+    return ticks;
+  }
   const last = Math.max(0, Math.floor(length));
   for (let value = 0; value <= last; value += 1) {
-    ticks.push({ offset: value, isTen: value % 10 === 0, isFive: value % 5 === 0 });
+    const isTen = value % 10 === 0;
+    ticks.push({ offset: value, height: isTen ? 0.62 : value % 5 === 0 ? 0.42 : 0.26, label: isTen && value > 0 ? String(value) : undefined });
   }
   return ticks;
 }
@@ -313,6 +328,64 @@ export function cornerRulerArmLength(ruler: { corner: CornerRulerVector; frame: 
   const axis = toVector(arm === "x" ? ruler.frame.xAxis : ruler.frame.zAxis).normalize();
   const along = toVector(point).sub(toVector(ruler.corner)).dot(axis);
   return Math.min(CORNER_RULER_MAX_ARM, Math.max(CORNER_RULER_MIN_ARM, Math.round(along)));
+}
+
+/** How long the third arm, the one standing up from the corner along the square's normal, is to begin with (Discussion #1649). */
+export const CORNER_RULER_DEFAULT_ARM_ELEVATION = 50;
+
+/** Which arms a framing square shows when it says nothing: the two in its plane, not the third (Discussion #1649). */
+const CORNER_RULER_ARMS_DEFAULT: Record<CornerRulerAxis, boolean> = { x: true, z: true, elevation: false };
+
+/** Which of its three arms a framing square shows: the two in its plane unless switched off, the third only when switched on. */
+export function cornerRulerArmsShown(arms?: Partial<Record<CornerRulerAxis, boolean>>): Record<CornerRulerAxis, boolean> {
+  return {
+    x: typeof arms?.x === "boolean" ? arms.x : CORNER_RULER_ARMS_DEFAULT.x,
+    z: typeof arms?.z === "boolean" ? arms.z : CORNER_RULER_ARMS_DEFAULT.z,
+    elevation: typeof arms?.elevation === "boolean" ? arms.elevation : CORNER_RULER_ARMS_DEFAULT.elevation,
+  };
+}
+
+/**
+ * One arm switched on or off, the others as they were (Discussion #1649). The last arm shown stays on. What is kept
+ * names only the arms that differ from the start, so a square as it always was keeps nothing (undefined).
+ */
+export function toggledCornerRulerArms(arms: Partial<Record<CornerRulerAxis, boolean>> | undefined, arm: CornerRulerAxis): Partial<Record<CornerRulerAxis, boolean>> | undefined {
+  const shown = cornerRulerArmsShown(arms);
+  const next = { ...shown, [arm]: !shown[arm] };
+  return keptCornerRulerArms(CORNER_RULER_AXES.some((entry) => next[entry]) ? next : shown);
+}
+
+/**
+ * What is kept of the arms a square shows: only those that differ from the start, undefined when none does. Arms
+ * with none shown are no square's: they keep nothing, so the square shows its two arms again.
+ */
+export function keptCornerRulerArms(arms: Partial<Record<CornerRulerAxis, boolean>> | undefined): Partial<Record<CornerRulerAxis, boolean>> | undefined {
+  const shown = cornerRulerArmsShown(arms);
+  if (!CORNER_RULER_AXES.some((entry) => shown[entry])) return undefined;
+  const result: Partial<Record<CornerRulerAxis, boolean>> = {};
+  CORNER_RULER_AXES.forEach((entry) => { if (shown[entry] !== CORNER_RULER_ARMS_DEFAULT[entry]) result[entry] = shown[entry]; });
+  return Object.keys(result).length ? result : undefined;
+}
+
+/**
+ * How long the third arm becomes when its end is dragged (Discussion #1649): the arm stands out of the square's
+ * plane, so the pointer's ray is taken, and the point of the arm's line closest to that ray. Whole millimetres,
+ * between CORNER_RULER_MIN_ARM and CORNER_RULER_MAX_ARM. Null when the ray runs almost along the arm, as when looking
+ * straight down onto a square on the plate: then the place along it cannot be told.
+ */
+export function cornerRulerElevationArmLength(
+  ruler: { corner: CornerRulerVector; frame: CornerRulerFrame },
+  ray: { origin: CornerRulerVector; direction: CornerRulerVector },
+): number | null {
+  const arm = toVector(ruler.frame.normal).normalize();
+  const along = toVector(ray.direction).normalize();
+  const offset = toVector(ruler.corner).sub(toVector(ray.origin));
+  const b = arm.dot(along);
+  const denominator = 1 - b * b;
+  // Less than about 3 degrees between the ray and the arm.
+  if (denominator < 0.0025) return null;
+  const t = (b * along.dot(offset) - arm.dot(offset)) / denominator;
+  return Math.min(CORNER_RULER_MAX_ARM, Math.max(CORNER_RULER_MIN_ARM, Math.round(t)));
 }
 
 /**

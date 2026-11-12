@@ -1,3 +1,5 @@
+import { EDITOR_PROFILE_ELEMENT_ID, EDITOR_PROFILE_MAX_LENGTH, getEditorProfile } from "@/lib/editorProfile";
+
 /**
  * The simple mode (#695): layerling cut down for children and beginners. The ribbon keeps the tools a workshop uses, the
  * shape library a short list, the start page shows the designs and nothing that leads out of layerling, and the buttons are
@@ -55,7 +57,29 @@ export function resolveSimpleMode(choice: SimpleModeChoice | null, server: "on" 
  * Runs in <head> before the page paints, so the full start page does not flash up first. It also takes a `?mode=` link into
  * the stored choice (and drops the parameter from the address); the server's suggestion comes later, from the page.
  */
-export const SIMPLE_MODE_BOOT_SCRIPT = `try{var k=${JSON.stringify(SIMPLE_MODE_STORAGE_KEY)};var u=new URL(location.href);var m=(u.searchParams.get(${JSON.stringify(SIMPLE_MODE_PARAMETER)})||"").toLowerCase();if(m==="simple"||m==="full"){localStorage.setItem(k,m==="simple"?"on":"off");u.searchParams.delete(${JSON.stringify(SIMPLE_MODE_PARAMETER)});history.replaceState(null,"",u.pathname+u.search+u.hash)}if(localStorage.getItem(k)==="on")document.documentElement.dataset.simpleMode="on"}catch(e){}`;
+export const SIMPLE_MODE_BOOT_SCRIPT = `try {
+  const element = document.getElementById(${JSON.stringify(EDITOR_PROFILE_ELEMENT_ID)});
+  let base;
+  if (element?.type === "application/json" && element.textContent.length <= ${EDITOR_PROFILE_MAX_LENGTH}) {
+    try {
+      const profile = JSON.parse(element.textContent);
+      if (profile?.version === 1) {
+        if (profile.base === "simple" || profile.base === "full") base = profile.base;
+        if (profile.enlargeInSimpleMode === false) document.documentElement.dataset.simpleModeEnlarge = "off";
+      }
+    } catch {}
+  }
+  const key = ${JSON.stringify(SIMPLE_MODE_STORAGE_KEY)};
+  const parameter = ${JSON.stringify(SIMPLE_MODE_PARAMETER)};
+  const url = new URL(location.href);
+  const mode = (url.searchParams.get(parameter) || "").toLowerCase();
+  if (mode === "simple" || mode === "full") {
+    if (!base) localStorage.setItem(key, mode === "simple" ? "on" : "off");
+    url.searchParams.delete(parameter);
+    history.replaceState(null, "", url.pathname + url.search + url.hash);
+  }
+  if (base ? base === "simple" : localStorage.getItem(key) === "on") document.documentElement.dataset.simpleMode = "on";
+} catch {}`;
 
 /** The choice of a browser that keeps nothing: it holds until the page is closed. */
 let storedFallback: SimpleModeChoice | null = null;
@@ -76,18 +100,22 @@ let simple = typeof window !== "undefined" ? resolveSimpleMode(readStoredChoice(
 
 export function applySimpleMode(on: boolean) {
   if (typeof document === "undefined") return;
-  if (on) document.documentElement.dataset.simpleMode = "on";
-  else delete document.documentElement.dataset.simpleMode;
+  const { dataset } = document.documentElement;
+  if (on) dataset.simpleMode = "on";
+  else delete dataset.simpleMode;
+  if (getEditorProfile()?.enlargeInSimpleMode === false) dataset.simpleModeEnlarge = "off";
+  else delete dataset.simpleModeEnlarge;
 }
 
 function publish() {
   simple = resolveSimpleMode(readStoredChoice(), serverSetting);
-  applySimpleMode(simple);
+  applySimpleMode(getSimpleMode());
   listeners.forEach((listener) => listener());
 }
 
 /** Switches the simple mode on or off for this browser; a server that fixes it ignores the switch. */
 export function setSimpleMode(on: boolean) {
+  if (getEditorProfile()?.base) return;
   try {
     window.localStorage.setItem(SIMPLE_MODE_STORAGE_KEY, on ? "on" : "off");
   } catch {
@@ -103,12 +131,13 @@ export function setServerSimpleMode(setting: ServerSetting) {
   publish();
 }
 
-export function isSimpleModeFixedByServer() {
-  return serverSetting === "always";
+export function isSimpleModeFixed() {
+  return Boolean(getEditorProfile()?.base) || serverSetting === "always";
 }
 
 export function getSimpleMode() {
-  return simple;
+  const base = getEditorProfile()?.base;
+  return base ? base === "simple" : simple;
 }
 
 export function subscribeToSimpleMode(listener: () => void) {

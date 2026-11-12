@@ -100,6 +100,7 @@ Quando un progetto contiene più di quanto un piatto possa stampare, per esempio
 
 - Ogni piatto è grande quanto il piano di lavoro, e i piatti stanno uno accanto all'altro a destra del primo, a 20 mm di distanza. Un corpo appartiene al piatto su cui si trova il centro della sua base, quindi trascinandolo dall'altra parte passa sull'altro piatto. Un progetto ha fino a 12 piatti.
 - Un clic su un piatto nella barra lo mostra, e le nuove forme e i file importati finiscono poi su di esso. {{ui:plates.showAll}} li mostra tutti. Un doppio clic su un piatto, o {{ui:plates.rename}}, gli dà un nome come «Coperchio», scritto sul piatto.
+- Anche un nuovo schizzo sul piatto inizia sul piatto attivo: l'area dello schizzo mostra quel piatto con i suoi corpi, e il corpo finito si trova lì.
 - {{ui:plates.moveLeft}} e {{ui:plates.moveRight}} cambiano l'ordine, e i corpi seguono il loro piatto. {{ui:plates.remove}} toglie il piatto attivo; i suoi corpi passano sul primo piatto nello stesso punto.
 - {{ui:plates.arrange}} dispone i corpi selezionati, o tutti, fila per fila sui piatti, i più grandi per primi, a 5 mm di distanza, e aggiunge piatti finché servono. Un corpo più grande di un piatto resta dov'è.
 - Con una stampante scelta, ogni corpo viene controllato rispetto al proprio piatto, e l'altezza di stampa conta dal corpo più basso di quel piatto. Un piatto con un corpo che non ci sta mostra il suo numero in rosso.

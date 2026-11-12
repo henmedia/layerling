@@ -22,7 +22,7 @@ Avec de nombreuses pièces, il est facile de perdre le fil de la vue. La liste d
 ![La liste d'objets : le groupe "Groupe" avec deux parties et une sphère à côté. Une icône de dossier ouvre le groupe.](shot:object-list)
 
 - Un clic sur une entrée sélectionne la forme, y compris les pièces à l'intérieur d'un groupe. Avec [[Shift]] maintenu, vous ajoutez ou supprimez d'autres entrées, comme dans la vue. Les flèches plient les groupes pour s'ouvrir et se fermer.
-- L'étiquette indique si une pièce est {{ui:outliner.solid}} ou {{ui:outliner.hole}}.
+- La lettre après le nom indique si une pièce est {{ui:outliner.solid}} ou {{ui:outliner.hole}} : c'est la première lettre du mot, et le mot entier s'affiche au survol de la souris.
 - Sous le nom figure le type de forme. Un corps qui n'est plus une forme simple (arrondi, évidé ou importé) affiche {{ui:shape.exactBody}} quand l'export STEP l'écrit exactement, et {{ui:shape.mesh}} quand il n'est fait que de triangles et part en STL. Un rétrécissement, une inclinaison ou une torsion ajoutés après avoir arrondi ou évidé un corps ne déforment que son maillage : il affiche alors {{ui:shape.mesh}}.
 - Cadenas et œillet de verrouillage et cache pièces détachées.
 - {{ui:outliner.rename}} donne à une pièce un nom qui lui est propre ; le crayon à côté du nom en haut des paramètres fait de même pour la forme sélectionnée. Les noms sensés aident énormément dans les conceptions plus grandes.
@@ -32,7 +32,7 @@ Avec de nombreuses pièces, il est facile de perdre le fil de la vue. La liste d
 - Le champ de recherche trouve les formes par nom et par genre, donc aussi "cylindre" ou "trou". Il examine également l'intérieur des groupes, aussi profondément imbriqués soient-ils : un groupe détenant une allumette reste dans la liste et s'ouvre pour montrer les parties correspondantes et les groupes qui y mènent. Un groupe trouvé par son propre nom affiche toutes ses parties lorsque vous l'ouvrez.
 - La flèche à l'extrême gauche de la barre de titre replie la liste jusqu'à sa barre de titre et inversement.
 
-La liste est ancrée juste à droite du cube de vue. Faites-le glisser par sa barre de titre pour le placer n'importe où sur le plan de travail ; il passe sous le cube de vue et la barre de vue. Déposez-le à côté du cube de vue ou double-cliquez sur la barre de titre et il s'ancre à nouveau. L'endroit où il se trouvait et s'il a été plié sont mémorisés dans ce navigateur.
+La liste est ancrée juste à droite du cube de vue. Faites-le glisser par sa barre de titre pour le placer n'importe où sur le plan de travail ; il passe sous le cube de vue et la barre de vue. Déposez-le à côté du cube de vue ou double-cliquez sur la barre de titre et il s'ancre à nouveau. L'endroit où il se trouvait et s'il a été plié sont mémorisés dans ce navigateur. Pour élargir ou rétrécir la liste, faites glisser son coin inférieur droit, de 240 à 600 pixels ; le navigateur retient aussi la largeur.
 
 ## Saisir une position
 
@@ -45,6 +45,8 @@ Vous pouvez faire glisser une forme au-delà du bord de la plaque et la laisser 
 ## Capturer en bougeant
 
 Lorsque vous faites glisser une forme sur le plan de travail, elle s'aligne sur d'autres formes : son bord gauche, droit, avant ou arrière ou son centre atterrit exactement sur un bord ou le centre d'une autre forme. Une ligne de guidage rose montre à quoi il s'accroche. De cette façon, deux pièces sont alignées côte à côte ou centrées l’une derrière l’autre sans taper de chiffres. Cela fonctionne également avec le réseau éteint. Le centre du plan de travail compte aussi : les lignes roses montrent quand la forme est au milieu du plateau selon X, selon Y ou les deux.
+
+Le redimensionnement s'aligne aussi : lorsque vous faites glisser une poignée latérale, ce côté s'arrête sur les bords et les centres d'autres formes et contre la paroi qu'il rencontre, y compris la paroi intérieure d'une boîte, d'un corps évidé ou d'un boîtier importé, et la ligne rose montre où. Cette mesure est gardée exactement, hors de la grille. Ainsi une pièce remplit un boîtier de paroi à paroi : placez-la contre une paroi et faites glisser son autre côté jusqu'à la paroi opposée. Avec [[Alt]], la forme grandit depuis son milieu et le côté tiré s'aligne de la même façon ; avec [[Shift]], elle garde ses proportions et ne s'aligne pas. Cela fonctionne sur le plan de travail à plat, pour les formes debout dont les côtés suivent X et Y, et {{ui:workspace.objectSnap}} le désactive en même temps que l'alignement lors du déplacement.
 
 Maintenez [[Shift]] tout en faisant glisser pour conserver le déplacement sur un axe : la forme suit la direction, X ou Y, dans laquelle vous avez tiré plus loin et laisse l'autre seule. Il est préférable d'appuyer sur [[Shift]] une fois que vous faites déjà glisser ; sur une forme qui n'est pas encore sélectionnée, un clic avec [[Shift]] ne fait que l'ajouter à la sélection.
 

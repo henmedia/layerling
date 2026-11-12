@@ -808,13 +808,15 @@ export function shapeToManifoldSolid(runtime: ManifoldToplevel, shape: Workplane
   }
 
   const solid = manifoldFromMeshData(runtime, meshForShape(shape));
+  // Listed before it is checked: a solid that did not close is the caller's to report and `created`'s to free.
+  created.push(solid);
   if (solid.status() !== "NoError") return solid;
   // A group of solids is the loose pile of its parts' surfaces, and parts that
   // overlap or lie on top of one another (a frame whose posts stand in its
   // rails) are several shells in one mesh. A cut through such a pile comes out
   // wrong, so the shells are joined into one body first.
   const normalized = unionSplitManifoldComponents(runtime, solid);
-  created.push(solid, ...normalized.created);
+  created.push(...normalized.created);
   return normalized.solid ?? solid;
 }
 
@@ -823,7 +825,8 @@ function shapesToManifoldUnion(runtime: ManifoldToplevel, shapes: WorkplaneShape
   for (const shape of shapes) {
     const part = shapeToManifoldSolid(runtime, shape, created, useBoxPrimitive);
     if (!part || part.status() !== "NoError" || part.numTri() < 1) {
-      disposeManifold(part);
+      // One listed in `created` is freed there; freeing it here as well would free it twice, which manifold refuses.
+      if (part && !created.includes(part)) disposeManifold(part);
       return null;
     }
     parts.push(part);
@@ -929,7 +932,9 @@ export async function splitShapeByPlane(shape: WorkplaneShape, plane: SplitPlane
       if (!positiveShape || !negativeShape || (pinsMesh && !pinsShape)) {
         return { parts: null, error: t("split.error.store") };
       }
-      const parts: WorkplaneShape[] = [canonicalizeShape(positiveShape), canonicalizeShape(negativeShape), ...(pinsShape ? [canonicalizeShape(pinsShape)] : [])];
+      // Dowels on a breakaway base say so, for the print check (#1633).
+      const dowels = pinsShape && connectors?.kind === "dowels" && connectors.dowelBase ? { ...pinsShape, breakawayBase: true } : pinsShape;
+      const parts: WorkplaneShape[] = [canonicalizeShape(positiveShape), canonicalizeShape(negativeShape), ...(dowels ? [canonicalizeShape(dowels)] : [])];
       return { parts, closedHoles, ...(tally ? { connectors: tally } : {}) };
     } finally {
       disposeManifold(positiveMesh);

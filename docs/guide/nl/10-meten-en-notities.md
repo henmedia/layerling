@@ -35,6 +35,7 @@ De winkelhaak ligt op het werkvlak. Ligt dat op de zijkant van een lichaam, dan 
 - **Een korte klik op de greep** draait hem 90°.
 - **Het ×** ernaast verwijdert hem.
 - **Sleep aan het cirkeltje aan het einde van een arm** om die arm langer of korter te maken, in hele millimeters. De onderste knop onder de greep, {{ui:ruler.armsToPlate}}, maakt beide armen zo lang als het printbed van de printer in de instellingen breed en diep is. De winkelhaak bewaart de lengte van zijn armen bij het ontwerp, en een opnieuw geplaatste neemt die over.
+- **{{ui:ruler.arms}}** (de knop met drie assen, er net boven) opent voor elke arm een schakelaar, genoemd naar de as waarlangs hij loopt. Naast de twee armen in het vlak is er een derde die bij de hoek rechtop staat, haaks op het werkvlak: op het printbed wijst hij langs Z omhoog, met eigen streepjes, voor een cilinder of alles wat je in de hoogte bouwt. In het begin staat hij uit: klik op zijn letter om hem te tonen, en sleep aan het cirkeltje aan zijn einde om hem langer of korter te maken. De armen in het vlak zet je op dezelfde manier uit als ze in de weg zitten; één arm blijft altijd. De groene getallen van een geselecteerd lichaam blijven, welke armen ook te zien zijn, en het ontwerp onthoudt welke dat zijn.
 - **Het knopje links van de greep** wisselt waarvandaan gemeten wordt: de buitenkant van een lichaam (eindpunt, een icoon met lijnen) of het midden ervan (middelpunt, een vizierkruis). Naast elk groen getal zit zo'n klein schakelaartje dat alleen dat getal omzet: bij een staande cilinder het midden in de twee armen en de onderkant in de hoogte, bij een liggende het midden dwars en een uiteinde in de lengte. Komen alle drie weer overeen, dan toont het knopje bij de greep de gemeenschappelijke stand.
 
 Staan er lichamen bij een van de armen, dan toont de winkelhaak automatisch hun afmetingen. Dat werkt alleen op de bodemplaat, niet op de zijkant van een lichaam. De knop met de pijl onder de greep van de winkelhaak schakelt dat uit, zodat alleen de geselecteerde lichamen hun afmetingen tonen; hij wordt met het ontwerp opgeslagen.
@@ -49,7 +50,7 @@ Zowel het meetlint als de winkelhaak blijven staan terwijl je schetst en terugke
 
 Met {{ui:camera.protractor}} in de weergavebalk meet je hoeken. Ernaast gaat een rij knoppen open, en tot je de knop opnieuw aanklikt of op [[Esc]] drukt, meet een klik in de weergave met de gradenboog. Net als het meetlint klikt hij vast op hoeken en randen van lichamen; naast de lichamen zet hij een punt op de plaat.
 
-- {{ui:camera.protractorPoints}}: klik eerst op het hoekpunt van de hoek, dan op een punt op elk been. Terwijl je het laatste punt plaatst, staat de hoek er al; na de derde klik blijft hij staan, met een boog tussen de benen. Het is de hoek in het hoekpunt, van 0° tot 180°.
+- {{ui:camera.protractorPoints}}: klik eerst op het hoekpunt van de hoek, dan op een punt op elk been. Terwijl je het laatste punt plaatst, staat de hoek er al; na de derde klik blijft hij staan, met een boog tussen de benen. Het is de hoek in het hoekpunt, van 0° tot 180°. Recht van boven, van voren of van opzij gezien meet hij de hoek zoals die daar te zien is: een bovenhoek en de onderhoek er recht onder zijn hetzelfde punt. In een schuine weergave is het de hoek in de ruimte.
 - {{ui:camera.protractorFaces}}: klik op twee platte vlakken. Een kort blauw streepje op elk vlak toont welke kant het op kijkt, en het label geeft beide hoeken die de vlakken maken, de kleinste eerst: een afschuining van 45° tegen de bovenkant geeft 45° · 135°, twee zijden van een blok alleen 90°. Een gebogen vlak heeft geen enkele richting, dus vraagt de gradenboog om een plat vlak.
 
 De volgende klik na een afgemaakte hoek begint een nieuwe, en {{ui:camera.protractorClear}} verwijdert hem. De hoek volgt de lichamen als ze verschuiven of draaien. Niets ervan wordt opgeslagen of komt in de geschiedenis: hij is weg zodra je de gradenboog wegzet.
@@ -58,7 +59,7 @@ De volgende klik na een afgemaakte hoek begint een nieuwe, en {{ui:camera.protra
 
 In de instellingen onder {{ui:workspace.appearance}} staan twee schakelaars voor live maten:
 
-- {{ui:workspace.showMoveDimensions}} toont hoeveel je verplaatst tijdens het slepen. Dat geldt ook bij het optillen met de zwarte pijl boven een lichaam; de afstand staat dan bij de voorste hoek. Na het loslaten klik je op zo'n getal en typ je de precieze afstand; een min gaat omlaag.
+- {{ui:workspace.showMoveDimensions}} toont hoeveel je verplaatst tijdens het slepen. Dat geldt ook bij het optillen met de blauwe pijl boven een lichaam; de afstand staat dan bij de voorste hoek. Na het loslaten klik je op zo'n getal en typ je de precieze afstand; een min gaat omlaag.
 - {{ui:workspace.showOriginDimensions}} toont de afstanden van de selectie tot de oorsprong van de plaat, ook bij meerdere geselecteerde lichamen.
 
 Met {{ui:workspace.dimensionsAlwaysVisible}} blijven de maten altijd zichtbaar. Staat een lichaam niet op het werkvlak, dan staat ook zijn hoogte erboven erbij; klik op het getal om een nieuwe waarde te typen.

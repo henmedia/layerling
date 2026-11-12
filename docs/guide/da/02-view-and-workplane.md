@@ -104,6 +104,7 @@ Når et design rummer mere, end én plade kan printe, for eksempel en æske med 
 
 - Hver plade er lige så stor som arbejdsfladen, og pladerne ligger side om side til højre for den første, 20 mm fra hinanden. Et legeme hører til den plade, midten af dets grundflade står på, så trækker man det over, står det på den anden plade. Et design har op til 12 plader.
 - Et klik på en plade i linjen viser den, og nye former og importerede filer lander så på den. {{ui:plates.showAll}} viser dem alle. Et dobbeltklik på en plade eller {{ui:plates.rename}} giver den et navn som "Låg", der står skrevet på pladen.
+- En ny skitse på pladen begynder også på den aktive plade: skitsefladen viser den plade med legemerne på den, og det færdige legeme står der.
 - {{ui:plates.moveLeft}} og {{ui:plates.moveRight}} ændrer rækkefølgen, og legemerne følger med deres plade. {{ui:plates.remove}} fjerner den aktive plade; dens legemer kommer på den første plade samme sted.
 - {{ui:plates.arrange}} lægger de markerede legemer, eller alle, ud række for række på pladerne, de største først, 5 mm fra hinanden, og tilføjer plader, så længe der er brug for dem. Et legeme, der er større end en plade, bliver stående.
 - Med en valgt printer kontrolleres hvert legeme mod sin egen plade, og byggehøjden regnes fra det laveste legeme på den plade. En plade med et legeme, der ikke passer, viser sit tal med rødt.

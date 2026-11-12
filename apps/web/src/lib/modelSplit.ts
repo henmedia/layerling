@@ -14,6 +14,22 @@ export type ModelSplitPlane = {
   min: number;
   max: number;
   size: number;
+  /** The translucent rectangle the viewport draws: it fits the part on the plane, see `splitPlanePreview`. */
+  preview: SplitPlanePreview;
+};
+
+/**
+ * Where the preview of the plane is drawn (Issue #1606): a rectangle on the plane with the in-plane axes `u` and `v`
+ * (u × v = normal), centred on what the part covers there and as wide and tall as that, with a margin. It used to be a
+ * square as large as the part's whole diagonal around its middle, so for a flat part cut in X or Y it stood far above
+ * and below the part, and seen from above that tall half looked shifted away from the white cut line.
+ */
+export type SplitPlanePreview = {
+  center: [number, number, number];
+  u: [number, number, number];
+  v: [number, number, number];
+  width: number;
+  height: number;
 };
 
 type Point3 = readonly [number, number, number];
@@ -155,6 +171,61 @@ export function modelSplitPlane(points: readonly Point3[], axis: AlignAxis, requ
     min,
     max,
     size: Math.max(10, Math.hypot(maxs[0] - mins[0], maxs[1] - mins[1], maxs[2] - mins[2]) * 1.1),
+    preview: splitPlanePreview(points, normal, origin),
+  };
+}
+
+const PREVIEW_MARGIN_RATIO = 1.1;
+const PREVIEW_MARGIN_MM = 4;
+const PREVIEW_MIN_MM = 10;
+// The short side of a flat part's rectangle keeps at least this share of the long side, so the plane still reads as a
+// plane and not as a line.
+const PREVIEW_MIN_SHARE = 0.1;
+
+/**
+ * The rectangle a split plane is drawn as: the part's points projected onto the plane, their extent along two
+ * in-plane axes, plus a margin. One in-plane axis follows the scene's up (y) wherever the plane allows, so a
+ * standing plane is drawn upright.
+ */
+export function splitPlanePreview(points: readonly Point3[], normal: Point3, origin: Point3): SplitPlanePreview {
+  const reference: Point3 = Math.abs(normal[1]) < 0.9 ? [0, 1, 0] : [1, 0, 0];
+  const along = pointProjection(reference, normal);
+  const vRaw: Point3 = [reference[0] - normal[0] * along, reference[1] - normal[1] * along, reference[2] - normal[2] * along];
+  const vLength = Math.hypot(vRaw[0], vRaw[1], vRaw[2]);
+  const v: [number, number, number] = [vRaw[0] / vLength, vRaw[1] / vLength, vRaw[2] / vLength];
+  const u: [number, number, number] = [
+    v[1] * normal[2] - v[2] * normal[1],
+    v[2] * normal[0] - v[0] * normal[2],
+    v[0] * normal[1] - v[1] * normal[0],
+  ];
+  let minU = Number.POSITIVE_INFINITY;
+  let maxU = Number.NEGATIVE_INFINITY;
+  let minV = Number.POSITIVE_INFINITY;
+  let maxV = Number.NEGATIVE_INFINITY;
+  points.forEach((point) => {
+    if (!point.every(Number.isFinite)) return;
+    const relative: Point3 = [point[0] - origin[0], point[1] - origin[1], point[2] - origin[2]];
+    const a = pointProjection(relative, u);
+    const b = pointProjection(relative, v);
+    minU = Math.min(minU, a);
+    maxU = Math.max(maxU, a);
+    minV = Math.min(minV, b);
+    maxV = Math.max(maxV, b);
+  });
+  if (![minU, maxU, minV, maxV].every(Number.isFinite)) {
+    minU = 0; maxU = 0; minV = 0; maxV = 0;
+  }
+  const midU = (minU + maxU) / 2;
+  const midV = (minV + maxV) / 2;
+  const longest = Math.max(maxU - minU, maxV - minV);
+  const side = (span: number) => Math.max(PREVIEW_MIN_MM, longest * PREVIEW_MIN_SHARE, span * PREVIEW_MARGIN_RATIO + PREVIEW_MARGIN_MM);
+  const clean = (value: number) => Math.abs(value) < 1e-9 ? 0 : value;
+  return {
+    center: [0, 1, 2].map((index) => clean(origin[index] + u[index] * midU + v[index] * midV)) as [number, number, number],
+    u: u.map(clean) as [number, number, number],
+    v: v.map(clean) as [number, number, number],
+    width: side(maxU - minU),
+    height: side(maxV - minV),
   };
 }
 
@@ -175,6 +246,19 @@ export function snapSplitPositionToVertices(points: readonly Point3[], normal: P
     }
   }
   return snapped;
+}
+
+/**
+ * Where "Align to workplane" puts the plane (#644): through the workplane's origin where that crosses the parts, so a
+ * workplane laid on a face cuts right there; otherwise through their middle. Across the base plate its origin is only
+ * the middle of the plate and says nothing about the parts, so the caller passes `throughOrigin` false there and the
+ * plane goes through their middle (Discussion #1590); the plate's surface is a real level, so Parallel keeps it.
+ */
+export function splitPositionAlongWorkplane(points: readonly Point3[], centered: ModelSplitPlane, workplaneOrigin: Point3, throughOrigin: boolean) {
+  if (!throughOrigin) return centered.position;
+  const through = pointProjection(workplaneOrigin, centered.normal);
+  const crosses = through > centered.min + 1e-6 && through < centered.max - 1e-6;
+  return crosses ? snapSplitPositionToVertices(points, centered.normal, through) : centered.position;
 }
 
 export function splitPlaneIntersectsPoints(points: readonly Point3[], normal: Point3, position: number, tolerance = 1e-5) {

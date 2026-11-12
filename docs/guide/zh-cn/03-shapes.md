@@ -110,13 +110,13 @@ layerling 里的每个零件都从一个形状开始。用这些形状，你可�
 除了设置之外，形状本身也有手柄：
 
 - **角和边**用于放大或缩小形状。把其中一个拖过对侧，形状会在该边的另一侧继续增大。顶部的箭头在底面下方做同样的事。拖动角时按住 [[Shift]] 可同时缩放宽度、深度和高度并保持比例；按住 [[Alt]] 则从中心缩放，而不是从对角缩放。没有键盘，或者不想按键时，可开启属性顶部的 {{ui:inspector.keepProportions}}：此后角始终保持比例，输入宽度、深度或高度之一，另外两个会按相同比例缩放。该设置会被记住。
-- 形状**上方的黑色箭头**抬高或降低形状；从一开始按住 [[Alt]]，会在松开处生成一个副本，方便叠放。**顶面上的白色手柄**改变高度。
-- 顶部的**红色和绿色箭头**只沿 X 或只沿 Y 移动形状。形状会沿这条线跟随鼠标，即使从很低的角度看平台也是如此，而自由拖动在那里会跑得很远。它像拖动时一样吸附到其他形状，之后可以点击移动的距离并输入精确值。
+- 形状**上方的蓝色箭头**抬高或降低形状；从一开始按住 [[Alt]]，会在松开处生成一个副本，方便叠放。**顶面上的白色手柄**改变高度。
+- 顶部的**红色和绿色箭头**只沿 X 或只沿 Y 移动形状。形状会沿这条线跟随鼠标，即使从很低的角度看平台也是如此，而自由拖动在那里会跑得很远。它像拖动时一样吸附到其他形状，之后可以点击移动的距离并输入精确值。如果碍事，可在设置中关闭 {{ui:workspace.showSlideArrows}}。
 - **弧形箭头**旋转它。
 - **形状旁的数值**显示尺寸。单击其中一个会打开字段，可输入想要的数字。按 [[Enter]] 时，形状从该数字对面的边开始增大，与拖动时相同；按 [[Alt]]+[[Enter]] 时，它围绕自己的中心增大，因此与另一个形状对齐过的形状仍保持对齐。这适用于宽度和长度；高度始终从底面向上增大。右侧属性中的字段不用按键就保持中心。[[Tab]] 保留数字并打开下一个（宽度、深度、高度）；[[Shift]]+[[Tab]] 返回上一个。在已单击过的属性字段中，鼠标滚轮也会改变数值：一格一个单位，按住 [[Shift]] 为十倍，[[Ctrl]] 为十分之一，[[Alt]] 为百分之一。未单击过的字段把滚轮留给面板，由面板滚动。
 - **单击一个角**（不拖动）会同时打开宽度和深度。输入第一个，按 [[Tab]] 切到第二个，按 [[Enter]] 应用两者。[[Esc]] 取消。
 
-形状一旦按直角转过，例如用 {{ui:editor.tool.layFlat}} 侧放，属性中的字段就会按每项尺寸当前的方向命名：{{ui:prop.height}} 是向上的尺寸，{{ui:prop.width}} 沿 X 方向，{{ui:prop.length}} 沿 Y 方向。因此输入躺倒形状的高度会改变垂标尺寸，它的底面仍留在平台上。以其他角度倾斜的形状会在字段中显示自己的尺寸，下方会有说明。
+形状一旦按直角转过，例如用 {{ui:editor.tool.layFlat}} 侧放，属性中的字段就会按每项尺寸当前的方向命名：{{ui:prop.height}} 是向上的尺寸，{{ui:prop.width}} 沿 X 方向，{{ui:prop.length}} 沿 Y 方向。有专用名称的字段（例如沉头孔的头部直径）保留其名称。因此输入躺倒形状的高度会改变垂标尺寸，它的底面仍留在平台上。以其他角度倾斜的形状会在字段中显示自己的尺寸，下方会有说明。
 
 不用鼠标时，可以用键盘：方向键按一个吸附步距移动选中项（网格关闭时为 0.01 mm），按住 [[Shift]] 为五步，或者在设置的 {{ui:workspace.appearance}} 下把 {{ui:workspace.gridMajorEvery}} 设为 {{ui:workspace.gridMajorSteps|10}} 时，为十步：直到下一条更深的线，与 Tinkercad 中一样。它们跟随视图：[[→]] 移向屏幕右侧，[[↑]] 远离你，即使转动过平台也是如此。把形状推出画面时，视图会跟着移动。[[Ctrl]]+[[↑]] 和 [[Ctrl]]+[[↓]] 升高和降低它。连续按方向键在历史记录中算作一步：只要下一次按键在 1.5 秒内跟上，撤销就会收回整串操作，而不是一次一次地收回。[[R]] 旋转 45°，[[Shift]]+[[R]] 旋转 22.5°。[[D]] 把选中项放到工作平面上。
 
@@ -126,7 +126,7 @@ layerling 里的每个零件都从一个形状开始。用这些形状，你可�
 
 ## 复制与重复
 
-{{ui:editor.tool.copy}}、{{ui:editor.tool.paste}} 和 {{ui:editor.tool.duplicate}} 位于功能区（{{ui:editor.group.clipboard}}）。[[Ctrl]]+[[D]] 复制选中项。layerling 会记住你上次如何移动或旋转副本，并在下次复制时再次应用。这样几下按键就能做出一排孔或一排台阶。规则排列还可以使用阵列，见[选择与排列](chapter:select-and-arrange)。 如果你还调整了副本的大小，之后的每个副本都会再按同样的比例缩放，和 Tinkercad 一样。
+{{ui:editor.tool.copy}}、{{ui:editor.tool.paste}} 和 {{ui:editor.tool.duplicate}} 位于功能区（{{ui:editor.group.clipboard}}）。[[Ctrl]]+[[D]] 复制选中项。layerling 会记住你上次如何移动或旋转副本，并在下次复制时再次应用。这样几下按键就能做出一排孔或一排台阶。同时选中多个零件也可以：复制整层，把副本抬高，之后每按一次 [[Ctrl]]+[[D]] 都会以相同间距叠上下一层。规则排列还可以使用阵列，见[选择与排列](chapter:select-and-arrange)。 如果你还调整了副本的大小，之后的每个副本都会再按同样的比例缩放，和 Tinkercad 一样。
 
 > **提示：** 如果某个形状不肯接受你想要的尺寸，通常是新形状的限制所致。在设置的 {{ui:workspace.shapeDefaults}} 下，你可以决定每种形状如何开始，以及最大能有多大。
 
@@ -174,7 +174,7 @@ layerling 里的每个零件都从一个形状开始。用这些形状，你可�
 
 ## 表面纹理
 
-在实体上加凹槽、滚花、蜂窝或凸点，让它更好握或更好看：在形状设置中打开 {{ui:inspector.surfaceTexture}}。顶部 {{ui:editor.section.surface}} 组里的 {{ui:inspector.surfaceTexture}} 按钮作用相同：它为选中的实体打开或关闭这张卡片，卡片打开时按钮保持高亮。
+在实体上加凹槽、滚花、蜂窝或凸点，让它更好握或更好看：在形状设置中打开 {{ui:inspector.surfaceTexture}}。顶部 {{ui:editor.section.surface}} 组里的 {{ui:inspector.surfaceTexture}} 按钮作用相同：它为选中的实体打开或关闭这张卡片，卡片打开时按钮保持高亮。 与其他卡片不同，layerling 不会记住它：选择其他实体或不选任何实体时，它会重新关闭。
 
 1. 选择 {{ui:inspector.surfacePattern}}、它的 {{ui:inspector.surfaceSpacing}} 和 {{ui:inspector.surfaceDepth}}。{{ui:inspector.surfaceDirection}} 决定纹理是压进实体还是凸出实体。对于 {{ui:surfaceTexture.bumps}}，{{ui:inspector.surfaceBumpShape}} 可在 {{ui:surfaceTexture.bumpDome}}、{{ui:surfaceTexture.bumpCone}}、{{ui:surfaceTexture.bumpSoft}} 和 {{ui:surfaceTexture.bumpFlat}} 之间选择。在 {{ui:inspector.surfaceBumpGrid}} 下，它们可以 {{ui:surfaceTexture.bumpGridStaggered}}（每隔一行错开半个间距），或排成 {{ui:surfaceTexture.bumpGridStraight}}。
 2. 在 {{ui:inspector.surfaceProjection}} 下，杯子、旋钮或把手等圆形实体选 {{ui:surfaceTexture.cylinder}}。图案绕 {{ui:inspector.surfaceAxis}} 一圈，间距会略作取整，使一圈正好是整数个凹槽或单元：图案闭合，没有接缝。{{ui:surfaceTexture.allRound}} 适合不是圆形的实体，{{ui:surfaceTexture.flatProjection}} 适合从上方看的盖子或平板。保持 {{ui:surfaceTexture.auto}}，Layerling 会替你选择：圆形实体以及像盒子这样直立的棱角实体用 {{ui:surfaceTexture.cylinder}}（图案随外轮廓走，无接缝地绕过棱边，凸起的图案会顺着棱边弯过去），其他棱角实体用 {{ui:surfaceTexture.allRound}}。

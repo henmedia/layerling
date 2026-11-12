@@ -22,7 +22,7 @@ U složitého modelu pomůže seznam všech tvarů: {{ui:editor.tool.showOutline
 ![Seznam objektů: sloučený celek se dvěma částmi a vedle něj koule. Ikona složky otevře úpravu celku.](shot:object-list)
 
 - Kliknutí vybere tvar, i uvnitř sloučení. [[Shift]] přidává a odebírá položky jako v pohledu. Šipky rozbalují a sbalují vnořené části.
-- Popisek rozlišuje {{ui:outliner.solid}} a {{ui:outliner.hole}}.
+- Písmeno za názvem ukazuje, zda je díl {{ui:outliner.solid}}, nebo {{ui:outliner.hole}}: je to první písmeno slova a po najetí myší se zobrazí celé slovo.
 - Pod názvem stojí, o jaký tvar jde. Těleso, které už není jednoduchým tvarem (zaoblené, vydutěné nebo importované), ukazuje {{ui:shape.exactBody}}, když ho export STEP zapíše přesně, a {{ui:shape.mesh}}, když je jen z trojúhelníků a jde ven jako STL. Zúžení, náklon nebo zkroucení přidané až po zaoblení nebo vydutění ohne jen jeho síť, takže pak ukazuje {{ui:shape.mesh}}.
 - Zámek a oko ovládají zamknutí a skrytí jednotlivých částí.
 - {{ui:outliner.rename}} přiřadí vlastní název. Stejně funguje tužka nahoře v nastavení vybraného tvaru. Smysluplné názvy usnadňují práci ve velkém projektu.
@@ -32,7 +32,7 @@ U složitého modelu pomůže seznam všech tvarů: {{ui:editor.tool.showOutline
 - Vyhledávání používá názvy i typy, například válec nebo výřez, a prochází libovolně vnořená sloučení. Nadřazené celky zůstanou v seznamu a rozbalí cestu k nalezeným částem. Celek nalezený vlastním názvem po rozbalení ukazuje všechny části.
 - Šipka vlevo v záhlaví sbalí seznam na záhlaví a znovu jej rozbalí.
 
-Seznam je ukotvený vpravo od orientační krychle. Přetáhněte jej za záhlaví kamkoliv na plochu; může se zasunout pod krychli a lištu pohledu. Vrácení vedle krychle nebo dvojklik jej znovu ukotví. Poloha i sbalení se pamatují v tomto prohlížeči.
+Seznam je ukotvený vpravo od orientační krychle. Přetáhněte jej za záhlaví kamkoliv na plochu; může se zasunout pod krychli a lištu pohledu. Vrácení vedle krychle nebo dvojklik jej znovu ukotví. Poloha i sbalení se pamatují v tomto prohlížeči. Širší nebo užší seznam uděláte tažením za jeho pravý dolní roh, od 240 do 600 pixelů; i šířku si prohlížeč zapamatuje.
 
 ## Zadání polohy
 
@@ -45,6 +45,8 @@ Tvar lze odtáhnout za okraj, přibližně o jednu šířku podložky na každou
 ## Přichytávání při přesouvání
 
 Při tažení po pracovní rovině se levý, pravý, přední a zadní okraj i střed přichytávají na odpovídající okraje či středy jiných tvarů. Růžová vodicí čára ukazuje místo přichycení. Bez zadávání čísel tak díly položíte těsně vedle sebe nebo je vystředíte. Funguje to i při vypnuté mřížce. Počítá se i střed pracovní roviny: růžové čáry ukážou, kdy tvar sedí uprostřed desky ve směru X, Y nebo v obou.
+
+Přichytávání funguje i při změně velikosti: když táhneš za boční úchyt, ta strana se zastaví u hran a středů jiných tvarů a u stěny, na kterou narazí, také u vnitřní stěny krabice, vydutého tělesa nebo importovaného pouzdra, a růžová čára ukáže kde. Tento rozměr zůstane přesně takový, mimo mřížku. Tak díl vyplní pouzdro od stěny ke stěně: přilož ho k jedné stěně a jeho druhou stranu přetáhni k protější. S [[Alt]] tvar roste od středu a tažená strana se přichytí stejně; s [[Shift]] si zachová proporce a nepřichytává se. Platí to na rovné pracovní rovině pro tvary, které stojí rovně a mají strany podél X a Y, a {{ui:workspace.objectSnap}} to vypne spolu s přichytáváním při posunu.
 
 [[Shift]] během tažení omezí posun na osu X nebo Y podle toho, v kterém směru jste táhli více. Druhá souřadnice se zachová. Klávesu stiskněte nejlépe až po zahájení pohybu, protože Shift+klik na nevybraný tvar jej pouze přidá do výběru.
 

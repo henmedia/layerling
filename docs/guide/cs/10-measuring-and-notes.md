@@ -35,6 +35,7 @@ Pro měření v pravém úhlu použijte {{ui:camera.cornerRulerTool}} v liště 
 - **Krátkým kliknutím na úchyt** otočíte úhelník o 90°.
 - **×** vedle úhelníku jej odstraní.
 - **Tažením malého kroužku na konci ramene** rameno prodloužíte nebo zkrátíte, po celých milimetrech. Nejspodnější tlačítko pod úchytem, {{ui:ruler.armsToPlate}}, nastaví obě ramena na šířku a hloubku tiskové podložky tiskárny zvolené v nastavení. Úhelník si délky ramen pamatuje s návrhem a nově umístěný je převezme.
+- **{{ui:ruler.arms}}** (tlačítko se třemi osami, hned nad ním) otevře přepínač pro každé rameno, pojmenovaný podle osy, podél které vede. Kromě dvou ramen v rovině je tu třetí, které stojí v rohu kolmo k pracovní rovině: na podložce míří nahoru podél Z, s vlastní stupnicí, pro válec nebo cokoli, co stavíte do výšky. Na začátku je vypnuté: klikněte na jeho písmeno a zobrazí se, a tažením malého kroužku na jeho konci ho prodloužíte nebo zkrátíte. Ramena v rovině se stejně vypínají, když překážejí; jedno rameno zůstane vždy. Zelená čísla vybraného tělesa zůstávají, ať jsou vidět kterákoli ramena, a návrh si pamatuje, která to jsou.
 - **Malé tlačítko vlevo od úchytu** přepíná měření od vnějšího okraje tělesa, se symbolem čar, nebo od jeho středu, se zaměřovacím křížem. Stejný malý přepínač je i u každého zeleného čísla a nastavuje pouze danou kótu. U stojícího válce tak můžete měřit v obou ramenech ke středu a ve výšce ke spodní straně, u ležícího napříč ke středu a podélně ke konci. Pokud se všechna tři nastavení shodují, tlačítko u úchytu ukáže společný režim.
 
 U těles umístěných u ramen úhelník automaticky ukazuje rozměry. To funguje pouze na základní podložce, nikoli na boční stěně. Tlačítko se šipkou pod úchytem úhelníku to vypne, takže míry ukazují jen vybraná tělesa; ukládá se s projektem.
@@ -49,7 +50,7 @@ Měřicí nástroj i úhelník zůstávají na místě při přechodu do náčrt
 
 Úhel změříte tlačítkem {{ui:camera.protractor}} v liště pohledu. Vedle něj se otevře řada tlačítek, a dokud na tlačítko znovu nekliknete nebo nestisknete [[Esc]], měří každé kliknutí do pohledu úhloměrem. Stejně jako měření vzdáleností se přichytává k rohům a hranám těles; vedle těles položí bod na podložku.
 
-- {{ui:camera.protractorPoints}}: nejprve klikněte na vrchol úhlu, pak na bod na každém rameni. Už při umisťování posledního bodu se úhel zobrazuje; po třetím kliknutí zůstane, s obloukem mezi rameny. Je to úhel ve vrcholu, od 0° do 180°.
+- {{ui:camera.protractorPoints}}: nejprve klikněte na vrchol úhlu, pak na bod na každém rameni. Už při umisťování posledního bodu se úhel zobrazuje; po třetím kliknutí zůstane, s obloukem mezi rameny. Je to úhel ve vrcholu, od 0° do 180°. Při pohledu přímo shora, zepředu nebo z boku měří úhel tak, jak je tam vidět: horní roh a dolní roh přímo pod ním jsou tentýž bod. V šikmém pohledu je to úhel v prostoru.
 - {{ui:camera.protractorFaces}}: klikněte na dvě rovné plochy. Krátká modrá čárka na každé ukazuje, kam plocha směřuje, a popisek uvádí oba úhly, které plochy svírají, menší jako první: zkosení 45° proti horní ploše dá 45° · 135°, dvě stěny kvádru jen 90°. Zakřivená plocha nemá jediný směr, proto úhloměr žádá rovnou plochu.
 
 Další kliknutí po hotovém úhlu začne nový a {{ui:camera.protractorClear}} jej odstraní. Úhel sleduje tělesa, když je posunete nebo otočíte. Nic z něj se neukládá ani nejde do historie: zmizí, jakmile úhloměr odložíte.
@@ -58,7 +59,7 @@ Další kliknutí po hotovém úhlu začne nový a {{ui:camera.protractorClear}}
 
 V nastavení {{ui:workspace.appearance}} jsou dva přepínače průběžného kótování:
 
-- {{ui:workspace.showMoveDimensions}} zobrazuje posunutí během tažení. Patří sem i zvedání černou šipkou nad tělesem, měřené podél jeho přední hrany. Po puštění klikni na takové číslo a napiš přesnou vzdálenost; záporná hodnota jde dolů.
+- {{ui:workspace.showMoveDimensions}} zobrazuje posunutí během tažení. Patří sem i zvedání modrou šipkou nad tělesem, měřené podél jeho přední hrany. Po puštění klikni na takové číslo a napiš přesnou vzdálenost; záporná hodnota jde dolů.
 - {{ui:workspace.showOriginDimensions}} zobrazuje vzdálenosti výběru od počátku podložky, i při výběru více těles.
 
 {{ui:workspace.dimensionsAlwaysVisible}} ponechá rozměry zobrazené trvale. Když těleso nestojí na pracovní rovině, zobrazí se i jeho výška nad ní; kliknutím na číslo zadáš novou.

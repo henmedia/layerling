@@ -1,3 +1,4 @@
+import { GUIDE_CHAPTERS, GUIDE_SECTIONS, guideHref, type GuideChapter, type GuideSection } from "@/lib/guideLinks";
 import { LANGUAGES, type Language } from "@/lib/languages";
 import whatsNewData from "./whatsNew.json";
 
@@ -11,7 +12,66 @@ import whatsNewData from "./whatsNew.json";
  */
 /** A text in English and in as many other languages as were written; the others read the English one. */
 export type WhatsNewText = { en: string } & Partial<Record<Language, string>>;
-export type WhatsNewItem = { title: WhatsNewText; body: WhatsNewText };
+/**
+ * A link from a card to the guide: a section (preferred) or a whole chapter, with its own words where a card has more
+ * than one link; without them it reads "Read about this in the user guide".
+ */
+export type WhatsNewGuideLink = { section?: string; chapter?: string; label?: WhatsNewText };
+export type WhatsNewItem = { title: WhatsNewText; body: WhatsNewText; guide?: WhatsNewGuideLink | WhatsNewGuideLink[] };
+
+/**
+ * The guide links of a card that this version of layerling knows, as the address of their place in the guide.
+ * An installation previewing an update reads the cards of a newer version, which may point at a section it does not
+ * have yet: such a link is left out rather than leading to the guide's front page.
+ */
+export function whatsNewGuideLinks(item: WhatsNewItem, language: Language): Array<{ href: string; label: WhatsNewText | null }> {
+  const links = item.guide === undefined ? [] : Array.isArray(item.guide) ? item.guide : [item.guide];
+  return links.flatMap((link) => {
+    const section = link.section && link.section in GUIDE_SECTIONS ? (link.section as GuideSection) : undefined;
+    const chapter = link.chapter && link.chapter in GUIDE_CHAPTERS ? (link.chapter as GuideChapter) : undefined;
+    if (!section && !chapter) return [];
+    return [{ href: guideHref(language, chapter, section), label: link.label ?? null }];
+  });
+}
+
+/**
+ * A card's text in blocks: an empty line starts a new paragraph, and lines beginning with a dash are a list. Plain
+ * text otherwise, so an older version that shows the text in one line still reads it well.
+ */
+export type WhatsNewBlock = { kind: "paragraph"; text: string } | { kind: "list"; items: string[] };
+
+export function whatsNewBlocks(text: string): WhatsNewBlock[] {
+  const blocks: WhatsNewBlock[] = [];
+  for (const chunk of text.replace(/\r\n/g, "\n").split(/\n\s*\n/)) {
+    const lines = chunk.split("\n").map((line) => line.trim()).filter(Boolean);
+    let paragraph: string[] = [];
+    let list: string[] = [];
+    const flush = () => {
+      if (paragraph.length) blocks.push({ kind: "paragraph", text: paragraph.join(" ") });
+      if (list.length) blocks.push({ kind: "list", items: list });
+      paragraph = [];
+      list = [];
+    };
+    for (const line of lines) {
+      const item = /^[-–•]\s+(.*)$/.exec(line);
+      if (item) {
+        if (paragraph.length) {
+          blocks.push({ kind: "paragraph", text: paragraph.join(" ") });
+          paragraph = [];
+        }
+        list.push(item[1]);
+      } else {
+        if (list.length) {
+          blocks.push({ kind: "list", items: list });
+          list = [];
+        }
+        paragraph.push(line);
+      }
+    }
+    flush();
+  }
+  return blocks;
+}
 export type WhatsNewEntry = { version: string; items: WhatsNewItem[] };
 
 /**

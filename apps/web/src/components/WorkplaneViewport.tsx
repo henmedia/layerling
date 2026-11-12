@@ -5,7 +5,7 @@ import type { SurfaceTextureFace, SurfaceTextureSettings } from "@/lib/surfaceTe
 import { markEscapeHandled } from "@/lib/escapeHandled";
 import { ArrowDownToLine, Check, ChevronLeft, Crosshair, Cuboid, Download, Eye, EyeOff, FlipHorizontal, GripVertical, Home, Layers, Minus, MousePointer2, PanelsTopLeft, ScanEye, PencilLine, PictureInPicture2, Plus, Rotate3d, RotateCcw, Ruler, RulerDimensionLine, Slice, Spline, Trash2, X } from "lucide-react";
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperties, type Dispatch, type DragEvent, type MutableRefObject, type PointerEvent as ReactPointerEvent, type ReactNode, type SetStateAction, type WheelEvent as ReactWheelEvent } from "react";
-import { objectSnapOffset, shiftSnapBox, type ObjectSnapGuide, type SnapBox } from "@/lib/objectSnap";
+import { boxEdgeTargets, edgeSnapGuide, objectSnapOffset, shiftSnapBox, snapResizeEdge, type EdgeSnapTarget, type ObjectSnapGuide, type SnapBox } from "@/lib/objectSnap";
 import { dragReach } from "@/lib/dragReach";
 import { useMovablePanel, type MovablePanelOptions } from "@/lib/useMovablePanel";
 import { computeSectionPlaneVector, DEFAULT_SECTION_SETTINGS, getSectionBounds, SECTION_AXES_SHOWN, sectionAxisLetter, sectionAxisVector, sectionFineWindow, sectionFrameFromView, sectionFrameFromWorkplane, sectionPlacementWorkplane, sectionPointFromFrame, sectionPointToFrame, type SectionFrame, type SectionOrientation, type SectionPlaneAxis, type SectionPlaneSettings } from "@/lib/sectionView";
@@ -56,7 +56,7 @@ import { fitCameraDepthRange, frameBounds, resetCamera, selectionBounds, startVi
 import { disposeCutPreviewResources, renderFrame } from "@/components/workplane/renderFrame";
 import { DIMENSION_FORMULA_FIELDS, formulaMatchesMillimeters, formulaToRemember, withFieldFormula } from "@/lib/fieldFormulas";
 import { displayToMillimeters, formatLengthMm, lengthDisplayUnit, measurementOptionLabel, millimetersToDisplay, parseLengthMm, parseMeasurementInput, resolveLengthMm, setLengthUnit } from "@/lib/measurementUnits";
-import { computeCornerRulerRelativeCoordinates, cornerRulerArmLength, cornerRulerAxisModes, cornerRulerPlateArms, cornerRulerFrameForWorkplane, cornerRulerShiftVector, pointAlongRuler, rotateCornerRulerFrame, rulerDimensionMatch, toggledCornerRulerAxis, toggledCornerRulerMode, type CornerRulerAxis, type RulerDimensionField } from "@/lib/rulerDimensions";
+import { computeCornerRulerRelativeCoordinates, cornerRulerArmLength, cornerRulerElevationArmLength, toggledCornerRulerArms, cornerRulerAxisModes, cornerRulerPlateArms, cornerRulerFrameForWorkplane, cornerRulerShiftVector, pointAlongRuler, rotateCornerRulerFrame, rulerDimensionMatch, toggledCornerRulerAxis, toggledCornerRulerMode, type CornerRulerAxis, type RulerDimensionField } from "@/lib/rulerDimensions";
 import { createMoveDimensionOverlay, type MoveDimensionAxis, type MoveDimensionOverlayData } from "@/lib/moveDimensionLines";
 import { computeOriginAxisDistance, createOriginDimensionOverlay, type OriginDimensionOverlayData } from "@/lib/originDimensionLines";
 import { horizontalPlacementWorkplane, placementPatchForNewShape, placementWorkplaneCoordinates, placementWorkplaneFromSurface, placementWorkplaneIsBase, placementWorkplanePoint, snapPlacementWorkplaneOrigin, type PlacementPoint, type PlacementWorkplane } from "@/lib/placementWorkplane";
@@ -124,11 +124,12 @@ import { isTypingTarget } from "@/lib/editorKeyTargets";
 import { liftHandleOffset, screenAngle, framePoint, selectionFrameCorners, workplaneFootprintY, syncTransformOverlay, syncAlignOverlay, syncMirrorOverlay, syncLayFlatHover } from "./workplane/viewportTransformOverlays";
 import { ClearanceMarkOverlay, clearanceFocusBox, syncClearanceMarkOverlay, type ClearanceMark, type ClearanceMarkOverlayState } from "./workplane/ClearanceMarkOverlay";
 import { clipThinWallOverlay, syncThinWallOverlay, type PrintCheckView } from "./workplane/ThinWallOverlay";
-import { EMPTY_PROTRACTOR, pickProtractorFace, protractorFaceFromWorld, protractorReading, ProtractorOverlay, syncProtractorOverlay, type ProtractorKind, type ProtractorModel, type ProtractorOverlayState } from "./workplane/viewportProtractor";
+import { EMPTY_PROTRACTOR, pickProtractorFace, protractorFaceFromWorld, protractorReading, protractorStraightView, ProtractorOverlay, syncProtractorOverlay, type ProtractorKind, type ProtractorModel, type ProtractorOverlayState } from "./workplane/viewportProtractor";
 import { tapeAttachmentFromWorld, TAPE_PERPENDICULAR_SNAP_PIXELS, pickModelTapeCandidate, tapeCentresNear, sameTapeCentres, distanceToScreenSegment, SectionMeasureModel, SectionMeasureOverlayState, syncSectionMeasureOverlay } from "./workplane/viewportTape";
 export type { LayFlatPick } from "@/components/workplane/viewportPicking";
 import { MIN_ELEVATION, MAX_ELEVATION, ResizeSigns, ResizeAnchorMemory, TransformDragState, TransformDragItem, snapValue, selectionWorldYBounds, resizeSignsForHandle, resizeAnchorPointForFrame, resizeCenterFromAnchor, resizeSignsForDimension, patchWithResizeAnchor, patchWithUniformHeightScale, resizeShapeFromFrameHandle, resizeShapeAlongFrameNormal, resizeSelectionFromHandle, scaleSelectionItems } from "./workplane/viewportResize";
 import { pulleySizedPatch } from "@/lib/pulleyGeometry";
+import { setPickRayFromCamera } from "@/lib/cameraRay";
 
 const WORKSPACE_DEFAULTS_STORAGE_PREFIX = "layerling.workspaceDefault.";
 const MOVE_DIMENSIONS_ENABLED_STORAGE_KEY = "layerling.editor.moveDimensionsEnabled";
@@ -871,7 +872,7 @@ function projectCadPointToCanvas(point: THREE.Vector3, state: ThreeState, rect: 
 function modifierEdgePointHidden(state: ThreeState, point: THREE.Vector3) {
   const ndc = point.clone().project(state.camera);
   state.pointer.set(ndc.x, ndc.y);
-  state.raycaster.setFromCamera(state.pointer, state.camera);
+  setPickRayFromCamera(state.raycaster, state.pointer, state.camera);
   state.raycaster.layers.set(RENDER_LAYER_SHAPES);
   const ray = state.raycaster.ray;
   const pointDistance = point.clone().sub(ray.origin).dot(ray.direction);
@@ -1060,6 +1061,73 @@ function unionSnapBox(boxes: SnapBox[]): SnapBox | null {
     minZ: Math.min(all.minZ, box.minZ),
     maxZ: Math.max(all.maxZ, box.maxZ),
   }));
+}
+
+/**
+ * What a side handle snaps to on the flat workplane (Discussion #1647): the edges and middles of other bodies, as a
+ * drag has them, and the walls the dragged side runs into as the body grows, found with rays from that side - so the
+ * inside of a box, a hollowed body or an imported case counts too, not only its outline. Only for a side handle of a
+ * selection standing upright with its sides along X and Y; otherwise undefined.
+ */
+function resizeSnapForHandle(
+  state: ThreeState,
+  frame: SelectionFrame,
+  signs: ResizeSigns,
+  shapes: WorkplaneShape[],
+  moved: Set<string>,
+  points: Array<{ x: number; z: number }>,
+  workplane: PlacementWorkplane,
+): TransformDragState["resizeSnap"] {
+  if (!isWorldHorizontalWorkplane(workplane) || Boolean(signs.x) === Boolean(signs.z)) return undefined;
+  if (Math.abs(frame.yAxis.y) < 1 - 1e-6) return undefined;
+  const frameAxis = signs.x ? "x" : "z";
+  const axisVector = frameAxis === "x" ? frame.xAxis : frame.zAxis;
+  const worldAxis = Math.abs(axisVector.x) > 1 - 1e-6 ? "x" : Math.abs(axisVector.z) > 1 - 1e-6 ? "z" : null;
+  if (!worldAxis) return undefined;
+  const sign = frameAxis === "x" ? signs.x : signs.z;
+  const worldDirection: 1 | -1 = Math.sign(axisVector[worldAxis]) * sign > 0 ? 1 : -1;
+  const otherAxis = worldAxis === "x" ? "z" : "x";
+  const size = frameAxis === "x" ? frame.width : frame.depth;
+  const crossSize = frameAxis === "x" ? frame.depth : frame.width;
+  const crossVector = frameAxis === "x" ? frame.zAxis : frame.xAxis;
+  const movingFrom = frame.center[otherAxis] - crossSize / 2;
+  const movingTo = frame.center[otherAxis] + crossSize / 2;
+  const targets: EdgeSnapTarget[] = boxEdgeTargets(moveSnapTargets(shapes, moved, points, workplane), worldAxis);
+  // Rays from the dragged side, a little inside it so a wall it already touches is met, spread over its face.
+  const skip = new Set([...moved, ...shapes.filter((entry) => entry.hidden).map((entry) => entry.id)]);
+  const direction = new THREE.Vector3();
+  direction[worldAxis] = worldDirection;
+  const side = framePoint(frame, frameAxis === "x" ? (sign * size) / 2 : 0, 0, frameAxis === "z" ? (sign * size) / 2 : 0);
+  const height = frame.max.y - frame.min.y;
+  const middleY = (frame.max.y + frame.min.y) / 2;
+  const walls = new Map<string, EdgeSnapTarget>();
+  state.raycaster.layers.set(RENDER_LAYER_SHAPES);
+  for (const across of [-0.4, -0.2, 0, 0.2, 0.4]) {
+    for (const up of [-0.4, 0, 0.4]) {
+      const origin = side.clone()
+        .addScaledVector(crossVector, across * crossSize)
+        .addScaledVector(frame.yAxis, middleY + up * height)
+        .addScaledVector(direction, -0.01);
+      state.raycaster.set(origin, direction);
+      const hit = firstShapeHit(state, { needsFace: true, skip });
+      if (!hit) continue;
+      // To a hundredth: a mesh carries float rounding, and a hole cuts a thousandth wider than typed.
+      const value = Math.round(hit.point[worldAxis] * 100) / 100;
+      const key = value.toFixed(2);
+      const along = hit.point[otherAxis];
+      const wall = walls.get(key);
+      if (wall) {
+        wall.from = Math.min(wall.from, along);
+        wall.to = Math.max(wall.to, along);
+      } else {
+        walls.set(key, { value, from: along, to: along });
+      }
+    }
+  }
+  targets.push(...walls.values());
+  // The guide lies under the body, so it shows on the floor of a case too, not hidden in it on the workplane.
+  const guideY = framePoint(frame, 0, frame.min.y, 0).y;
+  return { frameAxis, worldAxis, worldDirection, targets, movingFrom, movingTo, guideY };
 }
 
 /** Converts OBJECT_SNAP_PIXELS into millimetres at `at`, so the pull feels the same at every zoom. */
@@ -2042,7 +2110,7 @@ export function WorkplaneViewport({
   const cornerRulerOverlayRef = useRef<CornerRulerOverlayState | null>(null);
   const cornerRulerIdRef = useRef(toolMemory?.current.cornerRulerId ?? storedCornerRulers.current.length);
   const cornerRulerDragRef = useRef<{ id: string; pointerId: number; moved: boolean } | null>(null);
-  const cornerRulerArmDragRef = useRef<{ id: string; arm: "x" | "z"; pointerId: number } | null>(null);
+  const cornerRulerArmDragRef = useRef<{ id: string; arm: CornerRulerAxis; pointerId: number } | null>(null);
   const protractorOpenRef = useRef(false);
   const protractorModelRef = useRef<ProtractorModel>(EMPTY_PROTRACTOR);
   const protractorOverlayRef = useRef<ProtractorOverlayState | null>(null);
@@ -4377,6 +4445,9 @@ export function WorkplaneViewport({
             guideY: activeWorkplane.origin.y,
           }
         : undefined;
+      const resizeSnap = kind === "scale" && scaleSigns && state && workspaceRef.current.objectSnap
+        ? resizeSnapForHandle(state, frame, scaleSigns, shapesRef.current, new Set(frame.ids), notesVisibleRef.current ? referencePoints(notesRef.current) : [], activeWorkplane)
+        : undefined;
       rememberResizeAnchor(shape.id, kind, resizeHandleKey);
       event.preventDefault();
       event.stopPropagation();
@@ -4429,6 +4500,7 @@ export function WorkplaneViewport({
         liftStartValue,
         duplicate: kind === "lift" && event.altKey && state ? beginLiftDuplicate(state, frame.ids) : undefined,
         slideSnap,
+        resizeSnap,
         rotationAxisVector: kind === "rotate" ? axisVector : undefined,
         rotationPivot: kind === "rotate" ? pivot : undefined,
         customPivot: kind === "rotate" && Boolean(rotationPivotRef.current),
@@ -4803,17 +4875,49 @@ export function WorkplaneViewport({
       }
 
       if (transform.kind === "scale") {
-        const worldPoint = transform.scalePlane ? toRawPlanePoint(clientX, clientY, transform.scalePlane) : null;
+        let worldPoint = transform.scalePlane ? toRawPlanePoint(clientX, clientY, transform.scalePlane) : null;
         if (!worldPoint) {
           return true;
         }
+        // A side handle stops at the edges of other bodies and the walls it runs into (Discussion #1647); with Alt the
+        // body still grows from its middle and the dragged side snaps all the same. A snapped size goes off the grid.
+        const snap = transform.resizeSnap;
+        const snapState = threeRef.current;
+        let freeAxis: "x" | "z" | undefined;
+        if (snap && snapState) {
+          let guides: ObjectSnapGuide[] = [];
+          const frame = transform.selectionFrame;
+          const signs = transform.scaleSigns ?? resizeSignsForHandle(transform.handleKey);
+          const axisVector = snap.frameAxis === "x" ? frame.xAxis : frame.zAxis;
+          const sign = snap.frameAxis === "x" ? signs.x : signs.z;
+          const current = snap.frameAxis === "x" ? frame.width : frame.depth;
+          const delta = transform.scaleStartPoint ? worldPoint.clone().sub(transform.scaleStartPoint).dot(axisVector) : 0;
+          const factor = altKey ? 2 : 1;
+          const rawSize = current + sign * delta * factor;
+          const anchorPoint = altKey ? frame.center : transform.scaleAnchorPoint ?? resizeAnchorPointForFrame(frame, signs);
+          if (!(shiftKey || proportionLockRef.current) && rawSize > 0) {
+            const hit = snapResizeEdge(
+              { anchor: anchorPoint[snap.worldAxis], direction: snap.worldDirection, size: rawSize, symmetric: altKey },
+              snap.targets,
+              objectSnapThreshold(snapState, worldPoint),
+              MIN_SHAPE_SIZE,
+            );
+            if (hit) {
+              const wanted = (hit.size - current) / (sign * factor);
+              worldPoint = worldPoint.clone().addScaledVector(axisVector, wanted - delta);
+              freeAxis = snap.frameAxis;
+              guides = [edgeSnapGuide(snap.worldAxis, hit.target, snap.movingFrom, snap.movingTo)];
+            }
+          }
+          syncObjectSnapGuides(snapState, guides, snap.guideY + 0.06);
+        }
         if (transform.items.length === 1) {
           const maxSize = handleDimensionLimit(workspaceRef.current, transform.startShape.kind, 220, "across", Math.max(transform.selectionFrame.width, transform.selectionFrame.depth, transform.selectionFrame.height));
-          const next = resizeShapeFromFrameHandle(transform, worldPoint, transform.handleKey, shiftKey || proportionLockRef.current, altKey, step, maxSize);
+          const next = resizeShapeFromFrameHandle(transform, worldPoint, transform.handleKey, shiftKey || proportionLockRef.current, altKey, step, maxSize, freeAxis);
           onUpdateShape(transform.id, next);
         } else {
           const maxSize = Math.max(...transform.items.map((item) => handleDimensionLimit(workspaceRef.current, item.startShape.kind, 260, "across", Math.max(transform.selectionFrame.width, transform.selectionFrame.depth, transform.selectionFrame.height))));
-          resizeSelectionFromHandle(transform, worldPoint, transform.handleKey, shiftKey || proportionLockRef.current, altKey, step, maxSize).forEach(({ id, patch }) => onUpdateShape(id, patch));
+          resizeSelectionFromHandle(transform, worldPoint, transform.handleKey, shiftKey || proportionLockRef.current, altKey, step, maxSize, freeAxis).forEach(({ id, patch }) => onUpdateShape(id, patch));
         }
         return true;
       }
@@ -5021,6 +5125,9 @@ export function WorkplaneViewport({
     }
     if (transform.kind === "scale" && transform.hasMoved) {
       suppressCornerEditAfterDrag();
+    }
+    if (transform.resizeSnap && threeRef.current) {
+      syncObjectSnapGuides(threeRef.current, [], 0);
     }
     if (transform.kind === "rotate" && transform.hasMoved) {
       suppressNextRotationEditRef.current = true;
@@ -6022,6 +6129,9 @@ export function WorkplaneViewport({
       frame: cornerRulerFrameForWorkplane(workplane),
       armLengthX: previous?.armLengthX ?? CORNER_RULER_DEFAULT_ARM_X,
       armLengthZ: previous?.armLengthZ ?? CORNER_RULER_DEFAULT_ARM_Z,
+      // The third arm and the arms switched off come along too (Discussion #1649).
+      ...(previous?.armLengthElevation !== undefined ? { armLengthElevation: previous.armLengthElevation } : {}),
+      ...(previous?.arms ? { arms: previous.arms } : {}),
       mode: existingMode,
       ...(existingAxisModes ? { axisModes: existingAxisModes } : {}),
       ...(stayInView ? { occlude: false } : {}),
@@ -6379,7 +6489,14 @@ export function WorkplaneViewport({
     if (model.kind === "points") {
       const point = resolveProtractorPoint(clientX, clientY);
       if (!point) return;
-      storeProtractorModel({ ...model, points: model.points.length >= 3 ? [point] : [...model.points, point], hoverPoint: null });
+      // A new angle begun in a straight view is measured as seen there (#1650).
+      const starting = model.points.length === 0 || model.points.length >= 3;
+      storeProtractorModel({
+        ...model,
+        points: starting ? [point] : [...model.points, point],
+        hoverPoint: null,
+        view: starting ? protractorStraightView(state) : model.view,
+      });
       return;
     }
     const face = pickProtractorFace(state, clientX, clientY);
@@ -6425,20 +6542,34 @@ export function WorkplaneViewport({
   }, [storeCornerRulerModel]);
 
   /** Dragging an arm's end makes the arm as long as the pointer is far from the corner along it, in whole millimetres (Discussion #1469). */
-  const handleCornerRulerArmPointerDown = useCallback((event: ReactPointerEvent<SVGCircleElement>, id: string, arm: "x" | "z") => {
+  const handleCornerRulerArmPointerDown = useCallback((event: ReactPointerEvent<SVGCircleElement>, id: string, arm: CornerRulerAxis) => {
     event.preventDefault();
     event.stopPropagation();
     cornerRulerArmDragRef.current = { id, arm, pointerId: event.pointerId };
     capturePointer(event.currentTarget, event.pointerId);
   }, []);
 
-  const handleCornerRulerArmPointerMove = useCallback((event: ReactPointerEvent<SVGCircleElement>, id: string, arm: "x" | "z") => {
+  const handleCornerRulerArmPointerMove = useCallback((event: ReactPointerEvent<SVGCircleElement>, id: string, arm: CornerRulerAxis) => {
     const drag = cornerRulerArmDragRef.current;
     if (!drag || drag.id !== id || drag.arm !== arm || drag.pointerId !== event.pointerId) return;
     event.preventDefault();
     event.stopPropagation();
     const current = cornerRulerModelRef.current.find((ruler) => ruler.id === id);
     if (!current) return;
+    if (arm === "elevation") {
+      // The third arm stands out of the workplane: its length comes from the pointer's ray, not from a point in the
+      // plane (Discussion #1649).
+      const state = threeRef.current;
+      if (!state) return;
+      const rect = state.renderer.domElement.getBoundingClientRect();
+      const ndc = new THREE.Vector2(((event.clientX - rect.left) / rect.width) * 2 - 1, -((event.clientY - rect.top) / rect.height) * 2 + 1);
+      const ray = new THREE.Raycaster();
+      setPickRayFromCamera(ray, ndc, state.camera);
+      const length = cornerRulerElevationArmLength(current, { origin: ray.ray.origin, direction: ray.ray.direction });
+      if (length === null || current.armLengthElevation === length) return;
+      storeCornerRulerModel(cornerRulerModelRef.current.map((ruler) => ruler.id === id ? { ...ruler, armLengthElevation: length } : ruler));
+      return;
+    }
     const point = resolveCornerRulerPoint(event.clientX, event.clientY, current.workplane);
     if (!point) return;
     const length = cornerRulerArmLength(current, arm, point);
@@ -6447,7 +6578,19 @@ export function WorkplaneViewport({
     storeCornerRulerModel(cornerRulerModelRef.current.map((ruler) => ruler.id === id ? { ...ruler, [key]: length } : ruler));
   }, [resolveCornerRulerPoint, storeCornerRulerModel]);
 
-  const handleCornerRulerArmPointerUp = useCallback((event: ReactPointerEvent<SVGCircleElement>, id: string, arm: "x" | "z") => {
+  /** One of the three arms shown or hidden; the last one shown stays (Discussion #1649). */
+  const toggleCornerRulerArm = useCallback((id: string, arm: CornerRulerAxis) => {
+    storeCornerRulerModel(
+      cornerRulerModelRef.current.map((ruler) => {
+        if (ruler.id !== id) return ruler;
+        const { arms: _was, ...rest } = ruler;
+        const arms = toggledCornerRulerArms(ruler.arms, arm);
+        return arms ? { ...rest, arms } : rest;
+      })
+    );
+  }, [storeCornerRulerModel]);
+
+  const handleCornerRulerArmPointerUp = useCallback((event: ReactPointerEvent<SVGCircleElement>, id: string, arm: CornerRulerAxis) => {
     const drag = cornerRulerArmDragRef.current;
     if (!drag || drag.id !== id || drag.arm !== arm) return;
     cornerRulerArmDragRef.current = null;
@@ -8298,7 +8441,7 @@ export function WorkplaneViewport({
   );
 
   const handleTapeSegmentPointerDown = useCallback(
-    (event: ReactPointerEvent<SVGElement>, segmentId: string) => {
+    (event: ReactPointerEvent<Element>, segmentId: string) => {
       if (event.button !== 0) {
         return;
       }
@@ -9061,6 +9204,7 @@ export function WorkplaneViewport({
               rotationReadout={rotationReadout}
               angleBadge={dimensionsHidden ? null : angleBadge}
               locked={selectionLocked}
+              showSlideArrows={workspace.showSlideArrows}
               sizeLocked={selectionSizeLocked}
               showRotationWheel={activeRotationWheel}
               hideSelectionChrome={activeTransformKind === "rotate"}
@@ -9174,6 +9318,7 @@ export function WorkplaneViewport({
               onArmEndPointerMove={handleCornerRulerArmPointerMove}
               onArmEndPointerUp={handleCornerRulerArmPointerUp}
               onArmsToPlate={cornerRulerArmsToPlate}
+              onToggleArm={toggleCornerRulerArm}
               onCoordinateClick={beginRulerCoordinateEdit}
             />
           ) : null}
@@ -9582,7 +9727,7 @@ function pickCadFace(state: ThreeState, pick: CadFacePick, clientX: number, clie
   const rect = state.renderer.domElement.getBoundingClientRect();
   state.pointer.x = ((clientX - rect.left) / rect.width) * 2 - 1;
   state.pointer.y = -((clientY - rect.top) / rect.height) * 2 + 1;
-  state.raycaster.setFromCamera(state.pointer, state.camera);
+  setPickRayFromCamera(state.raycaster, state.pointer, state.camera);
   state.raycaster.layers.set(RENDER_LAYER_SHAPES);
   const cut = (point: THREE.Vector3) => Boolean(state.sectionPlane && state.sectionPlane.distanceToPoint(point) < -0.001);
   // The shared raycaster stops at the first hit of a bounds tree; with the section view on, that hit

@@ -22,7 +22,7 @@ With many parts it is easy to lose track in the view. The object list ({{ui:edit
 ![The object list: the group "Group" with two parts and a sphere beside it. A folder icon opens the group.](shot:object-list)
 
 - A click on an entry selects the shape, including parts inside a group. With [[Shift]] held you add more entries or take them away again, just as in the view. The arrows fold groups open and shut.
-- The label shows whether a part is {{ui:outliner.solid}} or {{ui:outliner.hole}}.
+- The letter after the name says whether a part is {{ui:outliner.solid}} or {{ui:outliner.hole}}: it is the first letter of the word, and the word shows when you hold the mouse over it.
 - Under the name stands what kind of shape it is. A body that is no longer a plain shape (rounded, hollowed or imported) says {{ui:shape.exactBody}} when the STEP export writes it exactly, and {{ui:shape.mesh}} when it is only triangles and goes as STL. A taper, lean or twist set after rounding or hollowing a body bends only its mesh, so it then says {{ui:shape.mesh}}.
 - Padlock and eye lock and hide single parts.
 - {{ui:outliner.rename}} gives a part a name of its own; the pencil beside the name at the top of the settings does the same for the selected shape. Sensible names help enormously in larger designs.
@@ -32,7 +32,7 @@ With many parts it is easy to lose track in the view. The object list ({{ui:edit
 - The search field finds shapes by name and by kind, so also "cylinder" or "hole". It also looks inside groups, however deeply nested: a group holding a match stays in the list and folds open to show the matching parts and the groups that lead to them. A group found by its own name shows all its parts when you open it.
 - The arrow on the far left of the title bar folds the list down to its title bar and back.
 
-The list sits docked just right of the view cube. Drag it by its title bar to put it anywhere on the workplane; it passes underneath the view cube and the view bar. Drop it back beside the view cube, or double-click the title bar, and it docks again. Where it was and whether it was folded are remembered in this browser.
+The list sits docked just right of the view cube. Drag it by its title bar to put it anywhere on the workplane; it passes underneath the view cube and the view bar. Drop it back beside the view cube, or double-click the title bar, and it docks again. Where it was and whether it was folded are remembered in this browser. To make the list wider or narrower, drag its lower right corner, from 240 to 600 pixels; the width is remembered in this browser as well.
 
 ## Typing a position
 
@@ -45,6 +45,8 @@ You can drag a shape past the edge of the plate and leave it there, about one pl
 ## Snapping while moving
 
 When you drag a shape across the workplane, it snaps to other shapes: its left, right, front or back edge or its centre lands exactly on an edge or centre of another shape. A pink guide line shows what it is holding on to. That way two parts sit flush side by side or centred one behind the other without typing numbers. It works with the grid switched off, too. The centre of the workplane counts too: the pink lines show when the shape sits in the middle of the plate along X, along Y or both.
+
+Resizing snaps too: when you drag a side handle, that side stops at the edges and centres of other shapes and at the wall it runs into, the inside wall of a box, a hollowed body or an imported case as well, and the pink line shows where. That size is kept exactly, off the grid. So a part fills a case from wall to wall: put it against one wall and drag its other side to the opposite one. With [[Alt]] the shape grows from its middle and the dragged side snaps the same way; with [[Shift]] it keeps its proportions and does not snap. This works on the flat workplane, for shapes standing upright with their sides along X and Y, and {{ui:workspace.objectSnap}} switches it off together with snapping while moving.
 
 Hold [[Shift]] while dragging to keep the move on one axis: the shape follows whichever direction, X or Y, you have dragged further in, and leaves the other alone. Best press [[Shift]] once you are already dragging; on a shape that is not selected yet, a click with [[Shift]] only adds it to the selection.
 

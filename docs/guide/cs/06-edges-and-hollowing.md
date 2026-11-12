@@ -31,6 +31,7 @@ Okno nabízí:
 - {{ui:edge.onlyVisibleEdges}} skryje hrany za tělesem. Ve výchozím stavu prosvítají všechny, což může být u složitého dílu nepřehledné. Po zapnutí vybíráte pouze hrany obrácené k vám; pro ostatní otočte pohled. Chybová červená hrana se zobrazuje vždy.
 - {{ui:edge.tangentChains}} přidává po kliknutí i plynule navazující hrany, například celý obvod plochy se zaoblenými rohy. Volba ovlivňuje jen výběr kliknutím. CAD jádro vždy pokračuje v úpravě podél tečně navazujících hran. Okno uvádí, kolik dalších hran se tím upraví.
 - {{ui:edge.keepSize}} zachová velikost zkosení či zaoblení i při pozdější změně velikosti tělesa.
+- {{ui:edge.findLargest}} se objeví pod hlášením, když je velikost pro vybrané hrany příliš velká. Zkouší menší velikosti, dokud jedna neprojde, přiblíží se k největší vhodné na setinu milimetru a zapíše ji do pole; náhled následuje jako obvykle. U velkého tělesa to trvá pár sekund. Pokud se nevejde ani velmi malá velikost, řekne to: pak nejde o velikost, ale o hrany vybrané společně.
 - {{ui:edge.previewQuality}} nabízí {{ui:edge.draft}}, {{ui:edge.standard}} nebo {{ui:edge.fine}}. U složitých dílů poskytuje {{ui:edge.draft}} rychlejší výpočet.
 - Okno si pamatuje svá nastavení v tomto prohlížeči, zvlášť pro sražení, zaoblení a sražení se zaoblením: velikost, úhel, práh, kvalita náhledu a přepínače zůstanou po {{ui:edge.apply}}, po vrácení zpět i při dalším otevření nástroje tak, jak jste je nechali. Velikost, kterou těleso nepojme, ustoupí velikosti spočtené z tělesa. Znovu začíná jen {{ui:edge.tangentChains}}: zapnuto při prvním sražení nebo zaoblení tělesa, potom vypnuto.
 
@@ -80,7 +81,7 @@ Volba {{ui:shell.edges}} se projeví pouze tam, kde se vnitřní stěny rozestup
 
 ![Stejná krabička s otevřenou přední stranou jako prostor pro zásuvku.](shot:hollow-sides)
 
-Na každé otevřené straně potřebuje těleso rovinnou plochu na svém krajním povrchu. Koule a volně tvarovaná tělesa proto nelze tímto způsobem otevřít. Je-li stěna pro těleso příliš silná, program požádá o menší tloušťku. Takovým případem je zaoblená krabice, jejíž horní a dolní hrany jsou také zaoblené: její stěna musí být zřetelně tenčí než toto zaoblení, nebo nejdřív nastavte zaoblení na 0.
+Na každé otevřené straně potřebuje těleso rovinnou plochu na svém krajním povrchu. Počítá se i šikmo seříznutý vršek: kvádr se sklonem nebo kvádr seskupený s nakloněným otvorem, který mu ubere vršek, zůstane otevřený podél svého šikmého vršku, pokud se ten neodklání o víc než 60° od vodorovné. Koule a volně tvarovaná tělesa proto nelze tímto způsobem otevřít. Je-li stěna pro těleso příliš silná, program požádá o menší tloušťku. Takovým případem je zaoblená krabice, jejíž horní a dolní hrany jsou také zaoblené: její stěna musí být zřetelně tenčí než toto zaoblení, nebo nejdřív nastavte zaoblení na 0.
 
 Vytvořit dutinu lze i v tělese s kapsou, tedy kvádru se slepým otvorem vzniklým sloučením s nadzvednutým výřezem. Při otevřené horní straně se vytvoří stěny i kolem kapsy. Mezi kapsou a vnějším pláštěm zůstane prstencová dutina otevřená nahoře a pod dnem kapsy tenká dutina.
 
@@ -103,7 +104,7 @@ Při pozdější změně velikosti se dutina ihned přepočítá. Zadaná tlouš
 - {{ui:lid.type.bayonet}}: otočný uzávěr pro kulaté těleso, víko, které se nasadí přes ozuby a pootočí; víc níže.
 - {{ui:lid.type.slide}}: deska, která se do krabičky zasouvá jednou stěnou, jako víko dřevěného penálu; víc o něm níže.
 
-Pak nastavíš {{ui:lid.thickness}}, {{ui:lid.fit}} ({{ui:lid.gap}} mezi víkem a tělesem: 0,1 mm těsné, 0,2 mm běžné, 0,3 mm volné, nebo jakákoli hodnota do 1 mm) a jak hluboko límec nebo okraj sahá a jak silná je jeho stěna. Klikni na {{ui:lid.apply}}: víko leží vedle tělesa, otočené deskou dolů, takže se tiskne bez podpěr. Těleso zůstane, jak je. Víko sleduje jakýkoli obrys, kulatý i hranatý, protože se odebírá ze samotného tělesa těsně pod jeho okrajem. Těleso bez otvoru nahoře dostane jen ploché víko; pro ostatní druhy ho nejdřív vydlab s otevřenou horní stranou.
+Pak nastavíš {{ui:lid.thickness}}, {{ui:lid.fit}} ({{ui:lid.gap}} mezi víkem a tělesem: 0,1 mm těsné, 0,2 mm běžné, 0,3 mm volné, nebo jakákoli hodnota do 1 mm) a jak hluboko límec nebo okraj sahá a jak silná je jeho stěna. Klikni na {{ui:lid.apply}}: víko leží vedle tělesa, otočené deskou dolů, takže se tiskne bez podpěr. Těleso zůstane, jak je. Víko sleduje jakýkoli obrys, kulatý i hranatý, protože se odebírá ze samotného tělesa těsně pod jeho okrajem. Těleso bez otvoru nahoře dostane jen ploché víko; pro ostatní druhy ho nejdřív vydlab s otevřenou horní stranou. Okraj musí být vodorovný: těleso se šikmým vrškem vydlab {{ui:shell.side.closed}} a rozřízni ho nástrojem {{ui:split.title}} podél nakloněné roviny tam, kde má víko odcházet; díl nahoře je víko, i se svými stěnami.
 
 > **Tip:** Jak těsně víko sedí, záleží na tiskárně. Nejdřív vytiskni malou krabičku s víkem; je-li víko příliš těsné, zvol další volnější uložení.
 

@@ -71,6 +71,7 @@ export function TransformOverlay({
   angleBadge = null,
   locked = false,
   sizeLocked = false,
+  showSlideArrows = true,
   showRotationWheel,
   hideSelectionChrome,
   hideDimensionMarks,
@@ -381,8 +382,8 @@ export function TransformOverlay({
           </span>
         </button>
       ))}
-      {/* The X and Y arrows (Discussion #1434) only move the selection; a locked one keeps still and shows none. */}
-      {locked ? null : box.slideHandles.map((handle) => (
+      {/* The X and Y arrows (Discussion #1434) only move the selection; a locked one keeps still and shows none, and the settings can leave them out. */}
+      {locked || !showSlideArrows ? null : box.slideHandles.map((handle) => (
         <button
           key={handle.key}
           className={`slide-handle ${handle.className}`}
