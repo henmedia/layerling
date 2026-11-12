@@ -500,6 +500,7 @@ export const MESSAGES_RU: Partial<Record<MessageKey, string>> = {
   "confirm.emptyProjectBody": "Проект «{name}» пуст. Хотите сохранить его?",
   "confirm.yes": "Да",
   "confirm.no": "Нет",
+  "confirm.keep": "Оставить",
   "confirm.cancel": "Отмена",
   "confirm.delete": "Удалить",
   "sketch.revolvePreview": "3D-предпросмотр вращения",

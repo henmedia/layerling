@@ -497,6 +497,7 @@ export const MESSAGES_ZH_TW: Partial<Record<MessageKey, string>> = {
   "confirm.emptyProjectBody": "{name} 是空的。要保留嗎？",
   "confirm.yes": "是",
   "confirm.no": "否",
+  "confirm.keep": "保留",
   "confirm.cancel": "取消",
   "confirm.delete": "刪除",
   "sketch.revolvePreview": "旋轉 3D 預覽",

@@ -498,6 +498,7 @@ export const MESSAGES_NL: Record<MessageKey, string> = {
   "confirm.emptyProjectBody": "{name} is leeg. Wil je het bewaren?",
   "confirm.yes": "Ja",
   "confirm.no": "Nee",
+  "confirm.keep": "Bewaren",
   "confirm.cancel": "Annuleren",
   "confirm.delete": "Verwijderen",
   "sketch.revolvePreview": "3D-voorbeeld van de omwenteling",

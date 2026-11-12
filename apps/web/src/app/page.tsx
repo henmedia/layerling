@@ -3239,12 +3239,14 @@ export default function Home() {
             </header>
             <p>{t("confirm.emptyProjectBody", { name: emptyProjectPrompt.name })}</p>
             <div className="dashboard-confirm-actions">
-              <button className="dashboard-confirm-cancel" type="button" onClick={removeEmptyProject}>
-                {t("confirm.no")}
+              {/* The buttons say what they do: "No" to "Keep empty design?" was read in a hurry as "No, don't delete it"
+                  and took the design away (Discussion #1669). Delete in red, as the other deletes on the start page. */}
+              <button className="dashboard-confirm-delete" type="button" onClick={removeEmptyProject}>
+                {t("confirm.delete")}
               </button>
               {/* Focused, so Enter keeps the design. */}
               <button className="dashboard-confirm-save" type="button" autoFocus onClick={() => setEmptyProjectPromptId(null)}>
-                {t("confirm.yes")}
+                {t("confirm.keep")}
               </button>
             </div>
           </div>

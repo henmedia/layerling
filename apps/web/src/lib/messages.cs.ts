@@ -648,6 +648,7 @@ export const MESSAGES_CS: Record<MessageKey, string> = {
   "confirm.emptyProjectBody": "Projekt {name} je prázdný. Chcete jej ponechat?",
   "confirm.yes": "Ano",
   "confirm.no": "Ne",
+  "confirm.keep": "Ponechat",
   "confirm.cancel": "Zrušit",
   "confirm.delete": "Smazat",
   "sketch.revolvePreview": "3D náhled rotačního tělesa",

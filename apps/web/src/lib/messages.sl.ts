@@ -480,6 +480,7 @@ export const MESSAGES_SL: Partial<Record<MessageKey, string>> = {
   "confirm.emptyProjectBody": "{name} je prazen. Ga želiš obdržati?",
   "confirm.yes": "Da",
   "confirm.no": "Ne",
+  "confirm.keep": "Obdrži",
   "confirm.cancel": "Prekliči",
   "confirm.delete": "Izbriši",
   "sketch.revolvePreview": "3D predogled vrtenja",

@@ -499,6 +499,7 @@ export const MESSAGES_EN = {
   "confirm.emptyProjectBody": "{name} is empty. Do you want to keep it?",
   "confirm.yes": "Yes",
   "confirm.no": "No",
+  "confirm.keep": "Keep",
   "confirm.cancel": "Cancel",
   "confirm.delete": "Delete",
   "sketch.revolvePreview": "Revolve 3D preview",

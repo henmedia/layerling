@@ -1624,6 +1624,7 @@ export const MESSAGES_DA: Partial<Record<MessageKey, string>> = {
   "confirm.emptyProjectBody": "{name} er tomt. Vil du beholde det?",
   "confirm.yes": "Ja",
   "confirm.no": "Nej",
+  "confirm.keep": "Behold",
   "confirm.cancel": "Annullér",
   "confirm.delete": "Slet",
   "sketch.revolvePreview": "Revolver 3D-forhåndsvisning",

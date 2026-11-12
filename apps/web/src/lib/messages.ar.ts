@@ -497,6 +497,7 @@ export const MESSAGES_AR: Partial<Record<MessageKey, string>> = {
   "confirm.emptyProjectBody": "{name} فارغ. هل تريد الاحتفاظ به؟",
   "confirm.yes": "نعم",
   "confirm.no": "لا",
+  "confirm.keep": "الإبقاء",
   "confirm.cancel": "إلغاء",
   "confirm.delete": "حذف",
   "sketch.revolvePreview": "معاينة ثلاثية الأبعاد للدوران",

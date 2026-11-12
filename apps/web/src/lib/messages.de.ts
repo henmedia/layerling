@@ -498,6 +498,7 @@ export const MESSAGES_DE: Record<MessageKey, string> = {
   "confirm.emptyProjectBody": "{name} ist leer. Möchtest du ihn behalten?",
   "confirm.yes": "Ja",
   "confirm.no": "Nein",
+  "confirm.keep": "Behalten",
   "confirm.cancel": "Abbrechen",
   "confirm.delete": "Löschen",
   "sketch.revolvePreview": "3D-Vorschau der Drehung",

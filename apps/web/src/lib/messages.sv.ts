@@ -494,6 +494,7 @@ export const MESSAGES_SV: Partial<Record<MessageKey, string>> = {
   "confirm.emptyProjectBody": "{name} är tom. Vill du behålla den?",
   "confirm.yes": "Ja",
   "confirm.no": "Nej",
+  "confirm.keep": "Behåll",
   "confirm.cancel": "Avbryt",
   "confirm.delete": "Ta bort",
   "sketch.revolvePreview": "3D-förhandsgranskning av rotation",

@@ -501,6 +501,7 @@ export const MESSAGES_ES: Partial<Record<MessageKey, string>> = {
   "confirm.emptyProjectBody": "{name} está vacío. ¿Quieres conservarlo?",
   "confirm.yes": "Sí",
   "confirm.no": "No",
+  "confirm.keep": "Conservar",
   "confirm.cancel": "Cancelar",
   "confirm.delete": "Eliminar",
   "sketch.revolvePreview": "Vista previa 3D de la revolución",

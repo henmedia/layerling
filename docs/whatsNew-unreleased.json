@@ -61,5 +61,17 @@
       "da": "layerling er først og fremmest lavet til eksakte CAD-legemer. Mesh fra STL, OBJ eller 3MF virker også, og mindre dele er intet problem. Meget store mesh med hundredtusinder eller millioner af trekanter gør dog editoren langsom, optager meget hukommelse og gør gemning langsom.\n\nNår en import bringer et mesh på 400.000 trekanter eller flere ind, eller et designs mesh tilsammen når en million, siger layerling det nu én gang, med en knap til det nye afsnit i brugervejledningen. Forenkl mesh (højreklik på legemet) gør sådanne mesh lettere."
     },
     "guide": { "section": "largeMeshes" }
+  },
+  {
+    "title": {
+      "de": "Leerer Entwurf: Behalten oder Löschen",
+      "en": "Empty design: Keep or Delete",
+      "da": "Tomt design: Behold eller Slet"
+    },
+    "body": {
+      "de": "Verlässt man einen leeren Entwurf, fragte layerling „Leeren Entwurf behalten?“ mit Ja und Nein, und Nein löschte ihn sofort. In der Eile war das leicht falsch zu lesen. Jetzt sagen die Knöpfe, was sie tun: Behalten und Löschen, Löschen in Rot.",
+      "en": "When you left an empty design, layerling asked \"Keep empty design?\" with Yes and No, and No deleted it at once. In a hurry that was easy to misread. Now the buttons say what they do: Keep and Delete, with Delete in red.",
+      "da": "Når man forlod et tomt design, spurgte layerling \"Behold tomt design?\" med Ja og Nej, og Nej slettede det med det samme. I en fart var det let at læse forkert. Nu siger knapperne, hvad de gør: Behold og Slet, med Slet i rødt."
+    }
   }
 ]
