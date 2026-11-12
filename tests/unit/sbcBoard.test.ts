@@ -136,6 +136,16 @@ describe("SBC board data (#1098)", () => {
     for (const part of board.parts.filter((entry) => entry.y0 <= 0)) expect(sbcPartAtEdge(board, part)).toBe(true);
     expect(sbcPartAtEdge(board, board.parts.find((part) => part.name === "SoC")!)).toBe(false);
   });
+
+  it("puts the Raspberry Pi 4's and 3 B+'s USB blocks where the makers' drawings put their middles", () => {
+    const usbMiddles = (type: "pi4" | "pi3bPlus") =>
+      SBC_BOARDS[type].parts.filter((part) => part.profile === "usbA2").map((part) => ({ middle: (part.y0 + part.y1) / 2, width: part.y1 - part.y0 }));
+    for (const [type, middles] of [["pi4", [9, 27]], ["pi3bPlus", [29, 47]]] as const) {
+      const blocks = usbMiddles(type);
+      expect(blocks.map((block) => block.middle)).toEqual(middles.map((middle) => expect.closeTo(middle, 6)));
+      for (const block of blocks) expect(block.width).toBeCloseTo(13.14, 6);
+    }
+  });
 });
 
 describe("SBC board clearance", () => {
