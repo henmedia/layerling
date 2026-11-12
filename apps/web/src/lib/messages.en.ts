@@ -891,6 +891,8 @@ export const MESSAGES_EN = {
   "lid.wallBoth": "Lip and rim wall",
   "lid.threadPitch": "Thread pitch",
   "lid.threadTurns": "Turns",
+  "lid.threadOffset": "Thread offset",
+  "lid.threadOffsetHint": "How far below the rim the thread starts. At 0 it starts at the rim; more leaves a plain piece of the wall above it, and the cap's rim (or the plug) reaches down that much further.",
   "lid.screwHint": "The body gets a thread {depth} mm deep on the outside of its top, the cap the same one inside its rim, which reaches {height} mm down. The flanks are at 45°, so both print without support.",
   "lid.screwInHint": "The body gets a thread {depth} mm deep inside its opening, the lid the same one on a plug below its plate, which reaches {height} mm down. Where there is room, the plug is a ring with a {wall} mm wall. The flanks are at 45°, so both print without support.",
   "lid.screwThreadName": "{name} thread",

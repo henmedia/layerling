@@ -881,6 +881,8 @@ export const MESSAGES_FR: Partial<Record<MessageKey, string>> = {
   "lid.wallBoth": "Paroi de la lèvre et du rebord",
   "lid.threadPitch": "Pas du filetage",
   "lid.threadTurns": "Tours",
+  "lid.threadOffset": "Décalage du filetage",
+  "lid.threadOffsetHint": "À quelle distance sous le bord le filetage commence. À 0, il commence au bord ; plus, il laisse au-dessus un morceau de paroi lisse, et le rebord du couvercle (ou le bouchon) descend d'autant plus bas.",
   "lid.screwHint": "Le corps reçoit en haut, à l'extérieur, un filetage de {depth} mm de profondeur, le couvercle le même à l'intérieur de son rebord, qui descend de {height} mm. Les flancs sont à 45°, les deux s'impriment donc sans support.",
   "lid.screwInHint": "Le corps reçoit à l'intérieur de son ouverture un filetage de {depth} mm de profondeur, le couvercle le même sur un bouchon sous sa plaque, qui descend de {height} mm. Là où il y a la place, le bouchon est un anneau avec une paroi de {wall} mm. Les flancs sont à 45°, les deux s'impriment donc sans support.",
   "lid.screwThreadName": "{name} filetage",

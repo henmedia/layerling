@@ -175,6 +175,8 @@ export const MESSAGES_DA: Partial<Record<MessageKey, string>> = {
   "lid.wallBoth": "Læbens og kantens væg",
   "lid.threadPitch": "Gevindstigning",
   "lid.threadTurns": "Omgange",
+  "lid.threadOffset": "Gevind under kanten",
+  "lid.threadOffsetHint": "Hvor langt under kanten gevindet begynder. Ved 0 begynder det ved kanten; mere efterlader et glat stykke væg over det, og lågets kant (eller proppen) når lige så meget længere ned.",
   "lid.screwHint": "Legemet får et gevind på {depth} mm udvendigt foroven, låget det samme inden i kanten, der går {height} mm ned. Flankerne står i 45°, så begge printes uden support.",
   "lid.screwInHint": "Legemet får et gevind på {depth} mm inden i åbningen, låget det samme på en prop under pladen, der går {height} mm ned. Hvor der er plads, er proppen en ring med en væg på {wall} mm. Flankerne står i 45°, så begge printes uden support.",
   "lid.screwThreadName": "{name} gevind",

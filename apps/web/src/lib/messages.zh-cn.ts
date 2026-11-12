@@ -847,6 +847,8 @@ export const MESSAGES_ZH_CN: Partial<Record<MessageKey, string>> = {
   "lid.wallBoth": "唇边与扣沿壁厚",
   "lid.threadPitch": "螺距",
   "lid.threadTurns": "圈数",
+  "lid.threadOffset": "螺纹偏移",
+  "lid.threadOffsetHint": "螺纹从边沿向下多远处开始。为 0 时从边沿开始；更大时，上方留下一段光滑的壁，盖子边沿（或塞子）也向下多伸同样的长度。",
   "lid.screwHint": "实体顶部外侧会加上深 {depth} 毫米的螺纹，盖子边沿内侧是相同的螺纹，边沿向下伸 {height} 毫米。螺纹侧面呈 45°，两者都无需支撑即可打印。",
   "lid.screwInHint": "实体开口内侧会加上深 {depth} 毫米的螺纹，盖子板下的塞子上是相同的螺纹，塞子向下伸 {height} 毫米。空间足够时，塞子是壁厚 {wall} 毫米的圆环。螺纹侧面呈 45°，两者都无需支撑即可打印。",
   "lid.screwThreadName": "{name} 螺纹",

@@ -883,6 +883,8 @@ export const MESSAGES_IT: Partial<Record<MessageKey, string>> = {
   "lid.wallBoth": "Spessore della linguetta e del bordo",
   "lid.threadPitch": "Passo della filettatura",
   "lid.threadTurns": "Giri",
+  "lid.threadOffset": "Spostamento della filettatura",
+  "lid.threadOffsetHint": "A che distanza sotto il bordo inizia la filettatura. Con 0 parte dal bordo; di più lascia sopra un tratto liscio di parete, e il bordo del coperchio (o il tappo) scende di altrettanto.",
   "lid.screwHint": "Il corpo riceve in alto, all'esterno, una filettatura profonda {depth} mm, e il coperchio la stessa dentro il bordo, che scende di {height} mm. I fianchi sono inclinati di 45°, quindi entrambi si stampano senza supporti.",
   "lid.screwInHint": "Il corpo riceve all'interno dell'apertura una filettatura profonda {depth} mm, e il coperchio la stessa su un tappo sotto la piastra, che scende di {height} mm. Dove c'è spazio, il tappo è un anello con una parete di {wall} mm. I fianchi sono inclinati di 45°, quindi entrambi si stampano senza supporti.",
   "lid.screwThreadName": "{name} filettatura",

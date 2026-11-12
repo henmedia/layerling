@@ -885,6 +885,8 @@ export const MESSAGES_SV: Partial<Record<MessageKey, string>> = {
   "lid.wallBoth": "Läpp- och kantvägg",
   "lid.threadPitch": "Gängstigning",
   "lid.threadTurns": "Varv",
+  "lid.threadOffset": "Gängans avstånd från kanten",
+  "lid.threadOffsetHint": "Hur långt under kanten gängan börjar. Vid 0 börjar den vid kanten; mer lämnar ett slätt stycke vägg ovanför, och lockets sarg (eller tappen) når lika mycket längre ned.",
   "lid.screwHint": "Kroppen får en {depth} mm djup gänga på utsidan av toppen, och locket får samma gänga på insidan av sin kant, som når {height} mm ner. Flankerna lutar 45°, så båda skrivs ut utan stöd.",
   "lid.screwInHint": "Kroppen får en {depth} mm djup gänga på insidan av öppningen, och locket får samma gänga på en tapp under sin platta, som når {height} mm ner. Där det finns plats är tappen en ring med {wall} mm vägg. Flankerna lutar 45°, så båda skrivs ut utan stöd.",
   "lid.screwThreadName": "{name} gänga",

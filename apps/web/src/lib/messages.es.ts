@@ -893,6 +893,8 @@ export const MESSAGES_ES: Partial<Record<MessageKey, string>> = {
   "lid.wallBoth": "Pared de labio y borde",
   "lid.threadPitch": "Paso de rosca",
   "lid.threadTurns": "Vueltas",
+  "lid.threadOffset": "Desplazamiento de la rosca",
+  "lid.threadOffsetHint": "A qué distancia por debajo del borde empieza la rosca. Con 0 empieza en el borde; más deja arriba un trozo liso de pared, y el borde de la tapa (o el tapón) baja otro tanto.",
   "lid.screwHint": "El cuerpo recibe arriba, por fuera, una rosca de {depth} mm de profundidad, y la tapa la misma dentro de su borde, que baja {height} mm. Los flancos están a 45°, así que ambos se imprimen sin soportes.",
   "lid.screwInHint": "El cuerpo recibe dentro de su abertura una rosca de {depth} mm de profundidad, y la tapa la misma en un tapón bajo su placa, que baja {height} mm. Donde hay sitio, el tapón es un anillo con una pared de {wall} mm. Los flancos están a 45°, así que ambos se imprimen sin soportes.",
   "lid.screwThreadName": "{name} rosca",

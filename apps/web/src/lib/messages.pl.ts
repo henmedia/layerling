@@ -846,6 +846,8 @@ export const MESSAGES_PL: Partial<Record<MessageKey, string>> = {
   "lid.wallBoth": "Ścianka kołnierza i obrzeża",
   "lid.threadPitch": "Skok gwintu",
   "lid.threadTurns": "Obroty",
+  "lid.threadOffset": "Odsunięcie gwintu",
+  "lid.threadOffsetHint": "Jak nisko pod krawędzią zaczyna się gwint. Przy 0 zaczyna się przy krawędzi; więcej zostawia nad nim gładki kawałek ścianki, a obrzeże pokrywy (lub czop) sięga o tyle samo niżej.",
   "lid.screwHint": "Bryła dostaje u góry na zewnątrz gwint o głębokości {depth} mm, a pokrywka taki sam wewnątrz obrzeża, które sięga {height} mm w dół. Boki zwojów są nachylone pod kątem 45°, więc obie części drukują się bez podpór.",
   "lid.screwInHint": "Bryła dostaje wewnątrz otworu gwint o głębokości {depth} mm, a pokrywka taki sam na czopie pod płytką, który sięga {height} mm w dół. Tam, gdzie jest miejsce, czop jest pierścieniem ze ścianką {wall} mm. Boki zwojów są nachylone pod kątem 45°, więc obie części drukują się bez podpór.",
   "lid.screwThreadName": "{name} gwint",
