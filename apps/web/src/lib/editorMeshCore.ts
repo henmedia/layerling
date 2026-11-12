@@ -131,7 +131,33 @@ function sanitizeName(name: string) {
   return name.replace(/[^a-z0-9_-]+/gi, "_") || "shape";
 }
 
-export function transformMesh(mesh: MeshData, shape: WorkplaneShape): MeshData {
+/**
+ * The extent a taper or twist works over: its lowest and highest point and the middle it turns about. Left out, it is
+ * the mesh's own extent. One part of a group passes the group's, so it turns as it does inside the whole (#1648).
+ */
+export type DeformFrame = { minY: number; maxY: number; centerX: number; centerZ: number };
+
+/** The extent of a mesh as a taper or twist sees it, before transformMesh. */
+export function deformFrameOf(vertices: readonly Vec3[]): DeformFrame | undefined {
+  if (vertices.length === 0) return undefined;
+  let minY = Number.POSITIVE_INFINITY;
+  let maxY = Number.NEGATIVE_INFINITY;
+  let minX = Number.POSITIVE_INFINITY;
+  let maxX = Number.NEGATIVE_INFINITY;
+  let minZ = Number.POSITIVE_INFINITY;
+  let maxZ = Number.NEGATIVE_INFINITY;
+  vertices.forEach(([x, y, z]) => {
+    minY = Math.min(minY, y);
+    maxY = Math.max(maxY, y);
+    minX = Math.min(minX, x);
+    maxX = Math.max(maxX, x);
+    minZ = Math.min(minZ, z);
+    maxZ = Math.max(maxZ, z);
+  });
+  return { minY, maxY, centerX: (minX + maxX) / 2, centerZ: (minZ + maxZ) / 2 };
+}
+
+export function transformMesh(mesh: MeshData, shape: WorkplaneShape, frame?: DeformFrame): MeshData {
   const centerY = shape.height / 2;
   const tapered = shapeHasTaper(shape);
   const deformed = shapeHasExtrudeDeform(shape);
@@ -142,22 +168,11 @@ export function transformMesh(mesh: MeshData, shape: WorkplaneShape): MeshData {
   let deformCenterX = 0;
   let deformCenterZ = 0;
   if ((tapered || deformed) && mesh.vertices.length) {
-    minLocalY = Number.POSITIVE_INFINITY;
-    maxLocalY = Number.NEGATIVE_INFINITY;
-    let minX = Number.POSITIVE_INFINITY;
-    let maxX = Number.NEGATIVE_INFINITY;
-    let minZ = Number.POSITIVE_INFINITY;
-    let maxZ = Number.NEGATIVE_INFINITY;
-    mesh.vertices.forEach((vertex) => {
-      minLocalY = Math.min(minLocalY, vertex[1]);
-      maxLocalY = Math.max(maxLocalY, vertex[1]);
-      minX = Math.min(minX, vertex[0]);
-      maxX = Math.max(maxX, vertex[0]);
-      minZ = Math.min(minZ, vertex[2]);
-      maxZ = Math.max(maxZ, vertex[2]);
-    });
-    deformCenterX = (minX + maxX) / 2;
-    deformCenterZ = (minZ + maxZ) / 2;
+    const extent = frame ?? deformFrameOf(mesh.vertices as Vec3[])!;
+    minLocalY = extent.minY;
+    maxLocalY = extent.maxY;
+    deformCenterX = extent.centerX;
+    deformCenterZ = extent.centerZ;
     // A star turns about its own middle, not about the middle of its box (#476).
     if (deformsAboutOrigin(shape.kind)) {
       deformCenterX = 0;
@@ -813,21 +828,7 @@ export function meshForShape(shape: WorkplaneShape): MeshData {
   }
 
   if (shape.groupedShapes?.length) {
-    const vertices: Vec3[] = [];
-    const faces: [number, number, number][] = [];
-    const stretch = groupedContentScale(shape, localGroupBounds(shape.groupedShapes));
-    // A thread is not stretched with the group: it is built again at the size the stretch gives it, as Ungroup builds
-    // it, so its turns keep their shape instead of coming out squeezed or pulled (Discussion #1066).
-    const rebuilt: MeshData[] = [];
-    shape.groupedShapes.filter((child) => !child.hidden).forEach((child) => {
-      if (child.kind === "thread") rebuilt.push(meshForShape(groupedThreadAtStretch(child, stretch)));
-      else appendMeshData(vertices, faces, meshForShape(child));
-    });
-    // Without the stretch, split, export and alignment would see a resized
-    // group at the size it had when it was grouped.
-    const scaled = scaleGroupedVertices(vertices, stretch);
-    rebuilt.forEach((mesh) => appendMeshData(scaled, faces, mesh));
-    return transformMesh({ name: sanitizeName(shape.name), vertices: scaled, faces }, shape);
+    return transformMesh(groupedContentMesh(shape), shape);
   }
 
   const cached = cachedUnplacedMesh(shape);
@@ -847,6 +848,26 @@ export function meshForShape(shape: WorkplaneShape): MeshData {
             : boxMesh(shape));
   rememberUnplacedMesh(shape, raw);
   return transformMesh(raw, shape);
+}
+
+/** A group's parts in its own frame, stretched to its size, before its own taper, twist and placement (transformMesh). */
+export function groupedContentMesh(shape: WorkplaneShape): MeshData {
+  const vertices: Vec3[] = [];
+  const faces: [number, number, number][] = [];
+  const children = shape.groupedShapes ?? [];
+  const stretch = groupedContentScale(shape, localGroupBounds(children));
+  // A thread is not stretched with the group: it is built again at the size the stretch gives it, as Ungroup builds
+  // it, so its turns keep their shape instead of coming out squeezed or pulled (Discussion #1066).
+  const rebuilt: MeshData[] = [];
+  children.filter((child) => !child.hidden).forEach((child) => {
+    if (child.kind === "thread") rebuilt.push(meshForShape(groupedThreadAtStretch(child, stretch)));
+    else appendMeshData(vertices, faces, meshForShape(child));
+  });
+  // Without the stretch, split, export and alignment would see a resized
+  // group at the size it had when it was grouped.
+  const scaled = scaleGroupedVertices(vertices, stretch);
+  rebuilt.forEach((mesh) => appendMeshData(scaled, faces, mesh));
+  return { name: sanitizeName(shape.name), vertices: scaled, faces };
 }
 
 // Moving or turning a spring built it again from scratch, about 300 ms each time it was aligned,
