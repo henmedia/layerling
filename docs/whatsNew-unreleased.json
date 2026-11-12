@@ -1,6 +1,16 @@
 [
   {
     "title": {
+      "de": "Winkellineal im dunklen Farbschema gut lesbar",
+      "en": "Framing square easy to read in the dark themes"
+    },
+    "body": {
+      "de": "Im dunklen und im Graphit-Farbschema waren die braunen Arme, Teilstriche und Zahlen des Winkellineals auf dem Raster kaum zu sehen. Jetzt sind sie dort hell, in demselben Orange wie das Maßband.",
+      "en": "In the dark and graphite themes, the brown arms, ticks and numbers of the framing square were hard to see on the grid. Now they are light there, in the same orange as the tape measure."
+    }
+  },
+  {
+    "title": {
       "de": "Fokusmodus: der Name ist mit dabei",
       "en": "Focus mode: the name comes along"
     },
