@@ -23,5 +23,17 @@
       "en": "To switch it off, you hold the button for two seconds. On a touch screen the long press opened the browser's menu instead, and simple mode stayed on. Now the menu stays shut and the two seconds run through.",
       "da": "For at slå den fra holder man knappen nede i to sekunder. På en touchskærm åbnede det lange tryk i stedet browserens menu, og enkel tilstand forblev slået til. Nu forbliver menuen lukket, og de to sekunder løber igennem."
     }
+  },
+  {
+    "title": {
+      "de": "Drehen: der Zeiger der Skala beginnt auf null",
+      "en": "Turning: the dial's needle starts on zero",
+      "da": "Drejning: skalaens viser starter på nul"
+    },
+    "body": {
+      "de": "Griff man den Drehpfeil etwas neben der Mitte, stand der kleine Zeiger der Drehskala um genau so viel neben der Null, obwohl die Anzeige 0° sagte. Jetzt beginnt er immer auf der Null und zeigt auf den Strich, den die Anzeige nennt.",
+      "en": "When you grabbed the turning arrow a little beside its middle, the small needle on the dial started beside the zero by just as much, although the readout said 0°. Now it always starts on the zero and points at the tick the readout names.",
+      "da": "Når man greb drejepilen lidt ved siden af midten, startede den lille viser på skalaen lige så meget ved siden af nul, selv om visningen sagde 0°. Nu starter den altid på nul og peger på den streg, visningen nævner."
+    }
   }
 ]
