@@ -13,8 +13,10 @@
  * - Raspberry Pi 5: the official 3D model (RP-010083, "rpi-5 3D STEP - No Graphics", Raspberry Pi Ltd),
  *   each part's box read from it.
  * - Raspberry Pi 4 Model B: the mechanical drawing (RP-008342 DXF for places, RP-008343 PDF for the heights
- *   written on it, "Z=").
+ *   written on it, "Z="). Each USB block is its housing only (13.14 mm wide, its middle at 9 and 27 mm as the PDF
+ *   gives it), without the small tab that the DXF draws at one side of its front.
  * - Raspberry Pi 3 Model B+: the mechanical drawing (RP-008336 DXF for places, RP-008337 PDF for its "Z-Height").
+ *   The USB blocks as on the Pi 4: the housing only, its middle at 29 and 47 mm.
  * - Raspberry Pi Zero 2 W: the mechanical drawing (RP-008358), which gives the outline, the holes and the
  *   connectors' middles only; their widths are read off the drawing and their heights are estimated.
  * - BIGTREETECH Pi V1.2: the maker's own 3D model (BIGTREETECH_Pi_V1.2.step, github.com/bigtreetech/BTT-Pi).
@@ -288,8 +290,8 @@ export const SBC_BOARDS: Record<SbcBoardType, SbcBoard> = {
       { name: "micro-HDMI 1", x0: 35.9, x1: 43.1, y0: -1.43, y1: 6.52, height: 3.0, kind: "connector", profile: "microHdmi" },
       { name: "camera", x0: 45.05, x1: 49.0, y0: 0.3, y1: 22.7, height: 5.5, kind: "header", ribbon: true, ribbonExit: "left" },
       { name: "audio/video jack", x0: 50.5, x1: 57.5, y0: -2.5, y1: 12.5, height: 6.0, kind: "connector", profile: "audio" },
-      { name: "USB 2.0", x0: 70.3, x1: 88.0, y0: 1.65, y1: 15.57, height: 16.0, kind: "connector", profile: "usbA2" },
-      { name: "USB 3.0", x0: 70.5, x1: 88.0, y0: 20.43, y1: 34.25, height: 16.0, kind: "connector", profile: "usbA2" },
+      { name: "USB 2.0", x0: 70.3, x1: 88.0, y0: 2.43, y1: 15.57, height: 16.0, kind: "connector", profile: "usbA2" },
+      { name: "USB 3.0", x0: 70.5, x1: 88.0, y0: 20.43, y1: 33.57, height: 16.0, kind: "connector", profile: "usbA2" },
       { name: "Ethernet", x0: 66.65, x1: 88.0, y0: 37.99, y1: 53.51, height: 13.5, kind: "connector", profile: "rj45" },
       { name: "display", x0: 1.5, x1: 5.45, y0: 16.8, y1: 39.2, height: 5.5, kind: "header", ribbon: true },
       { name: "GPIO header", x0: 7.1, x1: 57.9, y0: 50.0, y1: 55.0, height: 8.5, kind: "header", pins: [20, 2], gpio: true },
@@ -318,8 +320,8 @@ export const SBC_BOARDS: Record<SbcBoardType, SbcBoard> = {
       { name: "camera", x0: 43.55, x1: 47.5, y0: 0.3, y1: 22.7, height: 5.5, kind: "header", ribbon: true, ribbonExit: "left" },
       { name: "audio/video jack", x0: 50.0, x1: 57.0, y0: -2.5, y1: 12.5, height: 6.0, kind: "connector", profile: "audio" },
       { name: "Ethernet", x0: 65.65, x1: 87.0, y0: 2.5, y1: 18.0, height: 13.5, kind: "connector", profile: "rj45" },
-      { name: "USB 2.0 (middle)", x0: 69.3, x1: 87.0, y0: 21.65, y1: 35.57, height: 16.0, kind: "connector", profile: "usbA2" },
-      { name: "USB 2.0 (back)", x0: 69.3, x1: 87.0, y0: 39.65, y1: 53.57, height: 16.0, kind: "connector", profile: "usbA2" },
+      { name: "USB 2.0 (middle)", x0: 69.3, x1: 87.0, y0: 22.43, y1: 35.57, height: 16.0, kind: "connector", profile: "usbA2" },
+      { name: "USB 2.0 (back)", x0: 69.3, x1: 87.0, y0: 40.43, y1: 53.57, height: 16.0, kind: "connector", profile: "usbA2" },
       { name: "display", x0: 1.5, x1: 5.45, y0: 16.8, y1: 39.2, height: 5.5, kind: "header", ribbon: true },
       { name: "GPIO header", x0: 7.1, x1: 57.9, y0: 50.0, y1: 55.0, height: 8.5, kind: "header", pins: [20, 2], gpio: true },
       { name: "microSD card slot", x0: -2.27, x1: 13.13, y0: 22.11, y1: 34.1, height: 1.4, kind: "connector", underside: true, estimated: true },
