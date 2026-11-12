@@ -6,9 +6,9 @@
       "da": "Forsænkning: længde under hovedet"
     },
     "body": {
-      "de": "Zylinderkopfschrauben werden nach der Länge unter dem Kopf verkauft. Die Stufenbohrung hat dafür jetzt das Feld „Länge unter dem Kopf“: Trag die Schraubenlänge ein, und die Kopftiefe kommt für die Gesamtlänge dazu. Eine M3 × 12 ergibt so ein Loch von 15,2 mm.",
-      "en": "Socket head cap screws are sold by the length under the head. The counterbore now has the field \"Length below head\" for it: enter the screw's length, and the head depth is added for the total length. An M3 × 12 makes a hole 15.2 mm long.",
-      "da": "Skruer med cylinderhoved sælges efter længden under hovedet. Forsænkningen har nu feltet \"Længde under hovedet\" til det: skriv skruens længde, så lægges hoveddybden til for den totale længde. En M3 × 12 giver et hul på 15,2 mm."
+      "de": "Zylinderkopfschrauben werden nach der Länge unter dem Kopf verkauft. Die Stufenbohrung hat dafür jetzt das Feld „Länge unter dem Kopf“: Trag die Schraubenlänge ein, und die Kopftiefe kommt für die Gesamtlänge dazu. Bei 3,2 mm Kopftiefe ergibt eine M3 × 12 so ein Loch von 15,2 mm.",
+      "en": "Socket head cap screws are sold by the length under the head. The counterbore now has the field \"Length below head\" for it: enter the screw's length, and the head depth is added for the total length. With a head depth of 3.2 mm, an M3 × 12 makes a hole 15.2 mm long.",
+      "da": "Skruer med cylinderhoved sælges efter længden under hovedet. Forsænkningen har nu feltet \"Længde under hovedet\" til det: skriv skruens længde, så lægges hoveddybden til for den totale længde. Med en hoveddybde på 3,2 mm giver en M3 × 12 et hul på 15,2 mm."
     },
     "guide": { "section": "screwHoles" }
   }
