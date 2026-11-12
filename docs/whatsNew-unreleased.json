@@ -1,14 +1,1 @@
-[
-  {
-    "title": {
-      "de": "Nicht gespeichert: mit Grund, und Neu laden wartet",
-      "en": "Not saved: with the reason, and reloading waits",
-      "da": "Ikke gemt: med årsagen, og genindlæsning venter"
-    },
-    "body": {
-      "de": "Kann der Browser einen Entwurf nicht speichern, nennt die rote Meldung jetzt immer den Grund, und darunter in einer kleinen Zeile, was der Browser selbst sagt: den Fehler, wie voll sein Speicher für layerling ist und ob ein kleiner Probeschreibvorgang durchgeht. Ein Bildschirmfoto davon zeigt, warum es klemmt. Dieselbe Zeile steht in der Konsole und im Fehlerbericht.\n\n„Speichern und neu laden“ im Update-Hinweis wartet jetzt, bis gespeichert ist. Konnte der offene Entwurf nicht gespeichert werden, lädt es nicht neu, sondern sagt es dir; sichere dann zuerst eine Kopie mit Exportieren → LYL.",
-      "en": "When the browser cannot save a design, the red note now always gives the reason, and below it, in a small line, what the browser itself says: the error, how full its storage for layerling is and whether a tiny test write gets through. A screenshot of it shows why saving is stuck. The same line is in the console and in the bug report.\n\n\"Save and reload\" in the update notice now waits until the design is saved. If the open design could not be saved, it does not reload but tells you; keep a copy with Export → LYL first.",
-      "da": "Når browseren ikke kan gemme et design, angiver den røde besked nu altid årsagen, og under den, i en lille linje, hvad browseren selv siger: fejlen, hvor fuldt dens lager til layerling er, og om en lille testskrivning går igennem. Et skærmbillede af den viser, hvorfor det hænger. Den samme linje står i konsollen og i fejlrapporten.\n\n\"Gem og genindlæs\" i opdateringsbeskeden venter nu, til designet er gemt. Kunne det åbne design ikke gemmes, genindlæser den ikke, men siger det til dig; gem først en kopi med Eksportér → LYL."
-    }
-  }
-]
+[]
