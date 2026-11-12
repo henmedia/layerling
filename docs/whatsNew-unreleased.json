@@ -1,6 +1,16 @@
 [
   {
     "title": {
+      "de": "Geschrägte Rohre: die Bohrung folgt der Schräge",
+      "en": "Sloped tubes: the bore follows the slope"
+    },
+    "body": {
+      "de": "Zwei Rohre mit einer Schräge entlang, zu einer Ecke zusammengesetzt, trafen sich außen sauber, innen stand aber ein Keil quer in der Ecke. Ist „Bohrung schneidet beim Gruppieren wie ein Loch“ an, läuft die Bohrung jetzt in derselben Ebene wie das Rohr, und die Ecke ist auch innen offen.",
+      "en": "Two tubes with a slope along, put together into a corner, met cleanly outside, but inside a wedge stood across the corner. With \"Bore cuts as a hole when grouped\" on, the bore now runs in the same plane as the tube, and the corner is open inside too."
+    }
+  },
+  {
+    "title": {
       "de": "Duplizieren: wieder eine schlichte Kopie",
       "en": "Duplicate: a plain copy again"
     },

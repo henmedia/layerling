@@ -2939,7 +2939,9 @@ export function splitBoreTube(shape: WorkplaneShape): WorkplaneShape[] {
   const { tubeBoreHole: _flag, bevel: _wall, ...rest } = shape;
   return [
     { ...rest, kind: "cylinder", bevel: 0 },
-    { ...rest, id: derivedLocalId(shape.id, "bore"), kind: "cylinder", hole: true, bevel: 0, width, depth, size: Math.max(width, depth) },
+    // The bore's slope and side drop are measured over the tube, so its top lies on the tube's (#1698): measured over its
+    // own, narrower width it ran down more steeply, stood out past the sloped end on one side and stopped short on the other.
+    { ...rest, id: derivedLocalId(shape.id, "bore"), kind: "cylinder", hole: true, bevel: 0, width, depth, size: Math.max(width, depth), slopeSpan: { width: shape.width, depth: shape.depth ?? shape.width } },
   ];
 }
 

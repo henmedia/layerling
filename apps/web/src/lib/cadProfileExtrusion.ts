@@ -8,7 +8,7 @@ import { profileArcPoint, profileLoopBounds, TWIST_SECTION_STEP, validateCadProf
 import { cadTransformFromMatrix } from "@/lib/cadBakeMetadata";
 import { CAD_MODIFIER_EXACT_SEGMENT_LIMIT } from "@/lib/cadModifierRuntime";
 import { deformsAboutOrigin, extrudeTwistPivot, meshYawDegrees, mirrorSign, shapeDepth, shapeHasExtrudeDeform, shapeHasShapeDeform, shapeHasTaper, shapeTaperDimensions, shapeWidth } from "@/lib/workplaneShapes";
-import { alongLevels, LYING_ALONG_KINDS, narrowCurveForShape, narrowHalfWidthAt, normalizeSlopeSide, shapeHasAlongDeform, shapeHasNarrow, shapeHasSymmetricDeform, shapeHasSlope, slopeAlongWidth, slopeCurveForShape, slopeScaleAt, slopeSectionCount } from "@/lib/slopeAlong";
+import { alongLevels, LYING_ALONG_KINDS, narrowCurveForShape, narrowHalfWidthAt, normalizeSlopeSide, shapeHasAlongDeform, shapeHasNarrow, shapeHasSymmetricDeform, shapeHasSlope, slopeAlongWidth, slopeCurveForShape, slopeLengths, slopeScaleAt, slopeSectionCount } from "@/lib/slopeAlong";
 import { regularPolygonFootprintScale } from "@/lib/regularPolygonFootprint";
 import { roundSideCount } from "@/lib/roundSideCount";
 import { drawnRound, ROUND_FROM_BENT_TUBE_QUALITY, ROUND_FROM_HALF_SPHERE_STEPS, ROUND_FROM_ROOF_SIDES, ROUND_FROM_SIDES, ROUND_FROM_SPHERE_STEPS } from "@/lib/roundness";
@@ -1447,7 +1447,8 @@ function trimmedUprightProfile(shape: WorkplaneShape, width: number, depth: numb
     if (topRound > 1e-4 || bottomRound > 1e-4) return null;
   }
   const alongWidth = slopeAlongWidth(side);
-  const half = (alongWidth ? width : depth) / 2;
+  // A tube's bore split off as a hole is trimmed by the tube's top line, which runs on past it at both ends (#1698).
+  const half = Math.max(alongWidth ? width : depth, slopeLengths(shape, alongWidth).span) / 2;
   const keepAt = keptEndAt(side, half);
   const farAt = -keepAt;
   const outward = Math.sign(farAt - keepAt);

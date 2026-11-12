@@ -1098,6 +1098,11 @@ export type WorkplaneShape = {
   /** Side drop: -1 to 1, 0 a straight line from the middle to the edge, above 0 bulging up, below 0 sagging. */
   sideCurve?: number;
   /**
+   * Only on a tube's bore split off as a hole (splitBoreTube), never saved: the width and depth of the
+   * tube around it. Its slope and side drop are measured over the tube, so its top lies on the tube's (#1698).
+   */
+  slopeSpan?: { width: number; depth: number };
+  /**
    * Narrow along: seen from above, the width of the narrow end in mm,
    * both long sides running in evenly. Missing or the full width means no narrowing.
    */
