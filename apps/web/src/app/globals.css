@@ -2071,6 +2071,38 @@ html[data-theme="dark"] .whats-new-earlier:hover {
   background: #3a2c16;
 }
 
+/* An announcement from the author (announcements.json): the whole text, paragraphs and points, read like a letter. */
+.announcement {
+  /* Opened again from the footer, it scrolls up to just below the sticky top bar. */
+  scroll-margin-top: 86px;
+}
+
+.announcement-body p {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.55;
+}
+
+.announcement-body ul {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+  padding-inline-start: 20px;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.5;
+  list-style: disc;
+}
+
+.announcement-body li::marker {
+  color: #bf6508;
+}
+
+html[data-theme="dark"] .announcement-body li::marker {
+  color: #f3a452;
+}
+
 .dashboard-action-tile {
   display: flex;
   min-width: 0;
@@ -17457,6 +17489,7 @@ html[data-theme="dark"] .interactive-help-window a:not(.primary):not(.secondary)
 .dashboard-welcome-switch a,
 .dashboard-welcome-videos a,
 .whats-new-note a,
+.announcement-body a,
 .guide-videos a,
 .interactive-help-more a {
   color: #8f4700;
@@ -17469,6 +17502,7 @@ html[data-theme="dark"] .interactive-help-window a:not(.primary):not(.secondary)
 .dashboard-welcome-switch a:hover,
 .dashboard-welcome-videos a:hover,
 .whats-new-note a:hover,
+.announcement-body a:hover,
 .guide-videos a:hover,
 .interactive-help-more a:hover {
   color: #ad6206;
@@ -17478,6 +17512,7 @@ html[data-theme="dark"] .interactive-help-window a:not(.primary):not(.secondary)
 .dashboard-welcome-switch a[target="_blank"]::after,
 .dashboard-welcome-videos a[target="_blank"]::after,
 .whats-new-note a[target="_blank"]::after,
+.announcement-body a[target="_blank"]::after,
 .guide-videos a[target="_blank"]::after,
 .interactive-help-more a[target="_blank"]::after {
   content: "\00a0\2197\FE0E";
@@ -17489,6 +17524,7 @@ html[data-theme="dark"] .interactive-help-window a:not(.primary):not(.secondary)
 html[data-theme="dark"] .dashboard-welcome-switch a,
 html[data-theme="dark"] .dashboard-welcome-videos a,
 html[data-theme="dark"] .whats-new-note a,
+html[data-theme="dark"] .announcement-body a,
 html[data-theme="dark"] .guide-videos a,
 html[data-theme="dark"] .interactive-help-more a {
   color: #f3a452;
@@ -17497,6 +17533,7 @@ html[data-theme="dark"] .interactive-help-more a {
 html[data-theme="dark"] .dashboard-welcome-switch a:hover,
 html[data-theme="dark"] .dashboard-welcome-videos a:hover,
 html[data-theme="dark"] .whats-new-note a:hover,
+html[data-theme="dark"] .announcement-body a:hover,
 html[data-theme="dark"] .guide-videos a:hover,
 html[data-theme="dark"] .interactive-help-more a:hover {
   color: #ffc784;
