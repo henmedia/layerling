@@ -348,7 +348,6 @@ export const LANGUAGE_INFO: Readonly<Record<Language, LanguageInfo>> = {
     },
   },
   // Polish: added as a language that is fetched when chosen, not complete yet (missing sentences show in English).
-  // The README and the guide stay English until they are translated, so readme and quickstartAnchor point at the English ones.
   pl: {
     name: "Polski",
     htmlLang: "pl",
@@ -357,8 +356,8 @@ export const LANGUAGE_INFO: Readonly<Record<Language, LanguageInfo>> = {
     quotes: ["„", "”"],
     guideDir: "instrukcja",
     communityUrl: GITHUB_DISCUSSIONS,
-    readme: "README.md",
-    quickstartAnchor: "windows-quickstart",
+    readme: "README.pl.md",
+    quickstartAnchor: "szybki-start-w-windows",
     legal: { imprint: "Nota prawna", privacy: "Polityka prywatności" },
     // Polish keyboards label most keys in English; only the mouse actions get Polish names.
     keyNames: { Click: "Klik", RightClick: "Prawy klik", MiddleClick: "Środkowy klik", Drag: "Przeciągnij" },

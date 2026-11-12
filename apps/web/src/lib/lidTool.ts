@@ -95,13 +95,15 @@ export type LidTopEdge = "square" | "round" | "chamfer";
  * With `clickBumps`, bumps on the lip or rim and dimples for them in the body, so the lid clicks into place, each reaching
  * `clickBumpHeight` into the body's wall past the gap; `handle` a pull tab or a finger notch.
  * A screw lid's thread climbs `threadPitch` mm a turn and goes `threadTurns` times round: that is how far its cap's rim
- * reaches down. The gap is then the thread's room per side, measured across the radius as a nut's clearance is (on the
+ * reaches down. With a `threadOffset` above 0 the own thread starts that many mm lower (Discussion #1594): the wall stands
+ * plain above it, and the cap's rim reaches down the offset further, as far as the thread's end. The gap is then the
+ * thread's room per side, measured across the radius as a nut's clearance is (on the
  * 45 degree flanks that leaves about 0.7 of it), and the wall what the cap's rim keeps outside the thread. With a
  * `threadStandard` other than `own`, the thread is that standard's and pitch and turns do not count; the gap is then the
  * room all round the thread, square to its faces as well, and the body gets the thread only if its top is that
- * standard's neck (`lidNeckFit`): otherwise the cap is made alone.
- * lid takes the same thread, on a plug that reaches as far down into the opening; its wall is the plug's, inside its
- * thread, SCREW_MIN_WALL at least.
+ * standard's neck (`lidNeckFit`): otherwise the cap is made alone. A standard's thread has its place on its neck, so
+ * `threadOffset` does not count with it. The screw-in lid takes the same thread, on a plug that reaches as far down
+ * into the opening, the offset included; its wall is the plug's, inside its thread, SCREW_MIN_WALL at least.
  * A bayonet lid has `bayonetLugs` lugs round the body's top, and its cap's rim reaches `bayonetDepth` down. The gap is the
  * room per side across the radius, round the lugs and along the body's wall; `bayonetAxialGap` is the room along the
  * axis between the lugs' undersides and the ledge of the cap under them, how far the locked cap lifts before it holds;
@@ -145,6 +147,7 @@ export type LidOptions = {
   handle: LidHandle;
   threadPitch: number;
   threadTurns: number;
+  threadOffset: number;
   threadStandard: LidThreadStandard;
   bayonetLugs: number;
   bayonetDepth: number;
@@ -164,7 +167,7 @@ export const LID_TYPES: readonly LidType[] = ["plug", "cap", "both", "flat", "sc
 export const LID_DEFAULTS: LidOptions = {
   type: "plug", thickness: 2, gap: 0.2, depth: 4, wall: 1.6, magnets: false, magnetDiameter: 6, magnetHeight: 2, magnetGap: 0.1,
   hinge: false, hingePin: 1.75, hingeGap: 0.3, hingePinPlay: 0.2, hingeKnuckles: 0, hingePrintPin: false, hingeSide: "back", hingeTeardrop: true, hingeStyle: "outside", hingeEndPlugs: false,
-  clickBumps: false, clickBumpHeight: 0.4, handle: "none", threadPitch: 3, threadTurns: 2, threadStandard: "own",
+  clickBumps: false, clickBumpHeight: 0.4, handle: "none", threadPitch: 3, threadTurns: 2, threadOffset: 0, threadStandard: "own",
   bayonetLugs: 3, bayonetDepth: 8, bayonetAxialGap: 0.3, bayonetDetent: 0.3, bayonetTurn: 0, tether: false,
   flipTop: false, flipTopOpening: 8, topEdge: "square", topEdgeSize: 1, slideSide: "front", slideFrame: 0,
 };
@@ -314,6 +317,12 @@ export const MAX_LID_THREAD_PITCH = 8;
 /** How many times a screw lid's thread goes round; two to begin with, enough for a cap that stays on. */
 export const MIN_LID_THREAD_TURNS = 1;
 export const MAX_LID_THREAD_TURNS = 8;
+/**
+ * How far below the rim a screw lid's own thread may start, in mm (Discussion #1594): 0 to begin with, the thread
+ * beginning at the top as it always has. A plain piece of the wall stands above it and the cap's rim is that much longer.
+ */
+export const MIN_LID_THREAD_OFFSET = 0;
+export const MAX_LID_THREAD_OFFSET = 20;
 /** The deepest a screw lid's thread gets, in mm, however coarse its pitch: the vase's screw lid's limit too. */
 const MAX_THREAD_DEPTH = 1.5;
 /**
@@ -719,6 +728,8 @@ export function normalizeLidOptions(value?: Partial<Record<keyof LidOptions, unk
   if (threadPitch !== null) result.threadPitch = clamp(threadPitch, MIN_LID_THREAD_PITCH, MAX_LID_THREAD_PITCH);
   const threadTurns = finiteNumber(value?.threadTurns);
   if (threadTurns !== null) result.threadTurns = clamp(threadTurns, MIN_LID_THREAD_TURNS, MAX_LID_THREAD_TURNS);
+  const threadOffset = finiteNumber(value?.threadOffset);
+  if (threadOffset !== null) result.threadOffset = clamp(threadOffset, MIN_LID_THREAD_OFFSET, MAX_LID_THREAD_OFFSET);
   // Written as the standard is ("PCO 1881", "GL45", "mason-70") or as the list has it.
   const threadStandard = typeof value?.threadStandard === "string" ? value.threadStandard.toLowerCase().replace(/[\s_-]+/g, "") : "";
   if ((LID_THREAD_STANDARDS as readonly string[]).includes(threadStandard)) result.threadStandard = threadStandard as LidThreadStandard;
@@ -1585,7 +1596,8 @@ export type ScrewPlan = {
   reach: number;
   /**
    * Where the thread on the body starts and ends. The own thread's start is the height the cap's rim reaches down to
-   * when screwed on, its end just below the rim; a standard's lies where the standard has it on its neck.
+   * when screwed on, its end just below the rim, or `threadOffset` further down (Discussion #1594); a standard's lies
+   * where the standard has it on its neck.
    */
   from: number;
   to: number;
@@ -1628,8 +1640,9 @@ export type ScrewPlan = {
  * a box, an oval or a pot that tapers there is refused. The thread is added to the outside of the wall, not cut into it,
  * so the wall keeps its strength and a thin one takes a thread too; it reaches SCREW_REACH into the wall (half the wall at
  * most), which must be SCREW_MIN_WALL thick where it is thinnest: from the farthest point of an opening to the nearest of
- * the outline. Below the thread, SCREW_FLOOR of the body stays. The gap may be at most half the thread's depth, so the
- * threads still overlap by as much as they keep apart. With a standard's thread, see `standardScrewPlan`.
+ * the outline. Below the thread, SCREW_FLOOR of the body stays. With a `threadOffset` the thread and the cap's rim both
+ * reach that much further down (Discussion #1594): the body must be round that far, and have that much more height.
+ * The gap may be at most half the thread's depth, so the threads still overlap by as much as they keep apart. With a standard's thread, see `standardScrewPlan`.
  * A rim rounded or chamfered, outside, inside or both, is no circle as large as the wall below it (Discussion #1426): a
  * vessel revolved from a stroke with round ends has one. Then the thread goes on the straight wall below the rounding,
  * as it would below a square rim there (`roundWall`), and the cap reaches over the rounding, its plate on the top.
@@ -1638,14 +1651,16 @@ export function screwPlan(sliceAt: LidSlicer, options: LidOptions, top: number, 
   if (options.threadStandard !== "own") return standardScrewPlan(sliceAt, options, options.threadStandard, top, bottom, rim);
   const thread = lidThread(options);
   if (options.gap > thread.depth / 2 + 1e-9) return { error: { code: "screwGapDeep", gap: Math.floor((thread.depth / 2) * 100 + 1e-6) / 100 } };
-  const height = Math.round(thread.height * 10) / 10;
-  if (top - thread.height < bottom + SCREW_FLOOR) return { error: { code: "screwTooLow", height } };
-  const found = roundWall(sliceAt, top, rim, thread.height, bottom + SCREW_FLOOR, SCREW_MIN_WALL);
+  // How far the cap's rim reaches down from the top of the wall: the plain piece above the thread and the thread.
+  const reach = options.threadOffset + thread.height;
+  const height = Math.round(reach * 10) / 10;
+  if (top - reach < bottom + SCREW_FLOOR) return { error: { code: "screwTooLow", height } };
+  const found = roundWall(sliceAt, top, rim, reach, bottom + SCREW_FLOOR, SCREW_MIN_WALL);
   if ("error" in found) return { error: found.error === "notRound" ? { code: "screwNotRound" } : found.error === "thinWall" ? { code: "screwThinWall" } : { code: "screwRimRound", height } };
   const { centre, radius, inner, wall } = found.body;
   return {
-    centre, radius, inner, reach: Math.min(SCREW_REACH, wall / 2), from: found.wallTop - thread.height, to: found.wallTop - SCREW_TOP_INSET, wallTop: found.wallTop,
-    pitch: thread.pitch, turns: options.threadTurns, depth: thread.depth, crest: thread.crest, slope: 1, base: radius, mouth: found.wallTop - thread.height, clear: radius + options.gap, widen: 0,
+    centre, radius, inner, reach: Math.min(SCREW_REACH, wall / 2), from: found.wallTop - reach, to: found.wallTop - options.threadOffset - SCREW_TOP_INSET, wallTop: found.wallTop,
+    pitch: thread.pitch, turns: options.threadTurns, depth: thread.depth, crest: thread.crest, slope: 1, base: radius, mouth: found.wallTop - reach, clear: radius + options.gap, widen: 0,
     capRadius: radius + options.gap + thread.depth + options.wall, standard: "own", neck: null,
   };
 }
@@ -1739,8 +1754,9 @@ export type ScrewInPlan = {
   openingFar: number;
   /** How far the thread in the body reaches into its wall, from `openingFar`. */
   reach: number;
-  /** Where the thread starts: the height the plug's end reaches down to when screwed in. */
+  /** Where the thread starts and ends: the height the plug's end reaches down to when screwed in, and just below where the thread stops, `threadOffset` under the rim. */
   from: number;
+  to: number;
   pitch: number;
   depth: number;
   crest: number;
@@ -1766,8 +1782,8 @@ export type ScrewInPlan = {
 export function screwInPlan(sliceAt: LidSlicer, options: LidOptions, top: number, bottom: number, rim: number): ScrewInPlan | { error: LidError } {
   const thread = lidThread(options);
   if (options.gap > thread.depth / 2 + 1e-9) return { error: { code: "screwGapDeep", gap: Math.floor((thread.depth / 2) * 100 + 1e-6) / 100 } };
-  const from = top - thread.height;
-  const height = Math.round(thread.height * 10) / 10;
+  const from = top - options.threadOffset - thread.height;
+  const height = Math.round((options.threadOffset + thread.height) * 10) / 10;
   if (from < bottom + SCREW_FLOOR) return { error: { code: "screwTooLow", height } };
   const body = roundBody(sliceAt, rim, from + 0.05);
   if (!body) return { error: { code: "screwInNotRound" } };
@@ -1783,7 +1799,7 @@ export function screwInPlan(sliceAt: LidSlicer, options: LidOptions, top: number
   }
   const hole = root - Math.max(options.wall, SCREW_MIN_WALL);
   return {
-    centre: body.centre, radius: body.radius, opening, openingFar: body.hole.radius, reach: Math.min(SCREW_REACH, body.wall / 2), from,
+    centre: body.centre, radius: body.radius, opening, openingFar: body.hole.radius, reach: Math.min(SCREW_REACH, body.wall / 2), from, to: top - options.threadOffset - SCREW_TOP_INSET,
     pitch: thread.pitch, depth: thread.depth, crest: thread.crest, plugRadius, holeRadius: 2 * hole >= SCREW_IN_MIN_HOLE - 1e-9 ? hole : 0,
   };
 }
@@ -2406,7 +2422,8 @@ function rowsFrom(low: number, high: number, step: number) {
  * - The thread on the body is a ring reaching `reach` into the wall, to be grouped with it. Its crest stands the depth
  *   out from the body's outer face; its flanks run at 45 degrees on down to its root, a hair inside that face, so no face
  *   of it lies on the body's. At both ends it is cut back at 45 degrees from the root, so it begins and ends gently and
- *   prints upright without support; at the top it stays SCREW_TOP_INSET below the rim, inside the wall: below where a
+ *   prints upright without support; at the top it stays SCREW_TOP_INSET below the rim, inside the wall (`threadOffset`
+ *   further down, the wall plain above it, and the cap's rim as much longer): below where a
  *   rounded rim's rounding begins (`wallTop`), so it stands on the straight wall.
  * - The cap is the plate on the rim and a rim reaching down to where the thread starts, its inside the body's thread
  *   moved the gap further out all round, so the two never meet, its outside the wall further out. Its mouth widens at 45
@@ -2558,7 +2575,7 @@ function standardScrewSolids(runtime: ManifoldToplevel, plan: ScrewPlan, options
  *   body. Its crest stands the depth in from the opening's face; its flanks run at 45 degrees on out to its root, a hair
  *   inside the wall, so no face of it lies on the opening's. At both ends it is cut back at 45 degrees towards the root,
  *   so it begins and ends gently and the body prints upright without support, the thread's undersides sloping at 45
- *   degrees; at the top it stays SCREW_TOP_INSET below the rim.
+ *   degrees; at the top it stays SCREW_TOP_INSET below the rim, `threadOffset` further down if that is set.
  * - The lid is a plate as large as the body, lying on the rim, and a plug below it down to where the thread starts, its
  *   outside the body's thread moved the gap further in all round, so the two never meet: a nut's bolt. Its end narrows
  *   at 45 degrees to clear the thread's crest, so it finds the thread. It is a ring with a hole up to the plate, or
@@ -2576,7 +2593,7 @@ function screwInSolids(runtime: ManifoldToplevel, plan: ScrewInPlan, options: Li
     return plan.depth - Math.max(0, along - plan.crest / 2);
   };
   const root = plan.openingFar + SCREW_ROOT_INSET;
-  const to = top - SCREW_TOP_INSET;
+  const to = plan.to;
   const thread = roundMesh(runtime, plan.centre, sides, { rows: [plan.from, to], radius: () => plan.openingFar + plan.reach }, {
     rows: rowsFrom(plan.from, to, step),
     radius: (angle, z) => Math.min(root, Math.max(plan.opening - crestHeight(angle, z), root - (z - plan.from), root - (to - z))),

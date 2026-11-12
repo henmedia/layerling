@@ -123,4 +123,42 @@ describe("picking faces in the surface texture card", () => {
   it("still leaves it out for a text, which goes where it is put", () => {
     expect(pickButton({ pattern: "text" })).toBeNull();
   });
+
+  // Discussion #1607: the picked faces can be lit for a look, without picking, and the button leaves with the faces.
+  const showButton = (container: HTMLElement) => Array.from(container.querySelectorAll("button")).find((button) => /picked faces$/.test(button.textContent?.trim() ?? "") && button.textContent?.trim() !== "Pick faces") ?? null;
+  const renderCard = (texture: Record<string, unknown>, facesShown: boolean, onFacePick: (...args: unknown[]) => void) => {
+    const textured = { ...cylinder, surfaceTexture: normalizeSurfaceTexture(texture) } as WorkplaneShape;
+    const card = (shape: WorkplaneShape) => createElement(SurfaceTextureCard, {
+      shape, workspace: DEFAULT_WORKPLANE_WORKSPACE, disabled: false, onApply: () => {}, open: true, onOpenChange: () => {}, facesShown, onFacePick,
+    });
+    container = document.createElement("div");
+    document.body.appendChild(container);
+    root = createRoot(container);
+    act(() => root!.render(card(textured)));
+    act(() => root!.render(card(cylinder)));
+    return container;
+  };
+
+  it("offers Show picked faces only once faces are picked, and asks the editor to light them without picking", () => {
+    expect(showButton(renderCard({ pattern: "knurl" }, false, () => {}))).toBeNull();
+    act(() => root?.unmount());
+    container?.remove();
+    const calls: unknown[][] = [];
+    const shown = renderCard({ pattern: "knurl", faces: [{ at: [0, 0, 1], normal: [0, 0, 1] }, { at: [0, 0, 0], normal: [0, 0, -1] }] }, false, (...args) => calls.push(args));
+    const button = showButton(shown);
+    expect(button?.textContent?.trim()).toBe("Show picked faces");
+    act(() => button!.click());
+    expect(calls).toHaveLength(1);
+    expect(calls[0][2]).toBe(true);
+    expect(calls[0][0]).toHaveLength(2);
+  });
+
+  it("turns Show picked faces into Hide, which lets the editor go", () => {
+    const calls: unknown[][] = [];
+    const shown = renderCard({ pattern: "knurl", faces: [{ at: [0, 0, 1], normal: [0, 0, 1] }] }, true, (...args) => calls.push(args));
+    const button = showButton(shown);
+    expect(button?.textContent?.trim()).toBe("Hide picked faces");
+    act(() => button!.click());
+    expect(calls[0][0]).toBeNull();
+  });
 });

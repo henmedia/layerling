@@ -471,7 +471,8 @@ function buildGridfinityBody(brep: Brep, shape: WorkplaneShape): BuildOutcome {
 
 /**
  * The hinge as the boxes, cylinders, tubes and cones it is made of, fused, its screw holes cut out: two bodies that turn
- * against each other. Each knuckle of the cone hinge's B has its recesses cut first, before the cones in them are added.
+ * against each other. Each knuckle of the cone hinge's B has its recesses cut first, before the cones in them are added,
+ * and each of the snap hinge's clips its opening, before the pin in it is.
  */
 function buildHingeBody(brep: Brep, shape: WorkplaneShape): BuildOutcome {
   const solids: BrepSolid[] = [];

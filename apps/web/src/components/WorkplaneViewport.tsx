@@ -250,7 +250,8 @@ type WorkplaneViewportProps = {
   onSurfaceTextureOpenChange?: (open: boolean) => void;
   surfaceFacePicking?: boolean;
   surfacePickedFaces?: SurfaceTextureFace[] | null;
-  onSurfaceFacePick?: (faces: SurfaceTextureFace[] | null, edgeAngle: number) => void;
+  surfaceFacesShown?: boolean;
+  onSurfaceFacePick?: (faces: SurfaceTextureFace[] | null, edgeAngle: number, review?: boolean) => void;
   /** The region drawn last for the texture (see surfaceRegionDrawing), and starting or stopping the drawing. */
   surfaceDrawnRegion?: { region: SurfaceTextureRegion } | null;
   onSurfaceRegionDraw?: (drawing: boolean) => void;
@@ -1645,6 +1646,7 @@ export function WorkplaneViewport({
   onSurfaceTextureOpenChange,
   surfaceFacePicking,
   surfacePickedFaces,
+  surfaceFacesShown,
   onSurfaceFacePick,
   surfaceDrawnRegion,
   onSurfaceRegionDraw,
@@ -9465,6 +9467,7 @@ export function WorkplaneViewport({
           onSurfaceTextureOpenChange={onSurfaceTextureOpenChange}
           surfaceFacePicking={surfaceFacePicking}
           surfacePickedFaces={surfacePickedFaces}
+          surfaceFacesShown={surfaceFacesShown}
           onSurfaceFacePick={onSurfaceFacePick}
           surfaceRegionDrawing={surfaceRegionDrawing}
           surfaceDrawnRegion={surfaceDrawnRegion}

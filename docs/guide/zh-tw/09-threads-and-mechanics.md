@@ -184,7 +184,9 @@ G 規格是符合 ISO 228-1 的平行惠氏管螺紋，常見於水、瓦斯、�
 
 {{ui:hinge.styleLiftOff}} 做出像許多門上那樣的可拆式鉸鏈：兩個鉸節，下方的帶著銷子一直到端部，上方的是可以從銷子上拔出的套筒，所以蓋子或門可以取下再掛回去。它總是兩個鉸節。它和其他樣式一樣平放整體列印；要直立列印、銷子朝上，就用 {{ui:inspector.separateParts}} 把它拆開，把帶銷的那件立在它的鉸節上，另一件立在它的套筒上：這樣兩件都不需要支撐。另一側用鏡像。在 {{ui:prop.hingeScrewHead}} 下，所有樣式都可選 {{ui:hinge.screwNut}}：在每個孔上方開一個六角螺帽槽，位於闔上時朝向另一片的那一面，這樣從下方鎖入的螺栓能固定；{{ui:hinge.screwCountersunkNut}} 把後片（帶銷的那片）做成沉頭，前片開螺帽槽。{{ui:prop.hingeNutWidth}} 是螺帽的對邊寬度；為 0 時依孔取值（M3 5.8 mm，M4 7.3 mm，含間隙）。槽深等於螺帽高度，但下面留 0.6 mm 的葉片，所以葉片越厚，螺帽嵌得越深。
 
-{{ui:prop.hingeStyle}}有三個選項：{{ui:hinge.stylePin}}、{{ui:prop.hingePinless}}（為自備銷留的孔）和{{ui:hinge.styleCone}}。選圓錐時，{{ui:prop.hingeConeSize}}決定圓錐從關節長出處的大小；圓錐越大越牢固，預設取能放下的最大值。帶圓錐的鉸鏈沒有銷也沒有孔，所以它的翼板可以和整個關節一樣厚：把{{ui:prop.hingeLeafThickness}}設為關節直徑，翼板就與關節齊平；這樣的鉸鏈最多開啟約 90°，因為厚翼板會相碰。
+{{ui:hinge.styleSnap}} 做出兩半分開列印、再喀一聲扣合的鉸鏈。後片的鉸節照常帶著銷子；前片的鉸節是卡夾，頂部開口，開在鉸鏈闔上時面對另一片的那一側。開口比銷子窄 {{ui:prop.hingeSnapGrip}} 所設的量，預設 0.3 mm，開口邊緣的 45° 倒角把銷子引進去。用 {{ui:inspector.separateParts}} 把鉸鏈拆開，兩半都照原樣平放列印，不需支撐：卡夾正好在孔需要搭橋的地方開口，銷子只跨過它的鉸節之間的短間隙。組裝時，把帶卡夾的一半按闔上的姿態放到銷子上，按下直到喀一聲卡入；之後它可以自由轉動，銷子周圍留有間隙（{{ui:prop.hingeClearance}}）。卡緊量越大越牢，但需要的力也越大：卡夾裂了就調小，兩半太容易脫開就調大。選 {{ui:hinge.leafRaised}} 時，只有前片在開口下方仍連著它的卡夾，才會被抬高。
+
+{{ui:prop.hingeStyle}}有五個選項：{{ui:hinge.stylePin}}、{{ui:prop.hingePinless}}（為自備銷留的孔）、{{ui:hinge.styleCone}}、{{ui:hinge.styleLiftOff}}和{{ui:hinge.styleSnap}}。選圓錐時，{{ui:prop.hingeConeSize}}決定圓錐從關節長出處的大小；圓錐越大越牢固，預設取能放下的最大值。帶圓錐的鉸鏈沒有銷也沒有孔，所以它的翼板可以和整個關節一樣厚：把{{ui:prop.hingeLeafThickness}}設為關節直徑，翼板就與關節齊平；這樣的鉸鏈最多開啟約 90°，因為厚翼板會相碰。
 
 要用螺絲固定鉸鏈，設定 {{ui:prop.hingeScrewHoles}}：沿軸最多六個孔，孔徑為你選擇的 {{ui:prop.hingeScrewDiameter}}。在 {{ui:prop.hingeScrewHead}} 下，它們預設為 {{ui:hinge.screwCountersunk}}，90° 用於沉頭螺絲，位於鉸鏈合上時朝向另一片的那一面，因此螺絲頭齊平；{{ui:hinge.screwStraight}} 則保持直孔。不設其他數值時，孔平均分配長度並位於每片的中間；{{ui:prop.hingeScrewSpacing}} 與 {{ui:prop.hingeScrewAcross}} 依中心距設定它們，例如為了對上你要替換的購買鉸鏈。每個孔到邊緣、鉸節與下一個孔之間都至少保留半毫米的片；放不下那麼多時就少放，欄位會說明。{{ui:prop.hingeCornerRadius}} 會把兩片的四個外角倒圓。無論有無銷軸，孔與圓角在 STEP 匯出與邊緣工具中都保持精確。
 

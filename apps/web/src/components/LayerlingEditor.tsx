@@ -3412,7 +3412,7 @@ export function LayerlingEditor({
   const deleteFaceRunRef = useRef(0);
   // Faces of the selected body picked for its texture with clicks (the texture card holds the other settings): the
   // body's faces as the texture finds them, on the body under a texture there is, and the faces picked so far.
-  const [surfaceFacePick, setSurfaceFacePick] = useState<{ shapeId: string; shape: WorkplaneShape; edgeAngle: number; pick: SurfaceTextureFacePick; faces: SurfaceTextureFace[] } | null>(null);
+  const [surfaceFacePick, setSurfaceFacePick] = useState<{ shapeId: string; shape: WorkplaneShape; edgeAngle: number; pick: SurfaceTextureFacePick; faces: SurfaceTextureFace[]; review: boolean } | null>(null);
   // A region drawn on the selected body for its texture with a lasso (Discussion #1579): the body, its triangles under a
   // texture there is, and the region drawn last, which the texture card takes for the layer it was drawn for.
   const [surfaceRegionDraw, setSurfaceRegionDraw] = useState<{ shapeId: string; shape: WorkplaneShape; positions: Float64Array } | null>(null);
@@ -9046,14 +9046,14 @@ export function LayerlingEditor({
       setLidTool(null);
       return;
     }
-    const { type, thickness, gap, depth, wall, magnets, magnetDiameter, magnetHeight, magnetGap, hinge, hingePin, hingeGap, hingePinPlay, hingeKnuckles, hingePrintPin, hingeSide, hingeTeardrop, hingeStyle, hingeEndPlugs, clickBumps, clickBumpHeight, handle, threadPitch, threadTurns, threadStandard, bayonetLugs, bayonetDepth, bayonetAxialGap, bayonetDetent, bayonetTurn, tether, flipTop, flipTopOpening, topEdge, topEdgeSize, slideSide, slideFrame } = lidTool;
+    const { type, thickness, gap, depth, wall, magnets, magnetDiameter, magnetHeight, magnetGap, hinge, hingePin, hingeGap, hingePinPlay, hingeKnuckles, hingePrintPin, hingeSide, hingeTeardrop, hingeStyle, hingeEndPlugs, clickBumps, clickBumpHeight, handle, threadPitch, threadTurns, threadOffset, threadStandard, bayonetLugs, bayonetDepth, bayonetAxialGap, bayonetDetent, bayonetTurn, tether, flipTop, flipTopOpening, topEdge, topEdgeSize, slideSide, slideFrame } = lidTool;
     setLidTool((current) => current ? { ...current, busy: true, error: null } : current);
     // Click bumps, a handle and end plugs the panel does not show (a flat lid, a pivot lid, a hinge not flush)
     // are not asked for, nor magnets and a hinge with a screw lid or a bayonet lid, nor a tether without one, nor a flip-top with another lid; nor magnets and a hinge with a slide-in lid.
     void makeLid({
       type, thickness, gap, depth, wall, magnets: magnets && lidTakesMagnets(lidTool), magnetDiameter, magnetHeight, magnetGap, hinge: hinge && LID_HINGE_TYPES.includes(type), hingePin, hingeGap, hingePinPlay, hingeKnuckles, hingePrintPin, hingeSide, hingeTeardrop, hingeStyle,
       hingeEndPlugs: hingeEndPlugs && hingeStyle === "flush",
-      clickBumps: clickBumps && lidClickBumpsFit(lidTool), clickBumpHeight, handle: lidHandleFits(lidTool) ? handle : "none", threadPitch, threadTurns, threadStandard,
+      clickBumps: clickBumps && lidClickBumpsFit(lidTool), clickBumpHeight, handle: lidHandleFits(lidTool) ? handle : "none", threadPitch, threadTurns, threadOffset, threadStandard,
       bayonetLugs, bayonetDepth, bayonetAxialGap, bayonetDetent, bayonetTurn, tether: tether && lidTetherFits(lidTool), flipTop: flipTop && lidFlipTopFits(lidTool), flipTopOpening,
       topEdge: lidTopEdgeFits(lidTool) ? topEdge : "square", topEdgeSize, slideSide, slideFrame,
     }, targets).then((result) => {
@@ -11052,7 +11052,8 @@ export function LayerlingEditor({
 
   // Picking faces for the texture (#954): on the body the texture is made on - under a texture there is - where the
   // selected body stands. Started again with other faces (all of them again) on the same body, the faces it has stay.
-  const pickSurfaceFaces = useCallback((faces: SurfaceTextureFace[] | null, edgeAngle: number) => {
+  // With review the faces are only lit for a look (Discussion #1607): a click in the view does not change them.
+  const pickSurfaceFaces = useCallback((faces: SurfaceTextureFace[] | null, edgeAngle: number, review = false) => {
     if (!faces) {
       setSurfaceFacePick(null);
       return;
@@ -11061,7 +11062,7 @@ export function LayerlingEditor({
     setSurfaceRegionDraw(null);
     const current = selectedShape;
     if (surfaceFacePick?.shapeId === current.id && surfaceFacePick.edgeAngle === edgeAngle) {
-      setSurfaceFacePick({ ...surfaceFacePick, faces });
+      setSurfaceFacePick({ ...surfaceFacePick, faces, review });
       return;
     }
     const source = canChangeSurfaceTexture(current) ? shapeUnderSurfaceTexture(current) : canTextureSurface(current) ? current : null;
@@ -11070,12 +11071,12 @@ export function LayerlingEditor({
       return;
     }
     if (deleteFaceTool && !deleteFaceTool.busy) setDeleteFaceTool(null);
-    setSurfaceFacePick({ shapeId: current.id, shape: current, edgeAngle, pick: surfaceTextureFacePick(surfaceTextureInput(source), edgeAngle), faces });
-    setNotice(t("status.surfaceFacesPick"));
+    setSurfaceFacePick({ shapeId: current.id, shape: current, edgeAngle, pick: surfaceTextureFacePick(surfaceTextureInput(source), edgeAngle), faces, review });
+    if (!review) setNotice(t("status.surfaceFacesPick"));
   }, [deleteFaceTool, selectedShape, selectedShapes.length, surfaceFacePick]);
 
   const toggleSurfaceFace = useCallback((faceId: number) => {
-    setSurfaceFacePick((current) => current && { ...current, faces: toggleSurfaceTexturePickedFace(current.pick, current.faces, faceId) });
+    setSurfaceFacePick((current) => current && !current.review ? { ...current, faces: toggleSurfaceTexturePickedFace(current.pick, current.faces, faceId) } : current);
   }, []);
 
   // Drawing a region for the texture (Discussion #1579): on the body the texture is made on - under a texture there is -
@@ -15042,6 +15043,7 @@ export function LayerlingEditor({
           handle: params.handle,
           threadPitch: params.threadPitch,
           threadTurns: params.threadTurns,
+          threadOffset: params.threadOffset,
           threadStandard: params.threadStandard,
           bayonetLugs: params.bayonetLugs,
           bayonetDepth: params.bayonetDepth,
@@ -19258,8 +19260,9 @@ export function LayerlingEditor({
           onRemoveSurfaceTexture={selectedShapes.length === 1 && surfaceTextureEntry(selectedShape) ? removeSelectedSurfaceTexture : undefined}
           surfaceTextureOpen={surfaceTextureOpen}
           onSurfaceTextureOpenChange={setSurfaceTextureOpen}
-          surfaceFacePicking={Boolean(surfaceFacePick)}
-          surfacePickedFaces={surfaceFacePick?.faces ?? null}
+          surfaceFacePicking={Boolean(surfaceFacePick && !surfaceFacePick.review)}
+          surfaceFacesShown={Boolean(surfaceFacePick?.review)}
+          surfacePickedFaces={surfaceFacePick && !surfaceFacePick.review ? surfaceFacePick.faces : null}
           onSurfaceFacePick={selectedShapes.length === 1 && offersSurfaceTexture(selectedShape) ? pickSurfaceFaces : undefined}
           surfaceRegionDrawing={Boolean(surfaceRegionDraw)}
           surfaceDrawnRegion={surfaceDrawnRegion}
