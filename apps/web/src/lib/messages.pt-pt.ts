@@ -3627,7 +3627,7 @@ export const MESSAGES_PT_PT: Partial<Record<MessageKey, string>> = {
   "inspector.surfaceSeedHint": "Outro número gera uma nova disposição das células ou dos grãos.",
   "inspector.surfaceImage": "Imagem",
   "inspector.surfaceImageLoad": "Carregar imagem personalizada…",
-  "inspector.surfaceImageHint": "As zonas claras atingem a profundidade máxima e as escuras mantêm-se inalteradas. Um desenho escuro sobre fundo transparente, como linhas pretas num SVG, é interpretado pelas linhas, que atingem a profundidade máxima. A imagem personalizada é guardada com o projeto em tons de cinzento, com um máximo de 256 pontos por lado; cada módulo tem a largura definida e uma altura proporcional à imagem.",
+  "inspector.surfaceImageHint": "As zonas claras atingem a profundidade máxima e as escuras mantêm-se inalteradas. Um desenho escuro sobre fundo transparente, como linhas pretas num SVG, é interpretado pelas linhas, que atingem a profundidade máxima. A imagem personalizada é guardada com o projeto em tons de cinzento, com um máximo de 512 pontos por lado; cada módulo tem a largura definida e uma altura proporcional à imagem.",
   "inspector.surfaceTileHeight": "Altura do módulo (0 = proporcional à imagem)",
   "inspector.surfaceImageHeight": "Altura da imagem",
   "inspector.surfaceImageOnceHint": "A imagem é aplicada uma única vez, como uma etiqueta: Posição angular e Altura definem o centro, como no texto. Fora da imagem, a superfície mantém-se lisa; Profundidade e Direção definem quanto fica saliente ou escavada. Uma altura de imagem de 0 mantém as proporções originais. Quando há faces selecionadas, a imagem é sempre aplicada sobre elas.",

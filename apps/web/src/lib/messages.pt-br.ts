@@ -1314,7 +1314,7 @@ export const MESSAGES_PT_BR: Partial<Record<MessageKey, string>> = {
   "inspector.surfaceSeedHint": "Outro número distribui as células ou os grãos de outro jeito.",
   "inspector.surfaceImage": "Imagem",
   "inspector.surfaceImageLoad": "Carregar sua própria imagem…",
-  "inspector.surfaceImageHint": "As áreas claras ganham a profundidade total; as escuras ficam como estão. Um desenho escuro em fundo transparente, como linhas pretas num SVG, conta pelas linhas: elas ganham a profundidade total. Sua imagem fica salva com o projeto, em tons de cinza e com no máximo 256 pontos por lado. Cada ladrilho usa a largura definida e mantém a proporção da imagem.",
+  "inspector.surfaceImageHint": "As áreas claras ganham a profundidade total; as escuras ficam como estão. Um desenho escuro em fundo transparente, como linhas pretas num SVG, conta pelas linhas: elas ganham a profundidade total. Sua imagem fica salva com o projeto, em tons de cinza e com no máximo 512 pontos por lado. Cada ladrilho usa a largura definida e mantém a proporção da imagem.",
   "inspector.surfaceTileHeight": "Altura do ladrilho (0 = a da imagem)",
   "inspector.surfaceImageHeight": "Altura da imagem",
   "inspector.surfaceImageOnceHint": "A imagem é estampada uma única vez, como uma etiqueta: \"Na volta\" e \"Altura\" posicionam o centro dela, como num texto. Fora dela a superfície fica lisa; \"Profundidade\" e \"Direção\" definem quanto ela se destaca ou fica rebaixada. Uma altura de imagem 0 mantém as proporções dela. Com faces escolhidas, a imagem sempre cai sobre elas.",

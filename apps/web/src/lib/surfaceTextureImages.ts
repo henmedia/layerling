@@ -32,7 +32,7 @@ export type GreyImage = { width: number; height: number; data: Uint8Array };
 export type SurfaceTextureOwnImage = { width: number; height: number; data: string };
 
 /** One's own image has at most this many points on its longer side (kept in the design, in every undo step). */
-export const SURFACE_TEXTURE_OWN_IMAGE_SIZE = 256;
+export const SURFACE_TEXTURE_OWN_IMAGE_SIZE = 512;
 
 const TAU = 2 * Math.PI;
 const fract = (x: number) => x - Math.floor(x);

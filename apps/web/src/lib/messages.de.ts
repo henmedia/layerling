@@ -3775,7 +3775,7 @@ export const MESSAGES_DE: Record<MessageKey, string> = {
   "inspector.surfaceSeedHint": "Eine andere Zahl legt die Zellen oder Körner neu an.",
   "inspector.surfaceImage": "Bild",
   "inspector.surfaceImageLoad": "Eigenes Bild laden …",
-  "inspector.surfaceImageHint": "Helles wird voll tief, Dunkles bleibt, wie es ist. Eine dunkle Zeichnung auf durchsichtigem Grund, etwa schwarze Linien in einer SVG, zählt nach ihren Linien: Sie werden voll tief. Ein eigenes Bild wird in Graustufen mit dem Entwurf gespeichert, höchstens 256 Punkte je Seite; eine Kachel ist so breit wie eingestellt und so hoch, wie das Bild dazu passt.",
+  "inspector.surfaceImageHint": "Helles wird voll tief, Dunkles bleibt, wie es ist. Eine dunkle Zeichnung auf durchsichtigem Grund, etwa schwarze Linien in einer SVG, zählt nach ihren Linien: Sie werden voll tief. Ein eigenes Bild wird in Graustufen mit dem Entwurf gespeichert, höchstens 512 Punkte je Seite; eine Kachel ist so breit wie eingestellt und so hoch, wie das Bild dazu passt.",
   "inspector.surfaceTileHeight": "Kachelhöhe (0 = wie das Bild)",
   "inspector.surfaceImageHeight": "Bildhöhe",
   "inspector.surfaceImageOnceHint": "Das Bild wird einmal aufgedrückt wie ein Etikett: „Rundherum“ und „Höhe“ setzen seine Mitte, wie beim Text. Außerhalb bleibt die Fläche glatt; „Tiefe“ und „Richtung“ legen fest, wie weit es heraussteht oder eingeprägt ist. Bildhöhe 0 behält die Proportionen des Bildes. Sind Flächen gewählt, landet es immer auf ihnen.",
