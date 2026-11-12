@@ -5186,6 +5186,8 @@ export const MESSAGES_DA: Partial<Record<MessageKey, string>> = {
   "error.projectTooLarge": "Dette design er for stort til at blive gemt: historikken og mesherne fylder for meget. Slet historikken i historikvisningen, eller forenkl de tungeste legemer.",
   "error.storageFull": "Browseren har ikke mere plads til dette design. Slet historikken i historikvisningen, fjern designs du ikke har brug for, eller tag en sikkerhedskopi først.",
   "notice.projectShapesSaveFailedWhy": "Kunne ikke gemme designformer: {reason}",
+  "notice.designNotSavedTitle": "Dette design er ikke gemt",
+  "notice.designNotSavedHint": "Dine nyeste ændringer findes kun i denne fane: luk den ikke, og genindlæs den ikke. Gør store mesh lettere med Forenkl mesh, eller gem en kopi med Eksportér → LYL.",
   "notice.projectHistoryTrimmed": "Dette design er stort: den gemte kopi i browseren beholder kun de sidste {kept} af {total} trin i historikken. Slet historikken for at gøre det lettere.",
   "notice.projectShapesMigrateFailed": "Kunne ikke migrere designformer til større lager",
   "notice.projectShapesPrepareFailed": "Kunne ikke forberede lager til designformer",

@@ -5451,6 +5451,8 @@ export const MESSAGES_NL: Record<MessageKey, string> = {
   "error.projectTooLarge": "Dit ontwerp is te groot om op te slaan: geschiedenis en netten nemen te veel ruimte in. Verwijder de geschiedenis in de geschiedenisweergave of vereenvoudig de zwaarste lichamen.",
   "error.storageFull": "De browser heeft geen ruimte meer voor dit ontwerp. Verwijder de geschiedenis in de geschiedenisweergave, verwijder ontwerpen die je niet nodig hebt of maak er eerst een back-up van.",
   "notice.projectShapesSaveFailedWhy": "Kon de vormen van het ontwerp niet opslaan: {reason}",
+  "notice.designNotSavedTitle": "Dit ontwerp is niet opgeslagen",
+  "notice.designNotSavedHint": "Je nieuwste wijzigingen staan alleen in dit tabblad: sluit het niet en laad het niet opnieuw. Maak grote meshes lichter met Mesh vereenvoudigen, of bewaar een kopie met Exporteren → LYL.",
   "notice.projectHistoryTrimmed": "Dit ontwerp is groot: de opgeslagen kopie in de browser bewaart alleen de laatste {kept} van {total} geschiedenisstappen. Verwijder de geschiedenis om het lichter te maken.",
   "notice.projectShapesMigrateFailed": "Kon de vormen van het ontwerp niet naar grotere opslag overzetten",
   "notice.projectShapesPrepareFailed": "Kon de opslag voor de vormen van het ontwerp niet voorbereiden",

@@ -4338,6 +4338,8 @@ export const MESSAGES_SL: Partial<Record<MessageKey, string>> = {
   "error.projectTooLarge": "Ta projekt je prevelik za shranjevanje: zgodovina in mreže zavzemajo preveč prostora. Izbrišite zgodovino v pogledu zgodovine ali poenostavite najtežja telesa.",
   "error.storageFull": "V brskalniku ni več prostora za ta projekt. Izbrišite zgodovino v pogledu zgodovine, odstranite projekte, ki jih ne potrebujete, ali jih najprej varnostno kopirajte.",
   "notice.projectShapesSaveFailedWhy": "Oblik projekta ni bilo mogoče shraniti: {reason}",
+  "notice.designNotSavedTitle": "Ta načrt ni shranjen",
+  "notice.designNotSavedHint": "Najnovejše spremembe so samo v tem zavihku: ne zapri ga in ga ne naloži znova. Velike mreže olajšaj s Poenostavi mrežo ali shrani kopijo z Izvozi → LYL.",
   "notice.projectHistoryTrimmed": "Ta projekt je velik: shranjena kopija v brskalniku obdrži samo zadnjih {kept} od {total} korakov zgodovine. Izbrišite zgodovino, da bo lažji.",
   "notice.projectShapesMigrateFailed": "Oblik projekta ni bilo mogoče prenesti v večjo shrambo",
   "notice.projectShapesPrepareFailed": "Shrambe oblik projekta ni bilo mogoče pripraviti",

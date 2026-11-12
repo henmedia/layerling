@@ -5451,6 +5451,8 @@ export const MESSAGES_EN = {
   "error.projectTooLarge": "This design is too big to save: its history and its meshes take too much room. Delete the history in the History view or simplify the heaviest bodies.",
   "error.storageFull": "The browser has no room left to save this design. Delete the history in the History view, remove designs you do not need, or back them up first.",
   "notice.projectShapesSaveFailedWhy": "Could not save design shapes: {reason}",
+  "notice.designNotSavedTitle": "This design is not saved",
+  "notice.designNotSavedHint": "Your newest changes are only in this tab: don't close or reload it. Make large meshes lighter with Simplify mesh, or keep a copy with Export → LYL.",
   "notice.projectHistoryTrimmed": "This design is large: the saved copy in the browser keeps only the last {kept} of {total} history steps. Delete the history to make it lighter.",
   "notice.projectShapesMigrateFailed": "Could not migrate design shapes to larger storage",
   "notice.projectShapesPrepareFailed": "Could not prepare design shape storage",

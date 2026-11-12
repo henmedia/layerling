@@ -16127,6 +16127,30 @@ html[data-theme="dark"] .export-holes-only-warning svg {
 /* ==========================================================================
    Open group: the bar that closes it again
    ========================================================================== */
+/* The newest state of the design could not be stored (#1652): stays up, red, until a save gets through. */
+.unsaved-design-banner {
+  position: fixed;
+  bottom: 140px;
+  left: 50%;
+  z-index: 42;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  max-width: min(640px, calc(100vw - 32px));
+  padding: 10px 16px;
+  color: #fff;
+  font-size: 13px;
+  line-height: 1.4;
+  background: #c82031;
+  border-radius: 10px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.25);
+  transform: translateX(-50%);
+}
+
+.unsaved-design-banner strong {
+  font-size: 14px;
+}
+
 .open-group-banner {
   position: fixed;
   bottom: 88px;

@@ -5428,6 +5428,8 @@ export const MESSAGES_IT: Partial<Record<MessageKey, string>> = {
   "error.projectTooLarge": "Questo progetto è troppo grande per essere salvato: la cronologia e le mesh occupano troppo spazio. Elimina la cronologia nella vista cronologia o semplifica i corpi più pesanti.",
   "error.storageFull": "Il browser non ha più spazio per questo progetto. Elimina la cronologia nella vista cronologia, rimuovi i progetti che non ti servono o salvali prima in un backup.",
   "notice.projectShapesSaveFailedWhy": "Impossibile salvare le forme del progetto: {reason}",
+  "notice.designNotSavedTitle": "Questo progetto non è salvato",
+  "notice.designNotSavedHint": "Le modifiche più recenti sono solo in questa scheda: non chiuderla e non ricaricarla. Alleggerisci le mesh grandi con Semplifica mesh, oppure salva una copia con Esporta → LYL.",
   "notice.projectHistoryTrimmed": "Questo progetto è grande: la copia salvata nel browser conserva solo gli ultimi {kept} di {total} passaggi della cronologia. Elimina la cronologia per alleggerirlo.",
   "notice.projectShapesMigrateFailed": "Impossibile trasferire le forme del progetto in uno spazio di archiviazione più capiente",
   "notice.projectShapesPrepareFailed": "Impossibile preparare lo spazio di archiviazione delle forme del progetto",

@@ -5432,6 +5432,8 @@ export const MESSAGES_CS: Record<MessageKey, string> = {
   "error.projectTooLarge": "Tento projekt je příliš velký pro uložení: historie a sítě zabírají příliš mnoho místa. Smažte historii v zobrazení historie nebo zjednodušte nejtěžší tělesa.",
   "error.storageFull": "V prohlížeči už není místo pro tento projekt. Smažte historii v zobrazení historie, odstraňte projekty, které nepotřebujete, nebo je nejdřív zálohujte.",
   "notice.projectShapesSaveFailedWhy": "Tvary projektu se nepodařilo uložit: {reason}",
+  "notice.designNotSavedTitle": "Tento návrh není uložen",
+  "notice.designNotSavedHint": "Nejnovější změny jsou jen v této kartě: nezavírejte ji ani ji znovu nenačítejte. Velké sítě odlehčete pomocí Zjednodušit síť, nebo si uložte kopii přes Export → LYL.",
   "notice.projectHistoryTrimmed": "Tento projekt je velký: uložená kopie v prohlížeči si ponechává jen posledních {kept} z {total} kroků historie. Smažte historii, aby byl lehčí.",
   "notice.projectShapesMigrateFailed": "Tvary projektu se nepodařilo převést do většího úložiště",
   "notice.projectShapesPrepareFailed": "Úložiště tvarů projektu se nepodařilo připravit",

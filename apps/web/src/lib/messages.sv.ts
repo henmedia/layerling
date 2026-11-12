@@ -5445,6 +5445,8 @@ export const MESSAGES_SV: Partial<Record<MessageKey, string>> = {
   "error.projectTooLarge": "Den här designen är för stor för att sparas: dess historik och nät tar för mycket plats. Ta bort historiken i Historikvyn eller förenkla de tyngsta kropparna.",
   "error.storageFull": "Webbläsaren har inget utrymme kvar för att spara den här designen. Ta bort historiken i Historikvyn, radera designer du inte behöver eller säkerhetskopiera dem först.",
   "notice.projectShapesSaveFailedWhy": "Kunde inte spara designens former: {reason}",
+  "notice.designNotSavedTitle": "Den här designen är inte sparad",
+  "notice.designNotSavedHint": "Dina senaste ändringar finns bara i den här fliken: stäng den inte och ladda inte om den. Gör stora nät lättare med Förenkla nät, eller spara en kopia med Exportera → LYL.",
   "notice.projectHistoryTrimmed": "Den här designen är stor: den sparade kopian i webbläsaren behåller bara de senaste {kept} av {total} historiksteg. Ta bort historiken för att göra den lättare.",
   "notice.projectShapesMigrateFailed": "Kunde inte flytta designens former till större lagring",
   "notice.projectShapesPrepareFailed": "Kunde inte förbereda lagring för designens former",

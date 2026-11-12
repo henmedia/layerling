@@ -5432,6 +5432,8 @@ export const MESSAGES_ZH_TW: Partial<Record<MessageKey, string>> = {
   "error.projectTooLarge": "此設計太大，無法儲存：歷史記錄與網格佔用太多空間。請在歷史記錄視圖中刪除歷史記錄，或簡化最佔空間的實體。",
   "error.storageFull": "瀏覽器已沒有空間儲存此設計。請在歷史記錄視圖中刪除歷史記錄、移除不需要的設計，或先備份。",
   "notice.projectShapesSaveFailedWhy": "無法儲存設計形狀：{reason}",
+  "notice.designNotSavedTitle": "此設計尚未儲存",
+  "notice.designNotSavedHint": "最新的變更只存在於此分頁中：請不要關閉或重新載入它。用「簡化網格」減輕大型網格，或透過 匯出 → LYL 保存一份副本。",
   "notice.projectHistoryTrimmed": "此設計較大：瀏覽器中儲存的副本只保留最後 {kept} 步歷史記錄（共 {total} 步）。刪除歷史記錄可讓它更小。",
   "notice.projectShapesMigrateFailed": "無法將設計形狀遷移到更大的儲存空間",
   "notice.projectShapesPrepareFailed": "無法準備設計形狀的儲存空間",

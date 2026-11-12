@@ -5450,6 +5450,8 @@ export const MESSAGES_DE: Record<MessageKey, string> = {
   "error.projectTooLarge": "Dieser Entwurf ist zu groß zum Speichern: Verlauf und Netze brauchen zu viel Platz. Lösche den Verlauf in der Verlaufsansicht oder vereinfache die schwersten Körper.",
   "error.storageFull": "Der Browser hat keinen Platz mehr für diesen Entwurf. Lösche den Verlauf in der Verlaufsansicht, entferne Entwürfe, die du nicht brauchst, oder sichere sie vorher.",
   "notice.projectShapesSaveFailedWhy": "Die Formen des Entwurfs konnten nicht gespeichert werden: {reason}",
+  "notice.designNotSavedTitle": "Dieser Entwurf ist nicht gespeichert",
+  "notice.designNotSavedHint": "Deine neuesten Änderungen gibt es nur in diesem Tab: Schließ ihn nicht und lade ihn nicht neu. Mach große Netze mit „Netz vereinfachen“ leichter, oder sichere eine Kopie mit Exportieren → LYL.",
   "notice.projectHistoryTrimmed": "Dieser Entwurf ist groß: Die gespeicherte Kopie im Browser behält nur die letzten {kept} von {total} Verlaufsschritten. Lösche den Verlauf, um ihn leichter zu machen.",
   "notice.projectShapesMigrateFailed": "Die Formen konnten nicht in den größeren Speicher übernommen werden",
   "notice.projectShapesPrepareFailed": "Der Speicher für die Formen konnte nicht vorbereitet werden",

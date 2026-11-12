@@ -5456,6 +5456,8 @@ export const MESSAGES_PL: Partial<Record<MessageKey, string>> = {
   "error.projectTooLarge": "Ten projekt jest zbyt duży, by go zapisać: historia i siatki zajmują za dużo miejsca. Usuń historię w widoku historii lub uprość najcięższe bryły.",
   "error.storageFull": "W przeglądarce nie ma już miejsca na ten projekt. Usuń historię w widoku historii, usuń niepotrzebne projekty albo najpierw zrób ich kopię zapasową.",
   "notice.projectShapesSaveFailedWhy": "Nie udało się zapisać kształtów projektu: {reason}",
+  "notice.designNotSavedTitle": "Ten projekt nie jest zapisany",
+  "notice.designNotSavedHint": "Najnowsze zmiany są tylko w tej karcie: nie zamykaj jej ani nie odświeżaj. Odciąż duże siatki przez Uprość siatkę albo zachowaj kopię przez Eksport → LYL.",
   "notice.projectHistoryTrimmed": "Ten projekt jest duży: zapisana kopia w przeglądarce zachowuje tylko ostatnie {kept} z {total} kroków historii. Usuń historię, aby go odciążyć.",
   "notice.projectShapesMigrateFailed": "Nie udało się przenieść kształtów projektu do większego magazynu",
   "notice.projectShapesPrepareFailed": "Nie udało się przygotować magazynu kształtów projektu",

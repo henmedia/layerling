@@ -3054,6 +3054,7 @@ export function LayerlingEditor({
   onProjectSnapshot,
   isProjectThumbnailMissing,
   projectSaveFailure,
+  projectUnsaved,
   onProjectWorkspaceChange,
   onProjectNameChange,
   onCreateProjectFromState,
@@ -3107,6 +3108,8 @@ export function LayerlingEditor({
   isProjectThumbnailMissing?: (projectId: string) => Promise<boolean>;
   /** The last failed autosave, so the editor can say so; `at` makes a repeat failure show again. */
   projectSaveFailure?: { message: string; at: number } | null;
+  /** Why the newest state of this design could not be stored, while it could not (#1652): a note stays up until a save gets through. */
+  projectUnsaved?: string | null;
   onProjectNameChange?: (name: string) => void;
   /** Legt aus einem frueheren Stand ein neues Projekt an und sagt in einem Satz, was daraus wurde. */
   onCreateProjectFromState?: (request: HistoryProjectRequest) => Promise<string>;
@@ -19314,6 +19317,13 @@ export function LayerlingEditor({
           onDeleteHistory={clearHistory}
           onClose={closeHistoryView}
         />
+      ) : null}
+      {projectUnsaved ? (
+        <div className="unsaved-design-banner" role="alert">
+          <strong>{t("notice.designNotSavedTitle")}</strong>
+          <span>{projectUnsaved}</span>
+          <span>{t("notice.designNotSavedHint")}</span>
+        </div>
       ) : null}
       {openGroup ? (
         <div className="open-group-banner" role="status">

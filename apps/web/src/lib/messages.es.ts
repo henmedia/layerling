@@ -5453,6 +5453,8 @@ export const MESSAGES_ES: Partial<Record<MessageKey, string>> = {
   "error.projectTooLarge": "Este diseño es demasiado grande para guardarlo: su historial y sus mallas ocupan demasiado. Borra el historial en la vista del historial o simplifica los cuerpos más pesados.",
   "error.storageFull": "El navegador no tiene espacio para guardar este diseño. Borra el historial en la vista del historial, elimina los diseños que no necesites o haz antes una copia de seguridad de ellos.",
   "notice.projectShapesSaveFailedWhy": "No se han podido guardar las formas del diseño: {reason}",
+  "notice.designNotSavedTitle": "Este diseño no está guardado",
+  "notice.designNotSavedHint": "Tus cambios más recientes solo están en esta pestaña: no la cierres ni la recargues. Aligera las mallas grandes con Simplificar malla o guarda una copia con Exportar → LYL.",
   "notice.projectHistoryTrimmed": "Este diseño es grande: la copia guardada en el navegador solo conserva los últimos {kept} de {total} pasos del historial. Borra el historial para aligerarlo.",
   "notice.projectShapesMigrateFailed": "No se han podido pasar las formas del diseño a un almacenamiento más grande",
   "notice.projectShapesPrepareFailed": "No se ha podido preparar el almacenamiento de las formas del diseño",

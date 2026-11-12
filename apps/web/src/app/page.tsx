@@ -43,7 +43,7 @@ import { applyAppTheme, getAppThemePreference, hasStoredAppTheme, readStoredAppT
 import { hydrateEditorHistoryState, notesForHistoryIndex, type EditorHistoryEntry } from "@/lib/editorHistory";
 import { detectLanguage, setLanguage, t, translate, type Language } from "@/lib/i18n";
 import { localizedError } from "@/lib/userErrors";
-import { historyTrimSteps, isProjectTooLargeError, isStorageFullError, trimHistoryWindow } from "@/lib/historyTrim";
+import { historyTrimSteps, isOutOfMemoryError, isProjectTooLargeError, isRetriedWithLessHistory, isStorageFullError, trimHistoryWindow } from "@/lib/historyTrim";
 import { GuideHelpLink } from "@/components/GuideHelpLink";
 import { WelcomeGuideBody } from "@/components/WelcomeGuide";
 import { DashboardWelcome, useWelcomeHidden } from "@/components/DashboardWelcome";
@@ -631,8 +631,9 @@ async function saveProjectShapes(projectId: string, entry: ProjectShapeCacheEntr
   try {
     lylPackage = await pack(entry.history, entry.historyIndex);
   } catch (error) {
-    if (!isProjectTooLargeError(error) || entry.history.length <= 1) throw error;
-    // Too big with the whole history: keep the newest steps that fit, so the design is saved all the same.
+    if (!isRetriedWithLessHistory(error) || entry.history.length <= 1) throw error;
+    // Too big with the whole history, or out of memory packing it (#1652): keep the newest steps that fit, so the design
+    // is saved all the same.
     let packed: Awaited<ReturnType<typeof exportLylProject>> | null = null;
     for (const keep of historyTrimSteps(entry.history.length)) {
       const trimmed = trimHistoryWindow(entry.history, entry.historyIndex, keep);
@@ -641,7 +642,7 @@ async function saveProjectShapes(projectId: string, entry: ProjectShapeCacheEntr
         historyTrimmed = { kept: trimmed.history.length, total: entry.history.length };
         break;
       } catch (retryError) {
-        if (!isProjectTooLargeError(retryError)) throw retryError;
+        if (!isRetriedWithLessHistory(retryError)) throw retryError;
       }
     }
     if (!packed) throw error;
@@ -1072,6 +1073,10 @@ export default function Home() {
   const projectsRef = useRef(projects);
   projectsRef.current = projects;
   const [projectSaveFailure, setProjectSaveFailure] = useState<{ message: string; at: number } | null>(null);
+  // Designs whose newest state could not be stored (#1652): the revision that failed, until a newer save gets through. While
+  // one is listed, closing or reloading the tab asks first, and the editor keeps a red note up.
+  const unsavedProjectsRef = useRef(new Map<string, number>());
+  const [unsavedDesign, setUnsavedDesign] = useState<{ projectId: string; message: string } | null>(null);
   const editorLoadingStartedAtRef = useRef(0);
 
   // Warm the editor chunk once the dashboard is idle, so opening a project
@@ -1345,7 +1350,8 @@ export default function Home() {
   // browser asks first. A save takes well under a second, so this rarely shows.
   useEffect(() => {
     const warnWhileSaving = (event: BeforeUnloadEvent) => {
-      if (Object.keys(projectShapeSaveQueuesRef.current).length === 0) return;
+      // Also once a save has failed: the newest state lives only in this tab then (#1652).
+      if (Object.keys(projectShapeSaveQueuesRef.current).length === 0 && unsavedProjectsRef.current.size === 0) return;
       event.preventDefault();
       event.returnValue = "";
     };
@@ -1693,6 +1699,12 @@ export default function Home() {
     void queuedSave
       .then((result) => {
         setProjectSaveFailure(null);
+        // A save that got through holds every change up to its revision, the failed one before it too.
+        const failedAt = unsavedProjectsRef.current.get(snapshot.projectId);
+        if (failedAt !== undefined && failedAt <= revision) {
+          unsavedProjectsRef.current.delete(snapshot.projectId);
+          setUnsavedDesign((current) => (current?.projectId === snapshot.projectId ? null : current));
+        }
         // Said once per design and session: the stored copy keeps only the newest steps of a very large history (#475).
         const trimmed = result?.historyTrimmed;
         if (trimmed && !trimmedHistoryToldRef.current.has(snapshot.projectId)) {
@@ -1712,11 +1724,11 @@ export default function Home() {
           setDashboardNotice(error instanceof Error ? localizedError(error.message) : t("notice.projectShapesSaveFailed"));
           // The dashboard is not on screen while someone works; the editor has to say it too.
           // With the reason when it is one a person can act on: too big for the project file, or no room left (#475).
-          const known = isProjectTooLargeError(error) || isStorageFullError(error);
-          setProjectSaveFailure({
-            message: known && error instanceof Error ? t("notice.projectShapesSaveFailedWhy", { reason: localizedError(error.message) }) : t("notice.projectShapesSaveFailed"),
-            at: Date.now(),
-          });
+          const known = isProjectTooLargeError(error) || isStorageFullError(error) || isOutOfMemoryError(error);
+          const message = known && error instanceof Error ? t("notice.projectShapesSaveFailedWhy", { reason: localizedError(error.message) }) : t("notice.projectShapesSaveFailed");
+          setProjectSaveFailure({ message, at: Date.now() });
+          unsavedProjectsRef.current.set(snapshot.projectId, Math.max(unsavedProjectsRef.current.get(snapshot.projectId) ?? 0, revision));
+          setUnsavedDesign({ projectId: snapshot.projectId, message });
         }
       })
       .finally(() => {
@@ -3291,6 +3303,7 @@ export default function Home() {
               onProjectSnapshot={updateProjectSnapshot}
               isProjectThumbnailMissing={isProjectThumbnailMissing}
               projectSaveFailure={projectSaveFailure}
+              projectUnsaved={unsavedDesign && unsavedDesign.projectId === activeProjectId ? unsavedDesign.message : null}
               onProjectWorkspaceChange={updateProjectWorkspace}
               onProjectNameChange={(name) => {
                 if (activeProjectId) renameProject(activeProjectId, name);

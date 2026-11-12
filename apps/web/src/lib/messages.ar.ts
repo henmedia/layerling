@@ -5459,6 +5459,8 @@ export const MESSAGES_AR: Partial<Record<MessageKey, string>> = {
   "error.projectTooLarge": "هذا التصميم أكبر من أن يُحفظ: يشغل السجل والشبكات مساحة كبيرة. احذف السجل في عرض السجل أو بسّط أثقل الأجسام.",
   "error.storageFull": "لم تعد هناك مساحة في المتصفح لهذا التصميم. احذف السجل في عرض السجل، أو أزل التصاميم التي لا تحتاجها، أو انسخها احتياطيًا أولًا.",
   "notice.projectShapesSaveFailedWhy": "تعذر حفظ أشكال التصميم: {reason}",
+  "notice.designNotSavedTitle": "هذا التصميم غير محفوظ",
+  "notice.designNotSavedHint": "أحدث تغييراتك موجودة في علامة التبويب هذه فقط: لا تغلقها ولا تعِد تحميلها. خفّف الشبكات الكبيرة باستخدام «تبسيط الشبكة»، أو احتفظ بنسخة عبر تصدير ← LYL.",
   "notice.projectHistoryTrimmed": "هذا التصميم كبير: النسخة المحفوظة في المتصفح تحتفظ فقط بآخر {kept} من {total} خطوة في السجل. احذف السجل لتخفيفه.",
   "notice.projectShapesMigrateFailed": "تعذر نقل أشكال التصميم إلى مساحة تخزين أكبر",
   "notice.projectShapesPrepareFailed": "تعذر تجهيز تخزين أشكال التصميم",

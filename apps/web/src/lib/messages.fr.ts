@@ -5427,6 +5427,8 @@ export const MESSAGES_FR: Partial<Record<MessageKey, string>> = {
   "error.projectTooLarge": "Cette conception est trop grande pour être enregistrée : l'historique et les maillages prennent trop de place. Supprimez l'historique dans la vue de l'historique ou simplifiez les corps les plus lourds.",
   "error.storageFull": "Le navigateur n'a plus de place pour cette conception. Supprimez l'historique dans la vue de l'historique, retirez les conceptions inutiles ou sauvegardez-les d'abord.",
   "notice.projectShapesSaveFailedWhy": "Impossible d'enregistrer les formes de conception : {reason}",
+  "notice.designNotSavedTitle": "Ce design n'est pas enregistré",
+  "notice.designNotSavedHint": "Vos dernières modifications n'existent que dans cet onglet : ne le fermez pas et ne le rechargez pas. Allégez les grands maillages avec Simplifier le maillage, ou gardez une copie avec Exporter → LYL.",
   "notice.projectHistoryTrimmed": "Cette conception est grande : la copie enregistrée dans le navigateur ne garde que les {kept} dernières des {total} étapes de l'historique. Supprimez l'historique pour l'alléger.",
   "notice.projectShapesMigrateFailed": "Impossible de migrer les formes de conception vers un espace de stockage plus grand",
   "notice.projectShapesPrepareFailed": "Impossible de préparer le stockage des formes de conception",

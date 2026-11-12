@@ -73,5 +73,17 @@
       "en": "When you left an empty design, layerling asked \"Keep empty design?\" with Yes and No, and No deleted it at once. In a hurry that was easy to misread. Now the buttons say what they do: Keep and Delete, with Delete in red.",
       "da": "Når man forlod et tomt design, spurgte layerling \"Behold tomt design?\" med Ja og Nej, og Nej slettede det med det samme. I en fart var det let at læse forkert. Nu siger knapperne, hvad de gør: Behold og Slet, med Slet i rødt."
     }
+  },
+  {
+    "title": {
+      "de": "Wenn ein Entwurf nicht gespeichert werden kann",
+      "en": "When a design cannot be saved",
+      "da": "Når et design ikke kan gemmes"
+    },
+    "body": {
+      "de": "Bei sehr großen Netzen konnte dem Browser beim Speichern der Speicher ausgehen. Das Speichern scheiterte dann still, und nach dem Neuladen war der Entwurf auf einem Stunden alten Stand. Jetzt versucht layerling es mit einer kürzeren Rückgängig-Liste noch einmal. Klappt es trotzdem nicht, bleibt ein roter Hinweis stehen, bis wieder gespeichert ist, und der Browser fragt nach, bevor der Tab geschlossen oder neu geladen wird.",
+      "en": "With very large meshes the browser could run out of memory while saving. The save then failed quietly, and after a reload the design was back at a state hours old. Now layerling tries again with a shorter undo history. If it still fails, a red note stays up until the design is saved again, and the browser asks before the tab is closed or reloaded.",
+      "da": "Med meget store mesh kunne browseren løbe tør for hukommelse, mens der blev gemt. Gemningen slog så fejl i stilhed, og efter en genindlæsning var designet tilbage på en flere timer gammel tilstand. Nu prøver layerling igen med en kortere fortryd-historik. Lykkes det stadig ikke, bliver en rød besked stående, til designet er gemt igen, og browseren spørger, før fanen lukkes eller genindlæses."
+    }
   }
 ]
