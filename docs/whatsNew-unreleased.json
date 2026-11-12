@@ -1,1 +1,14 @@
-[]
+[
+  {
+    "title": {
+      "de": "Strecken: keine schwarzen Linien mehr an den Nähten",
+      "en": "Stretch: no more black lines at the seams",
+      "da": "Stræk: ingen sorte streger ved sømmene mere"
+    },
+    "body": {
+      "de": "Ging das Strecken durch schräge oder gerundete Wände, zeigte das verlängerte Stück schwarze Linien, und nach einem späteren Schnitt blieben Reste stehen. Ursache waren haarfeine Dreiecke an beiden Nähten; sie werden jetzt weggefaltet, die Form bleibt dabei gleich.",
+      "en": "When Stretch went through slanted or rounded walls, the longer piece showed black lines, and remnants stayed behind after a later cut. Hairline triangles along both seams caused it; they are now folded away, and the shape stays the same.",
+      "da": "Når Stræk gik gennem skrå eller afrundede vægge, viste det forlængede stykke sorte streger, og der blev rester tilbage efter et senere snit. Årsagen var hårfine trekanter langs begge sømme; de foldes nu væk, og formen forbliver den samme."
+    }
+  }
+]

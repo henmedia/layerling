@@ -6,6 +6,8 @@ code still carries it - so a lower number further down is older, not newer.
 
 ## Unreleased
 
+- **Stretch: no black lines at the seams (Discussion #1569):** The filler of a stretch reaches 0.001 mm into both pieces so that the union joins them, but where it met slanted or rounded walls the union left hairline triangles along both seams and the filler's sides: over a thousand on a ramp from the discussion, drawn as black lines in the longer piece and left standing as remnants after a later cut (the slicer did not show them). After the union the result is now taken as one mesh and walls thinner than 0.002 mm are folded away, as the group merge does, kept only when the volume and surface stay the same (foldKeptShape); the ramp is back to the 27 thin triangles it came with. Unit test with a stretched cylinder and cone
+
 ## 1.159.1
 
 - **Prusa CORE One INDX in the printer list (Discussion #1648):** The CORE One with Prusa's INDX tool changer has a smaller plate than the CORE One, 248 × 205 mm and 270 mm high, as its owner gave it. It is not in OrcaSlicer's profiles yet, so the preset generator adds it next to the other CORE One models, as it does the UltiMaker S3; should OrcaSlicer bring it, its own entry wins. Unit test for the preset
