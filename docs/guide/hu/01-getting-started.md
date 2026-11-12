@@ -113,6 +113,8 @@ Példaként egy lyukas kockát építünk.
 
 Ha egy frissítés után újra megnyitod a layerlinget, a kezdőlapon egy kártya felsorolja, mi került be azóta, hogy utoljára itt jártál: minden azóta megjelent verziót, a legújabbal kezdve. Hosszabb távollét után a kártyán belül görgethetsz lefelé. Alattuk a {{ui:whatsNew.earlier}} a legutóbbi látogatásod előtti verziókat is hozzáadja. Az {{ui:whatsNew.dismiss}} gombbal bezárod, és a következő frissítésig nem jelenik meg. A kezdőlap láblécében a {{ui:whatsNew.footerLink}} bármikor újra megmutatja a legutóbbi újdonságokat. A szerkesztőben ugyanezt a listát nyitja meg a jobb felső sarokban, a {{ui:editor.guide}} mellett lévő {{ui:whatsNew.footerLink}} gomb vagy a parancskeresés; nyitva marad a terved mellett, amíg kipróbálod az újdonságokat. A böngésző megjegyzi az utoljára látott verziót, és rólad semmi sem hagyja el.
 
+Időnként egy második kártya is megjelenik fölötte: a layerling szerzőjének üzenete, például egy szünetről, amikor a válaszok tovább tartanak. Csak a neki szánt napokon látszik, és a {{ui:whatsNew.dismiss}} elrejti.
+
 A layerling saját gépen vagy szerveren futó példányán a „Frissítés érhető el” értesítésben van egy {{ui:update.previewShow}} gomb, amely telepítés előtt felsorolja, mit hoz a frissítés. A listát csak akkor tölti le a GitHubról, amikor megnyomod a gombot.
 
 ## A tervtől a nyomtatásig

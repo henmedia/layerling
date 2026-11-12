@@ -113,6 +113,8 @@ Takto se vytvářejí otvory, drážky i kapsy. Podrobnosti najdete v kapitole [
 
 Po aktualizaci se na úvodní stránce zobrazí karta s novinkami od vaší poslední návštěvy. Obsahuje jednotlivá vydání od nejnovějšího. Po delší nepřítomnosti můžete uvnitř karty posouvat seznam. Volba {{ui:whatsNew.earlier}} přidá i starší vydání. Kartu zavřete přes {{ui:whatsNew.dismiss}}; znovu se objeví až po další aktualizaci. Poslední novinky lze kdykoliv otevřít pomocí {{ui:whatsNew.footerLink}} v zápatí úvodní stránky. V editoru otevře stejný seznam tlačítko {{ui:whatsNew.footerLink}} vedle {{ui:editor.guide}} vpravo nahoře nebo vyhledávání příkazů; zůstane otevřený vedle vašeho návrhu, zatímco zkoušíte novinky. Poslední zobrazenou verzi si pamatuje prohlížeč a žádné vaše údaje se přitom neodesílají.
 
+Občas nad ní stojí druhá karta: zpráva od autora layerlingu, například o přestávce, kdy odpovědi trvají déle. Zobrazuje se jen ve dnech, pro které je určena, a {{ui:whatsNew.dismiss}} ji skryje.
+
 Ve vlastní instalaci na počítači nebo serveru obsahuje oznámení o dostupné aktualizaci tlačítko {{ui:update.previewShow}}. Zobrazí změny ještě před instalací. Seznam se načte z GitHubu teprve po stisknutí tlačítka.
 
 ## Od modelu k tisku

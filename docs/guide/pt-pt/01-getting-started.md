@@ -113,6 +113,8 @@ Como exemplo, vamos criar um bloco com um furo.
 
 Quando voltas a abrir o layerling após uma atualização, um cartão na página inicial apresenta as novidades desde a tua última visita: todas as versões entretanto publicadas, começando pela mais recente. Após uma ausência prolongada, podes percorrer a lista dentro do cartão. Por baixo, {{ui:whatsNew.earlier}} acrescenta também as versões anteriores à tua última visita. Fecha o cartão com {{ui:whatsNew.dismiss}} e este só volta a aparecer na próxima atualização. A opção {{ui:whatsNew.footerLink}}, no rodapé da página inicial, permite voltar a consultar as novidades mais recentes a qualquer momento. No editor, o botão {{ui:whatsNew.footerLink}} ao lado de {{ui:editor.guide}}, no canto superior direito, ou a pesquisa de comandos abre a mesma lista; esta fica aberta ao lado do teu projeto enquanto experimentas as novidades. O navegador memoriza a última versão que viste, sem enviar para fora qualquer informação sobre ti.
 
+De vez em quando aparece por cima um segundo cartão: um aviso do autor do layerling, por exemplo sobre uma pausa em que as respostas demoram mais. Só aparece nos dias para que foi pensado, e {{ui:whatsNew.dismiss}} esconde-o.
+
 Numa cópia do layerling instalada no teu computador ou servidor, o aviso de atualização disponível inclui o botão {{ui:update.previewShow}}, que apresenta as novidades antes de instalares a atualização. A lista só é obtida do GitHub quando primes o botão.
 
 ## Do projeto à impressão

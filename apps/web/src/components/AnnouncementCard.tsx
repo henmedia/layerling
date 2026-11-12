@@ -1,6 +1,7 @@
 "use client";
 
 import { Megaphone, X } from "lucide-react";
+import { GuideHelpLink } from "@/components/GuideHelpLink";
 import { useEffect, useRef } from "react";
 import { announcementInlines, SUPPORT_LINK_TARGET, type Announcement } from "@/lib/announcements";
 import { localizedText, t } from "@/lib/i18n";
@@ -57,6 +58,7 @@ export function AnnouncementCard({ announcement, reveal = false, onClose }: { an
           <Megaphone size={20} strokeWidth={2.4} />
         </span>
         <strong>{title}</strong>
+        <GuideHelpLink section="whatsNew" />
         <button className="whats-new-close" type="button" aria-label={t("whatsNew.close")} title={t("whatsNew.close")} onClick={onClose}>
           <X size={16} />
         </button>

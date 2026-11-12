@@ -113,6 +113,8 @@ C'est ainsi que sont créés les perçages, fentes et poches. Le chapitre [Solid
 
 Lorsque vous ouvrez à nouveau layerling après une mise à jour, une carte sur la page d'accueil liste ce qui a été ajouté depuis votre dernière visite : chaque version depuis lors, la plus récente en premier. Après une longue absence, vous pouvez faire défiler l'intérieur de la carte. En dessous, {{ui:whatsNew.earlier}} affiche également les versions antérieures à votre dernière visite. Fermez-la avec {{ui:whatsNew.dismiss}} et elle restera masquée jusqu'à la prochaine mise à jour. {{ui:whatsNew.footerLink}} dans le pied de page de la page d'accueil affiche à tout moment les derniers ajouts. Dans l'éditeur, le bouton {{ui:whatsNew.footerLink}} à côté de {{ui:editor.guide}} en haut à droite, ou la recherche de commandes, ouvre la même liste ; elle reste ouverte à côté de votre modèle pendant que vous essayez les nouveautés. Le navigateur se souvient de la dernière version consultée, et aucune donnée personnelle ne quitte votre machine.
 
+De temps en temps, une deuxième carte s'affiche au-dessus : un message de l'auteur de layerling, par exemple au sujet d'une pause pendant laquelle les réponses prennent plus de temps. Elle n'apparaît que pendant les jours prévus, et {{ui:whatsNew.dismiss}} la fait disparaître.
+
 Sur une copie locale de layerling sur votre ordinateur ou serveur, la notification "Mise à jour disponible" comporte un bouton, {{ui:update.previewShow}}, qui liste ce que la mise à jour apporte avant de l'installer. La liste n'est récupérée sur GitHub que lorsque vous cliquez sur le bouton.
 
 ## De la conception à l'impression

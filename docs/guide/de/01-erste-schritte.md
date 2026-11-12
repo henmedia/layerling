@@ -113,6 +113,8 @@ Genau so entstehen Bohrungen, Nuten und Taschen. Das Kapitel [Körper und Ausspa
 
 Wenn du layerling nach einer Aktualisierung wieder öffnest, zeigt dir eine Karte auf der Startseite, was seit deinem letzten Besuch dazugekommen ist: jede Version seitdem, die neueste zuerst. Warst du lange weg, rollst du in der Karte nach unten. Darunter holt {{ui:whatsNew.earlier}} auch die Versionen von vor deinem letzten Besuch dazu. Mit {{ui:whatsNew.dismiss}} schließt du sie, und sie bleibt bis zur nächsten Aktualisierung weg. {{ui:whatsNew.footerLink}} in der Fußzeile der Startseite zeigt die letzten Neuerungen jederzeit wieder. Im Editor öffnet der Knopf {{ui:whatsNew.footerLink}} neben {{ui:editor.guide}} oben rechts dieselbe Liste, ebenso die Befehlssuche; sie bleibt neben deinem Entwurf offen, während du das Neue ausprobierst. Der Browser merkt sich die zuletzt gesehene Version, und nichts über dich verlässt ihn.
 
+Ab und zu steht darüber eine zweite Karte: eine Nachricht vom Autor von layerling, etwa zu einer Pause, in der Antworten länger dauern. Sie erscheint nur in den Tagen, für die sie gedacht ist, und {{ui:whatsNew.dismiss}} blendet sie aus.
+
 Bei einer Kopie von layerling auf deinem eigenen Rechner oder Server hat der Hinweis „Update verfügbar“ einen Knopf, {{ui:update.previewShow}}, der auflistet, was das Update bringt, bevor du es einspielst. Die Liste wird nur beim Drücken des Knopfs von GitHub geholt.
 
 ## Vom Entwurf zum Druck
