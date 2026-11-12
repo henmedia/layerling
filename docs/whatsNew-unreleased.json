@@ -10,5 +10,17 @@
       "en": "When Stretch went through slanted or rounded walls, the longer piece showed black lines, and remnants stayed behind after a later cut. Hairline triangles along both seams caused it; they are now folded away, and the shape stays the same.",
       "da": "Når Stræk gik gennem skrå eller afrundede vægge, viste det forlængede stykke sorte streger, og der blev rester tilbage efter et senere snit. Årsagen var hårfine trekanter langs begge sømme; de foldes nu væk, og formen forbliver den samme."
     }
+  },
+  {
+    "title": {
+      "de": "Das Mittelkreuz bleibt auch von weitem zu sehen",
+      "en": "The centre cross stays visible from afar",
+      "da": "Midterkrydset kan ses, også på afstand"
+    },
+    "body": {
+      "de": "Das Kreuz durch die Mitte der Platte wurde beim Herauszoomen so dünn wie die anderen Rasterlinien und ging zwischen ihnen unter. Es bleibt jetzt immer mindestens drei Bildpunkte breit; nah herangezoomt sieht es aus wie bisher.",
+      "en": "Zoomed out, the cross through the middle of the plate became as thin as the other grid lines and got lost among them. It now always stays at least three pixels wide; close up it looks as before.",
+      "da": "Når man zoomede ud, blev krydset gennem pladens midte lige så tyndt som de andre gitterlinjer og forsvandt imellem dem. Nu er det altid mindst tre pixel bredt; tæt på ser det ud som før."
+    }
   }
 ]
