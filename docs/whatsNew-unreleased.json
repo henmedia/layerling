@@ -24,5 +24,15 @@
     "guide": {
       "chapter": "files"
     }
+  },
+  {
+    "title": {
+      "de": "Verdrehte Textur kommt verdreht in die Datei",
+      "en": "A twisted texture comes out twisted"
+    },
+    "body": {
+      "de": "Ein Körper mit Textur, den du als Ganzes verdrehst, verjüngst oder neigst, kam bisher gerade in STL, 3MF und OBJ, obwohl ihn die Ansicht verdreht zeigte. Jetzt enthält die Datei, was du siehst, und im 3MF behalten Körper und Muster ihre Farben.",
+      "en": "A body with a texture that you twist, taper or lean as a whole came out straight in STL, 3MF and OBJ, although the view showed it twisted. Now the file holds what you see, and in a 3MF the body and the pattern keep their colours."
+    }
   }
 ]
