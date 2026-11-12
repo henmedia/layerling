@@ -21,7 +21,7 @@ Quando ci sono molte parti, è facile perderne qualcuna nella vista. L’elenco 
 
 ![L’elenco degli oggetti: il gruppo “Gruppo” contiene due parti e accanto c’è una sfera. L’icona della cartella apre il gruppo.](shot:object-list)
 
-- Fai clic su una voce per selezionare la forma, anche se si trova dentro un gruppo. Tieni premuto [[Shift]] per aggiungere o rimuovere altre voci, proprio come nella vista. Le frecce aprono e chiudono i gruppi.
+- Fai clic su una voce per selezionare la forma, anche se si trova dentro un gruppo. Come in un gestore di file, [[Ctrl]] ([[Cmd]] su Mac) aggiunge o rimuove una voce, e [[Shift]] seleziona tutte le voci dall'ultima cliccata fino a questa, nell'ordine della lista; [[Ctrl]]+[[Shift]] le aggiunge alla selezione. Nella vista, invece, è [[Shift]] ad aggiungere e rimuovere. Le frecce aprono e chiudono i gruppi.
 - La lettera dopo il nome indica se una parte è {{ui:outliner.solid}} o {{ui:outliner.hole}}: è l'iniziale della parola, e la parola intera compare tenendoci sopra il mouse.
 - Sotto il nome compare il tipo di forma. Un corpo che non è più una forma semplice (arrotondato, svuotato o importato) mostra {{ui:shape.exactBody}} quando l'esportazione STEP lo scrive in modo esatto, e {{ui:shape.mesh}} quando è fatto solo di triangoli e va esportato come STL. Una rastremazione, un'inclinazione o una torsione aggiunte dopo aver arrotondato o svuotato un corpo piegano solo la sua mesh, quindi allora mostra {{ui:shape.mesh}}.
 - Il lucchetto e l’occhio bloccano o nascondono le singole parti.

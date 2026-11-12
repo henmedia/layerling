@@ -55,8 +55,10 @@ import { useOfflineAvailable } from "@/lib/offlineSupport";
 import { InstallAppHint } from "@/components/InstallAppHint";
 import { TabletHint } from "@/components/TabletHint";
 import { WhatsNewCard } from "@/components/WhatsNewCard";
+import { AnnouncementCard } from "@/components/AnnouncementCard";
 import { UpdatePreview } from "@/components/UpdatePreview";
 import { useWhatsNew } from "@/lib/useWhatsNew";
+import { useAnnouncements } from "@/lib/useAnnouncements";
 import { TabPresenceNotice } from "@/components/TabPresenceNotice";
 import { SafeModeErrorBoundary } from "@/components/SafeModeErrorBoundary";
 import { duplicateName, type DuplicateNamePatterns } from "@/lib/duplicateName";
@@ -3671,6 +3673,7 @@ function Dashboard({
   const offlineOk = useOfflineAvailable();
   const { update, isDismissed, dismiss: dismissUpdate } = useAppUpdate(LYL_CREATED_WITH_VERSION);
   const whatsNew = useWhatsNew(LYL_CREATED_WITH_VERSION);
+  const announcements = useAnnouncements();
   const simpleMode = useSimpleMode();
   const [openProjectMenuId, setOpenProjectMenuId] = useState<string | null>(null);
   const [openSharedProjectMenuKey, setOpenSharedProjectMenuKey] = useState<string | null>(null);
@@ -4125,6 +4128,7 @@ function Dashboard({
               {dashboardNotice}
             </div>
           ) : null}
+          {announcements.shown && !simpleMode ? <AnnouncementCard announcement={announcements.shown} reveal={announcements.reopened} onClose={announcements.close} /> : null}
           {whatsNew.view && !simpleMode ? <WhatsNewCard view={whatsNew.view} current={LYL_CREATED_WITH_VERSION} onClose={whatsNew.dismiss} /> : null}
           {simpleMode ? null : <InstallAppHint />}
           {simpleMode ? null : <TabletHint />}
@@ -4857,7 +4861,7 @@ function Dashboard({
               ) : null}
             </>
           )}
-          <AppFooter version={LYL_CREATED_WITH_VERSION} updateInfo={update} onShowWelcome={welcome.hidden && !simpleMode ? showWelcome : undefined} />
+          <AppFooter version={LYL_CREATED_WITH_VERSION} updateInfo={update} onShowWelcome={welcome.hidden && !simpleMode ? showWelcome : undefined} onShowAnnouncement={announcements.closedButActive && !simpleMode ? announcements.reopen : undefined} />
         </section>
       </div>
 

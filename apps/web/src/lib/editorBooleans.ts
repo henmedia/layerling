@@ -29,7 +29,7 @@ import type { WorkplaneShape } from "@/types/layerling";
 import { cylinderToEllipsePatch } from "@/lib/cylinderToEllipse";
 import { pointInDrillPoint, shapeDrillPointAngle } from "@/lib/drillPoint";
 import { tubeBeforeEdgeTreatments } from "@/lib/edgeTreatmentHistory";
-import { type Vec3, type MeshData, type Cuboid, type ShapeUpdatePatch, type ManifoldSolid, CUTTER_PADDING, CUTTER_LATERAL_PADDING, POINT_TOLERANCE, CUTTER_RESIDUAL_INSET, MIN_SHAPE_DIMENSION, IMPORTED_FALLBACK_BOOLEAN_TRIANGLE_LIMIT, COPLANAR_BOOLEAN_RESCUE_DEGREES, cleanModelDimension, getManifoldRuntime, transformMesh, meshForShape, appendMeshData, formatTriangleCount, shapeAabb, boundsForShapesOfVertices, boundsForCuboids, meshAabb, geometryFromMeshData, positionsFromGeometryDrawRange, boundsForPositions, positionsDifferFromMeshData, geometryDiffersFromMeshData, positionsBoundaryEdges, meshDataPositions, midpoint, localGroupBounds } from "@/lib/editorMeshCore";
+import { type Vec3, type MeshData, type Cuboid, type ShapeUpdatePatch, type ManifoldSolid, CUTTER_PADDING, CUTTER_LATERAL_PADDING, POINT_TOLERANCE, CUTTER_RESIDUAL_INSET, MIN_SHAPE_DIMENSION, IMPORTED_FALLBACK_BOOLEAN_TRIANGLE_LIMIT, COPLANAR_BOOLEAN_RESCUE_DEGREES, cleanModelDimension, getManifoldRuntime, transformMesh, meshForShape, groupedContentMesh, deformFrameOf, appendMeshData, formatTriangleCount, shapeAabb, boundsForShapesOfVertices, boundsForCuboids, meshAabb, geometryFromMeshData, positionsFromGeometryDrawRange, boundsForPositions, positionsDifferFromMeshData, geometryDiffersFromMeshData, positionsBoundaryEdges, meshDataPositions, midpoint, localGroupBounds } from "@/lib/editorMeshCore";
 
 export type GroupBuildResult = {
   group: WorkplaneShape | null;
@@ -1519,10 +1519,21 @@ export const SECTION_SEEN_FROM_KEYS = {
 /** A bundle goes out as its parts, each a body of its own with its own colour (or the bundle's, letters included, with Multicolor off); its holes cut nothing. */
 export function expandBundles(source: readonly WorkplaneShape[]): WorkplaneShape[] {
   return source.flatMap((shape) => (
-    shape.groupOperation === "bundle" && shape.groupedShapes?.length
+    shape.groupOperation === "bundle" && shape.groupedShapes?.length && !keptWholeForItsDeform(shape)
       ? expandBundles(restoreGroupedChildren(shape).map((part) => (shape.multicolor === false ? { ...part, color: shape.color, gridfinityLabelColor: undefined } : part))).filter((part) => !part.hidden)
       : [shape]
   ));
+}
+
+/**
+ * A bundle tapered, twisted or leaned as a whole goes out whole (#1648): its parts on their own cannot carry that, so
+ * taken apart its texture came out straight while the view showed it twisted. meshForShape turns it as the view does.
+ * One with a hole in it is still taken apart, or the hole would come out solid.
+ */
+function keptWholeForItsDeform(bundle: WorkplaneShape): boolean {
+  if (!shapeHasShapeDeform(bundle)) return false;
+  const hasHole = (shape: WorkplaneShape): boolean => (shape.groupedShapes ?? []).some((part) => !part.hidden && (part.hole || hasHole(part)));
+  return !hasHole(bundle);
 }
 
 export function visibleExportShapes(source: readonly WorkplaneShape[]) {
@@ -1590,6 +1601,9 @@ function partColorMeshes(shape: WorkplaneShape): Array<{ mesh: MeshData; color: 
   let lowest = Number.POSITIVE_INFINITY;
   if (imported) for (let index = 1; index < imported.positions.length; index += 3) lowest = Math.min(lowest, imported.positions[index]);
   const scale = imported ? null : groupedContentScale(shape, localGroupBounds(shape.groupedShapes ?? []));
+  // A tapered or twisted group turns each part over the whole group's height, as meshForShape does, not over the
+  // part's own: the pattern of a twisted bundle, higher up than its body, kept its colour off the twisted faces (#1648).
+  const frame = !imported && shapeHasShapeDeform(shape) ? deformFrameOf(groupedContentMesh(shape).vertices) : undefined;
   const meshes: Array<{ mesh: MeshData; color: string }> = [];
   const add = (local: MeshData, color: string) => {
     if (local.faces.length === 0) return;
@@ -1602,7 +1616,7 @@ function partColorMeshes(shape: WorkplaneShape): Array<{ mesh: MeshData; color: 
     } else {
       vertices = scaleGroupedVertices(local.vertices, scale!) as Vec3[];
     }
-    meshes.push({ mesh: transformMesh({ name: local.name, vertices, faces: local.faces }, shape), color });
+    meshes.push({ mesh: transformMesh({ name: local.name, vertices, faces: local.faces }, shape, frame), color });
   };
   parts.forEach((part) => {
     // A bin's letters in their own colour come before the bin, as for a bin on its own; here the bin stays its mesh, as

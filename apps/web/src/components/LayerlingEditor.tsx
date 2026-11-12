@@ -901,6 +901,12 @@ function shapeMoveDeltaBetween(from: ShapeTransformSnapshot, to: ShapeTransformS
   };
 }
 
+function sameIdSet(a: readonly string[], b: readonly string[]) {
+  if (a.length !== b.length) return false;
+  const inA = new Set(a);
+  return b.every((id) => inA.has(id));
+}
+
 function isZeroMoveDelta(delta: ShapeMoveDelta) {
   const epsilon = 1e-6;
   return Math.abs(delta.dx) < epsilon && Math.abs(delta.dz) < epsilon && Math.abs(delta.delevation) < epsilon
@@ -6927,6 +6933,13 @@ export function LayerlingEditor({
    */
   const smartDuplicateRef = useRef<{ id: string; baseline: ShapeTransformSnapshot; delta: ShapeMoveDelta }[] | null>(null);
 
+  // The chain ends once the selection leaves the copies, also by a click into empty space: selecting the copy
+  // again and duplicating then gives a plain copy in the same spot, as in similar tools (Discussion #1691).
+  useEffect(() => {
+    const chain = smartDuplicateRef.current;
+    if (chain && !sameIdSet(chain.map((link) => link.id), selectedIds)) smartDuplicateRef.current = null;
+  }, [selectedIds]);
+
   const duplicateSelected = useCallback(() => {
     if (!hasSelection) {
       setNotice(t("status.selectShapeFirst"));
@@ -9223,7 +9236,10 @@ export function LayerlingEditor({
         setShellTool(null);
       })
       .catch((error: unknown) => {
-        const message = error instanceof Error ? localizedError(error.message) : String(error);
+        // A body the kernel cannot finish said only that the worker was restarted (#1687).
+        const message = error instanceof Error
+          ? (error.message.includes("Timed out waiting for the CAD worker") ? t("shell.errorTooSlow") : localizedError(error.message))
+          : String(error);
         setShellTool((current) => current ? { ...current, busy: false, error: message } : current);
       });
   }, [commitShapes, offsetShape, selectedShape, selectedShapes.length, shellShape, shellTool]);

@@ -21,7 +21,7 @@ U složitého modelu pomůže seznam všech tvarů: {{ui:editor.tool.showOutline
 
 ![Seznam objektů: sloučený celek se dvěma částmi a vedle něj koule. Ikona složky otevře úpravu celku.](shot:object-list)
 
-- Kliknutí vybere tvar, i uvnitř sloučení. [[Shift]] přidává a odebírá položky jako v pohledu. Šipky rozbalují a sbalují vnořené části.
+- Kliknutí vybere tvar, i uvnitř sloučení. Jako ve správci souborů [[Ctrl]] ([[Cmd]] na Macu) přidá nebo odebere jednu položku a [[Shift]] vybere všechny položky od naposledy kliknuté až po tuto, v pořadí seznamu; [[Ctrl]]+[[Shift]] je přidá k výběru. V pohledu naopak přidává a odebírá [[Shift]]. Šipky rozbalují a sbalují vnořené části.
 - Písmeno za názvem ukazuje, zda je díl {{ui:outliner.solid}}, nebo {{ui:outliner.hole}}: je to první písmeno slova a po najetí myší se zobrazí celé slovo.
 - Pod názvem stojí, o jaký tvar jde. Těleso, které už není jednoduchým tvarem (zaoblené, vydutěné nebo importované), ukazuje {{ui:shape.exactBody}}, když ho export STEP zapíše přesně, a {{ui:shape.mesh}}, když je jen z trojúhelníků a jde ven jako STL. Zúžení, náklon nebo zkroucení přidané až po zaoblení nebo vydutění ohne jen jeho síť, takže pak ukazuje {{ui:shape.mesh}}.
 - Zámek a oko ovládají zamknutí a skrytí jednotlivých částí.

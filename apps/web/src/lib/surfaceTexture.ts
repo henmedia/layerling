@@ -86,6 +86,7 @@ import {
   type SurfaceMesh,
 } from "@/lib/surfaceTextureMesh";
 import { crackEdgeNear, crackFillBody, crackNetwork, crackValue, surfaceFillBody, surfaceIndex, type CrackNetwork, type CrackSurfaceIndex } from "@/lib/surfaceTextureCracks";
+import { SURFACE_IMAGE_OUTLINE_UNITS } from "@/lib/surfaceImageOutline";
 import { nearestSurfacePoint, unfoldSurface } from "@/lib/surfaceTextureUnfold";
 import { BARK_KINDS, BARK_STARTS, BARK_WOOD, barkValue, WOOD_CUTS, WOOD_KINDS, WOOD_RINGS, woodFrame, woodValue, type WoodFrame } from "@/lib/surfaceTextureWood";
 import { nearestOnOutline, outlineAngle, outlineRing, prismOutline, type SurfaceOutline } from "@/lib/surfaceTextureOutline";
@@ -3091,6 +3092,21 @@ function onceSize(s: SurfaceTextureSettings, image: GreyImage | null | undefined
   const width = s.spacing;
   const height = s.tileHeight > 0 ? s.tileHeight : image ? (width * image.height) / image.width : width;
   return { width, height };
+}
+
+/**
+ * An image once that is cut along outlines (a drawing's, see SurfaceTextureOwnImage.outline): the rings in mm on the
+ * plane of the surface, centred on the image's middle as a text's are, and null for an image that goes by its grey
+ * values. Inverted, a ring round the image's box turns inside and outside over (even-odd).
+ */
+export function onceOutline(s: SurfaceTextureSettings, size: { width: number; height: number }): number[][] | null {
+  if (!imageOnce(s) || s.image !== "own" || !s.imageOwn?.outline?.length) return null;
+  const rings = s.imageOwn.outline.map((ring) => ring.map((value, k) => (value / SURFACE_IMAGE_OUTLINE_UNITS - 0.5) * (k % 2 === 0 ? size.width : size.height)));
+  if (s.imageInvert) {
+    const w = size.width / 2, h = size.height / 2;
+    rings.push([-w, -h, w, -h, w, h, -w, h]);
+  }
+  return rings;
 }
 
 /**
@@ -6427,7 +6443,11 @@ export function createSurfaceTextureSession(positions: ArrayLike<number>) {
         };
         const split = subdivide(mesh, edge, maxTriangles, null, null, near);
         mesh = { ...split, parents: Uint32Array.from(split.parents, (f) => mesh.parents[f]) };
-        if (once) {
+        // An image of a drawing is cut along its outlines as a text is: the same path below, with its rings and turn.
+        const cutRings = once ? onceOutline(s, { width: place.width, height: place.height }) : null;
+        const rings = cutRings ?? s.textOutline;
+        const turn = once ? s.imageTurn : s.textTurn;
+        if (once && !cutRings) {
           // The image: finer where its grey value jumps (an outline drawn in it), rolled out anew each round. Softened to
           // the finest mesh its outlines get, as a tile is to its mesh (see textureImage), over its width: softened to
           // the coarser grid, a thin line drawn in it faded to a faint groove or to nothing (#1268).
@@ -6478,7 +6498,7 @@ export function createSurfaceTextureSession(positions: ArrayLike<number>) {
             let uv = unrolled(mesh, place, s, -1, fold);
             const creased = uv.creased;
             for (let round = 0; round < FLANK_ROUNDS && !mesh.limited; round += 1) {
-              const F = textField(uv.U, uv.V, s.textOutline, s.textTurn, cap);
+              const F = textField(uv.U, uv.V, rings, turn, cap);
               const v = mesh.vertices, I = mesh.indices;
               const flags = new Uint8Array(v.length / 3);
               let any = false;
@@ -6505,8 +6525,8 @@ export function createSurfaceTextureSession(positions: ArrayLike<number>) {
           let kept = over;
           if (over.creased) {
             const straightOn = lay(mesh, false);
-            const wholeOver = lettersWhole(over.mesh, over.uv.U, over.uv.V, s.textOutline, s.textTurn);
-            const wholeStraight = lettersWhole(straightOn.mesh, straightOn.uv.U, straightOn.uv.V, s.textOutline, s.textTurn);
+            const wholeOver = lettersWhole(over.mesh, over.uv.U, over.uv.V, rings, turn);
+            const wholeStraight = lettersWhole(straightOn.mesh, straightOn.uv.U, straightOn.uv.V, rings, turn);
             if (wholeOver < wholeStraight - WHOLE_MARGIN || (wholeOver <= wholeStraight + WHOLE_MARGIN && over.uv.torn >= straightOn.uv.torn)) kept = straightOn;
           }
           mesh = kept.mesh;
@@ -6514,7 +6534,7 @@ export function createSurfaceTextureSession(positions: ArrayLike<number>) {
           // Then cut along both sides of every wall: the letters' edges become edges of the mesh, following the outlines
           // instead of the grid (on the grid they came out as steps). Between the cuts the wall rises; points carry the
           // distance they were cut at.
-          const F = textField(uv.U, uv.V, s.textOutline, s.textTurn, cap);
+          const F = textField(uv.U, uv.V, rings, turn, cap);
           const I = mesh.indices;
           const sliced = new Uint8Array(I.length / 3);
           for (let f = 0; f < sliced.length; f += 1) {

@@ -5,6 +5,8 @@
  * kept with the settings as Base64.
  */
 
+import { SURFACE_IMAGE_OUTLINE_MAX_POINTS, SURFACE_IMAGE_OUTLINE_UNITS } from "@/lib/surfaceImageOutline";
+
 /** The ready images, by the name the settings keep. */
 export const SURFACE_TEXTURE_IMAGE_PRESETS = ["topography", "wood", "woodRift", "guilloche", "terrazzo", "craquelure", "cord", "moire", "mosaic", "folds", "fingerprint", "rosettes"] as const;
 export type SurfaceTextureImagePreset = (typeof SURFACE_TEXTURE_IMAGE_PRESETS)[number];
@@ -28,11 +30,15 @@ export const SURFACE_TEXTURE_IMAGE_TILE: Record<SurfaceTextureImagePreset, numbe
 /** A grey image: values 0 to 255, a row at a time from the top. */
 export type GreyImage = { width: number; height: number; data: Uint8Array };
 
-/** One's own image as the settings keep it: its size and its grey values as Base64. */
-export type SurfaceTextureOwnImage = { width: number; height: number; data: string };
+/**
+ * One's own image as the settings keep it: its size and its grey values as Base64. A drawing in two tones (an SVG) also
+ * keeps its outlines (#1268): closed rings [u0, v0, u1, v1, ...] in whole numbers from 0 to SURFACE_IMAGE_OUTLINE_UNITS
+ * across the image, v up, filled even-odd. Pressed on once, the surface is cut along them, as along a text's letters.
+ */
+export type SurfaceTextureOwnImage = { width: number; height: number; data: string; outline?: number[][] };
 
 /** One's own image has at most this many points on its longer side (kept in the design, in every undo step). */
-export const SURFACE_TEXTURE_OWN_IMAGE_SIZE = 256;
+export const SURFACE_TEXTURE_OWN_IMAGE_SIZE = 512;
 
 const TAU = 2 * Math.PI;
 const fract = (x: number) => x - Math.floor(x);
@@ -332,12 +338,27 @@ export function base64ToBytes(text: string) {
 /** One's own image as the settings may keep it: whole numbers within the size, and exactly as many grey values; else null. */
 export function normalizeSurfaceTextureOwnImage(input: unknown): SurfaceTextureOwnImage | null {
   if (!input || typeof input !== "object") return null;
-  const { width, height, data } = input as { width?: unknown; height?: unknown; data?: unknown };
+  const { width, height, data, outline } = input as { width?: unknown; height?: unknown; data?: unknown; outline?: unknown };
   if (typeof width !== "number" || typeof height !== "number" || typeof data !== "string") return null;
   if (!Number.isInteger(width) || !Number.isInteger(height) || width < 2 || height < 2) return null;
   if (width > SURFACE_TEXTURE_OWN_IMAGE_SIZE || height > SURFACE_TEXTURE_OWN_IMAGE_SIZE) return null;
   if (!/^[A-Za-z0-9+/]*={0,2}$/.test(data) || base64ToBytes(data).length !== width * height) return null;
-  return { width, height, data };
+  const rings = normalizeOwnImageOutline(outline);
+  return rings.length ? { width, height, data, outline: rings } : { width, height, data };
+}
+
+/** The outlines as the settings may keep them: rings of at least three points in whole parts of the image, within the budget; the rest dropped. */
+function normalizeOwnImageOutline(input: unknown): number[][] {
+  if (!Array.isArray(input)) return [];
+  const out: number[][] = [];
+  let budget = SURFACE_IMAGE_OUTLINE_MAX_POINTS * 2;
+  for (const ring of input) {
+    if (!Array.isArray(ring) || ring.length < 6 || ring.length % 2 !== 0 || ring.length > budget) continue;
+    if (!ring.every((value) => Number.isInteger(value) && value >= 0 && value <= SURFACE_IMAGE_OUTLINE_UNITS)) continue;
+    out.push(ring.slice());
+    budget -= ring.length;
+  }
+  return out;
 }
 
 /**
@@ -381,6 +402,11 @@ export function surfaceTextureOwnImage(rgba: ArrayLike<number>, width: number, h
 export function ownImageKey(own: SurfaceTextureOwnImage) {
   let h = 2166136261;
   for (let i = 0; i < own.data.length; i += 1) h = Math.imul(h ^ own.data.charCodeAt(i), 16777619);
+  // The outlines count too: the same grey values with other outlines is another image.
+  for (const ring of own.outline ?? []) {
+    h = Math.imul(h ^ ring.length, 16777619);
+    for (const value of ring) h = Math.imul(h ^ value, 16777619);
+  }
   return `${own.width}x${own.height}:${(h >>> 0).toString(36)}`;
 }
 
