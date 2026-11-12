@@ -3770,7 +3770,7 @@ export const MESSAGES_SV: Partial<Record<MessageKey, string>> = {
   "inspector.surfaceSeedHint": "Ett annat nummer lägger ut cellerna eller kornen på nytt.",
   "inspector.surfaceImage": "Bild",
   "inspector.surfaceImageLoad": "Läs in egen bild…",
-  "inspector.surfaceImageHint": "Ljust blir fullt djup, mörkt förblir som det är. En mörk teckning mot genomskinlig bakgrund, till exempel svarta linjer i en SVG, räknas efter sina linjer: de blir fullt djup. Din egen bild sparas i designen i gråskala, högst 256 punkter per sida; en ruta blir så bred som angivet och så hög som bilden är vid den bredden.",
+  "inspector.surfaceImageHint": "Ljust blir fullt djup, mörkt förblir som det är. En mörk teckning mot genomskinlig bakgrund, till exempel svarta linjer i en SVG, räknas efter sina linjer: de blir fullt djup. Din egen bild sparas i designen i gråskala, högst 512 punkter per sida; en ruta blir så bred som angivet och så hög som bilden är vid den bredden.",
   "inspector.surfaceTileHeight": "Ruthöjd (0 = som bilden)",
   "inspector.surfaceImageHeight": "Bildhöjd",
   "inspector.surfaceImageOnceHint": "Bilden trycks på en gång, som en etikett: \"Runt om\" och \"Höjd\" placerar dess mitt, precis som för en text. Utanför den förblir ytan slät; \"Djup\" och \"Riktning\" styr hur långt den sticker ut eller skärs in. En bildhöjd på 0 behåller bildens proportioner. Om ytor är valda hamnar bilden alltid på dem.",

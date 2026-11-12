@@ -654,7 +654,7 @@ export const MESSAGES_DA: Partial<Record<MessageKey, string>> = {
   "inspector.surfaceSeedHint": "Et andet tal lægger cellerne eller kornene ud på ny.",
   "inspector.surfaceImage": "Billede",
   "inspector.surfaceImageLoad": "Indlæs dit eget billede …",
-  "inspector.surfaceImageHint": "Lyst bliver til fuld dybde, mørkt bliver som det er. En mørk tegning på en gennemsigtig baggrund, som sorte streger i en SVG, tæller efter sine streger: de får fuld dybde. Dit eget billede gemmes med designet i gråtoner, højst 256 punkter pr. side; en flis er så bred som sat og så høj som billedet er ved den bredde.",
+  "inspector.surfaceImageHint": "Lyst bliver til fuld dybde, mørkt bliver som det er. En mørk tegning på en gennemsigtig baggrund, som sorte streger i en SVG, tæller efter sine streger: de får fuld dybde. Dit eget billede gemmes med designet i gråtoner, højst 512 punkter pr. side; en flis er så bred som sat og så høj som billedet er ved den bredde.",
   "inspector.surfaceTileHeight": "Flishøjde (0 = som billedet)",
   "inspector.surfaceImageHeight": "Billedhøjde",
   "inspector.surfaceImageOnceHint": "Billedet trykkes på én gang, som en etiket: „Rundt om“ og „Højde“ placerer dets midte, som ved en tekst. Uden for det forbliver fladen glat; „Dybde“ og „Retning“ bestemmer, hvor meget det står frem eller er trykket ind. En billedhøjde på 0 bevarer billedets proportioner. Er der valgt flader, lander billedet altid på dem.",

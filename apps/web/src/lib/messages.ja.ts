@@ -2948,7 +2948,7 @@ export const MESSAGES_JA: Partial<Record<MessageKey, string>> = {
   "inspector.surfaceSeedHint": "数を変えると、セルやつぶを新しくならべ直します。",
   "inspector.surfaceImage": "画像",
   "inspector.surfaceImageLoad": "自分の画像を読みこむ…",
-  "inspector.surfaceImageHint": "明るいところがいちばん深くなり、暗いところはそのままです。SVGの黒い線のように、すき通った背景に暗い絵をかいたものは線を見て、線がいちばん深くなります。自分の画像はグレーにして、1辺256点までの大きさでデザインといっしょに保存します。タイルの幅は設定した幅で、高さはその幅に合わせた画像の高さです。",
+  "inspector.surfaceImageHint": "明るいところがいちばん深くなり、暗いところはそのままです。SVGの黒い線のように、すき通った背景に暗い絵をかいたものは線を見て、線がいちばん深くなります。自分の画像はグレーにして、1辺512点までの大きさでデザインといっしょに保存します。タイルの幅は設定した幅で、高さはその幅に合わせた画像の高さです。",
   "inspector.surfaceTileHeight": "タイルの高さ（0 = 画像に合わせる）",
   "inspector.surfaceImageTurn": "回転（°）",
   "inspector.surfaceImageInvert": "明るさを反転",

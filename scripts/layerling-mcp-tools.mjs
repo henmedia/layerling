@@ -1256,7 +1256,7 @@ export const tools = [
         image: { type: "string", enum: ["topography", "wood", "woodRift", "guilloche", "terrazzo", "craquelure", "cord", "moire", "mosaic", "folds", "fingerprint", "rosettes", "own"], description: "Image: a ready height map drawn in code (each tiles without a seam), or own for imageOwn. Default topography." },
         imageOwn: {
           type: "object",
-          description: "Image: one's own height map, kept with the design: width and height (2 to 256 each) and data, width × height grey values 0 to 255, a row at a time from the top, as Base64. Light is the full depth.",
+          description: "Image: one's own height map, kept with the design: width and height (2 to 512 each) and data, width × height grey values 0 to 255, a row at a time from the top, as Base64. Light is the full depth.",
           required: ["width", "height", "data"],
           properties: { width: { type: "number" }, height: { type: "number" }, data: { type: "string" } },
         },
