@@ -4346,6 +4346,7 @@ export function ShapeInspector({
   onSurfaceTextureOpenChange,
   surfaceFacePicking,
   surfacePickedFaces,
+  surfaceFacesShown,
   onSurfaceFacePick,
   onVaseAccessories,
   onGridfinityKeys,
@@ -4393,8 +4394,10 @@ export function ShapeInspector({
   /** Whether faces of this body are being picked for its texture with clicks in the view, and the faces picked so far. */
   surfaceFacePicking?: boolean;
   surfacePickedFaces?: SurfaceTextureFace[] | null;
-  /** Starts picking faces from these (null: stops), on the faces as the given edge angle bounds them. */
-  onSurfaceFacePick?: (faces: SurfaceTextureFace[] | null, edgeAngle: number) => void;
+  /** The picked faces are lit for a look only: clicks in the view do not change them (Discussion #1607). */
+  surfaceFacesShown?: boolean;
+  /** Starts picking faces from these (null: stops), on the faces as the given edge angle bounds them; review only lights them. */
+  onSurfaceFacePick?: (faces: SurfaceTextureFace[] | null, edgeAngle: number, review?: boolean) => void;
   /** Lays this vase's accessories out beside it, ready to print. */
   onVaseAccessories?: () => void;
   /** Lays this Swallowtail baseplate's keys out in front of it, ready to print (#1061). */
@@ -5169,6 +5172,7 @@ export function ShapeInspector({
           onInteractionActiveChange={onInteractionActiveChange}
           facePicking={surfaceFacePicking}
           pickedFaces={surfacePickedFaces}
+          facesShown={surfaceFacesShown}
           onFacePick={onSurfaceFacePick}
         />
       ) : null}
@@ -6768,6 +6772,7 @@ export function SurfaceTextureCard({
   onInteractionActiveChange,
   facePicking = false,
   pickedFaces = null,
+  facesShown = false,
   onFacePick,
 }: {
   shape: WorkplaneShape;
@@ -6784,7 +6789,9 @@ export function SurfaceTextureCard({
   /** Faces picked with clicks in the view (the editor holds the clicks): while picking, they are the card's faces. */
   facePicking?: boolean;
   pickedFaces?: SurfaceTextureFace[] | null;
-  onFacePick?: (faces: SurfaceTextureFace[] | null, edgeAngle: number) => void;
+  /** The faces of the shown layer are lit for a look, without picking (Discussion #1607). */
+  facesShown?: boolean;
+  onFacePick?: (faces: SurfaceTextureFace[] | null, edgeAngle: number, review?: boolean) => void;
 }) {
   const [ownOpen, setOwnOpen] = useState(false);
   const open = openProp ?? ownOpen;
@@ -6835,6 +6842,7 @@ export function SurfaceTextureCard({
     pickedLayer.current = index;
     setLayerIndex(index);
     if (facePicking) onFacePick?.(layers[index].faces, layers[index].edgeAngle);
+    else if (facesShown) onFacePick?.(layers[index].faces.length > 0 ? layers[index].faces : null, layers[index].edgeAngle, true);
   };
   const addLayer = () => {
     // A new layer starts on no faces and asks for them at once: it goes only where it is picked.
@@ -6851,7 +6859,7 @@ export function SurfaceTextureCard({
     const shown = Math.max(0, index - 1);
     pickedLayer.current = shown;
     setLayerIndex(shown);
-    if (facePicking) onFacePick?.(null, settings.edgeAngle);
+    if (facePicking || facesShown) onFacePick?.(null, settings.edgeAngle);
   };
   // A further layer needs faces of its own; the first, picking none, takes the faces the others leave.
   const layerWithoutFaces = layers.findIndex((layer, index) => index > 0 && !surfaceTextureLayerPlaced(layer));
@@ -6924,7 +6932,7 @@ export function SurfaceTextureCard({
   const percent = (id: string, label: string, value: number, onChange: (value: number) => void) => range(id, label, Math.round(value * 100), [0, 100], 1, (share) => onChange(share / 100));
   const apply = async () => {
     // The faces picked so far are in the settings already; picking ends with the texture made.
-    if (facePicking) onFacePick?.(null, settings.edgeAngle);
+    if (facePicking || facesShown) onFacePick?.(null, settings.edgeAngle);
     setBusy(true);
     try {
       await onApply(layers[0], layers.slice(1));
@@ -7329,6 +7337,19 @@ export function SurfaceTextureCard({
                     <MousePointerClick size={17} strokeWidth={2.5} />
                     <span>{t(facePicking ? "inspector.surfaceFacesDone" : "inspector.surfaceFacesPick")}</span>
                   </button>
+                  {picked && !facePicking ? (
+                    <button
+                      className={`inspector-action-button ${facesShown ? "active" : ""}`}
+                      type="button"
+                      aria-pressed={facesShown}
+                      disabled={disabled || busy}
+                      onClick={() => onFacePick(facesShown ? null : settings.faces, settings.edgeAngle, true)}
+                    >
+                      {facesShown ? <EyeOff size={17} strokeWidth={2.5} /> : <Eye size={17} strokeWidth={2.5} />}
+                      <span>{t(facesShown ? "inspector.surfaceFacesShowDone" : "inspector.surfaceFacesShow")}</span>
+                    </button>
+                  ) : null}
+                  {facesShown ? <p className="cylinder-wrap-hint">{t("inspector.surfaceFacesShowHint")}</p> : null}
                   {picked && shownLayer === 0 ? (
                     <button
                       className="inspector-action-button"
@@ -7337,6 +7358,7 @@ export function SurfaceTextureCard({
                       onClick={() => {
                         set({ faces: [] });
                         if (facePicking) onFacePick([], settings.edgeAngle);
+                        else if (facesShown) onFacePick(null, settings.edgeAngle);
                       }}
                     >
                       <RotateCcw size={17} strokeWidth={2.5} />
