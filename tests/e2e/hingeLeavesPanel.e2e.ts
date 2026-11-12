@@ -150,4 +150,21 @@ describe("the hinge's leaves in its settings", () => {
     expect(row(liftOff, "Pin diameter")).toBeTruthy();
     expect(liftOff.textContent).toContain("the upper one is a sleeve that lifts off it");
   });
+
+  it("has a snap-on style with a grip that says how wide the opening is, and the pin's own diameter (#1520)", () => {
+    const patches: Partial<WorkplaneShape>[] = [];
+    const panel = mount({}, (patch) => patches.push(patch));
+    expect([...select(panel, "snap").options].map((option) => option.value)).toEqual(["pin", "pinless", "cone", "liftOff", "snap"]);
+    expect(row(panel, "Snap grip")).toBeUndefined();
+    choose(select(panel, "snap"), "snap");
+    const snap = mount({ hingeStyle: "snap" }, (patch) => patches.push(patch));
+    expect(select(snap, "snap").value).toBe("snap");
+    expect(snap.textContent).toContain("the other's are clips open on top");
+    expect(row(snap, "Knuckles")).toBeTruthy();
+    expect(row(snap, "Pin diameter")).toBeTruthy();
+    expect(field(snap, "Snap grip").value).toBe("0.30");
+    expect(row(snap, "Snap grip")!.nextElementSibling?.textContent).toBe("How much narrower the clips' opening is than the pin. Now 2.7 mm for a 3 mm pin. More holds tighter but takes more force to click in.");
+    type(field(snap, "Snap grip"), "0.5");
+    expect(patches).toEqual([{ hingeStyle: "snap", hingePinless: undefined }, { hingeSnapGrip: 0.5 }]);
+  });
 });

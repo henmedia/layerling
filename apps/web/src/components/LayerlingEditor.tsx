@@ -3412,7 +3412,7 @@ export function LayerlingEditor({
   const deleteFaceRunRef = useRef(0);
   // Faces of the selected body picked for its texture with clicks (the texture card holds the other settings): the
   // body's faces as the texture finds them, on the body under a texture there is, and the faces picked so far.
-  const [surfaceFacePick, setSurfaceFacePick] = useState<{ shapeId: string; shape: WorkplaneShape; edgeAngle: number; pick: SurfaceTextureFacePick; faces: SurfaceTextureFace[] } | null>(null);
+  const [surfaceFacePick, setSurfaceFacePick] = useState<{ shapeId: string; shape: WorkplaneShape; edgeAngle: number; pick: SurfaceTextureFacePick; faces: SurfaceTextureFace[]; review: boolean } | null>(null);
   const [cruiseAsset, setCruiseAsset] = useState<ShapeAsset | null>(null);
   const cruiseAssetRef = useRef<ShapeAsset | null>(null);
   cruiseAssetRef.current = cruiseAsset;
@@ -11048,7 +11048,8 @@ export function LayerlingEditor({
 
   // Picking faces for the texture (#954): on the body the texture is made on - under a texture there is - where the
   // selected body stands. Started again with other faces (all of them again) on the same body, the faces it has stay.
-  const pickSurfaceFaces = useCallback((faces: SurfaceTextureFace[] | null, edgeAngle: number) => {
+  // With review the faces are only lit for a look (Discussion #1607): a click in the view does not change them.
+  const pickSurfaceFaces = useCallback((faces: SurfaceTextureFace[] | null, edgeAngle: number, review = false) => {
     if (!faces) {
       setSurfaceFacePick(null);
       return;
@@ -11056,7 +11057,7 @@ export function LayerlingEditor({
     if (selectedShapes.length !== 1 || !selectedShape) return;
     const current = selectedShape;
     if (surfaceFacePick?.shapeId === current.id && surfaceFacePick.edgeAngle === edgeAngle) {
-      setSurfaceFacePick({ ...surfaceFacePick, faces });
+      setSurfaceFacePick({ ...surfaceFacePick, faces, review });
       return;
     }
     const source = canChangeSurfaceTexture(current) ? shapeUnderSurfaceTexture(current) : canTextureSurface(current) ? current : null;
@@ -11065,12 +11066,12 @@ export function LayerlingEditor({
       return;
     }
     if (deleteFaceTool && !deleteFaceTool.busy) setDeleteFaceTool(null);
-    setSurfaceFacePick({ shapeId: current.id, shape: current, edgeAngle, pick: surfaceTextureFacePick(surfaceTextureInput(source), edgeAngle), faces });
-    setNotice(t("status.surfaceFacesPick"));
+    setSurfaceFacePick({ shapeId: current.id, shape: current, edgeAngle, pick: surfaceTextureFacePick(surfaceTextureInput(source), edgeAngle), faces, review });
+    if (!review) setNotice(t("status.surfaceFacesPick"));
   }, [deleteFaceTool, selectedShape, selectedShapes.length, surfaceFacePick]);
 
   const toggleSurfaceFace = useCallback((faceId: number) => {
-    setSurfaceFacePick((current) => current && { ...current, faces: toggleSurfaceTexturePickedFace(current.pick, current.faces, faceId) });
+    setSurfaceFacePick((current) => current && !current.review ? { ...current, faces: toggleSurfaceTexturePickedFace(current.pick, current.faces, faceId) } : current);
   }, []);
 
   // The Honeycomb is gone as a shape (#223): one in an older design becomes a box with hexagonal holes, grouped, as the
@@ -19201,8 +19202,9 @@ export function LayerlingEditor({
           onRemoveSurfaceTexture={selectedShapes.length === 1 && surfaceTextureEntry(selectedShape) ? removeSelectedSurfaceTexture : undefined}
           surfaceTextureOpen={surfaceTextureOpen}
           onSurfaceTextureOpenChange={setSurfaceTextureOpen}
-          surfaceFacePicking={Boolean(surfaceFacePick)}
-          surfacePickedFaces={surfaceFacePick?.faces ?? null}
+          surfaceFacePicking={Boolean(surfaceFacePick && !surfaceFacePick.review)}
+          surfaceFacesShown={Boolean(surfaceFacePick?.review)}
+          surfacePickedFaces={surfaceFacePick && !surfaceFacePick.review ? surfaceFacePick.faces : null}
           onSurfaceFacePick={selectedShapes.length === 1 && offersSurfaceTexture(selectedShape) ? pickSurfaceFaces : undefined}
           onVaseAccessories={selectedShapes.length === 1 && selectedShape?.kind === "vase" && !bodyLocked(selectedShape) ? () => layOutVaseAccessories(selectedShape.id) : undefined}
           onGridfinityKeys={selectedShapes.length === 1 && selectedShape?.kind === "gridfinity" && selectedShape.gridfinitySwallowtail === true && !historyViewState ? () => void makeSwallowtailKeys(selectedShape.id) : undefined}

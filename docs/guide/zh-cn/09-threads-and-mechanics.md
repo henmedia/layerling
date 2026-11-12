@@ -184,7 +184,9 @@ G 规格是符合 ISO 228-1 的平行惠氏管螺纹，常见于水、燃气、�
 
 {{ui:hinge.styleLiftOff}} 做出像许多门上那样的可拆式铰链：两个铰节，下方的带着销子一直到端部，上方的是可以从销子上拔出的套筒，所以盖子或门可以取下再挂回去。它总是两个铰节。它和其他样式一样平放整体打印；要竖着打印、销子朝上，就用 {{ui:inspector.separateParts}} 把它拆开，把带销的那件立在它的铰节上，另一件立在它的套筒上：这样两件都不需要支撑。另一侧用镜像。在 {{ui:prop.hingeScrewHead}} 下，所有样式都可选 {{ui:hinge.screwNut}}：在每个孔上方开一个六角螺母槽，位于合上时朝向另一片的那一面，这样从下方拧入的螺栓能固定；{{ui:hinge.screwCountersunkNut}} 把后片（带销的那片）做成沉头，前片开螺母槽。{{ui:prop.hingeNutWidth}} 是螺母的对边宽度；为 0 时按孔取值（M3 5.8 mm，M4 7.3 mm，含间隙）。槽深等于螺母高度，但下面留 0.6 mm 的叶片，所以叶片越厚，螺母嵌得越深。
 
-{{ui:prop.hingeStyle}}有三个选项：{{ui:hinge.stylePin}}、{{ui:prop.hingePinless}}（为自备销留的孔）和{{ui:hinge.styleCone}}。选圆锥时，{{ui:prop.hingeConeSize}}决定圆锥从关节长出处的大小；圆锥越大越牢固，默认取能放下的最大值。带圆锥的铰链没有销也没有孔，所以它的翼板可以和整个关节一样厚：把{{ui:prop.hingeLeafThickness}}设为关节直径，翼板就与关节齐平；这样的铰链最多打开约 90°，因为厚翼板会相碰。
+{{ui:hinge.styleSnap}} 做出两半分开打印、再咔哒一声扣合的铰链。后片的铰节照常带着销子；前片的铰节是卡夹，顶部开口，开在铰链合上时面对另一片的那一侧。开口比销子窄 {{ui:prop.hingeSnapGrip}} 所设的量，默认 0.3 mm，开口边缘的 45° 倒角把销子引进去。用 {{ui:inspector.separateParts}} 把铰链拆开，两半都按原样平放打印，无需支撑：卡夹正好在孔需要搭桥的地方开口，销子只跨过它的铰节之间的短间隙。组装时，把带卡夹的一半按合上的姿态放到销子上，按下直到咔哒一声卡入；之后它可以自由转动，销子周围留有间隙（{{ui:prop.hingeClearance}}）。卡紧量越大越牢，但需要的力也越大：卡夹裂了就调小，两半太容易脱开就调大。选 {{ui:hinge.leafRaised}} 时，只有前片在开口下方仍连着它的卡夹，才会被抬高。
+
+{{ui:prop.hingeStyle}}有五个选项：{{ui:hinge.stylePin}}、{{ui:prop.hingePinless}}（为自备销留的孔）、{{ui:hinge.styleCone}}、{{ui:hinge.styleLiftOff}}和{{ui:hinge.styleSnap}}。选圆锥时，{{ui:prop.hingeConeSize}}决定圆锥从关节长出处的大小；圆锥越大越牢固，默认取能放下的最大值。带圆锥的铰链没有销也没有孔，所以它的翼板可以和整个关节一样厚：把{{ui:prop.hingeLeafThickness}}设为关节直径，翼板就与关节齐平；这样的铰链最多打开约 90°，因为厚翼板会相碰。
 
 要用螺钉固定铰链，设置 {{ui:prop.hingeScrewHoles}}：沿轴最多六个孔，孔径为你选择的 {{ui:prop.hingeScrewDiameter}}。在 {{ui:prop.hingeScrewHead}} 下，它们默认为 {{ui:hinge.screwCountersunk}}，90° 用于沉头螺钉，位于铰链合上时朝向另一片的那一面，因此螺钉头齐平；{{ui:hinge.screwStraight}} 则保持直孔。不设其他数值时，孔平均分配长度并位于每片的中间；{{ui:prop.hingeScrewSpacing}} 和 {{ui:prop.hingeScrewAcross}} 按中心距设定它们，例如为了对上你要替换的购买铰链。每个孔到边缘、铰节和下一个孔之间都至少保留半毫米的片；放不下那么多时就少放，字段会说明。{{ui:prop.hingeCornerRadius}} 会把两片的四个外角倒圆。无论有无销轴，孔和圆角在 STEP 导出和边工具中都保持精确。
 

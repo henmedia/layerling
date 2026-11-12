@@ -10,7 +10,7 @@ import { canonicalizeShape } from "@/lib/workplaneShapes";
 import { DEFAULT_SNAP_GRID, DEFAULT_WORKPLANE_WORKSPACE, normalizeShapeCustomizations } from "@/lib/workplaneSettings";
 import type { WorkplaneShape } from "@/types/layerling";
 import { automaticSideCount } from "@/lib/roundSideCount";
-import { hingeLeaves, minimumHingeDepth, normalizeHingeAngle, normalizeHingeNutWidth, normalizeHingeScrewHead, hingeSections, hingeConeRadius, hingeKnucklesForWidth, normalizeHingeStyle, hingeLocalParts, hingePlan, hingeTriangles, normalizeHingeKnuckleWidth, normalizeHingeKnuckles, normalizeHingeLeafThickness, normalizeHingePinDiameter } from "@/lib/hingeGeometry";
+import { hingeLeaves, minimumHingeDepth, normalizeHingeAngle, normalizeHingeNutWidth, normalizeHingeScrewHead, hingeSections, hingeConeRadius, hingeKnucklesForWidth, normalizeHingeStyle, hingeLocalParts, hingePlan, hingeTriangles, normalizeHingeKnuckleWidth, normalizeHingeKnuckles, normalizeHingeLeafThickness, normalizeHingePinDiameter, normalizeHingeSnapGrip } from "@/lib/hingeGeometry";
 
 type V = [number, number, number];
 
@@ -630,6 +630,176 @@ describe("the lift-off hinge", () => {
     expect(lying.filter((part) => part.kind === "cylinder" && Math.abs(part.height - shape.width) < 1e-9)).toHaveLength(1);
     expect(lying.filter((part) => part.kind === "cylinder")).toHaveLength(2);
     expect(lying.filter((part) => part.kind === "tube")).toHaveLength(1);
+  });
+});
+
+describe("the snap hinge (#1520)", () => {
+  const snap = { ...shape, hingeStyle: "snap" };
+  const shoelace = (loop: Array<{ u: number; v: number }>) => loop.reduce((sum, p, n) => { const q = loop[(n + 1) % loop.length]; return sum + (p.u * q.v - q.u * p.v) / 2; }, 0);
+  const cases = [
+    snap,
+    { ...snap, hingeAngle: 180 },
+    { ...snap, hingeAngle: -90, hingeScrewHoles: 2, hingeScrewHead: "nut", hingeCornerRadius: 3 },
+    { ...snap, hingeLeafStyle: "fingers", hingeAngle: 135 },
+    { ...snap, hingeLeafStyle: "raised" },
+    { ...snap, hingeSnapGrip: 1.5, hingeClearance: 0.2, sides: 24 },
+    { width: 25, depth: 30, height: 4, hingeKnuckles: 3, hingeStyle: "snap", hingeLeafThickness: 0.8 },
+    { width: 80, depth: 60, height: 12, hingeKnuckles: 9, hingePinDiameter: 5, hingeLeafThickness: 3, hingeClearance: 0.25, hingeStyle: "snap" },
+    // A pin near its largest with a thin raised leaf: the opening would cut the clip off its leaf, which stays on the plate.
+    { width: 40, depth: 40, height: 8, hingePinDiameter: 6.4, hingeLeafThickness: 0.4, hingeLeafStyle: "raised", hingeStyle: "snap" },
+    { width: 40, depth: 40, height: 8, hingePinDiameter: 0.2, hingeStyle: "snap" },
+  ];
+
+  it("takes a grip from 0.05 to 1.5 mm, 0.3 when left out, and is a style of its own", () => {
+    expect(normalizeHingeStyle("snap")).toBe("snap");
+    expect(normalizeHingeStyle("snap", true)).toBe("snap");
+    expect(normalizeHingeSnapGrip(undefined)).toBe(0.3);
+    expect(normalizeHingeSnapGrip(0)).toBe(0.05);
+    expect(normalizeHingeSnapGrip(9)).toBe(1.5);
+    expect(normalizeHingeSnapGrip(Number.NaN)).toBe(0.3);
+    expect(hingePlan(snap)).toMatchObject({ style: "snap", pinless: false, snapGrip: 0.3 });
+    // The pin hinge has no lead-in, and its sections are the pin hinge's own.
+    expect(hingePlan(shape).snapLeadIn).toBe(0);
+    expect(hingeSections(hingePlan(shape)).clip).toEqual(hingeSections(hingePlan(shape)).bKnuckle);
+  });
+
+  it("raises B's leaf only where it joins its clip below the opening", () => {
+    expect(hingePlan({ ...snap, hingeLeafStyle: "raised" })).toMatchObject({ raised: true, lift: 8 - 4 - 0.4 });
+    const wide = { width: 40, depth: 40, height: 8, hingePinDiameter: 6.4, hingeLeafThickness: 0.4, hingeLeafStyle: "raised" };
+    expect(hingePlan(wide).raised).toBe(true);
+    expect(hingePlan({ ...wide, hingeStyle: "snap" })).toMatchObject({ raised: false, lift: 0 });
+    // Raised, the strip that joins B's leaf to its clip ends below where the opening and its lead-in begin.
+    const plan = hingePlan({ ...snap, hingeLeafStyle: "raised", hingeSnapGrip: 0.05 });
+    expect(plan.raised).toBe(true);
+    const s = hingeSections(plan);
+    // The leaf's top meets the clip's outside where it did, clear of the opening.
+    expect(s.clip.slice(0, 2)).toEqual(s.bKnuckle.slice(0, 2));
+    expect(s.clip[1].v).toBeCloseTo(plan.lift + plan.leaf, 9);
+    expect(s.clip[1].u).toBeGreaterThan(plan.snapHalf + 0.2 - 1e-9);
+  });
+
+  it("is closed, wound outwards and in two parts in every fold and leaf shape; B's fingers are loose clips", () => {
+    cases.forEach((fields) => {
+      const triangles = hingeTriangles(fields);
+      expect(edgeProblems(triangles), JSON.stringify(fields)).toBe(0);
+      expect(signedVolume(triangles), JSON.stringify(fields)).toBeGreaterThan(0);
+      const plan = hingePlan(fields);
+      expect(components(triangles), JSON.stringify(fields)).toBe(plan.fingers ? 1 + (plan.knuckles - 1) / 2 : 2);
+      // Folding turns B and keeps its volume.
+      expect(signedVolume(triangles)).toBeCloseTo(signedVolume(hingeTriangles({ ...fields, hingeAngle: 0 })), 6);
+    });
+  });
+
+  it("opens each clip at the top, narrower than the pin by the grip, with a lead-in wider than the pin at the mouth", () => {
+    cases.forEach((fields) => {
+      const plan = hingePlan(fields);
+      const s = hingeSections(plan);
+      const pin = plan.pinRadius;
+      const key = JSON.stringify(fields);
+      expect(2 * plan.snapHalf, key).toBeCloseTo(pin > 0.4 ? 2 * pin - plan.snapGrip : Math.max(2 * pin - plan.snapGrip, Math.min(0.4, pin)), 9);
+      expect(plan.snapHalf).toBeLessThan(pin);
+      // Nothing of B in the opening above the axis, and nothing inside the bore: the pin turns freely and comes in from the top.
+      s.clip.forEach((p) => {
+        if (p.v > plan.radius + 1e-9) expect(Math.abs(p.u), key).toBeGreaterThanOrEqual(plan.snapHalf - 1e-9);
+        expect(Math.hypot(p.u, p.v - plan.radius), key).toBeGreaterThanOrEqual(plan.boreRadius * Math.cos(Math.PI / plan.sides) - 1e-9);
+      });
+      // The slot's two sides, from the bore up.
+      const lip = plan.radius + Math.sqrt(plan.boreRadius ** 2 - plan.snapHalf ** 2);
+      for (const side of [-1, 1]) expect(s.clip.some((p) => Math.abs(p.u - side * plan.snapHalf) < 1e-9 && Math.abs(p.v - lip) < 1e-9), key).toBe(true);
+      // The clip is the knuckle less the bore and the opening, and still starts and ends where the leaf joins it.
+      expect(shoelace(s.clip), key).toBeGreaterThan(0);
+      expect(shoelace(s.clip)).toBeLessThan(shoelace(s.bKnuckle) - Math.PI * plan.boreRadius ** 2 * 0.9);
+      expect(s.clip[0]).toEqual(s.bKnuckle[0]);
+      expect(s.clip[s.clip.length - 1]).toEqual(s.bKnuckle[s.bKnuckle.length - 1]);
+    });
+    // At the default size: a 3 mm pin, a 2.7 mm opening, and where the chamfers meet the knuckle's outside the mouth is
+    // wider than the pin, so the pin rests in it before it is pressed in.
+    const plan = hingePlan(snap);
+    expect(2 * plan.snapHalf).toBeCloseTo(2.7, 9);
+    expect(plan.snapLeadIn).toBeCloseTo(0.65, 9);
+    const mouth = hingeSections(plan).clip.filter((p) => Math.abs(Math.hypot(p.u, p.v - plan.radius) - plan.radius) < 1e-6 && p.v > plan.radius);
+    const inner = mouth.reduce((best, p) => (Math.abs(p.u) < Math.abs(best.u) ? p : best));
+    expect(2 * Math.abs(inner.u)).toBeGreaterThan(2 * plan.pinRadius);
+  });
+
+  it("chamfers the mouth at 45 degrees, which prints without supports, and leaves no bridge over the bore", () => {
+    const plan = hingePlan(snap);
+    const clip = hingeSections(plan).clip;
+    const top = 2 * plan.radius;
+    for (const side of [-1, 1]) {
+      const corner = clip.findIndex((p) => Math.abs(p.u - side * plan.snapHalf) < 1e-9 && Math.abs(p.v - (top - plan.snapLeadIn)) < 1e-9);
+      expect(corner).toBeGreaterThanOrEqual(0);
+      // Its neighbour away from the slot is on the knuckle's outside, up and out at 45 degrees.
+      const out = [clip[corner - 1], clip[corner + 1]].find((p) => Math.abs(p.u) > plan.snapHalf + 1e-9)!;
+      expect(Math.abs(out.v - clip[corner].v)).toBeCloseTo(Math.abs(out.u - clip[corner].u), 9);
+      expect(out.v).toBeGreaterThan(clip[corner].v);
+    }
+    // Above the bore there is no material between the slot's sides: the bore's top is open, not a bridge.
+    const above = clip.filter((p) => p.v > plan.radius + plan.boreRadius - 1e-9);
+    expect(above.every((p) => Math.abs(p.u) >= plan.snapHalf - 1e-9)).toBe(true);
+  });
+
+  it("keeps the pin hinge's part A, the pin running through every knuckle", () => {
+    const plan = hingePlan(snap);
+    const pinPoints = (fields: object) => hingeTriangles(fields).flat().filter(([, y, z]) => Math.abs(Math.hypot(y - plan.radius, z) - plan.pinRadius) < 1e-6).length;
+    expect(pinPoints(snap)).toBe(pinPoints(shape));
+    // Less material than the pin hinge: the opening.
+    expect(signedVolume(hingeTriangles(snap))).toBeLessThan(signedVolume(hingeTriangles(shape)));
+  });
+
+  it("builds each clip of the exact parts on its own: the knuckle and strip, a slot and two lead-in boxes cut out", () => {
+    cases.forEach((fields) => {
+      const plan = hingePlan(fields);
+      const parts = hingeLocalParts(fields);
+      const key = JSON.stringify(fields);
+      expect(parts.filter((part) => part.kind === "cylinder" && part.rotationZ === 90 && Math.abs(part.height - plan.width) < 1e-9), key).toHaveLength(1);
+      plan.segments.forEach((segment, index) => {
+        const own = parts.filter((part) => part.knuckle === index);
+        if (segment.owner === "a") return expect(own).toHaveLength(0);
+        expect(own.map((part) => `${part.kind}${part.hole ? " hole" : ""}`).sort(), key).toEqual(plan.snapLeadIn > 0 ? ["box", "box hole", "box hole", "box hole", "tube"] : ["box", "box hole", "tube"]);
+        const slot = own.find((part) => part.hole && part.depth === 2 * plan.snapHalf)!;
+        expect(slot.width).toBeGreaterThan(plan.knuckleLength);
+      });
+      // The screw holes stay on the hinge's own level.
+      expect(parts.filter((part) => part.hole && part.knuckle === undefined)).toHaveLength(2 * plan.screwXs.length + (plan.screwTops.a === "nut" ? plan.screwXs.length : 0) + (plan.screwTops.b === "nut" ? plan.screwXs.length : 0));
+    });
+  });
+
+  it("puts the corners of the exact lead-in where the display mesh has them, folded with B", () => {
+    for (const hingeAngle of [0, 70, 180, -90]) {
+      const fields = { ...snap, hingeAngle };
+      const plan = hingePlan(fields);
+      const mesh = hingeTriangles(fields).flat();
+      const leadIns = hingeLocalParts(fields).filter((part) => part.hole && part.knuckle !== undefined && part.rotationX !== undefined && Math.abs(Math.abs(part.rotationX - (45 - hingeAngle)) % 360) < 1e-9);
+      expect(leadIns, String(hingeAngle)).toHaveLength(2 * (plan.knuckles - 1) / 2);
+      leadIns.forEach((part) => {
+        const center = new THREE.Vector3(part.x, (part.elevation ?? 0) + part.height / 2, part.z ?? 0);
+        const segment = plan.segments.find((one) => Math.abs((one.x0 + one.x1) / 2 - part.x) < 1e-9)!;
+        // Of the turned square's four corners, the one where the chamfer meets the slot lies on the knuckle's end face.
+        const corners = [[-1, -1], [-1, 1], [1, -1], [1, 1]].map(([y, z]) => new THREE.Vector3(segment.x0, (y * part.height) / 2, (z * (part.depth ?? 0)) / 2)
+          .applyAxisAngle(new THREE.Vector3(1, 0, 0), THREE.MathUtils.degToRad(part.rotationX ?? 0)).add(new THREE.Vector3(0, center.y, center.z)));
+        const nearest = Math.min(...corners.map((corner) => Math.min(...mesh.map(([x, y, z]) => Math.hypot(x - corner.x, y - corner.y, z - corner.z)))));
+        expect(nearest, String(hingeAngle)).toBeLessThan(1e-6);
+      });
+    }
+  });
+
+  it("keeps the style and grip in saved defaults, AI commands, new hinges and a saved design file", async () => {
+    const hinge = (source: Record<string, unknown>) => normalizeShapeCustomizations({ hinge: source }).hinge ?? {};
+    expect(hinge({ hingeStyle: "snap", hingeSnapGrip: 0.5 })).toMatchObject({ hingeStyle: "snap", hingeSnapGrip: 0.5 });
+    expect(hinge({ hingeSnapGrip: 7 }).hingeSnapGrip).toBe(1.5);
+    const asset = toolbarShapeAssets.find((entry) => entry.kind === "hinge")!;
+    expect(makeShapeFromAsset(asset, { x: 0, z: 0 }, { hingeStyle: "snap", hingeSnapGrip: 0.45 })).toMatchObject({ hingeStyle: "snap", hingeSnapGrip: 0.45 });
+    expect(makeShapeFromAsset(asset, { x: 0, z: 0 }, { hingeSnapGrip: 0.45 }).hingeSnapGrip).toBeUndefined();
+    const base = { name: "Hinge", kind: "hinge", color: "#9aa5b1", x: 0, z: 0, elevation: 0, size: 40, width: 40, depth: 40, height: 8, rotation: 0 };
+    const shapes = [canonicalizeShape({ ...base, id: "snap", hingeStyle: "snap", hingeSnapGrip: 0.4 } as WorkplaneShape)];
+    const exported = await exportLylProject({
+      projectId: "hinge", projectName: "Hinge", createdAt: 1_700_000_000_000, modifiedAt: 1_700_000_100_000,
+      shapes, history: [editorHistoryEntry(shapes, [])], historyIndex: 0, assets: [],
+      workspace: DEFAULT_WORKPLANE_WORKSPACE, snapGrid: DEFAULT_SNAP_GRID, placementElevation: 0,
+    });
+    const restored = await importLylProject(exported);
+    expect(restored.shapes.find((one) => one.id === "snap")).toMatchObject({ hingeStyle: "snap", hingeSnapGrip: 0.4 });
   });
 });
 
