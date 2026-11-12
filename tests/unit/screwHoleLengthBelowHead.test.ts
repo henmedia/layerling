@@ -31,7 +31,7 @@ describe("the length below a counterbore's head", () => {
   });
 
   it("has its field and hint named", () => {
-    expect(en["prop.screwHoleLengthBelowHead"]).toBe("Length below head");
+    expect(en["prop.screwHoleLengthBelowHead"]).toBe("Screw length");
     expect(en["prop.screwHoleLengthBelowHeadHint"]).toMatch(/under the head/);
   });
 });

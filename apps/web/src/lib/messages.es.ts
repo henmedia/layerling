@@ -4297,7 +4297,7 @@ export const MESSAGES_ES: Partial<Record<MessageKey, string>> = {
   "prop.screwHoleChamfer": "Chaflán del borde",
   "prop.screwHoleChamferHint": "Un chaflán de 45° en el borde superior del alojamiento, con esta profundidad. Se abre fuera del diámetro de la cabeza, así que la cabeza del tornillo sigue cabiendo; 0 deja el borde vivo.",
   "prop.screwHoleLength": "Longitud total",
-  "prop.screwHoleLengthBelowHead": "Longitud bajo la cabeza",
+  "prop.screwHoleLengthBelowHead": "Long. del tornillo",
   "prop.screwHoleLengthBelowHeadHint": "Los tornillos de cabeza cilíndrica se miden desde debajo de la cabeza. Escribe aquí su longitud y se le suma la profundidad de la cabeza para la longitud total.",
   "prop.holeBottom": "Fondo",
   "holeBottom.flat": "Plano",

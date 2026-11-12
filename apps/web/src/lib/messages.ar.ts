@@ -3929,7 +3929,7 @@ export const MESSAGES_AR: Partial<Record<MessageKey, string>> = {
   "prop.screwHoleChamfer": "شطف الحافة",
   "prop.screwHoleChamferHint": "شطف بزاوية 45° عند الحافة العلوية للتجويف بهذا العمق. ينفتح خارج قطر الرأس، فيبقى رأس البرغي مناسبًا؛ القيمة 0 تترك الحافة حادة.",
   "prop.screwHoleLength": "الطول الإجمالي",
-  "prop.screwHoleLengthBelowHead": "الطول تحت الرأس",
+  "prop.screwHoleLengthBelowHead": "طول البرغي",
   "prop.screwHoleLengthBelowHeadHint": "تُقاس براغي الرأس الأسطواني من أسفل الرأس. أدخل طولها هنا فيُضاف إليه عمق الرأس ليصبح الطول الإجمالي.",
   "prop.holeBottom": "القاع",
   "holeBottom.flat": "مستوٍ",

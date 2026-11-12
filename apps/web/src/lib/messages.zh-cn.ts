@@ -4218,7 +4218,7 @@ export const MESSAGES_ZH_CN: Partial<Record<MessageKey, string>> = {
   "prop.screwHoleChamfer": "边缘倒角",
   "prop.screwHoleChamferHint": "在沉孔上边缘加一个这么深的45°倒角。它向头部直径之外展开，螺钉头仍然放得下；0 保留锐边。",
   "prop.screwHoleLength": "总长度",
-  "prop.screwHoleLengthBelowHead": "头下长度",
+  "prop.screwHoleLengthBelowHead": "螺钉长度",
   "prop.screwHoleLengthBelowHeadHint": "内六角圆柱头螺钉的长度从头部下方量起。在此输入其长度，会加上头部深度得到总长度。",
   "prop.holeBottom": "孔底",
   "holeBottom.flat": "平底",

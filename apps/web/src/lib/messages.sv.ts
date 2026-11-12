@@ -4289,7 +4289,7 @@ export const MESSAGES_SV: Partial<Record<MessageKey, string>> = {
   "prop.screwHoleChamfer": "Kantfas",
   "prop.screwHoleChamferHint": "En 45°-fas vid fickans överkant, med detta djup. Den öppnar sig utanför skalldiametern så att skruvskallen fortfarande får plats; 0 lämnar kanten skarp.",
   "prop.screwHoleLength": "Totallängd",
-  "prop.screwHoleLengthBelowHead": "Längd under skallen",
+  "prop.screwHoleLengthBelowHead": "Skruvlängd",
   "prop.screwHoleLengthBelowHeadHint": "Insexskruvar med cylindriskt huvud mäts från undersidan av skallen. Skriv deras längd här så läggs skalldjupet till och ger totallängden.",
   "prop.holeBottom": "Botten",
   "holeBottom.flat": "Plan",

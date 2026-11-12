@@ -4092,7 +4092,7 @@ export const MESSAGES_DA: Partial<Record<MessageKey, string>> = {
   "prop.screwHoleChamfer": "Affasning af kanten",
   "prop.screwHoleChamferHint": "En affasning på 45° ved lommens øverste kant, så dyb. Den åbner sig uden for hoveddiameteren, så skruehovedet stadig passer; 0 lader kanten være skarp.",
   "prop.screwHoleLength": "Total længde",
-  "prop.screwHoleLengthBelowHead": "Længde under hovedet",
+  "prop.screwHoleLengthBelowHead": "Skruelængde",
   "prop.screwHoleLengthBelowHeadHint": "Unbrakoskruer med cylinderhoved måles fra undersiden af hovedet. Skriv deres længde her, så lægges hoveddybden til, og det giver den totale længde.",
   "prop.holeBottom": "Bund",
   "holeBottom.flat": "Flad",
