@@ -72,7 +72,7 @@ Att skriva är mer exakt än att dra. Alla sifferfält tar emot millimeter, men 
 
 ### Välja färger
 
-Ett klick på {{ui:inspector.solid}} i en kropps egenskaper öppnar färgkortet med rubriken {{ui:inspector.shapeColor}}. Överst visar det hex-värdet för den färg kroppen har nu. Nedanför ligger palettens färdiga färger; ett klick på en av dem färgar kroppen och stänger kortet.
+Ett klick på {{ui:inspector.solid}} i en kropps egenskaper öppnar färgkortet med rubriken {{ui:inspector.shapeColor}}. Överst visar det hex-värdet för den färg kroppen har nu. Klicka på det för att skriva eller klistra in en färgkod som #5EBDDB (5ebddb och den korta #5bd fungerar också) och tryck [[Enter]]: kroppen får den färgen, och med flera kroppar markerade får alla den. [[Esc]] behåller den gamla färgen. Nedanför ligger palettens färdiga färger; ett klick på en av dem färgar kroppen och stänger kortet.
 
 {{ui:inspector.custom}} öppnar webbläsarens färgväljare för en egen färg. Vad den erbjuder beror på webbläsaren: i Chrome och Edge har den ett färgfält, ett reglage för färgtonen, en pipett som hämtar en färg var som helst på skärmen samt värdet som HEX, RGB eller HSL som du växlar mellan med pilarna bredvid. Färgen gäller när du stänger väljaren eller klickar utanför.
 

@@ -957,6 +957,13 @@ export const MAX_STRETCH_LENGTH = 1000;
  * only part of its face; this much overlap joins them for sure and is far below what a printer shows.
  */
 const STRETCH_OVERLAP = 1e-3;
+/**
+ * How thin (mm) a triangle at a stretch's seams may be before the kernel folds it away. Where the overlap meets a slanted
+ * or rounded wall, the union leaves slivers thinner than it along both seams and the filler's sides - over a thousand on
+ * a ramp, drawn as black lines and left standing as remnants after a later cut (Discussion #1569); twice the overlap
+ * folds them, as they would never print.
+ */
+const STRETCH_SEAM_TOLERANCE = 2 * STRETCH_OVERLAP;
 
 /** What the Split panel's Stretch starts with, in mm. */
 export const DEFAULT_STRETCH_LENGTH = 10;
@@ -1052,6 +1059,8 @@ export async function stretchShapeByPlane(
       joined = keep(runtime.Manifold.union(joint ? [negative, joint, moved] : [negative, moved]));
     }
     if (joined.status() !== "NoError" || joined.numTri() < 1) return { parts: null, error: t("split.error.emptyHalf") };
+    // The slivers at the seams come from different pieces, and the kernel folds only within one mesh: taken as one first.
+    joined = foldedThinWalls(keep(joined.asOriginal()), joined, STRETCH_SEAM_TOLERANCE, created);
     const mesh = joined.getMesh();
     try {
       const stretched = splitShapeFromWorldPositions(shape, manifoldMeshToPositions(mesh), createLocalId(`${shape.id}-stretched`), shape.name);

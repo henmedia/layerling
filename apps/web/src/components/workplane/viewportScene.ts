@@ -14,7 +14,7 @@ import { horizontalPlacementWorkplane, placementWorkplaneIsBase, placementWorkpl
 import { printerPresetById } from "@/lib/printBed";
 import { plateCenterX, plateCount } from "@/lib/buildPlates";
 import { DEFAULT_WORKPLANE_WORKSPACE, effectiveViewSettings, viewPixelRatio, orbitControlsZoomSpeed, orbitControlsPanSpeed } from "@/lib/workplaneSettings";
-import { workplaneGridBandWidths, AXIS_ARROW_COLORS, axisArrowLayout, fillLightPosition, keyLightPosition, sceneLightLevels, shadowBlurRadius, softSceneLightLevels, workplaneGridLayout, workplaneGridLines, workplaneGridPalette, workplaneLabelLayout, workplaneThemePalette, WORKPLANE_LABEL_ASPECT, WORKPLANE_LINE_ELEVATION, type WorkplaneGridLayout } from "@/lib/workplaneGrid";
+import { axisCrossWidth, mmPerScreenPixel, workplaneGridBandWidths, AXIS_ARROW_COLORS, axisArrowLayout, fillLightPosition, keyLightPosition, sceneLightLevels, shadowBlurRadius, softSceneLightLevels, workplaneGridLayout, workplaneGridLines, workplaneGridPalette, workplaneLabelLayout, workplaneThemePalette, WORKPLANE_LABEL_ASPECT, WORKPLANE_LINE_ELEVATION, type WorkplaneGridLayout } from "@/lib/workplaneGrid";
 import type { WorkplaneWorkspaceSettings } from "@/types/layerling";
 import { pivotKeptAhead, ZOOM_PIVOT_REACH_MM } from "@/lib/zoomPivot";
 import { RENDER_LAYER_SHAPES } from "@/components/workplane/viewportPicking";
@@ -910,11 +910,14 @@ export function createGridLines(
   // a narrow band on the plate: stronger, and growing as you zoom in, as in similar tools (#143).
   const axisBand = THREE.MathUtils.clamp(Math.min(width, depth) * 0.0012, 0.15, 1);
   const borderBand = axisBand * 2;
-  const axisBands: Array<[number, number, number, number]> = outlineOnly ? [] : [
-    [0, -depth / 2, 0, depth / 2],
-    [-width / 2, 0, width / 2, 0],
-  ];
-  group.add(bandsFromSegments(axisBands, axisBand, palette.axis));
+  // Zoomed out, the cross no longer shrinks with the plate below AXIS_MIN_PIXELS, or it is lost among the darker
+  // lines (Discussion #1666): each arm is a band 1 mm wide, stretched across before every frame.
+  if (!outlineOnly) {
+    group.add(
+      axisCrossArm(bandsFromSegments([[0, -depth / 2, 0, depth / 2]], 1, palette.axis), "x", axisBand),
+      axisCrossArm(bandsFromSegments([[-width / 2, 0, width / 2, 0]], 1, palette.axis), "z", axisBand),
+    );
+  }
   // The border band lies inside the plate, so the plate keeps its size.
   const inset = borderBand / 2;
   group.add(bandsFromSegments(round ? rim(inset) : [
@@ -961,6 +964,38 @@ export function bandsFromSegments(segments: Array<[number, number, number, numbe
   }));
   bands.renderOrder = crossings?.order ?? 1;
   return bands;
+}
+
+const crossCentre = new THREE.Vector3();
+const crossLook = new THREE.Vector3();
+const crossViewport = new THREE.Vector2();
+
+/**
+ * An arm of the centre cross (a band 1 mm wide, see bandsFromSegments), stretched along `across` to `bandWidth` mm - or
+ * wider, so that it stays AXIS_MIN_PIXELS wide on the screen at the plate's middle (Discussion #1666). Set before every
+ * frame: the matrix is taken over right after, so it holds for the frame being drawn.
+ */
+function axisCrossArm(arm: THREE.Mesh, across: "x" | "z", bandWidth: number) {
+  arm.scale[across] = bandWidth;
+  arm.onBeforeRender = (renderer, _scene, camera) => {
+    renderer.getSize(crossViewport);
+    let perPixel = Number.NaN;
+    if ((camera as THREE.PerspectiveCamera).isPerspectiveCamera) {
+      arm.getWorldPosition(crossCentre);
+      camera.getWorldDirection(crossLook);
+      const depth = crossCentre.sub(camera.getWorldPosition(new THREE.Vector3())).dot(crossLook);
+      perPixel = mmPerScreenPixel({ perspective: true, fovDegrees: (camera as THREE.PerspectiveCamera).fov }, depth, crossViewport.y);
+    } else if ((camera as THREE.OrthographicCamera).isOrthographicCamera) {
+      const ortho = camera as THREE.OrthographicCamera;
+      perPixel = mmPerScreenPixel({ perspective: false, top: ortho.top, bottom: ortho.bottom, zoom: ortho.zoom }, 0, crossViewport.y);
+    }
+    const next = axisCrossWidth(bandWidth, perPixel);
+    if (Math.abs(arm.scale[across] - next) <= 1e-9) return;
+    arm.scale[across] = next;
+    arm.updateMatrix();
+    arm.updateMatrixWorld();
+  };
+  return arm;
 }
 
 export function linesFromPoints(points: number[], material: THREE.LineBasicMaterial) {

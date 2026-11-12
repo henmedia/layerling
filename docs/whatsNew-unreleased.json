@@ -1,1 +1,28 @@
-[]
+[
+  {
+    "title": {
+      "de": "Fokusmodus: der Name ist mit dabei",
+      "en": "Focus mode: the name comes along"
+    },
+    "body": {
+      "de": "Die kleine Leiste im Fokusmodus zeigt jetzt auch den Namen des Entwurfs. Ein Klick darauf benennt ihn um, ohne dass du den Fokusmodus verlassen musst.",
+      "en": "The small bar in focus mode now also shows the design's name. Click it to rename the design without leaving focus mode."
+    },
+    "guide": {
+      "section": "focusMode"
+    }
+  },
+  {
+    "title": {
+      "de": "„Alle sichern“ nimmt die Einstellungen mit",
+      "en": "\"Back up all\" takes your settings along"
+    },
+    "body": {
+      "de": "Die Sicherung aller Entwürfe enthält jetzt auch die Einstellungen dieses Browsers: deine Vorgabe für neue Entwürfe, das Farbschema, das Menüband, deine eigenen Tasten und die Drucker.\n\nBeim Wiederherstellen fragt ein Häkchen, ob du sie übernehmen willst. Auf einem neuen Rechner ist es schon gesetzt, so kommt mit einem Schritt alles zurück.",
+      "en": "The backup of all designs now also holds the settings of this browser: your default for new designs, the theme, the ribbon, your own keys and the printers.\n\nWhen you restore it, a tick box asks whether to take them over. On a new computer it is ticked already, so everything comes back in one step."
+    },
+    "guide": {
+      "chapter": "files"
+    }
+  }
+]

@@ -91,6 +91,7 @@ En bas de la fenêtre : {{ui:dashboard.sponsor}} mène à la page où vous pouve
 ### Mode concentration
 
 Sur un petit écran, le {{ui:focusMode.enter}} laisse la ligne de titre et le pied de page au travail : le bouton aux deux flèches tournées vers l’extérieur en haut à droite, [[Ctrl]]+[[Shift]]+[[F]] ou la recherche de commandes l’activent. Le ruban remonte et la vue descend jusqu’au bord de la fenêtre. Une petite barre sous le ruban garde la maison vers la page d’accueil, les onglets {{ui:editor.modeGeometry}} et {{ui:editor.modeSketch}}, la loupe, les réglages et le bouton aux deux flèches tournées vers l’intérieur, qui quitte le mode ; faites glisser la barre par sa poignée ailleurs, un double-clic sur la poignée la remet en place. layerling retient ce choix dans ce navigateur et, tant que le navigateur remplit tout l’écran (F11), passe de lui-même en mode concentration.
+La barre affiche aussi le nom du motif ; un clic dessus permet de le renommer sans quitter le mode concentration.
 
 ## Votre première pièce
 

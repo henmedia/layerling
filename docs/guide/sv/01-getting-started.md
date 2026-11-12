@@ -91,6 +91,7 @@ Längst ned i fönstret: {{ui:dashboard.sponsor}} leder till sidan där du kan s
 ### Fokusläge
 
 På en liten skärm ger {{ui:focusMode.enter}} rubrikraden och sidfoten till arbetsytan: knappen med de två pilarna som pekar utåt uppe till höger, [[Ctrl]]+[[Shift]]+[[F]] eller kommandosökningen slår på läget. Verktygsfältet flyttar upp och vyn når ända ned till fönsterkanten. En liten list under verktygsfältet behåller huset till startsidan, flikarna {{ui:editor.modeGeometry}} och {{ui:editor.modeSketch}}, förstoringsglaset, inställningarna och knappen med de två inåtvända pilarna som avslutar fokusläget; dra listen i dess handtag till en annan plats, eller dubbelklicka på handtaget för att sätta tillbaka den. layerling kommer ihåg valet i den aktuella webbläsaren, och när webbläsaren körs i helskärm (F11) växlar den automatiskt till fokusläge.
+Listen visar också designens namn; klicka på det för att byta namn utan att lämna fokusläget.
 
 ## Din första del
 

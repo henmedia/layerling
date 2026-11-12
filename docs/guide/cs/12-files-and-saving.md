@@ -46,6 +46,7 @@ Při desítkách projektů jeden seznam nestačí. Na úvodní stránce vytvoř�
 ## Zálohování a předávání
 
 Každý projekt na úvodní stránce má nabídku přejmenování, duplikování a smazání. Řada tlačítek vedle záložek je na každé záložce stejná. Chcete-li smazat více projektů naráz, klikněte na {{ui:dashboard.select}}: kliknutí na kartu ji zvolí (zvolené ukazuje fajfka), {{ui:dashboard.selectAll}} zvolí všechny projekty v seznamu a {{ui:common.delete}} se zeptá jednou na všechny. {{ui:dashboard.selectDone}} nebo [[Esc]] výběr opustí. {{ui:dashboard.backupAll}} zabalí všechny projekty otevřené záložky do jediného souboru ZIP. {{ui:dashboard.restoreBackup}} hned vedle (je tam i na novém počítači bez projektů) je obnoví i v jiném prohlížeči nebo počítači; stejný soubor přijme i {{ui:dashboard.importGeometry}}. Součástí zálohy jsou také {{ui:myShapes.title}} ve složce `Custom shapes`, viz [Tvary](chapter:shapes). Pokud obnovíte zálohu v prohlížeči, který některé z těchto projektů už má, nepřidají se znovu; zpráva uvede, kolik jich tu už bylo. Projekt, který nejde přečíst, se vynechá a zpráva ho jmenuje. Pokud se stránka uprostřed zálohy znovu načte, obvykle proto, že velmi velký projekt zabral všechnu paměť, kterou prohlížeč dovolí, úvodní stránka potom uvede, u kterého projektu se zastavila: uložte ho samostatně jako soubor (viz níže) nebo zjednodušte jeho největší sítě a zálohujte znovu. Nad projekty tohoto prohlížeče krátký řádek říká, jak na tom jsou: oranžově, dokud nejsou v žádné záloze nebo když od posledního {{ui:dashboard.backupAll}} nějaké přibyly či se změnily (uvede, kdy to bylo a kolik jich je), a šedě, jakmile jsou v záloze všechny. Počítá se jen záloha všech projektů, ne záloha složky nebo vybraných projektů.
+Záloha všech projektů obsahuje také nastavení tohoto prohlížeče: vaše výchozí nastavení pro nové projekty, motiv, pás karet, vlastní klávesy a tiskárny. Při obnovení se zaškrtávací políčko zeptá, zda je převzít také; je zaškrtnuté, když tento prohlížeč ještě nemá vlastní výchozí nastavení.
 
 Jen některé návrhy: po {{ui:dashboard.select}} zabalí {{ui:dashboard.backupSelected}} jen vybrané návrhy v jejich složkách do jednoho souboru ZIP a {{ui:dashboard.backupSelected}} v nabídce složky zabalí tuto složku se všemi návrhy a složkami v ní. Vlastní tvary nejdou ani v jednom případě s sebou a {{ui:dashboard.restoreBackup}} vrátí obojí jako plnou zálohu. Platí to pro návrhy tohoto prohlížeče.
 
@@ -133,6 +134,10 @@ Cizí soubory vložíte přes {{ui:editor.import}} nebo [[Ctrl]]+[[I]].
 Projekt z **novějšího Layerlingu** může obsahovat neznámé tvary, parametry nebo vlastní písma. Pokud jej kvůli tomu nelze otevřít, hlášení uvede obě verze. Otevře-li se, upozorní na možný odlišný vzhled novějších prvků. Pomáhá aktualizace: layerling.com po obnovení poskytuje aktuální verzi, nainstalovaná aplikace ji načte při dalším spuštění a vlastní server musíte aktualizovat sami.
 
 Obrázkové podklady se přidávají v režimu náčrtu, viz [Náčrty](chapter:sketches).
+
+## Velké sítě
+
+layerling je určen především ke stavbě přesných CAD těles: válec se ukládá jako kružnice a výška, zaoblení jako jedna zakřivená plocha. Importovaná síť je naproti tomu přiblížení z trojúhelníků, čím jemnější, tím víc jich je, a každý z nich je v paměti, kreslí se a ukládá. Menší díly jako sítě nevadí. Velmi velké sítě, třeba skeny, sochy nebo modely z Blenderu se stovkami tisíc či miliony trojúhelníků, editor zpomalí, zaberou hodně paměti a zpomalí ukládání, a řezání s nimi nemusí fungovat vůbec. Když import takové sítě přinese, layerling na to jednou upozorní. Takovou síť nejdřív zjednodušte (viz níže), importujte jen díly, které potřebujete, nebo jednoduché díly postavte z vlastních tvarů layerlingu.
 
 ## Zjednodušení importované sítě
 

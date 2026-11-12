@@ -68,7 +68,7 @@ Zúžený či nakloněný kvádr, válec, elipsa, mnohoúhelník, trubka a prste
 
 ### Výběr barev
 
-Kliknutí na {{ui:inspector.solid}} ve vlastnostech tělesa otevře kartu barev s nadpisem {{ui:inspector.shapeColor}}. Nahoře ukazuje hexadecimální hodnotu barvy, kterou těleso právě má. Pod ní jsou hotové barvy palety; kliknutí na jednu z nich těleso obarví a kartu zavře.
+Kliknutí na {{ui:inspector.solid}} ve vlastnostech tělesa otevře kartu barev s nadpisem {{ui:inspector.shapeColor}}. Nahoře ukazuje hexadecimální hodnotu barvy, kterou těleso právě má. Kliknutím do ní můžete napsat nebo vložit kód barvy, třeba #5EBDDB (funguje i 5ebddb a krátké #5bd), a stisknout [[Enter]]: těleso dostane tuto barvu, a je-li vybráno více těles, dostanou ji všechna. [[Esc]] ponechá starou barvu. Pod ní jsou hotové barvy palety; kliknutí na jednu z nich těleso obarví a kartu zavře.
 
 {{ui:inspector.custom}} otevře výběr barev vašeho prohlížeče pro vlastní barvu. Co nabízí, závisí na prohlížeči: v Chrome a Edge má barevné pole, posuvník odstínu, pipetu, která převezme barvu odkudkoli na obrazovce, a hodnotu jako HEX, RGB nebo HSL, mezi nimiž přepínáte šipkami vedle. Barva platí, jakmile výběr zavřete nebo kliknete mimo něj.
 

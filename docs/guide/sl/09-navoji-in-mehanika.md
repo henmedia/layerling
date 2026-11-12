@@ -258,6 +258,8 @@ Glava ugreznjenega vijaka je poravnana s površino. Če naj sedi globlje, pri {{
 
 Če želiš odstraniti oster rob na robu poglobitve, nastavi {{ui:prop.screwHoleChamfer}} pri {{ui:shape.counterbore}} (Discussion #1632): vrh poglobitve se tedaj odpre pod 45 stopinjami za toliko milimetrov. Posnetje leži zunaj {{ui:prop.screwHoleHead}}, zato glava vijaka še vedno pade vanjo, in ostane plitvejše od {{ui:prop.screwHoleHeadDepth}}. Pri 0 ostane rob oster kot doslej; podolgovata luknja ga prav tako sprejme in ostane natančno telo.
 
+Vijake s cilindrično glavo prodajajo po dolžini pod glavo, vijake s pogreznjeno glavo po dolžini z glavo. Zato ima {{ui:shape.counterbore}} drugo polje, {{ui:prop.screwHoleLengthBelowHead}} (Discussion #1670): vanj vnesi dolžino vijaka, in {{ui:prop.screwHoleHeadDepth}} se ji prišteje v {{ui:prop.screwHoleLength}}. Vijak M3 × 12 z vgrezom 3,2 mm da luknjo dolžine 15,2 mm. Stožčasti vgrez ohrani eno dolžino.
+
 {{ui:shape.finishingWasher}} (rozeta, Discussion #1131) je izbočena podložka pod ugreznim ali lečastim ugreznim vijakom, za čist videz na lesu ali pokrovu. Je poln del, spodaj raven; iz nizkega roba se kupola dviga do sedeža, stožca za glavo vijaka, z izvrtino pod njim. Pod {{ui:prop.screwHoleSize}} izbereš M2 do M20: izvrtina je prehodna luknja, sedež pa ugrezanje te velikosti, {{ui:prop.diameter}} in {{ui:prop.height}} sledita iz njiju (M3: 10,3 × 2,95 mm, M6: 16,6 × 4,5 mm). {{ui:prop.diameter}}, {{ui:prop.height}}, {{ui:prop.centerHole}}, {{ui:prop.screwHoleHead}} na vrhu sedeža in njegov {{ui:prop.screwHoleAngle}} lahko nastaviš tudi sam. Ostane okrogla in je natančno telo, zato na njej delujeta orodje za robove in STEP.
 
 ## Vijačni steber

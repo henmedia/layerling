@@ -260,6 +260,8 @@ Otwór fasolkowy zostawia części luz, by przed dokręceniem śruby dało się 
 
 Aby stępić ostrą krawędź na brzegu pogłębienia walcowego, ustaw {{ui:prop.screwHoleChamfer}} w {{ui:shape.counterbore}} (Discussion #1632): górna część pogłębienia rozszerza się wtedy pod kątem 45 stopni o tyle milimetrów. Fazka leży poza {{ui:prop.screwHoleHead}}, więc łeb śruby nadal się mieści, i pozostaje płytsza niż {{ui:prop.screwHoleHeadDepth}}. Przy 0 krawędź pozostaje ostra jak dotąd; otwór podłużny też ją przyjmuje i pozostaje dokładną bryłą.
 
+Śruby z łbem walcowym sprzedaje się według długości pod łbem, śruby z łbem stożkowym według długości razem z łbem. Dlatego {{ui:shape.counterbore}} ma drugie pole, {{ui:prop.screwHoleLengthBelowHead}} (Discussion #1670): wpisz tam długość śruby, a {{ui:prop.screwHoleHeadDepth}} zostanie do niej dodana jako {{ui:prop.screwHoleLength}}. Śruba M3 × 12 z gniazdem 3,2 mm daje otwór długości 15,2 mm. Pogłębienie stożkowe zachowuje jedną długość.
+
 {{ui:shape.finishingWasher}} to wypukła podkładka pod śrubę z łbem stożkowym albo soczewkowym, dla schludnego wyglądu na drewnie albo osłonie. To pełna część, płaska od spodu: od niskiego brzegu wznosi się kopułka do gniazda, stożka pod łeb śruby, z otworem pod nim. W {{ui:prop.screwHoleSize}} wybierasz od M2 do M20: otwór to otwór przejściowy, a gniazdo to pogłębienie stożkowe tego rozmiaru, a {{ui:prop.diameter}} i {{ui:prop.height}} wynikają z nich (M3: 10,3 na 2,95 mm, M6: 16,6 na 4,5 mm). {{ui:prop.diameter}}, {{ui:prop.height}}, {{ui:prop.centerHole}}, {{ui:prop.screwHoleHead}} na górze gniazda i jego {{ui:prop.screwHoleAngle}} możesz też ustawić sam. Rozeta zostaje okrągła i jest dokładną bryłą, więc działają na niej narzędzie krawędzi i STEP.
 
 ## Tulejka na wkręt

@@ -2146,6 +2146,9 @@ function SimpleModeSetting() {
         onPointerUp={cancel}
         onPointerLeave={cancel}
         onPointerCancel={cancel}
+        // On a phone or tablet a long press opens the browser's own menu, which takes the touch away and cancels the hold
+        // (#1671): the menu stays shut here, so the two seconds run through.
+        onContextMenu={(event) => event.preventDefault()}
         onKeyDown={(event) => {
           if ((event.key === "Enter" || event.key === " ") && !event.repeat) start();
         }}

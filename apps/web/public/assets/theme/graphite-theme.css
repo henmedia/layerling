@@ -953,6 +953,11 @@ html[data-theme="dark"]:where([data-palette="graphite"]) .whats-new-earlier:hove
   background: #a85f14;
 }
 
+:where(html[data-theme="dark"][data-palette="graphite"]) .empty-project-dialog .dashboard-confirm-save {
+  border-color: #2e7d32;
+  background: #2e7d32;
+}
+
 :where(html[data-theme="dark"][data-palette="graphite"]) .dashboard-rename-dialog > label {
   color: #565656;
 }
@@ -4210,6 +4215,25 @@ html[data-theme="dark"]:where([data-palette="graphite"]) .rotation-angle-badge {
 
 :where(html[data-theme="dark"][data-palette="graphite"]) .color-value {
   color: #747474;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .color-hex-input {
+  border: 1px solid transparent;
+  background: transparent;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .color-hex-input:hover:not(:disabled),
+:where(html[data-theme="dark"][data-palette="graphite"]) .color-hex-input:focus {
+  border-color: rgba(116, 116, 116, 0.55);
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .color-hex-input:focus {
+  outline: none;
+  background: rgba(116, 116, 116, 0.1);
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .color-hex-input::placeholder {
+  color: inherit;
 }
 
 :where(html[data-theme="dark"][data-palette="graphite"]) .color-grid button {
@@ -7677,6 +7701,12 @@ html[data-theme="dark"]:where([data-palette="graphite"]) .export-holes-only-warn
   color: #ffa447;
 }
 
+:where(html[data-theme="dark"][data-palette="graphite"]) .unsaved-design-banner {
+  color: #fff;
+  background: #c82031;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.25);
+}
+
 :where(html[data-theme="dark"][data-palette="graphite"]) .open-group-banner {
   color: #404040;
   background: #f9f9f9;
@@ -8101,6 +8131,17 @@ html[data-theme="dark"]:where([data-palette="graphite"]) .qr-code-panel small.qr
   color: white;
   background: #cf6a12;
   border-color: #b45a0c;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .new-version-notice .new-version-notice-unsaved {
+  color: #ffffff;
+  background: #c82031;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .new-version-notice-actions .danger {
+  color: #ffffff;
+  background: #c82031;
+  border-color: #a81a29;
 }
 
 :where(html[data-theme="dark"][data-palette="graphite"]) [data-help-hover] {
@@ -10963,6 +11004,18 @@ html[data-theme="dark"]:where([data-palette="graphite"]) .browser-backup-note.ur
   color: var(--foreground);
   background: var(--panel);
   border: 1px solid var(--border-strong);
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .backup-settings-take {
+  color: #363636;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .backup-settings-take input {
+  accent-color: #d07415;
+}
+
+html[data-theme="dark"]:where([data-palette="graphite"]) .backup-settings-take {
+  color: #ebebeb;
 }
 
 :where(html[data-theme="dark"][data-palette="graphite"]) .toolbar-section-tools,

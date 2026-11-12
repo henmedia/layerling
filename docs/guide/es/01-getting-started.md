@@ -91,6 +91,7 @@ En la parte de abajo de la ventana: {{ui:dashboard.sponsor}} lleva a la página 
 ### Modo concentración
 
 En una pantalla pequeña, {{ui:focusMode.enter}} cede la fila del título y el pie de página al trabajo: lo activan el botón con las dos flechas hacia fuera arriba a la derecha, [[Ctrl]]+[[Shift]]+[[F]] o la búsqueda de comandos. La cinta sube y la vista llega hasta el borde de la ventana. Una pequeña barra bajo la cinta conserva la casa para la página de inicio, las pestañas {{ui:editor.modeGeometry}} y {{ui:editor.modeSketch}}, la lupa, los ajustes y el botón con las dos flechas hacia dentro, que termina el modo; arrastra la barra por su asa a otro sitio, y un doble clic en el asa la devuelve. layerling recuerda la elección en este navegador y, mientras el navegador ocupa toda la pantalla (F11), pasa solo al modo concentración.
+La barra también muestra el nombre del diseño; haz clic en él para cambiarlo sin salir del modo concentración.
 
 ## Tu primera pieza
 

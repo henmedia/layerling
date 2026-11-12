@@ -19,6 +19,7 @@ export {
   measureKeyForHandle,
   normalizedRotationPlaneBasis,
   rotateHandleArrow,
+  rotationNeedleAngle,
   rotationPlaneDirectionSign,
   screenSpaceDimensionMark,
   transformBoundsIntersectClipVolume,

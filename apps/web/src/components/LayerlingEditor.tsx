@@ -11,6 +11,8 @@ import { SAVED_VIEW_KEYS } from "@/lib/designView";
 import * as THREE from "three";
 import type { AppThemePreference, ResolvedAppTheme } from "@/lib/appTheme";
 import { getLanguage, numberLocale, t, type MessageKey } from "@/lib/i18n";
+import { guideHref } from "@/lib/guideLinks";
+import { largeMeshWarningTriangles } from "@/lib/largeMeshes";
 import { isObjectListOrder, moveShapeBefore, sortObjectList } from "@/lib/objectListSearch";
 import { useLanguage } from "@/lib/useLanguage";
 import { loftShapePatch, normalizeLoftMiddles, type LoftMeasures } from "@/lib/loftGeometry";
@@ -238,7 +240,8 @@ import { sketchOutlineBounds } from "@/lib/sketchKeyring";
 import { meshSlicePath, planeCutsMesh } from "@/lib/sketchSlice";
 import { projectedEdgesPath } from "@/lib/sketchEdges";
 import { useRememberedFlag } from "@/lib/useRememberedFlag";
-import { BUG_REPORT_FILE, bugReportText, rememberBugReportEvent, type BugReportEvent } from "@/lib/bugReport";
+import { BUG_REPORT_ERROR_EVENT, BUG_REPORT_FILE, bugReportText, rememberBugReportEvent, type BugReportEvent } from "@/lib/bugReport";
+import type { SaveFailureKind } from "@/lib/saveFailureDiagnosis";
 import { formatLengthMm, lengthDisplayUnit } from "@/lib/measurementUnits";
 import { tightBendShown } from "@/lib/cadTightBends";
 import { angleAtVertex, angleBetweenFaces, formatFaceAngles, formatProtractorAngle } from "@/lib/protractor";
@@ -3052,6 +3055,7 @@ export function LayerlingEditor({
   onProjectSnapshot,
   isProjectThumbnailMissing,
   projectSaveFailure,
+  projectUnsaved,
   onProjectWorkspaceChange,
   onProjectNameChange,
   onCreateProjectFromState,
@@ -3077,7 +3081,7 @@ export function LayerlingEditor({
   initialPlacementElevation?: number;
   initialPlacementWorkplane?: PlacementWorkplane;
   onHome?: (leaving: { itemCount: number }) => void;
-  onOpenLylProjectFile?: (file: File, shared?: undefined, fileHandle?: LylFileHandle, options?: { name?: string }) => Promise<{ ok: boolean; message: string } | void> | { ok: boolean; message: string } | void;
+  onOpenLylProjectFile?: (file: File, shared?: undefined, fileHandle?: LylFileHandle, options?: { name?: string; onSlow?: (message: string) => void }) => Promise<{ ok: boolean; message: string } | void> | { ok: boolean; message: string } | void;
   /** "Back up all" of the start page, for the reminder in the status line; it starts with the save dialog. */
   onBackUpAllDesigns?: () => void;
   onSaveSharedProject?: (request: { exportName: string; bytes: Uint8Array; thumbnailDataUrl: string; targetFileName?: string }) => Promise<string>;
@@ -3105,6 +3109,8 @@ export function LayerlingEditor({
   isProjectThumbnailMissing?: (projectId: string) => Promise<boolean>;
   /** The last failed autosave, so the editor can say so; `at` makes a repeat failure show again. */
   projectSaveFailure?: { message: string; at: number } | null;
+  /** Why the newest state of this design could not be stored, while it could not (#1652): a note stays up until a save gets through. */
+  projectUnsaved?: { message: string; kind: SaveFailureKind; detail: string } | null;
   onProjectNameChange?: (name: string) => void;
   /** Legt aus einem frueheren Stand ein neues Projekt an und sagt in einem Satz, was daraus wurde. */
   onCreateProjectFromState?: (request: HistoryProjectRequest) => Promise<string>;
@@ -3457,11 +3463,17 @@ export function LayerlingEditor({
     };
     const onError = (event: ErrorEvent) => remember(`${event.message}${event.filename ? ` (${event.filename.split("/").pop()}:${event.lineno})` : ""}`);
     const onRejection = (event: PromiseRejectionEvent) => remember(`Unhandled: ${event.reason instanceof Error ? event.reason.message : String(event.reason)}`);
+    const onReported = (event: Event) => {
+      const text = (event as CustomEvent<unknown>).detail;
+      if (typeof text === "string") remember(text);
+    };
     window.addEventListener("error", onError);
     window.addEventListener("unhandledrejection", onRejection);
+    window.addEventListener(BUG_REPORT_ERROR_EVENT, onReported);
     return () => {
       window.removeEventListener("error", onError);
       window.removeEventListener("unhandledrejection", onRejection);
+      window.removeEventListener(BUG_REPORT_ERROR_EVENT, onReported);
     };
   }, []);
   // A failed autosave is said where the work happens, and stays a while.
@@ -13065,7 +13077,7 @@ export function LayerlingEditor({
   }, [beginSketch, sectionSketchAt, sketchActive]);
 
   // Der Dateiimport steht weiter unten; die MCP-Aktion nimmt denselben Weg.
-  const importFilesRef = useRef<((files: File[], fileHandle?: LylFileHandle, options?: { keepSvgPage?: boolean; svgWidth?: number | null }) => Promise<{ importedIds: string[]; failures: Array<{ fileName: string; reason: string }> }>) | null>(null);
+  const importFilesRef = useRef<((files: File[], fileHandle?: LylFileHandle, options?: { keepSvgPage?: boolean; svgWidth?: number | null }) => Promise<{ importedIds: string[]; failures: Array<{ fileName: string; reason: string }>; warning?: string }>) | null>(null);
 
   const {
     customShapeEntries, customShapeFolders, serverAvailable: customShapesServerAvailable, myShapesFileInputRef,
@@ -16227,6 +16239,8 @@ export function LayerlingEditor({
         return {
           imported: imported.map((shape) => ({ id: shape.id, name: shape.name, color: shape.color, width: shape.width, depth: shape.depth, height: shape.height, x: shape.x, z: shape.z, elevation: shape.elevation ?? 0 })),
           failures: result.failures,
+          // The editor's own warning about very large meshes (Discussion #1652), when it gave one.
+          ...(result.warning ? { warning: result.warning } : {}),
         };
       }
 
@@ -17768,7 +17782,7 @@ export function LayerlingEditor({
     if (await insertDesignFile(file)) setTopPanel(null);
   }, [insertDesignFile]);
 
-  const importFiles = useCallback(async (selected: File[], fileHandle?: LylFileHandle, importOptions?: { keepSvgPage?: boolean; svgWidth?: number | null }): Promise<{ importedIds: string[]; failures: Array<{ fileName: string; reason: string }> }> => {
+  const importFiles = useCallback(async (selected: File[], fileHandle?: LylFileHandle, importOptions?: { keepSvgPage?: boolean; svgWidth?: number | null }): Promise<{ importedIds: string[]; failures: Array<{ fileName: string; reason: string }>; warning?: string }> => {
     const none = { importedIds: [] as string[], failures: [] as Array<{ fileName: string; reason: string }> };
     if (!selected.length) return none;
     const projectFiles = selected.filter((file) => /\.(lyl|skf)$/i.test(file.name));
@@ -17782,7 +17796,8 @@ export function LayerlingEditor({
         return none;
       }
       setNotice(t("status.validatingFile", { name: projectFiles[0].name }), true);
-      const result = await onOpenLylProjectFile(projectFiles[0], undefined, fileHandle);
+      // An opening that takes long says so here too, with the step it is on (#1639).
+      const result = await onOpenLylProjectFile(projectFiles[0], undefined, fileHandle, { onSlow: (message) => setNotice(message, "stay") });
       if (result?.message) setNotice(result.message);
       if (result?.ok !== false) setTopPanel(null);
       return none;
@@ -17837,13 +17852,19 @@ export function LayerlingEditor({
     const nextAssets = dedupeProjectAssets([...projectAssetsRef.current, ...importedAssets]);
     projectAssetsRef.current = nextAssets;
     setProjectAssets(nextAssets);
-    commitShapes(
-      [...shapesRef.current, ...importedShapes],
-      importedShapes.map((shape) => shape.id),
-      [successSummary, ...notes].join(" ") + failureSummary,
-    );
+    const designAfter = [...shapesRef.current, ...importedShapes];
+    const importMessage = [successSummary, ...notes].join(" ") + failureSummary;
+    commitShapes(designAfter, importedShapes.map((shape) => shape.id), importMessage);
     setTopPanel(null);
-    return { importedIds: importedShapes.map((shape) => shape.id), failures };
+    // Very large meshes make the editor slow and saving slow (Discussion #1652): said once, after the import that brings them,
+    // and it stays until closed, with the way to the guide.
+    const largeTriangles = largeMeshWarningTriangles(importedShapes, designAfter);
+    const warning = largeTriangles === null ? undefined : t("status.largeMeshes", { count: formatTriangleCount(largeTriangles) });
+    if (warning) {
+      const href = guideHref(getLanguage(), undefined, "largeMeshes");
+      setNotice(`${importMessage} ${warning}`, "stay", { label: t("status.largeMeshesGuide"), run: () => window.open(href, "_blank", "noopener") });
+    }
+    return { importedIds: importedShapes.map((shape) => shape.id), failures, warning };
   }, [commitShapes, onOpenLylProjectFile, ontoActivePlate]);
   importFilesRef.current = importFiles;
 
@@ -19303,6 +19324,16 @@ export function LayerlingEditor({
           onDeleteHistory={clearHistory}
           onClose={closeHistoryView}
         />
+      ) : null}
+      {projectUnsaved ? (
+        <div className="unsaved-design-banner" role="alert">
+          <strong>{t("notice.designNotSavedTitle")}</strong>
+          <span>{projectUnsaved.message}</span>
+          {/* Lighter meshes help only where size or memory was the reason; a design of a few plates is refused all the same (#1639). */}
+          <span>{t(projectUnsaved.kind === "outOfMemory" || projectUnsaved.kind === "tooLarge" ? "notice.designNotSavedHint" : "notice.designNotSavedHintCopy")}</span>
+          {/* The browser's own words and its storage figures, so a screenshot tells why (#1639). */}
+          {projectUnsaved.detail ? <small className="unsaved-design-detail">{t("notice.designNotSavedDetail", { detail: projectUnsaved.detail })}</small> : null}
+        </div>
       ) : null}
       {openGroup ? (
         <div className="open-group-banner" role="status">

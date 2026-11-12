@@ -75,7 +75,7 @@ At taste er mere nøjagtigt end at trække. Alle talfelter tager millimeter, men
 
 ### Vælg farver
 
-Et klik på {{ui:inspector.solid}} i egenskaberne for en form åbner farvekortet, med overskriften {{ui:inspector.shapeColor}}. Øverst viser det hexværdien af den farve, formen har nu. Under det ligger palettens færdige farver; et klik på en farver formen og lukker kortet.
+Et klik på {{ui:inspector.solid}} i egenskaberne for en form åbner farvekortet, med overskriften {{ui:inspector.shapeColor}}. Øverst viser det hexværdien af den farve, formen har nu. Klik på den for at skrive eller indsætte en farvekode som #5EBDDB (5ebddb og den korte #5bd virker også), og tryk [[Enter]]: formen får den farve, og er flere former valgt, får de den alle. [[Esc]] beholder den gamle farve. Under det ligger palettens færdige farver; et klik på en farver formen og lukker kortet.
 
 {{ui:inspector.custom}} åbner browserens farvevælger, til en farve af dine egne. Hvad den tilbyder afhænger af browseren: i Chrome og Edge har den et farvefelt, en skyder for nuancen, en pipette der tager en farve fra hvor som helst på skærmen, og værdien som HEX, RGB eller HSL, som du skifter mellem med pilene ved siden af den. Farven tæller, når du lukker vælgeren eller klikker uden for den.
 

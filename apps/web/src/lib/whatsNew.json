@@ -1,5 +1,161 @@
 [
   {
+    "version": "1.160.1",
+    "items": [
+      {
+        "title": {
+          "de": "Nicht gespeichert: mit Grund, und Neu laden wartet",
+          "en": "Not saved: with the reason, and reloading waits",
+          "da": "Ikke gemt: med årsagen, og genindlæsning venter"
+        },
+        "body": {
+          "de": "Kann der Browser einen Entwurf nicht speichern, nennt die rote Meldung jetzt immer den Grund, und darunter in einer kleinen Zeile, was der Browser selbst sagt: den Fehler, wie voll sein Speicher für layerling ist und ob ein kleiner Probeschreibvorgang durchgeht. Ein Bildschirmfoto davon zeigt, warum es klemmt. Dieselbe Zeile steht in der Konsole und im Fehlerbericht.\n\n„Speichern und neu laden“ im Update-Hinweis wartet jetzt, bis gespeichert ist. Konnte der offene Entwurf nicht gespeichert werden, lädt es nicht neu, sondern sagt es dir; sichere dann zuerst eine Kopie mit Exportieren → LYL.",
+          "en": "When the browser cannot save a design, the red note now always gives the reason, and below it, in a small line, what the browser itself says: the error, how full its storage for layerling is and whether a tiny test write gets through. A screenshot of it shows why saving is stuck. The same line is in the console and in the bug report.\n\n\"Save and reload\" in the update notice now waits until the design is saved. If the open design could not be saved, it does not reload but tells you; keep a copy with Export → LYL first.",
+          "da": "Når browseren ikke kan gemme et design, angiver den røde besked nu altid årsagen, og under den, i en lille linje, hvad browseren selv siger: fejlen, hvor fuldt dens lager til layerling er, og om en lille testskrivning går igennem. Et skærmbillede af den viser, hvorfor det hænger. Den samme linje står i konsollen og i fejlrapporten.\n\n\"Gem og genindlæs\" i opdateringsbeskeden venter nu, til designet er gemt. Kunne det åbne design ikke gemmes, genindlæser den ikke, men siger det til dig; gem først en kopi med Eksportér → LYL."
+        }
+      }
+    ]
+  },
+  {
+    "version": "1.160.0",
+    "items": [
+      {
+        "title": {
+          "de": "Stufenbohrung: Länge unter dem Kopf",
+          "en": "Counterbore: length below the head",
+          "da": "Forsænkning: længde under hovedet"
+        },
+        "body": {
+          "de": "Zylinderkopfschrauben werden nach der Länge unter dem Kopf verkauft. Die Stufenbohrung hat dafür jetzt das Feld „Schraubenlänge“: Trag die Schraubenlänge ein, und die Kopftiefe kommt für die Gesamtlänge dazu. Bei 3,2 mm Kopftiefe ergibt eine M3 × 12 so ein Loch von 15,2 mm.",
+          "en": "Socket head cap screws are sold by the length under the head. The counterbore now has the field \"Screw length\" for it: enter the screw's length, and the head depth is added for the total length. With a head depth of 3.2 mm, an M3 × 12 makes a hole 15.2 mm long.",
+          "da": "Skruer med cylinderhoved sælges efter længden under hovedet. Forsænkningen har nu feltet \"Skruelængde\" til det: skriv skruens længde, så lægges hoveddybden til for den totale længde. Med en hoveddybde på 3,2 mm giver en M3 × 12 et hul på 15,2 mm."
+        },
+        "guide": {
+          "section": "screwHoles"
+        }
+      },
+      {
+        "title": {
+          "de": "Einfacher Modus lässt sich auf Handy und Tablet ausschalten",
+          "en": "Simple mode can be switched off on phones and tablets",
+          "da": "Enkel tilstand kan slås fra på telefon og tablet"
+        },
+        "body": {
+          "de": "Zum Ausschalten hält man den Knopf zwei Sekunden lang. Auf einem Touchscreen öffnete das lange Drücken stattdessen das Menü des Browsers, und der einfache Modus blieb an. Jetzt bleibt das Menü zu, und die zwei Sekunden laufen durch.",
+          "en": "To switch it off, you hold the button for two seconds. On a touch screen the long press opened the browser's menu instead, and simple mode stayed on. Now the menu stays shut and the two seconds run through.",
+          "da": "For at slå den fra holder man knappen nede i to sekunder. På en touchskærm åbnede det lange tryk i stedet browserens menu, og enkel tilstand forblev slået til. Nu forbliver menuen lukket, og de to sekunder løber igennem."
+        }
+      },
+      {
+        "title": {
+          "de": "Drehen: der Zeiger der Skala beginnt auf null",
+          "en": "Turning: the dial's needle starts on zero",
+          "da": "Drejning: skalaens viser starter på nul"
+        },
+        "body": {
+          "de": "Griff man den Drehpfeil etwas neben der Mitte, stand der kleine Zeiger der Drehskala um genau so viel neben der Null, obwohl die Anzeige 0° sagte. Jetzt beginnt er immer auf der Null und zeigt auf den Strich, den die Anzeige nennt.",
+          "en": "When you grabbed the turning arrow a little beside its middle, the small needle on the dial started beside the zero by just as much, although the readout said 0°. Now it always starts on the zero and points at the tick the readout names.",
+          "da": "Når man greb drejepilen lidt ved siden af midten, startede den lille viser på skalaen lige så meget ved siden af nul, selv om visningen sagde 0°. Nu starter den altid på nul og peger på den streg, visningen nævner."
+        }
+      },
+      {
+        "title": {
+          "de": "Farbcode direkt eintippen",
+          "en": "Type a colour code",
+          "da": "Skriv en farvekode direkte"
+        },
+        "body": {
+          "de": "Der Hex-Wert oben in der Farbkarte ist jetzt ein Eingabefeld. Klick darauf, tippe oder füge einen Code wie #5EBDDB ein und drück Enter: Der Körper bekommt genau diese Farbe, bei mehreren ausgewählten Körpern alle. Der Umweg über Rot, Grün und Blau entfällt.",
+          "en": "The hex value at the top of the colour card is now a field. Click it, type or paste a code such as #5EBDDB and press Enter: the body takes exactly that colour, and with several bodies selected all of them do. No more detour through red, green and blue.",
+          "da": "Hexværdien øverst i farvekortet er nu et felt. Klik på det, skriv eller indsæt en kode som #5EBDDB, og tryk Enter: formen får præcis den farve, og er flere former valgt, får de den alle. Ingen omvej over rød, grøn og blå længere."
+        },
+        "guide": {
+          "section": "colorCard"
+        }
+      },
+      {
+        "title": {
+          "de": "Ein Hinweis bei sehr großen Netzen",
+          "en": "A note on very large meshes",
+          "da": "En bemærkning om meget store mesh"
+        },
+        "body": {
+          "de": "layerling ist vor allem für exakte CAD-Körper gemacht. Netze aus STL, OBJ oder 3MF gehen auch, und kleinere Teile sind kein Problem. Sehr große Netze mit Hunderttausenden oder Millionen Dreiecken machen den Editor aber langsam, belegen viel Speicher und verlangsamen das Speichern.\n\nBringt ein Import ein Netz ab 400 000 Dreiecken herein, oder kommen die Netze eines Entwurfs zusammen auf eine Million, sagt layerling das jetzt einmal, mit einem Knopf zum neuen Abschnitt der Anleitung. Netz vereinfachen (Rechtsklick auf den Körper) macht solche Netze leichter.",
+          "en": "layerling is made first of all for exact CAD bodies. Meshes from STL, OBJ or 3MF work too, and smaller parts are no problem. Very large meshes with hundreds of thousands or millions of triangles, though, make the editor slow, take a lot of memory and make saving slow.\n\nWhen an import brings in a mesh of 400,000 triangles or more, or a design's meshes reach a million together, layerling now says so once, with a button to the new section of the user guide. Simplify mesh (right-click on the body) makes such meshes lighter.",
+          "da": "layerling er først og fremmest lavet til eksakte CAD-legemer. Mesh fra STL, OBJ eller 3MF virker også, og mindre dele er intet problem. Meget store mesh med hundredtusinder eller millioner af trekanter gør dog editoren langsom, optager meget hukommelse og gør gemning langsom.\n\nNår en import bringer et mesh på 400.000 trekanter eller flere ind, eller et designs mesh tilsammen når en million, siger layerling det nu én gang, med en knap til det nye afsnit i brugervejledningen. Forenkl mesh (højreklik på legemet) gør sådanne mesh lettere."
+        },
+        "guide": {
+          "section": "largeMeshes"
+        }
+      },
+      {
+        "title": {
+          "de": "Leerer Entwurf: Behalten oder Löschen",
+          "en": "Empty design: Keep or Delete",
+          "da": "Tomt design: Behold eller Slet"
+        },
+        "body": {
+          "de": "Verlässt man einen leeren Entwurf, fragte layerling „Leeren Entwurf behalten?“ mit Ja und Nein, und Nein löschte ihn sofort. In der Eile war das leicht falsch zu lesen. Jetzt sagen die Knöpfe, was sie tun: Behalten und Löschen, Löschen in Rot.",
+          "en": "When you left an empty design, layerling asked \"Keep empty design?\" with Yes and No, and No deleted it at once. In a hurry that was easy to misread. Now the buttons say what they do: Keep and Delete, with Delete in red.",
+          "da": "Når man forlod et tomt design, spurgte layerling \"Behold tomt design?\" med Ja og Nej, og Nej slettede det med det samme. I en fart var det let at læse forkert. Nu siger knapperne, hvad de gør: Behold og Slet, med Slet i rødt."
+        }
+      },
+      {
+        "title": {
+          "de": "Wenn ein Entwurf nicht gespeichert werden kann",
+          "en": "When a design cannot be saved",
+          "da": "Når et design ikke kan gemmes"
+        },
+        "body": {
+          "de": "Bei sehr großen Netzen konnte dem Browser beim Speichern der Speicher ausgehen. Das Speichern scheiterte dann still, und nach dem Neuladen war der Entwurf auf einem Stunden alten Stand. Jetzt versucht layerling es mit einer kürzeren Rückgängig-Liste noch einmal. Klappt es trotzdem nicht, bleibt ein roter Hinweis stehen, bis wieder gespeichert ist, und der Browser fragt nach, bevor der Tab geschlossen oder neu geladen wird.",
+          "en": "With very large meshes the browser could run out of memory while saving. The save then failed quietly, and after a reload the design was back at a state hours old. Now layerling tries again with a shorter undo history. If it still fails, a red note stays up until the design is saved again, and the browser asks before the tab is closed or reloaded.",
+          "da": "Med meget store mesh kunne browseren løbe tør for hukommelse, mens der blev gemt. Gemningen slog så fejl i stilhed, og efter en genindlæsning var designet tilbage på en flere timer gammel tilstand. Nu prøver layerling igen med en kortere fortryd-historik. Lykkes det stadig ikke, bliver en rød besked stående, til designet er gemt igen, og browseren spørger, før fanen lukkes eller genindlæses."
+        }
+      }
+    ]
+  },
+  {
+    "version": "1.159.2",
+    "items": [
+      {
+        "title": {
+          "de": "Strecken: keine schwarzen Linien mehr an den Nähten",
+          "en": "Stretch: no more black lines at the seams",
+          "da": "Stræk: ingen sorte streger ved sømmene mere"
+        },
+        "body": {
+          "de": "Ging das Strecken durch schräge oder gerundete Wände, zeigte das verlängerte Stück schwarze Linien, und nach einem späteren Schnitt blieben Reste stehen. Ursache waren haarfeine Dreiecke an beiden Nähten; sie werden jetzt weggefaltet, die Form bleibt dabei gleich.",
+          "en": "When Stretch went through slanted or rounded walls, the longer piece showed black lines, and remnants stayed behind after a later cut. Hairline triangles along both seams caused it; they are now folded away, and the shape stays the same.",
+          "da": "Når Stræk gik gennem skrå eller afrundede vægge, viste det forlængede stykke sorte streger, og der blev rester tilbage efter et senere snit. Årsagen var hårfine trekanter langs begge sømme; de foldes nu væk, og formen forbliver den samme."
+        }
+      },
+      {
+        "title": {
+          "de": "Das Mittelkreuz bleibt auch von weitem zu sehen",
+          "en": "The centre cross stays visible from afar",
+          "da": "Midterkrydset kan ses, også på afstand"
+        },
+        "body": {
+          "de": "Das Kreuz durch die Mitte der Platte wurde beim Herauszoomen so dünn wie die anderen Rasterlinien und ging zwischen ihnen unter. Es bleibt jetzt immer mindestens drei Bildpunkte breit; nah herangezoomt sieht es aus wie bisher.",
+          "en": "Zoomed out, the cross through the middle of the plate became as thin as the other grid lines and got lost among them. It now always stays at least three pixels wide; close up it looks as before.",
+          "da": "Når man zoomede ud, blev krydset gennem pladens midte lige så tyndt som de andre gitterlinjer og forsvandt imellem dem. Nu er det altid mindst tre pixel bredt; tæt på ser det ud som før."
+        }
+      },
+      {
+        "title": {
+          "de": "Ein Entwurf, der sich nicht lesen lässt, öffnet nicht mehr leer",
+          "en": "A design that cannot be read no longer opens empty",
+          "da": "Et design, der ikke kan læses, åbner ikke længere tomt"
+        },
+        "body": {
+          "de": "Ließ sich ein gespeicherter Entwurf nicht lesen, öffnete er leer, und schon die erste Änderung konnte ihn so überschreiben. Jetzt bleibt er unverändert auf der Startseite stehen, und eine Meldung nennt den Grund. „Alle sichern“ sagt außerdem, zu welchen Entwürfen der Browser keinen Inhalt hat, und dauert das Öffnen einer .lyl-Datei ungewöhnlich lange, steht da, bei welchem Schritt es ist.",
+          "en": "When a stored design could not be read, it opened empty, and the first change could save it that way. Now it stays on the start page untouched, with a message that gives the reason. “Back up all” also tells you which designs the browser holds no content for, and when opening a .lyl file takes unusually long, it says which step it is on.",
+          "da": "Når et gemt design ikke kunne læses, åbnede det tomt, og den første ændring kunne gemme det sådan. Nu bliver det urørt på startsiden med en besked, der giver grunden. “Sikkerhedskopiér alle” fortæller også, hvilke designs browseren ikke har indhold til, og når det tager usædvanligt lang tid at åbne en .lyl-fil, står der, hvilket trin det er nået til."
+        }
+      }
+    ]
+  },
+  {
     "version": "1.159.1",
     "items": [
       {

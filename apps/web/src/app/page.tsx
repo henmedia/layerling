@@ -43,7 +43,10 @@ import { applyAppTheme, getAppThemePreference, hasStoredAppTheme, readStoredAppT
 import { hydrateEditorHistoryState, notesForHistoryIndex, type EditorHistoryEntry } from "@/lib/editorHistory";
 import { detectLanguage, setLanguage, t, translate, type Language } from "@/lib/i18n";
 import { localizedError } from "@/lib/userErrors";
-import { historyTrimSteps, isProjectTooLargeError, isStorageFullError, trimHistoryWindow } from "@/lib/historyTrim";
+import { historyTrimSteps, isRetriedWithLessHistory, trimHistoryWindow } from "@/lib/historyTrim";
+import { describeSaveError, probeBrowserStorage, saveFailureKind, storageProbeText, type SaveFailureKind } from "@/lib/saveFailureDiagnosis";
+import { reportBugReportError } from "@/lib/bugReport";
+import { leaveGuardReleased, provideDesignSaveState } from "@/lib/leaveGuard";
 import { GuideHelpLink } from "@/components/GuideHelpLink";
 import { WelcomeGuideBody } from "@/components/WelcomeGuide";
 import { DashboardWelcome, useWelcomeHidden } from "@/components/DashboardWelcome";
@@ -79,7 +82,9 @@ import { useFileAccept } from "@/lib/fileAccept";
 import { dropBackupTarget, linkedLylFile, lylFileAccessSupported, onLylFilesLaunched, pickBackupTarget, pickFilesToImport, rememberLylFile, writeBackupTarget, type LylFileHandle } from "@/lib/lylFileAccess";
 import { exportLylProject, importLylProject, inspectLylProjectPackage, LYL_CREATED_WITH_VERSION, LYL_MEDIA_TYPE, withLylProjectName, withLylThumbnail } from "@/lib/lylProject";
 import { relieveOverFineCadMeshes, type RemeshCadBrep } from "@/lib/cadMeshRelief";
-import { backupDesignAlreadyThere, backupEntryPaths, backupFileName, backupFolderPaths, backupNamePrefix, backupThumbnailPath, unpackBackupFolders, isBackupFileName, createBackupWriter, unpackBackup, zipHoldsDesigns } from "@/lib/projectBackup";
+import { backupDesignAlreadyThere, backupEntryPaths, backupFileName, backupFolderPaths, backupNamePrefix, backupThumbnailPath, unpackBackupFolders, isBackupFileName, createBackupWriter, unpackBackup, unpackBackupSettingsText, SETTINGS_BACKUP_FILE, zipHoldsDesigns } from "@/lib/projectBackup";
+import { applySettingsFile, browserSettingsFile } from "@/lib/applySettingsFile";
+import { parseSettingsFile, settingsFileText } from "@/lib/settingsFile";
 import { CUSTOM_SHAPES_FOLDER } from "@/lib/customShapesServer";
 import { backupNoteState, readLastFullBackup, rememberFullBackup } from "@/lib/backupState";
 import { FileBackupsDialog, type FileBackupsScope } from "@/components/FileBackupsDialog";
@@ -166,6 +171,9 @@ function sharedProjectKey(project: Pick<SharedProject, "fileName" | "path">) {
 /** Joins a folder path with a name, without leaving a stray slash at the front. */
 /** How long a design must have been open before its opening counts as done (#1157, lib/openingDesignGuard.ts). */
 const DESIGN_OPENED_AFTER_MS = 10_000;
+/** Opening a .lyl file: read, check, store, place. A large one takes a few seconds; after this the notice says which step it is on (#1639). */
+const OPENING_STEPS = 4;
+const OPENING_SLOW_NOTICE_MS = 15_000;
 
 function joinStorePath(path: string, name: string) {
   return path ? `${path}/${name}` : name;
@@ -531,21 +539,25 @@ async function loadProjectShapes(projectId: string, options: { currentStateOnly?
   };
 }
 
-/** The .lyl bytes of a project: the stored package, or a freshly packed one. */
-async function projectPackageBytes(project: DashboardProject) {
-  const stored = await loadProjectPackage(project.id);
-  // Under the card's name: a rename on the start page leaves the old one in the saved package (#689).
-  if (stored) return withLylProjectName(stored, project.name);
-  const context = projectShapeSaveContext(project);
+/** A design's state packed as a .lyl, as the browser keeps it. */
+function packProjectEntry(
+  projectId: string,
+  entry: Pick<ProjectShapeCacheEntry, "revision" | "shapes" | "assets" | "attachments">,
+  context: ProjectShapeSaveContext,
+  history: ProjectShapeCacheEntry["history"],
+  historyIndex: number,
+) {
   return exportLylProject({
-    projectId: project.id,
+    projectId,
     projectName: context.projectName,
     createdAt: context.createdAt,
-    modifiedAt: project.updatedAt,
-    shapes: [],
-    history: [],
-    historyIndex: 0,
-    assets: [],
+    modifiedAt: entry.revision,
+    shapes: entry.shapes,
+    notes: notesForHistoryIndex(history, historyIndex),
+    history,
+    historyIndex,
+    assets: entry.assets,
+    attachments: entry.attachments,
     workspace: context.workspace,
     snapGrid: context.snapGrid,
     placementElevation: context.placementElevation,
@@ -553,6 +565,22 @@ async function projectPackageBytes(project: DashboardProject) {
     sketchPlacementWorkplane: context.sketchPlacementWorkplane,
     compressionLevel: 1,
   });
+}
+
+/**
+ * The .lyl bytes of a project: the stored package, or one packed from a record of the older kind. `missing` says that
+ * the browser holds nothing for the design, so the bytes are an empty design under its name and settings: a backup
+ * says so instead of carrying it along unnoticed (#1638).
+ */
+async function projectPackageBytes(project: DashboardProject): Promise<{ bytes: Uint8Array; missing: boolean }> {
+  const stored = await loadProjectPackage(project.id);
+  // Under the card's name: a rename on the start page leaves the old one in the saved package (#689).
+  if (stored) return { bytes: await withLylProjectName(stored, project.name), missing: false };
+  // A record written before designs were kept as packages has its shapes beside it; packing nothing lost them.
+  const record = await loadProjectShapes(project.id);
+  const entry = projectShapeCacheEntry(project.updatedAt, record?.shapes ?? [], record?.history, record?.historyIndex, record?.assets, record?.attachments);
+  const bytes = await packProjectEntry(project.id, entry, projectShapeSaveContext(project), entry.history, entry.historyIndex);
+  return { bytes, missing: !record };
 }
 
 /** Die beiden Muster, aus denen der Name einer Kopie entsteht. */
@@ -602,31 +630,15 @@ async function loadProjectPackage(projectId: string): Promise<Uint8Array | null>
 type ProjectShapesSaveResult = { historyTrimmed?: { kept: number; total: number } };
 
 async function saveProjectShapes(projectId: string, entry: ProjectShapeCacheEntry, context: ProjectShapeSaveContext): Promise<ProjectShapesSaveResult> {
-  const pack = (history: ProjectShapeCacheEntry["history"], historyIndex: number) => exportLylProject({
-    projectId,
-    projectName: context.projectName,
-    createdAt: context.createdAt,
-    modifiedAt: entry.revision,
-    shapes: entry.shapes,
-    notes: notesForHistoryIndex(history, historyIndex),
-    history,
-    historyIndex,
-    assets: entry.assets,
-    attachments: entry.attachments,
-    workspace: context.workspace,
-    snapGrid: context.snapGrid,
-    placementElevation: context.placementElevation,
-    placementWorkplane: context.placementWorkplane,
-    sketchPlacementWorkplane: context.sketchPlacementWorkplane,
-    compressionLevel: 1,
-  });
+  const pack = (history: ProjectShapeCacheEntry["history"], historyIndex: number) => packProjectEntry(projectId, entry, context, history, historyIndex);
   let lylPackage: Awaited<ReturnType<typeof exportLylProject>>;
   let historyTrimmed: ProjectShapesSaveResult["historyTrimmed"];
   try {
     lylPackage = await pack(entry.history, entry.historyIndex);
   } catch (error) {
-    if (!isProjectTooLargeError(error) || entry.history.length <= 1) throw error;
-    // Too big with the whole history: keep the newest steps that fit, so the design is saved all the same.
+    if (!isRetriedWithLessHistory(error) || entry.history.length <= 1) throw error;
+    // Too big with the whole history, or out of memory packing it (#1652): keep the newest steps that fit, so the design
+    // is saved all the same.
     let packed: Awaited<ReturnType<typeof exportLylProject>> | null = null;
     for (const keep of historyTrimSteps(entry.history.length)) {
       const trimmed = trimHistoryWindow(entry.history, entry.historyIndex, keep);
@@ -635,7 +647,7 @@ async function saveProjectShapes(projectId: string, entry: ProjectShapeCacheEntr
         historyTrimmed = { kept: trimmed.history.length, total: entry.history.length };
         break;
       } catch (retryError) {
-        if (!isProjectTooLargeError(retryError)) throw retryError;
+        if (!isRetriedWithLessHistory(retryError)) throw retryError;
       }
     }
     if (!packed) throw error;
@@ -1000,6 +1012,13 @@ export default function Home() {
   const [themePreference, setThemePreference] = useState<AppThemePreference>("system");
   const [resolvedTheme, setResolvedTheme] = useState<ResolvedAppTheme>("light");
   const [dashboardNotice, setDashboardNotice] = useState("");
+  // A backup that holds the settings of the browser it came from asks, before it is restored, whether they come along
+  // (Discussion #1678). The answer: true or false for the tick box, null for Cancel.
+  const [backupSettingsAsk, setBackupSettingsAsk] = useState<{ fileName: string; take: boolean; resolve: (answer: boolean | null) => void } | null>(null);
+  const answerBackupSettings = (answer: boolean | null) => {
+    backupSettingsAsk?.resolve(answer);
+    setBackupSettingsAsk(null);
+  };
   // When "Back up all" last took every design of this browser, for the notice over them; read once on the page.
   const [lastFullBackup, setLastFullBackup] = useState<number | null>(null);
   useEffect(() => setLastFullBackup(readLastFullBackup()), []);
@@ -1066,6 +1085,25 @@ export default function Home() {
   const projectsRef = useRef(projects);
   projectsRef.current = projects;
   const [projectSaveFailure, setProjectSaveFailure] = useState<{ message: string; at: number } | null>(null);
+  // Designs whose newest state could not be stored (#1652): the revision that failed, until a newer save gets through. While
+  // one is listed, closing or reloading the tab asks first, and the editor keeps a red note up.
+  const unsavedProjectsRef = useRef(new Map<string, number>());
+  const [unsavedDesign, setUnsavedDesign] = useState<{ projectId: string; message: string; kind: SaveFailureKind; detail: string } | null>(null);
+  /**
+   * The error with what the browser says about its storage and whether a tiny write gets through (#1639), for the
+   * note, the console and the bug report. A failing design fails at every change, so the storage is asked once a
+   * minute for the same error.
+   */
+  const lastSaveDiagnosisRef = useRef<{ detail: string; at: number; text: string } | null>(null);
+  const diagnoseSaveFailure = useCallback(async (detail: string) => {
+    const last = lastSaveDiagnosisRef.current;
+    if (last && last.detail === detail && Date.now() - last.at < 60000) return last.text;
+    const text = `${detail} · ${storageProbeText(await probeBrowserStorage())}`;
+    lastSaveDiagnosisRef.current = { detail, at: Date.now(), text };
+    console.error(`layerling: storage when the save failed: ${text}`);
+    reportBugReportError(`Save failed: ${text}`);
+    return text;
+  }, []);
   const editorLoadingStartedAtRef = useRef(0);
 
   // Warm the editor chunk once the dashboard is idle, so opening a project
@@ -1339,11 +1377,19 @@ export default function Home() {
   // browser asks first. A save takes well under a second, so this rarely shows.
   useEffect(() => {
     const warnWhileSaving = (event: BeforeUnloadEvent) => {
-      if (Object.keys(projectShapeSaveQueuesRef.current).length === 0) return;
+      // Also once a save has failed: the newest state lives only in this tab then (#1652).
+      if (Object.keys(projectShapeSaveQueuesRef.current).length === 0 && unsavedProjectsRef.current.size === 0) return;
+      // "Reload anyway" in the update notice was the answer already (#1639).
+      if (leaveGuardReleased()) return;
       event.preventDefault();
       event.returnValue = "";
     };
     window.addEventListener("beforeunload", warnWhileSaving);
+    // A reload layerling starts itself waits for this and does not throw an unstored design away (#1639).
+    provideDesignSaveState(() => ({
+      saving: Object.keys(projectShapeSaveQueuesRef.current).length > 0,
+      unsaved: unsavedProjectsRef.current.size > 0,
+    }));
     return () => window.removeEventListener("beforeunload", warnWhileSaving);
   }, []);
 
@@ -1444,18 +1490,21 @@ export default function Home() {
       .catch((error) => {
         // A design that could not be read did not crash the page.
         clearDesignOpening(window.localStorage, activeProjectId);
-        if (!canceled) {
+        if (canceled) return;
+        // Live editor changes that came in while the read was pending stay as they are.
+        if (projectShapesByIdRef.current[activeProjectId]) {
           setDashboardNotice(error instanceof Error ? localizedError(error.message) : t("notice.projectShapesLoadFailed"));
-          setProjectShapesById((current) => {
-            // A failed background read must not erase a project that has already
-            // received live editor changes while the read was pending.
-            if (current[activeProjectId]) return current;
-            return {
-              ...current,
-              [activeProjectId]: projectShapeCacheEntry(activeProject.revision ?? Date.now(), []),
-            };
-          });
+          return;
         }
+        // It does not open as an empty design: the editor would save that empty design over the stored one at the
+        // first change, the card would count 0 and a backup or a copy would take the empty one (#1638, #1639).
+        // Back on the start page the stored design is untouched and can be opened again or without history.
+        const reason = error instanceof Error ? localizedError(error.message) : t("notice.projectShapesLoadFailed");
+        setDashboardNotice(t("notice.designNotOpened", { name: activeProject.name, reason }));
+        setActiveProjectId(null);
+        setEditorLoading(false);
+        setView("dashboard");
+        window.history.replaceState(null, "", "/");
       });
     return () => {
       canceled = true;
@@ -1684,6 +1733,12 @@ export default function Home() {
     void queuedSave
       .then((result) => {
         setProjectSaveFailure(null);
+        // A save that got through holds every change up to its revision, the failed one before it too.
+        const failedAt = unsavedProjectsRef.current.get(snapshot.projectId);
+        if (failedAt !== undefined && failedAt <= revision) {
+          unsavedProjectsRef.current.delete(snapshot.projectId);
+          setUnsavedDesign((current) => (current?.projectId === snapshot.projectId ? null : current));
+        }
         // Said once per design and session: the stored copy keeps only the newest steps of a very large history (#475).
         const trimmed = result?.historyTrimmed;
         if (trimmed && !trimmedHistoryToldRef.current.has(snapshot.projectId)) {
@@ -1700,13 +1755,22 @@ export default function Home() {
       })
       .catch((error) => {
         if (projectShapeSaveQueuesRef.current[snapshot.projectId] === queuedSave) {
-          setDashboardNotice(error instanceof Error ? localizedError(error.message) : t("notice.projectShapesSaveFailed"));
           // The dashboard is not on screen while someone works; the editor has to say it too.
           // With the reason when it is one a person can act on: too big for the project file, or no room left (#475).
-          const known = isProjectTooLargeError(error) || isStorageFullError(error);
-          setProjectSaveFailure({
-            message: known && error instanceof Error ? t("notice.projectShapesSaveFailedWhy", { reason: localizedError(error.message) }) : t("notice.projectShapesSaveFailed"),
-            at: Date.now(),
+          // An error of such a kind may come without any text (#1639); the reason is then the kind's own sentence.
+          const kind = saveFailureKind(error);
+          const raw = error instanceof Error ? localizedError(error.message) : "";
+          const reason = kind === "storageFull" ? t("error.storageFull") : kind === "outOfMemory" ? raw || t("error.outOfMemory") : kind === "tooLarge" ? raw : "";
+          const message = reason ? t("notice.projectShapesSaveFailedWhy", { reason }) : t("notice.projectShapesSaveFailed");
+          setDashboardNotice(message);
+          setProjectSaveFailure({ message, at: Date.now() });
+          unsavedProjectsRef.current.set(snapshot.projectId, Math.max(unsavedProjectsRef.current.get(snapshot.projectId) ?? 0, revision));
+          // The error itself, in the note, the console and the bug report, so a screenshot says why the browser refused (#1639).
+          const detail = describeSaveError(error);
+          console.error(`layerling: could not save the design: ${detail}`, error);
+          setUnsavedDesign({ projectId: snapshot.projectId, message, kind, detail });
+          void diagnoseSaveFailure(detail).then((full) => {
+            setUnsavedDesign((current) => (current?.projectId === snapshot.projectId ? { ...current, detail: full } : current));
           });
         }
       })
@@ -1715,7 +1779,7 @@ export default function Home() {
           delete projectShapeSaveQueuesRef.current[snapshot.projectId];
         }
       });
-  }, []);
+  }, [diagnoseSaveFailure]);
 
   const updateProjectWorkspace = useCallback((snapshot: {
     projectId: string;
@@ -1789,10 +1853,23 @@ export default function Home() {
     openEditor(project.id, { allowMissingFromStorage: true });
   };
 
-  const openLylProjectFromFile = useCallback(async (file: File, sharedProject?: SharedProject, fileHandle?: LylFileHandle, options?: { name?: string }) => {
+  const openLylProjectFromFile = useCallback(async (file: File, sharedProject?: SharedProject, fileHandle?: LylFileHandle, options?: { name?: string; onSlow?: (message: string) => void }) => {
     setDashboardNotice(t("notice.validatingFile", { name: file.name }));
+    // An opening that does not end said nothing at all: "Validating …" stayed and nothing came (#1639). After a while
+    // the notice says which step it is on, and so does the bug report, whose last messages are these.
+    let step = 1;
+    const startedAt = Date.now();
+    const slowTimer = window.setInterval(() => {
+      const seconds = Math.round((Date.now() - startedAt) / 1000);
+      const message = t("notice.stillOpening", { name: file.name, step, total: OPENING_STEPS, seconds });
+      setDashboardNotice(message);
+      options?.onSlow?.(message);
+    }, OPENING_SLOW_NOTICE_MS);
     try {
-      const restored = (await relieveOverFineCadMeshes(await importLylProject(await file.arrayBuffer()), remeshCadBrepLater)).project;
+      const bytes = await file.arrayBuffer();
+      step = 2;
+      const restored = (await relieveOverFineCadMeshes(await importLylProject(bytes), remeshCadBrepLater)).project;
+      step = 3;
       const now = Date.now();
       // A project on the server has one working copy here, not one per opening.
       // Without this, every visit to the folder left another namesake behind.
@@ -1819,6 +1896,7 @@ export default function Home() {
       };
       const entry = projectShapeCacheEntry(now, restored.shapes, restored.history, restored.historyIndex, restored.assets, restored.attachments);
       await saveProjectShapes(project.id, entry, projectShapeSaveContext(project));
+      step = 4;
       // A file opened as a new design goes where new designs go; a server design is there already.
       const { project: placed, problem } = sharedProject || existing ? { project } : await placeNewDesignRef.current(project);
       if (placed.sharedProject && !sharedProject) void refreshSharedProjects();
@@ -1848,6 +1926,8 @@ export default function Home() {
       const message = error instanceof Error ? localizedError(error.message) : "Could not open layerling project";
       setDashboardNotice(message);
       return { ok: false, message };
+    } finally {
+      window.clearInterval(slowTimer);
     }
   }, [openFolderId, projects, refreshSharedProjects]);
 
@@ -2161,7 +2241,7 @@ export default function Home() {
   /** Puts a project into a folder of the store as a file that is not there yet. */
   const putProjectOnServer = useCallback(async (project: DashboardProject, targetPath: string) => {
     // The file carries the card's picture, for other programs to show (#1226).
-    const bytes = await withLylThumbnail(await projectPackageBytes(project), await projectThumbnailPngBytes(project.thumbnailUrl).catch(() => null));
+    const bytes = await withLylThumbnail((await projectPackageBytes(project)).bytes, await projectThumbnailPngBytes(project.thumbnailUrl).catch(() => null));
     const { fileName } = sharedProjectSaveTarget({ projectName: project.name, exportName: project.name, binding: undefined });
     const body = bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength) as ArrayBuffer;
     const projectBlob = new Blob([body], { type: LYL_MEDIA_TYPE });
@@ -2511,12 +2591,16 @@ export default function Home() {
       // more in memory, where large designs made Safari reload the page without a word (#887).
       const writer = createBackupWriter();
       const skipped: string[] = [];
+      // Designs the browser holds nothing for: in the backup as empty designs, and named in the notice (#1638).
+      const empty: string[] = [];
       for (let index = 0; index < designs.length; index += 1) {
         setDashboardNotice(t("notice.backingUp", { index: index + 1, total: designs.length }));
         // Noted before the design is read, so a page that is gone in the middle can say afterwards where it stopped.
         writeBackupProgress({ index: index + 1, total: designs.length, name: designs[index].name });
         try {
-          writer.add(names[index], await projectPackageBytes(designs[index]));
+          const { bytes, missing } = await projectPackageBytes(designs[index]);
+          writer.add(names[index], bytes);
+          if (missing) empty.push(designs[index].name);
         } catch (error) {
           // One design that cannot be read does not cost the backup of the others; the message names it.
           skipped.push(`${designs[index].name} (${error instanceof Error ? localizedError(error.message) : String(error)})`);
@@ -2527,6 +2611,15 @@ export default function Home() {
         if (thumbnail) writer.add(backupThumbnailPath(names[index]), thumbnail);
       }
       shapeEntries.forEach((entry) => writer.add(entry.name, entry.bytes));
+      // A backup of everything takes this browser's settings along (Discussion #1678); a restore asks whether to take
+      // them over. Settings that cannot be read do not cost the backup.
+      if (!scope) {
+        try {
+          writer.add(SETTINGS_BACKUP_FILE, new TextEncoder().encode(settingsFileText(browserSettingsFile())));
+        } catch {
+          // Without them, as before.
+        }
+      }
       // Folders with no design anywhere inside them go along as empty folders.
       const holding = new Set(designs.flatMap((project) => folderTrail(designFolders, folderOfDesign(designFolders, project.folderId)).map((folder) => folder.id)));
       const foldersAlong = !scope ? designFolders : "folderId" in scope ? designFolders.filter((folder) => inFolder(scope.folderId, folder.id)) : [];
@@ -2543,7 +2636,12 @@ export default function Home() {
       const done = shapeCount
         ? t("notice.backupDoneWithShapes", { count: saved, shapes: shapeCount, name: fileName })
         : t("notice.backupDone", { count: saved, name: fileName });
-      setDashboardNotice(skipped.length ? `${done} ${t("notice.backupSkipped", { count: skipped.length, names: skipped.join("; ") })}` : done);
+      const notes = [
+        done,
+        ...(skipped.length ? [t("notice.backupSkipped", { count: skipped.length, names: skipped.join("; ") })] : []),
+        ...(empty.length ? [t("notice.backupEmptyDesigns", { count: empty.length, names: empty.join("; ") })] : []),
+      ];
+      setDashboardNotice(notes.join(" "));
     } catch (error) {
       writeBackupProgress(null);
       setDashboardNotice(t("notice.backupFailed", { reason: error instanceof Error ? localizedError(error.message) : String(error) }));
@@ -2569,6 +2667,12 @@ export default function Home() {
       // As in the browser's backup, a shape that cannot be read does not cost the designs.
       const shapes = await serverCustomShapesBackupEntries().catch(() => ({ entries: [], count: 0 }));
       shapes.entries.forEach((entry) => writer.add(entry.name, entry.bytes));
+      // The settings are this browser's, as in the browser's backup (Discussion #1678).
+      try {
+        writer.add(SETTINGS_BACKUP_FILE, new TextEncoder().encode(settingsFileText(browserSettingsFile())));
+      } catch {
+        // Without them, as before.
+      }
       writeBackupProgress(null);
       if (count === 0 && skipped.length === 0 && shapes.count === 0) {
         await dropBackupTarget(target);
@@ -2594,8 +2698,30 @@ export default function Home() {
     let entries;
     let emptyFolderPaths: string[][] = [];
     let shapes = { added: 0, skipped: 0 };
+    let bytes: Uint8Array;
     try {
-      const bytes = new Uint8Array(await file.arrayBuffer());
+      bytes = new Uint8Array(await file.arrayBuffer());
+    } catch {
+      setDashboardNotice(t("notice.backupNotReadable", { name: file.name }));
+      return;
+    }
+    // The settings the backup brings (Discussion #1678): asked before anything is restored. The box is ticked when this
+    // browser has no default of its own yet, as after a new computer or lost browser data.
+    const backupSettingsText = unpackBackupSettingsText(bytes);
+    const backupSettings = backupSettingsText ? parseSettingsFile(backupSettingsText) : null;
+    let settingsNote = "";
+    if (backupSettings) {
+      const take = await new Promise<boolean | null>((resolve) => setBackupSettingsAsk({ fileName: file.name, take: readWorkspaceDefault() === null, resolve }));
+      if (take === null) {
+        setDashboardNotice("");
+        return;
+      }
+      if (take) {
+        applySettingsFile(backupSettings);
+        settingsNote = ` ${t("notice.backupSettingsTaken")}`;
+      }
+    }
+    try {
       entries = unpackBackup(bytes);
       emptyFolderPaths = unpackBackupFolders(bytes);
       const restoredShapes = await restoreCustomShapesFromBackup(bytes).catch(() => null);
@@ -2604,7 +2730,7 @@ export default function Home() {
       setDashboardNotice(t("notice.backupNotReadable", { name: file.name }));
       return;
     }
-    const shapesNote = shapes.added + shapes.skipped > 0 ? ` ${t("notice.backupShapesRestored", { count: shapes.added, skipped: shapes.skipped })}` : "";
+    const shapesNote = (shapes.added + shapes.skipped > 0 ? ` ${t("notice.backupShapesRestored", { count: shapes.added, skipped: shapes.skipped })}` : "") + settingsNote;
     if (entries.length === 0 && shapesNote) {
       setDashboardNotice(shapesNote.trim());
       return;
@@ -3199,18 +3325,22 @@ export default function Home() {
             if (event.key === "Escape") setEmptyProjectPromptId(null);
           }}
         >
-          <div className="dashboard-confirm-dialog">
+          {/* Its own look (Discussion #1669): the question larger and centred, Keep in green beside the red Delete,
+              so the two answers tell themselves apart at a glance. */}
+          <div className="dashboard-confirm-dialog empty-project-dialog">
             <header>
               <strong id="empty-project-title">{t("confirm.emptyProjectTitle")}</strong>
             </header>
             <p>{t("confirm.emptyProjectBody", { name: emptyProjectPrompt.name })}</p>
             <div className="dashboard-confirm-actions">
-              <button className="dashboard-confirm-cancel" type="button" onClick={removeEmptyProject}>
-                {t("confirm.no")}
+              {/* The buttons say what they do: "No" to "Keep empty design?" was read in a hurry as "No, don't delete it"
+                  and took the design away (Discussion #1669). Delete in red, as the other deletes on the start page. */}
+              <button className="dashboard-confirm-delete" type="button" onClick={removeEmptyProject}>
+                {t("confirm.delete")}
               </button>
               {/* Focused, so Enter keeps the design. */}
               <button className="dashboard-confirm-save" type="button" autoFocus onClick={() => setEmptyProjectPromptId(null)}>
-                {t("confirm.yes")}
+                {t("confirm.keep")}
               </button>
             </div>
           </div>
@@ -3255,6 +3385,7 @@ export default function Home() {
               onProjectSnapshot={updateProjectSnapshot}
               isProjectThumbnailMissing={isProjectThumbnailMissing}
               projectSaveFailure={projectSaveFailure}
+              projectUnsaved={unsavedDesign && unsavedDesign.projectId === activeProjectId ? unsavedDesign : null}
               onProjectWorkspaceChange={updateProjectWorkspace}
               onProjectNameChange={(name) => {
                 if (activeProjectId) renameProject(activeProjectId, name);
@@ -3275,6 +3406,38 @@ export default function Home() {
         </SafeModeErrorBoundary>
       ) : null}
       {view === "editor" && (editorLoading || !canRenderEditor) ? <EditorLoadingSkeleton /> : null}
+      {backupSettingsAsk ? (
+        <section className="dashboard-confirm-overlay" role="dialog" aria-modal="true" aria-labelledby="backup-settings-title">
+          <div className="dashboard-confirm-dialog backup-settings-dialog">
+            <header>
+              <strong id="backup-settings-title">{t("dashboard.restoreBackup")}</strong>
+              <button type="button" aria-label={t("confirm.cancel")} onClick={() => answerBackupSettings(null)}>
+                <X size={18} />
+              </button>
+            </header>
+            <p>{t("backupSettings.body", { name: backupSettingsAsk.fileName })}</p>
+            <label className="backup-settings-take">
+              <input
+                type="checkbox"
+                checked={backupSettingsAsk.take}
+                onChange={(event) => {
+                  const take = event.currentTarget.checked;
+                  setBackupSettingsAsk((current) => (current ? { ...current, take } : current));
+                }}
+              />
+              <span>{t("backupSettings.take")}</span>
+            </label>
+            <div className="dashboard-confirm-actions">
+              <button className="dashboard-confirm-cancel" type="button" onClick={() => answerBackupSettings(null)}>
+                {t("confirm.cancel")}
+              </button>
+              <button className="dashboard-confirm-save" type="button" autoFocus onClick={() => answerBackupSettings(backupSettingsAsk.take)}>
+                {t("backupSettings.restore")}
+              </button>
+            </div>
+          </div>
+        </section>
+      ) : null}
       <TabPresenceNotice version={LYL_CREATED_WITH_VERSION} projectId={view === "editor" ? activeProjectId : null} />
     </>
   );

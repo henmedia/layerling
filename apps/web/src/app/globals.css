@@ -2666,6 +2666,30 @@ html[data-theme="dark"] .whats-new-earlier:hover {
   opacity: 0.45;
 }
 
+/* "Keep empty design?" (Discussion #1669): the question larger and centred,
+   Keep in green beside the red Delete, so the answers tell themselves apart. */
+.empty-project-dialog header {
+  justify-content: center;
+  text-align: center;
+}
+
+.empty-project-dialog header strong {
+  font-size: 18px;
+}
+
+.empty-project-dialog p {
+  text-align: center;
+}
+
+.empty-project-dialog .dashboard-confirm-actions {
+  justify-content: center;
+}
+
+.empty-project-dialog .dashboard-confirm-save {
+  border-color: #2e7d32;
+  background: #2e7d32;
+}
+
 .dashboard-rename-dialog > label {
   display: grid;
   gap: 7px;
@@ -10009,6 +10033,34 @@ html[data-theme="dark"] .rotation-angle-badge {
   font-weight: 600;
 }
 
+/* The colour code in the header of the colour card, to type in (Discussion #1674): text until pointed at. */
+.color-hex-input {
+  width: 92px;
+  min-width: 0;
+  padding: 3px 6px;
+  border: 1px solid transparent;
+  border-radius: 5px;
+  background: transparent;
+  font-family: inherit;
+  text-align: right;
+}
+
+.color-hex-input:hover:not(:disabled),
+.color-hex-input:focus {
+  border-color: rgba(152, 132, 111, 0.55);
+}
+
+.color-hex-input:focus {
+  outline: none;
+  background: rgba(152, 132, 111, 0.1);
+  text-align: left;
+}
+
+.color-hex-input::placeholder {
+  color: inherit;
+  opacity: 1;
+}
+
 .color-grid {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
@@ -16099,6 +16151,40 @@ html[data-theme="dark"] .export-holes-only-warning svg {
 /* ==========================================================================
    Open group: the bar that closes it again
    ========================================================================== */
+/* The newest state of the design could not be stored (#1652): stays up, red, until a save gets through. */
+.unsaved-design-banner {
+  position: fixed;
+  bottom: 140px;
+  left: 50%;
+  z-index: 42;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  max-width: min(640px, calc(100vw - 32px));
+  padding: 10px 16px;
+  color: #fff;
+  font-size: 13px;
+  line-height: 1.4;
+  background: #c82031;
+  border-radius: 10px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.25);
+  transform: translateX(-50%);
+}
+
+.unsaved-design-banner strong {
+  font-size: 14px;
+}
+
+/* The browser's own words and its storage figures (#1639): smaller, and selectable to copy. */
+.unsaved-design-banner .unsaved-design-detail {
+  margin-top: 4px;
+  font-size: 11px;
+  line-height: 1.35;
+  opacity: 0.9;
+  overflow-wrap: anywhere;
+  user-select: text;
+}
+
 .open-group-banner {
   position: fixed;
   bottom: 88px;
@@ -17187,6 +17273,27 @@ html[data-theme="dark"] .qr-code-panel small.qr-code-warning {
   border-color: #b45a0c;
 }
 
+.new-version-notice-actions .primary:disabled {
+  cursor: progress;
+  opacity: 0.6;
+}
+
+/* The open design could not be stored (#1639): reloading would lose its newest changes. */
+.new-version-notice .new-version-notice-unsaved {
+  margin: 0;
+  padding: 8px 10px;
+  color: #ffffff;
+  font-weight: 600;
+  background: #c82031;
+  border-radius: 6px;
+}
+
+.new-version-notice-actions .danger {
+  color: #ffffff;
+  background: #c82031;
+  border-color: #a81a29;
+}
+
 /* Interactive Help (#424): while it is on the pointer is a question mark and whatever has a name
    under it is outlined; a click asks the guide about it. The window is a tool panel of its own,
    at the left edge so it stands beside the tool panels at the right, and above every dialog. */
@@ -17306,6 +17413,11 @@ html[data-theme="dark"] .interactive-help-window a:not(.primary):not(.secondary)
   color: inherit;
   font: inherit;
   cursor: pointer;
+  /* Held on a phone or tablet: no text selection, magnifier or long-press menu, and the touch stays with the button (#1671). */
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
+  touch-action: none;
 }
 
 .simple-mode-hold::after {

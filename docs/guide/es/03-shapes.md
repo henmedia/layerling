@@ -72,7 +72,7 @@ Escribir es más exacto que arrastrar. Todos los campos numéricos admiten milí
 
 ### Elegir colores
 
-Un clic en {{ui:inspector.solid}}, en las propiedades de un cuerpo, abre la tarjeta de colores, con el título {{ui:inspector.shapeColor}}. Arriba muestra el valor hexadecimal del color que tiene ahora el cuerpo. Debajo están los colores ya preparados de la paleta; un clic en uno pinta el cuerpo y cierra la tarjeta.
+Un clic en {{ui:inspector.solid}}, en las propiedades de un cuerpo, abre la tarjeta de colores, con el título {{ui:inspector.shapeColor}}. Arriba muestra el valor hexadecimal del color que tiene ahora el cuerpo. Haz clic en él para escribir o pegar un código de color como #5EBDDB (también valen 5ebddb y el corto #5bd) y pulsa [[Intro]]: el cuerpo toma ese color, y con varios cuerpos seleccionados lo toman todos. [[Esc]] conserva el color anterior. Debajo están los colores ya preparados de la paleta; un clic en uno pinta el cuerpo y cierra la tarjeta.
 
 {{ui:inspector.custom}} abre el selector de color de tu navegador, para un color a tu gusto. Lo que ofrece depende del navegador: en Chrome y Edge tiene un campo de color, un control deslizante para el tono, un cuentagotas que toma un color de cualquier punto de la pantalla y el valor en HEX, RGB o HSL, entre los que cambias con las flechas de al lado. El color se aplica cuando cierras el selector o haces clic fuera de él.
 
