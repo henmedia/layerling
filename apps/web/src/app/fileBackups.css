@@ -305,3 +305,33 @@ html[data-theme="dark"] .browser-backup-note.urgent > svg {
     padding: 14px;
   }
 }
+
+/* "Restore backup" with the settings of the browser the backup came from (Discussion #1678): the tick box under the
+   question, in the dialog's own padding. */
+.backup-settings-dialog p {
+  padding-bottom: 10px;
+}
+
+.backup-settings-take {
+  display: flex;
+  gap: 9px;
+  align-items: flex-start;
+  padding: 0 18px 16px;
+  color: #48331d;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.4;
+  cursor: pointer;
+}
+
+.backup-settings-take input {
+  flex: none;
+  width: 16px;
+  height: 16px;
+  margin: 2px 0 0;
+  accent-color: #d07415;
+}
+
+html[data-theme="dark"] .backup-settings-take {
+  color: #f3ede2;
+}

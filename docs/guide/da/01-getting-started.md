@@ -92,6 +92,7 @@ Nederst i vinduet: {{ui:dashboard.sponsor}} fører til siden, hvor du kan støtt
 ### Fokustilstand
 
 På en lille skærm giver {{ui:focusMode.enter}} titellinjen og sidefoden til arbejdet: knappen med de to pile, der peger udad, øverst til højre, [[Ctrl]]+[[Shift]]+[[F]] eller kommandosøgningen slår den til. Båndet rykker op, og visningen når ned til vinduets kant. En lille bjælke under båndet beholder huset til startsiden, fanerne {{ui:editor.modeGeometry}} og {{ui:editor.modeSketch}}, forstørrelsesglasset, indstillingerne og knappen med de to pile, der peger indad, som afslutter fokustilstanden; træk bjælken i dens greb et andet sted hen, et dobbeltklik på grebet sætter den tilbage. layerling husker valget i denne browser, og mens browseren fylder hele skærmen (F11), skifter den selv til fokustilstand.
+Bjælken viser også designets navn; klik på det for at omdøbe designet uden at forlade fokustilstand.
 
 ## Din første del
 

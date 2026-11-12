@@ -206,6 +206,24 @@ export function unpackCustomShapes(bytes: Uint8Array): { entries: BackupEntry[];
   return { entries, manifest };
 }
 
+/**
+ * The settings of the browser a full backup came from (Discussion #1678): the default for new designs and the settings
+ * that are the browser's, not a design's (theme, ribbon, keys, printers), as the file "Export settings" writes. It lies at
+ * the top of the ZIP; a design's own settings travel in its .lyl anyway. A restore takes them over only when asked to.
+ */
+export const SETTINGS_BACKUP_FILE = "layerling-settings.json";
+
+/** The text of the settings file a backup holds, or null for a backup without one (every backup made before it went along). */
+export function unpackBackupSettingsText(bytes: Uint8Array): string | null {
+  try {
+    const files = unzipSync(bytes, { filter: (file) => file.name === SETTINGS_BACKUP_FILE });
+    const data = files[SETTINGS_BACKUP_FILE];
+    return data ? new TextDecoder().decode(data) : null;
+  } catch {
+    return null;
+  }
+}
+
 export function isBackupFileName(fileName: string) {
   return /\.zip$/i.test(fileName);
 }

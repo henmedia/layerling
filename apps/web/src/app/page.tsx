@@ -82,7 +82,9 @@ import { useFileAccept } from "@/lib/fileAccept";
 import { dropBackupTarget, linkedLylFile, lylFileAccessSupported, onLylFilesLaunched, pickBackupTarget, pickFilesToImport, rememberLylFile, writeBackupTarget, type LylFileHandle } from "@/lib/lylFileAccess";
 import { exportLylProject, importLylProject, inspectLylProjectPackage, LYL_CREATED_WITH_VERSION, LYL_MEDIA_TYPE, withLylProjectName, withLylThumbnail } from "@/lib/lylProject";
 import { relieveOverFineCadMeshes, type RemeshCadBrep } from "@/lib/cadMeshRelief";
-import { backupDesignAlreadyThere, backupEntryPaths, backupFileName, backupFolderPaths, backupNamePrefix, backupThumbnailPath, unpackBackupFolders, isBackupFileName, createBackupWriter, unpackBackup, zipHoldsDesigns } from "@/lib/projectBackup";
+import { backupDesignAlreadyThere, backupEntryPaths, backupFileName, backupFolderPaths, backupNamePrefix, backupThumbnailPath, unpackBackupFolders, isBackupFileName, createBackupWriter, unpackBackup, unpackBackupSettingsText, SETTINGS_BACKUP_FILE, zipHoldsDesigns } from "@/lib/projectBackup";
+import { applySettingsFile, browserSettingsFile } from "@/lib/applySettingsFile";
+import { parseSettingsFile, settingsFileText } from "@/lib/settingsFile";
 import { CUSTOM_SHAPES_FOLDER } from "@/lib/customShapesServer";
 import { backupNoteState, readLastFullBackup, rememberFullBackup } from "@/lib/backupState";
 import { FileBackupsDialog, type FileBackupsScope } from "@/components/FileBackupsDialog";
@@ -1010,6 +1012,13 @@ export default function Home() {
   const [themePreference, setThemePreference] = useState<AppThemePreference>("system");
   const [resolvedTheme, setResolvedTheme] = useState<ResolvedAppTheme>("light");
   const [dashboardNotice, setDashboardNotice] = useState("");
+  // A backup that holds the settings of the browser it came from asks, before it is restored, whether they come along
+  // (Discussion #1678). The answer: true or false for the tick box, null for Cancel.
+  const [backupSettingsAsk, setBackupSettingsAsk] = useState<{ fileName: string; take: boolean; resolve: (answer: boolean | null) => void } | null>(null);
+  const answerBackupSettings = (answer: boolean | null) => {
+    backupSettingsAsk?.resolve(answer);
+    setBackupSettingsAsk(null);
+  };
   // When "Back up all" last took every design of this browser, for the notice over them; read once on the page.
   const [lastFullBackup, setLastFullBackup] = useState<number | null>(null);
   useEffect(() => setLastFullBackup(readLastFullBackup()), []);
@@ -2602,6 +2611,15 @@ export default function Home() {
         if (thumbnail) writer.add(backupThumbnailPath(names[index]), thumbnail);
       }
       shapeEntries.forEach((entry) => writer.add(entry.name, entry.bytes));
+      // A backup of everything takes this browser's settings along (Discussion #1678); a restore asks whether to take
+      // them over. Settings that cannot be read do not cost the backup.
+      if (!scope) {
+        try {
+          writer.add(SETTINGS_BACKUP_FILE, new TextEncoder().encode(settingsFileText(browserSettingsFile())));
+        } catch {
+          // Without them, as before.
+        }
+      }
       // Folders with no design anywhere inside them go along as empty folders.
       const holding = new Set(designs.flatMap((project) => folderTrail(designFolders, folderOfDesign(designFolders, project.folderId)).map((folder) => folder.id)));
       const foldersAlong = !scope ? designFolders : "folderId" in scope ? designFolders.filter((folder) => inFolder(scope.folderId, folder.id)) : [];
@@ -2649,6 +2667,12 @@ export default function Home() {
       // As in the browser's backup, a shape that cannot be read does not cost the designs.
       const shapes = await serverCustomShapesBackupEntries().catch(() => ({ entries: [], count: 0 }));
       shapes.entries.forEach((entry) => writer.add(entry.name, entry.bytes));
+      // The settings are this browser's, as in the browser's backup (Discussion #1678).
+      try {
+        writer.add(SETTINGS_BACKUP_FILE, new TextEncoder().encode(settingsFileText(browserSettingsFile())));
+      } catch {
+        // Without them, as before.
+      }
       writeBackupProgress(null);
       if (count === 0 && skipped.length === 0 && shapes.count === 0) {
         await dropBackupTarget(target);
@@ -2674,8 +2698,30 @@ export default function Home() {
     let entries;
     let emptyFolderPaths: string[][] = [];
     let shapes = { added: 0, skipped: 0 };
+    let bytes: Uint8Array;
     try {
-      const bytes = new Uint8Array(await file.arrayBuffer());
+      bytes = new Uint8Array(await file.arrayBuffer());
+    } catch {
+      setDashboardNotice(t("notice.backupNotReadable", { name: file.name }));
+      return;
+    }
+    // The settings the backup brings (Discussion #1678): asked before anything is restored. The box is ticked when this
+    // browser has no default of its own yet, as after a new computer or lost browser data.
+    const backupSettingsText = unpackBackupSettingsText(bytes);
+    const backupSettings = backupSettingsText ? parseSettingsFile(backupSettingsText) : null;
+    let settingsNote = "";
+    if (backupSettings) {
+      const take = await new Promise<boolean | null>((resolve) => setBackupSettingsAsk({ fileName: file.name, take: readWorkspaceDefault() === null, resolve }));
+      if (take === null) {
+        setDashboardNotice("");
+        return;
+      }
+      if (take) {
+        applySettingsFile(backupSettings);
+        settingsNote = ` ${t("notice.backupSettingsTaken")}`;
+      }
+    }
+    try {
       entries = unpackBackup(bytes);
       emptyFolderPaths = unpackBackupFolders(bytes);
       const restoredShapes = await restoreCustomShapesFromBackup(bytes).catch(() => null);
@@ -2684,7 +2730,7 @@ export default function Home() {
       setDashboardNotice(t("notice.backupNotReadable", { name: file.name }));
       return;
     }
-    const shapesNote = shapes.added + shapes.skipped > 0 ? ` ${t("notice.backupShapesRestored", { count: shapes.added, skipped: shapes.skipped })}` : "";
+    const shapesNote = (shapes.added + shapes.skipped > 0 ? ` ${t("notice.backupShapesRestored", { count: shapes.added, skipped: shapes.skipped })}` : "") + settingsNote;
     if (entries.length === 0 && shapesNote) {
       setDashboardNotice(shapesNote.trim());
       return;
@@ -3360,6 +3406,38 @@ export default function Home() {
         </SafeModeErrorBoundary>
       ) : null}
       {view === "editor" && (editorLoading || !canRenderEditor) ? <EditorLoadingSkeleton /> : null}
+      {backupSettingsAsk ? (
+        <section className="dashboard-confirm-overlay" role="dialog" aria-modal="true" aria-labelledby="backup-settings-title">
+          <div className="dashboard-confirm-dialog backup-settings-dialog">
+            <header>
+              <strong id="backup-settings-title">{t("dashboard.restoreBackup")}</strong>
+              <button type="button" aria-label={t("confirm.cancel")} onClick={() => answerBackupSettings(null)}>
+                <X size={18} />
+              </button>
+            </header>
+            <p>{t("backupSettings.body", { name: backupSettingsAsk.fileName })}</p>
+            <label className="backup-settings-take">
+              <input
+                type="checkbox"
+                checked={backupSettingsAsk.take}
+                onChange={(event) => {
+                  const take = event.currentTarget.checked;
+                  setBackupSettingsAsk((current) => (current ? { ...current, take } : current));
+                }}
+              />
+              <span>{t("backupSettings.take")}</span>
+            </label>
+            <div className="dashboard-confirm-actions">
+              <button className="dashboard-confirm-cancel" type="button" onClick={() => answerBackupSettings(null)}>
+                {t("confirm.cancel")}
+              </button>
+              <button className="dashboard-confirm-save" type="button" autoFocus onClick={() => answerBackupSettings(backupSettingsAsk.take)}>
+                {t("backupSettings.restore")}
+              </button>
+            </div>
+          </div>
+        </section>
+      ) : null}
       <TabPresenceNotice version={LYL_CREATED_WITH_VERSION} projectId={view === "editor" ? activeProjectId : null} />
     </>
   );

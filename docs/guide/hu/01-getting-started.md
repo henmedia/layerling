@@ -91,6 +91,7 @@ Az ablak alján: a {{ui:dashboard.sponsor}} arra az oldalra vezet, ahol támogat
 ### Fókusz mód
 
 Kis képernyőn a {{ui:focusMode.enter}} átadja a címsort és a láblécet a munkának: a jobb felső sarokban a két kifelé mutató nyíllal jelölt gomb, a [[Ctrl]]+[[Shift]]+[[F]] vagy a parancskereső kapcsolja be. A szalag feljebb kerül, a nézet pedig az ablak széléig ér. A szalag alatti kis sáv megtartja a házat a kezdőlaphoz, a {{ui:editor.modeGeometry}} és {{ui:editor.modeSketch}} fület, a nagyítót, a beállításokat és a két befelé mutató nyíllal jelölt gombot, amely kilép a módból; a sávot a fogantyújánál fogva máshová húzhatod, a fogantyúra kettőt kattintva visszakerül. A layerling ebben a böngészőben megjegyzi a választást, és amíg a böngésző kitölti az egész képernyőt (F11), magától fókusz módba vált.
+A sáv a terv nevét is mutatja; rákattintva átnevezheted a tervet anélkül, hogy kilépnél a fókusz módból.
 
 ## Az első alkatrészed
 

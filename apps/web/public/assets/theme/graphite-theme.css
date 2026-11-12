@@ -11006,6 +11006,18 @@ html[data-theme="dark"]:where([data-palette="graphite"]) .browser-backup-note.ur
   border: 1px solid var(--border-strong);
 }
 
+:where(html[data-theme="dark"][data-palette="graphite"]) .backup-settings-take {
+  color: #363636;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .backup-settings-take input {
+  accent-color: #d07415;
+}
+
+html[data-theme="dark"]:where([data-palette="graphite"]) .backup-settings-take {
+  color: #ebebeb;
+}
+
 :where(html[data-theme="dark"][data-palette="graphite"]) .toolbar-section-tools,
 :where(html[data-theme="dark"][data-palette="graphite"]) .toolbar-section .action-buttons {
   background: var(--toolbar-tile);
