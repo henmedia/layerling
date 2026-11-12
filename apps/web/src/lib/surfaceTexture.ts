@@ -221,6 +221,146 @@ export const SURFACE_TEXTURE_MAX_MASK_PLANES = 2048;
  */
 export type SurfaceTextureMask = { mode: SurfaceTextureMaskMode; planes: number[]; box?: number[] };
 
+/**
+ * A region drawn on a face (Discussion #1579): a closed outline the layer's pattern stays inside, so that one face can
+ * carry several patterns side by side - the petals, the leaves and the stem on the one flat top of a keychain - and the
+ * rest of it stays smooth. The outline is seen along `normal` (in the inside frame, pointing out of the face it was drawn
+ * on); its points are [right, up] in mm from the middle of the body's box, as one looks at that face from outside: right
+ * and up as on the screen, and on a face looking up or down (a top, a bottom) up is towards the back, as in the view from
+ * above (see surfaceTextureRegionFrame). Inside by the even-odd rule. The outline goes through the body as a prism and
+ * takes only the surface that faces its way (within 60 degrees of the normal): the top of a plate, not its bottom or its
+ * sides. A region takes the place of picked faces: what it covers is the layer's face, also on a top kept smooth.
+ */
+export type SurfaceTextureRegion = { normal: [number, number, number]; points: [number, number][] };
+/** At most this many points in a region's outline (one drawn by hand is simplified to fewer, see simplifySurfaceTextureOutline). */
+export const SURFACE_TEXTURE_MAX_REGION_POINTS = 256;
+/** A region takes the surface whose normal lies within 60 degrees of its own (the cosine). */
+const REGION_FACING = 0.5;
+
+/**
+ * The directions of a region's outline in the inside frame (see SurfaceTextureRegion): `right` and `up` as one sees them
+ * looking at the face from outside, both across its normal. A face looking more up or down than sideways is seen with
+ * the back up, as from above; any other with the top up.
+ */
+export function surfaceTextureRegionFrame(normal: readonly number[]) {
+  const [nx, ny, nz] = normal;
+  const ref = Math.abs(ny) > Math.SQRT1_2 ? [0, 0, -1] : [0, 1, 0];
+  // Right is the reference across the normal (ref x n), up the normal across right (n x right).
+  let rx = ref[1] * nz - ref[2] * ny, ry = ref[2] * nx - ref[0] * nz, rz = ref[0] * ny - ref[1] * nx;
+  const rl = Math.hypot(rx, ry, rz) || 1;
+  rx /= rl;
+  ry /= rl;
+  rz /= rl;
+  return { right: [rx, ry, rz] as [number, number, number], up: [ny * rz - nz * ry, nz * rx - nx * rz, nx * ry - ny * rx] as [number, number, number] };
+}
+
+/** A point of the inside frame as a region sees it (see SurfaceTextureRegion): [right, up] in mm from `middle`. */
+export function surfaceTextureRegionPoint(normal: readonly number[], middle: readonly number[], point: readonly number[]): [number, number] {
+  const { right, up } = surfaceTextureRegionFrame(normal);
+  const d = [point[0] - middle[0], point[1] - middle[1], point[2] - middle[2]];
+  return [d[0] * right[0] + d[1] * right[1] + d[2] * right[2], d[0] * up[0] + d[1] * up[1] + d[2] * up[2]];
+}
+
+/** How far (u, v) lies from an outline (x0, y0, x1, y1, ...), mm: positive inside it by the even-odd rule, negative outside. */
+export function surfaceTextureRegionDistance(outline: ArrayLike<number>, u: number, v: number) {
+  const m = outline.length / 2;
+  let best = Infinity;
+  let inside = false;
+  for (let k = 0, j = m - 1; k < m; j = k, k += 1) {
+    const ax = outline[j * 2], ay = outline[j * 2 + 1], bx = outline[k * 2], by = outline[k * 2 + 1];
+    if (ay > v !== by > v && u < ax + ((v - ay) * (bx - ax)) / (by - ay)) inside = !inside;
+    const ex = bx - ax, ey = by - ay;
+    const l2 = ex * ex + ey * ey;
+    const t = l2 > 0 ? Math.min(1, Math.max(0, ((u - ax) * ex + (v - ay) * ey) / l2)) : 0;
+    best = Math.min(best, Math.hypot(u - ax - t * ex, v - ay - t * ey));
+  }
+  return inside ? best : -best;
+}
+
+/**
+ * An outline drawn by hand made fit for a region: points closer than `tolerance` mm to the line between the points kept
+ * round them fall away (Douglas-Peucker on the closed ring), the tolerance doubling while more than
+ * SURFACE_TEXTURE_MAX_REGION_POINTS stay. A point repeated, and the end joined to the start, are dropped.
+ */
+export function simplifySurfaceTextureOutline(points: readonly (readonly [number, number])[], tolerance = 0.1): [number, number][] {
+  const ring: [number, number][] = [];
+  for (const [u, v] of points) {
+    const last = ring[ring.length - 1];
+    if (!last || Math.hypot(u - last[0], v - last[1]) > 1e-6) ring.push([u, v]);
+  }
+  while (ring.length > 1 && Math.hypot(ring[0][0] - ring[ring.length - 1][0], ring[0][1] - ring[ring.length - 1][1]) <= 1e-6) ring.pop();
+  if (ring.length <= 3) return ring;
+  // The closed ring as two open runs: from the first point to the one furthest from it, and back.
+  let far = 0;
+  ring.forEach(([u, v], k) => {
+    if (Math.hypot(u - ring[0][0], v - ring[0][1]) > Math.hypot(ring[far][0] - ring[0][0], ring[far][1] - ring[0][1])) far = k;
+  });
+  const keep = (from: number, to: number, limit: number, out: Uint8Array) => {
+    const [ax, ay] = ring[from], [bx, by] = ring[to % ring.length];
+    const ex = bx - ax, ey = by - ay, el = Math.hypot(ex, ey);
+    let worst = -1, at = -1;
+    for (let k = from + 1; k < to; k += 1) {
+      const [px, py] = ring[k];
+      const d = el > 1e-12 ? Math.abs((px - ax) * ey - (py - ay) * ex) / el : Math.hypot(px - ax, py - ay);
+      if (d > worst) {
+        worst = d;
+        at = k;
+      }
+    }
+    if (at < 0 || worst <= limit) return;
+    out[at] = 1;
+    keep(from, at, limit, out);
+    keep(at, to, limit, out);
+  };
+  for (let limit = tolerance; ; limit *= 2) {
+    const out = new Uint8Array(ring.length);
+    out[0] = 1;
+    out[far] = 1;
+    keep(0, far, limit, out);
+    keep(far, ring.length, limit, out);
+    const kept = ring.filter((_, k) => out[k]);
+    if (kept.length <= SURFACE_TEXTURE_MAX_REGION_POINTS) return kept;
+  }
+}
+
+/**
+ * A region kept to what can be used: a normal and an outline of 3 to SURFACE_TEXTURE_MAX_REGION_POINTS points with an
+ * area; else null. An assistant may name the face instead of the normal (`face`, see SURFACE_TEXTURE_FACE_NAMES; with
+ * neither, the top).
+ */
+export function normalizeSurfaceTextureRegion(input: unknown): SurfaceTextureRegion | null {
+  if (!input || typeof input !== "object") return null;
+  const { face, points } = input as { face?: unknown; normal?: unknown; points?: unknown };
+  const named = typeof face === "string" && (SURFACE_TEXTURE_FACE_NAMES as readonly string[]).includes(face) ? FACE_BY_NAME[face as SurfaceTextureFaceName].normal : undefined;
+  if (face !== undefined && !named) return null;
+  const normal = named ?? (input as { normal?: unknown }).normal ?? FACE_BY_NAME.top.normal;
+  if (!Array.isArray(normal) || normal.length !== 3 || !normal.every((n) => typeof n === "number" && Number.isFinite(n))) return null;
+  const length = Math.hypot(normal[0], normal[1], normal[2]);
+  if (length < 1e-9 || !Array.isArray(points) || points.length > SURFACE_TEXTURE_MAX_REGION_POINTS + 1) return null;
+  const ring: [number, number][] = [];
+  for (const point of points) {
+    if (!Array.isArray(point) || point.length !== 2 || !point.every((n) => typeof n === "number" && Number.isFinite(n) && Math.abs(n) < 1e5)) return null;
+    const last = ring[ring.length - 1];
+    if (!last || Math.hypot(point[0] - last[0], point[1] - last[1]) > 1e-6) ring.push([point[0], point[1]]);
+  }
+  // A ring closed by its first point again at the end is the same ring.
+  if (ring.length > 1 && Math.hypot(ring[0][0] - ring[ring.length - 1][0], ring[0][1] - ring[ring.length - 1][1]) <= 1e-6) ring.pop();
+  if (ring.length < 3 || ring.length > SURFACE_TEXTURE_MAX_REGION_POINTS) return null;
+  let area = 0;
+  ring.forEach(([u, v], k) => {
+    const [nu, nv] = ring[(k + 1) % ring.length];
+    area += u * nv - nu * v;
+  });
+  if (Math.abs(area) / 2 < 1e-4) return null;
+  return { normal: [normal[0] / length, normal[1] / length, normal[2] / length], points: ring };
+}
+
+/** Regions others take (see SurfaceTextureSettings.exceptRegions): each one usable, at most SURFACE_TEXTURE_MAX_FACES. */
+function normalizeSurfaceTextureRegions(input: unknown): SurfaceTextureRegion[] {
+  if (!Array.isArray(input)) return [];
+  return input.slice(0, SURFACE_TEXTURE_MAX_FACES).map(normalizeSurfaceTextureRegion).filter((region): region is SurfaceTextureRegion => region !== null);
+}
+
 export type SurfaceTextureSettings = {
   pattern: SurfaceTexturePattern;
   /** Distance between grooves or cell centres, in mm (around a cylinder rounded so the pattern closes). */
@@ -274,6 +414,16 @@ export type SurfaceTextureSettings = {
    * of its own goes everywhere the settings above allow except there, so each face carries one pattern.
    */
   exceptFaces: SurfaceTextureFace[];
+  /**
+   * A region drawn on a face (see SurfaceTextureRegion): the pattern goes only inside its outline, on the surface facing
+   * its way, and ends at the outline; null: no region. It takes the place of picked faces (`faces` is emptied).
+   */
+  region: SurfaceTextureRegion | null;
+  /**
+   * The regions of the layers made after this one (see WorkplaneShape.surfaceTextureLayers): they stay smooth here, so where
+   * two regions overlap the later layer's pattern goes, and a layer all over leaves the regions to theirs.
+   */
+  exceptRegions: SurfaceTextureRegion[];
   /** Cracks: style, where they begin and how many. */
   crackStyle: SurfaceTextureCrackStyle;
   crackStart: SurfaceTextureCrackStart;
@@ -420,6 +570,8 @@ export const SURFACE_TEXTURE_DEFAULTS: Readonly<SurfaceTextureSettings> = Object
   masks: [],
   faces: [],
   exceptFaces: [],
+  region: null,
+  exceptRegions: [],
   crackStyle: "crack",
   crackStart: "top",
   crackCount: 5,
@@ -681,9 +833,12 @@ export function normalizeSurfaceTexture(input: unknown): SurfaceTextureSettings 
   }
   if (out.pattern === "wood" && source.ringWidth === undefined) out.ringWidth = WOOD_RINGS[out.woodType];
   out.masks = normalizeSurfaceTextureMasks(source.masks);
-  out.faces = normalizeSurfaceTextureFaces(source.faces);
+  out.region = normalizeSurfaceTextureRegion(source.region);
+  // A region is the layer's place: faces picked as well would not count.
+  out.faces = out.region ? [] : normalizeSurfaceTextureFaces(source.faces);
   // Faces left to other layers count only for a layer that picks none of its own.
-  out.exceptFaces = out.faces.length ? [] : normalizeSurfaceTextureFaces(source.exceptFaces);
+  out.exceptFaces = out.faces.length || out.region ? [] : normalizeSurfaceTextureFaces(source.exceptFaces);
+  out.exceptRegions = normalizeSurfaceTextureRegions(source.exceptRegions);
   out.textOutline = normalizeSurfaceTextOutline(source.textOutline);
   return out;
 }
@@ -2848,7 +3003,7 @@ function fitTiles(base: SurfaceBase, s: SurfaceTextureSettings, kept: Uint8Array
     }
   }
   // The height band up z, where it counts (not with picked faces, see weightsFor).
-  if (!s.faces.length && Number.isFinite(lo[2])) {
+  if (!placePicked(s) && Number.isFinite(lo[2])) {
     const zH = base.size[2] || 1;
     lo[2] = Math.max(lo[2], base.min[2] + (s.zoneFrom / 100) * zH);
     hi[2] = Math.max(lo[2], Math.min(hi[2], base.min[2] + (s.zoneTo / 100) * zH));
@@ -2890,14 +3045,14 @@ function keptRanges(base: SurfaceBase, s: SurfaceTextureSettings, kept: Uint8Arr
       hi[k] = Math.max(hi[k], v[i * 3 + k]);
     }
   }
-  if (!s.faces.length && Number.isFinite(lo[2])) {
+  if (!placePicked(s) && Number.isFinite(lo[2])) {
     const zH = base.size[2] || 1;
     lo[2] = Math.max(lo[2], base.min[2] + (s.zoneFrom / 100) * zH);
     hi[2] = Math.max(lo[2], Math.min(hi[2], base.min[2] + (s.zoneTo / 100) * zH));
   }
   const reach = Math.max(s.fade + s.margin, least);
   const up = s.projection === "cylinder" ? AXIS_INDEX[s.axis] : s.projection === "flat" ? acrossAxes(s.axis)[1] : 2;
-  const picked = s.faces.length > 0;
+  const picked = placePicked(s);
   return [0, 1, 2].map((k) => {
     if (!Number.isFinite(lo[k])) return [0, 0] as [number, number];
     const below = s.keepEdges || (k === up && ((s.bottomFree > 0 && !picked) || s.zoneFrom > 0));
@@ -3070,6 +3225,11 @@ function standsOut(s: SurfaceTextureSettings) {
  */
 function borderFade(s: SurfaceTextureSettings) {
   return standsOut(s) ? s.fade : Math.max(s.fade, BORDER_LEAST);
+}
+
+/** Whether the pattern goes on a place picked for it - faces, or a region drawn on one - which goes before what stays smooth. */
+function placePicked(s: Pick<SurfaceTextureSettings, "faces" | "region">) {
+  return s.faces.length > 0 || s.region !== null;
 }
 
 /** An image pressed on a single time (its tiles "once"): it goes where it is put, as a text does, and nowhere else. */
@@ -5317,6 +5477,71 @@ export function toggleSurfaceTexturePickedFace(pick: SurfaceTextureFacePick, fac
   return normalizeSurfaceTextureFaces([...faces, face]);
 }
 
+type RegionVector = { x: number; y: number; z: number };
+/** Where the eye was for a lasso drawn in the view (see paintLassoInView): its place and axes, in the inside frame. */
+export type SurfaceTextureLassoView = { origin: RegionVector; right: RegionVector; up: RegionVector; forward: RegionVector; perspective: boolean };
+
+/**
+ * A region drawn round a place on a body with a lasso (Discussion #1579). `positions` are the body's triangles in the inside
+ * frame (the body under its texture), `start` where the press landed and the normal there, `view` and `outline` the lasso
+ * as paintLassoInView gives it. The face is the body's own triangle nearest the press among those facing about its way -
+ * on a textured body the press lands on the pattern -; the lasso's rays meet that triangle's plane, and the points are
+ * seen from outside the face, from the middle of the body's box, as a region's are (see SurfaceTextureRegion), to a
+ * thousandth of a millimetre and simplified to 0.05 mm. Null when no such triangle lies within 5 mm of the press (it
+ * landed on another body) or the outline keeps no area.
+ */
+export function surfaceTextureRegionFromLasso(
+  positions: ArrayLike<number>,
+  start: { point: RegionVector; normal: RegionVector },
+  view: SurfaceTextureLassoView,
+  outline: readonly (readonly [number, number])[],
+): SurfaceTextureRegion | null {
+  const p = [start.point.x, start.point.y, start.point.z];
+  const hl = Math.hypot(start.normal.x, start.normal.y, start.normal.z) || 1;
+  const pressed = [start.normal.x / hl, start.normal.y / hl, start.normal.z / hl];
+  const lo = [Infinity, Infinity, Infinity], hi = [-Infinity, -Infinity, -Infinity];
+  let best = Infinity;
+  let normal: number[] | null = null;
+  let offset = 0;
+  for (let t = 0; t + 9 <= positions.length; t += 9) {
+    const a = [positions[t], positions[t + 1], positions[t + 2]], b = [positions[t + 3], positions[t + 4], positions[t + 5]], c = [positions[t + 6], positions[t + 7], positions[t + 8]];
+    for (const q of [a, b, c]) {
+      for (let k = 0; k < 3; k += 1) {
+        lo[k] = Math.min(lo[k], q[k]);
+        hi[k] = Math.max(hi[k], q[k]);
+      }
+    }
+    const u = [b[0] - a[0], b[1] - a[1], b[2] - a[2]], w = [c[0] - a[0], c[1] - a[1], c[2] - a[2]];
+    const n = [u[1] * w[2] - u[2] * w[1], u[2] * w[0] - u[0] * w[2], u[0] * w[1] - u[1] * w[0]];
+    const l = Math.hypot(n[0], n[1], n[2]);
+    if (l < 1e-12 || (n[0] * pressed[0] + n[1] * pressed[1] + n[2] * pressed[2]) / l < REGION_FACING) continue;
+    const d = triangleDistance2(p, a, b, c);
+    if (d < best) {
+      best = d;
+      normal = n.map((value) => value / l);
+      offset = normal[0] * a[0] + normal[1] * a[1] + normal[2] * a[2];
+    }
+  }
+  if (!normal || best > 25) return null;
+  const face = normal;
+  const middle = [0, 1, 2].map((k) => (lo[k] + hi[k]) / 2);
+  const along = (v: RegionVector) => [v.x, v.y, v.z];
+  const [origin, right, up, forward] = [view.origin, view.right, view.up, view.forward].map(along);
+  const points: [number, number][] = [];
+  for (const [a, b] of outline) {
+    // In perspective the ray leaves the eye through the point; in a flat view it leaves the point along the line of sight.
+    const from = view.perspective ? origin : origin.map((o, k) => o + a * right[k] + b * up[k]);
+    const dir = view.perspective ? forward.map((f, k) => f + a * right[k] + b * up[k]) : forward;
+    const across = dir[0] * face[0] + dir[1] * face[1] + dir[2] * face[2];
+    if (Math.abs(across) < 1e-9) continue;
+    const t = (offset - (from[0] * face[0] + from[1] * face[1] + from[2] * face[2])) / across;
+    if (t <= 0) continue;
+    const [u, v] = surfaceTextureRegionPoint(face, middle, from.map((f, k) => f + t * dir[k]));
+    points.push([Math.round(u * 1000) / 1000, Math.round(v * 1000) / 1000]);
+  }
+  return normalizeSurfaceTextureRegion({ normal: face.map((value) => Math.round(value * 1e6) / 1e6), points: simplifySurfaceTextureOutline(points, 0.05) });
+}
+
 /**
  * A pattern standing out of the body bends round its convex edges in an arc, as a rope round a box's edge would, instead
  * of meeting in a sharp mitre: round the sharp corners between an angular body's sides (see SurfaceOutline.corners) and,
@@ -5726,14 +5951,180 @@ export function createSurfaceTextureSession(positions: ArrayLike<number>) {
   let cache: RefinedState | null = null;
   let chosenCache: { key: string; chosen: Uint8Array | null } | null = null;
 
-  /** Per input triangle whether it lies on a picked face (see SurfaceTextureSettings.faces); null: none picked, all go. */
+  /**
+   * Per input triangle whether it lies on a picked face (see SurfaceTextureSettings.faces), or - for a region drawn on a
+   * face - faces the region's way and reaches into its outline's box; null: none picked, all go.
+   */
   function chosenFaces(s: SurfaceTextureSettings) {
-    if (!s.faces.length) return null;
-    const key = JSON.stringify([s.faces, s.edgeAngle]);
+    if (!placePicked(s)) return null;
+    const key = JSON.stringify([s.faces, s.region, s.edgeAngle]);
     if (chosenCache?.key === key) return chosenCache.chosen;
-    const chosen = surfaceTextureChosenTriangles(base, s.faces, s.edgeAngle);
+    const chosen = s.region ? regionTriangles(s.region) : surfaceTextureChosenTriangles(base, s.faces, s.edgeAngle);
     chosenCache = { key, chosen };
     return chosen;
+  }
+
+  /**
+   * A region made ready to test points against (see SurfaceTextureRegion): per input triangle whether it faces the
+   * region's way, the outline as (u0, v0, u1, v1, ...) with its box (u and v from, u and v to), and where a point of the
+   * screen frame lies in the region's plane. Kept by the region: the same one is asked for by the cut and every weighting.
+   */
+  type RegionTest = { facing: Uint8Array; outline: Float64Array; box: [number, number, number, number]; at: (x: number, y: number, z: number) => [number, number] };
+  const regionTests = new Map<string, RegionTest>();
+  function regionTest(region: SurfaceTextureRegion): RegionTest {
+    const key = JSON.stringify(region);
+    const known = regionTests.get(key);
+    if (known) return known;
+    const { lo, size } = insideBox(base);
+    const middle = [0, 1, 2].map((k) => lo[k] + size[k] / 2);
+    const { right, up } = surfaceTextureRegionFrame(region.normal);
+    // A point (x, y, z) of the screen frame is (x, z, -y) in the inside frame; so is a normal.
+    const at = (x: number, y: number, z: number): [number, number] => {
+      const dx = x - middle[0], dy = z - middle[1], dz = -y - middle[2];
+      return [dx * right[0] + dy * right[1] + dz * right[2], dx * up[0] + dy * up[1] + dz * up[2]];
+    };
+    const v = base.vertices, I = base.indices;
+    const [nx, ny, nz] = region.normal;
+    const facing = new Uint8Array(I.length / 3);
+    for (let t = 0; t < facing.length; t += 1) {
+      const c = faceCross(v, I[t * 3], I[t * 3 + 1], I[t * 3 + 2]);
+      const l = Math.hypot(c[0], c[1], c[2]);
+      if (l > 0 && c[0] * nx + c[2] * ny - c[1] * nz >= REGION_FACING * l) facing[t] = 1;
+    }
+    const outline = Float64Array.from(region.points.flat());
+    const box: [number, number, number, number] = [Infinity, Infinity, -Infinity, -Infinity];
+    for (const [u, w] of region.points) {
+      box[0] = Math.min(box[0], u);
+      box[1] = Math.min(box[1], w);
+      box[2] = Math.max(box[2], u);
+      box[3] = Math.max(box[3], w);
+    }
+    const test: RegionTest = { facing, outline, box, at };
+    if (regionTests.size >= 32) regionTests.clear();
+    regionTests.set(key, test);
+    return test;
+  }
+
+  /**
+   * How far a point (screen frame) lies inside a region's outline, mm, negative outside. More than `near` mm outside the
+   * outline's box, only that distance to the box: the outline lies further still.
+   */
+  function regionDistance(test: RegionTest, x: number, y: number, z: number, near: number) {
+    const [u, w] = test.at(x, y, z);
+    const out = Math.max(test.box[0] - u, u - test.box[2], test.box[1] - w, w - test.box[3]);
+    return out > near ? -out : surfaceTextureRegionDistance(test.outline, u, w);
+  }
+
+  /** Per input triangle whether a region has it (see chosenFaces): it faces the region's way and reaches into the outline's box. */
+  function regionTriangles(region: SurfaceTextureRegion) {
+    const test = regionTest(region);
+    const v = base.vertices, I = base.indices;
+    const out = new Uint8Array(I.length / 3);
+    for (let t = 0; t < out.length; t += 1) {
+      if (!test.facing[t]) continue;
+      let u0 = Infinity, w0 = Infinity, u1 = -Infinity, w1 = -Infinity;
+      for (let k = 0; k < 3; k += 1) {
+        const i = I[t * 3 + k];
+        const [u, w] = test.at(v[i * 3], v[i * 3 + 1], v[i * 3 + 2]);
+        u0 = Math.min(u0, u);
+        w0 = Math.min(w0, w);
+        u1 = Math.max(u1, u);
+        w1 = Math.max(w1, w);
+      }
+      if (u1 >= test.box[0] && u0 <= test.box[2] && w1 >= test.box[1] && w0 <= test.box[3]) out[t] = 1;
+    }
+    return out;
+  }
+
+  /** The regions that count for a layer: its own (not for a text or an image once, see regionCut) and the later layers'. */
+  function regionsOf(s: SurfaceTextureSettings) {
+    return [...(s.region ? [s.region] : []), ...s.exceptRegions];
+  }
+
+  let regionCutCache: { key: string; state: RefinedState } | null = null;
+  /**
+   * The mesh cut along the outlines of the regions that count for this layer - its own, and the later layers' it leaves
+   * alone (see SurfaceTextureSettings.region and exceptRegions) - so that the pattern ends right at an outline, along a
+   * line of the mesh's points, not in the steps of its triangles: the border's wall and fade follow it from there as they
+   * follow the edge of a picked face (see refineTransitions). Only triangles facing the region's way that the outline
+   * crosses are cut, and no point comes closer than SURFACE_MIN_EDGE to one there was (see sliceByField): no slivers.
+   * A text and an image once keep their points' values, and are not cut; the state as it was without a region.
+   */
+  function regionCut(state: RefinedState, s: SurfaceTextureSettings, maxTriangles: number): RefinedState {
+    const regions = stuckOn(s) ? [] : regionsOf(s);
+    if (!regions.length) return state;
+    const key = `${state.key}|regions:${JSON.stringify(regions)}`;
+    if (regionCutCache?.key === key) return regionCutCache.state;
+    let mesh: SurfaceMesh = state.mesh;
+    for (const region of regions) {
+      const test = regionTest(region);
+      const v = mesh.vertices, I = mesh.indices;
+      const field = new Float64Array(v.length / 3);
+      const known = new Uint8Array(v.length / 3);
+      const sliced = new Uint8Array(I.length / 3);
+      let any = false;
+      for (let f = 0; f < sliced.length; f += 1) {
+        if (!test.facing[mesh.parents[f]]) continue;
+        let lo = Infinity, hi = -Infinity;
+        for (let k = 0; k < 3; k += 1) {
+          const i = I[f * 3 + k];
+          if (!known[i]) {
+            // Exact within reach of the longest triangles: a cut along a triangle reaching further would be off.
+            field[i] = regionDistance(test, v[i * 3], v[i * 3 + 1], v[i * 3 + 2], FADE_BEYOND);
+            known[i] = 1;
+          }
+          lo = Math.min(lo, field[i]);
+          hi = Math.max(hi, field[i]);
+        }
+        if (lo < 0 && hi > 0) {
+          sliced[f] = 1;
+          any = true;
+        }
+      }
+      if (any) mesh = sliceByField(mesh, field, (i, j) => field[j] - field[i], 1e6, [0], sliced);
+    }
+    let next = state;
+    if (mesh !== state.mesh) {
+      if (mesh.indices.length / 3 > maxTriangles) mesh.limited = true;
+      // A stone wall's points added by the cut take its heights from the triangles they were put in (see carryStoneHeights).
+      const fixed = s.pattern === "stones" && state.fixed ? carryStoneHeights(state.mesh, state.fixed, mesh) : state.fixed;
+      next = { ...withNormals(key, mesh, state.edge, state.crossMax, state.limited || Boolean(mesh.limited), state.slice, s.edgeAngle), fixed, straightAxis: state.straightAxis };
+    }
+    regionCutCache = { key, state: next };
+    return next;
+  }
+
+  /**
+   * Per point of a mesh whether the regions keep it smooth, or null without any (see SurfaceTextureSettings.region and
+   * exceptRegions): outside the layer's own region or on its outline (cut there, see regionCut), or on no face facing its
+   * way; inside a later layer's region or on its outline, on a face facing that region's way.
+   */
+  function regionFreePoints(mesh: SurfaceMesh, s: SurfaceTextureSettings) {
+    const regions = regionsOf(s);
+    if (!regions.length) return null;
+    const v = mesh.vertices, I = mesh.indices, n = v.length / 3;
+    const free = new Uint8Array(n);
+    regions.forEach((region, k) => {
+      const own = k === 0 && region === s.region;
+      const test = regionTest(region);
+      const on = new Uint8Array(n);
+      for (let f = 0; f < I.length / 3; f += 1) {
+        if (!test.facing[mesh.parents[f]]) continue;
+        on[I[f * 3]] = 1;
+        on[I[f * 3 + 1]] = 1;
+        on[I[f * 3 + 2]] = 1;
+      }
+      for (let i = 0; i < n; i += 1) {
+        if (free[i]) continue;
+        if (!on[i]) {
+          if (own) free[i] = 1;
+          continue;
+        }
+        const d = regionDistance(test, v[i * 3], v[i * 3 + 1], v[i * 3 + 2], 1);
+        if (own ? d <= SURFACE_MIN_EDGE : d >= -SURFACE_MIN_EDGE) free[i] = 1;
+      }
+    });
+    return free;
   }
   let exceptCache: { key: string; except: Uint8Array | null } | null = null;
   /** Per input triangle whether another layer takes it (see SurfaceTextureSettings.exceptFaces); null: none. */
@@ -6076,7 +6467,7 @@ export function createSurfaceTextureSession(positions: ArrayLike<number>) {
     const ax = AXIS_INDEX[s.axis];
     const [i1, i2] = acrossAxes(s.axis);
     const key = JSON.stringify([s.crackStyle, s.crackStart, s.crackCount, s.crackLength, s.crackWidth, s.crackBranch, s.crackJag, s.crackRough, s.crackSeed, s.axis,
-      s.bottomFree, s.topFree, s.inside, s.outside, s.zoneFrom, s.zoneTo, s.masks, s.faces, s.exceptFaces, layout.center]);
+      s.bottomFree, s.topFree, s.inside, s.outside, s.zoneFrom, s.zoneTo, s.masks, s.faces, s.region, s.exceptFaces, s.exceptRegions, layout.center]);
     if (crackCache?.key === key) return crackCache.net;
     crackIndex ??= surfaceIndex(base);
     const N = crackIndex.normals;
@@ -6273,7 +6664,7 @@ export function createSurfaceTextureSession(positions: ArrayLike<number>) {
    * edges are kept. 0 for every other point, and for one on a face that neither is the bed nor gets the pattern.
    */
   function bedRimPoints(mesh: SurfaceMesh, s: SurfaceTextureSettings, layout: SurfaceTextureLayout) {
-    const key = JSON.stringify([s.faces, s.exceptFaces, s.bottomFree, s.topFree, s.outside, s.inside, s.edgeAngle, layout.center]);
+    const key = JSON.stringify([s.faces, s.region, s.exceptFaces, s.bottomFree, s.topFree, s.outside, s.inside, s.edgeAngle, layout.center]);
     if (bedCache?.mesh === mesh && bedCache.key === key) return bedCache.bed;
     const bv = base.vertices, BI = base.indices;
     const chosen = chosenFaces(s);
@@ -6389,7 +6780,7 @@ export function createSurfaceTextureSession(positions: ArrayLike<number>) {
         : JSON.stringify([s.pattern, s.spacing, s.width, s.profile, s.projection, s.axis, layout.cell, layout.period, layout.angle, layout.radius, layout.center, s.faceTurn, Boolean(layout.flatCaps), s.capStyle, layout.capEdge ?? null, layout.rims ?? null, patternExtras(s, layout)]);
     // A raised pattern round an outline's corners is cut along arcs as deep as the pattern stands out (cornerCuts).
     const cornerReach = s.projection === "cylinder" && layout.outline?.corners.length && standsOut(s) ? Math.max(1, s.depth) : 0;
-    const key = `${edge.toFixed(5)}|${smoothKey}|${JSON.stringify(s.faces)}|${JSON.stringify(s.exceptFaces)}|${maxTriangles}|${s.edgeAngle}|${s.detail}|${scale}|${cornerReach}|${layoutKey}`;
+    const key = `${edge.toFixed(5)}|${smoothKey}|${JSON.stringify([s.faces, s.region])}|${JSON.stringify(s.exceptFaces)}|${maxTriangles}|${s.edgeAngle}|${s.detail}|${scale}|${cornerReach}|${layoutKey}`;
     if (cache?.key === key) {
       // An image softened to the grid made before (see below).
       if (s.pattern === "image" && !once) layout.image = textureImage(s, cache.edge, layout.cell);
@@ -7078,7 +7469,8 @@ export function createSurfaceTextureSession(positions: ArrayLike<number>) {
     }
     if (s.pattern === "cracks") layout.crack = crackLines(s, layout, maskFree);
     if (stuckOn(s)) layout.text = textPlacement(s, layout);
-    const r = refined(s, layout, maxTriangles, preview ? 1.5 : 1);
+    // A region's outline is cut into the mesh, so the pattern ends right at it (see regionCut).
+    const r = regionCut(refined(s, layout, maxTriangles, preview ? 1.5 : 1), s, maxTriangles);
 
     // A text goes where it was put, and so does an image once: what stays smooth for a pattern all over (bottom, top, a
     // wall, the height band, sharp edges) does not hold it back - masks do.
@@ -7102,6 +7494,8 @@ export function createSurfaceTextureSession(positions: ArrayLike<number>) {
       const chosen = placed ? null : chosenFaces(s);
       // Faces another layer takes end the pattern the same way.
       const except = placed || chosen ? null : exceptedFaces(s);
+      // Regions end it at their outlines: outside its own, inside the later layers' (see regionFreePoints).
+      const regionFree = regionFreePoints(mesh, s);
       let notChosen: Uint8Array | null = null;
       if (chosen || except) {
         notChosen = new Uint8Array(n);
@@ -7161,6 +7555,7 @@ export function createSurfaceTextureSession(positions: ArrayLike<number>) {
         const z = v[i * 3 + 2];
         let free = false;
         if (maskFree && maskFree(v[i * 3], v[i * 3 + 1], z)) free = true;
+        else if (regionFree && regionFree[i]) free = true;
         else if (placed) free = false;
         else if (notChosen) free = (notChosen[i] === 1 && !bed?.[i]) || keptAt(i);
         else if (keptAt(i)) free = true;
@@ -7289,7 +7684,7 @@ export function createSurfaceTextureSession(positions: ArrayLike<number>) {
     // A pattern standing out: its run-out, finer still (see RUN_OUT_STEPS).
     // Bark all round fades out at the edges it keeps (see weightsFor): over its grid's triangles there in teeth.
     if (r.crossMax > 0 || r.straightAxis || standsOut(s) || endsInWall(s) || (s.pattern === "bark" && s.projection === "allRound")) {
-      const weightKey = JSON.stringify([r.key, s.bottomFree, s.topFree, s.zoneFrom, s.zoneTo, s.keepEdges, s.edgeAngle, s.fade, s.direction, s.margin, s.outside, s.inside, layout.center, s.masks, s.faces, s.exceptFaces]);
+      const weightKey = JSON.stringify([r.key, s.bottomFree, s.topFree, s.zoneFrom, s.zoneTo, s.keepEdges, s.edgeAngle, s.fade, s.direction, s.margin, s.outside, s.inside, layout.center, s.masks, s.faces, s.region, s.exceptFaces, s.exceptRegions]);
       const runOut = standsOut(s) ? Math.min(0.5, Math.max(s.fade, 0.25) / RUN_OUT_STEPS) : Math.min(0.5, Math.max(s.fade, 0.25) / 2);
       if (fadeCache?.key === weightKey) state = fadeCache.state;
       else {
