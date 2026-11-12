@@ -1,5 +1,584 @@
 [
   {
+    "version": "1.160.1",
+    "items": [
+      {
+        "title": {
+          "de": "Nicht gespeichert: mit Grund, und Neu laden wartet",
+          "en": "Not saved: with the reason, and reloading waits",
+          "da": "Ikke gemt: med årsagen, og genindlæsning venter"
+        },
+        "body": {
+          "de": "Kann der Browser einen Entwurf nicht speichern, nennt die rote Meldung jetzt immer den Grund, und darunter in einer kleinen Zeile, was der Browser selbst sagt: den Fehler, wie voll sein Speicher für layerling ist und ob ein kleiner Probeschreibvorgang durchgeht. Ein Bildschirmfoto davon zeigt, warum es klemmt. Dieselbe Zeile steht in der Konsole und im Fehlerbericht.\n\n„Speichern und neu laden“ im Update-Hinweis wartet jetzt, bis gespeichert ist. Konnte der offene Entwurf nicht gespeichert werden, lädt es nicht neu, sondern sagt es dir; sichere dann zuerst eine Kopie mit Exportieren → LYL.",
+          "en": "When the browser cannot save a design, the red note now always gives the reason, and below it, in a small line, what the browser itself says: the error, how full its storage for layerling is and whether a tiny test write gets through. A screenshot of it shows why saving is stuck. The same line is in the console and in the bug report.\n\n\"Save and reload\" in the update notice now waits until the design is saved. If the open design could not be saved, it does not reload but tells you; keep a copy with Export → LYL first.",
+          "da": "Når browseren ikke kan gemme et design, angiver den røde besked nu altid årsagen, og under den, i en lille linje, hvad browseren selv siger: fejlen, hvor fuldt dens lager til layerling er, og om en lille testskrivning går igennem. Et skærmbillede af den viser, hvorfor det hænger. Den samme linje står i konsollen og i fejlrapporten.\n\n\"Gem og genindlæs\" i opdateringsbeskeden venter nu, til designet er gemt. Kunne det åbne design ikke gemmes, genindlæser den ikke, men siger det til dig; gem først en kopi med Eksportér → LYL."
+        }
+      }
+    ]
+  },
+  {
+    "version": "1.160.0",
+    "items": [
+      {
+        "title": {
+          "de": "Stufenbohrung: Länge unter dem Kopf",
+          "en": "Counterbore: length below the head",
+          "da": "Forsænkning: længde under hovedet"
+        },
+        "body": {
+          "de": "Zylinderkopfschrauben werden nach der Länge unter dem Kopf verkauft. Die Stufenbohrung hat dafür jetzt das Feld „Schraubenlänge“: Trag die Schraubenlänge ein, und die Kopftiefe kommt für die Gesamtlänge dazu. Bei 3,2 mm Kopftiefe ergibt eine M3 × 12 so ein Loch von 15,2 mm.",
+          "en": "Socket head cap screws are sold by the length under the head. The counterbore now has the field \"Screw length\" for it: enter the screw's length, and the head depth is added for the total length. With a head depth of 3.2 mm, an M3 × 12 makes a hole 15.2 mm long.",
+          "da": "Skruer med cylinderhoved sælges efter længden under hovedet. Forsænkningen har nu feltet \"Skruelængde\" til det: skriv skruens længde, så lægges hoveddybden til for den totale længde. Med en hoveddybde på 3,2 mm giver en M3 × 12 et hul på 15,2 mm."
+        },
+        "guide": {
+          "section": "screwHoles"
+        }
+      },
+      {
+        "title": {
+          "de": "Einfacher Modus lässt sich auf Handy und Tablet ausschalten",
+          "en": "Simple mode can be switched off on phones and tablets",
+          "da": "Enkel tilstand kan slås fra på telefon og tablet"
+        },
+        "body": {
+          "de": "Zum Ausschalten hält man den Knopf zwei Sekunden lang. Auf einem Touchscreen öffnete das lange Drücken stattdessen das Menü des Browsers, und der einfache Modus blieb an. Jetzt bleibt das Menü zu, und die zwei Sekunden laufen durch.",
+          "en": "To switch it off, you hold the button for two seconds. On a touch screen the long press opened the browser's menu instead, and simple mode stayed on. Now the menu stays shut and the two seconds run through.",
+          "da": "For at slå den fra holder man knappen nede i to sekunder. På en touchskærm åbnede det lange tryk i stedet browserens menu, og enkel tilstand forblev slået til. Nu forbliver menuen lukket, og de to sekunder løber igennem."
+        }
+      },
+      {
+        "title": {
+          "de": "Drehen: der Zeiger der Skala beginnt auf null",
+          "en": "Turning: the dial's needle starts on zero",
+          "da": "Drejning: skalaens viser starter på nul"
+        },
+        "body": {
+          "de": "Griff man den Drehpfeil etwas neben der Mitte, stand der kleine Zeiger der Drehskala um genau so viel neben der Null, obwohl die Anzeige 0° sagte. Jetzt beginnt er immer auf der Null und zeigt auf den Strich, den die Anzeige nennt.",
+          "en": "When you grabbed the turning arrow a little beside its middle, the small needle on the dial started beside the zero by just as much, although the readout said 0°. Now it always starts on the zero and points at the tick the readout names.",
+          "da": "Når man greb drejepilen lidt ved siden af midten, startede den lille viser på skalaen lige så meget ved siden af nul, selv om visningen sagde 0°. Nu starter den altid på nul og peger på den streg, visningen nævner."
+        }
+      },
+      {
+        "title": {
+          "de": "Farbcode direkt eintippen",
+          "en": "Type a colour code",
+          "da": "Skriv en farvekode direkte"
+        },
+        "body": {
+          "de": "Der Hex-Wert oben in der Farbkarte ist jetzt ein Eingabefeld. Klick darauf, tippe oder füge einen Code wie #5EBDDB ein und drück Enter: Der Körper bekommt genau diese Farbe, bei mehreren ausgewählten Körpern alle. Der Umweg über Rot, Grün und Blau entfällt.",
+          "en": "The hex value at the top of the colour card is now a field. Click it, type or paste a code such as #5EBDDB and press Enter: the body takes exactly that colour, and with several bodies selected all of them do. No more detour through red, green and blue.",
+          "da": "Hexværdien øverst i farvekortet er nu et felt. Klik på det, skriv eller indsæt en kode som #5EBDDB, og tryk Enter: formen får præcis den farve, og er flere former valgt, får de den alle. Ingen omvej over rød, grøn og blå længere."
+        },
+        "guide": {
+          "section": "colorCard"
+        }
+      },
+      {
+        "title": {
+          "de": "Ein Hinweis bei sehr großen Netzen",
+          "en": "A note on very large meshes",
+          "da": "En bemærkning om meget store mesh"
+        },
+        "body": {
+          "de": "layerling ist vor allem für exakte CAD-Körper gemacht. Netze aus STL, OBJ oder 3MF gehen auch, und kleinere Teile sind kein Problem. Sehr große Netze mit Hunderttausenden oder Millionen Dreiecken machen den Editor aber langsam, belegen viel Speicher und verlangsamen das Speichern.\n\nBringt ein Import ein Netz ab 400 000 Dreiecken herein, oder kommen die Netze eines Entwurfs zusammen auf eine Million, sagt layerling das jetzt einmal, mit einem Knopf zum neuen Abschnitt der Anleitung. Netz vereinfachen (Rechtsklick auf den Körper) macht solche Netze leichter.",
+          "en": "layerling is made first of all for exact CAD bodies. Meshes from STL, OBJ or 3MF work too, and smaller parts are no problem. Very large meshes with hundreds of thousands or millions of triangles, though, make the editor slow, take a lot of memory and make saving slow.\n\nWhen an import brings in a mesh of 400,000 triangles or more, or a design's meshes reach a million together, layerling now says so once, with a button to the new section of the user guide. Simplify mesh (right-click on the body) makes such meshes lighter.",
+          "da": "layerling er først og fremmest lavet til eksakte CAD-legemer. Mesh fra STL, OBJ eller 3MF virker også, og mindre dele er intet problem. Meget store mesh med hundredtusinder eller millioner af trekanter gør dog editoren langsom, optager meget hukommelse og gør gemning langsom.\n\nNår en import bringer et mesh på 400.000 trekanter eller flere ind, eller et designs mesh tilsammen når en million, siger layerling det nu én gang, med en knap til det nye afsnit i brugervejledningen. Forenkl mesh (højreklik på legemet) gør sådanne mesh lettere."
+        },
+        "guide": {
+          "section": "largeMeshes"
+        }
+      },
+      {
+        "title": {
+          "de": "Leerer Entwurf: Behalten oder Löschen",
+          "en": "Empty design: Keep or Delete",
+          "da": "Tomt design: Behold eller Slet"
+        },
+        "body": {
+          "de": "Verlässt man einen leeren Entwurf, fragte layerling „Leeren Entwurf behalten?“ mit Ja und Nein, und Nein löschte ihn sofort. In der Eile war das leicht falsch zu lesen. Jetzt sagen die Knöpfe, was sie tun: Behalten und Löschen, Löschen in Rot.",
+          "en": "When you left an empty design, layerling asked \"Keep empty design?\" with Yes and No, and No deleted it at once. In a hurry that was easy to misread. Now the buttons say what they do: Keep and Delete, with Delete in red.",
+          "da": "Når man forlod et tomt design, spurgte layerling \"Behold tomt design?\" med Ja og Nej, og Nej slettede det med det samme. I en fart var det let at læse forkert. Nu siger knapperne, hvad de gør: Behold og Slet, med Slet i rødt."
+        }
+      },
+      {
+        "title": {
+          "de": "Wenn ein Entwurf nicht gespeichert werden kann",
+          "en": "When a design cannot be saved",
+          "da": "Når et design ikke kan gemmes"
+        },
+        "body": {
+          "de": "Bei sehr großen Netzen konnte dem Browser beim Speichern der Speicher ausgehen. Das Speichern scheiterte dann still, und nach dem Neuladen war der Entwurf auf einem Stunden alten Stand. Jetzt versucht layerling es mit einer kürzeren Rückgängig-Liste noch einmal. Klappt es trotzdem nicht, bleibt ein roter Hinweis stehen, bis wieder gespeichert ist, und der Browser fragt nach, bevor der Tab geschlossen oder neu geladen wird.",
+          "en": "With very large meshes the browser could run out of memory while saving. The save then failed quietly, and after a reload the design was back at a state hours old. Now layerling tries again with a shorter undo history. If it still fails, a red note stays up until the design is saved again, and the browser asks before the tab is closed or reloaded.",
+          "da": "Med meget store mesh kunne browseren løbe tør for hukommelse, mens der blev gemt. Gemningen slog så fejl i stilhed, og efter en genindlæsning var designet tilbage på en flere timer gammel tilstand. Nu prøver layerling igen med en kortere fortryd-historik. Lykkes det stadig ikke, bliver en rød besked stående, til designet er gemt igen, og browseren spørger, før fanen lukkes eller genindlæses."
+        }
+      }
+    ]
+  },
+  {
+    "version": "1.159.2",
+    "items": [
+      {
+        "title": {
+          "de": "Strecken: keine schwarzen Linien mehr an den Nähten",
+          "en": "Stretch: no more black lines at the seams",
+          "da": "Stræk: ingen sorte streger ved sømmene mere"
+        },
+        "body": {
+          "de": "Ging das Strecken durch schräge oder gerundete Wände, zeigte das verlängerte Stück schwarze Linien, und nach einem späteren Schnitt blieben Reste stehen. Ursache waren haarfeine Dreiecke an beiden Nähten; sie werden jetzt weggefaltet, die Form bleibt dabei gleich.",
+          "en": "When Stretch went through slanted or rounded walls, the longer piece showed black lines, and remnants stayed behind after a later cut. Hairline triangles along both seams caused it; they are now folded away, and the shape stays the same.",
+          "da": "Når Stræk gik gennem skrå eller afrundede vægge, viste det forlængede stykke sorte streger, og der blev rester tilbage efter et senere snit. Årsagen var hårfine trekanter langs begge sømme; de foldes nu væk, og formen forbliver den samme."
+        }
+      },
+      {
+        "title": {
+          "de": "Das Mittelkreuz bleibt auch von weitem zu sehen",
+          "en": "The centre cross stays visible from afar",
+          "da": "Midterkrydset kan ses, også på afstand"
+        },
+        "body": {
+          "de": "Das Kreuz durch die Mitte der Platte wurde beim Herauszoomen so dünn wie die anderen Rasterlinien und ging zwischen ihnen unter. Es bleibt jetzt immer mindestens drei Bildpunkte breit; nah herangezoomt sieht es aus wie bisher.",
+          "en": "Zoomed out, the cross through the middle of the plate became as thin as the other grid lines and got lost among them. It now always stays at least three pixels wide; close up it looks as before.",
+          "da": "Når man zoomede ud, blev krydset gennem pladens midte lige så tyndt som de andre gitterlinjer og forsvandt imellem dem. Nu er det altid mindst tre pixel bredt; tæt på ser det ud som før."
+        }
+      },
+      {
+        "title": {
+          "de": "Ein Entwurf, der sich nicht lesen lässt, öffnet nicht mehr leer",
+          "en": "A design that cannot be read no longer opens empty",
+          "da": "Et design, der ikke kan læses, åbner ikke længere tomt"
+        },
+        "body": {
+          "de": "Ließ sich ein gespeicherter Entwurf nicht lesen, öffnete er leer, und schon die erste Änderung konnte ihn so überschreiben. Jetzt bleibt er unverändert auf der Startseite stehen, und eine Meldung nennt den Grund. „Alle sichern“ sagt außerdem, zu welchen Entwürfen der Browser keinen Inhalt hat, und dauert das Öffnen einer .lyl-Datei ungewöhnlich lange, steht da, bei welchem Schritt es ist.",
+          "en": "When a stored design could not be read, it opened empty, and the first change could save it that way. Now it stays on the start page untouched, with a message that gives the reason. “Back up all” also tells you which designs the browser holds no content for, and when opening a .lyl file takes unusually long, it says which step it is on.",
+          "da": "Når et gemt design ikke kunne læses, åbnede det tomt, og den første ændring kunne gemme det sådan. Nu bliver det urørt på startsiden med en besked, der giver grunden. “Sikkerhedskopiér alle” fortæller også, hvilke designs browseren ikke har indhold til, og når det tager usædvanligt lang tid at åbne en .lyl-fil, står der, hvilket trin det er nået til."
+        }
+      }
+    ]
+  },
+  {
+    "version": "1.159.1",
+    "items": [
+      {
+        "title": {
+          "de": "Skizze auf der aktiven Druckplatte",
+          "en": "Sketches on the active build plate"
+        },
+        "body": {
+          "de": "Mit mehreren Druckplatten öffnete sich eine neue Skizze immer über Platte 1, und Platte 2 war von dort aus nicht zu erreichen. Jetzt beginnt die Skizze auf der Platte, die gerade aktiv ist: Du siehst die Körper darauf, und der fertige Körper steht dort.",
+          "en": "With several build plates, a new sketch always opened over plate 1, and plate 2 could not be reached from there. Now the sketch starts on the plate that is active: you see the bodies on it, and the finished body stands there."
+        },
+        "guide": {
+          "section": "buildPlates"
+        }
+      },
+      {
+        "title": {
+          "de": "Prusa CORE One INDX",
+          "en": "Prusa CORE One INDX"
+        },
+        "body": {
+          "de": "Die Druckerliste in den Einstellungen kennt jetzt auch den CORE One mit dem INDX-Werkzeugwechsler, mit seiner kleineren Platte von 248 × 205 mm.",
+          "en": "The printer list in the settings now has the CORE One with the INDX tool changer too, with its smaller 248 × 205 mm plate."
+        }
+      },
+      {
+        "title": {
+          "de": "Duplizieren wiederholt die Verschiebung auch für mehrere Teile",
+          "en": "Duplicate repeats the move for several parts too"
+        },
+        "body": {
+          "de": "Strg+D wiederholte bisher nur bei einem einzelnen Teil, wie die Kopie verschoben, gedreht oder in der Größe geändert wurde. Jetzt geht das auch mit einer Auswahl: Lage duplizieren, die Kopie anheben, und jedes weitere Strg+D setzt die nächste Lage im gleichen Abstand obendrauf.",
+          "en": "Ctrl+D used to repeat how a copy was moved, turned or resized only for a single part. Now it works for a selection too: duplicate a layer, lift the copy, and every further Ctrl+D puts the next layer on top at the same distance."
+        }
+      },
+      {
+        "title": {
+          "de": "Skizze: Punkte ohne Einrasten",
+          "en": "Sketch: points without snapping"
+        },
+        "body": {
+          "de": "Ein Punkt nahe an einer Ecke eines Körpers darunter, an einer Linienmitte oder einer Kreuzung rastete dort immer ein. Hältst du beim Setzen oder Ziehen Alt gedrückt, geht er jetzt nur aufs Raster, so zeichnest du auch dicht neben einer Ecke nach.",
+          "en": "A point near a corner of a body underneath, the middle of a line or a crossing always snapped there. Hold Alt while you set or drag it and it keeps to the grid only, so you can trace just beside a corner."
+        },
+        "guide": {
+          "section": "sketchDrawing"
+        }
+      },
+      {
+        "title": {
+          "de": "SVG-Vorlagen in Firefox",
+          "en": "SVG templates in Firefox"
+        },
+        "body": {
+          "de": "Ein SVG-Bild als Vorlage unter einer Skizze ließ sich in Firefox nicht lesen. Jetzt klappt das auch dort.",
+          "en": "An SVG picture added as a template under a sketch could not be read in Firefox. Now it works there too."
+        },
+        "guide": {
+          "section": "sketchImage"
+        }
+      },
+      {
+        "title": {
+          "de": "Docker: Container starten wieder",
+          "en": "Docker: containers start again"
+        },
+        "body": {
+          "de": "Wer layerling per Docker auf einem NAS betreibt und den Container mit Portainer oder dem Container Manager von Synology neu erstellt, bekam mit 1.159.0 einen Container, der nicht startete. Das Image bringt das alte Startskript wieder mit, und solche Container laufen wie vorher.",
+          "en": "If you run layerling with Docker on a NAS and recreate the container with Portainer or Synology's Container Manager, the container did not start with 1.159.0. The image has the old start script again, and such containers run as before."
+        }
+      }
+    ]
+  },
+  {
+    "version": "1.159.0",
+    "items": [
+      {
+        "title": {
+          "de": "Frühere Fassungen – und warum du trotzdem selbst sichern musst",
+          "en": "Earlier versions – and why you still need your own backup"
+        },
+        "body": {
+          "de": "Deine Entwürfe liegen in diesem Browser auf deinem Rechner. Wie bei allen Daten gilt: Sicher ist nur, was es ein zweites Mal an einem anderen Ort gibt. Eine defekte Festplatte, ein neuer PC, gelöschte Browserdaten oder ein Fehler im Programm, und ohne Sicherung ist die Arbeit weg. Um diese Sicherung kümmerst du dich selbst, das kann dir keine Software abnehmen.\n\nWas du tun solltest: Klicke nach jeder größeren Sitzung auf der Startseite auf „Alle sichern“. Das packt alle Entwürfe samt Ordnern und eigenen Formen in eine einzige Datei. Leg sie auf einen USB-Stick, in einen Cloud-Ordner oder auf ein NAS, also nicht nur auf denselben Rechner. „Sicherung wiederherstellen“ holt alles zurück, auch auf einem anderen Computer.\n\nWas layerling jetzt zusätzlich von selbst tut: Bevor Speichern (Strg+S) eine .lyl-Datei überschreibt, behält layerling die Datei, wie sie war. Und während du arbeitest, legt es alle 10 Minuten einen Zwischenstand ab, wenn sich etwas geändert hat. Das hilft, wenn du versehentlich etwas überschrieben oder kaputtgemacht hast.\n\nSo kommst du an frühere Fassungen: im Editor über Export → LYL → „Frühere Fassungen“ oder über die Befehlssuche, auf der Startseite neben „Sicherung wiederherstellen“ für alle Entwürfe und im Menü einer Entwurfskarte für diesen einen. Jede Fassung zeigt Bild, Zeit und Größe. „Öffnen“ legt sie als neuen Entwurf an, dein aktueller Entwurf bleibt unverändert. Du kannst sie auch als Datei speichern oder löschen.\n\nWas du einstellen kannst (Zahnrad im Menüband → Sicherungen):\n– wie viele frühere Fassungen je Datei bleiben (aus bis 20, anfangs 5),\n– wie oft ein Zwischenstand entsteht (aus, alle 10 oder alle 30 Minuten; je Entwurf bleiben die letzten sechs),\n– ab wann layerling an „Alle sichern“ erinnert (nach 3, 7 oder 14 Tagen oder nie),\n– in Chrome und Edge einen Sicherungsordner auf deinem Rechner, in den jede Sicherung zusätzlich als .lyl-Datei mit Name und Uhrzeit wandert. Liegt dieser Ordner in der Cloud oder auf einem anderen Laufwerk, ist er ein zweiter Ort.\n\nWoran du merkst, dass es Zeit wird: Der Hinweis über deinen Entwürfen wird deutlicher, je länger die letzte Sicherung her ist. Nach 7 Tagen mit Änderungen erscheint ein Knopf „Jetzt sichern“, nach 30 Tagen oder bei mehreren Entwürfen ganz ohne Sicherung wird er rot. Im Editor erinnert dich die Statuszeile höchstens einmal am Tag.\n\nWichtig: Die früheren Fassungen liegen im selben Browser wie deine Entwürfe. Löschst du die Browserdaten oder geht der Rechner kaputt, sind sie mit weg. Sie ersetzen „Alle sichern“ also nicht, sie ergänzen es.",
+          "en": "Your designs live in this browser on your computer. As with all data, only what exists a second time in another place is safe. A failing drive, a new PC, cleared browser data or a bug, and without a backup the work is gone. Keeping that backup is up to you; no software can do it for you.\n\nWhat you should do: after every bigger session, click “Back up all” on the start page. It puts every design, with its folders and your custom shapes, into a single file. Keep it on a USB stick, in a cloud folder or on a NAS, not only on the same computer. “Restore backup” brings everything back, on another computer too.\n\nWhat layerling now also does by itself: before Save (Ctrl+S) writes over a .lyl file, layerling keeps the file as it was. And while you work, it keeps a state of the design every 10 minutes when something changed. That helps when you saved over something or broke it by mistake.\n\nWhere to find earlier versions: in the editor under Export → LYL → “Earlier versions” or in the command search, on the start page beside “Restore backup” for every design, and in a design card's menu for that one. Each shows its picture, time and size. “Open” makes it a new design; the design you have open stays as it is. You can also save it as a file or delete it.\n\nWhat you can set (cogwheel in the ribbon → Backups):\n– how many earlier versions of a file stay (off up to 20, 5 to begin with),\n– how often a state is kept (off, every 10 or every 30 minutes; the last six of each design stay),\n– when layerling reminds you of “Back up all” (after 3, 7 or 14 days, or never),\n– in Chrome and Edge, a backup folder on your computer that also gets every backup as a .lyl file named after the design and the time. A folder in the cloud or on another drive is a second place.\n\nHow you know it is time: the notice above your designs grows louder the longer the last backup lies back. After 7 days with changes it gets a “Back up now” button; after 30 days, or with several designs and no backup at all, it turns red. In the editor the status line reminds you once a day at most.\n\nImportant: the earlier versions live in the same browser as your designs. Clear the browser data or lose the computer, and they are gone too. So they do not replace “Back up all”; they add to it."
+        },
+        "guide": [
+          {
+            "section": "yourBackup",
+            "label": {
+              "de": "Anleitung: Deine Daten, deine Sicherung",
+              "en": "Guide: Your designs, your backup"
+            }
+          },
+          {
+            "section": "fileBackups",
+            "label": {
+              "de": "Anleitung: Frühere Fassungen",
+              "en": "Guide: Earlier versions"
+            }
+          }
+        ]
+      },
+      {
+        "title": {
+          "de": "layerling auf Schwedisch",
+          "en": "layerling in Swedish",
+          "sv": "layerling på svenska"
+        },
+        "body": {
+          "de": "Programm und Anleitung gibt es jetzt auch auf Schwedisch, alle 17 Kapitel. Ein Browser auf Schwedisch startet gleich darin, sonst wählst du es oben rechts in der Sprachliste.",
+          "en": "The program and its user guide now speak Swedish too, all 17 chapters. A browser set to Swedish starts in it; otherwise pick it in the language list at the top right.",
+          "sv": "Programmet och användarhandboken finns nu även på svenska, alla 17 kapitel. En webbläsare inställd på svenska startar direkt på svenska; annars väljer du det i språklistan uppe till höger."
+        }
+      },
+      {
+        "title": {
+          "de": "Schwalbenschwanz folgt der Schräge",
+          "en": "The dovetail follows a slope"
+        },
+        "body": {
+          "de": "Teilst du eine Rampe oder einen Keil quer zur Schräge mit Schwalbenschwanz, endete die Zunge bisher gerade an der Schnittfläche, und zusammengesteckt blieb über jeder Zunge eine Stufe in der Schräge. Jetzt läuft die Zunge mit der Schräge weiter, die Oberfläche ist glatt.",
+          "en": "Split a ramp or wedge across its slope with a dovetail, and the tongue used to end square at the cut face, leaving a step in the slope above each tongue once put together. Now the tongue runs on with the slope, and the surface is smooth."
+        }
+      }
+    ]
+  },
+  {
+    "version": "1.158.0",
+    "items": [
+      {
+        "title": {
+          "de": "Größe ziehen bis an die Wand",
+          "en": "Resize right up to the wall",
+          "da": "Træk størrelsen helt hen til væggen"
+        },
+        "body": {
+          "de": "Ziehst du eine Form an einem Seitengriff größer, hält die Seite jetzt an den Kanten anderer Formen und an der Wand, auf die sie trifft, auch an der Innenwand eines Kastens oder Gehäuses. So füllt ein Teil einen Kasten genau von Wand zu Wand, ohne dass du nachmessen musst.",
+          "en": "When you drag a side handle to make a shape bigger, the side now stops at the edges of other shapes and at the wall it runs into, the inside wall of a box or case as well. So a part fills a box exactly from wall to wall, without measuring.",
+          "da": "Når du trækker i et sidehåndtag for at gøre en form større, stopper siden nu ved kanterne af andre former og ved den væg, den løber ind i, også indervæggen i en kasse eller et kabinet. Så fylder en del en kasse præcist fra væg til væg, uden at du skal måle."
+        }
+      },
+      {
+        "title": {
+          "de": "Winkellineal mit drittem Arm nach oben",
+          "en": "A third arm on the framing square, pointing up",
+          "da": "En tredje arm på vinkelmåleren, der peger op"
+        },
+        "body": {
+          "de": "Das Winkellineal hat einen dritten Arm, der an der Ecke senkrecht nach oben steht, mit eigenen Teilstrichen, für Zylinder und alles, was du in die Höhe baust. Der neue Knopf mit drei Achsen unter dem Griff schaltet jeden Arm ein oder aus.",
+          "en": "The framing square has a third arm that stands straight up from its corner, with its own ticks, for cylinders and anything you build upwards. The new button with three axes under its handle switches each arm on or off.",
+          "da": "Vinkelmåleren har en tredje arm, der står lodret op fra hjørnet med sine egne streger, til cylindre og alt, hvad du bygger i højden. Den nye knap med tre akser under håndtaget tænder eller slukker hver arm."
+        }
+      },
+      {
+        "title": {
+          "de": "Änderungen gehen nicht mehr verloren",
+          "en": "Edits are no longer lost",
+          "da": "Ændringer går ikke længere tabt"
+        },
+        "body": {
+          "de": "Lag die gespeicherte Zeit eines Entwurfs vor der Uhr deines Rechners, etwa nach einer zurückgestellten Uhr, wurde nach dem Neuladen keine Änderung mehr gespeichert, und ein Wechsel des Rasters holte den alten Stand zurück. Jetzt wird jede Änderung gespeichert, die erste bringt einen solchen Entwurf wieder in Ordnung.",
+          "en": "If the stored time of a design was ahead of your computer's clock, for example after the clock was set back, no edit was saved after a reload, and changing the snap step brought the old state back. Now every edit is saved, and the first one puts such a design right again.",
+          "da": "Hvis den gemte tid for et design lå foran din computers ur, for eksempel efter at uret var stillet tilbage, blev ingen ændring gemt efter en genindlæsning, og et skift af gitteret hentede den gamle tilstand tilbage. Nu gemmes hver ændring, og den første bringer sådan et design i orden igen."
+        }
+      },
+      {
+        "title": {
+          "de": "Winkelmesser misst, was die gerade Ansicht zeigt",
+          "en": "The protractor measures what a straight view shows",
+          "da": "Vinkelmåleren måler det, en lige visning viser"
+        },
+        "body": {
+          "de": "Von oben, vorn oder von der Seite gesehen misst der Winkelmesser jetzt den Winkel, den du siehst: Die Diagonale eines Würfels von oben ergibt 45° statt 54,7°. Das bleibt so, auch wenn du die Ansicht danach drehst.",
+          "en": "Seen straight from the top, the front or a side, the protractor now measures the angle you see: the diagonal of a cube seen from the top gives 45° instead of 54.7°. It stays so when you turn the view afterwards.",
+          "da": "Set lige ovenfra, forfra eller fra siden måler vinkelmåleren nu den vinkel, du ser: diagonalen i en terning set ovenfra giver 45° i stedet for 54,7°. Det bliver sådan, også når du drejer visningen bagefter."
+        }
+      },
+      {
+        "title": {
+          "de": "Stützrippe: Brücken mit Abstand zum Teil",
+          "en": "Support rib: bridges with a gap to the part",
+          "da": "Støtteribbe: broer med afstand til delen"
+        },
+        "body": {
+          "de": "Unter Weitere Einstellungen lässt „Abstand der Brückenenden“ jede Brücke kurz vor dem Teil enden. So druckt der Slicer die Brücke als eigene Bahn, und die Stütze lässt sich leichter abbrechen. Ein halber Strang, etwa 0,2 mm bei einer 0,4-mm-Düse, ist ein guter Anfang.",
+          "en": "Under More settings, \"Gap at the bridge ends\" lets each bridge end just before the part. The slicer then prints the bridge as a path of its own, and the support breaks away more easily. Half a line, about 0.2 mm for a 0.4 mm nozzle, is a good start.",
+          "da": "Under Flere indstillinger lader \"Afstand ved broernes ender\" hver bro slutte lige før delen. Så printer sliceren broen som sin egen bane, og støtten brækker lettere af. En halv streng, cirka 0,2 mm med en 0,4 mm dyse, er en god start."
+        }
+      },
+      {
+        "title": {
+          "de": "Neue Boards: Cheap Yellow Display",
+          "en": "New boards: Cheap Yellow Display",
+          "da": "Nye boards: Cheap Yellow Display"
+        },
+        "body": {
+          "de": "Bei den SBC-Boards gibt es das ESP32-2432S028R („CYD“) mit Micro-USB und mit Micro-USB und USB-C, mit dem Bildschirm nach oben und allen Anschlüssen auf der Rückseite. Knöpfe unter einem Board reichen jetzt durch den Boden.",
+          "en": "The SBC boards now include the ESP32-2432S028R (\"CYD\") with micro-USB and with micro-USB plus USB-C, screen up, with every connector on the back. Buttons under a board now reach down through the floor.",
+          "da": "Blandt SBC-boardene findes nu ESP32-2432S028R (\"CYD\") med micro-USB og med micro-USB plus USB-C, med skærmen opad og alle stik på bagsiden. Knapper under et board når nu ned gennem bunden."
+        }
+      },
+      {
+        "title": {
+          "de": "SBC-Board bleibt auf seinen Befestigungslöchern",
+          "en": "An SBC board stays on its mounting holes",
+          "da": "Et SBC-board bliver på sine monteringshuller"
+        },
+        "body": {
+          "de": "Änderst du Abstand, Durchreichen durch die Wand oder Öffnungen eines Boards, bleibt das Board an seinem Platz, auch gedreht oder gekippt. Vorher konnte es sich dabei mitsamt seinen Löchern verschieben.",
+          "en": "When you change an SBC board's clearance, its reach through the wall or its openings, the board now keeps its place, also turned or tilted. Before, it could move along with its holes.",
+          "da": "Når du ændrer et SBC-boards afstand, gennemføring gennem væggen eller åbninger, bliver boardet nu på sin plads, også drejet eller vippet. Før kunne det flytte sig sammen med sine huller."
+        }
+      },
+      {
+        "title": {
+          "de": "Skizzenkörper behält Verjüngung, Verdrehung und Neigung",
+          "en": "A sketch body keeps its taper, twist and lean",
+          "da": "Et skitselegeme beholder tilspidsning, drejning og hældning"
+        },
+        "body": {
+          "de": "Bearbeitest du die Skizze eines Skizzenkörpers oder änderst seine Füllung, bleiben Verjüngung, Verdrehung und Neigung jetzt erhalten. Die Verjüngung wächst mit dem Umriss mit.",
+          "en": "When you edit the sketch of a sketch body or change its fill, its taper, twist and lean now stay. The taper grows or shrinks with the outline.",
+          "da": "Når du redigerer skitsen til et skitselegeme eller ændrer dets fyld, bliver tilspidsning, drejning og hældning nu bevaret. Tilspidsningen vokser og skrumper med omridset."
+        }
+      },
+      {
+        "title": {
+          "de": "Liegende Teile skalieren mit",
+          "en": "Parts lying on their side scale along",
+          "da": "Liggende dele skalerer med"
+        },
+        "body": {
+          "de": "Ziehst du mehrere ausgewählte Teile größer, wächst ein liegender Zylinder jetzt mit: länger an den Griffen an seinen Enden, dicker und weiter rund an denen an seiner Seite.",
+          "en": "When you stretch several selected parts, a cylinder lying on its side now grows along: longer with the handles at its ends, thicker and still round with those at its side.",
+          "da": "Når du trækker flere valgte dele større, vokser en liggende cylinder nu med: længere med håndtagene ved enderne, tykkere og stadig rund med dem på siden."
+        }
+      },
+      {
+        "title": {
+          "de": "Bündel: wo seine Löcher schneiden",
+          "en": "Bundles: where their holes cut",
+          "da": "Bundter: hvor deres huller skærer"
+        },
+        "body": {
+          "de": "Der Hinweis in den Einstellungen eines Bündels sagt jetzt, dass seine Löcher nie die eigenen Teile schneiden, auch nicht später in einer Gruppe, sondern nur die anderen Teile.",
+          "en": "The note in a bundle's settings now says that its holes never cut the bundle's own parts, not even later in a group, only the other parts.",
+          "da": "Noten i et bundts indstillinger siger nu, at dets huller aldrig skærer bundtets egne dele, heller ikke senere i en gruppe, kun de andre dele."
+        }
+      }
+    ]
+  },
+  {
+    "version": "1.157.2",
+    "items": [
+      {
+        "title": {
+          "de": "Entwürfe vom Server zurück in den Browser",
+          "en": "Designs from the server back into the browser",
+          "da": "Designs fra serveren tilbage i browseren"
+        },
+        "body": {
+          "de": "Im Menü eines Entwurfs auf dem Reiter Server steht jetzt „In diesen Browser holen“, als Gegenstück zu „Auf den Server legen“. Seine Karte auf den Reiter Browser zu ziehen geht auch. Der Entwurf liegt danach nur noch in diesem Browser und nicht mehr im Serverordner.",
+          "en": "The menu of a design on the Server tab now has \"Put in this browser\", the way back from \"Put on the server\". Dragging its card onto the Browser tab works too. The design then lives only in this browser and no longer in the server folder.",
+          "da": "Menuen for et design under fanen Server har nu \"Læg i denne browser\", vejen tilbage fra \"Læg på serveren\". Det virker også at trække kortet til fanen Browser. Designet ligger derefter kun i denne browser og ikke længere i servermappen."
+        }
+      },
+      {
+        "title": {
+          "de": "Die Schrittliste im Verlauf erscheint wieder sofort",
+          "en": "The list of steps in the History view shows at once again",
+          "da": "Listen over trin i historikken vises straks igen"
+        },
+        "body": {
+          "de": "Bei Entwürfen mit vielen Schritten und großen Körpern brauchte die Liste der Schritte in der Verlaufsansicht bis zu einer halben Minute. Jetzt steht sie sofort da, auch beim erneuten Öffnen.",
+          "en": "With designs of many steps and large bodies, the list of steps in the History view took up to half a minute to show. Now it is there at once, also when you open it again.",
+          "da": "Ved designs med mange trin og store legemer tog listen over trin i historikken op til et halvt minut at vise. Nu er den der straks, også når du åbner den igen."
+        }
+      },
+      {
+        "title": {
+          "de": "Ordner kommen mit auf den Server",
+          "en": "Folders come along onto the server",
+          "da": "Mapper kommer med på serveren"
+        },
+        "body": {
+          "de": "„Alle auf den Server legen“ behält jetzt deine Ordner: Jeder Entwurf landet auf dem Server im selben Ordner wie im Browser. Auch ein einzelner Ordner kommt mit allem darin auf den Server, über „Auf den Server legen“ in seinem Menü oder indem du ihn auf den Reiter Server ziehst.",
+          "en": "\"Put all on the server\" now keeps your folders: each design ends up on the server in the same folder as in the browser. A single folder goes onto the server with everything in it too, with \"Put on the server\" in its menu or by dragging it onto the Server tab.",
+          "da": "\"Læg alle på serveren\" beholder nu dine mapper: hvert design havner på serveren i samme mappe som i browseren. En enkelt mappe kommer også på serveren med alt indhold, med \"Læg på serveren\" i dens menu eller ved at trække den til fanen Server."
+        }
+      }
+    ]
+  },
+  {
+    "version": "1.157.1",
+    "items": [
+      {
+        "title": {
+          "de": "Mehr Platz für die Namen in der Objektliste",
+          "en": "More room for the names in the object list",
+          "da": "Mere plads til navnene i objektlisten"
+        },
+        "body": {
+          "de": "Ob ein Teil Körper oder Aussparung ist, zeigt die Objektliste jetzt mit einem Buchstaben statt mit dem ganzen Wort; mit der Maus darüber steht das Wort da. Und an ihrer rechten unteren Ecke lässt sich die Liste breiter ziehen, bis 600 Pixel; der Browser merkt sich die Breite.",
+          "en": "The object list now shows whether a part is a solid or a hole with one letter instead of the whole word; hold the mouse over it to see the word. And you can drag the list wider at its lower right corner, up to 600 pixels; the browser remembers the width.",
+          "da": "Objektlisten viser nu med ét bogstav i stedet for hele ordet, om en del er massiv eller et hul; hold musen over det for at se ordet. Og listen kan trækkes bredere i sit nederste højre hjørne, op til 600 pixel; browseren husker bredden."
+        }
+      },
+      {
+        "title": {
+          "de": "Fase und Rundung: die größte passende Größe",
+          "en": "Chamfer and fillet: the largest size that fits",
+          "da": "Fas og afrunding: den største størrelse, der passer"
+        },
+        "body": {
+          "de": "Ist eine Fase oder Rundung zu groß für die gewählten Kanten, steht unter der Meldung jetzt „Größte passende Größe suchen“. Ein Klick probiert kleinere Größen und trägt die größte ein, die durchgeht, auf ein Hundertstel Millimeter genau.",
+          "en": "When a chamfer or fillet is too large for the picked edges, \"Find the largest size that fits\" now shows under the message. One click tries smaller sizes and puts in the largest that goes through, to a hundredth of a millimetre.",
+          "da": "Er en fas eller afrunding for stor til de valgte kanter, står der nu \"Find den største størrelse, der passer\" under meddelelsen. Ét klik prøver mindre størrelser og skriver den største, der går igennem, ind, på en hundrededel millimeter."
+        }
+      },
+      {
+        "title": {
+          "de": "Rote und grüne Verschiebepfeile abschaltbar",
+          "en": "The red and green move arrows can be switched off",
+          "da": "De røde og grønne flyttepile kan slås fra"
+        },
+        "body": {
+          "de": "Unter Einstellungen → Darstellung → „Rote und grüne Verschiebepfeile anzeigen“. Ausgeschaltet behält die Auswahl ihre Drehpfeile und den Hebepfeil; die beiden Pfeile, die sie nur entlang X oder Y schieben, sitzen bei kleinen Körpern nicht mehr im Weg.",
+          "en": "Under Settings → Appearance → \"Show the red and green move arrows\". Switched off, the selection keeps its turn arrows and the lift arrow; the two arrows that only slide it along X or Y no longer get in the way on small bodies.",
+          "da": "Under Indstillinger → Udseende → \"Vis de røde og grønne flyttepile\". Slået fra beholder markeringen sine drejepile og løftepilen; de to pile, der kun skubber den langs X eller Y, er ikke længere i vejen på små legemer."
+        }
+      },
+      {
+        "title": {
+          "de": "Gedrehte Senkung behält ihre Feldnamen",
+          "en": "A turned countersink keeps the names of its fields",
+          "da": "En drejet undersænkning beholder navnene på sine felter"
+        },
+        "body": {
+          "de": "Um 90° gedreht hieß der Kopfdurchmesser einer Senkung plötzlich „Höhe“ und die Gesamtlänge „Breite“. Jetzt folgen nur die schlichten Felder Länge, Breite und Höhe der Drehung; Felder mit eigenem Namen behalten ihn.",
+          "en": "Turned by 90°, a countersink's head diameter was suddenly called Height and its total length Width. Now only the plain Length, Width and Height fields follow the turn; fields with a name of their own keep it.",
+          "da": "Drejet 90° hed en undersænknings hoveddiameter pludselig Højde og dens samlede længde Bredde. Nu følger kun de enkle felter Længde, Bredde og Højde drejningen; felter med deres eget navn beholder det."
+        }
+      },
+      {
+        "title": {
+          "de": "„Als Vorgabe speichern“ merkt sich alle Felder",
+          "en": "Save as default keeps every field",
+          "da": "Gem som standard husker alle felter"
+        },
+        "body": {
+          "de": "„Als Vorgabe speichern“ ließ neuere Felder aus, etwa die Fase am Rand einer Stufenbohrung, Langloch und Vertiefung einer Schraubenbohrung oder Kopf, Antrieb und Bund eines Gewindes. Jetzt kommen sie bei neuen Formen so wieder, wie du sie gespeichert hast.",
+          "en": "Save as default left out the newer fields, such as a counterbore's rim chamfer, a screw hole's slot and recess, or a thread's head, drive and collar. Now new shapes get them back as you saved them.",
+          "da": "Gem som standard udelod de nyere felter, f.eks. affasningen ved kanten af en forsænkning, en skruehuls langhul og fordybning eller et gevinds hoved, drev og krave. Nu får nye former dem igen, som du gemte dem."
+        }
+      }
+    ]
+  },
+  {
+    "version": "1.157.0",
+    "items": [
+      {
+        "title": {
+          "de": "Stufenbohrung mit Fase am Rand",
+          "en": "Counterbore with a chamfer at the rim",
+          "da": "Forsænkning med affasning ved kanten"
+        },
+        "body": {
+          "de": "Die Stufenbohrung hat jetzt das Feld „Fase am Rand“: Es setzt eine 45°-Fase an die Oberkante der Senkung, damit die Kante nicht scharf bleibt und die Schraube leichter hineinfindet. Die Fase liegt außerhalb des Kopfdurchmessers, der Schraubenkopf passt also weiter, und sie bleibt ein exakter Körper, auch im Langloch.",
+          "en": "The counterbore now has a Rim chamfer field: it puts a 45° chamfer on the top edge of the pocket, so the edge is not sharp and the screw finds its way in more easily. The chamfer lies outside the head diameter, so the screw head still fits, and it stays an exact body, in a slotted hole too.",
+          "da": "Forsænkningen har nu feltet „Affasning af kanten“: Det sætter en affasning på 45° på lommens øverste kant, så kanten ikke er skarp, og skruen lettere finder vej ind. Affasningen ligger uden for hoveddiameteren, så skruehovedet stadig passer, og den forbliver et eksakt legeme, også i et langhul."
+        }
+      },
+      {
+        "title": {
+          "de": "Aushöhlen: importierte flache Figuren mit leicht schrägen Seiten",
+          "en": "Hollow: imported flat figures with sides that lean a hair",
+          "da": "Hul: importerede flade figurer med en anelse skrå sider"
+        },
+        "body": {
+          "de": "Ein STL, dessen Ober- und Unterseite getrennt abgetastet wurden, hat Seiten aus vielen einzelnen, ganz leicht geneigten Dreiecken. Aushöhlen gab bei so einer Figur bei jeder Wandstärke auf. Jetzt höhlt es sie über ihren Umriss aus, wie einen geraden Körper, und die Außenseite bleibt, wie sie ist.",
+          "en": "An STL whose top and bottom were sampled apart has sides of many single triangles, each leaning a tiny bit. Hollow gave up on such a figure at any wall thickness. Now it hollows it through its outline, as it does an upright body, and the outside stays as it is.",
+          "da": "En STL, hvis top og bund er samplet hver for sig, har sider af mange enkelte trekanter, der hver hælder en lille smule. Hul gav op over for sådan en figur ved enhver vægtykkelse. Nu udhuler det den gennem dens omrids, som en lodret krop, og ydersiden forbliver, som den er."
+        }
+      },
+      {
+        "title": {
+          "de": "Werkzeuge mit CAD-Kern laufen auch bei langsamer Leitung",
+          "en": "CAD tools work on a slow connection too",
+          "da": "CAD-værktøjer virker også på en langsom forbindelse"
+        },
+        "body": {
+          "de": "Aushöhlen, Verrundung, Fase und die anderen Werkzeuge mit CAD-Kern laden den Kern (21 MB) beim ersten Gebrauch. Die Wartezeit zählte diesen Download mit: Bei langsamer Leitung lief sie ab, der Download begann von vorn, und jedes Werkzeug meldete eine Zeitüberschreitung. Jetzt lädt der Editor den Kern vorab, sobald er bereit ist, und die Wartezeit beginnt erst, wenn der Kern geladen ist.",
+          "en": "Hollow, Fillet, Chamfer and the other tools that use the CAD kernel load it (21 MB) the first time they need it. Their time limit counted that download: on a slow connection it ran out, the download began again, and every tool timed out. Now the editor loads the kernel ahead once it is ready, and the time limit starts only when the kernel is loaded.",
+          "da": "Hul, Rund, Fas og de andre værktøjer med CAD-kernen henter kernen (21 MB), første gang de skal bruge den. Ventetiden talte den download med: På en langsom forbindelse løb den ud, downloaden begyndte forfra, og hvert værktøj meldte timeout. Nu henter editoren kernen på forhånd, så snart den er klar, og ventetiden begynder først, når kernen er hentet."
+        }
+      },
+      {
+        "title": {
+          "de": "Auswahlfelder: ganze Wahl lesbar, Hinweis über die ganze Breite",
+          "en": "Drop-downs: the whole choice shows, the note runs full width",
+          "da": "Rullelister: hele valget kan ses, noten går i fuld bredde"
+        },
+        "body": {
+          "de": "Bei einer langen Beschriftung wie „Durch die Querschnitte“ im Loft war das Auswahlfeld so schmal, dass „Gerade“ abgeschnitten wurde, und der Hinweis darunter stand in einer schmalen Spalte. Jetzt bricht eine lange Beschriftung um und lässt dem Feld Platz, und Hinweise unter Auswahlfeldern nutzen die ganze Breite wie unter den Zahlenfeldern.",
+          "en": "With a long label like “Through the Sections” in the loft, the drop-down was so narrow that “Straight” was cut off, and the note below it ran in a narrow column. Now a long label wraps and leaves the field room, and notes under drop-downs use the whole width, as under the number fields.",
+          "da": "Med en lang etiket som „Gennem sektionerne“ i loftet var rullelisten så smal, at „Lige“ blev skåret af, og noten under den stod i en smal kolonne. Nu brydes en lang etiket om og giver feltet plads, og noter under rullelister bruger hele bredden ligesom under talfelterne."
+        }
+      },
+      {
+        "title": {
+          "de": "Hohlrad und Zahnstange auch schräg- und pfeilverzahnt",
+          "en": "Helical and herringbone ring gears and racks",
+          "da": "Skrå- og sildebensfortandede indvendige tandhjul og tandstænger"
+        },
+        "body": {
+          "de": "Hohlrad und Zahnstange haben jetzt einen Schrägungswinkel und die Wahl Pfeilverzahnung, damit sie mit einem Schräg- oder Pfeilzahnrad laufen. Sie bekommen denselben Winkel wie das Zahnrad, das mit ihnen läuft. Die Zahnstange behält ihre Länge, ihre schrägen Zähne werden an den Enden gerade abgeschnitten, und beide gehen als exakte Körper in den STEP-Export.",
+          "en": "Ring gears and racks now take a helix angle and herringbone teeth, so they run with a helical or herringbone gear. Give them the same angle as the gear that runs with them. The rack keeps its length, its slanted teeth cut off square at the ends, and both go to the STEP export as exact bodies.",
+          "da": "Indvendige tandhjul og tandstænger har nu en skråvinkel og valget sildebensfortanding, så de kan køre med et skrå- eller sildebenstandhjul. De får samme vinkel som det tandhjul, der kører med dem. Tandstangen beholder sin længde, dens skrå tænder skæres lige af i enderne, og begge går til STEP-eksporten som eksakte legemer."
+        }
+      }
+    ]
+  },
+  {
     "version": "1.156.4",
     "items": [
       {

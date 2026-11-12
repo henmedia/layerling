@@ -260,6 +260,20 @@ export function placementWorkplaneIsBase(workplane: PlacementWorkplane) {
   );
 }
 
+/**
+ * How far along X a workplane lies that is the plate itself, only moved sideways - the plate's frame put in the middle of
+ * another build plate, where a new sketch starts on that plate (#1660) - or null for any other workplane (lifted, tilted,
+ * turned, or moved along Z). The base plate itself gives 0.
+ */
+export function placementWorkplanePlateShift(workplane: PlacementWorkplane): number | null {
+  const near = (value: number, target: number) => Math.abs(value - target) < 1e-6;
+  const upright = near(workplane.normal.x, 0) && near(workplane.normal.y, 1) && near(workplane.normal.z, 0);
+  const square = near(workplane.xAxis.x, 1) && near(workplane.xAxis.y, 0) && near(workplane.xAxis.z, 0)
+    && near(workplane.zAxis.x, 0) && near(workplane.zAxis.y, 0) && near(workplane.zAxis.z, 1);
+  if (!upright || !square || Math.abs(workplane.origin.y) > 1e-6 || Math.abs(workplane.origin.z) > 1e-6) return null;
+  return Math.abs(workplane.origin.x) < 1e-6 ? 0 : workplane.origin.x;
+}
+
 // A workplane moved or turned on the plate but still lying in its plane. Its grid
 // and the plate's then share one plane, slightly offset, and the two make a
 // moiré (#178), so the plate keeps only its outline.

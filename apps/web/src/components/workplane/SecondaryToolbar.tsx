@@ -2,10 +2,12 @@
 
 import { GuideHelpLink } from "@/components/GuideHelpLink";
 import { FocusModeBar } from "@/components/workplane/FocusModeBar";
+import { ProjectNameField } from "@/components/workplane/ProjectNameField";
 import { FOCUS_MODE_CHANGE_EVENT, FOCUS_MODE_SHORTCUT } from "@/lib/focusMode";
 import { ShapeMenuPanel } from "@/components/workplane/ShapeMenuPanel";
 import { ShapeLibraryList } from "@/components/workplane/ShapeLibraryList";
-import { AlertTriangle, ArrowDownToLine, ArrowLeftRight, ArrowUpFromLine, Check, CircleHelp, Percent, Circle as CircleIcon, Eye, EyeOff, Hexagon as HexagonIcon, ListTree, Maximize2, Minimize2, Pencil, Pentagon as PentagonIcon, Pin, PinOff, Rotate3d, Route as RouteIcon, ScanEye, Search, Sparkles, Square as SquareIcon, Star as StarIcon, Triangle as TriangleIcon, X } from "lucide-react";
+import { AlertTriangle, ArchiveRestore, ArrowDownToLine, ArrowLeftRight, ArrowUpFromLine, Check, CircleHelp, Percent, Circle as CircleIcon, Eye, EyeOff, Hexagon as HexagonIcon, ListTree, Maximize2, Minimize2, Pentagon as PentagonIcon, Pin, PinOff, Rotate3d, Route as RouteIcon, ScanEye, Search, Sparkles, Square as SquareIcon, Star as StarIcon, Triangle as TriangleIcon, X } from "lucide-react";
+import { OPEN_FILE_BACKUPS_EVENT } from "@/lib/fileBackups";
 import { useEffect, useLayoutEffect, useRef, useState, type CSSProperties } from "react";
 import { createPortal } from "react-dom";
 import { useWheelField } from "@/lib/useWheelField";
@@ -737,32 +739,6 @@ export function SecondaryToolbar({
   const visibilityMenuRef = useRef<HTMLDivElement>(null);
   const touchShapeStartRef = useRef<{ id: string; x: number; y: number } | null>(null);
   const suppressNextShapeClickRef = useRef(false);
-  const cancelProjectNameEditRef = useRef(false);
-  const projectNameFieldRef = useRef<HTMLLabelElement>(null);
-  const projectNameInputRef = useRef<HTMLInputElement>(null);
-  const [projectNameDraft, setProjectNameDraft] = useState(projectName);
-  useEffect(() => {
-    setProjectNameDraft(projectName);
-  }, [projectName]);
-  useEffect(() => {
-    const finishProjectNameEdit = (event: PointerEvent) => {
-      const input = projectNameInputRef.current;
-      if (input && document.activeElement === input && !projectNameFieldRef.current?.contains(event.target as Node)) {
-        input.blur();
-      }
-    };
-    document.addEventListener("pointerdown", finishProjectNameEdit, true);
-    return () => document.removeEventListener("pointerdown", finishProjectNameEdit, true);
-  }, []);
-  const commitProjectName = (value: string) => {
-    const nextName = value.trim().slice(0, 80);
-    if (!nextName) {
-      setProjectNameDraft(projectName);
-      return;
-    }
-    setProjectNameDraft(nextName);
-    if (nextName !== projectName) onProjectNameChange?.(nextName);
-  };
   const selectToolbarMode = (mode: "geometry" | "sketch") => {
     setShapesOpen(false);
     setVisibilityOpen(false);
@@ -1295,6 +1271,7 @@ export function SecondaryToolbar({
       plain("note", t("editor.tool.note"), visibilityGroup, true, onNoteTool, { icon: ToolbarNoteIcon, active: noteMode }),
       plain("import", t("editor.import"), fileGroup, true, () => onTopPanel("import"), { icon: ToolbarImportIcon }),
       plain("export", t("editor.export"), fileGroup, true, () => onTopPanel("export"), { icon: ToolbarVectorExportIcon }),
+      plain("file-backups", t("backups.title"), fileGroup, true, () => window.dispatchEvent(new Event(OPEN_FILE_BACKUPS_EVENT)), { icon: ArchiveRestore, keywords: ["backup", "backups", "version", "versions", "restore", "sicherung", "fassung", "wiederherstellen"] }),
       plain("attachments", t("editor.attachments"), fileGroup, true, () => onTopPanel("attachments"), { icon: ToolbarAttachmentsIcon, keywords: ["attachment", "file", "notes", "instructions", "readme", "anhang", "datei"] }),
       plain("settings", t("editor.workspaceSettings"), t("editor.group.help"), true, () => window.dispatchEvent(new Event("layerling:open-workspace-settings")), { icon: ToolbarSettingsIcon }),
       plain("focus-mode", focusMode ? t("focusMode.leave") : t("focusMode.enter"), t("shortcuts.group.view"), Boolean(onFocusModeChange), () => onFocusModeChange?.(!focusMode), { icon: focusMode ? Minimize2 : Maximize2, active: focusMode }),
@@ -1892,32 +1869,7 @@ export function SecondaryToolbar({
           </button>
         </div>
         <div className="toolbar-project-name">
-          <label ref={projectNameFieldRef} className="toolbar-project-name-field" title={t("editor.renameProject")}>
-            <input
-              ref={projectNameInputRef}
-              aria-label={t("confirm.projectName")}
-              value={projectNameDraft}
-              maxLength={80}
-              spellCheck={false}
-              onChange={(event) => setProjectNameDraft(event.target.value)}
-              onBlur={(event) => {
-                if (cancelProjectNameEditRef.current) {
-                  cancelProjectNameEditRef.current = false;
-                  setProjectNameDraft(projectName);
-                  return;
-                }
-                commitProjectName(event.currentTarget.value);
-              }}
-              onKeyDown={(event) => {
-                if (event.key === "Enter") event.currentTarget.blur();
-                if (event.key === "Escape") {
-                  cancelProjectNameEditRef.current = true;
-                  event.currentTarget.blur();
-                }
-              }}
-            />
-            <Pencil size={13} strokeWidth={2.4} aria-hidden="true" />
-          </label>
+          <ProjectNameField projectName={projectName} onProjectNameChange={onProjectNameChange} />
         </div>
         <div className="toolbar-title-row-actions">
           {/* Focus mode (Discussion #1554): this row and the footer make room, a small bar over the view keeps the tabs. */}
@@ -1988,6 +1940,7 @@ export function SecondaryToolbar({
           onSettings={() => window.dispatchEvent(new Event("layerling:open-workspace-settings"))}
           onLeave={() => onFocusModeChange(false)}
           showSearch={!simpleMode}
+          nameField={<ProjectNameField className="focus-mode-bar-name" projectName={projectName} onProjectNameChange={onProjectNameChange} />}
         />
       ) : null}
     </div>

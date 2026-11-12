@@ -572,14 +572,24 @@ describe("the lid's panel with a slide-in lid (Discussion #1443)", () => {
     act(() => root?.unmount());
     const on = mount({ type: "slide", clickBumps: true, handle: "notch" }).panel;
     expect(slider(on, "Bump height")).not.toBeNull();
-    expect(texts(on)).toContain("A small bump under the lid's end clicks past the inner edge of the cut wall");
+    expect(texts(on)).toContain("A small bump under the lid's end clicks past the inner edge of the wall it slides in through");
     expect(texts(on)).not.toContain("snap into dimples in the body");
-    expect(texts(on)).toContain("Four grooves across the lid's top near its end at the cut wall, for a thumb to push it out.");
+    expect(texts(on)).toContain("Four grooves across the lid's top near its end at the wall it slides in through, for a thumb to push it out.");
     expect(texts(on)).not.toContain("A recess in the body's front wall");
     const handles = on.querySelector<HTMLElement>('[role="radiogroup"][aria-label="Handle"]')!;
     expect([...handles.querySelectorAll<HTMLButtonElement>('[role="radio"]')].every((button) => !button.disabled)).toBe(true);
     act(() => root?.unmount());
-    expect(texts(mount({ type: "slide", handle: "tab" }).panel)).toContain("A tab as thick as the plate, 6 mm out from the lid's end at the cut wall, to pull it out by.");
+    expect(texts(mount({ type: "slide", handle: "tab" }).panel)).toContain("A tab as thick as the plate, 6 mm out from the lid's end at the wall it slides in through, to pull it out by.");
+    act(() => root?.unmount());
+    // With a frame that wall is not cut down but has a slot (#1497): the hints for the bump, the grip and the tab hold
+    // for both, so none of them speaks of a cut wall.
+    for (const handle of ["notch", "tab"] as const) {
+      const framed = texts(mount({ type: "slide", slideFrame: 2, clickBumps: true, handle }).panel);
+      expect(framed).toContain("clicks past the inner edge of the wall it slides in through");
+      expect(framed).toContain(handle === "tab" ? "A tab as thick as the plate" : "Four grooves across the lid's top");
+      expect(framed).not.toContain("cut wall");
+      act(() => root?.unmount());
+    }
   });
 
   it("asks how far below the rim the lid sits, framed by the walls, 0 to begin with, says what changes and how low a frame is too low", () => {

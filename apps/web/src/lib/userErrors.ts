@@ -48,12 +48,12 @@ export const ERROR_RULES: ErrorRule[] = [
   { pattern: /The exact (profile body|thread body|spring body|gear body|Hirth joint|Gridfinity body|screw boss|snap-fit|rib) (is not|does not)|The pulley body is not a valid solid|The imported STEP body does not match/i, key: "error.exactBodyInvalid" },
   // No exact body, and the mesh too dense to stand in for it (cadModifier.worker.ts).
   { pattern: /could not be (re)?built as an exact( CAD)? body, and its mesh is too dense|could not be restored for edge treatment, and its mesh is too dense/i, key: "error.solidNotValid" },
-  { pattern: /The (thread|gear|spring) body is not a valid solid|The (Hirth joint|Gridfinity body) is not a valid solid/i, key: "error.solidNotValid" },
+  { pattern: /The (thread|gear|ring gear|rack|spring) body is not a valid solid|The (Hirth joint|Gridfinity body) is not a valid solid/i, key: "error.solidNotValid" },
   // Enclosure parts (enclosureSolid.ts): screw boss, snap-fit and rib.
   { pattern: /The (screw boss|snap-fit|rib) is not a valid solid|The (screw boss|rib|gusset)[\w' ]{0,40} came out as \d+ solids|The snap-fit has neither hook nor catch/i, key: "error.solidNotValid" },
-  { pattern: /The (thread|gear|spring|Hirth joint)'s .* (came out as|sewed into|did not close|did not sweep)/i, key: "error.solidNotValid" },
-  { pattern: /The (thread|gear|spring|Hirth joint|pulley)'s measures are out of range/i, key: "error.measuresOutOfRange" },
-  { pattern: /(gear|Hirth joint)( with its bore)? came out as|The pulley [\w ]{1,40} came out as/i, key: "error.solidNotValid" },
+  { pattern: /The (thread|gear|ring gear|spring|Hirth joint)'s .* (came out as|sewed into|did not close|did not sweep)/i, key: "error.solidNotValid" },
+  { pattern: /The (thread|gear|rack|spring|Hirth joint|pulley)'s measures are out of range|The ring gear's rim does not reach round its teeth/i, key: "error.measuresOutOfRange" },
+  { pattern: /(gear|rack|Hirth joint)( with its bore)? came out as|The pulley [\w ]{1,40} came out as/i, key: "error.solidNotValid" },
   // Measures a profile cannot be built from (cadProfileSolid.ts): an outline, a loft or a sweep path that does not hold together.
   { pattern: /The profile (has no height|has no outline|outline (is incomplete|has an invalid|has a zero-length|is not closed))|A profile arc does not meet|The loft's (point is not a number|top does not match)|A section of the loft does not match|A loft to a point (needs|cannot)|The sweep has no centre line|A sweep (piece|bend)|A straight sweep piece has no length/i, key: "error.primitiveDimensions" },
   { pattern: /(loft|sweep|swept|tapered)[\w' ]{0,40} did not (become|close|make)|moved outlines are not a valid face|(elliptical arc|half ellipse) differently than expected|The profile did not become one solid|^sweep:invalid|letter could not be widened|widened text (has no letters|is not a valid solid|does not keep)/i, key: "error.solidNotValid" },
@@ -63,6 +63,9 @@ export const ERROR_RULES: ErrorRule[] = [
   { pattern: /Drawing source contains/i, key: "error.drawingNoGeometry" },
   // Profiles turned, swept, lofted, trimmed or with rounded or chamfered ends (cadProfileSolid.ts), and lofts.
   { pattern: /profile solid (is not valid|is inside out|are not valid|does not keep)|A loft through its sections did not become one solid/i, key: "error.solidNotValid" },
+  // A slotted hole's straight section and a sloped profile's rounded rims (cadProfileSolid.ts).
+  { pattern: /A slotted hole's section has no width/i, key: "error.measuresOutOfRange" },
+  { pattern: /A slotted hole needs one section of straight lines|The slotted hole (did not become one solid|is not a valid solid)|The sloped profile solid has no edges to round/i, key: "error.solidNotValid" },
   { pattern: /thread's chamfer reaches its axis/i, key: "error.threadChamferAxis" },
   { pattern: /gear's centre hole reaches its teeth/i, key: "error.gearHoleTeeth" },
   { pattern: /crescent horn rounding does not fit/i, key: "error.crescentRounding" },

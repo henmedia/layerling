@@ -35,6 +35,7 @@ A derékszögvonalzó a munkasíkon fekszik. Ha az egy test oldalán van, a der�
 - **Egy rövid kattintás a fogantyúra** 90°-kal elforgatja.
 - **A mellette lévő ×** eltávolítja.
 - **A szár végén lévő kis kör húzásával** a szár hosszabb vagy rövidebb lesz, egész milliméterenként. A fogantyú alatti legalsó gomb, a {{ui:ruler.armsToPlate}}, mindkét szárat olyan hosszúra állítja, amilyen széles és mély a beállításokban választott nyomtató asztala. A derékszög a terv mellett megőrzi a szárak hosszát, és az újra lerakott átveszi azt.
+- **{{ui:ruler.arms}}** (a háromtengelyes gomb, közvetlenül fölötte) minden szárhoz kapcsolót nyit, annak a tengelynek a nevével, amely mentén fut. A síkban fekvő két szár mellett van egy harmadik is, amely a saroknál merőlegesen áll a munkasíkra: az asztalon Z mentén felfelé mutat, saját beosztással, hengerhez vagy bármihez, amit felfelé építesz. Kezdetben ki van kapcsolva: kattints a betűjére, hogy megjelenjen, és a végén lévő kis kört húzva hosszabbíthatod vagy rövidítheted. A síkbeli szárakat ugyanígy kikapcsolhatod, ha útban vannak; egy szár mindig marad. A kijelölt test zöld számai megmaradnak, bármelyik szár látszik is, és a terv megjegyzi, melyek látszanak.
 - **A fogantyútól balra lévő kis gomb** azt váltja, honnan mér: egy test külső oldalától (végpont, vonalas ikon) vagy a közepétől (középpont, célkereszt). Minden zöld szám mellett egy ugyanilyen kis kapcsoló van, amely csak azt a számot állítja: egy álló hengernél a két szárban a közepet, magasságban az alját, egy fekvőnél keresztben a közepet, hosszában az egyik végét. Ha mindhárom újra egyezik, a fogantyúnál lévő gomb a közös módot mutatja.
 
 Ha testek állnak valamelyik szárnál, a derékszögvonalzó automatikusan mutatja a méreteiket. Ez csak az alaplapon működik, egy test oldalán nem. A derékszögvonalzó fogantyúja alatti nyilas gomb ezt kikapcsolja, így csak a kijelölt testek mutatják a méreteiket; a tervvel együtt mentődik.
@@ -49,7 +50,7 @@ A mérőszalag és a derékszögvonalzó is a helyén marad, amíg vázlatot ké
 
 Szöget a nézetsáv {{ui:camera.protractor}} gombjával mérsz. Mellette gombsor nyílik, és amíg újra rá nem kattintasz a gombra, vagy meg nem nyomod az [[Esc]] billentyűt, a nézetbe kattintva a szögmérővel mérsz. A mérőszalaghoz hasonlóan a testek sarkaihoz és éleihez illeszkedik; a testek mellett pontot tesz a lapra.
 
-- {{ui:camera.protractorPoints}}: először a szög csúcsára kattints, aztán mindkét szárán egy-egy pontra. Az utolsó pont elhelyezése közben a szög már látszik; a harmadik kattintás után megmarad, a szárak közti ívvel. Ez a csúcsnál lévő szög, 0° és 180° között.
+- {{ui:camera.protractorPoints}}: először a szög csúcsára kattints, aztán mindkét szárán egy-egy pontra. Az utolsó pont elhelyezése közben a szög már látszik; a harmadik kattintás után megmarad, a szárak közti ívvel. Ez a csúcsnál lévő szög, 0° és 180° között. Egyenesen felülről, elölről vagy oldalról nézve úgy méri a szöget, ahogy ott látszik: egy felső sarok és a közvetlenül alatta lévő alsó sarok ugyanaz a pont. Ferde nézetben a térbeli szöget méri.
 - {{ui:camera.protractorFaces}}: kattints két sík lapra. Mindegyiken egy rövid kék vonal mutatja, merre néz, a felirat pedig mindkét szöget megadja, amelyet a lapok bezárnak, a kisebbet elöl: egy 45°-os letörés a felső laphoz képest 45° · 135°, egy hasáb két oldala csak 90°. Egy ívelt lapnak nincs egyetlen iránya, ezért a szögmérő sík lapot kér.
 
 Egy kész szög utáni következő kattintás újat kezd, a {{ui:camera.protractorClear}} pedig eltávolítja. A szög követi a testeket, ha elmozdulnak vagy elfordulnak. Semmi sem mentődik belőle, és az előzményekbe sem kerül: eltűnik, amikor elteszed a szögmérőt.
@@ -58,7 +59,7 @@ Egy kész szög utáni következő kattintás újat kezd, a {{ui:camera.protract
 
 A beállításokban a {{ui:workspace.appearance}} alatt két kapcsoló van az élő méretekhez:
 
-- A {{ui:workspace.showMoveDimensions}} húzás közben mutatja, mennyit mozdulsz. Ez a test feletti fekete nyíllal való emelésre is érvényes; az utat az elülső sarkánál mutatja. Elengedés után kattints egy ilyen számra, és írd be a pontos távolságot; a negatív érték lefelé visz.
+- A {{ui:workspace.showMoveDimensions}} húzás közben mutatja, mennyit mozdulsz. Ez a test feletti kék nyíllal való emelésre is érvényes; az utat az elülső sarkánál mutatja. Elengedés után kattints egy ilyen számra, és írd be a pontos távolságot; a negatív érték lefelé visz.
 - Az {{ui:workspace.showOriginDimensions}} a kijelölés távolságait mutatja a tárgyasztal origójától, több kijelölt testnél is.
 
 A {{ui:workspace.dimensionsAlwaysVisible}} beállítással a méretek állandóan láthatók maradnak. Ha egy test nem a munkasíkon áll, a fölötte lévő magassága is látszik; a számra kattintva újat írhatsz be.

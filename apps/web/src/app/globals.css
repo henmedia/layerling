@@ -710,34 +710,36 @@ button {
   transform: translate(-50%, -50%);
 }
 
+/* No rounding: the shimmer's radius only showed on the corners the faces share with their boxes, not on the top. */
 .editor-loading-model span {
   position: absolute;
-  border-radius: 8px;
+  border-radius: 0;
   box-shadow: 0 10px 24px rgba(94, 72, 48, 0.08);
 }
 
+/* A 2:1 isometric box, 66 px from its middle to each side, the faces 6 px apart with even seams. */
 .editor-loading-model-top {
-  top: 9px;
+  top: 10px;
   left: 24px;
   width: 132px;
   height: 66px;
-  clip-path: polygon(50% 0, 100% 44%, 50% 100%, 0 44%);
+  clip-path: polygon(66px 0, 132px 33px, 66px 66px, 0 33px);
 }
 
 .editor-loading-model-front {
-  top: 66px;
+  top: 49px;
   left: 24px;
-  width: 66px;
-  height: 78px;
-  clip-path: polygon(0 0, 100% 27%, 100% 100%, 0 72%);
+  width: 63px;
+  height: 103.5px;
+  clip-path: polygon(0 0, 63px 31.5px, 63px 103.5px, 0 72px);
 }
 
 .editor-loading-model-side {
-  top: 66px;
-  left: 90px;
-  width: 66px;
-  height: 78px;
-  clip-path: polygon(0 27%, 100% 0, 100% 72%, 0 100%);
+  top: 49px;
+  left: 93px;
+  width: 63px;
+  height: 103.5px;
+  clip-path: polygon(0 31.5px, 63px 0, 63px 72px, 0 103.5px);
 }
 
 .editor-loading-viewport-controls {
@@ -2664,6 +2666,30 @@ html[data-theme="dark"] .whats-new-earlier:hover {
   opacity: 0.45;
 }
 
+/* "Keep empty design?" (Discussion #1669): the question larger and centred,
+   Keep in green beside the red Delete, so the answers tell themselves apart. */
+.empty-project-dialog header {
+  justify-content: center;
+  text-align: center;
+}
+
+.empty-project-dialog header strong {
+  font-size: 18px;
+}
+
+.empty-project-dialog p {
+  text-align: center;
+}
+
+.empty-project-dialog .dashboard-confirm-actions {
+  justify-content: center;
+}
+
+.empty-project-dialog .dashboard-confirm-save {
+  border-color: #2e7d32;
+  background: #2e7d32;
+}
+
 .dashboard-rename-dialog > label {
   display: grid;
   gap: 7px;
@@ -4130,8 +4156,7 @@ html[data-theme="dark"] .toolbar-ribbon-pin:hover {
   color: inherit;
 }
 
-.toolbar-title-help .action-icon-button:hover,
-.toolbar-title-help .action-icon-button.active {
+.toolbar-title-help .action-icon-button:hover {
   color: var(--group-color);
 }
 
@@ -4139,9 +4164,34 @@ html[data-theme="dark"] .toolbar-title-help .action-icon-button {
   color: #e3d3c0;
 }
 
-html[data-theme="dark"] .toolbar-title-help .action-icon-button:hover,
-html[data-theme="dark"] .toolbar-title-help .action-icon-button.active {
+html[data-theme="dark"] .toolbar-title-help .action-icon-button:hover {
   color: #f7f2ea;
+}
+
+/* Interactive Help, while it is on: its circle is filled orange with the question mark light in it. Only a change of
+   colour of the question mark looked like the other help buttons, and it was taken for off (Discussion #1640). The
+   circle itself is filled, not the button: the button is wider than the icon, and a filled button stood square and
+   to one side of the round icon. */
+.toolbar-title-help .action-icon-button.active,
+.toolbar-title-help .action-icon-button.active:hover {
+  color: #d07415;
+}
+
+.toolbar-title-help .action-icon-button.active svg circle {
+  fill: currentColor;
+}
+
+.toolbar-title-help .action-icon-button.active svg path {
+  stroke: #fff;
+}
+
+html[data-theme="dark"] .toolbar-title-help .action-icon-button.active,
+html[data-theme="dark"] .toolbar-title-help .action-icon-button.active:hover {
+  color: #f29a45;
+}
+
+html[data-theme="dark"] .toolbar-title-help .action-icon-button.active svg path {
+  stroke: #2a2017;
 }
 
 /* On a narrow window - a tablet held upright - the name of the design needs the room: the colour scheme keeps its
@@ -8513,15 +8563,46 @@ html[data-theme="dark"] .touch-multi-select {
 /* The ruler's lines stay in view over bodies (the eye is open) or hide behind them. */
 .corner-ruler-occlude-toggle,
 .corner-ruler-selected-toggle,
-.corner-ruler-plate-toggle {
+.corner-ruler-plate-toggle,
+.corner-ruler-arms-toggle {
   color: #6b5b46;
   background: rgba(255, 255, 255, 0.96);
   border-color: rgba(182, 97, 8, 0.45);
 }
 
 .corner-ruler-occlude-toggle.active,
-.corner-ruler-selected-toggle.active {
+.corner-ruler-selected-toggle.active,
+.corner-ruler-arms-toggle.active {
   color: #b66108;
+}
+
+/* The switch of one arm (Discussion #1649): its axis letter, filled in the axis colour while the arm is shown. */
+.corner-ruler-arm-toggle {
+  --corner-ruler-arm-axis: #6b5b46;
+  width: 18px;
+  height: 18px;
+  color: var(--corner-ruler-arm-axis);
+  background: rgba(255, 255, 255, 0.96);
+  border: 1px dashed var(--corner-ruler-arm-axis);
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.corner-ruler-arm-toggle.axis-x { --corner-ruler-arm-axis: #d6363c; }
+.corner-ruler-arm-toggle.axis-y { --corner-ruler-arm-axis: #2f9a4b; }
+.corner-ruler-arm-toggle.axis-z { --corner-ruler-arm-axis: #2f6fe0; }
+
+.corner-ruler-arm-toggle.active,
+.corner-ruler-arm-toggle.active:hover {
+  color: #ffffff;
+  background: var(--corner-ruler-arm-axis);
+  border-style: solid;
+}
+
+/* The last arm shown cannot be switched off. */
+.corner-ruler-arm-toggle:disabled {
+  cursor: default;
 }
 
 .corner-ruler-tick-label.hidden,
@@ -8577,6 +8658,22 @@ html[data-theme="dark"] .touch-multi-select {
 [data-theme="dark"] .corner-ruler-mode-toggle:hover {
   background: rgba(46, 125, 50, 0.35);
   border-color: #81c784;
+}
+
+[data-theme="dark"] .corner-ruler-arm-toggle.axis-x { --corner-ruler-arm-axis: #ff6b70; }
+[data-theme="dark"] .corner-ruler-arm-toggle.axis-y { --corner-ruler-arm-axis: #5fd47c; }
+[data-theme="dark"] .corner-ruler-arm-toggle.axis-z { --corner-ruler-arm-axis: #6aa0ff; }
+
+[data-theme="dark"] .corner-ruler-arm-toggle {
+  color: var(--corner-ruler-arm-axis);
+  border-color: var(--corner-ruler-arm-axis);
+}
+
+[data-theme="dark"] .corner-ruler-arm-toggle.active,
+[data-theme="dark"] .corner-ruler-arm-toggle.active:hover {
+  color: #14110e;
+  background: var(--corner-ruler-arm-axis);
+  border-color: var(--corner-ruler-arm-axis);
 }
 
 [data-theme="dark"] .ruler-coordinate-badge {
@@ -9244,6 +9341,7 @@ html[data-theme="dark"] .align-dot.axis-z, html[data-theme="dark"] .align-spread
     border-color: var(--hover-accent-border-color);
 }
 
+/* The lift arrow moves along Z, so it is blue like the Z turn arrow and the Z axis arrow on the plate (Facebook group). */
 .transform-handle.height-lift {
   border: 0;
   width: 0;
@@ -9251,13 +9349,13 @@ html[data-theme="dark"] .align-dot.axis-z, html[data-theme="dark"] .align-spread
   background: transparent;
   border-left: 6px solid transparent;
   border-right: 6px solid transparent;
-  border-bottom: 13px solid #433629;
+  border-bottom: 13px solid #2f6fe0;
   box-shadow: none;
 }
 
 .transform-handle.height-lift.lower {
   border-bottom: 0;
-  border-top: 13px solid #433629;
+  border-top: 13px solid #2f6fe0;
 }
 
 .transform-handle.height-lift:hover {
@@ -9935,6 +10033,34 @@ html[data-theme="dark"] .rotation-angle-badge {
   font-weight: 600;
 }
 
+/* The colour code in the header of the colour card, to type in (Discussion #1674): text until pointed at. */
+.color-hex-input {
+  width: 92px;
+  min-width: 0;
+  padding: 3px 6px;
+  border: 1px solid transparent;
+  border-radius: 5px;
+  background: transparent;
+  font-family: inherit;
+  text-align: right;
+}
+
+.color-hex-input:hover:not(:disabled),
+.color-hex-input:focus {
+  border-color: rgba(152, 132, 111, 0.55);
+}
+
+.color-hex-input:focus {
+  outline: none;
+  background: rgba(152, 132, 111, 0.1);
+  text-align: left;
+}
+
+.color-hex-input::placeholder {
+  color: inherit;
+  opacity: 1;
+}
+
 .color-grid {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
@@ -10464,13 +10590,20 @@ html[data-theme="dark"] .property-defaults-actions button {
 
 .select-property {
   display: grid;
-  /* A long label (German "Buchstabenkanten") takes the room it needs instead of running under the field. */
-  grid-template-columns: minmax(92px, max-content) minmax(0, 1fr);
+  /* A long label (German "Buchstabenkanten") takes the room it needs instead of running under the field,
+     but at most a little over half the row: past that it wraps, and the field keeps room for its choice
+     ("Through the Sections" left "Straight" cut off, Discussion #1614). */
+  grid-template-columns: fit-content(55%) minmax(0, 1fr);
   align-items: center;
   gap: 10px;
   color: #867563;
   font-size: 15px;
   font-weight: 650;
+}
+
+/* Short labels still start their fields at the same place. */
+.select-property > span:first-child {
+  min-width: 92px;
 }
 
 /* The board's number fields keep their width and a long label wraps instead: "Reach through the wall (mm)" squeezed its field until the last digit was cut off (#1344). */
@@ -11362,8 +11495,9 @@ html[data-theme="dark"] .shape-inspector .name-tag-start .name-tag-start-button:
   border-color: #f0a65a;
 }
 
+/* Across the whole row, as under the number fields: under the field alone it was a narrow column (Discussion #1614). */
 .select-property-hint {
-  grid-column: 2;
+  grid-column: 1 / -1;
   margin-top: -5px;
   color: #8d7b68;
   font-size: 12px;
@@ -14446,11 +14580,11 @@ html[data-theme="dark"] .transform-handle.axis-y { background: #5fd47c; border-c
 html[data-theme="dark"] .transform-handle.axis-z { background: #6aa0ff; border-color: #163f86; }
 
 html[data-theme="dark"] .transform-handle.height-lift {
-  border-bottom-color: #ffffff;
+  border-bottom-color: #6aa0ff;
 }
 
 html[data-theme="dark"] .transform-handle.height-lift.lower {
-  border-top-color: #ffffff;
+  border-top-color: #6aa0ff;
 }
 
 html[data-theme="dark"] .transform-handle.height-lift:hover {
@@ -15284,7 +15418,10 @@ html[data-theme="dark"] .theme-check {
   display: flex;
   flex-direction: column;
   width: 300px;
-  max-width: calc(100vw - 120px);
+  /* Wider or narrower at the lower right corner (Discussion #1636); MIN/MAX_PANEL_WIDTH in ObjectListPanel.tsx. */
+  min-width: min(240px, calc(100vw - 120px));
+  max-width: min(600px, calc(100vw - 120px));
+  resize: horizontal;
   max-height: calc(100% - 96px);
   background: rgba(254, 253, 252, 0.96);
   backdrop-filter: blur(12px);
@@ -15649,14 +15786,18 @@ html[data-theme="dark"] .theme-check {
   flex: none;
 }
 
+/* One letter for Solid or Hole, the word as its tooltip (Discussion #1636). */
 .outliner-badge {
   display: inline-block;
-  padding: 1px 6px;
+  min-width: 18px;
+  padding: 1px 4px;
   font-size: 10px;
   font-weight: 700;
+  line-height: 14px;
+  text-align: center;
   border-radius: 4px;
   text-transform: uppercase;
-  letter-spacing: 0.02em;
+  cursor: default;
 }
 
 .outliner-badge.badge-solid {
@@ -15672,8 +15813,10 @@ html[data-theme="dark"] .theme-check {
 }
 
 .outliner-badge.small {
-  padding: 0 4px;
+  min-width: 15px;
+  padding: 0 3px;
   font-size: 9px;
+  line-height: 12px;
 }
 
 .outliner-row-actions {
@@ -16008,6 +16151,40 @@ html[data-theme="dark"] .export-holes-only-warning svg {
 /* ==========================================================================
    Open group: the bar that closes it again
    ========================================================================== */
+/* The newest state of the design could not be stored (#1652): stays up, red, until a save gets through. */
+.unsaved-design-banner {
+  position: fixed;
+  bottom: 140px;
+  left: 50%;
+  z-index: 42;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  max-width: min(640px, calc(100vw - 32px));
+  padding: 10px 16px;
+  color: #fff;
+  font-size: 13px;
+  line-height: 1.4;
+  background: #c82031;
+  border-radius: 10px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.25);
+  transform: translateX(-50%);
+}
+
+.unsaved-design-banner strong {
+  font-size: 14px;
+}
+
+/* The browser's own words and its storage figures (#1639): smaller, and selectable to copy. */
+.unsaved-design-banner .unsaved-design-detail {
+  margin-top: 4px;
+  font-size: 11px;
+  line-height: 1.35;
+  opacity: 0.9;
+  overflow-wrap: anywhere;
+  user-select: text;
+}
+
 .open-group-banner {
   position: fixed;
   bottom: 88px;
@@ -16180,6 +16357,11 @@ html[data-theme="dark"] .shape-menu-pin.active {
 /* Collapsed: the title bar alone, without the line that separates it from the list. */
 .outliner-panel.collapsed .outliner-header {
   border-bottom: none;
+}
+
+/* The title bar alone has no corner to drag the width at. */
+.outliner-panel.collapsed {
+  resize: none;
 }
 
 .guide-modal h3 {
@@ -17091,6 +17273,27 @@ html[data-theme="dark"] .qr-code-panel small.qr-code-warning {
   border-color: #b45a0c;
 }
 
+.new-version-notice-actions .primary:disabled {
+  cursor: progress;
+  opacity: 0.6;
+}
+
+/* The open design could not be stored (#1639): reloading would lose its newest changes. */
+.new-version-notice .new-version-notice-unsaved {
+  margin: 0;
+  padding: 8px 10px;
+  color: #ffffff;
+  font-weight: 600;
+  background: #c82031;
+  border-radius: 6px;
+}
+
+.new-version-notice-actions .danger {
+  color: #ffffff;
+  background: #c82031;
+  border-color: #a81a29;
+}
+
 /* Interactive Help (#424): while it is on the pointer is a question mark and whatever has a name
    under it is outlined; a click asks the guide about it. The window is a tool panel of its own,
    at the left edge so it stands beside the tool panels at the right, and above every dialog. */
@@ -17210,6 +17413,11 @@ html[data-theme="dark"] .interactive-help-window a:not(.primary):not(.secondary)
   color: inherit;
   font: inherit;
   cursor: pointer;
+  /* Held on a phone or tablet: no text selection, magnifier or long-press menu, and the touch stays with the button (#1671). */
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
+  touch-action: none;
 }
 
 .simple-mode-hold::after {

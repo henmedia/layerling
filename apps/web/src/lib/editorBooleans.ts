@@ -808,13 +808,15 @@ export function shapeToManifoldSolid(runtime: ManifoldToplevel, shape: Workplane
   }
 
   const solid = manifoldFromMeshData(runtime, meshForShape(shape));
+  // Listed before it is checked: a solid that did not close is the caller's to report and `created`'s to free.
+  created.push(solid);
   if (solid.status() !== "NoError") return solid;
   // A group of solids is the loose pile of its parts' surfaces, and parts that
   // overlap or lie on top of one another (a frame whose posts stand in its
   // rails) are several shells in one mesh. A cut through such a pile comes out
   // wrong, so the shells are joined into one body first.
   const normalized = unionSplitManifoldComponents(runtime, solid);
-  created.push(solid, ...normalized.created);
+  created.push(...normalized.created);
   return normalized.solid ?? solid;
 }
 
@@ -823,7 +825,8 @@ function shapesToManifoldUnion(runtime: ManifoldToplevel, shapes: WorkplaneShape
   for (const shape of shapes) {
     const part = shapeToManifoldSolid(runtime, shape, created, useBoxPrimitive);
     if (!part || part.status() !== "NoError" || part.numTri() < 1) {
-      disposeManifold(part);
+      // One listed in `created` is freed there; freeing it here as well would free it twice, which manifold refuses.
+      if (part && !created.includes(part)) disposeManifold(part);
       return null;
     }
     parts.push(part);
@@ -929,7 +932,9 @@ export async function splitShapeByPlane(shape: WorkplaneShape, plane: SplitPlane
       if (!positiveShape || !negativeShape || (pinsMesh && !pinsShape)) {
         return { parts: null, error: t("split.error.store") };
       }
-      const parts: WorkplaneShape[] = [canonicalizeShape(positiveShape), canonicalizeShape(negativeShape), ...(pinsShape ? [canonicalizeShape(pinsShape)] : [])];
+      // Dowels on a breakaway base say so, for the print check (#1633).
+      const dowels = pinsShape && connectors?.kind === "dowels" && connectors.dowelBase ? { ...pinsShape, breakawayBase: true } : pinsShape;
+      const parts: WorkplaneShape[] = [canonicalizeShape(positiveShape), canonicalizeShape(negativeShape), ...(dowels ? [canonicalizeShape(dowels)] : [])];
       return { parts, closedHoles, ...(tally ? { connectors: tally } : {}) };
     } finally {
       disposeManifold(positiveMesh);
@@ -952,6 +957,13 @@ export const MAX_STRETCH_LENGTH = 1000;
  * only part of its face; this much overlap joins them for sure and is far below what a printer shows.
  */
 const STRETCH_OVERLAP = 1e-3;
+/**
+ * How thin (mm) a triangle at a stretch's seams may be before the kernel folds it away. Where the overlap meets a slanted
+ * or rounded wall, the union leaves slivers thinner than it along both seams and the filler's sides - over a thousand on
+ * a ramp, drawn as black lines and left standing as remnants after a later cut (Discussion #1569); twice the overlap
+ * folds them, as they would never print.
+ */
+const STRETCH_SEAM_TOLERANCE = 2 * STRETCH_OVERLAP;
 
 /** What the Split panel's Stretch starts with, in mm. */
 export const DEFAULT_STRETCH_LENGTH = 10;
@@ -1047,6 +1059,8 @@ export async function stretchShapeByPlane(
       joined = keep(runtime.Manifold.union(joint ? [negative, joint, moved] : [negative, moved]));
     }
     if (joined.status() !== "NoError" || joined.numTri() < 1) return { parts: null, error: t("split.error.emptyHalf") };
+    // The slivers at the seams come from different pieces, and the kernel folds only within one mesh: taken as one first.
+    joined = foldedThinWalls(keep(joined.asOriginal()), joined, STRETCH_SEAM_TOLERANCE, created);
     const mesh = joined.getMesh();
     try {
       const stretched = splitShapeFromWorldPositions(shape, manifoldMeshToPositions(mesh), createLocalId(`${shape.id}-stretched`), shape.name);

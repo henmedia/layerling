@@ -28,6 +28,7 @@ import { planarMeshFaces } from "@/lib/cadPlanarMesh";
 import { EXACT_MESH_FAILED_MESSAGE, exactMeshFreeformShare, exactSolidFromMesh, type ExactMeshReport } from "@/lib/cadMeshExact";
 import { cadFlatFaceMeshStraysFromOutline } from "@/lib/cadFaceOutline";
 import { buildMessage } from "@/lib/buildStamp";
+import { announceKernel, isWarmKernelMessage, kernelStatusMessage } from "@/lib/cadKernelGate";
 import { CAD_MODIFIER_KERNEL_RESTART_MESSAGE, CAD_MODIFIER_RUNTIME_BASE, VARIABLE_FILLET_ONE_EDGE_MESSAGE, cadModifierCappedDeflection, cadModifierTessellationDeflection, cadModifierTopologyEdgeIsSelectable, applyCadTransform, isCadModifierKernelExhausted, isCadModifierWasmMemoryFault } from "@/lib/cadModifierRuntime";
 import { isKernelMemoryFault } from "@/lib/kernelFault";
 import { tightBendMessage, tightestOutsideBend } from "@/lib/cadTightBends";
@@ -68,13 +69,14 @@ function kernel() {
   // fetching the 22 MB wasm) can be retried on the next call instead of
   // poisoning edge treatment for the rest of the session - same fix as
   // brepKernel.ts's loadBrepWithOcct.
-  kernelPromise ??= import(/* webpackIgnore: true */ moduleUrl).then((imported: { default: OcctModuleFactory }) => OcctKernel.init({
+  // The page starts the clock for its requests only once this says the kernel is loaded (#1612).
+  kernelPromise ??= announceKernel(import(/* webpackIgnore: true */ moduleUrl).then((imported: { default: OcctModuleFactory }) => OcctKernel.init({
     createModule: imported.default,
     wasm: `${CAD_MODIFIER_RUNTIME_BASE}/occt-wasm.wasm`,
   })).catch((error) => {
     kernelPromise = null;
     throw error;
-  });
+  }), (message) => self.postMessage(message));
   return kernelPromise;
 }
 
@@ -1145,6 +1147,99 @@ function treatPastInnerCorners(cad: OcctKernel, solid: ShapeHandle, entries: { i
   return result ? { ...result, count: corners.length } : null;
 }
 
+type EdgePreviewRequest = Extract<CadModifierWorkerRequest, { type: "preview" }>;
+
+/*
+ * Whether the picked edges take the chamfer or fillet at this size, by the same checks a preview makes, without its
+ * second tries (corner edges, inner corners) and without meshing: those cost seconds on a refused size, and the search
+ * below makes a dozen of these. A size that passes here passes the preview as well.
+ */
+function treatmentHolds(cad: OcctKernel, request: EdgePreviewRequest, nearLimit = false) {
+  const components: ShapeHandle[] = [];
+  let result: ShapeHandle | null = null;
+  try {
+    for (let owner = 0; owner < baseSolids.length; owner += 1) {
+      const solid = baseSolids[owner];
+      const edges = request.edgeIds
+        .filter((id) => edgeOwners[id] === owner)
+        .map((id) => edgeHandles[id])
+        .filter((edge): edge is ShapeHandle => edge !== undefined);
+      if (edges.length === 0) {
+        components.push(cad.copy(solid));
+        continue;
+      }
+      const component = nearLimit ? treatEdgesNearLimit(cad, solid, edges, request) : treatEdges(cad, solid, edges, request);
+      if (!component) return false;
+      components.push(component);
+      if (!cadHasSolidBody(cad, component)) return false;
+      const plainTreatment = request.kind === "chamfer" || (request.kind === "fillet" && !request.concave);
+      if (plainTreatment && cadTreatmentLostFaces(cad, solid, edges, component) > 0) return false;
+    }
+    result = components.length === 1 ? components[0] : cad.makeCompound(components);
+    if (!cadShapeIsValid(cad, result)) return false;
+    if ((request.kind === "fillet" || request.kind === "chamfer") && cadFlatFaceMeshStraysFromOutline(cad, result)) return false;
+    return true;
+  } catch (error) {
+    if (isFatalKernelFault(error)) throw error;
+    return false;
+  } finally {
+    releaseHandles(cad, components);
+    if (result !== null && components.length > 1) cad.release(result);
+  }
+}
+
+// The search stops here and gives the largest size found so far; the page waits well beyond it.
+const LARGEST_SEARCH_BUDGET_MS = 15_000;
+
+/*
+ * The largest size up to the refused one that the picked edges still take (Discussion #1635), in hundredths of a
+ * millimetre (thousandths below 0.2 mm). First halved down until a size goes through, then halved between that and the
+ * one that failed. Only a size that went through is ever given back: a larger one does not always fail where a smaller
+ * did, so the search finds a size that fits, the largest as far as halving can tell. Null when not even a sliver goes
+ * through: then the size is not what stands in the way.
+ */
+function largestWorkingAmount(cad: OcctKernel, request: Extract<CadModifierWorkerRequest, { type: "largest" }>) {
+  const unit = request.amount >= 0.2 ? 0.01 : 0.001;
+  const ratio = request.kind === "fillet" && request.endAmount !== undefined && request.amount > 0 ? request.endAmount / request.amount : null;
+  const sized = (steps: number): EdgePreviewRequest => {
+    const amount = Math.round(steps * unit * 1000) / 1000;
+    return {
+      type: "preview",
+      requestId: request.requestId,
+      kind: request.kind,
+      edgeIds: request.edgeIds,
+      amount,
+      quality: "draft",
+      chamferAngle: request.chamferAngle,
+      ...(ratio !== null ? { endAmount: amount * ratio } : {}),
+      ...(request.concave ? { concave: true } : {}),
+    };
+  };
+  const deadline = performance.now() + LARGEST_SEARCH_BUDGET_MS;
+  const top = Math.floor(request.amount / unit + 1e-9);
+  let high = top;
+  let low = 0;
+  for (let probe = Math.floor(high / 2); probe >= 1; probe = Math.floor(probe / 2)) {
+    if (performance.now() > deadline) return null;
+    if (treatmentHolds(cad, sized(probe))) {
+      low = probe;
+      break;
+    }
+    high = probe;
+  }
+  if (low === 0) return null;
+  while (high - low > 1 && performance.now() < deadline) {
+    const middle = Math.floor((low + high) / 2);
+    if (treatmentHolds(cad, sized(middle))) low = middle;
+    else high = middle;
+  }
+  // A size the kernel refuses only because it takes the face beside the edge away whole goes through a hair less,
+  // as the preview does it (treatEdgesNearLimit): so 2 mm on a 2 mm high disc is found as 2, not 1.99.
+  if (high - low === 1 && high < top && performance.now() < deadline && treatmentHolds(cad, sized(high), true)) low = high;
+  const found = sized(low);
+  return { amount: found.amount, ...(found.endAmount !== undefined ? { endAmount: found.endAmount } : {}) };
+}
+
 // Which solid of the body each edge or face belongs to, found by hash and isSame.
 function componentOwners(cad: OcctKernel, handles: ShapeHandle[], type: "edge" | "face", unmappedMessage: string) {
   // One solid owns everything there is.
@@ -1218,7 +1313,13 @@ async function bearbeiteAnfrage(request: CadModifierWorkerRequest, halter: { cad
     return;
   }
   if (baseShape === null) throw new Error("Prepare an object before previewing the modifier");
-  const selected = request.edgeIds.map((id) => ({ id, edge: edgeHandles[id], owner: edgeOwners[id] })).filter((entry): entry is { id: number; edge: ShapeHandle; owner: number } => entry.edge !== undefined);
+  if (request.type === "largest") {
+    if (request.edgeIds.every((id) => edgeHandles[id] === undefined)) throw new Error("Select at least one highlighted edge");
+    const found = largestWorkingAmount(activeCad, request);
+    post({ type: "largest", requestId: request.requestId, amount: found?.amount ?? null, ...(found?.endAmount !== undefined ? { endAmount: found.endAmount } : {}) });
+    return;
+  }
+  const selected =request.edgeIds.map((id) => ({ id, edge: edgeHandles[id], owner: edgeOwners[id] })).filter((entry): entry is { id: number; edge: ShapeHandle; owner: number } => entry.edge !== undefined);
   const selectedFaces = request.kind === "deleteFace"
     ? (request.faceIds ?? []).map((id) => ({ id, face: faceHandles[id], owner: faceOwners[id] })).filter((entry): entry is { id: number; face: ShapeHandle; owner: number } => entry.face !== undefined)
     : [];
@@ -1361,6 +1462,16 @@ async function bearbeiteAnfrage(request: CadModifierWorkerRequest, halter: { cad
 }
 
 self.onmessage = async (event: MessageEvent<CadModifierWorkerRequest>) => {
+  // Loaded ahead, so the first tool does not wait for the 21 MB download (#1612).
+  if (isWarmKernelMessage(event.data)) {
+    try {
+      await kernel();
+    } catch {
+      // Without WebAssembly SIMD kernel() throws before it starts loading; the page must still hear it.
+      self.postMessage(kernelStatusMessage("failed"));
+    }
+    return;
+  }
   const request = event.data;
   const halter: { cad: OcctKernel | null } = { cad: null };
   let error: unknown = null;

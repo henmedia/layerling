@@ -35,6 +35,7 @@ Kotno ravnilo se položi na delovno ravnino. Če leži na strani telesa, torej l
 - **Kratek klik na ročaj** ga zavrti za 90°.
 - **×** ob njem ga odstrani.
 - **Vlečenje krožca na koncu kraka** ta krak podaljša ali skrajša, po celih milimetrih. Najnižji gumb pod ročajem, {{ui:ruler.armsToPlate}}, naredi oba kraka dolga, kot je tiskalna plošča tiskalnika iz nastavitev široka in globoka. Kotnik si dolžini krakov zapomni z modelom, na novo postavljen pa ju prevzame.
+- **{{ui:ruler.arms}}** (gumb s tremi osmi, tik nad njim) odpre stikalo za vsak krak, poimenovano po osi, ob kateri teče. Poleg dveh krakov v ravnini je še tretji, ki v kotu stoji pravokotno na delovno ravnino: na plošči kaže navzgor vzdolž Z, z lastnimi črticami, za valj ali karkoli, kar gradiš v višino. Na začetku je izklopljen: klikni njegovo črko, da ga pokažeš, in povleci krožec na njegovem koncu, da ga podaljšaš ali skrajšaš. Kraka v ravnini izklopiš enako, kadar sta v napoto; en krak vedno ostane. Zelene številke izbranega telesa ostanejo, ne glede na to, kateri kraki so vidni, in načrt si zapomni, kateri so.
 - **Majhen gumb levo od ročaja** preklopi, od kod se meri: od zunanjega roba telesa (oglišče, simbol s črtami) ali od njegove sredine (središče, nitni križ). Majhno stikalo iste vrste je ob vsaki zeleni številki in nastavi samo to številko: pri stoječem valju sredino v obeh krakih in dno po višini, pri ležečem sredino počez in konec po dolžini. Ko se vse tri spet ujemajo, gumb pri ročaju pokaže skupni način.
 
 Če ob enem od krakov stojijo telesa, kotno ravnilo samodejno pokaže njihove mere. To gre samo na osnovni plošči, ne na strani telesa. Gumb s puščico pod ročico kotnega ravnila to izklopi, tako da mere kažejo samo izbrana telesa; shrani se z načrtom.
@@ -49,7 +50,7 @@ Merilni trak in kotno ravnilo ostaneta tam, kjer sta, ko skiciraš in se vrneš 
 
 Kot izmeriš z gumbom {{ui:camera.protractor}} v vrstici pogleda. Ob njem se odpre vrsta gumbov, in dokler gumba ne klikneš znova ali ne pritisneš [[Esc]], vsak klik v pogled meri s kotomerom. Kot merilni trak se pripne na oglišča in robove teles; ob telesih postavi točko na ploščo.
 
-- {{ui:camera.protractorPoints}}: najprej klikni oglišče kota, nato točko na vsakem kraku. Že med postavljanjem zadnje točke se kot prikaže; po tretjem kliku ostane, z lokom med krakoma. To je kot v oglišču, od 0° do 180°.
+- {{ui:camera.protractorPoints}}: najprej klikni oglišče kota, nato točko na vsakem kraku. Že med postavljanjem zadnje točke se kot prikaže; po tretjem kliku ostane, z lokom med krakoma. To je kot v oglišču, od 0° do 180°. Pri pogledu naravnost od zgoraj, spredaj ali s strani meri kot tako, kot je tam viden: zgornji vogal in spodnji vogal tik pod njim sta ista točka. V nagnjenem pogledu je to kot v prostoru.
 - {{ui:camera.protractorFaces}}: klikni dve ravni ploskvi. Kratka modra črta na vsaki pokaže, kam je obrnjena, oznaka pa navede oba kota, ki ju ploskvi oklepata, najprej manjšega: 45° posnetje proti zgornji ploskvi da 45° · 135°, dve stranici kvadra le 90°. Ukrivljena ploskev nima ene same smeri, zato kotomer zahteva ravno.
 
 Naslednji klik po končanem kotu začne novega, {{ui:camera.protractorClear}} pa ga odstrani. Kot sledi telesom, ko jih premakneš ali zavrtiš. Nič od tega se ne shrani in ne gre v zgodovino: ko kotomer odložiš, ga ni več.
@@ -58,7 +59,7 @@ Naslednji klik po končanem kotu začne novega, {{ui:camera.protractorClear}} pa
 
 V nastavitvah pod {{ui:workspace.appearance}} sta dve stikali za tekoče mere:
 
-- {{ui:workspace.showMoveDimensions}} pri premikanju pokaže, za koliko se premikaš. To velja tudi pri dvigovanju s črno puščico nad telesom; pot se pokaže ob njegovem sprednjem vogalu. Ko spustiš, klikni takšno število in vpiši natančno razdaljo; minus gre navzdol.
+- {{ui:workspace.showMoveDimensions}} pri premikanju pokaže, za koliko se premikaš. To velja tudi pri dvigovanju z modro puščico nad telesom; pot se pokaže ob njegovem sprednjem vogalu. Ko spustiš, klikni takšno število in vpiši natančno razdaljo; minus gre navzdol.
 - {{ui:workspace.showOriginDimensions}} pokaže razdalje izbora do ničle plošče, tudi pri več označenih telesih.
 
 Z {{ui:workspace.dimensionsAlwaysVisible}} mere ostanejo trajno vidne. Če telo ne stoji na delovni ravnini, je prikazana tudi njegova višina nad njo; klikni številko, da vneseš novo.

@@ -38,6 +38,7 @@ Vinkelmåleren ligger på arbejdsplanet. Ligger det på siden af en form, ligger
 - **Et kort klik på håndtaget** drejer den 90°.
 - **×** ved siden af fjerner den.
 - **Træk i den lille cirkel for enden af en arm** for at gøre armen længere eller kortere, i hele millimeter. Den nederste knap under håndtaget, {{ui:ruler.armsToPlate}}, gør begge arme lige så lange, som printpladen på printeren fra indstillingerne er bred og dyb. Vinklen gemmer armenes længder med designet, og en vinkel, der sættes igen, overtager dem.
+- **{{ui:ruler.arms}}** (knappen med tre akser, lige over den) åbner en kontakt for hver arm, opkaldt efter den akse, den løber langs. Ud over de to arme i planet er der en tredje, som står op fra hjørnet, vinkelret på arbejdsplanet: på printpladen peger den op langs Z, med sine egne streger, til en cylinder eller alt, hvad du bygger i højden. Den er slukket fra start: klik på dens bogstav for at vise den, og træk i den lille cirkel for enden for at gøre den længere eller kortere. Armene i planet slukkes på samme måde, når de er i vejen; én arm bliver altid. De grønne tal for et valgt legeme bliver, uanset hvilke arme der vises, og designet husker hvilke.
 - **Den lille knap til venstre for håndtaget** skifter hvad der måles fra: ydersiden af en form (endepunkt, et ikon med streger) eller dens midte (midtpunkt, et sigtekorn).
   En lille kontakt af samme slags sidder ved siden af hvert grønt tal og sætter kun det tal: for en stående cylinder er det midten i de to arme og bunden i højden, for en liggende midten på tværs og en ende i længden. Når alle tre igen er enige, viser knappen ved håndtaget den fælles tilstand.
 
@@ -55,7 +56,7 @@ Både målebåndet og vinkelmåleren bliver hvor de er mens du skitser og kommer
 
 Klik på {{ui:camera.protractor}} i visningsbjælken for at måle en vinkel. Ved siden af åbner en række knapper, og indtil du klikker på knappen igen eller trykker [[Esc]], måler et klik i visningen med gradskiven. Ligesom målebåndet fanger den hjørner og kanter på former; ved siden af formerne sætter den et punkt på pladen.
 
-- {{ui:camera.protractorPoints}}: klik først på vinklens hjørne, derefter på et punkt på hvert ben. Mens du sætter det sidste punkt, vises vinklen allerede; efter det tredje klik bliver den stående med en bue mellem benene. Det er vinklen i hjørnet, fra 0° til 180°.
+- {{ui:camera.protractorPoints}}: klik først på vinklens hjørne, derefter på et punkt på hvert ben. Mens du sætter det sidste punkt, vises vinklen allerede; efter det tredje klik bliver den stående med en bue mellem benene. Det er vinklen i hjørnet, fra 0° til 180°. Set lige oppefra, forfra eller fra siden måler den vinklen, som den ser ud der: et øverste hjørne og det nederste lige under det er det samme punkt. I en skrå visning er det vinklen i rummet.
 - {{ui:camera.protractorFaces}}: klik på to plane flader. En kort blå streg på hver viser, hvilken vej fladen vender, og mærkaten angiver begge vinkler, fladerne danner, den mindste først: en 45°-affasning mod toppen giver 45° · 135°, to sider af en kasse kun 90°. En krum flade har ikke én retning, så gradskiven beder om en plan flade.
 
 Det næste klik efter en færdig vinkel starter en ny, og {{ui:camera.protractorClear}} fjerner den. Vinklen følger formerne, når de flyttes eller drejes. Intet af den gemmes eller kommer i historikken: den er væk, når du lægger gradskiven fra dig.
@@ -64,7 +65,7 @@ Det næste klik efter en færdig vinkel starter en ny, og {{ui:camera.protractor
 
 Under {{ui:workspace.appearance}} i indstillingerne er der to kontakter for levende dimensioner:
 
-- {{ui:workspace.showMoveDimensions}} viser hvor meget du flytter mens du trækker. Det gælder også, når du løfter med den sorte pil over et legeme; vejen måles op langs dets forreste hjørne. Piletasterne viser også vejen: tastetrykkene tæller sammen, indtil du markerer noget andet eller drager, og [[Ctrl]]+[[↑]] og [[Ctrl]]+[[↓]] viser vejen op eller ned. Når du har sluppet, klikker du på sådan et tal og skriver den nøjagtige afstand; minus går ned.
+- {{ui:workspace.showMoveDimensions}} viser hvor meget du flytter mens du trækker. Det gælder også, når du løfter med den blå pil over et legeme; vejen måles op langs dets forreste hjørne. Piletasterne viser også vejen: tastetrykkene tæller sammen, indtil du markerer noget andet eller drager, og [[Ctrl]]+[[↑]] og [[Ctrl]]+[[↓]] viser vejen op eller ned. Når du har sluppet, klikker du på sådan et tal og skriver den nøjagtige afstand; minus går ned.
 - {{ui:workspace.showOriginDimensions}} viser afstandene fra markeringen til pladens nulpunkt, også med flere valgte former.
 
 Med {{ui:workspace.dimensionsAlwaysVisible}} bliver dimensionerne permanent synlige. Et legeme, der ikke står på arbejdsplanet, viser også sin højde over det; klik på tallet for at skrive en ny.

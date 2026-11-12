@@ -101,6 +101,7 @@ Cuando un diseño contiene más de lo que cabe en una placa, por ejemplo una caj
 
 - Cada placa es tan grande como el plano de trabajo, y las placas están una junto a otra a la derecha de la primera, a 20 mm. Un cuerpo pertenece a la placa en la que está el centro de su base, así que al arrastrarlo al otro lado pasa a la otra placa. Un diseño tiene hasta 12 placas.
 - Un clic en una placa de la barra la muestra, y las formas nuevas y los archivos importados aparecen entonces en ella. {{ui:plates.showAll}} las muestra todas. Un doble clic en una placa, o {{ui:plates.rename}}, le da un nombre como «Tapa», que aparece escrito en la placa.
+- Un boceto nuevo en la placa también empieza en la placa activa: el área del boceto muestra esa placa con sus cuerpos, y el cuerpo terminado queda allí.
 - {{ui:plates.moveLeft}} y {{ui:plates.moveRight}} cambian el orden, y los cuerpos van con su placa. {{ui:plates.remove}} quita la placa activa; sus cuerpos pasan a la primera placa en el mismo sitio.
 - {{ui:plates.arrange}} coloca los cuerpos seleccionados, o todos, fila a fila en las placas, los más grandes primero, a 5 mm, y añade placas mientras hagan falta. Un cuerpo más grande que una placa se queda donde está.
 - Con una impresora elegida, cada cuerpo se comprueba con su propia placa, y la altura de impresión cuenta desde el cuerpo más bajo de esa placa. Una placa con un cuerpo que no cabe muestra su número en rojo.

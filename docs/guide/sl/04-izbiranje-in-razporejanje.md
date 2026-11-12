@@ -22,7 +22,7 @@ Pri mnogih delih v pogledu zlahka izgubiš pregled. Seznam objektov ({{ui:editor
 ![Seznam objektov: skupina »Skupina« z dvema delama in ob njej krogla. Ikona mape odpre skupino.](shot:object-list)
 
 - Klik na vnos izbere obliko, tudi dele znotraj skupine. S [[Shift]] dodaš še druge vnose ali jih spet odvzameš, popolnoma enako kot v pogledu. Puščice zložijo in razpro skupine.
-- Oznaka kaže, ali je del {{ui:outliner.solid}} ali {{ui:outliner.hole}}.
+- Črka za imenom pokaže, ali je del {{ui:outliner.solid}} ali {{ui:outliner.hole}}: to je prva črka besede, cela beseda pa se pokaže, ko greš z miško nadnjo.
 - Pod imenom piše, kakšna oblika je. Telo, ki ni več preprosta oblika (zaobljeno, izdolbeno ali uvoženo), kaže {{ui:shape.exactBody}}, ko ga izvoz STEP zapiše natančno, in {{ui:shape.mesh}}, ko je sestavljeno le iz trikotnikov in gre ven kot STL. Zoženje, nagib ali zasuk, dodan šele po zaobljanju ali dolbenju telesa, upogne samo njegovo mrežo, zato takrat piše {{ui:shape.mesh}}.
 - Ključavnica in oko zaklenita in skrijeta posamezne dele.
 - Z {{ui:outliner.rename}} daš delu lastno ime; svinčnik ob imenu zgoraj v nastavitvah naredi isto za izbrano obliko. Smiselna imena pri večjih načrtih zelo pomagajo.
@@ -32,7 +32,7 @@ Pri mnogih delih v pogledu zlahka izgubiš pregled. Seznam objektov ({{ui:editor
 - Iskalno polje najde oblike po imenu in po vrsti, torej tudi »valj« ali »luknja«. Išče tudi v skupinah, ne glede na to, kako globoko so ugnezdene: skupina z zadetkom ostane na seznamu in se razpre, tako da so vidni ustrezni deli in skupine na poti do njih. Če ime same skupine ustreza, pokaže razpro vse svoje dele.
 - Puščica čisto levo v naslovni vrstici zloži seznam do naslovne vrstice in ga spet razpre.
 
-Seznam je zasidran desno ob orientacijski kocki. Za naslovno vrstico ga povlečeš na katerokoli mesto delovne površine; pri tem drsi pod orientacijsko kocko in vrstico pogleda. Če ga odložiš ob orientacijski kocki ali dvokliknes naslovno vrstico, se spet zasidra. Kje je stal in ali je bil zložen, si brskalnik zapomni.
+Seznam je zasidran desno ob orientacijski kocki. Za naslovno vrstico ga povlečeš na katerokoli mesto delovne površine; pri tem drsi pod orientacijsko kocko in vrstico pogleda. Če ga odložiš ob orientacijski kocki ali dvokliknes naslovno vrstico, se spet zasidra. Kje je stal in ali je bil zložen, si brskalnik zapomni. Seznam razširiš ali zožiš tako, da povlečeš njegov spodnji desni kot, od 240 do 600 pikslov; tudi širino si brskalnik zapomni.
 
 ## Vpiši lego
 
@@ -45,6 +45,8 @@ Obliko lahko povlečeš čez rob plošče in jo pustiš tam, približno za širi
 ## Zaskakovanje med premikanjem
 
 Če oblika vlečeš čez delovno ravnino, se zaskoči na druge oblike: njen levi, desni, sprednji ali zadnji rob ali njena sredina se položi natanko na rob ali sredino druge oblike. Roza pomožna črta kaže, na kaj je ravno pripeta. Tako postaviš dva dela poravnana drug ob drugega ali sredinsko drug za drugim, ne da bi vpisoval številke. To velja tudi, če je mreža izklopljena. Šteje tudi sredina delovne ravnine: rožnate črte pokažejo, kdaj oblika stoji na sredini plošče vzdolž X, Y ali obeh.
+
+Pripenjanje deluje tudi pri spreminjanju velikosti: ko vlečeš stranski ročaj, se ta stranica ustavi na robovih in središčih drugih oblik in ob steni, v katero zadene, tudi ob notranji steni škatle, izdolbenega telesa ali uvoženega ohišja, rožnata črta pa pokaže kje. Ta mera ostane natančno taka, zunaj mreže. Tako del zapolni ohišje od stene do stene: prisloni ga k eni steni in njegovo drugo stranico povleci do nasprotne. Z [[Alt]] oblika raste iz sredine in vlečena stranica se pripne enako; s [[Shift]] obdrži razmerja in se ne pripne. To deluje na ravni delovni ravnini za oblike, ki stojijo pokonci s stranicami vzdolž X in Y, {{ui:workspace.objectSnap}} pa to izklopi skupaj s pripenjanjem med premikanjem.
 
 Če pri vlečenju držiš [[Shift]], ostane gibanje na eni osi: oblika sledi smeri, X ali Y, v katero si vlekel dalje, drugo pa pusti nedotaknjeno. Najbolje je, da [[Shift]] pritisneš šele, ko že vlečeš; na obliki, ki še ni izbrana, klik s [[Shift]] samo doda k izboru.
 

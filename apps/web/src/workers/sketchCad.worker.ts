@@ -2,6 +2,7 @@
 
 import { OcctKernel, type OcctModuleFactory, type ShapeHandle } from "occt-wasm";
 import { CAD_MODIFIER_RUNTIME_BASE } from "@/lib/cadModifierRuntime";
+import { announceKernel } from "@/lib/cadKernelGate";
 import { sketchCadDeflection, sketchRevolveCadDeflection } from "@/lib/sketchCadDeflection";
 import { cadSketchRegions } from "@/lib/sketchCadProfile";
 import { buildRevolvedSketchSolid } from "@/lib/cadSketchRevolve";
@@ -25,7 +26,8 @@ function kernel() {
   // fetching the 22 MB wasm) can be retried on the next call instead of
   // poisoning sketch-to-3D for the rest of the session - same fix as
   // brepKernel.ts's loadBrepWithOcct.
-  kernelPromise ??= import(/* webpackIgnore: true */ moduleUrl)
+  // The page starts the clock for its requests only once this says the kernel is loaded (#1612).
+  kernelPromise ??= announceKernel(import(/* webpackIgnore: true */ moduleUrl)
     .then((imported: { default: OcctModuleFactory }) => OcctKernel.init({
       createModule: imported.default,
       wasm: `${CAD_MODIFIER_RUNTIME_BASE}/occt-wasm.wasm`,
@@ -33,7 +35,7 @@ function kernel() {
     .catch((error) => {
       kernelPromise = null;
       throw error;
-    });
+    }), (message) => self.postMessage(message));
   return kernelPromise;
 }
 

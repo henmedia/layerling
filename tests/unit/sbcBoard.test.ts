@@ -39,7 +39,7 @@ const ESP32_BOARDS: SbcBoardType[] = ["xiaoEsp32c6", "esp32c3SuperMini", "esp32c
 /** The microcontroller boards: no microSD card slot, no ribbon cables, no GPIO header to open up. */
 /** The camera boards: their microSD card slot is on top, by the camera. */
 const CAMERA_BOARDS: SbcBoardType[] = ["esp32CamMb", "esp32s3Cam"];
-const MICRO_BOARDS: SbcBoardType[] = [...ESP32_BOARDS, "featherEsp32s3", "arduinoUno", "arduinoMega", "arduinoNano", "wemosD1Mini", "pico", "picoW", "pico2", "pico2W", "esp32CamMb", "esp32s3Cam", "esp32DevKitC", "esp32DevKitV1"];
+const MICRO_BOARDS: SbcBoardType[] = [...ESP32_BOARDS, "featherEsp32s3", "arduinoUno", "arduinoMega", "arduinoNano", "wemosD1Mini", "pico", "picoW", "pico2", "pico2W", "esp32CamMb", "esp32s3Cam", "esp32DevKitC", "esp32DevKitV1", "cyd", "cyd2usb"];
 
 /** A body carrying board settings; what carries them does not matter to the project file. */
 function boardBody(id: string, sbcBoard: SbcBoardSettings = { board: "pi4", clearance: 0.3 }): WorkplaneShape {
@@ -73,7 +73,7 @@ async function withDefinition(patch: Record<string, unknown>) {
 
 describe("SBC board data (#1098)", () => {
   it("has every board in the list, the Raspberry Pi 5 first", () => {
-    expect(SBC_BOARD_ORDER).toEqual(["pi5", "pi4", "pi3bPlus", "zero2w", "bttPi12", "xiaoEsp32c6", "esp32c3SuperMini", "esp32c6SuperMini", "featherEsp32s3", "arduinoUno", "arduinoMega", "arduinoNano", "wemosD1Mini", "pico", "picoW", "pico2", "pico2W", "esp32CamMb", "esp32s3Cam", "esp32DevKitC", "esp32DevKitV1"]);
+    expect(SBC_BOARD_ORDER).toEqual(["pi5", "pi4", "pi3bPlus", "zero2w", "bttPi12", "xiaoEsp32c6", "esp32c3SuperMini", "esp32c6SuperMini", "featherEsp32s3", "arduinoUno", "arduinoMega", "arduinoNano", "wemosD1Mini", "pico", "picoW", "pico2", "pico2W", "esp32CamMb", "esp32s3Cam", "esp32DevKitC", "esp32DevKitV1", "cyd", "cyd2usb"]);
     expect(DEFAULT_SBC_BOARD).toBe("pi5");
     for (const type of SBC_BOARD_ORDER) expect(SBC_BOARDS[type].type).toBe(type);
   });
@@ -419,8 +419,8 @@ describe("the microSD card slot", () => {
   const slot = (type: keyof typeof SBC_BOARDS) => SBC_BOARDS[type].parts.find((part) => part.name === "microSD card slot")!;
 
   it("is on every board, at the left edge where the card goes in, as the makers' models and drawings have it", () => {
-    // The microcontroller boards have none.
-    for (const type of MICRO_BOARDS.filter((entry) => !CAMERA_BOARDS.includes(entry))) expect(slot(type), type).toBeUndefined();
+    // The microcontroller boards have none, but the camera boards and the CYDs.
+    for (const type of MICRO_BOARDS.filter((entry) => !CAMERA_BOARDS.includes(entry) && entry !== "cyd" && entry !== "cyd2usb")) expect(slot(type), type).toBeUndefined();
     for (const type of SBC_BOARD_ORDER.filter((entry) => !MICRO_BOARDS.includes(entry))) {
       const board = SBC_BOARDS[type];
       const part = slot(type);
@@ -747,6 +747,43 @@ describe("the Adafruit ESP32-S3 Feather, the Arduino UNO R3, the Arduino Nano an
     expect(pinDots("esp32DevKitV1", "pins (EN to VIN)")).toHaveLength(15);
     expect(board.parts.every((entry) => entry.estimated)).toBe(true);
     expect(part("esp32DevKitV1", "EN button").y0).toBeGreaterThan(part("esp32DevKitV1", "BOOT button").y1);
+  });
+
+  it("give the CYD the maker's 50 x 86 mm and four 3.2 mm holes, screen up, its connectors under the board at their edges", () => {
+    const board = SBC_BOARDS.cyd;
+    expect(board).toMatchObject({ width: 86, depth: 50, holeDiameter: 3.2 });
+    expect(board.holes).toEqual([[4, 4], [82, 4], [4, 46], [82, 46]]);
+    // The screen module (JC2432A028N) on top, 69.2 mm long and as wide as the board; everything else under it.
+    expect(part("cyd", "screen")).toMatchObject({ y0: 0, y1: 50, height: 2.6 });
+    expect(part("cyd", "screen").x1 - part("cyd", "screen").x0).toBeCloseTo(69.2, 6);
+    expect(board.parts.filter((entry) => !entry.underside).map((entry) => entry.name)).toEqual(["screen"]);
+    expect(board.parts.every((entry) => entry.estimated)).toBe(true);
+    const edges = (name: string) => sbcPartEdges(board, part("cyd", name));
+    expect(edges("micro-USB")).toEqual({ left: true, right: false, front: false, back: false });
+    expect(edges("power and serial (P1)")).toEqual({ left: true, right: false, front: false, back: false });
+    for (const name of ["microSD card slot", "sensor socket (CN1)", "extended IO (P3)"]) expect(edges(name), name).toEqual({ left: false, right: false, front: false, back: true });
+    expect(edges("speaker socket (P4)")).toEqual({ left: false, right: false, front: true, back: false });
+    // Not mirrored: seen from the screen, RESET is nearer the antenna end than BOOT, as the maker's interface picture shows from below.
+    expect(part("cyd", "RESET button").x0).toBeGreaterThanOrEqual(part("cyd", "BOOT button").x1);
+    expect(part("cyd", "ESP32-WROOM-32").x1).toBe(86);
+    // A button under the board reaches down through the floor, grown by the clearance.
+    const index = board.parts.indexOf(part("cyd", "RESET button"));
+    const reset = sbcBoardBlocks(board, 0.3, 0, { buttonReach: 8 })[index];
+    expect(reset.top).toBe(0);
+    expect(reset.bottom).toBeCloseTo(-(2.0 + 0.3 + 8), 9);
+    expect(sbcBoardHasButtons(board)).toBe(true);
+  });
+
+  it("give the CYD with two USB ports the same plate and screen, its USB-C between the power socket and the micro-USB", () => {
+    const [first, second] = [SBC_BOARDS.cyd, SBC_BOARDS.cyd2usb];
+    for (const key of ["width", "depth", "holes", "holeDiameter", "outline", "thickness", "cornerRadius"] as const) expect(second[key], key).toEqual(first[key]);
+    expect(part("cyd2usb", "screen")).toEqual(part("cyd", "screen"));
+    expect(second.parts.map((entry) => entry.name).sort()).toEqual([...first.parts.map((entry) => entry.name), "USB-C"].sort());
+    for (const name of ["USB-C", "micro-USB", "power and serial (P1)"]) expect(sbcPartEdges(second, part("cyd2usb", name)).left, name).toBe(true);
+    expect(part("cyd2usb", "USB-C").y0).toBeGreaterThan(part("cyd2usb", "power and serial (P1)").y1);
+    expect(part("cyd2usb", "micro-USB").y0).toBeGreaterThan(part("cyd2usb", "USB-C").y1);
+    expect(sbcPartEdges(second, part("cyd2usb", "speaker socket (P4)")).front).toBe(true);
+    expect(second.parts.every((entry) => entry.estimated)).toBe(true);
   });
 
   it("give the D1 mini V4.0.0 the outline and pins of Wemos's drawing, laid with USB-C at the left", () => {

@@ -101,6 +101,7 @@ Als een ontwerp meer bevat dan één plaat kan printen, bijvoorbeeld een doos me
 
 - Elke plaat is zo groot als het werkvlak, en de platen liggen naast elkaar rechts van de eerste, 20 mm uit elkaar. Een lichaam hoort bij de plaat waarop het midden van zijn voetafdruk staat; sleep je het naar de overkant, dan staat het op de andere plaat. Een ontwerp heeft tot 12 platen.
 - Een klik op een plaat in de balk toont die, en nieuwe vormen en geïmporteerde bestanden komen er dan op. {{ui:plates.showAll}} toont ze allemaal. Een dubbelklik op een plaat, of {{ui:plates.rename}}, geeft haar een naam zoals "Deksel", die op de plaat staat.
+- Ook een nieuwe schets op de plaat begint op de actieve plaat: het schetsvlak toont die plaat met de lichamen erop, en het afgemaakte lichaam staat daar.
 - {{ui:plates.moveLeft}} en {{ui:plates.moveRight}} veranderen de volgorde, de lichamen gaan mee met hun plaat. {{ui:plates.remove}} haalt de actieve plaat weg; haar lichamen komen op dezelfde plek op de eerste plaat.
 - {{ui:plates.arrange}} legt de geselecteerde lichamen, of alle, rij voor rij op de platen, de grootste eerst, 5 mm uit elkaar, en voegt platen toe zolang die nodig zijn. Een lichaam dat groter is dan een plaat blijft staan.
 - Met een gekozen printer wordt elk lichaam tegen zijn eigen plaat gecontroleerd, en de bouwhoogte telt vanaf het laagste lichaam op die plaat. Een plaat met een lichaam dat niet past, toont haar getal in rood.

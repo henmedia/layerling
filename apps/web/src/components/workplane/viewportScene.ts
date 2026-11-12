@@ -14,12 +14,12 @@ import { horizontalPlacementWorkplane, placementWorkplaneIsBase, placementWorkpl
 import { printerPresetById } from "@/lib/printBed";
 import { plateCenterX, plateCount } from "@/lib/buildPlates";
 import { DEFAULT_WORKPLANE_WORKSPACE, effectiveViewSettings, viewPixelRatio, orbitControlsZoomSpeed, orbitControlsPanSpeed } from "@/lib/workplaneSettings";
-import { workplaneGridBandWidths, AXIS_ARROW_COLORS, axisArrowLayout, fillLightPosition, keyLightPosition, sceneLightLevels, shadowBlurRadius, softSceneLightLevels, workplaneGridLayout, workplaneGridLines, workplaneGridPalette, workplaneLabelLayout, workplaneThemePalette, WORKPLANE_LABEL_ASPECT, WORKPLANE_LINE_ELEVATION, type WorkplaneGridLayout } from "@/lib/workplaneGrid";
+import { axisCrossWidth, mmPerScreenPixel, workplaneGridBandWidths, AXIS_ARROW_COLORS, axisArrowLayout, fillLightPosition, keyLightPosition, sceneLightLevels, shadowBlurRadius, softSceneLightLevels, workplaneGridLayout, workplaneGridLines, workplaneGridPalette, workplaneLabelLayout, workplaneThemePalette, WORKPLANE_LABEL_ASPECT, WORKPLANE_LINE_ELEVATION, type WorkplaneGridLayout } from "@/lib/workplaneGrid";
 import type { WorkplaneWorkspaceSettings } from "@/types/layerling";
 import { pivotKeptAhead, ZOOM_PIVOT_REACH_MM } from "@/lib/zoomPivot";
 import { RENDER_LAYER_SHAPES } from "@/components/workplane/viewportPicking";
 import { RENDER_LAYER_HELPERS, type ShapeRenderRecord, type ThreeState, setObjectRenderLayer, freezeStaticObjectMatrices, disposeChildren, disposeObject } from "@/components/workplane/ViewportOverlays";
-import { RENDER_LAYER_MODIFIERS, RENDER_LAYER_PREVIEWS, clamp, WORKPLANE_LABEL_FONT_STACK } from "./viewportShapeObjects";
+import { RENDER_LAYER_MODIFIERS, RENDER_LAYER_PREVIEWS, clamp, pullModifierEdgeTowardCamera, WORKPLANE_LABEL_FONT_STACK } from "./viewportShapeObjects";
 import { CAMERA_DAMPING_PER_60HZ_FRAME } from "@/lib/cameraInertia";
 
 export const WORKPLANE_WIDTH = 200;
@@ -910,11 +910,14 @@ export function createGridLines(
   // a narrow band on the plate: stronger, and growing as you zoom in, as in similar tools (#143).
   const axisBand = THREE.MathUtils.clamp(Math.min(width, depth) * 0.0012, 0.15, 1);
   const borderBand = axisBand * 2;
-  const axisBands: Array<[number, number, number, number]> = outlineOnly ? [] : [
-    [0, -depth / 2, 0, depth / 2],
-    [-width / 2, 0, width / 2, 0],
-  ];
-  group.add(bandsFromSegments(axisBands, axisBand, palette.axis));
+  // Zoomed out, the cross no longer shrinks with the plate below AXIS_MIN_PIXELS, or it is lost among the darker
+  // lines (Discussion #1666): each arm is a band 1 mm wide, stretched across before every frame.
+  if (!outlineOnly) {
+    group.add(
+      axisCrossArm(bandsFromSegments([[0, -depth / 2, 0, depth / 2]], 1, palette.axis), "x", axisBand),
+      axisCrossArm(bandsFromSegments([[-width / 2, 0, width / 2, 0]], 1, palette.axis), "z", axisBand),
+    );
+  }
   // The border band lies inside the plate, so the plate keeps its size.
   const inset = borderBand / 2;
   group.add(bandsFromSegments(round ? rim(inset) : [
@@ -961,6 +964,38 @@ export function bandsFromSegments(segments: Array<[number, number, number, numbe
   }));
   bands.renderOrder = crossings?.order ?? 1;
   return bands;
+}
+
+const crossCentre = new THREE.Vector3();
+const crossLook = new THREE.Vector3();
+const crossViewport = new THREE.Vector2();
+
+/**
+ * An arm of the centre cross (a band 1 mm wide, see bandsFromSegments), stretched along `across` to `bandWidth` mm - or
+ * wider, so that it stays AXIS_MIN_PIXELS wide on the screen at the plate's middle (Discussion #1666). Set before every
+ * frame: the matrix is taken over right after, so it holds for the frame being drawn.
+ */
+function axisCrossArm(arm: THREE.Mesh, across: "x" | "z", bandWidth: number) {
+  arm.scale[across] = bandWidth;
+  arm.onBeforeRender = (renderer, _scene, camera) => {
+    renderer.getSize(crossViewport);
+    let perPixel = Number.NaN;
+    if ((camera as THREE.PerspectiveCamera).isPerspectiveCamera) {
+      arm.getWorldPosition(crossCentre);
+      camera.getWorldDirection(crossLook);
+      const depth = crossCentre.sub(camera.getWorldPosition(new THREE.Vector3())).dot(crossLook);
+      perPixel = mmPerScreenPixel({ perspective: true, fovDegrees: (camera as THREE.PerspectiveCamera).fov }, depth, crossViewport.y);
+    } else if ((camera as THREE.OrthographicCamera).isOrthographicCamera) {
+      const ortho = camera as THREE.OrthographicCamera;
+      perPixel = mmPerScreenPixel({ perspective: false, top: ortho.top, bottom: ortho.bottom, zoom: ortho.zoom }, 0, crossViewport.y);
+    }
+    const next = axisCrossWidth(bandWidth, perPixel);
+    if (Math.abs(arm.scale[across] - next) <= 1e-9) return;
+    arm.scale[across] = next;
+    arm.updateMatrix();
+    arm.updateMatrixWorld();
+  };
+  return arm;
 }
 
 export function linesFromPoints(points: number[], material: THREE.LineBasicMaterial) {
@@ -1130,6 +1165,9 @@ export function syncSplitPlane(state: ThreeState | null, plane: ModelSplitPlane 
     new THREE.Vector3(...plane.normal).normalize(),
   ));
 
+  // The part hides the plane behind and inside it, as a slicer's cut does (Issue #1606): drawn over everything, the plane,
+  // its lines and the cut line on the far side piled up into a jumble when seen almost along the plane, close up. Only
+  // the plane's outline shows faintly through, so it stays clear how far the plane reaches.
   const surface = new THREE.Mesh(
     new THREE.PlaneGeometry(width, height),
     new THREE.MeshBasicMaterial({
@@ -1137,16 +1175,22 @@ export function syncSplitPlane(state: ThreeState | null, plane: ModelSplitPlane 
       transparent: true,
       opacity: 0.24,
       side: THREE.DoubleSide,
-      depthTest: false,
       depthWrite: false,
     }),
   );
   surface.renderOrder = 900;
   root.add(surface);
 
+  const borderGeometry = new THREE.EdgesGeometry(surface.geometry);
+  const borderBehind = new THREE.LineSegments(
+    borderGeometry,
+    new THREE.LineBasicMaterial({ color: "#b35f07", transparent: true, opacity: 0.3, depthTest: false }),
+  );
+  borderBehind.renderOrder = 900;
+  root.add(borderBehind);
   const border = new THREE.LineSegments(
-    new THREE.EdgesGeometry(surface.geometry),
-    new THREE.LineBasicMaterial({ color: "#b35f07", transparent: true, opacity: 0.95, depthTest: false }),
+    borderGeometry,
+    new THREE.LineBasicMaterial({ color: "#b35f07", transparent: true, opacity: 0.95 }),
   );
   border.renderOrder = 901;
   root.add(border);
@@ -1157,7 +1201,7 @@ export function syncSplitPlane(state: ThreeState | null, plane: ModelSplitPlane 
   ]);
   const cross = new THREE.LineSegments(
     crossGeometry,
-    new THREE.LineBasicMaterial({ color: "#ffffff", transparent: true, opacity: 0.8, depthTest: false }),
+    new THREE.LineBasicMaterial({ color: "#ffffff", transparent: true, opacity: 0.8 }),
   );
   cross.renderOrder = 902;
   root.add(cross);
@@ -1197,7 +1241,18 @@ export function syncSplitPlane(state: ThreeState | null, plane: ModelSplitPlane 
   if (outlinePoints.length) {
     const outlineGeometry = new THREE.BufferGeometry();
     outlineGeometry.setAttribute("position", new THREE.Float32BufferAttribute(outlinePoints, 3));
-    const outline = new THREE.LineSegments(outlineGeometry, new THREE.LineBasicMaterial({ color: "#ffffff", transparent: true, opacity: 1, depthTest: false }));
+    // Bright where it can be seen, faint where it runs behind the part (Issue #1606): seen close up, the near and the far
+    // line were equally bright, and which of them was the cut could not be told. The bright one is pulled a hair towards
+    // the camera, as the edges of the edge tool are, so the face it lies on does not hide it.
+    const behindMaterial = new THREE.LineBasicMaterial({ color: "#ffffff", transparent: true, opacity: 0.28, depthTest: false });
+    const behind = new THREE.LineSegments(outlineGeometry, behindMaterial);
+    behind.name = "SplitCutLineBehind";
+    behind.renderOrder = 904;
+    behind.layers.set(RENDER_LAYER_PREVIEWS);
+    state.splitLayer.add(behind);
+    const outlineMaterial = new THREE.LineBasicMaterial({ color: "#ffffff", transparent: true, opacity: 1 });
+    pullModifierEdgeTowardCamera(outlineMaterial);
+    const outline = new THREE.LineSegments(outlineGeometry, outlineMaterial);
     outline.name = "SplitCutLine";
     outline.renderOrder = 905;
     outline.layers.set(RENDER_LAYER_PREVIEWS);

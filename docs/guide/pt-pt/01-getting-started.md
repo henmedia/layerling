@@ -91,6 +91,7 @@ No fundo da janela: {{ui:dashboard.sponsor}} abre a página onde podes apoiar o 
 ### Modo foco
 
 Num ecrã pequeno, o {{ui:focusMode.enter}} deixa a linha do título e o rodapé para o trabalho: o botão com as duas setas para fora no canto superior direito, [[Ctrl]]+[[Shift]]+[[F]] ou a pesquisa de comandos ativam-no. O friso sobe e a vista chega até ao limite da janela. Uma pequena barra por baixo do friso mantém a casinha para a página inicial, os separadores {{ui:editor.modeGeometry}} e {{ui:editor.modeSketch}}, a lupa, as definições e o botão com as duas setas para dentro, que termina o modo; arraste a barra pela pega para outro sítio, e um duplo clique na pega volta a colocá-la no lugar. O layerling lembra a escolha neste navegador e, enquanto o navegador ocupa o ecrã inteiro (F11), passa sozinho para o modo foco.
+A barra também mostra o nome do design; clique nele para lhe mudar o nome sem sair do modo foco.
 
 ## A tua primeira peça
 

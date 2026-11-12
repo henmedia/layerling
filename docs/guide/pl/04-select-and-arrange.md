@@ -22,7 +22,7 @@ Przy wielu częściach łatwo zgubić się w widoku. Lista obiektów ({{ui:edito
 ![Lista obiektów: grupa „Group” z dwiema częściami i kula obok niej. Ikona folderu otwiera grupę.](shot:object-list)
 
 - Kliknięcie wpisu zaznacza kształt, także części wewnątrz grupy. Z wciśniętym [[Shift]] dodajesz kolejne wpisy albo je odznaczasz, tak jak w widoku. Strzałki rozwijają i zwijają grupy.
-- Etykieta pokazuje, czy część jest {{ui:outliner.solid}}, czy {{ui:outliner.hole}}.
+- Litera za nazwą pokazuje, czy część jest {{ui:outliner.solid}}, czy {{ui:outliner.hole}}: to pierwsza litera słowa, a całe słowo pojawia się po najechaniu myszą.
 - Pod nazwą widać, jaki to kształt. Bryła, która nie jest już prostym kształtem (zaokrąglona, wydrążona lub zaimportowana), pokazuje {{ui:shape.exactBody}}, gdy eksport STEP zapisuje ją dokładnie, i {{ui:shape.mesh}}, gdy składa się tylko z trójkątów i trafia do STL. Zwężenie, pochylenie lub skręt dodane dopiero po zaokrągleniu lub wydrążeniu bryły wyginają tylko jej siatkę, więc wtedy pokazuje {{ui:shape.mesh}}.
 - Kłódka i oko blokują i ukrywają pojedyncze części.
 - {{ui:outliner.rename}} nadaje części własną nazwę. Ołówek obok nazwy na górze ustawień robi to samo dla zaznaczonego kształtu. Sensowne nazwy bardzo pomagają w większych projektach.
@@ -32,7 +32,7 @@ Przy wielu częściach łatwo zgubić się w widoku. Lista obiektów ({{ui:edito
 - Pole wyszukiwania znajduje kształty po nazwie i po rodzaju, więc także „walec” albo „otwór”. Zagląda też do wnętrza grup, niezależnie od głębokości zagnieżdżenia: grupa zawierająca trafienie zostaje na liście i rozwija się, pokazując pasujące części i grupy, które do nich prowadzą. Grupa znaleziona po własnej nazwie po otwarciu pokazuje wszystkie swoje części.
 - Strzałka po lewej stronie paska tytułu zwija listę do samego paska i z powrotem.
 
-Lista jest zadokowana tuż na prawo od kostki widoku. Przeciągnij ją za pasek tytułu, aby położyć ją w dowolnym miejscu na płaszczyźnie roboczej. Przechodzi pod kostką widoku i paskiem widoku. Upuść ją z powrotem obok kostki widoku albo kliknij dwukrotnie pasek tytułu, a znów się zadokuje. Przeglądarka zapamiętuje, gdzie była i czy była zwinięta.
+Lista jest zadokowana tuż na prawo od kostki widoku. Przeciągnij ją za pasek tytułu, aby położyć ją w dowolnym miejscu na płaszczyźnie roboczej. Przechodzi pod kostką widoku i paskiem widoku. Upuść ją z powrotem obok kostki widoku albo kliknij dwukrotnie pasek tytułu, a znów się zadokuje. Przeglądarka zapamiętuje, gdzie była i czy była zwinięta. Aby poszerzyć lub zwęzić listę, przeciągnij jej prawy dolny róg, od 240 do 600 pikseli; przeglądarka zapamiętuje także szerokość.
 
 ## Wpisywanie pozycji
 
@@ -45,6 +45,8 @@ Kształt możesz przeciągnąć poza krawędź płyty i tam zostawić, mniej wi�
 ## Przyciąganie podczas przesuwania
 
 Gdy przeciągasz kształt po płaszczyźnie roboczej, przyciąga się on do innych kształtów: jego lewa, prawa, przednia lub tylna krawędź albo środek ląduje dokładnie na krawędzi albo środku innego kształtu. Różowa linia pomocnicza pokazuje, czego się trzyma. Dzięki temu dwie części stają na równo obok siebie albo wyśrodkowane jedna za drugą bez wpisywania liczb. Działa to także przy wyłączonej siatce. Liczy się też środek płaszczyzny roboczej: różowe linie pokazują, kiedy kształt stoi na środku płyty wzdłuż X, Y albo obu.
+
+Przy zmianie rozmiaru też działa przyciąganie: gdy ciągniesz za boczny uchwyt, ten bok zatrzymuje się na krawędziach i środkach innych kształtów oraz na ściance, na którą trafi, także na wewnętrznej ściance pudełka, wydrążonej bryły lub zaimportowanej obudowy, a różowa linia pokazuje gdzie. Ten wymiar zostaje dokładnie taki, poza siatką. Tak część wypełnia obudowę od ścianki do ścianki: przyłóż ją do jednej ścianki i przeciągnij jej drugi bok do przeciwległej. Z [[Alt]] kształt rośnie od środka, a przeciągany bok przyciąga się tak samo; z [[Shift]] zachowuje proporcje i się nie przyciąga. Działa to na płaskiej płaszczyźnie roboczej dla kształtów stojących prosto, z bokami wzdłuż X i Y, a {{ui:workspace.objectSnap}} wyłącza to razem z przyciąganiem przy przesuwaniu.
 
 Przytrzymaj [[Shift]] podczas przeciągania, aby ruch został na jednej osi: kształt podąża w tym kierunku, X albo Y, w którym przeciągnąłeś dalej, a drugiego nie rusza. Najlepiej naciśnij [[Shift]] dopiero w trakcie przeciągania, bo na kształcie, który nie jest jeszcze zaznaczony, kliknięcie z [[Shift]] tylko dodaje go do zaznaczenia.
 

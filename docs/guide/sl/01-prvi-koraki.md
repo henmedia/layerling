@@ -91,6 +91,7 @@ Na dnu okna: {{ui:dashboard.sponsor}} vodi na stran, kjer lahko podprete projekt
 ### Način osredotočenja
 
 Na majhnem zaslonu {{ui:focusMode.enter}} prepusti naslovno vrstico in nogo delu: vklopi ga gumb z dvema puščicama navzven zgoraj desno, [[Ctrl]]+[[Shift]]+[[F]] ali iskanje ukazov. Trak se pomakne navzgor, pogled pa sega do roba okna. Majhna vrstica pod trakom obdrži hišico za začetno stran, zavihka {{ui:editor.modeGeometry}} in {{ui:editor.modeSketch}}, lupo, nastavitve in gumb z dvema puščicama navznoter, ki način konča; vrstico za ročaj povlecite drugam, dvoklik na ročaj jo vrne. layerling si izbiro zapomni v tem brskalniku, in dokler brskalnik zapolnjuje cel zaslon (F11), sam preklopi v način osredotočenja.
+Vrstica prikazuje tudi ime projekta; s klikom nanj ga preimenujete, ne da bi zapustili način osredotočenja.
 
 ## Tvoj prvi del
 

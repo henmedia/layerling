@@ -91,6 +91,7 @@ Am Fuß des Fensters: {{ui:dashboard.sponsor}} führt zur Seite, auf der du das 
 ### Fokusmodus
 
 Auf einem kleinen Bildschirm gibt der {{ui:focusMode.enter}} die Titelzeile und die Fußzeile an die Arbeit ab: Der Knopf mit den zwei nach außen zeigenden Pfeilen oben rechts, [[Strg]]+[[Umschalt]]+[[F]] oder die Befehlssuche schalten ihn ein. Das Menüband rückt nach oben, und die Ansicht reicht bis an den unteren Fensterrand. Eine kleine Leiste unter dem Menüband behält das Haus zur Startseite, die Reiter {{ui:editor.modeGeometry}} und {{ui:editor.modeSketch}}, die Lupe, die Einstellungen und den Knopf mit den zwei nach innen zeigenden Pfeilen, der den Fokusmodus beendet; am Griff lässt sich die Leiste an eine andere Stelle ziehen, ein Doppelklick auf den Griff stellt sie zurück. layerling merkt sich die Wahl in diesem Browser, und solange der Browser den ganzen Bildschirm füllt (F11), schaltet es von selbst in den Fokusmodus.
+Die Leiste zeigt auch den Namen des Entwurfs; ein Klick darauf benennt ihn um, ohne den Fokusmodus zu verlassen.
 
 ## Dein erstes Teil
 

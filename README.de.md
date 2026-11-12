@@ -21,7 +21,7 @@
     <a href="#layerling-mcp-skill"><img alt="Von einer KI steuerbar" src="https://img.shields.io/badge/KI--steuerbar-MCP--Server-16c0d4"></a>
   </p>
 
-  <p><a href="README.md">English</a> · <strong>Deutsch</strong> · <a href="README.es.md">Español</a> · <a href="README.nl.md">Nederlands</a> · <a href="README.ar.md">العربية</a> · <a href="README.ja.md">日本語</a> · <a href="README.zh-cn.md">简体中文</a> · <a href="README.zh-tw.md">繁體中文</a></p>
+  <p><a href="README.md">English</a> · <strong>Deutsch</strong> · <a href="README.es.md">Español</a> · <a href="README.nl.md">Nederlands</a> · <a href="README.sv.md">Svenska</a> · <a href="README.ar.md">العربية</a> · <a href="README.ja.md">日本語</a> · <a href="README.zh-cn.md">简体中文</a> · <a href="README.zh-tw.md">繁體中文</a></p>
 </div>
 
 <p align="center">
@@ -71,7 +71,7 @@ Ein vollständiges CAD-Paket ist es nicht: Es gibt keine parametrische Zeitleist
 - **Licht und Schatten nach Geschmack** – Kontrast der Schattierung, Stärke und Weichheit der Schatten sowie Richtung und Höhe des Lichts, bis senkrecht von oben wie bei Tinkercad, alles in den Einstellungen. Ein Knopf „Wie Tinkercad“ stellt Farben, Raster und Licht auf einmal so ein wie dort, und die kräftigen Rasterlinien kommen auf Wunsch jeden Zentimeter in eigener Farbe.
 - **Schnellmodus** – für langsamere Rechner: ein Schalter in den Einstellungen schaltet Schatten, Kantenlinien und das Nachlaufen der Kamera ab und zeichnet die Ansicht in Bildschirmauflösung; das Nachlaufen lässt sich auch einzeln abschalten, dann steht die Ansicht sofort.
 - **Flächen aneinanderlegen und Winkel sehen** – das Werkzeug legt eine Fläche eines Teils an eine Fläche eines anderen, berührend oder bündig, auf Wunsch mit Abstand, bringt ein Loch oder einen Zapfen auf die Achse eines anderen Lochs oder verschiebt ein Teil gerade, sodass eine Ecke oder ein Bezugspunkt auf einem Punkt eines anderen Teils landet, entlang X, Y und Z oder nur einzelner Achsen, und dreht es mit einem zweiten und dritten Punktpaar in Lage, wie beim Ausrichten an drei Punkten; ein gedrehter Körper zeigt seine Winkel um X, Y und Z unter der Auswahl, und die Karte „Drehung“ in seinen Einstellungen nimmt sie als Zahlen.
-- **Fangen an anderen Formen** – beim Verschieben rastet eine Form mit Kante oder Mitte an Kanten und Mitten der Formen ringsum ein, eine Hilfslinie zeigt woran. So sitzen Teile bündig, ohne Zahlen zu tippen. Auch die Mitte der Arbeitsebene zählt, für ein Teil genau in der Plattenmitte. Alt während des Ziehens hält das kurz an; Umschalt hält die Bewegung auf einer Achse, und mit Alt zu Beginn ziehst du wie in Tinkercad eine Kopie.
+- **Fangen an anderen Formen** – beim Verschieben rastet eine Form mit Kante oder Mitte an Kanten und Mitten der Formen ringsum ein, eine Hilfslinie zeigt woran. So sitzen Teile bündig, ohne Zahlen zu tippen. Auch die Mitte der Arbeitsebene zählt, für ein Teil genau in der Plattenmitte. Alt während des Ziehens hält das kurz an; Umschalt hält die Bewegung auf einer Achse, und mit Alt zu Beginn ziehst du wie in Tinkercad eine Kopie. Auch beim Ändern der Größe rastet es ein: Ein Seitengriff hält an den Kanten anderer Formen und an der Wand, auf die er trifft, auch an der Innenwand eines Kastens, so füllt ein Teil ein Gehäuse von Wand zu Wand.
 - **Auf Flächen absetzen** – wie Cruise in Tinkercad: Eine neue Form legt sich auf die Fläche unter dem Zeiger, auch auf eine schräge, und C nimmt die Auswahl auf und setzt sie so auf eine andere Fläche. Mit gedrückter Umschalttaste beim Absetzen sinkt sie stattdessen ein, aufrecht und oben bündig mit der Fläche - etwa für eine Senkung oder eine Stufenbohrung.
 - **Bezugspunkte** – Körper mit der rechten Maustaste anklicken und Mitte, Ecken oder Kantenmitten mit Punkten markieren, die nichts druckt und an denen gezogene Formen einrasten; Punkte lassen sich ziehen oder per Koordinate eintippen und werden mit dem Entwurf gespeichert. Das Maßband kann die Mitte einer Messung markieren, etwa den Mittelpunkt einer runden Bohrung.
 - **Winkelmesser** – der Winkelmesser in der Ansichtsleiste misst den Winkel an einer Ecke aus drei Klicks oder zwischen zwei ebenen Flächen (eine 45°-Fase zeigt 45° · 135°); er rastet wie das Maßband an Ecken und Kanten ein und folgt den Körpern.
@@ -80,7 +80,7 @@ Ein vollständiges CAD-Paket ist es nicht: Es gibt keine parametrische Zeitleist
 - **Befehlssuche** – mit Strg+K ein Werkzeug, eine Form oder einen Befehl eintippen („Verrunden“, „Spiegeln“, „Zylinder“) und direkt dorthin springen; sie versteht deutsche und englische Wörter und zeigt die Tastenkürzel dazu.
 - **Eigene Tasten** – jeden Befehl der Befehlssuche im Fenster „Tastenkürzel“ auf eine eigene Taste legen: Zentrieren, die Formenauswahl oder die Lieblingsform liegen dann eine Taste entfernt.
 - **Eigenes Menüband** – Gruppen und Knöpfe, die du nie brauchst, in den Einstellungen (Darstellung) aus dem Menüband nehmen; Befehlssuche und Tasten führen sie weiter aus, und die Reihenfolge des Menübands bleibt gleich.
-- **Fokusmodus** – auf einem kleinen Laptop-Bildschirm Titelzeile und Fußzeile des Editors mit einem Knopf oder Strg+Umschalt+F ausblenden; eine kleine Leiste über der Ansicht behält Reiter, Startseite, Befehlssuche und Einstellungen. Er kommt auch von selbst, solange der Browser im Vollbild ist (F11).
+- **Fokusmodus** – auf einem kleinen Laptop-Bildschirm Titelzeile und Fußzeile des Editors mit einem Knopf oder Strg+Umschalt+F ausblenden; eine kleine Leiste über der Ansicht behält Reiter, Startseite, den Namen des Entwurfs, Befehlssuche und Einstellungen. Er kommt auch von selbst, solange der Browser im Vollbild ist (F11).
 - **Verlaufsansicht** – mit einem Schieber auf jeden früheren Stand des Projekts zurückschauen, ohne etwas zu ändern; diesen Stand exportieren oder als neues Projekt anlegen. Von @rmpel. Rückgängig und Wiederholen nennen im Tooltip den Schritt, den sie zurücknehmen, mit seinem Maß („Kanten von Box gerundet (5 mm)“), und eine Liste in der Verlaufsansicht nennt jeden Schritt, um mit einem Klick zu einem davon zu springen.
 - **Millimeter oder Zoll** – mit Imperial erscheinen alle Maße in Zoll, als Bruch wie in Tinkercad (1 5/8) oder als Dezimalzahl, das Raster rastet von 1/64 bis 1 Zoll, und das Gitter der Platte ist in Zoll gezeichnet.
 - **Die Platte deines Druckers** – wähl einen von über 230 gängigen Druckern, dann bekommt die Platte seine Größe – rund bei einem Delta-Drucker wie einem FLSun. Name und Bauraum stehen in der Ecke der Arbeitsfläche (ein Schalter in den Einstellungen blendet das und den Namen des Entwurfs aus), und eine Warnung erscheint, wenn ein Körper über den Rand ragt.
@@ -104,7 +104,7 @@ Ein vollständiges CAD-Paket ist es nicht: Es gibt keine parametrische Zeitleist
 
 ### Bearbeiten
 
-- **Kanten fasen und verrunden** – jede Kante eines Körpers brechen oder abrunden, eine gerade Kante auch konkav als Hohlkehle ausschneiden wie die ausgehöhlten Ecken einer Box, und später wieder zurücknehmen oder ändern.
+- **Kanten fasen und verrunden** – jede Kante eines Körpers brechen oder abrunden, eine gerade Kante auch konkav als Hohlkehle ausschneiden wie die ausgehöhlten Ecken einer Box, und später wieder zurücknehmen oder ändern; ist eine Größe zu groß für die Kante, findet ein Klick die größte passende.
 - **Skizzen** – Umrisse aus Linien, Kurven und fertigen Formen zeichnen, mit Stift, Finger oder Maus freihand zeichnen (die Linie wird zu wenigen Punkten, die sich bearbeiten lassen), Linien schon beim Zeichnen nach Länge und Winkel setzen („50<30“, Umschalt rastet in 15°-Schritten ein), Längen, Winkel, Größen und die Lage eines ausgewählten Umrisses, Punkts oder Kurvengriffs eintippen (Rechnungen wie „60+12,5“ gehen in jedem Zahlenfeld), Ecken runden oder fasen, an den Umrissen anderer Körper einrasten, Hilfslinien zum Einrasten ziehen und daraus exakte Körper ziehen, drehen oder an einem Pfad entlangziehen. Eine Drehung mit Steigung windet den Umriss als einen durchgehenden Strang zur Schraubenlinie statt zu Ringen, wie Filament auf einer Spule. Eine Skizze lässt sich auch als Kontur bauen: Ein geschlossener Umriss wird ein Rahmen, innen, außen oder mittig auf der Linie, eine offene Linie ein Streifen mit flachen, eckigen oder runden Enden. Eine Zeichnung oder ein Foto unter der Skizze wird mit einem Klick zu Skizzenlinien nachgezeichnet, der dunkle oder der helle Teil, bei einer Schwelle, die du einstellst.
 - **Aushöhlen** – aus einem Körper Wände gleicher Stärke machen, auf jeder gewünschten Seite offen (oben, unten, vorne, hinten, links, rechts, beliebig kombiniert) oder ganz geschlossen – für Dosen, Becher und Gehäuse.
 - **Gefälle und Zulaufen in der Länge** – die Oberseite von Quader, Zylinder, Vieleck, Rohr, Keil oder rundem Dach zu einem Ende hin abfallen lassen oder die Seiten aller außer dem Rohr zu einem Ende hin zusammenlaufen lassen, gerade oder gewölbt, per Zahl oder mit einem Punkt am Ende: ein Dach, das in der Länge abfällt, eine Rampe, ein schräg abgeschnittenes Rohrende, ein Bootsbug. Ein Gefälle bleibt exakt für Fasen, Verrundungen und STEP, ebenso ein zulaufender Quader, Keil oder rundes Dach. Von @plazmabokor.
@@ -132,6 +132,7 @@ Ein vollständiges CAD-Paket ist es nicht: Es gibt keine parametrische Zeitleist
 - **Mehrere Entwürfe auf einmal löschen** – **Auswählen** auf der Startseite wählt Entwürfe per Klick auf ihre Karten (oder alle), und eine Frage löscht die ganze Auswahl; auch im Serverordner.
 - **Ordner für Entwürfe** – die Entwürfe auf der Startseite in Ordner sortieren (auch Ordner in Ordnern), per Ziehen oder mit „Verschieben nach …“; die Suche schaut in alle, und „Alle sichern“ nimmt sie mit.
 - **Projekte als Datei** – ein ganzes Projekt samt Verlauf, Skizzen und Gruppen als `.lyl` sichern und anderswo weiterbauen. In Chrome und Edge wählst du den Ordner selbst, und Strg+S speichert wieder in genau diese Datei; andere Browser laden sie herunter. Ältere `.skf`-Dateien aus früheren Fassungen öffnen sich weiterhin; gespeichert wird dann als `.lyl` daneben.
+- **Frühere Fassungen** – bevor Speichern eine `.lyl`-Datei überschreibt, behält layerling die Datei, wie sie war, und beim Arbeiten alle paar Minuten einen Zwischenstand; jede Fassung öffnet sich wieder als neuer Entwurf. Wie viele bleiben, legst du unter Einstellungen → Sicherungen fest, und in Chrome und Edge landen sie auf Wunsch auch in einem eigenen Ordner. Ein Hinweis auf der Startseite und im Editor erinnert daran, alle Entwürfe in eine Datei zu sichern und sie an einem zweiten Ort aufzubewahren: deine Daten, deine Sicherung.
 - **Fehlerbericht** – ein Link in der Fußzeile speichert ein ZIP mit dem Entwurf als `.lyl` und einem Text mit Version, Browser und den letzten Meldungen, fertig zum Anhängen im Forum oder bei GitHub, die eine bloße `.lyl` ablehnen.
 - **Entwürfe, die du wiedererkennst** – jeder Entwurf mit Vorschaubild, in deinem Browser oder im Serverordner.
 - **Anhänge** – Notizen, ein Foto des gedruckten Teils oder ein Datenblatt im Entwurf aufbewahren: `.md`- und `.txt`-Dateien, Bilder als `.png`, `.jpg` und `.webp` sowie PDF-Dateien reisen mit der `.lyl`-Datei. Das Auge öffnet einen Text oder ein Bild in einem Fenster; ein PDF wird heruntergeladen. SVG wird nicht angenommen, weil es Skripte tragen kann.
@@ -143,7 +144,7 @@ Ein vollständiges CAD-Paket ist es nicht: Es gibt keine parametrische Zeitleist
 - **Vier gespeicherte Ansichten je Entwurf** – **Umschalt+7**, **8**, **9** oder **0** speichert die Ansicht genau so, wie sie ist (Blickwinkel, Ausschnitt, Zoom), und die Taste allein holt sie zurück. Jeder Entwurf hat seine eigenen, und eine gespeicherte `.lyl`-Datei nimmt sie mit.
 - **Gerade auf die Arbeitsebene schauen** – **P** oder der Knopf neben „Arbeitsebene setzen“ in der Ansichtsleiste dreht die Ansicht gerade auf die Arbeitsebene, auch auf einer schrägen Fläche, mit ihrem Ursprung in der Mitte.
 - **Der Ansichtswürfel in jeder Ecke** – Einstellungen > Darstellung > **Position des Ansichtswürfels** stellt den Würfel oben links, oben rechts, unten links oder unten rechts hin; in jeder Ecke außer oben links rückt die Ansichtsleiste an seinen Platz nach oben.
-- **In deiner Sprache** – das Programm und seine Anleitung gibt es auf Englisch, Deutsch und in 17 weiteren Sprachen; die Sprachliste steht ganz oben rechts.
+- **In deiner Sprache** – das Programm und seine Anleitung gibt es auf Englisch, Deutsch und in 18 weiteren Sprachen; die Sprachliste steht ganz oben rechts.
 - **Von unten schauen** – das Auge über dem Gitter in der Ansichtsleiste blendet die Platte aus, damit die Unterseite eines Entwurfs frei zu sehen ist.
 - **Eine zweite Ansicht im eigenen Fenster** – ein Knopf in der Ansichtsleiste öffnet ein zweites Fenster, das denselben Entwurf durch eine eigene Kamera zeigt, mit eigenem Ansichtswürfel und eigener Ansichtsleiste, und folgt jeder Änderung. Es öffnet sich dort, wo du es zuletzt gelassen hast.
 - **Fenster nach Wunsch** – Objektliste, Einstellungen, Schnittansicht, Maßband und die Werkzeugfenster für Kanten, Aushöhlen und Muster lassen sich an ihrer Titelleiste frei verschieben und öffnen sich dort wieder; ein Doppelklick dockt sie an.
@@ -239,6 +240,8 @@ Dieselbe Zeile später noch einmal ausführen **aktualisiert**: Der vorhandene O
 
 Um layerling auf einem Rechner, NAS (Synology, Unraid usw.) oder Heimserver ohne Node.js zu betreiben, nimmst du das fertige Image **`henmedia/layerling`** auf Docker Hub (auch unter **`ghcr.io/henmedia/layerling`**, dasselbe Image). Jedes Release veröffentlicht es für amd64 und arm64 (Raspberry Pi, ARM-NAS), unter seiner Versionsnummer und als `latest`. Die App lauscht auf Port **3000**.
 
+Noch nie mit Docker gearbeitet? [layerling in Docker, Schritt für Schritt](docs/docker/de/docker-schritt-fuer-schritt.md) fängt unter Windows, macOS oder Linux bei null an: Docker installieren, layerling starten und die Entwürfe als Dateien in einem Ordner auf dem Rechner speichern. Auf Englisch: [step by step](docs/docker/en/docker-step-by-step.md).
+
 Am schnellsten geht es mit einem einzigen Befehl:
 
 ```bash
@@ -312,6 +315,24 @@ Vier Dinge zu wissen:
 - **Ein schneller Test auf dem eigenen Rechner:** `npx serve apps/web/.next-export` und die angezeigte Adresse öffnen.
 - **Als App installieren und offline nutzen geht nur mit https.** Der Export enthält die Offline-Dateien (`sw.js`), aber ein Browser nutzt sie nur unter einer `https://`-Adresse oder auf `localhost`, nicht unter einer einfachen `http://`-Adresse im eigenen Netz.
 
+### Editor-Profile
+
+Ein optionales Editor-Profil ändert das 3D-Menüband und ausgewählte Werkzeugoptionen für diese Seite. So probierst du das [Beispielprofil](docs/examples/editor-profile.json) in einem lokalen Checkout aus:
+
+```sh
+LAYERLING_EDITOR_PROFILE="$(cat docs/examples/editor-profile.json)" npm run dev
+```
+
+Öffne den Editor, füge einen Quader hinzu und wähle ihn aus. Das einfache Menüband nutzt die übliche Symbolgröße. **Druck prüfen** ist sichtbar, **Deckel** und **Flexi-Gelenke** sind ausgeblendet. Öffne **Verrundung**: Auf einem Quader, der groß genug dafür ist, steht der Startradius auf 2 mm. Die Option **Nur sichtbare Kanten** ist ausgeblendet und eingeschaltet.
+
+- `version` muss `1` sein. Ein optionales `base` mit `simple` oder `full` wählt dieses Layout für diese Seite, vor der Wahl im Browser und der Voreinstellung des Node-Servers. Lässt du es weg, bleibt der gewohnte Umschalter für den Modus.
+- Mit `enlargeInSimpleMode: false` haben Werkzeugleiste, Formenmenü und Bedienelemente dieselbe Größe wie im vollen Modus. Die im Browser gewählte Größe der Werkzeugleiste gilt weiter.
+- Unter `tools` überschreibt `visible: true` oder `false` das Layout für die Werkzeuge in den Bereichen Zwischenablage, Verlauf, Kombinieren, Ändern und Anordnen des 3D-Menübands sowie für `import`. Nimm die ID des Werkzeugs (das Attribut `data-layerling-tool` an den normalen Knöpfen des Menübands). Die Menüband-Einstellungen können die Werkzeuge, die das aktive Profil anbietet, weiterhin ausblenden oder umsortieren. Ein sichtbares Werkzeug braucht weiterhin die übliche Auswahl. Unbekannte Einträge wirken nicht.
+- Unter `tools.fillet.options` ist `amount.default` ein Radius in Millimetern. Ein gültiger gemerkter Radius hat Vorrang, und der eigene Startwert des Werkzeugs gilt, wenn keiner von beiden zum Körper passt. `onlyVisibleEdges` nimmt `visible`, einen booleschen `default` und `locked`. Eine Sperre braucht einen `default` und hat Vorrang vor dem gemerkten Wert.
+- Profile wirken auf das Menüband und die zugehörigen Optionen in den Dialogen. Kontextmenüs, Tastenkürzel, Formen und die Kamera verhalten sich wie gewohnt. Den Zugriff auf Projekte regelst du über die Berechtigungen des Hosts.
+
+`LAYERLING_EDITOR_PROFILE` wird vom Layout gelesen, wenn das HTML erzeugt wird. Setze es, bevor du den Entwicklungsserver startest oder das Produktions-HTML baust, auch für einen statischen Export. Hosts, die das HTML selbst erzeugen, können stattdessen ein einzelnes `<script type="application/json" id="layerling-editor-profile">…</script>` in den Kopf des Dokuments setzen, vor die Skripte von layerling. Schreibe ein wörtliches `<` im serialisierten JSON als `\u003c`. Profile sind unabhängig von Projektdateien und Browsereinstellungen und werden einmal je Seitenaufruf gelesen. Für Profile je Konto liefere das persönliche HTML von einer privaten, nicht zwischengespeicherten Seite außerhalb des Offline-Caches des statischen Service Workers aus, etwa über einen PHP-Einstiegspunkt.
+
 ### Gemeinsame Entwürfe im Netz
 
 layerling selbst besteht nur aus Dateien, der gemeinsame Ordner braucht also etwas auf dem Server, das schreiben kann. Es gibt zwei Wege, und du brauchst nur einen: **Node oder Docker** (dieser Abschnitt, mit `LAYERLING_SHARED_PROJECTS_DIR`) oder **ein gewöhnlicher Webserver mit PHP** (der Ordner `store`, weiter unten). Ein Webserver, der die Dateien nur ausliefert – `npx serve`, nginx oder Apache ohne PHP –, zeigt layerling ganz normal, hat aber keinen Serverordner.
@@ -325,13 +346,17 @@ layerling startet (ein Ordner unter `/srv` gehört oft root, lege einen eigenen 
 LAYERLING_SHARED_PROJECTS_DIR=/srv/layerling-projekte npm run start
 ```
 
-Auf der Startseite steht dann neben deinen Browser-Entwürfen der Ordner **Auf dem Server**. Öffnest du ihn, bist du in
-diesem Ordner: **Neuer Entwurf** legt einen darin an, **Neuer Ordner** einen Unterordner, und die Pfadzeile unter der
-Überschrift sagt, wo du bist. Eine `..`-Kachel führt wieder hinaus, und **Zurück zu den Entwürfen in diesem Browser** links neben den Knöpfen bringt dich zu den Entwürfen dieses Browsers zurück. Entwürfe wandern per Ziehen auf einen Ordner, auf
-diese Kachel oder auf einen Schritt der Pfadzeile – oder über **Verschieben nach …** in ihrem Menü. Ein Entwurf aus dem
-Browser kommt genauso auf den Server: seine Kachel auf den Serverordner ziehen.
+Auf der Startseite stehen die Entwürfe dann in zwei Reitern, **Server** für den gemeinsamen Ordner und **Browser** für die
+Entwürfe dieses Browsers. Ist der Reiter Server offen, legt **Neuen 3D-Entwurf anlegen** den Entwurf in dem Serverordner
+an, in dem du bist, **Neuer Ordner** einen Unterordner, und die Pfadzeile unter den Reitern sagt, wo du bist, und führt
+wieder hinaus. Entwürfe wandern per Ziehen auf einen Ordner oder auf einen Schritt der Pfadzeile – oder über
+**Verschieben nach …** in ihrem Menü. Ein Entwurf aus dem Browser kommt auf den Server, indem du seine Kachel auf den
+Reiter Server ziehst, oder mit **Auf den Server legen** in seinem Menü; ein Ordner kommt genauso hin, mit allem darin, und
+bleibt auf dem Server ein Ordner. Zurück geht es mit **In diesen Browser holen** im
+Menü eines Serverentwurfs oder indem du seine Kachel auf den Reiter Browser ziehst: Der Entwurf liegt dann nur noch in
+diesem Browser und verschwindet aus dem Serverordner, auch für die anderen.
 
-Zwei Schaltflächen auf der Startseite ersparen das Verschieben von Hand: **Alle auf den Server legen** legt alle Entwürfe dieses Browsers auf einmal in den Serverordner, und der Haken **Neue Entwürfe auf dem Server** lässt jeden neuen Entwurf gleich im Serverordner beginnen, sodass er sich dort ab der ersten Änderung sichert. Ein Entwurf, dessen Name auf dem Server schon vergeben ist, bleibt im Browser.
+Zwei Schaltflächen auf der Startseite ersparen das Verschieben von Hand: **Alle auf den Server legen** legt alle Entwürfe dieses Browsers auf einmal in den Serverordner, in dieselben Ordner, und der Haken **Neue Entwürfe auf dem Server** lässt jeden neuen Entwurf gleich im Serverordner beginnen, sodass er sich dort ab der ersten Änderung sichert. Ein Entwurf, dessen Name auf dem Server schon vergeben ist, bleibt im Browser.
 
 Das Suchfeld oben durchsucht den **ganzen** Serverordner, nicht nur den, in dem du gerade stehst. Jeder Treffer sagt,
 in welchem Ordner er liegt, und dieser Ordner ist ein Knopf: ein Klick, und du bist dort, die Suche ist beendet.

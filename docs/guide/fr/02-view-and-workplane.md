@@ -99,6 +99,7 @@ Quand un design contient plus qu'un plateau ne peut imprimer, une boîte avec so
 
 - Chaque plateau est aussi grand que le plan de travail, et les plateaux sont côte à côte à droite du premier, à 20 mm l'un de l'autre. Un corps appartient au plateau sur lequel se trouve le milieu de son empreinte ; en le faisant glisser de l'autre côté, il passe sur l'autre plateau. Un design compte jusqu'à 12 plateaux.
 - Un clic sur un plateau dans la barre l'affiche, et les nouvelles formes et les fichiers importés s'y posent alors. {{ui:plates.showAll}} les affiche tous. Un double-clic sur un plateau, ou {{ui:plates.rename}}, lui donne un nom comme « Couvercle », écrit sur le plateau.
+- Une nouvelle esquisse sur le plateau commence aussi sur le plateau actif : la zone d'esquisse montre ce plateau avec ses corps, et le corps terminé s'y trouve.
 - {{ui:plates.moveLeft}} et {{ui:plates.moveRight}} changent l'ordre, les corps suivant leur plateau. {{ui:plates.remove}} retire le plateau actif ; ses corps passent sur le premier plateau au même endroit.
 - {{ui:plates.arrange}} dispose les corps sélectionnés, ou tous, rangée par rangée sur les plateaux, les plus grands d'abord, à 5 mm l'un de l'autre, et ajoute des plateaux tant qu'il en faut. Un corps plus grand qu'un plateau reste en place.
 - Avec une imprimante choisie, chaque corps est contrôlé par rapport à son propre plateau, et la hauteur d'impression compte à partir du corps le plus bas de ce plateau. Un plateau avec un corps qui ne tient pas affiche son nombre en rouge.

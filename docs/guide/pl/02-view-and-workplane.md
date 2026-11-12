@@ -102,6 +102,7 @@ Gdy projekt zawiera więcej, niż zmieści jeden stół, na przykład pudełko z
 
 - Każdy stół jest tak duży jak płaszczyzna robocza, a stoły leżą obok siebie na prawo od pierwszego, 20 mm od siebie. Bryła należy do stołu, na którym stoi środek jej podstawy, więc po przeciągnięciu na drugą stronę trafia na inny stół. Projekt ma do 12 stołów.
 - Kliknięcie stołu na pasku pokazuje go, a nowe kształty i importowane pliki trafiają potem na niego. {{ui:plates.showAll}} pokazuje wszystkie. Dwukrotne kliknięcie stołu lub {{ui:plates.rename}} nadaje mu nazwę, np. „Pokrywka”, która jest napisana na stole.
+- Nowy szkic na stole też zaczyna się na aktywnym stole: obszar szkicu pokazuje ten stół z jego bryłami, a gotowa bryła stoi właśnie tam.
 - {{ui:plates.moveLeft}} i {{ui:plates.moveRight}} zmieniają kolejność, a bryły przesuwają się ze swoim stołem. {{ui:plates.remove}} usuwa aktywny stół; jego bryły trafiają na pierwszy stół w to samo miejsce.
 - {{ui:plates.arrange}} układa zaznaczone bryły, albo wszystkie, rząd po rzędzie na stołach, największe najpierw, 5 mm od siebie, i dodaje stoły, dopóki są potrzebne. Bryła większa niż stół zostaje na miejscu.
 - Przy wybranej drukarce każda bryła jest sprawdzana względem własnego stołu, a wysokość druku liczy się od najniższej bryły na tym stole. Stół z bryłą, która się nie mieści, pokazuje swoją liczbę na czerwono.

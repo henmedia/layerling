@@ -333,6 +333,8 @@ export function tapeShapeTopologyKey(shape: WorkplaneShape): string {
     gearRim: shape.gearRim,
     helixAngle: shape.helixAngle,
     bevelHelixAngle: shape.bevelHelixAngle,
+    ringRackHelixAngle: shape.ringRackHelixAngle,
+    ringRackHerringbone: shape.ringRackHerringbone,
     threadRole: shape.threadRole,
     threadHead: shape.threadHead,
     threadHand: shape.threadHand,
@@ -496,6 +498,7 @@ export function tapeShapeTopologyKey(shape: WorkplaneShape): string {
     screwHoleAngle: shape.screwHoleAngle,
     screwHoleSlot: shape.screwHoleSlot,
     screwHoleRecess: shape.screwHoleRecess,
+    screwHoleChamfer: shape.screwHoleChamfer,
     // The drill point as built: a solid, the double countersink and a tapered body keep a flat end (drillPoint.ts).
     drillPoint: shapeDrillPointAngle(shape),
     portProfile: shape.portProfile,
@@ -768,6 +771,8 @@ export function shapeGeometrySignature(shape: WorkplaneShape): string {
     gearRim: shape.gearRim,
     helixAngle: shape.helixAngle,
     bevelHelixAngle: shape.bevelHelixAngle,
+    ringRackHelixAngle: shape.ringRackHelixAngle,
+    ringRackHerringbone: shape.ringRackHerringbone,
     threadRole: shape.threadRole,
     threadHead: shape.threadHead,
     threadHand: shape.threadHand,
@@ -933,6 +938,7 @@ export function shapeGeometrySignature(shape: WorkplaneShape): string {
     screwHoleAngle: shape.screwHoleAngle,
     screwHoleSlot: shape.screwHoleSlot,
     screwHoleRecess: shape.screwHoleRecess,
+    screwHoleChamfer: shape.screwHoleChamfer,
     // The drill point as built: a solid, the double countersink and a tapered body keep a flat end (drillPoint.ts).
     drillPoint: shapeDrillPointAngle(shape),
     portProfile: shape.portProfile,
@@ -2145,7 +2151,7 @@ export function createShapeObject(
     case "counterbore":
     case "countersink":
     case "doubleCountersink":
-      addMesh(group, sharedShapeGeometry(geometryCacheKey, () => createScrewHoleGeometry({ kind: shape.kind as "counterbore" | "countersink" | "doubleCountersink", width, depth, height, screwHoleShaft: shape.screwHoleShaft, screwHoleHeadDepth: shape.screwHoleHeadDepth, screwHoleAngle: shape.screwHoleAngle, screwHoleRecess: shape.screwHoleRecess, drillPointAngle: shapeDrillPointAngle(shape), slot: shape.screwHoleSlot, sides: roundSideCount(shape.sides, width, depth) })), material, shape);
+      addMesh(group, sharedShapeGeometry(geometryCacheKey, () => createScrewHoleGeometry({ kind: shape.kind as "counterbore" | "countersink" | "doubleCountersink", width, depth, height, screwHoleShaft: shape.screwHoleShaft, screwHoleHeadDepth: shape.screwHoleHeadDepth, screwHoleAngle: shape.screwHoleAngle, screwHoleRecess: shape.screwHoleRecess, screwHoleChamfer: shape.screwHoleChamfer, drillPointAngle: shapeDrillPointAngle(shape), slot: shape.screwHoleSlot, sides: roundSideCount(shape.sides, width, depth) })), material, shape);
       break;
     case "finishingWasher":
       addMesh(group, sharedShapeGeometry(geometryCacheKey, () => createFinishingWasherGeometry({ width, depth, height, screwHoleShaft: shape.screwHoleShaft, screwHoleHeadDepth: shape.screwHoleHeadDepth, screwHoleAngle: shape.screwHoleAngle, sides: roundSideCount(shape.sides, width, depth) })), material, shape);
@@ -2370,6 +2376,8 @@ export function createShapeObject(
         gearRim: shape.gearRim,
         helixAngle: shape.helixAngle,
         bevelHelixAngle: shape.bevelHelixAngle,
+        ringRackHelixAngle: shape.ringRackHelixAngle,
+        ringRackHerringbone: shape.ringRackHerringbone,
         helixQuality: shape.helixQuality,
         gearProfile: shape.gearProfile,
         gearPressureAngle: shape.gearPressureAngle,
