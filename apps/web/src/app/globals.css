@@ -16175,6 +16175,16 @@ html[data-theme="dark"] .export-holes-only-warning svg {
   font-size: 14px;
 }
 
+/* The browser's own words and its storage figures (#1639): smaller, and selectable to copy. */
+.unsaved-design-banner .unsaved-design-detail {
+  margin-top: 4px;
+  font-size: 11px;
+  line-height: 1.35;
+  opacity: 0.9;
+  overflow-wrap: anywhere;
+  user-select: text;
+}
+
 .open-group-banner {
   position: fixed;
   bottom: 88px;
@@ -17261,6 +17271,27 @@ html[data-theme="dark"] .qr-code-panel small.qr-code-warning {
   color: white;
   background: #cf6a12;
   border-color: #b45a0c;
+}
+
+.new-version-notice-actions .primary:disabled {
+  cursor: progress;
+  opacity: 0.6;
+}
+
+/* The open design could not be stored (#1639): reloading would lose its newest changes. */
+.new-version-notice .new-version-notice-unsaved {
+  margin: 0;
+  padding: 8px 10px;
+  color: #ffffff;
+  font-weight: 600;
+  background: #c82031;
+  border-radius: 6px;
+}
+
+.new-version-notice-actions .danger {
+  color: #ffffff;
+  background: #c82031;
+  border-color: #a81a29;
 }
 
 /* Interactive Help (#424): while it is on the pointer is a question mark and whatever has a name

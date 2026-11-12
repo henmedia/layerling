@@ -240,7 +240,8 @@ import { sketchOutlineBounds } from "@/lib/sketchKeyring";
 import { meshSlicePath, planeCutsMesh } from "@/lib/sketchSlice";
 import { projectedEdgesPath } from "@/lib/sketchEdges";
 import { useRememberedFlag } from "@/lib/useRememberedFlag";
-import { BUG_REPORT_FILE, bugReportText, rememberBugReportEvent, type BugReportEvent } from "@/lib/bugReport";
+import { BUG_REPORT_ERROR_EVENT, BUG_REPORT_FILE, bugReportText, rememberBugReportEvent, type BugReportEvent } from "@/lib/bugReport";
+import type { SaveFailureKind } from "@/lib/saveFailureDiagnosis";
 import { formatLengthMm, lengthDisplayUnit } from "@/lib/measurementUnits";
 import { tightBendShown } from "@/lib/cadTightBends";
 import { angleAtVertex, angleBetweenFaces, formatFaceAngles, formatProtractorAngle } from "@/lib/protractor";
@@ -3109,7 +3110,7 @@ export function LayerlingEditor({
   /** The last failed autosave, so the editor can say so; `at` makes a repeat failure show again. */
   projectSaveFailure?: { message: string; at: number } | null;
   /** Why the newest state of this design could not be stored, while it could not (#1652): a note stays up until a save gets through. */
-  projectUnsaved?: string | null;
+  projectUnsaved?: { message: string; kind: SaveFailureKind; detail: string } | null;
   onProjectNameChange?: (name: string) => void;
   /** Legt aus einem frueheren Stand ein neues Projekt an und sagt in einem Satz, was daraus wurde. */
   onCreateProjectFromState?: (request: HistoryProjectRequest) => Promise<string>;
@@ -3462,11 +3463,17 @@ export function LayerlingEditor({
     };
     const onError = (event: ErrorEvent) => remember(`${event.message}${event.filename ? ` (${event.filename.split("/").pop()}:${event.lineno})` : ""}`);
     const onRejection = (event: PromiseRejectionEvent) => remember(`Unhandled: ${event.reason instanceof Error ? event.reason.message : String(event.reason)}`);
+    const onReported = (event: Event) => {
+      const text = (event as CustomEvent<unknown>).detail;
+      if (typeof text === "string") remember(text);
+    };
     window.addEventListener("error", onError);
     window.addEventListener("unhandledrejection", onRejection);
+    window.addEventListener(BUG_REPORT_ERROR_EVENT, onReported);
     return () => {
       window.removeEventListener("error", onError);
       window.removeEventListener("unhandledrejection", onRejection);
+      window.removeEventListener(BUG_REPORT_ERROR_EVENT, onReported);
     };
   }, []);
   // A failed autosave is said where the work happens, and stays a while.
@@ -19321,8 +19328,11 @@ export function LayerlingEditor({
       {projectUnsaved ? (
         <div className="unsaved-design-banner" role="alert">
           <strong>{t("notice.designNotSavedTitle")}</strong>
-          <span>{projectUnsaved}</span>
-          <span>{t("notice.designNotSavedHint")}</span>
+          <span>{projectUnsaved.message}</span>
+          {/* Lighter meshes help only where size or memory was the reason; a design of a few plates is refused all the same (#1639). */}
+          <span>{t(projectUnsaved.kind === "outOfMemory" || projectUnsaved.kind === "tooLarge" ? "notice.designNotSavedHint" : "notice.designNotSavedHintCopy")}</span>
+          {/* The browser's own words and its storage figures, so a screenshot tells why (#1639). */}
+          {projectUnsaved.detail ? <small className="unsaved-design-detail">{t("notice.designNotSavedDetail", { detail: projectUnsaved.detail })}</small> : null}
         </div>
       ) : null}
       {openGroup ? (

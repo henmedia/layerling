@@ -43,7 +43,10 @@ import { applyAppTheme, getAppThemePreference, hasStoredAppTheme, readStoredAppT
 import { hydrateEditorHistoryState, notesForHistoryIndex, type EditorHistoryEntry } from "@/lib/editorHistory";
 import { detectLanguage, setLanguage, t, translate, type Language } from "@/lib/i18n";
 import { localizedError } from "@/lib/userErrors";
-import { historyTrimSteps, isOutOfMemoryError, isProjectTooLargeError, isRetriedWithLessHistory, isStorageFullError, trimHistoryWindow } from "@/lib/historyTrim";
+import { historyTrimSteps, isRetriedWithLessHistory, trimHistoryWindow } from "@/lib/historyTrim";
+import { describeSaveError, probeBrowserStorage, saveFailureKind, storageProbeText, type SaveFailureKind } from "@/lib/saveFailureDiagnosis";
+import { reportBugReportError } from "@/lib/bugReport";
+import { leaveGuardReleased, provideDesignSaveState } from "@/lib/leaveGuard";
 import { GuideHelpLink } from "@/components/GuideHelpLink";
 import { WelcomeGuideBody } from "@/components/WelcomeGuide";
 import { DashboardWelcome, useWelcomeHidden } from "@/components/DashboardWelcome";
@@ -1076,7 +1079,22 @@ export default function Home() {
   // Designs whose newest state could not be stored (#1652): the revision that failed, until a newer save gets through. While
   // one is listed, closing or reloading the tab asks first, and the editor keeps a red note up.
   const unsavedProjectsRef = useRef(new Map<string, number>());
-  const [unsavedDesign, setUnsavedDesign] = useState<{ projectId: string; message: string } | null>(null);
+  const [unsavedDesign, setUnsavedDesign] = useState<{ projectId: string; message: string; kind: SaveFailureKind; detail: string } | null>(null);
+  /**
+   * The error with what the browser says about its storage and whether a tiny write gets through (#1639), for the
+   * note, the console and the bug report. A failing design fails at every change, so the storage is asked once a
+   * minute for the same error.
+   */
+  const lastSaveDiagnosisRef = useRef<{ detail: string; at: number; text: string } | null>(null);
+  const diagnoseSaveFailure = useCallback(async (detail: string) => {
+    const last = lastSaveDiagnosisRef.current;
+    if (last && last.detail === detail && Date.now() - last.at < 60000) return last.text;
+    const text = `${detail} · ${storageProbeText(await probeBrowserStorage())}`;
+    lastSaveDiagnosisRef.current = { detail, at: Date.now(), text };
+    console.error(`layerling: storage when the save failed: ${text}`);
+    reportBugReportError(`Save failed: ${text}`);
+    return text;
+  }, []);
   const editorLoadingStartedAtRef = useRef(0);
 
   // Warm the editor chunk once the dashboard is idle, so opening a project
@@ -1352,10 +1370,17 @@ export default function Home() {
     const warnWhileSaving = (event: BeforeUnloadEvent) => {
       // Also once a save has failed: the newest state lives only in this tab then (#1652).
       if (Object.keys(projectShapeSaveQueuesRef.current).length === 0 && unsavedProjectsRef.current.size === 0) return;
+      // "Reload anyway" in the update notice was the answer already (#1639).
+      if (leaveGuardReleased()) return;
       event.preventDefault();
       event.returnValue = "";
     };
     window.addEventListener("beforeunload", warnWhileSaving);
+    // A reload layerling starts itself waits for this and does not throw an unstored design away (#1639).
+    provideDesignSaveState(() => ({
+      saving: Object.keys(projectShapeSaveQueuesRef.current).length > 0,
+      unsaved: unsavedProjectsRef.current.size > 0,
+    }));
     return () => window.removeEventListener("beforeunload", warnWhileSaving);
   }, []);
 
@@ -1721,14 +1746,23 @@ export default function Home() {
       })
       .catch((error) => {
         if (projectShapeSaveQueuesRef.current[snapshot.projectId] === queuedSave) {
-          setDashboardNotice(error instanceof Error ? localizedError(error.message) : t("notice.projectShapesSaveFailed"));
           // The dashboard is not on screen while someone works; the editor has to say it too.
           // With the reason when it is one a person can act on: too big for the project file, or no room left (#475).
-          const known = isProjectTooLargeError(error) || isStorageFullError(error) || isOutOfMemoryError(error);
-          const message = known && error instanceof Error ? t("notice.projectShapesSaveFailedWhy", { reason: localizedError(error.message) }) : t("notice.projectShapesSaveFailed");
+          // An error of such a kind may come without any text (#1639); the reason is then the kind's own sentence.
+          const kind = saveFailureKind(error);
+          const raw = error instanceof Error ? localizedError(error.message) : "";
+          const reason = kind === "storageFull" ? t("error.storageFull") : kind === "outOfMemory" ? raw || t("error.outOfMemory") : kind === "tooLarge" ? raw : "";
+          const message = reason ? t("notice.projectShapesSaveFailedWhy", { reason }) : t("notice.projectShapesSaveFailed");
+          setDashboardNotice(message);
           setProjectSaveFailure({ message, at: Date.now() });
           unsavedProjectsRef.current.set(snapshot.projectId, Math.max(unsavedProjectsRef.current.get(snapshot.projectId) ?? 0, revision));
-          setUnsavedDesign({ projectId: snapshot.projectId, message });
+          // The error itself, in the note, the console and the bug report, so a screenshot says why the browser refused (#1639).
+          const detail = describeSaveError(error);
+          console.error(`layerling: could not save the design: ${detail}`, error);
+          setUnsavedDesign({ projectId: snapshot.projectId, message, kind, detail });
+          void diagnoseSaveFailure(detail).then((full) => {
+            setUnsavedDesign((current) => (current?.projectId === snapshot.projectId ? { ...current, detail: full } : current));
+          });
         }
       })
       .finally(() => {
@@ -1736,7 +1770,7 @@ export default function Home() {
           delete projectShapeSaveQueuesRef.current[snapshot.projectId];
         }
       });
-  }, []);
+  }, [diagnoseSaveFailure]);
 
   const updateProjectWorkspace = useCallback((snapshot: {
     projectId: string;
@@ -3305,7 +3339,7 @@ export default function Home() {
               onProjectSnapshot={updateProjectSnapshot}
               isProjectThumbnailMissing={isProjectThumbnailMissing}
               projectSaveFailure={projectSaveFailure}
-              projectUnsaved={unsavedDesign && unsavedDesign.projectId === activeProjectId ? unsavedDesign.message : null}
+              projectUnsaved={unsavedDesign && unsavedDesign.projectId === activeProjectId ? unsavedDesign : null}
               onProjectWorkspaceChange={updateProjectWorkspace}
               onProjectNameChange={(name) => {
                 if (activeProjectId) renameProject(activeProjectId, name);
