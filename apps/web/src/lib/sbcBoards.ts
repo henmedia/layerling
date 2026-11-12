@@ -91,7 +91,9 @@
  * - Waveshare ESP32-S3-Zero (Discussion #1673): Waveshare's own 3D model (ESP32-S3-Zero_v2 .stp, on its documentation
  *   page) and 2D drawing: 23.5 x 18 x 1.6 mm, the 2 x 9 pins (0.9 mm holes) 2.54 mm apart in rows 15.24 mm apart, the
  *   USB-C (8.94 mm wide, 3.25 mm high, 1.23 mm over the end), the two buttons, the chip and the ceramic antenna, read off
- *   the model; only the corner radius is `estimated`. The ESP32-C3-Zero and ESP32-C6-Zero share its 23.5 x 18 mm outline.
+ *   the model. The model's corners are square: the corner radius (R 1.00) and which button is BOOT and which RESET are
+ *   from Waveshare's dimension drawing and its numbered top view on the ESP32-S3-Zero documentation page (BOOT on the
+ *   side of the 5V, GND and 3V3 pins, as the antenna). The ESP32-C3-Zero and ESP32-C6-Zero share its 23.5 x 18 mm outline.
  * - Arduino Pro Mini (Discussion #1673): SparkFun's board file (sparkfun/Arduino_Pro_Mini_328, Hardware/Arduino-Pro-
  *   Mini.brd): 0.7 x 1.3 in (17.78 x 33.02 mm), every pin's place and name, the reset switch and the parts; the PCB 0.8 mm
  *   as SparkFun gives it. The parts' heights are `estimated`.
@@ -898,16 +900,15 @@ export const SBC_BOARDS: Record<SbcBoardType, SbcBoard> = {
     holeDiameter: 0,
     holes: [],
     color: "#1b2f5c",
-    estimated: ["cornerRadius"],
+    estimated: [],
     // From Waveshare's 3D model, laid with the USB-C at the right end: the 2 x 9 pins 2.54 mm apart, the first 1.59 mm
     // from the end without USB, the rows 15.24 mm apart and 1.37 mm in from the long edges.
     parts: [
       { name: "USB-C", x0: 17.13, x1: 24.73, y0: 4.53, y1: 13.47, height: 3.25, kind: "connector", profile: "usbC" },
       { name: "pins, front row", x0: 0.32, x1: 23.18, y0: 0.571, y1: 2.171, height: 0.1, kind: "header", pins: [9, 1] },
       { name: "pins, back row", x0: 0.32, x1: 23.18, y0: 15.811, y1: 17.411, height: 0.1, kind: "header", pins: [9, 1] },
-      // Which of the two is BOOT and which RESET the model does not say.
-      { name: "button, front", x0: 13.59, x1: 16.09, y0: 3.28, y1: 6.28, height: 1.6, kind: "button" },
-      { name: "button, back", x0: 13.59, x1: 16.09, y0: 11.63, y1: 14.63, height: 1.6, kind: "button" },
+      { name: "RESET button", x0: 13.59, x1: 16.09, y0: 3.28, y1: 6.28, height: 1.6, kind: "button" },
+      { name: "BOOT button", x0: 13.59, x1: 16.09, y0: 11.63, y1: 14.63, height: 1.6, kind: "button" },
       { name: "ESP32-S3", x0: 2.68, x1: 12.79, y0: 3.94, y1: 14.06, height: 1.0, kind: "chip" },
       { name: "ceramic antenna", x0: 0.21, x1: 2.21, y0: 8.02, y1: 15.02, height: 1.0, kind: "chip" },
     ],

@@ -785,6 +785,11 @@ describe("the Adafruit ESP32-S3 Feather, the Arduino UNO R3, the Arduino Nano an
     expect(ys).toEqual([expect.closeTo(1.371, 3), expect.closeTo(16.611, 3)]);
     // The USB-C stands 1.23 mm over the right end, as the model has it.
     expect(part("waveshareEsp32s3Zero", "USB-C").x1 - board.width).toBeCloseTo(1.23, 6);
+    // Waveshare's drawing: R 1.00 corners; BOOT on the side of the 5V pins, where the antenna is, RESET on the TX/RX side.
+    expect(board).toMatchObject({ cornerRadius: 1, estimated: [] });
+    expect(part("waveshareEsp32s3Zero", "BOOT button").y0).toBeGreaterThan(board.depth / 2);
+    expect(part("waveshareEsp32s3Zero", "RESET button").y1).toBeLessThan(board.depth / 2);
+    expect(part("waveshareEsp32s3Zero", "ceramic antenna").y1).toBeGreaterThan(board.depth / 2);
   });
 
   it("give the Arduino Pro Mini SparkFun's outline and pins: 12 + 12 down the long edges, 6 FTDI pins at the right end", () => {
