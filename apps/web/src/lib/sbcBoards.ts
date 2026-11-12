@@ -88,6 +88,13 @@
  * - The later CYD with micro-USB and USB-C (CYD2USB): no maker's drawing. DIYmall's dimensioned picture of it (the Amazon
  *   listing B0BVFXR313, the same 78 x 42 mm holes 4 mm from the edges, R 1.6), true to scale by its holes, gives the parts'
  *   places, all `estimated`; the plate and the screen as on the first kind.
+ * - Waveshare ESP32-S3-Zero (Discussion #1673): Waveshare's own 3D model (ESP32-S3-Zero_v2 .stp, on its documentation
+ *   page) and 2D drawing: 23.5 x 18 x 1.6 mm, the 2 x 9 pins (0.9 mm holes) 2.54 mm apart in rows 15.24 mm apart, the
+ *   USB-C (8.94 mm wide, 3.25 mm high, 1.23 mm over the end), the two buttons, the chip and the ceramic antenna, read off
+ *   the model; only the corner radius is `estimated`. The ESP32-C3-Zero and ESP32-C6-Zero share its 23.5 x 18 mm outline.
+ * - Arduino Pro Mini (Discussion #1673): SparkFun's board file (sparkfun/Arduino_Pro_Mini_328, Hardware/Arduino-Pro-
+ *   Mini.brd): 0.7 x 1.3 in (17.78 x 33.02 mm), every pin's place and name, the reset switch and the parts; the PCB 0.8 mm
+ *   as SparkFun gives it. The parts' heights are `estimated`.
  * Every board was checked against the maker's own picture of its top, so none is a mirror image.
  * A value the maker does not give is marked `estimated`. A board without mounting holes has `holes: []`.
  *
@@ -881,9 +888,60 @@ export const SBC_BOARDS: Record<SbcBoardType, SbcBoard> = {
       { name: "speaker amplifier (FM8002A)", x0: 46.0, x1: 51.0, y0: 3.0, y1: 7.0, height: 1.6, kind: "chip", underside: true, estimated: true },
     ],
   },
+  waveshareEsp32s3Zero: {
+    type: "waveshareEsp32s3Zero",
+    name: "Waveshare ESP32-S3-Zero",
+    width: 23.5,
+    depth: 18,
+    thickness: 1.6,
+    cornerRadius: 1,
+    holeDiameter: 0,
+    holes: [],
+    color: "#1b2f5c",
+    estimated: ["cornerRadius"],
+    // From Waveshare's 3D model, laid with the USB-C at the right end: the 2 x 9 pins 2.54 mm apart, the first 1.59 mm
+    // from the end without USB, the rows 15.24 mm apart and 1.37 mm in from the long edges.
+    parts: [
+      { name: "USB-C", x0: 17.13, x1: 24.73, y0: 4.53, y1: 13.47, height: 3.25, kind: "connector", profile: "usbC" },
+      { name: "pins, front row", x0: 0.32, x1: 23.18, y0: 0.571, y1: 2.171, height: 0.1, kind: "header", pins: [9, 1] },
+      { name: "pins, back row", x0: 0.32, x1: 23.18, y0: 15.811, y1: 17.411, height: 0.1, kind: "header", pins: [9, 1] },
+      // Which of the two is BOOT and which RESET the model does not say.
+      { name: "button, front", x0: 13.59, x1: 16.09, y0: 3.28, y1: 6.28, height: 1.6, kind: "button" },
+      { name: "button, back", x0: 13.59, x1: 16.09, y0: 11.63, y1: 14.63, height: 1.6, kind: "button" },
+      { name: "ESP32-S3", x0: 2.68, x1: 12.79, y0: 3.94, y1: 14.06, height: 1.0, kind: "chip" },
+      { name: "ceramic antenna", x0: 0.21, x1: 2.21, y0: 8.02, y1: 15.02, height: 1.0, kind: "chip" },
+    ],
+  },
+  arduinoProMini: {
+    type: "arduinoProMini",
+    name: "Arduino Pro Mini",
+    width: 33.02,
+    depth: 17.78,
+    thickness: 0.8,
+    cornerRadius: 0,
+    holeDiameter: 0,
+    holes: [],
+    color: "#1f5aa6",
+    estimated: [],
+    // From SparkFun's board file, laid with the FTDI pins at the right end: the two rows of 12 pins 16.51 mm apart along
+    // the long edges, 1.27 mm in; A4/A5 and A6/A7 inside the board. No USB, no mounting holes.
+    parts: [
+      { name: "pins (D10 to RAW)", x0: 0.47, x1: 30.01, y0: 0.47, y1: 2.07, height: 0.1, kind: "header", pins: [12, 1] },
+      { name: "pins (D9 to TXO)", x0: 0.47, x1: 30.01, y0: 15.71, y1: 17.31, height: 0.1, kind: "header", pins: [12, 1] },
+      { name: "FTDI pins (DTR to GND)", x0: 30.95, x1: 32.55, y0: 1.27, y1: 16.51, height: 0.1, kind: "header", pins: [6, 1] },
+      { name: "pins (A4, A5)", x0: 16.637, x1: 21.717, y0: 3.391, y1: 4.991, height: 0.1, kind: "header", pins: [2, 1] },
+      { name: "pins (A6, A7)", x0: 6.223, x1: 11.303, y0: 3.391, y1: 4.991, height: 0.1, kind: "header", pins: [2, 1] },
+      // The switch's outline from the board file; its height is not given.
+      { name: "RESET button", x0: 0.127, x1: 5.207, y0: 6.223, y1: 11.303, height: 1.5, kind: "button", estimated: true },
+      // The chip is turned 45 degrees on the board: drawn here square, 7 x 7 mm round its middle.
+      { name: "ATmega328P", x0: 10.47, x1: 17.47, y0: 5.39, y1: 12.39, height: 1.2, kind: "chip", estimated: true },
+      { name: "resonator", x0: 17.15, x1: 20.9, y0: 12.88, y1: 14.2, height: 0.9, kind: "chip", estimated: true },
+      { name: "regulator (MIC5205)", x0: 22.76, x1: 25.6, y0: 8.08, y1: 9.7, height: 1.1, kind: "chip", estimated: true },
+    ],
+  },
 };
 
-export const SBC_BOARD_ORDER: SbcBoardType[] = ["pi5", "pi4", "pi3bPlus", "zero2w", "bttPi12", "xiaoEsp32c6", "esp32c3SuperMini", "esp32c6SuperMini", "featherEsp32s3", "arduinoUno", "arduinoMega", "arduinoNano", "wemosD1Mini", "pico", "picoW", "pico2", "pico2W", "esp32CamMb", "esp32s3Cam", "esp32DevKitC", "esp32DevKitV1", "cyd", "cyd2usb"];
+export const SBC_BOARD_ORDER: SbcBoardType[] = ["pi5", "pi4", "pi3bPlus", "zero2w", "bttPi12", "xiaoEsp32c6", "esp32c3SuperMini", "esp32c6SuperMini", "waveshareEsp32s3Zero", "featherEsp32s3", "arduinoUno", "arduinoMega", "arduinoNano", "arduinoProMini", "wemosD1Mini", "pico", "picoW", "pico2", "pico2W", "esp32CamMb", "esp32s3Cam", "esp32DevKitC", "esp32DevKitV1", "cyd", "cyd2usb"];
 export const DEFAULT_SBC_BOARD: SbcBoardType = "pi5";
 /** Extra room for the connectors at the edge, so a case wall cut with the board leaves them a gap: 0 to 2 mm. */
 export const MAX_SBC_CLEARANCE = 2;
