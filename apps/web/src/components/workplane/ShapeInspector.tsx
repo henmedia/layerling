@@ -324,7 +324,7 @@ import { meshAabb } from "@/lib/editorMeshCore";
 import { undersideOffset } from "@/lib/positionUnderside";
 import { plateOffsetOfShape } from "@/lib/buildPlates";
 import { isNonSolidShape, normalizeGroupResize, resizedShapeSize, shapeDepth, shapeHasTaper, shapeOverallFootprintDimensions, shapeSupportsTaper, shapeTaperDimensions, shapeWidth } from "@/lib/workplaneShapes";
-import { tubeBeforeEdgeTreatments } from "@/lib/edgeTreatmentHistory";
+import { shapeBeforeEdgeTreatments, tubeBeforeEdgeTreatments } from "@/lib/edgeTreatmentHistory";
 import { MAX_SKETCH_REVOLVE_TURNS, normalizeSketchRevolveSettings } from "@/lib/sketchRevolve";
 import { roundSideCount } from "@/lib/roundSideCount";
 import { normalizeCurvedConeBend, normalizeCurvedConeTop } from "@/lib/curvedCone";
@@ -4446,6 +4446,16 @@ export function ShapeInspector({
   const printerPlay = usePrinterPlay();
   const properties = withFitTestNotes(getShapeProperties(shape, onUpdate, workspace, { loftSection, setLoftSection, portPresetWithScrewHoles: onPortPresetWithScrewHoles }), shape.kind, printerPlay);
   const tiltedMeasures = orientedMeasures(shape).kind === "tilted";
+  // A shape with settings of its own that got a fillet or chamfer shows only its measures now; the note names it
+  // and says how its settings come back (#1689). A plain box had nothing more, so it gets no note.
+  const kindBeforeEdgeTreatments = (() => {
+    const before = shapeBeforeEdgeTreatments(shape);
+    if (!before) return null;
+    const now = new Set(properties.map((property) => property.id));
+    const own = getShapePropertiesWithAppLimits(before, () => undefined);
+    if (!own.some((property) => !now.has(property.id))) return null;
+    return t(`shape.${before.kind}` as MessageKey) || before.kind;
+  })();
   // What each value would be on a shape of this kind made new, with the saved defaults: the
   // small arrow next to a changed value takes it back there.
   const propertyDefaults = useMemo(() => shapePropertyDefaults(shape.kind, workspace, shape.kind === "gridfinity" ? normalizeGridfinityType(shape.gridfinityType) : undefined, printerPlay), [shape.kind, workspace, shape.gridfinityType, printerPlay]);
@@ -5334,6 +5344,16 @@ export function ShapeInspector({
             {/* Only the plain Length, Width and Height need the note; a Head diameter means the same at any angle (#1634). */}
             {tiltedMeasures && primaryProperties.some((property) => isPlainMeasure(property, MEASURE_LABELS())) ? (
               <p className="cylinder-wrap-hint">{t("prop.tiltedMeasures")}</p>
+            ) : null}
+            {kindBeforeEdgeTreatments ? (
+              <p className="cylinder-wrap-hint">{t("prop.settingsBeforeEdgeFeature", {
+                shape: kindBeforeEdgeTreatments,
+                fillet: t("editor.tool.fillet"),
+                chamfer: t("editor.tool.chamfer"),
+                hollow: t("editor.tool.hollow"),
+                list: t("edge.featureHistory"),
+                undo: t("edge.revertAction"),
+              })}</p>
             ) : null}
             {shape.kind === "gridfinity" && gridfinityPlan({ ...shape, depth: shapeDepth(shape) }).swallowtail ? (
               <>

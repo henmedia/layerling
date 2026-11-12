@@ -3291,6 +3291,7 @@ export const MESSAGES_NL: Record<MessageKey, string> = {
   "prop.twist": "Torsie",
   "prop.widthOffset": "Breedteverschuiving",
   "prop.tiltedMeasures": "Het lichaam is gekanteld: lengte, breedte en hoogte zijn zijn eigen maten, niet de richtingen in de ruimte.",
+  "prop.settingsBeforeEdgeFeature": "Gemaakt van: {shape}. De eigen instellingen komen terug als de randbewerking ongedaan wordt gemaakt: {fillet}, {chamfer} of {hollow}, dan {undo} onder \"{list}\".",
   "prop.lengthOffset": "Lengteverschuiving",
   "font.manage": "Je eigen lettertypen …",
   "font.customGroup": "Je eigen lettertypen",

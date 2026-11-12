@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { compactEdgeTreatmentHistory, edgeTreatmentAppliedFrame, restoreShapeBeforeEdgeTreatment } from "@/lib/edgeTreatmentHistory";
+import { compactEdgeTreatmentHistory, edgeTreatmentAppliedFrame, restoreShapeBeforeEdgeTreatment, shapeBeforeEdgeTreatments } from "@/lib/edgeTreatmentHistory";
 import type { EdgeTreatmentHistoryEntry, WorkplaneShape } from "@/types/layerling";
 
 function box(overrides: Partial<WorkplaneShape> = {}): WorkplaneShape {
@@ -184,5 +184,21 @@ describe("edge treatment history restoration", () => {
       height: 45,
       rotation: 35,
     });
+  });
+});
+
+describe("the shape a treated body was made from (#1689)", () => {
+  const mesh = { meshAssetId: "m", baseWidth: 20, baseDepth: 20, baseHeight: 20, triangleCount: 12 } as WorkplaneShape["importedMesh"];
+  it("names the Hirth joint a chamfered body was", () => {
+    const hirth = box({ id: "h", kind: "hirth", teeth: 24 } as Partial<WorkplaneShape>);
+    const treated = box({ id: "h", kind: "mesh", importedMesh: mesh, edgeTreatmentHistory: [historyEntry(hirth)] });
+    expect(shapeBeforeEdgeTreatments(treated)?.kind).toBe("hirth");
+  });
+  it("has none for a group, an imported mesh or an untreated shape", () => {
+    const group = box({ kind: "mesh", groupedShapes: [box()] });
+    const imported = box({ kind: "mesh", importedMesh: mesh });
+    expect(shapeBeforeEdgeTreatments(box({ kind: "mesh", importedMesh: mesh, edgeTreatmentHistory: [historyEntry(group)] }))).toBeNull();
+    expect(shapeBeforeEdgeTreatments(box({ kind: "mesh", importedMesh: mesh, edgeTreatmentHistory: [historyEntry(imported)] }))).toBeNull();
+    expect(shapeBeforeEdgeTreatments(box())).toBeNull();
   });
 });

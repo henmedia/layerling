@@ -1,6 +1,19 @@
 [
   {
     "title": {
+      "de": "Wohin die Einstellungen nach einer Fase gehen",
+      "en": "Where a shape's settings go after a chamfer"
+    },
+    "body": {
+      "de": "Nach einer Fase oder Verrundung ist eine Form wie eine Hirth-Verzahnung ein fester Körper, und im Feld stehen nur noch Länge, Breite und Höhe. Jetzt steht dort auch, woraus der Körper entstanden ist und wie die eigenen Einstellungen zurückkommen: Kantenbearbeitung zurücknehmen.",
+      "en": "After a chamfer or fillet, a shape like a Hirth joint is a fixed body and the panel shows only Length, Width and Height. Now it also says what the body was made from and how its own settings come back: take the edge treatment back."
+    },
+    "guide": {
+      "section": "edgeTreatment"
+    }
+  },
+  {
+    "title": {
       "de": "Winkellineal im dunklen Farbschema gut lesbar",
       "en": "Framing square easy to read in the dark themes"
     },

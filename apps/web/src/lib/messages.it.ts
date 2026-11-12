@@ -3278,6 +3278,7 @@ export const MESSAGES_IT: Partial<Record<MessageKey, string>> = {
   "prop.twist": "Torsione",
   "prop.widthOffset": "Spostamento in larghezza",
   "prop.tiltedMeasures": "Il corpo è inclinato: lunghezza, larghezza e altezza indicano le sue dimensioni proprie, non le direzioni nello spazio.",
+  "prop.settingsBeforeEdgeFeature": "Ricavato da: {shape}. Le sue impostazioni tornano quando si annulla la lavorazione degli spigoli: {fillet}, {chamfer} o {hollow}, poi {undo} sotto \"{list}\".",
   "prop.lengthOffset": "Spostamento in lunghezza",
   "font.manage": "Gestisci i tuoi caratteri …",
   "font.customGroup": "I tuoi caratteri",

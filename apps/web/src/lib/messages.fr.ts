@@ -3277,6 +3277,7 @@ export const MESSAGES_FR: Partial<Record<MessageKey, string>> = {
   "prop.twist": "Torsion",
   "prop.widthOffset": "Décalage de largeur",
   "prop.tiltedMeasures": "Le corps est incliné : la longueur, la largeur et la hauteur sont ses propres mesures, et non les directions dans l'espace.",
+  "prop.settingsBeforeEdgeFeature": "Issu de : {shape}. Ses propres réglages reviennent quand le traitement des bords est annulé : {fillet}, {chamfer} ou {hollow}, puis {undo} sous « {list} ».",
   "prop.lengthOffset": "Décalage de longueur",
   "font.manage": "Vos propres polices…",
   "font.customGroup": "Vos propres polices",

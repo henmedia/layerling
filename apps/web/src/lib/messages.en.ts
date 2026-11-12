@@ -3291,6 +3291,7 @@ export const MESSAGES_EN = {
   "prop.twist": "Twist",
   "prop.widthOffset": "Width Offset",
   "prop.tiltedMeasures": "The body is tilted: Length, Width and Height are its own measures, not the directions in space.",
+  "prop.settingsBeforeEdgeFeature": "Made from: {shape}. Its own settings come back when the edge treatment is taken back: {fillet}, {chamfer} or {hollow}, then {undo} under \"{list}\".",
   "prop.lengthOffset": "Length Offset",
   "font.manage": "Your own fonts …",
   "font.customGroup": "Your own fonts",

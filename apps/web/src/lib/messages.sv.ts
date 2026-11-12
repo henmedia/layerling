@@ -3285,6 +3285,7 @@ export const MESSAGES_SV: Partial<Record<MessageKey, string>> = {
   "prop.twist": "Vridning",
   "prop.widthOffset": "Förskjutning i bredd",
   "prop.tiltedMeasures": "Kroppen lutar: längd, bredd och höjd är dess egna mått, inte riktningarna i rummet.",
+  "prop.settingsBeforeEdgeFeature": "Gjord av: {shape}. Dess egna inställningar kommer tillbaka när kantbearbetningen ångras: {fillet}, {chamfer} eller {hollow}, sedan {undo} under \"{list}\".",
   "prop.lengthOffset": "Förskjutning i längd",
   "font.manage": "Egna typsnitt …",
   "font.customGroup": "Egna typsnitt",

@@ -3290,6 +3290,7 @@ export const MESSAGES_DE: Record<MessageKey, string> = {
   "prop.twist": "Verdrehung",
   "prop.widthOffset": "Breitenversatz",
   "prop.tiltedMeasures": "Der Körper steht schräg: Länge, Breite und Höhe sind seine eigenen Maße, nicht die Richtungen im Raum.",
+  "prop.settingsBeforeEdgeFeature": "Entstanden aus: {shape}. Ihre eigenen Einstellungen kommen zurück, wenn die Kantenbearbeitung zurückgenommen wird: {fillet}, {chamfer} oder {hollow}, dann {undo} unter „{list}“.",
   "prop.lengthOffset": "Längenversatz",
   "font.manage": "Eigene Schriften …",
   "font.customGroup": "Eigene Schriften",
