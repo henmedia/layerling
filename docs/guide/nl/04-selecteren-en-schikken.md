@@ -21,7 +21,7 @@ Met veel onderdelen raak je in de weergave makkelijk het overzicht kwijt. De obj
 
 ![De objectlijst: de groep "Groep" met twee onderdelen en een bol ernaast. Een mappictogram opent de groep.](shot:object-list)
 
-- Een klik op een regel selecteert de vorm, ook onderdelen binnen een groep. Met [[Shift]] ingedrukt voeg je meer regels toe of haal je ze weer weg, net als in de weergave. De pijltjes klappen groepen open en dicht.
+- Een klik op een regel selecteert de vorm, ook onderdelen binnen een groep. Net als in een bestandsbeheerder voegt [[Ctrl]] ([[Cmd]] op een Mac) een regel toe of haalt hem weer weg, en selecteert [[Shift]] alle regels van de laatst aangeklikte tot deze, in de volgorde van de lijst; [[Ctrl]]+[[Shift]] voegt ze aan de selectie toe. In de weergave voegt juist [[Shift]] toe en haalt weg. De pijltjes klappen groepen open en dicht.
 - De letter achter de naam laat zien of een onderdeel {{ui:outliner.solid}} of {{ui:outliner.hole}} is: het is de eerste letter van het woord, en met de muis erboven verschijnt het hele woord.
 - Onder de naam staat wat voor vorm het is. Een lichaam dat geen eenvoudige vorm meer is (afgerond, uitgehold of geïmporteerd), toont {{ui:shape.exactBody}} als de STEP-export het exact schrijft, en {{ui:shape.mesh}} als het alleen uit driehoeken bestaat en als STL meegaat. Een versmalling, helling of draaiing die pas na het afronden of uithollen komt, buigt alleen de mesh; dan staat er {{ui:shape.mesh}}.
 - Hangslot en oog vergrendelen en verbergen afzonderlijke onderdelen.

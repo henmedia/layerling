@@ -21,7 +21,7 @@ Przy wielu częściach łatwo zgubić się w widoku. Lista obiektów ({{ui:edito
 
 ![Lista obiektów: grupa „Group” z dwiema częściami i kula obok niej. Ikona folderu otwiera grupę.](shot:object-list)
 
-- Kliknięcie wpisu zaznacza kształt, także części wewnątrz grupy. Z wciśniętym [[Shift]] dodajesz kolejne wpisy albo je odznaczasz, tak jak w widoku. Strzałki rozwijają i zwijają grupy.
+- Kliknięcie wpisu zaznacza kształt, także części wewnątrz grupy. Jak w menedżerze plików [[Ctrl]] ([[Cmd]] na Macu) dodaje wpis albo go odznacza, a [[Shift]] zaznacza wszystkie wpisy od ostatnio klikniętego do tego, w kolejności listy; [[Ctrl]]+[[Shift]] dodaje je do zaznaczenia. W widoku natomiast dodaje i odznacza [[Shift]]. Strzałki rozwijają i zwijają grupy.
 - Litera za nazwą pokazuje, czy część jest {{ui:outliner.solid}}, czy {{ui:outliner.hole}}: to pierwsza litera słowa, a całe słowo pojawia się po najechaniu myszą.
 - Pod nazwą widać, jaki to kształt. Bryła, która nie jest już prostym kształtem (zaokrąglona, wydrążona lub zaimportowana), pokazuje {{ui:shape.exactBody}}, gdy eksport STEP zapisuje ją dokładnie, i {{ui:shape.mesh}}, gdy składa się tylko z trójkątów i trafia do STL. Zwężenie, pochylenie lub skręt dodane dopiero po zaokrągleniu lub wydrążeniu bryły wyginają tylko jej siatkę, więc wtedy pokazuje {{ui:shape.mesh}}.
 - Kłódka i oko blokują i ukrywają pojedyncze części.

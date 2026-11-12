@@ -23,7 +23,7 @@ Den bliver åben eller lukket, som du lod den være, for hvert design, indtil du
 
 ![Objektlisten: gruppen "Gruppe" med to dele og en kugle ved siden af. Et mappeikon åbner gruppen.](shot:object-list)
 
-- Et klik på en post vælger formen, inklusive dele inde i en gruppe. Med [[Shift]] holdt tilføjer du flere poster eller tager dem væk igen, ligesom i visningen. Pilene folder grupper åbne og i.
+- Et klik på en post vælger formen, inklusive dele inde i en gruppe. Som i en filhåndtering tilføjer [[Ctrl]] ([[Cmd]] på en Mac) en post eller tager den væk igen, og [[Shift]] vælger alle poster fra den sidst klikkede til denne, i listens rækkefølge; [[Ctrl]]+[[Shift]] føjer dem til det valgte. I visningen er det i stedet [[Shift]], der tilføjer og tager væk. Pilene folder grupper åbne og i.
 - Bogstavet efter navnet viser, om en del er {{ui:outliner.solid}} eller {{ui:outliner.hole}}: det er ordets første bogstav, og hele ordet vises, når du holder musen over det.
 - Under navnet står, hvilken slags form det er. En form, der ikke længere er en simpel form (afrundet, udhulet eller importeret), viser {{ui:shape.exactBody}}, når STEP-eksporten skriver den eksakt, og {{ui:shape.mesh}}, når den kun består af trekanter og går ud som STL. En tilspidsning, hældning eller vridning, der først kommer til efter afrunding eller udhuling, bøjer kun dens mesh, så viser den {{ui:shape.mesh}}.
 - Hængelås og øje låser og skjuler enkelte dele.

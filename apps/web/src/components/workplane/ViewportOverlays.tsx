@@ -1675,6 +1675,8 @@ export function syncCornerRulerToolOverlay(
   overlayRef: MutableRefObject<CornerRulerOverlayState | null>,
   setOverlay: Dispatch<SetStateAction<CornerRulerOverlayState | null>>,
   accuracy: MeasurementAccuracy,
+  /** Dark and graphite draw the lines lighter; the dark brown vanished on the dark grid (Discussion #1686). */
+  theme: ResolvedAppTheme = "light",
 ) {
   const items: CornerRulerOverlayItem[] = [];
   const worldRulers: CornerRulerWorldLines[] = [];
@@ -1880,7 +1882,7 @@ export function syncCornerRulerToolOverlay(
       });
       worldRulers.push(lines);
     });
-    syncCornerRulerWorldLines(state, worldRulers);
+    syncCornerRulerWorldLines(state, worldRulers, theme);
   }
   const previous = overlayRef.current;
   if (previous && previous.items.length === 0 && items.length === 0) {
@@ -1939,9 +1941,9 @@ export function worldPointHidden(point: THREE.Vector3, state: ThreeState, ignore
  * hides behind bodies tests depth; one that stays in view draws over everything. The lines only depend
  * on the rulers and the selection, not on the camera, so they are rebuilt only when those change.
  */
-export function syncCornerRulerWorldLines(state: ThreeState, rulers: CornerRulerWorldLines[]) {
+export function syncCornerRulerWorldLines(state: ThreeState, rulers: CornerRulerWorldLines[], theme: ResolvedAppTheme = "light") {
   const layer = state.cornerRulerLayer;
-  const signature = JSON.stringify(rulers);
+  const signature = `${theme}:${JSON.stringify(rulers)}`;
   if (layer.userData.cornerRulerSignature === signature) return;
   layer.userData.cornerRulerSignature = signature;
   disposeChildren(layer);
@@ -1984,11 +1986,13 @@ export function syncCornerRulerWorldLines(state: ThreeState, rulers: CornerRuler
     setObjectRenderLayer(object, RENDER_LAYER_HELPERS);
     layer.add(object);
   };
+  // Dark and graphite: the orange of the tape measure for the arms, a light tan for the ticks (Discussion #1686).
+  const dark = theme === "dark";
   rulers.forEach((ruler) => {
     addLines(ruler, ruler.arrows, { color: "#4caf50", width: 6, opacity: 0.35, order: 1000 });
     addLines(ruler, ruler.guides, { color: "#81c784", width: 1.2, opacity: 0.85, dashed: true, order: 1001 });
-    addLines(ruler, ruler.ticks, { color: "#8a6a45", width: 1.2, opacity: 1, order: 1002 });
-    addLines(ruler, ruler.arms, { color: "#5a3917", width: 2.2, opacity: 1, order: 1003 });
+    addLines(ruler, ruler.ticks, { color: dark ? "#d9b48a" : "#8a6a45", width: 1.2, opacity: 1, order: 1002 });
+    addLines(ruler, ruler.arms, { color: dark ? "#f2a65a" : "#5a3917", width: 2.2, opacity: 1, order: 1003 });
   });
   state.needsRender = true;
 }

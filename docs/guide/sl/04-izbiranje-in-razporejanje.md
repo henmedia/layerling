@@ -21,7 +21,7 @@ Pri mnogih delih v pogledu zlahka izgubiš pregled. Seznam objektov ({{ui:editor
 
 ![Seznam objektov: skupina »Skupina« z dvema delama in ob njej krogla. Ikona mape odpre skupino.](shot:object-list)
 
-- Klik na vnos izbere obliko, tudi dele znotraj skupine. S [[Shift]] dodaš še druge vnose ali jih spet odvzameš, popolnoma enako kot v pogledu. Puščice zložijo in razpro skupine.
+- Klik na vnos izbere obliko, tudi dele znotraj skupine. Kot v upravitelju datotek [[Ctrl]] ([[Cmd]] na Macu) doda vnos ali ga spet odvzame, [[Shift]] pa izbere vse vnose od zadnjega kliknjenega do tega, v vrstnem redu seznama; [[Ctrl]]+[[Shift]] jih doda k izbiri. V pogledu pa dodaja in odvzema [[Shift]]. Puščice zložijo in razpro skupine.
 - Črka za imenom pokaže, ali je del {{ui:outliner.solid}} ali {{ui:outliner.hole}}: to je prva črka besede, cela beseda pa se pokaže, ko greš z miško nadnjo.
 - Pod imenom piše, kakšna oblika je. Telo, ki ni več preprosta oblika (zaobljeno, izdolbeno ali uvoženo), kaže {{ui:shape.exactBody}}, ko ga izvoz STEP zapiše natančno, in {{ui:shape.mesh}}, ko je sestavljeno le iz trikotnikov in gre ven kot STL. Zoženje, nagib ali zasuk, dodan šele po zaobljanju ali dolbenju telesa, upogne samo njegovo mrežo, zato takrat piše {{ui:shape.mesh}}.
 - Ključavnica in oko zaklenita in skrijeta posamezne dele.

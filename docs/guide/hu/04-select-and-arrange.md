@@ -21,7 +21,7 @@ Sok résznél a nézetben könnyű elveszíteni a fonalat. Az objektumlista ({{u
 
 ![Az objektumlista: a „Group” csoport két résszel, mellette egy gömb. Egy mappa ikon megnyitja a csoportot.](shot:object-list)
 
-- Egy bejegyzésre kattintva kijelölöd az alakzatot, a csoporton belüli részeket is. Nyomva tartott [[Shift]] billentyűvel további bejegyzéseket adsz hozzá vagy veszel el, mint a nézetben. A nyilak kinyitják és összecsukják a csoportokat.
+- Egy bejegyzésre kattintva kijelölöd az alakzatot, a csoporton belüli részeket is. Mint egy fájlkezelőben, a [[Ctrl]] (Macen [[Cmd]]) hozzáad egy bejegyzést vagy elveszi, a [[Shift]] pedig az utoljára kattintott bejegyzéstől eddig mindet kijelöli, a lista sorrendjében; a [[Ctrl]]+[[Shift]] hozzáadja őket a kijelöléshez. A nézetben viszont a [[Shift]] ad hozzá és vesz el. A nyilak kinyitják és összecsukják a csoportokat.
 - A név utáni betű mutatja, hogy egy rész {{ui:outliner.solid}} vagy {{ui:outliner.hole}}: ez a szó kezdőbetűje, és ha fölé viszed az egeret, megjelenik a teljes szó.
 - A név alatt az áll, milyen alakzatról van szó. Az a test, amely már nem egyszerű alakzat (lekerekített, kiüregelt vagy importált), {{ui:shape.exactBody}} feliratot kap, ha a STEP-export pontosan kiírja, és {{ui:shape.mesh}} feliratot, ha csak háromszögekből áll, és STL-ként megy ki. A lekerekítés vagy kiüregelés után hozzáadott szűkítés, döntés vagy csavarás csak a hálóját hajlítja meg, ezért ekkor {{ui:shape.mesh}} áll ott.
 - A lakat és a szem egyes részeket zárol és rejt el.
