@@ -6,6 +6,8 @@ code still carries it - so a lower number further down is older, not newer.
 
 ## Unreleased
 
+## 1.161.0
+
 - **brepjs 20.21.2 (from 20.18.0):** New lofts along guide rails, surface blending and fillet corner options in the library, and two fixes in its brepkit part; layerling uses none of the new calls yet.
 
 - **A surface texture only inside a region drawn on a face (Discussion #1579, PR #1701 by @marcus040473):** A texture went on whole faces, so a round patch of knurling on a lid or a grip zone on one side meant splitting the body first. In the texture's inspector, "Draw region" now lets you press on the face in the view and draw round the place with the button held; the pattern goes only inside the outline, ends at it, and the rest of the face stays smooth. "Draw region again" and clearing it sit beside it, and pressing beside the body turns the view as usual. Every layer of the texture can have a region of its own, also on the same face; where two overlap, the later layer's pattern wins. The MCP tool `layerling_texture_surface` takes `region` on the texture and on each layer.
