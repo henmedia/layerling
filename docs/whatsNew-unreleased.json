@@ -11,6 +11,19 @@
   },
   {
     "title": {
+      "de": "Objektliste: Auswahl wie im Explorer",
+      "en": "Object list: select as in a file manager"
+    },
+    "body": {
+      "de": "In der Objektliste nimmt Strg (auf dem Mac Cmd) einen Eintrag dazu oder wieder weg. Umschalt wählt alle Einträge vom zuletzt angeklickten bis zum angeklickten, Strg+Umschalt nimmt sie zur Auswahl dazu.\n\nIn der Ansicht bleibt es bei Umschalt, denn Strg mit der linken Maustaste dreht dort die Ansicht.",
+      "en": "In the object list, Ctrl (Cmd on a Mac) adds an entry or takes it away again. Shift selects every entry from the one clicked last to the one you click, and Ctrl+Shift adds them to what is selected.\n\nIn the view it stays with Shift, as Ctrl with the left mouse button turns the view there."
+    },
+    "guide": {
+      "section": "objectList"
+    }
+  },
+  {
+    "title": {
       "de": "Fokusmodus: der Name ist mit dabei",
       "en": "Focus mode: the name comes along"
     },

@@ -18,6 +18,7 @@ import {
   sortObjectList,
   type ObjectListOrder,
 } from "@/lib/objectListSearch";
+import { objectListAnchor, objectListClickSelection } from "@/lib/objectListSelection";
 import type { WorkplaneShape } from "@/types/layerling";
 
 export interface ObjectListPanelProps {
@@ -228,12 +229,19 @@ export function ObjectListPanel({
     }
   };
 
+  /** The entry clicked last, where a Shift-click starts its run (Discussion #1683). */
+  const lastClickedRef = useRef<string | null>(null);
+
+  // As in a file manager (Discussion #1683): Ctrl or Cmd adds or takes away one entry, Shift selects the run of
+  // entries from the last clicked one, in the order the list shows them; Ctrl+Shift adds that run.
   const handleRowClick = (shapeId: string, e: MouseEvent) => {
-    if (e.shiftKey) {
-      onSelectShape(shapeId, "toggle");
-    } else {
-      onSelectShape(shapeId, "replace");
-    }
+    const listedIds = listedShapes.map((shape) => shape.id);
+    const click = { toggle: e.ctrlKey || e.metaKey, range: e.shiftKey };
+    const anchor = objectListAnchor(listedIds, selectedIds, lastClickedRef.current);
+    const { ids, mode } = objectListClickSelection(listedIds, selectedIds, anchor, shapeId, click);
+    // A run keeps its start, so the next Shift-click measures from the same entry.
+    lastClickedRef.current = click.range && anchor ? anchor : shapeId;
+    onSelectShape(ids, mode);
   };
 
   useEffect(() => setSearchExpandedGroups({}), [query]);
@@ -507,8 +515,8 @@ export function ObjectListPanel({
                     role="option"
                     aria-selected={isSelected}
                     onMouseDown={(e) => {
-                      // Shift-click would otherwise highlight text across the rows.
-                      if (e.shiftKey && !(e.target instanceof HTMLInputElement)) e.preventDefault();
+                      // Shift- and Ctrl-click would otherwise highlight text across the rows.
+                      if ((e.shiftKey || e.ctrlKey || e.metaKey) && !(e.target instanceof HTMLInputElement)) e.preventDefault();
                     }}
                     onClick={(e) => handleRowClick(shape.id, e)}
                   >

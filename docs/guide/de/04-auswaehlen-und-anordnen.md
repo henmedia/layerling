@@ -21,7 +21,7 @@ Bei vielen Teilen verliert man in der Ansicht leicht den Überblick. Die Objektl
 
 ![Die Objektliste: die Gruppe „Gruppe“ mit zwei Teilen und daneben eine Kugel. Ein Ordnersymbol öffnet die Gruppe.](shot:object-list)
 
-- Ein Klick auf einen Eintrag wählt die Form aus, auch die Teile innerhalb einer Gruppe. Mit [[Umschalt]] nimmst du weitere Einträge dazu oder wieder weg, genau wie in der Ansicht. Die Pfeile klappen Gruppen auf und zu.
+- Ein Klick auf einen Eintrag wählt die Form aus, auch die Teile innerhalb einer Gruppe. Wie im Explorer nimmt [[Strg]] (auf dem Mac [[Cmd]]) einen Eintrag dazu oder wieder weg, und [[Umschalt]] wählt alle Einträge vom zuletzt angeklickten bis zu diesem, in der Reihenfolge der Liste; [[Strg]]+[[Umschalt]] nimmt sie zur Auswahl dazu. In der Ansicht nimmt dagegen [[Umschalt]] dazu und wieder weg. Die Pfeile klappen Gruppen auf und zu.
 - Der Buchstabe hinter dem Namen zeigt, ob ein Teil {{ui:outliner.solid}} oder {{ui:outliner.hole}} ist: Es ist der Anfangsbuchstabe des Worts, und mit der Maus darüber erscheint das ganze Wort.
 - Unter dem Namen steht, was für eine Form es ist. Ein Körper, der keine einfache Form mehr ist (verrundet, ausgehöhlt oder eingelesen), zeigt {{ui:shape.exactBody}}, wenn die STEP-Ausfuhr ihn exakt schreibt, und {{ui:shape.mesh}}, wenn er nur aus Dreiecken besteht und als STL hinausgeht. Eine Verjüngung, Neigung oder Verdrehung, die erst nach dem Verrunden oder Aushöhlen dazukommt, verformt nur sein Netz; dann steht dort {{ui:shape.mesh}}.
 - Schloss und Auge sperren und verstecken einzelne Teile.
