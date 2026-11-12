@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
-import { applySurfaceTexture, normalizeSurfaceTexture } from "@/lib/surfaceTexture";
+import { applySurfaceTexture, normalizeSurfaceTexture, surfaceTexturePositions } from "@/lib/surfaceTexture";
 import { surfaceMeshReport } from "@/lib/surfaceTextureMesh";
+import { surfaceTextureLayersToMake } from "@/lib/surfaceTextureShape";
 
 type Vec3 = [number, number, number];
 
@@ -16,8 +17,20 @@ function circle(cx: number, cy: number, r: number, n = 48): [number, number][] {
   return Array.from({ length: n }, (_, k) => [cx + r * Math.cos((2 * Math.PI * k) / n), cy + r * Math.sin((2 * Math.PI * k) / n)] as [number, number]);
 }
 
-describe("explore", () => {
-  it("knurls a circle on a plate's top", () => {
+function ellipse(cx: number, cy: number, rx: number, ry: number, n = 48): [number, number][] {
+  return Array.from({ length: n }, (_, k) => [cx + rx * Math.cos((2 * Math.PI * k) / n), cy + ry * Math.sin((2 * Math.PI * k) / n)] as [number, number]);
+}
+function volume(p: ArrayLike<number>) {
+  let v = 0;
+  for (let t = 0; t < p.length; t += 9) {
+    const [ax, ay, az, bx, by, bz, cx, cy, cz] = Array.from({ length: 9 }, (_, k) => p[t + k]);
+    v += (ax * (by * cz - bz * cy) - ay * (bx * cz - bz * cx) + az * (bx * cy - by * cx)) / 6;
+  }
+  return v;
+}
+
+describe("surface texture regions", () => {
+  it("knurls only inside a circle drawn on a plate's top", () => {
     const plate = box(60, 4, 40);
     const region = { normal: [0, 1, 0], points: circle(-12, 0, 10) };
     const result = applySurfaceTexture(plate, normalizeSurfaceTexture({ pattern: "knurl", region }));
@@ -36,7 +49,23 @@ describe("explore", () => {
       if (r < 10) movedInside += 1;
       else movedOutside += 1;
     }
-    expect({ movedInside, movedOutside, t: result.stats.triangles, r: surfaceMeshReport(result.indices, v.length / 3), nothing: result.stats.nothing, nearest }).toEqual(null);
     expect(movedInside).toBeGreaterThan(0);
+    expect(movedOutside).toBe(0);
+    expect(nearest).toBeGreaterThan(0.5);
+    expect(result.stats.nothing).toBe(false);
+    expect(surfaceMeshReport(result.indices, v.length / 3)).toEqual({ nonManifoldEdges: 0, openEdges: 0, shells: 1 });
   }, 30000);
+
+  it("bumps a second region the same after a knurled one", () => {
+    const plate = box(45, 4, 70);
+    const knurl = normalizeSurfaceTexture({ pattern: "knurl", region: { points: ellipse(-8, 15, 8, 10) } });
+    const bumps = normalizeSurfaceTexture({ pattern: "bumps", region: { points: ellipse(8, -15, 8, 12) } });
+    const [l1, l2] = surfaceTextureLayersToMake(knurl, [bumps]);
+    const v0 = volume(plate);
+    const after1 = surfaceTexturePositions(applySurfaceTexture(plate, l1));
+    const after2 = surfaceTexturePositions(applySurfaceTexture(after1, l2));
+    const alone = surfaceTexturePositions(applySurfaceTexture(plate, bumps));
+    expect(v0 - volume(after1)).toBeGreaterThan(0);
+    expect(Math.abs(volume(after1) - volume(after2) - (v0 - volume(alone)))).toBeLessThan(0.05 * (v0 - volume(alone)));
+  }, 60000);
 });
