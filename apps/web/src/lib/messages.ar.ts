@@ -5491,6 +5491,7 @@ export const MESSAGES_AR: Partial<Record<MessageKey, string>> = {
   "notice.designNotSavedTitle": "هذا التصميم غير محفوظ",
   "notice.designNotSavedHint": "أحدث تغييراتك موجودة في علامة التبويب هذه فقط: لا تغلقها ولا تعِد تحميلها. خفّف الشبكات الكبيرة باستخدام «تبسيط الشبكة»، أو احتفظ بنسخة عبر تصدير ← LYL.",
   "notice.designNotSavedHintCopy": "أحدث تغييراتك موجودة في علامة التبويب هذه فقط: لا تغلقها ولا تعِد تحميلها. احتفظ بنسخة عبر تصدير ← LYL.",
+  "notice.storageBroken": "يرفض المتصفح حفظ أي شيء لـ layerling رغم أن معظم مساحته فارغة: تخزينه لهذا الموقع تالف، وحذف التصاميم لن يفيد. احفظ هذا التصميم عبر Export → LYL والباقي عبر \"{backupAll}\" في صفحة البداية. ثم احذف بيانات موقع layerling.com من إعدادات المتصفح (في Chrome: chrome://settings/content/all)، وافتح layerling من جديد واستعد النسخة الاحتياطية.",
   "notice.designNotSavedDetail": "التفاصيل: {detail}",
   "notice.projectHistoryTrimmed": "هذا التصميم كبير: النسخة المحفوظة في المتصفح تحتفظ فقط بآخر {kept} من {total} خطوة في السجل. احذف السجل لتخفيفه.",
   "notice.projectShapesMigrateFailed": "تعذر نقل أشكال التصميم إلى مساحة تخزين أكبر",

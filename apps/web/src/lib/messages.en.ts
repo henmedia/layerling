@@ -5483,6 +5483,7 @@ export const MESSAGES_EN = {
   "notice.designNotSavedTitle": "This design is not saved",
   "notice.designNotSavedHint": "Your newest changes are only in this tab: don't close or reload it. Make large meshes lighter with Simplify mesh, or keep a copy with Export → LYL.",
   "notice.designNotSavedHintCopy": "Your newest changes are only in this tab: don't close or reload it. Keep a copy with Export → LYL.",
+  "notice.storageBroken": "The browser refuses to store anything for layerling, although most of its room is free: its storage for this site is damaged, and deleting designs will not help. Keep this design with Export → LYL and the others with \"{backupAll}\" on the start page. Then delete the site data of layerling.com in the browser's settings (in Chrome: chrome://settings/content/all), open layerling again and restore the backup.",
   "notice.designNotSavedDetail": "Details: {detail}",
   "notice.projectHistoryTrimmed": "This design is large: the saved copy in the browser keeps only the last {kept} of {total} history steps. Delete the history to make it lighter.",
   "notice.projectShapesMigrateFailed": "Could not migrate design shapes to larger storage",

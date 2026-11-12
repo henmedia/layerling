@@ -5477,6 +5477,7 @@ export const MESSAGES_SV: Partial<Record<MessageKey, string>> = {
   "notice.designNotSavedTitle": "Den här designen är inte sparad",
   "notice.designNotSavedHint": "Dina senaste ändringar finns bara i den här fliken: stäng den inte och ladda inte om den. Gör stora nät lättare med Förenkla nät, eller spara en kopia med Exportera → LYL.",
   "notice.designNotSavedHintCopy": "Dina senaste ändringar finns bara i den här fliken: stäng den inte och ladda inte om den. Spara en kopia med Exportera → LYL.",
+  "notice.storageBroken": "Webbläsaren vägrar spara något för layerling, fast det mesta av utrymmet är ledigt: dess lagring för den här webbplatsen är skadad, och att ta bort designer hjälper inte. Spara den här designen med Export → LYL och de andra med \"{backupAll}\" på startsidan. Ta sedan bort webbplatsdata för layerling.com i webbläsarens inställningar (i Chrome: chrome://settings/content/all), öppna layerling igen och återställ säkerhetskopian.",
   "notice.designNotSavedDetail": "Detaljer: {detail}",
   "notice.projectHistoryTrimmed": "Den här designen är stor: den sparade kopian i webbläsaren behåller bara de senaste {kept} av {total} historiksteg. Ta bort historiken för att göra den lättare.",
   "notice.projectShapesMigrateFailed": "Kunde inte flytta designens former till större lagring",

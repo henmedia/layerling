@@ -79,6 +79,17 @@ export function storageProbeText(probe: StorageProbe): string {
   return parts.join(" · ");
 }
 
+/**
+ * Whether the browser's storage for this site looks broken rather than full: a tiny test write is refused although
+ * most of the room is free. Two people's Chrome on a Mac did this, at 3 % of 10 GB (#1639, Facebook); deleting the
+ * site's data in the browser and restoring a backup was the cure, deleting designs was not.
+ */
+export function storageLooksBroken(probe: StorageProbe): boolean {
+  if (!probe.indexedDbWrite.startsWith("failed")) return false;
+  if (probe.usage === undefined || !probe.quota) return false;
+  return probe.usage / probe.quota < 0.5 && probe.quota - probe.usage > 100 * 1024 * 1024;
+}
+
 const PROBE_DB = "layerling-storage-probe";
 const PROBE_TIMEOUT_MS = 5000;
 

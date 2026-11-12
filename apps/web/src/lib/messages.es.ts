@@ -5485,6 +5485,7 @@ export const MESSAGES_ES: Partial<Record<MessageKey, string>> = {
   "notice.designNotSavedTitle": "Este diseño no está guardado",
   "notice.designNotSavedHint": "Tus cambios más recientes solo están en esta pestaña: no la cierres ni la recargues. Aligera las mallas grandes con Simplificar malla o guarda una copia con Exportar → LYL.",
   "notice.designNotSavedHintCopy": "Tus cambios más recientes solo están en esta pestaña: no la cierres ni la recargues. Guarda una copia con Exportar → LYL.",
+  "notice.storageBroken": "El navegador no guarda nada de layerling, aunque tiene libre la mayor parte del espacio: su almacenamiento para este sitio está dañado y borrar diseños no servirá. Guarda este diseño con Export → LYL y los demás con «{backupAll}» en la página de inicio. Después borra los datos del sitio layerling.com en los ajustes del navegador (en Chrome: chrome://settings/content/all), vuelve a abrir layerling y restaura la copia.",
   "notice.designNotSavedDetail": "Detalles: {detail}",
   "notice.projectHistoryTrimmed": "Este diseño es grande: la copia guardada en el navegador solo conserva los últimos {kept} de {total} pasos del historial. Borra el historial para aligerarlo.",
   "notice.projectShapesMigrateFailed": "No se han podido pasar las formas del diseño a un almacenamiento más grande",

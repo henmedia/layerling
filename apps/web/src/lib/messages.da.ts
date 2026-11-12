@@ -5218,6 +5218,7 @@ export const MESSAGES_DA: Partial<Record<MessageKey, string>> = {
   "notice.designNotSavedTitle": "Dette design er ikke gemt",
   "notice.designNotSavedHint": "Dine nyeste ændringer findes kun i denne fane: luk den ikke, og genindlæs den ikke. Gør store mesh lettere med Forenkl mesh, eller gem en kopi med Eksportér → LYL.",
   "notice.designNotSavedHintCopy": "Dine nyeste ændringer findes kun i denne fane: luk den ikke, og genindlæs den ikke. Gem en kopi med Eksportér → LYL.",
+  "notice.storageBroken": "Browseren nægter at gemme noget for layerling, selvom det meste af pladsen er fri: dens lager for dette websted er beskadiget, og det hjælper ikke at slette designs. Gem dette design med Export → LYL og de andre med \"{backupAll}\" på startsiden. Slet derefter webstedsdataene for layerling.com i browserens indstillinger (i Chrome: chrome://settings/content/all), åbn layerling igen og gendan sikkerhedskopien.",
   "notice.designNotSavedDetail": "Detaljer: {detail}",
   "notice.projectHistoryTrimmed": "Dette design er stort: den gemte kopi i browseren beholder kun de sidste {kept} af {total} trin i historikken. Slet historikken for at gøre det lettere.",
   "notice.projectShapesMigrateFailed": "Kunne ikke migrere designformer til større lager",

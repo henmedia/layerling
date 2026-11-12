@@ -5459,6 +5459,7 @@ export const MESSAGES_FR: Partial<Record<MessageKey, string>> = {
   "notice.designNotSavedTitle": "Ce design n'est pas enregistré",
   "notice.designNotSavedHint": "Vos dernières modifications n'existent que dans cet onglet : ne le fermez pas et ne le rechargez pas. Allégez les grands maillages avec Simplifier le maillage, ou gardez une copie avec Exporter → LYL.",
   "notice.designNotSavedHintCopy": "Vos dernières modifications n'existent que dans cet onglet : ne le fermez pas et ne le rechargez pas. Gardez une copie avec Exporter → LYL.",
+  "notice.storageBroken": "Le navigateur refuse de stocker quoi que ce soit pour layerling, alors que la plus grande partie de l'espace est libre : son stockage pour ce site est endommagé, et supprimer des conceptions n'y changera rien. Gardez cette conception avec Export → LYL et les autres avec « {backupAll} » sur la page d'accueil. Supprimez ensuite les données du site layerling.com dans les paramètres du navigateur (dans Chrome : chrome://settings/content/all), rouvrez layerling et restaurez la sauvegarde.",
   "notice.designNotSavedDetail": "Détails : {detail}",
   "notice.projectHistoryTrimmed": "Cette conception est grande : la copie enregistrée dans le navigateur ne garde que les {kept} dernières des {total} étapes de l'historique. Supprimez l'historique pour l'alléger.",
   "notice.projectShapesMigrateFailed": "Impossible de migrer les formes de conception vers un espace de stockage plus grand",

@@ -4367,6 +4367,7 @@ export const MESSAGES_SL: Partial<Record<MessageKey, string>> = {
   "notice.designNotSavedTitle": "Ta načrt ni shranjen",
   "notice.designNotSavedHint": "Najnovejše spremembe so samo v tem zavihku: ne zapri ga in ga ne naloži znova. Velike mreže olajšaj s Poenostavi mrežo ali shrani kopijo z Izvozi → LYL.",
   "notice.designNotSavedHintCopy": "Najnovejše spremembe so samo v tem zavihku: ne zapri ga in ga ne naloži znova. Shrani kopijo z Izvozi → LYL.",
+  "notice.storageBroken": "Brskalnik za layerling ne shrani ničesar, čeprav je večina prostora prosta: njegova shramba za to spletno mesto je poškodovana in brisanje modelov ne bo pomagalo. Ta model shranite z Export → LYL, ostale pa z »{backupAll}« na začetni strani. Nato v nastavitvah brskalnika izbrišite podatke spletnega mesta layerling.com (v Chromu: chrome://settings/content/all), znova odprite layerling in obnovite varnostno kopijo.",
   "notice.designNotSavedDetail": "Podrobnosti: {detail}",
   "notice.projectHistoryTrimmed": "Ta projekt je velik: shranjena kopija v brskalniku obdrži samo zadnjih {kept} od {total} korakov zgodovine. Izbrišite zgodovino, da bo lažji.",
   "notice.projectShapesMigrateFailed": "Oblik projekta ni bilo mogoče prenesti v večjo shrambo",

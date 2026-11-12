@@ -3116,7 +3116,7 @@ export function LayerlingEditor({
   /** The last failed autosave, so the editor can say so; `at` makes a repeat failure show again. */
   projectSaveFailure?: { message: string; at: number } | null;
   /** Why the newest state of this design could not be stored, while it could not (#1652): a note stays up until a save gets through. */
-  projectUnsaved?: { message: string; kind: SaveFailureKind; detail: string } | null;
+  projectUnsaved?: { message: string; kind: SaveFailureKind; detail: string; broken?: boolean } | null;
   onProjectNameChange?: (name: string) => void;
   /** Legt aus einem frueheren Stand ein neues Projekt an und sagt in einem Satz, was daraus wurde. */
   onCreateProjectFromState?: (request: HistoryProjectRequest) => Promise<string>;
@@ -19409,7 +19409,8 @@ export function LayerlingEditor({
       {projectUnsaved ? (
         <div className="unsaved-design-banner" role="alert">
           <strong>{t("notice.designNotSavedTitle")}</strong>
-          <span>{projectUnsaved.message}</span>
+          {/* Refused with most of the room free, the browser's storage for the site is broken: "no room left" would send people deleting designs, which does not help (#1639, Facebook). */}
+          <span>{projectUnsaved.broken ? t("notice.storageBroken", { backupAll: t("dashboard.backupAll") }) : projectUnsaved.message}</span>
           {/* Lighter meshes help only where size or memory was the reason; a design of a few plates is refused all the same (#1639). */}
           <span>{t(projectUnsaved.kind === "outOfMemory" || projectUnsaved.kind === "tooLarge" ? "notice.designNotSavedHint" : "notice.designNotSavedHintCopy")}</span>
           {/* The browser's own words and its storage figures, so a screenshot tells why (#1639). */}

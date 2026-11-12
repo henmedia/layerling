@@ -5460,6 +5460,7 @@ export const MESSAGES_IT: Partial<Record<MessageKey, string>> = {
   "notice.designNotSavedTitle": "Questo progetto non è salvato",
   "notice.designNotSavedHint": "Le modifiche più recenti sono solo in questa scheda: non chiuderla e non ricaricarla. Alleggerisci le mesh grandi con Semplifica mesh, oppure salva una copia con Esporta → LYL.",
   "notice.designNotSavedHintCopy": "Le modifiche più recenti sono solo in questa scheda: non chiuderla e non ricaricarla. Salva una copia con Esporta → LYL.",
+  "notice.storageBroken": "Il browser non salva più nulla per layerling, anche se la maggior parte dello spazio è libera: la sua memoria per questo sito è danneggiata ed eliminare progetti non serve. Salva questo progetto con Export → LYL e gli altri con \"{backupAll}\" nella pagina iniziale. Poi elimina i dati del sito layerling.com nelle impostazioni del browser (in Chrome: chrome://settings/content/all), riapri layerling e ripristina il backup.",
   "notice.designNotSavedDetail": "Dettagli: {detail}",
   "notice.projectHistoryTrimmed": "Questo progetto è grande: la copia salvata nel browser conserva solo gli ultimi {kept} di {total} passaggi della cronologia. Elimina la cronologia per alleggerirlo.",
   "notice.projectShapesMigrateFailed": "Impossibile trasferire le forme del progetto in uno spazio di archiviazione più capiente",

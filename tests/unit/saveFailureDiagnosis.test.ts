@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { describeSaveError, formatBytes, saveFailureKind, storageProbeText } from "@/lib/saveFailureDiagnosis";
+import { describeSaveError, formatBytes, saveFailureKind, storageLooksBroken, storageProbeText } from "@/lib/saveFailureDiagnosis";
 import { designsSettled, type DesignSaveState } from "@/lib/leaveGuard";
 
 // #1639: a Chrome on a Mac refused every save with an error that carried no text, and the note said only
@@ -64,5 +64,21 @@ describe("Save and reload waits for the save (#1639)", () => {
     const result = await run([{ saving: true, unsaved: false }]);
     expect(result.settled).toBe(false);
     expect(result.slept).toBe(2000);
+  });
+});
+
+// Facebook, 12.11.2026, and #1639: Chrome on a Mac refused even a tiny test write at 285 MB of 10 GB. That is broken
+// storage, not a full one, and the note says how to clear it instead of "delete designs".
+describe("storage that looks broken rather than full", () => {
+  const MB = 1024 * 1024;
+  const failed = "failed, QuotaExceededError (DOMException): (no message)";
+  it("is broken when a tiny write fails with most of the room free", () => {
+    expect(storageLooksBroken({ usage: 285 * MB, quota: 10240 * MB, indexedDbWrite: failed, localStorageWrite: "ok" })).toBe(true);
+  });
+  it("is full, not broken, when the room is nearly used up or the write goes through", () => {
+    expect(storageLooksBroken({ usage: 9800 * MB, quota: 10240 * MB, indexedDbWrite: failed, localStorageWrite: "ok" })).toBe(false);
+    expect(storageLooksBroken({ usage: 40 * MB, quota: 120 * MB, indexedDbWrite: failed, localStorageWrite: "ok" })).toBe(false);
+    expect(storageLooksBroken({ usage: 285 * MB, quota: 10240 * MB, indexedDbWrite: "ok", localStorageWrite: "ok" })).toBe(false);
+    expect(storageLooksBroken({ indexedDbWrite: failed, localStorageWrite: "ok" })).toBe(false);
   });
 });

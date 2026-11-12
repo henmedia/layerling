@@ -5464,6 +5464,7 @@ export const MESSAGES_CS: Record<MessageKey, string> = {
   "notice.designNotSavedTitle": "Tento návrh není uložen",
   "notice.designNotSavedHint": "Nejnovější změny jsou jen v této kartě: nezavírejte ji ani ji znovu nenačítejte. Velké sítě odlehčete pomocí Zjednodušit síť, nebo si uložte kopii přes Export → LYL.",
   "notice.designNotSavedHintCopy": "Nejnovější změny jsou jen v této kartě: nezavírejte ji ani ji znovu nenačítejte. Uložte si kopii přes Export → LYL.",
+  "notice.storageBroken": "Prohlížeč pro layerling nic neuloží, přestože má většinu místa volnou: jeho úložiště pro tento web je poškozené a mazání návrhů nepomůže. Tento návrh si uložte přes Export → LYL a ostatní přes „{backupAll}“ na úvodní stránce. Pak v nastavení prohlížeče smažte data webu layerling.com (v Chromu: chrome://settings/content/all), znovu otevřete layerling a obnovte zálohu.",
   "notice.designNotSavedDetail": "Podrobnosti: {detail}",
   "notice.projectHistoryTrimmed": "Tento projekt je velký: uložená kopie v prohlížeči si ponechává jen posledních {kept} z {total} kroků historie. Smažte historii, aby byl lehčí.",
   "notice.projectShapesMigrateFailed": "Tvary projektu se nepodařilo převést do většího úložiště",

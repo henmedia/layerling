@@ -5488,6 +5488,7 @@ export const MESSAGES_PL: Partial<Record<MessageKey, string>> = {
   "notice.designNotSavedTitle": "Ten projekt nie jest zapisany",
   "notice.designNotSavedHint": "Najnowsze zmiany są tylko w tej karcie: nie zamykaj jej ani nie odświeżaj. Odciąż duże siatki przez Uprość siatkę albo zachowaj kopię przez Eksport → LYL.",
   "notice.designNotSavedHintCopy": "Najnowsze zmiany są tylko w tej karcie: nie zamykaj jej ani nie odświeżaj. Zachowaj kopię przez Eksport → LYL.",
+  "notice.storageBroken": "Przeglądarka nie zapisuje niczego dla layerling, choć większość miejsca jest wolna: jej pamięć dla tej strony jest uszkodzona i usuwanie projektów nie pomoże. Zachowaj ten projekt przez Export → LYL, a pozostałe przez „{backupAll}” na stronie startowej. Potem w ustawieniach przeglądarki usuń dane witryny layerling.com (w Chrome: chrome://settings/content/all), otwórz layerling ponownie i przywróć kopię.",
   "notice.designNotSavedDetail": "Szczegóły: {detail}",
   "notice.projectHistoryTrimmed": "Ten projekt jest duży: zapisana kopia w przeglądarce zachowuje tylko ostatnie {kept} z {total} kroków historii. Usuń historię, aby go odciążyć.",
   "notice.projectShapesMigrateFailed": "Nie udało się przenieść kształtów projektu do większego magazynu",

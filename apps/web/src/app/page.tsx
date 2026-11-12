@@ -44,7 +44,7 @@ import { hydrateEditorHistoryState, notesForHistoryIndex, type EditorHistoryEntr
 import { detectLanguage, setLanguage, t, translate, type Language } from "@/lib/i18n";
 import { localizedError } from "@/lib/userErrors";
 import { historyTrimSteps, isRetriedWithLessHistory, trimHistoryWindow } from "@/lib/historyTrim";
-import { describeSaveError, probeBrowserStorage, saveFailureKind, storageProbeText, type SaveFailureKind } from "@/lib/saveFailureDiagnosis";
+import { describeSaveError, probeBrowserStorage, saveFailureKind, storageLooksBroken, storageProbeText, type SaveFailureKind } from "@/lib/saveFailureDiagnosis";
 import { reportBugReportError } from "@/lib/bugReport";
 import { leaveGuardReleased, provideDesignSaveState } from "@/lib/leaveGuard";
 import { GuideHelpLink } from "@/components/GuideHelpLink";
@@ -1090,21 +1090,24 @@ export default function Home() {
   // Designs whose newest state could not be stored (#1652): the revision that failed, until a newer save gets through. While
   // one is listed, closing or reloading the tab asks first, and the editor keeps a red note up.
   const unsavedProjectsRef = useRef(new Map<string, number>());
-  const [unsavedDesign, setUnsavedDesign] = useState<{ projectId: string; message: string; kind: SaveFailureKind; detail: string } | null>(null);
+  const [unsavedDesign, setUnsavedDesign] = useState<{ projectId: string; message: string; kind: SaveFailureKind; detail: string; broken?: boolean } | null>(null);
   /**
    * The error with what the browser says about its storage and whether a tiny write gets through (#1639), for the
    * note, the console and the bug report. A failing design fails at every change, so the storage is asked once a
    * minute for the same error.
    */
-  const lastSaveDiagnosisRef = useRef<{ detail: string; at: number; text: string } | null>(null);
+  const lastSaveDiagnosisRef = useRef<{ detail: string; at: number; text: string; broken: boolean } | null>(null);
   const diagnoseSaveFailure = useCallback(async (detail: string) => {
     const last = lastSaveDiagnosisRef.current;
-    if (last && last.detail === detail && Date.now() - last.at < 60000) return last.text;
-    const text = `${detail} · ${storageProbeText(await probeBrowserStorage())}`;
-    lastSaveDiagnosisRef.current = { detail, at: Date.now(), text };
-    console.error(`layerling: storage when the save failed: ${text}`);
+    if (last && last.detail === detail && Date.now() - last.at < 60000) return { text: last.text, broken: last.broken };
+    const probe = await probeBrowserStorage();
+    const text = `${detail} · ${storageProbeText(probe)}`;
+    // A tiny write refused with most of the room free: the site's storage is broken, not full.
+    const broken = storageLooksBroken(probe);
+    lastSaveDiagnosisRef.current = { detail, at: Date.now(), text, broken };
+    console.error(`layerling: storage when the save failed: ${text}${broken ? " (storage looks broken, not full)" : ""}`);
     reportBugReportError(`Save failed: ${text}`);
-    return text;
+    return { text, broken };
   }, []);
   const editorLoadingStartedAtRef = useRef(0);
 
@@ -1771,8 +1774,8 @@ export default function Home() {
           const detail = describeSaveError(error);
           console.error(`layerling: could not save the design: ${detail}`, error);
           setUnsavedDesign({ projectId: snapshot.projectId, message, kind, detail });
-          void diagnoseSaveFailure(detail).then((full) => {
-            setUnsavedDesign((current) => (current?.projectId === snapshot.projectId ? { ...current, detail: full } : current));
+          void diagnoseSaveFailure(detail).then(({ text, broken }) => {
+            setUnsavedDesign((current) => (current?.projectId === snapshot.projectId ? { ...current, detail: text, broken } : current));
           });
         }
       })

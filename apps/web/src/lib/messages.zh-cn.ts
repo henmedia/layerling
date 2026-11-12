@@ -5464,6 +5464,7 @@ export const MESSAGES_ZH_CN: Partial<Record<MessageKey, string>> = {
   "notice.designNotSavedTitle": "此设计尚未保存",
   "notice.designNotSavedHint": "最新的更改只存在于此标签页中：请不要关闭或重新加载它。用“简化网格”减轻大型网格，或通过 导出 → LYL 保存一份副本。",
   "notice.designNotSavedHintCopy": "最新的更改只存在于此标签页中：请不要关闭或重新加载它。请通过 导出 → LYL 保存一份副本。",
+  "notice.storageBroken": "浏览器拒绝为 layerling 保存任何内容，尽管大部分空间都是空的：它为此网站保存数据的存储已损坏，删除设计也无济于事。请用 Export → LYL 保存这个设计，用起始页上的“{backupAll}”保存其余设计。然后在浏览器设置中删除 layerling.com 的网站数据（Chrome：chrome://settings/content/all），重新打开 layerling 并恢复备份。",
   "notice.designNotSavedDetail": "详细信息：{detail}",
   "notice.projectHistoryTrimmed": "此设计较大：浏览器中保存的副本仅保留 {kept} 步历史（共 {total} 步）。删除历史可使其更轻。",
   "notice.projectShapesMigrateFailed": "无法将设计形状迁移到更大的存储空间",

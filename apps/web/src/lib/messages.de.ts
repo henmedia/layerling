@@ -5482,6 +5482,7 @@ export const MESSAGES_DE: Record<MessageKey, string> = {
   "notice.designNotSavedTitle": "Dieser Entwurf ist nicht gespeichert",
   "notice.designNotSavedHint": "Deine neuesten Änderungen gibt es nur in diesem Tab: Schließ ihn nicht und lade ihn nicht neu. Mach große Netze mit „Netz vereinfachen“ leichter, oder sichere eine Kopie mit Exportieren → LYL.",
   "notice.designNotSavedHintCopy": "Deine neuesten Änderungen gibt es nur in diesem Tab: Schließ ihn nicht und lade ihn nicht neu. Sichere eine Kopie mit Exportieren → LYL.",
+  "notice.storageBroken": "Der Browser speichert für layerling gar nichts mehr, obwohl der meiste Platz frei ist: Sein Speicher für diese Seite ist beschädigt, und Entwürfe zu löschen hilft nicht. Sichere diesen Entwurf mit Export → LYL und die anderen mit „{backupAll}“ auf der Startseite. Lösche danach in den Einstellungen des Browsers die Websitedaten von layerling.com (in Chrome: chrome://settings/content/all), öffne layerling neu und spiele die Sicherung zurück.",
   "notice.designNotSavedDetail": "Einzelheiten: {detail}",
   "notice.projectHistoryTrimmed": "Dieser Entwurf ist groß: Die gespeicherte Kopie im Browser behält nur die letzten {kept} von {total} Verlaufsschritten. Lösche den Verlauf, um ihn leichter zu machen.",
   "notice.projectShapesMigrateFailed": "Die Formen konnten nicht in den größeren Speicher übernommen werden",

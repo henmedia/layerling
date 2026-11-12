@@ -1,6 +1,16 @@
 [
   {
     "title": {
+      "de": "Speicher beschädigt statt voll: der rote Hinweis sagt, was hilft",
+      "en": "Damaged storage, not a full one: the red note says what helps"
+    },
+    "body": {
+      "de": "Weigert sich der Browser zu speichern, obwohl er kaum belegt ist, ist sein Speicher für layerling beschädigt, und Entwürfe zu löschen hilft nicht. Der rote Hinweis sagt das jetzt und nennt den Weg: alles sichern, die Websitedaten von layerling.com im Browser löschen und die Sicherung zurückspielen.",
+      "en": "When the browser refuses to save although it is hardly used, its storage for layerling is damaged, and deleting designs does not help. The red note now says so and gives the way out: back everything up, delete the site data of layerling.com in the browser and restore the backup."
+    }
+  },
+  {
+    "title": {
       "de": "Glatte Seiten an ausgezogenen Kurven",
       "en": "Smooth sides on extruded curves"
     },

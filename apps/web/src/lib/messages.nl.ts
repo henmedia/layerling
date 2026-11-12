@@ -5483,6 +5483,7 @@ export const MESSAGES_NL: Record<MessageKey, string> = {
   "notice.designNotSavedTitle": "Dit ontwerp is niet opgeslagen",
   "notice.designNotSavedHint": "Je nieuwste wijzigingen staan alleen in dit tabblad: sluit het niet en laad het niet opnieuw. Maak grote meshes lichter met Mesh vereenvoudigen, of bewaar een kopie met Exporteren → LYL.",
   "notice.designNotSavedHintCopy": "Je nieuwste wijzigingen staan alleen in dit tabblad: sluit het niet en laad het niet opnieuw. Bewaar een kopie met Exporteren → LYL.",
+  "notice.storageBroken": "De browser slaat niets meer op voor layerling, hoewel de meeste ruimte vrij is: de opslag voor deze site is beschadigd, en ontwerpen verwijderen helpt niet. Bewaar dit ontwerp met Export → LYL en de andere met \"{backupAll}\" op de startpagina. Verwijder daarna in de instellingen van de browser de sitegegevens van layerling.com (in Chrome: chrome://settings/content/all), open layerling opnieuw en zet de back-up terug.",
   "notice.designNotSavedDetail": "Details: {detail}",
   "notice.projectHistoryTrimmed": "Dit ontwerp is groot: de opgeslagen kopie in de browser bewaart alleen de laatste {kept} van {total} geschiedenisstappen. Verwijder de geschiedenis om het lichter te maken.",
   "notice.projectShapesMigrateFailed": "Kon de vormen van het ontwerp niet naar grotere opslag overzetten",
