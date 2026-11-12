@@ -17306,6 +17306,11 @@ html[data-theme="dark"] .interactive-help-window a:not(.primary):not(.secondary)
   color: inherit;
   font: inherit;
   cursor: pointer;
+  /* Held on a phone or tablet: no text selection, magnifier or long-press menu, and the touch stays with the button (#1671). */
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
+  touch-action: none;
 }
 
 .simple-mode-hold::after {

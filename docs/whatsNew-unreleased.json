@@ -11,5 +11,17 @@
       "da": "Skruer med cylinderhoved sælges efter længden under hovedet. Forsænkningen har nu feltet \"Skruelængde\" til det: skriv skruens længde, så lægges hoveddybden til for den totale længde. Med en hoveddybde på 3,2 mm giver en M3 × 12 et hul på 15,2 mm."
     },
     "guide": { "section": "screwHoles" }
+  },
+  {
+    "title": {
+      "de": "Einfacher Modus lässt sich auf Handy und Tablet ausschalten",
+      "en": "Simple mode can be switched off on phones and tablets",
+      "da": "Enkel tilstand kan slås fra på telefon og tablet"
+    },
+    "body": {
+      "de": "Zum Ausschalten hält man den Knopf zwei Sekunden lang. Auf einem Touchscreen öffnete das lange Drücken stattdessen das Menü des Browsers, und der einfache Modus blieb an. Jetzt bleibt das Menü zu, und die zwei Sekunden laufen durch.",
+      "en": "To switch it off, you hold the button for two seconds. On a touch screen the long press opened the browser's menu instead, and simple mode stayed on. Now the menu stays shut and the two seconds run through.",
+      "da": "For at slå den fra holder man knappen nede i to sekunder. På en touchskærm åbnede det lange tryk i stedet browserens menu, og enkel tilstand forblev slået til. Nu forbliver menuen lukket, og de to sekunder løber igennem."
+    }
   }
 ]

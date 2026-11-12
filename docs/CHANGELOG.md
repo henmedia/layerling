@@ -6,6 +6,8 @@ code still carries it - so a lower number further down is older, not newer.
 
 ## Unreleased
 
+- **Simple mode can be switched off on a phone or tablet (#1671):** Simple mode is switched off by holding its button for two seconds, so that a child does not leave it with a tap (#695). On a touch screen the long press opened the browser's own menu instead (back, reload, download), which took the touch away and cancelled the hold, so simple mode could not be left at all. The button now keeps that menu shut and takes no text selection, magnifier or scrolling (touch-action: none), so the two seconds run through. Checked in headless Edge with a touch screen emulated: held for 2.5 s, simple mode went off
+
 - **Counterbore: length below the head (Discussion #1670):** Socket head cap screws are sold by the length under the head (ISO 4762), countersunk screws by the length with the head, but the screw hole had only its Total length, so a counterbore for an M3 × 12 needed 15.2 worked out by hand. The counterbore now has a second field, Screw length (measured below the head), under Total length: it shows the total less the head depth, and entering the screw's length sets the total to it plus the head depth (`screwHoleLengthBelowHead`, `screwHoleHeightForLengthBelowHead`). Nothing new is stored; the countersink keeps its one length. Texts in 15 languages, user guide (chapter 9), MCP skill and tool description, unit test.
 
 ## 1.159.2
