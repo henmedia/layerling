@@ -1,6 +1,16 @@
 [
   {
     "title": {
+      "de": "Winkellineal: Zahlen größer und gut lesbar",
+      "en": "Framing square: larger numbers, easy to read"
+    },
+    "body": {
+      "de": "Die Zahlen an den Armen des Winkellineals sind größer und stehen auf einem kleinen Schild, damit keine Rasterlinie mehr durch sie läuft, auch bei feinem Raster wie 1/8 Zoll. Weit herausgezoomt zeigt ein Arm nur jede zweite, fünfte oder zehnte Zahl, damit sie sich nicht überdecken.",
+      "en": "The numbers along the framing square's arms are larger and stand on a small plate, so no grid line runs through them, even on a fine grid such as 1/8 inch. Zoomed far out, an arm shows only every 2nd, 5th or 10th number, so they do not cover each other."
+    }
+  },
+  {
+    "title": {
       "de": "Speicher beschädigt statt voll: der rote Hinweis sagt, was hilft",
       "en": "Damaged storage, not a full one: the red note says what helps"
     },

@@ -11,7 +11,7 @@ import { LineSegmentsGeometry } from "three/examples/jsm/lines/LineSegmentsGeome
 import { type AppThemePalette, type ResolvedAppTheme } from "@/lib/appTheme";
 import { t, type MessageKey } from "@/lib/i18n";
 import { currentLengthUnitLabel, displayToMillimeters, formatLengthMm, formatMeasurementNumber, lengthDisplayUnit, millimetersToDisplay, parseMeasurementInput } from "@/lib/measurementUnits";
-import { CORNER_RULER_DEFAULT_ARM_ELEVATION, computeCornerRulerRelativeCoordinates, cornerRulerArmsShown, cornerRulerAxisModes, cornerRulerElevationFieldBesideBody, cornerRulerDimensionMatchesFromCorner, cornerRulerFlatRotation, cornerRulerTicks, pointAlongRuler, rulerDimensionMatch, rulerLiesFlat, spreadCornerRulerFields, worldAxisNameOfDirection, type CornerRulerAxis, type CornerRulerAxisModes, type CornerRulerFrame, type CornerRulerMode, type RulerDimensionField, type RulerDimensionMatch, type RulerPose } from "@/lib/rulerDimensions";
+import { CORNER_RULER_DEFAULT_ARM_ELEVATION, computeCornerRulerRelativeCoordinates, cornerRulerArmsShown, cornerRulerAxisModes, cornerRulerElevationFieldBesideBody, cornerRulerDimensionMatchesFromCorner, cornerRulerFlatRotation, cornerRulerTicks, pointAlongRuler, rulerDimensionMatch, rulerLiesFlat, spreadCornerRulerFields, thinCornerRulerLabels, worldAxisNameOfDirection, type CornerRulerAxis, type CornerRulerAxisModes, type CornerRulerFrame, type CornerRulerMode, type RulerDimensionField, type RulerDimensionMatch, type RulerPose } from "@/lib/rulerDimensions";
 import { type PlacementPoint, type PlacementWorkplane } from "@/lib/placementWorkplane";
 import { capturePointer } from "@/lib/pointerCapture";
 import { GuideHelpLink } from "@/components/GuideHelpLink";
@@ -1722,6 +1722,7 @@ export function syncCornerRulerToolOverlay(
 
       const labels: CornerRulerLabelScreen[] = [];
       const buildTicks = (axisDir: THREE.Vector3, acrossDir: THREE.Vector3, length: number) => {
+        const armLabels: CornerRulerLabelScreen[] = [];
         cornerRulerTicks(length, currentLengthUnitLabel()).forEach((tick) => {
           const base = corner.clone().addScaledVector(axisDir, tick.offset);
           pushSegment(lines.ticks, base, base.clone().addScaledVector(acrossDir, armWidth * tick.height));
@@ -1729,10 +1730,12 @@ export function syncCornerRulerToolOverlay(
             const labelWorld = base.clone().addScaledVector(acrossDir, armWidth * 0.95);
             if (depthInFrontOfCamera(labelWorld, state) > 0) {
               const labelScreen = projectToScreen(labelWorld, state);
-              labels.push({ x: labelScreen.x, y: labelScreen.y, text: tick.label, hidden: occlude && worldPointHidden(labelWorld, state) });
+              armLabels.push({ x: labelScreen.x, y: labelScreen.y, text: tick.label, hidden: occlude && worldPointHidden(labelWorld, state) });
             }
           }
         });
+        // Zoomed out the numbers' plates would cover each other: every 2nd, 5th ... (Discussion #1704).
+        labels.push(...thinCornerRulerLabels(armLabels));
       };
       // Die Teilstriche zeigen nach aussen (weg vom jeweils anderen Arm),
       // wie bei vergleichbaren Programmen - nicht in die Ecke hinein, wo sonst platzierte

@@ -242,6 +242,43 @@ export function cornerRulerTicks(length: number, unitLabel = "mm"): CornerRulerT
   return ticks;
 }
 
+/** Width of one character of a framing square's number on screen (px), and the room around the number. */
+const CORNER_RULER_LABEL_CHAR_PX = 7.5;
+const CORNER_RULER_LABEL_PAD_PX = 10;
+const CORNER_RULER_LABEL_HEIGHT_PX = 16;
+const CORNER_RULER_LABEL_GAP_PX = 4;
+const CORNER_RULER_LABEL_STRIDES = [1, 2, 5, 10, 20, 50, 100];
+
+/**
+ * The numbers along one arm of the framing square, thinned so they do not run into each
+ * other (Discussion #1704): each number has a small plate behind it, so the grid does not
+ * cross its digits, and zoomed out the plates would cover their neighbours. Kept is every
+ * number, every 2nd, 5th, 10th ... (counted from the corner: 10, 20, 30 mm or 1, 2, 3"),
+ * the first step at which neighbours stand apart by a plate and a gap along the arm.
+ * The labels come in order from the corner outwards, in screen pixels.
+ */
+export function thinCornerRulerLabels<T extends { x: number; y: number; text: string }>(labels: T[]): T[] {
+  if (labels.length < 2) return labels;
+  const longest = labels.reduce((most, label) => Math.max(most, label.text.length), 0);
+  const width = longest * CORNER_RULER_LABEL_CHAR_PX + CORNER_RULER_LABEL_PAD_PX;
+  // The closest two neighbours, and the room a plate needs in their direction.
+  let closest = Infinity;
+  let needed = width + CORNER_RULER_LABEL_GAP_PX;
+  for (let index = 1; index < labels.length; index += 1) {
+    const dx = labels[index].x - labels[index - 1].x;
+    const dy = labels[index].y - labels[index - 1].y;
+    const distance = Math.hypot(dx, dy);
+    if (distance < closest) {
+      closest = distance;
+      needed = distance > 1e-6
+        ? (Math.abs(dx) / distance) * width + (Math.abs(dy) / distance) * CORNER_RULER_LABEL_HEIGHT_PX + CORNER_RULER_LABEL_GAP_PX
+        : width + CORNER_RULER_LABEL_GAP_PX;
+    }
+  }
+  const stride = CORNER_RULER_LABEL_STRIDES.find((step) => closest * step >= needed) ?? CORNER_RULER_LABEL_STRIDES[CORNER_RULER_LABEL_STRIDES.length - 1];
+  return stride === 1 ? labels : labels.filter((_, index) => (index + 1) % stride === 0);
+}
+
 export type CornerRulerMode = "endpoint" | "midpoint";
 
 /** The three numbers a framing square gives a body: along its two arms and in height. */

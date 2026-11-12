@@ -8486,14 +8486,21 @@ html[data-theme="dark"] .touch-multi-select {
   filter: drop-shadow(0 0 4px rgba(129, 67, 0, 0.4));
 }
 
+/* The numbers sit on a small plate of their own, so grid lines behind them do not cut through
+   the digits at any zoom (Discussion #1704: 10 px plain text on a 1/8" grid was unreadable). */
 .corner-ruler-tick-label {
   position: absolute;
   z-index: 2;
-  color: #5a3917;
-  font-size: 10px;
-  font-weight: 600;
+  padding: 2px 4px;
+  color: #4a2e12;
+  background: rgba(255, 255, 255, 0.88);
+  border-radius: 4px;
+  box-shadow: 0 0 0 1px rgba(90, 57, 23, 0.18);
+  font-size: 12px;
+  font-weight: 700;
   line-height: 1;
   text-align: center;
+  white-space: nowrap;
   pointer-events: none;
   transform: translate(-50%, -50%);
 }
@@ -8510,7 +8517,8 @@ html[data-theme="dark"] .corner-ruler-tick {
 
 html[data-theme="dark"] .corner-ruler-tick-label {
   color: #f6dfc2;
-  text-shadow: 0 0 2px rgba(0, 0, 0, 0.9), 0 0 4px rgba(0, 0, 0, 0.7);
+  background: rgba(24, 20, 16, 0.86);
+  box-shadow: 0 0 0 1px rgba(242, 166, 90, 0.35);
 }
 
 .corner-ruler-delete {
