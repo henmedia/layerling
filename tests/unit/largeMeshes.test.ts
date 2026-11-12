@@ -34,9 +34,11 @@ describe("large meshes", () => {
   it("warns when one imported mesh is large, or when the design's meshes together are", () => {
     const big = mesh("big", LARGE_MESH_TRIANGLES);
     expect(largeMeshWarningTriangles([big], [big])).toBe(LARGE_MESH_TRIANGLES);
-    // Three of 400,000 each: none large alone, 1.2 million together.
-    const parts = [mesh("1", 400_000), mesh("2", 400_000), mesh("3", 400_000)];
-    expect(largeMeshWarningTriangles([parts[2]], parts)).toBe(1_200_000);
+    // A 25 MB binary STL holds about 500,000 triangles, and is called large.
+    expect(LARGE_MESH_TRIANGLES).toBeLessThan(499_000);
+    // Three of 350,000 each: none large alone, 1.05 million together.
+    const parts = [mesh("1", 350_000), mesh("2", 350_000), mesh("3", 350_000)];
+    expect(largeMeshWarningTriangles([parts[2]], parts)).toBe(1_050_000);
     expect(largeMeshWarningTriangles([parts[1]], parts.slice(0, 2))).toBeNull();
     expect(LARGE_DESIGN_MESH_TRIANGLES).toBe(1_000_000);
   });

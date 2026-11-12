@@ -7,7 +7,7 @@ import type { WorkplaneShape } from "@/types/layerling";
  */
 
 /** One imported mesh from this many triangles on is called large. */
-export const LARGE_MESH_TRIANGLES = 500_000;
+export const LARGE_MESH_TRIANGLES = 400_000;
 /** The imported meshes of a design together from this many triangles on are called large. */
 export const LARGE_DESIGN_MESH_TRIANGLES = 1_000_000;
 
