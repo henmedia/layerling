@@ -6,6 +6,8 @@ code still carries it - so a lower number further down is older, not newer.
 
 ## Unreleased
 
+## 1.160.0
+
 - **A design that cannot be saved says so, and the newest state is not lost on a reload (Discussion #1652):** Every change packs the whole design with its history into the browser's storage. With imported meshes of millions of triangles that packing ran the tab out of memory, so every save failed; the editor said "Could not save design shapes" once in the status line, the next message covered it, and closing or reloading the tab (as the update notice does several times a day) brought back the last state that was stored, hours old. Now a save that runs out of memory is packed again with fewer history steps, as a package too big for the project format already was (isRetriedWithLessHistory), and its reason is named. While the newest state of a design is not stored, a red note stays up in the editor until a save gets through, and closing or reloading the tab asks first. Texts in 15 languages. Checked in the editor through headless Edge with the storage made to fail: the note came, the tab asked before closing, and both went away with the next save; unit test
 
 - **"Keep empty design?" answers with Keep and Delete (Discussion #1669):** Leaving an empty design asked "Keep empty design?" with Yes and No, and No deleted the design at once. Read in a hurry as "No, don't delete it", it took a design away. The buttons now say what they do: Keep (focused, so Enter keeps it) and Delete in red, as the other deletes on the start page. New text confirm.keep in 15 languages. Checked on the start page through headless Edge
