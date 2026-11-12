@@ -3077,7 +3077,7 @@ export function LayerlingEditor({
   initialPlacementElevation?: number;
   initialPlacementWorkplane?: PlacementWorkplane;
   onHome?: (leaving: { itemCount: number }) => void;
-  onOpenLylProjectFile?: (file: File, shared?: undefined, fileHandle?: LylFileHandle, options?: { name?: string }) => Promise<{ ok: boolean; message: string } | void> | { ok: boolean; message: string } | void;
+  onOpenLylProjectFile?: (file: File, shared?: undefined, fileHandle?: LylFileHandle, options?: { name?: string; onSlow?: (message: string) => void }) => Promise<{ ok: boolean; message: string } | void> | { ok: boolean; message: string } | void;
   /** "Back up all" of the start page, for the reminder in the status line; it starts with the save dialog. */
   onBackUpAllDesigns?: () => void;
   onSaveSharedProject?: (request: { exportName: string; bytes: Uint8Array; thumbnailDataUrl: string; targetFileName?: string }) => Promise<string>;
@@ -17782,7 +17782,8 @@ export function LayerlingEditor({
         return none;
       }
       setNotice(t("status.validatingFile", { name: projectFiles[0].name }), true);
-      const result = await onOpenLylProjectFile(projectFiles[0], undefined, fileHandle);
+      // An opening that takes long says so here too, with the step it is on (#1639).
+      const result = await onOpenLylProjectFile(projectFiles[0], undefined, fileHandle, { onSlow: (message) => setNotice(message, "stay") });
       if (result?.message) setNotice(result.message);
       if (result?.ok !== false) setTopPanel(null);
       return none;

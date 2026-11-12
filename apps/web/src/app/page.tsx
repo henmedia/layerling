@@ -166,6 +166,9 @@ function sharedProjectKey(project: Pick<SharedProject, "fileName" | "path">) {
 /** Joins a folder path with a name, without leaving a stray slash at the front. */
 /** How long a design must have been open before its opening counts as done (#1157, lib/openingDesignGuard.ts). */
 const DESIGN_OPENED_AFTER_MS = 10_000;
+/** Opening a .lyl file: read, check, store, place. A large one takes a few seconds; after this the notice says which step it is on (#1639). */
+const OPENING_STEPS = 4;
+const OPENING_SLOW_NOTICE_MS = 15_000;
 
 function joinStorePath(path: string, name: string) {
   return path ? `${path}/${name}` : name;
@@ -531,21 +534,25 @@ async function loadProjectShapes(projectId: string, options: { currentStateOnly?
   };
 }
 
-/** The .lyl bytes of a project: the stored package, or a freshly packed one. */
-async function projectPackageBytes(project: DashboardProject) {
-  const stored = await loadProjectPackage(project.id);
-  // Under the card's name: a rename on the start page leaves the old one in the saved package (#689).
-  if (stored) return withLylProjectName(stored, project.name);
-  const context = projectShapeSaveContext(project);
+/** A design's state packed as a .lyl, as the browser keeps it. */
+function packProjectEntry(
+  projectId: string,
+  entry: Pick<ProjectShapeCacheEntry, "revision" | "shapes" | "assets" | "attachments">,
+  context: ProjectShapeSaveContext,
+  history: ProjectShapeCacheEntry["history"],
+  historyIndex: number,
+) {
   return exportLylProject({
-    projectId: project.id,
+    projectId,
     projectName: context.projectName,
     createdAt: context.createdAt,
-    modifiedAt: project.updatedAt,
-    shapes: [],
-    history: [],
-    historyIndex: 0,
-    assets: [],
+    modifiedAt: entry.revision,
+    shapes: entry.shapes,
+    notes: notesForHistoryIndex(history, historyIndex),
+    history,
+    historyIndex,
+    assets: entry.assets,
+    attachments: entry.attachments,
     workspace: context.workspace,
     snapGrid: context.snapGrid,
     placementElevation: context.placementElevation,
@@ -553,6 +560,22 @@ async function projectPackageBytes(project: DashboardProject) {
     sketchPlacementWorkplane: context.sketchPlacementWorkplane,
     compressionLevel: 1,
   });
+}
+
+/**
+ * The .lyl bytes of a project: the stored package, or one packed from a record of the older kind. `missing` says that
+ * the browser holds nothing for the design, so the bytes are an empty design under its name and settings: a backup
+ * says so instead of carrying it along unnoticed (#1638).
+ */
+async function projectPackageBytes(project: DashboardProject): Promise<{ bytes: Uint8Array; missing: boolean }> {
+  const stored = await loadProjectPackage(project.id);
+  // Under the card's name: a rename on the start page leaves the old one in the saved package (#689).
+  if (stored) return { bytes: await withLylProjectName(stored, project.name), missing: false };
+  // A record written before designs were kept as packages has its shapes beside it; packing nothing lost them.
+  const record = await loadProjectShapes(project.id);
+  const entry = projectShapeCacheEntry(project.updatedAt, record?.shapes ?? [], record?.history, record?.historyIndex, record?.assets, record?.attachments);
+  const bytes = await packProjectEntry(project.id, entry, projectShapeSaveContext(project), entry.history, entry.historyIndex);
+  return { bytes, missing: !record };
 }
 
 /** Die beiden Muster, aus denen der Name einer Kopie entsteht. */
@@ -602,24 +625,7 @@ async function loadProjectPackage(projectId: string): Promise<Uint8Array | null>
 type ProjectShapesSaveResult = { historyTrimmed?: { kept: number; total: number } };
 
 async function saveProjectShapes(projectId: string, entry: ProjectShapeCacheEntry, context: ProjectShapeSaveContext): Promise<ProjectShapesSaveResult> {
-  const pack = (history: ProjectShapeCacheEntry["history"], historyIndex: number) => exportLylProject({
-    projectId,
-    projectName: context.projectName,
-    createdAt: context.createdAt,
-    modifiedAt: entry.revision,
-    shapes: entry.shapes,
-    notes: notesForHistoryIndex(history, historyIndex),
-    history,
-    historyIndex,
-    assets: entry.assets,
-    attachments: entry.attachments,
-    workspace: context.workspace,
-    snapGrid: context.snapGrid,
-    placementElevation: context.placementElevation,
-    placementWorkplane: context.placementWorkplane,
-    sketchPlacementWorkplane: context.sketchPlacementWorkplane,
-    compressionLevel: 1,
-  });
+  const pack = (history: ProjectShapeCacheEntry["history"], historyIndex: number) => packProjectEntry(projectId, entry, context, history, historyIndex);
   let lylPackage: Awaited<ReturnType<typeof exportLylProject>>;
   let historyTrimmed: ProjectShapesSaveResult["historyTrimmed"];
   try {
@@ -1444,18 +1450,21 @@ export default function Home() {
       .catch((error) => {
         // A design that could not be read did not crash the page.
         clearDesignOpening(window.localStorage, activeProjectId);
-        if (!canceled) {
+        if (canceled) return;
+        // Live editor changes that came in while the read was pending stay as they are.
+        if (projectShapesByIdRef.current[activeProjectId]) {
           setDashboardNotice(error instanceof Error ? localizedError(error.message) : t("notice.projectShapesLoadFailed"));
-          setProjectShapesById((current) => {
-            // A failed background read must not erase a project that has already
-            // received live editor changes while the read was pending.
-            if (current[activeProjectId]) return current;
-            return {
-              ...current,
-              [activeProjectId]: projectShapeCacheEntry(activeProject.revision ?? Date.now(), []),
-            };
-          });
+          return;
         }
+        // It does not open as an empty design: the editor would save that empty design over the stored one at the
+        // first change, the card would count 0 and a backup or a copy would take the empty one (#1638, #1639).
+        // Back on the start page the stored design is untouched and can be opened again or without history.
+        const reason = error instanceof Error ? localizedError(error.message) : t("notice.projectShapesLoadFailed");
+        setDashboardNotice(t("notice.designNotOpened", { name: activeProject.name, reason }));
+        setActiveProjectId(null);
+        setEditorLoading(false);
+        setView("dashboard");
+        window.history.replaceState(null, "", "/");
       });
     return () => {
       canceled = true;
@@ -1789,10 +1798,23 @@ export default function Home() {
     openEditor(project.id, { allowMissingFromStorage: true });
   };
 
-  const openLylProjectFromFile = useCallback(async (file: File, sharedProject?: SharedProject, fileHandle?: LylFileHandle, options?: { name?: string }) => {
+  const openLylProjectFromFile = useCallback(async (file: File, sharedProject?: SharedProject, fileHandle?: LylFileHandle, options?: { name?: string; onSlow?: (message: string) => void }) => {
     setDashboardNotice(t("notice.validatingFile", { name: file.name }));
+    // An opening that does not end said nothing at all: "Validating …" stayed and nothing came (#1639). After a while
+    // the notice says which step it is on, and so does the bug report, whose last messages are these.
+    let step = 1;
+    const startedAt = Date.now();
+    const slowTimer = window.setInterval(() => {
+      const seconds = Math.round((Date.now() - startedAt) / 1000);
+      const message = t("notice.stillOpening", { name: file.name, step, total: OPENING_STEPS, seconds });
+      setDashboardNotice(message);
+      options?.onSlow?.(message);
+    }, OPENING_SLOW_NOTICE_MS);
     try {
-      const restored = (await relieveOverFineCadMeshes(await importLylProject(await file.arrayBuffer()), remeshCadBrepLater)).project;
+      const bytes = await file.arrayBuffer();
+      step = 2;
+      const restored = (await relieveOverFineCadMeshes(await importLylProject(bytes), remeshCadBrepLater)).project;
+      step = 3;
       const now = Date.now();
       // A project on the server has one working copy here, not one per opening.
       // Without this, every visit to the folder left another namesake behind.
@@ -1819,6 +1841,7 @@ export default function Home() {
       };
       const entry = projectShapeCacheEntry(now, restored.shapes, restored.history, restored.historyIndex, restored.assets, restored.attachments);
       await saveProjectShapes(project.id, entry, projectShapeSaveContext(project));
+      step = 4;
       // A file opened as a new design goes where new designs go; a server design is there already.
       const { project: placed, problem } = sharedProject || existing ? { project } : await placeNewDesignRef.current(project);
       if (placed.sharedProject && !sharedProject) void refreshSharedProjects();
@@ -1848,6 +1871,8 @@ export default function Home() {
       const message = error instanceof Error ? localizedError(error.message) : "Could not open layerling project";
       setDashboardNotice(message);
       return { ok: false, message };
+    } finally {
+      window.clearInterval(slowTimer);
     }
   }, [openFolderId, projects, refreshSharedProjects]);
 
@@ -2161,7 +2186,7 @@ export default function Home() {
   /** Puts a project into a folder of the store as a file that is not there yet. */
   const putProjectOnServer = useCallback(async (project: DashboardProject, targetPath: string) => {
     // The file carries the card's picture, for other programs to show (#1226).
-    const bytes = await withLylThumbnail(await projectPackageBytes(project), await projectThumbnailPngBytes(project.thumbnailUrl).catch(() => null));
+    const bytes = await withLylThumbnail((await projectPackageBytes(project)).bytes, await projectThumbnailPngBytes(project.thumbnailUrl).catch(() => null));
     const { fileName } = sharedProjectSaveTarget({ projectName: project.name, exportName: project.name, binding: undefined });
     const body = bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength) as ArrayBuffer;
     const projectBlob = new Blob([body], { type: LYL_MEDIA_TYPE });
@@ -2511,12 +2536,16 @@ export default function Home() {
       // more in memory, where large designs made Safari reload the page without a word (#887).
       const writer = createBackupWriter();
       const skipped: string[] = [];
+      // Designs the browser holds nothing for: in the backup as empty designs, and named in the notice (#1638).
+      const empty: string[] = [];
       for (let index = 0; index < designs.length; index += 1) {
         setDashboardNotice(t("notice.backingUp", { index: index + 1, total: designs.length }));
         // Noted before the design is read, so a page that is gone in the middle can say afterwards where it stopped.
         writeBackupProgress({ index: index + 1, total: designs.length, name: designs[index].name });
         try {
-          writer.add(names[index], await projectPackageBytes(designs[index]));
+          const { bytes, missing } = await projectPackageBytes(designs[index]);
+          writer.add(names[index], bytes);
+          if (missing) empty.push(designs[index].name);
         } catch (error) {
           // One design that cannot be read does not cost the backup of the others; the message names it.
           skipped.push(`${designs[index].name} (${error instanceof Error ? localizedError(error.message) : String(error)})`);
@@ -2543,7 +2572,12 @@ export default function Home() {
       const done = shapeCount
         ? t("notice.backupDoneWithShapes", { count: saved, shapes: shapeCount, name: fileName })
         : t("notice.backupDone", { count: saved, name: fileName });
-      setDashboardNotice(skipped.length ? `${done} ${t("notice.backupSkipped", { count: skipped.length, names: skipped.join("; ") })}` : done);
+      const notes = [
+        done,
+        ...(skipped.length ? [t("notice.backupSkipped", { count: skipped.length, names: skipped.join("; ") })] : []),
+        ...(empty.length ? [t("notice.backupEmptyDesigns", { count: empty.length, names: empty.join("; ") })] : []),
+      ];
+      setDashboardNotice(notes.join(" "));
     } catch (error) {
       writeBackupProgress(null);
       setDashboardNotice(t("notice.backupFailed", { reason: error instanceof Error ? localizedError(error.message) : String(error) }));
