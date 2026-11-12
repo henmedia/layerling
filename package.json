@@ -42,7 +42,7 @@
   },
   "dependencies": {
     "@types/three": "^0.184.1",
-    "brepjs": "^20.18.0",
+    "brepjs": "^20.21.2",
     "fflate": "^0.8.3",
     "lucide-react": "^0.511.0",
     "manifold-3d": "^3.5.0",

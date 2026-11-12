@@ -1,6 +1,71 @@
 [
   {
     "title": {
+      "de": "Textur nur in einem gezeichneten Bereich",
+      "en": "A surface texture only in a region you draw"
+    },
+    "body": {
+      "de": "Eine Textur kann jetzt nur auf einen Teil einer Fläche, etwa ein rundes Rändelfeld auf einem Deckel. Klicke im Feld der Textur auf „Bereich zeichnen“ und fahre mit gedrückter Taste auf der Fläche um die Stelle herum: Das Muster liegt nur innerhalb des Umrisses, der Rest der Fläche bleibt glatt. Jede Schicht der Textur kann ihren eigenen Bereich haben.\n\nUnd „Angeklickte Flächen zeigen“ leuchtet die gewählten Flächen noch einmal auf, damit du siehst, wo die Textur hinkommt.",
+      "en": "A texture can now go on just part of a face, such as a round patch of knurling on a lid. Click \"Draw region\" in the texture's panel and draw round the place on the face with the button held: the pattern stays inside the outline, and the rest of the face stays smooth. Every layer of the texture can have a region of its own.\n\nAnd \"Show picked faces\" lights the picked faces again, so you see where the texture goes."
+    },
+    "guide": {
+      "section": "surfaceTexture"
+    }
+  },
+  {
+    "title": {
+      "de": "Scharnier zum Einrasten",
+      "en": "A snap-on hinge"
+    },
+    "body": {
+      "de": "Das Scharnier hat die neue Art „Zum Einrasten“: Eine Hälfte trägt den Stift, die andere hat oben offene Klammern, die über den Stift einrasten und sich danach frei drehen. Beide Hälften drucken flach ohne Stützen. Wie fest die Klammern halten, stellst du mit „Halt der Klammern“ ein.",
+      "en": "The hinge has a new style, \"Snap-on\": one half carries the pin, the other has clips open on top that snap over the pin and then turn freely. Both halves print flat without supports. How tightly the clips hold, you set with \"Snap grip\"."
+    },
+    "guide": {
+      "section": "hinge"
+    }
+  },
+  {
+    "title": {
+      "de": "Schraubdeckel: Gewinde tiefer ansetzen",
+      "en": "Screw lid: the thread can start lower"
+    },
+    "body": {
+      "de": "Mit dem neuen Regler „Gewindebeginn unter dem Rand“ beginnt das Gewinde eines Schraubdeckels oder eines Einschraubdeckels bis zu 20 mm unter dem Rand. Darüber steht ein glattes Stück Rohr, etwa für einen Schlauch, und der Deckel lässt sich trotzdem ganz zuschrauben.",
+      "en": "With the new slider \"Thread offset\", the thread of a screw lid or a screw-in lid starts up to 20 mm below the rim. A plain piece of tube stands above it, for a hose for example, and the cap still screws on all the way."
+    },
+    "guide": {
+      "section": "lid"
+    }
+  },
+  {
+    "title": {
+      "de": "Platinen: ESP32-S3-Zero und Arduino Pro Mini",
+      "en": "Boards: ESP32-S3-Zero and Arduino Pro Mini"
+    },
+    "body": {
+      "de": "Beim Platinen-Werkzeug gibt es zwei neue Boards: das Waveshare ESP32-S3-Zero und das Arduino Pro Mini, nach den Zeichnungen der Hersteller. Außerdem sitzen die USB-Buchsen des Raspberry Pi 4 und 3 B+ jetzt genau dort, wo sie auf dem echten Board sind; beim Pi 4 lagen sie bisher etwa 0,7 mm zu weit auseinander.",
+      "en": "The board tool has two new boards: the Waveshare ESP32-S3-Zero and the Arduino Pro Mini, from the makers' drawings. Also, the USB sockets of the Raspberry Pi 4 and 3 B+ now sit exactly where they are on the real board; on the Pi 4 they used to be about 0.7 mm too far apart."
+    },
+    "guide": {
+      "section": "sbcBoard"
+    }
+  },
+  {
+    "title": {
+      "de": "Eigenes Bild als Textur: schärfer und mit glatten Kanten",
+      "en": "Your own image as a texture: sharper, with clean edges"
+    },
+    "body": {
+      "de": "Ein eigenes Bild darf jetzt 512 statt 256 Punkte groß sein, so werden Kanten, dünne Linien und kleine Schrift schärfer. Und eine SVG-Zeichnung in zwei Tönen, einmal aufgeprägt, wird jetzt wie ein Text an ihren Umrissen ausgeschnitten: schräge Linien und Bögen kommen glatt statt in Stufen.",
+      "en": "Your own image can now be 512 instead of 256 points, so edges, thin lines and small writing come out sharper. And an SVG drawing in two tones, pressed on once, is now cut along its outlines like a text: slanted lines and curves come out clean instead of in steps."
+    },
+    "guide": {
+      "section": "surfaceTexture"
+    }
+  },
+  {
+    "title": {
       "de": "Winkellineal: Zahlen größer und gut lesbar",
       "en": "Framing square: larger numbers, easy to read"
     },
