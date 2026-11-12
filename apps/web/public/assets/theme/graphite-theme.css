@@ -707,6 +707,14 @@ html[data-theme="dark"]:where([data-palette="graphite"]) .whats-new-earlier:hove
   background: #2d2d2d;
 }
 
+:where(html[data-theme="dark"][data-palette="graphite"]) .announcement-body li::marker {
+  color: #bf6508;
+}
+
+html[data-theme="dark"]:where([data-palette="graphite"]) .announcement-body li::marker {
+  color: #f3a452;
+}
+
 :where(html[data-theme="dark"][data-palette="graphite"]) .dashboard-action-tile {
   color: #414141;
   background: #fafafa;
@@ -3418,6 +3426,19 @@ html[data-theme="dark"]:where([data-palette="graphite"]) .touch-multi-select {
 
 :where(html[data-theme="dark"][data-palette="graphite"]) .corner-ruler-tick-label {
   color: #5a3917;
+}
+
+html[data-theme="dark"]:where([data-palette="graphite"]) .corner-ruler-arm {
+  stroke: #f2a65a;
+}
+
+html[data-theme="dark"]:where([data-palette="graphite"]) .corner-ruler-tick {
+  stroke: #d9b48a;
+}
+
+html[data-theme="dark"]:where([data-palette="graphite"]) .corner-ruler-tick-label {
+  color: #dcdcdc;
+  text-shadow: 0 0 2px rgba(0, 0, 0, 0.9), 0 0 4px rgba(0, 0, 0, 0.7);
 }
 
 :where(html[data-theme="dark"][data-palette="graphite"]) .corner-ruler-delete {
@@ -8183,6 +8204,7 @@ html[data-theme="dark"]:where([data-palette="graphite"]) .interactive-help-windo
 :where(html[data-theme="dark"][data-palette="graphite"]) .dashboard-welcome-switch a,
 :where(html[data-theme="dark"][data-palette="graphite"]) .dashboard-welcome-videos a,
 :where(html[data-theme="dark"][data-palette="graphite"]) .whats-new-note a,
+:where(html[data-theme="dark"][data-palette="graphite"]) .announcement-body a,
 :where(html[data-theme="dark"][data-palette="graphite"]) .guide-videos a,
 :where(html[data-theme="dark"][data-palette="graphite"]) .interactive-help-more a {
   color: #8f4700;
@@ -8192,6 +8214,7 @@ html[data-theme="dark"]:where([data-palette="graphite"]) .interactive-help-windo
 :where(html[data-theme="dark"][data-palette="graphite"]) .dashboard-welcome-switch a:hover,
 :where(html[data-theme="dark"][data-palette="graphite"]) .dashboard-welcome-videos a:hover,
 :where(html[data-theme="dark"][data-palette="graphite"]) .whats-new-note a:hover,
+:where(html[data-theme="dark"][data-palette="graphite"]) .announcement-body a:hover,
 :where(html[data-theme="dark"][data-palette="graphite"]) .guide-videos a:hover,
 :where(html[data-theme="dark"][data-palette="graphite"]) .interactive-help-more a:hover {
   color: #ad6206;
@@ -8200,6 +8223,7 @@ html[data-theme="dark"]:where([data-palette="graphite"]) .interactive-help-windo
 :where(html[data-theme="dark"][data-palette="graphite"]) .dashboard-welcome-switch a[target="_blank"]::after,
 :where(html[data-theme="dark"][data-palette="graphite"]) .dashboard-welcome-videos a[target="_blank"]::after,
 :where(html[data-theme="dark"][data-palette="graphite"]) .whats-new-note a[target="_blank"]::after,
+:where(html[data-theme="dark"][data-palette="graphite"]) .announcement-body a[target="_blank"]::after,
 :where(html[data-theme="dark"][data-palette="graphite"]) .guide-videos a[target="_blank"]::after,
 :where(html[data-theme="dark"][data-palette="graphite"]) .interactive-help-more a[target="_blank"]::after {
   text-decoration: none;
@@ -8208,6 +8232,7 @@ html[data-theme="dark"]:where([data-palette="graphite"]) .interactive-help-windo
 html[data-theme="dark"]:where([data-palette="graphite"]) .dashboard-welcome-switch a,
 html[data-theme="dark"]:where([data-palette="graphite"]) .dashboard-welcome-videos a,
 html[data-theme="dark"]:where([data-palette="graphite"]) .whats-new-note a,
+html[data-theme="dark"]:where([data-palette="graphite"]) .announcement-body a,
 html[data-theme="dark"]:where([data-palette="graphite"]) .guide-videos a,
 html[data-theme="dark"]:where([data-palette="graphite"]) .interactive-help-more a {
   color: #f3a452;
@@ -8216,6 +8241,7 @@ html[data-theme="dark"]:where([data-palette="graphite"]) .interactive-help-more 
 html[data-theme="dark"]:where([data-palette="graphite"]) .dashboard-welcome-switch a:hover,
 html[data-theme="dark"]:where([data-palette="graphite"]) .dashboard-welcome-videos a:hover,
 html[data-theme="dark"]:where([data-palette="graphite"]) .whats-new-note a:hover,
+html[data-theme="dark"]:where([data-palette="graphite"]) .announcement-body a:hover,
 html[data-theme="dark"]:where([data-palette="graphite"]) .guide-videos a:hover,
 html[data-theme="dark"]:where([data-palette="graphite"]) .interactive-help-more a:hover {
   color: #ffc784;

@@ -1,6 +1,52 @@
 [
   {
     "title": {
+      "de": "Duplizieren: wieder eine schlichte Kopie",
+      "en": "Duplicate: a plain copy again"
+    },
+    "body": {
+      "de": "Duplizieren wiederholt das Verschieben, Drehen oder Skalieren der letzten Kopie, so entsteht mit wiederholtem Drücken eine Lochreihe. Das endet jetzt, sobald du etwas anderes auswählst oder ins Leere klickst. Wählst du die Kopie danach wieder aus, macht Duplizieren eine schlichte Kopie an derselben Stelle.",
+      "en": "Duplicate repeats the move, turn or resize of the copy made last, so pressing it again and again lays out a row of holes. That now ends once you select something else or click into empty space. Select the copy again afterwards and Duplicate makes a plain copy in the same spot."
+    }
+  },
+  {
+    "title": {
+      "de": "Wohin die Einstellungen nach einer Fase gehen",
+      "en": "Where a shape's settings go after a chamfer"
+    },
+    "body": {
+      "de": "Nach einer Fase oder Verrundung ist eine Form wie eine Hirth-Verzahnung ein fester Körper, und im Feld stehen nur noch Länge, Breite und Höhe. Jetzt steht dort auch, woraus der Körper entstanden ist und wie die eigenen Einstellungen zurückkommen: Kantenbearbeitung zurücknehmen.",
+      "en": "After a chamfer or fillet, a shape like a Hirth joint is a fixed body and the panel shows only Length, Width and Height. Now it also says what the body was made from and how its own settings come back: take the edge treatment back."
+    },
+    "guide": {
+      "section": "edgeTreatment"
+    }
+  },
+  {
+    "title": {
+      "de": "Winkellineal im dunklen Farbschema gut lesbar",
+      "en": "Framing square easy to read in the dark themes"
+    },
+    "body": {
+      "de": "Im dunklen und im Graphit-Farbschema waren die braunen Arme, Teilstriche und Zahlen des Winkellineals auf dem Raster kaum zu sehen. Jetzt sind sie dort hell, in demselben Orange wie das Maßband.",
+      "en": "In the dark and graphite themes, the brown arms, ticks and numbers of the framing square were hard to see on the grid. Now they are light there, in the same orange as the tape measure."
+    }
+  },
+  {
+    "title": {
+      "de": "Objektliste: Auswahl wie im Explorer",
+      "en": "Object list: select as in a file manager"
+    },
+    "body": {
+      "de": "In der Objektliste nimmt Strg (auf dem Mac Cmd) einen Eintrag dazu oder wieder weg. Umschalt wählt alle Einträge vom zuletzt angeklickten bis zum angeklickten, Strg+Umschalt nimmt sie zur Auswahl dazu.\n\nIn der Ansicht bleibt es bei Umschalt, denn Strg mit der linken Maustaste dreht dort die Ansicht.",
+      "en": "In the object list, Ctrl (Cmd on a Mac) adds an entry or takes it away again. Shift selects every entry from the one clicked last to the one you click, and Ctrl+Shift adds them to what is selected.\n\nIn the view it stays with Shift, as Ctrl with the left mouse button turns the view there."
+    },
+    "guide": {
+      "section": "objectList"
+    }
+  },
+  {
+    "title": {
       "de": "Fokusmodus: der Name ist mit dabei",
       "en": "Focus mode: the name comes along"
     },
@@ -33,6 +79,16 @@
     "body": {
       "de": "Ein Körper mit Textur, den du als Ganzes verdrehst, verjüngst oder neigst, kam bisher gerade in STL, 3MF und OBJ, obwohl ihn die Ansicht verdreht zeigte. Jetzt enthält die Datei, was du siehst, und im 3MF behalten Körper und Muster ihre Farben.",
       "en": "A body with a texture that you twist, taper or lean as a whole came out straight in STL, 3MF and OBJ, although the view showed it twisted. Now the file holds what you see, and in a 3MF the body and the pattern keep their colours."
+    }
+  },
+  {
+    "title": {
+      "de": "Gewinde lassen sich aushöhlen",
+      "en": "Threads can be hollowed"
+    },
+    "body": {
+      "de": "Eine Gewindestange oder Schraube auszuhöhlen lief bisher in eine Zeitüberschreitung. Jetzt geht es in wenigen Sekunden: Außen bleibt das Gewinde, wie es ist, und die Wand ist am Gewindegrund so dick, wie du sie einstellst.",
+      "en": "Hollowing a threaded rod or screw used to run into a time-out. Now it takes a few seconds: the thread stays as it is outside, and the wall is as thick as you set it at the root of the thread."
     }
   }
 ]

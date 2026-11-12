@@ -21,7 +21,7 @@ Con muchas piezas, es fácil perderse en la vista. La lista de objetos ({{ui:edi
 
 ![La lista de objetos: el grupo «Grupo» con dos piezas y una esfera al lado. Un icono de carpeta abre el grupo.](shot:object-list)
 
-- Un clic en una entrada selecciona la forma, también las piezas que están dentro de un grupo. Con [[Mayús]] pulsado, añades más entradas o las vuelves a quitar, igual que en la vista. Las flechas despliegan y pliegan los grupos.
+- Un clic en una entrada selecciona la forma, también las piezas que están dentro de un grupo. Como en un explorador de archivos, [[Ctrl]] ([[Cmd]] en un Mac) añade una entrada o la vuelve a quitar, y [[Mayús]] selecciona todas las entradas desde la última pulsada hasta esta, en el orden de la lista; [[Ctrl]]+[[Mayús]] las añade a lo seleccionado. En la vista, en cambio, es [[Mayús]] la que añade y quita. Las flechas despliegan y pliegan los grupos.
 - La letra tras el nombre indica si una pieza es {{ui:outliner.solid}} o {{ui:outliner.hole}}: es la primera letra de la palabra, y la palabra completa aparece al pasar el ratón por encima.
 - Debajo del nombre aparece qué tipo de forma es. Un cuerpo que ya no es una forma simple (redondeado, vaciado o importado) muestra {{ui:shape.exactBody}} cuando la exportación STEP lo escribe con exactitud, y {{ui:shape.mesh}} cuando solo son triángulos y sale como STL. Un estrechamiento, una inclinación o una torsión añadidos después de redondear o vaciar un cuerpo solo doblan su malla, así que entonces muestra {{ui:shape.mesh}}.
 - El candado y el ojo bloquean y ocultan piezas sueltas.

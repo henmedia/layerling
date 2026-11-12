@@ -21,7 +21,7 @@ Med många delar tappar man lätt överblicken i vyn. Objektlistan ({{ui:editor.
 
 ![Objektlistan: gruppen ”Group” med två delar och en sfär bredvid. En mappikon öppnar gruppen.](shot:object-list)
 
-- Ett klick på en rad markerar formen, även delar inuti en grupp. Håller du [[Shift]] nere lägger du till eller tar bort poster precis som i 3D-vyn. Pilarna fäller upp och ihop grupper.
+- Ett klick på en rad markerar formen, även delar inuti en grupp. Som i en filhanterare lägger [[Ctrl]] ([[Cmd]] på en Mac) till en rad eller tar bort den igen, och [[Shift]] markerar alla rader från den senast klickade till den här, i listans ordning; [[Ctrl]]+[[Shift]] lägger till dem i markeringen. I 3D-vyn är det i stället [[Shift]] som lägger till och tar bort. Pilarna fäller upp och ihop grupper.
 - Bokstaven efter namnet anger om delen är {{ui:outliner.solid}} eller {{ui:outliner.hole}}: det är första bokstaven i ordet, och hela ordet syns när du håller muspekaren över den.
 - Under namnet står vilken sorts form det är. En kropp som inte längre är en enkel grundform (avrundad, urgröpt eller importerad) visar {{ui:shape.exactBody}} när STEP-exporten sparar den exakt, och {{ui:shape.mesh}} när den bara är trianglar och sparas som STL. En avsmalning, lutning eller vridning lagd efter avrundning eller urgröpning böjer bara nätet, så då visar den {{ui:shape.mesh}}.
 - Hänglås och öga låser och döljer enskilda delar.

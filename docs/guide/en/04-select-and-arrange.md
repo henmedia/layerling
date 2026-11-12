@@ -21,7 +21,7 @@ With many parts it is easy to lose track in the view. The object list ({{ui:edit
 
 ![The object list: the group "Group" with two parts and a sphere beside it. A folder icon opens the group.](shot:object-list)
 
-- A click on an entry selects the shape, including parts inside a group. With [[Shift]] held you add more entries or take them away again, just as in the view. The arrows fold groups open and shut.
+- A click on an entry selects the shape, including parts inside a group. As in a file manager, [[Ctrl]] ([[Cmd]] on a Mac) adds an entry or takes it away again, and [[Shift]] selects every entry from the one clicked last to this one, in the order the list shows; [[Ctrl]]+[[Shift]] adds them to what is selected. In the view, [[Shift]] adds and takes away instead. The arrows fold groups open and shut.
 - The letter after the name says whether a part is {{ui:outliner.solid}} or {{ui:outliner.hole}}: it is the first letter of the word, and the word shows when you hold the mouse over it.
 - Under the name stands what kind of shape it is. A body that is no longer a plain shape (rounded, hollowed or imported) says {{ui:shape.exactBody}} when the STEP export writes it exactly, and {{ui:shape.mesh}} when it is only triangles and goes as STL. A taper, lean or twist set after rounding or hollowing a body bends only its mesh, so it then says {{ui:shape.mesh}}.
 - Padlock and eye lock and hide single parts.

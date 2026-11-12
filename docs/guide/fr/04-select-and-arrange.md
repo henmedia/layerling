@@ -21,7 +21,7 @@ Avec de nombreuses pièces, il est facile de perdre le fil de la vue. La liste d
 
 ![La liste d'objets : le groupe "Groupe" avec deux parties et une sphère à côté. Une icône de dossier ouvre le groupe.](shot:object-list)
 
-- Un clic sur une entrée sélectionne la forme, y compris les pièces à l'intérieur d'un groupe. Avec [[Shift]] maintenu, vous ajoutez ou supprimez d'autres entrées, comme dans la vue. Les flèches plient les groupes pour s'ouvrir et se fermer.
+- Un clic sur une entrée sélectionne la forme, y compris les pièces à l'intérieur d'un groupe. Comme dans un gestionnaire de fichiers, [[Ctrl]] ([[Cmd]] sur Mac) ajoute une entrée ou la retire, et [[Shift]] sélectionne toutes les entrées de la dernière cliquée jusqu'à celle-ci, dans l'ordre de la liste ; [[Ctrl]]+[[Shift]] les ajoute à la sélection. Dans la vue, c'est au contraire [[Shift]] qui ajoute et retire. Les flèches plient les groupes pour s'ouvrir et se fermer.
 - La lettre après le nom indique si une pièce est {{ui:outliner.solid}} ou {{ui:outliner.hole}} : c'est la première lettre du mot, et le mot entier s'affiche au survol de la souris.
 - Sous le nom figure le type de forme. Un corps qui n'est plus une forme simple (arrondi, évidé ou importé) affiche {{ui:shape.exactBody}} quand l'export STEP l'écrit exactement, et {{ui:shape.mesh}} quand il n'est fait que de triangles et part en STL. Un rétrécissement, une inclinaison ou une torsion ajoutés après avoir arrondi ou évidé un corps ne déforment que son maillage : il affiche alors {{ui:shape.mesh}}.
 - Cadenas et œillet de verrouillage et cache pièces détachées.
