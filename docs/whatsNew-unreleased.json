@@ -1,6 +1,16 @@
 [
   {
     "title": {
+      "de": "Duplizieren: wieder eine schlichte Kopie",
+      "en": "Duplicate: a plain copy again"
+    },
+    "body": {
+      "de": "Duplizieren wiederholt das Verschieben, Drehen oder Skalieren der letzten Kopie, so entsteht mit wiederholtem Drücken eine Lochreihe. Das endet jetzt, sobald du etwas anderes auswählst oder ins Leere klickst. Wählst du die Kopie danach wieder aus, macht Duplizieren eine schlichte Kopie an derselben Stelle.",
+      "en": "Duplicate repeats the move, turn or resize of the copy made last, so pressing it again and again lays out a row of holes. That now ends once you select something else or click into empty space. Select the copy again afterwards and Duplicate makes a plain copy in the same spot."
+    }
+  },
+  {
+    "title": {
       "de": "Wohin die Einstellungen nach einer Fase gehen",
       "en": "Where a shape's settings go after a chamfer"
     },

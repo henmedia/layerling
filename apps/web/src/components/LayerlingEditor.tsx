@@ -901,6 +901,12 @@ function shapeMoveDeltaBetween(from: ShapeTransformSnapshot, to: ShapeTransformS
   };
 }
 
+function sameIdSet(a: readonly string[], b: readonly string[]) {
+  if (a.length !== b.length) return false;
+  const inA = new Set(a);
+  return b.every((id) => inA.has(id));
+}
+
 function isZeroMoveDelta(delta: ShapeMoveDelta) {
   const epsilon = 1e-6;
   return Math.abs(delta.dx) < epsilon && Math.abs(delta.dz) < epsilon && Math.abs(delta.delevation) < epsilon
@@ -6926,6 +6932,13 @@ export function LayerlingEditor({
    * eine ganze Lage Teile stapelt sich so Lage fuer Lage.
    */
   const smartDuplicateRef = useRef<{ id: string; baseline: ShapeTransformSnapshot; delta: ShapeMoveDelta }[] | null>(null);
+
+  // The chain ends once the selection leaves the copies, also by a click into empty space: selecting the copy
+  // again and duplicating then gives a plain copy in the same spot, as in similar tools (Discussion #1691).
+  useEffect(() => {
+    const chain = smartDuplicateRef.current;
+    if (chain && !sameIdSet(chain.map((link) => link.id), selectedIds)) smartDuplicateRef.current = null;
+  }, [selectedIds]);
 
   const duplicateSelected = useCallback(() => {
     if (!hasSelection) {
