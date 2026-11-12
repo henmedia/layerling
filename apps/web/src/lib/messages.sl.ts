@@ -759,6 +759,8 @@ export const MESSAGES_SL: Partial<Record<MessageKey, string>> = {
   "lid.wallBoth": "Stena ustnice in roba",
   "lid.threadPitch": "Korak navoja",
   "lid.threadTurns": "Obrati",
+  "lid.threadOffset": "Zamik navoja",
+  "lid.threadOffsetHint": "Kako daleč pod robom se navoj začne. Pri 0 se začne pri robu; več pusti zgoraj gladek kos stene, rob pokrova (ali čep) pa seže za toliko globlje.",
   "lid.screwHint": "Telo dobi na vrhu zunaj navoj, globok {depth} mm, pokrov enakega v robu, ki seže {height} mm navzdol. Boki navoja so nagnjeni za 45°, zato se oba natisneta brez podpor.",
   "lid.screwInHint": "Telo dobi v odprtini navoj, globok {depth} mm, pokrov enakega na čepu pod ploščo, ki seže {height} mm navzdol. Kjer je prostor, je čep obroč s steno {wall} mm. Boki navoja so nagnjeni za 45°, zato se oba natisneta brez podpor.",
   "lid.screwThreadName": "{name} navoj",

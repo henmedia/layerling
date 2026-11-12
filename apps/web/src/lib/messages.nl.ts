@@ -893,6 +893,8 @@ export const MESSAGES_NL: Record<MessageKey, string> = {
   "lid.wallBoth": "Wand lip en rand",
   "lid.threadPitch": "Spoed van de schroefdraad",
   "lid.threadTurns": "Slagen",
+  "lid.threadOffset": "Schroefdraad onder de rand",
+  "lid.threadOffsetHint": "Hoe ver onder de rand de schroefdraad begint. Bij 0 begint hij aan de rand; meer laat erboven een glad stuk wand staan, en de rand van het deksel (of de plug) reikt evenveel verder naar beneden.",
   "lid.screwHint": "De vorm krijgt bovenaan aan de buitenkant schroefdraad van {depth} mm diep, het deksel dezelfde binnen in de rand, die {height} mm naar beneden reikt. De flanken staan op 45°, dus beide printen zonder support.",
   "lid.screwInHint": "De vorm krijgt binnen in de opening schroefdraad van {depth} mm diep, het deksel dezelfde op een plug onder de plaat, die {height} mm naar beneden reikt. Waar er ruimte is, is de plug een ring met een wand van {wall} mm. De flanken staan op 45°, dus beide printen zonder support.",
   "lid.screwThreadName": "{name} schroefdraad",

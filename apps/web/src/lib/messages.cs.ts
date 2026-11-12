@@ -1038,6 +1038,8 @@ export const MESSAGES_CS: Record<MessageKey, string> = {
   "lid.wallBoth": "Stěna límce a okraje",
   "lid.threadPitch": "Stoupání závitu",
   "lid.threadTurns": "Otáčky",
+  "lid.threadOffset": "Odsazení závitu",
+  "lid.threadOffsetHint": "Jak hluboko pod okrajem závit začíná. Při 0 začíná u okraje; víc nechá nahoře hladký kus stěny a okraj víka (nebo čep) sahá o stejně víc dolů.",
   "lid.screwHint": "Těleso dostane nahoře zvenku závit hluboký {depth} mm, víko stejný uvnitř okraje, který sahá {height} mm dolů. Boky závitu jsou skloněné o 45°, takže se obojí tiskne bez podpěr.",
   "lid.screwInHint": "Těleso dostane uvnitř otvoru závit hluboký {depth} mm, víko stejný na čepu pod deskou, který sahá {height} mm dolů. Kde je místo, je čep prstenec se stěnou {wall} mm. Boky závitu jsou skloněné o 45°, takže se obojí tiskne bez podpěr.",
   "lid.screwThreadName": "{name} závit",

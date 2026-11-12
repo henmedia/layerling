@@ -893,6 +893,8 @@ export const MESSAGES_DE: Record<MessageKey, string> = {
   "lid.wallBoth": "Wand von Lippe und Rand",
   "lid.threadPitch": "Gewindesteigung",
   "lid.threadTurns": "Umdrehungen",
+  "lid.threadOffset": "Gewindebeginn unter dem Rand",
+  "lid.threadOffsetHint": "Wie weit unter dem Rand das Gewinde beginnt. Bei 0 fängt es am Rand an; mehr lässt oben ein glattes Stück Wand stehen, und der Rand des Deckels (oder der Zapfen) reicht genauso viel weiter nach unten.",
   "lid.screwHint": "Der Körper bekommt oben außen ein Gewinde, {depth} mm tief, der Deckel dasselbe innen im Rand, der {height} mm hinunterreicht. Die Flanken stehen 45° schräg, so drucken beide ohne Stützen.",
   "lid.screwInHint": "Der Körper bekommt innen in der Öffnung ein Gewinde, {depth} mm tief, der Deckel dasselbe an einem Zapfen unter der Platte, der {height} mm hinunterreicht. Wo Platz ist, ist der Zapfen ein Ring mit {wall} mm Wand. Die Flanken stehen 45° schräg, so drucken beide ohne Stützen.",
   "lid.screwThreadName": "{name} Gewinde",
