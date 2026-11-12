@@ -1245,6 +1245,7 @@ export const MESSAGES_NL: Record<MessageKey, string> = {
   "shell.errorNoFlatSide": "Dit lichaam heeft aan de gekozen zijde geen plat vlak om open te laten.",
   "shell.errorProjectChanged": "Het object of project is gewijzigd tijdens het uithollen; probeer het opnieuw.",
   "shell.errorFailed": "Het lichaam kon niet worden uitgehold. Kies een andere wanddikte of opening.",
+  "shell.errorTooSlow": "Het uithollen van dit lichaam duurde te lang en is gestopt; er is niets veranderd. De CAD-kern kan de wanden van deze vorm niet berekenen. Probeer een dunnere wand of andere open zijden.",
   "status.shelled": "Uitgehold met wanden van {size} mm",
   "status.shelledClosed": "Uitgehold met wanden van {size} mm, rondom dicht: de holte zit binnenin en is alleen in de doorsnedeweergave te zien",
   "status.shelledMcp": "MCP heeft het object uitgehold met wanden van {size} mm",

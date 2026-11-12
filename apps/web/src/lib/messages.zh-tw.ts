@@ -1202,6 +1202,7 @@ export const MESSAGES_ZH_TW: Partial<Record<MessageKey, string>> = {
   "shell.errorNoFlatSide": "此實體在所選側沒有可保持開放的平面。",
   "shell.errorProjectChanged": "抽殼過程中物件或專案已變更；請重試。",
   "shell.errorFailed": "無法對此實體抽殼。請選擇其他壁厚或開口。",
+  "shell.errorTooSlow": "抽殼此實體耗時過長，已被停止；沒有任何變更。CAD 核心無法為此形狀計算壁。請嘗試更薄的壁或其他開口。",
   "status.shelled": "已抽殼，壁厚 {size} mm",
   "status.shelledClosed": "已抽殼，壁厚 {size} mm，四周封閉：空腔在內部，僅能在剖視圖中看到",
   "status.shelledMcp": "MCP 已對物件抽殼，壁厚 {size} mm",

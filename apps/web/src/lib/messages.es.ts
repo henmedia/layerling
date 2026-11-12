@@ -1248,6 +1248,7 @@ export const MESSAGES_ES: Partial<Record<MessageKey, string>> = {
   "shell.errorNoFlatSide": "Este cuerpo no tiene en el lado elegido ninguna cara plana que se pueda dejar abierta.",
   "shell.errorProjectChanged": "El objeto o el diseño ha cambiado mientras se vaciaba; inténtalo de nuevo.",
   "shell.errorFailed": "No se ha podido vaciar el cuerpo. Elige otro grosor de pared u otra abertura.",
+  "shell.errorTooSlow": "Vaciar este cuerpo tardó demasiado y se detuvo; no ha cambiado nada. El núcleo CAD no puede calcular las paredes de esta forma. Prueba con una pared más fina u otros lados abiertos.",
   "status.shelled": "Vaciado con paredes de {size} mm",
   "status.shelledClosed": "Vaciado con paredes de {size} mm y cerrado por completo: la cavidad queda dentro y solo se ve en la vista de sección",
   "status.shelledMcp": "MCP ha vaciado el objeto con paredes de {size} mm",

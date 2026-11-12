@@ -1236,6 +1236,7 @@ export const MESSAGES_FR: Partial<Record<MessageKey, string>> = {
   "shell.errorNoFlatSide": "Ce corps n'a pas de face plane du côté choisi pour laisser ouvert.",
   "shell.errorProjectChanged": "L'objet ou le projet a changé au cours de son creusement ; veuillez réessayer.",
   "shell.errorFailed": "Le corps ne pouvait pas être creusé. Veuillez choisir une épaisseur de paroi ou une ouverture différente.",
+  "shell.errorTooSlow": "Le creusement de ce corps a pris trop de temps et a été arrêté ; rien n'a changé. Le noyau CAO ne parvient pas à calculer les parois de cette forme. Essayez une paroi plus fine ou d'autres côtés ouverts.",
   "status.shelled": "Creux avec des parois {size} mm",
   "status.shelledClosed": "Creux avec des parois {size} mm, fermé de tous côtés : la cavité est à l'intérieur et n'apparaît que dans la vue en coupe",
   "status.shelledMcp": "MCP a creusé l'objet avec des parois {size} mm",

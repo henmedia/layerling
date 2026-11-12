@@ -1245,6 +1245,7 @@ export const MESSAGES_DE: Record<MessageKey, string> = {
   "shell.errorNoFlatSide": "Dieser Körper hat auf der gewählten Seite keine ebene Fläche, die geöffnet werden kann.",
   "shell.errorProjectChanged": "Das Objekt oder Projekt wurde während des Aushöhlens geändert. Bitte erneut versuchen.",
   "shell.errorFailed": "Der Körper konnte nicht ausgehöhlt werden. Bitte eine andere Wandstärke oder Öffnung wählen.",
+  "shell.errorTooSlow": "Das Aushöhlen dieses Körpers hat zu lange gedauert und wurde abgebrochen; nichts wurde geändert. Der CAD-Kern kann die Wände an dieser Form nicht berechnen. Versuche eine dünnere Wand oder andere offene Seiten.",
   "status.shelled": "Mit {size} mm Wandstärke ausgehöhlt",
   "status.shelledClosed": "Mit {size} mm Wandstärke ausgehöhlt, rundum geschlossen: Der Hohlraum liegt innen und ist nur in der Schnittansicht zu sehen",
   "status.shelledMcp": "MCP hat das Objekt mit {size} mm Wandstärke ausgehöhlt",

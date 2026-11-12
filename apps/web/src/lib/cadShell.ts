@@ -1,7 +1,8 @@
 import { JoinType, type BoundingBox, type OcctKernel, type ShapeHandle } from "occt-wasm";
-import { isCadModifierWasmMemoryFault } from "@/lib/cadModifierRuntime";
+import { applyCadTransform, isCadModifierWasmMemoryFault } from "@/lib/cadModifierRuntime";
 import { shellOpenSides } from "@/lib/shellLimits";
 import type { ShellEdges, ShellOpenings, ShellSide } from "@/types/layerling";
+import type { CadModifierMeshPart } from "@/lib/cadModifierTypes";
 import { isKernelMemoryFault } from "@/lib/kernelFault";
 
 // Hollowing ("shell") for the CAD modifier worker. It lives outside the worker
@@ -614,6 +615,65 @@ function withoutSliverFaces(cad: OcctKernel, solid: ShapeHandle): ShapeHandle | 
     return null;
   } finally {
     releaseAll(cad, faces);
+  }
+}
+
+/** The plain round core of a threaded rod or screw (#1687): its radius and height in the thread's own frame (axis on y,
+ * bottom at y = 0), and the transform that places that frame, as for the thread itself. */
+export type ThreadShellCore = { radius: number; height: number; transform?: number[] };
+
+/**
+ * The plain core of a body that is one threaded rod or screw, straight and solid (#1687): as wide as the root of the
+ * thread, and narrower where a chamfer at an end cuts deeper, so the core stays inside it. A nut, a bore, a tapered
+ * thread or anything with other parts goes the usual way.
+ */
+export function threadShellCoreOf(parts: readonly CadModifierMeshPart[]): ThreadShellCore | null {
+  if (parts.length !== 1) return null;
+  const [part] = parts;
+  const thread = part.thread;
+  if (!thread || part.hole || thread.taper || (thread.role !== "rod" && thread.role !== "screw")) return null;
+  const radius = Math.min(
+    thread.minor,
+    thread.chamfer > 0 ? thread.major - thread.chamfer : Infinity,
+    thread.chamferBottom && thread.chamferLow > 0 ? thread.major - thread.chamferLow : Infinity,
+  );
+  if (!(radius > 0) || !(thread.height > 0)) return null;
+  return { radius, height: thread.height, ...(thread.transform ? { transform: thread.transform } : {}) };
+}
+
+const Z_TO_Y_UP = [1, 0, 0, 0, 0, 0, 1, 0, 0, -1, 0, 0];
+/** How far the core reaches past the thread's ends, so an open end of the cavity goes cleanly through them. */
+const CORE_OVERHANG = 0.001;
+
+/**
+ * Hollows a threaded rod or screw through its plain core (#1687). The thick solid over the helical flanks of a
+ * thread ran past the worker's time limit, even for a short rod. The cavity of a hollowed cylinder of the core's
+ * size, with the same wall and open sides, is cut out of the thread instead: the outside stays as it is, and the wall
+ * is the thickness asked for at the root of the thread, where it is thinnest. The core reaches a hair past both ends,
+ * so an open end cuts through cleanly; a closed end keeps its wall less that hair.
+ */
+export function shellThreadByCore(cad: OcctKernel, solid: ShapeHandle, core: ThreadShellCore, thickness: number, openings: ShellOpenings, edges: ShellEdges = "round") {
+  const owned: ShapeHandle[] = [];
+  const own = (shape: ShapeHandle) => {
+    owned.push(shape);
+    return shape;
+  };
+  try {
+    const upright = own(cad.transform(own(cad.makeCylinder(core.radius, core.height + 2 * CORE_OVERHANG)), Z_TO_Y_UP));
+    const local = own(cad.translate(upright, 0, -CORE_OVERHANG, 0));
+    const placed = applyCadTransform(cad, local, core.transform);
+    if (placed !== local) own(placed);
+    const hollowCore = own(shellSolid(cad, placed, thickness, openings, edges));
+    const cavity = own(cad.cut(placed, hollowCore));
+    const result = cad.cut(solid, cavity);
+    const volume = shapeIsValid(cad, result) ? cad.getVolume(result) : 0;
+    if (!(volume > 0 && volume < cad.getVolume(solid) * (1 - 1e-6))) {
+      cad.release(result);
+      throw new Error(CANNOT_HOLLOW_MESSAGE);
+    }
+    return result;
+  } finally {
+    releaseAll(cad, owned);
   }
 }
 

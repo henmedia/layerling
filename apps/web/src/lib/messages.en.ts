@@ -1246,6 +1246,7 @@ export const MESSAGES_EN = {
   "shell.errorNoFlatSide": "This body has no flat face on the chosen side to leave open.",
   "shell.errorProjectChanged": "The object or project changed while it was being hollowed; please try again.",
   "shell.errorFailed": "The body could not be hollowed. Please choose a different wall thickness or opening.",
+  "shell.errorTooSlow": "Hollowing this body took too long and was stopped; nothing changed. The CAD kernel cannot work out the walls on this shape. Try a thinner wall or other open sides.",
   "status.shelled": "Hollowed with {size} mm walls",
   "status.shelledClosed": "Hollowed with {size} mm walls, closed all round: the cavity is inside and shows only in the section view",
   "status.shelledMcp": "MCP hollowed the object with {size} mm walls",

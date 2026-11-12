@@ -1201,6 +1201,7 @@ export const MESSAGES_PL: Partial<Record<MessageKey, string>> = {
   "shell.errorNoFlatSide": "Ta bryła nie ma płaskiej ściany po wybranej stronie, którą można zostawić otwartą.",
   "shell.errorProjectChanged": "Obiekt lub projekt zmienił się w trakcie wydrążania. Spróbuj ponownie.",
   "shell.errorFailed": "Nie udało się wydrążyć bryły. Wybierz inną grubość ścianki lub inne otwarcie.",
+  "shell.errorTooSlow": "Drążenie tej bryły trwało zbyt długo i zostało przerwane; nic się nie zmieniło. Jądro CAD nie potrafi obliczyć ścian dla tego kształtu. Spróbuj cieńszej ściany lub innych otwartych stron.",
   "status.shelled": "Wydrążono ze ściankami {size} mm",
   "status.shelledClosed": "Wydrążono ze ściankami {size} mm, zamknięte ze wszystkich stron: wnęka jest w środku i widać ją tylko w widoku przekroju",
   "status.shelledMcp": "MCP wydrążył obiekt ze ściankami {size} mm",

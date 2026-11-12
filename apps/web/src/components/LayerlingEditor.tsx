@@ -9223,7 +9223,10 @@ export function LayerlingEditor({
         setShellTool(null);
       })
       .catch((error: unknown) => {
-        const message = error instanceof Error ? localizedError(error.message) : String(error);
+        // A body the kernel cannot finish said only that the worker was restarted (#1687).
+        const message = error instanceof Error
+          ? (error.message.includes("Timed out waiting for the CAD worker") ? t("shell.errorTooSlow") : localizedError(error.message))
+          : String(error);
         setShellTool((current) => current ? { ...current, busy: false, error: message } : current);
       });
   }, [commitShapes, offsetShape, selectedShape, selectedShapes.length, shellShape, shellTool]);

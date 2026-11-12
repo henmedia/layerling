@@ -57,5 +57,15 @@
       "de": "Ein Körper mit Textur, den du als Ganzes verdrehst, verjüngst oder neigst, kam bisher gerade in STL, 3MF und OBJ, obwohl ihn die Ansicht verdreht zeigte. Jetzt enthält die Datei, was du siehst, und im 3MF behalten Körper und Muster ihre Farben.",
       "en": "A body with a texture that you twist, taper or lean as a whole came out straight in STL, 3MF and OBJ, although the view showed it twisted. Now the file holds what you see, and in a 3MF the body and the pattern keep their colours."
     }
+  },
+  {
+    "title": {
+      "de": "Gewinde lassen sich aushöhlen",
+      "en": "Threads can be hollowed"
+    },
+    "body": {
+      "de": "Eine Gewindestange oder Schraube auszuhöhlen lief bisher in eine Zeitüberschreitung. Jetzt geht es in wenigen Sekunden: Außen bleibt das Gewinde, wie es ist, und die Wand ist am Gewindegrund so dick, wie du sie einstellst.",
+      "en": "Hollowing a threaded rod or screw used to run into a time-out. Now it takes a few seconds: the thread stays as it is outside, and the wall is as thick as you set it at the root of the thread."
+    }
   }
 ]

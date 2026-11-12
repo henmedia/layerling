@@ -990,6 +990,7 @@ export const MESSAGES_SL: Partial<Record<MessageKey, string>> = {
   "shell.errorNoFlatSide": "To telo na izbrani strani nima ravne ploskve, ki bi jo pustili odprto.",
   "shell.errorProjectChanged": "Objekt ali projekt se je med dolbljenjem spremenil; poskusi znova.",
   "shell.errorFailed": "Telesa ni bilo mogoče izdolbiti. Izberi drugo debelino stene ali odprtino.",
+  "shell.errorTooSlow": "Izdolbenje tega telesa je trajalo predolgo in je bilo ustavljeno; nič se ni spremenilo. Jedro CAD ne zmore izračunati sten za to obliko. Poskusi tanjšo steno ali druge odprte strani.",
   "status.shelled": "Izdolbeno s stenami {size} mm",
   "status.shelledClosed": "Izdolbeno s stenami {size} mm, zaprto z vseh strani: votlina je znotraj in se vidi le v prerezu",
   "status.shelledMcp": "MCP je izdolbel objekt s stenami {size} mm",

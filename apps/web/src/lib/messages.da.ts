@@ -1944,6 +1944,7 @@ export const MESSAGES_DA: Partial<Record<MessageKey, string>> = {
   "shell.errorNoFlatSide": "Denne form har ingen flad flade på den valgte side at lade stå åben.",
   "shell.errorProjectChanged": "Objektet eller projektet ændrede sig mens det blev udhulet; prøv igen.",
   "shell.errorFailed": "Formen kunne ikke udhules. Vælg en anden vægtykkelse eller åbning.",
+  "shell.errorTooSlow": "Udhulingen af dette legeme tog for lang tid og blev stoppet; intet er ændret. CAD-kernen kan ikke beregne væggene på denne form. Prøv en tyndere væg eller andre åbne sider.",
   "status.shelled": "Udhuet med {size} mm vægge",
   "status.shelledClosed": "Udhulet med {size} mm vægge, lukket hele vejen rundt: hulrummet ligger indeni og ses kun i snitvisningen",
   "status.shelledMcp": "MCP udhulede objektet med {size} mm vægge",

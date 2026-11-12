@@ -1240,6 +1240,7 @@ export const MESSAGES_SV: Partial<Record<MessageKey, string>> = {
   "shell.errorNoFlatSide": "Den här kroppen har ingen plan yta på den valda sidan att lämna öppen.",
   "shell.errorProjectChanged": "Objektet eller projektet ändrades medan det gröptes ur; försök igen.",
   "shell.errorFailed": "Kroppen kunde inte gröpas ur. Välj en annan väggtjocklek eller öppning.",
+  "shell.errorTooSlow": "Urgröpningen av den här kroppen tog för lång tid och stoppades; inget har ändrats. CAD-kärnan kan inte beräkna väggarna på den här formen. Prova en tunnare vägg eller andra öppna sidor.",
   "status.shelled": "Urgröpt med {size} mm väggar",
   "status.shelledClosed": "Urgröpt med {size} mm väggar, sluten runt om: hålrummet är inuti och syns bara i snittvyn",
   "status.shelledMcp": "MCP gröpte ur objektet med {size} mm väggar",

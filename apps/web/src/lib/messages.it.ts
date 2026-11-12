@@ -1238,6 +1238,7 @@ export const MESSAGES_IT: Partial<Record<MessageKey, string>> = {
   "shell.errorNoFlatSide": "Questo corpo non ha una faccia piana sul lato scelto da lasciare aperta.",
   "shell.errorProjectChanged": "L'oggetto o il progetto è cambiato durante lo svuotamento. Riprova.",
   "shell.errorFailed": "Non è stato possibile svuotare il corpo. Prova a scegliere uno spessore delle pareti o un'apertura diversa.",
+  "shell.errorTooSlow": "Lo svuotamento di questo corpo ha richiesto troppo tempo ed è stato interrotto; non è cambiato nulla. Il kernel CAD non riesce a calcolare le pareti di questa forma. Prova una parete più sottile o altri lati aperti.",
   "status.shelled": "Corpo svuotato con pareti di {size} mm",
   "status.shelledClosed": "Corpo svuotato con pareti di {size} mm, chiuso su tutti i lati: la cavità è all'interno e si vede solo nella vista in sezione",
   "status.shelledMcp": "MCP ha svuotato l'oggetto con pareti di {size} mm",

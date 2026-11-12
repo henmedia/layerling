@@ -1389,6 +1389,7 @@ export const MESSAGES_CS: Record<MessageKey, string> = {
   "shell.errorNoFlatSide": "Těleso nemá na vybrané straně rovnou plochu, kterou lze otevřít.",
   "shell.errorProjectChanged": "Během vytváření dutiny se objekt nebo projekt změnil. Zkuste to znovu.",
   "shell.errorFailed": "Dutinu se nepodařilo vytvořit. Zvolte jinou tloušťku stěn nebo otevřenou stranu.",
+  "shell.errorTooSlow": "Vytvoření dutiny v tomto tělese trvalo příliš dlouho a bylo zastaveno; nic se nezměnilo. Jádro CAD nedokáže stěny u tohoto tvaru spočítat. Zkuste tenčí stěnu nebo jiné otevřené strany.",
   "status.shelled": "Vytvořena dutina se stěnami {size} mm",
   "status.shelledClosed": "Vytvořena dutina se stěnami {size} mm, uzavřená ze všech stran: dutina je uvnitř a je vidět jen v řezu",
   "status.shelledMcp": "MCP vytvořilo dutinu v objektu se stěnami {size} mm",
