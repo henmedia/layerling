@@ -92,6 +92,8 @@ import {
   gridfinityOutlineToPlate,
   gridfinityPlateFlat,
   gridfinityPlatePieceKeys,
+  gridfinityPlatePieceClips,
+  gridfinityPlateSplitsWithClips,
   gridfinityPlatePieces,
   gridfinityPlateSplit,
   gridfinityPlateToWorld,
@@ -106,6 +108,15 @@ import {
   gridfinitySceneWithKeys,
   gridfinitySceneWithPieces,
   gridfinityShapePatch,
+  GRIDFINITY_CLIP_HEIGHT,
+  GRIDFINITY_CLIP_LENGTH,
+  gridfinityClipCount,
+  gridfinityClipCuts,
+  gridfinityClipOutline,
+  gridfinityClipProfile,
+  gridfinityClips,
+  gridfinitySceneWithClips,
+  gridfinityPlateCuts,
   gridfinitySwallowtailClearance,
   gridfinitySwallowtailKeyCount,
   gridfinitySwallowtailKeyOutline,
@@ -4797,6 +4808,38 @@ describe("gridfinity baseplate split to fit the printer", () => {
     expect(gridfinitySceneWithPieces(scene, shape.id, pieces, keys).map((s) => s.id)).toEqual(["other", "piece1", "piece2", "piece3", "piece4", "kept", ...keys.map((k) => k.id)]);
   });
 
+  it("splits a plate with clip notches into pieces joined by clips: notches on the cut sides too, Swallowtail as the plate has it", () => {
+    const shape = padded({ color: "#123456", gridfinityClipNotches: true, gridfinityClipCount: 7 });
+    expect(gridfinityPlateSplitsWithClips(shape)).toBe(true);
+    expect(gridfinityPlateSplitsWithClips(padded())).toBe(false);
+    expect(gridfinityPlateSplitsWithClips({ ...shape, gridfinityType: "bin" })).toBe(false);
+    const split = gridfinityPlateSplit(shape, coreOne)!;
+    const pieces = gridfinityPlatePieces(shape, split, "Gridfinity", ids("piece"), repaint(shape));
+    // No Swallowtail forced on, and each piece set to the clips for the seams it owns, as the keys would be.
+    expect(pieces.map((piece) => [piece.gridfinitySwallowtail, piece.gridfinityClipNotches, piece.gridfinityClipCount])).toEqual([[undefined, true, 4], [undefined, true, 0], [undefined, true, 9], [undefined, true, 5]]);
+    for (const piece of pieces) expect(piece).toMatchObject({ width: 230, depth: 188, height: 5 });
+    // The notches are on the cut sides, which have no padding, and meet in pairs across each seam; the padded outer sides have none.
+    expect(gridfinityPlan(shape).clips).toHaveLength(0);
+    const notches = pieces.flatMap((piece) => world(piece, gridfinityPlan(piece).clips));
+    expect(notches).toHaveLength(36);
+    expect(new Set(notches).size).toBe(18);
+    expect(pieces.every((piece) => gridfinityPlan(piece).pockets.length === 0)).toBe(true);
+    // One clip for each pair across a seam, in a row in front of the plate, each the piece's that owns the seam.
+    const built = { ...binShape(plate()), width: 4.3, height: 10, hole: true };
+    const clips = gridfinityPlatePieceClips(pieces, split, box, built, 3.2, "Gridfinity clip", ids("clip"));
+    expect(clips.map((clip) => clip.gridfinityClipOf)).toEqual([...Array(4).fill("piece1"), ...Array(9).fill("piece3"), ...Array(5).fill("piece4")]);
+    expect(clips.map(({ name, color, hole, rotationX, z }) => ({ name, color, hole, rotationX, z }))).toEqual(clips.map(() => ({ name: "Gridfinity clip", color: "#123456", hole: false, rotationX: 90, z: 197 })));
+    expect(gridfinityClipCount(pieces[2])).toBe(clips.filter((clip) => clip.gridfinityClipOf === "piece3").length);
+    // The plate's clips and keys from before give way; another plate's stay.
+    const scene = [shape, { ...built, id: "oldClip", gridfinityClipOf: shape.id }, { ...key, id: "oldKey", gridfinityKeyOf: shape.id }, { ...built, id: "kept", gridfinityClipOf: "other" }];
+    expect(gridfinitySceneWithPieces(scene, shape.id, pieces, [], clips).map((s) => s.id)).toEqual(["piece1", "piece2", "piece3", "piece4", "kept", ...clips.map((clip) => clip.id)]);
+    // With Swallowtail on as well the pieces keep it and its pockets, and the clips lie behind the keys' row.
+    const both = gridfinityPlatePieces({ ...shape, gridfinitySwallowtail: true }, split, "Gridfinity", ids("piece"), repaint(shape));
+    expect(both.map((piece) => piece.gridfinitySwallowtail)).toEqual([true, true, true, true]);
+    expect(both.flatMap((piece) => gridfinityPlan(piece).pockets)).toHaveLength(36);
+    expect(gridfinityPlatePieceClips(both, split, box, built, 3.2, "Gridfinity clip", ids("clip"))[0].z).toBe(211);
+  });
+
   it("keeps the paint on the cells it lay on", () => {
     // 4 x 1 units, 168 x 42 mm, a red circle 20 mm across on the top at the far left, on a bed of 100 mm: two plates of 84.
     const painted = plateShape({ width: 168, depth: 42, paint: [{ mode: "circle", color: "#ff0000", size: [168, 5, 42], point: [-80, 5, 0], normal: [0, 1, 0], diameter: 20 }] });
@@ -4819,6 +4862,7 @@ describe("gridfinity baseplate split to fit the printer", () => {
     expect(() => mcpGridfinitySplitCheck(shape, split, coreOne)).not.toThrow();
     expect(() => mcpGridfinitySplitCheck({ ...shape, kind: "box" }, {}, null)).not.toThrow();
     expect(() => mcpGridfinitySplitCheck(shape, { ...split, gridfinityKeys: true }, coreOne)).toThrow(MCP_GRIDFINITY_SPLIT_ALONE);
+    expect(() => mcpGridfinitySplitCheck({ ...shape, gridfinityClipNotches: true }, { ...split, gridfinityClips: true }, coreOne)).toThrow(MCP_GRIDFINITY_SPLIT_ALONE);
     expect(() => mcpGridfinitySplitCheck({ ...shape, locked: true }, split, coreOne)).toThrow(MCP_GRIDFINITY_SPLIT_ALONE);
     expect(() => mcpGridfinitySplitCheck({ ...shape, shapeLocked: true }, split, coreOne)).toThrow(MCP_GRIDFINITY_SPLIT_ALONE);
     // Keys asked for on a plate that has no split: the refusal of keys with a split comes first.
@@ -4826,6 +4870,115 @@ describe("gridfinity baseplate split to fit the printer", () => {
     expect(() => mcpGridfinitySplitCheck(shape, split, null)).toThrow(MCP_GRIDFINITY_SPLIT_NEEDS);
     expect(() => mcpGridfinitySplitCheck(shape, split, { width: 500, depth: 500 })).toThrow(MCP_GRIDFINITY_SPLIT_NEEDS);
     expect(() => mcpGridfinitySplitCheck({ ...shape, hole: true }, split, coreOne)).toThrow(MCP_GRIDFINITY_SPLIT_NEEDS);
+  });
+});
+
+describe("gridfinity clip notches", () => {
+  let runtime: ManifoldToplevel;
+
+  beforeAll(async () => {
+    runtime = await manifoldModule();
+    runtime.setup();
+  });
+
+  const notched = (fields: Record<string, unknown> = {}) => plate({ gridfinityClipNotches: true, ...fields });
+  const sides = (fields: Record<string, unknown> = {}) => gridfinityPlan(notched(fields)).clips.map((p) => `${p.side} ${p.x} ${p.z}`).sort();
+  const volume = (triangles: V[][]) => triangles.reduce((sum, [a, b, c]) => sum + (a[0] * (b[1] * c[2] - b[2] * c[1]) - a[1] * (b[0] * c[2] - b[2] * c[0]) + a[2] * (b[0] * c[1] - b[1] * c[0])) / 6, 0);
+
+  it("has a notch at the middle of each cell along every side without padding, and keeps the plate's box", () => {
+    expect(gridfinityPlan(plate()).clips).toHaveLength(0);
+    expect(sides()).toEqual(["back -21 -21", "back 21 -21", "front -21 21", "front 21 21", "left -42 0", "right 42 0"]);
+    expect(gridfinityPlan(notched()).size).toEqual({ width: 84, depth: 42, height: 5 });
+    expect(gridfinityFootprintPatch(notched())).toEqual({ width: 84, depth: 42, height: 5 });
+    expect(gridfinityPlan(notched({ width: 94, gridfinityPaddingRight: 10 })).clips.some((clip) => clip.side === "right")).toBe(false);
+    expect(gridfinityPlan(notched({ width: 504, depth: 504, gridfinityLargePlate: true })).clips).toHaveLength(48);
+    expect(gridfinityPlan({ width: 83.5, depth: 41.5, height: 25.4, gridfinityType: "bin", gridfinityClipNotches: true }).clips).toHaveLength(0);
+    const outline = [{ x: -60, z: -30 }, { x: 60, z: -30 }, { x: 60, z: 30 }, { x: -60, z: 30 }];
+    expect(gridfinityPlan({ width: 120, depth: 60, height: 5, gridfinityType: "baseplate", gridfinityOutline: outline, gridfinityClipNotches: true }).clips).toHaveLength(0);
+  });
+
+  it("cuts each notch to the measures of Gridfinity Extended's wall clip: size 10, tolerance 0.1, a kept wall of 1 x 1.5 mm", () => {
+    const right = gridfinityClipCuts({ ...gridfinityPlan(notched({ width: 42 })), clips: [{ side: "right", x: 21, z: 0 }] }, 0.1);
+    const box = ({ outline, y0, y1 }: (typeof right)[number]) => [Math.min(...outline.map((p) => p.x)), Math.max(...outline.map((p) => p.x)), Math.min(...outline.map((p) => p.z)), Math.max(...outline.map((p) => p.z)), y0, y1].map((v) => Math.round(v * 1000) / 1000);
+    // Behind the kept wall: from 1 mm to 5.1 mm in, 10.2 mm wide, from the clip's seat at 1 mm up through the top.
+    expect(box(right[0])).toEqual([15.9, 20, -5.1, 5.1, 1, 5.1]);
+    // Over the kept wall, which ends 1.5 mm over the seat, and out past the side.
+    expect(box(right[1])).toEqual([19.9, 21.1, -5.1, 5.1, 2.5, 5.1]);
+    // On a Swallowtail plate the notches stand on its floor.
+    const raised = gridfinityClipCuts(gridfinityPlan(notched({ gridfinitySwallowtail: true })), 0.1);
+    expect(raised[0].y0).toBeCloseTo(3.4);
+    expect(raised[1].y0).toBeCloseTo(4.9);
+    expect(gridfinityPlateCuts(gridfinityPlan(notched({ gridfinitySwallowtail: true })), 0.1)).toHaveLength(4 * 6);
+  });
+
+  it("draws the plate less its notches as a closed mesh, the same on every side", () => {
+    const plain = volume(gridfinityTriangles(plate({ width: 42 })));
+    const one = plain - volume(gridfinityLabelledTriangles(runtime, notched({ width: 52, gridfinityPaddingRight: 10 }))) + 10 * 42 * 5;
+    const all = plain - volume(gridfinityLabelledTriangles(runtime, notched({ width: 42 })));
+    expect(gridfinityHasPieces(notched())).toBe(true);
+    expect(gridfinityHasPieces(plate())).toBe(false);
+    // Three notches on the plate padded at its right; each takes the rim's 10.2 mm but for the wall of 1 x 1.5 mm2.
+    expect(one / 3).toBeGreaterThan(40);
+    expect(one / 3).toBeLessThan(70);
+    expect(all).toBeCloseTo((one / 3) * 4, 1);
+  });
+
+  it("makes the clip Gridfinity Extended makes for a straight wall: 10 mm of the rim's section with a slot of 2.1 x 1.7 mm", () => {
+    // ClipConnector(size = 10, clearance = 0.1, straightWall = true): a block of 10 x 10 x 3.2 mm less the two cells'
+    // cavities, which leave the rim 2.15 mm either side of the seam up to 1.79 mm and 0.74 mm at the top (the cavity is
+    // cut 0.01 mm low), less the clipped wall's slot, 2 + 0.1 mm wide and 1.6 + 0.1 mm tall.
+    expect(gridfinityClipOutline()).toEqual([
+      { x: -2.15, z: 0 }, { x: -1.05, z: 0 }, { x: -1.05, z: 1.7 }, { x: 1.05, z: 1.7 }, { x: 1.05, z: 0 }, { x: 2.15, z: 0 },
+      { x: 2.15, z: 1.79 }, { x: 0.74, z: 3.2 }, { x: -0.74, z: 3.2 }, { x: -2.15, z: 1.79 },
+    ]);
+    expect(GRIDFINITY_CLIP_LENGTH).toBe(10);
+    expect(GRIDFINITY_CLIP_HEIGHT).toBe(3.2);
+    const profile = gridfinityClipProfile();
+    expect(profile.points).toHaveLength(10);
+    expect(profile.segments.every((segment) => segment.kind === "line")).toBe(true);
+    // In the sketch the clip's top is towards -z, which the turn onto its feet brings up.
+    expect(Math.min(...profile.points.map((point) => point.z))).toBe(-3.2);
+  });
+
+  it("lays out as many clips as the plate is set to, none unless it is, on their feet in a row in front of it", () => {
+    const count = (fields: Record<string, unknown>) => gridfinityClipCount({ kind: "gridfinity", ...notched(fields) });
+    expect(count({})).toBe(0);
+    expect(count({ gridfinityClipCount: 6 })).toBe(6);
+    expect(count({ gridfinityClipCount: 2.6 })).toBe(3);
+    expect(count({ gridfinityClipCount: 0 })).toBe(0);
+    expect(count({ gridfinityClipCount: 1000 })).toBe(100);
+    expect(count({ gridfinityClipNotches: false, gridfinityClipCount: 4 })).toBe(0);
+    expect(gridfinityClipCount({ kind: "box", ...notched() })).toBe(0);
+    // The built section is 4.3 wide, 3.2 deep and 10 tall; turned onto its feet about its middle it is 10 deep and 3.2 tall.
+    const built = { ...binShape(plate()), width: 4.3, height: 10, hole: true };
+    const ids = ["c1", "c2", "c3"];
+    const made = gridfinityClips({ id: "a", color: "#123456" }, { minX: -42, maxZ: 21, minY: 2 }, built, 3.2, 3, "Gridfinity clip", () => ids.shift()!);
+    expect(made.map(({ id, name, gridfinityClipOf, color, hole, rotationX, x, z, elevation }) => ({ id, name, gridfinityClipOf, color, hole, rotationX, x: Math.round(x * 100) / 100, z, elevation: Math.round(elevation * 100) / 100 })))
+      .toEqual([-39.85, -31.55, -23.25].map((x, k) => ({ id: `c${k + 1}`, name: "Gridfinity clip", gridfinityClipOf: "a", color: "#123456", hole: false, rotationX: 90, x, z: 30, elevation: -1.4 })));
+    // Behind a Swallowtail plate's keys, which keep the first row.
+    expect(gridfinityClips({ id: "a", color: "#123456", gridfinitySwallowtail: true }, { minX: -42, maxZ: 21, minY: 2 }, built, 3.2, 1, "Gridfinity clip", () => "c")[0].z).toBe(44);
+    // Laid out again, a plate's clips replace the ones laid out for it before, and leave its keys and another plate's clips.
+    const part = (id: string, fields: Record<string, unknown>) => ({ ...binShape(plate()), id, ...fields });
+    const scene = [binShape(plate()), part("old", { gridfinityClipOf: "a" }), part("other", { gridfinityClipOf: "b" }), part("key", { gridfinityKeyOf: "a" })];
+    expect(gridfinitySceneWithClips(scene, "a", [part("new", { gridfinityClipOf: "a" })]).map((shape) => shape.id)).toEqual([scene[0].id, "other", "key", "new"]);
+  });
+
+  it("is kept with the shape: compared, signed, sent to the kernel and saved", async () => {
+    const shape = canonicalizeShape(binShape(notched({ gridfinityClipCount: 6 })));
+    expect(shape).toMatchObject({ height: 5, gridfinityClipNotches: true, gridfinityClipCount: 6 });
+    expect(workplaneShapesEqual(shape, { ...shape, gridfinityClipCount: 2 })).toBe(false);
+    expect(workplaneShapesEqual(shape, { ...shape, gridfinityClipOf: "a" })).toBe(false);
+    expect(workplaneShapesEqual(shape, { ...shape, gridfinityClipNotches: false })).toBe(false);
+    expect(shapeGeometrySignature(shape)).not.toBe(shapeGeometrySignature({ ...shape, gridfinityClipNotches: false }));
+    expect(cadModifierGridfinityForShape(shape)).toMatchObject({ gridfinityClipNotches: true, height: 5 });
+    expect(sceneShape(shape)).toMatchObject({ gridfinityClipNotches: true });
+    expect(mcpShapeSummary(shape)).toMatchObject({ settings: { gridfinityClipNotches: true } });
+    expect(normalizeShapeCustomizations({ gridfinity: { gridfinityClipNotches: true } }, {})).toMatchObject({ gridfinity: { gridfinityClipNotches: true } });
+    expect(shapeDefaultsFromShape(shape)).toMatchObject({ gridfinityClipNotches: true });
+    const save = (shapes: WorkplaneShape[]) => exportLylProject({ projectId: "clips", projectName: "Clips", createdAt: 1, modifiedAt: 2, shapes, history: [editorHistoryEntry(shapes, [])], historyIndex: 0, assets: [], workspace: DEFAULT_WORKPLANE_WORKSPACE, snapGrid: DEFAULT_SNAP_GRID, placementElevation: 0 });
+    const loaded = (await importLylProject(await save([shape]))).shapes[0];
+    expect(loaded).toMatchObject({ height: 5, gridfinityClipNotches: true, gridfinityClipCount: 6 });
+    await expect(importLylProject(await save([{ ...shape, gridfinityClipNotches: "yes" } as unknown as WorkplaneShape]))).rejects.toThrow("gridfinityClipNotches must");
   });
 });
 

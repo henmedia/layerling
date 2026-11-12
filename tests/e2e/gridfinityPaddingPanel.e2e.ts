@@ -16,7 +16,8 @@ import type { WorkplaneShape } from "@/types/layerling";
  * row (#856) rounds the plate's outer corners less, down to square. The large plate switch
  * (#1061) lets a baseplate take up to 12 units, and the Swallowtail switch (#1061) puts it on a floor
  * with pockets for keys, which Add keys lays out beside it with the clearance set under the switch.
- * A plate larger than the chosen printer's bed is offered a split into plates that fit it (#1388).
+ * A plate larger than the chosen printer's bed is offered a split into plates that fit it (#1388), joined by
+ * clips when it has clip notches.
  * A plate fitted into an outline (#1061) has its size in mm and a switch to take the outline away; a
  * baseplate and another shape selected together offer the fit.
  */
@@ -235,6 +236,13 @@ describe("a Gridfinity baseplate's split to fit the printer (#1388)", () => {
     expect(made).toBe(1);
   });
 
+  it("says a plate with clip notches is joined by clips, with notches on the cut sides too", () => {
+    const panel = mount({ ...large, gridfinityClipNotches: true }, undefined, coreOne, actions);
+    expect(panel.textContent).toContain("into 4 plates that fit the Prusa CORE One, with clip notches on the cut sides too, and lays out the clips for the seams");
+    expect(panel.textContent).not.toContain("each with Swallowtail, and lays out their keys");
+    expect(splitButton(panel)).toBeDefined();
+  });
+
   it("is not offered without a printer, for a plate that fits its bed, or without the editor's action", () => {
     expect(splitButton(mount(large, undefined, undefined, actions))).toBeUndefined();
     act(() => root?.unmount());
@@ -321,5 +329,35 @@ describe("a baseplate and another shape selected together (#1061)", () => {
 
   it("greys it out with a locked shape", () => {
     expect(fitButton(mountSelection([basePlate, { ...box, locked: true }]))!.disabled).toBe(true);
+  });
+});
+
+describe("a Gridfinity baseplate's clip notches in its settings", () => {
+  const notches = "Clip notches";
+  const addClips = "Add clips";
+
+  it("offers the switch on a baseplate, and Add clips with a count once it is on, each handing the count to the editor", () => {
+    const updates: Array<Partial<WorkplaneShape>> = [];
+    const counts: number[] = [];
+    const actions = { onGridfinityClips: (count: number) => { counts.push(count); } };
+    const off = mount(plate, (patch) => updates.push(patch), undefined, actions);
+    expect(toggleNamed(off, addClips)).toBeUndefined();
+    expect(toggleNamed(mount({ gridfinityType: "bin" }), notches)).toBeUndefined();
+    act(() => toggleNamed(off, notches)!.querySelector("input")!.click());
+    expect(updates).toEqual([{ gridfinityClipNotches: true }]);
+    act(() => root?.unmount());
+    // Switched on, no clips yet: Add clips lays out one, and only then is there a count to change.
+    const on = mount({ ...plate, gridfinityClipNotches: true }, undefined, undefined, actions);
+    expect(toggleNamed(on, addClips)!.querySelector("input")!.checked).toBe(false);
+    expect(rowNamed(on, "Clips")).toBeUndefined();
+    act(() => toggleNamed(on, addClips)!.querySelector("input")!.click());
+    expect(counts).toEqual([1]);
+    act(() => root?.unmount());
+    const five = mount({ ...plate, gridfinityClipNotches: true, gridfinityClipCount: 1 }, undefined, undefined, actions);
+    expect(toggleNamed(five, addClips)!.querySelector("input")!.checked).toBe(true);
+    type(rowNamed(five, "Clips")!.querySelector<HTMLInputElement>("input:not([type=range])")!, "5");
+    expect(counts).toEqual([1, 5]);
+    act(() => toggleNamed(five, addClips)!.querySelector("input")!.click());
+    expect(counts).toEqual([1, 5, 0]);
   });
 });

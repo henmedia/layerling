@@ -24,5 +24,15 @@
     "guide": {
       "section": "settingsMeasurement"
     }
+  },
+  {
+    "title": {
+      "de": "Gridfinity-Bodenplatten mit Clips verbinden",
+      "en": "Gridfinity baseplates joined with clips"
+    },
+    "body": {
+      "de": "Schalte im Eigenschaften-Fenster einer Bodenplatte „Clip-Kerben“ ein, und der Rand bekommt in der Mitte jeder Zelle an jeder Seite ohne Ausgleich eine Kerbe für die kleinen Wand-Clips von Gridfinity Extended. So passt die Platte auch zu Platten von dort. „Clips hinzufügen“ legt die Clips druckfertig vor die Platte, und „Clips“ legt fest, wie viele. Drücke über jeder Fuge einen Clip von oben auf die beiden Stege. „Passend zum Drucker teilen“ teilt eine Platte mit Clip-Kerben in Teile mit Kerben auch an den Schnittkanten und legt die Clips für die Nähte an.",
+      "en": "Switch on \"Clip notches\" in a baseplate's Properties panel and the rim gets a notch at the middle of each cell along every side without padding, for the small wall clips of Gridfinity Extended. So the plate also joins plates made there. \"Add clips\" lays the clips out in front of the plate, ready to print, and \"Clips\" sets how many. Press a clip over the two low walls across each seam from above. \"Split to fit the printer\" cuts a plate with clip notches into pieces with notches on their cut sides too, and lays out the clips for the seams."
+    }
   }
 ]

@@ -327,6 +327,10 @@ export type ShapeCustomization = {
   gridfinityLargePlate?: boolean;
   /** Gridfinity baseplate: Swallowtail, on a 2.4 mm floor with a pocket for a key under each side without padding (#1061); missing means off. */
   gridfinitySwallowtail?: boolean;
+  /** Gridfinity baseplate: notches in its sides for ostat's wall clips, which join plates printed in pieces. */
+  gridfinityClipNotches?: boolean;
+  /** Gridfinity baseplate with clip notches: how many clips Add clips lays out, 1 unless set. */
+  gridfinityClipCount?: number;
   /** Gridfinity baseplate with Swallowtail: the clearance of the keys Add keys lays out, in mm on every side; missing means 0.05, at most 0.15; the plate stays as it is (#1061). */
   gridfinitySwallowtailClearance?: number;
   /** Gridfinity bin: a label shelf along the back wall. */
@@ -1332,6 +1336,10 @@ export type WorkplaneShape = {
   gridfinityLargePlate?: boolean;
   /** Gridfinity baseplate: Swallowtail, on a 2.4 mm floor with a pocket for a key under each side without padding (#1061); missing means off. */
   gridfinitySwallowtail?: boolean;
+  /** Gridfinity baseplate: notches in its sides for ostat's wall clips, which join plates printed in pieces. */
+  gridfinityClipNotches?: boolean;
+  /** Gridfinity baseplate with clip notches: how many clips Add clips lays out, 1 unless set. */
+  gridfinityClipCount?: number;
   /** Gridfinity baseplate with Swallowtail: the clearance of the keys Add keys lays out, in mm on every side; missing means 0.05, at most 0.15; the plate stays as it is (#1061). */
   gridfinitySwallowtailClearance?: number;
   /** Gridfinity bin: a label shelf along the back wall. */
@@ -1691,6 +1699,8 @@ export type WorkplaneShape = {
   vasePartOf?: string;
   /** A Swallowtail key laid out for a Gridfinity plate (its id, #1061): laying them out again replaces it. */
   gridfinityKeyOf?: string;
+  /** A clip laid out for a Gridfinity baseplate with clip notches: that plate's id, so laying them out again replaces it. */
+  gridfinityClipOf?: string;
   importedMesh?: {
     positions: number[];
     normals?: number[];

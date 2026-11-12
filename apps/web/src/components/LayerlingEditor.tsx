@@ -21,7 +21,7 @@ import { loftShapePatch, normalizeLoftMiddles, type LoftMeasures } from "@/lib/l
 import { hingePartScope, hingeWorldParts } from "@/lib/hingeParts";
 import { copyViaSelectionField, decodeClipboardPayload, encodeClipboardPayload, LOCAL_CLIPBOARD_LIMIT, newestClipboard, type ClipboardPayload } from "@/lib/clipboardPayload";
 import { bentTubeNaturalDimensions, normalizedBentTubeFields } from "@/lib/bentTubeGeometry";
-import { GRIDFINITY_SWALLOWTAIL_KEY_THICKNESS, gridfinityHasLabelText, gridfinityOutlineFit, gridfinityOutlineFromLoops, gridfinityOutlineToPlate, gridfinityPlan, gridfinityPlateFlat, gridfinityPlatePieceKeys, gridfinityPlatePieces, gridfinityPlateSplit, gridfinityPlateToWorld, gridfinitySceneWithKeys, gridfinitySceneWithPieces, gridfinitySwallowtailKeyCount, gridfinitySwallowtailKeyProfile, gridfinitySwallowtailKeys } from "@/lib/gridfinityGeometry";
+import { GRIDFINITY_SWALLOWTAIL_KEY_THICKNESS, gridfinityHasLabelText, gridfinityOutlineFit, gridfinityOutlineFromLoops, gridfinityOutlineToPlate, gridfinityPlan, gridfinityPlateFlat, gridfinityPlatePieceClips, gridfinityPlateSplitsWithClips, gridfinityPlatePieceKeys, gridfinityPlatePieces, gridfinityPlateSplit, gridfinityPlateToWorld, gridfinitySceneWithKeys, gridfinitySceneWithPieces, gridfinitySwallowtailKeyCount, gridfinitySwallowtailKeyProfile, gridfinitySwallowtailKeys, GRIDFINITY_CLIP_LENGTH, MAX_GRIDFINITY_CLIP_COUNT, gridfinityClipCount, gridfinityClipProfile, gridfinityClips, gridfinitySceneWithClips } from "@/lib/gridfinityGeometry";
 import { DEFAULT_THREAD_PROFILE, defaultThreadHeadHeight, normalizeThreadHeadHeight, threadCollarFields, threadCollarSettings, threadDriveFields, threadDriveSettings, threadNaturalFootprint, threadSettings } from "@/lib/threadGeometry";
 import { textOffsetAsFill } from "@/lib/textFillChoice";
 import { curvedTextPatch, MAX_TEXT_LETTER_WIDTH, MAX_TEXT_SPACING, MIN_TEXT_LETTER_WIDTH, MIN_TEXT_SPACING } from "@/lib/textGeometry";
@@ -2769,6 +2769,7 @@ function mcpLoftChange(params: Record<string, unknown>): Partial<LoftMeasures> {
 }
 
 const MCP_GRIDFINITY_KEYS_NEEDS = "gridfinityKeys needs a Gridfinity baseplate with gridfinitySwallowtail and pockets at its back or right, sides without padding";
+const MCP_GRIDFINITY_CLIPS_NEEDS = "gridfinityClips needs a Gridfinity baseplate with gridfinityClipNotches, not fitted to an outline";
 const MCP_BENT_TUBE_KEYS = ["bentTubeProfile", "bentTubeInnerProfile", "bentTubeSize", "bentTubeWall", "bentTubeQuality", "bentTubeSegments"] as const;
 
 /**
@@ -13790,7 +13791,9 @@ export function LayerlingEditor({
   /**
    * A baseplate larger than the chosen printer's bed, split on its cell lines into the fewest plates that fit it (#1388),
    * each with Swallowtail, in its place and selected, and a key for each pair of pockets across a seam laid out in one row
-   * in front of it; its keys from before give way. One undo step. The same code the MCP's gridfinitySplit uses.
+   * in front of it; its keys from before give way. A plate with clip notches keeps Swallowtail as it has it, its pieces
+   * carry the notches on their cut sides too, and a clip for each pair of notches across a seam is laid out (behind the
+   * keys, when it has Swallowtail as well). One undo step. The same code the MCP's gridfinitySplit uses.
    */
   const splitGridfinityPlate = useCallback(async (plateId: string) => {
     const fail = (message: string) => {
@@ -13806,14 +13809,58 @@ export function LayerlingEditor({
     if (!printer || !split) return { ok: false as const, message: MCP_GRIDFINITY_SPLIT_NEEDS };
     const sourceFingerprint = projectShapesFingerprint(shapesRef.current);
     const sourceProjectId = projectInfoRef.current.projectId;
+    const clipped = gridfinityPlateSplitsWithClips(plate);
+    const withKeys = !clipped || plate.gridfinitySwallowtail === true;
     try {
-      const built = await cadShapeFromSketchProfile(gridfinitySwallowtailKeyProfile(plate), GRIDFINITY_SWALLOWTAIL_KEY_THICKNESS, null);
-      if (projectInfoRef.current.projectId !== sourceProjectId || projectShapesFingerprint(shapesRef.current) !== sourceFingerprint) return fail(t("status.gridfinityKeysChanged"));
+      const builtKey = withKeys ? await cadShapeFromSketchProfile(gridfinitySwallowtailKeyProfile(plate), GRIDFINITY_SWALLOWTAIL_KEY_THICKNESS, null) : null;
+      const builtClip = clipped ? await cadShapeFromSketchProfile(gridfinityClipProfile(), GRIDFINITY_CLIP_LENGTH, null) : null;
+      if (projectInfoRef.current.projectId !== sourceProjectId || projectShapesFingerprint(shapesRef.current) !== sourceFingerprint) return fail(t(clipped ? "status.gridfinityClipsChanged" : "status.gridfinityKeysChanged"));
       if (historyViewStateRef.current) return fail(t("status.historyViewBlocksEdits"));
       const pieces = gridfinityPlatePieces(plate, split, displayShapeName(plate), () => createLocalId("gridfinity"), (piece) => rebasePaintStrokes(plate.paint ?? [], plate, piece)).map(canonicalizeShape);
-      const keys = gridfinityPlatePieceKeys(pieces, split, boundsForShapes([plate]), built, shapeDepth(built), t("gridfinity.swallowtailKey"), () => createLocalId("swallowtail-key")).map(canonicalizeShape);
-      commitShapes(gridfinitySceneWithPieces(shapesRef.current, plate.id, pieces, keys), pieces.map((piece) => piece.id), t("status.gridfinitySplit", { count: pieces.length, printer: `${printer.vendor} ${printer.model}`, keys: keys.length }));
-      return { ok: true as const, pieces, keys };
+      const box = boundsForShapes([plate]);
+      const keys = builtKey ? gridfinityPlatePieceKeys(pieces, split, box, builtKey, shapeDepth(builtKey), t("gridfinity.swallowtailKey"), () => createLocalId("swallowtail-key")).map(canonicalizeShape) : [];
+      const clips = builtClip ? gridfinityPlatePieceClips(pieces, split, box, builtClip, shapeDepth(builtClip), t("gridfinity.clip"), () => createLocalId("gridfinity-clip")).map(canonicalizeShape) : [];
+      const printerName = `${printer.vendor} ${printer.model}`;
+      const message = clipped
+        ? [t("status.gridfinitySplitClips", { count: pieces.length, printer: printerName, clips: clips.length }), keys.length ? t("status.gridfinityKeysMade", { count: keys.length }) : ""].filter(Boolean).join(" ")
+        : t("status.gridfinitySplit", { count: pieces.length, printer: printerName, keys: keys.length });
+      commitShapes(gridfinitySceneWithPieces(shapesRef.current, plate.id, pieces, keys, clips), pieces.map((piece) => piece.id), message);
+      return { ok: true as const, pieces, keys, clips };
+    } catch (error) {
+      return fail(error instanceof Error ? localizedError(error.message) : t("status.sketchCannotExtrude"));
+    }
+  }, [commitShapes]);
+
+  /**
+   * The clips of a plate with clip notches, as many as it is set to, on their feet in a row in front of it, 4 mm apart, as
+   * sketch bodies ready to print; the clips laid out for it before give way. The same code the MCP's gridfinityClips uses.
+   */
+  const makeGridfinityClips = useCallback(async (plateId: string, setCount?: number) => {
+    const fail = (message: string) => {
+      setNotice(message, true);
+      return { ok: false as const, message };
+    };
+    const found = shapesRef.current.find((shape) => shape.id === plateId);
+    // From the panel the count comes along and is written to the plate in the same step; the MCP lays out what it is set to, one unless it is.
+    const plate = found && setCount !== undefined ? { ...found, gridfinityClipCount: Math.round(Math.min(MAX_GRIDFINITY_CLIP_COUNT, Math.max(0, setCount))) } : found;
+    if (!plate || plate.kind !== "gridfinity" || !gridfinityPlan({ ...plate, depth: shapeDepth(plate) }).clipNotches) return { ok: false as const, message: MCP_GRIDFINITY_CLIPS_NEEDS };
+    if (plate.locked) return fail(t("status.objectLocked"));
+    const count = setCount !== undefined ? plate.gridfinityClipCount ?? 0 : Math.max(1, gridfinityClipCount({ ...plate, depth: shapeDepth(plate) }));
+    const withPlate = (shapes: WorkplaneShape[]) => shapes.map((shape) => (shape.id === plate.id ? plate : shape));
+    if (count === 0) {
+      commitShapes(gridfinitySceneWithClips(withPlate(shapesRef.current), plate.id, []), plate.id);
+      return { ok: true as const, clips: [] as WorkplaneShape[] };
+    }
+    const sourceFingerprint = projectShapesFingerprint(shapesRef.current);
+    const sourceProjectId = projectInfoRef.current.projectId;
+    try {
+      const built = await cadShapeFromSketchProfile(gridfinityClipProfile(), GRIDFINITY_CLIP_LENGTH, null);
+      if (projectInfoRef.current.projectId !== sourceProjectId || projectShapesFingerprint(shapesRef.current) !== sourceFingerprint) return fail(t("status.gridfinityClipsChanged"));
+      if (historyViewStateRef.current) return fail(t("status.historyViewBlocksEdits"));
+      const clips = gridfinityClips(plate, boundsForShapes([plate]), built, shapeDepth(built), count, t("gridfinity.clip"), () => createLocalId("gridfinity-clip")).map(canonicalizeShape);
+      // The plate stays selected, so its panel stays open for another count.
+      commitShapes(gridfinitySceneWithClips(withPlate(shapesRef.current), plate.id, clips), plate.id, t("status.gridfinityClipsMade", { count }));
+      return { ok: true as const, clips };
     } catch (error) {
       return fail(error instanceof Error ? localizedError(error.message) : t("status.sketchCannotExtrude"));
     }
@@ -14890,6 +14937,7 @@ export function LayerlingEditor({
         const withScrewHoles = committedShape.kind === "port" && params.portScrewHoles !== false ? portWithScrewHolesGroup(committedShape) : null;
         if (committedShape.kind === "port" && params.portScrewHoles === true && !withScrewHoles) throw new Error("portScrewHoles needs a port opening whose socket has screw holes (portPreset dsub9)");
         if (params.gridfinityKeys === true && gridfinitySwallowtailKeyCount({ ...committedShape, depth: shapeDepth(committedShape) }) === 0) throw new Error(MCP_GRIDFINITY_KEYS_NEEDS);
+        if (params.gridfinityClips === true && !(committedShape.kind === "gridfinity" && gridfinityPlan({ ...committedShape, depth: shapeDepth(committedShape) }).clipNotches)) throw new Error(MCP_GRIDFINITY_CLIPS_NEEDS);
         if (withScrewHoles) {
           commitShapes([...currentShapes(), withScrewHoles], withScrewHoles.id, t("status.shapeAddedMcp", { name: displayShapeName(withScrewHoles) }));
           return { object: mcpShapeSummary(withScrewHoles) };
@@ -14899,9 +14947,13 @@ export function LayerlingEditor({
           const { parts, missing } = layOutVaseAccessories(committedShape.id);
           return { object: mcpShapeSummary(committedShape), parts: parts.map(mcpShapeSummary), ...(missing.length ? { notPossible: missing } : {}) };
         }
-        if (params.gridfinityKeys === true) {
-          const made = await makeSwallowtailKeys(committedShape.id);
-          return made.ok ? { object: mcpShapeSummary(committedShape), parts: made.keys.map(mcpShapeSummary) } : { object: mcpShapeSummary(committedShape), parts: [], notPossible: [made.message] };
+        if (params.gridfinityKeys === true || params.gridfinityClips === true) {
+          // Keys first, then clips: each laid out on its own, and what could not be made said with its reason.
+          const keys = params.gridfinityKeys === true ? await makeSwallowtailKeys(committedShape.id) : null;
+          const clips = params.gridfinityClips === true ? await makeGridfinityClips(committedShape.id) : null;
+          const parts = [...(keys?.ok ? keys.keys : []), ...(clips?.ok ? clips.clips : [])];
+          const notPossible = [keys, clips].flatMap((made) => (made && !made.ok ? [made.message] : []));
+          return { object: mcpShapeSummary(committedShape), parts: parts.map(mcpShapeSummary), ...(notPossible.length ? { notPossible } : {}) };
         }
         return { object: mcpShapeSummary(committedShape) };
       }
@@ -15185,6 +15237,7 @@ export function LayerlingEditor({
         let updated = nextShapes.find((shape) => shape.id === target.id) as WorkplaneShape;
         mcpGridfinitySplitCheck({ ...updated, depth: shapeDepth(updated) }, params, printerPresetById(workspaceSettingsRef.current.printer));
         if (params.gridfinityKeys === true && gridfinitySwallowtailKeyCount({ ...updated, depth: shapeDepth(updated) }) === 0) throw new Error(MCP_GRIDFINITY_KEYS_NEEDS);
+        if (params.gridfinityClips === true && !(updated.kind === "gridfinity" && gridfinityPlan({ ...updated, depth: shapeDepth(updated) }).clipNotches)) throw new Error(MCP_GRIDFINITY_CLIPS_NEEDS);
         commitShapes(nextShapes, target.id, t("status.shapeUpdatedMcp", { name: displayShapeName(updated) }));
         // A group that keeps its holes and small parts is built again at its new size (#526); the answer waits for it.
         const keepingParts = groupsToKeepParts(new Map([[target.id, target]]), [updated]);
@@ -15234,11 +15287,15 @@ export function LayerlingEditor({
         // The plate is gone after a split (#1388): its pieces come back as objects, their keys as parts.
         if (params.gridfinitySplit === true) {
           const made = await splitGridfinityPlate(updated.id);
-          return made.ok ? { objects: made.pieces.map(mcpShapeSummary), parts: made.keys.map(mcpShapeSummary) } : { object: mcpShapeSummary(updated), parts: [], notPossible: [made.message] };
+          return made.ok ? { objects: made.pieces.map(mcpShapeSummary), parts: [...made.keys, ...made.clips].map(mcpShapeSummary) } : { object: mcpShapeSummary(updated), parts: [], notPossible: [made.message] };
         }
-        if (params.gridfinityKeys === true) {
-          const made = await makeSwallowtailKeys(updated.id);
-          return made.ok ? { object: mcpShapeSummary(updated), parts: made.keys.map(mcpShapeSummary) } : { object: mcpShapeSummary(updated), parts: [], notPossible: [made.message] };
+        if (params.gridfinityKeys === true || params.gridfinityClips === true) {
+          // Keys first, then clips: each laid out on its own, and what could not be made said with its reason.
+          const keys = params.gridfinityKeys === true ? await makeSwallowtailKeys(updated.id) : null;
+          const clips = params.gridfinityClips === true ? await makeGridfinityClips(updated.id) : null;
+          const parts = [...(keys?.ok ? keys.keys : []), ...(clips?.ok ? clips.clips : [])];
+          const notPossible = [keys, clips].flatMap((made) => (made && !made.ok ? [made.message] : []));
+          return { object: mcpShapeSummary(updated), parts: parts.map(mcpShapeSummary), ...(notPossible.length ? { notPossible } : {}) };
         }
         return { object: mcpShapeSummary(updated) };
       }
@@ -18510,6 +18567,7 @@ export function LayerlingEditor({
     layOutVaseAccessories,
     makeSwallowtailKeys,
     splitGridfinityPlate,
+    makeGridfinityClips,
     invertSelection,
     selectSameColor,
     hideOthers,
@@ -21189,6 +21247,7 @@ export function LayerlingEditor({
           onGridfinityKeys={selectedShapes.length === 1 && selectedShape?.kind === "gridfinity" && selectedShape.gridfinitySwallowtail === true && !historyViewState ? () => void makeSwallowtailKeys(selectedShape.id) : undefined}
           onBoltSplit={selectedShapes.length === 1 && selectedShape && boltSplitFits(selectedShape) && !historyViewState ? (pins, filament) => void splitBoltForPrint(selectedShape.id, { pins, filament }) : undefined}
           onGridfinitySplit={selectedShapes.length === 1 && selectedShape?.kind === "gridfinity" && !historyViewState ? () => void splitGridfinityPlate(selectedShape.id) : undefined}
+          onGridfinityClips={selectedShapes.length === 1 && selectedShape?.kind === "gridfinity" && selectedShape.gridfinityClipNotches === true && !historyViewState ? (count: number) => void makeGridfinityClips(selectedShape.id, count) : undefined}
           onLayerText={selectedShapes.length === 1 && offersTextLayers(selectedShape) ? layerSelectedText : undefined}
           onTextTags={selectedShapes.length === 1 && offersTextLayers(selectedShape) ? makeTextTags : undefined}
           onTextBlock={selectedShapes.length === 1 && offersTextBlock(selectedShape) && !historyViewState ? makeTextBlock : undefined}

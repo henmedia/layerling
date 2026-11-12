@@ -247,6 +247,8 @@ import {
   MAX_GRIDFINITY_LIP_CHAMFER,
   MAX_GRIDFINITY_PADDING,
   MAX_GRIDFINITY_SWALLOWTAIL_CLEARANCE,
+  DEFAULT_GRIDFINITY_CLIP_COUNT,
+  MAX_GRIDFINITY_CLIP_COUNT,
   MAX_GRIDFINITY_TRAY_HEIGHT,
   MIN_GRIDFINITY_COMPARTMENT_LABEL_LENGTH,
   MIN_GRIDFINITY_COMPARTMENT_LABEL_MM,
@@ -323,13 +325,14 @@ import {
   gridfinityOverhangPatch,
   gridfinityOverhangSupportSides,
   gridfinityPlan,
-  gridfinityPlateSplit,
+  gridfinityPlateSplit, gridfinityPlateSplitsWithClips,
   gridfinityScoopFits,
   gridfinityScoopMaxRadius,
   gridfinityScoopRadius,
   gridfinityScoopsLeftOut,
   gridfinityShapePatch,
   gridfinitySwallowtailClearance,
+  gridfinityClipCount,
   gridfinityWallFits,
   gridfinityWallMaxThickness,
   gridfinityWallSolid,
@@ -790,6 +793,8 @@ type ShapePropertyView = {
   portPresetWithScrewHoles?: (patch: Partial<WorkplaneShape>) => void;
   /** The bed of the printer chosen in the workspace settings, which a Gridfinity bin or tray may reach across (#1917). */
   bed?: GridfinityBed;
+  /** Lays so many clips out in front of a baseplate with clip notches and writes the count to it; 0 takes them away. */
+  gridfinityClips?: (count: number) => void;
 };
 const NO_PROPERTY_VIEW: ShapePropertyView = { loftSection: 0, setLoftSection: () => undefined };
 
@@ -1843,6 +1848,15 @@ function getShapePropertiesWithAppLimits(shape: WorkplaneShape, onUpdate: ShapeI
       properties.push({ type: "toggle", id: "gridfinityLargePlate", label: t("prop.gridfinityLargePlate"), value: plan.largePlate, disabled: plan.largePlate && needsLargePlate, onChange: (value) => apply({ largePlate: value }) });
       // Swallowtail (#1061): not on a plate fitted to an outline, one piece for its drawer. The floor's 2.4 mm come with the switch.
       if (!plan.outline) properties.push({ type: "toggle", id: "gridfinitySwallowtail", label: t("prop.gridfinitySwallowtail"), value: plan.swallowtail, onChange: (value) => apply({ swallowtail: value }) });
+      // Clip notches for ostat's wall clips: not on an outline plate either. The plate's box stays as it is.
+      if (!plan.outline) properties.push({ type: "toggle", id: "gridfinityClipNotches", label: t("prop.gridfinityClipNotches"), value: plan.clipNotches, onChange: (value) => onUpdate({ gridfinityClipNotches: value }) });
+      // Add clips lays the clips out in front of the plate at once, one to start with, and the count lays them out anew; switched off, they go.
+      const onGridfinityClips = view.gridfinityClips;
+      if (plan.clipNotches && onGridfinityClips) {
+        const clips = gridfinityClipCount(shape);
+        properties.push({ type: "toggle", id: "gridfinityClips", label: t("inspector.gridfinityClips"), value: clips > 0, onChange: (value) => onGridfinityClips(value ? DEFAULT_GRIDFINITY_CLIP_COUNT : 0) });
+        if (clips > 0) properties.push({ id: "gridfinityClipCount", label: t("prop.gridfinityClipCount"), value: clips, min: 1, max: MAX_GRIDFINITY_CLIP_COUNT, step: 1, hint: t("gridfinity.clipCountHint"), onChange: (value) => onGridfinityClips(Math.round(clamp(value, 1, MAX_GRIDFINITY_CLIP_COUNT))) });
+      }
       // The keys' clearance (#1061): only for the keys Add keys lays out next; the plate stays as it is.
       if (plan.swallowtail) properties.push({ id: "gridfinitySwallowtailClearance", label: t("prop.gridfinitySwallowtailClearance"), value: gridfinitySwallowtailClearance(shape), min: 0, max: MAX_GRIDFINITY_SWALLOWTAIL_CLEARANCE, step: 0.01, hint: t("gridfinity.swallowtailClearanceHint"), onChange: (value) => onUpdate({ gridfinitySwallowtailClearance: clamp(value, 0, MAX_GRIDFINITY_SWALLOWTAIL_CLEARANCE) }) });
     }
@@ -4621,6 +4635,7 @@ export function ShapeInspector({
   onGridfinityKeys,
   onGridfinitySplit,
   onBoltSplit,
+  onGridfinityClips,
   onLayerText,
   onTextTags,
   onTextBlock,
@@ -4684,6 +4699,8 @@ export function ShapeInspector({
   onGridfinitySplit?: () => void;
   /** A screw or rod split lengthwise and laid flat for printing, with centring pins or without (lib/boltSplit.ts). */
   onBoltSplit?: (pins: boolean, filament: boolean) => void;
+  /** Lays so many clips out in front of this baseplate, ready to print, for its clip notches; 0 takes them away. */
+  onGridfinityClips?: (count: number) => void;
   /** Splits a text into layers, or builds a layered text again with new words, font or layers (#215). */
   onLayerText?: (patch: TextLayerPatch) => void;
   /** One tag like this text or stack per name, laid out in rows (#215). */
@@ -4756,7 +4773,7 @@ export function ShapeInspector({
   const [loftSection, setLoftSection] = useState(0);
   useEffect(() => setLoftSection(0), [shape.id]);
   const printerPlay = usePrinterPlay();
-  const properties = withFitTestNotes(getShapeProperties(shape, onUpdate, workspace, { loftSection, setLoftSection, portPresetWithScrewHoles: onPortPresetWithScrewHoles }), shape.kind, printerPlay);
+  const properties = withFitTestNotes(getShapeProperties(shape, onUpdate, workspace, { loftSection, setLoftSection, portPresetWithScrewHoles: onPortPresetWithScrewHoles, gridfinityClips: onGridfinityClips }), shape.kind, printerPlay);
   const tiltedMeasures = orientedMeasures(shape).kind === "tilted";
   // A shape with settings of its own that got a fillet or chamfer shows only its measures now; the note names it
   // and says how its settings come back (#1689). A plain box had nothing more, so it gets no note.
@@ -5651,6 +5668,9 @@ export function ShapeInspector({
                 undo: t("edge.revertAction"),
               })}</p>
             ) : null}
+            {shape.kind === "gridfinity" && gridfinityPlan({ ...shape, depth: shapeDepth(shape) }).clipNotches ? (
+              <p className="cylinder-wrap-hint">{t("gridfinity.clipNotchesHint")}</p>
+            ) : null}
             {shape.kind === "gridfinity" && gridfinityPlan({ ...shape, depth: shapeDepth(shape) }).swallowtail ? (
               <>
                 <p className="cylinder-wrap-hint">{t("gridfinity.swallowtailHint")}</p>
@@ -5684,7 +5704,7 @@ export function ShapeInspector({
             ) : null}
             {splitPrinter && gridfinitySplit ? (
               <>
-                <p className="cylinder-wrap-hint">{t("gridfinity.splitHint", { count: gridfinitySplit.length, printer: `${splitPrinter.vendor} ${splitPrinter.model}` })}</p>
+                <p className="cylinder-wrap-hint">{t(gridfinityPlateSplitsWithClips(shape) ? "gridfinity.splitHintClips" : "gridfinity.splitHint", { count: gridfinitySplit.length, printer: `${splitPrinter.vendor} ${splitPrinter.model}` })}</p>
                 <button className="inspector-action-button" type="button" disabled={frozen} onClick={onGridfinitySplit}>
                   <Grid3x3 size={17} strokeWidth={2.5} />
                   <span>{t("inspector.gridfinitySplit")}</span>

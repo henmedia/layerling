@@ -894,6 +894,8 @@ export function workplaneShapesEqual(a: WorkplaneShape, b: WorkplaneShape) {
     a.gridfinityHalfGrid === b.gridfinityHalfGrid &&
     a.gridfinityLargePlate === b.gridfinityLargePlate &&
     a.gridfinitySwallowtail === b.gridfinitySwallowtail &&
+    a.gridfinityClipNotches === b.gridfinityClipNotches &&
+    a.gridfinityClipCount === b.gridfinityClipCount &&
     a.gridfinitySwallowtailClearance === b.gridfinitySwallowtailClearance &&
     a.gridfinityLabelBack === b.gridfinityLabelBack &&
     a.gridfinityLabelFront === b.gridfinityLabelFront &&
@@ -1022,6 +1024,7 @@ export function workplaneShapesEqual(a: WorkplaneShape, b: WorkplaneShape) {
     vaseSettingsEqual(a.vase, b.vase) &&
     a.vasePartOf === b.vasePartOf &&
     a.gridfinityKeyOf === b.gridfinityKeyOf &&
+    a.gridfinityClipOf === b.gridfinityClipOf &&
     a.textRadius === b.textRadius &&
     a.textSize === b.textSize &&
     a.textInward === b.textInward &&

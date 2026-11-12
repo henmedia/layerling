@@ -1797,7 +1797,7 @@ export function cadModifierGridfinityForShape(shape: WorkplaneShape): CadModifie
   const width = shapeWidth(shape);
   const depth = shapeDepth(shape);
   if (![width, depth, shape.height].every((value) => Number.isFinite(value) && value > 0)) return null;
-  const plan = gridfinityPlan({ width, depth, height: shape.height, gridfinityType: shape.gridfinityType, gridfinityLip: shape.gridfinityLip, gridfinityMagnets: shape.gridfinityMagnets, gridfinityHalfGrid: shape.gridfinityHalfGrid, gridfinityLargePlate: shape.gridfinityLargePlate, gridfinitySwallowtail: shape.gridfinitySwallowtail, gridfinityPaddingBack: shape.gridfinityPaddingBack, gridfinityPaddingFront: shape.gridfinityPaddingFront, gridfinityPaddingLeft: shape.gridfinityPaddingLeft, gridfinityPaddingRight: shape.gridfinityPaddingRight, gridfinityOverhangBack: shape.gridfinityOverhangBack, gridfinityOverhangFront: shape.gridfinityOverhangFront, gridfinityOverhangLeft: shape.gridfinityOverhangLeft, gridfinityOverhangRight: shape.gridfinityOverhangRight, gridfinityOverhangChamfer: shape.gridfinityOverhangChamfer, gridfinityOverhangSolid: shape.gridfinityOverhangSolid, gridfinityOverhangLipOnGrid: shape.gridfinityOverhangLipOnGrid, gridfinityOutline: shape.gridfinityOutline });
+  const plan = gridfinityPlan({ width, depth, height: shape.height, gridfinityType: shape.gridfinityType, gridfinityLip: shape.gridfinityLip, gridfinityMagnets: shape.gridfinityMagnets, gridfinityHalfGrid: shape.gridfinityHalfGrid, gridfinityLargePlate: shape.gridfinityLargePlate, gridfinitySwallowtail: shape.gridfinitySwallowtail, gridfinityClipNotches: shape.gridfinityClipNotches, gridfinityPaddingBack: shape.gridfinityPaddingBack, gridfinityPaddingFront: shape.gridfinityPaddingFront, gridfinityPaddingLeft: shape.gridfinityPaddingLeft, gridfinityPaddingRight: shape.gridfinityPaddingRight, gridfinityOverhangBack: shape.gridfinityOverhangBack, gridfinityOverhangFront: shape.gridfinityOverhangFront, gridfinityOverhangLeft: shape.gridfinityOverhangLeft, gridfinityOverhangRight: shape.gridfinityOverhangRight, gridfinityOverhangChamfer: shape.gridfinityOverhangChamfer, gridfinityOverhangSolid: shape.gridfinityOverhangSolid, gridfinityOverhangLipOnGrid: shape.gridfinityOverhangLipOnGrid, gridfinityOutline: shape.gridfinityOutline });
   // Label shelves, finger scoops and dividers, an outline plate's sockets and a Swallowtail plate's pockets, are in the display mesh only once Manifold has loaded; until then the body would not match it (#455, #554, #1061).
   if (!loadedManifoldRuntime() && gridfinityHasPieces({ ...shape, width, depth })) return null;
   // The letters on the shelves (#1308) with the font's own curves, laid out where the display mesh has them.
@@ -1823,6 +1823,7 @@ export function cadModifierGridfinityForShape(shape: WorkplaneShape): CadModifie
     gridfinityHalfGrid: plan.halfGrid,
     gridfinityLargePlate: plan.largePlate,
     gridfinitySwallowtail: plan.swallowtail,
+    gridfinityClipNotches: plan.clipNotches,
     gridfinityLabelBack: shape.gridfinityLabelBack,
     gridfinityLabelFront: shape.gridfinityLabelFront,
     gridfinityLabelLeft: shape.gridfinityLabelLeft,
