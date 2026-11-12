@@ -2039,6 +2039,8 @@ export const MESSAGES_ES: Partial<Record<MessageKey, string>> = {
   "status.exportedStepMany": "B-Rep STEP exportado con {count} cuerpos{skipNote}",
   "status.importedFile": "Importado: {name}.",
   "status.importedFiles": "{count} de {total} archivos importados.",
+  "status.largeMeshes": "Este diseño contiene ahora {count} triángulos en mallas importadas. layerling está hecho ante todo para cuerpos CAD exactos: mallas tan grandes pueden volverlo lento, ocupar mucha memoria y hacer lento el guardado. Simplificar malla (clic derecho en el cuerpo) las aligera.",
+  "status.largeMeshesGuide": "Más información",
   "status.importFailedList": "No importados: {details}{more}.",
   "status.importFailedMore": " y {count} más",
   "status.importColoredParts": "{name} tiene {count} colores y entra como {count} cuerpos, cada uno en su sitio y seleccionados juntos.",

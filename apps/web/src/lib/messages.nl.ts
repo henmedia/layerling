@@ -2036,6 +2036,8 @@ export const MESSAGES_NL: Record<MessageKey, string> = {
   "status.exportedStepMany": "STEP B-Rep met {count} lichamen geëxporteerd{skipNote}",
   "status.importedFile": "{name} geïmporteerd.",
   "status.importedFiles": "{count} van {total} bestanden geïmporteerd.",
+  "status.largeMeshes": "Dit ontwerp bevat nu {count} driehoeken in geïmporteerde meshes. layerling is in de eerste plaats gemaakt voor exacte CAD-lichamen: zulke grote meshes kunnen het traag maken, veel geheugen kosten en het opslaan vertragen. Mesh vereenvoudigen (rechtsklik op het lichaam) maakt ze lichter.",
+  "status.largeMeshesGuide": "Meer lezen",
   "status.importFailedList": "Niet geïmporteerd: {details}{more}.",
   "status.importFailedMore": " en nog {count}",
   "status.importColoredParts": "{name} heeft {count} kleuren en komt binnen als {count} lichamen, elk op zijn plek en samen geselecteerd.",

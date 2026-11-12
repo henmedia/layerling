@@ -134,6 +134,10 @@ Načrt, shranjen z **novejšo različico programa layerling**, lahko vsebuje stv
 
 Slike kot predlogo vstaviš v skicirnem načinu, glej [Skice](chapter:skice).
 
+## Velike mreže
+
+layerling je narejen predvsem za gradnjo natančnih CAD teles: valj se shrani kot krog in višina, zaokrožitev kot ena ukrivljena ploskev. Uvožena mreža pa je približek iz trikotnikov, čim bolj fina, tem več jih je, in vsak od njih je v pomnilniku, se riše in shranjuje. Manjši deli kot mreže niso težava. Zelo velike mreže, na primer skeni, skulpture ali modeli iz Blenderja s stotisoči ali milijoni trikotnikov, upočasnijo urejevalnik, zasedejo veliko pomnilnika in upočasnijo shranjevanje, rezanje pa morda sploh ne uspe. Po uvozu, ki prinese take mreže, layerling na to enkrat opozori. Tako mrežo najprej poenostavi (glej spodaj), uvozi samo dele, ki jih potrebuješ, ali preproste dele zgradi iz layerlingovih lastnih oblik.
+
 ## Poenostavitev uvožene mreže
 
 Skenirana ali modelirana mreža ima pogosto bistveno več trikotnikov, kot jih njena oblika potrebuje, in vsakega se vleče zraven pri premikanju, rezanju in shranjevanju. {{ui:simplify.title}} v skupini Spreminjanje (ali v meniju z desnim klikom na telo) pokaže mrežo, kakršna je, ob tistem, kar od nje ostane pri izbranem deležu njenih trikotnikov; oba pogleda se vrtita in zumirata skupaj, z miškinimi gumbi delovne ravnine. Določiš, koliko naj ostane, kot odstotek ali kot število trikotnikov, in {{ui:simplify.apply}} prevzame lažjo mrežo. Rezultat je preprosta mreža: pri rezultatu reza ali združitve odpadeta {{ui:group.edit}} in prvotni deli. Z vklopljenim {{ui:simplify.keepEdges}}, kot je na začetku, ostanejo ostri robovi in robovi lukenj natanko tam, kjer so, ravne ploskve pa vseeno izgubijo večino trikotnikov; izklopljeno jih poenostavitev sme zaobliti za manjše število.

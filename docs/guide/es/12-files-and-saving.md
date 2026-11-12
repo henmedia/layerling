@@ -140,6 +140,10 @@ Un diseño guardado con una **versión más reciente de layerling** puede conten
 
 Las imágenes de plantilla se añaden en el modo de boceto; consulta [Bocetos](chapter:sketches).
 
+## Mallas grandes
+
+layerling está hecho ante todo para construir cuerpos CAD exactos: un cilindro se guarda como un círculo y una altura, un redondeo como una sola cara curva. Una malla importada, en cambio, es una aproximación hecha de triángulos, cuanto más fina, más triángulos, y cada uno se guarda en memoria, se dibuja y se almacena. Las piezas pequeñas como mallas no son ningún problema. Las mallas muy grandes, como escaneos, esculturas o modelos de Blender con cientos de miles o millones de triángulos, hacen más lento el editor, ocupan mucha memoria y ralentizan el guardado, y puede que no se puedan cortar. Tras una importación que trae mallas así, layerling lo avisa una vez. Simplifica antes esa malla (ver abajo), importa solo las piezas que necesitas o construye las piezas sencillas con las formas propias de layerling.
+
 ## Simplificar una malla importada
 
 Una malla escaneada o esculpida suele tener muchos más triángulos de los que necesita su forma, y todos ellos se arrastran cada vez que mueves, cortas y guardas. {{ui:simplify.title}}, en el grupo Modificar (o en el menú del clic derecho del cuerpo), muestra la malla tal como es junto a lo que quedaría de ella con la proporción de triángulos que elijas; las dos vistas giran y se acercan a la vez con los mismos botones del ratón que la zona de trabajo. Indica cuánto quieres conservar, en porcentaje o en número de triángulos, y {{ui:simplify.apply}} se queda con la malla más ligera. El resultado es una malla simple: si era el resultado de un corte o una fusión, se pierden {{ui:group.edit}} y sus piezas originales. Con {{ui:simplify.keepEdges}} activado, como viene de inicio, las aristas vivas y los bordes de los agujeros se quedan exactamente donde están, mientras que las caras planas pierden igualmente la mayoría de sus triángulos; desactivado, la simplificación puede redondearlos para bajar más.

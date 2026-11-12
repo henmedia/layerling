@@ -2592,6 +2592,8 @@ export const MESSAGES_DA: Partial<Record<MessageKey, string>> = {
   "status.exportedStepMany": "Eksporterede STEP B-Rep med {count} former{skipNote}",
   "status.importedFile": "Importerede {name}.",
   "status.importedFiles": "Importerede {count} af {total} filer.",
+  "status.largeMeshes": "Dette design rummer nu {count} trekanter i importerede mesh. layerling er først og fremmest lavet til eksakte CAD-legemer: så store mesh kan gøre det langsomt, optage meget hukommelse og gøre gemning langsom. Forenkl mesh (højreklik på legemet) gør dem lettere.",
+  "status.largeMeshesGuide": "Læs mere",
   "status.importFailedList": "Ikke importeret: {details}{more}.",
   "status.importFailedMore": " og {count} mere",
   "status.importColoredParts": "{name} har {count} farver og kommer ind som {count} former, hver på sin plads og valgt sammen.",

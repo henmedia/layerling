@@ -2168,6 +2168,8 @@ export const MESSAGES_CS: Record<MessageKey, string> = {
   "status.exportedStepMany": "Exportován STEP B-Rep s počtem těles {count}{skipNote}",
   "status.importedFile": "Importováno: {name}.",
   "status.importedFiles": "Importováno {count} z {total} souborů.",
+  "status.largeMeshes": "Tento návrh teď obsahuje {count} trojúhelníků v importovaných sítích. layerling je určen především pro přesná CAD tělesa: takto velké sítě ho mohou zpomalit, zabrat hodně paměti a zpomalit ukládání. Zjednodušit polygonovou síť (pravým tlačítkem na těleso) je odlehčí.",
+  "status.largeMeshesGuide": "Více",
   "status.importFailedList": "Neimportováno: {details}{more}.",
   "status.importFailedMore": " a další (počet: {count})",
   "status.importColoredParts": "Soubor {name} má {count} barev a vloží se jako {count} těles na původních místech se společným výběrem.",

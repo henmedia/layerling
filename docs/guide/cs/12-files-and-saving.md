@@ -134,6 +134,10 @@ Projekt z **novějšího Layerlingu** může obsahovat neznámé tvary, parametr
 
 Obrázkové podklady se přidávají v režimu náčrtu, viz [Náčrty](chapter:sketches).
 
+## Velké sítě
+
+layerling je určen především ke stavbě přesných CAD těles: válec se ukládá jako kružnice a výška, zaoblení jako jedna zakřivená plocha. Importovaná síť je naproti tomu přiblížení z trojúhelníků, čím jemnější, tím víc jich je, a každý z nich je v paměti, kreslí se a ukládá. Menší díly jako sítě nevadí. Velmi velké sítě, třeba skeny, sochy nebo modely z Blenderu se stovkami tisíc či miliony trojúhelníků, editor zpomalí, zaberou hodně paměti a zpomalí ukládání, a řezání s nimi nemusí fungovat vůbec. Když import takové sítě přinese, layerling na to jednou upozorní. Takovou síť nejdřív zjednodušte (viz níže), importujte jen díly, které potřebujete, nebo jednoduché díly postavte z vlastních tvarů layerlingu.
+
 ## Zjednodušení importované sítě
 
 Skenovaná či sochařsky vytvořená síť mívá zbytečně mnoho trojúhelníků, které se zpracovávají při přesunu, řezání i ukládání. {{ui:simplify.title}} v části Úpravy nebo nabídce pravého tlačítka zobrazí vedle sebe originál a zjednodušený náhled. Oba se současně otáčejí a přibližují stejnými tlačítky jako pracovní plocha. Zadejte zachované procento nebo počet trojúhelníků a potvrďte {{ui:simplify.apply}}. Výsledkem je obyčejná síť. U výsledku řezu či sloučení tím přijdete o původní části a {{ui:group.edit}}. Se zapnutým {{ui:simplify.keepEdges}}, jak je nastaveno na začátku, zůstanou ostré hrany a okraje otvorů přesně na místě, zatímco rovné plochy i tak přijdou o většinu trojúhelníků; vypnuté je zjednodušení smí zaoblit kvůli menšímu počtu.

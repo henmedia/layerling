@@ -140,6 +140,10 @@ Ein Entwurf, der mit einer **neueren layerling-Version** gespeichert wurde, kann
 
 Bilder als Vorlage fügst du im Skizzenmodus ein, siehe [Skizzen](chapter:skizzen).
 
+## Große Netze
+
+layerling ist vor allem dafür gemacht, exakte CAD-Körper zu bauen: Ein Zylinder wird als Kreis und Höhe gespeichert, eine Rundung als eine gekrümmte Fläche. Ein importiertes Netz ist dagegen eine Näherung aus Dreiecken, je feiner, desto mehr, und jedes davon liegt im Speicher, wird gezeichnet und gespeichert. Kleinere Teile als Netz sind kein Problem. Sehr große Netze, etwa Scans, Skulpturen oder Modelle aus Blender mit Hunderttausenden oder Millionen Dreiecken, machen den Editor langsamer, belegen viel Speicher und verlangsamen das Speichern, und Schneiden geht damit unter Umständen gar nicht. Bringt ein Import solche Netze herein, sagt layerling das einmal. Vereinfache ein solches Netz zuerst (siehe unten), importiere nur die Teile, die du brauchst, oder baue einfache Teile aus layerlings eigenen Formen.
+
 ## Ein importiertes Netz vereinfachen
 
 Ein gescanntes oder modelliertes Netz hat oft weit mehr Dreiecke, als seine Form braucht, und jedes davon wird beim Verschieben, Schneiden und Speichern mitgeschleppt. {{ui:simplify.title}} in der Gruppe Ändern (oder im Rechtsklickmenü des Körpers) zeigt das Netz, wie es ist, neben dem, was ein gewählter Anteil seiner Dreiecke davon übrig lässt; beide Ansichten drehen und zoomen gemeinsam, mit den Maustasten der Arbeitsebene. Lege fest, wie viel bleiben soll, als Prozentsatz oder als Zahl von Dreiecken, und {{ui:simplify.apply}} übernimmt das leichtere Netz. Das Ergebnis ist ein einfaches Netz: Beim Ergebnis eines Schnitts oder einer Vereinigung entfallen {{ui:group.edit}} und die ursprünglichen Teile. Mit eingeschaltetem {{ui:simplify.keepEdges}}, wie es anfangs ist, bleiben scharfe Kanten und die Ränder von Bohrungen genau, wo sie sind, während ebene Flächen trotzdem die meisten Dreiecke verlieren; ausgeschaltet darf das Vereinfachen sie für weniger Dreiecke abrunden.

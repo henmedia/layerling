@@ -140,6 +140,10 @@ En design som sparats med en **nyare layerling** kan innehålla sådant som din 
 
 Mallbilder läggs till i skissläget, se [Skisser](chapter:sketches).
 
+## Stora mesh
+
+layerling är framför allt gjort för att bygga exakta CAD-kroppar: en cylinder sparas som en cirkel och en höjd, en avrundning som en enda krökt yta. Ett importerat mesh är däremot en approximation av trianglar, ju finare, desto fler, och var och en av dem ligger i minnet, ritas och sparas. Mindre delar som mesh är inget problem. Mycket stora mesh, som skanningar, skulpturer eller modeller från Blender med hundratusentals eller miljontals trianglar, gör redigeraren långsammare, tar mycket minne och gör sparandet långsamt, och att skära i dem kanske inte går alls. Efter en import som tar in sådana mesh säger layerling det en gång. Förenkla ett sådant mesh först (se nedan), importera bara de delar du behöver, eller bygg enkla delar av layerlings egna former.
+
 ## Förenkla en importerad mesh
 
 En skannad eller skulpterad mesh har ofta långt fler trianglar än dess form behöver, och varenda en av dem följer med när du flyttar, skär och sparar. {{ui:simplify.title}} i gruppen Ändra (eller i kroppens högerklicksmeny) visar meshen som den ser ut bredvid vad en vald andel av dess trianglar skulle lämna kvar av den; båda vyerna vrids och zoomas tillsammans med arbetsytans musknappar. Ställ in hur mycket som ska behållas som en procentsats eller ett antal trianglar, så övertar {{ui:simplify.apply}} den lättare meshen. Resultatet är en ren mesh: för resultatet av en skärning eller sammanslagning försvinner {{ui:group.edit}} och dess ursprungliga delar. Med {{ui:simplify.keepEdges}} påslagen, som den är från början, stannar skarpa kanter och kanterna på hål exakt där de är medan plana ytor ändå blir av med de flesta av sina trianglar; avslagen får förenklingen runda av dem för att nå ett lägre antal.

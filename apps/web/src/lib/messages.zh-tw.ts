@@ -1991,6 +1991,8 @@ export const MESSAGES_ZH_TW: Partial<Record<MessageKey, string>> = {
   "status.exportedStepMany": "已匯出 STEP B-Rep，含 {count} 個實體{skipNote}",
   "status.importedFile": "已匯入 {name}。",
   "status.importedFiles": "已匯入 {count}/{total} 個檔案。",
+  "status.largeMeshes": "此設計現在包含 {count} 個匯入網格的三角形。layerling 主要用於精確的 CAD 實體：這麼大的網格可能會讓它變慢、佔用大量記憶體並拖慢儲存。簡化網格（在實體上按右鍵）可以讓它們變輕。",
+  "status.largeMeshesGuide": "了解更多",
   "status.importFailedList": "未匯入：{details}{more}。",
   "status.importFailedMore": " 以及另外 {count} 項",
   "status.importColoredParts": "{name} 有 {count} 種顏色，將作為 {count} 個實體匯入，各自位於原位並一起選取。",

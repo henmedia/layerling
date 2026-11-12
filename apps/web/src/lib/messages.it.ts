@@ -2027,6 +2027,8 @@ export const MESSAGES_IT: Partial<Record<MessageKey, string>> = {
   "status.exportedStepMany": "B-Rep STEP esportato con {count} corpi{skipNote}",
   "status.importedFile": "{name} importato.",
   "status.importedFiles": "Importati {count} file su {total}.",
+  "status.largeMeshes": "Questo progetto contiene ora {count} triangoli in mesh importate. layerling è fatto soprattutto per corpi CAD esatti: mesh così grandi possono rallentarlo, occupare molta memoria e rallentare il salvataggio. Semplifica mesh (clic destro sul corpo) le alleggerisce.",
+  "status.largeMeshesGuide": "Per saperne di più",
   "status.importFailedList": "File non importati: {details}{more}.",
   "status.importFailedMore": " e altri {count}",
   "status.importColoredParts": "{name} contiene {count} colori ed è stato importato come {count} corpi, ciascuno nella propria posizione e selezionati insieme.",

@@ -136,6 +136,10 @@ Un progetto salvato con una **versione più recente di layerling** può contener
 
 Le immagini modello si aggiungono in modalità schizzo; vedi [Schizzi](chapter:sketches).
 
+## Mesh grandi
+
+layerling è fatto soprattutto per costruire corpi CAD esatti: un cilindro viene salvato come un cerchio e un'altezza, un raccordo come un'unica faccia curva. Una mesh importata è invece un'approssimazione fatta di triangoli, tanto più numerosi quanto più è fine, e ognuno di essi resta in memoria, viene disegnato e salvato. Pezzi piccoli come mesh non sono un problema. Mesh molto grandi, come scansioni, sculture o modelli da Blender con centinaia di migliaia o milioni di triangoli, rallentano l'editor, occupano molta memoria e rallentano il salvataggio, e tagliarle potrebbe non riuscire affatto. Dopo un'importazione che porta mesh di questo tipo, layerling lo segnala una volta. Semplifica prima una mesh del genere (vedi sotto), importa solo i pezzi che ti servono, oppure costruisci i pezzi semplici con le forme di layerling.
+
 ## Semplificare una mesh importata
 
 Una mesh acquisita con una scansione o creata scolpendo spesso ha molti più triangoli del necessario; tutti vengono elaborati quando sposti, tagli o salvi il modello. {{ui:simplify.title}}, nel gruppo Modifica o nel menu contestuale del corpo, mostra la mesh originale accanto al risultato che si otterrebbe mantenendo la percentuale scelta di triangoli. Puoi ruotare e ingrandire entrambe le viste insieme con i pulsanti del mouse usati sul piano di lavoro. Imposta la percentuale o il numero di triangoli da conservare e {{ui:simplify.apply}} crea la mesh alleggerita. Il risultato è una mesh semplice: se semplifichi il risultato di un taglio o di un’unione, {{ui:group.edit}} e le parti originali vengono eliminati. Con {{ui:simplify.keepEdges}} attivo, come è all'inizio, gli spigoli vivi e i bordi dei fori restano esattamente dove sono, mentre le facce piane perdono comunque la maggior parte dei triangoli; disattivato, la semplificazione può arrotondarli per scendere di più.

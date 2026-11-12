@@ -140,6 +140,10 @@ A design saved with a **newer layerling** may hold things your version does not 
 
 Template pictures are added in sketch mode, see [Sketches](chapter:sketches).
 
+## Large meshes
+
+layerling is made first of all for building exact CAD bodies: a cylinder is stored as a circle and a height, a rounding as one curved face. An imported mesh is an approximation made of triangles, the finer the more of them, and every one of them is held in memory, drawn and saved. Smaller parts as meshes are no problem. Very large meshes, such as scans, sculpts or models from Blender with hundreds of thousands or millions of triangles, make the editor slower, take a lot of memory and make saving slow, and cutting them may not work at all. After an import that brings such meshes in, layerling says so once. Simplify such a mesh first (see below), import only the parts you need, or build simple parts from layerling's own shapes.
+
 ## Simplifying an imported mesh
 
 A scanned or sculpted mesh often has far more triangles than its shape needs, and every one of them is carried along while you move, cut and save. {{ui:simplify.title}} in the Modify group (or in the right-click menu of the body) shows the mesh as it is next to what a chosen share of its triangles would leave of it; both views turn and zoom together with the mouse buttons of the workplane. Set how much to keep as a percentage or a number of triangles, and {{ui:simplify.apply}} takes the lighter mesh. The result is a plain mesh: for the result of a cut or merge, {{ui:group.edit}} and its original parts are given up. With {{ui:simplify.keepEdges}} switched on, as it is to begin with, sharp edges and the rims of holes stay exactly where they are while flat faces still lose most of their triangles; switched off, the simplifier may round them off to reach a lower count.

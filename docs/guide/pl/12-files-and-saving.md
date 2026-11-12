@@ -140,6 +140,10 @@ Projekt zapisany w **nowszej wersji layerling** może zawierać rzeczy, których
 
 Obrazy wzorcowe dodaje się w trybie szkicu, zobacz [Szkice](chapter:sketches).
 
+## Duże siatki
+
+layerling jest stworzony przede wszystkim do budowania dokładnych brył CAD: walec zapisuje się jako okrąg i wysokość, zaokrąglenie jako jedną zakrzywioną powierzchnię. Zaimportowana siatka to natomiast przybliżenie z trójkątów, im dokładniejsze, tym ich więcej, a każdy z nich jest trzymany w pamięci, rysowany i zapisywany. Mniejsze części jako siatki nie stanowią problemu. Bardzo duże siatki, takie jak skany, rzeźby czy modele z Blendera z setkami tysięcy lub milionami trójkątów, spowalniają edytor, zajmują dużo pamięci i spowalniają zapisywanie, a ich cięcie może w ogóle się nie udać. Po imporcie, który wnosi takie siatki, layerling raz o tym informuje. Najpierw uprość taką siatkę (zobacz niżej), importuj tylko potrzebne części albo zbuduj proste części z własnych kształtów layerlinga.
+
 ## Upraszczanie zaimportowanej siatki
 
 Zeskanowana albo rzeźbiona siatka często ma dużo więcej trójkątów, niż potrzebuje jej kształt, a każdy z nich jest przenoszony podczas przesuwania, cięcia i zapisu. {{ui:simplify.title}} w grupie Modyfikuj (albo w menu prawego przycisku na bryle) pokazuje siatkę taką, jaka jest, obok tego, co zostałoby z niej przy wybranym odsetku trójkątów. Oba widoki obracają się i przybliżają razem przyciskami myszy jak na płaszczyźnie roboczej. Ustaw, ile zachować, w procentach albo jako liczbę trójkątów, a {{ui:simplify.apply}} bierze lżejszą siatkę. Wynik to zwykła siatka: dla wyniku cięcia albo scalenia rezygnujesz z {{ui:group.edit}} i jego oryginalnych części. Z włączoną opcją {{ui:simplify.keepEdges}}, jak na początku, ostre krawędzie i brzegi otworów zostają dokładnie na miejscu, a płaskie ściany i tak tracą większość trójkątów; po wyłączeniu upraszczanie może je zaokrąglić, by zejść niżej.

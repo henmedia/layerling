@@ -1490,6 +1490,8 @@ export const MESSAGES_SL: Partial<Record<MessageKey, string>> = {
   "status.exportedStepMany": "Izvožen STEP B-Rep, teles: {count}{skipNote}",
   "status.importedFile": "Uvoženo: {name}.",
   "status.importedFiles": "Uvoženih datotek: {count} od {total}.",
+  "status.largeMeshes": "Ta projekt ima zdaj {count} trikotnikov v uvoženih mrežah. layerling je narejen predvsem za natančna CAD telesa: tako velike mreže ga lahko upočasnijo, zasedejo veliko pomnilnika in upočasnijo shranjevanje. Poenostavi mrežo (desni klik na telo) jih olajša.",
+  "status.largeMeshesGuide": "Več o tem",
   "status.importFailedList": "Ni uvoženo: {details}{more}.",
   "status.importFailedMore": " in še {count}",
   "status.importColoredParts": "{name} ima barv: {count} in se uvozi kot teles: {count}, vsako na svojem mestu in skupaj izbrana.",

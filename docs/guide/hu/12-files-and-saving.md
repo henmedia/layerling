@@ -136,6 +136,10 @@ Egy **újabb layerlinggel** mentett terv olyasmit tartalmazhat, amit a te verzi�
 
 A mintaképeket vázlatmódban adod hozzá, lásd a [Vázlatok](chapter:sketches) fejezetet.
 
+## Nagy hálók
+
+A layerling elsősorban pontos CAD-testek építésére készült: egy henger körként és magasságként, egy lekerekítés egyetlen görbült felületként tárolódik. Egy importált háló ezzel szemben háromszögekből álló közelítés, minél finomabb, annál több háromszöggel, és mindegyik a memóriában van, kirajzolódik és mentődik. Kisebb alkatrészek hálóként nem gondot okoznak. A nagyon nagy hálók, például szkennek, szobrok vagy Blenderből származó modellek százezres vagy milliós háromszögszámmal, lelassítják a szerkesztőt, sok memóriát foglalnak és lassítják a mentést, és a vágásuk akár egyáltalán nem sikerül. Ha egy importálás ilyen hálókat hoz be, a layerling ezt egyszer jelzi. Az ilyen hálót először egyszerűsítsd (lásd lent), csak a szükséges alkatrészeket importáld, vagy az egyszerű részeket a layerling saját alakzataiból építsd meg.
+
 ## Importált háló egyszerűsítése
 
 Egy szkennelt vagy szobrászprogramban készült háló gyakran sokkal több háromszögből áll, mint amennyi az alakjához kell, és mindegyiket magával cipeli mozgatáskor, vágáskor és mentéskor. A Módosítás csoportban (vagy a test jobb gombos menüjében) a {{ui:simplify.title}} a hálót a jelenlegi állapotában mutatja amellé, ami a háromszögek kiválasztott hányadából maradna belőle; mindkét nézet együtt forog és nagyít a munkasík egérgombjaival. Add meg százalékban vagy háromszögszámban, mennyi maradjon meg, és az {{ui:simplify.apply}} a könnyebb hálót veszi át. Az eredmény egyszerű háló: egy vágás vagy egyesítés eredményénél a {{ui:group.edit}} és az eredeti részek elvesznek. Bekapcsolt {{ui:simplify.keepEdges}} mellett – kezdetben így áll – az éles élek és a furatok peremei pontosan a helyükön maradnak, a sík lapok viszont így is elveszítik háromszögeik nagy részét; kikapcsolva az egyszerűsítés le is kerekítheti őket, hogy kevesebb háromszög maradjon.

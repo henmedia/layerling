@@ -2031,6 +2031,8 @@ export const MESSAGES_SV: Partial<Record<MessageKey, string>> = {
   "status.exportedStepMany": "Exporterade STEP B-Rep med {count} kroppar{skipNote}",
   "status.importedFile": "Importerade {name}.",
   "status.importedFiles": "Importerade {count} av {total} filer.",
+  "status.largeMeshes": "Den här designen innehåller nu {count} trianglar i importerade mesh. layerling är framför allt gjort för exakta CAD-kroppar: så stora mesh kan göra det långsamt, ta mycket minne och göra sparandet långsamt. Förenkla mesh (högerklick på kroppen) gör dem lättare.",
+  "status.largeMeshesGuide": "Läs mer",
   "status.importFailedList": "Inte importerade: {details}{more}.",
   "status.importFailedMore": " och {count} till",
   "status.importColoredParts": "{name} har {count} färger och kommer in som {count} kroppar, var och en på sin plats och markerade tillsammans.",

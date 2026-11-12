@@ -11,6 +11,8 @@ import { SAVED_VIEW_KEYS } from "@/lib/designView";
 import * as THREE from "three";
 import type { AppThemePreference, ResolvedAppTheme } from "@/lib/appTheme";
 import { getLanguage, numberLocale, t, type MessageKey } from "@/lib/i18n";
+import { guideHref } from "@/lib/guideLinks";
+import { largeMeshWarningTriangles } from "@/lib/largeMeshes";
 import { isObjectListOrder, moveShapeBefore, sortObjectList } from "@/lib/objectListSearch";
 import { useLanguage } from "@/lib/useLanguage";
 import { loftShapePatch, normalizeLoftMiddles, type LoftMeasures } from "@/lib/loftGeometry";
@@ -13065,7 +13067,7 @@ export function LayerlingEditor({
   }, [beginSketch, sectionSketchAt, sketchActive]);
 
   // Der Dateiimport steht weiter unten; die MCP-Aktion nimmt denselben Weg.
-  const importFilesRef = useRef<((files: File[], fileHandle?: LylFileHandle, options?: { keepSvgPage?: boolean; svgWidth?: number | null }) => Promise<{ importedIds: string[]; failures: Array<{ fileName: string; reason: string }> }>) | null>(null);
+  const importFilesRef = useRef<((files: File[], fileHandle?: LylFileHandle, options?: { keepSvgPage?: boolean; svgWidth?: number | null }) => Promise<{ importedIds: string[]; failures: Array<{ fileName: string; reason: string }>; warning?: string }>) | null>(null);
 
   const {
     customShapeEntries, customShapeFolders, serverAvailable: customShapesServerAvailable, myShapesFileInputRef,
@@ -16227,6 +16229,8 @@ export function LayerlingEditor({
         return {
           imported: imported.map((shape) => ({ id: shape.id, name: shape.name, color: shape.color, width: shape.width, depth: shape.depth, height: shape.height, x: shape.x, z: shape.z, elevation: shape.elevation ?? 0 })),
           failures: result.failures,
+          // The editor's own warning about very large meshes (Discussion #1652), when it gave one.
+          ...(result.warning ? { warning: result.warning } : {}),
         };
       }
 
@@ -17768,7 +17772,7 @@ export function LayerlingEditor({
     if (await insertDesignFile(file)) setTopPanel(null);
   }, [insertDesignFile]);
 
-  const importFiles = useCallback(async (selected: File[], fileHandle?: LylFileHandle, importOptions?: { keepSvgPage?: boolean; svgWidth?: number | null }): Promise<{ importedIds: string[]; failures: Array<{ fileName: string; reason: string }> }> => {
+  const importFiles = useCallback(async (selected: File[], fileHandle?: LylFileHandle, importOptions?: { keepSvgPage?: boolean; svgWidth?: number | null }): Promise<{ importedIds: string[]; failures: Array<{ fileName: string; reason: string }>; warning?: string }> => {
     const none = { importedIds: [] as string[], failures: [] as Array<{ fileName: string; reason: string }> };
     if (!selected.length) return none;
     const projectFiles = selected.filter((file) => /\.(lyl|skf)$/i.test(file.name));
@@ -17838,13 +17842,19 @@ export function LayerlingEditor({
     const nextAssets = dedupeProjectAssets([...projectAssetsRef.current, ...importedAssets]);
     projectAssetsRef.current = nextAssets;
     setProjectAssets(nextAssets);
-    commitShapes(
-      [...shapesRef.current, ...importedShapes],
-      importedShapes.map((shape) => shape.id),
-      [successSummary, ...notes].join(" ") + failureSummary,
-    );
+    const designAfter = [...shapesRef.current, ...importedShapes];
+    const importMessage = [successSummary, ...notes].join(" ") + failureSummary;
+    commitShapes(designAfter, importedShapes.map((shape) => shape.id), importMessage);
     setTopPanel(null);
-    return { importedIds: importedShapes.map((shape) => shape.id), failures };
+    // Very large meshes make the editor slow and saving slow (Discussion #1652): said once, after the import that brings them,
+    // and it stays until closed, with the way to the guide.
+    const largeTriangles = largeMeshWarningTriangles(importedShapes, designAfter);
+    const warning = largeTriangles === null ? undefined : t("status.largeMeshes", { count: formatTriangleCount(largeTriangles) });
+    if (warning) {
+      const href = guideHref(getLanguage(), undefined, "largeMeshes");
+      setNotice(`${importMessage} ${warning}`, "stay", { label: t("status.largeMeshesGuide"), run: () => window.open(href, "_blank", "noopener") });
+    }
+    return { importedIds: importedShapes.map((shape) => shape.id), failures, warning };
   }, [commitShapes, onOpenLylProjectFile, ontoActivePlate]);
   importFilesRef.current = importFiles;
 

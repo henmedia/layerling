@@ -2036,6 +2036,8 @@ export const MESSAGES_DE: Record<MessageKey, string> = {
   "status.exportedStepMany": "STEP-B-Rep mit {count} Körpern exportiert{skipNote}",
   "status.importedFile": "Importiert: {name}.",
   "status.importedFiles": "{count} von {total} Dateien importiert.",
+  "status.largeMeshes": "Dieser Entwurf enthält jetzt {count} Dreiecke in importierten Netzen. layerling ist vor allem für exakte CAD-Körper gemacht: So große Netze können es langsam machen, viel Speicher belegen und das Speichern verlangsamen. Netz vereinfachen (Rechtsklick auf den Körper) macht sie leichter.",
+  "status.largeMeshesGuide": "Mehr dazu",
   "status.importFailedList": "Nicht importiert: {details}{more}.",
   "status.importFailedMore": " und {count} weitere",
   "status.importColoredParts": "{name} hat {count} Farben und kommt als {count} Körper, alle an ihrem Platz und gemeinsam ausgewählt.",

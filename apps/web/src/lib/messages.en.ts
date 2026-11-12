@@ -2037,6 +2037,8 @@ export const MESSAGES_EN = {
   "status.exportedStepMany": "Exported STEP B-Rep with {count} bodies{skipNote}",
   "status.importedFile": "Imported {name}.",
   "status.importedFiles": "Imported {count} of {total} files.",
+  "status.largeMeshes": "This design now holds {count} triangles in imported meshes. layerling is made first of all for exact CAD bodies: meshes this large can make it slow, take a lot of memory and make saving slow. Simplify mesh (right-click on the body) makes them lighter.",
+  "status.largeMeshesGuide": "Read more",
   "status.importFailedList": "Not imported: {details}{more}.",
   "status.importFailedMore": " and {count} more",
   "status.importColoredParts": "{name} has {count} colours and comes in as {count} bodies, each in its place and selected together.",

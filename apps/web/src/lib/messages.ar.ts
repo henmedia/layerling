@@ -2035,6 +2035,8 @@ export const MESSAGES_AR: Partial<Record<MessageKey, string>> = {
   "status.exportedStepMany": "تم تصدير STEP B-Rep، عدد الأجسام: {count}{skipNote}",
   "status.importedFile": "تم استيراد {name}.",
   "status.importedFiles": "تم استيراد {count} من أصل {total} ملفًا.",
+  "status.largeMeshes": "يحتوي هذا التصميم الآن على {count} مثلث في شبكات مستوردة. صُمّم layerling أساسًا للأجسام CAD الدقيقة: الشبكات بهذا الحجم قد تبطئه وتستهلك ذاكرة كبيرة وتبطئ الحفظ. تبسيط الشبكة (نقرة يمنى على الجسم) يجعلها أخف.",
+  "status.largeMeshesGuide": "اقرأ المزيد",
   "status.importFailedList": "لم يتم استيراد: {details}{more}.",
   "status.importFailedMore": " و{count} غيرها",
   "status.importColoredParts": "{name} فيه ألوان عددها {count}، ويدخل كأجسام عددها {count}، كل منها في مكانه، ومحددة معًا.",

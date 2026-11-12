@@ -2025,6 +2025,8 @@ export const MESSAGES_FR: Partial<Record<MessageKey, string>> = {
   "status.exportedStepMany": "STEP B-Rep exporté avec {count} corps{skipNote}",
   "status.importedFile": "{name} importé.",
   "status.importedFiles": "{count} fichiers importés sur {total}.",
+  "status.largeMeshes": "Ce dessin contient maintenant {count} triangles dans des maillages importés. layerling est fait avant tout pour des corps CAO exacts : des maillages aussi gros peuvent le ralentir, prendre beaucoup de mémoire et ralentir l'enregistrement. Simplifier le maillage (clic droit sur le corps) les allège.",
+  "status.largeMeshesGuide": "En savoir plus",
   "status.importFailedList": "Non importé : {details}{more}.",
   "status.importFailedMore": "et {count} autres",
   "status.importColoredParts": "{name} a {count} couleurs et se présente sous forme de {count} corps, chacun à sa place et tous sélectionnés.",

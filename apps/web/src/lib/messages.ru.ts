@@ -2032,6 +2032,8 @@ export const MESSAGES_RU: Partial<Record<MessageKey, string>> = {
   "status.exportedStepMany": "Экспортирован STEP B-Rep, тел: {count}{skipNote}",
   "status.importedFile": "Импортирован {name}.",
   "status.importedFiles": "Импортировано файлов: {count} из {total}.",
+  "status.largeMeshes": "В этом проекте теперь {count} треугольников в импортированных сетках. layerling создан прежде всего для точных CAD-тел: такие большие сетки могут замедлить его, занять много памяти и замедлить сохранение. Упрощение сетки (правый клик по телу) делает их легче.",
+  "status.largeMeshesGuide": "Подробнее",
   "status.importFailedList": "Не импортировано: {details}{more}.",
   "status.importFailedMore": "и ещё {count}",
   "status.importColoredParts": "{name}: цветов — {count}, тел — {count}; каждое на своём месте, все выделены вместе.",

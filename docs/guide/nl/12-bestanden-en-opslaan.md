@@ -134,6 +134,10 @@ Een ontwerp dat met een **nieuwere layerling** is opgeslagen, kan dingen bevatte
 
 Sjabloonafbeeldingen voeg je toe in de schetsmodus, zie [Schetsen](chapter:schetsen).
 
+## Grote meshes
+
+layerling is in de eerste plaats gemaakt om exacte CAD-lichamen te bouwen: een cilinder wordt opgeslagen als een cirkel en een hoogte, een afronding als één gebogen vlak. Een geïmporteerde mesh is daarentegen een benadering uit driehoeken, hoe fijner, hoe meer, en elk daarvan staat in het geheugen, wordt getekend en opgeslagen. Kleinere onderdelen als mesh zijn geen probleem. Zeer grote meshes, zoals scans, sculpturen of modellen uit Blender met honderdduizenden of miljoenen driehoeken, maken de editor trager, kosten veel geheugen en vertragen het opslaan, en snijden lukt er misschien helemaal niet mee. Na een import die zulke meshes binnenhaalt, meldt layerling dat één keer. Vereenvoudig zo'n mesh eerst (zie hieronder), importeer alleen de onderdelen die je nodig hebt, of bouw eenvoudige onderdelen met de eigen vormen van layerling.
+
 ## Een geïmporteerde mesh vereenvoudigen
 
 Een gescande of geboetseerde mesh heeft vaak veel meer driehoeken dan zijn vorm nodig heeft, en elk daarvan wordt meegesleept terwijl je verplaatst, snijdt en opslaat. {{ui:simplify.title}} in de groep Aanpassen (of in het rechtsklikmenu van het lichaam) toont de mesh zoals hij is naast wat een gekozen deel van zijn driehoeken ervan zou overlaten; beide weergaven draaien en zoomen samen met de muisknoppen van het werkvlak. Stel in hoeveel er moet blijven, als percentage of als aantal driehoeken, en {{ui:simplify.apply}} neemt de lichtere mesh over. Het resultaat is een gewone mesh: bij het resultaat van een snede of samenvoeging worden {{ui:group.edit}} en de oorspronkelijke onderdelen opgegeven. Met {{ui:simplify.keepEdges}} aan, zoals het in het begin staat, blijven scherpe randen en de randen van gaten precies waar ze zijn, terwijl vlakke delen toch de meeste driehoeken verliezen; uit mag het vereenvoudigen ze afronden om lager uit te komen.

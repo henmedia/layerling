@@ -140,6 +140,10 @@ Et design gemt med en **nyere layerling** kan indeholde ting din version ikke ke
 
 Skabelonbilleder tilføjes i skitsetilstand, se [Skitser](chapter:sketches).
 
+## Store mesh
+
+layerling er først og fremmest lavet til at bygge eksakte CAD-legemer: en cylinder gemmes som en cirkel og en højde, en afrunding som én krum flade. Et importeret mesh er derimod en tilnærmelse af trekanter, jo finere, jo flere, og hver af dem ligger i hukommelsen, tegnes og gemmes. Mindre dele som mesh er intet problem. Meget store mesh, som scanninger, skulpturer eller modeller fra Blender med hundredtusinder eller millioner af trekanter, gør editoren langsommere, optager meget hukommelse og gør gemning langsom, og det er ikke sikkert, at de kan skæres i. Efter en import, der bringer sådanne mesh ind, siger layerling det én gang. Forenkl sådan et mesh først (se nedenfor), importer kun de dele, du har brug for, eller byg enkle dele af layerlings egne former.
+
 ## Forenkling af et importeret mesh
 
 Et scannet eller skulptureret mesh har ofte langt flere trekanter end dets form har brug for, og hver eneste af dem bæres med mens du flytter, skærer og gemmer. {{ui:simplify.title}} i Modificér-gruppen (eller i højreklik-menuen på formen) viser meshet som det er ved siden af hvad en valgt andel af dets trekanter ville efterlade af det; begge visninger drejer og zoomer sammen med arbejdsplanets museknapper. Sæt hvor meget der skal beholdes som en procent eller et antal trekanter, og {{ui:simplify.apply}} tager det lettere mesh. Resultatet er et almindeligt mesh: for resultatet af en skæring eller sammenfletning opgives {{ui:group.edit}} og dets originale dele. Med {{ui:simplify.keepEdges}} slået til, som det er fra start, bliver skarpe kanter og kanterne af huller præcis, hvor de er, mens plane flader stadig mister de fleste trekanter; slået fra må forenklingen runde dem af for et lavere antal.

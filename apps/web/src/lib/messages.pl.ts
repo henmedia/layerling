@@ -1992,6 +1992,8 @@ export const MESSAGES_PL: Partial<Record<MessageKey, string>> = {
   "status.exportedStepMany": "Wyeksportowano STEP B-Rep, bryły: {count}{skipNote}",
   "status.importedFile": "Zaimportowano {name}.",
   "status.importedFiles": "Zaimportowano pliki: {count} z {total}.",
+  "status.largeMeshes": "Ten projekt zawiera teraz {count} trójkątów w zaimportowanych siatkach. layerling jest stworzony przede wszystkim do dokładnych brył CAD: tak duże siatki mogą go spowolnić, zająć dużo pamięci i spowolnić zapisywanie. Uprość siatkę (prawy klik na bryle) je odchudzi.",
+  "status.largeMeshesGuide": "Więcej",
   "status.importFailedList": "Nie zaimportowano: {details}{more}.",
   "status.importFailedMore": " i jeszcze {count}",
   "status.importColoredParts": "Kolory w {name}: {count}. Plik trafia jako bryły ({count}), każda na swoim miejscu, zaznaczone razem.",
