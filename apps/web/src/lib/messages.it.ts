@@ -4282,6 +4282,8 @@ export const MESSAGES_IT: Partial<Record<MessageKey, string>> = {
   "prop.screwHoleChamfer": "Smusso del bordo",
   "prop.screwHoleChamferHint": "Uno smusso a 45° sul bordo superiore della sede, profondo così. Si apre fuori dal diametro della testa, quindi la testa della vite entra ancora; 0 lascia lo spigolo vivo.",
   "prop.screwHoleLength": "Lunghezza totale",
+  "prop.screwHoleLengthBelowHead": "Lunghezza sotto la testa",
+  "prop.screwHoleLengthBelowHeadHint": "Le viti a testa cilindrica si misurano da sotto la testa. Inserisci qui la loro lunghezza: la profondità della testa viene aggiunta per la lunghezza totale.",
   "prop.holeBottom": "Fondo",
   "holeBottom.flat": "Piatto",
   "holeBottom.drillPoint": "Cono della punta {angle}°",

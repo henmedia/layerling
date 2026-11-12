@@ -4295,6 +4295,8 @@ export const MESSAGES_EN = {
   "prop.screwHoleChamfer": "Rim chamfer",
   "prop.screwHoleChamferHint": "A 45° chamfer at the top edge of the pocket, this deep. It opens outside the head diameter, so the screw head still fits; 0 leaves the edge sharp.",
   "prop.screwHoleLength": "Total length",
+  "prop.screwHoleLengthBelowHead": "Length below head",
+  "prop.screwHoleLengthBelowHeadHint": "Socket head cap screws are measured from under the head. Enter their length here and the head depth is added to make the total length.",
   "prop.holeBottom": "Bottom",
   "holeBottom.flat": "Flat",
   "holeBottom.drillPoint": "Drill point {angle}°",

@@ -254,6 +254,8 @@ microSD 卡槽也是左边缘的接口，位于电路板下方（Zero 2 W 上在
 
 要去掉沉孔边缘的锐边，在{{ui:shape.counterbore}}上设置{{ui:prop.screwHoleChamfer}}（Discussion #1632）：沉孔顶部随之以 45 度向外展开这么多毫米。倒角位于{{ui:prop.screwHoleHead}}之外，螺钉头仍然放得下，并且它始终比{{ui:prop.screwHoleHeadDepth}}浅。设为 0 时边缘保持原来的锐边；腰形孔同样可以使用，并且仍是精确实体。
 
+内六角圆柱头螺钉按头部下方的长度出售，沉头螺钉按含头部的长度出售。因此{{ui:shape.counterbore}}有第二个字段 {{ui:prop.screwHoleLengthBelowHead}}（Discussion #1670）：在那里输入螺钉长度，会加上 {{ui:prop.screwHoleHeadDepth}} 得到 {{ui:prop.screwHoleLength}}。M3 × 12 的螺钉配 3.2 mm 的沉孔，得到长 15.2 mm 的孔。锥形沉孔仍只有一个长度。
+
 {{ui:shape.finishingWasher}}（一种装饰垫圈，Discussion #1131）是放在沉头或半沉头螺钉下面的拱形垫圈，用于在木头或盖板上显得整洁。它是实心件，底面平；从较低的边缘起，拱顶升到座面，座面是承托螺钉头的锥面，下面是孔。在 {{ui:prop.screwHoleSize}} 下选择 M2 到 M20：孔是该规格的过孔，座面是该规格的沉头孔，{{ui:prop.diameter}} 和 {{ui:prop.height}} 由此得出（M3：10.3 × 2.95 mm，M6：16.6 × 4.5 mm）。你也可以自己设定 {{ui:prop.diameter}}、{{ui:prop.height}}、{{ui:prop.centerHole}}、座面顶部的 {{ui:prop.screwHoleHead}} 及其 {{ui:prop.screwHoleAngle}}。它保持圆形，并且是精确实体，因此边工具和 STEP 都能处理它。
 
 ## 螺丝柱

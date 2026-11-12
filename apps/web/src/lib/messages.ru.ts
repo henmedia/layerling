@@ -4288,6 +4288,8 @@ export const MESSAGES_RU: Partial<Record<MessageKey, string>> = {
   "prop.screwHoleChamfer": "Фаска по краю",
   "prop.screwHoleChamferHint": "Фаска 45° по верхней кромке цековки такой глубины. Она расходится за пределы диаметра головки, так что головка винта по-прежнему входит; 0 оставляет кромку острой.",
   "prop.screwHoleLength": "Общая длина",
+  "prop.screwHoleLengthBelowHead": "Длина под головкой",
+  "prop.screwHoleLengthBelowHeadHint": "Винты с цилиндрической головкой измеряют от нижней стороны головки. Введите здесь их длину, и к ней прибавится глубина головки до общей длины.",
   "prop.holeBottom": "Дно",
   "holeBottom.flat": "Плоское",
   "holeBottom.drillPoint": "Конус сверла {angle}°",

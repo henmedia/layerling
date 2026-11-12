@@ -258,6 +258,8 @@ Hlava zápustného šroubu lícuje s povrchem. Chcete-li ji zapustit hlouběji, 
 
 Chcete-li srazit ostrou hranu na okraji zahloubení, nastavte u {{ui:shape.counterbore}} {{ui:prop.screwHoleChamfer}} (Discussion #1632): horní část zahloubení se pak rozevře pod úhlem 45 stupňů o tolik milimetrů. Zkosení leží vně {{ui:prop.screwHoleHead}}, takže hlava šroubu stále pasuje, a zůstává mělčí než {{ui:prop.screwHoleHeadDepth}}. Při 0 zůstane hrana ostrá jako dosud; podélný otvor ho přijme také a zůstává přesným tělesem.
 
+Šrouby s válcovou hlavou se prodávají podle délky pod hlavou, zápustné šrouby podle délky včetně hlavy. {{ui:shape.counterbore}} má proto druhé pole, {{ui:prop.screwHoleLengthBelowHead}} (Discussion #1670): zadejte do něj délku šroubu a {{ui:prop.screwHoleHeadDepth}} se k ní přičte na {{ui:prop.screwHoleLength}}. Šroub M3 × 12 se zahloubením 3,2 mm dá otvor dlouhý 15,2 mm. Kuželové zahloubení má dál jedinou délku.
+
 {{ui:shape.finishingWasher}} (rozeta, Discussion #1131) je vypouklá podložka pod zápustný nebo čočkový zápustný šroub, pro úhledný vzhled na dřevě nebo krytu. Je to plný díl, zespodu plochý; z nízkého okraje stoupá kopule k sedlu, kuželu pro hlavu šroubu, s vrtáním pod ním. V {{ui:prop.screwHoleSize}} zvolíte M2 až M20: vrtání je průchozí otvor a sedlo zahloubení této velikosti, {{ui:prop.diameter}} a {{ui:prop.height}} z nich vyplynou (M3: 10,3 × 2,95 mm, M6: 16,6 × 4,5 mm). {{ui:prop.diameter}}, {{ui:prop.height}}, {{ui:prop.centerHole}}, {{ui:prop.screwHoleHead}} nahoře v sedle a jeho {{ui:prop.screwHoleAngle}} můžete nastavit i sami. Zůstává kulatá a je přesným tělesem, takže na ní funguje nástroj hran i STEP.
 
 ## Šroubový sloupek

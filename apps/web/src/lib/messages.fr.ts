@@ -4281,6 +4281,8 @@ export const MESSAGES_FR: Partial<Record<MessageKey, string>> = {
   "prop.screwHoleChamfer": "Chanfrein du bord",
   "prop.screwHoleChamferHint": "Un chanfrein à 45° sur l'arête supérieure du lamage, de cette profondeur. Il s'ouvre en dehors du diamètre de la tête, la tête de vis y entre donc toujours ; 0 laisse l'arête vive.",
   "prop.screwHoleLength": "Longueur totale",
+  "prop.screwHoleLengthBelowHead": "Longueur sous tête",
+  "prop.screwHoleLengthBelowHeadHint": "Les vis à tête cylindrique se mesurent sous la tête. Saisissez ici leur longueur : la profondeur de la tête s'y ajoute pour donner la longueur totale.",
   "prop.holeBottom": "Fond",
   "holeBottom.flat": "Plat",
   "holeBottom.drillPoint": "Pointe de foret {angle}°",

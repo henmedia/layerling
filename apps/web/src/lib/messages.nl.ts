@@ -4295,6 +4295,8 @@ export const MESSAGES_NL: Record<MessageKey, string> = {
   "prop.screwHoleChamfer": "Afschuining van de rand",
   "prop.screwHoleChamferHint": "Een afschuining van 45° aan de bovenrand van de verzinking, zo diep. Ze opent buiten de kopdiameter, dus de schroefkop past nog; 0 laat de rand scherp.",
   "prop.screwHoleLength": "Totale lengte",
+  "prop.screwHoleLengthBelowHead": "Lengte onder de kop",
+  "prop.screwHoleLengthBelowHeadHint": "Cilinderkopschroeven meet je vanaf de onderkant van de kop. Vul hun lengte hier in; de kopdiepte komt erbij en dat geeft de totale lengte.",
   "prop.holeBottom": "Bodem",
   "holeBottom.flat": "Vlak",
   "holeBottom.drillPoint": "Boorpunt {angle}°",

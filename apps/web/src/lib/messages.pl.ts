@@ -4232,6 +4232,8 @@ export const MESSAGES_PL: Partial<Record<MessageKey, string>> = {
   "prop.screwHoleChamfer": "Fazka krawędzi",
   "prop.screwHoleChamferHint": "Fazka 45° na górnej krawędzi pogłębienia, o tej głębokości. Otwiera się poza średnicą łba, więc łeb śruby nadal się mieści; 0 zostawia ostrą krawędź.",
   "prop.screwHoleLength": "Długość całkowita",
+  "prop.screwHoleLengthBelowHead": "Długość pod łbem",
+  "prop.screwHoleLengthBelowHeadHint": "Śruby z łbem walcowym mierzy się od spodu łba. Wpisz tu ich długość, a głębokość łba zostanie dodana do długości całkowitej.",
   "prop.holeBottom": "Dno",
   "holeBottom.flat": "Płaskie",
   "holeBottom.drillPoint": "Stożek wiertła {angle}°",

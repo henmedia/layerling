@@ -3353,6 +3353,8 @@ export const MESSAGES_SL: Partial<Record<MessageKey, string>> = {
   "prop.screwHoleChamfer": "Posnetje roba",
   "prop.screwHoleChamferHint": "Posnetje pod 45° na zgornjem robu poglobitve, tako globoko. Odpre se zunaj premera glave, zato glava vijaka še vedno pade vanjo; 0 pusti rob oster.",
   "prop.screwHoleLength": "Skupna dolžina",
+  "prop.screwHoleLengthBelowHead": "Dolžina pod glavo",
+  "prop.screwHoleLengthBelowHeadHint": "Vijake s cilindrično glavo merimo od spodnje strani glave. Tukaj vnesi njihovo dolžino in globina glave se ji prišteje v skupno dolžino.",
   "prop.holeBottom": "Dno",
   "holeBottom.flat": "Ravno",
   "holeBottom.drillPoint": "Konica svedra {angle}°",

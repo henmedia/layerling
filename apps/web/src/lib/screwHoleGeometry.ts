@@ -69,6 +69,20 @@ export function normalizeScrewHoleHeadDepth(value: number | undefined, height: n
 }
 
 /**
+ * A counterbore's length below the head (Discussion #1670): socket head cap screws are sold by the length under the
+ * head (ISO 4762), so this is the hole's whole length less its pocket.
+ */
+export function screwHoleLengthBelowHead(height: number, screwHoleHeadDepth: number | undefined) {
+  return Math.max(0, height - normalizeScrewHoleHeadDepth(screwHoleHeadDepth, height));
+}
+
+/** The whole length that leaves this much below a counterbore's head, the pocket keeping the depth set for it. */
+export function screwHoleHeightForLengthBelowHead(lengthBelowHead: number, screwHoleHeadDepth: number | undefined) {
+  const headDepth = Math.max(0.1, Number.isFinite(screwHoleHeadDepth) ? (screwHoleHeadDepth as number) : DEFAULT_SCREW_HOLE_HEAD_DEPTH);
+  return Math.max(MIN_SHAFT_LENGTH, lengthBelowHead) + headDepth;
+}
+
+/**
  * How far a countersink's head sits below the face (Discussion #1531), 0 for flush. It leaves the cone and some
  * shaft room: at most the length less a little shaft, on the double countersink half of that at each end.
  */

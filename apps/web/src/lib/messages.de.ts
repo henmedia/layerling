@@ -4294,6 +4294,8 @@ export const MESSAGES_DE: Record<MessageKey, string> = {
   "prop.screwHoleChamfer": "Fase am Rand",
   "prop.screwHoleChamferHint": "Eine 45°-Fase an der Oberkante der Senkung, so tief. Sie öffnet sich außerhalb des Kopfdurchmessers, der Schraubenkopf passt also weiter; bei 0 bleibt die Kante scharf.",
   "prop.screwHoleLength": "Gesamtlänge",
+  "prop.screwHoleLengthBelowHead": "Länge unter dem Kopf",
+  "prop.screwHoleLengthBelowHeadHint": "Zylinderkopfschrauben misst man ab der Unterseite des Kopfes. Trägst du ihre Länge hier ein, kommt die Kopftiefe dazu und ergibt die Gesamtlänge.",
   "prop.holeBottom": "Boden",
   "holeBottom.flat": "Flach",
   "holeBottom.drillPoint": "Bohrerspitze {angle}°",

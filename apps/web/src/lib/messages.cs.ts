@@ -4352,6 +4352,8 @@ export const MESSAGES_CS: Record<MessageKey, string> = {
   "prop.screwHoleChamfer": "Zkosení okraje",
   "prop.screwHoleChamferHint": "Zkosení 45° na horní hraně zahloubení, takto hluboké. Otevírá se vně průměru hlavy, takže hlava šroubu stále pasuje; 0 nechá hranu ostrou.",
   "prop.screwHoleLength": "Celková délka",
+  "prop.screwHoleLengthBelowHead": "Délka pod hlavou",
+  "prop.screwHoleLengthBelowHeadHint": "Šrouby s válcovou hlavou se měří od spodní strany hlavy. Zadejte sem jejich délku a přičte se k ní hloubka zahloubení na celkovou délku.",
   "prop.holeBottom": "Dno",
   "holeBottom.flat": "Rovné",
   "holeBottom.drillPoint": "Špička vrtáku {angle}°",

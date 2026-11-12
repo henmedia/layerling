@@ -196,7 +196,7 @@ import { VasePrintReport } from "@/components/workplane/VasePrintReport";
 import { shapeDefaultsAsset, shapeDefaultsFromShape } from "@/lib/shapeDefaults";
 import { fromPrinterPlay, printerPlayShapeRows, withPrinterPlay } from "@/lib/printerPlay";
 import { usePrinterPlay } from "@/lib/usePrinterPlay";
-import { MAX_SCREW_HOLE_ANGLE, MIN_SCREW_HOLE_ANGLE, maxScrewHoleChamfer, maxScrewHoleRecess, normalizeScrewHoleAngle, normalizeScrewHoleChamfer, normalizeScrewHoleHeadDepth, normalizeScrewHoleRecess, normalizeScrewHoleShaft, screwHoleSlotMeasures } from "@/lib/screwHoleGeometry";
+import { MAX_SCREW_HOLE_ANGLE, MIN_SCREW_HOLE_ANGLE, maxScrewHoleChamfer, maxScrewHoleRecess, normalizeScrewHoleAngle, normalizeScrewHoleChamfer, normalizeScrewHoleHeadDepth, normalizeScrewHoleRecess, normalizeScrewHoleShaft, screwHoleHeightForLengthBelowHead, screwHoleLengthBelowHead, screwHoleSlotMeasures } from "@/lib/screwHoleGeometry";
 import { DEFAULT_DRILL_POINT_ANGLE, DRILL_POINT_ANGLES, MAX_DRILL_POINT_ANGLE, MIN_DRILL_POINT_ANGLE, normalizeDrillPointAngle, shapeDrillPointLength, shapeTakesDrillPoint } from "@/lib/drillPoint";
 import { MAX_TEARDROP_TIP_ANGLE, MIN_TEARDROP_TIP_ANGLE, normalizeTeardropTipAngle, teardropHeightForTipAngle, teardropTipAngle } from "@/lib/teardropGeometry";
 import { MAX_PORT_CLEARANCE, maxPortCorner, normalizePortClearance, normalizePortCorner, PORT_PRESET_ORDER, PORT_PRESETS, portPresetFor, portPresetSize, type PortPreset } from "@/lib/portGeometry";
@@ -1310,6 +1310,18 @@ function getShapePropertiesWithAppLimits(shape: WorkplaneShape, onUpdate: ShapeI
             onChange: (value: number) => onUpdate({ screwHoleRecess: normalizeScrewHoleRecess(value, shape.height, holeKind) || undefined }),
           }]),
       { id: "height", label: t("prop.screwHoleLength"), value: shape.height, min: MIN_SHAPE_SIZE, max: 160, onChange: setHeight },
+      // Socket head cap screws are sold by the length under the head (Discussion #1670): the pocket is added to it.
+      ...(shape.kind === "counterbore"
+        ? [{
+            id: "screwHoleLengthBelowHead",
+            label: t("prop.screwHoleLengthBelowHead"),
+            value: screwHoleLengthBelowHead(shape.height, shape.screwHoleHeadDepth),
+            min: 0.2,
+            max: Math.max(0.3, 160 - normalizeScrewHoleHeadDepth(shape.screwHoleHeadDepth, shape.height)),
+            hint: t("prop.screwHoleLengthBelowHeadHint"),
+            onChange: (value: number) => setHeight(screwHoleHeightForLengthBelowHead(value, shape.screwHoleHeadDepth)),
+          }]
+        : []),
       // A blind one may end in a drill point below its shaft (Discussion #621); the double countersink goes through.
       ...drillPointProperties(shape, onUpdate),
       // One entry in the library for both: the double countersink is the countersink chamfered on both faces (#621).
