@@ -269,7 +269,7 @@ import { roundedAlignedValue } from "@/lib/alignRounding";
 import { buildSketchLoftFromSelection, canSketchLoft } from "@/lib/sketchLoft";
 import { alignBounds, sizeAlignmentState, sizedShapesForSelection } from "@/lib/alignSize";
 import { ALIGN_PLATE_ID, alignPlateShape, distributedShapesForSelection, distributionState, type DistributeProblem, type DistributeResult } from "@/lib/alignDistribute";
-import { cloneAsGroupChild, meshDataToManifoldMesh, shapeToManifoldSolid, withClosedHolesNote, withConnectorsNote, stretchNotice, stretchLengthLabel, MAX_STRETCH_LENGTH, DEFAULT_STRETCH_LENGTH, unionOverlappingExportMeshes, exportBodiesWithLooseHoles, formatSectionOffset, SECTION_SEEN_FROM_KEYS, visibleExportShapes, multicolorExportSolids, exportFaceColors, colorSeparatedExportMeshes, disposeManifold, canIntersectShapes, buildIntersectionShapeFromSelection, canHullShapes, buildHullShapeFromSelection, groupedShape, quaternionForShape, rotationFromQuaternion, cleanShapePatch, restoreGroupedChildren, restoreGroupedChildrenForEdges } from "@/lib/editorBooleans";
+import { cloneAsGroupChild, meshDataToManifoldMesh, shapeToManifoldSolid, withClosedHolesNote, withConnectorsNote, stretchNotice, stretchLengthLabel, type RebuildStretchedGroup, MAX_STRETCH_LENGTH, DEFAULT_STRETCH_LENGTH, unionOverlappingExportMeshes, exportBodiesWithLooseHoles, formatSectionOffset, SECTION_SEEN_FROM_KEYS, visibleExportShapes, multicolorExportSolids, exportFaceColors, colorSeparatedExportMeshes, disposeManifold, canIntersectShapes, buildIntersectionShapeFromSelection, canHullShapes, buildHullShapeFromSelection, groupedShape, quaternionForShape, rotationFromQuaternion, cleanShapePatch, restoreGroupedChildren, restoreGroupedChildrenForEdges } from "@/lib/editorBooleans";
 import { handleViewArrowKey } from "@/lib/viewArrowKeys";
 import { createKeyRepeatBatch } from "@/lib/keyRepeatBatch";
 import { escapeWasHandled } from "@/lib/escapeHandled";
@@ -3517,6 +3517,8 @@ export function LayerlingEditor({
   }, [projectId]);
   const booleanAutomationRunRef = useRef<string | null>(null);
   const splitRunRef = useRef(0);
+  // A stretched group is built again from its parts (Discussion #1707); set once rebuildGroupFromParts is made, below.
+  const rebuildStretchedGroupRef = useRef<RebuildStretchedGroup | undefined>(undefined);
   const splitProjectIdRef = useRef(projectId ?? null);
   splitProjectIdRef.current = projectId ?? null;
   const projectHydratingRef = useRef(false);
@@ -7720,7 +7722,7 @@ export function LayerlingEditor({
     splitAbortRef.current = splitAbort;
     const stretch = session.mode === "stretch" ? session.stretch : undefined;
     const connectors = stretch !== undefined || session.connectors.kind === "none" ? undefined : session.connectors;
-    const outcome = await splitShapesByPlaneOffThread(splitTargetShapes, plane, () => splitRunRef.current === runId && sourceContextIsCurrent(), splitAbort.signal, connectors, stretch);
+    const outcome = await splitShapesByPlaneOffThread(splitTargetShapes, plane, () => splitRunRef.current === runId && sourceContextIsCurrent(), splitAbort.signal, connectors, stretch, rebuildStretchedGroupRef.current);
     if (splitRunRef.current !== runId) return;
     if (outcome.status === "stale" || !sourceContextIsCurrent()) {
       splitRunRef.current += 1;
@@ -12019,6 +12021,10 @@ export function LayerlingEditor({
     const mergeWarning = "mergeWarning" in result && typeof result.mergeWarning === "string" ? result.mergeWarning : "";
     return { group, mergeWarning };
   }, []);
+  rebuildStretchedGroupRef.current = async (group, parts) => {
+    const rebuilt = await rebuildGroupFromParts(group, parts);
+    return rebuilt.group ?? { error: rebuilt.failure };
+  };
 
   const finishOpenGroup = useCallback(async (): Promise<OpenGroupOutcome> => {
     const levels = openGroupsRef.current;
@@ -15494,6 +15500,7 @@ export function LayerlingEditor({
           geometryAbortRef.current?.signal,
           connectors.kind === "none" ? undefined : connectors,
           stretch,
+          rebuildStretchedGroupRef.current,
         );
         if (outcome.status === "stale") throw new Error("The scene changed while splitting; run the command again");
         if (outcome.status === "failed") throw new Error(t(stretch === undefined ? "split.error.failed" : "split.error.stretchFailed", { name: outcome.shape.name, detail: outcome.error }));

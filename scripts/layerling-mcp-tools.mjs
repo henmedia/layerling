@@ -1406,7 +1406,7 @@ export const tools = [
         dovetailDepth: { type: "number", description: "How far the tongue stands out of the cut face into the other half in mm, 1.5 to 15, default 4; the groove is 0.3 mm deeper. Only with connectors dovetail." },
         dovetailAngle: { type: "number", description: "How far each flank of the tongue leans out from square to the cut face, in degrees, 5 to 30, default 15. Only with connectors dovetail." },
         dovetailDirection: { type: "number", description: "Which way the tongues run, in degrees from the long way of the cut face, -90 to 90: 0 (default) along it, 90 across it. Only with connectors dovetail." },
-        stretch: { type: "number", description: "Make the objects this many mm longer at the plane instead of splitting them (-1000 to 1000, not 0; minus: shorter). Not with connectors." },
+        stretch: { type: "number", description: "Make the objects this many mm longer at the plane instead of splitting them (-1000 to 1000, not 0; minus: shorter). Not with connectors. A plain group stays a group: its crossed parts get longer, its parts beyond the plane move along (Discussion #1707); a selected object wholly beyond the plane moves along too." },
       },
     },
   },

@@ -1,6 +1,19 @@
 [
   {
     "title": {
+      "de": "Strecken: eine Gruppe bleibt eine Gruppe",
+      "en": "Stretch: a group stays a group"
+    },
+    "body": {
+      "de": "Wer eine Gruppe streckt, bekommt jetzt wieder eine Gruppe, die sich auflösen lässt. Die Teile, durch die die Ebene geht, werden länger, die Teile dahinter rücken mit, und die davor bleiben, wie sie sind. Löcher bleiben Löcher. Auch ein mit ausgewähltes Objekt, das ganz jenseits der Ebene liegt, rückt mit.",
+      "en": "Stretching a group now gives a group again, one you can ungroup. The parts the plane crosses get longer, the parts beyond it move along, and those before it stay as they were. Holes stay holes. An object selected with the others that lies wholly beyond the plane moves along too."
+    },
+    "guide": {
+      "section": "splitting"
+    }
+  },
+  {
+    "title": {
       "de": "Sicherung ohne Speicherfenster: „Stattdessen herunterladen“",
       "en": "Backups without the save dialog: \"Download instead\""
     },

@@ -14,7 +14,7 @@ import { sphereTessellation } from "@/lib/sphereTessellation";
 import { groupDisplayMergeable, groupShowsPartColors } from "@/lib/groupColors";
 import { gridfinityLabelColor, gridfinityLetterMeshes } from "@/lib/gridfinityLetterColor";
 import { acceleratedRaycast, computeBoundsTree } from "three-mesh-bvh";
-import { groupedContentScale, groupedPartSizeScale, scaleGroupedVertices, type GroupPartPlacement } from "@/lib/groupScale";
+import { groupCanKeepParts, groupedContentScale, groupedPartSizeScale, scaleGroupedVertices, type GroupPartPlacement } from "@/lib/groupScale";
 import { applySplitConnectors, dropSplitSlivers, planSplitConnectors, splitByPlaneClearOfFaces, unionSplitManifoldComponents } from "@/lib/manifoldSplit";
 import { paintedWorldMesh } from "@/lib/paintMesh";
 import { addConnectorTallies, NO_CONNECTORS, splitFramePoint, tongueOutlines, type SplitConnectorKind, type SplitConnectorOptions, type SplitConnectorTally, type SplitTongueOutline } from "@/lib/splitConnectors";
@@ -1162,11 +1162,73 @@ export type SplitShapesOutcome =
     connectors?: SplitConnectorTally;
   };
 
-/** The cut of one target - or with `stretch` the target made that much longer there -, or `missed` when the plane does not go through it. */
+/**
+ * The cut of one target - or with `stretch` the target made that much longer there -, or `missed` when the plane does
+ * not go through it, with `beyond` when it lies wholly on the side the plane's normal points to (a stretch moves it).
+ */
 export async function splitShapeIfCrossed(shape: WorkplaneShape, plane: SplitPlaneArgs, connectors?: SplitConnectorOptions, stretch?: number) {
-  if (!splitPlaneIntersectsPoints(meshForShape(shape).vertices, plane.normal, plane.position)) return { missed: true as const };
+  const vertices = meshForShape(shape).vertices;
+  if (!splitPlaneIntersectsPoints(vertices, plane.normal, plane.position)) {
+    const [nx, ny, nz] = plane.normal;
+    return { missed: true as const, beyond: vertices.some(([x, y, z]) => x * nx + y * ny + z * nz > plane.position + 1e-5) };
+  }
   if (stretch !== undefined) return stretchShapeByPlane(shape, plane, stretch);
   return splitShapeByPlane(shape, plane, connectors);
+}
+
+/** A group built again from its parts after a stretch, keeping what is its own (lib/LayerlingEditor's rebuildGroupFromParts). */
+export type RebuildStretchedGroup = (group: WorkplaneShape, parts: WorkplaneShape[]) => Promise<WorkplaneShape | { error: string }>;
+
+type StretchPartsResult =
+  | { missed: true; beyond: boolean }
+  | { parts: WorkplaneShape[]; closedHoles: number }
+  | { parts: null; error?: string };
+
+/** `shape` moved as a whole by `offset` in the world (x, height, z), as a part beyond a stretch's plane goes. */
+function shiftedShape(shape: WorkplaneShape, offset: Vec3): WorkplaneShape {
+  const clean = (value: number) => (Math.abs(value) < 1e-9 ? 0 : Math.round(value * 1e6) / 1e6);
+  return { ...shape, x: clean(shape.x + offset[0]), elevation: clean((shape.elevation ?? 0) + offset[1]), z: clean(shape.z + offset[2]) };
+}
+
+/**
+ * A group stretched part by part (Discussion #1707): the parts the plane crosses get longer, the parts wholly beyond it
+ * move along by the length, the parts before it stay as they are, and the group is built again from them, so it stays a
+ * group that can be ungrouped, its holes stay holes and its untouched parts keep their settings. A group inside it is
+ * stretched the same way. Only a group whose parts lie where its box says (`groupCanKeepParts`: not mirrored, deformed,
+ * filleted, textured or wrapped) goes so; any other is stretched as one body, as before.
+ */
+async function stretchGroupByParts(
+  group: WorkplaneShape,
+  plane: SplitPlaneArgs,
+  stretch: number,
+  splitOne: typeof splitShapeIfCrossed,
+  rebuildGroup: RebuildStretchedGroup,
+  offset: Vec3,
+): Promise<StretchPartsResult> {
+  const children = restoreGroupedChildren(group);
+  const next: WorkplaneShape[] = [];
+  let crossed = false;
+  let beyondCount = 0;
+  let closedHoles = 0;
+  for (const child of children) {
+    const result: StretchPartsResult = groupCanKeepParts(child)
+      ? await stretchGroupByParts(child, plane, stretch, splitOne, rebuildGroup, offset)
+      : await splitOne(child, plane, undefined, stretch);
+    if ("missed" in result) {
+      if (result.beyond) beyondCount += 1;
+      next.push(result.beyond ? shiftedShape(child, offset) : child);
+      continue;
+    }
+    if (!result.parts) return { parts: null, error: result.error };
+    crossed = true;
+    closedHoles += result.closedHoles ?? 0;
+    next.push(...result.parts);
+  }
+  // The plane in a gap between the parts still makes the group longer; wholly on one side it is missed.
+  if (!crossed && (beyondCount === 0 || beyondCount === children.length)) return { missed: true, beyond: beyondCount > 0 };
+  const rebuilt = await rebuildGroup(group, next);
+  if ("error" in rebuilt) return { parts: null, error: rebuilt.error };
+  return { parts: [rebuilt], closedHoles };
 }
 
 /**
@@ -1181,6 +1243,7 @@ export async function splitShapesByPlane(
   splitOne: typeof splitShapeIfCrossed = splitShapeIfCrossed,
   connectors?: SplitConnectorOptions,
   stretch?: number,
+  rebuildGroup?: RebuildStretchedGroup,
 ): Promise<SplitShapesOutcome> {
   const replacements = new Map<string, WorkplaneShape[]>();
   let splitCount = 0;
@@ -1188,9 +1251,21 @@ export async function splitShapesByPlane(
   // A stretch keeps each body whole, so it takes no connectors.
   const asked = stretch === undefined && connectors && connectors.kind !== "none" ? connectors : undefined;
   let tally: SplitConnectorTally | undefined = asked ? NO_CONNECTORS : undefined;
+  // How far a stretch moves what lies beyond its plane: along the plane's normal, by the length (back for a minus one).
+  const normalLength = Math.hypot(...plane.normal) || 1;
+  const offset: Vec3 = stretch === undefined
+    ? [0, 0, 0]
+    : [plane.normal[0] / normalLength * stretch, plane.normal[1] / normalLength * stretch, plane.normal[2] / normalLength * stretch];
   for (const shape of targets) {
-    const result = await splitOne(shape, plane, asked, stretch);
-    if ("missed" in result) continue;
+    const result: StretchPartsResult | Awaited<ReturnType<typeof splitShapeIfCrossed>> = stretch !== undefined && rebuildGroup && groupCanKeepParts(shape)
+      ? await stretchGroupByParts(shape, plane, stretch, splitOne, rebuildGroup, offset)
+      : await splitOne(shape, plane, asked, stretch);
+    if ("missed" in result) {
+      // Selected with the stretched ones, a part wholly beyond the plane moves along (Discussion #1707): a hole at the
+      // end of a case stays at the end. It is not counted as stretched.
+      if (stretch !== undefined && result.beyond) replacements.set(shape.id, [shiftedShape(shape, offset)]);
+      continue;
+    }
     if (!stillCurrent()) return { status: "stale" };
     if (!result.parts) return { status: "failed", shape, error: result.error ?? t("split.error.failedDefault") };
     replacements.set(shape.id, result.parts);
