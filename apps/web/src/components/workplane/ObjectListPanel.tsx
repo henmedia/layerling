@@ -52,6 +52,24 @@ type DropTarget = { before: string | null } | { into: string };
 const COLLAPSED_STORAGE_KEY = "layerling.editor.objectListCollapsed";
 const ORDER_STORAGE_KEY = "layerling.editor.objectListOrder";
 
+const WIDTH_STORAGE_KEY = "layerling.editor.objectListWidth";
+/** The width the panel can be dragged to at its lower right corner (Discussion #1636); min-width in globals.css. */
+const MIN_PANEL_WIDTH = 240;
+const MAX_PANEL_WIDTH = 600;
+
+/**
+ * Solid or hole as one letter, the first of the word, with the word as its tooltip (Discussion #1636): the
+ * whole word took the room the name needed. The first letters differ in every language.
+ */
+function SolidHoleBadge({ hole, small = false }: { hole: boolean; small?: boolean }) {
+  const word = hole ? t("outliner.hole") : t("outliner.solid");
+  return (
+    <span className={`outliner-badge ${small ? "small" : ""} ${hole ? "badge-hole" : "badge-solid"}`} title={word} aria-label={word}>
+      {Array.from(word)[0]?.toLocaleUpperCase(getLanguage())}
+    </span>
+  );
+}
+
 /** Docked just right of the view cube - where .outliner-panel puts it in globals.css. */
 const OBJECT_LIST_PANEL: MovablePanelOptions = {
   dockedAt: () => ({ left: 104, top: 64 }),
@@ -87,6 +105,10 @@ export function ObjectListPanel({
   const movable = useMovablePanel("layerling.editor.objectListPosition", OBJECT_LIST_PANEL);
   const [collapsed, setCollapsed] = useState(false);
   const [order, setOrder] = useState<ObjectListOrder>("added");
+  /** The width dragged at the lower right corner (Discussion #1636); null keeps the 300 px of globals.css. */
+  const [width, setWidth] = useState<number | null>(null);
+  const widthRef = useRef(width);
+  widthRef.current = width;
 
   // Remembered in this browser, like the panel's position; read after mounting so the first render matches the server's.
   useEffect(() => {
@@ -94,10 +116,33 @@ export function ObjectListPanel({
       setCollapsed(window.localStorage.getItem(COLLAPSED_STORAGE_KEY) === "true");
       const storedOrder = window.localStorage.getItem(ORDER_STORAGE_KEY);
       if (isObjectListOrder(storedOrder)) setOrder(storedOrder);
+      const storedWidth = Number(window.localStorage.getItem(WIDTH_STORAGE_KEY));
+      if (storedWidth >= MIN_PANEL_WIDTH && storedWidth <= MAX_PANEL_WIDTH) setWidth(Math.round(storedWidth));
     } catch {
       // Blocked storage: the panel starts expanded, in the order the shapes were added.
     }
   }, []);
+
+  // The browser's own resize grip writes the new width into the panel's style; keep it from there. A window too
+  // narrow for it only squeezes the panel (max-width) and leaves the wish as it was.
+  useEffect(() => {
+    const panel = movable.panelRef.current;
+    if (!panel || typeof ResizeObserver === "undefined") return;
+    const observer = new ResizeObserver(() => {
+      const dragged = Number.parseFloat(panel.style.width);
+      if (!Number.isFinite(dragged)) return;
+      const next = Math.round(Math.min(MAX_PANEL_WIDTH, Math.max(MIN_PANEL_WIDTH, dragged)));
+      if (next === widthRef.current) return;
+      setWidth(next);
+      try {
+        window.localStorage.setItem(WIDTH_STORAGE_KEY, String(next));
+      } catch {
+        // Blocked storage: the width holds until the panel closes.
+      }
+    });
+    observer.observe(panel);
+    return () => observer.disconnect();
+  }, [movable.panelRef]);
 
   const toggleOrder = () => {
     const next: ObjectListOrder = order === "name" ? "added" : "name";
@@ -353,9 +398,7 @@ export function ObjectListPanel({
           <span className="outliner-child-name" title={childDisplayName}>
             {childDisplayName}
           </span>
-          <span className={`outliner-badge small ${child.hole ? "badge-hole" : "badge-solid"}`}>
-            {child.hole ? t("outliner.hole") : t("outliner.solid")}
-          </span>
+          <SolidHoleBadge hole={Boolean(child.hole)} small />
         </li>
       );
       return leadsToMatch && child.groupedShapes ? [row, ...renderGroupParts(child.groupedShapes, depth + 1, false)] : [row];
@@ -365,7 +408,7 @@ export function ObjectListPanel({
     <div
       ref={movable.panelRef}
       className={`outliner-panel ${movable.dragging ? "moving" : ""} ${collapsed ? "collapsed" : ""}`}
-      style={movable.style}
+      style={width === null ? movable.style : { ...movable.style, width }}
       inert={inert}
       role="region"
       aria-label={t("outliner.title")}
@@ -533,9 +576,7 @@ export function ObjectListPanel({
                       </div>
 
                       <div className="outliner-badges">
-                        <span className={`outliner-badge ${shape.hole ? "badge-hole" : "badge-solid"}`}>
-                          {shape.hole ? t("outliner.hole") : t("outliner.solid")}
-                        </span>
+                        <SolidHoleBadge hole={Boolean(shape.hole)} />
                       </div>
 
                       <div className="outliner-row-actions">

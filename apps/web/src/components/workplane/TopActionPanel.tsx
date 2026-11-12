@@ -3,7 +3,8 @@
 import { DEFAULT_STENCIL_BRIDGES, MAX_BRIDGE_COUNT, normalizedStencilBridges, type StencilBridgeOptions } from "@/lib/stencilBridges";
 import { GuideHelpLink } from "@/components/GuideHelpLink";
 import { MovableToolPanel } from "@/components/workplane/MovableToolPanel";
-import { CloudUpload, Download, EyeOff, FilePlus2, FolderOpen, ImagePlus, Info, Server, X } from "lucide-react";
+import { ArchiveRestore, CloudUpload, Download, EyeOff, FilePlus2, FolderOpen, ImagePlus, Info, Server, X } from "lucide-react";
+import { OPEN_FILE_BACKUPS_EVENT } from "@/lib/fileBackups";
 import { useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
 import { t, type MessageKey } from "@/lib/i18n";
 import { useLanguage } from "@/lib/useLanguage";
@@ -151,14 +152,15 @@ export function TopActionPanel({
     setExportName((current) => current === previousSuggestedName ? suggestedName : current);
     previousSuggestedNameRef.current = suggestedName;
   }, [suggestedName]);
-  // A custom number from the settings joins the usual stops in its place; the last stop, None,
+  // A custom number from the settings joins the usual stops in its place; the first stop, None,
   // saves the design with its current state only, for sharing a file without its undo steps (#246).
+  // More history lies to the right, as on the slider in the workspace settings (#1631).
   const lylHistoryLimits = useMemo<readonly LylHistoryLimit[]>(() => {
-    const presets: number[] = [100, 50, 30];
+    const presets: number[] = [30, 50, 100];
     const numbers = typeof workspaceHistoryLimit === "number" && !presets.includes(workspaceHistoryLimit)
-      ? [...presets, workspaceHistoryLimit].sort((a, b) => b - a)
+      ? [...presets, workspaceHistoryLimit].sort((a, b) => a - b)
       : presets;
-    return ["unlimited", ...numbers, 0];
+    return [0, ...numbers, "unlimited"];
   }, [workspaceHistoryLimit]);
   const lylHistoryLimitIndex = Math.max(0, lylHistoryLimits.indexOf(lylHistoryLimit));
   const [printMaterial, setPrintMaterial] = useState<PrintMaterial>(() => {
@@ -689,6 +691,12 @@ export function TopActionPanel({
               {exportFormat === "stl" && stlFileName ? (
                 <button className="export-shared-button" type="button" onClick={() => onExport("stl", exportName, true)} disabled={shapeCount === 0}>
                   <span>{t("export.stlSaveAs")}</span>
+                </button>
+              ) : null}
+              {exportFormat === "lyl" ? (
+                <button className="export-shared-button" type="button" title={t("backups.openTitle")} onClick={() => window.dispatchEvent(new Event(OPEN_FILE_BACKUPS_EVENT))}>
+                  <ArchiveRestore />
+                  <span>{t("backups.title")}</span>
                 </button>
               ) : null}
               {exportFormat === "lyl" && sharedProjectsEnabled ? (

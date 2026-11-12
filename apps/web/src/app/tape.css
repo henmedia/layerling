@@ -69,7 +69,9 @@
 }
 
 .tape-overlay.delete-mode .tape-segment-group:hover .tape-segment,
-.tape-overlay.quick-delete .tape-segment-group:hover .tape-segment {
+.tape-overlay.quick-delete .tape-segment-group:hover .tape-segment,
+.tape-overlay.delete-mode .tape-segment-group.hovered .tape-segment,
+.tape-overlay.quick-delete .tape-segment-group.hovered .tape-segment {
   stroke: var(--hover-accent-color);
   stroke-width: 3;
   filter: drop-shadow(0 0 2px rgba(220, 63, 54, 0.3));
@@ -174,6 +176,19 @@
 .tape-label.occluded {
   pointer-events: auto;
   cursor: default;
+}
+
+/* While deleting, the label deletes its measurement too (#1613), and says so in the colour its line takes. */
+.tape-label.deletable {
+  pointer-events: auto;
+  cursor: pointer;
+}
+
+.tape-label.deletable:hover,
+.tape-label.deletable.hovered {
+  color: var(--hover-accent-color);
+  border-color: var(--hover-accent-color);
+  opacity: 1;
 }
 
 /* Mostly behind a body: still readable, but it no longer looks like it floats in front. */

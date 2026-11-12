@@ -66,6 +66,8 @@ function solidVolume(solid: SbcSolid) {
 function plateArea(board: SbcBoard) {
   if (!board.outline) return board.width * board.depth - (4 - Math.PI) * board.cornerRadius ** 2;
   if (board.type === "wemosD1Mini") return d1MiniArea();
+  // The CYDs: their rounded rectangle less the cut under the antenna, 6.6 x 18.2 mm at the right end.
+  if (board.type === "cyd" || board.type === "cyd2usb") return board.width * board.depth - (4 - Math.PI) * board.cornerRadius ** 2 - 6.6 * 18.2;
   expect(["arduinoUno", "arduinoMega"]).toContain(board.type);
   // 66.04 x 53.34 (the MEGA 99.06 x 53.34) with three corners round, the back right one cut 1.524 mm
   // at 45°; the step from (66.04, 2.54) over (68.58, 5.08) and (68.58, 37.846) to (66.04, 40.386), on the MEGA 33.02 further right.

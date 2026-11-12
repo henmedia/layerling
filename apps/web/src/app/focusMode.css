@@ -133,6 +133,25 @@ html[data-theme="dark"] .focus-mode-bar .guide-help-link {
   cursor: default;
 }
 
+/* The design's name beside the tabs (Discussion #1678): the title row's field, a little lower and narrower, so a new
+   design can be named in focus mode too. */
+.focus-mode-bar .focus-mode-bar-name {
+  width: 220px;
+  margin: 0 4px;
+  align-self: center;
+}
+
+.focus-mode-bar .focus-mode-bar-name input {
+  height: 28px;
+  font-size: 13px;
+}
+
+@media (max-width: 760px) {
+  .focus-mode-bar .focus-mode-bar-name {
+    width: 130px;
+  }
+}
+
 html[data-theme="dark"] .focus-mode-bar {
   box-shadow: 0 6px 18px rgba(0, 0, 0, 0.45);
 }

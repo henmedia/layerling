@@ -728,7 +728,8 @@ export function LidPanel({
         <input type="checkbox" checked={settings.clickBumps && bumpsFit} disabled={busy || !bumpsFit} onChange={(event) => onChange({ clickBumps: event.target.checked })} />
         <span>{t("lid.clickBumps")}</span>
       </label>
-      {/* A slide-in lid's is one bump under its end, which clicks past the cut wall; it says what its height is. */}
+      {/* A slide-in lid's is one bump under its end, which clicks past the wall it slides in through (cut down, or with a
+          frame slotted); it says what its height is. */}
       {(settings.clickBumps || !bumpsFit) && extras ? <span className="shell-openings-summary">{t(slide ? "lid.slideBumpHint" : "lid.clickBumpsHint")}</span> : null}
       {/* How far they reach into the body's wall: a small box or a stiff lip wants less (#1220). */}
       {settings.clickBumps && bumpsFit ? (<>

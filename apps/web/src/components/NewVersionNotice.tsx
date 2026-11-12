@@ -14,7 +14,7 @@ const RUNNING_VERSION = process.env.NEXT_PUBLIC_APP_VERSION ?? "";
  */
 export function NewVersionNotice() {
   const language = useLanguage();
-  const { latest, reason, later, reload } = useNewVersionNotice();
+  const { latest, reason, later, reload, reloadAnyway, state } = useNewVersionNotice();
   if (!latest) return null;
   const news = highlightsAfter(RUNNING_VERSION, latest).slice(0, 4);
   return (
@@ -28,12 +28,21 @@ export function NewVersionNotice() {
           ))}
         </ul>
       ) : null}
+      {/* The open design could not be stored (#1639): reloading now would lose its newest changes. */}
+      {state === "notSaved" ? <p className="new-version-notice-unsaved" role="alert">{t("newVersion.notSaved")}</p> : null}
       <div className="new-version-notice-actions">
         <button type="button" className="secondary" onClick={later}>{t("newVersion.later")}</button>
-        <button type="button" className="primary" onClick={reload}>
-          <RefreshCw size={16} aria-hidden="true" />
-          {t("newVersion.reload")}
-        </button>
+        {state === "notSaved" ? (
+          <button type="button" className="danger" onClick={reloadAnyway}>
+            <RefreshCw size={16} aria-hidden="true" />
+            {t("newVersion.reloadAnyway")}
+          </button>
+        ) : (
+          <button type="button" className="primary" disabled={state === "saving"} onClick={() => void reload()}>
+            <RefreshCw size={16} aria-hidden="true" />
+            {t("newVersion.reload")}
+          </button>
+        )}
       </div>
     </div>
   );

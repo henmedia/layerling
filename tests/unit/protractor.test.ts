@@ -1,6 +1,6 @@
 import * as THREE from "three";
 import { describe, expect, it } from "vitest";
-import { angleAtVertex, angleBetweenFaces, facetOfCurvedSurface, formatFaceAngles, formatProtractorAngle } from "@/lib/protractor";
+import { angleAtVertex, angleBetweenFaces, facetOfCurvedSurface, flattenOntoPlane, formatFaceAngles, formatProtractorAngle, pointAsSeen, straightViewAxis } from "@/lib/protractor";
 import { planarFaceTriangles } from "@/lib/rotationPivot";
 
 const point = (x: number, y: number, z: number) => ({ x, y, z });
@@ -22,6 +22,53 @@ describe("angleAtVertex", () => {
 
   it("has no angle when a leg has no length", () => {
     expect(angleAtVertex(point(1, 1, 1), point(1, 1, 1), point(2, 1, 1))).toBeNull();
+  });
+
+  // #1650: a 20 mm cube seen from the top (y is the height). The corner on top, a point along the top edge,
+  // and the opposite corner caught at the bottom: in space that is 54.7°, seen from the top the diagonal 45°.
+  it("reads the angle as a straight view shows it when given one", () => {
+    const corner = point(20, 20, 0);
+    const alongTop = point(0, 20, 0);
+    const oppositeBottom = point(0, 0, 20);
+    const top = { normal: point(0, 1, 0) };
+    expect(angleAtVertex(corner, alongTop, oppositeBottom)).toBeCloseTo(54.7356, 3);
+    expect(angleAtVertex(corner, alongTop, oppositeBottom, top)).toBeCloseTo(45, 9);
+    // A point on the plate beside a raised corner reads square, as it looks.
+    expect(angleAtVertex(corner, point(20, 0, 30), alongTop, top)).toBeCloseTo(90, 9);
+  });
+
+  it("follows the sight lines of a perspective, so what lies behind a point on screen reads as that point", () => {
+    const eye = point(30, 200, 10);
+    const corner = point(20, 20, 0);
+    const alongTop = point(0, 20, 0);
+    // On the plate, exactly where the sight line through (20, 20, 30) meets it.
+    const t = 200 / 180;
+    const onPlate = point(30 + (20 - 30) * t, 0, 10 + (30 - 10) * t);
+    const view = { normal: point(0, 1, 0), eye };
+    expect(angleAtVertex(corner, onPlate, alongTop, view)).toBeCloseTo(90, 9);
+    expect(pointAsSeen(corner, onPlate, view)).toEqual({ x: expect.closeTo(20, 9), y: expect.closeTo(20, 9), z: expect.closeTo(30, 9) });
+  });
+});
+
+describe("straightViewAxis", () => {
+  it("finds the axis a straight view looks along, either way", () => {
+    expect(straightViewAxis(point(0, -1, 0))).toEqual({ x: 0, y: 1, z: 0 });
+    expect(straightViewAxis(point(0, 0, 5))).toEqual({ x: 0, y: 0, z: 1 });
+    expect(straightViewAxis(point(-2, 0, 0))).toEqual({ x: 1, y: 0, z: 0 });
+  });
+
+  it("takes a view a hair off the axis as straight, a tilted one not", () => {
+    const tilt = (degrees: number) => point(Math.sin((degrees * Math.PI) / 180), -Math.cos((degrees * Math.PI) / 180), 0);
+    expect(straightViewAxis(tilt(0.5))).toEqual({ x: 0, y: 1, z: 0 });
+    expect(straightViewAxis(tilt(2))).toBeNull();
+    expect(straightViewAxis(point(1, -1, 1))).toBeNull();
+    expect(straightViewAxis(point(0, 0, 0))).toBeNull();
+  });
+});
+
+describe("flattenOntoPlane", () => {
+  it("moves a point along the normal onto the plane through the corner", () => {
+    expect(flattenOntoPlane(point(1, 5, 2), point(4, -3, 7), point(0, 1, 0))).toEqual({ x: 4, y: 5, z: 7 });
   });
 });
 

@@ -45,11 +45,34 @@ const EDGE_FIELDS = new Set(["edgeTreatments", "edgeTreatmentHistory", "cadDispl
 /** Fields that follow from another change and say nothing of their own. */
 const DERIVED_FIELDS = new Set(["formulas"]);
 
-function sameValue(a: unknown, b: unknown) {
+/**
+ * Whether two values hold the same data, stopping at the first difference. It used to compare them as JSON
+ * text, and a group carrying its parts' CAD data was written out in full for every field of every step: with
+ * 100 steps of such a group the History view's list took 9 to 25 seconds to show (Discussion #1637). As with
+ * JSON, a key set to undefined counts as missing.
+ */
+function sameValue(a: unknown, b: unknown): boolean {
   if (a === b) return true;
-  if (a === undefined || b === undefined || a === null || b === null) return false;
-  if (typeof a !== "object" || typeof b !== "object") return false;
-  return JSON.stringify(a) === JSON.stringify(b);
+  if (typeof a !== "object" || typeof b !== "object" || a === null || b === null) {
+    return typeof a === "number" && typeof b === "number" && Number.isNaN(a) && Number.isNaN(b);
+  }
+  if (ArrayBuffer.isView(a) || ArrayBuffer.isView(b)) {
+    if (!ArrayBuffer.isView(a) || !ArrayBuffer.isView(b) || a.constructor !== b.constructor || a.byteLength !== b.byteLength) return false;
+    const left = new Uint8Array(a.buffer, a.byteOffset, a.byteLength);
+    const right = new Uint8Array(b.buffer, b.byteOffset, b.byteLength);
+    for (let index = 0; index < left.length; index += 1) if (left[index] !== right[index]) return false;
+    return true;
+  }
+  if (Array.isArray(a) || Array.isArray(b)) {
+    if (!Array.isArray(a) || !Array.isArray(b) || a.length !== b.length) return false;
+    for (let index = 0; index < a.length; index += 1) if (!sameValue(a[index], b[index])) return false;
+    return true;
+  }
+  const left = a as Record<string, unknown>;
+  const right = b as Record<string, unknown>;
+  for (const key of Object.keys(left)) if (left[key] !== undefined && !sameValue(left[key], right[key])) return false;
+  for (const key of Object.keys(right)) if (right[key] !== undefined && left[key] === undefined) return false;
+  return true;
 }
 
 function changedFields(before: WorkplaneShape, after: WorkplaneShape) {
@@ -332,6 +355,28 @@ function describeNotes(before: EditorHistoryEntry, after: EditorHistoryEntry): H
 export function describeHistoryStep(before: EditorHistoryEntry | undefined, after: EditorHistoryEntry, openGroups?: OpenGroupCount): HistoryStepDescription {
   if (!before) return { key: "historyStep.start" };
   const openGroupsChange = openGroups ? Math.sign(openGroups(after) - openGroups(before)) : 0;
+  // A history entry is never changed once made, so a step is read once: the list of the History view
+  // reads every step each time it opens, and the arrows read the same steps again.
+  let byAfter = describedSteps.get(before);
+  if (!byAfter) {
+    byAfter = new WeakMap();
+    describedSteps.set(before, byAfter);
+  }
+  let byOpenGroups = byAfter.get(after);
+  if (!byOpenGroups) {
+    byOpenGroups = new Map();
+    byAfter.set(after, byOpenGroups);
+  }
+  const known = byOpenGroups.get(openGroupsChange);
+  if (known) return known;
+  const described = describeStepAfresh(before, after, openGroupsChange);
+  byOpenGroups.set(openGroupsChange, described);
+  return described;
+}
+
+const describedSteps = new WeakMap<EditorHistoryEntry, WeakMap<EditorHistoryEntry, Map<number, HistoryStepDescription>>>();
+
+function describeStepAfresh(before: EditorHistoryEntry, after: EditorHistoryEntry, openGroupsChange: number): HistoryStepDescription {
   const shapes = describeShapes(before.shapes, after.shapes, openGroupsChange);
   if (shapes) return shapes;
   const notes = describeNotes(before, after);

@@ -22,7 +22,7 @@ Bei vielen Teilen verliert man in der Ansicht leicht den Überblick. Die Objektl
 ![Die Objektliste: die Gruppe „Gruppe“ mit zwei Teilen und daneben eine Kugel. Ein Ordnersymbol öffnet die Gruppe.](shot:object-list)
 
 - Ein Klick auf einen Eintrag wählt die Form aus, auch die Teile innerhalb einer Gruppe. Mit [[Umschalt]] nimmst du weitere Einträge dazu oder wieder weg, genau wie in der Ansicht. Die Pfeile klappen Gruppen auf und zu.
-- Das Etikett zeigt, ob ein Teil {{ui:outliner.solid}} oder {{ui:outliner.hole}} ist.
+- Der Buchstabe hinter dem Namen zeigt, ob ein Teil {{ui:outliner.solid}} oder {{ui:outliner.hole}} ist: Es ist der Anfangsbuchstabe des Worts, und mit der Maus darüber erscheint das ganze Wort.
 - Unter dem Namen steht, was für eine Form es ist. Ein Körper, der keine einfache Form mehr ist (verrundet, ausgehöhlt oder eingelesen), zeigt {{ui:shape.exactBody}}, wenn die STEP-Ausfuhr ihn exakt schreibt, und {{ui:shape.mesh}}, wenn er nur aus Dreiecken besteht und als STL hinausgeht. Eine Verjüngung, Neigung oder Verdrehung, die erst nach dem Verrunden oder Aushöhlen dazukommt, verformt nur sein Netz; dann steht dort {{ui:shape.mesh}}.
 - Schloss und Auge sperren und verstecken einzelne Teile.
 - Über {{ui:outliner.rename}} gibst du einem Teil einen eigenen Namen; der Stift neben dem Namen oben in den Einstellungen macht dasselbe für die ausgewählte Form. Vernünftige Namen helfen bei größeren Entwürfen enorm.
@@ -32,7 +32,7 @@ Bei vielen Teilen verliert man in der Ansicht leicht den Überblick. Die Objektl
 - Das Suchfeld findet Formen nach Namen und nach Art, also auch „Zylinder“ oder „Aussparung“. Es sucht auch in Gruppen, egal wie tief verschachtelt: Eine Gruppe mit einem Treffer bleibt in der Liste und klappt auf, sodass die passenden Teile und die Gruppen auf dem Weg dorthin zu sehen sind. Passt der Name der Gruppe selbst, zeigt sie aufgeklappt alle ihre Teile.
 - Der Pfeil ganz links in der Titelleiste klappt die Liste bis auf ihre Titelleiste ein und wieder auf.
 
-Die Liste ist rechts neben dem Ansichtswürfel angedockt. An ihrer Titelleiste ziehst du sie an jede Stelle der Arbeitsfläche; dabei gleitet sie unter dem Ansichtswürfel und der Ansichtsleiste hindurch. Legst du sie neben dem Ansichtswürfel wieder ab oder doppelklickst auf die Titelleiste, dockt sie wieder an. Wo sie stand und ob sie eingeklappt war, merkt sich der Browser.
+Die Liste ist rechts neben dem Ansichtswürfel angedockt. An ihrer Titelleiste ziehst du sie an jede Stelle der Arbeitsfläche; dabei gleitet sie unter dem Ansichtswürfel und der Ansichtsleiste hindurch. Legst du sie neben dem Ansichtswürfel wieder ab oder doppelklickst auf die Titelleiste, dockt sie wieder an. Wo sie stand und ob sie eingeklappt war, merkt sich der Browser. Breiter oder schmaler machst du die Liste an ihrer rechten unteren Ecke, von 240 bis 600 Pixeln; auch die Breite merkt sich der Browser.
 
 ## Position eintippen
 
@@ -45,6 +45,8 @@ Du kannst eine Form über den Rand der Platte hinausziehen und dort liegen lasse
 ## Fangen beim Verschieben
 
 Ziehst du eine Form über die Arbeitsebene, rastet sie an anderen Formen ein: Ihre linke, rechte, vordere oder hintere Kante oder ihre Mitte legt sich genau auf eine Kante oder Mitte einer anderen Form. Eine rosa Hilfslinie zeigt, woran sie gerade hängt. So stellst du zwei Teile bündig nebeneinander oder mittig hintereinander, ohne Zahlen einzutippen. Das gilt auch, wenn das Raster ausgeschaltet ist. Auch die Mitte der Arbeitsebene zählt: Die rosa Linien zeigen, wann die Form auf X, auf Y oder auf beiden Achsen mittig auf der Platte sitzt.
+
+Auch beim Ändern der Größe rastet es ein: Ziehst du an einem Seitengriff, hält diese Seite an den Kanten und Mitten anderer Formen und an der Wand, auf die sie trifft, auch an der Innenwand eines Kastens, eines ausgehöhlten Körpers oder eines importierten Gehäuses, und die rosa Linie zeigt, wo. Dieses Maß bleibt genau so, abseits vom Raster. So füllt ein Teil ein Gehäuse von Wand zu Wand: Lege es an die eine Wand und ziehe seine andere Seite an die gegenüberliegende. Mit [[Alt]] wächst die Form aus ihrer Mitte, und die gezogene Seite rastet genauso ein; mit [[Shift]] behält sie ihre Proportionen und rastet nicht ein. Das gilt auf der flachen Arbeitsebene für Formen, die aufrecht stehen und mit ihren Seiten entlang X und Y liegen, und {{ui:workspace.objectSnap}} schaltet es zusammen mit dem Fangen beim Verschieben aus.
 
 Hältst du beim Ziehen [[Umschalt]] gedrückt, bleibt die Bewegung auf einer Achse: Die Form folgt der Richtung, X oder Y, in die du weiter gezogen hast, und lässt die andere unberührt. Drück [[Umschalt]] am besten erst, wenn du schon ziehst; auf einer Form, die noch nicht ausgewählt ist, nimmt ein Klick mit [[Umschalt]] sie nur zur Auswahl dazu.
 

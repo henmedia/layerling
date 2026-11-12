@@ -7,6 +7,7 @@ import { outwardFaceNormal } from "@/lib/layFlat";
 import type { PaintLassoView } from "@/lib/paintMesh";
 import { planarFaceCentroid, planarFaceTriangles, type PivotPoint } from "@/lib/rotationPivot";
 import { roundFaceTriangles, type RoundFaceAxis } from "@/lib/roundFaceAxis";
+import { setPickRayFromCamera } from "@/lib/cameraRay";
 
 /**
  * Finding what is under the pointer in the 3D view: the ray from the camera
@@ -35,7 +36,7 @@ export function aimPickRay(state: PickRayState, clientX: number, clientY: number
   const rect = state.renderer.domElement.getBoundingClientRect();
   state.pointer.x = ((clientX - rect.left) / rect.width) * 2 - 1;
   state.pointer.y = -((clientY - rect.top) / rect.height) * 2 + 1;
-  state.raycaster.setFromCamera(state.pointer, state.camera);
+  setPickRayFromCamera(state.raycaster, state.pointer, state.camera);
   if (layer !== undefined) state.raycaster.layers.set(layer);
   return rect;
 }
@@ -118,7 +119,7 @@ export function pickShapeAt(
     const angle = (step / PICK_TOLERANCE_RAYS) * Math.PI * 2;
     state.pointer.x = ((clientX + Math.cos(angle) * tolerance - rect.left) / rect.width) * 2 - 1;
     state.pointer.y = -((clientY + Math.sin(angle) * tolerance - rect.top) / rect.height) * 2 + 1;
-    state.raycaster.setFromCamera(state.pointer, state.camera);
+    setPickRayFromCamera(state.raycaster, state.pointer, state.camera);
     const near = state.raycaster.intersectObjects(state.shapeLayer.children, true).find(pickable);
     if (near && near.distance < nearestDistance) {
       nearestId = near.object.userData.shapeId as string;

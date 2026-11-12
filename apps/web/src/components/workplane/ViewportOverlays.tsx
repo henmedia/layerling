@@ -1,5 +1,5 @@
 
-import { Crosshair, Eye, EyeOff, Maximize2, MousePointer2, Plus, Rows3, X } from "lucide-react";
+import { Axis3d, Crosshair, Eye, EyeOff, Maximize2, MousePointer2, Plus, Rows3, X } from "lucide-react";
 import { useLayoutEffect, useRef, useState, type Dispatch, type MutableRefObject, type PointerEvent as ReactPointerEvent, type SetStateAction } from "react";
 import type { CameraTurn } from "@/lib/viewCubeTransition";
 import * as THREE from "three";
@@ -11,7 +11,7 @@ import { LineSegmentsGeometry } from "three/examples/jsm/lines/LineSegmentsGeome
 import { type AppThemePalette, type ResolvedAppTheme } from "@/lib/appTheme";
 import { t, type MessageKey } from "@/lib/i18n";
 import { currentLengthUnitLabel, displayToMillimeters, formatLengthMm, formatMeasurementNumber, lengthDisplayUnit, millimetersToDisplay, parseMeasurementInput } from "@/lib/measurementUnits";
-import { computeCornerRulerRelativeCoordinates, cornerRulerAxisModes, cornerRulerElevationFieldBesideBody, cornerRulerDimensionMatchesFromCorner, cornerRulerFlatRotation, cornerRulerTicks, pointAlongRuler, rulerDimensionMatch, rulerLiesFlat, spreadCornerRulerFields, worldAxisNameOfDirection, type CornerRulerAxis, type CornerRulerAxisModes, type CornerRulerFrame, type CornerRulerMode, type RulerDimensionField, type RulerDimensionMatch, type RulerPose } from "@/lib/rulerDimensions";
+import { CORNER_RULER_DEFAULT_ARM_ELEVATION, computeCornerRulerRelativeCoordinates, cornerRulerArmsShown, cornerRulerAxisModes, cornerRulerElevationFieldBesideBody, cornerRulerDimensionMatchesFromCorner, cornerRulerFlatRotation, cornerRulerTicks, pointAlongRuler, rulerDimensionMatch, rulerLiesFlat, spreadCornerRulerFields, worldAxisNameOfDirection, type CornerRulerAxis, type CornerRulerAxisModes, type CornerRulerFrame, type CornerRulerMode, type RulerDimensionField, type RulerDimensionMatch, type RulerPose } from "@/lib/rulerDimensions";
 import { type PlacementPoint, type PlacementWorkplane } from "@/lib/placementWorkplane";
 import { capturePointer } from "@/lib/pointerCapture";
 import { GuideHelpLink } from "@/components/GuideHelpLink";
@@ -27,12 +27,15 @@ import { placeTapeLabel, screenPolylineMiddle, tapeAxisSpans, tapeAxisTag, tapeD
 import { roundEdgeMeasure } from "@/lib/tapeCircle";
 import { tapeLengthMover, type TapeLengthMover, type TapeLengthRefusal } from "@/lib/tapeLengthEdit";
 import { displayShapeName } from "@/lib/shapeCatalog";
+import { setPickRayFromCamera } from "@/lib/cameraRay";
 
 /** Light-blue chrome for origin-distance lines, matching `.origin-dimension-value`. */
 const ORIGIN_DIMENSION_LINE_COLOR = { light: "#6ec4e8", dark: "#8fd4f0" } as const;
 
 /** Kreuzbreite und Vorgabe-Armlaengen des Winkellineal-Werkzeugs - kein Formen-Katalog-Eintrag mehr, siehe layerling-lineal.md. */
 const CORNER_RULER_ARM_WIDTH = 12;
+/** An arm's end this close to the corner on the screen gets no grip of its own: it would lie on the corner's handle. */
+const CORNER_RULER_END_CLEARANCE_PX = 12;
 
 export const RENDER_LAYER_HELPERS = 2;
 const RENDER_LAYER_SHAPES = 1;
@@ -1248,7 +1251,8 @@ export function TapeOverlay({
   onPointPointerDown: (event: ReactPointerEvent<SVGCircleElement>, pointId: string) => void;
   onPointPointerMove: (event: ReactPointerEvent<SVGCircleElement>, pointId: string) => void;
   onPointPointerUp: (event: ReactPointerEvent<SVGCircleElement>, pointId: string) => void;
-  onSegmentPointerDown: (event: ReactPointerEvent<SVGElement>, segmentId: string) => void;
+  /** The line, and while deleting the label too: on a hole the line is its small, often hidden rim (#1613). */
+  onSegmentPointerDown: (event: ReactPointerEvent<Element>, segmentId: string) => void;
   /** Puts a reference point in the middle of a measurement (#323). */
   onMarkMiddle?: (segmentId: string) => void;
   /** Opens the field to type a length, which moves the body at one end (#823). */
@@ -1340,7 +1344,14 @@ export function TapeOverlay({
             style={{ left: segment.labelX, top: segment.labelY }}
             title={hint}
             aria-label={t("camera.tapeDistance", { length: `${segment.label} ${currentLengthUnitLabel()}` })}
-            onPointerDown={(event) => event.stopPropagation()}
+            onPointerDown={(event) => {
+              // Shift or Ctrl/Cmd held in Add measurement deletes the measurement here as on its line (#1613).
+              if (quickDelete) {
+                onSegmentPointerDown(event, segment.id);
+                return;
+              }
+              event.stopPropagation();
+            }}
             onClick={() => onEditLength(segment.id)}
             {...hoverSegment(segment.id, true)}
           >
@@ -1348,11 +1359,14 @@ export function TapeOverlay({
           </button>
         ) : (
           // A label that cannot be typed says why when it is pointed at, so it catches the pointer like one with a tip.
+          // While deleting, the label takes the click as its line does: on a hole the line is the rim, small and often
+          // hidden in the hole, and the number is what one clicks (#1613).
           <span
             key={`${segment.id}-label`}
-            className={`tape-label ${hoverClass(segment)} ${segment.deltas ? "has-deltas" : ""} ${hint ? "has-hint" : ""}`}
+            className={`tape-label ${hoverClass(segment)} ${segment.deltas ? "has-deltas" : ""} ${hint ? "has-hint" : ""} ${deleteMode || quickDelete ? "deletable" : ""}`}
             style={{ left: segment.labelX, top: segment.labelY }}
             title={hint || undefined}
+            onPointerDown={deleteMode || quickDelete ? (event) => onSegmentPointerDown(event, segment.id) : undefined}
             {...hoverSegment(segment.id, true)}
           >
             {content}
@@ -1578,6 +1592,10 @@ export type CornerRulerInstance = {
   occlude?: boolean;
   /** The measures of the bodies at the arms are shown only for the selected bodies (false when left out, #831). */
   selectedOnly?: boolean;
+  /** How long the third arm, standing up from the corner along the normal, is (CORNER_RULER_DEFAULT_ARM_ELEVATION when left out, Discussion #1649). */
+  armLengthElevation?: number;
+  /** The arms switched away from the start: the two in the plane on, the third off (Discussion #1649). */
+  arms?: Partial<Record<CornerRulerAxis, boolean>>;
 };
 
 /** A tick number or a neighbour's measure on the screen; `hidden` when a body stands in front of the place it belongs to. */
@@ -1591,8 +1609,14 @@ type CornerRulerOverlayItem = {
   modes: Record<CornerRulerAxis, CornerRulerMode>;
   handleX: number;
   handleY: number;
-  /** Where the two arms end on the screen, and how long they are: their ends are dragged to make them longer or shorter (Discussion #1469). */
-  ends: Record<"x" | "z", { x: number; y: number; text: string }>;
+  /**
+   * Where the arms end on the screen, and how long they are: their ends are dragged to make them longer or shorter
+   * (Discussion #1469). `grip` is false for an arm switched off, and for the third arm while it points almost at the
+   * eye, where its end would lie on the corner's handle (Discussion #1649).
+   */
+  ends: Record<CornerRulerAxis, { x: number; y: number; text: string; grip: boolean }>;
+  /** Which of the three arms are shown (Discussion #1649). */
+  arms: Record<CornerRulerAxis, boolean>;
   /** The axis of the position fields (X, Y, Z) that each green number counts along: by where its arm points (#597). */
   axisNames: Record<CornerRulerAxis, "X" | "Y" | "Z">;
   /** True when a body in front hides the ruler's lines; false when they stay in view. */
@@ -1678,24 +1702,32 @@ export function syncCornerRulerToolOverlay(
       const pushSegment = (target: number[], a: THREE.Vector3, b: THREE.Vector3) => {
         target.push(a.x, a.y, a.z, b.x, b.y, b.z);
       };
+      // The third arm stands up from the corner along the normal, switched on by hand; any arm can be switched off,
+      // one stays (Discussion #1649).
+      const shown = cornerRulerArmsShown(ruler.arms);
+      const armLengthElevation = ruler.armLengthElevation ?? CORNER_RULER_DEFAULT_ARM_ELEVATION;
       const xArmEnd = corner.clone().addScaledVector(xAxis, ruler.armLengthX);
       const zArmEnd = corner.clone().addScaledVector(zAxis, ruler.armLengthZ);
-      pushSegment(lines.arms, corner, xArmEnd);
-      pushSegment(lines.arms, corner, zArmEnd);
+      const elevationArmEnd = corner.clone().addScaledVector(yAxis, armLengthElevation);
+      if (shown.x) pushSegment(lines.arms, corner, xArmEnd);
+      if (shown.z) pushSegment(lines.arms, corner, zArmEnd);
+      if (shown.elevation) pushSegment(lines.arms, corner, elevationArmEnd);
       const xEndHandle = projectToScreen(xArmEnd, state);
       const zEndHandle = projectToScreen(zArmEnd, state);
+      const elevationEndHandle = projectToScreen(elevationArmEnd, state);
+      // Looking along the third arm its end lies on the corner's handle and would take its clicks.
+      const elevationEndClear = Math.hypot(elevationEndHandle.x - handleScreen.x, elevationEndHandle.y - handleScreen.y) > CORNER_RULER_END_CLEARANCE_PX;
 
       const labels: CornerRulerLabelScreen[] = [];
       const buildTicks = (axisDir: THREE.Vector3, acrossDir: THREE.Vector3, length: number) => {
-        cornerRulerTicks(length).forEach((tick) => {
+        cornerRulerTicks(length, currentLengthUnitLabel()).forEach((tick) => {
           const base = corner.clone().addScaledVector(axisDir, tick.offset);
-          const tickHeight = armWidth * (tick.isTen ? 0.62 : tick.isFive ? 0.42 : 0.26);
-          pushSegment(lines.ticks, base, base.clone().addScaledVector(acrossDir, tickHeight));
-          if (tick.isTen && tick.offset > 0) {
+          pushSegment(lines.ticks, base, base.clone().addScaledVector(acrossDir, armWidth * tick.height));
+          if (tick.label) {
             const labelWorld = base.clone().addScaledVector(acrossDir, armWidth * 0.95);
             if (depthInFrontOfCamera(labelWorld, state) > 0) {
               const labelScreen = projectToScreen(labelWorld, state);
-              labels.push({ x: labelScreen.x, y: labelScreen.y, text: String(tick.offset), hidden: occlude && worldPointHidden(labelWorld, state) });
+              labels.push({ x: labelScreen.x, y: labelScreen.y, text: tick.label, hidden: occlude && worldPointHidden(labelWorld, state) });
             }
           }
         });
@@ -1703,8 +1735,10 @@ export function syncCornerRulerToolOverlay(
       // Die Teilstriche zeigen nach aussen (weg vom jeweils anderen Arm),
       // wie bei vergleichbaren Programmen - nicht in die Ecke hinein, wo sonst platzierte
       // Formen sitzen wuerden.
-      buildTicks(xAxis, zAxis.clone().negate(), ruler.armLengthX);
-      buildTicks(zAxis, xAxis.clone().negate(), ruler.armLengthZ);
+      if (shown.x) buildTicks(xAxis, zAxis.clone().negate(), ruler.armLengthX);
+      if (shown.z) buildTicks(zAxis, xAxis.clone().negate(), ruler.armLengthZ);
+      // The third arm's ticks point away from the arm along x, out of the corner where bodies stand.
+      if (shown.elevation) buildTicks(yAxis, xAxis.clone().negate(), armLengthElevation);
 
       let selectedCoordinate: CornerRulerOverlayItem["selectedCoordinate"] = null;
       if (selectedShapes.length) {
@@ -1809,14 +1843,14 @@ export function syncCornerRulerToolOverlay(
             depth: shapeDepth(candidate),
           },
         );
-        if (armX) {
+        if (armX && shown.x) {
           neighborLabels.push(cornerRulerNeighborLabel(
             `${ruler.id}:${candidate.id}:x`,
             { x: ruler.corner.x, z: ruler.corner.z, rotation: flatRotation, length: ruler.armLengthX, crossWidth: armWidth },
             zAxis, armX, topY, state, accuracy, occlude,
           ));
         }
-        if (armZ) {
+        if (armZ && shown.z) {
           neighborLabels.push(cornerRulerNeighborLabel(
             `${ruler.id}:${candidate.id}:z`,
             { x: ruler.corner.x, z: ruler.corner.z, rotation: flatRotation + 90, length: ruler.armLengthZ, crossWidth: armWidth },
@@ -1832,9 +1866,11 @@ export function syncCornerRulerToolOverlay(
         handleX: handleScreen.x,
         handleY: handleScreen.y,
         ends: {
-          x: { x: xEndHandle.x, y: xEndHandle.y, text: `${formatMeasure(ruler.armLengthX, accuracy)} ${currentLengthUnitLabel()}` },
-          z: { x: zEndHandle.x, y: zEndHandle.y, text: `${formatMeasure(ruler.armLengthZ, accuracy)} ${currentLengthUnitLabel()}` },
+          x: { x: xEndHandle.x, y: xEndHandle.y, text: `${formatMeasure(ruler.armLengthX, accuracy)} ${currentLengthUnitLabel()}`, grip: shown.x },
+          z: { x: zEndHandle.x, y: zEndHandle.y, text: `${formatMeasure(ruler.armLengthZ, accuracy)} ${currentLengthUnitLabel()}`, grip: shown.z },
+          elevation: { x: elevationEndHandle.x, y: elevationEndHandle.y, text: `${formatMeasure(armLengthElevation, accuracy)} ${currentLengthUnitLabel()}`, grip: shown.elevation && elevationEndClear },
         },
+        arms: shown,
         axisNames: { x: worldAxisNameOfDirection(xAxis), z: worldAxisNameOfDirection(zAxis), elevation: worldAxisNameOfDirection(yAxis) },
         occlude,
         selectedOnly: ruler.selectedOnly === true,
@@ -1883,7 +1919,7 @@ export function worldPointHidden(point: THREE.Vector3, state: ThreeState, ignore
   if (!Number.isFinite(ndc.x) || !Number.isFinite(ndc.y) || Math.abs(ndc.x) > 1.2 || Math.abs(ndc.y) > 1.2) return false;
   const raycaster = state.raycaster;
   const previousLayers = raycaster.layers.mask;
-  raycaster.setFromCamera(new THREE.Vector2(ndc.x, ndc.y), state.camera);
+  setPickRayFromCamera(raycaster, new THREE.Vector2(ndc.x, ndc.y), state.camera);
   raycaster.layers.set(RENDER_LAYER_SHAPES);
   const along = point.clone().sub(raycaster.ray.origin).dot(raycaster.ray.direction);
   const savedFar = raycaster.far;
@@ -1971,6 +2007,7 @@ export function CornerRulerToolOverlay({
   onArmEndPointerMove,
   onArmEndPointerUp,
   onArmsToPlate,
+  onToggleArm,
   onCoordinateClick,
 }: {
   overlay: CornerRulerOverlayState;
@@ -1984,14 +2021,18 @@ export function CornerRulerToolOverlay({
   onToggleOcclude: (id: string) => void;
   /** Switches whether the bodies at the arms show their measures without being selected (#831). */
   onToggleSelectedOnly: (id: string) => void;
-  /** Dragging an arm's end makes that arm longer or shorter (Discussion #1469). */
-  onArmEndPointerDown: (event: ReactPointerEvent<SVGCircleElement>, id: string, arm: "x" | "z") => void;
-  onArmEndPointerMove: (event: ReactPointerEvent<SVGCircleElement>, id: string, arm: "x" | "z") => void;
-  onArmEndPointerUp: (event: ReactPointerEvent<SVGCircleElement>, id: string, arm: "x" | "z") => void;
+  /** Dragging an arm's end makes that arm longer or shorter (Discussion #1469), the third one too (Discussion #1649). */
+  onArmEndPointerDown: (event: ReactPointerEvent<SVGCircleElement>, id: string, arm: CornerRulerAxis) => void;
+  onArmEndPointerMove: (event: ReactPointerEvent<SVGCircleElement>, id: string, arm: CornerRulerAxis) => void;
+  onArmEndPointerUp: (event: ReactPointerEvent<SVGCircleElement>, id: string, arm: CornerRulerAxis) => void;
   /** Makes both arms as long as the build plate is wide and deep (Discussion #1469). */
   onArmsToPlate: (id: string) => void;
+  /** Shows or hides one of the three arms; the last one shown stays (Discussion #1649). */
+  onToggleArm: (id: string, arm: CornerRulerAxis) => void;
   onCoordinateClick: (rulerId: string, shapeIds: string[], axis: "x" | "z" | "elevation", value: number, x: number, y: number) => void;
 }) {
+  // The square whose three arm switches are open beside its arms button.
+  const [armsOpenFor, setArmsOpenFor] = useState<string | null>(null);
   if (overlay.items.length === 0) {
     return null;
   }
@@ -2010,7 +2051,7 @@ export function CornerRulerToolOverlay({
               onPointerUp={(event) => onHandlePointerUp(event, item.id)}
               onPointerCancel={(event) => onHandlePointerUp(event, item.id)}
             />
-            {(["x", "z"] as const).map((arm) => (
+            {(["x", "z", "elevation"] as const).filter((arm) => item.ends[arm].grip).map((arm) => (
               <circle
                 key={arm}
                 className="corner-ruler-end-handle"
@@ -2120,7 +2161,7 @@ export function CornerRulerToolOverlay({
           <button
             type="button"
             className="corner-ruler-mode-toggle corner-ruler-plate-toggle"
-            style={{ left: item.handleX, top: item.handleY + 54 }}
+            style={{ left: item.handleX, top: item.handleY + 72 }}
             aria-label={t("aria.cornerRulerArmsToPlate")}
             title={t("ruler.armsToPlate")}
             onPointerDown={(event) => event.stopPropagation()}
@@ -2128,6 +2169,41 @@ export function CornerRulerToolOverlay({
           >
             <Maximize2 size={11} strokeWidth={2.5} aria-hidden="true" />
           </button>
+          {/* The arms: the two in the plane and the third standing up, each shown or hidden (Discussion #1649). Above
+              the plate button, which stays the lowest. */}
+          <button
+            type="button"
+            className={`corner-ruler-mode-toggle corner-ruler-arms-toggle${armsOpenFor === item.id ? " active" : ""}`}
+            style={{ left: item.handleX, top: item.handleY + 54 }}
+            aria-label={t("aria.cornerRulerArms")}
+            aria-expanded={armsOpenFor === item.id}
+            title={t("ruler.arms")}
+            onPointerDown={(event) => event.stopPropagation()}
+            onClick={() => setArmsOpenFor((open) => open === item.id ? null : item.id)}
+          >
+            <Axis3d size={11} strokeWidth={2.5} aria-hidden="true" />
+          </button>
+          {armsOpenFor === item.id ? (["x", "z", "elevation"] as const).map((arm, index) => {
+            const axisName = item.axisNames[arm];
+            const on = item.arms[arm];
+            const last = on && (["x", "z", "elevation"] as const).filter((entry) => item.arms[entry]).length === 1;
+            return (
+              <button
+                key={arm}
+                type="button"
+                className={`corner-ruler-mode-toggle corner-ruler-arm-toggle axis-${axisName.toLowerCase()}${on ? " active" : ""}`}
+                style={{ left: item.handleX + 20 + index * 19, top: item.handleY + 54 }}
+                aria-label={t("aria.cornerRulerArm", { axis: axisName })}
+                aria-pressed={on}
+                disabled={last}
+                title={last ? t("ruler.arm.last", { axis: axisName }) : on ? t("ruler.arm.hide", { axis: axisName }) : t("ruler.arm.show", { axis: axisName })}
+                onPointerDown={(event) => event.stopPropagation()}
+                onClick={() => onToggleArm(item.id, arm)}
+              >
+                {axisName}
+              </button>
+            );
+          }) : null}
           <button
             type="button"
             className="corner-ruler-delete"

@@ -25,6 +25,12 @@ Die App läuft standardmäßig unter `http://127.0.0.1:3000/`.
 - Füge bei Änderungen an der Oberfläche nach Möglichkeit Bildschirmfotos oder kurze Aufnahmen bei.
 - Weise auf Änderungen an Speicherung, Import, Export, Gruppierung oder Rückgängig/Wiederholen ausdrücklich hin.
 
+## Editor-Profile für Werkzeuge
+
+Wenn ein Betreiber ein Werkzeug für einen Workshop oder einen ähnlichen Einsatz anpassen möchte,
+kann das Werkzeug seine Einstellungen über ein [Editor-Profil](../README.md#editor-profiles)
+anbieten. Als Vorlage dient [Abrunden im Beispielprofil](../docs/examples/editor-profile.json).
+
 ## Bereiche, die Sorgfalt verlangen
 
 - STL-Import und -Export

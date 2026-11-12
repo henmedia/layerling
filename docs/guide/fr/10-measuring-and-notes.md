@@ -35,6 +35,7 @@ Le carré d'encadrement repose sur le plan de travail. Si cela se trouve sur le 
 - **Un clic court sur la poignée** la fait tourner de 90°.
 - **Le ×** à côté le supprime.
 - **Faire glisser le petit cercle au bout d'un bras** allonge ou raccourcit ce bras, au millimètre entier. Le bouton le plus bas sous la poignée, {{ui:ruler.armsToPlate}}, rend les deux bras aussi longs que le plateau de l'imprimante choisie dans les réglages est large et profond. L'équerre garde la longueur de ses bras avec le projet, et une équerre posée à nouveau la reprend.
+- **{{ui:ruler.arms}}** (le bouton aux trois axes, juste au-dessus) ouvre un interrupteur pour chaque bras, nommé d'après l'axe qu'il suit. En plus des deux bras dans le plan, il y en a un troisième qui se dresse au coin, perpendiculaire au plan de travail : sur le plateau il monte le long de Z, avec ses propres graduations, pour un cylindre ou tout ce que vous construisez en hauteur. Il est éteint au départ : cliquez sur sa lettre pour l'afficher, et faites glisser le petit cercle à son bout pour l'allonger ou le raccourcir. Les bras dans le plan se masquent de la même façon quand ils gênent ; un bras reste toujours. Les nombres verts d'un corps sélectionné restent, quels que soient les bras affichés, et le design garde lesquels le sont.
 - **Le petit bouton à gauche de la poignée** change ce qui est mesuré à partir de : l'extérieur d'un corps (point final, une icône avec des lignes) ou son milieu (point médian, un réticule).
 
 Si des corps se tiennent près de l'un des bras, le carré d'encadrement affiche automatiquement leurs dimensions. Cela fonctionne uniquement sur la plaque de base, pas sur le côté d'une carrosserie. Le bouton à la flèche sous la poignée de l'équerre le désactive, de sorte que seuls les corps sélectionnés montrent leurs dimensions ; il est enregistré avec le design.
@@ -49,7 +50,7 @@ Le ruban à mesurer et l'équerre de cadrage restent là où ils se trouvent pen
 
 Cliquez sur {{ui:camera.protractor}} dans la barre de vue pour mesurer un angle. Une rangée de boutons s'ouvre à côté et, jusqu'à ce que vous cliquiez à nouveau sur le bouton ou appuyiez sur [[Esc]], chaque clic dans la vue mesure avec le rapporteur. Comme le ruban à mesurer, il s'accroche aux coins et aux bords des corps ; à côté des corps, il pose un point sur le plateau.
 
-- {{ui:camera.protractorPoints}} : cliquez d'abord sur le sommet de l'angle, puis sur un point de chaque côté. Pendant que vous placez le dernier point, l'angle s'affiche déjà ; après le troisième clic, il reste, avec un arc entre les côtés. C'est l'angle au sommet, de 0° à 180°.
+- {{ui:camera.protractorPoints}} : cliquez d'abord sur le sommet de l'angle, puis sur un point de chaque côté. Pendant que vous placez le dernier point, l'angle s'affiche déjà ; après le troisième clic, il reste, avec un arc entre les côtés. C'est l'angle au sommet, de 0° à 180°. Vu droit de dessus, de face ou de côté, il mesure l'angle tel qu'il apparaît : un coin du dessus et le coin du dessous juste en dessous sont le même point. Dans une vue inclinée, c'est l'angle dans l'espace.
 - {{ui:camera.protractorFaces}} : cliquez sur deux faces planes. Un court trait bleu sur chacune montre de quel côté elle est tournée, et l'étiquette donne les deux angles que forment les faces, le plus petit d'abord : un chanfrein de 45° contre le dessus donne 45° · 135°, deux côtés d'un pavé seulement 90°. Une face courbe n'a pas de direction unique, le rapporteur demande donc une face plane.
 
 Le clic suivant après un angle terminé en commence un nouveau, et {{ui:camera.protractorClear}} le supprime. L'angle suit les corps quand ils sont déplacés ou tournés. Rien n'en est enregistré ni n'entre dans l'historique : il disparaît quand vous refermez le rapporteur.
@@ -58,7 +59,7 @@ Le clic suivant après un angle terminé en commence un nouveau, et {{ui:camera.
 
 Dans les paramètres sous {{ui:workspace.appearance}}, il y a deux commutateurs pour les cotes dynamiques :
 
-- {{ui:workspace.showMoveDimensions}} indique de combien vous vous déplacez en faisant glisser. Cela vaut aussi pour le levage avec la flèche noire au-dessus d'un corps ; le déplacement s'affiche à son coin avant. Une fois relâché, cliquez sur ce nombre et saisissez la distance exacte ; une valeur négative descend.
+- {{ui:workspace.showMoveDimensions}} indique de combien vous vous déplacez en faisant glisser. Cela vaut aussi pour le levage avec la flèche bleue au-dessus d'un corps ; le déplacement s'affiche à son coin avant. Une fois relâché, cliquez sur ce nombre et saisissez la distance exacte ; une valeur négative descend.
 - {{ui:workspace.showOriginDimensions}} montre les distances de la sélection à l'origine de la plaque, également avec plusieurs corps sélectionnés.
 
 Avec {{ui:workspace.dimensionsAlwaysVisible}} les cotes restent visibles en permanence. Un corps qui ne repose pas sur le plan de travail affiche aussi sa hauteur au-dessus ; cliquez sur le nombre pour en saisir une nouvelle.

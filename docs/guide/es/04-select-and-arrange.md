@@ -22,7 +22,7 @@ Con muchas piezas, es fácil perderse en la vista. La lista de objetos ({{ui:edi
 ![La lista de objetos: el grupo «Grupo» con dos piezas y una esfera al lado. Un icono de carpeta abre el grupo.](shot:object-list)
 
 - Un clic en una entrada selecciona la forma, también las piezas que están dentro de un grupo. Con [[Mayús]] pulsado, añades más entradas o las vuelves a quitar, igual que en la vista. Las flechas despliegan y pliegan los grupos.
-- La etiqueta indica si una pieza es {{ui:outliner.solid}} u {{ui:outliner.hole}}.
+- La letra tras el nombre indica si una pieza es {{ui:outliner.solid}} o {{ui:outliner.hole}}: es la primera letra de la palabra, y la palabra completa aparece al pasar el ratón por encima.
 - Debajo del nombre aparece qué tipo de forma es. Un cuerpo que ya no es una forma simple (redondeado, vaciado o importado) muestra {{ui:shape.exactBody}} cuando la exportación STEP lo escribe con exactitud, y {{ui:shape.mesh}} cuando solo son triángulos y sale como STL. Un estrechamiento, una inclinación o una torsión añadidos después de redondear o vaciar un cuerpo solo doblan su malla, así que entonces muestra {{ui:shape.mesh}}.
 - El candado y el ojo bloquean y ocultan piezas sueltas.
 - {{ui:outliner.rename}} le da a una pieza un nombre propio; el lápiz junto al nombre, en la parte de arriba del panel de propiedades, hace lo mismo con la forma seleccionada. En los diseños grandes, unos nombres con sentido ayudan muchísimo.
@@ -32,7 +32,7 @@ Con muchas piezas, es fácil perderse en la vista. La lista de objetos ({{ui:edi
 - El campo de búsqueda encuentra formas por su nombre y por su tipo, así que también puedes buscar «cilindro» u «orificio». Busca también dentro de los grupos, por muy anidados que estén: un grupo que contiene una coincidencia se queda en la lista y se despliega para mostrar las piezas que coinciden y los grupos que llevan hasta ellas. Un grupo encontrado por su propio nombre muestra todas sus piezas cuando lo abres.
 - La flecha del extremo izquierdo de la barra de título pliega la lista hasta dejar solo la barra de título, y la vuelve a desplegar.
 
-La lista está acoplada justo a la derecha del cubo de vista. Arrástrala por su barra de título para ponerla en cualquier punto del plano de trabajo; pasa por debajo del cubo de vista y de la barra de vista. Si la sueltas otra vez junto al cubo de vista, o haces doble clic en la barra de título, se vuelve a acoplar. Este navegador recuerda dónde estaba y si estaba plegada.
+La lista está acoplada justo a la derecha del cubo de vista. Arrástrala por su barra de título para ponerla en cualquier punto del plano de trabajo; pasa por debajo del cubo de vista y de la barra de vista. Si la sueltas otra vez junto al cubo de vista, o haces doble clic en la barra de título, se vuelve a acoplar. Este navegador recuerda dónde estaba y si estaba plegada. Para hacer la lista más ancha o más estrecha, arrastra su esquina inferior derecha, de 240 a 600 píxeles; el navegador recuerda también el ancho.
 
 ## Escribir una posición
 
@@ -45,6 +45,8 @@ Puedes arrastrar una forma más allá del borde de la placa y dejarla ahí, hast
 ## Ajuste al mover
 
 Cuando arrastras una forma por el plano de trabajo, se ajusta a otras formas: su lado izquierdo, derecho, delantero o trasero, o su centro, cae exactamente sobre un lado o el centro de otra forma. Una línea guía rosa muestra a qué se está ajustando. Así dejas dos piezas a ras una junto a otra, o centradas una detrás de otra, sin escribir números. También funciona con la cuadrícula desactivada. También cuenta el centro del plano de trabajo: las líneas rosas muestran cuándo la forma queda en el centro de la placa en X, en Y o en ambos.
+
+Al cambiar el tamaño también se ajusta: cuando arrastras un tirador lateral, ese lado se detiene en las aristas y los centros de otras formas y en la pared con la que se encuentra, también la pared interior de una caja, de un cuerpo vaciado o de una carcasa importada, y la línea rosa muestra dónde. Esa medida se mantiene exacta, fuera de la cuadrícula. Así una pieza llena una carcasa de pared a pared: apóyala en una pared y arrastra su otro lado hasta la opuesta. Con [[Alt]] la forma crece desde su centro y el lado arrastrado se ajusta igual; con [[Shift]] conserva sus proporciones y no se ajusta. Funciona en el plano de trabajo plano, con formas en pie con sus lados a lo largo de X e Y, y {{ui:workspace.objectSnap}} lo desactiva junto con el ajuste al mover.
 
 Mantén pulsado [[Mayús]] mientras arrastras para que el movimiento siga un solo eje: la forma sigue la dirección, X o Y, en la que más hayas arrastrado y no se mueve en la otra. Lo mejor es pulsar [[Mayús]] cuando ya estás arrastrando; sobre una forma que aún no está seleccionada, un clic con [[Mayús]] solo la añade a la selección.
 

@@ -91,6 +91,7 @@ At the foot of the window: {{ui:dashboard.sponsor}} leads to the page where you 
 ### Focus mode
 
 On a small screen, {{ui:focusMode.enter}} gives the title row and the footer to the work: the button with the two arrows pointing outwards at the top right, [[Ctrl]]+[[Shift]]+[[F]] or the command search switch it on. The ribbon moves up and the view reaches down to the edge of the window. A small bar below the ribbon keeps the house for the start page, the tabs {{ui:editor.modeGeometry}} and {{ui:editor.modeSketch}}, the magnifying glass, the settings and the button with the two arrows pointing inwards, which ends focus mode; drag the bar by its grip to another spot, a double click on the grip puts it back. layerling remembers the choice in this browser, and while the browser fills the whole screen (F11) it switches to focus mode by itself.
+The bar also shows the design's name; click it to rename the design without leaving focus mode.
 
 ## Your first part
 

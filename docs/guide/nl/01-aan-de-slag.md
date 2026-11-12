@@ -91,6 +91,7 @@ Onderaan het venster: {{ui:dashboard.sponsor}} leidt naar de pagina waar je het 
 ### Focusmodus
 
 Op een klein scherm geeft de {{ui:focusMode.enter}} de titelregel en de voettekst aan het werk: de knop met de twee naar buiten wijzende pijlen rechtsboven, [[Ctrl]]+[[Shift]]+[[F]] of het zoeken naar opdrachten zet hem aan. Het lint schuift omhoog en de weergave reikt tot de rand van het venster. Een kleine balk onder het lint houdt het huisje naar de startpagina, de tabbladen {{ui:editor.modeGeometry}} en {{ui:editor.modeSketch}}, het vergrootglas, de instellingen en de knop met de twee naar binnen wijzende pijlen, die de modus beëindigt; sleep de balk aan zijn greep naar een andere plek, een dubbelklik op de greep zet hem terug. layerling onthoudt de keuze in deze browser, en zolang de browser het hele scherm vult (F11), schakelt het vanzelf naar de focusmodus.
+De balk toont ook de naam van het ontwerp; klik erop om het te hernoemen zonder de focusmodus te verlaten.
 
 ## Je eerste onderdeel
 

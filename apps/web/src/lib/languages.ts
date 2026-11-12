@@ -16,7 +16,7 @@
  * (Čeština, Dansk, Deutsch, Français, ...); then the others, by the name in their own script.
  * A new language goes in at its place, not at the end.
  */
-export const LANGUAGES = ["en", "cs", "da", "de", "es", "fr", "it", "hu", "nl", "pl", "pt-pt", "pt-br", "sl", "tr", "ru", "ar", "ja", "zh-cn", "zh-tw"] as const;
+export const LANGUAGES = ["en", "cs", "da", "de", "es", "fr", "it", "hu", "nl", "pl", "pt-pt", "pt-br", "sl", "sv", "tr", "ru", "ar", "ja", "zh-cn", "zh-tw"] as const;
 export type Language = (typeof LANGUAGES)[number];
 export const DEFAULT_LANGUAGE: Language = "en";
 
@@ -578,6 +578,57 @@ export const LANGUAGE_INFO: Readonly<Record<Language, LanguageInfo>> = {
       printAllLead: "Vsa poglavja eno za drugim, za tiskanje ali shranjevanje kot PDF: pritisni Ctrl+P in v nastavitvah tiskanja izklopi »Glave in noge«. Če želiš natisniti le del, tam izberi številke strani.",
       printContents: "Kazalo",
       printButton: "Natisni",
+    },
+  },
+  sv: {
+    name: "Svenska",
+    htmlLang: "sv",
+    numberLocale: "sv-SE",
+    quotes: ["”", "”"],
+    guideDir: "handbok",
+    communityUrl: GITHUB_DISCUSSIONS,
+    readme: "README.sv.md",
+    quickstartAnchor: "snabbstart-i-windows",
+    legal: { imprint: "Juridisk information", privacy: "Integritetspolicy" },
+    keyNames: {
+      Ctrl: "Ctrl",
+      Shift: "Skift",
+      Delete: "Delete",
+      Backspace: "Backsteg",
+      Home: "Home",
+      End: "End",
+      "Page Up": "Page Up",
+      "Page Down": "Page Down",
+      Enter: "Enter",
+      Click: "Klick",
+      RightClick: "Högerklick",
+      MiddleClick: "Mellanklick",
+      Drag: "Dra",
+    },
+    asciiUmlauts: false,
+    complete: true,
+    guide: {
+      site: "layerling användarhandbok",
+      home: "Användarhandbok",
+      openEditor: "Öppna redigeraren",
+      backToEditor: "Tillbaka till redigeraren",
+      editorElsewhere: "Redigeraren är redan öppen i en annan flik – byt bara till den.",
+      chapters: "Kapitel",
+      onThisPage: "På den här sidan",
+      previous: "Föregående kapitel",
+      next: "Nästa kapitel",
+      overviewLead: "Allt som layerling kan göra, steg för steg. Bilderna kommer från det körande programmet och förnyas med varje version.",
+      sourceNote: "Den här handboken växer tillsammans med programmet. Om något saknas eller är fel, berätta det i",
+      forum: "diskussionerna",
+      notTranslated: "Det här kapitlet är ännu inte översatt till svenska. Här nedanför följer den engelska texten.",
+      languageMenu: "Språk",
+      search: "Sök i handboken",
+      searchNothing: "Inget hittades.",
+      printAll: "Hela handboken, för utskrift",
+      printAllTitle: "Hela handboken på en sida",
+      printAllLead: "Alla kapitel efter varandra, för att skriva ut eller spara som PDF: tryck Ctrl+P och stäng av ”Sidhuvud och sidfot” i utskriftsinställningarna. För att bara skriva ut en del, välj sidnummer där.",
+      printContents: "Innehåll",
+      printButton: "Skriv ut",
     },
   },
   // Hungarian: the whole interface and the 16 chapters of the guide, informal ("te") like the German "du". Not marked

@@ -7,8 +7,8 @@ import { starSettingsForSize } from "@/lib/starGeometry";
 import { gridfinityFootprintPatch } from "@/lib/gridfinityGeometry";
 import { pulleyFootprint, pulleyFromSize, pulleySizedPatch } from "@/lib/pulleyGeometry";
 import { type SelectionFrame } from "@/lib/liftGeometry";
-import type { SnapBox } from "@/lib/objectSnap";
-import { scaledHorizontalShapePatch } from "@/lib/scaleByPercent";
+import type { EdgeSnapTarget, SnapBox } from "@/lib/objectSnap";
+import { scaledHorizontalShapePatch, worldBoxOfShapes } from "@/lib/scaleByPercent";
 import { POSITION_TYPED_LIMIT } from "@/lib/workplaneSettings";
 import { heightPatchKeepingBase, shapeIsTurned } from "@/lib/rotationPivot";
 import { cleanNearZero, proportionalResizeScale, resizedImportedMeshPositions, resizedShapeSize, shapeDepth, shapeHasTaper, shapeWidth } from "@/lib/workplaneShapes";
@@ -55,6 +55,21 @@ export type TransformDragState = {
   duplicate?: { standIns: THREE.Object3D[] };
   /** An X or Y arrow on the flat workplane (Discussion #1434): the footprints it snaps to, as a drag does; guideY: where its lines are drawn. */
   slideSnap?: { moving: SnapBox; targets: SnapBox[]; guideY: number };
+  /**
+   * A side handle on the flat workplane (Discussion #1647): the dragged side stops at the edges and middles of other
+   * bodies and at the walls it runs into. `frameAxis` is the selection's own axis the handle pulls along, `worldAxis`
+   * the scene axis it lies on and `worldDirection` the way the dragged side moves along it as the body grows;
+   * `movingFrom`/`movingTo` its stretch across, for the guide line.
+   */
+  resizeSnap?: {
+    frameAxis: "x" | "z";
+    worldAxis: "x" | "z";
+    worldDirection: 1 | -1;
+    targets: EdgeSnapTarget[];
+    movingFrom: number;
+    movingTo: number;
+    guideY: number;
+  };
   rotationAxisVector?: THREE.Vector3;
   rotationPivot?: THREE.Vector3;
   /** A pivot the user set; the shapes then move around it instead of spinning in place. */
@@ -274,9 +289,10 @@ export function resizeShapeFromFrameHandle(
   altKey: boolean,
   step: number,
   maxSize: number,
+  freeAxis?: "x" | "z",
 ): Partial<WorkplaneShape> {
   // A GT2 pulley (Discussion #1319) takes the size as teeth and belt width.
-  return pulleySizedPatch(transform.startShape, resizeShapeFromFrameHandleBox(transform, point, handleKey, shiftKey, altKey, step, maxSize));
+  return pulleySizedPatch(transform.startShape, resizeShapeFromFrameHandleBox(transform, point, handleKey, shiftKey, altKey, step, maxSize, freeAxis));
 }
 
 function resizeShapeFromFrameHandleBox(
@@ -287,6 +303,7 @@ function resizeShapeFromFrameHandleBox(
   altKey: boolean,
   step: number,
   maxSize: number,
+  freeAxis?: "x" | "z",
 ): Partial<WorkplaneShape> {
   const shape = transform.startShape;
   const frame = transform.selectionFrame;
@@ -297,16 +314,17 @@ function resizeShapeFromFrameHandleBox(
   const signs = transform.scaleSigns ?? resizeSignsForHandle(handleKey);
   // A handle dragged past the opposite side keeps growing there, as in Tinkercad: the size is the
   // distance from that side and the body stands on the other side of it.
-  const axisResize = (current: number, delta: number, sign: number) => {
+  // A side that snapped to another body (Discussion #1647) keeps that size off the grid.
+  const axisResize = (current: number, delta: number, sign: number, free: boolean) => {
     if (!sign) {
       return { size: current, flipped: false };
     }
     const raw = current + sign * delta * (altKey ? 2 : 1);
-    return { size: snapDimension(Math.abs(raw), step, MIN_SHAPE_SIZE, maxSize), flipped: raw < 0 && !altKey };
+    return { size: snapDimension(Math.abs(raw), free ? 0 : step, MIN_SHAPE_SIZE, maxSize), flipped: raw < 0 && !altKey };
   };
 
-  const resizedX = axisResize(width, localDelta.x, signs.x);
-  const resizedZ = axisResize(depth, localDelta.z, signs.z);
+  const resizedX = axisResize(width, localDelta.x, signs.x, freeAxis === "x");
+  const resizedZ = axisResize(depth, localDelta.z, signs.z, freeAxis === "z");
   let nextWidth = resizedX.size;
   let nextDepth = resizedZ.size;
   let flipX = resizedX.flipped;
@@ -601,22 +619,25 @@ export function resizeSelectionFromHandle(
   altKey: boolean,
   step: number,
   maxSize: number,
+  freeAxis?: "x" | "z",
 ) {
   const frame = transform.selectionFrame;
   const localDelta = transform.scaleStartPoint ? frameLocalDelta(frame, transform.scaleStartPoint, point) : new THREE.Vector3();
   const signs = transform.scaleSigns ?? resizeSignsForHandle(handleKey);
   // Past the opposite side the selection keeps growing there, mirrored: its scale is negative then
   // and the bodies in it change sides with it.
-  const axisResize = (current: number, delta: number, sign: number) => {
+  const axisResize = (current: number, delta: number, sign: number, free: boolean) => {
     if (!sign) {
       return { size: current, scale: 1, flipped: false };
     }
+    // A side that snapped to another body (Discussion #1647) keeps that size off the grid.
+    const grid = free ? 0 : step;
     if (altKey) {
-      const size = snapDimension(Math.abs(current + sign * delta * 2), step, MIN_SHAPE_SIZE, maxSize);
+      const size = snapDimension(Math.abs(current + sign * delta * 2), grid, MIN_SHAPE_SIZE, maxSize);
       return { size, scale: size / Math.max(MIN_SHAPE_SIZE, current), flipped: false };
     }
     const rawSize = current + sign * delta;
-    const size = snapDimension(Math.abs(rawSize), step, MIN_SHAPE_SIZE, maxSize);
+    const size = snapDimension(Math.abs(rawSize), grid, MIN_SHAPE_SIZE, maxSize);
     const flipped = rawSize < 0;
     return {
       size,
@@ -625,8 +646,8 @@ export function resizeSelectionFromHandle(
     };
   };
 
-  let nextX = axisResize(frame.width, localDelta.x, signs.x);
-  let nextZ = axisResize(frame.depth, localDelta.z, signs.z);
+  let nextX = axisResize(frame.width, localDelta.x, signs.x, freeAxis === "x");
+  let nextZ = axisResize(frame.depth, localDelta.z, signs.z, freeAxis === "z");
   let uniformScale = 1;
   if (shiftKey && signs.x && signs.z) {
     const scale = proportionalResizeScale(frame.width, frame.depth, nextX.size, nextZ.size);
@@ -680,6 +701,14 @@ export function scaleSelectionItems(
     // Only the selection as a whole lies on the grid. A body of several is not snapped on its own: each would round
     // to a different factor and the layers of an imported drawing no longer fitted into one another (Discussion #1416).
     const sized = (size: number) => (items.length === 1 ? snapDimension(size, step, MIN_SHAPE_SIZE, maxSize) : clamp(size, MIN_SHAPE_SIZE, maxSize));
+    // A turned body (a cylinder laid on its side) grows along its own axes as far as the selection grows along them,
+    // or the stretch along X went to its own width while its length ran along X (#1645).
+    if (shapeIsTurned(item.startShape)) {
+      return {
+        id: item.id,
+        patch: turnedItemScalePatch(item.startShape, frame, Math.abs(nextX.scale), Math.abs(nextZ.scale), uniformScale, nextItemCenter, heightAnchorY, sized),
+      };
+    }
     const width = sized(shapeWidth(item.startShape) * Math.abs(nextX.scale));
     const depth = sized(shapeDepth(item.startShape) * Math.abs(nextZ.scale));
     const actualScaleX = width / Math.max(MIN_SHAPE_SIZE, shapeWidth(item.startShape));
@@ -695,4 +724,61 @@ export function scaleSelectionItems(
       patch: patchWithUniformHeightScale(item.startShape, patch, uniformScale, heightAnchorY),
     };
   });
+}
+
+/** Bodies that are round across: their width and depth are one diameter, so they never become an oval. */
+function keepsRoundFootprint(shape: WorkplaneShape) {
+  if (shape.kind === "gear") return shape.gearType !== "rack" && (shape.gearProfile === "involute" || shape.gearProfile === "round");
+  return shape.kind === "cylinder" || shape.kind === "star" || shape.kind === "knurl" || shape.kind === "hirth" || shape.kind === "pulley" || shape.kind === "finishingWasher";
+}
+
+/**
+ * A turned body of a selection that is stretched along the selection's sideways axes (#1645). Each of its own sizes
+ * grows by as much as the stretch lengthens the axis it runs along: a cylinder laid along X grows longer with the
+ * handles on X and thicker with those on Z. A body turned at a slant gets the nearest it can: a slanting stretch
+ * would be a shear, which no size of its own can show. It keeps its bottom where it was, so nothing sinks into the plate;
+ * with Shift (`uniformScale`) the selection grows in height too and its bottom moves with it.
+ */
+export function turnedItemScalePatch(
+  shape: WorkplaneShape,
+  frame: SelectionFrame,
+  scaleX: number,
+  scaleZ: number,
+  uniformScale: number,
+  center: THREE.Vector3,
+  heightAnchorY: number,
+  sized: (size: number) => number,
+): Partial<WorkplaneShape> {
+  const turn = quaternionForShape(shape);
+  const stretch = (own: THREE.Vector3) => {
+    const axis = own.applyQuaternion(turn);
+    return Math.hypot(axis.dot(frame.xAxis) * scaleX, axis.dot(frame.yAxis) * uniformScale, axis.dot(frame.zAxis) * scaleZ);
+  };
+  let widthScale = stretch(new THREE.Vector3(1, 0, 0));
+  const heightScale = stretch(new THREE.Vector3(0, 1, 0));
+  let depthScale = stretch(new THREE.Vector3(0, 0, 1));
+  if (keepsRoundFootprint(shape)) {
+    // The diameter takes the side that changes the most; the other one, across the stretch, keeps its size otherwise.
+    const diameterScale = Math.abs(Math.log(widthScale)) >= Math.abs(Math.log(depthScale)) ? widthScale : depthScale;
+    widthScale = depthScale = diameterScale;
+  }
+  const width = sized(shapeWidth(shape) * widthScale);
+  const depth = sized(shapeDepth(shape) * depthScale);
+  const height = Math.abs(heightScale - 1) < 1e-9 ? shape.height : sized(shape.height * heightScale);
+  const patch: Partial<WorkplaneShape> = {
+    ...scaledHorizontalShapePatch(shape, width / Math.max(MIN_SHAPE_SIZE, shapeWidth(shape)), depth / Math.max(MIN_SHAPE_SIZE, shapeDepth(shape))),
+    ...(height !== shape.height ? { height } : {}),
+    x: center.x,
+    z: center.z,
+    elevation: center.y - height / 2,
+  };
+  const startBottom = worldBoxOfShapes([shape]).min.y;
+  const wantedBottom = heightAnchorY + (startBottom - heightAnchorY) * uniformScale;
+  const delta = wantedBottom - worldBoxOfShapes([{ ...shape, ...patch } as WorkplaneShape]).min.y;
+  return {
+    ...patch,
+    x: cleanNearZero(center.x, 0.0005),
+    z: cleanNearZero(center.z, 0.0005),
+    elevation: cleanNearZero(clamp((patch.elevation ?? 0) + delta, MIN_ELEVATION, MAX_ELEVATION), 0.0005),
+  };
 }

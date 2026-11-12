@@ -2,10 +2,12 @@
 
 import { GuideHelpLink } from "@/components/GuideHelpLink";
 import { FocusModeBar } from "@/components/workplane/FocusModeBar";
+import { ProjectNameField } from "@/components/workplane/ProjectNameField";
 import { FOCUS_MODE_CHANGE_EVENT, FOCUS_MODE_SHORTCUT } from "@/lib/focusMode";
 import { ShapeMenuPanel } from "@/components/workplane/ShapeMenuPanel";
 import { ShapeLibraryList } from "@/components/workplane/ShapeLibraryList";
-import { AlertTriangle, ArrowDownToLine, ArrowLeftRight, ArrowUpFromLine, Check, CircleHelp, Percent, Circle as CircleIcon, Eye, EyeOff, Hexagon as HexagonIcon, ListTree, Maximize2, Minimize2, Pencil, Pentagon as PentagonIcon, Pin, PinOff, Rotate3d, Route as RouteIcon, ScanEye, Search, Sparkles, Square as SquareIcon, Star as StarIcon, Triangle as TriangleIcon, X } from "lucide-react";
+import { AlertTriangle, ArchiveRestore, ArrowDownToLine, ArrowLeftRight, ArrowUpFromLine, Check, CircleHelp, Percent, Circle as CircleIcon, Eye, EyeOff, Hexagon as HexagonIcon, ListTree, Maximize2, Minimize2, Pentagon as PentagonIcon, Pin, PinOff, Rotate3d, Route as RouteIcon, ScanEye, Search, Sparkles, Square as SquareIcon, Star as StarIcon, Triangle as TriangleIcon, X } from "lucide-react";
+import { OPEN_FILE_BACKUPS_EVENT } from "@/lib/fileBackups";
 import { useEffect, useLayoutEffect, useRef, useState, type CSSProperties } from "react";
 import { createPortal } from "react-dom";
 import { useWheelField } from "@/lib/useWheelField";
@@ -15,6 +17,7 @@ import { t, type MessageKey } from "@/lib/i18n";
 import { useLanguage } from "@/lib/useLanguage";
 import { useSimpleMode } from "@/lib/useSimpleMode";
 import { simpleModeKeepsShape, simpleModeKeepsTool } from "@/lib/simpleMode";
+import { getEditorProfile, profileToolVisible } from "@/lib/editorProfile";
 import { ribbonGroupShown, setRibbonLayout, shownInRibbon, useRibbonHidden } from "@/lib/ribbonHidden";
 import { ribbonSectionOrders, useRibbonOrder } from "@/lib/ribbonOrder";
 import { ribbonToolOrderFor, sortByRibbonToolOrder, useRibbonToolOrder } from "@/lib/ribbonToolOrder";
@@ -736,32 +739,6 @@ export function SecondaryToolbar({
   const visibilityMenuRef = useRef<HTMLDivElement>(null);
   const touchShapeStartRef = useRef<{ id: string; x: number; y: number } | null>(null);
   const suppressNextShapeClickRef = useRef(false);
-  const cancelProjectNameEditRef = useRef(false);
-  const projectNameFieldRef = useRef<HTMLLabelElement>(null);
-  const projectNameInputRef = useRef<HTMLInputElement>(null);
-  const [projectNameDraft, setProjectNameDraft] = useState(projectName);
-  useEffect(() => {
-    setProjectNameDraft(projectName);
-  }, [projectName]);
-  useEffect(() => {
-    const finishProjectNameEdit = (event: PointerEvent) => {
-      const input = projectNameInputRef.current;
-      if (input && document.activeElement === input && !projectNameFieldRef.current?.contains(event.target as Node)) {
-        input.blur();
-      }
-    };
-    document.addEventListener("pointerdown", finishProjectNameEdit, true);
-    return () => document.removeEventListener("pointerdown", finishProjectNameEdit, true);
-  }, []);
-  const commitProjectName = (value: string) => {
-    const nextName = value.trim().slice(0, 80);
-    if (!nextName) {
-      setProjectNameDraft(projectName);
-      return;
-    }
-    setProjectNameDraft(nextName);
-    if (nextName !== projectName) onProjectNameChange?.(nextName);
-  };
   const selectToolbarMode = (mode: "geometry" | "sketch") => {
     setShapesOpen(false);
     setVisibilityOpen(false);
@@ -960,7 +937,9 @@ export function SecondaryToolbar({
   // falls sie spaeter einmal memoisiert wird.
   useLanguage();
   // The simple mode (#695) shows the tools of a workshop only; the others stay in the lists the command search and the keys read.
-  const inSimpleMode = <T extends { id: string }>(tools: T[]) => shownInRibbon(simpleMode ? tools.filter((tool) => simpleModeKeepsTool(tool.id)) : tools, ribbonHidden);
+  const profile = getEditorProfile();
+  const availableInRibbon = (id: string) => profileToolVisible(profile, id, !simpleMode || simpleModeKeepsTool(id));
+  const shownLayoutTools = <T extends { id: string }>(tools: T[]) => shownInRibbon(tools.filter(({ id }) => availableInRibbon(id)), ribbonHidden);
   const shownShapeAssets = simpleMode ? libraryShapeAssets.filter((shape) => simpleModeKeepsShape(shape.id)) : libraryShapeAssets;
   const leftTools = [
     { id: "copy", label: t("editor.tool.copy"), icon: ToolbarCopyIcon, action: onCopy, enabled: hasSelection, needs: need("selection") },
@@ -1292,6 +1271,7 @@ export function SecondaryToolbar({
       plain("note", t("editor.tool.note"), visibilityGroup, true, onNoteTool, { icon: ToolbarNoteIcon, active: noteMode }),
       plain("import", t("editor.import"), fileGroup, true, () => onTopPanel("import"), { icon: ToolbarImportIcon }),
       plain("export", t("editor.export"), fileGroup, true, () => onTopPanel("export"), { icon: ToolbarVectorExportIcon }),
+      plain("file-backups", t("backups.title"), fileGroup, true, () => window.dispatchEvent(new Event(OPEN_FILE_BACKUPS_EVENT)), { icon: ArchiveRestore, keywords: ["backup", "backups", "version", "versions", "restore", "sicherung", "fassung", "wiederherstellen"] }),
       plain("attachments", t("editor.attachments"), fileGroup, true, () => onTopPanel("attachments"), { icon: ToolbarAttachmentsIcon, keywords: ["attachment", "file", "notes", "instructions", "readme", "anhang", "datei"] }),
       plain("settings", t("editor.workspaceSettings"), t("editor.group.help"), true, () => window.dispatchEvent(new Event("layerling:open-workspace-settings")), { icon: ToolbarSettingsIcon }),
       plain("focus-mode", focusMode ? t("focusMode.leave") : t("focusMode.enter"), t("shortcuts.group.view"), Boolean(onFocusModeChange), () => onFocusModeChange?.(!focusMode), { icon: focusMode ? Minimize2 : Maximize2, active: focusMode }),
@@ -1309,19 +1289,20 @@ export function SecondaryToolbar({
   };
   buildPaletteCommandsRef.current = buildPaletteCommands;
 
-  // What the ribbon shows of each group (#1519): the simple mode's cut first, then what was taken out in the settings.
-  const clipboardShown = shownInRibbon(ordered("clipboard", leftTools.slice(0, 4)), ribbonHidden);
-  const historyShown = inSimpleMode(ordered("history", leftTools.slice(4)));
+  // The profile and the mode define the available tools. Personal ribbon settings can hide or reorder those tools.
+  const clipboardTools = leftTools.slice(0, 4).filter(({ id }) => profileToolVisible(profile, id, true));
+  const clipboardShown = shownInRibbon(ordered("clipboard", clipboardTools), ribbonHidden);
+  const historyShown = shownLayoutTools(ordered("history", leftTools.slice(4)));
   const visibilityShown = shownInRibbon(ordered("visibility", visibilityTools), ribbonHidden);
-  const combineShown = inSimpleMode(ordered("combine", combineTools));
+  const combineShown = shownLayoutTools(ordered("combine", combineTools));
   // Modify's four groups (#1551), each with the tools of its section.
   const modifyGroups = MODIFY_SECTIONS.map(([section, group, labelKey, priority]) => {
     const tools = modifyTools.filter((tool) => tool.section === section);
-    return { section, group, label: t(labelKey), priority, tools, shown: inSimpleMode(ordered(group, tools)) };
+    return { section, group, label: t(labelKey), priority, tools, shown: shownLayoutTools(ordered(group, tools)) };
   });
-  const arrangeShown = inSimpleMode(ordered("arrange", arrangeTools));
+  const arrangeShown = shownLayoutTools(ordered("arrange", arrangeTools));
   const fileToolsShipped = [
-    ...(simpleMode ? [] : [{ id: "import", label: t("editor.import") }]),
+    ...(profileToolVisible(profile, "import", !simpleMode) ? [{ id: "import", label: t("editor.import") }] : []),
     { id: "export", label: t("editor.export") },
     { id: "attachments", label: t("editor.attachments") },
   ];
@@ -1363,9 +1344,9 @@ export function SecondaryToolbar({
   };
   // The settings window lists the groups and buttons from here, named as on the buttons. Help stays: without it the
   // settings could not be found again.
-  // In the simple mode it lists what that mode keeps: a tick on a button the mode leaves out anyway would change nothing.
+  // List only tools available in the active layout, so each setting affects the ribbon.
   const pick = (tools: readonly { id: string; label: string; section?: string }[], cut = true) => tools
-    .filter((tool) => !cut || !simpleMode || simpleModeKeepsTool(tool.id))
+    .filter((tool) => !cut || availableInRibbon(tool.id))
     .map(({ id, label, section }) => ({ id, label, ...(section ? { section } : {}) }));
   // A group as the settings list it: its buttons in the order set for it, and the ids in the order the ribbon ships them.
   const layoutGroup = (group: string, label: string, tools: readonly { id: string; label: string; section?: string }[], cut = true) => ({
@@ -1375,7 +1356,7 @@ export function SecondaryToolbar({
     tools: pick(ordered(group, tools), cut),
   });
   const layoutGroups = [
-    layoutGroup("clipboard", t("editor.group.clipboard"), leftTools.slice(0, 4), false),
+    layoutGroup("clipboard", t("editor.group.clipboard"), clipboardTools, false),
     layoutGroup("history", t("editor.group.history"), leftTools.slice(4)),
     layoutGroup("shapes", t("editor.group.shapes"), shapesTools, false),
     ...(simpleMode ? [] : [layoutGroup("visibility", t("editor.group.visibility"), visibilityTools, false)]),
@@ -1389,7 +1370,7 @@ export function SecondaryToolbar({
   return (
     <div className="secondary-toolbar">
       {paletteOpen ? <CommandPalette commands={buildPaletteCommands()} onClose={() => setPaletteOpen(false)} /> : null}
-      <div ref={toolbarContentRef} className={`toolbar-mode-content ${toolbarMode}`}>
+      <div ref={toolbarContentRef} className={`toolbar-mode-content ${toolbarMode}${ribbonPinned && !simpleMode ? " ribbon-pinned" : ""}`}>
         {toolbarMode === "geometry" ? (
           <>
       <div className="tool-group left">
@@ -1888,32 +1869,7 @@ export function SecondaryToolbar({
           </button>
         </div>
         <div className="toolbar-project-name">
-          <label ref={projectNameFieldRef} className="toolbar-project-name-field" title={t("editor.renameProject")}>
-            <input
-              ref={projectNameInputRef}
-              aria-label={t("confirm.projectName")}
-              value={projectNameDraft}
-              maxLength={80}
-              spellCheck={false}
-              onChange={(event) => setProjectNameDraft(event.target.value)}
-              onBlur={(event) => {
-                if (cancelProjectNameEditRef.current) {
-                  cancelProjectNameEditRef.current = false;
-                  setProjectNameDraft(projectName);
-                  return;
-                }
-                commitProjectName(event.currentTarget.value);
-              }}
-              onKeyDown={(event) => {
-                if (event.key === "Enter") event.currentTarget.blur();
-                if (event.key === "Escape") {
-                  cancelProjectNameEditRef.current = true;
-                  event.currentTarget.blur();
-                }
-              }}
-            />
-            <Pencil size={13} strokeWidth={2.4} aria-hidden="true" />
-          </label>
+          <ProjectNameField projectName={projectName} onProjectNameChange={onProjectNameChange} />
         </div>
         <div className="toolbar-title-row-actions">
           {/* Focus mode (Discussion #1554): this row and the footer make room, a small bar over the view keeps the tabs. */}
@@ -1984,6 +1940,7 @@ export function SecondaryToolbar({
           onSettings={() => window.dispatchEvent(new Event("layerling:open-workspace-settings"))}
           onLeave={() => onFocusModeChange(false)}
           showSearch={!simpleMode}
+          nameField={<ProjectNameField className="focus-mode-bar-name" projectName={projectName} onProjectNameChange={onProjectNameChange} />}
         />
       ) : null}
     </div>

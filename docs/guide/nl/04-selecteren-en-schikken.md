@@ -22,7 +22,7 @@ Met veel onderdelen raak je in de weergave makkelijk het overzicht kwijt. De obj
 ![De objectlijst: de groep "Groep" met twee onderdelen en een bol ernaast. Een mappictogram opent de groep.](shot:object-list)
 
 - Een klik op een regel selecteert de vorm, ook onderdelen binnen een groep. Met [[Shift]] ingedrukt voeg je meer regels toe of haal je ze weer weg, net als in de weergave. De pijltjes klappen groepen open en dicht.
-- Het label laat zien of een onderdeel {{ui:outliner.solid}} of {{ui:outliner.hole}} is.
+- De letter achter de naam laat zien of een onderdeel {{ui:outliner.solid}} of {{ui:outliner.hole}} is: het is de eerste letter van het woord, en met de muis erboven verschijnt het hele woord.
 - Onder de naam staat wat voor vorm het is. Een lichaam dat geen eenvoudige vorm meer is (afgerond, uitgehold of geïmporteerd), toont {{ui:shape.exactBody}} als de STEP-export het exact schrijft, en {{ui:shape.mesh}} als het alleen uit driehoeken bestaat en als STL meegaat. Een versmalling, helling of draaiing die pas na het afronden of uithollen komt, buigt alleen de mesh; dan staat er {{ui:shape.mesh}}.
 - Hangslot en oog vergrendelen en verbergen afzonderlijke onderdelen.
 - {{ui:outliner.rename}} geeft een onderdeel een eigen naam; het potlood naast de naam bovenaan in de instellingen doet hetzelfde voor de geselecteerde vorm. Zinnige namen helpen enorm in grotere ontwerpen.
@@ -32,7 +32,7 @@ Met veel onderdelen raak je in de weergave makkelijk het overzicht kwijt. De obj
 - Het zoekveld vindt vormen op naam en op soort, dus ook "cilinder" of "gat". Het zoekt ook binnen groepen, hoe diep ook genest: een groep met een treffer blijft in de lijst staan en klapt open om de gevonden onderdelen te tonen en de groepen die ernaartoe leiden. Een groep die op zijn eigen naam gevonden is, toont al zijn onderdelen als je hem opent.
 - Het pijltje helemaal links in de titelbalk klapt de lijst in tot alleen de titelbalk, en weer terug.
 
-De lijst zit vastgezet net rechts van de weergavekubus. Sleep hem aan zijn titelbalk om hem ergens op het werkvlak neer te zetten; hij schuift onder de weergavekubus en de weergavebalk door. Laat hem weer naast de weergavekubus los, of dubbelklik op de titelbalk, en hij zit weer vast. Waar hij stond en of hij ingeklapt was, onthoudt deze browser.
+De lijst zit vastgezet net rechts van de weergavekubus. Sleep hem aan zijn titelbalk om hem ergens op het werkvlak neer te zetten; hij schuift onder de weergavekubus en de weergavebalk door. Laat hem weer naast de weergavekubus los, of dubbelklik op de titelbalk, en hij zit weer vast. Waar hij stond en of hij ingeklapt was, onthoudt deze browser. De lijst maak je breder of smaller door de rechteronderhoek te slepen, van 240 tot 600 pixels; ook de breedte onthoudt de browser.
 
 ## Een positie typen
 
@@ -45,6 +45,8 @@ Je kunt een vorm voorbij de rand van de plaat slepen en hem daar laten liggen, t
 ## Uitlijnen tijdens het verplaatsen
 
 Als je een vorm over het werkvlak sleept, lijnt hij uit op andere vormen: zijn linker-, rechter-, voor- of achterrand of zijn midden komt precies op een rand of midden van een andere vorm te liggen. Een roze hulplijn laat zien waaraan hij zich vasthoudt. Zo staan twee onderdelen strak naast elkaar of gecentreerd achter elkaar zonder dat je getallen hoeft te typen. Het werkt ook als het raster uitstaat. Het midden van het werkvlak telt ook mee: de roze lijnen laten zien wanneer de vorm langs X, langs Y of beide midden op de plaat staat.
+
+Ook het van grootte veranderen lijnt uit: als je aan een zijgreep trekt, stopt die zijde bij de randen en middelpunten van andere vormen en bij de wand waar hij tegenaan loopt, ook de binnenwand van een doos, een uitgehold lichaam of een geïmporteerde behuizing, en de roze lijn laat zien waar. Die maat blijft precies zo, los van het raster. Zo vult een onderdeel een behuizing van wand tot wand: leg het tegen de ene wand en trek de andere zijde naar de tegenoverliggende. Met [[Alt]] groeit de vorm vanuit het midden en lijnt de gesleepte zijde op dezelfde manier uit; met [[Shift]] houdt hij zijn verhoudingen en lijnt hij niet uit. Dit werkt op het vlakke werkvlak, voor vormen die rechtop staan met hun zijden langs X en Y, en {{ui:workspace.objectSnap}} zet het samen met het uitlijnen bij verplaatsen uit.
 
 Houd [[Shift]] ingedrukt tijdens het slepen om de verplaatsing op één as te houden: de vorm volgt de richting, X of Y, waarin je het verst hebt gesleept, en laat de andere met rust. Druk [[Shift]] het best pas in als je al aan het slepen bent; bij een vorm die nog niet geselecteerd is, voegt een klik met [[Shift]] hem alleen aan de selectie toe.
 

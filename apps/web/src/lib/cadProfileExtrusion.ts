@@ -40,7 +40,7 @@ import { gridfinityHasPieces, gridfinityPlan } from "@/lib/gridfinityGeometry";
 import { gridfinityLabelGlyphs } from "@/lib/gridfinityLabelText";
 import { knurlCorners, knurlSettings, roundKnurlWave } from "@/lib/knurlGeometry";
 import { pulleyArcPoint, pulleyMeasures, pulleyToothArcs } from "@/lib/pulleyGeometry";
-import { BEVEL_GEAR_TOP_SCALE, bevelGearIsSpiral, gearHelixTwist, gearOutlineCorners, gearTypeHasHelix, internalGearMeasures, internalGearOutline, involuteFlankPoint, involuteGearMeasures, involuteOutlineStretch, involuteToothCentre, normalizeGearCenterHoleSize, normalizeGearProfile, normalizeGearToothSize, normalizeGearType, rackMeasures, rackOutlinePoints, rackToothArcs, roundGearMeasures, roundInternalMeasures, roundToothArcs, type GearOutlineOptions, type InternalGearOptions, type InvoluteGearMeasures, type RackOptions, type RoundWave } from "@/lib/gearGeometry";
+import { BEVEL_GEAR_TOP_SCALE, bevelGearIsSpiral, extendedRackMeasures, gearHelixTwist, gearOutlineCorners, gearTypeHasHelix, internalGearMeasures, internalGearOutline, involuteFlankPoint, involuteGearMeasures, involuteOutlineStretch, involuteToothCentre, normalizeGearCenterHoleSize, normalizeGearProfile, normalizeGearToothSize, normalizeGearTeeth, normalizeGearType, rackExtraTeeth, rackHelixTravel, rackMeasures, rackOutlinePoints, rackToothArcs, ringGearHelixTwist, ringRackIsHelical, roundGearMeasures, roundInternalMeasures, roundToothArcs, type GearOutlineOptions, type InternalGearOptions, type InvoluteGearMeasures, type RackOptions, type RoundWave } from "@/lib/gearGeometry";
 
 /*
  * The outlines below follow the display geometry of each shape
@@ -1225,7 +1225,7 @@ export function cadProfileForShapeKind(shape: WorkplaneShape, designedRound = fa
       const slot = shape.screwHoleSlot ? screwHoleSlotMeasures(width, depth) : null;
       // Only a round hole is a body of revolution; stretched along z it stays a mesh.
       if (!slot && Math.abs(width - depth) > 1e-6) return null;
-      const points = screwHoleProfile({ kind: shape.kind, width: slot ? slot.head : width, height: shape.height, screwHoleShaft: shape.screwHoleShaft, screwHoleHeadDepth: shape.screwHoleHeadDepth, screwHoleAngle: shape.screwHoleAngle, screwHoleRecess: shape.screwHoleRecess, drillPointAngle: shapeDrillPointAngle(shape) })
+      const points = screwHoleProfile({ kind: shape.kind, width: slot ? slot.head : width, height: shape.height, screwHoleShaft: shape.screwHoleShaft, screwHoleHeadDepth: shape.screwHoleHeadDepth, screwHoleAngle: shape.screwHoleAngle, screwHoleRecess: shape.screwHoleRecess, screwHoleChamfer: shape.screwHoleChamfer, drillPointAngle: shapeDrillPointAngle(shape) })
         .map(({ r, y }) => ({ x: r, z: y }));
       // A drill point's tip (Discussion #621) lies on the axis already; the loop leaves out the edge of no length to it.
       const section = [{ x: 0, z: points[0].z }, ...points, { x: 0, z: points[points.length - 1].z }];
@@ -1248,6 +1248,8 @@ export function cadProfileForShapeKind(shape: WorkplaneShape, designedRound = fa
     }
     case "gear": {
       const gearType = normalizeGearType(shape.gearType);
+      // Slanted teeth (Discussion #1627) are no straight extrusion: cadModifierHelicalGearForShape builds them.
+      if (ringRackIsHelical(shape)) return null;
       if (gearType === "internal") return { loops: internalGearLoops(width, depth, shape) };
       if (gearType === "rack") return { loops: [rackLoop(width, depth, shape)] };
       return gearType === "spur" ? { loops: gearProfileLoops(width, depth, shape) } : null;
@@ -1891,8 +1893,10 @@ function turningReach(radius: number, angle: number, twist: number) {
 const HELICAL_GEAR_CORNER_LIMIT = 480;
 
 export function cadModifierHelicalGearForShape(shape: WorkplaneShape, options: { anySize?: boolean } = {}): CadModifierHelicalGearPart | null {
-  if (shape.kind !== "gear" || !gearTypeHasHelix(shape.gearType)) return null;
+  if (shape.kind !== "gear") return null;
   if (shape.importedMesh || shape.groupedShapes?.length || shape.cadBrep || shape.imagePlate || shapeHasShapeDeform(shape)) return null;
+  if (ringRackIsHelical(shape)) return slantedRingRackPart(shape, options);
+  if (!gearTypeHasHelix(shape.gearType)) return null;
   const width = shapeWidth(shape);
   const depth = shapeDepth(shape);
   if (![width, depth, shape.height].every((value) => Number.isFinite(value) && value > 0)) return null;
@@ -1926,6 +1930,37 @@ export function cadModifierHelicalGearForShape(shape: WorkplaneShape, options: {
     if (!(boreRadius < outlineClearance(ring) * Math.min(stretch.x, stretch.z) * 0.999)) return null;
   }
   return { corners, twist, ...(herringbone ? { herringbone } : {}), height: shape.height, stretch, boreRadius, transform: profileTransformForShape(shape) };
+}
+
+/**
+ * A ring gear or a rack with slanted teeth (Discussion #1627) as the exact body its display mesh draws. The ring
+ * gear's teeth turn inside the round rim as the helical gear's ring does - on an oval footprint, or past the corner
+ * limit outside the STEP export, it stays a mesh like the helical gear; the rack is the outline of a longer straight
+ * rack drawn out at the slant and cut off square at its ends.
+ */
+function slantedRingRackPart(shape: WorkplaneShape, options: { anySize?: boolean }): CadModifierHelicalGearPart | null {
+  const width = shapeWidth(shape);
+  const depth = shapeDepth(shape);
+  if (![width, depth, shape.height].every((value) => Number.isFinite(value) && value > 0)) return null;
+  const herringbone = shape.ringRackHerringbone === true;
+  const transform = profileTransformForShape(shape);
+  if (normalizeGearType(shape.gearType) === "rack") {
+    const measures = rackMeasures(width, depth, shape);
+    const travel = rackHelixTravel(shape.height, shape.ringRackHelixAngle);
+    const outline = rackOutlinePoints(extendedRackMeasures(measures, rackExtraTeeth(measures, travel)));
+    return {
+      corners: [], twist: 0, ...(herringbone ? { herringbone } : {}), height: shape.height, stretch: { x: 1, z: 1 }, boreRadius: 0,
+      rack: { outline, length: measures.length, backZ: measures.backZ, tipZ: measures.tipZ, travel }, transform,
+    };
+  }
+  if (Math.abs(width - depth) > 1e-6) return null;
+  const outlineOfRing = internalGearOutline(width, depth, shape);
+  const corners = outlineOfRing.corners.map((corner) => ({ angle: corner.angle, radius: corner.radiusX }));
+  if (!options.anySize && corners.length > HELICAL_GEAR_CORNER_LIMIT) return null;
+  return {
+    corners, twist: ringGearHelixTwist(outlineOfRing.module, normalizeGearTeeth(shape.teeth), shape.height, shape.ringRackHelixAngle), ...(herringbone ? { herringbone } : {}),
+    height: shape.height, stretch: outlineOfRing.stretch, boreRadius: 0, ringRadius: outlineOfRing.rimRadius, transform,
+  };
 }
 
 /**

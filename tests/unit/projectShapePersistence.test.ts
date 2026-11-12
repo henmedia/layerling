@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { editorHistoryEntry } from "@/lib/editorHistory";
-import { compactProjectShapeState, hydrateProjectShapeState, reconcileLoadedProjectShapeCacheEntry } from "@/lib/projectShapePersistence";
+import { compactProjectShapeState, hydrateProjectShapeState, nextProjectRevision, reconcileLoadedProjectShapeCacheEntry } from "@/lib/projectShapePersistence";
 import type { WorkplaneShape } from "@/types/layerling";
 
 function importedShape(): WorkplaneShape {
@@ -87,5 +87,29 @@ describe("project shape persistence resources", () => {
     expect(currentMesh?.normals).toEqual(mesh.importedMesh?.normals);
     expect(currentMesh?.storageResourceId).toBeUndefined();
     expect(historyMesh).toBe(currentMesh);
+  });
+});
+
+describe("the revision of an edit (Discussion #1652)", () => {
+  const now = 1_800_000_000_000;
+
+  it("is the time when nothing is newer", () => {
+    expect(nextProjectRevision(now, 0, now - 5_000, undefined)).toBe(now);
+  });
+
+  it("follows the last one given out within the same millisecond", () => {
+    expect(nextProjectRevision(now, now, now - 5_000)).toBe(now + 1);
+  });
+
+  it("is newer than a stored revision ahead of the clock, also right after a reload", () => {
+    const ahead = now + 86_400_000;
+    const first = nextProjectRevision(now, 0, ahead, ahead);
+    expect(first).toBeGreaterThan(ahead);
+    // The next edit, a moment later, is newer again: every edit is kept.
+    expect(nextProjectRevision(now + 50, first, first)).toBe(first + 1);
+  });
+
+  it("ignores revisions that are not numbers", () => {
+    expect(nextProjectRevision(now, 0, Number.NaN, Number.POSITIVE_INFINITY, undefined)).toBe(now);
   });
 });

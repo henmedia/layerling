@@ -55,4 +55,22 @@ describe("orientedMeasures (#230)", () => {
     const result = withOrientedMeasures(mixed, orientedMeasures(turn(90)), labels);
     expect(result.map((field) => field.id)).toEqual(["sides", "height", "color", "width", "length"]);
   });
+
+  it("keeps a measure with a name of its own, such as a countersink's head diameter and length (#1634)", () => {
+    const countersink = [
+      { id: "width", label: "Head diameter" },
+      { id: "screwHoleShaft", label: "Shaft diameter" },
+      { id: "height", label: "Total length" },
+    ];
+    // Laid on its side (Y -90 degrees): the own height runs along X, the own width up.
+    const oriented = orientedMeasures(turn(0, 0, -90));
+    expect(oriented.kind).toBe("aligned");
+    expect(withOrientedMeasures(countersink, oriented, labels)).toEqual(countersink);
+    // A cylinder's Diameter stays, its plain Height follows the turn and stays in its place.
+    const cylinder = [
+      { id: "width", label: "Diameter" },
+      { id: "height", label: "Height" },
+    ];
+    expect(withOrientedMeasures(cylinder, oriented, labels).map((field) => field.label)).toEqual(["Diameter", "Width"]);
+  });
 });

@@ -91,6 +91,7 @@ In fondo alla finestra trovi {{ui:dashboard.sponsor}}, che porta alla pagina per
 ### Modalità concentrazione
 
 Su uno schermo piccolo la {{ui:focusMode.enter}} lascia al lavoro la riga del titolo e il piè di pagina: la attivano il pulsante con le due frecce verso l’esterno in alto a destra, [[Ctrl]]+[[Shift]]+[[F]] o la ricerca dei comandi. La barra multifunzione sale e la vista arriva fino al bordo della finestra. Una piccola barra sotto la barra multifunzione conserva la casetta per la pagina iniziale, le schede {{ui:editor.modeGeometry}} e {{ui:editor.modeSketch}}, la lente, le impostazioni e il pulsante con le due frecce verso l’interno, che chiude la modalità; trascina la barra dalla sua maniglia in un altro punto, un doppio clic sulla maniglia la rimette a posto. layerling ricorda la scelta in questo browser e, finché il browser riempie tutto lo schermo (F11), passa da solo alla modalità concentrazione.
+La barra mostra anche il nome del progetto; un clic sopra lo rinomina senza uscire dalla modalità concentrazione.
 
 ## Il tuo primo pezzo
 

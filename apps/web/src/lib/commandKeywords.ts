@@ -98,7 +98,7 @@ export const SHAPE_KEYWORDS: Readonly<Record<string, readonly string[]>> = {
   // The French names have left the carpenter's and the machinist's words behind; the old ones still find the shape.
   dovetail: ["queue d'aronde", "schwalbenschwanz", "trapezoid", "trapèze"],
   bentTube: ["tube courbé", "tube plié", "gebogenes rohr", "rohrbogen"],
-  counterbore: ["lamage", "senkbohrung", "zylindersenkung", "drill point", "bohrerspitze", "slotted hole", "langloch"],
+  counterbore: ["lamage", "senkbohrung", "zylindersenkung", "drill point", "bohrerspitze", "slotted hole", "langloch", "chamfer", "fase", "chanfrein"],
   countersink: ["fraisage", "kegelsenkung", "senkkopf", "double countersink", "both sides", "double fraisage", "doppelsenkung", "beidseitig", "drill point", "bohrerspitze", "slotted hole", "langloch", "recessed", "versenkt", "tiefer"],
   finishingWasher: ["rosette", "cup washer", "screw cup", "countersunk washer", "trim washer", "washer", "rondelle", "senkscheibe", "zierscheibe", "unterlegscheibe"],
   knurl: ["moletage", "moleté", "rändel", "rändelung"],
