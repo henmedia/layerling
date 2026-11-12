@@ -50,7 +50,7 @@ En sikkerhedskopi af alle designs indeholder også indstillingerne fra denne bro
 
 Kun nogle designs: Efter {{ui:dashboard.select}} pakker {{ui:dashboard.backupSelected}} kun de valgte designs, i deres mapper, i én ZIP-fil, og {{ui:dashboard.backupSelected}} i en mappes menu pakker mappen med alle designs og mapper i den. Ingen af dem tager de egne former med, og {{ui:dashboard.restoreBackup}} henter begge tilbage som en fuld sikkerhedskopi. Det gælder designs i denne browser.
 
-Hvor en sikkerhedskopi havner: i Chrome og Edge spørger en gem-dialog om mappe og navn og husker mappen til næste sikkerhedskopi. Så havner dine sikkerhedskopier direkte i en mappe, du selv vælger, for eksempel på et clouddrev. Det samme gælder {{ui:myShapes.backup}}. Andre browsere lægger filen i deres downloadmappe; hvilken mappe det er, indstiller du i browserens indstillinger.
+Hvor en sikkerhedskopi havner: i Chrome og Edge spørger en gem-dialog om mappe og navn og husker mappen til næste sikkerhedskopi. Så havner dine sikkerhedskopier direkte i en mappe, du selv vælger, for eksempel på et clouddrev. Det samme gælder {{ui:myShapes.backup}}. Andre browsere lægger filen i deres downloadmappe; hvilken mappe det er, indstiller du i browserens indstillinger. Giver dialogen ingen fil tilbage, tilbyder beskeden {{ui:status.saveAsDownload}}: sikkerhedskopien havner så som en almindelig download i mappen Overførsler.
 
 Vil du prøve noget af uden at røre et design, så vælg {{ui:dashboard.openCopy}} i dets menu på startsiden. layerling laver en kopi ligesom {{ui:common.duplicate}} og åbner kopien med det samme; originalen forbliver, som den var, uanset hvad du gør i kopien. På en server ligger kopien der ved siden af originalen.
 

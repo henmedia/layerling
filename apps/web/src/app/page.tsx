@@ -1014,6 +1014,14 @@ export default function Home() {
   const [themePreference, setThemePreference] = useState<AppThemePreference>("system");
   const [resolvedTheme, setResolvedTheme] = useState<ResolvedAppTheme>("light");
   const [dashboardNotice, setDashboardNotice] = useState("");
+  // A notice may carry one button, shown while that notice stands: a backup whose save dialog handed back no file
+  // offers to make it a download instead (Facebook group, 12.11.2026).
+  const [dashboardNoticeAction, setDashboardNoticeAction] = useState<{ notice: string; label: string; run: () => void } | null>(null);
+  const noticeNoBackupChosen = useCallback((retryAsDownload: () => void) => {
+    const notice = t("notice.backupNothingChosen");
+    setDashboardNotice(notice);
+    setDashboardNoticeAction({ notice, label: t("status.saveAsDownload"), run: retryAsDownload });
+  }, []);
   // A backup that holds the settings of the browser it came from asks, before it is restored, whether they come along
   // (Discussion #1678). The answer: true or false for the tick box, null for Cancel.
   const [backupSettingsAsk, setBackupSettingsAsk] = useState<{ fileName: string; take: boolean; resolve: (answer: boolean | null) => void } | null>(null);
@@ -2552,7 +2560,7 @@ export default function Home() {
   // Designs of this browser, each as its own .lyl, together in one ZIP. "Back up all" takes every design
   // and the custom shapes of this browser in a folder beside them; the chosen designs or one folder (#991)
   // go without the shapes. Empty folders go along when all or a folder is backed up.
-  const backupProjects = useCallback(async (scope: { designIds: string[] } | { folderId: string } | null) => {
+  const backupProjects = useCallback(async (scope: { designIds: string[] } | { folderId: string } | null, asDownload = false): Promise<void> => {
     // The browser's own designs: a design of the server kept here while open is the server's to back up.
     const inFolder = (folderId: string, id: string | null | undefined) => folderTrail(designFolders, folderOfDesign(designFolders, id)).some((folder) => folder.id === folderId);
     const designs = !scope
@@ -2574,9 +2582,9 @@ export default function Home() {
     }
     // Where the backup goes is asked first, while the click still counts for the browser: reading the designs can
     // take a while. Chrome and Edge show a save dialog that remembers its folder; elsewhere it is a download.
-    let target = designs.length > 0 ? await pickBackupTarget(suggestedName) : null;
+    let target = designs.length > 0 ? await pickBackupTarget(suggestedName, asDownload) : null;
     if (designs.length > 0 && !target) {
-      setDashboardNotice(t("notice.backupNothingChosen"));
+      noticeNoBackupChosen(() => void backupProjects(scope, true));
       return;
     }
     const shapeEntries = scope ? [] : await customShapesBackupEntries().catch(() => []);
@@ -2586,9 +2594,9 @@ export default function Home() {
       return;
     }
     // Only custom shapes: asked once they are read, which is quick.
-    target ??= await pickBackupTarget(suggestedName);
+    target ??= await pickBackupTarget(suggestedName, asDownload);
     if (!target) {
-      setDashboardNotice(t("notice.backupNothingChosen"));
+      noticeNoBackupChosen(() => void backupProjects(scope, true));
       return;
     }
     try {
@@ -2653,16 +2661,16 @@ export default function Home() {
       writeBackupProgress(null);
       setDashboardNotice(t("notice.backupFailed", { reason: error instanceof Error ? localizedError(error.message) : String(error) }));
     }
-  }, [designFolders, localDesigns]);
+  }, [designFolders, localDesigns, noticeNoBackupChosen]);
   const backupAllProjects = useCallback(() => backupProjects(null), [backupProjects]);
 
   // Every design of the server, in its folders, and its custom shapes, as the same kind of ZIP:
   // "Restore backup" brings it back, on this computer or another.
-  const backupAllServerDesigns = useCallback(async () => {
+  const backupAllServerDesigns = useCallback(async (asDownload = false): Promise<void> => {
     // Asked before the designs are fetched, while the click still counts (see backupProjects).
-    const target = await pickBackupTarget(backupFileName(new Date(), "layerling-server-backup"));
+    const target = await pickBackupTarget(backupFileName(new Date(), "layerling-server-backup"), asDownload);
     if (!target) {
-      setDashboardNotice(t("notice.backupNothingChosen"));
+      noticeNoBackupChosen(() => void backupAllServerDesigns(true));
       return;
     }
     try {
@@ -2696,7 +2704,7 @@ export default function Home() {
       writeBackupProgress(null);
       setDashboardNotice(t("notice.backupFailed", { reason: error instanceof Error ? localizedError(error.message) : String(error) }));
     }
-  }, []);
+  }, [noticeNoBackupChosen]);
 
   // A backup brings every design back as a new design of this browser; the
   // editor stays closed, so the whole set lands on the start page at once.
@@ -3242,6 +3250,12 @@ export default function Home() {
         <Dashboard
           dashboardSection={dashboardSection}
           dashboardNotice={dashboardNotice}
+          dashboardNoticeAction={dashboardNoticeAction?.notice === dashboardNotice ? dashboardNoticeAction : null}
+          onDashboardNoticeAction={(run) => {
+            setDashboardNoticeAction(null);
+            setDashboardNotice("");
+            run();
+          }}
           hasProjects={projects.length > 0}
           projects={visibleProjects}
           designFolders={designFolders}
@@ -3524,6 +3538,8 @@ function EditorLoadingSkeleton() {
 function Dashboard({
   dashboardSection,
   dashboardNotice,
+  dashboardNoticeAction,
+  onDashboardNoticeAction,
   hasProjects,
   projects,
   designFolders,
@@ -3592,6 +3608,9 @@ function Dashboard({
 }: {
   dashboardSection: DashboardSection;
   dashboardNotice: string;
+  /** The button of the notice, when it has one. */
+  dashboardNoticeAction: { label: string; run: () => void } | null;
+  onDashboardNoticeAction: (run: () => void) => void;
   hasProjects: boolean;
   projects: DashboardProject[];
   /** Every folder of this browser, the ones to show here, and the folder that is open (null: the top level). */
@@ -4134,6 +4153,11 @@ function Dashboard({
           {dashboardNotice ? (
             <div className="dashboard-import-notice" role="status">
               {dashboardNotice}
+              {dashboardNoticeAction ? (
+                <button className="dashboard-notice-action" type="button" onClick={() => onDashboardNoticeAction(dashboardNoticeAction.run)}>
+                  {dashboardNoticeAction.label}
+                </button>
+              ) : null}
             </div>
           ) : null}
           {announcements.shown && !simpleMode ? <AnnouncementCard announcement={announcements.shown} reveal={announcements.reopened} onClose={announcements.close} /> : null}

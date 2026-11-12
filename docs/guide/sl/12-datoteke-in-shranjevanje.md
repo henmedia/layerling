@@ -50,7 +50,7 @@ Varnostna kopija vseh projektov vsebuje tudi nastavitve tega brskalnika: vaše p
 
 Samo nekateri modeli: po {{ui:dashboard.select}} {{ui:dashboard.backupSelected}} zapakira samo izbrane modele v njihovih mapah v eno datoteko ZIP, {{ui:dashboard.backupSelected}} v meniju mape pa zapakira to mapo z vsemi modeli in mapami v njej. Nobeden od njiju ne vzame lastnih oblik, {{ui:dashboard.restoreBackup}} pa vrne oboje kot polno varnostno kopijo. To velja za modele tega brskalnika.
 
-Kam gre varnostna kopija: v Chromu in Edgu pogovorno okno za shranjevanje vpraša za mapo in ime ter si mapo zapomni za naslednjo kopijo. Tako gredo kopije naravnost v lastno mapo, na primer na disk v oblaku. Enako velja za {{ui:myShapes.backup}}. Drugi brskalniki shranijo datoteko v svojo mapo za prenose; katera mapa je to, se nastavi v nastavitvah brskalnika.
+Kam gre varnostna kopija: v Chromu in Edgu pogovorno okno za shranjevanje vpraša za mapo in ime ter si mapo zapomni za naslednjo kopijo. Tako gredo kopije naravnost v lastno mapo, na primer na disk v oblaku. Enako velja za {{ui:myShapes.backup}}. Drugi brskalniki shranijo datoteko v svojo mapo za prenose; katera mapa je to, se nastavi v nastavitvah brskalnika. Če okno ne vrne nobene datoteke, sporočilo ponudi {{ui:status.saveAsDownload}}: varnostna kopija gre nato kot običajen prenos v mapo Prenosi.
 
 Če želite nekaj preizkusiti, ne da bi se dotaknili projekta, v njegovem meniju na začetni strani izberite {{ui:dashboard.openCopy}}. layerling naredi kopijo, kot jo naredi {{ui:common.duplicate}}, in takoj odpre kopijo; izvirnik ostane, kakršen je bil, karkoli naredite v kopiji. Na strežniku je kopija tam poleg izvirnika.
 

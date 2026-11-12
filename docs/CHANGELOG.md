@@ -6,6 +6,8 @@ code still carries it - so a lower number further down is older, not newer.
 
 ## Unreleased
 
+- **A backup whose save dialog hands back no file offers a download (Facebook group):** On some PCs the save dialog of Chrome and Edge closes after Save but hands back no file, and the browser reports that like Cancel. Saving a design has had a **Download instead** button for that since Discussion #1449, but Back up all, Back up selected, a folder's backup, the server backup and Back up custom shapes then ended with "No backup made", so on such a PC there was no way to get a backup at all. Their message now has the same **Download instead** button: the backup is made again as a normal download into the Downloads folder, without the dialog (`pickBackupTarget(name, asDownload)` in lylFileAccess.ts; the start page's notice can carry a button now). Checked in the editor through headless Edge with a save dialog that always reports Cancel, English light and German dark: Back up all and Back up custom shapes show the button, and one click downloads the ZIP without opening the dialog again. Unit test, guide in 16 languages
+
 ## 1.161.0
 
 - **brepjs 20.21.2 (from 20.18.0):** New lofts along guide rails, surface blending and fillet corner options in the library, and two fixes in its brepkit part; layerling uses none of the new calls yet.

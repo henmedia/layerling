@@ -50,7 +50,7 @@ Záloha všech projektů obsahuje také nastavení tohoto prohlížeče: vaše v
 
 Jen některé návrhy: po {{ui:dashboard.select}} zabalí {{ui:dashboard.backupSelected}} jen vybrané návrhy v jejich složkách do jednoho souboru ZIP a {{ui:dashboard.backupSelected}} v nabídce složky zabalí tuto složku se všemi návrhy a složkami v ní. Vlastní tvary nejdou ani v jednom případě s sebou a {{ui:dashboard.restoreBackup}} vrátí obojí jako plnou zálohu. Platí to pro návrhy tohoto prohlížeče.
 
-Kam se záloha uloží: v Chrome a Edge se dialog pro uložení zeptá na složku a název a složku si zapamatuje pro další zálohu. Zálohy tak jdou rovnou do vaší vlastní složky, třeba na cloudový disk. Totéž platí pro {{ui:myShapes.backup}}. Ostatní prohlížeče ukládají soubor do své složky stažených souborů; o kterou složku jde, se nastavuje v nastavení prohlížeče.
+Kam se záloha uloží: v Chrome a Edge se dialog pro uložení zeptá na složku a název a složku si zapamatuje pro další zálohu. Zálohy tak jdou rovnou do vaší vlastní složky, třeba na cloudový disk. Totéž platí pro {{ui:myShapes.backup}}. Ostatní prohlížeče ukládají soubor do své složky stažených souborů; o kterou složku jde, se nastavuje v nastavení prohlížeče. Pokud dialog nevrátí žádný soubor, zpráva nabídne {{ui:status.saveAsDownload}}: záloha se pak uloží jako běžné stažení do složky Stažené soubory.
 
 Chcete-li něco vyzkoušet a projekt přitom nezměnit, zvolte v jeho nabídce na úvodní stránce {{ui:dashboard.openCopy}}. layerling vytvoří kopii jako {{ui:common.duplicate}} a hned ji otevře; originál zůstane tak, jak byl, ať v kopii uděláte cokoli. Na serveru leží kopie vedle originálu.
 

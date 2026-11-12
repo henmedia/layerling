@@ -50,7 +50,7 @@ En säkerhetskopia av alla designer innehåller också inställningarna i den h�
 
 Bara några designer: efter {{ui:dashboard.select}} packar {{ui:dashboard.backupSelected}} bara de valda designerna, i sina mappar, i en ZIP-fil, och {{ui:dashboard.backupSelected}} i en mapps meny packar den mappen med varje design och undermapp i den. Ingendera tar med de egna formerna, och {{ui:dashboard.restoreBackup}} hämtar tillbaka båda precis som en fullständig säkerhetskopia. Det här gäller den här webbläsarens designer.
 
-Var en säkerhetskopia hamnar: i Chrome och Edge frågar en spardialog efter mapp och namn, och den kommer ihåg mappen till nästa säkerhetskopia. På så vis hamnar dina säkerhetskopior direkt i en egen mapp, till exempel på en molnenhet. Detsamma gäller {{ui:myShapes.backup}}. Andra webbläsare lägger filen i sin nedladdningsmapp; vilken mapp det är ställer du in i webbläsarens inställningar.
+Var en säkerhetskopia hamnar: i Chrome och Edge frågar en spardialog efter mapp och namn, och den kommer ihåg mappen till nästa säkerhetskopia. På så vis hamnar dina säkerhetskopior direkt i en egen mapp, till exempel på en molnenhet. Detsamma gäller {{ui:myShapes.backup}}. Andra webbläsare lägger filen i sin nedladdningsmapp; vilken mapp det är ställer du in i webbläsarens inställningar. Lämnar dialogen ingen fil tillbaka erbjuder meddelandet {{ui:status.saveAsDownload}}: säkerhetskopian hamnar då som en vanlig nedladdning i mappen Hämtade filer.
 
 Vill du prova något utan att röra en design väljer du {{ui:dashboard.openCopy}} i dess meny på startsidan. layerling gör en kopia, som {{ui:common.duplicate}}, och öppnar kopian direkt; originalet förblir som det var, vad du än gör i kopian. På en server ligger kopian där bredvid originalet.
 

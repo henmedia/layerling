@@ -1381,6 +1381,29 @@ html[data-theme="dark"] .dashboard-trademark {
   font-weight: 600;
 }
 
+/* The button a notice may carry, such as "Download instead" after a backup whose save dialog handed back no file. */
+.dashboard-notice-action {
+  margin-left: 10px;
+  padding: 3px 10px;
+  border: 1px solid #c96a12;
+  border-radius: 6px;
+  background: #fff4e6;
+  color: #9a4f08;
+  font: inherit;
+  cursor: pointer;
+}
+
+.dashboard-notice-action:hover,
+.dashboard-notice-action:focus-visible {
+  background: #ffe6c2;
+}
+
+html[data-theme="dark"] .dashboard-notice-action {
+  border-color: #f3a452;
+  background: #3a2c16;
+  color: #f3a452;
+}
+
 /* The recommendation to install layerling as an app: a card under the start tiles that is meant
    to be seen - what it brings, an install button where the browser has one, "Not now" for two
    weeks and a cross for good. */

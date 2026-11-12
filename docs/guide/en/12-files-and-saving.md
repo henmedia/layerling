@@ -50,7 +50,7 @@ A backup of all designs also holds the settings of this browser: your default fo
 
 Only some designs: after {{ui:dashboard.select}}, {{ui:dashboard.backupSelected}} packs just the chosen designs, in their folders, into one ZIP file, and {{ui:dashboard.backupSelected}} in a folder's menu packs that folder with every design and folder in it. Neither takes the custom shapes along, and {{ui:dashboard.restoreBackup}} brings both back like a full backup. This is for the designs of this browser.
 
-Where a backup goes: in Chrome and Edge a save dialog asks for the folder and the name, and it remembers the folder for the next backup. That way your backups go straight into a folder of your own, on a cloud drive for example. The same goes for {{ui:myShapes.backup}}. Other browsers put the file into their download folder; which folder that is, you set in the browser's settings.
+Where a backup goes: in Chrome and Edge a save dialog asks for the folder and the name, and it remembers the folder for the next backup. That way your backups go straight into a folder of your own, on a cloud drive for example. The same goes for {{ui:myShapes.backup}}. Other browsers put the file into their download folder; which folder that is, you set in the browser's settings. If the dialog hands back no file, the message offers {{ui:status.saveAsDownload}}: the backup then goes into the Downloads folder as a normal download.
 
 To try something out without touching a design, choose {{ui:dashboard.openCopy}} in its menu on the start page. layerling makes a copy, as {{ui:common.duplicate}} does, and opens the copy right away; the original stays as it was, whatever you do in the copy. On a server the copy lies there next to the original.
 

@@ -50,7 +50,7 @@ Kopia zapasowa wszystkich projektów zawiera też ustawienia tej przeglądarki: 
 
 Tylko niektóre projekty: po {{ui:dashboard.select}} przycisk {{ui:dashboard.backupSelected}} pakuje tylko wybrane projekty, w ich folderach, do jednego pliku ZIP, a {{ui:dashboard.backupSelected}} w menu folderu pakuje ten folder ze wszystkimi projektami i folderami. Żaden z nich nie zabiera własnych kształtów, a {{ui:dashboard.restoreBackup}} przywraca oba jak pełną kopię. Dotyczy to projektów tej przeglądarki.
 
-Gdzie trafia kopia zapasowa: w Chrome i Edge okno zapisu pyta o folder i nazwę oraz zapamiętuje folder na następną kopię. Dzięki temu kopie trafiają od razu do własnego folderu, na przykład na dysk w chmurze. To samo dotyczy {{ui:myShapes.backup}}. Inne przeglądarki zapisują plik w swoim folderze pobranych plików; który to folder, ustawia się w ustawieniach przeglądarki.
+Gdzie trafia kopia zapasowa: w Chrome i Edge okno zapisu pyta o folder i nazwę oraz zapamiętuje folder na następną kopię. Dzięki temu kopie trafiają od razu do własnego folderu, na przykład na dysk w chmurze. To samo dotyczy {{ui:myShapes.backup}}. Inne przeglądarki zapisują plik w swoim folderze pobranych plików; który to folder, ustawia się w ustawieniach przeglądarki. Jeśli okno nie zwróci żadnego pliku, komunikat proponuje {{ui:status.saveAsDownload}}: kopia trafia wtedy jako zwykłe pobranie do folderu Pobrane.
 
 Aby coś wypróbować bez zmieniania projektu, wybierz {{ui:dashboard.openCopy}} w jego menu na stronie startowej. layerling tworzy kopię, tak jak {{ui:common.duplicate}}, i od razu ją otwiera; oryginał pozostaje taki, jaki był, cokolwiek zrobisz w kopii. Na serwerze kopia leży tam obok oryginału.
 

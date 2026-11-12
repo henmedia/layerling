@@ -50,7 +50,7 @@ layerling 會提醒你。上一次 {{ui:dashboard.backupAll}} 越久遠，此瀏
 
 只備份部分設計：點選 {{ui:dashboard.select}} 後，{{ui:dashboard.backupSelected}} 只把所選設計連同其資料夾打包成一個 ZIP 檔案；資料夾選單中的 {{ui:dashboard.backupSelected}} 會打包該資料夾及其中所有設計和資料夾。兩者都不包含自訂形狀，{{ui:dashboard.restoreBackup}} 可以像完整備份一樣還原它們。這適用於此瀏覽器中的設計。
 
-備份存到哪裡：在 Chrome 和 Edge 中，儲存對話框會詢問資料夾和名稱，並為下一次備份記住該資料夾。這樣備份就能直接存入你自己的資料夾，例如雲端硬碟。{{ui:myShapes.backup}} 也是如此。其他瀏覽器會把檔案放進它們的下載資料夾；是哪個資料夾，可在瀏覽器設定中更改。
+備份存到哪裡：在 Chrome 和 Edge 中，儲存對話框會詢問資料夾和名稱，並為下一次備份記住該資料夾。這樣備份就能直接存入你自己的資料夾，例如雲端硬碟。{{ui:myShapes.backup}} 也是如此。其他瀏覽器會把檔案放進它們的下載資料夾；是哪個資料夾，可在瀏覽器設定中更改。如果對話框沒有傳回檔案，訊息會提供 {{ui:status.saveAsDownload}}：備份隨後會作為一般下載存入下載資料夾。
 
 想嘗試一些東西又不改動某個設計時，在開始頁上該設計的選單中選擇{{ui:dashboard.openCopy}}。layerling 會像{{ui:common.duplicate}}一樣複製一份，並立即開啟副本；無論你在副本中做什麼，原設計都保持原樣。在伺服器上，副本就放在原設計旁邊。
 

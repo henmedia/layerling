@@ -407,6 +407,23 @@ html[data-theme="dark"]:where([data-palette="graphite"]) .dashboard-trademark {
   color: #565656;
 }
 
+:where(html[data-theme="dark"][data-palette="graphite"]) .dashboard-notice-action {
+  border: 1px solid #c96a12;
+  background: #f3f3f3;
+  color: #9a4f08;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .dashboard-notice-action:hover,
+:where(html[data-theme="dark"][data-palette="graphite"]) .dashboard-notice-action:focus-visible {
+  background: #e1e1e1;
+}
+
+html[data-theme="dark"]:where([data-palette="graphite"]) .dashboard-notice-action {
+  border-color: #f3a452;
+  background: #2d2d2d;
+  color: #f3a452;
+}
+
 :where(html[data-theme="dark"][data-palette="graphite"]) .install-app-hint {
   background: linear-gradient(135deg, #f0f0f0 0%, #e1e1e1 100%);
   border: 2px solid #e08a2c;
