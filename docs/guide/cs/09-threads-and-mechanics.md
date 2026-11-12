@@ -120,6 +120,8 @@ V nabídce {{ui:prop.springForm}} se z pružiny stane plochá pružina ({{ui:spr
 
 {{ui:prop.loftWall}} vytvoří místo plného tělesa otevřenou trubku. Na obou koncích je otvor zmenšen o tloušťku stěny měřenou napříč; na šikmé stěně je skutečná kolmá tloušťka menší. Změna rozměrů rámečkem zvětšuje oba konce, ale poloměr rohů a tloušťka stěny zůstávají.
 
+{{ui:prop.loftTopWall}} dá hornímu konci vlastní stěnu, jakmile nějaká stěna je: hubice 3 mm silná u obdélníku dole, která končí 1 mm tenká u kulatého horního konce. Dokud nezadáte vlastní hodnotu, řídí se stěnou dole. Mezi konci se stěna mění rovnoměrně a u přechodu přes další průřezy dostane každý průřez stěnu odpovídající jeho výšce.
+
 {{ui:prop.loftSmooth}} mění průběh propojení. Při 0 vedou boky rovně jako kužel. Při 100 vycházejí oba konce svisle a rozměr se mění mezi nimi po křivce S pro plynulý adaptér místo trychtýře. Mezilehlé hodnoty oba průběhy kombinují. Funguje současně s {{ui:prop.loftWall}}, zkroucením, nakloněním a odsazením. Dutý díl zůstává otevřený na obou koncích. Zachovává přesné těleso pro úpravy hran, ale sestavení přes více průřezů trvá déle.
 
 {{ui:prop.loftSegments}} určuje, jak jemně se kreslí kruhy a zaoblené rohy: z kolika rovných kusů se skládá celý kruh v pohledu a v STL, OBJ a 3MF. Začíná na 96, což je pro většinu dílů hladké; pro velký kulatý konec, který chcete vidět bez plošek, ho zvyšte, až na 360. Víc kusů znamená větší soubory. Mnohoúhelník si ponechá nastavený {{ui:prop.loftBottomSides}}. Pole se ukáže, když je konec kulatý nebo má zaoblený roh.

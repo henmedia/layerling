@@ -2755,33 +2755,18 @@ function splitBentTubeBore(shape: WorkplaneShape): WorkplaneShape[] {
   const boreSize = sides === 0 ? 2 * radii.inner : 2 * radii.inner * Math.cos(Math.PI / sides);
   const { tubeBoreHole: _flag, ...rest } = shape;
   const solid = { ...rest, ...bentTubeParameterPatch(shape, { bentTubeInnerProfile: "none" }) };
-  const boreChanges = { bentTubeProfile: settings.innerProfile, bentTubeInnerProfile: "none" as const, bentTubeSize: boreSize };
-  // Where the opening goes is worked out on the pipe lying flat, unturned and unmirrored. There the patch keeps its start
-  // where the pipe starts, and its box shares its middle with the pipe's in height, the thickness of the pipe; otherwise it
-  // lies a wall lower and cuts through the bottom (#892). A standing or tipped pipe has a leg and its bend in its height, so
-  // the middle of its box is not the middle of the pipe: the opening ended short of the top end and closed it (#1367).
-  // The shift found lying flat is turned and mirrored as the pipe is.
-  const { mirrorX: _mirrorX, mirrorY: _mirrorY, mirrorZ: _mirrorZ, ...unmirrored } = rest;
-  const flat: WorkplaneShape = { ...unmirrored, rotation: 0, rotationX: 0, rotationZ: 0 };
-  const flatSolid = { ...flat, ...bentTubeParameterPatch(flat, { bentTubeInnerProfile: "none" }) };
-  const flatBore = { ...flat, ...bentTubeParameterPatch(flat, boreChanges) };
-  const solidBox = boundsForShapesOfVertices([flatSolid]);
-  const boreBox = boundsForShapesOfVertices([flatBore]);
-  const middleOf = (part: WorkplaneShape, centreY: number) => new THREE.Vector3(part.x, centreY, part.z);
-  const shift = middleOf(flatBore, (boreBox.minY + boreBox.maxY) / 2)
-    .sub(middleOf(flatSolid, (solidBox.minY + solidBox.maxY) / 2))
-    .setY(0)
-    .multiply(new THREE.Vector3(mirrorSign(shape.mirrorX), mirrorSign(shape.mirrorY), mirrorSign(shape.mirrorZ)))
-    .applyQuaternion(quaternionForShape(shape));
+  // The opening starts where the pipe starts, in all three directions, turned and mirrored as the pipe is: handed its
+  // path, the patch keeps the start in place in height too, as it does when the bends change. Its box sharing its middle
+  // with the pipe's is not enough: a pipe lying flat has the opening a wall lower (#892), and one standing, by its
+  // rotation (#1367) or by the roll of a bend (#1545), has a leg and a bend in its height, so the opening ended short of
+  // the top end and closed it.
+  const boreChanges = { bentTubeProfile: settings.innerProfile, bentTubeInnerProfile: "none" as const, bentTubeSize: boreSize, bentTubeSegments: settings.segments };
   const bore = {
     ...rest,
     ...bentTubeParameterPatch(shape, boreChanges),
     id: derivedLocalId(shape.id, "bore"),
     hole: true,
   };
-  bore.x = solid.x + shift.x;
-  bore.z = solid.z + shift.z;
-  bore.elevation = (solid.elevation ?? 0) + solid.height / 2 + shift.y - bore.height / 2;
   return [solid, bore];
 }
 

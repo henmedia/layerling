@@ -163,6 +163,7 @@ AI 使用与你相同的功能，走的是与你在编辑器中的操作相同�
 | `layerling_insert_custom_shape` | 把自定义形状插入当前设计，可指定 x/z 位置 |
 | `layerling_delete_custom_shape` | 移除自定义形状；已插入的实体保留 |
 | `layerling_show_workplane` | 隐藏和显示带网格的平台，例如为了拍摄底部图片（仅改变视图） |
+| `layerling_focus_mode` | 开启或关闭专注模式：隐藏标题栏和页脚以留出更多空间（只影响编辑器框架） |
 | `layerling_set_section_view` | 沿一个平面把视图剖开以便查看内部（仅改变视图，不会真正切开任何东西） |
 | `layerling_measurements` | 显示或隐藏卷尺的测量，并列出它们及其长度，并像 [[Q]] 一样隐藏或显示所选对象周围的尺寸，并可为其中一个测量输入长度，像点击其数字一样移动其一端的物体 |
 | `layerling_measure_angle` | 像量角器一样测量角度：三点的顶点处或两个平面之间，并在视图中显示 |

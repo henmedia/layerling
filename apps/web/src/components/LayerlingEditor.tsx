@@ -124,6 +124,7 @@ import { GuideModal } from "./workplane/GuideModal";
 import { HistoryViewOverlay, historyStateNameSuffix } from "./workplane/HistoryViewOverlay";
 import { useHistoryViewPicking } from "./workplane/useHistoryViewPicking";
 import { ShortcutsModal } from "./workplane/ShortcutsModal";
+import { WhatsNewWindow } from "./workplane/WhatsNewWindow";
 import { InteractiveHelp } from "./InteractiveHelp";
 import { ShapeContextMenu, type ShapeContextMenuItem } from "./workplane/ShapeContextMenu";
 import { nextSelectionTransparency } from "@/lib/selectionTransparency";
@@ -169,6 +170,7 @@ import { dedupeProjectAssets } from "@/lib/projectAssets";
 import { useCustomShapes } from "@/lib/useCustomShapes";
 import { packBackup } from "@/lib/projectBackup";
 import { MyShapesSection } from "@/components/workplane/MyShapesSection";
+import { searchCustomShapes } from "@/lib/customShapeSearch";
 import { addLineIntersectionPoints, onlyMovesPoints, splitSketchSegment } from "@/lib/sketchPointRefinement";
 import { joinOpenEnds } from "@/lib/sketchPointJoin";
 import { mirrorSketchSelection, SKETCH_MIRROR_HORIZONTAL, SKETCH_MIRROR_VERTICAL, sketchMirrorAxisThroughSegment } from "@/lib/sketchMirror";
@@ -273,6 +275,7 @@ import { drawingLabelsInLanguage } from "@/lib/drawingLabels";
 import { DEFAULT_TEXT_BLOCK_GAP, offersTextBlock, TEXT_BLOCK_ALIGNS, textBlockFor, textBlockLines, type TextBlockAlign, type TextBlockOptions } from "@/lib/textBlock";
 import { offersTextLayers, textLayerStack, layeredTextShape, nameTagSource, nameTagsFor, offersIconLayers, iconLayerStack, iconTagArea, layeredIconShape, iconTagCopies, svgIconArea, iconTagFromSvg, keyringTabShape, keyringTabTag, keyringTabAt, keyringTabPlace, textFreeKeyring, textFreeKeyringPlace, iconFreeKeyring, iconFreeKeyringPlace } from "@/lib/editorTextTags";
 import { isNonTextControl, isTypingTarget } from "@/lib/editorKeyTargets";
+import { isFocusModeKey, useFocusMode } from "@/lib/focusMode";
 import { DEFAULT_KEYRING_DIAMETER } from "@/lib/textGeometry";
 import { TopPanel, DirectExportFormat, SvgExportView, DxfExportView, ViewImageOptions, LylHistoryLimit, LylExportTarget, TopActionPanel } from "./workplane/TopActionPanel";
 import { ToolbarMode, SketchShapeOptions, SecondaryToolbar } from "./workplane/SecondaryToolbar";
@@ -296,6 +299,7 @@ const HISTORY_VIEW_MCP_ACTIONS = new Set([
   "measure_section",
   "set_section_view",
   "show_workplane",
+  "focus_mode",
   "measurements",
   "saved_view",
   "export_section_svg",
@@ -449,6 +453,8 @@ type BooleanAutomationResult = {
 };
 const SHARED_CLIPBOARD_STORAGE_KEY = "layerling.clipboard";
 const SYSTEM_CLIPBOARD_PREFIX = "LAYERLING/1\n";
+/** How long Ctrl+V waits for the browser's paste event before pasting as the Paste button does (#1548), in ms. */
+const PASTE_EVENT_WAIT_MS = 250;
 
 declare global {
   interface Window {
@@ -522,12 +528,20 @@ async function readSystemClipboard(): Promise<ClipboardPayload<WorkplaneShape> |
     return null;
   }
   try {
-    const value = await navigator.clipboard.readText();
-    if (!value.startsWith(SYSTEM_CLIPBOARD_PREFIX)) return null;
-    return parseClipboardShapes(value.slice(SYSTEM_CLIPBOARD_PREFIX.length));
+    return systemClipboardShapes(await navigator.clipboard.readText());
   } catch {
     return null;
   }
+}
+
+/**
+ * The shapes in a text from the system clipboard, when layerling put it there. Windows hands the line break after the
+ * prefix back as \r\n (#1548), which the prefix alone did not match.
+ */
+function systemClipboardShapes(value: string): ClipboardPayload<WorkplaneShape> | null {
+  const text = value.replace(/^(LAYERLING\/1)\r\n/, "$1\n");
+  if (!text.startsWith(SYSTEM_CLIPBOARD_PREFIX)) return null;
+  return parseClipboardShapes(text.slice(SYSTEM_CLIPBOARD_PREFIX.length));
 }
 
 function copyTextWithSelectionFallback(value: string) {
@@ -2672,7 +2686,7 @@ function mcpLoftChange(params: Record<string, unknown>): Partial<LoftMeasures> {
   const numbers: Array<[string, keyof LoftMeasures]> = [
     ["loftBottomWidth", "bottomWidth"], ["loftBottomDepth", "bottomDepth"], ["loftTopWidth", "topWidth"], ["loftTopDepth", "topDepth"],
     ["loftBottomCorner", "bottomCorner"], ["loftTopCorner", "topCorner"], ["loftBottomSides", "bottomSides"], ["loftTopSides", "topSides"],
-    ["loftOffsetX", "offsetX"], ["loftOffsetZ", "offsetZ"], ["loftWall", "wall"],
+    ["loftOffsetX", "offsetX"], ["loftOffsetZ", "offsetZ"], ["loftWall", "wall"], ["loftTopWall", "topWall"],
     ["loftTwist", "twist"], ["loftTiltX", "tiltX"], ["loftTiltZ", "tiltZ"], ["loftSmooth", "smooth"], ["loftSegments", "segments"],
   ];
   numbers.forEach(([param, key]) => {
@@ -3125,6 +3139,10 @@ export function LayerlingEditor({
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [clipboard, setClipboard] = useState<WorkplaneShape[]>([]);
   const clipboardCopiedAtRef = useRef(0);
+  // Ctrl+V waits for the browser's paste event (#1548): the press it belongs to, and the one still waiting for it.
+  const pasteKeyPressRef = useRef(0);
+  const pasteKeyPendingRef = useRef(0);
+  const pasteShapeRef = useRef<(systemText?: string) => Promise<void>>(async () => {});
   const [systemClipboardSupported, setSystemClipboardSupported] = useState(false);
   const [history, setHistory] = useState<EditorHistoryEntry[]>(() => (initialHistoryStateRef.current as EditorHistoryState).entries);
   const [historyIndex, setHistoryIndex] = useState(() => (initialHistoryStateRef.current as EditorHistoryState).index);
@@ -3186,6 +3204,8 @@ export function LayerlingEditor({
   const [iconTagPanelOpen, setIconTagPanelOpen] = useState(false);
   const [qrCodePanelOpen, setQrCodePanelOpen] = useState(false);
   const [shortcutsOpen, setShortcutsOpen] = useState(false);
+  // The list of updates over the design (#1530), so it can be read while a new tool is tried.
+  const [whatsNewOpen, setWhatsNewOpen] = useState(false);
   // Interactive Help: while on, a click asks the guide about the element instead of using it.
   const [interactiveHelp, setInteractiveHelp] = useState(false);
   const toggleInteractiveHelp = useCallback(() => {
@@ -3510,6 +3530,23 @@ export function LayerlingEditor({
   const interactionHistoryTimerRef = useRef<number | null>(null);
   const [projectInteractionActive, setProjectInteractionActive] = useState(false);
   const [toolbarMode, setToolbarMode] = useState<ToolbarMode>("geometry");
+  // Focus mode (Discussion #1554): the title row and the footer make room for the work.
+  const focusMode = useFocusMode();
+  const setFocusModeRef = useRef(focusMode.set);
+  setFocusModeRef.current = focusMode.set;
+  const focusModeActiveRef = useRef(focusMode.active);
+  focusModeActiveRef.current = focusMode.active;
+  useEffect(() => {
+    // Ctrl+Shift+F, before the view's own F (which looks at the selection) and also in a field, where it types nothing.
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.defaultPrevented || event.repeat || !isFocusModeKey(event)) return;
+      event.preventDefault();
+      event.stopPropagation();
+      setFocusModeRef.current();
+    };
+    window.addEventListener("keydown", onKeyDown, true);
+    return () => window.removeEventListener("keydown", onKeyDown, true);
+  }, []);
   const [sketchActive, setSketchActive] = useState(false);
   const [activeSketchWorkplane, setActiveSketchWorkplane] = useState<PlacementWorkplane>(
     () => normalizePlacementWorkplane(initialPlacementWorkplane, initialPlacementElevation),
@@ -6964,7 +7001,12 @@ export function LayerlingEditor({
       : t("status.copiedMany", { count: selectedShapes.length }));
   }, [hasSelection, selectedShapes]);
 
-  const pasteShape = useCallback(async () => {
+  /**
+   * `systemText` is the system clipboard as the browser's paste event handed it over with Ctrl+V. Without it (the
+   * Paste button, the context menu) the clipboard is asked for, which Firefox confirms each time with a small Paste
+   * menu of its own (#1548).
+   */
+  const pasteShape = useCallback(async (systemText?: string) => {
     const sourceProjectId = projectInfoRef.current.projectId;
     // The newest copy wins, wherever it landed: this tab, another tab (local
     // storage) or another browser (system clipboard).
@@ -6972,7 +7014,7 @@ export function LayerlingEditor({
       { copiedAt: clipboardCopiedAtRef.current, shapes: clipboard },
       pageClipboard,
       readSharedClipboard(),
-      await readSystemClipboard(),
+      systemText === undefined ? await readSystemClipboard() : systemClipboardShapes(systemText),
     ]);
     const sourceClipboard = newest?.shapes ?? [];
     if (sourceClipboard.length === 0) {
@@ -7002,6 +7044,21 @@ export function LayerlingEditor({
       : pasteNudged(copies, sourceClipboard);
     commitShapes([...shapesRef.current, ...pasted], pasted.map((shape) => shape.id), pasted.length === 1 ? t("status.pastedOne") : t("status.pastedMany", { count: pasted.length }));
   }, [clipboard, commitShapes, workspaceSettings.pasteCentered]);
+  pasteShapeRef.current = pasteShape;
+
+  // The paste that follows Ctrl+V (#1548): its clipboard text is handed over with the key press, so Firefox does not
+  // ask with its Paste menu as it does when the page reads the clipboard itself. Only a paste after the editor's own
+  // Ctrl+V counts; one into a field stays the field's.
+  useEffect(() => {
+    const handlePaste = (event: ClipboardEvent) => {
+      if (!pasteKeyPendingRef.current || isTypingTarget(event.target)) return;
+      pasteKeyPendingRef.current = 0;
+      event.preventDefault();
+      void pasteShapeRef.current(event.clipboardData?.getData("text/plain") ?? "");
+    };
+    document.addEventListener("paste", handlePaste);
+    return () => document.removeEventListener("paste", handlePaste);
+  }, []);
 
   const undo = useCallback(() => {
     if (projectInteractionActiveRef.current) {
@@ -15701,6 +15758,12 @@ export function LayerlingEditor({
         };
       }
 
+      if (command.action === "focus_mode") {
+        if (params.on !== undefined && typeof params.on !== "boolean") throw new Error("on must be true or false");
+        const on = typeof params.on === "boolean" ? setFocusModeRef.current(params.on) : focusModeActiveRef.current;
+        return { on };
+      }
+
       if (command.action === "show_workplane") {
         if (!window.layerlingWorkplaneDisplay) throw new Error("The workplane display is not available in this editor");
         if (params.visible !== undefined && typeof params.visible !== "boolean") throw new Error("visible must be true or false");
@@ -17866,8 +17929,16 @@ export function LayerlingEditor({
       }
 
       if (shortcut && key === "v") {
-        event.preventDefault();
-        pasteShape();
+        // The browser's own paste follows the key and brings the system clipboard with it, unasked (#1548); the
+        // paste listener below takes it. Should it not come, the paste runs as from the Paste button.
+        const press = pasteKeyPressRef.current + 1;
+        pasteKeyPressRef.current = press;
+        pasteKeyPendingRef.current = press;
+        window.setTimeout(() => {
+          if (pasteKeyPendingRef.current !== press) return;
+          pasteKeyPendingRef.current = 0;
+          void pasteShapeRef.current();
+        }, PASTE_EVENT_WAIT_MS);
         return;
       }
 
@@ -18298,7 +18369,7 @@ export function LayerlingEditor({
   };
 
   return (
-    <div className={`layerling-editor ${historyViewState ? "history-view-active" : ""}`}>
+    <div className={`layerling-editor ${historyViewState ? "history-view-active" : ""} ${focusMode.active ? "focus-mode" : ""}`}>
       <SecondaryToolbar
         toolbarMode={toolbarMode}
         projectName={projectName}
@@ -18389,6 +18460,8 @@ export function LayerlingEditor({
         onSketchFinish={finishSketch}
         onSketchCancel={cancelSketch}
         onHome={onHome ? leaveToDashboard : undefined}
+        focusMode={focusMode.active}
+        onFocusModeChange={(on) => focusMode.set(on)}
         onAlign={toggleAlignMode}
         onChamfer={() => edgeModifier?.kind === "chamfer" || edgeModifier?.kind === "chamfillet" ? cancelEdgeModifier() : startEdgeModifier("chamfer")}
         onCopy={copySelected}
@@ -18460,7 +18533,7 @@ export function LayerlingEditor({
         scalePercentActive={Boolean(scalePercentTool)}
         rotationPivotActive={pivotPickMode || Boolean(activeRotationPivot)}
         onSplit={toggleSplitMode}
-        onPaste={pasteShape}
+        onPaste={() => void pasteShape()}
         onRedo={redo}
         onSnap={snapSelected}
         onShowHidden={showHidden}
@@ -18470,6 +18543,7 @@ export function LayerlingEditor({
         onUngroup={ungroupSelected}
         onUndo={undo}
         onShortcuts={() => setShortcutsOpen(true)}
+        onWhatsNew={() => setWhatsNewOpen(true)}
         onInteractiveHelp={toggleInteractiveHelp}
         interactiveHelpActive={interactiveHelp}
         onGuide={() => setGuideOpen(true)}
@@ -18491,8 +18565,10 @@ export function LayerlingEditor({
         onInsertCustomShape={insertCustomShapeAndCarry}
         onNotice={(text) => setNotice(text)}
         splitActive={Boolean(splitSession)}
-        renderMyShapes={(close) => (
+        countMyShapeMatches={(query) => searchCustomShapes(customShapeEntries, query).length}
+        renderMyShapes={(close, query) => (
           <MyShapesSection
+            searchQuery={query}
             shapes={customShapeEntries}
             folders={customShapeFolders}
             serverAvailable={customShapesServerAvailable}
@@ -19536,6 +19612,7 @@ export function LayerlingEditor({
       {shortcutsOpen ? (
         <ShortcutsModal sketchMode={toolbarMode === "sketch"} onClose={() => setShortcutsOpen(false)} />
       ) : null}
+      {whatsNewOpen ? <WhatsNewWindow onClose={() => setWhatsNewOpen(false)} /> : null}
       {interactiveHelp ? <InteractiveHelp onExit={toggleInteractiveHelp} /> : null}
       {viewedAttachment ? <AttachmentViewer attachment={viewedAttachment} onClose={() => setViewedAttachmentId(null)} /> : null}
       {guideOpen ? <GuideModal sharedStore={sharedProjectsEnabled} sketchMode={toolbarMode === "sketch"} onClose={() => setGuideOpen(false)} /> : null}

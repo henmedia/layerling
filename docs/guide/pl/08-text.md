@@ -85,7 +85,7 @@ Aby umieścić napis na bocznej ścianie, najpierw połóż na niej płaszczyzn�
 Po przecięciu płyty litery takie jak O, A i B tracą środek: leży luźno w literze i wypada. {{ui:stencilBridges.title}} utrzymuje go przy płycie małymi mostkami, jak w szablonie.
 
 1. Przełącz tekst na {{ui:inspector.hole}}, niech przechodzi przez płytę, i zaznacz oba obiekty, zgrupowane lub nie.
-2. Kliknij {{ui:stencilBridges.title}} w grupie {{ui:editor.group.modify}} na wstążce, kliknij prawym przyciskiem zaznaczenie albo znajdź to przez [[Ctrl]]+[[K]]. Mostki pojawiają się na pomarańczowo tam, gdzie będą.
+2. Kliknij {{ui:stencilBridges.title}} w grupie {{ui:editor.section.splitShape}} na wstążce, kliknij prawym przyciskiem zaznaczenie albo znajdź to przez [[Ctrl]]+[[K]]. Mostki pojawiają się na pomarańczowo tam, gdzie będą.
 3. Ustaw {{ui:stencilBridges.width}} i {{ui:stencilBridges.count}}. {{ui:stencilBridges.height}} zaczyna się od grubości płyty; niższe mostki leżą równo z dołem, pośrodku albo równo z górą płyty, zgodnie z {{ui:stencilBridges.position}}. W szablonie do malowania sprayem mostki u góry zostawiają pod sobą miejsce na farbę.
 4. {{ui:stencilBridges.apply}} grupuje mostki z płytą.
 

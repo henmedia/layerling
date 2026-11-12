@@ -137,7 +137,7 @@ Con {{ui:array.groupCopies}} marcado, {{ui:array.apply}} agrupa en el mismo paso
 
 ## Patrón de orificios en una cara
 
-Para rejillas de ventilación, rejillas de altavoz, cestas y cajas de electrónica, el {{ui:holePattern.title}} reparte orificios por igual sobre una cara plana. Ya no tienes que hacer un orificio, repetirlo y colocarlo en la pared. Selecciona exactamente un cuerpo y haz clic en {{ui:holePattern.title}}, en el grupo {{ui:editor.group.modify}} de la cinta, junto al patrón. También puedes hacer clic derecho en el cuerpo o buscarlo con [[Ctrl]]+[[K]].
+Para rejillas de ventilación, rejillas de altavoz, cestas y cajas de electrónica, el {{ui:holePattern.title}} reparte orificios por igual sobre una cara plana. Ya no tienes que hacer un orificio, repetirlo y colocarlo en la pared. Selecciona exactamente un cuerpo y haz clic en {{ui:holePattern.title}}, en el grupo {{ui:editor.section.mirrorPattern}} de la cinta, junto al patrón. También puedes hacer clic derecho en el cuerpo o buscarlo con [[Ctrl]]+[[K]].
 
 1. Haz clic en una cara plana del cuerpo. Cuenta toda la cara plana alrededor de tu clic, no solo el triángulo que hay bajo el puntero. La pared redonda de un cilindro, un tubo o un taladro también sirve, mira más abajo; otra cara curva no: te sale un aviso y haces clic en una plana. En un grupo o un conjunto, la cara continúa por las piezas que se tocan, como en un solo cuerpo; en un conjunto, solo si no hay ningún orificio entre ellas. Las piezas se unen poco después de abrir la herramienta; hasta entonces solo se ilumina bajo el puntero la cara de una pieza, y un clic espera a que se unan. En un grupo o conjunto que contenga un texto, solo se ilumina la cara de una pieza, y el clic une las piezas.
 2. En la ventana, elige cómo son los orificios y cómo se colocan:
@@ -165,7 +165,7 @@ Una IA puede hacer lo mismo a través del puente MCP con `layerling_perforate_fa
 
 ## Empujar una cara hacia fuera o hacia dentro
 
-Para engrosar una pared, poner un resalte sobre una cara o abrir un hueco en ella, la herramienta {{ui:faceTool.title}} trabaja sobre una cara plana. También funciona con un STL importado, donde no hay ningún boceto que cambiar. Selecciona exactamente un cuerpo y haz clic en {{ui:faceTool.title}}, en el grupo {{ui:editor.group.modify}} de la cinta, junto al patrón de orificios. También puedes hacer clic derecho en el cuerpo o buscarla con [[Ctrl]]+[[K]].
+Para engrosar una pared, poner un resalte sobre una cara o abrir un hueco en ella, la herramienta {{ui:faceTool.title}} trabaja sobre una cara plana. También funciona con un STL importado, donde no hay ningún boceto que cambiar. Selecciona exactamente un cuerpo y haz clic en {{ui:faceTool.title}}, en el grupo {{ui:editor.section.mirrorPattern}} de la cinta, junto al patrón de orificios. También puedes hacer clic derecho en el cuerpo o buscarla con [[Ctrl]]+[[K]].
 
 1. Haz clic en una cara plana del cuerpo. Igual que con el patrón de orificios, cuenta toda la cara plana alrededor de tu clic; una cara curva no sirve aquí, tampoco una pared redonda. En un grupo o un conjunto, la cara continúa por las piezas que se tocan, igual que con el patrón de orificios.
 2. En la ventana:

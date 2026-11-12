@@ -137,6 +137,8 @@ Več teles pride ven skupaj, tako kot so stala drugo glede na drugo, in ostanejo
 
 {{ui:myShapes.title}} so v tem brskalniku, ločeno od načrtov, in so ob naslednjem zagonu takoj spet tam. {{ui:dashboard.backupAll}} na začetni strani jih shrani skupaj z načrti, ob odpiranju varnostne kopije se vrnejo oboje. Samo oblike shraniš z {{ui:myShapes.backup}} (puščica navzdol) kot datoteko ZIP in jih z {{ui:myShapes.load}} (puščica navzgor) prineseš v drug brskalnik. {{ui:myShapes.load}} sprejme tudi posamezne načrte `.lyl`, vsak potem postane oblika. Kar je že tam, se ne ustvari dvakrat.
 
+Iskanje v knjižnici oblik najde tudi vaše lastne oblike po imenu, tudi tiste v mapah; prikažejo se nad zadetki knjižnice. Gumb s puščico in črkami od A do Ž ob gumbu za mape uredi lastne oblike po imenu namesto po dnevu shranjevanja; drugi klik vrne prejšnji vrstni red, brskalnik pa si izbiro zapomni.
+
 ### Mape
 
 Veliko oblik po meri je laže razvrstiti v mape. {{ui:myShapes.newFolder}} (mapa s plusom poleg {{ui:myShapes.saveSelection}}) vpraša za ime in ustvari mapo na vrhu; mapa s plusom pri mapi, {{ui:myShapes.newSubfolder}}, ustvari mapo v njej. Mape segajo tri ravni globoko: mapa na tretji ravni sprejme oblike, ne pa novih map. Mape stojijo nad oblikami, ki niso v nobeni mapi, urejene po imenu, in se odpirajo in zapirajo s puščico; število pri mapi šteje oblike v njej in v mapah pod njo. Pri shranjevanju izberi mapo na seznamu poleg imena; z {{ui:myShapes.noFolder}} oblika ostane na vrhu.
@@ -167,7 +169,7 @@ Rezultat je mreža kot uvožen model. Z Razveljavi je oblika spet ravna; za drug
 
 ## Površinska tekstura
 
-Utori, narebričenje, satovje ali izbokline na telesu, za boljši oprijem ali za lepši videz: v nastavitvah oblike razprite {{ui:inspector.surfaceTexture}}. Enako naredi gumb {{ui:inspector.surfaceTexture}} zgoraj v skupini {{ui:editor.group.modify}}: kartico za izbrano telo razpre in spet zapre ter sveti, dokler je odprta.
+Utori, narebričenje, satovje ali izbokline na telesu, za boljši oprijem ali za lepši videz: v nastavitvah oblike razprite {{ui:inspector.surfaceTexture}}. Enako naredi gumb {{ui:inspector.surfaceTexture}} zgoraj v skupini {{ui:editor.section.surface}}: kartico za izbrano telo razpre in spet zapre ter sveti, dokler je odprta.
 
 1. Izberite {{ui:inspector.surfacePattern}}, njegov {{ui:inspector.surfaceSpacing}} in {{ui:inspector.surfaceDepth}}. {{ui:inspector.surfaceDirection}} pove, ali gre vzorec v telo ali iz njega izstopa. Pri vzorcu {{ui:surfaceTexture.bumps}} pri {{ui:inspector.surfaceBumpShape}} izberete med {{ui:surfaceTexture.bumpDome}}, {{ui:surfaceTexture.bumpCone}}, {{ui:surfaceTexture.bumpSoft}} in {{ui:surfaceTexture.bumpFlat}}. Pod {{ui:inspector.surfaceBumpGrid}} so {{ui:surfaceTexture.bumpGridStaggered}}, vsaka druga vrsta za pol razmika zamaknjena, ali v {{ui:surfaceTexture.bumpGridStraight}}.
 2. Pri {{ui:inspector.surfaceProjection}} vzemite {{ui:surfaceTexture.cylinder}} za okrogla telesa, kot so lonček, gumb ali ročaj. Vzorec teče okoli izbrane {{ui:inspector.surfaceAxis}}, razmik pa se nekoliko zaokroži, da gre naokoli celo število utorov ali celic: vzorec se sklene brez šiva. {{ui:surfaceTexture.allRound}} je primeren za telesa, ki niso okrogla, {{ui:surfaceTexture.flatProjection}} za pokrov ali ploščo, gledano od zgoraj. Če pustite {{ui:surfaceTexture.auto}}, Layerling izbere sam: {{ui:surfaceTexture.cylinder}} pri okroglih telesih in pri pokončnih oglatih, kot je škatla – vzorec tedaj sledi obrisu in brez šiva teče okoli robov, dvignjen vzorec se okoli njih zaobli –, {{ui:surfaceTexture.allRound}} pri drugih oglatih.
@@ -203,7 +205,7 @@ Za tisk v dveh barvah vklopite {{ui:inspector.surfacePatternPart}}, pri katerem 
 
 ## Barvanje v več barvah
 
-Za tisk v več barvah {{ui:paint.title}} pobarva dele telesa kar v načrtu: ploskev, okroglo steno, notranjost luknje, okroglo liso ali območje, ki ga obkrožite. Deluje kot orodja za barvanje v rezalnikih, le da barva ostane shranjena v načrtu. Izberite eno telo in v skupini {{ui:editor.group.modify}} kliknite {{ui:paint.title}}, poleg {{ui:inspector.surfaceTexture}}. Okno ponudi barve vašega načrta, {{ui:paint.customColor}} pa zmeša vašo lastno. Nato barvajte v pogledu z enim od treh orodij:
+Za tisk v več barvah {{ui:paint.title}} pobarva dele telesa kar v načrtu: ploskev, okroglo steno, notranjost luknje, okroglo liso ali območje, ki ga obkrožite. Deluje kot orodja za barvanje v rezalnikih, le da barva ostane shranjena v načrtu. Izberite eno telo in v skupini {{ui:editor.section.surface}} kliknite {{ui:paint.title}}, poleg {{ui:inspector.surfaceTexture}}. Okno ponudi barve vašega načrta, {{ui:paint.customColor}} pa zmeša vašo lastno. Nato barvajte v pogledu z enim od treh orodij:
 
 - {{ui:paint.mode.fill}}: klik zapolni ploskev do njenih ostrih robov, kot vedro barve v risalnem programu: zgornjo stran kvadra, steno valja, dno žepa ali notranjost luknje, vsakič z enim klikom. {{ui:paint.angle}} pove, kako oster mora biti rob, da ustavi polnilo; pri 90° gre čez robove kvadra.
 - {{ui:paint.mode.circle}}: klik položi na površino okroglo liso nastavljene velikosti ({{ui:paint.diameter}}), s središčem tam, kjer kliknete, tudi na ukrivljeno površino. Ustavi se na ostrih robovih telesa in nikoli ne pride skozi na zadnjo stran stene.

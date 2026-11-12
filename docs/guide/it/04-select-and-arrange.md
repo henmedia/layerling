@@ -131,7 +131,7 @@ Con {{ui:array.groupCopies}} spuntato, {{ui:array.apply}} raggruppa l'originale 
 
 ## Schema di fori su una faccia
 
-Per creare prese d’aria, griglie per altoparlanti, cestini e involucri, {{ui:holePattern.title}} distribuisce regolarmente i fori su una faccia piatta. Non devi più creare un foro, duplicarlo e posizionarlo sulla parete. Seleziona esattamente un corpo e fai clic su {{ui:holePattern.title}} nel gruppo {{ui:editor.group.modify}} della barra degli strumenti, accanto allo strumento per gli schemi. Puoi anche fare clic destro sul corpo o cercare lo strumento con [[Ctrl]]+[[K]].
+Per creare prese d’aria, griglie per altoparlanti, cestini e involucri, {{ui:holePattern.title}} distribuisce regolarmente i fori su una faccia piatta. Non devi più creare un foro, duplicarlo e posizionarlo sulla parete. Seleziona esattamente un corpo e fai clic su {{ui:holePattern.title}} nel gruppo {{ui:editor.section.mirrorPattern}} della barra degli strumenti, accanto allo strumento per gli schemi. Puoi anche fare clic destro sul corpo o cercare lo strumento con [[Ctrl]]+[[K]].
 
 1. Fai clic su una faccia piatta del corpo. Viene considerata tutta la faccia piatta intorno al punto, non solo il triangolo sotto il puntatore. Funziona anche la parete tonda di un cilindro, un tubo o un foro, vedi più sotto; le altre facce curve non sono supportate: compare un suggerimento e puoi fare clic su una faccia piatta.
 2. Nella finestra, imposta forma e disposizione dei fori:
@@ -159,7 +159,7 @@ Un’IA può eseguire la stessa operazione tramite il bridge MCP con `layerling_
 
 ## Estrudere una faccia verso l’esterno o l’interno
 
-Per ispessire una parete, aggiungere una sporgenza su una faccia o ricavarvi una cavità, lo strumento {{ui:faceTool.title}} agisce su una singola faccia piatta. Funziona anche con un file STL importato, che non contiene schizzi modificabili. Seleziona esattamente un corpo e fai clic su {{ui:faceTool.title}} nel gruppo {{ui:editor.group.modify}} della barra degli strumenti, accanto allo schema di fori. Puoi anche fare clic destro sul corpo o cercare lo strumento con [[Ctrl]]+[[K]].
+Per ispessire una parete, aggiungere una sporgenza su una faccia o ricavarvi una cavità, lo strumento {{ui:faceTool.title}} agisce su una singola faccia piatta. Funziona anche con un file STL importato, che non contiene schizzi modificabili. Seleziona esattamente un corpo e fai clic su {{ui:faceTool.title}} nel gruppo {{ui:editor.section.mirrorPattern}} della barra degli strumenti, accanto allo schema di fori. Puoi anche fare clic destro sul corpo o cercare lo strumento con [[Ctrl]]+[[K]].
 
 1. Fai clic su una faccia piatta del corpo. Come per lo schema di fori, viene considerata l’intera faccia piatta intorno al punto; le facce curve qui non sono supportate, nemmeno una parete tonda.
 2. Nella finestra:

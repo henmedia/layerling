@@ -83,7 +83,7 @@ layerling 无法读取 WOFF2 文件（几乎总能找到 TTF 或 OTF 版本）�
 文字穿透板时，O、A、B 等字母会失去中间部分：它松散地留在字母里并掉出。{{ui:stencilBridges.title}} 用小连接桥把它固定在板上，就像镂空模板一样。
 
 1. 把文字切换为{{ui:inspector.hole}}，让它穿透板，然后选中两者，组合与否均可。
-2. 单击功能区 {{ui:editor.group.modify}} 组中的 {{ui:stencilBridges.title}}，或右键单击所选对象，或用 [[Ctrl]]+[[K]] 查找。连接桥会以橙色显示在将要放置的位置。
+2. 单击功能区 {{ui:editor.section.splitShape}} 组中的 {{ui:stencilBridges.title}}，或右键单击所选对象，或用 [[Ctrl]]+[[K]] 查找。连接桥会以橙色显示在将要放置的位置。
 3. 设置 {{ui:stencilBridges.width}} 和 {{ui:stencilBridges.count}}。{{ui:stencilBridges.height}} 从板的厚度开始；较矮的连接桥按 {{ui:stencilBridges.position}} 与板底齐平、位于中间或与板顶齐平。用于喷漆的模板，顶部的连接桥下方会给油漆留出空间。
 4. {{ui:stencilBridges.apply}} 把连接桥与板组合在一起。
 

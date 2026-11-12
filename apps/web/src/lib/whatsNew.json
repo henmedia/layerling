@@ -1,5 +1,176 @@
 [
   {
+    "version": "1.156.1",
+    "items": [
+      {
+        "title": {
+          "de": "Fokusmodus: Ansicht bis ganz unten",
+          "en": "Focus mode: the view reaches the bottom",
+          "da": "Fokustilstand: visningen når helt ned"
+        },
+        "body": {
+          "de": "Im Fokusmodus reicht die 3D-Ansicht jetzt bis an den unteren Fensterrand, auch nach F11; das Raster liegt wieder in der Ansicht statt in einem eigenen Streifen. Die Symbole der kleinen Leiste sind gleich groß.",
+          "en": "In focus mode the 3D view now reaches the bottom edge of the window, also after F11; the snap grid lies in the view again instead of in a band of its own. The icons of the small bar are all one size.",
+          "da": "I fokustilstand når 3D-visningen nu helt ned til vinduets nederste kant, også efter F11; gitteret ligger igen i visningen i stedet for i sin egen stribe. Ikonerne i den lille bjælke har alle samme størrelse."
+        }
+      }
+    ]
+  },
+  {
+    "version": "1.156.0",
+    "items": [
+      {
+        "title": {
+          "de": "Übergang: Wandstärke oben",
+          "en": "Transition: wall at the top",
+          "da": "Overgang: vægtykkelse foroven"
+        },
+        "body": {
+          "de": "Ein Übergang mit Wand hat unter Eigenschaften jetzt auch „Wandstärke oben“: eine Düse, unten am Rechteck 3 mm dick, die oben am Rund mit 1 mm endet. Dazwischen ändert sich die Wand gleichmäßig; ohne eigenen Wert ist sie oben so dick wie unten.",
+          "en": "A transition with a wall now also has Wall Thickness at the Top under Properties: a nozzle 3 mm thick on the rectangle at the bottom that ends 1 mm thin on the round top. In between the wall changes evenly; without a value of its own the top is as thick as the bottom.",
+          "da": "En overgang med væg har nu også Vægtykkelse foroven under Egenskaber: en dyse, 3 mm tyk ved rektanglet forneden, som ender 1 mm tynd ved den runde top. Imellem ændrer væggen sig jævnt; uden egen værdi er toppen lige så tyk som bunden."
+        }
+      },
+      {
+        "title": {
+          "de": "Löcher durchsichtiger einstellen",
+          "en": "Set how see-through holes are",
+          "da": "Indstil, hvor gennemsigtige huller er"
+        },
+        "body": {
+          "de": "Unter Einstellungen > Darstellung stellt „Deckkraft der Löcher“ ein, wie dicht Löcher gezeichnet werden. Weniger zeigt besser, wo ein Loch einen Körper berührt; zusammen mit „Löcher deutlicher zeigen“ werden Löcher dunkel und gut durchsichtig.",
+          "en": "Hole opacity in Settings > Appearance sets how solid holes are drawn. Lower shows better where a hole touches a body; together with Show holes more clearly, holes become dark and well see-through.",
+          "da": "Hullers dækkevne under Indstillinger > Udseende bestemmer, hvor tæt huller tegnes. Lavere viser bedre, hvor et hul rører et legeme; sammen med Vis huller tydeligere bliver huller mørke og godt gennemsigtige."
+        }
+      },
+      {
+        "title": {
+          "de": "Was ist neu? auch im Editor",
+          "en": "What's new, also in the editor",
+          "da": "Hvad er nyt? også i editoren"
+        },
+        "body": {
+          "de": "Der Knopf mit den Funkeln neben der Kurzanleitung oben rechts (oder die Befehlssuche) öffnet diese Liste auch im Editor. Sie bleibt neben dem Entwurf offen, während du das Neue ausprobierst.",
+          "en": "The button with the sparkles beside the quick guide at the top right (or the command search) opens this list in the editor too. It stays open beside the design while you try out what is new.",
+          "da": "Knappen med gnisterne ved siden af hurtigguiden øverst til højre (eller kommandosøgningen) åbner også denne liste i editoren. Den bliver åben ved siden af designet, mens du prøver det nye."
+        }
+      },
+      {
+        "title": {
+          "de": "Klarere Hinweise bei großen und offenen Netzen",
+          "en": "Clearer hints for dense and open meshes",
+          "da": "Tydeligere hints ved tætte og åbne mesh"
+        },
+        "body": {
+          "de": "Versetzen, Aushöhlen und die Kantenbearbeitung sagen jetzt, was weiterhilft: Hat ein Netz zu viele Dreiecke, verweisen sie auf „Netz vereinfachen“ im Rechtsklickmenü. Ist es offen, raten sie, das Vereinfachen rückgängig zu machen oder ein importiertes Netz im Slicer zu reparieren, statt auf ein Reparaturwerkzeug zu verweisen, das es nicht gibt.",
+          "en": "Offset, Hollow and edge treatment now say what helps: when a mesh has too many triangles, they point to Simplify mesh in the right-click menu. When it is open, they suggest undoing the simplify step or repairing an imported mesh in your slicer, instead of a repair tool that does not exist.",
+          "da": "Forskyd legeme, Hul form og kantbehandling siger nu, hvad der hjælper: har et mesh for mange trekanter, henviser de til Forenkl mesh i højrekliksmenuen. Er det åbent, foreslår de at fortryde forenklingen eller reparere et importeret mesh i din slicer i stedet for at henvise til et reparationsværktøj, der ikke findes."
+        }
+      },
+      {
+        "title": {
+          "de": "Fokusmodus: mehr Platz auf kleinen Bildschirmen",
+          "en": "Focus mode: more room on small screens",
+          "da": "Fokustilstand: mere plads på små skærme"
+        },
+        "body": {
+          "de": "Der Knopf mit den zwei Pfeilen oben rechts (oder Strg+Umschalt+F) blendet Titelzeile und Fußzeile aus, und Menüband und Ansicht bekommen ihren Platz. Eine kleine verschiebbare Leiste unter dem Menüband behält Startseite, 3D-Editor und Skizze, Befehlssuche und Einstellungen. Im Browser-Vollbild (F11) kommt der Fokusmodus von selbst.",
+          "en": "The button with the two arrows at the top right (or Ctrl+Shift+F) hides the title row and the footer, and the ribbon and the view get their room. A small movable bar below the ribbon keeps Home, 3D editor and Sketch, the command search and the settings. In the browser's full screen (F11) focus mode comes by itself.",
+          "da": "Knappen med de to pile øverst til højre (eller Ctrl+Shift+F) skjuler titellinjen og sidefoden, så båndet og visningen får pladsen. En lille bjælke, der kan flyttes, under båndet beholder Hjem, 3D-editor og Skitse, kommandosøgningen og indstillingerne. I browserens fuldskærm (F11) kommer fokustilstanden af sig selv."
+        }
+      },
+      {
+        "title": {
+          "de": "Ansicht schneller verschieben",
+          "en": "Shift the view faster",
+          "da": "Flyt visningen hurtigere"
+        },
+        "body": {
+          "de": "Die Ansicht folgt beim Verschieben jetzt der Maus: der gegriffene Punkt bleibt unter dem Mauszeiger, vorher lief sie langsamer mit. Unter Einstellungen > Darstellung stellt „Verschiebetempo“ das langsamer oder schneller ein. Wer keinen Nachlauf möchte, schaltet dort „Kamera läuft nach“ aus; das gilt fürs Drehen und Verschieben.",
+          "en": "Shifting the view now keeps up with the mouse: the point you grab stays under the cursor, where it used to lag behind. Pan speed in Settings > Appearance makes it slower or faster. To have the view stop at once when you let go, turn off Camera keeps turning there; it covers turning and shifting.",
+          "da": "Når du flytter visningen, følger den nu musen: det punkt, du griber, bliver under markøren, hvor den før haltede bagefter. Flyttehastighed under Indstillinger > Udseende gør det langsommere eller hurtigere. Vil du have, at visningen stopper med det samme, når du slipper, så slå Kameraet bliver ved med at dreje fra der; det gælder både drejning og flytning."
+        }
+      },
+      {
+        "title": {
+          "de": "Menüband: vier Gruppen statt Anpassen, Einklappen nach Wahl",
+          "en": "Ribbon: four groups instead of Modify, folding your way",
+          "da": "Bånd: fire grupper i stedet for Tilpas, sammenfoldning efter valg"
+        },
+        "body": {
+          "de": "Spiegeln & Muster, Teilen & Formen, Kanten & Wände und Oberfläche sind jetzt eigene Gruppen: Jede lässt sich verschieben, einklappen und herausnehmen. Unter Einstellungen > Menüband legt „Einklappen“ für jede Gruppe fest, ob sie bei Platzmangel einklappt, immer eingeklappt bleibt oder als letzte einklappt.",
+          "en": "Mirror & pattern, Split & shape, Edges & walls and Surface are groups of their own now: each moves, folds and can be taken out by itself. In Settings > Ribbon, Folding sets for each group whether it folds when there is no room, stays folded or folds last.",
+          "da": "Spejl og mønster, Del og form, Kanter og vægge og Overflade er nu selvstændige grupper: hver kan flyttes, foldes sammen og tages ud for sig. Under Indstillinger > Bånd bestemmer Sammenfoldning for hver gruppe, om den foldes sammen ved pladsmangel, altid er foldet sammen eller foldes sammen sidst."
+        }
+      }
+    ]
+  },
+  {
+    "version": "1.155.0",
+    "items": [
+      {
+        "title": {
+          "de": "Zollgrößen für Senkbohrungen",
+          "en": "Inch sizes for countersinks",
+          "da": "Tommestørrelser til forsænkninger"
+        },
+        "body": {
+          "de": "Unter „Schraubengröße“ bietet die Senkbohrung jetzt auch #2 bis #14 nach ASME B18.6.1: Kegel 82°, Kopf und Schaft passend zur Schraube. Das sind auch die australischen Gauges (eine 6-gauge ist eine #6). Doppelsenkung und Lochmuster kennen sie ebenfalls.",
+          "en": "Under Screw size, the countersink now also offers #2 to #14 to ASME B18.6.1: a cone of 82°, head and shaft to fit the screw. These are the Australian gauges too (a 6-gauge is a #6). The double countersink and the hole pattern have them as well.",
+          "da": "Under Skruestørrelse tilbyder forsænkningen nu også #2 til #14 efter ASME B18.6.1: kegle på 82°, hoved og skaft, der passer til skruen. Det er også de australske gauges (en 6-gauge er en #6). Dobbelt forsænkning og hulmønsteret har dem også."
+        }
+      },
+      {
+        "title": {
+          "de": "Entwürfe immer als Download speichern",
+          "en": "Always save designs as a download",
+          "da": "Gem altid designs som download"
+        },
+        "body": {
+          "de": "Unter Einstellungen > Darstellung gibt es den Schalter „Entwürfe als Download speichern“: Export > LYL, Strg+S und Speichern unter legen den Entwurf dann ohne Speicherfenster in den Download-Ordner. Das hilft auf PCs, auf denen das Speicherfenster von Chrome und Edge keine Datei zurückgibt. Ein STL-Export, der dort scheitert, bietet jetzt ebenfalls „Stattdessen herunterladen“ an.",
+          "en": "Settings > Appearance has a switch, Save designs as a download: Export > LYL, Ctrl+S and Save as then put the design into the Downloads folder without the save dialog. That helps on PCs where the save dialog of Chrome and Edge hands back no file. An STL export that fails there now offers Download instead as well.",
+          "da": "Under Indstillinger > Udseende er der en kontakt, Gem designs som download: Eksport > LYL, Ctrl+S og Gem som lægger så designet i mappen Overførsler uden gem-vinduet. Det hjælper på pc'er, hvor gem-vinduet i Chrome og Edge ikke giver en fil tilbage. En STL-eksport, der fejler der, tilbyder nu også Download i stedet."
+        }
+      },
+      {
+        "title": {
+          "de": "Senkbohrung tiefer versenkt",
+          "en": "Recessed countersinks",
+          "da": "Nedsænkede undersænkninger"
+        },
+        "body": {
+          "de": "Senkbohrung und Doppelsenkung haben ein Feld „Versenkung“: Über dem Kegel sitzt dann eine gerade Senkung in Kopfbreite, sodass der Schraubenkopf so viele Millimeter unter der Oberfläche liegt statt bündig.",
+          "en": "The countersink and the double countersink have a field, Recess: a straight pocket as wide as the head then sits above the cone, so the screw head ends that many millimetres below the face instead of flush.",
+          "da": "Undersænkning og dobbelt forsænkning har et felt, Nedsænkning: Over keglen sidder der så en lige lomme i hovedets bredde, så skruehovedet ligger så mange millimeter under overfladen i stedet for at flugte."
+        }
+      },
+      {
+        "title": {
+          "de": "Das Menüband passt wieder in die Breite",
+          "en": "The ribbon fits the window again",
+          "da": "Båndet passer i bredden igen"
+        },
+        "body": {
+          "de": "Bei Fensterbreiten zwischen etwa 1900 und 2050 Pixeln (und ebenso zwischen 2215 und 2375) war das Menüband breiter als das Fenster: Gruppen wie „Fläche“ oder „Spiegeln und Muster“ rutschten unter ihre Nachbarn, und ihre Symbole waren kaum zu sehen. Die Stufen, in denen die Symbole kleiner werden, sind neu gemessen und greifen jetzt rechtzeitig.",
+          "en": "At window widths between about 1900 and 2050 pixels (and likewise between 2215 and 2375) the ribbon was wider than the window: groups such as Surface or Mirror & Pattern slipped under their neighbours, and their icons were hardly visible. The steps at which the icons shrink are measured anew and now apply in time.",
+          "da": "Ved vinduesbredder mellem omkring 1900 og 2050 pixel (og tilsvarende mellem 2215 og 2375) var båndet bredere end vinduet: grupper som Overflade eller Spejl og mønster gled ind under deres naboer, og ikonerne var næsten ikke at se. De trin, hvor ikonerne bliver mindre, er målt igen og slår nu til i tide."
+        }
+      },
+      {
+        "title": {
+          "de": "Eigene Formen: Suche und Sortierung",
+          "en": "Custom shapes: search and order",
+          "da": "Egne former: søgning og sortering"
+        },
+        "body": {
+          "de": "Die Suche in der Formenbibliothek findet jetzt auch deine eigenen Formen nach ihrem Namen, auch die in Ordnern. Sie erscheinen über den Treffern der Bibliothek. Dazu gibt es neben dem Ordnerknopf einen Knopf, der die eigenen Formen nach Namen (A bis Z) statt nach dem Tag des Speicherns ordnet; der Browser merkt sich die Wahl.",
+          "en": "The search in the shape library now finds your custom shapes by their name too, also those inside folders. They show above the library's own matches. There is also a button beside the folder button that puts the custom shapes in order by name (A to Z) instead of by the day they were saved; the browser remembers the choice.",
+          "da": "Søgningen i formbiblioteket finder nu også dine egne former på deres navn, også dem i mapper. De står over bibliotekets egne træffere. Ved siden af mappeknappen er der desuden en knap, der sorterer de egne former efter navn (A til Å) i stedet for efter den dag, de blev gemt; browseren husker valget."
+        }
+      }
+    ]
+  },
+  {
     "version": "1.154.1",
     "items": [
       {

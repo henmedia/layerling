@@ -16,7 +16,7 @@ summary: 在場景中移動、正對著觀察，以及把新形狀放到任何�
 | 按住 [[Ctrl]] / [[Cmd]] 並以左鍵拖曳 | 也可平移檢視（在 MacBook 觸控式軌跡板上：按住 [[Cmd]]，按下並拖曳） |
 | 按兩下工作平面上的空白處或平台旁邊 | 平移檢視，使該處位於中央；之後檢視繞該處旋轉 |
 
-滾輪縮放的速度在設定的 {{ui:workspace.appearance}} 下用 {{ui:workspace.zoomSpeed}} 設定：滑桿範圍 1 到 14，初始值為 5。它只影響滾輪與觸控式軌跡板：按鈕與 [[+]]、[[−]] 鍵一律以相同的小步距縮放。滑鼠滾輪的一格在任何瀏覽器中的縮放幅度都相同，觸控式軌跡板則依你滑過的距離縮放。
+滾輪縮放的速度在設定的 {{ui:workspace.appearance}} 下用 {{ui:workspace.zoomSpeed}} 設定：滑桿範圍 1 到 14，初始值為 5。它只影響滾輪與觸控式軌跡板：按鈕與 [[+]]、[[−]] 鍵一律以相同的小步距縮放。滑鼠滾輪的一格在任何瀏覽器中的縮放幅度都相同，觸控式軌跡板則依你滑過的距離縮放。其下方的 {{ui:workspace.panSpeed}} 設定平移時檢視跟隨滑鼠的速度：滑桿範圍 1 到 9，初始值為 5，此時你抓住的點會一直停在游標下。
 
 **與切片軟體一致的滑鼠按鍵。** 如果你習慣了 Bambu Studio 或 OrcaSlicer，在設定的 {{ui:workspace.appearance}} 下把 {{ui:workspace.mouseScheme}} 設為 {{ui:workspace.mouseSchemeSlicer}}。這樣在空白處左鍵拖曳會轉動檢視，右鍵像中鍵一樣平移檢視，Shift 加左鍵拖曳會畫出選取框。拖曳實體仍會移動它，短按右鍵仍會開啟選單。在草圖中右鍵同樣平移檢視。
 
@@ -133,7 +133,9 @@ X 與 [[Esc]] 會關閉視窗；若正在量測，[[Esc]] 會先結束量測。�
 
 {{ui:workspace.ribbonButtons}} 把你從不使用的群組和按鈕從功能區中移除。按一下群組開啟它的清單：{{ui:workspace.ribbonGroupShown}} 移除整個群組，按鈕旁的勾選框只移除這一個按鈕。{{ui:workspace.ribbonShowAll}} 把一切恢復。沒有按鈕的群組會消失，其他群組隨之前移，一列就能放下更多功能區。
 
-移除的內容只是不在功能區中：命令搜尋（[[Ctrl]]+[[K]]）仍能找到它，它的快速鍵仍能執行它。群組旁邊的箭頭會把它在清單中上移或下移，也就是在功能區中移動；{{ui:workspace.ribbonResetOrder}}會恢復原來的順序。按鈕旁邊的箭頭以同樣方式在其群組內移動它；在「{{ui:editor.group.modify}}」群組中，它仍留在自己的命名分區內。「形狀」群組和「說明」始終保留，「形狀」群組固定在前兩個群組之後。這個瀏覽器會記住你的選擇，它也會寫入 {{ui:workspace.exportSettings}} 的檔案。它適用於 3D 編輯器；草圖有自己的工具列。
+移除的內容只是不在功能區中：命令搜尋（[[Ctrl]]+[[K]]）仍能找到它，它的快速鍵仍能執行它。群組旁邊的箭頭會把它在清單中上移或下移，也就是在功能區中移動；{{ui:workspace.ribbonResetOrder}}會恢復原來的順序。按鈕旁邊的箭頭以同樣方式在其群組內移動它。「說明」始終保留。「形狀」群組可以像其他群組一樣移動和移除；移除後，它的面板仍可從命令搜尋開啟。這個瀏覽器會記住你的選擇，它也會寫入 {{ui:workspace.exportSettings}} 的檔案。它適用於 3D 編輯器；草圖有自己的工具列。
+
+群組清單中 {{ui:workspace.ribbonGroupShown}} 下方的 {{ui:workspace.ribbonFold}} 決定視窗放不下所有群組時這個群組怎麼做。{{ui:workspace.ribbonFoldAuto}} 是預設設定：最少用到的群組先摺疊。{{ui:workspace.ribbonFoldAlways}} 讓這個群組即使在寬視窗中也摺疊成一個按鈕，佔用空間很少，又隨手可用。{{ui:workspace.ribbonFoldKeep}} 讓它在其他所有群組之後才摺疊。{{ui:workspace.ribbonResetOrder}} 也會恢復這項選擇。{{ui:editor.section.mirrorPattern}}、{{ui:editor.section.splitShape}}、{{ui:editor.section.edgesWalls}} 與 {{ui:editor.section.surface}} 是四個獨立的群組：每個都可以單獨移動、摺疊和移除。
 
 ### 外觀：快速模式
 
@@ -161,6 +163,8 @@ X 與 [[Esc]] 會關閉視窗；若正在量測，[[Esc]] 會先結束量測。�
 
 {{ui:workspace.strongHoles}} 會將孔畫成較深的灰色、較不透明，並在周圍加上深色線條。當孔在透明實體中難以找到時很有幫助。與邊線不同，它在快速模式下仍會保持開啟。
 
+下方的{{ui:workspace.holeOpacity}}設定孔繪製得有多實，範圍為 10% 到 90%。數值越低，越容易看出孔與實體相接的位置。預設為自動：52%，開啟{{ui:workspace.strongHoles}}時為 72%；按兩下滑桿即可恢復。
+
 ### 外觀：光線與陰影
 
 {{ui:workspace.showShadows}} 開啟或關閉投射陰影。兩個滑桿設定實體的受光方式。{{ui:workspace.shadowStrength}} 決定投射陰影的深淺，{{ui:workspace.shadeContrast}} 則將光線從均勻的環境光轉向主光源：偏向「強烈」時，背光面會更暗、陰影更明顯；偏向「柔和」時，整體會更平坦。對比拉到最高時會非常強烈，背光面與陰影會變得非常暗。{{ui:workspace.shadowSoftness}} 讓陰影邊緣變得柔和而不是銳利。{{ui:workspace.lightAzimuth}} 讓主光源繞著平台旋轉（0° 從前方，90° 從右方），{{ui:workspace.lightElevation}} 則將它抬高；在 90° 時它會像 Tinkercad 那樣位於平台正上方，陰影正好落在實體下方。{{ui:workspace.softLighting}} 讓大部分光線來自你觀察的方向，並隨檢視轉動：沒有哪個面會留在暗處，朝上的深色面也不再被照得發白。主光源仍保留一點用於陰影，對比度滑桿依然有效。如果光線放低後仍能看到明亮的反光，把 {{ui:workspace.lightElevation}} 抬到 90°：這時看起來就像 Tinkercad。{{ui:workspace.lightReset}} 會還原所有設定。
@@ -187,7 +191,9 @@ X 與 [[Esc]] 會關閉視窗；若正在量測，[[Esc]] 會先結束量測。�
 
 {{ui:workspace.startWithScrollbars}}：設計開啟時即顯示視圖的捲動軸。此設定會隨設計一起儲存，也會隨 {{ui:workspace.makeDefault}} 儲存。
 
-{{ui:workspace.zoomSpeed}} 是一個從慢到快的滑桿：滾輪與觸控式軌跡板的縮放速度；縮放按鈕與按鍵仍維持自己的小步距。{{ui:workspace.cameraInertia}}：放開滑鼠後，檢視會繼續轉一下子並平緩減速。關閉後它會立刻停住，與 Tinkercad 和 Fusion 360 相同。
+{{ui:workspace.viewBarOpensOnHover}}：收合的視圖列在滑鼠停在其箭頭上時展開，滑鼠離開後不久再次收合，除非正在使用它的某個工具。以這種方式展開時按一下箭頭，可使其保持展開。僅適用於滑鼠；在觸控螢幕上，仍像以前一樣輕觸即可開啟視圖列。
+
+{{ui:workspace.zoomSpeed}} 是一個從慢到快的滑桿：滾輪與觸控式軌跡板的縮放速度；縮放按鈕與按鍵仍維持自己的小步距。{{ui:workspace.panSpeed}} 同樣是一個從慢到快的滑桿：平移時檢視跟隨滑鼠的速度；置中時你抓住的點會一直停在游標下。{{ui:workspace.cameraInertia}}：放開滑鼠後，檢視會繼續轉動或平移一下子並平緩減速。關閉後它會立刻停住，與 Tinkercad 和 Fusion 360 相同。
 
 {{ui:workspace.overhangAngle}} 是在可見度選單中開啟「顯示懸垂」時，面被視為懸垂的起始角度：這些面會以紅白斜線標示。30° 偏保守，70° 則仰賴良好的列印冷卻；45° 是常用的起點。顯示時，視圖下方的一行會寫出最陡的懸垂，以及有多少 cm² 需要支撐。
 

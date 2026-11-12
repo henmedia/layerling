@@ -1434,9 +1434,16 @@ function slopedProfile(shape: WorkplaneShape, width: number, depth: number, desi
 function trimmedUprightProfile(shape: WorkplaneShape, width: number, depth: number, designedRound?: boolean): CadModifierProfilePart | null {
   // A round cylinder is an analytic primitive without an outline of its own: as an ellipse it gets the circle.
   const base = cadProfileForShapeKind(shape.kind === "cylinder" ? { ...shape, kind: "ellipse" } : shape, designedRound);
-  if (!base || base.frame || base.capFillet || base.capFilletBottom !== undefined || base.capChamfer || base.grow) return null;
+  if (!base || base.frame || base.capChamfer || base.grow) return null;
   const side = normalizeSlopeSide(shape.kind, shape.slopeSide);
   const curve = slopeCurveForShape(shape);
+  // A rounded box keeps its rounded top and bottom edges (Discussion #1544): rounded after the top is cut, so the
+  // round runs along the sloping top. Where the low end is too short for both rounds the display mesh stays.
+  const topRound = base.capFillet ?? 0;
+  const bottomRound = base.capFilletBottom ?? topRound;
+  if (topRound + bottomRound > Math.min(curve.end, curve.control.y) - 1e-3) {
+    if (topRound > 1e-4 || bottomRound > 1e-4) return null;
+  }
   const alongWidth = slopeAlongWidth(side);
   const half = (alongWidth ? width : depth) / 2;
   const keepAt = keptEndAt(side, half);
@@ -1465,6 +1472,8 @@ function trimmedUprightProfile(shape: WorkplaneShape, width: number, depth: numb
     height: shape.height,
     transform: profileTransformForShape(shape),
     trim: { loops: [{ ...start, segments }], height: across, frame: cadTransformFromMatrix(frame.local) },
+    ...(base.capFillet !== undefined ? { capFillet: base.capFillet } : {}),
+    ...(base.capFilletBottom !== undefined ? { capFilletBottom: base.capFilletBottom } : {}),
   };
   validateCadProfile(part);
   return part;

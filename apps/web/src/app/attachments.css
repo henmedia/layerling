@@ -410,3 +410,32 @@ html[data-theme="dark"] .markdown-image {
   color: #cdbca6;
   border-color: #7a5b35;
 }
+
+/*
+ * What's new in the editor (Discussion #1530): the attachment viewer's window, but not modal. The layer over the
+ * editor lets every click through, only the card takes them, so the part can be worked on while the list is open.
+ */
+.whats-new-window {
+  pointer-events: none;
+}
+
+/* It opens at the right, below the ribbon, so the part in the middle of the view stays in sight. */
+.shortcuts-modal.whats-new-window {
+  justify-items: end;
+  padding: 132px 16px 16px;
+}
+
+.whats-new-window .shortcuts-modal-card {
+  width: min(440px, calc(100vw - 32px));
+  max-height: calc(100vh - 148px);
+  pointer-events: auto;
+}
+
+.whats-new-window-body {
+  gap: 14px;
+}
+
+.whats-new-window-footer {
+  justify-content: flex-end;
+  min-height: 0;
+}

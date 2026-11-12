@@ -133,7 +133,7 @@ Les copies apparaissent d'abord sous forme d'aperçu. Seul {{ui:array.apply}} le
 
 ## Motif de trous sur un visage
 
-Pour les évents, les grilles d'enceintes, les paniers et les enceintes, le {{ui:holePattern.title}} répartit les trous uniformément sur une face plane. Vous n'avez plus besoin de faire un trou, de le répéter et de le fixer au mur. Sélectionnez exactement un corps et cliquez sur {{ui:holePattern.title}} dans le groupe {{ui:editor.group.modify}} du ruban, à côté du motif. Vous pouvez également cliquer avec le bouton droit sur le corps ou le trouver avec [[Ctrl]]+[[K]].
+Pour les évents, les grilles d'enceintes, les paniers et les enceintes, le {{ui:holePattern.title}} répartit les trous uniformément sur une face plane. Vous n'avez plus besoin de faire un trou, de le répéter et de le fixer au mur. Sélectionnez exactement un corps et cliquez sur {{ui:holePattern.title}} dans le groupe {{ui:editor.section.mirrorPattern}} du ruban, à côté du motif. Vous pouvez également cliquer avec le bouton droit sur le corps ou le trouver avec [[Ctrl]]+[[K]].
 
 1. Cliquez sur une face plate du corps. Toute la face plate autour de votre clic compte, pas seulement le triangle sous le pointeur. La paroi ronde d'un cylindre, d'un tube ou d'un alésage fonctionne aussi, voir plus bas ; une autre face incurvée ne fonctionne pas : vous obtenez un indice et cliquez sur une face plate à la place. Sur un groupe ou un bundle, une face se prolonge sur les pièces qui se touchent, comme sur un seul corps ; sur un bundle seulement si aucun trou n'en fait partie. Les pièces sont réunies peu après l'ouverture de l'outil ; jusque-là, seule la face d'une pièce s'allume sous le pointeur, et un clic attend qu'elles soient réunies. Sur un groupe ou un bundle contenant du texte, seule la face d'une pièce s'allume, et c'est le clic qui réunit les pièces.
 2. Dans la fenêtre, définissez l'apparence et la position des trous :
@@ -161,7 +161,7 @@ Une IA peut faire la même chose via le pont MCP avec `layerling_perforate_face`
 
 ## Tirer une face vers l'extérieur ou l'intérieur
 
-Pour une paroi plus épaisse, un bossage sur une face ou une poche creusée dedans, l'outil {{ui:faceTool.title}} travaille sur une face plane. Il fonctionne aussi sur un STL importé, qui n'a pas d'esquisse à modifier. Sélectionnez exactement un corps et cliquez sur {{ui:faceTool.title}} dans le groupe {{ui:editor.group.modify}} du ruban, à côté du motif de trous. Vous pouvez également cliquer avec le bouton droit sur le corps ou le trouver avec [[Ctrl]]+[[K]].
+Pour une paroi plus épaisse, un bossage sur une face ou une poche creusée dedans, l'outil {{ui:faceTool.title}} travaille sur une face plane. Il fonctionne aussi sur un STL importé, qui n'a pas d'esquisse à modifier. Sélectionnez exactement un corps et cliquez sur {{ui:faceTool.title}} dans le groupe {{ui:editor.section.mirrorPattern}} du ruban, à côté du motif de trous. Vous pouvez également cliquer avec le bouton droit sur le corps ou le trouver avec [[Ctrl]]+[[K]].
 
 1. Cliquez sur une face plane du corps. Comme pour le motif de trous, toute la face plane autour de votre clic compte ; une face courbe ne fonctionne pas ici, une paroi ronde non plus. Sur un groupe ou un bundle, la face se prolonge sur les pièces qui se touchent, comme pour le motif de trous.
 2. Dans la fenêtre :

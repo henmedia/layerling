@@ -94,7 +94,7 @@ A noter : les congés et chanfreins que vous aviez mis sur l'ensemble **tout** s
 
 ## Fractionnement
 
-{{ui:editor.tool.split}} dans la zone {{ui:editor.group.modify}} coupe la sélection en deux avec un plan - une partie trop grande pour le lit d'impression, par exemple, ou une partie dont vous voulez voir l'intérieur. Sélectionnez un ou plusieurs solides ou trous et cliquez dessus. Un plan translucide montre exactement où ira la coupe ; rien ne change jusqu'à ce que vous l'appliquiez.
+{{ui:editor.tool.split}} dans la zone {{ui:editor.section.splitShape}} coupe la sélection en deux avec un plan - une partie trop grande pour le lit d'impression, par exemple, ou une partie dont vous voulez voir l'intérieur. Sélectionnez un ou plusieurs solides ou trous et cliquez dessus. Un plan translucide montre exactement où ira la coupe ; rien ne change jusqu'à ce que vous l'appliquiez.
 
 - {{ui:split.orientation}} : **X** fait une coupe verticale entre gauche et droite, **Y** entre l'avant et l'arrière, **Z** une coupe horizontale entre le haut et le bas. Les axes sont nommés comme sur la carte Position, avec Z en haut ; Z est l'endroit où commence l'avion.
 - {{ui:split.workplane}} : {{ui:split.workplaneParallel}} pose le plan parallèlement au plan de travail, {{ui:split.workplaneAcrossX}} et {{ui:split.workplaneAcrossY}} le placent perpendiculairement, en travers de sa direction X ou Y. Si l'origine du plan de travail traverse la sélection, le plan passe par elle, sinon par le milieu. Tu poses ainsi le plan de travail sur une face inclinée avec [[W]] et tu coupes exactement là, sans toucher aux curseurs de rotation.

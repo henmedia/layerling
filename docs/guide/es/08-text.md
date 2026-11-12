@@ -85,7 +85,7 @@ Para rotular una cara lateral, coloca antes el plano de trabajo sobre esa cara: 
 Recortadas a través de una placa, letras como O, A y B pierden su centro: queda suelto dentro de la letra y se cae. {{ui:stencilBridges.title}} lo sujeta a la placa con pequeños puentes, como en una plantilla.
 
 1. Cambia el texto a {{ui:inspector.hole}}, haz que atraviese la placa y selecciona ambos, agrupados o no.
-2. Haz clic en {{ui:stencilBridges.title}} en el grupo {{ui:editor.group.modify}} de la cinta, haz clic derecho en la selección o búscalo con [[Ctrl]]+[[K]]. Los puentes aparecen en naranja donde irán.
+2. Haz clic en {{ui:stencilBridges.title}} en el grupo {{ui:editor.section.splitShape}} de la cinta, haz clic derecho en la selección o búscalo con [[Ctrl]]+[[K]]. Los puentes aparecen en naranja donde irán.
 3. Ajusta {{ui:stencilBridges.width}} y {{ui:stencilBridges.count}}. {{ui:stencilBridges.height}} empieza en el grosor de la placa; los puentes más bajos quedan a ras de la cara inferior, en medio o a ras de la cara superior, según {{ui:stencilBridges.position}}. En una plantilla para pintura en spray, los puentes arriba dejan pasar la pintura por debajo.
 4. {{ui:stencilBridges.apply}} agrupa los puentes con la placa.
 

@@ -99,7 +99,7 @@ En bemærkning: fas og rund du har lagt på **hele** gruppen mistes ved genopbyg
 
 ## Deling
 
-{{ui:editor.tool.split}} i {{ui:editor.group.modify}}-området skærer markeringen over i to med et plan - en del der er for stor til printlejet for eksempel, eller en du vil se indersiden af. Vælg en eller flere solider eller huller og klik det. Et gennemsigtigt plan viser præcis hvor snittet vil gå, og en hvid linje markerer det på formerne selv, der hvor planet møder dem; intet ændres før du anvender det.
+{{ui:editor.tool.split}} i {{ui:editor.section.splitShape}}-området skærer markeringen over i to med et plan - en del der er for stor til printlejet for eksempel, eller en du vil se indersiden af. Vælg en eller flere solider eller huller og klik det. Et gennemsigtigt plan viser præcis hvor snittet vil gå, og en hvid linje markerer det på formerne selv, der hvor planet møder dem; intet ændres før du anvender det.
 
 - {{ui:split.orientation}}: **X** laver et lodret snit mellem venstre og højre, **Y** mellem for og bag, **Z** et vandret snit mellem top og bund. Akserne er navngivet som på Positionskortet, med Z op; Z er der planet starter.
 - {{ui:split.workplane}}: {{ui:split.workplaneParallel}} lægger planet parallelt med arbejdsplanet, {{ui:split.workplaneAcrossX}} og {{ui:split.workplaneAcrossY}} stiller det vinkelret på det, på tværs af dets X- eller Y-retning. Skærer arbejdsplanets origo markeringen, går planet gennem det, ellers gennem midten. Så lægger du arbejdsplanet på en skrå flade med [[W]] og skærer præcis der, uden at dreje på drejeskyderne.

@@ -83,7 +83,7 @@ Za napise na stranski ploskvi najprej položi delovno ravnino na to ploskev, gle
 Ko besedilo izrežeš skozi ploščo, črke, kot so O, A in B, izgubijo sredino: ohlapno leži v črki in izpade. {{ui:stencilBridges.title}} jo z majhnimi mostički drži na plošči, kot pri šabloni.
 
 1. Besedilo preklopi na {{ui:inspector.hole}}, naj gre skozi ploščo, in izberi oboje, združeno ali ne.
-2. Klikni {{ui:stencilBridges.title}} v skupini {{ui:editor.group.modify}} na traku, desno klikni izbor ali ga poišči z [[Ctrl]]+[[K]]. Mostički se oranžno pokažejo tam, kamor pridejo.
+2. Klikni {{ui:stencilBridges.title}} v skupini {{ui:editor.section.splitShape}} na traku, desno klikni izbor ali ga poišči z [[Ctrl]]+[[K]]. Mostički se oranžno pokažejo tam, kamor pridejo.
 3. Nastavi {{ui:stencilBridges.width}} in {{ui:stencilBridges.count}}. {{ui:stencilBridges.height}} se začne pri debelini plošče; nižji mostički so poravnani s spodnjo stranjo, na sredini ali poravnani z zgornjo stranjo plošče, kot pove {{ui:stencilBridges.position}}. Pri šabloni za razpršilno barvo mostički zgoraj pod seboj pustijo prostor za barvo.
 4. {{ui:stencilBridges.apply}} združi mostičke s ploščo.
 

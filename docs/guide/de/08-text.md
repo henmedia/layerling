@@ -85,7 +85,7 @@ Für Beschriftungen auf einer Seitenfläche legst du vorher die Arbeitsebene auf
 Durch eine Platte geschnitten, verlieren Buchstaben wie O, A und B ihre Mitte: Sie liegt lose im Buchstaben und fällt heraus. {{ui:stencilBridges.title}} hält sie mit kleinen Stegen an der Platte, wie bei einer Schablone.
 
 1. Schalte den Text auf {{ui:inspector.hole}}, lass ihn durch die Platte reichen und wähle beides aus, gruppiert oder nicht.
-2. Klicke im Menüband in der Gruppe {{ui:editor.group.modify}} auf {{ui:stencilBridges.title}}, mach einen Rechtsklick auf die Auswahl oder finde es mit [[Ctrl]]+[[K]]. Die Stege erscheinen orange dort, wo sie hinkommen.
+2. Klicke im Menüband in der Gruppe {{ui:editor.section.splitShape}} auf {{ui:stencilBridges.title}}, mach einen Rechtsklick auf die Auswahl oder finde es mit [[Ctrl]]+[[K]]. Die Stege erscheinen orange dort, wo sie hinkommen.
 3. Stelle {{ui:stencilBridges.width}} und {{ui:stencilBridges.count}} ein. {{ui:stencilBridges.height}} beginnt bei der Dicke der Platte; niedrigere Stege sitzen bündig unten, in der Mitte oder bündig oben, wie es {{ui:stencilBridges.position}} sagt. Bei einer Sprühschablone lassen Stege oben darunter Platz für die Farbe.
 4. {{ui:stencilBridges.apply}} gruppiert die Stege mit der Platte.
 

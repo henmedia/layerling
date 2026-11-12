@@ -142,6 +142,8 @@ Více těles zachová vzájemné rozmístění a každé lze vybírat samostatn�
 
 Vlastní tvary jsou v tomto prohlížeči odděleně od projektů a zůstanou i po dalším spuštění. {{ui:dashboard.backupAll}} zálohuje obojí a otevření zálohy obnoví obojí. Pro přenos samotných tvarů použijte {{ui:myShapes.backup}}, šipku dolů, která vytvoří ZIP, a {{ui:myShapes.load}}, šipku nahoru. Načíst lze i jednotlivé `.lyl`; každý se stane vlastním tvarem. Shodné existující tvary se nepřidávají znovu.
 
+Vyhledávání v knihovně tvarů najde i vaše vlastní tvary podle názvu, také ty ve složkách; zobrazí se nad nálezy knihovny. Tlačítko se šipkou a písmeny A až Z vedle tlačítka složek seřadí vlastní tvary podle názvu místo podle dne uložení; druhé kliknutí vrátí původní pořadí a prohlížeč si volbu pamatuje.
+
 ### Složky
 
 Mnoho vlastních tvarů se lépe třídí do složek. {{ui:myShapes.newFolder}} (složka s plusem vedle {{ui:myShapes.saveSelection}}) se zeptá na název a vytvoří složku nahoře; složka s plusem u složky, {{ui:myShapes.newSubfolder}}, vytvoří složku uvnitř ní. Složky mají nejvýše tři úrovně: složka na třetí úrovni pojme tvary, ale už žádné další složky. Složky stojí nad tvary, které nejsou v žádné, seřazené podle názvu, a otevírají a zavírají se šipkou; číslo u složky počítá tvary v ní i ve složkách pod ní. Při ukládání zvolte složku v seznamu vedle názvu; s {{ui:myShapes.noFolder}} zůstane tvar nahoře.
@@ -172,7 +174,7 @@ Výsledek je síť jako importovaný model. Zpět obnoví rovinnou podobu. Tvar 
 
 ## Povrchová textura
 
-Drážky, vroubkování, plástev nebo výstupky na tělese, pro lepší úchop nebo pro vzhled: v nastavení tvaru rozbalte {{ui:inspector.surfaceTexture}}. Totéž umí tlačítko {{ui:inspector.surfaceTexture}} nahoře ve skupině {{ui:editor.group.modify}}: kartu pro vybrané těleso rozbalí i sbalí a svítí, dokud je otevřená.
+Drážky, vroubkování, plástev nebo výstupky na tělese, pro lepší úchop nebo pro vzhled: v nastavení tvaru rozbalte {{ui:inspector.surfaceTexture}}. Totéž umí tlačítko {{ui:inspector.surfaceTexture}} nahoře ve skupině {{ui:editor.section.surface}}: kartu pro vybrané těleso rozbalí i sbalí a svítí, dokud je otevřená.
 
 1. Zvolte {{ui:inspector.surfacePattern}}, jeho {{ui:inspector.surfaceSpacing}} a {{ui:inspector.surfaceDepth}}. {{ui:inspector.surfaceDirection}} určuje, zda vzor jde do tělesa, nebo z něj vystupuje. U vzoru {{ui:surfaceTexture.bumps}} zvolíte v položce {{ui:inspector.surfaceBumpShape}} mezi {{ui:surfaceTexture.bumpDome}}, {{ui:surfaceTexture.bumpCone}}, {{ui:surfaceTexture.bumpSoft}} a {{ui:surfaceTexture.bumpFlat}}. V poli {{ui:inspector.surfaceBumpGrid}} jsou {{ui:surfaceTexture.bumpGridStaggered}}, každá druhá řada o polovinu rozestupu dál, nebo {{ui:surfaceTexture.bumpGridStraight}}.
 2. V položce {{ui:inspector.surfaceProjection}} zvolte {{ui:surfaceTexture.cylinder}} pro kulatá tělesa, jako je hrnek, knoflík nebo rukojeť. Vzor obíhá kolem zvolené {{ui:inspector.surfaceAxis}} a rozteč se mírně zaokrouhlí, aby se po obvodu vešel celý počet drážek nebo buněk: vzor se uzavře bez švu. {{ui:surfaceTexture.allRound}} se hodí pro tělesa, která nejsou kulatá, {{ui:surfaceTexture.flatProjection}} pro víčko nebo desku při pohledu shora. Když ponecháte {{ui:surfaceTexture.auto}}, Layerling zvolí sám: {{ui:surfaceTexture.cylinder}} u kulatých těles a u stojících hranatých, jako je krabice – vzor pak sleduje obrys a bez švu obíhá hrany, vystouplý vzor se kolem nich zaoblí –, {{ui:surfaceTexture.allRound}} u ostatních hranatých.
@@ -208,7 +210,7 @@ Pro tisk ve dvou barvách zapněte {{ui:inspector.surfacePatternPart}}, u jakéh
 
 ## Malování více barvami
 
-Pro tisk více barvami obarví {{ui:paint.title}} části tělesa přímo v návrhu: plochu, kulatou stěnu, vnitřek otvoru, kulatou skvrnu nebo oblast, kterou obtáhnete. Funguje to jako malovací nástroje sliceru, jen barva zůstane uložená v návrhu. Vyberte jedno těleso a klikněte ve skupině {{ui:editor.group.modify}} na {{ui:paint.title}}, vedle {{ui:inspector.surfaceTexture}}. Panel nabízí barvy vašeho návrhu a {{ui:paint.customColor}} namíchá vlastní. Pak malujte v pohledu jedním ze tří nástrojů:
+Pro tisk více barvami obarví {{ui:paint.title}} části tělesa přímo v návrhu: plochu, kulatou stěnu, vnitřek otvoru, kulatou skvrnu nebo oblast, kterou obtáhnete. Funguje to jako malovací nástroje sliceru, jen barva zůstane uložená v návrhu. Vyberte jedno těleso a klikněte ve skupině {{ui:editor.section.surface}} na {{ui:paint.title}}, vedle {{ui:inspector.surfaceTexture}}. Panel nabízí barvy vašeho návrhu a {{ui:paint.customColor}} namíchá vlastní. Pak malujte v pohledu jedním ze tří nástrojů:
 
 - {{ui:paint.mode.fill}}: kliknutí vyplní plochu až k jejím ostrým hranám, jako kyblík barvy v kreslicím programu: horní stranu kvádru, stěnu válce, dno kapsy nebo vnitřek otvoru, vždy jedním kliknutím. {{ui:paint.angle}} říká, jak ostrá musí hrana být, aby výplň zastavila; při 90° přejde přes hrany kvádru.
 - {{ui:paint.mode.circle}}: kliknutí položí na povrch kulatou skvrnu nastaveného průměru ({{ui:paint.diameter}}), se středem tam, kam kliknete, i na zakřivený povrch. Zastaví se na ostrých hranách tělesa a nikdy neprojde na zadní stranu stěny.

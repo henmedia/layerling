@@ -264,6 +264,8 @@ async function callTool(name, args) {
       return bridgeCommand("restore_from_history", args);
     case "layerling_show_workplane":
       return bridgeCommand("show_workplane", args);
+    case "layerling_focus_mode":
+      return bridgeCommand("focus_mode", args);
     case "layerling_measurements":
       return bridgeCommand("measurements", args);
     case "layerling_measure_angle":

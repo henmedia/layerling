@@ -137,7 +137,7 @@ Ist {{ui:array.groupCopies}} angehakt, gruppiert {{ui:array.apply}} das Original
 
 ## Lochmuster auf einer Fläche
 
-Für Lüftungsschlitze, Lautsprechergitter, Körbe und Gehäuse verteilt das {{ui:holePattern.title}} Löcher gleichmäßig auf einer ebenen Fläche oder rund um die Wand eines Zylinders. Du musst dafür kein Loch einzeln anlegen, vervielfältigen und an die Wand setzen. Wähle genau einen Körper aus und klicke in der Gruppe {{ui:editor.group.modify}} des Menübands auf {{ui:holePattern.title}}, gleich neben dem Muster. Du kannst auch mit der rechten Maustaste auf den Körper klicken oder es mit [[Strg]]+[[K]] suchen.
+Für Lüftungsschlitze, Lautsprechergitter, Körbe und Gehäuse verteilt das {{ui:holePattern.title}} Löcher gleichmäßig auf einer ebenen Fläche oder rund um die Wand eines Zylinders. Du musst dafür kein Loch einzeln anlegen, vervielfältigen und an die Wand setzen. Wähle genau einen Körper aus und klicke in der Gruppe {{ui:editor.section.mirrorPattern}} des Menübands auf {{ui:holePattern.title}}, gleich neben dem Muster. Du kannst auch mit der rechten Maustaste auf den Körper klicken oder es mit [[Strg]]+[[K]] suchen.
 
 1. Klicke eine ebene Fläche des Körpers an. Die ganze ebene Fläche um deinen Klick zählt, nicht nur das Dreieck unter dem Mauszeiger. Die runde Wand eines Zylinders, Rohrs oder einer Bohrung geht auch, siehe unten; eine andere gewölbte Fläche nicht: Du bekommst einen Hinweis und klickst eine ebene an. Bei einer Gruppe oder einem Bündel geht eine Fläche über Teile hinweg, die sich berühren, wie bei einem einzigen Körper, bei einem Bündel aber nur, wenn keine Aussparung darin steckt. Die Teile werden zusammengefügt, kurz nachdem du das Werkzeug öffnest; bis dahin leuchtet unter dem Mauszeiger nur die Fläche eines Teils auf, und ein Klick wartet, bis sie zusammengefügt sind. Bei einer Gruppe oder einem Bündel mit Text leuchtet nur die Fläche eines Teils auf, und erst der Klick fügt die Teile zusammen.
 2. Stelle im Fenster ein, wie die Löcher aussehen und liegen:
@@ -165,7 +165,7 @@ Eine KI kann dasselbe über die MCP-Schnittstelle tun, mit `layerling_perforate_
 
 ## Eine Fläche heraus- oder hineinziehen
 
-Für eine dickere Wand, eine Erhebung auf einer Fläche oder eine hineingeschnittene Tasche arbeitet das Werkzeug {{ui:faceTool.title}} an einer ebenen Fläche. Es geht auch bei einem importierten STL, an dem es keine Skizze zu ändern gibt. Wähle genau einen Körper aus und klicke in der Gruppe {{ui:editor.group.modify}} des Menübands auf {{ui:faceTool.title}}, gleich neben dem Lochmuster. Du kannst auch mit der rechten Maustaste auf den Körper klicken oder es mit [[Strg]]+[[K]] suchen.
+Für eine dickere Wand, eine Erhebung auf einer Fläche oder eine hineingeschnittene Tasche arbeitet das Werkzeug {{ui:faceTool.title}} an einer ebenen Fläche. Es geht auch bei einem importierten STL, an dem es keine Skizze zu ändern gibt. Wähle genau einen Körper aus und klicke in der Gruppe {{ui:editor.section.mirrorPattern}} des Menübands auf {{ui:faceTool.title}}, gleich neben dem Lochmuster. Du kannst auch mit der rechten Maustaste auf den Körper klicken oder es mit [[Strg]]+[[K]] suchen.
 
 1. Klicke eine ebene Fläche des Körpers an. Wie beim Lochmuster zählt die ganze ebene Fläche um deinen Klick; eine gewölbte Fläche geht hier nicht, auch keine runde Wand. Bei einer Gruppe oder einem Bündel geht die Fläche wie beim Lochmuster über Teile hinweg, die sich berühren.
 2. Im Fenster:

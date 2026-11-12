@@ -142,6 +142,8 @@ layerling 里的每个零件都从一个形状开始。用这些形状，你可�
 
 {{ui:myShapes.title}} 保存在此浏览器中，与设计分开，下次启动时仍在。起始页的 {{ui:dashboard.backupAll}} 会把它们和设计一起备份，打开备份即可恢复两者。如果只想把形状带到另一个浏览器，{{ui:myShapes.backup}}（向下的箭头）会把它们保存为 ZIP 文件，{{ui:myShapes.load}}（向上的箭头）会把它们带回来。{{ui:myShapes.load}} 也接受单个 `.lyl` 设计；每个都会变成一个形状。已有的形状不会重复添加。
 
+形状库的搜索也会按名称找到你的自定义形状，包括文件夹里的形状；它们显示在形状库自己的结果上方。文件夹按钮旁边带箭头和字母 A 到 Z 的按钮，会按名称而不是按保存日期排列自定义形状；再点一次恢复原来的顺序，浏览器会记住这个选择。
+
 ### 文件夹
 
 许多自定义形状更适合分类到文件夹中。{{ui:myShapes.newFolder}}（带加号的文件夹，位于 {{ui:myShapes.saveSelection}} 旁）会要求输入名称，并在顶部创建文件夹；文件夹上的加号 {{ui:myShapes.newSubfolder}} 会在其中创建子文件夹。文件夹最多三层：第三层的文件夹可以放形状，但不能再放文件夹。文件夹按名称顺序排列在不属于任何文件夹的形状上方，可用箭头展开和收起；文件夹上的数字统计其中及内部文件夹中的形状数量。保存时，在名称旁的列表中选择文件夹；{{ui:myShapes.noFolder}} 会把形状留在顶部。
@@ -172,7 +174,7 @@ layerling 里的每个零件都从一个形状开始。用这些形状，你可�
 
 ## 表面纹理
 
-在实体上加凹槽、滚花、蜂窝或凸点，让它更好握或更好看：在形状设置中打开 {{ui:inspector.surfaceTexture}}。顶部 {{ui:editor.group.modify}} 组里的 {{ui:inspector.surfaceTexture}} 按钮作用相同：它为选中的实体打开或关闭这张卡片，卡片打开时按钮保持高亮。
+在实体上加凹槽、滚花、蜂窝或凸点，让它更好握或更好看：在形状设置中打开 {{ui:inspector.surfaceTexture}}。顶部 {{ui:editor.section.surface}} 组里的 {{ui:inspector.surfaceTexture}} 按钮作用相同：它为选中的实体打开或关闭这张卡片，卡片打开时按钮保持高亮。
 
 1. 选择 {{ui:inspector.surfacePattern}}、它的 {{ui:inspector.surfaceSpacing}} 和 {{ui:inspector.surfaceDepth}}。{{ui:inspector.surfaceDirection}} 决定纹理是压进实体还是凸出实体。对于 {{ui:surfaceTexture.bumps}}，{{ui:inspector.surfaceBumpShape}} 可在 {{ui:surfaceTexture.bumpDome}}、{{ui:surfaceTexture.bumpCone}}、{{ui:surfaceTexture.bumpSoft}} 和 {{ui:surfaceTexture.bumpFlat}} 之间选择。在 {{ui:inspector.surfaceBumpGrid}} 下，它们可以 {{ui:surfaceTexture.bumpGridStaggered}}（每隔一行错开半个间距），或排成 {{ui:surfaceTexture.bumpGridStraight}}。
 2. 在 {{ui:inspector.surfaceProjection}} 下，杯子、旋钮或把手等圆形实体选 {{ui:surfaceTexture.cylinder}}。图案绕 {{ui:inspector.surfaceAxis}} 一圈，间距会略作取整，使一圈正好是整数个凹槽或单元：图案闭合，没有接缝。{{ui:surfaceTexture.allRound}} 适合不是圆形的实体，{{ui:surfaceTexture.flatProjection}} 适合从上方看的盖子或平板。保持 {{ui:surfaceTexture.auto}}，Layerling 会替你选择：圆形实体以及像盒子这样直立的棱角实体用 {{ui:surfaceTexture.cylinder}}（图案随外轮廓走，无接缝地绕过棱边，凸起的图案会顺着棱边弯过去），其他棱角实体用 {{ui:surfaceTexture.allRound}}。
@@ -208,7 +210,7 @@ layerling 里的每个零件都从一个形状开始。用这些形状，你可�
 
 ## 多色上色
 
-为了多色打印，{{ui:paint.title}} 直接在设计中给实体的部分表面上色：一个面、一圈圆柱壁、孔的内壁、一个圆斑，或者你圈出的一块区域。它和切片软件里的上色工具类似，但颜色随设计一起保存。选择一个实体，在 {{ui:editor.group.modify}} 组中点击 {{ui:paint.title}}（在 {{ui:inspector.surfaceTexture}} 旁边）。面板会列出设计中用到的颜色，{{ui:paint.customColor}} 可以调出自己的颜色。然后在视图中用三种工具之一上色：
+为了多色打印，{{ui:paint.title}} 直接在设计中给实体的部分表面上色：一个面、一圈圆柱壁、孔的内壁、一个圆斑，或者你圈出的一块区域。它和切片软件里的上色工具类似，但颜色随设计一起保存。选择一个实体，在 {{ui:editor.section.surface}} 组中点击 {{ui:paint.title}}（在 {{ui:inspector.surfaceTexture}} 旁边）。面板会列出设计中用到的颜色，{{ui:paint.customColor}} 可以调出自己的颜色。然后在视图中用三种工具之一上色：
 
 - {{ui:paint.mode.fill}}：点击一下，把面一直填充到它的锐利边缘，就像画图软件里的油漆桶：长方体的顶面、圆柱的侧壁、凹槽的底面或孔的内壁，各点一下即可。{{ui:paint.angle}} 决定边缘要多锐利才会让填充停下；设为 90° 时会越过长方体的棱边。
 - {{ui:paint.mode.circle}}：点击一下，在表面上放一个设定 {{ui:paint.diameter}} 的圆斑，圆心就在点击处，曲面上也可以。它会在实体的锐利边缘停下，也不会透到壁的背面。

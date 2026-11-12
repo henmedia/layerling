@@ -166,6 +166,7 @@ const SHORTCUT_GROUPS: ShortcutGroup[] = [
     shortcuts: [
       { combos: ["Ctrl+K"], label: "shortcuts.commandSearch" },
       { combos: ["Shift+F1"], label: "shortcuts.interactiveHelp" },
+      { combos: ["Ctrl+Shift+F"], label: "shortcuts.focusMode" },
     ],
   },
   {
@@ -174,6 +175,7 @@ const SHORTCUT_GROUPS: ShortcutGroup[] = [
     shortcuts: [
       { combos: ["Ctrl+K"], label: "shortcuts.commandSearch" },
       { combos: ["Shift+F1"], label: "shortcuts.interactiveHelp" },
+      { combos: ["Ctrl+Shift+F"], label: "shortcuts.focusMode" },
       { combos: ["Esc"], label: "shortcuts.sketchEscape" },
       { combos: ["Delete", "Backspace"], label: "shortcuts.sketchDelete" },
       { combos: ["Ctrl+C"], label: "shortcuts.copy" },

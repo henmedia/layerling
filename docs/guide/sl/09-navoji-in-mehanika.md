@@ -120,6 +120,8 @@ Pod {{ui:prop.springForm}} postane vzmet ploščata ({{ui:spring.flat}}): trak, 
 
 {{ui:prop.loftWall}} naredi iz polnega telesa cev, ki je zgoraj in spodaj odprta. Odprtina je na obeh koncih manjša za debelino stene, merjeno vodoravno; kjer stena stoji poševno, je torej malo tanjša. Če okvir povečaš, rasteta oba konca, polmer vogala in stena ostaneta enaka.
 
+{{ui:prop.loftTopWall}} da zgornjemu koncu lastno debelino stene, takoj ko stena obstaja: šoba, 3 mm debela pri pravokotniku spodaj, ki se pri okroglem zgornjem koncu konča z 1 mm. Dokler ne vpišete svoje vrednosti, sledi steni spodaj. Vmes se stena enakomerno spreminja, pri prehodu skozi več prerezov pa vsak prerez dobi steno, ki ustreza njegovi višini.
+
 {{ui:prop.loftSmooth}} naredi prehod mehak. Pri 0 stranice tečejo naravnost od dna do vrha, kot pri stožcu. Pri 100 zapustijo oba konca naravnost navzgor, vmes pa spreminjajo velikost po krivulji S: adapter za cev, ki se mehko razširi iz ozke v široko cev, namesto da bi tekel kot lijak. Vmes drsnik oba mešata. Mehak prehod deluje skupaj z {{ui:prop.loftWall}}, zasukom, nagibom in bočnim zamikom; cev s steno ostane odprta na obeh koncih. Je natančno telo kot raven, zato lahko robove posnameš in zaokrožiš, a je zgrajen prek več prerezov in se računa malo dlje.
 
 {{ui:prop.loftSegments}} določa, kako fino so narisani krogi in zaobljeni vogali: iz koliko ravnih kosov je sestavljen cel krog v pogledu in v STL, OBJ in 3MF. Začne se pri 96, kar je za večino delov gladko; za velik okrogel konec, ki ga želiš videti brez ploskvic, ga dvigni, do 360. Več kosov pomeni večje datoteke. Mnogokotnik obdrži nastavljeni {{ui:prop.loftBottomSides}}. Polje se pokaže, ko je konec okrogel ali ima zaobljen vogal.
