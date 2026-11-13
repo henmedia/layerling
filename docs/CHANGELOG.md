@@ -6,6 +6,8 @@ code still carries it - so a lower number further down is older, not newer.
 
 ## Unreleased
 
+- **Focus mode no longer comes by itself when the page is zoomed out (Discussion #1738):** The mode switches itself on while the browser fills the screen (F11), found by comparing the page's size with the screen's. The browser's zoom made the page larger in its own pixels, so a page zoomed out to about 80 % looked as large as the screen and every new design opened in focus mode, however often it was switched off. The page is now measured in the screen's pixels (the zoom is the window's outer width over the page's own). Unit test in `focusMode`. Reported by @tmorgan003.
+
 - **A washer goes back to a tube (Issue #1739):** A straight tube turned into a washer by the Washer size menu could not be turned back: "Custom" in the menu and the arrow back to the default did nothing, because only the sizes of the list were handled. Both now give the tube the outer diameter, thickness and wall of a new tube; changing a measure by hand still switches the menu to Custom. Panel test `washerBackToCustom`. Reported by @vicman52.
 
 - **A mirrored cone keeps its direction in a group (Discussion #1733):** Two cones with a gentle taper, mirrored top to bottom, came out upside down once they were grouped. The kernel built the cone (and box, sphere and cylinder) without the shape's mirror; a box, a ball and an even cylinder look the same either way, a cone with two radii does not. The mirror is now applied about the shape's middle before it is turned, as the mesh does it, so the merged body of a group, a union, a cut and a hollowing agree with what the viewport shows. Unit test `mirroredConeUnion`. Reported by @craig-childs.

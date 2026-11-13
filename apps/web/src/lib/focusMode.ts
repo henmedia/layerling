@@ -22,11 +22,15 @@ export function isFocusModeKey(event: { key: string; code?: string; ctrlKey: boo
 }
 
 type ScreenLike = { width: number; height: number };
-type WindowLike = { innerWidth: number; innerHeight: number; screen?: ScreenLike | null; matchMedia?: (query: string) => { matches: boolean } };
+type WindowLike = { innerWidth: number; innerHeight: number; outerWidth?: number; screen?: ScreenLike | null; matchMedia?: (query: string) => { matches: boolean } };
 
 /**
  * Whether the browser fills the screen by its own full screen, as F11 does. A maximised window still has the task bar
- * and the browser's own bars; one pixel of slack covers rounding at a zoom that is not 100 %.
+ * and the browser's own bars; one pixel of slack covers rounding.
+ *
+ * The page's size is counted in the screen's own pixels: the browser's zoom makes the page larger in its pixels while
+ * the screen stays as it is, so a page zoomed out to 80 % looked as large as the screen and switched the mode on in an
+ * ordinary window (Discussion #1738). The zoom is the window's outer width over the page's own.
  */
 export function browserFillsScreen(win: WindowLike): boolean {
   try {
@@ -36,7 +40,9 @@ export function browserFillsScreen(win: WindowLike): boolean {
   }
   const screen = win.screen;
   if (!screen || !(screen.width > 0) || !(screen.height > 0)) return false;
-  return win.innerWidth >= screen.width - 1 && win.innerHeight >= screen.height - 1;
+  const outer = win.outerWidth;
+  const zoom = outer && outer > 0 && win.innerWidth > 0 && outer / win.innerWidth > 0.2 && outer / win.innerWidth < 5 ? outer / win.innerWidth : 1;
+  return win.innerWidth * zoom >= screen.width - 1 && win.innerHeight * zoom >= screen.height - 1;
 }
 
 /** Shown when it was switched on, or while the browser fills the screen unless it was switched off in that full screen. */
