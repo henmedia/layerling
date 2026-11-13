@@ -3143,6 +3143,7 @@ export const MESSAGES_FR: Partial<Record<MessageKey, string>> = {
   "nameTag.makeTagsOne": "Créer 1 étiquette nominative",
   "nameTag.makeTagsNone": "Créer les étiquettes nominatives",
   "nameTag.bundleNote": "Chaque couche est un corps à part entière dans sa propre couleur. Pour arrondir ou biseauter les bords d’une couche, ouvrez le paquet.",
+  "nameTag.layerStepsNote": "Une couche a une modification qui lui est propre (texture de surface, bords arrondis ou biseautés, peinture). Une modification ici reconstruit les couches sans elle ; Annuler la rétablit.",
   "shape.iconTag": "Badge d'icône",
   "iconTag.title": "Badge d'icône",
   "iconTag.hint": "Choisissez un fichier SVG, PNG ou JPG : le symbole devient une étiquette en couches, comme une étiquette de nom.",

@@ -5154,6 +5154,7 @@ export const MESSAGES_SL: Partial<Record<MessageKey, string>> = {
   "nameTag.makeTagsOne": "Naredi 1 napis",
   "nameTag.makeTagsNone": "Naredi napise",
   "nameTag.bundleNote": "Vsaka plast je telo zase v svoji barvi. Če hočeš zaobliti ali posneti robove ene plasti, odpri sveženj.",
+  "nameTag.layerStepsNote": "Ena plast ima svojo spremembo (površinska tekstura, zaobljeni ali posneti robovi, barvanje). Sprememba tukaj plasti zgradi znova brez nje; Razveljavi jo vrne.",
   "inspector.more": "Več",
   "inspector.less": "Manj",
   "prop.textFill": "Polnilo",

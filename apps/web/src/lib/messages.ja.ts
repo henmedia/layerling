@@ -3165,6 +3165,7 @@ export const MESSAGES_JA: Partial<Record<MessageKey, string>> = {
   "nameTag.makeTagsOne": "1個のネームタグを作る",
   "nameTag.makeTagsNone": "ネームタグを作る",
   "nameTag.bundleNote": "各レイヤーはそれぞれ独自の色を持つ独立したボディです。1つのレイヤーのエッジを丸めたりベベルを付けたりするには、バンドルを開いてください。",
+  "nameTag.layerStepsNote": "レイヤーに独自の変更（表面テクスチャ、丸めた・面取りしたエッジ、ペイント）があります。ここで変更するとレイヤーはそれなしで作り直されます。元に戻すで戻せます。",
   "shape.iconTag": "アイコンタグ",
   "iconTag.title": "アイコンタグ",
   "iconTag.hint": "SVG、PNG、JPGのファイルを選ぶと、アイコンがネームタグと同じようにレイヤー状のタグになります。",

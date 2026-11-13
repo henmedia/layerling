@@ -2997,6 +2997,7 @@ export const MESSAGES_PT_PT: Partial<Record<MessageKey, string>> = {
   "nameTag.makeTagsOne": "Criar 1 placa de identificação",
   "nameTag.makeTagsNone": "Criar placas de identificação",
   "nameTag.bundleNote": "Cada camada é um sólido independente com a sua própria cor. Para arredondar ou chanfrar as arestas de uma camada, abre o conjunto.",
+  "nameTag.layerStepsNote": "Uma camada tem uma alteração própria (textura de superfície, arestas arredondadas ou chanfradas, pintura). Uma alteração aqui reconstrói as camadas sem ela; Anular repõe-na.",
   "shape.iconTag": "Placa com ícone",
   "iconTag.title": "Placa com ícone",
   "iconTag.hint": "Escolhe um ficheiro SVG, PNG ou JPG: o ícone transforma-se numa placa em camadas, como uma placa de identificação.",

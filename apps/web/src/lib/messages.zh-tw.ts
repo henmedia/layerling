@@ -3108,6 +3108,7 @@ export const MESSAGES_ZH_TW: Partial<Record<MessageKey, string>> = {
   "nameTag.makeTagsOne": "建立 1 個名牌",
   "nameTag.makeTagsNone": "建立名牌",
   "nameTag.bundleNote": "每一層都是獨立的實體，各有自己的顏色。要為某一層的邊緣加上圓角或斜角，請開啟綁定。",
+  "nameTag.layerStepsNote": "某一層有它自己的修改（表面紋理、圓角或斜角邊緣、上色）。在這裡修改會重新建立各層而不含這些修改；復原可以恢復。",
   "shape.iconTag": "圖示牌",
   "iconTag.title": "圖示牌",
   "iconTag.hint": "選擇一個 SVG、PNG 或 JPG 檔案：圖示會像名牌那樣變成有分層的圖示牌。",

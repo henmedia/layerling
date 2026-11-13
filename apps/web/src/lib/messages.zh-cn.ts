@@ -3108,6 +3108,7 @@ export const MESSAGES_ZH_CN: Partial<Record<MessageKey, string>> = {
   "nameTag.makeTagsOne": "生成 1 个名牌",
   "nameTag.makeTagsNone": "生成名牌",
   "nameTag.bundleNote": "每一层都是独立的实体，各有自己的颜色。要圆角或斜切某一层的边缘，请打开捆绑。",
+  "nameTag.layerStepsNote": "某一层有它自己的修改（表面纹理、圆角或斜角边缘、涂色）。在这里修改会重新生成各层而不带这些修改；撤销可以恢复。",
   "shape.iconTag": "图标牌",
   "iconTag.title": "图标牌",
   "iconTag.hint": "选择一个 SVG、PNG 或 JPG 文件：图标会像名牌那样变成分层挂牌。",
