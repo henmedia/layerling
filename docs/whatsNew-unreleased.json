@@ -101,5 +101,15 @@
       "de": "Ein SVG kam nur bis 2500 Linien und Kurven als Skizze herein, mit Füllung und Silhouette in den Eigenschaften; darüber blieb es ein festes Netz, und beide fehlten. Eine aus einem Bild nachgezeichnete Datei besteht aus tausenden winzigen Stufen, darum schien der Silhouette-Knopf verschwunden. Jetzt kommen SVGs bis 10 000 Linien und Kurven als Skizze herein; ein sehr feines kann beim Import ein paar Sekunden brauchen.",
       "en": "An SVG came in as a sketch, with Fill and Silhouette in its properties, only up to 2500 lines and curves; above that it stayed a fixed mesh and both were missing. A file traced from a picture is drawn in thousands of tiny steps, which is why the Silhouette button seemed to have disappeared. Now SVGs of up to 10,000 lines and curves come in as a sketch; a very fine one can take a few seconds to import."
     }
+  },
+  {
+    "title": {
+      "de": "3D-Maus ohne Verbinden nach jedem Neustart",
+      "en": "3D mouse without Connect after every restart"
+    },
+    "body": {
+      "de": "Die 3D-Maus musste in jeder Sitzung neu verbunden werden, weil Chrome die Erlaubnis bei vielen Mäusen nicht behält. Jetzt liest layerling eine 3Dconnexion-Maus auch als Spielcontroller, den der Browser ohne Nachfrage zeigt, sobald du die Kappe bewegst. Bewegt sich die Ansicht in einer Richtung verkehrt herum, drehst du sie in den Einstellungen unter Steuerung um.",
+      "en": "The 3D mouse had to be connected again in every session, because Chrome does not keep the permission for many of these mice. Now layerling also reads a 3Dconnexion mouse as a game controller, which the browser shows with no question as soon as you move the cap. If the view moves the wrong way in one direction, reverse it in the settings under Controls."
+    }
   }
 ]
