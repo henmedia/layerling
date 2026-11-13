@@ -8,7 +8,7 @@ import { ShapeMenuPanel } from "@/components/workplane/ShapeMenuPanel";
 import { ShapeLibraryList } from "@/components/workplane/ShapeLibraryList";
 import { AlertTriangle, ArchiveRestore, ArrowDownToLine, ArrowLeftRight, ArrowUpFromLine, Check, CircleHelp, Percent, Circle as CircleIcon, Eye, EyeOff, Hexagon as HexagonIcon, ListTree, Maximize2, Minimize2, Pentagon as PentagonIcon, Pin, PinOff, Rotate3d, Route as RouteIcon, ScanEye, Search, Sparkles, Square as SquareIcon, Star as StarIcon, Triangle as TriangleIcon, X } from "lucide-react";
 import { OPEN_FILE_BACKUPS_EVENT } from "@/lib/fileBackups";
-import { useEffect, useLayoutEffect, useRef, useState, type CSSProperties } from "react";
+import { useEffect, useLayoutEffect, useRef, useState, type CSSProperties, type PointerEvent as ReactPointerEvent } from "react";
 import { createPortal } from "react-dom";
 import { useWheelField } from "@/lib/useWheelField";
 import { wheelNextValue } from "@/lib/wheelValueStep";
@@ -37,6 +37,7 @@ import type { CadModifierKind } from "@/lib/cadModifierTypes";
 import type { ShapeAsset, SketchOperation, WorkplaneWorkspaceSettings } from "@/types/layerling";
 import { TopPanel } from "./TopActionPanel";
 import { useToolbarCollapse } from "./useToolbarCollapse";
+import { createHoverOpener, type HoverOpener } from "@/lib/hoverOpen";
 
 
 /** Die Befehle der Suche, die im Verlaufsblick wach bleiben: sie aendern nichts am Entwurf. */
@@ -656,6 +657,44 @@ export function SecondaryToolbar({
     } catch {
       // The pin still works for this visit.
     }
+  };
+  // Resting the mouse on the chevron tab under the Shapes button opens the panel, as it opens a folded group (#1722).
+  const shapesOpenRef = useRef(false);
+  shapesOpenRef.current = shapesOpen;
+  const shapesHoverRef = useRef<HoverOpener | null>(null);
+  if (!shapesHoverRef.current) {
+    shapesHoverRef.current = createHoverOpener({
+      isOpen: () => shapesOpenRef.current,
+      isPinned: () => shapesPinnedRef.current,
+      open: () => {
+        setVisibilityOpen(false);
+        setShapesOpen(true);
+      },
+      close: () => setShapesOpen(false),
+    });
+  }
+  const shapesHover = shapesHoverRef.current;
+  useEffect(() => () => shapesHover.dispose(), [shapesHover]);
+  // Closed some other way or pinned: the mouse leaving no longer closes it.
+  useEffect(() => {
+    if (!shapesOpen || shapesPinned) shapesHover.settle();
+  }, [shapesOpen, shapesPinned, shapesHover]);
+  /** The pointer handlers of the shapes section: the tab opens, leaving the button and panel closes what the mouse opened. */
+  const shapesHoverProps = {
+    onPointerEnter: (event: ReactPointerEvent) => shapesHover.enter(event.pointerType),
+    onPointerLeave: (event: ReactPointerEvent) => shapesHover.leave(event.pointerType),
+    // Working in the panel (a search typed, a tab chosen) keeps it, as a click on the button does.
+    onPointerDown: (event: ReactPointerEvent) => {
+      if (event.target instanceof Element && !event.target.closest(".shape-menu-trigger")) shapesHover.settle();
+    },
+  };
+  const shapesTab = (
+    <span className="shape-menu-tab" aria-hidden="true" onPointerEnter={(event) => shapesHover.enterTab(event.pointerType)} />
+  );
+  const toggleShapesFromButton = () => {
+    if (!shapesHover.click()) return;
+    setVisibilityOpen(false);
+    setShapesOpen((open) => !open);
   };
   /** Picking a shape closes the panel, unless it is pinned open. */
   const closeShapesAfterPick = () => {
@@ -1388,7 +1427,7 @@ export function SecondaryToolbar({
           <div className="toolbar-section-tools">{historyShown.map(renderToolButton)}</div>
         </div>
         ) : null}
-        <div className={`toolbar-section toolbar-shapes-section${shapesInRibbon ? "" : " out-of-ribbon"}`} data-group="shapes" style={{ order: sectionOrder.shapes }} ref={shapesMenuRef} inert={historyViewActive}>
+        <div className={`toolbar-section toolbar-shapes-section${shapesInRibbon ? "" : " out-of-ribbon"}`} data-group="shapes" style={{ order: sectionOrder.shapes }} ref={shapesMenuRef} inert={historyViewActive} {...shapesHoverProps}>
           {shapesInRibbon ? (
           <>
           <div className="toolbar-section-label">{t("editor.group.shapes")}</div>
@@ -1397,12 +1436,10 @@ export function SecondaryToolbar({
               className={`shape-menu-trigger ${shapesOpen ? "active" : ""}`}
               aria-label={t("editor.addShape")}
               aria-expanded={shapesOpen}
-              onClick={() => {
-                setVisibilityOpen(false);
-                setShapesOpen((value) => !value);
-              }}
+              onClick={toggleShapesFromButton}
             >
               <ToolbarShapeAddIcon />
+              {shapesTab}
             </button>
           </div>
           </>
@@ -1615,7 +1652,7 @@ export function SecondaryToolbar({
                     </button>
                   </div>
                 </div>
-                <div className="toolbar-section toolbar-shapes-section sketch-shapes-section" data-group="shapes" ref={shapesMenuRef}>
+                <div className="toolbar-section toolbar-shapes-section sketch-shapes-section" data-group="shapes" ref={shapesMenuRef} {...shapesHoverProps}>
                   <div className="toolbar-section-label">{t("sketch.group.shapes")}</div>
                   <div className="toolbar-section-tools">
                     <button
@@ -1624,12 +1661,10 @@ export function SecondaryToolbar({
                       aria-label={t("sketch.addShape")}
                       aria-haspopup="menu"
                       aria-expanded={shapesOpen}
-                      onClick={() => {
-                        setVisibilityOpen(false);
-                        setShapesOpen((open) => !open);
-                      }}
+                      onClick={toggleShapesFromButton}
                     >
                       <ToolbarShapeAddIcon />
+                      {shapesTab}
                     </button>
                   </div>
                   {shapesOpen ? (

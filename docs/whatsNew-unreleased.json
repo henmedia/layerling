@@ -143,5 +143,17 @@
     "guide": {
       "section": "backingUp"
     }
+  },
+  {
+    "title": {
+      "de": "Formen öffnen sich auch beim Zeigen auf den Pfeil",
+      "en": "Shapes opens when you point at its arrow too",
+      "da": "Former åbner også, når du peger på pilen"
+    },
+    "body": {
+      "de": "Der Knopf „Formen“ trägt denselben Pfeil wie die eingeklappten Gruppen des Menübands, öffnete sich aber nur per Klick. Jetzt öffnet sich die Formenbibliothek auch, wenn die Maus kurz auf dem Pfeil ruht, und schließt sich wieder, wenn die Maus sie verlässt. Klickst du den Knopf, arbeitest in der Bibliothek oder heftest sie an, bleibt sie offen.",
+      "en": "The Shapes button carries the same arrow as the folded groups of the ribbon, but it opened only with a click. Now the shape library also opens when the mouse rests on the arrow for a moment, and closes again when the mouse leaves it. If you click the button, work in the library or pin it, it stays open.",
+      "da": "Knappen Former har den samme pil som de sammenfoldede grupper i båndet, men åbnede kun med et klik. Nu åbner formbiblioteket også, når musen hviler et øjeblik på pilen, og lukker igen, når musen forlader det. Klikker du på knappen, arbejder i biblioteket eller fastgør det, bliver det åbent."
+    }
   }
 ]

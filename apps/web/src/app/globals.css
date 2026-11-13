@@ -4922,6 +4922,18 @@ html[data-theme="dark"] .toolbar-title-help .action-icon-button.active svg path 
   transform: translateX(-50%) scaleY(-1);
 }
 
+/* The tab's hit area: resting the mouse on it opens the shapes panel, as on a folded group (#1722). A little larger than
+   the chevron, so it is easy to meet, and above it, so the chevron itself stays a drawing only. */
+.shape-menu-tab {
+  position: absolute;
+  z-index: 2;
+  bottom: -13px;
+  left: 50%;
+  width: 26px;
+  height: 13px;
+  transform: translateX(-50%);
+}
+
 .shape-menu-dropdown {
   position: absolute;
   top: var(--editor-toolbar-tools-height);
