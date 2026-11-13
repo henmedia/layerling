@@ -3157,6 +3157,7 @@ export const MESSAGES_EN = {
   "nameTag.makeTagsOne": "Make 1 name tag",
   "nameTag.makeTagsNone": "Make name tags",
   "nameTag.bundleNote": "Each layer is a body of its own in its own colour. To round or bevel the edges of one layer, open the bundle.",
+  "nameTag.layerStepsNote": "A layer has a change of its own (a surface texture, rounded or bevelled edges, paint). A change here builds the layers anew without it; Undo brings it back.",
   "shape.iconTag": "Icon tag",
   "iconTag.title": "Icon tag",
   "iconTag.hint": "Choose an SVG, PNG or JPG file: the icon becomes a tag in layers, like a name tag.",

@@ -3151,6 +3151,7 @@ export const MESSAGES_SV: Partial<Record<MessageKey, string>> = {
   "nameTag.makeTagsOne": "Skapa 1 namnskylt",
   "nameTag.makeTagsNone": "Skapa namnskyltar",
   "nameTag.bundleNote": "Varje lager är en egen kropp i sin egen färg. För att avrunda eller fasa kanterna på ett lager öppnar du bunten.",
+  "nameTag.layerStepsNote": "Ett lager har en egen ändring (ytstruktur, avrundade eller fasade kanter, målning). En ändring här bygger om lagren utan den; Ångra tar tillbaka den.",
   "shape.iconTag": "Ikonskylt",
   "iconTag.title": "Ikonskylt",
   "iconTag.hint": "Välj en SVG-, PNG- eller JPG-fil: ikonen blir en skylt i lager, som en namnskylt.",

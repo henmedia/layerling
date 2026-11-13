@@ -3144,6 +3144,7 @@ export const MESSAGES_IT: Partial<Record<MessageKey, string>> = {
   "nameTag.makeTagsOne": "Crea 1 targhetta",
   "nameTag.makeTagsNone": "Crea targhette",
   "nameTag.bundleNote": "Ogni strato è un corpo indipendente con il proprio colore. Per arrotondare o smussare i bordi di uno strato, apri l'insieme.",
+  "nameTag.layerStepsNote": "Uno strato ha una modifica propria (texture della superficie, bordi arrotondati o smussati, pittura). Una modifica qui ricostruisce gli strati senza di essa; Annulla la riporta.",
   "shape.iconTag": "Targhetta con icona",
   "iconTag.title": "Targhetta con icona",
   "iconTag.hint": "Scegli un file SVG, PNG o JPG: l'icona diventerà una targhetta a livelli, come una targhetta identificativa.",

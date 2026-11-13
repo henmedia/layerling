@@ -2054,6 +2054,7 @@ export const MESSAGES_TR: Partial<Record<MessageKey, string>> = {
   "nameTag.makeTagsOne": "1 isimlik yap",
   "nameTag.makeTagsNone": "İsimlik yap",
   "nameTag.bundleNote": "Her katman kendi renginde ayrı bir gövdedir. Bir katmanın kenarlarını yuvarlatmak veya pahlamak için paketi aç.",
+  "nameTag.layerStepsNote": "Bir katmanın kendine ait bir değişikliği var (yüzey dokusu, yuvarlatılmış veya pahlanmış kenarlar, boya). Burada yapılan bir değişiklik katmanları onsuz yeniden oluşturur; Geri al onu geri getirir.",
   "shape.iconTag": "Simge etiketi",
   "iconTag.title": "Simge etiketi",
   "iconTag.hint": "Bir SVG, PNG veya JPG dosyası seç: simge, isimlik gibi katmanlı bir etikete dönüşür.",

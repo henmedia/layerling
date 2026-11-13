@@ -3165,6 +3165,7 @@ export const MESSAGES_AR: Partial<Record<MessageKey, string>> = {
   "nameTag.makeTagsOne": "إنشاء بطاقة اسم واحدة",
   "nameTag.makeTagsNone": "إنشاء بطاقات أسماء",
   "nameTag.bundleNote": "كل طبقة جسم مستقل بلونه الخاص. لتنعيم حواف طبقة واحدة أو شطفها، افتح الحزمة.",
+  "nameTag.layerStepsNote": "لإحدى الطبقات تعديل خاص بها (نسيج السطح، حواف مستديرة أو مشطوفة، طلاء). أي تغيير هنا يعيد بناء الطبقات من دونه؛ والتراجع يعيده.",
   "shape.iconTag": "بطاقة أيقونة",
   "iconTag.title": "بطاقة أيقونة",
   "iconTag.hint": "اختر ملف SVG أو PNG أو JPG: تصبح الأيقونة بطاقة في طبقات، مثل بطاقة الاسم.",
