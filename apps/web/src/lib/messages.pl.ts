@@ -3122,6 +3122,7 @@ export const MESSAGES_PL: Partial<Record<MessageKey, string>> = {
   "nameTag.makeTagsOne": "Utwórz 1 plakietkę",
   "nameTag.makeTagsNone": "Utwórz plakietki",
   "nameTag.bundleNote": "Każda warstwa jest osobną bryłą we własnym kolorze. Aby zaokrąglić lub ściąć krawędzie jednej warstwy, otwórz zestaw.",
+  "nameTag.layerStepsNote": "Jedna z warstw ma własną zmianę (tekstura powierzchni, zaokrąglone lub ścięte krawędzie, malowanie). Zmiana tutaj buduje warstwy od nowa bez niej; Cofnij ją przywraca.",
   "shape.iconTag": "Plakietka z ikoną",
   "iconTag.title": "Plakietka z ikoną",
   "iconTag.hint": "Wybierz plik SVG, PNG lub JPG: ikona stanie się plakietką z warstw, jak plakietka z imieniem.",

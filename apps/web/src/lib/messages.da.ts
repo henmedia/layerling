@@ -3566,6 +3566,7 @@ export const MESSAGES_DA: Partial<Record<MessageKey, string>> = {
   "nameTag.makeTagsOne": "Lav 1 navneskilt",
   "nameTag.makeTagsNone": "Lav navneskilte",
   "nameTag.bundleNote": "Hvert lag er sin egen form i sin egen farve. For at runde eller fase kanterne på et lag, åbn bundtet.",
+  "nameTag.layerStepsNote": "Et lag har sin egen ændring (overfladestruktur, afrundede eller fasede kanter, maling). En ændring her bygger lagene op igen uden den; Fortryd bringer den tilbage.",
   "shape.iconTag": "Ikon-tag",
   "iconTag.title": "Ikon-tag",
   "iconTag.hint": "Vælg en SVG-fil: ikonet bliver et tag i lag, som et navneskilt.",

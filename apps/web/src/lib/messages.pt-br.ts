@@ -3603,6 +3603,7 @@ export const MESSAGES_PT_BR: Partial<Record<MessageKey, string>> = {
   "nameTag.makeTagsOne": "Criar 1 etiqueta de nome",
   "nameTag.makeTagsNone": "Criar etiquetas de nome",
   "nameTag.bundleNote": "Cada camada é um sólido separado, com sua própria cor. Para arredondar ou chanfrar as bordas de uma camada, abra o conjunto para edição.",
+  "nameTag.layerStepsNote": "Uma camada tem uma alteração própria (textura de superfície, bordas arredondadas ou chanfradas, pintura). Uma alteração aqui reconstrói as camadas sem ela; Desfazer a traz de volta.",
 
   "iconTag.title": "Etiqueta de ícone",
   "iconTag.hint": "Escolha um arquivo SVG, PNG ou JPG: o ícone vira uma etiqueta em camadas, como uma etiqueta de nome.",

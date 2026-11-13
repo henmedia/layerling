@@ -3159,6 +3159,7 @@ export const MESSAGES_ES: Partial<Record<MessageKey, string>> = {
   "nameTag.makeTagsOne": "Crear 1 placa con nombre",
   "nameTag.makeTagsNone": "Crear placas con nombre",
   "nameTag.bundleNote": "Cada capa es un cuerpo independiente con su propio color. Para redondear o biselar las aristas de una capa, abre el conjunto.",
+  "nameTag.layerStepsNote": "Una capa tiene un cambio propio (textura de superficie, aristas redondeadas o biseladas, pintura). Un cambio aquí reconstruye las capas sin él; Deshacer lo recupera.",
   "shape.iconTag": "Placa con icono",
   "iconTag.title": "Placa con icono",
   "iconTag.hint": "Elige un archivo SVG, PNG o JPG: el icono se convierte en una placa por capas, como una placa con nombre.",

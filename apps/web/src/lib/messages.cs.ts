@@ -3229,6 +3229,7 @@ export const MESSAGES_CS: Record<MessageKey, string> = {
   "nameTag.makeTagsOne": "Vytvořit 1 jmenovku",
   "nameTag.makeTagsNone": "Vytvořit jmenovky",
   "nameTag.bundleNote": "Každá vrstva je samostatné těleso ve vlastní barvě. Pro zaoblení nebo zkosení jedné vrstvy otevřete seskupení.",
+  "nameTag.layerStepsNote": "Jedna vrstva má vlastní úpravu (povrchová textura, zaoblené nebo zkosené hrany, malba). Změna zde sestaví vrstvy znovu bez ní; Zpět ji vrátí.",
   "shape.iconTag": "Štítek se symbolem",
   "iconTag.title": "Štítek se symbolem",
   "iconTag.hint": "Vyberte SVG, PNG nebo JPG: symbol se převede na vrstvený štítek podobně jako jmenovka.",

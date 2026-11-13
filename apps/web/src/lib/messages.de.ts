@@ -3156,6 +3156,7 @@ export const MESSAGES_DE: Record<MessageKey, string> = {
   "nameTag.makeTagsOne": "1 Namensschild machen",
   "nameTag.makeTagsNone": "Namensschilder machen",
   "nameTag.bundleNote": "Jede Schicht ist ein eigener Körper in eigener Farbe. Um die Kanten einer Schicht abzurunden oder abzuschrägen, öffne das Bündel.",
+  "nameTag.layerStepsNote": "Eine Schicht hat eine eigene Änderung (Oberflächentextur, abgerundete oder abgeschrägte Kanten, Bemalung). Eine Änderung hier baut die Schichten ohne sie neu auf; Rückgängig holt sie zurück.",
   "shape.iconTag": "Symbolschild",
   "iconTag.title": "Symbolschild",
   "iconTag.hint": "Wähle eine SVG-, PNG- oder JPG-Datei: Das Symbol wird zu einem Schild in Schichten, wie ein Namensschild.",

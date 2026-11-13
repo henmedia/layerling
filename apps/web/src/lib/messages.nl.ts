@@ -3157,6 +3157,7 @@ export const MESSAGES_NL: Record<MessageKey, string> = {
   "nameTag.makeTagsOne": "1 naambordje maken",
   "nameTag.makeTagsNone": "Naambordjes maken",
   "nameTag.bundleNote": "Elke laag is een eigen lichaam in een eigen kleur. Open de bundel om de randen van één laag af te ronden of af te schuinen.",
+  "nameTag.layerStepsNote": "Een laag heeft een eigen wijziging (oppervlaktetextuur, afgeronde of afgeschuinde randen, verf). Een wijziging hier bouwt de lagen opnieuw op zonder; Ongedaan maken brengt die terug.",
   "shape.iconTag": "Icoonbordje",
   "iconTag.title": "Icoonbordje",
   "iconTag.hint": "Kies een SVG-, PNG- of JPG-bestand: het icoon wordt een bordje in lagen, net als een naambordje.",

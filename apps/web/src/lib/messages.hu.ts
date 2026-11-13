@@ -2089,6 +2089,7 @@ export const MESSAGES_HU: Partial<Record<MessageKey, string>> = {
   "nameTag.makeTagsOne": "1 névcímke készítése",
   "nameTag.makeTagsNone": "Névcímkék készítése",
   "nameTag.bundleNote": "Minden réteg önálló test a saját színében. Egy réteg éleinek lekerekítéséhez vagy letöréséhez nyisd meg a köteget.",
+  "nameTag.layerStepsNote": "Egy rétegen saját módosítás van (felületi textúra, lekerekített vagy letört élek, festés). Ha itt változtatsz, a rétegek újraépülnek, és ez lekerül róluk; a Visszavonás visszahozza.",
   "shape.iconTag": "Ikoncímke",
   "iconTag.title": "Ikoncímke",
   "iconTag.hint": "Válassz egy SVG-, PNG- vagy JPG-fájlt: az ikonból rétegekből álló címke lesz, mint a névcímke.",
