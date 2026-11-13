@@ -2,7 +2,7 @@ import * as THREE from "three";
 import { describe, expect, it } from "vitest";
 import { cameraButtonsFor, slicerLeftTurn } from "@/lib/cameraMouseButtons";
 import { isSketchPanGesture } from "@/lib/sketchPointerControls";
-import { moveCameraBySpaceMouse, readSpaceMouseReport, SPACE_MOUSE_NO_INVERT, SPACE_MOUSE_REST, spaceMouseAmount } from "@/lib/spaceMouse";
+import { moveCameraBySpaceMouse, readSpaceMouseReport, smoothSpaceMouseAxes, SPACE_MOUSE_NO_INVERT, SPACE_MOUSE_REST, spaceMouseAmount, type SpaceMouseAxes } from "@/lib/spaceMouse";
 import { DEFAULT_WORKPLANE_WORKSPACE, normalizeWorkspaceSettings } from "@/lib/workplaneSettings";
 
 describe("mouse buttons as in Bambu Studio and OrcaSlicer (#1013)", () => {
@@ -125,5 +125,49 @@ describe("a 3D mouse over WebHID (#1013)", () => {
     const tilted = run({ rx: 350 }).camera.position.y;
     const tiltedBack = run({ rx: 350 }, { ...SPACE_MOUSE_NO_INVERT, tilt: true }).camera.position.y;
     expect(Math.sign(tiltedBack - 100)).toBe(-Math.sign(tilted - 100));
+  });
+});
+
+describe("a 3D mouse turned freely moves the view smoothly (#1013)", () => {
+  const frame = 1 / 60;
+  /** A cap twisted and tilted at once, every axis trembling by up to `shake` device units from report to report. */
+  const shaky = (index: number, shake: number): SpaceMouseAxes => {
+    const wobble = (seed: number) => Math.sin(index * 12.9898 + seed * 78.233) * shake;
+    return { tx: 30 + wobble(1), ty: wobble(2), tz: 20 + wobble(3), rx: 160 + wobble(4), ry: wobble(5), rz: 200 + wobble(6) };
+  };
+  const spread = (values: number[]) => {
+    const mean = values.reduce((sum, value) => sum + value, 0) / values.length;
+    return Math.sqrt(values.reduce((sum, value) => sum + (value - mean) ** 2, 0) / values.length);
+  };
+
+  it("evens out the trembling of several axes at once", () => {
+    let smoothed = SPACE_MOUSE_REST;
+    const raw: number[] = [];
+    const even: number[] = [];
+    for (let index = 0; index < 120; index += 1) {
+      const axes = shaky(index, 60);
+      smoothed = smoothSpaceMouseAxes(smoothed, axes, frame);
+      if (index >= 60) {
+        raw.push(spaceMouseAmount(axes.rz));
+        even.push(spaceMouseAmount(smoothed.rz));
+      }
+    }
+    expect(spread(even)).toBeLessThan(spread(raw) / 2);
+  });
+
+  it("follows a held cap within a few tenths of a second", () => {
+    let smoothed = SPACE_MOUSE_REST;
+    const held = { ...SPACE_MOUSE_REST, rz: 300 };
+    for (let index = 0; index < 18; index += 1) smoothed = smoothSpaceMouseAxes(smoothed, held, frame);
+    expect(smoothed.rz).toBeGreaterThan(290);
+    expect(smoothed.rz).toBeLessThanOrEqual(300);
+  });
+
+  it("stops at once when the cap is let go, and a long frame does not overshoot", () => {
+    const moving = { ...SPACE_MOUSE_REST, rz: 250, rx: -120 };
+    expect(smoothSpaceMouseAxes(moving, { ...SPACE_MOUSE_REST, rz: 5, tx: -8 }, frame)).toBe(SPACE_MOUSE_REST);
+    const caughtUp = smoothSpaceMouseAxes(SPACE_MOUSE_REST, moving, 5);
+    expect(caughtUp.rz).toBeCloseTo(250, 3);
+    expect(caughtUp.rx).toBeCloseTo(-120, 3);
   });
 });

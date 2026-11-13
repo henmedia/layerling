@@ -27,6 +27,19 @@
   },
   {
     "title": {
+      "de": "3D-Maus: Ansicht ruckelt nicht mehr beim freien Drehen",
+      "en": "3D mouse: the view no longer stutters when turned freely"
+    },
+    "body": {
+      "de": "Wer die Kappe einer SpaceMouse zugleich dreht und kippt, bekam bisher manchmal kleine Sprünge in der Ansicht. Die Bewegungen der Kappe werden jetzt kurz geglättet, so dass die Ansicht ruhig folgt. Lässt du los, bleibt sie sofort stehen.",
+      "en": "Twisting and tilting the cap of a SpaceMouse at the same time sometimes made the view jump a little. The cap's movements are now smoothed briefly, so the view follows calmly. Let go, and it stops at once."
+    },
+    "guide": {
+      "chapter": "view"
+    }
+  },
+  {
+    "title": {
       "de": "Symbolschild behält seine Karte nach „Bündel bearbeiten“",
       "en": "An icon tag keeps its card after Edit Bundle"
     },

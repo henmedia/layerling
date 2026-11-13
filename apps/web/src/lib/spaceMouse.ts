@@ -37,6 +37,28 @@ export function spaceMouseAmount(value: number) {
   return Math.sign(value) * share * share;
 }
 
+/**
+ * How quickly the smoothed axes follow the cap, in seconds (#1013): the time in which they cover about two thirds of a
+ * change. A cap turned freely sends several axes at once, each trembling a little round its value, and taken raw from
+ * report to report that made the view jump and stutter; short enough that the view does not feel slow.
+ */
+const SMOOTHING_SECONDS = 0.07;
+
+const AXIS_NAMES = ["tx", "ty", "tz", "rx", "ry", "rz"] as const;
+
+/**
+ * The axes the view is moved by after `seconds` more of the cap held as `raw`: each follows its raw value smoothly, by
+ * the time that passed, so the trembling of several axes at once evens out instead of jerking the view (#1013). With the
+ * cap let go (every axis inside its rest band) the view stops at once rather than drifting on.
+ */
+export function smoothSpaceMouseAxes(smoothed: SpaceMouseAxes, raw: SpaceMouseAxes, seconds: number): SpaceMouseAxes {
+  if (AXIS_NAMES.every((axis) => !spaceMouseAmount(raw[axis]))) return SPACE_MOUSE_REST;
+  const share = 1 - Math.exp(-Math.max(0, seconds) / SMOOTHING_SECONDS);
+  const next = { ...smoothed };
+  for (const axis of AXIS_NAMES) next[axis] = smoothed[axis] + (raw[axis] - smoothed[axis]) * share;
+  return next;
+}
+
 /** How far the view goes in one second at full deflection: turns in radians, shifts in view heights, zoom as a factor. */
 const TURN_PER_SECOND = 2.2;
 const SHIFT_PER_SECOND = 0.9;
