@@ -19,8 +19,8 @@ Alle deine Entwürfe erscheinen später auf der Startseite mit einem Vorschaubil
 
 ![Der Editor mit seinen beschrifteten Bereichen: oben das Menüband, links der Ansichtswürfel und darunter die Ansichtsleiste, daneben die Statusmeldung und die Objektliste, rechts die Eigenschaften der ausgewählten Form.](shot:editor-areas)
 
-- **Oben** steht das **Menüband**. Es ist nach Aufgaben sortiert: {{ui:editor.group.clipboard}}, {{ui:editor.group.history}}, {{ui:editor.group.shapes}}, {{ui:editor.group.visibility}}, {{ui:editor.group.combine}}, {{ui:editor.section.mirrorPattern}}, {{ui:editor.section.splitShape}}, {{ui:editor.section.edgesWalls}}, {{ui:editor.section.surface}}, {{ui:editor.group.arrange}} und {{ui:editor.group.file}}; {{ui:editor.group.help}} steht darüber in der Titelzeile, und das Haus neben den Reitern führt zurück zur Startseite. Ist das Fenster für alle Gruppen zu schmal, klappen die seltener gebrauchten zu einem Knopf unter ihrem Namen zusammen, an dem unten ein kleiner Pfeil hängt: Zeigst du darauf, öffnen sich ihre Werkzeuge darunter. Bei {{ui:editor.group.history}} ist der Knopf selbst {{ui:editor.tool.undo}}, und erst der Pfeil darunter öffnet {{ui:editor.tool.redo}} und den Rest. Die Stecknadel oben rechts, links neben der Lupe, hält stattdessen alle Gruppen offen. Der Doppelpfeil daneben blendet die Titelleiste aus.
-Wenn du mit der Maus über ein Symbol fährst, steht sein Name da, auch bei einem ausgegrauten; die {{ui:interactiveHelp.title}} (das Fragezeichen unter {{ui:editor.group.help}}, oder Shift+F1) erklärt jedes mit einem Klick und führt zu seinem Abschnitt in dieser Anleitung. Wo du ein kleines Fragezeichen siehst, etwa in den Eigenschaften einer Form, in der Formenbibliothek oder in den Werkzeugfenstern, führt es direkt zum passenden Kapitel dieser Anleitung. Ein ausgegrautes Symbol sagt dazu, worauf es wartet, etwa {{ui:editor.needs.oneBody}} oder {{ui:editor.needs.locked}}. Findest du ein Werkzeug nicht? Drücke [[Strg]]+[[K]] und tippe seinen Namen; ein leerer Entwurf erinnert unten in der Ansicht daran.
+- **Oben** steht das **Menüband**. Es ist nach Aufgaben sortiert: {{ui:editor.group.clipboard}}, {{ui:editor.group.history}}, {{ui:editor.group.shapes}}, {{ui:editor.group.visibility}}, {{ui:editor.group.combine}}, {{ui:editor.section.mirrorPattern}}, {{ui:editor.section.splitShape}}, {{ui:editor.section.edgesWalls}}, {{ui:editor.section.surface}}, {{ui:editor.group.arrange}} und {{ui:editor.group.file}}; {{ui:editor.group.help}} steht darüber in der Titelzeile, und das Haus neben den Reitern führt zurück zur Startseite. Ist das Fenster für alle Gruppen zu schmal, klappen die seltener gebrauchten zu einem Knopf unter ihrem Namen zusammen, an dem unten ein kleiner Pfeil hängt: Zeigst du darauf, öffnen sich ihre Werkzeuge darunter. Bei {{ui:editor.group.history}} ist der Knopf selbst {{ui:editor.tool.undo}}, und erst der Pfeil darunter öffnet {{ui:editor.tool.redo}} und den Rest. Die Stecknadel oben rechts, links neben der Lupe, hält stattdessen alle Gruppen offen. Der Doppelpfeil daneben wechselt in den {{ui:focusMode.enter}}, der etwas mehr Platz für die Arbeitsfläche bietet.
+Wenn du mit der Maus über ein Symbol fährst, steht sein Name da, auch bei einem ausgegrauten; wenn du nicht sicher bist, was ein Knopf tut, klicke im Bereich {{ui:editor.group.help}} auf {{ui:interactiveHelp.title}} ([[Umschalt]]+[[F1]]) und dann auf den Knopf. Hier stehen die, nach denen am häufigsten gefragt wird. Wo du ein kleines Fragezeichen siehst, etwa in den Eigenschaften einer Form, in der Formenbibliothek oder in den Werkzeugfenstern, führt es direkt zum passenden Kapitel dieser Anleitung. Ein ausgegrautes Symbol sagt dazu, worauf es wartet, etwa {{ui:editor.needs.oneBody}} oder {{ui:editor.needs.locked}}. Findest du ein Werkzeug nicht? Drücke [[Strg]]+[[K]] und tippe seinen Namen; ein leerer Entwurf erinnert unten in der Ansicht daran.
 - **In der Mitte** liegt die Arbeitsebene. Hier stellst du Formen hin, ziehst sie zurecht und siehst das Ergebnis.
 - **Rechts** stehen die **Eigenschaften** der ausgewählten Form: Farbe, Maße, Lage und alles, was die Form sonst noch ausmacht. Zahlen tippen ist genauer als ziehen.
 - **Links** liegt die **Ansichtsleiste** mit dem **Ansichtswürfel** darüber. Mit ihr bewegst du dich durch die Szene, mehr dazu im Kapitel [Ansicht und Arbeitsebene](chapter:ansicht-und-arbeitsebene).
@@ -28,22 +28,6 @@ Wenn du mit der Maus über ein Symbol fährst, steht sein Name da, auch bei eine
 - **Rechts neben dem Ansichtswürfel** erscheint die **Statusmeldung**, wenn layerling dir etwas mitzuteilen hat, etwa was ein Werkzeug gerade von dir erwartet. Gibt es nichts zu sagen, ist sie nicht da.
 - **Werkzeugfenster** öffnen sich über der Arbeitsebene, wenn du ein Werkzeug wie Verrunden, Muster oder Aushöhlen startest. An ihrer Titelleiste schiebst du sie beiseite, wenn sie etwas verdecken.
 - **In der Titelleiste** wechselst du zwischen {{ui:editor.modeGeometry}} und {{ui:editor.modeSketch}}, benennst den Entwurf um, stellst Sprache und Farbschema ein und findest die Hilfefunktionen.
-
-## Die Knöpfe rund um die Arbeitsfläche
-
-Fahre mit der Maus über einen Knopf, dann siehst du seinen Namen. Wenn du nicht sicher bist, was ein Knopf tut, klicke im Bereich {{ui:editor.group.help}} auf {{ui:interactiveHelp.title}} ([[Umschalt]]+[[F1]]) und dann auf den Knopf. Hier stehen die, nach denen am häufigsten gefragt wird.
-
-### Einfügen
-
-{{ui:editor.tool.paste}} ([[Strg]]+[[V]]) fügt in den Entwurf ein, was du mit {{ui:editor.tool.copy}} kopiert hast. {{ui:common.duplicate}} kopiert und fügt in einem Schritt ein. Beim Einfügen liegt jedes Teil ein Stück neben seiner alten Stelle. Teile aus einem anderen Programm können weit weg von der Platte landen, dafür gibt es in den Einstellungen unter {{ui:workspace.appearance}} {{ui:workspace.pasteCentered}}: Beim Einfügen kommen die Teile dann zusammen in die Mitte der Arbeitsebene und werden darauf abgesetzt.
-
-### Löschen
-
-{{ui:common.delete}} ([[Entf]]) entfernt die gewählten Formen. {{ui:editor.tool.undo}} holt sie zurück.
-
-### Gruppierung aufheben
-
-{{ui:editor.tool.ungroup}} ([[Strg]]+[[Umschalt]]+[[G]]) zerlegt die gewählte Gruppe wieder in die Formen, aus denen sie gemacht wurde.
 
 ### Arbeitsbereich-Einstellungen
 
@@ -53,25 +37,9 @@ Fahre mit der Maus über einen Knopf, dann siehst du seinen Namen. Wenn du nicht
 
 {{ui:common.theme}} ganz oben bestimmt, wie layerling aussieht: wie dein System, hell, dunkel oder Graphit.
 
-### Entwurf umbenennen
-
-{{ui:editor.renameProject}}: der Stift neben dem Namen ganz oben. Tippe den neuen Namen und drücke [[Enter]].
-
-### Entwurfsname
+### Entwurf benennen
 
 Der Name des Entwurfs ({{ui:confirm.projectName}}) steht ganz oben. Klicke ihn an, tippe, und [[Enter]] behält den Namen.
-
-### Sichtbarkeitsoptionen
-
-{{ui:editor.visibilityOptions}}, der Pfeil neben dem Augensymbol, enthält, was du ein- oder ausblenden kannst: die Objektliste, alles, was du ausgeblendet hast, die Notizen und die Überhänge des Drucks. Mehr dazu in [Auswählen und anordnen](chapter:auswaehlen-und-anordnen).
-
-### Auswahl ausblenden
-
-{{ui:editor.tool.hideSelected}} ([[Strg]]+[[H]]) blendet die gewählten Formen aus. Sie bleiben im Entwurf und in der Objektliste; {{ui:editor.visibilityOptions}} zeigt sie wieder.
-
-### Befehle suchen
-
-{{ui:palette.open}}: Tippe, was du suchst, ein Werkzeug, eine Form oder eine Einstellung, und klicke auf das Ergebnis.
 
 ### Ansichtsleiste ausblenden
 
@@ -87,12 +55,11 @@ Der Schalter **mm | in** neben {{ui:inspector.snapGrid}} ändert die Einheit, da
 
 ### Die Fußzeile
 
-Am Fuß des Fensters: {{ui:dashboard.sponsor}} führt zur Seite, auf der du das Projekt unterstützen kannst; {{ui:dashboard.userGuide}} öffnet diese Anleitung; {{ui:dashboard.forum}} führt zum Ort für Fragen, Ideen und Fehlermeldungen (die Diskussionen auf GitHub, auf Deutsch das Forum von drucktipps3d); {{ui:editor.bugReport}} macht ein ZIP für eine Fehlermeldung; {{ui:dashboard.projectOnGitHub}} führt zum Projekt auf GitHub, und die Versionsnummer öffnet die Versionshinweise. Die Links zu Impressum und Datenschutz gehören dem, der die Kopie von layerling betreibt, die du benutzt.
+Am Fuß des Fensters: {{ui:dashboard.sponsor}} führt zur Seite, auf der du das Projekt unterstützen kannst; {{ui:dashboard.userGuide}} öffnet diese Anleitung; {{ui:dashboard.forum}} führt zum Ort für Fragen, Ideen und Fehlermeldungen (die Diskussionen auf GitHub, auf Deutsch das Forum von drucktipps3d); {{ui:editor.bugReport}} erstellt eine ZIP-Datei für eine Fehlermeldung; {{ui:dashboard.projectOnGitHub}} führt zum Projekt auf GitHub, und die Versionsnummer öffnet die Versionshinweise. Die Links zu Impressum und Datenschutz gehören dem, der die Kopie von layerling betreibt, die du benutzt.
 
 ### Fokusmodus
 
-Auf einem kleinen Bildschirm gibt der {{ui:focusMode.enter}} die Titelzeile und die Fußzeile an die Arbeit ab: Der Knopf mit den zwei nach außen zeigenden Pfeilen oben rechts, [[Strg]]+[[Umschalt]]+[[F]] oder die Befehlssuche schalten ihn ein. Das Menüband rückt nach oben, und die Ansicht reicht bis an den unteren Fensterrand. Eine kleine Leiste unter dem Menüband behält das Haus zur Startseite, die Reiter {{ui:editor.modeGeometry}} und {{ui:editor.modeSketch}}, die Lupe, die Einstellungen und den Knopf mit den zwei nach innen zeigenden Pfeilen, der den Fokusmodus beendet; am Griff lässt sich die Leiste an eine andere Stelle ziehen, ein Doppelklick auf den Griff stellt sie zurück. layerling merkt sich die Wahl in diesem Browser, und solange der Browser den ganzen Bildschirm füllt (F11), schaltet es von selbst in den Fokusmodus.
-Die Leiste zeigt auch den Namen des Entwurfs; ein Klick darauf benennt ihn um, ohne den Fokusmodus zu verlassen.
+Auf einem kleinen Bildschirm gibt der {{ui:focusMode.enter}} die Titelzeile und die Fußzeile an die Arbeitfläche ab: Der Knopf mit den zwei nach außen zeigenden Pfeilen oben rechts, [[Strg]]+[[Umschalt]]+[[F]] oder die Befehlssuche schalten ihn ein. Eine kleine Leiste unter dem Menüband zeigt das Haus zur Entwurfsübersicht, die Reiter {{ui:editor.modeGeometry}} und {{ui:editor.modeSketch}}, den Namen des Entwurfs ({{ui:confirm.projectName}}), Befehle suchen [[Strg]]+[[K]], die Einstellungen und den Knopf, der den Fokusmodus beendet; am Griff lässt sich die Leiste an eine andere Stelle ziehen, ein Doppelklick auf den Griff stellt sie zurück. layerling merkt sich die Wahl in diesem Browser, und solange der Browser den ganzen Bildschirm füllt (F11), schaltet es von selbst in den Fokusmodus.
 
 ## Dein erstes Teil
 
@@ -120,4 +87,4 @@ Bei einer Kopie von layerling auf deinem eigenen Rechner oder Server hat der Hin
 
 Wenn dein Teil fertig ist, klickst du auf {{ui:editor.export}}, wählst STL oder 3MF und lädst die Datei herunter. Die öffnest du in deinem Slicer, zum Beispiel in Bambu Studio, PrusaSlicer, OrcaSlicer oder Cura. Wer seinen Drucker in den Einstellungen wählt, sieht schon beim Bauen, ob das Teil auf die Druckplatte passt. Mehr dazu im Kapitel [Drucken](chapter:drucken).
 
-> **Tipp:** Wenn du von Tinkercad kommst, wirst du dich schnell zurechtfinden: Platte, Formen, Körper und Aussparung, Gruppieren, Ausrichten und Spiegeln funktionieren fast genauso. Neu sind vor allem Fase und Verrundung, Aushöhlen, Gewinde und Skizzen. Auch deine eigenen Tinkercad-Designs kannst du mitnehmen, siehe [Dateien, Speichern und Weitergeben](chapter:dateien-und-speichern).
+> **Tipp:** Wenn du von Tinkercad kommst, wirst du dich schnell zurechtfinden: Platte, Formen, Körper und Aussparung, Gruppieren, Ausrichten und Spiegeln funktionieren fast genauso. Neu sind vor allem Fase und Verrundung, Aushöhlen, Gewinde, Hüllen, erweiterte Funktionen zum Ausrichten, überprüfen, verformen, verdrehen und zur Oberflächengestaltung. Auch deine eigenen Tinkercad-Designs kannst du mitnehmen, siehe [Dateien, Speichern und Weitergeben](chapter:dateien-und-speichern).
