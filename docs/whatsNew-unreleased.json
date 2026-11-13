@@ -181,5 +181,18 @@
       "en": "The Shapes button carries the same arrow as the folded groups of the ribbon, but it opened only with a click. Now the shape library also opens when the mouse rests on the arrow for a moment, and closes again when the mouse leaves it. If you click the button, work in the library or pin it, it stays open.",
       "da": "Knappen Former har den samme pil som de sammenfoldede grupper i båndet, men åbnede kun med et klik. Nu åbner formbiblioteket også, når musen hviler et øjeblik på pilen, og lukker igen, når musen forlader det. Klikker du på knappen, arbejder i biblioteket eller fastgør det, bliver det åbent."
     }
+  },
+  {
+    "title": {
+      "de": "Fase an einer Gruppe: Netz bleibt geschlossen",
+      "en": "Chamfer on a group: the mesh stays closed"
+    },
+    "body": {
+      "de": "Nach einer Fase an einer Gruppe konnte das Netz Löcher haben: Teilen brach mit „Netz nicht geschlossen“ ab, die Druckprüfung mit einem Fehler, und der Slicer ließ Teile weg. layerling schließt solche Lücken jetzt gleich beim Fasen und Verrunden.\n\nEin schon gespeicherter Entwurf mit so einem Netz lässt sich wieder teilen. Für einen geschlossenen Export die Fase einmal neu setzen.",
+      "en": "After a chamfer on a group the mesh could have holes: Split stopped with \"mesh not closed\", the print check with an error, and the slicer left parts out. layerling now closes such gaps right when it chamfers or fillets.\n\nA design already saved with such a mesh can be split again. To export it closed, do the chamfer once more."
+    },
+    "guide": {
+      "section": "edgeTreatment"
+    }
   }
 ]

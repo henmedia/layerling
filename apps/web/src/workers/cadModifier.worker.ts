@@ -25,6 +25,7 @@ import { hirthPartSolid } from "@/lib/hirthSolid";
 import { ENCLOSURE_PART_NAMES, enclosurePartSolid } from "@/lib/enclosureSolid";
 import { meshTreatedBody } from "@/lib/cadMeshAccuracy";
 import { tessellateWithRuledStrips } from "@/lib/cadRuledStrips";
+import { closeFlatMeshGaps } from "@/lib/meshHoleFill";
 import { planarMeshFaces } from "@/lib/cadPlanarMesh";
 import { EXACT_MESH_FAILED_MESSAGE, exactMeshFreeformShare, exactSolidFromMesh, type ExactMeshReport } from "@/lib/cadMeshExact";
 import { cadFlatFaceMeshStraysFromOutline } from "@/lib/cadFaceOutline";
@@ -1429,7 +1430,8 @@ async function bearbeiteAnfrage(request: CadModifierWorkerRequest, halter: { cad
     const deflection = meshed.deflection;
     const options = tessellationOptions(deflection);
     // The side of an extruded curve in straight strips (#1696); the kernel keeps the triangulation it just made.
-    const mesh = copyCadMesh(tessellateWithRuledStrips(activeCad, result, options));
+    // A flat face the kernel left without triangles is capped from its rim (#1711).
+    const mesh = copyCadMesh(closeFlatMeshGaps(tessellateWithRuledStrips(activeCad, result, options)));
     const displayEdges = collectEdges(activeCad, result, 0).displayEdges;
     const brep = storedBrep(activeCad, result);
     // One component is the body itself: its mesh, BREP and edges are the ones just made, copied
@@ -1443,7 +1445,7 @@ async function bearbeiteAnfrage(request: CadModifierWorkerRequest, halter: { cad
       brep,
       displayEdges,
     }] : componentResults.map((component, owner) => {
-      const componentMesh = copyCadMesh(tessellateWithRuledStrips(activeCad, component, options));
+      const componentMesh = copyCadMesh(closeFlatMeshGaps(tessellateWithRuledStrips(activeCad, component, options)));
       return {
         owner,
         positions: componentMesh.positions,
