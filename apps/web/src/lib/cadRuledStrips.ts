@@ -1,5 +1,6 @@
 import type { Mesh, OcctKernel, ShapeHandle, Vec3 } from "occt-wasm";
 import { cadTriangleFaces } from "@/lib/cadFacePick";
+import { cadMeshHasOpenEdges } from "@/lib/cadMeshAccuracy";
 
 /**
  * Straight strips on the side of an extruded body (#1696).
@@ -28,14 +29,14 @@ function distance(a: Point, b: Point) {
   return Math.hypot(a[0] - b[0], a[1] - b[1], a[2] - b[2]);
 }
 
-function areaVector(positions: ArrayLike<number>, triangles: ArrayLike<number>): Point {
+function areaVector(triangles: ArrayLike<number>, point: (vertex: number) => Point): Point {
   let x = 0;
   let y = 0;
   let z = 0;
   for (let corner = 0; corner + 2 < triangles.length; corner += 3) {
-    const a = pointAt(positions, triangles[corner]);
-    const b = pointAt(positions, triangles[corner + 1]);
-    const c = pointAt(positions, triangles[corner + 2]);
+    const a = point(triangles[corner]);
+    const b = point(triangles[corner + 1]);
+    const c = point(triangles[corner + 2]);
     const u = [b[0] - a[0], b[1] - a[1], b[2] - a[2]];
     const v = [c[0] - a[0], c[1] - a[1], c[2] - a[2]];
     x += u[1] * v[2] - u[2] * v[1];
@@ -180,11 +181,200 @@ export function ruledStripTriangles(
     return null;
   }
   // The same face, the same way round: the area vectors agree.
-  const before = areaVector(positions, triangles);
-  const after = areaVector(positions, result);
+  const before = areaVector(triangles, (vertex) => pointAt(positions, vertex));
+  const after = areaVector(result, (vertex) => pointAt(positions, vertex));
   const size = Math.hypot(before[0], before[1], before[2]);
   const gap = Math.hypot(before[0] - after[0], before[1] - after[1], before[2] - after[2]);
   if (!(size > 0) || gap > size * 0.05) return null;
+  return result;
+}
+
+/**
+ * Zips two chains of points into triangles by their share of the way along, like the strips above: `lower` and `upper`
+ * run the same way, the triangles turn as the face does when `lower` is its side nearer the start. Triangles with a
+ * point twice (where both chains start or end at the same point) are left out.
+ */
+function zipChains(lower: number[], upper: number[], lowerShares: number[], upperShares: number[], out: number[]) {
+  let i = 0;
+  let j = 0;
+  const n = lower.length - 1;
+  const m = upper.length - 1;
+  const push = (a: number, b: number, c: number) => {
+    if (a !== b && b !== c && a !== c) out.push(a, b, c);
+  };
+  while (i < n || j < m) {
+    const stepLower = j === m || (i < n && lowerShares[i + 1] <= upperShares[j + 1] + 1e-9);
+    if (stepLower) {
+      push(lower[i], lower[i + 1], upper[j]);
+      i += 1;
+    } else {
+      push(lower[i], upper[j + 1], upper[j]);
+      j += 1;
+    }
+  }
+}
+
+/** Points made for a face's grid: their positions and normals, numbered from `base` on. */
+export type GridPoints = { base: number; positions: number[]; normals: number[] };
+
+/**
+ * A swept face in an even grid (#1696, the sweep).
+ *
+ * A sketch swept along a path gives free-form (B-spline) faces, one for each piece of the cross-section along each
+ * piece of the path. OCCT meshes them with points spread unevenly inside, and on a narrow, tightly curved face most of
+ * its triangles become slivers that lean off the surface: the reporter's sweep, 1 mm across and 17 mm long, had 57 of
+ * 102 triangles on one face with an angle under 5 degrees, and triangles tilted up to 11 degrees. The view hides that
+ * under smooth normals; a slicer shows every facet, as grain.
+ *
+ * Such a face is a plain patch of its surface: four edges, each lying on one side of the surface's parameter
+ * rectangle. It is meshed here in rows across it, one at each point the kernel set on the two long sides, each row
+ * with the points of the denser short side, all taken on the surface itself; neighbouring rows are zipped together as
+ * in the straight strips. Every point the kernel set on the border stays, so the face meets its neighbours point for
+ * point. Null for anything that is not such a patch, or when the rows would not cover the face the same way round.
+ */
+export function isoGridTriangles(
+  cad: OcctKernel,
+  face: ShapeHandle,
+  positions: ArrayLike<number>,
+  triangles: ArrayLike<number>,
+  corners: Point[],
+  points: GridPoints,
+  tolerance = 1e-3,
+): number[] | null {
+  const loop = borderLoop(triangles);
+  if (!loop || corners.length !== 4) return null;
+  const at = corners.map((corner) => {
+    const found = loop.flatMap((vertex, index) => (distance(pointAt(positions, vertex), corner) <= tolerance ? [index] : []));
+    return found.length === 1 ? found[0] : -1;
+  });
+  if (at.some((index) => index < 0)) return null;
+  const sorted = [...at].sort((a, b) => a - b);
+  if (new Set(sorted).size !== 4) return null;
+  const run = (from: number, to: number) => {
+    const out: number[] = [];
+    for (let index = from; ; index = (index + 1) % loop.length) {
+      out.push(loop[index]);
+      if (index === to) return out;
+    }
+  };
+  const runs = [run(sorted[0], sorted[1]), run(sorted[1], sorted[2]), run(sorted[2], sorted[3]), run(sorted[3], sorted[0])];
+
+  // Each run must lie on one side of the parameter rectangle: u or v the same all along, at its least or most.
+  const bounds = cad.uvBounds(face);
+  const uSpan = bounds.uMax - bounds.uMin;
+  const vSpan = bounds.vMax - bounds.vMin;
+  if (!(uSpan > 0) || !(vSpan > 0)) return null;
+  const uv = new Map<number, { u: number; v: number }>();
+  for (const vertex of loop) {
+    const point = pointAt(positions, vertex);
+    uv.set(vertex, cad.uvFromPoint(face, { x: point[0], y: point[1], z: point[2] }));
+  }
+  const onSide = (chain: number[]) => {
+    const near = (value: number, target: number, span: number) => Math.abs(value - target) <= span * 1e-4;
+    for (const [key, target, span] of [["u", bounds.uMin, uSpan], ["u", bounds.uMax, uSpan], ["v", bounds.vMin, vSpan], ["v", bounds.vMax, vSpan]] as const) {
+      if (chain.every((vertex) => near(uv.get(vertex)![key], target, span))) return `${key}${target}`;
+    }
+    return null;
+  };
+  const sides = runs.map(onSide);
+  if (sides.some((side) => side === null) || new Set(sides).size !== 4) return null;
+  if (sides[0]![0] !== sides[2]![0] || sides[1]![0] !== sides[3]![0] || sides[0]![0] === sides[1]![0]) return null;
+
+  // The long sides carry the rows: put them second and fourth, so the first run is the near short side.
+  const length = (chain: number[]) => chain.reduce((sum, vertex, index) => (index === 0 ? 0 : sum + distance(pointAt(positions, chain[index - 1]), pointAt(positions, vertex))), 0);
+  const turn = length(runs[0]) + length(runs[2]) > length(runs[1]) + length(runs[3]) ? 1 : 0;
+  const [r0, r1, r2, r3] = [0, 1, 2, 3].map((k) => runs[(k + turn) % 4]);
+  // The near short side and the far one, both from the left long side to the right one.
+  const near = r0;
+  const far = [...r2].reverse();
+  const left = [...r3].reverse();
+  const right = r1;
+  const across: "u" | "v" = sides[(turn) % 4]![0] === "u" ? "v" : "u";
+
+  // Where the points lie across, as a share from left to right, taken from the denser short side.
+  const dense = near.length >= far.length ? near : far;
+  const from = uv.get(dense[0])![across];
+  const to = uv.get(dense[dense.length - 1])![across];
+  if (Math.abs(to - from) <= 1e-12) return null;
+  const fractions = dense.slice(1, -1).map((vertex) => (uv.get(vertex)![across] - from) / (to - from));
+  for (let index = 0; index < fractions.length; index += 1) {
+    const previous = index === 0 ? 0 : fractions[index - 1];
+    if (!(fractions[index] > previous) || !(fractions[index] < 1)) return null;
+  }
+
+  // Rows at the points of the two long sides, paired by their share of the way.
+  const leftShares = shares(positions, left);
+  const rightShares = shares(positions, right);
+  if (!leftShares || !rightShares) return null;
+  const pairs: Array<[number, number]> = [[0, 0]];
+  {
+    let i = 0;
+    let j = 0;
+    const n = left.length - 1;
+    const m = right.length - 1;
+    while (i < n || j < m) {
+      if (i === n) j += 1;
+      else if (j === m) i += 1;
+      else {
+        const nextLeft = leftShares[i + 1];
+        const nextRight = rightShares[j + 1];
+        const step = Math.min(nextLeft - leftShares[i], nextRight - rightShares[j]);
+        if (Math.abs(nextLeft - nextRight) <= step / 2) {
+          i += 1;
+          j += 1;
+        } else if (nextLeft < nextRight) i += 1;
+        else j += 1;
+      }
+      pairs.push([i, j]);
+    }
+  }
+
+  const newPositions: number[] = [];
+  const newNormals: number[] = [];
+  const start = points.base + points.positions.length / 3;
+  // Rows only use the kernel's border points and this face's new points.
+  const point = (vertex: number): Point => (vertex < start ? pointAt(positions, vertex) : pointAt(newPositions, vertex - start));
+  const rows: number[][] = pairs.map(([i, j], index) => {
+    if (index === 0) return near;
+    if (index === pairs.length - 1) return far;
+    const a = uv.get(left[i])!;
+    const b = uv.get(right[j])!;
+    const row = [left[i]];
+    for (const fraction of fractions) {
+      const u = a.u + (b.u - a.u) * fraction;
+      const v = a.v + (b.v - a.v) * fraction;
+      const p = cad.pointOnSurface(face, u, v);
+      const n = cad.surfaceNormal(face, u, v);
+      row.push(start + newPositions.length / 3);
+      newPositions.push(p.x, p.y, p.z);
+      newNormals.push(n.x, n.y, n.z);
+    }
+    row.push(right[j]);
+    return row;
+  });
+  const rowShares = (row: number[]) => {
+    const lengths = [0];
+    for (let index = 1; index < row.length; index += 1) lengths.push(lengths[index - 1] + distance(point(row[index - 1]), point(row[index])));
+    const total = lengths[lengths.length - 1];
+    return total > 0 ? lengths.map((value) => value / total) : null;
+  };
+  const result: number[] = [];
+  let lowerShares = rowShares(rows[0]);
+  for (let index = 0; index + 1 < rows.length; index += 1) {
+    const upperShares = rowShares(rows[index + 1]);
+    if (!lowerShares || !upperShares) return null;
+    zipChains(rows[index], rows[index + 1], lowerShares, upperShares, result);
+    lowerShares = upperShares;
+  }
+
+  // The same face, the same way round: the area vectors agree.
+  const before = areaVector(triangles, (vertex) => pointAt(positions, vertex));
+  const after = areaVector(result, point);
+  const size = Math.hypot(before[0], before[1], before[2]);
+  const gap = Math.hypot(before[0] - after[0], before[1] - after[1], before[2] - after[2]);
+  if (!(size > 0) || gap > size * 0.05) return null;
+  points.positions.push(...newPositions);
+  points.normals.push(...newNormals);
   return result;
 }
 
@@ -234,19 +424,41 @@ function extrusionSides(cad: OcctKernel, face: ShapeHandle): [[Point, Point], [P
   }
 }
 
+/** The four corners of a free-form face with four edges, the kind a sweep gives (isoGridTriangles), or null. */
+function gridCorners(cad: OcctKernel, face: ShapeHandle): Point[] | null {
+  const kind = cad.surfaceType(face);
+  if (kind !== "bspline" && kind !== "bezier") return null;
+  const edges = cad.getSubShapes(face, "edge");
+  const vertices = cad.getSubShapes(face, "vertex");
+  try {
+    if (edges.length !== 4 || vertices.length !== 4) return null;
+    return vertices.map((vertex) => toPoint(cad.vertexPosition(vertex)));
+  } finally {
+    releaseAll(cad, [...edges, ...vertices]);
+  }
+}
+
+type Candidate = { sides: [[Point, Point], [Point, Point]] } | { corners: Point[] };
+
 /**
  * The shape meshed as `cad.tessellate` would, but with the side of every extruded curve in straight strips
- * (ruledStripTriangles). Faces that are not such a patch keep the kernel's triangles; points no triangle uses any more
- * are dropped. When no face changes, the kernel's mesh is returned as it came.
+ * (ruledStripTriangles) and every face of a sweep in an even grid (isoGridTriangles). Faces that are not such a patch
+ * keep the kernel's triangles; points no triangle uses any more are dropped. When no face changes, or the new mesh
+ * would have a gap the kernel's did not, the kernel's mesh is returned as it came.
  */
 export function tessellateWithRuledStrips(cad: OcctKernel, shape: ShapeHandle, options: { linearDeflection: number; angularDeflection: number }): Mesh {
   const mesh = cad.meshShape(shape, options);
   const faces = cad.getSubShapes(shape, "face");
   try {
-    const candidates = new Map<number, [[Point, Point], [Point, Point]]>();
+    const candidates = new Map<number, Candidate>();
     faces.forEach((face, id) => {
       const sides = extrusionSides(cad, face);
-      if (sides) candidates.set(id, sides);
+      if (sides) {
+        candidates.set(id, { sides });
+        return;
+      }
+      const corners = gridCorners(cad, face);
+      if (corners) candidates.set(id, { corners });
     });
     if (candidates.size === 0) return mesh;
     const triangleFaces = cadTriangleFaces(mesh.faceGroups ?? [], faces.map((face) => cad.hashCode(face, HASH_UPPER_BOUND)), mesh.triangleCount);
@@ -258,10 +470,20 @@ export function tessellateWithRuledStrips(cad: OcctKernel, shape: ShapeHandle, o
       list.push(mesh.indices[triangle * 3], mesh.indices[triangle * 3 + 1], mesh.indices[triangle * 3 + 2]);
       byFace.set(face, list);
     }
+    const vertexCount = mesh.positions.length / 3;
+    const added: GridPoints = { base: vertexCount, positions: [], normals: [] };
     const replaced = new Map<number, number[]>();
     for (const [face, triangles] of byFace) {
-      const strips = ruledStripTriangles(mesh.positions, triangles, candidates.get(face)!);
-      if (strips) replaced.set(face, strips);
+      const candidate = candidates.get(face)!;
+      let triangulated: number[] | null = null;
+      try {
+        triangulated = "sides" in candidate
+          ? ruledStripTriangles(mesh.positions, triangles, candidate.sides)
+          : isoGridTriangles(cad, faces[face], mesh.positions, triangles, candidate.corners, added);
+      } catch {
+        triangulated = null;
+      }
+      if (triangulated) replaced.set(face, triangulated);
     }
     if (replaced.size === 0) return mesh;
     const indices: number[] = [];
@@ -269,9 +491,9 @@ export function tessellateWithRuledStrips(cad: OcctKernel, shape: ShapeHandle, o
       if (replaced.has(triangleFaces[triangle])) continue;
       indices.push(mesh.indices[triangle * 3], mesh.indices[triangle * 3 + 1], mesh.indices[triangle * 3 + 2]);
     }
-    for (const strips of replaced.values()) indices.push(...strips);
-    // Drop the points inside the changed faces.
-    const remap = new Int32Array(mesh.positions.length / 3).fill(-1);
+    for (const triangles of replaced.values()) indices.push(...triangles);
+    // Drop the points inside the changed faces; the grids' new points come after the kernel's.
+    const remap = new Int32Array(vertexCount + added.positions.length / 3).fill(-1);
     let kept = 0;
     for (const vertex of indices) if (remap[vertex] < 0) remap[vertex] = kept++;
     const positions = new Float32Array(kept * 3);
@@ -279,14 +501,23 @@ export function tessellateWithRuledStrips(cad: OcctKernel, shape: ShapeHandle, o
     for (let vertex = 0; vertex < remap.length; vertex += 1) {
       const to = remap[vertex];
       if (to < 0) continue;
-      positions.set(mesh.positions.subarray(vertex * 3, vertex * 3 + 3), to * 3);
-      normals.set(mesh.normals.subarray(vertex * 3, vertex * 3 + 3), to * 3);
+      if (vertex < vertexCount) {
+        positions.set(mesh.positions.subarray(vertex * 3, vertex * 3 + 3), to * 3);
+        normals.set(mesh.normals.subarray(vertex * 3, vertex * 3 + 3), to * 3);
+      } else {
+        const from = (vertex - vertexCount) * 3;
+        positions.set(added.positions.slice(from, from + 3), to * 3);
+        normals.set(added.normals.slice(from, from + 3), to * 3);
+      }
     }
     const remapped = new Uint32Array(indices.length);
     indices.forEach((vertex, index) => {
       remapped[index] = remap[vertex];
     });
-    return { positions, normals, indices: remapped, vertexCount: kept, triangleCount: remapped.length / 3 };
+    const result = { positions, normals, indices: remapped, vertexCount: kept, triangleCount: remapped.length / 3 };
+    // Never trade a closed mesh for one with a gap.
+    if (cadMeshHasOpenEdges(result) && !cadMeshHasOpenEdges(mesh)) return mesh;
+    return result;
   } finally {
     releaseAll(cad, faces);
   }

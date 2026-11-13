@@ -1,6 +1,16 @@
 [
   {
     "title": {
+      "de": "Glatte Flächen bei Skizzen entlang eines Pfads",
+      "en": "Smooth faces on swept sketches"
+    },
+    "body": {
+      "de": "Eine Skizze, die entlang eines gebogenen Pfads gezogen wurde, sah körnig aus, vor allem im Slicer. Ihre Flächen werden jetzt in einem gleichmäßigen Gitter vernetzt und bleiben glatt. Ein schon gebauter Körper bekommt das, sobald er neu gebaut wird, etwa nach einer Änderung an seiner Skizze.",
+      "en": "A sketch swept along a curved path looked grainy, above all in the slicer. Its faces are now meshed in an even grid and stay smooth. A body built before gets this once it is built again, for example after a change to its sketch."
+    }
+  },
+  {
+    "title": {
       "de": "Meldung nach jedem Schritt abschaltbar",
       "en": "The message after each step can be switched off"
     },
