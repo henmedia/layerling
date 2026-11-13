@@ -21,7 +21,7 @@ Sok résznél a nézetben könnyű elveszíteni a fonalat. Az objektumlista ({{u
 
 ![Az objektumlista: a „Group” csoport két résszel, mellette egy gömb. Egy mappa ikon megnyitja a csoportot.](shot:object-list)
 
-- Egy bejegyzésre kattintva kijelölöd az alakzatot, a csoporton belüli részeket is. Nyomva tartott [[Shift]] billentyűvel további bejegyzéseket adsz hozzá vagy veszel el, mint a nézetben. A nyilak kinyitják és összecsukják a csoportokat.
+- Egy bejegyzésre kattintva kijelölöd az alakzatot, a csoporton belüli részeket is. Mint egy fájlkezelőben, a [[Ctrl]] (Macen [[Cmd]]) hozzáad egy bejegyzést vagy elveszi, a [[Shift]] pedig az utoljára kattintott bejegyzéstől eddig mindet kijelöli, a lista sorrendjében; a [[Ctrl]]+[[Shift]] hozzáadja őket a kijelöléshez. A nézetben viszont a [[Shift]] ad hozzá és vesz el. A nyilak kinyitják és összecsukják a csoportokat.
 - A név utáni betű mutatja, hogy egy rész {{ui:outliner.solid}} vagy {{ui:outliner.hole}}: ez a szó kezdőbetűje, és ha fölé viszed az egeret, megjelenik a teljes szó.
 - A név alatt az áll, milyen alakzatról van szó. Az a test, amely már nem egyszerű alakzat (lekerekített, kiüregelt vagy importált), {{ui:shape.exactBody}} feliratot kap, ha a STEP-export pontosan kiírja, és {{ui:shape.mesh}} feliratot, ha csak háromszögekből áll, és STL-ként megy ki. A lekerekítés vagy kiüregelés után hozzáadott szűkítés, döntés vagy csavarás csak a hálóját hajlítja meg, ezért ekkor {{ui:shape.mesh}} áll ott.
 - A lakat és a szem egyes részeket zárol és rejt el.
@@ -45,6 +45,8 @@ Egy alakzatot áthúzhatsz a tárgyasztal szélén túlra, és ott hagyhatod, mi
 ## Illesztés mozgatás közben
 
 Amikor egy alakzatot a munkasíkon húzol, más alakzatokhoz illeszkedik: a bal, jobb, első vagy hátsó éle vagy a közepe pontosan egy másik alakzat élére vagy közepére kerül. Egy rózsaszín segédvonal mutatja, mihez tartja magát. Így két rész számok begépelése nélkül egy síkban egymás mellé vagy egymás mögé középre kerül. Kikapcsolt rácsnál is működik. A munkasík közepe is számít: a rózsaszín vonalak mutatják, mikor áll az alakzat a lap közepén X, Y vagy mindkét irányban.
+
+Átméretezéskor is illeszkedik: ha egy oldalsó fogantyút húzol, az az oldal megáll más alakzatok élein és középpontjain, valamint a falnál, amelybe ütközik, egy doboz, egy kivájt test vagy egy importált ház belső falánál is, és a rózsaszín vonal mutatja, hol. Ez a méret pontosan megmarad, a rácstól függetlenül. Így egy alkatrész faltól falig kitölt egy házat: tedd az egyik falhoz, és húzd a másik oldalát a szemközti falig. [[Alt]] lenyomásával az alakzat a közepéből nő, és a húzott oldal ugyanígy illeszkedik; [[Shift]] lenyomásával megtartja az arányait, és nem illeszkedik. Ez a vízszintes munkasíkon működik, az egyenesen álló alakzatoknál, amelyek oldalai X és Y mentén futnak, és a(z) {{ui:workspace.objectSnap}} a mozgatás közbeni illesztéssel együtt kikapcsolja.
 
 Húzás közben tartsd nyomva a [[Shift]] billentyűt, hogy a mozgás egy tengelyen maradjon: az alakzat abba az irányba, X-be vagy Y-ba megy, amerre jobban elhúztad, a másikat pedig békén hagyja. A [[Shift]] billentyűt legjobb akkor megnyomni, amikor már húzod; egy még ki nem jelölt alakzaton a nyomva tartott [[Shift]] billentyűvel végzett kattintás csak a kijelöléshez adja hozzá.
 
@@ -186,6 +188,8 @@ Ha több rész van kijelölve, a jobb oldali tulajdonságpanel mutatja, hány va
 Ha egy vagy több részt ugyanannyival nagyobbítanál vagy kisebbítenél, mondjuk egy nyomtatási fájl összes részét 20%-kal, használd a {{ui:scalePercent.title}} parancsot. Jelöld ki a részeket, kattints rájuk jobb gombbal, és válaszd a {{ui:scalePercent.title}} parancsot, vagy keresd meg a [[Ctrl]]+[[K]] billentyűvel.
 
 Az {{ui:scalePercent.percent}} alá a jelenlegi méret százalékában gépeled be az új méretet: 120% egyötöddel nagyobb, 50% fele akkora. A szélesség, a mélység és a magasság egyformán változik, így az arányok megmaradnak. Az alja a helyén marad, így semmi sem süllyed a tárgyasztalba.
+
+Makettezéshez fent a {{ui:scalePercent.by.percent}} helyett válaszd a {{ui:scalePercent.by.scale}} lehetőséget. A {{ui:scalePercent.scalePresets}} alatt a szokásos méretarányok vannak Z-től (1:220) G-ig (1:22,5), a {{ui:scalePercent.ratio}} mezőbe pedig bármilyen más arányt beírhatsz, például 35-öt az 1:35-höz. Ha a modell az eredeti valódi méretében készült, hagyd a {{ui:scalePercent.original.fullSize}} lehetőséget: az 1:87 87-szer kisebbre veszi. Ha tetszőleges méretben készítetted, válaszd a {{ui:scalePercent.original.realSize}} lehetőséget, majd a {{ui:scalePercent.axis.height}} vagy a {{ui:scalePercent.axis.length}} gombot (a leghosszabb oldal a lapon), és a {{ui:scalePercent.realSize}} mezőbe írd be, mekkora valójában az eredeti, méterben (hüvelykes mértékegységnél lábban). Egy valóságban 16 m magas fa így H0-ban 16 000 mm / 87 = 184 mm magas lesz, akármekkora volt előtte. Az új méret a mezők alatt látszik, mielőtt a {{ui:scalePercent.apply}} gombra kattintasz. A méretarány beállítva marad, amíg a szerkesztő nyitva van.
 
 Több résznél kiválasztod, hogyan nőjenek:
 

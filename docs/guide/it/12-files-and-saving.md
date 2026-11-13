@@ -11,6 +11,27 @@ Se torni alla pagina iniziale da un progetto vuoto, layerling ti chiede se vuoi 
 
 Questo sistema ha un inconveniente: chi cancella i dati del browser o passa a un altro computer perde i progetti. **Fai quindi una copia di sicurezza dei lavori importanti in un file.**
 
+## I tuoi progetti, il tuo backup
+
+I tuoi progetti sono in questo browser, sul tuo computer. Come per tutti i dati, è al sicuro solo ciò che esiste una seconda volta in un altro posto: un disco che si guasta, un nuovo PC, i dati del browser cancellati o un errore del programma, e senza backup il lavoro è perso. Quel backup spetta a te; nessun programma può farlo al posto tuo. layerling lo rende facile: {{ui:dashboard.backupAll}} nella pagina iniziale mette tutti i progetti in un unico file con un clic (vedi sotto). Conserva quel file su una chiavetta USB, in una cartella cloud o su un NAS, dopo ogni sessione importante.
+
+layerling te lo ricorda. La riga sopra i progetti di questo browser si fa più evidente quanto più l'ultimo {{ui:dashboard.backupAll}} è lontano: con il pulsante {{ui:backups.backUpNow}} appena supera i giorni impostati in {{ui:backups.reminderDays}} (7 all'inizio) e da allora i progetti sono cambiati, e in rosso se ci sono più di tre progetti senza alcun backup, o nessuno da 30 giorni. L'editor te lo ricorda una volta al giorno nella riga di stato, con lo stesso pulsante. I backup automatici qui sotto non contano: sono sullo stesso computer.
+
+## Versioni precedenti
+
+layerling conserva inoltre da solo due tipi di backup:
+
+- **Prima di sovrascrivere un file.** Quando [[Ctrl]]+[[S]] o {{ui:export.saveProject}} scrive in un file `.lyl` che esiste già (Chrome ed Edge, vedi sotto), prima viene conservato il file com'era. Un file che non è cambiato dal suo ultimo backup non viene conservato due volte.
+- **Stati durante il lavoro.** Mentre lavori a un progetto, ne viene conservato uno stato ogni 10 minuti, ma solo se qualcosa è cambiato; di ogni progetto restano gli ultimi sei.
+
+{{ui:backups.title}} li elenca: nell'editor, nella finestra di esportazione sotto **LYL** e nella ricerca comandi; nella pagina iniziale, accanto a {{ui:dashboard.restoreBackup}}, per tutti i progetti; e nel menu di un progetto per quello. Ognuno mostra immagine, ora, tipo, nome e dimensione. {{ui:backups.open}} apre la versione come nuovo progetto: il progetto aperto resta com'è e quello nuovo non è legato al file originale, quindi salvarlo non sovrascrive mai quel file. Il pulsante di download salva la versione come file `.lyl`, il cestino la elimina.
+
+Nelle impostazioni (l'ingranaggio nella barra multifunzione), la pagina {{ui:backups.settingsTitle}} stabilisce quante versioni precedenti di un file restano (nessuna fino a 20, 5 all'inizio), ogni quanto resta uno stato (mai, ogni 10 o ogni 30 minuti) e da quando iniziano i promemoria. Queste impostazioni appartengono a questo browser, non a un progetto. Tutti i backup insieme occupano al massimo 500 MB; oltre, se ne vanno per primi gli stati più vecchi.
+
+**Cartella di backup (Chrome ed Edge).** In {{ui:backups.folder}} puoi scegliere una cartella sul tuo computer. Ogni backup va allora anche lì come file `.lyl` con il nome del progetto e l'ora, per esempio `Staffa 2026-11-11 20-31-05.lyl`, uno stato con ` auto` prima dell'estensione. I vecchi se ne vanno lì come nel browser; nient'altro nella cartella viene toccato. Dopo un ricaricamento il browser chiede di nuovo il permesso al primo salvataggio; uno stato conservato prima resta nel browser e il messaggio offre {{ui:backups.allowFolder}}. Una cartella sincronizzata con il cloud o su un altro disco è anch'essa un secondo posto.
+
+I backup nel browser se ne vanno con i dati del browser. Per questo non sostituiscono {{ui:dashboard.backupAll}}.
+
 ## Cartelle per i progetti
 
 Quando i progetti diventano tanti, un unico elenco non basta. Nella pagina iniziale, {{ui:shared.newFolder}} crea una cartella per i progetti salvati in questo browser; fai clic sulla cartella per aprirla. Le cartelle possono contenere altre cartelle.
@@ -25,10 +46,13 @@ Quando i progetti diventano tanti, un unico elenco non basta. Nella pagina inizi
 ## Fare copie di sicurezza e condividere i progetti
 
 Nella pagina iniziale ogni progetto ha un menu con le opzioni per rinominarlo, duplicarlo ed eliminarlo. La fila accanto alle schede ha gli stessi pulsanti su ogni scheda. Per eliminare più progetti in una volta, fai clic su {{ui:dashboard.select}}: un clic su una scheda la sceglie (un segno di spunta mostra cosa è scelto), {{ui:dashboard.selectAll}} sceglie ogni progetto dell'elenco e {{ui:common.delete}} chiede una sola volta per tutti. {{ui:dashboard.selectDone}} o [[Esc]] escono dalla selezione. {{ui:dashboard.backupAll}} raccoglie tutti i progetti della scheda aperta in un unico file ZIP. {{ui:dashboard.restoreBackup}}, subito accanto (lo trovi anche su un computer nuovo senza progetti), li ripristina, anche in un altro browser o computer. Puoi usare allo stesso scopo {{ui:dashboard.importGeometry}}. Anche gli {{ui:myShapes.title}} di questo browser vengono inclusi nello stesso file, nella cartella `Forme personalizzate`; vedi [Forme](chapter:shapes). Se ripristini un backup in un browser che contiene già alcuni di quei progetti, non vengono duplicati e l’avviso indica quanti erano già presenti. Un progetto che non si riesce a leggere viene escluso, e l'avviso lo nomina. Se la pagina si ricarica a metà di un backup, di solito perché un progetto molto grande ha preso tutta la memoria che il browser consente, la pagina iniziale dice poi a quale progetto si è fermato: salva quello da solo come file (vedi sotto) o semplifica le sue mesh più grandi, poi rifai il backup. Sopra i progetti di questo browser, una breve riga dice a che punto sono: in arancione finché non sono in nessun backup, o se dall’ultimo {{ui:dashboard.backupAll}} ce ne sono di nuovi o modificati (dice quando è stato e quanti), e in grigio quando ci sono tutti. Conta solo un backup di tutti i progetti, non quello di una cartella o di progetti scelti.
+Un backup di tutti i progetti contiene anche le impostazioni di questo browser: le tue impostazioni predefinite per i nuovi progetti, il tema, la barra multifunzione, i tuoi tasti e le stampanti. Al ripristino, una casella chiede se riprenderle; è spuntata quando questo browser non ha ancora impostazioni predefinite proprie.
 
 Solo alcuni progetti: dopo {{ui:dashboard.select}}, {{ui:dashboard.backupSelected}} impacchetta solo i progetti scelti, nelle loro cartelle, in un file ZIP, e {{ui:dashboard.backupSelected}} nel menu di una cartella impacchetta quella cartella con tutti i progetti e le cartelle che contiene. Nessuno dei due porta con sé le forme personalizzate, e {{ui:dashboard.restoreBackup}} li riporta entrambi come un backup completo. Vale per i progetti di questo browser.
 
-Dove finisce un backup: in Chrome ed Edge una finestra di salvataggio chiede la cartella e il nome, e ricorda la cartella per il backup successivo. Così i backup vanno direttamente in una cartella propria, per esempio su un'unità cloud. Lo stesso vale per {{ui:myShapes.backup}}. Gli altri browser mettono il file nella loro cartella dei download; quale sia, lo si imposta nelle impostazioni del browser.
+Dove finisce un backup: in Chrome ed Edge una finestra di salvataggio chiede la cartella e il nome, e ricorda la cartella per il backup successivo. Così i backup vanno direttamente in una cartella propria, per esempio su un'unità cloud. Lo stesso vale per {{ui:myShapes.backup}}. Gli altri browser mettono il file nella loro cartella dei download; quale sia, lo si imposta nelle impostazioni del browser. Se la finestra non restituisce alcun file, il messaggio offre {{ui:status.saveAsDownload}}: il backup finisce allora nella cartella Download come un normale download.
+
+Per provare qualcosa senza toccare un progetto, scegli {{ui:dashboard.openCopy}} nel suo menu della pagina iniziale. layerling ne fa una copia, come {{ui:common.duplicate}}, e apre subito la copia; l'originale resta com'era, qualunque cosa tu faccia nella copia. Su un server la copia si trova lì accanto all'originale.
 
 Se un progetto si apre molto lentamente o non si apre più, di solito perché la sua cronologia di passaggi di Annulla è diventata molto grande, scegli {{ui:dashboard.openWithoutHistory}} nel suo menu della pagina iniziale. layerling legge allora solo lo stato attuale, elimina definitivamente tutti i passaggi precedenti e apre il progetto; prima chiede conferma, perché non si può annullare. Per conservare i passaggi, salva prima il progetto con {{ui:dashboard.backupSelected}}.
 
@@ -114,6 +138,10 @@ Con {{ui:editor.import}} o [[Ctrl]]+[[I]] puoi importare file esterni nel proget
 Un progetto salvato con una **versione più recente di layerling** può contenere elementi che la tua versione non conosce ancora, come una nuova forma, un’impostazione o font personalizzati. Se layerling non riesce ad aprirlo per questo motivo, un messaggio indica entrambe le versioni. Se invece riesce ad aprirlo, ti avvisa che gli elementi più recenti potrebbero apparire diversi. In entrambi i casi può essere utile ricaricare la pagina: layerling.com offre sempre la versione più recente. L’app installata la scarica al successivo avvio; sul tuo server devi installare l’aggiornamento.
 
 Le immagini modello si aggiungono in modalità schizzo; vedi [Schizzi](chapter:sketches).
+
+## Mesh grandi
+
+layerling è fatto soprattutto per costruire corpi CAD esatti: un cilindro viene salvato come un cerchio e un'altezza, un raccordo come un'unica faccia curva. Una mesh importata è invece un'approssimazione fatta di triangoli, tanto più numerosi quanto più è fine, e ognuno di essi resta in memoria, viene disegnato e salvato. Pezzi piccoli come mesh non sono un problema. Mesh molto grandi, come scansioni, sculture o modelli da Blender con centinaia di migliaia o milioni di triangoli, rallentano l'editor, occupano molta memoria e rallentano il salvataggio, e tagliarle potrebbe non riuscire affatto. Dopo un'importazione che porta mesh di questo tipo, layerling lo segnala una volta. Semplifica prima una mesh del genere (vedi sotto), importa solo i pezzi che ti servono, oppure costruisci i pezzi semplici con le forme di layerling.
 
 ## Semplificare una mesh importata
 

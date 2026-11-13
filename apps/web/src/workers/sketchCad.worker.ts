@@ -13,6 +13,8 @@ import { buildInsetSketchSolid } from "@/lib/cadSketchInset";
 import { pathWire } from "@/lib/sketchCadWire";
 import { buildMessage } from "@/lib/buildStamp";
 import { meshTreatedBody } from "@/lib/cadMeshAccuracy";
+import { tessellateWithRuledStrips } from "@/lib/cadRuledStrips";
+import { closeFlatMeshGaps } from "@/lib/meshHoleFill";
 import { SKETCH_EDGE_FAILED, SKETCH_INSET_UNSUPPORTED, SKETCH_STROKE_UNSUPPORTED, type SketchCadBuildRequest, type SketchCadBuildResponse } from "@/lib/sketchCadTypes";
 
 /** Past this many edges in a sketch's outlines the kernel's validity check is skipped (it takes seconds to minutes there). */
@@ -97,7 +99,9 @@ self.onmessage = async (event: MessageEvent<SketchCadBuildRequest>) => {
       result = chamfered;
     }
     const deflection = request.revolve ? sketchRevolveCadDeflection(request.profile, request.revolve.smoothness) : sketchCadDeflection(request.profile);
-    const mesh = cad.tessellate(result, { linearDeflection: deflection.linear, angularDeflection: deflection.angular });
+    // The side of an extruded curve in straight strips, not the kernel's leaning triangles (#1696), and a flat face
+    // the kernel left without triangles capped from its rim (#1711).
+    const mesh = closeFlatMeshGaps(tessellateWithRuledStrips(cad, result, { linearDeflection: deflection.linear, angularDeflection: deflection.angular }));
     const positions = new Float32Array(mesh.positions);
     const normals = new Float32Array(mesh.normals);
     const indices = new Uint32Array(mesh.indices);

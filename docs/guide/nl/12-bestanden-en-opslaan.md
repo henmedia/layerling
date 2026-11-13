@@ -11,6 +11,27 @@ Ga je terug naar de startpagina vanuit een ontwerp waar niets in staat, dan vraa
 
 Dat heeft een keerzijde: wie de browseropslag wist of op een andere computer verdergaat, is de ontwerpen kwijt. **Maak van belangrijk werk dus een back-up in een bestand.**
 
+## Jouw ontwerpen, jouw back-up
+
+Je ontwerpen staan in deze browser op je computer. Zoals bij alle gegevens is alleen veilig wat een tweede keer op een andere plek bestaat: een kapotte schijf, een nieuwe pc, gewiste browsergegevens of een fout in het programma, en zonder back-up is het werk weg. Die back-up is jouw zaak; geen programma kan dat voor je doen. layerling maakt het makkelijk: {{ui:dashboard.backupAll}} op de startpagina zet met één klik alle ontwerpen in één bestand (zie hieronder). Bewaar dat bestand op een usb-stick, in een cloudmap of op een NAS, na elke grotere sessie.
+
+layerling herinnert je eraan. De regel boven de ontwerpen van deze browser wordt nadrukkelijker naarmate de laatste {{ui:dashboard.backupAll}} langer geleden is: met de knop {{ui:backups.backUpNow}} zodra die ouder is dan de dagen onder {{ui:backups.reminderDays}} (eerst 7) en er sindsdien ontwerpen zijn veranderd, en in rood als er meer dan drie ontwerpen zijn zonder enige back-up, of 30 dagen geen. De editor herinnert je eens per dag in de statusregel, met dezelfde knop. De automatische back-ups hieronder tellen hier niet: ze staan op dezelfde computer.
+
+## Eerdere versies
+
+layerling maakt daarnaast vanzelf twee soorten back-ups:
+
+- **Vóór het overschrijven.** Als [[Ctrl]]+[[S]] of {{ui:export.saveProject}} in een `.lyl`-bestand schrijft dat er al is (Chrome en Edge, zie hieronder), blijft eerst het bestand bewaard zoals het was. Een bestand dat sinds zijn laatste back-up niet veranderd is, wordt niet twee keer bewaard.
+- **Tussenstanden tijdens het werken.** Terwijl je aan een ontwerp werkt, blijft er elke 10 minuten een stand van bewaard, maar alleen als er iets veranderd is; per ontwerp blijven de laatste zes.
+
+{{ui:backups.title}} toont ze: in de editor in het exportvenster onder **LYL** en in het zoeken naar opdrachten, op de startpagina naast {{ui:dashboard.restoreBackup}} voor alle ontwerpen, en in het menu van een ontwerp voor dat ene. Elke versie toont afbeelding, tijd, soort, naam en grootte. {{ui:backups.open}} opent de versie als nieuw ontwerp: het geopende ontwerp blijft zoals het is, en het nieuwe hangt niet aan het oorspronkelijke bestand, dus opslaan overschrijft dat bestand nooit. De downloadknop slaat de versie op als `.lyl`-bestand, de prullenbak verwijdert haar.
+
+In de instellingen (het tandwiel in het lint) legt de pagina {{ui:backups.settingsTitle}} vast hoeveel eerdere versies van een bestand blijven (geen tot 20, eerst 5), hoe vaak een tussenstand blijft (nooit, elke 10 of elke 30 minuten) en wanneer de herinneringen beginnen. Deze instellingen horen bij deze browser, niet bij een ontwerp. Alle back-ups samen nemen hoogstens 500 MB in beslag; daarboven gaan eerst de oudste tussenstanden weg.
+
+**Back-upmap (Chrome en Edge).** Onder {{ui:backups.folder}} kies je een map op je computer. Elke back-up komt daar dan ook als `.lyl`-bestand met de naam van het ontwerp en de tijd, bijvoorbeeld `Houder 2026-11-11 20-31-05.lyl`, een tussenstand met ` auto` voor de extensie. Oude verdwijnen daar net als in de browser; verder blijft alles in de map onaangeroerd. Na het herladen vraagt de browser bij de eerste keer opslaan opnieuw om toestemming; een tussenstand daarvoor blijft in de browser, en de melding biedt {{ui:backups.allowFolder}} aan. Een map die met de cloud wordt gesynchroniseerd of op een andere schijf staat, is ook een tweede plek.
+
+De back-ups in de browser verdwijnen met de browsergegevens. Daarom vervangen ze {{ui:dashboard.backupAll}} niet.
+
 ## Mappen voor je ontwerpen
 
 Met tientallen ontwerpen is één lijst niet genoeg. Op de startpagina maakt {{ui:shared.newFolder}} een map voor de ontwerpen in deze browser; een klik op de map opent haar. Mappen kunnen mappen bevatten.
@@ -25,10 +46,13 @@ Met tientallen ontwerpen is één lijst niet genoeg. Op de startpagina maakt {{u
 ## Back-up maken en doorgeven
 
 Op de startpagina heeft elk ontwerp een menu met de opties hernoemen, dupliceren en verwijderen. De rij naast de tabbladen heeft op elk tabblad dezelfde knoppen. Om meerdere ontwerpen tegelijk te verwijderen, klik je op {{ui:dashboard.select}}: een klik op een kaart kiest die (een vinkje toont wat gekozen is), {{ui:dashboard.selectAll}} kiest elk ontwerp in de lijst, en {{ui:common.delete}} vraagt één keer voor allemaal. {{ui:dashboard.selectDone}} of [[Esc]] verlaat de selectie. Met {{ui:dashboard.backupAll}} pak je alle ontwerpen van het open tabblad in één enkel ZIP-bestand in. {{ui:dashboard.restoreBackup}}, ernaast (ook op een nieuwe computer zonder ontwerpen), haalt ze terug, ook in een andere browser of op een andere computer; {{ui:dashboard.importGeometry}} neemt hetzelfde bestand. De {{ui:myShapes.title}} van deze browser reizen mee in hetzelfde bestand, in de map `Custom shapes`, zie [Vormen](chapter:vormen). Zet je een back-up terug in een browser die een deel van deze ontwerpen al heeft, dan worden die niet nog eens toegevoegd; de melding noemt hoeveel er al waren. Een ontwerp dat niet gelezen kan worden, wordt overgeslagen, en de melding noemt het. Herlaadt de pagina midden in een back-up, meestal omdat een heel groot ontwerp al het geheugen nam dat de browser toestaat, dan zegt de startpagina daarna bij welk ontwerp het stopte: sla dat los op als bestand (zie hieronder) of vereenvoudig zijn grootste meshes, en maak dan opnieuw een back-up. Boven de ontwerpen van deze browser zegt een korte regel hoe ze ervoor staan: oranje zolang ze in geen back-up zitten, of als er sinds de laatste {{ui:dashboard.backupAll}} nieuwe of gewijzigde zijn (met wanneer dat was en hoeveel), en grijs zodra ze er allemaal in zitten. Alleen een back-up van alle ontwerpen telt, niet die van een map of van gekozen ontwerpen.
+Een back-up van alle ontwerpen bevat ook de instellingen van deze browser: je standaard voor nieuwe ontwerpen, het thema, het lint, je eigen toetsen en de printers. Bij het terugzetten vraagt een vinkje of je ze ook wilt overnemen; het staat aan als deze browser nog geen eigen standaard heeft.
 
 Alleen sommige ontwerpen: na {{ui:dashboard.select}} pakt {{ui:dashboard.backupSelected}} alleen de gekozen ontwerpen, in hun mappen, in één ZIP-bestand, en {{ui:dashboard.backupSelected}} in het menu van een map pakt die map met alle ontwerpen en mappen erin. Geen van beide neemt de eigen vormen mee, en {{ui:dashboard.restoreBackup}} haalt beide terug zoals een volledige back-up. Dit geldt voor de ontwerpen van deze browser.
 
-Waar een back-up terechtkomt: in Chrome en Edge vraagt een opslagvenster naar de map en de naam, en het onthoudt de map voor de volgende back-up. Zo gaan je back-ups meteen naar een eigen map, bijvoorbeeld op een clouddrive. Hetzelfde geldt voor {{ui:myShapes.backup}}. Andere browsers zetten het bestand in hun downloadmap; welke map dat is, stel je in de instellingen van de browser in.
+Waar een back-up terechtkomt: in Chrome en Edge vraagt een opslagvenster naar de map en de naam, en het onthoudt de map voor de volgende back-up. Zo gaan je back-ups meteen naar een eigen map, bijvoorbeeld op een clouddrive. Hetzelfde geldt voor {{ui:myShapes.backup}}. Andere browsers zetten het bestand in hun downloadmap; welke map dat is, stel je in de instellingen van de browser in. Geeft het venster geen bestand terug, dan biedt de melding {{ui:status.saveAsDownload}} aan: de back-up komt dan als gewone download in de map Downloads.
+
+Wil je iets uitproberen zonder een ontwerp aan te raken, kies dan {{ui:dashboard.openCopy}} in het menu van het ontwerp op de startpagina. layerling maakt een kopie, zoals {{ui:common.duplicate}}, en opent meteen de kopie; het origineel blijft zoals het was, wat je ook in de kopie doet. Op een server staat de kopie daar naast het origineel.
 
 Opent een ontwerp heel traag of helemaal niet, meestal omdat de geschiedenis van stappen voor Ongedaan maken erg groot is geworden, kies dan {{ui:dashboard.openWithoutHistory}} in het menu ervan op de startpagina. layerling leest dan alleen de huidige stand, verwijdert alle eerdere stappen definitief en opent het ontwerp; na een vraag, want dit kan niet ongedaan worden gemaakt. Wil je de stappen houden, maak dan eerst een back-up met {{ui:dashboard.backupSelected}}.
 
@@ -112,6 +136,10 @@ Met {{ui:editor.import}} of [[Ctrl]]+[[I]] haal je bestanden van buiten in het o
 Een ontwerp dat met een **nieuwere layerling** is opgeslagen, kan dingen bevatten die jouw versie nog niet kent, zoals een nieuwe vorm, een nieuwe instelling of eigen lettertypen. Kan layerling het daardoor niet openen, dan noemt de melding beide versies. Opent het wel, dan zegt de melding dat nieuwere dingen er hier anders uit kunnen zien. Hoe dan ook helpt het om de pagina opnieuw te laden: layerling.com levert altijd de nieuwste versie. De geïnstalleerde app haalt hem op bij de volgende keer starten; op je eigen server installeer je de update.
 
 Sjabloonafbeeldingen voeg je toe in de schetsmodus, zie [Schetsen](chapter:schetsen).
+
+## Grote meshes
+
+layerling is in de eerste plaats gemaakt om exacte CAD-lichamen te bouwen: een cilinder wordt opgeslagen als een cirkel en een hoogte, een afronding als één gebogen vlak. Een geïmporteerde mesh is daarentegen een benadering uit driehoeken, hoe fijner, hoe meer, en elk daarvan staat in het geheugen, wordt getekend en opgeslagen. Kleinere onderdelen als mesh zijn geen probleem. Zeer grote meshes, zoals scans, sculpturen of modellen uit Blender met honderdduizenden of miljoenen driehoeken, maken de editor trager, kosten veel geheugen en vertragen het opslaan, en snijden lukt er misschien helemaal niet mee. Na een import die zulke meshes binnenhaalt, meldt layerling dat één keer. Vereenvoudig zo'n mesh eerst (zie hieronder), importeer alleen de onderdelen die je nodig hebt, of bouw eenvoudige onderdelen met de eigen vormen van layerling.
 
 ## Een geïmporteerde mesh vereenvoudigen
 

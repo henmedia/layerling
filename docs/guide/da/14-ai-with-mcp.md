@@ -97,7 +97,7 @@ AI'en arbejder med de samme funktioner som dig, gennem den samme vej som din han
 | `layerling_import_mesh` | bringer et trekantsmesh ind i designet |
 | `layerling_update_object` | ændrer dimensioner, position, farve, navn, solid eller hul og alt andet der udgør formen, en teksts bogstavkant inkluderet |
 | `layerling_align_objects` | justerer objekter med hinanden |
-| `layerling_scale_objects` | skalerer objekter med en procent, sammen eller hver på stedet |
+| `layerling_scale_objects` | skalerer objekter med en procent, sammen eller hver på stedet, eller til en modelskala som 1:87 |
 | `layerling_lay_flat` | lægger et objekt med én flade på pladen |
 | `layerling_place_on_face` | sætter objekter ned på en flade af en anden, også skrå, som C-tasten |
 | `layerling_perforate_face` | skærer et hulmønster ind i en flad flade eller rundt om væggen på en cylinder, et rør eller en boring; hullerne bliver som huller grupperet med formen |
@@ -170,6 +170,8 @@ AI'en arbejder med de samme funktioner som dig, gennem den samme vej som din han
 | `layerling_saved_view` | gemmer den aktuelle visning under tasten 7, 8, 9 eller 0 og går tilbage til den, som Shift+tast og tasten (kun visningen); sætter også startvisningen for nye designs |
 | `layerling_build_plates` | viser, tilføjer, navngiver, ordner og fjerner byggepladerne, flytter objekter til en plade og fordeler dem på pladerne, som pladelinjen |
 | `layerling_clear_history` | sletter hvert fortryd-trin for evigt, som historikvisningens "Slet historik"-knap; kræver `confirm: true` |
+| `layerling_list_backups` | viser de automatiske sikkerhedskopier (Tidligere versioner) af det åbne design, eller med `all: true` af alle designs i denne browser |
+| `layerling_open_backup` | åbner en sikkerhedskopi via dens `id` som et nyt design, aldrig knyttet til den oprindelige fil |
 | `layerling_set_history_view` | ser tilbage på en tidligere tilstand af projektet, som historikvisningen (det rigtige design forbliver urørt; ændringsværktøjer venter indtil den er lukket) |
 | `layerling_restore_from_history` | henter objekter (også dele i grupper) fra en tidligere tilstand tilbage i designet som kopier, som historikvisningens knap til at hente ind i designet - ét trin, som fortryd tager tilbage |
 | `layerling_export_section_svg` | returnerer omridsene på et skæreplan som en SVG i 1:1, fra de samme former som eksporten |

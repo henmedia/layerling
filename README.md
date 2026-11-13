@@ -21,7 +21,7 @@
     <a href="#layerling-mcp-skill"><img alt="Drivable by AI" src="https://img.shields.io/badge/AI--drivable-MCP%20server-16c0d4"></a>
   </p>
 
-  <p><strong>English</strong> · <a href="README.de.md">Deutsch</a> · <a href="README.es.md">Español</a> · <a href="README.nl.md">Nederlands</a> · <a href="README.ar.md">العربية</a> · <a href="README.ja.md">日本語</a> · <a href="README.zh-cn.md">简体中文</a> · <a href="README.zh-tw.md">繁體中文</a></p>
+  <p><strong>English</strong> · <a href="README.de.md">Deutsch</a> · <a href="README.es.md">Español</a> · <a href="README.nl.md">Nederlands</a> · <a href="README.pl.md">Polski</a> · <a href="README.sv.md">Svenska</a> · <a href="README.ar.md">العربية</a> · <a href="README.ja.md">日本語</a> · <a href="README.zh-cn.md">简体中文</a> · <a href="README.zh-tw.md">繁體中文</a></p>
 </div>
 
 <p align="center">
@@ -46,7 +46,7 @@ layerling sits a step beyond Tinkercad towards Fusion 360: it is operated the sa
 - **Hollow, split, sketch, thread.** Hollow a body to an even wall, split it with a plane or stretch it there, draw sketches with exact lengths and angles and extrude or revolve them, and add screws, nuts and tapped holes.
 - **Patterns and wrapping.** Repeat a shape in a row, a grid of columns and rows, a circle or a spiral, or wrap a pattern or text around a cylinder.
 - **Hole patterns.** Click a flat face, or the round wall of a cylinder or tube, and spread round, square, rectangular, hexagonal or slot holes over it, in a grid or staggered, with spacing, margin and depth - vents, speaker grilles and baskets in one step. Or set a ring of screw holes along its edge, with counterbores or countersinks if you like, or repeat a shape of your own over it, rivets or a diamond plate.
-- **Scale by percent.** Make one or many parts larger or smaller by a percentage - together, so the layout grows with them, or each in place.
+- **Scale by percent.** Make one or many parts larger or smaller by a percentage - together, so the layout grows with them, or each in place. Or bring them to a model scale such as 1:87 for H0, from the original's real size if you like (a tree 16 m tall becomes 184 mm).
 - **Match sizes.** Hold Alt on an align dot and the parts stretch instead of moving: to the side of another part, or to its width, length or height - to swap a box for a cylinder of the same size, for instance.
 - **Equal gaps.** Spread parts of different sizes so the space between them is the same everywhere - between the outer two, on a board with the same gap at its edges, or row by row, as for a peg puzzle; or type the gap.
 - **Measure and look inside.** Tape measure, rulers, a section view that cuts the model open, and a history slider to look back at earlier states.
@@ -70,7 +70,7 @@ It is not a full CAD package: there is no parametric timeline and no assemblies.
 - **Light and shadows to taste** – shading contrast, shadow strength and softness, and the direction and height of the light, up to straight above as in Tinkercad, all in the settings. A "Tinkercad look" button sets colours, grid and light like there in one go, and the darker grid lines can come every centimetre in a colour of their own.
 - **Fast mode** – for slower computers: one switch in the settings turns off shadows, edge lines and the camera's inertia and draws the view at screen resolution; the camera's inertia can also be switched off on its own, so the view stops the moment you let go.
 - **Align faces and see the angles** – the Align faces tool brings a face of one part against a face of another, touching or flush, with an optional gap, puts a hole or pin on the axis of another hole, or moves a part straight so a corner or reference point lands on a point of another part, along X, Y and Z or only some of them, and with a second and third pair of points turns it into place, like aligning by three points; a turned body shows its angles about X, Y and Z under the selection, and the Rotation card in its settings takes them as numbers.
-- **Snap to other shapes** – while moving, a shape locks its edges or centre onto the edges and centres of the shapes around it, with a guide line, so parts sit flush without typing numbers. The centre of the workplane counts too, to put a part in the middle of the plate. Alt during the drag pauses it; Shift keeps the move on one axis, and Alt held from the start drags a copy, as in Tinkercad.
+- **Snap to other shapes** – while moving, a shape locks its edges or centre onto the edges and centres of the shapes around it, with a guide line, so parts sit flush without typing numbers. The centre of the workplane counts too, to put a part in the middle of the plate. Alt during the drag pauses it; Shift keeps the move on one axis, and Alt held from the start drags a copy, as in Tinkercad. Resizing snaps too: a side handle stops at the edges of other shapes and at the wall it runs into, the inside wall of a box included, so a part fills a case from wall to wall.
 - **Set down on faces** – like Cruise in Tinkercad: a new shape lies down on the face under the pointer, sloped ones too, and C picks the selection up and sets it down on another face the same way. Hold Shift while placing or carrying it and it sinks in instead, upright, its top flush with the face - for a countersink or a counterbore.
 - **Reference points** – right-click a body to mark its centre, corners or edge middles with points that nothing prints and that dragged shapes snap to; drag a point or type its coordinates, and the marks are saved with the design. The tape measure can mark the middle of a measurement - the centre of a round hole, for one.
 - **Protractor** – the protractor in the view bar measures the angle at a corner from three clicks, or between two flat faces (a 45° chamfer reads 45° · 135°); it snaps to corners and edges like the tape measure and follows the bodies.
@@ -79,7 +79,7 @@ It is not a full CAD package: there is no parametric timeline and no assemblies.
 - **Command search** – press Ctrl+K and type a tool, a shape or a command ("fillet", "mirror", "cylinder") to jump straight to it; it understands English and German words and shows the keyboard shortcuts beside each entry.
 - **Your own keys** – put any command of the command search on a key you choose, in the keyboard shortcuts window: Center on workplane, the shapes panel or your favourite shape is then one key away.
 - **Your own ribbon** – take the groups and buttons you never use out of the ribbon in the settings (Appearance); the command search and the keys still run them, and the order of the ribbon stays the same.
-- **Focus mode** – on a small laptop screen, hide the editor's title row and footer with one button or Ctrl+Shift+F; a small bar over the view keeps the tabs, Home, the command search and the settings. It also comes by itself while the browser is in full screen (F11).
+- **Focus mode** – on a small laptop screen, hide the editor's title row and footer with one button or Ctrl+Shift+F; a small bar over the view keeps the tabs, Home, the design's name, the command search and the settings. It also comes by itself while the browser is in full screen (F11).
 - **History view** – look back at any earlier state of the project with a slider, without changing anything; export that state or start a new project from it. By @rmpel. Undo and Redo name the step they take back in their tooltip, with its measure ("Rounded the edges of Box (5 mm)"), and a list in the History view names every step, to jump to any of them with one click.
 - **Millimetres or inches** – with Imperial units every measure is shown in inches, as fractions like Tinkercad (1 5/8) or as decimals, the snap grid steps from 1/64 to 1 inch, and the plate's grid is drawn in inches.
 - **Your printer's plate** – pick one of more than 230 common printers and the plate takes its size - round for a delta printer such as an FLSun. Its name and build volume show in the corner of the workplane (a switch in the settings hides this and the design's name), and a warning appears when a body reaches past the edge.
@@ -131,6 +131,7 @@ It is not a full CAD package: there is no parametric timeline and no assemblies.
 - **Delete several designs at once** – **Select** on the start page chooses designs by a click on their cards (or all of them), and one question deletes the whole choice; it works in the server folder too.
 - **Folders for your designs** – sort the designs on the start page into folders (and folders into folders) by dragging them or with "Move to …"; the search looks through all of them, and "Back up all" keeps them.
 - **Projects as files** – save a whole project, history, sketches and groups included, as a `.lyl` file and carry on elsewhere. In Chrome and Edge you choose the folder yourself and Ctrl+S saves into that same file again; other browsers download it. Older `.skf` files from earlier versions still open; saving then writes a `.lyl` beside them.
+- **Earlier versions** – before Save writes over a `.lyl` file, layerling keeps the file as it was, and while you work a state of the design every few minutes; each opens again as a new design. How many stay is set under Settings → Backups, and in Chrome and Edge they can also go into a folder of your own. A notice on the start page and in the editor reminds you to back up all designs into a file and keep it in a second place: your designs, your backup.
 - **Bug report** – one link in the footer saves a ZIP with the design as a `.lyl` and a text with the version, browser and last messages, ready to attach in the forum or on GitHub, which refuse a bare `.lyl`.
 - **Designs you recognise** – each design with a thumbnail, in your own browser or in the server folder.
 - **Attachments** – keep notes, a photo of the printed part or a datasheet inside the design: `.md` and `.txt` files, `.png`, `.jpg` and `.webp` pictures and PDF files travel with the `.lyl` file. The eye opens a text or a picture in a window; a PDF is downloaded. SVG is not accepted, since it can carry scripts.
@@ -142,7 +143,7 @@ It is not a full CAD package: there is no parametric timeline and no assemblies.
 - **Four saved views per design** – **Shift+7**, **8**, **9** or **0** saves the view exactly as it is (angle, pan, zoom), and the key alone brings it back. Each design keeps its own, and a saved `.lyl` file carries them along.
 - **Look straight onto the workplane** – **P**, or the button next to Place workplane in the view bar, turns the view square onto the workplane, on a sloped face too, with its origin in the middle.
 - **The view cube in any corner** – Settings > Appearance > **View cube position** puts the cube in the top left, top right, bottom left or bottom right; in any corner but the top left, the view bar moves up into its place.
-- **In your language** – the program and its user guide come in English, German and 17 more languages; the language list is at the very top right.
+- **In your language** – the program and its user guide come in English, German and 18 more languages; the language list is at the very top right.
 - **Look from below** – the eye over a grid in the view bar hides the plate, so the underside of a design can be seen without it in the way.
 - **A second view in its own window** – a button in the view bar opens a second window that shows the same design through a camera of its own, with its own view cube and view bar, and follows every change. It opens where you last left it.
 - **Panels where you want them** – the object list, the settings, the section view, the tape measure and the tool panels for edges, hollowing and patterns move by their title bar and open there again; a double-click docks them.
@@ -359,6 +360,9 @@ there.
 under a free name, picture and all – nothing is repacked, so the copy carries exactly the geometry of the original. In
 your browser the copy becomes a design of its own, with the same shapes, the same history and its own preview picture,
 and it belongs to nobody on the server.
+
+**Open a copy** in the same menu does the same and opens the copy right away, for trying something out: the original
+stays as it was, whatever you do in the copy.
 
 A design that lives on the server saves itself back there, five seconds after the last change and when you leave the
 editor. Thumbnails land beside the files in `.thumbnails`. Designs that are only in your browser stay there, untouched.

@@ -11,6 +11,27 @@ Ha egy üres tervből mész vissza a kezdőlapra, a layerling megkérdezi, megta
 
 Ennek van egy hátulütője: aki törli a böngésző tárolóját, vagy másik számítógépre vált, elveszíti a terveket. **A fontos munkáidról ezért készíts biztonsági mentést egy fájlba.**
 
+## A terveid, a te biztonsági mentésed
+
+A terveid ebben a böngészőben vannak, a számítógépeden. Mint minden adatnál, csak az van biztonságban, ami egy másik helyen is megvan: egy tönkrement lemez, egy új gép, törölt böngészőadatok vagy egy programhiba, és mentés nélkül a munka elvész. Erről a mentésről neked kell gondoskodnod; ezt egy program sem tudja helyetted megtenni. A layerling megkönnyíti: a kezdőoldalon a {{ui:dashboard.backupAll}} egy kattintással minden tervet egyetlen fájlba tesz (lásd lent). Ezt a fájlt minden nagyobb munka után tedd pendrive-ra, felhőmappába vagy NAS-ra.
+
+A layerling emlékeztet rá. A böngésző tervei fölötti sor annál feltűnőbb, minél régebben volt az utolsó {{ui:dashboard.backupAll}}: a {{ui:backups.backUpNow}} gombbal, amint régebbi, mint a {{ui:backups.reminderDays}} alatt beállított napok (kezdetben 7), és azóta változtak tervek, pirosan pedig, ha háromnál több terv van és egyáltalán nincs mentés, vagy 30 napja nincs. A szerkesztő naponta egyszer emlékeztet az állapotsorban, ugyanazzal a gombbal. A lenti automatikus mentések itt nem számítanak: ugyanazon a gépen vannak.
+
+## Korábbi változatok
+
+A layerling ezenkívül magától kétféle mentést készít:
+
+- **Felülírás előtt.** Ha a [[Ctrl]]+[[S]] vagy a {{ui:export.saveProject}} egy már meglévő `.lyl` fájlba ír (Chrome és Edge, lásd lent), előbb megmarad a fájl úgy, ahogy volt. Az utolsó mentése óta változatlan fájl nem marad meg kétszer.
+- **Munka közbeni állapotok.** Amíg egy terven dolgozol, 10 percenként megmarad egy állapota, de csak ha valami változott; tervenként az utolsó hat marad.
+
+A {{ui:backups.title}} felsorolja őket: a szerkesztőben az exportálás ablakában a **LYL** alatt és a parancskeresőben, a kezdőoldalon a {{ui:dashboard.restoreBackup}} mellett az összes tervre, és egy terv menüjében arra az egyre. Mindegyiknél látszik a kép, az idő, a fajta, a név és a méret. A {{ui:backups.open}} új tervként nyitja meg a változatot: a megnyitott terv változatlan marad, az új pedig nincs az eredeti fájlhoz kötve, így mentése sosem írja felül azt a fájlt. A letöltés gomb `.lyl` fájlként menti a változatot, a kuka törli.
+
+A beállításokban (fogaskerék a szalagon) a {{ui:backups.settingsTitle}} oldal adja meg, hány korábbi változat marad meg egy fájlból (egy sem–20, kezdetben 5), milyen gyakran marad meg egy állapot (soha, 10 vagy 30 percenként), és mikortól jönnek az emlékeztetők. Ezek a beállítások ehhez a böngészőhöz tartoznak, nem egy tervhez. Az összes mentés együtt legfeljebb 500 MB-ot foglal; e fölött először a legrégebbi állapotok tűnnek el.
+
+**Mentési mappa (Chrome és Edge).** A {{ui:backups.folder}} alatt kiválaszthatsz egy mappát a gépeden. Ekkor minden mentés oda is bekerül `.lyl` fájlként a terv nevével és az idővel, például `Tartó 2026-11-11 20-31-05.lyl`, egy állapot ` auto` taggal a kiterjesztés előtt. A régiek ott is eltűnnek, mint a böngészőben; a mappában semmi máshoz nem nyúl. Újratöltés után a böngésző az első mentéskor újra engedélyt kér; az addigi állapot a böngészőben marad, és az üzenet felajánlja a {{ui:backups.allowFolder}} lehetőséget. A felhővel szinkronizált vagy másik lemezen lévő mappa szintén második hely.
+
+A böngészőben lévő mentések a böngésző adataival együtt elvesznek. Ezért nem helyettesítik a {{ui:dashboard.backupAll}} gombot.
+
 ## Mappák a terveidhez
 
 Több tucat tervnél egyetlen lista már nem elég. A kezdőlapon a {{ui:shared.newFolder}} mappát készít ennek a böngészőnek a terveihez; a mappára kattintva megnyílik. A mappák mappákat is tartalmazhatnak.
@@ -25,10 +46,13 @@ A {{ui:dashboard.backupAll}} megőrzi a mappákat: a tervek a biztonsági menté
 ## Biztonsági mentés és továbbadás
 
 A kezdőlapon minden tervnek van egy menüje az átnevezés, a másolatkészítés és a törlés lehetőségével. A fülek melletti sorban minden fülön ugyanazok a gombok vannak. Ha egyszerre több tervet törölnél, kattints a(z) {{ui:dashboard.select}} gombra: egy kártyára kattintva kiválasztod (egy pipa mutatja, mi van kiválasztva), a(z) {{ui:dashboard.selectAll}} a lista minden tervét kiválasztja, a(z) {{ui:common.delete}} pedig egyszer kérdez rá mindegyikre. A(z) {{ui:dashboard.selectDone}} vagy az [[Esc]] kilép a kiválasztásból. A {{ui:dashboard.backupAll}} gombbal a nyitott fül összes tervét egyetlen ZIP-fájlba csomagolod. A mellette lévő {{ui:dashboard.restoreBackup}} (új, tervek nélküli számítógépen is ott van) visszahozza őket, másik böngészőben vagy másik számítógépen is; a {{ui:dashboard.importGeometry}} ugyanezt a fájlt fogadja. Ennek a böngészőnek a {{ui:myShapes.title}} ugyanabban a fájlban utaznak, a `Custom shapes` mappában, lásd az [Alakzatok](chapter:shapes) fejezetet. Ha olyan böngészőbe állítasz vissza mentést, amelyben ezek közül néhány terv már megvan, azok nem kerülnek be még egyszer; az üzenet megmondja, hányat találtunk már meg. Egy olvashatatlan terv kimarad, és az üzenet megnevezi. Ha az oldal egy mentés közben újratöltődik, általában mert egy nagyon nagy terv elfoglalta a böngésző által engedett összes memóriát, a kezdőlap utána megmondja, melyik tervnél állt meg: azt mentsd el külön fájlként (lásd lent), vagy egyszerűsítsd a legnagyobb hálóit, majd készíts újra mentést. A kártyák előnézeti képei is bekerülnek a fájlba, így visszaállítás után azonnal megjelennek. A böngésző tervei fölött egy rövid sor megmondja, hol tartanak: narancssárga, amíg egyik mentésben sincsenek, vagy ha a legutóbbi {{ui:dashboard.backupAll}} óta új vagy módosított terv van (megmondja, mikor volt és hány ilyen van), és szürke, ha mind benne van. Csak az összes terv mentése számít, egy mappáé vagy kiválasztott terveké nem.
+Az összes terv biztonsági mentése ennek a böngészőnek a beállításait is tartalmazza: az új tervek alapértelmezését, a témát, a menüszalagot, a saját billentyűidet és a nyomtatókat. Visszaállításkor egy jelölőnégyzet megkérdezi, hogy ezeket is átvegye-e; be van jelölve, ha ennek a böngészőnek még nincs saját alapértelmezése.
 
 Csak néhány terv: a {{ui:dashboard.select}} után a {{ui:dashboard.backupSelected}} csak a kiválasztott terveket csomagolja a mappáikkal együtt egy ZIP-fájlba, egy mappa menüjében pedig a {{ui:dashboard.backupSelected}} a mappát csomagolja a benne lévő összes tervvel és mappával. Egyik sem viszi magával a saját formákat, és a {{ui:dashboard.restoreBackup}} mindkettőt visszahozza, mint egy teljes mentést. Ez a böngésző saját terveire vonatkozik.
 
-Hová kerül a biztonsági mentés: Chrome-ban és Edge-ben egy mentési ablak megkérdezi a mappát és a nevet, és a következő mentéshez megjegyzi a mappát. Így a mentések egyenesen egy saját mappába kerülnek, például egy felhőtárhelyre. Ugyanez érvényes erre is: {{ui:myShapes.backup}}. Más böngészők a letöltési mappájukba teszik a fájlt; hogy ez melyik mappa, azt a böngésző beállításaiban lehet megadni.
+Hová kerül a biztonsági mentés: Chrome-ban és Edge-ben egy mentési ablak megkérdezi a mappát és a nevet, és a következő mentéshez megjegyzi a mappát. Így a mentések egyenesen egy saját mappába kerülnek, például egy felhőtárhelyre. Ugyanez érvényes erre is: {{ui:myShapes.backup}}. Más böngészők a letöltési mappájukba teszik a fájlt; hogy ez melyik mappa, azt a böngésző beállításaiban lehet megadni. Ha az ablak nem ad vissza fájlt, az üzenet felajánlja ezt: {{ui:status.saveAsDownload}}; a mentés ekkor normál letöltésként a Letöltések mappába kerül.
+
+Ha ki akarsz próbálni valamit anélkül, hogy egy tervhez hozzányúlnál, válaszd a kezdőlapon a terv menüjében a {{ui:dashboard.openCopy}} pontot. A layerling másolatot készít, mint a {{ui:common.duplicate}}, és rögtön megnyitja a másolatot; az eredeti olyan marad, amilyen volt, bármit csinálsz a másolatban. Szerveren a másolat ott, az eredeti mellett lesz.
 
 Ha egy terv nagyon lassan vagy egyáltalán nem nyílik meg, többnyire azért, mert a visszavonási lépések előzménye nagyon nagyra nőtt, válaszd a kezdőlapon a menüjében a {{ui:dashboard.openWithoutHistory}} pontot. A layerling ekkor csak a jelenlegi állapotot olvassa be, minden korábbi lépést véglegesen töröl, és megnyitja a tervet; előtte rákérdez, mert ez nem vonható vissza. Ha meg akarod tartani a lépéseket, előbb ments a tervről a {{ui:dashboard.backupSelected}} gombbal.
 
@@ -114,6 +138,10 @@ Az {{ui:editor.import}} gombbal vagy a [[Ctrl]]+[[I]] billentyűvel hozol be ide
 Egy **újabb layerlinggel** mentett terv olyasmit tartalmazhat, amit a te verziód még nem ismer, például egy új alakzatot, egy új beállítást vagy saját betűtípusokat. Ha a layerling emiatt nem tudja megnyitni, az üzenet mindkét verziót megnevezi. Ha megnyílik, az értesítés jelzi, hogy az újabb dolgok itt másképp nézhetnek ki. Mindkét esetben az oldal újratöltése segít: a layerling.com mindig a legújabb verziót adja. A telepített alkalmazás a következő indításkor veszi át; a saját szervereden te telepíted a frissítést.
 
 A mintaképeket vázlatmódban adod hozzá, lásd a [Vázlatok](chapter:sketches) fejezetet.
+
+## Nagy hálók
+
+A layerling elsősorban pontos CAD-testek építésére készült: egy henger körként és magasságként, egy lekerekítés egyetlen görbült felületként tárolódik. Egy importált háló ezzel szemben háromszögekből álló közelítés, minél finomabb, annál több háromszöggel, és mindegyik a memóriában van, kirajzolódik és mentődik. Kisebb alkatrészek hálóként nem gondot okoznak. A nagyon nagy hálók, például szkennek, szobrok vagy Blenderből származó modellek százezres vagy milliós háromszögszámmal, lelassítják a szerkesztőt, sok memóriát foglalnak és lassítják a mentést, és a vágásuk akár egyáltalán nem sikerül. Ha egy importálás ilyen hálókat hoz be, a layerling ezt egyszer jelzi. Az ilyen hálót először egyszerűsítsd (lásd lent), csak a szükséges alkatrészeket importáld, vagy az egyszerű részeket a layerling saját alakzataiból építsd meg.
 
 ## Importált háló egyszerűsítése
 

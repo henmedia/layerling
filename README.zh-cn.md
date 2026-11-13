@@ -21,7 +21,7 @@
     <a href="#layerling-mcp-skill"><img alt="可由 AI 驱动" src="https://img.shields.io/badge/AI--drivable-MCP%20server-16c0d4"></a>
   </p>
 
-  <p><strong>简体中文</strong> · <a href="README.md">English</a> · <a href="README.de.md">Deutsch</a> · <a href="README.es.md">Español</a> · <a href="README.nl.md">Nederlands</a> · <a href="README.ar.md">العربية</a> · <a href="README.ja.md">日本語</a> · <a href="README.zh-tw.md">繁體中文</a></p>
+  <p><strong>简体中文</strong> · <a href="README.md">English</a> · <a href="README.de.md">Deutsch</a> · <a href="README.es.md">Español</a> · <a href="README.nl.md">Nederlands</a> · <a href="README.pl.md">Polski</a> · <a href="README.sv.md">Svenska</a> · <a href="README.ar.md">العربية</a> · <a href="README.ja.md">日本語</a> · <a href="README.zh-tw.md">繁體中文</a></p>
 </div>
 
 <p align="center">
@@ -131,6 +131,7 @@ layerling 站在 Tinkercad 之上、朝 Fusion 360 更近一步：操作方式�
 - **一次删除多个设计** – 起始页上的 **选择** 通过单击卡片（或全选）选中设计，一次确认即可删除全部所选；在服务器文件夹中同样可用。
 - **为设计建立文件夹**——把起始页上的设计拖进文件夹（文件夹还能放进文件夹），或使用“移动到……”，从而整理它们；搜索会查遍所有文件夹，“全部备份”会把它们一并保存。
 - **把项目存成文件**——把整个项目（包括历史记录、草图和分组）保存为 `.lyl` 文件，带到别处继续。在 Chrome 和 Edge 中，你可以自己选择文件夹，Ctrl+S 会再次保存到同一个文件；其他浏览器则会下载它。旧版本留下的 `.skf` 文件仍可打开；保存时会在旁边写入一个 `.lyl`。
+- **早期版本**——在“保存”覆盖 `.lyl` 文件之前，layerling 会保留文件原来的样子，工作时每隔几分钟还会保留一次设计的中间状态；每个版本都能作为新设计重新打开。保留多少可在 设置 → 备份 中设定，在 Chrome 和 Edge 中还可以保存到你自己的文件夹。首页和编辑器中的提示会提醒你把所有设计备份到一个文件，并存放在第二个位置：你的设计，你的备份。
 - **错误报告**——页脚里的一个链接会保存一个 ZIP，其中包含作为 `.lyl` 的设计，以及记录版本、浏览器和最近消息的文本文件，可直接附到论坛或 GitHub 上，因为它们不接受单独的 `.lyl`。
 - **一眼认出的设计**——所有内容都在你自己的浏览器里，每个设计都有缩略图。
 - **附件** – 把笔记、打印成品的照片或数据表放进设计里：`.md` 和 `.txt` 文件、`.png`、`.jpg` 和 `.webp` 图片以及 PDF 文件会随 `.lyl` 文件一起保存。眼睛图标在窗口中打开文字或图片；PDF 则会下载。不接受 SVG，因为它可能包含脚本。
@@ -142,7 +143,7 @@ layerling 站在 Tinkercad 之上、朝 Fusion 360 更近一步：操作方式�
 - **每个设计四个保存的视图**——**Shift+7**、**8**、**9** 或 **0** 会按当前样子保存视图（角度、平移、缩放），单独按对应键即可恢复。每个设计各有自己的视图，保存的 `.lyl` 文件也会带上它们。
 - **正视工作平面**——按 **P**，或点视图栏中“放置工作平面”旁的按钮，视图会正对工作平面，斜面上也可以，原点位于中央。
 - **视图立方体可放在任意角落**——设置 > 外观 > **视图立方体位置** 可把立方体放到左上、右上、左下或右下；只要不是左上角，相机控件就会上移填补它的位置。
-- **使用你的语言** – 程序和用户手册提供英语、德语以及另外 17 种语言；语言列表在右上角最顶端。
+- **使用你的语言** – 程序和用户手册提供英语、德语以及另外 18 种语言；语言列表在右上角最顶端。
 - **从下方观察**——相机栏中网格上方的眼睛图标会隐藏平台，这样就能看到设计的底面，而不会被平台挡住。
 - **独立窗口中的第二视图** – 相机栏中的按钮打开第二个窗口，用自己的相机、视图立方体和相机栏显示同一个设计，并跟随每一次更改。它会在你上次放置的位置打开。
 - **把面板放到想要的位置**——对象列表、设置、剖视图、卷尺，以及边、抽壳和阵列的工具面板都可以拖动标题栏移动，并在那里再次打开；双击即可停靠。
@@ -234,6 +235,8 @@ curl -fsSL https://raw.githubusercontent.com/henmedia/layerling/main/scripts/mac
 想在电脑、NAS（Synology、Unraid 等）或家用服务器上运行 layerling 又不想安装 Node.js，可以使用 Docker Hub 上现成的镜像
 **`henmedia/layerling`**（**`ghcr.io/henmedia/layerling`** 也是同一个镜像）。每个版本都会以版本号和 `latest` 发布
 amd64 与 arm64（树莓派、ARM NAS）镜像。应用监听 **3000** 端口。
+
+第一次用 Docker？[一步步在 Docker 中运行 layerling（英文）](docs/docker/en/docker-step-by-step.md) 从零开始，适用于 Windows、macOS 和 Linux：安装 Docker、启动 layerling，并把设计作为文件保存在电脑上的一个文件夹里。
 
 最快的方式是一条命令：
 

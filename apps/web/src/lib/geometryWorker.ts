@@ -1,6 +1,6 @@
 import { buildsDiffer, BUILD_ID, isBuildMessage, reportWorkerBuild } from "@/lib/buildStamp";
 import { checkClearance, type ClearanceOptions, type ClearanceResult } from "@/lib/clearanceCheck";
-import { buildGroupedShapeFromSelection, exportSolidVolume, faceReadJoins, faceReadPositions, previewSplitConnectors, splitShapeIfCrossed, splitShapesByPlane, type ExportSolidVolume, type GroupBuildResult, type SplitConnectorPreview, type SplitShapesOutcome } from "@/lib/editorBooleans";
+import { buildGroupedShapeFromSelection, exportSolidVolume, faceReadJoins, faceReadPositions, previewSplitConnectors, splitShapeIfCrossed, splitShapesByPlane, type ExportSolidVolume, type RebuildStretchedGroup, type GroupBuildResult, type SplitConnectorPreview, type SplitShapesOutcome } from "@/lib/editorBooleans";
 import { packValue, packedTransfer, unpackValue } from "@/lib/geometryTransfer";
 import { articulateShapes, type FlexiOptions, type FlexiShapesResult } from "@/lib/flexiJoints";
 import { lidForShapes, lidTopForShapes, type LidOptions, type LidShapeResult } from "@/lib/lidTool";
@@ -263,10 +263,10 @@ function splitShapeOffThread(shape: WorkplaneShape, plane: SplitPlane, connector
 
 /**
  * splitShapesByPlane (lib/editorBooleans.ts) with each cut made off the page, with connectors when they are asked for - or,
- * with `stretch`, each body made that much longer at the plane (Discussions #506, #1569).
+ * with `stretch`, each body made that much longer at the plane (Discussions #506, #1569); a group with `rebuildGroup` part by part, so it stays a group (Discussion #1707).
  */
-export function splitShapesByPlaneOffThread(targets: readonly WorkplaneShape[], plane: SplitPlane, stillCurrent: () => boolean, signal?: AbortSignal, connectors?: SplitConnectorOptions, stretch?: number): Promise<SplitShapesOutcome> {
-  return splitShapesByPlane(targets, plane, stillCurrent, (shape, shapePlane, asked, length) => splitShapeOffThread(shape, shapePlane, asked, length, signal), connectors, stretch);
+export function splitShapesByPlaneOffThread(targets: readonly WorkplaneShape[], plane: SplitPlane, stillCurrent: () => boolean, signal?: AbortSignal, connectors?: SplitConnectorOptions, stretch?: number, rebuildGroup?: RebuildStretchedGroup): Promise<SplitShapesOutcome> {
+  return splitShapesByPlane(targets, plane, stillCurrent, (shape, shapePlane, asked, length) => splitShapeOffThread(shape, shapePlane, asked, length, signal), connectors, stretch, rebuildGroup);
 }
 
 /**

@@ -46,7 +46,7 @@ At the left edge is a narrow bar. From the top:
 - {{ui:camera.orthographic}} switches to a flat view in which parallel edges stay parallel. For measuring and lining up edges that is often more comfortable than the perspective view. [[O]] switches back and forth, and a second click returns.
 - {{ui:camera.secondView}} opens a second view of the design in a window of its own, described below. A second click closes it.
 - {{ui:camera.showScrollbars}} puts a scrollbar along the bottom of the view and one down its right edge. Drag a bar to slide the view smoothly, click an arrow at its end to move it a little (hold it to keep going), or click beside the bar to move by most of the view. Nothing turns, and unlike the arrow keys the bars work while a part is selected - handy close up on small details. A second click hides them; {{ui:workspace.startWithScrollbars}} in the settings decides whether a design opens with them. This browser also remembers the switch.
-- {{ui:camera.hideWorkplane}} (the eye over a grid) hides the plate with its grid, so you can look at the underside of a design from below. Only the view changes: new shapes still land on the workplane. A second click shows it again.
+- {{ui:camera.hideWorkplane}} (the eye over a grid) hides the plate with its grid, so you can look at the underside of a design from below. Only the view changes: new shapes still land on the workplane. A second click shows it again. With a workplane on a face it is called {{ui:camera.hideBuildPlate}} and hides only the build plate: the workplane on the face stays, it has its own eye, {{ui:camera.hideFaceWorkplane}}.
 - {{ui:camera.placeWorkplane}}, the tape measure and the framing square are tools of their own, covered below and in [Measuring and notes](chapter:measuring-and-notes).
 
 The small arrow at the very top of the bar hides it if it gets in the way. That same button, dragged, moves the bar anywhere in the editor, in a sketch too; a double click puts it back. The 3D preview of a revolved sketch moves by its title in the same way.
@@ -101,6 +101,7 @@ When a design holds more than one plate can print, a box with its lid and insert
 
 - Every plate is as large as the workplane, and the plates lie side by side to the right of the first one, 20 mm apart. A body belongs to the plate the middle of its footprint stands on, so dragging it across puts it on the other plate. A design holds up to 12 plates.
 - A click on a plate in the bar looks at it, and new shapes and imported files then land on it. {{ui:plates.showAll}} looks at all of them. A double click on a plate, or {{ui:plates.rename}}, gives it a name such as "Lid", which is written on the plate.
+- A new sketch on the plate starts on the active plate too: the sketch area shows that plate with the bodies on it, and the finished body stands there.
 - {{ui:plates.moveLeft}} and {{ui:plates.moveRight}} change the order, the bodies moving with their plate. {{ui:plates.remove}} takes the active plate away; its bodies go onto the first plate at the same spot.
 - {{ui:plates.arrange}} lays the selected bodies, or all of them, out row by row on the plates, the largest first, 5 mm apart, and adds plates while they are needed. A body larger than a plate stays where it is.
 - With a printer chosen, every body is checked against its own plate, and the build height counts from the lowest body on that plate. A plate with a body that does not fit shows its number in red.
@@ -157,7 +158,7 @@ The sketch view has its own colours: {{ui:workspace.sketchBackground}} for the w
 
 ### Appearance: axis arrows and edge lines
 
-{{ui:workspace.showAxes}} (on by default) draws three arrows at the back left corner of the plate: **X** in red to the right, **Y** in green to the back and **Z** in blue upwards, the way the position fields count. That is the right-hand rule Tinkercad, CAD programs and the slicers use too. With the workplane on a face they follow it. Switch them off here if they are in your way.
+{{ui:workspace.showAxes}} (on by default) draws three arrows at the back left corner of the plate: **X** in red to the right, **Y** in green to the back and **Z** in blue upwards, the way the position fields count. That is the right-hand rule Tinkercad, CAD programs and the slicers use too. With the workplane on a face they follow it. Switch them off here if they are in your way. While the arrows are on, the centre cross of the grid takes their colours too: the line along X red, the one along Y green, so on a small part you see at once which way each axis runs.
 
 {{ui:workspace.edgeLines}} draws an outline on every body, in the colour of {{ui:workspace.edgeColor}} (black to begin with, as in Tinkercad): it helps when dark colours run into each other. It is off by default, and very large imported meshes are left out.
 
@@ -192,6 +193,8 @@ The sketch view has its own colours: {{ui:workspace.sketchBackground}} for the w
 {{ui:workspace.startWithScrollbars}}: a design then opens with the view's scrollbars shown. It is saved with the design and with {{ui:workspace.makeDefault}}.
 
 {{ui:workspace.viewBarOpensOnHover}}: a view bar folded away opens while the mouse is over its arrow and folds again shortly after the mouse has left it, unless one of its tools is in use. A click on the arrow while it is open like this keeps it open. It works with the mouse only; on a touch screen a tap opens the bar as before.
+
+{{ui:workspace.showStepNotices}}: after a step such as a union, a short message beside the view cube says what was done and offers {{ui:shortcuts.undo}}. Switched off, these messages stay away; messages that want something from you or report a problem still appear, and {{ui:editor.tool.undo}} in the ribbon still names the step when you point at it.
 
 {{ui:workspace.startView}} sets the angle a new design opens in and {{ui:camera.home}} goes back to. Turn and zoom the view the way you like it, then click {{ui:workspace.startViewUseCurrent}}; {{ui:workspace.startViewStandard}} brings back the usual view from the front right. It holds for every design in this browser. A design you open again still opens the way you left it.
 

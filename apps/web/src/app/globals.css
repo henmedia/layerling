@@ -1381,6 +1381,29 @@ html[data-theme="dark"] .dashboard-trademark {
   font-weight: 600;
 }
 
+/* The button a notice may carry, such as "Download instead" after a backup whose save dialog handed back no file. */
+.dashboard-notice-action {
+  margin-left: 10px;
+  padding: 3px 10px;
+  border: 1px solid #c96a12;
+  border-radius: 6px;
+  background: #fff4e6;
+  color: #9a4f08;
+  font: inherit;
+  cursor: pointer;
+}
+
+.dashboard-notice-action:hover,
+.dashboard-notice-action:focus-visible {
+  background: #ffe6c2;
+}
+
+html[data-theme="dark"] .dashboard-notice-action {
+  border-color: #f3a452;
+  background: #3a2c16;
+  color: #f3a452;
+}
+
 /* The recommendation to install layerling as an app: a card under the start tiles that is meant
    to be seen - what it brings, an install button where the browser has one, "Not now" for two
    weeks and a cross for good. */
@@ -2071,6 +2094,38 @@ html[data-theme="dark"] .whats-new-earlier:hover {
   background: #3a2c16;
 }
 
+/* An announcement from the author (announcements.json): the whole text, paragraphs and points, read like a letter. */
+.announcement {
+  /* Opened again from the footer, it scrolls up to just below the sticky top bar. */
+  scroll-margin-top: 86px;
+}
+
+.announcement-body p {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.55;
+}
+
+.announcement-body ul {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+  padding-inline-start: 20px;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.5;
+  list-style: disc;
+}
+
+.announcement-body li::marker {
+  color: #bf6508;
+}
+
+html[data-theme="dark"] .announcement-body li::marker {
+  color: #f3a452;
+}
+
 .dashboard-action-tile {
   display: flex;
   min-width: 0;
@@ -2666,6 +2721,30 @@ html[data-theme="dark"] .whats-new-earlier:hover {
   opacity: 0.45;
 }
 
+/* "Keep empty design?" (Discussion #1669): the question larger and centred,
+   Keep in green beside the red Delete, so the answers tell themselves apart. */
+.empty-project-dialog header {
+  justify-content: center;
+  text-align: center;
+}
+
+.empty-project-dialog header strong {
+  font-size: 18px;
+}
+
+.empty-project-dialog p {
+  text-align: center;
+}
+
+.empty-project-dialog .dashboard-confirm-actions {
+  justify-content: center;
+}
+
+.empty-project-dialog .dashboard-confirm-save {
+  border-color: #2e7d32;
+  background: #2e7d32;
+}
+
 .dashboard-rename-dialog > label {
   display: grid;
   gap: 7px;
@@ -3102,6 +3181,27 @@ html[data-theme="dark"] .edge-modifier-quick-actions button.active {
 /* Five hole shapes: three to a row. */
 .hole-pattern-panel .hole-pattern-forms {
   grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+/* Scale by percent: the model railway gauges, four to a row. */
+.model-scale-presets {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.model-scale-presets button {
+  padding: 0 4px;
+  white-space: nowrap;
+}
+
+.model-scale-result {
+  margin: 8px 0 0;
+  color: #6d5133;
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+}
+
+html[data-theme="dark"] .model-scale-result {
+  color: #d9c3a8;
 }
 
 /* Paint: fill, circle and lasso side by side. */
@@ -4820,6 +4920,18 @@ html[data-theme="dark"] .toolbar-title-help .action-icon-button.active svg path 
 
 .shape-menu-trigger.active::before {
   transform: translateX(-50%) scaleY(-1);
+}
+
+/* The tab's hit area: resting the mouse on it opens the shapes panel, as on a folded group (#1722). A little larger than
+   the chevron, so it is easy to meet, and above it, so the chevron itself stays a drawing only. */
+.shape-menu-tab {
+  position: absolute;
+  z-index: 2;
+  bottom: -13px;
+  left: 50%;
+  width: 26px;
+  height: 13px;
+  transform: translateX(-50%);
 }
 
 .shape-menu-dropdown {
@@ -7170,7 +7282,6 @@ html[data-theme="dark"] .sketch-shape-options .unit {
   color: #321d07;
   background: rgba(247, 235, 223, 0.82);
   border-color: rgba(207, 182, 155, 0.7);
-  transform: translateX(1px);
 }
 
 .camera-controls button:focus-visible {
@@ -8430,16 +8541,39 @@ html[data-theme="dark"] .touch-multi-select {
   filter: drop-shadow(0 0 4px rgba(129, 67, 0, 0.4));
 }
 
+/* The numbers sit on a small plate of their own, so grid lines behind them do not cut through
+   the digits at any zoom (Discussion #1704: 10 px plain text on a 1/8" grid was unreadable). */
 .corner-ruler-tick-label {
   position: absolute;
   z-index: 2;
-  color: #5a3917;
-  font-size: 10px;
-  font-weight: 600;
+  padding: 2px 4px;
+  color: #4a2e12;
+  background: rgba(255, 255, 255, 0.88);
+  border-radius: 4px;
+  box-shadow: 0 0 0 1px rgba(90, 57, 23, 0.18);
+  font-size: 12px;
+  font-weight: 700;
   line-height: 1;
   text-align: center;
+  white-space: nowrap;
   pointer-events: none;
   transform: translate(-50%, -50%);
+}
+
+/* Dark and graphite: the dark brown of the square vanished on the dark grid (Discussion #1686). The arms take
+   the orange of the tape measure, the ticks a light tan, the numbers a light tone with a dark edge. */
+html[data-theme="dark"] .corner-ruler-arm {
+  stroke: #f2a65a;
+}
+
+html[data-theme="dark"] .corner-ruler-tick {
+  stroke: #d9b48a;
+}
+
+html[data-theme="dark"] .corner-ruler-tick-label {
+  color: #f6dfc2;
+  background: rgba(24, 20, 16, 0.86);
+  box-shadow: 0 0 0 1px rgba(242, 166, 90, 0.35);
 }
 
 .corner-ruler-delete {
@@ -8539,15 +8673,46 @@ html[data-theme="dark"] .touch-multi-select {
 /* The ruler's lines stay in view over bodies (the eye is open) or hide behind them. */
 .corner-ruler-occlude-toggle,
 .corner-ruler-selected-toggle,
-.corner-ruler-plate-toggle {
+.corner-ruler-plate-toggle,
+.corner-ruler-arms-toggle {
   color: #6b5b46;
   background: rgba(255, 255, 255, 0.96);
   border-color: rgba(182, 97, 8, 0.45);
 }
 
 .corner-ruler-occlude-toggle.active,
-.corner-ruler-selected-toggle.active {
+.corner-ruler-selected-toggle.active,
+.corner-ruler-arms-toggle.active {
   color: #b66108;
+}
+
+/* The switch of one arm (Discussion #1649): its axis letter, filled in the axis colour while the arm is shown. */
+.corner-ruler-arm-toggle {
+  --corner-ruler-arm-axis: #6b5b46;
+  width: 18px;
+  height: 18px;
+  color: var(--corner-ruler-arm-axis);
+  background: rgba(255, 255, 255, 0.96);
+  border: 1px dashed var(--corner-ruler-arm-axis);
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.corner-ruler-arm-toggle.axis-x { --corner-ruler-arm-axis: #d6363c; }
+.corner-ruler-arm-toggle.axis-y { --corner-ruler-arm-axis: #2f9a4b; }
+.corner-ruler-arm-toggle.axis-z { --corner-ruler-arm-axis: #2f6fe0; }
+
+.corner-ruler-arm-toggle.active,
+.corner-ruler-arm-toggle.active:hover {
+  color: #ffffff;
+  background: var(--corner-ruler-arm-axis);
+  border-style: solid;
+}
+
+/* The last arm shown cannot be switched off. */
+.corner-ruler-arm-toggle:disabled {
+  cursor: default;
 }
 
 .corner-ruler-tick-label.hidden,
@@ -8603,6 +8768,22 @@ html[data-theme="dark"] .touch-multi-select {
 [data-theme="dark"] .corner-ruler-mode-toggle:hover {
   background: rgba(46, 125, 50, 0.35);
   border-color: #81c784;
+}
+
+[data-theme="dark"] .corner-ruler-arm-toggle.axis-x { --corner-ruler-arm-axis: #ff6b70; }
+[data-theme="dark"] .corner-ruler-arm-toggle.axis-y { --corner-ruler-arm-axis: #5fd47c; }
+[data-theme="dark"] .corner-ruler-arm-toggle.axis-z { --corner-ruler-arm-axis: #6aa0ff; }
+
+[data-theme="dark"] .corner-ruler-arm-toggle {
+  color: var(--corner-ruler-arm-axis);
+  border-color: var(--corner-ruler-arm-axis);
+}
+
+[data-theme="dark"] .corner-ruler-arm-toggle.active,
+[data-theme="dark"] .corner-ruler-arm-toggle.active:hover {
+  color: #14110e;
+  background: var(--corner-ruler-arm-axis);
+  border-color: var(--corner-ruler-arm-axis);
 }
 
 [data-theme="dark"] .ruler-coordinate-badge {
@@ -9960,6 +10141,34 @@ html[data-theme="dark"] .rotation-angle-badge {
   color: #98846f;
   font-size: 12px;
   font-weight: 600;
+}
+
+/* The colour code in the header of the colour card, to type in (Discussion #1674): text until pointed at. */
+.color-hex-input {
+  width: 92px;
+  min-width: 0;
+  padding: 3px 6px;
+  border: 1px solid transparent;
+  border-radius: 5px;
+  background: transparent;
+  font-family: inherit;
+  text-align: right;
+}
+
+.color-hex-input:hover:not(:disabled),
+.color-hex-input:focus {
+  border-color: rgba(152, 132, 111, 0.55);
+}
+
+.color-hex-input:focus {
+  outline: none;
+  background: rgba(152, 132, 111, 0.1);
+  text-align: left;
+}
+
+.color-hex-input::placeholder {
+  color: inherit;
+  opacity: 1;
 }
 
 .color-grid {
@@ -16052,6 +16261,40 @@ html[data-theme="dark"] .export-holes-only-warning svg {
 /* ==========================================================================
    Open group: the bar that closes it again
    ========================================================================== */
+/* The newest state of the design could not be stored (#1652): stays up, red, until a save gets through. */
+.unsaved-design-banner {
+  position: fixed;
+  bottom: 140px;
+  left: 50%;
+  z-index: 42;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  max-width: min(640px, calc(100vw - 32px));
+  padding: 10px 16px;
+  color: #fff;
+  font-size: 13px;
+  line-height: 1.4;
+  background: #c82031;
+  border-radius: 10px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.25);
+  transform: translateX(-50%);
+}
+
+.unsaved-design-banner strong {
+  font-size: 14px;
+}
+
+/* The browser's own words and its storage figures (#1639): smaller, and selectable to copy. */
+.unsaved-design-banner .unsaved-design-detail {
+  margin-top: 4px;
+  font-size: 11px;
+  line-height: 1.35;
+  opacity: 0.9;
+  overflow-wrap: anywhere;
+  user-select: text;
+}
+
 .open-group-banner {
   position: fixed;
   bottom: 88px;
@@ -17140,6 +17383,27 @@ html[data-theme="dark"] .qr-code-panel small.qr-code-warning {
   border-color: #b45a0c;
 }
 
+.new-version-notice-actions .primary:disabled {
+  cursor: progress;
+  opacity: 0.6;
+}
+
+/* The open design could not be stored (#1639): reloading would lose its newest changes. */
+.new-version-notice .new-version-notice-unsaved {
+  margin: 0;
+  padding: 8px 10px;
+  color: #ffffff;
+  font-weight: 600;
+  background: #c82031;
+  border-radius: 6px;
+}
+
+.new-version-notice-actions .danger {
+  color: #ffffff;
+  background: #c82031;
+  border-color: #a81a29;
+}
+
 /* Interactive Help (#424): while it is on the pointer is a question mark and whatever has a name
    under it is outlined; a click asks the guide about it. The window is a tool panel of its own,
    at the left edge so it stands beside the tool panels at the right, and above every dialog. */
@@ -17259,6 +17523,11 @@ html[data-theme="dark"] .interactive-help-window a:not(.primary):not(.secondary)
   color: inherit;
   font: inherit;
   cursor: pointer;
+  /* Held on a phone or tablet: no text selection, magnifier or long-press menu, and the touch stays with the button (#1671). */
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
+  touch-action: none;
 }
 
 .simple-mode-hold::after {
@@ -17283,6 +17552,7 @@ html[data-theme="dark"] .interactive-help-window a:not(.primary):not(.secondary)
 .dashboard-welcome-switch a,
 .dashboard-welcome-videos a,
 .whats-new-note a,
+.announcement-body a,
 .guide-videos a,
 .interactive-help-more a {
   color: #8f4700;
@@ -17295,6 +17565,7 @@ html[data-theme="dark"] .interactive-help-window a:not(.primary):not(.secondary)
 .dashboard-welcome-switch a:hover,
 .dashboard-welcome-videos a:hover,
 .whats-new-note a:hover,
+.announcement-body a:hover,
 .guide-videos a:hover,
 .interactive-help-more a:hover {
   color: #ad6206;
@@ -17304,6 +17575,7 @@ html[data-theme="dark"] .interactive-help-window a:not(.primary):not(.secondary)
 .dashboard-welcome-switch a[target="_blank"]::after,
 .dashboard-welcome-videos a[target="_blank"]::after,
 .whats-new-note a[target="_blank"]::after,
+.announcement-body a[target="_blank"]::after,
 .guide-videos a[target="_blank"]::after,
 .interactive-help-more a[target="_blank"]::after {
   content: "\00a0\2197\FE0E";
@@ -17315,6 +17587,7 @@ html[data-theme="dark"] .interactive-help-window a:not(.primary):not(.secondary)
 html[data-theme="dark"] .dashboard-welcome-switch a,
 html[data-theme="dark"] .dashboard-welcome-videos a,
 html[data-theme="dark"] .whats-new-note a,
+html[data-theme="dark"] .announcement-body a,
 html[data-theme="dark"] .guide-videos a,
 html[data-theme="dark"] .interactive-help-more a {
   color: #f3a452;
@@ -17323,6 +17596,7 @@ html[data-theme="dark"] .interactive-help-more a {
 html[data-theme="dark"] .dashboard-welcome-switch a:hover,
 html[data-theme="dark"] .dashboard-welcome-videos a:hover,
 html[data-theme="dark"] .whats-new-note a:hover,
+html[data-theme="dark"] .announcement-body a:hover,
 html[data-theme="dark"] .guide-videos a:hover,
 html[data-theme="dark"] .interactive-help-more a:hover {
   color: #ffc784;
@@ -17935,4 +18209,32 @@ html[data-theme="dark"] .select-property select option {
 }
 html[data-theme="dark"] .property-card > button.property-card-header:hover {
   background: rgba(255, 255, 255, 0.1);
+}
+
+.align-size-toggle {
+  display: none;
+  position: absolute;
+  left: 12px;
+  bottom: 72px;
+  padding: 8px 14px;
+  border: 1px solid var(--border-strong);
+  border-radius: 999px;
+  background: var(--panel);
+  color: var(--foreground);
+  font: 600 13px var(--font-ui);
+  box-shadow: 0 2px 8px rgba(40, 27, 13, 0.22);
+  pointer-events: auto;
+  touch-action: manipulation;
+}
+
+.align-size-toggle.on {
+  background: rgba(173, 89, 0, 0.92);
+  border-color: rgba(173, 89, 0, 0.92);
+  color: #fff;
+}
+
+@media (any-pointer: coarse) {
+  .align-size-toggle {
+    display: block;
+  }
 }

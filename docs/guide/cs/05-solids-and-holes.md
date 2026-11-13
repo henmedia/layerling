@@ -125,6 +125,8 @@ Výřezy se rozdělují bez spojovacích prvků.
 
 {{ui:split.modeStretch}} nahoře v panelu vedle {{ui:split.modeSplit}} výběr v rovině prodlouží, místo aby ho rozřízl na dvě části - třeba staženou krabičku bez souboru CAD, jejíž přihrádka má být delší. Umístěte rovinu jako při dělení, přes část, která smí narůst, a zadejte {{ui:split.stretchLength}}: část na straně, kam ukazuje šipka, se posune o tuto délku a řez tělesem v rovině, protažený o tuto délku, vyplní mezeru. Rovné stěny a dna se prodlouží; přihrádky, zaoblení a otvory na obou stranách si zachovají velikost. Záporná hodnota ho zkrátí: na straně šipky se odebere plátek této tloušťky a zbytek se přisune. {{ui:split.stretchApply}} změnu použije; každý objekt, který rovina protne, zůstane jedním uzavřeným tělesem se svým názvem, polygonovou sítí jako poloviny při dělení. Vede-li rovina šikmou nebo zaoblenou částí, její řez se protáhne rovně; umístěte ji proto tam, kde je těleso rovné.
 
+Skupina zůstane skupinou: její části, které rovina protíná, se prodlouží, části za rovinou se posunou s nimi a části před ní zůstanou, jak jsou. Její otvory zůstanou otvory, části, kterých se rovina nedotkne, si ponechají své nastavení, a {{ui:editor.tool.ungroup}} ji pak dál rozloží. Zrcadlená, zúžená, zaoblená nebo texturovaná skupina se dál natahuje jako jedno těleso. Objekt vybraný s ostatními, který leží celý za rovinou, se posune také, takže otvor na konci krabičky zůstane na konci.
+
 Poloviny jsou běžné polygonové sítě. Parametry původního tvaru, například počet stran válce nebo text nápisu, už nemají; nastavte je před rozdělením. [[Ctrl]]+[[Z]] obnoví originál jediným krokem. Zamčené a skryté objekty nelze rozdělit.
 
 ## Oddělení částí

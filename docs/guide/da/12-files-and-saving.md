@@ -11,6 +11,27 @@ Hvis du går tilbage til startsiden fra et design der ikke har noget i sig, spø
 
 Det har en ulempe: den der rydder browserens lager eller skifter til en anden computer mister designsene. **Så sikkerhedskopiér vigtigt arbejde i en fil.**
 
+## Dine designs, din sikkerhedskopi
+
+Dine designs ligger i denne browser på din computer. Som med alle data er kun det sikkert, der findes en gang til et andet sted: et defekt drev, en ny pc, slettede browserdata eller en fejl i programmet, og uden sikkerhedskopi er arbejdet væk. Den sikkerhedskopi er dit ansvar; intet program kan tage den fra dig. layerling gør det nemt: {{ui:dashboard.backupAll}} på startsiden lægger med ét klik alle designs i én fil (se nedenfor). Gem filen på en USB-nøgle, i en skymappe eller på en NAS efter hver større session.
+
+layerling minder dig om det. Linjen over designene i denne browser bliver tydeligere, jo længere den seneste {{ui:dashboard.backupAll}} ligger tilbage: med knappen {{ui:backups.backUpNow}}, så snart den er ældre end dagene under {{ui:backups.reminderDays}} (7 til at begynde med), og designs er ændret siden, og i rødt, når der er mere end tre designs og slet ingen sikkerhedskopi, eller ingen i 30 dage. Editoren minder dig om det én gang om dagen i statuslinjen med samme knap. De automatiske sikkerhedskopier nedenfor tæller ikke her: de ligger på samme computer.
+
+## Tidligere versioner
+
+layerling laver desuden selv to slags sikkerhedskopier:
+
+- **Før en fil overskrives.** Når [[Ctrl]]+[[S]] eller {{ui:export.saveProject}} skriver i en `.lyl`-fil, der findes i forvejen (Chrome og Edge, se nedenfor), gemmes filen først, som den var. En fil, der ikke er ændret siden sin seneste sikkerhedskopi, gemmes ikke to gange.
+- **Mellemstande mens du arbejder.** Mens du arbejder på et design, gemmes en stand af det hvert 10. minut, men kun når noget er ændret; de seneste seks af hvert design bliver.
+
+{{ui:backups.title}} viser dem: i editoren i eksportvinduet under **LYL** og i kommandosøgningen, på startsiden ved siden af {{ui:dashboard.restoreBackup}} for alle designs og i et designs menu for det ene. Hver viser billede, tid, art, navn og størrelse. {{ui:backups.open}} åbner versionen som et nyt design: det åbne design forbliver, som det er, og det nye er ikke knyttet til den oprindelige fil, så det overskriver aldrig den fil, når det gemmes. Download-knappen gemmer versionen som en `.lyl`-fil, skraldespanden sletter den.
+
+I indstillingerne (tandhjulet i båndet) fastlægger siden {{ui:backups.settingsTitle}}, hvor mange tidligere versioner af en fil der gemmes (ingen til 20, 5 til at begynde med), hvor ofte en stand gemmes (aldrig, hvert 10. eller hvert 30. minut), og hvornår påmindelserne begynder. Indstillingerne hører til denne browser, ikke til et design. Alle sikkerhedskopier fylder tilsammen højst 500 MB; derover forsvinder de ældste mellemstande først.
+
+**Mappe til sikkerhedskopier (Chrome og Edge).** Under {{ui:backups.folder}} kan du vælge en mappe på din computer. Hver sikkerhedskopi lægges så også der som en `.lyl`-fil med designets navn og tidspunktet, for eksempel `Holder 2026-11-11 20-31-05.lyl`, en mellemstand med ` auto` før endelsen. Gamle forsvinder der som i browseren; intet andet i mappen røres. Efter en genindlæsning beder browseren om tilladelse igen første gang, du gemmer; en mellemstand fra før bliver i browseren, og meddelelsen tilbyder {{ui:backups.allowFolder}}. En mappe, der synkroniseres med skyen eller ligger på et andet drev, er også et andet sted.
+
+Sikkerhedskopierne i browseren forsvinder med browserens data. Derfor erstatter de ikke {{ui:dashboard.backupAll}}.
+
 ## Mapper til dine designs
 
 Med snesevis af designs er én liste ikke nok. På startsiden laver {{ui:shared.newFolder}} en mappe til denne browsers designs; et klik på mappen åbner den. Mapper kan indeholde mapper.
@@ -25,10 +46,13 @@ Med snesevis af designs er én liste ikke nok. På startsiden laver {{ui:shared.
 ## Sikkerhedskopiér og giv videre
 
 På startsiden har hvert design en menu med mulighederne omdøb, duplikér og slet. Rækken ved siden af fanerne har de samme knapper på hver fane. For at slette flere ad gangen klikker du på {{ui:dashboard.select}}: et klik på et kort markerer det (et flueben viser hvad der er markeret), {{ui:dashboard.selectAll}} vælger alle designs i listen, og {{ui:common.delete}} spørger én gang for dem alle. {{ui:dashboard.selectDone}} eller [[Esc]] forlader markeringen. Med {{ui:dashboard.backupAll}} pakker du alle designs på den åbne fane i én ZIP-fil. {{ui:dashboard.restoreBackup}}, lige ved siden af (den er der også på en ny computer uden designs), bringer dem tilbage, også i en anden browser eller på en anden computer; {{ui:dashboard.importGeometry}} tager den samme fil. {{ui:myShapes.title}} fra denne browser rejser med i den samme fil, i mappen `Custom shapes`, se [Former](chapter:shapes). Gendanner du en sikkerhedskopi ind i en browser der allerede har nogle af disse designs, bliver de ikke lagt ind en gang til; beskeden siger hvor mange der allerede var. Et design der ikke kan læses, springes over, og beskeden nævner det. Genindlæses siden midt i en sikkerhedskopi, ofte fordi et meget stort design har brugt hele den hukommelse browseren tillader, siger startsiden bagefter hvilket design den stoppede ved: gem det som en fil på egen hånd (se nedenfor) eller forenkl dets største meshes, og tag så en sikkerhedskopi igen. Over designene i denne browser siger en kort linje, hvordan de står: orange, så længe de ikke er i nogen sikkerhedskopi, eller når nogle er kommet til eller ændret siden sidste {{ui:dashboard.backupAll}} (den siger hvornår og hvor mange), og grå, når de alle er med. Kun en sikkerhedskopi af alle designs tæller, ikke af en mappe eller udvalgte designs.
+En sikkerhedskopi af alle designs indeholder også indstillingerne fra denne browser: din standard for nye designs, temaet, båndet, dine egne taster og printerne. Når du gendanner den, spørger et afkrydsningsfelt, om de også skal overtages; det er markeret, når denne browser endnu ikke har sin egen standard.
 
 Kun nogle designs: Efter {{ui:dashboard.select}} pakker {{ui:dashboard.backupSelected}} kun de valgte designs, i deres mapper, i én ZIP-fil, og {{ui:dashboard.backupSelected}} i en mappes menu pakker mappen med alle designs og mapper i den. Ingen af dem tager de egne former med, og {{ui:dashboard.restoreBackup}} henter begge tilbage som en fuld sikkerhedskopi. Det gælder designs i denne browser.
 
-Hvor en sikkerhedskopi havner: i Chrome og Edge spørger en gem-dialog om mappe og navn og husker mappen til næste sikkerhedskopi. Så havner dine sikkerhedskopier direkte i en mappe, du selv vælger, for eksempel på et clouddrev. Det samme gælder {{ui:myShapes.backup}}. Andre browsere lægger filen i deres downloadmappe; hvilken mappe det er, indstiller du i browserens indstillinger.
+Hvor en sikkerhedskopi havner: i Chrome og Edge spørger en gem-dialog om mappe og navn og husker mappen til næste sikkerhedskopi. Så havner dine sikkerhedskopier direkte i en mappe, du selv vælger, for eksempel på et clouddrev. Det samme gælder {{ui:myShapes.backup}}. Andre browsere lægger filen i deres downloadmappe; hvilken mappe det er, indstiller du i browserens indstillinger. Giver dialogen ingen fil tilbage, tilbyder beskeden {{ui:status.saveAsDownload}}: sikkerhedskopien havner så som en almindelig download i mappen Overførsler.
+
+Vil du prøve noget af uden at røre et design, så vælg {{ui:dashboard.openCopy}} i dets menu på startsiden. layerling laver en kopi ligesom {{ui:common.duplicate}} og åbner kopien med det samme; originalen forbliver, som den var, uanset hvad du gør i kopien. På en server ligger kopien der ved siden af originalen.
 
 Hvis et design åbner meget langsomt eller slet ikke, som regel fordi dets historik af fortryd-trin er blevet meget stor, så vælg {{ui:dashboard.openWithoutHistory}} i dets menu på startsiden. layerling læser så kun den nuværende tilstand, sletter alle tidligere trin for evigt og åbner designet; efter et spørgsmål, for det kan ikke fortrydes. Vil du beholde trinnene, så sikkerhedskopiér designet først med {{ui:dashboard.backupSelected}}.
 
@@ -118,6 +142,10 @@ Med {{ui:editor.import}} eller [[Ctrl]]+[[I]] bringer du fremmede filer ind i de
 Et design gemt med en **nyere layerling** kan indeholde ting din version ikke kender endnu, såsom en ny form, en ny indstilling eller egne fonte. Hvis layerling ikke kan åbne det af den grund, navngiver beskeden begge versioner. Hvis det åbner, siger meddelelsen at nyere ting kan se anderledes ud her. I begge tilfælde hjælper det at genindlæse siden: layerling.com serverer altid den nyeste version. Den installerede app henter den næste gang den starter; på din egen server installerer du opdateringen.
 
 Skabelonbilleder tilføjes i skitsetilstand, se [Skitser](chapter:sketches).
+
+## Store mesh
+
+layerling er først og fremmest lavet til at bygge eksakte CAD-legemer: en cylinder gemmes som en cirkel og en højde, en afrunding som én krum flade. Et importeret mesh er derimod en tilnærmelse af trekanter, jo finere, jo flere, og hver af dem ligger i hukommelsen, tegnes og gemmes. Mindre dele som mesh er intet problem. Meget store mesh, som scanninger, skulpturer eller modeller fra Blender med hundredtusinder eller millioner af trekanter, gør editoren langsommere, optager meget hukommelse og gør gemning langsom, og det er ikke sikkert, at de kan skæres i. Efter en import, der bringer sådanne mesh ind, siger layerling det én gang. Forenkl sådan et mesh først (se nedenfor), importer kun de dele, du har brug for, eller byg enkle dele af layerlings egne former.
 
 ## Forenkling af et importeret mesh
 

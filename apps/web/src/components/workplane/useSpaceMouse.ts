@@ -6,6 +6,7 @@ import {
   SPACE_MOUSE_FILTERS,
   SPACE_MOUSE_INVERT_EVENT,
   SPACE_MOUSE_REST,
+  smoothSpaceMouseAxes,
   type SpaceMouseAxes,
 } from "@/lib/spaceMouse";
 import type { ThreeState } from "@/components/workplane/ViewportOverlays";
@@ -67,6 +68,8 @@ export function useSpaceMouse(threeRef: RefObject<ThreeState | null>) {
     const hid = webHid();
     if (!hid) return;
     let axes: SpaceMouseAxes = SPACE_MOUSE_REST;
+    // What the view is moved by: the cap's axes smoothed over a few hundredths of a second (#1013).
+    let smoothed: SpaceMouseAxes = SPACE_MOUSE_REST;
     let invert = readSpaceMouseInvert();
     const onInvert = () => {
       invert = readSpaceMouseInvert();
@@ -80,12 +83,18 @@ export function useSpaceMouse(threeRef: RefObject<ThreeState | null>) {
       const seconds = Math.min(0.05, Math.max(0, (now - last) / 1000));
       last = now;
       const state = threeRef.current;
-      if (!state || document.visibilityState !== "visible") return;
-      if (!moveCameraBySpaceMouse(state.camera, state.controls.target, axes, seconds, invert)) return;
-      state.cameraTurn = null;
-      state.controls.update();
-      state.needsRender = true;
-      frame = requestAnimationFrame(step);
+      if (!state || document.visibilityState !== "visible") {
+        smoothed = SPACE_MOUSE_REST;
+        return;
+      }
+      smoothed = smoothSpaceMouseAxes(smoothed, axes, seconds);
+      if (moveCameraBySpaceMouse(state.camera, state.controls.target, smoothed, seconds, invert)) {
+        state.cameraTurn = null;
+        state.controls.update();
+        state.needsRender = true;
+      }
+      // While the cap is held the smoothed axes may still lie inside the rest band for a frame or two: keep going.
+      if (smoothed !== SPACE_MOUSE_REST) frame = requestAnimationFrame(step);
     };
     const onReport = (event: Event) => {
       const report = event as HidInputReportEvent;

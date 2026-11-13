@@ -93,7 +93,7 @@ Az MI ugyanazokkal a funkciókkal dolgozik, mint te, ugyanazon az úton, mint a 
 | `layerling_import_mesh` | háromszöghálót hoz be a tervbe |
 | `layerling_update_object` | méreteket, helyzetet, színt, nevet, tömör vagy lyuk állapotot és minden mást módosít, ami az alakzathoz tartozik, egy szöveg betűélét is |
 | `layerling_align_objects` | objektumokat igazít egymáshoz |
-| `layerling_scale_objects` | objektumokat méretez százalékban, együtt vagy mindegyiket a helyén |
+| `layerling_scale_objects` | objektumokat méretez százalékban, együtt vagy mindegyiket a helyén, vagy modellméretarányra, például 1:87-re |
 | `layerling_lay_flat` | egy objektumot az egyik lapjával a tárgyasztalra fektet |
 | `layerling_place_on_face` | objektumokat tesz le egy másik objektum lapjára, a ferdékre is, mint a C billentyű |
 | `layerling_perforate_face` | lyukmintát vág egy sík lapba vagy egy henger, cső vagy furat kerek falára körbe; a lyukak a testtel csoportosított lyukak maradnak |
@@ -166,6 +166,8 @@ Az MI ugyanazokkal a funkciókkal dolgozik, mint te, ugyanazon az úton, mint a 
 | `layerling_saved_view` | elmenti az aktuális nézetet a 7, 8, 9 vagy 0 billentyű alá, és visszaállítja, mint a Shift+billentyű és a billentyű (csak a nézet); az új tervek indulási nézetét is beállítja |
 | `layerling_build_plates` | listázza, hozzáadja, elnevezi, sorba rendezi és eltávolítja a nyomtatótálcákat, objektumokat tesz egy tálcára és elrendezi őket a tálcákon, mint a tálcasáv |
 | `layerling_clear_history` | véglegesen töröl minden visszavonási lépést, ahogy az előzménynézet „Előzmények törlése” gombja; `confirm: true` kell hozzá |
+| `layerling_list_backups` | felsorolja a megnyitott terv automatikus mentéseit (Korábbi változatok), `all: true` esetén a böngésző összes tervéét |
+| `layerling_open_backup` | egy mentést az `id`-ja alapján új tervként nyit meg, sosem kötve az eredeti fájlhoz |
 | `layerling_set_history_view` | visszatekint a projekt egy korábbi állapotára, mint az előzménynézet (a valódi terv érintetlen marad; a módosító eszközök várnak, amíg bezárul) |
 | `layerling_restore_from_history` | objektumokat (csoportokon belüli alkatrészeket is) hoz vissza másolatként egy korábbi állapotból a tervbe, mint az előzménynézet visszahozó gombja - egy lépés, amelyet a visszavonás visszavesz |
 | `layerling_export_section_svg` | 1:1 méretarányú SVG-ként adja vissza egy vágósík körvonalait, ugyanazokból a testekből, mint az export |

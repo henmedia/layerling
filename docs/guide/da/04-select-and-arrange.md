@@ -23,7 +23,7 @@ Den bliver åben eller lukket, som du lod den være, for hvert design, indtil du
 
 ![Objektlisten: gruppen "Gruppe" med to dele og en kugle ved siden af. Et mappeikon åbner gruppen.](shot:object-list)
 
-- Et klik på en post vælger formen, inklusive dele inde i en gruppe. Med [[Shift]] holdt tilføjer du flere poster eller tager dem væk igen, ligesom i visningen. Pilene folder grupper åbne og i.
+- Et klik på en post vælger formen, inklusive dele inde i en gruppe. Som i en filhåndtering tilføjer [[Ctrl]] ([[Cmd]] på en Mac) en post eller tager den væk igen, og [[Shift]] vælger alle poster fra den sidst klikkede til denne, i listens rækkefølge; [[Ctrl]]+[[Shift]] føjer dem til det valgte. I visningen er det i stedet [[Shift]], der tilføjer og tager væk. Pilene folder grupper åbne og i.
 - Bogstavet efter navnet viser, om en del er {{ui:outliner.solid}} eller {{ui:outliner.hole}}: det er ordets første bogstav, og hele ordet vises, når du holder musen over det.
 - Under navnet står, hvilken slags form det er. En form, der ikke længere er en simpel form (afrundet, udhulet eller importeret), viser {{ui:shape.exactBody}}, når STEP-eksporten skriver den eksakt, og {{ui:shape.mesh}}, når den kun består af trekanter og går ud som STL. En tilspidsning, hældning eller vridning, der først kommer til efter afrunding eller udhuling, bøjer kun dens mesh, så viser den {{ui:shape.mesh}}.
 - Hængelås og øje låser og skjuler enkelte dele.
@@ -47,6 +47,8 @@ Du kan trække en form forbi kanten af pladen og lade den stå der, omkring én 
 ## Snap under flytning
 
 Når du trækker en form hen over arbejdsplanet, snapper den til andre former: dens venstre, højre, for- eller bagkant eller dens midte lander præcis på en kant eller midte af en anden form. En lyserød hjælpelinje viser hvad den holder fast i. Sådan sidder to dele lige ud for hinanden eller centreret den ene bag den anden uden at taste tal. Det virker også med gitteret slået fra. Arbejdsplanets midte tæller også: de lyserøde linjer viser, når formen står midt på pladen langs X, langs Y eller begge.
+
+Også når du ændrer størrelse, snapper det: Trækker du i et sidehåndtag, stopper den side ved kanter og centre af andre former og ved den væg, den løber ind i, også indervæggen i en kasse, en udhulet form eller et importeret kabinet, og den lyserøde linje viser hvor. Det mål bevares nøjagtigt, uden for gitteret. Sådan fylder en del et kabinet fra væg til væg: læg den mod den ene væg, og træk dens anden side hen til den modsatte. Med [[Alt]] vokser formen fra midten, og den trukne side snapper på samme måde; med [[Shift]] beholder den sine proportioner og snapper ikke. Det virker på det flade arbejdsplan for former, der står oprejst med siderne langs X og Y, og {{ui:workspace.objectSnap}} slår det fra sammen med snap under flytning.
 
 Hold [[Shift]] mens du trækker for at holde flytningen på én akse: formen følger den retning, X eller Y, du har trukket længst i, og lader den anden være. Bedst at trykke [[Shift]] når du allerede trækker; på en form der ikke er valgt endnu, tilføjer et klik med [[Shift]] den kun til markeringen.
 
@@ -78,7 +80,7 @@ Er der blandt de valgte figurer en plade (en grundform, som de andre står på, 
 
 Uden en plade holder du [[Shift]] nede og klikker først på et tomt sted på byggepladen: så er den den faste figur, lige store mellemrum fordeler figurerne over hele pladen med samme mellemrum til kanterne, og de andre punkter justerer dem efter dens kanter eller midte. Et nyt klik med [[Shift]] på den tomme plade slipper den igen. Et klik på et tomt sted uden [[Shift]] afslutter justeringen, ligesom [[L]] og [[Esc]].
 
-Hold [[Alt]] nede og klik på punktet for selv at indtaste mellemrummet, fx 5 mm: figurerne stilles så langt fra hinanden, fra den første figur eller fra den, du klikkede først; på en plade kommer rækken i midten. En låst figur bliver stående, så en mellem de yderste figurer forhindrer lige store mellemrum.
+Hold [[Alt]] nede og klik på punktet for selv at indtaste mellemrummet, fx 5 mm: figurerne stilles så langt fra hinanden, fra den første figur eller fra den, du klikkede først; på en plade kommer rækken i midten. En låst figur bliver stående, så en mellem de yderste figurer forhindrer lige store mellemrum. På en tablet, som ikke har nogen Alt-tast, gør kontakten {{ui:align.sizeSwitch}} ved siden af prikkerne det samme: Tænder du den, forbliver prikkerne firkanter, og afstandsprikken åbner sit felt, indtil du slukker den igen.
 
 ## Spejling
 
@@ -193,6 +195,8 @@ Med flere dele valgt viser egenskabspanelet til højre hvor mange der er og tilb
 For at gøre en eller flere dele større eller mindre med den samme andel, for eksempel alle dele i en printfil med 20 %, brug {{ui:scalePercent.title}}. Vælg delene, højreklik på dem og vælg {{ui:scalePercent.title}}, eller søg efter den med [[Ctrl]]+[[K]].
 
 Under {{ui:scalePercent.percent}} taster du den nye størrelse som en procent af den aktuelle: 120 % er en femtedel større, 50 % halv størrelse. Bredde, dybde og højde ændres ens, så proportionerne bevares. Bunden bliver hvor den er, så intet synker ned i pladen.
+
+Til modelbygning vælger du {{ui:scalePercent.by.scale}} i stedet for {{ui:scalePercent.by.percent}} øverst. {{ui:scalePercent.scalePresets}} har de almindelige skalaer fra Z (1:220) til G (1:22,5), og i {{ui:scalePercent.ratio}} taster du enhver anden skala, fx 35 for 1:35. Er modellen bygget i forbilledets virkelige størrelse, så lad {{ui:scalePercent.original.fullSize}} være valgt: 1:87 gør den 87 gange mindre. Har du bygget den i en vilkårlig størrelse, vælg {{ui:scalePercent.original.realSize}}, så {{ui:scalePercent.axis.height}} eller {{ui:scalePercent.axis.length}} (den længste side på pladen), og tast i {{ui:scalePercent.realSize}}, hvor stort forbilledet virkelig er, i meter (i fod med tommeenheder). Et træ, der i virkeligheden er 16 m højt, bliver så 16.000 mm / 87 = 184 mm højt i H0, uanset hvor stort det var før. Den nye størrelse står under felterne, før du trykker på {{ui:scalePercent.apply}}. Skalaen bliver stående, så længe editoren er åben.
 
 Med flere dele vælger du hvordan de vokser:
 

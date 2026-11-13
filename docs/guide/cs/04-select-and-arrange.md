@@ -21,7 +21,7 @@ U složitého modelu pomůže seznam všech tvarů: {{ui:editor.tool.showOutline
 
 ![Seznam objektů: sloučený celek se dvěma částmi a vedle něj koule. Ikona složky otevře úpravu celku.](shot:object-list)
 
-- Kliknutí vybere tvar, i uvnitř sloučení. [[Shift]] přidává a odebírá položky jako v pohledu. Šipky rozbalují a sbalují vnořené části.
+- Kliknutí vybere tvar, i uvnitř sloučení. Jako ve správci souborů [[Ctrl]] ([[Cmd]] na Macu) přidá nebo odebere jednu položku a [[Shift]] vybere všechny položky od naposledy kliknuté až po tuto, v pořadí seznamu; [[Ctrl]]+[[Shift]] je přidá k výběru. V pohledu naopak přidává a odebírá [[Shift]]. Šipky rozbalují a sbalují vnořené části.
 - Písmeno za názvem ukazuje, zda je díl {{ui:outliner.solid}}, nebo {{ui:outliner.hole}}: je to první písmeno slova a po najetí myší se zobrazí celé slovo.
 - Pod názvem stojí, o jaký tvar jde. Těleso, které už není jednoduchým tvarem (zaoblené, vydutěné nebo importované), ukazuje {{ui:shape.exactBody}}, když ho export STEP zapíše přesně, a {{ui:shape.mesh}}, když je jen z trojúhelníků a jde ven jako STL. Zúžení, náklon nebo zkroucení přidané až po zaoblení nebo vydutění ohne jen jeho síť, takže pak ukazuje {{ui:shape.mesh}}.
 - Zámek a oko ovládají zamknutí a skrytí jednotlivých částí.
@@ -45,6 +45,8 @@ Tvar lze odtáhnout za okraj, přibližně o jednu šířku podložky na každou
 ## Přichytávání při přesouvání
 
 Při tažení po pracovní rovině se levý, pravý, přední a zadní okraj i střed přichytávají na odpovídající okraje či středy jiných tvarů. Růžová vodicí čára ukazuje místo přichycení. Bez zadávání čísel tak díly položíte těsně vedle sebe nebo je vystředíte. Funguje to i při vypnuté mřížce. Počítá se i střed pracovní roviny: růžové čáry ukážou, kdy tvar sedí uprostřed desky ve směru X, Y nebo v obou.
+
+Přichytávání funguje i při změně velikosti: když táhneš za boční úchyt, ta strana se zastaví u hran a středů jiných tvarů a u stěny, na kterou narazí, také u vnitřní stěny krabice, vydutého tělesa nebo importovaného pouzdra, a růžová čára ukáže kde. Tento rozměr zůstane přesně takový, mimo mřížku. Tak díl vyplní pouzdro od stěny ke stěně: přilož ho k jedné stěně a jeho druhou stranu přetáhni k protější. S [[Alt]] tvar roste od středu a tažená strana se přichytí stejně; s [[Shift]] si zachová proporce a nepřichytává se. Platí to na rovné pracovní rovině pro tvary, které stojí rovně a mají strany podél X a Y, a {{ui:workspace.objectSnap}} to vypne spolu s přichytáváním při posunu.
 
 [[Shift]] během tažení omezí posun na osu X nebo Y podle toho, v kterém směru jste táhli více. Druhá souřadnice se zachová. Klávesu stiskněte nejlépe až po zahájení pohybu, protože Shift+klik na nevybraný tvar jej pouze přidá do výběru.
 
@@ -70,7 +72,7 @@ Je-li mezi vybranými tvary deska, která je v tomto směru delší než všechn
 
 Bez desky nejdřív se stisknutým [[Shift]] klikněte na volné místo podložky: podložka je pak pevný tvar, stejné mezery rozmístí tvary po celé podložce se stejnou mezerou k jejím okrajům a ostatní body je zarovnají k jejím okrajům nebo středu. Další klik se [[Shift]] na volnou podložku ji uvolní. Klik do prázdna bez [[Shift]] zarovnání ukončí, stejně jako [[L]] a [[Esc]].
 
-Podržte [[Alt]] a klikněte na bod, chcete-li mezeru zadat sami, třeba 5 mm: tvary se seřadí v této vzdálenosti, od prvního tvaru nebo od toho, na který jste klikli jako první; na desce přijde řada doprostřed. Zamčený tvar zůstane na místě, takže jeden mezi krajními tvary stejným mezerám zabrání.
+Podržte [[Alt]] a klikněte na bod, chcete-li mezeru zadat sami, třeba 5 mm: tvary se seřadí v této vzdálenosti, od prvního tvaru nebo od toho, na který jste klikli jako první; na desce přijde řada doprostřed. Zamčený tvar zůstane na místě, takže jeden mezi krajními tvary stejným mezerám zabrání. Na tabletu, který nemá klávesu Alt, dělá totéž přepínač {{ui:align.sizeSwitch}} vedle teček: když ho zapnete, tečky zůstanou čtverečky a tečka rozestupu otevře své pole, dokud přepínač nevypnete.
 
 ## Zrcadlení
 
@@ -186,6 +188,8 @@ Při více vybraných dílech ukazuje pravý panel jejich počet a společné vl
 Pro stejné zvětšení či zmenšení jednoho nebo více dílů použijte {{ui:scalePercent.title}} v pravé nabídce nebo přes [[Ctrl]]+[[K]].
 
 {{ui:scalePercent.percent}} zadává novou velikost v procentech původní. 120 % znamená zvětšení o pětinu, 50 % poloviční velikost. Všechny tři rozměry se mění stejně a zachovají proporce. Spodek zůstává na místě, takže se díl nezanoří do podložky.
+
+Pro modelářství zvolte nahoře {{ui:scalePercent.by.scale}} místo {{ui:scalePercent.by.percent}}. {{ui:scalePercent.scalePresets}} nabízí obvyklé velikosti od Z (1:220) po G (1:22,5) a do {{ui:scalePercent.ratio}} zadáte jakékoli jiné měřítko, třeba 35 pro 1:35. Je-li model postavený ve skutečné velikosti předlohy, nechte {{ui:scalePercent.original.fullSize}}: 1:87 ho zmenší 87krát. Pokud jste ho postavili v libovolné velikosti, zvolte {{ui:scalePercent.original.realSize}}, pak {{ui:scalePercent.axis.height}} nebo {{ui:scalePercent.axis.length}} (nejdelší strana na desce) a do {{ui:scalePercent.realSize}} zadejte, jak velká je předloha doopravdy, v metrech (při palcových jednotkách ve stopách). Strom, který je ve skutečnosti 16 m vysoký, bude v H0 vysoký 16 000 mm / 87 = 184 mm, ať byl předtím jakkoli velký. Nová velikost se ukáže pod poli dřív, než stisknete {{ui:scalePercent.apply}}. Měřítko zůstane nastavené, dokud je editor otevřený.
 
 Pro více dílů zvolte:
 

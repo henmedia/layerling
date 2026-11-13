@@ -21,7 +21,7 @@ Met veel onderdelen raak je in de weergave makkelijk het overzicht kwijt. De obj
 
 ![De objectlijst: de groep "Groep" met twee onderdelen en een bol ernaast. Een mappictogram opent de groep.](shot:object-list)
 
-- Een klik op een regel selecteert de vorm, ook onderdelen binnen een groep. Met [[Shift]] ingedrukt voeg je meer regels toe of haal je ze weer weg, net als in de weergave. De pijltjes klappen groepen open en dicht.
+- Een klik op een regel selecteert de vorm, ook onderdelen binnen een groep. Net als in een bestandsbeheerder voegt [[Ctrl]] ([[Cmd]] op een Mac) een regel toe of haalt hem weer weg, en selecteert [[Shift]] alle regels van de laatst aangeklikte tot deze, in de volgorde van de lijst; [[Ctrl]]+[[Shift]] voegt ze aan de selectie toe. In de weergave voegt juist [[Shift]] toe en haalt weg. De pijltjes klappen groepen open en dicht.
 - De letter achter de naam laat zien of een onderdeel {{ui:outliner.solid}} of {{ui:outliner.hole}} is: het is de eerste letter van het woord, en met de muis erboven verschijnt het hele woord.
 - Onder de naam staat wat voor vorm het is. Een lichaam dat geen eenvoudige vorm meer is (afgerond, uitgehold of geïmporteerd), toont {{ui:shape.exactBody}} als de STEP-export het exact schrijft, en {{ui:shape.mesh}} als het alleen uit driehoeken bestaat en als STL meegaat. Een versmalling, helling of draaiing die pas na het afronden of uithollen komt, buigt alleen de mesh; dan staat er {{ui:shape.mesh}}.
 - Hangslot en oog vergrendelen en verbergen afzonderlijke onderdelen.
@@ -45,6 +45,8 @@ Je kunt een vorm voorbij de rand van de plaat slepen en hem daar laten liggen, t
 ## Uitlijnen tijdens het verplaatsen
 
 Als je een vorm over het werkvlak sleept, lijnt hij uit op andere vormen: zijn linker-, rechter-, voor- of achterrand of zijn midden komt precies op een rand of midden van een andere vorm te liggen. Een roze hulplijn laat zien waaraan hij zich vasthoudt. Zo staan twee onderdelen strak naast elkaar of gecentreerd achter elkaar zonder dat je getallen hoeft te typen. Het werkt ook als het raster uitstaat. Het midden van het werkvlak telt ook mee: de roze lijnen laten zien wanneer de vorm langs X, langs Y of beide midden op de plaat staat.
+
+Ook het van grootte veranderen lijnt uit: als je aan een zijgreep trekt, stopt die zijde bij de randen en middelpunten van andere vormen en bij de wand waar hij tegenaan loopt, ook de binnenwand van een doos, een uitgehold lichaam of een geïmporteerde behuizing, en de roze lijn laat zien waar. Die maat blijft precies zo, los van het raster. Zo vult een onderdeel een behuizing van wand tot wand: leg het tegen de ene wand en trek de andere zijde naar de tegenoverliggende. Met [[Alt]] groeit de vorm vanuit het midden en lijnt de gesleepte zijde op dezelfde manier uit; met [[Shift]] houdt hij zijn verhoudingen en lijnt hij niet uit. Dit werkt op het vlakke werkvlak, voor vormen die rechtop staan met hun zijden langs X en Y, en {{ui:workspace.objectSnap}} zet het samen met het uitlijnen bij verplaatsen uit.
 
 Houd [[Shift]] ingedrukt tijdens het slepen om de verplaatsing op één as te houden: de vorm volgt de richting, X of Y, waarin je het verst hebt gesleept, en laat de andere met rust. Druk [[Shift]] het best pas in als je al aan het slepen bent; bij een vorm die nog niet geselecteerd is, voegt een klik met [[Shift]] hem alleen aan de selectie toe.
 
@@ -70,7 +72,7 @@ Zit er tussen de gekozen vormen een plaat die in die richting langer is dan alle
 
 Zonder plaat houd je [[Shift]] ingedrukt en klik je eerst op een lege plek van het bouwplatform: dat is dan de vaste vorm, gelijke tussenruimte verdeelt de vormen over het hele platform met dezelfde ruimte tot de randen, en de andere punten lijnen ze uit op de randen of het midden. Nog een klik met [[Shift]] op de lege plek laat het weer los. Een klik op een lege plek zonder [[Shift]] beëindigt het uitlijnen, net als [[L]] en [[Esc]].
 
-Houd [[Alt]] ingedrukt en klik op de punt om de tussenruimte zelf in te typen, bijvoorbeeld 5 mm: de vormen komen dan zo ver uit elkaar te staan, vanaf de eerste vorm of vanaf de vorm die je eerst aanklikte; op een plaat komt de rij in het midden. Een vergrendelde vorm blijft staan, dus een tussen de buitenste vormen verhindert gelijke tussenruimte.
+Houd [[Alt]] ingedrukt en klik op de punt om de tussenruimte zelf in te typen, bijvoorbeeld 5 mm: de vormen komen dan zo ver uit elkaar te staan, vanaf de eerste vorm of vanaf de vorm die je eerst aanklikte; op een plaat komt de rij in het midden. Een vergrendelde vorm blijft staan, dus een tussen de buitenste vormen verhindert gelijke tussenruimte. Op een tablet, dat geen Alt-toets heeft, doet de schakelaar {{ui:align.sizeSwitch}} naast de stippen hetzelfde: zet je hem aan, dan blijven de stippen vierkantjes en opent de afstandsstip zijn veld, tot je hem weer uitzet.
 
 ## Spiegelen
 
@@ -186,6 +188,8 @@ Met meerdere onderdelen geselecteerd laat het eigenschappenpaneel rechts zien ho
 Om een of meer onderdelen met hetzelfde deel groter of kleiner te maken, zeg alle onderdelen van een printbestand met 20 %, gebruik je {{ui:scalePercent.title}}. Selecteer de onderdelen, klik er met rechts op en kies {{ui:scalePercent.title}}, of zoek het met [[Ctrl]]+[[K]].
 
 Onder {{ui:scalePercent.percent}} typ je de nieuwe maat als percentage van de huidige: 120 % is een vijfde groter, 50 % half zo groot. Breedte, diepte en hoogte veranderen gelijk, zodat de verhoudingen blijven. De onderkant blijft waar hij is, zodat er niets in de plaat zakt.
+
+Voor modelbouw kies je bovenaan {{ui:scalePercent.by.scale}} in plaats van {{ui:scalePercent.by.percent}}. Onder {{ui:scalePercent.scalePresets}} staan de gangbare sporen van Z (1:220) tot G (1:22,5), en bij {{ui:scalePercent.ratio}} typ je elke andere schaal, zoals 35 voor 1:35. Is het model op ware grootte gebouwd, laat dan {{ui:scalePercent.original.fullSize}} gekozen: 1:87 maakt het 87 keer kleiner. Heb je het op een willekeurige grootte gebouwd, kies dan {{ui:scalePercent.original.realSize}}, kies {{ui:scalePercent.axis.height}} of {{ui:scalePercent.axis.length}} (de langste zijde over de plaat) en typ bij {{ui:scalePercent.realSize}} hoe groot het origineel echt is, in meters (in voet bij inch-eenheden). Een boom die in werkelijkheid 16 m hoog is, wordt in H0 zo 16.000 mm / 87 = 184 mm hoog, hoe groot hij eerst ook was. Onder de velden staat de nieuwe grootte voordat je op {{ui:scalePercent.apply}} drukt. De schaal blijft ingesteld zolang de editor open is.
 
 Met meerdere onderdelen kies je hoe ze groeien:
 

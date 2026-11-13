@@ -19,6 +19,8 @@ export function useEditorNotice() {
   const [noticeAction, setNoticeAction] = useState<NoticeAction | null>(null);
   // When the message came (performance.now()), so the editor can tell one that reports a change just made.
   const [noticeAt, setNoticeAt] = useState(0);
+  // An ordinary message goes after a few seconds and carries no button of its own: a confirmation, which can be switched off (#1708).
+  const [noticeOrdinary, setNoticeOrdinary] = useState(true);
   const noticeTimerRef = useRef<number | null>(null);
   // Fuer den Fehlerbericht: die letzten Meldungen dieser Sitzung.
   const reportNoticesRef = useRef<BugReportEvent[]>([]);
@@ -37,6 +39,7 @@ export function useEditorNotice() {
     setNoticeText(message);
     setNoticeAction(action);
     setNoticeAt(performance.now());
+    setNoticeOrdinary(patient === false && action === null);
     if (patient === "stay") {
       if (noticeTimerRef.current !== null) window.clearTimeout(noticeTimerRef.current);
       noticeTimerRef.current = null;
@@ -60,5 +63,5 @@ export function useEditorNotice() {
     if (noticeTimerRef.current !== null) window.clearTimeout(noticeTimerRef.current);
   }, []);
 
-  return { notice, noticeAction, noticeAt, setNotice, holdNotice, releaseNotice, dismissNotice, reportNoticesRef };
+  return { notice, noticeAction, noticeAt, noticeOrdinary, setNotice, holdNotice, releaseNotice, dismissNotice, reportNoticesRef };
 }

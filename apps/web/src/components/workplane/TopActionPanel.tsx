@@ -3,7 +3,8 @@
 import { DEFAULT_STENCIL_BRIDGES, MAX_BRIDGE_COUNT, normalizedStencilBridges, type StencilBridgeOptions } from "@/lib/stencilBridges";
 import { GuideHelpLink } from "@/components/GuideHelpLink";
 import { MovableToolPanel } from "@/components/workplane/MovableToolPanel";
-import { CloudUpload, Download, EyeOff, FilePlus2, FolderOpen, ImagePlus, Info, Server, X } from "lucide-react";
+import { ArchiveRestore, CloudUpload, Download, EyeOff, FilePlus2, FolderOpen, ImagePlus, Info, Server, X } from "lucide-react";
+import { OPEN_FILE_BACKUPS_EVENT } from "@/lib/fileBackups";
 import { useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
 import { t, type MessageKey } from "@/lib/i18n";
 import { useLanguage } from "@/lib/useLanguage";
@@ -690,6 +691,12 @@ export function TopActionPanel({
               {exportFormat === "stl" && stlFileName ? (
                 <button className="export-shared-button" type="button" onClick={() => onExport("stl", exportName, true)} disabled={shapeCount === 0}>
                   <span>{t("export.stlSaveAs")}</span>
+                </button>
+              ) : null}
+              {exportFormat === "lyl" ? (
+                <button className="export-shared-button" type="button" title={t("backups.openTitle")} onClick={() => window.dispatchEvent(new Event(OPEN_FILE_BACKUPS_EVENT))}>
+                  <ArchiveRestore />
+                  <span>{t("backups.title")}</span>
                 </button>
               ) : null}
               {exportFormat === "lyl" && sharedProjectsEnabled ? (

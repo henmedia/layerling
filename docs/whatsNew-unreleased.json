@@ -8,5 +8,28 @@
       "de": "Füllt eine Bodenplatte mit Ausgleich eine Schublade, die kein ganzes Raster misst, kann ein Behälter jetzt auf jeder Seite über das Raster hinausreichen, über den Ausgleich bis an die Wand, damit nichts daneben hinunterfällt. Die Füße bleiben auf dem Raster. Eine Fase unter dem Überstand lässt ihn ohne Stützen drucken; ein massiver Überstand oder ein Stapelrand auf dem Raster sind wählbar.",
       "en": "When a padded baseplate fills a drawer that is not whole units, a bin can now reach out beyond the grid on any side, over the padding to the wall, so nothing falls down beside it. Its feet stay on the grid. A chamfer under the overhang lets it print without supports; a solid overhang or a lip kept on the grid are there to choose."
     }
+  },
+  {
+    "title": {
+      "de": "Vorlagenbild in der Skizze größer als 200 mm",
+      "en": "Sketch picture larger than 200 mm"
+    },
+    "body": {
+      "de": "Breite und Höhe eines Bildes unter der Skizze lassen sich jetzt auch über 200 mm eintippen, etwa für eine Druckplatte von 250 mm. Der Regler reicht bis zur Größe deiner Platte, und das Feld zeigt immer die echte Größe, auch nachdem du an den Griffen gezogen hast.",
+      "en": "The width and height of a picture under a sketch can now be typed past 200 mm, for a 250 mm plate for instance. The slider reaches to the size of your plate, and the field always shows the real size, also after dragging the handles."
+    },
+    "guide": {
+      "section": "sketchImage"
+    }
+  },
+  {
+    "title": {
+      "de": "Speichern klappt auch bei sehr langem Verlauf",
+      "en": "Saving works with a very long history too"
+    },
+    "body": {
+      "de": "Lehnt der Browser ein großes Design ab, obwohl noch Platz frei ist, speichert layerling es jetzt mit einem kürzeren Rückgängig-Verlauf, statt gar nicht. Ein Hinweis sagt dann, wie viele Schritte behalten wurden.",
+      "en": "If the browser refuses a large design although there is room left, layerling now saves it with a shorter undo history instead of not at all. A note then says how many steps were kept."
+    }
   }
 ]

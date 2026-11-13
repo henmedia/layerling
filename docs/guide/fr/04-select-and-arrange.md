@@ -21,7 +21,7 @@ Avec de nombreuses pièces, il est facile de perdre le fil de la vue. La liste d
 
 ![La liste d'objets : le groupe "Groupe" avec deux parties et une sphère à côté. Une icône de dossier ouvre le groupe.](shot:object-list)
 
-- Un clic sur une entrée sélectionne la forme, y compris les pièces à l'intérieur d'un groupe. Avec [[Shift]] maintenu, vous ajoutez ou supprimez d'autres entrées, comme dans la vue. Les flèches plient les groupes pour s'ouvrir et se fermer.
+- Un clic sur une entrée sélectionne la forme, y compris les pièces à l'intérieur d'un groupe. Comme dans un gestionnaire de fichiers, [[Ctrl]] ([[Cmd]] sur Mac) ajoute une entrée ou la retire, et [[Shift]] sélectionne toutes les entrées de la dernière cliquée jusqu'à celle-ci, dans l'ordre de la liste ; [[Ctrl]]+[[Shift]] les ajoute à la sélection. Dans la vue, c'est au contraire [[Shift]] qui ajoute et retire. Les flèches plient les groupes pour s'ouvrir et se fermer.
 - La lettre après le nom indique si une pièce est {{ui:outliner.solid}} ou {{ui:outliner.hole}} : c'est la première lettre du mot, et le mot entier s'affiche au survol de la souris.
 - Sous le nom figure le type de forme. Un corps qui n'est plus une forme simple (arrondi, évidé ou importé) affiche {{ui:shape.exactBody}} quand l'export STEP l'écrit exactement, et {{ui:shape.mesh}} quand il n'est fait que de triangles et part en STL. Un rétrécissement, une inclinaison ou une torsion ajoutés après avoir arrondi ou évidé un corps ne déforment que son maillage : il affiche alors {{ui:shape.mesh}}.
 - Cadenas et œillet de verrouillage et cache pièces détachées.
@@ -45,6 +45,8 @@ Vous pouvez faire glisser une forme au-delà du bord de la plaque et la laisser 
 ## Capturer en bougeant
 
 Lorsque vous faites glisser une forme sur le plan de travail, elle s'aligne sur d'autres formes : son bord gauche, droit, avant ou arrière ou son centre atterrit exactement sur un bord ou le centre d'une autre forme. Une ligne de guidage rose montre à quoi il s'accroche. De cette façon, deux pièces sont alignées côte à côte ou centrées l’une derrière l’autre sans taper de chiffres. Cela fonctionne également avec le réseau éteint. Le centre du plan de travail compte aussi : les lignes roses montrent quand la forme est au milieu du plateau selon X, selon Y ou les deux.
+
+Le redimensionnement s'aligne aussi : lorsque vous faites glisser une poignée latérale, ce côté s'arrête sur les bords et les centres d'autres formes et contre la paroi qu'il rencontre, y compris la paroi intérieure d'une boîte, d'un corps évidé ou d'un boîtier importé, et la ligne rose montre où. Cette mesure est gardée exactement, hors de la grille. Ainsi une pièce remplit un boîtier de paroi à paroi : placez-la contre une paroi et faites glisser son autre côté jusqu'à la paroi opposée. Avec [[Alt]], la forme grandit depuis son milieu et le côté tiré s'aligne de la même façon ; avec [[Shift]], elle garde ses proportions et ne s'aligne pas. Cela fonctionne sur le plan de travail à plat, pour les formes debout dont les côtés suivent X et Y, et {{ui:workspace.objectSnap}} le désactive en même temps que l'alignement lors du déplacement.
 
 Maintenez [[Shift]] tout en faisant glisser pour conserver le déplacement sur un axe : la forme suit la direction, X ou Y, dans laquelle vous avez tiré plus loin et laisse l'autre seule. Il est préférable d'appuyer sur [[Shift]] une fois que vous faites déjà glisser ; sur une forme qui n'est pas encore sélectionnée, un clic avec [[Shift]] ne fait que l'ajouter à la sélection.
 
@@ -70,7 +72,7 @@ Si une plaque fait partie de la sélection, plus longue dans cette direction que
 
 Sans plaque, maintenez [[Shift]] et cliquez d'abord sur un endroit libre du plateau : le plateau devient alors la forme fixe, l'espacement égal répartit les formes sur tout le plateau avec le même écart à ses bords, et les autres points les alignent sur ses bords ou son milieu. Un nouveau clic avec [[Shift]] sur le plateau libre le relâche. Un clic dans le vide sans [[Shift]] termine l'alignement, comme [[L]] et [[Esc]].
 
-Maintenez [[Alt]] et cliquez sur le point pour saisir l'écart vous-même, par exemple 5 mm : les formes s'alignent à cette distance, à partir de la première forme ou de celle cliquée en premier ; sur une plaque, la rangée vient en son milieu. Une forme verrouillée reste en place ; entre les formes extérieures, elle empêche donc l'espacement égal.
+Maintenez [[Alt]] et cliquez sur le point pour saisir l'écart vous-même, par exemple 5 mm : les formes s'alignent à cette distance, à partir de la première forme ou de celle cliquée en premier ; sur une plaque, la rangée vient en son milieu. Une forme verrouillée reste en place ; entre les formes extérieures, elle empêche donc l'espacement égal. Sur une tablette, qui n'a pas de touche Alt, l'interrupteur {{ui:align.sizeSwitch}} à côté des points fait la même chose : activé, les points restent des carrés et le point d'écart ouvre son champ, jusqu'à ce que vous le désactiviez.
 
 ## Mise en miroir
 
@@ -186,6 +188,8 @@ Avec plusieurs pièces sélectionnées, le panneau des propriétés de droite mo
 Pour agrandir ou réduire une ou plusieurs parties d'un même partage, disons toutes les parties d'un fichier d'impression de 20 %, utilisez {{ui:scalePercent.title}}. Sélectionnez les pièces, cliquez dessus avec le bouton droit et choisissez {{ui:scalePercent.title}}, ou recherchez-la avec [[Ctrl]]+[[K]].
 
 Sous {{ui:scalePercent.percent}}, vous saisissez la nouvelle taille en pourcentage de la taille actuelle : 120 % correspond à un cinquième de plus, 50 % à la moitié de la taille. La largeur, la profondeur et la hauteur changent de la même manière, donc les proportions restent. Le fond reste là où il est, donc rien ne coule dans l'assiette.
+
+Pour le modélisme, choisissez {{ui:scalePercent.by.scale}} au lieu de {{ui:scalePercent.by.percent}} en haut. {{ui:scalePercent.scalePresets}} propose les échelles courantes de Z (1:220) à G (1:22,5), et dans {{ui:scalePercent.ratio}} vous tapez toute autre échelle, par exemple 35 pour 1:35. Si le modèle est construit à la taille réelle de l'original, laissez {{ui:scalePercent.original.fullSize}} : 1:87 le rend 87 fois plus petit. Si vous l'avez construit à une taille quelconque, choisissez {{ui:scalePercent.original.realSize}}, puis {{ui:scalePercent.axis.height}} ou {{ui:scalePercent.axis.length}} (le plus long côté sur le plateau), et tapez dans {{ui:scalePercent.realSize}} la taille réelle de l'original, en mètres (en pieds avec les unités impériales). Un arbre de 16 m de haut en réalité mesure alors 16 000 mm / 87 = 184 mm en H0, quelle que soit sa taille avant. La nouvelle taille s'affiche sous les champs avant que vous appuyiez sur {{ui:scalePercent.apply}}. L'échelle reste réglée tant que l'éditeur est ouvert.
 
 Avec plusieurs parties, vous choisissez comment elles poussent :
 

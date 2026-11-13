@@ -21,7 +21,7 @@ Quando ci sono molte parti, è facile perderne qualcuna nella vista. L’elenco 
 
 ![L’elenco degli oggetti: il gruppo “Gruppo” contiene due parti e accanto c’è una sfera. L’icona della cartella apre il gruppo.](shot:object-list)
 
-- Fai clic su una voce per selezionare la forma, anche se si trova dentro un gruppo. Tieni premuto [[Shift]] per aggiungere o rimuovere altre voci, proprio come nella vista. Le frecce aprono e chiudono i gruppi.
+- Fai clic su una voce per selezionare la forma, anche se si trova dentro un gruppo. Come in un gestore di file, [[Ctrl]] ([[Cmd]] su Mac) aggiunge o rimuove una voce, e [[Shift]] seleziona tutte le voci dall'ultima cliccata fino a questa, nell'ordine della lista; [[Ctrl]]+[[Shift]] le aggiunge alla selezione. Nella vista, invece, è [[Shift]] ad aggiungere e rimuovere. Le frecce aprono e chiudono i gruppi.
 - La lettera dopo il nome indica se una parte è {{ui:outliner.solid}} o {{ui:outliner.hole}}: è l'iniziale della parola, e la parola intera compare tenendoci sopra il mouse.
 - Sotto il nome compare il tipo di forma. Un corpo che non è più una forma semplice (arrotondato, svuotato o importato) mostra {{ui:shape.exactBody}} quando l'esportazione STEP lo scrive in modo esatto, e {{ui:shape.mesh}} quando è fatto solo di triangoli e va esportato come STL. Una rastremazione, un'inclinazione o una torsione aggiunte dopo aver arrotondato o svuotato un corpo piegano solo la sua mesh, quindi allora mostra {{ui:shape.mesh}}.
 - Il lucchetto e l’occhio bloccano o nascondono le singole parti.
@@ -45,6 +45,8 @@ Puoi trascinare una forma oltre il bordo della piastra e lasciarla lì, fino a c
 ## Aggancio durante lo spostamento
 
 Quando trascini una forma sul piano di lavoro, questa si aggancia alle altre forme: il bordo sinistro, destro, anteriore o posteriore, oppure il centro, coincide esattamente con un bordo o con il centro di un’altra forma. Una guida rosa indica il punto di aggancio. Così puoi affiancare due parti senza spazi o centrarne una dietro l’altra senza digitare valori. Funziona anche con la griglia disattivata. Conta anche il centro del piano di lavoro: le linee rosa mostrano quando la forma sta al centro del piano lungo X, lungo Y o entrambi.
+
+Anche il ridimensionamento si aggancia: quando trascini una maniglia laterale, quel lato si ferma sugli spigoli e sui centri delle altre forme e alla parete che incontra, anche la parete interna di una scatola, di un corpo svuotato o di un involucro importato, e la linea rosa mostra dove. Quella misura resta esatta, fuori dalla griglia. Così un pezzo riempie un involucro da parete a parete: appoggialo a una parete e trascina l'altro lato fino a quella opposta. Con [[Alt]] la forma cresce dal centro e il lato trascinato si aggancia allo stesso modo; con [[Shift]] mantiene le proporzioni e non si aggancia. Funziona sul piano di lavoro piatto, per le forme in piedi con i lati lungo X e Y, e {{ui:workspace.objectSnap}} lo disattiva insieme all'aggancio durante lo spostamento.
 
 Tieni premuto [[Shift]] mentre trascini per vincolare lo spostamento a un asse: la forma segue la direzione in cui ti sei spostato di più, X oppure Y, e non si muove lungo l’altro asse. È preferibile premere [[Shift]] dopo aver iniziato a trascinare; se la forma non è ancora selezionata, un clic con [[Shift]] la aggiunge soltanto alla selezione.
 
@@ -70,7 +72,7 @@ Se tra le forme selezionate c'è una base più lunga di tutte le altre in quella
 
 Senza base, tieni premuto [[Shift]] e fai prima clic su un punto libero del piano: il piano diventa la forma fissa, la spaziatura uguale distribuisce le forme su tutto il piano con la stessa distanza dai bordi, e gli altri punti le allineano ai suoi bordi o al suo centro. Un altro clic con [[Shift]] sul piano libero lo rilascia. Un clic in un punto vuoto senza [[Shift]] termina l'allineamento, come [[L]] ed [[Esc]].
 
-Tieni premuto [[Alt]] e fai clic sul punto per digitare tu la distanza, per esempio 5 mm: le forme si allineano a quella distanza, a partire dalla prima forma o da quella cliccata per prima; su una base la fila va al suo centro. Una forma bloccata resta ferma, quindi una tra le forme esterne impedisce la spaziatura uguale.
+Tieni premuto [[Alt]] e fai clic sul punto per digitare tu la distanza, per esempio 5 mm: le forme si allineano a quella distanza, a partire dalla prima forma o da quella cliccata per prima; su una base la fila va al suo centro. Una forma bloccata resta ferma, quindi una tra le forme esterne impedisce la spaziatura uguale. Su un tablet, che non ha il tasto Alt, l'interruttore {{ui:align.sizeSwitch}} accanto ai punti fa lo stesso: se lo attivi, i punti restano quadrati e il punto della distanza apre il suo campo, finché non lo disattivi.
 
 ## Specchiare
 
@@ -184,6 +186,8 @@ Quando selezioni più parti, il pannello delle proprietà a destra mostra quante
 Per ingrandire o rimpicciolire una o più parti della stessa percentuale, per esempio tutte le parti di un file di stampa del 20%, usa {{ui:scalePercent.title}}. Seleziona le parti, fai clic destro e scegli {{ui:scalePercent.title}}, oppure cercalo con [[Ctrl]]+[[K]].
 
 In {{ui:scalePercent.percent}} digita la nuova dimensione come percentuale di quella attuale: 120% è un quinto in più, 50% è la metà. Larghezza, profondità e altezza cambiano nella stessa proporzione, mantenendo la forma. La base resta nella posizione iniziale, così l’oggetto non sprofonda nella piastra.
+
+Per il modellismo scegli in alto {{ui:scalePercent.by.scale}} invece di {{ui:scalePercent.by.percent}}. {{ui:scalePercent.scalePresets}} offre le scale più comuni da Z (1:220) a G (1:22,5), e in {{ui:scalePercent.ratio}} scrivi qualsiasi altra scala, per esempio 35 per 1:35. Se il modello è costruito alla dimensione reale dell'originale, lascia {{ui:scalePercent.original.fullSize}}: 1:87 lo rende 87 volte più piccolo. Se l'hai costruito a una dimensione qualsiasi, scegli {{ui:scalePercent.original.realSize}}, poi {{ui:scalePercent.axis.height}} o {{ui:scalePercent.axis.length}} (il lato più lungo sul piano) e scrivi in {{ui:scalePercent.realSize}} quanto è grande davvero l'originale, in metri (in piedi con le unità imperiali). Un albero alto davvero 16 m diventa così in H0 alto 16.000 mm / 87 = 184 mm, qualunque fosse la sua dimensione prima. La nuova dimensione compare sotto i campi prima che tu prema {{ui:scalePercent.apply}}. La scala resta impostata finché l'editor è aperto.
 
 Selezionando più parti, puoi scegliere come ridimensionarle:
 

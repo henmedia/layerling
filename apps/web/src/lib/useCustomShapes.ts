@@ -63,7 +63,7 @@ const DEPTH_MESSAGE = `Folders go ${CUSTOM_SHAPE_FOLDER_DEPTH} levels deep; this
 
 export interface CustomShapesOptions {
   sharedProjectsEnabled: boolean;
-  setNotice: (message: string, busy?: boolean) => void;
+  setNotice: (message: string, busy?: boolean, action?: { label: string; run: () => void } | null) => void;
   commitShapes: (next: WorkplaneShape[], nextSelection?: string | string[] | null, message?: string) => void;
   setProjectAssets: (assets: ProjectAsset[]) => void;
   downloadBlob: (fileName: string, blob: Blob) => Promise<void>;
@@ -370,12 +370,16 @@ export function useCustomShapes(options: CustomShapesOptions) {
     setNotice(t("status.myShapeFolderDeleted", { name }));
   }, [refreshMyShapes, refreshServerShapes]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const backUpMyShapes = useCallback(async () => {
+  const backUpMyShapes = useCallback(async (asDownload = false): Promise<void> => {
     // Where it goes is asked first, while the click still counts: in Chrome and Edge a save dialog that remembers its
     // folder, elsewhere a download, as for the backups of the start page.
-    const target = await pickBackupTarget(myShapesBackupFileName(new Date()));
+    const target = await pickBackupTarget(myShapesBackupFileName(new Date()), asDownload);
     if (!target) {
-      setNotice(t("status.saveNothingChosen"));
+      // On some PCs the dialog hands back no file for any folder: the button makes the backup a download.
+      setNotice(t("status.saveNothingChosen"), true, {
+        label: t("status.saveAsDownload"),
+        run: () => void backUpMyShapes(true).catch((error) => setNotice(error instanceof Error ? localizedError(error.message) : String(error))),
+      });
       return;
     }
     const entries = await customShapesBackupEntries();

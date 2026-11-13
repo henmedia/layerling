@@ -83,6 +83,14 @@ export function isChainDrawingTool(tool: string) {
   return tool === "line" || tool === "bezier" || tool === "smooth";
 }
 
+/**
+ * Whether switching from one tool to another goes on with the chain being drawn (#1725): from a straight
+ * line to a smooth line or a curve and back the next point joins the last one, any other switch ends it.
+ */
+export function toolSwitchKeepsChain(from: string, to: string) {
+  return from !== to && isChainDrawingTool(from) && isChainDrawingTool(to);
+}
+
 /** How far the pointer may wander between pressing and releasing the right button and still count as a click, in screen pixels. */
 const RIGHT_CLICK_REACH = 5;
 

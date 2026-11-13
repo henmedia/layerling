@@ -200,8 +200,8 @@ describe("an image as the pattern", () => {
   });
 
   it("takes one's own picture as grey values, made smaller, and refuses one that does not fit", () => {
-    // A picture 600 x 300, dark on the left and light on the right, half transparent at the bottom.
-    const width = 600, height = 300;
+    // A picture 1200 x 600, dark on the left and light on the right, half transparent at the bottom.
+    const width = 1200, height = 600;
     const rgba = new Uint8ClampedArray(width * height * 4);
     for (let y = 0; y < height; y += 1) {
       for (let x = 0; x < width; x += 1) {
@@ -211,16 +211,16 @@ describe("an image as the pattern", () => {
       }
     }
     const own = surfaceTextureOwnImage(rgba, width, height);
-    expect(own).toMatchObject({ width: 256, height: 128 });
+    expect(own).toMatchObject({ width: 512, height: 256 });
     const grey = base64ToBytes(own.data);
-    expect(grey.length).toBe(256 * 128);
+    expect(grey.length).toBe(512 * 256);
     expect(grey[0]).toBeLessThan(5);
-    expect(grey[255]).toBeGreaterThan(250);
+    expect(grey[511]).toBeGreaterThan(250);
     // Transparent counts as dark.
-    expect(grey[127 * 256 + 255]).toBe(0);
+    expect(grey[255 * 512 + 511]).toBe(0);
     expect(normalizeSurfaceTextureOwnImage(own)).toEqual(own);
-    expect(normalizeSurfaceTextureOwnImage({ ...own, height: 129 })).toBeNull();
-    expect(normalizeSurfaceTextureOwnImage({ ...own, width: 512 })).toBeNull();
+    expect(normalizeSurfaceTextureOwnImage({ ...own, height: 257 })).toBeNull();
+    expect(normalizeSurfaceTextureOwnImage({ ...own, width: 513 })).toBeNull();
     expect(normalizeSurfaceTextureOwnImage({ ...own, data: "not base64!" })).toBeNull();
     // Kept with the settings, and the tile as high as the picture is for its width.
     const s = normalizeSurfaceTexture({ pattern: "image", image: "own", imageOwn: own, projection: "flat", axis: "z", spacing: 40 });
@@ -232,6 +232,33 @@ describe("an image as the pattern", () => {
     expect(at(39, 15)).toBeGreaterThan(0.9);
     expect(at(1, 15)).toBeLessThan(0.1);
     expect(at(39, 15, { ...s, imageInvert: true })).toBeLessThan(0.1);
+  });
+
+  it("makes the edge of one's own picture across a wide tile steeper than 256 points would (#1462)", () => {
+    // A picture 1000 x 1000, light on the left of a line at a slant, on a tile 140 mm wide: at 256 across a point is
+    // 0.55 mm, and the steps of the grid showed as a saw along the edge. The way from dark to light is now shorter.
+    const n = 1000;
+    const rgba = new Uint8ClampedArray(n * n * 4);
+    for (let y = 0; y < n; y += 1) {
+      for (let x = 0; x < n; x += 1) {
+        rgba.set(x < 300 + 0.3 * y ? [255, 255, 255, 255] : [0, 0, 0, 255], (y * n + x) * 4);
+      }
+    }
+    const own = surfaceTextureOwnImage(rgba, n, n);
+    expect(own.width).toBe(512);
+    const s = normalizeSurfaceTexture({ pattern: "image", image: "own", imageOwn: own, imageBlur: 0, projection: "flat", axis: "z", spacing: 140 });
+    const layout = makeSurfaceTextureLayout(screenBase(box(200, 10, 200)), s);
+    const at = (u: number, v: number) => surfaceTextureValueAt(u, v, 10, 0, 0, 1, s, layout);
+    // How far (mm) along a row the value is between a tenth and nine tenths: the way from dark to light.
+    const across = (v: number) => {
+      let width = 0;
+      for (let u = 0; u < 140; u += 0.01) {
+        const value = at(u, v);
+        if (value > 0.1 && value < 0.9) width += 0.01;
+      }
+      return width;
+    };
+    for (const v of [30, 70, 110]) expect(across(v)).toBeLessThan(0.7);
   });
 
   /**

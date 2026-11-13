@@ -11,6 +11,27 @@ Jeśli wracasz na stronę startową z projektu, w którym nic nie ma, layerling 
 
 Ma to swoją wadę: kto wyczyści pamięć przeglądarki albo przesiądzie się na inny komputer, traci projekty. **Dlatego ważną pracę zapisuj w kopii zapasowej do pliku.**
 
+## Twoje projekty, twoja kopia
+
+Twoje projekty są w tej przeglądarce na twoim komputerze. Jak w przypadku wszystkich danych bezpieczne jest tylko to, co istnieje drugi raz w innym miejscu: awaria dysku, nowy komputer, wyczyszczone dane przeglądarki lub błąd programu i bez kopii praca przepada. O tę kopię dbasz sam; żaden program nie zrobi tego za ciebie. layerling to ułatwia: {{ui:dashboard.backupAll}} na stronie startowej jednym kliknięciem zapisuje wszystkie projekty w jednym pliku (zobacz niżej). Trzymaj ten plik na pendrivie, w folderze w chmurze lub na NAS, po każdej większej sesji.
+
+layerling o tym przypomina. Wiersz nad projektami tej przeglądarki staje się wyraźniejszy, im dawniej było ostatnie {{ui:dashboard.backupAll}}: z przyciskiem {{ui:backups.backUpNow}}, gdy jest starsze niż dni ustawione w {{ui:backups.reminderDays}} (na początek 7), a projekty od tego czasu się zmieniły, oraz na czerwono, gdy jest więcej niż trzy projekty i żadnej kopii albo żadnej od 30 dni. Edytor przypomina raz dziennie w wierszu stanu, z tym samym przyciskiem. Automatyczne kopie opisane niżej się tu nie liczą: są na tym samym komputerze.
+
+## Wcześniejsze wersje
+
+layerling sam tworzy też dwa rodzaje kopii:
+
+- **Przed nadpisaniem pliku.** Gdy [[Ctrl]]+[[S]] lub {{ui:export.saveProject}} zapisuje do istniejącego pliku `.lyl` (Chrome i Edge, zobacz niżej), najpierw zachowywany jest plik w poprzedniej postaci. Plik, który nie zmienił się od ostatniej kopii, nie jest zachowywany dwa razy.
+- **Stany podczas pracy.** Podczas pracy nad projektem co 10 minut zachowywany jest jego stan, ale tylko gdy coś się zmieniło; z każdego projektu zostaje sześć ostatnich.
+
+{{ui:backups.title}} pokazuje je: w edytorze w oknie eksportu pod **LYL** i w wyszukiwaniu poleceń, na stronie startowej obok {{ui:dashboard.restoreBackup}} dla wszystkich projektów oraz w menu projektu dla niego. Każda pokazuje obraz, czas, rodzaj, nazwę i rozmiar. {{ui:backups.open}} otwiera wersję jako nowy projekt: otwarty projekt pozostaje bez zmian, a nowy nie jest powiązany z oryginalnym plikiem, więc zapisanie go nigdy nie nadpisze tego pliku. Przycisk pobierania zapisuje wersję jako plik `.lyl`, kosz ją usuwa.
+
+W ustawieniach (koło zębate na wstążce) strona {{ui:backups.settingsTitle}} określa, ile wcześniejszych wersji pliku zostaje (od żadnej do 20, na początek 5), jak często zachowywany jest stan (nigdy, co 10 lub co 30 minut) i od kiedy pojawiają się przypomnienia. Te ustawienia należą do tej przeglądarki, nie do projektu. Wszystkie kopie razem zajmują najwyżej 500 MB; powyżej najpierw znikają najstarsze stany.
+
+**Folder kopii (Chrome i Edge).** W {{ui:backups.folder}} możesz wybrać folder na swoim komputerze. Każda kopia trafia wtedy też tam jako plik `.lyl` z nazwą projektu i godziną, na przykład `Uchwyt 2026-11-11 20-31-05.lyl`, stan z ` auto` przed rozszerzeniem. Stare znikają tam tak jak w przeglądarce; niczego innego w folderze to nie dotyka. Po przeładowaniu przeglądarka przy pierwszym zapisie ponownie prosi o zgodę; stan zachowany wcześniej zostaje w przeglądarce, a komunikat proponuje {{ui:backups.allowFolder}}. Folder synchronizowany z chmurą lub na innym dysku też jest drugim miejscem.
+
+Kopie w przeglądarce znikają razem z jej danymi. Dlatego nie zastępują {{ui:dashboard.backupAll}}.
+
 ## Foldery na projekty
 
 Przy kilkudziesięciu projektach jedna lista nie wystarcza. Na stronie startowej {{ui:shared.newFolder}} tworzy folder na projekty z tej przeglądarki, a kliknięcie folderu go otwiera. Foldery mogą zawierać foldery.
@@ -25,10 +46,13 @@ Przy kilkudziesięciu projektach jedna lista nie wystarcza. Na stronie startowej
 ## Kopie zapasowe i przekazywanie
 
 Na stronie startowej każdy projekt ma menu z opcjami zmiany nazwy, duplikowania i usuwania. Rząd przycisków obok kart jest taki sam na każdej karcie. Aby usunąć kilka projektów naraz, kliknij {{ui:dashboard.select}}: kliknięcie karty ją wybiera (ptaszek pokazuje, co jest wybrane), {{ui:dashboard.selectAll}} wybiera wszystkie projekty z listy, a {{ui:common.delete}} pyta raz o wszystkie. {{ui:dashboard.selectDone}} albo [[Esc]] kończy wybieranie. Przyciskiem {{ui:dashboard.backupAll}} pakujesz wszystkie projekty otwartej karty do jednego pliku ZIP. {{ui:dashboard.restoreBackup}}, tuż obok (jest tam też na nowym komputerze bez projektów), przywraca je, także w innej przeglądarce albo na innym komputerze. {{ui:dashboard.importGeometry}} przyjmuje ten sam plik. {{ui:myShapes.title}} z tej przeglądarki wędrują w tym samym pliku, w folderze `Custom shapes`, zobacz [Kształty](chapter:shapes). Jeśli przywracasz kopię do przeglądarki, która ma już niektóre z tych projektów, nie są one dodawane drugi raz, a komunikat mówi, ile ich już było. Projekt, którego nie da się odczytać, zostaje pominięty, a komunikat podaje jego nazwę. Jeśli strona przeładuje się w trakcie tworzenia kopii, zwykle dlatego, że bardzo duży projekt zajął całą pamięć, na jaką pozwala przeglądarka, strona startowa mówi potem, na którym projekcie się zatrzymała: zapisz go osobno jako plik (zobacz niżej) albo uprość jego największe siatki, a potem utwórz kopię ponownie. Nad projektami z tej przeglądarki krótki wiersz mówi, jak się mają: na pomarańczowo, dopóki nie ma ich w żadnej kopii albo gdy od ostatniego {{ui:dashboard.backupAll}} doszły nowe lub zmienione (podaje, kiedy to było i ile ich jest), a na szaro, gdy wszystkie są w kopii. Liczy się tylko kopia wszystkich projektów, nie folderu ani wybranych projektów.
+Kopia zapasowa wszystkich projektów zawiera też ustawienia tej przeglądarki: Twoje domyślne ustawienia dla nowych projektów, motyw, wstążkę, własne skróty klawiszowe i drukarki. Przy przywracaniu pole wyboru pyta, czy je również przejąć; jest zaznaczone, gdy ta przeglądarka nie ma jeszcze własnych ustawień domyślnych.
 
 Tylko niektóre projekty: po {{ui:dashboard.select}} przycisk {{ui:dashboard.backupSelected}} pakuje tylko wybrane projekty, w ich folderach, do jednego pliku ZIP, a {{ui:dashboard.backupSelected}} w menu folderu pakuje ten folder ze wszystkimi projektami i folderami. Żaden z nich nie zabiera własnych kształtów, a {{ui:dashboard.restoreBackup}} przywraca oba jak pełną kopię. Dotyczy to projektów tej przeglądarki.
 
-Gdzie trafia kopia zapasowa: w Chrome i Edge okno zapisu pyta o folder i nazwę oraz zapamiętuje folder na następną kopię. Dzięki temu kopie trafiają od razu do własnego folderu, na przykład na dysk w chmurze. To samo dotyczy {{ui:myShapes.backup}}. Inne przeglądarki zapisują plik w swoim folderze pobranych plików; który to folder, ustawia się w ustawieniach przeglądarki.
+Gdzie trafia kopia zapasowa: w Chrome i Edge okno zapisu pyta o folder i nazwę oraz zapamiętuje folder na następną kopię. Dzięki temu kopie trafiają od razu do własnego folderu, na przykład na dysk w chmurze. To samo dotyczy {{ui:myShapes.backup}}. Inne przeglądarki zapisują plik w swoim folderze pobranych plików; który to folder, ustawia się w ustawieniach przeglądarki. Jeśli okno nie zwróci żadnego pliku, komunikat proponuje {{ui:status.saveAsDownload}}: kopia trafia wtedy jako zwykłe pobranie do folderu Pobrane.
+
+Aby coś wypróbować bez zmieniania projektu, wybierz {{ui:dashboard.openCopy}} w jego menu na stronie startowej. layerling tworzy kopię, tak jak {{ui:common.duplicate}}, i od razu ją otwiera; oryginał pozostaje taki, jaki był, cokolwiek zrobisz w kopii. Na serwerze kopia leży tam obok oryginału.
 
 Jeśli projekt otwiera się bardzo wolno albo wcale, zwykle dlatego, że jego historia kroków cofania bardzo się rozrosła, wybierz {{ui:dashboard.openWithoutHistory}} w jego menu na stronie startowej. layerling wczyta wtedy tylko bieżący stan, usunie na dobre wszystkie wcześniejsze kroki i otworzy projekt; najpierw zapyta, bo tego nie da się cofnąć. Aby zachować kroki, najpierw zrób kopię projektu przez {{ui:dashboard.backupSelected}}.
 
@@ -118,6 +142,10 @@ Przez {{ui:editor.import}} albo [[Ctrl]]+[[I]] wprowadzasz do projektu obce plik
 Projekt zapisany w **nowszej wersji layerling** może zawierać rzeczy, których Twoja wersja jeszcze nie zna, na przykład nowy kształt, nowe ustawienie albo własne czcionki. Jeśli layerling nie może go z tego powodu otworzyć, komunikat podaje obie wersje. Jeśli się otworzy, komunikat mówi, że nowsze elementy mogą tu wyglądać inaczej. W obu przypadkach pomaga przeładowanie strony: layerling.com zawsze podaje najnowszą wersję. Zainstalowana aplikacja pobiera ją przy następnym uruchomieniu, a na własnym serwerze instalujesz aktualizację.
 
 Obrazy wzorcowe dodaje się w trybie szkicu, zobacz [Szkice](chapter:sketches).
+
+## Duże siatki
+
+layerling jest stworzony przede wszystkim do budowania dokładnych brył CAD: walec zapisuje się jako okrąg i wysokość, zaokrąglenie jako jedną zakrzywioną powierzchnię. Zaimportowana siatka to natomiast przybliżenie z trójkątów, im dokładniejsze, tym ich więcej, a każdy z nich jest trzymany w pamięci, rysowany i zapisywany. Mniejsze części jako siatki nie stanowią problemu. Bardzo duże siatki, takie jak skany, rzeźby czy modele z Blendera z setkami tysięcy lub milionami trójkątów, spowalniają edytor, zajmują dużo pamięci i spowalniają zapisywanie, a ich cięcie może w ogóle się nie udać. Po imporcie, który wnosi takie siatki, layerling raz o tym informuje. Najpierw uprość taką siatkę (zobacz niżej), importuj tylko potrzebne części albo zbuduj proste części z własnych kształtów layerlinga.
 
 ## Upraszczanie zaimportowanej siatki
 

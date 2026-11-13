@@ -46,7 +46,7 @@ Am linken Rand liegt eine schmale Leiste. Von oben nach unten:
 - {{ui:camera.orthographic}} schaltet auf eine flache Ansicht um, in der parallele Kanten parallel bleiben. Das ist zum Messen und zum Ausrichten von Kanten oft angenehmer als die perspektivische Ansicht. Mit [[O]] wechselst du hin und her, ein zweiter Klick geht zurück.
 - {{ui:camera.secondView}} öffnet eine zweite Ansicht des Entwurfs in einem eigenen Fenster, siehe unten. Ein zweiter Klick schließt es.
 - {{ui:camera.showScrollbars}} blendet unten und am rechten Rand der Ansicht je eine Bildlaufleiste ein. Ziehst du den Balken, gleitet die Ansicht stufenlos mit; ein Klick auf einen Pfeil am Ende schiebt sie ein kleines Stück (gehalten läuft sie weiter), ein Klick neben den Balken fast um eine ganze Bildbreite. Dabei dreht sich nichts, und anders als die Pfeiltasten gehen die Leisten auch, während ein Teil ausgewählt ist - praktisch, wenn du nah an kleinen Details arbeitest. Ein zweiter Klick blendet sie aus; ob ein Entwurf mit ihnen öffnet, entscheidet {{ui:workspace.startWithScrollbars}} in den Einstellungen. Dieser Browser merkt sich den Schalter außerdem.
-- {{ui:camera.hideWorkplane}} (das Auge über dem Gitter) blendet die Platte mit ihrem Gitter aus, damit du die Unterseite eines Entwurfs von unten ansehen kannst. Es ändert sich nur die Ansicht: Neue Formen landen weiter auf der Arbeitsebene. Ein zweiter Klick blendet sie wieder ein.
+- {{ui:camera.hideWorkplane}} (das Auge über dem Gitter) blendet die Platte mit ihrem Gitter aus, damit du die Unterseite eines Entwurfs von unten ansehen kannst. Es ändert sich nur die Ansicht: Neue Formen landen weiter auf der Arbeitsebene. Ein zweiter Klick blendet sie wieder ein. Liegt eine Arbeitsebene auf einer Fläche, heißt er {{ui:camera.hideBuildPlate}} und blendet nur die Druckplatte aus: Die Arbeitsebene auf der Fläche bleibt, sie hat ihr eigenes Auge, {{ui:camera.hideFaceWorkplane}}.
 - {{ui:camera.placeWorkplane}}, das Maßband und das Winkellineal sind eigene Werkzeuge, sie kommen weiter unten und im Kapitel [Messen und Notizen](chapter:messen-und-notizen) vor.
 
 Über den kleinen Pfeil ganz oben in der Leiste kannst du sie ausblenden, wenn sie stört. Derselbe Knopf, gezogen, verschiebt die Leiste an eine beliebige Stelle im Editor, auch in einer Skizze; ein Doppelklick stellt sie zurück. Die 3D-Vorschau einer gedrehten Skizze verschiebst du ebenso an ihrer Titelzeile.
@@ -101,6 +101,7 @@ Passt ein Entwurf nicht auf eine Platte, etwa eine Dose mit Deckel und Einsätze
 
 - Jede Platte ist so groß wie die Arbeitsfläche, die Platten liegen rechts neben der ersten, 20 mm auseinander. Ein Körper gehört zu der Platte, auf der die Mitte seiner Grundfläche steht; zieht man ihn hinüber, steht er auf der anderen Platte. Ein Entwurf hat bis zu 12 Platten.
 - Ein Klick auf eine Platte in der Leiste zeigt sie, und neue Formen und importierte Dateien landen dann auf ihr. {{ui:plates.showAll}} zeigt alle. Ein Doppelklick auf eine Platte oder {{ui:plates.rename}} gibt ihr einen Namen wie „Deckel“, der auf der Platte steht.
+- Auch eine neue Skizze auf der Platte beginnt auf der aktiven Platte: Die Skizzenfläche zeigt diese Platte mit den Körpern darauf, und der fertige Körper steht dort.
 - {{ui:plates.moveLeft}} und {{ui:plates.moveRight}} ändern die Reihenfolge, die Körper wandern mit ihrer Platte. {{ui:plates.remove}} nimmt die aktive Platte weg; ihre Körper kommen an derselben Stelle auf die erste Platte.
 - {{ui:plates.arrange}} legt die ausgewählten Körper, oder alle, Reihe für Reihe auf die Platten, die größten zuerst, 5 mm auseinander, und fügt Platten hinzu, solange sie gebraucht werden. Ein Körper, der größer als eine Platte ist, bleibt stehen.
 - Mit gewähltem Drucker wird jeder Körper gegen seine eigene Platte geprüft, und die Bauhöhe zählt ab dem tiefsten Körper dieser Platte. Eine Platte mit einem Körper, der nicht passt, zeigt ihre Zahl rot.
@@ -157,7 +158,7 @@ Die Skizzenansicht hat eigene Farben: {{ui:workspace.sketchBackground}} für das
 
 ### Darstellung: Achsenpfeile und Kantenlinien
 
-{{ui:workspace.showAxes}} (zunächst an) zeichnet am hinteren linken Eck der Platte drei Pfeile: **X** in Rot nach rechts, **Y** in Grün nach hinten und **Z** in Blau nach oben, so wie die Positionsfelder zählen. Das ist die Rechte-Hand-Regel, die auch Tinkercad, CAD-Programme und die Slicer nutzen. Liegt die Arbeitsebene auf einer Fläche, wandern sie mit. Hier schaltest du sie aus, wenn sie stören.
+{{ui:workspace.showAxes}} (zunächst an) zeichnet am hinteren linken Eck der Platte drei Pfeile: **X** in Rot nach rechts, **Y** in Grün nach hinten und **Z** in Blau nach oben, so wie die Positionsfelder zählen. Das ist die Rechte-Hand-Regel, die auch Tinkercad, CAD-Programme und die Slicer nutzen. Liegt die Arbeitsebene auf einer Fläche, wandern sie mit. Hier schaltest du sie aus, wenn sie stören. Solange die Pfeile an sind, trägt auch das Mittelkreuz des Rasters ihre Farben: die Linie entlang X rot, die entlang Y grün. So siehst du auch an einem kleinen Teil sofort, wohin welche Achse läuft.
 
 {{ui:workspace.edgeLines}} zeichnet an jedem Körper eine Umrisslinie in der Farbe von {{ui:workspace.edgeColor}} (zunächst Schwarz, wie bei Tinkercad): Das hilft, wenn dunkle Farben ineinander verschwimmen. Es ist zunächst aus, und sehr große importierte Netze bleiben ausgenommen.
 
@@ -192,6 +193,8 @@ Die Skizzenansicht hat eigene Farben: {{ui:workspace.sketchBackground}} für das
 {{ui:workspace.startWithScrollbars}}: Ein Entwurf öffnet dann mit den Bildlaufleisten der Ansicht. Die Einstellung wird mit dem Entwurf und mit {{ui:workspace.makeDefault}} gespeichert.
 
 {{ui:workspace.viewBarOpensOnHover}}: Eine eingeklappte Ansichtsleiste klappt auf, solange die Maus über ihrem Pfeil ist, und kurz nachdem die Maus sie verlassen hat wieder zu, außer eines ihrer Werkzeuge ist in Gebrauch. Ein Klick auf den Pfeil, während sie so offen ist, lässt sie offen. Das gilt nur für die Maus; auf einem Touchscreen öffnet ein Tippen die Leiste wie bisher.
+
+{{ui:workspace.showStepNotices}}: Nach einem Schritt wie Vereinen sagt eine kurze Meldung neben dem Ansichtswürfel, was geschehen ist, und bietet {{ui:shortcuts.undo}} an. Ausgeschaltet bleiben diese Meldungen weg; Meldungen, die etwas von dir wollen oder ein Problem melden, erscheinen weiter, und {{ui:editor.tool.undo}} im Menüband nennt den Schritt weiterhin, wenn du darauf zeigst.
 
 {{ui:workspace.startView}} legt den Blickwinkel fest, in dem ein neuer Entwurf öffnet und zu dem {{ui:camera.home}} zurückkehrt. Dreh und zoome die Ansicht, wie du sie magst, und klicke dann {{ui:workspace.startViewUseCurrent}}; {{ui:workspace.startViewStandard}} bringt den gewohnten Blick von vorne rechts zurück. Das gilt für alle Entwürfe in diesem Browser. Ein Entwurf, den du wieder öffnest, öffnet weiter so, wie du ihn verlassen hast.
 

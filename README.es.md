@@ -21,7 +21,7 @@
     <a href="#skill-mcp-de-layerling"><img alt="Manejable por una IA" src="https://img.shields.io/badge/manejable%20por%20IA-servidor%20MCP-16c0d4"></a>
   </p>
 
-  <p><a href="README.md">English</a> · <a href="README.de.md">Deutsch</a> · <strong>Español</strong> · <a href="README.nl.md">Nederlands</a> · <a href="README.ar.md">العربية</a> · <a href="README.ja.md">日本語</a> · <a href="README.zh-cn.md">简体中文</a> · <a href="README.zh-tw.md">繁體中文</a></p>
+  <p><a href="README.md">English</a> · <a href="README.de.md">Deutsch</a> · <strong>Español</strong> · <a href="README.nl.md">Nederlands</a> · <a href="README.pl.md">Polski</a> · <a href="README.sv.md">Svenska</a> · <a href="README.ar.md">العربية</a> · <a href="README.ja.md">日本語</a> · <a href="README.zh-cn.md">简体中文</a> · <a href="README.zh-tw.md">繁體中文</a></p>
 </div>
 
 <p align="center">
@@ -131,6 +131,7 @@ No es un paquete de CAD completo: no tiene línea de tiempo paramétrica ni ensa
 - **Eliminar varios diseños a la vez**: **Seleccionar**, en la página de inicio, elige diseños con un clic en sus tarjetas (o todos), y una sola pregunta elimina toda la selección; también funciona en la carpeta del servidor.
 - **Carpetas para tus diseños**: ordena los diseños de la página de inicio en carpetas (y carpetas dentro de carpetas) arrastrándolos o con «Mover a…»; la búsqueda mira en todas, y «Hacer copia de seguridad» las conserva.
 - **Proyectos como archivos**: guarda un proyecto entero, con historial, bocetos y grupos, como archivo `.lyl` y sigue en otro sitio. En Chrome y Edge eliges tú la carpeta y Ctrl+S vuelve a guardar en ese mismo archivo; los demás navegadores lo descargan. Los archivos `.skf` de versiones anteriores se siguen abriendo; al guardar, se escribe un `.lyl` a su lado.
+- **Versiones anteriores**: antes de que Guardar sobrescriba un archivo `.lyl`, layerling conserva el archivo tal como era y, mientras trabajas, un estado del diseño cada pocos minutos; cada versión se vuelve a abrir como diseño nuevo. Cuántas se conservan lo decides en Ajustes → Copias de seguridad, y en Chrome y Edge también pueden ir a una carpeta tuya. Un aviso en la página de inicio y en el editor te recuerda hacer una copia de todos los diseños en un archivo y guardarlo en un segundo lugar: tus diseños, tu copia.
 - **Informe de error**: un enlace en el pie de página guarda un ZIP con el diseño como `.lyl` y un texto con la versión, el navegador y los últimos mensajes, listo para adjuntarlo en el foro o en GitHub, que no aceptan un `.lyl` suelto.
 - **Diseños que reconoces**: cada diseño con su miniatura, en tu navegador o en la carpeta del servidor.
 - **Adjuntos**: guarda dentro del diseño notas, una foto de la pieza impresa o una hoja de datos: los archivos `.md` y `.txt`, las imágenes `.png`, `.jpg` y `.webp` y los PDF viajan con el archivo `.lyl`. El ojo abre un texto o una imagen en una ventana; un PDF se descarga. SVG no se admite, porque puede llevar scripts.
@@ -142,7 +143,7 @@ No es un paquete de CAD completo: no tiene línea de tiempo paramétrica ni ensa
 - **Cuatro vistas guardadas por diseño**: **Mayús+7**, **8**, **9** o **0** guarda la vista tal como está (ángulo, desplazamiento, zoom), y la tecla sola la recupera. Cada diseño guarda las suyas, y un archivo `.lyl` guardado se las lleva consigo.
 - **Mirar de frente al plano de trabajo**: **P**, o el botón junto a Colocar plano de trabajo en la barra de vista, gira la vista de frente al plano de trabajo, también sobre una cara inclinada, con su origen en el centro.
 - **El cubo de vista en cualquier esquina**: **Ajustes > Aspecto > Posición del cubo** pone el cubo arriba a la izquierda, arriba a la derecha, abajo a la izquierda o abajo a la derecha; en cualquier esquina que no sea la de arriba a la izquierda, la barra de vista sube a su sitio.
-- **En tu idioma**: el programa y su guía de usuario están en inglés, alemán y otros 17 idiomas; la lista de idiomas está arriba del todo a la derecha.
+- **En tu idioma**: el programa y su guía de usuario están en inglés, alemán y otros 18 idiomas; la lista de idiomas está arriba del todo a la derecha.
 - **Mirar desde abajo**: el ojo sobre una cuadrícula de la barra de vista oculta la placa, para ver la parte de abajo de un diseño sin que estorbe.
 - **Una segunda vista en su propia ventana**: un botón de la barra de vista abre una segunda ventana que muestra el mismo diseño a través de una cámara propia, con su propio cubo de vista y su propia barra de vista, y sigue cada cambio. Se abre donde la dejaste la última vez.
 - **Los paneles donde quieras**: la lista de objetos, los ajustes, la vista de sección, la cinta métrica y los paneles de las herramientas de aristas, vaciado y patrones se mueven por su barra de título y vuelven a abrirse ahí; un doble clic los acopla.
@@ -235,6 +236,8 @@ Ejecuta la misma línea de nuevo cuando quieras **actualizar**: la carpeta exist
 ### Docker
 
 Para tener layerling en un ordenador, un NAS (Synology, Unraid, etc.) o un servidor de casa sin instalar Node.js, usa la imagen ya hecha **`henmedia/layerling`** de Docker Hub (también en **`ghcr.io/henmedia/layerling`**, que es la misma imagen). Cada versión la publica para amd64 y arm64 (Raspberry Pi, NAS con ARM) con su número de versión y como `latest`. La aplicación escucha en el puerto **3000**.
+
+¿Nuevo en Docker? [Ejecutar layerling en Docker, paso a paso (en inglés)](docs/docker/en/docker-step-by-step.md) empieza desde cero en Windows, macOS o Linux: instala Docker, inicia layerling y guarda tus diseños como archivos en una carpeta de tu ordenador.
 
 Lo más rápido es una sola orden:
 

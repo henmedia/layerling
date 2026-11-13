@@ -42,7 +42,7 @@ Sur le bord gauche se trouve une barre étroite. Du haut :
 - {{ui:camera.orthographic}} passe à une vue plate dans laquelle les bords parallèles restent parallèles. Pour mesurer et aligner les bords, c'est souvent plus confortable que la vue en perspective. [[O]] bascule d'avant en arrière et un deuxième clic revient.
 - {{ui:camera.secondView}} ouvre une deuxième vue du design dans une fenêtre à part, décrite plus bas. Un second clic la ferme.
 - {{ui:camera.showScrollbars}} affiche une barre de défilement en bas de la vue et une autre le long de son bord droit. Faites glisser une barre pour déplacer la vue en douceur, cliquez sur une flèche à son extrémité pour la déplacer un peu (maintenez pour continuer), ou cliquez à côté de la barre pour avancer de presque toute la vue. Rien ne tourne et, contrairement aux touches fléchées, les barres fonctionnent même quand une pièce est sélectionnée - pratique de près, sur les petits détails. Un second clic les masque ; {{ui:workspace.startWithScrollbars}} dans les réglages décide si un projet s'ouvre avec elles. Ce navigateur retient aussi le choix.
-- {{ui:camera.hideWorkplane}} (l'œil au-dessus d'une grille) cache la plaque avec sa grille, vous pouvez donc regarder le dessous d'un dessin par le bas. Seule la vue change : de nouvelles formes atterrissent toujours sur le plan de travail. Un deuxième clic l'affiche à nouveau.
+- {{ui:camera.hideWorkplane}} (l'œil au-dessus d'une grille) cache la plaque avec sa grille, vous pouvez donc regarder le dessous d'un dessin par le bas. Seule la vue change : de nouvelles formes atterrissent toujours sur le plan de travail. Un deuxième clic l'affiche à nouveau. Avec un plan de travail posé sur une face, il s'appelle {{ui:camera.hideBuildPlate}} et ne masque que la plaque de construction : le plan de travail sur la face reste, il a son propre œil, {{ui:camera.hideFaceWorkplane}}.
 - {{ui:camera.placeWorkplane}}, le mètre ruban et l'équerre d'encadrement sont des outils à part entière, abordés ci-dessous et dans [Mesures et notes] (chapter:measuring-and-notes).
 
 La petite flèche tout en haut de la barre la cache si elle gêne.
@@ -99,6 +99,7 @@ Quand un design contient plus qu'un plateau ne peut imprimer, une boîte avec so
 
 - Chaque plateau est aussi grand que le plan de travail, et les plateaux sont côte à côte à droite du premier, à 20 mm l'un de l'autre. Un corps appartient au plateau sur lequel se trouve le milieu de son empreinte ; en le faisant glisser de l'autre côté, il passe sur l'autre plateau. Un design compte jusqu'à 12 plateaux.
 - Un clic sur un plateau dans la barre l'affiche, et les nouvelles formes et les fichiers importés s'y posent alors. {{ui:plates.showAll}} les affiche tous. Un double-clic sur un plateau, ou {{ui:plates.rename}}, lui donne un nom comme « Couvercle », écrit sur le plateau.
+- Une nouvelle esquisse sur le plateau commence aussi sur le plateau actif : la zone d'esquisse montre ce plateau avec ses corps, et le corps terminé s'y trouve.
 - {{ui:plates.moveLeft}} et {{ui:plates.moveRight}} changent l'ordre, les corps suivant leur plateau. {{ui:plates.remove}} retire le plateau actif ; ses corps passent sur le premier plateau au même endroit.
 - {{ui:plates.arrange}} dispose les corps sélectionnés, ou tous, rangée par rangée sur les plateaux, les plus grands d'abord, à 5 mm l'un de l'autre, et ajoute des plateaux tant qu'il en faut. Un corps plus grand qu'un plateau reste en place.
 - Avec une imprimante choisie, chaque corps est contrôlé par rapport à son propre plateau, et la hauteur d'impression compte à partir du corps le plus bas de ce plateau. Un plateau avec un corps qui ne tient pas affiche son nombre en rouge.
@@ -155,7 +156,7 @@ La vue d'esquisse a ses propres couleurs : {{ui:workspace.sketchBackground}} pou
 
 ### Apparence : flèches d'axes et lignes de bord
 
-{{ui:workspace.showAxes}} (activé par défaut) dessine trois flèches dans le coin arrière gauche de la plaque : **X** en rouge vers la droite, **Y** en vert vers l'arrière et **Z** en bleu vers le haut, comme le comptent les champs de position. C'est la règle de droite que Tinkercad, les programmes de CAO et les slicers utilisent également. Avec le plan de travail sur une face, ils le suivent. Éteignez-les ici s'ils vous gênent.
+{{ui:workspace.showAxes}} (activé par défaut) dessine trois flèches dans le coin arrière gauche de la plaque : **X** en rouge vers la droite, **Y** en vert vers l'arrière et **Z** en bleu vers le haut, comme le comptent les champs de position. C'est la règle de droite que Tinkercad, les programmes de CAO et les slicers utilisent également. Avec le plan de travail sur une face, ils le suivent. Éteignez-les ici s'ils vous gênent. Tant que les flèches sont affichées, la croix centrale de la grille prend aussi leurs couleurs : la ligne le long de X en rouge, celle le long de Y en vert. Ainsi, même sur une petite pièce, vous voyez tout de suite dans quel sens va chaque axe.
 
 {{ui:workspace.edgeLines}} dessine un contour sur chaque corps, dans la couleur de {{ui:workspace.edgeColor}} (noir au départ, comme dans Tinkercad) : cela aide lorsque des couleurs sombres se rejoignent. C'est désactivé par défaut, et les très grands maillages importés sont laissés de côté.
 
@@ -190,6 +191,8 @@ La vue d'esquisse a ses propres couleurs : {{ui:workspace.sketchBackground}} pou
 {{ui:workspace.startWithScrollbars}} : un projet s'ouvre alors avec les barres de défilement de la vue. Le réglage est enregistré avec le projet et avec {{ui:workspace.makeDefault}}.
 
 {{ui:workspace.viewBarOpensOnHover}} : une barre de vue repliée s'ouvre tant que la souris est sur sa flèche et se replie peu après que la souris l'a quittée, sauf si l'un de ses outils est en cours d'utilisation. Un clic sur la flèche pendant qu'elle est ainsi ouverte la garde ouverte. Cela ne vaut que pour la souris ; sur un écran tactile, un toucher ouvre la barre comme avant.
+
+{{ui:workspace.showStepNotices}} : après une étape comme une union, un court message à côté du cube de vue dit ce qui a été fait et propose {{ui:shortcuts.undo}}. Désactivé, ces messages n'apparaissent plus ; ceux qui attendent quelque chose de vous ou signalent un problème s'affichent toujours, et {{ui:editor.tool.undo}} dans le ruban nomme toujours l'étape quand vous le survolez.
 
 {{ui:workspace.startView}} définit l'angle sous lequel s'ouvre une nouvelle conception et auquel revient {{ui:camera.home}}. Tournez et zoomez la vue comme vous l'aimez, puis cliquez sur {{ui:workspace.startViewUseCurrent}} ; {{ui:workspace.startViewStandard}} ramène la vue habituelle de l'avant droit. Cela vaut pour chaque conception de ce navigateur. Une conception que vous rouvrez s'ouvre toujours comme vous l'avez laissée.
 

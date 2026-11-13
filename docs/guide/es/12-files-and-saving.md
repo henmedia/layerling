@@ -11,6 +11,27 @@ Si vuelves a la página de inicio desde un diseño vacío, layerling te pregunta
 
 Esto tiene un inconveniente: si borras los datos del navegador o te cambias a otro ordenador, pierdes los diseños. **Así que haz copias de seguridad de tus trabajos importantes en un archivo.**
 
+## Tus diseños, tu copia de seguridad
+
+Tus diseños están en este navegador, en tu ordenador. Como con todos los datos, solo está a salvo lo que existe una segunda vez en otro lugar: un disco que falla, un PC nuevo, datos del navegador borrados o un fallo del programa, y sin copia el trabajo se pierde. Esa copia depende de ti; ningún programa puede hacerla por ti. layerling lo pone fácil: {{ui:dashboard.backupAll}} en la página de inicio guarda todos los diseños en un solo archivo con un clic (ver más abajo). Guarda ese archivo en una memoria USB, en una carpeta en la nube o en un NAS, después de cada sesión importante.
+
+layerling te lo recuerda. La línea sobre los diseños de este navegador se hace más visible cuanto más atrás queda el último {{ui:dashboard.backupAll}}: con el botón {{ui:backups.backUpNow}} en cuanto supera los días ajustados en {{ui:backups.reminderDays}} (7 al principio) y han cambiado diseños desde entonces, y en rojo si hay más de tres diseños sin ninguna copia, o ninguna en 30 días. El editor te lo recuerda una vez al día en la línea de estado, con el mismo botón. Las copias automáticas de abajo no cuentan aquí: están en el mismo ordenador.
+
+## Versiones anteriores
+
+layerling además guarda por sí solo dos tipos de copias:
+
+- **Antes de sobrescribir un archivo.** Cuando [[Ctrl]]+[[S]] o {{ui:export.saveProject}} escribe en un archivo `.lyl` que ya existe (Chrome y Edge, ver más abajo), primero se conserva el archivo tal como era. Un archivo que no ha cambiado desde su última copia no se guarda dos veces.
+- **Estados mientras trabajas.** Mientras trabajas en un diseño, se guarda un estado cada 10 minutos, pero solo si algo cambió; de cada diseño quedan los seis últimos.
+
+{{ui:backups.title}} los muestra: en el editor, en la ventana de exportación bajo **LYL** y en la búsqueda de comandos; en la página de inicio, junto a {{ui:dashboard.restoreBackup}}, para todos los diseños; y en el menú de un diseño para ese. Cada una muestra imagen, hora, tipo, nombre y tamaño. {{ui:backups.open}} abre la versión como un diseño nuevo: el diseño abierto se queda como está y el nuevo no está ligado al archivo original, así que guardarlo nunca sobrescribe ese archivo. El botón de descarga guarda la versión como archivo `.lyl` y la papelera la elimina.
+
+En los ajustes (la rueda dentada de la cinta), la página {{ui:backups.settingsTitle}} fija cuántas versiones anteriores de un archivo se conservan (ninguna hasta 20, 5 al principio), cada cuánto se guarda un estado (nunca, cada 10 o cada 30 minutos) y cuándo empiezan los recordatorios. Estos ajustes son de este navegador, no de un diseño. Todas las copias juntas ocupan como mucho 500 MB; por encima se van primero los estados más antiguos.
+
+**Carpeta de copias (Chrome y Edge).** En {{ui:backups.folder}} puedes elegir una carpeta de tu ordenador. Cada copia va entonces también allí como archivo `.lyl` con el nombre del diseño y la hora, por ejemplo `Soporte 2026-11-11 20-31-05.lyl`, un estado con ` auto` antes de la extensión. Las antiguas se van allí como en el navegador; nada más de la carpeta se toca. Tras recargar la página, el navegador vuelve a pedir permiso la primera vez que guardas; un estado guardado antes se queda en el navegador y el mensaje ofrece {{ui:backups.allowFolder}}. Una carpeta sincronizada con la nube o en otra unidad también es un segundo lugar.
+
+Las copias del navegador se pierden con los datos del navegador. Por eso no sustituyen a {{ui:dashboard.backupAll}}.
+
 ## Carpetas para tus diseños
 
 Cuando tienes decenas de diseños, una sola lista no basta. En la página de inicio, {{ui:shared.newFolder}} crea una carpeta para los diseños de este navegador; al hacer clic en la carpeta, se abre. Las carpetas pueden contener otras carpetas.
@@ -25,10 +46,13 @@ Cuando tienes decenas de diseños, una sola lista no basta. En la página de ini
 ## Hacer copias de seguridad y compartir
 
 En la página de inicio, cada diseño tiene un menú con las opciones de cambiar el nombre, duplicar y eliminar. La fila junto a las pestañas tiene los mismos botones en cada pestaña. Para eliminar varios diseños a la vez, haz clic en {{ui:dashboard.select}}: un clic en una tarjeta la elige (una marca indica lo elegido), {{ui:dashboard.selectAll}} elige todos los diseños de la lista y {{ui:common.delete}} pide confirmación una sola vez para todos. {{ui:dashboard.selectDone}} o [[Esc]] salen de la selección. Con {{ui:dashboard.backupAll}} metes todos los diseños de la pestaña abierta en un único archivo ZIP. {{ui:dashboard.restoreBackup}}, justo al lado (también está en un ordenador nuevo sin diseños), los recupera, también en otro navegador o en otro ordenador; {{ui:dashboard.importGeometry}} admite ese mismo archivo. Las {{ui:myShapes.title}} de este navegador viajan en el mismo archivo, en la carpeta `Custom shapes`; consulta [Formas](chapter:shapes). Si restauras una copia de seguridad en un navegador que ya tiene algunos de esos diseños, no se añaden por segunda vez; el aviso te dice cuántos había ya. Un diseño que no se puede leer se deja fuera, y el aviso lo nombra. Si la página se recarga en mitad de una copia de seguridad, normalmente porque un diseño muy grande ha agotado toda la memoria que permite el navegador, la página de inicio te dice después en qué diseño se detuvo: guárdalo aparte como archivo (se explica más abajo) o simplifica sus mallas más grandes, y vuelve a hacer la copia. Sobre los diseños de este navegador, una línea breve dice cómo están: en naranja mientras no estén en ninguna copia, o si desde el último {{ui:dashboard.backupAll}} hay diseños nuevos o cambiados (dice cuándo fue y cuántos), y en gris cuando todos están en ella. Solo cuenta una copia de todos los diseños, no la de una carpeta o de diseños elegidos.
+Una copia de seguridad de todos los diseños también contiene los ajustes de este navegador: tu configuración predeterminada para diseños nuevos, el tema, la cinta, tus propias teclas y las impresoras. Al restaurarla, una casilla pregunta si aplicarlos también; está marcada cuando este navegador aún no tiene una configuración predeterminada propia.
 
 Solo algunos diseños: tras {{ui:dashboard.select}}, {{ui:dashboard.backupSelected}} empaqueta solo los diseños elegidos, en sus carpetas, en un archivo ZIP, y {{ui:dashboard.backupSelected}} en el menú de una carpeta empaqueta esa carpeta con todos sus diseños y carpetas. Ninguno de los dos incluye las formas personalizadas, y {{ui:dashboard.restoreBackup}} recupera ambos como una copia completa. Esto vale para los diseños de este navegador.
 
-Dónde va una copia de seguridad: en Chrome y Edge, un cuadro de guardado pregunta por la carpeta y el nombre, y recuerda la carpeta para la próxima copia. Así tus copias van directamente a una carpeta propia, por ejemplo en una unidad en la nube. Lo mismo vale para {{ui:myShapes.backup}}. Los demás navegadores guardan el archivo en su carpeta de descargas; cuál es esa carpeta se ajusta en la configuración del navegador.
+Dónde va una copia de seguridad: en Chrome y Edge, un cuadro de guardado pregunta por la carpeta y el nombre, y recuerda la carpeta para la próxima copia. Así tus copias van directamente a una carpeta propia, por ejemplo en una unidad en la nube. Lo mismo vale para {{ui:myShapes.backup}}. Los demás navegadores guardan el archivo en su carpeta de descargas; cuál es esa carpeta se ajusta en la configuración del navegador. Si el cuadro no devuelve ningún archivo, el mensaje ofrece {{ui:status.saveAsDownload}}: la copia va entonces a la carpeta Descargas como una descarga normal.
+
+Para probar algo sin tocar un diseño, elige {{ui:dashboard.openCopy}} en su menú de la página de inicio. layerling hace una copia, como {{ui:common.duplicate}}, y abre la copia enseguida; el original queda como estaba, hagas lo que hagas en la copia. En un servidor, la copia queda allí junto al original.
 
 Si un diseño se abre muy lento o no se abre, normalmente porque su historial de pasos de Deshacer ha crecido mucho, elige {{ui:dashboard.openWithoutHistory}} en su menú de la página de inicio. layerling lee entonces solo el estado actual, elimina para siempre todos los pasos anteriores y abre el diseño; antes pregunta, porque no se puede deshacer. Para conservar los pasos, haz primero una copia del diseño con {{ui:dashboard.backupSelected}}.
 
@@ -118,6 +142,10 @@ Con {{ui:editor.import}} o [[Ctrl]]+[[I]] traes archivos externos al diseño.
 Un diseño guardado con una **versión más reciente de layerling** puede contener cosas que tu versión aún no conoce, como una forma nueva, un ajuste nuevo o fuentes propias. Si layerling no puede abrirlo por ese motivo, el mensaje indica las dos versiones. Si se abre, el aviso te dice que lo más reciente puede verse distinto aquí. En ambos casos, ayuda recargar la página: layerling.com sirve siempre la versión más reciente. La aplicación instalada la recoge la próxima vez que se inicia; en tu propio servidor, la actualización la instalas tú.
 
 Las imágenes de plantilla se añaden en el modo de boceto; consulta [Bocetos](chapter:sketches).
+
+## Mallas grandes
+
+layerling está hecho ante todo para construir cuerpos CAD exactos: un cilindro se guarda como un círculo y una altura, un redondeo como una sola cara curva. Una malla importada, en cambio, es una aproximación hecha de triángulos, cuanto más fina, más triángulos, y cada uno se guarda en memoria, se dibuja y se almacena. Las piezas pequeñas como mallas no son ningún problema. Las mallas muy grandes, como escaneos, esculturas o modelos de Blender con cientos de miles o millones de triángulos, hacen más lento el editor, ocupan mucha memoria y ralentizan el guardado, y puede que no se puedan cortar. Tras una importación que trae mallas así, layerling lo avisa una vez. Simplifica antes esa malla (ver abajo), importa solo las piezas que necesitas o construye las piezas sencillas con las formas propias de layerling.
 
 ## Simplificar una malla importada
 

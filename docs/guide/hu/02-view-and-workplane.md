@@ -44,7 +44,7 @@ A bal szélen egy keskeny sáv van. Felülről lefelé:
 - Az {{ui:camera.orthographic}} lapos nézetre vált, amelyben a párhuzamos élek párhuzamosak maradnak. Méréshez és élek egymáshoz igazításához ez gyakran kényelmesebb, mint a perspektivikus nézet. Az [[O]] oda-vissza vált, és egy második kattintás visszavált.
 - A {{ui:camera.secondView}} a terv második nézetét nyitja meg egy saját ablakban, lásd lent. Egy második kattintás bezárja.
 - A {{ui:camera.showScrollbars}} egy görgetősávot tesz a nézet aljára és egyet a jobb szélére. Húzd a sávot, és a nézet egyenletesen csúszik; a végén lévő nyílra kattintva egy kicsit mozdul (nyomva tartva tovább megy), a sáv mellé kattintva pedig majdnem egy egész nézetnyit. Semmi sem fordul el, és a nyílbillentyűkkel ellentétben a sávok akkor is működnek, ha egy alkatrész ki van jelölve - közelről, apró részleteknél hasznos. Egy második kattintás elrejti őket; hogy egy terv velük nyíljon-e meg, azt a beállítások {{ui:workspace.startWithScrollbars}} kapcsolója dönti el. Ez a böngésző a választást is megjegyzi.
-- A {{ui:camera.hideWorkplane}} (a rács fölötti szem) elrejti a tárgyasztalt a rácsával együtt, így alulról is megnézheted egy terv alját. Csak a nézet változik: az új alakzatok továbbra is a munkasíkra kerülnek. Egy második kattintás újra megmutatja.
+- A {{ui:camera.hideWorkplane}} (a rács fölötti szem) elrejti a tárgyasztalt a rácsával együtt, így alulról is megnézheted egy terv alját. Csak a nézet változik: az új alakzatok továbbra is a munkasíkra kerülnek. Egy második kattintás újra megmutatja. Ha egy felületen van munkasík, a neve {{ui:camera.hideBuildPlate}}, és csak a nyomtatótálcát rejti el: a felületen lévő munkasík marad, annak saját szeme van, {{ui:camera.hideFaceWorkplane}}.
 - A {{ui:camera.placeWorkplane}}, a mérőszalag és a derékszögvonalzó önálló eszközök, ezekről lentebb és a [Mérés és jegyzetek](chapter:measuring-and-notes) fejezetben olvashatsz.
 
 A sáv legtetején lévő kis nyíl elrejti a sávot, ha útban van.
@@ -99,6 +99,7 @@ Ha egy terv több alkatrészt tartalmaz, mint amennyi egy tálcára fér, péld�
 
 - Minden tálca akkora, mint a munkasík, és a tálcák egymás mellett fekszenek az első jobb oldalán, 20 mm-re egymástól. Egy test ahhoz a tálcához tartozik, amelyen az alapterülete közepe áll, így áthúzva a másik tálcára kerül. Egy tervnek legfeljebb 12 tálcája lehet.
 - A sávban egy tálcára kattintva az megjelenik, és az új alakzatok és az importált fájlok ezután rá kerülnek. A {{ui:plates.showAll}} mindet megmutatja. Dupla kattintás egy tálcán vagy a {{ui:plates.rename}} nevet ad neki, például „Fedél”, ami a tálcára is kiíródik.
+- Egy új vázlat a tálcán szintén az aktív tálcán kezdődik: a vázlatterület azt a tálcát mutatja a rajta lévő testekkel, és a kész test oda kerül.
 - A {{ui:plates.moveLeft}} és a {{ui:plates.moveRight}} a sorrendet változtatja, a testek a tálcájukkal mozognak. A {{ui:plates.remove}} eltávolítja az aktív tálcát; a testei ugyanarra a helyre kerülnek az első tálcán.
 - Az {{ui:plates.arrange}} a kijelölt testeket, vagy mindet, sorról sorra a tálcákra rakja, a legnagyobbat először, 5 mm-re egymástól, és tálcákat ad hozzá, amíg kell. A tálcánál nagyobb test a helyén marad.
 - Kiválasztott nyomtatóval minden test a saját tálcájához mérve ellenőrződik, és a nyomtatási magasság a tálca legalsó testétől számít. Az a tálca, amelyen egy test nem fér el, pirosan mutatja a számát.
@@ -155,7 +156,7 @@ A(z) {{ui:workspace.classicLook}} úgy állítja be a munkaterületet, ahogy a T
 
 ### Megjelenés: tengelynyilak és élvonalak
 
-A {{ui:workspace.showAxes}} (alapból bekapcsolva) három nyilat rajzol a tárgyasztal bal hátsó sarkába: az **X** pirosan jobbra, az **Y** zölden hátra, a **Z** kéken felfelé mutat, ahogy a helyzetmezők számolnak. Ez a jobbkéz-szabály, amelyet a Tinkercad, a CAD-programok és a szeletelők is használnak. Ha a munkasík egy lapon van, követik. Itt kapcsolhatod ki őket, ha útban vannak.
+A {{ui:workspace.showAxes}} (alapból bekapcsolva) három nyilat rajzol a tárgyasztal bal hátsó sarkába: az **X** pirosan jobbra, az **Y** zölden hátra, a **Z** kéken felfelé mutat, ahogy a helyzetmezők számolnak. Ez a jobbkéz-szabály, amelyet a Tinkercad, a CAD-programok és a szeletelők is használnak. Ha a munkasík egy lapon van, követik. Itt kapcsolhatod ki őket, ha útban vannak. Amíg a nyilak be vannak kapcsolva, a rács középkeresztje is az ő színüket kapja: az X menti vonal piros, az Y menti zöld, így egy kis alkatrésznél is rögtön látod, merre fut melyik tengely.
 
 A(z) {{ui:workspace.edgeLines}} minden testre körvonalat rajzol {{ui:workspace.edgeColor}} színnel (először feketével, mint a Tinkercad): segít, ha a sötét színek összefolynak. Alapból ki van kapcsolva, a nagyon nagy importált hálók pedig kimaradnak.
 
@@ -190,6 +191,8 @@ A(z) {{ui:workspace.objectSnap}} húzás közben más alakzatokhoz illeszti egy 
 {{ui:workspace.startWithScrollbars}}: a terv ilyenkor a nézet görgetősávjaival nyílik meg. A beállítás a tervvel és a {{ui:workspace.makeDefault}} gombbal is mentődik.
 
 {{ui:workspace.viewBarOpensOnHover}}: a becsukott nézetsáv kinyílik, amíg az egér a nyila fölött van, és nem sokkal azután, hogy az egér elhagyta, újra becsukódik, hacsak valamelyik eszköze nincs használatban. Ha így nyitva van, egy kattintás a nyílra nyitva tartja. Csak egérrel működik; érintőképernyőn egy koppintás nyitja ki a sávot, mint eddig.
+
+{{ui:workspace.showStepNotices}}: egy lépés, például egyesítés után a nézetkocka mellett rövid üzenet mondja el, mi történt, és felajánlja a(z) {{ui:shortcuts.undo}} lehetőséget. Kikapcsolva ezek az üzenetek elmaradnak; azok, amelyek valamit kérnek tőled vagy hibát jeleznek, továbbra is megjelennek, és a menüszalagon a(z) {{ui:editor.tool.undo}} gomb rámutatáskor továbbra is megnevezi a lépést.
 
 A(z) {{ui:workspace.startView}} azt a szöget adja meg, amelyben egy új terv megnyílik, és amelyhez a(z) {{ui:camera.home}} visszatér. Forgasd és nagyítsd a nézetet, ahogy tetszik, majd kattints a(z) {{ui:workspace.startViewUseCurrent}} gombra; a(z) {{ui:workspace.startViewStandard}} visszahozza a szokásos elölről-jobbról nézetet. Ebben a böngészőben minden tervre érvényes. Egy újra megnyitott terv továbbra is úgy nyílik meg, ahogy otthagytad.
 

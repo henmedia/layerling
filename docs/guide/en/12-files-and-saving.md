@@ -11,6 +11,27 @@ If you go back to the start page from a design with nothing in it, layerling ask
 
 That has a downside: whoever clears the browser storage or switches to another computer loses the designs. **So back up important work into a file.**
 
+## Your designs, your backup
+
+Your designs live in this browser on your computer. As with all data, only what exists a second time in another place is safe: a failing drive, a new PC, cleared browser data or a bug, and without a backup the work is gone. Keeping that backup is up to you; no software can do it for you. layerling makes it easy: {{ui:dashboard.backupAll}} on the start page puts every design into one file in a single click (see below). Keep that file on a USB stick, in a cloud folder or on a NAS, after every bigger session.
+
+layerling reminds you. The line above the designs of this browser grows louder the longer the last {{ui:dashboard.backupAll}} lies back: with the button {{ui:backups.backUpNow}} once it is older than the days set under {{ui:backups.reminderDays}} (7 to begin with) and designs changed since, and in red when there are more than three designs and no backup at all, or none for 30 days. The editor reminds you once a day in the status line, with the same button. The automatic backups below do not count here: they are on the same computer.
+
+## Earlier versions
+
+layerling also keeps two kinds of backup by itself:
+
+- **Before saving over a file.** When [[Ctrl]]+[[S]] or {{ui:export.saveProject}} writes into a `.lyl` file that is already there (Chrome and Edge, see below), the file as it was is kept first. A file that has not changed since its last backup is not kept twice.
+- **States while working.** While you work on a design, a state of it is kept every 10 minutes, but only when something changed; the last six of each design stay.
+
+{{ui:backups.title}} lists them: in the editor in the export window under **LYL** and in the command search, on the start page beside {{ui:dashboard.restoreBackup}} for every design, and in the menu of a design for that one. Each shows its picture, time, kind, name and size. {{ui:backups.open}} opens the version as a new design: the design you have open stays as it is, and the new one is not tied to the original file, so saving it never writes over that file. The download button saves the version as a `.lyl` file, the bin deletes it.
+
+In the settings (the cogwheel in the ribbon), the page {{ui:backups.settingsTitle}} sets how many earlier versions of a file are kept (none up to 20, 5 to begin with), how often a state is kept (never, every 10 or every 30 minutes) and when the reminders start. These settings belong to this browser, not to a design. All backups together take at most 500 MB; above that the oldest states go first.
+
+**Backup folder (Chrome and Edge).** Under {{ui:backups.folder}} you can choose a folder on your computer. Each backup then also goes there as a `.lyl` file named after the design and the time, for example `Bracket 2026-11-11 20-31-05.lyl`, a state with ` auto` before the ending. Old ones go there as they do in the browser; nothing else in the folder is touched. After a reload the browser asks once more for permission the first time you save; a state kept before that stays in the browser, and the message offers {{ui:backups.allowFolder}}. A folder that syncs with the cloud or lies on another drive is a second place too.
+
+The backups in the browser go when the browser's data is cleared. That is why they do not replace {{ui:dashboard.backupAll}}.
+
 ## Folders for your designs
 
 With dozens of designs a single list is not enough. On the start page, {{ui:shared.newFolder}} makes a folder for the designs of this browser; a click on the folder opens it. Folders can hold folders.
@@ -25,10 +46,13 @@ With dozens of designs a single list is not enough. On the start page, {{ui:shar
 ## Backing up and passing on
 
 On the start page every design has a menu with the options to rename, duplicate and delete. The row beside the tabs has the same buttons on every tab. To delete several designs at once, click {{ui:dashboard.select}}: a click on a card chooses it (a tick shows what is chosen), {{ui:dashboard.selectAll}} chooses every design in the list, and {{ui:common.delete}} asks once for all of them. {{ui:dashboard.selectDone}} or [[Esc]] leaves the selection. With {{ui:dashboard.backupAll}} you pack all designs of the open tab into one single ZIP file. {{ui:dashboard.restoreBackup}}, beside it (it is there on a new computer with no designs, too), brings them back, also in another browser or on another computer; {{ui:dashboard.importGeometry}} takes the same file. The {{ui:myShapes.title}} travel in the same file, in the folder `Custom shapes`, see [Shapes](chapter:shapes). If you restore a backup into a browser that already has some of these designs, those are not added a second time; the notice says how many were already there. A design that cannot be read is left out, and the notice names it. If the page reloads in the middle of a backup, usually because a very large design took all the memory the browser allows, the start page says afterwards at which design it stopped: save that one on its own as a file (see below) or simplify its largest meshes, then back up again. Above the designs of this browser, a short line says where they stand: in orange while they are in no backup yet, or when some were added or changed since the last {{ui:dashboard.backupAll}} (it says when that was and how many), and in grey once all of them are in it. Only a backup of all designs counts, not one of a folder or of chosen designs.
+A backup of all designs also holds the settings of this browser: your default for new designs, the theme, the ribbon, your own keys and the printers. When you restore it, a tick box asks whether to take them over too; it is ticked when this browser has no default of its own yet.
 
 Only some designs: after {{ui:dashboard.select}}, {{ui:dashboard.backupSelected}} packs just the chosen designs, in their folders, into one ZIP file, and {{ui:dashboard.backupSelected}} in a folder's menu packs that folder with every design and folder in it. Neither takes the custom shapes along, and {{ui:dashboard.restoreBackup}} brings both back like a full backup. This is for the designs of this browser.
 
-Where a backup goes: in Chrome and Edge a save dialog asks for the folder and the name, and it remembers the folder for the next backup. That way your backups go straight into a folder of your own, on a cloud drive for example. The same goes for {{ui:myShapes.backup}}. Other browsers put the file into their download folder; which folder that is, you set in the browser's settings.
+Where a backup goes: in Chrome and Edge a save dialog asks for the folder and the name, and it remembers the folder for the next backup. That way your backups go straight into a folder of your own, on a cloud drive for example. The same goes for {{ui:myShapes.backup}}. Other browsers put the file into their download folder; which folder that is, you set in the browser's settings. If the dialog hands back no file, the message offers {{ui:status.saveAsDownload}}: the backup then goes into the Downloads folder as a normal download.
+
+To try something out without touching a design, choose {{ui:dashboard.openCopy}} in its menu on the start page. layerling makes a copy, as {{ui:common.duplicate}} does, and opens the copy right away; the original stays as it was, whatever you do in the copy. On a server the copy lies there next to the original.
 
 If a design opens very slowly or not at all, usually because its history of undo steps has grown very large, choose {{ui:dashboard.openWithoutHistory}} in its menu on the start page. layerling then reads only the current state, deletes every earlier step for good and opens the design; after a question, because this cannot be undone. To keep the steps, back the design up with {{ui:dashboard.backupSelected}} first.
 
@@ -118,6 +142,10 @@ With {{ui:editor.import}} or [[Ctrl]]+[[I]] you bring foreign files into the des
 A design saved with a **newer layerling** may hold things your version does not know yet, such as a new shape, a new setting or fonts of one's own. If layerling cannot open it for that reason, the message names both versions. If it opens, the notice says that newer things may look different here. Either way, reloading the page helps: layerling.com always serves the newest version. The installed app picks it up the next time it starts; on your own server you install the update.
 
 Template pictures are added in sketch mode, see [Sketches](chapter:sketches).
+
+## Large meshes
+
+layerling is made first of all for building exact CAD bodies: a cylinder is stored as a circle and a height, a rounding as one curved face. An imported mesh is an approximation made of triangles, the finer the more of them, and every one of them is held in memory, drawn and saved. Smaller parts as meshes are no problem. Very large meshes, such as scans, sculpts or models from Blender with hundreds of thousands or millions of triangles, make the editor slower, take a lot of memory and make saving slow, and cutting them may not work at all. After an import that brings such meshes in, layerling says so once. Simplify such a mesh first (see below), import only the parts you need, or build simple parts from layerling's own shapes.
 
 ## Simplifying an imported mesh
 

@@ -13,8 +13,10 @@
  * - Raspberry Pi 5: the official 3D model (RP-010083, "rpi-5 3D STEP - No Graphics", Raspberry Pi Ltd),
  *   each part's box read from it.
  * - Raspberry Pi 4 Model B: the mechanical drawing (RP-008342 DXF for places, RP-008343 PDF for the heights
- *   written on it, "Z=").
+ *   written on it, "Z="). Each USB block is its housing only (13.14 mm wide, its middle at 9 and 27 mm as the PDF
+ *   gives it), without the small tab that the DXF draws at one side of its front.
  * - Raspberry Pi 3 Model B+: the mechanical drawing (RP-008336 DXF for places, RP-008337 PDF for its "Z-Height").
+ *   The USB blocks as on the Pi 4: the housing only, its middle at 29 and 47 mm.
  * - Raspberry Pi Zero 2 W: the mechanical drawing (RP-008358), which gives the outline, the holes and the
  *   connectors' middles only; their widths are read off the drawing and their heights are estimated.
  * - BIGTREETECH Pi V1.2: the maker's own 3D model (BIGTREETECH_Pi_V1.2.step, github.com/bigtreetech/BTT-Pi).
@@ -34,8 +36,9 @@
  *   it is drawn 8.94 mm wide in its place. It has no LEDs, so none are drawn. All of it is `estimated`.
  * - ESP32-C6 Super Mini: no maker's drawing either. From the published community model "ESP32-C6
  *   SuperMini.step" (SolidWorks, github.com/mistic100/Nixie-Clock-IN2): 18 x 26 x 1.15 mm, square
- *   corners, 2 x 10 pins, each part's box read from it. All of it is `estimated`; the model does not
- *   say which button is BOOT and which RESET.
+ *   corners, 2 x 10 pins, each part's box read from it. All of it is `estimated`. The model does not
+ *   say which button is BOOT and which RESET: the silkscreen on the board's photo (MakerGO, mischianti.org's
+ *   pinout) does, BOOT on the side of the TX and RX pins, RST on the side of the 5V, GND and 3V3 pins.
  * - Adafruit ESP32-S3 Feather (PIDs 5323, 5477 and 5885 share one board): the outline, the holes and the pins
  *   from Adafruit's EagleCAD PCB file ("Adafruit ESP32-S3 8MB No PSRAM.brd", github.com/adafruit/Adafruit-Feather-ESP32-S3-PCB),
  *   every part's box and height from Adafruit's own 3D model ("5323 Feather ESP32-S3.step/.stl",
@@ -77,6 +80,26 @@
  * - ESP32 DevKit V1 (DOIT, 30 pins): sold unbranded, no maker's drawing. From the published true-size drawing
  *   (mischianti.org, DOIT-ESP32-DevKit-v1.svg; 28.2 x 51.8 mm, four 2.8 mm holes, as a real board was measured
  *   in the Fritzing forum); all of it `estimated`.
+ * - ESP32-2432S028R, the "Cheap Yellow Display" (CYD), the first kind with only micro-USB (Discussion #1644): the maker's
+ *   specification (Shenzhen Jingcai, "ESP32-2432S028 Specifications-EN.pdf", in github.com/witnessmenow/ESP32-Cheap-Yellow-Display,
+ *   OriginalDocumentation): 50 x 86 mm, the four holes 4 mm from the edges and 42 x 78 mm apart, R 1.60 (3.2 mm); the screen
+ *   module from the maker's JC2432A028N sheet (50 x 69.2 x 2.3 mm, 0.3 mm foam tape). The places of the cut under the antenna,
+ *   the screen and the parts underneath are read off the maker's dimension picture and its interface picture, both true to
+ *   scale (checked by the holes), so they are `estimated`; the 1.25 mm sockets 3.57 mm high as HCTL gives its HC-1.25 PWT
+ *   series, the module 18 x 25.5 x 3.1 mm (Espressif's datasheet), the other heights `estimated`. Laid screen up, so all
+ *   the connectors hang under the board.
+ * - The later CYD with micro-USB and USB-C (CYD2USB): no maker's drawing. DIYmall's dimensioned picture of it (the Amazon
+ *   listing B0BVFXR313, the same 78 x 42 mm holes 4 mm from the edges, R 1.6), true to scale by its holes, gives the parts'
+ *   places, all `estimated`; the plate and the screen as on the first kind.
+ * - Waveshare ESP32-S3-Zero (Discussion #1673): Waveshare's own 3D model (ESP32-S3-Zero_v2 .stp, on its documentation
+ *   page) and 2D drawing: 23.5 x 18 x 1.6 mm, the 2 x 9 pins (0.9 mm holes) 2.54 mm apart in rows 15.24 mm apart, the
+ *   USB-C (8.94 mm wide, 3.25 mm high, 1.23 mm over the end), the two buttons, the chip and the ceramic antenna, read off
+ *   the model. The model's corners are square: the corner radius (R 1.00) and which button is BOOT and which RESET are
+ *   from Waveshare's dimension drawing and its numbered top view on the ESP32-S3-Zero documentation page (BOOT on the
+ *   side of the 5V, GND and 3V3 pins, as the antenna). The ESP32-C3-Zero and ESP32-C6-Zero share its 23.5 x 18 mm outline.
+ * - Arduino Pro Mini (Discussion #1673): SparkFun's board file (sparkfun/Arduino_Pro_Mini_328, Hardware/Arduino-Pro-
+ *   Mini.brd): 0.7 x 1.3 in (17.78 x 33.02 mm), every pin's place and name, the reset switch and the parts; the PCB 0.8 mm
+ *   as SparkFun gives it. The parts' heights are `estimated`.
  * Every board was checked against the maker's own picture of its top, so none is a mirror image.
  * A value the maker does not give is marked `estimated`. A board without mounting holes has `holes: []`.
  *
@@ -197,6 +220,22 @@ export function sbcHoleDiameter(board: SbcBoard, hole: SbcBoard["holes"][number]
 
 const piHoles = (depth: number): Array<[number, number]> => [[3.5, 3.5], [61.5, 3.5], [3.5, depth - 3.5], [61.5, depth - 3.5]];
 
+/** The CYD's plate, the same on both kinds (the maker's drawing; the second kind's seller drawing gives the same holes). */
+const CYD_PLATE: Omit<SbcBoard, "type" | "name" | "parts"> = {
+  width: 86,
+  depth: 50,
+  thickness: 1.6,
+  cornerRadius: 3,
+  holeDiameter: 3.2,
+  holes: [[4, 4], [82, 4], [4, 46], [82, 46]],
+  // The board is cut back under the module's antenna, at the end away from USB.
+  outline: { add: [], cut: [{ x: 83.0, y: 25.1, width: 7.2, depth: 18.2 }] },
+  color: "#e8c21a",
+  estimated: ["thickness", "cornerRadius"],
+};
+/** The screen module (JC2432A028N): 50 x 69.2 x 2.3 mm on 0.3 mm of foam tape; its place along the board is read off the drawing. */
+const CYD_SCREEN: SbcPart = { name: "screen", x0: 8.5, x1: 77.7, y0: 0, y1: 50, height: 2.6, kind: "shield", estimated: true };
+
 export const SBC_BOARDS: Record<SbcBoardType, SbcBoard> = {
   pi5: {
     type: "pi5",
@@ -251,8 +290,8 @@ export const SBC_BOARDS: Record<SbcBoardType, SbcBoard> = {
       { name: "micro-HDMI 1", x0: 35.9, x1: 43.1, y0: -1.43, y1: 6.52, height: 3.0, kind: "connector", profile: "microHdmi" },
       { name: "camera", x0: 45.05, x1: 49.0, y0: 0.3, y1: 22.7, height: 5.5, kind: "header", ribbon: true, ribbonExit: "left" },
       { name: "audio/video jack", x0: 50.5, x1: 57.5, y0: -2.5, y1: 12.5, height: 6.0, kind: "connector", profile: "audio" },
-      { name: "USB 2.0", x0: 70.3, x1: 88.0, y0: 1.65, y1: 15.57, height: 16.0, kind: "connector", profile: "usbA2" },
-      { name: "USB 3.0", x0: 70.5, x1: 88.0, y0: 20.43, y1: 34.25, height: 16.0, kind: "connector", profile: "usbA2" },
+      { name: "USB 2.0", x0: 70.3, x1: 88.0, y0: 2.43, y1: 15.57, height: 16.0, kind: "connector", profile: "usbA2" },
+      { name: "USB 3.0", x0: 70.5, x1: 88.0, y0: 20.43, y1: 33.57, height: 16.0, kind: "connector", profile: "usbA2" },
       { name: "Ethernet", x0: 66.65, x1: 88.0, y0: 37.99, y1: 53.51, height: 13.5, kind: "connector", profile: "rj45" },
       { name: "display", x0: 1.5, x1: 5.45, y0: 16.8, y1: 39.2, height: 5.5, kind: "header", ribbon: true },
       { name: "GPIO header", x0: 7.1, x1: 57.9, y0: 50.0, y1: 55.0, height: 8.5, kind: "header", pins: [20, 2], gpio: true },
@@ -281,8 +320,8 @@ export const SBC_BOARDS: Record<SbcBoardType, SbcBoard> = {
       { name: "camera", x0: 43.55, x1: 47.5, y0: 0.3, y1: 22.7, height: 5.5, kind: "header", ribbon: true, ribbonExit: "left" },
       { name: "audio/video jack", x0: 50.0, x1: 57.0, y0: -2.5, y1: 12.5, height: 6.0, kind: "connector", profile: "audio" },
       { name: "Ethernet", x0: 65.65, x1: 87.0, y0: 2.5, y1: 18.0, height: 13.5, kind: "connector", profile: "rj45" },
-      { name: "USB 2.0 (middle)", x0: 69.3, x1: 87.0, y0: 21.65, y1: 35.57, height: 16.0, kind: "connector", profile: "usbA2" },
-      { name: "USB 2.0 (back)", x0: 69.3, x1: 87.0, y0: 39.65, y1: 53.57, height: 16.0, kind: "connector", profile: "usbA2" },
+      { name: "USB 2.0 (middle)", x0: 69.3, x1: 87.0, y0: 22.43, y1: 35.57, height: 16.0, kind: "connector", profile: "usbA2" },
+      { name: "USB 2.0 (back)", x0: 69.3, x1: 87.0, y0: 40.43, y1: 53.57, height: 16.0, kind: "connector", profile: "usbA2" },
       { name: "display", x0: 1.5, x1: 5.45, y0: 16.8, y1: 39.2, height: 5.5, kind: "header", ribbon: true },
       { name: "GPIO header", x0: 7.1, x1: 57.9, y0: 50.0, y1: 55.0, height: 8.5, kind: "header", pins: [20, 2], gpio: true },
       { name: "microSD card slot", x0: -2.27, x1: 13.13, y0: 22.11, y1: 34.1, height: 1.4, kind: "connector", underside: true, estimated: true },
@@ -412,8 +451,8 @@ export const SBC_BOARDS: Record<SbcBoardType, SbcBoard> = {
       { name: "USB-C", x0: 20.57, x1: 27.97, y0: 4.53, y1: 13.47, height: 3.38, kind: "connector", profile: "usbC", estimated: true },
       { name: "pins (5V to GPIO8)", x0: 0.77, x1: 25.23, y0: 0.59, y1: 2.19, height: 0.1, kind: "header", pins: [10, 1], estimated: true },
       { name: "pins (TX to GPIO7)", x0: 0.77, x1: 25.23, y0: 15.83, y1: 17.43, height: 0.1, kind: "header", pins: [10, 1], estimated: true },
-      { name: "button (front)", x0: 15.37, x1: 18.37, y0: 2.63, y1: 6.63, height: 1.93, kind: "button", estimated: true },
-      { name: "button (back)", x0: 15.37, x1: 18.37, y0: 11.38, y1: 15.38, height: 1.93, kind: "button", estimated: true },
+      { name: "RESET button", x0: 15.37, x1: 18.37, y0: 2.63, y1: 6.63, height: 1.93, kind: "button", estimated: true },
+      { name: "BOOT button", x0: 15.37, x1: 18.37, y0: 11.38, y1: 15.38, height: 1.93, kind: "button", estimated: true },
       { name: "LED (front)", x0: 24.39, x1: 25.39, y0: 2.67, y1: 3.17, height: 0.35, kind: "chip", estimated: true },
       { name: "LED (back)", x0: 24.39, x1: 25.39, y0: 14.92, y1: 15.42, height: 0.35, kind: "chip", estimated: true },
       { name: "RGB LED (WS2812)", x0: 9.78, x1: 11.78, y0: 13.22, y1: 15.42, height: 0.87, kind: "chip", estimated: true },
@@ -804,10 +843,109 @@ export const SBC_BOARDS: Record<SbcBoardType, SbcBoard> = {
       { name: "pins (EN to VIN)", x0: 9.41, x1: 46.57, y0: 26.0, y1: 27.6, height: 0.05, kind: "header", pins: [15, 1], estimated: true },
     ],
   },
-
+  cyd: {
+    type: "cyd",
+    name: "ESP32-2432S028R (CYD, micro-USB)",
+    ...CYD_PLATE,
+    // Laid screen up, micro-USB at the left end, the microSD card slot at the back: the maker's
+    // drawing seen from the screen. Everything else is on the underside.
+    parts: [
+      CYD_SCREEN,
+      { name: "micro-USB", x0: -1.2, x1: 4.0, y0: 30.6, y1: 38.1, height: 2.7, kind: "connector", underside: true, estimated: true },
+      // The four 1.25 mm sockets (HC-1.25-4PWT, P1, CN1 and P3; the speaker's 2 pins), their cables going in at the edge.
+      { name: "power and serial (P1)", x0: 0, x1: 5.0, y0: 9.8, y1: 20.4, height: 3.57, kind: "connector", underside: true, estimated: true },
+      { name: "microSD card slot", x0: 31.1, x1: 45.7, y0: 35.6, y1: 50.2, height: 1.85, kind: "connector", underside: true, estimated: true },
+      { name: "sensor socket (CN1)", x0: 50.0, x1: 60.0, y0: 45.1, y1: 49.6, height: 3.57, kind: "connector", underside: true, estimated: true },
+      { name: "extended IO (P3)", x0: 66.0, x1: 76.1, y0: 45.1, y1: 49.6, height: 3.57, kind: "connector", underside: true, estimated: true },
+      { name: "speaker socket (P4)", x0: 24.7, x1: 29.5, y0: -0.2, y1: 3.7, height: 3.57, kind: "connector", underside: true, estimated: true },
+      // Pressed from below, the side they are on: their reach goes down.
+      { name: "RESET button", x0: 74.7, x1: 78.6, y0: 0.5, y1: 8.2, height: 2.0, kind: "button", underside: true, estimated: true },
+      { name: "BOOT button", x0: 71.0, x1: 74.7, y0: 0.5, y1: 8.2, height: 2.0, kind: "button", underside: true, estimated: true },
+      // The ESP32-WROOM-32: 18 x 25.5 x 3.1 mm (Espressif's datasheet), its antenna over the cut.
+      { name: "ESP32-WROOM-32", x0: 60.5, x1: 86.0, y0: 16.0, y1: 34.2, height: 3.1, kind: "shield", underside: true, estimated: true },
+      { name: "USB chip (CH340C)", x0: 15.9, x1: 19.6, y0: 37.4, y1: 47.3, height: 1.75, kind: "chip", underside: true, estimated: true },
+      { name: "RGB LED", x0: 52.4, x1: 57.2, y0: 36.4, y1: 41.2, height: 1.6, kind: "chip", underside: true, estimated: true },
+      { name: "touch controller (XPT2046)", x0: 63.3, x1: 67.8, y0: 3.0, y1: 7.9, height: 1.2, kind: "chip", underside: true, estimated: true },
+      { name: "speaker amplifier (FM8002A)", x0: 46.1, x1: 51.1, y0: 2.9, y1: 6.8, height: 1.6, kind: "chip", underside: true, estimated: true },
+    ],
+  },
+  cyd2usb: {
+    type: "cyd2usb",
+    name: "ESP32-2432S028R (CYD, micro-USB + USB-C)",
+    ...CYD_PLATE,
+    // As the first kind; the USB-C between the power socket and the micro-USB, which sits 2.5 mm further back.
+    parts: [
+      CYD_SCREEN,
+      { name: "USB-C", x0: -0.2, x1: 6.8, y0: 22.2, y1: 31.1, height: 3.26, kind: "connector", underside: true, estimated: true },
+      { name: "micro-USB", x0: -0.9, x1: 4.8, y0: 33.0, y1: 40.5, height: 2.7, kind: "connector", underside: true, estimated: true },
+      { name: "power and serial (P1)", x0: 0.3, x1: 4.9, y0: 8.9, y1: 19.9, height: 3.57, kind: "connector", underside: true, estimated: true },
+      { name: "microSD card slot", x0: 30.5, x1: 45.7, y0: 35.3, y1: 50.2, height: 1.85, kind: "connector", underside: true, estimated: true },
+      { name: "sensor socket (CN1)", x0: 49.0, x1: 60.0, y0: 45.6, y1: 49.8, height: 3.57, kind: "connector", underside: true, estimated: true },
+      { name: "extended IO (P3)", x0: 65.0, x1: 76.0, y0: 45.6, y1: 49.8, height: 3.57, kind: "connector", underside: true, estimated: true },
+      // Its housing starts about 0.5 mm in from the front edge, the cable going in there.
+      { name: "speaker socket (P4)", x0: 23.5, x1: 31.5, y0: 0.5, y1: 4.3, height: 3.57, kind: "connector", underside: true, estimated: true },
+      { name: "RESET button", x0: 75.1, x1: 78.6, y0: 0.7, y1: 8.9, height: 2.0, kind: "button", underside: true, estimated: true },
+      { name: "BOOT button", x0: 70.9, x1: 74.4, y0: 0.7, y1: 8.9, height: 2.0, kind: "button", underside: true, estimated: true },
+      { name: "ESP32-WROOM-32", x0: 60.2, x1: 85.3, y0: 16.1, y1: 33.8, height: 3.1, kind: "shield", underside: true, estimated: true },
+      { name: "USB chip (CH340C)", x0: 15.3, x1: 19.3, y0: 37.1, y1: 46.9, height: 1.75, kind: "chip", underside: true, estimated: true },
+      { name: "RGB LED", x0: 51.6, x1: 56.4, y0: 35.5, y1: 41.1, height: 1.6, kind: "chip", underside: true, estimated: true },
+      { name: "touch controller (XPT2046)", x0: 62.7, x1: 68.0, y0: 3.2, y1: 8.3, height: 1.2, kind: "chip", underside: true, estimated: true },
+      { name: "speaker amplifier (FM8002A)", x0: 46.0, x1: 51.0, y0: 3.0, y1: 7.0, height: 1.6, kind: "chip", underside: true, estimated: true },
+    ],
+  },
+  waveshareEsp32s3Zero: {
+    type: "waveshareEsp32s3Zero",
+    name: "Waveshare ESP32-S3-Zero",
+    width: 23.5,
+    depth: 18,
+    thickness: 1.6,
+    cornerRadius: 1,
+    holeDiameter: 0,
+    holes: [],
+    color: "#1b2f5c",
+    estimated: [],
+    // From Waveshare's 3D model, laid with the USB-C at the right end: the 2 x 9 pins 2.54 mm apart, the first 1.59 mm
+    // from the end without USB, the rows 15.24 mm apart and 1.37 mm in from the long edges.
+    parts: [
+      { name: "USB-C", x0: 17.13, x1: 24.73, y0: 4.53, y1: 13.47, height: 3.25, kind: "connector", profile: "usbC" },
+      { name: "pins, front row", x0: 0.32, x1: 23.18, y0: 0.571, y1: 2.171, height: 0.1, kind: "header", pins: [9, 1] },
+      { name: "pins, back row", x0: 0.32, x1: 23.18, y0: 15.811, y1: 17.411, height: 0.1, kind: "header", pins: [9, 1] },
+      { name: "RESET button", x0: 13.59, x1: 16.09, y0: 3.28, y1: 6.28, height: 1.6, kind: "button" },
+      { name: "BOOT button", x0: 13.59, x1: 16.09, y0: 11.63, y1: 14.63, height: 1.6, kind: "button" },
+      { name: "ESP32-S3", x0: 2.68, x1: 12.79, y0: 3.94, y1: 14.06, height: 1.0, kind: "chip" },
+      { name: "ceramic antenna", x0: 0.21, x1: 2.21, y0: 8.02, y1: 15.02, height: 1.0, kind: "chip" },
+    ],
+  },
+  arduinoProMini: {
+    type: "arduinoProMini",
+    name: "Arduino Pro Mini",
+    width: 33.02,
+    depth: 17.78,
+    thickness: 0.8,
+    cornerRadius: 0,
+    holeDiameter: 0,
+    holes: [],
+    color: "#1f5aa6",
+    estimated: [],
+    // From SparkFun's board file, laid with the FTDI pins at the right end: the two rows of 12 pins 16.51 mm apart along
+    // the long edges, 1.27 mm in; A4/A5 and A6/A7 inside the board. No USB, no mounting holes.
+    parts: [
+      { name: "pins (D10 to RAW)", x0: 0.47, x1: 30.01, y0: 0.47, y1: 2.07, height: 0.1, kind: "header", pins: [12, 1] },
+      { name: "pins (D9 to TXO)", x0: 0.47, x1: 30.01, y0: 15.71, y1: 17.31, height: 0.1, kind: "header", pins: [12, 1] },
+      { name: "FTDI pins (DTR to GND)", x0: 30.95, x1: 32.55, y0: 1.27, y1: 16.51, height: 0.1, kind: "header", pins: [6, 1] },
+      { name: "pins (A4, A5)", x0: 16.637, x1: 21.717, y0: 3.391, y1: 4.991, height: 0.1, kind: "header", pins: [2, 1] },
+      { name: "pins (A6, A7)", x0: 6.223, x1: 11.303, y0: 3.391, y1: 4.991, height: 0.1, kind: "header", pins: [2, 1] },
+      // The switch's outline from the board file; its height is not given.
+      { name: "RESET button", x0: 0.127, x1: 5.207, y0: 6.223, y1: 11.303, height: 1.5, kind: "button", estimated: true },
+      // The chip is turned 45 degrees on the board: drawn here square, 7 x 7 mm round its middle.
+      { name: "ATmega328P", x0: 10.47, x1: 17.47, y0: 5.39, y1: 12.39, height: 1.2, kind: "chip", estimated: true },
+      { name: "resonator", x0: 17.15, x1: 20.9, y0: 12.88, y1: 14.2, height: 0.9, kind: "chip", estimated: true },
+      { name: "regulator (MIC5205)", x0: 22.76, x1: 25.6, y0: 8.08, y1: 9.7, height: 1.1, kind: "chip", estimated: true },
+    ],
+  },
 };
 
-export const SBC_BOARD_ORDER: SbcBoardType[] = ["pi5", "pi4", "pi3bPlus", "zero2w", "bttPi12", "xiaoEsp32c6", "esp32c3SuperMini", "esp32c6SuperMini", "featherEsp32s3", "arduinoUno", "arduinoMega", "arduinoNano", "wemosD1Mini", "pico", "picoW", "pico2", "pico2W", "esp32CamMb", "esp32s3Cam", "esp32DevKitC", "esp32DevKitV1"];
+export const SBC_BOARD_ORDER: SbcBoardType[] = ["pi5", "pi4", "pi3bPlus", "zero2w", "bttPi12", "xiaoEsp32c6", "esp32c3SuperMini", "esp32c6SuperMini", "waveshareEsp32s3Zero", "featherEsp32s3", "arduinoUno", "arduinoMega", "arduinoNano", "arduinoProMini", "wemosD1Mini", "pico", "picoW", "pico2", "pico2W", "esp32CamMb", "esp32s3Cam", "esp32DevKitC", "esp32DevKitV1", "cyd", "cyd2usb"];
 export const DEFAULT_SBC_BOARD: SbcBoardType = "pi5";
 /** Extra room for the connectors at the edge, so a case wall cut with the board leaves them a gap: 0 to 2 mm. */
 export const MAX_SBC_CLEARANCE = 2;
@@ -944,8 +1082,9 @@ export function sbcBoardBlocks(board: SbcBoard, clearance = 0, reach = 0, passag
       y1: part.y1 + grow + (edges.back ? out : 0) + push("back"),
       height: part.height + grow + (rising ? up : 0) + push("up"),
     };
+    // Under the board, the height grows down: a button there pressed from its own side reaches down through the floor.
     return part.underside
-      ? { ...box, bottom: -(part.height + grow), top: 0 }
+      ? { ...box, bottom: -box.height, top: 0 }
       : { ...box, bottom: board.thickness, top: board.thickness + box.height };
   });
 }

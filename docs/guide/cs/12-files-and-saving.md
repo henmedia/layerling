@@ -11,6 +11,27 @@ Při návratu z prázdného projektu se program zeptá, zda jej ponechat. {{ui:c
 
 Nevýhodou je ztráta projektů při vymazání úložiště prohlížeče nebo přechodu na jiný počítač. **Důležitou práci proto zálohujte do souboru.**
 
+## Vaše návrhy, vaše záloha
+
+Vaše návrhy jsou v tomto prohlížeči ve vašem počítači. Jako u všech dat platí: v bezpečí je jen to, co existuje podruhé na jiném místě. Vadný disk, nový počítač, smazaná data prohlížeče nebo chyba programu a bez zálohy je práce pryč. O tuto zálohu se staráte sami; žádný program to za vás neudělá. layerling to usnadňuje: {{ui:dashboard.backupAll}} na úvodní stránce jedním kliknutím uloží všechny návrhy do jednoho souboru (viz níže). Ten soubor uchovávejte na flash disku, ve složce v cloudu nebo na NAS, po každé větší práci.
+
+layerling vám to připomene. Řádek nad návrhy tohoto prohlížeče je tím výraznější, čím déle je poslední {{ui:dashboard.backupAll}}: s tlačítkem {{ui:backups.backUpNow}}, jakmile je starší než dny nastavené v {{ui:backups.reminderDays}} (zpočátku 7) a návrhy se od té doby změnily, a červeně, když jsou víc než tři návrhy bez jakékoli zálohy nebo 30 dní žádná. Editor připomíná jednou denně ve stavovém řádku se stejným tlačítkem. Automatické zálohy níže se tu nepočítají: jsou na stejném počítači.
+
+## Dřívější verze
+
+layerling navíc sám vytváří dva druhy záloh:
+
+- **Před přepsáním souboru.** Když [[Ctrl]]+[[S]] nebo {{ui:export.saveProject}} zapisuje do souboru `.lyl`, který už existuje (Chrome a Edge, viz níže), nejprve se ponechá soubor, jak byl. Soubor, který se od poslední zálohy nezměnil, se neponechává dvakrát.
+- **Průběžné stavy při práci.** Při práci na návrhu se každých 10 minut ponechá jeho stav, ale jen když se něco změnilo; u každého návrhu zůstane posledních šest.
+
+{{ui:backups.title}} je vypíše: v editoru v okně exportu pod **LYL** a ve vyhledávání příkazů, na úvodní stránce vedle {{ui:dashboard.restoreBackup}} pro všechny návrhy a v nabídce návrhu pro ten jeden. Každá ukazuje obrázek, čas, druh, název a velikost. {{ui:backups.open}} otevře verzi jako nový návrh: otevřený návrh zůstane, jak je, a nový není svázaný s původním souborem, takže jeho uložení ten soubor nikdy nepřepíše. Tlačítko stažení uloží verzi jako soubor `.lyl`, koš ji smaže.
+
+V nastavení (ozubené kolo na pásu karet) stránka {{ui:backups.settingsTitle}} určuje, kolik dřívějších verzí souboru zůstane (žádná až 20, zpočátku 5), jak často se ponechá stav (nikdy, každých 10 nebo 30 minut) a odkdy připomínat. Tato nastavení patří tomuto prohlížeči, ne návrhu. Všechny zálohy dohromady zaberou nejvýš 500 MB; nad tím odpadají nejdřív nejstarší stavy.
+
+**Složka záloh (Chrome a Edge).** V {{ui:backups.folder}} můžete zvolit složku ve svém počítači. Každá záloha pak jde také tam jako soubor `.lyl` s názvem návrhu a časem, například `Držák 2026-11-11 20-31-05.lyl`, stav s ` auto` před příponou. Staré tam odpadají jako v prohlížeči; ničeho jiného ve složce se to nedotkne. Po znovunačtení se prohlížeč při prvním uložení znovu zeptá na povolení; stav ponechaný předtím zůstane v prohlížeči a zpráva nabídne {{ui:backups.allowFolder}}. Složka synchronizovaná s cloudem nebo na jiném disku je také druhé místo.
+
+Zálohy v prohlížeči zmizí s daty prohlížeče. Proto nenahrazují {{ui:dashboard.backupAll}}.
+
 ## Složky pro projekty
 
 Při desítkách projektů jeden seznam nestačí. Na úvodní stránce vytvoří {{ui:shared.newFolder}} složku pro projekty tohoto prohlížeče; kliknutím na složku ji otevřete. Složky mohou obsahovat další složky.
@@ -25,10 +46,13 @@ Při desítkách projektů jeden seznam nestačí. Na úvodní stránce vytvoř�
 ## Zálohování a předávání
 
 Každý projekt na úvodní stránce má nabídku přejmenování, duplikování a smazání. Řada tlačítek vedle záložek je na každé záložce stejná. Chcete-li smazat více projektů naráz, klikněte na {{ui:dashboard.select}}: kliknutí na kartu ji zvolí (zvolené ukazuje fajfka), {{ui:dashboard.selectAll}} zvolí všechny projekty v seznamu a {{ui:common.delete}} se zeptá jednou na všechny. {{ui:dashboard.selectDone}} nebo [[Esc]] výběr opustí. {{ui:dashboard.backupAll}} zabalí všechny projekty otevřené záložky do jediného souboru ZIP. {{ui:dashboard.restoreBackup}} hned vedle (je tam i na novém počítači bez projektů) je obnoví i v jiném prohlížeči nebo počítači; stejný soubor přijme i {{ui:dashboard.importGeometry}}. Součástí zálohy jsou také {{ui:myShapes.title}} ve složce `Custom shapes`, viz [Tvary](chapter:shapes). Pokud obnovíte zálohu v prohlížeči, který některé z těchto projektů už má, nepřidají se znovu; zpráva uvede, kolik jich tu už bylo. Projekt, který nejde přečíst, se vynechá a zpráva ho jmenuje. Pokud se stránka uprostřed zálohy znovu načte, obvykle proto, že velmi velký projekt zabral všechnu paměť, kterou prohlížeč dovolí, úvodní stránka potom uvede, u kterého projektu se zastavila: uložte ho samostatně jako soubor (viz níže) nebo zjednodušte jeho největší sítě a zálohujte znovu. Nad projekty tohoto prohlížeče krátký řádek říká, jak na tom jsou: oranžově, dokud nejsou v žádné záloze nebo když od posledního {{ui:dashboard.backupAll}} nějaké přibyly či se změnily (uvede, kdy to bylo a kolik jich je), a šedě, jakmile jsou v záloze všechny. Počítá se jen záloha všech projektů, ne záloha složky nebo vybraných projektů.
+Záloha všech projektů obsahuje také nastavení tohoto prohlížeče: vaše výchozí nastavení pro nové projekty, motiv, pás karet, vlastní klávesy a tiskárny. Při obnovení se zaškrtávací políčko zeptá, zda je převzít také; je zaškrtnuté, když tento prohlížeč ještě nemá vlastní výchozí nastavení.
 
 Jen některé návrhy: po {{ui:dashboard.select}} zabalí {{ui:dashboard.backupSelected}} jen vybrané návrhy v jejich složkách do jednoho souboru ZIP a {{ui:dashboard.backupSelected}} v nabídce složky zabalí tuto složku se všemi návrhy a složkami v ní. Vlastní tvary nejdou ani v jednom případě s sebou a {{ui:dashboard.restoreBackup}} vrátí obojí jako plnou zálohu. Platí to pro návrhy tohoto prohlížeče.
 
-Kam se záloha uloží: v Chrome a Edge se dialog pro uložení zeptá na složku a název a složku si zapamatuje pro další zálohu. Zálohy tak jdou rovnou do vaší vlastní složky, třeba na cloudový disk. Totéž platí pro {{ui:myShapes.backup}}. Ostatní prohlížeče ukládají soubor do své složky stažených souborů; o kterou složku jde, se nastavuje v nastavení prohlížeče.
+Kam se záloha uloží: v Chrome a Edge se dialog pro uložení zeptá na složku a název a složku si zapamatuje pro další zálohu. Zálohy tak jdou rovnou do vaší vlastní složky, třeba na cloudový disk. Totéž platí pro {{ui:myShapes.backup}}. Ostatní prohlížeče ukládají soubor do své složky stažených souborů; o kterou složku jde, se nastavuje v nastavení prohlížeče. Pokud dialog nevrátí žádný soubor, zpráva nabídne {{ui:status.saveAsDownload}}: záloha se pak uloží jako běžné stažení do složky Stažené soubory.
+
+Chcete-li něco vyzkoušet a projekt přitom nezměnit, zvolte v jeho nabídce na úvodní stránce {{ui:dashboard.openCopy}}. layerling vytvoří kopii jako {{ui:common.duplicate}} a hned ji otevře; originál zůstane tak, jak byl, ať v kopii uděláte cokoli. Na serveru leží kopie vedle originálu.
 
 Pokud se projekt otevírá velmi pomalu nebo vůbec, obvykle proto, že jeho historie kroků Zpět příliš narostla, zvol v jeho nabídce na úvodní stránce {{ui:dashboard.openWithoutHistory}}. layerling pak načte jen aktuální stav, trvale smaže všechny předchozí kroky a projekt otevře; nejdřív se zeptá, protože to nejde vrátit. Chceš-li kroky zachovat, nejdřív projekt zálohuj pomocí {{ui:dashboard.backupSelected}}.
 
@@ -112,6 +136,10 @@ Cizí soubory vložíte přes {{ui:editor.import}} nebo [[Ctrl]]+[[I]].
 Projekt z **novějšího Layerlingu** může obsahovat neznámé tvary, parametry nebo vlastní písma. Pokud jej kvůli tomu nelze otevřít, hlášení uvede obě verze. Otevře-li se, upozorní na možný odlišný vzhled novějších prvků. Pomáhá aktualizace: layerling.com po obnovení poskytuje aktuální verzi, nainstalovaná aplikace ji načte při dalším spuštění a vlastní server musíte aktualizovat sami.
 
 Obrázkové podklady se přidávají v režimu náčrtu, viz [Náčrty](chapter:sketches).
+
+## Velké sítě
+
+layerling je určen především ke stavbě přesných CAD těles: válec se ukládá jako kružnice a výška, zaoblení jako jedna zakřivená plocha. Importovaná síť je naproti tomu přiblížení z trojúhelníků, čím jemnější, tím víc jich je, a každý z nich je v paměti, kreslí se a ukládá. Menší díly jako sítě nevadí. Velmi velké sítě, třeba skeny, sochy nebo modely z Blenderu se stovkami tisíc či miliony trojúhelníků, editor zpomalí, zaberou hodně paměti a zpomalí ukládání, a řezání s nimi nemusí fungovat vůbec. Když import takové sítě přinese, layerling na to jednou upozorní. Takovou síť nejdřív zjednodušte (viz níže), importujte jen díly, které potřebujete, nebo jednoduché díly postavte z vlastních tvarů layerlingu.
 
 ## Zjednodušení importované sítě
 

@@ -116,6 +116,8 @@ G 规格是符合 ISO 228-1 的平行惠氏管螺纹，常见于水、燃气、�
 
 一个 {{ui:shape.bentTube}} 最多由十二段组成：一段直管，接着一个弯。每一段你设置 {{ui:prop.bentTubeSegmentLength}}、{{ui:prop.bentTubeBendAngle}}、{{ui:prop.bentTubeBendRadius}} 和 {{ui:prop.bentTubeRoll}}。正在编辑的段会在管上以橙色高亮，方便你跟上顺序。滚转角为 0° 时在工作平面内弯曲，90° 时管子向上弯。轮廓可以是圆形、方形、六边形或八边形，内部同样如此，也可以完全实心。如果管子撞到自己，layerling 会提醒你。
 
+圆形截面设置{{ui:prop.outerDiameter}}，方形、六边形或八边形截面设置{{ui:prop.bentTubeAcrossFlats}}。内部截面相同时，还会显示{{ui:prop.innerDiameter}}或{{ui:prop.bentTubeInnerAcrossFlats}}；输入它，{{ui:prop.bentTubeWall}}会随之调整。{{ui:prop.quality}}排在最前，位于普通管子显示边数的位置：它决定圆形截面有多少个角，以及弯曲部分分得多细。{{ui:prop.bentTubeBendAngle}}为 0° 的弯管就是直管，因此也可以用它做出方管、六角管或八角管。
+
 ## 放样
 
 {{ui:shape.loft}} 把底部的一个轮廓与顶部另一个轮廓连接起来，就像 Fusion 里的放样：从一种直径到另一种直径的软管接头、把方形风扇接到圆管上、向上逐渐变圆的支架。每一端你选择 {{ui:prop.loftBottomOutline}} 和 {{ui:prop.loftTopOutline}}：{{ui:loft.round}}、带 {{ui:prop.loftBottomCorner}} 的 {{ui:loft.rectangle}}，或带角数的 {{ui:loft.polygon}}，再加上每一端的宽度、长度和高度。{{ui:prop.loftOffsetX}} 和 {{ui:prop.loftOffsetZ}} 把顶端向侧面移动，形成倾斜过渡；底端保持在原处。
@@ -186,7 +188,9 @@ G 规格是符合 ISO 228-1 的平行惠氏管螺纹，常见于水、燃气、�
 
 {{ui:hinge.styleLiftOff}} 做出像许多门上那样的可拆式铰链：两个铰节，下方的带着销子一直到端部，上方的是可以从销子上拔出的套筒，所以盖子或门可以取下再挂回去。它总是两个铰节。它和其他样式一样平放整体打印；要竖着打印、销子朝上，就用 {{ui:inspector.separateParts}} 把它拆开，把带销的那件立在它的铰节上，另一件立在它的套筒上：这样两件都不需要支撑。另一侧用镜像。在 {{ui:prop.hingeScrewHead}} 下，所有样式都可选 {{ui:hinge.screwNut}}：在每个孔上方开一个六角螺母槽，位于合上时朝向另一片的那一面，这样从下方拧入的螺栓能固定；{{ui:hinge.screwCountersunkNut}} 把后片（带销的那片）做成沉头，前片开螺母槽。{{ui:prop.hingeNutWidth}} 是螺母的对边宽度；为 0 时按孔取值（M3 5.8 mm，M4 7.3 mm，含间隙）。槽深等于螺母高度，但下面留 0.6 mm 的叶片，所以叶片越厚，螺母嵌得越深。
 
-{{ui:prop.hingeStyle}}有三个选项：{{ui:hinge.stylePin}}、{{ui:prop.hingePinless}}（为自备销留的孔）和{{ui:hinge.styleCone}}。选圆锥时，{{ui:prop.hingeConeSize}}决定圆锥从关节长出处的大小；圆锥越大越牢固，默认取能放下的最大值。带圆锥的铰链没有销也没有孔，所以它的翼板可以和整个关节一样厚：把{{ui:prop.hingeLeafThickness}}设为关节直径，翼板就与关节齐平；这样的铰链最多打开约 90°，因为厚翼板会相碰。
+{{ui:hinge.styleSnap}} 做出两半分开打印、再咔哒一声扣合的铰链。后片的铰节照常带着销子；前片的铰节是卡夹，顶部开口，开在铰链合上时面对另一片的那一侧。开口比销子窄 {{ui:prop.hingeSnapGrip}} 所设的量，默认 0.3 mm，开口边缘的 45° 倒角把销子引进去。用 {{ui:inspector.separateParts}} 把铰链拆开，两半都按原样平放打印，无需支撑：卡夹正好在孔需要搭桥的地方开口，销子只跨过它的铰节之间的短间隙。组装时，把带卡夹的一半按合上的姿态放到销子上，按下直到咔哒一声卡入；之后它可以自由转动，销子周围留有间隙（{{ui:prop.hingeClearance}}）。卡紧量越大越牢，但需要的力也越大：卡夹裂了就调小，两半太容易脱开就调大。选 {{ui:hinge.leafRaised}} 时，只有前片在开口下方仍连着它的卡夹，才会被抬高。
+
+{{ui:prop.hingeStyle}}有五个选项：{{ui:hinge.stylePin}}、{{ui:prop.hingePinless}}（为自备销留的孔）、{{ui:hinge.styleCone}}、{{ui:hinge.styleLiftOff}}和{{ui:hinge.styleSnap}}。选圆锥时，{{ui:prop.hingeConeSize}}决定圆锥从关节长出处的大小；圆锥越大越牢固，默认取能放下的最大值。带圆锥的铰链没有销也没有孔，所以它的翼板可以和整个关节一样厚：把{{ui:prop.hingeLeafThickness}}设为关节直径，翼板就与关节齐平；这样的铰链最多打开约 90°，因为厚翼板会相碰。
 
 要用螺钉固定铰链，设置 {{ui:prop.hingeScrewHoles}}：沿轴最多六个孔，孔径为你选择的 {{ui:prop.hingeScrewDiameter}}。在 {{ui:prop.hingeScrewHead}} 下，它们默认为 {{ui:hinge.screwCountersunk}}，90° 用于沉头螺钉，位于铰链合上时朝向另一片的那一面，因此螺钉头齐平；{{ui:hinge.screwStraight}} 则保持直孔。不设其他数值时，孔平均分配长度并位于每片的中间；{{ui:prop.hingeScrewSpacing}} 和 {{ui:prop.hingeScrewAcross}} 按中心距设定它们，例如为了对上你要替换的购买铰链。每个孔到边缘、铰节和下一个孔之间都至少保留半毫米的片；放不下那么多时就少放，字段会说明。{{ui:prop.hingeCornerRadius}} 会把两片的四个外角倒圆。无论有无销轴，孔和圆角在 STEP 导出和边工具中都保持精确。
 
@@ -255,6 +259,8 @@ microSD 卡槽也是左边缘的接口，位于电路板下方（Zero 2 W 上在
 沉头螺丝的头部与表面齐平。若要沉得更深，可在{{ui:shape.countersink}}上设置{{ui:prop.screwHoleRecess}}（Discussion #1531）：锥面上方会多出一段与头部同宽的直孔，深度为所设毫米数，{{ui:prop.screwHoleLength}}也包含这一段。{{ui:shape.doubleCountersink}}两端都有这段直孔。设为 0 时头部仍与表面齐平；长孔同样适用，且仍是精确实体。
 
 要去掉沉孔边缘的锐边，在{{ui:shape.counterbore}}上设置{{ui:prop.screwHoleChamfer}}（Discussion #1632）：沉孔顶部随之以 45 度向外展开这么多毫米。倒角位于{{ui:prop.screwHoleHead}}之外，螺钉头仍然放得下，并且它始终比{{ui:prop.screwHoleHeadDepth}}浅。设为 0 时边缘保持原来的锐边；腰形孔同样可以使用，并且仍是精确实体。
+
+内六角圆柱头螺钉按头部下方的长度出售，沉头螺钉按含头部的长度出售。因此{{ui:shape.counterbore}}有第二个字段 {{ui:prop.screwHoleLengthBelowHead}}（Discussion #1670）：在那里输入螺钉长度，会加上 {{ui:prop.screwHoleHeadDepth}} 得到 {{ui:prop.screwHoleLength}}。M3 × 12 的螺钉配 3.2 mm 的沉孔，得到长 15.2 mm 的孔。锥形沉孔仍只有一个长度。
 
 {{ui:shape.finishingWasher}}（一种装饰垫圈，Discussion #1131）是放在沉头或半沉头螺钉下面的拱形垫圈，用于在木头或盖板上显得整洁。它是实心件，底面平；从较低的边缘起，拱顶升到座面，座面是承托螺钉头的锥面，下面是孔。在 {{ui:prop.screwHoleSize}} 下选择 M2 到 M20：孔是该规格的过孔，座面是该规格的沉头孔，{{ui:prop.diameter}} 和 {{ui:prop.height}} 由此得出（M3：10.3 × 2.95 mm，M6：16.6 × 4.5 mm）。你也可以自己设定 {{ui:prop.diameter}}、{{ui:prop.height}}、{{ui:prop.centerHole}}、座面顶部的 {{ui:prop.screwHoleHead}} 及其 {{ui:prop.screwHoleAngle}}。它保持圆形，并且是精确实体，因此边工具和 STEP 都能处理它。
 

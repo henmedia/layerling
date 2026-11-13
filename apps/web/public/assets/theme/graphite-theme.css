@@ -407,6 +407,23 @@ html[data-theme="dark"]:where([data-palette="graphite"]) .dashboard-trademark {
   color: #565656;
 }
 
+:where(html[data-theme="dark"][data-palette="graphite"]) .dashboard-notice-action {
+  border: 1px solid #c96a12;
+  background: #f3f3f3;
+  color: #9a4f08;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .dashboard-notice-action:hover,
+:where(html[data-theme="dark"][data-palette="graphite"]) .dashboard-notice-action:focus-visible {
+  background: #e1e1e1;
+}
+
+html[data-theme="dark"]:where([data-palette="graphite"]) .dashboard-notice-action {
+  border-color: #f3a452;
+  background: #2d2d2d;
+  color: #f3a452;
+}
+
 :where(html[data-theme="dark"][data-palette="graphite"]) .install-app-hint {
   background: linear-gradient(135deg, #f0f0f0 0%, #e1e1e1 100%);
   border: 2px solid #e08a2c;
@@ -707,6 +724,14 @@ html[data-theme="dark"]:where([data-palette="graphite"]) .whats-new-earlier:hove
   background: #2d2d2d;
 }
 
+:where(html[data-theme="dark"][data-palette="graphite"]) .announcement-body li::marker {
+  color: #bf6508;
+}
+
+html[data-theme="dark"]:where([data-palette="graphite"]) .announcement-body li::marker {
+  color: #f3a452;
+}
+
 :where(html[data-theme="dark"][data-palette="graphite"]) .dashboard-action-tile {
   color: #414141;
   background: #fafafa;
@@ -953,6 +978,11 @@ html[data-theme="dark"]:where([data-palette="graphite"]) .whats-new-earlier:hove
   background: #a85f14;
 }
 
+:where(html[data-theme="dark"][data-palette="graphite"]) .empty-project-dialog .dashboard-confirm-save {
+  border-color: #2e7d32;
+  background: #2e7d32;
+}
+
 :where(html[data-theme="dark"][data-palette="graphite"]) .dashboard-rename-dialog > label {
   color: #565656;
 }
@@ -1135,6 +1165,14 @@ html[data-theme="dark"]:where([data-palette="graphite"]) .edge-modifier-quick-ac
   color: #515151;
   background: #f8f8f8;
   border: 1px solid #c8c8c8;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .model-scale-result {
+  color: #515151;
+}
+
+html[data-theme="dark"]:where([data-palette="graphite"]) .model-scale-result {
+  color: #c1c1c1;
 }
 
 :where(html[data-theme="dark"][data-palette="graphite"]) .paint-eraser {
@@ -3412,7 +3450,23 @@ html[data-theme="dark"]:where([data-palette="graphite"]) .touch-multi-select {
 }
 
 :where(html[data-theme="dark"][data-palette="graphite"]) .corner-ruler-tick-label {
-  color: #5a3917;
+  color: #323232;
+  background: rgba(255, 255, 255, 0.88);
+  box-shadow: 0 0 0 1px rgba(90, 57, 23, 0.18);
+}
+
+html[data-theme="dark"]:where([data-palette="graphite"]) .corner-ruler-arm {
+  stroke: #f2a65a;
+}
+
+html[data-theme="dark"]:where([data-palette="graphite"]) .corner-ruler-tick {
+  stroke: #d9b48a;
+}
+
+html[data-theme="dark"]:where([data-palette="graphite"]) .corner-ruler-tick-label {
+  color: #dcdcdc;
+  background: rgba(27, 27, 27, 0.86);
+  box-shadow: 0 0 0 1px rgba(242, 166, 90, 0.35);
 }
 
 :where(html[data-theme="dark"][data-palette="graphite"]) .corner-ruler-delete {
@@ -3453,15 +3507,42 @@ html[data-theme="dark"]:where([data-palette="graphite"]) .touch-multi-select {
 
 :where(html[data-theme="dark"][data-palette="graphite"]) .corner-ruler-occlude-toggle,
 :where(html[data-theme="dark"][data-palette="graphite"]) .corner-ruler-selected-toggle,
-:where(html[data-theme="dark"][data-palette="graphite"]) .corner-ruler-plate-toggle {
+:where(html[data-theme="dark"][data-palette="graphite"]) .corner-ruler-plate-toggle,
+:where(html[data-theme="dark"][data-palette="graphite"]) .corner-ruler-arms-toggle {
   color: #595959;
   background: rgba(255, 255, 255, 0.96);
   border-color: rgba(182, 97, 8, 0.45);
 }
 
 :where(html[data-theme="dark"][data-palette="graphite"]) .corner-ruler-occlude-toggle.active,
-:where(html[data-theme="dark"][data-palette="graphite"]) .corner-ruler-selected-toggle.active {
+:where(html[data-theme="dark"][data-palette="graphite"]) .corner-ruler-selected-toggle.active,
+:where(html[data-theme="dark"][data-palette="graphite"]) .corner-ruler-arms-toggle.active {
   color: #b66108;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .corner-ruler-arm-toggle {
+  --corner-ruler-arm-axis: #595959;
+  color: var(--corner-ruler-arm-axis);
+  background: rgba(255, 255, 255, 0.96);
+  border: 1px dashed var(--corner-ruler-arm-axis);
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .corner-ruler-arm-toggle.axis-x {
+  --corner-ruler-arm-axis: #d6363c;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .corner-ruler-arm-toggle.axis-y {
+  --corner-ruler-arm-axis: #2f9a4b;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .corner-ruler-arm-toggle.axis-z {
+  --corner-ruler-arm-axis: #2f6fe0;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .corner-ruler-arm-toggle.active,
+:where(html[data-theme="dark"][data-palette="graphite"]) .corner-ruler-arm-toggle.active:hover {
+  color: #ffffff;
+  background: var(--corner-ruler-arm-axis);
 }
 
 :where(html[data-theme="dark"][data-palette="graphite"]) .corner-ruler-mode-toggle:hover {
@@ -3499,6 +3580,30 @@ html[data-theme="dark"]:where([data-palette="graphite"]) .touch-multi-select {
 :where(html[data-theme="dark"][data-palette="graphite"]) [data-theme="dark"] .corner-ruler-mode-toggle:hover {
   background: rgba(46, 125, 50, 0.35);
   border-color: #81c784;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) [data-theme="dark"] .corner-ruler-arm-toggle.axis-x {
+  --corner-ruler-arm-axis: #ff6b70;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) [data-theme="dark"] .corner-ruler-arm-toggle.axis-y {
+  --corner-ruler-arm-axis: #5fd47c;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) [data-theme="dark"] .corner-ruler-arm-toggle.axis-z {
+  --corner-ruler-arm-axis: #6aa0ff;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) [data-theme="dark"] .corner-ruler-arm-toggle {
+  color: var(--corner-ruler-arm-axis);
+  border-color: var(--corner-ruler-arm-axis);
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) [data-theme="dark"] .corner-ruler-arm-toggle.active,
+:where(html[data-theme="dark"][data-palette="graphite"]) [data-theme="dark"] .corner-ruler-arm-toggle.active:hover {
+  color: #181818;
+  background: var(--corner-ruler-arm-axis);
+  border-color: var(--corner-ruler-arm-axis);
 }
 
 :where(html[data-theme="dark"][data-palette="graphite"]) [data-theme="dark"] .ruler-coordinate-badge {
@@ -4159,6 +4264,25 @@ html[data-theme="dark"]:where([data-palette="graphite"]) .rotation-angle-badge {
 
 :where(html[data-theme="dark"][data-palette="graphite"]) .color-value {
   color: #747474;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .color-hex-input {
+  border: 1px solid transparent;
+  background: transparent;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .color-hex-input:hover:not(:disabled),
+:where(html[data-theme="dark"][data-palette="graphite"]) .color-hex-input:focus {
+  border-color: rgba(116, 116, 116, 0.55);
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .color-hex-input:focus {
+  outline: none;
+  background: rgba(116, 116, 116, 0.1);
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .color-hex-input::placeholder {
+  color: inherit;
 }
 
 :where(html[data-theme="dark"][data-palette="graphite"]) .color-grid button {
@@ -7626,6 +7750,12 @@ html[data-theme="dark"]:where([data-palette="graphite"]) .export-holes-only-warn
   color: #ffa447;
 }
 
+:where(html[data-theme="dark"][data-palette="graphite"]) .unsaved-design-banner {
+  color: #fff;
+  background: #c82031;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.25);
+}
+
 :where(html[data-theme="dark"][data-palette="graphite"]) .open-group-banner {
   color: #404040;
   background: #f9f9f9;
@@ -8052,6 +8182,17 @@ html[data-theme="dark"]:where([data-palette="graphite"]) .qr-code-panel small.qr
   border-color: #b45a0c;
 }
 
+:where(html[data-theme="dark"][data-palette="graphite"]) .new-version-notice .new-version-notice-unsaved {
+  color: #ffffff;
+  background: #c82031;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .new-version-notice-actions .danger {
+  color: #ffffff;
+  background: #c82031;
+  border-color: #a81a29;
+}
+
 :where(html[data-theme="dark"][data-palette="graphite"]) [data-help-hover] {
   outline: 2px solid #1a73c9 !important;
 }
@@ -8091,6 +8232,7 @@ html[data-theme="dark"]:where([data-palette="graphite"]) .interactive-help-windo
 :where(html[data-theme="dark"][data-palette="graphite"]) .dashboard-welcome-switch a,
 :where(html[data-theme="dark"][data-palette="graphite"]) .dashboard-welcome-videos a,
 :where(html[data-theme="dark"][data-palette="graphite"]) .whats-new-note a,
+:where(html[data-theme="dark"][data-palette="graphite"]) .announcement-body a,
 :where(html[data-theme="dark"][data-palette="graphite"]) .guide-videos a,
 :where(html[data-theme="dark"][data-palette="graphite"]) .interactive-help-more a {
   color: #8f4700;
@@ -8100,6 +8242,7 @@ html[data-theme="dark"]:where([data-palette="graphite"]) .interactive-help-windo
 :where(html[data-theme="dark"][data-palette="graphite"]) .dashboard-welcome-switch a:hover,
 :where(html[data-theme="dark"][data-palette="graphite"]) .dashboard-welcome-videos a:hover,
 :where(html[data-theme="dark"][data-palette="graphite"]) .whats-new-note a:hover,
+:where(html[data-theme="dark"][data-palette="graphite"]) .announcement-body a:hover,
 :where(html[data-theme="dark"][data-palette="graphite"]) .guide-videos a:hover,
 :where(html[data-theme="dark"][data-palette="graphite"]) .interactive-help-more a:hover {
   color: #ad6206;
@@ -8108,6 +8251,7 @@ html[data-theme="dark"]:where([data-palette="graphite"]) .interactive-help-windo
 :where(html[data-theme="dark"][data-palette="graphite"]) .dashboard-welcome-switch a[target="_blank"]::after,
 :where(html[data-theme="dark"][data-palette="graphite"]) .dashboard-welcome-videos a[target="_blank"]::after,
 :where(html[data-theme="dark"][data-palette="graphite"]) .whats-new-note a[target="_blank"]::after,
+:where(html[data-theme="dark"][data-palette="graphite"]) .announcement-body a[target="_blank"]::after,
 :where(html[data-theme="dark"][data-palette="graphite"]) .guide-videos a[target="_blank"]::after,
 :where(html[data-theme="dark"][data-palette="graphite"]) .interactive-help-more a[target="_blank"]::after {
   text-decoration: none;
@@ -8116,6 +8260,7 @@ html[data-theme="dark"]:where([data-palette="graphite"]) .interactive-help-windo
 html[data-theme="dark"]:where([data-palette="graphite"]) .dashboard-welcome-switch a,
 html[data-theme="dark"]:where([data-palette="graphite"]) .dashboard-welcome-videos a,
 html[data-theme="dark"]:where([data-palette="graphite"]) .whats-new-note a,
+html[data-theme="dark"]:where([data-palette="graphite"]) .announcement-body a,
 html[data-theme="dark"]:where([data-palette="graphite"]) .guide-videos a,
 html[data-theme="dark"]:where([data-palette="graphite"]) .interactive-help-more a {
   color: #f3a452;
@@ -8124,6 +8269,7 @@ html[data-theme="dark"]:where([data-palette="graphite"]) .interactive-help-more 
 html[data-theme="dark"]:where([data-palette="graphite"]) .dashboard-welcome-switch a:hover,
 html[data-theme="dark"]:where([data-palette="graphite"]) .dashboard-welcome-videos a:hover,
 html[data-theme="dark"]:where([data-palette="graphite"]) .whats-new-note a:hover,
+html[data-theme="dark"]:where([data-palette="graphite"]) .announcement-body a:hover,
 html[data-theme="dark"]:where([data-palette="graphite"]) .guide-videos a:hover,
 html[data-theme="dark"]:where([data-palette="graphite"]) .interactive-help-more a:hover {
   color: #ffc784;
@@ -8670,6 +8816,19 @@ html[data-theme="dark"]:where([data-palette="graphite"]) .property-card > button
   background: rgba(255, 255, 255, 0.1);
 }
 
+:where(html[data-theme="dark"][data-palette="graphite"]) .align-size-toggle {
+  border: 1px solid var(--border-strong);
+  background: var(--panel);
+  color: var(--foreground);
+  box-shadow: 0 2px 8px rgba(33, 33, 33, 0.22);
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .align-size-toggle.on {
+  background: rgba(173, 89, 0, 0.92);
+  border-color: rgba(173, 89, 0, 0.92);
+  color: #fff;
+}
+
 :where(html[data-theme="dark"][data-palette="graphite"]) .dashboard-welcome-hide {
   color: #717171;
   background: transparent;
@@ -8940,6 +9099,31 @@ html[data-theme="dark"]:where([data-palette="graphite"]) .browser-backup-note.ba
 
 html[data-theme="dark"]:where([data-palette="graphite"]) .browser-backup-note.backed-up > svg {
   color: #7cc48f;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .whats-new-version .whats-new-points li {
+  color: #595959;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .whats-new-guide-link {
+  color: #bf6508;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .whats-new-guide-link:hover,
+:where(html[data-theme="dark"][data-palette="graphite"]) .whats-new-guide-link:focus-visible {
+  text-decoration: underline;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .dashboard-update-preview .whats-new-version .whats-new-points li {
+  color: inherit;
+}
+
+html[data-theme="dark"]:where([data-palette="graphite"]) .whats-new-version .whats-new-points li {
+  color: #929292;
+}
+
+html[data-theme="dark"]:where([data-palette="graphite"]) .whats-new-guide-link {
+  color: #f3a452;
 }
 
 :where(html[data-theme="dark"][data-palette="graphite"]) .history-view-bar {
@@ -10764,6 +10948,141 @@ html[data-theme="dark"]:where([data-palette="graphite"]) .focus-mode-bar .action
 
 html[data-theme="dark"]:where([data-palette="graphite"]) .focus-mode-bar .action-icon-button:hover:not(:disabled) {
   color: #f1f1f1;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .file-backups-problem {
+  color: #b3261e;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .file-backup-row {
+  background: var(--tile);
+  border: 1px solid var(--border);
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .file-backup-picture {
+  background: var(--panel);
+  border: 1px solid var(--border);
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .file-backup-text > span {
+  color: var(--muted-strong);
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .file-backup-actions button {
+  color: var(--foreground);
+  background: var(--panel);
+  border: 1px solid var(--border-strong);
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .file-backup-actions button:hover:not(:disabled),
+:where(html[data-theme="dark"][data-palette="graphite"]) .file-backup-actions button:focus-visible {
+  border-color: var(--primary);
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .file-backup-actions .file-backup-open {
+  color: #ffffff;
+  background: var(--primary);
+  border-color: var(--primary);
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .file-backups-settings-hint {
+  color: var(--muted-strong);
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .browser-backup-note.overdue {
+  color: #2a2a2a;
+  background: #dcdcdc;
+  border-color: #d9730d;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .browser-backup-note.urgent {
+  color: #5c1210;
+  background: #ffe0dd;
+  border-color: #c62828;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .browser-backup-note.urgent > svg {
+  color: #c62828;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .browser-backup-now {
+  color: #ffffff;
+  background: #d9730d;
+  border: 0;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .browser-backup-note.urgent .browser-backup-now {
+  background: #c62828;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .browser-backup-now:hover,
+:where(html[data-theme="dark"][data-palette="graphite"]) .browser-backup-now:focus-visible {
+  filter: brightness(1.08);
+}
+
+html[data-theme="dark"]:where([data-palette="graphite"]) .browser-backup-note.overdue {
+  color: #ffd9a8;
+  background: #2c2c2c;
+  border-color: #f0923a;
+}
+
+html[data-theme="dark"]:where([data-palette="graphite"]) .browser-backup-note.urgent {
+  color: #ffd2cd;
+  background: #42181a;
+  border-color: #ef5350;
+}
+
+html[data-theme="dark"]:where([data-palette="graphite"]) .browser-backup-note.urgent > svg {
+  color: #ef5350;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .your-backup-card {
+  color: var(--foreground);
+  background: var(--tile);
+  border: 2px solid var(--primary);
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .your-backup-card > svg {
+  color: var(--primary);
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .your-backup-actions button {
+  color: var(--foreground);
+  background: var(--panel);
+  border: 1px solid var(--border-strong);
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .your-backup-actions .your-backup-now {
+  color: #ffffff;
+  background: var(--primary);
+  border-color: var(--primary);
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .workspace-backup-hint {
+  color: var(--muted-strong);
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .workspace-backup-folder,
+:where(html[data-theme="dark"][data-palette="graphite"]) .workspace-backup-usage {
+  border-top: 1px solid var(--border);
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .workspace-backup-buttons button {
+  color: var(--foreground);
+  background: var(--panel);
+  border: 1px solid var(--border-strong);
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .backup-settings-take {
+  color: #363636;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .backup-settings-take input {
+  accent-color: #d07415;
+}
+
+html[data-theme="dark"]:where([data-palette="graphite"]) .backup-settings-take {
+  color: #ebebeb;
 }
 
 :where(html[data-theme="dark"][data-palette="graphite"]) .toolbar-section-tools,

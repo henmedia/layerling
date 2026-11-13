@@ -21,7 +21,7 @@ Bei vielen Teilen verliert man in der Ansicht leicht den Überblick. Die Objektl
 
 ![Die Objektliste: die Gruppe „Gruppe“ mit zwei Teilen und daneben eine Kugel. Ein Ordnersymbol öffnet die Gruppe.](shot:object-list)
 
-- Ein Klick auf einen Eintrag wählt die Form aus, auch die Teile innerhalb einer Gruppe. Mit [[Umschalt]] nimmst du weitere Einträge dazu oder wieder weg, genau wie in der Ansicht. Die Pfeile klappen Gruppen auf und zu.
+- Ein Klick auf einen Eintrag wählt die Form aus, auch die Teile innerhalb einer Gruppe. Wie im Explorer nimmt [[Strg]] (auf dem Mac [[Cmd]]) einen Eintrag dazu oder wieder weg, und [[Umschalt]] wählt alle Einträge vom zuletzt angeklickten bis zu diesem, in der Reihenfolge der Liste; [[Strg]]+[[Umschalt]] nimmt sie zur Auswahl dazu. In der Ansicht nimmt dagegen [[Umschalt]] dazu und wieder weg. Die Pfeile klappen Gruppen auf und zu.
 - Der Buchstabe hinter dem Namen zeigt, ob ein Teil {{ui:outliner.solid}} oder {{ui:outliner.hole}} ist: Es ist der Anfangsbuchstabe des Worts, und mit der Maus darüber erscheint das ganze Wort.
 - Unter dem Namen steht, was für eine Form es ist. Ein Körper, der keine einfache Form mehr ist (verrundet, ausgehöhlt oder eingelesen), zeigt {{ui:shape.exactBody}}, wenn die STEP-Ausfuhr ihn exakt schreibt, und {{ui:shape.mesh}}, wenn er nur aus Dreiecken besteht und als STL hinausgeht. Eine Verjüngung, Neigung oder Verdrehung, die erst nach dem Verrunden oder Aushöhlen dazukommt, verformt nur sein Netz; dann steht dort {{ui:shape.mesh}}.
 - Schloss und Auge sperren und verstecken einzelne Teile.
@@ -45,6 +45,8 @@ Du kannst eine Form über den Rand der Platte hinausziehen und dort liegen lasse
 ## Fangen beim Verschieben
 
 Ziehst du eine Form über die Arbeitsebene, rastet sie an anderen Formen ein: Ihre linke, rechte, vordere oder hintere Kante oder ihre Mitte legt sich genau auf eine Kante oder Mitte einer anderen Form. Eine rosa Hilfslinie zeigt, woran sie gerade hängt. So stellst du zwei Teile bündig nebeneinander oder mittig hintereinander, ohne Zahlen einzutippen. Das gilt auch, wenn das Raster ausgeschaltet ist. Auch die Mitte der Arbeitsebene zählt: Die rosa Linien zeigen, wann die Form auf X, auf Y oder auf beiden Achsen mittig auf der Platte sitzt.
+
+Auch beim Ändern der Größe rastet es ein: Ziehst du an einem Seitengriff, hält diese Seite an den Kanten und Mitten anderer Formen und an der Wand, auf die sie trifft, auch an der Innenwand eines Kastens, eines ausgehöhlten Körpers oder eines importierten Gehäuses, und die rosa Linie zeigt, wo. Dieses Maß bleibt genau so, abseits vom Raster. So füllt ein Teil ein Gehäuse von Wand zu Wand: Lege es an die eine Wand und ziehe seine andere Seite an die gegenüberliegende. Mit [[Alt]] wächst die Form aus ihrer Mitte, und die gezogene Seite rastet genauso ein; mit [[Shift]] behält sie ihre Proportionen und rastet nicht ein. Das gilt auf der flachen Arbeitsebene für Formen, die aufrecht stehen und mit ihren Seiten entlang X und Y liegen, und {{ui:workspace.objectSnap}} schaltet es zusammen mit dem Fangen beim Verschieben aus.
 
 Hältst du beim Ziehen [[Umschalt]] gedrückt, bleibt die Bewegung auf einer Achse: Die Form folgt der Richtung, X oder Y, in die du weiter gezogen hast, und lässt die andere unberührt. Drück [[Umschalt]] am besten erst, wenn du schon ziehst; auf einer Form, die noch nicht ausgewählt ist, nimmt ein Klick mit [[Umschalt]] sie nur zur Auswahl dazu.
 
@@ -76,7 +78,7 @@ Ist unter den gewählten Formen ein Brett (eine Grundform, auf der die anderen s
 
 Ohne Brett hältst du [[Umschalt]] und klickst zuerst auf eine freie Stelle der Platte: Dann ist die Platte die feste Form, gleiche Abstände verteilen die Formen über die ganze Platte mit demselben Abstand zu ihren Rändern, und die anderen Punkte richten sie an ihren Rändern oder ihrer Mitte aus. Ein zweiter Klick mit [[Umschalt]] auf die freie Platte lässt sie wieder los. Ein Klick ins Leere ohne [[Umschalt]] beendet das Ausrichten, wie [[L]] und [[Esc]].
 
-Halte [[Alt]] und klicke den Punkt, um den Abstand selbst einzutippen, etwa 5 mm: Die Formen reihen sich dann so weit auseinander auf, ab der ersten Form oder ab der, die du zuerst angeklickt hast; auf einem Brett kommt die Reihe in seine Mitte. Eine gesperrte Form bleibt stehen, eine zwischen den äußeren Formen verhindert also gleiche Abstände.
+Halte [[Alt]] und klicke den Punkt, um den Abstand selbst einzutippen, etwa 5 mm: Die Formen reihen sich dann so weit auseinander auf, ab der ersten Form oder ab der, die du zuerst angeklickt hast; auf einem Brett kommt die Reihe in seine Mitte. Eine gesperrte Form bleibt stehen, eine zwischen den äußeren Formen verhindert also gleiche Abstände. Auf einem Tablet, das keine Alt-Taste hat, tut der Schalter {{ui:align.sizeSwitch}} neben den Punkten dasselbe: Schaltest du ihn ein, bleiben die Punkte Quadrate und der Abstandspunkt öffnet sein Feld, bis du ihn wieder ausschaltest.
 
 ## Spiegeln
 
@@ -190,6 +192,8 @@ Sind mehrere Teile ausgewählt, zeigt das Eigenschaften-Feld rechts, wie viele e
 Sollen ein oder mehrere Teile um denselben Anteil größer oder kleiner werden, etwa alle Teile einer Druckdatei um 20 %, nimmst du {{ui:scalePercent.title}}. Wähle die Teile aus, klicke mit der rechten Maustaste darauf und wähle {{ui:scalePercent.title}}, oder suche es mit [[Strg]]+[[K]].
 
 Bei {{ui:scalePercent.percent}} gibst du die neue Größe in Prozent der jetzigen ein: 120 % ist ein Fünftel größer, 50 % halb so groß. Breite, Tiefe und Höhe ändern sich dabei gleich, die Proportionen bleiben also erhalten. Die Unterseite bleibt, wo sie ist, so dass nichts in die Platte rutscht.
+
+Für den Modellbau wählst du oben {{ui:scalePercent.by.scale}} statt {{ui:scalePercent.by.percent}}. Unter {{ui:scalePercent.scalePresets}} stehen die üblichen Spuren von Z (1:220) bis G (1:22,5), und bei {{ui:scalePercent.ratio}} tippst du jeden anderen Maßstab ein, etwa 35 für 1:35. Ist das Modell in echter Größe gebaut, bleibt {{ui:scalePercent.original.fullSize}} gewählt: 1:87 macht es 87-mal kleiner. Hast du es in irgendeiner Größe gebaut, nimm {{ui:scalePercent.original.realSize}}, wähle {{ui:scalePercent.axis.height}} oder {{ui:scalePercent.axis.length}} (die längste Seite auf der Platte) und gib bei {{ui:scalePercent.realSize}} ein, wie groß das Vorbild wirklich ist, in Metern (mit Zoll-Einheiten in Fuß). Ein Baum, der in Wirklichkeit 16 m hoch ist, wird in H0 so 16.000 mm / 87 = 184 mm hoch, gleich wie groß er vorher war. Unter den Feldern steht die neue Größe, bevor du {{ui:scalePercent.apply}} drückst. Der Maßstab bleibt eingestellt, solange der Editor offen ist.
 
 Bei mehreren Teilen wählst du, wie sie wachsen:
 

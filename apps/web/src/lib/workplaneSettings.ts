@@ -110,6 +110,7 @@ export const DEFAULT_WORKPLANE_WORKSPACE: WorkplaneWorkspaceSettings = {
   showSlideArrows: true,
   startWithScrollbars: false,
   viewBarOpensOnHover: false,
+  showStepNotices: true,
   zoomSpeed: 5,
   panSpeed: 5,
   mouseScheme: "layerling",
@@ -491,8 +492,9 @@ export function normalizeShapeCustomizations(value: unknown, fallback: ShapeCust
       entry.hingeClearance = optionalShapeNumber(source.hingeClearance, fallbackEntry?.hingeClearance, 0.1, 1);
       entry.hingeAngle = optionalShapeNumber(source.hingeAngle, fallbackEntry?.hingeAngle, -180, 180);
       entry.hingePinless = typeof source.hingePinless === "boolean" ? source.hingePinless : fallbackEntry?.hingePinless;
-      entry.hingeStyle = source.hingeStyle === "cone" || source.hingeStyle === "pinless" || source.hingeStyle === "pin" || source.hingeStyle === "liftOff" ? source.hingeStyle : fallbackEntry?.hingeStyle;
+      entry.hingeStyle = source.hingeStyle === "cone" || source.hingeStyle === "pinless" || source.hingeStyle === "pin" || source.hingeStyle === "liftOff" || source.hingeStyle === "snap" ? source.hingeStyle : fallbackEntry?.hingeStyle;
       entry.hingeConeSize = optionalShapeNumber(source.hingeConeSize, fallbackEntry?.hingeConeSize, 0.6, MAX_CUSTOM_SHAPE_DIMENSION);
+      entry.hingeSnapGrip = optionalShapeNumber(source.hingeSnapGrip, fallbackEntry?.hingeSnapGrip, 0.05, 1.5);
       entry.hingeScrewHoles = optionalShapeNumber(source.hingeScrewHoles, fallbackEntry?.hingeScrewHoles, 0, 6, true);
       entry.hingeScrewDiameter = optionalShapeNumber(source.hingeScrewDiameter, fallbackEntry?.hingeScrewDiameter, 1, 12);
       entry.hingeScrewSpacing = optionalShapeNumber(source.hingeScrewSpacing, fallbackEntry?.hingeScrewSpacing, 0, MAX_CUSTOM_SHAPE_DIMENSION);
@@ -956,6 +958,7 @@ export function normalizeWorkspaceSettings(value: unknown, fallback: WorkplaneWo
     showSlideArrows: booleanOrDefault(candidate.showSlideArrows, fallback.showSlideArrows),
     startWithScrollbars: booleanOrDefault(candidate.startWithScrollbars, fallback.startWithScrollbars),
     viewBarOpensOnHover: booleanOrDefault(candidate.viewBarOpensOnHover, fallback.viewBarOpensOnHover),
+    showStepNotices: booleanOrDefault(candidate.showStepNotices, fallback.showStepNotices),
     zoomSpeed: numberOrDefault(candidate.zoomSpeed, fallback.zoomSpeed),
     panSpeed: numberOrDefault(candidate.panSpeed, fallback.panSpeed),
     mouseScheme: candidate.mouseScheme === "slicer" ? "slicer" : candidate.mouseScheme === "layerling" ? "layerling" : fallback.mouseScheme,

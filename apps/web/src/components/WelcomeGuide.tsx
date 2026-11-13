@@ -49,6 +49,7 @@ const MORE = [
   ["welcome.moreAttachmentsTitle", "welcome.moreAttachmentsBody"],
   ["welcome.moreSaveTitle", "welcome.moreSaveBody"],
   ["welcome.moreBackupTitle", "welcome.moreBackupBody"],
+  ["welcome.moreEarlierVersionsTitle", "welcome.moreEarlierVersionsBody"],
   ["welcome.morePrintersTitle", "welcome.morePrintersBody"],
   ["welcome.moreImportTitle", "welcome.moreImportBody"],
   ["welcome.moreLanguagesTitle", "welcome.moreLanguagesBody"],

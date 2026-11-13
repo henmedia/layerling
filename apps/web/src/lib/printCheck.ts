@@ -462,7 +462,14 @@ export async function checkPrint(source: readonly WorkplaneShape[], given: Parti
     const ownerOf = new Map<number, number>();
     const owners: WorkplaneShape[] = [];
     for (const shape of shapes) {
-      const solid = shapeToManifoldSolid(runtime, shape, created);
+      // A mesh with openings too large to cap is refused as "Not manifold" (#1711): it stays unchecked, and the
+      // open-mesh check above already names it, instead of the whole check failing on the kernel's English.
+      let solid: ManifoldSolid | null = null;
+      try {
+        solid = shapeToManifoldSolid(runtime, shape, created);
+      } catch {
+        solid = null;
+      }
       if (solid) created.push(solid);
       if (!solid || solid.status() !== "NoError" || solid.numTri() === 0) {
         result.unchecked.push({ id: shape.id, name: displayShapeName(shape) });

@@ -57,6 +57,7 @@ Klikaj punkty jeden po drugim.
 ::: Zamykanie albo kończenie linii
 Aby zamknąć kontur, na końcu kliknij ponownie pierwszy punkt.
 Aby zakończyć ciąg linii bez zamykania konturu, kliknij prawym przyciskiem bez ruszania wskaźnikiem albo kliknij dwukrotnie ostatni punkt.
+Jeśli w trakcie rysowania ciągu przełączysz się na {{ui:sketch.line}}, {{ui:sketch.bezier}} albo {{ui:sketch.smooth}}, linia biegnie dalej od ostatniego punktu.
 => Bryła powstaje tylko z **zamkniętego** konturu.
 :::
 
@@ -353,6 +354,7 @@ Drzewo obok domu, postać na pstrokatym tle: tam, gdzie żaden kolor nie odróż
 | [[Ctrl]]+[[A]] | zaznacza wszystkie punkty i linie |
 | [[Ctrl]]+[[I]] | {{ui:sketch.addImage}} |
 | [[Shift]] | podczas rysowania: przyciąga linię co 15°, podczas przeciągania: utrzymuje ruch na jednej osi |
+| [[Alt]] | przy stawianiu lub przeciąganiu punktu: tylko na siatkę, bez przyciągania do narożników i środków |
 | cyfra, [[<]], [[Tab]], [[Enter]] | podczas rysowania: wpisuje i ustawia długość i kąt następnej linii |
 | [[R]] | obraca zamknięty szkic o 45° |
 | [[Ctrl]]+[[L]] | blokuje lub odblokowuje zaznaczony kontur albo obraz wzorcowy |

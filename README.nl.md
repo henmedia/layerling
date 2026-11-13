@@ -21,7 +21,7 @@
     <a href="#layerling-mcp-skill"><img alt="Door AI te besturen" src="https://img.shields.io/badge/AI--drivable-MCP%20server-16c0d4"></a>
   </p>
 
-  <p><a href="README.md">English</a> · <a href="README.de.md">Deutsch</a> · <a href="README.es.md">Español</a> · <strong>Nederlands</strong> · <a href="README.ar.md">العربية</a> · <a href="README.ja.md">日本語</a> · <a href="README.zh-cn.md">简体中文</a> · <a href="README.zh-tw.md">繁體中文</a></p>
+  <p><a href="README.md">English</a> · <a href="README.de.md">Deutsch</a> · <a href="README.es.md">Español</a> · <strong>Nederlands</strong> · <a href="README.pl.md">Polski</a> · <a href="README.sv.md">Svenska</a> · <a href="README.ar.md">العربية</a> · <a href="README.ja.md">日本語</a> · <a href="README.zh-cn.md">简体中文</a> · <a href="README.zh-tw.md">繁體中文</a></p>
 </div>
 
 <p align="center">
@@ -132,6 +132,7 @@ Het is geen volledig CAD-pakket: er is geen parametrische tijdlijn en er zijn ge
 - **Meerdere ontwerpen tegelijk verwijderen** – **Selecteren** op de startpagina kiest ontwerpen met een klik op hun kaart (of allemaal), en één vraag verwijdert de hele keuze; het werkt ook in de servermap.
 - **Mappen voor je ontwerpen** – sorteer de ontwerpen op de startpagina in mappen (en mappen in mappen) door ze te slepen of met "Verplaatsen naar …"; de zoekfunctie doorzoekt ze allemaal, en "Alles back-uppen" bewaart ze.
 - **Projecten als bestanden** – sla een heel project op, inclusief geschiedenis, schetsen en groepen, als `.lyl`-bestand en werk ergens anders verder. In Chrome en Edge kies je zelf de map en slaat Ctrl+S weer op in datzelfde bestand; andere browsers downloaden het. Oudere `.skf`-bestanden uit eerdere versies openen nog steeds; bij opslaan wordt er dan een `.lyl` naast gezet.
+- **Eerdere versies** – voordat Opslaan een `.lyl`-bestand overschrijft, bewaart layerling het bestand zoals het was, en tijdens het werken om de paar minuten een tussenstand; elke versie opent weer als nieuw ontwerp. Hoeveel er blijven stel je in onder Instellingen → Back-ups, en in Chrome en Edge kunnen ze ook in een eigen map. Een melding op de startpagina en in de editor herinnert je eraan alle ontwerpen in een bestand te back-uppen en dat op een tweede plek te bewaren: jouw ontwerpen, jouw back-up.
 - **Bugrapport** – één link in de voettekst slaat een ZIP op met het ontwerp als `.lyl` en een tekst met de versie, browser en laatste meldingen, klaar om bij te voegen op het forum of op GitHub, die een losse `.lyl` weigeren.
 - **Ontwerpen die je herkent** – alles staat in je eigen browser, elk ontwerp met een miniatuur.
 - **Bijlagen** – bewaar notities, een foto van het geprinte onderdeel of een datasheet in het ontwerp: `.md`- en `.txt`-bestanden, `.png`-, `.jpg`- en `.webp`-afbeeldingen en PDF-bestanden reizen mee met het `.lyl`-bestand. Het oog opent een tekst of afbeelding in een venster; een PDF wordt gedownload. SVG wordt niet geaccepteerd, omdat het scripts kan bevatten.
@@ -143,7 +144,7 @@ Het is geen volledig CAD-pakket: er is geen parametrische tijdlijn en er zijn ge
 - **Vier opgeslagen weergaven per ontwerp** – **Shift+7**, **8**, **9** of **0** slaat de weergave precies op zoals ze is (hoek, positie, zoom), en de toets alleen brengt haar terug. Elk ontwerp heeft zijn eigen, en een opgeslagen `.lyl`-bestand neemt ze mee.
 - **Recht op het werkvlak kijken** – **P**, of de knop naast Werkvlak plaatsen in de weergavebalk, draait de weergave recht op het werkvlak, ook op een schuin vlak, met zijn oorsprong in het midden.
 - **De richtingskubus in elke hoek** – Instellingen > Weergave > **Positie van de richtingskubus** zet de kubus linksboven, rechtsboven, linksonder of rechtsonder; in elke hoek behalve linksboven schuift de camerabediening omhoog naar zijn plek.
-- **In jouw taal** – het programma en de handleiding zijn er in het Engels, Duits en 17 andere talen; de taalkeuze staat helemaal rechtsboven.
+- **In jouw taal** – het programma en de handleiding zijn er in het Engels, Duits en 18 andere talen; de taalkeuze staat helemaal rechtsboven.
 - **Van onderen kijken** – het oog boven een raster in de camerabalk verbergt het printbed, zodat je de onderkant van een ontwerp kunt zien zonder dat het in de weg zit.
 - **Een tweede weergave in een eigen venster** – een knop in de camerabalk opent een tweede venster dat hetzelfde ontwerp door een eigen camera toont, met een eigen weergavekubus en camerabalk, en volgt elke wijziging. Het opent waar je het het laatst liet.
 - **Panelen waar jij ze wilt** – de objectenlijst, de instellingen, de doorsnede, het meetlint en de gereedschapspanelen voor randen, uithollen en patronen verplaats je aan hun titelbalk en openen daar weer; dubbelklikken dockt ze.
@@ -236,6 +237,8 @@ Voer dezelfde regel opnieuw uit wanneer je wilt **bijwerken**: de bestaande map 
 ### Docker
 
 Om layerling op een computer, NAS (Synology, Unraid, enz.) of thuisserver te draaien zonder Node.js te installeren, gebruik je de kant-en-klare image **`henmedia/layerling`** op Docker Hub (ook te vinden als **`ghcr.io/henmedia/layerling`**, dezelfde image). Elke release publiceert die voor amd64 en arm64 (Raspberry Pi, ARM-NAS) onder het versienummer en als `latest`. De app luistert op poort **3000**.
+
+Nieuw met Docker? [layerling in Docker, stap voor stap (in het Engels)](docs/docker/en/docker-step-by-step.md) begint bij nul op Windows, macOS of Linux: Docker installeren, layerling starten en je ontwerpen als bestanden in een map op je computer bewaren.
 
 De snelste manier is één enkel commando:
 

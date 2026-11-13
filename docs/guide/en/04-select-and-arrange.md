@@ -21,7 +21,7 @@ With many parts it is easy to lose track in the view. The object list ({{ui:edit
 
 ![The object list: the group "Group" with two parts and a sphere beside it. A folder icon opens the group.](shot:object-list)
 
-- A click on an entry selects the shape, including parts inside a group. With [[Shift]] held you add more entries or take them away again, just as in the view. The arrows fold groups open and shut.
+- A click on an entry selects the shape, including parts inside a group. As in a file manager, [[Ctrl]] ([[Cmd]] on a Mac) adds an entry or takes it away again, and [[Shift]] selects every entry from the one clicked last to this one, in the order the list shows; [[Ctrl]]+[[Shift]] adds them to what is selected. In the view, [[Shift]] adds and takes away instead. The arrows fold groups open and shut.
 - The letter after the name says whether a part is {{ui:outliner.solid}} or {{ui:outliner.hole}}: it is the first letter of the word, and the word shows when you hold the mouse over it.
 - Under the name stands what kind of shape it is. A body that is no longer a plain shape (rounded, hollowed or imported) says {{ui:shape.exactBody}} when the STEP export writes it exactly, and {{ui:shape.mesh}} when it is only triangles and goes as STL. A taper, lean or twist set after rounding or hollowing a body bends only its mesh, so it then says {{ui:shape.mesh}}.
 - Padlock and eye lock and hide single parts.
@@ -45,6 +45,8 @@ You can drag a shape past the edge of the plate and leave it there, about one pl
 ## Snapping while moving
 
 When you drag a shape across the workplane, it snaps to other shapes: its left, right, front or back edge or its centre lands exactly on an edge or centre of another shape. A pink guide line shows what it is holding on to. That way two parts sit flush side by side or centred one behind the other without typing numbers. It works with the grid switched off, too. The centre of the workplane counts too: the pink lines show when the shape sits in the middle of the plate along X, along Y or both.
+
+Resizing snaps too: when you drag a side handle, that side stops at the edges and centres of other shapes and at the wall it runs into, the inside wall of a box, a hollowed body or an imported case as well, and the pink line shows where. That size is kept exactly, off the grid. So a part fills a case from wall to wall: put it against one wall and drag its other side to the opposite one. With [[Alt]] the shape grows from its middle and the dragged side snaps the same way; with [[Shift]] it keeps its proportions and does not snap. This works on the flat workplane, for shapes standing upright with their sides along X and Y, and {{ui:workspace.objectSnap}} switches it off together with snapping while moving.
 
 Hold [[Shift]] while dragging to keep the move on one axis: the shape follows whichever direction, X or Y, you have dragged further in, and leaves the other alone. Best press [[Shift]] once you are already dragging; on a shape that is not selected yet, a click with [[Shift]] only adds it to the selection.
 
@@ -76,7 +78,7 @@ If a board (a base the others stand on, such as a flat box, not an SBC board) is
 
 Without a board, hold [[Shift]] and click an empty spot of the plate first: the plate is then the fixed shape, equal gaps spread the shapes over the whole plate with the same gap to its edges, and the other dots line them up on its edges or its middle. Another click with [[Shift]] on the empty plate lets it go. A click on empty space without [[Shift]] ends Align, as [[L]] and [[Esc]] do.
 
-Hold [[Alt]] and click the dot to type the gap yourself, say 5 mm: the shapes line up that far apart, starting at the first shape or at the one you clicked first; on a board the row comes to its middle. A locked shape stays where it is, so one between the outer shapes stops the equal gaps.
+Hold [[Alt]] and click the dot to type the gap yourself, say 5 mm: the shapes line up that far apart, starting at the first shape or at the one you clicked first; on a board the row comes to its middle. A locked shape stays where it is, so one between the outer shapes stops the equal gaps. On a tablet, which has no Alt key, the switch {{ui:align.sizeSwitch}} beside the dots does the same: switch it on and the dots stay squares and the gap dot opens its field, until you switch it off.
 
 ## Mirroring
 
@@ -190,6 +192,8 @@ With several parts selected, the properties panel on the right shows how many th
 To make one or several parts larger or smaller by the same share, say all the parts of a print file by 20 %, use {{ui:scalePercent.title}}. Select the parts, right-click them and choose {{ui:scalePercent.title}}, or search for it with [[Ctrl]]+[[K]].
 
 Under {{ui:scalePercent.percent}} you type the new size as a percentage of the current one: 120 % is a fifth larger, 50 % half the size. Width, depth and height change alike, so the proportions stay. The bottom stays where it is, so nothing sinks into the plate.
+
+For model making, choose {{ui:scalePercent.by.scale}} instead of {{ui:scalePercent.by.percent}} at the top. {{ui:scalePercent.scalePresets}} offers the usual gauges from Z (1:220) to G (1:22.5), and in {{ui:scalePercent.ratio}} you type any other scale, such as 35 for 1:35. If the model is built at the original's real size, leave {{ui:scalePercent.original.fullSize}} chosen: 1:87 makes it 87 times smaller. If you built it at some other size, choose {{ui:scalePercent.original.realSize}}, pick {{ui:scalePercent.axis.height}} or {{ui:scalePercent.axis.length}} (the longest side across the plate) and type in {{ui:scalePercent.realSize}} how big the original really is, in metres (in feet with imperial units). A tree that is 16 m tall in real life then becomes 16,000 mm / 87 = 184 mm tall in H0, whatever size it had before. The new size shows under the fields before you press {{ui:scalePercent.apply}}. The scale stays set while the editor is open.
 
 With several parts you choose how they grow:
 

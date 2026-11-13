@@ -7,7 +7,7 @@ import { cornerEdgeCandidates, edgesTouchingEnds } from "@/lib/cadCornerEdges";
 import { innerCornerEdges, treatAfterInnerCorners } from "@/lib/cadInnerCorners";
 import { OcctKernel, type OcctModuleFactory, type ShapeHandle } from "occt-wasm";
 import { assertCadKernelRunnable } from "@/lib/wasmSupport";
-import { CANNOT_OFFSET_MESSAGE, offsetSolid, offsetSolidSideways, orientedFaceNormal, shellSolid } from "@/lib/cadShell";
+import { CANNOT_OFFSET_MESSAGE, offsetSolid, offsetSolidSideways, orientedFaceNormal, shellSolid, shellThreadByCore, threadShellCoreOf, type ThreadShellCore } from "@/lib/cadShell";
 import { chamfilletSolid } from "@/lib/cadChamfillet";
 import { isBundleScopeKey } from "@/lib/cadModifierGroups";
 import { cadLidSolid } from "@/lib/cadLid";
@@ -24,6 +24,8 @@ import { helicalGearPartSolid } from "@/lib/gearSolid";
 import { hirthPartSolid } from "@/lib/hirthSolid";
 import { ENCLOSURE_PART_NAMES, enclosurePartSolid } from "@/lib/enclosureSolid";
 import { meshTreatedBody } from "@/lib/cadMeshAccuracy";
+import { tessellateWithRuledStrips } from "@/lib/cadRuledStrips";
+import { closeFlatMeshGaps } from "@/lib/meshHoleFill";
 import { planarMeshFaces } from "@/lib/cadPlanarMesh";
 import { EXACT_MESH_FAILED_MESSAGE, exactMeshFreeformShare, exactSolidFromMesh, type ExactMeshReport } from "@/lib/cadMeshExact";
 import { cadFlatFaceMeshStraysFromOutline } from "@/lib/cadFaceOutline";
@@ -46,6 +48,8 @@ let edgeOwners: number[] = [];
 let edgeInfos: CadModifierEdge[] = [];
 let faceHandles: ShapeHandle[] = [];
 let faceOwners: number[] = [];
+// A lone threaded rod or screw is hollowed through its plain core (#1687); set by prepare.
+let threadShellCore: ThreadShellCore | null = null;
 
 type CollectedCadEdgeGeometry = Omit<CadModifierEdge, "display" | "selectable"> & {
   curveType: string;
@@ -86,6 +90,7 @@ function releaseSession(cad: OcctKernel) {
   } catch {
     // The arena may already be empty after an operation failure.
   }
+  threadShellCore = null;
   baseShape = null;
   baseSolids = [];
   edgeHandles = [];
@@ -1286,6 +1291,7 @@ async function bearbeiteAnfrage(request: CadModifierWorkerRequest, halter: { cad
       exactRequested = false;
     }
     const exactReport = sumExactReports(exactReports);
+    threadShellCore = threadShellCoreOf(request.parts);
     const collected = collectEdges(activeCad, baseShape, request.sharpAngle, Boolean(request.suppressTreatmentDetailEdges), true);
     edgeHandles = collected.handles;
     baseSolids = activeCad.isSolid(baseShape) ? [baseShape] : activeCad.getSubShapes(baseShape, "solid");
@@ -1347,7 +1353,9 @@ async function bearbeiteAnfrage(request: CadModifierWorkerRequest, halter: { cad
       // The edges a plain chamfer or fillet went over, for the check on faces it had no business with (#1503).
       let treatedEdges: ShapeHandle[] | null = null;
       if (request.kind === "shell") {
-        component = shellSolid(activeCad, solid, request.amount, request.shellOpenings ?? "none", request.shellEdges);
+        component = threadShellCore && baseSolids.length === 1
+          ? shellThreadByCore(activeCad, solid, threadShellCore, request.amount, request.shellOpenings ?? "none", request.shellEdges)
+          : shellSolid(activeCad, solid, request.amount, request.shellOpenings ?? "none", request.shellEdges);
       } else if (request.kind === "offset") {
         component = (request.offsetSideways ? offsetSolidSideways : offsetSolid)(activeCad, solid, request.amount, request.offsetShrink === true, request.shellEdges);
       } else if (request.kind === "deleteFace") {
@@ -1421,7 +1429,9 @@ async function bearbeiteAnfrage(request: CadModifierWorkerRequest, halter: { cad
     result = meshed.result;
     const deflection = meshed.deflection;
     const options = tessellationOptions(deflection);
-    const mesh = copyCadMesh(meshed.mesh);
+    // The side of an extruded curve in straight strips (#1696); the kernel keeps the triangulation it just made.
+    // A flat face the kernel left without triangles is capped from its rim (#1711).
+    const mesh = copyCadMesh(closeFlatMeshGaps(tessellateWithRuledStrips(activeCad, result, options)));
     const displayEdges = collectEdges(activeCad, result, 0).displayEdges;
     const brep = storedBrep(activeCad, result);
     // One component is the body itself: its mesh, BREP and edges are the ones just made, copied
@@ -1435,7 +1445,7 @@ async function bearbeiteAnfrage(request: CadModifierWorkerRequest, halter: { cad
       brep,
       displayEdges,
     }] : componentResults.map((component, owner) => {
-      const componentMesh = copyCadMesh(activeCad.tessellate(component, options));
+      const componentMesh = copyCadMesh(closeFlatMeshGaps(tessellateWithRuledStrips(activeCad, component, options)));
       return {
         owner,
         positions: componentMesh.positions,

@@ -47,7 +47,7 @@ Przy lewej krawędzi jest wąski pasek. Od góry:
 - {{ui:camera.orthographic}} przełącza na płaski widok, w którym równoległe krawędzie zostają równoległe. Do mierzenia i wyrównywania krawędzi bywa wygodniejszy od widoku perspektywicznego. [[O]] przełącza w obie strony, a drugie kliknięcie przywraca poprzedni widok.
 - {{ui:camera.secondView}} otwiera drugi widok projektu we własnym oknie, opisanym niżej. Drugie kliknięcie je zamyka.
 - {{ui:camera.showScrollbars}} pokazuje pasek przewijania u dołu widoku i drugi wzdłuż jego prawej krawędzi. Przeciągnij pasek, aby płynnie przesuwać widok, kliknij strzałkę na jego końcu, aby przesunąć go odrobinę (przytrzymaj, aby przesuwać dalej), albo kliknij obok paska, aby przesunąć o prawie cały widok. Nic się nie obraca, a w przeciwieństwie do klawiszy strzałek paski działają także przy zaznaczonej części - przydatne z bliska przy drobnych szczegółach. Drugie kliknięcie je ukrywa; to, czy projekt otwiera się z nimi, decyduje {{ui:workspace.startWithScrollbars}} w ustawieniach. Ta przeglądarka dodatkowo zapamiętuje wybór.
-- {{ui:camera.hideWorkplane}} (oko nad siatką) ukrywa płytę z siatką, żeby obejrzeć projekt od spodu. Zmienia się tylko widok: nowe kształty dalej trafiają na płaszczyznę roboczą. Drugie kliknięcie pokazuje ją z powrotem.
+- {{ui:camera.hideWorkplane}} (oko nad siatką) ukrywa płytę z siatką, żeby obejrzeć projekt od spodu. Zmienia się tylko widok: nowe kształty dalej trafiają na płaszczyznę roboczą. Drugie kliknięcie pokazuje ją z powrotem. Gdy płaszczyzna robocza leży na ścianie, nazywa się {{ui:camera.hideBuildPlate}} i ukrywa tylko stół roboczy: płaszczyzna robocza na ścianie zostaje, ma własne oko, {{ui:camera.hideFaceWorkplane}}.
 - {{ui:camera.placeWorkplane}}, narzędzie Zmierz i kątownik to osobne narzędzia, opisane niżej i w rozdziale [Pomiary i notatki](chapter:measuring-and-notes).
 
 Mała strzałka na samej górze paska ukrywa go, jeśli przeszkadza. Ten sam przycisk, przeciągnięty, przenosi pasek w dowolne miejsce edytora, także w szkicu, a dwukrotne kliknięcie odkłada go z powrotem. Podgląd 3D obracanego szkicu przesuwa się tak samo za swój tytuł.
@@ -102,6 +102,7 @@ Gdy projekt zawiera więcej, niż zmieści jeden stół, na przykład pudełko z
 
 - Każdy stół jest tak duży jak płaszczyzna robocza, a stoły leżą obok siebie na prawo od pierwszego, 20 mm od siebie. Bryła należy do stołu, na którym stoi środek jej podstawy, więc po przeciągnięciu na drugą stronę trafia na inny stół. Projekt ma do 12 stołów.
 - Kliknięcie stołu na pasku pokazuje go, a nowe kształty i importowane pliki trafiają potem na niego. {{ui:plates.showAll}} pokazuje wszystkie. Dwukrotne kliknięcie stołu lub {{ui:plates.rename}} nadaje mu nazwę, np. „Pokrywka”, która jest napisana na stole.
+- Nowy szkic na stole też zaczyna się na aktywnym stole: obszar szkicu pokazuje ten stół z jego bryłami, a gotowa bryła stoi właśnie tam.
 - {{ui:plates.moveLeft}} i {{ui:plates.moveRight}} zmieniają kolejność, a bryły przesuwają się ze swoim stołem. {{ui:plates.remove}} usuwa aktywny stół; jego bryły trafiają na pierwszy stół w to samo miejsce.
 - {{ui:plates.arrange}} układa zaznaczone bryły, albo wszystkie, rząd po rzędzie na stołach, największe najpierw, 5 mm od siebie, i dodaje stoły, dopóki są potrzebne. Bryła większa niż stół zostaje na miejscu.
 - Przy wybranej drukarce każda bryła jest sprawdzana względem własnego stołu, a wysokość druku liczy się od najniższej bryły na tym stole. Stół z bryłą, która się nie mieści, pokazuje swoją liczbę na czerwono.
@@ -158,7 +159,7 @@ Widok szkicu ma własne kolory: {{ui:workspace.sketchBackground}} dla okna wokó
 
 ### Wygląd: strzałki osi i linie krawędzi
 
-{{ui:workspace.showAxes}} (domyślnie włączone) rysuje trzy strzałki w lewym tylnym narożniku płyty: **X** na czerwono w prawo, **Y** na zielono do tyłu i **Z** na niebiesko w górę, tak jak liczą pola pozycji. To reguła prawej dłoni, której używają też Tinkercad, programy CAD i slicery. Gdy płaszczyzna robocza leży na ścianie, strzałki podążają za nią. Jeśli przeszkadzają, wyłącz je tutaj.
+{{ui:workspace.showAxes}} (domyślnie włączone) rysuje trzy strzałki w lewym tylnym narożniku płyty: **X** na czerwono w prawo, **Y** na zielono do tyłu i **Z** na niebiesko w górę, tak jak liczą pola pozycji. To reguła prawej dłoni, której używają też Tinkercad, programy CAD i slicery. Gdy płaszczyzna robocza leży na ścianie, strzałki podążają za nią. Jeśli przeszkadzają, wyłącz je tutaj. Dopóki strzałki są włączone, krzyż środkowy siatki też przyjmuje ich kolory: linia wzdłuż X jest czerwona, a wzdłuż Y zielona, więc nawet przy małej części od razu widać, w którą stronę biegnie każda oś.
 
 {{ui:workspace.edgeLines}} rysuje obrys na każdej bryle w kolorze {{ui:workspace.edgeColor}} (na początek czarnym, jak w Tinkercadzie). Pomaga, gdy ciemne kolory zlewają się ze sobą. Domyślnie jest wyłączone, a bardzo duże zaimportowane siatki są pomijane.
 
@@ -193,6 +194,8 @@ Widok szkicu ma własne kolory: {{ui:workspace.sketchBackground}} dla okna wokó
 {{ui:workspace.startWithScrollbars}}: projekt otwiera się wtedy z paskami przewijania widoku. Ustawienie zapisuje się z projektem i przez {{ui:workspace.makeDefault}}.
 
 {{ui:workspace.viewBarOpensOnHover}}: zwinięty pasek widoku otwiera się, gdy mysz jest nad jego strzałką, i zwija się ponownie chwilę po tym, jak mysz go opuści, chyba że używasz jednego z jego narzędzi. Kliknięcie strzałki, gdy jest tak otwarty, pozostawia go otwartym. Działa tylko z myszą; na ekranie dotykowym pasek otwiera stuknięcie, jak dotąd.
+
+{{ui:workspace.showStepNotices}}: po kroku takim jak połączenie krótki komunikat obok kostki widoku mówi, co zrobiono, i proponuje {{ui:shortcuts.undo}}. Po wyłączeniu te komunikaty się nie pojawiają; komunikaty, które czegoś od ciebie chcą lub zgłaszają problem, nadal się pojawiają, a {{ui:editor.tool.undo}} na wstążce nadal podaje krok po najechaniu.
 
 {{ui:workspace.startView}} ustawia kąt, pod jakim otwiera się nowy projekt i do którego wraca {{ui:camera.home}}. Obróć i przybliż widok tak, jak lubisz, a potem kliknij {{ui:workspace.startViewUseCurrent}}. {{ui:workspace.startViewStandard}} przywraca zwykły widok z prawego przodu. Obowiązuje dla każdego projektu w tej przeglądarce. Projekt otwierany ponownie nadal otwiera się tak, jak go zostawiłeś.
 

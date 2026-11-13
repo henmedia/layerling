@@ -21,7 +21,7 @@ Con muchas piezas, es fácil perderse en la vista. La lista de objetos ({{ui:edi
 
 ![La lista de objetos: el grupo «Grupo» con dos piezas y una esfera al lado. Un icono de carpeta abre el grupo.](shot:object-list)
 
-- Un clic en una entrada selecciona la forma, también las piezas que están dentro de un grupo. Con [[Mayús]] pulsado, añades más entradas o las vuelves a quitar, igual que en la vista. Las flechas despliegan y pliegan los grupos.
+- Un clic en una entrada selecciona la forma, también las piezas que están dentro de un grupo. Como en un explorador de archivos, [[Ctrl]] ([[Cmd]] en un Mac) añade una entrada o la vuelve a quitar, y [[Mayús]] selecciona todas las entradas desde la última pulsada hasta esta, en el orden de la lista; [[Ctrl]]+[[Mayús]] las añade a lo seleccionado. En la vista, en cambio, es [[Mayús]] la que añade y quita. Las flechas despliegan y pliegan los grupos.
 - La letra tras el nombre indica si una pieza es {{ui:outliner.solid}} o {{ui:outliner.hole}}: es la primera letra de la palabra, y la palabra completa aparece al pasar el ratón por encima.
 - Debajo del nombre aparece qué tipo de forma es. Un cuerpo que ya no es una forma simple (redondeado, vaciado o importado) muestra {{ui:shape.exactBody}} cuando la exportación STEP lo escribe con exactitud, y {{ui:shape.mesh}} cuando solo son triángulos y sale como STL. Un estrechamiento, una inclinación o una torsión añadidos después de redondear o vaciar un cuerpo solo doblan su malla, así que entonces muestra {{ui:shape.mesh}}.
 - El candado y el ojo bloquean y ocultan piezas sueltas.
@@ -45,6 +45,8 @@ Puedes arrastrar una forma más allá del borde de la placa y dejarla ahí, hast
 ## Ajuste al mover
 
 Cuando arrastras una forma por el plano de trabajo, se ajusta a otras formas: su lado izquierdo, derecho, delantero o trasero, o su centro, cae exactamente sobre un lado o el centro de otra forma. Una línea guía rosa muestra a qué se está ajustando. Así dejas dos piezas a ras una junto a otra, o centradas una detrás de otra, sin escribir números. También funciona con la cuadrícula desactivada. También cuenta el centro del plano de trabajo: las líneas rosas muestran cuándo la forma queda en el centro de la placa en X, en Y o en ambos.
+
+Al cambiar el tamaño también se ajusta: cuando arrastras un tirador lateral, ese lado se detiene en las aristas y los centros de otras formas y en la pared con la que se encuentra, también la pared interior de una caja, de un cuerpo vaciado o de una carcasa importada, y la línea rosa muestra dónde. Esa medida se mantiene exacta, fuera de la cuadrícula. Así una pieza llena una carcasa de pared a pared: apóyala en una pared y arrastra su otro lado hasta la opuesta. Con [[Alt]] la forma crece desde su centro y el lado arrastrado se ajusta igual; con [[Shift]] conserva sus proporciones y no se ajusta. Funciona en el plano de trabajo plano, con formas en pie con sus lados a lo largo de X e Y, y {{ui:workspace.objectSnap}} lo desactiva junto con el ajuste al mover.
 
 Mantén pulsado [[Mayús]] mientras arrastras para que el movimiento siga un solo eje: la forma sigue la dirección, X o Y, en la que más hayas arrastrado y no se mueve en la otra. Lo mejor es pulsar [[Mayús]] cuando ya estás arrastrando; sobre una forma que aún no está seleccionada, un clic con [[Mayús]] solo la añade a la selección.
 
@@ -76,7 +78,7 @@ Si entre las formas seleccionadas hay una base (una forma sobre la que están la
 
 Sin base, mantén [[Shift]] y haz clic primero en un sitio libre de la placa: la placa pasa a ser la forma fija, el espaciado igual reparte las formas por toda la placa con la misma separación a sus bordes, y los demás puntos las alinean con sus bordes o su centro. Otro clic con [[Shift]] en la placa libre la suelta. Un clic en un lugar vacío sin [[Shift]] termina la alineación, igual que [[L]] y [[Esc]].
 
-Mantén [[Alt]] y haz clic en el punto para escribir tú la separación, por ejemplo 5 mm: las formas se alinean a esa distancia, desde la primera forma o desde la que pulsaste primero; sobre una base, la fila queda en su centro. Una forma bloqueada no se mueve, así que una entre las formas exteriores impide el espaciado igual.
+Mantén [[Alt]] y haz clic en el punto para escribir tú la separación, por ejemplo 5 mm: las formas se alinean a esa distancia, desde la primera forma o desde la que pulsaste primero; sobre una base, la fila queda en su centro. Una forma bloqueada no se mueve, así que una entre las formas exteriores impide el espaciado igual. En una tableta, que no tiene tecla Alt, el interruptor {{ui:align.sizeSwitch}} junto a los puntos hace lo mismo: al activarlo, los puntos siguen siendo cuadrados y el punto de separación abre su campo, hasta que lo desactives.
 
 ## Reflejar
 
@@ -190,6 +192,8 @@ Con varias piezas seleccionadas, el panel de propiedades de la derecha muestra c
 Para hacer una o varias piezas más grandes o más pequeñas en la misma proporción, por ejemplo todas las piezas de un archivo de impresión un 20 %, usa {{ui:scalePercent.title}}. Selecciona las piezas, haz clic derecho sobre ellas y elige {{ui:scalePercent.title}}, o búscalo con [[Ctrl]]+[[K]].
 
 En {{ui:scalePercent.percent}} escribes el tamaño nuevo como porcentaje del actual: 120 % es una quinta parte más grande y 50 %, la mitad. La anchura, la profundidad y la altura cambian igual, así que se mantienen las proporciones. La base se queda donde está, así que nada se hunde en la placa.
+
+Para modelismo, elige arriba {{ui:scalePercent.by.scale}} en lugar de {{ui:scalePercent.by.percent}}. {{ui:scalePercent.scalePresets}} ofrece las escalas habituales desde Z (1:220) hasta G (1:22,5), y en {{ui:scalePercent.ratio}} escribes cualquier otra, como 35 para 1:35. Si el modelo está hecho al tamaño real del original, deja {{ui:scalePercent.original.fullSize}}: 1:87 lo hace 87 veces más pequeño. Si lo hiciste a cualquier otro tamaño, elige {{ui:scalePercent.original.realSize}}, luego {{ui:scalePercent.axis.height}} o {{ui:scalePercent.axis.length}} (el lado más largo sobre la placa) y escribe en {{ui:scalePercent.realSize}} cuánto mide de verdad el original, en metros (en pies con unidades imperiales). Un árbol que en realidad mide 16 m queda así en H0 con 16 000 mm / 87 = 184 mm, tuviera el tamaño que tuviera antes. El nuevo tamaño aparece bajo los campos antes de pulsar {{ui:scalePercent.apply}}. La escala se mantiene mientras el editor esté abierto.
 
 Con varias piezas, eliges cómo crecen:
 

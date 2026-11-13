@@ -43,7 +43,7 @@ import { resizeSketchPoints, resizeSketchPointsToSize, type ResizeHandle, type S
 import { alignSketchSelection, canAlignSketchSelection, type SketchAlignMode } from "@/lib/sketchAlign";
 import { changesLockedOutline, lockedCornerTurn, lockedLengthAnchor, sketchLockState } from "@/lib/sketchLock";
 import { dragRotationDegrees, rotateSketchPointsAbout, sketchPointsPivot, sketchTurnRing, sketchTurnStep, SKETCH_TURN_RING_STEP } from "@/lib/sketchRotation";
-import { calibrateImage, centreImage, cropImage, imageAngleTo, imageCorners, imageCropViewBox, imageHandlePositions, normalizeImageRotation, resizeImage, rotateImage, uncropImage } from "@/lib/sketchImageTransform";
+import { calibrateImage, centreImage, cropImage, imageAngleTo, imageCorners, imageCropViewBox, imageHandlePositions, normalizeImageRotation, resizeImage, rotateImage, sketchImageSizeLimits, uncropImage } from "@/lib/sketchImageTransform";
 import { MAX_TRACE_CORNER_ANGLE, MIN_TRACE_CORNER_ANGLE, type PictureTrace, type TracePart } from "@/lib/pictureTrace";
 import { planePointToTraced, tracedLinePath, tracedPixelSize, tracedPointOnPlane, tracePreviewPath, type TracedSize } from "@/lib/sketchImageTrace";
 import { useSketchImageTrace, type SketchImageTraceState } from "@/lib/useSketchImageTrace";
@@ -879,7 +879,7 @@ export function SketchWorkspace({
   useEffect(() => {
     setSelectedHandle(null);
   }, [selected, tool]);
-  const lastPointerRef = useRef<{ clientX: number; clientY: number } | null>(null);
+  const lastPointerRef = useRef<{ clientX: number; clientY: number; altKey?: boolean } | null>(null);
   const [refinePreview, setRefinePreview] = useState<{ segmentId: string; placement: SketchSegmentPlacement } | null>(null);
   const [pointerAction, setPointerAction] = useState<PointerAction | null>(null);
   // A freehand stroke (#1280) in progress: its samples in a ref, not in state, so no move of a fast pen is lost
@@ -1463,13 +1463,14 @@ export function SketchWorkspace({
   const constrainDrawing = (origin: { x: number; z: number }, point: { x: number; z: number }) =>
     constrainToAngle(origin, point, 15, snapStep(snap));
 
-  const pointFromEvent = (event: { clientX: number; clientY: number }) => {
+  const pointFromEvent = (event: { clientX: number; clientY: number; altKey?: boolean }) => {
     const local = unsnappedPointFromEvent(event);
     if (!local) return null;
     // Near a corner of another body shown underneath, a drawn or dragged point takes that
     // corner instead of the grid (#189). Not while a whole selection moves: its grip is
-    // wherever it was taken, so the corner would only make it jump.
-    if (!pointerAction || pointerAction.kind === "move-point") {
+    // wherever it was taken, so the corner would only make it jump. Alt keeps the point on the
+    // grid only, for tracing just beside a corner (Discussion #1659), as Alt does for a moved selection.
+    if (!event.altKey && (!pointerAction || pointerAction.kind === "move-point")) {
       const reach = REFERENCE_SNAP_PX * screenUnit;
       let nearest: { x: number; z: number } | null = null;
       let nearestDistance = reach;
@@ -1681,7 +1682,7 @@ export function SketchWorkspace({
   };
 
   const handlePointerMove = (event: ReactPointerEvent<SVGSVGElement>) => {
-    lastPointerRef.current = { clientX: event.clientX, clientY: event.clientY };
+    lastPointerRef.current = { clientX: event.clientX, clientY: event.clientY, altKey: event.altKey };
     if (extendFreehand(event)) return;
     if (pointerAction?.kind === "pan") {
       const matrix = svgRef.current?.getScreenCTM();
@@ -3523,6 +3524,7 @@ export function SketchWorkspace({
       {selectedImage && tool === "select" ? (
         <SketchImageInspector
           image={selectedImage}
+          plate={{ width: workspace.width, depth: workspace.depth }}
           accuracy={workspace.accuracy}
           revolve={operation === "revolve"}
           cropMode={cropMode}
@@ -3772,6 +3774,7 @@ type ImageCalibrationStep = { type: "start" } | { type: "cancel" } | { type: "ap
 
 function SketchImageInspector({
   image,
+  plate,
   accuracy,
   revolve,
   cropMode,
@@ -3786,6 +3789,8 @@ function SketchImageInspector({
   onApplyTrace,
 }: {
   image: SketchImage;
+  /** The printer's plate, which sets how far width and height go (#1727). */
+  plate: { width: number; depth: number };
   accuracy: 1 | 2 | 3;
   /** Revolving: x = 0 is the axis, so centring on it is the point. */
   revolve: boolean;
@@ -3810,6 +3815,7 @@ function SketchImageInspector({
     if (Number.isFinite(length) && length > 0) onCalibrate({ type: "apply", length });
   };
   const aspect = image.width / Math.max(0.5, image.depth);
+  const sizeLimits = sketchImageSizeLimits(plate, image);
   const updateWidth = (width: number) => onUpdate({
     width,
     ...(image.lockAspect !== false ? { depth: Math.max(0.5, width / aspect) } : {}),
@@ -3895,8 +3901,8 @@ function SketchImageInspector({
       <div className="property-card">
         <div className="property-card-header static"><span>{t("sketch.imageProperties")}</span></div>
         <div className="property-list">
-          <SketchImageRange label={t("sketch.imageWidth")} value={image.width} min={0.5} max={200} accuracy={accuracy} disabled={image.locked} onChange={updateWidth} />
-          <SketchImageRange label={t("sketch.imageHeight")} value={image.depth} min={0.5} max={200} accuracy={accuracy} disabled={image.locked} onChange={updateDepth} />
+          <SketchImageRange label={t("sketch.imageWidth")} value={image.width} min={0.5} max={sizeLimits.slider} typedMax={sizeLimits.typed} accuracy={accuracy} disabled={image.locked} onChange={updateWidth} />
+          <SketchImageRange label={t("sketch.imageHeight")} value={image.depth} min={0.5} max={sizeLimits.slider} typedMax={sizeLimits.typed} accuracy={accuracy} disabled={image.locked} onChange={updateDepth} />
           <SketchImageRange label={t("sketch.imageOpacity")} value={(image.opacity ?? 0.55) * 100} min={5} max={100} accuracy={1} suffix="%" disabled={image.locked} onChange={(opacity) => onUpdate({ opacity: opacity / 100 }, t("sketch.imageOpacityUpdated"))} />
           <SketchImagePositionField label={t("sketch.imagePositionX")} value={image.x} accuracy={accuracy} disabled={image.locked} onChange={(x) => onUpdate({ x }, t("sketch.imageMoved"))} />
           <SketchImagePositionField label={t("sketch.imagePositionY")} value={image.z} accuracy={accuracy} disabled={image.locked} onChange={(z) => onUpdate({ z }, t("sketch.imageMoved"))} />
@@ -4248,6 +4254,7 @@ function SketchImageRange({
   value,
   min,
   max,
+  typedMax = max,
   accuracy,
   suffix = "mm",
   disabled = false,
@@ -4257,7 +4264,10 @@ function SketchImageRange({
   label: string;
   value: number;
   min: number;
+  /** The end of the slider. */
   max: number;
+  /** How far a typed value may go, when that is further than the slider (#1727). */
+  typedMax?: number;
   accuracy: 1 | 2 | 3;
   suffix?: string;
   disabled?: boolean;
@@ -4265,14 +4275,15 @@ function SketchImageRange({
   whole?: boolean;
   onChange: (value: number) => void;
 }) {
-  const safeValue = clamp(Number.isFinite(value) ? value : min, min, max);
+  const shownValue = clamp(Number.isFinite(value) ? value : min, min, Math.max(max, typedMax));
+  const safeValue = clamp(shownValue, min, max);
   const isLength = suffix === "mm";
   const formatValue = isLength ? formatDimension : whole ? formatWholeNumber : formatPlainNumber;
-  const [draft, setDraft] = useState(formatValue(safeValue, accuracy));
-  useEffect(() => setDraft(formatValue(safeValue, accuracy)), [accuracy, safeValue, formatValue]);
+  const [draft, setDraft] = useState(formatValue(shownValue, accuracy));
+  useEffect(() => setDraft(formatValue(shownValue, accuracy)), [accuracy, shownValue, formatValue]);
   const commit = () => {
     const parsed = isLength ? parseLengthMm(draft) : parseMeasurementInput(draft);
-    const value = clamp(Number.isFinite(parsed) ? parsed : safeValue, min, max);
+    const value = clamp(Number.isFinite(parsed) ? parsed : shownValue, min, Math.max(max, typedMax));
     onChange(whole ? Math.round(value) : value);
   };
   const position = ((safeValue - min) / Math.max(0.001, max - min)) * 100;

@@ -45,7 +45,7 @@ Sul bordo sinistro trovi una barra sottile. Dall’alto:
 - {{ui:camera.zoomIn}} e {{ui:camera.zoomOut}} ingrandiscono o rimpiccioliscono a scatti, come i tasti [[+]] e [[−]].
 - {{ui:camera.orthographic}} attiva una vista piatta, in cui gli spigoli paralleli restano paralleli. Per misurare e allineare gli spigoli è spesso più comoda della prospettiva. Premi [[O]] per alternare le due viste; un secondo clic torna alla vista precedente.
 - {{ui:camera.showScrollbars}} mostra una barra di scorrimento in basso nella vista e una lungo il bordo destro. Trascina una barra per spostare la vista in modo fluido, fai clic su una freccia all’estremità per spostarla di poco (tienila premuta per continuare), oppure fai clic accanto alla barra per avanzare di quasi tutta la vista. Non ruota nulla e, a differenza dei tasti freccia, le barre funzionano anche con una parte selezionata: comodo da vicino sui piccoli dettagli. Un secondo clic le nasconde; {{ui:workspace.startWithScrollbars}} nelle impostazioni decide se un progetto si apre con le barre. Questo browser ricorda inoltre la scelta.
-- {{ui:camera.hideWorkplane}} (l’occhio sopra una griglia) nasconde il piano con la griglia, così puoi guardare da sotto il lato inferiore del progetto. Cambia solo la vista: le nuove forme continuano a essere posizionate sul piano di lavoro. Fai di nuovo clic per mostrarlo.
+- {{ui:camera.hideWorkplane}} (l’occhio sopra una griglia) nasconde il piano con la griglia, così puoi guardare da sotto il lato inferiore del progetto. Cambia solo la vista: le nuove forme continuano a essere posizionate sul piano di lavoro. Fai di nuovo clic per mostrarlo. Con un piano di lavoro su una faccia si chiama {{ui:camera.hideBuildPlate}} e nasconde solo il piatto di stampa: il piano di lavoro sulla faccia resta, ha il suo occhio, {{ui:camera.hideFaceWorkplane}}.
 - {{ui:camera.placeWorkplane}}, il metro a nastro e la squadra sono strumenti separati, descritti qui sotto e in [Misurazioni e annotazioni](chapter:measuring-and-notes).
 
 La piccola freccia in cima alla barra la nasconde se è d’ingombro.
@@ -100,6 +100,7 @@ Quando un progetto contiene più di quanto un piatto possa stampare, per esempio
 
 - Ogni piatto è grande quanto il piano di lavoro, e i piatti stanno uno accanto all'altro a destra del primo, a 20 mm di distanza. Un corpo appartiene al piatto su cui si trova il centro della sua base, quindi trascinandolo dall'altra parte passa sull'altro piatto. Un progetto ha fino a 12 piatti.
 - Un clic su un piatto nella barra lo mostra, e le nuove forme e i file importati finiscono poi su di esso. {{ui:plates.showAll}} li mostra tutti. Un doppio clic su un piatto, o {{ui:plates.rename}}, gli dà un nome come «Coperchio», scritto sul piatto.
+- Anche un nuovo schizzo sul piatto inizia sul piatto attivo: l'area dello schizzo mostra quel piatto con i suoi corpi, e il corpo finito si trova lì.
 - {{ui:plates.moveLeft}} e {{ui:plates.moveRight}} cambiano l'ordine, e i corpi seguono il loro piatto. {{ui:plates.remove}} toglie il piatto attivo; i suoi corpi passano sul primo piatto nello stesso punto.
 - {{ui:plates.arrange}} dispone i corpi selezionati, o tutti, fila per fila sui piatti, i più grandi per primi, a 5 mm di distanza, e aggiunge piatti finché servono. Un corpo più grande di un piatto resta dov'è.
 - Con una stampante scelta, ogni corpo viene controllato rispetto al proprio piatto, e l'altezza di stampa conta dal corpo più basso di quel piatto. Un piatto con un corpo che non ci sta mostra il suo numero in rosso.
@@ -156,7 +157,7 @@ La vista dello schizzo ha colori propri: {{ui:workspace.sketchBackground}} per l
 
 ### Aspetto: frecce degli assi e contorni
 
-{{ui:workspace.showAxes}}, attivo per impostazione predefinita, disegna tre frecce nell’angolo posteriore sinistro della piastra: **X** in rosso verso destra, **Y** in verde verso il fondo e **Z** in blu verso l’alto, secondo il sistema usato dai campi di posizione. È la regola della mano destra, adottata anche da Tinkercad, dai programmi CAD e dagli slicer. Se il piano di lavoro è appoggiato a una faccia, gli assi lo seguono. Se sono d’intralcio, puoi disattivarli qui.
+{{ui:workspace.showAxes}}, attivo per impostazione predefinita, disegna tre frecce nell’angolo posteriore sinistro della piastra: **X** in rosso verso destra, **Y** in verde verso il fondo e **Z** in blu verso l’alto, secondo il sistema usato dai campi di posizione. È la regola della mano destra, adottata anche da Tinkercad, dai programmi CAD e dagli slicer. Se il piano di lavoro è appoggiato a una faccia, gli assi lo seguono. Se sono d’intralcio, puoi disattivarli qui. Finché le frecce sono attive, anche la croce centrale della griglia prende i loro colori: la linea lungo X rossa, quella lungo Y verde, così anche su un pezzo piccolo vedi subito dove va ciascun asse.
 
 {{ui:workspace.edgeLines}} disegna il contorno di ogni corpo nel colore indicato da {{ui:workspace.edgeColor}} (inizialmente nero, come in Tinkercad), utile quando i colori scuri si confondono tra loro. L’opzione è disattivata per impostazione predefinita e non viene applicata alle mesh importate molto grandi.
 
@@ -191,6 +192,8 @@ Con {{ui:workspace.startInPerspective}} l’editor si apre nella vista prospetti
 Con {{ui:workspace.startWithScrollbars}} un progetto si apre con le barre di scorrimento della vista. L’impostazione si salva con il progetto e con {{ui:workspace.makeDefault}}.
 
 {{ui:workspace.viewBarOpensOnHover}}: una barra della vista chiusa si apre mentre il mouse è sulla sua freccia e si richiude poco dopo che il mouse l'ha lasciata, a meno che uno dei suoi strumenti sia in uso. Un clic sulla freccia mentre è aperta così la tiene aperta. Vale solo per il mouse; su uno schermo touch un tocco apre la barra come prima.
+
+{{ui:workspace.showStepNotices}}: dopo un passo come un'unione, un breve messaggio accanto al cubo di vista dice cosa è stato fatto e offre {{ui:shortcuts.undo}}. Disattivato, questi messaggi non compaiono; quelli che ti chiedono qualcosa o segnalano un problema compaiono comunque, e {{ui:editor.tool.undo}} nella barra multifunzione indica ancora il passo quando ci passi sopra.
 
 {{ui:workspace.startView}} fissa l'angolo da cui si apre un nuovo progetto e a cui torna {{ui:camera.home}}. Ruota e ingrandisci la vista come ti piace, poi fai clic su {{ui:workspace.startViewUseCurrent}}; {{ui:workspace.startViewStandard}} riporta la vista consueta da davanti a destra. Vale per ogni progetto in questo browser. Un progetto che riapri si apre comunque come lo hai lasciato.
 

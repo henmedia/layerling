@@ -44,7 +44,7 @@ Ob levem robu je ozka vrstica. Od zgoraj navzdol:
 - {{ui:camera.orthographic}} preklopi na ploski pogled, v katerem vzporedni robovi ostanejo vzporedni. To je za merjenje in za poravnavanje robov pogosto prijetnejše kot perspektivni pogled. S [[O]] preklapljaš sem in tja, drugi klik gre nazaj.
 - {{ui:camera.secondView}} odpre drugi pogled na načrt v lastnem oknu, opisanem spodaj. Drugi klik ga zapre.
 - {{ui:camera.showScrollbars}} pokaže drsnik ob spodnjem robu pogleda in drugega ob desnem robu. Povleci drsnik, da pogled gladko premakneš, klikni puščico na njegovem koncu za majhen premik (če jo držiš, se premika naprej) ali klikni ob drsnik za skoraj cel pogled. Nič se ne zavrti, in za razliko od smernih tipk drsnika delujeta tudi, ko je izbran del - priročno od blizu pri drobnih podrobnostih. Drugi klik ju skrije; ali se načrt odpre z njima, določa {{ui:workspace.startWithScrollbars}} v nastavitvah. Ta brskalnik si izbiro tudi zapomni.
-- {{ui:camera.hideWorkplane}} (oko nad mrežo) skrije ploščo z mrežo, da lahko spodnjo stran načrta pogledaš od spodaj. Spremeni se samo pogled: nove oblike še naprej pristanejo na delovni ravnini. Drugi klik jo spet prikaže.
+- {{ui:camera.hideWorkplane}} (oko nad mrežo) skrije ploščo z mrežo, da lahko spodnjo stran načrta pogledaš od spodaj. Spremeni se samo pogled: nove oblike še naprej pristanejo na delovni ravnini. Drugi klik jo spet prikaže. Z delovno ravnino na ploskvi se imenuje {{ui:camera.hideBuildPlate}} in skrije samo tiskalno ploščo: delovna ravnina na ploskvi ostane, ima svoje oko, {{ui:camera.hideFaceWorkplane}}.
 - {{ui:camera.placeWorkplane}}, merilni trak in kotomer so lastna orodja, ki so opisana spodaj in v poglavju [Merjenje in opombe](chapter:merjenje-in-opombe).
 
 Z majhno puščico čisto na vrhu vrstice jo lahko skriješ, če te moti.
@@ -101,6 +101,7 @@ Ko načrt vsebuje več, kot se natisne na eno ploščo, na primer škatlo s pokr
 
 - Vsaka plošča je velika kot delovna ravnina, plošče pa ležijo druga ob drugi desno od prve, 20 mm narazen. Telo spada k plošči, na kateri stoji sredina njegovega tlorisa, zato ga z vlečenjem na drugo stran postavite na drugo ploščo. Načrt ima do 12 plošč.
 - Klik na ploščo v vrstici jo pokaže in nove oblike in uvožene datoteke nato pristanejo na njej. {{ui:plates.showAll}} pokaže vse. Dvojni klik na ploščo ali {{ui:plates.rename}} ji da ime, na primer »Pokrov«, ki je napisano na plošči.
+- Tudi nova skica na plošči se začne na aktivni plošči: površina skice pokaže to ploščo s telesi na njej, in končano telo stoji tam.
 - {{ui:plates.moveLeft}} in {{ui:plates.moveRight}} spremenita vrstni red, telesa se premikajo s svojo ploščo. {{ui:plates.remove}} odstrani dejavno ploščo; njena telesa gredo na prvo ploščo na isto mesto.
 - {{ui:plates.arrange}} razporedi izbrana telesa, ali vsa, vrsto za vrsto po ploščah, največja najprej, 5 mm narazen, in dodaja plošče, dokler so potrebne. Telo, večje od plošče, ostane na mestu.
 - Z izbranim tiskalnikom se vsako telo preveri glede na svojo ploščo, višina tiska pa se šteje od najnižjega telesa na tej plošči. Plošča s telesom, ki ne gre nanjo, pokaže svoje število rdeče.
@@ -157,7 +158,7 @@ Skicirni pogled ima lastne barve: {{ui:workspace.sketchBackground}} za okno okol
 
 ### Videz: puščice osi in robne črte
 
-{{ui:workspace.showAxes}} (sprva vklopljeno) nariše v zadnjem levem kotu plošče tri puščice: **X** rdeče v desno, **Y** zeleno nazaj in **Z** modro navzgor, tako kot štejejo polja za lego. To je pravilo desne roke, ki ga uporabljajo tudi Tinkercad, CAD-programi in rezalniki. Če delovna ravnina leži na ploskvi, se puščice premaknejo z njo. Tu jih izklopiš, če te motijo.
+{{ui:workspace.showAxes}} (sprva vklopljeno) nariše v zadnjem levem kotu plošče tri puščice: **X** rdeče v desno, **Y** zeleno nazaj in **Z** modro navzgor, tako kot štejejo polja za lego. To je pravilo desne roke, ki ga uporabljajo tudi Tinkercad, CAD-programi in rezalniki. Če delovna ravnina leži na ploskvi, se puščice premaknejo z njo. Tu jih izklopiš, če te motijo. Dokler so puščice vklopljene, ima tudi sredinski križ mreže njihove barve: črta vzdolž X rdečo, črta vzdolž Y zeleno, tako da tudi pri majhnem delu takoj vidite, kam gre katera os.
 
 {{ui:workspace.edgeLines}} nariše na vsakem telesu obrisno črto v barvi {{ui:workspace.edgeColor}} (sprva črno, kot v Tinkercadu): to pomaga, ko se temne barve zlijejo. Sprva je izklopljeno, zelo veliki uvoženi modeli (mreže) pa so izvzeti.
 
@@ -192,6 +193,8 @@ Skicirni pogled ima lastne barve: {{ui:workspace.sketchBackground}} za okno okol
 {{ui:workspace.startWithScrollbars}}: načrt se potem odpre z drsniki pogleda. Nastavitev se shrani z načrtom in z {{ui:workspace.makeDefault}}.
 
 {{ui:workspace.viewBarOpensOnHover}}: zložena vrstica pogleda se odpre, ko je miška nad njeno puščico, in se kmalu potem, ko jo miška zapusti, spet zloži, razen če je v uporabi eno od njenih orodij. Klik na puščico, ko je tako odprta, jo pusti odprto. Velja samo za miško; na zaslonu na dotik vrstico kot doslej odpre dotik.
+
+{{ui:workspace.showStepNotices}}: po koraku, kot je združitev, kratko sporočilo ob kocki pogleda pove, kaj se je zgodilo, in ponudi {{ui:shortcuts.undo}}. Izklopljeno teh sporočil ni; sporočila, ki od vas nekaj želijo ali sporočajo težavo, se še vedno prikažejo, {{ui:editor.tool.undo}} na traku pa ob premiku miške še vedno navede korak.
 
 {{ui:workspace.startView}} določa kot, pod katerim se odpre nov načrt in na katerega se vrne {{ui:camera.home}}. Zavrti in približaj pogled, kot ti je všeč, nato klikni {{ui:workspace.startViewUseCurrent}}; {{ui:workspace.startViewStandard}} vrne običajni pogled od spredaj desno. Velja za vsak načrt v tem brskalniku. Načrt, ki ga znova odpreš, se še vedno odpre tako, kot si ga zapustil.
 

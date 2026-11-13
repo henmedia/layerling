@@ -46,7 +46,7 @@ En el borde izquierdo hay una barra estrecha. De arriba abajo:
 - {{ui:camera.orthographic}} cambia a una vista plana en la que las aristas paralelas siguen siendo paralelas. Para medir y alinear aristas suele ser más cómoda que la vista en perspectiva. [[O]] alterna entre las dos, y un segundo clic vuelve a la de antes.
 - {{ui:camera.secondView}} abre una segunda vista del diseño en una ventana propia, descrita más abajo. Un segundo clic la cierra.
 - {{ui:camera.showScrollbars}} pone una barra de desplazamiento en la parte inferior de la vista y otra a lo largo de su borde derecho. Arrastra una barra para desplazar la vista con suavidad, haz clic en una flecha de su extremo para moverla un poco (mantenla pulsada para seguir), o haz clic junto a la barra para avanzar casi una vista entera. Nada gira y, a diferencia de las teclas de flecha, las barras funcionan con una pieza seleccionada: útil de cerca, en detalles pequeños. Un segundo clic las oculta; {{ui:workspace.startWithScrollbars}} en los ajustes decide si un diseño se abre con ellas. Este navegador también recuerda la elección.
-- {{ui:camera.hideWorkplane}} (el ojo sobre una cuadrícula) oculta la placa con su cuadrícula, para que puedas mirar desde abajo la parte inferior de un diseño. Solo cambia la vista: las formas nuevas siguen apareciendo en el plano de trabajo. Un segundo clic vuelve a mostrarla.
+- {{ui:camera.hideWorkplane}} (el ojo sobre una cuadrícula) oculta la placa con su cuadrícula, para que puedas mirar desde abajo la parte inferior de un diseño. Solo cambia la vista: las formas nuevas siguen apareciendo en el plano de trabajo. Un segundo clic vuelve a mostrarla. Con un plano de trabajo sobre una cara se llama {{ui:camera.hideBuildPlate}} y oculta solo la placa de impresión: el plano de trabajo sobre la cara se queda, tiene su propio ojo, {{ui:camera.hideFaceWorkplane}}.
 - {{ui:camera.placeWorkplane}}, la cinta métrica y la escuadra son herramientas aparte; se explican más abajo y en [Medidas y notas](chapter:measuring-and-notes).
 
 La flechita de arriba del todo de la barra la oculta si te estorba. Si arrastras ese mismo botón, mueves la barra a cualquier punto del editor, también en un boceto; un doble clic la devuelve a su sitio. La vista previa 3D de un boceto de revolución se mueve del mismo modo, arrastrándola por su título.
@@ -101,6 +101,7 @@ Cuando un diseño contiene más de lo que cabe en una placa, por ejemplo una caj
 
 - Cada placa es tan grande como el plano de trabajo, y las placas están una junto a otra a la derecha de la primera, a 20 mm. Un cuerpo pertenece a la placa en la que está el centro de su base, así que al arrastrarlo al otro lado pasa a la otra placa. Un diseño tiene hasta 12 placas.
 - Un clic en una placa de la barra la muestra, y las formas nuevas y los archivos importados aparecen entonces en ella. {{ui:plates.showAll}} las muestra todas. Un doble clic en una placa, o {{ui:plates.rename}}, le da un nombre como «Tapa», que aparece escrito en la placa.
+- Un boceto nuevo en la placa también empieza en la placa activa: el área del boceto muestra esa placa con sus cuerpos, y el cuerpo terminado queda allí.
 - {{ui:plates.moveLeft}} y {{ui:plates.moveRight}} cambian el orden, y los cuerpos van con su placa. {{ui:plates.remove}} quita la placa activa; sus cuerpos pasan a la primera placa en el mismo sitio.
 - {{ui:plates.arrange}} coloca los cuerpos seleccionados, o todos, fila a fila en las placas, los más grandes primero, a 5 mm, y añade placas mientras hagan falta. Un cuerpo más grande que una placa se queda donde está.
 - Con una impresora elegida, cada cuerpo se comprueba con su propia placa, y la altura de impresión cuenta desde el cuerpo más bajo de esa placa. Una placa con un cuerpo que no cabe muestra su número en rojo.
@@ -157,7 +158,7 @@ La vista de boceto tiene sus propios colores: {{ui:workspace.sketchBackground}} 
 
 ### Aspecto: flechas de los ejes y líneas de arista
 
-{{ui:workspace.showAxes}} (activado de forma predeterminada) dibuja tres flechas en la esquina trasera izquierda de la placa: **X** en rojo hacia la derecha, **Y** en verde hacia el fondo y **Z** en azul hacia arriba, igual que cuentan los campos de posición. Es la regla de la mano derecha, la misma que usan Tinkercad, los programas de CAD y los laminadores (*slicers*). Con el plano de trabajo sobre una cara, las flechas lo siguen. Si te estorban, desactívalas aquí.
+{{ui:workspace.showAxes}} (activado de forma predeterminada) dibuja tres flechas en la esquina trasera izquierda de la placa: **X** en rojo hacia la derecha, **Y** en verde hacia el fondo y **Z** en azul hacia arriba, igual que cuentan los campos de posición. Es la regla de la mano derecha, la misma que usan Tinkercad, los programas de CAD y los laminadores (*slicers*). Con el plano de trabajo sobre una cara, las flechas lo siguen. Si te estorban, desactívalas aquí. Mientras las flechas están activadas, la cruz central de la cuadrícula también toma sus colores: la línea a lo largo de X en rojo y la de Y en verde, así ves enseguida hacia dónde va cada eje incluso en una pieza pequeña.
 
 {{ui:workspace.edgeLines}} dibuja un contorno en cada cuerpo, del color de {{ui:workspace.edgeColor}} (negro al principio, como en Tinkercad): ayuda cuando los colores oscuros se confunden entre sí. Está desactivado de forma predeterminada, y las mallas importadas muy grandes quedan fuera.
 
@@ -192,6 +193,8 @@ La vista de boceto tiene sus propios colores: {{ui:workspace.sketchBackground}} 
 {{ui:workspace.startWithScrollbars}}: un diseño se abre entonces con las barras de desplazamiento de la vista. Se guarda con el diseño y con {{ui:workspace.makeDefault}}.
 
 {{ui:workspace.viewBarOpensOnHover}}: una barra de vista plegada se abre mientras el ratón está sobre su flecha y se vuelve a plegar poco después de que el ratón salga de ella, salvo que una de sus herramientas esté en uso. Un clic en la flecha mientras está abierta así la deja abierta. Solo funciona con el ratón; en una pantalla táctil, un toque abre la barra como antes.
+
+{{ui:workspace.showStepNotices}}: tras un paso como una unión, un mensaje breve junto al cubo de vista dice qué se hizo y ofrece {{ui:shortcuts.undo}}. Desactivado, estos mensajes no aparecen; los que te piden algo o informan de un problema siguen apareciendo, y {{ui:editor.tool.undo}} en la cinta sigue nombrando el paso al señalarlo.
 
 {{ui:workspace.startView}} fija el ángulo en que se abre un diseño nuevo y al que vuelve {{ui:camera.home}}. Gira la vista y haz zoom hasta que te guste, y haz clic en {{ui:workspace.startViewUseCurrent}}; {{ui:workspace.startViewStandard}} recupera la vista habitual, desde delante a la derecha. Vale para todos los diseños de este navegador. Un diseño que vuelves a abrir se sigue abriendo tal como lo dejaste.
 

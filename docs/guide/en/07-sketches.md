@@ -57,6 +57,7 @@ Click points one after another.
 ::: Closing or ending a line
 To close the outline, click the first point again at the end.
 To end the chain of lines without closing the outline, right-click without moving the pointer, or double-click the last point.
+If you switch to {{ui:sketch.line}}, {{ui:sketch.bezier}} or {{ui:sketch.smooth}} in the middle of a chain, the line goes on from its last point.
 => A body comes only from a **closed** outline.
 :::
 
@@ -353,6 +354,7 @@ The tree beside a house, a figure before a busy background – where no colour t
 | [[Ctrl]]+[[A]] | select every point and line |
 | [[Ctrl]]+[[I]] | {{ui:sketch.addImage}} |
 | [[Shift]] | while drawing: snap the line in 15° steps; while dragging: keep movement on one axis |
+| [[Alt]] | while setting or dragging a point: on the grid only, no snapping to corners and middles |
 | digit, [[<]], [[Tab]], [[Enter]] | while drawing: type and set the length and angle of the next line |
 | [[R]] | rotate the closed sketch by 45° |
 | [[Ctrl]]+[[L]] | lock or unlock the selected outline, or the template image |

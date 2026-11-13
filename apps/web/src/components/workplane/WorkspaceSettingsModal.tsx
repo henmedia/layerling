@@ -4,7 +4,7 @@ import { GuideHelpLink } from "@/components/GuideHelpLink";
 import { RibbonButtonsSetting } from "@/components/workplane/RibbonButtonsSetting";
 import type { GuideSection } from "@/lib/guideLinks";
 import { MAX_OVERHANG_ANGLE, MIN_OVERHANG_ANGLE } from "@/lib/overhangLimits";
-import { Box as BoxIcon, ChevronDown, Grid3X3, History, Palette, PanelTop, Plus, RotateCcw, Ruler, Trash2, X } from "lucide-react";
+import { ArchiveRestore, Box as BoxIcon, ChevronDown, Grid3X3, History, Palette, PanelTop, Plus, RotateCcw, Ruler, Trash2, X } from "lucide-react";
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { useMovablePanel } from "@/lib/useMovablePanel";
 import { SpaceMouseSetting } from "@/components/workplane/SpaceMouseSetting";
@@ -12,6 +12,7 @@ import { printerPlayShapeStart } from "@/lib/printerPlay";
 import { usePrinterPlayFor } from "@/lib/usePrinterPlay";
 import { PrinterPlaySetting } from "@/components/workplane/PrinterPlaySetting";
 import { SettingsFileButtons } from "@/components/workplane/SettingsFileButtons";
+import { FileBackupSettingsSection } from "@/components/workplane/FileBackupSettingsSection";
 import { createPortal } from "react-dom";
 import { HexColorInput, HexColorPicker } from "react-colorful";
 import { APP_THEME_OPTIONS, type AppThemePreference } from "@/lib/appTheme";
@@ -106,7 +107,7 @@ import { MAX_TEXT_LENGTH } from "@/lib/textLength";
 import { DEFAULT_HIRTH_BORE, DEFAULT_HIRTH_TEETH, MAX_HIRTH_TEETH, MIN_HIRTH_TEETH, MIN_HIRTH_TOOTH_HEIGHT, hirthBoreLimit, hirthToothHeightLimit } from "@/lib/hirthGeometry";
 
 type WorkspaceSettings = WorkplaneWorkspaceSettings;
-type WorkspaceSettingsSection = "appearance" | "ribbon" | "measurement" | "workplane" | "shapes" | "history";
+type WorkspaceSettingsSection = "appearance" | "ribbon" | "measurement" | "workplane" | "shapes" | "history" | "backups";
 // The question mark of each tab opens that tab's own part of the guide.
 const SETTINGS_HELP_SECTION: Record<WorkspaceSettingsSection, GuideSection> = {
   appearance: "settingsAppearance",
@@ -115,6 +116,7 @@ const SETTINGS_HELP_SECTION: Record<WorkspaceSettingsSection, GuideSection> = {
   workplane: "settingsWorkplane",
   shapes: "shapeSettings",
   history: "backingUp",
+  backups: "fileBackups",
 };
 
 const MIN_WORKSPACE_SIZE = 60;
@@ -287,7 +289,7 @@ function specialFieldsForShape(
   if (kind === "tube" || kind === "ring") {
     return [
       { type: "number", key: "sides", label: t("prop.sides"), defaultValue: defaults.sides ?? automaticSideCount(dimensions.width, dimensions.depth), min: 3, max: MAX_HIGH_RESOLUTION_SIDES, step: 1 },
-      { type: "number", key: "bevel", label: t("prop.thickness"), defaultValue: defaults.bevel ?? 4, min: 0.5, max: 20, unit: "mm" },
+      { type: "number", key: "bevel", label: t("prop.bentTubeWall"), defaultValue: defaults.bevel ?? 4, min: 0.5, max: 20, unit: "mm" },
     ];
   }
   if (kind === "text") {
@@ -498,9 +500,9 @@ function specialFieldsForShape(
     return [
       { type: "select", key: "bentTubeProfile", label: t("prop.bentTubeProfile"), defaultValue: defaults.bentTubeProfile ?? DEFAULT_BENT_TUBE_PROFILE, options: profileOptions },
       { type: "select", key: "bentTubeInnerProfile", label: t("prop.bentTubeInnerProfile"), defaultValue: defaults.bentTubeInnerProfile ?? DEFAULT_BENT_TUBE_INNER_PROFILE, options: [{ value: "none", label: t("bentTube.innerNone") }, ...profileOptions] },
+      { type: "number", key: "bentTubeQuality", label: t("prop.quality"), defaultValue: defaults.bentTubeQuality ?? DEFAULT_BENT_TUBE_QUALITY, min: MIN_BENT_TUBE_QUALITY, max: MAX_BENT_TUBE_QUALITY, step: 4 },
       { type: "number", key: "bentTubeSize", label: t("prop.bentTubeSize"), defaultValue: defaults.bentTubeSize ?? DEFAULT_BENT_TUBE_SIZE, min: MIN_BENT_TUBE_SIZE, max: 100, step: 0.5, unit: "mm" },
       { type: "number", key: "bentTubeWall", label: t("prop.bentTubeWall"), defaultValue: defaults.bentTubeWall ?? DEFAULT_BENT_TUBE_WALL, min: MIN_BENT_TUBE_WALL, max: 20, step: 0.1, unit: "mm" },
-      { type: "number", key: "bentTubeQuality", label: t("prop.quality"), defaultValue: defaults.bentTubeQuality ?? DEFAULT_BENT_TUBE_QUALITY, min: MIN_BENT_TUBE_QUALITY, max: MAX_BENT_TUBE_QUALITY, step: 4 },
     ];
   }
   if (kind === "roundedBox") {
@@ -821,6 +823,10 @@ export function WorkspaceSettingsModal({
               <History size={18} />
               <span>{t("workspace.history")}</span>
             </button>
+            <button className={activeSection === "backups" ? "active" : ""} data-help={t("backups.settingsTitle")} aria-current={activeSection === "backups" ? "page" : undefined} onClick={() => setActiveSection("backups")}>
+              <ArchiveRestore size={18} />
+              <span>{t("backups.settingsTitle")}</span>
+            </button>
           </nav>
 
           <div className="workspace-modal-content">
@@ -1008,6 +1014,12 @@ export function WorkspaceSettingsModal({
                     description={t("workspace.viewBarOpensOnHoverHint")}
                     checked={workspace.viewBarOpensOnHover}
                     onChange={(viewBarOpensOnHover) => patchWorkspace({ viewBarOpensOnHover })}
+                  />
+                  <WorkspaceToggle
+                    label={t("workspace.showStepNotices")}
+                    description={t("workspace.showStepNoticesHint")}
+                    checked={workspace.showStepNotices}
+                    onChange={(showStepNotices) => patchWorkspace({ showStepNotices })}
                   />
                   <div className="workspace-reset-row" data-help={t("workspace.startViewHint")}>
                     <span>{t("workspace.startView")}</span>
@@ -1677,6 +1689,8 @@ export function WorkspaceSettingsModal({
                 </>
               ) : null}
 
+              {activeSection === "backups" ? <FileBackupSettingsSection /> : null}
+
               {activeSection === "history" ? (
                 <>
                   <div className="workspace-section-heading">
@@ -2138,6 +2152,9 @@ function SimpleModeSetting() {
         onPointerUp={cancel}
         onPointerLeave={cancel}
         onPointerCancel={cancel}
+        // On a phone or tablet a long press opens the browser's own menu, which takes the touch away and cancels the hold
+        // (#1671): the menu stays shut here, so the two seconds run through.
+        onContextMenu={(event) => event.preventDefault()}
         onKeyDown={(event) => {
           if ((event.key === "Enter" || event.key === " ") && !event.repeat) start();
         }}

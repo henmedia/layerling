@@ -125,6 +125,8 @@ Oblike, ki so luknje, se razdelijo brez spojnikov.
 
 {{ui:split.modeStretch}} na vrhu okna, ob {{ui:split.modeSplit}}, izbor ob ravnini podaljša, namesto da bi ga prerezal na dvoje - na primer škatlo, preneseno brez datoteke CAD, katere predelek naj bo daljši. Postavi ravnino kot za razdelitev, skozi del, ki sme zrasti, in vnesi {{ui:split.stretchLength}}: del na strani, kamor kaže puščica, se odmakne za toliko, prerez telesa ob ravnini, potegnjen čez to dolžino, pa zapolni vrzel. Ravne stene in dna se podaljšajo; predelki, zaobljenja in luknje na obeh straneh obdržijo velikost. Negativna vrednost ga skrajša: na strani puščice odpade rezina te debeline, preostanek pa se pomakne nazaj. {{ui:split.stretchApply}} to uporabi; vsak objekt, ki ga ravnina preseka, ostane eno zaprto telo s svojim imenom, mreža kot polovici pri razdelitvi. Če ravnina poteka skozi poševen ali okrogel del, se njen prerez potegne naravnost, zato jo postavi tam, kjer telo poteka naravnost.
 
+Skupina ostane skupina: njeni deli, ki jih ravnina preseka, se podaljšajo, deli za ravnino se premaknejo z njimi, tisti pred njo pa ostanejo, kot so. Njene luknje ostanejo luknje, deli, ki se jih ravnina ne dotakne, obdržijo svoje nastavitve, in {{ui:editor.tool.ungroup}} jo še vedno razstavi tudi pozneje. Zrcaljena, zožena, zaobljena ali teksturirana skupina se še vedno raztegne kot eno telo. Predmet, izbran skupaj z drugimi, ki leži v celoti za ravnino, se prav tako premakne, tako da luknja na koncu ohišja ostane na koncu.
+
 Polovici sta preprosti mreži: nastavitve, kot je število stranic valja ali črke besedila, se izgubijo, zato jih nastavi prej. [[Ctrl]]+[[Z]] vrne original v enem koraku. Zaklenjenih in skritih predmetov ni mogoče razrezati.
 
 ## Ločevanje delov

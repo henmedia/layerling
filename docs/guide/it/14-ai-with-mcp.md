@@ -97,7 +97,7 @@ L’IA usa le stesse funzioni che hai a disposizione, attraverso lo stesso perco
 | `layerling_import_mesh` | Importa nel progetto una mesh di triangoli. |
 | `layerling_update_object` | Modifica dimensioni, posizione, colore, nome, tipo pieno o foro e tutte le altre proprietà della forma, compreso il bordo delle lettere di un testo. |
 | `layerling_align_objects` | Allinea gli oggetti tra loro. |
-| `layerling_scale_objects` | Ridimensiona gli oggetti in percentuale, tutti insieme oppure ciascuno attorno alla propria posizione. |
+| `layerling_scale_objects` | Ridimensiona gli oggetti in percentuale, tutti insieme oppure ciascuno attorno alla propria posizione, oppure a una scala modellistica come 1:87. |
 | `layerling_lay_flat` | Appoggia un oggetto sul piano usando una delle sue facce. |
 | `layerling_place_on_face` | Appoggia gli oggetti su una faccia di un altro, anche se inclinata, come con il tasto C. |
 | `layerling_perforate_face` | Crea un motivo di fori su una faccia piana o intorno alla parete di un cilindro, un tubo o un foro; i fori restano tali e vengono raggruppati con il corpo. |
@@ -170,6 +170,8 @@ L’IA usa le stesse funzioni che hai a disposizione, attraverso lo stesso perco
 | `layerling_saved_view` | Salva la vista corrente con il tasto 7, 8, 9 o 0 e la richiama in seguito, come con Maiusc+tasto e poi il tasto (modifica solo la vista). Imposta anche la vista di avvio dei nuovi progetti. |
 | `layerling_build_plates` | Elenca, aggiunge, nomina, ordina e toglie i piatti di stampa, sposta oggetti su un piatto e li distribuisce sui piatti, come la barra dei piatti. |
 | `layerling_clear_history` | Elimina definitivamente tutti i passaggi annullabili, come il pulsante «Elimina cronologia» nella vista Cronologia; richiede `confirm: true`. |
+| `layerling_list_backups` | elenca i backup automatici (Versioni precedenti) del progetto aperto, o con `all: true` di tutti i progetti di questo browser |
+| `layerling_open_backup` | apre un backup tramite il suo `id` come nuovo progetto, mai legato al file originale |
 | `layerling_set_history_view` | Mostra uno stato precedente del progetto, come la vista Cronologia. Il progetto vero e proprio non viene modificato; gli strumenti di modifica restano in attesa finché la vista non viene chiusa. |
 | `layerling_restore_from_history` | Ripristina nel progetto come copie gli oggetti di uno stato precedente, comprese le parti all’interno dei gruppi, come «Inserisci nel progetto» nella vista Cronologia; l’operazione è un singolo passaggio annullabile. |
 | `layerling_export_section_svg` | Restituisce in formato SVG, in scala 1:1, i contorni sul piano di sezione, usando gli stessi corpi dell’esportazione. |
