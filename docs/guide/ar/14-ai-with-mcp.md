@@ -97,7 +97,7 @@ curl -fsSL https://raw.githubusercontent.com/henmedia/layerling/main/scripts/mac
 | `layerling_import_mesh` | تجلب شبكة مثلثات إلى التصميم |
 | `layerling_update_object` | تغيّر الأبعاد والموضع واللون والاسم، وجسم صلب أو ثقب، وكل ما يكوّن الشكل، بما في ذلك حافة حروف النص |
 | `layerling_align_objects` | تحاذي الأجسام بعضها مع بعض |
-| `layerling_scale_objects` | تغيّر حجم الأجسام بنسبة مئوية، معًا أو كلًّا في مكانه |
+| `layerling_scale_objects` | تغيّر حجم الأجسام بنسبة مئوية، معًا أو كلًّا في مكانه، أو إلى مقياس نماذج مثل 1:87 |
 | `layerling_lay_flat` | تضع جسمًا بأحد أوجهه على اللوحة |
 | `layerling_place_on_face` | تضع أجسامًا على وجه جسم آخر، حتى المائل منها، كالمفتاح C |
 | `layerling_perforate_face` | تقطع نمط ثقوب في وجه مستوٍ أو حول جدار أسطوانة أو أنبوب أو ثقب؛ وتبقى الثقوب ثقوبًا مجمّعة مع الجسم |

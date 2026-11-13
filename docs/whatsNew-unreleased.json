@@ -1,6 +1,19 @@
 [
   {
     "title": {
+      "de": "Skalieren auf einen Modellbau-Maßstab",
+      "en": "Scale to a model scale"
+    },
+    "body": {
+      "de": "„Um Prozent skalieren“ kann jetzt auch einen Maßstab: Wähle oben „Maßstab“ und eine Spur von Z (1:220) bis G (1:22,5), oder tippe einen eigenen Maßstab ein.\n\nIst das Modell in Originalgröße gebaut, wird es so viel kleiner. Hast du es in irgendeiner Größe gebaut, gib die echte Höhe oder Länge des Vorbilds in Metern ein: Ein 16 m hoher Baum wird in H0 genau 184 mm hoch. Die neue Größe steht im Fenster, bevor du skalierst.\n\nZu finden über Rechtsklick auf die Teile oder Strg+K, „Um Prozent skalieren“.",
+      "en": "Scale by percent can now do a scale too: choose Model scale at the top and a gauge from Z (1:220) to G (1:22.5), or type a scale of your own.\n\nIf the model is built at full size, it becomes that much smaller. If you built it at any other size, type the original's real height or length in metres: a tree 16 m tall becomes exactly 184 mm in H0. The window shows the new size before you scale.\n\nFind it by right-clicking the parts or with Ctrl+K, Scale by percent."
+    },
+    "guide": {
+      "section": "scaleByPercent"
+    }
+  },
+  {
+    "title": {
       "de": "Keil: Neigungswinkel in den Eigenschaften",
       "en": "Wedge: the slope angle in its properties"
     },
@@ -109,6 +122,8 @@
       "de": "Auf manchen PCs schließt sich das Speicherfenster von Chrome und Edge nach dem Speichern, gibt aber keine Datei zurück, und „Alle sichern“ endete dann ohne Sicherung. Die Meldung hat jetzt den Knopf „Stattdessen herunterladen“: Die Sicherung landet dann als normaler Download im Download-Ordner. Das gilt auch für die Sicherung eigener Formen.",
       "en": "On some PCs the save dialog of Chrome and Edge closes after Save but hands back no file, and Back up all then ended without a backup. The message now has a \"Download instead\" button: the backup then goes into the Downloads folder as a normal download. The same goes for backing up custom shapes."
     },
-    "guide": { "section": "backingUp" }
+    "guide": {
+      "section": "backingUp"
+    }
   }
 ]

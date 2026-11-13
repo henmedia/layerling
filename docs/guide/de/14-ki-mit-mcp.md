@@ -97,7 +97,7 @@ Die KI arbeitet mit denselben Funktionen wie du, sie läuft über denselben Weg 
 | `layerling_import_mesh` | bringt ein Dreiecksnetz in den Entwurf |
 | `layerling_update_object` | ändert Maße, Lage, Farbe, Name, Körper oder Aussparung und alles, was die Form sonst ausmacht, bei einem Text auch die Buchstabenkante |
 | `layerling_align_objects` | richtet Objekte aneinander aus |
-| `layerling_scale_objects` | skaliert Objekte um einen Prozentwert, zusammen oder jedes für sich |
+| `layerling_scale_objects` | skaliert Objekte um einen Prozentwert, zusammen oder jedes für sich, oder auf einen Modellbau-Maßstab wie 1:87 |
 | `layerling_lay_flat` | legt ein Objekt mit einer Fläche auf die Platte |
 | `layerling_place_on_face` | setzt Objekte auf eine Fläche eines anderen, auch schräg, wie die Taste C |
 | `layerling_perforate_face` | schneidet ein Lochmuster in eine ebene Fläche oder rund um die Wand eines Zylinders, Rohrs oder einer Bohrung, die Löcher bleiben als Aussparungen mit dem Körper gruppiert |

@@ -3183,6 +3183,27 @@ html[data-theme="dark"] .edge-modifier-quick-actions button.active {
   grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
+/* Scale by percent: the model railway gauges, four to a row. */
+.model-scale-presets {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.model-scale-presets button {
+  padding: 0 4px;
+  white-space: nowrap;
+}
+
+.model-scale-result {
+  margin: 8px 0 0;
+  color: #6d5133;
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+}
+
+html[data-theme="dark"] .model-scale-result {
+  color: #d9c3a8;
+}
+
 /* Paint: fill, circle and lasso side by side. */
 .paint-panel .shell-opening-options {
   grid-template-columns: repeat(3, minmax(0, 1fr));

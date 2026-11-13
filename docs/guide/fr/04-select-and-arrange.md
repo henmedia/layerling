@@ -189,6 +189,8 @@ Pour agrandir ou réduire une ou plusieurs parties d'un même partage, disons to
 
 Sous {{ui:scalePercent.percent}}, vous saisissez la nouvelle taille en pourcentage de la taille actuelle : 120 % correspond à un cinquième de plus, 50 % à la moitié de la taille. La largeur, la profondeur et la hauteur changent de la même manière, donc les proportions restent. Le fond reste là où il est, donc rien ne coule dans l'assiette.
 
+Pour le modélisme, choisissez {{ui:scalePercent.by.scale}} au lieu de {{ui:scalePercent.by.percent}} en haut. {{ui:scalePercent.scalePresets}} propose les échelles courantes de Z (1:220) à G (1:22,5), et dans {{ui:scalePercent.ratio}} vous tapez toute autre échelle, par exemple 35 pour 1:35. Si le modèle est construit à la taille réelle de l'original, laissez {{ui:scalePercent.original.fullSize}} : 1:87 le rend 87 fois plus petit. Si vous l'avez construit à une taille quelconque, choisissez {{ui:scalePercent.original.realSize}}, puis {{ui:scalePercent.axis.height}} ou {{ui:scalePercent.axis.length}} (le plus long côté sur le plateau), et tapez dans {{ui:scalePercent.realSize}} la taille réelle de l'original, en mètres (en pieds avec les unités impériales). Un arbre de 16 m de haut en réalité mesure alors 16 000 mm / 87 = 184 mm en H0, quelle que soit sa taille avant. La nouvelle taille s'affiche sous les champs avant que vous appuyiez sur {{ui:scalePercent.apply}}. L'échelle reste réglée tant que l'éditeur est ouvert.
+
 Avec plusieurs parties, vous choisissez comment elles poussent :
 
 - **{{ui:scalePercent.mode.together}} :** Les parties grandissent autour de leur centre commun, et les écarts grandissent avec elles. Le tout s’agrandit comme s’il s’agissait d’une seule partie.
