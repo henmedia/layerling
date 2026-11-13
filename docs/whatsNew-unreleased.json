@@ -91,5 +91,15 @@
       "de": "Ist die Seite im Browser verkleinert (Strg und Minus, etwa auf 80 %), hielt layerling das Fenster für einen Vollbildschirm und öffnete jedes neue Design im Fokusmodus, auch wenn er ausgeschaltet wurde. Jetzt kommt der Fokusmodus von selbst nur noch im echten Vollbild (F11).",
       "en": "With the page zoomed out in the browser (Ctrl and minus, say to 80 %), layerling took the window for a full screen and opened every new design in focus mode, even when it was switched off. Now focus mode comes by itself only in a real full screen (F11)."
     }
+  },
+  {
+    "title": {
+      "de": "Verfolgte SVG mit tausenden kleinen Linien bleibt eine Skizze",
+      "en": "A traced SVG with thousands of tiny lines stays a sketch"
+    },
+    "body": {
+      "de": "Ein SVG kam nur bis 2500 Linien und Kurven als Skizze herein, mit Füllung und Silhouette in den Eigenschaften; darüber blieb es ein festes Netz, und beide fehlten. Eine aus einem Bild nachgezeichnete Datei besteht aus tausenden winzigen Stufen, darum schien der Silhouette-Knopf verschwunden. Jetzt kommen SVGs bis 10 000 Linien und Kurven als Skizze herein; ein sehr feines kann beim Import ein paar Sekunden brauchen.",
+      "en": "An SVG came in as a sketch, with Fill and Silhouette in its properties, only up to 2500 lines and curves; above that it stayed a fixed mesh and both were missing. A file traced from a picture is drawn in thousands of tiny steps, which is why the Silhouette button seemed to have disappeared. Now SVGs of up to 10,000 lines and curves come in as a sketch; a very fine one can take a few seconds to import."
+    }
   }
 ]

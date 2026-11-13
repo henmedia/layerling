@@ -3,7 +3,7 @@ import { dxfEntityEnds, dxfLoopEntities, type DxfEntity, type DxfPoint } from "@
 import { placementWorkplaneCoordinates, type PlacementWorkplane } from "@/lib/placementWorkplane";
 import type { SectionLoop, SectionPoint } from "@/lib/sectionSvg";
 import { sectionPointFromFrame, type SectionFrame, type SectionPlaneAxis } from "@/lib/sectionView";
-import { ellipsePieces, MAX_SVG_SKETCH_SEGMENTS, sketchFromPieceRings, splitPiece, type SketchPiece } from "@/lib/svgSketch";
+import { ellipsePieces, sketchFromPieceRings, splitPiece, type SketchPiece } from "@/lib/svgSketch";
 import type { SketchProfile } from "@/types/layerling";
 
 /*
@@ -14,8 +14,8 @@ import type { SketchProfile } from "@/types/layerling";
  * arc goes into the sketch as cubic curves of a quarter turn at most, as an imported SVG's arcs do.
  */
 
-/** The most lines and curves a sketch from the cut may have, as for an SVG. */
-export const MAX_SECTION_SKETCH_SEGMENTS = MAX_SVG_SKETCH_SEGMENTS;
+/** The most lines and curves a sketch from the cut may have (an SVG may bring more, a traced picture needs them). */
+export const MAX_SECTION_SKETCH_SEGMENTS = 2500;
 
 /** A point of the cut in the frame's coordinates: projectSectionPoint undone. */
 export function sectionPointInFrame(point: SectionPoint, axis: SectionPlaneAxis, offset: number): [number, number, number] {
