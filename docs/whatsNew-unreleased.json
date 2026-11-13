@@ -1,1 +1,15 @@
-[]
+[
+  {
+    "title": {
+      "de": "Vorlagenbild in der Skizze größer als 200 mm",
+      "en": "Sketch picture larger than 200 mm"
+    },
+    "body": {
+      "de": "Breite und Höhe eines Bildes unter der Skizze lassen sich jetzt auch über 200 mm eintippen, etwa für eine Druckplatte von 250 mm. Der Regler reicht bis zur Größe deiner Platte, und das Feld zeigt immer die echte Größe, auch nachdem du an den Griffen gezogen hast.",
+      "en": "The width and height of a picture under a sketch can now be typed past 200 mm, for a 250 mm plate for instance. The slider reaches to the size of your plate, and the field always shows the real size, also after dragging the handles."
+    },
+    "guide": {
+      "section": "sketchImage"
+    }
+  }
+]

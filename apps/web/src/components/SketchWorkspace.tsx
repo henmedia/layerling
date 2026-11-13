@@ -43,7 +43,7 @@ import { resizeSketchPoints, resizeSketchPointsToSize, type ResizeHandle, type S
 import { alignSketchSelection, canAlignSketchSelection, type SketchAlignMode } from "@/lib/sketchAlign";
 import { changesLockedOutline, lockedCornerTurn, lockedLengthAnchor, sketchLockState } from "@/lib/sketchLock";
 import { dragRotationDegrees, rotateSketchPointsAbout, sketchPointsPivot, sketchTurnRing, sketchTurnStep, SKETCH_TURN_RING_STEP } from "@/lib/sketchRotation";
-import { calibrateImage, centreImage, cropImage, imageAngleTo, imageCorners, imageCropViewBox, imageHandlePositions, normalizeImageRotation, resizeImage, rotateImage, uncropImage } from "@/lib/sketchImageTransform";
+import { calibrateImage, centreImage, cropImage, imageAngleTo, imageCorners, imageCropViewBox, imageHandlePositions, normalizeImageRotation, resizeImage, rotateImage, sketchImageSizeLimits, uncropImage } from "@/lib/sketchImageTransform";
 import { MAX_TRACE_CORNER_ANGLE, MIN_TRACE_CORNER_ANGLE, type PictureTrace, type TracePart } from "@/lib/pictureTrace";
 import { planePointToTraced, tracedLinePath, tracedPixelSize, tracedPointOnPlane, tracePreviewPath, type TracedSize } from "@/lib/sketchImageTrace";
 import { useSketchImageTrace, type SketchImageTraceState } from "@/lib/useSketchImageTrace";
@@ -3524,6 +3524,7 @@ export function SketchWorkspace({
       {selectedImage && tool === "select" ? (
         <SketchImageInspector
           image={selectedImage}
+          plate={{ width: workspace.width, depth: workspace.depth }}
           accuracy={workspace.accuracy}
           revolve={operation === "revolve"}
           cropMode={cropMode}
@@ -3773,6 +3774,7 @@ type ImageCalibrationStep = { type: "start" } | { type: "cancel" } | { type: "ap
 
 function SketchImageInspector({
   image,
+  plate,
   accuracy,
   revolve,
   cropMode,
@@ -3787,6 +3789,8 @@ function SketchImageInspector({
   onApplyTrace,
 }: {
   image: SketchImage;
+  /** The printer's plate, which sets how far width and height go (#1727). */
+  plate: { width: number; depth: number };
   accuracy: 1 | 2 | 3;
   /** Revolving: x = 0 is the axis, so centring on it is the point. */
   revolve: boolean;
@@ -3811,6 +3815,7 @@ function SketchImageInspector({
     if (Number.isFinite(length) && length > 0) onCalibrate({ type: "apply", length });
   };
   const aspect = image.width / Math.max(0.5, image.depth);
+  const sizeLimits = sketchImageSizeLimits(plate, image);
   const updateWidth = (width: number) => onUpdate({
     width,
     ...(image.lockAspect !== false ? { depth: Math.max(0.5, width / aspect) } : {}),
@@ -3896,8 +3901,8 @@ function SketchImageInspector({
       <div className="property-card">
         <div className="property-card-header static"><span>{t("sketch.imageProperties")}</span></div>
         <div className="property-list">
-          <SketchImageRange label={t("sketch.imageWidth")} value={image.width} min={0.5} max={200} accuracy={accuracy} disabled={image.locked} onChange={updateWidth} />
-          <SketchImageRange label={t("sketch.imageHeight")} value={image.depth} min={0.5} max={200} accuracy={accuracy} disabled={image.locked} onChange={updateDepth} />
+          <SketchImageRange label={t("sketch.imageWidth")} value={image.width} min={0.5} max={sizeLimits.slider} typedMax={sizeLimits.typed} accuracy={accuracy} disabled={image.locked} onChange={updateWidth} />
+          <SketchImageRange label={t("sketch.imageHeight")} value={image.depth} min={0.5} max={sizeLimits.slider} typedMax={sizeLimits.typed} accuracy={accuracy} disabled={image.locked} onChange={updateDepth} />
           <SketchImageRange label={t("sketch.imageOpacity")} value={(image.opacity ?? 0.55) * 100} min={5} max={100} accuracy={1} suffix="%" disabled={image.locked} onChange={(opacity) => onUpdate({ opacity: opacity / 100 }, t("sketch.imageOpacityUpdated"))} />
           <SketchImagePositionField label={t("sketch.imagePositionX")} value={image.x} accuracy={accuracy} disabled={image.locked} onChange={(x) => onUpdate({ x }, t("sketch.imageMoved"))} />
           <SketchImagePositionField label={t("sketch.imagePositionY")} value={image.z} accuracy={accuracy} disabled={image.locked} onChange={(z) => onUpdate({ z }, t("sketch.imageMoved"))} />
@@ -4249,6 +4254,7 @@ function SketchImageRange({
   value,
   min,
   max,
+  typedMax = max,
   accuracy,
   suffix = "mm",
   disabled = false,
@@ -4258,7 +4264,10 @@ function SketchImageRange({
   label: string;
   value: number;
   min: number;
+  /** The end of the slider. */
   max: number;
+  /** How far a typed value may go, when that is further than the slider (#1727). */
+  typedMax?: number;
   accuracy: 1 | 2 | 3;
   suffix?: string;
   disabled?: boolean;
@@ -4266,14 +4275,15 @@ function SketchImageRange({
   whole?: boolean;
   onChange: (value: number) => void;
 }) {
-  const safeValue = clamp(Number.isFinite(value) ? value : min, min, max);
+  const shownValue = clamp(Number.isFinite(value) ? value : min, min, Math.max(max, typedMax));
+  const safeValue = clamp(shownValue, min, max);
   const isLength = suffix === "mm";
   const formatValue = isLength ? formatDimension : whole ? formatWholeNumber : formatPlainNumber;
-  const [draft, setDraft] = useState(formatValue(safeValue, accuracy));
-  useEffect(() => setDraft(formatValue(safeValue, accuracy)), [accuracy, safeValue, formatValue]);
+  const [draft, setDraft] = useState(formatValue(shownValue, accuracy));
+  useEffect(() => setDraft(formatValue(shownValue, accuracy)), [accuracy, shownValue, formatValue]);
   const commit = () => {
     const parsed = isLength ? parseLengthMm(draft) : parseMeasurementInput(draft);
-    const value = clamp(Number.isFinite(parsed) ? parsed : safeValue, min, max);
+    const value = clamp(Number.isFinite(parsed) ? parsed : shownValue, min, Math.max(max, typedMax));
     onChange(whole ? Math.round(value) : value);
   };
   const position = ((safeValue - min) / Math.max(0.001, max - min)) * 100;

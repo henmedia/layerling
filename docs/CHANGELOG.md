@@ -6,6 +6,8 @@ code still carries it - so a lower number further down is older, not newer.
 
 ## Unreleased
 
+- **The width of a sketch picture goes past 200 mm (#1727):** in the settings of a picture under a sketch, the fields Width and Height stopped at 200 mm whatever the plate, so on a 250 mm plate 210 mm sprang back to 200, while dragging the handles made it larger; and a picture dragged past 200 mm still showed 200. The slider now reaches to the larger side of the plate (at least 200 mm, and always to the picture's own size), a typed size goes up to ten times the plate, and the fields show the real size (sketchImageSizeLimits in lib/sketchImageTransform.ts). Unit test; checked in the editor through headless Edge (picture imported, 260 mm and 210 mm typed and kept, height following). By @gorepj in #1727.
+
 ## 1.162.0
 
 - **A sketched line goes on when switching between straight and smooth (#1725):** in a sketch, switching from Line to Smooth line or Bezier curve, or back, in the middle of a chain started a new line at the next click, because every change of tool forgot the last point drawn. Switching between these three drawing tools now keeps the chain, so the next point joins the last one; any other tool still ends it. Unit test; checked in the editor through headless Edge (two straight points, two smooth, one straight: five points, four segments, one chain). Guide chapter 7 in every language. By @stefaanl in #1725.
