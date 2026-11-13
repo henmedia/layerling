@@ -44,7 +44,7 @@ U levého okraje je úzká lišta. Shora obsahuje:
 - {{ui:camera.orthographic}} zapne rovnoběžné promítání bez perspektivy. Rovnoběžné hrany zůstávají rovnoběžné, což usnadňuje měření a zarovnávání. Přepíná je i [[O]]; dalším kliknutím se vrátíte.
 - {{ui:camera.secondView}} otevře druhý pohled na projekt ve vlastním okně, popsaném níže. Druhé kliknutí ho zavře.
 - {{ui:camera.showScrollbars}} zobrazí posuvník u dolního okraje pohledu a druhý podél pravého okraje. Tažením posuvníku se pohled plynule posouvá, klik na šipku na jeho konci jím posune o kousek (podržením pokračuje) a klik vedle posuvníku o téměř celý pohled. Nic se neotáčí a na rozdíl od šipek na klávesnici posuvníky fungují i s vybraným dílem - šikovné zblízka u drobných detailů. Druhý klik je skryje; zda se návrh otevře s nimi, určuje {{ui:workspace.startWithScrollbars}} v nastavení. Tento prohlížeč si volbu navíc pamatuje.
-- {{ui:camera.hideWorkplane}}, oko nad mřížkou, skryje podložku, aby bylo vidět spodní strany modelu. Mění pouze zobrazení; nové tvary stále dopadají na pracovní rovinu. Další kliknutí ji ukáže.
+- {{ui:camera.hideWorkplane}}, oko nad mřížkou, skryje podložku, aby bylo vidět spodní strany modelu. Mění pouze zobrazení; nové tvary stále dopadají na pracovní rovinu. Další kliknutí ji ukáže. S pracovní rovinou na ploše se jmenuje {{ui:camera.hideBuildPlate}} a skryje jen tiskovou podložku: pracovní rovina na ploše zůstane, má vlastní oko, {{ui:camera.hideFaceWorkplane}}.
 - {{ui:camera.placeWorkplane}}, měření vzdáleností a úhelník jsou samostatné nástroje popsané níže a v kapitole [Měření a poznámky](chapter:measuring-and-notes).
 
 Malá šipka úplně nahoře lištu skryje, pokud překáží.
@@ -158,7 +158,7 @@ Pohled náčrtu má vlastní barvy: {{ui:workspace.sketchBackground}} pro okno k
 
 ### Vzhled: šipky os a obrysy
 
-{{ui:workspace.showAxes}}, výchozí zapnuto, kreslí v rohu podložky tři šipky: **X** červeně doprava, **Y** zeleně dozadu a **Z** modře vzhůru, podle údajů polohy. Jde o pravotočivou soustavu jako v Tinkercadu, CAD programech a slicerech. Na pracovní rovině umístěné na ploše se osy přizpůsobí její orientaci. Pokud překážejí, vypněte je.
+{{ui:workspace.showAxes}}, výchozí zapnuto, kreslí v rohu podložky tři šipky: **X** červeně doprava, **Y** zeleně dozadu a **Z** modře vzhůru, podle údajů polohy. Jde o pravotočivou soustavu jako v Tinkercadu, CAD programech a slicerech. Na pracovní rovině umístěné na ploše se osy přizpůsobí její orientaci. Pokud překážejí, vypněte je. Dokud jsou šipky zapnuté, nese jejich barvy i středový kříž mřížky: čára podél X červenou, čára podél Y zelenou, takže i u malého dílu hned vidíte, kam která osa vede.
 
 {{ui:workspace.edgeLines}} kreslí obrys na každém tělese barvou {{ui:workspace.edgeColor}} (nejprve černou, jako v Tinkercadu): pomáhá, když tmavé barvy splývají. Ve výchozím stavu je vypnuto a velmi velké importované sítě se vynechávají.
 

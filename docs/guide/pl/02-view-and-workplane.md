@@ -47,7 +47,7 @@ Przy lewej krawędzi jest wąski pasek. Od góry:
 - {{ui:camera.orthographic}} przełącza na płaski widok, w którym równoległe krawędzie zostają równoległe. Do mierzenia i wyrównywania krawędzi bywa wygodniejszy od widoku perspektywicznego. [[O]] przełącza w obie strony, a drugie kliknięcie przywraca poprzedni widok.
 - {{ui:camera.secondView}} otwiera drugi widok projektu we własnym oknie, opisanym niżej. Drugie kliknięcie je zamyka.
 - {{ui:camera.showScrollbars}} pokazuje pasek przewijania u dołu widoku i drugi wzdłuż jego prawej krawędzi. Przeciągnij pasek, aby płynnie przesuwać widok, kliknij strzałkę na jego końcu, aby przesunąć go odrobinę (przytrzymaj, aby przesuwać dalej), albo kliknij obok paska, aby przesunąć o prawie cały widok. Nic się nie obraca, a w przeciwieństwie do klawiszy strzałek paski działają także przy zaznaczonej części - przydatne z bliska przy drobnych szczegółach. Drugie kliknięcie je ukrywa; to, czy projekt otwiera się z nimi, decyduje {{ui:workspace.startWithScrollbars}} w ustawieniach. Ta przeglądarka dodatkowo zapamiętuje wybór.
-- {{ui:camera.hideWorkplane}} (oko nad siatką) ukrywa płytę z siatką, żeby obejrzeć projekt od spodu. Zmienia się tylko widok: nowe kształty dalej trafiają na płaszczyznę roboczą. Drugie kliknięcie pokazuje ją z powrotem.
+- {{ui:camera.hideWorkplane}} (oko nad siatką) ukrywa płytę z siatką, żeby obejrzeć projekt od spodu. Zmienia się tylko widok: nowe kształty dalej trafiają na płaszczyznę roboczą. Drugie kliknięcie pokazuje ją z powrotem. Gdy płaszczyzna robocza leży na ścianie, nazywa się {{ui:camera.hideBuildPlate}} i ukrywa tylko stół roboczy: płaszczyzna robocza na ścianie zostaje, ma własne oko, {{ui:camera.hideFaceWorkplane}}.
 - {{ui:camera.placeWorkplane}}, narzędzie Zmierz i kątownik to osobne narzędzia, opisane niżej i w rozdziale [Pomiary i notatki](chapter:measuring-and-notes).
 
 Mała strzałka na samej górze paska ukrywa go, jeśli przeszkadza. Ten sam przycisk, przeciągnięty, przenosi pasek w dowolne miejsce edytora, także w szkicu, a dwukrotne kliknięcie odkłada go z powrotem. Podgląd 3D obracanego szkicu przesuwa się tak samo za swój tytuł.
@@ -159,7 +159,7 @@ Widok szkicu ma własne kolory: {{ui:workspace.sketchBackground}} dla okna wokó
 
 ### Wygląd: strzałki osi i linie krawędzi
 
-{{ui:workspace.showAxes}} (domyślnie włączone) rysuje trzy strzałki w lewym tylnym narożniku płyty: **X** na czerwono w prawo, **Y** na zielono do tyłu i **Z** na niebiesko w górę, tak jak liczą pola pozycji. To reguła prawej dłoni, której używają też Tinkercad, programy CAD i slicery. Gdy płaszczyzna robocza leży na ścianie, strzałki podążają za nią. Jeśli przeszkadzają, wyłącz je tutaj.
+{{ui:workspace.showAxes}} (domyślnie włączone) rysuje trzy strzałki w lewym tylnym narożniku płyty: **X** na czerwono w prawo, **Y** na zielono do tyłu i **Z** na niebiesko w górę, tak jak liczą pola pozycji. To reguła prawej dłoni, której używają też Tinkercad, programy CAD i slicery. Gdy płaszczyzna robocza leży na ścianie, strzałki podążają za nią. Jeśli przeszkadzają, wyłącz je tutaj. Dopóki strzałki są włączone, krzyż środkowy siatki też przyjmuje ich kolory: linia wzdłuż X jest czerwona, a wzdłuż Y zielona, więc nawet przy małej części od razu widać, w którą stronę biegnie każda oś.
 
 {{ui:workspace.edgeLines}} rysuje obrys na każdej bryle w kolorze {{ui:workspace.edgeColor}} (na początek czarnym, jak w Tinkercadzie). Pomaga, gdy ciemne kolory zlewają się ze sobą. Domyślnie jest wyłączone, a bardzo duże zaimportowane siatki są pomijane.
 

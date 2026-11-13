@@ -48,7 +48,7 @@ Ved venstre kant er en smal bjælke. Fra toppen:
 - {{ui:camera.orthographic}} skifter til en flad visning hvor parallelle kanter forbliver parallelle. Til måling og justering af kanter er det ofte mere behageligt end perspektivvisningen. [[O]] skifter frem og tilbage, og endnu et klik vender tilbage.
 - {{ui:camera.secondView}} åbner en anden visning af designet i sit eget vindue, beskrevet nedenfor. Et klik mere lukker det.
 - {{ui:camera.showScrollbars}} viser et rullepanel langs bunden af visningen og et langs dens højre kant. Træk i et panel for at skubbe visningen jævnt, klik på en pil i enden for at flytte den en smule (hold for at fortsætte), eller klik ved siden af panelet for at flytte næsten en hel visning. Intet drejer, og i modsætning til piletasterne virker panelerne også, mens en del er valgt - praktisk tæt på små detaljer. Et klik mere skjuler dem; {{ui:workspace.startWithScrollbars}} i indstillingerne afgør, om et design åbner med dem. Denne browser husker desuden valget.
-- {{ui:camera.hideWorkplane}} (øjet over et gitter) skjuler pladen med sit gitter, så du kan se undersiden af et design nedefra. Kun visningen ændres: nye former lander stadig på arbejdsplanet. Endnu et klik viser den igen.
+- {{ui:camera.hideWorkplane}} (øjet over et gitter) skjuler pladen med sit gitter, så du kan se undersiden af et design nedefra. Kun visningen ændres: nye former lander stadig på arbejdsplanet. Endnu et klik viser den igen. Med et arbejdsplan på en flade hedder den {{ui:camera.hideBuildPlate}} og skjuler kun byggepladen: arbejdsplanet på fladen bliver, det har sit eget øje, {{ui:camera.hideFaceWorkplane}}.
 - {{ui:camera.placeWorkplane}}, målebåndet og vinkelmåleren er deres egne værktøjer, dækket nedenfor og i [Måling og noter](chapter:measuring-and-notes).
 
 Den lille pil helt øverst på bjælken skjuler den hvis den er i vejen. Den samme knap kan trækkes, så bjælken flyttes rundt i editoren, også i en skitse; et dobbeltklik sætter den tilbage. 3D-forhåndsvisningen af en revolvering flyttes på samme måde med sin titel.
@@ -160,7 +160,7 @@ Skitsevisningen har sine egne farver: {{ui:workspace.sketchBackground}} for vind
 
 ### Udseende: aksepile og kantlinjer
 
-{{ui:workspace.showAxes}} (til som standard) tegner tre pile ved pladens bagerste venstre hjørne: **X** i rød til højre, **Y** i grøn bagud og **Z** i blå opad, den måde positionsfelterne tæller på. Det er højrehåndsreglen Tinkercad, CAD-programmer og slicerne også bruger. Med arbejdsplanet på en flade følger de den. Slå dem fra her hvis de er i vejen.
+{{ui:workspace.showAxes}} (til som standard) tegner tre pile ved pladens bagerste venstre hjørne: **X** i rød til højre, **Y** i grøn bagud og **Z** i blå opad, den måde positionsfelterne tæller på. Det er højrehåndsreglen Tinkercad, CAD-programmer og slicerne også bruger. Med arbejdsplanet på en flade følger de den. Slå dem fra her hvis de er i vejen. Så længe pilene er slået til, får gitterets midterkors også deres farver: linjen langs X rød, den langs Y grøn, så du selv på en lille del straks kan se, hvilken vej hver akse går.
 
 {{ui:workspace.edgeLines}} tegner et omrids på hvert legeme, i farven {{ui:workspace.edgeColor}} (sort til at begynde med, som i Tinkercad): det hjælper når mørke farver løber sammen. Det er fra som standard, og meget store importerede meshes udelades.
 

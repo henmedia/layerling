@@ -46,7 +46,7 @@ Längs vänsterkanten sitter en smal list. Uppifrån och ned:
 - {{ui:camera.orthographic}} växlar till en ortografisk (rak) vy där parallella kanter förblir parallella. För mätning och kantpassning är det ofta bekvämare än perspektivvy. [[O]] växlar fram och tillbaka, och ett andra klick återgår.
 - {{ui:camera.secondView}} öppnar en andra vy av designen i ett eget fönster, se nedan. Ett andra klick stänger den.
 - {{ui:camera.showScrollbars}} lägger en rullningslist längst ned och längs högra kanten av vyn. Dra i en list för att skjuta vyn mjukt i sidled eller höjdled, klicka på en pil i änden för att flytta lite (håll inne för att fortsätta) eller klicka bredvid markören för att flytta nästan en hel vy. Inget roteras, och till skillnad från piltangenterna fungerar listerna även när en del är markerad – praktiskt när du är nära små detaljer. Ett andra klick döljer dem; {{ui:workspace.startWithScrollbars}} i inställningarna bestämmer om en design öppnas med dem synliga. Webbläsaren kommer också ihåg knappen.
-- {{ui:camera.hideWorkplane}} (ögat över ett rutnät) döljer plattan och rutnätet så att du kan se undersidan av designen nedifrån. Bara vyn ändras: nya former landar fortfarande på arbetsytan. Ett andra klick visar den igen.
+- {{ui:camera.hideWorkplane}} (ögat över ett rutnät) döljer plattan och rutnätet så att du kan se undersidan av designen nedifrån. Bara vyn ändras: nya former landar fortfarande på arbetsytan. Ett andra klick visar den igen. Med ett arbetsplan på en yta heter den {{ui:camera.hideBuildPlate}} och döljer bara byggplattan: arbetsplanet på ytan blir kvar, det har ett eget öga, {{ui:camera.hideFaceWorkplane}}.
 - {{ui:camera.placeWorkplane}}, måttbandet och vinkelhaken är egna verktyg som beskrivs nedan och i [Mäta och anteckningar](chapter:measuring-and-notes).
 
 Den lilla pilen högst upp på fältet fäller in det om det är i vägen. Samma knapp går att dra för att flytta vyfältet var som helst i redigeraren, även i skissläget; ett dubbelklick sätter tillbaka det. 3D-förhandsgranskningen i en rotationsskiss flyttas på samma sätt i sin rubrik.
@@ -158,7 +158,7 @@ Skissläget har sina egna färger: {{ui:workspace.sketchBackground}} för områd
 
 ### Utseende: axelpilar och kantlinjer
 
-{{ui:workspace.showAxes}} (påslaget som standard) ritar tre pilar i bakre vänstra hörnet på plattan: **X** i rött åt höger, **Y** i grönt bakåt och **Z** i blått uppåt, åt samma håll som positionsfälten räknar. Det är samma högerhandsregel som Tinkercad, CAD-program och slicers använder. Med arbetsytan lagd på en yta följer pilarna med den. Slå av dem här om de stör.
+{{ui:workspace.showAxes}} (påslaget som standard) ritar tre pilar i bakre vänstra hörnet på plattan: **X** i rött åt höger, **Y** i grönt bakåt och **Z** i blått uppåt, åt samma håll som positionsfälten räknar. Det är samma högerhandsregel som Tinkercad, CAD-program och slicers använder. Med arbetsytan lagd på en yta följer pilarna med den. Slå av dem här om de stör. Så länge pilarna är på får även rutnätets mittkors deras färger: linjen längs X röd, den längs Y grön, så att du även på en liten del direkt ser åt vilket håll varje axel går.
 
 {{ui:workspace.edgeLines}} ritar konturlinjer på varje kropp i färgen från {{ui:workspace.edgeColor}} (svart som standard, som i Tinkercad): det hjälper när mörka färger annars flyter ihop. Det är avslaget från start, och mycket stora importerade nät hoppas över.
 

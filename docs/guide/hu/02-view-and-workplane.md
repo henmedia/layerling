@@ -44,7 +44,7 @@ A bal szélen egy keskeny sáv van. Felülről lefelé:
 - Az {{ui:camera.orthographic}} lapos nézetre vált, amelyben a párhuzamos élek párhuzamosak maradnak. Méréshez és élek egymáshoz igazításához ez gyakran kényelmesebb, mint a perspektivikus nézet. Az [[O]] oda-vissza vált, és egy második kattintás visszavált.
 - A {{ui:camera.secondView}} a terv második nézetét nyitja meg egy saját ablakban, lásd lent. Egy második kattintás bezárja.
 - A {{ui:camera.showScrollbars}} egy görgetősávot tesz a nézet aljára és egyet a jobb szélére. Húzd a sávot, és a nézet egyenletesen csúszik; a végén lévő nyílra kattintva egy kicsit mozdul (nyomva tartva tovább megy), a sáv mellé kattintva pedig majdnem egy egész nézetnyit. Semmi sem fordul el, és a nyílbillentyűkkel ellentétben a sávok akkor is működnek, ha egy alkatrész ki van jelölve - közelről, apró részleteknél hasznos. Egy második kattintás elrejti őket; hogy egy terv velük nyíljon-e meg, azt a beállítások {{ui:workspace.startWithScrollbars}} kapcsolója dönti el. Ez a böngésző a választást is megjegyzi.
-- A {{ui:camera.hideWorkplane}} (a rács fölötti szem) elrejti a tárgyasztalt a rácsával együtt, így alulról is megnézheted egy terv alját. Csak a nézet változik: az új alakzatok továbbra is a munkasíkra kerülnek. Egy második kattintás újra megmutatja.
+- A {{ui:camera.hideWorkplane}} (a rács fölötti szem) elrejti a tárgyasztalt a rácsával együtt, így alulról is megnézheted egy terv alját. Csak a nézet változik: az új alakzatok továbbra is a munkasíkra kerülnek. Egy második kattintás újra megmutatja. Ha egy felületen van munkasík, a neve {{ui:camera.hideBuildPlate}}, és csak a nyomtatótálcát rejti el: a felületen lévő munkasík marad, annak saját szeme van, {{ui:camera.hideFaceWorkplane}}.
 - A {{ui:camera.placeWorkplane}}, a mérőszalag és a derékszögvonalzó önálló eszközök, ezekről lentebb és a [Mérés és jegyzetek](chapter:measuring-and-notes) fejezetben olvashatsz.
 
 A sáv legtetején lévő kis nyíl elrejti a sávot, ha útban van.
@@ -156,7 +156,7 @@ A(z) {{ui:workspace.classicLook}} úgy állítja be a munkaterületet, ahogy a T
 
 ### Megjelenés: tengelynyilak és élvonalak
 
-A {{ui:workspace.showAxes}} (alapból bekapcsolva) három nyilat rajzol a tárgyasztal bal hátsó sarkába: az **X** pirosan jobbra, az **Y** zölden hátra, a **Z** kéken felfelé mutat, ahogy a helyzetmezők számolnak. Ez a jobbkéz-szabály, amelyet a Tinkercad, a CAD-programok és a szeletelők is használnak. Ha a munkasík egy lapon van, követik. Itt kapcsolhatod ki őket, ha útban vannak.
+A {{ui:workspace.showAxes}} (alapból bekapcsolva) három nyilat rajzol a tárgyasztal bal hátsó sarkába: az **X** pirosan jobbra, az **Y** zölden hátra, a **Z** kéken felfelé mutat, ahogy a helyzetmezők számolnak. Ez a jobbkéz-szabály, amelyet a Tinkercad, a CAD-programok és a szeletelők is használnak. Ha a munkasík egy lapon van, követik. Itt kapcsolhatod ki őket, ha útban vannak. Amíg a nyilak be vannak kapcsolva, a rács középkeresztje is az ő színüket kapja: az X menti vonal piros, az Y menti zöld, így egy kis alkatrésznél is rögtön látod, merre fut melyik tengely.
 
 A(z) {{ui:workspace.edgeLines}} minden testre körvonalat rajzol {{ui:workspace.edgeColor}} színnel (először feketével, mint a Tinkercad): segít, ha a sötét színek összefolynak. Alapból ki van kapcsolva, a nagyon nagy importált hálók pedig kimaradnak.
 

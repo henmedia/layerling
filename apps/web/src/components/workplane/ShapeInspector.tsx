@@ -201,6 +201,7 @@ import { usePrinterPlay } from "@/lib/usePrinterPlay";
 import { MAX_SCREW_HOLE_ANGLE, MIN_SCREW_HOLE_ANGLE, maxScrewHoleChamfer, maxScrewHoleRecess, normalizeScrewHoleAngle, normalizeScrewHoleChamfer, normalizeScrewHoleHeadDepth, normalizeScrewHoleRecess, normalizeScrewHoleShaft, screwHoleHeightForLengthBelowHead, screwHoleLengthBelowHead, screwHoleSlotMeasures } from "@/lib/screwHoleGeometry";
 import { DEFAULT_DRILL_POINT_ANGLE, DRILL_POINT_ANGLES, MAX_DRILL_POINT_ANGLE, MIN_DRILL_POINT_ANGLE, normalizeDrillPointAngle, shapeDrillPointLength, shapeTakesDrillPoint } from "@/lib/drillPoint";
 import { MAX_TEARDROP_TIP_ANGLE, MIN_TEARDROP_TIP_ANGLE, normalizeTeardropTipAngle, teardropHeightForTipAngle, teardropTipAngle } from "@/lib/teardropGeometry";
+import { MAX_WEDGE_ANGLE, MIN_WEDGE_ANGLE, wedgeAngle, wedgeHeightForAngle } from "@/lib/wedgeAngle";
 import { MAX_PORT_CLEARANCE, maxPortCorner, normalizePortClearance, normalizePortCorner, PORT_PRESET_ORDER, PORT_PRESETS, portPresetFor, portPresetSize, type PortPreset } from "@/lib/portGeometry";
 import { MAX_DOVETAIL_CLEARANCE, maxDovetailNeckWidth, normalizeDovetailClearance, normalizeDovetailNeckWidth } from "@/lib/dovetailGeometry";
 import { DEFAULT_SKETCH_STROKE, MAX_SKETCH_STROKE_WIDTH, MIN_SKETCH_STROKE_EDGE, MIN_SKETCH_STROKE_WIDTH, normalizeSketchStroke, SKETCH_STROKE_JOINS } from "@/lib/sketchStroke";
@@ -2767,6 +2768,24 @@ function getShapePropertiesWithAppLimits(shape: WorkplaneShape, onUpdate: ShapeI
         min: 0,
         max: 160,
         onChange: (topWidth) => onUpdate({ topWidth: normalizePyramidTop(topWidth, width) }),
+      },
+    ];
+  }
+
+  if (shape.kind === "wedge") {
+    // The slope's angle beside the sizes (Discussion #1714): typed, it sets the height for the width as it stands.
+    return [
+      { id: "length", label: t("prop.length"), value: depth, min: MIN_SHAPE_SIZE, max: 160, onChange: setDepth },
+      { id: "width", label: t("prop.width"), value: width, min: MIN_SHAPE_SIZE, max: 160, onChange: setWidth },
+      { id: "height", label: t("prop.height"), value: shape.height, min: MIN_SHAPE_SIZE, max: 160, onChange: setHeight },
+      {
+        id: "wedgeAngle",
+        label: t("prop.wedgeAngle"),
+        value: wedgeAngle(width, shape.height),
+        min: MIN_WEDGE_ANGLE,
+        max: MAX_WEDGE_ANGLE,
+        step: 1,
+        onChange: (angle) => onUpdate({ height: Math.max(MIN_SHAPE_SIZE, wedgeHeightForAngle(width, angle)) }, { resizeAxis: "height" }),
       },
     ];
   }

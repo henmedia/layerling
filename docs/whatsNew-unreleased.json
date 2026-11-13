@@ -1,6 +1,45 @@
 [
   {
     "title": {
+      "de": "Keil: Neigungswinkel in den Eigenschaften",
+      "en": "Wedge: the slope angle in its properties"
+    },
+    "body": {
+      "de": "Die Eigenschaften des Keils zeigen jetzt neben Länge, Breite und Höhe den Neigungswinkel seiner Schräge. Tippst du einen Winkel ein, passt sich die Höhe bei gleicher Breite an. So stellst du eine Arbeitsebene auf der Schräge genau auf den Winkel, den du brauchst, ohne Winkelmesser.",
+      "en": "The wedge's properties now show the slope angle beside length, width and height. Type an angle and the height changes to match at the same width. So you can set a workplane on its slope to exactly the angle you need, without a protractor."
+    },
+    "guide": {
+      "chapter": "shapes"
+    }
+  },
+  {
+    "title": {
+      "de": "Druckplatte ausblenden, Arbeitsebene auf der Fläche bleibt",
+      "en": "Hide the build plate, keep the workplane on the face"
+    },
+    "body": {
+      "de": "Liegt eine Arbeitsebene auf einer Fläche, blendet der Knopf mit dem Auge über dem Raster in der Ansichtsleiste jetzt nur die Druckplatte aus. Die Arbeitsebene auf der Fläche bleibt sichtbar und hat weiter ihr eigenes Auge.",
+      "en": "With a workplane set on a face, the button with the eye over a grid in the view bar now hides only the build plate. The workplane on the face stays visible and still has its own eye."
+    },
+    "guide": {
+      "chapter": "view"
+    }
+  },
+  {
+    "title": {
+      "de": "Mittelkreuz des Rasters in Achsfarben",
+      "en": "The grid's centre cross in the axis colours"
+    },
+    "body": {
+      "de": "Die Nulllinien des Rasters tragen jetzt die Farben der Achsenpfeile: die Linie entlang X rot, die entlang Y grün, auf der Druckplatte und auf einer Arbeitsebene auf einer Fläche. So siehst du auch an kleinen Teilen sofort, wohin welche Achse läuft.",
+      "en": "The grid's zero lines now take the colours of the axis arrows: the line along X red, the one along Y green, on the build plate and on a workplane on a face. So even on small parts you see at once which way each axis runs."
+    },
+    "guide": {
+      "chapter": "view"
+    }
+  },
+  {
+    "title": {
       "de": "Glatte Flächen bei Skizzen entlang eines Pfads",
       "en": "Smooth faces on swept sketches"
     },
