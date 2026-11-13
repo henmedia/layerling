@@ -67,5 +67,15 @@
       "de": "Ein Kegel, der oben und unten gespiegelt war, stand nach dem Gruppieren wieder auf dem Kopf, weil die Spiegelung beim Zusammenführen verloren ging. Jetzt bleibt er so, wie er vor dem Gruppieren zu sehen war, auch beim Verbinden, Ausschneiden und Aushöhlen.",
       "en": "A cone mirrored top to bottom came out upside down once it was grouped, because the mirror was lost when the parts were merged. It now stays as it looked before grouping, also when joining, cutting and hollowing."
     }
+  },
+  {
+    "title": {
+      "de": "Unterlegscheibe zurück zum Rohr",
+      "en": "A washer goes back to a tube"
+    },
+    "body": {
+      "de": "Ein Rohr, das über die Auswahl „Unterlegscheibe“ zur Scheibe gemacht wurde, ließ sich nicht mehr zurückstellen: „Eigene Maße“ und der Pfeil „Auf die Vorgabe zurücksetzen“ taten nichts. Jetzt bekommt das Rohr wieder die Maße eines neuen Rohrs.",
+      "en": "A tube turned into a washer with the Washer menu could not be put back: Custom and the arrow back to the default did nothing. Now the tube gets the measures of a new tube again."
+    }
   }
 ]

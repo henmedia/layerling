@@ -2827,6 +2827,15 @@ function getShapePropertiesWithAppLimits(shape: WorkplaneShape, onUpdate: ShapeI
       const inner = tubeInnerDiameter(width, wall);
       // A washer is a tube of its screw size's measures (ISO 7089, #1052): one choice sets all three.
       const applyWasher = (value: string) => {
+        if (value === "custom") {
+          // Custom and the arrow back to the default (#1739) give the tube the measures of a new one; a size left
+          // as it is would be the one it shows already.
+          const asset = shapeDefaultsAsset(shape.kind);
+          if (!asset) return;
+          const fresh = makeShapeFromAsset(asset);
+          onUpdate({ ...widthPatch(shapeWidth(fresh)), depth: shapeDepth(fresh), size: resizedShapeSize(shapeWidth(fresh), shapeDepth(fresh)), height: fresh.height, bevel: fresh.bevel }, { resizeAxis: "width" });
+          return;
+        }
         if (!isWasherSize(value)) return;
         const washer = washerTubeFields(value);
         onUpdate({ ...widthPatch(washer.width), depth: washer.depth, size: resizedShapeSize(washer.width, washer.depth), height: washer.height, bevel: washer.bevel }, { resizeAxis: "width" });
