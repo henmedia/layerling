@@ -697,14 +697,16 @@ export const tools = [
   },
   {
     name: "layerling_scale_objects",
-    description: "Scale objects by a percentage, the same in every direction - the editor's Scale by percent tool. 120 makes them a fifth larger, 50 half the size. mode together (default) scales them around their common centre, so the layout grows with them; each scales every object where it stands, so the gaps stay. The bottom stays where it is. Locked objects are left as they are. One undo step.",
+    description: "Scale objects by a percentage, the same in every direction - the editor's Scale by percent tool. 120 makes them a fifth larger, 50 half the size. Or bring them to a model scale: scale 87 is 1:87 (H0; Z 220, N 160, TT 120, 0 45, 1 32, G 22.5). Without realSize the objects count as built at full size, so 1:87 is 100/87 percent; with realSize, the original's real size in mm along realSizeAxis (a tree 16 m tall: 16000), the objects are brought to realSize / scale along that side. mode together (default) scales them around their common centre, so the layout grows with them; each scales every object where it stands, so the gaps stay. The bottom stays where it is. Locked objects are left as they are. One undo step.",
     inputSchema: {
       ...editorTargetSchema,
-      required: ["percent"],
       properties: {
         ...editorTargetSchema.properties,
         ids: { type: "array", items: { type: "string" }, description: "Object ids to scale. If omitted, uses the current selection." },
-        percent: { type: "number", minimum: 1, maximum: 1000, description: "The new size in percent of the current one." },
+        percent: { type: "number", minimum: 0.01, maximum: 1000, description: "The new size in percent of the current one. Give either percent or scale." },
+        scale: { type: "number", minimum: 1, maximum: 10000, description: "A model scale instead of percent: 87 for 1:87. The answer reports the percentage used." },
+        realSize: { type: "number", exclusiveMinimum: 0, description: "Only with scale: the original's real size in mm along realSizeAxis. Omit when the objects already have the original's size." },
+        realSizeAxis: { type: "string", enum: ["height", "length"], description: "Only with realSize: height (default) is the height of the selection, length its longest side across the plate." },
         mode: { type: "string", enum: ["together", "each"], description: "together (default): around the common centre. each: every object in place." },
       },
     },

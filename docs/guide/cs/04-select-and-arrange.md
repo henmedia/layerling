@@ -189,6 +189,8 @@ Pro stejné zvětšení či zmenšení jednoho nebo více dílů použijte {{ui:
 
 {{ui:scalePercent.percent}} zadává novou velikost v procentech původní. 120 % znamená zvětšení o pětinu, 50 % poloviční velikost. Všechny tři rozměry se mění stejně a zachovají proporce. Spodek zůstává na místě, takže se díl nezanoří do podložky.
 
+Pro modelářství zvolte nahoře {{ui:scalePercent.by.scale}} místo {{ui:scalePercent.by.percent}}. {{ui:scalePercent.scalePresets}} nabízí obvyklé velikosti od Z (1:220) po G (1:22,5) a do {{ui:scalePercent.ratio}} zadáte jakékoli jiné měřítko, třeba 35 pro 1:35. Je-li model postavený ve skutečné velikosti předlohy, nechte {{ui:scalePercent.original.fullSize}}: 1:87 ho zmenší 87krát. Pokud jste ho postavili v libovolné velikosti, zvolte {{ui:scalePercent.original.realSize}}, pak {{ui:scalePercent.axis.height}} nebo {{ui:scalePercent.axis.length}} (nejdelší strana na desce) a do {{ui:scalePercent.realSize}} zadejte, jak velká je předloha doopravdy, v metrech (při palcových jednotkách ve stopách). Strom, který je ve skutečnosti 16 m vysoký, bude v H0 vysoký 16 000 mm / 87 = 184 mm, ať byl předtím jakkoli velký. Nová velikost se ukáže pod poli dřív, než stisknete {{ui:scalePercent.apply}}. Měřítko zůstane nastavené, dokud je editor otevřený.
+
 Pro více dílů zvolte:
 
 - **{{ui:scalePercent.mode.together}}:** růst kolem společného středu včetně mezer, jako jeden celek.

@@ -93,7 +93,7 @@ AI používá stejné funkce a stejné zpracování příkazů jako ruční ovl�
 | `layerling_import_mesh` | vloží trojúhelníkovou síť |
 | `layerling_update_object` | změní rozměry, polohu, barvu, název, režim tělesa/výřezu a další vlastnosti včetně hran písmen |
 | `layerling_align_objects` | vzájemně zarovná objekty |
-| `layerling_scale_objects` | změní velikost o procenta společně nebo samostatně na místě |
+| `layerling_scale_objects` | změní velikost o procenta společně nebo samostatně na místě nebo na modelářské měřítko, třeba 1:87 |
 | `layerling_lay_flat` | položí objekt vybranou plochou na podložku |
 | `layerling_place_on_face` | umístí objekty na plochu jiného tělesa, i šikmou, jako klávesa C |
 | `layerling_perforate_face` | vytvoří rastr otvorů na rovinné ploše nebo dokola na stěně válce, trubky či díry; výřezy zůstanou sloučené s tělesem |

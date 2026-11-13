@@ -97,7 +97,7 @@ La IA trabaja con las mismas funciones que tú, por el mismo camino que sigues c
 | `layerling_import_mesh` | trae una malla de triángulos al diseño |
 | `layerling_update_object` | cambia las medidas, la posición, el color, el nombre, si es sólido u orificio y todo lo demás que define la forma, incluido el canto de las letras de un texto |
 | `layerling_align_objects` | alinea objetos entre sí |
-| `layerling_scale_objects` | escala objetos en un porcentaje, juntos o cada uno en su sitio |
+| `layerling_scale_objects` | escala objetos en un porcentaje, juntos o cada uno en su sitio, o a una escala de modelismo como 1:87 |
 | `layerling_lay_flat` | apoya un objeto sobre la placa por una de sus caras |
 | `layerling_place_on_face` | posa objetos sobre una cara de otro, aunque esté inclinada, como la tecla C |
 | `layerling_perforate_face` | corta un patrón de orificios en una cara plana o alrededor de la pared de un cilindro, un tubo o un taladro; los orificios se quedan como orificios agrupados con el cuerpo |

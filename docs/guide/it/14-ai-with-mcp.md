@@ -97,7 +97,7 @@ L’IA usa le stesse funzioni che hai a disposizione, attraverso lo stesso perco
 | `layerling_import_mesh` | Importa nel progetto una mesh di triangoli. |
 | `layerling_update_object` | Modifica dimensioni, posizione, colore, nome, tipo pieno o foro e tutte le altre proprietà della forma, compreso il bordo delle lettere di un testo. |
 | `layerling_align_objects` | Allinea gli oggetti tra loro. |
-| `layerling_scale_objects` | Ridimensiona gli oggetti in percentuale, tutti insieme oppure ciascuno attorno alla propria posizione. |
+| `layerling_scale_objects` | Ridimensiona gli oggetti in percentuale, tutti insieme oppure ciascuno attorno alla propria posizione, oppure a una scala modellistica come 1:87. |
 | `layerling_lay_flat` | Appoggia un oggetto sul piano usando una delle sue facce. |
 | `layerling_place_on_face` | Appoggia gli oggetti su una faccia di un altro, anche se inclinata, come con il tasto C. |
 | `layerling_perforate_face` | Crea un motivo di fori su una faccia piana o intorno alla parete di un cilindro, un tubo o un foro; i fori restano tali e vengono raggruppati con il corpo. |

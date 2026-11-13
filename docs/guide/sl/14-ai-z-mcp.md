@@ -93,7 +93,7 @@ Umetna inteligenca dela z istimi funkcijami kot ti, teče po isti poti kot tvoje
 | `layerling_import_mesh` | prinese mrežo trikotnikov v načrt |
 | `layerling_update_object` | spremeni mere, lego, barvo, ime, telo ali luknjo in vse, kar oblika še ima, pri besedilu tudi rob črk |
 | `layerling_align_objects` | poravna objekte drug z drugim |
-| `layerling_scale_objects` | poveča objekte za odstotno vrednost, skupaj ali vsak zase |
+| `layerling_scale_objects` | poveča objekte za odstotno vrednost, skupaj ali vsak zase ali v modelarsko merilo, npr. 1:87 |
 | `layerling_lay_flat` | položi objekt s ploskvijo na ploščo |
 | `layerling_place_on_face` | postavi objekte na ploskev drugega, tudi poševno, kot tipka C |
 | `layerling_perforate_face` | vreže vzorec lukenj v ravno ploskev ali okrog stene valja, cevi ali izvrtine, luknje ostanejo kot luknje, združene v skupino s telesom |

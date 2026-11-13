@@ -102,12 +102,13 @@ import { customFontList, onCustomFontsChanged, textFontLabel } from "@/lib/textF
 import { isCustomFontId } from "@/lib/customFonts";
 import { storedCustomFonts } from "@/lib/customFontStore";
 import { ArrayPanel } from "./workplane/ArrayPanel";
-import { ScalePercentPanel, type ScalePercentSettings } from "./workplane/ScalePercentPanel";
+import { DEFAULT_SCALE_PERCENT_SETTINGS, ScalePercentPanel, type ScalePercentSettings } from "./workplane/ScalePercentPanel";
 import { ClearancePanel, clearanceMarkFor, clearanceRowIds, type ClearanceSettings, type ClearanceToolState } from "./workplane/ClearancePanel";
 import { CLEARANCE_THRESHOLD_LIMITS, clearanceMeshShape, clearanceSourceShapes, clearanceStartThreshold, normalizeClearanceOptions, reclassifyClearance, readClearanceSettings, writeClearanceSettings } from "@/lib/clearanceCheck";
 import { PrintCheckPanel, printCheckLineFocus, printCheckLineIds, type PrintCheckLine, type PrintCheckSettings, type PrintCheckToolState } from "./workplane/PrintCheckPanel";
 import { normalizePrintCheckOptions, printCheckFloating, printCheckSmallContacts, printCheckTopLevelId, printCheckWarnings, PRINT_CHECK_NOZZLE_LIMITS, readPrintCheckSettings, writePrintCheckSettings } from "@/lib/printCheck";
-import { scaleShapesByPercent } from "@/lib/scaleByPercent";
+import { scaleShapesByPercent, worldBoxOfShapes } from "@/lib/scaleByPercent";
+import { MODEL_SCALE_RATIO_MAX, MODEL_SCALE_RATIO_MIN, modelScalePercent, type ModelScaleAxis } from "@/lib/modelScale";
 import { isSameSize, resizedCopy, SAME_SIZE, shapeSize, sizeFactorsBetween, type ShapeSize, type SizeFactors } from "@/lib/duplicateResize";
 import { canToggleGroupColors, colorForParts, groupShowsPartColors } from "@/lib/groupColors";
 import { disposeBoundsTree } from "three-mesh-bvh";
@@ -3428,6 +3429,8 @@ export function LayerlingEditor({
   const [arrayTool, setArrayTool] = useState<ArraySettings | null>(null);
   const [scalePercentTool, setScalePercentTool] = useState<ScalePercentSettings | null>(null);
   const [scalePercentError, setScalePercentError] = useState<string | null>(null);
+  // The model scale chosen last stays for the next time the window opens: a model railway builder keeps to one gauge.
+  const lastModelScaleRef = useRef<Pick<ScalePercentSettings, "by" | "ratio" | "useRealSize" | "realSize" | "axis"> | null>(null);
   const editorLanguage = useLanguage();
   const { notice, noticeAction, noticeAt, noticeOrdinary, setNotice, holdNotice, releaseNotice, dismissNotice, reportNoticesRef } = useEditorNotice();
   // Cuts and splits run in a worker (lib/geometryWorker.ts): one that takes a moment says so, and
@@ -4122,6 +4125,13 @@ export function LayerlingEditor({
   }, [initialSnap]);
 
   const selectedShapes = useMemo(() => shapes.filter((shape) => selectedIds.includes(shape.id)), [selectedIds, shapes]);
+  const scalePercentOpen = Boolean(scalePercentTool);
+  // The box the selection takes up, for the model scale in Scale by percent (only while the window is open).
+  const scalePercentSelectionSize = useMemo(() => {
+    if (!scalePercentOpen || selectedShapes.length === 0) return { width: 0, depth: 0, height: 0 };
+    const size = worldBoxOfShapes(selectedShapes).getSize(new THREE.Vector3());
+    return { width: size.x, depth: size.z, height: size.y };
+  }, [scalePercentOpen, selectedShapes]);
   const selectedShape = selectedShapes.at(-1) ?? null;
   const hasSelection = selectedShapes.length > 0;
 
@@ -7009,7 +7019,7 @@ export function LayerlingEditor({
     if (refuseBodyLockedSelection()) return;
     setArrayTool(null);
     setScalePercentError(null);
-    setScalePercentTool({ percent: 100, mode: "together" });
+    setScalePercentTool({ ...DEFAULT_SCALE_PERCENT_SETTINGS, ...lastModelScaleRef.current });
   }, [refuseLockedSelection, scalePercentTool, selectedShapes.length, refuseBodyLockedSelection]);
 
   const applyScalePercentTool = useCallback((percent?: number) => {
@@ -7019,6 +7029,8 @@ export function LayerlingEditor({
       setScalePercentError(result.message);
       return;
     }
+    const { by, ratio, useRealSize, realSize, axis } = scalePercentTool;
+    lastModelScaleRef.current = { by, ratio, useRealSize, realSize, axis };
     setScalePercentTool(null);
     setScalePercentError(null);
   }, [scalePercentTool, scaleSelectionByPercent]);
@@ -13971,9 +13983,18 @@ export function LayerlingEditor({
       if (command.action === "scale_objects") {
         const requestedIds = mcpStringArray(params.ids ?? params.id);
         const ids = requestedIds.length ? requestedIds : selectedIdsRef.current;
-        const percent = typeof params.percent === "number" ? params.percent : Number.NaN;
         const mode = params.mode === "each" ? "each" : "together";
         if (ids.length === 0) throw new Error("scale_objects needs ids or a selection");
+        // A model scale such as 1:87 works the percentage out, as in the window (forum, 3DVadda).
+        const ratio = typeof params.scale === "number" ? params.scale : null;
+        let percent = typeof params.percent === "number" ? params.percent : Number.NaN;
+        if (ratio !== null) {
+          const realSize = typeof params.realSize === "number" ? params.realSize : null;
+          const axis: ModelScaleAxis = params.realSizeAxis === "length" ? "length" : "height";
+          const size = worldBoxOfShapes(currentShapes().filter((shape) => ids.includes(shape.id))).getSize(new THREE.Vector3());
+          percent = modelScalePercent(ratio, realSize, { width: size.x, depth: size.z, height: size.y }, axis);
+          if (!Number.isFinite(percent)) throw new Error(`scale must be between ${MODEL_SCALE_RATIO_MIN} and ${MODEL_SCALE_RATIO_MAX}, realSize a size in mm above 0`);
+        }
         const unscaled = new Map(currentShapes().map((shape) => [shape.id, shape]));
         const result = scaleSelectionByPercent(ids, percent, mode);
         if (!result.ok) throw new Error(result.message);
@@ -13983,6 +14004,7 @@ export function LayerlingEditor({
         const scaled = new Set(ids);
         return {
           percent,
+          ...(ratio !== null ? { scale: ratio } : {}),
           mode,
           skippedLocked: result.skipped,
           objects: currentShapes().filter((shape) => scaled.has(shape.id)).map(mcpShapeSummary),
@@ -19515,6 +19537,7 @@ export function LayerlingEditor({
         <ScalePercentPanel
           targetName={selectedShapes.length === 1 ? selectedShapes[0].name : t("array.targetMany", { count: selectedShapes.length })}
           count={selectedShapes.length}
+          selectionSize={scalePercentSelectionSize}
           settings={scalePercentTool}
           workspace={workspaceSettings}
           error={scalePercentError}

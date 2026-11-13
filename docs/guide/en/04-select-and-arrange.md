@@ -193,6 +193,8 @@ To make one or several parts larger or smaller by the same share, say all the pa
 
 Under {{ui:scalePercent.percent}} you type the new size as a percentage of the current one: 120 % is a fifth larger, 50 % half the size. Width, depth and height change alike, so the proportions stay. The bottom stays where it is, so nothing sinks into the plate.
 
+For model making, choose {{ui:scalePercent.by.scale}} instead of {{ui:scalePercent.by.percent}} at the top. {{ui:scalePercent.scalePresets}} offers the usual gauges from Z (1:220) to G (1:22.5), and in {{ui:scalePercent.ratio}} you type any other scale, such as 35 for 1:35. If the model is built at the original's real size, leave {{ui:scalePercent.original.fullSize}} chosen: 1:87 makes it 87 times smaller. If you built it at some other size, choose {{ui:scalePercent.original.realSize}}, pick {{ui:scalePercent.axis.height}} or {{ui:scalePercent.axis.length}} (the longest side across the plate) and type in {{ui:scalePercent.realSize}} how big the original really is, in metres (in feet with imperial units). A tree that is 16 m tall in real life then becomes 16,000 mm / 87 = 184 mm tall in H0, whatever size it had before. The new size shows under the fields before you press {{ui:scalePercent.apply}}. The scale stays set while the editor is open.
+
 With several parts you choose how they grow:
 
 - **{{ui:scalePercent.mode.together}}:** The parts grow around their common centre, and the gaps grow with them. The whole becomes larger as if it were one part.

@@ -97,7 +97,7 @@ AI'en arbejder med de samme funktioner som dig, gennem den samme vej som din han
 | `layerling_import_mesh` | bringer et trekantsmesh ind i designet |
 | `layerling_update_object` | ændrer dimensioner, position, farve, navn, solid eller hul og alt andet der udgør formen, en teksts bogstavkant inkluderet |
 | `layerling_align_objects` | justerer objekter med hinanden |
-| `layerling_scale_objects` | skalerer objekter med en procent, sammen eller hver på stedet |
+| `layerling_scale_objects` | skalerer objekter med en procent, sammen eller hver på stedet, eller til en modelskala som 1:87 |
 | `layerling_lay_flat` | lægger et objekt med én flade på pladen |
 | `layerling_place_on_face` | sætter objekter ned på en flade af en anden, også skrå, som C-tasten |
 | `layerling_perforate_face` | skærer et hulmønster ind i en flad flade eller rundt om væggen på en cylinder, et rør eller en boring; hullerne bliver som huller grupperet med formen |

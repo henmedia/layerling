@@ -97,7 +97,7 @@ AI pracuje tymi samymi funkcjami co Ty, tą samą drogą co Twoja praca w edytor
 | `layerling_import_mesh` | wprowadza siatkę trójkątów do projektu |
 | `layerling_update_object` | zmienia wymiary, pozycję, kolor, nazwę, bryłę albo otwór i wszystko inne, co tworzy kształt, także krawędź liter tekstu |
 | `layerling_align_objects` | wyrównuje obiekty względem siebie |
-| `layerling_scale_objects` | skaluje obiekty o procent, razem albo każdy w miejscu |
+| `layerling_scale_objects` | skaluje obiekty o procent, razem albo każdy w miejscu albo do skali modelarskiej, np. 1:87 |
 | `layerling_lay_flat` | kładzie obiekt jedną ścianą na płycie |
 | `layerling_place_on_face` | odkłada obiekty na ścianę innego, także skośną, jak klawisz C |
 | `layerling_perforate_face` | wycina wzór otworów w płaskiej ścianie albo dookoła ścianki walca, rury lub otworu. Otwory zostają otworami zgrupowanymi z bryłą |

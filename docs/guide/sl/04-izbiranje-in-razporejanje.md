@@ -189,6 +189,8 @@ Umetna inteligenca lahko isto naredi prek vmesnika MCP, z `layerling_push_face` 
 
 Pri {{ui:scalePercent.percent}} vpišeš novo velikost v odstotkih sedanje: 120 % je petino večje, 50 % pol manjše. Širina, globina in višina se pri tem spremenijo enako, razmerja torej ostanejo. Spodnja stran ostane, kjer je, tako da nič ne zdrsne v ploščo.
 
+Za modelarstvo zgoraj izberi {{ui:scalePercent.by.scale}} namesto {{ui:scalePercent.by.percent}}. {{ui:scalePercent.scalePresets}} ponuja običajne velikosti od Z (1:220) do G (1:22,5), v {{ui:scalePercent.ratio}} pa vpišeš katero koli drugo merilo, npr. 35 za 1:35. Če je model narejen v pravi velikosti izvirnika, pusti izbrano {{ui:scalePercent.original.fullSize}}: 1:87 ga pomanjša 87-krat. Če si ga naredil v poljubni velikosti, izberi {{ui:scalePercent.original.realSize}}, nato {{ui:scalePercent.axis.height}} ali {{ui:scalePercent.axis.length}} (najdaljša stranica na plošči) in v {{ui:scalePercent.realSize}} vpiši, kako velik je izvirnik v resnici, v metrih (pri palčnih enotah v čevljih). Drevo, ki je v resnici visoko 16 m, je tako v H0 visoko 16.000 mm / 87 = 184 mm, ne glede na to, kako veliko je bilo prej. Nova velikost je vidna pod polji, preden pritisneš {{ui:scalePercent.apply}}. Merilo ostane nastavljeno, dokler je urejevalnik odprt.
+
 Pri več delih izbereš, kako rastejo:
 
 - **{{ui:scalePercent.mode.together}}:** Deli rastejo okoli skupne sredine, razdalje rastejo z njimi. Celota postane večja, kot da bi bila en del.

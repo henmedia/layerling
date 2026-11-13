@@ -93,7 +93,7 @@ De AI werkt met dezelfde functies als jij, via dezelfde weg als jouw bediening i
 | `layerling_import_mesh` | brengt een driehoeksmesh in het ontwerp |
 | `layerling_update_object` | wijzigt maten, positie, kleur, naam, lichaam of gat en al het andere wat de vorm bepaalt, de letterrand van een tekst inbegrepen |
 | `layerling_align_objects` | lijnt objecten ten opzichte van elkaar uit |
-| `layerling_scale_objects` | schaalt objecten met een percentage, samen of elk op zijn plek |
+| `layerling_scale_objects` | schaalt objecten met een percentage, samen of elk op zijn plek, of naar een modelschaal zoals 1:87 |
 | `layerling_lay_flat` | legt een object met één vlak op de plaat |
 | `layerling_place_on_face` | zet objecten neer op een vlak van een ander, ook op schuine, zoals de C-toets |
 | `layerling_perforate_face` | snijdt een gatenpatroon in een plat vlak of rond de wand van een cilinder, buis of boring; de gaten blijven gaten, gegroepeerd met het lichaam |

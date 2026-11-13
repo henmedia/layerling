@@ -1167,6 +1167,14 @@ html[data-theme="dark"]:where([data-palette="graphite"]) .edge-modifier-quick-ac
   border: 1px solid #c8c8c8;
 }
 
+:where(html[data-theme="dark"][data-palette="graphite"]) .model-scale-result {
+  color: #515151;
+}
+
+html[data-theme="dark"]:where([data-palette="graphite"]) .model-scale-result {
+  color: #c1c1c1;
+}
+
 :where(html[data-theme="dark"][data-palette="graphite"]) .paint-eraser {
   color: #515151;
   background: #f8f8f8;

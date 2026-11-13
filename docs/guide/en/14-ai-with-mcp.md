@@ -97,7 +97,7 @@ The AI works with the same functions as you, through the same path as your opera
 | `layerling_import_mesh` | brings a triangle mesh into the design |
 | `layerling_update_object` | changes dimensions, position, colour, name, solid or hole and everything else that makes up the shape, a text's letter edge included |
 | `layerling_align_objects` | aligns objects with each other |
-| `layerling_scale_objects` | scales objects by a percentage, together or each in place |
+| `layerling_scale_objects` | scales objects by a percentage, together or each in place, or to a model scale such as 1:87 |
 | `layerling_lay_flat` | lays an object with one face on the plate |
 | `layerling_place_on_face` | sets objects down on a face of another, sloped ones too, like the C key |
 | `layerling_perforate_face` | cuts a hole pattern into a flat face or round the wall of a cylinder, tube or bore; the holes stay as holes grouped with the body |

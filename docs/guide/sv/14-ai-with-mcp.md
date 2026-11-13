@@ -97,7 +97,7 @@ AI:n arbetar med samma funktioner som du, via samma väg som din användning i r
 | `layerling_import_mesh` | tar in ett triangelnät i designen |
 | `layerling_update_object` | ändrar mått, position, färg, namn, solid eller hål och allt annat som utgör formen, inklusive en texts bokstavskant |
 | `layerling_align_objects` | riktar in objekt mot varandra |
-| `layerling_scale_objects` | skalar objekt med en procentsats, tillsammans eller vart och ett på sin plats |
+| `layerling_scale_objects` | skalar objekt med en procentsats, tillsammans eller vart och ett på sin plats, eller till en modellskala som 1:87 |
 | `layerling_lay_flat` | lägger ett objekt med en yta mot plattan |
 | `layerling_place_on_face` | sätter ner objekt på en yta av ett annat objekt, även lutande ytor, som C-tangenten |
 | `layerling_perforate_face` | skär ut ett hålmönster i en plan yta eller runt väggen på en cylinder, ett rör eller ett borrhål; hålen stannar kvar som hål grupperade med kroppen |

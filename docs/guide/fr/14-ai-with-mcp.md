@@ -93,7 +93,7 @@ L'IA fonctionne avec les mêmes fonctions que vous, via le même chemin que votr
 | `layerling_import_mesh` | apporte un maillage triangulaire dans la conception |
 | `layerling_update_object` | change les dimensions, la position, la couleur, le nom, le solide ou le trou et tout ce qui constitue la forme, le bord d'une lettre de texte inclus |
 | `layerling_align_objects` | aligne les objets les uns avec les autres |
-| `layerling_scale_objects` | met à l'échelle les objets selon un pourcentage, ensemble ou chacun en place |
+| `layerling_scale_objects` | met à l'échelle les objets selon un pourcentage, ensemble ou chacun en place, ou à une échelle de modélisme comme 1:87 |
 | `layerling_lay_flat` | pose un objet avec une face sur la plaque |
 | `layerling_place_on_face` | pose des objets sur une face d'une autre, également inclinée, comme la touche C |
 | `layerling_perforate_face` | découpe un motif de trous dans une face plate ou autour de la paroi d'un cylindre, d'un tube ou d'un alésage ; les trous restent groupés avec le corps |

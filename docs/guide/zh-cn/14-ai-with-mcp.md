@@ -97,7 +97,7 @@ AI 使用与你相同的功能，走的是与你在编辑器中的操作相同�
 | `layerling_import_mesh` | 把三角网格带入设计 |
 | `layerling_update_object` | 修改尺寸、位置、颜色、名称、实体或孔，以及构成形状的其他一切，包括文字的字母边缘 |
 | `layerling_align_objects` | 让对象彼此对齐 |
-| `layerling_scale_objects` | 按百分比缩放对象，可整体缩放或各自在原位缩放 |
+| `layerling_scale_objects` | 按百分比缩放对象，可整体缩放或各自在原位缩放，或缩放到 1:87 等模型比例 |
 | `layerling_lay_flat` | 让对象的一个面贴在平台上 |
 | `layerling_place_on_face` | 把对象放到另一个对象的某个面上，斜面也可以，如同 C 键 |
 | `layerling_perforate_face` | 在平面上或绕圆柱、圆管、孔的侧壁切出孔阵列；孔仍作为孔与实体分组在一起 |

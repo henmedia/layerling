@@ -189,6 +189,8 @@ Ha egy vagy több részt ugyanannyival nagyobbítanál vagy kisebbítenél, mond
 
 Az {{ui:scalePercent.percent}} alá a jelenlegi méret százalékában gépeled be az új méretet: 120% egyötöddel nagyobb, 50% fele akkora. A szélesség, a mélység és a magasság egyformán változik, így az arányok megmaradnak. Az alja a helyén marad, így semmi sem süllyed a tárgyasztalba.
 
+Makettezéshez fent a {{ui:scalePercent.by.percent}} helyett válaszd a {{ui:scalePercent.by.scale}} lehetőséget. A {{ui:scalePercent.scalePresets}} alatt a szokásos méretarányok vannak Z-től (1:220) G-ig (1:22,5), a {{ui:scalePercent.ratio}} mezőbe pedig bármilyen más arányt beírhatsz, például 35-öt az 1:35-höz. Ha a modell az eredeti valódi méretében készült, hagyd a {{ui:scalePercent.original.fullSize}} lehetőséget: az 1:87 87-szer kisebbre veszi. Ha tetszőleges méretben készítetted, válaszd a {{ui:scalePercent.original.realSize}} lehetőséget, majd a {{ui:scalePercent.axis.height}} vagy a {{ui:scalePercent.axis.length}} gombot (a leghosszabb oldal a lapon), és a {{ui:scalePercent.realSize}} mezőbe írd be, mekkora valójában az eredeti, méterben (hüvelykes mértékegységnél lábban). Egy valóságban 16 m magas fa így H0-ban 16 000 mm / 87 = 184 mm magas lesz, akármekkora volt előtte. Az új méret a mezők alatt látszik, mielőtt a {{ui:scalePercent.apply}} gombra kattintasz. A méretarány beállítva marad, amíg a szerkesztő nyitva van.
+
 Több résznél kiválasztod, hogyan nőjenek:
 
 - **{{ui:scalePercent.mode.together}}:** A részek a közös középpontjuk körül nőnek, és a hézagok is velük nőnek. Az egész úgy lesz nagyobb, mintha egyetlen rész lenne.

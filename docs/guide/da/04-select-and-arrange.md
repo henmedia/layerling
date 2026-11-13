@@ -196,6 +196,8 @@ For at gøre en eller flere dele større eller mindre med den samme andel, for e
 
 Under {{ui:scalePercent.percent}} taster du den nye størrelse som en procent af den aktuelle: 120 % er en femtedel større, 50 % halv størrelse. Bredde, dybde og højde ændres ens, så proportionerne bevares. Bunden bliver hvor den er, så intet synker ned i pladen.
 
+Til modelbygning vælger du {{ui:scalePercent.by.scale}} i stedet for {{ui:scalePercent.by.percent}} øverst. {{ui:scalePercent.scalePresets}} har de almindelige skalaer fra Z (1:220) til G (1:22,5), og i {{ui:scalePercent.ratio}} taster du enhver anden skala, fx 35 for 1:35. Er modellen bygget i forbilledets virkelige størrelse, så lad {{ui:scalePercent.original.fullSize}} være valgt: 1:87 gør den 87 gange mindre. Har du bygget den i en vilkårlig størrelse, vælg {{ui:scalePercent.original.realSize}}, så {{ui:scalePercent.axis.height}} eller {{ui:scalePercent.axis.length}} (den længste side på pladen), og tast i {{ui:scalePercent.realSize}}, hvor stort forbilledet virkelig er, i meter (i fod med tommeenheder). Et træ, der i virkeligheden er 16 m højt, bliver så 16.000 mm / 87 = 184 mm højt i H0, uanset hvor stort det var før. Den nye størrelse står under felterne, før du trykker på {{ui:scalePercent.apply}}. Skalaen bliver stående, så længe editoren er åben.
+
 Med flere dele vælger du hvordan de vokser:
 
 - **{{ui:scalePercent.mode.together}}:** Delene vokser omkring deres fælles centrum, og mellemrummene vokser med dem. Hele bliver større som om det var én del.

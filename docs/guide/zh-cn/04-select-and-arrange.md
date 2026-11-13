@@ -187,6 +187,8 @@ AI 可以通过 MCP 桥接使用 `layerling_push_face` 完成同样的事（参�
 
 在 {{ui:scalePercent.percent}} 下，以当前尺寸的百分比输入新尺寸：120 % 表示放大五分之一，50 % 表示缩小一半。宽度、深度和高度会同样变化，因此比例保持不变。底部保持在原处，所以不会有东西陷入平台。
 
+做模型时，在顶部选择 {{ui:scalePercent.by.scale}} 而不是 {{ui:scalePercent.by.percent}}。{{ui:scalePercent.scalePresets}} 列出从 Z（1:220）到 G（1:22.5）的常用比例，在 {{ui:scalePercent.ratio}} 中可以输入任何其他比例，例如输入 35 表示 1:35。如果模型是按原物实际尺寸做的，保持 {{ui:scalePercent.original.fullSize}}：1:87 会把它缩小到 1/87。如果你按任意尺寸做的，选择 {{ui:scalePercent.original.realSize}}，再选 {{ui:scalePercent.axis.height}} 或 {{ui:scalePercent.axis.length}}（平台上最长的一边），并在 {{ui:scalePercent.realSize}} 中输入原物的实际大小，单位为米（英制单位时为英尺）。一棵实际高 16 米的树，在 H0 中就变成 16000 mm / 87 = 184 mm 高，无论它原来多大。按下 {{ui:scalePercent.apply}} 之前，新尺寸会显示在字段下方。只要编辑器开着，比例就保持不变。
+
 选中多个零件时，可以选择它们如何增长：
 
 - **{{ui:scalePercent.mode.together}}：** 零件围绕它们的共同中心增大，间隙也随之增大。整体就像一个大零件一样变大。

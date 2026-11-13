@@ -93,7 +93,7 @@ Az MI ugyanazokkal a funkciókkal dolgozik, mint te, ugyanazon az úton, mint a 
 | `layerling_import_mesh` | háromszöghálót hoz be a tervbe |
 | `layerling_update_object` | méreteket, helyzetet, színt, nevet, tömör vagy lyuk állapotot és minden mást módosít, ami az alakzathoz tartozik, egy szöveg betűélét is |
 | `layerling_align_objects` | objektumokat igazít egymáshoz |
-| `layerling_scale_objects` | objektumokat méretez százalékban, együtt vagy mindegyiket a helyén |
+| `layerling_scale_objects` | objektumokat méretez százalékban, együtt vagy mindegyiket a helyén, vagy modellméretarányra, például 1:87-re |
 | `layerling_lay_flat` | egy objektumot az egyik lapjával a tárgyasztalra fektet |
 | `layerling_place_on_face` | objektumokat tesz le egy másik objektum lapjára, a ferdékre is, mint a C billentyű |
 | `layerling_perforate_face` | lyukmintát vág egy sík lapba vagy egy henger, cső vagy furat kerek falára körbe; a lyukak a testtel csoportosított lyukak maradnak |
