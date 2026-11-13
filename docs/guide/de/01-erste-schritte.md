@@ -27,7 +27,7 @@ Wenn du mit der Maus über ein Symbol fährst, steht sein Name da, auch bei eine
 - **Neben der Ansichtsleiste** öffnet sich die **Objektliste** ([[Strg]]+[[U]]) mit allen Formen des Entwurfs. Mehr dazu in [Auswählen und anordnen](chapter:auswaehlen-und-anordnen).
 - **Rechts neben dem Ansichtswürfel** erscheint die **Statusmeldung**, wenn layerling dir etwas mitzuteilen hat, etwa was ein Werkzeug gerade von dir erwartet. Gibt es nichts zu sagen, ist sie nicht da.
 - **Werkzeugfenster** öffnen sich über der Arbeitsebene, wenn du ein Werkzeug wie Verrunden, Muster oder Aushöhlen startest. An ihrer Titelleiste schiebst du sie beiseite, wenn sie etwas verdecken.
-- **Ganz oben** wechselst du zwischen {{ui:editor.modeGeometry}} und {{ui:editor.modeSketch}}, benennst den Entwurf um und stellst Sprache und Farbschema ein.
+- **In der Titelleiste** wechselst du zwischen {{ui:editor.modeGeometry}} und {{ui:editor.modeSketch}}, benennst den Entwurf um, stellst Sprache und Farbschema ein und findest die Hilfefunktionen.
 
 ## Die Knöpfe rund um die Arbeitsfläche
 
