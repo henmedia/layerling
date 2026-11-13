@@ -1,14 +1,132 @@
 [
   {
     "title": {
-      "de": "Hülle mit offenen Löchern",
-      "en": "Hull with open holes",
-      "da": "Hylster med åbne huller"
+      "de": "Keil: Neigungswinkel in den Eigenschaften",
+      "en": "Wedge: the slope angle in its properties",
+      "da": "Kile: hældningsvinklen i egenskaberne"
     },
     "body": {
-      "de": "Eine Hülle füllt alles, was in ihren Teilen hohl ist: ein Rohr, einen ausgehöhlten Zylinder, Löcher in einer Gruppe. Mit „Löcher der Teile behalten“ unter Eigenschaften bleiben sie offen, und die Hülle füllt nur den Raum zwischen den Teilen.",
-      "en": "A hull fills whatever is hollow in its parts: a tube, a hollowed cylinder, the holes in a group. With Keep the parts' holes under Properties they stay open, and the hull only fills the space between the parts.",
-      "da": "Et hylster fylder alt, hvad der er hult i dets dele: et rør, en udhulet cylinder, hullerne i en gruppe. Med „Bevar delenes huller“ under Egenskaber forbliver de åbne, og hylsteret fylder kun rummet mellem delene."
+      "de": "Die Eigenschaften des Keils zeigen jetzt neben Länge, Breite und Höhe den Neigungswinkel seiner Schräge. Tippst du einen Winkel ein, passt sich die Höhe bei gleicher Breite an. So stellst du eine Arbeitsebene auf der Schräge genau auf den Winkel, den du brauchst, ohne Winkelmesser.",
+      "en": "The wedge's properties now show the slope angle beside length, width and height. Type an angle and the height changes to match at the same width. So you can set a workplane on its slope to exactly the angle you need, without a protractor.",
+      "da": "Kilens egenskaber viser nu hældningsvinklen ved siden af længde, bredde og højde. Skriver du en vinkel ind, ændrer højden sig, så den passer ved samme bredde. Så kan du sætte et arbejdsplan på kildens hældning i præcis den vinkel, du har brug for, uden en gradskive."
+    },
+    "guide": {
+      "chapter": "shapes"
     }
+  },
+  {
+    "title": {
+      "de": "Druckplatte ausblenden, Arbeitsebene auf der Fläche bleibt",
+      "en": "Hide the build plate, keep the workplane on the face",
+      "da": "Skjul byggepladen, behold arbejdsplanet på fladen"
+    },
+    "body": {
+      "de": "Liegt eine Arbeitsebene auf einer Fläche, blendet der Knopf mit dem Auge über dem Raster in der Ansichtsleiste jetzt nur die Druckplatte aus. Die Arbeitsebene auf der Fläche bleibt sichtbar und hat weiter ihr eigenes Auge.",
+      "en": "With a workplane set on a face, the button with the eye over a grid in the view bar now hides only the build plate. The workplane on the face stays visible and still has its own eye.",
+      "da": "Når et arbejdsplan er sat på en flade, skjuler knappen med øjet over et gitter i visningsbælken nu kun byggepladen. Arbejdsplanet på fladen bliver, og det har stadig sit eget øje."
+    },
+    "guide": {
+      "chapter": "view"
+    }
+  },
+  {
+    "title": {
+      "de": "Mittelkreuz des Rasters in Achsfarben",
+      "en": "The grid's centre cross in the axis colours",
+      "da": "Gitterets midterkors i aksefarver"
+    },
+    "body": {
+      "de": "Die Nulllinien des Rasters tragen jetzt die Farben der Achsenpfeile: die Linie entlang X rot, die entlang Y grün, auf der Druckplatte und auf einer Arbeitsebene auf einer Fläche. So siehst du auch an kleinen Teilen sofort, wohin welche Achse läuft.",
+      "en": "The grid's zero lines now take the colours of the axis arrows: the line along X red, the one along Y green, on the build plate and on a workplane on a face. So even on small parts you see at once which way each axis runs.",
+      "da": "Gitterets nulstreger har nu farverne fra aksepilerne: linjen langs X rød, den langs Y grøn, på byggepladen og på et arbejdsplan på en flade. Så ser du selv på en lille del straks, hvilken vej hver akse går."
+    },
+    "guide": {
+      "chapter": "view"
+    }
+  },
+  {
+    "title": {
+      "de": "Glatte Flächen bei Skizzen entlang eines Pfads",
+      "en": "Smooth faces on swept sketches",
+      "da": "Glatte flader på skitser langs en kurve"
+    },
+    "body": {
+      "de": "Eine Skizze, die entlang eines gebogenen Pfads gezogen wurde, sah körnig aus, vor allem im Slicer. Ihre Flächen werden jetzt in einem gleichmäßigen Gitter vernetzt und bleiben glatt. Ein schon gebauter Körper bekommt das, sobald er neu gebaut wird, etwa nach einer Änderung an seiner Skizze.",
+      "en": "A sketch swept along a curved path looked grainy, above all in the slicer. Its faces are now meshed in an even grid and stay smooth. A body built before gets this once it is built again, for example after a change to its sketch.",
+      "da": "En skitse, der blev trukket langs en kurve, så kornet ud, især i sliceren. Dens flader er nu meshet i et jævnt gitter og bliver glatte. Et legeme, der er bygget før, får det, når det bygges igen, for eksempel efter en ændring af sin skitse."
+    }
+  },
+  {
+    "title": {
+      "de": "Meldung nach jedem Schritt abschaltbar",
+      "en": "The message after each step can be switched off",
+      "da": "Beskeden efter hvert trin kan slås fra"
+    },
+    "body": {
+      "de": "Nach einem Schritt wie Vereinen sagt eine kurze Meldung neben dem Ansichtswürfel, was geschehen ist, und bietet Rückgängig an. Wer sie nicht braucht, schaltet sie in den Einstellungen unter „Darstellung: die Ansicht“ mit „Nach jedem Schritt eine Meldung zeigen“ ab. Meldungen, die etwas von dir wollen oder ein Problem melden, erscheinen weiter, und Rückgängig im Menüband nennt den Schritt, wenn du darauf zeigst.",
+      "en": "After a step such as a union, a short message beside the view cube says what was done and offers Undo. If you don't need it, switch it off in the settings under \"Appearance: the view\" with \"Show a message after each step\". Messages that want something from you or report a problem still appear, and Undo in the ribbon names the step when you point at it.",
+      "da": "Efter et trin som en forening siger en kort besked ved siden af visningsterningen, hvad der skete, og tilbyder Fortryd. Har du ikke brug for den, slår du den fra i indstillingerne under \"Udseende\" med \"Vis en besked efter hvert trin\". Beskeder, der vil have noget af dig eller melder et problem, vises stadig, og Fortryd i båndet nævner stadig trinnet, når du peger på det."
+    },
+    "guide": {
+      "section": "settingsView"
+    }
+  },
+  {
+    "title": {
+      "de": "Strecken: eine Gruppe bleibt eine Gruppe",
+      "en": "Stretch: a group stays a group",
+      "da": "Stræk: en gruppe bliver en gruppe"
+    },
+    "body": {
+      "de": "Wer eine Gruppe streckt, bekommt jetzt wieder eine Gruppe, die sich auflösen lässt. Die Teile, durch die die Ebene geht, werden länger, die Teile dahinter rücken mit, und die davor bleiben, wie sie sind. Löcher bleiben Löcher. Auch ein mit ausgewähltes Objekt, das ganz jenseits der Ebene liegt, rückt mit.",
+      "en": "Stretching a group now gives a group again, one you can ungroup. The parts the plane crosses get longer, the parts beyond it move along, and those before it stay as they were. Holes stay holes. An object selected with the others that lies wholly beyond the plane moves along too.",
+      "da": "At strække en gruppe giver nu igen en gruppe, som du kan opløse. De dele, planet gennemskærer, bliver længere, de dele, der ligger uden for, flytter med, og de foran bliver, som de var. Huller bliver huller. Et objekt, der er markeret sammen med de andre og ligger helt uden for planet, flytter også med."
+    },
+    "guide": {
+      "section": "splitting"
+    }
+  },
+  {
+    "title": {
+      "de": "3D-Maus: Ansicht ruckelt nicht mehr beim freien Drehen",
+      "en": "3D mouse: the view no longer stutters when turned freely",
+      "da": "3D-mus: visningen rykker ikke længere, når du drejer den frit"
+    },
+    "body": {
+      "de": "Wer die Kappe einer SpaceMouse zugleich dreht und kippt, bekam bisher manchmal kleine Sprünge in der Ansicht. Die Bewegungen der Kappe werden jetzt kurz geglättet, so dass die Ansicht ruhig folgt. Lässt du los, bleibt sie sofort stehen.",
+      "en": "Twisting and tilting the cap of a SpaceMouse at the same time sometimes made the view jump a little. The cap's movements are now smoothed briefly, so the view follows calmly. Let go, and it stops at once.",
+      "da": "Når du både drejer og vipper hætten på en SpaceMouse, kom visningen nogle gange til at springe lidt. Kappens bevægelser glattes nu kortvarigt, så visningen følger roligt med. Slipper du, stopper den med det samme."
+    },
+    "guide": {
+      "chapter": "view"
+    }
+  },
+  {
+    "title": {
+      "de": "Symbolschild behält seine Karte nach „Bündel bearbeiten“",
+      "en": "An icon tag keeps its card after Edit Bundle",
+      "da": "Et ikon-tag beholder sit kort efter \"Redigér bundt\""
+    },
+    "body": {
+      "de": "Wer ein Symbolschild mit „Bündel bearbeiten“ öffnete oder in der Objektliste eine seiner Schichten anklickte, fand nach „Fertig“ nur noch die Eigenschaften eines Bündels: Die Karte mit Schichten, Randbreiten, Höhen und Schlüsselring-Loch war weg. Jetzt bleibt sie. Dasselbe gilt für Namensschilder, QR-Codes und SBC-Platinen.",
+      "en": "Opening an icon tag with Edit Bundle, or clicking one of its layers in the Objects list, left only the bundle's properties after Done: the card with the layers, border widths, heights and key ring hole was gone. Now it stays. The same goes for name tags, QR codes and SBC boards.",
+      "da": "Åbnede du et ikon-tag med \"Redigér bundt\", eller klikkede du på et af dets lag i objektlisten, stod der efter \"Færdig\" kun bundtets egenskaber: kortet med lagene, kantbredderne, højderne og nøgleringshullet var væk. Nu bliver kortet der. Det samme gælder navneskilte, QR-koder og SBC-print."
+    },
+    "guide": {
+      "section": "iconTag"
+    }
+  },
+  {
+    "title": {
+      "de": "Sicherung ohne Speicherfenster: „Stattdessen herunterladen“",
+      "en": "Backups without the save dialog: \"Download instead\"",
+      "da": "Sikkerhedskopier uden gem-vinduet: \"Download i stedet\""
+    },
+    "body": {
+      "de": "Auf manchen PCs schließt sich das Speicherfenster von Chrome und Edge nach dem Speichern, gibt aber keine Datei zurück, und „Alle sichern“ endete dann ohne Sicherung. Die Meldung hat jetzt den Knopf „Stattdessen herunterladen“: Die Sicherung landet dann als normaler Download im Download-Ordner. Das gilt auch für die Sicherung eigener Formen.",
+      "en": "On some PCs the save dialog of Chrome and Edge closes after Save but hands back no file, and Back up all then ended without a backup. The message now has a \"Download instead\" button: the backup then goes into the Downloads folder as a normal download. The same goes for backing up custom shapes.",
+      "da": "På nogle pc'er lukker gem-vinduet i Chrome og Edge sig efter Gem, men giver ingen fil tilbage, og Sikkerhedskopiér alle endte så uden en sikkerhedskopi. Beskeden har nu en knap \"Download i stedet\": sikkerhedskopien lægger så i mappen Downloads som en almindelig download. Det samme gælder sikkerhedskopi af egne former."
+    },
+    "guide": { "section": "backingUp" }
   }
 ]
