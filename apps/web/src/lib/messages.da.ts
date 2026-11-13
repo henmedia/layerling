@@ -1416,7 +1416,7 @@ export const MESSAGES_DA: Partial<Record<MessageKey, string>> = {
   "welcome.moreSbcTitle": "SBC-print",
   "welcome.moreSbcBody": "Raspberry Pi 5, 4, 3 B+ og Zero 2 W og BIGTREETECH Pi i fuld størrelse, med monteringshuller, stik og større chips - til at bygge en kasse omkring. Grupperet med kassen som hul skærer printet åbningerne til sine stik, med den frigang du giver dem.",
   "welcome.morePatternTitle": "Mønstre",
-  "welcome.morePatternBody": "gentag en form n gange i række, i et gitter eller rundt i en cirkel, til hulgitre eller tandede ringe – og skalér flere dele på én gang med en procent. Alt på et justeringspunkt strækker dele til en anden dels kant eller størrelse i stedet for at flytte dem. Punktet ved siden af hver justeringslinje fordeler dele i forskellige størrelser med lige store mellemrum, også på en plade og række for række.",
+  "welcome.morePatternBody": "gentag en form n gange i række, i et gitter eller rundt i en cirkel, til hulgitre eller tandede ringe – og skalér flere dele på én gang med en procent eller til en modelskala som 1:87. Alt på et justeringspunkt strækker dele til en anden dels kant eller størrelse i stedet for at flytte dem. Punktet ved siden af hver justeringslinje fordeler dele i forskellige størrelser med lige store mellemrum, også på en plade og række for række.",
   "welcome.moreBundleTitle": "Bundt",
   "welcome.moreBundleBody": "hold dele sammen med Ctrl+B som i Tinkercad, uden at flette dem – farver bevares og hver del er sin egen form i eksporten, praktisk til flerfarvede print. En gruppe viser også hver del i sin egen farve, med Multifarve-knappen, også efter den er flettet med huller.",
   "welcome.moreWorkplaneTitle": "Arbejdsplan på enhver flade",
