@@ -6,6 +6,8 @@ code still carries it - so a lower number further down is older, not newer.
 
 ## Unreleased
 
+- **A mirrored cone keeps its direction in a group (Discussion #1733):** Two cones with a gentle taper, mirrored top to bottom, came out upside down once they were grouped. The kernel built the cone (and box, sphere and cylinder) without the shape's mirror; a box, a ball and an even cylinder look the same either way, a cone with two radii does not. The mirror is now applied about the shape's middle before it is turned, as the mesh does it, so the merged body of a group, a union, a cut and a hollowing agree with what the viewport shows. Unit test `mirroredConeUnion`. Reported by @craig-childs.
+
 - **Settings: Controls and Saving and export as areas of their own (Discussion #1013):** The Appearance area had grown into a catch-all, with the mouse and 3D mouse settings far down and the Save STL / Save designs as a download options among the colours. It now keeps the looks (theme, colours, edges, shadows, measures, start view); **Controls** takes the mouse scheme, zoom and pan speed, camera inertia, 3D mouse, selecting and moving, double click, object snap and cruise; **Saving and export** takes Save STL as a download, Save designs as a download and the question before a tab closes. The question marks of the new areas open the guide where those settings are described. Four texts in 15 languages, guide chapter 2 in every language names the areas, What's new card. Suggested by @Jeff-Haas.
 
 - **16mm scale among the model scales (Discussion #1732):** Scale by percent, Model scale, offers 16mm, 16 mm to the foot or 1:19.05 (the scale SM32 and SM45 narrow gauge is built to), after G; the preset carries the name modellers use. Guide chapter 4 in every language.

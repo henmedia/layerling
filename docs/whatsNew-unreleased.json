@@ -57,5 +57,15 @@
       "de": "Teilen die gewählten Formen nichts, schließt der zweite Klick auf „Schnittmenge“ jetzt die Vorschau: Die Formen sind wieder fest, der Knopf nicht mehr gedrückt, und eine Meldung sagt, dass nichts geändert wurde. Vorher blieb die Vorschau offen, und am Tablet gab es ohne Esc keinen Ausweg.",
       "en": "When the selected shapes share nothing, the second click on Intersection now closes the preview: the shapes are solid again, the button is no longer pressed, and a message says nothing was changed. Before, the preview stayed open, and on a tablet without Esc there was no way out."
     }
+  },
+  {
+    "title": {
+      "de": "Gespiegelte Kegel bleiben beim Gruppieren richtig herum",
+      "en": "Mirrored cones keep their direction when grouped"
+    },
+    "body": {
+      "de": "Ein Kegel, der oben und unten gespiegelt war, stand nach dem Gruppieren wieder auf dem Kopf, weil die Spiegelung beim Zusammenführen verloren ging. Jetzt bleibt er so, wie er vor dem Gruppieren zu sehen war, auch beim Verbinden, Ausschneiden und Aushöhlen.",
+      "en": "A cone mirrored top to bottom came out upside down once it was grouped, because the mirror was lost when the parts were merged. It now stays as it looked before grouping, also when joining, cutting and hollowing."
+    }
   }
 ]
