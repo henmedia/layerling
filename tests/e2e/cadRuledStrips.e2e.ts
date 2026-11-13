@@ -8,8 +8,10 @@ import { pathWire } from "@/lib/sketchCadWire";
 import { SKETCH_CAD_DEFLECTION } from "@/lib/cadModifierRuntime";
 import { cadMeshHasOpenEdges } from "@/lib/cadMeshAccuracy";
 import { tessellateWithRuledStrips } from "@/lib/cadRuledStrips";
+import { buildSweptSketchSolid } from "@/lib/cadSketchSweep";
 
-// #1696: the side of an extruded curve meshed in straight strips instead of OCCT's leaning triangles.
+// #1696: the side of an extruded curve meshed in straight strips instead of OCCT's leaning triangles, and the faces of
+// a sweep in an even grid.
 
 let cad: OcctKernel;
 const options = { linearDeflection: SKETCH_CAD_DEFLECTION.linear, angularDeflection: SKETCH_CAD_DEFLECTION.angular };
@@ -132,5 +134,94 @@ describe("straight strips on extruded curves (#1696)", () => {
     expect(mesh.triangleCount).toBe(kernelMesh.triangleCount);
     const sphere = cad.makeSphere(8);
     expect(tessellateWithRuledStrips(cad, sphere, options).triangleCount).toBe(cad.tessellate(cad.makeSphere(8), options).triangleCount);
+  });
+});
+
+/**
+ * The reporter's sweep: a lens 1 mm across and 5 mm tall (a straight side and a curve meeting it at both ends) swept
+ * along a path of two curves, 11 mm straight down and 6 mm with a slight bend.
+ */
+const lensSweep: SketchProfile = {
+  points: [
+    { id: "a", x: -10, z: -10, mode: "split", handleIn: { x: -10, z: -8.5 }, handleOut: { x: -10, z: -9 } },
+    { id: "b", x: -9, z: -7.5, mode: "smooth", handleIn: { x: -9, z: -8.5 }, handleOut: { x: -9, z: -6.5 } },
+    { id: "c", x: -10, z: -5, mode: "split", handleIn: { x: -10, z: -6 }, handleOut: { x: -10, z: -6.5 } },
+    { id: "p0", x: 0, z: 0, mode: "corner", handleOut: { x: 0, z: -4 } },
+    { id: "p1", x: 0, z: -11, mode: "smooth", handleIn: { x: 0, z: -8 }, handleOut: { x: 0, z: -14 } },
+    { id: "p2", x: 1, z: -17, mode: "corner", handleIn: { x: 2 / 3, z: -15 - 1 / 3 } },
+  ],
+  segments: [
+    { id: "s0", kind: "bezier", startId: "a", endId: "b" },
+    { id: "s1", kind: "bezier", startId: "b", endId: "c" },
+    { id: "s2", kind: "bezier", startId: "c", endId: "a" },
+    { id: "q0", kind: "bezier", startId: "p0", endId: "p1", construction: true },
+    { id: "q1", kind: "bezier", startId: "p1", endId: "p2", construction: true },
+  ],
+};
+
+/** How far any triangle tilts off the exact surface nearest its middle, in degrees (either way round). */
+function worstTilt(shape: ReturnType<OcctKernel["makeBox"]>, mesh: Meshed) {
+  const faces = cad.getSubShapes(shape, "face");
+  let worst = 0;
+  for (let triangle = 0; triangle < mesh.triangleCount; triangle += 1) {
+    const p = [0, 1, 2].map((k) => {
+      const v = mesh.indices[triangle * 3 + k] * 3;
+      return [mesh.positions[v], mesh.positions[v + 1], mesh.positions[v + 2]];
+    });
+    const u = p[1].map((x, i) => x - p[0][i]);
+    const w = p[2].map((x, i) => x - p[0][i]);
+    const n = [u[1] * w[2] - u[2] * w[1], u[2] * w[0] - u[0] * w[2], u[0] * w[1] - u[1] * w[0]];
+    const length = Math.hypot(n[0], n[1], n[2]);
+    if (!(length > 0)) continue;
+    const middle = { x: (p[0][0] + p[1][0] + p[2][0]) / 3, y: (p[0][1] + p[1][1] + p[2][1]) / 3, z: (p[0][2] + p[1][2] + p[2][2]) / 3 };
+    // Where two faces meet at a knife edge (the lens's tips) both lie as near: the one the triangle lies on counts.
+    const near = faces.map((face) => {
+      const on = cad.projectPointOnFace(face, middle);
+      const uv = cad.uvFromPoint(face, on);
+      const normal = cad.surfaceNormal(face, uv.u, uv.v);
+      const dot = Math.abs(n[0] * normal.x + n[1] * normal.y + n[2] * normal.z) / length;
+      return { gap: Math.hypot(on.x - middle.x, on.y - middle.y, on.z - middle.z), tilt: (Math.acos(Math.min(1, dot)) * 180) / Math.PI };
+    });
+    const nearest = Math.min(...near.map((entry) => entry.gap));
+    const tilt = Math.min(...near.filter((entry) => entry.gap <= nearest + 0.02).map((entry) => entry.tilt));
+    worst = Math.max(worst, tilt);
+  }
+  return worst;
+}
+
+describe("an even grid on the faces of a sweep (#1696)", () => {
+  it("meshes the reporter's sweep with triangles that lie on the surface, closed and of the same volume", () => {
+    const solid = buildSweptSketchSolid(cad, lensSweep);
+    const kernelMesh = cad.tessellate(buildSweptSketchSolid(cad, lensSweep), options);
+    const mesh = tessellateWithRuledStrips(cad, solid, options);
+    // Measured: the kernel's triangles tilt up to 11.2 degrees off the surface, the grid's 1.2.
+    expect(worstTilt(solid, kernelMesh)).toBeGreaterThan(7);
+    expect(worstTilt(solid, mesh)).toBeLessThan(3);
+    expect(cadMeshHasOpenEdges(mesh)).toBe(false);
+    const exact = cad.getVolume(solid);
+    expect(Math.abs(meshVolume(mesh) - exact)).toBeLessThan(exact * 0.01);
+    expect(new Set(mesh.indices).size).toBe(mesh.vertexCount);
+    // Every new point has a normal to shade with.
+    for (let vertex = 0; vertex < mesh.vertexCount; vertex += 1) {
+      expect(Math.hypot(mesh.normals[vertex * 3], mesh.normals[vertex * 3 + 1], mesh.normals[vertex * 3 + 2])).toBeGreaterThan(0.5);
+    }
+  });
+
+  it("keeps the sweep closed with a hole cut through it", () => {
+    const hole = cad.translate(cad.makeBox(4, 0.8, 0.8), -1.5, 2.1, -8.4);
+    const solid = cad.cut(buildSweptSketchSolid(cad, lensSweep), hole);
+    const mesh = tessellateWithRuledStrips(cad, solid, options);
+    expect(cadMeshHasOpenEdges(mesh)).toBe(false);
+    const exact = cad.getVolume(solid);
+    expect(exact).toBeLessThan(cad.getVolume(buildSweptSketchSolid(cad, lensSweep)) - 0.1);
+    expect(Math.abs(meshVolume(mesh) - exact)).toBeLessThan(exact * 0.01);
+  });
+
+  it("leaves a filleted box as the kernel meshed it", () => {
+    const filleted = () => {
+      const box = cad.makeBox(20, 10, 8);
+      return cad.fillet(box, cad.getSubShapes(box, "edge"), 2);
+    };
+    expect(tessellateWithRuledStrips(cad, filleted(), options).triangleCount).toBe(cad.tessellate(filleted(), options).triangleCount);
   });
 });
