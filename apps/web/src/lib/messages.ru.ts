@@ -3325,6 +3325,7 @@ export const MESSAGES_RU: Partial<Record<MessageKey, string>> = {
   "prop.twist": "Скручивание",
   "prop.widthOffset": "Смещение по ширине",
   "prop.tiltedMeasures": "Тело наклонено: длина, ширина и высота — его собственные размеры, а не направления в пространстве.",
+  "prop.tiltedOverall": "Общий размер в пространстве: длина {length}, ширина {width}, высота {height} ({unit}).",
   "prop.settingsBeforeEdgeFeature": "Сделано из: {shape}. Собственные настройки вернутся, если отменить обработку кромки: {fillet}, {chamfer} или {hollow}, затем {undo} в разделе «{list}».",
   "prop.lengthOffset": "Смещение по длине",
   "font.manage": "Ваши шрифты…",

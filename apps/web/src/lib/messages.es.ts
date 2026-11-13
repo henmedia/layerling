@@ -3334,6 +3334,7 @@ export const MESSAGES_ES: Partial<Record<MessageKey, string>> = {
   "prop.twist": "Torsión",
   "prop.widthOffset": "Desplazamiento a lo ancho",
   "prop.tiltedMeasures": "El cuerpo está inclinado: longitud, anchura y altura son sus propias medidas, no las direcciones del espacio.",
+  "prop.tiltedOverall": "Tamaño total en el espacio: {length} de largo, {width} de ancho, {height} de alto ({unit}).",
   "prop.settingsBeforeEdgeFeature": "Hecho a partir de: {shape}. Sus propios ajustes vuelven al deshacer la operación de aristas: {fillet}, {chamfer} o {hollow} y luego {undo} en «{list}».",
   "prop.lengthOffset": "Desplazamiento a lo largo",
   "font.manage": "Tus fuentes…",

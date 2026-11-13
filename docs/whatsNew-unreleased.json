@@ -1,6 +1,19 @@
 [
   {
     "title": {
+      "de": "Gekippte Körper: die echte Höhe in den Eigenschaften",
+      "en": "Tilted bodies: the real height in the properties"
+    },
+    "body": {
+      "de": "Ein gekippter Körper zeigt in den Eigenschaften seine eigenen Maße, nicht wie hoch er im Raum steht. Unter dem Hinweis steht jetzt auch die Gesamtgröße im Raum (lang, breit, hoch), zum Ablesen. Ein um 45° gekippter Würfel von 20 mm zeigt so seine 28,3 mm Höhe.",
+      "en": "A tilted body shows its own measures in the properties, not how high it stands in space. Below the note there is now also the overall size in space (long, wide, high), for reading. A cube of 20 mm tilted by 45° shows its height of 28.3 mm that way."
+    },
+    "guide": {
+      "chapter": "shapes"
+    }
+  },
+  {
+    "title": {
       "de": "Vorlagenbild in der Skizze größer als 200 mm",
       "en": "Sketch picture larger than 200 mm"
     },

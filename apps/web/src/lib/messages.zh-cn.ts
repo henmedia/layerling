@@ -3283,6 +3283,7 @@ export const MESSAGES_ZH_CN: Partial<Record<MessageKey, string>> = {
   "prop.twist": "扭转",
   "prop.widthOffset": "宽度偏移",
   "prop.tiltedMeasures": "实体已倾斜：长度、宽度和高度是它自身的尺寸，而非空间方向上的尺寸。",
+  "prop.tiltedOverall": "空间中的总尺寸：长 {length}、宽 {width}、高 {height}（{unit}）。",
   "prop.settingsBeforeEdgeFeature": "原始形状：{shape}。撤销边处理后，它自己的设置就会回来：{fillet}、{chamfer}或{hollow}，然后在“{list}”下点{undo}。",
   "prop.lengthOffset": "长度偏移",
   "font.manage": "你自己的字体…",

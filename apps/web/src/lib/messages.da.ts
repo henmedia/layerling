@@ -3734,6 +3734,7 @@ export const MESSAGES_DA: Partial<Record<MessageKey, string>> = {
   "prop.twist": "Snoing",
   "prop.widthOffset": "Breddeoffset",
   "prop.tiltedMeasures": "Formen er tiltet: Længde, Bredde og Højde er dens egne mål, ikke retningerne i rummet.",
+  "prop.tiltedOverall": "Samlet størrelse i rummet: {length} lang, {width} bred, {height} høj ({unit}).",
   "prop.settingsBeforeEdgeFeature": "Lavet af: {shape}. Dens egne indstillinger kommer tilbage, når kantbehandlingen fortrydes: {fillet}, {chamfer} eller {hollow}, derefter {undo} under \"{list}\".",
   "prop.lengthOffset": "Længdeoffset",
   "font.manage": "Dine egne fonte …",

@@ -179,7 +179,8 @@ import {
   minBentTubeBendRadius,
   normalizedBentTubeFields,
 } from "@/lib/bentTubeGeometry";
-import { displayStepFromMillimeters, formatFractionalInches, showsInchFractions, displayToMillimeters, formatMeasurementNumber, lengthDisplayUnit, measurementOptionLabel, millimetersToDisplay, parseMeasurementInput, resolveMeasurementInput } from "@/lib/measurementUnits";
+import { alignBounds } from "@/lib/alignSize";
+import { currentLengthUnitLabel, displayStepFromMillimeters, formatFractionalInches, showsInchFractions, displayToMillimeters, formatMeasurementNumber, lengthDisplayUnit, measurementOptionLabel, millimetersToDisplay, parseMeasurementInput, resolveMeasurementInput } from "@/lib/measurementUnits";
 import { numberLocale, t, type MessageKey } from "@/lib/i18n";
 import { localizedError } from "@/lib/userErrors";
 import { normalizeHexColor } from "@/lib/coloredImport";
@@ -5405,7 +5406,19 @@ export function ShapeInspector({
             ) : null}
             {/* Only the plain Length, Width and Height need the note; a Head diameter means the same at any angle (#1634). */}
             {tiltedMeasures && primaryProperties.some((property) => isPlainMeasure(property, MEASURE_LABELS())) ? (
-              <p className="cylinder-wrap-hint">{t("prop.tiltedMeasures")}</p>
+              <>
+                <p className="cylinder-wrap-hint">{t("prop.tiltedMeasures")}</p>
+                {(() => {
+                  // What the tilted body measures in space, read only: its own measures cannot say how high it stands (#1730).
+                  const box = alignBounds(shape);
+                  const size = (value: number) => formatPropertyNumber(millimetersToDisplay(value, workspace), workspace.accuracy, 0.1);
+                  return (
+                    <p className="cylinder-wrap-hint">
+                      {t("prop.tiltedOverall", { length: size(box.maxZ - box.minZ), width: size(box.maxX - box.minX), height: size(box.maxY - box.minY), unit: currentLengthUnitLabel() })}
+                    </p>
+                  );
+                })()}
+              </>
             ) : null}
             {kindBeforeEdgeTreatments ? (
               <p className="cylinder-wrap-hint">{t("prop.settingsBeforeEdgeFeature", {

@@ -3297,6 +3297,7 @@ export const MESSAGES_PL: Partial<Record<MessageKey, string>> = {
   "prop.twist": "Skręt",
   "prop.widthOffset": "Przesunięcie w szerokości",
   "prop.tiltedMeasures": "Bryła jest pochylona: Długość, Szerokość i Wysokość to jej własne wymiary, a nie kierunki w przestrzeni.",
+  "prop.tiltedOverall": "Całkowity rozmiar w przestrzeni: długość {length}, szerokość {width}, wysokość {height} ({unit}).",
   "prop.settingsBeforeEdgeFeature": "Powstało z: {shape}. Własne ustawienia wracają po cofnięciu obróbki krawędzi: {fillet}, {chamfer} lub {hollow}, potem {undo} w sekcji „{list}”.",
   "prop.lengthOffset": "Przesunięcie w długości",
   "font.manage": "Własne czcionki …",
