@@ -48,7 +48,7 @@ Ved venstre kant er en smal bjælke. Fra toppen:
 - {{ui:camera.orthographic}} skifter til en flad visning hvor parallelle kanter forbliver parallelle. Til måling og justering af kanter er det ofte mere behageligt end perspektivvisningen. [[O]] skifter frem og tilbage, og endnu et klik vender tilbage.
 - {{ui:camera.secondView}} åbner en anden visning af designet i sit eget vindue, beskrevet nedenfor. Et klik mere lukker det.
 - {{ui:camera.showScrollbars}} viser et rullepanel langs bunden af visningen og et langs dens højre kant. Træk i et panel for at skubbe visningen jævnt, klik på en pil i enden for at flytte den en smule (hold for at fortsætte), eller klik ved siden af panelet for at flytte næsten en hel visning. Intet drejer, og i modsætning til piletasterne virker panelerne også, mens en del er valgt - praktisk tæt på små detaljer. Et klik mere skjuler dem; {{ui:workspace.startWithScrollbars}} i indstillingerne afgør, om et design åbner med dem. Denne browser husker desuden valget.
-- {{ui:camera.hideWorkplane}} (øjet over et gitter) skjuler pladen med sit gitter, så du kan se undersiden af et design nedefra. Kun visningen ændres: nye former lander stadig på arbejdsplanet. Endnu et klik viser den igen.
+- {{ui:camera.hideWorkplane}} (øjet over et gitter) skjuler pladen med sit gitter, så du kan se undersiden af et design nedefra. Kun visningen ændres: nye former lander stadig på arbejdsplanet. Endnu et klik viser den igen. Med et arbejdsplan på en flade hedder den {{ui:camera.hideBuildPlate}} og skjuler kun byggepladen: arbejdsplanet på fladen bliver, det har sit eget øje, {{ui:camera.hideFaceWorkplane}}.
 - {{ui:camera.placeWorkplane}}, målebåndet og vinkelmåleren er deres egne værktøjer, dækket nedenfor og i [Måling og noter](chapter:measuring-and-notes).
 
 Den lille pil helt øverst på bjælken skjuler den hvis den er i vejen. Den samme knap kan trækkes, så bjælken flyttes rundt i editoren, også i en skitse; et dobbeltklik sætter den tilbage. 3D-forhåndsvisningen af en revolvering flyttes på samme måde med sin titel.
@@ -104,6 +104,7 @@ Når et design rummer mere, end én plade kan printe, for eksempel en æske med 
 
 - Hver plade er lige så stor som arbejdsfladen, og pladerne ligger side om side til højre for den første, 20 mm fra hinanden. Et legeme hører til den plade, midten af dets grundflade står på, så trækker man det over, står det på den anden plade. Et design har op til 12 plader.
 - Et klik på en plade i linjen viser den, og nye former og importerede filer lander så på den. {{ui:plates.showAll}} viser dem alle. Et dobbeltklik på en plade eller {{ui:plates.rename}} giver den et navn som "Låg", der står skrevet på pladen.
+- En ny skitse på pladen begynder også på den aktive plade: skitsefladen viser den plade med legemerne på den, og det færdige legeme står der.
 - {{ui:plates.moveLeft}} og {{ui:plates.moveRight}} ændrer rækkefølgen, og legemerne følger med deres plade. {{ui:plates.remove}} fjerner den aktive plade; dens legemer kommer på den første plade samme sted.
 - {{ui:plates.arrange}} lægger de markerede legemer, eller alle, ud række for række på pladerne, de største først, 5 mm fra hinanden, og tilføjer plader, så længe der er brug for dem. Et legeme, der er større end en plade, bliver stående.
 - Med en valgt printer kontrolleres hvert legeme mod sin egen plade, og byggehøjden regnes fra det laveste legeme på den plade. En plade med et legeme, der ikke passer, viser sit tal med rødt.
@@ -159,7 +160,7 @@ Skitsevisningen har sine egne farver: {{ui:workspace.sketchBackground}} for vind
 
 ### Udseende: aksepile og kantlinjer
 
-{{ui:workspace.showAxes}} (til som standard) tegner tre pile ved pladens bagerste venstre hjørne: **X** i rød til højre, **Y** i grøn bagud og **Z** i blå opad, den måde positionsfelterne tæller på. Det er højrehåndsreglen Tinkercad, CAD-programmer og slicerne også bruger. Med arbejdsplanet på en flade følger de den. Slå dem fra her hvis de er i vejen.
+{{ui:workspace.showAxes}} (til som standard) tegner tre pile ved pladens bagerste venstre hjørne: **X** i rød til højre, **Y** i grøn bagud og **Z** i blå opad, den måde positionsfelterne tæller på. Det er højrehåndsreglen Tinkercad, CAD-programmer og slicerne også bruger. Med arbejdsplanet på en flade følger de den. Slå dem fra her hvis de er i vejen. Så længe pilene er slået til, får gitterets midterkors også deres farver: linjen langs X rød, den langs Y grøn, så du selv på en lille del straks kan se, hvilken vej hver akse går.
 
 {{ui:workspace.edgeLines}} tegner et omrids på hvert legeme, i farven {{ui:workspace.edgeColor}} (sort til at begynde med, som i Tinkercad): det hjælper når mørke farver løber sammen. Det er fra som standard, og meget store importerede meshes udelades.
 
@@ -195,6 +196,8 @@ Skitsevisningen har sine egne farver: {{ui:workspace.sketchBackground}} for vind
 
 {{ui:workspace.viewBarOpensOnHover}}: en foldet visningsbjælke åbner, mens musen er over dens pil, og folder sammen igen kort efter, at musen har forladt den, medmindre et af dens værktøjer er i brug. Et klik på pilen, mens den er åben på denne måde, holder den åben. Det gælder kun musen; på en berøringsskærm åbner et tryk bjælken som før.
 
+{{ui:workspace.showStepNotices}}: efter et trin som en forening siger en kort besked ved siden af visningsterningen, hvad der skete, og tilbyder {{ui:shortcuts.undo}}. Slået fra bliver disse beskeder væk; beskeder, der vil have noget af dig eller melder et problem, vises stadig, og {{ui:editor.tool.undo}} i båndet nævner stadig trinnet, når du peger på det.
+
 {{ui:workspace.startView}} bestemmer den vinkel, et nyt design åbner i, og som {{ui:camera.home}} vender tilbage til. Drej og zoom visningen, som du kan lide den, og klik så {{ui:workspace.startViewUseCurrent}}; {{ui:workspace.startViewStandard}} giver den sædvanlige visning forfra til højre igen. Det gælder alle designs i denne browser. Et design, du åbner igen, åbner stadig, som du forlod det.
 
 {{ui:workspace.zoomSpeed}} er en skyder fra langsom til hurtig: hvor hurtigt hjulet og trackpad'en zoomer; zoomknapperne og tasterne beholder deres egne små trin. {{ui:workspace.panSpeed}} er også en skyder fra langsom til hurtig: hvor hurtigt visningen følger musen, når du flytter den; i midten bliver det punkt, du griber, under markøren. {{ui:workspace.cameraInertia}}: når du slipper musen, drejer eller flytter visningen sig videre et øjeblik og falder blødt af. Slået fra stopper den med det samme, som i Tinkercad og Fusion 360.
@@ -205,7 +208,7 @@ Skitsevisningen har sine egne farver: {{ui:workspace.sketchBackground}} for vind
 
 ### Mål: enheder, skala og snap-trin
 
-Under {{ui:workspace.measurement}} sætter du {{ui:workspace.units}}, den enhed mål vises i ({{ui:workspace.scale}}: millimeter, centimeter eller meter i det metriske system, tommer eller fod i det imperialt system), hvor mange decimaler et tal viser ({{ui:workspace.accuracy}}), det {{ui:workspace.snapGrid}}, som flytning og skalering snapper til, og dine egne snap-trin under {{ui:workspace.customSnapGrids}}.
+Under {{ui:workspace.measurement}} sætter du {{ui:workspace.units}}, den enhed mål vises i ({{ui:workspace.scale}}: millimeter, centimeter eller meter i det metriske system, tommer eller fod i det imperiale system), hvor mange decimaler et tal viser ({{ui:workspace.accuracy}}), det {{ui:workspace.snapGrid}}, som flytning og skalering snapper til, og dine egne snap-trin under {{ui:workspace.customSnapGrids}}.
 
 Under {{ui:workspace.measurement}} i indstillingerne sætter du {{ui:workspace.units}}. Med {{ui:units.imperial}} viser layerling hvert mål i tommer, på formen, i egenskabspanelet, på målebåndet og linealen. Snapgitteret tilbyder så trin fra 1/64 til 1 tomme, og gitteret på pladen tegnes i tommer (1/8 til 1 tomme, 1/4 tomme som standard) med en stærkere linje hver hele tomme. Under {{ui:workspace.inchFormat}} vælger du om tommer vises som brøker som i Tinkercad (1 5/8, afrundet til 1/64 tomme) eller som decimaler (1.625) med så mange decimaler som sat under {{ui:workspace.accuracy}}. Du kan taste begge dele, "1 5/8" inkluderet. Hurtigere skifter du mellem millimeter og tommer med den lille kontakt **mm | in** ved siden af {{ui:inspector.snapGrid}} nederst i egenskabsvinduet: Den ændrer enheden, pladens gitter og fangtrinnet som indstillingerne, for dette design.
 
