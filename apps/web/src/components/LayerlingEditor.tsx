@@ -18254,6 +18254,9 @@ export function LayerlingEditor({
           event.preventDefault();
           exitIntersectPreview();
           setNotice("");
+          // The Intersection button was clicked and still has the focus: its frame would stay round it, and a folded
+          // group stay open while the pointer rests on it, after the preview is over (#1729).
+          if (document.activeElement instanceof HTMLButtonElement && document.activeElement.classList.contains("toolbar-icon")) document.activeElement.blur();
           return;
         }
         if (clearanceToolOpenRef.current) {
