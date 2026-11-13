@@ -1,14 +1,29 @@
 [
   {
     "title": {
-      "de": "Hülle mit offenen Löchern",
-      "en": "Hull with open holes",
-      "da": "Hylster med åbne huller"
+      "de": "Vorlagenbild in der Skizze größer als 200 mm",
+      "en": "Sketch picture larger than 200 mm",
+      "da": "Skitserbillede større end 200 mm"
     },
     "body": {
-      "de": "Eine Hülle füllt alles, was in ihren Teilen hohl ist: ein Rohr, einen ausgehöhlten Zylinder, Löcher in einer Gruppe. Mit „Löcher der Teile behalten“ unter Eigenschaften bleiben sie offen, und die Hülle füllt nur den Raum zwischen den Teilen.",
-      "en": "A hull fills whatever is hollow in its parts: a tube, a hollowed cylinder, the holes in a group. With Keep the parts' holes under Properties they stay open, and the hull only fills the space between the parts.",
-      "da": "Et hylster fylder alt, hvad der er hult i dets dele: et rør, en udhulet cylinder, hullerne i en gruppe. Med „Bevar delenes huller“ under Egenskaber forbliver de åbne, og hylsteret fylder kun rummet mellem delene."
+      "de": "Breite und Höhe eines Bildes unter der Skizze lassen sich jetzt auch über 200 mm eintippen, etwa für eine Druckplatte von 250 mm. Der Regler reicht bis zur Größe deiner Platte, und das Feld zeigt immer die echte Größe, auch nachdem du an den Griffen gezogen hast.",
+      "en": "The width and height of a picture under a sketch can now be typed past 200 mm, for a 250 mm plate for instance. The slider reaches to the size of your plate, and the field always shows the real size, also after dragging the handles.",
+      "da": "Bredden og højden af et billede under en skitse kan nu tastes over 200 mm, for eksempel til en 250 mm plade. Skyderen rækker til din plades størrelse, og feltet viser altid den virkelige størrelse, også når du har trukket i håndtagene."
+    },
+    "guide": {
+      "section": "sketchImage"
+    }
+  },
+  {
+    "title": {
+      "de": "Speichern klappt auch bei sehr langem Verlauf",
+      "en": "Saving works with a very long history too",
+      "da": "Gem virker også med en meget lang historik"
+    },
+    "body": {
+      "de": "Lehnt der Browser ein großes Design ab, obwohl noch Platz frei ist, speichert layerling es jetzt mit einem kürzeren Rückgängig-Verlauf, statt gar nicht. Ein Hinweis sagt dann, wie viele Schritte behalten wurden.",
+      "en": "If the browser refuses a large design although there is room left, layerling now saves it with a shorter undo history instead of not at all. A note then says how many steps were kept.",
+      "da": "Nægter browseren et stort design, selv om der er plads tilbage, gemmer layerling det nu med en kortere fortrydelseshistorik i stedet for slet ikke at gemme det. En note siger så, hvor mange trin der blev gemt."
     }
   }
 ]
