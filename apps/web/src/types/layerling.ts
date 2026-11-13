@@ -200,6 +200,10 @@ export type ShapeCustomization = {
   helixQuality?: number;
   /** A bevel gear's helix angle (Discussion #1299): its teeth turn while they taper, a spiral bevel gear; missing or 0 keeps them straight. */
   bevelHelixAngle?: number;
+  /** A ring gear's or a rack's helix angle (Discussion #1627): its teeth run at a slant; missing or 0 keeps them straight. */
+  ringRackHelixAngle?: number;
+  /** A ring gear or a rack with a helix angle: its teeth turn back at half the height, herringbone teeth (Discussion #1627). */
+  ringRackHerringbone?: boolean;
   /** Involute teeth (#201) or the straight ones every gear had before; missing means straight. */
   gearProfile?: GearProfile;
   /** Involute teeth: pressure angle in degrees (20 by default). */
@@ -268,8 +272,10 @@ export type ShapeCustomization = {
   hingeKnuckleWidth?: number;
   /** Hinge, cone style: the diameter of the cones at their root in mm; left out, the largest that fits (#907). */
   hingeConeSize?: number;
-  /** Hinge: "pin" (default) or "cone": cones on every other knuckle that nest into the others, printing without bridges (#907). */
-  hingeStyle?: "pin" | "pinless" | "cone" | "liftOff";
+  /** Hinge: "pin" (default) or "cone": cones on every other knuckle that nest into the others, printing without bridges (#907); "snap": B's knuckles are open clips that snap over A's pin (#1520). */
+  hingeStyle?: "pin" | "pinless" | "cone" | "liftOff" | "snap";
+  /** Hinge, snap style: how much narrower the clips' opening is than the pin in mm; left out, 0.3 (#1520). */
+  hingeSnapGrip?: number;
   /** Hinge: diameter of the pin in mm; the other part's bore is wider by the clearance. */
   hingePinDiameter?: number;
   /** Hinge: thickness of the two leaves in mm. */
@@ -464,6 +470,8 @@ export type ShapeCustomization = {
   screwHoleSlot?: boolean;
   /** Countersink and double countersink: how far in mm the head sits below the face (Discussion #1531), as on the shape. */
   screwHoleRecess?: number;
+  /** Counterbore: a 45-degree chamfer in mm at the rim of the pocket (Discussion #1632), as on the shape. */
+  screwHoleChamfer?: number;
   /** Port opening: rounded corners, or the lower ones cut off as on an HDMI or DisplayPort socket. */
   portProfile?: PortProfile;
   /** Port opening: extra room in mm on every side on top of the preset's, already in width and height; it lets the preset be recognised. */
@@ -586,6 +594,8 @@ export type WorkplaneWorkspaceSettings = {
   dimensionAxisColors: boolean;
   /** A turned body shows its angles about X, Y and Z beside it while it is selected. */
   showRotationAngles: boolean;
+  /** The red X and green Y arrows round the top of a selection that move it along one axis (Discussion #1434); on by default. */
+  showSlideArrows: boolean;
   /** The editor opens a design with the view's scrollbars shown (Discussion #1241); the view bar still switches them. */
   startWithScrollbars: boolean;
   /** A folded view bar opens while the mouse is over its arrow and folds again once the mouse has left it (Discussion #1552). */
@@ -1088,6 +1098,11 @@ export type WorkplaneShape = {
   /** Side drop: -1 to 1, 0 a straight line from the middle to the edge, above 0 bulging up, below 0 sagging. */
   sideCurve?: number;
   /**
+   * Only on a tube's bore split off as a hole (splitBoreTube), never saved: the width and depth of the
+   * tube around it. Its slope and side drop are measured over the tube, so its top lies on the tube's (#1698).
+   */
+  slopeSpan?: { width: number; depth: number };
+  /**
    * Narrow along: seen from above, the width of the narrow end in mm,
    * both long sides running in evenly. Missing or the full width means no narrowing.
    */
@@ -1121,6 +1136,10 @@ export type WorkplaneShape = {
   helixQuality?: number;
   /** A bevel gear's helix angle (Discussion #1299): its teeth turn while they taper, a spiral bevel gear; missing or 0 keeps them straight. */
   bevelHelixAngle?: number;
+  /** A ring gear's or a rack's helix angle (Discussion #1627): its teeth run at a slant; missing or 0 keeps them straight. */
+  ringRackHelixAngle?: number;
+  /** A ring gear or a rack with a helix angle: its teeth turn back at half the height, herringbone teeth (Discussion #1627). */
+  ringRackHerringbone?: boolean;
   /** Involute teeth (#201) or the straight ones every gear had before; missing means straight. */
   gearProfile?: GearProfile;
   /** Involute teeth: pressure angle in degrees (20 by default). */
@@ -1189,8 +1208,10 @@ export type WorkplaneShape = {
   hingeKnuckleWidth?: number;
   /** Hinge, cone style: the diameter of the cones at their root in mm; left out, the largest that fits (#907). */
   hingeConeSize?: number;
-  /** Hinge: "pin" (default) or "cone": cones on every other knuckle that nest into the others, printing without bridges (#907). */
-  hingeStyle?: "pin" | "pinless" | "cone" | "liftOff";
+  /** Hinge: "pin" (default) or "cone": cones on every other knuckle that nest into the others, printing without bridges (#907); "snap": B's knuckles are open clips that snap over A's pin (#1520). */
+  hingeStyle?: "pin" | "pinless" | "cone" | "liftOff" | "snap";
+  /** Hinge, snap style: how much narrower the clips' opening is than the pin in mm; left out, 0.3 (#1520). */
+  hingeSnapGrip?: number;
   /** Hinge: diameter of the pin in mm; the other part's bore is wider by the clearance. */
   hingePinDiameter?: number;
   /** Hinge: thickness of the two leaves in mm. */
@@ -1419,6 +1440,11 @@ export type WorkplaneShape = {
    * straight pocket as wide as the head above the cone, on the double countersink at both ends. Missing or 0: flush.
    */
   screwHoleRecess?: number;
+  /**
+   * Counterbore: a 45-degree chamfer in mm at the rim of the pocket (Discussion #1632). The rim opens by that much
+   * outside the head's diameter, so the pocket keeps its width; it stays shallower than the pocket. Missing or 0: none.
+   */
+  screwHoleChamfer?: number;
   /** Port opening: rounded corners, or the lower ones cut off as on an HDMI or DisplayPort socket. */
   portProfile?: PortProfile;
   /** Port opening: extra room in mm on every side on top of the preset's, already in width and height; it lets the preset be recognised. */
@@ -1630,6 +1656,12 @@ export type WorkplaneShape = {
    */
   stencilBridge?: boolean;
   /**
+   * The body stands on a breakaway base (lib/breakawayBase), as the fit test's pin and the Split tool's loose dowels can:
+   * the pin's foot hangs a little over the socket's floor and that floor is one layer thick, on purpose, so the print
+   * check leaves both out (#1633).
+   */
+  breakawayBase?: boolean;
+  /**
    * The point this body turns about, kept with the body: a fraction of its
    * width, height and depth from its centre, in its own frame, so it moves,
    * turns and scales with it. See lib/rotationPivot.
@@ -1713,7 +1745,7 @@ export type QrErrorCorrection = "L" | "M" | "Q" | "H";
 export type QrStyle = "code" | "raised" | "engraved";
 /** What a QR body keeps so it can be made again from the inspector (#553). */
 /** The single-board computers the SBC board shape knows (#1098). */
-export type SbcBoardType = "pi5" | "pi4" | "pi3bPlus" | "zero2w" | "bttPi12" | "xiaoEsp32c6" | "esp32c3SuperMini" | "esp32c6SuperMini" | "featherEsp32s3" | "arduinoUno" | "arduinoMega" | "arduinoNano" | "wemosD1Mini" | "pico" | "picoW" | "pico2" | "pico2W" | "esp32CamMb" | "esp32s3Cam" | "esp32DevKitC" | "esp32DevKitV1";
+export type SbcBoardType = "pi5" | "pi4" | "pi3bPlus" | "zero2w" | "bttPi12" | "xiaoEsp32c6" | "esp32c3SuperMini" | "esp32c6SuperMini" | "featherEsp32s3" | "arduinoUno" | "arduinoMega" | "arduinoNano" | "wemosD1Mini" | "pico" | "picoW" | "pico2" | "pico2W" | "esp32CamMb" | "esp32s3Cam" | "esp32DevKitC" | "esp32DevKitV1" | "cyd" | "cyd2usb" | "waveshareEsp32s3Zero" | "arduinoProMini";
 
 export type SbcBoardSettings = {
   board: SbcBoardType;

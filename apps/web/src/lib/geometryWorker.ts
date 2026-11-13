@@ -1,6 +1,6 @@
 import { buildsDiffer, BUILD_ID, isBuildMessage, reportWorkerBuild } from "@/lib/buildStamp";
 import { checkClearance, type ClearanceOptions, type ClearanceResult } from "@/lib/clearanceCheck";
-import { buildGroupedShapeFromSelection, exportSolidVolume, faceReadJoins, faceReadPositions, previewSplitConnectors, splitShapeIfCrossed, splitShapesByPlane, type ExportSolidVolume, type GroupBuildResult, type SplitConnectorPreview, type SplitShapesOutcome } from "@/lib/editorBooleans";
+import { buildGroupedShapeFromSelection, exportSolidVolume, faceReadJoins, faceReadPositions, previewSplitConnectors, splitShapeIfCrossed, splitShapesByPlane, type ExportSolidVolume, type RebuildStretchedGroup, type GroupBuildResult, type SplitConnectorPreview, type SplitShapesOutcome } from "@/lib/editorBooleans";
 import { packValue, packedTransfer, unpackValue } from "@/lib/geometryTransfer";
 import { articulateShapes, type FlexiOptions, type FlexiShapesResult } from "@/lib/flexiJoints";
 import { lidForShapes, lidTopForShapes, type LidOptions, type LidShapeResult } from "@/lib/lidTool";
@@ -255,15 +255,18 @@ export function buildGroupedShapeOffThread(selected: WorkplaneShape[], triangleL
 
 type SplitPlane = Pick<ModelSplitPlane, "axis" | "normal" | "position">;
 
-function splitShapeOffThread(shape: WorkplaneShape, plane: SplitPlane, connectors: SplitConnectorOptions | undefined, signal?: AbortSignal) {
-  const onPage = () => splitShapeIfCrossed(shape, plane, connectors);
+function splitShapeOffThread(shape: WorkplaneShape, plane: SplitPlane, connectors: SplitConnectorOptions | undefined, stretch: number | undefined, signal?: AbortSignal) {
+  const onPage = () => splitShapeIfCrossed(shape, plane, connectors, stretch);
   if (containsText([shape])) return onPage();
-  return runGeometryTask<Awaited<ReturnType<typeof splitShapeIfCrossed>>>("split", { shape, plane, ...(connectors ? { connectors } : {}) }, onPage, () => ({ parts: null, error: t("status.computeTimedOut") }), signal);
+  return runGeometryTask<Awaited<ReturnType<typeof splitShapeIfCrossed>>>("split", { shape, plane, ...(connectors ? { connectors } : {}), ...(stretch !== undefined ? { stretch } : {}) }, onPage, () => ({ parts: null, error: t("status.computeTimedOut") }), signal);
 }
 
-/** splitShapesByPlane (lib/editorBooleans.ts) with each cut made off the page, with connectors when they are asked for. */
-export function splitShapesByPlaneOffThread(targets: readonly WorkplaneShape[], plane: SplitPlane, stillCurrent: () => boolean, signal?: AbortSignal, connectors?: SplitConnectorOptions): Promise<SplitShapesOutcome> {
-  return splitShapesByPlane(targets, plane, stillCurrent, (shape, shapePlane, asked) => splitShapeOffThread(shape, shapePlane, asked, signal), connectors);
+/**
+ * splitShapesByPlane (lib/editorBooleans.ts) with each cut made off the page, with connectors when they are asked for - or,
+ * with `stretch`, each body made that much longer at the plane (Discussions #506, #1569); a group with `rebuildGroup` part by part, so it stays a group (Discussion #1707).
+ */
+export function splitShapesByPlaneOffThread(targets: readonly WorkplaneShape[], plane: SplitPlane, stillCurrent: () => boolean, signal?: AbortSignal, connectors?: SplitConnectorOptions, stretch?: number, rebuildGroup?: RebuildStretchedGroup): Promise<SplitShapesOutcome> {
+  return splitShapesByPlane(targets, plane, stillCurrent, (shape, shapePlane, asked, length) => splitShapeOffThread(shape, shapePlane, asked, length, signal), connectors, stretch, rebuildGroup);
 }
 
 /**

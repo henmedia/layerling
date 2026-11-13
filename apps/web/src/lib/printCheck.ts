@@ -1,5 +1,6 @@
 import * as THREE from "three";
 import { MeshBVH } from "three-mesh-bvh";
+import { BREAKAWAY_FOOT_MM, standsOnBreakawayBase } from "@/lib/breakawayBase";
 import { clearanceBoxesNear, clearancePartName, clearanceSourceShapes, closestPointGeometry, separateParts, type ClearanceBox, type ClearanceVec3 } from "@/lib/clearanceCheck";
 import { disposeManifold, shapeToManifoldSolid } from "@/lib/editorBooleans";
 import { getManifoldRuntime, meshForShape } from "@/lib/editorMeshCore";
@@ -139,7 +140,7 @@ export function measureThinWalls(
   positions: ArrayLike<number>,
   indices: ArrayLike<number>,
   minimumWall: number,
-  options: { owners?: ArrayLike<number>; minArea?: number; rayBudget?: number; skipOwners?: ReadonlySet<number> } = {},
+  options: { owners?: ArrayLike<number>; minArea?: number; rayBudget?: number; skipOwners?: ReadonlySet<number>; footOwners?: ReadonlySet<number> } = {},
 ): ThinWallMeasurement {
   const minArea = options.minArea ?? PRINT_CHECK_MIN_THIN_AREA_MM2;
   const budget = options.rayBudget ?? PRINT_CHECK_RAY_BUDGET;
@@ -172,8 +173,25 @@ export function measureThinWalls(
 
   // Pieces about a wall across, fewer and larger when there would be more rays than the budget.
   const splits = new Uint8Array(triangles);
+  // The lowest point of each owner on a breakaway base: its socket's floor, up to BREAKAWAY_FOOT_MM above that, is one
+  // layer thick on purpose (#1633).
+  const footTop = new Map<number, number>();
+  if (options.footOwners?.size && options.owners) {
+    for (let tri = 0; tri < triangles; tri += 1) {
+      const owner = Number(options.owners[tri]);
+      if (!options.footOwners.has(owner)) continue;
+      const low = Math.min(corners[tri * 9 + 1], corners[tri * 9 + 4], corners[tri * 9 + 7]);
+      footTop.set(owner, Math.min(footTop.get(owner) ?? Infinity, low));
+    }
+    footTop.forEach((low, owner) => footTop.set(owner, low + BREAKAWAY_FOOT_MM));
+  }
+  const inFoot = (tri: number) => {
+    if (!footTop.size || !options.owners) return false;
+    const top = footTop.get(Number(options.owners[tri]));
+    return top !== undefined && Math.max(corners[tri * 9 + 1], corners[tri * 9 + 4], corners[tri * 9 + 7]) <= top;
+  };
   // Triangles of an owner that is thin on purpose (a support rib) get no rays: they are never a thin place.
-  const skipped = (tri: number) => Boolean(options.skipOwners?.size && options.owners && options.skipOwners.has(Number(options.owners[tri])));
+  const skipped = (tri: number) => Boolean(options.skipOwners?.size && options.owners && options.skipOwners.has(Number(options.owners[tri]))) || inFoot(tri);
   let target = minimumWall;
   for (let attempt = 0; attempt < 8; attempt += 1) {
     let total = 0;
@@ -477,7 +495,9 @@ export async function checkPrint(source: readonly WorkplaneShape[], given: Parti
         }
         // A support rib is two lines thick and its bridges one line wide, on purpose (Discussion #1385).
         const ribs = new Set(owners.flatMap((shape, index) => (isSupportRib(shape) ? [index] : [])));
-        const measured = measureThinWalls(positions, mesh.triVerts, result.minimumWallMm, { owners: triangleOwners(mesh, ownerOf), skipOwners: ribs });
+        // A breakaway base's socket floor is one layer thick, on purpose (#1633).
+        const onBase = new Set(owners.flatMap((shape, index) => (standsOnBreakawayBase(shape) ? [index] : [])));
+        const measured = measureThinWalls(positions, mesh.triVerts, result.minimumWallMm, { owners: triangleOwners(mesh, ownerOf), skipOwners: ribs, footOwners: onBase });
         result.thinWalls = {
           places: measured.places.map((place) => {
             const shape = owners[place.owner];

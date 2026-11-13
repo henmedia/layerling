@@ -13,6 +13,14 @@ export const BUG_REPORT_EVENT_LIMIT = 40;
 
 export type BugReportEvent = { at: number; text: string };
 
+/** An error from outside the editor for the report's Errors, such as a save the browser refused (#1639). */
+export const BUG_REPORT_ERROR_EVENT = "layerling:report-error";
+
+export function reportBugReportError(text: string) {
+  if (typeof window === "undefined") return;
+  window.dispatchEvent(new CustomEvent<string>(BUG_REPORT_ERROR_EVENT, { detail: text }));
+}
+
 export type BugReportInfo = {
   version: string;
   createdAt: number;

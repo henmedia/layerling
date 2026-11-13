@@ -91,6 +91,7 @@ In fondo alla finestra trovi {{ui:dashboard.sponsor}}, che porta alla pagina per
 ### Modalità concentrazione
 
 Su uno schermo piccolo la {{ui:focusMode.enter}} lascia al lavoro la riga del titolo e il piè di pagina: la attivano il pulsante con le due frecce verso l’esterno in alto a destra, [[Ctrl]]+[[Shift]]+[[F]] o la ricerca dei comandi. La barra multifunzione sale e la vista arriva fino al bordo della finestra. Una piccola barra sotto la barra multifunzione conserva la casetta per la pagina iniziale, le schede {{ui:editor.modeGeometry}} e {{ui:editor.modeSketch}}, la lente, le impostazioni e il pulsante con le due frecce verso l’interno, che chiude la modalità; trascina la barra dalla sua maniglia in un altro punto, un doppio clic sulla maniglia la rimette a posto. layerling ricorda la scelta in questo browser e, finché il browser riempie tutto lo schermo (F11), passa da solo alla modalità concentrazione.
+La barra mostra anche il nome del progetto; un clic sopra lo rinomina senza uscire dalla modalità concentrazione.
 
 ## Il tuo primo pezzo
 
@@ -111,6 +112,8 @@ Come esempio, creiamo un cubo con un foro.
 ## Novità dalla tua ultima visita
 
 Quando riapri layerling dopo un aggiornamento, nella pagina iniziale un riquadro elenca tutte le novità introdotte dalla tua ultima visita, dalla versione più recente alla meno recente. Se è passato molto tempo, scorri il contenuto del riquadro. Sotto, {{ui:whatsNew.earlier}} aggiunge anche le versioni precedenti alla tua ultima visita. Chiudi il riquadro con {{ui:whatsNew.dismiss}}: resterà nascosto fino al prossimo aggiornamento. Puoi riaprire in qualsiasi momento l’elenco delle ultime novità con {{ui:whatsNew.footerLink}}, nel piè di pagina della pagina iniziale. Nell’editor lo stesso elenco si apre con il pulsante {{ui:whatsNew.footerLink}} accanto a {{ui:editor.guide}} in alto a destra, oppure dalla ricerca comandi; resta aperto accanto al tuo progetto mentre provi le novità. Il browser ricorda l’ultima versione che hai visualizzato e nessun dato su di te viene trasmesso.
+
+Di tanto in tanto sopra compare una seconda scheda: un messaggio dell'autore di layerling, per esempio su una pausa in cui le risposte arrivano più lentamente. Si vede solo nei giorni a cui è destinata, e {{ui:whatsNew.dismiss}} la nasconde.
 
 Se usi una copia di layerling sul tuo computer o server, l’avviso «Aggiornamento disponibile» include un pulsante, {{ui:update.previewShow}}, che mostra le novità prima di installare l’aggiornamento. L’elenco viene scaricato da GitHub solo quando premi il pulsante.
 

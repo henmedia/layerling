@@ -4,6 +4,7 @@ import { surfaceTextureLayerPlaced } from "@/lib/surfaceTextureShape";
 import { surfaceTextureOwnImage } from "@/lib/surfaceTextureImages";
 import { surfaceMeshReport } from "@/lib/surfaceTextureMesh";
 import { analyzeTriangleSoup } from "@/lib/svgImport";
+import { drawingOutlines } from "@/lib/surfaceImageOutline";
 
 type Vec3 = [number, number, number];
 
@@ -259,4 +260,54 @@ describe("an image pressed on once", () => {
     expect(Math.max(...points.filter((p) => p.along < -28 && p.along > -30).map((p) => p.depth))).toBeGreaterThan(0.05);
     expect(Math.max(...points.filter((p) => p.along > 27 && p.along < 30.5).map((p) => p.depth))).toBeLessThan(0.05);
   }, 60_000);
+  describe("cut along the outlines of a drawing (#1268)", () => {
+    // A diamond |x| + |y| <= 1/3 of the image's width: on a 30 mm image its half-diagonal is 10 mm. The image itself is only
+    // 16 points, so its grey values give steps along the slanted edges; the outlines are found on a fine drawing of it.
+    const fine = 512;
+    const diamond = (x: number, y: number) => Math.abs(x - 0.5) + Math.abs(y - 0.5) <= 1 / 3;
+    const finePoints = new Float32Array(fine * fine);
+    for (let y = 0; y < fine; y += 1) for (let x = 0; x < fine; x += 1) finePoints[y * fine + x] = diamond((x + 0.5) / fine, (y + 0.5) / fine) ? 1 : 0;
+    const drawn = { ...ownImage(16, (x, y) => diamond((x + 0.5) / 16, (y + 0.5) / 16)), outline: drawingOutlines(finePoints, fine, fine) };
+    const settings = { ...ONCE, imageOwn: drawn, spacing: 30, depth: 1 };
+
+    it("raises the diamond with its edges on the outline, not on the steps of the small image", () => {
+      expect(drawn.outline).toHaveLength(1);
+      const result = applySurfaceTexture(box(60, 40, 20), settings);
+      expect(result.stats.image?.placed).toBe(true);
+      expectClosed(result);
+      const out = outOfBox(result, 60, 40, 20);
+      // Everything raised lies within the diamond (a hair of the wall's width), and all but its edge stands the full depth.
+      const reach = (p: { x: number; y: number }) => Math.abs(p.x) + Math.abs(p.y - 20);
+      expect(out.length).toBeGreaterThan(20);
+      expect(Math.max(...out.filter((p) => p.by > 0.5).map(reach))).toBeLessThan(10.1);
+      const inside = out.filter((p) => reach(p) < 9.8);
+      expect(inside.length).toBeGreaterThan(10);
+      expect(Math.min(...inside.map((p) => p.by))).toBeGreaterThan(0.95);
+      // Right out to the corners: the points near the edge lie on it within a tenth of a millimetre.
+      const edge = out.filter((p) => p.by > 0.3 && p.by < 0.7);
+      expect(edge.length).toBeGreaterThan(8);
+      expect(edge.every((p) => Math.abs(reach(p) - 10) < 0.1)).toBe(true);
+    }, 60_000);
+
+    it("keeps the grey values' way for the same image without outlines", () => {
+      const { outline: _outline, ...grey } = drawn;
+      const result = applySurfaceTexture(box(60, 40, 20), { ...settings, imageOwn: grey });
+      const edge = outOfBox(result, 60, 40, 20).filter((p) => p.by > 0.3 && p.by < 0.7);
+      const reach = (p: { x: number; y: number }) => Math.abs(p.x) + Math.abs(p.y - 20);
+      // Not cut along the outline: the edge strays from the diamond by the steps of 16 points over 30 mm.
+      expect(edge.some((p) => Math.abs(reach(p) - 10) > 0.1)).toBe(true);
+    }, 60_000);
+
+    it("swaps what is raised inside its box when inverted, the surface beside the box staying smooth", () => {
+      const result = applySurfaceTexture(box(60, 40, 20), { ...settings, imageInvert: true });
+      expectClosed(result);
+      const out = outOfBox(result, 60, 40, 20);
+      const reach = (p: { x: number; y: number }) => Math.abs(p.x) + Math.abs(p.y - 20);
+      const raised = out.filter((p) => p.by > 0.95);
+      expect(raised.length).toBeGreaterThan(10);
+      // The ground of the box stands the full depth, the diamond itself stays flat, and beside the box nothing stands.
+      expect(raised.every((p) => reach(p) > 9.9 && Math.abs(p.x) <= 15.1 && Math.abs(p.y - 20) <= 15.1)).toBe(true);
+      expect(out.filter((p) => reach(p) < 9.8).every((p) => p.by < 0.05)).toBe(true);
+    }, 60_000);
+  });
 });

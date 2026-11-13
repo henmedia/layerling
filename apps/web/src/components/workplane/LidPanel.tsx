@@ -33,6 +33,7 @@ import {
   MAX_LID_DEPTH,
   MAX_LID_GAP,
   MAX_LID_THICKNESS,
+  MAX_LID_THREAD_OFFSET,
   MAX_LID_THREAD_PITCH,
   MAX_LID_THREAD_TURNS,
   MAX_LID_WALL,
@@ -50,6 +51,7 @@ import {
   MIN_HINGE_PIN_PLAY,
   MIN_LID_DEPTH,
   MIN_LID_THICKNESS,
+  MIN_LID_THREAD_OFFSET,
   MIN_LID_THREAD_PITCH,
   MIN_LID_THREAD_TURNS,
   MIN_LID_WALL,
@@ -333,6 +335,19 @@ export function LidPanel({
             disabled={busy}
             onChange={(value) => onChange({ threadTurns: value })}
           />
+          {/* How far below the rim the thread starts (Discussion #1594): the wall stays plain above it, the rim or plug reaches that much further down. */}
+          <EdgeModifierSlider
+            label={t("lid.threadOffset")}
+            value={settings.threadOffset}
+            min={MIN_LID_THREAD_OFFSET}
+            max={MAX_LID_THREAD_OFFSET}
+            step={0.5}
+            workspace={workspace}
+            length
+            disabled={busy}
+            onChange={(value) => onChange({ threadOffset: value })}
+          />
+          <span className="shell-openings-summary">{t("lid.threadOffsetHint")}</span>
         </>) : screw ? null : bayonet ? (<>
           {/* How many lugs, how far the cap's rim reaches down over them, and its room along the axis above the ledge. */}
           <EdgeModifierSlider
@@ -728,7 +743,8 @@ export function LidPanel({
         <input type="checkbox" checked={settings.clickBumps && bumpsFit} disabled={busy || !bumpsFit} onChange={(event) => onChange({ clickBumps: event.target.checked })} />
         <span>{t("lid.clickBumps")}</span>
       </label>
-      {/* A slide-in lid's is one bump under its end, which clicks past the cut wall; it says what its height is. */}
+      {/* A slide-in lid's is one bump under its end, which clicks past the wall it slides in through (cut down, or with a
+          frame slotted); it says what its height is. */}
       {(settings.clickBumps || !bumpsFit) && extras ? <span className="shell-openings-summary">{t(slide ? "lid.slideBumpHint" : "lid.clickBumpsHint")}</span> : null}
       {/* How far they reach into the body's wall: a small box or a stiff lip wants less (#1220). */}
       {settings.clickBumps && bumpsFit ? (<>

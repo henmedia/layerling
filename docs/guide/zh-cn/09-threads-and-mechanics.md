@@ -100,6 +100,8 @@ G 规格是符合 ISO 228-1 的平行惠氏管螺纹，常见于水、燃气、�
 
 {{ui:gear.rack}} 是半径无穷大的齿轮：一根沿一侧带齿的条，使用渐开线齿时牙侧是压力角下的直线。其宽度（沿 X）为齿数 × 齿距，齿距为 π × 模数，所以同一模数的齿条可以首尾相接，每一端都落在齿槽里。其长度（沿 Y）是条的厚度，可自由设置，只要齿和半毫米的条能放得下。齿朝前，即朝向主视图的观察者；根据需要转动齿条。相同模数的齿轮在其上滚动的条件是，其中心位于节线前方齿数 × 模数 / 2 处；节线在齿顶后方一个模数处，圆齿则为 0.6 个模数。齿圈和齿条有渐开线和圆齿两种，没有简单齿；切换齿轮类型会保留模数。
 
+{{ui:gear.internal}} 和 {{ui:gear.rack}} 也有 {{ui:prop.helixAngle}}（起初为 0，即直齿），这样就能与斜齿轮或人字齿轮配合运转。给它们与该齿轮相同的角度，正负号也相同，而不是像两个斜齿轮之间那样取相反的角度。{{ui:prop.ringRackHerringbone}} 让它们的齿在一半高度处折回，用于相同角度的人字齿轮。齿条保持原来的长度：倾斜的齿在两端被切平。对于内齿圈，{{ui:prop.helixQuality}} 与斜齿轮一样，决定扭转画得多细。边缘工具和 STEP 导出都把两者作为精确实体处理，内齿圈的限制与下文的斜齿轮相同。
+
 边缘工具和 STEP 导出把每个齿轮当作其精确实体，渐开线牙侧是平滑曲线。椭圆形轮廓上的斜齿轮仍是三角形网格，从约 31 齿起的渐开线斜齿轮也是如此。人字齿轮在这两种情况下同样仍是三角形网格。从约 31 齿起，这只适用于边缘工具：STEP 导出在任何齿数下都按精确实体写出这种齿轮，非常大的齿轮最多需要约一分钟。小齿限制了边能圆角到什么程度：对于简单齿的齿轮，直径 30 mm、12 齿时，两齿之间齿根处的平面只有约 0.65 mm 宽，所以给每条边倒圆最多到约 0.5 mm；锥齿轮顶部更小，最多约 0.4 mm。斜齿轮和人字齿轮的齿是倾斜的，这会在其斜边上收窄那个平面：螺旋角相对于齿轮高度越大，能容纳的圆角越小。两个平端面的边可以倒圆，但只给这些边倒角会在 CAD 内核中失败；请改为倒圆，或以更小的尺寸（例如 0.2 mm）给所有边一起倒角。渐开线齿、螺旋角约 15 度及以上（默认即如此）的人字齿轮不能一次给所有边倒圆或倒角；请分别给两端或两半相接处的边倒圆。
 
 ## 弹簧
@@ -182,7 +184,9 @@ G 规格是符合 ISO 228-1 的平行惠氏管螺纹，常见于水、燃气、�
 
 {{ui:hinge.styleLiftOff}} 做出像许多门上那样的可拆式铰链：两个铰节，下方的带着销子一直到端部，上方的是可以从销子上拔出的套筒，所以盖子或门可以取下再挂回去。它总是两个铰节。它和其他样式一样平放整体打印；要竖着打印、销子朝上，就用 {{ui:inspector.separateParts}} 把它拆开，把带销的那件立在它的铰节上，另一件立在它的套筒上：这样两件都不需要支撑。另一侧用镜像。在 {{ui:prop.hingeScrewHead}} 下，所有样式都可选 {{ui:hinge.screwNut}}：在每个孔上方开一个六角螺母槽，位于合上时朝向另一片的那一面，这样从下方拧入的螺栓能固定；{{ui:hinge.screwCountersunkNut}} 把后片（带销的那片）做成沉头，前片开螺母槽。{{ui:prop.hingeNutWidth}} 是螺母的对边宽度；为 0 时按孔取值（M3 5.8 mm，M4 7.3 mm，含间隙）。槽深等于螺母高度，但下面留 0.6 mm 的叶片，所以叶片越厚，螺母嵌得越深。
 
-{{ui:prop.hingeStyle}}有三个选项：{{ui:hinge.stylePin}}、{{ui:prop.hingePinless}}（为自备销留的孔）和{{ui:hinge.styleCone}}。选圆锥时，{{ui:prop.hingeConeSize}}决定圆锥从关节长出处的大小；圆锥越大越牢固，默认取能放下的最大值。带圆锥的铰链没有销也没有孔，所以它的翼板可以和整个关节一样厚：把{{ui:prop.hingeLeafThickness}}设为关节直径，翼板就与关节齐平；这样的铰链最多打开约 90°，因为厚翼板会相碰。
+{{ui:hinge.styleSnap}} 做出两半分开打印、再咔哒一声扣合的铰链。后片的铰节照常带着销子；前片的铰节是卡夹，顶部开口，开在铰链合上时面对另一片的那一侧。开口比销子窄 {{ui:prop.hingeSnapGrip}} 所设的量，默认 0.3 mm，开口边缘的 45° 倒角把销子引进去。用 {{ui:inspector.separateParts}} 把铰链拆开，两半都按原样平放打印，无需支撑：卡夹正好在孔需要搭桥的地方开口，销子只跨过它的铰节之间的短间隙。组装时，把带卡夹的一半按合上的姿态放到销子上，按下直到咔哒一声卡入；之后它可以自由转动，销子周围留有间隙（{{ui:prop.hingeClearance}}）。卡紧量越大越牢，但需要的力也越大：卡夹裂了就调小，两半太容易脱开就调大。选 {{ui:hinge.leafRaised}} 时，只有前片在开口下方仍连着它的卡夹，才会被抬高。
+
+{{ui:prop.hingeStyle}}有五个选项：{{ui:hinge.stylePin}}、{{ui:prop.hingePinless}}（为自备销留的孔）、{{ui:hinge.styleCone}}、{{ui:hinge.styleLiftOff}}和{{ui:hinge.styleSnap}}。选圆锥时，{{ui:prop.hingeConeSize}}决定圆锥从关节长出处的大小；圆锥越大越牢固，默认取能放下的最大值。带圆锥的铰链没有销也没有孔，所以它的翼板可以和整个关节一样厚：把{{ui:prop.hingeLeafThickness}}设为关节直径，翼板就与关节齐平；这样的铰链最多打开约 90°，因为厚翼板会相碰。
 
 要用螺钉固定铰链，设置 {{ui:prop.hingeScrewHoles}}：沿轴最多六个孔，孔径为你选择的 {{ui:prop.hingeScrewDiameter}}。在 {{ui:prop.hingeScrewHead}} 下，它们默认为 {{ui:hinge.screwCountersunk}}，90° 用于沉头螺钉，位于铰链合上时朝向另一片的那一面，因此螺钉头齐平；{{ui:hinge.screwStraight}} 则保持直孔。不设其他数值时，孔平均分配长度并位于每片的中间；{{ui:prop.hingeScrewSpacing}} 和 {{ui:prop.hingeScrewAcross}} 按中心距设定它们，例如为了对上你要替换的购买铰链。每个孔到边缘、铰节和下一个孔之间都至少保留半毫米的片；放不下那么多时就少放，字段会说明。{{ui:prop.hingeCornerRadius}} 会把两片的四个外角倒圆。无论有无销轴，孔和圆角在 STEP 导出和边工具中都保持精确。
 
@@ -249,6 +253,10 @@ microSD 卡槽也是左边缘的接口，位于电路板下方（Zero 2 W 上在
 长孔让零件在拧紧螺丝前仍能稍作移动，便于对齐（Discussion #1531）。在{{ui:shape.counterbore}}、{{ui:shape.countersink}}或{{ui:shape.doubleCountersink}}上打开{{ui:prop.screwHoleSlot}}：沉头孔或锥面以及孔身会绕过长孔的两端，并沿其两侧笔直延伸。{{ui:prop.screwHoleSlotLength}}决定延伸多长；起初与头部一样宽，沿宽度方向——要换方向就旋转该孔。{{ui:prop.screwHoleHead}}和{{ui:prop.screwHoleSize}}只改变头部，长孔保持不变。长孔没有钻尖，和圆孔一样是精确实体。
 
 沉头螺丝的头部与表面齐平。若要沉得更深，可在{{ui:shape.countersink}}上设置{{ui:prop.screwHoleRecess}}（Discussion #1531）：锥面上方会多出一段与头部同宽的直孔，深度为所设毫米数，{{ui:prop.screwHoleLength}}也包含这一段。{{ui:shape.doubleCountersink}}两端都有这段直孔。设为 0 时头部仍与表面齐平；长孔同样适用，且仍是精确实体。
+
+要去掉沉孔边缘的锐边，在{{ui:shape.counterbore}}上设置{{ui:prop.screwHoleChamfer}}（Discussion #1632）：沉孔顶部随之以 45 度向外展开这么多毫米。倒角位于{{ui:prop.screwHoleHead}}之外，螺钉头仍然放得下，并且它始终比{{ui:prop.screwHoleHeadDepth}}浅。设为 0 时边缘保持原来的锐边；腰形孔同样可以使用，并且仍是精确实体。
+
+内六角圆柱头螺钉按头部下方的长度出售，沉头螺钉按含头部的长度出售。因此{{ui:shape.counterbore}}有第二个字段 {{ui:prop.screwHoleLengthBelowHead}}（Discussion #1670）：在那里输入螺钉长度，会加上 {{ui:prop.screwHoleHeadDepth}} 得到 {{ui:prop.screwHoleLength}}。M3 × 12 的螺钉配 3.2 mm 的沉孔，得到长 15.2 mm 的孔。锥形沉孔仍只有一个长度。
 
 {{ui:shape.finishingWasher}}（一种装饰垫圈，Discussion #1131）是放在沉头或半沉头螺钉下面的拱形垫圈，用于在木头或盖板上显得整洁。它是实心件，底面平；从较低的边缘起，拱顶升到座面，座面是承托螺钉头的锥面，下面是孔。在 {{ui:prop.screwHoleSize}} 下选择 M2 到 M20：孔是该规格的过孔，座面是该规格的沉头孔，{{ui:prop.diameter}} 和 {{ui:prop.height}} 由此得出（M3：10.3 × 2.95 mm，M6：16.6 × 4.5 mm）。你也可以自己设定 {{ui:prop.diameter}}、{{ui:prop.height}}、{{ui:prop.centerHole}}、座面顶部的 {{ui:prop.screwHoleHead}} 及其 {{ui:prop.screwHoleAngle}}。它保持圆形，并且是精确实体，因此边工具和 STEP 都能处理它。
 

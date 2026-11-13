@@ -91,6 +91,7 @@ No fundo da janela: {{ui:dashboard.sponsor}} abre a página onde podes apoiar o 
 ### Modo foco
 
 Num ecrã pequeno, o {{ui:focusMode.enter}} deixa a linha do título e o rodapé para o trabalho: o botão com as duas setas para fora no canto superior direito, [[Ctrl]]+[[Shift]]+[[F]] ou a pesquisa de comandos ativam-no. O friso sobe e a vista chega até ao limite da janela. Uma pequena barra por baixo do friso mantém a casinha para a página inicial, os separadores {{ui:editor.modeGeometry}} e {{ui:editor.modeSketch}}, a lupa, as definições e o botão com as duas setas para dentro, que termina o modo; arraste a barra pela pega para outro sítio, e um duplo clique na pega volta a colocá-la no lugar. O layerling lembra a escolha neste navegador e, enquanto o navegador ocupa o ecrã inteiro (F11), passa sozinho para o modo foco.
+A barra também mostra o nome do design; clique nele para lhe mudar o nome sem sair do modo foco.
 
 ## A tua primeira peça
 
@@ -111,6 +112,8 @@ Como exemplo, vamos criar um bloco com um furo.
 ## Novidades desde a tua última visita
 
 Quando voltas a abrir o layerling após uma atualização, um cartão na página inicial apresenta as novidades desde a tua última visita: todas as versões entretanto publicadas, começando pela mais recente. Após uma ausência prolongada, podes percorrer a lista dentro do cartão. Por baixo, {{ui:whatsNew.earlier}} acrescenta também as versões anteriores à tua última visita. Fecha o cartão com {{ui:whatsNew.dismiss}} e este só volta a aparecer na próxima atualização. A opção {{ui:whatsNew.footerLink}}, no rodapé da página inicial, permite voltar a consultar as novidades mais recentes a qualquer momento. No editor, o botão {{ui:whatsNew.footerLink}} ao lado de {{ui:editor.guide}}, no canto superior direito, ou a pesquisa de comandos abre a mesma lista; esta fica aberta ao lado do teu projeto enquanto experimentas as novidades. O navegador memoriza a última versão que viste, sem enviar para fora qualquer informação sobre ti.
+
+De vez em quando aparece por cima um segundo cartão: um aviso do autor do layerling, por exemplo sobre uma pausa em que as respostas demoram mais. Só aparece nos dias para que foi pensado, e {{ui:whatsNew.dismiss}} esconde-o.
 
 Numa cópia do layerling instalada no teu computador ou servidor, o aviso de atualização disponível inclui o botão {{ui:update.previewShow}}, que apresenta as novidades antes de instalares a atualização. A lista só é obtida do GitHub quando primes o botão.
 

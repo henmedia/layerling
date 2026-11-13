@@ -91,6 +91,7 @@ En la parte de abajo de la ventana: {{ui:dashboard.sponsor}} lleva a la página 
 ### Modo concentración
 
 En una pantalla pequeña, {{ui:focusMode.enter}} cede la fila del título y el pie de página al trabajo: lo activan el botón con las dos flechas hacia fuera arriba a la derecha, [[Ctrl]]+[[Shift]]+[[F]] o la búsqueda de comandos. La cinta sube y la vista llega hasta el borde de la ventana. Una pequeña barra bajo la cinta conserva la casa para la página de inicio, las pestañas {{ui:editor.modeGeometry}} y {{ui:editor.modeSketch}}, la lupa, los ajustes y el botón con las dos flechas hacia dentro, que termina el modo; arrastra la barra por su asa a otro sitio, y un doble clic en el asa la devuelve. layerling recuerda la elección en este navegador y, mientras el navegador ocupa toda la pantalla (F11), pasa solo al modo concentración.
+La barra también muestra el nombre del diseño; haz clic en él para cambiarlo sin salir del modo concentración.
 
 ## Tu primera pieza
 
@@ -111,6 +112,8 @@ Así se hacen orificios, ranuras y huecos. El capítulo [Sólidos y orificios](c
 ## Novedades desde tu última visita
 
 Cuando vuelves a abrir layerling después de una actualización, una tarjeta en la página de inicio muestra lo que se ha añadido desde tu última visita: cada versión publicada desde entonces, empezando por la más reciente. Si llevabas mucho tiempo sin entrar, desplázate hacia abajo dentro de la tarjeta. Debajo, {{ui:whatsNew.earlier}} añade también las versiones anteriores a tu última visita. Ciérrala con {{ui:whatsNew.dismiss}} y no volverá a aparecer hasta la próxima actualización. {{ui:whatsNew.footerLink}}, en el pie de la página de inicio, vuelve a mostrar las últimas novedades cuando quieras. En el editor, el botón {{ui:whatsNew.footerLink}} junto a {{ui:editor.guide}}, arriba a la derecha, o la búsqueda de comandos abre la misma lista; se queda abierta junto a tu diseño mientras pruebas lo nuevo. El navegador recuerda la última versión que viste, y nada sobre ti sale de él.
+
+De vez en cuando aparece encima una segunda tarjeta: un aviso del autor de layerling, por ejemplo sobre una pausa en la que las respuestas tardan más. Solo se muestra en los días para los que está pensada, y {{ui:whatsNew.dismiss}} la oculta.
 
 En una copia de layerling instalada en tu propio ordenador o servidor, el aviso «Actualización disponible» tiene un botón, {{ui:update.previewShow}}, que muestra lo que trae la actualización antes de instalarla. La lista se descarga de GitHub solo cuando pulsas el botón.
 

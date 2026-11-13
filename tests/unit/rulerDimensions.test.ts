@@ -14,6 +14,7 @@ import {
   cornerRulerDimensionMatches,
   cornerRulerDimensionMatchesFromCorner,
   cornerRulerTicks,
+  thinCornerRulerLabels,
   worldAxisNameOfDirection,
   rulerTicks,
   pointAlongRuler,
@@ -182,22 +183,53 @@ describe("cornerRulerTicks", () => {
     const ticks = cornerRulerTicks(10);
 
     expect(ticks).toHaveLength(11);
-    expect(ticks[0]).toEqual({ offset: 0, isTen: true, isFive: true });
-    expect(ticks[10]).toEqual({ offset: 10, isTen: true, isFive: true });
+    expect(ticks[0]).toEqual({ offset: 0, height: 0.62, label: undefined });
+    expect(ticks[10]).toEqual({ offset: 10, height: 0.62, label: "10" });
   });
 
   it("markiert Fuenfer- und Zehner-Teilstriche richtig", () => {
     const ticks = cornerRulerTicks(12);
 
-    expect(ticks.find((tick) => tick.offset === 5)).toMatchObject({ isFive: true, isTen: false });
-    expect(ticks.find((tick) => tick.offset === 7)).toMatchObject({ isFive: false, isTen: false });
-    expect(ticks.find((tick) => tick.offset === 12)).toMatchObject({ isFive: false, isTen: false });
+    expect(ticks.find((tick) => tick.offset === 5)).toMatchObject({ height: 0.42, label: undefined });
+    expect(ticks.find((tick) => tick.offset === 7)).toMatchObject({ height: 0.26, label: undefined });
+    expect(ticks.find((tick) => tick.offset === 12)).toMatchObject({ height: 0.26, label: undefined });
   });
 
   it("liefert nur den Nullstrich fuer eine Laenge von 0", () => {
     const ticks = cornerRulerTicks(0);
 
-    expect(ticks).toEqual([{ offset: 0, isTen: true, isFive: true }]);
+    expect(ticks).toEqual([{ offset: 0, height: 0.62, label: undefined }]);
+  });
+});
+
+describe("thinCornerRulerLabels (Discussion #1704)", () => {
+  const along = (count: number, spacing: number, vertical = false) =>
+    Array.from({ length: count }, (_, index) => ({
+      x: vertical ? 100 : 100 + (index + 1) * spacing,
+      y: vertical ? 100 + (index + 1) * spacing : 100,
+      text: String((index + 1) * 10),
+    }));
+
+  it("behaelt alle Zahlen, wenn ihre Schilder nebeneinander Platz haben", () => {
+    const labels = along(10, 60);
+    expect(thinCornerRulerLabels(labels)).toEqual(labels);
+  });
+
+  it("zeigt herausgezoomt nur jede 2., 5. oder 10. Zahl, gezaehlt ab der Ecke", () => {
+    // "100" braucht rund 32 px Schild und 4 px Luft.
+    expect(thinCornerRulerLabels(along(20, 20)).map((label) => label.text)).toEqual(["20", "40", "60", "80", "100", "120", "140", "160", "180", "200"]);
+    expect(thinCornerRulerLabels(along(20, 10)).map((label) => label.text)).toEqual(["50", "100", "150", "200"]);
+    expect(thinCornerRulerLabels(along(30, 4)).map((label) => label.text)).toEqual(["100", "200", "300"]);
+  });
+
+  it("rechnet bei einem senkrecht laufenden Arm mit der Hoehe des Schilds, nicht seiner Breite", () => {
+    const labels = along(10, 24, true);
+    expect(thinCornerRulerLabels(labels)).toEqual(labels);
+  });
+
+  it("laesst eine einzelne Zahl stehen", () => {
+    const labels = along(1, 1);
+    expect(thinCornerRulerLabels(labels)).toEqual(labels);
   });
 });
 
@@ -540,5 +572,29 @@ describe("tipped ruler (#799)", () => {
     expect(point.x).toBeCloseTo(0, 6);
     expect(point.y).toBeCloseTo(85, 6);
     expect(point.z).toBeCloseTo(0, 6);
+  });
+});
+
+describe("cornerRulerTicks (Discussion #1618)", () => {
+  it("keeps one tick per millimetre with a number every 10 mm", () => {
+    const ticks = cornerRulerTicks(30);
+    expect(ticks).toHaveLength(31);
+    expect(ticks.filter((tick) => tick.label).map((tick) => tick.label)).toEqual(["10", "20", "30"]);
+    expect(ticks[5].height).toBeGreaterThan(ticks[4].height);
+  });
+
+  it("graduates in sixteenths of an inch with a number at every whole inch", () => {
+    const ticks = cornerRulerTicks(2 * 25.4, "in");
+    expect(ticks).toHaveLength(33);
+    expect(ticks[1].offset).toBeCloseTo(25.4 / 16, 6);
+    expect(ticks.filter((tick) => tick.label).map((tick) => [tick.offset, tick.label])).toEqual([[25.4, "1"], [50.8, "2"]]);
+    // inch > half > quarter > eighth > sixteenth
+    const heights = [16, 8, 4, 2, 1].map((index) => ticks[index].height);
+    expect([...heights].sort((a, b) => b - a)).toEqual(heights);
+    expect(new Set(heights).size).toBe(5);
+  });
+
+  it("marks inches on a square in a foot workspace", () => {
+    expect(cornerRulerTicks(30, "ft").find((tick) => tick.label)?.label).toBe('1"');
   });
 });

@@ -9,11 +9,12 @@ import { loadedManifoldRuntime } from "@/lib/manifoldHandle";
 import { ADDITION, Brush, Evaluator, HOLLOW_INTERSECTION, HOLLOW_SUBTRACTION, INTERSECTION, SUBTRACTION, type CSGOperation } from "three-bvh-csg";
 import * as THREE from "three";
 import { numberLocale, t } from "@/lib/i18n";
+import { currentLengthUnitLabel, formatLengthMm } from "@/lib/measurementUnits";
 import { sphereTessellation } from "@/lib/sphereTessellation";
 import { groupDisplayMergeable, groupShowsPartColors } from "@/lib/groupColors";
 import { gridfinityLabelColor, gridfinityLetterMeshes } from "@/lib/gridfinityLetterColor";
 import { acceleratedRaycast, computeBoundsTree } from "three-mesh-bvh";
-import { groupedContentScale, groupedPartSizeScale, scaleGroupedVertices, type GroupPartPlacement } from "@/lib/groupScale";
+import { groupCanKeepParts, groupedContentScale, groupedPartSizeScale, scaleGroupedVertices, type GroupPartPlacement } from "@/lib/groupScale";
 import { applySplitConnectors, dropSplitSlivers, planSplitConnectors, splitByPlaneClearOfFaces, unionSplitManifoldComponents } from "@/lib/manifoldSplit";
 import { paintedWorldMesh } from "@/lib/paintMesh";
 import { addConnectorTallies, NO_CONNECTORS, splitFramePoint, tongueOutlines, type SplitConnectorKind, type SplitConnectorOptions, type SplitConnectorTally, type SplitTongueOutline } from "@/lib/splitConnectors";
@@ -28,7 +29,7 @@ import type { WorkplaneShape } from "@/types/layerling";
 import { cylinderToEllipsePatch } from "@/lib/cylinderToEllipse";
 import { pointInDrillPoint, shapeDrillPointAngle } from "@/lib/drillPoint";
 import { tubeBeforeEdgeTreatments } from "@/lib/edgeTreatmentHistory";
-import { type Vec3, type MeshData, type Cuboid, type ShapeUpdatePatch, type ManifoldSolid, CUTTER_PADDING, CUTTER_LATERAL_PADDING, POINT_TOLERANCE, CUTTER_RESIDUAL_INSET, MIN_SHAPE_DIMENSION, IMPORTED_FALLBACK_BOOLEAN_TRIANGLE_LIMIT, COPLANAR_BOOLEAN_RESCUE_DEGREES, cleanModelDimension, getManifoldRuntime, transformMesh, meshForShape, appendMeshData, formatTriangleCount, shapeAabb, boundsForShapesOfVertices, boundsForCuboids, meshAabb, geometryFromMeshData, positionsFromGeometryDrawRange, boundsForPositions, positionsDifferFromMeshData, geometryDiffersFromMeshData, positionsBoundaryEdges, meshDataPositions, midpoint, localGroupBounds } from "@/lib/editorMeshCore";
+import { type Vec3, type MeshData, type Cuboid, type ShapeUpdatePatch, type ManifoldSolid, CUTTER_PADDING, CUTTER_LATERAL_PADDING, POINT_TOLERANCE, CUTTER_RESIDUAL_INSET, MIN_SHAPE_DIMENSION, IMPORTED_FALLBACK_BOOLEAN_TRIANGLE_LIMIT, COPLANAR_BOOLEAN_RESCUE_DEGREES, cleanModelDimension, getManifoldRuntime, transformMesh, meshForShape, groupedContentMesh, deformFrameOf, appendMeshData, formatTriangleCount, shapeAabb, boundsForShapesOfVertices, boundsForCuboids, meshAabb, geometryFromMeshData, positionsFromGeometryDrawRange, boundsForPositions, positionsDifferFromMeshData, geometryDiffersFromMeshData, positionsBoundaryEdges, meshDataPositions, midpoint, localGroupBounds } from "@/lib/editorMeshCore";
 
 export type GroupBuildResult = {
   group: WorkplaneShape | null;
@@ -807,13 +808,15 @@ export function shapeToManifoldSolid(runtime: ManifoldToplevel, shape: Workplane
   }
 
   const solid = manifoldFromMeshData(runtime, meshForShape(shape));
+  // Listed before it is checked: a solid that did not close is the caller's to report and `created`'s to free.
+  created.push(solid);
   if (solid.status() !== "NoError") return solid;
   // A group of solids is the loose pile of its parts' surfaces, and parts that
   // overlap or lie on top of one another (a frame whose posts stand in its
   // rails) are several shells in one mesh. A cut through such a pile comes out
   // wrong, so the shells are joined into one body first.
   const normalized = unionSplitManifoldComponents(runtime, solid);
-  created.push(solid, ...normalized.created);
+  created.push(...normalized.created);
   return normalized.solid ?? solid;
 }
 
@@ -822,7 +825,8 @@ function shapesToManifoldUnion(runtime: ManifoldToplevel, shapes: WorkplaneShape
   for (const shape of shapes) {
     const part = shapeToManifoldSolid(runtime, shape, created, useBoxPrimitive);
     if (!part || part.status() !== "NoError" || part.numTri() < 1) {
-      disposeManifold(part);
+      // One listed in `created` is freed there; freeing it here as well would free it twice, which manifold refuses.
+      if (part && !created.includes(part)) disposeManifold(part);
       return null;
     }
     parts.push(part);
@@ -928,12 +932,142 @@ export async function splitShapeByPlane(shape: WorkplaneShape, plane: SplitPlane
       if (!positiveShape || !negativeShape || (pinsMesh && !pinsShape)) {
         return { parts: null, error: t("split.error.store") };
       }
-      const parts: WorkplaneShape[] = [canonicalizeShape(positiveShape), canonicalizeShape(negativeShape), ...(pinsShape ? [canonicalizeShape(pinsShape)] : [])];
+      // Dowels on a breakaway base say so, for the print check (#1633).
+      const dowels = pinsShape && connectors?.kind === "dowels" && connectors.dowelBase ? { ...pinsShape, breakawayBase: true } : pinsShape;
+      const parts: WorkplaneShape[] = [canonicalizeShape(positiveShape), canonicalizeShape(negativeShape), ...(dowels ? [canonicalizeShape(dowels)] : [])];
       return { parts, closedHoles, ...(tally ? { connectors: tally } : {}) };
     } finally {
       disposeManifold(positiveMesh);
       disposeManifold(negativeMesh);
       disposeManifold(pinsMesh);
+    }
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error ?? "");
+    return { parts: null, error: openHolesError() ?? (message ? t("split.error.kernel", { message }) : t("split.error.kernelUnknown")) };
+  } finally {
+    Array.from(new Set(created)).forEach(disposeManifold);
+  }
+}
+
+/** Longest a body is made longer or shorter in one stretch (Discussions #506, #1569), in mm. */
+export const MAX_STRETCH_LENGTH = 1000;
+/**
+ * How far the pieces of a stretch reach into each other, in mm. Laid exactly face to face, Manifold's union can keep
+ * them as separate shells where a tilted cut leaves its faces a rounding apart, or where the filler meets a floor over
+ * only part of its face; this much overlap joins them for sure and is far below what a printer shows.
+ */
+const STRETCH_OVERLAP = 1e-3;
+/**
+ * How thin (mm) a triangle at a stretch's seams may be before the kernel folds it away. Where the overlap meets a slanted
+ * or rounded wall, the union leaves slivers thinner than it along both seams and the filler's sides - over a thousand on
+ * a ramp, drawn as black lines and left standing as remnants after a later cut (Discussion #1569); twice the overlap
+ * folds them, as they would never print.
+ */
+const STRETCH_SEAM_TOLERANCE = 2 * STRETCH_OVERLAP;
+
+/** What the Split panel's Stretch starts with, in mm. */
+export const DEFAULT_STRETCH_LENGTH = 10;
+
+/** A stretch's length for the status line, in the workspace's unit, without trailing zeros: "20 mm", "12.5 mm", "1⅝ in". */
+export function stretchLengthLabel(length: number) {
+  const shown = formatLengthMm(Math.abs(length), 2);
+  return `${/^\d+\.\d+$/.test(shown) ? String(Number(shown)) : shown} ${currentLengthUnitLabel()}`;
+}
+
+/** The status line after a stretch: how many objects got how much longer or shorter. */
+export function stretchNotice(length: number, count: number, lengthLabel: string) {
+  const key = length > 0
+    ? count === 1 ? "status.stretchLongerOne" : "status.stretchLongerMany"
+    : count === 1 ? "status.stretchShorterOne" : "status.stretchShorterMany";
+  return t(key, { count, length: lengthLabel });
+}
+
+/**
+ * The rotation that turns `unit` onto +z, and its inverse, as Manifold's column-major matrices: the rows of the rotation
+ * are two directions square to the normal and the normal itself, so it keeps the hand of the space.
+ */
+function rotationOntoZ(unit: Vec3) {
+  const helper: Vec3 = Math.abs(unit[2]) < 0.9 ? [0, 0, 1] : [1, 0, 0];
+  const dot = helper[0] * unit[0] + helper[1] * unit[1] + helper[2] * unit[2];
+  const rawU: Vec3 = [helper[0] - dot * unit[0], helper[1] - dot * unit[1], helper[2] - dot * unit[2]];
+  const lengthU = Math.hypot(...rawU);
+  const u: Vec3 = [rawU[0] / lengthU, rawU[1] / lengthU, rawU[2] / lengthU];
+  const v: Vec3 = [unit[1] * u[2] - unit[2] * u[1], unit[2] * u[0] - unit[0] * u[2], unit[0] * u[1] - unit[1] * u[0]];
+  type Mat4 = Parameters<ManifoldSolid["transform"]>[0];
+  const onto = [u[0], v[0], unit[0], 0, u[1], v[1], unit[1], 0, u[2], v[2], unit[2], 0, 0, 0, 0, 1] as Mat4;
+  const back = [u[0], u[1], u[2], 0, v[0], v[1], v[2], 0, unit[0], unit[1], unit[2], 0, 0, 0, 0, 1] as Mat4;
+  return { onto, back };
+}
+
+/**
+ * Makes a shape longer at the plane (Discussions #506, #1569): the part on the side the plane's normal points to moves
+ * `length` mm along it, and the cut through the body at the plane, drawn out over that length, fills the gap - so a case
+ * gets longer through its straight walls while the compartments and rounded corners on either side keep their size. A
+ * negative length shortens it instead: a slice that thick comes out on that side of the plane, and the part beyond moves
+ * back to close the gap. One body comes back, a mesh, under the shape's name.
+ */
+export async function stretchShapeByPlane(
+  shape: WorkplaneShape,
+  plane: SplitPlaneArgs,
+  length: number,
+): Promise<{ parts: WorkplaneShape[]; closedHoles: number; connectors?: SplitConnectorTally } | { parts: null; error: string }> {
+  const created: ManifoldSolid[] = [];
+  takeHoleFillTally();
+  try {
+    if (!Number.isFinite(length) || Math.abs(length) < 0.001) return { parts: null, error: t("split.error.stretchZero") };
+    const halves = await splitShapeHalves(shape, plane, created);
+    if ("error" in halves) return { parts: null, error: halves.error ?? t("split.error.failedDefault") };
+    const { runtime, solid, negative, positive, closedHoles } = halves;
+    const normalLength = Math.hypot(...plane.normal);
+    const unit: Vec3 = [plane.normal[0] / normalLength, plane.normal[1] / normalLength, plane.normal[2] / normalLength];
+    const keep = (made: ManifoldSolid) => {
+      created.push(made);
+      return made;
+    };
+    // The cut a hair past `at` on the side that moves, clear of a face lying there (a pocket's floor laid on with a
+    // picked face), drawn out along the normal from `from` over `over` mm and turned back into place.
+    const { onto, back } = rotationOntoZ(unit);
+    const turned = keep(solid.transform(onto));
+    const drawnOut = (at: number, from: number, over: number) => {
+      const section = turned.slice(at + 1e-3);
+      try {
+        if (section.isEmpty() || section.area() <= 1e-9) return null;
+        return keep(keep(keep(section.extrude(over)).translate([0, 0, from])).transform(back));
+      } finally {
+        section.delete();
+      }
+    };
+    let joined: ManifoldSolid;
+    if (length > 0) {
+      const filler = drawnOut(plane.position, plane.position - STRETCH_OVERLAP, length + 2 * STRETCH_OVERLAP);
+      if (!filler) return { parts: null, error: t("split.error.emptyHalf") };
+      const moved = keep(positive.translate([unit[0] * length, unit[1] * length, unit[2] * length]));
+      joined = keep(runtime.Manifold.union([negative, filler, moved]));
+    } else {
+      // Shorter: what lies beyond the slice comes back onto the plane, joined by a hair-thin piece of its own cut face.
+      const cut = -length;
+      const [beyond, slice] = splitByPlaneClearOfFaces(solid, unit, plane.position + cut);
+      keep(beyond);
+      keep(slice);
+      const trimmed = dropSplitSlivers(runtime, beyond);
+      created.push(...trimmed.created);
+      if (!trimmed.solid || trimmed.solid.status() !== "NoError" || trimmed.solid.numTri() < 1) {
+        return { parts: null, error: t("split.error.stretchTooShort") };
+      }
+      const moved = keep(trimmed.solid.translate([-unit[0] * cut, -unit[1] * cut, -unit[2] * cut]));
+      const joint = drawnOut(plane.position + cut, plane.position - STRETCH_OVERLAP, 2 * STRETCH_OVERLAP);
+      joined = keep(runtime.Manifold.union(joint ? [negative, joint, moved] : [negative, moved]));
+    }
+    if (joined.status() !== "NoError" || joined.numTri() < 1) return { parts: null, error: t("split.error.emptyHalf") };
+    // The slivers at the seams come from different pieces, and the kernel folds only within one mesh: taken as one first.
+    joined = foldedThinWalls(keep(joined.asOriginal()), joined, STRETCH_SEAM_TOLERANCE, created);
+    const mesh = joined.getMesh();
+    try {
+      const stretched = splitShapeFromWorldPositions(shape, manifoldMeshToPositions(mesh), createLocalId(`${shape.id}-stretched`), shape.name);
+      if (!stretched) return { parts: null, error: t("split.error.store") };
+      return { parts: [canonicalizeShape(stretched)], closedHoles };
+    } finally {
+      disposeManifold(mesh);
     }
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error ?? "");
@@ -1028,10 +1162,73 @@ export type SplitShapesOutcome =
     connectors?: SplitConnectorTally;
   };
 
-/** The cut of one target, or `missed` when the plane does not go through it. */
-export async function splitShapeIfCrossed(shape: WorkplaneShape, plane: SplitPlaneArgs, connectors?: SplitConnectorOptions) {
-  if (!splitPlaneIntersectsPoints(meshForShape(shape).vertices, plane.normal, plane.position)) return { missed: true as const };
+/**
+ * The cut of one target - or with `stretch` the target made that much longer there -, or `missed` when the plane does
+ * not go through it, with `beyond` when it lies wholly on the side the plane's normal points to (a stretch moves it).
+ */
+export async function splitShapeIfCrossed(shape: WorkplaneShape, plane: SplitPlaneArgs, connectors?: SplitConnectorOptions, stretch?: number) {
+  const vertices = meshForShape(shape).vertices;
+  if (!splitPlaneIntersectsPoints(vertices, plane.normal, plane.position)) {
+    const [nx, ny, nz] = plane.normal;
+    return { missed: true as const, beyond: vertices.some(([x, y, z]) => x * nx + y * ny + z * nz > plane.position + 1e-5) };
+  }
+  if (stretch !== undefined) return stretchShapeByPlane(shape, plane, stretch);
   return splitShapeByPlane(shape, plane, connectors);
+}
+
+/** A group built again from its parts after a stretch, keeping what is its own (lib/LayerlingEditor's rebuildGroupFromParts). */
+export type RebuildStretchedGroup = (group: WorkplaneShape, parts: WorkplaneShape[]) => Promise<WorkplaneShape | { error: string }>;
+
+type StretchPartsResult =
+  | { missed: true; beyond: boolean }
+  | { parts: WorkplaneShape[]; closedHoles: number }
+  | { parts: null; error?: string };
+
+/** `shape` moved as a whole by `offset` in the world (x, height, z), as a part beyond a stretch's plane goes. */
+function shiftedShape(shape: WorkplaneShape, offset: Vec3): WorkplaneShape {
+  const clean = (value: number) => (Math.abs(value) < 1e-9 ? 0 : Math.round(value * 1e6) / 1e6);
+  return { ...shape, x: clean(shape.x + offset[0]), elevation: clean((shape.elevation ?? 0) + offset[1]), z: clean(shape.z + offset[2]) };
+}
+
+/**
+ * A group stretched part by part (Discussion #1707): the parts the plane crosses get longer, the parts wholly beyond it
+ * move along by the length, the parts before it stay as they are, and the group is built again from them, so it stays a
+ * group that can be ungrouped, its holes stay holes and its untouched parts keep their settings. A group inside it is
+ * stretched the same way. Only a group whose parts lie where its box says (`groupCanKeepParts`: not mirrored, deformed,
+ * filleted, textured or wrapped) goes so; any other is stretched as one body, as before.
+ */
+async function stretchGroupByParts(
+  group: WorkplaneShape,
+  plane: SplitPlaneArgs,
+  stretch: number,
+  splitOne: typeof splitShapeIfCrossed,
+  rebuildGroup: RebuildStretchedGroup,
+  offset: Vec3,
+): Promise<StretchPartsResult> {
+  const children = restoreGroupedChildren(group);
+  const next: WorkplaneShape[] = [];
+  let crossed = false;
+  let beyondCount = 0;
+  let closedHoles = 0;
+  for (const child of children) {
+    const result: StretchPartsResult = groupCanKeepParts(child)
+      ? await stretchGroupByParts(child, plane, stretch, splitOne, rebuildGroup, offset)
+      : await splitOne(child, plane, undefined, stretch);
+    if ("missed" in result) {
+      if (result.beyond) beyondCount += 1;
+      next.push(result.beyond ? shiftedShape(child, offset) : child);
+      continue;
+    }
+    if (!result.parts) return { parts: null, error: result.error };
+    crossed = true;
+    closedHoles += result.closedHoles ?? 0;
+    next.push(...result.parts);
+  }
+  // The plane in a gap between the parts still makes the group longer; wholly on one side it is missed.
+  if (!crossed && (beyondCount === 0 || beyondCount === children.length)) return { missed: true, beyond: beyondCount > 0 };
+  const rebuilt = await rebuildGroup(group, next);
+  if ("error" in rebuilt) return { parts: null, error: rebuilt.error };
+  return { parts: [rebuilt], closedHoles };
 }
 
 /**
@@ -1045,15 +1242,30 @@ export async function splitShapesByPlane(
   stillCurrent: () => boolean,
   splitOne: typeof splitShapeIfCrossed = splitShapeIfCrossed,
   connectors?: SplitConnectorOptions,
+  stretch?: number,
+  rebuildGroup?: RebuildStretchedGroup,
 ): Promise<SplitShapesOutcome> {
   const replacements = new Map<string, WorkplaneShape[]>();
   let splitCount = 0;
   let closedHoles = 0;
-  const asked = connectors && connectors.kind !== "none" ? connectors : undefined;
+  // A stretch keeps each body whole, so it takes no connectors.
+  const asked = stretch === undefined && connectors && connectors.kind !== "none" ? connectors : undefined;
   let tally: SplitConnectorTally | undefined = asked ? NO_CONNECTORS : undefined;
+  // How far a stretch moves what lies beyond its plane: along the plane's normal, by the length (back for a minus one).
+  const normalLength = Math.hypot(...plane.normal) || 1;
+  const offset: Vec3 = stretch === undefined
+    ? [0, 0, 0]
+    : [plane.normal[0] / normalLength * stretch, plane.normal[1] / normalLength * stretch, plane.normal[2] / normalLength * stretch];
   for (const shape of targets) {
-    const result = await splitOne(shape, plane, asked);
-    if ("missed" in result) continue;
+    const result: StretchPartsResult | Awaited<ReturnType<typeof splitShapeIfCrossed>> = stretch !== undefined && rebuildGroup && groupCanKeepParts(shape)
+      ? await stretchGroupByParts(shape, plane, stretch, splitOne, rebuildGroup, offset)
+      : await splitOne(shape, plane, asked, stretch);
+    if ("missed" in result) {
+      // Selected with the stretched ones, a part wholly beyond the plane moves along (Discussion #1707): a hole at the
+      // end of a case stays at the end. It is not counted as stretched.
+      if (stretch !== undefined && result.beyond) replacements.set(shape.id, [shiftedShape(shape, offset)]);
+      continue;
+    }
     if (!stillCurrent()) return { status: "stale" };
     if (!result.parts) return { status: "failed", shape, error: result.error ?? t("split.error.failedDefault") };
     replacements.set(shape.id, result.parts);
@@ -1382,10 +1594,21 @@ export const SECTION_SEEN_FROM_KEYS = {
 /** A bundle goes out as its parts, each a body of its own with its own colour (or the bundle's, letters included, with Multicolor off); its holes cut nothing. */
 export function expandBundles(source: readonly WorkplaneShape[]): WorkplaneShape[] {
   return source.flatMap((shape) => (
-    shape.groupOperation === "bundle" && shape.groupedShapes?.length
+    shape.groupOperation === "bundle" && shape.groupedShapes?.length && !keptWholeForItsDeform(shape)
       ? expandBundles(restoreGroupedChildren(shape).map((part) => (shape.multicolor === false ? { ...part, color: shape.color, gridfinityLabelColor: undefined } : part))).filter((part) => !part.hidden)
       : [shape]
   ));
+}
+
+/**
+ * A bundle tapered, twisted or leaned as a whole goes out whole (#1648): its parts on their own cannot carry that, so
+ * taken apart its texture came out straight while the view showed it twisted. meshForShape turns it as the view does.
+ * One with a hole in it is still taken apart, or the hole would come out solid.
+ */
+function keptWholeForItsDeform(bundle: WorkplaneShape): boolean {
+  if (!shapeHasShapeDeform(bundle)) return false;
+  const hasHole = (shape: WorkplaneShape): boolean => (shape.groupedShapes ?? []).some((part) => !part.hidden && (part.hole || hasHole(part)));
+  return !hasHole(bundle);
 }
 
 export function visibleExportShapes(source: readonly WorkplaneShape[]) {
@@ -1453,6 +1676,9 @@ function partColorMeshes(shape: WorkplaneShape): Array<{ mesh: MeshData; color: 
   let lowest = Number.POSITIVE_INFINITY;
   if (imported) for (let index = 1; index < imported.positions.length; index += 3) lowest = Math.min(lowest, imported.positions[index]);
   const scale = imported ? null : groupedContentScale(shape, localGroupBounds(shape.groupedShapes ?? []));
+  // A tapered or twisted group turns each part over the whole group's height, as meshForShape does, not over the
+  // part's own: the pattern of a twisted bundle, higher up than its body, kept its colour off the twisted faces (#1648).
+  const frame = !imported && shapeHasShapeDeform(shape) ? deformFrameOf(groupedContentMesh(shape).vertices) : undefined;
   const meshes: Array<{ mesh: MeshData; color: string }> = [];
   const add = (local: MeshData, color: string) => {
     if (local.faces.length === 0) return;
@@ -1465,7 +1691,7 @@ function partColorMeshes(shape: WorkplaneShape): Array<{ mesh: MeshData; color: 
     } else {
       vertices = scaleGroupedVertices(local.vertices, scale!) as Vec3[];
     }
-    meshes.push({ mesh: transformMesh({ name: local.name, vertices, faces: local.faces }, shape), color });
+    meshes.push({ mesh: transformMesh({ name: local.name, vertices, faces: local.faces }, shape, frame), color });
   };
   parts.forEach((part) => {
     // A bin's letters in their own colour come before the bin, as for a bin on its own; here the bin stays its mesh, as
@@ -2788,7 +3014,9 @@ export function splitBoreTube(shape: WorkplaneShape): WorkplaneShape[] {
   const { tubeBoreHole: _flag, bevel: _wall, ...rest } = shape;
   return [
     { ...rest, kind: "cylinder", bevel: 0 },
-    { ...rest, id: derivedLocalId(shape.id, "bore"), kind: "cylinder", hole: true, bevel: 0, width, depth, size: Math.max(width, depth) },
+    // The bore's slope and side drop are measured over the tube, so its top lies on the tube's (#1698): measured over its
+    // own, narrower width it ran down more steeply, stood out past the sloped end on one side and stopped short on the other.
+    { ...rest, id: derivedLocalId(shape.id, "bore"), kind: "cylinder", hole: true, bevel: 0, width, depth, size: Math.max(width, depth), slopeSpan: { width: shape.width, depth: shape.depth ?? shape.width } },
   ];
 }
 

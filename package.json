@@ -1,6 +1,6 @@
 {
   "name": "layerling",
-  "version": "1.156.1",
+  "version": "1.161.0",
   "private": true,
   "description": "Easy 3D CAD for 3D printing. A local-first 3D editor that runs in your browser.",
   "author": {
@@ -42,13 +42,13 @@
   },
   "dependencies": {
     "@types/three": "^0.184.1",
-    "brepjs": "^20.18.0",
+    "brepjs": "^20.21.2",
     "fflate": "^0.8.3",
     "lucide-react": "^0.511.0",
     "manifold-3d": "^3.5.0",
     "meshoptimizer": "^1.3.0",
     "next": "^15.5.29",
-    "occt-wasm": "^5.15.0",
+    "occt-wasm": "^5.17.1",
     "opentype.js": "^1.3.4",
     "qrcode-generator": "^2.0.4",
     "react": "^19.1.0",

@@ -38,6 +38,17 @@ import type { AlignAxis, WorkplaneWorkspaceSettings } from "@/types/layerling";
 
 export type SplitWorkplaneDirection = "parallel" | "acrossX" | "acrossY";
 
+/** Cut in two, or make the selection longer or shorter at the plane (Discussions #506, #1569). */
+export type SplitMode = "split" | "stretch";
+
+const SPLIT_MODES = [
+  { mode: "split", label: "split.modeSplit", hint: "split.modeSplitHint" },
+  { mode: "stretch", label: "split.modeStretch", hint: "split.modeStretchHint" },
+] as const satisfies ReadonlyArray<{ mode: SplitMode; label: string; hint: string }>;
+
+/** How far the Stretch slider reaches either way, in mm; the field takes the same. */
+const STRETCH_SLIDER_LIMIT = 200;
+
 const SPLIT_WORKPLANE_DIRECTIONS = [
   { direction: "parallel", label: "split.workplaneParallel", hint: "split.workplaneParallelHint" },
   { direction: "acrossX", label: "split.workplaneAcrossX", hint: "split.workplaneAcrossXHint" },
@@ -88,6 +99,10 @@ export function SplitPanel({
   picking,
   connectors,
   connectorPreview,
+  mode = "split",
+  stretch = 10,
+  onModeChange = () => undefined,
+  onStretchChange = () => undefined,
   onPickToggle,
   onAxisChange,
   onAlignToWorkplane,
@@ -111,6 +126,11 @@ export function SplitPanel({
   /** Dowels, plugs or a dovetail that line the halves up again, or none (Discussion #832). */
   connectors: SplitConnectorOptions;
   connectorPreview: SplitConnectorPreviewState;
+  mode?: SplitMode;
+  /** How much longer the bodies get at the plane in Stretch, in mm; minus makes them shorter. */
+  stretch?: number;
+  onModeChange?: (mode: SplitMode) => void;
+  onStretchChange?: (stretch: number) => void;
   onPickToggle: () => void;
   onAxisChange: (axis: AlignAxis) => void;
   /** Lays the plane on the workplane, or square to it along its X or Y (#644). */
@@ -171,7 +191,7 @@ export function SplitPanel({
       <div className="split-panel-header movable" title={t("panel.moveHint")} {...handleProps}>
         <div>
           <strong id="split-panel-title">{t("split.title")}</strong>
-          <span>{t("split.subtitle")}</span>
+          <span>{t(mode === "stretch" ? "split.stretchSubtitle" : "split.subtitle")}</span>
         </div>
         <div className="panel-header-actions">
           <GuideHelpLink section="splitting" />
@@ -181,8 +201,26 @@ export function SplitPanel({
 
       <div className="split-panel-target">
         <strong>{targetCount === 1 ? t("split.targetOne") : t("split.targetMany", { count: targetCount })}</strong>
-        <span>{t("split.targetHint")}</span>
+        <span>{t(mode === "stretch" ? "split.stretchTargetHint" : "split.targetHint")}</span>
       </div>
+
+      <fieldset className="split-axis-control split-mode-control" disabled={busy}>
+        <legend>{t("split.mode")}</legend>
+        <div>
+          {SPLIT_MODES.map((entry) => (
+            <button
+              type="button"
+              className={mode === entry.mode ? "active" : ""}
+              aria-pressed={mode === entry.mode}
+              key={entry.mode}
+              title={t(entry.hint)}
+              onClick={() => onModeChange(entry.mode)}
+            >
+              {t(entry.label)}
+            </button>
+          ))}
+        </div>
+      </fieldset>
 
       <fieldset className="split-axis-control" disabled={busy}>
         <legend>{t("split.orientation")}</legend>
@@ -286,6 +324,21 @@ export function SplitPanel({
         />
       ))}
 
+      {mode === "stretch" ? (<>
+        <EdgeModifierSlider
+          label={t("split.stretchLength")}
+          value={stretch}
+          min={-STRETCH_SLIDER_LIMIT}
+          max={STRETCH_SLIDER_LIMIT}
+          step={0.5}
+          decimals={2}
+          workspace={workspace}
+          length
+          disabled={busy}
+          onChange={onStretchChange}
+        />
+        <p className="split-panel-help">{t("split.stretchHelp")}</p>
+      </>) : (<>
       <fieldset className="split-axis-control split-connector-control" disabled={busy}>
         <legend>{t("split.connectors")}</legend>
         <div>
@@ -408,15 +461,16 @@ export function SplitPanel({
           {splitConnectorSummary(connectorPreview, connectors.kind).map((line) => <span key={line}>{line}</span>)}
         </div>
       </>)}
+      </>)}
 
       <p className="split-panel-help">{t("split.help")}</p>
       {error ? <div className="split-panel-error" role="alert">{error}</div> : null}
 
       <div className="split-panel-footer">
         <button type="button" className="secondary" disabled={busy} onClick={onCancel}>{t("common.cancel")}</button>
-        <button type="button" className="primary" disabled={busy || max - min <= 0.0001} onClick={onApply}>
+        <button type="button" className="primary" disabled={busy || max - min <= 0.0001 || (mode === "stretch" && Math.abs(stretch) < 0.001)} onClick={onApply}>
           {busy ? <LoaderCircle className="split-panel-spinner" size={17} /> : <Check size={17} />}
-          {busy ? t("split.applying") : t("split.apply")}
+          {mode === "stretch" ? (busy ? t("split.stretchApplying") : t("split.stretchApply")) : busy ? t("split.applying") : t("split.apply")}
         </button>
       </div>
       </>)}

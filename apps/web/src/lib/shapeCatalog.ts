@@ -20,6 +20,7 @@ import {
   MAX_GEAR_BACKLASH,
   gearSizeForModule,
   gearToothProfile,
+  gearTypeIsModular,
   gearUsesModule,
   involuteGearDiameter,
   normalizeGearCenterHoleSize,
@@ -31,6 +32,8 @@ import {
   normalizeGearToothSize,
   normalizeGearToothWidth,
   normalizeGearType,
+  normalizeRingRackHelixAngle,
+  normalizeBevelHelixAngle,
   rackToothHeight,
 } from "@/lib/gearGeometry";
 import {
@@ -165,6 +168,7 @@ import {
   normalizeHingePinDiameter,
   normalizeHingeScrewDiameter,
   normalizeHingeScrewHoles,
+  normalizeHingeSnapGrip,
 } from "@/lib/hingeGeometry";
 import { DEFAULT_GRIDFINITY_LIP, DEFAULT_GRIDFINITY_MAGNETS, DEFAULT_GRIDFINITY_TRAY_SIZE, DEFAULT_GRIDFINITY_TYPE, DEFAULT_GRIDFINITY_UNITS, gridfinityFootprintPatch, gridfinityPadding, gridfinitySize, normalizeGridfinityType } from "@/lib/gridfinityGeometry";
 import {
@@ -201,7 +205,6 @@ import {
   DEFAULT_ROUNDED_BOX_QUALITY,
   normalizeCornerFillet,
   normalizeEndFillets,
-  normalizeTopBottomFillet,
   normalizeRoundedBoxQuality,
 } from "@/lib/roundedBoxGeometry";
 import {
@@ -782,6 +785,8 @@ export function sceneShape(shape: Partial<WorkplaneShape> & Pick<WorkplaneShape,
     gearRim: shape.gearRim,
     helixAngle: shape.helixAngle,
     bevelHelixAngle: shape.bevelHelixAngle,
+    ringRackHelixAngle: shape.ringRackHelixAngle,
+    ringRackHerringbone: shape.ringRackHerringbone,
     helixQuality: shape.helixQuality,
     gearProfile: shape.gearProfile,
     gearPressureAngle: shape.gearPressureAngle,
@@ -834,6 +839,7 @@ export function sceneShape(shape: Partial<WorkplaneShape> & Pick<WorkplaneShape,
     hingeKnuckleWidth: shape.hingeKnuckleWidth,
     hingeConeSize: shape.hingeConeSize,
     hingeStyle: shape.hingeStyle,
+    hingeSnapGrip: shape.hingeSnapGrip,
     hingePinDiameter: shape.hingePinDiameter,
     hingeLeafThickness: shape.hingeLeafThickness,
     hingeClearance: shape.hingeClearance,
@@ -942,6 +948,7 @@ export function sceneShape(shape: Partial<WorkplaneShape> & Pick<WorkplaneShape,
     drillPointAngle: shape.drillPointAngle,
     screwHoleSlot: shape.screwHoleSlot,
     screwHoleRecess: shape.screwHoleRecess,
+    screwHoleChamfer: shape.screwHoleChamfer,
     portProfile: shape.portProfile,
     portClearance: shape.portClearance,
     cornerFillet: shape.cornerFillet,
@@ -1230,7 +1237,12 @@ export function makeShapeFromAsset(
     gearType,
     gearRim,
     helixAngle: asset.kind === "gear" ? normalizeGearHelixAngle(customization.helixAngle ?? DEFAULT_GEAR_HELIX_ANGLE) : undefined,
+    // Slanted teeth on a ring gear or a rack (Discussion #1627); straight ones keep no angle.
+    ringRackHelixAngle: asset.kind === "gear" && gearTypeIsModular(gearType) && normalizeRingRackHelixAngle(customization.ringRackHelixAngle) !== 0 ? normalizeRingRackHelixAngle(customization.ringRackHelixAngle) : undefined,
+    ringRackHerringbone: asset.kind === "gear" && gearTypeIsModular(gearType) && normalizeRingRackHelixAngle(customization.ringRackHelixAngle) !== 0 && customization.ringRackHerringbone === true ? true : undefined,
     helixQuality: asset.kind === "gear" ? normalizeGearHelixQuality(customization.helixQuality ?? DEFAULT_GEAR_HELIX_QUALITY) : undefined,
+    // A spiral bevel gear; a straight one keeps no angle, as the inspector leaves it.
+    bevelHelixAngle: asset.kind === "gear" && gearType === "bevel" && normalizeBevelHelixAngle(customization.bevelHelixAngle) !== 0 ? normalizeBevelHelixAngle(customization.bevelHelixAngle) : undefined,
     gearProfile,
     gearPressureAngle: gearProfile === "involute" ? normalizeGearPressureAngle(customization.gearPressureAngle) : undefined,
     gearBacklash: gearUsesModule(gearProfile) ? Math.max(0, Math.min(MAX_GEAR_BACKLASH, customization.gearBacklash ?? DEFAULT_GEAR_BACKLASH)) : undefined,
@@ -1324,8 +1336,9 @@ export function makeShapeFromAsset(
     hingeClearance: asset.kind === "hinge" ? normalizeHingeClearance(customization.hingeClearance ?? DEFAULT_HINGE_CLEARANCE) : undefined,
     hingePinless: asset.kind === "hinge" ? customization.hingePinless === true : undefined,
     hingeKnuckleWidth: asset.kind === "hinge" ? normalizeHingeKnuckleWidth(customization.hingeKnuckleWidth) : undefined,
-    hingeStyle: asset.kind === "hinge" && (customization.hingeStyle === "cone" || customization.hingeStyle === "pinless" || customization.hingeStyle === "liftOff") ? customization.hingeStyle : undefined,
+    hingeStyle: asset.kind === "hinge" && (customization.hingeStyle === "cone" || customization.hingeStyle === "pinless" || customization.hingeStyle === "liftOff" || customization.hingeStyle === "snap") ? customization.hingeStyle : undefined,
     hingeConeSize: asset.kind === "hinge" && customization.hingeStyle === "cone" && Number.isFinite(customization.hingeConeSize) ? customization.hingeConeSize : undefined,
+    hingeSnapGrip: asset.kind === "hinge" && customization.hingeStyle === "snap" && Number.isFinite(customization.hingeSnapGrip) ? normalizeHingeSnapGrip(customization.hingeSnapGrip) : undefined,
     // Screw holes and round corners only when the defaults ask for them; the geometry fits them to the leaf.
     hingeScrewHoles: asset.kind === "hinge" && normalizeHingeScrewHoles(customization.hingeScrewHoles) > 0 ? normalizeHingeScrewHoles(customization.hingeScrewHoles) : undefined,
     hingeScrewDiameter: asset.kind === "hinge" && Number.isFinite(customization.hingeScrewDiameter) ? normalizeHingeScrewDiameter(customization.hingeScrewDiameter) : undefined,
@@ -1366,6 +1379,8 @@ export function makeShapeFromAsset(
     // A slotted hole and a recessed head (Discussion #1531); left out when off, as the editor leaves them.
     screwHoleSlot: (asset.kind === "counterbore" || asset.kind === "countersink" || asset.kind === "doubleCountersink") && customization.screwHoleSlot ? true : undefined,
     screwHoleRecess: (asset.kind === "countersink" || asset.kind === "doubleCountersink") && (customization.screwHoleRecess ?? 0) > 0 ? customization.screwHoleRecess : undefined,
+    // A chamfer at the rim of a counterbore (Discussion #1632); left out when off, as the editor leaves it.
+    screwHoleChamfer: asset.kind === "counterbore" && (customization.screwHoleChamfer ?? 0) > 0 ? customization.screwHoleChamfer : undefined,
     cornerFillet: asset.kind === "roundedBox" ? normalizeCornerFillet(customization.cornerFillet ?? DEFAULT_ROUNDED_BOX_CORNER_FILLET, Math.min(width, depth) / 2)
       : asset.kind === "port" ? normalizePortCorner(customization.cornerFillet, width, height, customization.portProfile) : undefined,
     portProfile: asset.kind === "port" ? normalizePortProfile(customization.portProfile) : undefined,

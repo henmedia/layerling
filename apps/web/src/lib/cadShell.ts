@@ -1,7 +1,8 @@
 import { JoinType, type BoundingBox, type OcctKernel, type ShapeHandle } from "occt-wasm";
-import { isCadModifierWasmMemoryFault } from "@/lib/cadModifierRuntime";
+import { applyCadTransform, isCadModifierWasmMemoryFault } from "@/lib/cadModifierRuntime";
 import { shellOpenSides } from "@/lib/shellLimits";
 import type { ShellEdges, ShellOpenings, ShellSide } from "@/types/layerling";
+import type { CadModifierMeshPart } from "@/lib/cadModifierTypes";
 import { isKernelMemoryFault } from "@/lib/kernelFault";
 
 // Hollowing ("shell") for the CAD modifier worker. It lives outside the worker
@@ -140,7 +141,9 @@ function shellByExtension(cad: OcctKernel, solid: ShapeHandle, open: ShapeHandle
       const reach = wall * 2 + 1e-3;
       const slab = cad.extrude(face, normal.x * reach, normal.y * reach, normal.z * reach);
       handles.push(slab);
-      const fused = cad.unifySameDomain(cad.fuse(grown, slab));
+      const joined = cad.fuse(grown, slab);
+      handles.push(joined);
+      const fused = cad.unifySameDomain(joined);
       handles.push(fused);
       grown = fused;
     }
@@ -364,6 +367,20 @@ function standsUpright(cad: OcctKernel, face: ShapeHandle) {
   return true;
 }
 
+/** How far a flat side leans from upright: the sine of its tilt, or null when the face is not flat. */
+function flatSideLean(cad: OcctKernel, face: ShapeHandle) {
+  if (cad.surfaceType(face) !== "plane") return null;
+  const { uMin, uMax, vMin, vMax } = cad.uvBounds(face);
+  const normal = cad.surfaceNormal(face, (uMin + uMax) / 2, (vMin + vMax) / 2);
+  return Math.abs(normal.y) / (Math.hypot(normal.x, normal.y, normal.z) || 1);
+}
+
+/**
+ * How far the top of a leaning side may stand from its bottom, at most, for the body to be hollowed through its
+ * bottom outline all the same: a hair against the wall. The wall is then that much thinner or thicker at the top.
+ */
+const MAX_LEAN_DRIFT = 0.1;
+
 /** Sampled outlines run within this of the curves they stand for. */
 const OUTLINE_DEFLECTION = 0.01;
 
@@ -378,6 +395,12 @@ const OUTLINE_DEFLECTION = 0.01;
  * the floor sharp. The outline is moved as it is first; where the kernel cannot move it cleanly, as straight pieces
  * within 0.01 mm of it. Only for openings at the top and the bottom. Undefined when the body is no upright prism or
  * the openings are on its sides, null when it is one but its outline cannot be moved.
+ *
+ * An STL whose top and bottom outlines were sampled apart (Discussion #1615: a flat figure, 470 points on top and 414
+ * below) has sides of single triangles, each leaning a little, up to 0.4 degrees; the thick solid gives up on them
+ * at any wall. Flat sides that lean so little that the top of the body stands at most MAX_LEAN_DRIFT (and a quarter
+ * of the wall) off its bottom count as upright: the cavity follows the bottom outline and is cut from the body as it
+ * is, so the outside stays.
  */
 function shellByOutline(cad: OcctKernel, solid: ShapeHandle, thickness: number, openings: ShellOpenings, edges: ShellEdges): ShapeHandle | null | undefined {
   const sides = shellOpenSides(openings);
@@ -393,6 +416,8 @@ function shellByOutline(cad: OcctKernel, solid: ShapeHandle, thickness: number, 
     const faces = cad.getSubShapes(solid, "face");
     made.push(...faces);
     const bottoms: ShapeHandle[] = [];
+    // The sine of the steepest lean of a flat side that does not stand quite upright (#1615).
+    let lean = 0;
     for (const face of faces) {
       const center = cad.getSurfaceCenterOfMass(face);
       const normal = orientedFaceNormal(cad, face, center);
@@ -403,12 +428,21 @@ function shellByOutline(cad: OcctKernel, solid: ShapeHandle, thickness: number, 
       }
       // Every other face stands upright everywhere, not only at its middle (a bulging vase side is
       // upright at its widest), and runs from the bottom to the top: the body is one layer.
-      if (!standsUpright(cad, face)) return undefined;
+      if (!standsUpright(cad, face)) {
+        const sideLean = flatSideLean(cad, face);
+        if (sideLean === null) return undefined;
+        lean = Math.max(lean, sideLean);
+      }
       const box = cad.getBoundingBox(face, false);
       if (box.ymin > bounds.ymin + flat || box.ymax < bounds.ymax - flat) return undefined;
     }
     if (bottoms.length !== 1) return undefined;
-    return hollowedThroughOutline(cad, solid, bottoms[0], bounds, thickness, sides, edges, made, keep, true);
+    if (lean > 0) {
+      const drift = ((bounds.ymax - bounds.ymin) * lean) / Math.sqrt(Math.max(1e-12, 1 - lean * lean));
+      if (drift > Math.min(MAX_LEAN_DRIFT, thickness / 4)) return undefined;
+    }
+    // A leaning body is cut as it is, never rebuilt from its bottom: that would stand its sides up.
+    return hollowedThroughOutline(cad, solid, bottoms[0], bounds, thickness, sides, edges, made, keep, lean === 0);
   } catch (error) {
     if (mustSurface(error)) throw error;
     return null;
@@ -584,7 +618,71 @@ function withoutSliverFaces(cad: OcctKernel, solid: ShapeHandle): ShapeHandle | 
   }
 }
 
+/** The plain round core of a threaded rod or screw (#1687): its radius and height in the thread's own frame (axis on y,
+ * bottom at y = 0), and the transform that places that frame, as for the thread itself. */
+export type ThreadShellCore = { radius: number; height: number; transform?: number[] };
+
+/**
+ * The plain core of a body that is one threaded rod or screw, straight and solid (#1687): as wide as the root of the
+ * thread, and narrower where a chamfer at an end cuts deeper, so the core stays inside it. A nut, a bore, a tapered
+ * thread or anything with other parts goes the usual way.
+ */
+export function threadShellCoreOf(parts: readonly CadModifierMeshPart[]): ThreadShellCore | null {
+  if (parts.length !== 1) return null;
+  const [part] = parts;
+  const thread = part.thread;
+  if (!thread || part.hole || thread.taper || (thread.role !== "rod" && thread.role !== "screw")) return null;
+  const radius = Math.min(
+    thread.minor,
+    thread.chamfer > 0 ? thread.major - thread.chamfer : Infinity,
+    thread.chamferBottom && thread.chamferLow > 0 ? thread.major - thread.chamferLow : Infinity,
+  );
+  if (!(radius > 0) || !(thread.height > 0)) return null;
+  return { radius, height: thread.height, ...(thread.transform ? { transform: thread.transform } : {}) };
+}
+
+const Z_TO_Y_UP = [1, 0, 0, 0, 0, 0, 1, 0, 0, -1, 0, 0];
+/** How far the core reaches past the thread's ends, so an open end of the cavity goes cleanly through them. */
+const CORE_OVERHANG = 0.001;
+
+/**
+ * Hollows a threaded rod or screw through its plain core (#1687). The thick solid over the helical flanks of a
+ * thread ran past the worker's time limit, even for a short rod. The cavity of a hollowed cylinder of the core's
+ * size, with the same wall and open sides, is cut out of the thread instead: the outside stays as it is, and the wall
+ * is the thickness asked for at the root of the thread, where it is thinnest. The core reaches a hair past both ends,
+ * so an open end cuts through cleanly; a closed end keeps its wall less that hair.
+ */
+export function shellThreadByCore(cad: OcctKernel, solid: ShapeHandle, core: ThreadShellCore, thickness: number, openings: ShellOpenings, edges: ShellEdges = "round") {
+  const owned: ShapeHandle[] = [];
+  const own = (shape: ShapeHandle) => {
+    owned.push(shape);
+    return shape;
+  };
+  try {
+    const upright = own(cad.transform(own(cad.makeCylinder(core.radius, core.height + 2 * CORE_OVERHANG)), Z_TO_Y_UP));
+    const local = own(cad.translate(upright, 0, -CORE_OVERHANG, 0));
+    const placed = applyCadTransform(cad, local, core.transform);
+    if (placed !== local) own(placed);
+    const hollowCore = own(shellSolid(cad, placed, thickness, openings, edges));
+    const cavity = own(cad.cut(placed, hollowCore));
+    const result = cad.cut(solid, cavity);
+    const volume = shapeIsValid(cad, result) ? cad.getVolume(result) : 0;
+    if (!(volume > 0 && volume < cad.getVolume(solid) * (1 - 1e-6))) {
+      cad.release(result);
+      throw new Error(CANNOT_HOLLOW_MESSAGE);
+    }
+    return result;
+  } finally {
+    releaseAll(cad, owned);
+  }
+}
+
 export function shellSolid(cad: OcctKernel, solid: ShapeHandle, thickness: number, openings: ShellOpenings, edges: ShellEdges = "round") {
+  // An upright prism goes through its outline as it is, slivers and all: the 2D offset lets them vanish. Taking
+  // them off first took 7 s on the figure of Discussion #1615 and left one side a thousandth of a millimetre short
+  // of the top, so the body no longer counted as one layer and went to the thick solid, which gave up after a minute.
+  const outlined = shellByOutline(cad, solid, thickness, openings, edges);
+  if (outlined) return outlined;
   const cleaned = withoutSliverFaces(cad, solid);
   try {
     return shellBody(cad, cleaned ?? solid, thickness, openings, edges);
@@ -812,10 +910,18 @@ export function offsetSolidSideways(cad: OcctKernel, solid: ShapeHandle, distanc
     if (layers.length === 0) throw new Error(CANNOT_OFFSET_MESSAGE);
     const joined = layers.length === 1 ? cad.copy(layers[0]) : keep(cad.fuseAll(layers));
     const result = layers.length === 1 ? joined : cad.unifySameDomain(joined);
-    const baseVolume = cad.getVolume(solid);
-    const volume = shapeIsValid(cad, result) ? cad.getVolume(result) : 0;
-    if (volume > 0 && (shrink ? volume < baseVolume * (1 - 1e-6) : volume > baseVolume * (1 + 1e-6))) return result;
-    cad.release(result);
+    // Freed unless it is handed on, also when a check below throws.
+    let handedOn = false;
+    try {
+      const baseVolume = cad.getVolume(solid);
+      const volume = shapeIsValid(cad, result) ? cad.getVolume(result) : 0;
+      if (volume > 0 && (shrink ? volume < baseVolume * (1 - 1e-6) : volume > baseVolume * (1 + 1e-6))) {
+        handedOn = true;
+        return result;
+      }
+    } finally {
+      if (!handedOn) cad.release(result);
+    }
     throw new Error(CANNOT_OFFSET_MESSAGE);
   } catch (error) {
     if (mustSurface(error)) throw error;

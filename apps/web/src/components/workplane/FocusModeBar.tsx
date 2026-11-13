@@ -1,6 +1,7 @@
 "use client";
 
 import { GripVertical, Minimize2, Search } from "lucide-react";
+import type { ReactNode } from "react";
 import { GuideHelpLink } from "@/components/GuideHelpLink";
 import { t } from "@/lib/i18n";
 import { FOCUS_MODE_SHORTCUT } from "@/lib/focusMode";
@@ -10,7 +11,8 @@ import { ToolbarHomeIcon, ToolbarSettingsIcon } from "../icons";
 /**
  * In focus mode (Discussion #1554) the title row and the footer give their room to the work, and what of them is
  * needed while designing comes along in this small bar over the view: Home, the 3D editor and Sketch tabs, the command
- * search, the settings, and the way back. It hangs below the ribbon in the middle; its grip moves it anywhere in the
+ * search, the settings, and the way back; and the design's name, so a new design can be named without leaving focus mode
+ * (Discussion #1678). It hangs below the ribbon in the middle; its grip moves it anywhere in the
  * editor, a double click on the grip puts it back.
  */
 const FOCUS_BAR_PANEL: MovablePanelOptions = {
@@ -31,6 +33,7 @@ export function FocusModeBar({
   onSettings,
   onLeave,
   showSearch,
+  nameField,
 }: {
   toolbarMode: "geometry" | "sketch";
   sketchDisabled: boolean;
@@ -41,6 +44,8 @@ export function FocusModeBar({
   onSettings: () => void;
   onLeave: () => void;
   showSearch: boolean;
+  /** The design's name, editable as in the title row. */
+  nameField?: ReactNode;
 }) {
   const move = useMovablePanel<HTMLDivElement>("layerling.editor.focusBarPosition", FOCUS_BAR_PANEL);
   return (
@@ -88,6 +93,7 @@ export function FocusModeBar({
           {t("editor.modeSketch")}
         </button>
       </div>
+      {nameField}
       {showSearch ? (
         <button className="action-icon-button" type="button" aria-label={t("palette.open")} title={t("palette.open")} aria-haspopup="dialog" onClick={onSearch}>
           <Search className="toolbar-search-icon" aria-hidden="true" />

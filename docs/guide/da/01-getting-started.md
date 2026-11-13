@@ -92,6 +92,7 @@ Nederst i vinduet: {{ui:dashboard.sponsor}} fører til siden, hvor du kan støtt
 ### Fokustilstand
 
 På en lille skærm giver {{ui:focusMode.enter}} titellinjen og sidefoden til arbejdet: knappen med de to pile, der peger udad, øverst til højre, [[Ctrl]]+[[Shift]]+[[F]] eller kommandosøgningen slår den til. Båndet rykker op, og visningen når ned til vinduets kant. En lille bjælke under båndet beholder huset til startsiden, fanerne {{ui:editor.modeGeometry}} og {{ui:editor.modeSketch}}, forstørrelsesglasset, indstillingerne og knappen med de to pile, der peger indad, som afslutter fokustilstanden; træk bjælken i dens greb et andet sted hen, et dobbeltklik på grebet sætter den tilbage. layerling husker valget i denne browser, og mens browseren fylder hele skærmen (F11), skifter den selv til fokustilstand.
+Bjælken viser også designets navn; klik på det for at omdøbe designet uden at forlade fokustilstand.
 
 ## Din første del
 
@@ -112,6 +113,8 @@ Sådan laves borehuller, slidser og lommer. Kapitlet [Solider og huller](chapter
 ## Nyt siden dit seneste besøg
 
 Når du åbner layerling igen efter en opdatering, viser et kort på startsiden hvad der er tilføjet siden du var her sidst: hver version siden da, den nyeste først. Efter et langt fravær scroller du ned i kortet. Nedenunder tilføjer {{ui:whatsNew.earlier}} også versionerne fra før dit seneste besøg. Luk det med {{ui:whatsNew.dismiss}} og det forbliver væk indtil næste opdatering. {{ui:whatsNew.footerLink}} i sidefoden på startsiden viser de seneste tilføjelser igen til enhver tid. I editoren åbner knappen {{ui:whatsNew.footerLink}} ved siden af {{ui:editor.guide}} øverst til højre den samme liste, og det gør kommandosøgningen også; den bliver åben ved siden af dit design, mens du prøver det nye. Browseren husker den seneste version du så, og intet om dig forlader den.
+
+Nu og da står der et andet kort over det: en besked fra layerlings forfatter, for eksempel om en pause, hvor svar tager længere tid. Det vises kun i de dage, det er tænkt til, og {{ui:whatsNew.dismiss}} lægger det væk.
 
 På en kopi af layerling på din egen computer eller server har meddelelsen "Opdatering tilgængelig" en knap, {{ui:update.previewShow}}, der viser hvad opdateringen bringer før du installerer den. Listen hentes fra GitHub først når du trykker på knappen.
 

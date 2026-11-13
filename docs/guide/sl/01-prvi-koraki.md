@@ -91,6 +91,7 @@ Na dnu okna: {{ui:dashboard.sponsor}} vodi na stran, kjer lahko podprete projekt
 ### Način osredotočenja
 
 Na majhnem zaslonu {{ui:focusMode.enter}} prepusti naslovno vrstico in nogo delu: vklopi ga gumb z dvema puščicama navzven zgoraj desno, [[Ctrl]]+[[Shift]]+[[F]] ali iskanje ukazov. Trak se pomakne navzgor, pogled pa sega do roba okna. Majhna vrstica pod trakom obdrži hišico za začetno stran, zavihka {{ui:editor.modeGeometry}} in {{ui:editor.modeSketch}}, lupo, nastavitve in gumb z dvema puščicama navznoter, ki način konča; vrstico za ročaj povlecite drugam, dvoklik na ročaj jo vrne. layerling si izbiro zapomni v tem brskalniku, in dokler brskalnik zapolnjuje cel zaslon (F11), sam preklopi v način osredotočenja.
+Vrstica prikazuje tudi ime projekta; s klikom nanj ga preimenujete, ne da bi zapustili način osredotočenja.
 
 ## Tvoj prvi del
 
@@ -111,6 +112,8 @@ Natanko tako nastanejo izvrtine, utori in žepi. Poglavje [Telesa in luknje](cha
 ## Novo od tvojega zadnjega obiska
 
 Ko po posodobitvi spet odpreš layerling, ti kartica na začetni strani pokaže, kaj je prišlo zraven od tvojega zadnjega obiska: vsako različico od takrat, najnovejšo na vrhu. Če te dolgo ni bilo, se v kartici pomakni navzdol. Pod njo {{ui:whatsNew.earlier}} doda tudi različice izpred tvojega zadnjega obiska. Z {{ui:whatsNew.dismiss}} jo zapreš in ostane skrita do naslednje posodobitve. {{ui:whatsNew.footerLink}} v nogi začetne strani vedno znova pokaže zadnje novosti. V urejevalniku isti seznam odpre gumb {{ui:whatsNew.footerLink}} poleg {{ui:editor.guide}} zgoraj desno ali iskanje ukazov; ostane odprt ob tvojem modelu, medtem ko preizkušaš novosti. Brskalnik si zapomni nazadnje videno različico in nič o tebi ne zapusti brskalnika.
+
+Občasno je nad njo druga kartica: sporočilo avtorja layerlinga, na primer o premoru, ko odgovori trajajo dlje. Prikaže se le v dneh, za katere je namenjena, in {{ui:whatsNew.dismiss}} jo skrije.
 
 Pri kopiji programa layerling na tvojem računalniku ali strežniku ima obvestilo »Na voljo je posodobitev« gumb {{ui:update.previewShow}}, ki našteje, kaj posodobitev prinaša, preden jo namestiš. Seznam se z GitHuba prenese šele, ko pritisneš gumb.
 

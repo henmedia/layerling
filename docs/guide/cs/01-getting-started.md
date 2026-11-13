@@ -91,6 +91,7 @@ Dole v okně: {{ui:dashboard.sponsor}} vede na stránku, kde můžete projekt po
 ### Režim soustředění
 
 Na malé obrazovce {{ui:focusMode.enter}} přenechá titulní řádek a zápatí práci: zapne ho tlačítko se dvěma šipkami ven vpravo nahoře, [[Ctrl]]+[[Shift]]+[[F]] nebo hledání příkazů. Pás nástrojů se posune nahoru a pohled sahá až k okraji okna. Malá lišta pod pásem ponechá domeček na úvodní stránku, karty {{ui:editor.modeGeometry}} a {{ui:editor.modeSketch}}, lupu, nastavení a tlačítko se dvěma šipkami dovnitř, které režim ukončí; za úchyt lištu přetáhnete jinam, dvojklik na úchyt ji vrátí. layerling si volbu pamatuje v tomto prohlížeči a dokud prohlížeč vyplňuje celou obrazovku (F11), přepne se do režimu soustředění sám.
+Lišta ukazuje také název projektu; kliknutím na něj projekt přejmenujete, aniž byste opustili režim soustředění.
 
 ## První díl
 
@@ -111,6 +112,8 @@ Takto se vytvářejí otvory, drážky i kapsy. Podrobnosti najdete v kapitole [
 ## Novinky od poslední návštěvy
 
 Po aktualizaci se na úvodní stránce zobrazí karta s novinkami od vaší poslední návštěvy. Obsahuje jednotlivá vydání od nejnovějšího. Po delší nepřítomnosti můžete uvnitř karty posouvat seznam. Volba {{ui:whatsNew.earlier}} přidá i starší vydání. Kartu zavřete přes {{ui:whatsNew.dismiss}}; znovu se objeví až po další aktualizaci. Poslední novinky lze kdykoliv otevřít pomocí {{ui:whatsNew.footerLink}} v zápatí úvodní stránky. V editoru otevře stejný seznam tlačítko {{ui:whatsNew.footerLink}} vedle {{ui:editor.guide}} vpravo nahoře nebo vyhledávání příkazů; zůstane otevřený vedle vašeho návrhu, zatímco zkoušíte novinky. Poslední zobrazenou verzi si pamatuje prohlížeč a žádné vaše údaje se přitom neodesílají.
+
+Občas nad ní stojí druhá karta: zpráva od autora layerlingu, například o přestávce, kdy odpovědi trvají déle. Zobrazuje se jen ve dnech, pro které je určena, a {{ui:whatsNew.dismiss}} ji skryje.
 
 Ve vlastní instalaci na počítači nebo serveru obsahuje oznámení o dostupné aktualizaci tlačítko {{ui:update.previewShow}}. Zobrazí změny ještě před instalací. Seznam se načte z GitHubu teprve po stisknutí tlačítka.
 

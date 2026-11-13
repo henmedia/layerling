@@ -1,11 +1,11 @@
 import { describe, expect, it } from "vitest";
-import { BAYONET_MIN_WALL, HINGE_PIN_GRIP, HINGE_PRINTED_PIN_GRIP, LID_DEFAULTS, LID_THREAD_STANDARD_SPECS, LID_THREAD_STANDARDS, LID_TYPES, NECK_LARGER, NECK_SMALLER, MAX_BAYONET_AXIAL_GAP, MAX_BAYONET_DEPTH, MAX_BAYONET_DETENT, MAX_BAYONET_LUGS, MAX_BAYONET_TURN, MIN_BAYONET_AXIAL_GAP, MIN_BAYONET_DEPTH, MIN_BAYONET_LUGS, MIN_BAYONET_TURN, MAX_CLICK_BUMP_HEIGHT, MAX_HINGE_PIN, MAX_HINGE_PIN_PLAY, MAX_LID_GAP, MAX_LID_THICKNESS, MAX_LID_THREAD_PITCH, MAX_LID_THREAD_TURNS, MAX_MAGNET_GAP, MIN_CLICK_BUMP_HEIGHT, MIN_HINGE_PIN, MIN_HINGE_PIN_PLAY, MIN_LID_THREAD_PITCH, MIN_LID_THREAD_TURNS, MIN_LID_WALL, MIN_MAGNET_DIAMETER, SCREW_MIN_WALL, bayonetLugSize, bayonetPlan, bayonetTurn, clickBumpPlaces, cornerKnucklePlan, endPlugPlan, hingeKnuckleRadius, hingePinGrip, hingePinHoles, lidClickBumpsFit, lidHandleFits, lidNeckFit, lidStandardThread, lidTakesExtras, lidTakesMagnets, lidThicknessForMagnets, lidThread, magnetPlaces, magnetPocketDepth, normalizeLidOptions, roundOutline, screwPlan, lidTetherFits, tetherPlan, FLIP_HINGE_LENGTH, FLIP_HINGE_THICKNESS, MAX_FLIP_TOP_OPENING, MIN_FLIP_TOP_OPENING, flipTopPlan, flipTopThickness, lidFlipTopFits, screwInPlan, LID_HINGE_TYPES, SLIDE_EDGE, SLIDE_LIP, SLIDE_MAX_GROOVE, SLIDE_MIN_HOLD, SLIDE_WALL_KEEP, slideBoxTurn, slidePlan, slideWall, MAX_SLIDE_FRAME, SLIDE_FRAME_KEEP, slideFrameNeeded, slideSlotRoom } from "@/lib/lidTool";
+import { BAYONET_MIN_WALL, HINGE_PIN_GRIP, HINGE_PRINTED_PIN_GRIP, LID_DEFAULTS, LID_THREAD_STANDARD_SPECS, LID_THREAD_STANDARDS, LID_TYPES, NECK_LARGER, NECK_SMALLER, MAX_BAYONET_AXIAL_GAP, MAX_BAYONET_DEPTH, MAX_BAYONET_DETENT, MAX_BAYONET_LUGS, MAX_BAYONET_TURN, MIN_BAYONET_AXIAL_GAP, MIN_BAYONET_DEPTH, MIN_BAYONET_LUGS, MIN_BAYONET_TURN, MAX_CLICK_BUMP_HEIGHT, MAX_HINGE_PIN, MAX_HINGE_PIN_PLAY, MAX_LID_GAP, MAX_LID_THICKNESS, MAX_LID_THREAD_PITCH, MAX_LID_THREAD_OFFSET, MAX_LID_THREAD_TURNS, MAX_MAGNET_GAP, MIN_CLICK_BUMP_HEIGHT, MIN_HINGE_PIN, MIN_HINGE_PIN_PLAY, MIN_LID_THREAD_OFFSET, MIN_LID_THREAD_PITCH, MIN_LID_THREAD_TURNS, MIN_LID_WALL, MIN_MAGNET_DIAMETER, SCREW_MIN_WALL, bayonetLugSize, bayonetPlan, bayonetTurn, clickBumpPlaces, cornerKnucklePlan, endPlugPlan, hingeKnuckleRadius, hingePinGrip, hingePinHoles, lidClickBumpsFit, lidHandleFits, lidNeckFit, lidStandardThread, lidTakesExtras, lidTakesMagnets, lidThicknessForMagnets, lidThread, magnetPlaces, magnetPocketDepth, normalizeLidOptions, roundOutline, screwPlan, lidTetherFits, tetherPlan, FLIP_HINGE_LENGTH, FLIP_HINGE_THICKNESS, MAX_FLIP_TOP_OPENING, MIN_FLIP_TOP_OPENING, flipTopPlan, flipTopThickness, lidFlipTopFits, screwInPlan, LID_HINGE_TYPES, SLIDE_EDGE, SLIDE_LIP, SLIDE_MAX_GROOVE, SLIDE_MIN_HOLD, SLIDE_WALL_KEEP, slideBoxTurn, slidePlan, slideWall, MAX_SLIDE_FRAME, SLIDE_FRAME_KEEP, slideFrameNeeded, slideSlotRoom } from "@/lib/lidTool";
 import { threadSize } from "@/lib/vase/vase-geometry.mjs";
 
 describe("lid options (#1009)", () => {
   it("starts from a push-in lid with a normal fit", () => {
     expect(normalizeLidOptions()).toEqual(LID_DEFAULTS);
-    expect(LID_DEFAULTS).toEqual({ type: "plug", thickness: 2, gap: 0.2, depth: 4, wall: 1.6, magnets: false, magnetDiameter: 6, magnetHeight: 2, magnetGap: 0.1, hinge: false, hingePin: 1.75, hingeGap: 0.3, hingePinPlay: 0.2, hingeKnuckles: 0, hingePrintPin: false, hingeSide: "back", hingeTeardrop: true, hingeStyle: "outside", hingeEndPlugs: false, clickBumps: false, clickBumpHeight: 0.4, handle: "none", threadPitch: 3, threadTurns: 2, threadStandard: "own", bayonetLugs: 3, bayonetDepth: 8, bayonetAxialGap: 0.3, bayonetDetent: 0.3, bayonetTurn: 0, tether: false, flipTop: false, flipTopOpening: 8, topEdge: "square", topEdgeSize: 1, slideSide: "front", slideFrame: 0 });
+    expect(LID_DEFAULTS).toEqual({ type: "plug", thickness: 2, gap: 0.2, depth: 4, wall: 1.6, magnets: false, magnetDiameter: 6, magnetHeight: 2, magnetGap: 0.1, hinge: false, hingePin: 1.75, hingeGap: 0.3, hingePinPlay: 0.2, hingeKnuckles: 0, hingePrintPin: false, hingeSide: "back", hingeTeardrop: true, hingeStyle: "outside", hingeEndPlugs: false, clickBumps: false, clickBumpHeight: 0.4, handle: "none", threadPitch: 3, threadTurns: 2, threadOffset: 0, threadStandard: "own", bayonetLugs: 3, bayonetDepth: 8, bayonetAxialGap: 0.3, bayonetDetent: 0.3, bayonetTurn: 0, tether: false, flipTop: false, flipTopOpening: 8, topEdge: "square", topEdgeSize: 1, slideSide: "front", slideFrame: 0 });
   });
 
   it("takes the kind in any case and keeps the default for an unknown one", () => {
@@ -345,6 +345,19 @@ describe("a screw lid (Discussion #1393)", () => {
     expect(normalizeLidOptions({ threadPitch: "x", threadTurns: null })).toMatchObject({ threadPitch: 3, threadTurns: 2 });
   });
 
+  it("starts the thread at the rim unless told otherwise, the offset 0 to 20 mm, and keeps the default for what is no number (Discussion #1594)", () => {
+    expect(LID_DEFAULTS.threadOffset).toBe(0);
+    expect([MIN_LID_THREAD_OFFSET, MAX_LID_THREAD_OFFSET]).toEqual([0, 20]);
+    expect(normalizeLidOptions({ threadOffset: 4.5 }).threadOffset).toBe(4.5);
+    expect(normalizeLidOptions({ threadOffset: "6" }).threadOffset).toBe(6);
+    expect(normalizeLidOptions({ threadOffset: -3 }).threadOffset).toBe(MIN_LID_THREAD_OFFSET);
+    expect(normalizeLidOptions({ threadOffset: 90 }).threadOffset).toBe(MAX_LID_THREAD_OFFSET);
+    expect(normalizeLidOptions({ threadOffset: "x" }).threadOffset).toBe(0);
+    expect(normalizeLidOptions({ threadOffset: null }).threadOffset).toBe(0);
+    expect(normalizeLidOptions({ threadOffset: Infinity }).threadOffset).toBe(0);
+    expect(normalizeLidOptions({ threadOffset: NaN }).threadOffset).toBe(0);
+  });
+
   it("has the vase's screw lid's thread: 0.3 of the pitch deep and at most 1.5 mm, crest and root alike, the pitch times the turns long", () => {
     for (const pitch of [2, 2.5, 3, 4, 5, 6, 8]) {
       const thread = lidThread({ threadPitch: pitch, threadTurns: 2 });
@@ -438,6 +451,37 @@ describe("where a screw lid's thread goes (Discussion #1393)", () => {
     expect(screwPlan(offMiddle, options(), 50, 0, 49.7)).toEqual({ error: { code: "screwThinWall" } });
     const widerBelow = pot((z) => ({ outer: [polygonRound(30)], opening: [polygonRound(z < 46 ? 29.5 : 28, 192, 0, 0, true)] }));
     expect(screwPlan(widerBelow, options(), 50, 0, 49.7)).toEqual({ error: { code: "screwThinWall" } });
+  });
+
+  it("starts the thread the offset lower and makes the cap's rim reach down as far, the thread itself as long as before (Discussion #1594)", () => {
+    const plain = screwPlan(pot(), options(), 50, 0, 49.7);
+    const lowered = screwPlan(pot(), options({ threadOffset: 5 }), 50, 0, 49.7);
+    if ("error" in plain || "error" in lowered) throw new Error("no plan");
+    // Without an offset nothing changes: from 44 to just below the rim.
+    expect(plain.from).toBe(44);
+    expect(plain.to).toBeCloseTo(49.8, 9);
+    expect(plain.mouth).toBe(44);
+    // With 5 mm: from 39 to 44.8, so 5 mm of plain wall stands above the thread, the cap's rim reaches down to 39.
+    expect(lowered.from).toBe(39);
+    expect(lowered.to).toBeCloseTo(44.8, 9);
+    expect(lowered.mouth).toBe(39);
+    expect(lowered.to - lowered.from).toBeCloseTo(plain.to - plain.from, 9);
+    // The body and the cap are the same size as without it.
+    expect([lowered.radius, lowered.reach, lowered.capRadius, lowered.pitch, lowered.depth, lowered.turns]).toEqual([plain.radius, plain.reach, plain.capRadius, plain.pitch, plain.depth, plain.turns]);
+    // An offset of 0 is the old plan exactly.
+    expect(screwPlan(pot(), options({ threadOffset: 0 }), 50, 0, 49.7)).toEqual(plain);
+  });
+
+  it("counts the offset in the body's height and in the wall that must be round: refused where the thread plus the offset do not fit", () => {
+    // 6.4 mm for the thread, 5 mm more for the offset: a body 11.4 mm high is the least.
+    expect(screwPlan(pot(), options({ threadOffset: 5 }), 50, 38.7, 49.7)).toEqual({ error: { code: "screwTooLow", height: 11 } });
+    expect("error" in screwPlan(pot(), options({ threadOffset: 5 }), 50, 38.5, 49.7)).toBe(false);
+    // The thread fits that body without the offset.
+    expect("error" in screwPlan(pot(), options(), 50, 38.7, 49.7)).toBe(false);
+    // A wall that narrows 8 mm below the rim is no problem for the thread alone, but the cap's rim now reaches down to it.
+    const narrowsLow = pot((z) => ({ outer: [polygonRound(z < 42 ? 28 : 30)], opening: [polygonRound(z < 42 ? 26 : 28, 192, 0, 0, true)] }));
+    expect("error" in screwPlan(narrowsLow, options(), 50, 0, 49.7)).toBe(false);
+    expect(screwPlan(narrowsLow, options({ threadOffset: 5 }), 50, 0, 49.7)).toEqual({ error: { code: "screwNotRound" } });
   });
 
   it("refuses a body too low for the thread, and a gap too large for it", () => {
@@ -536,6 +580,12 @@ describe("where a standard's thread and cap go", () => {
     return { outline: level.outer, opening: level.opening };
   };
   const options = (patch: Record<string, unknown> = {}) => normalizeLidOptions({ type: "screw", threadStandard: "pco1881", ...patch });
+
+  it("keeps a standard's thread where the standard has it, whatever the offset (Discussion #1594)", () => {
+    const plain = screwPlan(pot(24.94), options(), 30, 0, 29.7);
+    const offset = screwPlan(pot(24.94), options({ threadOffset: 6 }), 30, 0, 29.7);
+    expect(offset).toEqual(plain);
+  });
 
   it("puts a PCO 1881 neck's thread where the standard has it on a body that is the neck, and makes the cap to the standard", () => {
     const plan = screwPlan(pot(24.94), options(), 30, 0, 29.7);
@@ -1365,6 +1415,29 @@ describe("where a screw-in lid's thread and plug go (Discussion #1432)", () => {
     // A cone-shaped pocket: half a millimetre narrower at the bottom of the thread, 6 mm down.
     const narrowing = pot((z) => ({ outer: [polygonRound(30)], opening: [polygonRound(28 - (50 - z) / 12, 192, 0, 0, true)] }));
     expect(screwInPlan(narrowing, options(), 50, 0, 49.7)).toEqual({ error: { code: "screwInNotRound" } });
+  });
+
+  it("starts the thread inside the opening the offset lower and makes the plug reach down as far (Discussion #1594)", () => {
+    const plain = screwInPlan(pot(), options(), 50, 0, 49.7);
+    const lowered = screwInPlan(pot(), options({ threadOffset: 5 }), 50, 0, 49.7);
+    if ("error" in plain || "error" in lowered) throw new Error("no plan");
+    expect(plain.from).toBe(44);
+    expect(plain.to).toBeCloseTo(49.8, 9);
+    // The plug's end reaches 5 mm further down, the thread as long as before, 5 mm of plain opening above it.
+    expect(lowered.from).toBe(39);
+    expect(lowered.to).toBeCloseTo(44.8, 9);
+    expect(lowered.to - lowered.from).toBeCloseTo(plain.to - plain.from, 9);
+    expect([lowered.opening, lowered.reach, lowered.pitch, lowered.depth, lowered.plugRadius, lowered.holeRadius]).toEqual([plain.opening, plain.reach, plain.pitch, plain.depth, plain.plugRadius, plain.holeRadius]);
+    expect(screwInPlan(pot(), options({ threadOffset: 0 }), 50, 0, 49.7)).toEqual(plain);
+  });
+
+  it("counts the offset in the body's height and in the opening's depth: refused where the plug would not fit", () => {
+    expect(screwInPlan(pot(), options({ threadOffset: 5 }), 50, 38.7, 49.7)).toEqual({ error: { code: "screwTooLow", height: 11 } });
+    expect("error" in screwInPlan(pot(), options({ threadOffset: 5 }), 50, 38.5, 49.7)).toBe(false);
+    // An opening whose floor lies 41 mm up: the plug of the plain lid fits, the lowered one reaches the floor.
+    const floor = (thickness: number) => pot((z) => ({ outer: [polygonRound(30)], opening: z > thickness ? [polygonRound(28, 192, 0, 0, true)] : [] }));
+    expect("error" in screwInPlan(floor(41), options(), 50, 0, 49.7)).toBe(false);
+    expect(screwInPlan(floor(41), options({ threadOffset: 5 }), 50, 0, 49.7)).toEqual({ error: { code: "screwInShallow", height: 11 } });
   });
 
   it("refuses a wall under 0.8 mm, a body too low, an opening not deep enough or too small, and a gap too large for the thread", () => {

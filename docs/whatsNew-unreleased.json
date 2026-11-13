@@ -1,1 +1,26 @@
-[]
+[
+  {
+    "title": {
+      "de": "Strecken: eine Gruppe bleibt eine Gruppe",
+      "en": "Stretch: a group stays a group"
+    },
+    "body": {
+      "de": "Wer eine Gruppe streckt, bekommt jetzt wieder eine Gruppe, die sich auflösen lässt. Die Teile, durch die die Ebene geht, werden länger, die Teile dahinter rücken mit, und die davor bleiben, wie sie sind. Löcher bleiben Löcher. Auch ein mit ausgewähltes Objekt, das ganz jenseits der Ebene liegt, rückt mit.",
+      "en": "Stretching a group now gives a group again, one you can ungroup. The parts the plane crosses get longer, the parts beyond it move along, and those before it stay as they were. Holes stay holes. An object selected with the others that lies wholly beyond the plane moves along too."
+    },
+    "guide": {
+      "section": "splitting"
+    }
+  },
+  {
+    "title": {
+      "de": "Sicherung ohne Speicherfenster: „Stattdessen herunterladen“",
+      "en": "Backups without the save dialog: \"Download instead\""
+    },
+    "body": {
+      "de": "Auf manchen PCs schließt sich das Speicherfenster von Chrome und Edge nach dem Speichern, gibt aber keine Datei zurück, und „Alle sichern“ endete dann ohne Sicherung. Die Meldung hat jetzt den Knopf „Stattdessen herunterladen“: Die Sicherung landet dann als normaler Download im Download-Ordner. Das gilt auch für die Sicherung eigener Formen.",
+      "en": "On some PCs the save dialog of Chrome and Edge closes after Save but hands back no file, and Back up all then ended without a backup. The message now has a \"Download instead\" button: the backup then goes into the Downloads folder as a normal download. The same goes for backing up custom shapes."
+    },
+    "guide": { "section": "backingUp" }
+  }
+]

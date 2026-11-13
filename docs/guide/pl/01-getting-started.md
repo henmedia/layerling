@@ -91,6 +91,7 @@ Na dole okna: {{ui:dashboard.sponsor}} prowadzi do strony, na której możesz we
 ### Tryb skupienia
 
 Na małym ekranie {{ui:focusMode.enter}} oddaje pracy wiersz tytułu i stopkę: włącza go przycisk z dwiema strzałkami skierowanymi na zewnątrz w prawym górnym rogu, [[Ctrl]]+[[Shift]]+[[F]] lub wyszukiwanie poleceń. Wstążka przesuwa się w górę, a widok sięga do krawędzi okna. Mały pasek pod wstążką zachowuje domek do strony startowej, karty {{ui:editor.modeGeometry}} i {{ui:editor.modeSketch}}, lupę, ustawienia i przycisk z dwiema strzałkami skierowanymi do środka, który kończy tryb; pasek można przeciągnąć za uchwyt w inne miejsce, a dwuklik na uchwycie przywraca go. layerling zapamiętuje wybór w tej przeglądarce, a gdy przeglądarka wypełnia cały ekran (F11), sam przechodzi w tryb skupienia.
+Pasek pokazuje też nazwę projektu; kliknij ją, aby zmienić nazwę bez wychodzenia z trybu skupienia.
 
 ## Twoja pierwsza część
 
@@ -111,6 +112,8 @@ Tak powstają otwory, rowki i kieszenie. Szczegółowo wyjaśnia to rozdział [B
 ## Nowości od ostatniej wizyty
 
 Gdy po aktualizacji znów otworzysz layerling, karta na stronie startowej pokaże, co dodano od Twojej ostatniej wizyty: każdą wersję od tamtego czasu, od najnowszej. Po długiej przerwie przewiniesz listę wewnątrz karty. Pod nimi {{ui:whatsNew.earlier}} dokłada też wersje sprzed Twojej ostatniej wizyty. Zamknij kartę przyciskiem {{ui:whatsNew.dismiss}}, a nie pojawi się do następnej aktualizacji. {{ui:whatsNew.footerLink}} w stopce strony startowej w każdej chwili znów pokaże najnowsze zmiany. W edytorze tę samą listę otwiera przycisk {{ui:whatsNew.footerLink}} obok {{ui:editor.guide}} w prawym górnym rogu albo wyszukiwarka poleceń; zostaje otwarta obok projektu, gdy wypróbowujesz nowości. Przeglądarka zapamiętuje ostatnią wersję, którą widziałeś, i nic o Tobie jej nie opuszcza.
+
+Od czasu do czasu nad nią pojawia się druga karta: wiadomość od autora layerlinga, na przykład o przerwie, w której odpowiedzi trwają dłużej. Widać ją tylko w dniach, dla których jest przeznaczona, a {{ui:whatsNew.dismiss}} ją ukrywa.
 
 W kopii layerling na Twoim własnym komputerze lub serwerze komunikat „Dostępna aktualizacja” ma przycisk {{ui:update.previewShow}}, który przed instalacją pokazuje, co aktualizacja przynosi. Lista jest pobierana z GitHuba dopiero po naciśnięciu przycisku.
 

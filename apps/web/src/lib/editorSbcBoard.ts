@@ -1,3 +1,4 @@
+import * as THREE from "three";
 import { buildGroupedShapeFromSelection, groupedShape } from "@/lib/editorBooleans";
 import { t } from "@/lib/i18n";
 import { createLocalId } from "@/lib/localIds";
@@ -144,20 +145,51 @@ export async function sbcBoardShape(input: SbcBoardSettings, triangleLimit: numb
 }
 
 /**
- * An SBC board made again with new settings where the old one stood: same id, middle, turn and
- * state. A name the person gave is kept; the board's own name follows the new board.
+ * Where the board itself sits in the built group, as the group's middle sees it: the corner of the
+ * board's frame (x = 0, y = 0, on the board's underside), from the middle of the group's box. The
+ * clearance and the reach grow the box more on one side than on another (a Pi 4 has connectors at its
+ * front edge, none at its back), so the middle moves against the board when they change.
+ */
+function sbcBoardAnchor(settings: SbcBoardSettings) {
+  const board = SBC_BOARDS[settings.board];
+  const extent = sbcSolidsExtent(board, sbcBoardSolids(board, settings.clearance, settings.reach, settings));
+  const height = extent.height - extent.bottom;
+  const anchor = new THREE.Vector3(-(extent.minX + extent.maxX) / 2, -extent.bottom - height / 2, (extent.minY + extent.maxY) / 2);
+  return { anchor, height };
+}
+
+/**
+ * An SBC board made again with new settings where the old one stood: same id, turn and state. The
+ * same board stays where it is - only the connectors grow or reach out, the board does not move when
+ * the clearance, the reach or an opening changes; another board takes the old one's middle. A name
+ * the person gave is kept; the board's own name follows the new board.
  */
 export async function regeneratedSbcBoardShape(old: WorkplaneShape, settings: SbcBoardSettings, triangleLimit: number): Promise<WorkplaneShape> {
   const built = await sbcBoardShape(settings, triangleLimit);
   const previous = sbcBoardOf(old);
   const ownName = previous ? old.name !== SBC_BOARDS[previous.board].name : true;
+  let place = { x: old.x, z: old.z, elevation: old.elevation ?? 0 };
+  const next = normalizeSbcBoardSettings(settings);
+  // Another board takes the old one's middle; the same board, with other settings, stays where it is.
+  if (previous && next && previous.board === next.board) {
+    // The group turns about the middle of its box: the board's corner, turned as the group is, kept where it was.
+    const before = sbcBoardAnchor(previous);
+    const after = sbcBoardAnchor(next);
+    const turn = new THREE.Quaternion().setFromEuler(new THREE.Euler(
+      THREE.MathUtils.degToRad(old.rotationX ?? 0),
+      THREE.MathUtils.degToRad(old.rotation ?? 0),
+      THREE.MathUtils.degToRad(old.rotationZ ?? 0),
+      "XYZ",
+    ));
+    const shift = before.anchor.clone().sub(after.anchor).applyQuaternion(turn);
+    const middleHeight = (old.elevation ?? 0) + before.height / 2 + shift.y;
+    place = { x: old.x + shift.x, z: old.z + shift.z, elevation: middleHeight - after.height / 2 };
+  }
   return canonicalizeShape({
     ...built,
     id: old.id,
     name: ownName ? old.name : built.name,
-    x: old.x,
-    z: old.z,
-    elevation: old.elevation ?? 0,
+    ...place,
     rotation: old.rotation,
     rotationX: old.rotationX,
     rotationZ: old.rotationZ,

@@ -101,6 +101,7 @@ Když se návrh nevejde na jednu podložku, třeba krabička s víkem a vložkam
 
 - Každá podložka je velká jako pracovní plocha a podložky leží vedle sebe vpravo od první, 20 mm od sebe. Těleso patří k podložce, na které stojí střed jeho půdorysu, takže přetažením na druhou stranu se dostane na jinou podložku. Návrh má nejvýše 12 podložek.
 - Kliknutí na podložku v liště ji ukáže a nové tvary i importované soubory pak přistanou na ní. {{ui:plates.showAll}} ukáže všechny. Dvojklik na podložku nebo {{ui:plates.rename}} jí dá název, třeba „Víko“, který je na podložce napsán.
+- I nový náčrt na podložce začíná na aktivní podložce: plocha náčrtu ukazuje tuto podložku s tělesy na ní a hotové těleso stojí tam.
 - {{ui:plates.moveLeft}} a {{ui:plates.moveRight}} mění pořadí, tělesa se posouvají se svou podložkou. {{ui:plates.remove}} odebere aktivní podložku; její tělesa přejdou na první podložku na stejné místo.
 - {{ui:plates.arrange}} rozloží vybraná tělesa, nebo všechna, řadu po řadě na podložky, největší první, 5 mm od sebe, a přidává podložky, dokud jsou potřeba. Těleso větší než podložka zůstane na místě.
 - Se zvolenou tiskárnou se každé těleso kontroluje proti své podložce a výška tisku se počítá od nejnižšího tělesa na ní. Podložka s tělesem, které se nevejde, ukáže své číslo červeně.

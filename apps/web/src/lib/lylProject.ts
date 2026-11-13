@@ -64,7 +64,7 @@ export const LYL_FILE_TYPES_FORMAT_VERSION = 4;
 /** The newest format this layerling reads. */
 export const LYL_NEWEST_READABLE_FORMAT_VERSION = LYL_FILE_TYPES_FORMAT_VERSION;
 export const LYL_OLDEST_READABLE_FORMAT_VERSION = 1;
-export const LYL_CREATED_WITH_VERSION = "1.156.1";
+export const LYL_CREATED_WITH_VERSION = "1.161.0";
 export const LYL_MEDIA_TYPE = "application/vnd.layerling.project+zip";
 
 export const LYL_LIMITS = {
@@ -1413,6 +1413,11 @@ function validateShapeDefinition(definition: Record<string, unknown>, label: str
       throw new Error(`${label}.paint must be a list of at most ${PAINT_MAX_STROKES} paint strokes`);
     }
   }
+  // Marks and switches the editor writes as true or false, and the id of the body a rib was made for (lib/supportRib).
+  for (const field of ["breakawayBase", "stencilBridge", "hullKeepHoles", "multicolor", "shapeLocked"] as const) {
+    if (definition[field] !== undefined && typeof definition[field] !== "boolean") throw new Error(`${label}.${field} must be true or false`);
+  }
+  if (definition.supportRibFor !== undefined && typeof definition.supportRibFor !== "string") throw new Error(`${label}.supportRibFor must be an id`);
   // What a group does with its parts when it is resized (Discussion #526).
   if (definition.groupResize !== undefined && definition.groupResize !== "stretch" && definition.groupResize !== "keepParts") {
     throw new Error(`${label}.groupResize must be stretch or keepParts`);
@@ -1666,6 +1671,13 @@ function validateShapeDefinition(definition: Record<string, unknown>, label: str
       const bevelHelixAngle = finiteNumber(definition.bevelHelixAngle, `${label}.bevelHelixAngle`);
       if (bevelHelixAngle < -45 || bevelHelixAngle > 45) throw new Error(`${label}.bevelHelixAngle is outside the supported range`);
     }
+    if (definition.ringRackHelixAngle !== undefined) {
+      const ringRackHelixAngle = finiteNumber(definition.ringRackHelixAngle, `${label}.ringRackHelixAngle`);
+      if (ringRackHelixAngle < -45 || ringRackHelixAngle > 45) throw new Error(`${label}.ringRackHelixAngle is outside the supported range`);
+    }
+    if (definition.ringRackHerringbone !== undefined && typeof definition.ringRackHerringbone !== "boolean") {
+      throw new Error(`${label}.ringRackHerringbone must be a boolean`);
+    }
     if (definition.helixQuality !== undefined) {
       const helixQuality = finiteNumber(definition.helixQuality, `${label}.helixQuality`);
       if (!Number.isInteger(helixQuality) || helixQuality < 4 || helixQuality > 32) {
@@ -1738,7 +1750,7 @@ function validateShapeDefinition(definition: Record<string, unknown>, label: str
   }
   if (kind === "counterbore" || kind === "countersink" || kind === "doubleCountersink" || kind === "finishingWasher") {
     // Lenient on purpose: the geometry clamps the values itself; only nonsense is refused.
-    for (const key of ["screwHoleShaft", "screwHoleHeadDepth", "screwHoleAngle", "screwHoleRecess"] as const) {
+    for (const key of ["screwHoleShaft", "screwHoleHeadDepth", "screwHoleAngle", "screwHoleRecess", "screwHoleChamfer"] as const) {
       if (definition[key] === undefined) continue;
       const value = finiteNumber(definition[key], `${label}.${key}`);
       if (value < 0 || value > 1e6) throw new Error(`${label}.${key} is outside the supported range`);
@@ -1884,7 +1896,7 @@ function validateShapeDefinition(definition: Record<string, unknown>, label: str
   }
   if (kind === "hinge") {
     // Lenient on purpose: the geometry clamps the values itself; only nonsense is refused.
-    for (const key of ["hingeKnuckles", "hingeKnuckleWidth", "hingeConeSize", "hingePinDiameter", "hingeLeafThickness", "hingeClearance", "hingeAngle", "hingeScrewHoles", "hingeScrewDiameter", "hingeScrewSpacing", "hingeScrewAcross", "hingeCornerRadius", "hingeNutWidth"] as const) {
+    for (const key of ["hingeKnuckles", "hingeKnuckleWidth", "hingeConeSize", "hingeSnapGrip", "hingePinDiameter", "hingeLeafThickness", "hingeClearance", "hingeAngle", "hingeScrewHoles", "hingeScrewDiameter", "hingeScrewSpacing", "hingeScrewAcross", "hingeCornerRadius", "hingeNutWidth"] as const) {
       if (definition[key] === undefined) continue;
       const value = finiteNumber(definition[key], `${label}.${key}`);
       // The opening angle may fold the leaf down below lying flat (#1259).

@@ -91,6 +91,7 @@ Am Fuß des Fensters: {{ui:dashboard.sponsor}} führt zur Seite, auf der du das 
 ### Fokusmodus
 
 Auf einem kleinen Bildschirm gibt der {{ui:focusMode.enter}} die Titelzeile und die Fußzeile an die Arbeit ab: Der Knopf mit den zwei nach außen zeigenden Pfeilen oben rechts, [[Strg]]+[[Umschalt]]+[[F]] oder die Befehlssuche schalten ihn ein. Das Menüband rückt nach oben, und die Ansicht reicht bis an den unteren Fensterrand. Eine kleine Leiste unter dem Menüband behält das Haus zur Startseite, die Reiter {{ui:editor.modeGeometry}} und {{ui:editor.modeSketch}}, die Lupe, die Einstellungen und den Knopf mit den zwei nach innen zeigenden Pfeilen, der den Fokusmodus beendet; am Griff lässt sich die Leiste an eine andere Stelle ziehen, ein Doppelklick auf den Griff stellt sie zurück. layerling merkt sich die Wahl in diesem Browser, und solange der Browser den ganzen Bildschirm füllt (F11), schaltet es von selbst in den Fokusmodus.
+Die Leiste zeigt auch den Namen des Entwurfs; ein Klick darauf benennt ihn um, ohne den Fokusmodus zu verlassen.
 
 ## Dein erstes Teil
 
@@ -111,6 +112,8 @@ Genau so entstehen Bohrungen, Nuten und Taschen. Das Kapitel [Körper und Ausspa
 ## Neu seit deinem letzten Besuch
 
 Wenn du layerling nach einer Aktualisierung wieder öffnest, zeigt dir eine Karte auf der Startseite, was seit deinem letzten Besuch dazugekommen ist: jede Version seitdem, die neueste zuerst. Warst du lange weg, rollst du in der Karte nach unten. Darunter holt {{ui:whatsNew.earlier}} auch die Versionen von vor deinem letzten Besuch dazu. Mit {{ui:whatsNew.dismiss}} schließt du sie, und sie bleibt bis zur nächsten Aktualisierung weg. {{ui:whatsNew.footerLink}} in der Fußzeile der Startseite zeigt die letzten Neuerungen jederzeit wieder. Im Editor öffnet der Knopf {{ui:whatsNew.footerLink}} neben {{ui:editor.guide}} oben rechts dieselbe Liste, ebenso die Befehlssuche; sie bleibt neben deinem Entwurf offen, während du das Neue ausprobierst. Der Browser merkt sich die zuletzt gesehene Version, und nichts über dich verlässt ihn.
+
+Ab und zu steht darüber eine zweite Karte: eine Nachricht vom Autor von layerling, etwa zu einer Pause, in der Antworten länger dauern. Sie erscheint nur in den Tagen, für die sie gedacht ist, und {{ui:whatsNew.dismiss}} blendet sie aus.
 
 Bei einer Kopie von layerling auf deinem eigenen Rechner oder Server hat der Hinweis „Update verfügbar“ einen Knopf, {{ui:update.previewShow}}, der auflistet, was das Update bringt, bevor du es einspielst. Die Liste wird nur beim Drücken des Knopfs von GitHub geholt.
 

@@ -170,6 +170,8 @@ AI 使用与你相同的功能，走的是与你在编辑器中的操作相同�
 | `layerling_saved_view` | 把当前视图保存在按键 7、8、9 或 0 下，并可回到该视图，如同 Shift+按键和单独按该键（仅改变视图）；也可设置新设计的起始视图 |
 | `layerling_build_plates` | 列出、添加、命名、排序和删除打印板，把对象移到某个打印板并分布到各打印板上，如同打印板栏 |
 | `layerling_clear_history` | 永久删除所有撤销步骤，如同历史记录视图的“删除历史记录”按钮；需要 `confirm: true` |
+| `layerling_list_backups` | 列出当前设计的自动备份（早期版本），使用 `all: true` 时列出此浏览器中所有设计的备份 |
+| `layerling_open_backup` | 按 `id` 将备份作为新设计打开，绝不与原文件关联 |
 | `layerling_set_history_view` | 回看项目更早的状态，如同历史记录视图（实际设计不受影响；会改动设计的工具会等到它关闭） |
 | `layerling_restore_from_history` | 把对象（也包括分组内的部件）从更早的状态作为副本带回设计，如同历史记录视图的“带入设计”——撤销会一次性撤回这一步 |
 | `layerling_export_section_svg` | 以 1:1 的 SVG 返回剖切平面上的轮廓，所用实体与导出相同 |

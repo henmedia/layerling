@@ -91,6 +91,7 @@ Onderaan het venster: {{ui:dashboard.sponsor}} leidt naar de pagina waar je het 
 ### Focusmodus
 
 Op een klein scherm geeft de {{ui:focusMode.enter}} de titelregel en de voettekst aan het werk: de knop met de twee naar buiten wijzende pijlen rechtsboven, [[Ctrl]]+[[Shift]]+[[F]] of het zoeken naar opdrachten zet hem aan. Het lint schuift omhoog en de weergave reikt tot de rand van het venster. Een kleine balk onder het lint houdt het huisje naar de startpagina, de tabbladen {{ui:editor.modeGeometry}} en {{ui:editor.modeSketch}}, het vergrootglas, de instellingen en de knop met de twee naar binnen wijzende pijlen, die de modus beëindigt; sleep de balk aan zijn greep naar een andere plek, een dubbelklik op de greep zet hem terug. layerling onthoudt de keuze in deze browser, en zolang de browser het hele scherm vult (F11), schakelt het vanzelf naar de focusmodus.
+De balk toont ook de naam van het ontwerp; klik erop om het te hernoemen zonder de focusmodus te verlaten.
 
 ## Je eerste onderdeel
 
@@ -111,6 +112,8 @@ Zo maak je boringen, sleuven en kamers. Het hoofdstuk [Lichamen en gaten](chapte
 ## Nieuw sinds je laatste bezoek
 
 Open je layerling opnieuw na een update, dan toont een kaart op de startpagina wat er is bijgekomen sinds je hier het laatst was: elke versie sindsdien, de nieuwste eerst. Na een lange afwezigheid scrol je binnen de kaart naar beneden. Daaronder voegt {{ui:whatsNew.earlier}} ook de versies van vóór je laatste bezoek toe. Sluit hem met {{ui:whatsNew.dismiss}} en hij blijft weg tot de volgende update. {{ui:whatsNew.footerLink}} onderaan de startpagina toont de nieuwste toevoegingen op elk moment opnieuw. In de editor opent de knop {{ui:whatsNew.footerLink}} naast {{ui:editor.guide}} rechtsboven dezelfde lijst, net als het zoeken naar opdrachten; hij blijft open naast je ontwerp terwijl je het nieuwe uitprobeert. De browser onthoudt de laatste versie die je hebt gezien, en niets over jou verlaat de browser.
+
+Af en toe staat er een tweede kaart boven: een bericht van de maker van layerling, bijvoorbeeld over een pauze waarin antwoorden langer duren. Die verschijnt alleen op de dagen waarvoor ze bedoeld is, en {{ui:whatsNew.dismiss}} verbergt haar.
 
 Op een kopie van layerling op je eigen computer of server heeft de melding "Update beschikbaar" een knop, {{ui:update.previewShow}}, die laat zien wat de update brengt voordat je hem installeert. De lijst wordt pas bij GitHub opgehaald als je op de knop drukt.
 

@@ -91,6 +91,7 @@ En bas de la fenêtre : {{ui:dashboard.sponsor}} mène à la page où vous pouve
 ### Mode concentration
 
 Sur un petit écran, le {{ui:focusMode.enter}} laisse la ligne de titre et le pied de page au travail : le bouton aux deux flèches tournées vers l’extérieur en haut à droite, [[Ctrl]]+[[Shift]]+[[F]] ou la recherche de commandes l’activent. Le ruban remonte et la vue descend jusqu’au bord de la fenêtre. Une petite barre sous le ruban garde la maison vers la page d’accueil, les onglets {{ui:editor.modeGeometry}} et {{ui:editor.modeSketch}}, la loupe, les réglages et le bouton aux deux flèches tournées vers l’intérieur, qui quitte le mode ; faites glisser la barre par sa poignée ailleurs, un double-clic sur la poignée la remet en place. layerling retient ce choix dans ce navigateur et, tant que le navigateur remplit tout l’écran (F11), passe de lui-même en mode concentration.
+La barre affiche aussi le nom du motif ; un clic dessus permet de le renommer sans quitter le mode concentration.
 
 ## Votre première pièce
 
@@ -111,6 +112,8 @@ C'est ainsi que sont créés les perçages, fentes et poches. Le chapitre [Solid
 ## Nouveau depuis votre dernière visite
 
 Lorsque vous ouvrez à nouveau layerling après une mise à jour, une carte sur la page d'accueil liste ce qui a été ajouté depuis votre dernière visite : chaque version depuis lors, la plus récente en premier. Après une longue absence, vous pouvez faire défiler l'intérieur de la carte. En dessous, {{ui:whatsNew.earlier}} affiche également les versions antérieures à votre dernière visite. Fermez-la avec {{ui:whatsNew.dismiss}} et elle restera masquée jusqu'à la prochaine mise à jour. {{ui:whatsNew.footerLink}} dans le pied de page de la page d'accueil affiche à tout moment les derniers ajouts. Dans l'éditeur, le bouton {{ui:whatsNew.footerLink}} à côté de {{ui:editor.guide}} en haut à droite, ou la recherche de commandes, ouvre la même liste ; elle reste ouverte à côté de votre modèle pendant que vous essayez les nouveautés. Le navigateur se souvient de la dernière version consultée, et aucune donnée personnelle ne quitte votre machine.
+
+De temps en temps, une deuxième carte s'affiche au-dessus : un message de l'auteur de layerling, par exemple au sujet d'une pause pendant laquelle les réponses prennent plus de temps. Elle n'apparaît que pendant les jours prévus, et {{ui:whatsNew.dismiss}} la fait disparaître.
 
 Sur une copie locale de layerling sur votre ordinateur ou serveur, la notification "Mise à jour disponible" comporte un bouton, {{ui:update.previewShow}}, qui liste ce que la mise à jour apporte avant de l'installer. La liste n'est récupérée sur GitHub que lorsque vous cliquez sur le bouton.
 

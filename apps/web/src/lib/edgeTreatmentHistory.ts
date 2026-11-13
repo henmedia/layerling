@@ -78,6 +78,19 @@ export function tubeBeforeEdgeTreatments(shape: WorkplaneShape): WorkplaneShape 
   return hollow ? restoreShapeBeforeEdgeTreatment(shape, first) : null;
 }
 
+/**
+ * The shape of its own (a Hirth joint, a gear, a cylinder ...) this body was before its first edge feature, as it was
+ * then; null when it was a group, an imported mesh or nothing. A fillet makes the body a fixed one with only its three
+ * measures, and the panel says where the other settings went (#1689).
+ */
+export function shapeBeforeEdgeTreatments(shape: WorkplaneShape): WorkplaneShape | null {
+  const first = shape.edgeTreatmentHistory?.[0];
+  if (!first || !shape.importedMesh || shape.groupedShapes?.length) return null;
+  const before = first.before;
+  if (before.importedMesh || before.groupedShapes?.length || before.kind === "mesh") return null;
+  return before;
+}
+
 export function restoreShapeBeforeEdgeTreatment(shape: WorkplaneShape, entry: EdgeTreatmentHistoryEntry) {
   const before = cloneWorkplaneShapeSnapshot(entry.before);
   const entryIndex = (shape.edgeTreatmentHistory ?? []).findIndex((candidate) => candidate.id === entry.id);

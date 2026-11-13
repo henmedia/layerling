@@ -79,6 +79,11 @@ describe("workplane settings helpers", () => {
     expect(normalizeWorkspaceSettings({}).dimensionAxisColors).toBe(false);
     expect(normalizeWorkspaceSettings({ dimensionAxisColors: true }).dimensionAxisColors).toBe(true);
     expect(normalizeWorkspaceSettings({ dimensionAxisColors: "yes" }).dimensionAxisColors).toBe(false);
+    // The red and green move arrows can be switched off (Facebook group, 11.11.2026); older settings keep them.
+    expect(DEFAULT_WORKPLANE_WORKSPACE.showSlideArrows).toBe(true);
+    expect(normalizeWorkspaceSettings({}).showSlideArrows).toBe(true);
+    expect(normalizeWorkspaceSettings({ showSlideArrows: false }).showSlideArrows).toBe(false);
+    expect(normalizeWorkspaceSettings({ showSlideArrows: "no" }).showSlideArrows).toBe(true);
     expect(DEFAULT_WORKPLANE_WORKSPACE.startWithScrollbars).toBe(false);
     expect(normalizeWorkspaceSettings({ startWithScrollbars: true }).startWithScrollbars).toBe(true);
     expect(normalizeWorkspaceSettings({ startWithScrollbars: "yes" }).startWithScrollbars).toBe(false);

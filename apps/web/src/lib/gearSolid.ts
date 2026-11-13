@@ -27,8 +27,10 @@ const AXIS = { point: { x: 0, y: 0, z: 0 }, direction: { x: 0, y: 0, z: 1 } };
 
 /** The helical gear part's exact solid in the shape's own frame, y up. Throws when the kernel cannot build it. */
 export function helicalGearPartSolid(cad: OcctKernel, part: CadModifierHelicalGearPart): ShapeHandle {
+  if (part.rack) return slantedRackSolid(cad, part, part.rack);
   const { corners, twist, height, stretch, boreRadius, herringbone } = part;
   if (!(corners.length >= 3 && height > 0 && stretch.x > 0 && stretch.z > 0 && boreRadius >= 0 && Number.isFinite(twist))) throw new Error("The gear's measures are out of range");
+  if (part.ringRadius !== undefined) return slantedRingSolid(cad, part, part.ringRadius);
   // As drawn, a corner at angle a from +x towards +z turns on towards +z as
   // it rises; the turn up to y maps that to angle -a, turning clockwise
   // about +z seen from above - a left-hand helix for a positive twist.
@@ -76,4 +78,99 @@ export function helicalGearPartSolid(cad: OcctKernel, part: CadModifierHelicalGe
   }
   if (!cad.isValid(solid) || !(cad.getVolume(solid) > 0)) throw new Error("The gear body is not a valid solid");
   return solid;
+}
+
+/** The ruled faces between the helices of neighbouring corners, as for the helical gear: the teeth's flanks, rising `rise` while they turn `climb`. */
+function helicalSideFaces(cad: OcctKernel, corners: CadModifierHelicalGearPart["corners"], rise: number, climb: number) {
+  const turns = Math.abs(climb) > 1e-9;
+  const rails = corners.map(({ angle, radius }) => {
+    if (!turns) return cad.makeWire([cad.makeLineEdge(zUp(radius, angle, 0), zUp(radius, angle, rise))]);
+    const helix = cad.makeHelixWireHanded({ x: 0, y: 0, z: 0 }, { x: 0, y: 0, z: 1 }, (2 * Math.PI * rise) / Math.abs(climb), rise, radius, climb > 0);
+    return cad.rotate(helix, AXIS, -angle);
+  });
+  const faces: ShapeHandle[] = [];
+  rails.forEach((rail, index) => {
+    faces.push(...cad.getSubShapes(cad.loft([rail, rails[(index + 1) % rails.length]], false, true), "face"));
+  });
+  return faces;
+}
+
+/** A corner at angle a from +x towards +z, as drawn, in the kernel's frame with z up (see helicalGearPartSolid). */
+function zUp(radius: number, angle: number, z: number) {
+  return { x: radius * Math.cos(-angle), y: radius * Math.sin(-angle), z };
+}
+
+/** The ring of corners turned by `turn`, as a closed wire at height z. */
+function cornerWire(cad: OcctKernel, corners: CadModifierHelicalGearPart["corners"], turn: number, z: number) {
+  const points = corners.map(({ angle, radius }) => zUp(radius, angle + turn, z));
+  return cad.makeWire(points.map((point, index) => cad.makeLineEdge(point, points[(index + 1) % points.length])));
+}
+
+/** One sewn shell as a solid with its volume outside in, or a throw saying what went wrong. */
+function ringSolidFromFaces(cad: OcctKernel, faces: ShapeHandle[], size: number) {
+  const shells = cad.getSubShapes(cad.sew(faces, size * 1e-6), "shell");
+  if (shells.length !== 1) throw new Error(`The ring gear's sides sewed into ${shells.length} shells`);
+  let solid = cad.makeSolid(shells[0]);
+  if (!(cad.getVolume(solid) > 0)) solid = cad.makeSolid(cad.reverseShape(shells[0]));
+  if (!cad.isValid(solid) || !(cad.getVolume(solid) > 0)) throw new Error("The ring gear's sides did not close into a valid solid");
+  return solid;
+}
+
+/**
+ * A ring gear with slanted teeth (Discussion #1627), as its display mesh draws it: the teeth's flanks as the
+ * helical gear's, inside the round rim, and two flat ends with the teeth as their hole - all sewn into one solid
+ * without a boolean, as the helical gear is. Herringbone teeth: the lower half and its mirror image above.
+ */
+function slantedRingSolid(cad: OcctKernel, part: CadModifierHelicalGearPart, ringRadius: number) {
+  const { corners, twist, height, stretch, herringbone } = part;
+  if (!(ringRadius > Math.max(...corners.map((corner) => corner.radius)))) throw new Error("The ring gear's rim does not reach round its teeth");
+  const halved = herringbone === true && Math.abs(twist) > 1e-9;
+  const rise = halved ? height / 2 : height;
+  const climb = halved ? twist / 2 : twist;
+  const end = (z: number, turn: number) => {
+    const disc = cad.makeFace(cad.makeWire([cad.makeCircleEdge({ x: 0, y: 0, z }, { x: 0, y: 0, z: 1 }, ringRadius)]));
+    return cad.addHolesInFace(disc, [cornerWire(cad, corners, turn, z)]);
+  };
+  const rim = cad.getSubShapes(cad.makeCylinder(ringRadius, rise), "face").filter((face) => cad.surfaceType(face) === "cylinder");
+  const faces = [...helicalSideFaces(cad, corners, rise, climb), ...rim, end(0, 0)];
+  if (halved) faces.push(...faces.map((face) => cad.mirror(face, { x: 0, y: 0, z: height / 2 }, { x: 0, y: 0, z: 1 })));
+  else faces.push(end(height, twist));
+  let solid = cad.transform(ringSolidFromFaces(cad, faces, ringRadius), Z_TO_Y_UP);
+  if (Math.abs(stretch.x - 1) > 1e-12 || Math.abs(stretch.z - 1) > 1e-12) {
+    solid = cad.generalTransform(solid, [stretch.x, 0, 0, 0, 0, 1, 0, 0, 0, 0, stretch.z, 0]);
+  }
+  if (!cad.isValid(solid) || !(cad.getVolume(solid) > 0)) throw new Error("The ring gear body is not a valid solid");
+  return solid;
+}
+
+/**
+ * A rack with slanted teeth (#1627), as its display mesh draws it: the outline of a longer straight rack, flat on
+ * the ground (x along it, teeth towards +z), drawn out upwards while it moves `travel` along x - herringbone teeth
+ * half of it up to the middle and back again above - and cut off square where this rack ends. Built y up.
+ */
+function slantedRackSolid(cad: OcctKernel, part: CadModifierHelicalGearPart, rack: NonNullable<CadModifierHelicalGearPart["rack"]>) {
+  const { height, herringbone } = part;
+  const { length, backZ, tipZ, travel } = rack;
+  if (!(rack.outline.length >= 4 && height > 0 && length > 0 && tipZ > backZ && Number.isFinite(travel))) throw new Error("The rack's measures are out of range");
+  const points = rack.outline.filter((point, index, all) => {
+    const next = all[(index + 1) % all.length];
+    return Math.hypot(point.x - next.x, point.z - next.z) > 1e-9;
+  }).map((point) => ({ x: point.x, y: 0, z: point.z }))
+    // Counter-clockwise in x/z the face would look down (x cross z is -y): turned round it looks up, the way it is drawn out.
+    .reverse();
+  const foot = cad.makeFace(cad.makeWire(points.map((point, index) => cad.makeLineEdge(point, points[(index + 1) % points.length]))));
+  let drawn: ShapeHandle;
+  if (herringbone === true) {
+    const lower = cad.extrude(foot, travel / 2, height / 2, 0);
+    const upper = cad.extrude(cad.translate(foot, travel / 2, height / 2, 0), -travel / 2, height / 2, 0);
+    drawn = cad.fuse(lower, upper);
+  } else {
+    drawn = cad.extrude(foot, travel, height, 0);
+  }
+  const bar = cad.makeBoxFromCorners({ x: -length / 2, y: 0, z: backZ - 1 }, { x: length / 2, y: height, z: tipZ + 1 });
+  const cut = cad.common(drawn, bar);
+  const solids = cad.isSolid(cut) ? [cut] : cad.getSubShapes(cut, "solid");
+  if (solids.length !== 1) throw new Error(`The rack came out as ${solids.length} solids`);
+  if (!cad.isValid(solids[0]) || !(cad.getVolume(solids[0]) > 0)) throw new Error("The rack body is not a valid solid");
+  return solids[0];
 }

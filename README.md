@@ -21,7 +21,7 @@
     <a href="#layerling-mcp-skill"><img alt="Drivable by AI" src="https://img.shields.io/badge/AI--drivable-MCP%20server-16c0d4"></a>
   </p>
 
-  <p><strong>English</strong> · <a href="README.de.md">Deutsch</a> · <a href="README.es.md">Español</a> · <a href="README.nl.md">Nederlands</a> · <a href="README.ar.md">العربية</a> · <a href="README.ja.md">日本語</a> · <a href="README.zh-cn.md">简体中文</a> · <a href="README.zh-tw.md">繁體中文</a></p>
+  <p><strong>English</strong> · <a href="README.de.md">Deutsch</a> · <a href="README.es.md">Español</a> · <a href="README.nl.md">Nederlands</a> · <a href="README.pl.md">Polski</a> · <a href="README.sv.md">Svenska</a> · <a href="README.ar.md">العربية</a> · <a href="README.ja.md">日本語</a> · <a href="README.zh-cn.md">简体中文</a> · <a href="README.zh-tw.md">繁體中文</a></p>
 </div>
 
 <p align="center">
@@ -43,7 +43,7 @@ layerling works the way you already think: put a shape on the plate, drag it to 
 layerling sits a step beyond Tinkercad towards Fusion 360: it is operated the same way, so you will recognise everything – the plate, the shapes, solids and holes, group and ungroup, bundle, Alt-drag for a copy – but it does not stop where Tinkercad does. Things you have been missing are waiting for you:
 
 - **Chamfer and fillet.** Pick an edge and break it or round it – the one thing people ask for most once a printed part has to feel finished or slot into something. Applied edges stay changeable: take a treatment off again or press Edit to change its value on the same edges.
-- **Hollow, split, sketch, thread.** Hollow a body to an even wall, split it with a plane, draw sketches with exact lengths and angles and extrude or revolve them, and add screws, nuts and tapped holes.
+- **Hollow, split, sketch, thread.** Hollow a body to an even wall, split it with a plane or stretch it there, draw sketches with exact lengths and angles and extrude or revolve them, and add screws, nuts and tapped holes.
 - **Patterns and wrapping.** Repeat a shape in a row, a grid of columns and rows, a circle or a spiral, or wrap a pattern or text around a cylinder.
 - **Hole patterns.** Click a flat face, or the round wall of a cylinder or tube, and spread round, square, rectangular, hexagonal or slot holes over it, in a grid or staggered, with spacing, margin and depth - vents, speaker grilles and baskets in one step. Or set a ring of screw holes along its edge, with counterbores or countersinks if you like, or repeat a shape of your own over it, rivets or a diamond plate.
 - **Scale by percent.** Make one or many parts larger or smaller by a percentage - together, so the layout grows with them, or each in place.
@@ -70,7 +70,7 @@ It is not a full CAD package: there is no parametric timeline and no assemblies.
 - **Light and shadows to taste** – shading contrast, shadow strength and softness, and the direction and height of the light, up to straight above as in Tinkercad, all in the settings. A "Tinkercad look" button sets colours, grid and light like there in one go, and the darker grid lines can come every centimetre in a colour of their own.
 - **Fast mode** – for slower computers: one switch in the settings turns off shadows, edge lines and the camera's inertia and draws the view at screen resolution; the camera's inertia can also be switched off on its own, so the view stops the moment you let go.
 - **Align faces and see the angles** – the Align faces tool brings a face of one part against a face of another, touching or flush, with an optional gap, puts a hole or pin on the axis of another hole, or moves a part straight so a corner or reference point lands on a point of another part, along X, Y and Z or only some of them, and with a second and third pair of points turns it into place, like aligning by three points; a turned body shows its angles about X, Y and Z under the selection, and the Rotation card in its settings takes them as numbers.
-- **Snap to other shapes** – while moving, a shape locks its edges or centre onto the edges and centres of the shapes around it, with a guide line, so parts sit flush without typing numbers. The centre of the workplane counts too, to put a part in the middle of the plate. Alt during the drag pauses it; Shift keeps the move on one axis, and Alt held from the start drags a copy, as in Tinkercad.
+- **Snap to other shapes** – while moving, a shape locks its edges or centre onto the edges and centres of the shapes around it, with a guide line, so parts sit flush without typing numbers. The centre of the workplane counts too, to put a part in the middle of the plate. Alt during the drag pauses it; Shift keeps the move on one axis, and Alt held from the start drags a copy, as in Tinkercad. Resizing snaps too: a side handle stops at the edges of other shapes and at the wall it runs into, the inside wall of a box included, so a part fills a case from wall to wall.
 - **Set down on faces** – like Cruise in Tinkercad: a new shape lies down on the face under the pointer, sloped ones too, and C picks the selection up and sets it down on another face the same way. Hold Shift while placing or carrying it and it sinks in instead, upright, its top flush with the face - for a countersink or a counterbore.
 - **Reference points** – right-click a body to mark its centre, corners or edge middles with points that nothing prints and that dragged shapes snap to; drag a point or type its coordinates, and the marks are saved with the design. The tape measure can mark the middle of a measurement - the centre of a round hole, for one.
 - **Protractor** – the protractor in the view bar measures the angle at a corner from three clicks, or between two flat faces (a 45° chamfer reads 45° · 135°); it snaps to corners and edges like the tape measure and follows the bodies.
@@ -79,7 +79,7 @@ It is not a full CAD package: there is no parametric timeline and no assemblies.
 - **Command search** – press Ctrl+K and type a tool, a shape or a command ("fillet", "mirror", "cylinder") to jump straight to it; it understands English and German words and shows the keyboard shortcuts beside each entry.
 - **Your own keys** – put any command of the command search on a key you choose, in the keyboard shortcuts window: Center on workplane, the shapes panel or your favourite shape is then one key away.
 - **Your own ribbon** – take the groups and buttons you never use out of the ribbon in the settings (Appearance); the command search and the keys still run them, and the order of the ribbon stays the same.
-- **Focus mode** – on a small laptop screen, hide the editor's title row and footer with one button or Ctrl+Shift+F; a small bar over the view keeps the tabs, Home, the command search and the settings. It also comes by itself while the browser is in full screen (F11).
+- **Focus mode** – on a small laptop screen, hide the editor's title row and footer with one button or Ctrl+Shift+F; a small bar over the view keeps the tabs, Home, the design's name, the command search and the settings. It also comes by itself while the browser is in full screen (F11).
 - **History view** – look back at any earlier state of the project with a slider, without changing anything; export that state or start a new project from it. By @rmpel. Undo and Redo name the step they take back in their tooltip, with its measure ("Rounded the edges of Box (5 mm)"), and a list in the History view names every step, to jump to any of them with one click.
 - **Millimetres or inches** – with Imperial units every measure is shown in inches, as fractions like Tinkercad (1 5/8) or as decimals, the snap grid steps from 1/64 to 1 inch, and the plate's grid is drawn in inches.
 - **Your printer's plate** – pick one of more than 230 common printers and the plate takes its size - round for a delta printer such as an FLSun. Its name and build volume show in the corner of the workplane (a switch in the settings hides this and the design's name), and a warning appears when a body reaches past the edge.
@@ -101,11 +101,11 @@ It is not a full CAD package: there is no parametric timeline and no assemblies.
 - **Cookie cutter** – a wall and a flat rim round the outline of a sketch or an SVG, or of whatever a shape stands on, from one small window; the inside of an e or an a gets a wall of its own, held by bridges at the rim or by a plate over the whole outline, with small fillets so thin parts do not break off, and made lower it only presses a text into the dough instead of cutting it out. The outline is mirrored, so text and logos come out of the dough the right way round, and the wall runs up to a thin cutting edge. Wall thickness, cutting edge, height and rim are the sketch fill modes, so each can be changed afterwards.
 - **Flexi joints** – cut a flat body you drew yourself, a fish, a snake or a dragon, into links with a joint printed in place at every cut: an upright knuckle with 45° cones held in a socket of the next link, so the figure moves once printed, without support or assembly. Number of joints, clearance, swing and joint size can be set. Or the links fold up and down instead, like a flexi keychain: every cut becomes a flat hinge of knuckles with cones, across the body at half its height.
 - **Loft sketches** – two sketches or imported SVGs become one exact body, the outline of the lower one at the bottom and of the upper one at the top, with straight walls between them: a funnel, a square-to-round transition, or from two rings a tapered frame. Edit group opens the two sketches again.
-- **Split** – cut solids or holes in two with a plane; a hollowed body keeps its cavity. Turn the plane for an angled cut, drag its arrow, or lay it on any face with "Pick face".
+- **Split** – cut solids or holes in two with a plane; a hollowed body keeps its cavity. Turn the plane for an angled cut, drag its arrow, or lay it on any face with "Pick face". **Stretch** makes a body longer or shorter at the plane instead: the part beyond moves and the cut through the body fills the gap, so a downloaded case grows through its straight walls while its compartments and rounded corners keep their size.
 
 ### Refining
 
-- **Chamfer and fillet** – break or round any edge of a solid, or scoop a straight edge out as a concave fillet, like the notched corners of a box, and remove or change the treatment again later.
+- **Chamfer and fillet** – break or round any edge of a solid, or scoop a straight edge out as a concave fillet, like the notched corners of a box, and remove or change the treatment again later; when a size is too large for the edge, one click finds the largest that fits.
 - **Sketches** – draw outlines with lines, curves and ready-made shapes, draw freehand with a pen, a finger or the mouse (the line becomes a few points you can edit), set lines by length and angle as you draw ("50<30", Shift snaps in 15° steps), type lengths, angles, sizes and the position of a selected outline, point or curve handle (sums like "60+12.5" work in every number field), round or chamfer corners, snap to the outlines of other bodies, draw construction lines to snap to, and extrude, revolve or sweep them along a path into exact bodies. A revolve with a pitch winds the outline up as one continuous helical strand instead of rings, like filament on a spool. A sketch can also be built as a stroke: a closed outline becomes a frame, inside, outside or centred on the line, and an open line a stripe with flat, square or round ends. A drawing or photo laid under the sketch is traced into sketch lines with one click, its dark or its light part, at a threshold you set.
 - **Hollowing** – turn a body into walls of one thickness, open on any sides you choose (top, bottom, front, back, left, right, in any combination) or closed – for boxes, cups and cases.
 - **Slope and narrow along** – run the top of a box, cylinder, polygon, tube, wedge or round roof down to one end, or the sides of all but the tube in towards one end, straight or curved, by number or with a dot on the end: a roof sloping along its length, a ramp, a slanted pipe end, a boat's bow. A slope stays exact for chamfers, fillets and STEP, and so does a narrowed box, wedge or round roof. By @plazmabokor.
@@ -131,6 +131,7 @@ It is not a full CAD package: there is no parametric timeline and no assemblies.
 - **Delete several designs at once** – **Select** on the start page chooses designs by a click on their cards (or all of them), and one question deletes the whole choice; it works in the server folder too.
 - **Folders for your designs** – sort the designs on the start page into folders (and folders into folders) by dragging them or with "Move to …"; the search looks through all of them, and "Back up all" keeps them.
 - **Projects as files** – save a whole project, history, sketches and groups included, as a `.lyl` file and carry on elsewhere. In Chrome and Edge you choose the folder yourself and Ctrl+S saves into that same file again; other browsers download it. Older `.skf` files from earlier versions still open; saving then writes a `.lyl` beside them.
+- **Earlier versions** – before Save writes over a `.lyl` file, layerling keeps the file as it was, and while you work a state of the design every few minutes; each opens again as a new design. How many stay is set under Settings → Backups, and in Chrome and Edge they can also go into a folder of your own. A notice on the start page and in the editor reminds you to back up all designs into a file and keep it in a second place: your designs, your backup.
 - **Bug report** – one link in the footer saves a ZIP with the design as a `.lyl` and a text with the version, browser and last messages, ready to attach in the forum or on GitHub, which refuse a bare `.lyl`.
 - **Designs you recognise** – each design with a thumbnail, in your own browser or in the server folder.
 - **Attachments** – keep notes, a photo of the printed part or a datasheet inside the design: `.md` and `.txt` files, `.png`, `.jpg` and `.webp` pictures and PDF files travel with the `.lyl` file. The eye opens a text or a picture in a window; a PDF is downloaded. SVG is not accepted, since it can carry scripts.
@@ -142,7 +143,7 @@ It is not a full CAD package: there is no parametric timeline and no assemblies.
 - **Four saved views per design** – **Shift+7**, **8**, **9** or **0** saves the view exactly as it is (angle, pan, zoom), and the key alone brings it back. Each design keeps its own, and a saved `.lyl` file carries them along.
 - **Look straight onto the workplane** – **P**, or the button next to Place workplane in the view bar, turns the view square onto the workplane, on a sloped face too, with its origin in the middle.
 - **The view cube in any corner** – Settings > Appearance > **View cube position** puts the cube in the top left, top right, bottom left or bottom right; in any corner but the top left, the view bar moves up into its place.
-- **In your language** – the program and its user guide come in English, German and 17 more languages; the language list is at the very top right.
+- **In your language** – the program and its user guide come in English, German and 18 more languages; the language list is at the very top right.
 - **Look from below** – the eye over a grid in the view bar hides the plate, so the underside of a design can be seen without it in the way.
 - **A second view in its own window** – a button in the view bar opens a second window that shows the same design through a camera of its own, with its own view cube and view bar, and follows every change. It opens where you last left it.
 - **Panels where you want them** – the object list, the settings, the section view, the tape measure and the tool panels for edges, hollowing and patterns move by their title bar and open there again; a double-click docks them.
@@ -236,6 +237,8 @@ Run the same line again whenever you want to **update**: the existing folder is 
 
 To run layerling on a computer, NAS (Synology, Unraid, etc.) or home server without installing Node.js, use the ready-made image **`henmedia/layerling`** on Docker Hub (also at **`ghcr.io/henmedia/layerling`**, the same image). Every release publishes it for amd64 and arm64 (Raspberry Pi, ARM NAS) under its version number and as `latest`. The app listens on port **3000**.
 
+New to Docker? [Running layerling in Docker, step by step](docs/docker/en/docker-step-by-step.md) starts from nothing on Windows, macOS or Linux: it installs Docker, starts layerling and saves your designs as files in a folder on your computer.
+
 The quickest way is a single command:
 
 ```bash
@@ -278,7 +281,7 @@ Everyday commands:
 
 **Installing as an app and offline use need https, and the static export.** A browser installs an app and keeps it for offline use only on `https://` or on `localhost`; on a plain `http://192.168.x.x:3000` address it offers neither (layerling hides its install hint there). Even with https, the offline files (`sw.js`) are written only into the static export (see [Static Hosting](#static-hosting-plain-files-on-a-web-server)), not into this image, which runs the server version. For installing and offline use on a network, serve the static export over https; for an https address in front of the container, use a reverse proxy such as Caddy or nginx with a certificate (for example from mkcert).
 
-The image runs `next start` in production mode, so the MCP bridge is off there unless you switch it on (see [Letting an AI client reach a copy on a NAS or server](#letting-an-ai-client-reach-a-copy-on-a-nas-or-server)). To offer a shared project folder, bind a writable directory and set `LAYERLING_SHARED_PROJECTS_DIR` in `compose.yml` to the path inside the container where it is mounted, for example `./shared-projects:/shared-projects` with `LAYERLING_SHARED_PROJECTS_DIR: "/shared-projects"` (see [Shared Designs on a Network](#shared-designs-on-a-network)). The container runs as the user with the number 999, so that user must be allowed to write to the folder: `sudo chown 999:999 ./shared-projects`, or add `user: "1000:1000"` to the service (your own user and group numbers, `id -u` and `id -g` show them) so that the container runs as you. Without it the folder shows up on the start page but nothing can be saved there. After changing it, run `docker compose up -d`: `docker compose restart` keeps the old setting. `docker exec <container> printenv LAYERLING_SHARED_PROJECTS_DIR` shows the one in use.
+The image runs `node apps/web/server.js` in production mode, so the MCP bridge is off there unless you switch it on (see [Letting an AI client reach a copy on a NAS or server](#letting-an-ai-client-reach-a-copy-on-a-nas-or-server)). To offer a shared project folder, bind a writable directory and set `LAYERLING_SHARED_PROJECTS_DIR` in `compose.yml` to the path inside the container where it is mounted, for example `./shared-projects:/shared-projects` with `LAYERLING_SHARED_PROJECTS_DIR: "/shared-projects"` (see [Shared Designs on a Network](#shared-designs-on-a-network)). The container runs as the user with the number 999, so that user must be allowed to write to the folder: `sudo chown 999:999 ./shared-projects`, or add `user: "1000:1000"` to the service (your own user and group numbers, `id -u` and `id -g` show them) so that the container runs as you. Without it the folder shows up on the start page but nothing can be saved there. After changing it, run `docker compose up -d`: `docker compose restart` keeps the old setting. `docker exec <container> printenv LAYERLING_SHARED_PROJECTS_DIR` shows the one in use.
 
 To keep every design in that folder and none in the browser, there is a complete guide in English and German with its own compose file and an update script that checks the configuration, backs up the folder and rolls back a failed update: [docs/docker](docs/docker/README.md), written by Jürgen Keller. With `LAYERLING_NEW_DESIGNS_ON_SERVER: "always"`, everything that makes a design goes to the server folder: the tile, opening or importing a file, restoring a backup (with its folders), duplicating and a state taken from the history, and New folder on the start page makes a server folder.
 
@@ -308,6 +311,24 @@ Four things to know:
 - **A quick test on your own computer:** `npx serve apps/web/.next-export` and open the address it prints.
 - **Installing as an app and offline use need https.** The export holds the offline files (`sw.js`), but a browser uses them only on an `https://` address or on `localhost`, not on a plain `http://` address in your network.
 
+### Editor profiles
+
+An optional editor profile changes the 3D ribbon and selected tool options for this page. To try the [example profile](docs/examples/editor-profile.json) in a local checkout:
+
+```sh
+LAYERLING_EDITOR_PROFILE="$(cat docs/examples/editor-profile.json)" npm run dev
+```
+
+Open the editor, add a box, and select it. The simple ribbon uses the usual icon size. **Print check** is visible and **Lid** and **Flexi joints** are hidden. Open **Fillet** to see a starting radius of 2 mm on a box large enough for it. The **Only visible edges** option is hidden and on.
+
+- `version` must be `1`. An optional `base` of `simple` or `full` selects that layout for this page, ahead of the browser choice and the Node server default. Omit it to keep the ordinary mode switch.
+- Set `enlargeInSimpleMode: false` to use the same toolbar, shape menu and control sizing as in full mode. The browser’s toolbar size choice still applies.
+- Under `tools`, `visible: true` or `false` overrides the layout for tools in the clipboard, history, combine, modify and arrange sections of the 3D ribbon, as well as `import`. Use the tool's ID (the `data-layerling-tool` attribute on regular ribbon buttons). The Ribbon settings can still hide or reorder the tools available in the active profile. A visible tool still needs the usual selection. Unknown entries have no effect.
+- Under `tools.fillet.options`, `amount.default` is a radius in millimetres. A valid remembered radius takes precedence, and the tool's own starting value is used when neither fits the body. `onlyVisibleEdges` accepts `visible`, a boolean `default`, and `locked`. A lock requires a default and takes precedence over the remembered value.
+- Profiles affect the ribbon and the connected dialog options. Context menus, keyboard shortcuts, shapes and the camera retain their normal behavior. Use the host's authorization for access to projects.
+
+`LAYERLING_EDITOR_PROFILE` is read by the layout when the HTML is generated. Set it before starting the development server or building production HTML, including a static export. Hosts that generate HTML themselves may instead provide one `<script type="application/json" id="layerling-editor-profile">…</script>` in the document head before Layerling's scripts. Escape literal `<` in the serialized JSON as `\u003c`. Profiles are independent of project files and browser settings and are read once per page load. For per-account profiles, serve the personalized HTML from a private, uncached page outside the static service worker’s offline cache, such as a PHP entry point.
+
 ### Shared Designs on a Network
 
 layerling itself is only files, so the shared folder needs something on the server that can write. There are two ways, and you need just one of them: **Node or Docker** (this section, with `LAYERLING_SHARED_PROJECTS_DIR`), or **a plain web server with PHP** (the `store` folder, further down). A web server that serves the files without either of them – `npx serve`, nginx or Apache without PHP – shows layerling fine, but has no server folder.
@@ -319,13 +340,16 @@ shared folder for `.lyl` designs. `npm run start` serves what `npm run build` ma
 LAYERLING_SHARED_PROJECTS_DIR=/srv/layerling-projects npm run start
 ```
 
-The start page then shows a folder named **On the server** beside your browser designs. Open it and you are in that
-folder: **New design** starts one right there, **New folder** makes a subfolder, and a trail under the heading says where
-you are. A `..` tile leads back out, and **Back to designs in this browser** at the left of the buttons returns to the designs of this browser. Designs move by dragging them onto a folder, onto that tile or onto a step of the
-trail – or through **Move to …** in their menu. A design from your browser goes onto the server the same way: drag its
-card onto the server folder.
+The start page then shows the designs in two tabs, **Server** for the shared folder and **Browser** for the designs of
+this browser. With the Server tab open, **Create new 3D design** starts a design in the server folder you are in, **New
+folder** makes a subfolder, and a trail under the tabs says where you are and leads back out. Designs move by dragging
+them onto a folder or onto a step of the trail – or through **Move to …** in their menu. A design from your browser goes
+onto the server by dragging its card onto the Server tab, or with **Put on the server** in its menu; a folder goes the
+same way, with everything in it, and stays a folder on the server. The way back is
+**Put in this browser** in the menu of a server design, or dragging its card onto the Browser tab: the design then lives
+only in this browser and leaves the server folder, also for the others.
 
-Two buttons on the start page save the trouble of moving designs one by one: **Put all on the server** moves every design of this browser into the server folder in one go, and the tick **New designs on the server** makes each new design start in the server folder, so it is saved there from the first change on. A design whose name is already taken on the server stays in the browser.
+Two buttons on the start page save the trouble of moving designs one by one: **Put all on the server** moves every design of this browser into the server folder in one go, in the same folders, and the tick **New designs on the server** makes each new design start in the server folder, so it is saved there from the first change on. A design whose name is already taken on the server stays in the browser.
 
 The search box at the top searches the whole server folder, not just the one you are standing in. Every hit says
 which folder holds it, and that folder is a button: one click and you are there, with the search cleared. Folders are
@@ -336,6 +360,9 @@ there.
 under a free name, picture and all – nothing is repacked, so the copy carries exactly the geometry of the original. In
 your browser the copy becomes a design of its own, with the same shapes, the same history and its own preview picture,
 and it belongs to nobody on the server.
+
+**Open a copy** in the same menu does the same and opens the copy right away, for trying something out: the original
+stays as it was, whatever you do in the copy.
 
 A design that lives on the server saves itself back there, five seconds after the last change and when you leave the
 editor. Thumbnails land beside the files in `.thumbnails`. Designs that are only in your browser stay there, untouched.

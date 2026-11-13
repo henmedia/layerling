@@ -23,8 +23,8 @@ Den bliver åben eller lukket, som du lod den være, for hvert design, indtil du
 
 ![Objektlisten: gruppen "Gruppe" med to dele og en kugle ved siden af. Et mappeikon åbner gruppen.](shot:object-list)
 
-- Et klik på en post vælger formen, inklusive dele inde i en gruppe. Med [[Shift]] holdt tilføjer du flere poster eller tager dem væk igen, ligesom i visningen. Pilene folder grupper åbne og i.
-- Etiketten viser om en del er {{ui:outliner.solid}} eller {{ui:outliner.hole}}.
+- Et klik på en post vælger formen, inklusive dele inde i en gruppe. Som i en filhåndtering tilføjer [[Ctrl]] ([[Cmd]] på en Mac) en post eller tager den væk igen, og [[Shift]] vælger alle poster fra den sidst klikkede til denne, i listens rækkefølge; [[Ctrl]]+[[Shift]] føjer dem til det valgte. I visningen er det i stedet [[Shift]], der tilføjer og tager væk. Pilene folder grupper åbne og i.
+- Bogstavet efter navnet viser, om en del er {{ui:outliner.solid}} eller {{ui:outliner.hole}}: det er ordets første bogstav, og hele ordet vises, når du holder musen over det.
 - Under navnet står, hvilken slags form det er. En form, der ikke længere er en simpel form (afrundet, udhulet eller importeret), viser {{ui:shape.exactBody}}, når STEP-eksporten skriver den eksakt, og {{ui:shape.mesh}}, når den kun består af trekanter og går ud som STL. En tilspidsning, hældning eller vridning, der først kommer til efter afrunding eller udhuling, bøjer kun dens mesh, så viser den {{ui:shape.mesh}}.
 - Hængelås og øje låser og skjuler enkelte dele.
 - {{ui:outliner.rename}} giver en del sit eget navn; blyanten ved siden af navnet øverst i indstillingerne gør det samme for den valgte form. Fornuftige navne hjælper enormt i større designs.
@@ -34,7 +34,7 @@ Den bliver åben eller lukket, som du lod den være, for hvert design, indtil du
 - Søgefeltet finder former på navn og type, så også "cylinder" eller "hul". Det kigger også inden i grupper, uanset hvor dybt: en gruppe der indeholder et match bliver i listen og folder sig åben for at vise de matchende dele og de grupper der fører til dem. En gruppe fundet på sit eget navn viser alle sine dele når du åbner den.
 - Pilen yderst til venstre på titellinjen folder listen ned til dens titellinje og tilbage igen.
 
-Listen sidder docket lige til højre for visningskuben. Træk den i dens titellinje for at placere den hvor som helst på arbejdsplanet; den passerer under visningskuben og visningsbjælken. Slip den tilbage ved siden af visningskuben, eller dobbeltklik titellinjen, og den docker igen. Hvor den var og om den var foldet huskes i denne browser.
+Listen sidder docket lige til højre for visningskuben. Træk den i dens titellinje for at placere den hvor som helst på arbejdsplanet; den passerer under visningskuben og visningsbjælken. Slip den tilbage ved siden af visningskuben, eller dobbeltklik titellinjen, og den docker igen. Hvor den var og om den var foldet huskes i denne browser. Gør listen bredere eller smallere ved at trække i dens nederste højre hjørne, fra 240 til 600 pixel; også bredden huskes i browseren.
 
 ## Tast en position
 
@@ -47,6 +47,8 @@ Du kan trække en form forbi kanten af pladen og lade den stå der, omkring én 
 ## Snap under flytning
 
 Når du trækker en form hen over arbejdsplanet, snapper den til andre former: dens venstre, højre, for- eller bagkant eller dens midte lander præcis på en kant eller midte af en anden form. En lyserød hjælpelinje viser hvad den holder fast i. Sådan sidder to dele lige ud for hinanden eller centreret den ene bag den anden uden at taste tal. Det virker også med gitteret slået fra. Arbejdsplanets midte tæller også: de lyserøde linjer viser, når formen står midt på pladen langs X, langs Y eller begge.
+
+Også når du ændrer størrelse, snapper det: Trækker du i et sidehåndtag, stopper den side ved kanter og centre af andre former og ved den væg, den løber ind i, også indervæggen i en kasse, en udhulet form eller et importeret kabinet, og den lyserøde linje viser hvor. Det mål bevares nøjagtigt, uden for gitteret. Sådan fylder en del et kabinet fra væg til væg: læg den mod den ene væg, og træk dens anden side hen til den modsatte. Med [[Alt]] vokser formen fra midten, og den trukne side snapper på samme måde; med [[Shift]] beholder den sine proportioner og snapper ikke. Det virker på det flade arbejdsplan for former, der står oprejst med siderne langs X og Y, og {{ui:workspace.objectSnap}} slår det fra sammen med snap under flytning.
 
 Hold [[Shift]] mens du trækker for at holde flytningen på én akse: formen følger den retning, X eller Y, du har trukket længst i, og lader den anden være. Bedst at trykke [[Shift]] når du allerede trækker; på en form der ikke er valgt endnu, tilføjer et klik med [[Shift]] den kun til markeringen.
 
@@ -140,7 +142,7 @@ Med {{ui:array.groupCopies}} sat i kryds grupperer {{ui:array.apply}} originalen
 
 ## Hulmønster på en flade
 
-Til udluftninger, højttalergitre, kurve og kabinetter spreder {{ui:holePattern.title}} huller jævnt over en flad flade. Du behøver ikke længere lave ét hul, gentage det og sætte det på væggen. Vælg præcis én form og klik på {{ui:holePattern.title}} i {{ui:editor.section.mirrorPattern}}-gruppen i båndet, ved siden af mønsteret. Du kan også højreklikke på formen, eller finde den med [[Ctrl]]+[[K]].
+Til udluftninger, højttalergitre, kurve og kabinetter spreder {{ui:holePattern.title}} huller jævnt over en flad flade eller rundt om væggen på en cylinder. Du behøver ikke længere lave ét hul, gentage det og sætte det på væggen. Vælg præcis én form og klik på {{ui:holePattern.title}} i {{ui:editor.section.mirrorPattern}}-gruppen i båndet, ved siden af mønsteret. Du kan også højreklikke på formen, eller finde den med [[Ctrl]]+[[K]].
 
 1. Klik en flad flade af formen. Hele den flade flade omkring dit klik tæller, ikke kun trekanten under markøren. Den runde væg på en cylinder, et rør eller en boring virker også, se nedenfor; andre krumme flader virker ikke: du får et tip og klikker en flad i stedet. På en gruppe eller et bundt løber fladen videre på tværs af de dele der mødes, som på én form; på et bundt kun når der ikke er et hul blandt delene. Delene lægges sammen kort efter at værktøjet er åbnet; indtil da lyser kun én dels flade op under markøren, og et klik venter på at delene er lagt sammen. På en gruppe eller et bundt med tekst i lyser kun én dels flade op, og klikket lægger delene sammen.
 2. I vinduet sæt du hvordan hullerne ser ud og ligger:

@@ -40,7 +40,7 @@ export const COMMAND_KEYWORDS: Readonly<Record<string, readonly string[]>> = {
   holePattern: ["hole pattern", "perforate", "perforation", "perforated", "holes", "vent", "ventilation", "grille", "honeycomb", "hexagon holes", "slots", "lochmuster", "lochraster", "perforieren", "locher", "löcher", "loecher", "lüftung", "lueftung", "gitter", "wabe", "langloch", "luftschlitze", "cylinder holes", "round wall", "pen holder", "zylinder löcher", "runde wand", "stiftebecher"],
   faceTool: ["face", "push", "pull", "push pull", "extrude", "pad", "boss", "pocket", "recess", "thicken", "thicker", "wall", "inset", "flaeche", "fläche", "herausziehen", "hineinziehen", "tasche", "vertiefung", "aufdicken", "verdicken", "erhebung"],
   array: ["array", "pattern", "repeat", "muster", "reihe", "kreis", "wiederholen", "vervielfachen"],
-  split: ["split", "cut", "slice", "teilen", "schneiden", "trennen", "saegen", "sägen", "ebene", "dowel", "dowels", "plug", "peg", "pin", "connector", "connectors", "dübel", "duebel", "zapfen", "passstift", "verbinder", "dovetail", "tongue", "groove", "schwalbenschwanz"],
+  split: ["split", "cut", "slice", "teilen", "schneiden", "trennen", "saegen", "sägen", "ebene", "dowel", "dowels", "plug", "peg", "pin", "connector", "connectors", "dübel", "duebel", "zapfen", "passstift", "verbinder", "dovetail", "tongue", "groove", "schwalbenschwanz", "stretch", "lengthen", "elongate", "longer", "shorten", "strecken", "verlängern", "verlaengern", "länger", "laenger", "kürzen", "kuerzen"],
   snap: ["snap", "grid", "raster", "einrasten", "gitter"],
   chamfer: ["chamfer", "chamfillet", "bevel", "fase", "abschraegen", "abschrägen", "kante", "afschuinen", "rand"],
   fillet: ["fillet", "round", "radius", "verrunden", "abrunden", "runden", "kante", "afronden", "rand", "concave", "scoop", "cove", "konkav", "hohlkehle", "auskehlen"],
@@ -98,7 +98,7 @@ export const SHAPE_KEYWORDS: Readonly<Record<string, readonly string[]>> = {
   // The French names have left the carpenter's and the machinist's words behind; the old ones still find the shape.
   dovetail: ["queue d'aronde", "schwalbenschwanz", "trapezoid", "trapèze"],
   bentTube: ["tube courbé", "tube plié", "gebogenes rohr", "rohrbogen"],
-  counterbore: ["lamage", "senkbohrung", "zylindersenkung", "drill point", "bohrerspitze", "slotted hole", "langloch"],
+  counterbore: ["lamage", "senkbohrung", "zylindersenkung", "drill point", "bohrerspitze", "slotted hole", "langloch", "chamfer", "fase", "chanfrein"],
   countersink: ["fraisage", "kegelsenkung", "senkkopf", "double countersink", "both sides", "double fraisage", "doppelsenkung", "beidseitig", "drill point", "bohrerspitze", "slotted hole", "langloch", "recessed", "versenkt", "tiefer"],
   finishingWasher: ["rosette", "cup washer", "screw cup", "countersunk washer", "trim washer", "washer", "rondelle", "senkscheibe", "zierscheibe", "unterlegscheibe"],
   knurl: ["moletage", "moleté", "rändel", "rändelung"],

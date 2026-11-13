@@ -107,6 +107,7 @@ export const DEFAULT_WORKPLANE_WORKSPACE: WorkplaneWorkspaceSettings = {
   dimensionsAlwaysVisible: true,
   dimensionAxisColors: false,
   showRotationAngles: true,
+  showSlideArrows: true,
   startWithScrollbars: false,
   viewBarOpensOnHover: false,
   zoomSpeed: 5,
@@ -472,6 +473,10 @@ export function normalizeShapeCustomizations(value: unknown, fallback: ShapeCust
     if (kind === "countersink" || kind === "doubleCountersink") {
       entry.screwHoleRecess = optionalShapeNumber(source.screwHoleRecess, fallbackEntry?.screwHoleRecess, 0, MAX_CUSTOM_SHAPE_DIMENSION);
     }
+    if (kind === "counterbore") {
+      // A chamfer at the rim of the pocket (Discussion #1632), so a counterbore made through the AI bridge keeps it.
+      entry.screwHoleChamfer = optionalShapeNumber(source.screwHoleChamfer, fallbackEntry?.screwHoleChamfer, 0, MAX_CUSTOM_SHAPE_DIMENSION);
+    }
     if (kind === "cylinder" || kind === "counterbore" || kind === "countersink") {
       // A drill point at the bottom of a blind hole (Discussion #621); 0 or less stands for a flat bottom, so a patch can switch it back.
       entry.drillPointAngle = typeof source.drillPointAngle === "number" && source.drillPointAngle <= 0
@@ -486,8 +491,9 @@ export function normalizeShapeCustomizations(value: unknown, fallback: ShapeCust
       entry.hingeClearance = optionalShapeNumber(source.hingeClearance, fallbackEntry?.hingeClearance, 0.1, 1);
       entry.hingeAngle = optionalShapeNumber(source.hingeAngle, fallbackEntry?.hingeAngle, -180, 180);
       entry.hingePinless = typeof source.hingePinless === "boolean" ? source.hingePinless : fallbackEntry?.hingePinless;
-      entry.hingeStyle = source.hingeStyle === "cone" || source.hingeStyle === "pinless" || source.hingeStyle === "pin" || source.hingeStyle === "liftOff" ? source.hingeStyle : fallbackEntry?.hingeStyle;
+      entry.hingeStyle = source.hingeStyle === "cone" || source.hingeStyle === "pinless" || source.hingeStyle === "pin" || source.hingeStyle === "liftOff" || source.hingeStyle === "snap" ? source.hingeStyle : fallbackEntry?.hingeStyle;
       entry.hingeConeSize = optionalShapeNumber(source.hingeConeSize, fallbackEntry?.hingeConeSize, 0.6, MAX_CUSTOM_SHAPE_DIMENSION);
+      entry.hingeSnapGrip = optionalShapeNumber(source.hingeSnapGrip, fallbackEntry?.hingeSnapGrip, 0.05, 1.5);
       entry.hingeScrewHoles = optionalShapeNumber(source.hingeScrewHoles, fallbackEntry?.hingeScrewHoles, 0, 6, true);
       entry.hingeScrewDiameter = optionalShapeNumber(source.hingeScrewDiameter, fallbackEntry?.hingeScrewDiameter, 1, 12);
       entry.hingeScrewSpacing = optionalShapeNumber(source.hingeScrewSpacing, fallbackEntry?.hingeScrewSpacing, 0, MAX_CUSTOM_SHAPE_DIMENSION);
@@ -655,6 +661,8 @@ export function normalizeShapeCustomizations(value: unknown, fallback: ShapeCust
       entry.textCurved = typeof source.textCurved === "boolean" ? source.textCurved : fallbackEntry?.textCurved;
       entry.textInward = typeof source.textInward === "boolean" ? source.textInward : fallbackEntry?.textInward;
       entry.textFlipped = typeof source.textFlipped === "boolean" ? source.textFlipped : fallbackEntry?.textFlipped;
+      // Kerning (#1297): new texts have it on, so only an "off" saved as a default means anything; true and false are both kept.
+      entry.textKerning = typeof source.textKerning === "boolean" ? source.textKerning : fallbackEntry?.textKerning;
       entry.textRadius = optionalShapeNumber(source.textRadius, fallbackEntry?.textRadius, 5, 500);
       entry.textSize = optionalShapeNumber(source.textSize, fallbackEntry?.textSize, 0.5, 200);
     }
@@ -709,6 +717,16 @@ export function normalizeShapeCustomizations(value: unknown, fallback: ShapeCust
         : ["hex", "torx", "phillips", "slot", "robertson", "none"].includes(source.threadDrive)
           ? source.threadDrive
           : fallbackEntry?.threadDrive;
+      // makeShapeFromAsset reads these too, but they were dropped here, so the AI bridge and the shape defaults never
+      // got a tapered thread, a head of its own size, a drive or a collar through (same ranges as the .lyl check).
+      // false is kept, so a change through the AI bridge can switch the taper off again.
+      entry.threadTaper = typeof source.threadTaper === "boolean" ? source.threadTaper : fallbackEntry?.threadTaper;
+      entry.threadHeadHeight = optionalShapeNumber(source.threadHeadHeight, fallbackEntry?.threadHeadHeight, 0, 480);
+      entry.threadHeadDiameter = optionalShapeNumber(source.threadHeadDiameter, fallbackEntry?.threadHeadDiameter, 0, 640);
+      entry.threadDriveSize = optionalShapeNumber(source.threadDriveSize, fallbackEntry?.threadDriveSize, 0, 640);
+      entry.threadDriveDepth = optionalShapeNumber(source.threadDriveDepth, fallbackEntry?.threadDriveDepth, 0, 640);
+      entry.threadCollarHeight = optionalShapeNumber(source.threadCollarHeight, fallbackEntry?.threadCollarHeight, 0, 640);
+      entry.threadCollarDiameter = optionalShapeNumber(source.threadCollarDiameter, fallbackEntry?.threadCollarDiameter, 0, 640);
     }
     if (kind === "gear") {
       entry.teeth = optionalShapeNumber(source.teeth, fallbackEntry?.teeth, MIN_GEAR_TEETH, MAX_GEAR_TEETH, true);
@@ -726,6 +744,12 @@ export function normalizeShapeCustomizations(value: unknown, fallback: ShapeCust
       entry.gearPressureAngle = optionalShapeNumber(source.gearPressureAngle, fallbackEntry?.gearPressureAngle, 14.5, 30);
       entry.gearBacklash = optionalShapeNumber(source.gearBacklash, fallbackEntry?.gearBacklash, 0, 2);
       entry.gearRim = optionalShapeNumber(source.gearRim, fallbackEntry?.gearRim, 0.5, 60);
+      // Slanted teeth on a ring gear or a rack (Discussion #1627).
+      entry.ringRackHelixAngle = optionalShapeNumber(source.ringRackHelixAngle, fallbackEntry?.ringRackHelixAngle, -45, 45);
+      // false is kept, so a change through the AI bridge can switch the herringbone teeth off again.
+      entry.ringRackHerringbone = typeof source.ringRackHerringbone === "boolean" ? source.ringRackHerringbone : fallbackEntry?.ringRackHerringbone;
+      // A spiral bevel gear's angle, as the inspector and the .lyl check take it.
+      entry.bevelHelixAngle = optionalShapeNumber(source.bevelHelixAngle, fallbackEntry?.bevelHelixAngle, -45, 45);
     }
     if (kind === "hirth") {
       entry.teeth = optionalShapeNumber(source.teeth, fallbackEntry?.teeth, MIN_HIRTH_TEETH, MAX_HIRTH_TEETH, true);
@@ -923,6 +947,7 @@ export function normalizeWorkspaceSettings(value: unknown, fallback: WorkplaneWo
     dimensionsAlwaysVisible: booleanOrDefault(candidate.dimensionsAlwaysVisible, fallback.dimensionsAlwaysVisible),
     dimensionAxisColors: booleanOrDefault(candidate.dimensionAxisColors, fallback.dimensionAxisColors),
     showRotationAngles: booleanOrDefault(candidate.showRotationAngles, fallback.showRotationAngles),
+    showSlideArrows: booleanOrDefault(candidate.showSlideArrows, fallback.showSlideArrows),
     startWithScrollbars: booleanOrDefault(candidate.startWithScrollbars, fallback.startWithScrollbars),
     viewBarOpensOnHover: booleanOrDefault(candidate.viewBarOpensOnHover, fallback.viewBarOpensOnHover),
     zoomSpeed: numberOrDefault(candidate.zoomSpeed, fallback.zoomSpeed),

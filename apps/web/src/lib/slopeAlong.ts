@@ -119,9 +119,20 @@ function archCurve(length: number, keep: number, end: number, curveValue: number
   return { length, keep, end, control: { s: length / 2, y: middle + (curve * (keep - end)) / 2 } };
 }
 
+/**
+ * A body's own length along an axis and the length its slope or side drop is measured over: the
+ * same, except for a tube's bore split off as a hole (splitBoreTube), which is measured over the
+ * tube around it, so its top lies on the tube's instead of running down over its own shorter length (#1698).
+ */
+export function slopeLengths(shape: Pick<WorkplaneShape, "width" | "depth" | "size" | "slopeSpan">, alongWidth: boolean) {
+  const own = alongWidth ? (shape.width ?? shape.size) : (shape.depth ?? shape.size);
+  const span = shape.slopeSpan ? (alongWidth ? shape.slopeSpan.width : shape.slopeSpan.depth) : own;
+  return { own, span: Number.isFinite(span) && span >= own ? span : own };
+}
+
 export function slopeCurveForShape(shape: WorkplaneShape): SlopeCurve {
   const side = normalizeSlopeSide(shape.kind, shape.slopeSide);
-  const length = slopeAlongWidth(side) ? (shape.width ?? shape.size) : (shape.depth ?? shape.size);
+  const length = slopeLengths(shape, slopeAlongWidth(side)).span;
   const keep = shape.height;
   const end = slopeEndHeight(shape);
   if (normalizeSlopeFrom(shape.slopeFrom) === "arch") return archCurve(length, keep, end, shape.slopeCurve ?? 0);
@@ -198,7 +209,8 @@ export function maxSideDrop(height: number) {
 }
 
 /** Whether the lowered sides are across the width (the width is the shorter way) rather than across the depth. */
-export function sideDropAcrossWidth(shape: Pick<WorkplaneShape, "width" | "depth" | "size">) {
+export function sideDropAcrossWidth(shape: Pick<WorkplaneShape, "width" | "depth" | "size" | "slopeSpan">) {
+  if (shape.slopeSpan) return shape.slopeSpan.width < shape.slopeSpan.depth;
   return (shape.width ?? shape.size) < (shape.depth ?? shape.size);
 }
 
@@ -214,7 +226,7 @@ export function shapeHasSideDrop(shape: WorkplaneShape) {
 
 /** The side drop's top line, from the middle (distance 0) to an edge (half the shorter way). */
 export function sideDropCurveForShape(shape: WorkplaneShape): SlopeCurve {
-  const across = sideDropAcrossWidth(shape) ? (shape.width ?? shape.size) : (shape.depth ?? shape.size);
+  const across = slopeLengths(shape, sideDropAcrossWidth(shape)).span;
   return { ...topCurve(across / 2, shape.height, shape.height - sideDropAmount(shape), shape.sideCurve ?? 0), middle: true, full: across };
 }
 
@@ -370,24 +382,34 @@ export function slopeMesh(vertices: readonly Vec3[], faces: readonly Face[], sha
   const sideCurve = sides ? sideDropCurveForShape(shape) : null;
   const sideAxis: 0 | 2 = sideDropAcrossWidth(shape) ? 0 : 2;
   const cuts: Record<0 | 2, number[]> = { 0: [], 2: [] };
+  // The body's own length along the slope and across the side drop, and how far its kept end lies inside the
+  // length the line is measured over: 0, except for a tube's bore, which lies inside the tube (#1698).
+  const slopeLength = slopeLengths(shape, slopeAlongWidth(slopeSide));
+  const slopeInset = (slopeLength.span - slopeLength.own) / 2;
+  const sideOwnHalf = slopeLengths(shape, sideAxis === 0).own / 2;
   // From the middle the line is cut on both sides of it, and at the middle itself, where the two halves meet in a ridge.
-  const aroundMiddle = (axis: 0 | 2, curve: SlopeCurve) => {
+  // `ownHalf` is how far (mm) the body itself reaches from its middle; the line may run on past it.
+  const aroundMiddle = (axis: 0 | 2, curve: SlopeCurve, ownHalf: number) => {
     const low = axis === 0 ? min.x : min.z;
     const high = axis === 0 ? max.x : max.z;
     const centre = (low + high) / 2;
     const half = (high - low) / 2;
     cuts[axis].push(centre);
     alongLevels(curve.length, 0, curve, roof).forEach((s) => {
-      const offset = (s / Math.max(1e-9, curve.length)) * half;
+      if (s >= ownHalf - 1e-9) return;
+      const offset = (s / Math.max(1e-9, ownHalf)) * half;
       cuts[axis].push(centre - offset, centre + offset);
     });
   };
-  if (slopeCurve?.middle) aroundMiddle(slopeAlongWidth(slopeSide) ? 0 : 2, slopeCurve);
+  if (slopeCurve?.middle) aroundMiddle(slopeAlongWidth(slopeSide) ? 0 : 2, slopeCurve, slopeLength.own / 2);
   else if (slopeCurve) {
     const axis = slopeAlongWidth(slopeSide) ? 0 : 2;
-    alongLevels(slopeCurve.length, 0, slopeCurve, roof).forEach((s) => cuts[axis].push(coordinate(slopeSide, s, slopeCurve.length)));
+    alongLevels(slopeCurve.length, 0, slopeCurve, roof).forEach((s) => {
+      const own = s - slopeInset;
+      if (own > 1e-9 && own < slopeLength.own - 1e-9) cuts[axis].push(coordinate(slopeSide, own, slopeLength.own));
+    });
   }
-  if (sideCurve) aroundMiddle(sideAxis, sideCurve);
+  if (sideCurve) aroundMiddle(sideAxis, sideCurve, sideOwnHalf);
   if (narrowCurve) {
     const axis = slopeAlongWidth(narrowSide) ? 0 : 2;
     alongLevels(narrowCurve.total, narrowCurve.start, narrowCurve, roof).forEach((s) => cuts[axis].push(coordinate(narrowSide, s, narrowCurve.total)));
@@ -405,10 +427,10 @@ export function slopeMesh(vertices: readonly Vec3[], faces: readonly Face[], sha
     let ny = y;
     let nz = z;
     // A slope alone and a side drop alone scale the height by their top's share; both together add their drops.
-    const slopeTop = slopeCurve ? slopeTopAtDistance(slopeCurve, slopeDistance(slopeSide, x, z, min, max, slopeCurve.full ?? slopeCurve.length)) : null;
+    const slopeTop = slopeCurve ? slopeTopAtDistance(slopeCurve, slopeInset + slopeDistance(slopeSide, x, z, min, max, slopeLength.own)) : null;
     // The distance from the middle is taken as a share of half the way across, so a body drawn as a unit one (stretched afterwards) is judged as in millimetres.
     const sideTop = sideCurve
-      ? slopeTopAt(sideCurve, Math.min(1, Math.abs(sideAxis === 0 ? x - centerX : z - centerZ) / Math.max(1e-9, ((sideAxis === 0 ? max.x - min.x : max.z - min.z) / 2))) * sideCurve.length)
+      ? slopeTopAt(sideCurve, Math.min(1, Math.abs(sideAxis === 0 ? x - centerX : z - centerZ) / Math.max(1e-9, ((sideAxis === 0 ? max.x - min.x : max.z - min.z) / 2))) * sideOwnHalf)
       : null;
     if (slopeTop !== null && sideTop === null) ny = min.y + (y - min.y) * (slopeTop / Math.max(1e-9, slopeCurve!.keep));
     else if (sideTop !== null) {
