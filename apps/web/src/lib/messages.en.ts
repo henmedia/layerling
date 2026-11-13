@@ -5496,6 +5496,8 @@ export const MESSAGES_EN = {
   "align.gapLabel": "Gap",
   "align.gapApply": "Apply",
   "align.gapCancel": "Close",
+  "align.sizeSwitch": "Size mode",
+  "align.sizeSwitchTitle": "Like holding Alt: the dots match sizes, and the gap dot lets you type a gap",
   "mirror.leftRight": "left-right",
   "mirror.frontBack": "front-back",
   "mirror.topBottom": "top-bottom",

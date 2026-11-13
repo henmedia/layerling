@@ -5474,6 +5474,8 @@ export const MESSAGES_IT: Partial<Record<MessageKey, string>> = {
   "align.gapLabel": "Distanza",
   "align.gapApply": "Applica",
   "align.gapCancel": "Chiudi",
+  "align.sizeSwitch": "Modalità dimensione",
+  "align.sizeSwitchTitle": "Come tenendo premuto Alt: i punti uniformano le dimensioni e sul punto della distanza si digita la distanza",
   "mirror.leftRight": "sinistra-destra",
   "mirror.frontBack": "fronte-retro",
   "mirror.topBottom": "alto-basso",

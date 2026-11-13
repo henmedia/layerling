@@ -5280,6 +5280,8 @@ export const MESSAGES_RU: Partial<Record<MessageKey, string>> = {
   "align.gapLabel": "Промежуток",
   "align.gapApply": "Применить",
   "align.gapCancel": "Закрыть",
+  "align.sizeSwitch": "Режим размера",
+  "align.sizeSwitchTitle": "Как при зажатом Alt: точки выравнивают размеры, а у точки промежутка вводится промежуток",
   "mirror.leftRight": "слева-справа",
   "mirror.frontBack": "спереди-сзади",
   "mirror.topBottom": "сверху-снизу",

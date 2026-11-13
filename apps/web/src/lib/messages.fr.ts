@@ -5473,6 +5473,8 @@ export const MESSAGES_FR: Partial<Record<MessageKey, string>> = {
   "align.gapLabel": "Écart",
   "align.gapApply": "Appliquer",
   "align.gapCancel": "Fermer",
+  "align.sizeSwitch": "Mode taille",
+  "align.sizeSwitchTitle": "Comme en maintenant Alt : les points égalisent les tailles, et le point d'écart permet de saisir l'écart",
   "mirror.leftRight": "gauche-droite",
   "mirror.frontBack": "recto verso",
   "mirror.topBottom": "de haut en bas",

@@ -5496,6 +5496,8 @@ export const MESSAGES_NL: Record<MessageKey, string> = {
   "align.gapLabel": "Tussenruimte",
   "align.gapApply": "Toepassen",
   "align.gapCancel": "Sluiten",
+  "align.sizeSwitch": "Maatmodus",
+  "align.sizeSwitchTitle": "Zoals Alt ingedrukt houden: de stippen maken maten gelijk en bij de afstandsstip typ je de afstand",
   "mirror.leftRight": "links-rechts",
   "mirror.frontBack": "voor-achter",
   "mirror.topBottom": "boven-onder",

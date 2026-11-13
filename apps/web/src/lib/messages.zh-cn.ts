@@ -5478,6 +5478,8 @@ export const MESSAGES_ZH_CN: Partial<Record<MessageKey, string>> = {
   "align.gapLabel": "间距",
   "align.gapApply": "应用",
   "align.gapCancel": "关闭",
+  "align.sizeSwitch": "尺寸模式",
+  "align.sizeSwitchTitle": "相当于按住 Alt：圆点统一尺寸，间距圆点可输入间距",
   "mirror.leftRight": "左右",
   "mirror.frontBack": "前后",
   "mirror.topBottom": "上下",

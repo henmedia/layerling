@@ -78,7 +78,7 @@ Si entre las formas seleccionadas hay una base (una forma sobre la que están la
 
 Sin base, mantén [[Shift]] y haz clic primero en un sitio libre de la placa: la placa pasa a ser la forma fija, el espaciado igual reparte las formas por toda la placa con la misma separación a sus bordes, y los demás puntos las alinean con sus bordes o su centro. Otro clic con [[Shift]] en la placa libre la suelta. Un clic en un lugar vacío sin [[Shift]] termina la alineación, igual que [[L]] y [[Esc]].
 
-Mantén [[Alt]] y haz clic en el punto para escribir tú la separación, por ejemplo 5 mm: las formas se alinean a esa distancia, desde la primera forma o desde la que pulsaste primero; sobre una base, la fila queda en su centro. Una forma bloqueada no se mueve, así que una entre las formas exteriores impide el espaciado igual.
+Mantén [[Alt]] y haz clic en el punto para escribir tú la separación, por ejemplo 5 mm: las formas se alinean a esa distancia, desde la primera forma o desde la que pulsaste primero; sobre una base, la fila queda en su centro. Una forma bloqueada no se mueve, así que una entre las formas exteriores impide el espaciado igual. En una tableta, que no tiene tecla Alt, el interruptor {{ui:align.sizeSwitch}} junto a los puntos hace lo mismo: al activarlo, los puntos siguen siendo cuadrados y el punto de separación abre su campo, hasta que lo desactives.
 
 ## Reflejar
 

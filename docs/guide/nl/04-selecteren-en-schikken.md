@@ -72,7 +72,7 @@ Zit er tussen de gekozen vormen een plaat die in die richting langer is dan alle
 
 Zonder plaat houd je [[Shift]] ingedrukt en klik je eerst op een lege plek van het bouwplatform: dat is dan de vaste vorm, gelijke tussenruimte verdeelt de vormen over het hele platform met dezelfde ruimte tot de randen, en de andere punten lijnen ze uit op de randen of het midden. Nog een klik met [[Shift]] op de lege plek laat het weer los. Een klik op een lege plek zonder [[Shift]] beëindigt het uitlijnen, net als [[L]] en [[Esc]].
 
-Houd [[Alt]] ingedrukt en klik op de punt om de tussenruimte zelf in te typen, bijvoorbeeld 5 mm: de vormen komen dan zo ver uit elkaar te staan, vanaf de eerste vorm of vanaf de vorm die je eerst aanklikte; op een plaat komt de rij in het midden. Een vergrendelde vorm blijft staan, dus een tussen de buitenste vormen verhindert gelijke tussenruimte.
+Houd [[Alt]] ingedrukt en klik op de punt om de tussenruimte zelf in te typen, bijvoorbeeld 5 mm: de vormen komen dan zo ver uit elkaar te staan, vanaf de eerste vorm of vanaf de vorm die je eerst aanklikte; op een plaat komt de rij in het midden. Een vergrendelde vorm blijft staan, dus een tussen de buitenste vormen verhindert gelijke tussenruimte. Op een tablet, dat geen Alt-toets heeft, doet de schakelaar {{ui:align.sizeSwitch}} naast de stippen hetzelfde: zet je hem aan, dan blijven de stippen vierkantjes en opent de afstandsstip zijn veld, tot je hem weer uitzet.
 
 ## Spiegelen
 

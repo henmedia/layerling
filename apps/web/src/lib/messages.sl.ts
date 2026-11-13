@@ -4361,6 +4361,8 @@ export const MESSAGES_SL: Partial<Record<MessageKey, string>> = {
   "align.gapLabel": "Razmik",
   "align.gapApply": "Uporabi",
   "align.gapCancel": "Zapri",
+  "align.sizeSwitch": "Način velikosti",
+  "align.sizeSwitchTitle": "Kot pri držanju Alt: pike izenačijo velikosti, pri piki razmika pa vpišete razmik",
   "mirror.leftRight": "levo-desno",
   "mirror.frontBack": "spredaj-zadaj",
   "mirror.topBottom": "zgoraj-spodaj",

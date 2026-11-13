@@ -72,7 +72,7 @@ Ob srednji točki vsake črte stoji širša točka s črtico na vsaki strani. Ra
 
 Brez plošče najprej drži [[Shift]] in klikni prazno mesto podlage: podlaga je nato fiksna oblika, enaki razmiki razporedijo oblike po vsej podlagi z enakim razmikom do robov, druge točke pa jih poravnajo na njene robove ali sredino. Ponoven klik s [[Shift]] na prazno podlago jo izpusti. Klik na prazno mesto brez [[Shift]] konča poravnavo, tako kot [[L]] in [[Esc]].
 
-Drži [[Alt]] in klikni točko, da sam vpišeš razmik, na primer 5 mm: oblike se postavijo tako daleč narazen, od prve oblike ali od tiste, ki si jo kliknil najprej; na plošči pride vrsta na sredino. Zaklenjena oblika ostane na mestu, zato ena med zunanjima oblikama prepreči enake razmike.
+Drži [[Alt]] in klikni točko, da sam vpišeš razmik, na primer 5 mm: oblike se postavijo tako daleč narazen, od prve oblike ali od tiste, ki si jo kliknil najprej; na plošči pride vrsta na sredino. Zaklenjena oblika ostane na mestu, zato ena med zunanjima oblikama prepreči enake razmike. Na tablici, ki nima tipke Alt, isto naredi stikalo {{ui:align.sizeSwitch}} ob pikah: ko ga vklopite, pike ostanejo kvadratki in pika razmika odpre svoje polje, dokler stikala ne izklopite.
 
 ## Zrcaljenje
 

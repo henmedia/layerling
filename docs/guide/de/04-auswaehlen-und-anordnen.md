@@ -78,7 +78,7 @@ Ist unter den gewählten Formen ein Brett (eine Grundform, auf der die anderen s
 
 Ohne Brett hältst du [[Umschalt]] und klickst zuerst auf eine freie Stelle der Platte: Dann ist die Platte die feste Form, gleiche Abstände verteilen die Formen über die ganze Platte mit demselben Abstand zu ihren Rändern, und die anderen Punkte richten sie an ihren Rändern oder ihrer Mitte aus. Ein zweiter Klick mit [[Umschalt]] auf die freie Platte lässt sie wieder los. Ein Klick ins Leere ohne [[Umschalt]] beendet das Ausrichten, wie [[L]] und [[Esc]].
 
-Halte [[Alt]] und klicke den Punkt, um den Abstand selbst einzutippen, etwa 5 mm: Die Formen reihen sich dann so weit auseinander auf, ab der ersten Form oder ab der, die du zuerst angeklickt hast; auf einem Brett kommt die Reihe in seine Mitte. Eine gesperrte Form bleibt stehen, eine zwischen den äußeren Formen verhindert also gleiche Abstände.
+Halte [[Alt]] und klicke den Punkt, um den Abstand selbst einzutippen, etwa 5 mm: Die Formen reihen sich dann so weit auseinander auf, ab der ersten Form oder ab der, die du zuerst angeklickt hast; auf einem Brett kommt die Reihe in seine Mitte. Eine gesperrte Form bleibt stehen, eine zwischen den äußeren Formen verhindert also gleiche Abstände. Auf einem Tablet, das keine Alt-Taste hat, tut der Schalter {{ui:align.sizeSwitch}} neben den Punkten dasselbe: Schaltest du ihn ein, bleiben die Punkte Quadrate und der Abstandspunkt öffnet sein Feld, bis du ihn wieder ausschaltest.
 
 ## Spiegeln
 

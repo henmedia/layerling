@@ -5504,6 +5504,8 @@ export const MESSAGES_AR: Partial<Record<MessageKey, string>> = {
   "align.gapLabel": "المسافة",
   "align.gapApply": "تطبيق",
   "align.gapCancel": "إغلاق",
+  "align.sizeSwitch": "وضع الحجم",
+  "align.sizeSwitchTitle": "مثل الضغط على Alt: تطابق النقاط الأحجام، وتتيح نقطة المسافة كتابة المسافة",
   "mirror.leftRight": "يسار-يمين",
   "mirror.frontBack": "أمام-خلف",
   "mirror.topBottom": "أعلى-أسفل",

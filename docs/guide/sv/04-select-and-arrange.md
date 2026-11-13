@@ -78,7 +78,7 @@ Finns en basplatta (ett underlag de andra står på, som en platt låda, inte et
 
 Utan en basplatta håller du [[Shift]] och klickar först på en tom plats på byggplattan: då fungerar plattan som den fasta formen, lika mellanrum sprider ut formerna över hela plattan med samma marginal till dess kanter, och de andra prickarna riktar in dem mot plattans kanter eller mitt. Ett nytt [[Shift]]-klick på den tomma plattan släpper den. Ett klick på tom yta utan [[Shift]] avslutar Rikta in, precis som [[L]] och [[Esc]].
 
-Håll [[Alt]] nere och klicka på punkten för att själv skriva in mellanrummet, till exempel 5 mm: då radar formerna upp sig med just det avståndet från den första formen eller från den du klickade på först; på en underlagsplatta centreras raden på den. En låst form stannar där den är, så en låst del mellan de yttre formerna hindrar utjämning.
+Håll [[Alt]] nere och klicka på punkten för att själv skriva in mellanrummet, till exempel 5 mm: då radar formerna upp sig med just det avståndet från den första formen eller från den du klickade på först; på en underlagsplatta centreras raden på den. En låst form stannar där den är, så en låst del mellan de yttre formerna hindrar utjämning. På en surfplatta, som saknar Alt-tangent, gör reglaget {{ui:align.sizeSwitch}} bredvid prickarna samma sak: Slår du på det förblir prickarna fyrkanter och avståndsprickan öppnar sitt fält, tills du slår av det.
 
 ## Spegla
 

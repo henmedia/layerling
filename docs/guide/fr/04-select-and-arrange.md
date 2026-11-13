@@ -72,7 +72,7 @@ Si une plaque fait partie de la sélection, plus longue dans cette direction que
 
 Sans plaque, maintenez [[Shift]] et cliquez d'abord sur un endroit libre du plateau : le plateau devient alors la forme fixe, l'espacement égal répartit les formes sur tout le plateau avec le même écart à ses bords, et les autres points les alignent sur ses bords ou son milieu. Un nouveau clic avec [[Shift]] sur le plateau libre le relâche. Un clic dans le vide sans [[Shift]] termine l'alignement, comme [[L]] et [[Esc]].
 
-Maintenez [[Alt]] et cliquez sur le point pour saisir l'écart vous-même, par exemple 5 mm : les formes s'alignent à cette distance, à partir de la première forme ou de celle cliquée en premier ; sur une plaque, la rangée vient en son milieu. Une forme verrouillée reste en place ; entre les formes extérieures, elle empêche donc l'espacement égal.
+Maintenez [[Alt]] et cliquez sur le point pour saisir l'écart vous-même, par exemple 5 mm : les formes s'alignent à cette distance, à partir de la première forme ou de celle cliquée en premier ; sur une plaque, la rangée vient en son milieu. Une forme verrouillée reste en place ; entre les formes extérieures, elle empêche donc l'espacement égal. Sur une tablette, qui n'a pas de touche Alt, l'interrupteur {{ui:align.sizeSwitch}} à côté des points fait la même chose : activé, les points restent des carrés et le point d'écart ouvre son champ, jusqu'à ce que vous le désactiviez.
 
 ## Mise en miroir
 

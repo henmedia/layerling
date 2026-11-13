@@ -5495,6 +5495,8 @@ export const MESSAGES_DE: Record<MessageKey, string> = {
   "align.gapLabel": "Abstand",
   "align.gapApply": "Anwenden",
   "align.gapCancel": "Schließen",
+  "align.sizeSwitch": "Größenmodus",
+  "align.sizeSwitchTitle": "Wie gehaltenes Alt: Die Punkte gleichen Größen an, und am Abstandspunkt tippst du den Abstand ein",
   "mirror.leftRight": "links-rechts",
   "mirror.frontBack": "vorn-hinten",
   "mirror.topBottom": "oben-unten",

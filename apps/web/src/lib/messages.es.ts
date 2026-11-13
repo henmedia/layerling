@@ -5498,6 +5498,8 @@ export const MESSAGES_ES: Partial<Record<MessageKey, string>> = {
   "align.gapLabel": "Separación",
   "align.gapApply": "Aplicar",
   "align.gapCancel": "Cerrar",
+  "align.sizeSwitch": "Modo de tamaño",
+  "align.sizeSwitchTitle": "Como mantener Alt: los puntos igualan tamaños y en el punto de separación escribes la separación",
   "mirror.leftRight": "izquierda-derecha",
   "mirror.frontBack": "delante-detrás",
   "mirror.topBottom": "arriba-abajo",

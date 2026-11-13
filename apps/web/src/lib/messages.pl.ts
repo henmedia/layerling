@@ -5501,6 +5501,8 @@ export const MESSAGES_PL: Partial<Record<MessageKey, string>> = {
   "align.gapLabel": "Odstęp",
   "align.gapApply": "Zastosuj",
   "align.gapCancel": "Zamknij",
+  "align.sizeSwitch": "Tryb rozmiaru",
+  "align.sizeSwitchTitle": "Jak przy przytrzymanym Alt: punkty wyrównują rozmiary, a przy punkcie odstępu wpisujesz odstęp",
   "mirror.leftRight": "lewo-prawo",
   "mirror.frontBack": "przód-tył",
   "mirror.topBottom": "góra-dół",

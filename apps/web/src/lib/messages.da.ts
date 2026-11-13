@@ -5232,6 +5232,8 @@ export const MESSAGES_DA: Partial<Record<MessageKey, string>> = {
   "align.gapLabel": "Mellemrum",
   "align.gapApply": "Anvend",
   "align.gapCancel": "Luk",
+  "align.sizeSwitch": "Størrelsestilstand",
+  "align.sizeSwitchTitle": "Som når Alt holdes nede: Prikkerne tilpasser størrelser, og ved afstandsprikken skriver du afstanden",
   "mirror.leftRight": "venstre-højre",
   "mirror.frontBack": "for-bag",
   "mirror.topBottom": "top-bund",

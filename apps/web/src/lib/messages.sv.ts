@@ -5490,6 +5490,8 @@ export const MESSAGES_SV: Partial<Record<MessageKey, string>> = {
   "align.gapLabel": "Mellanrum",
   "align.gapApply": "Tillämpa",
   "align.gapCancel": "Stäng",
+  "align.sizeSwitch": "Storleksläge",
+  "align.sizeSwitchTitle": "Som när Alt hålls nere: Prickarna jämnar ut storlekar, och vid avståndsprickan skriver du avståndet",
   "mirror.leftRight": "vänster-höger",
   "mirror.frontBack": "fram-bak",
   "mirror.topBottom": "topp-botten",

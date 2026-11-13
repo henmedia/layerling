@@ -18210,3 +18210,31 @@ html[data-theme="dark"] .select-property select option {
 html[data-theme="dark"] .property-card > button.property-card-header:hover {
   background: rgba(255, 255, 255, 0.1);
 }
+
+.align-size-toggle {
+  display: none;
+  position: absolute;
+  left: 12px;
+  bottom: 72px;
+  padding: 8px 14px;
+  border: 1px solid var(--border-strong);
+  border-radius: 999px;
+  background: var(--panel);
+  color: var(--foreground);
+  font: 600 13px var(--font-ui);
+  box-shadow: 0 2px 8px rgba(40, 27, 13, 0.22);
+  pointer-events: auto;
+  touch-action: manipulation;
+}
+
+.align-size-toggle.on {
+  background: rgba(173, 89, 0, 0.92);
+  border-color: rgba(173, 89, 0, 0.92);
+  color: #fff;
+}
+
+@media (any-pointer: coarse) {
+  .align-size-toggle {
+    display: block;
+  }
+}

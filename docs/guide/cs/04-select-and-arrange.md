@@ -72,7 +72,7 @@ Je-li mezi vybranými tvary deska, která je v tomto směru delší než všechn
 
 Bez desky nejdřív se stisknutým [[Shift]] klikněte na volné místo podložky: podložka je pak pevný tvar, stejné mezery rozmístí tvary po celé podložce se stejnou mezerou k jejím okrajům a ostatní body je zarovnají k jejím okrajům nebo středu. Další klik se [[Shift]] na volnou podložku ji uvolní. Klik do prázdna bez [[Shift]] zarovnání ukončí, stejně jako [[L]] a [[Esc]].
 
-Podržte [[Alt]] a klikněte na bod, chcete-li mezeru zadat sami, třeba 5 mm: tvary se seřadí v této vzdálenosti, od prvního tvaru nebo od toho, na který jste klikli jako první; na desce přijde řada doprostřed. Zamčený tvar zůstane na místě, takže jeden mezi krajními tvary stejným mezerám zabrání.
+Podržte [[Alt]] a klikněte na bod, chcete-li mezeru zadat sami, třeba 5 mm: tvary se seřadí v této vzdálenosti, od prvního tvaru nebo od toho, na který jste klikli jako první; na desce přijde řada doprostřed. Zamčený tvar zůstane na místě, takže jeden mezi krajními tvary stejným mezerám zabrání. Na tabletu, který nemá klávesu Alt, dělá totéž přepínač {{ui:align.sizeSwitch}} vedle teček: když ho zapnete, tečky zůstanou čtverečky a tečka rozestupu otevře své pole, dokud přepínač nevypnete.
 
 ## Zrcadlení
 

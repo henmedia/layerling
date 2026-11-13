@@ -72,7 +72,7 @@ Se tra le forme selezionate c'è una base più lunga di tutte le altre in quella
 
 Senza base, tieni premuto [[Shift]] e fai prima clic su un punto libero del piano: il piano diventa la forma fissa, la spaziatura uguale distribuisce le forme su tutto il piano con la stessa distanza dai bordi, e gli altri punti le allineano ai suoi bordi o al suo centro. Un altro clic con [[Shift]] sul piano libero lo rilascia. Un clic in un punto vuoto senza [[Shift]] termina l'allineamento, come [[L]] ed [[Esc]].
 
-Tieni premuto [[Alt]] e fai clic sul punto per digitare tu la distanza, per esempio 5 mm: le forme si allineano a quella distanza, a partire dalla prima forma o da quella cliccata per prima; su una base la fila va al suo centro. Una forma bloccata resta ferma, quindi una tra le forme esterne impedisce la spaziatura uguale.
+Tieni premuto [[Alt]] e fai clic sul punto per digitare tu la distanza, per esempio 5 mm: le forme si allineano a quella distanza, a partire dalla prima forma o da quella cliccata per prima; su una base la fila va al suo centro. Una forma bloccata resta ferma, quindi una tra le forme esterne impedisce la spaziatura uguale. Su un tablet, che non ha il tasto Alt, l'interruttore {{ui:align.sizeSwitch}} accanto ai punti fa lo stesso: se lo attivi, i punti restano quadrati e il punto della distanza apre il suo campo, finché non lo disattivi.
 
 ## Specchiare
 

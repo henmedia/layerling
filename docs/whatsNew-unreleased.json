@@ -14,6 +14,19 @@
   },
   {
     "title": {
+      "de": "Ausrichten ohne Alt-Taste auf dem Tablet",
+      "en": "Align without the Alt key on a tablet"
+    },
+    "body": {
+      "de": "Beim Ausrichten gibt es neben den Punkten jetzt den Schalter „Größenmodus“, wo ein Finger oder Stift die Maus ersetzt. Er tut, was die gehaltene Alt-Taste tut: Die Punkte gleichen Größen an, statt zu verschieben, und am Abstandspunkt tippst du den Abstand ein. Einschalten, tippen, wieder ausschalten.",
+      "en": "Align now has a switch, Size mode, beside the dots wherever a finger or pen replaces the mouse. It does what holding Alt does: the dots match sizes instead of moving the parts, and at the gap dot you type the gap. Switch it on, tap, switch it off again."
+    },
+    "guide": {
+      "section": "alignSpread"
+    }
+  },
+  {
+    "title": {
       "de": "Keil: Neigungswinkel in den Eigenschaften",
       "en": "Wedge: the slope angle in its properties",
       "da": "Kile: hældningsvinklen i egenskaberne"

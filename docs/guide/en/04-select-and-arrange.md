@@ -78,7 +78,7 @@ If a board (a base the others stand on, such as a flat box, not an SBC board) is
 
 Without a board, hold [[Shift]] and click an empty spot of the plate first: the plate is then the fixed shape, equal gaps spread the shapes over the whole plate with the same gap to its edges, and the other dots line them up on its edges or its middle. Another click with [[Shift]] on the empty plate lets it go. A click on empty space without [[Shift]] ends Align, as [[L]] and [[Esc]] do.
 
-Hold [[Alt]] and click the dot to type the gap yourself, say 5 mm: the shapes line up that far apart, starting at the first shape or at the one you clicked first; on a board the row comes to its middle. A locked shape stays where it is, so one between the outer shapes stops the equal gaps.
+Hold [[Alt]] and click the dot to type the gap yourself, say 5 mm: the shapes line up that far apart, starting at the first shape or at the one you clicked first; on a board the row comes to its middle. A locked shape stays where it is, so one between the outer shapes stops the equal gaps. On a tablet, which has no Alt key, the switch {{ui:align.sizeSwitch}} beside the dots does the same: switch it on and the dots stay squares and the gap dot opens its field, until you switch it off.
 
 ## Mirroring
 

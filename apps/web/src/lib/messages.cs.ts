@@ -5477,6 +5477,8 @@ export const MESSAGES_CS: Record<MessageKey, string> = {
   "align.gapLabel": "Mezera",
   "align.gapApply": "Použít",
   "align.gapCancel": "Zavřít",
+  "align.sizeSwitch": "Režim velikosti",
+  "align.sizeSwitchTitle": "Jako při držení Alt: tečky srovnají velikosti a u tečky rozestupu zadáte rozestup",
   "mirror.leftRight": "vlevo–vpravo",
   "mirror.frontBack": "vpředu–vzadu",
   "mirror.topBottom": "nahoře–dole",

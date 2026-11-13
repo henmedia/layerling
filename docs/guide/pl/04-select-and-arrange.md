@@ -78,7 +78,7 @@ Jeśli wśród zaznaczonych kształtów jest płyta (kształt bazowy, na którym
 
 Bez płyty przytrzymaj [[Shift]] i kliknij najpierw wolne miejsce stołu: stół staje się wtedy stałym kształtem, równe odstępy rozkładają kształty na całym stole z takim samym odstępem od brzegów, a pozostałe punkty wyrównują je do jego brzegów lub środka. Ponowne kliknięcie z [[Shift]] wolnego miejsca zwalnia go. Kliknięcie w puste miejsce bez [[Shift]] kończy wyrównywanie, tak jak [[L]] i [[Esc]].
 
-Przytrzymaj [[Alt]] i kliknij punkt, żeby samemu wpisać odstęp, np. 5 mm: kształty ustawią się w takiej odległości, od pierwszego kształtu albo od tego, który kliknięto najpierw; na płycie rząd trafia na jej środek. Zablokowany kształt zostaje na miejscu, więc taki między skrajnymi kształtami uniemożliwia równe odstępy.
+Przytrzymaj [[Alt]] i kliknij punkt, żeby samemu wpisać odstęp, np. 5 mm: kształty ustawią się w takiej odległości, od pierwszego kształtu albo od tego, który kliknięto najpierw; na płycie rząd trafia na jej środek. Zablokowany kształt zostaje na miejscu, więc taki między skrajnymi kształtami uniemożliwia równe odstępy. Na tablecie, który nie ma klawisza Alt, to samo robi przełącznik {{ui:align.sizeSwitch}} obok punktów: po włączeniu punkty pozostają kwadratami, a punkt odstępu otwiera swoje pole, dopóki go nie wyłączysz.
 
 ## Odbicie lustrzane
 

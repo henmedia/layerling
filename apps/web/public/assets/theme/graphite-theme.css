@@ -8816,6 +8816,19 @@ html[data-theme="dark"]:where([data-palette="graphite"]) .property-card > button
   background: rgba(255, 255, 255, 0.1);
 }
 
+:where(html[data-theme="dark"][data-palette="graphite"]) .align-size-toggle {
+  border: 1px solid var(--border-strong);
+  background: var(--panel);
+  color: var(--foreground);
+  box-shadow: 0 2px 8px rgba(33, 33, 33, 0.22);
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .align-size-toggle.on {
+  background: rgba(173, 89, 0, 0.92);
+  border-color: rgba(173, 89, 0, 0.92);
+  color: #fff;
+}
+
 :where(html[data-theme="dark"][data-palette="graphite"]) .dashboard-welcome-hide {
   color: #717171;
   background: transparent;

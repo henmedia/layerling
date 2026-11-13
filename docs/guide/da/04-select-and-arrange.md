@@ -80,7 +80,7 @@ Er der blandt de valgte figurer en plade (en grundform, som de andre står på, 
 
 Uden en plade holder du [[Shift]] nede og klikker først på et tomt sted på byggepladen: så er den den faste figur, lige store mellemrum fordeler figurerne over hele pladen med samme mellemrum til kanterne, og de andre punkter justerer dem efter dens kanter eller midte. Et nyt klik med [[Shift]] på den tomme plade slipper den igen. Et klik på et tomt sted uden [[Shift]] afslutter justeringen, ligesom [[L]] og [[Esc]].
 
-Hold [[Alt]] nede og klik på punktet for selv at indtaste mellemrummet, fx 5 mm: figurerne stilles så langt fra hinanden, fra den første figur eller fra den, du klikkede først; på en plade kommer rækken i midten. En låst figur bliver stående, så en mellem de yderste figurer forhindrer lige store mellemrum.
+Hold [[Alt]] nede og klik på punktet for selv at indtaste mellemrummet, fx 5 mm: figurerne stilles så langt fra hinanden, fra den første figur eller fra den, du klikkede først; på en plade kommer rækken i midten. En låst figur bliver stående, så en mellem de yderste figurer forhindrer lige store mellemrum. På en tablet, som ikke har nogen Alt-tast, gør kontakten {{ui:align.sizeSwitch}} ved siden af prikkerne det samme: Tænder du den, forbliver prikkerne firkanter, og afstandsprikken åbner sit felt, indtil du slukker den igen.
 
 ## Spejling
 
