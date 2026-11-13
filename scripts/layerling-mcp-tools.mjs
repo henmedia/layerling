@@ -2001,7 +2001,7 @@ export const tools = [
   },
   {
     name: "layerling_show_workplane",
-    description: "Show or hide the plate with its grid, labels and any workplane set on a face, like the eye over a grid in the editor's camera bar. Only the view changes: new shapes still land on the workplane, and nothing is saved with the design. Hide it before layerling_capture_image with view \"bottom\" to see the underside, for example with layerling_show_overhangs. Call without visible to read the state. Returns visible.",
+    description: "Show or hide the build plate with its grid and labels, like the eye over a grid in the editor's camera bar. A workplane set on a face stays shown (Discussion #1714): it has its own eye in the editor. Only the view changes: new shapes still land on the workplane, and nothing is saved with the design. Hide it before layerling_capture_image with view \"bottom\" to see the underside, for example with layerling_show_overhangs. Call without visible to read the state. Returns visible.",
     inputSchema: {
       ...editorTargetSchema,
       properties: {

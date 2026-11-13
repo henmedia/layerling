@@ -501,6 +501,8 @@ export function rebuildWorkplane(
         majorLineColor,
         workspace.gridLinesGrow !== false,
         round,
+        // In the arrows' colours where the arrows stand (Discussion #1714).
+        !muted && !extraPlate && workspace.showAxes,
       ));
       const labelPalette = workplaneGridPalette(theme, lineColor, state.palette).major;
       // The design's name in the near left corner, so a screenshot of the scene
@@ -558,6 +560,8 @@ export function rebuildWorkplane(
     }
     group.position.set(workplane.origin.x, workplane.origin.y, workplane.origin.z);
     group.quaternion.copy(placementWorkplaneQuaternion(workplane));
+    // The workplane laid on a face: the plate's switch leaves it alone, it has its own eye (Discussion #1714).
+    if (showMarker) group.userData.faceWorkplane = true;
     state.workplaneLayer.add(group);
   };
 
@@ -574,6 +578,18 @@ export function rebuildWorkplane(
   state.workplaneLayer.quaternion.identity();
   setObjectRenderLayer(state.workplaneLayer, RENDER_LAYER_WORKPLANE);
   freezeStaticObjectMatrices(state.workplaneLayer);
+  showWorkplanePlates(state.workplaneLayer, !state.workplaneLayer.userData.platesHidden);
+}
+
+/**
+ * The view bar's workplane switch (Discussion #1714): it shows or hides the build plates, and with them the workplane
+ * when that lies on the plate. A workplane laid on a face stays, so the plate can be put away while working on the face;
+ * that one has its own eye. Kept on the layer, so a rebuilt workplane hides its plates again.
+ */
+export function showWorkplanePlates(layer: THREE.Object3D, visible: boolean) {
+  layer.userData.platesHidden = !visible;
+  layer.visible = true;
+  for (const child of layer.children) child.visible = visible || child.userData.faceWorkplane === true;
 }
 
 export function syncWorkplaneHoverPreview(
@@ -843,6 +859,8 @@ export function createGridLines(
   majorColor = "",
   linesGrow = true,
   round = false,
+  /** The zero lines in the axis arrows' colours, red along X and green along Y (Discussion #1714); a greyed plate keeps one colour. */
+  colouredAxes = false,
 ) {
   const group = new THREE.Group();
   // On a round plate (#1024) each line runs from rim to rim: half its length either side of the middle.
@@ -851,15 +869,20 @@ export function createGridLines(
   const palette = workplaneThemePalette(theme, DEFAULT_WORKSPACE.background, gridColor, paletteName, undefined, majorColor).grid;
   const minor = new THREE.LineBasicMaterial({ ...palette.minor, transparent: true, depthWrite: false });
   const major = new THREE.LineBasicMaterial({ ...palette.major, transparent: true, depthWrite: false });
-  const axis = new THREE.LineBasicMaterial({ ...palette.axis, transparent: true, depthWrite: false });
+  // The line across the plate's width at Y = 0 is the X axis, the one along its depth at X = 0 the Y axis.
+  const axisColourX = colouredAxes ? { ...palette.axis, color: AXIS_ARROW_COLORS.x } : palette.axis;
+  const axisColourY = colouredAxes ? { ...palette.axis, color: AXIS_ARROW_COLORS.y } : palette.axis;
+  const axisX = new THREE.LineBasicMaterial({ ...axisColourX, transparent: true, depthWrite: false });
+  const axisY = new THREE.LineBasicMaterial({ ...axisColourY, transparent: true, depthWrite: false });
   const minorPoints: number[] = [];
   const majorPoints: number[] = [];
-  const axisPoints: number[] = [];
+  const axisPointsX: number[] = [];
+  const axisPointsY: number[] = [];
   const borderPoints: number[] = [];
   const pushLine = (points: number[], from: [number, number, number], to: [number, number, number]) => {
     points.push(...from, ...to);
   };
-  const pointsFor = (kind: "axis" | "major" | "minor") => (kind === "axis" ? axisPoints : kind === "major" ? majorPoints : minorPoints);
+  const pointsFor = (kind: "axis" | "major" | "minor", along: "depth" | "width") => (kind === "axis" ? (along === "depth" ? axisPointsY : axisPointsX) : kind === "major" ? majorPoints : minorPoints);
   // Every fine and darker line also gets a band on the plate, growing as you zoom in (#143).
   const minorBands: Array<[number, number, number, number]> = [];
   const majorBands: Array<[number, number, number, number]> = [];
@@ -867,14 +890,14 @@ export function createGridLines(
   for (const { coordinate: centeredX, kind } of outlineOnly ? [] : workplaneGridLines(width, layout)) {
     const half = across(centeredX, depth / 2);
     if (half <= 0) continue;
-    pushLine(pointsFor(kind), [centeredX, WORKPLANE_LINE_ELEVATION, -half], [centeredX, WORKPLANE_LINE_ELEVATION, half]);
+    pushLine(pointsFor(kind, "depth"), [centeredX, WORKPLANE_LINE_ELEVATION, -half], [centeredX, WORKPLANE_LINE_ELEVATION, half]);
     bandsFor(kind)?.push([centeredX, -half, centeredX, half]);
   }
 
   for (const { coordinate: centeredZ, kind } of outlineOnly ? [] : workplaneGridLines(depth, layout)) {
     const half = across(centeredZ, width / 2);
     if (half <= 0) continue;
-    pushLine(pointsFor(kind), [-half, WORKPLANE_LINE_ELEVATION, centeredZ], [half, WORKPLANE_LINE_ELEVATION, centeredZ]);
+    pushLine(pointsFor(kind, "width"), [-half, WORKPLANE_LINE_ELEVATION, centeredZ], [half, WORKPLANE_LINE_ELEVATION, centeredZ]);
     bandsFor(kind)?.push([-half, centeredZ, half, centeredZ]);
   }
 
@@ -897,7 +920,8 @@ export function createGridLines(
 
   group.add(linesFromPoints(minorPoints, minor));
   group.add(linesFromPoints(majorPoints, major));
-  group.add(linesFromPoints(axisPoints, axis));
+  group.add(linesFromPoints(axisPointsX, axisX));
+  group.add(linesFromPoints(axisPointsY, axisY));
   group.add(linesFromPoints(borderPoints, border));
   // Switched off (#240), every line stays one pixel wide whatever the zoom, as in the sketch.
   if (!linesGrow) return group;
@@ -914,8 +938,8 @@ export function createGridLines(
   // lines (Discussion #1666): each arm is a band 1 mm wide, stretched across before every frame.
   if (!outlineOnly) {
     group.add(
-      axisCrossArm(bandsFromSegments([[0, -depth / 2, 0, depth / 2]], 1, palette.axis), "x", axisBand),
-      axisCrossArm(bandsFromSegments([[-width / 2, 0, width / 2, 0]], 1, palette.axis), "z", axisBand),
+      axisCrossArm(bandsFromSegments([[0, -depth / 2, 0, depth / 2]], 1, axisColourY), "x", axisBand),
+      axisCrossArm(bandsFromSegments([[-width / 2, 0, width / 2, 0]], 1, axisColourX), "z", axisBand),
     );
   }
   // The border band lies inside the plate, so the plate keeps its size.

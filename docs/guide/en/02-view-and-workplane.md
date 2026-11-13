@@ -46,7 +46,7 @@ At the left edge is a narrow bar. From the top:
 - {{ui:camera.orthographic}} switches to a flat view in which parallel edges stay parallel. For measuring and lining up edges that is often more comfortable than the perspective view. [[O]] switches back and forth, and a second click returns.
 - {{ui:camera.secondView}} opens a second view of the design in a window of its own, described below. A second click closes it.
 - {{ui:camera.showScrollbars}} puts a scrollbar along the bottom of the view and one down its right edge. Drag a bar to slide the view smoothly, click an arrow at its end to move it a little (hold it to keep going), or click beside the bar to move by most of the view. Nothing turns, and unlike the arrow keys the bars work while a part is selected - handy close up on small details. A second click hides them; {{ui:workspace.startWithScrollbars}} in the settings decides whether a design opens with them. This browser also remembers the switch.
-- {{ui:camera.hideWorkplane}} (the eye over a grid) hides the plate with its grid, so you can look at the underside of a design from below. Only the view changes: new shapes still land on the workplane. A second click shows it again.
+- {{ui:camera.hideWorkplane}} (the eye over a grid) hides the plate with its grid, so you can look at the underside of a design from below. Only the view changes: new shapes still land on the workplane. A second click shows it again. With a workplane on a face it is called {{ui:camera.hideBuildPlate}} and hides only the build plate: the workplane on the face stays, it has its own eye, {{ui:camera.hideFaceWorkplane}}.
 - {{ui:camera.placeWorkplane}}, the tape measure and the framing square are tools of their own, covered below and in [Measuring and notes](chapter:measuring-and-notes).
 
 The small arrow at the very top of the bar hides it if it gets in the way. That same button, dragged, moves the bar anywhere in the editor, in a sketch too; a double click puts it back. The 3D preview of a revolved sketch moves by its title in the same way.
@@ -158,7 +158,7 @@ The sketch view has its own colours: {{ui:workspace.sketchBackground}} for the w
 
 ### Appearance: axis arrows and edge lines
 
-{{ui:workspace.showAxes}} (on by default) draws three arrows at the back left corner of the plate: **X** in red to the right, **Y** in green to the back and **Z** in blue upwards, the way the position fields count. That is the right-hand rule Tinkercad, CAD programs and the slicers use too. With the workplane on a face they follow it. Switch them off here if they are in your way.
+{{ui:workspace.showAxes}} (on by default) draws three arrows at the back left corner of the plate: **X** in red to the right, **Y** in green to the back and **Z** in blue upwards, the way the position fields count. That is the right-hand rule Tinkercad, CAD programs and the slicers use too. With the workplane on a face they follow it. Switch them off here if they are in your way. While the arrows are on, the centre cross of the grid takes their colours too: the line along X red, the one along Y green, so on a small part you see at once which way each axis runs.
 
 {{ui:workspace.edgeLines}} draws an outline on every body, in the colour of {{ui:workspace.edgeColor}} (black to begin with, as in Tinkercad): it helps when dark colours run into each other. It is off by default, and very large imported meshes are left out.
 

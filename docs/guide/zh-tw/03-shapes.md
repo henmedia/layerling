@@ -32,7 +32,7 @@ layerling 的每個零件都從一個形狀開始。其餘一切都是由形狀�
 - **{{ui:library.section.decorative}}：** {{ui:shape.star}}、{{ui:shape.heart}}、{{ui:shape.crescent}}，以及用於握持的 {{ui:shape.knurl}}。
 - **{{ui:library.section.helpers}}：** {{ui:shape.ruler}}，它只是量測工具，永遠不會出現在匯出檔案中。
 
-要得到三角形有兩種方式：三邊的 {{ui:shape.polygon}} 是等腰三角形，也就是 Tinkercad 的「Roof」；{{ui:shape.wedge}} 則是直角三角形。兩者都是真正的三角柱。想挖出三角形孔，可複製該形狀、把副本縮小、標記為孔，再用 {{ui:editor.tool.centerOnWorkplane}} 或 {{ui:editor.tool.align}} 對齊。兩者都按形狀的邊界框運作，也就是包住它的最小方框，所以切掉一半的正方形仍算作完整正方形。命令搜尋（[[Ctrl]]+[[K]]）在「triangle」或「roof」下也找得到這兩種形狀。
+要得到三角形有兩種方式：三邊的 {{ui:shape.polygon}} 是等腰三角形，也就是 Tinkercad 的「Roof」；{{ui:shape.wedge}} 則是直角三角形。兩者都是真正的三角柱。想挖出三角形孔，可複製該形狀、把副本縮小、標記為孔，再用 {{ui:editor.tool.centerOnWorkplane}} 或 {{ui:editor.tool.align}} 對齊。兩者都按形狀的邊界框運作，也就是包住它的最小方框，所以切掉一半的正方形仍算作完整正方形。命令搜尋（[[Ctrl]]+[[K]]）在「triangle」或「roof」下也找得到這兩種形狀。楔形的屬性裡還有{{ui:prop.wedgeAngle}}，即其斜面與平台的夾角。輸入一個角度，高度會在寬度不變的情況下隨之改變，便於把面上的工作平面設成一定的傾角。
 
 {{ui:shape.slot}} 可以一端比另一端窄，例如用在兩顆皮帶輪之間的皮帶護罩。在 {{ui:inspector.properties}} 下設定 {{ui:prop.slotSmallEnd}}；大端與膠囊同寬，兩側從一段圓弧直通到另一段圓弧。{{ui:prop.slotCentreDistance}} 是兩段圓弧圓心之間的距離，也就是兩顆皮帶輪的間距。改變小端時圓心距保持不變，膠囊會變長或變短。錐形膠囊同樣是精確實體，可套用圓角並匯出 STEP。
 

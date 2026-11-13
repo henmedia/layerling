@@ -118,7 +118,7 @@ import { aimPickRay, firstShapeHit, paintLassoInView, pickImagePoint, pickLayFla
 import { fastEdgesGeometry } from "@/lib/fastEdgesGeometry";
 import { RENDER_LAYER_HELPERS, type PointCardOffset, type ThreeState, type MoveDimensionSession, type NoteOverlayState, type TapePoint, type TapeAttachment, type TapeEdgeAttachment, type TapeModel, type TapeOverlayState, type TapeCandidate, type DragItem, quaternionForShape, projectToScreen, syncMoveDimensionWorldLines, tapeShapeDimensions, tapePointWorld, tapeEdgeWorldPoints, tapeSegmentWorldPoints, tapeLengthMoverOf, tapeLengthRefusalText, syncTapeOverlay, tapeSegmentLengths, syncNoteOverlay, NoteOverlay, TapeOverlay, type RulerDimensionOverlayItem, type RulerDimensionOverlayState, syncRulerDimensionOverlay, RulerDimensionOverlay, type CornerRulerInstance, type CornerRulerOverlayState, syncCornerRulerToolOverlay, CornerRulerToolOverlay, syncOriginDimensionWorldLines, shapeCenter, shapeLocalExtents, projectShapeExtent, projectShapesExtent, type OriginDimensionFrame, formatMeasure, findShapeObject, releaseSharedShapeMaterials, disposeChildren, disposeObject } from "@/components/workplane/ViewportOverlays";
 import { MIN_SHAPE_SIZE, RENDER_LAYER_PREVIEWS, overhangUniforms, setEdgeLineStyle, setStrongHoles, setRulerInchScale, MODIFIER_EDGE_DEPTH_PULL, clamp, selectionFrameForShapes, refreshFrozenObjectMatrix, updateShapeObjectTransform, applySectionClipping, rebuildShapes, rebuildModifierEdges, setModifierEdgeHover, rebuildSelectionHelpers, cadFacePickLayerMesh, syncCadFaceLayer, syncBentTubeSegment, TRANSPARENT_SOLID_OPACITY, createShapeObject, onGroupDisplayReady } from "./workplane/viewportShapeObjects";
-import { movePivotToDepthUnder, WorkspaceSettings, createThreeScene, rebuildWorkplane, syncWorkplaneHoverPreview, updateSectionPlaneHelper, syncSplitPlane, type SplitConnectorMarks } from "./workplane/viewportScene";
+import { movePivotToDepthUnder, WorkspaceSettings, createThreeScene, rebuildWorkplane, showWorkplanePlates, syncWorkplaneHoverPreview, updateSectionPlaneHelper, syncSplitPlane, type SplitConnectorMarks } from "./workplane/viewportScene";
 import { pointInsideOutline } from "@/lib/screenHull";
 import { isTypingTarget } from "@/lib/editorKeyTargets";
 import { liftHandleOffset, screenAngle, framePoint, selectionFrameCorners, workplaneFootprintY, syncTransformOverlay, syncAlignOverlay, syncMirrorOverlay, syncLayFlatHover } from "./workplane/viewportTransformOverlays";
@@ -1807,6 +1807,11 @@ export function WorkplaneViewport({
   }, []);
   const workplaneLayerHiddenRef = useRef(workplaneLayerHidden);
   workplaneLayerHiddenRef.current = workplaneLayerHidden;
+  // With a workplane on a face showing, the switch puts away only the build plate (Discussion #1714) and says so.
+  const faceWorkplaneShown = !placementWorkplaneIsBase(placementWorkplane) && !workplaneHidden;
+  const platesSwitchLabel = faceWorkplaneShown
+    ? t(workplaneLayerHidden ? "camera.showBuildPlate" : "camera.hideBuildPlate")
+    : t(workplaneLayerHidden ? "camera.showWorkplane" : "camera.hideWorkplane");
   // Back from the sketch the measurements come from the editor's memory; on opening the design, from what the design keeps (#881).
   const [tapeModel, setTapeModel] = useState<TapeModel>(() => toolMemory?.current.tape ?? {
     ...(readTape(projectId) ?? { points: [], segments: [] }),
@@ -3164,7 +3169,7 @@ export function WorkplaneViewport({
   useEffect(() => {
     const state = threeRef.current;
     if (!state) return;
-    state.workplaneLayer.visible = !workplaneLayerHidden;
+    showWorkplanePlates(state.workplaneLayer, !workplaneLayerHidden);
     state.needsRender = true;
   }, [workplaneLayerHidden]);
 
@@ -3203,7 +3208,7 @@ export function WorkplaneViewport({
     state.palette = themePaletteRef.current;
     threeRef.current = state;
     rebuildWorkplane(state, workspaceRef.current, resolvedThemeRef.current, drawnWorkplane(), projectNameRef.current, (index) => plateLabel(workspaceRef.current, index));
-    state.workplaneLayer.visible = !workplaneLayerHiddenRef.current;
+    showWorkplanePlates(state.workplaneLayer, !workplaneLayerHiddenRef.current);
     window.layerlingCaptureCanvas = () => {
       state.camera.updateMatrixWorld();
       renderFrame(state);
@@ -8707,8 +8712,8 @@ export function WorkplaneViewport({
             <div className="workplane-display-control-group">
               <button
                 className={workplaneLayerHidden ? "active" : ""}
-                aria-label={workplaneLayerHidden ? t("camera.showWorkplane") : t("camera.hideWorkplane")}
-                title={workplaneLayerHidden ? t("camera.showWorkplane") : t("camera.hideWorkplane")}
+                aria-label={platesSwitchLabel}
+                title={platesSwitchLabel}
                 aria-pressed={workplaneLayerHidden}
                 onClick={() => setWorkplaneLayerHidden((current) => !current)}
               >

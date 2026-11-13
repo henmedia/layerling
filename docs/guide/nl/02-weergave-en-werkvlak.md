@@ -44,7 +44,7 @@ Aan de linkerrand staat een smalle balk. Van boven naar beneden:
 - {{ui:camera.orthographic}} schakelt naar een platte weergave waarin evenwijdige randen evenwijdig blijven. Voor meten en randen uitlijnen is dat vaak prettiger dan de perspectiefweergave. [[O]] schakelt heen en weer, en een tweede klik zet het terug.
 - {{ui:camera.secondView}} opent een tweede weergave van het ontwerp in een eigen venster, zie hieronder. Een tweede klik sluit het.
 - {{ui:camera.showScrollbars}} zet een schuifbalk onderaan de weergave en een langs de rechterrand. Sleep een balk om de weergave vloeiend te verschuiven, klik op een pijl aan het eind om een klein stukje te schuiven (ingedrukt houden gaat door), of klik naast de balk om bijna een hele weergave verder te gaan. Er draait niets, en anders dan de pijltoetsen werken de balken ook terwijl een onderdeel geselecteerd is - handig van dichtbij bij kleine details. Een tweede klik verbergt ze; {{ui:workspace.startWithScrollbars}} in de instellingen bepaalt of een ontwerp ermee opent. Deze browser onthoudt de keuze bovendien.
-- {{ui:camera.hideWorkplane}} (het oog boven een raster) verbergt de plaat met het raster, zodat je een ontwerp van onderen kunt bekijken. Alleen de weergave verandert: nieuwe vormen komen nog steeds op het werkvlak terecht. Een tweede klik toont de plaat weer.
+- {{ui:camera.hideWorkplane}} (het oog boven een raster) verbergt de plaat met het raster, zodat je een ontwerp van onderen kunt bekijken. Alleen de weergave verandert: nieuwe vormen komen nog steeds op het werkvlak terecht. Een tweede klik toont de plaat weer. Met een werkvlak op een vlak heet hij {{ui:camera.hideBuildPlate}} en verbergt hij alleen de bouwplaat: het werkvlak op het vlak blijft staan, dat heeft een eigen oog, {{ui:camera.hideFaceWorkplane}}.
 - {{ui:camera.placeWorkplane}}, het meetlint en de winkelhaak zijn gereedschappen op zich, die hieronder en in [Meten en notities](chapter:meten-en-notities) aan bod komen.
 
 Het pijltje helemaal bovenaan de balk verbergt hem als hij in de weg zit.
@@ -158,7 +158,7 @@ De schetsweergave heeft eigen kleuren: {{ui:workspace.sketchBackground}} voor he
 
 ### Weergave: aspijlen en randlijnen
 
-{{ui:workspace.showAxes}} (standaard aan) tekent drie pijlen in de linkerachterhoek van de plaat: **X** in rood naar rechts, **Y** in groen naar achteren en **Z** in blauw omhoog, zoals de positievelden tellen. Dat is de rechterhandregel die ook Tinkercad, CAD-programma's en de slicers gebruiken. Met het werkvlak op een vlak volgen ze dat. Zet ze hier uit als ze je in de weg zitten.
+{{ui:workspace.showAxes}} (standaard aan) tekent drie pijlen in de linkerachterhoek van de plaat: **X** in rood naar rechts, **Y** in groen naar achteren en **Z** in blauw omhoog, zoals de positievelden tellen. Dat is de rechterhandregel die ook Tinkercad, CAD-programma's en de slicers gebruiken. Met het werkvlak op een vlak volgen ze dat. Zet ze hier uit als ze je in de weg zitten. Zolang de pijlen aan staan, krijgt ook het middenkruis van het raster hun kleuren: de lijn langs X rood, die langs Y groen. Zo zie je ook bij een klein onderdeel meteen welke kant elke as op loopt.
 
 {{ui:workspace.edgeLines}} tekent een omtrek op elk lichaam, in de kleur van {{ui:workspace.edgeColor}} (eerst zwart, zoals in Tinkercad): dat helpt als donkere kleuren in elkaar overlopen. Het staat standaard uit, en zeer grote geïmporteerde meshes worden overgeslagen.
 
