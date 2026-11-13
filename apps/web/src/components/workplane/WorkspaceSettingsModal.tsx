@@ -4,7 +4,7 @@ import { GuideHelpLink } from "@/components/GuideHelpLink";
 import { RibbonButtonsSetting } from "@/components/workplane/RibbonButtonsSetting";
 import type { GuideSection } from "@/lib/guideLinks";
 import { MAX_OVERHANG_ANGLE, MIN_OVERHANG_ANGLE } from "@/lib/overhangLimits";
-import { ArchiveRestore, Box as BoxIcon, ChevronDown, Grid3X3, History, Palette, PanelTop, Plus, RotateCcw, Ruler, Trash2, X } from "lucide-react";
+import { ArchiveRestore, Box as BoxIcon, ChevronDown, Download, Grid3X3, History, MousePointer2, Palette, PanelTop, Plus, RotateCcw, Ruler, Trash2, X } from "lucide-react";
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { useMovablePanel } from "@/lib/useMovablePanel";
 import { SpaceMouseSetting } from "@/components/workplane/SpaceMouseSetting";
@@ -107,10 +107,12 @@ import { MAX_TEXT_LENGTH } from "@/lib/textLength";
 import { DEFAULT_HIRTH_BORE, DEFAULT_HIRTH_TEETH, MAX_HIRTH_TEETH, MIN_HIRTH_TEETH, MIN_HIRTH_TOOTH_HEIGHT, hirthBoreLimit, hirthToothHeightLimit } from "@/lib/hirthGeometry";
 
 type WorkspaceSettings = WorkplaneWorkspaceSettings;
-type WorkspaceSettingsSection = "appearance" | "ribbon" | "measurement" | "workplane" | "shapes" | "history" | "backups";
+type WorkspaceSettingsSection = "appearance" | "controls" | "output" | "ribbon" | "measurement" | "workplane" | "shapes" | "history" | "backups";
 // The question mark of each tab opens that tab's own part of the guide.
 const SETTINGS_HELP_SECTION: Record<WorkspaceSettingsSection, GuideSection> = {
   appearance: "settingsAppearance",
+  controls: "settingsView",
+  output: "exporting",
   ribbon: "ribbonButtons",
   measurement: "settingsMeasurement",
   workplane: "settingsWorkplane",
@@ -803,6 +805,14 @@ export function WorkspaceSettingsModal({
               <Palette size={18} />
               <span>{t("workspace.appearance")}</span>
             </button>
+            <button className={activeSection === "controls" ? "active" : ""} aria-current={activeSection === "controls" ? "page" : undefined} onClick={() => setActiveSection("controls")}>
+              <MousePointer2 size={18} />
+              <span>{t("workspace.controls")}</span>
+            </button>
+            <button className={activeSection === "output" ? "active" : ""} aria-current={activeSection === "output" ? "page" : undefined} onClick={() => setActiveSection("output")}>
+              <Download size={18} />
+              <span>{t("workspace.output")}</span>
+            </button>
             <button className={activeSection === "ribbon" ? "active" : ""} data-help={t("workspace.ribbon")} aria-current={activeSection === "ribbon" ? "page" : undefined} onClick={() => setActiveSection("ribbon")}>
               <PanelTop size={18} />
               <span>{t("workspace.ribbon")}</span>
@@ -1034,61 +1044,6 @@ export function WorkspaceSettingsModal({
                     </div>
                   </div>
                   <WorkspaceToggle
-                    label={t("workspace.selectBeforeMoving")}
-                    checked={workspace.selectBeforeMove}
-                    onChange={(selectBeforeMove) => patchWorkspace({ selectBeforeMove })}
-                  />
-                  <WorkspaceToggle
-                    label={t("workspace.frameByDirection")}
-                    description={t("workspace.frameByDirectionHint")}
-                    checked={workspace.frameByDirection}
-                    onChange={(frameByDirection) => patchWorkspace({ frameByDirection })}
-                  />
-                  <WorkspaceToggle
-                    label={t("workspace.pasteCentered")}
-                    description={t("workspace.pasteCenteredHint")}
-                    checked={workspace.pasteCentered}
-                    onChange={(pasteCentered) => patchWorkspace({ pasteCentered })}
-                  />
-                  <WorkspaceToggle
-                    label={t("workspace.doubleClickOpensSketch")}
-                    checked={workspace.doubleClickOpensSketch}
-                    onChange={(doubleClickOpensSketch) => patchWorkspace({ doubleClickOpensSketch })}
-                  />
-                  <WorkspaceToggle
-                    label={t("workspace.doubleClickOpensGroup")}
-                    checked={workspace.doubleClickOpensGroup}
-                    onChange={(doubleClickOpensGroup) => patchWorkspace({ doubleClickOpensGroup })}
-                  />
-                  <WorkspaceToggle
-                    label={t("workspace.doubleClickCentersView")}
-                    checked={workspace.doubleClickCentersView}
-                    onChange={(doubleClickCentersView) => patchWorkspace({ doubleClickCentersView })}
-                  />
-                  <WorkspaceToggle
-                    label={t("workspace.objectSnap")}
-                    checked={workspace.objectSnap}
-                    onChange={(objectSnap) => patchWorkspace({ objectSnap })}
-                  />
-                  <WorkspaceToggle
-                    label={t("workspace.stlAsDownload")}
-                    description={t("workspace.stlAsDownloadHint")}
-                    checked={workspace.stlAsDownload}
-                    onChange={(stlAsDownload) => patchWorkspace({ stlAsDownload })}
-                  />
-                  <WorkspaceToggle
-                    label={t("workspace.lylAsDownload")}
-                    description={t("workspace.lylAsDownloadHint")}
-                    checked={workspace.lylAsDownload}
-                    onChange={(lylAsDownload) => patchWorkspace({ lylAsDownload })}
-                  />
-                  <WorkspaceToggle
-                    label={t("workspace.confirmTabClose")}
-                    description={t("workspace.confirmTabCloseHint")}
-                    checked={workspace.confirmTabClose}
-                    onChange={(confirmTabClose) => patchWorkspace({ confirmTabClose })}
-                  />
-                  <WorkspaceToggle
                     label={t("workspace.showShadows")}
                     description={workspace.fastMode ? t("workspace.offInFastMode") : undefined}
                     checked={workspace.showShadows && !workspace.fastMode}
@@ -1219,6 +1174,84 @@ export function WorkspaceSettingsModal({
                       <span>{t("workspace.overhangLoose")}</span>
                     </small>
                   </label>
+                  <label className="workspace-select" data-help={t("workspace.booleanTriangleLimit")}>
+                    <span>{t("workspace.booleanTriangleLimit")}</span>
+                    <select
+                      value={booleanLimitMode}
+                      onChange={(event) => setBooleanLimitMode(event.currentTarget.value as BooleanTriangleLimitPreset | "custom")}
+                    >
+                      {BOOLEAN_TRIANGLE_LIMIT_PRESETS.map((preset) => (
+                        <option key={preset.id} value={preset.id}>
+                          {t(BOOLEAN_LIMIT_PRESET_LABEL_KEYS[preset.id], { count: formatSettingCount(preset.limit) })}
+                        </option>
+                      ))}
+                      <option value="custom">{t("workspace.custom")}</option>
+                    </select>
+                  </label>
+                  {booleanLimitMode === "custom" ? (
+                    <label className="workspace-history-custom">
+                      <span>{t("workspace.booleanTriangleLimitCustom")}</span>
+                      <input
+                        type="number"
+                        min={MIN_BOOLEAN_TRIANGLE_LIMIT}
+                        max={MAX_BOOLEAN_TRIANGLE_LIMIT}
+                        step={BOOLEAN_TRIANGLE_LIMIT_STEP}
+                        value={customBooleanLimitDraft}
+                        onChange={(event) => setCustomBooleanLimitDraft(event.currentTarget.value)}
+                        onBlur={(event) => setCustomBooleanLimit(event.currentTarget.value)}
+                        onKeyDown={(event) => {
+                          if (event.key === "Enter") event.currentTarget.blur();
+                        }}
+                      />
+                    </label>
+                  ) : null}
+                  <p className="workspace-history-note">{t("workspace.booleanTriangleLimitNote")}</p>
+                </>
+              ) : null}
+
+              {activeSection === "controls" ? (
+                <>
+                  <div className="workspace-section-heading">
+                    <strong>{t("workspace.controls")}</strong>
+                    <span>{t("workspace.controlsHint")}</span>
+                  </div>
+                  <WorkspaceToggle
+                    label={t("workspace.selectBeforeMoving")}
+                    checked={workspace.selectBeforeMove}
+                    onChange={(selectBeforeMove) => patchWorkspace({ selectBeforeMove })}
+                  />
+                  <WorkspaceToggle
+                    label={t("workspace.frameByDirection")}
+                    description={t("workspace.frameByDirectionHint")}
+                    checked={workspace.frameByDirection}
+                    onChange={(frameByDirection) => patchWorkspace({ frameByDirection })}
+                  />
+                  <WorkspaceToggle
+                    label={t("workspace.pasteCentered")}
+                    description={t("workspace.pasteCenteredHint")}
+                    checked={workspace.pasteCentered}
+                    onChange={(pasteCentered) => patchWorkspace({ pasteCentered })}
+                  />
+                  <WorkspaceToggle
+                    label={t("workspace.doubleClickOpensSketch")}
+                    checked={workspace.doubleClickOpensSketch}
+                    onChange={(doubleClickOpensSketch) => patchWorkspace({ doubleClickOpensSketch })}
+                  />
+                  <WorkspaceToggle
+                    label={t("workspace.doubleClickOpensGroup")}
+                    checked={workspace.doubleClickOpensGroup}
+                    onChange={(doubleClickOpensGroup) => patchWorkspace({ doubleClickOpensGroup })}
+                  />
+                  <WorkspaceToggle
+                    label={t("workspace.doubleClickCentersView")}
+                    checked={workspace.doubleClickCentersView}
+                    onChange={(doubleClickCentersView) => patchWorkspace({ doubleClickCentersView })}
+                  />
+                  <WorkspaceToggle
+                    label={t("workspace.objectSnap")}
+                    checked={workspace.objectSnap}
+                    onChange={(objectSnap) => patchWorkspace({ objectSnap })}
+                  />
                   <WorkspaceToggle
                     label={t("workspace.cruise")}
                     checked={workspace.clickToPlaceShapes}
@@ -1273,38 +1306,33 @@ export function WorkspaceSettingsModal({
                     disabled={workspace.fastMode}
                     onChange={(cameraInertia) => patchWorkspace({ cameraInertia })}
                   />
-                  <label className="workspace-select" data-help={t("workspace.booleanTriangleLimit")}>
-                    <span>{t("workspace.booleanTriangleLimit")}</span>
-                    <select
-                      value={booleanLimitMode}
-                      onChange={(event) => setBooleanLimitMode(event.currentTarget.value as BooleanTriangleLimitPreset | "custom")}
-                    >
-                      {BOOLEAN_TRIANGLE_LIMIT_PRESETS.map((preset) => (
-                        <option key={preset.id} value={preset.id}>
-                          {t(BOOLEAN_LIMIT_PRESET_LABEL_KEYS[preset.id], { count: formatSettingCount(preset.limit) })}
-                        </option>
-                      ))}
-                      <option value="custom">{t("workspace.custom")}</option>
-                    </select>
-                  </label>
-                  {booleanLimitMode === "custom" ? (
-                    <label className="workspace-history-custom">
-                      <span>{t("workspace.booleanTriangleLimitCustom")}</span>
-                      <input
-                        type="number"
-                        min={MIN_BOOLEAN_TRIANGLE_LIMIT}
-                        max={MAX_BOOLEAN_TRIANGLE_LIMIT}
-                        step={BOOLEAN_TRIANGLE_LIMIT_STEP}
-                        value={customBooleanLimitDraft}
-                        onChange={(event) => setCustomBooleanLimitDraft(event.currentTarget.value)}
-                        onBlur={(event) => setCustomBooleanLimit(event.currentTarget.value)}
-                        onKeyDown={(event) => {
-                          if (event.key === "Enter") event.currentTarget.blur();
-                        }}
-                      />
-                    </label>
-                  ) : null}
-                  <p className="workspace-history-note">{t("workspace.booleanTriangleLimitNote")}</p>
+                </>
+              ) : null}
+
+              {activeSection === "output" ? (
+                <>
+                  <div className="workspace-section-heading">
+                    <strong>{t("workspace.output")}</strong>
+                    <span>{t("workspace.outputHint")}</span>
+                  </div>
+                  <WorkspaceToggle
+                    label={t("workspace.stlAsDownload")}
+                    description={t("workspace.stlAsDownloadHint")}
+                    checked={workspace.stlAsDownload}
+                    onChange={(stlAsDownload) => patchWorkspace({ stlAsDownload })}
+                  />
+                  <WorkspaceToggle
+                    label={t("workspace.lylAsDownload")}
+                    description={t("workspace.lylAsDownloadHint")}
+                    checked={workspace.lylAsDownload}
+                    onChange={(lylAsDownload) => patchWorkspace({ lylAsDownload })}
+                  />
+                  <WorkspaceToggle
+                    label={t("workspace.confirmTabClose")}
+                    description={t("workspace.confirmTabCloseHint")}
+                    checked={workspace.confirmTabClose}
+                    onChange={(confirmTabClose) => patchWorkspace({ confirmTabClose })}
+                  />
                 </>
               ) : null}
 

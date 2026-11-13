@@ -6,6 +6,8 @@ code still carries it - so a lower number further down is older, not newer.
 
 ## Unreleased
 
+- **Settings: Controls and Saving and export as areas of their own (Discussion #1013):** The Appearance area had grown into a catch-all, with the mouse and 3D mouse settings far down and the Save STL / Save designs as a download options among the colours. It now keeps the looks (theme, colours, edges, shadows, measures, start view); **Controls** takes the mouse scheme, zoom and pan speed, camera inertia, 3D mouse, selecting and moving, double click, object snap and cruise; **Saving and export** takes Save STL as a download, Save designs as a download and the question before a tab closes. The question marks of the new areas open the guide where those settings are described. Four texts in 15 languages, guide chapter 2 in every language names the areas, What's new card. Suggested by @Jeff-Haas.
+
 - **16mm scale among the model scales (Discussion #1732):** Scale by percent, Model scale, offers 16mm, 16 mm to the foot or 1:19.05 (the scale SM32 and SM45 narrow gauge is built to), after G; the preset carries the name modellers use. Guide chapter 4 in every language.
 
 - **Tilted bodies show their overall size in space (Discussion #1730):** A tilted body shows its own Length, Width and Height in the properties, with a note saying so, but not how high it stands in space. Below that note there is now a read-only line with the overall size in space (long, wide, high, in the workspace unit), taken from the same box the Align tool measures (`alignBounds`). It is not editable, since changing it would distort a tilted body. Guide chapter 3 in 15 languages, `prop.tiltedOverall` in 15 languages and What's new card.

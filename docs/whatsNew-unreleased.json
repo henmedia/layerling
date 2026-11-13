@@ -1,6 +1,19 @@
 [
   {
     "title": {
+      "de": "Einstellungen: Bedienung und Speichern/Export als eigene Bereiche",
+      "en": "Settings: Controls and Saving/export as areas of their own"
+    },
+    "body": {
+      "de": "Der Bereich „Darstellung“ in den Einstellungen war zu lang geworden. Maus, 3D-Maus, Auswählen und Verschieben, Doppelklick und Objektfang stehen jetzt unter „Bedienung“, die Optionen zum Speichern von Entwürfen und STL als Download und die Rückfrage vor dem Schließen eines Tabs unter „Speichern und Export“. Das Zahnrad im Titel öffnet die Einstellungen.",
+      "en": "The Appearance area of the settings had grown too long. Mouse, 3D mouse, selecting and moving, double click and object snap are now under Controls, and the options to save designs and STL as a download, with the question before a tab closes, under Saving and export. The cogwheel in the title row opens the settings."
+    },
+    "guide": {
+      "section": "settingsView"
+    }
+  },
+  {
+    "title": {
       "de": "Gekippte Körper: die echte Höhe in den Eigenschaften",
       "en": "Tilted bodies: the real height in the properties"
     },
