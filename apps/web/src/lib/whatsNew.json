@@ -5,11 +5,13 @@
       {
         "title": {
           "de": "Skalieren auf einen Modellbau-Maßstab",
-          "en": "Scale to a model scale"
+          "en": "Scale to a model scale",
+          "da": "Skalér til en modelskala"
         },
         "body": {
           "de": "„Um Prozent skalieren“ kann jetzt auch einen Maßstab: Wähle oben „Maßstab“ und eine Spur von Z (1:220) bis G (1:22,5), oder tippe einen eigenen Maßstab ein.\n\nIst das Modell in Originalgröße gebaut, wird es so viel kleiner. Hast du es in irgendeiner Größe gebaut, gib die echte Höhe oder Länge des Vorbilds in Metern ein: Ein 16 m hoher Baum wird in H0 genau 184 mm hoch. Die neue Größe steht im Fenster, bevor du skalierst.\n\nZu finden über Rechtsklick auf die Teile oder Strg+K, „Um Prozent skalieren“.",
-          "en": "Scale by percent can now do a scale too: choose Model scale at the top and a gauge from Z (1:220) to G (1:22.5), or type a scale of your own.\n\nIf the model is built at full size, it becomes that much smaller. If you built it at any other size, type the original's real height or length in metres: a tree 16 m tall becomes exactly 184 mm in H0. The window shows the new size before you scale.\n\nFind it by right-clicking the parts or with Ctrl+K, Scale by percent."
+          "en": "Scale by percent can now do a scale too: choose Model scale at the top and a gauge from Z (1:220) to G (1:22.5), or type a scale of your own.\n\nIf the model is built at full size, it becomes that much smaller. If you built it at any other size, type the original's real height or length in metres: a tree 16 m tall becomes exactly 184 mm in H0. The window shows the new size before you scale.\n\nFind it by right-clicking the parts or with Ctrl+K, Scale by percent.",
+          "da": "\"Skalér med procent\" kan nu også skalere til en modelskala: vælg \"Modelskala\" øverst og en sporvidde fra Z (1:220) til G (1:22,5), eller tast en skala af din egen.\n\nEr modellen bygget i fuld størrelse, bliver den så meget mindre. Har du bygget den i en anden størrelse, tast forbilledets virkelige højde eller længde i meter: et træ på 16 m bliver præcis 184 mm højt i H0. Vinduet viser den nye størrelse, før du skalerer.\n\nDu finder det ved at højreklikke på delene eller med Ctrl+K, \"Skalér med procent\"."
         },
         "guide": {
           "section": "scaleByPercent"
@@ -18,11 +20,13 @@
       {
         "title": {
           "de": "Ausrichten ohne Alt-Taste auf dem Tablet",
-          "en": "Align without the Alt key on a tablet"
+          "en": "Align without the Alt key on a tablet",
+          "da": "Justér uden Alt-tasten på en tablet"
         },
         "body": {
           "de": "Beim Ausrichten gibt es neben den Punkten jetzt den Schalter „Größenmodus“, wo ein Finger oder Stift die Maus ersetzt. Er tut, was die gehaltene Alt-Taste tut: Die Punkte gleichen Größen an, statt zu verschieben, und am Abstandspunkt tippst du den Abstand ein. Einschalten, tippen, wieder ausschalten.",
-          "en": "Align now has a switch, Size mode, beside the dots wherever a finger or pen replaces the mouse. It does what holding Alt does: the dots match sizes instead of moving the parts, and at the gap dot you type the gap. Switch it on, tap, switch it off again."
+          "en": "Align now has a switch, Size mode, beside the dots wherever a finger or pen replaces the mouse. It does what holding Alt does: the dots match sizes instead of moving the parts, and at the gap dot you type the gap. Switch it on, tap, switch it off again.",
+          "da": "Justér har nu en kontakt, \"Størrelsestilstand\", ved siden af prikkerne, hvor en finger eller en pen erstatter musen. Den gør det samme som at holde Alt nede: prikkerne tilpasser størrelser i stedet for at flytte delene, og ved afstandsprikken skriver du afstanden ind. Tænd den, tryk, sluk den igen."
         },
         "guide": {
           "section": "alignSpread"
@@ -31,11 +35,13 @@
       {
         "title": {
           "de": "Rohr und gebogenes Rohr mit gleichen Feldern",
-          "en": "Tube and bent tube with matching fields"
+          "en": "Tube and bent tube with matching fields",
+          "da": "Rør og bøjet rør med ens felter"
         },
         "body": {
           "de": "Beide Rohre benennen ihre Maße jetzt gleich: Wandstärke statt Dicke beim Rohr, Außendurchmesser beim runden gebogenen Rohr (Schlüsselweite bei eckigem Profil).\n\nHat das gebogene Rohr innen dasselbe Profil, kannst du auch den Innendurchmesser eintippen, die Wandstärke folgt. Die Qualität steht oben, wo das einfache Rohr seine Seiten hat.\n\nTipp: Ein gebogenes Rohr mit Biegewinkel 0° ist ein gerades Vierkant-, Sechskant- oder Achtkantrohr.",
-          "en": "Both tubes now name their measures alike: Wall thickness instead of Thickness on the tube, Outer diameter on a round bent tube (Width across flats on an angular profile).\n\nIf the bent tube has the same profile inside, you can also type the inner diameter, and the wall follows. Quality sits at the top, where the plain tube has its sides.\n\nTip: a bent tube with a bend angle of 0° is a straight square, hexagonal or octagonal tube."
+          "en": "Both tubes now name their measures alike: Wall thickness instead of Thickness on the tube, Outer diameter on a round bent tube (Width across flats on an angular profile).\n\nIf the bent tube has the same profile inside, you can also type the inner diameter, and the wall follows. Quality sits at the top, where the plain tube has its sides.\n\nTip: a bent tube with a bend angle of 0° is a straight square, hexagonal or octagonal tube.",
+          "da": "Begge rør kalder nu deres mål ens: \"Vægtykkelse\" i stedet for \"Tykkelse\" på røret, \"Udvendig diameter\" på et rundt bøjet rør (\"Nøglevidde\" på et kantet profil).\n\nHar det bøjede rør samme profil indvendig, kan du også taste den indvendige diameter, og væggen følger med. \"Kvalitet\" står øverst, hvor det almindelige rør har sine sider.\n\nTip: et bøjet rør med en bøjningsvinkel på 0° er et lige firkant-, sekskant- eller ottekantrør."
         },
         "guide": {
           "section": "bentTubes"
@@ -188,11 +194,13 @@
       {
         "title": {
           "de": "Fase an einer Gruppe: Netz bleibt geschlossen",
-          "en": "Chamfer on a group: the mesh stays closed"
+          "en": "Chamfer on a group: the mesh stays closed",
+          "da": "Fas på en gruppe: meshet forbliver lukket"
         },
         "body": {
           "de": "Nach einer Fase an einer Gruppe konnte das Netz Löcher haben: Teilen brach mit „Netz nicht geschlossen“ ab, die Druckprüfung mit einem Fehler, und der Slicer ließ Teile weg. layerling schließt solche Lücken jetzt gleich beim Fasen und Verrunden.\n\nEin schon gespeicherter Entwurf mit so einem Netz lässt sich wieder teilen. Für einen geschlossenen Export die Fase einmal neu setzen.",
-          "en": "After a chamfer on a group the mesh could have holes: Split stopped with \"mesh not closed\", the print check with an error, and the slicer left parts out. layerling now closes such gaps right when it chamfers or fillets.\n\nA design already saved with such a mesh can be split again. To export it closed, do the chamfer once more."
+          "en": "After a chamfer on a group the mesh could have holes: Split stopped with \"mesh not closed\", the print check with an error, and the slicer left parts out. layerling now closes such gaps right when it chamfers or fillets.\n\nA design already saved with such a mesh can be split again. To export it closed, do the chamfer once more.",
+          "da": "Efter en affasning på en gruppe kunne meshet have huller: \"Del form\" stoppede med \"Kildemeshet kunne ikke danne en lukket solid\", \"Tjek print\" med en fejl, og sliceren lod dele være ude. layerling lukker nu sådanne huller med det samme, det affasner eller afrunder.\n\nEt design, der allerede er gemt med sådan et mesh, kan deles igen. Vil du eksportere det lukket, så affasner du en gang mere."
         },
         "guide": {
           "section": "edgeTreatment"
@@ -201,11 +209,13 @@
       {
         "title": {
           "de": "Skizzenlinie läuft beim Werkzeugwechsel weiter",
-          "en": "Sketch line goes on when switching tools"
+          "en": "Sketch line goes on when switching tools",
+          "da": "Skitse: linjen fortsætter, når du skifter værktøj"
         },
         "body": {
           "de": "Wechselst du beim Zeichnen einer Skizze zwischen Linie, Bézierkurve und Weicher Kurve, setzt die Linie jetzt am letzten Punkt fort. Bisher fing der nächste Klick eine neue Linie an.",
-          "en": "Switching between Line, Bezier curve and Smooth line while drawing a sketch now goes on from the last point. Until now the next click started a new line."
+          "en": "Switching between Line, Bezier curve and Smooth line while drawing a sketch now goes on from the last point. Until now the next click started a new line.",
+          "da": "Skifter du mellem \"Linje\", \"Bezier-kurve\" og \"Glat kurve\", mens du tegner en skitse, fortsætter linjen nu fra det sidste punkt. Før startede det næste klik en ny linje."
         },
         "guide": {
           "section": "sketchDrawing"
