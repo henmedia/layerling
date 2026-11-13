@@ -40,6 +40,12 @@ code still carries it - so a lower number further down is older, not newer.
 
 - **A chamfer on a group no longer leaves its mesh open (Discussion #1711):** After a chamfer on a joined group (a bent tube, ellipses and a cylinder), Split stopped at "This mesh is not closed", the print check ended on "Not manifold" and the slicer left parts of the body out. The exact body was valid, but OpenCascade had meshed three of its flat faces - half an ellipse on top and two small faces beside the chamfer - without a single triangle. The edge tool and sketch bodies now close such gaps right after meshing: a flat opening is capped from its rim, which is the edges of the faces around it (closeFlatMeshGaps in lib/meshHoleFill.ts). The hole filler before Split and other cuts now also closes a flat opening whose middle lies outside it, by triangulating it in its plane (Earcut) instead of a fan from the middle, so a design saved with such a mesh splits again; to export it closed, do its chamfer once more. A mesh the print check cannot read as a solid now stays unchecked and is named under open meshes, instead of the whole check failing. The reporter's body at standard quality: 0 instead of 138 open edges, 2892.2 of 2894.1 mm3. Gaps where curved faces do not meet point for point (seen with the same body at fine quality) are not closed by this.
 
+- **Japanese: every missing sentence translated (PR #1712):** About 1,100 sentences that still showed in English, among them the lid tool, the print check, paint, the split connectors, stretch, backups, earlier versions, own shortcuts and the fit test, are now in Japanese; none is missing any more. By @yokobond.
+
+- **Danish (PRs #1630, #1719, #1720, #1721):** Chapter 02 of the guide says "det imperiale system", chapter 03 has the paragraph on a texture in one region of a face, the snap-on hinge style is called "Med clips" in the catalogue, and the release notes and cards of 1.159.0, 1.159.1 and 1.161.0 are in Danish. By @Henrikth12.
+
+- **brepjs 20.22.2 (from 20.21.2) and manifold-3d 3.5.5 (from 3.5.4):** brepjs skips needless work in a boolean whose input faces carry no hashes and starts a gear flank on the root circle when the base circle lies inside it; manifold rejects out-of-range arguments that could crash it and no longer leaves a halfedge pair uninitialized.
+
 ## 1.161.0
 
 - **brepjs 20.21.2 (from 20.18.0):** New lofts along guide rails, surface blending and fillet corner options in the library, and two fixes in its brepkit part; layerling uses none of the new calls yet.
