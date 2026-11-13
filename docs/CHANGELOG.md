@@ -30,6 +30,8 @@ code still carries it - so a lower number further down is older, not newer.
 
 - **Shapes opens when the mouse rests on its arrow, like the folded groups (#1722):** Since Discussion #1506 the Shapes button carries the same chevron tab in the group's colour as the folded groups of the ribbon, but the folded groups open while the mouse rests on them and Shapes opened only with a click. Resting the mouse on the tab under the Shapes button (120 ms, as on a folded group) now opens the shape library too, in the 3D view and in the sketch; one opened this way closes again 300 ms after the mouse has left the button and the library, unless the button is clicked, the library is worked in (a search typed, a section folded) or it is pinned. Only the tab opens it, so passing over the button does not throw the large library open; a pen or a finger still opens it with a tap (`createHoverOpener` in lib/hoverOpen.ts). Unit tests, guide chapter 1 in every language. Reported by @uninteressant2026.
 
+- **The buttons of the left view bar no longer jump on hover (Discussion #1723):** Pointing at a button in the view bar on the left moved it a pixel to the right, a leftover from SketchForge, while the ribbon's buttons stay where they are. The view bar's buttons now only change colour too, like the ribbon's. Reported by @uninteressant2026.
+
 ## 1.161.0
 
 - **brepjs 20.21.2 (from 20.18.0):** New lofts along guide rails, surface blending and fillet corner options in the library, and two fixes in its brepkit part; layerling uses none of the new calls yet.

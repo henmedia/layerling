@@ -7282,7 +7282,6 @@ html[data-theme="dark"] .sketch-shape-options .unit {
   color: #321d07;
   background: rgba(247, 235, 223, 0.82);
   border-color: rgba(207, 182, 155, 0.7);
-  transform: translateX(1px);
 }
 
 .camera-controls button:focus-visible {
