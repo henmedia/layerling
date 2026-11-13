@@ -43,7 +43,7 @@ import { applyAppTheme, getAppThemePreference, hasStoredAppTheme, readStoredAppT
 import { hydrateEditorHistoryState, notesForHistoryIndex, type EditorHistoryEntry } from "@/lib/editorHistory";
 import { detectLanguage, setLanguage, t, translate, type Language } from "@/lib/i18n";
 import { localizedError } from "@/lib/userErrors";
-import { historyTrimSteps, isRetriedWithLessHistory, trimHistoryWindow } from "@/lib/historyTrim";
+import { saveWithLessHistoryIfNeeded } from "@/lib/historyTrim";
 import { describeSaveError, probeBrowserStorage, saveFailureKind, storageLooksBroken, storageProbeText, type SaveFailureKind } from "@/lib/saveFailureDiagnosis";
 import { reportBugReportError } from "@/lib/bugReport";
 import { leaveGuardReleased, provideDesignSaveState } from "@/lib/leaveGuard";
@@ -632,31 +632,19 @@ async function loadProjectPackage(projectId: string): Promise<Uint8Array | null>
 type ProjectShapesSaveResult = { historyTrimmed?: { kept: number; total: number } };
 
 async function saveProjectShapes(projectId: string, entry: ProjectShapeCacheEntry, context: ProjectShapeSaveContext): Promise<ProjectShapesSaveResult> {
-  const pack = (history: ProjectShapeCacheEntry["history"], historyIndex: number) => packProjectEntry(projectId, entry, context, history, historyIndex);
-  let lylPackage: Awaited<ReturnType<typeof exportLylProject>>;
-  let historyTrimmed: ProjectShapesSaveResult["historyTrimmed"];
-  try {
-    lylPackage = await pack(entry.history, entry.historyIndex);
-  } catch (error) {
-    if (!isRetriedWithLessHistory(error) || entry.history.length <= 1) throw error;
-    // Too big with the whole history, or out of memory packing it (#1652): keep the newest steps that fit, so the design
-    // is saved all the same.
-    let packed: Awaited<ReturnType<typeof exportLylProject>> | null = null;
-    for (const keep of historyTrimSteps(entry.history.length)) {
-      const trimmed = trimHistoryWindow(entry.history, entry.historyIndex, keep);
-      try {
-        packed = await pack(trimmed.history, trimmed.historyIndex);
-        historyTrimmed = { kept: trimmed.history.length, total: entry.history.length };
-        break;
-      } catch (retryError) {
-        if (!isRetriedWithLessHistory(retryError)) throw retryError;
-      }
-    }
-    if (!packed) throw error;
-    lylPackage = packed;
-  }
+  // Too big with the whole history, out of memory packing it (#1652), or refused by the browser (#1728): the newest
+  // steps that fit are kept, so the design is saved all the same.
+  return saveWithLessHistoryIfNeeded(
+    entry.history,
+    entry.historyIndex,
+    (history, historyIndex) => packProjectEntry(projectId, entry, context, history, historyIndex),
+    (lylPackage) => writeProjectPackage(projectId, entry.revision, lylPackage),
+  );
+}
+
+async function writeProjectPackage(projectId: string, revision: number, lylPackage: Awaited<ReturnType<typeof exportLylProject>>): Promise<void> {
   const database = await openProjectShapesDb();
-  return new Promise<ProjectShapesSaveResult>((resolve, reject) => {
+  return new Promise<void>((resolve, reject) => {
     const transaction = database.transaction(PROJECT_SHAPES_STORE_NAME, "readwrite");
     const store = transaction.objectStore(PROJECT_SHAPES_STORE_NAME);
     const existingRequest = store.get(projectId);
@@ -665,19 +653,19 @@ async function saveProjectShapes(projectId: string, entry: ProjectShapeCacheEntr
     };
     existingRequest.onsuccess = () => {
       const existing = existingRequest.result as ProjectShapeRecord | undefined;
-      if (existing && existing.revision > entry.revision) {
+      if (existing && existing.revision > revision) {
         return;
       }
       store.put({
         id: projectId,
-        revision: entry.revision,
+        revision,
         lylPackage,
         updatedAt: Date.now(),
       } satisfies ProjectShapeRecord);
     };
     transaction.oncomplete = () => {
       database.close();
-      resolve({ historyTrimmed });
+      resolve();
     };
     transaction.onerror = () => {
       database.close();

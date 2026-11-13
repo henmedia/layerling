@@ -11,5 +11,15 @@
     "guide": {
       "section": "sketchImage"
     }
+  },
+  {
+    "title": {
+      "de": "Speichern klappt auch bei sehr langem Verlauf",
+      "en": "Saving works with a very long history too"
+    },
+    "body": {
+      "de": "Lehnt der Browser ein großes Design ab, obwohl noch Platz frei ist, speichert layerling es jetzt mit einem kürzeren Rückgängig-Verlauf, statt gar nicht. Ein Hinweis sagt dann, wie viele Schritte behalten wurden.",
+      "en": "If the browser refuses a large design although there is room left, layerling now saves it with a shorter undo history instead of not at all. A note then says how many steps were kept."
+    }
   }
 ]

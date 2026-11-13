@@ -54,3 +54,43 @@ export function historyTrimSteps(total: number): number[] {
   }
   return steps;
 }
+
+/**
+ * Packs and writes a design, and when that fails for its size packs and writes it again with fewer history steps,
+ * so the design is saved at all: the package too big for the format or for the memory of the tab (#475, Discussion
+ * #1652), or the browser refusing to store it (#1728) - Chrome on a Mac turned down one large write with a
+ * QuotaExceededError while a small test write and 3 % of its room in use said nothing was full. Any other error,
+ * or no smaller history left to try, fails the save as before.
+ */
+export async function saveWithLessHistoryIfNeeded<T, P>(
+  history: readonly T[],
+  historyIndex: number,
+  pack: (history: T[], historyIndex: number) => Promise<P>,
+  write: (pack: P) => Promise<void>,
+): Promise<{ historyTrimmed?: { kept: number; total: number } }> {
+  const shrinks = (error: unknown, writing: boolean) => (writing ? isStorageFullError(error) : isRetriedWithLessHistory(error));
+  let firstError: unknown;
+  let writing = false;
+  try {
+    const packed = await pack([...history], historyIndex);
+    writing = true;
+    await write(packed);
+    return {};
+  } catch (error) {
+    if (!shrinks(error, writing) || history.length <= 1) throw error;
+    firstError = error;
+  }
+  for (const keep of historyTrimSteps(history.length)) {
+    const trimmed = trimHistoryWindow(history, historyIndex, keep);
+    writing = false;
+    try {
+      const packed = await pack(trimmed.history, trimmed.historyIndex);
+      writing = true;
+      await write(packed);
+      return { historyTrimmed: { kept: trimmed.history.length, total: history.length } };
+    } catch (error) {
+      if (!shrinks(error, writing)) throw error;
+    }
+  }
+  throw firstError;
+}

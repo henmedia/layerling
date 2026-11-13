@@ -6,6 +6,8 @@ code still carries it - so a lower number further down is older, not newer.
 
 ## Unreleased
 
+- **A design the browser refuses to store is saved with a shorter history (#1728):** layerling stores a design with its whole undo history in one go, and a revolved body keeps a full mesh for every change of its sweep. Chrome on a Mac refused such a large save with a QuotaExceededError although a small test write went through and only 3 % of its room was in use, and the design was not saved at all, again after every change; deleting the site data did not help. Such a refused save is now written again with fewer history steps, in the same steps as a package too big for the format (#475, #1652), and the note that the stored copy keeps only the newest steps says so (saveWithLessHistoryIfNeeded in lib/historyTrim.ts). Unit tests. By @stefaanl in #1728.
+
 - **The width of a sketch picture goes past 200 mm (#1727):** in the settings of a picture under a sketch, the fields Width and Height stopped at 200 mm whatever the plate, so on a 250 mm plate 210 mm sprang back to 200, while dragging the handles made it larger; and a picture dragged past 200 mm still showed 200. The slider now reaches to the larger side of the plate (at least 200 mm, and always to the picture's own size), a typed size goes up to ten times the plate, and the fields show the real size (sketchImageSizeLimits in lib/sketchImageTransform.ts). Unit test; checked in the editor through headless Edge (picture imported, 260 mm and 210 mm typed and kept, height following). By @gorepj in #1727.
 
 ## 1.162.0
