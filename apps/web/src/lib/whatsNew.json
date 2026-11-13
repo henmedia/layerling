@@ -1,5 +1,123 @@
 [
   {
+    "version": "1.163.0",
+    "items": [
+      {
+        "title": {
+          "de": "Einstellungen: Bedienung und Speichern/Export als eigene Bereiche",
+          "en": "Settings: Controls and Saving/export as areas of their own"
+        },
+        "body": {
+          "de": "Der Bereich „Darstellung“ in den Einstellungen war zu lang geworden. Maus, 3D-Maus, Auswählen und Verschieben, Doppelklick und Objektfang stehen jetzt unter „Bedienung“, die Optionen zum Speichern von Entwürfen und STL als Download und die Rückfrage vor dem Schließen eines Tabs unter „Speichern und Export“. Das Zahnrad im Titel öffnet die Einstellungen.",
+          "en": "The Appearance area of the settings had grown too long. Mouse, 3D mouse, selecting and moving, double click and object snap are now under Controls, and the options to save designs and STL as a download, with the question before a tab closes, under Saving and export. The cogwheel in the title row opens the settings."
+        },
+        "guide": {
+          "section": "settingsView"
+        }
+      },
+      {
+        "title": {
+          "de": "Gekippte Körper: die echte Höhe in den Eigenschaften",
+          "en": "Tilted bodies: the real height in the properties"
+        },
+        "body": {
+          "de": "Ein gekippter Körper zeigt in den Eigenschaften seine eigenen Maße, nicht wie hoch er im Raum steht. Unter dem Hinweis steht jetzt auch die Gesamtgröße im Raum (lang, breit, hoch), zum Ablesen. Ein um 45° gekippter Würfel von 20 mm zeigt so seine 28,3 mm Höhe.",
+          "en": "A tilted body shows its own measures in the properties, not how high it stands in space. Below the note there is now also the overall size in space (long, wide, high), for reading. A cube of 20 mm tilted by 45° shows its height of 28.3 mm that way."
+        },
+        "guide": {
+          "chapter": "shapes"
+        }
+      },
+      {
+        "title": {
+          "de": "Vorlagenbild in der Skizze größer als 200 mm",
+          "en": "Sketch picture larger than 200 mm",
+          "da": "Skitserbillede større end 200 mm"
+        },
+        "body": {
+          "de": "Breite und Höhe eines Bildes unter der Skizze lassen sich jetzt auch über 200 mm eintippen, etwa für eine Druckplatte von 250 mm. Der Regler reicht bis zur Größe deiner Platte, und das Feld zeigt immer die echte Größe, auch nachdem du an den Griffen gezogen hast.",
+          "en": "The width and height of a picture under a sketch can now be typed past 200 mm, for a 250 mm plate for instance. The slider reaches to the size of your plate, and the field always shows the real size, also after dragging the handles.",
+          "da": "Bredden og højden af et billede under en skitse kan nu tastes over 200 mm, for eksempel til en 250 mm plade. Skyderen rækker til din plades størrelse, og feltet viser altid den virkelige størrelse, også når du har trukket i håndtagene."
+        },
+        "guide": {
+          "section": "sketchImage"
+        }
+      },
+      {
+        "title": {
+          "de": "Speichern klappt auch bei sehr langem Verlauf",
+          "en": "Saving works with a very long history too",
+          "da": "Gem virker også med en meget lang historik"
+        },
+        "body": {
+          "de": "Lehnt der Browser ein großes Design ab, obwohl noch Platz frei ist, speichert layerling es jetzt mit einem kürzeren Rückgängig-Verlauf, statt gar nicht. Ein Hinweis sagt dann, wie viele Schritte behalten wurden.",
+          "en": "If the browser refuses a large design although there is room left, layerling now saves it with a shorter undo history instead of not at all. A note then says how many steps were kept.",
+          "da": "Nægter browseren et stort design, selv om der er plads tilbage, gemmer layerling det nu med en kortere fortrydelseshistorik i stedet for slet ikke at gemme det. En note siger så, hvor mange trin der blev gemt."
+        }
+      },
+      {
+        "title": {
+          "de": "Schnittmenge: die Vorschau schließt sich, wenn nichts gemeinsam ist",
+          "en": "Intersection: the preview closes when nothing is shared"
+        },
+        "body": {
+          "de": "Teilen die gewählten Formen nichts, schließt der zweite Klick auf „Schnittmenge“ jetzt die Vorschau: Die Formen sind wieder fest, der Knopf nicht mehr gedrückt, und eine Meldung sagt, dass nichts geändert wurde. Vorher blieb die Vorschau offen, und am Tablet gab es ohne Esc keinen Ausweg.",
+          "en": "When the selected shapes share nothing, the second click on Intersection now closes the preview: the shapes are solid again, the button is no longer pressed, and a message says nothing was changed. Before, the preview stayed open, and on a tablet without Esc there was no way out."
+        }
+      },
+      {
+        "title": {
+          "de": "Gespiegelte Kegel bleiben beim Gruppieren richtig herum",
+          "en": "Mirrored cones keep their direction when grouped"
+        },
+        "body": {
+          "de": "Ein Kegel, der oben und unten gespiegelt war, stand nach dem Gruppieren wieder auf dem Kopf, weil die Spiegelung beim Zusammenführen verloren ging. Jetzt bleibt er so, wie er vor dem Gruppieren zu sehen war, auch beim Verbinden, Ausschneiden und Aushöhlen.",
+          "en": "A cone mirrored top to bottom came out upside down once it was grouped, because the mirror was lost when the parts were merged. It now stays as it looked before grouping, also when joining, cutting and hollowing."
+        }
+      },
+      {
+        "title": {
+          "de": "Unterlegscheibe zurück zum Rohr",
+          "en": "A washer goes back to a tube"
+        },
+        "body": {
+          "de": "Ein Rohr, das über die Auswahl „Unterlegscheibe“ zur Scheibe gemacht wurde, ließ sich nicht mehr zurückstellen: „Eigene Maße“ und der Pfeil „Auf die Vorgabe zurücksetzen“ taten nichts. Jetzt bekommt das Rohr wieder die Maße eines neuen Rohrs.",
+          "en": "A tube turned into a washer with the Washer menu could not be put back: Custom and the arrow back to the default did nothing. Now the tube gets the measures of a new tube again."
+        }
+      },
+      {
+        "title": {
+          "de": "Fokusmodus startet nicht mehr bei verkleinertem Zoom",
+          "en": "Focus mode no longer starts when the page is zoomed out"
+        },
+        "body": {
+          "de": "Ist die Seite im Browser verkleinert (Strg und Minus, etwa auf 80 %), hielt layerling das Fenster für einen Vollbildschirm und öffnete jedes neue Design im Fokusmodus, auch wenn er ausgeschaltet wurde. Jetzt kommt der Fokusmodus von selbst nur noch im echten Vollbild (F11).",
+          "en": "With the page zoomed out in the browser (Ctrl and minus, say to 80 %), layerling took the window for a full screen and opened every new design in focus mode, even when it was switched off. Now focus mode comes by itself only in a real full screen (F11)."
+        }
+      },
+      {
+        "title": {
+          "de": "Verfolgte SVG mit tausenden kleinen Linien bleibt eine Skizze",
+          "en": "A traced SVG with thousands of tiny lines stays a sketch"
+        },
+        "body": {
+          "de": "Ein SVG kam nur bis 2500 Linien und Kurven als Skizze herein, mit Füllung und Silhouette in den Eigenschaften; darüber blieb es ein festes Netz, und beide fehlten. Eine aus einem Bild nachgezeichnete Datei besteht aus tausenden winzigen Stufen, darum schien der Silhouette-Knopf verschwunden. Jetzt kommen SVGs bis 10 000 Linien und Kurven als Skizze herein; ein sehr feines kann beim Import ein paar Sekunden brauchen.",
+          "en": "An SVG came in as a sketch, with Fill and Silhouette in its properties, only up to 2500 lines and curves; above that it stayed a fixed mesh and both were missing. A file traced from a picture is drawn in thousands of tiny steps, which is why the Silhouette button seemed to have disappeared. Now SVGs of up to 10,000 lines and curves come in as a sketch; a very fine one can take a few seconds to import."
+        }
+      },
+      {
+        "title": {
+          "de": "3D-Maus ohne Verbinden nach jedem Neustart",
+          "en": "3D mouse without Connect after every restart"
+        },
+        "body": {
+          "de": "Die 3D-Maus musste in jeder Sitzung neu verbunden werden, weil Chrome die Erlaubnis bei vielen Mäusen nicht behält. Jetzt liest layerling eine 3Dconnexion-Maus auch als Spielcontroller, den der Browser ohne Nachfrage zeigt, sobald du die Kappe bewegst. Bewegt sich die Ansicht in einer Richtung verkehrt herum, drehst du sie in den Einstellungen unter Steuerung um.",
+          "en": "The 3D mouse had to be connected again in every session, because Chrome does not keep the permission for many of these mice. Now layerling also reads a 3Dconnexion mouse as a game controller, which the browser shows with no question as soon as you move the cap. If the view moves the wrong way in one direction, reverse it in the settings under Controls."
+        }
+      }
+    ]
+  },
+  {
     "version": "1.162.0",
     "items": [
       {
