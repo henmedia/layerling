@@ -2564,6 +2564,8 @@ export const MESSAGES_TR: Partial<Record<MessageKey, string>> = {
   "prop.bentTubeInnerProfile": "İç profil",
   "prop.bentTubeSize": "Dış boyut",
   "prop.bentTubeWall": "Duvar kalınlığı",
+  "prop.bentTubeAcrossFlats": "Anahtar ağzı genişliği",
+  "prop.bentTubeInnerAcrossFlats": "İç anahtar ağzı genişliği",
   "prop.bentTubeSegment": "Segment",
   "prop.bentTubeSegmentLength": "Düz uzunluk",
   "prop.bentTubeBendAngle": "Büküm açısı",

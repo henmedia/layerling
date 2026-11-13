@@ -116,6 +116,8 @@ V nabídce {{ui:prop.springForm}} se z pružiny stane plochá pružina ({{ui:spr
 
 {{ui:shape.bentTube}} se skládá až z dvanácti přímých úseků následovaných ohybem. U každého nastavíte {{ui:prop.bentTubeSegmentLength}}, {{ui:prop.bentTubeBendAngle}}, {{ui:prop.bentTubeBendRadius}} a {{ui:prop.bentTubeRoll}}. Právě upravovaný úsek je oranžový. Natočení 0° ohýbá v rovině podložky, 90° vzhůru. Vnější i vnitřní profil může být kruhový, čtvercový, šestihranný nebo osmihranný; díl může být i plný. Na vlastní kolizi trubky program upozorní.
 
+U kulatého profilu nastavuješ {{ui:prop.outerDiameter}}, u čtvercového, šestihranného nebo osmihranného {{ui:prop.bentTubeAcrossFlats}}. Má-li vnitřek stejný profil, zobrazí se také {{ui:prop.innerDiameter}} nebo {{ui:prop.bentTubeInnerAcrossFlats}}; když ho zadáš, {{ui:prop.bentTubeWall}} se přizpůsobí. {{ui:prop.quality}} je nahoře, kde má obyčejná trubka strany: určuje, kolik rohů má kulatý profil a jak jemně jsou rozdělené ohyby. Ohnutá trubka s hodnotou {{ui:prop.bentTubeBendAngle}} 0° je rovná trubka, takže tak získáš i čtyřhrannou, šestihrannou nebo osmihrannou trubku.
+
 ## Propojení profilů
 
 {{ui:shape.loft}} propojí dolní a horní obrys podobně jako loft ve Fusion: redukci hadice, čtvercový ventilátor s kruhovým potrubím nebo stojánek měnící průřez. Pro {{ui:prop.loftBottomOutline}} a {{ui:prop.loftTopOutline}} vybíráte {{ui:loft.round}}, {{ui:loft.rectangle}} s {{ui:prop.loftBottomCorner}} nebo {{ui:loft.polygon}} s počtem rohů. Nastavíte rozměry obou konců a výšku. {{ui:prop.loftOffsetX}} a {{ui:prop.loftOffsetZ}} posunou horní konec do strany, spodní zůstává.

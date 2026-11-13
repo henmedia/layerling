@@ -4416,6 +4416,8 @@ export const MESSAGES_SV: Partial<Record<MessageKey, string>> = {
   "prop.bentTubeInnerProfile": "Inre profil",
   "prop.bentTubeSize": "Yttermått",
   "prop.bentTubeWall": "Väggtjocklek",
+  "prop.bentTubeAcrossFlats": "Nyckelvidd",
+  "prop.bentTubeInnerAcrossFlats": "Inre nyckelvidd",
   "prop.bentTubeSegment": "Segment",
   "prop.bentTubeSegmentLength": "Rak längd",
   "prop.bentTubeBendAngle": "Böjvinkel",

@@ -4421,6 +4421,8 @@ export const MESSAGES_DE: Record<MessageKey, string> = {
   "prop.bentTubeInnerProfile": "Innenprofil",
   "prop.bentTubeSize": "Außenmaß",
   "prop.bentTubeWall": "Wandstärke",
+  "prop.bentTubeAcrossFlats": "Schlüsselweite",
+  "prop.bentTubeInnerAcrossFlats": "Schlüsselweite innen",
   "prop.bentTubeSegment": "Segment",
   "prop.bentTubeSegmentLength": "Gerade Länge",
   "prop.bentTubeBendAngle": "Biegewinkel",

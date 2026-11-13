@@ -4355,6 +4355,8 @@ export const MESSAGES_PL: Partial<Record<MessageKey, string>> = {
   "prop.bentTubeInnerProfile": "Profil wewnętrzny",
   "prop.bentTubeSize": "Rozmiar zewnętrzny",
   "prop.bentTubeWall": "Grubość ścianki",
+  "prop.bentTubeAcrossFlats": "Rozmiar pod klucz",
+  "prop.bentTubeInnerAcrossFlats": "Wewnętrzny rozmiar pod klucz",
   "prop.bentTubeSegment": "Segment",
   "prop.bentTubeSegmentLength": "Długość prosta",
   "prop.bentTubeBendAngle": "Kąt gięcia",

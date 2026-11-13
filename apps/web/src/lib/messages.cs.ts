@@ -4479,6 +4479,8 @@ export const MESSAGES_CS: Record<MessageKey, string> = {
   "prop.bentTubeInnerProfile": "Vnitřní profil",
   "prop.bentTubeSize": "Vnější rozměr",
   "prop.bentTubeWall": "Tloušťka stěny",
+  "prop.bentTubeAcrossFlats": "Rozměr přes plochy",
+  "prop.bentTubeInnerAcrossFlats": "Vnitřní rozměr přes plochy",
   "prop.bentTubeSegment": "Úsek",
   "prop.bentTubeSegmentLength": "Délka přímého úseku",
   "prop.bentTubeBendAngle": "Úhel ohybu",

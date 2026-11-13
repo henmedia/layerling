@@ -4422,6 +4422,8 @@ export const MESSAGES_EN = {
   "prop.bentTubeInnerProfile": "Inner profile",
   "prop.bentTubeSize": "Outer size",
   "prop.bentTubeWall": "Wall thickness",
+  "prop.bentTubeAcrossFlats": "Width across flats",
+  "prop.bentTubeInnerAcrossFlats": "Inner width across flats",
   "prop.bentTubeSegment": "Segment",
   "prop.bentTubeSegmentLength": "Straight length",
   "prop.bentTubeBendAngle": "Bend angle",

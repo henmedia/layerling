@@ -27,6 +27,19 @@
   },
   {
     "title": {
+      "de": "Rohr und gebogenes Rohr mit gleichen Feldern",
+      "en": "Tube and bent tube with matching fields"
+    },
+    "body": {
+      "de": "Beide Rohre benennen ihre Maße jetzt gleich: Wandstärke statt Dicke beim Rohr, Außendurchmesser beim runden gebogenen Rohr (Schlüsselweite bei eckigem Profil).\n\nHat das gebogene Rohr innen dasselbe Profil, kannst du auch den Innendurchmesser eintippen, die Wandstärke folgt. Die Qualität steht oben, wo das einfache Rohr seine Seiten hat.\n\nTipp: Ein gebogenes Rohr mit Biegewinkel 0° ist ein gerades Vierkant-, Sechskant- oder Achtkantrohr.",
+      "en": "Both tubes now name their measures alike: Wall thickness instead of Thickness on the tube, Outer diameter on a round bent tube (Width across flats on an angular profile).\n\nIf the bent tube has the same profile inside, you can also type the inner diameter, and the wall follows. Quality sits at the top, where the plain tube has its sides.\n\nTip: a bent tube with a bend angle of 0° is a straight square, hexagonal or octagonal tube."
+    },
+    "guide": {
+      "section": "bentTubes"
+    }
+  },
+  {
+    "title": {
       "de": "Keil: Neigungswinkel in den Eigenschaften",
       "en": "Wedge: the slope angle in its properties",
       "da": "Kile: hældningsvinklen i egenskaberne"

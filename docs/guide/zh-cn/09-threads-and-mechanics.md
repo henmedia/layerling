@@ -116,6 +116,8 @@ G 规格是符合 ISO 228-1 的平行惠氏管螺纹，常见于水、燃气、�
 
 一个 {{ui:shape.bentTube}} 最多由十二段组成：一段直管，接着一个弯。每一段你设置 {{ui:prop.bentTubeSegmentLength}}、{{ui:prop.bentTubeBendAngle}}、{{ui:prop.bentTubeBendRadius}} 和 {{ui:prop.bentTubeRoll}}。正在编辑的段会在管上以橙色高亮，方便你跟上顺序。滚转角为 0° 时在工作平面内弯曲，90° 时管子向上弯。轮廓可以是圆形、方形、六边形或八边形，内部同样如此，也可以完全实心。如果管子撞到自己，layerling 会提醒你。
 
+圆形截面设置{{ui:prop.outerDiameter}}，方形、六边形或八边形截面设置{{ui:prop.bentTubeAcrossFlats}}。内部截面相同时，还会显示{{ui:prop.innerDiameter}}或{{ui:prop.bentTubeInnerAcrossFlats}}；输入它，{{ui:prop.bentTubeWall}}会随之调整。{{ui:prop.quality}}排在最前，位于普通管子显示边数的位置：它决定圆形截面有多少个角，以及弯曲部分分得多细。{{ui:prop.bentTubeBendAngle}}为 0° 的弯管就是直管，因此也可以用它做出方管、六角管或八角管。
+
 ## 放样
 
 {{ui:shape.loft}} 把底部的一个轮廓与顶部另一个轮廓连接起来，就像 Fusion 里的放样：从一种直径到另一种直径的软管接头、把方形风扇接到圆管上、向上逐渐变圆的支架。每一端你选择 {{ui:prop.loftBottomOutline}} 和 {{ui:prop.loftTopOutline}}：{{ui:loft.round}}、带 {{ui:prop.loftBottomCorner}} 的 {{ui:loft.rectangle}}，或带角数的 {{ui:loft.polygon}}，再加上每一端的宽度、长度和高度。{{ui:prop.loftOffsetX}} 和 {{ui:prop.loftOffsetZ}} 把顶端向侧面移动，形成倾斜过渡；底端保持在原处。

@@ -2614,6 +2614,8 @@ export const MESSAGES_HU: Partial<Record<MessageKey, string>> = {
   "prop.bentTubeInnerProfile": "Belső profil",
   "prop.bentTubeSize": "Külső méret",
   "prop.bentTubeWall": "Falvastagság",
+  "prop.bentTubeAcrossFlats": "Laptávolság",
+  "prop.bentTubeInnerAcrossFlats": "Belső laptávolság",
   "prop.bentTubeSegment": "Szakasz",
   "prop.bentTubeSegmentLength": "Egyenes hossz",
   "prop.bentTubeBendAngle": "Hajlítási szög",

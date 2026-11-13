@@ -4414,6 +4414,8 @@ export const MESSAGES_JA: Partial<Record<MessageKey, string>> = {
   "prop.bentTubeInnerProfile": "内側のプロファイル",
   "prop.bentTubeSize": "外形サイズ",
   "prop.bentTubeWall": "壁の厚さ",
+  "prop.bentTubeAcrossFlats": "二面幅",
+  "prop.bentTubeInnerAcrossFlats": "内側の二面幅",
   "prop.bentTubeSegment": "セグメント",
   "prop.bentTubeSegmentLength": "直線部の長さ",
   "prop.bentTubeBendAngle": "曲げ角度",

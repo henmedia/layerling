@@ -4052,6 +4052,8 @@ export const MESSAGES_AR: Partial<Record<MessageKey, string>> = {
   "prop.bentTubeInnerProfile": "المقطع الداخلي",
   "prop.bentTubeSize": "الحجم الخارجي",
   "prop.bentTubeWall": "سمك الجدار",
+  "prop.bentTubeAcrossFlats": "العرض بين السطحين",
+  "prop.bentTubeInnerAcrossFlats": "العرض الداخلي بين السطحين",
   "prop.bentTubeSegment": "القطعة",
   "prop.bentTubeSegmentLength": "الطول المستقيم",
   "prop.bentTubeBendAngle": "زاوية الانحناء",

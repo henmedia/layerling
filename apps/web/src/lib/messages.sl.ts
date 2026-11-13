@@ -3457,6 +3457,8 @@ export const MESSAGES_SL: Partial<Record<MessageKey, string>> = {
   "prop.bentTubeInnerProfile": "Notranji profil",
   "prop.bentTubeSize": "Zunanja velikost",
   "prop.bentTubeWall": "Debelina stene",
+  "prop.bentTubeAcrossFlats": "Širina med ploskvama",
+  "prop.bentTubeInnerAcrossFlats": "Notranja širina med ploskvama",
   "prop.bentTubeSegment": "Odsek",
   "prop.bentTubeSegmentLength": "Dolžina ravnega dela",
   "prop.bentTubeBendAngle": "Kot ukrivitve",

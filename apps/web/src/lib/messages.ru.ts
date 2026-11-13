@@ -4415,6 +4415,8 @@ export const MESSAGES_RU: Partial<Record<MessageKey, string>> = {
   "prop.bentTubeInnerProfile": "Внутренний профиль",
   "prop.bentTubeSize": "Наружный размер",
   "prop.bentTubeWall": "Толщина стенки",
+  "prop.bentTubeAcrossFlats": "Размер под ключ",
+  "prop.bentTubeInnerAcrossFlats": "Внутренний размер под ключ",
   "prop.bentTubeSegment": "Сегмент",
   "prop.bentTubeSegmentLength": "Длина прямого участка",
   "prop.bentTubeBendAngle": "Угол изгиба",

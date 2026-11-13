@@ -4424,6 +4424,8 @@ export const MESSAGES_ES: Partial<Record<MessageKey, string>> = {
   "prop.bentTubeInnerProfile": "Perfil interior",
   "prop.bentTubeSize": "Medida exterior",
   "prop.bentTubeWall": "Grosor de pared",
+  "prop.bentTubeAcrossFlats": "Ancho entre caras",
+  "prop.bentTubeInnerAcrossFlats": "Ancho interior entre caras",
   "prop.bentTubeSegment": "Segmento",
   "prop.bentTubeSegmentLength": "Longitud recta",
   "prop.bentTubeBendAngle": "Ángulo de curvatura",

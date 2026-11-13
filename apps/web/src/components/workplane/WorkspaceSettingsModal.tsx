@@ -289,7 +289,7 @@ function specialFieldsForShape(
   if (kind === "tube" || kind === "ring") {
     return [
       { type: "number", key: "sides", label: t("prop.sides"), defaultValue: defaults.sides ?? automaticSideCount(dimensions.width, dimensions.depth), min: 3, max: MAX_HIGH_RESOLUTION_SIDES, step: 1 },
-      { type: "number", key: "bevel", label: t("prop.thickness"), defaultValue: defaults.bevel ?? 4, min: 0.5, max: 20, unit: "mm" },
+      { type: "number", key: "bevel", label: t("prop.bentTubeWall"), defaultValue: defaults.bevel ?? 4, min: 0.5, max: 20, unit: "mm" },
     ];
   }
   if (kind === "text") {
@@ -500,9 +500,9 @@ function specialFieldsForShape(
     return [
       { type: "select", key: "bentTubeProfile", label: t("prop.bentTubeProfile"), defaultValue: defaults.bentTubeProfile ?? DEFAULT_BENT_TUBE_PROFILE, options: profileOptions },
       { type: "select", key: "bentTubeInnerProfile", label: t("prop.bentTubeInnerProfile"), defaultValue: defaults.bentTubeInnerProfile ?? DEFAULT_BENT_TUBE_INNER_PROFILE, options: [{ value: "none", label: t("bentTube.innerNone") }, ...profileOptions] },
+      { type: "number", key: "bentTubeQuality", label: t("prop.quality"), defaultValue: defaults.bentTubeQuality ?? DEFAULT_BENT_TUBE_QUALITY, min: MIN_BENT_TUBE_QUALITY, max: MAX_BENT_TUBE_QUALITY, step: 4 },
       { type: "number", key: "bentTubeSize", label: t("prop.bentTubeSize"), defaultValue: defaults.bentTubeSize ?? DEFAULT_BENT_TUBE_SIZE, min: MIN_BENT_TUBE_SIZE, max: 100, step: 0.5, unit: "mm" },
       { type: "number", key: "bentTubeWall", label: t("prop.bentTubeWall"), defaultValue: defaults.bentTubeWall ?? DEFAULT_BENT_TUBE_WALL, min: MIN_BENT_TUBE_WALL, max: 20, step: 0.1, unit: "mm" },
-      { type: "number", key: "bentTubeQuality", label: t("prop.quality"), defaultValue: defaults.bentTubeQuality ?? DEFAULT_BENT_TUBE_QUALITY, min: MIN_BENT_TUBE_QUALITY, max: MAX_BENT_TUBE_QUALITY, step: 4 },
     ];
   }
   if (kind === "roundedBox") {

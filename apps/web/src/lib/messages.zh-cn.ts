@@ -4341,6 +4341,8 @@ export const MESSAGES_ZH_CN: Partial<Record<MessageKey, string>> = {
   "prop.bentTubeInnerProfile": "内截面",
   "prop.bentTubeSize": "外形尺寸",
   "prop.bentTubeWall": "壁厚",
+  "prop.bentTubeAcrossFlats": "对边宽度",
+  "prop.bentTubeInnerAcrossFlats": "内对边宽度",
   "prop.bentTubeSegment": "分段",
   "prop.bentTubeSegmentLength": "直段长度",
   "prop.bentTubeBendAngle": "弯曲角度",
