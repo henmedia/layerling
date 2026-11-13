@@ -4827,6 +4827,8 @@ export const MESSAGES_ZH_CN: Partial<Record<MessageKey, string>> = {
   "workspace.startWithScrollbars": "编辑器启动时显示滚动条",
   "workspace.viewBarOpensOnHover": "鼠标悬停时打开视图栏",
   "workspace.viewBarOpensOnHoverHint": "折叠的视图栏在鼠标停在其箭头上时展开，鼠标离开后再次折叠。点击箭头可使其保持展开。",
+  "workspace.showStepNotices": "每一步之后显示提示",
+  "workspace.showStepNoticesHint": "在合并等步骤之后，视图立方体旁边出现的简短提示及其撤销按钮。如果碍事可以关闭；需要你操作或报告问题的提示仍会出现，指向功能区中的撤销按钮时仍会显示该步骤。",
   "workspace.startView": "起始视图",
   "workspace.startViewHint": "新设计打开时的角度，也是“复位”返回的角度。先把视图转到你喜欢的样子，再使用当前视图。适用于此浏览器中的所有设计。",
   "workspace.startViewUseCurrent": "使用当前视图",

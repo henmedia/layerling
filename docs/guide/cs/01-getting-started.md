@@ -24,7 +24,7 @@ Všechny projekty se později zobrazují na úvodní stránce s náhledem. Uchov
 - **Vpravo** se zobrazují **vlastnosti** vybraného tvaru: barva, rozměry, poloha a další vlastnosti. Zadání čísla je přesnější než tažení myší.
 - **Vlevo** najdete **lištu pohledu** a nad ní **orientační krychli**. Jejich použití popisuje kapitola [Pohled a pracovní rovina](chapter:view-and-workplane).
 - **Vedle lišty pohledu** se otevírá **seznam objektů** ([[Ctrl]]+[[U]]) se všemi tvary návrhu. Víc v kapitole [Výběr a uspořádání](chapter:select-and-arrange).
-- **Vpravo od orientační krychle** se objeví **stavová zpráva**, když vám layerling chce něco sdělit, třeba co nástroj právě očekává. Když není co říct, není vidět.
+- **Vpravo od orientační krychle** se objeví **stavová zpráva**, když vám layerling chce něco sdělit, třeba co nástroj právě očekává. Když není co říct, není vidět. Po kroku, jako je sjednocení, krátce řekne, co se stalo, a nabídne {{ui:shortcuts.undo}}; volba {{ui:workspace.showStepNotices}} v nastavení tyto zprávy vypne.
 - **Okna nástrojů** se otevírají nad pracovní rovinou, když spustíte nástroj jako {{ui:editor.tool.fillet}}, {{ui:editor.tool.array}} nebo {{ui:editor.tool.hollow}}. Za záhlaví je odsunete stranou, když něco zakrývají.
 - **Úplně nahoře** přepínáte mezi {{ui:editor.modeGeometry}} a {{ui:editor.modeSketch}}, přejmenováváte projekt a volíte jazyk a barevný motiv.
 

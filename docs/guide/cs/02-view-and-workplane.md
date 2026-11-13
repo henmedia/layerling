@@ -194,6 +194,8 @@ Pohled náčrtu má vlastní barvy: {{ui:workspace.sketchBackground}} pro okno k
 
 {{ui:workspace.viewBarOpensOnHover}}: sbalená lišta pohledu se otevře, když je myš nad její šipkou, a krátce poté, co ji myš opustí, se znovu sbalí, pokud se nepoužívá některý z jejích nástrojů. Klik na šipku, dokud je takto otevřená, ji nechá otevřenou. Platí jen pro myš; na dotykové obrazovce lištu otevře klepnutí jako dosud.
 
+{{ui:workspace.showStepNotices}}: po kroku, jako je sjednocení, krátká zpráva vedle krychle pohledu řekne, co se stalo, a nabídne {{ui:shortcuts.undo}}. Po vypnutí se tyto zprávy nezobrazují; zprávy, které od vás něco chtějí nebo hlásí problém, se zobrazují dál a {{ui:editor.tool.undo}} na pásu karet po najetí myší stále uvádí krok.
+
 {{ui:workspace.startView}} určuje úhel, ve kterém se otevře nový projekt a ke kterému se vrací {{ui:camera.home}}. Otočte a přibližte pohled, jak se vám líbí, a pak klikněte na {{ui:workspace.startViewUseCurrent}}; {{ui:workspace.startViewStandard}} vrátí obvyklý pohled zepředu zprava. Platí pro každý projekt v tomto prohlížeči. Projekt, který znovu otevřete, se stále otevře tak, jak jste ho opustili.
 
 {{ui:workspace.zoomSpeed}} je posuvník od pomalého po rychlé: jak rychle přibližuje kolečko a touchpad; tlačítka a klávesy přiblížení si ponechávají vlastní malé kroky. {{ui:workspace.panSpeed}} je také posuvník od pomalého po rychlé: jak rychle pohled při posouvání sleduje myš; uprostřed zůstává uchopený bod pod kurzorem. {{ui:workspace.cameraInertia}}: po puštění myši se pohled ještě chvíli otáčí nebo posouvá a jemně zpomalí. Vypnuté znamená, že se zastaví hned, jako v Tinkercadu a Fusion 360.

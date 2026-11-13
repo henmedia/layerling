@@ -2059,6 +2059,8 @@ export const MESSAGES_PT_BR: Partial<Record<MessageKey, string>> = {
   "workspace.startWithScrollbars": "Abrir o editor com barras de rolagem",
   "workspace.viewBarOpensOnHover": "Abrir a barra de visualização ao passar o mouse",
   "workspace.viewBarOpensOnHoverHint": "Uma barra de visualização recolhida abre enquanto o mouse está sobre a seta dela e se recolhe de novo quando o mouse sai da barra. Um clique na seta a mantém aberta.",
+  "workspace.showStepNotices": "Mostrar uma mensagem após cada passo",
+  "workspace.showStepNoticesHint": "A mensagem curta ao lado do cubo de visualização após um passo como uma união, com seu botão Desfazer. Desative se atrapalhar; mensagens que pedem algo de você ou relatam um problema continuam aparecendo, e Desfazer na faixa de opções ainda nomeia o passo quando você aponta para ele.",
   "workspace.startView": "Vista inicial",
   "workspace.startViewHint": "O ângulo em que novos projetos abrem e ao qual Início volta. Gire a vista como preferir e depois use a vista atual. Vale para todos os projetos deste navegador.",
   "workspace.startViewUseCurrent": "Usar a vista atual",

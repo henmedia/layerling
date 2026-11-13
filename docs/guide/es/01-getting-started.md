@@ -24,7 +24,7 @@ Todos tus diseños aparecen después en la página de inicio, con una imagen de 
 - **A la derecha** está el **panel de propiedades** de la forma seleccionada: color, medidas, posición y todo lo demás que define la forma. Escribir números es más exacto que arrastrar.
 - **A la izquierda** está la **barra de vista**, con el **cubo de vista** encima. Con ellos te mueves por la escena; tienes más detalles en [Vista y plano de trabajo](chapter:view-and-workplane).
 - **Junto a la barra de vista** se abre la **lista de objetos** ([[Ctrl]]+[[U]]), con todas las formas del diseño. Más en [Seleccionar y organizar](chapter:select-and-arrange).
-- **A la derecha del cubo de vista** aparece el **mensaje de estado** cuando layerling tiene algo que decirte, por ejemplo qué espera de ti una herramienta. Si no hay nada que decir, no está.
+- **A la derecha del cubo de vista** aparece el **mensaje de estado** cuando layerling tiene algo que decirte, por ejemplo qué espera de ti una herramienta. Si no hay nada que decir, no está. Tras un paso como una unión dice brevemente qué se hizo y ofrece {{ui:shortcuts.undo}}; {{ui:workspace.showStepNotices}} en los ajustes desactiva estos mensajes.
 - Las **ventanas de herramientas** se abren sobre el plano de trabajo cuando empiezas una herramienta como el redondeo, el patrón o el vaciado. Apártalas por su barra de título cuando tapen algo.
 - **Arriba del todo** cambias entre {{ui:editor.modeGeometry}} y {{ui:editor.modeSketch}}, cambias el nombre del diseño y eliges el idioma y el tema.
 

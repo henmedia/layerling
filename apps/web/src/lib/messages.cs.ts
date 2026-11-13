@@ -4828,6 +4828,8 @@ export const MESSAGES_CS: Record<MessageKey, string> = {
   "workspace.startWithScrollbars": "Spouštět editor s posuvníky",
   "workspace.viewBarOpensOnHover": "Otevřít lištu pohledu při najetí myší",
   "workspace.viewBarOpensOnHoverHint": "Sbalená lišta pohledu se otevře, když je myš nad její šipkou, a znovu se sbalí, když ji myš opustí. Klik na šipku ji nechá otevřenou.",
+  "workspace.showStepNotices": "Po každém kroku zobrazit zprávu",
+  "workspace.showStepNoticesHint": "Krátká zpráva vedle krychle pohledu po kroku, jako je sjednocení, s tlačítkem Zpět. Vypněte, pokud překáží; zprávy, které od vás něco chtějí nebo hlásí problém, se zobrazují dál a Zpět na pásu karet po najetí myší stále uvádí krok.",
   "workspace.startView": "Úvodní pohled",
   "workspace.startViewHint": "Úhel, ve kterém se otevírají nové návrhy a na který se vrací Domů. Natočte pohled podle sebe a pak použijte aktuální pohled. Platí pro všechny návrhy v tomto prohlížeči.",
   "workspace.startViewUseCurrent": "Použít aktuální pohled",

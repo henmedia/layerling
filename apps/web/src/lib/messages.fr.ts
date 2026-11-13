@@ -4822,6 +4822,8 @@ export const MESSAGES_FR: Partial<Record<MessageKey, string>> = {
   "workspace.startWithScrollbars": "Démarrer l'éditeur avec les barres de défilement",
   "workspace.viewBarOpensOnHover": "Ouvrir la barre de vue au survol",
   "workspace.viewBarOpensOnHoverHint": "Une barre de vue repliée s'ouvre tant que la souris est sur sa flèche et se replie quand la souris la quitte. Un clic sur la flèche la garde ouverte.",
+  "workspace.showStepNotices": "Afficher un message après chaque étape",
+  "workspace.showStepNoticesHint": "Le court message à côté du cube de vue après une étape comme une union, avec son bouton Annuler. À désactiver s'il gêne ; les messages qui attendent quelque chose de vous ou signalent un problème s'affichent toujours, et Annuler dans le ruban nomme toujours l'étape quand vous le survolez.",
   "workspace.startView": "Vue de départ",
   "workspace.startViewHint": "L’angle dans lequel s’ouvrent les nouveaux designs et auquel revient Accueil. Tournez la vue comme vous l’aimez, puis prenez la vue actuelle. Vaut pour tous les designs de ce navigateur.",
   "workspace.startViewUseCurrent": "Prendre la vue actuelle",

@@ -24,7 +24,7 @@ In seguito, tutti i tuoi progetti compariranno nella pagina iniziale con un’im
 - **A destra** trovi le **proprietà** della forma selezionata: colore, dimensioni, posizione e tutto il resto. Inserire numeri è più preciso che trascinare.
 - **A sinistra** c’è la **barra della vista**, con il **cubo di orientamento** sopra. Ti permettono di muoverti nella scena; trovi maggiori informazioni in [Vista e piano di lavoro](chapter:view-and-workplane).
 - **Accanto alla barra della vista** si apre l’**elenco degli oggetti** ([[Ctrl]]+[[U]]), con tutte le forme del progetto. Maggiori informazioni in [Selezionare e disporre](chapter:select-and-arrange).
-- **A destra del cubo di orientamento** compare il **messaggio di stato** quando layerling ha qualcosa da dirti, per esempio che cosa si aspetta da te uno strumento. Quando non c’è nulla da dire, non c’è.
+- **A destra del cubo di orientamento** compare il **messaggio di stato** quando layerling ha qualcosa da dirti, per esempio che cosa si aspetta da te uno strumento. Quando non c’è nulla da dire, non c’è. Dopo un passo come un'unione dice in breve cosa è stato fatto e offre {{ui:shortcuts.undo}}; {{ui:workspace.showStepNotices}} nelle impostazioni disattiva questi messaggi.
 - Le **finestre degli strumenti** si aprono sopra il piano di lavoro quando avvii uno strumento come {{ui:editor.tool.fillet}}, {{ui:editor.tool.array}} o {{ui:editor.tool.hollow}}. Spostale dalla barra del titolo quando coprono qualcosa.
 - **In cima alla finestra** puoi passare da {{ui:editor.modeGeometry}} a {{ui:editor.modeSketch}}, rinominare il progetto e scegliere la lingua e il tema.
 

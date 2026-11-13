@@ -24,7 +24,7 @@ Alle deine Entwürfe erscheinen später auf der Startseite mit einem Vorschaubil
 - **Rechts** stehen die **Eigenschaften** der ausgewählten Form: Farbe, Maße, Lage und alles, was die Form sonst noch ausmacht. Zahlen tippen ist genauer als ziehen.
 - **Links** liegt die **Ansichtsleiste** mit dem **Ansichtswürfel** darüber. Mit ihr bewegst du dich durch die Szene, mehr dazu im Kapitel [Ansicht und Arbeitsebene](chapter:ansicht-und-arbeitsebene).
 - **Neben der Ansichtsleiste** öffnet sich die **Objektliste** ([[Strg]]+[[U]]) mit allen Formen des Entwurfs. Mehr dazu in [Auswählen und anordnen](chapter:auswaehlen-und-anordnen).
-- **Rechts neben dem Ansichtswürfel** erscheint die **Statusmeldung**, wenn layerling dir etwas mitzuteilen hat, etwa was ein Werkzeug gerade von dir erwartet. Gibt es nichts zu sagen, ist sie nicht da.
+- **Rechts neben dem Ansichtswürfel** erscheint die **Statusmeldung**, wenn layerling dir etwas mitzuteilen hat, etwa was ein Werkzeug gerade von dir erwartet. Gibt es nichts zu sagen, ist sie nicht da. Nach einem Schritt wie Vereinen sagt sie kurz, was geschehen ist, und bietet {{ui:shortcuts.undo}} an; {{ui:workspace.showStepNotices}} in den Einstellungen schaltet diese Meldungen ab.
 - **Werkzeugfenster** öffnen sich über der Arbeitsebene, wenn du ein Werkzeug wie Verrunden, Muster oder Aushöhlen startest. An ihrer Titelleiste schiebst du sie beiseite, wenn sie etwas verdecken.
 - **Ganz oben** wechselst du zwischen {{ui:editor.modeGeometry}} und {{ui:editor.modeSketch}}, benennst den Entwurf um und stellst Sprache und Farbschema ein.
 

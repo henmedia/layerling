@@ -24,7 +24,7 @@ All your designs later appear on the start page with a preview picture. They are
 - **On the right** is the **properties panel** of the selected shape: colour, dimensions, position and whatever else makes up the shape. Typing numbers is more exact than dragging.
 - **On the left** is the **view bar** with the **view cube** above it. They move you around the scene, more in [View and workplane](chapter:view-and-workplane).
 - **Beside the view bar** the **object list** opens ([[Ctrl]]+[[U]]), with every shape of the design. More in [Select and arrange](chapter:select-and-arrange).
-- **To the right of the view cube** the **status message** appears when layerling has something to tell you, such as what a tool expects from you next. When there is nothing to say, it is not there.
+- **To the right of the view cube** the **status message** appears when layerling has something to tell you, such as what a tool expects from you next. When there is nothing to say, it is not there. After a step such as a union it says briefly what was done and offers {{ui:shortcuts.undo}}; {{ui:workspace.showStepNotices}} in the settings switches these messages off.
 - **Tool windows** open over the workplane when you start a tool such as fillet, pattern or hollow. Drag one aside by its title bar when it covers something.
 - **At the very top** you switch between {{ui:editor.modeGeometry}} and {{ui:editor.modeSketch}}, rename the design and choose language and colour scheme.
 

@@ -25,7 +25,7 @@ Men sikkerhedskopiér dine designs ind imellem: en browser kan fejle, og en brow
 - **Til højre** vises **egenskaberne** for den valgte form: farve, dimensioner, position og hvad ellers der udgør formen. At taste tal er mere nøjagtigt end at trække.
 - **Til venstre** er visningsbjælken med visningskuben over den. De flytter dig rundt i scenen, mere i [Visning og arbejdsplan](chapter:view-and-workplane).
 - **Ved siden af visningsbjælken** åbner **objektlisten** ([[Ctrl]]+[[U]]) med alle designets former. Mere i [Valg og arrangering](chapter:select-and-arrange).
-- **Til højre for visningskuben** vises **statusbeskeden**, når layerling har noget at fortælle dig, for eksempel hvad et værktøj venter på. Når der ikke er noget at sige, er den der ikke.
+- **Til højre for visningskuben** vises **statusbeskeden**, når layerling har noget at fortælle dig, for eksempel hvad et værktøj venter på. Når der ikke er noget at sige, er den der ikke. Efter et trin som en forening siger den kort, hvad der skete, og tilbyder {{ui:shortcuts.undo}}; {{ui:workspace.showStepNotices}} i indstillingerne slår disse beskeder fra.
 - **Værktøjsvinduer** åbner over arbejdsplanet, når du starter et værktøj som {{ui:editor.tool.fillet}}, {{ui:editor.tool.array}} eller {{ui:editor.tool.hollow}}. Træk dem til side i titellinjen, når de dækker noget.
 - **Øverst oppe** skifter du mellem {{ui:editor.modeGeometry}} og {{ui:editor.modeSketch}}, omdøber designet og vælger sprog og farveskema.
 

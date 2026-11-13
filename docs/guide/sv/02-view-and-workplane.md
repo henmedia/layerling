@@ -194,6 +194,8 @@ Skissläget har sina egna färger: {{ui:workspace.sketchBackground}} för områd
 
 {{ui:workspace.viewBarOpensOnHover}}: ett ihopfällt vyfält öppnas när musen hålls över pilen och fälls ihop strax efter att musen lämnar den, om inte ett av verktygen är aktivt. Ett klick på pilen medan det är öppet så här låter det stanna öppet. Det gäller bara med mus; på pekskärm öppnar ett tryck fältet som vanligt.
 
+{{ui:workspace.showStepNotices}}: efter ett steg som en förening säger ett kort meddelande bredvid vykuben vad som gjordes och erbjuder {{ui:shortcuts.undo}}. Avstängt visas inte dessa meddelanden; meddelanden som vill något av dig eller rapporterar ett problem visas fortfarande, och {{ui:editor.tool.undo}} i menyfliksområdet nämner fortfarande steget när du pekar på det.
+
 {{ui:workspace.startView}} ställer in vinkeln som en ny design öppnas i och som {{ui:camera.home}} går tillbaka till. Vrid och zooma vyn som du vill ha den och klicka på {{ui:workspace.startViewUseCurrent}}; {{ui:workspace.startViewStandard}} återställer den vanliga vyn snett framifrån höger. Det gäller för varje design i den här webbläsaren. En design som du öppnar igen öppnas ändå som du lämnade den.
 
 {{ui:workspace.zoomSpeed}} är ett reglage från långsam till snabb: hur fort mushjulet och styrplattan zoomar; zoomknapparna och tangenterna behåller sina egna små steg. {{ui:workspace.panSpeed}} är också ett reglage från långsam till snabb: hur fort vyn följer musen vid panorering; i mitten stannar punkten du griper tag i under pekaren. {{ui:workspace.cameraInertia}}: när du släpper musen fortsätter vyn att rotera eller glida ett ögonblick och stannar mjukt. Avslaget stannar vyn omedelbart, som i Tinkercad och Fusion 360.

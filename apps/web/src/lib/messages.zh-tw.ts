@@ -4827,6 +4827,8 @@ export const MESSAGES_ZH_TW: Partial<Record<MessageKey, string>> = {
   "workspace.startWithScrollbars": "編輯器啟動時顯示捲軸",
   "workspace.viewBarOpensOnHover": "滑鼠停留時開啟視圖列",
   "workspace.viewBarOpensOnHoverHint": "收合的視圖列在滑鼠停在其箭頭上時展開，滑鼠離開後再次收合。按一下箭頭可使其保持展開。",
+  "workspace.showStepNotices": "每一步之後顯示提示",
+  "workspace.showStepNoticesHint": "在合併等步驟之後，視圖方塊旁邊出現的簡短提示及其復原按鈕。如果礙事可以關閉；需要你操作或回報問題的提示仍會出現，指向功能區中的復原按鈕時仍會顯示該步驟。",
   "workspace.startView": "起始視圖",
   "workspace.startViewHint": "新設計開啟時的角度，也是「回到預設視角」返回的角度。先把視圖轉到你喜歡的樣子，再使用目前視圖。適用於此瀏覽器中的所有設計。",
   "workspace.startViewUseCurrent": "使用目前視圖",
