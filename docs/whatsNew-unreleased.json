@@ -194,5 +194,18 @@
     "guide": {
       "section": "edgeTreatment"
     }
+  },
+  {
+    "title": {
+      "de": "Skizzenlinie läuft beim Werkzeugwechsel weiter",
+      "en": "Sketch line goes on when switching tools"
+    },
+    "body": {
+      "de": "Wechselst du beim Zeichnen einer Skizze zwischen Linie, Bézierkurve und Weicher Kurve, setzt die Linie jetzt am letzten Punkt fort. Bisher fing der nächste Klick eine neue Linie an.",
+      "en": "Switching between Line, Bezier curve and Smooth line while drawing a sketch now goes on from the last point. Until now the next click started a new line."
+    },
+    "guide": {
+      "section": "sketchDrawing"
+    }
   }
 ]

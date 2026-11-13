@@ -57,6 +57,7 @@ Klicka ut punkter en efter en.
 ::: Stänga eller avsluta en linje
 För att stänga konturen klickar du på den första punkten igen på slutet.
 För att avsluta linjekedjan utan att stänga konturen högerklickar du utan att flytta pekaren, eller dubbelklickar på den sista punkten.
+Byter du till {{ui:sketch.line}}, {{ui:sketch.bezier}} eller {{ui:sketch.smooth}} mitt i en kedja fortsätter linjen från den sista punkten.
 => En kropp skapas bara av en **sluten** kontur.
 :::
 

@@ -57,6 +57,7 @@ Click points one after another.
 ::: Closing or ending a line
 To close the outline, click the first point again at the end.
 To end the chain of lines without closing the outline, right-click without moving the pointer, or double-click the last point.
+If you switch to {{ui:sketch.line}}, {{ui:sketch.bezier}} or {{ui:sketch.smooth}} in the middle of a chain, the line goes on from its last point.
 => A body comes only from a **closed** outline.
 :::
 

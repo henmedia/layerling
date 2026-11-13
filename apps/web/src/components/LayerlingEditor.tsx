@@ -57,6 +57,7 @@ import { changesLockedOutline, setSketchPointsLocked, sketchLockState } from "@/
 import { curveSketchSegment, isSegmentCurved, straightenSketchSegment } from "@/lib/sketchSegmentCurve";
 import { chordHandles, withBezierHandles, withBezierStartHandle } from "@/lib/sketchBezierHandles";
 import { sketchProfileWithoutPoint } from "@/lib/sketchPointRemoval";
+import { toolSwitchKeepsChain } from "@/lib/sketchPointerControls";
 import { sketchProfileWithArc, type SketchArcEnd } from "@/lib/sketchArc";
 import { withSegmentsConstruction } from "@/lib/sketchConstruction";
 import { alignAxesForWorkplane, shiftAlongAxis, type AlignAxes } from "@/lib/alignFrame";
@@ -5802,8 +5803,11 @@ export function LayerlingEditor({
 
   const setActiveSketchTool = useCallback((tool: SketchTool) => {
     setSketchTool(tool);
-    setSketchActivePointId(null);
-    setSketchSelection(null);
+    // Line, curve and smooth line go on from the last point (#1725); every other switch ends the chain.
+    if (!toolSwitchKeepsChain(sketchTool, tool)) {
+      setSketchActivePointId(null);
+      setSketchSelection(null);
+    }
     if (tool !== "measure") setSketchMeasureStart(null);
     const messages: Record<SketchTool, string> = {
       line: t("status.sketchTool.line"),
@@ -5827,7 +5831,7 @@ export function LayerlingEditor({
       measure: t("status.sketchTool.measure"),
     };
     setNotice(messages[tool]);
-  }, []);
+  }, [sketchTool]);
 
   const measureSketchPoint = useCallback(
     (point: SketchPoint) => {

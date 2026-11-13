@@ -57,6 +57,7 @@ Punkte nacheinander anklicken.
 ::: Eine Linie schließen oder beenden
 Um den Umriss zu schließen, klickst du am Ende wieder auf den ersten Punkt.
 Die Linienkette beendest du, ohne den Umriss zu schließen, mit einem Rechtsklick ohne Bewegung oder einem Doppelklick auf den letzten Punkt.
+Wechselst du mitten in der Kette zu {{ui:sketch.line}}, {{ui:sketch.bezier}} oder {{ui:sketch.smooth}}, geht die Linie am letzten Punkt weiter.
 => Ein Körper entsteht nur aus einem **geschlossenen** Umriss.
 :::
 
