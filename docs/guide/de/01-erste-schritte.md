@@ -3,7 +3,7 @@ title: Erste Schritte
 summary: Vom leeren Blatt zum ersten Teil für den 3D-Drucker – in fünf Minuten, ohne Konto und ohne Installation.
 ---
 
-layerling ist ein Konstruktionsprogramm für den 3D-Druck, das direkt im Browser läuft. Du baust ein Teil aus einfachen Formen, schneidest Löcher hinein, rundest die Kanten und schickst es an den Slicer. Es gibt nichts zu installieren und nichts anzumelden. Was du baust, bleibt auf deinem Rechner.
+layerling ist ein Konstruktionsprogramm für den 3D-Druck, das direkt im Browser läuft, oder lokal installiert werden kann. Du baust ein Teil aus einfachen Formen, schneidest Löcher hinein, rundest die Kanten und schickst es an den Slicer. Es gibt nichts zu installieren und nichts anzumelden. Was du baust, bleibt auf deinem Rechner.
 
 ![Die Startseite von layerling: oben „Neuen 3D-Entwurf anlegen“, darunter die eigenen Entwürfe und die Kurzanleitung.](shot:start-page)
 
