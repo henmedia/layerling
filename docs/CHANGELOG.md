@@ -6,6 +6,8 @@ code still carries it - so a lower number further down is older, not newer.
 
 ## Unreleased
 
+- **16mm scale among the model scales (Discussion #1732):** Scale by percent, Model scale, offers 16mm, 16 mm to the foot or 1:19.05 (the scale SM32 and SM45 narrow gauge is built to), after G; the preset carries the name modellers use. Guide chapter 4 in every language.
+
 - **Tilted bodies show their overall size in space (Discussion #1730):** A tilted body shows its own Length, Width and Height in the properties, with a note saying so, but not how high it stands in space. Below that note there is now a read-only line with the overall size in space (long, wide, high, in the workspace unit), taken from the same box the Align tool measures (`alignBounds`). It is not editable, since changing it would distort a tilted body. Guide chapter 3 in 15 languages, `prop.tiltedOverall` in 15 languages and What's new card.
 
 - **Intersection: the preview closes when nothing is shared (#1729):** The first click on Intersection shows a preview (shapes see-through, button pressed); the second applies it. When the shapes share nothing, the second click only said so and left the preview open, and Esc was the only way out, which a tablet lacks. It now closes the preview and says so (`status.intersectionEmptyClosed` in 15 languages). Esc ends the preview as before, and now also lets go of the focus on the Intersection button, so no frame stays round it after the preview (reported with a picture by the same tester). What's new card.

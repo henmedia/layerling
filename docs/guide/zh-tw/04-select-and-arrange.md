@@ -187,7 +187,7 @@ AI 可以透過 MCP 橋接使用 `layerling_push_face` 完成同樣的事（參�
 
 在 {{ui:scalePercent.percent}} 下，以目前尺寸的百分比輸入新尺寸：120 % 表示放大五分之一，50 % 表示縮小一半。寬度、深度和高度會同樣變化，因此比例保持不變。底部保持在原處，所以不會有東西陷入平台。
 
-做模型時，在頂部選擇 {{ui:scalePercent.by.scale}} 而不是 {{ui:scalePercent.by.percent}}。{{ui:scalePercent.scalePresets}} 列出從 Z（1:220）到 G（1:22.5）的常用比例，在 {{ui:scalePercent.ratio}} 中可以輸入任何其他比例，例如輸入 35 表示 1:35。如果模型是依原物實際尺寸做的，保持 {{ui:scalePercent.original.fullSize}}：1:87 會把它縮小到 1/87。如果你依任意尺寸做的，選擇 {{ui:scalePercent.original.realSize}}，再選 {{ui:scalePercent.axis.height}} 或 {{ui:scalePercent.axis.length}}（平台上最長的一邊），並在 {{ui:scalePercent.realSize}} 中輸入原物的實際大小，單位為公尺（英制單位時為英尺）。一棵實際高 16 公尺的樹，在 H0 中就變成 16000 mm / 87 = 184 mm 高，不論它原本多大。按下 {{ui:scalePercent.apply}} 之前，新尺寸會顯示在欄位下方。只要編輯器開著，比例就會保留。
+做模型時，在頂部選擇 {{ui:scalePercent.by.scale}} 而不是 {{ui:scalePercent.by.percent}}。{{ui:scalePercent.scalePresets}} 列出從 Z（1:220）到 16mm（1:19.05）的常用比例，在 {{ui:scalePercent.ratio}} 中可以輸入任何其他比例，例如輸入 35 表示 1:35。如果模型是依原物實際尺寸做的，保持 {{ui:scalePercent.original.fullSize}}：1:87 會把它縮小到 1/87。如果你依任意尺寸做的，選擇 {{ui:scalePercent.original.realSize}}，再選 {{ui:scalePercent.axis.height}} 或 {{ui:scalePercent.axis.length}}（平台上最長的一邊），並在 {{ui:scalePercent.realSize}} 中輸入原物的實際大小，單位為公尺（英制單位時為英尺）。一棵實際高 16 公尺的樹，在 H0 中就變成 16000 mm / 87 = 184 mm 高，不論它原本多大。按下 {{ui:scalePercent.apply}} 之前，新尺寸會顯示在欄位下方。只要編輯器開著，比例就會保留。
 
 選取多個零件時，可以選擇它們如何增長：
 

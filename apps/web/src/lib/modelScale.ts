@@ -8,7 +8,7 @@ import { SCALE_PERCENT_MAX, SCALE_PERCENT_MIN } from "@/lib/scaleByPercent";
  */
 export type ModelScalePreset = { id: string; label: string; ratio: number };
 
-/** The usual gauges of model railways, smallest first; G is the garden railway's 1:22.5. */
+/** The usual gauges of model railways, smallest first; G is the garden railway's 1:22.5, 16mm the narrow gauge on it. */
 export const MODEL_SCALE_PRESETS: readonly ModelScalePreset[] = [
   { id: "z", label: "Z", ratio: 220 },
   { id: "n", label: "N", ratio: 160 },
@@ -17,6 +17,8 @@ export const MODEL_SCALE_PRESETS: readonly ModelScalePreset[] = [
   { id: "0", label: "0", ratio: 45 },
   { id: "1", label: "1", ratio: 32 },
   { id: "g", label: "G", ratio: 22.5 },
+  // 16 mm to the foot (SM32 and SM45 run on it), 1:19.05; the name is the one the modellers use (Discussion #1732).
+  { id: "16mm", label: "16mm", ratio: 19.05 },
 ];
 
 export const MODEL_SCALE_RATIO_MIN = 1;
