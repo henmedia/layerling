@@ -14,6 +14,19 @@
   },
   {
     "title": {
+      "de": "Symbolschild behält seine Karte nach „Bündel bearbeiten“",
+      "en": "An icon tag keeps its card after Edit Bundle"
+    },
+    "body": {
+      "de": "Wer ein Symbolschild mit „Bündel bearbeiten“ öffnete oder in der Objektliste eine seiner Schichten anklickte, fand nach „Fertig“ nur noch die Eigenschaften eines Bündels: Die Karte mit Schichten, Randbreiten, Höhen und Schlüsselring-Loch war weg. Jetzt bleibt sie. Dasselbe gilt für Namensschilder, QR-Codes und SBC-Platinen.",
+      "en": "Opening an icon tag with Edit Bundle, or clicking one of its layers in the Objects list, left only the bundle's properties after Done: the card with the layers, border widths, heights and key ring hole was gone. Now it stays. The same goes for name tags, QR codes and SBC boards."
+    },
+    "guide": {
+      "section": "iconTag"
+    }
+  },
+  {
+    "title": {
       "de": "Sicherung ohne Speicherfenster: „Stattdessen herunterladen“",
       "en": "Backups without the save dialog: \"Download instead\""
     },
