@@ -6,6 +6,8 @@ code still carries it - so a lower number further down is older, not newer.
 
 ## Unreleased
 
+## 1.162.0
+
 - **A sketched line goes on when switching between straight and smooth (#1725):** in a sketch, switching from Line to Smooth line or Bezier curve, or back, in the middle of a chain started a new line at the next click, because every change of tool forgot the last point drawn. Switching between these three drawing tools now keeps the chain, so the next point joins the last one; any other tool still ends it. Unit test; checked in the editor through headless Edge (two straight points, two smooth, one straight: five points, four segments, one chain). Guide chapter 7 in every language. By @stefaanl in #1725.
 
 - **Align without the Alt key on a tablet (forum):** Alt in Align mode makes the dots match sizes and lets the gap dot take a typed gap, which a tablet cannot do without a keyboard. Beside the dots there is now a switch, **Size mode**, shown wherever a finger or pen is a pointer (CSS `any-pointer: coarse`); it holds the same mode as Alt until it is switched off. A finger or pen no longer undoes a mode set by Alt-less means, and clicking a dot with the switch on stretches parts or opens the gap field like Alt+click. Guide chapter 4 in every language, 2 texts in 20 languages and What's new card.
