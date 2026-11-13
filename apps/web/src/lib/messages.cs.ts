@@ -1324,6 +1324,7 @@ export const MESSAGES_CS: Record<MessageKey, string> = {
   "printCheck.nothing": "Není co kontrolovat: žádné viditelné těleso",
   "printCheck.otherTool": "Nejdřív zavřete otevřený nástroj, pak zkontrolujte tisk.",
   "status.intersectionEmptyKept": "Tvary nemají nic společného, průnik tedy neexistuje. Nic se nezměnilo.",
+  "status.intersectionEmptyClosed": "Tvary nemají nic společného, průnik tedy neexistuje. Náhled je zavřený a nic se nezměnilo.",
   "editor.tool.align": "Zarovnat",
   "editor.tool.mirror": "Zrcadlit",
   "editor.tool.rotationPivot": "Nastavit střed otáčení",

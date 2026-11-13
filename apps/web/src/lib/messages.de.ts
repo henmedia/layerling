@@ -1179,6 +1179,7 @@ export const MESSAGES_DE: Record<MessageKey, string> = {
   "printCheck.nothing": "Nichts zu prüfen: kein sichtbarer Körper",
   "printCheck.otherTool": "Schließe zuerst das offene Werkzeug, dann prüfe den Druck.",
   "status.intersectionEmptyKept": "Die Formen haben nichts gemeinsam, es gibt also keine Schnittmenge. Nichts wurde geändert.",
+  "status.intersectionEmptyClosed": "Die Formen haben nichts gemeinsam, es gibt also keine Schnittmenge. Die Vorschau ist geschlossen, nichts wurde geändert.",
   "editor.tool.align": "Ausrichten",
   "editor.tool.mirror": "Spiegeln",
   "editor.tool.rotationPivot": "Drehpunkt setzen",

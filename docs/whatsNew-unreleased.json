@@ -21,5 +21,15 @@
       "de": "Lehnt der Browser ein großes Design ab, obwohl noch Platz frei ist, speichert layerling es jetzt mit einem kürzeren Rückgängig-Verlauf, statt gar nicht. Ein Hinweis sagt dann, wie viele Schritte behalten wurden.",
       "en": "If the browser refuses a large design although there is room left, layerling now saves it with a shorter undo history instead of not at all. A note then says how many steps were kept."
     }
+  },
+  {
+    "title": {
+      "de": "Schnittmenge: die Vorschau schließt sich, wenn nichts gemeinsam ist",
+      "en": "Intersection: the preview closes when nothing is shared"
+    },
+    "body": {
+      "de": "Teilen die gewählten Formen nichts, schließt der zweite Klick auf „Schnittmenge“ jetzt die Vorschau: Die Formen sind wieder fest, der Knopf nicht mehr gedrückt, und eine Meldung sagt, dass nichts geändert wurde. Vorher blieb die Vorschau offen, und am Tablet gab es ohne Esc keinen Ausweg.",
+      "en": "When the selected shapes share nothing, the second click on Intersection now closes the preview: the shapes are solid again, the button is no longer pressed, and a message says nothing was changed. Before, the preview stayed open, and on a tablet without Esc there was no way out."
+    }
   }
 ]

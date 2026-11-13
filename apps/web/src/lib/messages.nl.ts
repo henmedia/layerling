@@ -1179,6 +1179,7 @@ export const MESSAGES_NL: Record<MessageKey, string> = {
   "printCheck.nothing": "Niets te controleren: geen zichtbaar lichaam",
   "printCheck.otherTool": "Sluit eerst het geopende gereedschap en controleer dan de print.",
   "status.intersectionEmptyKept": "De vormen hebben niets gemeen, dus er is geen doorsnede. Er is niets veranderd.",
+  "status.intersectionEmptyClosed": "De vormen hebben niets gemeen, dus er is geen doorsnede. Het voorbeeld is gesloten en er is niets veranderd.",
   "editor.tool.align": "Uitlijnen",
   "editor.tool.mirror": "Spiegelen",
   "editor.tool.rotationPivot": "Draaipunt instellen",

@@ -1174,6 +1174,7 @@ export const MESSAGES_SV: Partial<Record<MessageKey, string>> = {
   "printCheck.nothing": "Inget att kontrollera: ingen synlig kropp",
   "printCheck.otherTool": "Stäng det öppna verktyget först, kör sedan utskriftskontrollen.",
   "status.intersectionEmptyKept": "Formerna har ingenting gemensamt, så det blir inget snitt. Inget ändrades.",
+  "status.intersectionEmptyClosed": "Formerna har ingenting gemensamt, så det blir inget snitt. Förhandsvisningen är stängd och inget ändrades.",
   "editor.tool.align": "Rikta in",
   "editor.tool.mirror": "Spegla",
   "editor.tool.rotationPivot": "Ange rotationspunkt",

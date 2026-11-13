@@ -1170,6 +1170,7 @@ export const MESSAGES_FR: Partial<Record<MessageKey, string>> = {
   "printCheck.nothing": "Rien à vérifier : aucun corps visible",
   "printCheck.otherTool": "Fermez d'abord l'outil ouvert, puis vérifiez l'impression.",
   "status.intersectionEmptyKept": "Les formes n'ont rien en commun, il n'y a donc pas d'intersection. Rien n'a été modifié.",
+  "status.intersectionEmptyClosed": "Les formes n'ont rien en commun, il n'y a donc pas d'intersection. L'aperçu est fermé et rien n'a été modifié.",
   "editor.tool.align": "Aligner",
   "editor.tool.mirror": "Miroir",
   "editor.tool.rotationPivot": "Définir le pivot de rotation",

@@ -1180,6 +1180,7 @@ export const MESSAGES_EN = {
   "printCheck.nothing": "Nothing to check: no visible body",
   "printCheck.otherTool": "Close the open tool first, then check the print.",
   "status.intersectionEmptyKept": "The shapes share nothing, so there is no intersection. Nothing was changed.",
+  "status.intersectionEmptyClosed": "The shapes share nothing, so there is no intersection. The preview is closed and nothing was changed.",
   "editor.tool.align": "Align",
   "editor.tool.mirror": "Mirror",
   "editor.tool.rotationPivot": "Set rotation pivot",

@@ -1178,6 +1178,7 @@ export const MESSAGES_AR: Partial<Record<MessageKey, string>> = {
   "printCheck.nothing": "لا شيء للفحص: لا يوجد جسم ظاهر",
   "printCheck.otherTool": "أغلق الأداة المفتوحة أولًا، ثم افحص الطباعة.",
   "status.intersectionEmptyKept": "الأشكال لا تشترك في أي شيء، لذا لا يوجد تقاطع. لم يتغير شيء.",
+  "status.intersectionEmptyClosed": "الأشكال لا تشترك في أي شيء، لذا لا يوجد تقاطع. أُغلقت المعاينة ولم يتغير شيء.",
   "editor.tool.align": "محاذاة",
   "editor.tool.mirror": "انعكاس",
   "editor.tool.rotationPivot": "تعيين محور الدوران",

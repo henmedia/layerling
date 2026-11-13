@@ -1136,6 +1136,7 @@ export const MESSAGES_ZH_CN: Partial<Record<MessageKey, string>> = {
   "printCheck.nothing": "没有可检查的：没有可见的实体",
   "printCheck.otherTool": "请先关闭打开的工具，再检查打印。",
   "status.intersectionEmptyKept": "这些形状没有公共部分，因此无交集。未做任何更改。",
+  "status.intersectionEmptyClosed": "这些形状没有公共部分，因此无交集。预览已关闭，未做任何更改。",
   "editor.tool.align": "对齐",
   "editor.tool.mirror": "镜像",
   "editor.tool.rotationPivot": "设置旋转中心",

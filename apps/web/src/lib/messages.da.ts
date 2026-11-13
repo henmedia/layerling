@@ -5557,6 +5557,7 @@ export const MESSAGES_DA: Partial<Record<MessageKey, string>> = {
   "printCheck.nothing": "Intet at tjekke: ingen synlige legemer",
   "printCheck.otherTool": "Luk først det åbne værktøj, og tjek derefter printet.",
   "status.intersectionEmptyKept": "Formerne deler intet, så der er ingen fællesmængde. Intet blev ændret.",
+  "status.intersectionEmptyClosed": "Formerne deler intet, så der er ingen fællesmængde. Forhåndsvisningen er lukket, og intet blev ændret.",
   "status.multicolorNeedsGroup": "Multifarve virker på en gruppe: vælg én først",
   "status.groupPartsShrunk": "\"{name}\" er for lille til nogle af sine dele i deres egen størrelse: de er skrumpet med ({count}).",
   "status.groupStretchedInstead": "\"{name}\" er spejlet, deformeret eller har egne afrundinger, faser eller en overfladestruktur: alt er strakt med.",

@@ -1135,6 +1135,7 @@ export const MESSAGES_PL: Partial<Record<MessageKey, string>> = {
   "printCheck.nothing": "Nie ma czego sprawdzać: brak widocznej bryły",
   "printCheck.otherTool": "Najpierw zamknij otwarte narzędzie, potem sprawdź wydruk.",
   "status.intersectionEmptyKept": "Kształty nie mają nic wspólnego, więc nie ma części wspólnej. Niczego nie zmieniono.",
+  "status.intersectionEmptyClosed": "Kształty nie mają nic wspólnego, więc nie ma części wspólnej. Podgląd został zamknięty i niczego nie zmieniono.",
   "editor.tool.align": "Wyrównaj",
   "editor.tool.mirror": "Odbicie lustrzane",
   "editor.tool.rotationPivot": "Ustaw punkt obrotu",

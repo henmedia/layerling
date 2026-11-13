@@ -5572,4 +5572,5 @@ export const MESSAGES_SL: Partial<Record<MessageKey, string>> = {
   "printCheck.nothing": "Ni česa preveriti: ni vidnega telesa",
   "printCheck.otherTool": "Najprej zaprite odprto orodje, nato preverite tisk.",
   "status.intersectionEmptyKept": "Oblike nimajo nič skupnega, zato preseka ni. Nič se ni spremenilo.",
+  "status.intersectionEmptyClosed": "Oblike nimajo nič skupnega, zato preseka ni. Predogled je zaprt in nič se ni spremenilo.",
 };

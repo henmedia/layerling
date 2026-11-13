@@ -1179,6 +1179,7 @@ export const MESSAGES_RU: Partial<Record<MessageKey, string>> = {
   "printCheck.nothing": "Нечего проверять: нет видимых тел",
   "printCheck.otherTool": "Сначала закройте открытый инструмент, затем проверьте печать.",
   "status.intersectionEmptyKept": "У фигур нет ничего общего, поэтому пересечения нет. Ничего не изменено.",
+  "status.intersectionEmptyClosed": "У фигур нет ничего общего, поэтому пересечения нет. Предпросмотр закрыт, ничего не изменено.",
   "editor.tool.align": "Выровнять",
   "editor.tool.mirror": "Отразить",
   "editor.tool.rotationPivot": "Задать центр вращения",

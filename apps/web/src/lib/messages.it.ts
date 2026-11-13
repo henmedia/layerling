@@ -1172,6 +1172,7 @@ export const MESSAGES_IT: Partial<Record<MessageKey, string>> = {
   "printCheck.nothing": "Niente da controllare: non ci sono solidi visibili",
   "printCheck.otherTool": "Chiudi prima lo strumento aperto, poi controlla la stampa.",
   "status.intersectionEmptyKept": "Le forme non hanno parti in comune, quindi non esiste alcuna intersezione. Non è stata apportata alcuna modifica.",
+  "status.intersectionEmptyClosed": "Le forme non hanno parti in comune, quindi non esiste alcuna intersezione. L'anteprima è chiusa e non è stata apportata alcuna modifica.",
   "editor.tool.align": "Allinea",
   "editor.tool.mirror": "Specchia",
   "editor.tool.rotationPivot": "Imposta il centro di rotazione",

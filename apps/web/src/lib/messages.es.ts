@@ -1182,6 +1182,7 @@ export const MESSAGES_ES: Partial<Record<MessageKey, string>> = {
   "printCheck.nothing": "Nada que comprobar: no hay ningún cuerpo visible",
   "printCheck.otherTool": "Cierra primero la herramienta abierta y luego comprueba la impresión.",
   "status.intersectionEmptyKept": "Las formas no comparten nada, así que no hay intersección. No se ha cambiado nada.",
+  "status.intersectionEmptyClosed": "Las formas no comparten nada, así que no hay intersección. La vista previa se ha cerrado y no se ha cambiado nada.",
   "editor.tool.align": "Alinear",
   "editor.tool.mirror": "Reflejar",
   "editor.tool.rotationPivot": "Fijar el punto de giro",

@@ -11658,7 +11658,10 @@ export function LayerlingEditor({
     const remainingShapes = shapesRef.current.filter((shape) => !operandIds.has(shape.id));
     if (result.empty) {
       // Nothing is shared: the shapes stay, instead of vanishing (#372). Move them over each other, or take one out.
-      setNotice(t("status.intersectionEmptyKept"));
+      // The preview closes with it, so the button does not stay pressed and the shapes do not stay see-through (#1729).
+      const wasPreview = Boolean(intersectPreviewIdsRef.current);
+      if (wasPreview) exitIntersectPreview();
+      setNotice(t(wasPreview ? "status.intersectionEmptyClosed" : "status.intersectionEmptyKept"));
       return;
     }
 
