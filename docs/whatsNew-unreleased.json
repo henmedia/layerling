@@ -1,6 +1,19 @@
 [
   {
     "title": {
+      "de": "Meldung nach jedem Schritt abschaltbar",
+      "en": "The message after each step can be switched off"
+    },
+    "body": {
+      "de": "Nach einem Schritt wie Vereinen sagt eine kurze Meldung neben dem Ansichtswürfel, was geschehen ist, und bietet Rückgängig an. Wer sie nicht braucht, schaltet sie in den Einstellungen unter „Darstellung: die Ansicht“ mit „Nach jedem Schritt eine Meldung zeigen“ ab. Meldungen, die etwas von dir wollen oder ein Problem melden, erscheinen weiter, und Rückgängig im Menüband nennt den Schritt, wenn du darauf zeigst.",
+      "en": "After a step such as a union, a short message beside the view cube says what was done and offers Undo. If you don't need it, switch it off in the settings under \"Appearance: the view\" with \"Show a message after each step\". Messages that want something from you or report a problem still appear, and Undo in the ribbon names the step when you point at it."
+    },
+    "guide": {
+      "section": "settingsView"
+    }
+  },
+  {
+    "title": {
       "de": "Strecken: eine Gruppe bleibt eine Gruppe",
       "en": "Stretch: a group stays a group"
     },

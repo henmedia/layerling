@@ -4846,6 +4846,8 @@ export const MESSAGES_AR: Partial<Record<MessageKey, string>> = {
   "workspace.startWithScrollbars": "بدء المحرر مع أشرطة التمرير",
   "workspace.viewBarOpensOnHover": "فتح شريط العرض عند المرور بالمؤشر",
   "workspace.viewBarOpensOnHoverHint": "يُفتح شريط العرض المطوي ما دام المؤشر فوق سهمه، ويُطوى مجددًا عندما يغادره المؤشر. النقر على السهم يبقيه مفتوحًا.",
+  "workspace.showStepNotices": "إظهار رسالة بعد كل خطوة",
+  "workspace.showStepNoticesHint": "الرسالة القصيرة بجانب مكعب العرض بعد خطوة مثل الدمج، مع زر التراجع الخاص بها. أوقفها إذا كانت تزعجك؛ تظل الرسائل التي تطلب منك شيئًا أو تبلّغ عن مشكلة تظهر، ويظل زر التراجع في الشريط يذكر الخطوة عند الإشارة إليه.",
   "workspace.startView": "عرض البداية",
   "workspace.startViewHint": "الزاوية التي تُفتح بها التصاميم الجديدة ويعود إليها زر «المشهد كاملًا». أدِر العرض كما تحب ثم استخدم العرض الحالي. ينطبق على كل التصاميم في هذا المتصفح.",
   "workspace.startViewUseCurrent": "استخدام العرض الحالي",

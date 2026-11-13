@@ -24,7 +24,7 @@ Alla dina designer visas senare på startsidan med en förhandsgranskningsbild. 
 - **Till höger** visas **egenskapspanelen** för den markerade formen: färg, mått, position och allt annat som hör till formen. Att skriva in siffror är mer exakt än att dra.
 - **Till vänster** finns **vyfältet** med **vykuben** ovanför. De flyttar dig runt i scenen, läs mer i [Vy och arbetsyta](chapter:view-and-workplane).
 - **Bredvid vyfältet** öppnas **objektlistan** ([[Ctrl]]+[[U]]) med alla former i designen. Mer om det i [Markera och ordna](chapter:select-and-arrange).
-- **Till höger om vykuben** visas **statusmeddelandet** när layerling har något att tala om, till exempel vad ett verktyg väntar på härnäst. När inget finns att meddela syns rutan inte.
+- **Till höger om vykuben** visas **statusmeddelandet** när layerling har något att tala om, till exempel vad ett verktyg väntar på härnäst. När inget finns att meddela syns rutan inte. Efter ett steg som en förening säger det kort vad som gjordes och erbjuder {{ui:shortcuts.undo}}; {{ui:workspace.showStepNotices}} i inställningarna stänger av dessa meddelanden.
 - **Verktygsfönster** öppnas över arbetsytan när du startar ett verktyg som avrunda, mönster eller gröpa ur. Dra dem åt sidan i rubrikraden om de skymmer något.
 - **Längst upp** växlar du mellan {{ui:editor.modeGeometry}} och {{ui:editor.modeSketch}}, byter namn på designen och väljer språk och färgtema.
 

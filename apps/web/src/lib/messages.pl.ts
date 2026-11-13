@@ -4843,6 +4843,8 @@ export const MESSAGES_PL: Partial<Record<MessageKey, string>> = {
   "workspace.startWithScrollbars": "Uruchamiaj edytor z paskami przewijania",
   "workspace.viewBarOpensOnHover": "Otwieraj pasek widoku po najechaniu myszą",
   "workspace.viewBarOpensOnHoverHint": "Zwinięty pasek widoku otwiera się, gdy mysz jest nad jego strzałką, i zwija się ponownie, gdy mysz go opuści. Kliknięcie strzałki pozostawia go otwartym.",
+  "workspace.showStepNotices": "Pokazuj komunikat po każdym kroku",
+  "workspace.showStepNoticesHint": "Krótki komunikat obok kostki widoku po kroku takim jak połączenie, z przyciskiem Cofnij. Wyłącz, jeśli przeszkadza; komunikaty, które czegoś od ciebie chcą lub zgłaszają problem, nadal się pojawiają, a Cofnij na wstążce nadal podaje krok po najechaniu.",
   "workspace.startView": "Widok startowy",
   "workspace.startViewHint": "Kąt, w jakim otwierają się nowe projekty i do którego wraca Widok początkowy. Obróć widok tak, jak lubisz, a potem użyj bieżącego widoku. Dotyczy wszystkich projektów w tej przeglądarce.",
   "workspace.startViewUseCurrent": "Użyj bieżącego widoku",

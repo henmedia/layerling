@@ -4838,6 +4838,8 @@ export const MESSAGES_NL: Record<MessageKey, string> = {
   "workspace.startWithScrollbars": "Editor starten met schuifbalken",
   "workspace.viewBarOpensOnHover": "Weergavebalk openen bij aanwijzen",
   "workspace.viewBarOpensOnHoverHint": "Een ingeklapte weergavebalk klapt open zolang de muis boven zijn pijl is en klapt weer in als de muis hem verlaat. Een klik op de pijl houdt hem open.",
+  "workspace.showStepNotices": "Na elke stap een melding tonen",
+  "workspace.showStepNoticesHint": "De korte melding naast de weergavekubus na een stap zoals samenvoegen, met de knop Ongedaan maken. Zet uit als hij in de weg zit; meldingen die iets van je vragen of een probleem melden verschijnen nog steeds, en Ongedaan maken in het lint noemt de stap nog als je erop wijst.",
   "workspace.startView": "Startweergave",
   "workspace.startViewHint": "De hoek waarin nieuwe ontwerpen openen en waar Startpositie naar terugkeert. Draai de weergave zoals je wilt en neem dan de huidige weergave. Geldt voor alle ontwerpen in deze browser.",
   "workspace.startViewUseCurrent": "Huidige weergave nemen",

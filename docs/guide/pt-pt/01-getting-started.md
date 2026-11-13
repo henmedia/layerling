@@ -24,7 +24,7 @@ Todos os teus projetos aparecem depois na página inicial com uma imagem de pré
 - **À direita** aparecem as **propriedades** da forma selecionada: cor, dimensões, posição e tudo o resto. Introduzir valores numéricos é mais preciso do que arrastar.
 - **À esquerda** está a **barra de vista**, com o **cubo de vista** por cima. Permitem navegar pela cena. Mais informações em [Vista e plano de trabalho](chapter:view-and-workplane).
 - **Ao lado da barra de vista** abre-se a **lista de objetos** ([[Ctrl]]+[[U]]), com todas as formas do projeto.
-- **À direita do cubo de vista** aparece a **mensagem de estado** quando o layerling tem algo para te dizer, por exemplo o que uma ferramenta espera de ti. Quando não há nada a dizer, não aparece.
+- **À direita do cubo de vista** aparece a **mensagem de estado** quando o layerling tem algo para te dizer, por exemplo o que uma ferramenta espera de ti. Quando não há nada a dizer, não aparece. Após um passo como uma união, diz brevemente o que foi feito e oferece {{ui:shortcuts.undo}}; {{ui:workspace.showStepNotices}} nas definições desativa estas mensagens.
 - As **janelas de ferramentas** abrem-se sobre o plano de trabalho quando inicias uma ferramenta como {{ui:editor.tool.fillet}}, {{ui:editor.tool.array}} ou {{ui:editor.tool.hollow}}. Arrasta-as pela barra de título quando taparem alguma coisa.
 - **Na barra superior** podes alternar entre {{ui:editor.modeGeometry}} e {{ui:editor.modeSketch}}, mudar o nome do projeto e escolher o idioma e o esquema de cores.
 

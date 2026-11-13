@@ -4823,6 +4823,8 @@ export const MESSAGES_IT: Partial<Record<MessageKey, string>> = {
   "workspace.startWithScrollbars": "Avvia l'editor con le barre di scorrimento",
   "workspace.viewBarOpensOnHover": "Apri la barra della vista al passaggio del mouse",
   "workspace.viewBarOpensOnHoverHint": "Una barra della vista chiusa si apre mentre il mouse è sulla sua freccia e si richiude quando il mouse la lascia. Un clic sulla freccia la tiene aperta.",
+  "workspace.showStepNotices": "Mostra un messaggio dopo ogni passo",
+  "workspace.showStepNoticesHint": "Il breve messaggio accanto al cubo di vista dopo un passo come un'unione, con il suo pulsante Annulla. Disattivalo se dà fastidio; i messaggi che ti chiedono qualcosa o segnalano un problema compaiono comunque, e Annulla nella barra multifunzione indica ancora il passo quando ci passi sopra.",
   "workspace.startView": "Vista di avvio",
   "workspace.startViewHint": "L’angolazione in cui si aprono i nuovi progetti e a cui torna Vista iniziale. Ruota la vista come preferisci, poi usa la vista attuale. Vale per tutti i progetti in questo browser.",
   "workspace.startViewUseCurrent": "Usa la vista attuale",

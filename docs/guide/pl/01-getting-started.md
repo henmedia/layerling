@@ -24,7 +24,7 @@ Wszystkie Twoje projekty pojawiają się potem na stronie startowej z obrazkiem 
 - **Po prawej** pojawiają się **właściwości** zaznaczonego kształtu: kolor, wymiary, pozycja i wszystko inne, co go tworzy. Wpisywanie liczb jest dokładniejsze niż przeciąganie.
 - **Po lewej** jest **pasek widoku**, a nad nim **kostka widoku**. Służą do poruszania się po scenie, więcej w rozdziale [Widok i płaszczyzna robocza](chapter:view-and-workplane).
 - **Obok paska widoku** otwiera się **lista obiektów** ([[Ctrl]]+[[U]]) ze wszystkimi kształtami projektu. Więcej w rozdziale [Zaznaczanie i rozmieszczanie](chapter:select-and-arrange).
-- **Na prawo od kostki widoku** pojawia się **komunikat stanu**, gdy layerling ma ci coś do powiedzenia, na przykład czego narzędzie od ciebie oczekuje. Gdy nie ma nic do powiedzenia, nie ma go.
+- **Na prawo od kostki widoku** pojawia się **komunikat stanu**, gdy layerling ma ci coś do powiedzenia, na przykład czego narzędzie od ciebie oczekuje. Gdy nie ma nic do powiedzenia, nie ma go. Po kroku takim jak połączenie krótko mówi, co zrobiono, i proponuje {{ui:shortcuts.undo}}; {{ui:workspace.showStepNotices}} w ustawieniach wyłącza te komunikaty.
 - **Okna narzędzi** otwierają się nad płaszczyzną roboczą, gdy uruchamiasz narzędzie takie jak {{ui:editor.tool.fillet}}, {{ui:editor.tool.array}} albo {{ui:editor.tool.hollow}}. Gdy coś zasłaniają, odsuń je za pasek tytułu.
 - **Na samej górze** przełączasz między {{ui:editor.modeGeometry}} a {{ui:editor.modeSketch}}, zmieniasz nazwę projektu oraz wybierasz język i motyw kolorów.
 

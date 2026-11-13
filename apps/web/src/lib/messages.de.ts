@@ -4837,6 +4837,8 @@ export const MESSAGES_DE: Record<MessageKey, string> = {
   "workspace.startWithScrollbars": "Editor mit Bildlaufleisten starten",
   "workspace.viewBarOpensOnHover": "Ansichtsleiste beim Darüberfahren öffnen",
   "workspace.viewBarOpensOnHoverHint": "Eine eingeklappte Ansichtsleiste klappt auf, solange die Maus über ihrem Pfeil ist, und wieder zu, wenn die Maus sie verlässt. Ein Klick auf den Pfeil lässt sie offen.",
+  "workspace.showStepNotices": "Nach jedem Schritt eine Meldung zeigen",
+  "workspace.showStepNoticesHint": "Die kurze Meldung neben dem Ansichtswürfel nach einem Schritt wie Vereinen, mit ihrem Knopf Rückgängig. Ausschalten, wenn sie stört; Meldungen, die etwas von dir wollen oder ein Problem melden, erscheinen weiter, und Rückgängig in der Werkzeugleiste nennt den Schritt weiterhin, wenn du darauf zeigst.",
   "workspace.startView": "Startansicht",
   "workspace.startViewHint": "Der Blickwinkel, in dem neue Entwürfe öffnen und zu dem die Ausgangsansicht zurückkehrt. Dreh die Ansicht, wie du sie magst, und übernimm dann die aktuelle Ansicht. Gilt für alle Entwürfe in diesem Browser.",
   "workspace.startViewUseCurrent": "Aktuelle Ansicht nehmen",

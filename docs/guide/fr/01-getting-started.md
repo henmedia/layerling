@@ -24,7 +24,7 @@ Tous vos designs apparaissent ensuite sur la page d'accueil avec une image d'ape
 - **À droite** apparaissent les **propriétés** de la forme sélectionnée : couleur, dimensions, position et tout ce qui compose la forme. Saisir des valeurs numériques est plus précis que de glisser à la souris.
 - **À gauche** se trouve la **barre de vue**, surmontée du **cube de vue**. Elles permettent de se déplacer dans la scène, voir plus en détail dans [Vue et plan de travail](chapter:view-and-workplane).
 - **À côté de la barre de vue** s'ouvre la **liste des objets** ([[Ctrl]]+[[U]]), avec toutes les formes du design. Plus de détails dans [Choisir et organiser](chapter:select-and-arrange).
-- **À droite du cube de vue** apparaît le **message d'état** quand layerling a quelque chose à vous dire, par exemple ce qu'un outil attend de vous. Quand il n'y a rien à dire, il n'est pas là.
+- **À droite du cube de vue** apparaît le **message d'état** quand layerling a quelque chose à vous dire, par exemple ce qu'un outil attend de vous. Quand il n'y a rien à dire, il n'est pas là. Après une étape comme une union, il dit brièvement ce qui a été fait et propose {{ui:shortcuts.undo}} ; {{ui:workspace.showStepNotices}} dans les paramètres désactive ces messages.
 - Les **fenêtres d'outils** s'ouvrent au-dessus du plan de travail quand vous lancez un outil comme {{ui:editor.tool.fillet}}, {{ui:editor.tool.array}} ou {{ui:editor.tool.hollow}}. Écartez-les par leur barre de titre quand elles cachent quelque chose.
 - **Tout en haut**, vous basculez entre {{ui:editor.modeGeometry}} et {{ui:editor.modeSketch}}, renommez le design et choisissez la langue et le thème visuel.
 

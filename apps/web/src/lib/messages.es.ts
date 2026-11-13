@@ -4840,6 +4840,8 @@ export const MESSAGES_ES: Partial<Record<MessageKey, string>> = {
   "workspace.startWithScrollbars": "Abrir el editor con barras de desplazamiento",
   "workspace.viewBarOpensOnHover": "Abrir la barra de vista al pasar el ratón",
   "workspace.viewBarOpensOnHoverHint": "Una barra de vista plegada se abre mientras el ratón está sobre su flecha y se vuelve a plegar cuando el ratón sale de ella. Un clic en la flecha la deja abierta.",
+  "workspace.showStepNotices": "Mostrar un mensaje tras cada paso",
+  "workspace.showStepNoticesHint": "El mensaje breve junto al cubo de vista tras un paso como una unión, con su botón Deshacer. Desactívalo si estorba; los mensajes que te piden algo o informan de un problema siguen apareciendo, y Deshacer en la cinta sigue nombrando el paso al señalarlo.",
   "workspace.startView": "Vista de arranque",
   "workspace.startViewHint": "El ángulo en que se abren los diseños nuevos y al que vuelve Vista inicial. Gira la vista como te guste y luego usa la vista actual. Vale para todos los diseños de este navegador.",
   "workspace.startViewUseCurrent": "Usar la vista actual",

@@ -4838,6 +4838,8 @@ export const MESSAGES_EN = {
   "workspace.startWithScrollbars": "Start editor with scrollbars",
   "workspace.viewBarOpensOnHover": "Open the view bar on hover",
   "workspace.viewBarOpensOnHoverHint": "A folded view bar opens while the mouse is over its arrow and folds again when the mouse leaves it. A click on the arrow keeps it open.",
+  "workspace.showStepNotices": "Show a message after each step",
+  "workspace.showStepNoticesHint": "The short message beside the view cube after a step such as a union, with its Undo button. Switch off if it gets in the way; messages that want something from you or report a problem still appear, and Undo in the ribbon still names the step when you point at it.",
   "workspace.startView": "Start view",
   "workspace.startViewHint": "The angle new designs open in and Home goes back to. Turn the view the way you like it, then use the current view. Applies to every design in this browser.",
   "workspace.startViewUseCurrent": "Use current view",

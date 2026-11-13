@@ -84,6 +84,11 @@ describe("workplane settings helpers", () => {
     expect(normalizeWorkspaceSettings({}).showSlideArrows).toBe(true);
     expect(normalizeWorkspaceSettings({ showSlideArrows: false }).showSlideArrows).toBe(false);
     expect(normalizeWorkspaceSettings({ showSlideArrows: "no" }).showSlideArrows).toBe(true);
+    // The message after each step can be switched off (Discussion #1708); older settings keep it.
+    expect(DEFAULT_WORKPLANE_WORKSPACE.showStepNotices).toBe(true);
+    expect(normalizeWorkspaceSettings({}).showStepNotices).toBe(true);
+    expect(normalizeWorkspaceSettings({ showStepNotices: false }).showStepNotices).toBe(false);
+    expect(normalizeWorkspaceSettings({ showStepNotices: "no" }).showStepNotices).toBe(true);
     expect(DEFAULT_WORKPLANE_WORKSPACE.startWithScrollbars).toBe(false);
     expect(normalizeWorkspaceSettings({ startWithScrollbars: true }).startWithScrollbars).toBe(true);
     expect(normalizeWorkspaceSettings({ startWithScrollbars: "yes" }).startWithScrollbars).toBe(false);

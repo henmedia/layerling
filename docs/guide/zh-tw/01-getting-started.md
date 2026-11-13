@@ -24,7 +24,7 @@ layerling 是一款直接在瀏覽器中執行的 3D 列印設計程式。你用
 - **右側**會顯示所選形狀的**屬性**：顏色、尺寸、位置，以及構成該形狀的其他內容。輸入數字比拖曳更精確。
 - **左側**是檢視列，上方是視圖立方體。它們帶你在場景中移動，詳見[視圖與工作平面](chapter:view-and-workplane)。
 - **檢視列旁邊**會開啟**物件清單**（[[Ctrl]]+[[U]]），列出設計中的所有形狀。詳見[選取與排列](chapter:select-and-arrange)。
-- **視圖立方體右側**會出現**狀態訊息**，在 layerling 有話要告訴你時顯示，例如某個工具正等著你做什麼。沒有要說的，它就不出現。
+- **視圖立方體右側**會出現**狀態訊息**，在 layerling 有話要告訴你時顯示，例如某個工具正等著你做什麼。沒有要說的，它就不出現。 在合併等步驟之後，它會簡要說明剛才做了什麼，並提供{{ui:shortcuts.undo}}；在設定中關閉{{ui:workspace.showStepNotices}}即可不再顯示這些提示。
 - 啟動 {{ui:editor.tool.fillet}}、{{ui:editor.tool.array}} 或 {{ui:editor.tool.hollow}} 等工具時，**工具視窗**會在工作平面上方開啟。擋住內容時，拖曳標題列把它移開。
 - **最上方**可以切換 {{ui:editor.modeGeometry}} 與 {{ui:editor.modeSketch}}、重新命名設計，並選擇語言與配色方案。
 

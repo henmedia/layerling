@@ -24,7 +24,7 @@ Al je ontwerpen verschijnen later op de startpagina met een voorbeeldafbeelding.
 - **Rechts** verschijnen de **eigenschappen** van de geselecteerde vorm: kleur, afmetingen, positie en wat de vorm verder bepaalt. Getallen typen is nauwkeuriger dan slepen.
 - **Links** staat de weergavebalk, met de weergavekubus erboven. Daarmee beweeg je door de scène, meer daarover in [Weergave en werkvlak](chapter:weergave-en-werkvlak).
 - **Naast de weergavebalk** gaat de **objectenlijst** open ([[Ctrl]]+[[U]]), met alle vormen van het ontwerp. Meer in [Selecteren en schikken](chapter:selecteren-en-schikken).
-- **Rechts van de weergavekubus** verschijnt de **statusmelding** als layerling je iets te zeggen heeft, bijvoorbeeld wat een gereedschap van je verwacht. Is er niets te zeggen, dan is ze er niet.
+- **Rechts van de weergavekubus** verschijnt de **statusmelding** als layerling je iets te zeggen heeft, bijvoorbeeld wat een gereedschap van je verwacht. Is er niets te zeggen, dan is ze er niet. Na een stap zoals samenvoegen zegt ze kort wat er gebeurd is en biedt {{ui:shortcuts.undo}} aan; {{ui:workspace.showStepNotices}} in de instellingen zet deze meldingen uit.
 - **Gereedschapsvensters** gaan open boven het werkvlak als je een gereedschap start, zoals {{ui:editor.tool.fillet}}, {{ui:editor.tool.array}} of {{ui:editor.tool.hollow}}. Schuif ze aan hun titelbalk opzij als ze iets bedekken.
 - **Helemaal bovenaan** wissel je tussen {{ui:editor.modeGeometry}} en {{ui:editor.modeSketch}}, geef je het ontwerp een andere naam en kies je taal en kleurenschema.
 

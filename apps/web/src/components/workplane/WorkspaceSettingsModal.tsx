@@ -1015,6 +1015,12 @@ export function WorkspaceSettingsModal({
                     checked={workspace.viewBarOpensOnHover}
                     onChange={(viewBarOpensOnHover) => patchWorkspace({ viewBarOpensOnHover })}
                   />
+                  <WorkspaceToggle
+                    label={t("workspace.showStepNotices")}
+                    description={t("workspace.showStepNoticesHint")}
+                    checked={workspace.showStepNotices}
+                    onChange={(showStepNotices) => patchWorkspace({ showStepNotices })}
+                  />
                   <div className="workspace-reset-row" data-help={t("workspace.startViewHint")}>
                     <span>{t("workspace.startView")}</span>
                     <div className="property-defaults-actions">

@@ -4627,6 +4627,8 @@ export const MESSAGES_DA: Partial<Record<MessageKey, string>> = {
   "workspace.startWithScrollbars": "Start editoren med rullebjælker",
   "workspace.viewBarOpensOnHover": "Åbn visningsbjælken, når musen holdes over den",
   "workspace.viewBarOpensOnHoverHint": "En foldet visningsbjælke åbner, mens musen er over dens pil, og folder sammen igen, når musen forlader den. Et klik på pilen holder den åben.",
+  "workspace.showStepNotices": "Vis en besked efter hvert trin",
+  "workspace.showStepNoticesHint": "Den korte besked ved siden af visningsterningen efter et trin som en forening, med dens Fortryd-knap. Slå fra, hvis den er i vejen; beskeder, der vil have noget af dig eller melder et problem, vises stadig, og Fortryd i båndet nævner stadig trinnet, når du peger på det.",
   "workspace.startView": "Startvisning",
   "workspace.startViewHint": "Den vinkel nye designs åbner i, og som Hjem vender tilbage til. Drej visningen, som du kan lide den, og brug så den aktuelle visning. Gælder alle designs i denne browser.",
   "workspace.startViewUseCurrent": "Brug aktuel visning",
