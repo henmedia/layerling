@@ -3945,7 +3945,7 @@ export const MESSAGES_DA: Partial<Record<MessageKey, string>> = {
   "hinge.leafRaisedHint": "Det andet blad ligger højere, så det lukket ligger fladt på det første med frirummet imellem, og hængslet kan foldes et godt stykke forbi fladt. Print det med support under det hævede blad.",
   "hinge.styleLiftOff": "Aftagelig",
   "hinge.styleLiftOffHint": "To led: det nederste bærer stiften helt ud, det øverste er en bøsning, der løftes af den. Adskil dele giver de to dele; for at printe dem stående sættes delen med stiften på sit led og den anden på sin bøsning.",
-  "hinge.styleSnap": "Klik på",
+  "hinge.styleSnap": "Med clips",
   "hinge.styleSnapHint": "Det ene blads led bærer stiften, det andet blads led er clips, der er åbne foroven og lidt smallere end stiften. Adskil dele giver de to halvdele; hver printes fladt liggende uden support. Læg så halvdelen med clipsene over stiften, som om hængslet var lukket, og tryk, til den klikker på plads; derefter drejer den frit.",
   "prop.hingeSnapGrip": "Clipsgreb",
   "prop.hingeSnapGripHint": "Hvor meget smallere clipsenes åbning er end stiften. Nu {opening} mm til en stift på {pin} mm. Mere holder fastere, men kræver mere kraft at klikke på.",
