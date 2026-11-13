@@ -554,6 +554,13 @@ export function normalizeShapeCustomizations(value: unknown, fallback: ShapeCust
       entry.gridfinityPaddingFront = optionalShapeNumber(source.gridfinityPaddingFront, fallbackEntry?.gridfinityPaddingFront, 0, MAX_CUSTOM_SHAPE_DIMENSION);
       entry.gridfinityPaddingLeft = optionalShapeNumber(source.gridfinityPaddingLeft, fallbackEntry?.gridfinityPaddingLeft, 0, MAX_CUSTOM_SHAPE_DIMENSION);
       entry.gridfinityPaddingRight = optionalShapeNumber(source.gridfinityPaddingRight, fallbackEntry?.gridfinityPaddingRight, 0, MAX_CUSTOM_SHAPE_DIMENSION);
+      entry.gridfinityOverhangBack = optionalShapeNumber(source.gridfinityOverhangBack, fallbackEntry?.gridfinityOverhangBack, 0, MAX_CUSTOM_SHAPE_DIMENSION);
+      entry.gridfinityOverhangFront = optionalShapeNumber(source.gridfinityOverhangFront, fallbackEntry?.gridfinityOverhangFront, 0, MAX_CUSTOM_SHAPE_DIMENSION);
+      entry.gridfinityOverhangLeft = optionalShapeNumber(source.gridfinityOverhangLeft, fallbackEntry?.gridfinityOverhangLeft, 0, MAX_CUSTOM_SHAPE_DIMENSION);
+      entry.gridfinityOverhangRight = optionalShapeNumber(source.gridfinityOverhangRight, fallbackEntry?.gridfinityOverhangRight, 0, MAX_CUSTOM_SHAPE_DIMENSION);
+      entry.gridfinityOverhangChamfer = optionalShapeNumber(source.gridfinityOverhangChamfer, fallbackEntry?.gridfinityOverhangChamfer, 0, MAX_CUSTOM_SHAPE_DIMENSION);
+      entry.gridfinityOverhangSolid = typeof source.gridfinityOverhangSolid === "boolean" ? source.gridfinityOverhangSolid : fallbackEntry?.gridfinityOverhangSolid;
+      entry.gridfinityOverhangLipOnGrid = typeof source.gridfinityOverhangLipOnGrid === "boolean" ? source.gridfinityOverhangLipOnGrid : fallbackEntry?.gridfinityOverhangLipOnGrid;
       entry.gridfinityCornerRadius = optionalShapeNumber(source.gridfinityCornerRadius, fallbackEntry?.gridfinityCornerRadius, 0, MAX_CUSTOM_SHAPE_DIMENSION);
       entry.gridfinityBinCornerRadius = optionalShapeNumber(source.gridfinityBinCornerRadius, fallbackEntry?.gridfinityBinCornerRadius, 0, MAX_CUSTOM_SHAPE_DIMENSION);
       entry.gridfinityCompartmentsX = optionalShapeNumber(source.gridfinityCompartmentsX, fallbackEntry?.gridfinityCompartmentsX, 1, MAX_CUSTOM_SHAPE_DIMENSION, true);

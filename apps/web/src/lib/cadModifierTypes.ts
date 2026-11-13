@@ -415,6 +415,13 @@ export type CadModifierGridfinityPart = {
   gridfinityPaddingFront?: number;
   gridfinityPaddingLeft?: number;
   gridfinityPaddingRight?: number;
+  gridfinityOverhangBack?: number;
+  gridfinityOverhangFront?: number;
+  gridfinityOverhangLeft?: number;
+  gridfinityOverhangRight?: number;
+  gridfinityOverhangChamfer?: number;
+  gridfinityOverhangSolid?: boolean;
+  gridfinityOverhangLipOnGrid?: boolean;
   gridfinityCornerRadius?: number;
   gridfinityBinCornerRadius?: number;
   gridfinityCompartmentsX?: number;

@@ -170,7 +170,7 @@ import {
   normalizeHingeScrewHoles,
   normalizeHingeSnapGrip,
 } from "@/lib/hingeGeometry";
-import { DEFAULT_GRIDFINITY_LIP, DEFAULT_GRIDFINITY_MAGNETS, DEFAULT_GRIDFINITY_TRAY_SIZE, DEFAULT_GRIDFINITY_TYPE, DEFAULT_GRIDFINITY_UNITS, gridfinityFootprintPatch, gridfinityPadding, gridfinitySize, normalizeGridfinityType } from "@/lib/gridfinityGeometry";
+import { DEFAULT_GRIDFINITY_LIP, DEFAULT_GRIDFINITY_MAGNETS, DEFAULT_GRIDFINITY_TRAY_SIZE, DEFAULT_GRIDFINITY_TYPE, DEFAULT_GRIDFINITY_UNITS, gridfinityFootprintPatch, gridfinityGrowth, gridfinityPadding, gridfinitySize, normalizeGridfinityType } from "@/lib/gridfinityGeometry";
 import {
   DEFAULT_KNURL_ANGLE,
   DEFAULT_KNURL_CHAMFER,
@@ -902,6 +902,13 @@ export function sceneShape(shape: Partial<WorkplaneShape> & Pick<WorkplaneShape,
     gridfinityPaddingFront: shape.gridfinityPaddingFront,
     gridfinityPaddingLeft: shape.gridfinityPaddingLeft,
     gridfinityPaddingRight: shape.gridfinityPaddingRight,
+    gridfinityOverhangBack: shape.gridfinityOverhangBack,
+    gridfinityOverhangFront: shape.gridfinityOverhangFront,
+    gridfinityOverhangLeft: shape.gridfinityOverhangLeft,
+    gridfinityOverhangRight: shape.gridfinityOverhangRight,
+    gridfinityOverhangChamfer: shape.gridfinityOverhangChamfer,
+    gridfinityOverhangSolid: shape.gridfinityOverhangSolid,
+    gridfinityOverhangLipOnGrid: shape.gridfinityOverhangLipOnGrid,
     gridfinityCornerRadius: shape.gridfinityCornerRadius,
     gridfinityBinCornerRadius: shape.gridfinityBinCornerRadius,
     gridfinityCompartmentsX: shape.gridfinityCompartmentsX,
@@ -1090,8 +1097,16 @@ export function makeShapeFromAsset(
     gridfinityPaddingFront: customization.gridfinityPaddingFront,
     gridfinityPaddingLeft: customization.gridfinityPaddingLeft,
     gridfinityPaddingRight: customization.gridfinityPaddingRight,
+    gridfinityOverhangBack: customization.gridfinityOverhangBack,
+    gridfinityOverhangFront: customization.gridfinityOverhangFront,
+    gridfinityOverhangLeft: customization.gridfinityOverhangLeft,
+    gridfinityOverhangRight: customization.gridfinityOverhangRight,
+    gridfinityOverhangChamfer: customization.gridfinityOverhangChamfer,
+    gridfinityOverhangSolid: customization.gridfinityOverhangSolid,
+    gridfinityOverhangLipOnGrid: customization.gridfinityOverhangLipOnGrid,
   };
-  const gridfinityPaddingSize = gridfinityPadding(gridfinityPaddingFields);
+  // An overhung bin's overhang likewise (gridfinityGrowth).
+  const gridfinityPaddingSize = gridfinityGrowth(gridfinityPaddingFields);
   // A new tray (#837) has a tray's size, not the bin's.
   const gridfinityDefaults = normalizeGridfinityType(customization.gridfinityType) === "tray" ? DEFAULT_GRIDFINITY_TRAY_SIZE : defaults;
   const gridfinityFootprint = asset.kind === "gridfinity" ? gridfinityFootprintPatch({
@@ -1328,6 +1343,13 @@ export function makeShapeFromAsset(
     gridfinityPaddingFront: asset.kind === "gridfinity" ? customization.gridfinityPaddingFront : undefined,
     gridfinityPaddingLeft: asset.kind === "gridfinity" ? customization.gridfinityPaddingLeft : undefined,
     gridfinityPaddingRight: asset.kind === "gridfinity" ? customization.gridfinityPaddingRight : undefined,
+    gridfinityOverhangBack: asset.kind === "gridfinity" ? customization.gridfinityOverhangBack : undefined,
+    gridfinityOverhangFront: asset.kind === "gridfinity" ? customization.gridfinityOverhangFront : undefined,
+    gridfinityOverhangLeft: asset.kind === "gridfinity" ? customization.gridfinityOverhangLeft : undefined,
+    gridfinityOverhangRight: asset.kind === "gridfinity" ? customization.gridfinityOverhangRight : undefined,
+    gridfinityOverhangChamfer: asset.kind === "gridfinity" ? customization.gridfinityOverhangChamfer : undefined,
+    gridfinityOverhangSolid: asset.kind === "gridfinity" ? customization.gridfinityOverhangSolid : undefined,
+    gridfinityOverhangLipOnGrid: asset.kind === "gridfinity" ? customization.gridfinityOverhangLipOnGrid : undefined,
     gridfinityCornerRadius: asset.kind === "gridfinity" ? customization.gridfinityCornerRadius : undefined,
     gridfinityBinCornerRadius: asset.kind === "gridfinity" ? customization.gridfinityBinCornerRadius : undefined,
     gridfinityCompartmentsX: asset.kind === "gridfinity" ? customization.gridfinityCompartmentsX : undefined,

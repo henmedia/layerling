@@ -1,6 +1,6 @@
 import { beforeAll, describe, expect, it, vi } from "vitest";
 import { cadModifierGridfinityForShape } from "@/lib/cadProfileExtrusion";
-import { GRIDFINITY_LABEL_TEXT_HEIGHT, gridfinityLabelledTriangles, gridfinityLabelTextPlaces } from "@/lib/gridfinityGeometry";
+import { GRIDFINITY_LABEL_TEXT_HEIGHT, gridfinityLabelledTriangles, gridfinityLabelTextPlaces, gridfinityPlan } from "@/lib/gridfinityGeometry";
 import { gridfinityLabelLetters } from "@/lib/gridfinityLabelText";
 import { gridfinityPartSolid } from "@/lib/gridfinitySolid";
 import { rememberManifoldRuntime } from "@/lib/manifoldHandle";
@@ -48,6 +48,8 @@ describe("letters on Gridfinity label shelves in the exact body", () => {
     ["Script, whose kerned letters run into one another", { gridfinityLabelBack: true, gridfinityLabelBackText: "office", gridfinityLabelFont: "Script" }],
     ["Stencil, drawn with straight segments", { gridfinityLabelFront: true, gridfinityLabelFrontText: "PARTS", gridfinityLabelFont: "Stencil" }],
     ["every wall's shelf", { gridfinityLabelBack: true, gridfinityLabelFront: true, gridfinityLabelLeft: true, gridfinityLabelRight: true, gridfinityLabelBackText: "Back", gridfinityLabelFrontText: "Front", gridfinityLabelLeftText: "Left", gridfinityLabelRightText: "Right" }],
+    ["the back shelf of a bin overhanging on the right, hollow", { width: 103.5, size: 103.5, gridfinityOverhangRight: 19.75, gridfinityLabelBack: true, gridfinityLabelBackText: "AB08" }],
+    ["the back shelf of a bin overhanging on the right, solid", { width: 103.5, size: 103.5, gridfinityOverhangRight: 19.75, gridfinityOverhangSolid: true, gridfinityLabelBack: true, gridfinityLabelBackText: "AB08" }],
     ["two compartments' labels", { gridfinityCompartmentsX: 2, gridfinityCompartmentLabels: [{ column: 0, row: 0, side: "back", text: "M3" }, { column: 1, row: 0, side: "right", text: "Nuts" }] }],
   ])("builds %s as one valid solid with the letters the display mesh has", (name, fields) => {
     const { solid, exactGain, meshGain } = lettered(fields);
@@ -61,12 +63,19 @@ describe("letters on Gridfinity label shelves in the exact body", () => {
     ["on the back shelf", { gridfinityLabelBack: true, gridfinityLabelBackText: "Lg7" }],
     ["on the left shelf", { gridfinityLabelLeft: true, gridfinityLabelLeftText: "LP2" }],
     ["on the left shelf of a bin mirrored across x", { gridfinityLabelLeft: true, gridfinityLabelLeftText: "LP2", mirrorX: true }],
+    ["on the back shelf of a bin overhanging on the right, hollow", { width: 103.5, size: 103.5, gridfinityOverhangRight: 19.75, gridfinityLabelBack: true, gridfinityLabelBackText: "Lg7" }],
+    ["on the back shelf of a bin overhanging on the right, solid", { width: 103.5, size: 103.5, gridfinityOverhangRight: 19.75, gridfinityOverhangSolid: true, gridfinityLabelBack: true, gridfinityLabelBackText: "Lg7" }],
     ["against a compartment's divider", { gridfinityCompartmentsX: 2, gridfinityCompartmentLabels: [{ column: 1, row: 0, side: "right", text: "Lq" }] }],
   ])("puts the exact letters %s where the display mesh has them", (name, fields) => {
     const shape = binShape(fields);
     const solid = gridfinityPartSolid(cad, cadModifierGridfinityForShape(shape)!);
-    const [place] = gridfinityLabelTextPlaces(shape);
-    const shown = lettersAreaAndMiddle(gridfinityLabelLetters(shape));
+    const [unmoved] = gridfinityLabelTextPlaces(shape);
+    // A solid overhang plans the bin on the grid and moves it, letters and all, to its place in the box.
+    const overhang = gridfinityPlan(shape).overhang;
+    const offset = overhang?.mode === "ring" ? overhang.offset : { x: 0, z: 0 };
+    const place = { ...unmoved, centre: { x: unmoved.centre.x + offset.x, z: unmoved.centre.z + offset.z } };
+    const letters = lettersAreaAndMiddle(gridfinityLabelLetters(shape));
+    const shown = { ...letters, x: letters.x + offset.x, z: letters.z + offset.z };
     // The exact body's material above the shelf's top, over the room for the letters.
     const half = { x: (Math.abs(place.along.x) * place.length + Math.abs(place.up.x) * place.height) / 2, z: (Math.abs(place.along.z) * place.length + Math.abs(place.up.z) * place.height) / 2 };
     const above = cad.common(solid, cad.translate(cad.makeBox(2 * half.x, 0.38, 2 * half.z), place.centre.x - half.x, place.top + 0.01, place.centre.z - half.z));

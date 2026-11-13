@@ -1,6 +1,16 @@
 [
   {
     "title": {
+      "de": "Gridfinity-Behälter mit Überstand",
+      "en": "Gridfinity bins that overhang the grid"
+    },
+    "body": {
+      "de": "Füllt eine Bodenplatte mit Ausgleich eine Schublade, die kein ganzes Raster misst, kann ein Behälter jetzt auf jeder Seite über das Raster hinausreichen, über den Ausgleich bis an die Wand, damit nichts daneben hinunterfällt. Die Füße bleiben auf dem Raster. Eine Fase unter dem Überstand lässt ihn ohne Stützen drucken; ein massiver Überstand oder ein Stapelrand auf dem Raster sind wählbar.",
+      "en": "When a padded baseplate fills a drawer that is not whole units, a bin can now reach out beyond the grid on any side, over the padding to the wall, so nothing falls down beside it. Its feet stay on the grid. A chamfer under the overhang lets it print without supports; a solid overhang or a lip kept on the grid are there to choose."
+    }
+  },
+  {
+    "title": {
       "de": "Vorlagenbild in der Skizze größer als 200 mm",
       "en": "Sketch picture larger than 200 mm"
     },

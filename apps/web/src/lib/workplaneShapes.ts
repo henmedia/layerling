@@ -3,7 +3,7 @@ import { repairClampedMeshBase } from "@/lib/importedMeshBase";
 import { fieldFormulasEqual } from "@/lib/fieldFormulas";
 import { threadFootprintPatch } from "@/lib/threadGeometry";
 import { pulleyFootprint } from "@/lib/pulleyGeometry";
-import { GRIDFINITY_PADDING_KEYS, gridfinityCompartmentLabelsEqual, gridfinityDividerPositionsEqual, gridfinityFootprintPatch, gridfinityOpeningsEqual, gridfinityOutlinesEqual, normalizeGridfinityPadding } from "@/lib/gridfinityGeometry";
+import { GRIDFINITY_OVERHANG_KEYS, GRIDFINITY_PADDING_KEYS, normalizeGridfinityOverhang, gridfinityCompartmentLabelsEqual, gridfinityDividerPositionsEqual, gridfinityFootprintPatch, gridfinityOpeningsEqual, gridfinityOutlinesEqual, normalizeGridfinityPadding } from "@/lib/gridfinityGeometry";
 import { MCP_SHAPE_SETTING_KEYS } from "@/lib/mcpShapeSettings";
 import { bentTubeSegmentsEqual } from "@/lib/bentTubeGeometry";
 import { vaseSettingsEqual } from "@/lib/vaseSettings";
@@ -389,6 +389,19 @@ function eulerRotation(xDegrees: number, yDegrees: number, zDegrees: number): Ro
   ];
 }
 
+/**
+ * A move of (dx, 0, dz) in a shape's own frame, as it is on the plate: turned as three.js turns the shape (Euler
+ * "XYZ"). Used where a body grows on one side and its other parts must stay where they are, as a Gridfinity bin's
+ * feet when its overhang changes.
+ */
+export function shapeLocalOffset(shape: Pick<WorkplaneShape, "rotation"> & Partial<Pick<WorkplaneShape, "rotationX" | "rotationZ" | "mirrorX" | "mirrorZ">>, localX: number, localZ: number) {
+  const r = eulerRotation(shape.rotationX ?? 0, shape.rotation ?? 0, shape.rotationZ ?? 0);
+  // A mirrored shape is scaled by -1 in its own frame before it is turned, as the viewport draws it.
+  const dx = shape.mirrorX ? -localX : localX;
+  const dz = shape.mirrorZ ? -localZ : localZ;
+  return { x: cleanNearZero(r[0][0] * dx + r[0][2] * dz, 1e-12), z: cleanNearZero(r[2][0] * dx + r[2][2] * dz, 1e-12) };
+}
+
 function transposed(rotation: Rotation): Rotation {
   return rotation[0].map((_, column) => rotation.map((row) => row[column]));
 }
@@ -600,6 +613,8 @@ export function canonicalizeShape(unrepaired: WorkplaneShape): WorkplaneShape {
   if (shape.kind === "gridfinity") {
     // Padding is stored as the geometry reads it, 0 to 41 mm, so a saved project opens again whatever gave it (#455).
     for (const key of Object.values(GRIDFINITY_PADDING_KEYS)) if (typeof next[key] === "number") next[key] = normalizeGridfinityPadding(next[key]);
+    for (const key of Object.values(GRIDFINITY_OVERHANG_KEYS)) if (typeof next[key] === "number") next[key] = normalizeGridfinityOverhang(next[key]);
+    if (typeof next.gridfinityOverhangChamfer === "number") next.gridfinityOverhangChamfer = Number.isFinite(next.gridfinityOverhangChamfer) ? Math.max(0, Math.round(next.gridfinityOverhangChamfer * 100) / 100) : 0;
     const footprint = gridfinityFootprintPatch(next);
     Object.assign(next, footprint);
     next.size = resizedShapeSize(footprint.width, footprint.depth);
@@ -890,6 +905,13 @@ export function workplaneShapesEqual(a: WorkplaneShape, b: WorkplaneShape) {
     a.gridfinityPaddingFront === b.gridfinityPaddingFront &&
     a.gridfinityPaddingLeft === b.gridfinityPaddingLeft &&
     a.gridfinityPaddingRight === b.gridfinityPaddingRight &&
+    a.gridfinityOverhangBack === b.gridfinityOverhangBack &&
+    a.gridfinityOverhangFront === b.gridfinityOverhangFront &&
+    a.gridfinityOverhangLeft === b.gridfinityOverhangLeft &&
+    a.gridfinityOverhangRight === b.gridfinityOverhangRight &&
+    a.gridfinityOverhangChamfer === b.gridfinityOverhangChamfer &&
+    a.gridfinityOverhangSolid === b.gridfinityOverhangSolid &&
+    a.gridfinityOverhangLipOnGrid === b.gridfinityOverhangLipOnGrid &&
     a.gridfinityCornerRadius === b.gridfinityCornerRadius &&
     a.gridfinityBinCornerRadius === b.gridfinityBinCornerRadius &&
     a.gridfinityCompartmentsX === b.gridfinityCompartmentsX &&
