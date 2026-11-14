@@ -64,6 +64,7 @@ import {
   lidClickBumpsFit,
   lidFlipTopFits,
   lidHandleFits,
+  lidLatchesFit,
   lidNeckDiameter,
   lidNeckFit,
   lidTakesExtras,
@@ -78,6 +79,7 @@ import {
   slideFrameNeeded,
   type LidOptions,
 } from "@/lib/lidTool";
+import { MAX_LID_LATCHES, MAX_LID_LATCH_GRIP, MAX_LID_LATCH_WIDTH, MIN_LID_LATCH_GRIP, MIN_LID_LATCH_WIDTH, lidLatchMeasures } from "@/lib/lidLatch";
 import { numberLocale, t } from "@/lib/i18n";
 import { fromPrinterPlay } from "@/lib/printerPlay";
 import { useLanguage } from "@/lib/useLanguage";
@@ -170,6 +172,8 @@ export function LidPanel({
   const neckMiss = neckStandard && neckTop !== undefined ? lidNeckFit(neckStandard, neckTop) : null;
   // A slide-in lid's frame must leave the wall whole above the slot: thinner, it says how much is needed.
   const frameNeeds = slideFrameNeeded(settings);
+  // Latches go on a plug or flat lid whose plate lies on the rim; a pivot lid lies in the opening.
+  const latchesFit = lidLatchesFit(settings) && !(settings.hinge && settings.hingeStyle === "pivot");
   return (
     <MovableToolPanel className="edge-modifier-panel shell-panel offset-panel lid-panel" ariaLabel={title}>
       {(handleProps) => (<>
@@ -737,6 +741,53 @@ export function LidPanel({
           {settings.hingeEndPlugs ? <span className="shell-openings-summary">{t("lid.hingeEndPlugsHint")}</span> : null}
         </>) : null}
         <span className="shell-openings-summary">{t("lid.hingeHint", { diameter: millimetres(Math.round(2 * hingeKnuckleRadius(settings) * 10) / 10) })}</span>
+      </>) : null}
+
+      {/* Latches: a clip over a pin on the body and one on the lid, on the side the lid opens at (and the back without a hinge). */}
+      {extras && !slide ? (<>
+        <EdgeModifierSlider
+          label={t("lid.latches")}
+          value={latchesFit ? settings.latches : 0}
+          min={0}
+          max={MAX_LID_LATCHES}
+          step={1}
+          workspace={workspace}
+          decimals={0}
+          disabled={busy || !latchesFit}
+          onChange={(value) => onChange({ latches: normalizeLidOptions({ latches: value }).latches })}
+        />
+        {!latchesFit ? <span className="shell-openings-summary">{t("lid.error.latchLidType")}</span> : null}
+        {settings.latches > 0 && latchesFit ? (<>
+          {settings.hinge ? null : (
+            <label className="edge-modifier-field offset-copy">
+              <input type="checkbox" checked={settings.latchBack} disabled={busy} onChange={(event) => onChange({ latchBack: event.target.checked })} />
+              <span>{t("lid.latchBack")}</span>
+            </label>
+          )}
+          <EdgeModifierSlider
+            label={t("lid.latchWidth")}
+            value={settings.latchWidth}
+            min={MIN_LID_LATCH_WIDTH}
+            max={MAX_LID_LATCH_WIDTH}
+            step={0.5}
+            workspace={workspace}
+            length
+            disabled={busy}
+            onChange={(value) => onChange({ latchWidth: value })}
+          />
+          <EdgeModifierSlider
+            label={t("lid.latchGrip")}
+            value={settings.latchGrip}
+            min={MIN_LID_LATCH_GRIP}
+            max={MAX_LID_LATCH_GRIP}
+            step={0.05}
+            workspace={workspace}
+            length
+            disabled={busy}
+            onChange={(value) => onChange({ latchGrip: value })}
+          />
+          <span className="shell-openings-summary">{t(settings.hinge ? "lid.latchHintHinge" : "lid.latchHint", { pin: millimetres(Math.round(2 * lidLatchMeasures(settings.latchWidth, settings.latchGrip).pin * 10) / 10) })}</span>
+        </>) : null}
       </>) : null}
 
       <label className="edge-modifier-field offset-copy">
