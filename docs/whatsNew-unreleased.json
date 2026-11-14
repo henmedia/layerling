@@ -1,14 +1,29 @@
 [
   {
     "title": {
-      "de": "Hülle mit offenen Löchern",
-      "en": "Hull with open holes",
-      "da": "Hylster med åbne huller"
+      "de": "Ziehen in der Vorder- und Seitenansicht folgt der Maus",
+      "en": "Dragging in the front and side view follows the mouse",
+      "da": "Træk i for- og sidevisningen følger musen"
     },
     "body": {
-      "de": "Eine Hülle füllt alles, was in ihren Teilen hohl ist: ein Rohr, einen ausgehöhlten Zylinder, Löcher in einer Gruppe. Mit „Löcher der Teile behalten“ unter Eigenschaften bleiben sie offen, und die Hülle füllt nur den Raum zwischen den Teilen.",
-      "en": "A hull fills whatever is hollow in its parts: a tube, a hollowed cylinder, the holes in a group. With Keep the parts' holes under Properties they stay open, and the hull only fills the space between the parts.",
-      "da": "Et hylster fylder alt, hvad der er hult i dets dele: et rør, en udhulet cylinder, hullerne i en gruppe. Med „Bevar delenes huller“ under Egenskaber forbliver de åbne, og hylsteret fylder kun rummet mellem delene."
+      "de": "Von vorn oder von der Seite gesehen, etwa in der Vorderansicht mit orthografischer Ansicht, blieb ein gezogenes Teil an zufälligen Stellen stehen, hinkte der Maus hinterher oder sprang in der Tiefe. Jetzt folgt es der Maus entlang der Achse, die man sieht, und behält seine Tiefe.",
+      "en": "Seen from the front or the side, as in the front view with orthographic projection, a dragged part stopped at random points, lagged behind the mouse or jumped in depth. Now it follows the mouse along the axis that shows and keeps its depth.",
+      "da": "Set forfra eller fra siden, som i frontvisningen med ortografisk projicering, stoppede en del, der blev trukket, ved tilfældige punkter, kom bagefter musen eller sprang i dybden. Nu følger den musen langs den akse, du ser, og beholder sin dybde."
+    }
+  },
+  {
+    "title": {
+      "de": "Die Druckprüfung zeigt den Weg zum Export",
+      "en": "Print check points the way to the export",
+      "da": "Tjek print viser vejen til eksporten"
+    },
+    "body": {
+      "de": "Das Druckersymbol öffnet die Druckprüfung: Sie sucht nur nach Stellen, die beim Drucken Ärger machen, und druckt oder speichert nichts. Das sagt das Fenster jetzt selbst, und der Knopf Exportieren darin schließt die Prüfung und öffnet gleich den Export für den Slicer.",
+      "en": "The printer icon opens Print check: it only looks for places that would cause trouble when printing, and it does not print or save anything. The window now says so itself, and its Export button closes the check and opens the export for your slicer right away.",
+      "da": "Printerikonet åbner Tjek print: det kigger kun efter steder, der ville give problemer ved print, og det printer eller gemmer intet. Vinduet siger det nu selv, og knappen \"Eksportér …\" lukker tjekket og åbner eksporten til din slicer med det samme."
+    },
+    "guide": {
+      "section": "printCheck"
     }
   }
 ]
