@@ -47,10 +47,23 @@ export function level2JapaneseCharacters(): readonly string[] {
   return (level2 ??= jisRows(48, 84));
 }
 
-/** Whether a character is one the built-in faces lack and the Japanese face has: kana, kanji, their punctuation, the full-width forms. */
+/**
+ * Whether a character is one the built-in faces lack and the Japanese face or its Chinese files
+ * (chineseText.ts) bring: kana, kanji and hanzi, their punctuation, bopomofo, the compatibility
+ * ideographs and the full-width forms.
+ */
 export function isJapaneseCharacter(char: string): boolean {
   const code = char.codePointAt(0) ?? 0;
-  return (code >= 0x3000 && code <= 0x30ff) || (code >= 0x3400 && code <= 0x9fff) || (code >= 0xff01 && code <= 0xff9f);
+  return (
+    (code >= 0x3000 && code <= 0x30ff) ||
+    (code >= 0x3100 && code <= 0x312f) ||
+    (code >= 0x31a0 && code <= 0x31bf) ||
+    (code >= 0x3400 && code <= 0x9fff) ||
+    (code >= 0xf900 && code <= 0xfaff) ||
+    (code >= 0xfe30 && code <= 0xfe4f) ||
+    (code >= 0xff01 && code <= 0xff9f) ||
+    (code >= 0xffe0 && code <= 0xffe6)
+  );
 }
 
 /** Whether a text has a character the Japanese face is needed for. */
@@ -59,9 +72,11 @@ export function textNeedsJapanese(text: string): boolean {
   return false;
 }
 
-/** Whether a text has a Japanese character outside the common set - a level-2 kanji, a rare symbol - so the second file is needed. */
+let level2Set: Set<string> | null = null;
+
+/** Whether a text has a level-2 kanji, so the second file is needed; a character neither file has (a simplified hanzi) does not ask for it. */
 export function textNeedsJapaneseLevel2(text: string): boolean {
-  const common = commonJapaneseCharacters();
-  for (const char of text) if (isJapaneseCharacter(char) && !common.has(char)) return true;
+  level2Set ??= new Set(level2JapaneseCharacters());
+  for (const char of text) if (level2Set.has(char)) return true;
   return false;
 }

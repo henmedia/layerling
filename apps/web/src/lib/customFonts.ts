@@ -1,4 +1,5 @@
 import type { ManifoldToplevel } from "manifold-3d";
+import { big5Characters, gb2312Characters } from "@/lib/chineseText";
 import { commonJapaneseCharacters, level2JapaneseCharacters } from "@/lib/japaneseText";
 import type { Font as OpentypeFont, Glyph as OpentypeGlyph, GsubSubtable, GsubTable } from "opentype.js";
 import type { FontData } from "three/examples/jsm/loaders/FontLoader.js";
@@ -26,7 +27,7 @@ import { sha256Hex } from "@/lib/projectAssets";
 export const CUSTOM_FONT_PREFIX = "custom:";
 /** Font files larger than this are refused: a full CJK font is well past it. */
 export const MAX_CUSTOM_FONT_BYTES = 40 * 1024 * 1024;
-/** Characters kept from one font; a font with more keeps the common Japanese ones first, then the rest by code point. */
+/** Characters kept from one font; a font with more keeps the common ones of its language first (customFontRanks), then the rest by code point. */
 export const MAX_CUSTOM_FONT_CHARACTERS = 8000;
 /** A glyph outline longer than this is refused when a design brings it along. */
 const MAX_GLYPH_OUTLINE_LENGTH = 400_000;
@@ -337,6 +338,70 @@ function addArabicForms(font: OpentypeFont, byCharacter: Map<number, OpentypeGly
  * decompressor this does not carry, and a collection (.ttc) holds several fonts; both are refused
  * with a reason.
  */
+export type CustomFontScript = "japanese" | "simplified" | "traditional";
+
+/** The share of `characters` a font has. */
+function coverage(has: ReadonlySet<string>, characters: Iterable<string>) {
+  let total = 0;
+  let found = 0;
+  for (const char of characters) {
+    total += 1;
+    if (has.has(char)) found += 1;
+  }
+  return total === 0 ? 0 : found / total;
+}
+
+/**
+ * Which language a font with more characters than are kept is made for, by what it has: a
+ * simplified-Chinese font has the GB2312 characters Japanese does not use (说, 书), a traditional
+ * one the Big5 ones neither has. A font that has both (a pan-CJK one) goes by the browser's
+ * language; anything else is taken as Japanese, as before (Issue #1757).
+ */
+export function customFontScript(has: ReadonlySet<string>, language = typeof navigator === "undefined" ? "" : navigator.language ?? ""): CustomFontScript {
+  const japanese = new Set(commonJapaneseCharacters());
+  for (const char of level2JapaneseCharacters()) japanese.add(char);
+  const gb = gb2312Characters();
+  const gbAll = new Set([...gb.level1, ...gb.level2]);
+  const big5 = big5Characters();
+  const simplifiedOnly = [...gbAll].filter((char) => !japanese.has(char));
+  const traditionalOnly = [...big5.level1].filter((char) => !japanese.has(char) && !gbAll.has(char));
+  const simplified = coverage(has, simplifiedOnly) >= 0.8;
+  const traditional = coverage(has, traditionalOnly) >= 0.8;
+  const lang = language.toLowerCase();
+  if (simplified && traditional) {
+    if (lang.startsWith("ja")) return "japanese";
+    return /^zh-(tw|hk|mo|hant)/.test(lang) ? "traditional" : "simplified";
+  }
+  if (simplified) return "simplified";
+  if (traditional) return "traditional";
+  return "japanese";
+}
+
+/**
+ * The order in which a font's characters are kept, lowest first, when it has more than
+ * MAX_CUSTOM_FONT_CHARACTERS. By code point a CJK font would keep the first 8,000 and lose the
+ * common characters late in the block: for Japanese the level-1 kanji (郎, 高, 鈴), for Chinese
+ * nearly every simplified one (说, 试). So the common ones of the font's language come first.
+ */
+export function customFontRanks(has: ReadonlySet<string>, language?: string): (char: string) => number {
+  const script = customFontScript(has, language);
+  const japaneseCommon = commonJapaneseCharacters();
+  const tiers: Iterable<string>[] = [];
+  const latin: string[] = [];
+  for (let code = 0x20; code <= 0x7e; code++) latin.push(String.fromCharCode(code));
+  for (let code = 0xa0; code <= 0xff; code++) latin.push(String.fromCharCode(code));
+  const gb = gb2312Characters();
+  const big5 = big5Characters();
+  if (script === "simplified") tiers.push([...latin, ...gb.symbols, ...gb.level1], gb.level2, japaneseCommon, big5.level1);
+  else if (script === "traditional") tiers.push([...latin, ...gb.symbols, ...big5.level1], japaneseCommon, big5.level2, gb.level1);
+  else tiers.push(japaneseCommon, level2JapaneseCharacters());
+  const rankOf = new Map<string, number>();
+  tiers.forEach((tier, index) => {
+    for (const char of tier) if (!rankOf.has(char)) rankOf.set(char, index);
+  });
+  return (char) => rankOf.get(char) ?? tiers.length;
+}
+
 export async function typefaceFromFontFile(bytes: ArrayBuffer, fileName: string, runtime?: ManifoldToplevel): Promise<CustomTypeface> {
   if (bytes.byteLength > MAX_CUSTOM_FONT_BYTES) throw new CustomFontError("font-too-large");
   const signature = new TextDecoder("latin1").decode(new Uint8Array(bytes, 0, Math.min(4, bytes.byteLength)));
@@ -360,15 +425,8 @@ export async function typefaceFromFontFile(bytes: ArrayBuffer, fileName: string,
     }
   }
   addArabicForms(font, byCharacter);
-  // By code point, a Japanese font would keep the first 8,000 characters and lose the common
-  // kanji that come late in the block (郎, 高, 鈴): level 1 comes first, then level 2, then the rest.
-  const common = commonJapaneseCharacters();
-  const level2 = new Set(level2JapaneseCharacters());
-  const rank = (code: number) => {
-    const char = String.fromCodePoint(code);
-    return common.has(char) ? 0 : level2.has(char) ? 1 : 2;
-  };
-  const codes = [...byCharacter.keys()].sort((a, b) => rank(a) - rank(b) || a - b).slice(0, MAX_CUSTOM_FONT_CHARACTERS);
+  const rank = customFontRanks(new Set([...byCharacter.keys()].map((code) => String.fromCodePoint(code))));
+  const codes = [...byCharacter.keys()].sort((a, b) => rank(String.fromCodePoint(a)) - rank(String.fromCodePoint(b)) || a - b).slice(0, MAX_CUSTOM_FONT_CHARACTERS);
   const glyphs: Record<string, TypefaceGlyph> = {};
   for (const code of codes) {
     const glyph = byCharacter.get(code);

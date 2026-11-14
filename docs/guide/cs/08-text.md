@@ -7,7 +7,7 @@ summary: Vystouplé a zahloubené nápisy ve vestavěném či vlastním písmu, 
 
 V knihovně vyberte {{ui:shape.text}} a položte jej na plochu. Do pole {{ui:prop.text}} vpravo zadejte nápis. Níže jsou nastavení:
 
-- **{{ui:prop.font}}:** sedm vestavěných písem Multilanguage, Sans, Serif, Script, Monospace, Rounded a Stencil, které používá přímé tahy. Nový text začíná písmem Sans. Všechna obsahují akcentované znaky jako ä, ö, ü, é a znak €. Další můžete přidat, viz [Vlastní písma](#vlastni-pisma).
+- **{{ui:prop.font}}:** sedm vestavěných písem Multilanguage, Sans, Serif, Script, Monospace, Rounded a Stencil, které používá přímé tahy. Nový text začíná písmem Sans. Všechna obsahují akcentované znaky jako ä, ö, ü, é a znak €. Funguje i čínština: zjednodušené i tradiční znaky jako 说明书 a 說明書 pocházejí z písma Resource Han Rounded, z dalších souborů, které se načítají stejně, jen ty, které text potřebuje. Další můžete přidat, viz [Vlastní písma](#vlastni-pisma).
 - **{{ui:nameTag.letterSize}}:** velikost písmen při pohledu shora; jejich tloušťku určuje {{ui:prop.height}}.
 - **{{ui:prop.height}}:** vzdálenost, o kterou nápis vystupuje z povrchu.
 - **{{ui:prop.bevel}}:** změkčí hrany písmen. Počet kroků určuje {{ui:prop.segments}}.
@@ -49,7 +49,7 @@ Arabština, perština, urdština a hebrejština se píší zprava doleva. První
 
 Web nemůže libovolně číst nainstalovaná písma. Odpovídající oprávnění mají jen Chrome a Edge na bezpečné stránce přes `https`, jako na layerling.com. Při provozu přes `http`, například na vlastním serveru nebo domácím Dockeru, {{ui:font.fromSystem}} chybí. Písmo pak přetáhněte z Průzkumníku. V ostatních prohlížečích vyberte jeho soubor ze složky písem. Pokud jste přístup v Chrome či Edge odmítli, můžete jej znovu povolit v nastavení webu u adresního řádku.
 
-Layerling neumí WOFF2, kolekce `.ttc` ani barevná emoji písma. Pro WOFF2 bývá dostupná varianta TTF nebo OTF. Z velmi velkých písem, například čínských, načítá prvních 8000 znaků. Proměnné písmo používá výchozí řez, obvykle běžnou tloušťku.
+Layerling neumí WOFF2, kolekce `.ttc` ani barevná emoji písma. Pro WOFF2 bývá dostupná varianta TTF nebo OTF. Z velmi velkých písem načítá 8000 znaků, nejdřív ty běžné v jazyce, pro který je písmo určené: z písma pro zjednodušenou čínštinu znaky GB2312, z písma pro tradiční znaky Big5, z japonského kandži. Písmo pro oba druhy čínštiny se řídí jazykem prohlížeče. Proměnné písmo používá výchozí řez, obvykle běžnou tloušťku.
 
 Některá písma, zejména psací a proměnná, skládají znaky z překrývajících se tahů. Při načtení je Layerling sjednotí do čistého obrysu, aby bylo těleso tisknutelné. Obrys se pak skládá z krátkých úseček místo křivek, což není běžně vidět.
 

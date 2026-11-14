@@ -1,5 +1,6 @@
 import { FontLoader, type Font, type FontData } from "three/examples/jsm/loaders/FontLoader.js";
 import { isCustomFontId, type CustomTypeface } from "@/lib/customFonts";
+import { chineseFilesFor, type ChineseFile } from "@/lib/chineseText";
 import { textNeedsJapanese, textNeedsJapaneseLevel2 } from "@/lib/japaneseText";
 
 /**
@@ -176,7 +177,13 @@ export function textFont(name: string | undefined): Font {
  */
 export const JAPANESE_FONT = "Japanese";
 
-type JapaneseFile = "base" | "level2";
+/*
+ * Chinese (Issue #1757): the Japanese face lacks most simplified hanzi (说, 书) and many traditional
+ * ones. Four more files beside it (zh1, zh2, zht1, zht2; chineseText.ts says which characters each
+ * holds) are fetched the first time a text needs one of their characters, and lend them like the
+ * level-2 kanji: to the Japanese face, to every face and to fonts of one's own.
+ */
+type JapaneseFile = "base" | "level2" | ChineseFile;
 
 async function fetchJapaneseFile(file: JapaneseFile): Promise<FontData> {
   const response = await fetch(`/fonts/japanese/${process.env.NEXT_PUBLIC_JAPANESE_FONT_VERSION ?? ""}/${file}.typeface.json`);
@@ -190,6 +197,8 @@ let japaneseFont: Font | null = null;
 let japanesePromise: Promise<void> | null = null;
 let japaneseLevel2Promise: Promise<void> | null = null;
 let japaneseLevel2Done = false;
+const chinesePromises = new Map<ChineseFile, Promise<void>>();
+const chineseDone = new Set<ChineseFile>();
 let japaneseRevision = 0;
 
 export function japaneseTypefaceLoaded() {
@@ -231,19 +240,24 @@ export function loadJapaneseTypeface(): Promise<void> {
  * Fetches the level-2 kanji once, after the base face, and adds them to it, to every face the
  * editor has and to `japaneseData`, so a font of one's own parsed later has them too.
  */
+/** Adds a later file's characters to the Japanese face, its data, every face and every font of one's own. */
+function lendEverywhere(data: FontData) {
+  const borrowed = data.glyphs as Record<string, GlyphData>;
+  if (japaneseData) lend({ data: japaneseData }, borrowed);
+  if (japaneseFont) lend(japaneseFont, borrowed);
+  for (const font of new Set(Object.values(loadedFonts ?? {}))) lend(font, borrowed);
+  for (const entry of customFonts.values()) if (entry.font) lend(entry.font, borrowed);
+  japaneseRevision += 1;
+  customFontListeners.forEach((listener) => listener());
+}
+
 export function loadJapaneseLevel2(): Promise<void> {
   if (japaneseLevel2Done) return Promise.resolve();
   japaneseLevel2Promise ??= loadJapaneseTypeface()
     .then(() => japaneseFetcher("level2"))
     .then((data) => {
-      const borrowed = data.glyphs as Record<string, GlyphData>;
-      if (japaneseData) lend({ data: japaneseData }, borrowed);
-      if (japaneseFont) lend(japaneseFont, borrowed);
-      for (const font of new Set(Object.values(loadedFonts ?? {}))) lend(font, borrowed);
-      for (const entry of customFonts.values()) if (entry.font) lend(entry.font, borrowed);
       japaneseLevel2Done = true;
-      japaneseRevision += 1;
-      customFontListeners.forEach((listener) => listener());
+      lendEverywhere(data);
     })
     .catch((error) => {
       japaneseLevel2Promise = null;
@@ -264,6 +278,42 @@ export function ensureJapaneseGlyphs(text: string) {
   };
   if (!japaneseFont && !japanesePromise) loadJapaneseTypeface().catch(ignore);
   if (!japaneseLevel2Done && !japaneseLevel2Promise && textNeedsJapaneseLevel2(text)) loadJapaneseLevel2().catch(ignore);
+  for (const file of chineseFilesFor(text)) if (!chineseDone.has(file) && !chinesePromises.has(file)) loadChineseFile(file).catch(ignore);
+}
+
+export function chineseFileLoaded(file: ChineseFile) {
+  return chineseDone.has(file);
+}
+
+/** Fetches one Chinese file once, after the Japanese face, and lends its characters everywhere. */
+export function loadChineseFile(file: ChineseFile): Promise<void> {
+  if (chineseDone.has(file)) return Promise.resolve();
+  let promise = chinesePromises.get(file);
+  if (!promise) {
+    promise = loadJapaneseTypeface()
+      .then(() => japaneseFetcher(file))
+      .then((data) => {
+        chineseDone.add(file);
+        lendEverywhere(data);
+      })
+      .catch((error) => {
+        chinesePromises.delete(file);
+        throw error;
+      });
+    chinesePromises.set(file, promise);
+  }
+  return promise;
+}
+
+/** Waits for every file a text needs - the Japanese face, its level-2 kanji, the Chinese files - for code that draws once and cannot draw again. */
+export async function loadGlyphsForText(text: string): Promise<void> {
+  if (!textNeedsJapanese(text)) return;
+  const ignore = () => undefined;
+  await loadJapaneseTypeface().catch(ignore);
+  const waits: Promise<void>[] = [];
+  if (textNeedsJapaneseLevel2(text)) waits.push(loadJapaneseLevel2().catch(ignore));
+  for (const file of chineseFilesFor(text)) waits.push(loadChineseFile(file).catch(ignore));
+  await Promise.all(waits);
 }
 
 /*
@@ -323,6 +373,8 @@ export function resetJapaneseTypefaceForTests() {
   japanesePromise = null;
   japaneseLevel2Promise = null;
   japaneseLevel2Done = false;
+  chinesePromises.clear();
+  chineseDone.clear();
   japaneseRevision = 0;
   japaneseFetcher = fetchJapaneseFile;
 }

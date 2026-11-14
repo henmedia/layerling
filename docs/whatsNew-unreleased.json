@@ -27,6 +27,24 @@
   },
   {
     "title": {
+      "de": "Chinesischer Text",
+      "en": "Chinese text"
+    },
+    "body": {
+      "de": "Chinesischer Text kam bisher als Fragezeichen heraus, in jeder Schrift und sogar mit einer eigenen chinesischen Schrift. Jetzt geht er:\n\n– Vereinfachte und traditionelle Zeichen wie 说明书 und 說明書 gibt es in jeder eingebauten Schrift. Sie werden geholt, sobald ein Text sie zum ersten Mal braucht, darum zeigt so ein Text einen Moment lang Fragezeichen.\n– Eine eigene chinesische Schrift behält jetzt die gängigen Zeichen ihrer Sprache. Füge eine Schrift, die schon Fragezeichen zeigte, einmal neu hinzu.",
+      "en": "Chinese text used to come out as question marks, in every font and even in a Chinese font of your own. Now it works:\n\n– Simplified and traditional characters such as 说明书 and 說明書 are in every built-in font. They are fetched the first time a text needs them, so such a text shows question marks for a moment.\n– A Chinese font of your own now keeps the common characters of its language. Add a font that showed question marks once more."
+    },
+    "guide": [
+      {
+        "section": "addingText"
+      },
+      {
+        "section": "customFonts"
+      }
+    ]
+  },
+  {
+    "title": {
       "de": "Textur auf dem Bauch einer gedrehten Vase",
       "en": "Texture on the belly of a turned vase"
     },
