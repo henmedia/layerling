@@ -15,7 +15,7 @@ Pole nahoře v okně prohledává seznam: ponechá jen zkratky, v jejichž vět�
 
 Nemůžete najít nástroj? Stiskněte [[Ctrl]]+[[K]] nebo klikněte na lupu v části {{ui:editor.group.help}}. Zadejte nástroj, například „zaoblení“ nebo „zrcadlit“, tvar, například „válec“, nebo příkaz, například „export“ či „zpět“. Šipkami vyberte výsledek a potvrďte [[Enter]], případně na něj klikněte.
 
-- Vyhledávání rozumí anglickým i německým názvům, nerozlišuje velikost písmen a německé přehlásky: například „aushoehlen“ vyhledá {{ui:editor.tool.hollow}}.
+- Vyhledávání rozumí anglickým i německým názvům, nerozlišuje velikost písmen a německé přehlásky: například „aushoehlen“ vyhledá {{ui:editor.tool.hollow}}. Vyhledávání funguje v každém písmu: název se najde tak, jak je napsán v jazyce rozhraní („円柱“ v japonštině). Znaky plné a poloviční šířky, katakana a hiragana i diakritika se berou jako totožné.
 - Každá položka uvádí odpovídající klávesovou zkratku i část pásu nástrojů, ve které ji najdete.
 - Neaktivní položku nyní nelze spustit, zpravidla proto, že není nic vybráno. V seznamu zůstává, abyste věděli, kde nástroj hledat.
 

@@ -15,7 +15,7 @@ Pole u góry okna przeszukuje listę: zostawia tylko skróty, których zdanie, g
 
 Nie możesz znaleźć narzędzia? Naciśnij [[Ctrl]]+[[K]] albo kliknij lupę w sekcji {{ui:editor.group.help}}, a potem wpisz, czego szukasz: narzędzie („zaokrąglenie”, „odbicie”), kształt („walec”) albo polecenie („eksport”, „cofnij”). Poruszaj się strzałkami i naciśnij [[Enter]] albo kliknij wpis.
 
-- Wyszukiwanie rozumie nazwy w języku interfejsu oraz słowa angielskie i niemieckie, a wielkość liter i znaki diakrytyczne pomija: „wydraz” znajdzie {{ui:editor.tool.hollow}}.
+- Wyszukiwanie rozumie nazwy w języku interfejsu oraz słowa angielskie i niemieckie, a wielkość liter i znaki diakrytyczne pomija: „wydraz” znajdzie {{ui:editor.tool.hollow}}. Wyszukiwanie działa w każdym piśmie: nazwa jest znajdowana tak, jak stoi w języku interfejsu („円柱” po japońsku). Znaki pełnej i połowicznej szerokości, katakana i hiragana oraz akcenty są traktowane jak takie same.
 - Każdy wpis pokazuje klawisze, które robią to samo, i sekcję paska narzędzi, w której się znajduje, więc uczysz się, gdzie to jest.
 - Wpisy wyszarzone nie mogą się teraz wykonać, najczęściej dlatego, że nic nie jest zaznaczone. Zostają na liście, żeby wyszukiwanie i tak mówiło, gdzie jest narzędzie.
 

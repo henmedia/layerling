@@ -67,5 +67,18 @@
       "de": "Eine als Aussparung gesetzte Gruppe, in der ein fester Körper mit eigener Aussparung steckte, etwa ein Quader mit ausgeschnittener Kapsel, der eine verrundete Kapsel auf einen Umriss zuschneidet, kam im STEP-Export falsch heraus: Der feste Körper fehlte, und die innere Aussparung schnitt stattdessen den Körper aus. Übrig blieb ein dünner Ring. Jetzt schneidet die Gruppe in der STEP-Datei genau so wie im Editor.",
       "en": "A group set as a hole that held a solid with a hole of its own, such as a box with a capsule cut out of it trimming a rounded capsule to an outline, came out wrong in the STEP export: the solid was missing and the inner hole cut the body instead, leaving a thin ring. Now the group cuts the STEP file just as it cuts the design in the editor."
     }
+  },
+  {
+    "title": {
+      "de": "Suche findet Namen in jeder Schrift",
+      "en": "Search finds names in any script"
+    },
+    "body": {
+      "de": "Die Befehlssuche (Strg+K) und die Formensuche fanden in Sprachen ohne lateinische Schrift nichts: Im japanischen Editor ließ „円柱“ die ganze Liste stehen. Jetzt wird ein Name in jeder Schrift gefunden, so wie er in der Sprache der Oberfläche steht: Japanisch, Chinesisch, Russisch, Arabisch und mehr, auch Namen mit Bindestrich oder Klammern wie „USB-C“.\n\nVoll- und Halbbreite, Katakana und Hiragana sowie Akzente gelten als gleich. Ein Suchwort aus nur Satzzeichen findet nichts mehr statt alles. Beim Schreiben mit einer Eingabemethode (Kana zu Kanji, Pinyin) gehören Esc, Pfeile und Enter der Eingabemethode und schließen das Fenster nicht mehr.",
+      "en": "The command search (Ctrl+K) and the shape search found nothing in languages that are not written in Latin letters: in the Japanese editor, typing \"円柱\" left the whole list standing. Now a name is found in any script, as it is written in the language of the interface: Japanese, Chinese, Russian, Arabic and more, also names with a hyphen or brackets such as \"USB-C\".\n\nFull-width and half-width letters, katakana and hiragana, and accents count as the same. A search word of nothing but punctuation finds nothing instead of everything. While you write with an input method (kana to kanji, pinyin), Esc, the arrows and Enter belong to the input method and no longer close the window."
+    },
+    "guide": {
+      "section": "commandSearch"
+    }
   }
 ]

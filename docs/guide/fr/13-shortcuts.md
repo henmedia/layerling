@@ -15,7 +15,7 @@ Le champ en haut de la fenêtre cherche dans la liste : il ne garde que les racc
 
 Vous ne trouvez pas d'outil ? Appuyez sur [[Ctrl]]+[[K]] ou cliquez sur la loupe dans la zone {{ui:editor.group.help}}, puis tapez ce que vous recherchez : un outil ("congé", "miroir"), une forme ("cylindre") ou une commande ("exporter", "annuler"). Déplacez-vous avec les touches fléchées et appuyez sur [[Enter]], ou cliquez sur l'entrée.
 
-- La recherche comprend aussi bien le mot anglais que le mot allemand et ignore les majuscules et les trémas : "aushoehlen" trouve {{ui:editor.tool.hollow}}.
+- La recherche comprend aussi bien le mot anglais que le mot allemand et ignore les majuscules et les trémas : "aushoehlen" trouve {{ui:editor.tool.hollow}}. La recherche fonctionne avec toutes les écritures : un nom se trouve tel qu'il est écrit dans la langue de l'interface (« 円柱 » en japonais). Les caractères pleine chasse et demi-chasse, le katakana et le hiragana ainsi que les accents comptent pour identiques.
 - Chaque entrée affiche les touches qui font la même chose et le groupe du ruban dans lequel elle se trouve, afin que vous sachiez où elle se trouve.
 - Les entrées grisées ne peuvent pas être exécutées pour le moment, principalement parce que rien n'est sélectionné. Ils restent dans la liste afin que la recherche vous indique toujours où se trouve l'outil.
 

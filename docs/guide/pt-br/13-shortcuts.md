@@ -15,7 +15,7 @@ A caixa no alto da janela pesquisa a lista: ela mantém só os atalhos cuja fras
 
 Não acha uma ferramenta? Pressione [[Ctrl]]+[[K]] ou clique na lupa na área {{ui:editor.group.help}} e digite o que você procura: uma ferramenta ("arredondamento", "espelhar"), uma forma ("cilindro") ou um comando ("exportar", "desfazer"). Navegue com as setas e pressione [[Enter]], ou clique na entrada.
 
-- A pesquisa entende a palavra em português, em inglês e em alemão, e ignora maiúsculas e acentos: "aushoehlen" encontra {{ui:editor.tool.hollow}}.
+- A pesquisa entende a palavra em português, em inglês e em alemão, e ignora maiúsculas e acentos: "aushoehlen" encontra {{ui:editor.tool.hollow}}. A pesquisa funciona em qualquer escrita: um nome é encontrado como aparece no idioma da interface ("円柱" em japonês). Caracteres de largura total e meia largura, katakana e hiragana e acentos contam como iguais.
 - Cada entrada mostra o atalho de teclado e o grupo da barra de opções em que ela fica. Assim, você aprende onde encontrá-la.
 - Entradas em cinza não podem ser executadas agora, na maioria das vezes porque nada está selecionado. Elas continuam na lista para que a pesquisa ainda mostre onde a ferramenta fica.
 

@@ -15,7 +15,7 @@ Feltet øverst i vinduet søger i listen: det beholder kun de genveje, hvis sæt
 
 Kan du ikke finde et værktøj? Tryk [[Ctrl]]+[[K]] eller klik forstørrelsesglasset i området {{ui:editor.group.help}}, og tast hvad du leder efter: et værktøj ("rund", "spejl"), en form ("cylinder") eller en kommando ("eksportér", "fortryd"). Flyt med piletasterne og tryk [[Enter]], eller klik posten.
 
-- Søgningen forstår både det engelske og det tyske ord og ignorerer store bogstaver og omlyd: "aushoehlen" finder {{ui:editor.tool.hollow}}.
+- Søgningen forstår både det engelske og det tyske ord og ignorerer store bogstaver og omlyd: "aushoehlen" finder {{ui:editor.tool.hollow}}. Søgningen virker i alle skriftsystemer: et navn findes, som det står på grænsefladens sprog ("円柱" på japansk). Tegn i fuld og halv bredde, katakana og hiragana samt accenter regnes for ens.
 - Hver post viser de taster der gør det samme og den gruppe i båndet den bor i, så du lærer hvor den er.
 - Poster der er grået ud kan ikke køres lige nu, for det meste fordi intet er valgt. De bliver i listen så søgningen stadig fortæller dig hvor værktøjet er.
 

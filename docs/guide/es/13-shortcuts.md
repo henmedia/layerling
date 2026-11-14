@@ -15,7 +15,7 @@ El cuadro de la parte superior de la ventana busca en la lista: deja solo los at
 
 ¿No encuentras una herramienta? Pulsa [[Ctrl]]+[[K]] o haz clic en la lupa del grupo {{ui:editor.group.help}} y escribe lo que buscas: una herramienta («redondeo», «reflejar»), una forma («cilindro») o un comando («exportar», «deshacer»). Muévete con las flechas y pulsa [[Intro]], o haz clic en la entrada.
 
-- La búsqueda entiende igual la palabra en castellano que en inglés o en alemán, y no distingue mayúsculas, tildes ni diéresis: «aushoehlen» encuentra {{ui:editor.tool.hollow}}.
+- La búsqueda entiende igual la palabra en castellano que en inglés o en alemán, y no distingue mayúsculas, tildes ni diéresis: «aushoehlen» encuentra {{ui:editor.tool.hollow}}. La búsqueda funciona con cualquier escritura: un nombre se encuentra tal como aparece en el idioma de la interfaz («円柱» en japonés). Los caracteres de ancho completo y de medio ancho, el katakana y el hiragana, y los acentos cuentan como iguales.
 - Cada entrada muestra las teclas que hacen lo mismo y el grupo de la cinta en el que está, para que aprendas dónde se encuentra.
 - Las entradas en gris no se pueden ejecutar en ese momento, casi siempre porque no hay nada seleccionado. Siguen en la lista para que la búsqueda te diga igualmente dónde está la herramienta.
 
