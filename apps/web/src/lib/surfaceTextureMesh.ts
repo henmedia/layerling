@@ -158,14 +158,45 @@ function cleanSoup(soup: ArrayLike<number>) {
   return { soup: out, invalid, degenerate };
 }
 
-/** Points closer than 1/10000 mm become one; triangles that collapse to a line on the way are dropped. */
+/**
+ * How close two points of a body may lie before they count as one, mm. A mesh made from a curved sketch can hold rows of
+ * points a few thousandths of a millimetre apart (a revolved vase's belly had 37,000 edges under 0.003 mm and half of its
+ * triangles under 0.002 mm tall): triangles thinner than a hair whose normals point anywhere, so a pattern took the points
+ * for sharp edges and left them where they were (a belly's ridges came out as short dashes, Discussion #1648). Nothing a
+ * printer can show moves: the points go less than this to their neighbour.
+ */
+export const SURFACE_WELD_TOLERANCE = 0.02;
+/** The tolerance never exceeds this share of the typical edge, so a finely meshed body is not merged into lumps. */
+const SURFACE_WELD_EDGE_SHARE = 0.05;
+
+/** The typical edge of a soup of triangles (nine numbers each): the median of a sample, 0 for no triangles. */
+function typicalEdge(soup: Float64Array) {
+  const count = soup.length / 9;
+  const step = Math.max(1, Math.floor(count / 2000));
+  const lengths: number[] = [];
+  for (let t = 0; t < count; t += step) {
+    const i = t * 9;
+    for (let k = 0; k < 3; k += 1) {
+      const a = i + k * 3, b = i + ((k + 1) % 3) * 3;
+      lengths.push(Math.hypot(soup[a] - soup[b], soup[a + 1] - soup[b + 1], soup[a + 2] - soup[b + 2]));
+    }
+  }
+  if (lengths.length === 0) return 0;
+  lengths.sort((x, y) => x - y);
+  return lengths[Math.floor(lengths.length / 2)];
+}
+
+/**
+ * Points closer than 1/10000 mm become one, and then points closer than the weld tolerance (SURFACE_WELD_TOLERANCE, or
+ * a twentieth of the typical edge on a finely meshed body) are taken to the first of them; triangles that collapse to a
+ * line on the way are dropped. A body without such points comes out as it went in, point for point.
+ */
 function weld(soup: Float64Array) {
   const map = new Map<string, number>();
   const verts: number[] = [];
   const idx: number[] = [];
   const key = (x: number, y: number, z: number) => `${Math.round(x * 1e4)},${Math.round(y * 1e4)},${Math.round(z * 1e4)}`;
   for (let i = 0; i < soup.length; i += 9) {
-    const tri: number[] = [];
     for (let k = 0; k < 9; k += 3) {
       const x = soup[i + k], y = soup[i + k + 1], z = soup[i + k + 2];
       const kk = key(x, y, z);
@@ -175,11 +206,63 @@ function weld(soup: Float64Array) {
         verts.push(x, y, z);
         map.set(kk, id);
       }
-      tri.push(id);
+      idx.push(id);
     }
-    if (tri[0] !== tri[1] && tri[1] !== tri[2] && tri[0] !== tri[2]) idx.push(tri[0], tri[1], tri[2]);
   }
-  return { vertices: Float64Array.from(verts), indices: Uint32Array.from(idx), dropped: soup.length / 9 - idx.length / 3 };
+  // Points that lie within the tolerance of an earlier one go to it (the first of a cluster stays, so a cluster is never
+  // wider than the tolerance); the others keep their place and number in order.
+  const tolerance = Math.min(SURFACE_WELD_TOLERANCE, typicalEdge(soup) * SURFACE_WELD_EDGE_SHARE);
+  const count = verts.length / 3;
+  const leader = new Uint32Array(count);
+  const renumber = new Int32Array(count).fill(-1);
+  const kept: number[] = [];
+  if (tolerance > 1e-6) {
+    const cells = new Map<number, number[]>();
+    const cell = (c: number) => Math.floor(c / tolerance);
+    const hash = (a: number, b: number, c: number) => (((a * 73856093) ^ (b * 19349663) ^ (c * 83492791)) >>> 0);
+    for (let p = 0; p < count; p += 1) {
+      const x = verts[p * 3], y = verts[p * 3 + 1], z = verts[p * 3 + 2];
+      const cx = cell(x), cy = cell(y), cz = cell(z);
+      let found = -1;
+      search: for (let dx = -1; dx <= 1; dx += 1) {
+        for (let dy = -1; dy <= 1; dy += 1) {
+          for (let dz = -1; dz <= 1; dz += 1) {
+            const list = cells.get(hash(cx + dx, cy + dy, cz + dz));
+            if (!list) continue;
+            for (const q of list) {
+              if (Math.hypot(verts[q * 3] - x, verts[q * 3 + 1] - y, verts[q * 3 + 2] - z) < tolerance) {
+                found = q;
+                break search;
+              }
+            }
+          }
+        }
+      }
+      if (found >= 0) {
+        leader[p] = found;
+        continue;
+      }
+      leader[p] = p;
+      renumber[p] = kept.length / 3;
+      kept.push(x, y, z);
+      const h = hash(cx, cy, cz);
+      const list = cells.get(h);
+      if (list) list.push(p);
+      else cells.set(h, [p]);
+    }
+  } else {
+    for (let p = 0; p < count; p += 1) {
+      leader[p] = p;
+      renumber[p] = p;
+    }
+    kept.push(...verts);
+  }
+  const out: number[] = [];
+  for (let t = 0; t < idx.length; t += 3) {
+    const a = renumber[leader[idx[t]]], b = renumber[leader[idx[t + 1]]], c = renumber[leader[idx[t + 2]]];
+    if (a !== b && b !== c && a !== c) out.push(a, b, c);
+  }
+  return { vertices: Float64Array.from(kept), indices: Uint32Array.from(out), dropped: soup.length / 9 - out.length / 3 };
 }
 
 /**
