@@ -3,7 +3,8 @@ import { holdsShapeLock } from "@/lib/shapeLock";
 import type { TextBlockOptions } from "@/lib/textBlock";
 import type { SurfaceTextureFace, SurfaceTextureRegion, SurfaceTextureSettings } from "@/lib/surfaceTexture";
 import { markEscapeHandled } from "@/lib/escapeHandled";
-import { ArrowDownToLine, Check, ChevronLeft, Crosshair, Cuboid, Download, Eye, EyeOff, FlipHorizontal, GripVertical, Home, Layers, Minus, MousePointer2, PanelsTopLeft, ScanEye, PencilLine, PictureInPicture2, Plus, Rotate3d, RotateCcw, Ruler, RulerDimensionLine, Slice, Spline, Trash2, X } from "lucide-react";
+import { ArrowDownToLine, Check, ChevronLeft, Crosshair, Cuboid, Download, Eye, EyeOff, FlipHorizontal, GripVertical, Home, Layers, Minus, Move, MousePointer2, PanelsTopLeft, Pointer, ScanEye, PencilLine, PictureInPicture2, Plus, Rotate3d, RotateCcw, RotateCw, Ruler, RulerDimensionLine, Scaling, Slice, Spline, Trash2, X } from "lucide-react";
+import { loadTouchHandleMode, nextTouchHandleMode, saveTouchHandleMode, touchModeMovesBody, type TouchHandleMode } from "@/lib/touchHandleMode";
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperties, type Dispatch, type DragEvent, type MutableRefObject, type PointerEvent as ReactPointerEvent, type ReactNode, type SetStateAction, type WheelEvent as ReactWheelEvent } from "react";
 import { boxEdgeTargets, edgeSnapGuide, objectSnapOffset, shiftSnapBox, snapResizeEdge, type EdgeSnapTarget, type ObjectSnapGuide, type SnapBox } from "@/lib/objectSnap";
 import { dragReach } from "@/lib/dragReach";
@@ -2005,6 +2006,9 @@ export function WorkplaneViewport({
   // gebraucht wird. Anfangs falsch, damit das ausgelieferte HTML passt.
   const [touchDevice, setTouchDevice] = useState(false);
   const [touchRotate, setTouchRotate] = useState(false);
+  // Which handles a finger can reach (Discussion #1747); kept in this browser.
+  const [touchHandleMode, setTouchHandleMode] = useState<TouchHandleMode>("all");
+  const touchHandleModeRef = useRef<TouchHandleMode>("all");
   // The round Select multiple button of a touch screen (#337): it stands while a body is picked
   // with a finger. A tap on it locks Select multiple, so every further tap adds a body to the
   // selection or takes it out; a second tap ends the mode and lets the selection go. A mouse never
@@ -7255,6 +7259,10 @@ export function WorkplaneViewport({
       if (!canBeginShapeDrag(workspaceRef.current.selectBeforeMove, alreadySelected)) {
         return;
       }
+      // Set to the size or to turning, a finger on the part only selects it (Discussion #1747).
+      if (!touchModeMovesBody(touchHandleModeRef.current)) {
+        return;
+      }
       const dragIds = alreadySelected && selectedIdsSnapshot.length > 1 ? selectedIdsSnapshot : [id];
       // One locked shape holds the whole selection still, as the handles and the arrow keys do.
       if (dragIds.some((dragId) => shapesRef.current.find((entry) => entry.id === dragId)?.locked)) {
@@ -7662,6 +7670,15 @@ export function WorkplaneViewport({
   useEffect(() => {
     touchRotateRef.current = touchRotate;
   }, [touchRotate]);
+
+  useEffect(() => {
+    setTouchHandleMode(loadTouchHandleMode());
+  }, []);
+
+  useEffect(() => {
+    // Only on a touch screen: with a mouse every handle is in reach, whatever was picked on a tablet.
+    touchHandleModeRef.current = touchDevice ? touchHandleMode : "all";
+  }, [touchDevice, touchHandleMode]);
 
   /**
    * Die liegenden Finger an die Kamera uebergeben.
@@ -8690,6 +8707,26 @@ export function WorkplaneViewport({
                 <Rotate3d size={26} strokeWidth={2.15} />
               </button>
             ) : null}
+            {/* Which handles a finger reaches (Discussion #1747): all, or only moving, the size or turning. */}
+            {touchDevice ? (
+              <button
+                className={`camera-touch-handles${touchHandleMode !== "all" ? " active" : ""}`}
+                aria-label={t(`camera.touchHandles.${touchHandleMode}`)}
+                title={`${t(`camera.touchHandles.${touchHandleMode}`)} - ${t("camera.touchHandlesHint")}`}
+                aria-pressed={touchHandleMode !== "all"}
+                onClick={() => {
+                  const next = nextTouchHandleMode(touchHandleMode);
+                  setTouchHandleMode(next);
+                  saveTouchHandleMode(next);
+                  onNotice?.(t(`camera.touchHandles.${next}`));
+                }}
+              >
+                {touchHandleMode === "move" ? <Move size={24} strokeWidth={2.15} />
+                  : touchHandleMode === "size" ? <Scaling size={24} strokeWidth={2.15} />
+                  : touchHandleMode === "turn" ? <RotateCw size={24} strokeWidth={2.15} />
+                  : <Pointer size={24} strokeWidth={2.15} />}
+              </button>
+            ) : null}
             </div>
             <div className="camera-group">
             <button
@@ -9267,6 +9304,7 @@ export function WorkplaneViewport({
               locked={selectionLocked}
               showSlideArrows={workspace.showSlideArrows}
               sizeLocked={selectionSizeLocked}
+              handleMode={touchDevice ? touchHandleMode : "all"}
               showRotationWheel={activeRotationWheel}
               hideSelectionChrome={activeTransformKind === "rotate"}
               hideDimensionMarks={false}

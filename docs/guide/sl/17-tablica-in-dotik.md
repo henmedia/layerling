@@ -36,6 +36,8 @@ Kocka pogleda zgoraj levo vrti pogled, če jo vlečete, tap na eno od njenih str
 
 Konica prsta zakriva, na kar cilja. layerling pusti prstu seči do ročic, točk, črt in robov malo dlje kot kazalcu miške, vendar je pisalo natančnejše. To velja za pisalo, ki ga tablica pozna kot pisalo, na primer Apple Pencil ali S Pen. Preprosto pisalo z gumijasto konico šteje za zaslon kot prst in ni natančnejše od njega, zato z njim delajte kot s prstom. Če Apple Pencil na iPadu lebdi nad gumbom, se čez trenutek v majhnem oblačku pokaže njegovo ime, kakor namig pri miški.
 
+Okoli izbire so ročice za velikost, puščice za vrtenje in puščice za premikanje tesno skupaj, zato prst hitro zgrabi napačno. Gumb s kazočo roko v vrstici pogleda izbere, kaj naredi prst: {{ui:camera.touchHandles.all}}, {{ui:camera.touchHandles.move}}, {{ui:camera.touchHandles.size}} ali {{ui:camera.touchHandles.turn}}, vsak tap preklopi na naslednje. Druge ročice izginejo; pri velikosti ali vrtenju prst na telesu telo samo izbere in ga ne premika več. Brskalnik si izbiro zapomni. Kot {{ui:camera.touchRotate}} se gumb pokaže le na napravi z zaslonom na dotik.
+
 V načinu skice {{ui:sketch.freehand}} riše s pisalom ali prstom kot na papir; ko ga dvignete, črta postane točke skice, ki jih lahko urejate, glejte [Skice](chapter:skice).
 
 Če se telesa premikajo, ker se jih dotaknejo otroci ali hitre roke, vklopite v nastavitvah {{ui:workspace.selectBeforeMoving}}: telo mora biti potem najprej izbrano in šele naslednji poteg ga premakne.

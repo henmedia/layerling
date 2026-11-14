@@ -1,6 +1,19 @@
 [
   {
     "title": {
+      "de": "Finger nur zum Verschieben, für die Größe oder zum Drehen",
+      "en": "A finger for moving, sizing or turning only"
+    },
+    "body": {
+      "de": "Auf einem Tablet liegen die Griffe rund um eine Auswahl dicht beieinander, und ein Finger erwischte leicht den falschen. Ein neuer Knopf mit der zeigenden Hand in der Ansichtsleiste wählt, was ein Finger tut:\n– Alle Griffe, wie bisher\n– Nur verschieben\n– Nur Größe\n– Nur drehen\n\nDie übrigen Griffe verschwinden, und bei Größe oder Drehen wählt ein Finger auf dem Teil es nur aus, statt es zu verschieben. Der Knopf erscheint nur auf Geräten mit Touchscreen, und der Browser merkt sich die Wahl.",
+      "en": "On a tablet the handles around a selection lie close together, and a finger easily caught the wrong one. A new button with the pointing hand in the view bar chooses what a finger does:\n– All handles, as before\n– Move only\n– Size only\n– Turn only\n\nThe other handles are hidden, and set to the size or to turning, a finger on the part only selects it instead of moving it. The button only shows on a device with a touch screen, and the browser keeps the choice."
+    },
+    "guide": {
+      "chapter": "tablet"
+    }
+  },
+  {
+    "title": {
       "de": "Ziehen in der Vorder- und Seitenansicht folgt der Maus",
       "en": "Dragging in the front and side view follows the mouse"
     },
