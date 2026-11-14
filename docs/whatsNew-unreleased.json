@@ -34,5 +34,15 @@
     "guide": {
       "section": "printCheck"
     }
+  },
+  {
+    "title": {
+      "de": "Rechtsklick-Menü ohne doppelten Text",
+      "en": "Right-click menu without repeated text"
+    },
+    "body": {
+      "de": "Zeigte die Maus im Rechtsklick-Menü auf einen Eintrag, erschien derselbe Text noch einmal als Hinweis darüber. Die Einträge zeigen ihren Text ja schon ganz, der Hinweis kommt dort nicht mehr.",
+      "en": "Resting the mouse on an item of the right-click menu showed the same text again as a hint above it. The items show their text in full already, so the hint no longer comes there."
+    }
   }
 ]
