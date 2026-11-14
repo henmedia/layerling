@@ -130,6 +130,9 @@ export function CommandPalette({ commands, onClose }: { commands: PaletteCommand
         // window is open every key stops here.
         onKeyDown={(event) => {
           event.stopPropagation();
+          // While an input method is composing (kana to kanji, pinyin), every key belongs to it: Esc takes the
+          // composition back, the arrows walk through its candidates, Enter confirms it.
+          if (event.nativeEvent.isComposing) return;
           if (event.key === "Escape" || ((event.ctrlKey || event.metaKey) && !event.shiftKey && !event.altKey && (event.key ?? "").toLowerCase() === "k")) {
             event.preventDefault();
             onClose();
@@ -145,7 +148,7 @@ export function CommandPalette({ commands, onClose }: { commands: PaletteCommand
           } else if (event.key === "End" && results.length > 0) {
             event.preventDefault();
             setIndex(results.length - 1);
-          } else if (event.key === "Enter" && !event.nativeEvent.isComposing) {
+          } else if (event.key === "Enter") {
             event.preventDefault();
             choose(results[current]);
           } else if (event.key === "Tab") {
