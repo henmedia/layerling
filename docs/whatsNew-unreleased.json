@@ -75,5 +75,18 @@
     "guide": {
       "section": "shapeSettings"
     }
+  },
+  {
+    "title": {
+      "de": "Zwei weitere Platinen",
+      "en": "Two more boards"
+    },
+    "body": {
+      "de": "Die Platinen-Form kennt zwei weitere Platinen: den FriendlyELEC NanoPi NEO3 Plus und den Waveshare ESP32-P4-NANO. Beide sind nach den CAD-Dateien der Hersteller gebaut, mit Löchern, Buchsen und Tasten an ihrem Platz, damit ein Gehäuse um sie herum passt.",
+      "en": "The SBC board shape knows two more boards: the FriendlyELEC NanoPi NEO3 Plus and the Waveshare ESP32-P4-NANO. Both are built from the makers' CAD files, with their holes, sockets and buttons in place, so a case fits round them."
+    },
+    "guide": {
+      "section": "sbcBoard"
+    }
   }
 ]
