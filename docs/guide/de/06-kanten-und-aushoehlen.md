@@ -78,6 +78,8 @@ Die Wände wachsen nach innen. Außen bleibt alles, wie es ist.
 
 Die {{ui:shell.edges}} wirken nur dort, wo die Innenwände auseinanderlaufen - an einer Stufe im Körper oder rund um eine Öffnung. Die Ecken des Hohlraums eines einfachen Quaders sind mit beiden Einstellungen immer scharf. Für ein rundes Innere rundest du zuerst die Außenkanten des Körpers (siehe oben) und höhlst ihn dann aus: Das Innere folgt mit dem Radius minus der Wandstärke. Lässt sich das runde Innere nicht bauen, was bei einem Umriss aus sehr vielen kurzen geraden Stücken wie einer nachgezeichneten Zeichnung vorkommen kann, baut layerling denselben Hohlkörper stattdessen mit scharfen Innenecken.
 
+Ist oben die einzige offene Seite, macht {{ui:shell.stack}} die Box stapelbar: Die äußere Hälfte der Wand ragt als Kragen über den Rand ({{ui:shell.stackHeight}}, zu Beginn 3 mm), und unter der Wand wird eine um einen Millimeter tiefere Nut ausgespart, die den Kragen der Box darunter aufnimmt. Eine Box steht dann rutschfest auf der nächsten. Boden und Unterseite bleiben flach, die Box wird also weiter auf dem Boden stehend gedruckt, ohne dass etwas in der Luft hängt. Es braucht gerade Wände, eine Wand von mindestens 1,2 mm und einen Körper, der deutlich höher ist als der Kragen; geht es nicht, sagt das Werkzeugfenster warum.
+
 ![Das Ergebnis: eine Schale mit 3 mm Wand, oben offen.](shot:hollow-result)
 
 ![Derselbe Quader, nur an der Vorderseite offen: ein Schlitz für eine Schublade.](shot:hollow-sides)

@@ -77,6 +77,8 @@ Stene rastejo navznoter. Zunaj ostane vse, kot je.
 
 {{ui:shell.edges}} štejejo samo tam, kjer se notranje stene razmaknejo: pri stopnici v telesu ali okoli odprtine. Vogali votline preproste škatle so z obema nastavitvama vedno ostri. Za zaobljeno notranjost najprej zaobli zunanje robove telesa (glej zgoraj), nato ga izdolbi: notranjost sledi z radijem, zmanjšanim za debelino stene. Če zaobljene notranjosti ni mogoče zgraditi, kar se lahko zgodi pri obrisu iz zelo veliko kratkih ravnih koščkov, na primer pri izrisani sliki, layerling zgradi isto izdolbeno telo z ostrimi notranjimi vogali.
 
+Če je zgornja stran edina odprta, {{ui:shell.stack}} naredi škatlo zložljivo na kup: zunanja polovica stene štrli nad rob kot rob ({{ui:shell.stackHeight}}, na začetku 3 mm), pod steno pa se izreže utor, globlji za milimeter, ki sprejme rob spodnje škatle. Ena škatla potem stoji trdno na drugi. Dno in spodnja stran ostaneta ravni, zato se škatla še vedno tiska stoje na dnu, brez česar koli v zraku. Potrebne so ravne stene, stena vsaj 1,2 mm in telo, ki je jasno višje od roba; če ne gre, okno orodja pove zakaj.
+
 ![Rezultat: lupina s steno 3 mm, zgoraj odprta.](shot:hollow-result)
 
 ![Isti kvader, odprt samo na sprednji strani: reža za predal.](shot:hollow-sides)

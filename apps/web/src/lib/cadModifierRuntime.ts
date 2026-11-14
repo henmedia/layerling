@@ -1,4 +1,5 @@
 import { CONCAVE_FILLET_STRAIGHT_MESSAGE } from "@/lib/cadConcaveFillet";
+import { STACK_FAILED_MESSAGE, STACK_NEEDS_TOP_MESSAGE, STACK_NOT_STRAIGHT_MESSAGE, STACK_TOO_LOW_MESSAGE, STACK_WALL_THIN_MESSAGE } from "@/lib/shellStackMessages";
 import { TREATMENT_LOST_FACES_MESSAGE } from "@/lib/cadLostFaces";
 import { t } from "@/lib/i18n";
 import { isKernelMemoryFault, isWasmMemoryFaultMessage } from "@/lib/kernelFault";
@@ -400,6 +401,11 @@ export function cadModifierUserErrorMessage(rawError: string | null | undefined)
   ) {
     return t("edge.errorWorkerFailed");
   }
+  if (rawError.includes(STACK_NEEDS_TOP_MESSAGE)) return t("shell.errorStackNeedsTop");
+  if (rawError.includes(STACK_WALL_THIN_MESSAGE)) return t("shell.errorStackWallThin");
+  if (rawError.includes(STACK_TOO_LOW_MESSAGE)) return t("shell.errorStackTooLow");
+  if (rawError.includes(STACK_NOT_STRAIGHT_MESSAGE)) return t("shell.errorStackNotStraight");
+  if (rawError.includes(STACK_FAILED_MESSAGE)) return t("shell.errorStackFailed");
   if (
     rawError.includes("The walls cannot be this thick for this body") ||
     rawError.includes("Choose a thinner wall")

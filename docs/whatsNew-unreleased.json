@@ -1,6 +1,19 @@
 [
   {
     "title": {
+      "de": "Stapelbare Boxen",
+      "en": "Stackable boxes"
+    },
+    "body": {
+      "de": "Beim Aushöhlen einer Box mit offener Oberseite gibt es jetzt den Schalter „Stapelbar“. Die äußere Hälfte der Wand ragt als Kragen über den Rand, und unter der Wand sitzt eine Nut, die den Kragen der Box darunter aufnimmt. So steht eine Box rutschfest auf der nächsten.\n\n– Die Höhe des Kragens stellst du selbst ein (3 mm am Anfang).\n– Boden und Unterseite bleiben flach: Die Box wird weiter auf dem Boden stehend gedruckt.\n– Es braucht gerade Wände und eine Wand von mindestens 1,2 mm.",
+      "en": "When you hollow a box with its top open there is now a Stackable switch. The outer half of the wall rises above the rim as a collar, and under the wall sits a groove that takes the collar of the box below. One box then stands on the next without sliding.\n\n– You set the height of the collar yourself (3 mm to begin with).\n– The floor and the bottom stay flat: the box still prints standing on its floor.\n– It needs straight walls and a wall of at least 1.2 mm."
+    },
+    "guide": {
+      "section": "hollowing"
+    }
+  },
+  {
+    "title": {
       "de": "Deckel mit Klipp-Verschlüssen",
       "en": "Lid with clip latches"
     },

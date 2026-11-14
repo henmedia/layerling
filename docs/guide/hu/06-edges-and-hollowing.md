@@ -77,6 +77,8 @@ A falak befelé nőnek. A külső oldal változatlan marad.
 
 A {{ui:shell.edges}} csak ott számítanak, ahol a belső falak eltávolodnak egymástól – a test egy lépcsőjénél vagy egy nyílás körül. Egy egyszerű doboz üregének sarkai mindkét beállításnál élesek. Lekerekített belsőhöz előbb kerekítsd le a test külső éleit (lásd fent), aztán üregeld ki: a belső a sugár mínusz a falvastagság értékével követi. Ha a lekerekített belső nem építhető fel – ez nagyon sok rövid egyenes darabból álló körvonalnál, például egy körvonallá alakított rajznál előfordulhat –, a layerling ugyanazt az üreges testet éles belső sarkokkal építi meg.
 
+Ha a teteje az egyetlen nyitott oldal, a {{ui:shell.stack}} egymásra rakhatóvá teszi a dobozt: a fal külső fele gallérként kiemelkedik a perem fölé ({{ui:shell.stackHeight}}, kezdetben 3 mm), a fal alatt pedig egy milliméterrel mélyebb horony készül, amely befogadja az alatta lévő doboz gallérját. Így az egyik doboz biztosan áll a másikon. Az alja és az alsó oldal lapos marad, ezért a doboz továbbra is az alján állva nyomtatható, a levegőben semmi sem lóg. Egyenes falak, legalább 1,2 mm-es fal és a gallérnál határozottan magasabb test kell; ha nem megy, az eszközablak megmondja, miért.
+
 ![Az eredmény: 3 mm falú héj, felül nyitva.](shot:hollow-result)
 
 ![Ugyanaz a doboz csak az elülső oldalán nyitva: egy fióknak való nyílás.](shot:hollow-sides)

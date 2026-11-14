@@ -77,6 +77,8 @@ Stěny vznikají směrem dovnitř. Vnější povrch zůstává zachovaný.
 
 Volba {{ui:shell.edges}} se projeví pouze tam, kde se vnitřní stěny rozestupují, například u stupně nebo kolem otvoru. Rohy dutiny jednoduchého kvádru zůstávají v obou režimech ostré. Pro zaoblený vnitřek nejprve zaoblete vnější hrany a poté vytvořte dutinu. Vnitřní poloměr odpovídá vnějšímu poloměru zmenšenému o tloušťku stěny. Pokud takový vnitřek nelze sestavit, například u obrysu z mnoha krátkých úseček, vytvoří Layerling stejnou dutinu s ostrými rohy.
 
+Když je nahoře jediná otevřená strana, {{ui:shell.stack}} udělá krabici stohovatelnou: vnější polovina stěny vyčnívá nad okraj jako límec ({{ui:shell.stackHeight}}, zpočátku 3 mm) a pod stěnou se vyřízne o milimetr hlubší drážka, která přijme límec krabice pod ní. Jedna krabice pak stojí pevně na druhé. Dno a spodek zůstávají rovné, takže se krabice stále tiskne postavená na dně, bez čehokoli ve vzduchu. Je potřeba rovných stěn, stěny alespoň 1,2 mm a tělesa znatelně vyššího než límec; nejde-li to, okno nástroje řekne proč.
+
 ![Výsledný kryt se stěnou 3 mm a otevřenou horní stranou.](shot:hollow-result)
 
 ![Stejná krabička s otevřenou přední stranou jako prostor pro zásuvku.](shot:hollow-sides)

@@ -78,6 +78,8 @@ Pudełka, kubki, obudowy i pokrywki mają jedną cechę wspólną: w środku są
 
 {{ui:shell.edges}} mają znaczenie tylko tam, gdzie wewnętrzne ścianki się rozchodzą, czyli na stopniu bryły albo wokół otworu. Narożniki wnęki zwykłego prostopadłościanu są zawsze ostre, przy obu ustawieniach. Aby uzyskać zaokrąglone wnętrze, najpierw zaokrąglij zewnętrzne krawędzie bryły (zobacz wyżej), a potem ją wydrąż: wnętrze podąży za nimi z promieniem pomniejszonym o grubość ścianki. Jeśli zaokrąglonego wnętrza nie da się zbudować, co może się zdarzyć przy konturze z bardzo wielu krótkich prostych odcinków, na przykład obrysowanym rysunku, layerling buduje zamiast tego tę samą wydrążoną bryłę z ostrymi narożnikami wewnątrz.
 
+Gdy góra jest jedyną otwartą stroną, {{ui:shell.stack}} sprawia, że pudełko można układać w stos: zewnętrzna połowa ścianki wystaje ponad krawędź jak kołnierz ({{ui:shell.stackHeight}}, na początku 3 mm), a pod ścianką wycina się rowek głębszy o milimetr, który przyjmuje kołnierz pudełka poniżej. Jedno pudełko stoi wtedy stabilnie na drugim. Dno i spód pozostają płaskie, więc pudełko nadal drukuje się stojąc na dnie, bez niczego w powietrzu. Potrzebne są proste ścianki, ścianka co najmniej 1,2 mm i bryła wyraźnie wyższa niż kołnierz; jeśli się nie da, okno narzędzia podaje powód.
+
 ![Wynik: skorupa ze ścianką 3 mm, otwarta u góry.](shot:hollow-result)
 
 ![To samo pudełko z otwartym tylko przodem: wnęka na szufladę.](shot:hollow-sides)

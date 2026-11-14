@@ -7,6 +7,8 @@ import { cornerEdgeCandidates, edgesTouchingEnds } from "@/lib/cadCornerEdges";
 import { innerCornerEdges, treatAfterInnerCorners } from "@/lib/cadInnerCorners";
 import { OcctKernel, type OcctModuleFactory, type ShapeHandle } from "occt-wasm";
 import { assertCadKernelRunnable } from "@/lib/wasmSupport";
+import { STACK_NEEDS_TOP_MESSAGE, shellStackSolid } from "@/lib/cadShellStack";
+import { shellOpenSides } from "@/lib/shellLimits";
 import { CANNOT_OFFSET_MESSAGE, offsetSolid, offsetSolidSideways, orientedFaceNormal, shellSolid, shellThreadByCore, threadShellCoreOf, type ThreadShellCore } from "@/lib/cadShell";
 import { chamfilletSolid } from "@/lib/cadChamfillet";
 import { isBundleScopeKey } from "@/lib/cadModifierGroups";
@@ -1356,6 +1358,14 @@ async function bearbeiteAnfrage(request: CadModifierWorkerRequest, halter: { cad
         component = threadShellCore && baseSolids.length === 1
           ? shellThreadByCore(activeCad, solid, threadShellCore, request.amount, request.shellOpenings ?? "none", request.shellEdges)
           : shellSolid(activeCad, solid, request.amount, request.shellOpenings ?? "none", request.shellEdges);
+        // Stacking: a collar round the top and a groove under the wall, only for a body hollowed with its top open.
+        if (request.shellStack && request.shellStack > 0) {
+          const open = shellOpenSides(request.shellOpenings);
+          if (open.length !== 1 || open[0] !== "top") throw new Error(STACK_NEEDS_TOP_MESSAGE);
+          const stacked = shellStackSolid(activeCad, component, request.shellStack, request.amount);
+          activeCad.release(component);
+          component = stacked;
+        }
       } else if (request.kind === "offset") {
         component = (request.offsetSideways ? offsetSolidSideways : offsetSolid)(activeCad, solid, request.amount, request.offsetShrink === true, request.shellEdges);
       } else if (request.kind === "deleteFace") {

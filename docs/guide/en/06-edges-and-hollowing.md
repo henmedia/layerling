@@ -78,6 +78,8 @@ The walls grow inward. The outside stays as it is.
 
 The {{ui:shell.edges}} only matter where the inner walls move apart - at a step in the body or around an opening. The corners of the cavity of a plain box are always sharp, with both settings. For a rounded inside, round the outside edges of the body first (see above), then hollow it: the inside follows with the radius minus the wall thickness. If the rounded inside cannot be built, which can happen with an outline made of very many short straight pieces such as a traced drawing, layerling builds the same hollow body with sharp inner corners instead.
 
+With the top as the only open side, {{ui:shell.stack}} makes the box stackable: the outer half of the wall rises above the top as a collar ({{ui:shell.stackHeight}}, 3 mm to begin with), and under the wall a groove one millimetre deeper is cut that takes the collar of the box below. One box then stands on the next without sliding. The floor and the bottom stay flat, so the box still prints standing on its floor with nothing hanging in the air. It needs walls that go straight up, a wall of at least 1.2 mm and a body clearly taller than the collar; if it does not work, the tool window says why.
+
 ![The result: a shell with a 3 mm wall, open at the top.](shot:hollow-result)
 
 ![The same box with only the front side open: a slot for a drawer.](shot:hollow-sides)

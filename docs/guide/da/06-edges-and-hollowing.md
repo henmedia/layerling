@@ -78,6 +78,8 @@ Væggene vokser indad. Ydersiden forbliver som den er.
 
 {{ui:shell.edges}} betyder kun noget hvor de indvendige vægge går fra hinanden - ved et trin i formen eller omkring en åbning. Hjørnerne på hulrummet i en almindelig kasse er altid skarpe, med begge indstillinger. For en rundet inderside, rund formens ydre kanter først (se ovenfor), så hul den ud: indersiden følger med radius minus vægtykkelsen. Hvis den rundede inderside ikke kan bygges, hvilket kan ske med et omrids lavet af meget mange korte lige stykker såsom en tegnet skitse, bygger layerling den samme udhulede form med skarpe indvendige hjørner i stedet.
 
+Når toppen er den eneste åbne side, gør {{ui:shell.stack}} æsken stabelbar: den ydre halvdel af væggen rager op over kanten som en krave ({{ui:shell.stackHeight}}, til at begynde med 3 mm), og under væggen skæres en rille, der er en millimeter dybere og tager imod kraven på æsken under. Så står en æske fast på den næste. Bunden og undersiden forbliver flade, så æsken stadig printes stående på bunden uden noget i luften. Det kræver lige vægge, en væg på mindst 1,2 mm og en krop, der er tydeligt højere end kraven; virker det ikke, siger værktøjsvinduet hvorfor.
+
 ![Resultatet: en skal med 3 mm væg, åben foroven.](shot:hollow-result)
 
 ![Den samme kasse med kun forsiden åben: en slids til en skuffe.](shot:hollow-sides)
