@@ -14,6 +14,19 @@
   },
   {
     "title": {
+      "de": "Deckel mit Klipp-Verschlüssen",
+      "en": "Lid with clip latches"
+    },
+    "body": {
+      "de": "Im Deckel-Fenster gibt es neu „Latches“ (0 bis 4): Klipp-Verschlüsse wie bei einem Kamera-Akkufach. Der Körper bekommt dafür unter dem Rand je einen Zapfen zwischen zwei Wangen, der Deckel ebenso. Ein Klipp mit zwei C-förmigen Pfannen rastet auf beide Zapfen, bleibt am Deckel hängen und löst sich mit einem Zug am Griff.\n\nDie Klipps liegen als eigener Körper vor dem Deckel, auf der Seite, wie sie gedruckt werden, und die Wangen sind unten schräg, damit nichts Stützen braucht. Die Klippbreite (6 bis 30 mm) und der Sitz der Pfannen (Clip grip, 0,3 mm) sind einstellbar. Mit Scharnier sitzen die Verschlüsse auf der gegenüberliegenden Seite, ohne Scharnier auf Wunsch auch hinten. Es geht für den eingesetzten und den flachen Deckel auf dem Rand, nicht zusammen mit einem Griff. Gedruckt ist er noch nicht, der Sitz kann sich also noch ändern.",
+      "en": "The Lid panel has new Latches (0 to 4): clip latches like those on a camera battery box. The body gets a pin between two cheeks below its rim for each one, and the lid gets the same. A clip with two C-shaped sockets snaps over both pins, stays hanging on the lid and comes off with a pull at its tab.\n\nThe clips lie in front of the lid as a body of their own, on their side as they print, and the cheeks slope underneath so nothing needs support. Clip width (6 to 30 mm) and the fit of the sockets (Clip grip, 0.3 mm) can be set. With a hinge the latches sit on the opposite side, without one they can also go on the back. It works for the push-in and the flat lid lying on the rim, not together with a handle. It has not been printed yet, so the fit may still change."
+    },
+    "guide": {
+      "section": "lid"
+    }
+  },
+  {
+    "title": {
       "de": "Textur auf dem Bauch einer gedrehten Vase",
       "en": "Texture on the belly of a turned vase"
     },
