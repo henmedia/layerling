@@ -450,6 +450,27 @@ describe("STEP export round-trip (real OCCT kernel)", () => {
     expect(near(await reimportVolume(blob), expected, 1e-4)).toBe(true);
   });
 
+  it("cuts with a group set as a hole as the group is, its solids less its own holes (Discussion #1748)", async () => {
+    // A frame - a 60 x 60 plate with a 20 x 20 hole - set as a hole over the top half of a 40 x 40 x 20 block leaves
+    // the bottom half and a 20 x 20 post in the middle. Before, the plate was left out and the 20 x 20 hole cut the
+    // block itself: a block with a pocket.
+    const block = shape({ kind: "box", name: "Block", x: 0, width: 40, depth: 40, height: 20 });
+    const plate = shape({ kind: "box", name: "Plate", x: 0, width: 60, depth: 60, height: 10 });
+    const opening = shape({ kind: "box", name: "Opening", x: 0, width: 20, depth: 20, height: 10, hole: true });
+    const frame = shape({ kind: "mesh", name: "Frame", x: 0, elevation: 10, width: 60, depth: 60, height: 10, hole: true, groupedShapes: [plate, opening] });
+    // A group of holes alone stays the holes it holds.
+    const second = shape({ kind: "box", name: "Second block", x: 80, width: 40, depth: 40, height: 20 });
+    const pocketA = shape({ kind: "box", name: "Pocket A", x: -10, width: 10, depth: 10, height: 10, hole: true });
+    const pocketB = shape({ kind: "box", name: "Pocket B", x: 10, width: 10, depth: 10, height: 10, hole: true });
+    const pockets = shape({ kind: "mesh", name: "Pockets", x: 80, elevation: 10, width: 30, depth: 10, height: 10, hole: true, groupedShapes: [pocketA, pocketB] });
+
+    const { blob, exportedCount, skipped } = await exportShapesToStep([block, frame, second, pockets]);
+    expect(skipped).toEqual([]);
+    expect(exportedCount).toBe(2);
+    const expected = 40 * 40 * 10 + 20 * 20 * 10 + (40 * 40 * 20 - 2 * 10 * 10 * 10);
+    expect(near(await reimportVolume(blob), expected, 1e-4)).toBe(true);
+  });
+
   it("exports springs as their exact bodies, round wire and all", async () => {
     const { springBuildPlan } = await import("@/lib/springGeometry");
     const plain = shape({ kind: "spring", name: "Spring", x: -30, width: 20, depth: 20, height: 30, springTurns: 6, springWire: 3 });

@@ -44,5 +44,15 @@
       "de": "Zeigte die Maus im Rechtsklick-Menü auf einen Eintrag, erschien derselbe Text noch einmal als Hinweis darüber. Die Einträge zeigen ihren Text ja schon ganz, der Hinweis kommt dort nicht mehr.",
       "en": "Resting the mouse on an item of the right-click menu showed the same text again as a hint above it. The items show their text in full already, so the hint no longer comes there."
     }
+  },
+  {
+    "title": {
+      "de": "STEP-Export: Aussparungs-Gruppen schneiden wie im Editor",
+      "en": "STEP export: groups set as a hole cut as in the editor"
+    },
+    "body": {
+      "de": "Eine als Aussparung gesetzte Gruppe, in der ein fester Körper mit eigener Aussparung steckte, etwa ein Quader mit ausgeschnittener Kapsel, der eine verrundete Kapsel auf einen Umriss zuschneidet, kam im STEP-Export falsch heraus: Der feste Körper fehlte, und die innere Aussparung schnitt stattdessen den Körper aus. Übrig blieb ein dünner Ring. Jetzt schneidet die Gruppe in der STEP-Datei genau so wie im Editor.",
+      "en": "A group set as a hole that held a solid with a hole of its own, such as a box with a capsule cut out of it trimming a rounded capsule to an outline, came out wrong in the STEP export: the solid was missing and the inner hole cut the body instead, leaving a thin ring. Now the group cuts the STEP file just as it cuts the design in the editor."
+    }
   }
 ]
