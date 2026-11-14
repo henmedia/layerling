@@ -864,7 +864,6 @@ export const MESSAGES_PT_BR: Partial<Record<MessageKey, string>> = {
   "prop.curvedConeTopHint": "Na largura do topo plano, no máximo a largura da base; 0 termina em ponta. Mantém a proporção com a base quando o cone é redimensionado.",
   "prop.curvedConeBend": "Curvatura",
   "prop.curvedConeBendHint": "Quanto o lado se curva, em porcentagem: abaixo de 0 para dentro como um trompete, 0 reto, acima de 0 para fora como uma cúpula.",
-  "prop.thickness": "Espessura",
   "prop.outerDiameter": "Diâmetro externo",
   "prop.innerDiameter": "Diâmetro interno",
   "prop.tubeBoreHole": "O furo corta como vazio ao agrupar",

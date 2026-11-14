@@ -3501,7 +3501,6 @@ export const MESSAGES_DA: Partial<Record<MessageKey, string>> = {
   "prop.curvedConeTopHint": "Hen over den flade top, højst bundens bredde; 0 løber ud i en spids. Den beholder sit forhold til bunden, når keglen skaleres.",
   "prop.curvedConeBend": "Bue",
   "prop.curvedConeBendHint": "Hvor meget siden buer, i procent: under 0 indad til en trompet, 0 lige, over 0 udad til en kuppel.",
-  "prop.thickness": "Tykkelse",
   "prop.toothSize": "Tandstørrelse",
   "prop.toothWidth": "Tandbredde",
   "prop.gearProfile": "Tandform",

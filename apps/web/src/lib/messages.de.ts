@@ -3080,7 +3080,6 @@ export const MESSAGES_DE: Record<MessageKey, string> = {
   "prop.curvedConeTopHint": "Quer über die flache Oberseite, höchstens so breit wie unten; 0 läuft spitz zu. Beim Skalieren bleibt das Verhältnis zur Unterseite gleich.",
   "prop.curvedConeBend": "Biegung",
   "prop.curvedConeBendHint": "Wie stark sich die Seite biegt, in Prozent: unter 0 nach innen zur Trompete, 0 gerade, über 0 nach außen zur Kuppel.",
-  "prop.thickness": "Wandstärke",
   "prop.outerDiameter": "Außen-Ø",
   "prop.innerDiameter": "Innen-Ø",
   "prop.tubeBoreHole": "Bohrung schneidet beim Gruppieren wie ein Loch",

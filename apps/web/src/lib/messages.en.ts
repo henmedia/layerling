@@ -3081,7 +3081,6 @@ export const MESSAGES_EN = {
   "prop.curvedConeTopHint": "Across the flat top, at most the bottom's width; 0 runs to a point. It keeps its share of the bottom when the cone is resized.",
   "prop.curvedConeBend": "Bend",
   "prop.curvedConeBendHint": "How far the side bends, in percent: below 0 inward into a trumpet, 0 straight, above 0 outward into a dome.",
-  "prop.thickness": "Thickness",
   "prop.outerDiameter": "Outer diameter",
   "prop.innerDiameter": "Inner diameter",
   "prop.tubeBoreHole": "Bore cuts as a hole when grouped",

@@ -3098,7 +3098,6 @@ export const MESSAGES_JA: Partial<Record<MessageKey, string>> = {
   "prop.curvedConeTopHint": "平らな上面の直径で、最大でも底面の幅まで。0 にすると先がとがります。サイズを変えても底面との比率は保たれます。",
   "prop.curvedConeBend": "曲がり",
   "prop.curvedConeBendHint": "側面の曲がり具合（パーセント）。0 未満で内側へ曲がりトランペット形、0 でまっすぐ、0 より大きいと外側へふくらんでドーム形になります。",
-  "prop.thickness": "厚さ",
   "prop.outerDiameter": "外径",
   "prop.innerDiameter": "内径",
   "prop.tubeBoreHole": "グループ化するとき穴として切り抜く",

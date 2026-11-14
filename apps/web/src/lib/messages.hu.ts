@@ -2028,7 +2028,6 @@ export const MESSAGES_HU: Partial<Record<MessageKey, string>> = {
   "prop.bevel": "Letörés",
   "prop.topRadius": "Felső sugár",
   "prop.baseRadius": "Alsó sugár",
-  "prop.thickness": "Vastagság",
   "prop.outerDiameter": "Külső átmérő",
   "prop.innerDiameter": "Belső átmérő",
   "prop.tubeBoreHole": "A furat csoportosításkor lyukként vág",

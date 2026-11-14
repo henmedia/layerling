@@ -1998,7 +1998,6 @@ export const MESSAGES_TR: Partial<Record<MessageKey, string>> = {
   "prop.bevel": "Pah",
   "prop.topRadius": "Üst yarıçap",
   "prop.baseRadius": "Taban yarıçapı",
-  "prop.thickness": "Kalınlık",
   "prop.outerDiameter": "Dış çap",
   "prop.innerDiameter": "İç çap",
   "prop.tubeBoreHole": "Delik gruplanınca boşluk gibi keser",
