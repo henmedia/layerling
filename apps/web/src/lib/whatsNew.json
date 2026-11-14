@@ -1,5 +1,98 @@
 [
   {
+    "version": "1.164.0",
+    "items": [
+      {
+        "title": {
+          "de": "Einzelne Schritte des Verlaufs löschen",
+          "en": "Delete single steps of the history"
+        },
+        "body": {
+          "de": "Ein großer Entwurf lässt sich jetzt leichter machen, ohne den ganzen Verlauf zu verlieren. Öffne die Verlaufsansicht und dort die Liste der Schritte: Neben jedem Schritt steht, wie viel Platz sein Löschen etwa freigibt, und oben, wie viel der ganze Verlauf belegt.\n\n– Der Papierkorb neben einem Schritt löscht nur diesen Schritt. Der Entwurf bleibt, wie er ist.\n– „Größte Schritte löschen“ wählt alle Schritte, die allein 1 MB oder mehr freigeben, und fragt vorher.\n– Meist sind das Schritte, in denen ein Körper gedreht wurde: Jede Drehung speichert ein neues Netz.\n\nSpeichert der Browser einen Entwurf nur mit gekürztem Verlauf, öffnet der Knopf im Hinweis gleich diese Liste.",
+          "en": "A large design can now be made lighter without losing its whole history. Open the History view and its list of steps: beside each step stands about how much room deleting it would free, and at the top how much the whole history takes.\n\n– The bin beside a step deletes that step alone. The design stays as it is.\n– Delete largest steps picks every step that frees 1 MB or more on its own, and asks first.\n– Those are mostly steps where a body was turned: every turn stores a new mesh.\n\nWhen the browser stores a design only with a shortened history, the button in the note opens this list right away."
+        },
+        "guide": {
+          "section": "historyView"
+        }
+      },
+      {
+        "title": {
+          "de": "Finger nur zum Verschieben, für die Größe oder zum Drehen",
+          "en": "A finger for moving, sizing or turning only",
+          "da": "En finger kun til flytning, størrelse eller drejning"
+        },
+        "body": {
+          "de": "Auf einem Tablet liegen die Griffe rund um eine Auswahl dicht beieinander, und ein Finger erwischte leicht den falschen. Ein neuer Knopf mit der zeigenden Hand in der Ansichtsleiste wählt, was ein Finger tut:\n– Alle Griffe, wie bisher\n– Nur verschieben\n– Nur Größe\n– Nur drehen\n\nDie übrigen Griffe verschwinden, und bei Größe oder Drehen wählt ein Finger auf dem Teil es nur aus, statt es zu verschieben. Der Knopf erscheint nur auf Geräten mit Touchscreen, und der Browser merkt sich die Wahl.",
+          "en": "On a tablet the handles around a selection lie close together, and a finger easily caught the wrong one. A new button with the pointing hand in the view bar chooses what a finger does:\n– All handles, as before\n– Move only\n– Size only\n– Turn only\n\nThe other handles are hidden, and set to the size or to turning, a finger on the part only selects it instead of moving it. The button only shows on a device with a touch screen, and the browser keeps the choice.",
+          "da": "På en tablet ligger håndtagene omkring en markering tæt sammen, og en finger tog let fat i det forkerte. En ny knap med den pegende hånd i visningslinjen vælger, hvad en finger gør:\n– Finger: alle håndtag\n– Finger: kun flytte\n– Finger: kun størrelse\n– Finger: kun dreje\n\nDe andre håndtag skjules, og undtagen ved flytning vælger en finger på selve delen kun den i stedet for at flytte den. Knappen vises kun på en enhed med touch-skærm, og browseren husker valget."
+        },
+        "guide": {
+          "chapter": "tablet"
+        }
+      },
+      {
+        "title": {
+          "de": "Ziehen in der Vorder- und Seitenansicht folgt der Maus",
+          "en": "Dragging in the front and side view follows the mouse",
+          "da": "Træk i for- og sidevisningen følger musen"
+        },
+        "body": {
+          "de": "Von vorn oder von der Seite gesehen, etwa in der Vorderansicht mit orthografischer Ansicht, blieb ein gezogenes Teil an zufälligen Stellen stehen, hinkte der Maus hinterher oder sprang in der Tiefe. Jetzt folgt es der Maus entlang der Achse, die man sieht, und behält seine Tiefe.",
+          "en": "Seen from the front or the side, as in the front view with orthographic projection, a dragged part stopped at random points, lagged behind the mouse or jumped in depth. Now it follows the mouse along the axis that shows and keeps its depth.",
+          "da": "Set forfra eller fra siden, som i frontvisningen med ortografisk projicering, stoppede en del, der blev trukket, ved tilfældige punkter, kom bagefter musen eller sprang i dybden. Nu følger den musen langs den akse, du ser, og beholder sin dybde."
+        }
+      },
+      {
+        "title": {
+          "de": "Die Druckprüfung zeigt den Weg zum Export",
+          "en": "Print check points the way to the export",
+          "da": "Tjek print viser vejen til eksporten"
+        },
+        "body": {
+          "de": "Das Druckersymbol öffnet die Druckprüfung: Sie sucht nur nach Stellen, die beim Drucken Ärger machen, und druckt oder speichert nichts. Das sagt das Fenster jetzt selbst, und der Knopf Exportieren darin schließt die Prüfung und öffnet gleich den Export für den Slicer.",
+          "en": "The printer icon opens Print check: it only looks for places that would cause trouble when printing, and it does not print or save anything. The window now says so itself, and its Export button closes the check and opens the export for your slicer right away.",
+          "da": "Printerikonet åbner Tjek print: det kigger kun efter steder, der ville give problemer ved print, og det printer eller gemmer intet. Vinduet siger det nu selv, og knappen \"Eksportér …\" lukker tjekket og åbner eksporten til din slicer med det samme."
+        },
+        "guide": {
+          "section": "printCheck"
+        }
+      },
+      {
+        "title": {
+          "de": "Rechtsklick-Menü ohne doppelten Text",
+          "en": "Right-click menu without repeated text"
+        },
+        "body": {
+          "de": "Zeigte die Maus im Rechtsklick-Menü auf einen Eintrag, erschien derselbe Text noch einmal als Hinweis darüber. Die Einträge zeigen ihren Text ja schon ganz, der Hinweis kommt dort nicht mehr.",
+          "en": "Resting the mouse on an item of the right-click menu showed the same text again as a hint above it. The items show their text in full already, so the hint no longer comes there."
+        }
+      },
+      {
+        "title": {
+          "de": "STEP-Export: Aussparungs-Gruppen schneiden wie im Editor",
+          "en": "STEP export: groups set as a hole cut as in the editor"
+        },
+        "body": {
+          "de": "Eine als Aussparung gesetzte Gruppe, in der ein fester Körper mit eigener Aussparung steckte, etwa ein Quader mit ausgeschnittener Kapsel, der eine verrundete Kapsel auf einen Umriss zuschneidet, kam im STEP-Export falsch heraus: Der feste Körper fehlte, und die innere Aussparung schnitt stattdessen den Körper aus. Übrig blieb ein dünner Ring. Jetzt schneidet die Gruppe in der STEP-Datei genau so wie im Editor.",
+          "en": "A group set as a hole that held a solid with a hole of its own, such as a box with a capsule cut out of it trimming a rounded capsule to an outline, came out wrong in the STEP export: the solid was missing and the inner hole cut the body instead, leaving a thin ring. Now the group cuts the STEP file just as it cuts the design in the editor."
+        }
+      },
+      {
+        "title": {
+          "de": "Suche findet Namen in jeder Schrift",
+          "en": "Search finds names in any script"
+        },
+        "body": {
+          "de": "Die Befehlssuche (Strg+K) und die Formensuche fanden in Sprachen ohne lateinische Schrift nichts: Im japanischen Editor ließ „円柱“ die ganze Liste stehen. Jetzt wird ein Name in jeder Schrift gefunden, so wie er in der Sprache der Oberfläche steht: Japanisch, Chinesisch, Russisch, Arabisch und mehr, auch Namen mit Bindestrich oder Klammern wie „USB-C“.\n\nVoll- und Halbbreite, Katakana und Hiragana sowie Akzente gelten als gleich. Ein Suchwort aus nur Satzzeichen findet nichts mehr statt alles. Beim Schreiben mit einer Eingabemethode (Kana zu Kanji, Pinyin) gehören Esc, Pfeile und Enter der Eingabemethode und schließen das Fenster nicht mehr.",
+          "en": "The command search (Ctrl+K) and the shape search found nothing in languages that are not written in Latin letters: in the Japanese editor, typing \"円柱\" left the whole list standing. Now a name is found in any script, as it is written in the language of the interface: Japanese, Chinese, Russian, Arabic and more, also names with a hyphen or brackets such as \"USB-C\".\n\nFull-width and half-width letters, katakana and hiragana, and accents count as the same. A search word of nothing but punctuation finds nothing instead of everything. While you write with an input method (kana to kanji, pinyin), Esc, the arrows and Enter belong to the input method and no longer close the window."
+        },
+        "guide": {
+          "section": "commandSearch"
+        }
+      }
+    ]
+  },
+  {
     "version": "1.163.0",
     "items": [
       {
