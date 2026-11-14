@@ -91,7 +91,7 @@ A partir de entonces, los nuevos usos empiezan con la holgura en lugar del valor
 
 ![Una bandeja cuya pared derecha solo tiene 0,6 mm: Comprobar impresión la pinta de rojo y la indica en la ventana.](shot:print-check)
 
-{{ui:printCheck.show}} en una línea lleva allí la cámara; selecciona las piezas flotantes, las que se apoyan en muy poco y las mallas abiertas, y en los voladizos activa **Mostrar voladizos**. Los cuerpos que se solapan se comprueban unidos, como los une el laminador. Si cambias el diseño con la ventana abierta, aparece {{ui:printCheck.stale}}; haz clic ahí o en {{ui:printCheck.checkAgain}}. [[Esc]] cierra la ventana. El diseño no cambia. Una IA hace la misma comprobación con `layerling_check_print`.
+{{ui:printCheck.show}} en una línea lleva allí la cámara; selecciona las piezas flotantes, las que se apoyan en muy poco y las mallas abiertas, y en los voladizos activa **Mostrar voladizos**. Los cuerpos que se solapan se comprueban unidos, como los une el laminador. Si cambias el diseño con la ventana abierta, aparece {{ui:printCheck.stale}}; haz clic ahí o en {{ui:printCheck.checkAgain}}. [[Esc]] cierra la ventana. El diseño no cambia. Una IA hace la misma comprobación con `layerling_check_print`. La ventana solo comprueba, no imprime ni guarda nada: para imprimir, exporta el diseño para tu laminador con {{ui:editor.export}} en el grupo {{ui:editor.group.file}}. {{ui:printCheck.openExport}} en la ventana cierra la comprobación y abre la exportación.
 
 ## Cuando lo tengas listo
 

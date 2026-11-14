@@ -89,7 +89,7 @@ Od takrat nove uporabe začnejo z zračnostjo namesto z vgrajeno vrednostjo: {{u
 
 ![Pladenj, katerega desna stena je debela le 0,6 mm: Preveri tisk jo pobarva rdeče in jo navede v oknu.](shot:print-check)
 
-{{ui:printCheck.show}} v vrstici pripelje kamero tja; izbere lebdeče dele, dele z majhnim stikom in odprte mreže, pri previsih pa vklopi **Pokaži previse**. Telesa, ki se prekrivajo, se preverijo združena, kot jih združi slicer. Če model spremenite, medtem ko je okno odprto, se pokaže {{ui:printCheck.stale}}; kliknite to ali {{ui:printCheck.checkAgain}}. [[Esc]] zapre okno. Na modelu se nič ne spremeni. UI naredi isto preverjanje z `layerling_check_print`.
+{{ui:printCheck.show}} v vrstici pripelje kamero tja; izbere lebdeče dele, dele z majhnim stikom in odprte mreže, pri previsih pa vklopi **Pokaži previse**. Telesa, ki se prekrivajo, se preverijo združena, kot jih združi slicer. Če model spremenite, medtem ko je okno odprto, se pokaže {{ui:printCheck.stale}}; kliknite to ali {{ui:printCheck.checkAgain}}. [[Esc]] zapre okno. Na modelu se nič ne spremeni. UI naredi isto preverjanje z `layerling_check_print`. Okno samo preverja, nič ne natisne ali shrani: za tisk model izvozite za rezalnik z {{ui:editor.export}} v skupini {{ui:editor.group.file}}. {{ui:printCheck.openExport}} v oknu zapre preverjanje in odpre izvoz.
 
 ## Ko gre zares
 

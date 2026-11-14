@@ -36,6 +36,8 @@ Krychle pohledu vlevo nahoře otáčí pohled, když za ni táhnete, a klepnutí
 
 Špička prstu zakrývá to, na co míří. layerling nechá prst dosáhnout na úchyty, body, čáry a hrany o kousek dál než ukazatel myši, ale stylus je jemnější. To platí pro pero, které tablet zná jako pero, například Apple Pencil nebo S Pen. Obyčejný stylus s gumovým hrotem se pro obrazovku počítá jako prst a není jemnější než on, pracujte s ním tedy jako s prstem. Když se Apple Pencil na iPadu vznáší nad tlačítkem, po chvíli se v malé bublině objeví jeho název, jako nápověda u myši.
 
+Kolem výběru leží úchyty velikosti, šipky otáčení a šipky posunu těsně u sebe, takže prst snadno chytí ten nesprávný. Tlačítko s ukazující rukou v liště pohledu volí, co prst dělá: {{ui:camera.touchHandles.all}}, {{ui:camera.touchHandles.move}}, {{ui:camera.touchHandles.size}} nebo {{ui:camera.touchHandles.turn}}, každé klepnutí přepne na další. Ostatní úchyty zmizí; v režimu velikosti nebo otáčení prst na tělese těleso jen vybere a už ho neposune. Prohlížeč si volbu pamatuje. Stejně jako {{ui:camera.touchRotate}} se tlačítko ukazuje jen na zařízení s dotykovou obrazovkou.
+
 V režimu skici kreslí {{ui:sketch.freehand}} perem nebo prstem jako na papír; po zvednutí se z čáry stanou body skici, které můžete upravit, viz [Skici](chapter:sketches).
 
 Pokud se tělesa posouvají, protože se jich dotknou děti nebo spěchající ruce, zapněte v nastavení {{ui:workspace.selectBeforeMoving}}: těleso pak musí být nejprve vybráno a teprve další tažení ho přesune.

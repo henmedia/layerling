@@ -91,7 +91,7 @@ Från och med då utgår nya verktyg från ditt uppmätta spel i stället för s
 
 ![En bricka vars högra vägg bara är 0,6 mm tjock: Utskriftskontroll färgar den röd och nämner det i fönstret.](shot:print-check)
 
-{{ui:printCheck.show}} på en rad flyttar kameran dit; den markerar svävande delar, delar med för liten bas och öppna nät, och för överhäng slår den på **Visa överhäng**. Kroppar som överlappar varandra kontrolleras sammanslagna, så som slicern tolkar dem. Om du ändrar designen medan fönstret är öppet visas {{ui:printCheck.stale}}; klicka på det eller på {{ui:printCheck.checkAgain}}. [[Esc]] stänger fönstret. Ingenting i designen ändras. En AI kan köra samma kontroll med `layerling_check_print`.
+{{ui:printCheck.show}} på en rad flyttar kameran dit; den markerar svävande delar, delar med för liten bas och öppna nät, och för överhäng slår den på **Visa överhäng**. Kroppar som överlappar varandra kontrolleras sammanslagna, så som slicern tolkar dem. Om du ändrar designen medan fönstret är öppet visas {{ui:printCheck.stale}}; klicka på det eller på {{ui:printCheck.checkAgain}}. [[Esc]] stänger fönstret. Ingenting i designen ändras. En AI kan köra samma kontroll med `layerling_check_print`. Fönstret kontrollerar bara, det skriver inte ut eller sparar något: för att skriva ut exporterar du designen till din slicer med {{ui:editor.export}} i gruppen {{ui:editor.group.file}}. {{ui:printCheck.openExport}} i fönstret stänger kontrollen och öppnar exporten.
 
 ## När du är klar
 

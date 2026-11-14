@@ -357,6 +357,23 @@ export const CORNER_RULER_MIN_ARM = 10;
 export const CORNER_RULER_MAX_ARM = 5000;
 
 /**
+ * The mouse pointer over an arm's end: a double arrow along the arm as it runs on the screen, from the corner `from`
+ * to the end `to` (screen pixels, y down). The arm running up and down shows the up-and-down arrows, a slanted one
+ * the slanted arrows (Discussion #1743: every end showed the left-right arrows).
+ */
+export function cornerRulerArmCursor(from: { x: number; y: number }, to: { x: number; y: number }) {
+  const dx = to.x - from.x;
+  const dy = to.y - from.y;
+  if (Math.hypot(dx, dy) < 1e-6) return "ew-resize";
+  // The direction folded onto 0..180 degrees, since both ways of an arm show the same double arrow.
+  const angle = ((Math.atan2(dy, dx) * 180) / Math.PI + 180) % 180;
+  if (angle < 22.5 || angle >= 157.5) return "ew-resize";
+  if (angle < 67.5) return "nwse-resize";
+  if (angle < 112.5) return "ns-resize";
+  return "nesw-resize";
+}
+
+/**
  * How long an arm becomes when its end is dragged to `point`: the distance from the corner along that arm, rounded
  * to whole millimetres and kept between CORNER_RULER_MIN_ARM and CORNER_RULER_MAX_ARM. A point behind the corner
  * leaves the shortest arm (Discussion #1469).

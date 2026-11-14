@@ -36,6 +36,8 @@ De beeldkubus linksboven draait het beeld als je eraan sleept, en een tik op een
 
 Een vingertop bedekt waar hij op mikt. layerling laat een vinger iets verder naar hendels, punten, lijnen en randen reiken dan een muisaanwijzer, maar een stylus is fijner. Dat geldt voor een pen die de tablet als pen kent, zoals een Apple Pencil of een S Pen. Een gewone stylus met rubberen punt geldt voor het scherm als vinger en is niet fijner dan een vinger; werk er dus mee als met een vinger. Zweeft een Apple Pencil op de iPad boven een knop, dan verschijnt na een moment de naam in een klein tekstballonnetje, zoals bij de muis de tooltip.
 
+Rond een selectie liggen de groottehendels, de draaipijlen en de pijlen om te verplaatsen dicht bij elkaar, en een vinger pakt makkelijk de verkeerde. De knop met de wijzende hand in de weergavebalk kiest wat een vinger doet: {{ui:camera.touchHandles.all}}, {{ui:camera.touchHandles.move}}, {{ui:camera.touchHandles.size}} of {{ui:camera.touchHandles.turn}}, elke tik naar de volgende. De andere hendels verdwijnen; op grootte of draaien selecteert een vinger op het lichaam het alleen en verplaatst het niet meer. De browser onthoudt de keuze. Net als {{ui:camera.touchRotate}} verschijnt de knop alleen op een apparaat met aanraakscherm.
+
 In schetsmodus tekent {{ui:sketch.freehand}} met pen of vinger zoals op papier; als je loslaat, wordt de lijn schetspunten die je kunt bewerken, zie [Schetsen](chapter:schetsen).
 
 Verschuiven lichamen doordat kinderen of haastige handen ze aanraken, zet dan in de instellingen {{ui:workspace.selectBeforeMoving}} aan: een lichaam moet dan eerst geselecteerd zijn, en pas de volgende sleep verplaatst het.

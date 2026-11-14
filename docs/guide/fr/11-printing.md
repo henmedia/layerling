@@ -89,7 +89,7 @@ Dès lors, les nouvelles utilisations partent du jeu au lieu de la valeur intég
 
 ![Un bac dont la paroi droite ne fait que 0,6 mm : Vérifier l'impression la peint en rouge et la signale dans la fenêtre.](shot:print-check)
 
-{{ui:printCheck.show}} sur une ligne y amène la caméra ; il sélectionne les pièces en l'air, celles qui reposent sur trop peu et les maillages ouverts, et pour les surplombs il active **Afficher les surplombs**. Les corps qui se chevauchent sont vérifiés réunis, comme le trancheur les réunit. Si vous modifiez le modèle pendant que la fenêtre est ouverte, elle affiche {{ui:printCheck.stale}} ; cliquez dessus ou sur {{ui:printCheck.checkAgain}}. [[Esc]] ferme la fenêtre. Rien ne change dans le modèle. Une IA fait la même vérification avec `layerling_check_print`.
+{{ui:printCheck.show}} sur une ligne y amène la caméra ; il sélectionne les pièces en l'air, celles qui reposent sur trop peu et les maillages ouverts, et pour les surplombs il active **Afficher les surplombs**. Les corps qui se chevauchent sont vérifiés réunis, comme le trancheur les réunit. Si vous modifiez le modèle pendant que la fenêtre est ouverte, elle affiche {{ui:printCheck.stale}} ; cliquez dessus ou sur {{ui:printCheck.checkAgain}}. [[Esc]] ferme la fenêtre. Rien ne change dans le modèle. Une IA fait la même vérification avec `layerling_check_print`. La fenêtre ne fait que vérifier, elle n'imprime ni n'enregistre rien : pour imprimer, exportez le modèle pour votre trancheur avec {{ui:editor.export}} dans le groupe {{ui:editor.group.file}}. {{ui:printCheck.openExport}} dans la fenêtre ferme la vérification et ouvre l'export.
 
 ## Quand tu es prêt
 

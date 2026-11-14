@@ -36,6 +36,8 @@ Vykuben uppe till vänster vrider vyn när du drar i den, och ett tryck på någ
 
 En fingertopp skymmer det man siktar på. layerling låter ett finger fånga handtag, punkter, linjer och kanter på något längre håll än en muspekare, men en pekpenna är ändå mer exakt. Det gäller en aktiv penna som surfplattan känner igen som penna, till exempel Apple Pencil eller S Pen. En vanlig penna med gummispets räknas av skärmen som ett finger och blir inte mer finmaskig än ett sådant, så arbeta med den som med ett finger. En Apple Pencil som svävar strax ovanför skärmen på en iPad visar också namnet på en knapp efter ett ögonblick i en liten bubbla, precis som en muspekare med verktygstips.
 
+Runt en markering ligger storlekshandtagen, vridpilarna och pilarna för att flytta tätt, och ett finger tar lätt fel. Knappen med den pekande handen i vyfältet väljer vad ett finger gör: {{ui:camera.touchHandles.all}}, {{ui:camera.touchHandles.move}}, {{ui:camera.touchHandles.size}} eller {{ui:camera.touchHandles.turn}}, ett tryck till nästa. De andra handtagen döljs; på storlek eller vridning markerar ett finger på kroppen den bara och flyttar den inte längre. Webbläsaren minns valet. Precis som {{ui:camera.touchRotate}} syns knappen bara på en enhet med pekskärm.
+
 I skissläget ritar {{ui:sketch.freehand}} med pennan eller ett finger som på papper; när du lyfter spetsen omvandlas strecket till redigerbara skiss-punkter, se [Skisser](chapter:sketches).
 
 Om kroppar glider iväg när barn eller hastiga händer råkar nudda dem slår du på {{ui:workspace.selectBeforeMoving}} i inställningarna: då måste en kropp markeras först innan nästa dragning flyttar den.
