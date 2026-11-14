@@ -88,5 +88,18 @@
     "guide": {
       "section": "sbcBoard"
     }
+  },
+  {
+    "title": {
+      "de": "Gedrehte Teile in der Skizze richtig herum",
+      "en": "Turned parts the right way round in a sketch"
+    },
+    "body": {
+      "de": "Ein gedrehter Quader oder ein runder Körper unter einer Skizze war falsch herum gedreht: 45° wurden zu −45°, ein Balken lief als „\\“ statt als „/“. Jetzt liegen sein Umriss und die Punkte, an denen eine Linie einrastet, genau dort, wo das Teil steht.",
+      "en": "A turned box or round body under a sketch was turned the wrong way round: 45° came out as −45°, a bar ran as \"\\\" instead of \"/\". Now its outline and the points a line snaps to lie exactly where the part stands."
+    },
+    "guide": {
+      "section": "sketchDrawing"
+    }
   }
 ]
