@@ -919,6 +919,8 @@ export function SecondaryToolbar({
       if (!shapesPinnedRef.current && !shapesMenuRef.current?.contains(event.target as Node)) setShapesOpen(false);
     };
     const closeOnEscape = (event: KeyboardEvent) => {
+      // An Esc that takes back what an input method is composing in the shape search is not one for the panel.
+      if (event.isComposing) return;
       if (event.key === "Escape" && !shapesPinnedRef.current) setShapesOpen(false);
     };
     window.addEventListener("pointerdown", closeOnPointerDown);

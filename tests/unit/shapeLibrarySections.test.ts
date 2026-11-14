@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { setLanguage } from "@/lib/i18n";
+import { LANGUAGES } from "@/lib/languages";
 import { libraryShapeAssets, shapeAssetMenuLabel } from "@/lib/shapeCatalog";
 import {
   RECENT_SHAPE_LIMIT,
@@ -66,6 +67,30 @@ describe("searching the shape library (#1170)", () => {
     expect(found("Gewinde")).toEqual(["thread"]);
     await setLanguage("en", false);
     expect(found("charniere")).toEqual([]);
+  });
+
+  it("finds every shape by its name in every language, whatever script it is written in", async () => {
+    const missing: string[] = [];
+    for (const language of LANGUAGES) {
+      await setLanguage(language, false);
+      for (const shape of libraryShapeAssets) {
+        if (!found(label(shape)).includes(shape.id)) missing.push(`${language}: ${label(shape)}`);
+      }
+    }
+    await setLanguage("en", false);
+    expect(missing).toEqual([]);
+  });
+
+  it("finds a shape by its Japanese name, also from a part of it and from kana typed in hiragana", async () => {
+    await setLanguage("ja", false);
+    expect(found("円柱")).toContain("cylinder");
+    expect(found("歯車")).toContain("gear");
+    expect(found("xyzzy")).toEqual([]);
+    const tile = (id: string) => label(libraryShapeAssets.find((shape) => shape.id === id)!);
+    // Whatever the catalogue calls the sphere: its first two characters are enough, and none of them finds everything.
+    expect(found(tile("sphere").slice(0, 2))).toContain("sphere");
+    expect(found(tile("sphere").slice(0, 2)).length).toBeLessThan(libraryShapeAssets.length);
+    await setLanguage("en", false);
   });
 
   it("finds a shape by its own words, not by the name of its section, and nothing for a word no shape has", async () => {

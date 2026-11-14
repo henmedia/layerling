@@ -90,6 +90,106 @@ describe("searchCommands", () => {
     expect(found("połóż")).toEqual(["flat"]);
   });
 
+  it("finds a label in a script that is not Latin: Japanese, Chinese, Russian, Arabic", () => {
+    const commands: Cmd[] = [
+      { id: "ja-cylinder", label: "シェイプを追加: 円柱", group: "シェイプ" },
+      { id: "ja-fillet", label: "フィレット", group: "修正" },
+      { id: "ja-ungroup", label: "グループ化を解除", group: "結合" },
+      { id: "zh-cylinder", label: "添加形状：圆柱", group: "形状" },
+      { id: "ru-cylinder", label: "Добавить фигуру: Цилиндр", group: "Фигуры" },
+      { id: "ru-hollow", label: "Сделать полым", group: "Изменить" },
+      { id: "ar-cylinder", label: "إضافة شكل: أسطوانة", group: "الأشكال" },
+    ];
+    const found = (query: string) => searchCommands(commands, query).map((command) => command.id);
+    expect(found("円柱")).toEqual(["ja-cylinder"]);
+    expect(found("フィレ")).toEqual(["ja-fillet"]);
+    // Japanese writes no spaces: a word in the middle of a label is found too, and so is the group.
+    expect(found("解除")).toEqual(["ja-ungroup"]);
+    expect(found("追加 円柱")).toEqual(["ja-cylinder"]);
+    expect(found("修正")).toEqual(["ja-fillet"]);
+    expect(found("圆柱")).toEqual(["zh-cylinder"]);
+    expect(found("цилиндр")).toEqual(["ru-cylinder"]);
+    expect(found("ПОЛЫМ")).toEqual(["ru-hollow"]);
+    expect(found("أسطوانة")).toEqual(["ar-cylinder"]);
+    expect(found("xyzzy")).toEqual([]);
+    expect(found("球")).toEqual([]);
+  });
+
+  it("takes what the Japanese input writes differently as the same: kana, full width, half width", () => {
+    const commands: Cmd[] = [
+      { id: "fillet", label: "フィレット", group: "修正" },
+      { id: "group", label: "グループ化", group: "結合", keywords: ["group"] },
+      { id: "stl", label: "STLを書き出す", group: "ファイル" },
+    ];
+    const found = (query: string) => searchCommands(commands, query).map((command) => command.id);
+    // Hiragana, as the field holds it while the word is still being typed.
+    expect(found("ふぃれ")).toEqual(["fillet"]);
+    expect(found("ぐるーぷ")).toEqual(["group"]);
+    expect(found("ｸﾞﾙｰﾌﾟ")).toEqual(["group"]);
+    expect(found("ＳＴＬ")).toEqual(["stl"]);
+    expect(found("ｇｒｏｕｐ")).toEqual(["group"]);
+    // A full-width space separates the words like a plain one.
+    expect(found("書き出す　ＳＴＬ")).toEqual(["stl"]);
+    // The voiced kana is another letter, not an accent.
+    expect(found("くるーぷ")).toEqual([]);
+  });
+
+  it("does not care about the accents and marks of other alphabets either", () => {
+    const commands: Cmd[] = [
+      { id: "da", label: "Sløjfe på æsken", group: "x" },
+      { id: "tr", label: "Işık ve Çizgi", group: "x" },
+      { id: "ru", label: "Жёлтый слой", group: "x" },
+      { id: "ar", label: "أَسْطُوَانَة", group: "x" },
+      { id: "cs", label: "Zkosení hrany", group: "x" },
+    ];
+    const found = (query: string) => searchCommands(commands, query).map((command) => command.id);
+    expect(found("sløjfe")).toEqual(["da"]);
+    expect(found("slojfe aesken")).toEqual(["da"]);
+    expect(found("isik cizgi")).toEqual(["tr"]);
+    expect(found("IŞIK")).toEqual(["tr"]);
+    expect(found("желтый")).toEqual(["ru"]);
+    expect(found("اسطوانه")).toEqual(["ar"]);
+    expect(found("zkoseni")).toEqual(["cs"]);
+  });
+
+  it("cuts a query into words the way a label is cut, so a name typed with its hyphen or brackets is found", () => {
+    const commands: Cmd[] = [
+      { id: "port", label: "Port opening", group: "Shapes", keywords: ["usb-c", "micro-usb"] },
+      { id: "qr", label: "QR-kode", group: "Former" },
+      { id: "thread", label: "ねじ（頭付き）", group: "シェイプ" },
+    ];
+    const found = (query: string) => searchCommands(commands, query).map((command) => command.id);
+    expect(found("usb-c")).toEqual(["port"]);
+    expect(found("QR-kode")).toEqual(["qr"]);
+    expect(found("ねじ（頭付き）")).toEqual(["thread"]);
+  });
+
+  it("finds nothing for a query of nothing but punctuation, and everything for an empty one", () => {
+    expect(ids("")).toEqual(COMMANDS.map((command) => command.id));
+    expect(ids("  \u3000 ")).toEqual(COMMANDS.map((command) => command.id));
+    expect(ids("?")).toEqual([]);
+    expect(ids("---")).toEqual([]);
+    expect(ids("（）")).toEqual([]);
+  });
+
+  it("finds a word anywhere in a group name that is written without spaces", () => {
+    const commands: Cmd[] = [
+      { id: "fillet", label: "フィレット", group: "エッジと壁" },
+      { id: "array", label: "パターン", group: "ミラーとパターン" },
+      { id: "mirror", label: "ミラー", group: "ミラーとパターン" },
+      { id: "zh-fillet", label: "圆角", group: "边缘与壁" },
+      { id: "measure", label: "Ruler", group: "Measure" },
+    ];
+    const found = (query: string) => searchCommands(commands, query).map((command) => command.id);
+    // The label that says it comes before the one that is only in the group of that name.
+    expect(found("パターン")).toEqual(["array", "mirror"]);
+    expect(found("ぱたーん")).toEqual(["array", "mirror"]);
+    expect(found("壁")).toEqual(["fillet", "zh-fillet"]);
+    // A group name with spaces between its words is still found by how a word starts only.
+    expect(found("meas")).toEqual(["measure"]);
+    expect(found("sure")).toEqual([]);
+  });
+
   it("finds Delete face by the words other programs use, in both languages", () => {
     const commands: Cmd[] = [
       { id: "delete", label: "Delete", group: "Edit", keywords: COMMAND_KEYWORDS.delete },
