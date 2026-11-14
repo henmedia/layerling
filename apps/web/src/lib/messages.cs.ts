@@ -1283,6 +1283,8 @@ export const MESSAGES_CS: Record<MessageKey, string> = {
   "printCheck.title": "Zkontrolovat tisk",
   "printCheck.subtitle": "Co by se při tisku pokazilo",
   "printCheck.help": "Hledá tenké stěny, díly ve vzduchu, malou opěru na podložce, převisy a otevřené sítě. Model zůstane beze změny.",
+  "printCheck.exportHint": "Tady se model jen kontroluje, nic se netiskne ani neukládá. K tisku ho exportujte pro slicer: Export ve skupině Soubor ({shortcut}).",
+  "printCheck.openExport": "Export …",
   "printCheck.scope.selection": "Vybrané objekty: {count}",
   "printCheck.scope.all": "Všechny viditelné objekty",
   "printCheck.nozzle": "Tryska",

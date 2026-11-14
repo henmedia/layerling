@@ -1143,6 +1143,8 @@ export const MESSAGES_JA: Partial<Record<MessageKey, string>> = {
   "printCheck.title": "プリントチェック",
   "printCheck.subtitle": "プリントでうまくいかないところを調べる",
   "printCheck.help": "うすい壁、浮いているパーツ、プレートにふれる面が小さいもの、オーバーハング、開いたメッシュをさがします。デザインは変わりません。",
+  "printCheck.exportHint": "ここではチェックするだけで、印刷も保存もしません。印刷するには、スライサー用にエクスポートしてください：「ファイル」グループの「エクスポート」（{shortcut}）。",
+  "printCheck.openExport": "エクスポート …",
   "printCheck.scope.selection": "選んだ{count}個のオブジェクト",
   "printCheck.scope.all": "見えているすべてのオブジェクト",
   "printCheck.nozzle": "ノズル",

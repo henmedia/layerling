@@ -3206,6 +3206,10 @@ html[data-theme="dark"]:where([data-palette="graphite"]) .inspector-bundle-note 
   color: #656565;
 }
 
+:where(html[data-theme="dark"][data-palette="graphite"]) .print-check-export {
+  color: #656565;
+}
+
 :where(html[data-theme="dark"][data-palette="graphite"]) .print-check-row {
   color: #2d2d2d;
   background: #f7f7f7;
@@ -6320,7 +6324,8 @@ html[data-theme="dark"]:where([data-palette="graphite"]) .print-check-nozzle-fie
 }
 
 html[data-theme="dark"]:where([data-palette="graphite"]) .print-check-nozzle-field span,
-html[data-theme="dark"]:where([data-palette="graphite"]) .print-check-nozzle-hint {
+html[data-theme="dark"]:where([data-palette="graphite"]) .print-check-nozzle-hint,
+html[data-theme="dark"]:where([data-palette="graphite"]) .print-check-export {
   color: #909090;
 }
 

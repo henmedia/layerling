@@ -1137,6 +1137,8 @@ export const MESSAGES_AR: Partial<Record<MessageKey, string>> = {
   "printCheck.title": "فحص الطباعة",
   "printCheck.subtitle": "ما الذي سيسوء عند الطباعة",
   "printCheck.help": "يبحث عن الجدران الرقيقة والأجزاء المعلّقة في الهواء والتلامس القليل مع اللوحة والبروزات والشبكات المفتوحة. يبقى التصميم كما هو.",
+  "printCheck.exportHint": "هنا يتم الفحص فقط، ولا تتم طباعة أو حفظ أي شيء. للطباعة صدّر التصميم إلى برنامج التقطيع: تصدير في مجموعة ملف ({shortcut}).",
+  "printCheck.openExport": "تصدير …",
   "printCheck.scope.selection": "الأجسام المحددة: {count}",
   "printCheck.scope.all": "كل الأجسام الظاهرة",
   "printCheck.nozzle": "الفوهة",

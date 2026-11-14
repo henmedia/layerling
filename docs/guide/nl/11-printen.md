@@ -89,7 +89,7 @@ Vanaf dan beginnen nieuwe toepassingen met de speling in plaats van met de ingeb
 
 ![Een bak waarvan de rechterwand maar 0,6 mm dik is: Print controleren kleurt hem rood en noemt hem in het venster.](shot:print-check)
 
-{{ui:printCheck.show}} bij een regel brengt de camera erheen; het selecteert de zwevende delen, die met weinig houvast en de open meshes, en bij de overhangen zet het **Overhang tonen** aan. Lichamen die overlappen worden samengevoegd gecontroleerd, zoals de slicer ze samenvoegt. Verander je het ontwerp terwijl het venster open is, dan staat er {{ui:printCheck.stale}}; klik daarop of op {{ui:printCheck.checkAgain}}. [[Esc]] sluit het venster. Aan het ontwerp verandert niets. Een AI doet dezelfde controle met `layerling_check_print`.
+{{ui:printCheck.show}} bij een regel brengt de camera erheen; het selecteert de zwevende delen, die met weinig houvast en de open meshes, en bij de overhangen zet het **Overhang tonen** aan. Lichamen die overlappen worden samengevoegd gecontroleerd, zoals de slicer ze samenvoegt. Verander je het ontwerp terwijl het venster open is, dan staat er {{ui:printCheck.stale}}; klik daarop of op {{ui:printCheck.checkAgain}}. [[Esc]] sluit het venster. Aan het ontwerp verandert niets. Een AI doet dezelfde controle met `layerling_check_print`. Het venster controleert alleen, het print en bewaart niets: om te printen exporteer je het ontwerp voor je slicer met {{ui:editor.export}} in de groep {{ui:editor.group.file}}. {{ui:printCheck.openExport}} in het venster sluit de controle en opent de export.
 
 ## Als je klaar bent
 

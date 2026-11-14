@@ -1138,6 +1138,8 @@ export const MESSAGES_NL: Record<MessageKey, string> = {
   "printCheck.title": "Print controleren",
   "printCheck.subtitle": "Wat er bij het printen mis zou gaan",
   "printCheck.help": "Zoekt dunne wanden, delen in de lucht, weinig houvast op de plaat, overhangen en open meshes. Het ontwerp blijft zoals het is.",
+  "printCheck.exportHint": "Hier wordt het ontwerp alleen gecontroleerd, er wordt niets geprint of opgeslagen. Om te printen exporteer je het voor je slicer: Exporteren in de groep Bestand ({shortcut}).",
+  "printCheck.openExport": "Exporteren …",
   "printCheck.scope.selection": "{count} geselecteerde objecten",
   "printCheck.scope.all": "Alle zichtbare objecten",
   "printCheck.nozzle": "Nozzle",

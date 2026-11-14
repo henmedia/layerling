@@ -1095,6 +1095,8 @@ export const MESSAGES_ZH_CN: Partial<Record<MessageKey, string>> = {
   "printCheck.title": "打印检查",
   "printCheck.subtitle": "打印时会出什么问题",
   "printCheck.help": "查找过薄的壁、悬空的零件、与平台接触过少、悬垂和开放网格。设计本身保持不变。",
+  "printCheck.exportHint": "这里只做检查，不会打印或保存任何内容。要打印，请为切片软件导出模型：“文件”组中的“导出”（{shortcut}）。",
+  "printCheck.openExport": "导出 …",
   "printCheck.scope.selection": "已选 {count} 个对象",
   "printCheck.scope.all": "所有可见对象",
   "printCheck.nozzle": "喷嘴",

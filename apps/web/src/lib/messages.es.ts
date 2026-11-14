@@ -1141,6 +1141,8 @@ export const MESSAGES_ES: Partial<Record<MessageKey, string>> = {
   "printCheck.title": "Comprobar impresión",
   "printCheck.subtitle": "Lo que saldría mal al imprimir",
   "printCheck.help": "Busca paredes finas, piezas en el aire, poco contacto con la placa, voladizos y mallas abiertas. El diseño no cambia.",
+  "printCheck.exportHint": "Aquí solo se comprueba el diseño, no se imprime ni se guarda nada. Para imprimir, expórtalo para tu laminador: Exportar en el grupo Archivo ({shortcut}).",
+  "printCheck.openExport": "Exportar …",
   "printCheck.scope.selection": "{count} objetos seleccionados",
   "printCheck.scope.all": "Todos los objetos visibles",
   "printCheck.nozzle": "Boquilla",

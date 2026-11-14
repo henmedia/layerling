@@ -1138,6 +1138,8 @@ export const MESSAGES_DE: Record<MessageKey, string> = {
   "printCheck.title": "Druck prüfen",
   "printCheck.subtitle": "Was beim Drucken schiefginge",
   "printCheck.help": "Sucht dünne Wände, Teile in der Luft, wenig Halt auf der Platte, Überhänge und offene Netze. Der Entwurf bleibt, wie er ist.",
+  "printCheck.exportHint": "Hier wird nur geprüft, nichts gedruckt oder gespeichert. Zum Drucken exportierst du das Modell für deinen Slicer: Exportieren in der Gruppe Datei ({shortcut}).",
+  "printCheck.openExport": "Exportieren …",
   "printCheck.scope.selection": "{count} ausgewählte Objekte",
   "printCheck.scope.all": "Alle sichtbaren Objekte",
   "printCheck.nozzle": "Düse",

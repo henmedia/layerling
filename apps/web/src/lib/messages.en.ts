@@ -1139,6 +1139,8 @@ export const MESSAGES_EN = {
   "printCheck.title": "Print check",
   "printCheck.subtitle": "What would go wrong when printing",
   "printCheck.help": "Looks for thin walls, parts in the air, small contact with the plate, overhangs and open meshes. The design stays as it is.",
+  "printCheck.exportHint": "This only checks the design, nothing is printed or saved. To print, export it for your slicer: Export in the File group ({shortcut}).",
+  "printCheck.openExport": "Export …",
   "printCheck.scope.selection": "{count} selected objects",
   "printCheck.scope.all": "All visible objects",
   "printCheck.nozzle": "Nozzle",

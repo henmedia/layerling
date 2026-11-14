@@ -1138,6 +1138,8 @@ export const MESSAGES_RU: Partial<Record<MessageKey, string>> = {
   "printCheck.title": "Проверить печать",
   "printCheck.subtitle": "Что пойдёт не так при печати",
   "printCheck.help": "Ищет тонкие стенки, детали в воздухе, малую опору на столе, нависания и открытые сетки. Модель не меняется.",
+  "printCheck.exportHint": "Здесь модель только проверяется, ничего не печатается и не сохраняется. Чтобы напечатать, экспортируйте её для слайсера: Экспорт в группе Файл ({shortcut}).",
+  "printCheck.openExport": "Экспорт …",
   "printCheck.scope.selection": "Выбрано объектов: {count}",
   "printCheck.scope.all": "Все видимые объекты",
   "printCheck.nozzle": "Сопло",

@@ -5536,6 +5536,8 @@ export const MESSAGES_SL: Partial<Record<MessageKey, string>> = {
   "printCheck.title": "Preveri tisk",
   "printCheck.subtitle": "Kaj bi šlo pri tiskanju narobe",
   "printCheck.help": "Išče tanke stene, dele v zraku, majhen stik s ploščo, previse in odprte mreže. Model ostane nespremenjen.",
+  "printCheck.exportHint": "Tu se model samo preveri, nič se ne natisne ali shrani. Za tisk ga izvozite za rezalnik: Izvozi v skupini Datoteka ({shortcut}).",
+  "printCheck.openExport": "Izvozi …",
   "printCheck.scope.selection": "Izbrani predmeti: {count}",
   "printCheck.scope.all": "Vsi vidni predmeti",
   "printCheck.nozzle": "Šoba",

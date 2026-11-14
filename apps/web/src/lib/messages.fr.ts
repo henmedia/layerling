@@ -1129,6 +1129,8 @@ export const MESSAGES_FR: Partial<Record<MessageKey, string>> = {
   "printCheck.title": "Vérifier l'impression",
   "printCheck.subtitle": "Ce qui raterait à l'impression",
   "printCheck.help": "Cherche les parois fines, les pièces en l'air, le faible contact avec le plateau, les surplombs et les maillages ouverts. Le modèle reste tel quel.",
+  "printCheck.exportHint": "Ici, le modèle est seulement vérifié : rien n'est imprimé ni enregistré. Pour imprimer, exportez-le pour votre trancheur : Exporter dans le groupe Fichier ({shortcut}).",
+  "printCheck.openExport": "Exporter …",
   "printCheck.scope.selection": "{count} objets sélectionnés",
   "printCheck.scope.all": "Tous les objets visibles",
   "printCheck.nozzle": "Buse",

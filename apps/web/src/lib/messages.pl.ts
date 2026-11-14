@@ -1094,6 +1094,8 @@ export const MESSAGES_PL: Partial<Record<MessageKey, string>> = {
   "printCheck.title": "Sprawdź wydruk",
   "printCheck.subtitle": "Co poszłoby źle przy drukowaniu",
   "printCheck.help": "Szuka cienkich ścianek, części w powietrzu, małego styku z płytą, nawisów i otwartych siatek. Projekt zostaje bez zmian.",
+  "printCheck.exportHint": "Tutaj projekt jest tylko sprawdzany, nic nie jest drukowane ani zapisywane. Aby drukować, wyeksportuj go do slicera: Eksportuj w grupie Plik ({shortcut}).",
+  "printCheck.openExport": "Eksportuj …",
   "printCheck.scope.selection": "Zaznaczone obiekty: {count}",
   "printCheck.scope.all": "Wszystkie widoczne obiekty",
   "printCheck.nozzle": "Dysza",

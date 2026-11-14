@@ -91,7 +91,7 @@ Fra da af starter nye anvendelser med spillerummet i stedet for den indbyggede v
 
 ![En bakke, hvis højre væg kun er 0,6 mm tyk: Tjek print maler den rød og nævner den i vinduet.](shot:print-check)
 
-{{ui:printCheck.show}} ved en linje fører kameraet derhen; den vælger de svævende dele, dem med lille kontakt og de åbne mesh, og ved overhængene slår den **Vis overhæng** til. Legemer, der overlapper, tjekkes samlet, som sliceren samler dem. Ændrer du modellen, mens vinduet er åbent, står der {{ui:printCheck.stale}}; klik på det eller på {{ui:printCheck.checkAgain}}. [[Esc]] lukker vinduet. Intet i modellen ændres. En AI laver samme tjek med `layerling_check_print`.
+{{ui:printCheck.show}} ved en linje fører kameraet derhen; den vælger de svævende dele, dem med lille kontakt og de åbne mesh, og ved overhængene slår den **Vis overhæng** til. Legemer, der overlapper, tjekkes samlet, som sliceren samler dem. Ændrer du modellen, mens vinduet er åbent, står der {{ui:printCheck.stale}}; klik på det eller på {{ui:printCheck.checkAgain}}. [[Esc]] lukker vinduet. Intet i modellen ændres. En AI laver samme tjek med `layerling_check_print`. Vinduet tjekker kun, det printer og gemmer ikke noget: For at printe eksporterer du modellen til din slicer med {{ui:editor.export}} i gruppen {{ui:editor.group.file}}. {{ui:printCheck.openExport}} i vinduet lukker tjekket og åbner eksporten.
 
 ## Når du er klar
 

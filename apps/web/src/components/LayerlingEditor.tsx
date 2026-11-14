@@ -19540,6 +19540,10 @@ export function LayerlingEditor({
           onChange={changePrintCheckSettings}
           onCheck={() => void runPrintCheck(printCheckTool.settings, printCheckTool.scopeIds)}
           onShow={showPrintCheckLine}
+          onExport={() => {
+            closePrintCheck();
+            setTopPanel("export");
+          }}
           onClose={closePrintCheck}
         />
       ) : null}

@@ -1133,6 +1133,8 @@ export const MESSAGES_SV: Partial<Record<MessageKey, string>> = {
   "printCheck.title": "Utskriftskontroll",
   "printCheck.subtitle": "Vad som skulle gå fel vid utskrift",
   "printCheck.help": "Letar efter tunna väggar, svävande delar i luften, liten kontaktyta mot plattan, överhäng och öppna nät. Designen lämnas orörd.",
+  "printCheck.exportHint": "Här kontrolleras designen bara, inget skrivs ut eller sparas. För att skriva ut exporterar du den till din slicer: Exportera i gruppen Fil ({shortcut}).",
+  "printCheck.openExport": "Exportera …",
   "printCheck.scope.selection": "{count} markerade objekt",
   "printCheck.scope.all": "Alla synliga objekt",
   "printCheck.nozzle": "Munstycke",

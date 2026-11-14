@@ -1131,6 +1131,8 @@ export const MESSAGES_IT: Partial<Record<MessageKey, string>> = {
   "printCheck.title": "Controlla la stampa",
   "printCheck.subtitle": "Cosa andrebbe storto in stampa",
   "printCheck.help": "Cerca pareti sottili, parti sospese, poco contatto con il piatto, sporgenze e mesh aperte. Il progetto non viene modificato.",
+  "printCheck.exportHint": "Qui il progetto viene solo controllato, niente viene stampato o salvato. Per stampare, esportalo per lo slicer: Esporta nel gruppo File ({shortcut}).",
+  "printCheck.openExport": "Esporta …",
   "printCheck.scope.selection": "{count} oggetti selezionati",
   "printCheck.scope.all": "Tutti gli oggetti visibili",
   "printCheck.nozzle": "Ugello",

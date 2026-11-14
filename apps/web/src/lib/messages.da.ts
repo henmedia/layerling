@@ -5521,6 +5521,8 @@ export const MESSAGES_DA: Partial<Record<MessageKey, string>> = {
   "printCheck.title": "Tjek print",
   "printCheck.subtitle": "Hvad der ville gå galt ved print",
   "printCheck.help": "Finder tynde vægge, dele i luften, lille kontakt med pladen, overhæng og åbne mesh. Modellen forbliver uændret.",
+  "printCheck.exportHint": "Her tjekkes modellen kun, intet printes eller gemmes. For at printe skal du eksportere den til din slicer: Eksportér i gruppen Fil ({shortcut}).",
+  "printCheck.openExport": "Eksportér …",
   "printCheck.scope.selection": "{count} valgte objekter",
   "printCheck.scope.all": "Alle synlige objekter",
   "printCheck.nozzle": "Dyse",
