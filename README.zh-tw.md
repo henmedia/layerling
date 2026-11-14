@@ -226,6 +226,10 @@ curl -fsSL https://raw.githubusercontent.com/henmedia/layerling/main/scripts/mac
 
 想要**更新**時再次執行同一行即可：現有資料夾會保留，啟動 layerling 時會先取得最新版本。指令碼位於 [`scripts/mac-quickstart.sh`](scripts/mac-quickstart.sh)，執行前可以先看看它做了什麼。換一個資料夾：`LAYERLING_DIR=~/3D/layerling sh mac-quickstart.sh`（先下載指令碼）。它還沒有在真正的 Mac 上試過；如果出了問題，請在討論區告訴我們。
 
+### Linux 桌面應用程式（Omarchy / Arch Linux）
+
+在 [Omarchy](https://omarchy.org) 和其他 Arch Linux 系統上，[layerling-omarchy](https://github.com/joaobordignon/layerling-omarchy) 把 layerling 打包成桌面應用程式：應用程式啟動器裡的獨立視窗，在你的電腦上執行 layerling 的伺服器，因此不需網路即可使用，MCP 橋接也已為 AI 用戶端準備好。`bin/install` 建置目前的版本並以 pacman 套件安裝，`bin/update` 將其更新到最新版本。它在本儲存庫之外另行維護；應用程式的問題請到那裡回報。
+
 ### Docker
 
 想在電腦、NAS（Synology、Unraid 等）或家用伺服器上執行 layerling 又不想安裝 Node.js，可以使用 Docker Hub 上現成的映像

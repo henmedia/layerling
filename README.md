@@ -233,6 +233,10 @@ It needs Git and Node.js 22.18 or newer. If one is missing, the script says what
 
 Run the same line again whenever you want to **update**: the existing folder is kept, and starting layerling pulls the latest version first. The script lives at [`scripts/mac-quickstart.sh`](scripts/mac-quickstart.sh), so you can read what it does before you run it. For another folder: `LAYERLING_DIR=~/3D/layerling sh mac-quickstart.sh` (after downloading the script). It has not been tried on a real Mac yet; if something goes wrong, please tell us in the discussions.
 
+### Linux Desktop App (Omarchy / Arch Linux)
+
+On [Omarchy](https://omarchy.org) and other Arch Linux systems, [layerling-omarchy](https://github.com/joaobordignon/layerling-omarchy) packages layerling as a desktop app: its own window in the app launcher, running layerling's server on your computer, so it works without internet, with the MCP bridge ready for an AI client. `bin/install` builds the current release and installs it as a pacman package, and `bin/update` brings it up to date. It is maintained separately, outside this repository; please report problems with the app there.
+
 ### Docker
 
 To run layerling on a computer, NAS (Synology, Unraid, etc.) or home server without installing Node.js, use the ready-made image **`henmedia/layerling`** on Docker Hub (also at **`ghcr.io/henmedia/layerling`**, the same image). Every release publishes it for amd64 and arm64 (Raspberry Pi, ARM NAS) under its version number and as `latest`. The app listens on port **3000**.

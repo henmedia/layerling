@@ -233,6 +233,10 @@ curl -fsSL https://raw.githubusercontent.com/henmedia/layerling/main/scripts/mac
 
 شغّل السطر نفسه مرة أخرى متى أردت **التحديث**: يبقى المجلد الموجود، وعند البدء يجلب layerling أحدث إصدار أولًا. السكربت موجود في [`scripts/mac-quickstart.sh`](scripts/mac-quickstart.sh)، فيمكنك قراءة ما يفعله قبل تشغيله. لمجلد آخر: `LAYERLING_DIR=~/3D/layerling sh mac-quickstart.sh` (بعد تنزيل السكربت). لم يُجرَّب بعد على جهاز Mac حقيقي؛ إذا حدث خطأ فأخبرنا في النقاشات.
 
+### تطبيق سطح المكتب على Linux ‏(Omarchy / Arch Linux)
+
+على [Omarchy](https://omarchy.org) وأنظمة Arch Linux الأخرى، يحزم [layerling-omarchy](https://github.com/joaobordignon/layerling-omarchy) برنامج layerling كتطبيق لسطح المكتب: نافذة خاصة به في مشغّل التطبيقات تشغّل خادم layerling على حاسوبك، فيعمل دون إنترنت، مع جسر MCP جاهز لعميل ذكاء اصطناعي. يبني `bin/install` الإصدار الحالي ويثبّته كحزمة pacman، ويحدّثه `bin/update`. تتم صيانته بشكل منفصل خارج هذا المستودع؛ يُرجى الإبلاغ عن مشاكل التطبيق هناك.
+
 ### Docker
 
 لتشغيل layerling على حاسوب أو NAS ‏(Synology وUnraid وغيرهما) أو خادم منزلي دون تثبيت Node.js، استخدم الصورة الجاهزة **`henmedia/layerling`** على Docker Hub (وهي أيضًا على **`ghcr.io/henmedia/layerling`**، الصورة نفسها). كل إصدار ينشرها لـamd64 وarm64 ‏(Raspberry Pi، وأجهزة NAS بمعالج ARM) تحت رقم إصداره وباسم `latest`. يستمع التطبيق على المنفذ **3000**.
