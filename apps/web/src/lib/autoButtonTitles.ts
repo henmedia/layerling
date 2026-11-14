@@ -24,7 +24,8 @@ export function buttonLabel(button: Element) {
 
 /**
  * Names the buttons under `root` that have no title of their own after their label, and brings a name given so up to
- * date with the label. A button the hover bubble holds (penHoverTip.ts) waits until the pointer leaves it.
+ * date with the label. A button the hover bubble holds (penHoverTip.ts) waits until the pointer leaves it. An item of
+ * a menu (role="menuitem") gets no name: it shows its label in full.
  */
 export function applyAutoTitles(root: ParentNode) {
   root.querySelectorAll<HTMLButtonElement>("button").forEach((button) => {
@@ -32,7 +33,8 @@ export function applyAutoTitles(root: ParentNode) {
     const auto = button.getAttribute(AUTO_TITLE);
     const title = button.getAttribute("title");
     if (title && title !== auto) return;
-    const label = buttonLabel(button);
+    // A menu's item shows its whole label already; a title only repeated it in a bubble above (Discussion #1745).
+    const label = button.getAttribute("role") === "menuitem" ? "" : buttonLabel(button);
     if (!label) {
       if (auto === null) return;
       if (title === auto) button.removeAttribute("title");

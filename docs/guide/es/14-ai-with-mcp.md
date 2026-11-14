@@ -170,6 +170,7 @@ La IA trabaja con las mismas funciones que tú, por el mismo camino que sigues c
 | `layerling_saved_view` | guarda la vista actual en la tecla 7, 8, 9 o 0 y vuelve a ella, como Mayús+tecla y la tecla (solo la vista); también fija la vista de arranque de los diseños nuevos |
 | `layerling_build_plates` | lista, añade, nombra, ordena y quita las placas de impresión, mueve objetos a una placa y los reparte en las placas, como la barra de placas |
 | `layerling_clear_history` | elimina para siempre todos los pasos de deshacer, como el botón «Eliminar historial» de la vista del historial; necesita `confirm: true` |
+| `layerling_delete_history_steps` | borra para siempre estados sueltos del historial, nunca el actual, como la papelera junto a un paso en la lista de la vista del historial; necesita `steps` y `confirm: true` |
 | `layerling_list_backups` | lista las copias automáticas (Versiones anteriores) del diseño abierto, o con `all: true` de todos los diseños de este navegador |
 | `layerling_open_backup` | abre una copia por su `id` como diseño nuevo, nunca ligado al archivo original |
 | `layerling_set_history_view` | consulta un estado anterior del proyecto, como la vista del historial (el diseño real no se toca; las herramientas que cambian algo esperan a que se cierre) |

@@ -8027,6 +8027,21 @@ html[data-theme="dark"] .inspector-bundle-note {
   max-height: none;
 }
 
+.print-check-export {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 8px;
+  color: #867360;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+.print-check-export > span {
+  flex: 1;
+}
+
 .print-check-row {
   display: flex;
   align-items: flex-start;
@@ -8526,7 +8541,8 @@ html[data-theme="dark"] .touch-multi-select {
   filter: drop-shadow(0 0 4px rgba(129, 67, 0, 0.4));
 }
 
-/* An arm's end, dragged to make the arm longer or shorter (Discussion #1469): smaller than the corner's handle. */
+/* An arm's end, dragged to make the arm longer or shorter (Discussion #1469): smaller than the corner's handle.
+   The pointer follows the arm's direction on the screen (cornerRulerArmCursor, Discussion #1743); ew-resize is the fallback. */
 .corner-ruler-end-handle {
   fill: #ffffff;
   stroke: #b66108;
@@ -14307,7 +14323,8 @@ html[data-theme="dark"] .print-check-nozzle-field input {
 }
 
 html[data-theme="dark"] .print-check-nozzle-field span,
-html[data-theme="dark"] .print-check-nozzle-hint {
+html[data-theme="dark"] .print-check-nozzle-hint,
+html[data-theme="dark"] .print-check-export {
   color: #b9a58f;
 }
 

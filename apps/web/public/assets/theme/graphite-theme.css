@@ -3206,6 +3206,10 @@ html[data-theme="dark"]:where([data-palette="graphite"]) .inspector-bundle-note 
   color: #656565;
 }
 
+:where(html[data-theme="dark"][data-palette="graphite"]) .print-check-export {
+  color: #656565;
+}
+
 :where(html[data-theme="dark"][data-palette="graphite"]) .print-check-row {
   color: #2d2d2d;
   background: #f7f7f7;
@@ -6320,7 +6324,8 @@ html[data-theme="dark"]:where([data-palette="graphite"]) .print-check-nozzle-fie
 }
 
 html[data-theme="dark"]:where([data-palette="graphite"]) .print-check-nozzle-field span,
-html[data-theme="dark"]:where([data-palette="graphite"]) .print-check-nozzle-hint {
+html[data-theme="dark"]:where([data-palette="graphite"]) .print-check-nozzle-hint,
+html[data-theme="dark"]:where([data-palette="graphite"]) .print-check-export {
   color: #909090;
 }
 
@@ -9224,6 +9229,25 @@ html[data-theme="dark"]:where([data-palette="graphite"]) .whats-new-guide-link {
   color: #fff;
 }
 
+:where(html[data-theme="dark"][data-palette="graphite"]) .history-view-list button.history-view-list-delete {
+  color: #a33a2a;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .history-view-list button.history-view-list-delete:hover:not(:disabled),
+:where(html[data-theme="dark"][data-palette="graphite"]) .history-view-list button.history-view-list-delete:focus-visible {
+  background: #f6f6f6;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .history-view-list-head button {
+  color: #a33a2a;
+  background: white;
+  border: 1px solid #cccccc;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .history-view-list-head button:hover:not(:disabled) {
+  background: #f6f6f6;
+}
+
 :where(html[data-theme="dark"][data-palette="graphite"]) .history-view-facts {
   color: #676767;
 }
@@ -9327,6 +9351,22 @@ html[data-theme="dark"]:where([data-palette="graphite"]) .history-view-list butt
 
 html[data-theme="dark"]:where([data-palette="graphite"]) .history-view-list-now {
   color: #5fd394;
+}
+
+html[data-theme="dark"]:where([data-palette="graphite"]) .history-view-list button.history-view-list-delete {
+  color: #ff8a78;
+}
+
+html[data-theme="dark"]:where([data-palette="graphite"]) .history-view-list button.history-view-list-delete:hover:not(:disabled),
+html[data-theme="dark"]:where([data-palette="graphite"]) .history-view-list button.history-view-list-delete:focus-visible,
+html[data-theme="dark"]:where([data-palette="graphite"]) .history-view-list-head button:hover:not(:disabled) {
+  background: #3a3a3a;
+}
+
+html[data-theme="dark"]:where([data-palette="graphite"]) .history-view-list-head button {
+  color: #ff8a78;
+  background: #353535;
+  border-color: #515151;
 }
 
 html[data-theme="dark"]:where([data-palette="graphite"]) .history-view-play > button:not(.active),

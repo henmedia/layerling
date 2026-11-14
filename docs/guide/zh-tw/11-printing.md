@@ -91,7 +91,7 @@ FLSun、SeeMeCNC 等品牌的三角洲（Delta）印表機以及 Anycubic Predat
 
 ![右側壁只有 0.6 mm 厚的托盤：列印檢查把它塗成紅色，並在視窗中列出。](shot:print-check)
 
-點選某一行的{{ui:printCheck.show}}會把相機移到那裡；它會選取懸空的零件、接觸過少的零件和開放網格，對於懸垂則會開啟**顯示懸垂**。互相重疊的實體會合併後再檢查，就像切片軟體合併它們那樣。如果視窗開啟時修改了設計，會顯示{{ui:printCheck.stale}}；點選它或{{ui:printCheck.checkAgain}}即可。[[Esc]] 關閉視窗。設計本身不會改變。AI 可以用 `layerling_check_print` 做同樣的檢查。
+點選某一行的{{ui:printCheck.show}}會把相機移到那裡；它會選取懸空的零件、接觸過少的零件和開放網格，對於懸垂則會開啟**顯示懸垂**。互相重疊的實體會合併後再檢查，就像切片軟體合併它們那樣。如果視窗開啟時修改了設計，會顯示{{ui:printCheck.stale}}；點選它或{{ui:printCheck.checkAgain}}即可。[[Esc]] 關閉視窗。設計本身不會改變。AI 可以用 `layerling_check_print` 做同樣的檢查。這個視窗只做檢查，不會列印或儲存任何內容：要列印，請用 {{ui:editor.group.file}} 群組中的 {{ui:editor.export}} 為切片軟體匯出模型。視窗中的 {{ui:printCheck.openExport}} 會關閉檢查並開啟匯出。
 
 ## 準備就緒時
 

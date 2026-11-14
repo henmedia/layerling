@@ -36,6 +36,8 @@ Der Ansichtswürfel oben links dreht die Ansicht, wenn du ihn ziehst, und ein Ti
 
 Eine Fingerspitze verdeckt, worauf sie zielt. layerling lässt einen Finger an Griffe, Punkte, Linien und Kanten etwas weiter heranreichen als einen Mauszeiger, aber ein Stift ist feiner. Das gilt für einen Stift, den das Tablet als Stift kennt, etwa einen Apple Pencil oder einen S Pen. Ein einfacher Stift mit Gummispitze gilt für den Bildschirm als Finger und ist nicht feiner als einer, arbeite damit also wie mit dem Finger. Schwebt ein Apple Pencil auf dem iPad über einem Knopf, erscheint nach einem Moment sein Name in einer kleinen Blase, wie bei der Maus der Tooltip.
 
+Rund um eine Auswahl liegen die Größengriffe, die Drehpfeile und die Pfeile zum Verschieben dicht beieinander, und ein Finger erwischt leicht den falschen. Der Knopf mit der zeigenden Hand in der Ansichtsleiste wählt, was ein Finger tun kann: {{ui:camera.touchHandles.all}}, {{ui:camera.touchHandles.move}}, {{ui:camera.touchHandles.size}} oder {{ui:camera.touchHandles.turn}}, ein Tippen zum nächsten. Die übrigen Griffe verschwinden; steht er auf Größe oder Drehen, wählt ein Finger auf dem Körper ihn nur aus und verschiebt ihn nicht mehr. Der Browser merkt sich die Wahl. Wie {{ui:camera.touchRotate}} erscheint der Knopf nur auf Geräten mit Touchscreen.
+
 Im Skizzenmodus zeichnet {{ui:sketch.freehand}} mit Stift oder Finger wie auf Papier; beim Absetzen wird die Linie zu Skizzenpunkten, die du bearbeiten kannst, siehe [Skizzen](chapter:skizzen).
 
 Wenn Körper verrutschen, weil Kinder oder eilige Hände sie berühren, schalte in den Einstellungen {{ui:workspace.selectBeforeMoving}} ein: Ein Körper muss dann erst gewählt sein, und erst der nächste Zug verschiebt ihn.

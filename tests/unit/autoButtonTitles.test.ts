@@ -48,6 +48,15 @@ describe("titles the editor gives buttons (Discussion #1449)", () => {
     expect(button.hasAttribute(AUTO_TITLE)).toBe(false);
   });
 
+  it("gives a menu's items no title, since they show their label in full (Discussion #1745)", () => {
+    document.body.innerHTML = '<div role="menu"><button role="menuitem"><span>Mark the centre</span></button><button role="menuitem" title="Own title">Hide</button></div>';
+    const [item, titled] = [...document.querySelectorAll("button")];
+    applyAutoTitles(document);
+    expect(item.hasAttribute("title")).toBe(false);
+    expect(item.hasAttribute(AUTO_TITLE)).toBe(false);
+    expect(titled.title).toBe("Own title");
+  });
+
   it("waits while the hover bubble holds the button, and catches up when it lets go", () => {
     const button = exportButton("stl");
     applyAutoTitles(document);

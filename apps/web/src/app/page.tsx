@@ -1082,7 +1082,7 @@ export default function Home() {
   /** The newest list, for work that resumes after waiting on a save. */
   const projectsRef = useRef(projects);
   projectsRef.current = projects;
-  const [projectSaveFailure, setProjectSaveFailure] = useState<{ message: string; at: number } | null>(null);
+  const [projectSaveFailure, setProjectSaveFailure] = useState<{ message: string; at: number; historyTrimmed?: boolean } | null>(null);
   // Designs whose newest state could not be stored (#1652): the revision that failed, until a newer save gets through. While
   // one is listed, closing or reloading the tab asks first, and the editor keeps a red note up.
   const unsavedProjectsRef = useRef(new Map<string, number>());
@@ -1744,7 +1744,7 @@ export default function Home() {
         const trimmed = result?.historyTrimmed;
         if (trimmed && !trimmedHistoryToldRef.current.has(snapshot.projectId)) {
           trimmedHistoryToldRef.current.add(snapshot.projectId);
-          setProjectSaveFailure({ message: t("notice.projectHistoryTrimmed", { kept: trimmed.kept, total: trimmed.total }), at: Date.now() });
+          setProjectSaveFailure({ message: t("notice.projectHistoryTrimmed", { kept: trimmed.kept, total: trimmed.total }), at: Date.now(), historyTrimmed: true });
         }
         setProjects((current) =>
           current.map((project) =>

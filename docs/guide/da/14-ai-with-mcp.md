@@ -170,6 +170,7 @@ AI'en arbejder med de samme funktioner som dig, gennem den samme vej som din han
 | `layerling_saved_view` | gemmer den aktuelle visning under tasten 7, 8, 9 eller 0 og går tilbage til den, som Shift+tast og tasten (kun visningen); sætter også startvisningen for nye designs |
 | `layerling_build_plates` | viser, tilføjer, navngiver, ordner og fjerner byggepladerne, flytter objekter til en plade og fordeler dem på pladerne, som pladelinjen |
 | `layerling_clear_history` | sletter hvert fortryd-trin for evigt, som historikvisningens "Slet historik"-knap; kræver `confirm: true` |
+| `layerling_delete_history_steps` | sletter enkelte tilstande i historikken for altid, aldrig den aktuelle, som skraldespanden ved et trin i historikvisningens liste; kræver `steps` og `confirm: true` |
 | `layerling_list_backups` | viser de automatiske sikkerhedskopier (Tidligere versioner) af det åbne design, eller med `all: true` af alle designs i denne browser |
 | `layerling_open_backup` | åbner en sikkerhedskopi via dens `id` som et nyt design, aldrig knyttet til den oprindelige fil |
 | `layerling_set_history_view` | ser tilbage på en tidligere tilstand af projektet, som historikvisningen (det rigtige design forbliver urørt; ændringsværktøjer venter indtil den er lukket) |

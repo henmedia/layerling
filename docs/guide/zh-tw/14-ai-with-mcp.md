@@ -170,6 +170,7 @@ AI 使用的是與你相同的功能，走的也是你在編輯器中操作時�
 | `layerling_saved_view` | 把目前檢視儲存到按鍵 7、8、9 或 0，之後可回到該檢視，就像 Shift+按鍵與單按該鍵（只影響檢視）；也可設定新設計的起始視圖 |
 | `layerling_build_plates` | 列出、新增、命名、排序和移除列印板，把物件移到某個列印板並分配到各列印板上，如同列印板列 |
 | `layerling_clear_history` | 永久刪除所有復原步驟，就像歷史記錄檢視的「刪除歷史記錄」按鈕；需要 `confirm: true` |
+| `layerling_delete_history_steps` | 永久刪除歷史記錄中的單一狀態（不會刪除目前狀態），與歷史記錄檢視清單中步驟旁的垃圾桶相同；需要 `steps` 和 `confirm: true` |
 | `layerling_list_backups` | 列出目前設計的自動備份（早期版本），使用 `all: true` 時列出此瀏覽器中所有設計的備份 |
 | `layerling_open_backup` | 依 `id` 將備份作為新設計開啟，絕不與原檔案關聯 |
 | `layerling_set_history_view` | 回看專案較早的狀態，就像歷史記錄檢視（實際設計不受影響；會修改設計的工具會等到它關閉） |
