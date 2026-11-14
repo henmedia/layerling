@@ -8526,7 +8526,8 @@ html[data-theme="dark"] .touch-multi-select {
   filter: drop-shadow(0 0 4px rgba(129, 67, 0, 0.4));
 }
 
-/* An arm's end, dragged to make the arm longer or shorter (Discussion #1469): smaller than the corner's handle. */
+/* An arm's end, dragged to make the arm longer or shorter (Discussion #1469): smaller than the corner's handle.
+   The pointer follows the arm's direction on the screen (cornerRulerArmCursor, Discussion #1743); ew-resize is the fallback. */
 .corner-ruler-end-handle {
   fill: #ffffff;
   stroke: #b66108;
