@@ -91,7 +91,7 @@ describe("the print check's window", () => {
 
   it("has Show on the amber lines only, and hands the line over", () => {
     const { panel, calls } = mount();
-    const shows = [...panel.querySelectorAll<HTMLButtonElement>(".print-check-show")];
+    const shows = [...panel.querySelectorAll<HTMLButtonElement>(".print-check-list .print-check-show")];
     expect(shows.map((button) => button.getAttribute("aria-label"))).toEqual(["Show: Thin walls", "Show: Floating parts", "Show: Small contact with the plate", "Show: Overhangs"]);
     click(shows[1]);
     click(shows[3]);
@@ -101,7 +101,7 @@ describe("the print check's window", () => {
   it("says when nothing was found, and shows no Show at all", () => {
     const { panel } = mount({ result: clean });
     expect(rows(panel).every((row) => row.classList.contains("ok"))).toBe(true);
-    expect(panel.querySelector(".print-check-show")).toBeNull();
+    expect(panel.querySelector(".print-check-list .print-check-show")).toBeNull();
     expect(panel.textContent).toContain("Nothing found: ready for the slicer.");
     expect(panel.textContent).toContain("No wall thinner than 0");
   });
@@ -116,7 +116,7 @@ describe("the print check's window", () => {
     const { panel, calls } = mount({ stale: true });
     const stale = panel.querySelector<HTMLButtonElement>(".clearance-stale")!;
     expect(stale.textContent).toContain("Changed – check again");
-    expect([...panel.querySelectorAll<HTMLButtonElement>(".print-check-show")].every((button) => button.disabled)).toBe(true);
+    expect([...panel.querySelectorAll<HTMLButtonElement>(".print-check-list .print-check-show")].every((button) => button.disabled)).toBe(true);
     expect(panel.querySelector(".print-check-list")!.classList.contains("stale")).toBe(true);
     click(stale);
     expect(calls).toEqual(["check"]);
