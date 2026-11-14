@@ -1,8 +1,11 @@
 import { beforeAll, describe, expect, it, vi } from "vitest";
 import { cadModifierGridfinityForShape } from "@/lib/cadProfileExtrusion";
+import { manifoldFromMeshData } from "@/lib/editorBooleans";
+import { meshForShape } from "@/lib/editorMeshCore";
 import { GRIDFINITY_LABEL_TEXT_HEIGHT, gridfinityLabelledTriangles, gridfinityLabelTextPlaces } from "@/lib/gridfinityGeometry";
 import { gridfinityLabelLetters } from "@/lib/gridfinityLabelText";
 import { gridfinityPartSolid } from "@/lib/gridfinitySolid";
+import { LID_DEFAULTS, lidForSolid } from "@/lib/lidTool";
 import { rememberManifoldRuntime } from "@/lib/manifoldHandle";
 import { loadTextFonts } from "@/lib/textFonts";
 import type { WorkplaneShape } from "@/types/layerling";
@@ -10,8 +13,9 @@ import { cad, runtime, trianglesVolume } from "./helpers/gridfinityHarness";
 import { lettersAreaAndMiddle } from "./helpers/gridfinityLetters";
 
 /*
- * The letters on a Gridfinity bin's label shelves (Discussion #1308) in the exact body: built from the font's curves,
- * one glyph at a time, joined to the bin last, as much material as the display mesh draws, holes and all.
+ * The letters on a Gridfinity bin's or tray's label shelves (Discussion #1308, #1501) in the exact body, and Make lid
+ * on a lettered tray. They are built from the font's curves, one glyph at a time, joined to the bin last, as much
+ * material as the display mesh draws, holes and all.
  */
 
 beforeAll(async () => {
@@ -22,6 +26,9 @@ beforeAll(async () => {
 function binShape(fields: Record<string, unknown> = {}) {
   return { id: "g", name: "bin", kind: "gridfinity", x: 0, z: 0, elevation: 0, size: 83.5, width: 83.5, depth: 41.5, height: 25.4, rotation: 0, color: "#4f7fa8", gridfinityType: "bin", gridfinityLip: true, ...fields } as WorkplaneShape;
 }
+
+/** A tray of 80 x 40 x 20 mm (#1501), whose shelves run up to its top, or 0.4 mm under it with a text. */
+const TRAY = { gridfinityType: "tray", size: 80, width: 80, depth: 40, height: 20 };
 
 /** The exact body with and without its letters, and what the letters add in the display mesh. */
 function lettered(fields: Record<string, unknown>) {
@@ -49,6 +56,9 @@ describe("letters on Gridfinity label shelves in the exact body", () => {
     ["Stencil, drawn with straight segments", { gridfinityLabelFront: true, gridfinityLabelFrontText: "PARTS", gridfinityLabelFont: "Stencil" }],
     ["every wall's shelf", { gridfinityLabelBack: true, gridfinityLabelFront: true, gridfinityLabelLeft: true, gridfinityLabelRight: true, gridfinityLabelBackText: "Back", gridfinityLabelFrontText: "Front", gridfinityLabelLeftText: "Left", gridfinityLabelRightText: "Right" }],
     ["two compartments' labels", { gridfinityCompartmentsX: 2, gridfinityCompartmentLabels: [{ column: 0, row: 0, side: "back", text: "M3" }, { column: 1, row: 0, side: "right", text: "Nuts" }] }],
+    ["a tray's back shelf", { ...TRAY, gridfinityLabelBack: true, gridfinityLabelBackText: "AB08" }],
+    ["a low tray's back shelf at its widest", { ...TRAY, height: 8, gridfinityLabelBack: true, gridfinityLabelBackWidth: 40, gridfinityLabelBackText: "AB" }],
+    ["a tray's compartments, one with a text", { ...TRAY, gridfinityCompartmentsX: 2, gridfinityCompartmentLabels: [{ column: 0, row: 0, side: "back", text: "Nuts" }, { column: 1, row: 0, side: "back" }] }],
   ])("builds %s as one valid solid with the letters the display mesh has", (name, fields) => {
     const { solid, exactGain, meshGain } = lettered(fields);
     expectOneValidSolid(solid, name);
@@ -62,6 +72,7 @@ describe("letters on Gridfinity label shelves in the exact body", () => {
     ["on the left shelf", { gridfinityLabelLeft: true, gridfinityLabelLeftText: "LP2" }],
     ["on the left shelf of a bin mirrored across x", { gridfinityLabelLeft: true, gridfinityLabelLeftText: "LP2", mirrorX: true }],
     ["against a compartment's divider", { gridfinityCompartmentsX: 2, gridfinityCompartmentLabels: [{ column: 1, row: 0, side: "right", text: "Lq" }] }],
+    ["on a tray's back shelf", { ...TRAY, gridfinityLabelBack: true, gridfinityLabelBackText: "Lg7" }],
   ])("puts the exact letters %s where the display mesh has them", (name, fields) => {
     const shape = binShape(fields);
     const solid = gridfinityPartSolid(cad, cadModifierGridfinityForShape(shape)!);
@@ -98,5 +109,38 @@ describe("letters on Gridfinity label shelves in the exact body", () => {
     const box = cad.getBoundingBox(above);
     expect(box.ymax).toBeCloseTo(20.15 + GRIDFINITY_LABEL_TEXT_HEIGHT, 4);
     expect(box.ymin).toBeCloseTo(20.2, 4);
+  });
+
+  it("ends a tray's letters level with its top, 20 mm up in a tray 20 mm high, on a shelf 0.4 mm lower", () => {
+    const { solid } = lettered({ ...TRAY, gridfinityLabelBack: true, gridfinityLabelBackText: "HHH" });
+    // What stands above the shelf's top over the back shelf, clear of the walls.
+    const letters = cad.common(solid, cad.translate(cad.makeBox(60, 1, 10), -30, 19.65, -17));
+    const box = cad.getBoundingBox(letters);
+    expect(box.ymax).toBeCloseTo(20, 4);
+    expect(box.ymin).toBeCloseTo(19.65, 4);
+    // Nothing of the tray stands over its top, the letters included.
+    expect(Math.abs(cad.getVolume(cad.common(solid, cad.translate(cad.makeBox(80, 1, 40), -40, 20.01, -20))))).toBeCloseTo(0, 6);
+  });
+});
+
+describe("Make lid on a lettered tray", () => {
+  it("lets the flat lid and the cap close a tray with letters, on its top and clear of them", () => {
+    const body = manifoldFromMeshData(runtime, meshForShape(binShape({ ...TRAY, gridfinityLabelBack: true, gridfinityLabelBackText: "Screws" })));
+    for (const type of ["flat", "cap"] as const) {
+      const result = lidForSolid(runtime, body, { ...LID_DEFAULTS, type });
+      if ("error" in result) throw new Error(`${type}: ${result.error.code}`);
+      // The lid turned back over and set on the tray, its plate on the top and centred over it, as lidTool.e2e.ts closes it.
+      const turned = result.lid.rotate([180, 0, 0]);
+      const [top, box] = [body.boundingBox(), turned.boundingBox()];
+      const closed = turned.translate([-(box.min[0] + box.max[0]) / 2, top.max[1] + LID_DEFAULTS.thickness - box.max[1], -(box.min[2] + box.max[2]) / 2]);
+      const overlap = closed.intersect(body);
+      expect(overlap.volume(), type).toBeCloseTo(0, 6);
+      if (type === "flat") {
+        const plate = closed.boundingBox();
+        expect([plate.max[0] - plate.min[0], plate.min[1], plate.max[2] - plate.min[2]].map((n) => Math.round(n * 1000) / 1000)).toEqual([80, 20, 40]);
+      }
+      [result.lid, turned, closed, overlap].forEach((solid) => solid.delete());
+    }
+    body.delete();
   });
 });

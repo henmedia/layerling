@@ -16,9 +16,12 @@ import { mcpGridfinityLabelFont, mcpShapeSummary } from "@/lib/editorMcpSummary"
 import {
   GRIDFINITY_LABEL_FONTS,
   GRIDFINITY_LABEL_TEXT_HEIGHT,
+  GRIDFINITY_LABEL_TEXT_KEYS,
   GRIDFINITY_LIP_HEIGHT,
+  gridfinityCompartmentPieces,
   gridfinityHasLabelText,
   gridfinityLabelledTriangles,
+  gridfinityLabelPieces,
   gridfinityLabelTextPatch,
   gridfinityLabelTextPlaces,
   gridfinityListPatch,
@@ -56,6 +59,9 @@ beforeAll(async () => {
 });
 
 const bin = (fields: Record<string, unknown> = {}) => ({ width: 83.5, depth: 41.5, height: 21 + GRIDFINITY_LIP_HEIGHT, gridfinityType: "bin" as const, gridfinityLip: true, ...fields });
+
+/** A tray of 80 x 40 x 20 mm (#1501): 78.1 x 38.1 mm inside, its shelves' top at its own, 20 mm up, 19.6 under a text. */
+const tray = (fields: Record<string, unknown> = {}) => bin({ gridfinityType: "tray", width: 80, depth: 40, height: 20, ...fields });
 
 function binShape(fields: Record<string, unknown> = {}) {
   return { id: "g", name: "bin", kind: "gridfinity", x: 0, z: 0, elevation: 0, size: 83.5, width: 83.5, depth: 41.5, height: 25.4, rotation: 0, color: "#4f7fa8", gridfinityType: "bin", ...fields } as WorkplaneShape;
@@ -168,8 +174,41 @@ describe("the room for the letters on a Gridfinity label shelf", () => {
     expect(onDivider).toMatchObject({ along: { x: 0, z: 1 }, up: { x: 1, z: 0 } });
   });
 
-  it("has no letters on a tray, a bin under 3 units, a bin filled to the lip, a shelf on an open side or a shelf switched off", () => {
-    expect(gridfinityLabelTextPlaces({ ...bin({ gridfinityLabelBack: true, gridfinityLabelBackText: "AB" }), gridfinityType: "tray", width: 80, depth: 40, height: 20 })).toEqual([]);
+  it("puts a tray's letters on its shelf, 0.4 mm under its top, 0.3 mm off the wall, as no lip leans over them", () => {
+    // Along the back wall: the 78.1 mm inside less the inner corners' 2.8 mm rounding at either end; out from the wall,
+    // which is half the 38.1 mm inside (19.05) behind the middle, 0.3 up to 14 - 0.4.
+    const [place] = gridfinityLabelTextPlaces(tray({ gridfinityLabelBack: true, gridfinityLabelBackText: "AB" }));
+    expect(place).toMatchObject({ shelf: "back", text: "AB", along: { x: 1, z: 0 }, up: { x: 0, z: -1 } });
+    close(place.top, 19.6);
+    close(place.length, 72.5);
+    close(place.height, 13.3);
+    close(place.centre.x, 0);
+    close(place.centre.z, -19.05 + (0.3 + 13.6) / 2);
+  });
+
+  it("lowers a tray's shelf under a text by 0.4 mm, and only there", () => {
+    expect(gridfinityLabelPieces(tray({ gridfinityLabelBack: true }))!.top).toBe(20);
+    close(gridfinityLabelPieces(tray({ gridfinityLabelBack: true, gridfinityLabelBackText: "AB" }))!.top, 19.6);
+    expect(gridfinityLabelPieces(tray({ gridfinityLabelBack: true, gridfinityLabelBackText: "  " }))!.top).toBe(20);
+    // The shelves meet in the corners, so one text lowers them all.
+    close(gridfinityLabelPieces(tray({ gridfinityLabelBack: true, gridfinityLabelFront: true, gridfinityLabelFrontText: "AB" }))!.top, 19.6);
+    // A text kept for a shelf that is off lowers none.
+    expect(gridfinityLabelPieces(tray({ gridfinityLabelBack: true, gridfinityLabelLeftText: "M3" }))!.top).toBe(20);
+    // Nor one on an open side, where no shelf is built.
+    expect(gridfinityLabelPieces(tray({ gridfinityOpenBack: true, gridfinityLabelBack: true, gridfinityLabelFront: true, gridfinityLabelBackText: "AB" }))!.top).toBe(20);
+    // A bin's shelves stand under the lip and stay where they are.
+    close(gridfinityLabelPieces(bin({ gridfinityLabelBack: true, gridfinityLabelBackText: "AB" }))!.top, 20.15);
+    // Each compartment's label goes by its own text, a blank one as none; the dividers stay at the top.
+    const compartments = gridfinityCompartmentPieces(tray({ depth: 80, gridfinityCompartmentsX: 2, gridfinityCompartmentsZ: 2, gridfinityCompartmentLabels: [{ column: 0, row: 0, side: "back", text: "A" }, { column: 0, row: 1, side: "back" }, { column: 1, row: 0, side: "back", text: "  " }] }))!;
+    const cell = (column: number, row: number) => compartments.cells.find((c) => c.column === column && c.row === row)!;
+    close(cell(0, 0).labels!.top, 19.6);
+    expect(cell(0, 1).labels!.top).toBe(20);
+    expect(cell(1, 0).labels!.top).toBe(20);
+    expect(compartments.top).toBe(20);
+  });
+
+  it("has no letters on a baseplate, a bin under 3 units, a bin filled to the lip, a shelf on an open side or a shelf switched off", () => {
+    expect(gridfinityLabelTextPlaces({ ...bin({ gridfinityLabelBack: true, gridfinityLabelBackText: "AB" }), gridfinityType: "baseplate", height: 5 })).toEqual([]);
     expect(gridfinityLabelTextPlaces(bin({ height: 14 + GRIDFINITY_LIP_HEIGHT, gridfinityLabelBack: true, gridfinityLabelBackText: "AB" }))).toEqual([]);
     expect(gridfinityLabelTextPlaces(bin({ gridfinityFloorHeight: 25.4, gridfinityLabelBack: true, gridfinityLabelBackText: "AB" }))).toEqual([]);
     expect(gridfinityLabelTextPlaces(bin({ gridfinityOpenBack: true, gridfinityLabelBack: true, gridfinityLabelBackText: "AB" }))).toEqual([]);
@@ -311,7 +350,7 @@ describe("letters fitted to a Gridfinity label shelf", () => {
     expect(gridfinityHasLabelText(bin({ gridfinityLabelBack: true, gridfinityLabelLeftText: "M3" }))).toBe(false);
     expect(gridfinityLabelLetters(bin({ gridfinityLabelBack: true, gridfinityLabelLeftText: "M3" }))).toEqual([]);
     expect(gridfinityHasLabelText(bin({ gridfinityLabelBack: true, gridfinityLabelBackText: " \u200b\u2060 " }))).toBe(false);
-    expect(gridfinityHasLabelText({ ...bin({ gridfinityLabelBack: true, gridfinityLabelBackText: "M3" }), gridfinityType: "tray", width: 80, depth: 40, height: 20 })).toBe(false);
+    expect(gridfinityHasLabelText(tray({ gridfinityLabelBack: true, gridfinityLabelBackText: "M3" }))).toBe(true);
     expect(gridfinityHasLabelText(divided())).toBe(true);
     // Labels kept for compartments a smaller count leaves out carry no letters.
     expect(gridfinityHasLabelText(bin({ gridfinityCompartmentLabels: [{ column: 0, row: 0, side: "back", text: "M3" }] }))).toBe(false);
@@ -369,6 +408,42 @@ describe("a Gridfinity bin with letters on its shelves", { timeout: 60_000 }, ()
     expect(20.15 + GRIDFINITY_LABEL_TEXT_HEIGHT).toBeLessThanOrEqual(21 - 0.35 - 0.1 + 1e-9);
     // The letters add their area times their height, worked out from their outlines.
     expect((volume(lettered) - volume(plain)) / (lettersArea(shape) * GRIDFINITY_LABEL_TEXT_HEIGHT)).toBeCloseTo(1, 2);
+  });
+
+  it("ends a tray's letters level with its top, on a shelf 0.4 mm lower, as one closed body", () => {
+    const shape = tray({ gridfinityLabelBack: true, gridfinityLabelBackText: "AB" });
+    const plain = gridfinityLabelledTriangles(runtime, shape);
+    const lettered = gridfinityLabelledTriangles(runtime, shape, gridfinityLabelLetters(shape));
+    expect(openEdges(lettered)).toBe(0);
+    close(Math.max(...lettered.flat().map(([, y]) => y)), 20, 4);
+    expect((volume(lettered) - volume(plain)) / (lettersArea(shape) * GRIDFINITY_LABEL_TEXT_HEIGHT)).toBeCloseTo(1, 2);
+    const divided = tray({ gridfinityCompartmentsX: 2, gridfinityCompartmentLabels: [{ column: 0, row: 0, side: "back", text: "Nuts" }] });
+    const letters = gridfinityLabelLetters(divided);
+    expect(letters).toHaveLength(1);
+    const triangles = gridfinityLabelledTriangles(runtime, divided, letters);
+    expect(openEdges(triangles)).toBe(0);
+    close(Math.max(...triangles.flat().map(([, y]) => y)), 20, 4);
+  });
+
+  it("ends a tray's letters level with its top in the mesh an export takes, turned over by a mirror too", () => {
+    const shape = binShape({ gridfinityType: "tray", size: 80, width: 80, depth: 40, height: 20, gridfinityLabelBack: true, gridfinityLabelBackText: "AB", mirrorY: true });
+    const mesh = meshForShape(shape);
+    const ys = mesh.vertices.map(([, y]) => y);
+    close(Math.min(...ys), 0);
+    close(Math.max(...ys), 20);
+    // The letters are there, on the lowered shelf, not swallowed by a shelf left at the top.
+    const fields = tray({ gridfinityLabelBack: true, gridfinityLabelBackText: "AB" });
+    close(Math.abs(volume(mesh.faces.map((face) => face.map((i) => mesh.vertices[i]) as V[]))), volume(gridfinityLabelledTriangles(runtime, fields, gridfinityLabelLetters(fields))), 1);
+  });
+
+  it.each(["back", "front", "left", "right"] as const)("lowers a tray's shelves under the %s shelf's text in the mesh, the view and the CAD part", (wall) => {
+    const shape = binShape({ gridfinityType: "tray", size: 80, width: 80, depth: 40, height: 20, gridfinityLabelBack: true, gridfinityLabelFront: true, gridfinityLabelLeft: true, gridfinityLabelRight: true, [GRIDFINITY_LABEL_TEXT_KEYS[wall]]: "AB" });
+    // The shelves' top at 19.6, the display mesh's 0.0017 mm lower: left at 20, they would swallow the letters.
+    const lowered = (ys: ArrayLike<number>) => Array.from(ys).some((y) => Math.abs(y - 19.6) < 0.01);
+    expect(lowered(meshForShape(shape).vertices.map(([, y]) => y))).toBe(true);
+    const view = createShapeObject(shape).children.find((child): child is THREE.Mesh => child instanceof THREE.Mesh)!.geometry.getAttribute("position");
+    expect(lowered(Array.from({ length: view.count }, (_, i) => view.getY(i)))).toBe(true);
+    close(gridfinityLabelPieces(cadModifierGridfinityForShape(shape)!)!.top, 19.6);
   });
 
   it("joins letters on four shelves and in 40 compartments", () => {

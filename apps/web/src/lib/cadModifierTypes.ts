@@ -399,6 +399,10 @@ export type CadModifierGridfinityPart = {
   gridfinityLabelRightOffset?: number;
   gridfinityLabelCorner?: GridfinityLabelCorner;
   gridfinityLabelCornerSize?: number;
+  gridfinityLabelBackText?: string;
+  gridfinityLabelFrontText?: string;
+  gridfinityLabelLeftText?: string;
+  gridfinityLabelRightText?: string;
   gridfinityScoopBack?: boolean;
   gridfinityScoopFront?: boolean;
   gridfinityScoopLeft?: boolean;

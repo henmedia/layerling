@@ -74,9 +74,15 @@ describe("the letters' colour on a Gridfinity bin's label shelves in its setting
     expect(resetButton(row)).toBeNull();
   });
 
-  it("has no row without a text or on a tray, as the font has none", () => {
+  it("has no row without a text, as the font has none", () => {
     expect(colorRow(mount(bin))).toBeUndefined();
-    expect(colorRow(mount({ ...bin, gridfinityType: "tray", width: 80, depth: 40, height: 20, gridfinityLabelBackText: "Screws" }))).toBeUndefined();
+  });
+
+  it("has the row on a tray with a text too, and writes the colour picked there", () => {
+    const updates: Partial<WorkplaneShape>[] = [];
+    const panel = mount({ ...bin, gridfinityType: "tray", width: 80, depth: 40, height: 20, gridfinityLabelBackText: "Screws" }, (patch) => updates.push(patch));
+    pick(swatch(colorRow(panel)!), "#ff0000");
+    expect(updates).toEqual([{ gridfinityLabelColor: "#ff0000" }]);
   });
 
   it("shows the letters' own colour with a reset arrow, and the arrow gives them the bin's again", () => {
