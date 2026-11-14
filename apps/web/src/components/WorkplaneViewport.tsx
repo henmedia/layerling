@@ -77,7 +77,7 @@ import { displayYTurn, insideZ } from "@/lib/displayAxes";
 import { boundsInsideRect, marqueeMode } from "@/lib/marqueeSelection";
 import { slicerLeftTurn } from "@/lib/cameraMouseButtons";
 import { useSpaceMouse } from "@/components/workplane/useSpaceMouse";
-import { canBeginShapeDrag, handleDimensionLimit, DEFAULT_SNAP_GRID, effectiveViewSettings, normalizeSnapGrid, normalizeWorkspaceSettings, readWorkspaceDefault, saveShapeDefaultsForNewDesigns, saveWorkspaceDefault, customSnapGridLabel, snapGridForShortcut, snapGridForUnits, snapGridOptions, snapGridStep as snapStep, workplaneSettingsFingerprint, workspaceForUnits, workspaceHydrationSyncDecision, zoomDistanceScale, ZOOM_STEP_IN, ZOOM_STEP_OUT } from "@/lib/workplaneSettings";
+import { canBeginShapeDrag, handleDimensionLimit, typedDimensionLimit, DEFAULT_SNAP_GRID, effectiveViewSettings, normalizeSnapGrid, normalizeWorkspaceSettings, readWorkspaceDefault, saveShapeDefaultsForNewDesigns, saveWorkspaceDefault, customSnapGridLabel, snapGridForShortcut, snapGridForUnits, snapGridOptions, snapGridStep as snapStep, workplaneSettingsFingerprint, workspaceForUnits, workspaceHydrationSyncDecision, zoomDistanceScale, ZOOM_STEP_IN, ZOOM_STEP_OUT } from "@/lib/workplaneSettings";
 import { withShapeDefaults } from "@/lib/shapeDefaults";
 import { WORKPLANE_LINE_ELEVATION } from "@/lib/workplaneGrid";
 import { cleanNearZero, cleanRotationDegrees, isNonSolidShape, resizedShapeSize, shapeDepth, shapeHasTaper, shapeWidth, shapeWithParametricSource } from "@/lib/workplaneShapes";
@@ -5383,7 +5383,8 @@ export function WorkplaneViewport({
     const anchor = lastResizeAnchorRef.current?.shapeId === ids[0] ? lastResizeAnchorRef.current : null;
     const workspace = workspaceRef.current;
     const across = Math.max(frame.width, frame.depth, frame.height);
-    const maxSize = Math.max(...items.map((item) => handleDimensionLimit(workspace, item.startShape.kind, 260, "across", across)));
+    // A typed size is taken as it is, past the plate too; only a custom size limit holds (Discussion #1444).
+    const maxSize = Math.max(...items.map((item) => typedDimensionLimit(workspace, item.startShape.kind, across)));
     const sizes: { width?: number; depth?: number } = {};
     let height: number | undefined;
     edits.forEach((entry) => {
@@ -5391,8 +5392,7 @@ export function WorkplaneViewport({
       const value = resolveMeasureMm(entry.text, extent);
       if (!(Number.isFinite(value) && value > 0)) return;
       if (entry.axis === "height") {
-        const printerHeight = printerPresetById(workspace.printer)?.height;
-        const maxHeight = Math.max(...items.map((item) => handleDimensionLimit(workspace, item.startShape.kind, 180, "height", frame.height, printerHeight)));
+        const maxHeight = Math.max(...items.map((item) => typedDimensionLimit(workspace, item.startShape.kind, frame.height)));
         height = clamp(value, MIN_SHAPE_SIZE, maxHeight);
       } else {
         sizes[entry.axis] = clamp(value, MIN_SHAPE_SIZE, maxSize);

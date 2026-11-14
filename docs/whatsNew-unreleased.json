@@ -62,5 +62,18 @@
       "de": "Lag ein breiter Text um einen Körper mit Seiten, etwa eine Platte mit 21 Seiten, wurden die Dreiecke der hinteren Seiten vor dem Schneiden nicht fein genug unterteilt, und die Buchstaben liefen dort als Streifen darüber. Jetzt werden die Seiten so fein unterteilt wie die Mitte, und der Text liest sich überall sauber.",
       "en": "When a wide text lay round a body with sides, such as a plate with 21 sides, the triangles of the far sides were not split fine enough before the letters were cut, and the letters ran across them as streaks. Now the sides are split as fine as the middle, and the text reads cleanly everywhere."
     }
+  },
+  {
+    "title": {
+      "de": "Getippte Maße auch über die Platte hinaus",
+      "en": "Typed sizes past the plate too"
+    },
+    "body": {
+      "de": "Waren mehrere Teile ausgewählt, wurde eine eingetippte Breite, Länge oder Höhe auf die Größe der Druckplatte gekürzt: 914 mm wurden zu 260 mm. Jetzt gilt die Zahl, wie du sie tippst, wie schon bei einem einzelnen Teil. Nur die Griffe hören weiter an der Platte auf.",
+      "en": "With several parts selected, a typed width, length or height was cut down to the size of the plate: 914 mm became 260 mm. Now the number counts as you type it, as it already did for a single part. Only the handles still stop at the plate."
+    },
+    "guide": {
+      "section": "shapeSettings"
+    }
   }
 ]

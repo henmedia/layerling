@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { DEFAULT_WORKPLANE_WORKSPACE, handleDimensionLimit, RULER_MAX_LENGTH } from "@/lib/workplaneSettings";
+import { DEFAULT_WORKPLANE_WORKSPACE, handleDimensionLimit, RULER_MAX_LENGTH, typedDimensionLimit } from "@/lib/workplaneSettings";
 
 const plate = (width: number, depth: number, maxDimension?: number) => ({
   ...DEFAULT_WORKPLANE_WORKSPACE,
@@ -33,5 +33,17 @@ describe("how far the handles pull a body (#181)", () => {
     expect(handleDimensionLimit(plate(200, 200), "ruler", 220, "across", 20)).toBe(500);
     expect(handleDimensionLimit(plate(700, 650), "ruler", 220, "across", 20)).toBe(700);
     expect(handleDimensionLimit(plate(220, 220), "ruler", 220, "across", 620)).toBe(620);
+  });
+});
+
+describe("how large a typed size makes a body (Discussion #1444)", () => {
+  it("takes a size past the plate as it is typed, 36 in on the standard plate", () => {
+    expect(typedDimensionLimit(plate(200, 200), "box", 20)).toBe(Number.POSITIVE_INFINITY);
+    expect(Math.min(914.4, typedDimensionLimit(plate(200, 200), "group", 40))).toBe(914.4);
+  });
+
+  it("keeps a custom size limit, without shrinking a body already larger", () => {
+    expect(typedDimensionLimit(plate(200, 200, 500), "box", 20)).toBe(500);
+    expect(typedDimensionLimit(plate(200, 200, 500), "box", 650)).toBe(650);
   });
 });

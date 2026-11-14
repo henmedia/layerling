@@ -830,6 +830,22 @@ export function handleDimensionLimit(
   return Math.max(appDefault, plate, current);
 }
 
+/**
+ * How large a typed width, depth or height may make a body (Discussion #1444). Only the handles
+ * stop at the plate; a number typed in is taken as it is, for several bodies at once as for one,
+ * so a part larger than the plate (36 in for a bench) is a matter of typing it. A custom size
+ * limit for the shape still holds, but never shrinks a body that is already larger.
+ */
+export function typedDimensionLimit(
+  workspace: Pick<WorkplaneWorkspaceSettings, "shapeCustomizations">,
+  kind: ShapeKind,
+  currentSize: number,
+) {
+  const custom = workspace.shapeCustomizations[kind]?.maxDimension;
+  if (custom === undefined) return Number.POSITIVE_INFINITY;
+  return Math.max(custom, Number.isFinite(currentSize) ? currentSize : 0);
+}
+
 export function normalizeSnapGrid(value: unknown, fallback: GridSize = DEFAULT_SNAP_GRID): GridSize {
   if (parseCustomSnapGrid(value)) return value as GridSize;
   return fixedSnapGrids.includes(value as GridSize) ? (value as GridSize) : fallback;
