@@ -73,7 +73,7 @@ async function withDefinition(patch: Record<string, unknown>) {
 
 describe("SBC board data (#1098)", () => {
   it("has every board in the list, the Raspberry Pi 5 first", () => {
-    expect(SBC_BOARD_ORDER).toEqual(["pi5", "pi4", "pi3bPlus", "zero2w", "bttPi12", "xiaoEsp32c6", "esp32c3SuperMini", "esp32c6SuperMini", "waveshareEsp32s3Zero", "featherEsp32s3", "arduinoUno", "arduinoMega", "arduinoNano", "arduinoProMini", "wemosD1Mini", "pico", "picoW", "pico2", "pico2W", "esp32CamMb", "esp32s3Cam", "esp32DevKitC", "esp32DevKitV1", "cyd", "cyd2usb"]);
+    expect(SBC_BOARD_ORDER).toEqual(["pi5", "pi4", "pi3bPlus", "zero2w", "bttPi12", "nanoPiNeo3Plus", "xiaoEsp32c6", "esp32c3SuperMini", "esp32c6SuperMini", "waveshareEsp32s3Zero", "waveshareEsp32p4Nano", "featherEsp32s3", "arduinoUno", "arduinoMega", "arduinoNano", "arduinoProMini", "wemosD1Mini", "pico", "picoW", "pico2", "pico2W", "esp32CamMb", "esp32s3Cam", "esp32DevKitC", "esp32DevKitV1", "cyd", "cyd2usb"]);
     expect(DEFAULT_SBC_BOARD).toBe("pi5");
     for (const type of SBC_BOARD_ORDER) expect(SBC_BOARDS[type].type).toBe(type);
   });
@@ -609,7 +609,7 @@ describe("the small ESP32 boards", () => {
   it("names every button by what it does, never only by where it sits", () => {
     for (const type of SBC_BOARD_ORDER) {
       for (const button of SBC_BOARDS[type].parts.filter((entry) => entry.kind === "button")) {
-        expect(button.name, `${type}: ${button.name}`).toMatch(/RESET|BOOT|Boot|EN|power/);
+        expect(button.name, `${type}: ${button.name}`).toMatch(/RESET|BOOT|Boot|EN|power|USER|MASK/);
       }
     }
   });
@@ -831,6 +831,39 @@ describe("the Adafruit ESP32-S3 Feather, the Arduino UNO R3, the Arduino Nano an
     expect(board.parts.some((entry) => entry.kind === "connector")).toBe(false);
   });
 
+  it("give the NanoPi NEO3 Plus FriendlyELEC's outline and places: its sockets at the right end, the card at the left", () => {
+    const board = SBC_BOARDS.nanoPiNeo3Plus;
+    expect(board).toMatchObject({ width: 49.606, depth: 48.006, thickness: 1.2, cornerRadius: 3.048 });
+    expect(board.outline?.plateWidth).toBe(48.006);
+    // The four holes 42.012 mm apart, 2.997 mm in, as the PCB file puts them.
+    expect(board.holes).toEqual([[2.997, 2.997], [45.009, 2.997], [2.997, 45.009], [45.009, 45.009]]);
+    for (const name of ["Ethernet", "USB 3.0 (Type-A, upright)", "USB-C (power)"]) {
+      expect(sbcPartEdges(board, part("nanoPiNeo3Plus", name)), name).toEqual({ left: false, right: true, front: false, back: false });
+    }
+    // The Ethernet jack 3.834 mm past the plate, the USB 3.0 socket upright: 6.52 mm wide.
+    expect(part("nanoPiNeo3Plus", "Ethernet").x1 - 48.006).toBeCloseTo(3.834, 6);
+    const usb = part("nanoPiNeo3Plus", "USB 3.0 (Type-A, upright)");
+    expect(usb.y1 - usb.y0).toBeCloseTo(6.52, 6);
+    expect(sbcPartEdges(board, part("nanoPiNeo3Plus", "microSD card slot")).left).toBe(true);
+    const gpio = sbcBoardSolids(board, 0, 0).filter((solid) => solid.role === "pin" && solid.name.startsWith("GPIO header"));
+    expect(gpio).toHaveLength(26);
+  });
+
+  it("give the Waveshare ESP32-P4-NANO Waveshare's model: 2.70 mm holes 45.10 mm apart, USB-C left, Ethernet and USB-A right", () => {
+    const board = SBC_BOARDS.waveshareEsp32p4Nano;
+    expect(board).toMatchObject({ width: 50, depth: 50, thickness: 1.6, cornerRadius: 2, holeDiameter: 2.7 });
+    expect(board.holes).toEqual([[2.45, 2.45], [47.55, 2.45], [2.45, 47.55], [47.55, 47.55]]);
+    expect(sbcPartEdges(board, part("waveshareEsp32p4Nano", "USB-C")).left).toBe(true);
+    for (const name of ["Ethernet", "USB-A (upright)"]) expect(sbcPartEdges(board, part("waveshareEsp32p4Nano", name)).right, name).toBe(true);
+    // Two 2 x 13 headers, along the front and the back.
+    for (const name of ["GPIO header (front)", "GPIO header (back)"]) {
+      const dots = sbcBoardSolids(board, 0, 0).filter((solid) => solid.role === "pin" && solid.name.startsWith(name));
+      expect(dots, name).toHaveLength(26);
+    }
+    expect(part("waveshareEsp32p4Nano", "microSD card slot")).toMatchObject({ underside: true, x0: 0 });
+    expect(part("waveshareEsp32p4Nano", "Ethernet").height).toBe(13.6);
+  });
+
   it("give the CYD with two USB ports the same plate and screen, its USB-C between the power socket and the micro-USB", () => {
     const [first, second] = [SBC_BOARDS.cyd, SBC_BOARDS.cyd2usb];
     for (const key of ["width", "depth", "holes", "holeDiameter", "outline", "thickness", "cornerRadius"] as const) expect(second[key], key).toEqual(first[key]);
@@ -978,7 +1011,7 @@ describe("the buttons' reach", () => {
     expect(reset.x0).toBeCloseTo(1.0 - 0.3, 9);
     expect(reset.height).toBeCloseTo(2.0 + 0.3, 9);
     const pressedFromSide = SBC_BOARD_ORDER.flatMap((type) => SBC_BOARDS[type].parts.filter((part) => part.press).map((part) => `${type} ${part.name} ${part.press}`));
-    expect(pressedFromSide).toEqual(["pi5 power button left", "wemosD1Mini RESET button back", "esp32CamMb RESET button (MB) front"]);
+    expect(pressedFromSide).toEqual(["pi5 power button left", "nanoPiNeo3Plus USER button front", "nanoPiNeo3Plus MASK button front", "waveshareEsp32p4Nano BOOT button left", "waveshareEsp32p4Nano RESET button left", "wemosD1Mini RESET button back", "esp32CamMb RESET button (MB) front"]);
   });
 
   it("offers the reach on every board with buttons", () => {

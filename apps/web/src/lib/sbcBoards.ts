@@ -100,6 +100,23 @@
  * - Arduino Pro Mini (Discussion #1673): SparkFun's board file (sparkfun/Arduino_Pro_Mini_328, Hardware/Arduino-Pro-
  *   Mini.brd): 0.7 x 1.3 in (17.78 x 33.02 mm), every pin's place and name, the reset switch and the parts; the PCB 0.8 mm
  *   as SparkFun gives it. The parts' heights are `estimated`.
+ * - FriendlyELEC NanoPi NEO3 Plus: FriendlyELEC's PCB CAD file (NanoPi_NEO3_Plus_2601_DXF.zip, the wiki's "PCB CAD
+ *   File"): the outline (48.006 mm square, R 3.048 corners, the tab under the USB-C out to 49.606 mm, the notches), the
+ *   four holes' middles (2.997 mm in) and every part's place from its footprint's outline (layer PG_SILKSCREEN_TOP). It
+ *   keeps the file's own view: the Ethernet, USB 3.0 and USB-C at the right end, the GPIO header at the back, the microSD
+ *   card at the left edge, the USER and MASK buttons pressed from the front edge; checked against FriendlyELEC's labelled
+ *   top view. The PCB 1.2 mm as the wiki gives it. The file gives no hole size: the holes are 3.0 mm, as checked on a
+ *   real board. It gives no heights either, so they are `estimated`. The Ethernet jack and the USB socket are the
+ *   standard parts the Raspberry Pi 4 has: the jack's footprint (21.3 x 15.9 mm) is the common HR911105A's, 13.5 mm
+ *   high as on the Pi 4's drawing; the USB 3.0 socket stands upright (6.5 mm wide on the board), as high as a USB-A
+ *   housing is wide (13.14 mm, the Pi 4's). The SoC and memory are under the board and not drawn.
+ * - Waveshare ESP32-P4-NANO: Waveshare's mechanical files (ESP32-P4-Nano.zip on the board's Resources page: the 3D
+ *   model ESP32-P4-NANO.stp, the drawing ESP32-P4-NANO-20260331 .dxf/.pdf): 50 x 50 x 1.6 mm, four 2.70 mm holes 45.10 mm
+ *   apart, 2.45 mm in, every part's box and height read off the model; the R 2.00 corners from Waveshare's dimension
+ *   picture. Turned a quarter from Waveshare's view so the microSD card goes in at the left edge, as on every board here:
+ *   the USB-C and the BOOT and RESET buttons (pressed from the side) at the left end, the Ethernet and the upright USB-A
+ *   at the right end, the two 2 x 13 GPIO headers along the front and the back. The card slot is under the board; the
+ *   model stops it 1.22 mm short of the edge, so its reach to the edge is `estimated`.
  * Every board was checked against the maker's own picture of its top, so none is a mirror image.
  * A value the maker does not give is marked `estimated`. A board without mounting holes has `holes: []`.
  *
@@ -943,9 +960,87 @@ export const SBC_BOARDS: Record<SbcBoardType, SbcBoard> = {
       { name: "regulator (MIC5205)", x0: 22.76, x1: 25.6, y0: 8.08, y1: 9.7, height: 1.1, kind: "chip", estimated: true },
     ],
   },
+  nanoPiNeo3Plus: {
+    type: "nanoPiNeo3Plus",
+    name: "NanoPi NEO3 Plus",
+    width: 49.606,
+    depth: 48.006,
+    thickness: 1.2,
+    cornerRadius: 3.048,
+    holeDiameter: 3.0,
+    holes: [[2.997, 2.997], [45.009, 2.997], [2.997, 45.009], [45.009, 45.009]],
+    color: "#2a6fb8",
+    estimated: [],
+    // FriendlyELEC's outline: the plate 48.006 mm square; under the USB-C a tab out to 49.606 mm; a notch at the right
+    // edge between the USB 3.0 and the Ethernet; three small notches; the front edge 0.686 mm in by the two buttons.
+    outline: {
+      plateWidth: 48.006,
+      add: [{ x: 48.806, y: 10.49, width: 1.6, depth: 11.024 }],
+      cut: [
+        { x: 47.2525, y: 24.5745, width: 2.507, depth: 2.463 },
+        { x: 0.4995, y: 7.912, width: 1.999, depth: 1.498 },
+        { x: 40.7545, y: 0.4865, width: 1.499, depth: 1.973 },
+        { x: 40.7545, y: 47.5065, width: 1.499, depth: 1.999 },
+        { x: 23.99, y: 0.093, width: 20.142, depth: 1.186 },
+      ],
+    },
+    // Places from the footprints' outlines in FriendlyELEC's PCB file; the file gives no heights.
+    parts: [
+      { name: "Ethernet", x0: 30.53, x1: 51.84, y0: 25.98, y1: 41.88, height: 13.5, kind: "connector", profile: "rj45", estimated: true },
+      // Upright: 6.5 mm wide on the board, its opening standing on edge, so it stands as high as a USB-A housing is wide
+      // (13.14 mm, as Raspberry Pi's drawings give the Pi 4's).
+      { name: "USB 3.0 (Type-A, upright)", x0: 26.02, x1: 51.72, y0: 17.18, y1: 23.7, height: 13.14, kind: "connector", estimated: true },
+      { name: "USB-C (power)", x0: 43.79, x1: 51.08, y0: 6.1, y1: 15.04, height: 3.26, kind: "connector", profile: "usbC", estimated: true },
+      { name: "microSD card slot", x0: 0.05, x1: 13.26, y0: 26.22, y1: 40.91, height: 1.85, kind: "connector", estimated: true },
+      { name: "GPIO header", x0: 6.6, x1: 39.62, y0: 42.47, y1: 47.55, height: 8.5, kind: "header", pins: [13, 2], gpio: true, estimated: true },
+      { name: "debug UART header", x0: 33.81, x1: 41.43, y0: 13.36, y1: 15.9, height: 8.5, kind: "header", pins: [3, 1], estimated: true },
+      { name: "speaker connector", x0: 17.97, x1: 27.59, y0: 37.94, y1: 41.84, height: 4.0, kind: "header", estimated: true },
+      { name: "RTC battery connector", x0: 38.11, x1: 41.51, y0: 4.39, y1: 11.51, height: 4.0, kind: "header", estimated: true },
+      { name: "fan connector (5V)", x0: 32.22, x1: 35.93, y0: 5.47, y1: 11.49, height: 6.0, kind: "header", estimated: true },
+      { name: "eMMC module socket (front)", x0: 4.16, x1: 12.86, y0: 7.17, y1: 10.77, height: 1.5, kind: "header", estimated: true },
+      { name: "eMMC module socket (back)", x0: 3.76, x1: 13.26, y0: 20.17, y1: 23.77, height: 1.5, kind: "header", estimated: true },
+      { name: "Ethernet chip (RTL8211F)", x0: 19.98, x1: 24.98, y0: 31.21, y1: 36.21, height: 0.85, kind: "chip", estimated: true },
+      // Pressed from the front edge: the plunger reaches to 0.12 mm from the outline's line, past the edge set back there.
+      { name: "USER button", press: "front", x0: 16.75, x1: 21.25, y0: 0.12, y1: 3.52, height: 3.5, kind: "button", estimated: true },
+      { name: "MASK button", press: "front", x0: 26.76, x1: 31.26, y0: 0.12, y1: 3.52, height: 3.5, kind: "button", estimated: true },
+    ],
+  },
+  waveshareEsp32p4Nano: {
+    type: "waveshareEsp32p4Nano",
+    name: "Waveshare ESP32-P4-NANO",
+    width: 50,
+    depth: 50,
+    thickness: 1.6,
+    cornerRadius: 2,
+    holeDiameter: 2.7,
+    holes: [[2.45, 2.45], [47.55, 2.45], [2.45, 47.55], [47.55, 47.55]],
+    color: "#1a1a1a",
+    estimated: [],
+    // Every box and height from Waveshare's 3D model, turned a quarter: the card goes in at the left edge.
+    parts: [
+      { name: "Ethernet", x0: 29.72, x1: 51.12, y0: 6.24, y1: 22.28, height: 13.6, kind: "connector", profile: "rj45" },
+      // Upright: 7.2 mm wide on the board, its opening standing on edge.
+      { name: "USB-A (upright)", x0: 32.45, x1: 51.65, y0: 23.1, y1: 30.3, height: 14.45, kind: "connector" },
+      { name: "USB-C", x0: -1.2, x1: 6.33, y0: 20.52, y1: 29.48, height: 3.25, kind: "connector", profile: "usbC" },
+      { name: "ESP32-C6-MINI-1", x0: 33.15, x1: 49.75, y0: 31.2, y1: 44.4, height: 2.46, kind: "chip" },
+      { name: "ESP32-P4", x0: 15.5, x1: 25.5, y0: 23.5, y1: 33.5, height: 2.0, kind: "chip" },
+      { name: "display (MIPI-DSI)", x0: 0.5, x1: 22.9, y0: 6.45, y1: 11.52, height: 5.68, kind: "header", ribbon: true },
+      { name: "camera (MIPI-CSI)", x0: 0.5, x1: 22.9, y0: 13.7, y1: 18.77, height: 5.68, kind: "header", ribbon: true },
+      { name: "GPIO header (front)", x0: 5.69, x1: 38.31, y0: 0.21, y1: 5.29, height: 8.3, kind: "header", pins: [13, 2], gpio: true },
+      { name: "GPIO header (back)", x0: 5.29, x1: 37.91, y0: 44.71, y1: 49.79, height: 8.3, kind: "header", pins: [13, 2], gpio: true },
+      { name: "PoE module header", x0: 28.43, x1: 30.97, y0: 23.63, y1: 33.79, height: 8.3, kind: "header", pins: [4, 1] },
+      { name: "PoE / 5V header", x0: 5.29, x1: 10.37, y0: 41.88, y1: 44.42, height: 8.5, kind: "header", pins: [2, 2] },
+      { name: "speaker connector", x0: 39.05, x1: 44.05, y0: 0.9, y1: 4.1, height: 4.7, kind: "header" },
+      { name: "RTC battery connector", x0: 26.72, x1: 31.72, y0: 37.3, y1: 40.5, height: 4.7, kind: "header" },
+      { name: "BOOT button", press: "left", x0: -0.45, x1: 3.55, y0: 34.29, y1: 39.49, height: 3.3, kind: "button" },
+      { name: "RESET button", press: "left", x0: -0.45, x1: 3.55, y0: 40.09, y1: 45.29, height: 3.3, kind: "button" },
+      // Under the board; the model's slot ends 1.22 mm from the edge the card goes in at.
+      { name: "microSD card slot", x0: 0, x1: 12.47, y0: 6.78, y1: 18.13, height: 1.32, kind: "connector", underside: true, estimated: true },
+    ],
+  },
 };
 
-export const SBC_BOARD_ORDER: SbcBoardType[] = ["pi5", "pi4", "pi3bPlus", "zero2w", "bttPi12", "xiaoEsp32c6", "esp32c3SuperMini", "esp32c6SuperMini", "waveshareEsp32s3Zero", "featherEsp32s3", "arduinoUno", "arduinoMega", "arduinoNano", "arduinoProMini", "wemosD1Mini", "pico", "picoW", "pico2", "pico2W", "esp32CamMb", "esp32s3Cam", "esp32DevKitC", "esp32DevKitV1", "cyd", "cyd2usb"];
+export const SBC_BOARD_ORDER: SbcBoardType[] = ["pi5", "pi4", "pi3bPlus", "zero2w", "bttPi12", "nanoPiNeo3Plus", "xiaoEsp32c6", "esp32c3SuperMini", "esp32c6SuperMini", "waveshareEsp32s3Zero", "waveshareEsp32p4Nano", "featherEsp32s3", "arduinoUno", "arduinoMega", "arduinoNano", "arduinoProMini", "wemosD1Mini", "pico", "picoW", "pico2", "pico2W", "esp32CamMb", "esp32s3Cam", "esp32DevKitC", "esp32DevKitV1", "cyd", "cyd2usb"];
 export const DEFAULT_SBC_BOARD: SbcBoardType = "pi5";
 /** Extra room for the connectors at the edge, so a case wall cut with the board leaves them a gap: 0 to 2 mm. */
 export const MAX_SBC_CLEARANCE = 2;
