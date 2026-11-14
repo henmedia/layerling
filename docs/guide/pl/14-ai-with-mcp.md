@@ -170,6 +170,7 @@ AI pracuje tymi samymi funkcjami co Ty, tą samą drogą co Twoja praca w edytor
 | `layerling_saved_view` | zapisuje bieżący widok pod klawiszem 7, 8, 9 lub 0 i do niego wraca, jak Shift+klawisz i sam klawisz (tylko widok); ustawia też widok startowy nowych projektów |
 | `layerling_build_plates` | wyświetla, dodaje, nazywa, porządkuje i usuwa stoły robocze, przenosi obiekty na stół i rozkłada je na stołach, jak pasek stołów |
 | `layerling_clear_history` | usuwa na dobre wszystkie kroki cofania, tak jak przycisk „Usuń historię” w widoku historii. Wymaga `confirm: true` |
+| `layerling_delete_history_steps` | trwale usuwa pojedyncze stany historii, nigdy bieżący, jak kosz obok kroku na liście widoku historii; wymaga `steps` i `confirm: true` |
 | `layerling_list_backups` | wyświetla automatyczne kopie (Wcześniejsze wersje) otwartego projektu, a z `all: true` wszystkich projektów w tej przeglądarce |
 | `layerling_open_backup` | otwiera kopię po jej `id` jako nowy projekt, nigdy niepowiązany z oryginalnym plikiem |
 | `layerling_set_history_view` | pokazuje wcześniejszy stan projektu, jak widok historii (prawdziwy projekt zostaje nietknięty, a narzędzia zmieniające czekają, aż widok zostanie zamknięty) |

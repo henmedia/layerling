@@ -5516,7 +5516,7 @@ export const MESSAGES_JA: Partial<Record<MessageKey, string>> = {
   "notice.designNotSavedHintCopy": "いちばん新しい変更はこのタブにしかありません。タブを閉じたり、読みこみ直したりしないでください。「エクスポート」→ LYL でコピーを残してください。",
   "notice.storageBroken": "場所はほとんど空いているのに、ブラウザーが layerling のデータを何も保存しません。このサイトの保存場所がこわれているので、デザインを消してもなおりません。このデザインは「エクスポート」→ LYL で、ほかのデザインはスタートページの「{backupAll}」で残してください。それから、ブラウザーの設定で layerling.com のサイトデータを消し（Chrome では chrome://settings/content/all）、layerling をまた開いて、バックアップをもどしてください。",
   "notice.designNotSavedDetail": "くわしく: {detail}",
-  "notice.projectHistoryTrimmed": "このデザインは大きいため、ブラウザーに保存したコピーには、履歴{total}ステップのうち最後の{kept}ステップしか残っていません。軽くするには、履歴を削除してください。",
+  "notice.projectHistoryTrimmed": "このデザインは大きいため、ブラウザーに保存したコピーには、履歴{total}ステップのうち最後の{kept}ステップしか残っていません。軽くするには、履歴の一覧で大きいステップを削除するか、履歴全体を削除してください。",
   "notice.projectShapesMigrateFailed": "デザインのシェイプをより大きなストレージに移せませんでした",
   "notice.projectShapesPrepareFailed": "デザインのシェイプのストレージを準備できませんでした",
   "notice.projectShapesDeleteFailed": "デザインのシェイプをローカルストレージから削除できませんでした",

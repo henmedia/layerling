@@ -170,6 +170,7 @@ AI:n arbetar med samma funktioner som du, via samma väg som din användning i r
 | `layerling_saved_view` | sparar den aktuella vyn under tangenten 7, 8, 9 eller 0 och går tillbaka till den, som Skift+tangent och själva tangenten (endast vyn); anger också startvyn för nya designer |
 | `layerling_build_plates` | listar, lägger till, namnger, ordnar och tar bort byggplattorna, flyttar objekt till en platta och ordnar dem på plattorna, som plattraden |
 | `layerling_clear_history` | raderar alla ångra-steg för gott, precis som historikvyns knapp ”Ta bort historik”; kräver `confirm: true` |
+| `layerling_delete_history_steps` | tar bort enskilda tillstånd i historiken för gott, aldrig det aktuella, som papperskorgen bredvid ett steg i historikvyns lista; kräver `steps` och `confirm: true` |
 | `layerling_list_backups` | listar de automatiska säkerhetskopiorna (Tidigare versioner) av den öppna designen, eller med `all: true` av alla designer i den här webbläsaren |
 | `layerling_open_backup` | öppnar en säkerhetskopia via dess `id` som en ny design, aldrig kopplad till den ursprungliga filen |
 | `layerling_set_history_view` | blickar tillbaka på ett tidigare tillstånd i projektet, som historikvyn (den riktiga designen förblir orörd; verktyg som ändrar modellen väntar tills den stängs) |

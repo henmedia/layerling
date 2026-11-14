@@ -175,6 +175,7 @@ export type LayerlingMcpCommandName =
   | "set_history_view"
   | "restore_from_history"
   | "clear_history"
+  | "delete_history_steps"
   | "list_backups"
   | "open_backup"
   | "show_workplane"

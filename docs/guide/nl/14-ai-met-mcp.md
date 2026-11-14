@@ -166,6 +166,7 @@ De AI werkt met dezelfde functies als jij, via dezelfde weg als jouw bediening i
 | `layerling_saved_view` | slaat de huidige weergave op onder de toets 7, 8, 9 of 0 en gaat ernaar terug, zoals Shift+toets en de toets (alleen de weergave); stelt ook de startweergave van nieuwe ontwerpen in |
 | `layerling_build_plates` | toont, voegt toe, benoemt, ordent en verwijdert de bouwplaten, zet objecten op een plaat en verdeelt ze over de platen, zoals de platenbalk |
 | `layerling_clear_history` | verwijdert definitief elke stap voor ongedaan maken, zoals de knop "Geschiedenis verwijderen" van de geschiedenisweergave; vereist `confirm: true` |
+| `layerling_delete_history_steps` | verwijdert losse toestanden van de geschiedenis definitief, nooit de huidige, zoals de prullenbak naast een stap in de lijst van de geschiedenisweergave; vraagt `steps` en `confirm: true` |
 | `layerling_list_backups` | toont de automatische back-ups (Eerdere versies) van het geopende ontwerp, of met `all: true` van alle ontwerpen in deze browser |
 | `layerling_open_backup` | opent een back-up via zijn `id` als nieuw ontwerp, nooit gekoppeld aan het oorspronkelijke bestand |
 | `layerling_set_history_view` | kijkt terug naar een eerdere toestand van het project, zoals de geschiedenisweergave (het echte ontwerp blijft onaangeroerd; gereedschappen die iets wijzigen wachten tot hij gesloten is) |

@@ -126,7 +126,7 @@ import { connectorHoleRadius, normalizeSplitConnectorOptions, splitConnectorDefa
 import { AttachmentViewer } from "./workplane/AttachmentViewer";
 import { GuideModal } from "./workplane/GuideModal";
 import { FileBackupsDialog, fileBackupName } from "@/components/FileBackupsDialog";
-import { HistoryViewOverlay, historyStateNameSuffix } from "./workplane/HistoryViewOverlay";
+import { HistoryViewOverlay, historyStateNameSuffix, requestHistoryStepList } from "./workplane/HistoryViewOverlay";
 import { useHistoryViewPicking } from "./workplane/useHistoryViewPicking";
 import { ShortcutsModal } from "./workplane/ShortcutsModal";
 import { WhatsNewWindow } from "./workplane/WhatsNewWindow";
@@ -158,6 +158,7 @@ import { historyViewMcpCommand } from "./workplane/historyViewMcp";
 import { attachmentsFingerprint } from "@/lib/projectAttachments";
 import { ATTACHMENT_MCP_READ_ACTIONS, attachmentMcpCommand, attachmentMcpList } from "@/lib/projectAttachmentsMcp";
 import { appendEditorHistorySnapshot, boundedEditorHistoryState, continuesKeyRun, type KeyRun, editorHistoryBranch, editorHistoryEntry, editorHistoryForExport, historyStateAt, hydrateEditorHistoryState, notesForHistoryIndex, projectSceneFingerprint, projectShapesFingerprint, workplaneForHistoryIndex, type EditorHistoryEntry, type EditorHistoryState } from "@/lib/editorHistory";
+import { deleteHistoryEntries, formatHistoryBytes, historyFreedBytes, historyIndexAfterDelete } from "@/lib/historyStepSizes";
 import { snapShapeFootprintToVisibleGrid, visibleGridStep } from "@/lib/gridSnap";
 import { composedShapeRotation, geometryRotationDegreesForShortcut, geometryRotationDelta, rotatedGeometryShapePatch } from "@/lib/geometryRotation";
 import { carryShapePivot, heightPatchKeepingBase, pivotAfterJoin, shapePivotFromWorld, shapePivotWorld, type PivotPoint } from "@/lib/rotationPivot";
@@ -321,6 +322,7 @@ const HISTORY_VIEW_MCP_ACTIONS = new Set([
   "set_history_view",
   "restore_from_history",
   "clear_history",
+  "delete_history_steps",
   "list_backups",
   // Reading a design's files, as Download in the attachments panel still works there (#820).
   ...ATTACHMENT_MCP_READ_ACTIONS,
@@ -3117,7 +3119,7 @@ export function LayerlingEditor({
   /** Whether the design's card has no picture; the editor then takes one once the design is open. */
   isProjectThumbnailMissing?: (projectId: string) => Promise<boolean>;
   /** The last failed autosave, so the editor can say so; `at` makes a repeat failure show again. */
-  projectSaveFailure?: { message: string; at: number } | null;
+  projectSaveFailure?: { message: string; at: number; historyTrimmed?: boolean } | null;
   /** Why the newest state of this design could not be stored, while it could not (#1652): a note stays up until a save gets through. */
   projectUnsaved?: { message: string; kind: SaveFailureKind; detail: string; broken?: boolean } | null;
   onProjectNameChange?: (name: string) => void;
@@ -3492,8 +3494,14 @@ export function LayerlingEditor({
     };
   }, []);
   // A failed autosave is said where the work happens, and stays a while.
+  // Set once openHistoryView is made, below: the note that the stored copy kept fewer steps opens the list of steps.
+  const openHistoryStepListRef = useRef<() => void>(() => undefined);
   useEffect(() => {
-    if (projectSaveFailure) setNotice(projectSaveFailure.message, true);
+    if (!projectSaveFailure) return;
+    // A history cut short to be stored at all: its steps and their sizes are a click away, to choose what goes (#1728).
+    setNotice(projectSaveFailure.message, true, projectSaveFailure.historyTrimmed
+      ? { label: t("notice.projectHistoryTrimmedOpen"), run: () => openHistoryStepListRef.current() }
+      : null);
   }, [projectSaveFailure, setNotice]);
 
   // Die Statuszeile traegt fertigen Text, keinen Schluessel. Nach einem
@@ -7311,6 +7319,10 @@ export function LayerlingEditor({
     setHistoryViewIndex(historyIndexRef.current);
     setNotice(t("status.historyViewOpened"), true);
   }, []);
+  openHistoryStepListRef.current = () => {
+    requestHistoryStepList();
+    openHistoryView();
+  };
 
   const closeHistoryView = useCallback(() => {
     setHistoryViewIndex(null);
@@ -13216,6 +13228,38 @@ export function LayerlingEditor({
     return Math.max(0, removed);
   }, [syncProjectShapes]);
 
+  /**
+   * Throws away single states of the history, to make a design lighter without losing all of it (memory 14.11.2026,
+   * after #1728). The state the design stands at stays; Undo from the state after a deleted one goes straight to the
+   * one before it. Returns how many states went.
+   */
+  const deleteHistorySteps = useCallback((indices: readonly number[]) => {
+    if (projectInteractionActiveRef.current) {
+      setNotice(t("status.finishBeforeHistory"));
+      return 0;
+    }
+    const before = historyRef.current;
+    const freed = historyFreedBytes(before, indices);
+    const result = deleteHistoryEntries(before, historyIndexRef.current, indices);
+    if (!result) return 0;
+    const kept = new Set(result.entries.map((entry) => entry.fingerprint));
+    openGroupHistoryRef.current.forEach((_levels, fingerprint) => {
+      if (!kept.has(fingerprint)) openGroupHistoryRef.current.delete(fingerprint);
+    });
+    historyRef.current = result.entries;
+    historyIndexRef.current = result.index;
+    // The status line's offer to take back the last step would point at another state now.
+    lastHistoryChangeRef.current = null;
+    setHistory(result.entries);
+    setHistoryIndex(result.index);
+    setHistoryViewIndex((current) => (current === null ? null : Math.min(historyIndexAfterDelete(current, result.removed), result.entries.length - 1)));
+    syncProjectShapes(shapesRef.current, true);
+    setNotice(result.removed.length === 1
+      ? t("status.historyStepDeleted", { size: formatHistoryBytes(freed, numberLocale()) })
+      : t("status.historyStepsDeleted", { count: result.removed.length, size: formatHistoryBytes(freed, numberLocale()) }));
+    return result.removed.length;
+  }, [syncProjectShapes]);
+
   const executeMcpCommand = useCallback(async (command: LayerlingMcpCommand): Promise<unknown> => {
     const params = command.params ?? {};
     const currentShapes = () => shapesRef.current;
@@ -13240,6 +13284,7 @@ export function LayerlingEditor({
         showState: setHistoryViewIndex,
         busy: () => projectInteractionActiveRef.current,
         clearHistory,
+        deleteSteps: deleteHistorySteps,
         bringBack: historyView.bringBack,
         openGroups: openGroupCount,
         summary: mcpShapeSummary,
@@ -19445,6 +19490,8 @@ export function LayerlingEditor({
           onExport={() => setTopPanel((current) => (current === "export" ? null : "export"))}
           onCreateProject={() => void createProjectFromHistoryState()}
           onDeleteHistory={clearHistory}
+          entries={history}
+          onDeleteSteps={deleteHistorySteps}
           onClose={closeHistoryView}
         />
       ) : null}

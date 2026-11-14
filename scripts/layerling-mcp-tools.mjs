@@ -2120,14 +2120,14 @@ export const tools = [
   },
   {
     name: "layerling_set_history_view",
-    description: "Look back at an earlier state of the project, like the editor's History view: the workplane shows that state while the real design stays untouched. Give `index` (0 is the oldest state, the last one is the current design) to open the view at that state or move it, `open: false` to close it, or no settings to read where it stands. While it is open, tools that change the design answer with an error - close it first; reading, `layerling_capture_image` (a picture of the shown state) and the section view still work. `layerling_read_scene` keeps describing the live design. Returns the state shown, how many there are and its bodies; a group lists its `parts` at every depth, whose ids `layerling_restore_from_history` takes. Every answer also has undoStep and redoStep: what undo and redo would take back or bring again from the design's own state, as a sentence with the measure in brackets where the step has one (\"Rounded the edges of Box (5 mm)\"); lastStep and nextStep carry measures the same way. With `steps: true` it also lists every state with the step that led to it (`steps`, newest last), as the History view's list does.",
+    description: "Look back at an earlier state of the project, like the editor's History view: the workplane shows that state while the real design stays untouched. Give `index` (0 is the oldest state, the last one is the current design) to open the view at that state or move it, `open: false` to close it, or no settings to read where it stands. While it is open, tools that change the design answer with an error - close it first; reading, `layerling_capture_image` (a picture of the shown state) and the section view still work. `layerling_read_scene` keeps describing the live design. Returns the state shown, how many there are and its bodies; a group lists its `parts` at every depth, whose ids `layerling_restore_from_history` takes. Every answer also has undoStep and redoStep: what undo and redo would take back or bring again from the design's own state, as a sentence with the measure in brackets where the step has one (\"Rounded the edges of Box (5 mm)\"); lastStep and nextStep carry measures the same way. With `steps: true` it also lists every state with the step that led to it (`steps`, newest last), as the History view's list does, each with `freesBytes`: about how much deleting that state alone would free (a mesh that several states share counts for none of them alone), and `historyBytes` for the whole history.",
     inputSchema: {
       ...editorTargetSchema,
       properties: {
         ...editorTargetSchema.properties,
         open: { type: "boolean", description: "false closes the view; true (or an index) opens it." },
         index: { type: "number", description: "The state to show, 0 = oldest. Clamped to the existing states." },
-        steps: { type: "boolean", description: "true adds `steps`: every state's index with the step that led to it, as a sentence." },
+        steps: { type: "boolean", description: "true adds `steps`: every state's index with the step that led to it, as a sentence, and what deleting it would free (`freesBytes`)." },
       },
     },
   },
@@ -2153,6 +2153,19 @@ export const tools = [
       properties: {
         ...editorTargetSchema.properties,
         confirm: { type: "boolean", description: "Must be true: every earlier state is deleted for good." },
+      },
+    },
+  },
+  {
+    name: "layerling_delete_history_steps",
+    description: "Delete single states of the design's history for good, to make a large design lighter without losing the whole history, as the bin beside a step in the History view's list does. The state the design stands at cannot be deleted and the design itself does not change; undo from the state after a deleted one then goes straight to the one before it. `layerling_set_history_view` with `steps: true` lists the states with what deleting each would free (`freesBytes`): a turned body brings a whole mesh with every change of its angle, so those steps are usually the large ones. It cannot be undone and needs `confirm: true`. Returns how many states went, about how many bytes that freed, and the new count.",
+    inputSchema: {
+      ...editorTargetSchema,
+      required: ["steps", "confirm"],
+      properties: {
+        ...editorTargetSchema.properties,
+        steps: { type: "array", items: { type: "integer" }, description: "The indexes of the states to delete, as layerling_set_history_view lists them (0 is the oldest)." },
+        confirm: { type: "boolean", description: "Must be true: these states are deleted for good." },
       },
     },
   },

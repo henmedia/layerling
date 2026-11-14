@@ -1,6 +1,19 @@
 [
   {
     "title": {
+      "de": "Einzelne Schritte des Verlaufs löschen",
+      "en": "Delete single steps of the history"
+    },
+    "body": {
+      "de": "Ein großer Entwurf lässt sich jetzt leichter machen, ohne den ganzen Verlauf zu verlieren. Öffne die Verlaufsansicht und dort die Liste der Schritte: Neben jedem Schritt steht, wie viel Platz sein Löschen etwa freigibt, und oben, wie viel der ganze Verlauf belegt.\n\n– Der Papierkorb neben einem Schritt löscht nur diesen Schritt. Der Entwurf bleibt, wie er ist.\n– „Größte Schritte löschen“ wählt alle Schritte, die allein 1 MB oder mehr freigeben, und fragt vorher.\n– Meist sind das Schritte, in denen ein Körper gedreht wurde: Jede Drehung speichert ein neues Netz.\n\nSpeichert der Browser einen Entwurf nur mit gekürztem Verlauf, öffnet der Knopf im Hinweis gleich diese Liste.",
+      "en": "A large design can now be made lighter without losing its whole history. Open the History view and its list of steps: beside each step stands about how much room deleting it would free, and at the top how much the whole history takes.\n\n– The bin beside a step deletes that step alone. The design stays as it is.\n– Delete largest steps picks every step that frees 1 MB or more on its own, and asks first.\n– Those are mostly steps where a body was turned: every turn stores a new mesh.\n\nWhen the browser stores a design only with a shortened history, the button in the note opens this list right away."
+    },
+    "guide": {
+      "section": "historyView"
+    }
+  },
+  {
+    "title": {
       "de": "Finger nur zum Verschieben, für die Größe oder zum Drehen",
       "en": "A finger for moving, sizing or turning only"
     },

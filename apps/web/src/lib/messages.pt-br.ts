@@ -4633,7 +4633,7 @@ export const MESSAGES_PT_BR: Partial<Record<MessageKey, string>> = {
   "error.projectTooLarge": "Este projeto é grande demais para salvar: o histórico e as malhas ocupam espaço demais. Exclua o histórico na visualização do Histórico ou simplifique os sólidos mais pesados.",
   "error.storageFull": "O navegador não tem mais espaço para salvar este projeto. Exclua o histórico na visualização do Histórico, remova projetos de que você não precisa ou faça backup deles antes.",
   "notice.projectShapesSaveFailedWhy": "Não foi possível salvar as formas do projeto: {reason}",
-  "notice.projectHistoryTrimmed": "Este projeto é grande: a cópia salva no navegador guarda só os últimos {kept} de {total} passos do histórico. Exclua o histórico para deixá-lo mais leve.",
+  "notice.projectHistoryTrimmed": "Este projeto é grande: a cópia salva no navegador guarda só os últimos {kept} de {total} passos do histórico. Para deixá-lo mais leve, exclua os maiores passos na lista do histórico, ou o histórico inteiro.",
   "notice.projectShapesMigrateFailed": "Não foi possível migrar as formas do projeto para um armazenamento maior",
   "notice.projectShapesPrepareFailed": "Não foi possível preparar o armazenamento das formas do projeto",
   "notice.projectShapesDeleteFailed": "Não foi possível excluir as formas do projeto do armazenamento local",

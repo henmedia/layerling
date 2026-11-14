@@ -170,6 +170,7 @@ Die KI arbeitet mit denselben Funktionen wie du, sie läuft über denselben Weg 
 | `layerling_saved_view` | speichert die aktuelle Ansicht unter der Taste 7, 8, 9 oder 0 und holt sie zurück, wie Umschalt+Taste und die Taste (nur die Ansicht); setzt auch die Startansicht neuer Entwürfe |
 | `layerling_build_plates` | listet, fügt hinzu, benennt, sortiert und entfernt die Druckplatten, setzt Objekte auf eine Platte und verteilt sie auf die Platten, wie die Plattenleiste |
 | `layerling_clear_history` | löscht jeden Rückgängig-Schritt endgültig, wie der Knopf „Verlauf löschen“ im Verlaufsblick; verlangt `confirm: true` |
+| `layerling_delete_history_steps` | löscht einzelne Stände des Verlaufs endgültig, nie den aktuellen, wie der Papierkorb neben einem Schritt in der Liste der Verlaufsansicht; braucht `steps` und `confirm: true` |
 | `layerling_list_backups` | listet die automatischen Sicherungen (Frühere Fassungen) des offenen Entwurfs, mit `all: true` aller Entwürfe in diesem Browser |
 | `layerling_open_backup` | öffnet eine Sicherung über ihre `id` als neuen Entwurf, nie an die ursprüngliche Datei gebunden |
 | `layerling_set_history_view` | schaut auf einen früheren Stand des Projekts zurück, wie die Verlaufsansicht (der echte Entwurf bleibt unberührt; ändernde Werkzeuge warten, bis sie geschlossen ist) |
