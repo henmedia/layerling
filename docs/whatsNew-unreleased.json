@@ -1,1 +1,22 @@
-[]
+[
+  {
+    "title": {
+      "de": "Textur auf dem Bauch einer gedrehten Vase",
+      "en": "Texture on the belly of a turned vase"
+    },
+    "body": {
+      "de": "Eine aus einer Skizze gedrehte Vase hat auf dem Bauch Punktreihen, die nur wenige Tausendstel Millimeter auseinanderliegen. Die Oberflächentextur hielt sie für scharfe Kanten, und die Rillen wurden auf dem Bauch zu kurzen waagerechten Strichen, während der Hals sauber blieb. Jetzt werden solche Punkte zusammengefasst: Die Rillen laufen vom Hals über den ganzen Bauch, und beim Anklicken von Flächen bricht die Suche nicht mehr mit einem Fehler ab.",
+      "en": "A vase turned from a sketch has rows of points on its belly that lie only a few thousandths of a millimetre apart. The surface texture took them for sharp edges, and on the belly the grooves came out as short horizontal dashes while the neck stayed clean. Now such points are joined: the grooves run from the neck over the whole belly, and picking faces no longer stops with an error."
+    }
+  },
+  {
+    "title": {
+      "de": "Text um einen Körper mit Seiten ohne Streifen",
+      "en": "Text round a body with sides without streaks"
+    },
+    "body": {
+      "de": "Lag ein breiter Text um einen Körper mit Seiten, etwa eine Platte mit 21 Seiten, wurden die Dreiecke der hinteren Seiten vor dem Schneiden nicht fein genug unterteilt, und die Buchstaben liefen dort als Streifen darüber. Jetzt werden die Seiten so fein unterteilt wie die Mitte, und der Text liest sich überall sauber.",
+      "en": "When a wide text lay round a body with sides, such as a plate with 21 sides, the triangles of the far sides were not split fine enough before the letters were cut, and the letters ran across them as streaks. Now the sides are split as fine as the middle, and the text reads cleanly everywhere."
+    }
+  }
+]
