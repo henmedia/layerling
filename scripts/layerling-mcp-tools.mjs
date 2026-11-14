@@ -1452,7 +1452,7 @@ export const tools = [
   },
   {
     name: "layerling_hollow_object",
-    description: "Hollow a solid into walls of equal thickness, like a box, cup or case. A hole can be hollowed too and stays a hole. The walls grow inward, so the outside keeps its size. `openings` chooses which flat sides stay open, measured against the world's axes: a list of any of top, bottom, front (+z), back (-z), left (-x) and right (+x) - for example [\"front\"] for a drawer slot - or one of the names top (default), bottom, top-bottom, or none for a sealed cavity. A side asked for in a list must have a flat face at the very edge of the body on that side; a top cut off at an angle (a box with slopeEnd, or one grouped with a tilted hole) counts as top as long as it leans no more than 60 degrees from level, and is left open along its slope. `edges` sets how the inner walls meet where the body has a step or opening: round (default, radius = wall thickness) or sharp. Can be undone like an edge treatment. Resizing the body later hollows it again at the new size a moment afterwards, so the walls keep their thickness.",
+    description: "Hollow a solid into walls of equal thickness, like a box, cup or case. A hole can be hollowed too and stays a hole. The walls grow inward, so the outside keeps its size. `openings` chooses which flat sides stay open, measured against the world's axes: a list of any of top, bottom, front (+z), back (-z), left (-x) and right (+x) - for example [\"front\"] for a drawer slot - or one of the names top (default), bottom, top-bottom, or none for a sealed cavity. A side asked for in a list must have a flat face at the very edge of the body on that side; a top cut off at an angle (a box with slopeEnd, or one grouped with a tilted hole) counts as top as long as it leans no more than 60 degrees from level, and is left open along its slope. `edges` sets how the inner walls meet where the body has a step or opening: round (default, radius = wall thickness) or sharp. `stack` (millimetres, 1 to 10) makes the box stackable, only with the top as the one open side: the outer half of the wall rises as a collar that high round the top and a groove a millimetre deeper is cut under the wall, so one box stands on the next; it needs straight walls, at least 1.2 mm thick, and a body clearly taller than the collar. Can be undone like an edge treatment. Resizing the body later hollows it again at the new size a moment afterwards, so the walls keep their thickness.",
     inputSchema: {
       ...editorTargetSchema,
       required: ["id", "thickness"],
@@ -1467,6 +1467,7 @@ export const tools = [
           ],
         },
         edges: { type: "string", enum: ["round", "sharp"] },
+        stack: { type: "number", description: "Collar height in millimetres (1 to 10) for a stackable box; leave out for none." },
       },
     },
   },

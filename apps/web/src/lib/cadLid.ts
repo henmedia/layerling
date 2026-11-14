@@ -33,7 +33,7 @@ const FLAT = 1e-4;
 const MAKING = new Set(["makeFace", "offsetWire2D", "translate", "extrude", "makeBoxFromCorners", "common", "getSubShapes", "cut", "cutAll", "fuseAll", "makeCircleEdge", "makeWire", "simplify", "transform"]);
 
 /** The kernel, with every shape its making calls hand back noted in `made`. */
-function tracking(cad: OcctKernel, made: ShapeHandle[]): OcctKernel {
+export function tracking(cad: OcctKernel, made: ShapeHandle[]): OcctKernel {
   return new Proxy(cad, {
     get(target, key, receiver) {
       const value = Reflect.get(target, key, receiver);
@@ -49,7 +49,7 @@ function tracking(cad: OcctKernel, made: ShapeHandle[]): OcctKernel {
 }
 
 /** A face for the wire moved by `distance` outward (negative: inward), checked by its area; null when the kernel cannot. */
-function moved(cad: OcctKernel, wire: ShapeHandle, distance: number): ShapeHandle | null {
+export function moved(cad: OcctKernel, wire: ShapeHandle, distance: number): ShapeHandle | null {
   const base = cad.getSurfaceArea(cad.makeFace(wire));
   if (Math.abs(distance) < 1e-9) return cad.makeFace(wire);
   // Which way a wire moves depends on how it runs: the one whose area changes the way it should is the right one.
@@ -67,7 +67,7 @@ function moved(cad: OcctKernel, wire: ShapeHandle, distance: number): ShapeHandl
 }
 
 /** A face at the rim pushed into a block from `low` to `high`. */
-function block(cad: OcctKernel, face: ShapeHandle, rim: number, low: number, high: number) {
+export function block(cad: OcctKernel, face: ShapeHandle, rim: number, low: number, high: number) {
   return cad.extrude(cad.translate(face, 0, low - rim, 0), 0, high - low, 0);
 }
 
@@ -75,7 +75,7 @@ function block(cad: OcctKernel, face: ShapeHandle, rim: number, low: number, hig
  * The body's faces at the rim, each as its outline and its openings (a box hollowed with its top open has one face, a
  * ring). Null when an opening holds another face, a wall standing inside it: the mesh lid handles that.
  */
-function rimFaces(cad: OcctKernel, body: ShapeHandle, rim: number) {
+export function rimFaces(cad: OcctKernel, body: ShapeHandle, rim: number) {
   const box = cad.getBoundingBox(body);
   const slab = cad.makeBoxFromCorners({ x: box.xmin - 1, y: rim - 1, z: box.zmin - 1 }, { x: box.xmax + 1, y: rim, z: box.zmax + 1 });
   const below = cad.common(body, slab);

@@ -78,6 +78,8 @@ Las paredes crecen hacia dentro. El exterior se queda como está.
 
 Lo que elijas en {{ui:shell.edges}} solo importa donde las paredes interiores se separan: en un escalón del cuerpo o alrededor de una abertura. Las esquinas de la cavidad de una caja sencilla son siempre vivas, con cualquiera de los dos ajustes. Para un interior redondeado, redondea primero las aristas exteriores del cuerpo (ver más arriba) y luego vacíalo: el interior sigue la forma con el radio menos el grosor de pared. Si no se puede construir el interior redondeado, algo que puede pasar con un contorno hecho de muchísimos tramos rectos cortos, como un dibujo vectorizado, layerling construye en su lugar el mismo cuerpo hueco con esquinas interiores vivas.
 
+Cuando la parte superior es el único lado abierto, {{ui:shell.stack}} hace la caja apilable: la mitad exterior de la pared sobresale del borde como un reborde ({{ui:shell.stackHeight}}, al principio 3 mm), y bajo la pared se corta una ranura un milímetro más profunda que recibe el reborde de la caja de abajo. Así una caja se apoya en la siguiente sin deslizarse. El fondo y la base siguen planos, de modo que la caja se imprime apoyada en su fondo sin nada en el aire. Hacen falta paredes rectas, una pared de al menos 1,2 mm y un cuerpo claramente más alto que el reborde; si no funciona, la ventana de la herramienta dice por qué.
+
 ![El resultado: un cuerpo hueco con una pared de 3 mm, abierto por arriba.](shot:hollow-result)
 
 ![La misma caja con solo el lado delantero abierto: el hueco para un cajón.](shot:hollow-sides)

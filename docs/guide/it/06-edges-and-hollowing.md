@@ -78,6 +78,8 @@ Le pareti si sviluppano verso l’interno. L’esterno resta invariato.
 
 {{ui:shell.edges}} conta solo nei punti in cui le pareti interne si allontanano, cioè in corrispondenza di un gradino del corpo o attorno a un’apertura. Gli angoli interni di una scatola semplice restano sempre vivi con entrambe le impostazioni. Per ottenere un interno arrotondato, arrotonda prima gli spigoli esterni del corpo (vedi sopra) e poi svuotalo: all’interno il raggio sarà quello esterno meno lo spessore della parete. Se non è possibile creare il raccordo interno — può capitare con un contorno composto da moltissimi brevi segmenti, per esempio un disegno ricalcato — layerling crea lo stesso corpo cavo con angoli interni vivi.
 
+Quando la parte superiore è l'unico lato aperto, {{ui:shell.stack}} rende la scatola impilabile: la metà esterna della parete sporge sopra il bordo come un colletto ({{ui:shell.stackHeight}}, all'inizio 3 mm) e sotto la parete viene ricavata una scanalatura più profonda di un millimetro che accoglie il colletto della scatola sottostante. Una scatola sta così sull'altra senza scivolare. Il fondo e la base restano piatti, quindi la scatola si stampa ancora appoggiata sul fondo senza nulla in aria. Servono pareti dritte, una parete di almeno 1,2 mm e un corpo nettamente più alto del colletto; se non funziona, la finestra dello strumento ne spiega il motivo.
+
 ![Il risultato: un guscio con pareti spesse 3 mm e apertura superiore.](shot:hollow-result)
 
 ![La stessa scatola con il solo lato anteriore aperto: un’apertura per un cassetto.](shot:hollow-sides)

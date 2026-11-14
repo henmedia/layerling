@@ -78,6 +78,8 @@ Väggarna växer inåt. Utsidan förblir densamma.
 
 {{ui:shell.edges}} spelar bara roll där innerväggarna går isär – vid ett trappsteg i kroppen eller runt en öppning. Hörnen inuti hålrummet på en enkel låda blir alltid skarpa med båda valen. För rundad insida avrundar du först kroppens ytterkanter (se ovan) och gröper sedan ur den: insidan följer då med radien minus väggtjockleken. Om den rundade insidan inte kan byggas, vilket kan hända med en kontur av väldigt många korta raka bitar som en spårad teckning, bygger layerling samma ihåliga kropp med skarpa innerhörn i stället.
 
+När toppen är den enda öppna sidan gör {{ui:shell.stack}} lådan stapelbar: den yttre hälften av väggen sticker upp över kanten som en krage ({{ui:shell.stackHeight}}, till att börja med 3 mm), och under väggen skärs ett spår som är en millimeter djupare och tar emot kragen på lådan under. En låda står då stadigt på nästa. Botten och undersidan förblir plana, så lådan skrivs fortfarande ut stående på botten utan något i luften. Det krävs raka väggar, en vägg på minst 1,2 mm och en kropp som är tydligt högre än kragen; fungerar det inte säger verktygsfönstret varför.
+
 ![Resultatet: ett skal med 3 mm vägg, öppet upptill.](shot:hollow-result)
 
 ![Samma låda med bara framsidan öppen: ett fack för en utdragslåda.](shot:hollow-sides)

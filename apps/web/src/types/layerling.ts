@@ -872,6 +872,8 @@ export type EdgeTreatmentFeature = {
   openings?: ShellOpenings;
   /** Only for "shell" and "offset"; missing means "round". */
   shellEdges?: ShellEdges;
+  /** Only for "shell" with the top open: the height in mm of the collar round the top and of the groove under the wall, so one stands on the next; missing means none. */
+  shellStack?: number;
   /** Only for "offset": the faces moved inward, the body shrunk; missing means grown. */
   offsetShrink?: boolean;
   /** Only for "offset" (#1057): only the sides moved, flat tops and bottoms kept at their heights; missing means every face. */

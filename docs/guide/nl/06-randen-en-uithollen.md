@@ -77,6 +77,8 @@ De wanden groeien naar binnen. De buitenkant blijft zoals hij is.
 
 De {{ui:shell.edges}} doen er alleen toe waar de binnenwanden uit elkaar gaan: bij een trede in het lichaam of rond een opening. De hoeken van de holte in een gewoon blok zijn altijd scherp, bij beide instellingen. Wil je een afgeronde binnenkant, rond dan eerst de buitenranden van het lichaam af (zie hierboven) en hol het daarna uit: de binnenkant volgt met de straal min de wanddikte. Kan de afgeronde binnenkant niet worden gebouwd, wat kan gebeuren bij een omtrek uit heel veel korte rechte stukjes zoals een overgetrokken tekening, dan bouwt layerling hetzelfde holle lichaam met scherpe binnenhoeken.
 
+Als de bovenkant de enige open zijde is, maakt {{ui:shell.stack}} de doos stapelbaar: de buitenste helft van de wand steekt als kraag boven de rand uit ({{ui:shell.stackHeight}}, in het begin 3 mm), en onder de wand wordt een groef gemaakt die een millimeter dieper is en de kraag van de doos eronder opneemt. Een doos staat dan stevig op de volgende. De bodem en de onderkant blijven vlak, dus de doos wordt nog steeds op zijn bodem staand geprint zonder iets in de lucht. Er zijn rechte wanden nodig, een wand van minstens 1,2 mm en een lichaam dat duidelijk hoger is dan de kraag; lukt het niet, dan zegt het gereedschapsvenster waarom.
+
 ![Het resultaat: een schaal met een wand van 3 mm, aan de bovenkant open.](shot:hollow-result)
 
 ![Hetzelfde blok met alleen de voorkant open: een sleuf voor een lade.](shot:hollow-sides)
