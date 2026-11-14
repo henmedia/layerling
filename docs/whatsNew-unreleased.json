@@ -1,1 +1,12 @@
-[]
+[
+  {
+    "title": {
+      "de": "Ziehen in der Vorder- und Seitenansicht folgt der Maus",
+      "en": "Dragging in the front and side view follows the mouse"
+    },
+    "body": {
+      "de": "Von vorn oder von der Seite gesehen, etwa in der Vorderansicht mit orthografischer Ansicht, blieb ein gezogenes Teil an zufälligen Stellen stehen, hinkte der Maus hinterher oder sprang in der Tiefe. Jetzt folgt es der Maus entlang der Achse, die man sieht, und behält seine Tiefe.",
+      "en": "Seen from the front or the side, as in the front view with orthographic projection, a dragged part stopped at random points, lagged behind the mouse or jumped in depth. Now it follows the mouse along the axis that shows and keeps its depth."
+    }
+  }
+]

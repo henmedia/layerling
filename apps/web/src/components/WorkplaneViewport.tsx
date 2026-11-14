@@ -59,7 +59,7 @@ import { displayToMillimeters, formatLengthMm, lengthDisplayUnit, measurementOpt
 import { computeCornerRulerRelativeCoordinates, cornerRulerArmLength, cornerRulerElevationArmLength, toggledCornerRulerArms, cornerRulerAxisModes, cornerRulerPlateArms, cornerRulerFrameForWorkplane, cornerRulerShiftVector, pointAlongRuler, rotateCornerRulerFrame, rulerDimensionMatch, toggledCornerRulerAxis, toggledCornerRulerMode, type CornerRulerAxis, type RulerDimensionField } from "@/lib/rulerDimensions";
 import { createMoveDimensionOverlay, type MoveDimensionAxis, type MoveDimensionOverlayData } from "@/lib/moveDimensionLines";
 import { computeOriginAxisDistance, createOriginDimensionOverlay, type OriginDimensionOverlayData } from "@/lib/originDimensionLines";
-import { horizontalPlacementWorkplane, placementPatchForNewShape, placementWorkplaneCoordinates, placementWorkplaneFromSurface, placementWorkplaneIsBase, placementWorkplanePoint, snapPlacementWorkplaneOrigin, type PlacementPoint, type PlacementWorkplane } from "@/lib/placementWorkplane";
+import { EDGE_ON_WORKPLANE_SINE, edgeOnWorkplanePoint, horizontalPlacementWorkplane, placementPatchForNewShape, placementWorkplaneCoordinates, placementWorkplaneFromSurface, placementWorkplaneIsBase, placementWorkplanePoint, snapPlacementWorkplaneOrigin, type PlacementPoint, type PlacementWorkplane } from "@/lib/placementWorkplane";
 import { capturePointer } from "@/lib/pointerCapture";
 import { useMiddleClick } from "@/lib/middleClick";
 import { printerPresetById } from "@/lib/printBed";
@@ -3697,10 +3697,25 @@ export function WorkplaneViewport({
   const toPlanePoint = useCallback((clientX: number, clientY: number) => toPlanePointAtY(clientX, clientY, 0), [toPlanePointAtY]);
 
   const dragReachCacheRef = useRef<{ shapes: readonly WorkplaneShape[]; width: number; depth: number; x: number; z: number } | null>(null);
-  const toPlacementWorkplanePoint = useCallback((clientX: number, clientY: number, workplane = placementWorkplaneRef.current) => {
+  /**
+   * Where the pointer meets a workplane while a part is dragged on it. Seen edge-on, as from the front
+   * with the plate level, the ray misses the workplane or meets it far behind, and a dragged part stuck
+   * or jumped in depth (#1744): there the point follows the pointer sideways and keeps the depth.
+   */
+  const toWorkplaneDragPoint = useCallback((clientX: number, clientY: number, workplane: PlacementWorkplane) => {
+    const state = threeRef.current;
+    if (state) {
+      aimPickRay(state, clientX, clientY);
+      const edgeOn = edgeOnWorkplanePoint(workplane, state.raycaster.ray, state.camera.getWorldDirection(new THREE.Vector3()));
+      if (edgeOn) return edgeOn;
+    }
     const normal = new THREE.Vector3(workplane.normal.x, workplane.normal.y, workplane.normal.z);
     const origin = new THREE.Vector3(workplane.origin.x, workplane.origin.y, workplane.origin.z);
-    const raw = toRawPlanePoint(clientX, clientY, new THREE.Plane(normal, -normal.dot(origin)));
+    return toRawPlanePoint(clientX, clientY, new THREE.Plane(normal, -normal.dot(origin)));
+  }, [toRawPlanePoint]);
+
+  const toPlacementWorkplanePoint = useCallback((clientX: number, clientY: number, workplane = placementWorkplaneRef.current) => {
+    const raw = toWorkplaneDragPoint(clientX, clientY, workplane);
     if (!raw) return null;
     const local = placementWorkplaneCoordinates(workplane, raw);
     const step = snapStep(snapRef.current);
@@ -3719,7 +3734,7 @@ export function WorkplaneViewport({
       clamp(snapValue(local.x, step), -cached.x, cached.x),
       clamp(snapValue(local.z, step), -cached.z, cached.z),
     );
-  }, [toRawPlanePoint]);
+  }, [toWorkplaneDragPoint]);
 
   const toFreePlacementWorkplanePoint = useCallback((clientX: number, clientY: number, workplane = placementWorkplaneRef.current) => {
     const normal = new THREE.Vector3(workplane.normal.x, workplane.normal.y, workplane.normal.z);
@@ -7567,17 +7582,21 @@ export function WorkplaneViewport({
       const state = threeRef.current;
       if (drag.snapMoving && drag.snapTargets?.length && state && !axisLock?.still) {
         let guides: ObjectSnapGuide[] = [];
-        const raw = event.altKey ? null : toRawPlanePoint(event.clientX, event.clientY, new THREE.Plane(new THREE.Vector3(0, 1, 0), -drag.workplane.origin.y));
+        const raw = event.altKey ? null : toWorkplaneDragPoint(event.clientX, event.clientY, horizontalPlacementWorkplane(drag.workplane.origin.y));
         if (raw) {
           // Measured from the unsnapped pointer: the grid must not keep an edge
           // a step away from the neighbour it is being pulled to.
           // Snapping only runs on the flat workplane, where the lock is to X or Z;
           // the locked-out direction stays at zero and is not pulled anywhere.
+          // Seen edge-on, the depth does not show and is not pulled either (#1744).
+          const view = state.camera.getWorldDirection(new THREE.Vector3());
+          const edgeOn = Math.abs(view.y) < EDGE_ON_WORKPLANE_SINE;
+          const hiddenAxis = edgeOn ? (Math.abs(view.z) >= Math.abs(view.x) ? "z" : "x") : null;
           const rawDeltaX = axisLock?.along === "z" ? 0 : raw.x - drag.startPoint.x;
           const rawDeltaZ = axisLock?.along === "x" ? 0 : raw.z - drag.startPoint.z;
           const snap = objectSnapOffset(shiftSnapBox(drag.snapMoving, rawDeltaX, rawDeltaZ), drag.snapTargets, objectSnapThreshold(state, raw));
-          if (snap.dx !== null && axisLock?.along !== "z") deltaX = rawDeltaX + snap.dx;
-          if (snap.dz !== null && axisLock?.along !== "x") deltaZ = rawDeltaZ + snap.dz;
+          if (snap.dx !== null && axisLock?.along !== "z" && hiddenAxis !== "x") deltaX = rawDeltaX + snap.dx;
+          if (snap.dz !== null && axisLock?.along !== "x" && hiddenAxis !== "z") deltaZ = rawDeltaZ + snap.dz;
           if (snap.dx !== null || snap.dz !== null) {
             guides = objectSnapOffset(shiftSnapBox(drag.snapMoving, deltaX, deltaZ), drag.snapTargets, 1e-4).guides;
           }
@@ -7626,7 +7645,7 @@ export function WorkplaneViewport({
         threeRef.current.needsRender = true;
       }
     },
-    [pickPlacementSurface, resolveMatePoint, setMarqueeFromState, toPlacementWorkplanePoint, toRawPlanePoint, moveCruiseGhost, updateModifierEdgeHover, updateProtractorHover, updateTapeHover, updateTransform],
+    [pickPlacementSurface, resolveMatePoint, setMarqueeFromState, toPlacementWorkplanePoint, toRawPlanePoint, toWorkplaneDragPoint, moveCruiseGhost, updateModifierEdgeHover, updateProtractorHover, updateTapeHover, updateTransform],
   );
 
   useEffect(() => {
