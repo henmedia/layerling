@@ -15,11 +15,13 @@
   {
     "title": {
       "de": "Finger nur zum Verschieben, für die Größe oder zum Drehen",
-      "en": "A finger for moving, sizing or turning only"
+      "en": "A finger for moving, sizing or turning only",
+      "da": "En finger kun til flytning, størrelse eller drejning"
     },
     "body": {
       "de": "Auf einem Tablet liegen die Griffe rund um eine Auswahl dicht beieinander, und ein Finger erwischte leicht den falschen. Ein neuer Knopf mit der zeigenden Hand in der Ansichtsleiste wählt, was ein Finger tut:\n– Alle Griffe, wie bisher\n– Nur verschieben\n– Nur Größe\n– Nur drehen\n\nDie übrigen Griffe verschwinden, und bei Größe oder Drehen wählt ein Finger auf dem Teil es nur aus, statt es zu verschieben. Der Knopf erscheint nur auf Geräten mit Touchscreen, und der Browser merkt sich die Wahl.",
-      "en": "On a tablet the handles around a selection lie close together, and a finger easily caught the wrong one. A new button with the pointing hand in the view bar chooses what a finger does:\n– All handles, as before\n– Move only\n– Size only\n– Turn only\n\nThe other handles are hidden, and set to the size or to turning, a finger on the part only selects it instead of moving it. The button only shows on a device with a touch screen, and the browser keeps the choice."
+      "en": "On a tablet the handles around a selection lie close together, and a finger easily caught the wrong one. A new button with the pointing hand in the view bar chooses what a finger does:\n– All handles, as before\n– Move only\n– Size only\n– Turn only\n\nThe other handles are hidden, and set to the size or to turning, a finger on the part only selects it instead of moving it. The button only shows on a device with a touch screen, and the browser keeps the choice.",
+      "da": "På en tablet ligger håndtagene omkring en markering tæt sammen, og en finger tog let fat i det forkerte. En ny knap med den pegende hånd i visningslinjen vælger, hvad en finger gør:\n– Finger: alle håndtag\n– Finger: kun flytte\n– Finger: kun størrelse\n– Finger: kun dreje\n\nDe andre håndtag skjules, og undtagen ved flytning vælger en finger på selve delen kun den i stedet for at flytte den. Knappen vises kun på en enhed med touch-skærm, og browseren husker valget."
     },
     "guide": {
       "chapter": "tablet"
@@ -28,21 +30,25 @@
   {
     "title": {
       "de": "Ziehen in der Vorder- und Seitenansicht folgt der Maus",
-      "en": "Dragging in the front and side view follows the mouse"
+      "en": "Dragging in the front and side view follows the mouse",
+      "da": "Træk i for- og sidevisningen følger musen"
     },
     "body": {
       "de": "Von vorn oder von der Seite gesehen, etwa in der Vorderansicht mit orthografischer Ansicht, blieb ein gezogenes Teil an zufälligen Stellen stehen, hinkte der Maus hinterher oder sprang in der Tiefe. Jetzt folgt es der Maus entlang der Achse, die man sieht, und behält seine Tiefe.",
-      "en": "Seen from the front or the side, as in the front view with orthographic projection, a dragged part stopped at random points, lagged behind the mouse or jumped in depth. Now it follows the mouse along the axis that shows and keeps its depth."
+      "en": "Seen from the front or the side, as in the front view with orthographic projection, a dragged part stopped at random points, lagged behind the mouse or jumped in depth. Now it follows the mouse along the axis that shows and keeps its depth.",
+      "da": "Set forfra eller fra siden, som i frontvisningen med ortografisk projicering, stoppede en del, der blev trukket, ved tilfældige punkter, kom bagefter musen eller sprang i dybden. Nu følger den musen langs den akse, du ser, og beholder sin dybde."
     }
   },
   {
     "title": {
       "de": "Die Druckprüfung zeigt den Weg zum Export",
-      "en": "Print check points the way to the export"
+      "en": "Print check points the way to the export",
+      "da": "Tjek print viser vejen til eksporten"
     },
     "body": {
       "de": "Das Druckersymbol öffnet die Druckprüfung: Sie sucht nur nach Stellen, die beim Drucken Ärger machen, und druckt oder speichert nichts. Das sagt das Fenster jetzt selbst, und der Knopf Exportieren darin schließt die Prüfung und öffnet gleich den Export für den Slicer.",
-      "en": "The printer icon opens Print check: it only looks for places that would cause trouble when printing, and it does not print or save anything. The window now says so itself, and its Export button closes the check and opens the export for your slicer right away."
+      "en": "The printer icon opens Print check: it only looks for places that would cause trouble when printing, and it does not print or save anything. The window now says so itself, and its Export button closes the check and opens the export for your slicer right away.",
+      "da": "Printerikonet åbner Tjek print: det kigger kun efter steder, der ville give problemer ved print, og det printer eller gemmer intet. Vinduet siger det nu selv, og knappen \"Eksportér …\" lukker tjekket og åbner eksporten til din slicer med det samme."
     },
     "guide": {
       "section": "printCheck"
