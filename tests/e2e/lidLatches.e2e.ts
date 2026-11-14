@@ -129,6 +129,14 @@ describe("latches that clip the lid onto the body (real Manifold kernel)", () =>
       // With the hinge at the back the latch is at the front only, whatever latchBack says.
       expect(hinged.latch!.count).toBe(1);
       expect(hinged.latch!.body.boundingBox().min[2]).toBeGreaterThan(19);
+      // The clips lie apart from the lid and its knuckles, on the plate.
+      const clipsOnLid = hinged.latch!.clips.intersect(hinged.lid);
+      created.push(clipsOnLid);
+      expect(clipsOnLid.volume()).toBe(0);
+      const lidBox = hinged.lid.boundingBox();
+      const clipsBox = hinged.latch!.clips.boundingBox();
+      expect(clipsBox.min[1]).toBeCloseTo(lidBox.min[1], 6);
+      expect(clipsBox.min[2] > lidBox.max[2] || clipsBox.max[2] < lidBox.min[2]).toBe(true);
       const both = lidForSolid(kernel, body, normalizeLidOptions({ ...PLUG, type: "flat", latches: 1, latchBack: true }));
       if ("error" in both) throw new Error(JSON.stringify(both.error));
       created.push(both.lid, both.latch!.body, both.latch!.clips);
