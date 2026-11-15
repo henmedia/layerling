@@ -1,14 +1,14 @@
 [
   {
     "title": {
-      "de": "Hülle mit offenen Löchern",
-      "en": "Hull with open holes",
-      "da": "Hylster med åbne huller"
+      "de": "Bodenplatten, passend zum Drucker geteilt",
+      "en": "Baseplates split to fit your printer",
+      "da": "Bundplader deles, så de passer til din printer"
     },
     "body": {
-      "de": "Eine Hülle füllt alles, was in ihren Teilen hohl ist: ein Rohr, einen ausgehöhlten Zylinder, Löcher in einer Gruppe. Mit „Löcher der Teile behalten“ unter Eigenschaften bleiben sie offen, und die Hülle füllt nur den Raum zwischen den Teilen.",
-      "en": "A hull fills whatever is hollow in its parts: a tube, a hollowed cylinder, the holes in a group. With Keep the parts' holes under Properties they stay open, and the hull only fills the space between the parts.",
-      "da": "Et hylster fylder alt, hvad der er hult i dets dele: et rør, en udhulet cylinder, hullerne i en gruppe. Med „Bevar delenes huller“ under Egenskaber forbliver de åbne, og hylsteret fylder kun rummet mellem delene."
+      "de": "Ist dein Drucker in den Arbeitsbereich-Einstellungen gewählt, hat eine Bodenplatte, die größer ist als sein Druckbett, im Eigenschaften-Fenster den Knopf „Passend zum Drucker teilen“. Er teilt die Platte an den Zellgrenzen in so wenige Platten wie möglich, die auf das Druckbett passen, jede mit „Swallowtail“, und legt die Verbinder davor, die sie zusammenhalten. Die Platten bleiben, wo ihre Zellen waren, also schiebe oder drehe sie eine nach der anderen auf das Druckbett.",
+      "en": "With your printer chosen in the workspace settings, a baseplate larger than the printer's bed has \"Split to fit the printer\" in its Properties panel. It cuts the plate on its cell lines into the fewest plates that fit the bed, each with \"Swallowtail\", and lays out the keys that hold them together. The plates stay where their cells were, so move or turn them onto the bed one by one.",
+      "da": "Når din printer er valgt i arbejdsområdeindstillingerne, har en bundplade, der er større end printerens byggeplade, \"Del til printeren\" i sit egenskabspanel. Den skærer pladen langs cellernes kanter i de færrest mulige plader, der passer på byggepladen, hver med \"Svalehale\", og lægger de samlestykker, der holder dem sammen, frem foran dem. Pladerne ligger, hvor deres celler lå, så flyt eller drej dem ind på byggepladen én ad gang."
     }
   }
 ]
