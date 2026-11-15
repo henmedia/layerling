@@ -16,6 +16,7 @@ import type { WorkplaneShape } from "@/types/layerling";
  * row (#856) rounds the plate's outer corners less, down to square. The large plate switch
  * (#1061) lets a baseplate take up to 12 units, and the Swallowtail switch (#1061) puts it on a floor
  * with pockets for keys, which Add keys lays out beside it with the clearance set under the switch.
+ * A plate larger than the chosen printer's bed is offered a split into plates that fit it (#1388).
  * A plate fitted into an outline (#1061) has its size in mm and a switch to take the outline away; a
  * baseplate and another shape selected together offer the fit.
  */
@@ -216,6 +217,37 @@ describe("a Gridfinity baseplate's Swallowtail switch (#1061)", () => {
     expect(addKeys(bare)).toBeUndefined();
     act(() => root?.unmount());
     expect(mount(plate).textContent).not.toContain("7.4 mm tall");
+  });
+});
+
+describe("a Gridfinity baseplate's split to fit the printer (#1388)", () => {
+  const splitButton = (panel: HTMLElement) => [...panel.querySelectorAll<HTMLButtonElement>("button.inspector-action-button")].find((button) => button.textContent === "Split to fit the printer");
+  const coreOne = { ...DEFAULT_WORKPLANE_WORKSPACE, printer: "prusa-core-one", width: 250, depth: 220 };
+  /** 10 x 8 units with 20 mm of padding on every side, 460 x 376 mm: four plates on the CORE One. */
+  const large = { ...plate, width: 460, depth: 376, gridfinityLargePlate: true, gridfinityPaddingBack: 20, gridfinityPaddingFront: 20, gridfinityPaddingLeft: 20, gridfinityPaddingRight: 20 };
+  const actions = { onGridfinitySplit: () => {} };
+
+  it("says how many plates fit the chosen printer, and hands the click on", () => {
+    let made = 0;
+    const panel = mount(large, undefined, coreOne, { onGridfinitySplit: () => { made += 1; } });
+    expect(panel.textContent).toContain("into 4 plates that fit the Prusa CORE One");
+    act(() => splitButton(panel)!.click());
+    expect(made).toBe(1);
+  });
+
+  it("is not offered without a printer, for a plate that fits its bed, or without the editor's action", () => {
+    expect(splitButton(mount(large, undefined, undefined, actions))).toBeUndefined();
+    act(() => root?.unmount());
+    // 5 x 5 units, 210 mm a side, fit the CORE One's 250 x 220 mm.
+    expect(splitButton(mount({ ...plate, width: 210, depth: 210 }, undefined, coreOne, actions))).toBeUndefined();
+    act(() => root?.unmount());
+    expect(splitButton(mount(large, undefined, coreOne))).toBeUndefined();
+  });
+
+  it("is greyed out on a locked plate or one with its shape locked", () => {
+    expect(splitButton(mount({ ...large, locked: true }, undefined, coreOne, actions))!.disabled).toBe(true);
+    act(() => root?.unmount());
+    expect(splitButton(mount({ ...large, shapeLocked: true }, undefined, coreOne, actions))!.disabled).toBe(true);
   });
 });
 

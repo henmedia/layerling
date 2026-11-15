@@ -1,7 +1,8 @@
 import type { ThreadProfile, WorkplaneShape } from "@/types/layerling";
 import { isThreadProfile } from "@/lib/threadProfiles";
 import { normalizeHexColor } from "@/lib/coloredImport";
-import { GRIDFINITY_PADDING_KEYS, gridfinityLabelTextPatch, gridfinityListPatch, gridfinityOutlineFit, gridfinityOutlineLimit, gridfinityOutlineNeedsLargePlate, gridfinityOutlineRemovalPatch, gridfinityPaddingPatch, gridfinityPlateToWorld, gridfinityShapePatch, normalizeGridfinityOutline, normalizeGridfinityType, type GridfinityWall } from "@/lib/gridfinityGeometry";
+import { holdsShapeLock } from "@/lib/shapeLock";
+import { GRIDFINITY_PADDING_KEYS, gridfinityLabelTextPatch, gridfinityListPatch, gridfinityOutlineFit, gridfinityOutlineLimit, gridfinityOutlineNeedsLargePlate, gridfinityOutlineRemovalPatch, gridfinityPaddingPatch, gridfinityPlateSplit, gridfinityPlateToWorld, gridfinityShapePatch, normalizeGridfinityOutline, normalizeGridfinityType, type GridfinityWall } from "@/lib/gridfinityGeometry";
 import { normalizeThreadProfile, THREAD_SIZES, threadSettings, threadSizeById, threadSizeFor, threadSizeSettings, threadStandardSize } from "@/lib/threadGeometry";
 
 /**
@@ -155,6 +156,20 @@ export function mcpGridfinityOutlinePatch(shape: WorkplaneShape, params: Record<
   }
   const place = gridfinityPlateToWorld(fit.centre, shape);
   return { ...fit.patch, x: place.x, z: place.z };
+}
+
+export const MCP_GRIDFINITY_SPLIT_NEEDS = "gridfinitySplit needs a Gridfinity baseplate (not a hole) of whole units (not fitted to an outline), lying flat, larger than the bed of the printer chosen in the design's workspace settings, whose single cells, with their padding, fit it";
+export const MCP_GRIDFINITY_SPLIT_ALONE = "gridfinitySplit goes without gridfinityKeys and without locking the plate: the split lays out its own keys, and a locked plate is not split";
+
+/**
+ * Refuses update_object's gridfinitySplit (#1388) before anything changes, for the plate as the call leaves it: asked for
+ * together with gridfinityKeys, on a locked or shape-locked plate, or when `bed`, the chosen printer's, gives the plate no
+ * split.
+ */
+export function mcpGridfinitySplitCheck(shape: WorkplaneShape, params: Record<string, unknown>, bed: { width: number; depth: number; round?: boolean } | null) {
+  if (params.gridfinitySplit !== true) return;
+  if (params.gridfinityKeys === true || shape.locked || holdsShapeLock(shape)) throw new Error(MCP_GRIDFINITY_SPLIT_ALONE);
+  if (!gridfinityPlateSplit(shape, bed)) throw new Error(MCP_GRIDFINITY_SPLIT_NEEDS);
 }
 
 /**

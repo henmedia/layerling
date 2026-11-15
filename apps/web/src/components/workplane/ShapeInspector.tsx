@@ -305,6 +305,7 @@ import {
   gridfinityOutlineRemovalPatch,
   gridfinityPaddingPatch,
   gridfinityPlan,
+  gridfinityPlateSplit,
   gridfinityScoopFits,
   gridfinityScoopMaxRadius,
   gridfinityScoopRadius,
@@ -4402,6 +4403,7 @@ export function ShapeInspector({
   onSurfaceRegionDraw,
   onVaseAccessories,
   onGridfinityKeys,
+  onGridfinitySplit,
   onLayerText,
   onTextTags,
   onTextBlock,
@@ -4459,6 +4461,8 @@ export function ShapeInspector({
   onVaseAccessories?: () => void;
   /** Lays this Swallowtail baseplate's keys out in front of it, ready to print (#1061). */
   onGridfinityKeys?: () => void;
+  /** Splits this baseplate into plates that fit the printer, with their keys (#1388). */
+  onGridfinitySplit?: () => void;
   /** Splits a text into layers, or builds a layered text again with new words, font or layers (#215). */
   onLayerText?: (patch: TextLayerPatch) => void;
   /** One tag like this text or stack per name, laid out in rows (#215). */
@@ -4499,6 +4503,9 @@ export function ShapeInspector({
   // Lock shape (#1277): where the part stands and how it turns stay free; its size, settings and name do not.
   const shapeLocked = Boolean(shape.shapeLocked);
   const frozen = locked || holdsShapeLock(shape);
+  // A baseplate larger than the chosen printer's bed is offered the split (#1388), unless a single cell does not fit it either.
+  const splitPrinter = onGridfinitySplit ? printerPresetById(workspace.printer) : null;
+  const gridfinitySplit = splitPrinter ? gridfinityPlateSplit({ ...shape, depth: shapeDepth(shape) }, splitPrinter) : null;
   // A calculation typed into a field (#180) is noted just before the field's change and rides
   // along in that one change, so undo takes value and formula back together. A note nobody
   // picks up is dropped again right after.
@@ -5452,6 +5459,15 @@ export function ShapeInspector({
                     <span>{t("inspector.gridfinityKeys")}</span>
                   </button>
                 ) : null}
+              </>
+            ) : null}
+            {splitPrinter && gridfinitySplit ? (
+              <>
+                <p className="cylinder-wrap-hint">{t("gridfinity.splitHint", { count: gridfinitySplit.length, printer: `${splitPrinter.vendor} ${splitPrinter.model}` })}</p>
+                <button className="inspector-action-button" type="button" disabled={frozen} onClick={onGridfinitySplit}>
+                  <Grid3x3 size={17} strokeWidth={2.5} />
+                  <span>{t("inspector.gridfinitySplit")}</span>
+                </button>
               </>
             ) : null}
             {onShapeDefaultsChange && propertyDefaults ? (
