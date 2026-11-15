@@ -335,7 +335,7 @@ export function snapGridForUnits(units: string, snap: GridSize): GridSize {
 }
 const customizableShapeKinds: ShapeKind[] = [
   "box", "roundedBox", "cylinder", "slot", "ellipse", "sphere", "sketch", "scribble", "cone", "pyramid", "roof", "text", "roundRoof",
-  "halfSphere", "paraboloid", "curvedCone", "torus", "tube", "bentTube", "star", "heart", "crescent", "gear", "hirth", "pulley", "honeycomb", "hinge", "knurl", "dovetail", "screwBoss", "snapFit", "rib", "counterbore", "countersink", "doubleCountersink", "finishingWasher", "teardrop", "port", "loft", "vase", "thread", "spring", "gridfinity", "ring", "wedge", "polygon", "icosahedron", "ruler", "mesh",
+  "halfSphere", "paraboloid", "curvedCone", "torus", "tube", "bentTube", "star", "heart", "crescent", "sector", "gear", "hirth", "pulley", "honeycomb", "hinge", "knurl", "dovetail", "screwBoss", "snapFit", "rib", "counterbore", "countersink", "doubleCountersink", "finishingWasher", "teardrop", "port", "loft", "vase", "thread", "spring", "gridfinity", "ring", "wedge", "polygon", "icosahedron", "ruler", "mesh",
 ];
 
 function numberOrDefault(value: unknown, fallback: number) {
@@ -451,6 +451,11 @@ export function normalizeShapeCustomizations(value: unknown, fallback: ShapeCust
     if (kind === "heart") {
       entry.heartTipFillet = optionalShapeNumber(source.heartTipFillet, fallbackEntry?.heartTipFillet, 0, MAX_CUSTOM_SHAPE_DIMENSION);
       entry.heartQuality = optionalShapeNumber(source.heartQuality, fallbackEntry?.heartQuality, 16, 64, true);
+    }
+    if (kind === "sector") {
+      entry.sectorAngle = optionalShapeNumber(source.sectorAngle, fallbackEntry?.sectorAngle, 1, 360);
+      entry.sectorInnerDiameter = optionalShapeNumber(source.sectorInnerDiameter, fallbackEntry?.sectorInnerDiameter, 0, MAX_CUSTOM_SHAPE_DIMENSION);
+      entry.sectorEndRadius = optionalShapeNumber(source.sectorEndRadius, fallbackEntry?.sectorEndRadius, 0, MAX_CUSTOM_SHAPE_DIMENSION);
     }
     if (kind === "crescent") {
       entry.crescentThickness = optionalShapeNumber(source.crescentThickness, fallbackEntry?.crescentThickness, 1, MAX_CUSTOM_SHAPE_DIMENSION);

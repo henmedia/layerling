@@ -82,7 +82,7 @@ export const LYL_LIMITS = {
 
 const SHAPE_KINDS = new Set([
   "box", "roundedBox", "cylinder", "slot", "ellipse", "sphere", "sketch", "scribble", "cone", "pyramid", "roof", "text", "roundRoof",
-  "halfSphere", "paraboloid", "curvedCone", "torus", "tube", "bentTube", "star", "heart", "crescent", "gear", "hirth", "pulley", "honeycomb", "hinge", "knurl", "dovetail", "screwBoss", "snapFit", "rib", "counterbore", "countersink", "doubleCountersink", "finishingWasher", "teardrop", "port", "loft", "vase", "thread", "spring", "gridfinity", "ring", "wedge", "polygon", "icosahedron", "ruler", "mesh",
+  "halfSphere", "paraboloid", "curvedCone", "torus", "tube", "bentTube", "star", "heart", "crescent", "sector", "gear", "hirth", "pulley", "honeycomb", "hinge", "knurl", "dovetail", "screwBoss", "snapFit", "rib", "counterbore", "countersink", "doubleCountersink", "finishingWasher", "teardrop", "port", "loft", "vase", "thread", "spring", "gridfinity", "ring", "wedge", "polygon", "icosahedron", "ruler", "mesh",
 ]);
 
 const FEATURE_TYPES = new Set([
@@ -1729,6 +1729,18 @@ function validateShapeDefinition(definition: Record<string, unknown>, label: str
       const heartQuality = finiteNumber(definition.heartQuality, `${label}.heartQuality`);
       if (!Number.isInteger(heartQuality) || heartQuality < 16 || heartQuality > 64) {
         throw new Error(`${label}.heartQuality is outside the supported range`);
+      }
+    }
+  }
+  if (kind === "sector") {
+    if (definition.sectorAngle !== undefined) {
+      const sectorAngle = finiteNumber(definition.sectorAngle, `${label}.sectorAngle`);
+      if (sectorAngle < 1 || sectorAngle > 360) throw new Error(`${label}.sectorAngle is outside the supported range`);
+    }
+    for (const field of ["sectorInnerDiameter", "sectorEndRadius"] as const) {
+      if (definition[field] !== undefined) {
+        const value = finiteNumber(definition[field], `${label}.${field}`);
+        if (value < 0 || value > 1e6) throw new Error(`${label}.${field} is outside the supported range`);
       }
     }
   }

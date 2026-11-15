@@ -19,7 +19,7 @@ export const editorTargetSchema = {
  */
 export const creatableShapeKinds = [
   "box", "roundedBox", "cube", "cylinder", "slot", "ellipse", "polygon", "sphere", "cone", "pyramid", "wedge",
-  "roundRoof", "halfSphere", "paraboloid", "curvedCone", "torus", "loft", "vase", "tube", "bentTube", "star", "heart", "crescent", "text", "thread", "spring", "gridfinity", "gear", "hirth", "pulley",
+  "roundRoof", "halfSphere", "paraboloid", "curvedCone", "torus", "loft", "vase", "tube", "bentTube", "star", "heart", "crescent", "sector", "text", "thread", "spring", "gridfinity", "gear", "hirth", "pulley",
   "hinge", "knurl", "dovetail", "screwBoss", "snapFit", "rib", "counterbore", "countersink", "doubleCountersink", "finishingWasher", "teardrop", "port", "ruler", "sketch",
 ];
 
@@ -171,6 +171,9 @@ export const shapeSettingSchema = {
   crescentThickness: { type: "number", description: "Crescent only: thickness at the crescent center in mm." },
   crescentTipFillet: { type: "number", description: "Crescent only: fillet radius at horn tips in mm (0 to 8)." },
   crescentQuality: { type: "number", description: "Crescent only: quality / segment count for arc and tip rounding (16 to 64)." },
+  sectorAngle: { type: "number", description: "Sector only: how far the piece runs round from twelve o'clock, clockwise seen from above, in degrees (1 to 360; 360 is a full disc or ring)." },
+  sectorInnerDiameter: { type: "number", description: "Sector only: diameter of the bore in mm; 0 gives a solid pie slice, more gives a ring or ring segment." },
+  sectorEndRadius: { type: "number", description: "Sector only: rounding of the two ends of the piece in mm, up to a half circle (a curved slot, e.g. for a monitor mount)." },
   knurlPattern: { type: "string", enum: ["straight", "diamond", "round"], description: "Knurl only: \"straight\" grooves along the axis (default; an exact CAD body, so the edge tool works on it), \"diamond\", two slanted rows crossing into small diamonds (a mesh), or \"round\", straight grooves and ridges as a smooth wave of arcs, a pleasant grip for knobs (an exact body; its depth stays below 0.45 of the pitch round the grip). A knurl is a round grip: width is the diameter (depth follows), height the length." },
   knurlCount: { type: "number", description: "Knurl only: number of grooves around the grip, 6 up to what fits at a 0.8 mm pitch around the diameter, at most 180 (default 30)." },
   knurlDepth: { type: "number", description: "Knurl only: depth of a groove in mm, 0.1 up to a third of the radius (default 0.6)." },

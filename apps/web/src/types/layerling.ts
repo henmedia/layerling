@@ -24,6 +24,7 @@ export type ShapeKind =
   | "star"
   | "heart"
   | "crescent"
+  | "sector"
   | "gear"
   | "hirth"
   | "pulley"
@@ -261,6 +262,12 @@ export type ShapeCustomization = {
   crescentThickness?: number;
   crescentTipFillet?: number;
   crescentQuality?: number;
+  /** Sector: how far the piece runs round from twelve o'clock, clockwise, in degrees (1 to 360). */
+  sectorAngle?: number;
+  /** Sector: the bore's diameter in mm, 0 for a solid piece. */
+  sectorInnerDiameter?: number;
+  /** Sector: the rounding of the piece's two ends in mm, up to a half circle. */
+  sectorEndRadius?: number;
   honeycombCellSize?: number;
   honeycombWallThickness?: number;
   honeycombFrameWidth?: number;
@@ -1207,6 +1214,12 @@ export type WorkplaneShape = {
   crescentThickness?: number;
   crescentTipFillet?: number;
   crescentQuality?: number;
+  /** Sector: how far the piece runs round from twelve o'clock, clockwise, in degrees (1 to 360). */
+  sectorAngle?: number;
+  /** Sector: the bore's diameter in mm, 0 for a solid piece. */
+  sectorInnerDiameter?: number;
+  /** Sector: the rounding of the piece's two ends in mm, up to a half circle. */
+  sectorEndRadius?: number;
   honeycombCellSize?: number;
   honeycombWallThickness?: number;
   honeycombFrameWidth?: number;

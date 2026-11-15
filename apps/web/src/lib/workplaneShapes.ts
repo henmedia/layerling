@@ -819,6 +819,9 @@ export function workplaneShapesEqual(a: WorkplaneShape, b: WorkplaneShape) {
     a.crescentThickness === b.crescentThickness &&
     a.crescentTipFillet === b.crescentTipFillet &&
     a.crescentQuality === b.crescentQuality &&
+    a.sectorAngle === b.sectorAngle &&
+    a.sectorInnerDiameter === b.sectorInnerDiameter &&
+    a.sectorEndRadius === b.sectorEndRadius &&
     a.honeycombCellSize === b.honeycombCellSize &&
     a.honeycombWallThickness === b.honeycombWallThickness &&
     a.honeycombFrameWidth === b.honeycombFrameWidth &&

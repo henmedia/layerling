@@ -14,6 +14,7 @@ import { createFinishingWasherGeometry } from "@/lib/finishingWasherGeometry";
 import { createStarGeometry } from "@/lib/starGeometry";
 import { createHeartGeometry } from "@/lib/heartGeometry";
 import { createCrescentGeometry } from "@/lib/crescentGeometry";
+import { createSectorGeometry } from "@/lib/sectorGeometry";
 import { createSlotGeometry } from "@/lib/slotGeometry";
 import { createDovetailGeometry } from "@/lib/dovetailGeometry";
 import { createLoftGeometry } from "@/lib/loftGeometry";
@@ -501,6 +502,16 @@ function geometryMeshForShape(shape: WorkplaneShape): MeshData | null {
         height,
         heartTipFillet: shape.heartTipFillet,
         heartQuality: shape.heartQuality,
+      });
+      break;
+    case "sector":
+      geometry = createSectorGeometry({
+        width,
+        depth,
+        height,
+        sectorAngle: shape.sectorAngle,
+        sectorInnerDiameter: shape.sectorInnerDiameter,
+        sectorEndRadius: shape.sectorEndRadius,
       });
       break;
     case "crescent":

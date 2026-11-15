@@ -109,6 +109,7 @@ import {
   normalizeCrescentThickness,
   normalizeCrescentTipFillet,
 } from "@/lib/crescentGeometry";
+import { DEFAULT_SECTOR_ANGLE, DEFAULT_SECTOR_DIAMETER, DEFAULT_SECTOR_END_RADIUS, DEFAULT_SECTOR_HEIGHT, DEFAULT_SECTOR_INNER_DIAMETER, normalizeSectorAngle, normalizeSectorEndRadius, normalizeSectorInnerDiameter } from "@/lib/sectorGeometry";
 import {
   DEFAULT_SLOT_WIDTH,
   DEFAULT_SLOT_DEPTH,
@@ -247,6 +248,7 @@ const SHAPE_LABEL_KEYS: Record<string, MessageKey> = {
   star: "shape.star",
   heart: "shape.heart",
   crescent: "shape.crescent",
+  sector: "shape.sector",
   gear: "shape.gear",
   hirth: "shape.hirth",
   pulley: "shape.pulley",
@@ -290,6 +292,7 @@ export const toolbarShapeAssets: ToolbarShapeAsset[] = [
   { id: "paraboloid", name: "Paraboloid", src: "assets/editor/shape-icons-gray/paraboloid.png", menuIcon: "assets/editor/shape-icons-gray/paraboloid.png", kind: "paraboloid", color: "#8fdc5a" },
   { id: "curvedCone", name: "Curved Cone", src: "assets/editor/shape-icons-gray/curvedCone.png", menuIcon: "assets/editor/shape-icons-gray/curvedCone.png", kind: "curvedCone", color: "#9b59b6" },
   { id: "torus", name: "Torus", src: "assets/editor/shape-icons-gray/torus.png", menuIcon: "assets/editor/shape-icons-gray/torus.png", kind: "torus", color: "#0098c7" },
+  { id: "sector", name: "Sector", src: "assets/editor/shape-icons-gray/sector.png", menuIcon: "assets/editor/shape-icons-gray/sector.png", kind: "sector", color: "#2f9e6e" },
   { id: "loft", name: "Loft", src: "assets/editor/shape-icons-gray/loft.png", menuIcon: "assets/editor/shape-icons-gray/loft.png", kind: "loft", color: "#c0703a" },
   { id: "vase", name: "Vase", src: "assets/editor/shape-icons-gray/vase.png", menuIcon: "assets/editor/shape-icons-gray/vase.png", kind: "vase", color: "#2e8b8b" },
   { id: "tube", name: "Tube", src: "assets/editor/shape-icons-gray/tube.png", menuIcon: "assets/editor/shape-icons-gray/tube.png", kind: "tube", color: "#ce7013" },
@@ -462,6 +465,9 @@ export function shapeAssetDefaultDimensions(kind: ShapeKind) {
   if (kind === "heart") {
     return { width: DEFAULT_HEART_WIDTH, depth: DEFAULT_HEART_DEPTH, height: DEFAULT_HEART_HEIGHT };
   }
+  if (kind === "sector") {
+    return { width: DEFAULT_SECTOR_DIAMETER, depth: DEFAULT_SECTOR_DIAMETER, height: DEFAULT_SECTOR_HEIGHT };
+  }
   if (kind === "crescent") {
     return { width: DEFAULT_CRESCENT_WIDTH, depth: DEFAULT_CRESCENT_DEPTH, height: DEFAULT_CRESCENT_HEIGHT };
   }
@@ -598,6 +604,9 @@ export function shapeAssetSpecialDefaults(kind: ShapeKind, dimensions = shapeAss
       heartTipFillet: DEFAULT_HEART_TIP_FILLET,
       heartQuality: DEFAULT_HEART_QUALITY,
     };
+  }
+  if (kind === "sector") {
+    return { sectorAngle: DEFAULT_SECTOR_ANGLE, sectorInnerDiameter: DEFAULT_SECTOR_INNER_DIAMETER, sectorEndRadius: DEFAULT_SECTOR_END_RADIUS };
   }
   if (kind === "crescent") {
     return {
@@ -832,6 +841,9 @@ export function sceneShape(shape: Partial<WorkplaneShape> & Pick<WorkplaneShape,
     crescentThickness: shape.crescentThickness,
     crescentTipFillet: shape.crescentTipFillet,
     crescentQuality: shape.crescentQuality,
+    sectorAngle: shape.sectorAngle,
+    sectorInnerDiameter: shape.sectorInnerDiameter,
+    sectorEndRadius: shape.sectorEndRadius,
     honeycombCellSize: shape.honeycombCellSize,
     honeycombWallThickness: shape.honeycombWallThickness,
     honeycombFrameWidth: shape.honeycombFrameWidth,
@@ -1280,6 +1292,9 @@ export function makeShapeFromAsset(
     crescentThickness: asset.kind === "crescent" ? normalizeCrescentThickness(customization.crescentThickness ?? DEFAULT_CRESCENT_THICKNESS, width) : undefined,
     crescentTipFillet: asset.kind === "crescent" ? normalizeCrescentTipFillet(customization.crescentTipFillet ?? DEFAULT_CRESCENT_TIP_FILLET) : undefined,
     crescentQuality: asset.kind === "crescent" ? normalizeCrescentQuality(customization.crescentQuality ?? DEFAULT_CRESCENT_QUALITY) : undefined,
+    sectorAngle: asset.kind === "sector" ? normalizeSectorAngle(customization.sectorAngle ?? DEFAULT_SECTOR_ANGLE) : undefined,
+    sectorInnerDiameter: asset.kind === "sector" ? normalizeSectorInnerDiameter(customization.sectorInnerDiameter ?? DEFAULT_SECTOR_INNER_DIAMETER, width) : undefined,
+    sectorEndRadius: asset.kind === "sector" ? normalizeSectorEndRadius(customization.sectorEndRadius ?? DEFAULT_SECTOR_END_RADIUS, width, customization.sectorInnerDiameter ?? DEFAULT_SECTOR_INNER_DIAMETER, customization.sectorAngle ?? DEFAULT_SECTOR_ANGLE) : undefined,
     honeycombCellSize: asset.kind === "honeycomb" ? normalizeHoneycombCellSize(customization.honeycombCellSize ?? DEFAULT_HONEYCOMB_CELL_SIZE) : undefined,
     honeycombWallThickness: asset.kind === "honeycomb" ? normalizeHoneycombWallThickness(customization.honeycombWallThickness ?? DEFAULT_HONEYCOMB_WALL_THICKNESS) : undefined,
     honeycombFrameWidth: asset.kind === "honeycomb" ? normalizeHoneycombFrameWidth(customization.honeycombFrameWidth ?? DEFAULT_HONEYCOMB_FRAME_WIDTH) : undefined,
