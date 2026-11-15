@@ -2,11 +2,13 @@
   {
     "title": {
       "de": "Bodenplatten, passend zum Drucker geteilt",
-      "en": "Baseplates split to fit your printer"
+      "en": "Baseplates split to fit your printer",
+      "da": "Bundplader deles, så de passer til din printer"
     },
     "body": {
       "de": "Ist dein Drucker in den Arbeitsbereich-Einstellungen gewählt, hat eine Bodenplatte, die größer ist als sein Druckbett, im Eigenschaften-Fenster den Knopf „Passend zum Drucker teilen“. Er teilt die Platte an den Zellgrenzen in so wenige Platten wie möglich, die auf das Druckbett passen, jede mit „Swallowtail“, und legt die Verbinder davor, die sie zusammenhalten. Die Platten bleiben, wo ihre Zellen waren, also schiebe oder drehe sie eine nach der anderen auf das Druckbett.",
-      "en": "With your printer chosen in the workspace settings, a baseplate larger than the printer's bed has \"Split to fit the printer\" in its Properties panel. It cuts the plate on its cell lines into the fewest plates that fit the bed, each with \"Swallowtail\", and lays out the keys that hold them together. The plates stay where their cells were, so move or turn them onto the bed one by one."
+      "en": "With your printer chosen in the workspace settings, a baseplate larger than the printer's bed has \"Split to fit the printer\" in its Properties panel. It cuts the plate on its cell lines into the fewest plates that fit the bed, each with \"Swallowtail\", and lays out the keys that hold them together. The plates stay where their cells were, so move or turn them onto the bed one by one.",
+      "da": "Når din printer er valgt i arbejdsområdeindstillingerne, har en bundplade, der er større end printerens byggeplade, \"Del til printeren\" i sit egenskabspanel. Den skærer pladen langs cellernes kanter i de færrest mulige plader, der passer på byggepladen, hver med \"Svalehale\", og lægger de samlestykker, der holder dem sammen, frem foran dem. Pladerne ligger, hvor deres celler lå, så flyt eller drej dem ind på byggepladen én ad gang."
     }
   }
 ]
