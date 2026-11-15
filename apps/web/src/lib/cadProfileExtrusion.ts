@@ -1,3 +1,4 @@
+import { normalizePolygonCornerRadius } from "@/lib/roundedPolygonGeometry";
 import * as THREE from "three";
 import { taperedSlotOutline } from "@/lib/slotGeometry";
 import { weldOnGrid } from "@/lib/gridWeld";
@@ -161,14 +162,23 @@ function fitLoop(loop: CadModifierProfileLoop, width: number, depth: number) {
 }
 
 /** createPrismGeometry: THREE.CylinderGeometry corners (sin, cos) fitted with regularPolygonFootprintScale. */
-export function polygonProfileLoops(width: number, depth: number, sides = 6) {
+export function polygonProfileLoops(width: number, depth: number, sides = 6, cornerRadius = 0) {
   const count = Math.max(3, Math.round(sides));
   const fit = regularPolygonFootprintScale(width, depth, count);
   const points = Array.from({ length: count }, (_, index) => {
     const angle = (index / count) * Math.PI * 2;
     return { x: Math.sin(angle) * fit.x + fit.offsetX, z: Math.cos(angle) * fit.z + fit.offsetZ };
   });
-  return [polygonLoop(points)];
+  // Rounded corners (roundedPolygonGeometry.ts) as true arcs, one radius for every corner.
+  const radius = normalizePolygonCornerRadius(cornerRadius, width, depth, count);
+  if (radius <= 1e-4) return [polygonLoop(points)];
+  const corners = points.map((corner, index): Corner => {
+    const previous = points[(index - 1 + count) % count];
+    const next = points[(index + 1) % count];
+    const angles = cornerAngles(previous, corner, next);
+    return roundedCorner(previous, corner, next, radius / angles.tanAlpha, radius, angles.sinAlpha);
+  });
+  return [loopFromCorners(corners)];
 }
 
 /** createStarGeometry / buildStarContourPoints, with the corner roundings as true arcs. */
@@ -1046,7 +1056,7 @@ export function cadProfileForShapeKind(shape: WorkplaneShape, designedRound = fa
     case "bentTube":
       return bentTubeSweep(shape, width, depth, designedRound);
     case "polygon":
-      return { loops: polygonProfileLoops(width, depth, shape.sides ?? 6) };
+      return { loops: polygonProfileLoops(width, depth, shape.sides ?? 6, shape.cornerFillet ?? 0) };
     case "star":
       return { loops: starProfileLoops(width, depth, shape) };
     case "heart":

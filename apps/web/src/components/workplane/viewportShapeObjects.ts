@@ -48,6 +48,7 @@ import { rulerTicks } from "@/lib/rulerDimensions";
 import { horizontalPlacementWorkplane, placementWorkplaneIsBase, placementWorkplaneQuaternion, type PlacementWorkplane } from "@/lib/placementWorkplane";
 import { groundFootprintForFrame, type SelectionFrame } from "@/lib/liftGeometry";
 import { regularPolygonFootprintScale } from "@/lib/regularPolygonFootprint";
+import { createRoundedPolygonGeometry } from "@/lib/roundedPolygonGeometry";
 import { roundSideCount } from "@/lib/roundSideCount";
 import { createPyramidGeometry } from "@/lib/pyramidGeometry";
 import { bandLevels, positionsForTwist, twistBandCount, twistEdgeLength } from "@/lib/heightSlices";
@@ -694,6 +695,10 @@ export function shapeGeometrySignature(shape: WorkplaneShape): string {
     return JSON.stringify({ kind: shape.kind, sides: polygonSidesForShape(shape), segments: shape.segments, taper, deform, size: drillPoint === undefined ? size : [shapeWidth(shape), shapeDepth(shape), shape.height], drillPoint });
   }
   if (shape.kind === "polygon") {
+    // Rounded corners are built in millimetres, so the size is part of the geometry.
+    if ((shape.cornerFillet ?? 0) > 0) {
+      return JSON.stringify({ kind: "polygon", sides: shape.sides, cornerFillet: shape.cornerFillet, taper, deform, size: [shapeWidth(shape), shapeDepth(shape), shape.height] });
+    }
     return JSON.stringify({ kind: "polygon", sides: shape.sides, segments: shape.segments, taper, deform, size });
   }
   if (shape.kind === "sphere") {
@@ -1148,7 +1153,7 @@ export function syncShapeObjectDimensions(object: THREE.Group, shape: WorkplaneS
     );
   } else if (shape.kind === "box" && !(shape.radius && shape.radius > 0)) {
     scale = new THREE.Vector3(width, shape.height, depth);
-  } else if ((shape.kind === "cylinder" && shapeDrillPointLength(shape) === 0) || shape.kind === "ellipse" || shape.kind === "polygon") {
+  } else if ((shape.kind === "cylinder" && shapeDrillPointLength(shape) === 0) || shape.kind === "ellipse" || (shape.kind === "polygon" && !((shape.cornerFillet ?? 0) > 0))) {
     // A drilled hole is no unit body (Discussion #621): it was built at its size and is built again when that changes.
     const fit = regularPolygonFootprintScale(width, depth, polygonSidesForShape(shape));
     scale = new THREE.Vector3(fit.x, shape.height, fit.z);
@@ -2147,6 +2152,11 @@ export function createShapeObject(
         addMesh(group, sharedShapeGeometry(geometryCacheKey, () => createPrismGeometry(width, height, depth, sides, shape.segments ?? 1, drillPoint)), material, shape);
         break;
       }
+      if (shape.kind === "polygon" && (shape.cornerFillet ?? 0) > 0) {
+        // Rounded corners: built at its size, the rounding stays round when the polygon is stretched.
+        addMesh(group, sharedShapeGeometry(geometryCacheKey, () => createRoundedPolygonGeometry(width, height, depth, sides, shape.cornerFillet ?? 0)), material, shape);
+        break;
+      }
       const fit = regularPolygonFootprintScale(width, depth, sides);
       addMesh(
         group,
@@ -3060,7 +3070,7 @@ export function addShapeEdgeDecorations(group: THREE.Group, mesh: THREE.Mesh, pr
       // A slope along folds its curved top in short pieces the same way.
       // A part of a twisted group or bundle is cut into the group's bands (applyGroupedContentTaper) and folds the same way.
       const twisted = Math.abs(shape.extrudeTwist ?? 0) > 1e-6 || shapeHasAlongDeform(shape) || Boolean(prepared.userData.twistBanded);
-      const selectedThreshold = shape.importedMesh ? NORMAL_IMPORTED_SELECTION_EDGE_ANGLE : shape.kind === "thread" || shape.kind === "sector" || twisted || (shape.transparent && !shape.hole) ? 25 : 1;
+      const selectedThreshold = shape.importedMesh ? NORMAL_IMPORTED_SELECTION_EDGE_ANGLE : shape.kind === "thread" || shape.kind === "sector" || (shape.kind === "polygon" && (shape.cornerFillet ?? 0) > 0) || twisted || (shape.transparent && !shape.hole) ? 25 : 1;
       // A part-coloured group's surface can carry extra corners for its colour boundaries; its lines follow the plain mesh.
       const edgeSource = (prepared.userData.edgesSource as THREE.BufferGeometry | undefined) ?? prepared;
       const edgesGeometry = !selectedOutline && allEdgeLines

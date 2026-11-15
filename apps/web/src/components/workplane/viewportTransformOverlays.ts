@@ -1,5 +1,6 @@
 "use client";
 
+import { polygonCornerDot } from "@/lib/roundedPolygonGeometry";
 import { type Dispatch, type MutableRefObject, type SetStateAction } from "react";
 import * as THREE from "three";
 import { spreadAlignHandles } from "@/lib/alignHandleSpread";
@@ -447,7 +448,19 @@ export function syncTransformOverlay(
   // a Rounded box with flat top and bottom. The dot keeps clear of the other handles on the screen.
   const plainBox = frame.singleShape?.kind === "box" && !frame.singleShape.imagePlate && !((frame.singleShape.radius ?? 0) > 0);
   const cornerShape = frame.singleShape?.kind === "roundedBox" || plainBox ? frame.singleShape : null;
+  const polygonShape = frame.singleShape?.kind === "polygon" ? frame.singleShape : null;
   const cornerEntries = (() => {
+    if (polygonShape) {
+      // A polygon's dot: on the top, where the rounding of its front corner starts on the edge to the next corner.
+      const { point: local } = polygonCornerDot(frame.max.x - frame.min.x, frame.max.z - frame.min.z, polygonShape.sides, polygonShape.cornerFillet ?? 0);
+      const midX = (frame.min.x + frame.max.x) / 2;
+      const midZ = (frame.min.z + frame.max.z) / 2;
+      const point = project(framePoint(frame, midX + local.x, frame.max.y, midZ + local.y));
+      const others = [bottom.nearLeft, bottom.nearRight, bottom.farRight, bottom.farLeft, mid.near, mid.right, mid.far, mid.left, heightPoint, slopePoint, narrowPoint, liftPoint].filter((other) => other.visible);
+      const inward = project(framePoint(frame, midX, frame.max.y, midZ));
+      const clear = handleClearOfOthers(point, { x: inward.x - point.x, y: inward.y - point.y }, others);
+      return [{ point: clear, handle: { key: "corner-radius", className: "height-top slope-end", kind: "height" as const, x: clear.x, y: clear.y, title: t("transform.cornerRadius") } }];
+    }
     if (!cornerShape) return [];
     const largest = Math.min(frame.max.x - frame.min.x, frame.max.z - frame.min.z) / 2;
     // With flat top and bottom a Rounded box may give each corner its own radius: then every corner has a dot.

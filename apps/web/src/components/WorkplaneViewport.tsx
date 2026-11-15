@@ -1,4 +1,5 @@
 "use client";
+import { polygonCornerDragPatch } from "@/lib/roundedPolygonGeometry";
 import { holdsShapeLock } from "@/lib/shapeLock";
 import type { TextBlockOptions } from "@/lib/textBlock";
 import type { SurfaceTextureFace, SurfaceTextureRegion, SurfaceTextureSettings } from "@/lib/surfaceTexture";
@@ -4771,7 +4772,7 @@ export function WorkplaneViewport({
         if (transform.handleKey.startsWith("corner-radius")) {
           const start = transform.startShape;
           const index = transform.handleKey === "corner-radius" ? undefined : Number(transform.handleKey.slice("corner-radius-".length));
-          onUpdateShape(start.id, cornerRadiusDragPatch(start, snapValue(rawDelta, step), index));
+          onUpdateShape(start.id, start.kind === "polygon" ? polygonCornerDragPatch(start, snapValue(rawDelta, step)) : cornerRadiusDragPatch(start, snapValue(rawDelta, step), index));
           return true;
         }
         if (transform.handleKey === "slope-end") {
