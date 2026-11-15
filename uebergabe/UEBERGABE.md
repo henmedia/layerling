@@ -125,6 +125,10 @@ Do not build these until Marcus says so.
 - **#1607**: Surface Texture: a "Show selected faces" button that highlights a layer's picked faces. Stefan asked Marcus.
 - **#1573**: Texture Mask folded under Surface Texture, and Surface Texture/Wrap around cylinder placed lower than
   Properties/Position (this concerns Stefan's card view). Stefan asked Marcus.
+  Built on branch `texture-mask-fold` in the fork; PR draft waits for Marcus' OK on the status page.
+- **#1663**: shelf option in Hollow. Built on branch `shell-shelf` in the fork (commit cdc28a5e0, from Stefan's `main`
+  6a5bbe318): a ledge all round the inside of the wall, only with the top as the single open side. No loose plate was
+  built (open question for the author). PR draft waits for Marcus' OK on the status page.
 - **#1587**: sliding latch for boxes, print-in-place if possible, with an "OPEN" sign. Stefan asked Marcus.
 
 ## F. Stackable boxes, Gridfinity floor and dividers: what exists (checked 15 November 2026)
