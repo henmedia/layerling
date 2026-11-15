@@ -22,9 +22,9 @@ import type { WorkplaneShape } from "@/types/layerling";
 /** How far inside a face its point is taken: exportFaceColors takes it 0.02 mm in too, and the two must agree. */
 const FACE_PROBE = 0.02;
 
-/** The colour of a bin's letters when it is one of their own (#1308): none on a tray, a baseplate, a hole or a bin without text, and none when it is the bin's own. */
+/** The colour of a bin's or a tray's letters when it is one of their own (#1308): none on a baseplate, a hole or a bin or tray without text, and none when it is the bin's own. */
 export function gridfinityLabelColor(shape: WorkplaneShape) {
-  if (shape.kind !== "gridfinity" || shape.hole || normalizeGridfinityType(shape.gridfinityType) !== "bin" || !gridfinityLabelTextGiven(shape)) return undefined;
+  if (shape.kind !== "gridfinity" || shape.hole || normalizeGridfinityType(shape.gridfinityType) === "baseplate" || !gridfinityLabelTextGiven(shape)) return undefined;
   const color = normalizeHexColor(shape.gridfinityLabelColor);
   return color !== normalizeHexColor(shape.color) ? color : undefined;
 }
@@ -93,7 +93,7 @@ export function gridfinityLetterGroups(geometry: THREE.BufferGeometry, letters: 
   if (letters.length === 0) return geometry;
   const position = geometry.getAttribute("position");
   const glyphs = glyphBoxes(letters);
-  // A face below or above the letters is the bin's without asking each glyph; every shelf, and so every letter, stands at one height.
+  // A face below or above the letters is the bin's without asking each glyph; every shelf with letters, and so every letter, stands at one height.
   const low = letters[0].top - GRIDFINITY_LABEL_TEXT_SINK;
   const high = letters[0].top + GRIDFINITY_LABEL_TEXT_HEIGHT;
   const a = new THREE.Vector3();

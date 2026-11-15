@@ -36,7 +36,7 @@ import { loadedManifoldRuntime } from "@/lib/manifoldHandle";
 import { threadBuildPlan, WHITWORTH_PROFILE_CONSTANTS } from "@/lib/threadGeometry";
 import { springBuildPlan, springRingSectionShare } from "@/lib/springGeometry";
 import { flatSpringProfileLoops } from "@/lib/flatSpringGeometry";
-import { gridfinityHasPieces, gridfinityPlan } from "@/lib/gridfinityGeometry";
+import { gridfinityHasPieces, gridfinityLabelText, gridfinityPlan } from "@/lib/gridfinityGeometry";
 import { gridfinityLabelGlyphs } from "@/lib/gridfinityLabelText";
 import { knurlCorners, knurlSettings, roundKnurlWave } from "@/lib/knurlGeometry";
 import { pulleyArcPoint, pulleyMeasures, pulleyToothArcs } from "@/lib/pulleyGeometry";
@@ -1826,6 +1826,11 @@ export function cadModifierGridfinityForShape(shape: WorkplaneShape): CadModifie
     gridfinityLabelRightOffset: shape.gridfinityLabelRightOffset,
     gridfinityLabelCorner: shape.gridfinityLabelCorner,
     gridfinityLabelCornerSize: shape.gridfinityLabelCornerSize,
+    // The texts lower a tray's shelves under them (#1501); normalised, so a blank one gives the same part as none. The letters come as outlines below.
+    gridfinityLabelBackText: gridfinityLabelText(shape.gridfinityLabelBackText),
+    gridfinityLabelFrontText: gridfinityLabelText(shape.gridfinityLabelFrontText),
+    gridfinityLabelLeftText: gridfinityLabelText(shape.gridfinityLabelLeftText),
+    gridfinityLabelRightText: gridfinityLabelText(shape.gridfinityLabelRightText),
     gridfinityScoopBack: shape.gridfinityScoopBack,
     gridfinityScoopFront: shape.gridfinityScoopFront,
     gridfinityScoopLeft: shape.gridfinityScoopLeft,

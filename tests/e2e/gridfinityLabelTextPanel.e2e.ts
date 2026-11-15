@@ -14,7 +14,7 @@ import type { WorkplaneShape } from "@/types/layerling";
 
 /**
  * Text on a Gridfinity bin's label shelves in its settings (Discussion #1308): a text row under each shelf that is on and
- * in a compartment's label, none on a tray; a font row once a shelf has a text, with the fonts of one's own as for a
+ * in a compartment's label, on a tray's too (#1501); a font row once a shelf has a text, with the fonts of one's own as for a
  * text, and a letter size below the letter colour; a note under a text whose letters would be under 3 mm; typing is one
  * change and a locked bin's rows take none.
  */
@@ -74,14 +74,14 @@ describe("text on a Gridfinity bin's label shelves in its settings", () => {
     expect(rows[0].querySelector("input")!.maxLength).toBe(24);
   });
 
-  it("has no text row and no font row on a tray, whose shelves run up to its top, in its compartments either", () => {
+  it("has a text row and a font row on a tray, in its compartments too", () => {
     const tray = { gridfinityType: "tray" as const, width: 80, depth: 40, height: 20 };
     const walls = mount({ ...tray, gridfinityLabelBack: true, gridfinityLabelBackText: "Screws" });
-    expect(textRows(walls)).toHaveLength(0);
-    expect(fontRow(walls)).toBeUndefined();
+    expect(textRows(walls).map((row) => row.querySelector("input")!.value)).toEqual(["Screws"]);
+    expect(fontRow(walls)).toBeTruthy();
     const divided = mount({ ...tray, gridfinityCompartmentsX: 2, gridfinityCompartmentLabels: [{ column: 0, row: 0, side: "back", text: "Nuts" }] });
-    expect(textRows(divided)).toHaveLength(0);
-    expect(fontRow(divided)).toBeUndefined();
+    expect(textRows(divided).map((row) => row.querySelector("input")!.value)).toEqual(["Nuts"]);
+    expect(fontRow(divided)).toBeTruthy();
   });
 
   it("shows only the shelf's own note under a compartment's shelf too short to build, not the letters' one", () => {
