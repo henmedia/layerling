@@ -2798,7 +2798,7 @@ export const MESSAGES_DA: Partial<Record<MessageKey, string>> = {
   "historyView.deleteBody": "Designet forbliver præcis som det er nu. Alle tidligere trin fjernes for evigt – Fortryd og denne visning kan ikke længere gå tilbage, og en fil gemt bagefter har ingen historik.",
   "historyView.deleteConfirm": "Slet historik",
   "historyView.totalSize": "Historik: ca. {size}",
-  "historyView.totalSizeHint": "Talt som designet gemmes: et net, som flere trin deler, tæller én gang",
+  "historyView.totalSizeHint": "Talt som designet gemmes: et mesh, som flere trin deler, tæller én gang",
   "historyView.deleteLargest": "Slet de største trin",
   "historyView.deleteLargestCount": "Slet de største trin ({count})",
   "historyView.deleteLargestHint": "Vælger hvert trin, der alene frigør 1 MB eller mere, og spørger før sletning",
