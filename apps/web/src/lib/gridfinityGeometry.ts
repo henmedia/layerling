@@ -960,6 +960,115 @@ export function gridfinitySceneWithKeys(shapes: WorkplaneShape[], plateId: strin
   return [...shapes.filter((shape) => shape.gridfinityKeyOf !== plateId), ...keys];
 }
 
+/**
+ * A piece of a baseplate split to fit the printer (#1388): its units, its padding and its middle, in the plate's x and z,
+ * and how many keys it carries: one for each pocket at its back and right that meets another piece.
+ */
+export type GridfinityPlatePiece = { count: { x: number; z: number }; padding: Record<GridfinityWall, number>; x: number; z: number; keys: number };
+
+/** How far past each edge of the bed a plate may reach and still fit: the bed warning's own hair (BED_EDGE_TOLERANCE in printBed.ts). */
+const GRIDFINITY_SPLIT_BED_TOLERANCE = 0.01;
+
+/**
+ * One axis of a plate cut on its cell lines into k pieces (#1388): each piece's cells, the plate's padding it keeps at its
+ * start and end, its size and its middle, and the size of the largest. The cells left over go to the pieces with the least
+ * padding, a tie to the one further left or back, so 7 cells with 30 mm of padding on the left become 3 + 4 cells, 156 and
+ * 168 mm, not 198 and 126.
+ */
+function gridfinitySplitAxis(cells: number, k: number, start: number, end: number) {
+  const pieces = Array.from({ length: k }, (_, i) => ({ count: Math.floor(cells / k), start: i === 0 ? start : 0, end: i === k - 1 ? end : 0, size: 0, middle: 0 }));
+  [...pieces].sort((a, b) => a.start + a.end - b.start - b.end).slice(0, cells % k).forEach((piece) => { piece.count += 1; });
+  let at = -(cells * GRIDFINITY_GRID + start + end) / 2;
+  for (const piece of pieces) {
+    // To 0.01 mm, as gridfinitySize stores a plate's size and the bed warning reads it.
+    piece.size = Math.round((piece.count * GRIDFINITY_GRID + piece.start + piece.end) * 100) / 100;
+    piece.middle = at + piece.size / 2;
+    at += piece.size;
+  }
+  return { pieces, largest: Math.max(...pieces.map((piece) => piece.size)) };
+}
+
+/**
+ * A baseplate larger than the printer's bed cut on its cell lines into the fewest plates that fit the bed (#1388); null
+ * without a printer, when the plate fits already, when a single cell with its padding does not, for a hole, which is not
+ * printed, and for anything but a baseplate of whole units lying flat. A plate fits as for the bed warning: it may reach
+ * 0.01 mm past each edge, so a plate of the bed's size fits, and a round bed takes it as far as its rounded corners reach. The pieces all fit as they lie or
+ * all turned a quarter; when two cuts give as many pieces, the one that needs fewer keys wins.
+ */
+export function gridfinityPlateSplit(shape: GridfinityShapeFields & GridfinityPlacement & Pick<WorkplaneShape, "kind" | "hole">, bed: { width: number; depth: number; round?: boolean } | null): GridfinityPlatePiece[] | null {
+  if (!bed || shape.kind !== "gridfinity" || shape.hole || normalizeGridfinityType(shape.gridfinityType) !== "baseplate" || normalizeGridfinityOutline(shape.gridfinityOutline) || !gridfinityPlateFlat(shape)) return null;
+  const count = gridfinityUnits(shape);
+  const padding = gridfinityPadding(shape);
+  const radius = bed.round ? gridfinityCornerRadius(shape) : 0;
+  // Half the plate against half the bed, as the bed warning measures each side. On a round bed a plate reaches furthest at its
+  // corners' rounding: this takes the true arc, the bed warning the plate's mesh, which reaches about 0.02 mm less.
+  const fits = (width: number, depth: number) => bed.round
+    ? Math.hypot(width / 2 - radius, depth / 2 - radius) + radius - bed.width / 2 <= GRIDFINITY_SPLIT_BED_TOLERANCE
+    : width / 2 - bed.width / 2 <= GRIDFINITY_SPLIT_BED_TOLERANCE && depth / 2 - bed.depth / 2 <= GRIDFINITY_SPLIT_BED_TOLERANCE;
+  const cuts = (cells: number, start: number, end: number) => Array.from({ length: cells }, (_, k) => gridfinitySplitAxis(cells, k + 1, start, end));
+  const deeps = cuts(count.z, padding.back, padding.front);
+  let best: { across: (typeof deeps)[number]; deep: (typeof deeps)[number]; plates: number; keys: number } | null = null;
+  for (const across of cuts(count.x, padding.left, padding.right)) {
+    // The largest piece each way decides, and a cut deeper only adds pieces and keys: the first that fits is the best for this one across.
+    const deep = deeps.find((d) => fits(across.largest, d.largest) || fits(d.largest, across.largest));
+    if (!deep) continue;
+    const plates = across.pieces.length * deep.pieces.length;
+    // A key for every cell along a seam.
+    const keys = (across.pieces.length - 1) * count.z + (deep.pieces.length - 1) * count.x;
+    if (!best || plates < best.plates || (plates === best.plates && keys < best.keys)) best = { across, deep, plates, keys };
+  }
+  if (!best || best.plates === 1) return null;
+  const { across, deep } = best;
+  return deep.pieces.flatMap((d, j) => across.pieces.map((a, i) => ({
+    count: { x: a.count, z: d.count },
+    padding: { back: d.start, front: d.end, left: a.start, right: a.end },
+    x: a.middle,
+    z: d.middle,
+    keys: (i < across.pieces.length - 1 ? d.count : 0) + (j > 0 ? a.count : 0),
+  })));
+}
+
+/**
+ * The plates a baseplate is split into (#1388): the plate's settings with Swallowtail on, each piece's units, padding and
+ * size, its name numbered, and laid where its cells were, turned and mirrored as the plate is. Large plate is on only for a
+ * piece over 6 units; the turning pivot, a share of the plate's size, goes. A painted plate's strokes lie in its own frame,
+ * so `repaint` moves them into each piece's (rebasePaintStrokes in the editor), and a piece keeps the paint on its cells.
+ */
+export function gridfinityPlatePieces(plate: WorkplaneShape, pieces: GridfinityPlatePiece[], name: string, newId: () => string, repaint: (piece: WorkplaneShape) => NonNullable<WorkplaneShape["paint"]>): WorkplaneShape[] {
+  return pieces.map((piece, k) => {
+    const made: WorkplaneShape = {
+      ...plate,
+      ...gridfinityPlateToWorld(piece, plate),
+      id: newId(),
+      name: `${name} ${k + 1}`,
+      gridfinitySwallowtail: true,
+      gridfinityLargePlate: Math.max(piece.count.x, piece.count.z) > MAX_GRIDFINITY_UNITS ? true : undefined,
+      gridfinityPaddingBack: piece.padding.back,
+      gridfinityPaddingFront: piece.padding.front,
+      gridfinityPaddingLeft: piece.padding.left,
+      gridfinityPaddingRight: piece.padding.right,
+      ...gridfinitySize("baseplate", { ...piece.count, y: 1 }, false, GRIDFINITY_GRID, piece.padding, true),
+      rotationPivot: undefined,
+    };
+    return plate.paint?.length ? { ...made, paint: repaint(made) } : made;
+  });
+}
+
+/**
+ * The keys for the seams of a split plate (#1388): one for each pair of pockets across a seam, none for the plate's outer
+ * sides, in one row in front of the plate's box. Each belongs to the piece left of or in front of its seam, whose pocket at
+ * its right or back it fills, so that Add keys on that piece later replaces it.
+ */
+export function gridfinityPlatePieceKeys(pieces: WorkplaneShape[], split: GridfinityPlatePiece[], box: { minX: number; maxZ: number; minY: number }, key: WorkplaneShape, keyDepth: number, name: string, newId: () => string): WorkplaneShape[] {
+  const owners = pieces.flatMap((piece, k) => Array<string>(split[k].keys).fill(piece.id));
+  return gridfinitySwallowtailKeys(pieces[0], box, key, keyDepth, owners.length, name, newId).map((made, k) => ({ ...made, gridfinityKeyOf: owners[k] }));
+}
+
+/** The scene with a plate split into its pieces (#1388): the pieces in the plate's place, its keys from before gone, the new keys last. */
+export function gridfinitySceneWithPieces(shapes: WorkplaneShape[], plateId: string, pieces: WorkplaneShape[], keys: WorkplaneShape[]) {
+  return gridfinitySceneWithKeys(shapes.flatMap((shape) => (shape.id === plateId ? pieces : [shape])), plateId, keys);
+}
+
 /** The clearance of a Swallowtail plate's keys on every side (#1061), to 0.01 mm. */
 export function gridfinitySwallowtailClearance(shape: Pick<GridfinityShapeFields, "gridfinitySwallowtailClearance">) {
   return Math.round(clampLabel(shape.gridfinitySwallowtailClearance, DEFAULT_GRIDFINITY_SWALLOWTAIL_CLEARANCE, 0, MAX_GRIDFINITY_SWALLOWTAIL_CLEARANCE) * 100) / 100;

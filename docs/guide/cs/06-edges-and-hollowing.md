@@ -79,6 +79,8 @@ Volba {{ui:shell.edges}} se projeví pouze tam, kde se vnitřní stěny rozestup
 
 Když je nahoře jediná otevřená strana, {{ui:shell.stack}} udělá krabici stohovatelnou: vnější polovina stěny vyčnívá nad okraj jako límec ({{ui:shell.stackHeight}}, zpočátku 3 mm) a pod stěnou se vyřízne o milimetr hlubší drážka, která přijme límec krabice pod ní. Jedna krabice pak stojí pevně na druhé. Dno a spodek zůstávají rovné, takže se krabice stále tiskne postavená na dně, bez čehokoli ve vzduchu. Je potřeba rovných stěn, stěny alespoň 1,2 mm a tělesa znatelně vyššího než límec; nejde-li to, okno nástroje řekne proč.
 
+Je-li horní strana jedinou otevřenou stranou, {{ui:shell.shelf}} vytvoří po celém obvodu vnitřní strany stěny římsu, na které může ležet deska, například police nebo mezidno v krabici ({{ui:shell.shelfWidth}}, na začátku 1,5 mm, 0,5 až 5 mm). {{ui:shell.shelfHeight}} se měří od vnitřní strany dna k horní ploše římsy (na začátku 20 mm). Římsa je silná 2 mm a sleduje tvar vnitřku, včetně zaoblených rohů a kulatých krabic. Vyžaduje svislé stěny a těleso zřetelně vyšší než výška římsy; při zapnutém {{ui:shell.stack}} se límec staví kolem ní. Když to nejde, okno nástroje řekne proč.
+
 ![Výsledný kryt se stěnou 3 mm a otevřenou horní stranou.](shot:hollow-result)
 
 ![Stejná krabička s otevřenou přední stranou jako prostor pro zásuvku.](shot:hollow-sides)

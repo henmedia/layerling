@@ -8,7 +8,10 @@ import { meshForShape } from "@/lib/editorMeshCore";
 import { mcpShapeSummary } from "@/lib/editorMcpSummary";
 import { exportLylProject, importLylProject } from "@/lib/lylProject";
 import { rememberManifoldRuntime } from "@/lib/manifoldHandle";
-import { mcpGridfinityListParams, mcpGridfinityOutlinePatch, mcpGridfinityPaddingPatch } from "@/lib/mcpShapeSettings";
+import { MCP_GRIDFINITY_SPLIT_ALONE, MCP_GRIDFINITY_SPLIT_NEEDS, mcpGridfinityListParams, mcpGridfinityOutlinePatch, mcpGridfinityPaddingPatch, mcpGridfinitySplitCheck } from "@/lib/mcpShapeSettings";
+import { paintedWorldMesh, rebasePaintStrokes } from "@/lib/paintMesh";
+import { bedOverhangs, printerPresetById } from "@/lib/printBed";
+import { PRINTER_PRESETS } from "@/lib/printerPresets.generated";
 import { makeShapeFromAsset, sceneShape, toolbarShapeAssets } from "@/lib/shapeCatalog";
 import { DEFAULT_SNAP_GRID, DEFAULT_WORKPLANE_WORKSPACE, normalizeShapeCustomizations } from "@/lib/workplaneSettings";
 import { shapeDefaultsFromShape } from "@/lib/shapeDefaults";
@@ -84,6 +87,9 @@ import {
   gridfinityOutlineRemovalPatch,
   gridfinityOutlineToPlate,
   gridfinityPlateFlat,
+  gridfinityPlatePieceKeys,
+  gridfinityPlatePieces,
+  gridfinityPlateSplit,
   gridfinityPlateToWorld,
   gridfinityPadding,
   gridfinityPaddingPatch,
@@ -94,6 +100,7 @@ import {
   gridfinityScoopRadius,
   gridfinityScoopsLeftOut,
   gridfinitySceneWithKeys,
+  gridfinitySceneWithPieces,
   gridfinityShapePatch,
   gridfinitySwallowtailClearance,
   gridfinitySwallowtailKeyCount,
@@ -4284,6 +4291,288 @@ describe("gridfinity swallowtail", () => {
     expect(at(0.3, 3.2)).toEqual([-42, -41.3, -35, 35, 41.3, 42]);
     expect(at(1, 4.9)).toEqual([-42, -35.35, -35, 35, 35.35, 42]);
     expect(at(0.3, 4.9)).toEqual([-42, 42]);
+  });
+});
+
+describe("gridfinity baseplate split to fit the printer", () => {
+  const coreOne = printerPresetById("prusa-core-one")!;
+  const a1Mini = printerPresetById("bambu-lab-a1-mini")!;
+  const q5 = printerPresetById("flsun-q5")!;
+  const plateShape = (fields: Record<string, unknown>) => binShape(plate({ gridfinityLargePlate: true, ...fields }));
+  /** 10 x 8 units with 20 mm of padding on every side: 460 x 376 mm. */
+  const padded = (fields: Record<string, unknown> = {}) => plateShape({ width: 460, depth: 376, gridfinityPaddingBack: 20, gridfinityPaddingFront: 20, gridfinityPaddingLeft: 20, gridfinityPaddingRight: 20, ...fields });
+  const ids = (prefix: string) => { let n = 0; return () => `${prefix}${(n += 1)}`; };
+  /** As the editor moves a painted plate's strokes onto a piece. */
+  const repaint = (shape: WorkplaneShape) => (piece: WorkplaneShape) => rebasePaintStrokes(shape.paint ?? [], shape, piece);
+  const piecesOf = (shape: WorkplaneShape, bed: { width: number; depth: number; round?: boolean }) => gridfinityPlatePieces(shape, gridfinityPlateSplit(shape, bed)!, "Gridfinity", ids("piece"), repaint(shape));
+  const world = (shape: WorkplaneShape, points: Array<{ x: number; z: number }>) => points.map((p) => gridfinityPlateToWorld(p, shape)).map((p) => `${p.x.toFixed(6)} ${p.z.toFixed(6)}`.replace(/-0\.000000/g, "0.000000"));
+  const key = { ...binShape(plate()), id: "key", width: 13.9 };
+  const box = { minX: -230, maxZ: 188, minY: 2 };
+
+  beforeAll(async () => {
+    const runtime = await manifoldModule();
+    runtime.setup();
+    rememberManifoldRuntime(runtime);
+  });
+
+  it("cuts a plate larger than the bed into the fewest plates that fit it, on its cell lines, its padding kept on the outer sides", () => {
+    const split = gridfinityPlateSplit(padded(), coreOne)!;
+    expect(split.map((piece) => ({ count: piece.count, x: piece.x, z: piece.z }))).toEqual([
+      { count: { x: 5, z: 4 }, x: -115, z: -94 },
+      { count: { x: 5, z: 4 }, x: 115, z: -94 },
+      { count: { x: 5, z: 4 }, x: -115, z: 94 },
+      { count: { x: 5, z: 4 }, x: 115, z: 94 },
+    ]);
+    expect(split.map((piece) => piece.padding)).toEqual([
+      { back: 20, front: 0, left: 20, right: 0 },
+      { back: 20, front: 0, left: 0, right: 20 },
+      { back: 0, front: 20, left: 20, right: 0 },
+      { back: 0, front: 20, left: 0, right: 20 },
+    ]);
+    // On a bed 220 mm wide and 250 deep the same pieces fit turned a quarter; as they lie, 230 mm would not fit the 220 mm
+    // width, and it would take six.
+    expect(gridfinityPlateSplit(padded(), { width: 220, depth: 250 })).toEqual(split);
+  });
+
+  it("gives the pieces Swallowtail, their own size and padding, and Large plate only where one is over 6 units", () => {
+    const pieces = piecesOf(padded({ color: "#123456", gridfinitySwallowtailClearance: 0.1, rotationPivot: { x: 0.2, y: 0.5, z: 0.5 } }), coreOne);
+    expect(pieces.map((piece) => [piece.id, piece.name, piece.x, piece.z])).toEqual([["piece1", "Gridfinity 1", -115, -94], ["piece2", "Gridfinity 2", 115, -94], ["piece3", "Gridfinity 3", -115, 94], ["piece4", "Gridfinity 4", 115, 94]]);
+    for (const piece of pieces) {
+      expect(piece).toMatchObject({ kind: "gridfinity", gridfinityType: "baseplate", gridfinitySwallowtail: true, gridfinitySwallowtailClearance: 0.1, color: "#123456", width: 230, depth: 188, height: 7.4 });
+      expect(piece).toHaveProperty("gridfinityLargePlate", undefined);
+      expect(piece).toHaveProperty("rotationPivot", undefined);
+      // The editor keeps them as they are, and sets their size.
+      expect(canonicalizeShape(piece)).toMatchObject({ width: 230, depth: 188, height: 7.4, size: 230 });
+    }
+    expect(pieces[0]).toMatchObject({ gridfinityPaddingBack: 20, gridfinityPaddingFront: 0, gridfinityPaddingLeft: 20, gridfinityPaddingRight: 0 });
+    // 12 x 8 units on a bed of 300 x 340 mm: two plates of 6 x 8 units, which need Large plate.
+    const deep = piecesOf(plateShape({ width: 504, depth: 336 }), { width: 300, depth: 340 });
+    expect(deep.map((piece) => [piece.width, piece.depth, piece.gridfinityLargePlate])).toEqual([[252, 336, true], [252, 336, true]]);
+    expect(deep.map((piece) => canonicalizeShape(piece).depth)).toEqual([336, 336]);
+    // 12 x 6 units on a bed of 260 mm: two plates of 6 x 6 units, which do not.
+    const square = piecesOf(plateShape({ width: 504, depth: 252 }), { width: 260, depth: 260 });
+    expect(square.map((piece) => [piece.width, piece.depth])).toEqual([[252, 252], [252, 252]]);
+    square.forEach((piece) => expect(piece).toHaveProperty("gridfinityLargePlate", undefined));
+  });
+
+  it("gives a cell left over to the piece with the least padding, so that the fewest pieces fit", () => {
+    // 7 x 3 units, 30 mm of padding on the left, on a bed of 180 mm: 3 + 4 cells, 156 and 168 mm. The other way round the
+    // first piece would be 198 mm and a third piece would be needed.
+    const split = gridfinityPlateSplit(plateShape({ width: 324, depth: 126, gridfinityPaddingLeft: 30 }), a1Mini)!;
+    expect(split.map((piece) => ({ count: piece.count, x: piece.x, z: piece.z, left: piece.padding.left }))).toEqual([{ count: { x: 3, z: 3 }, x: -84, z: 0, left: 30 }, { count: { x: 4, z: 3 }, x: 78, z: 0, left: 0 }]);
+    // With the padding on the right, the left piece takes the cell: 4 + 3 cells, 168 and 156 mm.
+    const right = gridfinityPlateSplit(plateShape({ width: 324, depth: 126, gridfinityPaddingRight: 30 }), a1Mini)!;
+    expect(right.map((piece) => [piece.count.x, piece.padding.right])).toEqual([[4, 0], [3, 30]]);
+    // Padded on both sides, 10 mm on the left and 30 on the right, the left piece has less: 178 and 156 mm.
+    const both = gridfinityPlateSplit(plateShape({ width: 334, depth: 126, gridfinityPaddingLeft: 10, gridfinityPaddingRight: 30 }), a1Mini)!;
+    expect(both.map((piece) => [piece.count.x, piece.padding.left, piece.padding.right])).toEqual([[4, 10, 0], [3, 0, 30]]);
+    // Without padding the piece further left or back takes it.
+    expect(gridfinityPlateSplit(plateShape({ width: 294, depth: 42 }), a1Mini)!.map((piece) => piece.count.x)).toEqual([4, 3]);
+    expect(gridfinityPlateSplit(plateShape({ width: 42, depth: 294 }), a1Mini)!.map((piece) => piece.count.z)).toEqual([4, 3]);
+  });
+
+  it("cuts down to pieces of a single cell when only those fit, on either axis", () => {
+    // 3 units with 41 mm of padding at both ends on a bed of 90 mm: two cells are 125 mm with the padding, one is 83.
+    const across = gridfinityPlateSplit(plateShape({ width: 208, depth: 42, gridfinityPaddingLeft: 41, gridfinityPaddingRight: 41 }), { width: 90, depth: 90 })!;
+    expect(across.map((piece) => [piece.count.x, piece.padding.left, piece.padding.right])).toEqual([[1, 41, 0], [1, 0, 0], [1, 0, 41]]);
+    const deep = gridfinityPlateSplit(plateShape({ width: 42, depth: 208, gridfinityPaddingBack: 41, gridfinityPaddingFront: 41 }), { width: 90, depth: 90 })!;
+    expect(deep.map((piece) => [piece.count.z, piece.padding.back, piece.padding.front])).toEqual([[1, 41, 0], [1, 0, 0], [1, 0, 41]]);
+  });
+
+  it("splits 12 x 12 units for a bed of 180 mm into 9 plates of 4 x 4, with a key for each pair of pockets across a seam", () => {
+    const shape = plateShape({ width: 504, depth: 504 });
+    const split = gridfinityPlateSplit(shape, a1Mini)!;
+    const pieces = gridfinityPlatePieces(shape, split, "Gridfinity", ids("piece"), repaint(shape));
+    expect(pieces.map((piece) => [piece.width, piece.depth])).toEqual(Array(9).fill([168, 168]));
+    pieces.forEach((piece) => expect(piece).toHaveProperty("gridfinityLargePlate", undefined));
+    // Two seams across and two in depth, 12 cells long each: 2 x 12 + 2 x 12 = 48 keys, none for the 12 pockets on each
+    // outer side, which have no neighbour. Each piece takes the keys for its right and back seams.
+    const keys = gridfinityPlatePieceKeys(pieces, split, { minX: -252, maxZ: 252, minY: 0 }, key, 10, "Swallowtail key", ids("key"));
+    expect(keys).toHaveLength(48);
+    expect(pieces.map((piece) => keys.filter((k) => k.gridfinityKeyOf === piece.id).length)).toEqual([4, 4, 0, 8, 8, 4, 8, 8, 4]);
+  });
+
+  it("takes the fewest pieces, and the fewest keys when several cuts give as many", () => {
+    // 3 x 7 units on a bed of 130 x 50 mm: 7 strips of 126 x 42 mm, not 9 pieces of 42 x 126 mm turned a quarter.
+    expect(gridfinityPlateSplit(plateShape({ width: 126, depth: 294 }), { width: 130, depth: 50 })!.map((piece) => piece.count)).toEqual(Array(7).fill({ x: 3, z: 1 }));
+    // 4 x 12 units on a bed of 130 x 260 mm: 4 strips of 168 x 126 mm turned a quarter, 3 seams 4 cells long and 12 keys,
+    // rather than 2 x 2 pieces of 84 x 252 mm, whose seams take 12 + 4 keys.
+    const strips = gridfinityPlateSplit(plateShape({ width: 168, depth: 504 }), { width: 130, depth: 260 })!;
+    expect(strips.map((piece) => piece.count)).toEqual(Array(4).fill({ x: 4, z: 3 }));
+    expect(strips.reduce((sum, piece) => sum + piece.keys, 0)).toBe(12);
+    // 10 x 9 units with 20 mm of padding on every side on the Prusa MK4 (250 x 210 mm): 3 x 2 pieces of up to 168 x 230 mm
+    // turned a quarter and 28 keys, rather than 2 x 3 of up to 230 x 146 mm and 29 keys, with as many seams.
+    const mk4 = gridfinityPlateSplit(padded({ width: 460, depth: 418 }), printerPresetById("prusa-mk4")!)!;
+    expect(mk4.map((piece) => piece.count)).toEqual([{ x: 3, z: 5 }, { x: 4, z: 5 }, { x: 3, z: 5 }, { x: 3, z: 4 }, { x: 4, z: 4 }, { x: 3, z: 4 }]);
+    expect(mk4.reduce((sum, piece) => sum + piece.keys, 0)).toBe(28);
+  });
+
+  it("fits a round bed by how far the plate's rounded corners reach", () => {
+    // 6 x 6 units on the 200 mm FLSun Q5: four plates of 126 mm, 174.9 mm across the rounded corners.
+    expect(gridfinityPlateSplit(plateShape({ width: 252, depth: 252 }), q5)!.map((piece) => piece.count)).toEqual(Array(4).fill({ x: 3, z: 3 }));
+    // 4 x 4 units are 168 mm a side and fit a square bed of 200 mm, but reach 234.3 mm across: two plates of 84 x 168.
+    expect(gridfinityPlateSplit(plateShape({ width: 168, depth: 168 }), { width: 200, depth: 200 })).toBeNull();
+    expect(gridfinityPlateSplit(plateShape({ width: 168, depth: 168 }), q5)).toHaveLength(2);
+    // Plates longer than the bed's diameter across their box corners, which fit by their rounding: 3 x 6 units (126 x 252,
+    // 279.04 mm) on the 280 mm RostockMAX v4, 4 x 6 (168 x 252, 299.78 mm) on the 300 mm BOSSdelta 300, and 2 x 4 with 5 mm
+    // of padding (94 x 178, 198.52 mm) on the Q5.
+    expect(gridfinityPlateSplit(plateShape({ width: 126, depth: 252 }), printerPresetById("seemecnc-rostockmax-v4")!)).toBeNull();
+    expect(gridfinityPlateSplit(plateShape({ width: 168, depth: 252 }), printerPresetById("seemecnc-bossdelta-300")!)).toBeNull();
+    const small = { width: 94, depth: 178, gridfinityPaddingBack: 5, gridfinityPaddingFront: 5, gridfinityPaddingLeft: 5, gridfinityPaddingRight: 5 };
+    expect(gridfinityPlateSplit(plateShape(small), q5)).toBeNull();
+    // With square corners the same plate reaches 201.3 mm.
+    expect(gridfinityPlateSplit(plateShape({ ...small, gridfinityCornerRadius: 0 }), q5)).toHaveLength(2);
+    // 262 x 252 mm reaches 360.2102 mm, and as for the bed warning it may reach 0.01 mm past the edge: a bed of 360.2 takes
+    // it, 360.18 does not.
+    expect(gridfinityPlateSplit(plateShape({ width: 262, depth: 252, gridfinityPaddingLeft: 10 }), { width: 360.2, depth: 360.2, round: true })).toBeNull();
+    expect(gridfinityPlateSplit(plateShape({ width: 262, depth: 252, gridfinityPaddingLeft: 10 }), { width: 360.18, depth: 360.18, round: true })).toHaveLength(2);
+  });
+
+  it("offers a split only for a plate the bed warning flags, and every piece passes it", () => {
+    // Every round bed, where the rounding counts, and every fourth size of the others.
+    const sizes = [...new Map(PRINTER_PRESETS.map((preset) => [`${preset.width} ${preset.depth} ${preset.round === true}`, preset])).values()];
+    const beds = [...sizes.filter((bed) => bed.round), ...sizes.filter((bed) => !bed.round).filter((_, k) => k % 4 === 0)];
+    const paddings = [{}, { gridfinityPaddingLeft: 30, gridfinityPaddingFront: 41 }];
+    const flagged = (shape: WorkplaneShape, bed: (typeof beds)[number]) => bedOverhangs([shape], bed.width, bed.depth, undefined, bed.round).length > 0;
+    const measured = new Set<string>();
+    let splits = 0;
+    for (const bed of beds) {
+      for (let x = 1; x <= 12; x += 1) {
+        for (let z = 1; z <= 12; z += 1) {
+          for (const pad of paddings) {
+            const fields = { gridfinityPaddingBack: 0, gridfinityPaddingFront: 0, gridfinityPaddingLeft: 0, gridfinityPaddingRight: 0, ...pad };
+            const shape = plateShape({ ...fields, width: x * 42 + fields.gridfinityPaddingLeft + fields.gridfinityPaddingRight, depth: z * 42 + fields.gridfinityPaddingBack + fields.gridfinityPaddingFront });
+            const split = gridfinityPlateSplit(shape, bed);
+            if (!split) continue;
+            splits += 1;
+            const tag = `${bed.vendor} ${bed.model}, ${x} x ${z} ${JSON.stringify(pad)}`;
+            // The rounding takes at most 1.66 mm off each corner: a box 8 mm longer across than a round bed is flagged
+            // anyway, and its mesh need not be measured.
+            if (!bed.round || Math.hypot(shape.width, shape.depth!) <= bed.width + 8) expect(flagged(shape, bed), tag).toBe(true);
+            for (const piece of gridfinityPlatePieces(shape, split, "Gridfinity", ids("piece"), repaint(shape))) {
+              // Many plates give pieces of the same size and padding, measured once.
+              const seen = `${bed.width} ${bed.depth} ${bed.round} ${piece.width} ${piece.depth} ${piece.gridfinityPaddingBack} ${piece.gridfinityPaddingFront} ${piece.gridfinityPaddingLeft} ${piece.gridfinityPaddingRight}`;
+              if (measured.has(seen)) continue;
+              measured.add(seen);
+              const alone = { ...piece, x: 0, z: 0 };
+              expect(flagged(alone, bed) && flagged({ ...alone, rotation: 90 }, bed), tag).toBe(false);
+            }
+          }
+        }
+      }
+    }
+    expect(splits).toBeGreaterThan(5_000);
+  }, 60_000);
+
+  it("counts a plate as fitting exactly where the bed warning does, to the last hair", () => {
+    const flagged = (shape: WorkplaneShape, bed: { width: number; depth: number }) => bedOverhangs([shape], bed.width, bed.depth).length > 0;
+    const passes = (shape: WorkplaneShape, bed: { width: number; depth: number }) => {
+      for (const piece of piecesOf(shape, bed)) {
+        const alone = { ...piece, x: 0, z: 0 };
+        expect(flagged(alone, bed) && flagged({ ...alone, rotation: 90 }, bed)).toBe(false);
+      }
+    };
+    // 252 mm on a bed of 251.98 reaches 126 - 125.99 = 0.010000000000005 mm past each edge, which the bed warning flags.
+    const sixBySix = plateShape({ width: 252, depth: 252 });
+    const small = { width: 251.98, depth: 251.98 };
+    expect(flagged(sixBySix, small)).toBe(true);
+    expect(gridfinityPlateSplit(sixBySix, small)).toHaveLength(4);
+    passes(sixBySix, small);
+    // 10 x 4 units with 40.02 mm of padding on the left on the Prusa CORE One (250 x 220 mm): two plates would be 250.02 mm
+    // wide, as far past the bed, so three.
+    const wide = plateShape({ width: 460.02, depth: 168, gridfinityPaddingLeft: 40.02 });
+    expect(gridfinityPlateSplit(wide, coreOne)!.map((piece) => piece.count.x)).toEqual([3, 4, 3]);
+    passes(wide, coreOne);
+    // Sizes are stored to 0.01 mm, and 168 + 6.01 + 6.01 adds up to 180.01999999999998: the plate is 180.02 mm wide and flagged
+    // on the 180 mm bed of the Bambu Lab A1 mini, so it is split, while 252 + 14.41 + 33.61 is stored as 300.02, which passes on a
+    // 300 mm bed.
+    const narrow = plateShape({ width: 180.02, depth: 42, gridfinityPaddingLeft: 6.01, gridfinityPaddingRight: 6.01 });
+    expect(flagged(narrow, a1Mini)).toBe(true);
+    expect(gridfinityPlateSplit(narrow, a1Mini)).toHaveLength(2);
+    passes(narrow, a1Mini);
+    const square = { width: 300, depth: 300 };
+    const justFits = plateShape({ width: 300.02, depth: 252, gridfinityPaddingLeft: 14.41, gridfinityPaddingRight: 33.61 });
+    expect(flagged(justFits, square)).toBe(false);
+    expect(gridfinityPlateSplit(justFits, square)).toBeNull();
+  });
+
+  it("gives nothing for a plate that fits, one whose single cells do not, without a printer, for a hole, or for anything but a flat baseplate of whole units", () => {
+    const sixBySix = plateShape({ width: 252, depth: 252 });
+    expect(gridfinityPlateSplit(sixBySix, coreOne)).toHaveLength(4);
+    expect(gridfinityPlateSplit(sixBySix, printerPresetById("bambu-lab-a1")!)).toBeNull();
+    expect(gridfinityPlateSplit(sixBySix, null)).toBeNull();
+    // The bed's size fits, and as for the bed warning a plate may reach 0.01 mm past each edge.
+    expect(gridfinityPlateSplit(sixBySix, { width: 252, depth: 252 })).toBeNull();
+    expect(gridfinityPlateSplit(sixBySix, { width: 251.99, depth: 251.99 })).toBeNull();
+    expect(gridfinityPlateSplit(sixBySix, { width: 251.97, depth: 252 })).toHaveLength(2);
+    // One cell with 41 mm of padding is 124 mm.
+    expect(gridfinityPlateSplit(plateShape({ width: 124, depth: 124, gridfinityPaddingBack: 41, gridfinityPaddingFront: 41, gridfinityPaddingLeft: 41, gridfinityPaddingRight: 41 }), { width: 120, depth: 120 })).toBeNull();
+    const outline = [{ x: -126, z: -126 }, { x: 126, z: -126 }, { x: 126, z: 126 }, { x: -126, z: 126 }];
+    expect(gridfinityPlateSplit({ ...sixBySix, gridfinityOutline: outline }, a1Mini)).toBeNull();
+    expect(gridfinityPlateSplit({ ...sixBySix, rotationX: 90 }, a1Mini)).toBeNull();
+    expect(gridfinityPlateSplit({ ...sixBySix, gridfinityType: "bin", width: 251.5, depth: 251.5, height: 25.4 }, a1Mini)).toBeNull();
+    expect(gridfinityPlateSplit({ ...sixBySix, gridfinityType: "tray" }, { width: 10, depth: 10 })).toBeNull();
+    expect(gridfinityPlateSplit({ ...sixBySix, kind: "box" }, a1Mini)).toBeNull();
+    // A hole is not printed, and the bed warning passes over it.
+    expect(gridfinityPlateSplit({ ...sixBySix, hole: true }, a1Mini)).toBeNull();
+  });
+
+  it("lays every cell where the plate had it, also turned and mirrored, the pockets meeting in pairs across every seam", () => {
+    const shape = padded({ x: 10, z: -5, rotation: 30, mirrorX: true, gridfinitySwallowtail: true, height: 7.4 });
+    const pieces = piecesOf(shape, coreOne);
+    pieces.forEach((piece) => expect(piece).toMatchObject({ rotation: 30, mirrorX: true }));
+    const cells = (s: WorkplaneShape) => world(s, gridfinityPlan(s).cells);
+    expect(pieces.flatMap(cells).sort()).toEqual(cells(shape).sort());
+    const pockets = pieces.flatMap((piece) => world(piece, gridfinityPlan(piece).pockets));
+    // 8 cells along the seam across and 10 along the seam in depth; the padded outer sides have none.
+    expect(pockets).toHaveLength(36);
+    expect(new Set(pockets).size).toBe(18);
+  });
+
+  it("lays a key for each pair of pockets across a seam out in one row in front of the plate, and the plate's old keys give way", () => {
+    const shape = padded({ color: "#123456" });
+    const split = gridfinityPlateSplit(shape, coreOne)!;
+    const pieces = gridfinityPlatePieces(shape, split, "Gridfinity", ids("piece"), repaint(shape));
+    const keys = gridfinityPlatePieceKeys(pieces, split, box, key, 10, "Swallowtail key", ids("key"));
+    // The seam across is 4 cells long on each side of the seam in depth, which is 5 cells long on each side of the seam
+    // across: the back left piece takes 4, the front left 4 + 5 and the front right 5.
+    expect(keys.map((k) => k.gridfinityKeyOf)).toEqual([...Array(4).fill("piece1"), ...Array(9).fill("piece3"), ...Array(5).fill("piece4")]);
+    expect(keys.map(({ id, name, color, hole, z, elevation }) => ({ id, name, color, hole, z, elevation }))).toEqual(keys.map((_, k) => ({ id: `key${k + 1}`, name: "Swallowtail key", color: "#123456", hole: false, z: 197, elevation: 2 })));
+    expect(keys.map((k) => k.x)).toEqual(gridfinitySwallowtailKeyPlaces(box, { width: 13.9, depth: 10 }, 18).map((place) => place.x));
+    const other = { ...binShape(plate()), id: "other" };
+    const scene = [other, shape, { ...key, id: "old", gridfinityKeyOf: shape.id }, { ...key, id: "kept", gridfinityKeyOf: "other" }];
+    expect(gridfinitySceneWithPieces(scene, shape.id, pieces, keys).map((s) => s.id)).toEqual(["other", "piece1", "piece2", "piece3", "piece4", "kept", ...keys.map((k) => k.id)]);
+  });
+
+  it("keeps the paint on the cells it lay on", () => {
+    // 4 x 1 units, 168 x 42 mm, a red circle 20 mm across on the top at the far left, on a bed of 100 mm: two plates of 84.
+    const painted = plateShape({ width: 168, depth: 42, paint: [{ mode: "circle", color: "#ff0000", size: [168, 5, 42], point: [-80, 5, 0], normal: [0, 1, 0], diameter: 20 }] });
+    const redAcross = (shape: WorkplaneShape) => {
+      const mesh = paintedWorldMesh(shape);
+      if (!mesh) return null;
+      const xs = mesh.mesh.faces.filter((_, face) => mesh.faceColors[face] === "#ff0000").flatMap((corners) => corners.map((corner) => mesh.mesh.vertices[corner][0]));
+      return [Math.min(...xs), Math.max(...xs)].map((x) => Number(x.toFixed(3)));
+    };
+    const [left, right] = piecesOf(painted, { width: 100, depth: 100 });
+    // The circle meets the top of the plate's rim at its far left, 84 to 81.85 mm left of its middle.
+    expect(redAcross(painted)).toEqual([-84, -81.85]);
+    expect(redAcross(left)).toEqual(redAcross(painted));
+    expect(redAcross(right)).toBeNull();
+  });
+
+  it("refuses the MCP's split before anything changes, with keys, on a locked plate or one that has no split", () => {
+    const shape = padded();
+    const split = { gridfinitySplit: true };
+    expect(() => mcpGridfinitySplitCheck(shape, split, coreOne)).not.toThrow();
+    expect(() => mcpGridfinitySplitCheck({ ...shape, kind: "box" }, {}, null)).not.toThrow();
+    expect(() => mcpGridfinitySplitCheck(shape, { ...split, gridfinityKeys: true }, coreOne)).toThrow(MCP_GRIDFINITY_SPLIT_ALONE);
+    expect(() => mcpGridfinitySplitCheck({ ...shape, locked: true }, split, coreOne)).toThrow(MCP_GRIDFINITY_SPLIT_ALONE);
+    expect(() => mcpGridfinitySplitCheck({ ...shape, shapeLocked: true }, split, coreOne)).toThrow(MCP_GRIDFINITY_SPLIT_ALONE);
+    // Keys asked for on a plate that has no split: the refusal of keys with a split comes first.
+    expect(() => mcpGridfinitySplitCheck(shape, { ...split, gridfinityKeys: true }, null)).toThrow(MCP_GRIDFINITY_SPLIT_ALONE);
+    expect(() => mcpGridfinitySplitCheck(shape, split, null)).toThrow(MCP_GRIDFINITY_SPLIT_NEEDS);
+    expect(() => mcpGridfinitySplitCheck(shape, split, { width: 500, depth: 500 })).toThrow(MCP_GRIDFINITY_SPLIT_NEEDS);
+    expect(() => mcpGridfinitySplitCheck({ ...shape, hole: true }, split, coreOne)).toThrow(MCP_GRIDFINITY_SPLIT_NEEDS);
   });
 });
 

@@ -79,6 +79,8 @@ De {{ui:shell.edges}} doen er alleen toe waar de binnenwanden uit elkaar gaan: b
 
 Als de bovenkant de enige open zijde is, maakt {{ui:shell.stack}} de doos stapelbaar: de buitenste helft van de wand steekt als kraag boven de rand uit ({{ui:shell.stackHeight}}, in het begin 3 mm), en onder de wand wordt een groef gemaakt die een millimeter dieper is en de kraag van de doos eronder opneemt. Een doos staat dan stevig op de volgende. De bodem en de onderkant blijven vlak, dus de doos wordt nog steeds op zijn bodem staand geprint zonder iets in de lucht. Er zijn rechte wanden nodig, een wand van minstens 1,2 mm en een lichaam dat duidelijk hoger is dan de kraag; lukt het niet, dan zegt het gereedschapsvenster waarom.
 
+Met de bovenkant als enige open zijde legt {{ui:shell.shelf}} een rand helemaal rond de binnenkant van de wand waarop een plaat kan rusten, bijvoorbeeld een legplank of een tussenbodem in de doos ({{ui:shell.shelfWidth}}, in het begin 1,5 mm, 0,5 tot 5 mm). {{ui:shell.shelfHeight}} wordt gemeten van de binnenkant van de bodem tot de bovenkant van de rand (in het begin 20 mm). De rand is 2 mm dik en volgt de vorm van de binnenkant, inclusief afgeronde hoeken en ronde dozen. Hij heeft rechtopstaande wanden nodig en een lichaam dat duidelijk hoger is dan de hoogte van de rand; met {{ui:shell.stack}} aan wordt de kraag eromheen gebouwd. Lukt het niet, dan zegt het gereedschapsvenster waarom.
+
 ![Het resultaat: een schaal met een wand van 3 mm, aan de bovenkant open.](shot:hollow-result)
 
 ![Hetzelfde blok met alleen de voorkant open: een sleuf voor een lade.](shot:hollow-sides)

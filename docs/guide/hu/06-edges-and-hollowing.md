@@ -79,6 +79,8 @@ A {{ui:shell.edges}} csak ott számítanak, ahol a belső falak eltávolodnak eg
 
 Ha a teteje az egyetlen nyitott oldal, a {{ui:shell.stack}} egymásra rakhatóvá teszi a dobozt: a fal külső fele gallérként kiemelkedik a perem fölé ({{ui:shell.stackHeight}}, kezdetben 3 mm), a fal alatt pedig egy milliméterrel mélyebb horony készül, amely befogadja az alatta lévő doboz gallérját. Így az egyik doboz biztosan áll a másikon. Az alja és az alsó oldal lapos marad, ezért a doboz továbbra is az alján állva nyomtatható, a levegőben semmi sem lóg. Egyenes falak, legalább 1,2 mm-es fal és a gallérnál határozottan magasabb test kell; ha nem megy, az eszközablak megmondja, miért.
 
+Ha a felső oldal az egyetlen nyitott oldal, a {{ui:shell.shelf}} a fal belső oldalán körbefutó peremet készít, amelyen egy lap nyugodhat, például egy polc vagy egy közbenső fenék a dobozban ({{ui:shell.shelfWidth}}, kezdetben 1,5 mm, 0,5-től 5 mm-ig). A {{ui:shell.shelfHeight}} a fenék belső oldalától a perem felső síkjáig értendő (kezdetben 20 mm). A perem 2 mm vastag, és követi a belső tér alakját, a lekerekített sarkokat és a kerek dobozokat is. Egyenes falakat és a perem magasságánál egyértelműen magasabb testet igényel; bekapcsolt {{ui:shell.stack}} mellett a gallér a perem köré épül. Ha nem megy, az eszközablak megmondja, miért.
+
 ![Az eredmény: 3 mm falú héj, felül nyitva.](shot:hollow-result)
 
 ![Ugyanaz a doboz csak az elülső oldalán nyitva: egy fióknak való nyílás.](shot:hollow-sides)

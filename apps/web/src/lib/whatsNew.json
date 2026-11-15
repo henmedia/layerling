@@ -6,11 +6,13 @@
         "title": {
           "de": "Kopien kleiner Teile bleiben im Blick",
           "en": "Copies of small parts stay in view",
+          "da": "Kopier af små dele bliver synlige",
           "ar": "نسخ القطع الصغيرة تبقى في مجال الرؤية"
         },
         "body": {
           "de": "Eine eingefügte Kopie lag immer 12 mm neben dem Original. Bei einem Teil von wenigen Millimetern und starkem Zoom war sie damit außerhalb des Bildes. Jetzt rückt sie um die halbe Größe dessen, was du kopiert hast, zwischen 1 und 12 mm. Große Teile rücken wie bisher 12 mm.",
           "en": "A pasted copy always lay 12 mm beside the original, which put it out of view for a part of a few millimetres while zoomed in. Now it moves by half the size of what you copied, between 1 and 12 mm. Large parts still move 12 mm.",
+          "da": "En indsat kopi lå altid 12 mm ved siden af originalen, og så var den ude af syne for en del på få millimeter, når du var zoomet ind. Nu flytter den sig halvt så meget som det, du kopierede, mellem 1 og 12 mm. Store dele flytter sig stadig 12 mm.",
           "ar": "كانت النسخة الملصقة توضع دائمًا على بعد 12 مم بجانب الأصل، فتخرج من مجال الرؤية مع قطعة بحجم بضعة مليمترات عند التكبير. الآن تُزاح بمقدار نصف حجم ما نسخته، بين 1 و12 مم. أما القطع الكبيرة فتُزاح 12 مم كما من قبل."
         }
       }
@@ -23,11 +25,13 @@
         "title": {
           "de": "Neigungswinkel mit „Proportionen beibehalten“",
           "en": "Slope angle with Keep proportions",
+          "da": "Hældningsvinkel med Bevar proportioner",
           "ar": "زاوية الميل مع «الحفاظ على النسب»"
         },
         "body": {
           "de": "War „Proportionen beibehalten“ an, änderte ein getippter Neigungswinkel am Keil alle Maße, nur nicht den Winkel. Ebenso der Spitzenwinkel am Tropfen. Jetzt ändert ein Winkel nur die Höhe, Länge und Breite bleiben, wie sie sind.",
           "en": "With Keep proportions on, a slope angle typed on a wedge changed every size but the angle. So did the tip angle of a teardrop. Now an angle changes only the height; length and width stay as they are.",
+          "da": "Med Bevar proportioner slået til ændrede en hældningsvinkel, du tastede på en kile, alle mål undtagen vinklen. Det gjorde spidsvinklen på et dråbehul også. Nu ændrer en vinkel kun højden; længde og bredde bliver, som de er.",
           "ar": "عندما كان «الحفاظ على النسب» مفعّلًا، كانت كتابة زاوية الميل في الإسفين تغيّر كل المقاسات ما عدا الزاوية. وكذلك زاوية الطرف المدبب في الشكل الدمعي. الآن تغيّر الزاوية الارتفاع فقط، ويبقى الطول والعرض كما هما."
         },
         "guide": {
@@ -43,11 +47,13 @@
         "title": {
           "de": "Stapelbare Boxen",
           "en": "Stackable boxes",
+          "da": "Stabelbare æsker",
           "ar": "صناديق قابلة للتكديس"
         },
         "body": {
           "de": "Beim Aushöhlen einer Box mit offener Oberseite gibt es jetzt den Schalter „Stapelbar“. Die äußere Hälfte der Wand ragt als Kragen über den Rand, und unter der Wand sitzt eine Nut, die den Kragen der Box darunter aufnimmt. So steht eine Box rutschfest auf der nächsten.\n\n– Die Höhe des Kragens stellst du selbst ein (3 mm am Anfang).\n– Boden und Unterseite bleiben flach: Die Box wird weiter auf dem Boden stehend gedruckt.\n– Es braucht gerade Wände und eine Wand von mindestens 1,2 mm.",
           "en": "When you hollow a box with its top open there is now a Stackable switch. The outer half of the wall rises above the rim as a collar, and under the wall sits a groove that takes the collar of the box below. One box then stands on the next without sliding.\n\n– You set the height of the collar yourself (3 mm to begin with).\n– The floor and the bottom stay flat: the box still prints standing on its floor.\n– It needs straight walls and a wall of at least 1.2 mm.",
+          "da": "Når du udhuler en æske med kun toppen åben, kan du nu slå Stabelbar til. Den ydre halvdel af væggen rager op over kanten som en krave, og under væggen sidder en rille, der tager imod kraven på æsken under. Så står en æske fast på den næste.\n\n– Du bestemmer selv kravens højde (3 mm til at begynne med).\n– Bunden og undersiden forbliver flade: æsken printes stadig stående på sin bund.\n– Den kræver lige vægge og en væg på mindst 1,2 mm.",
           "ar": "عندما تفرّغ صندوقًا وأعلاه مفتوح، يوجد الآن مفتاح «قابل للتكديس». يرتفع النصف الخارجي من الجدار فوق الحافة كطوق، ويقع تحت الجدار أخدود يستقبل طوق الصندوق الذي تحته. فيقف الصندوق فوق الذي يليه دون أن ينزلق.\n\n– تضبط ارتفاع الطوق بنفسك (3 مم في البداية).\n– يبقى القاع والسطح السفلي مسطحين: ما زال الصندوق يُطبع واقفًا على قاعه.\n– يحتاج إلى جدران مستقيمة وجدار لا يقل سمكه عن 1.2 مم."
         },
         "guide": {
@@ -58,11 +64,13 @@
         "title": {
           "de": "Deckel mit Klipp-Verschlüssen",
           "en": "Lid with clip latches",
+          "da": "Låg med klipslåse",
           "ar": "غطاء بأقفال ذات مشابك"
         },
         "body": {
           "de": "Im Deckel-Fenster gibt es neu „Latches“ (0 bis 4): Klipp-Verschlüsse wie bei einem Kamera-Akkufach. Der Körper bekommt dafür unter dem Rand je einen Zapfen zwischen zwei Wangen, der Deckel ebenso. Ein Klipp mit zwei C-förmigen Pfannen rastet auf beide Zapfen, bleibt am Deckel hängen und löst sich mit einem Zug am Griff.\n\nDie Klipps liegen als eigener Körper vor dem Deckel, auf der Seite, wie sie gedruckt werden, und die Wangen sind unten schräg, damit nichts Stützen braucht. Die Klippbreite (6 bis 30 mm) und der Sitz der Pfannen (Clip grip, 0,3 mm) sind einstellbar. Mit Scharnier sitzen die Verschlüsse auf der gegenüberliegenden Seite, ohne Scharnier auf Wunsch auch hinten. Es geht für den eingesetzten und den flachen Deckel auf dem Rand, nicht zusammen mit einem Griff. Gedruckt ist er noch nicht, der Sitz kann sich also noch ändern.",
           "en": "The Lid panel has new Latches (0 to 4): clip latches like those on a camera battery box. The body gets a pin between two cheeks below its rim for each one, and the lid gets the same. A clip with two C-shaped sockets snaps over both pins, stays hanging on the lid and comes off with a pull at its tab.\n\nThe clips lie in front of the lid as a body of their own, on their side as they print, and the cheeks slope underneath so nothing needs support. Clip width (6 to 30 mm) and the fit of the sockets (Clip grip, 0.3 mm) can be set. With a hinge the latches sit on the opposite side, without one they can also go on the back. It works for the push-in and the flat lid lying on the rim, not together with a handle. It has not been printed yet, so the fit may still change.",
+          "da": "Låg-panelet har nye Låse (0 til 4): klipslåse som på en batteriboks til et kamera. Kroppen får en stift mellem to kinder under kanten for hver af dem, og låget får det samme. Et klips med to C-formede huller klikker over begge stifter, bliver hængende i låget og løsnes med et træk i fligen.\n\nKlipsene ligger foran låget som en form for sig selv, på siden som de printes, og kinderne skråner under, så intet behøver støtte. Klipsbredde (6 til 30 mm) og hullernes pasform (Klipsgreb, 0,3 mm) kan indstilles. Med et hængsel sidder låsene på den modsatte side, uden et kan de også komme på bagsiden. Det virker til et låg, der Stikkes ind, og til et Fladt låg, der ligger på kanten, men ikke sammen med et greb. Det er ikke printet endnu, så pasformen kan stadig ændre sig.",
           "ar": "في لوحة «الغطاء» خيار جديد «أقفال» (من 0 إلى 4): أقفال بمشابك مثل تلك الموجودة على علبة بطاريات الكاميرا. يحصل الجسم تحت حافته على دبوس بين خدّين لكل قفل، ويحصل الغطاء على مثله. وينطبق مشبك فيه تجويفان على شكل حرف C فوق الدبوسين، ويبقى معلقًا بالغطاء، ويُنزع بسحب لسانه.\n\nتوضع المشابك أمام الغطاء كجسم مستقل، على جنبها كما تُطبع، والخدّان مائلان من الأسفل فلا يحتاج شيء إلى دعامات. ويمكن ضبط «عرض المشبك» (من 6 إلى 30 مم) وإحكام التجاويف («قبضة المشبك»، 0.3 مم). ومع المفصلة توضع الأقفال على الجانب المقابل، ومن دونها يمكن وضعها في الخلف أيضًا. يعمل ذلك مع الغطاء «يُدفع للداخل» والغطاء «مسطح» الذي يستقر على الحافة، وليس مع مقبض. لم يُطبع بعد، لذا قد تتغير الملاءمة."
         },
         "guide": {
@@ -73,11 +81,13 @@
         "title": {
           "de": "Chinesischer Text",
           "en": "Chinese text",
+          "da": "Kinesisk tekst",
           "ar": "النص الصيني"
         },
         "body": {
           "de": "Chinesischer Text kam bisher als Fragezeichen heraus, in jeder Schrift und sogar mit einer eigenen chinesischen Schrift. Jetzt geht er:\n\n– Vereinfachte und traditionelle Zeichen wie 说明书 und 說明書 gibt es in jeder eingebauten Schrift. Sie werden geholt, sobald ein Text sie zum ersten Mal braucht, darum zeigt so ein Text einen Moment lang Fragezeichen.\n– Eine eigene chinesische Schrift behält jetzt die gängigen Zeichen ihrer Sprache. Füge eine Schrift, die schon Fragezeichen zeigte, einmal neu hinzu.",
           "en": "Chinese text used to come out as question marks, in every font and even in a Chinese font of your own. Now it works:\n\n– Simplified and traditional characters such as 说明书 and 說明書 are in every built-in font. They are fetched the first time a text needs them, so such a text shows question marks for a moment.\n– A Chinese font of your own now keeps the common characters of its language. Add a font that showed question marks once more.",
+          "da": "Kinesisk tekst kom før ud som spørgsmålstegn, i enhver font og også i en kinesisk font af din egen. Nu virker det:\n\n– Forenklede og traditionelle tegn som 说明书 og 說明書 findes i alle indbyggede fonte. De hentes, første gang en tekst har brug for dem, så en sådan tekst viser spørgsmålstegn et øjeblik.\n– En kinesisk font af din egen beholder nu sit sprogs almindelige tegn. Tilføj en font, der engang viste spørgsmålstegn.",
           "ar": "كان النص الصيني يظهر علامات استفهام، في كل الخطوط وحتى في خط صيني خاص بك. الآن يعمل:\n\n– الحروف المبسطة والتقليدية مثل 说明书 و說明書 موجودة في كل الخطوط المدمجة. تُجلب في أول مرة يحتاجها فيها نص، لذا يظهر هذا النص بعلامات استفهام للحظة.\n– الخط الصيني الخاص بك يحتفظ الآن بالحروف الشائعة في لغته. أضف مرة أخرى الخط الذي كان يُظهر علامات استفهام."
         },
         "guide": [
@@ -93,11 +103,13 @@
         "title": {
           "de": "Textur auf dem Bauch einer gedrehten Vase",
           "en": "Texture on the belly of a turned vase",
+          "da": "Overfladestruktur på maven af en drejet vase",
           "ar": "النقش على بطن المزهرية الدورانية"
         },
         "body": {
           "de": "Eine aus einer Skizze gedrehte Vase hat auf dem Bauch Punktreihen, die nur wenige Tausendstel Millimeter auseinanderliegen. Die Oberflächentextur hielt sie für scharfe Kanten, und die Rillen wurden auf dem Bauch zu kurzen waagerechten Strichen, während der Hals sauber blieb. Jetzt werden solche Punkte zusammengefasst: Die Rillen laufen vom Hals über den ganzen Bauch, und beim Anklicken von Flächen bricht die Suche nicht mehr mit einem Fehler ab.",
           "en": "A vase turned from a sketch has rows of points on its belly that lie only a few thousandths of a millimetre apart. The surface texture took them for sharp edges, and on the belly the grooves came out as short horizontal dashes while the neck stayed clean. Now such points are joined: the grooves run from the neck over the whole belly, and picking faces no longer stops with an error.",
+          "da": "En vase drejet ud fra en skitse har rækker af punkter på maven, der ligger kun få tusindele af en millimeter fra hinanden. Overfladestrukturen tog dem for skarpe kanter, og på maven kom rillerne ud som korte vandrette streger, mens halsen blev ren. Nu er sådanne punkter forbundet: rillerne løber fra halsen over hele maven, og at vælge flader stopper ikke længere med en fejl.",
           "ar": "المزهرية المصنوعة بالدوران من رسم تخطيطي فيها على بطنها صفوف من النقاط لا يفصل بينها إلا بضعة أجزاء من الألف من المليمتر. كان نقش السطح يعدّها حوافًا حادة، فتخرج الأخاديد على البطن شرطاتٍ أفقية قصيرة بينما يبقى العنق نظيفًا. الآن تُدمج هذه النقاط: تمتد الأخاديد من العنق على البطن كله، ولم يعد اختيار الأوجه يتوقف بخطأ."
         }
       },
@@ -105,11 +117,13 @@
         "title": {
           "de": "Text um einen Körper mit Seiten ohne Streifen",
           "en": "Text round a body with sides without streaks",
+          "da": "Tekst rundt om en form med sider uden strejf",
           "ar": "نص حول جسم متعدد الأضلاع دون خطوط"
         },
         "body": {
           "de": "Lag ein breiter Text um einen Körper mit Seiten, etwa eine Platte mit 21 Seiten, wurden die Dreiecke der hinteren Seiten vor dem Schneiden nicht fein genug unterteilt, und die Buchstaben liefen dort als Streifen darüber. Jetzt werden die Seiten so fein unterteilt wie die Mitte, und der Text liest sich überall sauber.",
           "en": "When a wide text lay round a body with sides, such as a plate with 21 sides, the triangles of the far sides were not split fine enough before the letters were cut, and the letters ran across them as streaks. Now the sides are split as fine as the middle, and the text reads cleanly everywhere.",
+          "da": "Når en bred tekst lå rundt om en form med sider, som et polygon med 21 sider, blev trekantene i de fjerne sider ikke delt fint nok, før bogstaverne blev skåret, og bogstaverne løb hen over dem som strejf. Nu deles siderne lige så fint som midten, og teksten læses rent overalt.",
           "ar": "عندما كان نص عريض يلتف حول جسم متعدد الأضلاع، مثل لوح بـ21 ضلعًا، لم تكن مثلثات الأضلاع البعيدة تُقسَّم بدقة كافية قبل قطع الحروف، فتمتد الحروف عبرها خطوطًا. الآن تُقسَّم الأضلاع بدقة المنتصف نفسها، ويُقرأ النص بوضوح في كل مكان."
         }
       },
@@ -117,11 +131,13 @@
         "title": {
           "de": "Getippte Maße auch über die Platte hinaus",
           "en": "Typed sizes past the plate too",
+          "da": "Indtastede mål ud over pladen også",
           "ar": "المقاسات المكتوبة تتجاوز اللوحة أيضًا"
         },
         "body": {
           "de": "Waren mehrere Teile ausgewählt, wurde eine eingetippte Breite, Länge oder Höhe auf die Größe der Druckplatte gekürzt: 914 mm wurden zu 260 mm. Jetzt gilt die Zahl, wie du sie tippst, wie schon bei einem einzelnen Teil. Nur die Griffe hören weiter an der Platte auf.",
           "en": "With several parts selected, a typed width, length or height was cut down to the size of the plate: 914 mm became 260 mm. Now the number counts as you type it, as it already did for a single part. Only the handles still stop at the plate.",
+          "da": "Når flere dele var valgt, blev en indtastet bredde, længde eller højde skåret ned til pladens størrelse: 914 mm blev 260 mm. Nu tæller tallet, mens du taster det, som det allerede gjorde for én del. Kun håndtagene stopper stadig ved pladen.",
           "ar": "عند تحديد عدة قطع، كان العرض أو الطول أو الارتفاع المكتوب يُقصّ إلى مقاس اللوحة: فكان 914 مم يصبح 260 مم. الآن يُعتمد الرقم كما تكتبه، كما كان من قبل مع القطعة الواحدة. أما المقابض فما زالت تتوقف عند اللوحة."
         },
         "guide": {
@@ -132,11 +148,13 @@
         "title": {
           "de": "Zwei weitere Platinen",
           "en": "Two more boards",
+          "da": "To print mere",
           "ar": "لوحتان إضافيتان"
         },
         "body": {
           "de": "Die Platinen-Form kennt zwei weitere Platinen: den FriendlyELEC NanoPi NEO3 Plus und den Waveshare ESP32-P4-NANO. Beide sind nach den CAD-Dateien der Hersteller gebaut, mit Löchern, Buchsen und Tasten an ihrem Platz, damit ein Gehäuse um sie herum passt.",
           "en": "The SBC board shape knows two more boards: the FriendlyELEC NanoPi NEO3 Plus and the Waveshare ESP32-P4-NANO. Both are built from the makers' CAD files, with their holes, sockets and buttons in place, so a case fits round them.",
+          "da": "SBC-printformen kender to print mere: FriendlyELEC NanoPi NEO3 Plus og Waveshare ESP32-P4-NANO. Begge er bygget fra producenternes CAD-filer, med deres huller, stik og knapper på plads, så en kasse passer omkring dem.",
           "ar": "يعرف شكل «لوحة SBC» لوحتين إضافيتين: FriendlyELEC NanoPi NEO3 Plus وWaveshare ESP32-P4-NANO. كلتاهما مبنية من ملفات CAD الخاصة بالمصنّعين، بثقوبها ومنافذها وأزرارها في مواضعها، فيلائمها الصندوق."
         },
         "guide": {
@@ -147,11 +165,13 @@
         "title": {
           "de": "Gedrehte Teile in der Skizze richtig herum",
           "en": "Turned parts the right way round in a sketch",
+          "da": "Drejede dele vendt rigtigt i en skitse",
           "ar": "القطع المُدارة في الاتجاه الصحيح في الرسم التخطيطي"
         },
         "body": {
           "de": "Ein gedrehter Quader oder ein runder Körper unter einer Skizze war falsch herum gedreht: 45° wurden zu −45°, ein Balken lief als „\\“ statt als „/“. Jetzt liegen sein Umriss und die Punkte, an denen eine Linie einrastet, genau dort, wo das Teil steht.",
           "en": "A turned box or round body under a sketch was turned the wrong way round: 45° came out as −45°, a bar ran as \"\\\" instead of \"/\". Now its outline and the points a line snaps to lie exactly where the part stands.",
+          "da": "En drejet kasse eller et rundt legeme under en skitse blev drejet den forkerte vej: 45° kom ud som −45°, en streg løb som \"\\\" i stedet for \"/\". Nu ligger dens omrids og de punkter, en linje snapper til, nøjagtig, hvor delen står.",
           "ar": "كان الصندوق أو الجسم المستدير المُدار تحت رسم تخطيطي يظهر مُدارًا في الاتجاه المعاكس: 45° تصبح ‎−45°، والقضيب يمتد هكذا \"\\\" بدلًا من \"/\". الآن يقع حده الخارجي والنقاط التي يلتقطها الخط تمامًا حيث تقف القطعة."
         },
         "guide": {
@@ -162,11 +182,13 @@
         "title": {
           "de": "Aufheben hält die Form",
           "en": "Ungrouping keeps the shape",
+          "da": "Opdel bevarer formen",
           "ar": "فك التجميع يحافظ على الشكل"
         },
         "body": {
           "de": "Ein verrundetes Sechseck aus einer Gruppe kam beim Aufheben gestaucht zurück, weil die Verrundung an den Spitzen für ein Verkleinern gehalten wurde. Jetzt kommen die Teile in ihren alten Maßen zurück.",
           "en": "A filleted hexagon made from a group came back squashed when it was ungrouped, as the fillet on its points was taken for a resize. Now the parts come back at their old size.",
+          "da": "En afrundet sekskant lavet af en gruppe kom tilbage presset sammen, da den blev opdelt, fordi afrundingen på dens spidser blev taget for en størrelsesændring. Nu kommer delene tilbage i deres gamle størrelse.",
           "ar": "كان المسدس المنعّم المصنوع من مجموعة يعود مضغوطًا عند فك تجميعه، لأن التنعيم على رؤوسه كان يُعدّ تغييرًا للحجم. الآن تعود الأجزاء بحجمها السابق."
         }
       },
@@ -174,11 +196,13 @@
         "title": {
           "de": "Knöpfe der eigenen Formen in älterem Firefox",
           "en": "Custom shape buttons in an older Firefox",
+          "da": "Knapper på egne former i en ældre Firefox",
           "ar": "أزرار الأشكال المخصصة في إصدار أقدم من Firefox"
         },
         "body": {
           "de": "In Firefox bis Version 120, etwa dem letzten Firefox auf Windows 7, blieben die Knöpfe auf den Kacheln der eigenen Formen unsichtbar: Verschieben, Umbenennen und Löschen. Ebenso die Knöpfe an den Ordnern. Jetzt erscheinen sie, sobald die Maus auf einer Kachel liegt.",
           "en": "In Firefox up to version 120, such as the last Firefox on Windows 7, the buttons on the custom shapes' tiles stayed invisible: move, rename and delete. So did the buttons on the folders. Now they show as soon as the mouse rests on a tile.",
+          "da": "I Firefox til og med version 120, som den sidste Firefox på Windows 7, forblev knapperne på egne formers fliser usynlige: flyt, omdøb og slet. Det gjorde knapperne på mapperne også. Nu viser de sig, så snart musen hviler på en flise.",
           "ar": "في Firefox حتى الإصدار 120، مثل آخر Firefox على Windows 7، بقيت الأزرار على بطاقات الأشكال المخصصة غير مرئية: النقل وإعادة التسمية والحذف. وكذلك الأزرار على المجلدات. الآن تظهر بمجرد أن تستقر الفأرة على البطاقة."
         },
         "guide": {
@@ -189,11 +213,13 @@
         "title": {
           "de": "Liegende Teile länger ziehen",
           "en": "Pull lying parts longer",
+          "da": "Træk liggende dele længere",
           "ar": "سحب القطع المستلقية لتطويلها"
         },
         "body": {
           "de": "Ein Teil, das auf der Seite liegt, etwa ein Quader auf der Stirnseite einer liegenden Schiene, blieb beim Ziehen am Höhengriff bei der Höhe des Druckers stehen. Seine Höhe läuft aber waagerecht. Jetzt reicht der Griff so weit, wie die Platte breit ist.",
           "en": "A part lying on its side, such as a box placed on the end face of a lying rail, stopped at the printer's height when you pulled its height handle, although its height runs along the plate. Now the handle reaches as far as the plate is wide.",
+          "da": "En del, der lå på siden, som en kasse sat på enden af en liggende skinne, stoppede ved printerens højde, når du trak i dens højdehåndtag, selv om højden løber langs pladen. Nu rækker håndtaget, så langt pladen er bred.",
           "ar": "القطعة المستلقية على جنبها، مثل صندوق موضوع على الوجه الطرفي لسكة مستلقية، كانت تتوقف عند ارتفاع الطابعة عندما تسحب مقبض ارتفاعها، مع أن ارتفاعها يمتد على طول اللوحة. الآن يصل المقبض إلى عرض اللوحة."
         },
         "guide": {
@@ -209,11 +235,13 @@
         "title": {
           "de": "Einzelne Schritte des Verlaufs löschen",
           "en": "Delete single steps of the history",
+          "da": "Slet enkelte trin i historikken",
           "ar": "حذف خطوات مفردة من السجل"
         },
         "body": {
           "de": "Ein großer Entwurf lässt sich jetzt leichter machen, ohne den ganzen Verlauf zu verlieren. Öffne die Verlaufsansicht und dort die Liste der Schritte: Neben jedem Schritt steht, wie viel Platz sein Löschen etwa freigibt, und oben, wie viel der ganze Verlauf belegt.\n\n– Der Papierkorb neben einem Schritt löscht nur diesen Schritt. Der Entwurf bleibt, wie er ist.\n– „Größte Schritte löschen“ wählt alle Schritte, die allein 1 MB oder mehr freigeben, und fragt vorher.\n– Meist sind das Schritte, in denen ein Körper gedreht wurde: Jede Drehung speichert ein neues Netz.\n\nSpeichert der Browser einen Entwurf nur mit gekürztem Verlauf, öffnet der Knopf im Hinweis gleich diese Liste.",
           "en": "A large design can now be made lighter without losing its whole history. Open the History view and its list of steps: beside each step stands about how much room deleting it would free, and at the top how much the whole history takes.\n\n– The bin beside a step deletes that step alone. The design stays as it is.\n– Delete largest steps picks every step that frees 1 MB or more on its own, and asks first.\n– Those are mostly steps where a body was turned: every turn stores a new mesh.\n\nWhen the browser stores a design only with a shortened history, the button in the note opens this list right away.",
+          "da": "Et stort design kan nu gøres lettere uden at miste hele historikken. Åbn historikvisningen og dens liste over trin: ved siden af hvert trin står omtrent, hvor meget plads sletning af det ville frigøre, og øverst, hvor meget hele historikken tager.\n\n– Skraldespanden ved siden af et trin sletter kun det trin. Designet forbliver, som det er.\n– Slet de største trin vælger hvert trin, der alene frigør 1 MB eller mere, og spørger først.\n– Det er for det meste trin, hvor et legeme blev drejet: hver drejning gemmer et nyt mesh.\n\nNår browseren gemmer et design kun med en forkortet historik, åbner knappen i beskeden denne liste med det samme.",
           "ar": "يمكن الآن تخفيف التصميم الكبير دون فقدان سجله كله. افتح عرض السجل وقائمة خطواته: بجانب كل خطوة تقدير للمساحة التي يحرّرها حذفها، وفي الأعلى حجم السجل كله.\n\n– سلة المهملات بجانب الخطوة تحذف تلك الخطوة وحدها. ويبقى التصميم كما هو.\n– «حذف أكبر الخطوات» يختار كل خطوة تحرّر وحدها 1 ميغابايت أو أكثر، ويسأل أولًا.\n– هذه في الغالب خطوات دُوِّر فيها جسم: فكل تدوير يحفظ شبكة جديدة.\n\nعندما لا يحفظ المتصفح التصميم إلا بسجل مختصر، يفتح الزر في التنبيه هذه القائمة مباشرة."
         },
         "guide": {
@@ -272,11 +300,13 @@
         "title": {
           "de": "Rechtsklick-Menü ohne doppelten Text",
           "en": "Right-click menu without repeated text",
+          "da": "Højreklikmenu uden gentaget tekst",
           "ar": "قائمة النقر بالزر الأيمن دون نص مكرر"
         },
         "body": {
           "de": "Zeigte die Maus im Rechtsklick-Menü auf einen Eintrag, erschien derselbe Text noch einmal als Hinweis darüber. Die Einträge zeigen ihren Text ja schon ganz, der Hinweis kommt dort nicht mehr.",
           "en": "Resting the mouse on an item of the right-click menu showed the same text again as a hint above it. The items show their text in full already, so the hint no longer comes there.",
+          "da": "Når musen hvilede på en kommando i højreklikmenuen, viste der den samme tekst igen som en forklaring oven over den. Kommandoerne viser allerede deres fulde tekst, så den forklaring kommer der ikke mere.",
           "ar": "كان وضع الفأرة على عنصر في قائمة النقر بالزر الأيمن يُظهر النص نفسه مرة أخرى كتلميح فوقه. العناصر تعرض نصها كاملًا أصلًا، لذا لم يعد التلميح يظهر هناك."
         }
       },
@@ -284,11 +314,13 @@
         "title": {
           "de": "STEP-Export: Aussparungs-Gruppen schneiden wie im Editor",
           "en": "STEP export: groups set as a hole cut as in the editor",
+          "da": "STEP-eksport: grupper sat som hul skærer som i redigeringen",
           "ar": "تصدير STEP: المجموعات المضبوطة كثقب تقطع كما في المحرر"
         },
         "body": {
           "de": "Eine als Aussparung gesetzte Gruppe, in der ein fester Körper mit eigener Aussparung steckte, etwa ein Quader mit ausgeschnittener Kapsel, der eine verrundete Kapsel auf einen Umriss zuschneidet, kam im STEP-Export falsch heraus: Der feste Körper fehlte, und die innere Aussparung schnitt stattdessen den Körper aus. Übrig blieb ein dünner Ring. Jetzt schneidet die Gruppe in der STEP-Datei genau so wie im Editor.",
           "en": "A group set as a hole that held a solid with a hole of its own, such as a box with a capsule cut out of it trimming a rounded capsule to an outline, came out wrong in the STEP export: the solid was missing and the inner hole cut the body instead, leaving a thin ring. Now the group cuts the STEP file just as it cuts the design in the editor.",
+          "da": "En gruppe sat som hul, som indeholdt en solid med sit eget hul, som en kasse med en kapsel skåret ud af den, der trimmede en rund kapsel til et omrids, kom ud forkert i STEP-eksporten: soliden manglede, og det indre hul skar i legemet i stedet og efterlod en tynd ring. Nu skærer gruppen STEP-filen lige sådan, som den skærer designet i redigeringen.",
           "ar": "المجموعة المضبوطة كثقب التي تحتوي على جسم صلب فيه ثقب خاص به، مثل صندوق قُطعت منه كبسولة يقصّ كبسولة مستديرة إلى حد خارجي، كانت تخرج خطأً في تصدير STEP: يغيب الجسم الصلب ويقطع الثقب الداخلي الجسم بدلًا منه، فتبقى حلقة رفيعة. الآن تقطع المجموعة ملف STEP تمامًا كما تقطع التصميم في المحرر."
         }
       },
@@ -296,11 +328,13 @@
         "title": {
           "de": "Suche findet Namen in jeder Schrift",
           "en": "Search finds names in any script",
+          "da": "Søgning finder navne i ethvert skriftsystem",
           "ar": "البحث يجد الأسماء بأي نظام كتابة"
         },
         "body": {
           "de": "Die Befehlssuche (Strg+K) und die Formensuche fanden in Sprachen ohne lateinische Schrift nichts: Im japanischen Editor ließ „円柱“ die ganze Liste stehen. Jetzt wird ein Name in jeder Schrift gefunden, so wie er in der Sprache der Oberfläche steht: Japanisch, Chinesisch, Russisch, Arabisch und mehr, auch Namen mit Bindestrich oder Klammern wie „USB-C“.\n\nVoll- und Halbbreite, Katakana und Hiragana sowie Akzente gelten als gleich. Ein Suchwort aus nur Satzzeichen findet nichts mehr statt alles. Beim Schreiben mit einer Eingabemethode (Kana zu Kanji, Pinyin) gehören Esc, Pfeile und Enter der Eingabemethode und schließen das Fenster nicht mehr.",
           "en": "The command search (Ctrl+K) and the shape search found nothing in languages that are not written in Latin letters: in the Japanese editor, typing \"円柱\" left the whole list standing. Now a name is found in any script, as it is written in the language of the interface: Japanese, Chinese, Russian, Arabic and more, also names with a hyphen or brackets such as \"USB-C\".\n\nFull-width and half-width letters, katakana and hiragana, and accents count as the same. A search word of nothing but punctuation finds nothing instead of everything. While you write with an input method (kana to kanji, pinyin), Esc, the arrows and Enter belong to the input method and no longer close the window.",
+          "da": "Kommando-søgningen (Ctrl+K) og formesøgningen fandt intet på sprog, der ikke skrives med latinske bogstaver: i den japanske redigering efterlod skrivningen af \"円柱\" hele listen stående. Nu findes et navn i ethvert skriftsystem, som det står på grænsefladens sprog: japansk, kinesisk, russisk, arabisk og mere, også navne med en bindestreg eller kantede parenteser som \"USB-C\".\n\nTegn i fuld og halv bredde, katakana og hiragana samt accenter regnes for ens. Et søgeord, der kun består af tegn, finder intet i stedet for alt. Mens du skriver med en inputmetode (kana til kanji, pinyin), hører Esc, piletasterne og Enter til inputmetoden og lukker ikke længere vinduet.",
           "ar": "لم يكن البحث عن الأوامر (Ctrl+K) والبحث عن الأشكال يجدان شيئًا في اللغات التي لا تُكتب بالحروف اللاتينية: في المحرر الياباني كانت كتابة \"円柱\" تترك القائمة كلها كما هي. الآن يُعثر على الاسم بأي نظام كتابة، كما يُكتب بلغة الواجهة: اليابانية والصينية والروسية والعربية وغيرها، وكذلك الأسماء التي فيها شرطة أو أقواس مثل \"USB-C\".\n\nالأحرف كاملة العرض ونصف العرض، والكاتاكانا والهيراغانا، والعلامات فوق الأحرف تُعدّ واحدة. وكلمة بحث لا تحوي إلا علامات ترقيم لا تجد شيئًا بدلًا من أن تجد كل شيء. وأثناء الكتابة بطريقة إدخال (من الكانا إلى الكانجي، أو البينيين)، تتبع Esc والأسهم وEnter طريقة الإدخال ولم تعد تغلق النافذة."
         },
         "guide": {

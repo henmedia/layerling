@@ -80,6 +80,8 @@ Die {{ui:shell.edges}} wirken nur dort, wo die Innenwände auseinanderlaufen - a
 
 Ist oben die einzige offene Seite, macht {{ui:shell.stack}} die Box stapelbar: Die äußere Hälfte der Wand ragt als Kragen über den Rand ({{ui:shell.stackHeight}}, zu Beginn 3 mm), und unter der Wand wird eine um einen Millimeter tiefere Nut ausgespart, die den Kragen der Box darunter aufnimmt. Eine Box steht dann rutschfest auf der nächsten. Boden und Unterseite bleiben flach, die Box wird also weiter auf dem Boden stehend gedruckt, ohne dass etwas in der Luft hängt. Es braucht gerade Wände, eine Wand von mindestens 1,2 mm und einen Körper, der deutlich höher ist als der Kragen; geht es nicht, sagt das Werkzeugfenster warum.
 
+Ist oben die einzige offene Seite, legt {{ui:shell.shelf}} rundum an der Innenseite der Wand eine Auflage an, auf die eine Platte gelegt werden kann, zum Beispiel ein Regalboden oder ein Zwischenboden in der Box ({{ui:shell.shelfWidth}}, zu Beginn 1,5 mm, 0,5 bis 5 mm). {{ui:shell.shelfHeight}} wird von der Innenseite des Bodens bis zur Oberkante der Auflage gemessen (zu Beginn 20 mm). Die Auflage ist 2 mm dick und folgt der Form der Innenseite, abgerundete Ecken und runde Boxen eingeschlossen. Sie braucht Wände, die gerade nach oben gehen, und einen Körper, der deutlich höher ist als die Höhe der Auflage; ist {{ui:shell.stack}} eingeschaltet, wird der Kragen um sie herum gebaut. Geht es nicht, sagt das Werkzeugfenster, warum.
+
 ![Das Ergebnis: eine Schale mit 3 mm Wand, oben offen.](shot:hollow-result)
 
 ![Derselbe Quader, nur an der Vorderseite offen: ein Schlitz für eine Schublade.](shot:hollow-sides)
