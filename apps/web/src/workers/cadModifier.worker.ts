@@ -7,6 +7,8 @@ import { cornerEdgeCandidates, edgesTouchingEnds } from "@/lib/cadCornerEdges";
 import { innerCornerEdges, treatAfterInnerCorners } from "@/lib/cadInnerCorners";
 import { OcctKernel, type OcctModuleFactory, type ShapeHandle } from "occt-wasm";
 import { assertCadKernelRunnable } from "@/lib/wasmSupport";
+import { SHELF_NEEDS_TOP_MESSAGE, shellShelfSolid } from "@/lib/cadShellShelf";
+import { DEFAULT_SHELL_SHELF_HEIGHT } from "@/lib/shellShelfLimits";
 import { STACK_NEEDS_TOP_MESSAGE, shellStackSolid } from "@/lib/cadShellStack";
 import { shellOpenSides } from "@/lib/shellLimits";
 import { CANNOT_OFFSET_MESSAGE, offsetSolid, offsetSolidSideways, orientedFaceNormal, shellSolid, shellThreadByCore, threadShellCoreOf, type ThreadShellCore } from "@/lib/cadShell";
@@ -1358,6 +1360,14 @@ async function bearbeiteAnfrage(request: CadModifierWorkerRequest, halter: { cad
         component = threadShellCore && baseSolids.length === 1
           ? shellThreadByCore(activeCad, solid, threadShellCore, request.amount, request.shellOpenings ?? "none", request.shellEdges)
           : shellSolid(activeCad, solid, request.amount, request.shellOpenings ?? "none", request.shellEdges);
+        // The shelf ledge (#1663) goes in first, so the collar and the groove are cut round it.
+        if (request.shellShelf && request.shellShelf > 0) {
+          const open = shellOpenSides(request.shellOpenings);
+          if (open.length !== 1 || open[0] !== "top") throw new Error(SHELF_NEEDS_TOP_MESSAGE);
+          const shelved = shellShelfSolid(activeCad, component, request.shellShelf, request.shellShelfHeight ?? DEFAULT_SHELL_SHELF_HEIGHT, request.amount);
+          activeCad.release(component);
+          component = shelved;
+        }
         // Stacking: a collar round the top and a groove under the wall, only for a body hollowed with its top open.
         if (request.shellStack && request.shellStack > 0) {
           const open = shellOpenSides(request.shellOpenings);

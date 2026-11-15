@@ -1472,6 +1472,8 @@ export const tools = [
         },
         edges: { type: "string", enum: ["round", "sharp"] },
         stack: { type: "number", description: "Collar height in millimetres (1 to 10) for a stackable box; leave out for none." },
+        shelf: { type: "number", description: "Width in millimetres (0.5 to 5) of a ledge all round the inside of the wall for a plate to rest on (#1663); only with the top as the one open side; leave out for none." },
+        shelfHeight: { type: "number", description: "With shelf: how high in millimetres (4 to 200) the top of the ledge lies above the inside of the floor; default 20." },
       },
     },
   },
