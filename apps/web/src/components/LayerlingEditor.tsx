@@ -19,7 +19,7 @@ import { loftShapePatch, normalizeLoftMiddles, type LoftMeasures } from "@/lib/l
 import { hingePartScope, hingeWorldParts } from "@/lib/hingeParts";
 import { copyViaSelectionField, decodeClipboardPayload, encodeClipboardPayload, LOCAL_CLIPBOARD_LIMIT, newestClipboard, type ClipboardPayload } from "@/lib/clipboardPayload";
 import { bentTubeNaturalDimensions, normalizedBentTubeFields } from "@/lib/bentTubeGeometry";
-import { GRIDFINITY_SWALLOWTAIL_KEY_THICKNESS, gridfinityHasLabelText, gridfinityOutlineFit, gridfinityOutlineFromLoops, gridfinityOutlineToPlate, gridfinityPlan, gridfinityPlateFlat, gridfinityPlateToWorld, gridfinitySceneWithKeys, gridfinitySwallowtailKeyCount, gridfinitySwallowtailKeyProfile, gridfinitySwallowtailKeys } from "@/lib/gridfinityGeometry";
+import { GRIDFINITY_SWALLOWTAIL_KEY_THICKNESS, gridfinityHasLabelText, gridfinityOutlineFit, gridfinityOutlineFromLoops, gridfinityOutlineToPlate, gridfinityPlan, gridfinityPlateFlat, gridfinityPlatePieceKeys, gridfinityPlatePieces, gridfinityPlateSplit, gridfinityPlateToWorld, gridfinitySceneWithKeys, gridfinitySceneWithPieces, gridfinitySwallowtailKeyCount, gridfinitySwallowtailKeyProfile, gridfinitySwallowtailKeys } from "@/lib/gridfinityGeometry";
 import { DEFAULT_THREAD_PROFILE, defaultThreadHeadHeight, normalizeThreadHeadHeight, threadCollarFields, threadCollarSettings, threadDriveFields, threadDriveSettings, threadNaturalFootprint, threadSettings } from "@/lib/threadGeometry";
 import { textOffsetAsFill } from "@/lib/textFillChoice";
 import { curvedTextPatch, MAX_TEXT_LETTER_WIDTH, MAX_TEXT_SPACING, MIN_TEXT_LETTER_WIDTH, MIN_TEXT_SPACING } from "@/lib/textGeometry";
@@ -215,7 +215,7 @@ import { withStencilBridges } from "@/lib/stencilBridgeSection";
 import type { CrossSection } from "manifold-3d";
 import { DrawingTooComplexError } from "@/lib/drawingProjection";
 import { DEFAULT_TAPER_DIMENSION_MAX, keyboardNudgeCoarseFactor, keyboardNudgeStep, normalizeShapeCustomizations, normalizeSnapGrid, normalizeWorkspaceSettings, shapeDimensionLimit, workplaneSettingsFingerprint } from "@/lib/workplaneSettings";
-import { mcpGridfinityOutlinePatch, mcpGridfinityPatch, mcpGridfinityPaddingPatch, mcpThreadSizeParams } from "@/lib/mcpShapeSettings";
+import { MCP_GRIDFINITY_SPLIT_NEEDS, mcpGridfinityOutlinePatch, mcpGridfinityPatch, mcpGridfinityPaddingPatch, mcpGridfinitySplitCheck, mcpThreadSizeParams } from "@/lib/mcpShapeSettings";
 import { createNoteId, normalizeNotes, NOTE_COUNT_LIMIT, NOTE_TEXT_LIMIT, referencePoints } from "@/lib/workplaneNotes";
 import { findShapeInHistoryState } from "@/lib/historyRestore";
 import { noteAnchorFromWorld, notesAfterShapeChange, notesPinnedTo, notesPutBack } from "@/lib/noteAnchoring";
@@ -12557,6 +12557,38 @@ export function LayerlingEditor({
   }, [commitShapes]);
 
   /**
+   * A baseplate larger than the chosen printer's bed, split on its cell lines into the fewest plates that fit it (#1388),
+   * each with Swallowtail, in its place and selected, and a key for each pair of pockets across a seam laid out in one row
+   * in front of it; its keys from before give way. One undo step. The same code the MCP's gridfinitySplit uses.
+   */
+  const splitGridfinityPlate = useCallback(async (plateId: string) => {
+    const fail = (message: string) => {
+      setNotice(message, true);
+      return { ok: false as const, message };
+    };
+    const plate = shapesRef.current.find((shape) => shape.id === plateId);
+    if (!plate) return { ok: false as const, message: MCP_GRIDFINITY_SPLIT_NEEDS };
+    if (plate.locked) return fail(t("status.objectLocked"));
+    if (holdsShapeLock(plate)) return fail(t("status.shapeLockHeld", { name: displayShapeName(plate) }));
+    const printer = printerPresetById(workspaceSettingsRef.current.printer);
+    const split = gridfinityPlateSplit({ ...plate, depth: shapeDepth(plate) }, printer);
+    if (!printer || !split) return { ok: false as const, message: MCP_GRIDFINITY_SPLIT_NEEDS };
+    const sourceFingerprint = projectShapesFingerprint(shapesRef.current);
+    const sourceProjectId = projectInfoRef.current.projectId;
+    try {
+      const built = await cadShapeFromSketchProfile(gridfinitySwallowtailKeyProfile(plate), GRIDFINITY_SWALLOWTAIL_KEY_THICKNESS, null);
+      if (projectInfoRef.current.projectId !== sourceProjectId || projectShapesFingerprint(shapesRef.current) !== sourceFingerprint) return fail(t("status.gridfinityKeysChanged"));
+      if (historyViewStateRef.current) return fail(t("status.historyViewBlocksEdits"));
+      const pieces = gridfinityPlatePieces(plate, split, displayShapeName(plate), () => createLocalId("gridfinity"), (piece) => rebasePaintStrokes(plate.paint ?? [], plate, piece)).map(canonicalizeShape);
+      const keys = gridfinityPlatePieceKeys(pieces, split, boundsForShapes([plate]), built, shapeDepth(built), t("gridfinity.swallowtailKey"), () => createLocalId("swallowtail-key")).map(canonicalizeShape);
+      commitShapes(gridfinitySceneWithPieces(shapesRef.current, plate.id, pieces, keys), pieces.map((piece) => piece.id), t("status.gridfinitySplit", { count: pieces.length, printer: `${printer.vendor} ${printer.model}`, keys: keys.length }));
+      return { ok: true as const, pieces, keys };
+    } catch (error) {
+      return fail(error instanceof Error ? localizedError(error.message) : t("status.sketchCannotExtrude"));
+    }
+  }, [commitShapes]);
+
+  /**
    * A vase's accessories (legs to plug in, a stand, a saucer, an insert, a lid), laid out beside it ready to
    * print; the ones laid out for it before give way, so changed settings come out new. Returns the new parts
    * and the kinds asked for that this vase does not allow.
@@ -13837,6 +13869,7 @@ export function LayerlingEditor({
           return rotationWasRequested ? canonicalizeShape(bakeShapeTransformIntoMesh(canonical)) : canonical;
         });
         let updated = nextShapes.find((shape) => shape.id === target.id) as WorkplaneShape;
+        mcpGridfinitySplitCheck({ ...updated, depth: shapeDepth(updated) }, params, printerPresetById(workspaceSettingsRef.current.printer));
         if (params.gridfinityKeys === true && gridfinitySwallowtailKeyCount({ ...updated, depth: shapeDepth(updated) }) === 0) throw new Error(MCP_GRIDFINITY_KEYS_NEEDS);
         commitShapes(nextShapes, target.id, t("status.shapeUpdatedMcp", { name: displayShapeName(updated) }));
         // A group that keeps its holes and small parts is built again at its new size (#526); the answer waits for it.
@@ -13883,6 +13916,11 @@ export function LayerlingEditor({
         if (updated.kind === "vase" && params.vaseParts === true) {
           const { parts, missing } = layOutVaseAccessories(updated.id);
           return { object: mcpShapeSummary(updated), parts: parts.map(mcpShapeSummary), ...(missing.length ? { notPossible: missing } : {}) };
+        }
+        // The plate is gone after a split (#1388): its pieces come back as objects, their keys as parts.
+        if (params.gridfinitySplit === true) {
+          const made = await splitGridfinityPlate(updated.id);
+          return made.ok ? { objects: made.pieces.map(mcpShapeSummary), parts: made.keys.map(mcpShapeSummary) } : { object: mcpShapeSummary(updated), parts: [], notPossible: [made.message] };
         }
         if (params.gridfinityKeys === true) {
           const made = await makeSwallowtailKeys(updated.id);
@@ -16756,6 +16794,7 @@ export function LayerlingEditor({
     updateProjectAttachments,
     layOutVaseAccessories,
     makeSwallowtailKeys,
+    splitGridfinityPlate,
     invertSelection,
     hideOthers,
     fitBodyToNeck,
@@ -19374,6 +19413,7 @@ export function LayerlingEditor({
           onSurfaceRegionLasso={surfaceRegionLasso}
           onVaseAccessories={selectedShapes.length === 1 && selectedShape?.kind === "vase" && !bodyLocked(selectedShape) ? () => layOutVaseAccessories(selectedShape.id) : undefined}
           onGridfinityKeys={selectedShapes.length === 1 && selectedShape?.kind === "gridfinity" && selectedShape.gridfinitySwallowtail === true && !historyViewState ? () => void makeSwallowtailKeys(selectedShape.id) : undefined}
+          onGridfinitySplit={selectedShapes.length === 1 && selectedShape?.kind === "gridfinity" && !historyViewState ? () => void splitGridfinityPlate(selectedShape.id) : undefined}
           onLayerText={selectedShapes.length === 1 && offersTextLayers(selectedShape) ? layerSelectedText : undefined}
           onTextTags={selectedShapes.length === 1 && offersTextLayers(selectedShape) ? makeTextTags : undefined}
           onTextBlock={selectedShapes.length === 1 && offersTextBlock(selectedShape) && !historyViewState ? makeTextBlock : undefined}
