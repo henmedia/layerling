@@ -127,6 +127,41 @@ Do not build these until Marcus says so.
   Properties/Position (this concerns Stefan's card view). Stefan asked Marcus.
 - **#1587**: sliding latch for boxes, print-in-place if possible, with an "OPEN" sign. Stefan asked Marcus.
 
+## F. Stackable boxes, Gridfinity floor and dividers: what exists (checked 15 November 2026)
+
+Marcus built these in another chat and said they are finished. Checked against `origin/marcus` at 7be830b24 and Stefan's
+`main` at 1.165.2. **Do not build any of this again.**
+
+At Stefan already (PR #1756, merged, branch `shell-stackable`):
+- Hollow: a stackable box (skirt under the bottom, collar on top).
+
+Only in Marcus's fork, no PR at Stefan yet:
+- Hollow: a Gridfinity floor fitted to the grid, with dividers, for a box with the top open (Discussion #1693).
+  Branch `shell-gridfinity-floor` (5 commits, `4c21aba60` to `12e0ce591`). It takes every cell that fits when the slider is
+  at its end, a floor that is switched off stays off, and Apply on a hollowed body replaces the hollowing.
+- Hollow: the tool opens with the settings the body was hollowed with. Cells can be set across and along; the box is made
+  as large as they need.
+- Hollow: stacking with a foot like Gridfinity bins, and a matching stacking lid; stacking also takes rounded corners and
+  rounded top and bottom edges (`0ee0ebde2`, `fd3f2d508`). Only on `marcus` and `stack-hinge-lid`.
+- Lid: a stacking top for a plug lid, hinged or not, printed upright, with a switch in the lid panel and in the MCP tool
+  (`50e094d73`, `7be830b24`). Only on `marcus`.
+- Lid: magnets that reach into the Gridfinity cells of the floor are reported; a body that changed after hollowing says why
+  it cannot be hollowed again (`e23f832e7`).
+- Surface texture: the walls of a Gridfinity socket and the ridges between sockets count as inside (`b3a44f650`); a
+  textured hollow body that is resized is hollowed and textured again (`3d01e62e8`).
+
+Checks on `marcus` at 7be830b24 (a copy checked out read-only, nothing changed on the branch):
+- `npm run typecheck`: green. Unit tests: 630 files, all green.
+- `npm run test:e2e`: 176 of 177 files green. One fails: `tests/e2e/printCheckPanel.e2e.ts`, "says that it only checks, and
+  opens the export (Discussion #1715)". Cause: on `marcus` the Print check window is docked (`MovableToolPanel`, `ToolHint`).
+  The hint now has its own "more" button, so `hint.querySelector("button")` is no longer the export button. The fix is in
+  the test: pick `.print-check-export .print-check-show`. Not done yet, because another chat works on `marcus`.
+- `marcus` is behind Stefan's `main` by some commits. A test merge conflicts only in `docs/CHANGELOG.md` and
+  `docs/whatsNew-unreleased.json`.
+
+Possible PRs to Stefan, only when Marcus says so: the Gridfinity floor (`shell-gridfinity-floor`), the two newer commits
+of `shell-stackable`, the stacking foot and lid, the lid stacking top.
+
 ## Status page
 
 Marcus's overview is a page on claude.ai that Copilot cannot reach. Do not try. Tell Marcus in German what you did, and
