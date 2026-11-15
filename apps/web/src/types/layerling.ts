@@ -406,6 +406,8 @@ export type ShapeCustomization = {
   gridfinityCompartmentsZ?: number;
   /** Gridfinity bin: the dividers' thickness in mm, 0.8 to 3; missing is 1.2. */
   gridfinityDividerThickness?: number;
+  /** Gridfinity bin: the dividers' height over the floor in mm, at least 3; missing, 0, or within 0.1 mm of the full height or over it is the full height (#1560). */
+  gridfinityDividerHeight?: number;
   /** Knurling: grooves straight along the axis, or crossed into diamonds. */
   knurlPattern?: "straight" | "diamond" | "round";
   /** Knurling: number of grooves around the grip. */
@@ -1354,6 +1356,8 @@ export type WorkplaneShape = {
   gridfinityCompartmentsZ?: number;
   /** Gridfinity bin: the dividers' thickness in mm, 0.8 to 3; missing is 1.2. */
   gridfinityDividerThickness?: number;
+  /** Gridfinity bin: the dividers' height over the floor in mm, at least 3; missing, 0, or within 0.1 mm of the full height or over it is the full height (#1560). */
+  gridfinityDividerHeight?: number;
   /** Gridfinity bin: each divider across, in mm from the inside of the left wall to its middle, left to right; missing spaces them evenly. */
   gridfinityDividerPositionsX?: number[];
   /** Gridfinity bin: each divider deep, in mm from the inside of the back wall to its middle, back to front; missing spaces them evenly. */

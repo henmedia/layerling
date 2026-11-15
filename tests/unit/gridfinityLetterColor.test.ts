@@ -319,6 +319,8 @@ describe("a Gridfinity bin's letters in their own colour in the view", () => {
   it.each([
     ["on a bin", {}],
     ["on a tray", { gridfinityType: "tray", height: 20 }],
+    // A label on a divider set lower (#1560) has its letters lower than one on the wall.
+    ["on a bin with lower dividers", { gridfinityCompartmentsX: 2, gridfinityCompartmentLabels: [{ column: 0, row: 0, side: "back", text: "AB" }, { column: 1, row: 0, side: "left", text: "C" }], gridfinityDividerHeight: 8 }],
   ])("draws the letters' faces %s as a second group in a second material, the faces an export colours and no others", (_name, fields) => {
     const shape = binShape(fields);
     const surface = surfaceOf(createShapeObject(shape));

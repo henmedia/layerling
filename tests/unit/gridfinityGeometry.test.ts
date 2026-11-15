@@ -44,6 +44,8 @@ import {
   gridfinityCornerRadius,
   gridfinityDividerBound,
   gridfinityDividerFits,
+  gridfinityDividerHeight,
+  gridfinityDividerHeightTop,
   gridfinityDividerLimits,
   gridfinityDividerPositionPatch,
   gridfinityDividerPositions,
@@ -2088,6 +2090,251 @@ describe("gridfinity dividers", { timeout: 30_000 }, () => {
     const { settings } = mcpShapeSummary(shape);
     expect(settings).toMatchObject({ gridfinityCompartmentsX: 3, gridfinityDividerThickness: 1.6, gridfinityDividerPositionsX: "[25,55]", gridfinityCompartmentLabels: '[{"column":0,"row":0,"side":"back"}]' });
     expect(normalizeGridfinityDividerPositions(JSON.parse(String(settings!.gridfinityDividerPositionsX)))).toEqual([25, 55]);
+  });
+});
+
+describe("gridfinity divider height", { timeout: 60_000 }, () => {
+  let runtime: ManifoldToplevel;
+
+  beforeAll(async () => {
+    runtime = await manifoldModule();
+    runtime.setup();
+  });
+
+  const tray = { gridfinityType: "tray" as const, width: 80, depth: 40, height: 20 };
+  /** A bin of 2 x 1 x 3 units with 3 x 2 compartments of 26.4 x 19.2 and labels; the label pieces of one compartment. */
+  const labelled = (labels: Record<string, unknown>[], fields: Record<string, unknown> = {}) => bin({ gridfinityCompartmentsX: 3, gridfinityCompartmentsZ: 2, gridfinityCompartmentLabels: labels, ...fields });
+  const labelOf = (shape: ReturnType<typeof bin>, column: number, row: number) => gridfinityCompartmentPieces(shape)!.cells.find((cell) => cell.column === column && cell.row === row)!.labels;
+  const volumeOf = (shape: Parameters<typeof gridfinityLabelledTriangles>[1]) => signedVolume(gridfinityLabelledTriangles(runtime, shape) as V[][]);
+  /** The compartments' inner corners a divider fills where it meets the wall: the square less the quarter circle. */
+  const corner = (r: number) => ((4 - Math.PI) / 4) * r * r;
+
+  it("lowers the dividers' top to the height over the floor, at least 3 mm, and keeps it unset, at 0 or less, or within 0.1 mm of the full height or over it", () => {
+    // A tray of 80 x 40 x 20 mm: the floor at 1.2, the dividers' top at 20.
+    for (const height of [undefined, 0, -1, Number.NaN, Number.POSITIVE_INFINITY, 18.85, 18.8, 100]) expect(gridfinityDividerHeightTop(height, 1.2, 20), `${height}`).toBe(20);
+    expect(gridfinityDividerHeightTop(2, 1.2, 20)).toBeCloseTo(4.2, 9);
+    expect(gridfinityDividerHeightTop(8, 1.2, 20)).toBeCloseTo(9.2, 9);
+    expect(gridfinityDividerHeightTop(18.6, 1.2, 20)).toBeCloseTo(19.8, 9);
+    const divided = { ...tray, gridfinityCompartmentsX: 2 };
+    expect(gridfinityCompartments({ ...divided, gridfinityDividerHeight: 8 })!.top).toBeCloseTo(9.2, 9);
+    expect(gridfinityPlan({ ...divided, gridfinityDividerHeight: 8 }).dividerTop).toBe(20);
+    expect(gridfinityDividerHeight(divided)).toBeCloseTo(18.8, 9);
+    expect(gridfinityDividerHeight({ ...divided, gridfinityDividerHeight: 8 })).toBeCloseTo(8, 9);
+    // A bin of 3 units: the dividers' top at 20.15 over the floor at 5.95, 14.2 mm.
+    expect(gridfinityDividerHeight(bin({ gridfinityCompartmentsX: 2 }))).toBeCloseTo(14.2, 9);
+    expect(gridfinityCompartments(bin({ gridfinityCompartmentsX: 2, gridfinityDividerHeight: 8 }))!.top).toBeCloseTo(13.95, 9);
+    expect(gridfinityCompartments(bin({ gridfinityCompartmentsX: 2, gridfinityDividerHeight: 1 }))!.top).toBeCloseTo(8.95, 9);
+    expect(gridfinityCompartments(bin({ gridfinityCompartmentsX: 2, gridfinityDividerHeight: 14.15 }))!.top).toBe(gridfinityPlan(bin()).dividerTop);
+    // Exactly 0.1 mm under the full height is the full height, in the bin and in the tray alike.
+    expect(gridfinityCompartments(bin({ gridfinityCompartmentsX: 2, gridfinityDividerHeight: 14.1 }))!.top).toBe(20.15);
+    expect(gridfinityCompartments({ ...divided, gridfinityDividerHeight: 18.7 })!.top).toBe(20);
+    // Within 0.011 mm of a wall label's land, 18.95, or the lip support's foot, 19.35, the top stands on it; a tray's land is at 18.8.
+    for (const [height, at] of [[12.985, 18.935], [12.995, 18.95], [13.005, 18.95], [13.395, 19.35], [13.415, 19.365]]) expect(gridfinityCompartments(bin({ gridfinityCompartmentsX: 2, gridfinityDividerHeight: height }))!.top, `${height}`).toBeCloseTo(at, 9);
+    expect(gridfinityCompartments({ ...divided, gridfinityDividerHeight: 17.605 })!.top).toBeCloseTo(18.8, 9);
+    // A bin's shelf with a text does not sink, so 0.4 mm under its dividers' top is no crease.
+    expect(gridfinityCompartments(bin({ gridfinityCompartmentsX: 2, gridfinityCompartmentLabels: [{ column: 0, row: 0, side: "back", text: "A" }], gridfinityDividerHeight: 13.795 }))!.top).toBeCloseTo(19.745, 9);
+    // A tray's shelf with a text stands at 19.6 (#1501), its land at 18.4: the top stands on either, only with a text.
+    const lettered = { ...divided, gridfinityCompartmentLabels: [{ column: 0, row: 0, side: "back" as const, text: "A" }] };
+    for (const [height, at] of [[17.185, 18.385], [17.19, 18.4], [17.21, 18.4], [18.39, 19.6], [18.41, 19.6]]) expect(gridfinityCompartments({ ...lettered, gridfinityDividerHeight: height })!.top, `${height}`).toBeCloseTo(at, 9);
+    expect(gridfinityCompartments({ ...divided, gridfinityDividerHeight: 18.41 })!.top).toBeCloseTo(19.61, 9);
+    // Never under 3 mm: on a floor raised so that 3 mm ends just over a crease, the dividers stay 3 mm high.
+    for (const floor of [15.958, 16.358]) expect(gridfinityDividerHeight(bin({ gridfinityCompartmentsX: 2, gridfinityFloorHeight: floor, gridfinityDividerHeight: 3 })), `${floor}`).toBeGreaterThanOrEqual(3);
+    // Whether dividers fit is judged at the full height, as before.
+    expect(gridfinityDividerFits(bin({ gridfinityFloorHeight: 17.15, gridfinityDividerHeight: 8 }))).toBe(true);
+    expect(gridfinityDividerFits(bin({ gridfinityFloorHeight: 17.2, gridfinityDividerHeight: 8 }))).toBe(false);
+  });
+
+  it("leaves every bin and tray as it was with the height unset, at 0 or less, at the full height or over it, and a bin without dividers at any height", () => {
+    const shapes = [
+      labelled([{ column: 1, row: 0, side: "back" }, { column: 0, row: 1, side: "right" }], { gridfinityScoopFront: true }),
+      bin({ gridfinityCompartmentsX: 2, gridfinityLip: false, height: 21 }),
+      { ...tray, gridfinityCompartmentsX: 2, gridfinityScoopFront: true },
+      { ...tray, gridfinityCompartmentsX: 2, gridfinityCompartmentLabels: [{ column: 0, row: 0, side: "back" as const, text: "A" }, { column: 1, row: 0, side: "left" as const, text: "B" }] },
+      bin({ gridfinityCompartmentsX: 2, gridfinityWallThickness: 2 }),
+      bin({ gridfinityCompartmentsX: 3, gridfinityCompartmentsZ: 2, gridfinityFloorHeight: 10, gridfinityScoopFront: true }),
+      bin({ gridfinityCompartmentsX: 2, gridfinityOpenFront: true, gridfinityOpenings: [{ side: "front", width: 20, depth: 10 }] }),
+    ];
+    for (const shape of shapes) {
+      const full = gridfinityDividerHeight(shape);
+      const mesh = gridfinityLabelledTriangles(runtime, shape);
+      for (const height of [0, -1, 100, full, full - 0.05]) {
+        const context = JSON.stringify({ shape, height });
+        const same = { ...shape, gridfinityDividerHeight: height };
+        expect(gridfinityPlan(same), context).toStrictEqual(gridfinityPlan(shape));
+        expect(gridfinityCompartmentPieces(same), context).toStrictEqual(gridfinityCompartmentPieces(shape));
+        expect(gridfinityLabelledTriangles(runtime, same), context).toEqual(mesh);
+      }
+    }
+    // Without dividers a notch 11.45 mm deep keeps its bottom on 13.95, where dividers 8 mm high would stand.
+    for (const fields of [{ gridfinityLabelBack: true, gridfinityScoopFront: true }, { gridfinityCompartmentsX: 1 }, { gridfinityOpenFront: true, gridfinityOpenings: [{ side: "front", width: 20, depth: 11.45 }] }]) {
+      const context = JSON.stringify(fields);
+      expect(gridfinityPlan(bin({ ...fields, gridfinityDividerHeight: 8 })), context).toStrictEqual(gridfinityPlan(bin(fields)));
+      expect(gridfinityLabelledTriangles(runtime, bin({ ...fields, gridfinityDividerHeight: 8 })), context).toEqual(gridfinityLabelledTriangles(runtime, bin(fields)));
+    }
+    // A tray 14 mm wide has room for one compartment though set to 2: a notch 10.8 mm deep keeps its bottom on 9.2.
+    const narrow = { ...tray, width: 14, gridfinityCompartmentsX: 2, gridfinityOpenFront: true, gridfinityOpenings: [{ side: "front", width: 6, depth: 10.8 }] };
+    expect(gridfinityCompartments(narrow)).toBeNull();
+    expect(gridfinityPlan(narrow).notches[0].bottom).toBeCloseTo(9.2, 9);
+    expect(gridfinityPlan({ ...narrow, gridfinityDividerHeight: 8 })).toStrictEqual(gridfinityPlan(narrow));
+    // With a wall near 1.75 mm the lip support's foot lies next to the full top, and the dividers stay on it.
+    for (const wall of [1.74, 1.745, 1.755, 1.76]) {
+      const plan = gridfinityPlan(bin({ gridfinityCompartmentsX: 2, gridfinityWallThickness: wall }));
+      expect(plan.dividerHeightTop, String(wall)).toBe(plan.dividerTop);
+    }
+  });
+
+  it("takes the height off the dividers alone, as calculated by hand, and leaves the bin's top where it was", () => {
+    // Each divider's section is its thickness along the inside, and at each end the compartments' inner corners on its
+    // two faces. A tray: 38.1 x 1.2 + 4 x 1.6826 = 52.45 mm², 10.8 mm lower, 566.46 mm³; a bin without the lip: 39.6 x 1.2
+    // + 6.73 = 54.25 mm², 6.2 mm lower, 336.35 mm³; a bin with the lip and a wall of 2 mm, its corners 1.75: 37.5 x 1.2 +
+    // 4 x 0.6573 = 47.63 mm², 295.30 mm³. The mesh's polygons within 1 %.
+    for (const [shape, height, drop] of [
+      [{ ...tray, gridfinityCompartmentsX: 2 }, 8, (38.1 * 1.2 + 4 * corner(2.8)) * 10.8],
+      [bin({ gridfinityCompartmentsX: 2, gridfinityLip: false, height: 21 }), 8, (39.6 * 1.2 + 4 * corner(2.8)) * 6.2],
+      [bin({ gridfinityCompartmentsX: 2, gridfinityWallThickness: 2 }), 8, (37.5 * 1.2 + 4 * corner(1.75)) * 6.2],
+    ] as const) {
+      const context = JSON.stringify(shape);
+      const lowered = gridfinityLabelledTriangles(runtime, { ...shape, gridfinityDividerHeight: height }) as V[][];
+      expect(edgeProblems(lowered), context).toBe(0);
+      expect(components(lowered), context).toBe(1);
+      expect(Math.abs(volumeOf(shape) - signedVolume(lowered) - drop) / drop, context).toBeLessThan(0.01);
+      expect(bounds(lowered), context).toEqual(bounds(gridfinityLabelledTriangles(runtime, shape) as V[][]));
+    }
+  });
+
+  it("stands a compartment's label as high as its side: on a divider at the dividers' top, on the wall at the full height", () => {
+    const shape = labelled([], { gridfinityDividerHeight: 8 });
+    const cell = gridfinityCompartments(shape)!.cells[1];
+    // The widest whose underside stays 0.5 mm over the floor: (13.95 - 1.2 - 5.95 - 0.5) / tan 36 = 8.6712 on a divider,
+    // 17.2048 at the full height; on the wall the 6 mm left open caps it at 19.2 - 6 - 2 = 11.2 as before.
+    expect(gridfinityCompartmentLabelMaxWidth(shape, cell, "left")).toBeCloseTo(8.6712, 4);
+    expect(gridfinityCompartmentLabelMaxWidth(shape, cell, "front")).toBeCloseTo(8.6712, 4);
+    expect(gridfinityCompartmentLabelMaxWidth(shape, cell, "back")).toBeCloseTo(11.2, 9);
+    const pieces = (label: Record<string, unknown>) => labelOf(labelled([{ column: 1, row: 0, ...label }], { gridfinityDividerHeight: 8 }), 1, 0)!;
+    expect(pieces({ side: "left" }).top).toBeCloseTo(13.95, 9);
+    expect(pieces({ side: "left", width: 30 }).shelves[0].profile.width).toBeCloseTo(8.6712, 4);
+    expect(pieces({ side: "back" }).top).toBeCloseTo(20.15, 9);
+    expect(pieces({ side: "back" }).shelves[0].profile.width).toBeCloseTo(11.2, 9);
+    // On a divider a label 4 mm wide needs 1.2 + 0.5 + 4 tan 36 = 4.606 mm of it over the floor: none at 4.6, 4.1291 mm at 4.7.
+    expect(gridfinityCompartmentLabelMaxWidth(labelled([], { gridfinityDividerHeight: 4.6 }), cell, "left")).toBeCloseTo(3.9915, 4);
+    expect(gridfinityCompartmentLabel(labelled([{ column: 1, row: 0, side: "left" }], { gridfinityDividerHeight: 4.6 }), 1, 0)).toBeNull();
+    expect(gridfinityCompartmentLabel(labelled([{ column: 1, row: 0, side: "left" }], { gridfinityDividerHeight: 4.7 }), 1, 0)!.width).toBeCloseTo(4.1291, 4);
+    expect(gridfinityCompartmentLabel(labelled([{ column: 1, row: 0, side: "back" }], { gridfinityDividerHeight: 3 }), 1, 0)!.width).toBeCloseTo(11.2, 9);
+    // The bin takes labels as before: their room is judged at the full height.
+    expect(gridfinityLabelFits(labelled([], { gridfinityDividerHeight: 3 }))).toBe(true);
+    // A tray's shelf with a text stands 0.4 mm under its top at 20 (#1501), on a divider at that or the dividers' top, the lower.
+    const trayTop = (label: Record<string, unknown>, height: number) => gridfinityCompartmentPieces({ ...tray, gridfinityCompartmentsX: 2, gridfinityCompartmentLabels: [{ column: 0, row: 0, ...label }], gridfinityDividerHeight: height })!.cells[0].labels!.top;
+    expect(trayTop({ side: "right", text: "A" }, 8)).toBeCloseTo(9.2, 9);
+    expect(trayTop({ side: "right", text: "A" }, 18.6)).toBeCloseTo(19.6, 9);
+    expect(trayTop({ side: "right" }, 18.6)).toBeCloseTo(19.8, 9);
+    expect(trayTop({ side: "back", text: "A" }, 8)).toBeCloseTo(19.6, 9);
+    expect(trayTop({ side: "back" }, 8)).toBe(20);
+  });
+
+  it("draws a label on the wall at the full height over lower dividers, as it adds as much there", () => {
+    const added = (fields: Record<string, unknown>) => volumeOf(labelled([{ column: 1, row: 0, side: "back", width: 8 }], fields)) - volumeOf(labelled([], fields));
+    // 839 mm³, and 4.3 more where its ends reach the 0.05 mm the mesh's inside runs past the compartment, over the dividers.
+    expect(Math.abs(added({ gridfinityDividerHeight: 8 }) - added({}))).toBeLessThan(5);
+    const mesh = gridfinityLabelledTriangles(runtime, labelled([{ column: 1, row: 0, side: "back", width: 8 }], { gridfinityDividerHeight: 8 })) as V[][];
+    expect(edgeProblems(mesh)).toBe(0);
+    expect(components(mesh)).toBe(1);
+  });
+
+  it("makes a label on the wall narrower where its underside would meet the lower dividers' top, so it passes 0.05 mm over it", () => {
+    // The underside drops tan 36 a mm out from the wall, from 1.2 under the top at 20.15, and the shelf loses (0.05 - over)
+    // / tan 36. A shelf 14 mm wide on the 2 mm wall is 0.0001 under the top of dividers 4.1 mm high 1.75 mm out, where the
+    // corner rounds: 13.9310. One 11.2 mm wide on the 0.95 mm wall is 0.0027 over it at the wall at 4.86, 11.1349, and
+    // 0.0029 under it 2.8 mm out at 6.9, 11.1271.
+    for (const [label, fields, height, narrowed, full] of [
+      [{ column: 2, row: 1, side: "right" }, { gridfinityWallThickness: 2 }, 4.1, 13.931, 14],
+      [{ column: 0, row: 0, side: "back" }, {}, 4.86, 11.1349, 11.2],
+      [{ column: 0, row: 0, side: "back" }, {}, 6.9, 11.1271, 11.2],
+    ] as const) {
+      const width = (at: number) => labelOf(labelled([label], { ...fields, gridfinityDividerHeight: at }), label.column, label.row)!.shelves[0].profile.width;
+      expect(width(height), `${height}`).toBeCloseTo(narrowed, 4);
+      // 0.005 mm either side it is narrowed too, 0.005 / tan 36 = 0.0069 less or more, and 0.1 mm away it keeps its width.
+      for (const step of [-1, 1]) {
+        expect(width(height + step * 0.005), `${height} ${step}`).toBeCloseTo(narrowed - step * 0.0069, 3);
+        expect(width(height + step * 0.1), `${height} ${step}`).toBe(full);
+      }
+    }
+    // A tray's shelf with a text stands 0.4 mm lower (#1501), and is narrowed 0.4 mm lower: 2.8 mm out at 9.06, not 9.46.
+    const trayWidth = (text: string | undefined, height: number) => gridfinityCompartmentPieces({ ...tray, gridfinityCompartmentsX: 2, gridfinityCompartmentLabels: [{ column: 0, row: 0, side: "back", text }], gridfinityDividerHeight: height })!.cells[0].labels!.shelves[0].profile.width;
+    expect(trayWidth("A", 9.06)).toBeCloseTo(13.9349, 4);
+    expect(trayWidth(undefined, 9.46)).toBeCloseTo(13.9349, 4);
+    expect(trayWidth(undefined, 9.06)).toBe(14);
+  });
+
+  it("keeps a compartment's scoops 0.5 mm under the lowered dividers' top, and leaves them out where even 3.5 mm would not fit", () => {
+    const radius = (height: number) => gridfinityCompartmentPieces(bin({ gridfinityCompartmentsX: 3, gridfinityCompartmentsZ: 2, gridfinityScoopFront: true, gridfinityDividerHeight: height }))!.cells.map((cell) => (cell.scoops ? Number(cell.scoops.radius.toFixed(9)) : null));
+    // The bin's 6.7 mm, at most the height less 0.5, against the middle divider in the back row and the wall in the front row alike.
+    expect(radius(8)).toEqual(Array(6).fill(6.7));
+    expect(radius(6)).toEqual(Array(6).fill(5.5));
+    expect(radius(4)).toEqual(Array(6).fill(3.5));
+    expect(radius(3.9)).toEqual(Array(6).fill(null));
+    // At the full height a bin without the lip keeps scoops that rise over its dividers' top, 14.55 mm over 14.2.
+    const high = gridfinityCompartmentPieces(bin({ gridfinityCompartmentsX: 2, gridfinityLip: false, height: 21, gridfinityScoopFront: true, gridfinityScoopRadius: 14.55 }))!;
+    expect(high.cells.map((cell) => cell.scoops!.radius)).toEqual([14.55, 14.55]);
+    for (const height of [8, 3.9]) {
+      const mesh = gridfinityLabelledTriangles(runtime, bin({ gridfinityCompartmentsX: 3, gridfinityCompartmentsZ: 2, gridfinityScoopFront: true, gridfinityDividerHeight: height })) as V[][];
+      expect(edgeProblems(mesh), `${height}`).toBe(0);
+      expect(components(mesh), `${height}`).toBe(1);
+    }
+  });
+
+  it("tells when dividers too low leave the compartments without their scoops, as narrow ones do", () => {
+    const leftOut = (height?: number) => gridfinityScoopsLeftOut(bin({ gridfinityCompartmentsX: 3, gridfinityCompartmentsZ: 2, gridfinityScoopFront: true, gridfinityDividerHeight: height }));
+    expect(leftOut(3.5)).toBe(true);
+    expect(leftOut(4)).toBe(false);
+    expect(leftOut()).toBe(false);
+  });
+
+  it("moves a notch's bottom off the lowered dividers' top, as off the ledge", () => {
+    // Measured from the lip's top at 25.4: 11.45 mm deep lands on 13.95, the top of dividers 8 mm high.
+    const bottom = (depth: number, height?: number) => gridfinityPlan(bin({ gridfinityCompartmentsX: 2, gridfinityOpenFront: true, gridfinityOpenings: [{ side: "front", width: 20, depth }], gridfinityDividerHeight: height })).notches[0].bottom;
+    expect(bottom(11.45)).toBeCloseTo(13.95, 9);
+    expect(bottom(11.45, 8)).toBeCloseTo(14, 9);
+    expect(bottom(11.45, 8.03)).toBeCloseTo(13.93, 9);
+    expect(bottom(5.25, 8)).toBeCloseTo(20.2, 9);
+  });
+
+  it("keeps the height through a saved project, the settings and the exact body, and refuses nonsense", async () => {
+    rememberManifoldRuntime(runtime);
+    const settings = { gridfinityDividerHeight: 8 };
+    const shape = canonicalizeShape({ ...binShape({ gridfinityCompartmentsX: 2 }), ...settings });
+    expect(shape).toMatchObject(settings);
+    expect(workplaneShapesEqual(shape, { ...shape, gridfinityDividerHeight: 9 })).toBe(false);
+    expect(shapeGeometrySignature(shape)).not.toBe(shapeGeometrySignature({ ...shape, gridfinityDividerHeight: 9 }));
+    const save = (shapes: WorkplaneShape[]) => exportLylProject({
+      projectId: "divider-height",
+      projectName: "Divider height",
+      createdAt: 1_700_000_000_000,
+      modifiedAt: 1_700_000_100_000,
+      shapes,
+      history: [editorHistoryEntry(shapes, [])],
+      historyIndex: 0,
+      assets: [],
+      workspace: DEFAULT_WORKPLANE_WORKSPACE,
+      snapGrid: DEFAULT_SNAP_GRID,
+      placementElevation: 0,
+    });
+    const [loaded] = (await importLylProject(await save([shape]))).shapes;
+    expect(workplaneShapesEqual(loaded, shape)).toBe(true);
+    expect(loaded).toMatchObject(settings);
+    expect(sceneShape(shape)).toMatchObject(settings);
+    expect(cadModifierGridfinityForShape(shape)).toMatchObject(settings);
+    expect(normalizeShapeCustomizations({ gridfinity: settings }, {})).toMatchObject({ gridfinity: settings });
+    expect(normalizeShapeCustomizations({ gridfinity: { gridfinityDividerHeight: -1 } }, {}).gridfinity).toMatchObject({ gridfinityDividerHeight: 0 });
+    expect(shapeDefaultsFromShape(shape)).toMatchObject(settings);
+    expect(mcpShapeSummary(shape).settings).toMatchObject(settings);
+    const asset = toolbarShapeAssets.find((entry) => entry.kind === "gridfinity")!;
+    expect(makeShapeFromAsset(asset, { x: 0, z: 0 }, settings)).toMatchObject(settings);
+    await expect(importLylProject(await save([{ ...shape, gridfinityDividerHeight: "low" } as unknown as WorkplaneShape]))).rejects.toThrow("gridfinityDividerHeight must be a finite number");
+    await expect(importLylProject(await save([{ ...shape, gridfinityDividerHeight: -1 }]))).rejects.toThrow("gridfinityDividerHeight is outside the supported range");
+    // The mesh that booleans and exports use has the lower dividers: 336.35 mm³ less within 1 %, as in the bin without the
+    // lip above, whose dividers run as far across, 39.6 mm, and come down as far, 6.2 mm.
+    const meshVolume = (s: WorkplaneShape) => { const { vertices, faces } = meshForShape(s); return signedVolume(faces.map((face) => face.map((i) => vertices[i]) as V[])); };
+    expect(Math.abs(meshVolume(canonicalizeShape(binShape({ gridfinityCompartmentsX: 2 }))) - meshVolume(shape) - 336.35) / 336.35).toBeLessThan(0.01);
   });
 });
 
