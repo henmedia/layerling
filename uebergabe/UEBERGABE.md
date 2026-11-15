@@ -128,7 +128,8 @@ Do not build these until Marcus says so.
   Built on branch `texture-mask-fold` in the fork; PR draft waits for Marcus' OK on the status page.
 - **#1663**: shelf option in Hollow. Built on branch `shell-shelf` in the fork (commit cdc28a5e0, from Stefan's `main`
   6a5bbe318): a ledge all round the inside of the wall, only with the top as the single open side. No loose plate was
-  built (open question for the author). PR draft waits for Marcus' OK on the status page.
+  built (open question for the author). PR draft waits for Marcus' OK on the status page. Merged into `marcus` on
+  15 November 2026 (`4f0a37f3e`). The CHANGELOG entry on `shell-shelf` was moved to "Unreleased" (`636bea761`).
 - **#1587**: sliding latch for boxes, print-in-place if possible, with an "OPEN" sign. Stefan asked Marcus.
 
 ## F. Stackable boxes, Gridfinity floor and dividers: what exists (checked 15 November 2026)
@@ -160,8 +161,14 @@ Checks on `marcus` at 7be830b24 (a copy checked out read-only, nothing changed o
   opens the export (Discussion #1715)". Cause: on `marcus` the Print check window is docked (`MovableToolPanel`, `ToolHint`).
   The hint now has its own "more" button, so `hint.querySelector("button")` is no longer the export button. The fix is in
   the test: pick `.print-check-export .print-check-show`. Not done yet, because another chat works on `marcus`.
-- `marcus` is behind Stefan's `main` by some commits. A test merge conflicts only in `docs/CHANGELOG.md` and
-  `docs/whatsNew-unreleased.json`.
+- Later the same day: `marcus` got the printCheckPanel test fixed, Stefan's `main` 1.165.2 merged in, and `shell-shelf`
+  merged in (`4f0a37f3e`). Typecheck, unit tests, e2e tests, `npm run guide` and `npm run i18n:status` were green.
+  `docs/whatsNew-unreleased.json` on `marcus` keeps only the Gridfinity entry.
+
+Order of the Hollow steps in `cadModifier.worker.ts` on `marcus`: shelf, then stacking, then Gridfinity floor, then
+dividers. The shelf height is measured from the plain inside floor, not from the raised floor of a foot or grid.
+`shellStackSolid` takes `(kernel, solid, height, wall, original, footStyle)` on `marcus`, which differs from the old
+version on `shell-shelf`. Merge `shell-shelf` into `marcus`, never the other way round.
 
 Possible PRs to Stefan, only when Marcus says so: the Gridfinity floor (`shell-gridfinity-floor`), the two newer commits
 of `shell-stackable`, the stacking foot and lid, the lid stacking top.
