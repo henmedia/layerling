@@ -6,6 +6,8 @@ code still carries it - so a lower number further down is older, not newer.
 
 ## Unreleased
 
+- **The texture mask is inside the Surface texture card, and the card is further down (Discussion #1573):** The mask choice had a card of its own, so a box or cylinder used as a mask showed two cards for one purpose. It is now the first field of the Surface texture card; the folded card still says "Texture mask: ..." in its header whenever the body is a mask. Wrap around a cylinder and Surface texture now follow the Twist & Lean cards instead of sitting above Properties. Existing mask choices are unchanged (`surfaceTextureMask`). Checked in the panel tests (`surfaceMaskFoldPanel`).
+
 ## 1.165.2
 
 - **A pasted copy of a small part lands in view (Discussion #1764):** A plain paste set every copy 12 mm along x and z from its original, so the copy of a part a few millimetres across landed out of view while zoomed in on it. The step is now half the larger side of what was copied, seen from above, between 1 and 12 mm (`pasteNudgeFor` in `lib/pasteCentering.ts`); large parts still move 12 mm, and the parts of one paste still move together. Duplicate is unchanged. Checked in the editor: a 4 x 3 mm box at (5, 5) pastes at (7, 7). Unit tests in `pasteCentering`. Suggested by @uninteressant2026.

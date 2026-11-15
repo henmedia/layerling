@@ -5206,60 +5206,6 @@ export function ShapeInspector({
         <p className="inspector-bundle-note">{t(nameTagStack || iconTag?.isTag ? "nameTag.bundleNote" : "inspector.bundleNote")}</p>
       ) : null}
 
-      {onWrapAroundCylinder ? (
-        <CylinderWrapCard
-          key={shape.id}
-          shape={shape}
-          workspace={workspace}
-          disabled={frozen}
-          onWrap={onWrapAroundCylinder}
-          onInteractionActiveChange={onInteractionActiveChange}
-        />
-      ) : null}
-
-      {onSurfaceTexture ? (
-        <SurfaceTextureCard
-          key={`surface-${shape.id}`}
-          shape={shape}
-          workspace={workspace}
-          disabled={frozen}
-          onApply={onSurfaceTexture}
-          onRemove={onRemoveSurfaceTexture}
-          open={surfaceTextureOpen}
-          onOpenChange={onSurfaceTextureOpenChange}
-          onInteractionActiveChange={onInteractionActiveChange}
-          facePicking={surfaceFacePicking}
-          pickedFaces={surfacePickedFaces}
-          facesShown={surfaceFacesShown}
-          onFacePick={onSurfaceFacePick}
-          regionDrawing={surfaceRegionDrawing}
-          drawnRegion={surfaceDrawnRegion}
-          onRegionDraw={onSurfaceRegionDraw}
-        />
-      ) : null}
-
-      {offersSurfaceTextureMask(shape) ? (
-        <div className="property-card">
-          <div className="property-list cylinder-wrap-body">
-            <SelectProperty
-              type="select"
-              label={t("inspector.surfaceMask")}
-              value={shape.surfaceTextureMask ?? "none"}
-              options={(["none", ...SURFACE_TEXTURE_MASK_MODES] as const).map((value) => ({ value, label: t(SURFACE_TEXTURE_LABELS.mask[value]) }))}
-              disabled={frozen}
-              // A mask is a helper one looks through: it turns transparent on the way.
-              onChange={(value) => onUpdate(value === "none" ? { surfaceTextureMask: undefined } : { surfaceTextureMask: value as SurfaceTextureMaskMode, transparent: true })}
-            />
-            {shape.surfaceTextureMask ? (
-              <p className="cylinder-wrap-hint">
-                {t("inspector.surfaceMaskHint")}
-                <GuideHelpLink section="surfaceTexture" className="inspector-help-link" />
-              </p>
-            ) : null}
-          </div>
-        </div>
-      ) : null}
-
       {onTextTags && shape.kind === "text" ? (
         <NameListCard key={`names-${shape.id}`} shapeId={shape.id} disabled={frozen} onTextTags={onTextTags} onInteractionActiveChange={onInteractionActiveChange} />
       ) : null}
@@ -5610,6 +5556,40 @@ export function ShapeInspector({
           ) : null}
         </div>
       ) : null}
+      {onWrapAroundCylinder ? (
+        <CylinderWrapCard
+          key={shape.id}
+          shape={shape}
+          workspace={workspace}
+          disabled={frozen}
+          onWrap={onWrapAroundCylinder}
+          onInteractionActiveChange={onInteractionActiveChange}
+        />
+      ) : null}
+
+      {onSurfaceTexture ? (
+        <SurfaceTextureCard
+          key={`surface-${shape.id}`}
+          shape={shape}
+          workspace={workspace}
+          disabled={frozen}
+          onApply={onSurfaceTexture}
+          onRemove={onRemoveSurfaceTexture}
+          open={surfaceTextureOpen}
+          onOpenChange={onSurfaceTextureOpenChange}
+          onInteractionActiveChange={onInteractionActiveChange}
+          facePicking={surfaceFacePicking}
+          pickedFaces={surfacePickedFaces}
+          facesShown={surfaceFacesShown}
+          onFacePick={onSurfaceFacePick}
+          regionDrawing={surfaceRegionDrawing}
+          drawnRegion={surfaceDrawnRegion}
+          onRegionDraw={onSurfaceRegionDraw}
+          maskMode={offersSurfaceTextureMask(shape) ? shape.surfaceTextureMask ?? "none" : undefined}
+          onMaskChange={(value) => onUpdate(value === "none" ? { surfaceTextureMask: undefined } : { surfaceTextureMask: value, transparent: true })}
+        />
+      ) : null}
+
       {isThread ? (
         <div className={`property-card ${threadOpen ? "" : "collapsed"}`}>
           <button
@@ -6857,6 +6837,8 @@ export function SurfaceTextureCard({
   regionDrawing = false,
   drawnRegion = null,
   onRegionDraw,
+  maskMode,
+  onMaskChange,
 }: {
   shape: WorkplaneShape;
   workspace: WorkplaneWorkspaceSettings;
@@ -6882,6 +6864,8 @@ export function SurfaceTextureCard({
   regionDrawing?: boolean;
   drawnRegion?: { region: SurfaceTextureRegion } | null;
   onRegionDraw?: (drawing: boolean) => void;
+  maskMode?: "none" | SurfaceTextureMaskMode;
+  onMaskChange?: (mode: "none" | SurfaceTextureMaskMode) => void;
 }) {
   const [ownOpen, setOwnOpen] = useState(false);
   const open = openProp ?? ownOpen;
@@ -7053,10 +7037,29 @@ export function SurfaceTextureCard({
         onClick={() => setOpen(!open)}
       >
         <span>{t("inspector.surfaceTexture")}</span>
+        {maskMode && maskMode !== "none" && !open ? <span className="property-card-note">{t("inspector.surfaceMask")}: {t(SURFACE_TEXTURE_LABELS.mask[maskMode])}</span> : null}
         <ChevronUp className={open ? "" : "collapsed"} size={25} strokeWidth={2.8} />
       </button>
       {open ? (
         <div className="property-list cylinder-wrap-body" id={`surface-texture-${shape.id}`}>
+          {maskMode && onMaskChange ? (
+            <>
+              <SelectProperty
+                type="select"
+                label={t("inspector.surfaceMask")}
+                value={maskMode}
+                options={(["none", ...SURFACE_TEXTURE_MASK_MODES] as const).map((value) => ({ value, label: t(SURFACE_TEXTURE_LABELS.mask[value]) }))}
+                disabled={disabled}
+                onChange={(value) => onMaskChange(value as "none" | SurfaceTextureMaskMode)}
+              />
+              {maskMode !== "none" ? (
+                <p className="cylinder-wrap-hint">
+                  {t("inspector.surfaceMaskHint")}
+                  <GuideHelpLink section="surfaceTexture" className="inspector-help-link" />
+                </p>
+              ) : null}
+            </>
+          ) : null}
           {applied && !changeable ? (
             <p className="cylinder-wrap-hint">
               {t("inspector.surfaceApplied", { pattern: appliedPatterns })}

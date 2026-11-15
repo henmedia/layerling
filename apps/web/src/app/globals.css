@@ -10355,6 +10355,19 @@ html[data-theme="dark"] .rotation-angle-badge {
   color: #c3731f;
 }
 
+.property-card-note {
+  flex: 1 1 auto;
+  min-width: 0;
+  margin: 0 8px 0 12px;
+  overflow: hidden;
+  font-size: 13px;
+  font-weight: 400;
+  text-align: right;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  opacity: 0.75;
+}
+
 .property-list {
   display: grid;
   gap: 17px;
