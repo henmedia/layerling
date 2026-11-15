@@ -11,7 +11,7 @@
         "body": {
           "de": "Eine eingefügte Kopie lag immer 12 mm neben dem Original. Bei einem Teil von wenigen Millimetern und starkem Zoom war sie damit außerhalb des Bildes. Jetzt rückt sie um die halbe Größe dessen, was du kopiert hast, zwischen 1 und 12 mm. Große Teile rücken wie bisher 12 mm.",
           "en": "A pasted copy always lay 12 mm beside the original, which put it out of view for a part of a few millimetres while zoomed in. Now it moves by half the size of what you copied, between 1 and 12 mm. Large parts still move 12 mm.",
-          "da": "En indsat kopi lå altid 12 mm ved siden af originalen, og det kom den ud af syet for en del på et par millimeter, når du var zoomet ind. Nu flytter den sig halvdelen af størrelsen på det, du kopierede, mellem 1 og 12 mm. Store dele flytter sig stadig 12 mm."
+          "da": "En indsat kopi lå altid 12 mm ved siden af originalen, og det kom den ude af syet i nogle millimeter, når du var zoomet ind. Nu flytter den sig halvt så meget som det, du kopierede, mellem 1 og 12 mm. Store dele flytter sig stadig 12 mm."
         }
       }
     ]
@@ -48,7 +48,7 @@
         "body": {
           "de": "Beim Aushöhlen einer Box mit offener Oberseite gibt es jetzt den Schalter „Stapelbar“. Die äußere Hälfte der Wand ragt als Kragen über den Rand, und unter der Wand sitzt eine Nut, die den Kragen der Box darunter aufnimmt. So steht eine Box rutschfest auf der nächsten.\n\n– Die Höhe des Kragens stellst du selbst ein (3 mm am Anfang).\n– Boden und Unterseite bleiben flach: Die Box wird weiter auf dem Boden stehend gedruckt.\n– Es braucht gerade Wände und eine Wand von mindestens 1,2 mm.",
           "en": "When you hollow a box with its top open there is now a Stackable switch. The outer half of the wall rises above the rim as a collar, and under the wall sits a groove that takes the collar of the box below. One box then stands on the next without sliding.\n\n– You set the height of the collar yourself (3 mm to begin with).\n– The floor and the bottom stay flat: the box still prints standing on its floor.\n– It needs straight walls and a wall of at least 1.2 mm.",
-          "da": "Når du udhuler en æske med kun toppen åben, er der nu en Stabelbar-knap. Den ydre halvdel af væggen rager op over kanten som en krave, og under væggen sidder en rille, der tager imod kraven på æsken under. Så står en æske fast på den næste.\n\n– Du bestemmer selv kravens højde (3 mm til at begynne med).\n– Bunden og undersiden forbliver flade: æsken printes stadig stående på sin bund.\n– Den kræver lige vægge og en væg på mindst 1,2 mm."
+          "da": "Når du udhuler en æske med kun toppen åben, kan du nu slå Stabelbar til. Den ydre halvdel af væggen rager op over kanten som en krave, og under væggen sidder en rille, der tager imod kraven på æsken under. Så står en æske fast på den næste.\n\n– Du bestemmer selv kravens højde (3 mm til at begynne med).\n– Bunden og undersiden forbliver flade: æsken printes stadig stående på sin bund.\n– Den kræver lige vægge og en væg på mindst 1,2 mm."
         },
         "guide": {
           "section": "hollowing"
@@ -78,7 +78,7 @@
         "body": {
           "de": "Chinesischer Text kam bisher als Fragezeichen heraus, in jeder Schrift und sogar mit einer eigenen chinesischen Schrift. Jetzt geht er:\n\n– Vereinfachte und traditionelle Zeichen wie 说明书 und 說明書 gibt es in jeder eingebauten Schrift. Sie werden geholt, sobald ein Text sie zum ersten Mal braucht, darum zeigt so ein Text einen Moment lang Fragezeichen.\n– Eine eigene chinesische Schrift behält jetzt die gängigen Zeichen ihrer Sprache. Füge eine Schrift, die schon Fragezeichen zeigte, einmal neu hinzu.",
           "en": "Chinese text used to come out as question marks, in every font and even in a Chinese font of your own. Now it works:\n\n– Simplified and traditional characters such as 说明书 and 說明書 are in every built-in font. They are fetched the first time a text needs them, so such a text shows question marks for a moment.\n– A Chinese font of your own now keeps the common characters of its language. Add a font that showed question marks once more.",
-          "da": "Kinesisk tekst kom før ud som spørgsmålstegn, i enhver font og også i en kinesisk font af din egen. Nu virker det:\n\n– Forenklede og traditionelle tegn som 说明书 og 說明書 findes i alle indbyggede fonte. De hentes, første gang en tekst har brug for dem, så en sådan tekst viser spørgsmålstegn et øjeblik.\n– En kinesisk font af din egen beholder nu de almindelige tegn i sit sprog. Tilføj en font, der engang viste spørgsmålstegn."
+          "da": "Kinesisk tekst kom før ud som spørgsmålstegn, i enhver font og også i en kinesisk font af din egen. Nu virker det:\n\n– Forenklede og traditionelle tegn som 说明书 og 說明書 findes i alle indbyggede fonte. De hentes, første gang en tekst har brug for dem, så en sådan tekst viser spørgsmålstegn et øjeblik.\n– En kinesisk font af din egen beholder nu sit sprogs almindelige tegn. Tilføj en font, der engang viste spørgsmålstegn."
         },
         "guide": [
           {
@@ -93,7 +93,7 @@
         "title": {
           "de": "Textur auf dem Bauch einer gedrehten Vase",
           "en": "Texture on the belly of a turned vase",
-          "da": "Overfladestruktur på maven på en drejet vase"
+          "da": "Overfladestruktur på maven af en drejet vase"
         },
         "body": {
           "de": "Eine aus einer Skizze gedrehte Vase hat auf dem Bauch Punktreihen, die nur wenige Tausendstel Millimeter auseinanderliegen. Die Oberflächentextur hielt sie für scharfe Kanten, und die Rillen wurden auf dem Bauch zu kurzen waagerechten Strichen, während der Hals sauber blieb. Jetzt werden solche Punkte zusammengefasst: Die Rillen laufen vom Hals über den ganzen Bauch, und beim Anklicken von Flächen bricht die Suche nicht mehr mit einem Fehler ab.",
@@ -110,7 +110,7 @@
         "body": {
           "de": "Lag ein breiter Text um einen Körper mit Seiten, etwa eine Platte mit 21 Seiten, wurden die Dreiecke der hinteren Seiten vor dem Schneiden nicht fein genug unterteilt, und die Buchstaben liefen dort als Streifen darüber. Jetzt werden die Seiten so fein unterteilt wie die Mitte, und der Text liest sich überall sauber.",
           "en": "When a wide text lay round a body with sides, such as a plate with 21 sides, the triangles of the far sides were not split fine enough before the letters were cut, and the letters ran across them as streaks. Now the sides are split as fine as the middle, and the text reads cleanly everywhere.",
-          "da": "Når en bred tekst lå rundt om en form med sider, som en flerkant med 21 sider, blev trekantene i de fjerne sider ikke delt fint nok, før bogstaverne blev skåret, og bogstaverne løb hen over dem som strejf. Nu deles siderne lige så fint som midten, og teksten læses rent overalt."
+          "da": "Når en bred tekst lå rundt om en form med sider, som et polygon med 21 sider, blev trekantene i de fjerne sider ikke delt fint nok, før bogstaverne blev skåret, og bogstaverne løb hen over dem som strejf. Nu deles siderne lige så fint som midten, og teksten læses rent overalt."
         }
       },
       {
@@ -271,7 +271,7 @@
         "body": {
           "de": "Zeigte die Maus im Rechtsklick-Menü auf einen Eintrag, erschien derselbe Text noch einmal als Hinweis darüber. Die Einträge zeigen ihren Text ja schon ganz, der Hinweis kommt dort nicht mehr.",
           "en": "Resting the mouse on an item of the right-click menu showed the same text again as a hint above it. The items show their text in full already, so the hint no longer comes there.",
-          "da": "Når musen hvilede på et element i højreklikmenuen, viste der den samme tekst igen som en forklaring oven over det. Elementerne viser allerede deres fulde tekst, så den forklaring kommer der ikke mere."
+          "da": "Når musen hvilede på en kommando i højreklikmenuen, viste der den samme tekst igen som en forklaring oven over den. Kommandoerne viser allerede deres fulde tekst, så den forklaring kommer der ikke mere."
         }
       },
       {
