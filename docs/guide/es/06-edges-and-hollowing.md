@@ -80,6 +80,8 @@ Lo que elijas en {{ui:shell.edges}} solo importa donde las paredes interiores se
 
 Cuando la parte superior es el único lado abierto, {{ui:shell.stack}} hace la caja apilable: la mitad exterior de la pared sobresale del borde como un reborde ({{ui:shell.stackHeight}}, al principio 3 mm), y bajo la pared se corta una ranura un milímetro más profunda que recibe el reborde de la caja de abajo. Así una caja se apoya en la siguiente sin deslizarse. El fondo y la base siguen planos, de modo que la caja se imprime apoyada en su fondo sin nada en el aire. Hacen falta paredes rectas, una pared de al menos 1,2 mm y un cuerpo claramente más alto que el reborde; si no funciona, la ventana de la herramienta dice por qué.
 
+Con la parte superior como único lado abierto, {{ui:shell.shelf}} coloca un saliente por todo el interior de la pared sobre el que puede apoyarse una placa, por ejemplo un estante o un doble fondo en la caja ({{ui:shell.shelfWidth}}, 1,5 mm al principio, de 0,5 a 5 mm). {{ui:shell.shelfHeight}} se mide desde el interior del fondo hasta la cara superior del saliente (20 mm al principio). El saliente tiene 2 mm de grosor y sigue la forma del interior, incluidas las esquinas redondeadas y las cajas redondas. Necesita paredes rectas y un cuerpo claramente más alto que la altura del saliente; con {{ui:shell.stack}} activado, el collar se construye alrededor. Si no funciona, la ventana de la herramienta dice por qué.
+
 ![El resultado: un cuerpo hueco con una pared de 3 mm, abierto por arriba.](shot:hollow-result)
 
 ![La misma caja con solo el lado delantero abierto: el hueco para un cajón.](shot:hollow-sides)

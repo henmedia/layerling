@@ -80,6 +80,8 @@ Væggene vokser indad. Ydersiden forbliver som den er.
 
 Når toppen er den eneste åbne side, gør {{ui:shell.stack}} æsken stabelbar: den ydre halvdel af væggen rager op over kanten som en krave ({{ui:shell.stackHeight}}, til at begynde med 3 mm), og under væggen skæres en rille, der er en millimeter dybere og tager imod kraven på æsken under. Så står en æske fast på den næste. Bunden og undersiden forbliver flade, så æsken stadig printes stående på bunden uden noget i luften. Det kræver lige vægge, en væg på mindst 1,2 mm og en krop, der er tydeligt højere end kraven; virker det ikke, siger værktøjsvinduet hvorfor.
 
+Når toppen er den eneste åbne side, lægger {{ui:shell.shelf}} en kant hele vejen rundt på indersiden af væggen, som en plade kan hvile på, for eksempel en hylde eller en mellembund i æsken ({{ui:shell.shelfWidth}}, til at begynde med 1,5 mm, 0,5 til 5 mm). {{ui:shell.shelfHeight}} måles fra indersiden af bunden til oversiden af kanten (til at begynde med 20 mm). Kanten er 2 mm tyk og følger indersidens form, også afrundede hjørner og runde æsker. Den kræver lodrette vægge og et legeme, der er tydeligt højere end kantens højde; med {{ui:shell.stack}} slået til bygges kraven rundt om den. Hvis det ikke virker, siger værktøjsvinduet hvorfor.
+
 ![Resultatet: en skal med 3 mm væg, åben foroven.](shot:hollow-result)
 
 ![Den samme kasse med kun forsiden åben: en slids til en skuffe.](shot:hollow-sides)

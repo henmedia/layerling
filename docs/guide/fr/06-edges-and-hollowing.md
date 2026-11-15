@@ -79,6 +79,8 @@ Le {{ui:shell.edges}} n'a d'importance que là où les parois intérieures s'éc
 
 Quand le haut est le seul côté ouvert, {{ui:shell.stack}} rend la boîte empilable : la moitié extérieure de la paroi dépasse du bord comme un col ({{ui:shell.stackHeight}}, 3 mm au départ), et sous la paroi une rainure plus profonde d'un millimètre reçoit le col de la boîte du dessous. Une boîte tient alors sur la suivante sans glisser. Le fond et le dessous restent plats : la boîte s'imprime toujours posée sur son fond, sans rien en porte-à-faux. Il faut des parois bien droites, une paroi d'au moins 1,2 mm et un corps nettement plus haut que le col ; si cela ne marche pas, la fenêtre de l'outil en donne la raison.
 
+Lorsque le dessus est le seul côté ouvert, {{ui:shell.shelf}} pose un rebord sur tout le tour de l'intérieur de la paroi, sur lequel peut reposer une plaque, par exemple une étagère ou un faux fond dans la boîte ({{ui:shell.shelfWidth}}, 1,5 mm au départ, de 0,5 à 5 mm). {{ui:shell.shelfHeight}} se mesure de l'intérieur du fond jusqu'au dessus du rebord (20 mm au départ). Le rebord fait 2 mm d'épaisseur et suit la forme de l'intérieur, coins arrondis et boîtes rondes compris. Il demande des parois bien droites et un corps nettement plus haut que la hauteur du rebord ; avec {{ui:shell.stack}} activé, le col est construit autour. Si cela ne marche pas, la fenêtre de l'outil en donne la raison.
+
 ![Le résultat : une coque avec une paroi de 3 mm, ouverte en haut.](shot:hollow-result)
 
 ![La même boîte avec seulement la face avant ouverte : un emplacement pour un tiroir.](shot:hollow-sides)

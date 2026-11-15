@@ -874,6 +874,10 @@ export type EdgeTreatmentFeature = {
   shellEdges?: ShellEdges;
   /** Only for "shell" with the top open: the height in mm of the collar round the top and of the groove under the wall, so one stands on the next; missing means none. */
   shellStack?: number;
+  /** Only for "shell" with the top open (#1663): the width in mm of a ledge round the inside of the wall for a plate to rest on; missing means none. */
+  shellShelf?: number;
+  /** Only with `shellShelf`: how high in mm the top of the ledge lies above the inside of the floor. */
+  shellShelfHeight?: number;
   /** Only for "offset": the faces moved inward, the body shrunk; missing means grown. */
   offsetShrink?: boolean;
   /** Only for "offset" (#1057): only the sides moved, flat tops and bottoms kept at their heights; missing means every face. */

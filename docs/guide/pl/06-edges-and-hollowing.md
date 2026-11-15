@@ -80,6 +80,8 @@ Pudełka, kubki, obudowy i pokrywki mają jedną cechę wspólną: w środku są
 
 Gdy góra jest jedyną otwartą stroną, {{ui:shell.stack}} sprawia, że pudełko można układać w stos: zewnętrzna połowa ścianki wystaje ponad krawędź jak kołnierz ({{ui:shell.stackHeight}}, na początku 3 mm), a pod ścianką wycina się rowek głębszy o milimetr, który przyjmuje kołnierz pudełka poniżej. Jedno pudełko stoi wtedy stabilnie na drugim. Dno i spód pozostają płaskie, więc pudełko nadal drukuje się stojąc na dnie, bez niczego w powietrzu. Potrzebne są proste ścianki, ścianka co najmniej 1,2 mm i bryła wyraźnie wyższa niż kołnierz; jeśli się nie da, okno narzędzia podaje powód.
 
+Gdy jedyną otwartą stroną jest góra, {{ui:shell.shelf}} układa dookoła wnętrza ściany występ, na którym może spoczywać płyta, na przykład półka albo podwójne dno w pudełku ({{ui:shell.shelfWidth}}, na początku 1,5 mm, od 0,5 do 5 mm). {{ui:shell.shelfHeight}} mierzy się od wnętrza dna do górnej powierzchni występu (na początku 20 mm). Występ ma 2 mm grubości i podąża za kształtem wnętrza, także przy zaokrąglonych narożnikach i okrągłych pudełkach. Wymaga pionowych ścian i bryły wyraźnie wyższej niż wysokość występu; przy włączonym {{ui:shell.stack}} kołnierz powstaje wokół niego. Jeśli się nie da, okno narzędzia podaje powód.
+
 ![Wynik: skorupa ze ścianką 3 mm, otwarta u góry.](shot:hollow-result)
 
 ![To samo pudełko z otwartym tylko przodem: wnęka na szufladę.](shot:hollow-sides)

@@ -80,6 +80,8 @@ Väggarna växer inåt. Utsidan förblir densamma.
 
 När toppen är den enda öppna sidan gör {{ui:shell.stack}} lådan stapelbar: den yttre hälften av väggen sticker upp över kanten som en krage ({{ui:shell.stackHeight}}, till att börja med 3 mm), och under väggen skärs ett spår som är en millimeter djupare och tar emot kragen på lådan under. En låda står då stadigt på nästa. Botten och undersidan förblir plana, så lådan skrivs fortfarande ut stående på botten utan något i luften. Det krävs raka väggar, en vägg på minst 1,2 mm och en kropp som är tydligt högre än kragen; fungerar det inte säger verktygsfönstret varför.
 
+När toppen är den enda öppna sidan lägger {{ui:shell.shelf}} en kant hela vägen runt på insidan av väggen som en platta kan vila på, till exempel en hylla eller ett mellanbotten i lådan ({{ui:shell.shelfWidth}}, från början 1,5 mm, 0,5 till 5 mm). {{ui:shell.shelfHeight}} mäts från insidan av botten till kantens ovansida (från början 20 mm). Kanten är 2 mm tjock och följer insidans form, även rundade hörn och runda lådor. Den kräver raka väggar och en kropp som är tydligt högre än kantens höjd; med {{ui:shell.stack}} påslaget byggs kragen runt den. Om det inte går säger verktygsfönstret varför.
+
 ![Resultatet: ett skal med 3 mm vägg, öppet upptill.](shot:hollow-result)
 
 ![Samma låda med bara framsidan öppen: ett fack för en utdragslåda.](shot:hollow-sides)

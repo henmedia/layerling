@@ -79,6 +79,8 @@ Stene rastejo navznoter. Zunaj ostane vse, kot je.
 
 Če je zgornja stran edina odprta, {{ui:shell.stack}} naredi škatlo zložljivo na kup: zunanja polovica stene štrli nad rob kot rob ({{ui:shell.stackHeight}}, na začetku 3 mm), pod steno pa se izreže utor, globlji za milimeter, ki sprejme rob spodnje škatle. Ena škatla potem stoji trdno na drugi. Dno in spodnja stran ostaneta ravni, zato se škatla še vedno tiska stoje na dnu, brez česar koli v zraku. Potrebne so ravne stene, stena vsaj 1,2 mm in telo, ki je jasno višje od roba; če ne gre, okno orodja pove zakaj.
 
+Ko je zgornja stran edina odprta stran, {{ui:shell.shelf}} naredi rob po vsej notranji strani stene, na katerem lahko počiva plošča, na primer polica ali vmesno dno v škatli ({{ui:shell.shelfWidth}}, na začetku 1,5 mm, od 0,5 do 5 mm). {{ui:shell.shelfHeight}} se meri od notranje strani dna do zgornje ploskve roba (na začetku 20 mm). Rob je debel 2 mm in sledi obliki notranjosti, tudi zaobljenim kotom in okroglim škatlam. Potrebuje navpične stene in telo, ki je jasno višje od višine roba; pri vklopljenem {{ui:shell.stack}} se ovratnik zgradi okoli njega. Če ne gre, okno orodja pove, zakaj.
+
 ![Rezultat: lupina s steno 3 mm, zgoraj odprta.](shot:hollow-result)
 
 ![Isti kvader, odprt samo na sprednji strani: reža za predal.](shot:hollow-sides)
