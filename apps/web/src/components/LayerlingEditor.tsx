@@ -1,4 +1,5 @@
 "use client";
+import { type GroupHoleChange, withHoleDiameters } from "@/lib/groupHoles";
 import { watchAutoTitles } from "@/lib/autoButtonTitles";
 import { deleteSketchDraft, loadSketchDraft, saveSketchDraft, sketchHasWork, type SketchDraft } from "@/lib/sketchDraftStore";
 import { normalizeNarrowStart, normalizeSlopeCurve, normalizeSlopeFrom, normalizeSlopeSide, shapeSupportsNarrow, shapeSupportsSlope } from "@/lib/slopeAlong";
@@ -12310,6 +12311,46 @@ export function LayerlingEditor({
     return { ok: true, hull: rebuilt };
   }, [commitShapes, rebuildGroupFromParts]);
 
+  /**
+   * The round holes of a group set to a new diameter, all at once or one of them, as one step: the groups they sit in
+   * are built again from the inside out, each hole keeping its middle and its depth (groupHoles.ts).
+   */
+  const holeDiameterRunRef = useRef<Promise<unknown>>(Promise.resolve());
+  const setGroupHoleDiameters = useCallback((groupId: string, change: GroupHoleChange) => {
+    // One change after the other: a slider let go twice quickly builds the second on the first.
+    const run = holeDiameterRunRef.current.then(async () => {
+      const group = shapesRef.current.find((shape) => shape.id === groupId);
+      if (!group || !group.groupedShapes?.length) return;
+      if (bodyLocked(group) || groupHeld(group)) {
+        setNotice(t("status.objectLocked"));
+        return;
+      }
+      const sourceFingerprint = projectShapesFingerprint(shapesRef.current);
+      const sourceProjectId = projectInfoRef.current.projectId;
+      let failure = "";
+      const rebuilt = await withHoleDiameters(group, change, async (original, parts) => {
+        const result = await rebuildGroupFromParts(original, parts);
+        if (!result.group) {
+          failure = result.failure;
+          return null;
+        }
+        return result.group;
+      });
+      if (projectInfoRef.current.projectId !== sourceProjectId || projectShapesFingerprint(shapesRef.current) !== sourceFingerprint) {
+        setNotice(t("status.groupChanged"));
+        return;
+      }
+      if (!rebuilt) {
+        setNotice(failure || t("status.groupChanged"));
+        return;
+      }
+      if (rebuilt === group) return;
+      commitShapes(shapesRef.current.map((shape) => (shape.id === groupId ? rebuilt : shape)), groupId, t("status.groupHolesResized"));
+    });
+    holeDiameterRunRef.current = run.catch(() => undefined);
+    return run;
+  }, [commitShapes, rebuildGroupFromParts]);
+
   // The design as the last finished step left it, by id: a group in it at another size has just been resized, one
   // that comes in new (a copy, an ungrouped part, another design) is left as it is. So is everything Undo brings back:
   // only a step at the end of the history is finished, as a rebuild in the middle would cut off the steps to redo.
@@ -19396,6 +19437,7 @@ export function LayerlingEditor({
           onEditSketch={beginSketchEdit}
           onOpenGroup={selectedShapes.length === 1 && canEditGroup(selectedShape) ? openGroupForEditing : undefined}
           onHullKeepHolesChange={(id, keepHoles) => void setHullKeepHoles(id, keepHoles)}
+          onGroupHoleDiameters={(id, change) => void setGroupHoleDiameters(id, change)}
           canSeparateParts={canSeparateSelectedParts || selectedIsSingleBundle}
           onSeparateParts={selectedIsSingleBundle ? ungroupSelected : separateSelectedParts}
           onSelectionHole={setSelectionHoleMode}
