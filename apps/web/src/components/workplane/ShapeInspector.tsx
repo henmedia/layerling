@@ -368,6 +368,7 @@ import {
   normalizeSpringForm,
 } from "@/lib/flatSpringGeometry";
 import { regularPolygonAspect } from "@/lib/regularPolygonFootprint";
+import { maxPolygonCornerRadius, normalizePolygonCornerRadius } from "@/lib/roundedPolygonGeometry";
 import { DEFAULT_TAPER_DIMENSION_MAX, MAX_HIGH_RESOLUTION_SIDES, MAX_HIGH_RESOLUTION_STEPS, POSITION_TYPED_LIMIT, RULER_MAX_LENGTH, customSnapGridLabel, positionReach, shapeDimensionLimit, snapGridStep } from "@/lib/workplaneSettings";
 import { printerPresetById } from "@/lib/printBed";
 import { maxSideDrop, narrowCrossWidth, narrowEndWidth, normalizeNarrowStart, normalizeSlopeCurve, normalizeSlopeFrom, normalizeSlopeSide, shapeSupportsNarrow, shapeSupportsSlope, SLOPE_MIN_END, slopeAlongWidth, slopeEndHeight, slopeSidesFor } from "@/lib/slopeAlong";
@@ -2805,6 +2806,16 @@ function getShapePropertiesWithAppLimits(shape: WorkplaneShape, onUpdate: ShapeI
           const nextDepth = Math.max(MIN_SHAPE_SIZE, (depth / current.depth) * next.depth);
           onUpdate({ sides: nextSides, width: nextWidth, depth: nextDepth, size: resizedShapeSize(nextWidth, nextDepth) });
         },
+      },
+      {
+        // The corners rounded like a Rounded box's, one radius for all; the dot on the model does the same.
+        id: "cornerFillet",
+        label: t("prop.cornerFillet"),
+        value: normalizePolygonCornerRadius(shape.cornerFillet, width, depth, sides),
+        min: 0,
+        max: Math.max(0.01, maxPolygonCornerRadius(width, depth, sides)),
+        step: 0.1,
+        onChange: (value) => onUpdate({ cornerFillet: Math.round(normalizePolygonCornerRadius(value, width, depth, sides) * 1e3) / 1e3 }),
       },
       { id: "length", label: t("prop.length"), value: depth, min: MIN_SHAPE_SIZE, max: 160, onChange: setDepth },
       { id: "width", label: t("prop.width"), value: width, min: MIN_SHAPE_SIZE, max: 160, onChange: setWidth },

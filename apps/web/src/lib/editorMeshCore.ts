@@ -32,6 +32,7 @@ import { createHoneycombGeometry } from "@/lib/honeycombGeometry";
 import { createRoundedBoxGeometry } from "@/lib/roundedBoxGeometry";
 import { createBentTubeGeometry } from "@/lib/bentTubeGeometry";
 import { createPrismGeometry } from "@/lib/prismGeometry";
+import { createRoundedPolygonGeometry } from "@/lib/roundedPolygonGeometry";
 import { shapeHasAlongDeform, slopeMesh } from "@/lib/slopeAlong";
 import { createBooleanHalfSphereGeometry, createBooleanHollowCylinderGeometry, createBooleanRoundRoofGeometry, createParaboloidGeometry } from "@/lib/roundBodyGeometry";
 import { createCurvedConeGeometry } from "@/lib/curvedCone";
@@ -777,7 +778,9 @@ function geometryMeshForShape(shape: WorkplaneShape): MeshData | null {
       geometry = createBooleanWedgeGeometry(width, height, depth);
       break;
     case "polygon":
-      geometry = createPrismGeometry(width, height, depth, shape.sides ?? 6);
+      geometry = (shape.cornerFillet ?? 0) > 0
+        ? createRoundedPolygonGeometry(width, height, depth, shape.sides ?? 6, shape.cornerFillet ?? 0)
+        : createPrismGeometry(width, height, depth, shape.sides ?? 6);
       break;
     case "icosahedron":
       geometry = new THREE.IcosahedronGeometry(size / 2, 1);
