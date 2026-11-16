@@ -258,6 +258,30 @@ export function serializedSceneSignature(shapes: WorkplaneShape[]) {
   };
 }
 
+/**
+ * What a state of the history holds, as the stored design keeps it: the scene itself, written once per state, and the
+ * large parts (meshes, exact bodies, sketch profiles, picture plates) that are stored once however many states share
+ * them, each under its fingerprint with its estimated size. The History view counts with it what deleting a step
+ * would free (memory 14.11.2026, after #1728).
+ */
+export function historyEntryResources(shapes: WorkplaneShape[]): { sceneBytes: number; resources: Map<string, number> } {
+  const resources = new Map<string, number>();
+  const serialized = JSON.stringify(shapes.map(canonicalizeShape), (key, value: unknown) => {
+    if (COMPACT_RESOURCE_KEYS.has(key) && value !== null && typeof value === "object") {
+      const signature = objectResourceSignature(value);
+      resources.set(`${key}:${signature.fingerprint}`, signature.estimatedBytes);
+      return { $resource: key, fingerprint: signature.fingerprint };
+    }
+    if (COMPACT_STRING_KEYS.has(key) && typeof value === "string" && value.length > 0) {
+      const signature = stringResourceSignature(value);
+      resources.set(`${key}:${signature.fingerprint}`, signature.estimatedBytes);
+      return { $resource: key, fingerprint: signature.fingerprint };
+    }
+    return value;
+  });
+  return { sceneBytes: serialized.length * 2, resources };
+}
+
 export function projectShapesFingerprint(shapes: WorkplaneShape[]) {
   return serializedSceneSignature(shapes).fingerprint;
 }

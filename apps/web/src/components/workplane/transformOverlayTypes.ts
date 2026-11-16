@@ -1,6 +1,8 @@
 import type { PointerEvent as ReactPointerEvent, WheelEvent as ReactWheelEvent } from "react";
 
 /** "slide": the red and green arrows that move the selection along X or Y only (Discussion #1434). */
+import type { TouchHandleMode } from "@/lib/touchHandleMode";
+
 export type TransformHandleKind = "scale" | "height" | "lift" | "rotate" | "slide";
 export type RotationAxis = "x" | "y" | "z";
 export type RotationWheelView = { x: number; y: number; radius: number };
@@ -488,6 +490,8 @@ export type TransformOverlayProps = {
   sizeLocked?: boolean;
   /** The red and green arrows that move the selection along X or Y; off in the settings, they are left out. */
   showSlideArrows?: boolean;
+  /** On a touch screen, which handles a finger can reach (Discussion #1747); "all" shows every one. */
+  handleMode?: TouchHandleMode;
   showRotationWheel: boolean;
   hideSelectionChrome: boolean;
   hideDimensionMarks: boolean;

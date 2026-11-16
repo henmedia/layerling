@@ -14,6 +14,7 @@ import { createFinishingWasherGeometry } from "@/lib/finishingWasherGeometry";
 import { createStarGeometry } from "@/lib/starGeometry";
 import { createHeartGeometry } from "@/lib/heartGeometry";
 import { createCrescentGeometry } from "@/lib/crescentGeometry";
+import { createSectorGeometry } from "@/lib/sectorGeometry";
 import { createSlotGeometry } from "@/lib/slotGeometry";
 import { createDovetailGeometry } from "@/lib/dovetailGeometry";
 import { createLoftGeometry } from "@/lib/loftGeometry";
@@ -503,6 +504,16 @@ function geometryMeshForShape(shape: WorkplaneShape): MeshData | null {
         heartQuality: shape.heartQuality,
       });
       break;
+    case "sector":
+      geometry = createSectorGeometry({
+        width,
+        depth,
+        height,
+        sectorAngle: shape.sectorAngle,
+        sectorInnerDiameter: shape.sectorInnerDiameter,
+        sectorEndRadius: shape.sectorEndRadius,
+      });
+      break;
     case "crescent":
       geometry = createCrescentGeometry({
         width,
@@ -607,6 +618,10 @@ function geometryMeshForShape(shape: WorkplaneShape): MeshData | null {
         gridfinityLabelRightOffset: shape.gridfinityLabelRightOffset,
         gridfinityLabelCorner: shape.gridfinityLabelCorner,
         gridfinityLabelCornerSize: shape.gridfinityLabelCornerSize,
+        gridfinityLabelBackText: shape.gridfinityLabelBackText,
+        gridfinityLabelFrontText: shape.gridfinityLabelFrontText,
+        gridfinityLabelLeftText: shape.gridfinityLabelLeftText,
+        gridfinityLabelRightText: shape.gridfinityLabelRightText,
         gridfinityScoopBack: shape.gridfinityScoopBack,
         gridfinityScoopFront: shape.gridfinityScoopFront,
         gridfinityScoopLeft: shape.gridfinityScoopLeft,
@@ -635,6 +650,7 @@ function geometryMeshForShape(shape: WorkplaneShape): MeshData | null {
         gridfinityCompartmentsX: shape.gridfinityCompartmentsX,
         gridfinityCompartmentsZ: shape.gridfinityCompartmentsZ,
         gridfinityDividerThickness: shape.gridfinityDividerThickness,
+        gridfinityDividerHeight: shape.gridfinityDividerHeight,
         gridfinityDividerPositionsX: shape.gridfinityDividerPositionsX,
         gridfinityDividerPositionsZ: shape.gridfinityDividerPositionsZ,
         gridfinityCompartmentLabels: shape.gridfinityCompartmentLabels,

@@ -15,7 +15,7 @@ Sökrutan längst upp i fönstret filtrerar listan: den behåller bara de kortko
 
 Hittar du inte ett verktyg? Tryck [[Ctrl]]+[[K]] eller klicka på förstoringsglaset i området {{ui:editor.group.help}} och skriv vad du letar efter: ett verktyg (”avrundning”, ”spegla”), en form (”cylinder”) eller ett kommando (”exportera”, ”ångra”). Flytta markeringen med piltangenterna och tryck [[Enter]], eller klicka på posten.
 
-- Sökningen förstår både svenska, engelska och tyska ord och bryr sig inte om versaler eller prickar: ”aushoehlen” hittar {{ui:editor.tool.hollow}}.
+- Sökningen förstår både svenska, engelska och tyska ord och bryr sig inte om versaler eller prickar: ”aushoehlen” hittar {{ui:editor.tool.hollow}}. Sökningen fungerar i alla skriftsystem: ett namn hittas så som det står på gränssnittets språk (”円柱” på japanska). Tecken med full och halv bredd, katakana och hiragana samt accenter räknas som lika.
 - Varje rad visar vilka tangenter som gör samma sak och vilken grupp i verktygsfältet verktyget bor i, så att du lär dig var det finns.
 - Poster som är nedtonade kan inte köras just nu, oftast för att inget är markerat. De ligger ändå kvar i listan så att sökningen alltid visar var verktyget finns.
 

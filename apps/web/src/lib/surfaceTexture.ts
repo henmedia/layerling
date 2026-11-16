@@ -6799,6 +6799,10 @@ export function createSurfaceTextureSession(positions: ArrayLike<number>) {
         // them into slivers.
         const first = unrolled(base, place, s, place.face);
         const nBase = base.vertices.length / 3;
+        // Laid over the creases, more of the body is reached than straight on (a wide text round a body with sides: the
+        // far sides come back only that way); a point either way reaches belongs to the window (#1665).
+        const folded = unrolled(base, place, s, place.face, true);
+        const reached = (i: number) => Number.isFinite(first.U[i]) || Number.isFinite(folded.U[i]);
         // Estimate first: the circle round the window over a triangle's area; too many - coarser.
         const budget = Math.max(1, maxTriangles - mesh.indices.length / 3);
         const estimate = (1.6 * Math.PI * place.reach ** 2) / (0.433 * edge * edge);
@@ -6824,7 +6828,7 @@ export function createSurfaceTextureSession(positions: ArrayLike<number>) {
         // Asked the same way from both triangles of an edge, or they would split it differently.
         const near = (verts: ArrayLike<number>, p: number, q: number) => {
           const a = Math.min(p, q), b = Math.max(p, q);
-          if ((a < nBase && !Number.isFinite(first.U[a])) || (b < nBase && !Number.isFinite(first.U[b]))) return false;
+          if ((a < nBase && !reached(a)) || (b < nBase && !reached(b))) return false;
           if (once && !inWindow(verts, a, b)) return false;
           const ox = verts[a * 3] - px, oy = verts[a * 3 + 1] - py, oz = verts[a * 3 + 2] - pz;
           const dx = verts[b * 3] - verts[a * 3], dy = verts[b * 3 + 1] - verts[a * 3 + 1], dz = verts[b * 3 + 2] - verts[a * 3 + 2];

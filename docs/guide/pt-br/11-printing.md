@@ -91,7 +91,7 @@ A partir daí, os novos usos partem da folga em vez do valor embutido: {{ui:lid.
 
 ![Uma bandeja cuja parede direita tem só 0,6 mm: Verificar impressão a pinta de vermelho e a aponta na janela.](shot:print-check)
 
-{{ui:printCheck.show}} numa linha leva a câmera até lá; seleciona as peças flutuantes, as que se apoiam em pouco e as malhas abertas, e nas saliências liga **Mostrar saliências**. Corpos que se sobrepõem são verificados unidos, como o fatiador os une. Se você mudar o desenho com a janela aberta, aparece {{ui:printCheck.stale}}; clique ali ou em {{ui:printCheck.checkAgain}}. [[Esc]] fecha a janela. Nada no desenho muda. Uma IA faz a mesma verificação com `layerling_check_print`.
+{{ui:printCheck.show}} numa linha leva a câmera até lá; seleciona as peças flutuantes, as que se apoiam em pouco e as malhas abertas, e nas saliências liga **Mostrar saliências**. Corpos que se sobrepõem são verificados unidos, como o fatiador os une. Se você mudar o desenho com a janela aberta, aparece {{ui:printCheck.stale}}; clique ali ou em {{ui:printCheck.checkAgain}}. [[Esc]] fecha a janela. Nada no desenho muda. Uma IA faz a mesma verificação com `layerling_check_print`. A janela só verifica, não imprime nem salva nada: para imprimir, exporte o desenho para o seu fatiador com {{ui:editor.export}} no grupo {{ui:editor.group.file}}. {{ui:printCheck.openExport}} na janela fecha a verificação e abre a exportação.
 
 ## Quando estiver pronto
 

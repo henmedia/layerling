@@ -7,6 +7,8 @@ import { EdgeFeatureHistory, EdgeModifierSlider, type EdgeHistoryOption } from "
 import { cadModifierUserErrorMessage } from "@/lib/cadModifierRuntime";
 import { t } from "@/lib/i18n";
 import { useLanguage } from "@/lib/useLanguage";
+import { DEFAULT_SHELL_SHELF_WIDTH, SHELL_SHELF_MAX_HEIGHT, SHELL_SHELF_MAX_WIDTH, SHELL_SHELF_MIN_HEIGHT, SHELL_SHELF_MIN_WIDTH } from "@/lib/shellShelfLimits";
+import { DEFAULT_SHELL_STACK_HEIGHT, SHELL_STACK_MAX_HEIGHT, SHELL_STACK_MIN_HEIGHT, SHELL_STACK_MIN_WALL } from "@/lib/shellStackLimits";
 import { MIN_SHELL_WALL, SHELL_SIDES, shellOpeningsFor, shellOpenSides } from "@/lib/shellLimits";
 import type { ShellEdges, ShellOpenings, WorkplaneWorkspaceSettings } from "@/types/layerling";
 
@@ -31,6 +33,11 @@ export function ShellPanel({
   maxThickness,
   openings,
   edges,
+  stack,
+  stackOffered,
+  shelf,
+  shelfHeight,
+  shelfOffered,
   workspace,
   busy,
   error,
@@ -43,6 +50,9 @@ export function ShellPanel({
   onThicknessChange,
   onOpeningsChange,
   onEdgesChange,
+  onStackChange,
+  onShelfChange,
+  onShelfHeightChange,
   onApply,
   onCancel,
 }: {
@@ -51,6 +61,16 @@ export function ShellPanel({
   maxThickness: number;
   openings: ShellOpenings;
   edges: ShellEdges;
+  /** The height in mm of the collar and the groove that let one box stand on the next; 0 for none. */
+  stack: number;
+  /** Stacking is offered only with the top as the one open side. */
+  stackOffered: boolean;
+  /** The width in mm of the ledge round the inside of the wall for a plate to rest on; 0 for none (#1663). */
+  shelf: number;
+  /** How high in mm the top of the ledge lies above the inside of the floor. */
+  shelfHeight: number;
+  /** The ledge is offered only with the top as the one open side. */
+  shelfOffered: boolean;
   workspace: WorkplaneWorkspaceSettings;
   busy: boolean;
   error: string | null;
@@ -65,6 +85,9 @@ export function ShellPanel({
   onThicknessChange: (value: number) => void;
   onOpeningsChange: (value: ShellOpenings) => void;
   onEdgesChange: (value: ShellEdges) => void;
+  onStackChange: (value: number) => void;
+  onShelfChange: (value: number) => void;
+  onShelfHeightChange: (value: number) => void;
   onApply: () => void;
   onCancel: () => void;
 }) {
@@ -164,6 +187,81 @@ export function ShellPanel({
         </div>
         <span className="shell-openings-summary">{t("shell.edgesHint")}</span>
       </div>
+
+      {stackOffered ? (
+        <div className="edge-modifier-field shell-openings shell-stack" role="group" aria-label={t("shell.stack")}>
+          <span>{t("shell.stack")}</span>
+          <div className="shell-opening-options">
+            <button
+              type="button"
+              aria-pressed={stack > 0}
+              className={stack > 0 ? "active" : ""}
+              disabled={busy}
+              onClick={() => onStackChange(stack > 0 ? 0 : DEFAULT_SHELL_STACK_HEIGHT)}
+            >
+              {t("shell.stack")}
+            </button>
+          </div>
+          {stack > 0 ? (
+            <EdgeModifierSlider
+              label={t("shell.stackHeight")}
+              value={stack}
+              min={SHELL_STACK_MIN_HEIGHT}
+              max={SHELL_STACK_MAX_HEIGHT}
+              step={WALL_STEP}
+              workspace={workspace}
+              length
+              disabled={busy}
+              onChange={onStackChange}
+            />
+          ) : null}
+          <span className="shell-openings-summary">{thickness < SHELL_STACK_MIN_WALL && stack > 0 ? t("shell.stackWallThin", { min: SHELL_STACK_MIN_WALL }) : t("shell.stackHint")}</span>
+        </div>
+      ) : null}
+
+      {shelfOffered ? (
+        <div className="edge-modifier-field shell-openings shell-shelf" role="group" aria-label={t("shell.shelf")}>
+          <span>{t("shell.shelf")}</span>
+          <div className="shell-opening-options">
+            <button
+              type="button"
+              aria-pressed={shelf > 0}
+              className={shelf > 0 ? "active" : ""}
+              disabled={busy}
+              onClick={() => onShelfChange(shelf > 0 ? 0 : DEFAULT_SHELL_SHELF_WIDTH)}
+            >
+              {t("shell.shelf")}
+            </button>
+          </div>
+          {shelf > 0 ? (
+            <>
+              <EdgeModifierSlider
+                label={t("shell.shelfWidth")}
+                value={shelf}
+                min={SHELL_SHELF_MIN_WIDTH}
+                max={SHELL_SHELF_MAX_WIDTH}
+                step={WALL_STEP}
+                workspace={workspace}
+                length
+                disabled={busy}
+                onChange={onShelfChange}
+              />
+              <EdgeModifierSlider
+                label={t("shell.shelfHeight")}
+                value={shelfHeight}
+                min={SHELL_SHELF_MIN_HEIGHT}
+                max={SHELL_SHELF_MAX_HEIGHT}
+                step={WALL_STEP}
+                workspace={workspace}
+                length
+                disabled={busy}
+                onChange={onShelfHeightChange}
+              />
+            </>
+          ) : null}
+          <span className="shell-openings-summary">{t("shell.shelfHint")}</span>
+        </div>
+      ) : null}
 
       {error ? <div className="edge-modifier-error" role="alert">{shellErrorMessage(error, roundedEdgesHint)}</div> : null}
       <div className="edge-modifier-footer">

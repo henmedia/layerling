@@ -24,6 +24,7 @@ export type ShapeKind =
   | "star"
   | "heart"
   | "crescent"
+  | "sector"
   | "gear"
   | "hirth"
   | "pulley"
@@ -261,6 +262,12 @@ export type ShapeCustomization = {
   crescentThickness?: number;
   crescentTipFillet?: number;
   crescentQuality?: number;
+  /** Sector: how far the piece runs round from twelve o'clock, clockwise, in degrees (1 to 360). */
+  sectorAngle?: number;
+  /** Sector: the bore's diameter in mm, 0 for a solid piece. */
+  sectorInnerDiameter?: number;
+  /** Sector: the rounding of the piece's two ends in mm, up to a half circle. */
+  sectorEndRadius?: number;
   honeycombCellSize?: number;
   honeycombWallThickness?: number;
   honeycombFrameWidth?: number;
@@ -420,6 +427,8 @@ export type ShapeCustomization = {
   gridfinityCompartmentsZ?: number;
   /** Gridfinity bin: the dividers' thickness in mm, 0.8 to 3; missing is 1.2. */
   gridfinityDividerThickness?: number;
+  /** Gridfinity bin: the dividers' height over the floor in mm, at least 3; missing, 0, or within 0.1 mm of the full height or over it is the full height (#1560). */
+  gridfinityDividerHeight?: number;
   /** Knurling: grooves straight along the axis, or crossed into diamonds. */
   knurlPattern?: "straight" | "diamond" | "round";
   /** Knurling: number of grooves around the grip. */
@@ -886,6 +895,12 @@ export type EdgeTreatmentFeature = {
   openings?: ShellOpenings;
   /** Only for "shell" and "offset"; missing means "round". */
   shellEdges?: ShellEdges;
+  /** Only for "shell" with the top open: the height in mm of the collar round the top and of the groove under the wall, so one stands on the next; missing means none. */
+  shellStack?: number;
+  /** Only for "shell" with the top open (#1663): the width in mm of a ledge round the inside of the wall for a plate to rest on; missing means none. */
+  shellShelf?: number;
+  /** Only with `shellShelf`: how high in mm the top of the ledge lies above the inside of the floor. */
+  shellShelfHeight?: number;
   /** Only for "offset": the faces moved inward, the body shrunk; missing means grown. */
   offsetShrink?: boolean;
   /** Only for "offset" (#1057): only the sides moved, flat tops and bottoms kept at their heights; missing means every face. */
@@ -1213,6 +1228,12 @@ export type WorkplaneShape = {
   crescentThickness?: number;
   crescentTipFillet?: number;
   crescentQuality?: number;
+  /** Sector: how far the piece runs round from twelve o'clock, clockwise, in degrees (1 to 360). */
+  sectorAngle?: number;
+  /** Sector: the bore's diameter in mm, 0 for a solid piece. */
+  sectorInnerDiameter?: number;
+  /** Sector: the rounding of the piece's two ends in mm, up to a half circle. */
+  sectorEndRadius?: number;
   honeycombCellSize?: number;
   honeycombWallThickness?: number;
   honeycombFrameWidth?: number;
@@ -1376,6 +1397,8 @@ export type WorkplaneShape = {
   gridfinityCompartmentsZ?: number;
   /** Gridfinity bin: the dividers' thickness in mm, 0.8 to 3; missing is 1.2. */
   gridfinityDividerThickness?: number;
+  /** Gridfinity bin: the dividers' height over the floor in mm, at least 3; missing, 0, or within 0.1 mm of the full height or over it is the full height (#1560). */
+  gridfinityDividerHeight?: number;
   /** Gridfinity bin: each divider across, in mm from the inside of the left wall to its middle, left to right; missing spaces them evenly. */
   gridfinityDividerPositionsX?: number[];
   /** Gridfinity bin: each divider deep, in mm from the inside of the back wall to its middle, back to front; missing spaces them evenly. */
@@ -1775,7 +1798,7 @@ export type QrErrorCorrection = "L" | "M" | "Q" | "H";
 export type QrStyle = "code" | "raised" | "engraved";
 /** What a QR body keeps so it can be made again from the inspector (#553). */
 /** The single-board computers the SBC board shape knows (#1098). */
-export type SbcBoardType = "pi5" | "pi4" | "pi3bPlus" | "zero2w" | "bttPi12" | "xiaoEsp32c6" | "esp32c3SuperMini" | "esp32c6SuperMini" | "featherEsp32s3" | "arduinoUno" | "arduinoMega" | "arduinoNano" | "wemosD1Mini" | "pico" | "picoW" | "pico2" | "pico2W" | "esp32CamMb" | "esp32s3Cam" | "esp32DevKitC" | "esp32DevKitV1" | "cyd" | "cyd2usb" | "waveshareEsp32s3Zero" | "arduinoProMini";
+export type SbcBoardType = "pi5" | "pi4" | "pi3bPlus" | "zero2w" | "bttPi12" | "xiaoEsp32c6" | "esp32c3SuperMini" | "esp32c6SuperMini" | "featherEsp32s3" | "arduinoUno" | "arduinoMega" | "arduinoNano" | "wemosD1Mini" | "pico" | "picoW" | "pico2" | "pico2W" | "esp32CamMb" | "esp32s3Cam" | "esp32DevKitC" | "esp32DevKitV1" | "cyd" | "cyd2usb" | "waveshareEsp32s3Zero" | "arduinoProMini" | "nanoPiNeo3Plus" | "waveshareEsp32p4Nano";
 
 export type SbcBoardSettings = {
   board: SbcBoardType;

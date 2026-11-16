@@ -14,7 +14,7 @@ import type { SketchPoint, SketchProfile, SketchSegment, WorkplaneShape } from "
  * true ellipse. Too many pieces, or a curve of a kind the loader does not draw, and the import
  * keeps the mesh.
  */
-export const MAX_SVG_SKETCH_SEGMENTS = 2500;
+export const MAX_SVG_SKETCH_SEGMENTS = 10000;
 
 type SvgPoint = { x: number; y: number };
 type SvgPiece = { start: SvgPoint; c1?: SvgPoint; c2?: SvgPoint; end: SvgPoint };

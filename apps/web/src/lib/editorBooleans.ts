@@ -728,6 +728,11 @@ function shapeRotationQuaternion(shape: WorkplaneShape) {
 function primitiveTransformMatrix(shape: WorkplaneShape, scale: THREE.Vector3, alignRotation?: THREE.Euler) {
   const center = new THREE.Vector3(shape.x, (shape.elevation ?? 0) + shape.height / 2, shape.z);
   const matrix = new THREE.Matrix4().compose(center, shapeRotationQuaternion(shape), new THREE.Vector3(1, 1, 1));
+  // A mirrored shape is mirrored about its own middle before it is turned, as transformMesh does it. A box, a sphere
+  // and an even cylinder look the same either way, a cone with two radii does not: it came out upside down (#1733).
+  if (shape.mirrorX || shape.mirrorY || shape.mirrorZ) {
+    matrix.multiply(new THREE.Matrix4().makeScale(mirrorSign(shape.mirrorX), mirrorSign(shape.mirrorY), mirrorSign(shape.mirrorZ)));
+  }
   if (alignRotation) {
     matrix.multiply(new THREE.Matrix4().makeRotationFromEuler(alignRotation));
   }

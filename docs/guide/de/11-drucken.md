@@ -91,7 +91,7 @@ Von da an beginnen neue Verwendungen mit dem Spiel statt mit dem eingebauten Wer
 
 ![Eine Schale, deren rechte Wand nur 0,6 mm dick ist: Druck prüfen malt sie rot an und nennt sie im Fenster.](shot:print-check)
 
-{{ui:printCheck.show}} an einer Zeile fährt die Kamera hin; es wählt die schwebenden Teile, die mit wenig Halt und die offenen Netze aus, und bei den Überhängen schaltet es **Überhänge zeigen** ein. Körper, die sich überschneiden, werden vereint geprüft, wie der Slicer sie vereint. Änderst du den Entwurf, während das Fenster offen ist, steht dort {{ui:printCheck.stale}}; klicke darauf oder auf {{ui:printCheck.checkAgain}}. [[Esc]] schließt das Fenster. Am Entwurf ändert sich nichts. Eine KI macht dieselbe Prüfung mit `layerling_check_print`.
+{{ui:printCheck.show}} an einer Zeile fährt die Kamera hin; es wählt die schwebenden Teile, die mit wenig Halt und die offenen Netze aus, und bei den Überhängen schaltet es **Überhänge zeigen** ein. Körper, die sich überschneiden, werden vereint geprüft, wie der Slicer sie vereint. Änderst du den Entwurf, während das Fenster offen ist, steht dort {{ui:printCheck.stale}}; klicke darauf oder auf {{ui:printCheck.checkAgain}}. [[Esc]] schließt das Fenster. Am Entwurf ändert sich nichts. Eine KI macht dieselbe Prüfung mit `layerling_check_print`. Das Fenster prüft nur, es druckt und speichert nichts: Zum Drucken exportierst du das Modell für deinen Slicer mit {{ui:editor.export}} in der Gruppe {{ui:editor.group.file}}. {{ui:printCheck.openExport}} im Fenster schließt die Prüfung und öffnet den Export.
 
 ## Wenn es losgehen soll
 

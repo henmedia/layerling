@@ -416,6 +416,15 @@ function rotateAround(point: { x: number; z: number }, degrees: number, cx: numb
   return { x: cx + dx * Math.cos(angle) - dz * Math.sin(angle), z: cz + dx * Math.sin(angle) + dz * Math.cos(angle) };
 }
 
+/**
+ * The angle SVG's rotate() takes to turn a box or a round body drawn underneath as the body stands (#1734). A body turns about
+ * the up axis as three.js turns it: seen from above, with z pointing down the screen, a positive turn goes against the clock,
+ * and rotate() with y down turns with it. A Box at 45° was drawn at -45°, mirrored across its own middle.
+ */
+export function referenceShapeTurn(shape: Pick<WorkplaneShape, "rotation">) {
+  return -(shape.rotation ?? 0);
+}
+
 function isRoundReference(shape: WorkplaneShape) {
   return ["cylinder", "sphere", "cone", "torus", "tube", "ring", "halfSphere"].includes(shape.kind);
 }
@@ -2301,7 +2310,7 @@ export function SketchWorkspace({
       }
       const footprint = referenceFootprints.get(shape.id);
       // An outline made from the body's own mesh stands in the plate's coordinates already.
-      const turn = (point: { x: number; z: number }) => (footprint?.world ? point : rotateAround(point, shape.rotation ?? 0, shape.x, shape.z));
+      const turn = (point: { x: number; z: number }) => (footprint?.world ? point : rotateAround(point, referenceShapeTurn(shape), shape.x, shape.z));
       const halfWidth = shape.width / 2;
       const halfDepth = shape.depth / 2;
       const local = footprint?.outlineD
@@ -2700,7 +2709,7 @@ export function SketchWorkspace({
                 );
               }
               return (
-                <g key={shape.id} transform={footprint?.world ? undefined : `rotate(${shape.rotation ?? 0} ${shape.x} ${shape.z})`}>
+                <g key={shape.id} transform={footprint?.world ? undefined : `rotate(${referenceShapeTurn(shape)} ${shape.x} ${shape.z})`}>
                   {footprint?.fillD || footprint?.outlineD ? (
                     <>
                       {footprint.fillD ? <path className="sketch-reference-mesh-face" d={footprint.fillD} /> : null}

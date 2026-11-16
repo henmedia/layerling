@@ -3,7 +3,8 @@ import { holdsShapeLock } from "@/lib/shapeLock";
 import type { TextBlockOptions } from "@/lib/textBlock";
 import type { SurfaceTextureFace, SurfaceTextureRegion, SurfaceTextureSettings } from "@/lib/surfaceTexture";
 import { markEscapeHandled } from "@/lib/escapeHandled";
-import { ArrowDownToLine, Check, ChevronLeft, Crosshair, Cuboid, Download, Eye, EyeOff, FlipHorizontal, GripVertical, Home, Layers, Minus, MousePointer2, PanelsTopLeft, ScanEye, PencilLine, PictureInPicture2, Plus, Rotate3d, RotateCcw, Ruler, RulerDimensionLine, Slice, Spline, Trash2, X } from "lucide-react";
+import { ArrowDownToLine, Check, ChevronLeft, Crosshair, Cuboid, Download, Eye, EyeOff, FlipHorizontal, GripVertical, Home, Layers, Minus, Move, MousePointer2, PanelsTopLeft, Pointer, ScanEye, PencilLine, PictureInPicture2, Plus, Rotate3d, RotateCcw, RotateCw, Ruler, RulerDimensionLine, Scaling, Slice, Spline, Trash2, X } from "lucide-react";
+import { loadTouchHandleMode, nextTouchHandleMode, saveTouchHandleMode, touchModeMovesBody, type TouchHandleMode } from "@/lib/touchHandleMode";
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperties, type Dispatch, type DragEvent, type MutableRefObject, type PointerEvent as ReactPointerEvent, type ReactNode, type SetStateAction, type WheelEvent as ReactWheelEvent } from "react";
 import { boxEdgeTargets, edgeSnapGuide, objectSnapOffset, shiftSnapBox, snapResizeEdge, type EdgeSnapTarget, type ObjectSnapGuide, type SnapBox } from "@/lib/objectSnap";
 import { dragReach } from "@/lib/dragReach";
@@ -39,7 +40,8 @@ import { readViewScrollbars, storeViewScrollbars } from "@/lib/viewScroll";
 import { openSecondViewWindow, SecondViewWindow, useSecondViewSupported } from "@/components/workplane/SecondViewWindow";
 import { starSettingsForSize } from "@/lib/starGeometry";
 import { carriedOntoFace } from "@/lib/carryOntoFace";
-import { keepsProportionsOnAxis } from "@/lib/keepProportions";
+import { keepsProportionsForUpdate, keepsProportionsOnAxis } from "@/lib/keepProportions";
+import type { GroupHoleChange } from "@/lib/groupHoles";
 import { useWheelField } from "@/lib/useWheelField";
 import { wheelBaseStep, wheelNextValue } from "@/lib/wheelValueStep";
 import { createLatestRunner, type LatestRunner } from "@/lib/latestRunner";
@@ -59,7 +61,7 @@ import { displayToMillimeters, formatLengthMm, lengthDisplayUnit, measurementOpt
 import { computeCornerRulerRelativeCoordinates, cornerRulerArmLength, cornerRulerElevationArmLength, toggledCornerRulerArms, cornerRulerAxisModes, cornerRulerPlateArms, cornerRulerFrameForWorkplane, cornerRulerShiftVector, pointAlongRuler, rotateCornerRulerFrame, rulerDimensionMatch, toggledCornerRulerAxis, toggledCornerRulerMode, type CornerRulerAxis, type RulerDimensionField } from "@/lib/rulerDimensions";
 import { createMoveDimensionOverlay, type MoveDimensionAxis, type MoveDimensionOverlayData } from "@/lib/moveDimensionLines";
 import { computeOriginAxisDistance, createOriginDimensionOverlay, type OriginDimensionOverlayData } from "@/lib/originDimensionLines";
-import { horizontalPlacementWorkplane, placementPatchForNewShape, placementWorkplaneCoordinates, placementWorkplaneFromSurface, placementWorkplaneIsBase, placementWorkplanePoint, snapPlacementWorkplaneOrigin, type PlacementPoint, type PlacementWorkplane } from "@/lib/placementWorkplane";
+import { EDGE_ON_WORKPLANE_SINE, edgeOnWorkplanePoint, horizontalPlacementWorkplane, placementPatchForNewShape, placementWorkplaneCoordinates, placementWorkplaneFromSurface, placementWorkplaneIsBase, placementWorkplanePoint, snapPlacementWorkplaneOrigin, type PlacementPoint, type PlacementWorkplane } from "@/lib/placementWorkplane";
 import { capturePointer } from "@/lib/pointerCapture";
 import { useMiddleClick } from "@/lib/middleClick";
 import { printerPresetById } from "@/lib/printBed";
@@ -76,7 +78,7 @@ import { displayYTurn, insideZ } from "@/lib/displayAxes";
 import { boundsInsideRect, marqueeMode } from "@/lib/marqueeSelection";
 import { slicerLeftTurn } from "@/lib/cameraMouseButtons";
 import { useSpaceMouse } from "@/components/workplane/useSpaceMouse";
-import { canBeginShapeDrag, handleDimensionLimit, DEFAULT_SNAP_GRID, effectiveViewSettings, normalizeSnapGrid, normalizeWorkspaceSettings, readWorkspaceDefault, saveShapeDefaultsForNewDesigns, saveWorkspaceDefault, customSnapGridLabel, snapGridForShortcut, snapGridForUnits, snapGridOptions, snapGridStep as snapStep, workplaneSettingsFingerprint, workspaceForUnits, workspaceHydrationSyncDecision, zoomDistanceScale, ZOOM_STEP_IN, ZOOM_STEP_OUT } from "@/lib/workplaneSettings";
+import { canBeginShapeDrag, handleDimensionLimit, heightHandleLimit, typedDimensionLimit, DEFAULT_SNAP_GRID, effectiveViewSettings, normalizeSnapGrid, normalizeWorkspaceSettings, readWorkspaceDefault, saveShapeDefaultsForNewDesigns, saveWorkspaceDefault, customSnapGridLabel, snapGridForShortcut, snapGridForUnits, snapGridOptions, snapGridStep as snapStep, workplaneSettingsFingerprint, workspaceForUnits, workspaceHydrationSyncDecision, zoomDistanceScale, ZOOM_STEP_IN, ZOOM_STEP_OUT } from "@/lib/workplaneSettings";
 import { withShapeDefaults } from "@/lib/shapeDefaults";
 import { WORKPLANE_LINE_ELEVATION } from "@/lib/workplaneGrid";
 import { cleanNearZero, cleanRotationDegrees, isNonSolidShape, resizedShapeSize, shapeDepth, shapeHasTaper, shapeWidth, shapeWithParametricSource } from "@/lib/workplaneShapes";
@@ -228,6 +230,7 @@ type WorkplaneViewportProps = {
   onOpenGroup?: (id: string) => void;
   /** A hull built again with its parts' holes kept open or filled (Discussion #1440). */
   onHullKeepHolesChange?: (id: string, keepHoles: boolean) => void;
+  onGroupHoleDiameters?: (id: string, change: GroupHoleChange) => void;
   canSeparateParts?: boolean;
   onSeparateParts?: () => void;
   /** Several parts selected (#183): solid or hole, a colour and locking for all of them. */
@@ -259,6 +262,8 @@ type WorkplaneViewportProps = {
   onVaseAccessories?: () => void;
   /** Lays the selected Swallowtail baseplate's keys out in front of it (#1061). */
   onGridfinityKeys?: () => void;
+  /** Splits the selected baseplate into plates that fit the printer (#1388). */
+  onGridfinitySplit?: () => void;
   onLayerText?: (patch: TextLayerPatch) => void;
   onTextTags?: (names: string[], gap: number) => void;
   /** Several lines of text under one another, one text each (#1207). */
@@ -1631,6 +1636,7 @@ export function WorkplaneViewport({
   onEditSketch,
   onOpenGroup,
   onHullKeepHolesChange,
+  onGroupHoleDiameters,
   canSeparateParts = false,
   onSeparateParts,
   onSelectionHole,
@@ -1652,6 +1658,7 @@ export function WorkplaneViewport({
   onSurfaceRegionDraw,
   onVaseAccessories,
   onGridfinityKeys,
+  onGridfinitySplit,
   onLayerText,
   onTextTags,
   onTextBlock,
@@ -2005,6 +2012,9 @@ export function WorkplaneViewport({
   // gebraucht wird. Anfangs falsch, damit das ausgelieferte HTML passt.
   const [touchDevice, setTouchDevice] = useState(false);
   const [touchRotate, setTouchRotate] = useState(false);
+  // Which handles a finger can reach (Discussion #1747); kept in this browser.
+  const [touchHandleMode, setTouchHandleMode] = useState<TouchHandleMode>("all");
+  const touchHandleModeRef = useRef<TouchHandleMode>("all");
   // The round Select multiple button of a touch screen (#337): it stands while a body is picked
   // with a finger. A tap on it locks Select multiple, so every further tap adds a body to the
   // selection or takes it out; a second tap ends the mode and lets the selection go. A mouse never
@@ -3697,10 +3707,25 @@ export function WorkplaneViewport({
   const toPlanePoint = useCallback((clientX: number, clientY: number) => toPlanePointAtY(clientX, clientY, 0), [toPlanePointAtY]);
 
   const dragReachCacheRef = useRef<{ shapes: readonly WorkplaneShape[]; width: number; depth: number; x: number; z: number } | null>(null);
-  const toPlacementWorkplanePoint = useCallback((clientX: number, clientY: number, workplane = placementWorkplaneRef.current) => {
+  /**
+   * Where the pointer meets a workplane while a part is dragged on it. Seen edge-on, as from the front
+   * with the plate level, the ray misses the workplane or meets it far behind, and a dragged part stuck
+   * or jumped in depth (#1744): there the point follows the pointer sideways and keeps the depth.
+   */
+  const toWorkplaneDragPoint = useCallback((clientX: number, clientY: number, workplane: PlacementWorkplane) => {
+    const state = threeRef.current;
+    if (state) {
+      aimPickRay(state, clientX, clientY);
+      const edgeOn = edgeOnWorkplanePoint(workplane, state.raycaster.ray, state.camera.getWorldDirection(new THREE.Vector3()));
+      if (edgeOn) return edgeOn;
+    }
     const normal = new THREE.Vector3(workplane.normal.x, workplane.normal.y, workplane.normal.z);
     const origin = new THREE.Vector3(workplane.origin.x, workplane.origin.y, workplane.origin.z);
-    const raw = toRawPlanePoint(clientX, clientY, new THREE.Plane(normal, -normal.dot(origin)));
+    return toRawPlanePoint(clientX, clientY, new THREE.Plane(normal, -normal.dot(origin)));
+  }, [toRawPlanePoint]);
+
+  const toPlacementWorkplanePoint = useCallback((clientX: number, clientY: number, workplane = placementWorkplaneRef.current) => {
+    const raw = toWorkplaneDragPoint(clientX, clientY, workplane);
     if (!raw) return null;
     const local = placementWorkplaneCoordinates(workplane, raw);
     const step = snapStep(snapRef.current);
@@ -3719,7 +3744,7 @@ export function WorkplaneViewport({
       clamp(snapValue(local.x, step), -cached.x, cached.x),
       clamp(snapValue(local.z, step), -cached.z, cached.z),
     );
-  }, [toRawPlanePoint]);
+  }, [toWorkplaneDragPoint]);
 
   const toFreePlacementWorkplanePoint = useCallback((clientX: number, clientY: number, workplane = placementWorkplaneRef.current) => {
     const normal = new THREE.Vector3(workplane.normal.x, workplane.normal.y, workplane.normal.z);
@@ -4759,7 +4784,9 @@ export function WorkplaneViewport({
         const resizingFromBottom = transform.handleKey === "bottom-height";
         const rawFrameHeight = transform.selectionFrame.height + (resizingFromBottom ? -rawDelta : rawDelta);
         const printerHeight = printerPresetById(workspaceRef.current.printer)?.height;
-        const maxHeight = Math.max(...transform.items.map((item) => handleDimensionLimit(workspaceRef.current, item.startShape.kind, 180, "height", transform.selectionFrame.height, printerHeight)));
+        // Laid on its side, the height runs along the plate: the printer's height is then no limit (Discussion #1558).
+        const heightUpright = Math.abs(transform.selectionFrame.yAxis.clone().normalize().y) > 0.9999;
+        const maxHeight = Math.max(...transform.items.map((item) => heightHandleLimit(workspaceRef.current, item.startShape.kind, transform.selectionFrame.height, printerHeight, heightUpright)));
         // The face you drag lands on the grid of the workplane; a tilted selection keeps the step from where it started.
         const startLift = liftGeometryForFrame(transform.selectionFrame, placementWorkplaneRef.current);
         const upright = transform.selectionFrame.yAxis.clone().normalize().dot(startLift.axis) > 0.9999;
@@ -5364,7 +5391,8 @@ export function WorkplaneViewport({
     const anchor = lastResizeAnchorRef.current?.shapeId === ids[0] ? lastResizeAnchorRef.current : null;
     const workspace = workspaceRef.current;
     const across = Math.max(frame.width, frame.depth, frame.height);
-    const maxSize = Math.max(...items.map((item) => handleDimensionLimit(workspace, item.startShape.kind, 260, "across", across)));
+    // A typed size is taken as it is, past the plate too; only a custom size limit holds (Discussion #1444).
+    const maxSize = Math.max(...items.map((item) => typedDimensionLimit(workspace, item.startShape.kind, across)));
     const sizes: { width?: number; depth?: number } = {};
     let height: number | undefined;
     edits.forEach((entry) => {
@@ -5372,8 +5400,7 @@ export function WorkplaneViewport({
       const value = resolveMeasureMm(entry.text, extent);
       if (!(Number.isFinite(value) && value > 0)) return;
       if (entry.axis === "height") {
-        const printerHeight = printerPresetById(workspace.printer)?.height;
-        const maxHeight = Math.max(...items.map((item) => handleDimensionLimit(workspace, item.startShape.kind, 180, "height", frame.height, printerHeight)));
+        const maxHeight = Math.max(...items.map((item) => typedDimensionLimit(workspace, item.startShape.kind, frame.height)));
         height = clamp(value, MIN_SHAPE_SIZE, maxHeight);
       } else {
         sizes[entry.axis] = clamp(value, MIN_SHAPE_SIZE, maxSize);
@@ -7240,6 +7267,10 @@ export function WorkplaneViewport({
       if (!canBeginShapeDrag(workspaceRef.current.selectBeforeMove, alreadySelected)) {
         return;
       }
+      // Set to the size or to turning, a finger on the part only selects it (Discussion #1747).
+      if (!touchModeMovesBody(touchHandleModeRef.current)) {
+        return;
+      }
       const dragIds = alreadySelected && selectedIdsSnapshot.length > 1 ? selectedIdsSnapshot : [id];
       // One locked shape holds the whole selection still, as the handles and the arrow keys do.
       if (dragIds.some((dragId) => shapesRef.current.find((entry) => entry.id === dragId)?.locked)) {
@@ -7567,17 +7598,21 @@ export function WorkplaneViewport({
       const state = threeRef.current;
       if (drag.snapMoving && drag.snapTargets?.length && state && !axisLock?.still) {
         let guides: ObjectSnapGuide[] = [];
-        const raw = event.altKey ? null : toRawPlanePoint(event.clientX, event.clientY, new THREE.Plane(new THREE.Vector3(0, 1, 0), -drag.workplane.origin.y));
+        const raw = event.altKey ? null : toWorkplaneDragPoint(event.clientX, event.clientY, horizontalPlacementWorkplane(drag.workplane.origin.y));
         if (raw) {
           // Measured from the unsnapped pointer: the grid must not keep an edge
           // a step away from the neighbour it is being pulled to.
           // Snapping only runs on the flat workplane, where the lock is to X or Z;
           // the locked-out direction stays at zero and is not pulled anywhere.
+          // Seen edge-on, the depth does not show and is not pulled either (#1744).
+          const view = state.camera.getWorldDirection(new THREE.Vector3());
+          const edgeOn = Math.abs(view.y) < EDGE_ON_WORKPLANE_SINE;
+          const hiddenAxis = edgeOn ? (Math.abs(view.z) >= Math.abs(view.x) ? "z" : "x") : null;
           const rawDeltaX = axisLock?.along === "z" ? 0 : raw.x - drag.startPoint.x;
           const rawDeltaZ = axisLock?.along === "x" ? 0 : raw.z - drag.startPoint.z;
           const snap = objectSnapOffset(shiftSnapBox(drag.snapMoving, rawDeltaX, rawDeltaZ), drag.snapTargets, objectSnapThreshold(state, raw));
-          if (snap.dx !== null && axisLock?.along !== "z") deltaX = rawDeltaX + snap.dx;
-          if (snap.dz !== null && axisLock?.along !== "x") deltaZ = rawDeltaZ + snap.dz;
+          if (snap.dx !== null && axisLock?.along !== "z" && hiddenAxis !== "x") deltaX = rawDeltaX + snap.dx;
+          if (snap.dz !== null && axisLock?.along !== "x" && hiddenAxis !== "z") deltaZ = rawDeltaZ + snap.dz;
           if (snap.dx !== null || snap.dz !== null) {
             guides = objectSnapOffset(shiftSnapBox(drag.snapMoving, deltaX, deltaZ), drag.snapTargets, 1e-4).guides;
           }
@@ -7626,7 +7661,7 @@ export function WorkplaneViewport({
         threeRef.current.needsRender = true;
       }
     },
-    [pickPlacementSurface, resolveMatePoint, setMarqueeFromState, toPlacementWorkplanePoint, toRawPlanePoint, moveCruiseGhost, updateModifierEdgeHover, updateProtractorHover, updateTapeHover, updateTransform],
+    [pickPlacementSurface, resolveMatePoint, setMarqueeFromState, toPlacementWorkplanePoint, toRawPlanePoint, toWorkplaneDragPoint, moveCruiseGhost, updateModifierEdgeHover, updateProtractorHover, updateTapeHover, updateTransform],
   );
 
   useEffect(() => {
@@ -7643,6 +7678,15 @@ export function WorkplaneViewport({
   useEffect(() => {
     touchRotateRef.current = touchRotate;
   }, [touchRotate]);
+
+  useEffect(() => {
+    setTouchHandleMode(loadTouchHandleMode());
+  }, []);
+
+  useEffect(() => {
+    // Only on a touch screen: with a mouse every handle is in reach, whatever was picked on a tablet.
+    touchHandleModeRef.current = touchDevice ? touchHandleMode : "all";
+  }, [touchDevice, touchHandleMode]);
 
   /**
    * Die liegenden Finger an die Kamera uebergeben.
@@ -8671,6 +8715,26 @@ export function WorkplaneViewport({
                 <Rotate3d size={26} strokeWidth={2.15} />
               </button>
             ) : null}
+            {/* Which handles a finger reaches (Discussion #1747): all, or only moving, the size or turning. */}
+            {touchDevice ? (
+              <button
+                className={`camera-touch-handles${touchHandleMode !== "all" ? " active" : ""}`}
+                aria-label={t(`camera.touchHandles.${touchHandleMode}`)}
+                title={`${t(`camera.touchHandles.${touchHandleMode}`)} - ${t("camera.touchHandlesHint")}`}
+                aria-pressed={touchHandleMode !== "all"}
+                onClick={() => {
+                  const next = nextTouchHandleMode(touchHandleMode);
+                  setTouchHandleMode(next);
+                  saveTouchHandleMode(next);
+                  onNotice?.(t(`camera.touchHandles.${next}`));
+                }}
+              >
+                {touchHandleMode === "move" ? <Move size={24} strokeWidth={2.15} />
+                  : touchHandleMode === "size" ? <Scaling size={24} strokeWidth={2.15} />
+                  : touchHandleMode === "turn" ? <RotateCw size={24} strokeWidth={2.15} />
+                  : <Pointer size={24} strokeWidth={2.15} />}
+              </button>
+            ) : null}
             </div>
             <div className="camera-group">
             <button
@@ -9248,6 +9312,7 @@ export function WorkplaneViewport({
               locked={selectionLocked}
               showSlideArrows={workspace.showSlideArrows}
               sizeLocked={selectionSizeLocked}
+              handleMode={touchDevice ? touchHandleMode : "all"}
               showRotationWheel={activeRotationWheel}
               hideSelectionChrome={activeTransformKind === "rotate"}
               hideDimensionMarks={false}
@@ -9446,7 +9511,7 @@ export function WorkplaneViewport({
             // Der Inspektor rechnet in der Urform; ein gedrehter Koerper wird
             // daraus neu gebaut, also muss auch der Anker daher kommen.
             const inspected = shapeWithParametricSource(selectedShape);
-            const resized = proportionLockRef.current ? patchWithKeptProportions(inspected, patch, options?.resizeAxis) : patch;
+            const resized = proportionLockRef.current && keepsProportionsForUpdate(inspected, options) ? patchWithKeptProportions(inspected, patch, options?.resizeAxis) : patch;
             onUpdateShape(selectedShape.id, patchWithResizeAnchor(inspected, resized, options?.resizeAxis, lastResizeAnchorRef.current));
           }}
           proportionLock={proportionLock}
@@ -9463,6 +9528,7 @@ export function WorkplaneViewport({
           onEditSketch={selectedShape.sketchProfile ? onEditSketch : undefined}
           onOpenGroup={selectedShape.groupedShapes?.length && onOpenGroup ? () => onOpenGroup(selectedShape.id) : undefined}
           onHullKeepHolesChange={selectedShape.groupOperation === "hull" && onHullKeepHolesChange ? (keepHoles) => onHullKeepHolesChange(selectedShape.id, keepHoles) : undefined}
+          onGroupHoleDiameters={selectedShape.groupedShapes?.length && onGroupHoleDiameters ? (change) => onGroupHoleDiameters(selectedShape.id, change) : undefined}
           canSeparateParts={canSeparateParts}
           onSeparateParts={onSeparateParts}
           onWrapAroundCylinder={onWrapAroundCylinder}
@@ -9479,6 +9545,7 @@ export function WorkplaneViewport({
           onSurfaceRegionDraw={onSurfaceRegionDraw}
           onVaseAccessories={onVaseAccessories}
           onGridfinityKeys={onGridfinityKeys}
+          onGridfinitySplit={onGridfinitySplit}
           onLayerText={onLayerText}
           onTextTags={onTextTags}
           onTextBlock={onTextBlock}

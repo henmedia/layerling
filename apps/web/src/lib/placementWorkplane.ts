@@ -205,6 +205,28 @@ export function placementWorkplaneCoordinates(workplane: PlacementWorkplane, wor
   };
 }
 
+/** A view tilted less than this towards the workplane sees it edge-on (#1744), as the sine of the angle. */
+export const EDGE_ON_WORKPLANE_SINE = Math.sin(THREE.MathUtils.degToRad(8));
+
+/**
+ * Where the pointer drags on a workplane seen edge-on (#1744), as from the front with the plate level:
+ * the pointer's ray meets an upright plane through the workplane's origin that faces the camera, and
+ * that point is brought straight down onto the workplane. So a part follows the pointer along the
+ * axis that shows and keeps its depth, where the ray itself would miss the workplane or meet it far
+ * behind. Null when the view is not edge-on; then the ray meets the workplane itself.
+ */
+export function edgeOnWorkplanePoint(workplane: PlacementWorkplane, ray: THREE.Ray, viewDirection: THREE.Vector3): THREE.Vector3 | null {
+  const normal = vector(workplane.normal).normalize();
+  const view = viewDirection.clone().normalize();
+  if (Math.abs(view.dot(normal)) >= EDGE_ON_WORKPLANE_SINE) return null;
+  const facing = view.projectOnPlane(normal);
+  if (facing.lengthSq() < 1e-9) return null;
+  const origin = vector(workplane.origin);
+  const hit = ray.intersectPlane(new THREE.Plane().setFromNormalAndCoplanarPoint(facing.normalize(), origin), new THREE.Vector3());
+  if (!hit) return null;
+  return hit.addScaledVector(normal, -normal.dot(hit.clone().sub(origin)));
+}
+
 export function placementWorkplanePoint(workplane: PlacementWorkplane, x: number, z: number): PlacementPoint {
   const world = vector(workplane.origin)
     .addScaledVector(vector(workplane.xAxis), x)

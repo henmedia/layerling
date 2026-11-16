@@ -27,27 +27,69 @@ export function rememberCommand(recent: readonly string[], id: string, limit = R
  * find the same thing. Two spellings of every word are searched: umlauts
  * spelled out (ö -> oe, the way the guide writes them) and umlauts reduced to
  * their base letter (ö -> o, the way most people type on a foreign keyboard).
+ *
+ * Every script is searched, not only the Latin one: a label is found by what
+ * it says in the language it is shown in ("円柱", "Цилиндр", "أسطوانة", "圆柱").
+ * What a keyboard or an input method writes differently counts as the same:
+ * full-width and half-width forms, katakana and hiragana (so the list already
+ * follows while the kana are still being typed, before they are converted),
+ * and the Arabic letters with and without their marks.
  */
-function foldUmlautsOut(text: string) {
+
+/** Letters that are a letter of their own to Unicode but an accented one to whoever types them. */
+const PLAIN_LETTERS: Readonly<Record<string, string>> = {
+  ß: "ss",
+  ł: "l",
+  ø: "o",
+  đ: "d",
+  ı: "i",
+  æ: "ae",
+  œ: "oe",
+  // Arabic: the two spellings of a final ya and of a final ha, which are typed one for the other.
+  "\u0649": "\u064a",
+  "\u0629": "\u0647",
+};
+const PLAIN_LETTER_PATTERN = new RegExp(`[${Object.keys(PLAIN_LETTERS).join("")}]`, "g");
+
+/**
+ * The marks that are accents: the combining diacritics of the Latin, Greek and
+ * Cyrillic letters, the Hebrew points, the Arabic vowel signs and the Arabic
+ * lengthening stroke. The marks of other scripts stay, they are part of the
+ * letter there - the voiced kana ("が" is not "か"), the vowel signs of Indic scripts.
+ */
+const ACCENT_MARKS = /[\u0300-\u036f\u0591-\u05bd\u05bf\u05c1\u05c2\u05c4\u05c5\u05c7\u0640\u064b-\u065f\u0670]/g;
+
+function fold(text: string) {
   return text
+    .normalize("NFKD")
     .toLowerCase()
-    .replace(/ä/g, "ae")
-    .replace(/ö/g, "oe")
-    .replace(/ü/g, "ue")
-    .replace(/ß/g, "ss");
+    .replace(PLAIN_LETTER_PATTERN, (letter) => PLAIN_LETTERS[letter])
+    .replace(ACCENT_MARKS, "")
+    .normalize("NFKC")
+    // Katakana to hiragana, the same sound written in the other syllabary.
+    .replace(/[\u30a1-\u30f6\u30fd\u30fe]/g, (kana) => String.fromCharCode(kana.charCodeAt(0) - 0x60));
+}
+
+function foldUmlautsOut(text: string) {
+  return fold(
+    text
+      .normalize("NFC")
+      .toLowerCase()
+      .replace(/ä/g, "ae")
+      .replace(/ö/g, "oe")
+      .replace(/ü/g, "ue"),
+  );
 }
 
 function foldAccents(text: string) {
-  return text
-    .toLowerCase()
-    .replace(/ß/g, "ss")
-    .replace(/ł/g, "l")
-    .normalize("NFD")
-    .replace(/[̀-ͯ]/g, "");
+  return fold(text);
 }
 
+/** Everything that is not a letter, a digit or a mark belonging to a letter separates words. */
+const WORD_BREAK = /[^\p{L}\p{N}\p{M}]+/u;
+
 function words(text: string) {
-  return text.split(/[^a-z0-9]+/).filter(Boolean);
+  return text.split(WORD_BREAK).filter(Boolean);
 }
 
 /** The words of a text in both spellings, de-duplicated. */
@@ -55,15 +97,21 @@ export function searchWords(text: string): string[] {
   return [...new Set([...words(foldUmlautsOut(text)), ...words(foldAccents(text))])];
 }
 
-/** The tokens of a typed query, in both spellings of every token. */
+/**
+ * The tokens of a typed query, in both spellings of every token. A query is cut into words the way a label is, so a
+ * name typed as it is written finds its entry: "USB-C", "QR-kode", "ねじ（頭付き）".
+ */
 function queryTokens(query: string): string[][] {
-  return query
-    .trim()
-    .split(/\s+/)
-    .filter(Boolean)
-    .map((token) => [...new Set([foldUmlautsOut(token).replace(/[^a-z0-9]/g, ""), foldAccents(token).replace(/[^a-z0-9]/g, "")])].filter(Boolean))
-    .filter((spellings) => spellings.length > 0);
+  const spelledOut = words(foldUmlautsOut(query));
+  // Both spellings change letters only, never what separates them, so the words stand at the same places.
+  return words(foldAccents(query)).map((word, index) => [...new Set([spelledOut[index] ?? word, word])]);
 }
+
+/**
+ * The scripts written without spaces between the words. A group name is one long word there ("ミラーとパターン",
+ * "边缘与壁"), so what is typed may stand anywhere in it, not only at its start.
+ */
+const UNSPACED_SCRIPT = /[\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}]/u;
 
 function tokenScore(spellings: string[], labelWords: string[], keywordWords: string[], groupWords: string[]) {
   let best = 0;
@@ -78,8 +126,9 @@ function tokenScore(spellings: string[], labelWords: string[], keywordWords: str
       else if (word.startsWith(token)) best = Math.max(best, 4);
       else if (word.includes(token)) best = Math.max(best, 2);
     }
+    const anywhere = UNSPACED_SCRIPT.test(token);
     for (const word of groupWords) {
-      if (word.startsWith(token)) best = Math.max(best, 1);
+      if (word.startsWith(token) || (anywhere && word.includes(token))) best = Math.max(best, 1);
     }
   }
   return best;
@@ -90,11 +139,13 @@ function tokenScore(spellings: string[], labelWords: string[], keywordWords: str
  * label starts with beats one that merely appears inside it, a keyword beats a
  * group name, and among equal scores a command that can run comes first and the
  * original order (the order of the toolbar) decides the rest. An empty query
- * returns everything in the original order.
+ * returns everything in the original order; one of nothing but punctuation
+ * ("?", "---") has no word to look for and finds nothing.
  */
 export function searchCommands<T extends SearchableCommand>(commands: readonly T[], query: string): T[] {
+  if (!query.trim()) return [...commands];
   const tokens = queryTokens(query);
-  if (tokens.length === 0) return [...commands];
+  if (tokens.length === 0) return [];
   const scored: { command: T; score: number; index: number }[] = [];
   commands.forEach((command, index) => {
     const labelWords = searchWords(command.label);

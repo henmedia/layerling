@@ -3,6 +3,7 @@ import { shapeToManifoldSolid, disposeManifold, type GroupBuildResult } from "@/
 import { getManifoldRuntime, type ManifoldSolid } from "@/lib/editorMeshCore";
 import { numberLocale, t } from "@/lib/i18n";
 import { createLocalId } from "@/lib/localIds";
+import { DEFAULT_LID_LATCH_GRIP, DEFAULT_LID_LATCH_WIDTH, MAX_LID_LATCHES, MAX_LID_LATCH_GRIP, MAX_LID_LATCH_WIDTH, MIN_LID_LATCH_GRIP, MIN_LID_LATCH_WIDTH, lidLatchClipProfile, lidLatchMeasures, type LidLatchMeasures } from "@/lib/lidLatch";
 import { splitShapeFromWorldPositions } from "@/lib/modelSplit";
 import { printerPlayStart } from "@/lib/printerPlay";
 import { sceneShape } from "@/lib/shapeCatalog";
@@ -44,6 +45,10 @@ import type { WorkplaneShape } from "@/types/layerling";
  * into the body's wall at the same places; how far they reach into it is a setting (#1220): less for a small box or a
  * stiff lip, more for a firmer click. A handle (#1230) is a pull tab on the plate's front edge, or a finger notch in
  * the body's front wall below the lid's edge: the front, or the side opposite the hinge.
+ * With latches (`latches`), clips like those on a camera battery box hold the lid down on the side it opens at (the front,
+ * or the side opposite the hinge), and on the back too without a hinge (`latchBack`): the body gets a pin between two
+ * cheeks just below its rim, the lid a pin between two cheeks hanging from a nose at its plate's edge, and a clip snaps
+ * over both (see `lidLatch.ts`). The clips lie beside the lid, on their side, as they print.
  * With a hinge, the lid swings open about an axis along a straight side of the body (the back, or the side picked), flush
  * with the lid's top, behind that side (outside) or in its wall (flush, see `LidHingeStyle`); or, as a pivot lid, it lies
  * in the opening and turns on two pins through the side walls. Outside and flush: knuckles
@@ -119,6 +124,9 @@ export type LidTopEdge = "square" | "round" | "chamfer";
  * With `tether`, a screw or bayonet cap comes with a tether that keeps it on the body (see `tetherPlan`).
  * With `flipTop`, a screw or bayonet cap's plate has a round opening `flipTopOpening` mm across, closed by a flap printed
  * in it, the gap round it, and joined to the plate by a thin strip that bends as a hinge.
+ * `latches` is how many latches go on the side the lid opens at, 0 for none, spread evenly along its straight stretch;
+ * with `latchBack` as many on the side opposite it, without a hinge. `latchWidth` is the clip's width, `latchGrip` how
+ * much narrower its sockets open than the pins.
  * `topEdge` rounds or chamfers the outer top rim of a screw or bayonet cap by `topEdgeSize` mm, at most the plate's
  * thickness (Discussion #1426): the cap is one mesh with its thread, far too many triangles for the edge tool afterwards.
  */
@@ -161,6 +169,10 @@ export type LidOptions = {
   topEdgeSize: number;
   slideSide: LidHingeSide;
   slideFrame: number;
+  latches: number;
+  latchBack: boolean;
+  latchWidth: number;
+  latchGrip: number;
 };
 
 export const LID_TYPES: readonly LidType[] = ["plug", "cap", "both", "flat", "screw", "screwIn", "bayonet", "slide"];
@@ -170,6 +182,7 @@ export const LID_DEFAULTS: LidOptions = {
   clickBumps: false, clickBumpHeight: 0.4, handle: "none", threadPitch: 3, threadTurns: 2, threadOffset: 0, threadStandard: "own",
   bayonetLugs: 3, bayonetDepth: 8, bayonetAxialGap: 0.3, bayonetDetent: 0.3, bayonetTurn: 0, tether: false,
   flipTop: false, flipTopOpening: 8, topEdge: "square", topEdgeSize: 1, slideSide: "front", slideFrame: 0,
+  latches: 0, latchBack: false, latchWidth: DEFAULT_LID_LATCH_WIDTH, latchGrip: DEFAULT_LID_LATCH_GRIP,
 };
 /**
  * What a lid starts from with this printer's play (printerPlay.ts): the gap per side and the hinge pin's play take it,
@@ -759,6 +772,13 @@ export function normalizeLidOptions(value?: Partial<Record<keyof LidOptions, unk
   if ((LID_TOP_EDGES as readonly string[]).includes(topEdge)) result.topEdge = topEdge as LidTopEdge;
   const topEdgeSize = finiteNumber(value?.topEdgeSize);
   if (topEdgeSize !== null) result.topEdgeSize = clamp(topEdgeSize, MIN_LID_TOP_EDGE, MAX_LID_TOP_EDGE);
+  const latches = finiteNumber(value?.latches);
+  if (latches !== null) result.latches = Math.round(clamp(latches, 0, MAX_LID_LATCHES));
+  if (value?.latchBack === true || value?.latchBack === "true") result.latchBack = true;
+  const latchWidth = finiteNumber(value?.latchWidth);
+  if (latchWidth !== null) result.latchWidth = clamp(latchWidth, MIN_LID_LATCH_WIDTH, MAX_LID_LATCH_WIDTH);
+  const latchGrip = finiteNumber(value?.latchGrip);
+  if (latchGrip !== null) result.latchGrip = clamp(latchGrip, MIN_LID_LATCH_GRIP, MAX_LID_LATCH_GRIP);
   return result;
 }
 
@@ -784,6 +804,35 @@ export function lidTakesMagnets(options: Pick<LidOptions, "type">) {
   return lidTakesExtras(options) && options.type !== "slide";
 }
 
+
+/**
+ * Whether latches go with this kind of lid: those whose plate is as large as the body, so its edge lies over the body's
+ * wall and the two pins line up: a plug lid and a flat one, as a hinge.
+ */
+export function lidLatchesFit(options: Pick<LidOptions, "type">) {
+  return options.type === "plug" || options.type === "flat";
+}
+
+/** Where the latches go along the front (least y) of an outline seen from above, and how far out the front is there. */
+export function lidLatchPlaces(polygons: readonly (readonly Point[])[], count: number, span: number): { front: number; places: number[] } | null {
+  const points = polygons.flat();
+  if (!points.length || count < 1) return null;
+  const front = Math.min(...points.map(([, y]) => y));
+  // The straight stretch of the front, where the wall runs along x; the latches are spread evenly along it.
+  const near = points.filter(([, y]) => y <= front + 0.05).map(([x]) => x);
+  const from = Math.min(...near);
+  const to = Math.max(...near);
+  if ((to - from) / count < span + 1) return null;
+  const places = Array.from({ length: count }, (_, index) => from + ((to - from) * (index + 0.5)) / count);
+  // Each latch stands on the straight wall, its cheeks too.
+  for (const middle of places) {
+    for (const x of [middle - span / 2, middle, middle + span / 2]) {
+      const y = frontAt(polygons, x);
+      if (y === null || Math.abs(y - front) > 0.05) return null;
+    }
+  }
+  return { front, places };
+}
 
 /** Whether the top rim can be rounded or chamfered: a screw or bayonet cap, round as it is (Discussion #1426). */
 export function lidTopEdgeFits(options: Pick<LidOptions, "type">) {
@@ -1399,6 +1448,8 @@ export type LidError =
   | { code: "flipTopThin"; thickness: number }
   | { code: "flipTopTooLarge"; opening: number }
   | { code: "magnetsThinLid"; thickness: number }
+  | { code: "latchLidType" | "latchHandle" | "latchSideShort" }
+  | { code: "latchBodyLow"; height: number }
   | { code: "kernel"; message?: string };
 
 /** The scene (y up) turned so that y points along z, Manifold's up; a turn about x, so nothing is mirrored. */
@@ -2952,7 +3003,10 @@ export type LidTether = { part: ManifoldSolid; bead: ManifoldSolid; strap: numbe
  */
 export type LidFlipTop = { opening: number; flap: number; hingeWidth: number; hingeLength: number; hingeThickness: number };
 
-export type LidResult = { lid: ManifoldSolid; magnets?: LidMagnets; hinge?: LidHinge; clickBumps?: LidClickBumps; handle?: LidHandleResult; screw?: LidScrew; bayonet?: LidBayonet; slide?: LidSlide; tether?: LidTether; flipTop?: LidFlipTop } | { error: LidError };
+/** With latches, the body's cheeks and pins (grouped with it, as a hinge's knuckles are), the clips beside the lid, and how many. */
+export type LidLatch = { body: ManifoldSolid; clips: ManifoldSolid; count: number; width: number; pin: number };
+
+export type LidResult = { lid: ManifoldSolid; magnets?: LidMagnets; hinge?: LidHinge; latch?: LidLatch; clickBumps?: LidClickBumps; handle?: LidHandleResult; screw?: LidScrew; bayonet?: LidBayonet; slide?: LidSlide; tether?: LidTether; flipTop?: LidFlipTop } | { error: LidError };
 
 /** Where a lid cuts the body to find its top: just below the rim, so a rim that is a hair uneven still counts as the top. */
 function lidRimHeight(top: number, height: number) {
@@ -3025,6 +3079,9 @@ export function lidForSolid(runtime: ManifoldToplevel, body: ManifoldSolid, give
     // Click bumps stand on a lip or a rim; a pivot lid lies in the opening, with no edge for a tab or a finger to take.
     if (options.clickBumps && !lidClickBumpsFit(options)) return { error: { code: "clickBumpsNoLip" } };
     if (options.handle !== "none" && !lidHandleFits(options)) return { error: { code: "handlePivot" } };
+    // Latches need the lid's plate over the body's wall, and a handle would sit where they go.
+    if (options.latches > 0 && (!lidLatchesFit(options) || (options.hinge && options.hingeStyle === "pivot"))) return { error: { code: "latchLidType" } };
+    if (options.latches > 0 && options.handle !== "none") return { error: { code: "latchHandle" } };
     // A hinge on another side is worked out with that side turned to the back, and its pieces turned back after.
     const turn = HINGE_SIDE_TURN[options.hingeSide];
     const turnedOutline = turnedPolygons(outline.toPolygons() as Point[][], turn);
@@ -3364,6 +3421,71 @@ export function lidForSolid(runtime: ManifoldToplevel, body: ManifoldSolid, give
       if (plan.curved) knuckleBody = keep(created, knuckleBody.subtract(keep(created, keep(created, opening.extrude(top - box.min[2] + 2)).translate([0, 0, box.min[2] - 1]))));
       bodyKnuckles = keep(created, knuckleBody.subtract(holeFor(plan.bodyHole, 1)));
     }
+    // The latches, on the side the lid opens at (and the back without a hinge), each worked out with its side turned to the
+    // front (least y), the wall facing -y, and turned back after. The body's cheeks stand out of its wall below the rim,
+    // their round ends about the pin and their undersides sloping in to the wall at 45 degrees, so it prints upright
+    // without support; the lid's hang from a nose at its plate's edge, clear of the body's wall, and rise from the plate as
+    // the lid is printed turned over. The two pins are `spacing` apart, the lid's as high as the clip's socket allows.
+    let latchBody: ManifoldSolid | null = null;
+    let latchMeasures: LidLatchMeasures | null = null;
+    let latchCount = 0;
+    if (options.latches > 0) {
+      const measures = lidLatchMeasures(options.latchWidth, options.latchGrip);
+      const lidPin = top + options.thickness - measures.rim;
+      const bodyPin = lidPin - measures.spacing;
+      const lowest = bodyPin - measures.rim - measures.tab;
+      if (lowest < box.min[2]) return { error: { code: "latchBodyLow", height: Math.ceil((top - lowest) * 2) / 2 } };
+      const embed = 0.4;
+      const steps = HINGE_SIDES;
+      const frontTurn = options.hinge ? turn : 0;
+      const sides = [frontTurn, ...(options.latchBack && !options.hinge ? [frontTurn + 180] : [])];
+      const bodyPieces: ManifoldSolid[] = [];
+      const lidPieces: ManifoldSolid[] = [];
+      for (const sideTurn of sides) {
+        const places = lidLatchPlaces(turnedPolygons(outline.toPolygons() as Point[][], sideTurn), options.latches, measures.span);
+        if (!places) return { error: { code: "latchSideShort" } };
+        // A point at `along` across the wall, `out` from it and at height `z`, in the turned frame.
+        const at = (along: number, out: number, z: number): [number, number, number] => [along, places.front - out, z];
+        const disc = (along: number, z: number, radius: number) => Array.from({ length: steps }, (_, step) => {
+          const angle = (step / steps) * Math.PI * 2;
+          return at(along, measures.reach + Math.sin(angle) * radius, z + Math.cos(angle) * radius);
+        });
+        const sideBody: ManifoldSolid[] = [];
+        const sideLid: ManifoldSolid[] = [];
+        const inside = measures.width / 2 + measures.sidePlay;
+        for (const middle of places.places) {
+          for (const sign of [-1, 1]) {
+            const ends = [middle + sign * inside, middle + sign * (inside + measures.cheek)];
+            sideBody.push(keep(created, runtime.Manifold.hull(ends.flatMap((along) => [
+              ...disc(along, bodyPin, measures.cheekRadius),
+              at(along, -embed, bodyPin + measures.cheekRadius),
+              at(along, -embed, bodyPin - measures.reach - embed - measures.cheekRadius * Math.SQRT2),
+            ]))));
+            // The lid's cheek: a nose in the plate's layer out to the cheek's outside, and the cheek hanging from it.
+            const nose = keep(created, keep(created, runtime.Manifold.cube([measures.cheek, measures.reach + measures.cheekRadius + 1, options.thickness])).translate([Math.min(...ends), places.front - measures.reach - measures.cheekRadius, top]));
+            const hanging = keep(created, runtime.Manifold.hull(ends.flatMap((along) => [
+              ...disc(along, lidPin, measures.cheekRadius),
+              at(along, measures.reach - measures.cheekRadius, top + options.thickness),
+              at(along, measures.reach + measures.cheekRadius, top + options.thickness),
+            ])));
+            sideLid.push(nose, hanging);
+          }
+          const pinEnds = [middle - inside - measures.cheek / 2, middle + inside + measures.cheek / 2];
+          sideBody.push(keep(created, runtime.Manifold.hull(pinEnds.flatMap((along) => disc(along, bodyPin, measures.pin)))));
+          sideLid.push(keep(created, runtime.Manifold.hull(pinEnds.flatMap((along) => disc(along, lidPin, measures.pin)))));
+          latchCount += 1;
+        }
+        const back = (solid: ManifoldSolid) => (sideTurn ? keep(created, solid.rotate([0, 0, -sideTurn])) : solid);
+        bodyPieces.push(back(unionOf(sideBody)));
+        lidPieces.push(back(unionOf(sideLid)));
+      }
+      // Nothing of the body's below its bottom, nor in its opening.
+      let latches = keep(created, unionOf(bodyPieces).trimByPlane([0, 0, 1], box.min[2]));
+      if (hasOpening) latches = keep(created, latches.subtract(prism(opening, box.min[2] - 1, top + 1)));
+      latchBody = latches;
+      made = keep(created, made.add(unionOf(lidPieces)));
+      latchMeasures = measures;
+    }
     // The handle, on the side the lid opens at: worked out with that side turned to the front (least y), opposite the
     // hinge's, and turned back after.
     const handleTurn = options.hinge ? turn : 0;
@@ -3508,6 +3630,26 @@ export function lidForSolid(runtime: ManifoldToplevel, body: ManifoldSolid, give
       }
       hinge = { knuckles, pin, count: pivot ? 2 : plan!.segments.length, cuts, style, plugs, pinLength };
     }
+    // The clips lie on their side in a row in front of the lid, their profile on the plate, as they print.
+    let latch: LidLatch | undefined;
+    if (latchBody && latchMeasures) {
+      const profile = keep(created, new runtime.CrossSection([lidLatchClipProfile(latchMeasures)], "NonZero"));
+      const clip = keep(created, profile.extrude(latchMeasures.width));
+      const clipBox = clip.boundingBox();
+      const placedBox = placed.boundingBox();
+      const length = clipBox.max[0] - clipBox.min[0];
+      const across = clipBox.max[1] - clipBox.min[1];
+      const clips = Array.from({ length: latchCount }, (_, index) => keep(created, clip.translate([
+        placedBox.min[0] - clipBox.min[0] + index * (length + PIN_SPACING),
+        placedBox.min[1] - PIN_SPACING - across - clipBox.min[1],
+        box.min[2] - clipBox.min[2],
+      ])));
+      const body = latchBody.transform(UP_TO_SCENE);
+      const laid = unionOf(clips).transform(UP_TO_SCENE);
+      handed.add(body);
+      handed.add(laid);
+      latch = { body, clips: laid, count: latchCount, width: latchMeasures.width, pin: 2 * latchMeasures.pin };
+    }
     let clickBumps: LidClickBumps | undefined;
     if (dimples) {
       clickBumps = { count: bumpCount, dimples: dimples.transform(UP_TO_SCENE) };
@@ -3561,7 +3703,7 @@ export function lidForSolid(runtime: ManifoldToplevel, body: ManifoldSolid, give
       handed.add(cuts);
       slideResult = { cuts, side: options.slideSide, depth: slide.plan.depth, wall: slide.plan.wall, bumps: slide.bumps, frame: slide.plan.frame };
     }
-    const extras = { ...(hinge ? { hinge } : {}), ...(clickBumps ? { clickBumps } : {}), ...(handle ? { handle } : {}), ...(screwResult ? { screw: screwResult } : {}), ...(bayonetResult ? { bayonet: bayonetResult } : {}), ...(slideResult ? { slide: slideResult } : {}), ...(tetherResult ? { tether: tetherResult } : {}), ...(flipTopResult ? { flipTop: flipTopResult } : {}) };
+    const extras = { ...(hinge ? { hinge } : {}), ...(latch ? { latch } : {}), ...(clickBumps ? { clickBumps } : {}), ...(handle ? { handle } : {}), ...(screwResult ? { screw: screwResult } : {}), ...(bayonetResult ? { bayonet: bayonetResult } : {}), ...(slideResult ? { slide: slideResult } : {}), ...(tetherResult ? { tether: tetherResult } : {}), ...(flipTopResult ? { flipTop: flipTopResult } : {}) };
     if (!options.magnets) return { lid, ...extras };
     handed.add(posts);
     // Back in the scene's frame: up is y, and the frame's y is the scene's z turned round.
@@ -3625,6 +3767,14 @@ export function lidErrorMessage(error: LidError) {
       return t("lid.error.handlePivot");
     case "handleSideShort":
       return t("lid.error.handleSideShort");
+    case "latchLidType":
+      return t("lid.error.latchLidType");
+    case "latchHandle":
+      return t("lid.error.latchHandle");
+    case "latchSideShort":
+      return t("lid.error.latchSideShort");
+    case "latchBodyLow":
+      return t("lid.error.latchBodyLow", { height: error.height.toLocaleString(numberLocale()) });
     case "handleNotchNoRoom":
       return t("lid.error.handleNotchNoRoom");
     case "screwExtras":
@@ -3754,7 +3904,10 @@ export type LidShapeSlide = { cuts: WorkplaneShape; side: LidHingeSide; depth: n
  */
 export type LidShapeTether = { part: WorkplaneShape; bead: WorkplaneShape; strap: number; neckRing: number; capRing: number };
 
-export type LidShapeResult = { lid: WorkplaneShape; magnets?: LidShapeMagnets; hinge?: LidShapeHinge; clickBumps?: LidShapeClickBumps; handle?: LidShapeHandle; screw?: LidShapeScrew; bayonet?: LidShapeBayonet; slide?: LidShapeSlide; tether?: LidShapeTether; flipTop?: LidFlipTop } | { lid: null; error: string };
+/** With latches, the body's cheeks and pins (grouped with it), the clips (a body of their own beside the lid) and how many. */
+export type LidShapeLatch = { body: WorkplaneShape; clips: WorkplaneShape; count: number; width: number; pin: number };
+
+export type LidShapeResult = { lid: WorkplaneShape; magnets?: LidShapeMagnets; hinge?: LidShapeHinge; latch?: LidShapeLatch; clickBumps?: LidShapeClickBumps; handle?: LidShapeHandle; screw?: LidShapeScrew; bayonet?: LidShapeBayonet; slide?: LidShapeSlide; tether?: LidShapeTether; flipTop?: LidFlipTop } | { lid: null; error: string };
 
 /**
  * The body a lid is made for, in the kernel: the solids among `targets` joined and the holes among them cut away. Null
@@ -3818,6 +3971,7 @@ export async function lidForShapes(targets: readonly WorkplaneShape[], given: Li
     created.push(result.lid);
     if (result.magnets?.posts) created.push(result.magnets.posts);
     if (result.hinge) created.push(result.hinge.knuckles, ...[result.hinge.pin, result.hinge.cuts, result.hinge.plugs].filter((part): part is ManifoldSolid => part !== null));
+    if (result.latch) created.push(result.latch.body, result.latch.clips);
     if (result.clickBumps) created.push(result.clickBumps.dimples);
     if (result.handle?.notch) created.push(result.handle.notch);
     if (result.screw?.thread) created.push(result.screw.thread);
@@ -3844,6 +3998,15 @@ export async function lidForShapes(targets: readonly WorkplaneShape[], given: Li
         knuckles: canonicalizeShape({ ...knuckles, hidden: false }), pin: pin ? canonicalizeShape({ ...pin, hidden: false }) : null, count: result.hinge.count, cuts, style: result.hinge.style,
         plugs: plugs ? canonicalizeShape({ ...plugs, hidden: false }) : null, pinLength: result.hinge.pinLength,
       };
+    }
+    // The latches' cheeks and pins are grouped with the body as a hinge's knuckles are; the clips lie beside the lid.
+    let latch: LidShapeLatch | undefined;
+    if (result.latch) {
+      const body = splitShapeFromWorldPositions(source, positionsOf(result.latch.body.getMesh()), createLocalId(`${source.id}-latch-cheeks`), t("lid.latchCheeksName", { name: source.name }));
+      const clips = splitShapeFromWorldPositions(source, positionsOf(result.latch.clips.getMesh()), createLocalId(`${source.id}-latch-clips`), t("lid.latchClipsName", { name: source.name }));
+      if (!body || !clips) return { lid: null, error: lidErrorMessage({ code: "empty" }) };
+      const { count, width, pin } = result.latch;
+      latch = { body: canonicalizeShape({ ...body, hidden: false }), clips: canonicalizeShape({ ...clips, hidden: false }), count, width, pin };
     }
     // The dimples and the finger notch are holes grouped with the body too.
     const holeShape = (solid: ManifoldSolid, suffix: string, name: string) => {
@@ -3891,7 +4054,7 @@ export async function lidForShapes(targets: readonly WorkplaneShape[], given: Li
       const { side, depth, wall, bumps, frame } = result.slide;
       slide = { cuts, side, depth, wall, bumps, frame };
     }
-    const extras = { ...(hinge ? { hinge } : {}), ...(clickBumps ? { clickBumps } : {}), ...(handle ? { handle } : {}), ...(screw ? { screw } : {}), ...(bayonet ? { bayonet } : {}), ...(slide ? { slide } : {}), ...(tether ? { tether } : {}), ...(result.flipTop ? { flipTop: result.flipTop } : {}) };
+    const extras = { ...(hinge ? { hinge } : {}), ...(latch ? { latch } : {}), ...(clickBumps ? { clickBumps } : {}), ...(handle ? { handle } : {}), ...(screw ? { screw } : {}), ...(bayonet ? { bayonet } : {}), ...(slide ? { slide } : {}), ...(tether ? { tether } : {}), ...(result.flipTop ? { flipTop: result.flipTop } : {}) };
     if (!result.magnets) return { lid, ...extras };
     const postName = t("lid.magnetPosts", { name: source.name });
     const meshPost = result.magnets.posts

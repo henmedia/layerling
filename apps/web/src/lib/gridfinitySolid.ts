@@ -96,6 +96,9 @@ import {
  * The letters on the shelves (#1308) come made on the page, each glyph with the
  * font's own curves: each is pushed up from 0.05 mm inside its shelf to 0.4 mm
  * over its top and fused with the finished bin, last, so no cut takes them.
+ *
+ * Dividers set lower (#1560) are cut the same way, with the box above them
+ * always added (see compartmentCutter).
  */
 
 /** z up to y up: (x, y, z) -> (x, z, -y). */
@@ -195,7 +198,7 @@ function binSolid(cad: OcctKernel, plan: GridfinityPlan, scoops: GridfinityScoop
     ? prism(cad, grown.hx - plan.wallThickness, grown.hz - plan.wallThickness, plan.innerRadius, inside[0][1], inside[1][1] + into, grown.x, grown.z)
     : steppedSolid(cad, grown.x, grown.z, grown.hx, grown.hz, GRIDFINITY_BIN_RADIUS, inside);
   const below = cutter;
-  if (compartments) cutter = compartmentCutter(cad, below, compartments, hx, hz, wallTop, !upper);
+  if (compartments) cutter = compartmentCutter(cad, below, compartments, hx, hz, wallTop, !upper || compartments.top < plan.dividerTop);
   else if (plan.floorRounding > 0) {
     const floor = inside[0][1];
     const floorEdges = cad.getSubShapes(cutter, "edge").filter((edge) => {
@@ -276,7 +279,8 @@ function lipChamferKeeper(cad: OcctKernel, plan: GridfinityPlan, hx: number, hz:
  * The cutter for a bin with dividers (#554): the inside above the dividers' top and a rounded prism for each
  * compartment, its floor edges filleted and its scoops taken out, fused into one and kept to the inside, so the bin
  * is cut once. Cutting the compartments one by one took 7 to 15 times as long. Under a ledge the loft over it is the
- * inside above the dividers' top, so no box is added (`withAbove` false).
+ * inside above the dividers' top, so no box is added (`withAbove` false), unless the dividers are set lower (#1560):
+ * the box then takes the inside between their top and the ledge.
  */
 function compartmentCutter(cad: OcctKernel, loft: ShapeHandle, pieces: GridfinityCompartmentPieces, hx: number, hz: number, wallTop: number, withAbove = true) {
   const above = withAbove ? cad.makeBoxFromCorners({ x: -hx - 1, y: -hz - 1, z: pieces.top }, { x: hx + 1, y: hz + 1, z: wallTop + 1 }) : null;

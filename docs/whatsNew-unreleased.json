@@ -11,25 +11,36 @@
   },
   {
     "title": {
-      "de": "Vorlagenbild in der Skizze größer als 200 mm",
-      "en": "Sketch picture larger than 200 mm"
+      "de": "Niedrigere Trennwände in Gridfinity-Behältern",
+      "en": "Lower dividers in Gridfinity bins"
     },
     "body": {
-      "de": "Breite und Höhe eines Bildes unter der Skizze lassen sich jetzt auch über 200 mm eintippen, etwa für eine Druckplatte von 250 mm. Der Regler reicht bis zur Größe deiner Platte, und das Feld zeigt immer die echte Größe, auch nachdem du an den Griffen gezogen hast.",
-      "en": "The width and height of a picture under a sketch can now be typed past 200 mm, for a 250 mm plate for instance. The slider reaches to the size of your plate, and the field always shows the real size, also after dragging the handles."
-    },
-    "guide": {
-      "section": "sketchImage"
+      "de": "Die Trennwände eines Gridfinity-Behälters oder einer Schale müssen nicht mehr über die ganze Höhe reichen: Stell unter „Fächer“ die „Trennwandhöhe“ ein, gemessen vom Boden, ab 3 mm. Die Wände bleiben, wie sie sind, und eine Etikettenleiste an einer Trennwand sitzt mit ihr tiefer.",
+      "en": "The dividers in a Gridfinity bin or tray no longer have to run their full height: set \"Divider height\" under \"Compartments\", measured from the floor, from 3 mm up. The walls stay as they are, and a label shelf on a divider comes down with it."
     }
   },
   {
     "title": {
-      "de": "Speichern klappt auch bei sehr langem Verlauf",
-      "en": "Saving works with a very long history too"
+      "de": "Text auf den Etikettenleisten von Gridfinity-Schalen",
+      "en": "Text on a Gridfinity tray's label shelves",
+      "da": "Tekst på Gridfinity-skålens etikethylder"
     },
     "body": {
-      "de": "Lehnt der Browser ein großes Design ab, obwohl noch Platz frei ist, speichert layerling es jetzt mit einem kürzeren Rückgängig-Verlauf, statt gar nicht. Ein Hinweis sagt dann, wie viele Schritte behalten wurden.",
-      "en": "If the browser refuses a large design although there is room left, layerling now saves it with a shorter undo history instead of not at all. A note then says how many steps were kept."
+      "de": "Auch die Etikettenleisten einer Gridfinity-Schale können jetzt einen Text tragen, an der Wand oder in einem Fach, mit Schriftart, Buchstabenfarbe und Buchstabengröße wie bei einem Behälter. Eine Leiste mit Text sitzt 0,4 mm tiefer, sodass die Buchstaben bündig mit der Oberkante der Schale enden. Tipp den Text im Eigenschaften-Fenster unter der Leiste bei „Text“ ein.",
+      "en": "A Gridfinity tray's label shelves now take a text too, along a wall or in a compartment, with the same font, letter colour and letter size as a bin's. A shelf with a text sits 0.4 mm lower, so the letters end level with the tray's top. Type the text under \"Text\" below the shelf in the Properties panel.",
+      "da": "En Gridfinity-skåls etikethylder kan nu også tage en tekst, langs en væg eller i et rum, med samme font, bogstavfarve og bogstavstørrelse som en bakkes. En hylde med tekst sidder 0,4 mm lavere, så bogstaverne ender i flugt med skålens top. Skriv teksten under \"Tekst\" under hyldens værdier i Egenskaber."
+    }
+  },
+  {
+    "title": {
+      "de": "Bodenplatten, passend zum Drucker geteilt",
+      "en": "Baseplates split to fit your printer",
+      "da": "Bundplader deles, så de passer til din printer"
+    },
+    "body": {
+      "de": "Ist dein Drucker in den Arbeitsbereich-Einstellungen gewählt, hat eine Bodenplatte, die größer ist als sein Druckbett, im Eigenschaften-Fenster den Knopf „Passend zum Drucker teilen“. Er teilt die Platte an den Zellgrenzen in so wenige Platten wie möglich, die auf das Druckbett passen, jede mit „Swallowtail“, und legt die Verbinder davor, die sie zusammenhalten. Die Platten bleiben, wo ihre Zellen waren, also schiebe oder drehe sie eine nach der anderen auf das Druckbett.",
+      "en": "With your printer chosen in the workspace settings, a baseplate larger than the printer's bed has \"Split to fit the printer\" in its Properties panel. It cuts the plate on its cell lines into the fewest plates that fit the bed, each with \"Swallowtail\", and lays out the keys that hold them together. The plates stay where their cells were, so move or turn them onto the bed one by one.",
+      "da": "Når din printer er valgt i arbejdsområdeindstillingerne, har en bundplade, der er større end printerens byggeplade, \"Del til printeren\" i Egenskaber. Den skærer pladen langs cellernes kanter i de færrest mulige plader, der passer på byggepladen, hver med \"Svalehale\", og lægger de samlestykker, der holder dem sammen, frem foran dem. Pladerne ligger, hvor deres celler lå, så flyt eller drej dem ind på byggepladen én ad gang."
     }
   }
 ]

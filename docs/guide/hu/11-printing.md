@@ -89,7 +89,7 @@ A {{ui:editor.tool.printCheck}} a {{ui:editor.group.combine}} csoportban, a {{ui
 
 ![Egy tálca, amelynek jobb fala csak 0,6 mm vastag: a nyomtatás ellenőrzése pirosra festi, és megnevezi az ablakban.](shot:print-check)
 
-Egy sor {{ui:printCheck.show}} gombja odaviszi a kamerát; kijelöli a lebegő alkatrészeket, a kevés felületen állókat és a nyitott hálókat, a túlnyúlásoknál pedig bekapcsolja a **Túlnyúlások mutatása** nézetet. Az egymásba érő testeket egyesítve ellenőrzi, ahogy a szeletelő is egyesíti őket. Ha az ablak nyitva van, miközben a tervet módosítod, megjelenik a {{ui:printCheck.stale}} felirat; kattints rá vagy a {{ui:printCheck.checkAgain}} gombra. Az [[Esc]] bezárja az ablakot. A tervben semmi sem változik. Egy MI ugyanezt az ellenőrzést a `layerling_check_print` eszközzel végzi.
+Egy sor {{ui:printCheck.show}} gombja odaviszi a kamerát; kijelöli a lebegő alkatrészeket, a kevés felületen állókat és a nyitott hálókat, a túlnyúlásoknál pedig bekapcsolja a **Túlnyúlások mutatása** nézetet. Az egymásba érő testeket egyesítve ellenőrzi, ahogy a szeletelő is egyesíti őket. Ha az ablak nyitva van, miközben a tervet módosítod, megjelenik a {{ui:printCheck.stale}} felirat; kattints rá vagy a {{ui:printCheck.checkAgain}} gombra. Az [[Esc]] bezárja az ablakot. A tervben semmi sem változik. Egy MI ugyanezt az ellenőrzést a `layerling_check_print` eszközzel végzi. Az ablak csak ellenőriz, nem nyomtat és nem ment semmit: nyomtatáshoz exportáld a modellt a szeletelőnek a(z) {{ui:editor.group.file}} csoport {{ui:editor.export}} gombjával. Az ablakban a(z) {{ui:printCheck.openExport}} bezárja az ellenőrzést és megnyitja az exportot.
 
 ## Ha kész vagy
 

@@ -89,7 +89,7 @@ Od té chvíle začínají nová použití s vůlí místo vestavěné hodnoty: 
 
 ![Miska, jejíž pravá stěna má jen 0,6 mm: Zkontrolovat tisk ji obarví červeně a uvede ji v okně.](shot:print-check)
 
-{{ui:printCheck.show}} u řádku tam přenese kameru; vybere díly ve vzduchu, díly s malou opěrou a otevřené sítě, a u převisů zapne **zobrazení převisů**. Tělesa, která se překrývají, se kontrolují sloučená, jak je sloučí slicer. Když model změníte, zatímco je okno otevřené, objeví se {{ui:printCheck.stale}}; klikněte na to nebo na {{ui:printCheck.checkAgain}}. [[Esc]] okno zavře. Na modelu se nic nezmění. AI dělá stejnou kontrolu přes `layerling_check_print`.
+{{ui:printCheck.show}} u řádku tam přenese kameru; vybere díly ve vzduchu, díly s malou opěrou a otevřené sítě, a u převisů zapne **zobrazení převisů**. Tělesa, která se překrývají, se kontrolují sloučená, jak je sloučí slicer. Když model změníte, zatímco je okno otevřené, objeví se {{ui:printCheck.stale}}; klikněte na to nebo na {{ui:printCheck.checkAgain}}. [[Esc]] okno zavře. Na modelu se nic nezmění. AI dělá stejnou kontrolu přes `layerling_check_print`. Okno jen kontroluje, nic netiskne ani neukládá: k tisku model exportujte pro slicer pomocí {{ui:editor.export}} ve skupině {{ui:editor.group.file}}. {{ui:printCheck.openExport}} v okně kontrolu zavře a otevře export.
 
 ## Dokončení
 

@@ -77,6 +77,8 @@ export function ShapeLibraryList<T extends LibraryShape>({
   };
 
   const onSearchKey = (event: KeyboardEvent<HTMLInputElement>) => {
+    // While an input method is composing, Esc takes the composition back and leaves what is typed.
+    if (event.nativeEvent.isComposing) return;
     // Escape empties the search first; with nothing typed it goes on and closes the library as before.
     if (event.key === "Escape" && query) {
       event.preventDefault();

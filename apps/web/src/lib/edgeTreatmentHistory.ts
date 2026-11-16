@@ -91,14 +91,46 @@ export function shapeBeforeEdgeTreatments(shape: WorkplaneShape): WorkplaneShape
   return before;
 }
 
+/**
+ * The frame this entry left, carried through what each later feature did to the body by itself: a fillet on the
+ * points of a hexagon makes its box shallower and can move its middle. Measured against the bare frame, that read
+ * as a resize, and the group came back squashed when it was ungrouped (#1760). What changed between the features
+ * and since the last of them is still the user's.
+ */
+function appliedFrameCarriedThroughLaterFeatures(history: readonly EdgeTreatmentHistoryEntry[], entryIndex: number, applied: NonNullable<EdgeTreatmentHistoryEntry["appliedFrame"]>) {
+  const later = entryIndex >= 0 ? history.slice(entryIndex + 1) : [];
+  const sameTurn = (frame: NonNullable<EdgeTreatmentHistoryEntry["appliedFrame"]>, before: WorkplaneShape) => (
+    Math.abs(frame.rotation - (before.rotation ?? 0)) < 1e-6
+    && Math.abs(frame.rotationX - (before.rotationX ?? 0)) < 1e-6
+    && Math.abs(frame.rotationZ - (before.rotationZ ?? 0)) < 1e-6
+  );
+  // A later entry without its frame, or one turned while it was made, says nothing reliable: as before then.
+  if (!later.length || later.some((next) => !next.appliedFrame || !sameTurn(next.appliedFrame, next.before))) return applied;
+  const middle = (frame: { elevation?: number; height: number }) => (frame.elevation ?? 0) + frame.height / 2;
+  const ratio = (after: number, before: number) => (before > 0.001 ? after / before : 1);
+  let { width, depth, height, x, z } = applied;
+  let center = middle(applied);
+  for (const next of later) {
+    const frame = next.appliedFrame!;
+    width *= ratio(frame.width, next.before.width);
+    depth *= ratio(frame.depth, next.before.depth);
+    height *= ratio(frame.height, next.before.height);
+    x += frame.x - next.before.x;
+    z += frame.z - next.before.z;
+    center += middle(frame) - middle(next.before);
+  }
+  return { ...applied, width, depth, height, x, z, elevation: center - height / 2 };
+}
+
 export function restoreShapeBeforeEdgeTreatment(shape: WorkplaneShape, entry: EdgeTreatmentHistoryEntry) {
   const before = cloneWorkplaneShapeSnapshot(entry.before);
-  const entryIndex = (shape.edgeTreatmentHistory ?? []).findIndex((candidate) => candidate.id === entry.id);
+  const history = shape.edgeTreatmentHistory ?? [];
+  const entryIndex = history.findIndex((candidate) => candidate.id === entry.id);
   const earlierHistory = entryIndex > 0
     ? compactEdgeTreatmentHistory(shape.edgeTreatmentHistory?.slice(0, entryIndex))
     : undefined;
-  const applied = entry.appliedFrame;
-  const stretch = hollowStretchSincePicture(shape, entry);
+  const applied = entry.appliedFrame ? appliedFrameCarriedThroughLaterFeatures(history, entryIndex, entry.appliedFrame) : undefined;
+  const stretch = hollowStretchSincePicture(shape, { ...entry, appliedFrame: applied });
   const width = applied ? before.width * stretch.x : before.width;
   const depth = applied ? before.depth * stretch.z : before.depth;
   const height = applied ? before.height * stretch.height : before.height;

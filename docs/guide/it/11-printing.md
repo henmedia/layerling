@@ -91,7 +91,7 @@ Da quel momento i nuovi utilizzi partono dal gioco invece che dal valore predefi
 
 ![Una vaschetta la cui parete destra è spessa solo 0,6 mm: Controlla la stampa la colora di rosso e la segnala nella finestra.](shot:print-check)
 
-{{ui:printCheck.show}} su una riga porta lì la telecamera; seleziona le parti sospese, quelle con poco appoggio e le mesh aperte, e per le sporgenze attiva **Mostra sbalzi**. I corpi che si sovrappongono vengono controllati uniti, come li unisce lo slicer. Se modifichi il progetto mentre la finestra è aperta, compare {{ui:printCheck.stale}}; fai clic lì o su {{ui:printCheck.checkAgain}}. [[Esc]] chiude la finestra. Il progetto non cambia. Un'IA fa lo stesso controllo con `layerling_check_print`.
+{{ui:printCheck.show}} su una riga porta lì la telecamera; seleziona le parti sospese, quelle con poco appoggio e le mesh aperte, e per le sporgenze attiva **Mostra sbalzi**. I corpi che si sovrappongono vengono controllati uniti, come li unisce lo slicer. Se modifichi il progetto mentre la finestra è aperta, compare {{ui:printCheck.stale}}; fai clic lì o su {{ui:printCheck.checkAgain}}. [[Esc]] chiude la finestra. Il progetto non cambia. Un'IA fa lo stesso controllo con `layerling_check_print`. La finestra controlla soltanto, non stampa né salva nulla: per stampare, esporta il progetto per lo slicer con {{ui:editor.export}} nel gruppo {{ui:editor.group.file}}. {{ui:printCheck.openExport}} nella finestra chiude il controllo e apre l'esportazione.
 
 ## Quando il pezzo è pronto
 

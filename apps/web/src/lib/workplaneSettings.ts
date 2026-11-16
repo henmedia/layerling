@@ -335,7 +335,7 @@ export function snapGridForUnits(units: string, snap: GridSize): GridSize {
 }
 const customizableShapeKinds: ShapeKind[] = [
   "box", "roundedBox", "cylinder", "slot", "ellipse", "sphere", "sketch", "scribble", "cone", "pyramid", "roof", "text", "roundRoof",
-  "halfSphere", "paraboloid", "curvedCone", "torus", "tube", "bentTube", "star", "heart", "crescent", "gear", "hirth", "pulley", "honeycomb", "hinge", "knurl", "dovetail", "screwBoss", "snapFit", "rib", "counterbore", "countersink", "doubleCountersink", "finishingWasher", "teardrop", "port", "loft", "vase", "thread", "spring", "gridfinity", "ring", "wedge", "polygon", "icosahedron", "ruler", "mesh",
+  "halfSphere", "paraboloid", "curvedCone", "torus", "tube", "bentTube", "star", "heart", "crescent", "sector", "gear", "hirth", "pulley", "honeycomb", "hinge", "knurl", "dovetail", "screwBoss", "snapFit", "rib", "counterbore", "countersink", "doubleCountersink", "finishingWasher", "teardrop", "port", "loft", "vase", "thread", "spring", "gridfinity", "ring", "wedge", "polygon", "icosahedron", "ruler", "mesh",
 ];
 
 function numberOrDefault(value: unknown, fallback: number) {
@@ -452,6 +452,11 @@ export function normalizeShapeCustomizations(value: unknown, fallback: ShapeCust
       entry.heartTipFillet = optionalShapeNumber(source.heartTipFillet, fallbackEntry?.heartTipFillet, 0, MAX_CUSTOM_SHAPE_DIMENSION);
       entry.heartQuality = optionalShapeNumber(source.heartQuality, fallbackEntry?.heartQuality, 16, 64, true);
     }
+    if (kind === "sector") {
+      entry.sectorAngle = optionalShapeNumber(source.sectorAngle, fallbackEntry?.sectorAngle, 1, 360);
+      entry.sectorInnerDiameter = optionalShapeNumber(source.sectorInnerDiameter, fallbackEntry?.sectorInnerDiameter, 0, MAX_CUSTOM_SHAPE_DIMENSION);
+      entry.sectorEndRadius = optionalShapeNumber(source.sectorEndRadius, fallbackEntry?.sectorEndRadius, 0, MAX_CUSTOM_SHAPE_DIMENSION);
+    }
     if (kind === "crescent") {
       entry.crescentThickness = optionalShapeNumber(source.crescentThickness, fallbackEntry?.crescentThickness, 1, MAX_CUSTOM_SHAPE_DIMENSION);
       entry.crescentTipFillet = optionalShapeNumber(source.crescentTipFillet, fallbackEntry?.crescentTipFillet, 0, MAX_CUSTOM_SHAPE_DIMENSION);
@@ -566,6 +571,7 @@ export function normalizeShapeCustomizations(value: unknown, fallback: ShapeCust
       entry.gridfinityCompartmentsX = optionalShapeNumber(source.gridfinityCompartmentsX, fallbackEntry?.gridfinityCompartmentsX, 1, MAX_CUSTOM_SHAPE_DIMENSION, true);
       entry.gridfinityCompartmentsZ = optionalShapeNumber(source.gridfinityCompartmentsZ, fallbackEntry?.gridfinityCompartmentsZ, 1, MAX_CUSTOM_SHAPE_DIMENSION, true);
       entry.gridfinityDividerThickness = optionalShapeNumber(source.gridfinityDividerThickness, fallbackEntry?.gridfinityDividerThickness, 0, MAX_CUSTOM_SHAPE_DIMENSION);
+      entry.gridfinityDividerHeight = optionalShapeNumber(source.gridfinityDividerHeight, fallbackEntry?.gridfinityDividerHeight, 0, MAX_CUSTOM_SHAPE_DIMENSION);
     }
     if (kind === "knurl") {
       entry.knurlPattern = source.knurlPattern === "straight" || source.knurlPattern === "diamond" || source.knurlPattern === "round" ? source.knurlPattern : fallbackEntry?.knurlPattern;
@@ -835,6 +841,38 @@ export function handleDimensionLimit(
     ? Math.max(workspace.width, workspace.depth)
     : printerHeight ?? Math.max(workspace.width, workspace.depth);
   return Math.max(appDefault, plate, current);
+}
+
+/**
+ * How far the height handle pulls a body (Discussion #1558). The printer's height holds only while the body's height stands
+ * upright; a box laid on its side by placing it on the face of a lying rail has its height along the plate, and stopped at
+ * the printer's 200 mm while it was pulled along a rail twice as long. Tilted, it reaches as far as the plate does too.
+ */
+export function heightHandleLimit(
+  workspace: Pick<WorkplaneWorkspaceSettings, "width" | "depth" | "shapeCustomizations">,
+  kind: ShapeKind,
+  currentHeight: number,
+  printerHeight: number | null | undefined,
+  upright: boolean,
+) {
+  const height = handleDimensionLimit(workspace, kind, 180, "height", currentHeight, printerHeight);
+  return upright ? height : Math.max(height, handleDimensionLimit(workspace, kind, 220, "across", currentHeight));
+}
+
+/**
+ * How large a typed width, depth or height may make a body (Discussion #1444). Only the handles
+ * stop at the plate; a number typed in is taken as it is, for several bodies at once as for one,
+ * so a part larger than the plate (36 in for a bench) is a matter of typing it. A custom size
+ * limit for the shape still holds, but never shrinks a body that is already larger.
+ */
+export function typedDimensionLimit(
+  workspace: Pick<WorkplaneWorkspaceSettings, "shapeCustomizations">,
+  kind: ShapeKind,
+  currentSize: number,
+) {
+  const custom = workspace.shapeCustomizations[kind]?.maxDimension;
+  if (custom === undefined) return Number.POSITIVE_INFINITY;
+  return Math.max(custom, Number.isFinite(currentSize) ? currentSize : 0);
 }
 
 export function normalizeSnapGrid(value: unknown, fallback: GridSize = DEFAULT_SNAP_GRID): GridSize {

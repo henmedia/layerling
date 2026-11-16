@@ -596,12 +596,23 @@ function isOpenableGroup(shape: WorkplaneShape) {
     && (shape.groupOperation === undefined || shape.groupOperation === "group");
 }
 
-/** The cutters among these shapes, a group of holes opened into the holes it holds. */
-function collectHoles(brep: Brep, shapes: WorkplaneShape[], skipped: SkippedShape[], holes: { box: Aabb; solid: BrepSolid }[]) {
+/**
+ * The cutters among these shapes. A group set as a hole cuts what the group is, as the editor builds it: a group of
+ * holes alone is opened into the holes it holds; a group with solids in it cuts its solids with its own holes taken out
+ * of them first (Discussion #1748: a box with a capsule hole, set as a hole, trims a filleted capsule to the capsule's
+ * outline - its box was left out and its capsule cut the body instead, leaving a thin ring).
+ */
+async function collectHoles(brep: Brep, shapes: WorkplaneShape[], skipped: SkippedShape[], holes: { box: Aabb; solid: BrepSolid }[], budget: ExactExportBudget) {
   for (const shape of shapes.filter((s) => s.hole)) {
     const source = stepSourceForShape(shape);
     if (source === "unsupported" && isOpenableGroup(shape)) {
-      collectHoles(brep, restoreGroupedChildren(shape).filter((child) => !child.hidden), skipped, holes);
+      const children = restoreGroupedChildren(shape).filter((child) => !child.hidden);
+      if (children.some((child) => !child.hole)) {
+        const inner = await buildScope(brep, children, skipped, budget);
+        holes.push(...inner.map((part) => ({ box: part.box, solid: part.solid })));
+      } else {
+        await collectHoles(brep, children, skipped, holes, budget);
+      }
       continue;
     }
     const text = source === "unsupported" ? buildTextBody(brep, shape) : null;
@@ -627,7 +638,7 @@ function collectHoles(brep: Brep, shapes: WorkplaneShape[], skipped: SkippedShap
 /** The solids of these shapes with the holes among them cut out; a group is a scope of its own. */
 async function buildScope(brep: Brep, shapes: WorkplaneShape[], skipped: SkippedShape[], budget: ExactExportBudget): Promise<ScopePart[]> {
   const holes: { box: Aabb; solid: BrepSolid }[] = [];
-  collectHoles(brep, shapes, skipped, holes);
+  await collectHoles(brep, shapes, skipped, holes, budget);
 
   const parts: ScopePart[] = [];
   for (const shape of shapes.filter((s) => !s.hole)) {

@@ -834,6 +834,9 @@ export function workplaneShapesEqual(a: WorkplaneShape, b: WorkplaneShape) {
     a.crescentThickness === b.crescentThickness &&
     a.crescentTipFillet === b.crescentTipFillet &&
     a.crescentQuality === b.crescentQuality &&
+    a.sectorAngle === b.sectorAngle &&
+    a.sectorInnerDiameter === b.sectorInnerDiameter &&
+    a.sectorEndRadius === b.sectorEndRadius &&
     a.honeycombCellSize === b.honeycombCellSize &&
     a.honeycombWallThickness === b.honeycombWallThickness &&
     a.honeycombFrameWidth === b.honeycombFrameWidth &&
@@ -917,6 +920,7 @@ export function workplaneShapesEqual(a: WorkplaneShape, b: WorkplaneShape) {
     a.gridfinityCompartmentsX === b.gridfinityCompartmentsX &&
     a.gridfinityCompartmentsZ === b.gridfinityCompartmentsZ &&
     a.gridfinityDividerThickness === b.gridfinityDividerThickness &&
+    a.gridfinityDividerHeight === b.gridfinityDividerHeight &&
     gridfinityDividerPositionsEqual(a.gridfinityDividerPositionsX, b.gridfinityDividerPositionsX) &&
     gridfinityDividerPositionsEqual(a.gridfinityDividerPositionsZ, b.gridfinityDividerPositionsZ) &&
     gridfinityCompartmentLabelsEqual(a.gridfinityCompartmentLabels, b.gridfinityCompartmentLabels) &&

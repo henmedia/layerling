@@ -68,6 +68,11 @@ function plateArea(board: SbcBoard) {
   if (board.type === "wemosD1Mini") return d1MiniArea();
   // The CYDs: their rounded rectangle less the cut under the antenna, 6.6 x 18.2 mm at the right end.
   if (board.type === "cyd" || board.type === "cyd2usb") return board.width * board.depth - (4 - Math.PI) * board.cornerRadius ** 2 - 6.6 * 18.2;
+  // The NanoPi NEO3 Plus as FriendlyELEC's PCB file has it: the 48.006 mm plate with R 3.048 corners, the tab under
+  // the USB-C (1.6 x 11.024 mm), less the notch at the right edge, the three small notches and the front edge set back.
+  if (board.type === "nanoPiNeo3Plus") {
+    return 48.006 ** 2 - (4 - Math.PI) * 3.048 ** 2 + 1.6 * 11.024 - (48.006 - 45.999) * 2.463 - 1.499 * 1.498 - 1.499 * 1.473 - 1.499 * (48.006 - 46.507) - 20.142 * 0.686;
+  }
   expect(["arduinoUno", "arduinoMega"]).toContain(board.type);
   // 66.04 x 53.34 (the MEGA 99.06 x 53.34) with three corners round, the back right one cut 1.524 mm
   // at 45°; the step from (66.04, 2.54) over (68.58, 5.08) and (68.58, 37.846) to (66.04, 40.386), on the MEGA 33.02 further right.

@@ -11,7 +11,7 @@ import { LineSegmentsGeometry } from "three/examples/jsm/lines/LineSegmentsGeome
 import { type AppThemePalette, type ResolvedAppTheme } from "@/lib/appTheme";
 import { t, type MessageKey } from "@/lib/i18n";
 import { currentLengthUnitLabel, displayToMillimeters, formatLengthMm, formatMeasurementNumber, lengthDisplayUnit, millimetersToDisplay, parseMeasurementInput } from "@/lib/measurementUnits";
-import { CORNER_RULER_DEFAULT_ARM_ELEVATION, computeCornerRulerRelativeCoordinates, cornerRulerArmsShown, cornerRulerAxisModes, cornerRulerElevationFieldBesideBody, cornerRulerDimensionMatchesFromCorner, cornerRulerFlatRotation, cornerRulerTicks, pointAlongRuler, rulerDimensionMatch, rulerLiesFlat, spreadCornerRulerFields, thinCornerRulerLabels, worldAxisNameOfDirection, type CornerRulerAxis, type CornerRulerAxisModes, type CornerRulerFrame, type CornerRulerMode, type RulerDimensionField, type RulerDimensionMatch, type RulerPose } from "@/lib/rulerDimensions";
+import { cornerRulerArmCursor, CORNER_RULER_DEFAULT_ARM_ELEVATION, computeCornerRulerRelativeCoordinates, cornerRulerArmsShown, cornerRulerAxisModes, cornerRulerElevationFieldBesideBody, cornerRulerDimensionMatchesFromCorner, cornerRulerFlatRotation, cornerRulerTicks, pointAlongRuler, rulerDimensionMatch, rulerLiesFlat, spreadCornerRulerFields, thinCornerRulerLabels, worldAxisNameOfDirection, type CornerRulerAxis, type CornerRulerAxisModes, type CornerRulerFrame, type CornerRulerMode, type RulerDimensionField, type RulerDimensionMatch, type RulerPose } from "@/lib/rulerDimensions";
 import { type PlacementPoint, type PlacementWorkplane } from "@/lib/placementWorkplane";
 import { capturePointer } from "@/lib/pointerCapture";
 import { GuideHelpLink } from "@/components/GuideHelpLink";
@@ -2066,6 +2066,7 @@ export function CornerRulerToolOverlay({
                 cy={item.ends[arm].y}
                 r="5"
                 data-arm={arm}
+                style={{ cursor: cornerRulerArmCursor({ x: item.handleX, y: item.handleY }, item.ends[arm]) }}
                 onPointerDown={(event) => onArmEndPointerDown(event, item.id, arm)}
                 onPointerMove={(event) => onArmEndPointerMove(event, item.id, arm)}
                 onPointerUp={(event) => onArmEndPointerUp(event, item.id, arm)}

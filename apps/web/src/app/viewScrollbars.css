@@ -31,7 +31,11 @@
   user-select: none;
 }
 
-.view-scrollbar:hover,
+/* Two rules: Firefox before 121 drops a whole list that holds :has() (#1761). */
+.view-scrollbar:hover {
+  opacity: 1;
+}
+
 .view-scrollbar:has(.dragging) {
   opacity: 1;
 }

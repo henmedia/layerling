@@ -187,7 +187,7 @@ AI 可以透過 MCP 橋接使用 `layerling_push_face` 完成同樣的事（參�
 
 在 {{ui:scalePercent.percent}} 下，以目前尺寸的百分比輸入新尺寸：120 % 表示放大五分之一，50 % 表示縮小一半。寬度、深度和高度會同樣變化，因此比例保持不變。底部保持在原處，所以不會有東西陷入平台。
 
-做模型時，在頂部選擇 {{ui:scalePercent.by.scale}} 而不是 {{ui:scalePercent.by.percent}}。{{ui:scalePercent.scalePresets}} 列出從 Z（1:220）到 G（1:22.5）的常用比例，在 {{ui:scalePercent.ratio}} 中可以輸入任何其他比例，例如輸入 35 表示 1:35。如果模型是依原物實際尺寸做的，保持 {{ui:scalePercent.original.fullSize}}：1:87 會把它縮小到 1/87。如果你依任意尺寸做的，選擇 {{ui:scalePercent.original.realSize}}，再選 {{ui:scalePercent.axis.height}} 或 {{ui:scalePercent.axis.length}}（平台上最長的一邊），並在 {{ui:scalePercent.realSize}} 中輸入原物的實際大小，單位為公尺（英制單位時為英尺）。一棵實際高 16 公尺的樹，在 H0 中就變成 16000 mm / 87 = 184 mm 高，不論它原本多大。按下 {{ui:scalePercent.apply}} 之前，新尺寸會顯示在欄位下方。只要編輯器開著，比例就會保留。
+做模型時，在頂部選擇 {{ui:scalePercent.by.scale}} 而不是 {{ui:scalePercent.by.percent}}。{{ui:scalePercent.scalePresets}} 列出從 Z（1:220）到 16mm（1:19.05）的常用比例，在 {{ui:scalePercent.ratio}} 中可以輸入任何其他比例，例如輸入 35 表示 1:35。如果模型是依原物實際尺寸做的，保持 {{ui:scalePercent.original.fullSize}}：1:87 會把它縮小到 1/87。如果你依任意尺寸做的，選擇 {{ui:scalePercent.original.realSize}}，再選 {{ui:scalePercent.axis.height}} 或 {{ui:scalePercent.axis.length}}（平台上最長的一邊），並在 {{ui:scalePercent.realSize}} 中輸入原物的實際大小，單位為公尺（英制單位時為英尺）。一棵實際高 16 公尺的樹，在 H0 中就變成 16000 mm / 87 = 184 mm 高，不論它原本多大。按下 {{ui:scalePercent.apply}} 之前，新尺寸會顯示在欄位下方。只要編輯器開著，比例就會保留。
 
 選取多個零件時，可以選擇它們如何增長：
 
@@ -209,3 +209,5 @@ AI 可以透過 MCP 橋接使用 `layerling_push_face` 完成同樣的事（參�
 你也可以把單一物件帶回設計。在所示狀態中點擊一個物件——[[Shift]]+點擊可加入更多或再取消一個，點擊空白處則什麼都不選——然後選擇 {{ui:historyView.bringBack}}。檢視關閉，每個物件的副本會進入目前設計，與該狀態中完全一樣，並位於它當時所在的位置，處於選取狀態，與設計目前的內容並排；其他內容不變。這是一步操作，因此復原即可還原。可用於帶回你後來改過的某個零件版本，或帶回你刪除過的零件。群組會整組帶回；物件上的備註和參考點則不會帶回。其名稱會帶上該狀態的時間，例如「長方體（12:32）」，因此很容易與設計目前的版本區分。要從群組內部帶回零件，請選取該群組並選擇 {{ui:historyView.openGroup}} 或按 [[E]]，與在設計中的操作一樣：其零件會擺放在編輯群組時它們應在的位置，可供挑選，這條列會顯示你正位於哪個群組。{{ui:historyView.backOut}} 可再次關閉。這只是查看——群組、設計和歷史記錄都保持原樣。
 
 {{ui:historyView.delete}} 單獨位於這條列的左下角。經確認後，它會永久移除所有較早的步驟：設計保留目前的狀態（不是所顯示的狀態），復原沒有可回退的內容，之後儲存的檔案也不帶歷史記錄。可用它在分享設計時去掉過去的歷史，或重新開始復原步驟。此操作無法復原；若要分享檔案而不影響自己的設計，請在匯出時選擇 {{ui:export.historyNone}}。
+
+要在不失去全部歷史記錄的情況下讓大型設計變小，可以刪除單一步驟。清單開啟時，每個步驟右側會顯示刪除它大約能釋放多少空間，依設計的儲存方式計算：多個步驟共用的網格不單獨算在其中任何一個上，釋放不到 10 KB 的步驟不顯示數值。旋轉過的物件每次旋轉後都會儲存為新的網格，所以這些步驟通常最大。步驟旁的垃圾桶會在詢問後只刪除該步驟：設計保持不變，復原會從它後面的步驟直接跳到它前面的步驟。設計目前所在的步驟不能刪除。清單上方顯示整個歷史記錄佔用的大小，{{ui:historyView.deleteLargest}} 會選出每個單獨可釋放 1 MB 或更多的步驟，並在一起刪除前詢問。當設計太大、瀏覽器無法連同全部歷史記錄一起儲存時，相關提示中有一個 {{ui:notice.projectHistoryTrimmedOpen}} 按鈕，可開啟此清單。

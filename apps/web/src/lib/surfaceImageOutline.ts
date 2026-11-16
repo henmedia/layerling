@@ -51,7 +51,7 @@ export function inTwoTones(grey: ArrayLike<number>) {
 export function drawingOutlines(grey: ArrayLike<number>, width: number, height: number, maxPoints = SURFACE_IMAGE_OUTLINE_MAX_POINTS): number[][] {
   if (width < 2 || height < 2) return [];
   // One ground point round the drawing, so a shape that reaches the border still closes.
-  const W = width + 2, H = height + 2;
+  const W = width + 2;
   const f = (x: number, y: number) => (x < 0 || y < 0 || x >= width || y >= height ? -0.5 : grey[y * width + x] - 0.5);
   // A crossing is named by the edge it lies on: horizontal edges (between x and x + 1 at row y) and vertical ones.
   const pointsX: number[] = [], pointsY: number[] = [];

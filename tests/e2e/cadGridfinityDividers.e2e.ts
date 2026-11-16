@@ -3,7 +3,7 @@ import { type ShapeHandle } from "occt-wasm";
 import type { CadModifierGridfinityPart } from "@/lib/cadModifierTypes";
 import { GRIDFINITY_LIP_HEIGHT, gridfinityCompartmentPieces, gridfinityDividerBound, gridfinityPlan, gridfinityTriangles } from "@/lib/gridfinityGeometry";
 import { gridfinityPartSolid } from "@/lib/gridfinitySolid";
-import { cad, bin, meshVolume, trianglesVolume, meshBounds, material } from "./helpers/gridfinityHarness";
+import { cad, bin, meshVolume, trianglesVolume, meshBounds, material, expectBuilt } from "./helpers/gridfinityHarness";
 
 
 /*
@@ -282,5 +282,97 @@ describe("exact Gridfinity bins with dividers, one of each hazard", () => {
     for (const [lip, radius] of [[{}, 3.5], [{ gridfinityLip: false, height: 21 }, 14.55]] as const) {
       expectClean(bin({ ...lip, gridfinityCompartmentsX: 2, gridfinityCompartmentsZ: 2, gridfinityDividerPositionsX: [6.6], gridfinityDividerPositionsZ: [6.6], gridfinityScoopFront: true, gridfinityScoopLeft: true, gridfinityScoopRadius: radius }));
     }
+  });
+});
+
+describe("exact Gridfinity bins with lower dividers", () => {
+  const divided = (extra: Partial<CadModifierGridfinityPart> = {}) => bin({ gridfinityCompartmentsX: 3, gridfinityCompartmentsZ: 2, ...extra });
+  const tray = (extra: Partial<CadModifierGridfinityPart> = {}): CadModifierGridfinityPart => ({ width: 80, depth: 40, height: 20, gridfinityType: "tray", gridfinityLip: false, gridfinityMagnets: false, ...extra });
+  const volume = (part: CadModifierGridfinityPart) => Math.abs(cad.getVolume(gridfinityPartSolid(cad, part)));
+  /** The compartments' inner corners a divider fills where it meets the wall: the square less the quarter circle. */
+  const corner = (r: number) => ((4 - Math.PI) / 4) * r * r;
+
+  it("builds the bin it built before with the height unset, at its full 14.2 mm or over it", () => {
+    // 28347.58 mm³, as the bin of 3 x 2 compartments with a front scoop has without the setting.
+    for (const height of [undefined, 14.2, 100]) expect(Math.abs(volume(divided({ gridfinityScoopFront: true, gridfinityDividerHeight: height })) - 28347.58), `${height}`).toBeLessThan(0.05);
+  });
+
+  it("takes the height off the dividers alone, as calculated by hand, in a tray, a bin without the lip and a bin with a thick wall", () => {
+    // Each divider's section is its thickness along the inside and the compartments' inner corners at its ends: 566.46 mm³
+    // in a tray 10.8 mm lower, 336.35 in a bin without the lip and 295.30 behind a wall of 2 mm, both 6.2 mm lower.
+    for (const [part, drop] of [
+      [tray({ gridfinityCompartmentsX: 2 }), (38.1 * 1.2 + 4 * corner(2.8)) * 10.8],
+      [bin({ gridfinityCompartmentsX: 2, gridfinityLip: false, height: 21 }), (39.6 * 1.2 + 4 * corner(2.8)) * 6.2],
+      [bin({ gridfinityCompartmentsX: 2, gridfinityWallThickness: 2 }), (37.5 * 1.2 + 4 * corner(1.75)) * 6.2],
+    ] as const) {
+      const lowered = { ...part, gridfinityDividerHeight: 8 };
+      expectBuilt(lowered);
+      expect(Math.abs(volume(part) - volume(lowered) - drop), JSON.stringify(part)).toBeLessThan(0.05);
+    }
+  });
+
+  it("cuts the inside between the lower dividers' top and the ledge of a thick wall", () => {
+    const solid = gridfinityPartSolid(cad, bin({ gridfinityCompartmentsX: 2, gridfinityWallThickness: 2, gridfinityDividerHeight: 8 }));
+    // Over the divider at x = 0 the inside is empty from 13.95 up to the ledge at 20.15, and the divider stands below it.
+    expect(material(solid, 0, 0, 14, 20)).toBe(0);
+    expect(material(solid, 0, 0, 10, 13.9)).toBeCloseTo(0.09 * 3.9, 3);
+  });
+
+  it("builds labels on a divider and on the wall, scoops under the lower top, and the lowest and highest heights", () => {
+    const labels = [
+      { column: 0, row: 0, side: "back" as const },
+      { column: 1, row: 0, side: "front" as const },
+      { column: 2, row: 0, side: "left" as const, length: 50 },
+      { column: 1, row: 1, side: "back" as const, width: 6 },
+      { column: 2, row: 1, side: "right" as const },
+    ];
+    for (const part of [
+      divided({ gridfinityScoopFront: true, gridfinityCompartmentLabels: labels, gridfinityDividerHeight: 8 }),
+      divided({ gridfinityScoopFront: true, gridfinityDividerHeight: 6 }),
+      divided({ gridfinityScoopFront: true, gridfinityScoopBack: true, gridfinityDividerHeight: 4 }),
+      divided({ gridfinityScoopFront: true, gridfinityDividerHeight: 3 }),
+      // 13.4 mm puts the dividers' top on the foot of the lip's support, 19.35.
+      divided({ gridfinityScoopFront: true, gridfinityCompartmentLabels: labels, gridfinityDividerHeight: 13.4 }),
+      divided({ gridfinityLip: false, height: 21, gridfinityScoopFront: true, gridfinityDividerHeight: 8 }),
+      divided({ gridfinityWallThickness: 2, gridfinityLipChamfer: 0.5, gridfinityScoopFront: true, gridfinityDividerHeight: 8 }),
+      divided({ gridfinityFloorHeight: 10, gridfinityScoopFront: true, gridfinityDividerHeight: 5 }),
+      tray({ gridfinityCompartmentsX: 3, gridfinityCompartmentsZ: 2, gridfinityScoopFront: true, gridfinityCompartmentLabels: labels, gridfinityDividerHeight: 8 }),
+    ]) expectBuilt(part);
+  });
+
+  it("builds a label on the wall whose underside meets the lower dividers' top at the wall or where the corner rounds", () => {
+    // A shelf 14 mm wide on the 2 mm wall crosses 10.05 mm, a height of 4.1, 1.75 mm out from the wall; one 11.2 mm
+    // wide on the 0.95 mm wall meets the wall at 10.81, a height of 4.86, and crosses 12.85, 6.9, 2.8 mm out.
+    const right = divided({ gridfinityWallThickness: 2, gridfinityCompartmentLabels: [{ column: 2, row: 1, side: "right" }] });
+    const back = divided({ gridfinityCompartmentLabels: [{ column: 0, row: 0, side: "back" }] });
+    // Each, and 0.005 mm either side of it.
+    for (const [part, height] of [[right, 4.1], [back, 4.86], [back, 6.9]] as const) {
+      for (const step of [-1, 0, 1]) expectBuilt({ ...part, gridfinityDividerHeight: height + step * 0.005 });
+    }
+  });
+
+  it("builds dividers whose top lands near a label's land on the wall or the foot of the lip's support", () => {
+    // The land's bottom at 18.95, a height of 13; the support's foot at 19.35, 13.4. Each, and 0.005 and 0.01 mm either side.
+    const back = divided({ gridfinityCompartmentLabels: [{ column: 0, row: 0, side: "back" }] });
+    for (const [part, height] of [[back, 13], [divided(), 13.4]] as const) {
+      for (const step of [-2, -1, 0, 1, 2]) expectBuilt({ ...part, gridfinityDividerHeight: height + step * 0.005 });
+    }
+  });
+
+  it("builds dividers whose top lands near the land or the top of a tray's label lowered for a text", () => {
+    // A shelf with a text stands at 19.6, its land's bottom at 18.4: heights of 18.4 and 17.2 over the floor at 1.2. At 9.06
+    // the wall's shelf, narrowed, passes over the dividers' top 2.8 mm out, where the corner rounds.
+    const wall = tray({ gridfinityCompartmentsX: 2, gridfinityCompartmentLabels: [{ column: 0, row: 0, side: "back", text: "A" }] });
+    const divider = tray({ gridfinityCompartmentsX: 2, gridfinityCompartmentLabels: [{ column: 0, row: 0, side: "right", text: "A" }] });
+    for (const [part, height] of [[wall, 17.2], [wall, 18.4], [divider, 18.4], [wall, 9.06]] as const) {
+      for (const step of [-1, 0, 1]) expectBuilt({ ...part, gridfinityDividerHeight: height + step * 0.005 });
+    }
+  });
+
+  it("builds a notch whose bottom lands on the lower dividers' top, and one through an open side", () => {
+    // 11.45 mm deep from the lip's top at 25.4 lands on 13.95 and is moved 0.05 mm up.
+    expectBuilt(bin({ gridfinityCompartmentsX: 2, gridfinityOpenFront: true, gridfinityOpenings: [{ side: "front", width: 20, depth: 11.45 }], gridfinityDividerHeight: 8 }));
+    expectBuilt(bin({ gridfinityCompartmentsZ: 2, gridfinityOpenFront: true, gridfinityOpenings: [{ side: "front", width: 30, depth: 15 }], gridfinityDividerHeight: 6 }));
+    expectBuilt(divided({ gridfinityOpenLeft: true, gridfinityScoopFront: true, gridfinityDividerHeight: 8 }));
   });
 });

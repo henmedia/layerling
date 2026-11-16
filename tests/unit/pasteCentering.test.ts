@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { meshAabb } from "@/lib/editorMeshCore";
-import { PASTE_NUDGE, pasteCenteringShift, pasteNudged } from "@/lib/pasteCentering";
+import { PASTE_NUDGE, pasteCenteringShift, pasteNudged, pasteNudgeFor } from "@/lib/pasteCentering";
 import { horizontalPlacementWorkplane } from "@/lib/placementWorkplane";
 import { DEFAULT_WORKPLANE_WORKSPACE } from "@/lib/workplaneSettings";
 import type { WorkplaneShape } from "@/types/layerling";
@@ -40,9 +40,23 @@ describe("plain paste keeps the parts together (#1304)", () => {
   it("sets every copy the same step from its original, also far beyond the plate", () => {
     const parts = [box("box", 220, 180, 0, 20, 20, 20), box("pin", 225, 185, 20, 10, 10, 10)];
     const pasted = pasteNudged(parts, parts);
-    expect(pasted.map((part) => [part.x, part.z])).toEqual([[220 + PASTE_NUDGE, 180 + PASTE_NUDGE], [225 + PASTE_NUDGE, 185 + PASTE_NUDGE]]);
+    // The two together are 20 mm across, so they move half of that.
+    expect(pasted.map((part) => [part.x, part.z])).toEqual([[230, 190], [235, 195]]);
     expect(pasted[1].x - pasted[0].x).toBe(5);
     expect(pasted[1].z - pasted[0].z).toBe(5);
     expect(pasted[1].elevation).toBe(20);
+  });
+});
+
+describe("a plain paste moves by the size of what was copied (Discussion #1764)", () => {
+  it("sets a small part's copy right beside it, so it stays in view when zoomed in", () => {
+    expect(pasteNudgeFor([box("tiny", 0, 0, 0, 4, 3, 2)])).toBe(2);
+    const pasted = pasteNudged([box("tiny", 5, 5, 0, 4, 3, 2)], [box("tiny", 5, 5, 0, 4, 3, 2)]);
+    expect([pasted[0].x, pasted[0].z]).toEqual([7, 7]);
+  });
+
+  it("moves a large part the full 12 mm as before, and a speck at least 1 mm", () => {
+    expect(pasteNudgeFor([box("big", 0, 0, 0, 80, 40, 10)])).toBe(PASTE_NUDGE);
+    expect(pasteNudgeFor([box("speck", 0, 0, 0, 0.4, 0.4, 0.4)])).toBe(1);
   });
 });

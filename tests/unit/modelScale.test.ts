@@ -43,9 +43,10 @@ describe("scaling to a model scale (forum, 3DVadda)", () => {
   });
 
   it("knows the usual gauges", () => {
-    expect(MODEL_SCALE_PRESETS.map((preset) => preset.label)).toEqual(["Z", "N", "TT", "H0", "0", "1", "G"]);
+    expect(MODEL_SCALE_PRESETS.map((preset) => preset.label)).toEqual(["Z", "N", "TT", "H0", "0", "1", "G", "16mm"]);
     expect(modelScalePresetFor(87)?.label).toBe("H0");
     expect(modelScalePresetFor(22.5)?.label).toBe("G");
+    expect(modelScalePresetFor(19.05)?.label).toBe("16mm");
     expect(modelScalePresetFor(100)).toBeNull();
   });
 });

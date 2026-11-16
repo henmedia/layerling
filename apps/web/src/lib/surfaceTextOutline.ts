@@ -1,6 +1,5 @@
-import { textNeedsJapanese, textNeedsJapaneseLevel2 } from "@/lib/japaneseText";
 import { SURFACE_TEXTURE_MAX_TEXT_POINTS } from "@/lib/surfaceTexture";
-import { loadJapaneseLevel2, loadJapaneseTypeface, loadTextFonts, textFont } from "@/lib/textFonts";
+import { loadGlyphsForText, loadTextFonts, textFont } from "@/lib/textFonts";
 import { straightTextShapes } from "@/lib/textGeometry";
 
 /** The built-in fonts, as a text shape offers them; fonts of one's own come by their id. */
@@ -19,9 +18,8 @@ export async function surfaceTextOutline({ content, font, size, vertical = false
   const words = content.trim();
   if (!words) return [];
   await loadTextFonts();
-  // Kana and kanji come from a face of their own, fetched the first time a text needs it.
-  if (textNeedsJapanese(words)) await loadJapaneseTypeface().catch(() => undefined);
-  if (textNeedsJapaneseLevel2(words)) await loadJapaneseLevel2().catch(() => undefined);
+  // Kana, kanji and hanzi come from a face of their own, fetched the first time a text needs it.
+  await loadGlyphsForText(words);
   const shape = { text: words, font };
   // Stencil is drawn with straight segments, as the text shape draws it.
   const segments = font === "Stencil" ? 1 : 6;

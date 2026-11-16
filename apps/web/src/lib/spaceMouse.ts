@@ -24,6 +24,29 @@ export function readSpaceMouseReport(axes: SpaceMouseAxes, reportId: number, dat
   return axes;
 }
 
+/**
+ * Whether a game controller of the browser's Gamepad API is a 3D mouse (#1013): a 3Dconnexion device, by the name the
+ * browser gives it ("SpaceMouse Compact (Vendor: 256f Product: c635)", "SpaceNavigator"...). Chrome shows the page such a
+ * controller as soon as it is moved, with no question, so it is found again after every restart, which a WebHID device
+ * without a serial number is not (Discussion #1013, Jeff-Haas).
+ */
+export function isSpaceMouseGamepad(id: string) {
+  return /3dconnexion|space ?(mouse|navigator|explorer|pilot|traveler|traveller)|vendor: ?256f|vendor: ?046d product: ?c6[2-6]/i.test(id);
+}
+
+/**
+ * The six axes of a 3D mouse read as a game controller: the browser gives each as -1 to 1 over the device's own range, in
+ * the order of the HID usages (X, Y, Z, then the turns about them), the order of the report of WebHID, so they are scaled
+ * back to device units. A controller with fewer axes leaves the rest at rest.
+ */
+export function readSpaceMouseGamepad(values: readonly number[]): SpaceMouseAxes {
+  const at = (index: number) => {
+    const value = values[index];
+    return typeof value === "number" && Number.isFinite(value) ? Math.max(-1, Math.min(1, value)) * FULL : 0;
+  };
+  return { tx: at(0), ty: at(1), tz: at(2), rx: at(3), ry: at(4), rz: at(5) };
+}
+
 /** Below this the cap is taken as at rest: a 3D mouse never quite returns to zero. */
 const DEAD_ZONE = 12;
 /** Full deflection, in device units. */
@@ -45,6 +68,11 @@ export function spaceMouseAmount(value: number) {
 const SMOOTHING_SECONDS = 0.07;
 
 const AXIS_NAMES = ["tx", "ty", "tz", "rx", "ry", "rz"] as const;
+
+/** Whether the cap is held off its rest band on any axis. */
+export function spaceMouseMoving(axes: SpaceMouseAxes) {
+  return AXIS_NAMES.some((axis) => spaceMouseAmount(axes[axis]) !== 0);
+}
 
 /**
  * The axes the view is moved by after `seconds` more of the cap held as `raw`: each follows its raw value smoothly, by

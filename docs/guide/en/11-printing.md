@@ -91,7 +91,7 @@ From then on, new uses start from the play instead of the built-in value: {{ui:l
 
 ![A tray whose right wall is only 0.6 mm thick: Print check paints it red and names it in the window.](shot:print-check)
 
-{{ui:printCheck.show}} on a line takes the camera there; it selects the floating parts, those standing on too little and the open meshes, and for the overhangs it switches **Show overhangs** on. Bodies that overlap are checked joined, as the slicer joins them. If you change the design while the window is open, it shows {{ui:printCheck.stale}}; click that or {{ui:printCheck.checkAgain}}. [[Esc]] closes the window. Nothing in the design changes. An AI runs the same check with `layerling_check_print`.
+{{ui:printCheck.show}} on a line takes the camera there; it selects the floating parts, those standing on too little and the open meshes, and for the overhangs it switches **Show overhangs** on. Bodies that overlap are checked joined, as the slicer joins them. If you change the design while the window is open, it shows {{ui:printCheck.stale}}; click that or {{ui:printCheck.checkAgain}}. [[Esc]] closes the window. Nothing in the design changes. An AI runs the same check with `layerling_check_print`. The window only checks, it does not print or save anything: to print, export the design for your slicer with {{ui:editor.export}} in {{ui:editor.group.file}}. {{ui:printCheck.openExport}} in the window closes the check and opens the export.
 
 ## When you are ready
 
