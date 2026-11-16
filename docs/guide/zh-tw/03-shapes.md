@@ -36,6 +36,10 @@ layerling 的每個零件都從一個形狀開始。其餘一切都是由形狀�
 
 {{ui:shape.slot}} 可以一端比另一端窄，例如用在兩顆皮帶輪之間的皮帶護罩。在 {{ui:inspector.properties}} 下設定 {{ui:prop.slotSmallEnd}}；大端與膠囊同寬，兩側從一段圓弧直通到另一段圓弧。{{ui:prop.slotCentreDistance}} 是兩段圓弧圓心之間的距離，也就是兩顆皮帶輪的間距。改變小端時圓心距保持不變，膠囊會變長或變短。錐形膠囊同樣是精確實體，可套用圓角並匯出 STEP。
 
+{{ui:shape.sector}} 是一個圓盤，你可以用 {{ui:prop.sectorAngle}}（1 到 360°）像時鐘指針一樣把它切掉一部分，從十二點鐘方向起順時針計算。{{ui:prop.innerDiameter}} 可以把它變成圓環或圓環段（為 0 時零件保持實心），{{ui:prop.sectorEndRadius}} 則把兩端倒成半圓：得到一條彎曲的槽，例如用於螢幕支架和其他需要轉動並夾緊的零件。直徑和高度的設定方法與圓柱相同。外框仍是完整的圓，所以形狀繞圓心旋轉。
+
+{{ui:shape.polygon}} 在 {{ui:prop.sides}} 下方有 {{ui:prop.cornerFillet}} 滑桿，模型上還有一個拖曳點，與 {{ui:shape.roundedBox}} 一樣。無論有多少條邊，一個半徑適用於所有角。它以毫米為單位，所以拉伸後的多邊形仍保持圓角；最大值是相鄰圓角恰好相接的位置，0 則是普通多邊形。
+
 ## 形狀的設定
 
 選取形狀後，它的設定會立刻出現在右側。最上方是名稱，旁邊的鉛筆（{{ui:outliner.rename}}）可讓你輸入新名稱。按 [[Enter]] 保留，按 [[Esc]] 取消，名稱為空則還原形狀的預設名稱。再往右，掛鎖可鎖住形狀、避免誤移動，眼睛圖示則可隱藏它。最左側的箭頭會把設定收合到只剩標題列。下方的卡片點擊標題即可展開與收起（{{ui:inspector.properties}}、{{ui:inspector.position}}、{{ui:inspector.rotation}}、{{ui:inspector.taper}}、{{ui:inspector.twist}} 以及特殊形狀的卡片）；layerling 會記住你留下哪些展開的卡片，下一個形狀與下次造訪都適用。

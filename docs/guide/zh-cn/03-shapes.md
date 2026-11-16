@@ -36,6 +36,10 @@ layerling 里的每个零件都从一个形状开始。用这些形状，你可�
 
 {{ui:shape.slot}} 可以一端比另一端窄，例如用于两个带轮之间的皮带护罩。在 {{ui:inspector.properties}} 下设置 {{ui:prop.slotSmallEnd}}；大端与胶囊一样宽，两侧从一段圆弧直通另一段圆弧。{{ui:prop.slotCentreDistance}} 是两段圆弧圆心之间的距离，也就是两个带轮的间距。改变小端时圆心距保持不变，胶囊会变长或变短。锥形胶囊同样是精确实体，可用于圆角和 STEP。
 
+{{ui:shape.sector}} 是一个圆盘，你可以用 {{ui:prop.sectorAngle}}（1 到 360°）像时钟指针一样把它切掉一部分，从十二点钟方向起顺时针计算。{{ui:prop.innerDiameter}} 可以把它变成圆环或圆环段（为 0 时零件保持实心），{{ui:prop.sectorEndRadius}} 则把两端倒成半圆：得到一条弯曲的槽，例如用于显示器支架和其他需要转动并夹紧的零件。直径和高度的设置方法与圆柱相同。外框仍是完整的圆，所以形状绕圆心旋转。
+
+{{ui:shape.polygon}} 在 {{ui:prop.sides}} 下方有 {{ui:prop.cornerFillet}} 滑块，模型上还有一个拖动点，与 {{ui:shape.roundedBox}} 一样。无论有多少条边，一个半径适用于所有角。它以毫米为单位，所以拉伸后的多边形仍保持圆角；最大值是相邻圆角恰好相接的位置，0 则是普通多边形。
+
 ## 形状的设置
 
 选中形状后，它的设置会立即出现在右侧。顶部是名称，旁边的铅笔（{{ui:outliner.rename}}）可输入新名称。[[Enter]] 保留，[[Esc]] 取消，名称为空则恢复形状的默认名称。再往右，挂锁可锁定形状、防止误移动，眼睛图标可隐藏它。最左侧的箭头可把设置折叠到只剩标题栏。下方的卡片可通过单击标题展开和收起（{{ui:inspector.properties}}、{{ui:inspector.position}}、{{ui:inspector.rotation}}、{{ui:inspector.taper}}、{{ui:inspector.twist}} 以及特殊形状的卡片）；layerling 会记住你保持展开的卡片，供下一个形状和下次访问使用。

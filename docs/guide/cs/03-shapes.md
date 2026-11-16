@@ -36,6 +36,10 @@ Trojúhelník získáte dvěma způsoby. {{ui:shape.polygon}} se třemi stranami
 
 {{ui:shape.slot}} může mít jeden konec užší, například jako kryt řemenu mezi dvěma různými řemenicemi. V {{ui:inspector.properties}} nastavte {{ui:prop.slotSmallEnd}}. Větší konec má šířku celého tvaru a boky vedou rovně mezi oblouky. {{ui:prop.slotCentreDistance}} určuje osovou vzdálenost oblouků, tedy řemenic. Při změně menšího konce se tato vzdálenost zachová a celková délka se přizpůsobí. I takový tvar zachovává přesnou geometrii pro zaoblení a STEP.
 
+{{ui:shape.sector}} je kotouč, který ubíráte pomocí {{ui:prop.sectorAngle}} (1 až 360°) jako ručičku hodin, od dvanácté ve směru hodinových ručiček. {{ui:prop.innerDiameter}} z něj udělá prstenec nebo jeho výseč (při 0 zůstane díl plný) a {{ui:prop.sectorEndRadius}} zaoblí oba konce do půlkruhu: tak vznikne zakřivená drážka, například pro držáky monitorů a další díly, které se otáčejí a upínají. Průměr a výšku nastavíte jako u válce. Rám zůstává celým kruhem, takže se tvar otáčí kolem středu kruhu.
+
+{{ui:shape.polygon}} má pod {{ui:prop.sides}} posuvník {{ui:prop.cornerFillet}} a tažný bod na modelu, stejně jako {{ui:shape.roundedBox}}. Jeden poloměr platí pro všechny rohy, při libovolném počtu stran. Zadává se v milimetrech, takže natažený mnohoúhelník si zachová kulaté rohy; největší hodnota je tam, kde se sousední zaoblení dotknou, a 0 je obyčejný mnohoúhelník.
+
 ## Nastavení tvaru
 
 Vybranému tvaru se vpravo zobrazí jeho nastavení. Nahoře je název; tužka vedle něj ({{ui:outliner.rename}}) umožní napsat nový. [[Enter]] ho ponechá, [[Esc]] zruší a prázdný název vrátí výchozí název tvaru. Dál vpravo zámek chrání tvar před nechtěným posunutím a oko ho skryje. Šipka úplně vlevo sbalí nastavení do záhlaví. Karty pod ním se otevírají a zavírají kliknutím na jejich název ({{ui:inspector.properties}}, {{ui:inspector.position}}, {{ui:inspector.rotation}}, {{ui:inspector.taper}}, {{ui:inspector.twist}} a karty zvláštních tvarů); layerling si pamatuje, které jste nechali otevřené, pro další tvar i příští návštěvu.

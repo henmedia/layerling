@@ -36,6 +36,10 @@ Du får en trekant på to måder: {{ui:shape.polygon}} med tre sider er en ligeb
 
 {{ui:shape.slot}} kan være smallere i den ene ende end den anden, for eksempel til en afskærmning over en rem mellem to remskiver. Under {{ui:inspector.properties}} sæt {{ui:prop.slotSmallEnd}}; den store ende er lige så bred som kapslen, og siderne løber lige fra den ene bue til den anden. {{ui:prop.slotCentreDistance}} er afstanden mellem de to buers centre, det er hvor langt fra hinanden remskiverne er. Skift den lille ende og centerafstanden bevares, kapslen bliver længere eller kortere. Den spidse kapsel forbliver også en eksakt form, til runder og STEP.
 
+{{ui:shape.sector}} er en skive, som du skærer ind med {{ui:prop.sectorAngle}} (1 til 360°) som en urviser, fra klokken tolv og med uret. {{ui:prop.innerDiameter}} gør den til en ring eller et ringstykke (ved 0 forbliver delen massiv), og {{ui:prop.sectorEndRadius}} runder de to ender op til en halvcirkel: det giver et buet langhul, for eksempel til skærmbeslag og andre dele, der drejes og spændes fast. Diameter og højde sætter du som på cylinderen. Rammen forbliver den fulde cirkel, så formen drejer om cirklens midte.
+
+{{ui:shape.polygon}} har skyderen {{ui:prop.cornerFillet}} under {{ui:prop.sides}} og et trækpunkt på modellen, ligesom {{ui:shape.roundedBox}}. Én radius gælder for alle hjørner, uanset antal sider. Den angives i millimeter, så en strakt polygon beholder runde hjørner; den største værdi er der, hvor nabohjørnernes rundinger mødes, og 0 er den almindelige polygon.
+
 ## Formens indstillinger
 
 Så snart en form er valgt, vises dens indstillinger til højre. Øverst er navnet; blyanten ved siden af ({{ui:outliner.rename}}) lader dig taste et nyt. [[Enter]] beholder det, [[Esc]] annullerer, og et tomt navn bringer formens standardnavn tilbage. Længere til højre, hængelåsen låser formen mod utilsigtet flytning og øjet skjuler den. Pilen yderst til venstre folder indstillingerne ned til deres titellinje.
