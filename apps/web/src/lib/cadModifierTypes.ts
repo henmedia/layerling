@@ -424,6 +424,7 @@ export type CadModifierGridfinityPart = {
   gridfinityCompartmentsX?: number;
   gridfinityCompartmentsZ?: number;
   gridfinityDividerThickness?: number;
+  gridfinityDividerHeight?: number;
   gridfinityDividerPositionsX?: number[];
   gridfinityDividerPositionsZ?: number[];
   gridfinityCompartmentLabels?: GridfinityCompartmentLabel[];

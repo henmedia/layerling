@@ -64,12 +64,14 @@ export function gridfinityLetterMeshes(shape: WorkplaneShape): MeshData[] {
   }));
 }
 
-/** Each glyph's rings with the box round it, to find a point's glyph quickly. */
+/** Each glyph's rings with the box round it, its shelf's height included, to find a point's glyph quickly. */
 function glyphBoxes(letters: GridfinityLabelLetters) {
-  return letters.flatMap(({ glyphs }) => glyphs.map((rings) => {
+  return letters.flatMap(({ top, glyphs }) => glyphs.map((rings) => {
     const points = rings.flat();
     return {
       rings: rings.map((ring) => ring.map(([x, z]): PlanePoint => ({ x, z }))),
+      low: top - GRIDFINITY_LABEL_TEXT_SINK,
+      high: top + GRIDFINITY_LABEL_TEXT_HEIGHT,
       minX: Math.min(...points.map(([x]) => x)),
       maxX: Math.max(...points.map(([x]) => x)),
       minZ: Math.min(...points.map(([, z]) => z)),
@@ -78,9 +80,9 @@ function glyphBoxes(letters: GridfinityLabelLetters) {
   }));
 }
 
-/** Whether a point lies in one of the glyphs: inside by the even-odd rule, as a glyph is built, so a point in a hole is in two rings. */
-function inGlyphs(glyphs: ReturnType<typeof glyphBoxes>, point: PlanePoint) {
-  return glyphs.some((glyph) => point.x >= glyph.minX && point.x <= glyph.maxX && point.z >= glyph.minZ && point.z <= glyph.maxZ
+/** Whether a point lies in one of the glyphs, between its shelf and its top: inside by the even-odd rule, as a glyph is built, so a point in a hole is in two rings. */
+function inGlyphs(glyphs: ReturnType<typeof glyphBoxes>, point: THREE.Vector3) {
+  return glyphs.some((glyph) => point.y > glyph.low && point.y < glyph.high && point.x >= glyph.minX && point.x <= glyph.maxX && point.z >= glyph.minZ && point.z <= glyph.maxZ
     && glyph.rings.reduce((inside, ring) => inside !== pointInPolygon(point, ring), false));
 }
 
@@ -93,9 +95,9 @@ export function gridfinityLetterGroups(geometry: THREE.BufferGeometry, letters: 
   if (letters.length === 0) return geometry;
   const position = geometry.getAttribute("position");
   const glyphs = glyphBoxes(letters);
-  // A face below or above the letters is the bin's without asking each glyph; every shelf with letters, and so every letter, stands at one height.
-  const low = letters[0].top - GRIDFINITY_LABEL_TEXT_SINK;
-  const high = letters[0].top + GRIDFINITY_LABEL_TEXT_HEIGHT;
+  // A face below or above all the letters is the bin's without asking each glyph.
+  const low = Math.min(...glyphs.map((glyph) => glyph.low));
+  const high = Math.max(...glyphs.map((glyph) => glyph.high));
   const a = new THREE.Vector3();
   const b = new THREE.Vector3();
   const c = new THREE.Vector3();

@@ -895,6 +895,7 @@ export function workplaneShapesEqual(a: WorkplaneShape, b: WorkplaneShape) {
     a.gridfinityCompartmentsX === b.gridfinityCompartmentsX &&
     a.gridfinityCompartmentsZ === b.gridfinityCompartmentsZ &&
     a.gridfinityDividerThickness === b.gridfinityDividerThickness &&
+    a.gridfinityDividerHeight === b.gridfinityDividerHeight &&
     gridfinityDividerPositionsEqual(a.gridfinityDividerPositionsX, b.gridfinityDividerPositionsX) &&
     gridfinityDividerPositionsEqual(a.gridfinityDividerPositionsZ, b.gridfinityDividerPositionsZ) &&
     gridfinityCompartmentLabelsEqual(a.gridfinityCompartmentLabels, b.gridfinityCompartmentLabels) &&

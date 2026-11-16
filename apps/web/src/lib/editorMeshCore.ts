@@ -632,6 +632,7 @@ function geometryMeshForShape(shape: WorkplaneShape): MeshData | null {
         gridfinityCompartmentsX: shape.gridfinityCompartmentsX,
         gridfinityCompartmentsZ: shape.gridfinityCompartmentsZ,
         gridfinityDividerThickness: shape.gridfinityDividerThickness,
+        gridfinityDividerHeight: shape.gridfinityDividerHeight,
         gridfinityDividerPositionsX: shape.gridfinityDividerPositionsX,
         gridfinityDividerPositionsZ: shape.gridfinityDividerPositionsZ,
         gridfinityCompartmentLabels: shape.gridfinityCompartmentLabels,

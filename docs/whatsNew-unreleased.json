@@ -1,6 +1,16 @@
 [
   {
     "title": {
+      "de": "Niedrigere Trennwände in Gridfinity-Behältern",
+      "en": "Lower dividers in Gridfinity bins"
+    },
+    "body": {
+      "de": "Die Trennwände eines Gridfinity-Behälters oder einer Schale müssen nicht mehr über die ganze Höhe reichen: Stell unter „Fächer“ die „Trennwandhöhe“ ein, gemessen vom Boden, ab 3 mm. Die Wände bleiben, wie sie sind, und eine Etikettenleiste an einer Trennwand sitzt mit ihr tiefer.",
+      "en": "The dividers in a Gridfinity bin or tray no longer have to run their full height: set \"Divider height\" under \"Compartments\", measured from the floor, from 3 mm up. The walls stay as they are, and a label shelf on a divider comes down with it."
+    }
+  },
+  {
+    "title": {
       "de": "Text auf den Etikettenleisten von Gridfinity-Schalen",
       "en": "Text on a Gridfinity tray's label shelves",
       "da": "Tekst på Gridfinity-skålens etikethylder"
