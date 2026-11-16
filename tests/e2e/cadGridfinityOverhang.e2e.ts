@@ -43,6 +43,20 @@ describe("exact Gridfinity bins with an overhang", { timeout: 300_000 }, () => {
     expectBuilt(bin({ width: 103.5, depth: 60.5, height: 32.4, gridfinityOverhangRight: 19.75, gridfinityOverhangBack: 18.75, gridfinityOverhangChamfer: 18 }));
   });
 
+  it("builds what the second review found, matching the mesh", () => {
+    // Corners rounded less than 3.75 mm, the grid off the box's middle.
+    expectBuilt(bin({ width: 88.75, gridfinityBinCornerRadius: 1, gridfinityOverhangRight: 5 }));
+    expectBuilt(bin({ width: 85.75, depth: 71.75, gridfinityBinCornerRadius: 1, gridfinityOverhangBack: 30, gridfinityOverhangLeft: 2 }));
+    // A solid, chamfered overhang on a side switched open keeps its floor over the slope, out to the outline.
+    const open = bin({ width: 103.5, depth: 83.5, height: 46.4, gridfinityOpenRight: true, gridfinityOverhangRight: 19.75, gridfinityOverhangSolid: true, gridfinityOverhangChamfer: 10 });
+    expectBuilt(open);
+    const box = cad.getBoundingBox(gridfinityPartSolid(cad, open));
+    expect(box.xmax - box.xmin).toBeCloseTo(103.5, 4);
+    // A small overhang at the highest chamfer, and a solid overhang at the back of a bin without a lip.
+    expectBuilt(bin({ width: 84.75, gridfinityOverhangRight: 1, gridfinityOverhangChamfer: 99 }));
+    expectBuilt(bin({ depth: 61.25, height: 21, gridfinityLip: false, gridfinityOverhangBack: 19.5, gridfinityOverhangSolid: true }));
+  });
+
   it("builds a chamfered overhang with compartments, a scoop and a shelf on the overhung wall", () => {
     expectBuilt(right({ height: 32.4, gridfinityOverhangChamfer: 20, gridfinityCompartmentsX: 3, gridfinityScoopRight: true, gridfinityLabelRight: true }));
   });

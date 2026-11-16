@@ -30,14 +30,14 @@ afterEach(() => {
 });
 
 /** The settings panel for a Gridfinity part with these fields. */
-function mount(fields: Partial<WorkplaneShape>, onUpdate: (patch: Partial<WorkplaneShape>) => void = () => {}) {
+function mount(fields: Partial<WorkplaneShape>, onUpdate: (patch: Partial<WorkplaneShape>) => void = () => {}, workspace = DEFAULT_WORKPLANE_WORKSPACE) {
   const asset = toolbarShapeAssets.find((entry) => entry.kind === "gridfinity")!;
   const shape = { ...makeShapeFromAsset(asset, { x: 0, z: 0 }), ...fields } as WorkplaneShape;
   container = document.createElement("div");
   document.body.appendChild(container);
   root = createRoot(container);
   act(() => {
-    root!.render(createElement(ShapeInspector, { shape, snap: DEFAULT_SNAP_GRID, snapOpen: false, workspace: DEFAULT_WORKPLANE_WORKSPACE, onUpdate, onSnapChange: () => {}, onSnapOpenChange: () => {} }));
+    root!.render(createElement(ShapeInspector, { shape, snap: DEFAULT_SNAP_GRID, snapOpen: false, workspace, onUpdate, onSnapChange: () => {}, onSnapOpenChange: () => {} }));
   });
   return container;
 }
@@ -83,6 +83,23 @@ describe("a Gridfinity bin's overhang in its settings", () => {
     const kept = mount({ ...overhung, gridfinityOverhangLipOnGrid: true });
     expect(toggle(kept, "Solid overhang").disabled).toBe(true);
     expect(toggle(kept, "Keep the lip on the grid").disabled).toBe(false);
+  });
+
+  it("has no lip to keep on the grid on a bin without a lip, and leaves Solid overhang to choose", () => {
+    const toggle = (panel: HTMLElement, name: string) => [...panel.querySelectorAll<HTMLLabelElement>("label.check-property")].find((r) => r.textContent === name)?.querySelector("input");
+    const panel = mount({ ...bin, height: 21, gridfinityLip: false, width: 103.5, gridfinityOverhangRight: 19.75, gridfinityOverhangLipOnGrid: true });
+    expect(panel.textContent).not.toContain("Keep the lip on the grid");
+    expect(toggle(panel, "Solid overhang")!.disabled).toBe(false);
+  });
+
+  it("shows and takes each side's overhang and the chamfer under it in inches in an inch workspace", () => {
+    const updates: Partial<WorkplaneShape>[] = [];
+    const inches = { ...DEFAULT_WORKPLANE_WORKSPACE, units: "Imperial", scale: "1:1 (inches)", inchFormat: "decimal" as const };
+    const panel = mount({ ...bin, height: 32.4, width: 103.5, gridfinityOverhangRight: 19.75, gridfinityOverhangChamfer: 12.7 }, (patch) => updates.push(patch), inches);
+    [...sides, "Chamfer under the overhang"].forEach((name) => expect(row(panel, name)!.querySelector(".range-value-unit")?.textContent, name).toBe("in"));
+    expect(field(panel, "Chamfer under the overhang").value).toBe("0.50");
+    type(field(panel, "Overhang on the left"), "0.5");
+    expect(updates[0].gridfinityOverhangLeft).toBeCloseTo(12.7, 9);
   });
 
   it("writes the box and moves a turned bin so its feet stay where they are", () => {

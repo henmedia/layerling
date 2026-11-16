@@ -931,13 +931,15 @@ export function gridfinityPlan(shape: GridfinityShapeFields) {
   const sides = gridfinityOverhang(shape);
   if (type !== "bin" || !LABEL_WALLS.some((wall) => sides[wall] > 0)) return { ...gridfinityPlanOf(shape), overhang: null as GridfinityOverhangPlan | null };
   const growth = gridfinityGrowth(shape);
-  const ring = shape.gridfinityOverhangSolid === true || shape.gridfinityOverhangLipOnGrid === true;
   const grown = gridfinityPlanOf(shape);
+  // Keep the lip on the grid asks nothing of a bin without a lip.
+  const lipOnGrid = shape.gridfinityOverhangLipOnGrid === true && grown.lip;
+  const ring = shape.gridfinityOverhangSolid === true || lipOnGrid;
   const outer = { width: grown.size.width, depth: grown.size.depth };
   const middle = { x: (growth.left - growth.right) / 2, z: (growth.back - growth.front) / 2 };
   // A solid overhang with the lip on the wider outline is flat OVERHANG_RING_TRIM under the lip's peak (its sharp edge,
   // or the inner edge of its chamfer), and the lip's edge is trimmed to it, so the two are flush and nothing stands above.
-  const capped = shape.gridfinityOverhangLipOnGrid !== true && grown.lip;
+  const capped = !lipOnGrid && grown.lip;
   const ringTop = capped ? Math.floor((grown.top + GRIDFINITY_LIP_HEIGHT - grown.lipChamfer * Math.SQRT1_2 - OVERHANG_RING_TRIM) * 100 + 1e-6) / 100 : grown.top;
   // At the outer wall a solid overhang is as high as its top, or lower by the lip's chamfer run on round its edge.
   const wallTop = !ring ? null : capped && grown.lipChamfer > 0 ? Math.min(ringTop, grown.top + GRIDFINITY_LIP_HEIGHT - grown.lipChamfer - OVERHANG_RING_TRIM) : ringTop;
@@ -2851,8 +2853,17 @@ export type GridfinityOverhangSection = { side: GridfinityWall; section: Array<[
  */
 export type GridfinityOverhangPieces = {
   envelope: { hx: number; hz: number; radius: number; from: number; to: number };
-  /** The box the skins are kept to: the envelope set in by a third of the thinnest wall, inside the outer wall, which is solid over the slope there, so no face of theirs lies on it; from inside the floor up. */
+  /**
+   * The box the skins are kept to: the envelope set in by a third of the thinnest wall, inside the outer wall, which is
+   * solid over the slope there, so no face of theirs lies on it; from inside the floor up to just under the wall's top,
+   * so a steep slope's skin never reaches into the stacking lip's inside.
+   */
   skinClip: { hx: number; hz: number; radius: number; from: number; to: number };
+  /**
+   * Where the skins go: everywhere (null) on a hollow overhang; on a solid one only on a side switched open, where the
+   * ring is cut away above the floor and the floor over the slope is all that is left.
+   */
+  skinZones: GridfinityOverhangBox[] | null;
   /**
    * The solid ring: the box cut to `zones` (beyond the corner centres on each overhung side) less the bin without
    * overhang set in a little (`inner`), so it fills the bin's rounded corners out to the box and overlaps its wall;
@@ -2957,7 +2968,10 @@ export function gridfinityOverhangPieces(plan: GridfinityPlan): GridfinityOverha
         foot: r < radius ? lipTop - plan.lipChamfer - OVERHANG_RING_TRIM : null,
       }
     : null;
-  const ring = overhang.mode === "ring" ? { inner: setIn(OVERHANG_RING_INTO), zones, open, from: plan.base, to: deepTop, cap, trim: capped ? overhang.ringTop : null, keeper } : null;
+  // Without a lip the ring's top is the bin's: built a hair higher and trimmed flat, as under a lip, so the two tops
+  // are one face and no seam stands along the bin's rounded corners.
+  const flush = overhang.mode === "ring" && !plan.lip;
+  const ring = overhang.mode === "ring" ? { inner: setIn(OVERHANG_RING_INTO), zones, open, from: plan.base, to: flush ? deepTop + OVERHANG_RING_OVERLAP : deepTop, cap, trim: capped || flush ? overhang.ringTop : null, keeper } : null;
   const wedges: GridfinityOverhangSection[] = [];
   if (overhang.chamfer > 0) {
     // Every side rises from its foot line, where the underside leaves the grid, straight up to the chamfer's height at the
@@ -2988,8 +3002,8 @@ export function gridfinityOverhangPieces(plan: GridfinityPlan): GridfinityOverha
   }
   // From half a floor over the underside, inside the floor: run on in over the feet, the skins' bottom never lies on
   // their tops.
-  const skinClip = { ...envelope, hx: hx - OVERHANG_SKIN_CLIP, hz: hz - OVERHANG_SKIN_CLIP, radius: Math.max(0, envelope.radius - OVERHANG_SKIN_CLIP), from: plan.base + GRIDFINITY_FLOOR / 2 };
-  return { envelope, skinClip, ring, wedges };
+  const skinClip = { ...envelope, hx: hx - OVERHANG_SKIN_CLIP, hz: hz - OVERHANG_SKIN_CLIP, radius: Math.max(0, envelope.radius - OVERHANG_SKIN_CLIP), from: plan.base + GRIDFINITY_FLOOR / 2, to: plan.top - OVERHANG_RING_OVERLAP };
+  return { envelope, skinClip, skinZones: ring ? open : null, ring, wedges };
 }
 
 /**
@@ -3233,8 +3247,13 @@ export function gridfinityTriangles(shape: GridfinityShapeFields) {
     return values;
   };
   // A tray has no feet whose corners the outline must match.
-  const breaksX = plan.type === "tray" ? [] : breaks(count.x, plan.centre.x);
-  const breaksZ = plan.type === "tray" ? [] : breaks(count.z, plan.centre.z);
+  // A bin whose corners are rounded less (#856) also gets where the outline's corners begin: the wall's outline has its
+  // corners further out and needs points there for the corners' flat faces and its sides to meet the outline's. On the
+  // grid in the box's middle the feet's corners already begin there; with an overhang the grid is off the middle.
+  const cornerEnds = (list: number[], half: number) => plan.wallRadius === plan.cornerRadius ? list
+    : [...list, ...[-half + plan.cornerRadius, half - plan.cornerRadius].filter((end) => list.every((b) => Math.abs(b - end) > 1e-9))];
+  const breaksX = plan.type === "tray" ? [] : cornerEnds(breaks(count.x, plan.centre.x), size.width / 2);
+  const breaksZ = plan.type === "tray" ? [] : cornerEnds(breaks(count.z, plan.centre.z), size.depth / 2);
   const outline = (inset: number) => roundedLoop(0, 0, size.width / 2, size.depth / 2, plan.cornerRadius, inset, breaksX, breaksZ);
   const openOutline = (inset: number) => roundedLoop(0, 0, size.width / 2, size.depth / 2, plan.cornerRadius, inset, breaksX, breaksZ, plan.open);
   // A bin's outer wall above the band over its feet, rounded less (#856); it keeps the outline's points along the sides.
@@ -3432,7 +3451,7 @@ function counterClockwise(points: Array<[number, number]>) {
 }
 
 /** Each side's frame for an overhang section: `u` out along its normal, the section's y up, `along` the side. */
-const OVERHANG_SIDE_FRAME: Record<GridfinityWall, { normal: [number, number]; along: [number, number] }> = {
+export const OVERHANG_SIDE_FRAME: Record<GridfinityWall, { normal: [number, number]; along: [number, number] }> = {
   right: { normal: [1, 0], along: [0, 1] },
   left: { normal: [-1, 0], along: [0, 1] },
   front: { normal: [0, 1], along: [1, 0] },
@@ -3499,10 +3518,15 @@ function gridfinityOverhangTriangles(runtime: ManifoldToplevel, plan: Gridfinity
     if (pieces.wedges.length > 0) {
       const wedges = keep(Manifold.union(pieces.wedges.map((wedge) => section(wedge, wedge.section))));
       // The skins joined first and every wedge cut once after, so one cut makes the slope and no face lies on another. A
-      // solid overhang has nothing to keep closed, and a skin would stand up through its trimmed top and chamfered edge.
-      if (!ring) {
+      // solid overhang has nothing to keep closed but a side switched open, and elsewhere a skin would stand up through
+      // its trimmed top and chamfered edge.
+      const { skinZones } = pieces;
+      if (skinZones === null || skinZones.length > 0) {
         const lifted = keep(Manifold.union(pieces.wedges.map((wedge) => section(wedge, wedge.skin))));
-        body = keep(Manifold.union([body, keep(lifted.intersect(box))]));
+        // A side switched open has no outer wall: its floor over the slope runs out to the outline.
+        const clip = skinZones === null ? box : standing(overhangFootprint(0, 0, envelope.hx, envelope.hz, envelope.radius), skinClip.from, skinClip.to);
+        const kept = keep(lifted.intersect(clip));
+        body = keep(Manifold.union([body, skinZones === null ? kept : keep(kept.intersect(keep(Manifold.union(skinZones.map(block)))))]));
       }
       body = keep(body.subtract(wedges));
     }

@@ -1864,8 +1864,9 @@ export function cadModifierGridfinityForShape(shape: WorkplaneShape): CadModifie
     gridfinityOutline: shape.gridfinityOutline,
     ...(letters.length > 0 ? { gridfinityLetters: letters } : {}),
     // Mesh and body are built at the size of the grid units, which canonicalizeShape
-    // keeps the shape's box at; a box that differs anyway stretches the body to it.
-    transform: profileTransformForShape(shape, new THREE.Matrix4().makeScale(width / plan.size.width, shape.height / plan.size.height, depth / plan.size.depth)),
+    // keeps the shape's box at; a box that differs anyway stretches the body to it. A
+    // solid overhang's plan is the bin on the grid, and the box is its whole outline.
+    transform: profileTransformForShape(shape, new THREE.Matrix4().makeScale(width / (plan.overhang?.outer.width ?? plan.size.width), shape.height / plan.size.height, depth / (plan.overhang?.outer.depth ?? plan.size.depth))),
   };
 }
 

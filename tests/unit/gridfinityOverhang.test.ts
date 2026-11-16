@@ -581,3 +581,88 @@ describe("gridfinity bin overhang: review fixes", { timeout: 120_000 }, () => {
     });
   });
 });
+
+describe("gridfinity bin overhang: second review (mlugo-apx)", { timeout: 120_000 }, () => {
+  let runtime: ManifoldToplevel;
+  beforeAll(async () => {
+    runtime = await manifoldModule();
+    runtime.setup();
+    rememberManifoldRuntime(runtime);
+  });
+  const binShape = (fields: Record<string, unknown> = {}) => ({ id: "g", name: "bin", kind: "gridfinity", x: 0, z: 0, elevation: 0, size: 103.5, width: 103.5, depth: 41.5, height: 25.4, rotation: 0, color: "#4f7fa8", gridfinityType: "bin", gridfinityLip: true, ...fields }) as WorkplaneShape;
+
+  it("builds a hollow overhang on a bin whose corners are rounded less than 3.75 mm, closed, out to its outline", () => {
+    const shape = bin({ width: 88.75, gridfinityBinCornerRadius: 1, gridfinityOverhangRight: 5 });
+    const mesh = gridfinityLabelledTriangles(runtime, shape) as V[][];
+    expect(edgeProblems(mesh)).toBe(0);
+    expect(bounds(mesh).max[0] - bounds(mesh).min[0]).toBeCloseTo(88.75, 6);
+  });
+
+  it("builds the overhang on every side and corner radius under 3.75 mm, the grid off the box's middle", () => {
+    [0, 1, 2.5, 3.5].forEach((radius) => {
+      [ov(30, 0, 2, 0), ov(0, 12, 0, 7), ov(5, 5, 5, 5)].forEach((sides) => {
+        const width = 83.5 + (sides.gridfinityOverhangLeft ? sides.gridfinityOverhangLeft + 0.25 : 0) + (sides.gridfinityOverhangRight ? sides.gridfinityOverhangRight + 0.25 : 0);
+        const depth = 41.5 + (sides.gridfinityOverhangBack ? sides.gridfinityOverhangBack + 0.25 : 0) + (sides.gridfinityOverhangFront ? sides.gridfinityOverhangFront + 0.25 : 0);
+        const mesh = gridfinityLabelledTriangles(runtime, bin({ width, depth, gridfinityBinCornerRadius: radius, ...sides })) as V[][];
+        const b = bounds(mesh);
+        const name = `${radius} ${JSON.stringify(sides)}`;
+        expect(edgeProblems(mesh), name).toBe(0);
+        expect(b.max[0] - b.min[0], name).toBeCloseTo(width, 6);
+        expect(b.max[2] - b.min[2], name).toBeCloseTo(depth, 6);
+      });
+    });
+  });
+
+  it("gives the exact body of a solid or lip-on-grid overhang no stretch: it is built at the box's size", () => {
+    [{}, { gridfinityOverhangSolid: true }, { gridfinityOverhangLipOnGrid: true }].forEach((fields) => {
+      const part = cadModifierGridfinityForShape(binShape({ gridfinityOverhangRight: 19.75, ...fields }))!;
+      expect(part.transform, JSON.stringify(fields)).toBeUndefined();
+    });
+  });
+
+  it("keeps a solid, chamfered overhang on a side switched open", () => {
+    const shape = bin({ width: 103.5, depth: 83.5, height: 46.4, gridfinityOpenRight: true, gridfinityOverhangRight: 19.75, gridfinityOverhangSolid: true, gridfinityOverhangChamfer: 10 });
+    const mesh = gridfinityLabelledTriangles(runtime, shape) as V[][];
+    expect(edgeProblems(mesh)).toBe(0);
+    expect(bounds(mesh).max[0] - bounds(mesh).min[0]).toBeCloseTo(103.5, 6);
+    // Over the overhang, out by the outer wall, there is material above the slope (4.75 + 10 there).
+    expect(column(mesh, 50, 0).length).toBeGreaterThan(0);
+  });
+
+  it("keeps a small overhang's skin out of the stacking lip at the highest chamfer", () => {
+    [0.25, 1].forEach((right) => {
+      const width = 83.5 + right + 0.25;
+      const plain = gridfinityLabelledTriangles(runtime, bin({ width, gridfinityOverhangRight: right })) as V[][];
+      const mesh = gridfinityLabelledTriangles(runtime, bin({ width, gridfinityOverhangRight: right, gridfinityOverhangChamfer: 99 })) as V[][];
+      expect(edgeProblems(mesh)).toBe(0);
+      // Up the wall and in the lip (from 15 mm, over the ramp from the floor up the slope), the chamfered bin has what the
+      // flat one has and no more.
+      const above = (m: V[][], x: number, z: number) => column(m, x, z).filter(([, to]) => to > 15).map(([from, to]) => [Math.max(from, 15), to].map((n) => n.toFixed(3)).join("-"));
+      [40.5, 40, 39.5].forEach((x) => [0, 10].forEach((z) => expect(above(mesh, x, z), `${right} ${x} ${z}`).toEqual(above(plain, x, z))));
+    });
+  });
+});
+
+describe("gridfinity bin overhang: second review, smaller things", { timeout: 120_000 }, () => {
+  let runtime: ManifoldToplevel;
+  beforeAll(async () => {
+    runtime = await manifoldModule();
+    runtime.setup();
+  });
+
+  it("has no lip to keep on the grid without a lip: the overhang stays hollow, or solid as asked", () => {
+    const noLip = (fields: Record<string, unknown>) => gridfinityPlan(bin({ width: 103.5, height: 21, gridfinityLip: false, gridfinityOverhangRight: 19.75, ...fields })).overhang?.mode;
+    expect(noLip({ gridfinityOverhangLipOnGrid: true })).toBe("grown");
+    expect(noLip({ gridfinityOverhangLipOnGrid: true, gridfinityOverhangSolid: true })).toBe("ring");
+    expect(gridfinityPlan(bin({ width: 103.5, gridfinityOverhangRight: 19.75, gridfinityOverhangLipOnGrid: true })).overhang?.mode).toBe("ring");
+  });
+
+  it("joins a solid overhang at the back or front of a bin without a lip with no doubled edges at its corners", () => {
+    [{ gridfinityOverhangBack: 19.5 }, { gridfinityOverhangFront: 19.5 }].forEach((side) => [{ gridfinityOverhangSolid: true }, { gridfinityOverhangLipOnGrid: true }].forEach((mode) => {
+      const shape = { width: 83.5, depth: 61.25, height: 21, gridfinityType: "bin" as const, gridfinityLip: false, ...side, ...mode };
+      const mesh = gridfinityLabelledTriangles(runtime, shape) as V[][];
+      expect(edgeProblems(mesh), JSON.stringify(shape)).toBe(0);
+      expect(bounds(mesh).max[1]).toBeCloseTo(21, 6);
+    }));
+  });
+});

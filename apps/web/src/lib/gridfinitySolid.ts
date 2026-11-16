@@ -46,6 +46,7 @@ import {
   gridfinityOpeningSection,
   gridfinityOverhangPieces,
   overhangTrim,
+  OVERHANG_SIDE_FRAME,
   gridfinityPlan,
   gridfinityScoopPieces,
   gridfinityScoopPoint,
@@ -412,14 +413,6 @@ function letteredSolid(cad: OcctKernel, body: ShapeHandle, part: CadModifierGrid
   return joined;
 }
 
-/** The Gridfinity part's exact solid in the shape's own frame, y up. Throws when the kernel cannot build it. */
-/** Each side's frame for an overhang section, in the shape's frame: `u` out along its normal (x, z), `along` the side. */
-const OVERHANG_SIDE_FRAME: Record<GridfinityOverhangSection["side"], { normal: [number, number]; along: [number, number] }> = {
-  right: { normal: [1, 0], along: [0, 1] },
-  left: { normal: [-1, 0], along: [0, 1] },
-  front: { normal: [0, 1], along: [1, 0] },
-  back: { normal: [0, -1], along: [1, 0] },
-};
 
 /**
  * A bin's overhang on its body, in the shape's own frame (y up), as the display mesh has it
@@ -462,18 +455,24 @@ function withOverhang(cad: OcctKernel, plan: GridfinityPlan, pieces: GridfinityO
   if (pieces.wedges.length > 0) {
     const wedges = pieces.wedges.map((wedge) => section(wedge, wedge.section));
     // The skins joined first and every wedge cut once after, so one cut makes the slope, under a corner the higher. A
-    // solid overhang has nothing to keep closed, and a skin would stand up through its trimmed top and chamfered edge.
-    if (!ring) {
-      // Kept within the outer wall (skinClip), which is solid over the slope there.
-      const clip = standingPrism(skinClip.hx, skinClip.hz, skinClip.radius, skinClip.from, skinClip.to);
+    // solid overhang has nothing to keep closed but a side switched open, and elsewhere a skin would stand up through
+    // its trimmed top and chamfered edge.
+    const { skinZones } = pieces;
+    if (skinZones === null || skinZones.length > 0) {
+      // Kept within the outer wall (skinClip), which is solid over the slope there; a side switched open has no outer
+      // wall, and its floor over the slope runs out to the outline.
+      const clip = skinZones === null ? standingPrism(skinClip.hx, skinClip.hz, skinClip.radius, skinClip.from, skinClip.to) : standingPrism(envelope.hx, envelope.hz, envelope.radius, skinClip.from, skinClip.to);
       const lifted = pieces.wedges.map((wedge) => section(wedge, wedge.skin));
-      result = cad.fuseAll([result, cad.common(lifted.length === 1 ? lifted[0] : cad.fuseAll(lifted), clip)]);
+      let kept = cad.common(lifted.length === 1 ? lifted[0] : cad.fuseAll(lifted), clip);
+      if (skinZones !== null) kept = cad.common(kept, skinZones.length === 1 ? block(skinZones[0]) : cad.fuseAll(skinZones.map(block)));
+      result = cad.fuseAll([result, kept]);
     }
     result = oneSolid(cad, cad.cutAll(result, wedges), "bin with its overhang chamfered");
   }
   return cad.unifySameDomain(result);
 }
 
+/** The Gridfinity part's exact solid in the shape's own frame, y up. Throws when the kernel cannot build it. */
 export function gridfinityPartSolid(cad: OcctKernel, part: CadModifierGridfinityPart): ShapeHandle {
   const plan = gridfinityPlan(part);
   const overhang = gridfinityOverhangPieces(plan);
