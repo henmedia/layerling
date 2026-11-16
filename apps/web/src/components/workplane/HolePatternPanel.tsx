@@ -19,6 +19,10 @@ import {
   HOLE_PATTERN_MIN_SIZE,
   HOLE_PATTERN_MIN_PERIMETER_COUNT,
   HOLE_PATTERN_MIN_WALL,
+  MAX_CORNER_COUNT,
+  MIN_CORNER_COUNT,
+  MIN_ROUND_COUNT,
+  normalizeCornerCount,
   holeHasHead,
   holeTiltApplies,
   holeHeadDepth,
@@ -56,6 +60,7 @@ export function HolePatternPanel({
   holeCount,
   tooMany,
   ring,
+  roundFace,
   wall,
   customChoices,
   customIsHole,
@@ -75,6 +80,8 @@ export function HolePatternPanel({
   tooMany: boolean;
   /** Holes round the edge (#1232): the length of the line they go round on, and whether they sit on its corners. */
   ring?: { length: number; onCorners: boolean };
+  /** Mounting holes on a round face (a round box's lid): they go evenly round a circle, any number from three. */
+  roundFace?: boolean;
   /** A round wall picked (#1393): its diameter, and round a closed one how many holes a row holds at what step. */
   wall?: { diameter: number; closed: boolean; columns?: number; spacing?: number };
   /** Own shape (#1235): the other objects of the scene that can be repeated, and whether the chosen one is a hole. */
@@ -454,6 +461,19 @@ export function HolePatternPanel({
           <span>{t("holePattern.mounting.toCenter")}</span>
         </label>
       ) : null}
+      {/* More screws for a watertight lid: on a rectangle in pairs along the sides, round a circle any number. */}
+      {mounting ? (
+        <EdgeModifierSlider
+          label={t("holePattern.mounting.count")}
+          value={normalizeCornerCount(settings.cornerCount, Boolean(roundFace))}
+          min={roundFace ? MIN_ROUND_COUNT : MIN_CORNER_COUNT}
+          max={MAX_CORNER_COUNT}
+          step={roundFace ? 1 : 2}
+          workspace={workspace}
+          onChange={(value) => onChange({ cornerCount: normalizeCornerCount(value, Boolean(roundFace)) })}
+        />
+      ) : null}
+      {mounting ? <p className="hole-pattern-mounting-note">{t(roundFace ? "holePattern.mounting.roundNote" : "holePattern.mounting.countNote")}</p> : null}
 
       {custom ? null : <div className="edge-modifier-field shell-openings" role="radiogroup" aria-label={t("holePattern.depth")}>
         <span>{t("holePattern.depth")}</span>

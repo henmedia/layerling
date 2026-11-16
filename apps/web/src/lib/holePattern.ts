@@ -62,6 +62,11 @@ export type HolePatternSettings = {
   /** Perimeter only, without corner holes: how far along the edge the first hole sits, in mm. */
   /** Mounting holes (`corners`): the margin counts to the holes' middles instead of their edges. */
   cornerToCenter?: boolean;
+  /**
+   * Mounting holes: how many in all, four in the corners and the rest shared out along the sides, the same number on
+   * opposite sides and as evenly spaced as the sides allow - a watertight lid wants more than four screws. Even, 4 up.
+   */
+  cornerCount?: number;
   perimeterStart?: number;
   /** Own shape (#1235): the id of the shape from the scene that is repeated. */
   customId?: string;
@@ -519,6 +524,8 @@ export type HolePatternResult = {
   rows: number;
   /** Perimeter only: how long the line is the holes go round on, and whether they sit on its corners. */
   ring?: { length: number; onCorners: boolean };
+  /** Mounting holes only: the face is round, so the holes go evenly round a circle instead of into corners. */
+  roundFace?: boolean;
 };
 
 /**
@@ -605,9 +612,30 @@ function bestLattice(
  * holes' edge (their widest point, a screw head included) or, with `cornerToCenter`, to their middles. None when two
  * holes on a side would run into each other.
  */
-export function cornerCenters(loops: readonly Point2[][], settings: Pick<HolePatternSettings, "margin" | "cornerToCenter">, footprint: readonly Point2[]): Point2[] {
+export function cornerCenters(
+  loops: readonly Point2[][],
+  settings: Pick<HolePatternSettings, "margin" | "cornerToCenter" | "cornerCount">,
+  footprint: readonly Point2[],
+  /** Whether a hole between the corners lies on the face; one that does not is left out. */
+  onFace: (point: Point2) => boolean = () => true,
+): { centers: Point2[]; round: boolean } {
   const hull = convexHull(loops.flat());
-  if (hull.length < 3) return [];
+  if (hull.length < 3) return { centers: [], round: false };
+  const radius = footprint.reduce((most, point) => Math.max(most, Math.hypot(point.u, point.v)), 0);
+  const inset = Math.max(0, settings.margin) + (settings.cornerToCenter ? 0 : radius);
+  // A round face (the lid of a round box) has no corners: the holes go evenly round a circle that far in from its edge.
+  const circle = roundOutline(hull);
+  if (circle) {
+    const count = normalizeCornerCount(settings.cornerCount, true);
+    const ring = circle.radius - inset;
+    // On the circle, neighbours must stay clear of each other.
+    if (!(ring > 0) || 2 * ring * Math.sin(Math.PI / count) < 2 * radius) return { centers: [], round: true };
+    const centers = Array.from({ length: count }, (_, index) => {
+      const angle = Math.PI / 2 + (2 * Math.PI * index) / count;
+      return { u: circle.u + ring * Math.cos(angle), v: circle.v + ring * Math.sin(angle) };
+    });
+    return { centers, round: true };
+  }
   // The smallest rectangle round the outline lies along one of its hull's sides; the face's own x wins a tie.
   let best: { angle: number; area: number; minA: number; maxA: number; minB: number; maxB: number } | null = null;
   const angles = [0, ...hull.map((point, index) => {
@@ -630,18 +658,65 @@ export function cornerCenters(loops: readonly Point2[][], settings: Pick<HolePat
     const area = (maxA - minA) * (maxB - minB);
     if (!best || area < best.area * (1 - 1e-6)) best = { angle, area, minA, maxA, minB, maxB };
   }
-  if (!best) return [];
-  const radius = footprint.reduce((most, point) => Math.max(most, Math.hypot(point.u, point.v)), 0);
-  const inset = Math.max(0, settings.margin) + (settings.cornerToCenter ? 0 : radius);
+  if (!best) return { centers: [], round: false };
   const left = best.minA + inset;
   const right = best.maxA - inset;
   const near = best.minB + inset;
   const far = best.maxB - inset;
-  if (right - left < 2 * radius || far - near < 2 * radius) return [];
+  if (right - left < 2 * radius || far - near < 2 * radius) return { centers: [], round: false };
   const cos = Math.cos(best.angle);
   const sin = Math.sin(best.angle);
   const back = (a: number, b: number): Point2 => ({ u: a * cos - b * sin, v: a * sin + b * cos });
-  return [back(left, near), back(right, near), back(right, far), back(left, far)];
+  const corners = [back(left, near), back(right, near), back(right, far), back(left, far)];
+  const extra = (normalizeCornerCount(settings.cornerCount) - 4) / 2;
+  if (extra <= 0) return { centers: corners, round: false };
+  // The holes past the corners go in pairs on opposite sides, split between the long and short sides so the gaps
+  // along both come out as near the same as they can.
+  const long = right - left;
+  const short = far - near;
+  let alongA = 0;
+  for (let a = 0; a <= extra; a += 1) {
+    const gap = (count: number, side: number) => side / (count + 1);
+    const best = Math.abs(gap(alongA, long) - gap(extra - alongA, short));
+    if (Math.abs(gap(a, long) - gap(extra - a, short)) < best - 1e-9) alongA = a;
+  }
+  const alongB = extra - alongA;
+  // Holes closer than their own width would run into one another.
+  if ((alongA > 0 && long / (alongA + 1) < 2 * radius) || (alongB > 0 && short / (alongB + 1) < 2 * radius)) return { centers: [], round: false };
+  const between: Point2[] = [];
+  for (let i = 1; i <= alongA; i += 1) {
+    const a = left + (long * i) / (alongA + 1);
+    between.push(back(a, near), back(a, far));
+  }
+  for (let i = 1; i <= alongB; i += 1) {
+    const b = near + (short * i) / (alongB + 1);
+    between.push(back(left, b), back(right, b));
+  }
+  return { centers: [...corners, ...between.filter(onFace)], round: false };
+}
+
+/** The middle and radius of an outline that is a circle (its hull's corners all as far from the middle), or null. */
+function roundOutline(hull: readonly Point2[]): { u: number; v: number; radius: number } | null {
+  if (hull.length < 12) return null;
+  const us = hull.map((point) => point.u);
+  const vs = hull.map((point) => point.v);
+  const u = (Math.min(...us) + Math.max(...us)) / 2;
+  const v = (Math.min(...vs) + Math.max(...vs)) / 2;
+  const distances = hull.map((point) => Math.hypot(point.u - u, point.v - v));
+  const far = Math.max(...distances);
+  return far > 0 && Math.min(...distances) / far > 0.985 ? { u, v, radius: far } : null;
+}
+
+export const MIN_CORNER_COUNT = 4;
+export const MIN_ROUND_COUNT = 3;
+export const MAX_CORNER_COUNT = 40;
+
+/** Mounting holes in all: on a rectangle even, from the four corners up; round a circle any number from three. */
+export function normalizeCornerCount(value: unknown, round = false) {
+  const raw = typeof value === "number" && Number.isFinite(value) ? Math.round(value) : MIN_CORNER_COUNT;
+  if (round) return Math.min(MAX_CORNER_COUNT, Math.max(MIN_ROUND_COUNT, raw));
+  // An odd number on a rectangle would leave one side short: the next even number down.
+  return Math.min(MAX_CORNER_COUNT, Math.max(MIN_CORNER_COUNT, raw - (raw % 2)));
 }
 
 export function holePatternCenters(
@@ -676,8 +751,10 @@ export function holePatternCenters(
   const fits = holeFitter((point) => insideRegion(loops, point), segments, footprint, margin);
 
   if (settings.arrangement === "corners") {
-    const centers = cornerCenters(loops, settings, footprint);
-    return { centers, tooMany: false, rows: centers.length ? 2 : 0 };
+    // Holes between the corners that would leave the face (a notch in a side) are left out; the corners always stay.
+    const onFace = holeFitter((point) => insideRegion(loops, point), segments, footprint, 0);
+    const { centers, round } = cornerCenters(loops, settings, footprint, onFace);
+    return { centers, tooMany: false, rows: centers.length ? 2 : 0, ...(round ? { roundFace: true } : {}) };
   }
 
   if (settings.arrangement === "perimeter") {
@@ -1273,6 +1350,8 @@ export function normalizeHolePattern(input: Partial<HolePatternSettings>): HoleP
     perimeterCorners: input.perimeterCorners !== false,
     perimeterStart: number(input.perimeterStart, 0, 0, HOLE_PATTERN_MAX_PERIMETER_START),
     ...(input.cornerToCenter === true ? { cornerToCenter: true } : {}),
+    // Kept as given (3 to 40): a round face takes it as it is, a rectangle the even number at or below it.
+    ...(typeof input.cornerCount === "number" && Number.isFinite(input.cornerCount) && Math.round(input.cornerCount) !== MIN_CORNER_COUNT ? { cornerCount: normalizeCornerCount(input.cornerCount, true) } : {}),
     ...custom,
     depth: typeof input.depth === "number" && Number.isFinite(input.depth) && input.depth > 0 ? Math.min(input.depth, 1000) : null,
     ...(input.allowMany === true ? { allowMany: true } : {}),

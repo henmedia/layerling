@@ -3212,6 +3212,12 @@ html[data-theme="dark"] .edge-modifier-quick-actions button.active {
   opacity: 0.85;
 }
 
+.hole-pattern-mounting-note {
+  margin: 4px 0 8px;
+  font-size: 11px;
+  opacity: 0.8;
+}
+
 /* Scale by percent: the model railway gauges, four to a row. */
 .model-scale-presets {
   grid-template-columns: repeat(4, minmax(0, 1fr));

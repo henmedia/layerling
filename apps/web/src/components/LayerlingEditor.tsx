@@ -14298,6 +14298,7 @@ export function LayerlingEditor({
           perimeterCorners: params.corners !== false,
           perimeterStart: mcpOptionalNumber(params.start),
           cornerToCenter: params.toCenter === true,
+          ...(arrangement === "corners" && count !== undefined ? { cornerCount: count } : {}),
           ...(custom ? holePatternCustomFootprint(custom) : {}),
         });
         // Taken before the face is read: joining a group's or bundle's parts takes a moment, and the scene may change meanwhile.
@@ -19746,6 +19747,7 @@ export function LayerlingEditor({
           holeCount={holePatternPreview?.holes.length ?? 0}
           tooMany={Boolean(holePatternPreview?.tooMany)}
           ring={holePatternPreview?.ring}
+          roundFace={Boolean(holePatternPreview?.roundFace)}
           wall={holePatternTool.face && isRoundWallFace(holePatternTool.face) ? holePatternPreview?.wall ?? { diameter: holePatternTool.face.round.radius * 2, closed: holePatternTool.face.round.outline.closed } : undefined}
           customChoices={holePatternCustomChoices(shapes, holePatternTool.sourceId).map((shape) => ({ id: shape.id, name: displayShapeName(shape) }))}
           customIsHole={Boolean(holePatternCustom?.hole)}

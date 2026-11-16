@@ -44,4 +44,28 @@ describe("mounting holes in the corners", () => {
     expect(settings({ cornerToCenter: true }).cornerToCenter).toBe(true);
     expect(settings({ holeTilt: 20 }).holeTilt).toBe(20);
   });
+
+  it("adds holes in pairs along the sides, evenly spaced", () => {
+    // 100 x 60, middles 5 mm in: 90 x 50 between the corner holes; 8 holes put one more on each side.
+    const eight = holePatternCenters({ loops: [rect(100, 60)] }, settings({ size: 4, cornerToCenter: true, cornerCount: 8 })).centers;
+    expect(sorted(eight)).toEqual([[-45, -25], [-45, 0], [-45, 25], [0, -25], [0, 25], [45, -25], [45, 0], [45, 25]]);
+    // 10: the two more go on the long sides, where the gaps are widest.
+    const ten = holePatternCenters({ loops: [rect(100, 60)] }, settings({ size: 4, cornerToCenter: true, cornerCount: 10 })).centers;
+    expect(ten).toHaveLength(10);
+    expect(sorted(ten).filter(([, v]) => v === 25).map(([u]) => u)).toEqual([-45, -15, 15, 45]);
+    // An odd number on a rectangle is the even one below it.
+    expect(holePatternCenters({ loops: [rect(100, 60)] }, settings({ size: 4, cornerCount: 7 })).centers).toHaveLength(6);
+  });
+
+  it("goes evenly round a round face", () => {
+    const circle = Array.from({ length: 64 }, (_, i) => ({ u: 50 * Math.cos((i / 64) * 2 * Math.PI), v: 50 * Math.sin((i / 64) * 2 * Math.PI) }));
+    const result = holePatternCenters({ loops: [circle] }, settings({ size: 4, margin: 5, cornerToCenter: true, cornerCount: 6 }));
+    expect(result.roundFace).toBe(true);
+    expect(result.centers).toHaveLength(6);
+    for (const point of result.centers) expect(Math.hypot(point.u, point.v)).toBeCloseTo(45, 6);
+    expect(result.centers[0].u).toBeCloseTo(0, 6);
+    expect(result.centers[0].v).toBeCloseTo(45, 6);
+    // Three are allowed round a circle.
+    expect(holePatternCenters({ loops: [circle] }, settings({ cornerCount: 3 })).centers).toHaveLength(3);
+  });
 });
