@@ -325,6 +325,7 @@ import { gridfinityLabelFont, gridfinityLabelTextLeftOut } from "@/lib/gridfinit
 import { gridfinityLabelColor } from "@/lib/gridfinityLetterColor";
 import { hingeLargestConeSize, hingeLargestCornerRadius, MAX_HINGE_ANGLE, MIN_HINGE_ANGLE, MAX_HINGE_CLEARANCE, MAX_HINGE_KNUCKLES, MAX_HINGE_SCREW_DIAMETER, MAX_HINGE_SCREW_HOLES, MIN_HINGE_CLEARANCE, MIN_HINGE_KNUCKLES, MIN_HINGE_SCREW_DIAMETER, hingePlan, minimumHingeDepth, normalizeHingeAngle, normalizeHingeClearance, normalizeHingeKnuckles, normalizeHingeKnuckleWidth, normalizeHingeLeafThickness, normalizeHingePinDiameter, normalizeHingeScrewDiameter, normalizeHingeScrewHead, normalizeHingeScrewHoles, normalizeHingeSnapGrip, MAX_HINGE_NUT_WIDTH, MAX_HINGE_SNAP_GRIP, MIN_HINGE_SNAP_GRIP } from "@/lib/hingeGeometry";
 import { useLanguage } from "@/lib/useLanguage";
+import { type GroupHoleChange, groupRoundHoles } from "@/lib/groupHoles";
 import { useMovablePanel, type MovablePanelOptions } from "@/lib/useMovablePanel";
 import { meshAabb } from "@/lib/editorMeshCore";
 import { undersideOffset } from "@/lib/positionUnderside";
@@ -4433,6 +4434,7 @@ export function ShapeInspector({
   onEditSketch,
   onOpenGroup,
   onHullKeepHolesChange,
+  onGroupHoleDiameters,
   canSeparateParts = false,
   onSeparateParts,
   onWrapAroundCylinder,
@@ -4481,6 +4483,8 @@ export function ShapeInspector({
   onOpenGroup?: () => void;
   /** A hull built again with its parts' holes kept open or filled (Discussion #1440). */
   onHullKeepHolesChange?: (keepHoles: boolean) => void;
+  /** The round holes of a group set to a new diameter, all or one (groupHoles.ts); built again by the editor. */
+  onGroupHoleDiameters?: (change: GroupHoleChange) => void;
   canSeparateParts?: boolean;
   onSeparateParts?: () => void;
   /** Wraps this body around a cylinder of the given diameter (#106). */
@@ -5216,6 +5220,11 @@ export function ShapeInspector({
             </p>
           </div>
         </div>
+      ) : null}
+
+      {/* The group's round holes: one diameter for all of them, or each its own (groupHoles.ts). */}
+      {onGroupHoleDiameters ? (
+        <GroupHolesCard shape={shape} workspace={workspace} disabled={frozen} onChange={onGroupHoleDiameters} onInteractionActiveChange={onInteractionActiveChange} />
       ) : null}
 
       {/* What the group does with its parts when it is resized (Discussion #526): two long choices, side by side. */}
@@ -8394,6 +8403,103 @@ function HexColorField({ color, placeholder, disabled, onCommit, onInteractionAc
 /** How far the name of a value is dragged before it changes the value, and how many pixels make one step of the wheel. */
 const SCRUB_START_PX = 3;
 const SCRUB_PX_PER_STEP = 4;
+
+/**
+ * The round holes of a group in its panel: one slider sets every hole's diameter, each keeping its middle and depth;
+ * "One by one" lists the holes with a diameter each. A change goes to the editor when a slider is let go or a value is
+ * typed, as the group is built again for it.
+ */
+function GroupHolesCard({
+  shape,
+  workspace,
+  disabled,
+  onChange,
+  onInteractionActiveChange,
+}: {
+  shape: WorkplaneShape;
+  workspace: WorkplaneWorkspaceSettings;
+  disabled: boolean;
+  onChange: (change: GroupHoleChange) => void;
+  onInteractionActiveChange?: (active: boolean) => void;
+}) {
+  useLanguage();
+  const holes = useMemo(() => groupRoundHoles(shape), [shape]);
+  const [oneByOne, setOneByOne] = useState(false);
+  const [draftAll, setDraftAll] = useState<number | null>(null);
+  const [draftOne, setDraftOne] = useState<{ key: string; diameter: number } | null>(null);
+  const pendingRef = useRef<GroupHoleChange | null>(null);
+  const send = () => {
+    const pending = pendingRef.current;
+    pendingRef.current = null;
+    if (pending) onChange(pending);
+  };
+  // A drag of a slider holds the change until it is let go; a typed value goes at once.
+  const draggingRef = useRef(false);
+  const hold = (active: boolean) => {
+    draggingRef.current = active;
+    onInteractionActiveChange?.(active);
+    if (!active) send();
+  };
+  const queue = (change: GroupHoleChange) => {
+    pendingRef.current = change;
+    if (!draggingRef.current) send();
+  };
+  useEffect(() => {
+    setDraftAll(null);
+    setDraftOne(null);
+  }, [shape]);
+  if (!holes.length) return null;
+  const allSame = holes.every((hole) => Math.abs(hole.diameter - holes[0].diameter) < 1e-3);
+  const shownAll = draftAll ?? holes[0].diameter;
+  const maxDiameter = Math.max(20, ...holes.map((hole) => hole.diameter * 2));
+  return (
+    <div className="property-card" data-help-section-all="group">
+      <div className="property-list cylinder-wrap-body">
+        <RangeProperty
+          id="diameter"
+          label={t("inspector.groupHoleDiameter")}
+          value={shownAll}
+          min={0.2}
+          max={maxDiameter}
+          step={0.1}
+          hint={allSame ? undefined : t("inspector.groupHolesDiffer")}
+          workspace={workspace}
+          disabled={disabled}
+          onInteractionActiveChange={hold}
+          onChange={(value) => {
+            setDraftAll(value);
+            queue({ all: value });
+          }}
+        />
+        <ToggleProperty label={t("inspector.groupHolesOneByOne")} value={oneByOne} disabled={disabled} onChange={setOneByOne} />
+        {oneByOne
+          ? holes.map((hole, index) => {
+            const key = hole.path.join(".");
+            return (
+              <RangeProperty
+                key={key}
+                id="diameter"
+                label={t("inspector.groupHoleNumber", { number: index + 1 })}
+                value={draftOne?.key === key ? draftOne.diameter : hole.diameter}
+                min={0.2}
+                max={maxDiameter}
+                step={0.1}
+                workspace={workspace}
+                disabled={disabled}
+                onInteractionActiveChange={hold}
+                onChange={(value) => {
+                  setDraftOne({ key, diameter: value });
+                  queue({ one: { path: hole.path, diameter: value } });
+                }}
+              />
+            );
+          })
+          : null}
+        <p className="cylinder-wrap-hint">{t("inspector.groupHolesHint", { count: holes.length })}</p>
+      </div>
+    </div>
+  );
+}
 
 function RangeProperty({
   id,
