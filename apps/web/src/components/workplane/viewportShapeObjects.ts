@@ -26,7 +26,7 @@ import { createLoftGeometry } from "@/lib/loftGeometry";
 import { createHingeGeometry } from "@/lib/hingeGeometry";
 import { createGridfinityGeometry, gridfinityLabelTextGiven } from "@/lib/gridfinityGeometry";
 import { gridfinityLabelLetters } from "@/lib/gridfinityLabelText";
-import { gridfinityLabelColor, gridfinityLetterGroups } from "@/lib/gridfinityLetterColor";
+import { gridfinityLabelColor, gridfinityLetterGroups, gridfinityLettersInBox } from "@/lib/gridfinityLetterColor";
 import { createKnurlGeometry } from "@/lib/knurlGeometry";
 import { createVaseGeometry, fittedVaseMesh } from "@/lib/vaseShape";
 import { createTeardropGeometry } from "@/lib/teardropGeometry";
@@ -455,6 +455,13 @@ export function tapeShapeTopologyKey(shape: WorkplaneShape): string {
     gridfinityPaddingFront: shape.gridfinityPaddingFront,
     gridfinityPaddingLeft: shape.gridfinityPaddingLeft,
     gridfinityPaddingRight: shape.gridfinityPaddingRight,
+    gridfinityOverhangBack: shape.gridfinityOverhangBack,
+    gridfinityOverhangFront: shape.gridfinityOverhangFront,
+    gridfinityOverhangLeft: shape.gridfinityOverhangLeft,
+    gridfinityOverhangRight: shape.gridfinityOverhangRight,
+    gridfinityOverhangChamfer: shape.gridfinityOverhangChamfer,
+    gridfinityOverhangSolid: shape.gridfinityOverhangSolid,
+    gridfinityOverhangLipOnGrid: shape.gridfinityOverhangLipOnGrid,
     gridfinityCornerRadius: shape.gridfinityCornerRadius,
     gridfinityBinCornerRadius: shape.gridfinityBinCornerRadius,
     gridfinityCompartmentsX: shape.gridfinityCompartmentsX,
@@ -904,6 +911,13 @@ export function shapeGeometrySignature(shape: WorkplaneShape): string {
     gridfinityPaddingFront: shape.gridfinityPaddingFront,
     gridfinityPaddingLeft: shape.gridfinityPaddingLeft,
     gridfinityPaddingRight: shape.gridfinityPaddingRight,
+    gridfinityOverhangBack: shape.gridfinityOverhangBack,
+    gridfinityOverhangFront: shape.gridfinityOverhangFront,
+    gridfinityOverhangLeft: shape.gridfinityOverhangLeft,
+    gridfinityOverhangRight: shape.gridfinityOverhangRight,
+    gridfinityOverhangChamfer: shape.gridfinityOverhangChamfer,
+    gridfinityOverhangSolid: shape.gridfinityOverhangSolid,
+    gridfinityOverhangLipOnGrid: shape.gridfinityOverhangLipOnGrid,
     gridfinityCornerRadius: shape.gridfinityCornerRadius,
     gridfinityBinCornerRadius: shape.gridfinityBinCornerRadius,
     gridfinityCompartmentsX: shape.gridfinityCompartmentsX,
@@ -2265,6 +2279,13 @@ export function createShapeObject(
         gridfinityPaddingFront: shape.gridfinityPaddingFront,
         gridfinityPaddingLeft: shape.gridfinityPaddingLeft,
         gridfinityPaddingRight: shape.gridfinityPaddingRight,
+        gridfinityOverhangBack: shape.gridfinityOverhangBack,
+        gridfinityOverhangFront: shape.gridfinityOverhangFront,
+        gridfinityOverhangLeft: shape.gridfinityOverhangLeft,
+        gridfinityOverhangRight: shape.gridfinityOverhangRight,
+        gridfinityOverhangChamfer: shape.gridfinityOverhangChamfer,
+        gridfinityOverhangSolid: shape.gridfinityOverhangSolid,
+        gridfinityOverhangLipOnGrid: shape.gridfinityOverhangLipOnGrid,
         gridfinityCornerRadius: shape.gridfinityCornerRadius,
         gridfinityBinCornerRadius: shape.gridfinityBinCornerRadius,
         gridfinityCompartmentsX: shape.gridfinityCompartmentsX,
@@ -2282,7 +2303,7 @@ export function createShapeObject(
       const geometry = sharedShapeGeometry(geometryCacheKey, () => {
         const letters = gridfinityLabelLetters({ ...shape, width, depth, height });
         // Letters in a colour of their own (#1308): their faces come last, as a group drawn in that colour.
-        return gridfinityLetterGroups(createGridfinityGeometry(fields, letters), gridfinityLabelColor(shape) ? letters : []);
+        return gridfinityLetterGroups(createGridfinityGeometry(fields, letters), gridfinityLabelColor(shape) ? gridfinityLettersInBox({ ...shape, width, depth, height }, letters) : []);
       });
       addMesh(group, geometry, gridfinityMaterials(shape, material, geometry), shape);
       break;

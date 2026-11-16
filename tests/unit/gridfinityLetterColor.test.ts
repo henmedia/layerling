@@ -178,6 +178,10 @@ describe("a Gridfinity bin's letters in their own colour in a 3MF or OBJ", () =>
     ["on all four shelves", { gridfinityLabelFront: true, gridfinityLabelLeft: true, gridfinityLabelRight: true, gridfinityLabelFrontText: "F", gridfinityLabelLeftText: "Left", gridfinityLabelRightText: "R" }],
     ["in Script, whose letters run into one another", { gridfinityLabelBackText: "office", gridfinityLabelFont: "Script" }],
     ["on a compartment's label", { gridfinityLabelBack: false, gridfinityLabelBackText: undefined, gridfinityCompartmentsX: 2, gridfinityCompartmentLabels: [{ column: 1, row: 0, side: "back", text: "Nuts" }] }],
+    ["on a bin overhanging on the right, hollow", { width: 103.5, size: 103.5, gridfinityOverhangRight: 19.75 }],
+    ["on a bin overhanging on the right, solid", { width: 103.5, size: 103.5, gridfinityOverhangRight: 19.75, gridfinityOverhangSolid: true }],
+    ["on a bin overhanging on the right, its lip kept on the grid", { width: 103.5, size: 103.5, gridfinityOverhangRight: 19.75, gridfinityOverhangLipOnGrid: true }],
+    ["on a bin overhanging at the back, solid", { depth: 61.25, gridfinityOverhangBack: 19.5, gridfinityOverhangSolid: true }],
     ["on a tray, level with its top", { gridfinityType: "tray", height: 20 }],
   ])("finds the letters %s", (_name, fields) => {
     expectLetterAreas(binShape(fields));
@@ -349,6 +353,21 @@ describe("a Gridfinity bin's letters in their own colour in the view", () => {
     };
     expect(middles(position, groups[1].start, groups[1].count)).toEqual(exported(LETTERS));
     expect(middles(position, 0, groups[0].count)).toEqual(exported(BIN));
+  });
+
+  it.each([
+    ["solid", { gridfinityOverhangSolid: true }],
+    ["its lip kept on the grid", { gridfinityOverhangLipOnGrid: true }],
+  ])("draws the letters of a bin overhanging on the right, %s, where they stand", (_name, fields) => {
+    const shape = binShape({ width: 103.5, size: 103.5, gridfinityOverhangRight: 19.75, ...fields });
+    const { groups, attributes } = surfaceOf(createShapeObject(shape)).geometry;
+    expect(groups).toHaveLength(2);
+    const position = attributes.position;
+    let area = 0;
+    for (let offset = groups[1].start; offset < groups[1].start + groups[1].count; offset += 3) {
+      area += triangleArea([0, 1, 2].map((corner) => [position.getX(offset + corner), position.getY(offset + corner), position.getZ(offset + corner)]) as V[]);
+    }
+    expect(area).toBeCloseTo(expectedAreas(shape).letters, 1);
   });
 
   it("keeps the geometry whatever the letters' colour, sorts it once one is set, and draws them anew when it changes", () => {

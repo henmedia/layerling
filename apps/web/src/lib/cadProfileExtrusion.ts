@@ -1793,7 +1793,7 @@ export function cadModifierGridfinityForShape(shape: WorkplaneShape): CadModifie
   const width = shapeWidth(shape);
   const depth = shapeDepth(shape);
   if (![width, depth, shape.height].every((value) => Number.isFinite(value) && value > 0)) return null;
-  const plan = gridfinityPlan({ width, depth, height: shape.height, gridfinityType: shape.gridfinityType, gridfinityLip: shape.gridfinityLip, gridfinityMagnets: shape.gridfinityMagnets, gridfinityHalfGrid: shape.gridfinityHalfGrid, gridfinityLargePlate: shape.gridfinityLargePlate, gridfinitySwallowtail: shape.gridfinitySwallowtail, gridfinityPaddingBack: shape.gridfinityPaddingBack, gridfinityPaddingFront: shape.gridfinityPaddingFront, gridfinityPaddingLeft: shape.gridfinityPaddingLeft, gridfinityPaddingRight: shape.gridfinityPaddingRight, gridfinityOutline: shape.gridfinityOutline });
+  const plan = gridfinityPlan({ width, depth, height: shape.height, gridfinityType: shape.gridfinityType, gridfinityLip: shape.gridfinityLip, gridfinityMagnets: shape.gridfinityMagnets, gridfinityHalfGrid: shape.gridfinityHalfGrid, gridfinityLargePlate: shape.gridfinityLargePlate, gridfinitySwallowtail: shape.gridfinitySwallowtail, gridfinityPaddingBack: shape.gridfinityPaddingBack, gridfinityPaddingFront: shape.gridfinityPaddingFront, gridfinityPaddingLeft: shape.gridfinityPaddingLeft, gridfinityPaddingRight: shape.gridfinityPaddingRight, gridfinityOverhangBack: shape.gridfinityOverhangBack, gridfinityOverhangFront: shape.gridfinityOverhangFront, gridfinityOverhangLeft: shape.gridfinityOverhangLeft, gridfinityOverhangRight: shape.gridfinityOverhangRight, gridfinityOverhangChamfer: shape.gridfinityOverhangChamfer, gridfinityOverhangSolid: shape.gridfinityOverhangSolid, gridfinityOverhangLipOnGrid: shape.gridfinityOverhangLipOnGrid, gridfinityOutline: shape.gridfinityOutline });
   // Label shelves, finger scoops and dividers, an outline plate's sockets and a Swallowtail plate's pockets, are in the display mesh only once Manifold has loaded; until then the body would not match it (#455, #554, #1061).
   if (!loadedManifoldRuntime() && gridfinityHasPieces({ ...shape, width, depth })) return null;
   // The letters on the shelves (#1308) with the font's own curves, laid out where the display mesh has them.
@@ -1808,9 +1808,10 @@ export function cadModifierGridfinityForShape(shape: WorkplaneShape): CadModifie
       return outer && holes.every((hole) => hole !== null) ? [[outer, ...(holes as CadModifierProfileLoop[])]] : [];
     }),
   }));
+  // An overhang built as a ring (solid, or the lip kept on the grid) plans the bin without it: the part is the whole box.
   return {
-    width: plan.size.width,
-    depth: plan.size.depth,
+    width: plan.overhang?.outer.width ?? plan.size.width,
+    depth: plan.overhang?.outer.depth ?? plan.size.depth,
     height: plan.size.height,
     gridfinityType: plan.type,
     gridfinityLip: plan.lip,
@@ -1857,6 +1858,13 @@ export function cadModifierGridfinityForShape(shape: WorkplaneShape): CadModifie
     gridfinityPaddingFront: shape.gridfinityPaddingFront,
     gridfinityPaddingLeft: shape.gridfinityPaddingLeft,
     gridfinityPaddingRight: shape.gridfinityPaddingRight,
+    gridfinityOverhangBack: shape.gridfinityOverhangBack,
+    gridfinityOverhangFront: shape.gridfinityOverhangFront,
+    gridfinityOverhangLeft: shape.gridfinityOverhangLeft,
+    gridfinityOverhangRight: shape.gridfinityOverhangRight,
+    gridfinityOverhangChamfer: shape.gridfinityOverhangChamfer,
+    gridfinityOverhangSolid: shape.gridfinityOverhangSolid,
+    gridfinityOverhangLipOnGrid: shape.gridfinityOverhangLipOnGrid,
     gridfinityCornerRadius: shape.gridfinityCornerRadius,
     gridfinityBinCornerRadius: shape.gridfinityBinCornerRadius,
     gridfinityCompartmentsX: shape.gridfinityCompartmentsX,
@@ -1872,8 +1880,9 @@ export function cadModifierGridfinityForShape(shape: WorkplaneShape): CadModifie
     gridfinityOutline: shape.gridfinityOutline,
     ...(letters.length > 0 ? { gridfinityLetters: letters } : {}),
     // Mesh and body are built at the size of the grid units, which canonicalizeShape
-    // keeps the shape's box at; a box that differs anyway stretches the body to it.
-    transform: profileTransformForShape(shape, new THREE.Matrix4().makeScale(width / plan.size.width, shape.height / plan.size.height, depth / plan.size.depth)),
+    // keeps the shape's box at; a box that differs anyway stretches the body to it. A
+    // solid overhang's plan is the bin on the grid, and the box is its whole outline.
+    transform: profileTransformForShape(shape, new THREE.Matrix4().makeScale(width / (plan.overhang?.outer.width ?? plan.size.width), shape.height / plan.size.height, depth / (plan.overhang?.outer.depth ?? plan.size.depth))),
   };
 }
 
