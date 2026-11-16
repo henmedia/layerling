@@ -159,6 +159,8 @@ summary: 选择形状、在对象列表中查找它们、对齐、镜像、旋�
 
 AI 可以通过 MCP 桥接使用 `layerling_perforate_face` 完成同样的事（参见 [AI 与 MCP](chapter:ai-with-mcp) 一章）。
 
+在侧边带缺口的板或盖子上，{{ui:holePattern.arrangement.perimeter}} 会让孔分布不均。为此 {{ui:holePattern.title}} 在 {{ui:holePattern.mode.pattern}} 旁边有第二个标签页 {{ui:holePattern.mode.mounting}}：它把孔放在所选面外接最小矩形的四个角上，到矩形各边的距离相同，即使板被旋转或带有缺口也一样。{{ui:holePattern.mounting.distance}} 量到孔的边缘（含螺丝头），若选 {{ui:holePattern.mounting.toCenter}} 则量到孔的中心。设置 {{ui:holePattern.mounting.count}} 后，四个孔放在角上，其余成对沿各边均匀分布，例如用于防水盖。在圆形面上，例如圆盒的盖子，孔沿一个圆均匀分布，三个或更多。孔的类型和尺寸与阵列相同：普通孔、沉头柱孔或沉头锥孔，通孔或指定深度。它们作为普通孔形状与实体编成一组，因此该组的 {{ui:inspector.groupHoleDiameter}} 也对它们有效。
+
 ## 将面推出或推入
 
 要加厚壁、在面上加凸台或在面上挖凹槽，可使用 {{ui:faceTool.title}} 工具处理一个平面。它也可用于导入的 STL，那里没有草图可改。只选中一个实体，然后单击 {{ui:faceTool.title}}，它位于功能区的 {{ui:editor.section.mirrorPattern}} 组中、孔阵列旁边。也可以右键单击实体，或用 [[Ctrl]]+[[K]] 找到它。

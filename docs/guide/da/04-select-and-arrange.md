@@ -168,6 +168,8 @@ Den runde væg på en cylinder, et rør eller en boring tager også huller: en b
 
 En AI kan gøre det samme gennem MCP-broen med `layerling_perforate_face` (se kapitlet [AI med MCP](chapter:ai-with-mcp)).
 
+På en plade eller et låg med udskæringer i siderne fordeler {{ui:holePattern.arrangement.perimeter}} hullerne ujævnt. Derfor har {{ui:holePattern.title}} en anden fane ved siden af {{ui:holePattern.mode.pattern}}, {{ui:holePattern.mode.mounting}}: den sætter hullerne i hjørnerne af det mindste rektangel omkring den valgte flade, i samme afstand fra dets sider, også på en drejet eller udskåret plade. {{ui:holePattern.mounting.distance}} måles til hullets kant, et skruehoved medregnet, eller med {{ui:holePattern.mounting.toCenter}} til dets midte. Med {{ui:holePattern.mounting.count}} kommer fire i hjørnerne og resten parvis, jævnt fordelt langs siderne, for eksempel til et vandtæt låg. På en rund flade, som låget på en rund æske, sidder de jævnt fordelt rundt på en cirkel, tre eller flere. Hultype og størrelser er de samme som ved mønsteret: almindeligt, med cylindrisk forsænkning eller kegleforsænkning, gennemgående eller til en dybde. De laves som almindelige hulformer grupperet med formen, så gruppens {{ui:inspector.groupHoleDiameter}} virker på dem også.
+
 ## Skub en flade ud eller ind
 
 Til en tykkere væg, et hævet stykke på en flade eller en lomme skåret ind i den arbejder {{ui:faceTool.title}} på én flad flade. Det virker også på en importeret STL, hvor der ingen skitse er at ændre. Vælg præcis én form og klik på {{ui:faceTool.title}} i {{ui:editor.section.mirrorPattern}}-gruppen i båndet, ved siden af hulmønsteret. Du kan også højreklikke på formen, eller finde den med [[Ctrl]]+[[K]].

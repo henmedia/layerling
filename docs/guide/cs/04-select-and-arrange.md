@@ -161,6 +161,8 @@ Otvory přijme i kulatá stěna válce, trubky nebo díry: stojánek na tužky, 
 
 AI může provést totéž přes `layerling_perforate_face`, viz [Modelování s AI](chapter:ai-with-mcp).
 
+U desky nebo víka s výřezy v bocích rozloží {{ui:holePattern.arrangement.perimeter}} otvory nerovnoměrně. Proto má {{ui:holePattern.title}} vedle {{ui:holePattern.mode.pattern}} druhou kartu, {{ui:holePattern.mode.mounting}}: umístí otvory do rohů nejmenšího obdélníku kolem vybrané plochy, vždy ve stejné vzdálenosti od jeho stran, i na otočené nebo vyříznuté desce. {{ui:holePattern.mounting.distance}} se měří k okraji otvoru včetně hlavy šroubu, nebo s {{ui:holePattern.mounting.toCenter}} k jeho středu. S {{ui:holePattern.mounting.count}} jdou čtyři do rohů a zbytek po dvojicích, rovnoměrně rozmístěný podél stran, například pro vodotěsné víko. Na kulaté ploše, třeba na víku kulaté krabičky, se rozmístí rovnoměrně po kružnici, tři nebo více. Typ a velikosti otvorů jsou stejné jako u vzoru: obyčejný, se zahloubením pro válcovou nebo zápustnou hlavu, průchozí nebo do hloubky. Vzniknou jako běžné tvary otvorů seskupené s tělesem, takže na ně působí i {{ui:inspector.groupHoleDiameter}} skupiny.
+
 ## Vysunutí plochy ven nebo dovnitř
 
 Pro zesílení stěny, vyvýšenou plošku nebo vyříznutou kapsu pracuje nástroj {{ui:faceTool.title}} s jednou rovinnou plochou. Funguje i u importovaného STL, které nemá náčrt ke změně. Vyberte právě jedno těleso a spusťte {{ui:faceTool.title}} v {{ui:editor.section.mirrorPattern}} vedle rastru otvorů, pravým tlačítkem nebo vyhledáváním [[Ctrl]]+[[K]].

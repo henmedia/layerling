@@ -1,6 +1,19 @@
 [
   {
     "title": {
+      "de": "Befestigungslöcher für Platten und Deckel",
+      "en": "Mounting holes for plates and lids"
+    },
+    "body": {
+      "de": "Das Lochmuster hat einen zweiten Reiter „Befestigungslöcher“. Er setzt Schraubenlöcher in die Ecken des kleinsten Rechtecks um die gewählte Fläche, gleich weit von den Seiten, auch bei einer gedrehten oder eingekerbten Platte, bei der „Entlang der Kante“ die Löcher ungleichmäßig verteilt.\n\n– Abstand zu den Seiten: bis zur Kante des Lochs (ein Schraubenkopf zählt mit) oder bis zur Lochmitte.\n– Anzahl: vier in den Ecken, die übrigen paarweise gleichmäßig entlang der Seiten, etwa für einen wasserdichten Deckel.\n– Auf einer runden Fläche, zum Beispiel dem Deckel einer runden Box, verteilen sie sich gleichmäßig auf einem Kreis, mindestens drei.\n– Einfach, mit Senkung oder Kegelsenkung, durch oder bis zu einer Tiefe.\n\nEs entstehen gewöhnliche Lochformen, mit dem Körper gruppiert, die Bohrungskarte der Gruppe wirkt also auch auf sie.",
+      "en": "The Hole pattern has a second tab, Mounting holes. It puts screw holes in the corners of the smallest rectangle round the picked face, the same distance from its sides, even on a turned or notched plate where \"Along the edge\" spreads the holes unevenly.\n\n– Distance from the sides: to the hole's edge (a screw head counts) or to the hole's middle.\n– Number of holes: four in the corners, the rest in pairs, evenly spaced along the sides, for example for a watertight lid.\n– On a round face, such as the lid of a round box, they go evenly round a circle, three or more.\n– Plain, counterbore or countersink, through or to a depth.\n\nThey are made as ordinary hole shapes grouped with the body, so the group's hole diameter card works on them too."
+    },
+    "guide": {
+      "section": "holePattern"
+    }
+  },
+  {
+    "title": {
       "de": "Neue Form: Kreisausschnitt",
       "en": "New shape: Sector"
     },

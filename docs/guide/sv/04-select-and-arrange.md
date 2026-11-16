@@ -165,6 +165,8 @@ Den runda väggen på en cylinder, ett rör eller ett hål kan också perforeras
 
 En AI kan göra samma sak över MCP-bryggan med `layerling_perforate_face` (se kapitlet [AI med MCP](chapter:ai-with-mcp)).
 
+På en platta eller ett lock med skåror i sidorna fördelar {{ui:holePattern.arrangement.perimeter}} hålen ojämnt. Därför har {{ui:holePattern.title}} en andra flik bredvid {{ui:holePattern.mode.pattern}}, {{ui:holePattern.mode.mounting}}: den lägger hålen i hörnen på den minsta rektangeln runt den valda ytan, lika långt från dess sidor, även på en vriden eller skårad platta. {{ui:holePattern.mounting.distance}} mäts till hålets kant, skruvhuvudet inräknat, eller med {{ui:holePattern.mounting.toCenter}} till dess mitt. Med {{ui:holePattern.mounting.count}} hamnar fyra i hörnen och resten parvis, jämnt fördelade längs sidorna, till exempel för ett vattentätt lock. På en rund yta, som locket till en rund ask, fördelas de jämnt runt en cirkel, tre eller fler. Håltyp och mått är desamma som för mönstret: rakt, med cylindrisk eller konisk försänkning, genomgående eller till ett visst djup. De skapas som vanliga hålformer grupperade med kroppen, så gruppens {{ui:inspector.groupHoleDiameter}} fungerar på dem också.
+
 ## Dra ut eller trycka in en yta
 
 För att göra en vägg tjockare, höja en klack på en yta eller fälla in en ficka i den arbetar {{ui:faceTool.title}} på en plan yta. Det fungerar även på importerade STL-filer där det inte finns någon skiss att redigera. Markera exakt en kropp och klicka på {{ui:faceTool.title}} i gruppen {{ui:editor.section.mirrorPattern}} i verktygsfältet bredvid hålmönstret. Du kan också högerklicka på kroppen eller söka med [[Ctrl]]+[[K]].

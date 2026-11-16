@@ -165,6 +165,8 @@ The round wall of a cylinder, a tube or a bore takes holes too: a pen holder, a 
 
 An AI can do the same through the MCP bridge with `layerling_perforate_face` (see the chapter [AI with MCP](chapter:ai-with-mcp)).
 
+On a plate or lid with notches in its sides, {{ui:holePattern.arrangement.perimeter}} spreads the holes unevenly. For that the {{ui:holePattern.title}} has a second tab next to {{ui:holePattern.mode.pattern}}, {{ui:holePattern.mode.mounting}}: it puts the holes in the corners of the smallest rectangle round the picked face, the same distance from its sides, even on a turned or notched plate. The {{ui:holePattern.mounting.distance}} is measured to the hole's edge, a screw head included, or with {{ui:holePattern.mounting.toCenter}} to its middle. With the {{ui:holePattern.mounting.count}}, four go in the corners and the rest in pairs, evenly spaced along the sides, for example for a watertight lid. On a round face, such as the lid of a round box, they go evenly round a circle, three or more. Hole type and sizes are the same as for the pattern: plain, counterbore or countersink, through or to a depth. They are made as ordinary hole shapes grouped with the body, so the group's {{ui:inspector.groupHoleDiameter}} works on them too.
+
 ## Pushing a face out or in
 
 For a thicker wall, a raised pad on a face or a pocket cut into it, the {{ui:faceTool.title}} tool works on one flat face. It works on an imported STL too, where there is no sketch to change. Select exactly one body and click {{ui:faceTool.title}} in the {{ui:editor.section.mirrorPattern}} group of the ribbon, next to the hole pattern. You can also right-click the body, or find it with [[Ctrl]]+[[K]].

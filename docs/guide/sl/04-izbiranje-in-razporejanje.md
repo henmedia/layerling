@@ -161,6 +161,8 @@ Luknje sprejme tudi okrogla stena valja, cevi ali izvrtine: lonček za svinčnik
 
 Umetna inteligenca lahko isto naredi prek vmesnika MCP, z `layerling_perforate_face` (glej poglavje [Umetna inteligenca z MCP](chapter:ai-z-mcp)).
 
+Na plošči ali pokrovu z zarezami ob straneh {{ui:holePattern.arrangement.perimeter}} razporedi luknje neenakomerno. Zato ima {{ui:holePattern.title}} poleg {{ui:holePattern.mode.pattern}} še drugi zavihek, {{ui:holePattern.mode.mounting}}: luknje postavi v vogale najmanjšega pravokotnika okoli izbrane ploskve, v enaki razdalji od njegovih stranic, tudi na zasukani ali zarezani plošči. {{ui:holePattern.mounting.distance}} se meri do roba luknje, vključno z glavo vijaka, ali z {{ui:holePattern.mounting.toCenter}} do njenega središča. Z {{ui:holePattern.mounting.count}} gredo štiri v vogale, ostale pa v parih, enakomerno razporejene ob stranicah, na primer za vodotesen pokrov. Na okrogli ploskvi, na primer na pokrovu okrogle škatle, se enakomerno razporedijo po krogu, tri ali več. Vrsta in mere lukenj so enake kot pri vzorcu: navadna, z valjastim ali stožčastim povrtanjem, skoznja ali do globine. Nastanejo kot navadne oblike lukenj, združene s telesom v skupino, zato nanje deluje tudi {{ui:inspector.groupHoleDiameter}} skupine.
+
 ## Vlečenje ploskve navzven ali navznoter
 
 Za debelejšo steno, dvignjeno ploščico na ploskvi ali vanjo izrezan žep orodje {{ui:faceTool.title}} dela na eni ravni ploskvi. Deluje tudi na uvoženem STL, ki nima skice za spreminjanje. Izberi natanko eno telo in v skupini {{ui:editor.section.mirrorPattern}} orodne vrstice klikni {{ui:faceTool.title}}, tik ob vzorcu lukenj. Lahko tudi z desnim gumbom klikneš na telo ali ga poiščeš s [[Ctrl]]+[[K]].
