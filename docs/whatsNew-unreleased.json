@@ -1,6 +1,45 @@
 [
   {
     "title": {
+      "de": "Neue Form: Kreisausschnitt",
+      "en": "New shape: Sector"
+    },
+    "body": {
+      "de": "In der Formenbibliothek unter den Grundformen (nach dem Torus) gibt es den „Kreisausschnitt“: eine Kreisscheibe, die du über den Winkel (1 bis 360°) wie einen Uhrzeiger zurückschneidest, von zwölf Uhr im Uhrzeigersinn.\n\n– Innen-Ø: bei 0 ein volles Stück, darüber ein Ring oder ein Ringsegment.\n– Enden runden: rundet die beiden Enden bis zum Halbkreis. So entsteht ein gebogenes Langloch, zum Beispiel für Monitorhalter und andere Teile, die sich drehen und festklemmen lassen.\n– Durchmesser und Höhe wie beim Zylinder.\n\nDer Rahmen bleibt der volle Kreis, die Form dreht sich also um die Mitte des Kreises.",
+      "en": "The shape library has a new basic shape after the Torus, the Sector: a disc that you cut back with the angle (1 to 360°) like a clock hand, from twelve o'clock clockwise.\n\n– Inner diameter: 0 is a solid piece, more gives a ring or a ring segment.\n– End rounding: rounds the two ends, up to a half circle. That gives a curved slot, for example for monitor mounts and other parts that turn and get clamped.\n– Diameter and height as on the Cylinder.\n\nThe frame stays the full circle, so the shape turns about the circle's middle."
+    },
+    "guide": {
+      "chapter": "shapes"
+    }
+  },
+  {
+    "title": {
+      "de": "Mehrkant mit runden Ecken",
+      "en": "Polygon with rounded corners"
+    },
+    "body": {
+      "de": "Ein Mehrkant hat jetzt unter „Seiten“ einen Regler „Eckenverrundung“ und einen Ziehpunkt am Modell, wie bei der Box mit runden Ecken. Ein Radius für alle Ecken, bei jeder Seitenzahl.\n\nDer Radius gilt in mm, ein gestreckter Mehrkant behält also runde Ecken. Der größte Wert ist dort, wo sich benachbarte Rundungen treffen. 0 ist der einfache Mehrkant, genau wie bisher.",
+      "en": "A polygon now has a \"Corner fillet\" slider under \"Sides\" and a drag dot on the model, like the Rounded box. One radius for every corner, for any number of sides.\n\nThe radius is in mm, so a stretched polygon keeps round corners. The largest value is where neighbouring roundings meet. 0 is the plain polygon, exactly as before."
+    },
+    "guide": {
+      "chapter": "shapes"
+    }
+  },
+  {
+    "title": {
+      "de": "Bohrungen einer Gruppe auf einmal ändern",
+      "en": "Change the holes of a group at once"
+    },
+    "body": {
+      "de": "Enthält eine Gruppe, oder eine Gruppe darin, runde Bohrungen, zeigt ihr Fenster einen Regler „Bohrungsdurchmesser“ für alle gleichzeitig und den Schalter „Einzeln“, der jede Bohrung mit eigenem Durchmesser auflistet.\n\nJede Bohrung behält ihre Mitte und ihre Tiefe. Die Gruppen werden von innen nach außen neu aufgebaut, wie bei „Gruppe bearbeiten → Fertig“, als ein Schritt zum Rückgängigmachen. Platinen, Schilder, QR-Codes und Bündel bleiben unberührt, und nur runde Bohrungen zählen, eckige oder ovale ändern sich nicht.",
+      "en": "When a group, or a group inside it, holds round holes, its window shows a \"Hole diameter\" slider for all of them at once and a \"One by one\" switch that lists each hole with its own diameter.\n\nEvery hole keeps its middle and its depth. The groups are rebuilt from the inside out, the way Edit group → Done does it, as one undo step. Boards, tags, QR codes and bundles are left alone, and only round holes count, so square or oval ones are not touched."
+    },
+    "guide": {
+      "chapter": "shapes"
+    }
+  },
+  {
+    "title": {
       "de": "Gridfinity-Behälter mit Überstand",
       "en": "Gridfinity bins that overhang the grid"
     },
