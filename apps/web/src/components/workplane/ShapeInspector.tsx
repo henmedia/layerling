@@ -146,6 +146,7 @@ import {
   normalizeCrescentTipFillet,
   normalizeCrescentQuality,
 } from "@/lib/crescentGeometry";
+import { maxSectorEndRadius, normalizeSectorAngle, normalizeSectorEndRadius, normalizeSectorInnerDiameter, sectorSettings } from "@/lib/sectorGeometry";
 import {
   DEFAULT_HONEYCOMB_CELL_SIZE,
   DEFAULT_HONEYCOMB_WALL_THICKNESS,
@@ -628,7 +629,7 @@ function formatPropertyNumber(value: number, accuracy: MeasurementAccuracy, step
 }
 
 const RELATIVE_SIZE_PROPERTY_IDS = new Set(["width", "height", "length", "diameter", "starOuterSize"]);
-const ROTATION_PROPERTY_IDS = new Set(["rotateX", "rotateY", "rotateZ"]);
+const ROTATION_PROPERTY_IDS = new Set(["rotateX", "rotateY", "rotateZ", "sectorAngle"]);
 /** How long after the last turn of the wheel a field is kept under the pointer. */
 const WHEEL_ANCHOR_MS = 600;
 
@@ -642,7 +643,7 @@ function scrollingAncestor(element: HTMLElement): HTMLElement | null {
 }
 
 function propertyUsesLengthUnit(key: string) {
-  return ["textLineWidth", "textBlockGap", "textEdgeSize", "letterSize", "iconWidth", "keyringDiameter", "keyringAlong", "positionX", "positionY", "positionZ", "pivotX", "pivotY", "pivotZ", "radius", "length", "width", "height", "bevel", "topRadius", "baseRadius", "curvedConeTop", "thickness", "outerDiameter", "innerDiameter", "textRadius", "extrudeTopOffsetX", "extrudeTopOffsetZ", "toothSize", "toothWidth", "gearBacklash", "centerHole", "slotSmallEnd", "slotCentreDistance", "torusTube", "sketchLineWidth", "sketchCuttingEdge", "topLength", "topWidth", "bottomLength", "bottomWidth", "diameter", "pitch", "clearance", "axialClearance", "boltClearance", "threadDepth", "threadCoreDiameter", "threadLength", "headHeight", "headDiameter", "collarHeight", "collarDiameter", "driveSize", "driveDepth", "chamfer", "chamferBottom", "headChamfer", "wire", "starOuterSize", "starInnerSize", "starOuterFillet", "starInnerFillet", "heartTipFillet", "crescentThickness", "crescentTipFillet", "honeycombCellSize", "honeycombWallThickness", "honeycombFrameWidth", "cornerFillet", "topBottomFillet", "bentTubeSize", "bentTubeInner", "bentTubeWall", "bentTubeSegmentLength", "bentTubeBendRadius", "dovetailNeckWidth", "dovetailClearance", "screwBossHole", "screwBossHoleDepth", "screwBossDiameter", "screwBossGussetHeight", "screwBossGussetThickness", "screwBossReach", "snapFitThickness", "snapFitUndercut", "snapFitClearance", "snapFitFoot", "ribLength", "ribThickness", "ribFootThickness", "portClearance", "hingePinDiameter", "hingeLeafThickness", "hingeClearance", "hingeCornerRadius", "hingeScrewDiameter", "hingeScrewSpacing", "hingeScrewAcross", "hingeNutWidth", "hingeSnapGrip", "screwHoleShaft", "screwHoleHeadDepth", "screwHoleSlotLength", "screwHoleRecess", "screwHoleChamfer", "screwHoleLengthBelowHead", "knurlDepth", "knurlChamfer", "loftBottomWidth", "loftBottomDepth", "loftTopWidth", "loftTopDepth", "loftBottomCorner", "loftTopCorner", "loftOffsetX", "loftOffsetZ", "loftWall", "loftTopWall", "loftSectionHeight", "loftSectionWidth", "loftSectionDepth", "loftSectionCorner", "loftSectionOffsetX", "loftSectionOffsetZ", "gridfinityLabelBackLength", "gridfinityLabelBackOffset", "gridfinityLabelBackWidth", "gridfinityLabelCornerSize", "gridfinityLabelTextSize", "gridfinityLabelFrontLength", "gridfinityLabelFrontOffset", "gridfinityLabelFrontWidth", "gridfinityLabelLeftLength", "gridfinityLabelLeftOffset", "gridfinityLabelLeftWidth", "gridfinityLabelRightLength", "gridfinityLabelRightOffset", "gridfinityLabelRightWidth", "gridfinityScoopRadius", "gridfinityFloorHeight", "gridfinityLipChamfer", "gridfinityWallThickness", "gridfinityDrawerWidth", "gridfinityDrawerDepth", "gridfinityPaddingBack", "gridfinityPaddingFront", "gridfinityPaddingLeft", "gridfinityPaddingRight", "gridfinityCornerRadius", "gridfinityBinCornerRadius", "gridfinitySwallowtailClearance", "gridfinityDividerThickness", "gridfinityDividerHeight", "gridfinityDividerPositionX", "gridfinityDividerPositionZ", "gridfinityCompartmentLabelWidth", "gridfinityOpeningCornerSize", "gridfinityOpeningDepthBack", "gridfinityOpeningDepthFront", "gridfinityOpeningDepthLeft", "gridfinityOpeningDepthRight", "gridfinityOpeningWidthBack", "gridfinityOpeningWidthFront", "gridfinityOpeningWidthLeft", "gridfinityOpeningWidthRight", "gridfinityOpeningDistanceBack", "gridfinityOpeningDistanceFront", "gridfinityOpeningDistanceLeft", "gridfinityOpeningDistanceRight", "surfaceSpacing", "surfaceDepth", "surfaceFade", "surfaceCrackWidth", "surfaceCrackRecess", "surfaceTextSize", "surfaceCarbonCross", "surfaceBrickHeight", "surfaceBrickJoint", "surfaceTimberHeight", "surfaceTimberBeam", "surfaceStoneJoint", "surfaceTileGap", "surfaceRingWidth", "surfaceTileHeight", "vase.wall", "vase.bottom", "vase.ribDepth", "vase.stripeDepth", "vase.voronoiCell", "vase.voronoiGap", "vase.voronoiDepth", "vase.waveAmplitude", "vaseFloor.drainDiameter", "vaseFloor.floorSlope", "vaseFloor.footHeight", "vaseFloor.rubberFootDiameter", "vaseFloor.rubberFootDepth", "vaseFloor.cutoutSize", "vaseFloor.cutoutWeb", "vaseFloor.lampHole", "vaseFloor.puckDiameter", "vaseFloor.lampNotch", "vaseFloor.lampNotchHeight", "vaseFloor.reinforceDepth", "vaseFloor.slitWidth", "vaseFloor.lineWidth", "vasePrint.lineWidth", "vaseParts.legHeight", "vaseParts.legDiameter", "vaseParts.saucerHeight", "vaseParts.saucerGap", "vaseParts.saucerWall", "vaseParts.insertWall", "vaseParts.insertStandoff", "vaseParts.reservoirHeight", "vaseParts.frogHole", "vaseParts.tubeDiameter", "vaseParts.lidClearance", "vaseParts.lidThickness", "vaseParts.lidDepth", "vaseParts.lidHeight", "vaseParts.lidJoint", "vaseParts.threadPitch", "vaseParts.fitClearance"].includes(key);
+  return ["textLineWidth", "textBlockGap", "textEdgeSize", "letterSize", "iconWidth", "keyringDiameter", "keyringAlong", "positionX", "positionY", "positionZ", "pivotX", "pivotY", "pivotZ", "radius", "length", "width", "height", "bevel", "topRadius", "baseRadius", "curvedConeTop", "thickness", "outerDiameter", "innerDiameter", "textRadius", "extrudeTopOffsetX", "extrudeTopOffsetZ", "toothSize", "toothWidth", "gearBacklash", "centerHole", "slotSmallEnd", "slotCentreDistance", "torusTube", "sketchLineWidth", "sketchCuttingEdge", "topLength", "topWidth", "bottomLength", "bottomWidth", "diameter", "pitch", "clearance", "axialClearance", "boltClearance", "threadDepth", "threadCoreDiameter", "threadLength", "headHeight", "headDiameter", "collarHeight", "collarDiameter", "driveSize", "driveDepth", "chamfer", "chamferBottom", "headChamfer", "wire", "starOuterSize", "starInnerSize", "starOuterFillet", "starInnerFillet", "heartTipFillet", "crescentThickness", "crescentTipFillet", "sectorEndRadius", "honeycombCellSize", "honeycombWallThickness", "honeycombFrameWidth", "cornerFillet", "topBottomFillet", "bentTubeSize", "bentTubeInner", "bentTubeWall", "bentTubeSegmentLength", "bentTubeBendRadius", "dovetailNeckWidth", "dovetailClearance", "screwBossHole", "screwBossHoleDepth", "screwBossDiameter", "screwBossGussetHeight", "screwBossGussetThickness", "screwBossReach", "snapFitThickness", "snapFitUndercut", "snapFitClearance", "snapFitFoot", "ribLength", "ribThickness", "ribFootThickness", "portClearance", "hingePinDiameter", "hingeLeafThickness", "hingeClearance", "hingeCornerRadius", "hingeScrewDiameter", "hingeScrewSpacing", "hingeScrewAcross", "hingeNutWidth", "hingeSnapGrip", "screwHoleShaft", "screwHoleHeadDepth", "screwHoleSlotLength", "screwHoleRecess", "screwHoleChamfer", "screwHoleLengthBelowHead", "knurlDepth", "knurlChamfer", "loftBottomWidth", "loftBottomDepth", "loftTopWidth", "loftTopDepth", "loftBottomCorner", "loftTopCorner", "loftOffsetX", "loftOffsetZ", "loftWall", "loftTopWall", "loftSectionHeight", "loftSectionWidth", "loftSectionDepth", "loftSectionCorner", "loftSectionOffsetX", "loftSectionOffsetZ", "gridfinityLabelBackLength", "gridfinityLabelBackOffset", "gridfinityLabelBackWidth", "gridfinityLabelCornerSize", "gridfinityLabelTextSize", "gridfinityLabelFrontLength", "gridfinityLabelFrontOffset", "gridfinityLabelFrontWidth", "gridfinityLabelLeftLength", "gridfinityLabelLeftOffset", "gridfinityLabelLeftWidth", "gridfinityLabelRightLength", "gridfinityLabelRightOffset", "gridfinityLabelRightWidth", "gridfinityScoopRadius", "gridfinityFloorHeight", "gridfinityLipChamfer", "gridfinityWallThickness", "gridfinityDrawerWidth", "gridfinityDrawerDepth", "gridfinityPaddingBack", "gridfinityPaddingFront", "gridfinityPaddingLeft", "gridfinityPaddingRight", "gridfinityCornerRadius", "gridfinityBinCornerRadius", "gridfinitySwallowtailClearance", "gridfinityDividerThickness", "gridfinityDividerHeight", "gridfinityDividerPositionX", "gridfinityDividerPositionZ", "gridfinityCompartmentLabelWidth", "gridfinityOpeningCornerSize", "gridfinityOpeningDepthBack", "gridfinityOpeningDepthFront", "gridfinityOpeningDepthLeft", "gridfinityOpeningDepthRight", "gridfinityOpeningWidthBack", "gridfinityOpeningWidthFront", "gridfinityOpeningWidthLeft", "gridfinityOpeningWidthRight", "gridfinityOpeningDistanceBack", "gridfinityOpeningDistanceFront", "gridfinityOpeningDistanceLeft", "gridfinityOpeningDistanceRight", "surfaceSpacing", "surfaceDepth", "surfaceFade", "surfaceCrackWidth", "surfaceCrackRecess", "surfaceTextSize", "surfaceCarbonCross", "surfaceBrickHeight", "surfaceBrickJoint", "surfaceTimberHeight", "surfaceTimberBeam", "surfaceStoneJoint", "surfaceTileGap", "surfaceRingWidth", "surfaceTileHeight", "vase.wall", "vase.bottom", "vase.ribDepth", "vase.stripeDepth", "vase.voronoiCell", "vase.voronoiGap", "vase.voronoiDepth", "vase.waveAmplitude", "vaseFloor.drainDiameter", "vaseFloor.floorSlope", "vaseFloor.footHeight", "vaseFloor.rubberFootDiameter", "vaseFloor.rubberFootDepth", "vaseFloor.cutoutSize", "vaseFloor.cutoutWeb", "vaseFloor.lampHole", "vaseFloor.puckDiameter", "vaseFloor.lampNotch", "vaseFloor.lampNotchHeight", "vaseFloor.reinforceDepth", "vaseFloor.slitWidth", "vaseFloor.lineWidth", "vasePrint.lineWidth", "vaseParts.legHeight", "vaseParts.legDiameter", "vaseParts.saucerHeight", "vaseParts.saucerGap", "vaseParts.saucerWall", "vaseParts.insertWall", "vaseParts.insertStandoff", "vaseParts.reservoirHeight", "vaseParts.frogHole", "vaseParts.tubeDiameter", "vaseParts.lidClearance", "vaseParts.lidThickness", "vaseParts.lidDepth", "vaseParts.lidHeight", "vaseParts.lidJoint", "vaseParts.threadPitch", "vaseParts.fitClearance"].includes(key);
 }
 
 /**
@@ -985,6 +986,49 @@ function getShapePropertiesWithAppLimits(shape: WorkplaneShape, onUpdate: ShapeI
       },
       { id: "length", label: t("prop.length"), value: depth, min: MIN_SHAPE_SIZE, max: 160, onChange: setDepth },
       { id: "width", label: t("prop.width"), value: width, min: MIN_SHAPE_SIZE, max: 160, onChange: setWidth },
+      { id: "height", label: t("prop.height"), value: shape.height, min: MIN_SHAPE_SIZE, max: 160, onChange: setHeight },
+    ];
+  }
+
+  if (shape.kind === "sector") {
+    // The angle first, as on a clock; the bore and the ends' rounding below it, then the circle's size.
+    const settings = sectorSettings(shape);
+    const endMax = maxSectorEndRadius(width, settings.innerDiameter, settings.angle);
+    return [
+      {
+        id: "sectorAngle",
+        label: t("prop.sectorAngle"),
+        value: settings.angle,
+        min: 1,
+        max: 360,
+        step: 1,
+        onChange: (value) => {
+          const angle = normalizeSectorAngle(value);
+          onUpdate({ sectorAngle: angle, sectorEndRadius: normalizeSectorEndRadius(shape.sectorEndRadius, width, settings.innerDiameter, angle) });
+        },
+      },
+      {
+        id: "innerDiameter",
+        label: t("prop.innerDiameter"),
+        value: settings.innerDiameter,
+        min: 0,
+        max: Math.max(0.2, width - 0.2),
+        step: 0.1,
+        onChange: (value) => {
+          const innerDiameter = normalizeSectorInnerDiameter(value, width);
+          onUpdate({ sectorInnerDiameter: innerDiameter, sectorEndRadius: normalizeSectorEndRadius(shape.sectorEndRadius, width, innerDiameter, settings.angle) });
+        },
+      },
+      {
+        id: "sectorEndRadius",
+        label: t("prop.sectorEndRadius"),
+        value: settings.endRadius,
+        min: 0,
+        max: Math.max(0.01, endMax),
+        step: 0.05,
+        onChange: (value) => onUpdate({ sectorEndRadius: normalizeSectorEndRadius(value, width, settings.innerDiameter, settings.angle) }),
+      },
+      { id: "diameter", label: t("prop.diameter"), value: width, min: MIN_SHAPE_SIZE, max: 160, onChange: setCylinderDiameter },
       { id: "height", label: t("prop.height"), value: shape.height, min: MIN_SHAPE_SIZE, max: 160, onChange: setHeight },
     ];
   }

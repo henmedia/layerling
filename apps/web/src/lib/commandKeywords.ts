@@ -133,6 +133,7 @@ export const SHAPE_KEYWORDS: Readonly<Record<string, readonly string[]>> = {
   ellipse: ["oval", "elliptic", "ovale", "elliptisch"],
   vase: ["pot", "planter", "bowl", "cup", "vase mode", "topf", "blumentopf", "schale", "becher", "gefäß", "gefaess"],
   iconTag: ["icon", "symbol", "emoji", "badge", "tag", "keychain", "symbolschild", "anhänger", "anhaenger", "plakette"],
+  sector: ["pie", "pie slice", "arc", "ring segment", "curved slot", "kreissektor", "körcikk", "gyűrűcikk", "ívelt hosszlyuk"],
   crescent: ["moon", "half moon", "sickle", "mond", "halbmond", "sichel", "croissant"],
   star: ["stern"],
   heart: ["herz"],
