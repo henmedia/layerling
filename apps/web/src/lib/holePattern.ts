@@ -11,7 +11,8 @@ export type Point2 = { u: number; v: number };
 /** custom repeats a shape from the scene over the face (#1235): a rivet, a tread, any body or hole. */
 export type HoleForm = "round" | "square" | "rectangle" | "hexagon" | "slot" | "custom";
 /** Grid and staggered fill the face; perimeter puts the holes in a ring along its outer edge (#1232). */
-export type HoleArrangement = "grid" | "staggered" | "perimeter";
+/** `corners`: mounting holes, one in each corner of the face's outline (see cornerCenters). */
+export type HoleArrangement = "grid" | "staggered" | "perimeter" | "corners";
 /** A round hole can take a screw's head (#1232): a counterbore for a cap screw, a countersink for a countersunk one. */
 export type HoleType = "plain" | "counterbore" | "countersink";
 /** Around the edge the holes follow the spacing or come to a set number. */
@@ -59,6 +60,13 @@ export type HolePatternSettings = {
   /** Perimeter only: a hole on every corner of the edge, each side shared out evenly between them. */
   perimeterCorners?: boolean;
   /** Perimeter only, without corner holes: how far along the edge the first hole sits, in mm. */
+  /** Mounting holes (`corners`): the margin counts to the holes' middles instead of their edges. */
+  cornerToCenter?: boolean;
+  /**
+   * Mounting holes: how many in all, four in the corners and the rest shared out along the sides, the same number on
+   * opposite sides and as evenly spaced as the sides allow - a watertight lid wants more than four screws. Even, 4 up.
+   */
+  cornerCount?: number;
   perimeterStart?: number;
   /** Own shape (#1235): the id of the shape from the scene that is repeated. */
   customId?: string;
@@ -156,12 +164,13 @@ export function normalizeHoleTilt(value: unknown): number {
 }
 
 /** Whether the holes can slope through the wall: not with a screw's head (screws go in straight) or an own shape. */
-export function holeTiltApplies(settings: Pick<HolePatternSettings, "form"> & Partial<Pick<HolePatternSettings, "holeType">>) {
-  return settings.form !== "custom" && !holeHasHead(settings);
+export function holeTiltApplies(settings: Pick<HolePatternSettings, "form"> & Partial<Pick<HolePatternSettings, "holeType" | "arrangement">>) {
+  // Mounting holes go in straight, for the screws.
+  return settings.form !== "custom" && !holeHasHead(settings) && settings.arrangement !== "corners";
 }
 
 /** The slope of every hole through the wall in radians, or 0 where it does not apply. */
-export function holeTiltRadians(settings: Pick<HolePatternSettings, "form"> & Partial<Pick<HolePatternSettings, "holeType" | "holeTilt">>) {
+export function holeTiltRadians(settings: Pick<HolePatternSettings, "form"> & Partial<Pick<HolePatternSettings, "holeType" | "holeTilt" | "arrangement">>) {
   if (!holeTiltApplies(settings)) return 0;
   const tilt = normalizeHoleTilt(settings.holeTilt);
   return tilt === 0 ? 0 : (tilt * Math.PI) / 180;
@@ -515,6 +524,8 @@ export type HolePatternResult = {
   rows: number;
   /** Perimeter only: how long the line is the holes go round on, and whether they sit on its corners. */
   ring?: { length: number; onCorners: boolean };
+  /** Mounting holes only: the face is round, so the holes go evenly round a circle instead of into corners. */
+  roundFace?: boolean;
 };
 
 /**
@@ -594,6 +605,120 @@ function bestLattice(
   return { centers: best, rows: bestRows };
 }
 
+/**
+ * Mounting holes: one hole in each corner of the face, the same distance from its sides - for the screws of a lid, a
+ * base plate or a board. The corners are those of the smallest rectangle round the face's outline, so a plate turned
+ * on the plate or one with notches in its sides still gets them in its own corners, evenly. The margin counts to the
+ * holes' edge (their widest point, a screw head included) or, with `cornerToCenter`, to their middles. None when two
+ * holes on a side would run into each other.
+ */
+export function cornerCenters(
+  loops: readonly Point2[][],
+  settings: Pick<HolePatternSettings, "margin" | "cornerToCenter" | "cornerCount">,
+  footprint: readonly Point2[],
+  /** Whether a hole between the corners lies on the face; one that does not is left out. */
+  onFace: (point: Point2) => boolean = () => true,
+): { centers: Point2[]; round: boolean } {
+  const hull = convexHull(loops.flat());
+  if (hull.length < 3) return { centers: [], round: false };
+  const radius = footprint.reduce((most, point) => Math.max(most, Math.hypot(point.u, point.v)), 0);
+  const inset = Math.max(0, settings.margin) + (settings.cornerToCenter ? 0 : radius);
+  // A round face (the lid of a round box) has no corners: the holes go evenly round a circle that far in from its edge.
+  const circle = roundOutline(hull);
+  if (circle) {
+    const count = normalizeCornerCount(settings.cornerCount, true);
+    const ring = circle.radius - inset;
+    // On the circle, neighbours must stay clear of each other.
+    if (!(ring > 0) || 2 * ring * Math.sin(Math.PI / count) < 2 * radius) return { centers: [], round: true };
+    const centers = Array.from({ length: count }, (_, index) => {
+      const angle = Math.PI / 2 + (2 * Math.PI * index) / count;
+      return { u: circle.u + ring * Math.cos(angle), v: circle.v + ring * Math.sin(angle) };
+    });
+    return { centers, round: true };
+  }
+  // The smallest rectangle round the outline lies along one of its hull's sides; the face's own x wins a tie.
+  let best: { angle: number; area: number; minA: number; maxA: number; minB: number; maxB: number } | null = null;
+  const angles = [0, ...hull.map((point, index) => {
+    const next = hull[(index + 1) % hull.length];
+    return Math.atan2(next.v - point.v, next.u - point.u);
+  })];
+  for (const raw of angles) {
+    // A rectangle repeats every quarter turn.
+    let angle = raw % (Math.PI / 2);
+    if (angle < 0) angle += Math.PI / 2;
+    if (angle > Math.PI / 4 + 1e-9) angle -= Math.PI / 2;
+    const cos = Math.cos(angle);
+    const sin = Math.sin(angle);
+    let minA = Infinity, maxA = -Infinity, minB = Infinity, maxB = -Infinity;
+    for (const point of hull) {
+      const a = point.u * cos + point.v * sin;
+      const b = -point.u * sin + point.v * cos;
+      minA = Math.min(minA, a); maxA = Math.max(maxA, a); minB = Math.min(minB, b); maxB = Math.max(maxB, b);
+    }
+    const area = (maxA - minA) * (maxB - minB);
+    if (!best || area < best.area * (1 - 1e-6)) best = { angle, area, minA, maxA, minB, maxB };
+  }
+  if (!best) return { centers: [], round: false };
+  const left = best.minA + inset;
+  const right = best.maxA - inset;
+  const near = best.minB + inset;
+  const far = best.maxB - inset;
+  if (right - left < 2 * radius || far - near < 2 * radius) return { centers: [], round: false };
+  const cos = Math.cos(best.angle);
+  const sin = Math.sin(best.angle);
+  const back = (a: number, b: number): Point2 => ({ u: a * cos - b * sin, v: a * sin + b * cos });
+  const corners = [back(left, near), back(right, near), back(right, far), back(left, far)];
+  const extra = (normalizeCornerCount(settings.cornerCount) - 4) / 2;
+  if (extra <= 0) return { centers: corners, round: false };
+  // The holes past the corners go in pairs on opposite sides, split between the long and short sides so the gaps
+  // along both come out as near the same as they can.
+  const long = right - left;
+  const short = far - near;
+  let alongA = 0;
+  for (let a = 0; a <= extra; a += 1) {
+    const gap = (count: number, side: number) => side / (count + 1);
+    const best = Math.abs(gap(alongA, long) - gap(extra - alongA, short));
+    if (Math.abs(gap(a, long) - gap(extra - a, short)) < best - 1e-9) alongA = a;
+  }
+  const alongB = extra - alongA;
+  // Holes closer than their own width would run into one another.
+  if ((alongA > 0 && long / (alongA + 1) < 2 * radius) || (alongB > 0 && short / (alongB + 1) < 2 * radius)) return { centers: [], round: false };
+  const between: Point2[] = [];
+  for (let i = 1; i <= alongA; i += 1) {
+    const a = left + (long * i) / (alongA + 1);
+    between.push(back(a, near), back(a, far));
+  }
+  for (let i = 1; i <= alongB; i += 1) {
+    const b = near + (short * i) / (alongB + 1);
+    between.push(back(left, b), back(right, b));
+  }
+  return { centers: [...corners, ...between.filter(onFace)], round: false };
+}
+
+/** The middle and radius of an outline that is a circle (its hull's corners all as far from the middle), or null. */
+function roundOutline(hull: readonly Point2[]): { u: number; v: number; radius: number } | null {
+  if (hull.length < 12) return null;
+  const us = hull.map((point) => point.u);
+  const vs = hull.map((point) => point.v);
+  const u = (Math.min(...us) + Math.max(...us)) / 2;
+  const v = (Math.min(...vs) + Math.max(...vs)) / 2;
+  const distances = hull.map((point) => Math.hypot(point.u - u, point.v - v));
+  const far = Math.max(...distances);
+  return far > 0 && Math.min(...distances) / far > 0.985 ? { u, v, radius: far } : null;
+}
+
+export const MIN_CORNER_COUNT = 4;
+export const MIN_ROUND_COUNT = 3;
+export const MAX_CORNER_COUNT = 40;
+
+/** Mounting holes in all: on a rectangle even, from the four corners up; round a circle any number from three. */
+export function normalizeCornerCount(value: unknown, round = false) {
+  const raw = typeof value === "number" && Number.isFinite(value) ? Math.round(value) : MIN_CORNER_COUNT;
+  if (round) return Math.min(MAX_CORNER_COUNT, Math.max(MIN_ROUND_COUNT, raw));
+  // An odd number on a rectangle would leave one side short: the next even number down.
+  return Math.min(MAX_CORNER_COUNT, Math.max(MIN_CORNER_COUNT, raw - (raw % 2)));
+}
+
 export function holePatternCenters(
   outline: FaceOutline,
   settings: HolePatternSettings,
@@ -624,6 +749,13 @@ export function holePatternCenters(
   }
   const segments = loopSegments(loops);
   const fits = holeFitter((point) => insideRegion(loops, point), segments, footprint, margin);
+
+  if (settings.arrangement === "corners") {
+    // Holes between the corners that would leave the face (a notch in a side) are left out; the corners always stay.
+    const onFace = holeFitter((point) => insideRegion(loops, point), segments, footprint, 0);
+    const { centers, round } = cornerCenters(loops, settings, footprint, onFace);
+    return { centers, tooMany: false, rows: centers.length ? 2 : 0, ...(round ? { roundFace: true } : {}) };
+  }
 
   if (settings.arrangement === "perimeter") {
     const runtime = loadedManifoldRuntime();
@@ -1171,7 +1303,7 @@ export function normalizeHolePattern(input: Partial<HolePatternSettings>): HoleP
   const number = (value: unknown, fallback: number, min: number, max: number) =>
     typeof value === "number" && Number.isFinite(value) ? Math.min(max, Math.max(min, value)) : fallback;
   const form = forms.includes(input.form as HoleForm) ? input.form as HoleForm : base.form;
-  const arrangement: HoleArrangement = input.arrangement === "grid" || input.arrangement === "staggered" || input.arrangement === "perimeter" ? input.arrangement : base.arrangement;
+  const arrangement: HoleArrangement = input.arrangement === "grid" || input.arrangement === "staggered" || input.arrangement === "perimeter" || input.arrangement === "corners" ? input.arrangement : base.arrangement;
   const size = number(input.size, base.size, HOLE_PATTERN_MIN_SIZE, HOLE_PATTERN_MAX_SIZE);
   const height = number(input.height, size, HOLE_PATTERN_MIN_SIZE, HOLE_PATTERN_MAX_SIZE);
   const holeType: HoleType = input.holeType === "counterbore" || input.holeType === "countersink" ? input.holeType : "plain";
@@ -1217,6 +1349,9 @@ export function normalizeHolePattern(input: Partial<HolePatternSettings>): HoleP
     perimeterCount: Math.round(number(input.perimeterCount, 8, HOLE_PATTERN_MIN_PERIMETER_COUNT, HOLE_PATTERN_MAX_PERIMETER_COUNT)),
     perimeterCorners: input.perimeterCorners !== false,
     perimeterStart: number(input.perimeterStart, 0, 0, HOLE_PATTERN_MAX_PERIMETER_START),
+    ...(input.cornerToCenter === true ? { cornerToCenter: true } : {}),
+    // Kept as given (3 to 40): a round face takes it as it is, a rectangle the even number at or below it.
+    ...(typeof input.cornerCount === "number" && Number.isFinite(input.cornerCount) && Math.round(input.cornerCount) !== MIN_CORNER_COUNT ? { cornerCount: normalizeCornerCount(input.cornerCount, true) } : {}),
     ...custom,
     depth: typeof input.depth === "number" && Number.isFinite(input.depth) && input.depth > 0 ? Math.min(input.depth, 1000) : null,
     ...(input.allowMany === true ? { allowMany: true } : {}),

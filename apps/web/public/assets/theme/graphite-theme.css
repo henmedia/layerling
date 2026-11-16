@@ -1167,6 +1167,11 @@ html[data-theme="dark"]:where([data-palette="graphite"]) .edge-modifier-quick-ac
   border: 1px solid #c8c8c8;
 }
 
+:where(html[data-theme="dark"][data-palette="graphite"]) .hole-pattern-mounting-title {
+  border-left: 3px solid var(--accent, #d97813);
+  background: rgba(217, 120, 19, 0.08);
+}
+
 :where(html[data-theme="dark"][data-palette="graphite"]) .model-scale-result {
   color: #515151;
 }

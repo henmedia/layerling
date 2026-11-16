@@ -476,6 +476,8 @@ export type HolePatternPlan = {
   tooMany: boolean;
   /** Holes round the edge: the length of the line they go round on, and whether they sit on its corners. */
   ring?: { length: number; onCorners: boolean };
+  /** Mounting holes on a round face: they go round a circle. */
+  roundFace?: boolean;
   /** On a round wall (#1393): its diameter, whether it goes all the way round, and then how many holes a row holds at what step. */
   wall?: { diameter: number; closed: boolean; columns?: number; spacing?: number };
 };
@@ -537,8 +539,8 @@ export function holePatternShapes(
   if (settings.form === "custom" && !custom) return { holes: [], tooMany: false };
   const tilt = holeTiltRadians(settings);
   const wall = face.wall ?? face.thickness;
-  const { centers, tooMany, ring } = holePatternCenters(face.outline, settings, tilt === 0 ? 0 : wall);
-  if (tooMany || centers.length === 0) return { holes: [], tooMany, ...(ring ? { ring } : {}) };
+  const { centers, tooMany, ring, roundFace } = holePatternCenters(face.outline, settings, tilt === 0 ? 0 : wall);
+  if (tooMany || centers.length === 0) return { holes: [], tooMany, ...(ring ? { ring } : {}), ...(roundFace ? { roundFace } : {}) };
 
   if (settings.form === "custom" && custom) {
     // A copy of the shape stands upright on every place, turned with the face: a body a little sunk in so it joins, a
@@ -564,7 +566,7 @@ export function holePatternShapes(
       };
       return canonicalizeShape(placed);
     });
-    return { holes: pieces, tooMany: false, ...(ring ? { ring } : {}) };
+    return { holes: pieces, tooMany: false, ...(ring ? { ring } : {}), ...(roundFace ? { roundFace } : {}) };
   }
 
   // A round hole with a head is a counterbore or countersink shape (#1232), its head on the face.
@@ -625,7 +627,7 @@ export function holePatternShapes(
     const placed = { ...sized, ...placementPatchForNewShape(sized, holeFrame, base), ...(previewIdPrefix ? { id: `${previewIdPrefix}-${index}` } : {}) };
     return canonicalizeShape(withHoleMode(placed, true));
   });
-  return { holes, tooMany: false, ...(ring ? { ring } : {}) };
+  return { holes, tooMany: false, ...(ring ? { ring } : {}), ...(roundFace ? { roundFace } : {}) };
 }
 
 /**
