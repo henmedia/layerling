@@ -95,7 +95,8 @@ import type { GridfinityCompartmentLabel, GridfinityLabelCorner, GridfinityOpeni
  * over the shelf, its front and the shelves it meets leave there
  * (gridfinityLabelTextPlaces). The fonts live on the page, so the letters come
  * in as outlines (gridfinityLabelText.ts) and are joined last, after every cut.
- * A tray has none.
+ * On a tray, whose shelves run up to its top, a shelf with a text sits 0.4 mm
+ * lower, so its letters end level with the top (#1501).
  *
  * A bin can also be open on any of its sides (#682), so that bins standing side
  * by side make one long run: above the floor an open side has no wall and no
@@ -223,7 +224,7 @@ const LABEL_DROP = 0.85;
 const LABEL_LAND = 1.2;
 /** The rise of the shelf's underside from the wall: 36 degrees. */
 const LABEL_RISE = Math.tan((36 * Math.PI) / 180);
-/** How far above the floor the widest shelf's underside ends, rather than on the floor's edge. */
+/** How far above the floor the widest shelf's underside ends, rather than on the floor's edge; 0.1 mm on a tray's shelf lowered for a text. */
 const LABEL_FLOOR_CLEARANCE = 0.5;
 /** The shortest set length; anything shorter would be a peg, not a shelf for a label. */
 const LABEL_MIN_LENGTH = 10;
@@ -387,6 +388,11 @@ function floorMinHeight(type: GridfinityType) {
 /** Where the label shelves and dividers stop: 0.85 mm under the top, clear of a stacked bin's feet, or at a tray's top. */
 function gridfinityDividerTop(type: GridfinityType, top: number) {
   return type === "tray" ? top : top - LABEL_DROP;
+}
+
+/** A label shelf's top: the dividers', or 0.4 mm lower on a tray where it carries a text, so its letters end level with the tray's top (#1501). */
+function labelTop(plan: GridfinityPlan, lettered: boolean) {
+  return lettered && plan.type === "tray" ? plan.dividerTop - GRIDFINITY_LABEL_TEXT_HEIGHT : plan.dividerTop;
 }
 
 /** A tray's box (#837): its width, depth and height in mm as they are, kept to the tray's limits. */
@@ -1503,7 +1509,9 @@ export function gridfinityLabelPieces(shape: GridfinityShapeFields): GridfinityL
     const centre = clamp(sign * offset, -along + length / 2, along - length / 2);
     return { centre, length, short: [centre - length / 2 > -along + snap, centre + length / 2 < along - snap] };
   };
-  return labelPiecesIn({ hx, hz, walls, widthOf, spanOf, size, round, top: plan.dividerTop, floor: plan.floor, open: plan.open, wallThickness: plan.wallThickness, lean: labelTextLean(plan) });
+  // On a tray a text lowers the shelves under it (#1501); they meet in the corners, so they all go down together.
+  const top = labelTop(plan, walls.some((wall) => gridfinityLabelText(shape[GRIDFINITY_LABEL_TEXT_KEYS[wall]]) !== ""));
+  return labelPiecesIn({ hx, hz, walls, widthOf, spanOf, size, round, top, floor: plan.floor, open: plan.open, wallThickness: plan.wallThickness, lean: labelTextLean(plan) });
 }
 
 /** A shelf's middle and length along its wall, and whether each end (0 at u = -along, 1 at u = along) stops short of the wall there. */
@@ -2110,8 +2118,9 @@ function compartmentLabelPieces(shape: GridfinityShapeFields, cell: GridfinityCo
     const to = short[1] ? half - snapped(half - centre - length / 2) : centre + length / 2;
     return { centre: (from + to) / 2, length: to - from, short };
   };
-  // A divider stops at the shelf's top: only the bin's wall has the lip's support leaning over the letters.
-  return labelPiecesIn({ hx: cell.hx, hz: cell.hz, walls: [side], widthOf: () => width, spanOf, size, round, top: plan.dividerTop, floor: plan.floor, open: cell.open, wallThickness: plan.wallThickness, lean: cell.onWall[side] ? labelTextLean(plan) : 0 });
+  const text = gridfinityLabelText(shape.gridfinityCompartmentLabels?.find((l) => l.column === cell.column && l.row === cell.row)?.text);
+  // A divider stops at the shelf's top, or 0.4 mm over a tray's shelf with a text: only the bin's wall has the lip's support leaning over the letters.
+  return labelPiecesIn({ hx: cell.hx, hz: cell.hz, walls: [side], widthOf: () => width, spanOf, size, round, top: labelTop(plan, text !== ""), floor: plan.floor, open: cell.open, wallThickness: plan.wallThickness, lean: cell.onWall[side] ? labelTextLean(plan) : 0 });
 }
 
 /**
@@ -2153,7 +2162,7 @@ export const GRIDFINITY_LABEL_FONTS = ["Multilanguage", "Sans", "Serif", "Script
 export const GRIDFINITY_LABEL_TEXT_KEYS = { back: "gridfinityLabelBackText", front: "gridfinityLabelFrontText", left: "gridfinityLabelLeftText", right: "gridfinityLabelRightText" } as const;
 
 /** A shelf's text as it is built, without the spaces at its ends; empty for none, also when nothing in it draws a letter. */
-function gridfinityLabelText(value: string | undefined) {
+export function gridfinityLabelText(value: string | undefined) {
   const text = value?.trim() ?? "";
   return /[^\s\p{Cf}]/u.test(text) ? text : "";
 }
@@ -2202,12 +2211,12 @@ const LABEL_TEXT_FRAMES: Record<GridfinityWall, { along: FlatPoint; up: FlatPoin
 };
 
 /**
- * Where the letters of each shelf with a text go (#1308): the shelves of a bin, or its compartments', none on a tray,
- * where they would stand above its top. A mirrored bin has its letters laid out for the wall each shelf ends up on and
- * mirrored back, so they come out of the mirror the right way round; turned upside down by a mirror, they read from below.
+ * Where the letters of each shelf with a text go (#1308): the shelves of a bin or a tray, or its compartments', none on a
+ * baseplate. A mirrored bin has its letters laid out for the wall each shelf ends up on and mirrored back, so they come
+ * out of the mirror the right way round; turned upside down by a mirror, they read from below.
  */
 export function gridfinityLabelTextPlaces(shape: GridfinityShapeFields): GridfinityLabelTextPlace[] {
-  if (normalizeGridfinityType(shape.gridfinityType) !== "bin" || !gridfinityLabelTextGiven(shape)) return [];
+  if (!gridfinityLabelTextGiven(shape)) return [];
   const [sx, sz] = [shape.mirrorX ? -1 : 1, shape.mirrorZ ? -1 : 1];
   const flip = shape.mirrorY ? -1 : 1;
   const frame = (wall: GridfinityWall) => {

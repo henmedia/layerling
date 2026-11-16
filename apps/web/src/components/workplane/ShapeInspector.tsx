@@ -1939,8 +1939,8 @@ function getShapePropertiesWithAppLimits(shape: WorkplaneShape, onUpdate: ShapeI
         if (limits.offset > 0) {
           properties.push({ id: keys.offset, label: t("prop.gridfinityLabelOffset"), value: clamp(shape[keys.offset] ?? 0, -limits.offset, limits.offset), min: -limits.offset, max: limits.offset, step: 1, onChange: (value) => onUpdate({ [keys.offset]: value }) });
         }
-        // The letters raised on the shelf (#1308); none on a tray, where they would stand above its top.
-        if (plan.type === "bin") properties.push(gridfinityLabelTextProperty(fields, wall, shape[GRIDFINITY_LABEL_TEXT_KEYS[wall]], (text) => onUpdate({ [GRIDFINITY_LABEL_TEXT_KEYS[wall]]: text })));
+        // The letters raised on the shelf (#1308).
+        properties.push(gridfinityLabelTextProperty(fields, wall, shape[GRIDFINITY_LABEL_TEXT_KEYS[wall]], (text) => onUpdate({ [GRIDFINITY_LABEL_TEXT_KEYS[wall]]: text })));
       });
       const shelves = compartments
         ? compartments.cells.some((cell) => gridfinityCompartmentLabel(fields, cell.column, cell.row))
@@ -7966,7 +7966,7 @@ function GridfinityCompartmentsCard({
           });
         }
         properties.push({ id: "gridfinityCompartmentLabelWidth", label: t("prop.gridfinityLabelWidth"), value: built.width, min: MIN_GRIDFINITY_LABEL_WIDTH, max: Math.max(MIN_GRIDFINITY_LABEL_WIDTH, maxWidth), step: 0.5, onChange: (value) => change({ width: clamp(value, MIN_GRIDFINITY_LABEL_WIDTH, maxWidth) }) });
-        if (normalizeGridfinityType(fields.gridfinityType) === "bin") properties.push(gridfinityLabelTextProperty(fields, { column, row }, stored.text, (text) => change({ text })));
+        properties.push(gridfinityLabelTextProperty(fields, { column, row }, stored.text, (text) => change({ text })));
       }
     }
   }

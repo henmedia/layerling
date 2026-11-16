@@ -1,6 +1,16 @@
 [
   {
     "title": {
+      "de": "Text auf den Etikettenleisten von Gridfinity-Schalen",
+      "en": "Text on a Gridfinity tray's label shelves"
+    },
+    "body": {
+      "de": "Auch die Etikettenleisten einer Gridfinity-Schale können jetzt einen Text tragen, an der Wand oder in einem Fach, mit Schriftart, Buchstabenfarbe und Buchstabengröße wie bei einem Behälter. Eine Leiste mit Text sitzt 0,4 mm tiefer, sodass die Buchstaben bündig mit der Oberkante der Schale enden. Tipp den Text im Eigenschaften-Fenster unter der Leiste bei „Text“ ein.",
+      "en": "A Gridfinity tray's label shelves now take a text too, along a wall or in a compartment, with the same font, letter colour and letter size as a bin's. A shelf with a text sits 0.4 mm lower, so the letters end level with the tray's top. Type the text under \"Text\" below the shelf in the Properties panel."
+    }
+  },
+  {
+    "title": {
       "de": "Bodenplatten, passend zum Drucker geteilt",
       "en": "Baseplates split to fit your printer",
       "da": "Bundplader deles, så de passer til din printer"
