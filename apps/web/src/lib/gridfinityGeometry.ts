@@ -3388,10 +3388,24 @@ export function gridfinityTriangles(shape: GridfinityShapeFields) {
         continue;
       }
       const cornerPoint = { x: sx > 0 ? box.x1 : box.x0, z: sz > 0 ? box.z1 : box.z0 };
+      // A point of the body's outline on the box's edges into this corner, as where a less rounded bin's corners begin
+      // off the grid's middle (an overhang beside an open side): the face is capped round it, so it meets the wall's.
+      const from = project(end);
+      const to = project(next);
+      const between = (p: { x: number; z: number }, q: { x: number; z: number }) => openOutline(0).filter((o) => {
+        const along = Math.abs(q.x - p.x) > 1e-9 ? (o.x - p.x) / (q.x - p.x) : (o.z - p.z) / (q.z - p.z);
+        const off = Math.abs(q.x - p.x) > 1e-9 ? Math.abs(o.z - p.z) : Math.abs(o.x - p.x);
+        return off < 1e-9 && along > 1e-9 && along < 1 - 1e-9;
+      }).sort((a, b) => Math.hypot(a.x - p.x, a.z - p.z) - Math.hypot(b.x - p.x, b.z - p.z));
+      const onEdges = [...between(from, cornerPoint), ...between(cornerPoint, to)];
+      if (onEdges.length > 0) {
+        cap(distinctPoints([from, ...between(from, cornerPoint), cornerPoint, ...between(cornerPoint, to), to, ...[...arc].reverse()]), [], y, up);
+        continue;
+      }
       const fan: Array<{ x: number; z: number }> = [];
-      if (!touches(end)) fan.push(project(end));
+      if (!touches(end)) fan.push(from);
       fan.push(...arc);
-      if (!touches(next)) fan.push(project(next));
+      if (!touches(next)) fan.push(to);
       for (let k = 0; k + 1 < fan.length; k += 1) push(at(cornerPoint, y), at(fan[k], y), at(fan[k + 1], y), want);
     }
   };
@@ -3716,7 +3730,7 @@ function gridfinityOverhangTriangles(runtime: ManifoldToplevel, plan: Gridfinity
       body = keep(body.subtract(wedges));
     }
     const result = keep(body.simplify(LABEL_SLIVER));
-    return result.status() === "NoError" ? trianglesOfManifold(result) : inner;
+    return result.status() === "NoError" ? withoutPinchedTriangles(trianglesOfManifold(result)) : inner;
   } catch {
     // The bin is drawn without its overhang's ring or chamfer rather than not at all.
     return inner;
@@ -3872,6 +3886,17 @@ function manifoldOfTriangles(runtime: ManifoldToplevel, triangles: Vec3[][]) {
 }
 
 /** A Manifold's mesh as triangles, the other way from manifoldOfTriangles. */
+/**
+ * The triangles less those with two corners on one point. Manifold can leave such a triangle, of no area, folded back
+ * on another along an edge where two pieces of an overhang meet (a side switched open between solid overhangs, a bin
+ * with square corners); its pair lies along the same edge, so each such edge seems to have four faces, which some
+ * slicers call non-manifold. Without them every edge has its two faces.
+ */
+function withoutPinchedTriangles(triangles: Vec3[][]) {
+  const same = (p: Vec3, q: Vec3) => p[0] === q[0] && p[1] === q[1] && p[2] === q[2];
+  return triangles.filter(([a, b, c]) => !same(a, b) && !same(b, c) && !same(c, a));
+}
+
 function trianglesOfManifold(manifold: ReturnType<ManifoldToplevel["Manifold"]["cube"]>) {
   const out = manifold.getMesh();
   const triangles: Vec3[][] = [];
