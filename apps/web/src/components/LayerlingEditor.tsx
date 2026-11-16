@@ -10248,7 +10248,7 @@ export function LayerlingEditor({
     setHolePatternTool((current) => {
       if (!current || current.sourceId !== source.id || current.step !== "pick") return current;
       // A ring along the edge is a flat face's arrangement; round a wall the holes are spread staggered instead.
-      const settings = round && current.settings.arrangement === "perimeter" ? normalizeHolePattern({ ...current.settings, arrangement: "staggered" }) : current.settings;
+      const settings = round && (current.settings.arrangement === "perimeter" || current.settings.arrangement === "corners") ? normalizeHolePattern({ ...current.settings, arrangement: "staggered" }) : current.settings;
       holePatternSettingsRef.current = settings;
       return { ...current, step: "ready", face: read.face, settings };
     });
@@ -14263,7 +14263,7 @@ export function LayerlingEditor({
           if (!custom) throw new Error("perforate_face shapeId must be another object of the scene, not the body itself");
         }
         const arrangement = params.arrangement === undefined ? DEFAULT_HOLE_PATTERN.arrangement : params.arrangement;
-        if (arrangement !== "grid" && arrangement !== "staggered" && arrangement !== "perimeter") throw new Error("perforate_face arrangement must be grid, staggered or perimeter");
+        if (arrangement !== "grid" && arrangement !== "staggered" && arrangement !== "perimeter" && arrangement !== "corners") throw new Error("perforate_face arrangement must be grid, staggered, perimeter or corners");
         const holeType = params.holeType === undefined ? "plain" : params.holeType;
         if (holeType !== "plain" && holeType !== "counterbore" && holeType !== "countersink") throw new Error("perforate_face holeType must be plain, counterbore or countersink");
         if (holeType !== "plain" && form !== "round") throw new Error("perforate_face holeType counterbore and countersink need form round");
@@ -14297,6 +14297,7 @@ export function LayerlingEditor({
           perimeterCount: count,
           perimeterCorners: params.corners !== false,
           perimeterStart: mcpOptionalNumber(params.start),
+          cornerToCenter: params.toCenter === true,
           ...(custom ? holePatternCustomFootprint(custom) : {}),
         });
         // Taken before the face is read: joining a group's or bundle's parts takes a moment, and the scene may change meanwhile.
@@ -14305,7 +14306,7 @@ export function LayerlingEditor({
         // A flat face, or the round wall of a cylinder, tube or bore (#1393).
         const read = readHolePatternFace(await faceReadPositionsOffThread(target, geometryAbortRef.current?.signal), point, normal);
         if (!read.ok) throw new Error(read.reason === "curved" ? "That face is curved but not a round wall; perforate_face needs a flat face or the wall of a cylinder, tube or bore" : "perforate_face found no face there");
-        if (isRoundWallFace(read.face) && arrangement === "perimeter") throw new Error("arrangement perimeter needs a flat face; on a round wall use grid or staggered");
+        if (isRoundWallFace(read.face) && (arrangement === "perimeter" || arrangement === "corners")) throw new Error(`arrangement ${arrangement} needs a flat face; on a round wall use grid or staggered`);
         if (isRoundWallFace(read.face) && holeTiltRadians(settings) !== 0) throw new Error("holeTilt needs a flat face for now; on a round wall the holes point straight at the axis");
         const plan = holePatternShapes(read.face, settings, t("holePattern.holeName"), undefined, custom);
         if (plan.tooMany) throw new Error("That would be too many holes; make them bigger or the spacing wider");

@@ -3,6 +3,7 @@
 import { GuideHelpLink } from "@/components/GuideHelpLink";
 import { MovableToolPanel } from "@/components/workplane/MovableToolPanel";
 import { Check, X } from "lucide-react";
+import { useRef } from "react";
 import { EdgeModifierSlider } from "@/components/workplane/EdgeModifierPanel";
 import { numberLocale, t } from "@/lib/i18n";
 import { useLanguage } from "@/lib/useLanguage";
@@ -91,6 +92,10 @@ export function HolePatternPanel({
   const twoSizes = settings.form === "rectangle" || settings.form === "slot";
   const head = holeHasHead(settings) ? settings.holeType as "counterbore" | "countersink" : null;
   const perimeter = settings.arrangement === "perimeter";
+  // Mounting holes (four in the corners) are their own part of the tool, apart from the patterns for vents and grilles.
+  const mounting = settings.arrangement === "corners" && !wall;
+  const lastPatternRef = useRef<HoleArrangement>(settings.arrangement === "corners" ? "staggered" : settings.arrangement);
+  if (settings.arrangement !== "corners") lastPatternRef.current = settings.arrangement;
   const byCount = perimeter && settings.perimeterBy === "count";
   const screwSize = holePatternScrewSize(settings);
   const custom = settings.form === "custom";
@@ -121,6 +126,7 @@ export function HolePatternPanel({
   // The wall between holes is measured square to them; round a wall they stand straight for now.
   const spaced = wall ? withoutHoleTilt(settings) : settings;
   const arrangements = wall ? ARRANGEMENTS.filter((option) => option !== "perimeter") : ARRANGEMENTS;
+  const pattern = !mounting;
   const millimetres = (value: number) => (Math.round(value * 10) / 10).toLocaleString(numberLocale());
   const wallNote = wall
     ? wall.closed && wall.columns
@@ -148,7 +154,36 @@ export function HolePatternPanel({
         {ready && wallNote ? <span>{wallNote}</span> : null}
       </div>
 
-      <div className="edge-modifier-field shell-openings" role="radiogroup" aria-label={t("holePattern.form")}>
+      {/* Two jobs, kept apart: a pattern of holes (vents, grilles) or four mounting holes in the corners, for screws. */}
+      {wall ? null : (
+        <div className="edge-modifier-field shell-openings hole-pattern-modes" role="tablist" aria-label={t("holePattern.title")}>
+          <div className="shell-opening-options">
+            {([false, true] as const).map((forMounting) => (
+              <button
+                key={String(forMounting)}
+                type="button"
+                role="tab"
+                aria-selected={mounting === forMounting}
+                className={mounting === forMounting ? "active" : ""}
+                onClick={() => {
+                  if (mounting === forMounting) return;
+                  onChange(forMounting ? { arrangement: "corners", form: "round" } : { arrangement: lastPatternRef.current });
+                }}
+              >
+                {t(forMounting ? "holePattern.mode.mounting" : "holePattern.mode.pattern")}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+      {mounting ? (
+        <div className="hole-pattern-mounting-title">
+          <strong>{t("holePattern.mode.mounting")}</strong>
+          <span>{t("holePattern.mounting.hint")}</span>
+        </div>
+      ) : null}
+
+      {pattern ? <div className="edge-modifier-field shell-openings" role="radiogroup" aria-label={t("holePattern.form")}>
         <span>{t("holePattern.form")}</span>
         <div className="shell-opening-options hole-pattern-forms">
           {HOLE_FORMS.map((option) => (
@@ -164,7 +199,7 @@ export function HolePatternPanel({
             </button>
           ))}
         </div>
-      </div>
+      </div> : null}
 
       {/* Own shape (#1235): a shape of the scene repeated in place of a hole; its width and depth are its room. */}
       {custom && !customMissing ? (
@@ -287,7 +322,7 @@ export function HolePatternPanel({
           onChange={(value) => onChange({ holeTilt: value })}
         />
       ) : null}
-      {byCount ? null : (
+      {byCount || mounting ? null : (
         <EdgeModifierSlider
           label={t("holePattern.spacing")}
           value={settings.spacing}
@@ -300,7 +335,7 @@ export function HolePatternPanel({
         />
       )}
       {/* A rectangle or slot spaces its rows on its own (#975): narrow holes close in the row, the rows clear of each other. */}
-      {holePatternHasRowSpacing(settings.form) && !perimeter ? (
+      {holePatternHasRowSpacing(settings.form) && !perimeter && pattern ? (
         <EdgeModifierSlider
           label={t("holePattern.rowSpacing")}
           value={holePatternRowSpacing(settings)}
@@ -313,7 +348,7 @@ export function HolePatternPanel({
         />
       ) : null}
       {/* The same as the spacing, said as the wall left between two holes (#239): set one and the other follows. */}
-      {byCount ? null : <EdgeModifierSlider
+      {byCount || mounting ? null : <EdgeModifierSlider
         label={t("holePattern.wall")}
         value={Math.max(HOLE_PATTERN_MIN_WALL, holePatternWall(spaced))}
         min={HOLE_PATTERN_MIN_WALL}
@@ -329,7 +364,7 @@ export function HolePatternPanel({
         }}
       />}
 
-      <div className="edge-modifier-field shell-openings" role="radiogroup" aria-label={t("holePattern.arrangement")}>
+      {pattern ? <div className="edge-modifier-field shell-openings" role="radiogroup" aria-label={t("holePattern.arrangement")}>
         <span>{t("holePattern.arrangement")}</span>
         <div className="shell-opening-options">
           {arrangements.map((option) => (
@@ -345,7 +380,7 @@ export function HolePatternPanel({
             </button>
           ))}
         </div>
-      </div>
+      </div> : null}
 
       {/* Round the edge (#1232): by spacing or by number, a hole on every corner, or from a start point along the edge. */}
       {perimeter && !wall ? (
@@ -403,15 +438,22 @@ export function HolePatternPanel({
       ) : null}
 
       <EdgeModifierSlider
-        label={t("holePattern.margin")}
+        label={t(mounting ? "holePattern.mounting.distance" : "holePattern.margin")}
         value={settings.margin}
         min={0}
         max={HOLE_PATTERN_MAX_MARGIN / 2}
-        step={0.5}
+        step={mounting ? 0.1 : 0.5}
         workspace={workspace}
         length
         onChange={(value) => onChange({ margin: value })}
       />
+      {/* Under the distance it belongs to: whether it counts to the holes' edge or to their middles. */}
+      {mounting ? (
+        <label className="edge-modifier-check">
+          <input type="checkbox" checked={Boolean(settings.cornerToCenter)} onChange={(event) => onChange({ cornerToCenter: event.target.checked })} />
+          <span>{t("holePattern.mounting.toCenter")}</span>
+        </label>
+      ) : null}
 
       {custom ? null : <div className="edge-modifier-field shell-openings" role="radiogroup" aria-label={t("holePattern.depth")}>
         <span>{t("holePattern.depth")}</span>

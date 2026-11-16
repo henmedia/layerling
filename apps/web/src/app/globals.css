@@ -3183,6 +3183,35 @@ html[data-theme="dark"] .edge-modifier-quick-actions button.active {
   grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
+/* The hole pattern's two jobs as tabs at the top: a pattern of holes, or mounting holes in the corners. */
+.hole-pattern-panel .hole-pattern-modes {
+  margin-top: 10px;
+}
+
+.hole-pattern-panel .hole-pattern-modes .shell-opening-options {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+/* Mounting holes have their own heading, so they are not taken for a vent pattern. */
+.hole-pattern-mounting-title {
+  display: grid;
+  gap: 2px;
+  margin-top: 10px;
+  padding: 8px 10px;
+  border-left: 3px solid var(--accent, #d97813);
+  border-radius: 4px;
+  background: rgba(217, 120, 19, 0.08);
+}
+
+.hole-pattern-mounting-title strong {
+  font-size: 12px;
+}
+
+.hole-pattern-mounting-title span {
+  font-size: 11px;
+  opacity: 0.85;
+}
+
 /* Scale by percent: the model railway gauges, four to a row. */
 .model-scale-presets {
   grid-template-columns: repeat(4, minmax(0, 1fr));
