@@ -133,6 +133,12 @@ export function validSketchConstraints(profile: SketchProfile): SketchConstraint
     (segment.kind ?? "line") === "line" && sameSketchEndpoints(a, b, segment.startId, segment.endId));
   return (profile.constraints ?? []).filter((rule) => {
     if (!ids.has(rule.a) || !ids.has(rule.b) || rule.a === rule.b) return false;
+    if (rule.kind === "concentric") {
+      const [first, second] = rule.circles;
+      return first.length === 4 && second.length === 4 && first.includes(rule.a) && second.includes(rule.b) &&
+        first.every((id) => !second.includes(id)) &&
+        Boolean(sketchOutlineSegments(profile, first) && sketchOutlineSegments(profile, second));
+    }
     if (rule.kind === "circle-diameter") {
       return rule.value > 0 && rule.outline.length === 4 && rule.outline.includes(rule.a) && rule.outline.includes(rule.b) &&
         Boolean(sketchOutlineSegments(profile, rule.outline));
@@ -165,7 +171,7 @@ export function applySketchConstraints(profile: SketchProfile, movedIds: Readonl
   // When adding a constraint or editing its dimension, hold the first reference
   // steady by default. Explicit drag targets take precedence.
   if (!preferred.size) {
-    for (const rule of constraints) if (!("c" in rule) && !("outline" in rule)) preferred.add(rule.a);
+    for (const rule of constraints) if (!("c" in rule) && !("outline" in rule) && rule.kind !== "concentric") preferred.add(rule.a);
   }
   const strength = (point: SketchPoint) => point.locked || preferred.has(point.id) ? 0 : 1;
   const move = (point: SketchPoint, dx: number, dz: number) => {
@@ -263,6 +269,13 @@ export function applySketchConstraints(profile: SketchProfile, movedIds: Readonl
   const outlineSegments = new Map(constraints.flatMap((rule) => "outline" in rule
     ? [[rule.id, sketchOutlineSegments(profile, rule.outline)!] as const] : []));
 
+  const concentricOutlines = new Map(constraints.flatMap((rule) => rule.kind === "concentric"
+    ? [[rule.id, rule.circles.map((ids) => sketchOutlineSegments(profile, ids)!)] as const] : []));
+  const concentricDelta = (rule: Extract<SketchConstraint, { kind: "concentric" }>) => {
+    const [first, second] = concentricOutlines.get(rule.id)!.map((segments) => sketchCircleGeometry(working, segments));
+    return first && second ? { x: second.center.x - first.center.x, z: second.center.z - first.center.z } : null;
+  };
+
   const outlineGap = (rule: Extract<SketchConstraint, { outline: string[] }>, a: SketchPoint, b: SketchPoint) => {
     const segments = outlineSegments.get(rule.id)!;
     if (rule.kind === "outline-line-distance") return sketchOutlineClearance(working, segments, a, b, rule.side);
@@ -274,6 +287,10 @@ export function applySketchConstraints(profile: SketchProfile, movedIds: Readonl
   const error = (rule: SketchConstraint): number => {
     const a = working.get(rule.a)!;
     const b = working.get(rule.b)!;
+    if (rule.kind === "concentric") {
+      const delta = concentricDelta(rule);
+      return delta ? Math.hypot(delta.x, delta.z) : Infinity;
+    }
     const axis = rule.frameX ?? { x: 1, z: 0 };
     const dx = b.x - a.x;
     const dz = b.z - a.z;
@@ -316,6 +333,18 @@ export function applySketchConstraints(profile: SketchProfile, movedIds: Readonl
     for (const rule of constraints) {
       const a = working.get(rule.a)!;
       const b = working.get(rule.b)!;
+      if (rule.kind === "concentric") {
+        const delta = concentricDelta(rule);
+        if (!delta || Math.hypot(delta.x, delta.z) < EPSILON) continue;
+        const [first, second] = rule.circles.map((ids) => ids.map((id) => working.get(id)!));
+        const canTranslate = (points: SketchPoint[]) => points.every((point) => !point.locked && !movedIds.has(point.id));
+        if (canTranslate(second)) {
+          for (const point of second) move(point, -delta.x, -delta.z);
+        } else if (canTranslate(first)) {
+          for (const point of first) move(point, delta.x, delta.z);
+        }
+        continue;
+      }
       if (rule.kind === "circle-diameter") {
         const circle = sketchCircleGeometry(working, outlineSegments.get(rule.id)!);
         const points = rule.outline.map((id) => working.get(id)!);
@@ -439,6 +468,11 @@ export function withSketchConstraint(profile: SketchProfile, rule: SketchConstra
   if (constraints.some((existing) => {
     if (existing.kind !== rule.kind) return false;
     const sameFirst = sameSketchEndpoints(existing.a, existing.b, rule.a, rule.b);
+    if (existing.kind === "concentric" && rule.kind === "concentric") {
+      const sameCircle = (first: string[], second: string[]) => first.every((id) => second.includes(id));
+      return (sameCircle(existing.circles[0], rule.circles[0]) && sameCircle(existing.circles[1], rule.circles[1])) ||
+        (sameCircle(existing.circles[0], rule.circles[1]) && sameCircle(existing.circles[1], rule.circles[0]));
+    }
     if ("d" in existing && "d" in rule) {
       return (sameFirst && sameSketchEndpoints(existing.c, existing.d, rule.c, rule.d)) ||
         (sameSketchEndpoints(existing.a, existing.b, rule.c, rule.d) &&

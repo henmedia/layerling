@@ -354,3 +354,51 @@ it.each(["center", "clearance"] as const)("resizes a circle while preserving its
   }
   expect(resized.profile.constraints).toHaveLength(2);
 });
+
+it("keeps separate circle diameters and follows a move of either concentric circle", () => {
+  let id = 0;
+  const nextId = () => `circle-${++id}`;
+  const hole = sketchPrimitiveGeometry("circle", { x: 0, z: 0 }, nextId, 3);
+  const recess = sketchPrimitiveGeometry("circle", { x: 12, z: 4 }, nextId, 6);
+  const first = hole.points.map((point) => point.id);
+  const second = recess.points.map((point) => point.id);
+  const rule = { id: "concentric", kind: "concentric" as const, a: first[0], b: second[0],
+    circles: [first, second] as [string[], string[]] };
+  const sketch = withSketchConstraint({
+    points: [...hole.points, ...recess.points], segments: [...hole.segments, ...recess.segments],
+  }, rule);
+  const centered = applySketchConstraints(sketch);
+  expect(centered.ok).toBe(true);
+  expect(centered.profile.points.slice(0, 4)).toEqual(hole.points);
+  expect(coordinates(centered.profile, second[0]).x).toBeCloseTo(3);
+
+  const moved = cloneSketchProfile(centered.profile);
+  for (const point of moved.points.filter((point) => second.includes(point.id))) {
+    point.x += 5;
+    point.z -= 2;
+    point.handleIn = { x: point.handleIn!.x + 5, z: point.handleIn!.z - 2 };
+    point.handleOut = { x: point.handleOut!.x + 5, z: point.handleOut!.z - 2 };
+  }
+  const followed = applySketchConstraints(moved, new Set(second));
+  expect(followed.ok).toBe(true);
+  expect(coordinates(followed.profile, first[0]).x).toBeCloseTo(6.5);
+  expect(coordinates(followed.profile, first[0]).z).toBeCloseTo(-2);
+
+  const holeMoved = cloneSketchProfile(followed.profile);
+  for (const point of holeMoved.points.filter((point) => first.includes(point.id))) {
+    point.x += 1;
+    point.handleIn = { ...point.handleIn!, x: point.handleIn!.x + 1 };
+    point.handleOut = { ...point.handleOut!, x: point.handleOut!.x + 1 };
+  }
+  const followedHole = applySketchConstraints(holeMoved, new Set(first));
+  expect(followedHole.ok).toBe(true);
+  expect(coordinates(followedHole.profile, second[0]).x).toBeCloseTo(9);
+
+  const resized = applySketchConstraints(withSketchConstraint(followedHole.profile, {
+    id: "size", kind: "circle-diameter", a: second[0], b: second[1], outline: second, value: 7,
+  }));
+  expect(resized.ok).toBe(true);
+  expect(coordinates(resized.profile, second[0]).x).toBeCloseTo(9.5);
+  expect(coordinates(resized.profile, first[0]).x).toBeCloseTo(7.5);
+  expect(withSketchConstraint(resized.profile, { ...rule, id: "duplicate", a: second[0], b: first[0], circles: [second, first] })).toBe(resized.profile);
+});

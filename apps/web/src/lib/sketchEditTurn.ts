@@ -56,7 +56,7 @@ export function turnedSketchProfile(profile: SketchProfile, turn: SketchEditTurn
   return {
     ...profile,
     ...(profile.constraints ? { constraints: profile.constraints.map((rule) => {
-      if ("c" in rule || "outline" in rule) return { ...rule };
+      if ("c" in rule || "outline" in rule || rule.kind === "concentric") return { ...rule };
       if (!rule.frameX && direction === "toBody") return { ...rule, frameX: toBodyVector(turn, { x: 1, z: 0 }) };
       const frameX = rule.frameX ?? { x: 1, z: 0 };
       return { ...rule, frameX: direction === "toPlate" ? toPlateVector(turn, frameX) : toBodyVector(turn, frameX) };

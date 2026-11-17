@@ -1331,7 +1331,7 @@ function validateSketchProfile(value: unknown, label: string) {
   if (profile.constraints !== undefined) {
     if (!Array.isArray(profile.constraints)) throw new Error(`${label}.constraints must be an array`);
     const ruleIds = new Set<string>();
-    const noDimension = new Set(["horizontal", "vertical", "coincident"]);
+    const noDimension = new Set(["horizontal", "vertical", "coincident", "concentric"]);
     const withDimension = new Set(["distance", "offset-x", "offset-z", "angle", "point-line-distance", "line-distance", "outline-line-distance", "circle-diameter", "circle-center-distance"]);
     const betweenLines = new Set(["parallel", "perpendicular", "equal-length", "angle", "line-distance"]);
     profile.constraints.forEach((rawRule, index) => {
@@ -1345,6 +1345,15 @@ function validateSketchProfile(value: unknown, label: string) {
       const a = stringValue(rule.a, `${ruleLabel}.a`);
       const b = stringValue(rule.b, `${ruleLabel}.b`);
       if (!pointIds.has(a) || !pointIds.has(b) || a === b) throw new Error(`${ruleLabel} references invalid points`);
+      if (kind === "concentric") {
+        const circles = rule.circles;
+        if (!Array.isArray(circles) || circles.length !== 2 ||
+          circles.some((circle) => !Array.isArray(circle) || circle.length !== 4 ||
+            circle.some((ref) => typeof ref !== "string" || !pointIds.has(ref))) ||
+          new Set(circles.flat()).size !== 8 || !circles[0].includes(a) || !circles[1].includes(b)) {
+          throw new Error(`${ruleLabel} references invalid circle outlines`);
+        }
+      }
       if (kind === "outline-line-distance" || kind === "circle-center-distance" || kind === "circle-diameter") {
         if (!Array.isArray(rule.outline) || rule.outline.length < 3 || new Set(rule.outline).size !== rule.outline.length ||
           rule.outline.some((ref) => typeof ref !== "string" || !pointIds.has(ref)) ||

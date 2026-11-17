@@ -1127,6 +1127,28 @@ export function SketchWorkspace({
     const shape = segments && sketchCircleGeometry(pointById, segments);
     return shape ? [{ ...shape, pointIds, segmentIds: segments.map((segment) => segment.id) }] : [];
   }), [paths, displayProfile, pointById]);
+  const selectedCircles = outlineSelection ? circles.filter((shape) =>
+    shape.pointIds.every((id) => outlineSelection.pointIds.includes(id))) : [];
+  const circlePair = selectedCircles.length === 2 && outlineSelection?.pointIds.length === 8 &&
+    outlineSelection.segmentIds.every((id) => selectedCircles.some((shape) => shape.segmentIds.includes(id)))
+    ? [...selectedCircles].sort((a, b) =>
+      outlineSelection.pointIds.indexOf(a.pointIds[0]) - outlineSelection.pointIds.indexOf(b.pointIds[0]))
+    : null;
+  const selectCircle = (shape: typeof circles[number], extend: boolean) => {
+    if (extend && outlineSelection) {
+      const existing = selectedCircles.find((entry) => entry.pointIds[0] === shape.pointIds[0]);
+      if (existing) {
+        onSelectMany(outlineSelection.pointIds.filter((id) => !shape.pointIds.includes(id)),
+          outlineSelection.segmentIds.filter((id) => !shape.segmentIds.includes(id)), []);
+      } else {
+        onSelectMany([...new Set([...outlineSelection.pointIds, ...shape.pointIds])],
+          [...new Set([...outlineSelection.segmentIds, ...shape.segmentIds])], []);
+      }
+      return;
+    }
+    const lineId = extend && selectedSegment && !selectedSegmentCurved ? selectedSegment.id : undefined;
+    onSelectMany(shape.pointIds, lineId ? [...shape.segmentIds, lineId] : shape.segmentIds, []);
+  };
   const outlineReference = (() => {
     if (!outlineSelection || !outlineSegments) return;
     const outside = outlineSelection.segmentIds.filter((id) => !outlineSegments.some((segment) => segment.id === id));
@@ -1151,6 +1173,8 @@ export function SketchWorkspace({
   }, [dimensionTarget]);
   const constraints = profile.constraints ?? [];
   const selectedConstraints = constraints.filter((rule) => {
+    if (rule.kind === "concentric") return rule.circles.some((ids) =>
+      selectedCircles.some((shape) => ids.every((id) => shape.pointIds.includes(id))));
     const matchesLine = (line: SketchSegment) =>
       sameSketchEndpoints(rule.a, rule.b, line.startId, line.endId) ||
       ("d" in rule && sameSketchEndpoints(rule.c, rule.d, line.startId, line.endId));
@@ -1164,6 +1188,9 @@ export function SketchWorkspace({
       : constraintPairs ? !("c" in rule) && constraintPairs.includes(rule.a) && constraintPairs.includes(rule.b)
       : false;
   });
+  const alreadyConcentric = circlePair && selectedConstraints.some((rule) =>
+    rule.kind === "concentric" && circlePair.every((shape) =>
+      rule.circles.some((ids) => ids.every((id) => shape.pointIds.includes(id)))));
   const diameterRule = selectedConstraints.find((rule) => rule.kind === "circle-diameter");
   const diameter = diameterRule?.kind === "circle-diameter" ? diameterRule.value : circle ? circle.radius * 2 : undefined;
   const requestedDiameter = draftValue === undefined ? diameter : parseLengthMm(draftValue);
@@ -3674,6 +3701,7 @@ export function SketchWorkspace({
               rule.outline.every((id) => shape.pointIds.includes(id)));
             const label = lockedDiameter?.kind === "circle-diameter"
               ? `Ø${formatDimension(lockedDiameter.value, workspace.accuracy)} mm` : null;
+            const concentric = constraints.some((rule) => rule.kind === "concentric" && shape.pointIds.includes(rule.a));
             const width = label ? label.length * 7 + 22 : 0;
             return (
               <g key={shape.pointIds[0]} className="sketch-constraint-markers"
@@ -3684,18 +3712,24 @@ export function SketchWorkspace({
                     if (event.button !== 0) return;
                     event.stopPropagation();
                     event.preventDefault();
-                    const lineId = event.shiftKey && selectedSegment && !selectedSegmentCurved ? selectedSegment.id : undefined;
-                    onSelectMany(shape.pointIds, lineId ? [...shape.segmentIds, lineId] : shape.segmentIds, []);
+                    selectCircle(shape, event.shiftKey);
                   }}
                   onKeyDown={(event) => {
                     if (event.key !== "Enter" && event.key !== " ") return;
                     event.preventDefault();
                     event.stopPropagation();
-                    onSelectMany(shape.pointIds, shape.segmentIds, []);
+                    selectCircle(shape, event.shiftKey);
                   }}>
-                  <title>Circle center</title>
+                  <title>Circle center (Shift-click to add to selection)</title>
                 </circle>
                 <path d="M -3 0 H 3 M 0 -3 V 3" stroke="white" strokeWidth={1.3} pointerEvents="none" />
+                {concentric && (
+                  <g transform={`translate(0 ${shape.radius / screenUnit + 13})`} pointerEvents="none" role="img" aria-label="Concentric circles">
+                    <rect x={-12} y={-8} width={24} height={16} rx={4} />
+                    <circle r={5} fill="none" stroke="white" strokeWidth={1} />
+                    <circle r={2} fill="none" stroke="white" strokeWidth={1} />
+                  </g>
+                )}
                 {label && (
                   <g transform={`translate(0 ${-shape.radius / screenUnit - 13})`} pointerEvents="none" role="img" aria-label={`Fixed diameter ${label}`}>
                     <rect x={-width / 2} y={-8} width={width} height={16} rx={4} />
@@ -4132,7 +4166,7 @@ export function SketchWorkspace({
         </div>
       ) : null}
       {tool === "select" && !mirrorOpen && onAddConstraint &&
-        ((selectedSegment && !selectedSegmentCurved) || constraintPairs || canRelateLines || pointLine || outlineReference || circle || selectedConstraints.length > 0) ? (
+        ((selectedSegment && !selectedSegmentCurved) || constraintPairs || canRelateLines || pointLine || outlineReference || circle || circlePair || selectedConstraints.length > 0) ? (
         <div className="sketch-point-actions" aria-label="Persistent sketch constraints" style={{ top: 89, maxWidth: "min(90vw, 1050px)", overflowX: "auto", borderRadius: 14 }}>
           <span className="sketch-corner-label">Constraints</span>
           {selectedSegment && !selectedSegmentCurved ? (
@@ -4159,6 +4193,13 @@ export function SketchWorkspace({
               onClick={() => onAddConstraint({ kind, a: firstLine.startId, b: firstLine.endId, c: secondLine.startId, d: secondLine.endId })}
             >{kind === "parallel" ? "Parallel" : kind === "perpendicular" ? "Perpendicular" : "Equal Length"}</button>
           ))}
+          {circlePair && (
+            <button type="button" disabled={Boolean(alreadyConcentric)} onClick={() => {
+              const [first, second] = circlePair;
+              onAddConstraint({ kind: "concentric", a: first.pointIds[0], b: second.pointIds[0],
+                circles: [first.pointIds, second.pointIds] });
+            }}>Make concentric</button>
+          )}
           {circle && outlineSelection && !outlineReference && diameter !== undefined && (
             <form className="sketch-length-control" onSubmit={(event) => {
               event.preventDefault();
@@ -4175,7 +4216,7 @@ export function SketchWorkspace({
                   aria-label="Circle diameter in millimeters" /> mm
               </label>
               <button type="submit" disabled={!canSetDiameter}>Set diameter</button>
-              <span className="sketch-constraint-hint">Shift-click a line to dimension the center</span>
+              <span className="sketch-constraint-hint">Shift-click another center or a line</span>
             </form>
           )}
           {centerRule && (
@@ -4263,7 +4304,8 @@ export function SketchWorkspace({
           {selectedConstraints.map((rule) => (
             <button type="button" key={rule.id} title={rule.kind === "distance" ? "Remove fixed length constraint" : `Remove ${rule.kind} constraint`} onClick={() => onRemoveConstraint?.(rule.id)}>
               {rule.kind === "angle" ? `Fixed angle ${formatDimension(rule.value, workspace.accuracy)}°` : (
-                rule.kind === "circle-diameter" ? `Fixed diameter Ø${formatDimension(rule.value, workspace.accuracy)} mm`
+                rule.kind === "concentric" ? "Concentric"
+                : rule.kind === "circle-diameter" ? `Fixed diameter Ø${formatDimension(rule.value, workspace.accuracy)} mm`
                 : rule.kind === "circle-center-distance" ? `Fixed center distance ${formatDimension(Math.abs(rule.value), workspace.accuracy)} mm`
                 : rule.kind === "outline-line-distance" ? `Fixed clearance ${formatDimension(rule.value, workspace.accuracy)} mm`
                 : rule.kind === "line-distance" || rule.kind === "point-line-distance"

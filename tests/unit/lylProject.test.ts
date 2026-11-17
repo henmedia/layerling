@@ -2,6 +2,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { strFromU8, strToU8, unzipSync, zipSync } from "fflate";
 import { editorHistoryEntry } from "@/lib/editorHistory";
 import { placementWorkplaneFromSurface } from "@/lib/placementWorkplane";
+import { sketchPrimitiveGeometry } from "@/lib/sketchPrimitives";
 import { projectAssetFromBytes } from "@/lib/projectAssets";
 import { canonicalizeShape } from "@/lib/workplaneShapes";
 import {
@@ -79,6 +80,25 @@ function mutateProject(bytes: Uint8Array, mutate: (document: LylProjectDocumentV
 
 describe("layerling .lyl project packages", () => {
   afterEach(() => vi.unstubAllGlobals());
+
+  it("round-trips a concentric circle constraint", async () => {
+    let id = 0;
+    const nextId = () => `circle-${++id}`;
+    const hole = sketchPrimitiveGeometry("circle", { x: 0, z: 0 }, nextId, 3);
+    const recess = sketchPrimitiveGeometry("circle", { x: 0, z: 0 }, nextId, 6);
+    const first = hole.points.map((point) => point.id);
+    const second = recess.points.map((point) => point.id);
+    const body = shape("mesh", "concentric-sketch", {
+      sketchOperation: "extrude",
+      sketchProfile: {
+        points: [...hole.points, ...recess.points],
+        segments: [...hole.segments, ...recess.segments],
+        constraints: [{ id: "shared-center", kind: "concentric", a: first[0], b: second[0], circles: [first, second] }],
+      },
+    });
+    const restored = await importLylProject(await exportLylProject(input([body])));
+    expect(restored.shapes[0].sketchProfile).toEqual(body.sketchProfile);
+  });
 
   it("round-trips every supported native shape kind and editable properties", async () => {
     const nativeKinds: ShapeKind[] = [
