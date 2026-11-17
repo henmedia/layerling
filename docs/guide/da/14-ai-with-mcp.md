@@ -119,6 +119,7 @@ AI'en arbejder med de samme funktioner som dig, gennem den samme vej som din han
 | `layerling_cookie_cutter` | laver en småkageudstikker af objekterne: en væg med en skærekant og en kant rundt om det spejlede omrids (Småkageudstikker) |
 | `layerling_flexi_joints` | skærer et fladt legeme i stykker med led, der er printet på plads og svinger ud til siden (Flexi-led) |
 | `layerling_make_lid` | laver et låg til et legeme, der er åbent foroven: skubbet ind, over ydersiden eller fladt, med den pasning du vælger og magneter, hvis du vil (Låg) |
+| `layerling_make_mold` | laver en form eller en stans ud fra en original: en todelt form at støbe i, en støbekasse til silikone, en åben form eller et stempel og en matrice til tyndt materiale (Støbeform & stans) |
 | `layerling_make_cable_channel` | lægger en rund kanal til et kabel gennem et legeme fra en indgang til en udgang og finder selv vejen med bløde bøjninger (Kabelkanal) |
 | `layerling_loft_sketches` | forbinder to skitseformer i en overgang fra det ene omrids til det andet (Overgang mellem skitser) |
 | `layerling_separate_parts` | adskiller en form i dens løse dele, et skitselegeme i ét legeme pr. omrids |

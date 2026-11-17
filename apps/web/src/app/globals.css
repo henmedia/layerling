@@ -18303,3 +18303,129 @@ html[data-theme="dark"] .property-card > button.property-card-header:hover {
     display: block;
   }
 }
+
+/* Findings in the mold window: each with its level, what it is and what helps. */
+.layer-check-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 8px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.layer-check-list.stale {
+  opacity: 0.55;
+}
+
+.layer-check-row {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 6px;
+  padding: 6px 8px;
+  color: #3a2816;
+  background: #fbf8f3;
+  border: 1px solid #ede5d6;
+  border-left: 4px solid #f2c230;
+  border-radius: 6px;
+}
+
+.layer-check-row.problem {
+  border-left-color: #e5484d;
+}
+
+.layer-check-row.active {
+  background: #fff1de;
+  box-shadow: 0 0 0 2px rgba(232, 133, 26, 0.45);
+}
+
+.layer-check-row > .print-check-show {
+  align-self: flex-end;
+}
+
+.layer-check-row-main {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+  padding: 0;
+  color: inherit;
+  text-align: left;
+  background: none;
+  border: 0;
+  cursor: pointer;
+  font: inherit;
+}
+
+.layer-check-row-main > svg {
+  flex: none;
+  margin-top: 1px;
+  color: #c79a00;
+}
+
+.layer-check-row.problem .layer-check-row-main > svg {
+  color: #e5484d;
+}
+
+.layer-check-row-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-size: 12px;
+  line-height: 1.35;
+}
+
+.layer-check-row-level {
+  color: #867360;
+  font-size: 11px;
+}
+
+.layer-check-remedy {
+  color: #8a5a1c;
+}
+
+html[data-theme="dark"] .layer-check-row {
+  color: #ecdcc9;
+  background: #2f2418;
+  border-color: #53412f;
+}
+
+html[data-theme="dark"] .layer-check-row.active {
+  background: #3f2c18;
+}
+
+html[data-theme="dark"] .layer-check-row-level,
+html[data-theme="dark"] .layer-check-note,
+html[data-theme="dark"] .layer-view-readout,
+html[data-theme="dark"] .layer-check-filters label,
+html[data-theme="dark"] .layer-view-play label {
+  color: #bfa98f;
+}
+
+html[data-theme="dark"] .layer-check-remedy {
+  color: #f0b46c;
+}
+
+.tool-plain-section > strong {
+  display: block;
+  margin-bottom: 6px;
+}
+
+.mold-analysis p {
+  margin: 4px 0;
+  font-size: 13px;
+}
+
+.mold-analysis.stale {
+  opacity: 0.6;
+}
+
+.mold-option-figure {
+  font-weight: 500;
+  opacity: 0.8;
+}
+
+.mold-vents {
+  display: grid;
+  gap: 4px;
+}

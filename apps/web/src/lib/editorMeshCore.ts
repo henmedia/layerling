@@ -903,7 +903,7 @@ export function groupedContentMesh(shape: WorkplaneShape): MeshData {
 // With them, the marks and switches that leave the body's own mesh as it is: hiding, locking or marking a large mesh
 // does not build it again (none of them is read while the mesh is built).
 const PLACEMENT_FIELDS = new Set(["id", "name", "color", "gridfinityLabelColor", "paint", "x", "z", "elevation", "rotation", "rotationX", "rotationZ",
-  "breakawayBase", "stencilBridge", "supportRibFor", "locked", "shapeLocked", "hidden", "transparent", "multicolor"]);
+  "breakawayBase", "stencilBridge", "supportRibFor", "moldOf", "locked", "shapeLocked", "hidden", "transparent", "multicolor"]);
 const MAX_UNPLACED_MESHES = 24;
 const MAX_UNPLACED_MESH_VERTICES = 1_500_000;
 const unplacedMeshCache: Array<{ shape: WorkplaneShape; mesh: MeshData; fontRevision: number }> = [];

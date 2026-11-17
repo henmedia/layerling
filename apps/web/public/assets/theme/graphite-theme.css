@@ -8839,6 +8839,66 @@ html[data-theme="dark"]:where([data-palette="graphite"]) .property-card > button
   color: #fff;
 }
 
+:where(html[data-theme="dark"][data-palette="graphite"]) .layer-check-row {
+  color: #2d2d2d;
+  background: #f7f7f7;
+  border: 1px solid #e2e2e2;
+  border-left: 4px solid #f2c230;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .layer-check-row.problem {
+  border-left-color: #e5484d;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .layer-check-row.active {
+  background: #efefef;
+  box-shadow: 0 0 0 2px rgba(232, 133, 26, 0.45);
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .layer-check-row-main {
+  color: inherit;
+  background: none;
+  border: 0;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .layer-check-row-main > svg {
+  color: #c79a00;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .layer-check-row.problem .layer-check-row-main > svg {
+  color: #e5484d;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .layer-check-row-level {
+  color: #656565;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .layer-check-remedy {
+  color: #8a5a1c;
+}
+
+html[data-theme="dark"]:where([data-palette="graphite"]) .layer-check-row {
+  color: #dbdbdb;
+  background: #292929;
+  border-color: #434343;
+}
+
+html[data-theme="dark"]:where([data-palette="graphite"]) .layer-check-row.active {
+  background: #303030;
+}
+
+html[data-theme="dark"]:where([data-palette="graphite"]) .layer-check-row-level,
+html[data-theme="dark"]:where([data-palette="graphite"]) .layer-check-note,
+html[data-theme="dark"]:where([data-palette="graphite"]) .layer-view-readout,
+html[data-theme="dark"]:where([data-palette="graphite"]) .layer-check-filters label,
+html[data-theme="dark"]:where([data-palette="graphite"]) .layer-view-play label {
+  color: #a7a7a7;
+}
+
+html[data-theme="dark"]:where([data-palette="graphite"]) .layer-check-remedy {
+  color: #f0b46c;
+}
+
 :where(html[data-theme="dark"][data-palette="graphite"]) .dashboard-welcome-hide {
   color: #717171;
   background: transparent;

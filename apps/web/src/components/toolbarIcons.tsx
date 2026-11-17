@@ -561,6 +561,21 @@ export function ToolbarLidIcon(props: IconProps) {
   );
 }
 
+/** A two-part mold opened: the lower half with a cone key and the cavity, the upper half above it with the funnel. */
+export function ToolbarMoldIcon(props: IconProps) {
+  return (
+    <ToolbarVectorIcon {...props}>
+      <path d="M6 27h36v13H6Z" {...SOLID} />
+      <path d="M6 27h36v13H6Z" />
+      <path d="M17 27a7 7 0 0 0 14 0" />
+      <path d="M9 27l2.5-4 2.5 4" />
+      <path d="M6 8h36v12H6Z" {...SOLID} />
+      <path d="M6 8h36v12H6Z" />
+      <path d="M19 8l3 4v8M29 8l-3 4v8" />
+    </ToolbarVectorIcon>
+  );
+}
+
 /** A block with a round channel through it: in at the side, a gentle bend, out at the top. */
 export function ToolbarCableChannelIcon(props: IconProps) {
   return (

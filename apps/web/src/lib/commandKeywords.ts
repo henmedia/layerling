@@ -26,6 +26,7 @@ export const COMMAND_KEYWORDS: Readonly<Record<string, readonly string[]>> = {
   intersect: ["intersect", "intersection", "preview", "common", "overlap", "venn", "schnittmenge", "verschneiden", "vorschau", "gemeinsam", "gemeinsames", "ueberlappung"],
   cookieCutter: ["cookie cutter", "cookie", "cutter", "biscuit", "pastry", "stencil", "christmas", "ausstechform", "ausstecher", "plaetzchen", "plätzchen", "keks", "keksform", "backform", "weihnachten"],
   flexi: ["flexi", "flexi toy", "articulated", "print in place", "joint", "joints", "links", "snake", "dragon", "fish", "gelenk", "gelenke", "beweglich", "glieder", "drache", "schlange", "fisch"],
+  mold: ["mold", "mould", "casting", "cast", "resin", "silicone", "plaster", "concrete", "soap", "wax", "chocolate", "pour box", "die", "punch", "stamp", "emboss", "leather", "sheet metal", "gussform", "giessform", "gießform", "giessen", "gießen", "silikon", "harz", "epoxid", "gips", "beton", "seife", "kerze", "stanze", "stanzwerkzeug", "prägen", "praegen", "leder", "blech", "matrize", "stempel"],
   lid: ["lid", "cover", "cap", "box lid", "plug", "deckel", "kistendeckel", "dose", "abdeckung", "verschluss", "stuelpdeckel", "stülpdeckel", "tupperware", "food container", "groove", "frischhaltedose", "nut"],
   loftSketches: ["loft", "transition", "two sketches", "two svgs", "blend", "uebergang", "übergang", "zwei skizzen", "skizzen verbinden", "trichter", "funnel"],
   hull: ["hull", "convex hull", "shrink wrap", "wrap", "hülle", "konvexe hülle", "schrumpffolie", "umhüllen"],

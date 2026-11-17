@@ -127,6 +127,7 @@ import { isTypingTarget } from "@/lib/editorKeyTargets";
 import { liftHandleOffset, screenAngle, framePoint, selectionFrameCorners, workplaneFootprintY, syncTransformOverlay, syncAlignOverlay, syncMirrorOverlay, syncLayFlatHover } from "./workplane/viewportTransformOverlays";
 import { ClearanceMarkOverlay, clearanceFocusBox, syncClearanceMarkOverlay, type ClearanceMark, type ClearanceMarkOverlayState } from "./workplane/ClearanceMarkOverlay";
 import { clipThinWallOverlay, syncThinWallOverlay, type PrintCheckView } from "./workplane/ThinWallOverlay";
+import { syncMoldPreviewOverlay, type MoldPreview } from "./workplane/MoldPreviewOverlay";
 import { EMPTY_PROTRACTOR, pickProtractorFace, protractorFaceFromWorld, protractorReading, protractorStraightView, ProtractorOverlay, syncProtractorOverlay, type ProtractorKind, type ProtractorModel, type ProtractorOverlayState } from "./workplane/viewportProtractor";
 import { tapeAttachmentFromWorld, TAPE_PERPENDICULAR_SNAP_PIXELS, pickModelTapeCandidate, tapeCentresNear, sameTapeCentres, distanceToScreenSegment, SectionMeasureModel, SectionMeasureOverlayState, syncSectionMeasureOverlay } from "./workplane/viewportTape";
 export type { LayFlatPick } from "@/components/workplane/viewportPicking";
@@ -222,6 +223,8 @@ type WorkplaneViewportProps = {
   clearanceMark?: ClearanceMark | null;
   /** The print check's thin walls, painted red on the bodies, and the place its Show brings the camera to. */
   printCheckView?: PrintCheckView | null;
+  /** The mold tool's preview: the parting face, the sprue, the vents and the air traps. */
+  moldPreview?: MoldPreview | null;
   onSetPlacementWorkplane: (workplane: PlacementWorkplane, source: "shape" | "base") => void;
   onToggleWorkplaneTool: () => void;
   onInteractionActiveChange?: (active: boolean) => void;
@@ -1630,6 +1633,7 @@ export function WorkplaneViewport({
   highlightIds,
   clearanceMark = null,
   printCheckView = null,
+  moldPreview = null,
   onSetPlacementWorkplane,
   onToggleWorkplaneTool,
   onInteractionActiveChange,
@@ -5839,6 +5843,14 @@ export function WorkplaneViewport({
   }, [printCheckThin]);
   useEffect(() => () => {
     if (threeRef.current) syncThinWallOverlay(threeRef.current, null);
+  }, []);
+  // The mold tool's preview while its panel is open.
+  useEffect(() => {
+    const state = threeRef.current;
+    if (state) syncMoldPreviewOverlay(state, moldPreview);
+  }, [moldPreview]);
+  useEffect(() => () => {
+    if (threeRef.current) syncMoldPreviewOverlay(threeRef.current, null);
   }, []);
   const printCheckRequest = printCheckView?.request ?? 0;
   const printCheckFocusRef = useRef<PrintCheckView["focus"]>(null);
