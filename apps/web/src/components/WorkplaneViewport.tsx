@@ -5750,6 +5750,8 @@ export function WorkplaneViewport({
     const value = parseMeasurementInput(edit.value);
     if (Number.isFinite(value)) {
       const pivot = pivotVector(rotationPivotRef.current);
+      // One change for all bodies, as for a typed size (#259), or each update would start from the shapes as they were.
+      onInteractionActiveChange?.(true);
       selectedIdsRef.current.forEach((id) => {
         const shape = shapesRef.current.find((entry) => entry.id === id);
         const rotationPatch = rotationPatchForAxis(edit.axis, value);
@@ -5761,11 +5763,12 @@ export function WorkplaneViewport({
         const delta = quaternionForShape({ ...shape, ...rotationPatch }).multiply(startQuaternion.clone().invert());
         onUpdateShape(id, { ...rotatedGeometryShapePatch(shape, delta, pivot), bakeTransform: true });
       });
+      onInteractionActiveChange?.(false);
     }
     setEditingRotation(null);
     setEditingCorner(null);
     setActiveRotationWheel(false);
-  }, [editingRotation, onUpdateShape]);
+  }, [editingRotation, onInteractionActiveChange, onUpdateShape]);
 
   // The angle box too (#486): a press outside applies the typed value before the selection can go.
   useEffect(() => {

@@ -1,6 +1,19 @@
 [
   {
     "title": {
+      "de": "Ein getippter Winkel dreht alle gewählten Teile",
+      "en": "A typed angle turns every selected part"
+    },
+    "body": {
+      "de": "Waren mehrere Teile ausgewählt, drehte ein ins Winkelfeld getippter Winkel nur das letzte: Bei zwei Quadern und 30° blieb der erste bei 0°. Jetzt drehen sich alle, und ein Rückgängig dreht sie alle zurück.",
+      "en": "With several parts selected, an angle typed into the angle box turned only the last of them: with two boxes and 30°, the first stayed at 0°. Now they all turn, and one Undo turns them all back."
+    },
+    "guide": {
+      "section": "rotating"
+    }
+  },
+  {
+    "title": {
       "de": "Befestigungslöcher für Platten und Deckel",
       "en": "Mounting holes for plates and lids",
       "da": "Monteringshuller til plader og låg"
