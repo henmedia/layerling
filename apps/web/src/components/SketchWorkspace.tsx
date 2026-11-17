@@ -40,7 +40,7 @@ import { DEFAULT_SNAP_GRID, DEFAULT_WORKPLANE_WORKSPACE, keyboardNudgeCoarseFact
 import type { GridSize, SketchConstraintInput, SketchImage, SketchNote, SketchOperation, SketchPoint, SketchProfile, SketchSegment, SketchStroke, SketchStrokeAlign, SketchStrokeCap, SketchStrokeJoin, SweepAnchor, WorkplaneShape, WorkplaneWorkspaceSettings } from "@/types/layerling";
 import { resizePointerOnGrid } from "@/lib/sketchFrameResize";
 import { viewArrowStep } from "@/lib/viewArrowKeys";
-import { resizeSketchPoints, resizeSketchPointsToSize, type ResizeHandle, type SelectionBounds } from "@/lib/sketchSelectionResize";
+import { concentricResizeLocks, resizeSketchPoints, resizeSketchPointsToSize, type ResizeHandle, type SelectionBounds } from "@/lib/sketchSelectionResize";
 import { alignSketchSelection, canAlignSketchSelection, type SketchAlignMode } from "@/lib/sketchAlign";
 import { changesLockedOutline, lockedCornerTurn, lockedLengthAnchor, sketchLockState } from "@/lib/sketchLock";
 import { dragRotationDegrees, rotateSketchPointsAbout, sketchPointsPivot, sketchTurnRing, sketchTurnStep, SKETCH_TURN_RING_STEP } from "@/lib/sketchRotation";
@@ -181,7 +181,7 @@ type PointerAction =
   | { kind: "bezier"; pointerId: number; origin: { x: number; z: number }; current: { x: number; z: number } }
   | { kind: "move-point"; pointerId: number; pointId: string; origin: { x: number; z: number }; current: { x: number; z: number } }
   | { kind: "move-selection"; pointerId: number; origin: { x: number; z: number }; current: { x: number; z: number }; startPoints: SketchPoint[] }
-  | { kind: "resize-selection"; pointerId: number; handle: ResizeHandle; current: { x: number; z: number }; startPoints: SketchPoint[]; bounds: SelectionBounds; proportional?: boolean; grab?: { x: number; z: number } }
+  | { kind: "resize-selection"; pointerId: number; handle: ResizeHandle; current: { x: number; z: number }; startPoints: SketchPoint[]; bounds: SelectionBounds; proportional?: boolean; concentricLocks?: ReadonlySet<string>; grab?: { x: number; z: number } }
   | { kind: "move-handle"; pointerId: number; pointId: string; handle: "in" | "out"; current: { x: number; z: number } }
   | { kind: "pan"; pointerId: number; clientX: number; clientY: number }
   | { kind: "marquee"; pointerId: number; origin: { x: number; z: number }; current: { x: number; z: number }; clientX: number; clientY: number }
@@ -1001,7 +1001,7 @@ export function SketchWorkspace({
       return { ...profile, points: profile.points.map((point) => movedById.get(point.id) ?? point) };
     }
     if (pointerAction?.kind === "resize-selection") {
-      const resized = resizeSketchPoints(pointerAction.startPoints, pointerAction.bounds, pointerAction.handle, resizeTarget(pointerAction), pointerAction.proportional || keepProportions);
+      const resized = resizeSketchPoints(pointerAction.startPoints, pointerAction.bounds, pointerAction.handle, resizeTarget(pointerAction), pointerAction.proportional || keepProportions, pointerAction.concentricLocks);
       const resizedById = new Map(resized.map((point) => [point.id, point]));
       return { ...profile, points: profile.points.map((point) => resizedById.get(point.id) ?? point) };
     }
@@ -1043,7 +1043,7 @@ export function SketchWorkspace({
       };
     }
     return profile;
-  }, [pointerAction, profile]);
+  }, [pointerAction, profile, keepProportions]);
   // A drag that would move a locked outline (#653) shows nothing moving: the editor refuses it on release.
   const displayProfile = useMemo(() => {
     if (previewProfile === profile) return profile;
@@ -1350,6 +1350,10 @@ export function SketchWorkspace({
     if (moved) onTransformPoints(moved, t("sketch.aligned"));
   };
   const selectionLocked = selectionLock !== "none";
+  const concentricLocks = selected?.kind === "multiple"
+    ? concentricResizeLocks(selected.pointIds, profile.constraints ?? []) : undefined;
+  const diameterResizeLocked = Boolean(concentricLocks && selected?.kind === "multiple" &&
+    selected.pointIds.every((id) => concentricLocks.has(id)));
   // A typed X or Y moves the selection so its middle lies there, in mm from the sketch's origin (#1064); Y counts up the
   // screen, as the Y of the 3D editor counts towards the back.
   const moveSelectionBy = (dx: number, dz: number) => {
@@ -1527,12 +1531,12 @@ export function SketchWorkspace({
         const current = editingBoxSize.axis === "x" ? bounds.width : bounds.depth;
         const size = resolveLengthMm(editingBoxSize.value, current);
         if (Number.isFinite(size) && size > 0) {
-          onTransformPoints(resizeSketchPointsToSize(startPoints, bounds, editingBoxSize.axis, size, keepProportionsRef.current), t("sketch.shapeResized"));
+          onTransformPoints(resizeSketchPointsToSize(startPoints, bounds, editingBoxSize.axis, size, keepProportionsRef.current, concentricLocks), t("sketch.shapeResized"));
         }
       }
     }
     setEditingBoxSize(null);
-  }, [editingBoxSize, onTransformPoints, profile.points, selected]);
+  }, [editingBoxSize, onTransformPoints, profile.points, selected, concentricLocks]);
 
   const angleEditDoneRef = useRef(false);
   const startAngleEdit = useCallback((pointId: string, value: string, sketchPos: { x: number; z: number }) => {
@@ -2055,7 +2059,7 @@ export function SketchWorkspace({
         t("sketch.shapeMoved"),
       );
     } else if (action.kind === "resize-selection") {
-      onTransformPoints(resizeSketchPoints(action.startPoints, action.bounds, action.handle, resizeTarget(action), action.proportional || keepProportionsRef.current), t("sketch.shapeResized"));
+      onTransformPoints(resizeSketchPoints(action.startPoints, action.bounds, action.handle, resizeTarget(action), action.proportional || keepProportionsRef.current, action.concentricLocks), t("sketch.shapeResized"));
     } else if (action.kind === "move-point") {
       onMovePoint(action.pointId, action.current);
     } else if (action.kind === "move-handle") {
@@ -3304,7 +3308,7 @@ export function SketchWorkspace({
                   { axis: "x" as const, label: widthLabel, pill: widthPill, at: { x: selectedGeometryBounds.cx, z: selectedGeometryBounds.minZ - selectionFrameGap - labelOffset } },
                   { axis: "z" as const, label: depthLabel, pill: depthPill, at: { x: selectedGeometryBounds.maxX + selectionFrameGap + 34 * screenUnit, z: selectedGeometryBounds.cz } },
                 ]).map(({ axis, label, pill, at }) => {
-                  const editable = selected?.kind === "multiple" && !selectionLocked;
+                  const editable = selected?.kind === "multiple" && !selectionLocked && !diameterResizeLocked;
                   return (
                     <g
                       key={`box-size-${axis}`}
@@ -3332,7 +3336,7 @@ export function SketchWorkspace({
                   <rect
                     key={`selection-handle-${handle.id}`}
                     data-sketch-entity="selection-handle"
-                    className={`sketch-geometry-resize-handle handle-${handle.id} ${selectionLocked ? "locked" : ""}`}
+                    className={`sketch-geometry-resize-handle handle-${handle.id} ${selectionLocked || diameterResizeLocked ? "locked" : ""}`}
                     x={handle.x - handleSize / 2}
                     y={handle.z - handleSize / 2}
                     width={handleSize}
@@ -3343,14 +3347,15 @@ export function SketchWorkspace({
                         beginPan(event);
                         return;
                       }
-                      if (event.button !== 0 || selected?.kind !== "multiple" || selectionLocked) return;
+                      if (event.button !== 0 || selected?.kind !== "multiple" || selectionLocked || diameterResizeLocked) return;
                       const startPoints = selected.pointIds.map((id) => profile.points.find((entry) => entry.id === id)).filter((entry): entry is SketchPoint => Boolean(entry)).map((entry) => ({ ...entry, handleIn: entry.handleIn ? { ...entry.handleIn } : undefined, handleOut: entry.handleOut ? { ...entry.handleOut } : undefined }));
                       const bounds = boundsForSketchPoints(startPoints);
                       if (!bounds) return;
-                      beginEntityDrag(event, { kind: "resize-selection", pointerId: event.pointerId, handle: handle.id, current: { x: handle.x, z: handle.z }, grab: handle.grab, startPoints, bounds });
+                      beginEntityDrag(event, { kind: "resize-selection", pointerId: event.pointerId, handle: handle.id, current: { x: handle.x, z: handle.z }, grab: handle.grab, startPoints, bounds, concentricLocks });
                     }}
                   >
-                    {selectionLocked ? <title>{t("status.objectLocked")}</title> : null}
+                    {diameterResizeLocked ? <title>Diameter locked. Use Set diameter to change it.</title>
+                      : selectionLocked ? <title>{t("status.objectLocked")}</title> : null}
                   </rect>
                 ))}
                 {selectionFrame && selected?.kind === "multiple" && !selected.imageIds?.length ? (() => {

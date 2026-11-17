@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { applySketchConstraints, validSketchConstraints, withSketchConstraint } from "@/lib/sketchConstraints";
+import { concentricResizeLocks, resizeSketchPoints, resizeSketchPointsToSize } from "@/lib/sketchSelectionResize";
 import { sketchPrimitiveGeometry } from "@/lib/sketchPrimitives";
 import { cloneSketchProfile } from "@/lib/sketchSmoothHandles";
 import type { SketchProfile } from "@/types/layerling";
@@ -401,4 +402,41 @@ it("keeps separate circle diameters and follows a move of either concentric circ
   expect(coordinates(resized.profile, second[0]).x).toBeCloseTo(9.5);
   expect(coordinates(resized.profile, first[0]).x).toBeCloseTo(7.5);
   expect(withSketchConstraint(resized.profile, { ...rule, id: "duplicate", a: second[0], b: first[0], circles: [second, first] })).toBe(resized.profile);
+});
+
+it("resizes concentric circles from their shared center without Shift", () => {
+  let id = 0;
+  const nextId = () => `resize-${++id}`;
+  const hole = sketchPrimitiveGeometry("circle", { x: 5, z: 9 }, nextId, 3);
+  const recess = sketchPrimitiveGeometry("circle", { x: 5, z: 9 }, nextId, 6);
+  const first = hole.points.map((point) => point.id);
+  const second = recess.points.map((point) => point.id);
+  const profile: SketchProfile = {
+    points: [...hole.points, ...recess.points], segments: [...hole.segments, ...recess.segments],
+    constraints: [
+      { id: "shared-center", kind: "concentric", a: first[0], b: second[0], circles: [first, second] },
+      { id: "locked-hole", kind: "circle-diameter", a: first[0], b: first[1], outline: first, value: 3 },
+    ],
+  };
+  const bounds = { minX: 2, maxX: 8, minZ: 6, maxZ: 12, width: 6, depth: 6, cx: 5, cz: 9 };
+  const useResize = (points: typeof profile.points, resized: typeof profile.points) => {
+    const byId = new Map(resized.map((point) => [point.id, point]));
+    return applySketchConstraints({ ...profile, points: profile.points.map((point) => byId.get(point.id) ?? point) },
+      new Set(points.map((point) => point.id).filter((key) => second.includes(key))));
+  };
+
+  const locks = concentricResizeLocks([...first, ...second], profile.constraints!);
+  expect(locks).toEqual(new Set(first));
+  const dragged = resizeSketchPoints(profile.points, bounds, "e", { x: 9, z: 9 }, false, locks);
+  const solved = useResize(profile.points, dragged);
+  expect(solved.ok).toBe(true);
+  expect(solved.profile.points.slice(0, 4)).toEqual(hole.points);
+  expect(coordinates(solved.profile, second[0]).x).toBeCloseTo(9);
+
+  const typed = resizeSketchPointsToSize(recess.points, bounds, "z", 4, false,
+    concentricResizeLocks(second, profile.constraints!));
+  const shrunk = useResize(recess.points, typed);
+  expect(shrunk.ok).toBe(true);
+  expect(coordinates(shrunk.profile, second[0]).x).toBeCloseTo(7);
+  expect(coordinates(shrunk.profile, second[1]).z).toBeCloseTo(11);
 });

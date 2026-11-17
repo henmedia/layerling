@@ -1,7 +1,42 @@
-import type { SketchPoint } from "@/types/layerling";
+import type { SketchConstraint, SketchPoint } from "@/types/layerling";
 
 export type ResizeHandle = "nw" | "n" | "ne" | "e" | "se" | "s" | "sw" | "w";
 export type SelectionBounds = { minX: number; maxX: number; minZ: number; maxZ: number; width: number; depth: number; cx: number; cz: number };
+
+/** A selection made entirely from complete concentric circles resizes about its center. */
+export function concentricResizeLocks(pointIds: readonly string[], constraints: readonly SketchConstraint[]) {
+  const selected = new Set(pointIds);
+  const covered = new Set<string>();
+  for (const rule of constraints) {
+    if (rule.kind !== "concentric") continue;
+    for (const outline of rule.circles) {
+      if (outline.every((id) => selected.has(id))) outline.forEach((id) => covered.add(id));
+    }
+  }
+  if (!covered.size || covered.size !== selected.size) return undefined;
+  const fixed = new Set<string>();
+  for (const rule of constraints) {
+    if (rule.kind === "circle-diameter") rule.outline.forEach((id) => fixed.add(id));
+  }
+  return fixed;
+}
+
+function mapPoints(points: SketchPoint[], map: (value: { x: number; z: number }) => { x: number; z: number }, fixed?: ReadonlySet<string>) {
+  return points.map((point) => fixed?.has(point.id) ? point : ({
+    ...point,
+    ...map(point),
+    handleIn: point.handleIn ? map(point.handleIn) : undefined,
+    handleOut: point.handleOut ? map(point.handleOut) : undefined,
+  }));
+}
+
+function scaleAboutCenter(points: SketchPoint[], bounds: SelectionBounds, factor: number, fixed: ReadonlySet<string>) {
+  if (!Number.isFinite(factor) || Math.abs(factor - 1) < 1e-12) return points;
+  return mapPoints(points, (point) => ({
+    x: bounds.cx + (point.x - bounds.cx) * factor,
+    z: bounds.cz + (point.z - bounds.cz) * factor,
+  }), fixed);
+}
 
 /**
  * Selected sketch points stretched by a handle of their frame. With `proportional` - Shift on a
@@ -9,8 +44,14 @@ export type SelectionBounds = { minX: number; maxX: number; minZ: number; maxZ: 
  * corner from the opposite corner, a side from the opposite side, the other direction about the
  * middle.
  */
-export function resizeSketchPoints(points: SketchPoint[], bounds: SelectionBounds, handle: ResizeHandle, current: { x: number; z: number }, proportional = false) {
+export function resizeSketchPoints(points: SketchPoint[], bounds: SelectionBounds, handle: ResizeHandle, current: { x: number; z: number }, proportional = false, concentricLocks?: ReadonlySet<string>) {
   const minimum = 0.5;
+  if (concentricLocks) {
+    const dx = handle.includes("w") ? bounds.minX - bounds.cx : handle.includes("e") ? bounds.maxX - bounds.cx : 0;
+    const dz = handle.includes("n") ? bounds.minZ - bounds.cz : handle.includes("s") ? bounds.maxZ - bounds.cz : 0;
+    const factor = ((current.x - bounds.cx) * dx + (current.z - bounds.cz) * dz) / (dx * dx + dz * dz);
+    return scaleAboutCenter(points, bounds, Math.max(Math.min(1, minimum / Math.min(bounds.width, bounds.depth)), factor), concentricLocks);
+  }
   let minX = bounds.minX;
   let maxX = bounds.maxX;
   let minZ = bounds.minZ;
@@ -45,16 +86,15 @@ export function resizeSketchPoints(points: SketchPoint[], bounds: SelectionBound
     x: minX + (value.x - bounds.minX) * scaleX,
     z: minZ + (value.z - bounds.minZ) * scaleZ,
   });
-  return points.map((point) => ({
-    ...point,
-    ...map(point),
-    handleIn: point.handleIn ? map(point.handleIn) : undefined,
-    handleOut: point.handleOut ? map(point.handleOut) : undefined,
-  }));
+  return mapPoints(points, map);
 }
 
 /** A width or height typed into the frame: along that axis only, or both alike while the proportions are kept. */
-export function resizeSketchPointsToSize(points: SketchPoint[], bounds: SelectionBounds, axis: "x" | "z", size: number, proportional = false) {
+export function resizeSketchPointsToSize(points: SketchPoint[], bounds: SelectionBounds, axis: "x" | "z", size: number, proportional = false, concentricLocks?: ReadonlySet<string>) {
+  if (concentricLocks) {
+    const factor = size / (axis === "x" ? bounds.width : bounds.depth);
+    return scaleAboutCenter(points, bounds, Math.max(Math.min(1, 0.5 / Math.min(bounds.width, bounds.depth)), factor), concentricLocks);
+  }
   if (proportional) {
     const scale = size / Math.max(0.5, axis === "x" ? bounds.width : bounds.depth);
     return resizeSketchPoints(points, bounds, "se", { x: bounds.minX + bounds.width * scale, z: bounds.minZ + bounds.depth * scale }, true);
