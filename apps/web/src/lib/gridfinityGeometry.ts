@@ -3885,7 +3885,6 @@ function manifoldOfTriangles(runtime: ManifoldToplevel, triangles: Vec3[][]) {
   return new runtime.Manifold(mesh);
 }
 
-/** A Manifold's mesh as triangles, the other way from manifoldOfTriangles. */
 /**
  * The triangles less those with two corners on one point. Manifold can leave such a triangle, of no area, folded back
  * on another along an edge where two pieces of an overhang meet (a side switched open between solid overhangs, a bin
@@ -3897,6 +3896,7 @@ function withoutPinchedTriangles(triangles: Vec3[][]) {
   return triangles.filter(([a, b, c]) => !same(a, b) && !same(b, c) && !same(c, a));
 }
 
+/** A Manifold's mesh as triangles, the other way from manifoldOfTriangles. */
 function trianglesOfManifold(manifold: ReturnType<ManifoldToplevel["Manifold"]["cube"]>) {
   const out = manifold.getMesh();
   const triangles: Vec3[][] = [];
