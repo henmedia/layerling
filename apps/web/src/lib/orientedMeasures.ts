@@ -51,8 +51,17 @@ export function orientedMeasures(shape: Pick<WorkplaneShape, "rotation" | "rotat
 const FIELD_ORDER: Record<MeasureField, number> = { length: 0, width: 1, height: 2 };
 
 /**
+ * Whether a field is one of the three plain measures, called by `labels` Width, Height or Length. A
+ * measure with a name of its own - a countersink's Head diameter and Total length, a cylinder's
+ * Diameter - means the same whichever way the body lies, and keeps its name and place (#1634).
+ */
+export function isPlainMeasure(field: { id: string; label: string }, labels: Record<MeasureField, string>): boolean {
+  return field.id in OWN_AXES && Object.values(labels).includes(field.label);
+}
+
+/**
  * `fields` relabelled and put in the usual order by what each measure means now. `labels` holds the
- * wording of the three directions. Fields other than the three measures stay where they were.
+ * wording of the three directions. Fields other than the three plain measures stay as they were.
  */
 export function withOrientedMeasures<T extends { id: string; label: string }>(
   fields: readonly T[],
@@ -60,7 +69,7 @@ export function withOrientedMeasures<T extends { id: string; label: string }>(
   labels: Record<MeasureField, string>,
 ): T[] {
   if (oriented.kind !== "aligned") return [...fields];
-  const isMeasure = (field: T) => field.id in OWN_AXES;
+  const isMeasure = (field: T) => isPlainMeasure(field, labels);
   const relabelled = fields.map((field) => (isMeasure(field) ? { ...field, label: labels[oriented.meaning[field.id as MeasureField]] } : field));
   // The measures take back the places they stood in, sorted among themselves.
   const sorted = relabelled

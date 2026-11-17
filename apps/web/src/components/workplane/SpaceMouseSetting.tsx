@@ -23,6 +23,10 @@ export function SpaceMouseSetting() {
   useEffect(() => {
     setSupported(webHid() !== null);
     void knownSpaceMice().then(setNames);
+    // A mouse found as a game controller shows up once it is moved (#1013).
+    const onPad = () => void knownSpaceMice().then(setNames);
+    window.addEventListener("gamepadconnected", onPad);
+    return () => window.removeEventListener("gamepadconnected", onPad);
   }, []);
   const connect = async () => {
     setFailed(false);

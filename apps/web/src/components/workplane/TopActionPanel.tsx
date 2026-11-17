@@ -3,7 +3,8 @@
 import { DEFAULT_STENCIL_BRIDGES, MAX_BRIDGE_COUNT, normalizedStencilBridges, type StencilBridgeOptions } from "@/lib/stencilBridges";
 import { GuideHelpLink } from "@/components/GuideHelpLink";
 import { MovableToolPanel } from "@/components/workplane/MovableToolPanel";
-import { CloudUpload, Download, EyeOff, FilePlus2, FolderOpen, ImagePlus, Info, Server, X } from "lucide-react";
+import { ArchiveRestore, CloudUpload, Download, EyeOff, FilePlus2, FolderOpen, ImagePlus, Info, Server, X } from "lucide-react";
+import { OPEN_FILE_BACKUPS_EVENT } from "@/lib/fileBackups";
 import { useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
 import { t, type MessageKey } from "@/lib/i18n";
 import { useLanguage } from "@/lib/useLanguage";
@@ -129,6 +130,18 @@ export function TopActionPanel({
   const suggestedName = ownObjectName && exportFormat !== "lyl" ? ownObjectName : projectName;
   const [exportName, setExportName] = useState(suggestedName);
   const previousSuggestedNameRef = useRef(suggestedName);
+  // Ready to type a new name when Export opens: the field takes the focus with the name selected, so typing replaces it
+  // (Discussion #1507) - except on a touch screen, where focusing it would pop up the keyboard. The name is selected here
+  // too, as the field's focus handler does not run while the window itself is not focused.
+  const exportNameRef = useRef<HTMLInputElement>(null);
+  useEffect(() => {
+    if (panel !== "export") return;
+    const touch = typeof window.matchMedia === "function" && window.matchMedia("(pointer: coarse)").matches;
+    const field = exportNameRef.current;
+    if (touch || !field) return;
+    field.focus({ preventScroll: true });
+    field.select();
+  }, [panel]);
   // Starts at the history setting from the workspace settings, so a project
   // file carries what the editor keeps unless it is changed here.
   const [lylHistoryLimit, setLylHistoryLimit] = useState<LylHistoryLimit>(workspaceHistoryLimit);
@@ -139,14 +152,15 @@ export function TopActionPanel({
     setExportName((current) => current === previousSuggestedName ? suggestedName : current);
     previousSuggestedNameRef.current = suggestedName;
   }, [suggestedName]);
-  // A custom number from the settings joins the usual stops in its place; the last stop, None,
+  // A custom number from the settings joins the usual stops in its place; the first stop, None,
   // saves the design with its current state only, for sharing a file without its undo steps (#246).
+  // More history lies to the right, as on the slider in the workspace settings (#1631).
   const lylHistoryLimits = useMemo<readonly LylHistoryLimit[]>(() => {
-    const presets: number[] = [100, 50, 30];
+    const presets: number[] = [30, 50, 100];
     const numbers = typeof workspaceHistoryLimit === "number" && !presets.includes(workspaceHistoryLimit)
-      ? [...presets, workspaceHistoryLimit].sort((a, b) => b - a)
+      ? [...presets, workspaceHistoryLimit].sort((a, b) => a - b)
       : presets;
-    return ["unlimited", ...numbers, 0];
+    return [0, ...numbers, "unlimited"];
   }, [workspaceHistoryLimit]);
   const lylHistoryLimitIndex = Math.max(0, lylHistoryLimits.indexOf(lylHistoryLimit));
   const [printMaterial, setPrintMaterial] = useState<PrintMaterial>(() => {
@@ -407,6 +421,7 @@ export function TopActionPanel({
             <label htmlFor="export-file-name">{t("export.fileName")}</label>
             <div className="export-file-input-wrap">
               <input
+                ref={exportNameRef}
                 id="export-file-name"
                 className="export-file-input"
                 value={exportName}
@@ -676,6 +691,12 @@ export function TopActionPanel({
               {exportFormat === "stl" && stlFileName ? (
                 <button className="export-shared-button" type="button" onClick={() => onExport("stl", exportName, true)} disabled={shapeCount === 0}>
                   <span>{t("export.stlSaveAs")}</span>
+                </button>
+              ) : null}
+              {exportFormat === "lyl" ? (
+                <button className="export-shared-button" type="button" title={t("backups.openTitle")} onClick={() => window.dispatchEvent(new Event(OPEN_FILE_BACKUPS_EVENT))}>
+                  <ArchiveRestore />
+                  <span>{t("backups.title")}</span>
                 </button>
               ) : null}
               {exportFormat === "lyl" && sharedProjectsEnabled ? (

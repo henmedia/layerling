@@ -15,7 +15,7 @@ La casella in cima alla finestra cerca nell’elenco: tiene solo le scorciatoie 
 
 Non trovi uno strumento? Premi [[Ctrl]]+[[K]] oppure fai clic sulla lente d’ingrandimento nell’area {{ui:editor.group.help}}, poi digita ciò che cerchi: uno strumento («raccordo», «specchia»), una forma («cilindro») o un comando («esporta», «annulla»). Spostati con i tasti freccia e premi [[Enter]], oppure fai clic sul risultato.
 
-- La ricerca riconosce sia il termine inglese sia quello tedesco e non distingue maiuscole e dieresi: «aushoehlen» trova {{ui:editor.tool.hollow}}.
+- La ricerca riconosce sia il termine inglese sia quello tedesco e non distingue maiuscole e dieresi: «aushoehlen» trova {{ui:editor.tool.hollow}}. La ricerca funziona con qualsiasi scrittura: un nome si trova come è scritto nella lingua dell’interfaccia («円柱» in giapponese). I caratteri a larghezza piena e a metà larghezza, il katakana e l’hiragana e gli accenti contano come uguali.
 - Ogni risultato mostra i tasti che eseguono la stessa operazione e il gruppo della barra degli strumenti in cui si trova, così puoi imparare dove cercarlo.
 - Le voci disattivate non sono disponibili in quel momento, spesso perché non hai selezionato nulla. Restano nell’elenco, così la ricerca ti indica comunque dove si trova lo strumento.
 
@@ -24,7 +24,23 @@ Anche la guida che stai leggendo ha una casella di ricerca in cima a ogni pagina
 - Il nome di una forma la aggiunge al piano di lavoro, proprio come se la scegliessi dal menu delle forme.
 - Se il campo è vuoto, in cima compaiono i comandi usati più di recente.
 - Se cerchi il nome di un corpo del progetto, la ricerca lo trova e lo seleziona: è utile quando il progetto contiene molti pezzi. I corpi compaiono solo dopo che inizi a digitare.
+- Anche una forma personalizzata salvata si trova dal nome, appena digiti, e un clic la inserisce nel progetto come nel pannello delle forme.
 - La ricerca funziona anche in modalità schizzo, con gli strumenti per gli schizzi.
+
+## I tuoi tasti
+
+Ogni comando della ricerca comandi può andare su un tasto tuo: uno strumento che usi di continuo, una forma, {{ui:editor.tool.centerOnWorkplane}} o {{ui:palette.openShapes}}.
+
+1. Apri {{ui:editor.keyboardShortcuts}} e fai clic su {{ui:customKeys.add}} sotto {{ui:customKeys.title}}, in alto nella finestra.
+2. Digita qualche lettera del comando e fai clic su di esso, oppure premi [[Enter]] per il primo.
+3. Premi il tasto che vuoi, da solo o con [[Ctrl]], [[Alt]] o [[Shift]]. Lettere, cifre e i tasti da F1 a F12 possono portare un comando.
+
+Un tasto che l’editor usa già, uno che il browser tiene per sé (come [[Ctrl]]+[[W]]) o uno dei tuoi tasti viene rifiutato, e la finestra dice a cosa serve. Fai clic su un tasto nell’elenco per cambiarlo, sulla X accanto per rimuoverlo, oppure su {{ui:customKeys.removeAll}} per ricominciare.
+
+- Il tasto avvia il comando proprio come la ricerca comandi. Se al momento non può partire, di solito perché non è selezionato nulla, lo dice la barra di stato.
+- I tuoi tasti compaiono accanto ai loro comandi nella ricerca comandi e nell’elenco stampato.
+- Restano in questo browser, come il tema. Un tasto per uno strumento dello schizzo funziona in modalità schizzo, uno per l’editor 3D fuori da essa.
+- Mentre scrivi in un campo, i tuoi tasti si fanno da parte come tutti gli altri.
 
 ## Guida interattiva
 

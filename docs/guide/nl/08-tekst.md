@@ -12,6 +12,7 @@ Kies {{ui:shape.text}} in de vormenbibliotheek en plaats de tekst. Typ rechts in
 - **{{ui:prop.height}}:** Hoe ver de belettering boven het oppervlak uitsteekt.
 - **{{ui:prop.bevel}}:** Rondt de randen van de letters af, zodat ze zachter ogen. Met {{ui:prop.segments}} bepaal je in hoeveel stappen.
 - **{{ui:nameTag.letterEdge}}:** rondt de bovenrand van de letters af of geeft hem een afschuining, zoals op een naambordje: {{ui:nameTag.edge.none}}, {{ui:nameTag.edge.round}} of {{ui:nameTag.edge.chamfer}}, met de {{ui:nameTag.letterEdgeSize}} (eerst 0,4 mm, hoogstens zo hoog als de tekst). Het gaat verder dan {{ui:prop.bevel}}, maar alleen zover de lijnen breed zijn: waar een lijn dunner is dan tweemaal de maat, eindigt de rand in een smallere bovenkant. De onderkant blijft vlak, zodat je losse letters er achteraf op kunt lijmen. Zolang een rand is gekozen, vervangt hij {{ui:prop.bevel}}.
+- **Lengte:** Een tekst kan tot 250 tekens bevatten. De letters houden hun grootte en de regel wordt zo lang als nodig; maak de letters kleiner om hem korter te maken. {{ui:nameTag.letterEdge}} werkt bij een tekst tot 40 tekens, omdat het berekenen bij een langere minuten zou duren.
 - **Grootte:** Lengte en breedte van de regel stel je in zoals bij elke vorm. Sleep aan de grepen of typ de maten in.
 - **{{ui:prop.textStretch}}:** In het begin uit: de letters houden hun verhoudingen en staan in het midden van het kader, dus een kader dat breder of dieper is getrokken dan het woord nodig heeft, blijft groter dan de letters. Zet je het aan, dan worden de letters in beide richtingen over het hele kader uitgerekt: een hoofdletter kun je lager of smaller maken, zoals in Tinkercad. Het geldt voor rechte tekst; gebogen tekst heeft een eigen lettergrootte.
 - **{{ui:prop.textKerning}}:** Schuift letterparen die te veel ruimte tussen zich laten, zoals AY, AV, LT of To, dichter naar elkaar toe, gemeten aan de vormen van de letters, in elk lettertype, ook je eigen. Nieuwe teksten hebben het aan; teksten van vóór deze functie hebben het uit, zodat er in een opgeslagen ontwerp niets verschuift. De letters houden hun grootte en het kader past zich aan. Het werkt bij rechte en gebogen tekst, niet bij verticale tekst, Arabisch, Hebreeuws of Japans.
@@ -75,6 +76,17 @@ Dus:
 - **Gegraveerd:** Zet de tekst op {{ui:inspector.hole}}, laat hem een stukje in het oppervlak steken en groepeer hem met het lichaam. De letters zijn dan gegraveerd.
 
 Voor belettering op een zijvlak zet je eerst het werkvlak op dat vlak, zie [Weergave en werkvlak](chapter:weergave-en-werkvlak).
+
+## Stencils: bruggen voor het midden van letters
+
+Door een plaat gesneden verliezen letters als O, A en B hun midden: het ligt los in de letter en valt eruit. {{ui:stencilBridges.title}} houdt het met kleine bruggen aan de plaat vast, zoals bij een stencil.
+
+1. Zet de tekst op {{ui:inspector.hole}}, laat hem door de plaat gaan en selecteer beide, gegroepeerd of niet.
+2. Klik op {{ui:stencilBridges.title}} in de groep {{ui:editor.section.splitShape}} van het lint, klik met rechts op de selectie of zoek het met [[Ctrl]]+[[K]]. De bruggen verschijnen in oranje waar ze komen.
+3. Stel {{ui:stencilBridges.width}} en {{ui:stencilBridges.count}} in. {{ui:stencilBridges.height}} begint bij de dikte van de plaat; lagere bruggen zitten gelijk met de onderkant, in het midden of gelijk met de bovenkant, zoals {{ui:stencilBridges.position}} zegt. Bij een spuitstencil laten bruggen bovenaan ruimte eronder voor de verf.
+4. {{ui:stencilBridges.apply}} groepeert de bruggen met de plaat.
+
+Elke brug is een gewone balk: open de groep om er een te verplaatsen, te verwijderen of er zelf een toe te voegen. Verander je de tekst later, selecteer dan de groep en klik nogmaals op {{ui:stencilBridges.title}}; nieuwe bruggen nemen de plaats van de oude in. Een tekst die alleen gegraveerd is en niet doorgaat, krijgt geen bruggen, want daar valt niets uit. Voor een laser of plotter voegen de DXF- en SVG-export dezelfde bruggen toe, zie [Bestanden, opslaan en delen](chapter:bestanden-en-opslaan).
 
 ## Contour, silhouet en breder
 

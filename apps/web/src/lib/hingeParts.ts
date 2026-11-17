@@ -4,7 +4,7 @@ import { hingeLocalParts } from "@/lib/hingeGeometry";
 import { meshYawDegrees, mirrorSign } from "@/lib/workplaneShapes";
 
 export type HingeWorldPart = WorkplaneShape & {
-  /** The knuckle of the cone hinge's B the part belongs to, as in `hingeLocalParts`. */
+  /** The knuckle of the cone or snap hinge's B the part belongs to, as in `hingeLocalParts`. */
   knuckle?: number;
 };
 

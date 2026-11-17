@@ -169,7 +169,9 @@ if ($portState -eq "layerling") {
         Write-Step "Installing dependencies (npm install)..."
         # --no-save: install exactly what package-lock.json lists without rewriting it, so
         # a different npm version leaves no "local change" that would block the next update.
-        npm install --no-save
+        # npm.cmd, not npm: plain "npm" makes PowerShell pick Node.js's npm.ps1, which Windows
+        # refuses to run while scripts are disabled (the default on Windows 10 and 11).
+        npm.cmd install --no-save
         if ($LASTEXITCODE -ne 0) { throw "npm install failed (exit code $LASTEXITCODE)." }
 
         Write-Step "Creating a desktop shortcut to start layerling next time..."
@@ -201,7 +203,7 @@ call "$InstallPath\scripts\start-layerling.cmd"
                     }
                 }
             } | Out-Null
-            npm run dev -- -p 3000
+            npm.cmd run dev -- -p 3000
         }
     } finally {
         Pop-Location

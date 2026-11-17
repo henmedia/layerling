@@ -7,6 +7,7 @@ import {
   placementWorkplaneFingerprint,
   placementWorkplaneFromSurface,
   placementWorkplaneLiesOnBase,
+  placementWorkplanePlateShift,
   placementWorkplanePoint,
   snapPlacementWorkplaneOrigin,
   translationToWorkplane,
@@ -190,5 +191,21 @@ describe("placement workplanes", () => {
         expect(JSON.stringify(once)).toBe(JSON.stringify(plane));
       }
     }
+  });
+});
+
+describe("placementWorkplanePlateShift", () => {
+  it("reads how far a plate's own plane was moved sideways onto another build plate (#1660)", () => {
+    const base = horizontalPlacementWorkplane();
+    expect(placementWorkplanePlateShift(base)).toBe(0);
+    expect(placementWorkplanePlateShift({ ...base, origin: { x: 260, y: 0, z: 0 } })).toBe(260);
+  });
+
+  it("takes no other workplane for the plate", () => {
+    const base = horizontalPlacementWorkplane();
+    expect(placementWorkplanePlateShift(horizontalPlacementWorkplane(5))).toBeNull();
+    expect(placementWorkplanePlateShift({ ...base, origin: { x: 260, y: 0, z: 10 } })).toBeNull();
+    expect(placementWorkplanePlateShift({ ...base, xAxis: { x: 0, y: 0, z: -1 }, zAxis: { x: 1, y: 0, z: 0 } })).toBeNull();
+    expect(placementWorkplanePlateShift({ ...base, normal: { x: 0, y: 0, z: 1 } })).toBeNull();
   });
 });

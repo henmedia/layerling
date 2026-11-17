@@ -239,6 +239,20 @@ describe("geometry worker on the page's side", () => {
     expect(page.calls).toBe(0);
   });
 
+  it("stops a STEP import the kernel is stuck on and says the file may be damaged (#286)", async () => {
+    vi.useFakeTimers();
+    const { importedShapesFromStepOffThread, GEOMETRY_WORKER_TIMEOUT_MS } = await load();
+    const result = importedShapesFromStepOffThread("model.step", new ArrayBuffer(8));
+    const failed = result.then(() => null, (error: Error) => error.message);
+    FakeWorker.instances[0].hello();
+    await vi.advanceTimersByTimeAsync(GEOMETRY_WORKER_TIMEOUT_MS);
+    const message = await failed;
+    expect(message).toMatch(/STEP/);
+    expect(message).toMatch(/3 minutes/);
+    expect(message).not.toMatch(/fewer or simpler objects/);
+    expect(FakeWorker.instances[0].terminated).toBe(true);
+  });
+
   it("calls off a request: no answer, and the worker stops working on it", async () => {
     const { buildGroupedShapeOffThread, subscribeGeometryBusy } = await load();
     const busy: boolean[] = [];

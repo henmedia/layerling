@@ -39,6 +39,16 @@ function volumeOf(shape: WorkplaneShape) {
   return Math.abs(closedMeshVolume(vertices, faces));
 }
 
+/** The volume of a closed mesh by the divergence theorem, every triangle on its own. */
+function signedVolumeOf(shape: WorkplaneShape) {
+  const p = shape.importedMesh!.positions;
+  let volume = 0;
+  for (let i = 0; i + 8 < p.length; i += 9) {
+    volume += (p[i] * (p[i + 4] * p[i + 8] - p[i + 5] * p[i + 7]) - p[i + 1] * (p[i + 3] * p[i + 8] - p[i + 5] * p[i + 6]) + p[i + 2] * (p[i + 3] * p[i + 7] - p[i + 4] * p[i + 6])) / 6;
+  }
+  return Math.abs(volume);
+}
+
 describe("Hull (#863)", () => {
   it("wraps two boxes with a gap into one box that spans both, and keeps them as its parts", async () => {
     const { group } = await buildHullShapeFromSelection([box("a", -15), box("b", 15)], 200_000);
@@ -82,6 +92,24 @@ describe("Hull (#863)", () => {
     const cut = await buildGroupedShapeFromSelection([plate, { ...group!, groupOperation: "hull" as const }], 200_000);
     expect(cut.group).not.toBeNull();
     expect(volumeOf(cut.group!)).toBeCloseTo(50 * 30 * 10 - (20 * 10 + Math.PI * 25) * 10, -1);
+  });
+
+  it("keeps the holes of its parts open when told to (Discussion #1440)", async () => {
+    const cylinder = (id: string, x: number, overrides: Partial<WorkplaneShape> = {}): WorkplaneShape => ({ ...box(id, x), kind: "cylinder", sides: 64, width: 20, depth: 20, size: 20, ...overrides });
+    // A tube made as a part grouped with its hole, and a plain cylinder beside it.
+    const tube = await buildGroupedShapeFromSelection([cylinder("t", -15), cylinder("b", -15, { hole: true, width: 14, depth: 14, size: 14, height: 30, elevation: -10 })], 200_000);
+    expect(tube.group).not.toBeNull();
+    const parts = [tube.group!, cylinder("c", 15)];
+    const filled = await buildHullShapeFromSelection(parts, 200_000);
+    const kept = await buildHullShapeFromSelection(parts, 200_000, { keepHoles: true });
+    expect(filled.group!.hullKeepHoles).toBeUndefined();
+    expect(kept.group!.hullKeepHoles).toBe(true);
+    // The bore of the tube is open again: 14 mm across, 10 high, through the whole hull. (A body with a hole through it
+    // is measured by the plain signed sum: closedMeshVolume takes its unwelded triangles apart.)
+    const bore = 64 / 2 * 7 * 7 * Math.sin((2 * Math.PI) / 64) * 10;
+    expect(signedVolumeOf(filled.group!) - signedVolumeOf(kept.group!)).toBeCloseTo(bore, 0);
+    // The outside stays the hull's.
+    expect(kept.group!.width).toBeCloseTo(filled.group!.width, 3);
   });
 
   it("stays one body in one colour inside another group with a hole", async () => {

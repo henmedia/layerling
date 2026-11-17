@@ -67,7 +67,7 @@ export const DXF_SKETCH_HEIGHT = 4;
 /** The colour of an imported DXF body, as that of an SVG. */
 export const DXF_SKETCH_COLOR = "#0098c7";
 
-/** As many pieces as an SVG may bring as a sketch (MAX_SVG_SKETCH_SEGMENTS). */
+/** As many pieces as a DXF may bring as a sketch. */
 export const MAX_DXF_SKETCH_SEGMENTS = 2500;
 /** Ends closer than this, in mm, are taken for one point when the pieces are joined. */
 export const DXF_JOIN_TOLERANCE = 0.01;

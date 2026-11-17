@@ -2,7 +2,8 @@
 
 import { OcctKernel, type OcctModuleFactory, type ShapeHandle } from "occt-wasm";
 import { CAD_MODIFIER_RUNTIME_BASE } from "@/lib/cadModifierRuntime";
-import { sketchCadDeflection } from "@/lib/sketchCadDeflection";
+import { announceKernel } from "@/lib/cadKernelGate";
+import { sketchCadDeflection, sketchRevolveCadDeflection } from "@/lib/sketchCadDeflection";
 import { cadSketchRegions } from "@/lib/sketchCadProfile";
 import { buildRevolvedSketchSolid } from "@/lib/cadSketchRevolve";
 import { buildStrokedSketchSolid, chamferTopEdges } from "@/lib/cadSketchStroke";
@@ -12,6 +13,8 @@ import { buildInsetSketchSolid } from "@/lib/cadSketchInset";
 import { pathWire } from "@/lib/sketchCadWire";
 import { buildMessage } from "@/lib/buildStamp";
 import { meshTreatedBody } from "@/lib/cadMeshAccuracy";
+import { tessellateWithRuledStrips } from "@/lib/cadRuledStrips";
+import { closeFlatMeshGaps } from "@/lib/meshHoleFill";
 import { SKETCH_EDGE_FAILED, SKETCH_INSET_UNSUPPORTED, SKETCH_STROKE_UNSUPPORTED, type SketchCadBuildRequest, type SketchCadBuildResponse } from "@/lib/sketchCadTypes";
 
 /** Past this many edges in a sketch's outlines the kernel's validity check is skipped (it takes seconds to minutes there). */
@@ -25,7 +28,8 @@ function kernel() {
   // fetching the 22 MB wasm) can be retried on the next call instead of
   // poisoning sketch-to-3D for the rest of the session - same fix as
   // brepKernel.ts's loadBrepWithOcct.
-  kernelPromise ??= import(/* webpackIgnore: true */ moduleUrl)
+  // The page starts the clock for its requests only once this says the kernel is loaded (#1612).
+  kernelPromise ??= announceKernel(import(/* webpackIgnore: true */ moduleUrl)
     .then((imported: { default: OcctModuleFactory }) => OcctKernel.init({
       createModule: imported.default,
       wasm: `${CAD_MODIFIER_RUNTIME_BASE}/occt-wasm.wasm`,
@@ -33,7 +37,7 @@ function kernel() {
     .catch((error) => {
       kernelPromise = null;
       throw error;
-    });
+    }), (message) => self.postMessage(message));
   return kernelPromise;
 }
 
@@ -94,8 +98,10 @@ self.onmessage = async (event: MessageEvent<SketchCadBuildRequest>) => {
       if (!chamfered) throw new Error(SKETCH_EDGE_FAILED);
       result = chamfered;
     }
-    const deflection = sketchCadDeflection(request.profile);
-    const mesh = cad.tessellate(result, { linearDeflection: deflection.linear, angularDeflection: deflection.angular });
+    const deflection = request.revolve ? sketchRevolveCadDeflection(request.profile, request.revolve.smoothness) : sketchCadDeflection(request.profile);
+    // The side of an extruded curve in straight strips, not the kernel's leaning triangles (#1696), and a flat face
+    // the kernel left without triangles capped from its rim (#1711).
+    const mesh = closeFlatMeshGaps(tessellateWithRuledStrips(cad, result, { linearDeflection: deflection.linear, angularDeflection: deflection.angular }));
     const positions = new Float32Array(mesh.positions);
     const normals = new Float32Array(mesh.normals);
     const indices = new Uint32Array(mesh.indices);

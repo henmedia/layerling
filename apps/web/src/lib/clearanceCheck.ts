@@ -6,6 +6,7 @@ import { getManifoldRuntime } from "@/lib/editorMeshCore";
 import { t } from "@/lib/i18n";
 import type { ManifoldSolid } from "@/lib/manifoldSplit";
 import { printerPlayStart } from "@/lib/printerPlay";
+import { supportRibHolds } from "@/lib/supportRibMark";
 import { isNonSolidShape } from "@/lib/workplaneShapes";
 import type { WorkplaneShape } from "@/types/layerling";
 
@@ -277,9 +278,13 @@ export async function checkClearance(source: readonly WorkplaneShape[], given: P
     }
     const result: ClearanceResult = { ...empty, parts: parts.map(({ solid: _solid, geometry: _geometry, ...part }) => part), tooFew: parts.length < 2 };
     const identity = new THREE.Matrix4();
+    const shapeOf = new Map(shapes.map((shape) => [shape.id, shape]));
     for (let i = 0; i < parts.length; i += 1) {
       for (let j = i + 1; j < parts.length; j += 1) {
         const a = parts[i], b = parts[j];
+        // A support rib and the part it holds (Discussion #1385): its bridges reach into the part on purpose.
+        const shapeA = shapeOf.get(a.id), shapeB = shapeOf.get(b.id);
+        if (shapeA && shapeB && supportRibHolds(shapeA, shapeB)) continue;
         if (!clearanceBoxesNear(a.box, b.box, options.searchLength)) {
           result.clearCount += 1;
           continue;

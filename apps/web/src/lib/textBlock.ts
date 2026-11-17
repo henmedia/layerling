@@ -2,6 +2,7 @@ import * as THREE from "three";
 import { quaternionForShape } from "@/lib/geometryRotation";
 import { createLocalId } from "@/lib/localIds";
 import { textLetterSize, textLetterSizePatch } from "@/lib/nameTag";
+import { MAX_TEXT_LENGTH } from "@/lib/textLength";
 import { canonicalizeShape, shapeDepth, shapeWidth } from "@/lib/workplaneShapes";
 import type { WorkplaneShape } from "@/types/layerling";
 
@@ -15,7 +16,7 @@ export const TEXT_BLOCK_ALIGNS: readonly TextBlockAlign[] = ["left", "center", "
 
 /** At most this many lines, and as many letters per line as a text holds. */
 export const MAX_TEXT_BLOCK_LINES = 20;
-const MAX_LINE_LENGTH = 24;
+const MAX_LINE_LENGTH = MAX_TEXT_LENGTH;
 /** The room between two lines, in mm, and how much each line may shrink or grow against the one above, in per cent. */
 export const DEFAULT_TEXT_BLOCK_GAP = 2;
 export const MAX_TEXT_BLOCK_GAP = 100;

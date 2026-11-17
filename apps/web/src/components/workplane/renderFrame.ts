@@ -367,10 +367,80 @@ function splitSeeThroughAtPlate(state: FrameState, plate: THREE.Object3D) {
   };
 }
 
+// The light-blue marks on the face a tool waits for: lay flat, align faces and the hole pattern
+// (viewportTransformOverlays.ts), delete faces and the faces of a texture (viewportShapeObjects.ts).
+const FACE_MARK_LAYERS = ["LayFlatHover", "CadFacePick"];
+const PLATE_NAMES = new Set(["WorkplaneBase", "WorkplaneBaseReference"]);
+const markBox = new THREE.Box3();
+const markPart = new THREE.Box3();
+const markCorner = new THREE.Vector3();
+const markPlaneNormal = new THREE.Vector3();
+const markPlaneCenter = new THREE.Vector3();
+const markToCamera = new THREE.Vector3();
+// A face lying on the plate - the floor of a body standing on it - is not behind it.
+const MARK_BEHIND_TOLERANCE = 1e-3;
+
+/**
+ * The face marks are see-through and drawn after the plates, which write depth. A face behind a plate from
+ * the camera - the underside of a part lifted off the plate, picked from below - failed that depth test, and
+ * its mark never showed while the pointer moved over it (#1492). For this frame the plates between the camera
+ * and a mark write no depth, so the mark is drawn over the plate at full strength; a solid body standing in
+ * front of the face still hides it. Returns what to undo after the frame, or null when nothing changed.
+ */
+export function showFaceMarksThroughPlates(scene: THREE.Object3D, camera: THREE.Camera) {
+  markBox.makeEmpty();
+  FACE_MARK_LAYERS.forEach((name) => {
+    const layer = scene.getObjectByName(name);
+    if (!layer?.visible) return;
+    layer.traverseVisible((child) => {
+      const mesh = child as THREE.Mesh;
+      if (!mesh.isMesh || !mesh.geometry) return;
+      if (!mesh.geometry.boundingBox) mesh.geometry.computeBoundingBox();
+      const box = mesh.geometry.boundingBox;
+      if (!box || box.isEmpty()) return;
+      mesh.updateWorldMatrix(true, false);
+      markBox.union(markPart.copy(box).applyMatrix4(mesh.matrixWorld));
+    });
+  });
+  if (markBox.isEmpty()) return null;
+
+  const opened: THREE.Material[] = [];
+  scene.traverse((object) => {
+    if (!PLATE_NAMES.has(object.name) || !object.visible) return;
+    const material = (object as THREE.Mesh).material;
+    if (!material || Array.isArray(material) || !material.depthWrite) return;
+    object.updateWorldMatrix(true, false);
+    markPlaneNormal.set(0, 0, 1).transformDirection(object.matrixWorld);
+    object.getWorldPosition(markPlaneCenter);
+    const cameraSide = markToCamera.copy(camera.position).sub(markPlaneCenter).dot(markPlaneNormal) >= 0 ? 1 : -1;
+    // Behind the plate when any corner of the marks lies on the other side of it from the camera.
+    let behind = false;
+    for (let corner = 0; corner < 8 && !behind; corner += 1) {
+      markCorner.set(
+        corner & 1 ? markBox.max.x : markBox.min.x,
+        corner & 2 ? markBox.max.y : markBox.min.y,
+        corner & 4 ? markBox.max.z : markBox.min.z,
+      );
+      behind = markCorner.sub(markPlaneCenter).dot(markPlaneNormal) * cameraSide < -MARK_BEHIND_TOLERANCE;
+    }
+    if (!behind) return;
+    material.depthWrite = false;
+    opened.push(material);
+  });
+  if (opened.length === 0) return null;
+  return () => {
+    opened.forEach((material) => {
+      material.depthWrite = true;
+    });
+  };
+}
+
 export function renderFrame(state: FrameState) {
   const plate = orderPlatesForView(state.scene, state.camera);
   const undoSplit = plate ? splitSeeThroughAtPlate(state, plate) : null;
+  const undoMarks = showFaceMarksThroughPlates(state.scene, state.camera);
   state.renderer.render(state.scene, state.camera);
+  undoMarks?.();
   undoSplit?.();
   drawCutPreviews(state);
 }

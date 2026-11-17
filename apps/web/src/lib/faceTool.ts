@@ -31,8 +31,17 @@ export const FACE_TOOL_MAX_INSET = 50;
 export const FACE_TOOL_MAX_RADIUS = 30;
 export const FACE_TOOL_MIN_DEPTH = 0.2;
 export const FACE_TOOL_MAX_DEPTH = 100;
-/** How far the new body reaches into the old one, or the pocket out of the face, so the two join without a skin. */
+/** How far a pocket reaches out of the face, so the cut leaves no skin over it. */
 export const FACE_TOOL_OVERLAP = 0.2;
+
+/**
+ * How far the new body reaches past the face: a pocket a little out of it, a body going out not at
+ * all. A body that reached into the old one stood out of its side walls wherever they lean in over
+ * the face, a flat rim around it (#1577); the union joins bodies that only touch.
+ */
+export function faceToolOverlap(direction: FaceToolDirection) {
+  return direction === "in" ? FACE_TOOL_OVERLAP : 0;
+}
 
 function clamp(value: number, min: number, max: number) {
   return Math.min(max, Math.max(min, value));
@@ -97,19 +106,18 @@ export function faceToolSettingsOn(face: { thickness: number }, settings: FaceTo
   return { ...settings, depth: Math.max(FACE_TOOL_MIN_DEPTH, face.thickness) };
 }
 
-/** The height of the body the tool builds: the depth plus the overlap that joins it to the face. */
-export function faceToolHeight(settings: Pick<FaceToolSettings, "depth">) {
-  return settings.depth + FACE_TOOL_OVERLAP;
+/** The height of the body the tool builds: the depth, for a pocket plus the overlap out of the face. */
+export function faceToolHeight(settings: Pick<FaceToolSettings, "direction" | "depth">) {
+  return settings.depth + faceToolOverlap(settings.direction);
 }
 
 /**
- * The workplane the new body stands on: the face's own, moved along its normal so that a body
- * going out starts a little inside the old one, and a pocket going in starts at its bottom and
- * reaches a little out of the face.
+ * The workplane the new body stands on: the face's own for a body going out, and for a pocket
+ * going in moved along the normal to its bottom, so that it reaches a little out of the face.
  */
 export function faceToolWorkplane(face: Pick<PerforableFace, "workplane">, settings: Pick<FaceToolSettings, "direction" | "depth">): PlacementWorkplane {
   const { origin, normal } = face.workplane;
-  const shift = settings.direction === "out" ? -FACE_TOOL_OVERLAP : -settings.depth;
+  const shift = settings.direction === "out" ? 0 : -settings.depth;
   return {
     ...face.workplane,
     origin: { x: origin.x + normal.x * shift, y: origin.y + normal.y * shift, z: origin.z + normal.z * shift },

@@ -1,15 +1,18 @@
 "use client";
 
 import { GuideHelpLink } from "@/components/GuideHelpLink";
+import { RibbonButtonsSetting } from "@/components/workplane/RibbonButtonsSetting";
 import type { GuideSection } from "@/lib/guideLinks";
 import { MAX_OVERHANG_ANGLE, MIN_OVERHANG_ANGLE } from "@/lib/overhangLimits";
-import { Box as BoxIcon, ChevronDown, Grid3X3, History, Palette, Plus, RotateCcw, Ruler, Trash2, X } from "lucide-react";
+import { ArchiveRestore, Box as BoxIcon, ChevronDown, Download, Grid3X3, History, MousePointer2, Palette, PanelTop, Plus, RotateCcw, Ruler, Trash2, X } from "lucide-react";
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { useMovablePanel } from "@/lib/useMovablePanel";
 import { SpaceMouseSetting } from "@/components/workplane/SpaceMouseSetting";
 import { printerPlayShapeStart } from "@/lib/printerPlay";
-import { usePrinterPlay } from "@/lib/usePrinterPlay";
+import { usePrinterPlayFor } from "@/lib/usePrinterPlay";
 import { PrinterPlaySetting } from "@/components/workplane/PrinterPlaySetting";
+import { SettingsFileButtons } from "@/components/workplane/SettingsFileButtons";
+import { FileBackupSettingsSection } from "@/components/workplane/FileBackupSettingsSection";
 import { createPortal } from "react-dom";
 import { HexColorInput, HexColorPicker } from "react-colorful";
 import { APP_THEME_OPTIONS, type AppThemePreference } from "@/lib/appTheme";
@@ -18,7 +21,7 @@ import { useToolbarSize } from "@/lib/useToolbarSize";
 import { useSimpleMode } from "@/lib/useSimpleMode";
 import { useShapeColors } from "@/lib/useShapeColors";
 import { setShapeColors } from "@/lib/shapeColors";
-import { isSimpleModeFixedByServer, setSimpleMode } from "@/lib/simpleMode";
+import { isSimpleModeFixed, setSimpleMode } from "@/lib/simpleMode";
 import { useViewCubePosition } from "@/lib/useViewCubePosition";
 import { setViewCubePosition, VIEW_CUBE_POSITION_OPTIONS, type ViewCubePosition } from "@/lib/viewCubePosition";
 import { gearCenterHoleLimits, gearToothPitch, gearTypeHasHelix, MAX_GEAR_TEETH, MIN_GEAR_TEETH } from "@/lib/gearGeometry";
@@ -93,24 +96,29 @@ import { useLanguage } from "@/lib/useLanguage";
 import { readStartWithCornerRuler, writeStartWithCornerRuler } from "@/lib/cornerRulerStore";
 import { measurementOptionLabel, normalizeScaleForUnits, parseMeasurementInput, scaleOptionsForUnits, WORKSPACE_UNIT_OPTIONS } from "@/lib/measurementUnits";
 import { shapeAssetDefaultDimensions, shapeAssetLabel, shapeAssetSpecialDefaults, toolbarShapeAssets } from "@/lib/shapeCatalog";
-import { BOOLEAN_TRIANGLE_LIMIT_PRESETS, BOOLEAN_TRIANGLE_LIMIT_STEP, DEFAULT_WORKPLANE_WORKSPACE, ZOOM_SPEED_SLIDER_MAX, MAX_BOOLEAN_TRIANGLE_LIMIT, MAX_CUSTOM_SHAPE_DIMENSION, MAX_HIGH_RESOLUTION_SIDES, MAX_HIGH_RESOLUTION_STEPS, MIN_BOOLEAN_TRIANGLE_LIMIT, MIN_CUSTOM_SHAPE_DIMENSION, booleanTriangleLimitPreset, workspaceForUnits, snapGridForUnits, type BooleanTriangleLimitPreset, DEFAULT_SNAP_GRID, MAX_CUSTOM_SNAP_GRID, MAX_CUSTOM_SNAP_GRID_NAME, MAX_CUSTOM_SNAP_GRIDS, MIN_CUSTOM_SNAP_GRID, customSnapGridDivisors, customSnapGridLabel, customSnapGridSize, parseCustomSnapGrid, readWorkspaceDefault, resetGridInSavedDefault, snapGridOptions, standardGridSettings, workspaceWithSavedDefault } from "@/lib/workplaneSettings";
+import { BOOLEAN_TRIANGLE_LIMIT_PRESETS, BOOLEAN_TRIANGLE_LIMIT_STEP, DEFAULT_WORKPLANE_WORKSPACE, HOLE_OPACITY_MAX, HOLE_OPACITY_MIN, effectiveHoleOpacity, ZOOM_SPEED_SLIDER_MAX, PAN_SPEED_SLIDER_MAX, MAX_BOOLEAN_TRIANGLE_LIMIT, MAX_CUSTOM_SHAPE_DIMENSION, MAX_HIGH_RESOLUTION_SIDES, MAX_HIGH_RESOLUTION_STEPS, MIN_BOOLEAN_TRIANGLE_LIMIT, MIN_CUSTOM_SHAPE_DIMENSION, booleanTriangleLimitPreset, workspaceForUnits, snapGridForUnits, type BooleanTriangleLimitPreset, DEFAULT_SNAP_GRID, MAX_CUSTOM_SNAP_GRID, MAX_CUSTOM_SNAP_GRID_NAME, MAX_CUSTOM_SNAP_GRIDS, MIN_CUSTOM_SNAP_GRID, customSnapGridDivisors, customSnapGridLabel, customSnapGridSize, parseCustomSnapGrid, readWorkspaceDefault, resetGridInSavedDefault, snapGridOptions, standardGridSettings, workspaceWithSavedDefault } from "@/lib/workplaneSettings";
 import { DEFAULT_SKETCH_BACKGROUND, DEFAULT_SKETCH_GRID_COLOR, DEFAULT_SKETCH_PLATE_COLOR, IMPERIAL_GRID_BLOCK_PRESETS, inchGridPresetMm, workplaneGridPalette } from "@/lib/workplaneGrid";
 import type { BentTubeProfile, CustomSnapGrid, GearProfile, GearType, GridSize, ShapeCustomization, ShapeKind, ThreadHand, ThreadHead, ThreadProfile, ThreadRole, WorkplaneWorkspaceSettings } from "@/types/layerling";
 import { DEFAULT_LOFT } from "@/lib/loftGeometry";
 import { DEFAULT_GRIDFINITY_TRAY_SIZE, normalizeGridfinityType } from "@/lib/gridfinityGeometry";
 import { selectWholeValue } from "@/lib/numberField";
 import { DEFAULT_PULLEY_BELT_WIDTH, DEFAULT_PULLEY_BORE, DEFAULT_PULLEY_FLANGE, DEFAULT_PULLEY_FLANGE_RISE, DEFAULT_PULLEY_HUB_DIAMETER, DEFAULT_PULLEY_HUB_HEIGHT, DEFAULT_PULLEY_TEETH, MAX_PULLEY_BELT_WIDTH, MAX_PULLEY_FLANGE, MAX_PULLEY_FLANGE_RISE, MAX_PULLEY_HUB_HEIGHT, MAX_PULLEY_TEETH, MIN_PULLEY_BELT_WIDTH, MIN_PULLEY_FLANGE_RISE, MIN_PULLEY_TEETH } from "@/lib/pulleyGeometry";
+import { MAX_TEXT_LENGTH } from "@/lib/textLength";
 import { DEFAULT_HIRTH_BORE, DEFAULT_HIRTH_TEETH, MAX_HIRTH_TEETH, MIN_HIRTH_TEETH, MIN_HIRTH_TOOTH_HEIGHT, hirthBoreLimit, hirthToothHeightLimit } from "@/lib/hirthGeometry";
 
 type WorkspaceSettings = WorkplaneWorkspaceSettings;
-type WorkspaceSettingsSection = "appearance" | "measurement" | "workplane" | "shapes" | "history";
+type WorkspaceSettingsSection = "appearance" | "controls" | "output" | "ribbon" | "measurement" | "workplane" | "shapes" | "history" | "backups";
 // The question mark of each tab opens that tab's own part of the guide.
 const SETTINGS_HELP_SECTION: Record<WorkspaceSettingsSection, GuideSection> = {
   appearance: "settingsAppearance",
+  controls: "settingsView",
+  output: "exporting",
+  ribbon: "ribbonButtons",
   measurement: "settingsMeasurement",
   workplane: "settingsWorkplane",
   shapes: "shapeSettings",
   history: "backingUp",
+  backups: "fileBackups",
 };
 
 const MIN_WORKSPACE_SIZE = 60;
@@ -283,12 +291,12 @@ function specialFieldsForShape(
   if (kind === "tube" || kind === "ring") {
     return [
       { type: "number", key: "sides", label: t("prop.sides"), defaultValue: defaults.sides ?? automaticSideCount(dimensions.width, dimensions.depth), min: 3, max: MAX_HIGH_RESOLUTION_SIDES, step: 1 },
-      { type: "number", key: "bevel", label: t("prop.thickness"), defaultValue: defaults.bevel ?? 4, min: 0.5, max: 20, unit: "mm" },
+      { type: "number", key: "bevel", label: t("prop.bentTubeWall"), defaultValue: defaults.bevel ?? 4, min: 0.5, max: 20, unit: "mm" },
     ];
   }
   if (kind === "text") {
     return [
-      { type: "text", key: "text", label: t("prop.text"), defaultValue: defaults.text ?? "TEXT", maxLength: 24 },
+      { type: "text", key: "text", label: t("prop.text"), defaultValue: defaults.text ?? "TEXT", maxLength: MAX_TEXT_LENGTH },
       { type: "select", key: "font", label: t("prop.font"), defaultValue: defaults.font ?? "Multilanguage", options: TEXT_FONT_OPTIONS.map((value) => ({ value, label: value })) },
       { type: "number", key: "bevel", label: t("prop.bevel"), defaultValue: defaults.bevel ?? 0, min: 0, max: 8, unit: "mm" },
       { type: "number", key: "segments", label: t("prop.segments"), defaultValue: defaults.segments ?? 0, min: 0, max: 24, step: 1 },
@@ -494,9 +502,9 @@ function specialFieldsForShape(
     return [
       { type: "select", key: "bentTubeProfile", label: t("prop.bentTubeProfile"), defaultValue: defaults.bentTubeProfile ?? DEFAULT_BENT_TUBE_PROFILE, options: profileOptions },
       { type: "select", key: "bentTubeInnerProfile", label: t("prop.bentTubeInnerProfile"), defaultValue: defaults.bentTubeInnerProfile ?? DEFAULT_BENT_TUBE_INNER_PROFILE, options: [{ value: "none", label: t("bentTube.innerNone") }, ...profileOptions] },
+      { type: "number", key: "bentTubeQuality", label: t("prop.quality"), defaultValue: defaults.bentTubeQuality ?? DEFAULT_BENT_TUBE_QUALITY, min: MIN_BENT_TUBE_QUALITY, max: MAX_BENT_TUBE_QUALITY, step: 4 },
       { type: "number", key: "bentTubeSize", label: t("prop.bentTubeSize"), defaultValue: defaults.bentTubeSize ?? DEFAULT_BENT_TUBE_SIZE, min: MIN_BENT_TUBE_SIZE, max: 100, step: 0.5, unit: "mm" },
       { type: "number", key: "bentTubeWall", label: t("prop.bentTubeWall"), defaultValue: defaults.bentTubeWall ?? DEFAULT_BENT_TUBE_WALL, min: MIN_BENT_TUBE_WALL, max: 20, step: 0.1, unit: "mm" },
-      { type: "number", key: "bentTubeQuality", label: t("prop.quality"), defaultValue: defaults.bentTubeQuality ?? DEFAULT_BENT_TUBE_QUALITY, min: MIN_BENT_TUBE_QUALITY, max: MAX_BENT_TUBE_QUALITY, step: 4 },
     ];
   }
   if (kind === "roundedBox") {
@@ -554,7 +562,8 @@ export function WorkspaceSettingsModal({
   // A default saved earlier or just now: what "Use my default" puts on this design (#754).
   const savedDefault = useMemo(() => readWorkspaceDefault(), [defaultSaved]);
   useLanguage();
-  const printerPlay = usePrinterPlay();
+  // The play of the printer chosen here (Discussion #1406), as a new shape for it starts from.
+  const { play: printerPlay } = usePrinterPlayFor(workspace.printer ?? "");
   const [activeSection, setActiveSection] = useState<WorkspaceSettingsSection>("appearance");
   // A setting of this browser, not of the design: read when the window opens (#1386).
   const [startWithCornerRuler, setStartWithCornerRuler] = useState(readStartWithCornerRuler);
@@ -796,6 +805,18 @@ export function WorkspaceSettingsModal({
               <Palette size={18} />
               <span>{t("workspace.appearance")}</span>
             </button>
+            <button className={activeSection === "controls" ? "active" : ""} aria-current={activeSection === "controls" ? "page" : undefined} onClick={() => setActiveSection("controls")}>
+              <MousePointer2 size={18} />
+              <span>{t("workspace.controls")}</span>
+            </button>
+            <button className={activeSection === "output" ? "active" : ""} aria-current={activeSection === "output" ? "page" : undefined} onClick={() => setActiveSection("output")}>
+              <Download size={18} />
+              <span>{t("workspace.output")}</span>
+            </button>
+            <button className={activeSection === "ribbon" ? "active" : ""} data-help={t("workspace.ribbon")} aria-current={activeSection === "ribbon" ? "page" : undefined} onClick={() => setActiveSection("ribbon")}>
+              <PanelTop size={18} />
+              <span>{t("workspace.ribbon")}</span>
+            </button>
             <button className={activeSection === "measurement" ? "active" : ""} aria-current={activeSection === "measurement" ? "page" : undefined} onClick={() => setActiveSection("measurement")}>
               <Ruler size={18} />
               <span>{t("workspace.measurement")}</span>
@@ -811,6 +832,10 @@ export function WorkspaceSettingsModal({
             <button className={activeSection === "history" ? "active" : ""} data-help={t("workspace.savedHistory")} aria-current={activeSection === "history" ? "page" : undefined} onClick={() => setActiveSection("history")}>
               <History size={18} />
               <span>{t("workspace.history")}</span>
+            </button>
+            <button className={activeSection === "backups" ? "active" : ""} data-help={t("backups.settingsTitle")} aria-current={activeSection === "backups" ? "page" : undefined} onClick={() => setActiveSection("backups")}>
+              <ArchiveRestore size={18} />
+              <span>{t("backups.settingsTitle")}</span>
             </button>
           </nav>
 
@@ -838,19 +863,6 @@ export function WorkspaceSettingsModal({
                       {APP_THEME_OPTIONS.map((option) => (
                         <option key={option.value} value={option.value}>
                           {t(THEME_LABEL_KEYS[option.value])}
-                        </option>
-                      ))}
-                    </select>
-                  </label>
-                  <label className="workspace-select" data-help={t("workspace.toolbarSize")}>
-                    <span>{t("workspace.toolbarSize")}</span>
-                    <select
-                      value={toolbarSize}
-                      onChange={(event) => setToolbarSize(event.currentTarget.value as ToolbarSize)}
-                    >
-                      {TOOLBAR_SIZE_OPTIONS.map((size) => (
-                        <option key={size} value={size}>
-                          {t(TOOLBAR_SIZE_LABEL_KEYS[size])}
                         </option>
                       ))}
                     </select>
@@ -915,6 +927,24 @@ export function WorkspaceSettingsModal({
                     checked={workspace.strongHoles}
                     onChange={(strongHoles) => patchWorkspace({ strongHoles })}
                   />
+                  <label className="workspace-range" data-help={t("workspace.holeOpacityHint")}>
+                    <span>
+                      {t("workspace.holeOpacity")}: {effectiveHoleOpacity(workspace)} %
+                      {workspace.holeOpacity ? "" : ` (${t("workspace.holeOpacityAuto")})`}
+                    </span>
+                    <input
+                      type="range"
+                      min={HOLE_OPACITY_MIN}
+                      max={HOLE_OPACITY_MAX}
+                      value={effectiveHoleOpacity(workspace)}
+                      onChange={(event) => patchWorkspace({ holeOpacity: Number(event.currentTarget.value) })}
+                      onDoubleClick={() => patchWorkspace({ holeOpacity: DEFAULT_WORKPLANE_WORKSPACE.holeOpacity })}
+                    />
+                    <small>
+                      <span>{t("workspace.holeOpacityClear")}</span>
+                      <span>{t("workspace.holeOpacitySolid")}</span>
+                    </small>
+                  </label>
                   <ColorSettingControl
                     label={t("workspace.sketchBackground")}
                     color={sketchBackground}
@@ -974,6 +1004,12 @@ export function WorkspaceSettingsModal({
                     onChange={(showRotationAngles) => patchWorkspace({ showRotationAngles })}
                   />
                   <WorkspaceToggle
+                    label={t("workspace.showSlideArrows")}
+                    description={t("workspace.showSlideArrowsHint")}
+                    checked={workspace.showSlideArrows}
+                    onChange={(showSlideArrows) => patchWorkspace({ showSlideArrows })}
+                  />
+                  <WorkspaceToggle
                     label={t("workspace.startInPerspective")}
                     checked={startInPerspective}
                     onChange={onStartInPerspectiveChange}
@@ -982,6 +1018,18 @@ export function WorkspaceSettingsModal({
                     label={t("workspace.startWithScrollbars")}
                     checked={workspace.startWithScrollbars}
                     onChange={(startWithScrollbars) => patchWorkspace({ startWithScrollbars })}
+                  />
+                  <WorkspaceToggle
+                    label={t("workspace.viewBarOpensOnHover")}
+                    description={t("workspace.viewBarOpensOnHoverHint")}
+                    checked={workspace.viewBarOpensOnHover}
+                    onChange={(viewBarOpensOnHover) => patchWorkspace({ viewBarOpensOnHover })}
+                  />
+                  <WorkspaceToggle
+                    label={t("workspace.showStepNotices")}
+                    description={t("workspace.showStepNoticesHint")}
+                    checked={workspace.showStepNotices}
+                    onChange={(showStepNotices) => patchWorkspace({ showStepNotices })}
                   />
                   <div className="workspace-reset-row" data-help={t("workspace.startViewHint")}>
                     <span>{t("workspace.startView")}</span>
@@ -995,55 +1043,6 @@ export function WorkspaceSettingsModal({
                       </button>
                     </div>
                   </div>
-                  <WorkspaceToggle
-                    label={t("workspace.selectBeforeMoving")}
-                    checked={workspace.selectBeforeMove}
-                    onChange={(selectBeforeMove) => patchWorkspace({ selectBeforeMove })}
-                  />
-                  <WorkspaceToggle
-                    label={t("workspace.frameByDirection")}
-                    description={t("workspace.frameByDirectionHint")}
-                    checked={workspace.frameByDirection}
-                    onChange={(frameByDirection) => patchWorkspace({ frameByDirection })}
-                  />
-                  <WorkspaceToggle
-                    label={t("workspace.pasteCentered")}
-                    description={t("workspace.pasteCenteredHint")}
-                    checked={workspace.pasteCentered}
-                    onChange={(pasteCentered) => patchWorkspace({ pasteCentered })}
-                  />
-                  <WorkspaceToggle
-                    label={t("workspace.doubleClickOpensSketch")}
-                    checked={workspace.doubleClickOpensSketch}
-                    onChange={(doubleClickOpensSketch) => patchWorkspace({ doubleClickOpensSketch })}
-                  />
-                  <WorkspaceToggle
-                    label={t("workspace.doubleClickOpensGroup")}
-                    checked={workspace.doubleClickOpensGroup}
-                    onChange={(doubleClickOpensGroup) => patchWorkspace({ doubleClickOpensGroup })}
-                  />
-                  <WorkspaceToggle
-                    label={t("workspace.doubleClickCentersView")}
-                    checked={workspace.doubleClickCentersView}
-                    onChange={(doubleClickCentersView) => patchWorkspace({ doubleClickCentersView })}
-                  />
-                  <WorkspaceToggle
-                    label={t("workspace.objectSnap")}
-                    checked={workspace.objectSnap}
-                    onChange={(objectSnap) => patchWorkspace({ objectSnap })}
-                  />
-                  <WorkspaceToggle
-                    label={t("workspace.stlAsDownload")}
-                    description={t("workspace.stlAsDownloadHint")}
-                    checked={workspace.stlAsDownload}
-                    onChange={(stlAsDownload) => patchWorkspace({ stlAsDownload })}
-                  />
-                  <WorkspaceToggle
-                    label={t("workspace.confirmTabClose")}
-                    description={t("workspace.confirmTabCloseHint")}
-                    checked={workspace.confirmTabClose}
-                    onChange={(confirmTabClose) => patchWorkspace({ confirmTabClose })}
-                  />
                   <WorkspaceToggle
                     label={t("workspace.showShadows")}
                     description={workspace.fastMode ? t("workspace.offInFastMode") : undefined}
@@ -1175,45 +1174,6 @@ export function WorkspaceSettingsModal({
                       <span>{t("workspace.overhangLoose")}</span>
                     </small>
                   </label>
-                  <WorkspaceToggle
-                    label={t("workspace.cruise")}
-                    checked={workspace.clickToPlaceShapes}
-                    onChange={(clickToPlaceShapes) => patchWorkspace({ clickToPlaceShapes })}
-                  />
-                  <label className="workspace-range" data-help={t("workspace.zoomSpeed")}>
-                    <span>{t("workspace.zoomSpeed")}</span>
-                    <input
-                      type="range"
-                      min={1}
-                      max={ZOOM_SPEED_SLIDER_MAX}
-                      value={workspace.zoomSpeed}
-                      onChange={(event) => patchWorkspace({ zoomSpeed: Number(event.currentTarget.value) })}
-                      onDoubleClick={() => patchWorkspace({ zoomSpeed: DEFAULT_WORKPLANE_WORKSPACE.zoomSpeed })}
-                    />
-                    <small>
-                      <span>{t("workspace.slow")}</span>
-                      <span>{t("workspace.fast")}</span>
-                    </small>
-                  </label>
-                  <label className="workspace-select" data-help={t("workspace.mouseScheme")}>
-                    <span>{t("workspace.mouseScheme")}</span>
-                    <select
-                      value={workspace.mouseScheme}
-                      onChange={(event) => patchWorkspace({ mouseScheme: event.currentTarget.value === "slicer" ? "slicer" : "layerling" })}
-                    >
-                      <option value="layerling">{t("workspace.mouseSchemeLayerling")}</option>
-                      <option value="slicer">{t("workspace.mouseSchemeSlicer")}</option>
-                    </select>
-                    <small>{workspace.mouseScheme === "slicer" ? t("workspace.mouseSchemeSlicerHint") : t("workspace.mouseSchemeLayerlingHint")}</small>
-                  </label>
-                  <SpaceMouseSetting />
-                  <WorkspaceToggle
-                    label={t("workspace.cameraInertia")}
-                    description={workspace.fastMode ? t("workspace.offInFastMode") : t("workspace.cameraInertiaHint")}
-                    checked={workspace.cameraInertia && !workspace.fastMode}
-                    disabled={workspace.fastMode}
-                    onChange={(cameraInertia) => patchWorkspace({ cameraInertia })}
-                  />
                   <label className="workspace-select" data-help={t("workspace.booleanTriangleLimit")}>
                     <span>{t("workspace.booleanTriangleLimit")}</span>
                     <select
@@ -1249,6 +1209,155 @@ export function WorkspaceSettingsModal({
                 </>
               ) : null}
 
+              {activeSection === "controls" ? (
+                <>
+                  <div className="workspace-section-heading">
+                    <strong>{t("workspace.controls")}</strong>
+                    <span>{t("workspace.controlsHint")}</span>
+                  </div>
+                  <WorkspaceToggle
+                    label={t("workspace.selectBeforeMoving")}
+                    checked={workspace.selectBeforeMove}
+                    onChange={(selectBeforeMove) => patchWorkspace({ selectBeforeMove })}
+                  />
+                  <WorkspaceToggle
+                    label={t("workspace.frameByDirection")}
+                    description={t("workspace.frameByDirectionHint")}
+                    checked={workspace.frameByDirection}
+                    onChange={(frameByDirection) => patchWorkspace({ frameByDirection })}
+                  />
+                  <WorkspaceToggle
+                    label={t("workspace.pasteCentered")}
+                    description={t("workspace.pasteCenteredHint")}
+                    checked={workspace.pasteCentered}
+                    onChange={(pasteCentered) => patchWorkspace({ pasteCentered })}
+                  />
+                  <WorkspaceToggle
+                    label={t("workspace.doubleClickOpensSketch")}
+                    checked={workspace.doubleClickOpensSketch}
+                    onChange={(doubleClickOpensSketch) => patchWorkspace({ doubleClickOpensSketch })}
+                  />
+                  <WorkspaceToggle
+                    label={t("workspace.doubleClickOpensGroup")}
+                    checked={workspace.doubleClickOpensGroup}
+                    onChange={(doubleClickOpensGroup) => patchWorkspace({ doubleClickOpensGroup })}
+                  />
+                  <WorkspaceToggle
+                    label={t("workspace.doubleClickCentersView")}
+                    checked={workspace.doubleClickCentersView}
+                    onChange={(doubleClickCentersView) => patchWorkspace({ doubleClickCentersView })}
+                  />
+                  <WorkspaceToggle
+                    label={t("workspace.objectSnap")}
+                    checked={workspace.objectSnap}
+                    onChange={(objectSnap) => patchWorkspace({ objectSnap })}
+                  />
+                  <WorkspaceToggle
+                    label={t("workspace.cruise")}
+                    checked={workspace.clickToPlaceShapes}
+                    onChange={(clickToPlaceShapes) => patchWorkspace({ clickToPlaceShapes })}
+                  />
+                  <label className="workspace-range" data-help={t("workspace.zoomSpeed")}>
+                    <span>{t("workspace.zoomSpeed")}</span>
+                    <input
+                      type="range"
+                      min={1}
+                      max={ZOOM_SPEED_SLIDER_MAX}
+                      value={workspace.zoomSpeed}
+                      onChange={(event) => patchWorkspace({ zoomSpeed: Number(event.currentTarget.value) })}
+                      onDoubleClick={() => patchWorkspace({ zoomSpeed: DEFAULT_WORKPLANE_WORKSPACE.zoomSpeed })}
+                    />
+                    <small>
+                      <span>{t("workspace.slow")}</span>
+                      <span>{t("workspace.fast")}</span>
+                    </small>
+                  </label>
+                  <label className="workspace-range" data-help={t("workspace.panSpeedHint")}>
+                    <span>{t("workspace.panSpeed")}</span>
+                    <input
+                      type="range"
+                      min={1}
+                      max={PAN_SPEED_SLIDER_MAX}
+                      value={workspace.panSpeed}
+                      onChange={(event) => patchWorkspace({ panSpeed: Number(event.currentTarget.value) })}
+                      onDoubleClick={() => patchWorkspace({ panSpeed: DEFAULT_WORKPLANE_WORKSPACE.panSpeed })}
+                    />
+                    <small>
+                      <span>{t("workspace.slow")}</span>
+                      <span>{t("workspace.fast")}</span>
+                    </small>
+                  </label>
+                  <label className="workspace-select" data-help={t("workspace.mouseScheme")}>
+                    <span>{t("workspace.mouseScheme")}</span>
+                    <select
+                      value={workspace.mouseScheme}
+                      onChange={(event) => patchWorkspace({ mouseScheme: event.currentTarget.value === "slicer" ? "slicer" : "layerling" })}
+                    >
+                      <option value="layerling">{t("workspace.mouseSchemeLayerling")}</option>
+                      <option value="slicer">{t("workspace.mouseSchemeSlicer")}</option>
+                    </select>
+                    <small>{workspace.mouseScheme === "slicer" ? t("workspace.mouseSchemeSlicerHint") : t("workspace.mouseSchemeLayerlingHint")}</small>
+                  </label>
+                  <SpaceMouseSetting />
+                  <WorkspaceToggle
+                    label={t("workspace.cameraInertia")}
+                    description={workspace.fastMode ? t("workspace.offInFastMode") : t("workspace.cameraInertiaHint")}
+                    checked={workspace.cameraInertia && !workspace.fastMode}
+                    disabled={workspace.fastMode}
+                    onChange={(cameraInertia) => patchWorkspace({ cameraInertia })}
+                  />
+                </>
+              ) : null}
+
+              {activeSection === "output" ? (
+                <>
+                  <div className="workspace-section-heading">
+                    <strong>{t("workspace.output")}</strong>
+                    <span>{t("workspace.outputHint")}</span>
+                  </div>
+                  <WorkspaceToggle
+                    label={t("workspace.stlAsDownload")}
+                    description={t("workspace.stlAsDownloadHint")}
+                    checked={workspace.stlAsDownload}
+                    onChange={(stlAsDownload) => patchWorkspace({ stlAsDownload })}
+                  />
+                  <WorkspaceToggle
+                    label={t("workspace.lylAsDownload")}
+                    description={t("workspace.lylAsDownloadHint")}
+                    checked={workspace.lylAsDownload}
+                    onChange={(lylAsDownload) => patchWorkspace({ lylAsDownload })}
+                  />
+                  <WorkspaceToggle
+                    label={t("workspace.confirmTabClose")}
+                    description={t("workspace.confirmTabCloseHint")}
+                    checked={workspace.confirmTabClose}
+                    onChange={(confirmTabClose) => patchWorkspace({ confirmTabClose })}
+                  />
+                </>
+              ) : null}
+
+              {activeSection === "ribbon" ? (
+                <>
+                  <div className="workspace-section-heading">
+                    <strong>{t("workspace.ribbon")}</strong>
+                    <span>{t("workspace.ribbonHint")}</span>
+                  </div>
+                  <label className="workspace-select" data-help={t("workspace.toolbarSize")}>
+                    <span>{t("workspace.toolbarSize")}</span>
+                    <select
+                      value={toolbarSize}
+                      onChange={(event) => setToolbarSize(event.currentTarget.value as ToolbarSize)}
+                    >
+                      {TOOLBAR_SIZE_OPTIONS.map((size) => (
+                        <option key={size} value={size}>
+                          {t(TOOLBAR_SIZE_LABEL_KEYS[size])}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+                  <RibbonButtonsSetting />
+                </>
+              ) : null}
               {activeSection === "measurement" ? (
                 <>
                   <div className="workspace-section-heading">
@@ -1350,7 +1459,11 @@ export function WorkspaceSettingsModal({
                         : t("workspace.printerInfo", { width: chosenPrinter.width, depth: chosenPrinter.depth, height: chosenPrinter.height })
                       : t("workspace.printerHint")}
                   </p>
-                  <PrinterPlaySetting onMakeFitTest={onMakeFitTest} />
+                  <PrinterPlaySetting
+                    onMakeFitTest={onMakeFitTest}
+                    printer={chosenPrinter?.id ?? ""}
+                    printerName={chosenPrinter ? `${chosenPrinter.vendor} ${chosenPrinter.model}` : ""}
+                  />
                   <WorkspaceToggle
                     label={t("workspace.showPlateLabels")}
                     description={t("workspace.showPlateLabelsHint")}
@@ -1604,6 +1717,8 @@ export function WorkspaceSettingsModal({
                 </>
               ) : null}
 
+              {activeSection === "backups" ? <FileBackupSettingsSection /> : null}
+
               {activeSection === "history" ? (
                 <>
                   <div className="workspace-section-heading">
@@ -1677,6 +1792,7 @@ export function WorkspaceSettingsModal({
                     {t("workspace.useMyDefault")}
                   </button>
                 ) : null}
+                <SettingsFileButtons workspace={workspace} snap={snap} onWorkspaceChange={onWorkspaceChange} onSnapChange={onSnapChange} />
                 <button
                   className="make-default-button"
                   onClick={() => {
@@ -2047,7 +2163,7 @@ function SimpleModeSetting() {
     }, SIMPLE_MODE_HOLD_MS);
   };
   useEffect(() => cancel, []);
-  if (isSimpleModeFixedByServer()) return null;
+  if (isSimpleModeFixed()) return null;
   if (!simple) {
     return <WorkspaceToggle label={t("workspace.simpleMode")} description={t("workspace.simpleModeHint")} checked={false} onChange={() => setSimpleMode(true)} />;
   }
@@ -2064,6 +2180,9 @@ function SimpleModeSetting() {
         onPointerUp={cancel}
         onPointerLeave={cancel}
         onPointerCancel={cancel}
+        // On a phone or tablet a long press opens the browser's own menu, which takes the touch away and cancels the hold
+        // (#1671): the menu stays shut here, so the two seconds run through.
+        onContextMenu={(event) => event.preventDefault()}
         onKeyDown={(event) => {
           if ((event.key === "Enter" || event.key === " ") && !event.repeat) start();
         }}

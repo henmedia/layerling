@@ -15,7 +15,7 @@ Das Feld oben im Fenster durchsucht die Liste: Es lässt nur die Kürzel stehen,
 
 Du findest ein Werkzeug nicht? Drücke [[Strg]]+[[K]] oder klicke auf die Lupe im Bereich {{ui:editor.group.help}} und tippe, was du suchst: ein Werkzeug („Verrunden“, „Spiegeln“), eine Form („Zylinder“) oder einen Befehl („Exportieren“, „Rückgängig“). Mit den Pfeiltasten wählst du, [[Enter]] führt aus; ein Klick auf den Eintrag geht auch.
 
-- Die Suche versteht das deutsche und das englische Wort und ignoriert Groß- und Kleinschreibung und Umlaute: „aushoehlen“ findet {{ui:editor.tool.hollow}}.
+- Die Suche versteht das deutsche und das englische Wort und ignoriert Groß- und Kleinschreibung und Umlaute: „aushoehlen“ findet {{ui:editor.tool.hollow}}. Die Suche funktioniert in jeder Schrift: Ein Name wird so gefunden, wie er in der Sprache der Oberfläche steht („円柱“ auf Japanisch). Voll- und Halbbreite, Katakana und Hiragana sowie Akzente gelten als gleich.
 - Jeder Eintrag zeigt die Tasten, die dasselbe tun, und die Gruppe des Menübands, in der er liegt, so lernst du, wo er sitzt.
 - Ausgegraute Einträge lassen sich gerade nicht ausführen, meist weil nichts ausgewählt ist. Sie bleiben in der Liste, damit die Suche trotzdem verrät, wo das Werkzeug liegt.
 
@@ -23,7 +23,23 @@ Auch diese Anleitung hat oben auf jeder Seite ein Suchfeld: Tippe ein oder zwei 
 - Der Name einer Form fügt diese Form auf die Arbeitsfläche ein, genau wie ein Klick im Formenmenü.
 - Bei leerem Feld stehen die zuletzt benutzten Befehle oben.
 - Der Name eines Körpers in deinem Entwurf findet diesen Körper und wählt ihn aus, praktisch bei Entwürfen mit vielen Teilen. Körper erscheinen erst, sobald du etwas tippst.
+- Eine selbst gespeicherte eigene Form findest du ebenfalls über ihren Namen, sobald du etwas tippst, und ein Klick fügt sie ein wie im Formenfenster.
 - Sie funktioniert auch im Skizzenmodus, dort mit den Skizzenwerkzeugen.
+
+## Eigene Tasten
+
+Jeden Befehl der Befehlssuche kannst du auf eine eigene Taste legen: ein Werkzeug, das du ständig brauchst, eine Form, {{ui:editor.tool.centerOnWorkplane}} oder {{ui:palette.openShapes}}.
+
+1. Öffne {{ui:editor.keyboardShortcuts}} und klicke oben im Fenster unter {{ui:customKeys.title}} auf {{ui:customKeys.add}}.
+2. Tippe ein paar Buchstaben des Befehls und klicke ihn an, oder drück [[Enter]] für den ersten.
+3. Drück die gewünschte Taste, allein oder mit [[Strg]], [[Alt]] oder [[Umschalt]]. Buchstaben, Ziffern und F1 bis F12 können einen Befehl tragen.
+
+Eine Taste, die der Editor schon nutzt, eine, die der Browser für sich behält (etwa [[Strg]]+[[W]]), oder eine deiner eigenen Tasten wird abgelehnt, und das Fenster sagt, wofür sie belegt ist. Ein Klick auf eine Taste in der Liste ändert sie, das X daneben entfernt sie, {{ui:customKeys.removeAll}} fängt von vorn an.
+
+- Die Taste startet den Befehl genau wie die Befehlssuche. Geht er gerade nicht, meist weil nichts ausgewählt ist, sagt es die Statuszeile.
+- Deine Tasten stehen in der Befehlssuche neben ihren Befehlen und auf der gedruckten Liste.
+- Sie bleiben in diesem Browser, wie das Farbschema. Eine Taste für ein Skizzenwerkzeug wirkt im Skizzenmodus, eine für den 3D-Editor außerhalb.
+- Während du in ein Feld tippst, halten sich deine Tasten zurück wie alle anderen.
 
 ## Interaktive Hilfe
 

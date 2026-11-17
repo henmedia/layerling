@@ -1,6 +1,6 @@
 import * as THREE from "three";
 import { normalizeHexColor } from "@/lib/coloredImport";
-import { GRIDFINITY_LABEL_TEXT_HEIGHT, GRIDFINITY_LABEL_TEXT_SINK, gridfinityLabelTextGiven, normalizeGridfinityType, type GridfinityLabelLetters } from "@/lib/gridfinityGeometry";
+import { GRIDFINITY_LABEL_TEXT_HEIGHT, GRIDFINITY_LABEL_TEXT_SINK, gridfinityLabelTextGiven, gridfinityPlan, normalizeGridfinityType, type GridfinityLabelLetters, type GridfinityShapeFields } from "@/lib/gridfinityGeometry";
 import { gridfinityLabelLetters } from "@/lib/gridfinityLabelText";
 import { pointInPolygon, type PlanePoint } from "@/lib/sketchContainment";
 import type { MeshData, Vec3 } from "@/lib/editorMeshCore";
@@ -22,11 +22,23 @@ import type { WorkplaneShape } from "@/types/layerling";
 /** How far inside a face its point is taken: exportFaceColors takes it 0.02 mm in too, and the two must agree. */
 const FACE_PROBE = 0.02;
 
-/** The colour of a bin's letters when it is one of their own (#1308): none on a tray, a baseplate, a hole or a bin without text, and none when it is the bin's own. */
+/** The colour of a bin's or a tray's letters when it is one of their own (#1308): none on a baseplate, a hole or a bin or tray without text, and none when it is the bin's own. */
 export function gridfinityLabelColor(shape: WorkplaneShape) {
-  if (shape.kind !== "gridfinity" || shape.hole || normalizeGridfinityType(shape.gridfinityType) !== "bin" || !gridfinityLabelTextGiven(shape)) return undefined;
+  if (shape.kind !== "gridfinity" || shape.hole || normalizeGridfinityType(shape.gridfinityType) === "baseplate" || !gridfinityLabelTextGiven(shape)) return undefined;
   const color = normalizeHexColor(shape.gridfinityLabelColor);
   return color !== normalizeHexColor(shape.color) ? color : undefined;
+}
+
+/**
+ * A bin's letters where they stand in its box. They are laid out on the bin planned on the grid, which is the box's
+ * middle but for a solid overhang or one with the lip kept on the grid: that bin is moved to its place in the box,
+ * letters and all, so the letters' colour moves with it. The body itself is built from the letters as they are.
+ */
+export function gridfinityLettersInBox(shape: GridfinityShapeFields, letters: GridfinityLabelLetters): GridfinityLabelLetters {
+  const overhang = gridfinityPlan(shape).overhang;
+  if (overhang?.mode !== "ring" || (overhang.offset.x === 0 && overhang.offset.z === 0)) return letters;
+  const { x, z } = overhang.offset;
+  return letters.map(({ top, glyphs }) => ({ top, glyphs: glyphs.map((rings) => rings.map((ring) => ring.map(([px, pz]): [number, number] => [px + x, pz + z]))) }));
 }
 
 /** A ring's points in x and z, counter-clockwise or clockwise as asked. */
@@ -41,7 +53,8 @@ function orientedRing(ring: Array<[number, number]>, clockwise: boolean) {
  * run into one another, and one mesh of overlapping glyphs would count a point in both as outside.
  */
 export function gridfinityLetterMeshes(shape: WorkplaneShape): MeshData[] {
-  return gridfinityLabelLetters({ ...shape, width: shapeWidth(shape), depth: shapeDepth(shape) }).flatMap(({ top, glyphs }) => glyphs.map((rings) => {
+  const sized = { ...shape, width: shapeWidth(shape), depth: shapeDepth(shape) };
+  return gridfinityLettersInBox(sized, gridfinityLabelLetters(sized)).flatMap(({ top, glyphs }) => glyphs.map((rings) => {
     const loops = rings.map((ring, index) => orientedRing(ring, index > 0));
     const caps = THREE.ShapeUtils.triangulateShape(loops[0], loops.slice(1));
     const points = loops.flat();
@@ -64,12 +77,14 @@ export function gridfinityLetterMeshes(shape: WorkplaneShape): MeshData[] {
   }));
 }
 
-/** Each glyph's rings with the box round it, to find a point's glyph quickly. */
+/** Each glyph's rings with the box round it, its shelf's height included, to find a point's glyph quickly. */
 function glyphBoxes(letters: GridfinityLabelLetters) {
-  return letters.flatMap(({ glyphs }) => glyphs.map((rings) => {
+  return letters.flatMap(({ top, glyphs }) => glyphs.map((rings) => {
     const points = rings.flat();
     return {
       rings: rings.map((ring) => ring.map(([x, z]): PlanePoint => ({ x, z }))),
+      low: top - GRIDFINITY_LABEL_TEXT_SINK,
+      high: top + GRIDFINITY_LABEL_TEXT_HEIGHT,
       minX: Math.min(...points.map(([x]) => x)),
       maxX: Math.max(...points.map(([x]) => x)),
       minZ: Math.min(...points.map(([, z]) => z)),
@@ -78,9 +93,9 @@ function glyphBoxes(letters: GridfinityLabelLetters) {
   }));
 }
 
-/** Whether a point lies in one of the glyphs: inside by the even-odd rule, as a glyph is built, so a point in a hole is in two rings. */
-function inGlyphs(glyphs: ReturnType<typeof glyphBoxes>, point: PlanePoint) {
-  return glyphs.some((glyph) => point.x >= glyph.minX && point.x <= glyph.maxX && point.z >= glyph.minZ && point.z <= glyph.maxZ
+/** Whether a point lies in one of the glyphs, between its shelf and its top: inside by the even-odd rule, as a glyph is built, so a point in a hole is in two rings. */
+function inGlyphs(glyphs: ReturnType<typeof glyphBoxes>, point: THREE.Vector3) {
+  return glyphs.some((glyph) => point.y > glyph.low && point.y < glyph.high && point.x >= glyph.minX && point.x <= glyph.maxX && point.z >= glyph.minZ && point.z <= glyph.maxZ
     && glyph.rings.reduce((inside, ring) => inside !== pointInPolygon(point, ring), false));
 }
 
@@ -93,9 +108,9 @@ export function gridfinityLetterGroups(geometry: THREE.BufferGeometry, letters: 
   if (letters.length === 0) return geometry;
   const position = geometry.getAttribute("position");
   const glyphs = glyphBoxes(letters);
-  // A face below or above the letters is the bin's without asking each glyph; every shelf, and so every letter, stands at one height.
-  const low = letters[0].top - GRIDFINITY_LABEL_TEXT_SINK;
-  const high = letters[0].top + GRIDFINITY_LABEL_TEXT_HEIGHT;
+  // A face below or above all the letters is the bin's without asking each glyph.
+  const low = Math.min(...glyphs.map((glyph) => glyph.low));
+  const high = Math.max(...glyphs.map((glyph) => glyph.high));
   const a = new THREE.Vector3();
   const b = new THREE.Vector3();
   const c = new THREE.Vector3();

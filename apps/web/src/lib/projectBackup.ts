@@ -37,9 +37,13 @@ export const CUSTOM_SHAPES_BACKUP_FOLDER = "Custom shapes";
 export const CUSTOM_SHAPES_MANIFEST = "custom-shapes.json";
 const inCustomShapesFolder = (path: string) => path.startsWith(`${CUSTOM_SHAPES_BACKUP_FOLDER}/`);
 
+/**
+ * The day and the time (hours and minutes), so each backup gets a name of its own: the save dialog of Chrome, Edge
+ * and the desktop app replaces a file of the same name instead of adding (2) as a download does (Discussion #1621).
+ */
 export function backupFileName(date: Date, prefix = "layerling-backup") {
   const pad = (value: number) => String(value).padStart(2, "0");
-  return `${prefix}-${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}.zip`;
+  return `${prefix}-${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}-${pad(date.getHours())}${pad(date.getMinutes())}.zip`;
 }
 
 /**
@@ -200,6 +204,24 @@ export function unpackCustomShapes(bytes: Uint8Array): { entries: BackupEntry[];
     }
   }
   return { entries, manifest };
+}
+
+/**
+ * The settings of the browser a full backup came from (Discussion #1678): the default for new designs and the settings
+ * that are the browser's, not a design's (theme, ribbon, keys, printers), as the file "Export settings" writes. It lies at
+ * the top of the ZIP; a design's own settings travel in its .lyl anyway. A restore takes them over only when asked to.
+ */
+export const SETTINGS_BACKUP_FILE = "layerling-settings.json";
+
+/** The text of the settings file a backup holds, or null for a backup without one (every backup made before it went along). */
+export function unpackBackupSettingsText(bytes: Uint8Array): string | null {
+  try {
+    const files = unzipSync(bytes, { filter: (file) => file.name === SETTINGS_BACKUP_FILE });
+    const data = files[SETTINGS_BACKUP_FILE];
+    return data ? new TextDecoder().decode(data) : null;
+  } catch {
+    return null;
+  }
 }
 
 export function isBackupFileName(fileName: string) {

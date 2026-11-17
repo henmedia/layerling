@@ -27,14 +27,17 @@ export function ShapeLibraryList<T extends LibraryShape>({
   label,
   renderTile,
   customShapes = null,
+  countCustomMatches,
 }: {
   /** The shapes the library offers, in the catalogue's order. */
   shapes: readonly T[];
   /** A shape's name in the current language, as its tile shows it. */
   label: (shape: T) => string;
   renderTile: (shape: T) => ReactNode;
-  /** The custom shapes' section, above the library's; left out while searching. */
-  customShapes?: ReactNode;
+  /** The custom shapes' section, above the library's. While searching it is asked again with the query, and shows only the matches. */
+  customShapes?: ReactNode | ((query: string) => ReactNode);
+  /** How many custom shapes match a search (#1537), so "No shapes found" shows only when neither they nor the library match. */
+  countCustomMatches?: (query: string) => number;
 }) {
   useLanguage();
   const [query, setQuery] = useState("");
@@ -60,6 +63,8 @@ export function ShapeLibraryList<T extends LibraryShape>({
   const sectionLabel = (id: ShapeLibrarySectionId) => t(SHAPE_LIBRARY_SECTION_LABELS[id]);
   const searching = query.trim().length > 0;
   const matches = searching ? searchShapeLibrary(sections, query, label) : null;
+  const customMatchCount = searching && countCustomMatches ? countCustomMatches(query) : 0;
+  const customNode = typeof customShapes === "function" ? (searching ? customShapes(query) : customShapes("")) : customShapes;
   const byId = new Map(shapes.map((shape) => [shape.id, shape]));
   const recent = recentIds.flatMap((id) => byId.get(id) ?? []);
 
@@ -72,6 +77,8 @@ export function ShapeLibraryList<T extends LibraryShape>({
   };
 
   const onSearchKey = (event: KeyboardEvent<HTMLInputElement>) => {
+    // While an input method is composing, Esc takes the composition back and leaves what is typed.
+    if (event.nativeEvent.isComposing) return;
     // Escape empties the search first; with nothing typed it goes on and closes the library as before.
     if (event.key === "Escape" && query) {
       event.preventDefault();
@@ -106,10 +113,12 @@ export function ShapeLibraryList<T extends LibraryShape>({
       </div>
 
       {matches ? (
-        matches.length === 0 ? (
+        matches.length === 0 && customMatchCount === 0 ? (
           <p className="shape-library-empty" role="status">{t("library.noMatch")}</p>
         ) : (
-          matches.map((section) => (
+          <>
+          {customMatchCount > 0 ? customNode : null}
+          {matches.map((section) => (
             <section key={section.id} className="shape-library-section" aria-label={sectionLabel(section.id)}>
               <div className="shape-library-heading">
                 <span>{sectionLabel(section.id)}</span>
@@ -118,11 +127,12 @@ export function ShapeLibraryList<T extends LibraryShape>({
               {note(section.id)}
               {grid(section.shapes)}
             </section>
-          ))
+          ))}
+          </>
         )
       ) : (
         <>
-          {customShapes}
+          {customNode}
           {recent.length > 0 ? (
             <section className="shape-library-section shape-library-recent" aria-label={t("library.recent")}>
               <div className="shape-library-heading">

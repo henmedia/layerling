@@ -16,11 +16,11 @@ Z miško:
 | drži [[Ctrl]] / [[Cmd]] in vleci z levim gumbom | prav tako premikanje |
 | dvojni klik na prazno mesto delovne ravnine ali ob ploščo | premakne pogled, da je to mesto na sredini; pogled se nato vrti okoli njega |
 
-Hitrost zumiranja s kolescem nastaviš z {{ui:workspace.zoomSpeed}} v nastavitvah, pod {{ui:workspace.appearance}}: drsnik od 1 do 14, na začetku 5; nad 10 se pospeši le kolešček.
+Hitrost zumiranja s kolescem nastaviš z {{ui:workspace.zoomSpeed}} v nastavitvah, pod {{ui:workspace.appearance}}: drsnik od 1 do 14, na začetku 5; nad 10 se pospeši le kolešček. Tik pod njim {{ui:workspace.panSpeed}} nastavi, kako hitro pogled sledi miški, ko ga premikaš: drsnik od 1 do 9; pri 5, kjer začne, ostane točka, ki jo primeš, pod kazalcem.
 
 **Gumbi miške kot v rezalniku.** Če si vajen Bambu Studia ali OrcaSlicerja, v nastavitvah, pod {{ui:workspace.appearance}}, nastavi {{ui:workspace.mouseScheme}} na {{ui:workspace.mouseSchemeSlicer}}. Vlečenje z levim gumbom po praznem mestu potem vrti pogled, desni gumb ga premika kot srednji, Shift z vlečenjem z levim pa riše izbirni okvir. Vlečenje telesa ga še vedno premakne in kratek desni klik še vedno odpre meni. V skici pogled premika tudi desni gumb.
 
-**3D-miška.** SpaceMouse ali druga 3D-miška vrti, premika in približuje 3D-pogled: potisni pokrovček stran za približanje, zdrsni z njim za premik pogleda, nagni ga za nagib pogleda in ga zasukaj za vrtenje pogleda. V nastavitvah, pod {{ui:workspace.appearance}}, klikni {{ui:workspace.spaceMouseConnect}} in izberi napravo v oknu, ki ga odpre brskalnik; izbiro si zapomni, zato je to treba narediti le enkrat. Deluje v Chromu in Edgeu, ki do takih naprav lahko dostopata; Firefox in Safari ne. Če je katera smer narobe obrnjena, jo obkljukaj pod gumbom: premik v stran, premik gor in dol, povečava, nagib ali vrtenje.
+**3D-miška.** SpaceMouse ali druga 3D-miška vrti, premika in približuje 3D-pogled: potisni pokrovček stran za približanje, zdrsni z njim za premik pogleda, nagni ga za nagib pogleda in ga zasukaj za vrtenje pogleda. V nastavitvah, pod {{ui:workspace.controls}}, klikni {{ui:workspace.spaceMouseConnect}} in izberi napravo v oknu, ki ga odpre brskalnik; izbiro si zapomni, zato je to treba narediti le enkrat. Deluje v Chromu in Edgeu, ki do takih naprav lahko dostopata; Firefox in Safari ne. Če je katera smer narobe obrnjena, jo obkljukaj pod gumbom: premik v stran, premik gor in dol, povečava, nagib ali vrtenje. Nekatere 3D-miške brskalnik najde tudi kot igralni krmilnik; layerling jo potem prevzame sam, takoj ko premakneš pokrovček, brez klika na {{ui:workspace.spaceMouseConnect}} po ponovnem zagonu.
 
 Na tablici ali telefonu dva prsta (razmikanje in približevanje) zumirata, skupno premikanje obeh pa premika pogled. En prst dela na načrtu, tako kot levi gumb miške. Kdor bi rad vrtel z enim prstom, v vrstici pogleda vklopi {{ui:camera.touchRotate}}. Stikalo se pokaže samo na napravah z zaslonom na dotik.
 
@@ -44,7 +44,7 @@ Ob levem robu je ozka vrstica. Od zgoraj navzdol:
 - {{ui:camera.orthographic}} preklopi na ploski pogled, v katerem vzporedni robovi ostanejo vzporedni. To je za merjenje in za poravnavanje robov pogosto prijetnejše kot perspektivni pogled. S [[O]] preklapljaš sem in tja, drugi klik gre nazaj.
 - {{ui:camera.secondView}} odpre drugi pogled na načrt v lastnem oknu, opisanem spodaj. Drugi klik ga zapre.
 - {{ui:camera.showScrollbars}} pokaže drsnik ob spodnjem robu pogleda in drugega ob desnem robu. Povleci drsnik, da pogled gladko premakneš, klikni puščico na njegovem koncu za majhen premik (če jo držiš, se premika naprej) ali klikni ob drsnik za skoraj cel pogled. Nič se ne zavrti, in za razliko od smernih tipk drsnika delujeta tudi, ko je izbran del - priročno od blizu pri drobnih podrobnostih. Drugi klik ju skrije; ali se načrt odpre z njima, določa {{ui:workspace.startWithScrollbars}} v nastavitvah. Ta brskalnik si izbiro tudi zapomni.
-- {{ui:camera.hideWorkplane}} (oko nad mrežo) skrije ploščo z mrežo, da lahko spodnjo stran načrta pogledaš od spodaj. Spremeni se samo pogled: nove oblike še naprej pristanejo na delovni ravnini. Drugi klik jo spet prikaže.
+- {{ui:camera.hideWorkplane}} (oko nad mrežo) skrije ploščo z mrežo, da lahko spodnjo stran načrta pogledaš od spodaj. Spremeni se samo pogled: nove oblike še naprej pristanejo na delovni ravnini. Drugi klik jo spet prikaže. Z delovno ravnino na ploskvi se imenuje {{ui:camera.hideBuildPlate}} in skrije samo tiskalno ploščo: delovna ravnina na ploskvi ostane, ima svoje oko, {{ui:camera.hideFaceWorkplane}}.
 - {{ui:camera.placeWorkplane}}, merilni trak in kotomer so lastna orodja, ki so opisana spodaj in v poglavju [Merjenje in opombe](chapter:merjenje-in-opombe).
 
 Z majhno puščico čisto na vrhu vrstice jo lahko skriješ, če te moti.
@@ -100,7 +100,8 @@ Dokler delovna ravnina leži na ploskvi, se ob {{ui:camera.placeWorkplane}} poka
 Ko načrt vsebuje več, kot se natisne na eno ploščo, na primer škatlo s pokrovom in vložki, ima lahko več tiskalnih plošč. Kliknite {{ui:editor.tool.buildPlates}} v skupini {{ui:editor.group.arrange}} ali izberite {{ui:plates.moveTo}} v meniju desnega klika na telo. Na dnu pogleda se pojavi vrstica z gumbom za vsako ploščo; število na njem pove, koliko teles stoji na plošči.
 
 - Vsaka plošča je velika kot delovna ravnina, plošče pa ležijo druga ob drugi desno od prve, 20 mm narazen. Telo spada k plošči, na kateri stoji sredina njegovega tlorisa, zato ga z vlečenjem na drugo stran postavite na drugo ploščo. Načrt ima do 12 plošč.
-- Klik na ploščo v vrstici jo pokaže in nove oblike nato pristanejo na njej. {{ui:plates.showAll}} pokaže vse. Dvojni klik na ploščo ali {{ui:plates.rename}} ji da ime, na primer »Pokrov«, ki je napisano na plošči.
+- Klik na ploščo v vrstici jo pokaže in nove oblike in uvožene datoteke nato pristanejo na njej. {{ui:plates.showAll}} pokaže vse. Dvojni klik na ploščo ali {{ui:plates.rename}} ji da ime, na primer »Pokrov«, ki je napisano na plošči.
+- Tudi nova skica na plošči se začne na aktivni plošči: površina skice pokaže to ploščo s telesi na njej, in končano telo stoji tam.
 - {{ui:plates.moveLeft}} in {{ui:plates.moveRight}} spremenita vrstni red, telesa se premikajo s svojo ploščo. {{ui:plates.remove}} odstrani dejavno ploščo; njena telesa gredo na prvo ploščo na isto mesto.
 - {{ui:plates.arrange}} razporedi izbrana telesa, ali vsa, vrsto za vrsto po ploščah, največja najprej, 5 mm narazen, in dodaja plošče, dokler so potrebne. Telo, večje od plošče, ostane na mestu.
 - Z izbranim tiskalnikom se vsako telo preveri glede na svojo ploščo, višina tiska pa se šteje od najnižjega telesa na tej plošči. Plošča s telesom, ki ne gre nanjo, pokaže svoje število rdeče.
@@ -111,22 +112,33 @@ Okno za izvoz nato ponudi {{ui:export.plates}}: vse plošče v eni datoteki, dru
 ## Mreža in pripenjanje
 
 Mreža kaže velikost plošče. Spodaj desno je **pripenjanje**: premikanje in spreminjanje velikosti se zaskočita v korakih te velikosti, na primer 1 mm. Za drobno delo ga nastaviš manjšega, za grobo razporejanje večjega. {{ui:editor.tool.snapToGrid}} v orodni vrstici naknadno pomakne izbrane oblike na najbližje presečišče mreže. Pri premikanju se oblike poleg tega zaskočijo na druge oblike, glej [Izbiranje in razporejanje](chapter:izbiranje-in-razporejanje).
+Kratek klik s srednjo miškino tipko, brez premikanja miške, odpre meni koraka pripenjanja tik ob kazalcu, tudi v skici; vlečenje s pritisnjeno srednjo tipko še naprej premika pogled.
 
 > **Namig:** Ne vrti več pogleda, ko deleže natančno postavljaš drug ob drugega. S številskimi tipkami preklopi na raven pogled od zgoraj ali od spredaj in s [[O]] preklopi na ploski prikaz. Tako takoj vidiš, ali sta dva roba res poravnana.
 
 ### Okno nastavitev
 
-Zobnik v naslovni vrstici ({{ui:editor.workspaceSettings}}) odpre nastavitve. Levo je pet področij: {{ui:workspace.appearance}}, {{ui:workspace.measurement}}, {{ui:workspace.workplane}}, {{ui:workspace.shapeDefaults}} in {{ui:workspace.history}}. Sprememba velja takoj. {{ui:workspace.makeDefault}} spodaj shrani trenutne nastavitve kot privzete, tako da nov načrt začne z njimi. Odprta datoteka prinese svoje nastavitve; {{ui:workspace.useMyDefault}} poleg tega uporabi tvoje shranjene barve, mrežo in ostalo na odprtem načrtu in pri tem obdrži njegove enote. Če tvoje privzete nastavitve vsebujejo tiskalnik, pride zraven tudi velikost njegove plošče; brez tiskalnika načrt obdrži svojo ploščo in tiskalnik. {{ui:workspace.close}} zgoraj desno okno zapre. Ta del gre skozi nastavitve eno za drugo.
+Zobnik v naslovni vrstici ({{ui:editor.workspaceSettings}}) odpre nastavitve. Levo je sedem področij: {{ui:workspace.appearance}}, {{ui:workspace.controls}}, {{ui:workspace.output}}, {{ui:workspace.measurement}}, {{ui:workspace.workplane}}, {{ui:workspace.shapeDefaults}} in {{ui:workspace.history}}. Sprememba velja takoj. {{ui:workspace.makeDefault}} spodaj shrani trenutne nastavitve kot privzete, tako da nov načrt začne z njimi. Odprta datoteka prinese svoje nastavitve; {{ui:workspace.useMyDefault}} poleg tega uporabi tvoje shranjene barve, mrežo in ostalo na odprtem načrtu in pri tem obdrži njegove enote. Če tvoje privzete nastavitve vsebujejo tiskalnik, pride zraven tudi velikost njegove plošče; brez tiskalnika načrt obdrži svojo ploščo in tiskalnik. {{ui:workspace.close}} zgoraj desno okno zapre. Ta del gre skozi nastavitve eno za drugo.
+
+{{ui:workspace.exportSettings}} shrani nastavitve okna v datoteko (layerling-settings-<datum>.json): barve, mrežo, sence, kamero in privzete vrednosti oblik skupaj s temo, velikostjo orodne vrstice, kotom kocke pogleda, barvami oblik in režo vsakega tiskalnika. Na drugem računalniku ali po izgubi podatkov brskalnika {{ui:workspace.importSettings}} datoteko znova prebere: postane tvoja privzeta nastavitev za nove načrte in se uporabi na odprtem načrtu kot {{ui:workspace.useMyDefault}}. Tudi tvoje lastne tipke iz bližnjic gredo zraven.
 
 ### Videz: tema, orodna vrstica in kocka
 
 {{ui:workspace.theme}} izbere barvno shemo celotnega programa: {{ui:workspace.themeSystem}} sledi računalniku, poleg tega so {{ui:workspace.themeLight}}, {{ui:workspace.themeDark}} in {{ui:workspace.themeGraphite}}. Zamenjaš jo lahko tudi zgoraj desno v urejevalniku.
 
-{{ui:workspace.toolbarSize}} pod {{ui:workspace.appearance}} naredi gumbe vrstice zgoraj, njen meni oblik, vrstico pogleda levo in ploščo lastnosti desno manjše ali večje: {{ui:workspace.toolbarSizeSmall}}, {{ui:workspace.toolbarSizeMedium}} (kot doslej) ali {{ui:workspace.toolbarSizeLarge}}. Majhna pusti na prenosniku več prostora za delovno ravnino, velika je lažje zadeti na velikem zaslonu ali s prstom. Z velikimi gumbi gredo skupine vrstice v drugo vrstico, če je okno zanje preozko. Velikost si zapomni ta brskalnik in velja za vsak načrt.
+{{ui:workspace.toolbarSize}} pod {{ui:workspace.appearance}} naredi gumbe vrstice zgoraj, njen meni oblik, vrstico pogleda levo in ploščo lastnosti desno manjše ali večje: {{ui:workspace.toolbarSizeSmall}}, {{ui:workspace.toolbarSizeMedium}} (kot doslej) ali {{ui:workspace.toolbarSizeLarge}}. Majhna pusti na prenosniku več prostora za delovno ravnino, velika je lažje zadeti na velikem zaslonu ali s prstom. Z velikimi gumbi gredo skupine vrstice v drugo vrstico, če je okno zanje preozko. Velikost je na zavihku {{ui:workspace.ribbon}} v nastavitvah; zapomni si jo ta brskalnik in velja za vsak načrt.
 
 {{ui:workspace.shapeColors}} na slikah knjižnice oblik pokaže barvo, s katero začne nova oblika (barvo njene vrste ali tisto, ki si jo shranil z {{ui:inspector.saveDefaults}}). Če imaš raje sive slike, to izklopi; brskalnik si izbiro zapomni.
 
 {{ui:workspace.viewCubePosition}} pod {{ui:workspace.appearance}} postavi kocko za usmerjanje pogleda v drug kot delovne površine: {{ui:workspace.viewCubePositionTopLeft}} (kot doslej), {{ui:workspace.viewCubePositionTopRight}}, {{ui:workspace.viewCubePositionBottomLeft}} ali {{ui:workspace.viewCubePositionBottomRight}}. V vsakem kotu razen zgoraj levo se vrstica pogleda pomakne navzgor na mesto, ki ga je kocka izpraznila. Spodaj desno stoji kocka tik nad gumbom {{ui:inspector.snapGrid}}. Dokler so desno odprte lastnosti oblike, se kocka na desni strani umakne levo od njih. Kot si zapomni ta brskalnik in velja za vsak načrt. V ozkem oknu, na primer na telefonu, je nastavitev skrita in kocka ostane zgoraj levo.
+
+### Videz: gumbi v orodni vrstici
+
+{{ui:workspace.ribbonButtons}} odstrani iz orodne vrstice skupine in gumbe, ki jih nikoli ne uporabljaš. Klikni skupino, da odpreš njen seznam: {{ui:workspace.ribbonGroupShown}} odstrani celo skupino, kljukica ob gumbu samo ta gumb. {{ui:workspace.ribbonShowAll}} vrne vse nazaj. Skupina brez gumbov izgine, druge se pomaknejo naprej, tako da v eno vrsto gre več orodne vrstice.
+
+Kar odstraniš, manjka samo v orodni vrstici: iskanje ukazov ([[Ctrl]]+[[K]]) to še najde in njegova tipka to še zažene. Puščici ob skupini jo premakneta po seznamu navzgor ali navzdol in tako po orodni vrstici; {{ui:workspace.ribbonResetOrder}} povrne prvotni vrstni red. Puščici ob gumbu ga enako premakneta znotraj skupine. Pomoč ostane vedno. Skupino Oblike lahko premikaš in odstraniš kot vsako drugo; njeno ploščo še vedno odpre iskanje ukazov. Izbiro si zapomni ta brskalnik in gre tudi v datoteko iz {{ui:workspace.exportSettings}}. Velja za 3D-urejevalnik; skica ima svojo vrstico.
+
+{{ui:workspace.ribbonFold}} pod {{ui:workspace.ribbonGroupShown}} na seznamu skupine določa, kaj skupina naredi, ko okno nima prostora za vse. {{ui:workspace.ribbonFoldAuto}} je privzeto: najmanj uporabljene skupine se zložijo prve. {{ui:workspace.ribbonFoldAlways}} drži skupino zloženo v en sam gumb tudi v širokem oknu, tako da zavzame malo prostora in je vseeno pri roki. {{ui:workspace.ribbonFoldKeep}} jo zloži šele za vsemi drugimi. {{ui:workspace.ribbonResetOrder}} ponastavi tudi to izbiro. {{ui:editor.section.mirrorPattern}}, {{ui:editor.section.splitShape}}, {{ui:editor.section.edgesWalls}} in {{ui:editor.section.surface}} so štiri samostojne skupine: vsako lahko premikaš, zložiš in odstraniš posebej.
 
 ### Videz: hitri način
 
@@ -146,13 +158,15 @@ Skicirni pogled ima lastne barve: {{ui:workspace.sketchBackground}} za okno okol
 
 ### Videz: puščice osi in robne črte
 
-{{ui:workspace.showAxes}} (sprva vklopljeno) nariše v zadnjem levem kotu plošče tri puščice: **X** rdeče v desno, **Y** zeleno nazaj in **Z** modro navzgor, tako kot štejejo polja za lego. To je pravilo desne roke, ki ga uporabljajo tudi Tinkercad, CAD-programi in rezalniki. Če delovna ravnina leži na ploskvi, se puščice premaknejo z njo. Tu jih izklopiš, če te motijo.
+{{ui:workspace.showAxes}} (sprva vklopljeno) nariše v zadnjem levem kotu plošče tri puščice: **X** rdeče v desno, **Y** zeleno nazaj in **Z** modro navzgor, tako kot štejejo polja za lego. To je pravilo desne roke, ki ga uporabljajo tudi Tinkercad, CAD-programi in rezalniki. Če delovna ravnina leži na ploskvi, se puščice premaknejo z njo. Tu jih izklopiš, če te motijo. Dokler so puščice vklopljene, ima tudi sredinski križ mreže njihove barve: črta vzdolž X rdečo, črta vzdolž Y zeleno, tako da tudi pri majhnem delu takoj vidite, kam gre katera os.
 
 {{ui:workspace.edgeLines}} nariše na vsakem telesu obrisno črto v barvi {{ui:workspace.edgeColor}} (sprva črno, kot v Tinkercadu): to pomaga, ko se temne barve zlijejo. Sprva je izklopljeno, zelo veliki uvoženi modeli (mreže) pa so izvzeti.
 
 ![Tri temna telesa z vklopljenimi robnimi črtami: obrisi jih ločijo med seboj.](shot:edge-lines)
 
 {{ui:workspace.strongHoles}} nariše luknje v temnejši sivi, manj prosojno in s temno črto okoli. Pomaga, ko je luknjo med prosojnimi telesi težko najti. Za razliko od robnih črt ostane vklopljeno tudi v hitrem načinu.
+
+{{ui:workspace.holeOpacity}} pod njo določa, kako gosto so narisane luknje, od 10 do 90 odstotkov. Manj bolje pokaže, kje se luknja dotika telesa. Na začetku je samodejno: 52 odstotkov ali 72 z nastavitvijo {{ui:workspace.strongHoles}}; dvoklik na drsnik to vrne.
 
 ### Videz: svetloba in sence
 
@@ -178,9 +192,13 @@ Skicirni pogled ima lastne barve: {{ui:workspace.sketchBackground}} za okno okol
 
 {{ui:workspace.startWithScrollbars}}: načrt se potem odpre z drsniki pogleda. Nastavitev se shrani z načrtom in z {{ui:workspace.makeDefault}}.
 
+{{ui:workspace.viewBarOpensOnHover}}: zložena vrstica pogleda se odpre, ko je miška nad njeno puščico, in se kmalu potem, ko jo miška zapusti, spet zloži, razen če je v uporabi eno od njenih orodij. Klik na puščico, ko je tako odprta, jo pusti odprto. Velja samo za miško; na zaslonu na dotik vrstico kot doslej odpre dotik.
+
+{{ui:workspace.showStepNotices}}: po koraku, kot je združitev, kratko sporočilo ob kocki pogleda pove, kaj se je zgodilo, in ponudi {{ui:shortcuts.undo}}. Izklopljeno teh sporočil ni; sporočila, ki od vas nekaj želijo ali sporočajo težavo, se še vedno prikažejo, {{ui:editor.tool.undo}} na traku pa ob premiku miške še vedno navede korak.
+
 {{ui:workspace.startView}} določa kot, pod katerim se odpre nov načrt in na katerega se vrne {{ui:camera.home}}. Zavrti in približaj pogled, kot ti je všeč, nato klikni {{ui:workspace.startViewUseCurrent}}; {{ui:workspace.startViewStandard}} vrne običajni pogled od spredaj desno. Velja za vsak načrt v tem brskalniku. Načrt, ki ga znova odpreš, se še vedno odpre tako, kot si ga zapustil.
 
-{{ui:workspace.zoomSpeed}} je drsnik od počasi do hitro: kako hitro približujeta kolesce in sledilna ploščica; gumbi in tipke za povečavo obdržijo svoje majhne korake. {{ui:workspace.cameraInertia}}: ko spustiš miško, se pogled še malo vrti in nežno zavira. Izklopljeno pomeni, da se takoj ustavi, kot v Tinkercadu in Fusion 360.
+{{ui:workspace.zoomSpeed}} je drsnik od počasi do hitro: kako hitro približujeta kolesce in sledilna ploščica; gumbi in tipke za povečavo obdržijo svoje majhne korake. {{ui:workspace.panSpeed}} je prav tako drsnik od počasi do hitro: kako hitro pogled sledi miški, ko ga premikaš; na sredini ostane točka, ki jo primeš, pod kazalcem. {{ui:workspace.cameraInertia}}: ko spustiš miško, se pogled še malo vrti ali premika in nežno zavira. Izklopljeno pomeni, da se takoj ustavi, kot v Tinkercadu in Fusion 360.
 
 {{ui:workspace.overhangAngle}} je kot, od katerega ploskev velja za previs, ko v meniju vidnosti vklopiš prikaz previsov: take ploskve so šrafirane rdeče in belo. 30° je previdno, 70° računa na dobro hlajenje tiska; 45° je običajen začetek. Dokler so prikazani, vrstica pod pogledom navede najstrmejši previs in koliko cm² potrebuje podporo.
 

@@ -770,6 +770,186 @@ export function extrudeOutline(contour: OutlinePoint[], holes: OutlinePoint[][],
   return geometry;
 }
 
+/** An outline with its holes at one height, every ring running the same way round. */
+export type OutlineLevel = { y: number; contour: OutlinePoint[]; holes: OutlinePoint[][] };
+
+/**
+ * A body through outlines at rising heights, as `extrudeOutline` makes one between two (Discussion #1627). The levels
+ * come in slabs: within a slab every level has the same rings with the same number of points, each point joined
+ * to the same one above it; from one slab to the next the points may change, as long as the last level of the one
+ * and the first of the next are the same outline - points that fall together are joined into one and the faces
+ * that shrink to nothing are left out, so the body stays closed. The foot and the top are filled as outlines.
+ */
+export function loftOutlineSlabs(slabs: OutlineLevel[][]) {
+  const positions: number[] = [];
+  const indices: number[] = [];
+  const known = new Map<string, number>();
+  const scale = 1e6;
+  const vertex = (point: OutlinePoint, y: number) => {
+    const key = `${Math.round(point.x * scale)},${Math.round(y * scale)},${Math.round(point.z * scale)}`;
+    let index = known.get(key);
+    if (index === undefined) {
+      index = positions.length / 3;
+      positions.push(point.x, y, point.z);
+      known.set(key, index);
+    }
+    return index;
+  };
+  const triangle = (a: number, b: number, c: number) => {
+    if (a !== b && b !== c && a !== c) indices.push(a, b, c);
+  };
+  for (const slab of slabs) {
+    for (let level = 0; level + 1 < slab.length; level += 1) {
+      const below = slab[level];
+      const above = slab[level + 1];
+      [below.contour, ...below.holes].forEach((ring, index) => {
+        const upper = index === 0 ? above.contour : above.holes[index - 1];
+        ring.forEach((point, at) => {
+          const next = (at + 1) % ring.length;
+          const a = vertex(point, below.y);
+          const b = vertex(ring[next], below.y);
+          const c = vertex(upper[at], above.y);
+          const d = vertex(upper[next], above.y);
+          // The same way round as extrudeOutline's walls: outward on the outline, into the holes.
+          if (index === 0) {
+            triangle(a, c, d);
+            triangle(a, d, b);
+          } else {
+            triangle(a, b, d);
+            triangle(a, d, c);
+          }
+        });
+      });
+    }
+  }
+  const ends: Array<[OutlineLevel, boolean]> = [[slabs[0][0], false], [slabs[slabs.length - 1][slabs[slabs.length - 1].length - 1], true]];
+  for (const [level, up] of ends) {
+    const flat = [level.contour, ...level.holes].flat();
+    const ids = flat.map((point) => vertex(point, level.y));
+    const triangles = THREE.ShapeUtils.triangulateShape(level.contour.map((point) => new THREE.Vector2(point.x, point.z)), level.holes.map((hole) => hole.map((point) => new THREE.Vector2(point.x, point.z))));
+    for (const [a, b, c] of triangles) {
+      const pa = flat[a];
+      const pb = flat[b];
+      const pc = flat[c];
+      // The y of (b - a) x (c - a), with x/z as here: positive faces up.
+      const facesUp = (pb.z - pa.z) * (pc.x - pa.x) - (pb.x - pa.x) * (pc.z - pa.z) > 0;
+      if (facesUp === up) triangle(ids[a], ids[b], ids[c]);
+      else triangle(ids[a], ids[c], ids[b]);
+    }
+  }
+  const indexed = new THREE.BufferGeometry();
+  indexed.setAttribute("position", new THREE.Float32BufferAttribute(positions, 3));
+  indexed.setIndex(indices);
+  const geometry = toCreasedNormals(indexed, THREE.MathUtils.degToRad(12));
+  indexed.dispose();
+  geometry.computeBoundingBox();
+  return geometry;
+}
+
+/**
+ * A rack longer by `extra` teeth at each end, the same module and teeth: what a slanted rack is cut from, so its
+ * teeth still reach both ends wherever they have moved to (#1627).
+ */
+export function extendedRackMeasures(measures: RackMeasures, extra: number): RackMeasures {
+  return { ...measures, teeth: measures.teeth + 2 * extra, length: measures.length + 2 * extra * measures.pitch };
+}
+
+/** How many teeth a rack whose teeth move by up to `travel` needs at each end to be cut from. */
+export function rackExtraTeeth(measures: RackMeasures, travel: number) {
+  return Math.ceil(Math.abs(travel) / measures.pitch) + 1;
+}
+
+/**
+ * A slanted rack (#1627) as slabs of outlines for `loftOutlineSlabs`. At every height its teeth are those of the
+ * straight rack moved along it by `shift(y)`, cut off square at both ends where the straight rack ends. The tooth
+ * corners move along straight lines and the ends stay where they are, so the faces are flat; a slab ends wherever
+ * a corner crosses an end (or the teeth turn back, for herringbone teeth), so that within a slab the same corners
+ * lie between the ends.
+ */
+export function slantedRackSlabs(measures: RackMeasures, height: number, travel: number, herringbone: boolean): OutlineLevel[][] {
+  const extra = rackExtraTeeth(measures, travel);
+  // The extended rack's teeth from its right end to its left: x falls all the way.
+  const top = rackOutlinePoints(extendedRackMeasures(measures, extra)).slice(2);
+  const half = measures.length / 2;
+  const shiftAt = (y: number) => helixTravelAt(travel, y / height, herringbone);
+  const breaks = new Set<number>([0, height]);
+  if (herringbone) breaks.add(height / 2);
+  // Herringbone teeth move as fast as helical ones, up to the middle and back.
+  const slope = travel / height;
+  if (Math.abs(slope) > 1e-12) {
+    for (const point of top) {
+      for (const end of [half, -half]) {
+        const rise = (end - point.x) / slope;
+        if (!herringbone) {
+          if (rise > 0 && rise < height) breaks.add(rise);
+        } else {
+          if (rise > 0 && rise < height / 2) breaks.add(rise);
+          if (height - rise > height / 2 && height - rise < height) breaks.add(height - rise);
+        }
+      }
+    }
+  }
+  const heights = [...breaks].sort((a, b) => a - b).filter((y, index, all) => index === 0 || y - all[index - 1] > height * 1e-9);
+  const slabs: OutlineLevel[][] = [];
+  for (let index = 0; index + 1 < heights.length; index += 1) {
+    const low = heights[index];
+    const high = heights[index + 1];
+    const middle = shiftAt((low + high) / 2);
+    // The corners between the ends in the middle of the slab: the same all through it.
+    const first = top.findIndex((point) => point.x + middle < half);
+    let last = -1;
+    top.forEach((point, at) => {
+      if (point.x + middle > -half) last = at;
+    });
+    if (first < 1 || last < first || last >= top.length - 1) throw new Error("The rack's teeth do not reach both of its ends");
+    const outlineAt = (y: number): OutlineLevel => {
+      const shift = shiftAt(y);
+      const cut = (a: OutlinePoint, b: OutlinePoint, x: number) => {
+        const t = clamp((x - (a.x + shift)) / (b.x - a.x), 0, 1);
+        return { x, z: a.z + (b.z - a.z) * t };
+      };
+      return {
+        y,
+        contour: [
+          { x: -half, z: measures.backZ },
+          { x: half, z: measures.backZ },
+          cut(top[first - 1], top[first], half),
+          ...top.slice(first, last + 1).map((point) => ({ x: point.x + shift, z: point.z })),
+          cut(top[last], top[last + 1], -half),
+        ],
+        holes: [],
+      };
+    };
+    slabs.push([outlineAt(low), outlineAt(high)]);
+  }
+  return slabs;
+}
+
+/**
+ * A slanted ring gear (#1627) as one slab of outlines for `loftOutlineSlabs`: the rim's circle stays, the teeth
+ * inside it turn by their share of `twist` at each of `levels` heights (half of it up to the middle and back for
+ * herringbone teeth), then all of it is stretched to width x depth.
+ */
+export function slantedRingLevels(
+  rim: OutlinePoint[],
+  corners: Array<{ angle: number; radiusX: number; radiusZ: number }>,
+  stretch: { x: number; z: number },
+  height: number,
+  twist: number,
+  herringbone: boolean,
+  levels: number,
+): OutlineLevel[] {
+  return Array.from({ length: levels }, (_, level) => {
+    const share = level / (levels - 1);
+    const turn = helixTravelAt(twist, share, herringbone);
+    return {
+      y: share * height,
+      contour: rim,
+      holes: [corners.map((corner) => ({ x: Math.cos(corner.angle + turn) * corner.radiusX * stretch.x, z: Math.sin(corner.angle + turn) * corner.radiusZ * stretch.z }))],
+    };
+  });
+}
+
 export function normalizeGearTeeth(value?: number) {
   return clamp(Math.round(Number.isFinite(value) ? value as number : DEFAULT_GEAR_TEETH), MIN_GEAR_TEETH, MAX_GEAR_TEETH);
 }
@@ -787,6 +967,39 @@ export function gearTypeHasHelix(value?: string) {
 /** A bevel gear's helix angle, 0 (straight teeth) when missing; -45 to 45 degrees like a helical gear's. */
 export function normalizeBevelHelixAngle(value?: number) {
   return Number.isFinite(value) ? clamp(value as number, MIN_GEAR_HELIX_ANGLE, MAX_GEAR_HELIX_ANGLE) : 0;
+}
+
+/** A ring gear's or a rack's helix angle (Discussion #1627), 0 (straight teeth) when missing; -45 to 45 degrees like a helical gear's. */
+export function normalizeRingRackHelixAngle(value?: number) {
+  return Number.isFinite(value) ? clamp(value as number, MIN_GEAR_HELIX_ANGLE, MAX_GEAR_HELIX_ANGLE) : 0;
+}
+
+/**
+ * Whether a ring gear's or a rack's teeth run at a slant (Discussion #1627). The angle is the one of the
+ * helical gear that runs with it, taken the same way: a ring gear and a rack take the same angle as that gear.
+ */
+export function ringRackIsHelical(shape: Pick<WorkplaneShape, "gearType" | "ringRackHelixAngle">) {
+  return gearTypeIsModular(shape.gearType) && Math.abs(normalizeRingRackHelixAngle(shape.ringRackHelixAngle)) > 1e-9;
+}
+
+/**
+ * How far the teeth of a slanted ring gear or rack have moved at `share` of the height: the full `travel` at the
+ * top, or for herringbone teeth half of it at the middle and back to nothing at the top - each half a helical
+ * one of half the height, as with the herringbone gear.
+ */
+export function helixTravelAt(travel: number, share: number, herringbone: boolean) {
+  return herringbone ? (travel / 2) * (1 - Math.abs(2 * share - 1)) : travel * share;
+}
+
+/** How far a slanted ring gear's teeth turn from foot to top, in radians: the helix angle on its pitch circle (#1627). */
+export function ringGearHelixTwist(module: number, teeth: number, height: number, helixAngle?: number) {
+  const pitchRadius = (Math.max(0.001, module) * normalizeGearTeeth(teeth)) / 2;
+  return (Math.max(0.01, height) * Math.tan(THREE.MathUtils.degToRad(normalizeRingRackHelixAngle(helixAngle)))) / pitchRadius;
+}
+
+/** How far a slanted rack's teeth move along it from foot to top (#1627): the height times the tangent of the helix angle. */
+export function rackHelixTravel(height: number, helixAngle?: number) {
+  return Math.max(0.01, height) * Math.tan(THREE.MathUtils.degToRad(normalizeRingRackHelixAngle(helixAngle)));
 }
 
 /** Whether a bevel gear's teeth turn (Discussion #1299): such a spiral bevel gear stays a triangle mesh. */
@@ -940,6 +1153,8 @@ type GearGeometryOptions = {
   helixAngle?: number;
   helixQuality?: number;
   bevelHelixAngle?: number;
+  ringRackHelixAngle?: number;
+  ringRackHerringbone?: boolean;
   gearProfile?: GearProfile;
   gearPressureAngle?: number;
   gearBacklash?: number;
@@ -972,6 +1187,8 @@ export function createGearGeometry({
   helixAngle: requestedHelixAngle,
   helixQuality: requestedHelixQuality,
   bevelHelixAngle: requestedBevelHelixAngle,
+  ringRackHelixAngle,
+  ringRackHerringbone,
   gearProfile,
   gearPressureAngle,
   gearBacklash,
@@ -983,18 +1200,30 @@ export function createGearGeometry({
   const teeth = normalizeGearTeeth(requestedTeeth);
   const type = normalizeGearType(requestedType);
   // A ring gear (#201): its rim's circle round the teeth of a gear turned inside out, both stretched to width x depth.
+  // A ring gear or a rack whose teeth run at a slant (Discussion #1627), helical or herringbone.
+  const slanted = ringRackIsHelical({ gearType: type, ringRackHelixAngle });
+  const herringboneRingRack = slanted && ringRackHerringbone === true;
   if (type === "internal") {
-    const { corners, rimRadius, stretch } = internalGearOutline(safeWidth, safeDepth, { teeth, gearProfile, gearPressureAngle, gearBacklash, gearRim });
+    const { corners, rimRadius, stretch, module } = internalGearOutline(safeWidth, safeDepth, { teeth, gearProfile, gearPressureAngle, gearBacklash, gearRim });
     const inner = corners.map((corner) => ({ x: Math.cos(corner.angle) * corner.radiusX * stretch.x, z: Math.sin(corner.angle) * corner.radiusZ * stretch.z }));
     const sides = Math.max(72, teeth * 6);
     const rim = Array.from({ length: sides }, (_, side) => {
       const angle = (side / sides) * Math.PI * 2;
       return { x: Math.cos(angle) * rimRadius * stretch.x, z: Math.sin(angle) * rimRadius * stretch.z };
     });
-    return extrudeOutline(rim, [inner], safeHeight);
+    if (!slanted) return extrudeOutline(rim, [inner], safeHeight);
+    const quality = normalizeGearHelixQuality(requestedHelixQuality);
+    // Herringbone teeth need a level exactly in the middle, where they turn back.
+    const levels = herringboneRingRack ? quality + (quality % 2 === 0 ? 1 : 0) : quality;
+    const twist = ringGearHelixTwist(module, teeth, safeHeight, ringRackHelixAngle);
+    return loftOutlineSlabs([slantedRingLevels(rim, corners, stretch, safeHeight, twist, herringboneRingRack, levels)]);
   }
   // A rack (#201): a bar with teeth along one side.
-  if (type === "rack") return extrudeOutline(rackOutlinePoints(rackMeasures(safeWidth, safeDepth, { teeth, gearProfile, gearPressureAngle, gearBacklash })), [], safeHeight);
+  if (type === "rack") {
+    const measures = rackMeasures(safeWidth, safeDepth, { teeth, gearProfile, gearPressureAngle, gearBacklash });
+    if (!slanted) return extrudeOutline(rackOutlinePoints(measures), [], safeHeight);
+    return loftOutlineSlabs(slantedRackSlabs(measures, safeHeight, rackHelixTravel(safeHeight, ringRackHelixAngle), herringboneRingRack));
+  }
   const toothSize = normalizeGearToothSize(requestedToothSize, safeWidth, safeDepth);
   const profile: GearOutlineOptions = { teeth, toothSize: requestedToothSize, toothWidth: requestedToothWidth, gearProfile, gearPressureAngle, gearBacklash };
   const corners = gearOutlineCorners(safeWidth, safeDepth, profile);

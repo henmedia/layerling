@@ -7,11 +7,12 @@ summary: Lettrage en relief ou gravé en sept caractères ou un de votre choix, 
 
 Choisissez {{ui:shape.text}} dans la bibliothèque de formes et placez-le. Dans le champ {{ui:prop.text}} à droite, saisissez ce qu'il doit dire. Les paramètres ci-dessous :
 
-- **{{ui:prop.font}} :** Sept polices de caractères sont disponibles : Multilingue, Sans, Serif, Script, Monospace, Rounded et Pochoir (lettres constituées de lignes droites). Le nouveau texte commence en Sans. Des lettres accentuées telles que ä, ö, ü, é et le signe € figurent dans chaque police. Vos propres polices viennent en tête, voir [Vos propres polices](#vos-propres-polices) ci-dessous.
+- **{{ui:prop.font}} :** Sept polices de caractères sont disponibles : Multilingue, Sans, Serif, Script, Monospace, Rounded et Pochoir (lettres constituées de lignes droites). Le nouveau texte commence en Sans. Des lettres accentuées telles que ä, ö, ü, é et le signe € figurent dans chaque police. Le chinois fonctionne aussi : les caractères simplifiés et traditionnels comme 说明书 et 說明書 viennent de Resource Han Rounded, dans d'autres fichiers chargés de la même façon, seulement ceux dont un texte a besoin. Vos propres polices viennent en tête, voir [Vos propres polices](#vos-propres-polices) ci-dessous.
 - **{{ui:nameTag.letterSize}} :** Quelle est la taille des lettres, vues d'en haut ; {{ui:prop.height}} définit leur épaisseur.
 - **{{ui:prop.height}} :** Dans quelle mesure le lettrage se détache de la surface.
 - **{{ui:prop.bevel}} :** Arrondit les bords des lettres pour qu'ils paraissent plus doux. Avec {{ui:prop.segments}}, vous décidez du nombre d'étapes.
 - **{{ui:nameTag.letterEdge}} :** arrondit ou chanfreine le bord supérieur des lettres, comme sur un porte-nom : {{ui:nameTag.edge.none}}, {{ui:nameTag.edge.round}} ou {{ui:nameTag.edge.chamfer}}, avec la {{ui:nameTag.letterEdgeSize}} (0,4 mm au départ, au plus aussi haute que le texte). Elle va plus loin que {{ui:prop.bevel}}, mais seulement jusqu'à la largeur des traits : là où un trait est plus fin que le double de la taille, le bord se termine par un sommet plus étroit. Le dessous reste plat, on peut donc coller les lettres une à une ensuite. Tant qu'un bord est choisi, il remplace {{ui:prop.bevel}}.
+- **Longueur :** Un texte peut compter jusqu'à 250 caractères. Les lettres gardent leur taille et la ligne s'allonge autant qu'il le faut ; pour la raccourcir, réduisez les lettres. {{ui:nameTag.letterEdge}} fonctionne sur un texte de 40 caractères au plus, car sur un texte plus long le calcul prendrait plusieurs minutes.
 - **{{ui:prop.textSpacing}} :** l'espace entre les lettres en plus de celui de la police, en pour cent de la taille des lettres : 0 le laisse tel que la police l'a fait, au-dessus les lettres s'écartent, en dessous (jusqu'à -50) elles se resserrent, ce dont une police à vous a souvent besoin. Les lettres gardent leur taille et la boîte suit la ligne, sur un texte droit comme courbe. L'espacement n'est pas appliqué à l'arabe et à l'hébreu, dont les lettres se lient.
 - **Taille :** Vous définissez la longueur et la largeur de la ligne comme pour n'importe quelle forme. Faites glisser les poignées ou saisissez les dimensions.
 - **{{ui:prop.textStretch}} :** Désactivé au départ : les lettres gardent leurs proportions et restent au milieu du cadre, donc un cadre étiré plus large ou plus profond que le mot n'en a besoin reste plus grand que les lettres. Activez-le et les lettres sont étirées dans les deux directions pour remplir tout le cadre : une majuscule peut être rendue plus basse ou plus étroite, comme dans Tinkercad. Il s'applique au texte droit ; le texte courbe a sa propre taille de lettre.
@@ -49,7 +50,7 @@ L'arabe, le persan, l'ourdou et l'hébreu s'écrivent de droite à gauche : la p
 
 Les pages Web ne peuvent pas simplement lire les polices installées. Seuls Chrome et Edge en ont l'autorisation, et uniquement sur les pages sécurisées, sur `https` comme sur layerling.com. Lorsque layerling s'exécute sur `http`, par exemple sur votre propre serveur ou en tant qu'installation Docker sur votre réseau domestique, {{ui:font.fromSystem}} est manquant ; faites ensuite glisser la police depuis l'Explorateur. Dans les autres navigateurs, vous choisissez le fichier de police dans le dossier des polices, avec le même résultat. Si vous avez refusé la question dans Chrome ou Edge, autorisez-la à nouveau dans les paramètres du site, derrière le cadenas à gauche de l'adresse.
 
-layerling ne peut pas lire les fichiers WOFF2 (il existe presque toujours une version TTF ou OTF), les collections de polices (`.ttc`, plusieurs polices dans un seul fichier) ou les polices emoji de couleur. À partir de très grandes polices, comme les polices chinoises, layerling prend les 8 000 premiers caractères. Une police variable est lue avec son réglage par défaut, généralement le poids normal.
+layerling ne peut pas lire les fichiers WOFF2 (il existe presque toujours une version TTF ou OTF), les collections de polices (`.ttc`, plusieurs polices dans un seul fichier) ou les polices emoji de couleur. Des très grandes polices, layerling prend 8 000 caractères, d'abord les plus courants de la langue pour laquelle la police est faite : ceux de GB2312 d'une police de chinois simplifié, ceux de Big5 d'une police de chinois traditionnel, les kanji d'une police japonaise. Une police faite pour les deux écritures chinoises suit la langue du navigateur. Une police variable est lue avec son réglage par défaut, généralement le poids normal.
 
 Certaines polices, scriptes et variables surtout, dessinent une lettre à partir de traits qui se chevauchent. layerling les fusionne en un seul contour net lors de la lecture de la police, de sorte que le corps reste imprimable. Ces lettres sont alors constituées de pièces droites très courtes au lieu de courbes ; ça ne se voit pas.
 
@@ -76,6 +77,17 @@ Donc:
 - **Gravé :** Basculez le texte sur {{ui:inspector.hole}}, laissez-le pénétrer un peu dans la surface et regroupez-le avec le corps. Les lettres sont ensuite gravées.
 
 Pour lettrage sur une face latérale, placez d'abord le plan de travail sur cette face, voir [Vue et plan de travail](chapter:view-and-workplane).
+
+## Pochoirs : des ponts pour le centre des lettres
+
+Découpées à travers une plaque, les lettres comme O, A et B perdent leur centre : il reste libre dans la lettre et tombe. {{ui:stencilBridges.title}} le retient à la plaque par de petits ponts, comme sur un pochoir.
+
+1. Basculez le texte sur {{ui:inspector.hole}}, faites-lui traverser la plaque et sélectionnez les deux, regroupés ou non.
+2. Cliquez sur {{ui:stencilBridges.title}} dans le groupe {{ui:editor.section.splitShape}} du ruban, faites un clic droit sur la sélection ou trouvez-le avec [[Ctrl]]+[[K]]. Les ponts apparaissent en orange là où ils seront.
+3. Réglez {{ui:stencilBridges.width}} et {{ui:stencilBridges.count}}. {{ui:stencilBridges.height}} commence à l'épaisseur de la plaque ; des ponts plus bas se placent au ras du dessous, au milieu ou au ras du dessus de la plaque, selon {{ui:stencilBridges.position}}. Sur un pochoir pour peinture en bombe, des ponts en haut laissent passer la peinture dessous.
+4. {{ui:stencilBridges.apply}} regroupe les ponts avec la plaque.
+
+Chaque pont est une boîte ordinaire : ouvrez le groupe pour en déplacer un, en supprimer un ou ajouter le vôtre. Si vous modifiez le texte plus tard, sélectionnez le groupe et cliquez à nouveau sur {{ui:stencilBridges.title}} ; de nouveaux ponts remplacent les anciens. Un texte seulement gravé, qui ne traverse pas, ne reçoit aucun pont, car rien ne tombe. Pour un laser ou un traceur, les exports DXF et SVG ajoutent les mêmes ponts, voir [Fichiers, sauvegarde et partage](chapter:files-and-saving).
 
 ## Contour, silhouette et plus large
 

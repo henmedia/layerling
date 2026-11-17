@@ -7,11 +7,12 @@ summary: Vystouplé a zahloubené nápisy ve vestavěném či vlastním písmu, 
 
 V knihovně vyberte {{ui:shape.text}} a položte jej na plochu. Do pole {{ui:prop.text}} vpravo zadejte nápis. Níže jsou nastavení:
 
-- **{{ui:prop.font}}:** sedm vestavěných písem Multilanguage, Sans, Serif, Script, Monospace, Rounded a Stencil, které používá přímé tahy. Nový text začíná písmem Sans. Všechna obsahují akcentované znaky jako ä, ö, ü, é a znak €. Další můžete přidat, viz [Vlastní písma](#vlastni-pisma).
+- **{{ui:prop.font}}:** sedm vestavěných písem Multilanguage, Sans, Serif, Script, Monospace, Rounded a Stencil, které používá přímé tahy. Nový text začíná písmem Sans. Všechna obsahují akcentované znaky jako ä, ö, ü, é a znak €. Funguje i čínština: zjednodušené i tradiční znaky jako 说明书 a 說明書 pocházejí z písma Resource Han Rounded, z dalších souborů, které se načítají stejně, jen ty, které text potřebuje. Další můžete přidat, viz [Vlastní písma](#vlastni-pisma).
 - **{{ui:nameTag.letterSize}}:** velikost písmen při pohledu shora; jejich tloušťku určuje {{ui:prop.height}}.
 - **{{ui:prop.height}}:** vzdálenost, o kterou nápis vystupuje z povrchu.
 - **{{ui:prop.bevel}}:** změkčí hrany písmen. Počet kroků určuje {{ui:prop.segments}}.
 - **{{ui:nameTag.letterEdge}}:** zaoblí nebo zkosí horní hranu písmen, jako u jmenovky: {{ui:nameTag.edge.none}}, {{ui:nameTag.edge.round}} nebo {{ui:nameTag.edge.chamfer}}, s hodnotou {{ui:nameTag.letterEdgeSize}} (nejdřív 0,4 mm, nejvýš tak vysoká jako text). Jde dál než {{ui:prop.bevel}}, ale jen tak daleko, jak jsou tahy široké: kde je tah tenčí než dvojnásobek velikosti, hrana skončí užší horní plochou. Spodek zůstává rovný, takže jednotlivá písmena lze pak nalepit. Dokud je hrana zvolená, nahrazuje {{ui:prop.bevel}}.
+- **Délka:** Text pojme až 250 znaků. Písmena si zachovají velikost a řádek bude tak dlouhý, jak je potřeba; kratší ho uděláte menšími písmeny. {{ui:nameTag.letterEdge}} funguje u textu do 40 znaků, protože u delšího by se počítala minuty.
 - **Rozměry:** délku a šířku nápisu upravíte úchyty nebo číselně stejně jako u jiných tvarů.
 - **{{ui:prop.textStretch}}:** Zpočátku vypnuto: písmena si drží proporce a stojí uprostřed rámečku, takže rámeček natažený víc do šířky nebo do hloubky, než slovo potřebuje, zůstane větší než písmena. Po zapnutí se písmena natáhnou v obou směrech na celý rámeček: velké písmeno lze udělat nižší nebo užší jako v Tinkercadu. Platí pro rovný text; zakřivený text má vlastní velikost písmen.
 - **{{ui:prop.textKerning}}:** Přisune k sobě dvojice písmen, mezi nimiž zůstává příliš mnoho místa, třeba AY, AV, LT nebo To, podle tvarů samotných písmen, v každém písmu, i ve vlastním. Nové texty ho mají zapnuté; texty vytvořené dřív ho mají vypnuté, aby se v uloženém projektu nic neposunulo. Písmena si ponechají velikost a rámeček se přizpůsobí. Funguje u rovného i zakřiveného textu, ne u svislého textu, arabštiny, hebrejštiny ani japonštiny.
@@ -48,7 +49,7 @@ Arabština, perština, urdština a hebrejština se píší zprava doleva. První
 
 Web nemůže libovolně číst nainstalovaná písma. Odpovídající oprávnění mají jen Chrome a Edge na bezpečné stránce přes `https`, jako na layerling.com. Při provozu přes `http`, například na vlastním serveru nebo domácím Dockeru, {{ui:font.fromSystem}} chybí. Písmo pak přetáhněte z Průzkumníku. V ostatních prohlížečích vyberte jeho soubor ze složky písem. Pokud jste přístup v Chrome či Edge odmítli, můžete jej znovu povolit v nastavení webu u adresního řádku.
 
-Layerling neumí WOFF2, kolekce `.ttc` ani barevná emoji písma. Pro WOFF2 bývá dostupná varianta TTF nebo OTF. Z velmi velkých písem, například čínských, načítá prvních 8000 znaků. Proměnné písmo používá výchozí řez, obvykle běžnou tloušťku.
+Layerling neumí WOFF2, kolekce `.ttc` ani barevná emoji písma. Pro WOFF2 bývá dostupná varianta TTF nebo OTF. Z velmi velkých písem načítá 8000 znaků, nejdřív ty běžné v jazyce, pro který je písmo určené: z písma pro zjednodušenou čínštinu znaky GB2312, z písma pro tradiční znaky Big5, z japonského kandži. Písmo pro oba druhy čínštiny se řídí jazykem prohlížeče. Proměnné písmo používá výchozí řez, obvykle běžnou tloušťku.
 
 Některá písma, zejména psací a proměnná, skládají znaky z překrývajících se tahů. Při načtení je Layerling sjednotí do čistého obrysu, aby bylo těleso tisknutelné. Obrys se pak skládá z krátkých úseček místo křivek, což není běžně vidět.
 
@@ -73,6 +74,17 @@ Projekt **neukládá soubor písma**, jen obrysy použitých znaků včetně tě
 - **Zahloubený:** změňte text na {{ui:inspector.hole}}, mírně jej zasuňte do povrchu a slučte s tělesem. Písmena se vyryjí do materiálu.
 
 Pro nápis na boční stěně nejprve položte pracovní rovinu na tuto plochu, viz [Pohled a pracovní rovina](chapter:view-and-workplane).
+
+## Šablony: můstky pro střed písmen
+
+Když se text prořízne deskou, písmena jako O, A a B ztratí střed: leží volně v písmenu a vypadne. {{ui:stencilBridges.title}} ho přidrží k desce malými můstky, jako u šablony.
+
+1. Přepněte text na {{ui:inspector.hole}}, nechte ho projít deskou a vyberte obojí, seskupené nebo ne.
+2. Klikněte na {{ui:stencilBridges.title}} ve skupině {{ui:editor.section.splitShape}} na pásu, klikněte pravým tlačítkem na výběr nebo to najděte přes [[Ctrl]]+[[K]]. Můstky se oranžově ukážou tam, kam přijdou.
+3. Nastavte {{ui:stencilBridges.width}} a {{ui:stencilBridges.count}}. {{ui:stencilBridges.height}} začíná na tloušťce desky; nižší můstky leží zarovnané se spodkem, uprostřed nebo zarovnané s vrchem desky, podle {{ui:stencilBridges.position}}. U šablony na sprej nechají můstky nahoře pod sebou místo pro barvu.
+4. {{ui:stencilBridges.apply}} seskupí můstky s deskou.
+
+Každý můstek je obyčejný kvádr: otevřete skupinu, chcete-li některý posunout, smazat nebo přidat vlastní. Když později změníte text, vyberte skupinu a klikněte znovu na {{ui:stencilBridges.title}}; nové můstky nahradí staré. Text, který je jen vyrytý a neprochází skrz, můstky nedostane, protože tam nic nevypadne. Pro laser nebo plotr přidá stejné můstky export DXF a SVG, viz [Soubory, ukládání a sdílení](chapter:files-and-saving).
 
 ## Obrys, silueta a rozšíření
 

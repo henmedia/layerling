@@ -7,11 +7,12 @@ summary: Raised or engraved lettering in eight typefaces or one of your own, and
 
 Choose {{ui:shape.text}} in the shape library and place it. In the {{ui:prop.text}} field on the right, type what it should say. The settings below:
 
-- **{{ui:prop.font}}:** Eight typefaces are available: Multilanguage, Sans, Serif, Script, Monospace, Rounded, Stencil (letters made of straight lines) and Japanese (Zen Maru Gothic). New text starts in Sans. Accented letters such as ä, ö, ü, é and the € sign are in every typeface, and so are kana, the common kanji and many of the rare ones in names such as 澤, 槇 and 檜: a Japanese name works in every typeface and on a name tag. The Japanese letters are fetched the first time a text needs them (the rare kanji in a second file, only when a text has one), so such a text shows question marks for a moment. They are kept on the computer afterwards, so Japanese also works offline from then on. Fonts of your own come on top, see [Your own fonts](#your-own-fonts) below.
+- **{{ui:prop.font}}:** Eight typefaces are available: Multilanguage, Sans, Serif, Script, Monospace, Rounded, Stencil (letters made of straight lines) and Japanese (Zen Maru Gothic). New text starts in Sans. Accented letters such as ä, ö, ü, é and the € sign are in every typeface, and so are kana, the common kanji and many of the rare ones in names such as 澤, 槇 and 檜: a Japanese name works in every typeface and on a name tag. The Japanese letters are fetched the first time a text needs them (the rare kanji in a second file, only when a text has one), so such a text shows question marks for a moment. They are kept on the computer afterwards, so Japanese also works offline from then on. Chinese works too: simplified and traditional characters such as 说明书 and 說明書 come from Resource Han Rounded, in further files that are fetched the same way, only those a text needs. Fonts of your own come on top, see [Your own fonts](#your-own-fonts) below.
 - **{{ui:nameTag.letterSize}}:** How big the letters are, seen from above; {{ui:prop.height}} sets how thick they are.
 - **{{ui:prop.height}}:** How far the lettering stands out from the surface.
 - **{{ui:prop.bevel}}:** Rounds the letter edges so they look softer. With {{ui:prop.segments}} you decide in how many steps.
 - **{{ui:nameTag.letterEdge}}:** rounds or chamfers the top edge of the letters, as on a name tag: {{ui:nameTag.edge.none}}, {{ui:nameTag.edge.round}} or {{ui:nameTag.edge.chamfer}}, with the {{ui:nameTag.letterEdgeSize}} (0.4 mm to start with, at most as high as the text). It goes further than the {{ui:prop.bevel}}, but only as far as the strokes are wide: where a stroke is thinner than twice the size, the edge ends in a narrower top. The underside stays flat, so single letters can be glued on afterwards. While an edge is chosen it takes the place of {{ui:prop.bevel}}.
+- **Length:** A text takes up to 250 characters. The letters keep their size and the line gets as long as it needs to be; to make it shorter, make the letters smaller. The {{ui:nameTag.letterEdge}} works on a text of up to 40 characters, because on a longer one it would take minutes to build.
 - **Size:** You set the length and width of the line as with any shape. Drag the handles or type the dimensions.
 - **{{ui:prop.textSpacing}}:** The space between the letters on top of the one the font has, in per cent of the letter size: 0 leaves it as the font made it, above it the letters stand further apart, below it (down to -50) tighter, which a font of your own often needs. The letters keep their size and the box follows the line, on straight and on curved text. The spacing is not applied to Arabic and Hebrew, whose letters join up.
 - **{{ui:prop.textStretch}}:** Off at first: the letters keep their proportions and sit in the middle of the frame, so a frame pulled wider or deeper than the word needs stays larger than the letters. Switch it on and the letters are stretched to fill the whole frame in both directions: a capital can be made lower or narrower, as in Tinkercad. It is for straight text; curved text has its own letter size.
@@ -51,7 +52,7 @@ Arabic, Persian, Urdu and Hebrew are written right to left: the first letter sta
 
 Web pages may not simply read the installed fonts. Only Chrome and Edge have a permission for it, and only on secure pages, over `https` as on layerling.com. When layerling runs over `http`, say on your own server or as a Docker install in your home network, {{ui:font.fromSystem}} is missing; drag the font over from Explorer then. In the other browsers you choose the font file from the fonts folder, with the same result. If you declined the question in Chrome or Edge, allow it again in the site settings, behind the padlock to the left of the address.
 
-layerling cannot read WOFF2 files (there is almost always a TTF or OTF version), font collections (`.ttc`, several fonts in one file) or colour emoji fonts. From very large fonts, such as Chinese ones, layerling takes the first 8000 characters. A variable font is read in its default setting, usually the regular weight.
+layerling cannot read WOFF2 files (there is almost always a TTF or OTF version), font collections (`.ttc`, several fonts in one file) or colour emoji fonts. From very large fonts layerling takes 8000 characters, the common ones of the font's language first: the characters of GB2312 from a simplified Chinese font, those of Big5 from a traditional one, the kanji from a Japanese one. A font made for both kinds of Chinese goes by the language of the browser. A variable font is read in its default setting, usually the regular weight.
 
 Some fonts, script and variable fonts above all, draw a letter from strokes that overlap. layerling merges them into one clean outline when it reads the font, so the body stays printable. Such letters are then made of very short straight pieces instead of curves; it does not show.
 
@@ -78,6 +79,17 @@ So:
 - **Engraved:** Switch the text to {{ui:inspector.hole}}, let it reach a little into the surface and group it with the body. The letters are then engraved.
 
 For lettering on a side face, first put the workplane on that face, see [View and workplane](chapter:view-and-workplane).
+
+## Stencils: bridges for the middle of letters
+
+Cut through a plate, letters like O, A and B lose their middle: it lies loose inside the letter and falls out. {{ui:stencilBridges.title}} holds it to the plate with small bridges, as on a stencil.
+
+1. Switch the text to {{ui:inspector.hole}}, let it reach through the plate and select both, grouped or not.
+2. Click {{ui:stencilBridges.title}} in the {{ui:editor.section.splitShape}} group of the ribbon, right-click the selection, or find it with [[Ctrl]]+[[K]]. The bridges show in orange where they will go.
+3. Set {{ui:stencilBridges.width}} and {{ui:stencilBridges.count}}. {{ui:stencilBridges.height}} starts at the plate's thickness; lower bridges sit flush with the bottom, in the middle or flush with the top of the plate, as {{ui:stencilBridges.position}} says. On a spray stencil, bridges at the top leave room under them for the paint.
+4. {{ui:stencilBridges.apply}} groups the bridges with the plate.
+
+Each bridge is an ordinary box: open the group to move one, delete one or add one of your own. If you change the text later, select the group and click {{ui:stencilBridges.title}} again; new bridges take the place of the old ones. A text that is engraved and does not go through gets no bridges, as nothing falls out there. For a laser or a plotter, the DXF and SVG export add the same bridges, see [Files, saving and sharing](chapter:files-and-saving).
 
 ## Outline, silhouette and wider
 

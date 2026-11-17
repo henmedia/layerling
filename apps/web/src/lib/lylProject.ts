@@ -20,7 +20,7 @@ import {
 } from "@/lib/projectAttachments";
 import { normalizeQrSettings } from "@/lib/qrCode";
 import { MAX_SBC_BUTTON_REACH, MAX_SBC_CLEARANCE, MAX_SBC_REACH, MAX_SBC_UP_REACH, MIN_SBC_UP_REACH, SBC_BOARD_ORDER } from "@/lib/sbcBoards";
-import { importedShapeFromStl } from "@/lib/stlImport";
+import { importedShapeFromStl, stlReadBeforeZUp, type StlReadOptions } from "@/lib/stlImport";
 import { importedShapeFromSvg } from "@/lib/svgImport";
 import { importedShapeFrom3mf } from "@/lib/threemfImport";
 import { normalizeDesignView, normalizeSavedViews, readDesignView, readSavedViews, type DesignView, type SavedDesignViews } from "@/lib/designView";
@@ -31,6 +31,7 @@ import { findSketchOutlineIntersection } from "@/lib/sketchProfileValidation";
 import { isReferenceImageOpacity } from "@/lib/referenceImage";
 import { isThreadProfile } from "@/lib/threadProfiles";
 import { PORT_PROFILES } from "@/lib/portGeometry";
+import { normalizePaintStroke, PAINT_MAX_STROKES } from "@/lib/paint";
 import { MAX_GEAR_TEETH, MIN_GEAR_TEETH } from "@/lib/gearGeometry";
 import { GRIDFINITY_LABEL_FONTS, GRIDFINITY_LABEL_TEXT_KEYS, MAX_GRIDFINITY_LABEL_TEXT_LENGTH, MAX_GRIDFINITY_OUTLINE_POINTS } from "@/lib/gridfinityGeometry";
 import type { PortProfile } from "@/types/layerling";
@@ -63,7 +64,7 @@ export const LYL_FILE_TYPES_FORMAT_VERSION = 4;
 /** The newest format this layerling reads. */
 export const LYL_NEWEST_READABLE_FORMAT_VERSION = LYL_FILE_TYPES_FORMAT_VERSION;
 export const LYL_OLDEST_READABLE_FORMAT_VERSION = 1;
-export const LYL_CREATED_WITH_VERSION = "1.146.1";
+export const LYL_CREATED_WITH_VERSION = "1.165.2";
 export const LYL_MEDIA_TYPE = "application/vnd.layerling.project+zip";
 
 export const LYL_LIMITS = {
@@ -81,7 +82,7 @@ export const LYL_LIMITS = {
 
 const SHAPE_KINDS = new Set([
   "box", "roundedBox", "cylinder", "slot", "ellipse", "sphere", "sketch", "scribble", "cone", "pyramid", "roof", "text", "roundRoof",
-  "halfSphere", "paraboloid", "curvedCone", "torus", "tube", "bentTube", "star", "heart", "crescent", "gear", "hirth", "pulley", "honeycomb", "hinge", "knurl", "dovetail", "screwBoss", "snapFit", "rib", "counterbore", "countersink", "doubleCountersink", "finishingWasher", "teardrop", "port", "loft", "vase", "thread", "spring", "gridfinity", "ring", "wedge", "polygon", "icosahedron", "ruler", "mesh",
+  "halfSphere", "paraboloid", "curvedCone", "torus", "tube", "bentTube", "star", "heart", "crescent", "sector", "gear", "hirth", "pulley", "honeycomb", "hinge", "knurl", "dovetail", "screwBoss", "snapFit", "rib", "counterbore", "countersink", "doubleCountersink", "finishingWasher", "teardrop", "port", "loft", "vase", "thread", "spring", "gridfinity", "ring", "wedge", "polygon", "icosahedron", "ruler", "mesh",
 ]);
 
 const FEATURE_TYPES = new Set([
@@ -329,7 +330,8 @@ export type LylProjectPackageSummary = {
   formatVersion: number;
 };
 
-export type LylSourceImporter = (asset: ProjectAsset) => Promise<NonNullable<WorkplaneShape["importedMesh"]>>;
+/** Reads an imported file again. `stl.yUp` reads an STL as it was read before 1.151.0 (Issue #1518). */
+export type LylSourceImporter = (asset: ProjectAsset, options?: { stl?: StlReadOptions }) => Promise<NonNullable<WorkplaneShape["importedMesh"]>>;
 
 export type ImportLylOptions = {
   sourceImporter?: LylSourceImporter;
@@ -1405,6 +1407,17 @@ function validateShapeDefinition(definition: Record<string, unknown>, label: str
       if (typeof text !== "string" || text.length > 80) throw new Error(`${label}.formulas.${field} must be a short text`);
     }
   }
+  // Paint on the body (paint.ts): strokes, each of which must be one.
+  if (definition.paint !== undefined) {
+    if (!Array.isArray(definition.paint) || definition.paint.length > PAINT_MAX_STROKES || definition.paint.some((stroke) => !normalizePaintStroke(stroke))) {
+      throw new Error(`${label}.paint must be a list of at most ${PAINT_MAX_STROKES} paint strokes`);
+    }
+  }
+  // Marks and switches the editor writes as true or false, and the id of the body a rib was made for (lib/supportRib).
+  for (const field of ["breakawayBase", "stencilBridge", "hullKeepHoles", "multicolor", "shapeLocked"] as const) {
+    if (definition[field] !== undefined && typeof definition[field] !== "boolean") throw new Error(`${label}.${field} must be true or false`);
+  }
+  if (definition.supportRibFor !== undefined && typeof definition.supportRibFor !== "string") throw new Error(`${label}.supportRibFor must be an id`);
   // What a group does with its parts when it is resized (Discussion #526).
   if (definition.groupResize !== undefined && definition.groupResize !== "stretch" && definition.groupResize !== "keepParts") {
     throw new Error(`${label}.groupResize must be stretch or keepParts`);
@@ -1457,7 +1470,7 @@ function validateShapeDefinition(definition: Record<string, unknown>, label: str
   // An SBC board's settings (#1098): a known board, a clearance of 0 to 2 mm and a reach of 0 to 10 mm;
   // the openings up and out as true or false, and how far up as 20 to 100 mm. Old projects have none.
   if (definition.sbcBoard !== undefined) {
-    const board = definition.sbcBoard as { board?: unknown; clearance?: unknown; reach?: unknown; ribbonUp?: unknown; ribbonSide?: unknown; gpioUp?: unknown; upReach?: unknown; buttonReach?: unknown } | null;
+    const board = definition.sbcBoard as { board?: unknown; clearance?: unknown; reach?: unknown; ribbonUp?: unknown; ribbonSide?: unknown; gpioUp?: unknown; lensUp?: unknown; upReach?: unknown; buttonReach?: unknown } | null;
     if (!board || typeof board !== "object" || !SBC_BOARD_ORDER.includes(board.board as never)) {
       throw new Error(`${label}.sbcBoard.board must be one of ${SBC_BOARD_ORDER.join(", ")}`);
     }
@@ -1467,7 +1480,7 @@ function validateShapeDefinition(definition: Record<string, unknown>, label: str
     if (board.reach !== undefined && (typeof board.reach !== "number" || !Number.isFinite(board.reach) || board.reach < 0 || board.reach > MAX_SBC_REACH)) {
       throw new Error(`${label}.sbcBoard.reach is outside the supported range`);
     }
-    for (const key of ["ribbonUp", "ribbonSide", "gpioUp"] as const) {
+    for (const key of ["ribbonUp", "ribbonSide", "gpioUp", "lensUp"] as const) {
       if (board[key] !== undefined && typeof board[key] !== "boolean") throw new Error(`${label}.sbcBoard.${key} must be true or false`);
     }
     if (board.upReach !== undefined && (typeof board.upReach !== "number" || !Number.isFinite(board.upReach) || board.upReach < MIN_SBC_UP_REACH || board.upReach > MAX_SBC_UP_REACH)) {
@@ -1658,6 +1671,13 @@ function validateShapeDefinition(definition: Record<string, unknown>, label: str
       const bevelHelixAngle = finiteNumber(definition.bevelHelixAngle, `${label}.bevelHelixAngle`);
       if (bevelHelixAngle < -45 || bevelHelixAngle > 45) throw new Error(`${label}.bevelHelixAngle is outside the supported range`);
     }
+    if (definition.ringRackHelixAngle !== undefined) {
+      const ringRackHelixAngle = finiteNumber(definition.ringRackHelixAngle, `${label}.ringRackHelixAngle`);
+      if (ringRackHelixAngle < -45 || ringRackHelixAngle > 45) throw new Error(`${label}.ringRackHelixAngle is outside the supported range`);
+    }
+    if (definition.ringRackHerringbone !== undefined && typeof definition.ringRackHerringbone !== "boolean") {
+      throw new Error(`${label}.ringRackHerringbone must be a boolean`);
+    }
     if (definition.helixQuality !== undefined) {
       const helixQuality = finiteNumber(definition.helixQuality, `${label}.helixQuality`);
       if (!Number.isInteger(helixQuality) || helixQuality < 4 || helixQuality > 32) {
@@ -1712,6 +1732,18 @@ function validateShapeDefinition(definition: Record<string, unknown>, label: str
       }
     }
   }
+  if (kind === "sector") {
+    if (definition.sectorAngle !== undefined) {
+      const sectorAngle = finiteNumber(definition.sectorAngle, `${label}.sectorAngle`);
+      if (sectorAngle < 1 || sectorAngle > 360) throw new Error(`${label}.sectorAngle is outside the supported range`);
+    }
+    for (const field of ["sectorInnerDiameter", "sectorEndRadius"] as const) {
+      if (definition[field] !== undefined) {
+        const value = finiteNumber(definition[field], `${label}.${field}`);
+        if (value < 0 || value > 1e6) throw new Error(`${label}.${field} is outside the supported range`);
+      }
+    }
+  }
   if (kind === "crescent") {
     if (definition.crescentThickness !== undefined) {
       const crescentThickness = finiteNumber(definition.crescentThickness, `${label}.crescentThickness`);
@@ -1730,11 +1762,15 @@ function validateShapeDefinition(definition: Record<string, unknown>, label: str
   }
   if (kind === "counterbore" || kind === "countersink" || kind === "doubleCountersink" || kind === "finishingWasher") {
     // Lenient on purpose: the geometry clamps the values itself; only nonsense is refused.
-    for (const key of ["screwHoleShaft", "screwHoleHeadDepth", "screwHoleAngle"] as const) {
+    for (const key of ["screwHoleShaft", "screwHoleHeadDepth", "screwHoleAngle", "screwHoleRecess", "screwHoleChamfer"] as const) {
       if (definition[key] === undefined) continue;
       const value = finiteNumber(definition[key], `${label}.${key}`);
       if (value < 0 || value > 1e6) throw new Error(`${label}.${key} is outside the supported range`);
     }
+  }
+  if ((kind === "counterbore" || kind === "countersink" || kind === "doubleCountersink") && definition.screwHoleSlot !== undefined && typeof definition.screwHoleSlot !== "boolean") {
+    // A slotted screw hole (Discussion #1531): on or off.
+    throw new Error(`${label}.screwHoleSlot must be true or false`);
   }
   if ((kind === "cylinder" || kind === "counterbore" || kind === "countersink" || kind === "doubleCountersink") && definition.drillPointAngle !== undefined) {
     // The drill point (Discussion #621). Lenient on purpose: 0 is a flat bottom and the geometry clamps the rest.
@@ -1783,10 +1819,10 @@ function validateShapeDefinition(definition: Record<string, unknown>, label: str
     if (definition.gridfinityType !== undefined && definition.gridfinityType !== "bin" && definition.gridfinityType !== "baseplate" && definition.gridfinityType !== "tray") {
       throw new Error(`${label}.gridfinityType is invalid`);
     }
-    for (const key of ["gridfinityLip", "gridfinityMagnets", "gridfinityHalfGrid", "gridfinityLargePlate", "gridfinitySwallowtail", "gridfinityLabelBack", "gridfinityLabelFront", "gridfinityLabelLeft", "gridfinityLabelRight", "gridfinityScoopBack", "gridfinityScoopFront", "gridfinityScoopLeft", "gridfinityScoopRight", "gridfinityOpenBack", "gridfinityOpenFront", "gridfinityOpenLeft", "gridfinityOpenRight", "hingePinless"] as const) {
+    for (const key of ["gridfinityLip", "gridfinityMagnets", "gridfinityHalfGrid", "gridfinityLargePlate", "gridfinitySwallowtail", "gridfinityLabelBack", "gridfinityLabelFront", "gridfinityLabelLeft", "gridfinityLabelRight", "gridfinityScoopBack", "gridfinityScoopFront", "gridfinityScoopLeft", "gridfinityScoopRight", "gridfinityOpenBack", "gridfinityOpenFront", "gridfinityOpenLeft", "gridfinityOpenRight", "gridfinityOverhangSolid", "gridfinityOverhangLipOnGrid", "hingePinless"] as const) {
       if (definition[key] !== undefined && typeof definition[key] !== "boolean") throw new Error(`${label}.${key} must be true or false`);
     }
-    for (const key of ["gridfinityLabelBackWidth", "gridfinityLabelBackLength", "gridfinityLabelBackOffset", "gridfinityLabelFrontWidth", "gridfinityLabelFrontLength", "gridfinityLabelFrontOffset", "gridfinityLabelLeftWidth", "gridfinityLabelLeftLength", "gridfinityLabelLeftOffset", "gridfinityLabelRightWidth", "gridfinityLabelRightLength", "gridfinityLabelRightOffset", "gridfinityLabelCornerSize", "gridfinityLabelTextSize", "gridfinityScoopRadius", "gridfinityFloorHeight", "gridfinityLipChamfer", "gridfinityWallThickness", "gridfinityOpeningCornerSize", "gridfinityPaddingBack", "gridfinityPaddingFront", "gridfinityPaddingLeft", "gridfinityPaddingRight", "gridfinityCornerRadius", "gridfinityBinCornerRadius", "gridfinitySwallowtailClearance", "gridfinityCompartmentsX", "gridfinityCompartmentsZ", "gridfinityDividerThickness"] as const) {
+    for (const key of ["gridfinityLabelBackWidth", "gridfinityLabelBackLength", "gridfinityLabelBackOffset", "gridfinityLabelFrontWidth", "gridfinityLabelFrontLength", "gridfinityLabelFrontOffset", "gridfinityLabelLeftWidth", "gridfinityLabelLeftLength", "gridfinityLabelLeftOffset", "gridfinityLabelRightWidth", "gridfinityLabelRightLength", "gridfinityLabelRightOffset", "gridfinityLabelCornerSize", "gridfinityLabelTextSize", "gridfinityOverhangBack", "gridfinityOverhangFront", "gridfinityOverhangLeft", "gridfinityOverhangRight", "gridfinityOverhangChamfer", "gridfinityScoopRadius", "gridfinityFloorHeight", "gridfinityLipChamfer", "gridfinityWallThickness", "gridfinityOpeningCornerSize", "gridfinityPaddingBack", "gridfinityPaddingFront", "gridfinityPaddingLeft", "gridfinityPaddingRight", "gridfinityCornerRadius", "gridfinityBinCornerRadius", "gridfinitySwallowtailClearance", "gridfinityCompartmentsX", "gridfinityCompartmentsZ", "gridfinityDividerThickness", "gridfinityDividerHeight"] as const) {
       if (definition[key] === undefined) continue;
       const value = finiteNumber(definition[key], `${label}.${key}`);
       // Only an offset runs both ways along a wall.
@@ -1872,7 +1908,7 @@ function validateShapeDefinition(definition: Record<string, unknown>, label: str
   }
   if (kind === "hinge") {
     // Lenient on purpose: the geometry clamps the values itself; only nonsense is refused.
-    for (const key of ["hingeKnuckles", "hingeKnuckleWidth", "hingeConeSize", "hingePinDiameter", "hingeLeafThickness", "hingeClearance", "hingeAngle", "hingeScrewHoles", "hingeScrewDiameter", "hingeScrewSpacing", "hingeScrewAcross", "hingeCornerRadius", "hingeNutWidth"] as const) {
+    for (const key of ["hingeKnuckles", "hingeKnuckleWidth", "hingeConeSize", "hingeSnapGrip", "hingePinDiameter", "hingeLeafThickness", "hingeClearance", "hingeAngle", "hingeScrewHoles", "hingeScrewDiameter", "hingeScrewSpacing", "hingeScrewAcross", "hingeCornerRadius", "hingeNutWidth"] as const) {
       if (definition[key] === undefined) continue;
       const value = finiteNumber(definition[key], `${label}.${key}`);
       // The opening angle may fold the leaf down below lying flat (#1259).
@@ -1890,7 +1926,7 @@ function validateShapeDefinition(definition: Record<string, unknown>, label: str
   }
   if (kind === "loft") {
     // Lenient on purpose: the geometry clamps the values itself; only nonsense is refused.
-    for (const key of ["loftBottomWidth", "loftBottomDepth", "loftTopWidth", "loftTopDepth", "loftBottomCorner", "loftTopCorner", "loftBottomSides", "loftTopSides", "loftOffsetX", "loftOffsetZ", "loftWall", "loftTwist", "loftTiltX", "loftTiltZ", "loftSmooth", "loftSegments"] as const) {
+    for (const key of ["loftBottomWidth", "loftBottomDepth", "loftTopWidth", "loftTopDepth", "loftBottomCorner", "loftTopCorner", "loftBottomSides", "loftTopSides", "loftOffsetX", "loftOffsetZ", "loftWall", "loftTopWall", "loftTwist", "loftTiltX", "loftTiltZ", "loftSmooth", "loftSegments"] as const) {
       if (definition[key] === undefined) continue;
       const value = finiteNumber(definition[key], `${label}.${key}`);
       if (Math.abs(value) > 1e6) throw new Error(`${label}.${key} is outside the supported range`);
@@ -1957,7 +1993,7 @@ function validateShapeDefinition(definition: Record<string, unknown>, label: str
     const portClearance = finiteNumber(definition.portClearance, `${label}.portClearance`);
     if (portClearance < 0 || portClearance > 2) throw new Error(`${label}.portClearance is outside the supported range`);
   }
-  if (kind === "port" && definition.cornerFillet !== undefined) {
+  if ((kind === "port" || kind === "polygon") && definition.cornerFillet !== undefined) {
     const cornerFillet = finiteNumber(definition.cornerFillet, `${label}.cornerFillet`);
     if (cornerFillet < 0 || cornerFillet > 1e6) throw new Error(`${label}.cornerFillet is outside the supported range`);
   }
@@ -1969,6 +2005,10 @@ function validateShapeDefinition(definition: Record<string, unknown>, label: str
     if (definition.topBottomFillet !== undefined) {
       const topBottomFillet = finiteNumber(definition.topBottomFillet, `${label}.topBottomFillet`);
       if (topBottomFillet < 0 || topBottomFillet > 1e6) throw new Error(`${label}.topBottomFillet is outside the supported range`);
+    }
+    if (definition.bottomFillet !== undefined) {
+      const bottomFillet = finiteNumber(definition.bottomFillet, `${label}.bottomFillet`);
+      if (bottomFillet < 0 || bottomFillet > 1e6) throw new Error(`${label}.bottomFillet is outside the supported range`);
     }
     if (definition.roundedBoxQuality !== undefined) {
       const roundedBoxQuality = finiteNumber(definition.roundedBoxQuality, `${label}.roundedBoxQuality`);
@@ -2199,14 +2239,14 @@ function sharedImportedMesh(decoded: object, reference: string, create: () => Im
   return mesh;
 }
 
-async function defaultSourceImporter(asset: ProjectAsset) {
+async function defaultSourceImporter(asset: ProjectAsset, options: { stl?: StlReadOptions } = {}) {
   if (asset.sourceFormat === "stl") {
     // In the browser the file is read off the page (lib/geometryWorker.ts); the server reads it here.
     if (typeof window !== "undefined") {
       const { importedShapeFromStlOffThread } = await import("@/lib/geometryWorker");
-      return (await importedShapeFromStlOffThread(asset.name, exactArrayBuffer(asset.bytes))).importedMesh as NonNullable<WorkplaneShape["importedMesh"]>;
+      return (await importedShapeFromStlOffThread(asset.name, exactArrayBuffer(asset.bytes), options.stl)).importedMesh as NonNullable<WorkplaneShape["importedMesh"]>;
     }
-    return importedShapeFromStl(asset.name, exactArrayBuffer(asset.bytes)).importedMesh as NonNullable<WorkplaneShape["importedMesh"]>;
+    return importedShapeFromStl(asset.name, exactArrayBuffer(asset.bytes), options.stl).importedMesh as NonNullable<WorkplaneShape["importedMesh"]>;
   }
   if (asset.sourceFormat === "obj") return importedShapeFromObj(asset.name, strFromU8(asset.bytes), true).importedMesh as NonNullable<WorkplaneShape["importedMesh"]>;
   if (asset.sourceFormat === "svg") return importedShapeFromSvg(asset.name, strFromU8(asset.bytes)).importedMesh as NonNullable<WorkplaneShape["importedMesh"]>;
@@ -2277,8 +2317,20 @@ async function restoreShapeFromNode(
       promise = sourceImporter(sourceAsset);
       sourceMeshCache.set(sourceAsset.id, promise);
     }
-    const regenerated = await promise;
-    importedMesh = sharedImportedMesh(regenerated, sourceAsset.id, () => ({ ...regenerated, assetId: sourceAsset.id }));
+    let regenerated = await promise;
+    let meshKey = sourceAsset.id;
+    // An STL imported before 1.151.0 may have been read Y-up; read Z-up now, it would open turned and stretched (Issue #1518).
+    if (sourceAsset.sourceFormat === "stl" && stlReadBeforeZUp(regenerated, node.importedMesh, definition as { width?: number; depth?: number; height?: number })) {
+      meshKey = `${sourceAsset.id}#y-up`;
+      let legacy = sourceMeshCache.get(meshKey);
+      if (!legacy) {
+        legacy = sourceImporter(sourceAsset, { stl: { yUp: true } });
+        sourceMeshCache.set(meshKey, legacy);
+      }
+      regenerated = await legacy;
+    }
+    const mesh = regenerated;
+    importedMesh = sharedImportedMesh(mesh, meshKey, () => ({ ...mesh, assetId: sourceAsset.id }));
   } else if (node.importedMesh?.meshAssetId) {
     const meshRecord = assetById.get(node.importedMesh.meshAssetId);
     if (!meshRecord) throw new Error(`Object '${node.objectId}' is missing its derived mesh`);

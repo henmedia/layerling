@@ -1,6 +1,6 @@
 # Translating layerling
 
-layerling speaks English, German, Dutch, French, Russian, Czech and Slovenian in full; Danish, Spanish, Italian, Polish, Brazilian and European Portuguese, Arabic, Hungarian, Simplified and Traditional Chinese, Turkish and Japanese are nearly there or on their way (`npm run i18n:status` shows how far each one is). Further languages are welcome (see the
+layerling speaks English, German, Dutch, French, Russian, Czech, Slovenian and Swedish in full; Danish, Spanish, Italian, Polish, Brazilian and European Portuguese, Arabic, Hungarian, Simplified and Traditional Chinese, Turkish and Japanese are nearly there or on their way (`npm run i18n:status` shows how far each one is). Further languages are welcome (see the
 [discussion](https://github.com/henmedia/layerling/discussions/141)); this page is how to add one. You do not have to
 finish it in one go: a language may start with a few hundred sentences and one chapter of the guide, and everything
 it does not have yet shows in English.

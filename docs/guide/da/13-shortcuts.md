@@ -15,7 +15,7 @@ Feltet øverst i vinduet søger i listen: det beholder kun de genveje, hvis sæt
 
 Kan du ikke finde et værktøj? Tryk [[Ctrl]]+[[K]] eller klik forstørrelsesglasset i området {{ui:editor.group.help}}, og tast hvad du leder efter: et værktøj ("rund", "spejl"), en form ("cylinder") eller en kommando ("eksportér", "fortryd"). Flyt med piletasterne og tryk [[Enter]], eller klik posten.
 
-- Søgningen forstår både det engelske og det tyske ord og ignorerer store bogstaver og omlyd: "aushoehlen" finder {{ui:editor.tool.hollow}}.
+- Søgningen forstår både det engelske og det tyske ord og ignorerer store bogstaver og omlyd: "aushoehlen" finder {{ui:editor.tool.hollow}}. Søgningen virker i alle skriftsystemer: et navn findes, som det står på grænsefladens sprog ("円柱" på japansk). Tegn i fuld og halv bredde, katakana og hiragana samt accenter regnes for ens.
 - Hver post viser de taster der gør det samme og den gruppe i båndet den bor i, så du lærer hvor den er.
 - Poster der er grået ud kan ikke køres lige nu, for det meste fordi intet er valgt. De bliver i listen så søgningen stadig fortæller dig hvor værktøjet er.
 
@@ -23,7 +23,23 @@ Vejledningen du læser har også en søgeboks, øverst på hver side: tast et or
 - En forms navn tilføjer den form til arbejdsplanet, ligesom at klikke den i formmenuen.
 - Med et tomt felt lister søgningen de kommandoer du brugte sidst øverst.
 - Navnet på en form i dit design finder den form og vælger den, hvilket hjælper i et design med mange dele. Former vises først når du taster.
+- En egen form, du har gemt, findes også på sit navn, så snart du skriver, og et klik sætter den ind i designet som i formpanelet.
 - Det virker også i skitsetilstand, med skitseværktøjerne.
+
+## Dine egne taster
+
+Enhver kommando fra kommandosøgningen kan lægges på din egen tast: et værktøj, du bruger hele tiden, en form, {{ui:editor.tool.centerOnWorkplane}} eller {{ui:palette.openShapes}}.
+
+1. Åbn {{ui:editor.keyboardShortcuts}} og klik på {{ui:customKeys.add}} under {{ui:customKeys.title}} øverst i vinduet.
+2. Skriv nogle bogstaver af kommandoen og klik på den, eller tryk [[Enter]] for den første.
+3. Tryk på den tast, du vil have, alene eller med [[Ctrl]], [[Alt]] eller [[Shift]]. Bogstaver, tal og F1 til F12 kan bære en kommando.
+
+En tast, som editoren allerede bruger, en som browseren holder for sig selv (som [[Ctrl]]+[[W]]), eller en af dine egne taster bliver afvist, og vinduet siger, hvad den gør. Klik på en tast i listen for at ændre den, på X’et ved siden af for at fjerne den, eller på {{ui:customKeys.removeAll}} for at starte forfra.
+
+- Tasten kører kommandoen præcis som kommandosøgningen. Kan den ikke køre lige nu, oftest fordi intet er valgt, siger statuslinjen det.
+- Dine taster står ved siden af deres kommandoer i kommandosøgningen og på den udskrevne liste.
+- De bliver i denne browser, ligesom temaet. En tast til et skitseværktøj virker i skitsetilstand, en til 3D-editoren uden for den.
+- Mens du skriver i et felt, holder dine taster sig væk ligesom alle de andre.
 
 ## Interaktiv hjælp
 

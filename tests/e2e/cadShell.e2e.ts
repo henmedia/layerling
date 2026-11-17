@@ -3,6 +3,7 @@ import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
 import { JoinType, OcctKernel, type ShapeHandle } from "occt-wasm";
 import { shellSolid } from "@/lib/cadShell";
+import { exactSolidFromMesh } from "@/lib/cadMeshExact";
 
 // Layerling is Y-up; OCCT primitives are built along Z.
 const ROTATE_Z_TO_Y: number[] = [
@@ -145,6 +146,33 @@ describe("hollowing a solid with the real OCCT kernel", () => {
     kernel.release(solid);
   });
 
+  it("leaves a top cut off at an angle open (Discussion #1544)", () => {
+    // The box 40 x 20 x 30 with a wedge taken off its top: 20 mm high at x = 0, 12 mm at x = 40.
+    const wedgeCut = kernel.makeBox(80, 60, 80);
+    const tilted = kernel.translate(kernel.rotate(wedgeCut, { point: { x: 0, y: 0, z: 0 }, direction: { x: 0, y: 0, z: 1 } }, -Math.atan2(8, 40)), -20, 24, -40);
+    const solid = kernel.cut(box(), tilted);
+    const open = shellSolid(kernel, solid, 1, "top");
+    const closed = shellSolid(kernel, solid, 1, "none");
+    expect(kernel.isValid(open)).toBe(true);
+    // Open, it lacks the sloping lid the sealed one keeps: about 40 x 30 x 1 mm, a little more along the slope.
+    const lidVolume = kernel.getVolume(closed) - kernel.getVolume(open);
+    expect(lidVolume).toBeGreaterThan(38 * 28 * 1);
+    expect(lidVolume).toBeLessThan(41 * 30 * 1.05);
+    // The walls stay where they were.
+    const bounds = kernel.getBoundingBox(open, false);
+    expect(bounds.xmax - bounds.xmin).toBeCloseTo(40, 4);
+    expect(bounds.ymax - bounds.ymin).toBeCloseTo(20, 4);
+    [open, closed, solid].forEach((shape) => kernel.release(shape));
+  });
+
+  it("takes the sloping face of a roof as its top only while it leans no more than 60 degrees", () => {
+    // What is left of the box below a face running down at 70 degrees from its top left edge: too steep to be a top.
+    const steep = kernel.rotate(kernel.makeBox(80, 80, 80), { point: { x: 0, y: 0, z: 0 }, direction: { x: 0, y: 0, z: 1 } }, -(70 * Math.PI) / 180);
+    const solid = kernel.cut(box(), kernel.translate(steep, -5, 20 + 5 * Math.tan((70 * Math.PI) / 180), -40));
+    expect(() => shellSolid(kernel, solid, 1, "top")).toThrow(/no flat top face/);
+    kernel.release(solid);
+  });
+
   it("explains when there is no flat face to open", () => {
     const solid = kernel.makeSphere(10);
     expect(() => shellSolid(kernel, solid, 1, "top")).toThrow(/no flat top face/);
@@ -271,11 +299,19 @@ describe("hollowing a solid with the real OCCT kernel", () => {
         return typeof value === "function" ? value.bind(target) : value;
       },
     });
-    const result = shellSolid(watching, body, 2, "top");
+    // Open at the front the thick solid builds it, and the strip is taken out first.
+    const result = shellSolid(watching, body, 2, ["front"]);
     expect(cleaned).toBe(1);
     expect(kernel.isValid(result)).toBe(true);
-    expect(kernel.getVolume(result)).toBeCloseTo(40 * 20 * 30 - 36 * 18 * 26, 1);
+    expect(kernel.getVolume(result)).toBeCloseTo(40 * 20 * 30 - 36 * 16 * 28, 1);
     kernel.release(result);
+    // Open at the top it is an upright prism, hollowed through its outline strip and all (Discussion #1615).
+    cleaned = 0;
+    const throughOutline = shellSolid(watching, body, 2, "top");
+    expect(cleaned).toBe(0);
+    expect(kernel.isValid(throughOutline)).toBe(true);
+    expect(kernel.getVolume(throughOutline)).toBeCloseTo(40 * 20 * 30 - 36 * 18 * 26, 1);
+    kernel.release(throughOutline);
     kernel.release(body);
   });
 
@@ -331,5 +367,144 @@ describe("hollowing a solid with the real OCCT kernel", () => {
     expect(kernel.getVolume(result)).toBeLessThan(kernel.getVolume(tube));
     kernel.release(result);
     kernel.release(tube);
+  });
+
+  it("hollows a prism whose outline of short pieces runs into a sharp corner (Making Layers, mail 08.11.2026)", () => {
+    // A box with an oval of 156 straight pieces on its end, the oval cut off where the box's side runs on: the cut
+    // makes a sharp corner among pieces 0.7 mm long. From a 1.5 mm wall on, the thick solid lost faces there and
+    // handed the body back untouched; the reporter's STL failed the same way at 2 mm. The editor rebuilds such an STL
+    // with arcs first (exactSolidFromMesh), and on that body the thick solid did not come back at all.
+    const segments = 156;
+    const oval = Array.from({ length: segments }, (_, index) => {
+      const angle = (2 * Math.PI * index) / segments;
+      return { x: 22 + 18.18 * Math.cos(angle), y: 78.5 + 23.75 * Math.sin(angle), z: 0 };
+    });
+    const ovalPrism = kernel.extrude(kernel.makeFace(kernel.makeWire(oval.map((point, index) => kernel.makeLineEdge(point, oval[(index + 1) % segments])))), 0, 0, 50);
+    const block = kernel.makeBoxFromCorners({ x: -1, y: 0, z: 0 }, { x: 32.8, y: 71.25, z: 50 });
+    const keep = kernel.makeBoxFromCorners({ x: -10, y: -10, z: -1 }, { x: 32.8, y: 120, z: 51 });
+    const solids = kernel.getSubShapes(kernel.unifySameDomain(kernel.common(kernel.fuse(block, ovalPrism), keep)), "solid");
+    expect(solids).toHaveLength(1);
+    const pieces = yUp(solids[0]);
+    const mesh = kernel.meshShape(pieces, { linearDeflection: 0.01, angularDeflection: 0.5 });
+    const rebuilt = exactSolidFromMesh(kernel, mesh.positions, mesh.indices, { budgetMs: 6000 });
+    expect(rebuilt).not.toBeNull();
+    expect(rebuilt!.report.cylinder).toBeGreaterThan(0);
+    for (const [label, body] of [["straight pieces", pieces], ["rebuilt with arcs", rebuilt!.solid]] as const) {
+      const volume = kernel.getVolume(body);
+      for (const [openings, edges] of [["top", "round"], ["top", "sharp"], ["top-bottom", "round"], ["none", "round"]] as const) {
+        const result = shellSolid(kernel, body, 2, openings, edges);
+        const name = `${label}, ${openings} ${edges}`;
+        expect(kernel.isValid(result), name).toBe(true);
+        // A 2 mm wall round about 280 mm of outline, 50 mm high, and a floor or lid where they stay: a fifth to a
+        // quarter of the body, by far not all of it.
+        expect(kernel.getVolume(result), name).toBeGreaterThan(volume * 0.12);
+        expect(kernel.getVolume(result), name).toBeLessThan(volume * 0.3);
+        // The outside stays where it was (an outline of arcs is sampled within 0.01 mm where it must be).
+        const bounds = kernel.getBoundingBox(result, false);
+        const before = kernel.getBoundingBox(body, false);
+        expect(bounds.xmax - bounds.xmin, name).toBeCloseTo(before.xmax - before.xmin, 1);
+        expect(bounds.ymax - bounds.ymin, name).toBeCloseTo(before.ymax - before.ymin, 3);
+        expect(bounds.zmax - bounds.zmin, name).toBeCloseTo(before.zmax - before.zmin, 1);
+        kernel.release(result);
+      }
+      // Too thick a wall is still refused as such.
+      expect(() => shellSolid(kernel, body, 17, "top"), label).toThrow(/thinner wall/);
+    }
+    kernel.release(rebuilt!.solid);
+    kernel.release(pieces);
+  });
+
+  // #1521: a box rounded by 1 mm with 2 mm walls. The cavity's roundings would shrink below nothing;
+  // the kernel's offset came back turned inside out or in loose pieces. Inside such a wall the box
+  // is hollowed as if its edges were sharp, and the outside keeps its roundings.
+  it("hollows a box whose rounded edges are thinner than the wall, closed and open at the bottom", () => {
+    const box = kernel.makeBox(160, 50, 185);
+    const rounded = kernel.fillet(box, kernel.getSubShapes(box, "edge"), 1);
+    const outside = kernel.getVolume(rounded);
+    const closed = shellSolid(kernel, rounded, 2, "none");
+    expect(kernel.isValid(closed)).toBe(true);
+    expect(kernel.getVolume(closed)).toBeCloseTo(outside - 156 * 46 * 181, 0);
+    const open = shellSolid(kernel, rounded, 2, "bottom");
+    expect(kernel.isValid(open)).toBe(true);
+    expect(kernel.subShapeCount(open, "shell")).toBe(1);
+    expect(kernel.getVolume(open)).toBeCloseTo(outside - 156 * 48 * 181, 0);
+    [open, closed, rounded, box].forEach((handle) => kernel.release(handle));
+  });
+
+  it("hollows the enclosure from the report, with its groove and notch, open at the bottom", () => {
+    const box = kernel.makeBox(160, 50, 185);
+    const rounded = kernel.fillet(box, kernel.getSubShapes(box, "edge"), 1);
+    const groove = kernel.makeBoxFromCorners({ x: 60, y: 42, z: -1 }, { x: 100, y: 51, z: 186 });
+    const notch = kernel.makeBoxFromCorners({ x: 60, y: 22.5, z: 158 }, { x: 100, y: 51, z: 186 });
+    const grooved = kernel.cut(rounded, groove);
+    const body = kernel.cut(grooved, notch);
+    const open = shellSolid(kernel, body, 2, "bottom");
+    expect(kernel.isValid(open)).toBe(true);
+    expect(kernel.subShapeCount(open, "solid")).toBe(1);
+    expect(kernel.getVolume(open)).toBeLessThan(kernel.getVolume(body) * 0.2);
+    [open, body, grooved, notch, groove, rounded, box].forEach((handle) => kernel.release(handle));
+  });
+
+  it("hollows a flat figure whose STL sampled its top and bottom outlines apart (Discussion #1615)", () => {
+    // A lobed outline 10 mm high, sampled with 150 points below and 170 on top, so the sides are single triangles
+    // leaning a little each way, as in the reporter's STL; two points 0.0009 mm apart on the bottom leave slivers.
+    const radius = (angle: number) => 30 + 6 * Math.cos(5 * angle);
+    const ring = (count: number, height: number, extra: number[] = []) => [...Array.from({ length: count }, (_, index) => (2 * Math.PI * (index + 0.37 * (height > 0 ? 1 : 0))) / count), ...extra]
+      .sort((a, b) => a - b)
+      .map((angle) => ({ angle, point: [radius(angle) * Math.cos(angle), height, radius(angle) * Math.sin(angle)] as [number, number, number] }));
+    const bottom = ring(150, 0, [(2 * Math.PI * 40) / 150 + 0.0009 / 30]);
+    const top = ring(170, 10);
+    const triangles: Array<[number, number, number][]> = [];
+    const facing = (corners: [number, number, number][], outward: [number, number, number]) => {
+      const [a, b, c] = corners;
+      const normal = [(b[1] - a[1]) * (c[2] - a[2]) - (b[2] - a[2]) * (c[1] - a[1]), (b[2] - a[2]) * (c[0] - a[0]) - (b[0] - a[0]) * (c[2] - a[2]), (b[0] - a[0]) * (c[1] - a[1]) - (b[1] - a[1]) * (c[0] - a[0])];
+      triangles.push(normal[0] * outward[0] + normal[1] * outward[1] + normal[2] * outward[2] >= 0 ? corners : [a, c, b]);
+    };
+    for (const [points, height, up] of [[bottom, 0, -1], [top, 10, 1]] as const) {
+      points.forEach(({ point }, index) => facing([[0, height, 0], point, points[(index + 1) % points.length].point], [0, up, 0]));
+    }
+    // The sides: the two rings zipped together by angle.
+    let below = 0;
+    let above = 0;
+    while (below < bottom.length || above < top.length) {
+      const nextBelow = below < bottom.length ? bottom[(below + 1) % bottom.length].angle + (below + 1 >= bottom.length ? 2 * Math.PI : 0) : Infinity;
+      const nextAbove = above < top.length ? top[(above + 1) % top.length].angle + (above + 1 >= top.length ? 2 * Math.PI : 0) : Infinity;
+      const b = bottom[below % bottom.length].point;
+      const t = top[above % top.length].point;
+      const out: [number, number, number] = [b[0] + t[0], 0, b[2] + t[2]];
+      if (nextBelow <= nextAbove) {
+        facing([b, bottom[(below + 1) % bottom.length].point, t], out);
+        below += 1;
+      } else {
+        facing([b, top[(above + 1) % top.length].point, t], out);
+        above += 1;
+      }
+    }
+    const stl = ["solid figure", ...triangles.map((corners) => `facet normal 0 0 0\nouter loop\n${corners.map((p) => `vertex ${p.join(" ")}`).join("\n")}\nendloop\nendfacet`), "endsolid figure"].join("\n");
+    // As the editor's CAD worker builds a mesh body: the triangles sewn into one solid, flat faces joined.
+    const faces = kernel.getSubShapes(kernel.importStl(stl), "face");
+    let body = kernel.unifySameDomain(kernel.removeDegenerateEdges(kernel.fixFaceOrientations(kernel.fixShape(kernel.sewAndSolidify(faces, 1e-5)))));
+    if (kernel.isSolid(body)) body = kernel.healSolid(body, 1e-5);
+    expect(kernel.isSolid(body)).toBe(true);
+    expect(kernel.isValid(body)).toBe(true);
+    const volume = kernel.getVolume(body);
+    const before = kernel.getBoundingBox(body, false);
+    for (const [openings, edges] of [["top", "round"], ["top", "sharp"], ["top-bottom", "round"]] as const) {
+      const result = shellSolid(kernel, body, 2, openings, edges);
+      const name = `${openings} ${edges}`;
+      expect(kernel.isValid(result), name).toBe(true);
+      expect(kernel.subShapeCount(result, "solid"), name).toBe(1);
+      // About 200 mm of outline with a 2 mm wall, 10 mm high, and a 2 mm floor where it stays.
+      expect(kernel.getVolume(result), name).toBeGreaterThan(volume * 0.15);
+      expect(kernel.getVolume(result), name).toBeLessThan(volume * 0.45);
+      // The outside is the body's own: cut as it is, not stood up from its bottom.
+      const bounds = kernel.getBoundingBox(result, false);
+      for (const axis of ["x", "y", "z"] as const) {
+        expect(bounds[`${axis}min`], name).toBeCloseTo(before[`${axis}min`], 4);
+        expect(bounds[`${axis}max`], name).toBeCloseTo(before[`${axis}max`], 4);
+      }
+      kernel.release(result);
+    }
+    kernel.release(body);
   });
 });

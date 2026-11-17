@@ -7,11 +7,12 @@ summary: Wypukłe albo grawerowane napisy w ośmiu krojach pisma lub we własnej
 
 Wybierz {{ui:shape.text}} w bibliotece kształtów i umieść go. W polu {{ui:prop.text}} po prawej wpisz, co ma tam być napisane. Ustawienia poniżej:
 
-- **{{ui:prop.font}}:** dostępnych jest osiem krojów: Multilanguage, Sans, Serif, Script, Monospace, Rounded, Stencil (litery z prostych linii) i Japanese (Zen Maru Gothic). Nowy tekst zaczyna w kroju Sans. Polskie litery, takie jak ą, ę, ł, ż, a także litery z akcentami i znak € są w każdym kroju, podobnie jak kana, popularne kanji i wiele rzadkich z nazwisk, takich jak 澤, 槇 i 檜: japońskie imię działa w każdym kroju i na plakietce z imieniem. Japońskie litery są pobierane, gdy tekst potrzebuje ich po raz pierwszy (rzadkie kanji w drugim pliku, tylko gdy tekst któreś zawiera), więc taki tekst przez chwilę pokazuje znaki zapytania. Potem zostają na komputerze, więc od tej chwili japoński działa także offline. Do tego dochodzą Twoje własne czcionki, zobacz niżej [Twoje czcionki](#twoje-czcionki).
+- **{{ui:prop.font}}:** dostępnych jest osiem krojów: Multilanguage, Sans, Serif, Script, Monospace, Rounded, Stencil (litery z prostych linii) i Japanese (Zen Maru Gothic). Nowy tekst zaczyna w kroju Sans. Polskie litery, takie jak ą, ę, ł, ż, a także litery z akcentami i znak € są w każdym kroju, podobnie jak kana, popularne kanji i wiele rzadkich z nazwisk, takich jak 澤, 槇 i 檜: japońskie imię działa w każdym kroju i na plakietce z imieniem. Japońskie litery są pobierane, gdy tekst potrzebuje ich po raz pierwszy (rzadkie kanji w drugim pliku, tylko gdy tekst któreś zawiera), więc taki tekst przez chwilę pokazuje znaki zapytania. Potem zostają na komputerze, więc od tej chwili japoński działa także offline. Działa też chiński: znaki uproszczone i tradycyjne, takie jak 说明书 i 說明書, pochodzą z Resource Han Rounded, z kolejnych plików pobieranych w ten sam sposób, tylko tych, których tekst potrzebuje. Do tego dochodzą Twoje własne czcionki, zobacz niżej [Twoje czcionki](#twoje-czcionki).
 - **{{ui:nameTag.letterSize}}:** jak duże są litery, patrząc z góry. {{ui:prop.height}} ustawia, jak są grube.
 - **{{ui:prop.height}}:** jak daleko napis wystaje z powierzchni.
 - **{{ui:prop.bevel}}:** zaokrągla krawędzie liter, żeby wyglądały łagodniej. {{ui:prop.segments}} decydują, w ilu krokach.
 - **{{ui:nameTag.letterEdge}}:** zaokrągla albo fazuje górną krawędź liter, jak na plakietce z imieniem: {{ui:nameTag.edge.none}}, {{ui:nameTag.edge.round}} albo {{ui:nameTag.edge.chamfer}}, z {{ui:nameTag.letterEdgeSize}} (na początek 0,4 mm, najwyżej tyle, ile wysokość tekstu). Sięga dalej niż {{ui:prop.bevel}}, ale tylko na szerokość kresek: tam, gdzie kreska jest cieńsza niż dwa razy rozmiar, krawędź kończy się węższą górą. Spód zostaje płaski, więc pojedyncze litery można potem przykleić. Gdy krawędź jest wybrana, zastępuje {{ui:prop.bevel}}.
+- **Długość:** Tekst może mieć do 250 znaków. Litery zachowują swój rozmiar, a wiersz staje się tak długi, jak trzeba; aby go skrócić, zmniejsz litery. {{ui:nameTag.letterEdge}} działa dla tekstu do 40 znaków, bo przy dłuższym obliczenia trwałyby minuty.
 - **Rozmiar:** długość i szerokość wiersza ustawiasz jak przy każdym kształcie. Przeciągnij uchwyty albo wpisz wymiary.
 - **{{ui:prop.textSpacing}}:** odstęp między literami ponad ten, który ma czcionka, w procentach wielkości liter: 0 zostawia go tak, jak zrobiła go czcionka, powyżej litery stoją dalej od siebie, poniżej (do -50) ciaśniej, czego często potrzebuje własna czcionka. Litery zachowują rozmiar, a ramka podąża za wierszem, w tekście prostym i na łuku. Odstęp nie jest stosowany do arabskiego i hebrajskiego, których litery się łączą.
 - **{{ui:prop.textKerning}}:** przysuwa do siebie pary liter, między którymi zostaje za dużo miejsca, jak AY, AV, LT czy To, mierząc kształty samych liter, w każdej czcionce, także we własnych. Nowe teksty mają go włączonego; teksty utworzone wcześniej mają go wyłączonego, żeby w zapisanym projekcie nic się nie przesunęło. Litery zachowują swoją wielkość, a ramka się dopasowuje. Działa przy tekście prostym i wygiętym, nie przy tekście pionowym, arabskim, hebrajskim ani japońskim.
@@ -51,7 +52,7 @@ Arabski, perski, urdu i hebrajski pisze się od prawej do lewej: pierwsza litera
 
 Strony internetowe nie mogą tak po prostu odczytywać zainstalowanych czcionek. Tylko Chrome i Edge mają na to zgodę, i to tylko na bezpiecznych stronach, przez `https`, jak na layerling.com. Gdy layerling działa przez `http`, na przykład na Twoim własnym serwerze albo jako instalacja Docker w sieci domowej, {{ui:font.fromSystem}} nie ma. Wtedy przeciągnij czcionkę z Eksploratora. W innych przeglądarkach wybierasz plik czcionki z folderu czcionek, z tym samym wynikiem. Jeśli w Chrome albo Edge odmówiłeś na pytanie, zezwól ponownie w ustawieniach witryny, za kłódką na lewo od adresu.
 
-layerling nie odczytuje plików WOFF2 (prawie zawsze jest wersja TTF albo OTF), kolekcji czcionek (`.ttc`, kilka czcionek w jednym pliku) ani kolorowych czcionek emoji. Z bardzo dużych czcionek, na przykład chińskich, layerling bierze pierwsze 8000 znaków. Czcionka zmienna jest odczytywana w ustawieniu domyślnym, zwykle w zwykłej grubości.
+layerling nie odczytuje plików WOFF2 (prawie zawsze jest wersja TTF albo OTF), kolekcji czcionek (`.ttc`, kilka czcionek w jednym pliku) ani kolorowych czcionek emoji. Z bardzo dużych czcionek layerling bierze 8000 znaków, najpierw popularne znaki języka, dla którego czcionka powstała: znaki GB2312 z czcionki dla chińskiego uproszczonego, znaki Big5 z czcionki dla tradycyjnego, kanji z japońskiej. Czcionka dla obu odmian chińskiego kieruje się językiem przeglądarki. Czcionka zmienna jest odczytywana w ustawieniu domyślnym, zwykle w zwykłej grubości.
 
 Niektóre czcionki, przede wszystkim pisane i zmienne, rysują literę z nakładających się kresek. layerling łączy je przy odczycie czcionki w jeden czysty kontur, więc bryła nadaje się do druku. Takie litery składają się wtedy z bardzo krótkich prostych odcinków zamiast krzywych, czego nie widać.
 
@@ -78,6 +79,17 @@ Zatem:
 - **Grawerowany:** przełącz tekst na {{ui:inspector.hole}}, wsuń go trochę w powierzchnię i zgrupuj z bryłą. Litery zostaną wtedy wygrawerowane.
 
 Aby umieścić napis na bocznej ścianie, najpierw połóż na niej płaszczyznę roboczą, zobacz [Widok i płaszczyzna robocza](chapter:view-and-workplane).
+
+## Szablony: mostki dla środka liter
+
+Po przecięciu płyty litery takie jak O, A i B tracą środek: leży luźno w literze i wypada. {{ui:stencilBridges.title}} utrzymuje go przy płycie małymi mostkami, jak w szablonie.
+
+1. Przełącz tekst na {{ui:inspector.hole}}, niech przechodzi przez płytę, i zaznacz oba obiekty, zgrupowane lub nie.
+2. Kliknij {{ui:stencilBridges.title}} w grupie {{ui:editor.section.splitShape}} na wstążce, kliknij prawym przyciskiem zaznaczenie albo znajdź to przez [[Ctrl]]+[[K]]. Mostki pojawiają się na pomarańczowo tam, gdzie będą.
+3. Ustaw {{ui:stencilBridges.width}} i {{ui:stencilBridges.count}}. {{ui:stencilBridges.height}} zaczyna się od grubości płyty; niższe mostki leżą równo z dołem, pośrodku albo równo z górą płyty, zgodnie z {{ui:stencilBridges.position}}. W szablonie do malowania sprayem mostki u góry zostawiają pod sobą miejsce na farbę.
+4. {{ui:stencilBridges.apply}} grupuje mostki z płytą.
+
+Każdy mostek to zwykły prostopadłościan: otwórz grupę, aby jakiś przesunąć, usunąć albo dodać własny. Jeśli później zmienisz tekst, zaznacz grupę i kliknij ponownie {{ui:stencilBridges.title}}; nowe mostki zajmą miejsce starych. Tekst tylko grawerowany, który nie przechodzi na wylot, nie dostaje mostków, bo nic tam nie wypada. Dla lasera lub plotera eksport DXF i SVG dodaje te same mostki, zobacz [Pliki, zapis i udostępnianie](chapter:files-and-saving).
 
 ## Kontur, sylwetka i poszerzenie
 

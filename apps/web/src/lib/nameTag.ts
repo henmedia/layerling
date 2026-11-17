@@ -213,3 +213,10 @@ export function textLetterSizePatch(shape: WorkplaneShape, size: number): Partia
   // Round the letters the fill's reach all round, and a key ring's ear on its side.
   return textBoxAroundLetters(shape, { width, depth: measures.depth * scale });
 }
+/**
+ * Whether a layer of this name tag or icon tag has a step of its own (a surface texture, rounded or bevelled edges,
+ * paint): building the layers anew from the tag's card makes them plain again, which the card says beforehand.
+ */
+export function tagHasLayerSteps(shape: WorkplaneShape | null | undefined) {
+  return Boolean((shape?.layeredText || shape?.layeredIcon) && shape.groupedShapes?.some((part) => part.surfaceTexture || part.edgeTreatmentHistory?.length || part.edgeTreatments?.length || part.paint?.length));
+}

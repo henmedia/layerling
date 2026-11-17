@@ -62,7 +62,9 @@ async function session(language, port) {
     return response.result?.value;
   };
   await send("Page.enable");
-  await send("Emulation.setDeviceMetricsOverride", { width: WIDTH, height: HEIGHT, deviceScaleFactor: 1, mobile: false });
+  await send("Emulation.setDeviceMetricsOverride", { width: WIDTH, height: HEIGHT, deviceScaleFactor: 1, mobile: false,
+    // A screen larger than the window: the editor takes a window as big as the screen for F11 and hides its title row (focus mode).
+    screenWidth: WIDTH + 640, screenHeight: HEIGHT + 400 });
   await send("Emulation.setFocusEmulationEnabled", { enabled: true });
   await send("Page.setWebLifecycleState", { state: "active" });
   const close = () => {

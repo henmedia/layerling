@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { BUILD_MISMATCH_EVENT } from "@/lib/buildStamp";
-import { releaseLeaveGuard } from "@/lib/leaveGuard";
+import { designSaveState, designsSettled, releaseLeaveGuard } from "@/lib/leaveGuard";
 import {
   fetchVersionInfo,
   isNewBuild,
@@ -99,17 +99,41 @@ export function useNewVersionNotice() {
     return () => window.clearTimeout(timer);
   }, [hiddenUntil]);
 
-  const later = useCallback(() => setHiddenUntil(Date.now() + VERSION_LATER_MS), []);
+  const [state, setState] = useState<"idle" | "saving" | "notSaved">("idle");
+  const later = useCallback(() => {
+    setHiddenUntil(Date.now() + VERSION_LATER_MS);
+    setState("idle");
+  }, []);
 
-  /** Saves what is open, then loads the page again; the address still names the open design. */
-  const reload = useCallback(() => {
+  /**
+   * Saves what is open, then loads the page again; the address still names the open design. It waits for the save
+   * itself rather than a fixed moment, and a design the browser would not store is not thrown away by the reload
+   * (#1639): the notice says so and leaves the choice, with "Reload anyway".
+   */
+  const reload = useCallback(async () => {
+    setState("saving");
     window.dispatchEvent(new Event(SAVE_NOW_EVENT));
-    window.setTimeout(() => {
-      releaseLeaveGuard();
-      window.location.reload();
-    }, 800);
+    if (!(await designsSettled())) {
+      setState("notSaved");
+      return;
+    }
+    releaseLeaveGuard();
+    window.location.reload();
+  }, []);
+  // Once a save gets through after all, the offer is the plain one again.
+  useEffect(() => {
+    if (state !== "notSaved") return;
+    const timer = window.setInterval(() => {
+      const { saving, unsaved } = designSaveState();
+      if (!saving && !unsaved) setState("idle");
+    }, 1000);
+    return () => window.clearInterval(timer);
+  }, [state]);
+  const reloadAnyway = useCallback(() => {
+    releaseLeaveGuard();
+    window.location.reload();
   }, []);
 
   const visible = offer !== null && hiddenUntil <= Date.now();
-  return { latest: visible ? offer.latest : null, reason: offer?.reason ?? "update", later, reload };
+  return { latest: visible ? offer.latest : null, reason: offer?.reason ?? "update", later, reload, reloadAnyway, state };
 }

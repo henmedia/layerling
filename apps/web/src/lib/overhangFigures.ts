@@ -1,3 +1,4 @@
+import { BREAKAWAY_FOOT_MM, standsOnBreakawayBase } from "@/lib/breakawayBase";
 import { appendMeshData, meshForShape, type Vec3 } from "@/lib/editorMeshCore";
 import { expandBundles } from "@/lib/editorBooleans";
 import { numberLocale, t } from "@/lib/i18n";
@@ -20,17 +21,32 @@ export function overhangBodies(shapes: readonly WorkplaneShape[], ids: readonly 
   return shapes.filter((shape) => !shape.hidden && !shape.hole && !isNonSolidShape(shape) && (ids.length === 0 || ids.includes(shape.id)));
 }
 
-/** A body's overhangs, read from its triangles in the world: a bundle's parts together, without its holes. */
+/**
+ * A body's overhangs, read from its triangles in the world: a bundle's parts together, without its holes. A part on a
+ * breakaway base is read on its own, without the foot that hangs over the socket on purpose (#1633).
+ */
 export function bodyOverhang(shape: WorkplaneShape, angle: number): BodyOverhang {
   const parts = expandBundles([shape]).filter((part) => !part.hole && !part.hidden);
-  const mesh = parts.length === 1 ? meshForShape(parts[0]) : (() => {
+  const onBase = parts.filter(standsOnBreakawayBase);
+  const rest = parts.filter((part) => !standsOnBreakawayBase(part));
+  const meshes: Array<{ vertices: Vec3[]; faces: [number, number, number][]; footMm: number }> = onBase.map((part) => ({ ...meshForShape(part), footMm: BREAKAWAY_FOOT_MM }));
+  if (rest.length === 1) meshes.push({ ...meshForShape(rest[0]), footMm: 0 });
+  else if (rest.length > 1) {
     const vertices: Vec3[] = [];
     const faces: [number, number, number][] = [];
-    parts.forEach((part) => appendMeshData(vertices, faces, meshForShape(part)));
-    return { vertices, faces };
-  })();
-  const found = overhangArea(mesh.vertices, mesh.faces, angle);
-  return { id: shape.id, name: shape.name, areaMm2: found.areaMm2, lowestY: found.lowestY, steepestDegrees: found.steepestDegrees };
+    rest.forEach((part) => appendMeshData(vertices, faces, meshForShape(part)));
+    meshes.push({ vertices, faces, footMm: 0 });
+  }
+  let areaMm2 = 0;
+  let lowestY: number | null = null;
+  let steepestDegrees: number | null = null;
+  for (const mesh of meshes) {
+    const found = overhangArea(mesh.vertices, mesh.faces, angle, 0, mesh.footMm);
+    areaMm2 += found.areaMm2;
+    if (found.lowestY !== null) lowestY = lowestY === null ? found.lowestY : Math.min(lowestY, found.lowestY);
+    if (found.steepestDegrees !== null) steepestDegrees = steepestDegrees === null ? found.steepestDegrees : Math.max(steepestDegrees, found.steepestDegrees);
+  }
+  return { id: shape.id, name: shape.name, areaMm2, lowestY, steepestDegrees };
 }
 
 /** All visible bodies together, as the line under the view shows them: the area to support and the steepest overhang. */

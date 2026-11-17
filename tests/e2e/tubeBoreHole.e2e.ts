@@ -138,6 +138,22 @@ async function bentPipeBlockedVolume(bore: boolean) {
   return volume;
 }
 
+/**
+ * A pipe of outer 10 and wall 1.5 with one 90° bend, its legs along the axes: along each leg the opening reaches the open
+ * end (no gap) and leaves the wall of the bend (1.5); across the pipe it sits in the middle (1.5 either side).
+ */
+function expectOpeningThroughBothEnds(pipe: WorkplaneShape, label: string) {
+  const [solid, bore] = splitBoreTube(pipe);
+  const solidBox = boundsForShapesOfVertices([solid]);
+  const boreBox = boundsForShapesOfVertices([bore]);
+  for (const [low, high] of [["minX", "maxX"], ["minY", "maxY"], ["minZ", "maxZ"]] as const) {
+    const gaps = [boreBox[low] - solidBox[low], solidBox[high] - boreBox[high]].sort((a, b) => a - b);
+    const acrossThePipe = Math.abs(gaps[0] - 1.5) < 0.02;
+    if (acrossThePipe) expect(gaps[1], `${label} ${low}`).toBeCloseTo(1.5, 1);
+    else expect(gaps, `${label} ${low}`).toEqual([expect.closeTo(0, 2), expect.closeTo(1.5, 1)]);
+  }
+}
+
 describe("a bent tube whose opening cuts as a hole (#892)", () => {
   it("leaves the wall standing in its opening without the switch", async () => {
     expect(await bentPipeBlockedVolume(false)).toBeGreaterThan(3);
@@ -179,16 +195,48 @@ describe("a bent tube whose opening cuts as a hole (#892)", () => {
     const natural = bentTubeNaturalDimensions(fields);
     const corner = { ...bentPipe(true), ...fields, width: natural.width, depth: natural.depth, height: natural.height, size: natural.size } as WorkplaneShape;
     for (const turn of [{}, { rotationZ: 270 }, { rotationZ: 90 }, { rotationX: 90 }, { rotationX: 270, rotation: 90 }, { rotationZ: 270, mirrorX: true }]) {
-      const [solid, bore] = splitBoreTube({ ...corner, ...turn } as WorkplaneShape);
-      const solidBox = boundsForShapesOfVertices([solid]);
-      const boreBox = boundsForShapesOfVertices([bore]);
-      for (const [low, high] of [["minX", "maxX"], ["minY", "maxY"], ["minZ", "maxZ"]] as const) {
-        const gaps = [boreBox[low] - solidBox[low], solidBox[high] - boreBox[high]].sort((a, b) => a - b);
-        const acrossThePipe = Math.abs(gaps[0] - 1.5) < 0.02;
-        if (acrossThePipe) expect(gaps[1], `${JSON.stringify(turn)} ${low}`).toBeCloseTo(1.5, 1);
-        else expect(gaps, `${JSON.stringify(turn)} ${low}`).toEqual([expect.closeTo(0, 2), expect.closeTo(1.5, 1)]);
-      }
+      expectOpeningThroughBothEnds({ ...corner, ...turn } as WorkplaneShape, JSON.stringify(turn));
     }
+  });
+
+  it("runs it out at both ends of a pipe bent upwards by the roll of its bend, too (#1545)", async () => {
+    // The pipe of the report: the corner pipe of #1367 with its bend rolled 90°, so it stands without being turned. Its
+    // height holds a leg and the bend as well, and the opening ended 0.75 short of the top end and closed it.
+    const fields = normalizedBentTubeFields({
+      bentTubeSize: 10,
+      bentTubeWall: 1.5,
+      bentTubeSegments: [{ length: 25, bendAngle: 90, bendRadius: 5.1, roll: 90 }, { length: 25, bendAngle: 0, bendRadius: 15, roll: 0 }],
+    });
+    const natural = bentTubeNaturalDimensions(fields);
+    const rolled = { ...bentPipe(true), ...fields, width: natural.width, depth: natural.depth, height: natural.height, size: natural.size } as WorkplaneShape;
+    for (const turn of [{}, { rotationZ: 270 }, { rotationX: 90 }, { rotationX: 180 }, { mirrorY: true }, { rotationZ: 90, mirrorX: true }]) {
+      expectOpeningThroughBothEnds({ ...rolled, ...turn } as WorkplaneShape, JSON.stringify(turn));
+    }
+    // Grouped with the same pipe lying flat beside it, as in the report: the top end stays open.
+    const flat = { ...rolled, ...normalizedBentTubeFields({ ...rolled, bentTubeSegments: [{ length: 25, bendAngle: 90, bendRadius: 5.1, roll: 0 }, { length: 25, bendAngle: 0, bendRadius: 15, roll: 0 }] }), id: "flat" } as WorkplaneShape;
+    const flatNatural = bentTubeNaturalDimensions(normalizedBentTubeFields(flat));
+    Object.assign(flat, { width: flatNatural.width, depth: flatNatural.depth, height: flatNatural.height, size: flatNatural.size, z: -12 });
+    const { group } = await buildGroupedShapeFromSelection([flat, rolled], 500_000);
+    expect(group).not.toBeNull();
+    const solid = manifoldFromMeshData(runtime, meshForShape(group!));
+    const pipeWithoutOpening = manifoldFromMeshData(runtime, meshForShape(splitBoreTube(rolled)[0]));
+    // A plug in the opening just under the top end: the upright leg is the part of the pipe that reaches the top.
+    const box = boundsForShapesOfVertices([rolled]);
+    const legX = [box.minX + 5, box.maxX - 5].find((x) => {
+      const probe = runtime.Manifold.cube([0.5, 0.5, 0.5], true).translate([x, box.maxY - 0.3, (box.minZ + box.maxZ) / 2]);
+      const hit = pipeWithoutOpening.intersect(probe);
+      const found = hit.volume() > 0.1;
+      [probe, hit].forEach((item) => item.delete());
+      return found;
+    });
+    expect(legX).toBeDefined();
+    const plug = runtime.Manifold.cube([3, 0.5, 3], true).translate([legX!, box.maxY - 0.3, (box.minZ + box.maxZ) / 2]);
+    const filled = pipeWithoutOpening.intersect(plug);
+    const inside = solid.intersect(plug);
+    const [filledVolume, volume] = [filled.volume(), inside.volume()];
+    [solid, pipeWithoutOpening, plug, filled, inside].forEach((item) => item.delete());
+    expect(filledVolume).toBeGreaterThan(4);
+    expect(volume).toBeLessThan(0.01);
   });
 
   it("is cut as a solid pipe and an opening that is a hole, and stays one shape otherwise", () => {

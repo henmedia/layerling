@@ -1,13 +1,29 @@
 name: CI
 
+# On main and on pull requests only: a tag points at a commit main has tested already, and a branch of its own gets
+# its run through its pull request.
 on:
   push:
+    branches: [main]
   pull_request:
 
+# A newer push to the same branch or pull request makes the older run worthless: it stops, the newer one tests.
+concurrency:
+  group: ci-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+# The checks run side by side instead of one after the other (16 to 20 minutes in one job, 06.11.2026): the unit tests
+# in three parts, the end-to-end tests in six, the build and the static export each in a job of their own. Vitest
+# splits by a hash of the file name, not by time, so the parts are uneven; with three and six the longest holds about
+# half of the unit time and a quarter of the end-to-end time. The typecheck goes with the lightest unit part.
 jobs:
-  checks:
-    name: Typecheck and unit tests
+  unit:
+    name: Unit tests (${{ matrix.shard }}/3)
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [1, 2, 3]
 
     steps:
       - name: Checkout
@@ -23,19 +39,80 @@ jobs:
         run: npm ci
 
       - name: Typecheck
+        if: matrix.shard == 1
         run: npm run typecheck
 
       - name: Unit tests
-        run: npm test
+        run: npm test -- --shard=${{ matrix.shard }}/3
+
+  e2e:
+    name: End-to-end tests (${{ matrix.shard }}/6)
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [1, 2, 3, 4, 5, 6]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Set up Node
+        uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
 
       - name: End-to-end tests
-        run: npm run test:e2e
+        run: npm run test:e2e -- --shard=${{ matrix.shard }}/6
 
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Set up Node
+        uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      # The types are checked once, in the first unit part; the builds leave out their own check (next.config.ts).
       - name: Build
         run: npm run build
+        env:
+          LAYERLING_TYPES_CHECKED: "1"
 
       - name: Check generated files are committed
         run: git diff --exit-code
 
+  export:
+    name: Static export
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Set up Node
+        uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
       - name: Static export
         run: npm run export
+        env:
+          LAYERLING_TYPES_CHECKED: "1"

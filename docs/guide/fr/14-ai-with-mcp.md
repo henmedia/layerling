@@ -78,10 +78,12 @@ L'IA fonctionne avec les mêmes fonctions que vous, via le même chemin que votr
 | Outil | Ce qu'il fait |
 | --- | --- |
 | `layerling_list_editors` | répertorie les onglets ouverts de l'éditeur |
+| `layerling_rename_project` | donne un nom au projet, comme le crayon à côté du nom du projet |
 | `layerling_open_editor` | ouvre un nouvel onglet d'éditeur dans votre navigateur par défaut et attend qu'il soit connecté (sur votre propre ordinateur uniquement) |
 | `layerling_read_scene` | lit la scène, la sélection, les unités et les dimensions exactes de tous les objets |
 | `layerling_list_objects` | répertorie tous les objets avec les dimensions, la position, la rotation et l'identifiant |
 | `layerling_select_objects` | sélectionne des objets |
+| `layerling_hide_others` | masque tout sauf la sélection ou les objets indiqués, en une seule étape d'annulation |
 | `layerling_delete_objects` | supprime des objets |
 | `layerling_move_object` | déplace un objet à un autre endroit de la liste des objets |
 | `layerling_create_shape` | crée une forme : boîte, cylindre, texte (également courbé), fil, engrenage, corps d'esquisse et tous les autres |
@@ -91,12 +93,16 @@ L'IA fonctionne avec les mêmes fonctions que vous, via le même chemin que votr
 | `layerling_import_mesh` | apporte un maillage triangulaire dans la conception |
 | `layerling_update_object` | change les dimensions, la position, la couleur, le nom, le solide ou le trou et tout ce qui constitue la forme, le bord d'une lettre de texte inclus |
 | `layerling_align_objects` | aligne les objets les uns avec les autres |
-| `layerling_scale_objects` | met à l'échelle les objets selon un pourcentage, ensemble ou chacun en place |
+| `layerling_scale_objects` | met à l'échelle les objets selon un pourcentage, ensemble ou chacun en place, ou à une échelle de modélisme comme 1:87 |
 | `layerling_lay_flat` | pose un objet avec une face sur la plaque |
 | `layerling_place_on_face` | pose des objets sur une face d'une autre, également inclinée, comme la touche C |
-| `layerling_perforate_face` | découpe un motif de trous dans une face plate ; les trous restent groupés avec le corps |
+| `layerling_perforate_face` | découpe un motif de trous dans une face plate ou autour de la paroi d'un cylindre, d'un tube ou d'un alésage ; les trous restent groupés avec le corps |
+| `layerling_thread_insert` | perce le trou pour un insert fileté à chaud (M2 à M8, 1/4-20 ou votre propre taille) dans une face plate ou la paroi extérieure d'un cylindre ou d'un tube, après avoir vérifié que la paroi à côté du trou et la profondeur derrière sont suffisantes ; le trou reste un trou groupé avec le corps |
 | `layerling_sweep_sketch` | tire une section rectangulaire ou ronde le long d'un chemin de points, comme un seul corps exact ; un chemin fermé donne un anneau |
 | `layerling_push_face` | tire une face plane vers l'extérieur ou y creuse une poche, avec un retrait depuis le bord et un rayon des coins ; la nouvelle pièce est un corps d'esquisse regroupé avec le corps |
+| `layerling_paint` | peint des parties d'un corps dans leurs propres couleurs pour une impression en plusieurs couleurs (Peindre) : remplir une face jusqu'à ses arêtes vives, une tache ronde ou un lasso tracé dans une vue à plat ; gommer, tout retirer ; enregistré avec le corps et écrit dans un 3MF sous forme de faces peintes |
+| `layerling_support_rib` | place une fine nervure de support sous la face inférieure d'une pièce imprimée inclinée sur une arête, avec des ponts d'une couche de haut (Nervure de support) |
+| `layerling_stencil_bridges` | retient les parties d'une plaque traversée par un texte qui tomberaient, avec des ponts regroupés avec la plaque, aussi larges et hauts que demandé (Ponts de pochoir) |
 | `layerling_mate_faces` | amène la face d'un objet contre la face d'un autre, face à face ou à fleur |
 | `layerling_open_group` | ouvre un groupe pour que ses parties puissent être modifiées une par une, également un groupe à l'intérieur d'un groupe ouvert |
 | `layerling_close_group` | le referme ("Terminé") ou annule |
@@ -154,12 +160,16 @@ L'IA fonctionne avec les mêmes fonctions que vous, via le même chemin que votr
 | `layerling_insert_custom_shape` | insère une forme personnalisée dans le design ouvert, à un endroit x/z si vous le souhaitez |
 | `layerling_delete_custom_shape` | supprime une forme personnalisée ; les corps insérés restent |
 | `layerling_show_workplane` | cache et affiche la plaque avec sa grille, pour une photo du dessous par exemple (uniquement la vue) |
+| `layerling_focus_mode` | active et désactive le mode concentration : masque la ligne de titre et le pied de page pour plus de place (seulement le cadre de l’éditeur) |
 | `layerling_set_section_view` | coupe la vue ouverte le long d'un plan pour regarder à l'intérieur (seulement la vue, rien n'est coupé) |
 | `layerling_measurements` | affiche ou masque les mesures du ruban à mesurer et les liste avec leurs longueurs, et masque ou affiche les cotes autour de la sélection comme [[Q]], et saisit une longueur pour l'une d'elles, ce qui déplace le corps à son extrémité comme un clic sur son nombre |
 | `layerling_measure_angle` | mesure un angle comme le rapporteur : au sommet de trois points ou entre deux faces planes, et l'affiche dans la vue |
 | `layerling_saved_view` | enregistre la vue actuelle sous la touche 7, 8, 9 ou 0 et y revient, comme Maj+touche et la touche (seulement la vue); règle aussi la vue de départ des nouveaux designs |
 | `layerling_build_plates` | liste, ajoute, nomme, ordonne et retire les plateaux d'impression, déplace des objets sur un plateau et les répartit sur les plateaux, comme la barre des plateaux |
 | `layerling_clear_history` | supprime définitivement chaque étape d'annulation, comme le fait le bouton "Supprimer l'historique" de la vue Historique ; besoins `confirm: true` |
+| `layerling_delete_history_steps` | supprime définitivement des états isolés de l'historique, jamais l'état actuel, comme la corbeille à côté d'une étape dans la liste de la vue de l'historique ; demande `steps` et `confirm: true` |
+| `layerling_list_backups` | liste les sauvegardes automatiques (Versions précédentes) du dessin ouvert, ou avec `all: true` de tous les dessins de ce navigateur |
+| `layerling_open_backup` | ouvre une sauvegarde par son `id` comme nouveau dessin, jamais lié au fichier d'origine |
 | `layerling_set_history_view` | revient sur un état antérieur du projet, comme la vue Historique (la conception réelle reste intacte ; les outils de changement attendent qu'il soit fermé) |
 | `layerling_restore_from_history` | ramène des objets (aussi des pièces dans des groupes) d'un état antérieur dans la conception, sous forme de copies, comme « Ramener dans la conception » de la vue Historique - une étape que l'annulation reprend |
 | `layerling_export_section_svg` | renvoie les contours sur un plan de coupe au format SVG à 1:1, à partir des mêmes corps que l'export |

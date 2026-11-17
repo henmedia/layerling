@@ -223,6 +223,262 @@ html[data-theme="dark"] .shortcuts-or {
   color: #9b8a76;
 }
 
+/* Your own keys (Discussion #1399): above the fixed list, as wide as the window, with the steps to add one. */
+.shortcuts-custom {
+  margin-bottom: 4px;
+  padding: 12px 14px;
+  background: #fbf8f3;
+  border: 1px solid #efe6da;
+  border-radius: 8px;
+}
+
+.shortcuts-custom h3 {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.shortcuts-custom-intro {
+  margin: 0;
+  color: #7a6550;
+  font-size: 12.5px;
+  font-weight: 600;
+}
+
+.shortcuts-custom dl {
+  max-width: 640px;
+}
+
+.shortcuts-custom-note {
+  color: #a3917f;
+  font-weight: 600;
+}
+
+.shortcuts-custom-elsewhere dt {
+  color: #a3917f;
+}
+
+.shortcuts-custom-keys {
+  gap: 6px;
+}
+
+.shortcuts-custom-change,
+.shortcuts-custom-remove {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px;
+  color: inherit;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.shortcuts-custom-change:hover,
+.shortcuts-custom-change:focus-visible {
+  border-color: #d46b08;
+}
+
+.shortcuts-custom-remove {
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  color: #a3917f;
+}
+
+.shortcuts-custom-remove:hover,
+.shortcuts-custom-remove:focus-visible {
+  color: #9a2f14;
+  background: #f3ece2;
+}
+
+.shortcuts-custom-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.shortcuts-custom-add,
+.shortcuts-custom-reset,
+.shortcuts-custom-cancel {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 11px;
+  color: #5f4529;
+  background: #ffffff;
+  border: 1px solid #dacfc2;
+  border-radius: 6px;
+  font-size: 12.5px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.shortcuts-custom-add:hover,
+.shortcuts-custom-reset:hover,
+.shortcuts-custom-cancel:hover {
+  border-color: #d46b08;
+}
+
+.shortcuts-custom-add:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.shortcuts-custom-reset {
+  color: #8a5a3a;
+  background: transparent;
+}
+
+.shortcuts-custom-find {
+  display: grid;
+  gap: 6px;
+}
+
+.shortcuts-custom-results {
+  display: grid;
+  gap: 2px;
+  max-width: 640px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.shortcuts-custom-results button {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 5px 8px;
+  color: #6c5a48;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  font-size: 12.5px;
+  font-weight: 600;
+  text-align: left;
+  cursor: pointer;
+}
+
+.shortcuts-custom-results button:hover,
+.shortcuts-custom-results button:focus-visible {
+  background: #f3ece2;
+  border-color: #e2d9cd;
+}
+
+.shortcuts-custom-result-label {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.shortcuts-custom-result-group {
+  color: #a3917f;
+  font-size: 11.5px;
+}
+
+.shortcuts-custom-results kbd {
+  padding: 1px 5px;
+  color: #5f4529;
+  background: #f6f3ed;
+  border: 1px solid #dacfc2;
+  border-bottom-width: 2px;
+  border-radius: 4px;
+  font-family: inherit;
+  font-size: 11px;
+}
+
+/* Waiting for the key: a field of its own that has the focus, so every key lands here and nowhere else. */
+.shortcuts-custom-record {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  max-width: 640px;
+  padding: 9px 12px;
+  color: #5f4529;
+  background: #fff4e5;
+  border: 1px dashed #d46b08;
+  border-radius: 6px;
+  outline: none;
+  font-size: 12.5px;
+  font-weight: 600;
+}
+
+.shortcuts-custom-record:focus-visible {
+  border-style: solid;
+}
+
+.shortcuts-custom-message {
+  margin: 0;
+  color: #3d6b2f;
+  font-size: 12.5px;
+  font-weight: 600;
+}
+
+.shortcuts-custom-message.error {
+  color: #9a2f14;
+}
+
+html[data-theme="dark"] .shortcuts-custom {
+  background: #241d17;
+  border-color: #3a2f25;
+}
+
+html[data-theme="dark"] .shortcuts-custom-intro {
+  color: #cbbba6;
+}
+
+html[data-theme="dark"] .shortcuts-custom-note,
+html[data-theme="dark"] .shortcuts-custom-elsewhere dt,
+html[data-theme="dark"] .shortcuts-custom-result-group {
+  color: #9b8a76;
+}
+
+html[data-theme="dark"] .shortcuts-custom-add,
+html[data-theme="dark"] .shortcuts-custom-cancel {
+  color: #f1eadd;
+  background: #1e1a16;
+  border-color: #443a30;
+}
+
+html[data-theme="dark"] .shortcuts-custom-reset {
+  color: #e0b48c;
+  border-color: #443a30;
+}
+
+html[data-theme="dark"] .shortcuts-custom-results button {
+  color: #cbbba6;
+}
+
+html[data-theme="dark"] .shortcuts-custom-results button:hover,
+html[data-theme="dark"] .shortcuts-custom-results button:focus-visible,
+html[data-theme="dark"] .shortcuts-custom-remove:hover {
+  background: #3a2e22;
+  border-color: #4a3b2c;
+}
+
+html[data-theme="dark"] .shortcuts-custom-results kbd {
+  color: #f1eadd;
+  background: #322518;
+  border-color: #635241;
+}
+
+html[data-theme="dark"] .shortcuts-custom-record {
+  color: #f1eadd;
+  background: #33241a;
+  border-color: #f6ad55;
+}
+
+html[data-theme="dark"] .shortcuts-custom-message {
+  color: #9ccc84;
+}
+
+html[data-theme="dark"] .shortcuts-custom-message.error {
+  color: #f19a7c;
+}
+
 /* The printed list of shortcuts (Print button of the window, or Ctrl+P while it is open): black on
    white and in large type, with nothing else of the app. The sheet is a child of the body, hidden on
    screen; while the attribute is on <html>, every other child of the body goes. */

@@ -13,6 +13,7 @@ import { createPrismGeometry } from "@/lib/prismGeometry";
 import { createRoundedBoxGeometry } from "@/lib/roundedBoxGeometry";
 import { transformMesh } from "@/lib/editorMeshCore";
 import { narrowCurveForShape, shapeHasNarrow, slopeCurveForShape } from "@/lib/slopeAlong";
+import { shellSolid } from "@/lib/cadShell";
 
 /*
  * Slope along: the exact body (a box's side outline pushed across, a round roof's
@@ -151,6 +152,8 @@ describe("slope along: exact bodies", () => {
     ["down to the right, straight", { slopeEnd: 5, slopeSide: "right" }],
     ["down to the back, bulging up", { slopeEnd: 6, slopeSide: "back", slopeCurve: 0.7 }],
     ["down to the right, sagging", { slopeEnd: 4, slopeSide: "right", slopeCurve: -1 }],
+    ["down to the back, arched from its middle", { slopeEnd: 6, slopeSide: "back", slopeFrom: "arch", slopeCurve: 0.7 }],
+    ["down to the left, arched downwards from its middle", { slopeEnd: 5, slopeSide: "left", slopeFrom: "arch", slopeCurve: -0.8 }],
   ];
 
   it.each(boxes)("builds a box sloping %s: the hand-worked volume, where the mesh stands", (_name, extra) => {
@@ -238,6 +241,7 @@ describe("slope along: exact bodies", () => {
     // [name, shape, its footprint's width across at z (mm from the middle along the slope's axis)]
     ["a cylinder cut down to the back, straight", shape("cylinder", { width: 30, depth: 30, slopeEnd: 8, slopeSide: "back" }), (z) => 2 * Math.sqrt(Math.max(0, 225 - z * z))],
     ["an ellipse sloping to the right, bulging", shape("ellipse", { width: 40, depth: 24, slopeEnd: 6, slopeSide: "right", slopeCurve: 0.8 }), (x) => 2 * 12 * Math.sqrt(Math.max(0, 1 - (x / 20) ** 2))],
+    ["an ellipse sloping to the right, arched from the middle of the slope", shape("ellipse", { width: 57, depth: 26, height: 25, slopeEnd: 9, slopeSide: "right", slopeFrom: "arch", slopeCurve: 0.6 }), (x) => 2 * 13 * Math.sqrt(Math.max(0, 1 - (x / 28.5) ** 2))],
     ["a tube cut slanting like a mitre", shape("tube", { width: 30, depth: 30, bevel: 3, slopeEnd: 5, slopeSide: "front" }), (z) => 2 * Math.sqrt(Math.max(0, 225 - z * z)) - 2 * Math.sqrt(Math.max(0, 144 - z * z))],
   ];
 
@@ -259,6 +263,41 @@ describe("slope along: exact bodies", () => {
       expect(cadProfileSolidMismatch(cad, solid, expected)).toBeNull();
       expect(Math.abs(cad.getVolume(solid) / expected.volume - 1)).toBeLessThan(2e-3);
     }
+  });
+
+  it("builds a sloping rounded box with rounded top and bottom edges, the top's round along the slope (Discussion #1544)", () => {
+    for (const extra of [{ topBottomFillet: 2 }, { topBottomFillet: 3, bottomFillet: 1 }]) {
+      const source = shape("roundedBox", { width: 60, depth: 40, height: 40, cornerFillet: 5, slopeEnd: 25, ...extra });
+      const { solid, expected } = body(source);
+      expect(cadProfileSolidMismatch(cad, solid, expected)).toBeNull();
+      // The display squeezes its rounds with the slope, the exact body keeps them round: close, not equal.
+      expect(Math.abs(cad.getVolume(solid) / expected.volume - 1)).toBeLessThan(1e-2);
+      // A body of its own faces, not the mesh's thousands of facets that Hollow could not take (it hung).
+      const faces = cad.getSubShapes(solid, "face");
+      expect(faces.length).toBeLessThan(40);
+      const types = faces.map((face) => cad.surfaceType(face));
+      expect(types.filter((type) => type !== "plane" && type !== "cylinder").length).toBeGreaterThan(0);
+      // The round over the high end's corner is a true round here and a squeezed one on the display: up to 0.24 mm apart.
+      const bounds = trueBounds(solid);
+      bounds.forEach((value, index) => expect(Math.abs(value - expected.bounds[index])).toBeLessThan(index === 4 ? 0.3 : 0.05));
+    }
+  });
+
+  it("hollows a sloping rounded box with its sloping top open, in moments (Discussion #1544)", () => {
+    const { solid } = body(shape("roundedBox", { width: 60, depth: 40, height: 40, cornerFillet: 5, topBottomFillet: 2, slopeEnd: 25 }));
+    const started = performance.now();
+    const open = shellSolid(cad, solid, 1.6, "top");
+    const closed = shellSolid(cad, solid, 1.6, "none");
+    expect(performance.now() - started).toBeLessThan(20000);
+    expect(cad.isValid(open)).toBe(true);
+    // The sloping lid the sealed one keeps: about 57 x 37 mm along the slope, 1.6 mm thick.
+    const lid = cad.getVolume(closed) - cad.getVolume(open);
+    expect(lid).toBeGreaterThan(0.8 * 57 * 37 * 1.6);
+    expect(lid).toBeLessThan(1.1 * 60 * 40 * 1.6);
+  });
+
+  it("leaves a sloping rounded box whose low end is too short for both rounds on its display mesh", () => {
+    expect(cadModifierProfileForShape(shape("roundedBox", { width: 60, depth: 40, height: 40, topBottomFillet: 2, slopeEnd: 3 }))).toBeNull();
   });
 
   it.each([

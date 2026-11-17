@@ -15,7 +15,7 @@ Tre ting sker:
 - I arbejdsplanets hjørne vises printerens navn og dens byggevolumen. Hvis teksten er i vejen, så slå den fra med {{ui:workspace.showPlateLabels}} under {{ui:workspace.workplane}}; det gælder også designets navn forrest til venstre.
 - layerling **advarer** når noget ikke passer.
 
-Printerprofilerne kommer fra OrcaSlicer, så de er de samme som din slicer kender. Hvis du hellere vil arbejde uden en printer, vælg {{ui:workspace.printerNone}}. Du kan også sætte arbejdsplanets størrelse i hånden.
+De fleste printerprofiler kommer fra OrcaSlicer. Hvis du hellere vil arbejde uden en printer, vælg {{ui:workspace.printerNone}}. Du kan også sætte arbejdsplanets størrelse i hånden.
 
 Deltaprintere som dem fra FLSun eller SeeMeCNC eller Anycubic Predator printer på en rund plade. Med en af dem er arbejdsfladen også rund, lige så bred som pladen, og et legeme er for stort, så snart det rækker ud over kanten. Et rundt legeme måles efter sit eget omrids, ikke efter kassen omkring det, så en cylinder næsten lige så bred som pladen passer stadig.
 
@@ -48,6 +48,20 @@ I menuen ved siden af øjet ({{ui:editor.group.visibility}}) slår **Vis overhæ
 
 Hvor stejlt din printer klarer sættes i indstillingerne under {{ui:workspace.appearance}}: fra 30° (forsigtig) til 70° (for printere med god delkøling). En flade der hviler på en anden form markeres stadig - layerling kigger kun på selve fladen.
 
+## Støtteribber til en skrå del
+
+En del, der printes skråt på en kant, for eksempel ved 45°, behøver ofte ingen støtter: dens flader er stejle nok. Men den står på en smal kant og kan vælte. {{ui:supportRib.title}} holder den: under dens nederste flade står en tynd ribbe med lidt afstand på en oval fod, og bittesmå broer holder delen fast. Vend først delen om på kanten, og lad den stå på pladen.
+
+1. Vælg delen og klik {{ui:supportRib.title}} i gruppen {{ui:editor.section.splitShape}} i båndet, højreklik på delen, eller find den med [[Ctrl]]+[[K]].
+2. Klik den nederste flade, hvor ribben skal stå. Fladen skal vende nedad, hælde mellem 15° og 75° og nå ned til pladen; ribben står fra dit klik lige ned ad fladen. Er delens nederste kant afrundet eller affaset, må fladen ende op til 3 mm over pladen: klik den plane flade over afrundingen.
+3. Indstil {{ui:supportRib.nozzle}}, {{ui:supportRib.layerHeight}} og {{ui:supportRib.firstLayer}} som i din slicer. Ribben er to dysebaner tyk, afstanden til delen en halv bane; hver bro er én bane bred og præcis ét lag høj og ligger på et lag i printet, så sliceren printer den som én tynd bane, der knækker rent af. {{ui:supportRib.height}} er, hvor højt ribben når op ad fladen (først halvvejs), {{ui:supportRib.bridgeSpacing}}, hvor langt broerne ligger fra hinanden, i hele lag.
+4. Under {{ui:supportRib.more}} kan tykkelsen, afstanden, broernes bredde og fodens tykkelse sættes i hånden (indtil da følger de dysen og lagene), og også fodens bredde og afrundingerne ved foden og foroven. Med {{ui:supportRib.bridgeGap}} over 0 rækker broerne ikke længere ind i delen, men stopper så langt før den, målt i laget: sliceren printer så hver som sin egen bane, der holder delen med den klemte streg og går af uden mærke (en halv streg, 0,2 mm ved en 0,4 mm dyse, er en god start). Gør {{ui:supportRib.gap}} større samtidig, så broerne stadig spænder over en del af den.
+5. {{ui:supportRib.apply}} tilføjer ribben. Med {{ui:supportRib.bundle}} (først slået til) er ribbe og del bundtet: de flytter sig sammen og kommer som to former side om side i sliceren, forbundet af broerne i printet.
+
+Ribben er en mesh-form: for at ændre den sletter du den og laver den igen. Hvert klik laver én ribbe; for flere klik {{ui:supportRib.repick}} eller gentag den med {{ui:editor.tool.array}}. Ribben må ingen steder gå ind i delen, og delen skal stå på pladen - ellers siger vinduet hvorfor. Dine indstillinger gemmes i denne browser til den næste ribbe.
+
+{{ui:clearance.title}} og {{ui:printCheck.title}} kender ribben: at dens broer går ind i delen, og at ribben og broerne er tynde og ligger ét lag høje over spalten, er meningen og meldes ikke. En ribbe lavet med layerling 1.148.0 har ikke dette mærke endnu; lav den igen, så springer kontrollerne den over.
+
 ## Vægtykkelse, frirum og faser
 
 - Vægge bør være mindst to ekstruderingslinjer brede, så 0,8 mm med en 0,4 mm dyse. Robuste dele har brug for 1,2 til 2 mm.
@@ -58,9 +72,12 @@ Hvor stejlt din printer klarer sættes i indstillingerne under {{ui:workspace.ap
 
 Hver printer printer huller lidt mindre og stifter lidt tykkere, end de er tegnet, hver med sit eget mål. Det spillerum, to printede dele har brug for, er derfor først et gæt. Mål det hellere én gang: i indstillingerne under {{ui:workspace.workplane}} lægger {{ui:workspace.fitTestMake}} en pasprøve på pladen. Det er en plade på 60 × 20 × 4 mm med syv huller til én stift på 5 mm, hvert tegnet som 5 mm plus to gange 0,05, 0,10, 0,15, 0,20, 0,25, 0,30 eller 0,40 mm, med værdien hævet ved siden af, og selve stiften på 5 mm, der står ved siden af pladen med en lille fas foroven. Den består af almindelige former, så den printes sammen med resten af pladen, uden support.
 
-Print den, som den ligger, og stik så stiften med fasen forrest ind i hullerne, det snævreste først. **Det snævreste hul, som stiften stadig kan dreje i,** giver din printers spillerum. Skriv tallet under {{ui:workspace.printerPlay}}, eller klik på det blandt værdierne under feltet. Spillerummet gælder pr. side, i millimeter, og browseren gemmer det for alle designs; et tomt felt betyder ikke målt.
+På en printer, hvor pladen bevæger sig frem og tilbage, kan den høje, tynde stift vakle løs eller blive bølget forneden, med eller uden brim. Sæt flueben ved {{ui:workspace.fitTestBase}}, før du laver pasningstesten: stiften står så på en lille 10 mm plade, der holder fast på pladen. Den rører ikke fatningens væg, men står på en lille knop i bunden; efter print vipper du stiften frem og tilbage, så knækker den af.
 
-Fra da af starter nye anvendelser med spillerummet i stedet for den indbyggede værdi: {{ui:lid.gap}} og {{ui:lid.hingePinPlay}} i værktøjet {{ui:editor.tool.lid}}, spillerummet for en ny {{ui:shape.dovetail}} og {{ui:shape.snapFit}}, {{ui:prop.clearance}} for en ny møtrik eller et nyt gevindhul – det dobbelte spillerum, da det er pladsen over hele diameteren – og {{ui:clearance.threshold}} i {{ui:editor.tool.clearance}}. Så længe et sådant felt stadig har den værdi, siger "{{ui:printerPlay.fromFitTest}}" ved siden af, hvor tallet kommer fra. Et hængsel, der printes i ét stykke, og leddene fra værktøjet {{ui:editor.tool.flexi}} beholder deres 0,4 mm: printet i ét stykke skal deres spalter også holdes åbne mellem lagene, og det måler en stift, der er printet for sig, ikke. Plads til at presse en magnet eller en Gridfinity-nøgle i og plads til et købt stik eller print beholder også deres egne værdier. Legemer, der allerede er i et design, ændrer sig aldrig, og det gør et design, du åbner, heller ikke.
+Print den, som den ligger, og stik så stiften med fasen forrest ind i hullerne, det snævreste først. **Det snævreste hul, som stiften stadig kan dreje i,** giver din printers spillerum. Skriv tallet under {{ui:workspace.printerPlay}}, eller klik på det blandt værdierne under feltet. Spillerummet gælder pr. side, i millimeter, og browseren gemmer det for alle designs; et tomt felt betyder ikke målt.
+Med flere printere vælger du først den, du printer på, under {{ui:workspace.printer}}: hver printer har sit eget spillerum, og nye brug starter fra spillerummet for den printer, designet er sat til. En printer uden sit eget bruger spillerummet, der blev sat, mens ingen printer var valgt.
+
+Fra da af starter nye anvendelser med spillerummet i stedet for den indbyggede værdi: {{ui:lid.gap}} og {{ui:lid.hingePinPlay}} i værktøjet {{ui:editor.tool.lid}}, spillerummet for en ny {{ui:shape.dovetail}} og {{ui:shape.snapFit}}, {{ui:prop.clearance}} for en ny møtrik eller et nyt gevindhul – det dobbelte spillerum, da det er pladsen over hele diameteren – og {{ui:clearance.threshold}} i {{ui:editor.tool.clearance}}. Det samme gælder {{ui:split.connectorClearance}} for dyvler, tappe og svalehaler i {{ui:editor.tool.split}}. Så længe et sådant felt stadig har den værdi, siger "{{ui:printerPlay.fromFitTest}}" ved siden af, hvor tallet kommer fra. Et hængsel, der printes i ét stykke, og leddene fra værktøjet {{ui:editor.tool.flexi}} beholder deres 0,4 mm: printet i ét stykke skal deres spalter også holdes åbne mellem lagene, og det måler en stift, der er printet for sig, ikke. Plads til at presse en magnet eller en Gridfinity-nøgle i og plads til et købt stik eller print beholder også deres egne værdier. Legemer, der allerede er i et design, ændrer sig aldrig, og det gør et design, du åbner, heller ikke.
 
 ## Tjek printet
 
@@ -74,7 +91,7 @@ Fra da af starter nye anvendelser med spillerummet i stedet for den indbyggede v
 
 ![En bakke, hvis højre væg kun er 0,6 mm tyk: Tjek print maler den rød og nævner den i vinduet.](shot:print-check)
 
-{{ui:printCheck.show}} ved en linje fører kameraet derhen; den vælger de svævende dele, dem med lille kontakt og de åbne mesh, og ved overhængene slår den **Vis overhæng** til. Legemer, der overlapper, tjekkes samlet, som sliceren samler dem. Ændrer du modellen, mens vinduet er åbent, står der {{ui:printCheck.stale}}; klik på det eller på {{ui:printCheck.checkAgain}}. [[Esc]] lukker vinduet. Intet i modellen ændres. En AI laver samme tjek med `layerling_check_print`.
+{{ui:printCheck.show}} ved en linje fører kameraet derhen; den vælger de svævende dele, dem med lille kontakt og de åbne mesh, og ved overhængene slår den **Vis overhæng** til. Legemer, der overlapper, tjekkes samlet, som sliceren samler dem. Ændrer du modellen, mens vinduet er åbent, står der {{ui:printCheck.stale}}; klik på det eller på {{ui:printCheck.checkAgain}}. [[Esc]] lukker vinduet. Intet i modellen ændres. En AI laver samme tjek med `layerling_check_print`. Vinduet tjekker kun, det printer og gemmer ikke noget: For at printe eksporterer du modellen til din slicer med {{ui:editor.export}} i gruppen {{ui:editor.group.file}}. {{ui:printCheck.openExport}} i vinduet lukker tjekket og åbner eksporten.
 
 ## Når du er klar
 

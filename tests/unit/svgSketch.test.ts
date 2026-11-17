@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 import { describe, expect, it } from "vitest";
 import { importedShapeFromSvg } from "@/lib/svgImport";
-import { sketchProfileFromSvg } from "@/lib/svgSketch";
+import { MAX_SVG_SKETCH_SEGMENTS, sketchProfileFromSvg } from "@/lib/svgSketch";
 import { cadSketchRegions, orderedCadSketchPaths, silhouetteSketchProfile, type OrderedCadSketchPath } from "@/lib/sketchCadProfile";
 import type { SketchProfile } from "@/types/layerling";
 
@@ -169,5 +169,22 @@ describe("SVG as a sketch (#197)", () => {
     expect(regions[0].holes).toHaveLength(0);
     expect(profileArea(silhouette)).toBeCloseTo(100 * 100, 6);
     expect(silhouette.silhouette).toBe(true);
+  });
+
+  it("takes a traced picture of thousands of tiny lines as a sketch (#1742), up to the limit", () => {
+    // A traced outline of pixel steps: a ring of n short lines, as the reporter's dog ornament came (7,282 of them).
+    const ring = (steps: number) => {
+      let d = "M 100,10";
+      for (let index = 1; index < steps; index += 1) {
+        const angle = (index / steps) * Math.PI * 2;
+        d += ` L ${(100 + 90 * Math.sin(angle)).toFixed(3)},${(100 - 90 * Math.cos(angle)).toFixed(3)}`;
+      }
+      return `<path d="${d} Z" />`;
+    };
+    expect(MAX_SVG_SKETCH_SEGMENTS).toBeGreaterThanOrEqual(7282);
+    const profile = sketchProfileFromSvg(svg(ring(7300)));
+    expect(profile).not.toBeNull();
+    expect(profile!.points).toHaveLength(7300);
+    expect(sketchProfileFromSvg(svg(ring(MAX_SVG_SKETCH_SEGMENTS + 50)))).toBeNull();
   });
 });

@@ -29,6 +29,9 @@ function communityUrl(language: Language) {
   return LANGUAGE_INFO[language].communityUrl;
 }
 
+/** The Layerling User Group on Facebook, for every language: many users meet there, not everyone is on GitHub. */
+export const FACEBOOK_GROUP_URL = "https://www.facebook.com/groups/1652302960025098/";
+
 // Whoever operates a layerling installation may be required to publish a legal
 // notice - in Germany every business site needs an Impressum. The pages differ
 // per operator and are not part of this project, so they are linked through
@@ -99,6 +102,7 @@ export function AppFooter({
   updateInfo,
   onBugReport,
   onShowWelcome,
+  onShowAnnouncement,
 }: {
   variant?: "dashboard" | "editor";
   version: string;
@@ -107,6 +111,8 @@ export function AppFooter({
   onBugReport?: () => void;
   /** On the start page once the welcome guide was closed: the way to bring it back. */
   onShowWelcome?: () => void;
+  /** On the start page while an announcement runs that was closed here: the way to read it again. */
+  onShowAnnouncement?: () => void;
 }) {
   const language = useLanguage();
   const simpleMode = useSimpleMode();
@@ -145,6 +151,18 @@ export function AppFooter({
               {sponsor.label || t("dashboard.sponsor")}
             </a>
           ) : null,
+          onShowAnnouncement ? (
+            <a
+              href="#announcement"
+              key="announcement"
+              onClick={(event) => {
+                event.preventDefault();
+                onShowAnnouncement();
+              }}
+            >
+              {t("announcement.footerLink")}
+            </a>
+          ) : null,
           onShowWelcome ? (
             <a
               href="#welcome"
@@ -154,7 +172,7 @@ export function AppFooter({
                 onShowWelcome();
               }}
             >
-              {t("welcome.teaserTitle")}
+              {t("dashboard.welcomeLink")}
             </a>
           ) : null,
           <a href={t("welcome.guideUrl")} target="_blank" rel="noreferrer" key="guide">
@@ -162,6 +180,10 @@ export function AppFooter({
           </a>,
           <a href={communityUrl(language)} target="_blank" rel="noreferrer" key="community">
             {t("dashboard.forum")}
+          </a>,
+          // Short names keep both halves of the footer on one line: the longer wording is the tooltip.
+          <a href={FACEBOOK_GROUP_URL} target="_blank" rel="noreferrer" key="facebook" title={t("dashboard.facebookGroup")}>
+            Facebook
           </a>,
           // Ein Link in Knopfrolle: so traegt er die Farben der Fusszeile in
           // jedem Thema, und die Werkzeugleiste wird nicht breiter.
@@ -186,8 +208,8 @@ export function AppFooter({
       </div>
       <div className="dashboard-legal-group">
         {joinWithDots([
-          <a href={readmeUrl(language)} target="_blank" rel="noreferrer" key="readme">
-            {t("dashboard.projectOnGitHub")}
+          <a href={readmeUrl(language)} target="_blank" rel="noreferrer" key="readme" title={t("dashboard.projectOnGitHub")}>
+            GitHub
           </a>,
           // Only on the start page, where the list is shown.
           variant === "dashboard" ? (

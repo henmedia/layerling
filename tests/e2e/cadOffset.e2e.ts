@@ -87,6 +87,49 @@ describe("offsetting a solid with the real OCCT kernel", () => {
     [small, box, disc, lying, wider].forEach((handle) => kernel.release(handle));
   });
 
+  // #1521: the rounded edges of a box rounded by 1 mm shrink to nothing at 2 mm, and the kernel handed
+  // back loose shells that were taken for a body; a hole made of them could not be cut.
+  it("shrinks a box with rounded edges by more than their radius into a closed body", () => {
+    const box = kernel.makeBox(160, 50, 185);
+    const rounded = kernel.fillet(box, kernel.getSubShapes(box, "edge"), 1);
+    const small = offsetSolid(kernel, rounded, 2, true);
+    expect(kernel.isSolid(small) || kernel.subShapeCount(small, "solid") === 1).toBe(true);
+    expect(kernel.subShapeCount(small, "shell")).toBe(1);
+    // Shrunk past its rounding the box comes out sharp: 156 x 46 x 181.
+    expect(kernel.getVolume(small)).toBeCloseTo(156 * 46 * 181, 0);
+    [small, rounded, box].forEach((handle) => kernel.release(handle));
+  });
+
+  it("shrinks the enclosure from the report with its groove and notch into a closed body", () => {
+    const box = kernel.makeBox(160, 50, 185);
+    const rounded = kernel.fillet(box, kernel.getSubShapes(box, "edge"), 1);
+    const groove = kernel.makeBoxFromCorners({ x: 60, y: 42, z: -1 }, { x: 100, y: 51, z: 186 });
+    const notch = kernel.makeBoxFromCorners({ x: 60, y: 22.5, z: 158 }, { x: 100, y: 51, z: 186 });
+    const grooved = kernel.cut(rounded, groove);
+    const body = kernel.cut(grooved, notch);
+    const small = offsetSolid(kernel, body, 2, true);
+    expect(kernel.isValid(small)).toBe(true);
+    expect(kernel.subShapeCount(small, "solid")).toBe(1);
+    expect(kernel.subShapeCount(small, "shell")).toBe(1);
+    expect(kernel.getVolume(small)).toBeLessThan(kernel.getVolume(body));
+    expect(kernel.getVolume(small)).toBeGreaterThan(156 * 46 * 181 * 0.9);
+    [small, body, grooved, notch, groove, rounded, box].forEach((handle) => kernel.release(handle));
+  });
+
+  it("keeps a thin round hole through a rounded box when shrinking it past the rounding", () => {
+    const box = kernel.makeBox(40, 20, 30);
+    const rounded = kernel.fillet(box, kernel.getSubShapes(box, "edge"), 1);
+    // The hole bends the other way: thinner than the distance, it still stays a hole and grows.
+    const pin = kernel.translate(kernel.makeCylinder(1.5, 40), 20, 10, -5);
+    const holed = kernel.cut(rounded, pin);
+    const small = offsetSolid(kernel, holed, 2, true);
+    expect(kernel.subShapeCount(small, "solid")).toBe(1);
+    expect(kernel.subShapeCount(small, "shell")).toBe(1);
+    // 36 x 16 x 26, with the hole grown from a radius of 1.5 to 3.5 all the way through.
+    expect(kernel.getVolume(small)).toBeCloseTo(36 * 16 * 26 - Math.PI * 3.5 * 3.5 * 26, 0);
+    [small, holed, pin, rounded, box].forEach((handle) => kernel.release(handle));
+  });
+
   it("refuses a shrink that eats the whole body", () => {
     const box = kernel.makeBox(4, 4, 4);
     expect(() => offsetSolid(kernel, box, 5, true)).toThrow(CANNOT_OFFSET_MESSAGE);

@@ -7,13 +7,14 @@ import { curveStretches } from "@/lib/sketchCurveThroughPoints";
 import { markEscapeHandled } from "@/lib/escapeHandled";
 import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties, type Dispatch, type SetStateAction, type FocusEvent as ReactFocusEvent, type KeyboardEvent as ReactKeyboardEvent, type MouseEvent as ReactMouseEvent, type PointerEvent as ReactPointerEvent, type WheelEvent as ReactWheelEvent } from "react";
 import { SnapGridControl } from "@/components/workplane/ShapeInspector";
+import { SnapGridPointerMenu } from "@/components/workplane/SnapGridMenu";
 import { SketchRevolvePreview } from "@/components/SketchRevolvePreview";
 import { SketchNotes } from "@/components/SketchNotes";
 import { SketchLockBadge, SketchRotateHandles, SketchTurnRing } from "@/components/SketchHandles";
 import { lockBadgeSpot, rotateHandleSpots } from "@/lib/sketchHandleSpots";
 import { SKETCH_DOUBLE_CLICK_PIXELS, useSketchViewSlide } from "@/lib/useSketchViewSlide";
 import { ToolbarConstructionLineIcon, ToolbarNoteIcon } from "@/components/toolbarIcons";
-import { CAMERA_BAR_PANEL, CameraBarHandle } from "@/components/workplane/CameraBarHandle";
+import { CAMERA_BAR_PANEL, CameraBarHandle, useCameraBarPeek } from "@/components/workplane/CameraBarHandle";
 import { constructionCrossings } from "@/lib/sketchConstruction";
 import { movingSelectionCentre, outlineSideMiddles, selectionSnapTargets, sketchSnapPoints, snappedSelectionTarget } from "@/lib/sketchSnapPoints";
 import { openEndPoints } from "@/lib/sketchPointJoin";
@@ -42,7 +43,7 @@ import { resizeSketchPoints, resizeSketchPointsToSize, type ResizeHandle, type S
 import { alignSketchSelection, canAlignSketchSelection, type SketchAlignMode } from "@/lib/sketchAlign";
 import { changesLockedOutline, lockedCornerTurn, lockedLengthAnchor, sketchLockState } from "@/lib/sketchLock";
 import { dragRotationDegrees, rotateSketchPointsAbout, sketchPointsPivot, sketchTurnRing, sketchTurnStep, SKETCH_TURN_RING_STEP } from "@/lib/sketchRotation";
-import { calibrateImage, centreImage, cropImage, imageAngleTo, imageCorners, imageCropViewBox, imageHandlePositions, normalizeImageRotation, resizeImage, rotateImage, uncropImage } from "@/lib/sketchImageTransform";
+import { calibrateImage, centreImage, cropImage, imageAngleTo, imageCorners, imageCropViewBox, imageHandlePositions, normalizeImageRotation, resizeImage, rotateImage, sketchImageSizeLimits, uncropImage } from "@/lib/sketchImageTransform";
 import { MAX_TRACE_CORNER_ANGLE, MIN_TRACE_CORNER_ANGLE, type PictureTrace, type TracePart } from "@/lib/pictureTrace";
 import { planePointToTraced, tracedLinePath, tracedPixelSize, tracedPointOnPlane, tracePreviewPath, type TracedSize } from "@/lib/sketchImageTrace";
 import { useSketchImageTrace, type SketchImageTraceState } from "@/lib/useSketchImageTrace";
@@ -53,6 +54,7 @@ import { displayY, insideZ } from "@/lib/displayAxes";
 import { clampNudge, constrainToAxis, sketchSegmentDragPointIds, sketchSelectedPointIds, sketchSelectedSegmentIds, sketchSelectionMovePointIds, type SketchSelectableEntity, type SketchSelection } from "@/lib/sketchSelection";
 import { closedPathAt, closedPathRegions, cubicPoint, curveControls, isInsideEdges, orderedPaths, pathEdges, type DisplayPath, type PlaneEdge } from "@/lib/sketchPaths";
 import { capturePointer } from "@/lib/pointerCapture";
+import { useMiddleClick } from "@/lib/middleClick";
 import { sketchBoardSize, sketchFarthestReach, sketchMinZoom, sketchPointerReach } from "@/lib/sketchBoard";
 import { arcPreviewPoints, arcThroughThreePoints, type SketchArcEnd } from "@/lib/sketchArc";
 import { constrainToAngle, sketchLineAngle, sketchPolarPoint, splitTypedLine } from "@/lib/sketchPolar";
@@ -412,6 +414,15 @@ function rotateAround(point: { x: number; z: number }, degrees: number, cx: numb
   const dx = point.x - cx;
   const dz = point.z - cz;
   return { x: cx + dx * Math.cos(angle) - dz * Math.sin(angle), z: cz + dx * Math.sin(angle) + dz * Math.cos(angle) };
+}
+
+/**
+ * The angle SVG's rotate() takes to turn a box or a round body drawn underneath as the body stands (#1734). A body turns about
+ * the up axis as three.js turns it: seen from above, with z pointing down the screen, a positive turn goes against the clock,
+ * and rotate() with y down turns with it. A Box at 45° was drawn at -45°, mirrored across its own middle.
+ */
+export function referenceShapeTurn(shape: Pick<WorkplaneShape, "rotation">) {
+  return -(shape.rotation ?? 0);
 }
 
 function isRoundReference(shape: WorkplaneShape) {
@@ -817,6 +828,14 @@ export function SketchWorkspace({
   const cameraBarMove = useMovablePanel<HTMLDivElement>("layerling.sketch.cameraBarPosition", CAMERA_BAR_PANEL);
   const [cameraBarCollapsed, setCameraBarCollapsed] = useState(false);
   const workspace = useMemo(() => normalizeWorkspaceSettings(initialWorkspace, DEFAULT_WORKPLANE_WORKSPACE), [initialWorkspace]);
+  // The same "Open the view bar on hover" as in the 3D view (Discussion #1552).
+  const cameraBarPeek = useCameraBarPeek({
+    enabled: workspace.viewBarOpensOnHover,
+    collapsed: cameraBarCollapsed,
+    onOpen: () => setCameraBarCollapsed(false),
+    onFold: () => setCameraBarCollapsed(true),
+    keepOpen: () => cameraBarMove.dragging,
+  });
   setLengthUnit(workspace);
   const unitLabel = lengthDisplayUnit(workspace).label;
   const [snap, setSnap] = useState<GridSize>(() => normalizeSnapGrid(initialSnap, DEFAULT_SNAP_GRID));
@@ -869,7 +888,7 @@ export function SketchWorkspace({
   useEffect(() => {
     setSelectedHandle(null);
   }, [selected, tool]);
-  const lastPointerRef = useRef<{ clientX: number; clientY: number } | null>(null);
+  const lastPointerRef = useRef<{ clientX: number; clientY: number; altKey?: boolean } | null>(null);
   const [refinePreview, setRefinePreview] = useState<{ segmentId: string; placement: SketchSegmentPlacement } | null>(null);
   const [pointerAction, setPointerAction] = useState<PointerAction | null>(null);
   // A freehand stroke (#1280) in progress: its samples in a ref, not in state, so no move of a fast pen is lost
@@ -902,6 +921,13 @@ export function SketchWorkspace({
   const [editingNoteId, setEditingNoteId] = useState<string | null>(null);
   const svgRef = useRef<SVGSVGElement | null>(null);
   const wrapRef = useRef<HTMLElement | null>(null);
+  // A middle drag moves the plate; a short middle click opens the snap menu where it happened (Discussion #1439).
+  const [snapMenuAt, setSnapMenuAt] = useState<{ x: number; y: number } | null>(null);
+  const closeSnapMenuAt = useCallback(() => setSnapMenuAt(null), []);
+  useMiddleClick(wrapRef, (x, y) => {
+    setSnapOpen(false);
+    setSnapMenuAt({ x, y });
+  });
   // Width or height of the selected shape, while its value is typed (#168).
   const [editingBoxSize, setEditingBoxSize] = useState<{ axis: "x" | "z"; value: string; sketchPos: { x: number; z: number } } | null>(null);
   const boxSizeEditDoneRef = useRef(false);
@@ -1446,13 +1472,14 @@ export function SketchWorkspace({
   const constrainDrawing = (origin: { x: number; z: number }, point: { x: number; z: number }) =>
     constrainToAngle(origin, point, 15, snapStep(snap));
 
-  const pointFromEvent = (event: { clientX: number; clientY: number }) => {
+  const pointFromEvent = (event: { clientX: number; clientY: number; altKey?: boolean }) => {
     const local = unsnappedPointFromEvent(event);
     if (!local) return null;
     // Near a corner of another body shown underneath, a drawn or dragged point takes that
     // corner instead of the grid (#189). Not while a whole selection moves: its grip is
-    // wherever it was taken, so the corner would only make it jump.
-    if (!pointerAction || pointerAction.kind === "move-point") {
+    // wherever it was taken, so the corner would only make it jump. Alt keeps the point on the
+    // grid only, for tracing just beside a corner (Discussion #1659), as Alt does for a moved selection.
+    if (!event.altKey && (!pointerAction || pointerAction.kind === "move-point")) {
       const reach = REFERENCE_SNAP_PX * screenUnit;
       let nearest: { x: number; z: number } | null = null;
       let nearestDistance = reach;
@@ -1664,7 +1691,7 @@ export function SketchWorkspace({
   };
 
   const handlePointerMove = (event: ReactPointerEvent<SVGSVGElement>) => {
-    lastPointerRef.current = { clientX: event.clientX, clientY: event.clientY };
+    lastPointerRef.current = { clientX: event.clientX, clientY: event.clientY, altKey: event.altKey };
     if (extendFreehand(event)) return;
     if (pointerAction?.kind === "pan") {
       const matrix = svgRef.current?.getScreenCTM();
@@ -2283,7 +2310,7 @@ export function SketchWorkspace({
       }
       const footprint = referenceFootprints.get(shape.id);
       // An outline made from the body's own mesh stands in the plate's coordinates already.
-      const turn = (point: { x: number; z: number }) => (footprint?.world ? point : rotateAround(point, shape.rotation ?? 0, shape.x, shape.z));
+      const turn = (point: { x: number; z: number }) => (footprint?.world ? point : rotateAround(point, referenceShapeTurn(shape), shape.x, shape.z));
       const halfWidth = shape.width / 2;
       const halfDepth = shape.depth / 2;
       const local = footprint?.outlineD
@@ -2385,8 +2412,9 @@ export function SketchWorkspace({
         style={cameraBarMove.style}
         aria-label={t("sketch.viewControls")}
         data-help-section="cameraBar"
+        {...cameraBarPeek.barProps}
       >
-        <CameraBarHandle move={cameraBarMove} collapsed={cameraBarCollapsed} onToggle={() => setCameraBarCollapsed((folded) => !folded)} />
+        <CameraBarHandle move={cameraBarMove} collapsed={cameraBarCollapsed || cameraBarPeek.peeking} onToggle={() => cameraBarPeek.toggle(() => setCameraBarCollapsed((folded) => !folded))} />
         {cameraBarCollapsed ? null : (<>
         <div className="camera-group">
           <button aria-label={t("sketch.resetView")} aria-keyshortcuts="Home" title={t("camera.shortcut", { label: t("sketch.resetView"), keys: "Home" })} onClick={resetView}><Home size={24} strokeWidth={2.25} /></button>
@@ -2681,7 +2709,7 @@ export function SketchWorkspace({
                 );
               }
               return (
-                <g key={shape.id} transform={footprint?.world ? undefined : `rotate(${shape.rotation ?? 0} ${shape.x} ${shape.z})`}>
+                <g key={shape.id} transform={footprint?.world ? undefined : `rotate(${referenceShapeTurn(shape)} ${shape.x} ${shape.z})`}>
                   {footprint?.fillD || footprint?.outlineD ? (
                     <>
                       {footprint.fillD ? <path className="sketch-reference-mesh-face" d={footprint.fillD} /> : null}
@@ -3394,7 +3422,7 @@ export function SketchWorkspace({
           if (!overlayPos) return null;
           return (
             <input
-              className="dimension-input sketch-dimension-input"
+              className="dimension-input sketch-dimension-input" autoComplete="off"
               style={{
                 "--overlay-x": `${overlayPos.x}px`,
                 "--overlay-y": `${overlayPos.y}px`,
@@ -3435,7 +3463,7 @@ export function SketchWorkspace({
           if (!overlayPos) return null;
           return (
             <input
-              className="dimension-input sketch-dimension-input"
+              className="dimension-input sketch-dimension-input" autoComplete="off"
               style={{ "--overlay-x": `${overlayPos.x}px`, "--overlay-y": `${overlayPos.y}px` } as CSSProperties}
               value={editingBoxSize.value}
               autoFocus
@@ -3464,7 +3492,7 @@ export function SketchWorkspace({
           if (!overlayPos) return null;
           return (
             <input
-              className="dimension-input sketch-dimension-input"
+              className="dimension-input sketch-dimension-input" autoComplete="off"
               style={{
                 "--overlay-x": `${overlayPos.x}px`,
                 "--overlay-y": `${overlayPos.y}px`,
@@ -3505,6 +3533,7 @@ export function SketchWorkspace({
       {selectedImage && tool === "select" ? (
         <SketchImageInspector
           image={selectedImage}
+          plate={{ width: workspace.width, depth: workspace.depth }}
           accuracy={workspace.accuracy}
           revolve={operation === "revolve"}
           cropMode={cropMode}
@@ -3743,6 +3772,9 @@ export function SketchWorkspace({
       <div className="grid-settings">
         <SnapGridControl units={workspace.units} customGrids={workspace.customSnapGrids} snap={snap} snapOpen={snapOpen} onSnapChange={chooseSnap} onSnapOpenChange={setSnapOpen} />
       </div>
+      {snapMenuAt ? (
+        <SnapGridPointerMenu x={snapMenuAt.x} y={snapMenuAt.y} units={workspace.units} customGrids={workspace.customSnapGrids} snap={snap} onSnapChange={chooseSnap} onClose={closeSnapMenuAt} />
+      ) : null}
     </main>
   );
 }
@@ -3751,6 +3783,7 @@ type ImageCalibrationStep = { type: "start" } | { type: "cancel" } | { type: "ap
 
 function SketchImageInspector({
   image,
+  plate,
   accuracy,
   revolve,
   cropMode,
@@ -3765,6 +3798,8 @@ function SketchImageInspector({
   onApplyTrace,
 }: {
   image: SketchImage;
+  /** The printer's plate, which sets how far width and height go (#1727). */
+  plate: { width: number; depth: number };
   accuracy: 1 | 2 | 3;
   /** Revolving: x = 0 is the axis, so centring on it is the point. */
   revolve: boolean;
@@ -3789,6 +3824,7 @@ function SketchImageInspector({
     if (Number.isFinite(length) && length > 0) onCalibrate({ type: "apply", length });
   };
   const aspect = image.width / Math.max(0.5, image.depth);
+  const sizeLimits = sketchImageSizeLimits(plate, image);
   const updateWidth = (width: number) => onUpdate({
     width,
     ...(image.lockAspect !== false ? { depth: Math.max(0.5, width / aspect) } : {}),
@@ -3874,8 +3910,8 @@ function SketchImageInspector({
       <div className="property-card">
         <div className="property-card-header static"><span>{t("sketch.imageProperties")}</span></div>
         <div className="property-list">
-          <SketchImageRange label={t("sketch.imageWidth")} value={image.width} min={0.5} max={200} accuracy={accuracy} disabled={image.locked} onChange={updateWidth} />
-          <SketchImageRange label={t("sketch.imageHeight")} value={image.depth} min={0.5} max={200} accuracy={accuracy} disabled={image.locked} onChange={updateDepth} />
+          <SketchImageRange label={t("sketch.imageWidth")} value={image.width} min={0.5} max={sizeLimits.slider} typedMax={sizeLimits.typed} accuracy={accuracy} disabled={image.locked} onChange={updateWidth} />
+          <SketchImageRange label={t("sketch.imageHeight")} value={image.depth} min={0.5} max={sizeLimits.slider} typedMax={sizeLimits.typed} accuracy={accuracy} disabled={image.locked} onChange={updateDepth} />
           <SketchImageRange label={t("sketch.imageOpacity")} value={(image.opacity ?? 0.55) * 100} min={5} max={100} accuracy={1} suffix="%" disabled={image.locked} onChange={(opacity) => onUpdate({ opacity: opacity / 100 }, t("sketch.imageOpacityUpdated"))} />
           <SketchImagePositionField label={t("sketch.imagePositionX")} value={image.x} accuracy={accuracy} disabled={image.locked} onChange={(x) => onUpdate({ x }, t("sketch.imageMoved"))} />
           <SketchImagePositionField label={t("sketch.imagePositionY")} value={image.z} accuracy={accuracy} disabled={image.locked} onChange={(z) => onUpdate({ z }, t("sketch.imageMoved"))} />
@@ -4227,6 +4263,7 @@ function SketchImageRange({
   value,
   min,
   max,
+  typedMax = max,
   accuracy,
   suffix = "mm",
   disabled = false,
@@ -4236,7 +4273,10 @@ function SketchImageRange({
   label: string;
   value: number;
   min: number;
+  /** The end of the slider. */
   max: number;
+  /** How far a typed value may go, when that is further than the slider (#1727). */
+  typedMax?: number;
   accuracy: 1 | 2 | 3;
   suffix?: string;
   disabled?: boolean;
@@ -4244,14 +4284,15 @@ function SketchImageRange({
   whole?: boolean;
   onChange: (value: number) => void;
 }) {
-  const safeValue = clamp(Number.isFinite(value) ? value : min, min, max);
+  const shownValue = clamp(Number.isFinite(value) ? value : min, min, Math.max(max, typedMax));
+  const safeValue = clamp(shownValue, min, max);
   const isLength = suffix === "mm";
   const formatValue = isLength ? formatDimension : whole ? formatWholeNumber : formatPlainNumber;
-  const [draft, setDraft] = useState(formatValue(safeValue, accuracy));
-  useEffect(() => setDraft(formatValue(safeValue, accuracy)), [accuracy, safeValue, formatValue]);
+  const [draft, setDraft] = useState(formatValue(shownValue, accuracy));
+  useEffect(() => setDraft(formatValue(shownValue, accuracy)), [accuracy, shownValue, formatValue]);
   const commit = () => {
     const parsed = isLength ? parseLengthMm(draft) : parseMeasurementInput(draft);
-    const value = clamp(Number.isFinite(parsed) ? parsed : safeValue, min, max);
+    const value = clamp(Number.isFinite(parsed) ? parsed : shownValue, min, Math.max(max, typedMax));
     onChange(whole ? Math.round(value) : value);
   };
   const position = ((safeValue - min) / Math.max(0.001, max - min)) * 100;

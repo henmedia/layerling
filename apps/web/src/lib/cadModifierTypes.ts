@@ -123,6 +123,12 @@ export type CadModifierProfilePart = {
    * also lays the extrusion on its side).
    */
   kind: "extrusion" | "revolution" | "sweep" | "loft";
+  /**
+   * Revolution only: a slotted screw hole (Discussion #1531). The half-section is turned whole at each end of a slot
+   * `length` long, and the whole section, both halves, is pushed along the slot between them. The slot runs along
+   * the local y axis, or along x with `alongX`, centred on the axis.
+   */
+  slot?: { length: number; alongX: boolean };
   /** Sweep only: the centre line, piece by piece. */
   path?: CadModifierSweepPiece[];
   /** Loft only: the section at the top, loop for loop and piece for piece the partner of `loops`. */
@@ -174,6 +180,11 @@ export type CadModifierProfilePart = {
   tilt?: { x: number; z: number };
   /** Extrusion only: round every edge of the two flat ends by this radius (a rounded box). */
   capFillet?: number;
+  /**
+   * Extrusion only, with `capFillet`: the bottom end (y = 0) on its own. `capFillet` is then the top
+   * end alone (0 when it stays flat); without this the two ends share `capFillet`.
+   */
+  capFilletBottom?: number;
   /**
    * Extrusion only, a GT2 pulley (Discussion #1319): `loops` is the toothed band alone, pushed up
    * from `teethBottom` to `teethTop`; the round discs (flanges, hub) on the y axis are joined to it
@@ -319,6 +330,18 @@ export type CadModifierHelicalGearPart = {
   stretch: { x: number; z: number };
   /** 0 for none. */
   boreRadius: number;
+  /**
+   * A ring gear with slanted teeth (Discussion #1627): the corners are its teeth, turning inside a round rim of
+   * this radius (before the stretch); it has no bore.
+   */
+  ringRadius?: number;
+  /**
+   * A rack with slanted teeth (#1627) instead of a turning ring: the outline of a straight rack longer than this
+   * one (x along it, teeth towards +z, counter-clockwise), drawn out upwards while its teeth move `travel` along it
+   * (half of it up to the middle and back for herringbone teeth), then cut off square at x = +-length / 2.
+   * `corners` and `twist` are not used.
+   */
+  rack?: { outline: Array<{ x: number; z: number }>; length: number; backZ: number; tipZ: number; travel: number };
   transform?: number[];
   expected?: { bounds: number[]; volume: number };
 };
@@ -376,6 +399,10 @@ export type CadModifierGridfinityPart = {
   gridfinityLabelRightOffset?: number;
   gridfinityLabelCorner?: GridfinityLabelCorner;
   gridfinityLabelCornerSize?: number;
+  gridfinityLabelBackText?: string;
+  gridfinityLabelFrontText?: string;
+  gridfinityLabelLeftText?: string;
+  gridfinityLabelRightText?: string;
   gridfinityScoopBack?: boolean;
   gridfinityScoopFront?: boolean;
   gridfinityScoopLeft?: boolean;
@@ -392,11 +419,19 @@ export type CadModifierGridfinityPart = {
   gridfinityPaddingFront?: number;
   gridfinityPaddingLeft?: number;
   gridfinityPaddingRight?: number;
+  gridfinityOverhangBack?: number;
+  gridfinityOverhangFront?: number;
+  gridfinityOverhangLeft?: number;
+  gridfinityOverhangRight?: number;
+  gridfinityOverhangChamfer?: number;
+  gridfinityOverhangSolid?: boolean;
+  gridfinityOverhangLipOnGrid?: boolean;
   gridfinityCornerRadius?: number;
   gridfinityBinCornerRadius?: number;
   gridfinityCompartmentsX?: number;
   gridfinityCompartmentsZ?: number;
   gridfinityDividerThickness?: number;
+  gridfinityDividerHeight?: number;
   gridfinityDividerPositionsX?: number[];
   gridfinityDividerPositionsZ?: number[];
   gridfinityCompartmentLabels?: GridfinityCompartmentLabel[];
@@ -534,6 +569,11 @@ export type CadModifierWorkerRequest =
       // Only for "shell": which faces stay open; `amount` is the wall thickness.
       shellOpenings?: ShellOpenings;
       shellEdges?: ShellEdges;
+      // Only for "shell" with the top open: the collar round the top and the groove under the wall, this high (mm).
+      shellStack?: number;
+      // Only for "shell" with the top open (#1663): a ledge round the inside of the wall, this wide (mm), its top this high (mm) above the inside of the floor.
+      shellShelf?: number;
+      shellShelfHeight?: number;
       // Only for "offset" (#919): `amount` is the distance, moved inward when this is set.
       offsetShrink?: boolean;
       // Only for "offset" (#1057): only the sides move, the body keeps its height.
@@ -549,6 +589,18 @@ export type CadModifierWorkerRequest =
       // any, the editor already knows which edge to blame on a refusal, and
       // the worker does not search for one.
       addedEdgeIds?: number[];
+    }
+  // The largest size up to `amount` at which the picked edges still take the chamfer or fillet (Discussion #1635):
+  // `amount` is the refused one. A variable fillet keeps the ratio of its two ends.
+  | {
+      type: "largest";
+      requestId: number;
+      kind: "chamfer" | "chamfillet" | "fillet";
+      edgeIds: number[];
+      amount: number;
+      chamferAngle: number;
+      endAmount?: number;
+      concave?: boolean;
     }
   | { type: "dispose"; requestId: number };
 
@@ -574,5 +626,8 @@ export type CadModifierWorkerResponse =
       innerCorners?: { count: number; amount: number };
     }
   | { type: "disposed"; requestId: number }
+  // amount: the largest size that went through, null when none did; endAmount goes with it for a variable fillet.
+  | { type: "largest"; requestId: number; amount: number | null; endAmount?: number }
   // failedEdgeIds: the selected edges the kernel could not treat together.
-  | { type: "error"; requestId: number; message: string; resetSession?: boolean; failedEdgeIds?: number[] };
+  // tightestBend: a fillet refused because a picked curve bends round the outside tighter than its radius, in mm (#1473).
+  | { type: "error"; requestId: number; message: string; resetSession?: boolean; failedEdgeIds?: number[]; tightestBend?: number };

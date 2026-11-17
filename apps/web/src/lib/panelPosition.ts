@@ -12,12 +12,15 @@ export function clampPanelPosition(
   position: PanelPosition,
   panel: { width: number; height?: number },
   area: { width: number; height: number },
+  /** The least top: below a bar that lies over the top of the area, where the title bar could not be grabbed (#1418). */
+  minTop = 0,
 ): PanelPosition {
+  const leastTop = Math.max(0, minTop);
   const maxLeft = Math.max(0, area.width - panel.width);
-  const maxTop = Math.max(0, area.height - (panel.height ?? PANEL_GRAB_HEIGHT));
+  const maxTop = Math.max(leastTop, area.height - (panel.height ?? PANEL_GRAB_HEIGHT));
   return {
     left: Math.round(Math.min(Math.max(0, position.left), maxLeft)),
-    top: Math.round(Math.min(Math.max(0, position.top), maxTop)),
+    top: Math.round(Math.min(Math.max(leastTop, position.top), maxTop)),
   };
 }
 

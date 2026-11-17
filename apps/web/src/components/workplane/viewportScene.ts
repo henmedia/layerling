@@ -13,13 +13,13 @@ import { CAMERA_FOV, CAMERA_MAX_DISTANCE, CAMERA_MIN_DISTANCE, CAMERA_TARGET, up
 import { horizontalPlacementWorkplane, placementWorkplaneIsBase, placementWorkplaneLiesOnBase, placementWorkplaneQuaternion, type PlacementWorkplane } from "@/lib/placementWorkplane";
 import { printerPresetById } from "@/lib/printBed";
 import { plateCenterX, plateCount } from "@/lib/buildPlates";
-import { DEFAULT_WORKPLANE_WORKSPACE, effectiveViewSettings, viewPixelRatio, orbitControlsZoomSpeed } from "@/lib/workplaneSettings";
-import { workplaneGridBandWidths, AXIS_ARROW_COLORS, axisArrowLayout, fillLightPosition, keyLightPosition, sceneLightLevels, shadowBlurRadius, softSceneLightLevels, workplaneGridLayout, workplaneGridLines, workplaneGridPalette, workplaneLabelLayout, workplaneThemePalette, WORKPLANE_LABEL_ASPECT, WORKPLANE_LINE_ELEVATION, type WorkplaneGridLayout } from "@/lib/workplaneGrid";
+import { DEFAULT_WORKPLANE_WORKSPACE, effectiveViewSettings, viewPixelRatio, orbitControlsZoomSpeed, orbitControlsPanSpeed } from "@/lib/workplaneSettings";
+import { axisCrossWidth, mmPerScreenPixel, workplaneGridBandWidths, AXIS_ARROW_COLORS, axisArrowLayout, fillLightPosition, keyLightPosition, sceneLightLevels, shadowBlurRadius, softSceneLightLevels, workplaneGridLayout, workplaneGridLines, workplaneGridPalette, workplaneLabelLayout, workplaneThemePalette, WORKPLANE_LABEL_ASPECT, WORKPLANE_LINE_ELEVATION, type WorkplaneGridLayout } from "@/lib/workplaneGrid";
 import type { WorkplaneWorkspaceSettings } from "@/types/layerling";
 import { pivotKeptAhead, ZOOM_PIVOT_REACH_MM } from "@/lib/zoomPivot";
 import { RENDER_LAYER_SHAPES } from "@/components/workplane/viewportPicking";
 import { RENDER_LAYER_HELPERS, type ShapeRenderRecord, type ThreeState, setObjectRenderLayer, freezeStaticObjectMatrices, disposeChildren, disposeObject } from "@/components/workplane/ViewportOverlays";
-import { RENDER_LAYER_MODIFIERS, RENDER_LAYER_PREVIEWS, clamp, WORKPLANE_LABEL_FONT_STACK } from "./viewportShapeObjects";
+import { RENDER_LAYER_MODIFIERS, RENDER_LAYER_PREVIEWS, clamp, pullModifierEdgeTowardCamera, WORKPLANE_LABEL_FONT_STACK } from "./viewportShapeObjects";
 import { CAMERA_DAMPING_PER_60HZ_FRAME } from "@/lib/cameraInertia";
 
 export const WORKPLANE_WIDTH = 200;
@@ -96,7 +96,7 @@ export function createThreeScene(host: HTMLDivElement): ThreeState {
   controls.dampingFactor = CAMERA_DAMPING_PER_60HZ_FRAME;
   controls.rotateSpeed = 0.58;
   controls.zoomSpeed = orbitControlsZoomSpeed(DEFAULT_WORKPLANE_WORKSPACE.zoomSpeed);
-  controls.panSpeed = 0.65;
+  controls.panSpeed = orbitControlsPanSpeed(DEFAULT_WORKPLANE_WORKSPACE.panSpeed);
   controls.screenSpacePanning = true;
   controls.zoomToCursor = true;
   controls.mouseButtons = {
@@ -431,6 +431,7 @@ export function rebuildWorkplane(
   state.lights.fill.position.set(fillPosition.x, fillPosition.y, fillPosition.z);
   state.needsRender = true;
   state.controls.zoomSpeed = orbitControlsZoomSpeed(workspace.zoomSpeed);
+  state.controls.panSpeed = orbitControlsPanSpeed(workspace.panSpeed);
   state.mouseScheme = workspace.mouseScheme;
   Object.assign(state.controls.mouseButtons, cameraButtonsFor(workspace.mouseScheme));
 
@@ -500,6 +501,8 @@ export function rebuildWorkplane(
         majorLineColor,
         workspace.gridLinesGrow !== false,
         round,
+        // In the arrows' colours where the arrows stand (Discussion #1714).
+        !muted && !extraPlate && workspace.showAxes,
       ));
       const labelPalette = workplaneGridPalette(theme, lineColor, state.palette).major;
       // The design's name in the near left corner, so a screenshot of the scene
@@ -516,8 +519,10 @@ export function rebuildWorkplane(
       if (label) {
         group.add(label);
       }
-      // Only on the real plate, and hidden together with the design name.
-      const printer = muted || extraPlate || workspace.showPlateLabels === false ? null : printerPresetById(workspace.printer);
+      // Only on the real plate, and hidden together with the design name. A workplane set on a face or on the
+      // empty plate (the one with the normal marker) leaves it off: with the printer's name it looked like a
+      // second build plate beside the real, greyed one (Issue #1512).
+      const printer = muted || extraPlate || showMarker || workspace.showPlateLabels === false ? null : printerPresetById(workspace.printer);
       if (printer) {
         const printerLabel = createWorkplaneLabel(
           cornerWidth,
@@ -555,6 +560,8 @@ export function rebuildWorkplane(
     }
     group.position.set(workplane.origin.x, workplane.origin.y, workplane.origin.z);
     group.quaternion.copy(placementWorkplaneQuaternion(workplane));
+    // The workplane laid on a face: the plate's switch leaves it alone, it has its own eye (Discussion #1714).
+    if (showMarker) group.userData.faceWorkplane = true;
     state.workplaneLayer.add(group);
   };
 
@@ -571,6 +578,18 @@ export function rebuildWorkplane(
   state.workplaneLayer.quaternion.identity();
   setObjectRenderLayer(state.workplaneLayer, RENDER_LAYER_WORKPLANE);
   freezeStaticObjectMatrices(state.workplaneLayer);
+  showWorkplanePlates(state.workplaneLayer, !state.workplaneLayer.userData.platesHidden);
+}
+
+/**
+ * The view bar's workplane switch (Discussion #1714): it shows or hides the build plates, and with them the workplane
+ * when that lies on the plate. A workplane laid on a face stays, so the plate can be put away while working on the face;
+ * that one has its own eye. Kept on the layer, so a rebuilt workplane hides its plates again.
+ */
+export function showWorkplanePlates(layer: THREE.Object3D, visible: boolean) {
+  layer.userData.platesHidden = !visible;
+  layer.visible = true;
+  for (const child of layer.children) child.visible = visible || child.userData.faceWorkplane === true;
 }
 
 export function syncWorkplaneHoverPreview(
@@ -840,6 +859,8 @@ export function createGridLines(
   majorColor = "",
   linesGrow = true,
   round = false,
+  /** The zero lines in the axis arrows' colours, red along X and green along Y (Discussion #1714); a greyed plate keeps one colour. */
+  colouredAxes = false,
 ) {
   const group = new THREE.Group();
   // On a round plate (#1024) each line runs from rim to rim: half its length either side of the middle.
@@ -848,15 +869,20 @@ export function createGridLines(
   const palette = workplaneThemePalette(theme, DEFAULT_WORKSPACE.background, gridColor, paletteName, undefined, majorColor).grid;
   const minor = new THREE.LineBasicMaterial({ ...palette.minor, transparent: true, depthWrite: false });
   const major = new THREE.LineBasicMaterial({ ...palette.major, transparent: true, depthWrite: false });
-  const axis = new THREE.LineBasicMaterial({ ...palette.axis, transparent: true, depthWrite: false });
+  // The line across the plate's width at Y = 0 is the X axis, the one along its depth at X = 0 the Y axis.
+  const axisColourX = colouredAxes ? { ...palette.axis, color: AXIS_ARROW_COLORS.x } : palette.axis;
+  const axisColourY = colouredAxes ? { ...palette.axis, color: AXIS_ARROW_COLORS.y } : palette.axis;
+  const axisX = new THREE.LineBasicMaterial({ ...axisColourX, transparent: true, depthWrite: false });
+  const axisY = new THREE.LineBasicMaterial({ ...axisColourY, transparent: true, depthWrite: false });
   const minorPoints: number[] = [];
   const majorPoints: number[] = [];
-  const axisPoints: number[] = [];
+  const axisPointsX: number[] = [];
+  const axisPointsY: number[] = [];
   const borderPoints: number[] = [];
   const pushLine = (points: number[], from: [number, number, number], to: [number, number, number]) => {
     points.push(...from, ...to);
   };
-  const pointsFor = (kind: "axis" | "major" | "minor") => (kind === "axis" ? axisPoints : kind === "major" ? majorPoints : minorPoints);
+  const pointsFor = (kind: "axis" | "major" | "minor", along: "depth" | "width") => (kind === "axis" ? (along === "depth" ? axisPointsY : axisPointsX) : kind === "major" ? majorPoints : minorPoints);
   // Every fine and darker line also gets a band on the plate, growing as you zoom in (#143).
   const minorBands: Array<[number, number, number, number]> = [];
   const majorBands: Array<[number, number, number, number]> = [];
@@ -864,14 +890,14 @@ export function createGridLines(
   for (const { coordinate: centeredX, kind } of outlineOnly ? [] : workplaneGridLines(width, layout)) {
     const half = across(centeredX, depth / 2);
     if (half <= 0) continue;
-    pushLine(pointsFor(kind), [centeredX, WORKPLANE_LINE_ELEVATION, -half], [centeredX, WORKPLANE_LINE_ELEVATION, half]);
+    pushLine(pointsFor(kind, "depth"), [centeredX, WORKPLANE_LINE_ELEVATION, -half], [centeredX, WORKPLANE_LINE_ELEVATION, half]);
     bandsFor(kind)?.push([centeredX, -half, centeredX, half]);
   }
 
   for (const { coordinate: centeredZ, kind } of outlineOnly ? [] : workplaneGridLines(depth, layout)) {
     const half = across(centeredZ, width / 2);
     if (half <= 0) continue;
-    pushLine(pointsFor(kind), [-half, WORKPLANE_LINE_ELEVATION, centeredZ], [half, WORKPLANE_LINE_ELEVATION, centeredZ]);
+    pushLine(pointsFor(kind, "width"), [-half, WORKPLANE_LINE_ELEVATION, centeredZ], [half, WORKPLANE_LINE_ELEVATION, centeredZ]);
     bandsFor(kind)?.push([-half, centeredZ, half, centeredZ]);
   }
 
@@ -894,7 +920,8 @@ export function createGridLines(
 
   group.add(linesFromPoints(minorPoints, minor));
   group.add(linesFromPoints(majorPoints, major));
-  group.add(linesFromPoints(axisPoints, axis));
+  group.add(linesFromPoints(axisPointsX, axisX));
+  group.add(linesFromPoints(axisPointsY, axisY));
   group.add(linesFromPoints(borderPoints, border));
   // Switched off (#240), every line stays one pixel wide whatever the zoom, as in the sketch.
   if (!linesGrow) return group;
@@ -907,11 +934,14 @@ export function createGridLines(
   // a narrow band on the plate: stronger, and growing as you zoom in, as in similar tools (#143).
   const axisBand = THREE.MathUtils.clamp(Math.min(width, depth) * 0.0012, 0.15, 1);
   const borderBand = axisBand * 2;
-  const axisBands: Array<[number, number, number, number]> = outlineOnly ? [] : [
-    [0, -depth / 2, 0, depth / 2],
-    [-width / 2, 0, width / 2, 0],
-  ];
-  group.add(bandsFromSegments(axisBands, axisBand, palette.axis));
+  // Zoomed out, the cross no longer shrinks with the plate below AXIS_MIN_PIXELS, or it is lost among the darker
+  // lines (Discussion #1666): each arm is a band 1 mm wide, stretched across before every frame.
+  if (!outlineOnly) {
+    group.add(
+      axisCrossArm(bandsFromSegments([[0, -depth / 2, 0, depth / 2]], 1, axisColourY), "x", axisBand),
+      axisCrossArm(bandsFromSegments([[-width / 2, 0, width / 2, 0]], 1, axisColourX), "z", axisBand),
+    );
+  }
   // The border band lies inside the plate, so the plate keeps its size.
   const inset = borderBand / 2;
   group.add(bandsFromSegments(round ? rim(inset) : [
@@ -958,6 +988,38 @@ export function bandsFromSegments(segments: Array<[number, number, number, numbe
   }));
   bands.renderOrder = crossings?.order ?? 1;
   return bands;
+}
+
+const crossCentre = new THREE.Vector3();
+const crossLook = new THREE.Vector3();
+const crossViewport = new THREE.Vector2();
+
+/**
+ * An arm of the centre cross (a band 1 mm wide, see bandsFromSegments), stretched along `across` to `bandWidth` mm - or
+ * wider, so that it stays AXIS_MIN_PIXELS wide on the screen at the plate's middle (Discussion #1666). Set before every
+ * frame: the matrix is taken over right after, so it holds for the frame being drawn.
+ */
+function axisCrossArm(arm: THREE.Mesh, across: "x" | "z", bandWidth: number) {
+  arm.scale[across] = bandWidth;
+  arm.onBeforeRender = (renderer, _scene, camera) => {
+    renderer.getSize(crossViewport);
+    let perPixel = Number.NaN;
+    if ((camera as THREE.PerspectiveCamera).isPerspectiveCamera) {
+      arm.getWorldPosition(crossCentre);
+      camera.getWorldDirection(crossLook);
+      const depth = crossCentre.sub(camera.getWorldPosition(new THREE.Vector3())).dot(crossLook);
+      perPixel = mmPerScreenPixel({ perspective: true, fovDegrees: (camera as THREE.PerspectiveCamera).fov }, depth, crossViewport.y);
+    } else if ((camera as THREE.OrthographicCamera).isOrthographicCamera) {
+      const ortho = camera as THREE.OrthographicCamera;
+      perPixel = mmPerScreenPixel({ perspective: false, top: ortho.top, bottom: ortho.bottom, zoom: ortho.zoom }, 0, crossViewport.y);
+    }
+    const next = axisCrossWidth(bandWidth, perPixel);
+    if (Math.abs(arm.scale[across] - next) <= 1e-9) return;
+    arm.scale[across] = next;
+    arm.updateMatrix();
+    arm.updateMatrixWorld();
+  };
+  return arm;
 }
 
 export function linesFromPoints(points: number[], material: THREE.LineBasicMaterial) {
@@ -1097,7 +1159,17 @@ export function splitCutOutlinePoints(state: ThreeState, plane: ModelSplitPlane,
   return planeCrossingSegments(meshes, plane.origin, plane.normal);
 }
 
-export function syncSplitPlane(state: ThreeState | null, plane: ModelSplitPlane | null, handleActive = false, selectedIds: readonly string[] = []) {
+/**
+ * The middles of a split's connectors on the plane, in world space, and the radius of their holes (Discussion #832); for a
+ * dovetail, the outlines of its tongues instead, each its foot and its wide top, four corners each.
+ */
+export type SplitConnectorMarks = {
+  points: ReadonlyArray<readonly [number, number, number]>;
+  radius: number;
+  tongues?: ReadonlyArray<{ foot: ReadonlyArray<readonly [number, number, number]>; top: ReadonlyArray<readonly [number, number, number]> }>;
+};
+
+export function syncSplitPlane(state: ThreeState | null, plane: ModelSplitPlane | null, handleActive = false, selectedIds: readonly string[] = [], connectorMarks: SplitConnectorMarks | null = null) {
   if (!state) return;
   disposeChildren(state.splitLayer);
   if (!plane) {
@@ -1107,38 +1179,53 @@ export function syncSplitPlane(state: ThreeState | null, plane: ModelSplitPlane 
   }
 
   const size = Math.max(10, plane.size);
+  // The rectangle fits the part on the plane (Issue #1606); its middle carries the arrow.
+  const { center, u, v, width, height } = plane.preview;
   const root = new THREE.Group();
-  root.position.set(...plane.origin);
-  root.quaternion.setFromUnitVectors(new THREE.Vector3(0, 0, 1), new THREE.Vector3(...plane.normal).normalize());
+  root.position.set(...center);
+  root.quaternion.setFromRotationMatrix(new THREE.Matrix4().makeBasis(
+    new THREE.Vector3(...u),
+    new THREE.Vector3(...v),
+    new THREE.Vector3(...plane.normal).normalize(),
+  ));
 
+  // The part hides the plane behind and inside it, as a slicer's cut does (Issue #1606): drawn over everything, the plane,
+  // its lines and the cut line on the far side piled up into a jumble when seen almost along the plane, close up. Only
+  // the plane's outline shows faintly through, so it stays clear how far the plane reaches.
   const surface = new THREE.Mesh(
-    new THREE.PlaneGeometry(size, size),
+    new THREE.PlaneGeometry(width, height),
     new THREE.MeshBasicMaterial({
       color: "#d07313",
       transparent: true,
       opacity: 0.24,
       side: THREE.DoubleSide,
-      depthTest: false,
       depthWrite: false,
     }),
   );
   surface.renderOrder = 900;
   root.add(surface);
 
+  const borderGeometry = new THREE.EdgesGeometry(surface.geometry);
+  const borderBehind = new THREE.LineSegments(
+    borderGeometry,
+    new THREE.LineBasicMaterial({ color: "#b35f07", transparent: true, opacity: 0.3, depthTest: false }),
+  );
+  borderBehind.renderOrder = 900;
+  root.add(borderBehind);
   const border = new THREE.LineSegments(
-    new THREE.EdgesGeometry(surface.geometry),
-    new THREE.LineBasicMaterial({ color: "#b35f07", transparent: true, opacity: 0.95, depthTest: false }),
+    borderGeometry,
+    new THREE.LineBasicMaterial({ color: "#b35f07", transparent: true, opacity: 0.95 }),
   );
   border.renderOrder = 901;
   root.add(border);
 
   const crossGeometry = new THREE.BufferGeometry().setFromPoints([
-    new THREE.Vector3(-size / 2, 0, 0), new THREE.Vector3(size / 2, 0, 0),
-    new THREE.Vector3(0, -size / 2, 0), new THREE.Vector3(0, size / 2, 0),
+    new THREE.Vector3(-width / 2, 0, 0), new THREE.Vector3(width / 2, 0, 0),
+    new THREE.Vector3(0, -height / 2, 0), new THREE.Vector3(0, height / 2, 0),
   ]);
   const cross = new THREE.LineSegments(
     crossGeometry,
-    new THREE.LineBasicMaterial({ color: "#ffffff", transparent: true, opacity: 0.8, depthTest: false }),
+    new THREE.LineBasicMaterial({ color: "#ffffff", transparent: true, opacity: 0.8 }),
   );
   cross.renderOrder = 902;
   root.add(cross);
@@ -1178,11 +1265,70 @@ export function syncSplitPlane(state: ThreeState | null, plane: ModelSplitPlane 
   if (outlinePoints.length) {
     const outlineGeometry = new THREE.BufferGeometry();
     outlineGeometry.setAttribute("position", new THREE.Float32BufferAttribute(outlinePoints, 3));
-    const outline = new THREE.LineSegments(outlineGeometry, new THREE.LineBasicMaterial({ color: "#ffffff", transparent: true, opacity: 1, depthTest: false }));
+    // Bright where it can be seen, faint where it runs behind the part (Issue #1606): seen close up, the near and the far
+    // line were equally bright, and which of them was the cut could not be told. The bright one is pulled a hair towards
+    // the camera, as the edges of the edge tool are, so the face it lies on does not hide it.
+    const behindMaterial = new THREE.LineBasicMaterial({ color: "#ffffff", transparent: true, opacity: 0.28, depthTest: false });
+    const behind = new THREE.LineSegments(outlineGeometry, behindMaterial);
+    behind.name = "SplitCutLineBehind";
+    behind.renderOrder = 904;
+    behind.layers.set(RENDER_LAYER_PREVIEWS);
+    state.splitLayer.add(behind);
+    const outlineMaterial = new THREE.LineBasicMaterial({ color: "#ffffff", transparent: true, opacity: 1 });
+    pullModifierEdgeTowardCamera(outlineMaterial);
+    const outline = new THREE.LineSegments(outlineGeometry, outlineMaterial);
     outline.name = "SplitCutLine";
     outline.renderOrder = 905;
     outline.layers.set(RENDER_LAYER_PREVIEWS);
     state.splitLayer.add(outline);
+  }
+  // Each connector as the ring of its hole on the plane, filled faintly, drawn over the bodies like the cut line.
+  if (connectorMarks?.points.length && connectorMarks.radius > 0) {
+    const ring = new THREE.BufferGeometry().setFromPoints(Array.from({ length: 48 }, (_, index) => {
+      const angle = (index / 48) * Math.PI * 2;
+      return new THREE.Vector3(Math.cos(angle) * connectorMarks.radius, Math.sin(angle) * connectorMarks.radius, 0);
+    }));
+    const disc = new THREE.CircleGeometry(connectorMarks.radius, 48);
+    const ringMaterial = new THREE.LineBasicMaterial({ color: "#ffffff", transparent: true, opacity: 1, depthTest: false });
+    const discMaterial = new THREE.MeshBasicMaterial({ color: "#ffffff", transparent: true, opacity: 0.45, side: THREE.DoubleSide, depthTest: false, depthWrite: false });
+    const facing = new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0, 0, 1), new THREE.Vector3(...plane.normal).normalize());
+    const marks = new THREE.Group();
+    marks.name = "SplitConnectorMarks";
+    connectorMarks.points.forEach((point) => {
+      const outlineLoop = new THREE.LineLoop(ring, ringMaterial);
+      const fill = new THREE.Mesh(disc, discMaterial);
+      [outlineLoop, fill].forEach((mark) => {
+        mark.position.set(point[0], point[1], point[2]);
+        mark.quaternion.copy(facing);
+        mark.renderOrder = 906;
+        mark.layers.set(RENDER_LAYER_PREVIEWS);
+        marks.add(mark);
+      });
+    });
+    state.splitLayer.add(marks);
+  }
+  // A dovetail's tongues as their outlines on the plane: the foot filled faintly like a dowel's ring, the wide top a fainter line about it.
+  if (connectorMarks?.tongues?.length) {
+    const footMaterial = new THREE.LineBasicMaterial({ color: "#ffffff", transparent: true, opacity: 1, depthTest: false });
+    const topMaterial = new THREE.LineBasicMaterial({ color: "#ffffff", transparent: true, opacity: 0.6, depthTest: false });
+    const fillMaterial = new THREE.MeshBasicMaterial({ color: "#ffffff", transparent: true, opacity: 0.45, side: THREE.DoubleSide, depthTest: false, depthWrite: false });
+    const marks = new THREE.Group();
+    marks.name = "SplitTongueMarks";
+    const corners = (points: ReadonlyArray<readonly [number, number, number]>) => points.map((point) => new THREE.Vector3(point[0], point[1], point[2]));
+    connectorMarks.tongues.forEach(({ foot, top }) => {
+      const fill = new THREE.BufferGeometry().setFromPoints(corners(foot));
+      fill.setIndex([0, 1, 2, 0, 2, 3]);
+      [
+        new THREE.Mesh(fill, fillMaterial),
+        new THREE.LineLoop(new THREE.BufferGeometry().setFromPoints(corners(foot)), footMaterial),
+        new THREE.LineLoop(new THREE.BufferGeometry().setFromPoints(corners(top)), topMaterial),
+      ].forEach((mark) => {
+        mark.renderOrder = 906;
+        mark.layers.set(RENDER_LAYER_PREVIEWS);
+        marks.add(mark);
+      });
+    });
+    state.splitLayer.add(marks);
   }
   state.splitLayer.visible = true;
   state.needsRender = true;

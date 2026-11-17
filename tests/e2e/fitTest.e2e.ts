@@ -3,6 +3,7 @@ import { resolve } from "node:path";
 import { beforeAll, describe, expect, it } from "vitest";
 // The exact kernel (Manifold) loads its files relative to the page; in node they are the public folder.
 (globalThis as unknown as { window: unknown }).window = { location: { href: pathToFileURL(resolve("apps/web/public") + "/").href } };
+import { BREAKAWAY_BASE, breakawayNubSize, breakawayPlateSize, breakawaySocketDiameter } from "@/lib/breakawayBase";
 import { FIT_TEST_LABEL_HEIGHT, FIT_TEST_PIN_DIAMETER, FIT_TEST_PIN_LENGTH, FIT_TEST_PLATE, fitTestHoles, fitTestShape } from "@/lib/fitTest";
 import { meshForShape } from "@/lib/editorMeshCore";
 import { setLanguage } from "@/lib/i18n";
@@ -98,5 +99,59 @@ describe("the fit test as the editor makes it", () => {
     const labels = (german.groupedShapes![0].groupedShapes ?? []).filter((child) => child.kind === "text");
     expect(labels.map((label) => label.text)).toEqual(["0,05", "0,10", "0,15", "0,20", "0,25", "0,30", "0,40"]);
     await setLanguage("en", false);
+  });
+});
+
+/** How many separate pieces a mesh falls into: triangles that share a corner (by position) belong to one piece. */
+function pieces(shape: WorkplaneShape) {
+  const mesh = meshForShape(shape);
+  const key = (index: number) => mesh.vertices[index].map((value) => value.toFixed(4)).join(",");
+  const parent = new Map<string, string>();
+  const find = (node: string): string => {
+    const up = parent.get(node) ?? node;
+    if (up === node) return node;
+    const top = find(up);
+    parent.set(node, top);
+    return top;
+  };
+  for (const face of mesh.faces) {
+    const [first, ...rest] = face.map(key);
+    for (const other of rest) parent.set(find(other), find(first));
+  }
+  return new Set(mesh.faces.map((face) => find(key(face[0])))).size;
+}
+
+describe("the fit test with the pin on a breakaway base", () => {
+  let based: WorkplaneShape;
+  beforeAll(async () => {
+    based = await fitTestShape(LIMIT, "en-US", { base: true });
+  });
+
+  it("raises the pin onto the base, one body with it, and keeps the hole plate as it was", () => {
+    const [plate, pin] = based.groupedShapes ?? [];
+    expect(pin.name).toBe("Test pin 5 mm");
+    // The base's 1.3 mm plate and socket, the pin 0.5 mm up on its nub: 15.5 mm in all.
+    expect(pin.height).toBeCloseTo(BREAKAWAY_BASE.lift + FIT_TEST_PIN_LENGTH, 6);
+    expect(shapeWidth(pin)).toBeCloseTo(breakawayPlateSize(FIT_TEST_PIN_DIAMETER), 6);
+    expect(shapeDepth(pin)).toBeCloseTo(breakawayPlateSize(FIT_TEST_PIN_DIAMETER), 6);
+    expect(pieces(pin)).toBe(1);
+    expect(pieces(shape.groupedShapes![1])).toBe(1);
+    // The base stays clear of the hole plate.
+    expect(pin.x - shapeWidth(pin) / 2).toBeGreaterThan(plate.x + shapeWidth(plate) / 2 + 2);
+    expect(plate.height).toBeCloseTo(shape.groupedShapes![0].height, 6);
+  });
+
+  it("leaves the pin free of the socket's wall: the base only holds it by the nub", () => {
+    const pin = based.groupedShapes![1];
+    const plain = shape.groupedShapes![1];
+    const plainVolume = meshVolume(triangleCorners(plain));
+    const volume = meshVolume(triangleCorners(pin));
+    const { height, floor, lift } = BREAKAWAY_BASE;
+    const plateSize = breakawayPlateSize(FIT_TEST_PIN_DIAMETER);
+    const socket = breakawaySocketDiameter(FIT_TEST_PIN_DIAMETER);
+    const nub = breakawayNubSize(FIT_TEST_PIN_DIAMETER);
+    // The plate less its socket, the nub between floor and pin, and the pin as before.
+    const base = plateSize ** 2 * height - Math.PI * (socket / 2) ** 2 * (height - floor) + nub ** 2 * (lift - floor);
+    expect(volume).toBeCloseTo(plainVolume + base, 0);
   });
 });

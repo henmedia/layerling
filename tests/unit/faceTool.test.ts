@@ -116,12 +116,13 @@ describe("face tool", () => {
     expect(insetFaceProfile(runtime, face.outline, 30)).toBeNull();
   });
 
-  it("starts a body going out inside the old one and a pocket at its bottom", () => {
+  it("starts a body going out on the face, exactly as tall as the depth, and a pocket at its bottom (#1577)", () => {
     const out = faceToolWorkplane(face, { direction: "out", depth: 3 });
-    expect(out.origin.z).toBeCloseTo(10 - FACE_TOOL_OVERLAP, 6);
+    expect(out.origin.z).toBeCloseTo(10, 6);
+    expect(faceToolHeight({ direction: "out", depth: 3 })).toBeCloseTo(3, 6);
     const pocket = faceToolWorkplane(face, { direction: "in", depth: 3 });
     expect(pocket.origin.z).toBeCloseTo(10 - 3, 6);
-    expect(faceToolHeight({ depth: 3 })).toBeCloseTo(3 + FACE_TOOL_OVERLAP, 6);
+    expect(faceToolHeight({ direction: "in", depth: 3 })).toBeCloseTo(3 + FACE_TOOL_OVERLAP, 6);
     expect(pocket.normal).toEqual(face.workplane.normal);
   });
 

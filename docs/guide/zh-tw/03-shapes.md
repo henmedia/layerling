@@ -32,9 +32,13 @@ layerling 的每個零件都從一個形狀開始。其餘一切都是由形狀�
 - **{{ui:library.section.decorative}}：** {{ui:shape.star}}、{{ui:shape.heart}}、{{ui:shape.crescent}}，以及用於握持的 {{ui:shape.knurl}}。
 - **{{ui:library.section.helpers}}：** {{ui:shape.ruler}}，它只是量測工具，永遠不會出現在匯出檔案中。
 
-要得到三角形有兩種方式：三邊的 {{ui:shape.polygon}} 是等腰三角形，也就是 Tinkercad 的「Roof」；{{ui:shape.wedge}} 則是直角三角形。兩者都是真正的三角柱。想挖出三角形孔，可複製該形狀、把副本縮小、標記為孔，再用 {{ui:editor.tool.centerOnWorkplane}} 或 {{ui:editor.tool.align}} 對齊。兩者都按形狀的邊界框運作，也就是包住它的最小方框，所以切掉一半的正方形仍算作完整正方形。命令搜尋（[[Ctrl]]+[[K]]）在「triangle」或「roof」下也找得到這兩種形狀。
+要得到三角形有兩種方式：三邊的 {{ui:shape.polygon}} 是等腰三角形，也就是 Tinkercad 的「Roof」；{{ui:shape.wedge}} 則是直角三角形。兩者都是真正的三角柱。想挖出三角形孔，可複製該形狀、把副本縮小、標記為孔，再用 {{ui:editor.tool.centerOnWorkplane}} 或 {{ui:editor.tool.align}} 對齊。兩者都按形狀的邊界框運作，也就是包住它的最小方框，所以切掉一半的正方形仍算作完整正方形。命令搜尋（[[Ctrl]]+[[K]]）在「triangle」或「roof」下也找得到這兩種形狀。楔形的屬性裡還有{{ui:prop.wedgeAngle}}，即其斜面與平台的夾角。輸入一個角度，高度會在寬度不變的情況下隨之改變，便於把面上的工作平面設成一定的傾角。
 
 {{ui:shape.slot}} 可以一端比另一端窄，例如用在兩顆皮帶輪之間的皮帶護罩。在 {{ui:inspector.properties}} 下設定 {{ui:prop.slotSmallEnd}}；大端與膠囊同寬，兩側從一段圓弧直通到另一段圓弧。{{ui:prop.slotCentreDistance}} 是兩段圓弧圓心之間的距離，也就是兩顆皮帶輪的間距。改變小端時圓心距保持不變，膠囊會變長或變短。錐形膠囊同樣是精確實體，可套用圓角並匯出 STEP。
+
+{{ui:shape.sector}} 是一個圓盤，你可以用 {{ui:prop.sectorAngle}}（1 到 360°）像時鐘指針一樣把它切掉一部分，從十二點鐘方向起順時針計算。{{ui:prop.innerDiameter}} 可以把它變成圓環或圓環段（為 0 時零件保持實心），{{ui:prop.sectorEndRadius}} 則把兩端倒成半圓：得到一條彎曲的槽，例如用於螢幕支架和其他需要轉動並夾緊的零件。直徑和高度的設定方法與圓柱相同。外框仍是完整的圓，所以形狀繞圓心旋轉。
+
+{{ui:shape.polygon}} 在 {{ui:prop.sides}} 下方有 {{ui:prop.cornerFillet}} 滑桿，模型上還有一個拖曳點，與 {{ui:shape.roundedBox}} 一樣。無論有多少條邊，一個半徑適用於所有角。它以毫米為單位，所以拉伸後的多邊形仍保持圓角；最大值是相鄰圓角恰好相接的位置，0 則是普通多邊形。
 
 ## 形狀的設定
 
@@ -68,7 +72,7 @@ layerling 的每個零件都從一個形狀開始。其餘一切都是由形狀�
 
 ### 選擇顏色
 
-點擊實體屬性中的 {{ui:inspector.solid}} 會開啟顏色卡片，標題為 {{ui:inspector.shapeColor}}。最上方顯示實體目前顏色的十六進位值。下方是色盤中的現成顏色；點擊其中一種就會為實體上色並關閉卡片。
+點擊實體屬性中的 {{ui:inspector.solid}} 會開啟顏色卡片，標題為 {{ui:inspector.shapeColor}}。最上方顯示實體目前顏色的十六進位值。點擊它即可輸入或貼上顏色代碼，例如 #5EBDDB（5ebddb 和簡寫 #5bd 也可以），然後按 [[Enter]]：實體就會變成這個顏色；選取多個實體時，它們全部變色。[[Esc]] 保留原本的顏色。下方是色盤中的現成顏色；點擊其中一種就會為實體上色並關閉卡片。
 
 {{ui:inspector.custom}} 會開啟瀏覽器的選色器，讓你選自訂顏色。它提供什麼取決於瀏覽器：在 Chrome 與 Edge 中，它有顏色欄位、色相滑桿、可從螢幕任何位置取色的滴管，以及可切換為 HEX、RGB 或 HSL 的色值（用旁邊的箭頭切換）。關閉選色器或在它外面點擊時，顏色才會生效。
 
@@ -110,12 +114,13 @@ layerling 的每個零件都從一個形狀開始。其餘一切都是由形狀�
 除了設定之外，形狀本身也有控制點：
 
 - **角與邊**可把形狀放大或縮小。把其中一個拖過對面，形狀會在那條邊的另一側繼續增大。頂端的箭頭在底面下方做同樣的事。拖曳角時按住 [[Shift]] 可同時縮放寬度、深度與高度並保持比例；按住 [[Alt]] 則從中心縮放，而不是從對角縮放。沒有鍵盤，或不想一直按著鍵時，可開啟屬性面板頂端的 {{ui:inspector.keepProportions}}：此後拖曳角一律保持比例，輸入寬度、深度或高度其中之一，另外兩項會按相同比例縮放。這項設定會被記住。
-- 形狀**上方的黑色箭頭**抬高或降低形狀；從一開始按住 [[Alt]]，會在放開處產生一個副本，方便疊放。**頂面上的白色控制點**改變高度。
+- 形狀**上方的藍色箭頭**抬高或降低形狀；從一開始按住 [[Alt]]，會在放開處產生一個副本，方便疊放。**頂面上的白色控制點**改變高度。
+- 頂部的**紅色和綠色箭頭**只沿 X 或只沿 Y 移動形狀。形狀會沿這條線跟隨滑鼠，即使從很低的角度看平台也是如此，而自由拖曳在那裡會跑得很遠。它像拖曳時一樣吸附到其他形狀，之後可以點擊移動的距離並輸入精確值。如果礙事，可在設定中關閉 {{ui:workspace.showSlideArrows}}。
 - **弧形箭頭**旋轉它。
 - **形狀旁的數字**顯示尺寸。點擊其中一個會開啟欄位，讓你輸入想要的數字。按 [[Enter]] 時，形狀從該數字對面的邊開始增大，跟拖曳時一樣；按 [[Alt]]+[[Enter]] 則繞著自己的中心增大，因此先前與其他形狀對齊過的形狀仍保持對齊。這適用於寬度與長度；高度一律從底面往上增大。右側屬性面板中的欄位不需按鍵就會保持中心。[[Tab]] 保留數字並開啟下一個欄位（寬度、深度、高度）；[[Shift]]+[[Tab]] 返回上一個。在屬性面板中已點入的欄位，滑鼠滾輪也能改變數值：每一格一個單位，按住 [[Shift]] 為十倍，[[Ctrl]] 為十分之一，[[Alt]] 為百分之一。沒點入的欄位則把滾輪留給面板捲動。
 - **點擊一個角**（不拖曳）會同時開啟寬度與深度。輸入第一個，按 [[Tab]] 切到第二個，再按 [[Enter]] 套用兩者。[[Esc]] 取消。
 
-形狀一旦轉過直角，例如用 {{ui:editor.tool.layFlat}} 側放，屬性面板中的欄位就會按每項尺寸目前的方向命名：{{ui:prop.height}} 是往上的尺寸，{{ui:prop.width}} 沿 X 方向，{{ui:prop.length}} 沿 Y 方向。因此對躺下的形狀輸入高度，改的是垂直方向的尺寸，而它的底面仍留在平台上。以其他角度傾斜的形狀，欄位中顯示的是它自己的尺寸，下方會有備註說明。
+形狀一旦轉過直角，例如用 {{ui:editor.tool.layFlat}} 側放，屬性面板中的欄位就會按每項尺寸目前的方向命名：{{ui:prop.height}} 是往上的尺寸，{{ui:prop.width}} 沿 X 方向，{{ui:prop.length}} 沿 Y 方向。有專用名稱的欄位（例如沉頭孔的頭部直徑）保留其名稱。因此對躺下的形狀輸入高度，改的是垂直方向的尺寸，而它的底面仍留在平台上。以其他角度傾斜的形狀，欄位中顯示的是它自己的尺寸，下方會有備註說明。 提示下方還會顯示空間中的總尺寸，因此可以讀出傾斜形狀實際有多高；它只用於查看。
 
 不用滑鼠時，可以用鍵盤：方向鍵把選取項移動一個吸附步距（格線關閉時為 0.01 mm），按住 [[Shift]] 為五個，若把 {{ui:workspace.gridMajorEvery}} 設為 {{ui:workspace.gridMajorSteps|10}}（在設定中的 {{ui:workspace.appearance}} 下），則為十個：移動到下一條較深的格線，跟 Tinkercad 一樣。方向鍵跟隨檢視：[[→]] 往螢幕右側，[[↑]] 遠離你，即使轉過平台也一樣。把形狀推出畫面，檢視也會跟著移動。[[Ctrl]]+[[↑]] 與 [[Ctrl]]+[[↓]] 升高與降低它。連續按方向鍵在歷史記錄中算一步：只要下一次按鍵在 1.5 秒內接上，復原就會收回整串操作，而不是一次一下。[[R]] 旋轉 45°，[[Shift]]+[[R]] 旋轉 22.5°。[[D]] 把選取項放到工作平面上。
 
@@ -125,7 +130,7 @@ layerling 的每個零件都從一個形狀開始。其餘一切都是由形狀�
 
 ## 複製與重複
 
-{{ui:editor.tool.copy}}、{{ui:editor.tool.paste}} 與 {{ui:editor.tool.duplicate}} 位於功能區（{{ui:editor.group.clipboard}}）。[[Ctrl]]+[[D]] 會重複選取項。layerling 會記住你上次如何移動或旋轉副本，並在下次重複時再套用相同的方式。這樣幾個按鍵就能做出一排孔或一排階梯。規則排列還可以使用陣列，說明見[選取與排列](chapter:select-and-arrange)。 如果你也調整了副本的大小，之後的每個副本都會再按相同比例縮放，和 Tinkercad 一樣。
+{{ui:editor.tool.copy}}、{{ui:editor.tool.paste}} 與 {{ui:editor.tool.duplicate}} 位於功能區（{{ui:editor.group.clipboard}}）。[[Ctrl]]+[[D]] 會重複選取項。layerling 會記住你上次如何移動或旋轉副本，並在下次重複時再套用相同的方式。這樣幾個按鍵就能做出一排孔或一排階梯。同時選取多個零件也可以：重複整層，把副本抬高，之後每按一次 [[Ctrl]]+[[D]] 都會以相同間距疊上下一層。規則排列還可以使用陣列，說明見[選取與排列](chapter:select-and-arrange)。 如果你也調整了副本的大小，之後的每個副本都會再按相同比例縮放，和 Tinkercad 一樣。
 
 > **提示：** 如果某個形狀不肯接受你想要的尺寸，通常是新形狀的限制所致。在設定中的 {{ui:workspace.shapeDefaults}} 下，你可以決定每種形狀如何開始，以及最大能有多大。
 
@@ -140,6 +145,8 @@ layerling 的每個零件都從一個形狀開始。其餘一切都是由形狀�
 多個實體會一起回來，保持彼此原本的相對位置，而且仍可逐一選取。釘在已儲存實體上的[備註](chapter:measuring-and-notes)會一起存下，插入時以收合狀態回來、仍釘在插入的實體上；自由備註與參考點則留在設計中。圖磚上的鉛筆可重新命名，垃圾桶會先詢問再刪除。已插入設計中的形狀則保持原樣。
 
 {{ui:myShapes.title}} 儲存在這個瀏覽器中，與設計分開，下次啟動時仍然存在。起始頁的 {{ui:dashboard.backupAll}} 會把它們和設計一起備份，開啟備份就會把兩者一起還原。若只想把形狀帶到另一個瀏覽器，{{ui:myShapes.backup}}（向下的箭頭）會把它們儲存成 ZIP 檔案，{{ui:myShapes.load}}（向上的箭頭）再把它們帶回那裡。{{ui:myShapes.load}} 也接受單一的 `.lyl` 設計；每一個都會變成一個形狀。已存在的形狀不會重複新增。
+
+形狀庫的搜尋也會依名稱找到你的自訂形狀，包括資料夾裡的形狀；它們顯示在形狀庫自己的結果上方。資料夾按鈕旁帶箭頭和字母 A 到 Z 的按鈕，會依名稱而不是依儲存日期排列自訂形狀；再按一次即恢復原本的順序，瀏覽器會記住這個選擇。
 
 ### 資料夾
 
@@ -171,25 +178,29 @@ layerling 的每個零件都從一個形狀開始。其餘一切都是由形狀�
 
 ## 表面紋理
 
-在實體上加凹槽、滾花、蜂巢或凸點，讓它更好握或更好看：在形狀設定中開啟 {{ui:inspector.surfaceTexture}}。上方 {{ui:editor.group.modify}} 群組裡的 {{ui:inspector.surfaceTexture}} 按鈕作用相同：它為選取的實體開啟或關閉這張卡片，卡片開啟時按鈕保持亮起。
+在實體上加凹槽、滾花、蜂巢或凸點，讓它更好握或更好看：在形狀設定中開啟 {{ui:inspector.surfaceTexture}}。上方 {{ui:editor.section.surface}} 群組裡的 {{ui:inspector.surfaceTexture}} 按鈕作用相同：它為選取的實體開啟或關閉這張卡片，卡片開啟時按鈕保持亮起。 與其他卡片不同，layerling 不會記住它：選取其他實體或不選取任何實體時，它會重新關閉。
 
 1. 選擇 {{ui:inspector.surfacePattern}}、它的 {{ui:inspector.surfaceSpacing}} 和 {{ui:inspector.surfaceDepth}}。{{ui:inspector.surfaceDirection}} 決定紋理是壓進實體還是凸出實體。對於 {{ui:surfaceTexture.bumps}}，{{ui:inspector.surfaceBumpShape}} 可在 {{ui:surfaceTexture.bumpDome}}、{{ui:surfaceTexture.bumpCone}}、{{ui:surfaceTexture.bumpSoft}} 和 {{ui:surfaceTexture.bumpFlat}} 之間選擇。在 {{ui:inspector.surfaceBumpGrid}} 下，它們可以 {{ui:surfaceTexture.bumpGridStaggered}}（每隔一列錯開半個間距），或排成 {{ui:surfaceTexture.bumpGridStraight}}。
 2. 在 {{ui:inspector.surfaceProjection}} 下，杯子、旋鈕或把手等圓形實體選 {{ui:surfaceTexture.cylinder}}。圖案繞 {{ui:inspector.surfaceAxis}} 一圈，間距會略作取整，使一圈正好是整數個凹槽或單元：圖案閉合，沒有接縫。{{ui:surfaceTexture.allRound}} 適合不是圓形的實體，{{ui:surfaceTexture.flatProjection}} 適合從上方看的蓋子或平板。保持 {{ui:surfaceTexture.auto}}，Layerling 會替你選擇：圓形實體以及像盒子這樣直立的稜角實體用 {{ui:surfaceTexture.cylinder}}（圖案沿外輪廓走，無接縫地繞過稜邊，凸起的圖案會順著稜邊彎過去），其他稜角實體用 {{ui:surfaceTexture.allRound}}。
 3. 點擊 {{ui:inspector.surfaceApply}}。大的實體需要幾秒鐘，期間可以繼續工作。
 
-如果只想給部分面加圖案，例如只給盒子的頂面，點擊 {{ui:inspector.surfaceFacesPick}}，再在檢視中點擊這些面：頂面、底面或某個側面。一個面一直延伸到實體的銳利稜邊；圓柱的側面是一個面，頂面和底面各是一個面。選取的面會亮起，再點擊一次可以取消，{{ui:inspector.surfaceFacesClear}} 讓圖案重新覆蓋整個實體。只有選取的面得到圖案，其他面保持原樣，三角形也很少。在頂面或底面上圖案是平鋪的；在圓形頂面上，凹槽、繩紋和針織紋繞中心排成一圈圈，像樹的年輪。{{ui:inspector.surfaceFaceTurn}} 轉動頂面和底面上的圖案：0° 時各列沿前緣，90° 時沿側緣。{{ui:inspector.surfaceCapStyle}} 讓那裡的凹槽、繩紋和針織紋在列與環之間切換；在稜角實體上，環會沿外輪廓走。{{ui:inspector.surfaceCapEdge}} 決定側面與帶圖案的頂面或底面之間的稜邊怎麼處理：{{ui:surfaceTexture.edgeSharp}} 讓兩者都止於稜邊。選 {{ui:surfaceTexture.edgeOver}} 時，側面的圖案繞過稜邊鋪滿整個頂面：繩紋、針織紋和水平凹槽的各列以環的形式延續，垂直和斜向的凹槽則作為射線幾乎延伸到中心。{{ui:surfaceTexture.edgeFold}} 效果相同，但只作為一圈邊；裡面是頂面自己的圖案，依 {{ui:inspector.surfaceCapStyle}} 的設定。{{ui:surfaceTexture.edgeBead}} 為任何圖案在稜邊加一圈飾邊：一條繩、一道收針鏈或一道圓珠邊。較窄的圓角也會結束一個面：杯緣有圓角的杯子，其外側、圓角、杯緣、內側和杯底各自是獨立的面，所以點擊外側只會選到外側。較寬的圓角（約占實體四分之一或更多）屬於該面，就像球是一個面。選了面時，{{ui:inspector.surfaceOutside}} 和 {{ui:inspector.surfaceInside}} 不起作用。
+如果只想給部分面加圖案，例如只給盒子的頂面，點擊 {{ui:inspector.surfaceFacesPick}}，再在檢視中點擊這些面：頂面、底面或某個側面。一個面一直延伸到實體的銳利稜邊；圓柱的側面是一個面，頂面和底面各是一個面。選取的面會亮起，再點擊一次可以取消，{{ui:inspector.surfaceFacesClear}} 讓圖案重新覆蓋整個實體。選取完成後，{{ui:inspector.surfaceFacesShow}} 會再次點亮目前顯示圖層所選的面供檢查，不會改動它們；一個實體上有多個圖樣時很有用。只有選取的面得到圖案，其他面保持原樣，三角形也很少。在頂面或底面上圖案是平鋪的；在圓形頂面上，凹槽、繩紋和針織紋繞中心排成一圈圈，像樹的年輪。{{ui:inspector.surfaceFaceTurn}} 轉動頂面和底面上的圖案：0° 時各列沿前緣，90° 時沿側緣。{{ui:inspector.surfaceCapStyle}} 讓那裡的凹槽、繩紋和針織紋在列與環之間切換；在稜角實體上，環會沿外輪廓走。{{ui:inspector.surfaceCapEdge}} 決定側面與帶圖案的頂面或底面之間的稜邊怎麼處理：{{ui:surfaceTexture.edgeSharp}} 讓兩者都止於稜邊。選 {{ui:surfaceTexture.edgeOver}} 時，側面的圖案繞過稜邊鋪滿整個頂面：繩紋、針織紋和水平凹槽的各列以環的形式延續，垂直和斜向的凹槽則作為射線幾乎延伸到中心。{{ui:surfaceTexture.edgeFold}} 效果相同，但只作為一圈邊；裡面是頂面自己的圖案，依 {{ui:inspector.surfaceCapStyle}} 的設定。{{ui:surfaceTexture.edgeBead}} 為任何圖案在稜邊加一圈飾邊：一條繩、一道收針鏈或一道圓珠邊。較窄的圓角也會結束一個面：杯緣有圓角的杯子，其外側、圓角、杯緣、內側和杯底各自是獨立的面，所以點擊外側只會選到外側。較寬的圓角（約占實體四分之一或更多）屬於該面，就像球是一個面。選了面時，{{ui:inspector.surfaceOutside}} 和 {{ui:inspector.surfaceInside}} 不起作用。
 
 一個實體上的多種圖案——四周是磚牆，頂面是滾花——就是圖層：第一個旁邊的 {{ui:inspector.surfaceLayerAddShort}} 會新增一層，並立即為它開啟選面；點擊它應覆蓋的面。之後的每一層只作用於它自己的面，第一層作用於其餘所有面。分頁一次顯示一個圖層及其設定，{{ui:inspector.surfaceLayerRemove}} 刪除一層。所有圖層都在紋理下方的實體上一起產生，因此修改其中一層或移除紋理，和單一圖案時一樣。文字作為圖層不需要選面：放在哪裡就在哪裡。
 
+如果只想給一個面上的某一處加圖案，例如蓋子上一塊圓形的滾花，點擊 {{ui:inspector.surfaceRegionDraw}}，在檢視中按住該面，並按住按鍵繞這一處畫一圈。圖案就只落在你畫的輪廓之內，面的其餘部分保持光滑；如果按在實體旁邊，檢視照常旋轉。{{ui:inspector.surfaceRegionAgain}} 重新繪製區域，{{ui:inspector.surfaceRegionClear}} 將它移除。每個圖層都可以有自己的區域，也可以在同一個面上。
+
 在 {{ui:inspector.more}} 下選擇圖案鋪在哪裡：外壁和內壁，底部和頂部各留多少光滑（光滑的底部讓實體平穩地放在熱床上），高度上的一條帶，以及銳利稜邊是否保持光滑。在所有保持光滑的地方旁邊，圖案會柔和地過渡出現；{{ui:inspector.surfaceFade}} 設定過渡的毫米數。數值越小，圖案越靠近稜邊；凸起的圖案會一直延伸到稜邊。在立方體這類稜角實體的平面上，圖案則在這個距離處以一條直邊結束：凹槽和菱形以一小段壁收尾，只保留完整的凸點。{{ui:inspector.surfaceProfile}} 決定凹槽或接縫的截面：尖形和平形是精確的，圓形則依 {{ui:inspector.surfaceDetail}} 給出的級數分段。
 
-除了 {{ui:surfaceTexture.grooves}}、{{ui:surfaceTexture.knurl}}、{{ui:surfaceTexture.honeycomb}} 和 {{ui:surfaceTexture.bumps}}，還有更多圖案。{{ui:surfaceTexture.cells}} 是像鋪路石或乾裂泥土那樣的不規則單元；接縫像蜂巢一樣切得乾淨，換一個 {{ui:inspector.surfaceSeed}} 就重新排布。{{ui:surfaceTexture.knit}}、{{ui:surfaceTexture.rope}} 和 {{ui:surfaceTexture.weave}} 模仿針織線圈、纏繞的繩子以及由立條和編條編成的籃子；它們預設凸起、圓潤，大小與原物相當。{{ui:surfaceTexture.grain}} 讓表面變得細微粗糙，像噴砂過一樣；顆粒分布在空間中，沒有接縫，也不會拉伸。{{ui:surfaceTexture.image}} 把一張灰階圖當作高度圖：可用現成的木紋、地形或磨石子，也可用 {{ui:inspector.surfaceImageLoad}} 載入自己的圖。亮處成為完整深度；{{ui:inspector.surfaceSpacingImage}} 設定一塊拼貼的寬度，在 {{ui:inspector.surfaceImageTiling}} 下，拼貼可以重複、鏡像或錯位。透明背景上的深色圖畫（例如 SVG 裡的黑色線條）按其線條計算：線條變成最大深度。選擇 {{ui:surfaceTexture.tilingOnce}} 時，圖片像標籤一樣只壓印一次：{{ui:inspector.surfaceTextAround}} 和 {{ui:inspector.surfaceTextHeight}} 像文字一樣決定它的中心，{{ui:inspector.surfaceImageWidth}} 設定它的寬度，旁邊的表面保持平滑。選了面時，它總是落在這些面上，即使 {{ui:inspector.surfaceTextAround}} 和 {{ui:inspector.surfaceTextHeight}} 指向別處。
+除了 {{ui:surfaceTexture.grooves}}、{{ui:surfaceTexture.knurl}}、{{ui:surfaceTexture.honeycomb}} 和 {{ui:surfaceTexture.bumps}}，還有更多圖案。{{ui:surfaceTexture.cells}} 是像鋪路石或乾裂泥土那樣的不規則單元；接縫像蜂巢一樣切得乾淨，換一個 {{ui:inspector.surfaceSeed}} 就重新排布。{{ui:surfaceTexture.knit}}、{{ui:surfaceTexture.rope}} 和 {{ui:surfaceTexture.weave}} 模仿針織線圈、纏繞的繩子以及由立條和編條編成的籃子；它們預設凸起、圓潤，大小與原物相當。{{ui:surfaceTexture.grain}} 讓表面變得細微粗糙，像噴砂過一樣；顆粒分布在空間中，沒有接縫，也不會拉伸。{{ui:surfaceTexture.image}} 把一張灰階圖當作高度圖：可用現成的木紋、地形或磨石子，也可用 {{ui:inspector.surfaceImageLoad}} 載入自己的圖。亮處成為完整深度；{{ui:inspector.surfaceSpacingImage}} 設定一塊拼貼的寬度，在 {{ui:inspector.surfaceImageTiling}} 下，拼貼可以重複、鏡像或錯位。透明背景上的深色圖畫（例如 SVG 裡的黑色線條）按其線條計算：線條變成最大深度。選擇 {{ui:surfaceTexture.tilingOnce}} 時，圖片像標籤一樣只壓印一次：{{ui:inspector.surfaceTextAround}} 和 {{ui:inspector.surfaceTextHeight}} 像文字一樣決定它的中心，{{ui:inspector.surfaceImageWidth}} 設定它的寬度，旁邊的表面保持平滑。選了面時，它總是落在這些面上，即使 {{ui:inspector.surfaceTextAround}} 和 {{ui:inspector.surfaceTextHeight}} 指向別處。 雙色的 SVG 圖案在一次性壓上時，會像文字一樣沿著輪廓切出，因此斜線和曲線乾淨俐落，不會出現階梯。
 
 {{ui:surfaceTexture.carbon}} 在實體上鋪斜紋編織的碳纖維：直向帶和橫向帶互相上下穿插，每條帶錯開一條帶的位置，於是出現熟悉的斜紋。{{ui:inspector.surfaceCarbonWeave}} 可選 {{ui:surfaceTexture.carbonTwill22}}（大多數碳纖維件的均勻編織），或 {{ui:surfaceTexture.carbonTwill21}} 和 {{ui:surfaceTexture.carbonTwill31}}，後兩者直向帶顯得長、橫向帶顯得短。{{ui:inspector.surfaceSpacingCarbon}} 設定直向帶的寬度；{{ui:inspector.surfaceCarbonCross}} 讓橫向帶更寬或更窄，得到不均勻的編織（0：一樣寬）。繞實體一圈時，帶寬會略作取整，使編織無接縫地閉合。單根纖維對列印來說太細了：看得見的是帶和它們的交叉。
 
 {{ui:surfaceTexture.bricks}} 在實體上鋪一面磚牆，接縫像砂漿一樣凹下。{{ui:inspector.surfaceBrickBond}} 選擇磚的砌法：大多數牆用的 {{ui:surfaceTexture.bondRunning}}、{{ui:surfaceTexture.bondStack}}，或在長磚之間夾短磚（{{ui:surfaceTexture.bondEnglish}}、{{ui:surfaceTexture.bondEnglishCross}}、{{ui:surfaceTexture.bondFlemish}}）。{{ui:inspector.surfaceSpacingBricks}} 和 {{ui:inspector.surfaceBrickHeight}} 從接縫量到接縫，並略作取整，使整塊磚正好排下：繞杯子一圈、盒子側面從稜到稜、從底到頂；{{ui:inspector.surfaceBrickJoint}} 設定接縫寬度。在 {{ui:inspector.more}} 下，{{ui:inspector.surfaceBrickVary}} 讓每塊磚凹得深淺略有不同，像舊牆一樣。
 
 {{ui:surfaceTexture.squares}} 和 {{ui:surfaceTexture.triangles}} 在實體上鋪出大小相同的網格磁磚，凸起或壓入，側壁陡直、切得乾淨；三角形排成列，尖角輪流朝上和朝下。{{ui:inspector.surfaceSpacingSquares}} 或 {{ui:inspector.surfaceSpacingTriangles}} 以及 {{ui:inspector.surfaceTileGap}} 嚴格保持你設定的值 – 3.2 mm 的正方形、間距 3.2 mm，各是 0.4 mm 噴嘴的八條線，列印得很乾淨。網格在每個面上置中；繞圓形實體時間距會略微取整，好讓整數個剛好繞一圈。開啟 {{ui:inspector.surfaceTileFromBottom}} 後，第一排緊貼底邊開始，一直延伸到第一層，由裙邊（Brim）固定。若只想在兩個側面的下半部分鋪磁磚，請選取這兩個面，並在上半部分放一個輔助實體，在 {{ui:inspector.surfaceMask}} 下選 {{ui:surfaceTexture.maskExclude}}（見下文）。在 {{ui:inspector.more}} 下，{{ui:inspector.surfaceProfile}} 選 {{ui:surfaceTexture.pointed}} 會做成金字塔，選 {{ui:surfaceTexture.round}} 或 {{ui:surfaceTexture.dome}} 則做成軟墊。
+
+{{ui:surfaceTexture.timber}}和{{ui:surfaceTexture.stones}}是為模型製作準備的，例如鐵道模型或場景模型裡的房子。{{ui:surfaceTexture.timber}}讓木樑凸出牆面，樑間的灰泥較低：立柱間距為{{ui:inspector.surfaceSpacingTimber}}，每層（{{ui:inspector.surfaceTimberHeight}}）都有底樑和頂樑，中間橫穿{{ui:inspector.surfaceTimberRails}}。{{ui:inspector.surfaceTimberBracing}}決定格裡放多少木料：{{ui:surfaceTexture.timberBraces}}從兩端向中間傾斜，{{ui:surfaceTexture.timberCross}}位於最低橫檔下面，{{ui:surfaceTexture.timberKnee}}在上方兩角，{{ui:surfaceTexture.timberMixed}}則在兩端放斜撐、中間放交叉撐和角撐，就像許多老房子那樣。{{ui:inspector.surfaceTimberBeam}}和{{ui:inspector.surfaceDepthTimber}}決定樑的寬度和凸出高度，{{ui:inspector.surfaceTimberGrain}}給樑加上木紋：0 % 沒有，低於 50 % 紋線更多更細，高於 50 % 是兩道又寬又深的紋槽——從刨光的木料到粗糙的厚板。和磚紋一樣，格寬和層高會略微取整，好讓整格放得下，從底邊開始向上。{{ui:surfaceTexture.stones}}砌出一面老牆：大小不一的石塊排成粗略的層，灰縫較低，每塊石頭都略微隆起，各不相同。{{ui:inspector.surfaceStoneRound}}從稜角鋒利的碎石（0 %）到圓潤的卵石（100 %）；{{ui:inspector.surfaceStoneVary}}、{{ui:inspector.surfaceBrickJoint}}和{{ui:inspector.surfaceSeed}}決定石塊差異多大、縫有多寬以及怎樣排列。兩者都只是形狀、只有一種顏色，所以{{ui:inspector.surfacePatternPart}}可以把木樑或石塊做成單獨的部件，用第二種顏色列印。
 
 {{ui:surfaceTexture.cracks}} 圖案讓裂紋像金繕那樣在表面蔓延，帶有轉折、分岔，寬度往末端逐漸變細。{{ui:inspector.surfaceCrackStart}} 決定裂紋從哪裡開始：花瓶或杯子的上緣、底部、從盤子邊緣往中心，或任意位置；在 {{ui:inspector.surfaceCrackStyle}} 下它們會變成閃電。選 {{ui:inspector.surfaceCrackGold}} 時，凹痕由一個獨立的金色零件填滿，可用第二種線材列印；更改或移除紋理時它會一起變化。在 {{ui:inspector.more}} 下設定分岔、鋸齒和崩邊，換一個 {{ui:inspector.surfaceCrackSeed}} 就重新產生裂紋。
 
@@ -202,6 +213,22 @@ layerling 的每個零件都從一個形狀開始。其餘一切都是由形狀�
 結果是一個網格，就像匯入的模型一樣，並保留產生它時所用的實體。之後再選取它（儲存後也可以），卡片會顯示產生時的設定：修改後點擊 {{ui:inspector.surfaceChange}}，紋理會在該實體上重新產生，位置和大小與紋理實體現在的一致。{{ui:inspector.surfaceRemove}} 恢復光滑的實體。更改紋理時遮罩實體會再次起作用：如果之後可能還要改，請隱藏而不是刪除它們。復原同樣可以撤回其中每一步。
 
 要用兩種顏色列印，請開啟 {{ui:inspector.surfacePatternPart}}，適用於任何圖樣：圖樣會成為獨立零件，{{ui:inspector.surfacePatternColor}} 決定它的顏色——第一次是與實體形成對比的顏色，下一次是你上次選的顏色。凸出實體時，零件就是凸出的部分，實體保持原樣；凹入實體時，實體被刻入圖樣，零件把凹槽一直填到表面，就像裂紋裡的金色填充。兩者一起放在綁定中：它們會一起移動，各自保留顏色，3MF 檔案中它們是交給切片軟體的兩個零件。像往常一樣修改或取下紋理；圖樣零件會隨之一起變化。有多個圖層時，它們必須朝同一方向，凸出或凹入實體；兩側置中的圖樣仍與實體為一體。
+
+## 多色上色
+
+為了多色列印，{{ui:paint.title}} 直接在設計中為實體的部分表面上色：一個面、一圈圓柱壁、孔的內壁、一個圓斑，或者你圈出的一塊區域。它和切片軟體裡的上色工具類似，但顏色會隨設計一起儲存。選取一個實體，在 {{ui:editor.section.surface}} 群組中點擊 {{ui:paint.title}}（在 {{ui:inspector.surfaceTexture}} 旁邊）。面板會列出設計中用到的顏色，{{ui:paint.customColor}} 可以調出自己的顏色。然後在檢視中用三種工具之一上色：
+
+- {{ui:paint.mode.fill}}：點擊一下，把面一直填色到它的銳利邊緣，就像繪圖軟體裡的油漆桶：長方體的頂面、圓柱的側壁、凹槽的底面或孔的內壁，各點一下即可。{{ui:paint.angle}} 決定邊緣要多銳利才會讓填色停下；設為 90° 時會越過長方體的稜邊。
+- {{ui:paint.mode.circle}}：點擊一下，在表面上放一個設定 {{ui:paint.diameter}} 的圓斑，圓心就在點擊處，曲面上也可以。它會在實體的銳利邊緣停下，也不會透到壁的背面。
+- {{ui:paint.mode.lasso}}：按住滑鼠鍵圈出一塊區域。區域內看得見的部分會被上色，實體後面的背面不會。
+
+![用三種工具上色的長方體：頂面填色為黃色，正面一個白色圓，側面一個用套索圈出的綠色星形；旁邊是上色面板。](shot:paint)
+
+{{ui:paint.eraser}} 用同樣的工具把顏色去掉，{{ui:paint.clear}} 一次去掉全部顏色。每一筆都是獨立的一步，所以 [[Ctrl]]+[[Z]] 會復原最後一筆。兩筆之間仍然可以像平常一樣用滑鼠右鍵旋轉檢視；{{ui:paint.done}} 或 [[Esc]] 關閉面板。
+
+圓和套索的邊緣會切進實體的網格：長方體面上的圓是圓的，而不是幾個三角形，實體也保持封閉。顏色屬於實體：它隨實體移動和旋轉，調整尺寸時隨之拉伸；修改後找不到位置的筆畫會被略過。匯出 3MF 時顏色會寫成已上色的面，OrcaSlicer、Bambu Studio 和 PrusaSlicer 會用各自的線材列印（見[檔案與儲存](chapter:files-and-saving)）；OBJ 也保留顏色，STL 仍是單色。
+
+切成一個實體的群組（例如帶孔的長方體）按一個實體上色：請在切出孔之後再上色，打開群組修改後顏色仍會保留。集合中的零件要逐一上色。把已上色的實體和其他實體組成群組後，它作為零件保留顏色，取消群組後會再次顯示。不封閉的匯入網格會按它自己的三角形上色。
 
 ## 花瓶
 

@@ -206,3 +206,28 @@ export function ensureFolderPath(
 export function folderPathNames(folders: readonly DesignFolder[], folderId: string | null | undefined): string[] {
   return folderTrail(folders, folderId ?? null).map((folder) => folder.name);
 }
+
+/**
+ * The names of the folders on the way to a folder, starting at `rootId` (null: at the top level), for designs that go
+ * onto the server with their folders (Discussion #1572): "Put all on the server" takes the whole way, a folder put on
+ * the server starts at itself, so it becomes a folder there. Empty for a folder that is not inside `rootId`.
+ */
+export function folderPathFrom(folders: readonly DesignFolder[], folderId: string | null | undefined, rootId: string | null): string[] {
+  const trail = folderTrail(folders, folderId ?? null);
+  if (!rootId) return trail.map((folder) => folder.name);
+  const start = trail.findIndex((folder) => folder.id === rootId);
+  return start < 0 ? [] : trail.slice(start).map((folder) => folder.name);
+}
+
+/**
+ * The folders of `scope` that are left empty once their designs went onto the server (Discussion #1572): those with no
+ * design of `staying` anywhere inside them. A folder with a design that could not go stays, and the folders on the way
+ * to it; one outside `scope` is never counted.
+ */
+export function foldersEmptiedByMove(folders: readonly DesignFolder[], staying: readonly InFolder[], scope: ReadonlySet<string>): Set<string> {
+  const holding = new Set<string>();
+  for (const design of staying) {
+    for (const folder of folderTrail(folders, folderOfDesign(folders, design.folderId))) holding.add(folder.id);
+  }
+  return new Set(folders.filter((folder) => scope.has(folder.id) && !holding.has(folder.id)).map((folder) => folder.id));
+}

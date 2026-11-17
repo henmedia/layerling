@@ -4,6 +4,7 @@ import { createRoot, type Root } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { MyShapesSection } from "@/components/workplane/MyShapesSection";
 import { ShapeLibraryList } from "@/components/workplane/ShapeLibraryList";
+import { searchCustomShapes } from "@/lib/customShapeSearch";
 import { setLanguage } from "@/lib/i18n";
 import { libraryShapeAssets, shapeAssetMenuLabel } from "@/lib/shapeCatalog";
 import { CLOSED_SECTIONS_STORAGE_KEY, storeRecentShape } from "@/lib/shapeLibrarySections";
@@ -61,12 +62,12 @@ describe("the shape library in sections (#1170)", () => {
     const panel = library();
     const headings = [...panel.querySelectorAll(".shape-library-toggle")].map((button) => button.textContent);
     expect(headings).toEqual([
-      "Basic shapes15", "Vessels, tubes & transitions4", "Holes & cut-outs4", "Connections4", "Enclosure parts3", "Mechanics & moving parts4",
+      "Basic shapes16", "Vessels, tubes & transitions4", "Holes & cut-outs4", "Connections4", "Enclosure parts3", "Mechanics & moving parts4",
       "Systems & templates2", "Lettering & signs4", "Decorative outlines4", "Helpers1",
     ]);
     expect([...panel.querySelectorAll(".shape-library-toggle")].every((button) => button.getAttribute("aria-expanded") === "true")).toBe(true);
-    expect(tiles(panel)).toHaveLength(45);
-    expect(new Set(tiles(panel)).size).toBe(45);
+    expect(tiles(panel)).toHaveLength(46);
+    expect(new Set(tiles(panel)).size).toBe(46);
     expect(panel.querySelector(".custom-stand-in")).not.toBeNull();
     // Nothing put in yet: no "Recently used".
     expect(section(panel, "Recently used")).toBeNull();
@@ -114,7 +115,7 @@ describe("the shape library in sections (#1170)", () => {
     });
     expect(escape.defaultPrevented).toBe(true);
     expect(input.value).toBe("");
-    expect(tiles(panel)).toHaveLength(45);
+    expect(tiles(panel)).toHaveLength(46);
   });
 
   it("lists the last four shapes put in on top, newest first, also while the library stays open", () => {
@@ -172,5 +173,58 @@ describe("the custom shapes above the library (#1170)", () => {
   it("is open when it holds shapes, as before", () => {
     const panel = mount(createElement(MyShapesSection, { ...props, shapes: [{ id: "a", name: "Bracket", thumbnail: "", location: "browser", folderId: null }] }));
     expect(panel.querySelector(".my-shapes-toggle")!.getAttribute("aria-expanded")).toBe("true");
+  });
+});
+
+describe("the custom shapes in the search and in order (Discussion #1537)", () => {
+  const props = {
+    serverAvailable: false, canSave: false, defaultName: "Shape",
+    onInsert: () => {}, onSave: async () => true, onRename: () => {}, onDelete: () => {}, onMoveToServer: () => {}, onMoveToFolder: () => {},
+    onCreateFolder: async () => null, onRenameFolder: async () => null, onDeleteFolder: () => {}, onBackup: () => {}, onLoad: () => {}, onShown: () => {}, onDragDone: () => {},
+  };
+  const entry = (id: string, name: string, folderId: string | null = null) => ({ id, name, thumbnail: "", location: "browser" as const, folderId });
+  const shapes = [entry("c", "Sunflower", "f"), entry("a", "Zebra"), entry("b", "Anchor")];
+  const folders = [{ id: "f", name: "Garden", location: "browser" as const, parentId: null }];
+  const names = (panel: HTMLElement) => [...panel.querySelectorAll(".my-shapes-list .my-shape-tile-name, .my-shapes-list .shape-menu-item")].map((tile) => tile.textContent?.trim());
+
+  const withCustom = () => mount(createElement(ShapeLibraryList<(typeof libraryShapeAssets)[number]>, {
+    shapes: libraryShapeAssets,
+    label: (shape) => shapeAssetMenuLabel(shape).replace(/\s+/g, " "),
+    renderTile: (shape) => createElement("button", { key: shape.id, type: "button", className: "shape-menu-item", "data-shape": shape.id }, shape.name),
+    customShapes: (query: string) => createElement(MyShapesSection, { ...props, shapes, folders, searchQuery: query }),
+    countCustomMatches: (query: string) => searchCustomShapes(shapes, query).length,
+  }));
+
+  it("finds a custom shape by its name, also one inside a folder, and shows it above the library's matches", () => {
+    const panel = withCustom();
+    searchFor(panel, "sunflower");
+    const mine = panel.querySelector<HTMLElement>(".my-shapes-search")!;
+    expect(mine).not.toBeNull();
+    expect(mine.textContent).toContain("Sunflower");
+    expect(mine.textContent).not.toContain("Zebra");
+    expect(panel.querySelector(".shape-library-empty")).toBeNull();
+  });
+
+  it("says No shapes found only when neither the custom shapes nor the library match", () => {
+    const panel = withCustom();
+    searchFor(panel, "qqqzzz");
+    expect(panel.querySelector(".shape-library-empty")).not.toBeNull();
+    expect(panel.querySelector(".my-shapes-search")).toBeNull();
+    // A name only a custom shape has: the library has no match, the custom shape is shown, no "No shapes found".
+    searchFor(panel, "anchor");
+    expect(panel.querySelector(".shape-library-empty")).toBeNull();
+    expect(panel.querySelector(".my-shapes-search")!.textContent).toContain("Anchor");
+  });
+
+  it("puts the shapes in order by name when asked, and remembers it", () => {
+    const panel = mount(createElement(MyShapesSection, { ...props, shapes: [entry("a", "Zebra"), entry("b", "anchor"), entry("c", "Moth")], folders: [] }));
+    const order = () => [...panel.querySelectorAll(".my-shapes-list [data-my-shape-id], .my-shapes-list .my-shape-tile")].map((tile) => tile.textContent);
+    const saved = order().join("|");
+    expect(saved.indexOf("Zebra")).toBeLessThan(saved.indexOf("anchor"));
+    act(() => panel.querySelector<HTMLButtonElement>('button[aria-pressed="false"][title^="Sort the custom shapes by name"]')!.click());
+    const sorted = order().join("|");
+    expect(sorted.indexOf("anchor")).toBeLessThan(sorted.indexOf("Moth"));
+    expect(sorted.indexOf("Moth")).toBeLessThan(sorted.indexOf("Zebra"));
+    expect(window.localStorage.getItem("layerling.myShapesOrder")).toBe("name");
   });
 });

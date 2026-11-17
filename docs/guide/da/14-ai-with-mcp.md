@@ -82,10 +82,12 @@ AI'en arbejder med de samme funktioner som dig, gennem den samme vej som din han
 | Værktøj | Hvad det gør |
 | --- | --- |
 | `layerling_list_editors` | lister de åbne editor-faner |
+| `layerling_rename_project` | giver projektet et navn, som blyanten ved siden af projektnavnet |
 | `layerling_open_editor` | åbner en ny editor-fane i din standardbrowser og venter indtil den har forbundet (kun på din egen computer) |
 | `layerling_read_scene` | læser scene, markering, enheder og de nøjagtige dimensioner af alle objekter |
 | `layerling_list_objects` | lister alle objekter med dimensioner, position, rotation og id |
 | `layerling_select_objects` | vælger objekter |
+| `layerling_hide_others` | skjuler alt undtagen markeringen eller de angivne objekter, i ét fortryd-trin |
 | `layerling_delete_objects` | sletter objekter |
 | `layerling_move_object` | flytter et objekt til et andet sted i objektlisten |
 | `layerling_create_shape` | skaber en form: kasse, cylinder, tekst (også buet), gevind, tandhjul, skitseform og alle de andre |
@@ -95,12 +97,16 @@ AI'en arbejder med de samme funktioner som dig, gennem den samme vej som din han
 | `layerling_import_mesh` | bringer et trekantsmesh ind i designet |
 | `layerling_update_object` | ændrer dimensioner, position, farve, navn, solid eller hul og alt andet der udgør formen, en teksts bogstavkant inkluderet |
 | `layerling_align_objects` | justerer objekter med hinanden |
-| `layerling_scale_objects` | skalerer objekter med en procent, sammen eller hver på stedet |
+| `layerling_scale_objects` | skalerer objekter med en procent, sammen eller hver på stedet, eller til en modelskala som 1:87 |
 | `layerling_lay_flat` | lægger et objekt med én flade på pladen |
 | `layerling_place_on_face` | sætter objekter ned på en flade af en anden, også skrå, som C-tasten |
-| `layerling_perforate_face` | skærer et hulmønster ind i en flad flade; hullerne bliver som huller grupperet med formen |
+| `layerling_perforate_face` | skærer et hulmønster ind i en flad flade eller rundt om væggen på en cylinder, et rør eller en boring; hullerne bliver som huller grupperet med formen |
+| `layerling_thread_insert` | laver hullet til en varmeindsat med gevind (M2 til M8, 1/4-20 eller din egen størrelse) i en flad flade eller på ydersiden af væggen på en cylinder eller et rør, efter at have kontrolleret, at væggen ved siden af hullet og dybden bagved er nok; hullet bliver som hul grupperet med formen |
 | `layerling_sweep_sketch` | trækker et rektangulært eller rundt tværsnit langs en sti af punkter som ét eksakt legeme; en lukket sti giver en ring |
 | `layerling_push_face` | skubber en flad flade ud eller skærer en lomme ind i den, med en indrykning fra kanten og en hjørneradius; den nye del er en skitseform grupperet med formen, eller et frit legeme for sig med `separate` |
+| `layerling_paint` | maler dele af et legeme i egne farver til print i flere farver (Mal): fyld en flade ud til de skarpe kanter, en rund plet eller en lasso i en flad visning; viskelæder, fjern alt; gemt med legemet og skrevet til 3MF som malede flader |
+| `layerling_support_rib` | stiller en tynd støtteribbe under den nederste flade på en del, der printes skråt på en kant, med broer ét lag høje (Støtteribbe) |
+| `layerling_stencil_bridges` | holder de dele af en plade med tekst skåret igennem, der ville falde ud, med broer grupperet med pladen, så brede og høje som angivet (Stencilbroer) |
 | `layerling_mate_faces` | bringer en flade på et objekt mod en flade på et andet, flade mod flade eller flugtende, eller lægger to runde flader på én akse |
 | `layerling_open_group` | åbner en gruppe så dens dele kan ændres én ad gangen, også en gruppe inden i en åben |
 | `layerling_close_group` | lukker den igen ("Udført") eller annullerer |
@@ -158,12 +164,16 @@ AI'en arbejder med de samme funktioner som dig, gennem den samme vej som din han
 | `layerling_insert_custom_shape` | indsætter en egen form i det åbne design, evt. på en position x/z |
 | `layerling_delete_custom_shape` | fjerner en egen form; indsatte former bevares |
 | `layerling_show_workplane` | skjuler og viser pladen med sit gitter, for et billede af undersiden for eksempel (kun visningen) |
+| `layerling_focus_mode` | slår fokustilstand til og fra: skjuler titellinjen og sidefoden for mere plads (kun editorens ramme) |
 | `layerling_set_section_view` | skærer visningen op langs et plan for at kigge indeni (kun visningen, intet skæres fra hinanden) |
 | `layerling_measurements` | viser eller skjuler målebåndets målinger og viser dem med deres længder, og skjuler eller viser målene omkring markeringen som [[Q]], og skriver en længde for en af dem, som flytter legemet i dens ende som et klik på tallet |
 | `layerling_measure_angle` | måler en vinkel som gradskiven: i hjørnet af tre punkter eller mellem to plane flader, og viser den i visningen |
 | `layerling_saved_view` | gemmer den aktuelle visning under tasten 7, 8, 9 eller 0 og går tilbage til den, som Shift+tast og tasten (kun visningen); sætter også startvisningen for nye designs |
 | `layerling_build_plates` | viser, tilføjer, navngiver, ordner og fjerner byggepladerne, flytter objekter til en plade og fordeler dem på pladerne, som pladelinjen |
 | `layerling_clear_history` | sletter hvert fortryd-trin for evigt, som historikvisningens "Slet historik"-knap; kræver `confirm: true` |
+| `layerling_delete_history_steps` | sletter enkelte tilstande i historikken for altid, aldrig den aktuelle, som skraldespanden ved et trin i historikvisningens liste; kræver `steps` og `confirm: true` |
+| `layerling_list_backups` | viser de automatiske sikkerhedskopier (Tidligere versioner) af det åbne design, eller med `all: true` af alle designs i denne browser |
+| `layerling_open_backup` | åbner en sikkerhedskopi via dens `id` som et nyt design, aldrig knyttet til den oprindelige fil |
 | `layerling_set_history_view` | ser tilbage på en tidligere tilstand af projektet, som historikvisningen (det rigtige design forbliver urørt; ændringsværktøjer venter indtil den er lukket) |
 | `layerling_restore_from_history` | henter objekter (også dele i grupper) fra en tidligere tilstand tilbage i designet som kopier, som historikvisningens knap til at hente ind i designet - ét trin, som fortryd tager tilbage |
 | `layerling_export_section_svg` | returnerer omridsene på et skæreplan som en SVG i 1:1, fra de samme former som eksporten |

@@ -90,6 +90,78 @@ describe("patterns on the flat sides of a box end at a border", () => {
   }, 60_000);
 });
 
+/** A closed cylinder standing on the plate (inside frame, y up), one row of tall triangles up the wall. */
+function cylinder(radius: number, height: number, segments = 128): number[] {
+  const out: number[] = [];
+  const at = (k: number, y: number): Vec3 => [radius * Math.cos((2 * Math.PI * k) / segments), y, radius * Math.sin((2 * Math.PI * k) / segments)];
+  for (let k = 0; k < segments; k += 1) {
+    out.push(...at(k, 0), ...at(k, height), ...at(k + 1, height), ...at(k, 0), ...at(k + 1, height), ...at(k + 1, 0));
+    out.push(0, height, 0, ...at(k + 1, height), ...at(k, height), 0, 0, 0, ...at(k, 0), ...at(k + 1, 0));
+  }
+  return out;
+}
+
+/**
+ * Points of a textured body that lie on its sides near a rim, as (how far from the rim, how far in, where along it):
+ * `inward` says how far a point lies inside the side as it was and where along the rim it lies, `rim` how far from the
+ * nearest rim and which (mm, from its moved place).
+ */
+function nearRims(vertices: Float32Array | Float64Array, indices: Uint32Array, inward: (x: number, y: number, z: number) => [number, number] | null, rim: (y: number) => [number, number]) {
+  const used = new Uint8Array(vertices.length / 3);
+  for (const i of indices) used[i] = 1;
+  const out: [number, number, string][] = [];
+  for (let i = 0; i < used.length; i += 1) {
+    if (!used[i]) continue;
+    const [x, y, z] = [vertices[i * 3], vertices[i * 3 + 1], vertices[i * 3 + 2]];
+    const side = inward(x, y, z);
+    const [distance, which] = rim(y);
+    if (side !== null && distance < 1) out.push([distance, side[0], `${which}|${Math.round(side[1] / 0.2)}`]);
+  }
+  return out;
+}
+
+// Reported round a cylinder of 32.9 x 45.5 mm and on a box with bricks, top and bottom patterned: with Fade in over at 0
+// the grooves' ends hung from the rim in fans, knurling's in splinters and a brick's head joint in needles.
+describe("with no fade, a pattern pressed in ends at the rim in a steep wall", () => {
+  /**
+   * No point within the wall's width (0.05 mm) of the rim sinks deeper than the wall there, and wherever the pattern lies
+   * at its full depth by the rim (in strips 0.2 mm wide along it), it does so from the wall's foot on, not from wherever
+   * the nearest points happened to be.
+   */
+  const expectWall = (points: [number, number, string][], depth: number, upright = true) => {
+    const lowest = new Map<string, number>();
+    for (const [rim, inward, along] of points) {
+      if (rim < 0.05 - 0.02) expect(inward).toBeLessThanOrEqual(depth * (rim / 0.05) + 0.01);
+      if (inward > depth - 1e-3) lowest.set(along, Math.min(lowest.get(along) ?? Infinity, rim));
+    }
+    // Knurling's grooves cross the rim aslant: their deepest line meets it in a point, not along a strip.
+    if (!upright) return;
+    expect(lowest.size).toBeGreaterThan(10);
+    for (const rim of lowest.values()) expect(rim).toBeLessThan(0.12);
+  };
+
+  it("round a cylinder: grooves and knurling, at the top and at the bottom", () => {
+    const R = 16.45, H = 45.5;
+    for (const pattern of ["grooves", "knurl"]) {
+      const result = createSurfaceTextureSession(cylinder(R, H)).apply({ pattern, fade: 0 });
+      expect(surfaceMeshReport(result.indices, result.vertices.length / 3)).toMatchObject({ openEdges: 0, nonManifoldEdges: 0 });
+      const depth = normalizeSurfaceTexture({ pattern }).depth;
+      // The flat segments of the side lie up to a hundredth of a millimetre inside the circle.
+      const side = (x: number, _y: number, z: number): [number, number] | null => (Math.hypot(x, z) > R - 2 ? [Math.max(0, R * Math.cos(Math.PI / 128) - Math.hypot(x, z)), Math.atan2(z, x) * R] : null);
+      expectWall(nearRims(result.vertices, result.indices, side, (y) => (y < H / 2 ? [y, 0] : [H - y, 1])), depth - 0.01, pattern === "grooves");
+    }
+  }, 60_000);
+
+  it("on a box: a brick's head joints at the bottom and top edges, the top and bottom patterned too", () => {
+    const [w, h, d] = [78.8, 58.6, 42.9];
+    const result = createSurfaceTextureSession(box(w, h, d)).apply({ pattern: "bricks", topFree: 0, bottomFree: 0, fade: 0 });
+    expect(surfaceMeshReport(result.indices, result.vertices.length / 3)).toMatchObject({ openEdges: 0, nonManifoldEdges: 0 });
+    // The front and the back, away from the upright edges; not the top's and bottom's own points (at their level).
+    const side = (x: number, y: number, z: number): [number, number] | null => (Math.abs(x) < w / 2 - 2 && y > 1e-6 && y < h - 1e-6 && Math.abs(z) > d / 2 - 1 ? [d / 2 - Math.abs(z), Math.sign(z) * 1000 + x] : null);
+    expectWall(nearRims(result.vertices, result.indices, side, (y) => (y < h / 2 ? [y, 0] : [h - y, 1])), 0.6);
+  }, 60_000);
+});
+
 describe("distance to the part that stays smooth", () => {
   it("is measured straight, not along the zigzag of long slanted triangles", () => {
     // A 10 x 4 strip cut into slanted triangles; its bottom edge stays smooth.

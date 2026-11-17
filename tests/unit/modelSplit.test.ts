@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { SPLIT_AXIS_DISPLAY_ORDER, modelSplitPlane, splitAxisFromLabel, splitAxisLabel, splitPlaneIntersectsPoints, snapSplitPositionToVertices, splitOrientationForNormal, splitRotationAxes, splitShapeFromWorldPositions } from "@/lib/modelSplit";
+import { SPLIT_AXIS_DISPLAY_ORDER, modelSplitPlane, splitAxisFromLabel, splitAxisLabel, splitPlaneIntersectsPoints, snapSplitPositionToVertices, splitOrientationForNormal, splitPositionAlongWorkplane, splitRotationAxes, splitShapeFromWorldPositions } from "@/lib/modelSplit";
 import type { WorkplaneShape } from "@/types/layerling";
 
 const source: WorkplaneShape = {
@@ -20,7 +20,8 @@ const source: WorkplaneShape = {
 describe("model split helpers", () => {
   it("centers and reorients the preview plane within model bounds", () => {
     const points: Array<[number, number, number]> = [[-4, 2, -6], [8, 12, 10]];
-    expect(modelSplitPlane(points, "y")).toEqual({
+    const plane = modelSplitPlane(points, "y");
+    expect(plane).toMatchObject({
       axis: "y",
       rotation: [0, 0],
       normal: [0, 1, 0],
@@ -30,7 +31,49 @@ describe("model split helpers", () => {
       max: 12,
       size: Math.sqrt(500) * 1.1,
     });
+    expect(plane?.preview.center).toEqual([2, 7, 2]);
+    expect(plane?.preview.width).toBeCloseTo(16 * 1.1 + 4, 8);
+    expect(plane?.preview.height).toBeCloseTo(12 * 1.1 + 4, 8);
     expect(modelSplitPlane(points, "x", 6)?.origin).toEqual([6, 7, 2]);
+  });
+
+  // Issue #1606: a flat grid 180 x 180 x 5 mm cut across X. The preview was a square of the whole diagonal (about
+  // 280 mm) around the middle, so it stood 140 mm above and below the plate; now it fits the grid on the plane.
+  it("draws the preview plane to fit the part on the plane", () => {
+    const points: Array<[number, number, number]> = [[0, 0, 0], [180, 5, 180], [0, 5, 180], [180, 0, 0]];
+    const plane = modelSplitPlane(points, "x", 40)!;
+    const { center, u, v, width, height } = plane.preview;
+    expect(center).toEqual([40, 2.5, 90]);
+    // A standing plane is drawn upright: one side along the scene's up.
+    expect(v).toEqual([0, 1, 0]);
+    expect(Math.abs(u[2])).toBe(1);
+    expect(width).toBeCloseTo(180 * 1.1 + 4, 8);
+    // 5 mm tall, but kept at a tenth of the long side so it still reads as a plane.
+    expect(height).toBeCloseTo(18, 8);
+    expect(plane.size).toBeGreaterThan(250);
+  });
+
+  it("keeps the preview's axes on the plane, turned the right way, also when tilted", () => {
+    const points: Array<[number, number, number]> = [];
+    for (const x of [-20, 20]) for (const y of [0, 30]) for (const z of [-10, 10]) points.push([x, y, z]);
+    for (const [axis, rotation] of [["x", [25, -40]], ["y", [30, 20]], ["z", [0, 90]], ["y", [0, 0]]] as const) {
+      const plane = modelSplitPlane(points, axis, undefined, rotation)!;
+      const { u, v } = plane.preview;
+      const n = plane.normal;
+      const dot = (a: readonly number[], b: readonly number[]) => a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
+      expect(dot(u, n)).toBeCloseTo(0, 9);
+      expect(dot(v, n)).toBeCloseTo(0, 9);
+      expect(dot(u, v)).toBeCloseTo(0, 9);
+      // u x v = normal, so the viewport can build its turn from the three.
+      const cross = [u[1] * v[2] - u[2] * v[1], u[2] * v[0] - u[0] * v[2], u[0] * v[1] - u[1] * v[0]];
+      cross.forEach((value, index) => expect(value).toBeCloseTo(n[index], 9));
+      // Every corner of the part, laid onto the plane, lies inside the rectangle.
+      for (const x of [-20, 20]) for (const y of [0, 30]) for (const z of [-10, 10]) {
+        const relative = [x - plane.preview.center[0], y - plane.preview.center[1], z - plane.preview.center[2]];
+        expect(Math.abs(dot(relative, u))).toBeLessThanOrEqual(plane.preview.width / 2);
+        expect(Math.abs(dot(relative, v))).toBeLessThanOrEqual(plane.preview.height / 2);
+      }
+    }
   });
 
   it("rotates the plane normal and projection range for angled cuts", () => {
@@ -111,6 +154,22 @@ describe("model split helpers", () => {
     const points: Array<[number, number, number]> = [[0, 0, 0], [0, 10, 0], [5, 20, 0]];
     expect(snapSplitPositionToVertices(points, [0, 1, 0], 10 - 3e-7)).toBe(10);
     expect(snapSplitPositionToVertices(points, [0, 1, 0], 10.4)).toBe(10.4);
+  });
+
+  it("aligns through the workplane's origin, but across the base plate through the parts' middle (#1590)", () => {
+    // A tube standing from x 20 to 60, away from the middle of the plate.
+    const points: Array<[number, number, number]> = [[20, 0, -20], [60, 30, 20]];
+    const across = modelSplitPlane(points, "x")!;
+    expect(across.position).toBe(40);
+    // Across the base plate the origin (x 0) only marks the plate's middle: the plane goes through the tube's middle.
+    expect(splitPositionAlongWorkplane(points, across, [0, 0, 0], false)).toBe(40);
+    expect(splitPositionAlongWorkplane(points, across, [25, 0, 0], false)).toBe(40);
+    // A workplane laid on the part cuts through its origin where that crosses the part, snapped onto a vertex...
+    expect(splitPositionAlongWorkplane(points, across, [25, 30, 0], true)).toBe(25);
+    const withStep: Array<[number, number, number]> = [...points, [32, 10, 0]];
+    expect(splitPositionAlongWorkplane(withStep, across, [32 - 3e-4, 30, 0], true)).toBe(32);
+    // ...and through the middle where it misses the part.
+    expect(splitPositionAlongWorkplane(points, across, [80, 30, 0], true)).toBe(40);
   });
 
   it("only reports a cut when vertices exist on both sides", () => {

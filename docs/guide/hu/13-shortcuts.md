@@ -15,7 +15,7 @@ Az ablak tetején lévő mező a listában keres: csak azokat a billentyűparanc
 
 Nem találsz egy eszközt? Nyomd meg a [[Ctrl]]+[[K]] billentyűt, vagy kattints a {{ui:editor.group.help}} területen lévő nagyítóra, majd gépeld be, amit keresel: egy eszközt („lekerekítés”, „tükrözés”), egy alakzatot („henger”) vagy egy parancsot („exportálás”, „visszavonás”). A nyílbillentyűkkel mozogj, és nyomj [[Enter]] billentyűt, vagy kattints a bejegyzésre.
 
-- A kereső a magyar, az angol és a német szót is érti, és figyelmen kívül hagyja a kis- és nagybetűket és az ékezeteket: a „kiuregeles” megtalálja a {{ui:editor.tool.hollow}} parancsot.
+- A kereső a magyar, az angol és a német szót is érti, és figyelmen kívül hagyja a kis- és nagybetűket és az ékezeteket: a „kiuregeles” megtalálja a {{ui:editor.tool.hollow}} parancsot. A kereső minden írásrendszerrel működik: egy nevet úgy talál meg, ahogy a felület nyelvén áll („円柱” japánul). A teljes és a fél szélességű jelek, a katakana és a hiragana, valamint az ékezetek azonosnak számítanak.
 - Minden bejegyzés mutatja az ugyanezt végző billentyűket és a szalagnak azt a csoportját, ahol található, így megtanulod, hol van.
 - A szürkén megjelenő bejegyzések éppen nem futtathatók, többnyire azért, mert semmi sincs kijelölve. A listában maradnak, így a kereső akkor is megmondja, hol van az eszköz.
 
@@ -23,7 +23,23 @@ Az útmutatónak, amelyet olvasol, szintén van keresőmezője, minden oldal tet
 - Egy alakzat nevével hozzáadod azt az alakzatot a munkasíkhoz, pont mintha az alakzatmenüben kattintanál rá.
 - Üres mezőnél a kereső felül az utoljára használt parancsokat sorolja fel.
 - A tervedben lévő test neve megtalálja és kijelöli azt a testet, ami sok részből álló tervben segít. A testek csak akkor jelennek meg, amikor gépelsz.
+- Az elmentett egyéni alakzatot is megtalálja a név alapján, amint gépelsz, és egy kattintás beteszi a tervbe, mint az alakzatpanelen.
 - Vázlatmódban is működik, a vázlateszközökkel.
+
+## Saját billentyűk
+
+A parancskereső bármelyik parancsát saját billentyűre teheted: egy eszközt, amit folyton használsz, egy alakzatot, a {{ui:editor.tool.centerOnWorkplane}} parancsot vagy a {{ui:palette.openShapes}} parancsot.
+
+1. Nyisd meg a {{ui:editor.keyboardShortcuts}} ablakot, és felül, a {{ui:customKeys.title}} alatt kattints a {{ui:customKeys.add}} gombra.
+2. Írd be a parancs néhány betűjét, és kattints rá, vagy nyomd meg az [[Enter]]-t az elsőhöz.
+3. Nyomd meg a kívánt billentyűt, magában vagy [[Ctrl]], [[Alt]] vagy [[Shift]] mellett. Betűk, számjegyek és az F1–F12 billentyűk kaphatnak parancsot.
+
+Az a billentyű, amelyet a szerkesztő már használ, amelyet a böngésző magának tart (például [[Ctrl]]+[[W]]), vagy amely már a saját billentyűid egyike, nem fogadható el, és az ablak megmondja, mire szolgál. A listában egy billentyűre kattintva megváltoztathatod, a mellette lévő X-szel eltávolíthatod, a {{ui:customKeys.removeAll}} gombbal pedig elölről kezdheted.
+
+- A billentyű pontosan úgy indítja a parancsot, mint a parancskereső. Ha most nem indulhat el, többnyire azért, mert semmi sincs kijelölve, az állapotsor megmondja.
+- A saját billentyűid a parancskeresőben a parancsuk mellett és a kinyomtatott listán is megjelennek.
+- Ebben a böngészőben maradnak, mint a téma. Egy vázlateszköz billentyűje vázlat módban működik, a 3D-szerkesztőé azon kívül.
+- Amíg egy mezőbe gépelsz, a saját billentyűid is félreállnak, mint a többi.
 
 ## Interaktív súgó
 

@@ -12,6 +12,7 @@ import {
   platesRemoved,
   platesRenamed,
   platesWithAdded,
+  shapeMovedAlongX,
   shapesMovedToPlate,
 } from "@/lib/buildPlates";
 import { normalizePlateNames, MAX_BUILD_PLATES } from "@/lib/buildPlateNames";
@@ -213,6 +214,16 @@ export function useBuildPlates({
     const index = Math.min(activeRef.current, plateCount(workspaceRef.current) - 1);
     return index > 0 ? { ...workplane.origin, x: workplane.origin.x + plateCenterX(workspaceRef.current, index) } : workplane.origin;
   }, [workspaceRef]);
+  /**
+   * Bodies that come in around the first plate's middle - an imported file - moved along by as much as the active
+   * plate's middle lies further on, so they land on the plate you are on, as a new shape does (#1514).
+   */
+  const ontoActivePlate = useCallback((bodies: WorkplaneShape[]): WorkplaneShape[] => {
+    const index = Math.min(activeRef.current, plateCount(workspaceRef.current) - 1);
+    if (index <= 0) return bodies;
+    const dx = plateCenterX(workspaceRef.current, index);
+    return bodies.map((shape) => shapeMovedAlongX(shape, dx));
+  }, [workspaceRef]);
 
   return {
     count,
@@ -236,5 +247,6 @@ export function useBuildPlates({
     },
     showAll: () => frame(0, count - 1),
     newShapeOrigin,
+    ontoActivePlate,
   };
 }

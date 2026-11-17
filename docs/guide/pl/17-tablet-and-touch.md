@@ -36,6 +36,8 @@ Kostka widoku w lewym górnym rogu obraca widok, gdy ją przeciągasz, a stukni�
 
 Opuszek palca zasłania to, w co celuje. layerling pozwala palcowi sięgać do uchwytów, punktów, linii i krawędzi nieco dalej niż wskaźnikowi myszy, ale rysik jest dokładniejszy. Dotyczy to piórka, które tablet rozpoznaje jako piórko, takiego jak Apple Pencil albo S Pen. Zwykły rysik z gumową końcówką ekran traktuje jak palec i nie jest od niego dokładniejszy, więc pracuj nim jak palcem. Gdy Apple Pencil zawisa nad przyciskiem na iPadzie, po chwili jego nazwa pojawia się w małej chmurce, tak jak podpowiedź przy myszy.
 
+Wokół zaznaczenia uchwyty rozmiaru, strzałki obrotu i strzałki przesuwania leżą blisko siebie, więc palec łatwo chwyta niewłaściwy. Przycisk ze wskazującą dłonią na pasku widoku wybiera, co robi palec: {{ui:camera.touchHandles.all}}, {{ui:camera.touchHandles.move}}, {{ui:camera.touchHandles.size}} lub {{ui:camera.touchHandles.turn}}, każde stuknięcie przechodzi do następnego. Pozostałe uchwyty znikają; przy rozmiarze lub obrocie palec na bryle tylko ją zaznacza i już jej nie przesuwa. Przeglądarka zapamiętuje wybór. Podobnie jak {{ui:camera.touchRotate}} przycisk pojawia się tylko na urządzeniu z ekranem dotykowym.
+
 W trybie szkicu {{ui:sketch.freehand}} rysuje piórkiem lub palcem jak na papierze; po podniesieniu linia zmienia się w punkty szkicu, które można edytować, zob. [Szkice](chapter:sketches).
 
 Jeśli bryły się przesuwają, gdy dotykają ich dzieci albo pośpieszne ręce, włącz w ustawieniach {{ui:workspace.selectBeforeMoving}}: bryłę trzeba wtedy najpierw zaznaczyć, a dopiero następne przeciągnięcie ją przesuwa.

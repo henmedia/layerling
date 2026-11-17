@@ -315,6 +315,25 @@ export function ToolbarHolePatternIcon(props: IconProps) {
   );
 }
 
+/**
+ * A block seen from above with a round hole and an insert in it, a ring of ticks round the inner circle like the
+ * knurl of a heat-set insert: the thread insert tool (#1828).
+ */
+export function ToolbarThreadInsertIcon(props: IconProps) {
+  const ticks = Array.from({ length: 8 }, (_, i) => {
+    const angle = (i * Math.PI) / 4;
+    return `M${24 + Math.cos(angle) * 7.5} ${24 + Math.sin(angle) * 7.5}L${24 + Math.cos(angle) * 10} ${24 + Math.sin(angle) * 10}`;
+  }).join("");
+  return (
+    <ToolbarVectorIcon {...props}>
+      <rect x="5" y="6" width="38" height="36" rx="3" />
+      <circle cx="24" cy="24" r="10" />
+      <circle cx="24" cy="24" r="4.5" />
+      <path d={ticks} strokeWidth="2" />
+    </ToolbarVectorIcon>
+  );
+}
+
 /** A slab with a pad set in from its edges standing on top, and an arrow out of the face: the face tool. */
 export function ToolbarFaceToolIcon(props: IconProps) {
   return (
@@ -324,6 +343,35 @@ export function ToolbarFaceToolIcon(props: IconProps) {
       <rect x="13" y="18" width="22" height="10" rx="3" {...SOLID} />
       <rect x="13" y="18" width="22" height="10" rx="3" />
       <path d="M24 14V4M19 9l5-5 5 5" />
+    </ToolbarVectorIcon>
+  );
+}
+
+/** A part standing tilted on one edge, a thin triangle under its lower face with two small bridges (#1385). */
+export function ToolbarSupportRibIcon(props: IconProps) {
+  return (
+    <ToolbarVectorIcon {...props}>
+      <path d="M4 42h40" />
+      <path d="M8 40 22 26l12 12-14 14Z" transform="translate(-4 -12)" {...SOLID} />
+      <path d="M8 40 22 26l12 12-14 14Z" transform="translate(-4 -12)" />
+      <path d="M22 41 38 25v16Z" {...SOLID} />
+      <path d="M22 41 38 25v16Z" />
+      <path d="M26 32h3M31 27h3" />
+    </ToolbarVectorIcon>
+  );
+}
+
+/** A plate with an "O" cut through it, its middle held by two bridges, as on a stencil (#1438). */
+export function ToolbarStencilBridgeIcon(props: IconProps) {
+  return (
+    <ToolbarVectorIcon {...props}>
+      <path d="M5 9h38v30H5ZM11 24a13 13 0 1 0 26 0a13 13 0 1 0-26 0Z" fillRule="evenodd" {...SOLID} />
+      <path d="M5 9h38v30H5Z" />
+      <path d="M11 24a13 13 0 1 0 26 0a13 13 0 1 0-26 0Z" />
+      <path d="M18 24a6 6 0 1 0 12 0a6 6 0 1 0-12 0Z" {...SOLID} />
+      <path d="M18 24a6 6 0 1 0 12 0a6 6 0 1 0-12 0Z" />
+      <path d="M22 11h4v7h-4ZM22 30h4v7h-4Z" {...SOLID} />
+      <path d="M22 11v7M26 11v7M22 30v7M26 30v7" />
     </ToolbarVectorIcon>
   );
 }
@@ -469,6 +517,20 @@ export function ToolbarSurfaceTextureIcon(props: IconProps) {
       <path d="M8 40V22c2.7-4.5 5.3-4.5 8 0s5.3 4.5 8 0 5.3-4.5 8 0 5.3 4.5 8 0v18Z" {...SOLID} />
       <path d="M8 40V22c2.7-4.5 5.3-4.5 8 0s5.3 4.5 8 0 5.3-4.5 8 0 5.3 4.5 8 0v18Z" />
       <path d="M8 31c2.7-4.5 5.3-4.5 8 0s5.3 4.5 8 0 5.3-4.5 8 0 5.3 4.5 8 0" strokeWidth="1.6" opacity="0.7" />
+    </ToolbarVectorIcon>
+  );
+}
+
+/** A block with a round patch of paint on its face and a brush over it: parts of a body painted in a colour of their own. */
+export function ToolbarPaintIcon(props: IconProps) {
+  return (
+    <ToolbarVectorIcon {...props}>
+      <path d="M5 20h28v22H5Z" {...SOLID} />
+      <path d="M5 20h28v22H5Z" />
+      <circle cx="16" cy="31" r="6" fill="currentColor" stroke="none" opacity="0.55" />
+      <path d="M43 5 33 15" strokeWidth="3.2" />
+      <path d="m31 14 3 3" strokeWidth="2.4" />
+      <path d="M30.5 16.5c-3.5.2-5.2 2.5-5.5 6.5 3.8-.2 6.2-2 6.5-5.5Z" fill="currentColor" />
     </ToolbarVectorIcon>
   );
 }

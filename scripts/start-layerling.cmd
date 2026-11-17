@@ -5,6 +5,19 @@ rem and only then opens the browser. Works from any folder - it finds the checko
 setlocal
 cd /d "%~dp0.."
 title layerling
+rem Node.js installed a moment ago - by winget, or by an AI setting layerling up - is
+rem not yet on the PATH of a window that was open before, and npm is not found (#1546).
+rem Then the PATH is read afresh from the system and the user settings, as a new window would.
+where npm >nul 2>nul
+if not errorlevel 1 goto npmfound
+for /f "usebackq delims=" %%p in (`powershell -NoProfile -Command "[Environment]::GetEnvironmentVariable('Path','Machine') + ';' + [Environment]::GetEnvironmentVariable('Path','User')"`) do set "PATH=%%p"
+where npm >nul 2>nul
+if errorlevel 1 (
+  echo Node.js was not found. Install it from https://nodejs.org, or run the quickstart line from the guide, then start layerling again.
+  pause
+  exit /b 1
+)
+:npmfound
 rem Started afresh after an update (see below): the checks and the update are done.
 if /i "%~1"=="--updated" goto start
 

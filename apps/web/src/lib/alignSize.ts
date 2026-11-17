@@ -65,13 +65,46 @@ function axesKey(axes: AlignAxes | null) {
 function withHiddenGroupPartsShown(shape: WorkplaneShape): WorkplaneShape {
   if (!shape.groupedShapes?.length || shape.importedMesh) return shape;
   let changed = false;
-  const groupedShapes = shape.groupedShapes.map((part) => {
+  const groupedShapes = shape.groupedShapes.flatMap((part) => {
     const inner = withHiddenGroupPartsShown(part);
-    if (!part.hidden && inner === part) return part;
+    // A group with a hole inside this one: its hidden solids stand beside its body, in the same place in this group.
+    const hiddenOfCut = part.hidden ? null : hiddenPartsOfCutGroup(part);
+    if (!part.hidden && inner === part && !hiddenOfCut) return [part];
     changed = true;
-    return { ...inner, hidden: false };
+    return hiddenOfCut ? [inner, hiddenOfCut] : [{ ...inner, hidden: false }];
   });
   return changed ? { ...shape, groupedShapes } : shape;
+}
+
+/**
+ * The solids hidden in a group cut into one body (a group with a hole), which its body leaves out, as a group of
+ * their own in the same place and frame; null when it has none. They count for the alignment all the same (#1323).
+ */
+function hiddenPartsOfCutGroup(shape: WorkplaneShape): WorkplaneShape | null {
+  const mesh = shape.importedMesh;
+  const hidden = shape.groupedShapes?.filter((part) => part.hidden && !part.hole) ?? [];
+  if (!mesh || hidden.length === 0) return null;
+  return {
+    ...shape,
+    importedMesh: undefined,
+    hidden: false,
+    // A group saved without the size it was built at had the box of its body.
+    groupedBaseWidth: shape.groupedBaseWidth ?? mesh.baseWidth,
+    groupedBaseHeight: shape.groupedBaseHeight ?? mesh.baseHeight,
+    groupedBaseDepth: shape.groupedBaseDepth ?? mesh.baseDepth,
+    groupedShapes: hidden.map((part) => ({ ...withHiddenGroupPartsShown(part), hidden: false })),
+  };
+}
+
+function unionBounds(a: Cuboid, b: Cuboid): Cuboid {
+  return {
+    minX: Math.min(a.minX, b.minX),
+    maxX: Math.max(a.maxX, b.maxX),
+    minY: Math.min(a.minY, b.minY),
+    maxY: Math.max(a.maxY, b.maxY),
+    minZ: Math.min(a.minZ, b.minZ),
+    maxZ: Math.max(a.maxZ, b.maxZ),
+  };
 }
 
 /** The box of a part as the alignment measures it, along a workplane's axes or the world's, measured once per part. */
@@ -84,8 +117,10 @@ export function alignBounds(shape: WorkplaneShape, axes: AlignAxes | null = null
   const key = axesKey(axes);
   const known = byAxes.get(key);
   if (known) return { ...known };
-  const measured = withHiddenGroupPartsShown(shape);
-  const bounds = axes ? frameAabb(measured, axes) : meshAabb(measured);
+  const measure = (part: WorkplaneShape) => (axes ? frameAabb(part, axes) : meshAabb(part));
+  const hiddenOfCut = hiddenPartsOfCutGroup(shape);
+  const own = measure(withHiddenGroupPartsShown(shape));
+  const bounds = hiddenOfCut ? unionBounds(own, measure(hiddenOfCut)) : own;
   byAxes.set(key, { ...bounds });
   return bounds;
 }

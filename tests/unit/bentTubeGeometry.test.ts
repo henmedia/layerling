@@ -171,14 +171,18 @@ function worldStart(shape: WorkplaneShape, bakedRotation?: { rotation: number; r
     THREE.MathUtils.degToRad(euler.rotationZ),
     "XYZ",
   ));
-  const start = toObject([0, 0, 0]).applyQuaternion(quaternion);
-  if (!bakedRotation) return new THREE.Vector3(shape.x, 0, shape.z).add(new THREE.Vector3(start.x, 0, start.z));
+  // A mirror flips the body about its centre before the turn.
+  const mirror = bakedRotation ? new THREE.Vector3(1, 1, 1) : new THREE.Vector3(shape.mirrorX ? -1 : 1, shape.mirrorY ? -1 : 1, shape.mirrorZ ? -1 : 1);
+  const start = toObject([0, 0, 0]).multiply(mirror).applyQuaternion(quaternion);
+  // Standing on its floor, the box's centre is half its height above the floor.
+  if (!bakedRotation) return new THREE.Vector3(shape.x, (shape.elevation ?? 0) + shape.height / 2, shape.z).add(start);
   const box = new THREE.Box3();
   for (let index = 0; index < mesh.outerVertexCount; index += 1) {
     box.expandByPoint(toObject([mesh.positions[index * 3], mesh.positions[index * 3 + 1], mesh.positions[index * 3 + 2]]).applyQuaternion(quaternion));
   }
   const centre = box.getCenter(new THREE.Vector3());
-  return new THREE.Vector3(shape.x + start.x - centre.x, 0, shape.z + start.z - centre.z);
+  // A baked body's floor is the bottom of its rotated bounds.
+  return new THREE.Vector3(shape.x + start.x - centre.x, (shape.elevation ?? 0) + start.y - box.min.y, shape.z + start.z - centre.z);
 }
 
 describe("bent tube geometry", () => {
@@ -409,6 +413,101 @@ describe("bent tube editing", () => {
     const after = worldStart({ ...baked, ...patch }, source);
     expect(after.x).toBeCloseTo(anchor.x, 6);
     expect(after.z).toBeCloseTo(anchor.z, 6);
+  });
+
+  describe("the start stays put in all three directions when a segment changes (#1422)", () => {
+    const moreSegments = (shape: WorkplaneShape): BentTubeShapeFields[] => {
+      const [first, second, ...rest] = shape.bentTubeSegments!;
+      return [
+        { bentTubeSegments: [{ ...first, length: first.length + 20 }, second, ...rest] },
+        { bentTubeSegments: [{ ...first, length: Math.max(5, first.length - 12) }, second, ...rest] },
+        { bentTubeSegments: [first, { ...second, bendAngle: second.bendAngle + 35 }, ...rest] },
+        { bentTubeSegments: [first, { ...second, bendRadius: second.bendRadius + 15 }, ...rest] },
+        { bentTubeSegments: [first, { ...second, roll: 40 }, ...rest] },
+        { bentTubeSegments: [first, second, ...rest, { length: 15, bendAngle: 30, bendRadius: 20, roll: 20 }] },
+        { bentTubeSegments: [first] },
+      ];
+    };
+
+    it.each([
+      ["tilted about a horizontal axis", { rotationZ: 30 }],
+      ["tilted about two axes", { rotationX: 20, rotationZ: 25, rotation: 15 }],
+      ["tilted and standing on a raised spot", { rotationZ: 30, x: 40, z: -20, elevation: 17 }],
+      ["flat", {}],
+      ["only turned about the vertical axis", { rotation: 50, elevation: 8 }],
+      ["mirrored and tilted", { rotationX: 35, mirrorY: true }],
+    ] as Array<[string, Partial<WorkplaneShape>]>)("%s: the start does not move when a change is applied", (_name, placement) => {
+      const shape = bentTube(placement);
+      const anchor = worldStart(shape);
+      for (const changes of moreSegments(shape)) {
+        const after = { ...shape, ...bentTubeParameterPatch(shape, changes) };
+        const start = worldStart(after);
+        expect(start.x).toBeCloseTo(anchor.x, 6);
+        expect(start.y).toBeCloseTo(anchor.y, 6);
+        expect(start.z).toBeCloseTo(anchor.z, 6);
+      }
+    });
+
+    it("keeps the start while a length slider is dragged one value at a time, on a tilted tube", () => {
+      let shape = bentTube({ rotationZ: 30, rotationX: 20, x: 12, z: 7, elevation: 3 });
+      const anchor = worldStart(shape);
+      const first = shape.bentTubeSegments!;
+      for (let length = 25; length <= 80; length += 0.5) {
+        shape = { ...shape, ...bentTubeParameterPatch(shape, { bentTubeSegments: [{ ...first[0], length }, first[1]] }) };
+        const start = worldStart(shape);
+        expect(start.x).toBeCloseTo(anchor.x, 6);
+        expect(start.y).toBeCloseTo(anchor.y, 6);
+        expect(start.z).toBeCloseTo(anchor.z, 6);
+      }
+    });
+
+    it("keeps the start of a rotated (baked) tube in all three directions", () => {
+      for (const source of [{ rotation: 37, rotationX: 22, rotationZ: -15 }, { rotation: 0, rotationX: 0, rotationZ: 40 }, { rotation: 90, rotationX: 0, rotationZ: 0 }]) {
+        const base = bentTube({ x: -63, z: 91, elevation: 4 });
+        const baked: WorkplaneShape = {
+          ...base,
+          parametricSource: { kind: "bentTube", width: base.width, depth: base.depth, height: base.height, size: base.size, ...source },
+        };
+        const anchor = worldStart(baked, source);
+        for (const changes of moreSegments(base)) {
+          const patch = bentTubeParameterPatch(baked, changes);
+          const start = worldStart({ ...baked, ...patch }, source);
+          expect(start.x).toBeCloseTo(anchor.x, 6);
+          expect(start.y).toBeCloseTo(anchor.y, 6);
+          expect(start.z).toBeCloseTo(anchor.z, 6);
+        }
+      }
+    });
+
+    it("leaves a flat tube's height alone when its length changes: it stays on the plate as before", () => {
+      const shape = bentTube({ elevation: 6 });
+      const patch = bentTubeParameterPatch(shape, { bentTubeSegments: [{ ...shape.bentTubeSegments![0], length: 70 }, shape.bentTubeSegments![1]] });
+      expect(patch.elevation).toBeCloseTo(6, 9);
+    });
+
+    it("lets a segment change reach below the plate rather than lift the tube", () => {
+      let reachedBelow = false;
+      for (const rotationZ of [30, -30, 60]) {
+        const shape = bentTube({ rotationZ });
+        const anchor = worldStart(shape);
+        for (const length of [5, 120]) {
+          const patch = bentTubeParameterPatch(shape, { bentTubeSegments: [{ ...shape.bentTubeSegments![0], length }, shape.bentTubeSegments![1]] });
+          expect(worldStart({ ...shape, ...patch }).y).toBeCloseTo(anchor.y, 6);
+          if ((patch.elevation as number) < -1e-6) reachedBelow = true;
+        }
+      }
+      expect(reachedBelow).toBe(true);
+    });
+
+    it("changes nothing for a profile change: no height in the patch, the position as before", () => {
+      for (const placement of [{}, { rotationZ: 30 }, { rotationX: 20, rotationZ: 25 }] as Array<Partial<WorkplaneShape>>) {
+        const shape = bentTube({ x: 5, z: -9, elevation: 2, ...placement });
+        for (const changes of [{ bentTubeSize: 20 }, { bentTubeWall: 3 }, { bentTubeProfile: "hexagon" as const }, { bentTubeInnerProfile: "none" as const }, { bentTubeQuality: 24 }]) {
+          const patch = bentTubeParameterPatch(shape, changes);
+          expect(patch).not.toHaveProperty("elevation");
+        }
+      }
+    });
   });
 
   it("writes the natural size and normalised values with every change", () => {

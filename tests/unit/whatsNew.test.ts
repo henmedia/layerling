@@ -10,9 +10,13 @@ import {
   WHATS_NEW_MANUAL_VERSIONS,
   WHATS_NEW_MAX_VERSIONS,
   whatsNewBefore,
+  whatsNewBlocks,
+  whatsNewGuideLinks,
   whatsNewSince,
   type WhatsNewEntry,
+  type WhatsNewItem,
 } from "@/lib/whatsNew";
+import { GUIDE_CHAPTERS, GUIDE_SECTIONS } from "@/lib/guideLinks";
 
 const entry = (version: string): WhatsNewEntry => ({
   version,
@@ -123,6 +127,45 @@ describe("the written list", () => {
     for (const { version } of WHATS_NEW) {
       if (version === prepared && changelog.includes("## Unreleased")) continue;
       expect(headings.has(version), `${version} in the changelog`).toBe(true);
+    }
+  });
+});
+
+describe("longer cards", () => {
+  it("reads empty lines as paragraphs and dashed lines as a list", () => {
+    expect(whatsNewBlocks("One line.")).toEqual([{ kind: "paragraph", text: "One line." }]);
+    expect(whatsNewBlocks("First.\n\nYou can set:\n– this,\n- that\n\nLast\nline.")).toEqual([
+      { kind: "paragraph", text: "First." },
+      { kind: "paragraph", text: "You can set:" },
+      { kind: "list", items: ["this,", "that"] },
+      { kind: "paragraph", text: "Last line." },
+    ]);
+  });
+
+  it("links to the guide in the reader's language, and leaves out a place this version does not know", () => {
+    const item: WhatsNewItem = {
+      title: { en: "T" },
+      body: { en: "B" },
+      guide: [{ section: "fileBackups", label: { en: "Earlier versions" } }, { chapter: "files" }, { section: "notThere" }],
+    };
+    const links = whatsNewGuideLinks(item, "de");
+    expect(links).toHaveLength(2);
+    expect(links[0].href).toMatch(/#fruehere-fassungen$/);
+    expect(links[0].label).toEqual({ en: "Earlier versions" });
+    expect(links[1].label).toBeNull();
+    expect(whatsNewGuideLinks({ title: { en: "T" }, body: { en: "B" } }, "en")).toEqual([]);
+  });
+
+  it("points every card's guide link, released or waiting, at a place the guide has", () => {
+    const waiting = JSON.parse(readFileSync("docs/whatsNew-unreleased.json", "utf8")) as WhatsNewItem[];
+    const items = [...WHATS_NEW.flatMap((entryItem) => entryItem.items), ...waiting];
+    for (const item of items) {
+      const links = item.guide === undefined ? [] : Array.isArray(item.guide) ? item.guide : [item.guide];
+      for (const link of links) {
+        const known = (link.section !== undefined && link.section in GUIDE_SECTIONS) || (link.chapter !== undefined && link.chapter in GUIDE_CHAPTERS);
+        expect(known, `${item.title.en}: ${JSON.stringify(link)}`).toBe(true);
+        if (link.label) expect(link.label.de?.trim() && link.label.en.trim(), item.title.en).toBeTruthy();
+      }
     }
   });
 });

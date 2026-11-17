@@ -78,10 +78,12 @@ Az MI ugyanazokkal a funkciókkal dolgozik, mint te, ugyanazon az úton, mint a 
 | Eszköz | Mit csinál |
 | --- | --- |
 | `layerling_list_editors` | felsorolja a nyitott szerkesztőlapokat |
+| `layerling_rename_project` | nevet ad a projektnek, mint a projekt neve melletti ceruza |
 | `layerling_open_editor` | új szerkesztőlapot nyit az alapértelmezett böngésződben, és megvárja, amíg csatlakozik (csak a saját számítógépeden) |
 | `layerling_read_scene` | beolvassa a jelenetet, a kijelölést, a mértékegységeket és az összes objektum pontos méreteit |
 | `layerling_list_objects` | felsorolja az összes objektumot méretekkel, helyzettel, elforgatással és azonosítóval |
 | `layerling_select_objects` | objektumokat jelöl ki |
+| `layerling_hide_others` | a kijelölésen vagy a megadott objektumokon kívül mindent elrejt, egyetlen visszavonási lépésben |
 | `layerling_delete_objects` | objektumokat töröl |
 | `layerling_move_object` | áthelyez egy objektumot az objektumlista egy másik helyére |
 | `layerling_create_shape` | alakzatot hoz létre: dobozt, hengert, szöveget (íveset is), menetet, fogaskereket, vázlattestet és az összes többit |
@@ -91,12 +93,16 @@ Az MI ugyanazokkal a funkciókkal dolgozik, mint te, ugyanazon az úton, mint a 
 | `layerling_import_mesh` | háromszöghálót hoz be a tervbe |
 | `layerling_update_object` | méreteket, helyzetet, színt, nevet, tömör vagy lyuk állapotot és minden mást módosít, ami az alakzathoz tartozik, egy szöveg betűélét is |
 | `layerling_align_objects` | objektumokat igazít egymáshoz |
-| `layerling_scale_objects` | objektumokat méretez százalékban, együtt vagy mindegyiket a helyén |
+| `layerling_scale_objects` | objektumokat méretez százalékban, együtt vagy mindegyiket a helyén, vagy modellméretarányra, például 1:87-re |
 | `layerling_lay_flat` | egy objektumot az egyik lapjával a tárgyasztalra fektet |
 | `layerling_place_on_face` | objektumokat tesz le egy másik objektum lapjára, a ferdékre is, mint a C billentyű |
-| `layerling_perforate_face` | lyukmintát vág egy sík lapba; a lyukak a testtel csoportosított lyukak maradnak |
+| `layerling_perforate_face` | lyukmintát vág egy sík lapba vagy egy henger, cső vagy furat kerek falára körbe; a lyukak a testtel csoportosított lyukak maradnak |
+| `layerling_thread_insert` | elkészíti a lyukat egy hőbesüllyesztéses menetes betéthez (M2-től M8-ig, 1/4-20 vagy saját méret) egy sík lapba vagy egy henger vagy cső külső falába, miután ellenőrizte, hogy a lyuk melletti fal és a mögötte lévő mélység elég; a lyuk a testtel csoportosított lyuk marad |
 | `layerling_sweep_sketch` | téglalap vagy kör keresztmetszetet húz végig egy pontokból álló pályán egyetlen pontos testként; zárt pálya gyűrűt ad |
 | `layerling_push_face` | kihúz egy sík lapot, vagy zsebet vág bele, a lap szélétől mért távolsággal és sarokrádiusszal; az új rész a testtel csoportosított vázlattest |
+| `layerling_paint` | többszínű nyomtatáshoz saját színekkel festi egy test részeit (Festés): lap kitöltése az éles élekig, kerek folt vagy sík nézetben rajzolt lasszó; radírozás, mindent levesz; a testtel mentődik, és a 3MF-be festett lapokként kerül |
+| `layerling_support_rib` | vékony támasztóbordát állít egy élére döntve nyomtatott alkatrész alsó lapja alá, egy réteg magas hidakkal (Támasztóborda) |
+| `layerling_stencil_bridges` | az átvágott szövegű lemez kieső részeit a lemezzel csoportosított, megadott szélességű és magasságú hidakkal tartja meg (Sablonhidak) |
 | `layerling_mate_faces` | egy objektum lapját egy másik lapjához illeszti, laptól lapig vagy egy síkba |
 | `layerling_open_group` | megnyit egy csoportot, hogy a részei egyenként módosíthatók legyenek, egy nyitott csoporton belüli csoportot is |
 | `layerling_close_group` | újra bezárja („Kész”) vagy megszakítja |
@@ -154,12 +160,16 @@ Az MI ugyanazokkal a funkciókkal dolgozik, mint te, ugyanazon az úton, mint a 
 | `layerling_insert_custom_shape` | beilleszt egy saját alakzatot a nyitott tervbe, ha kell, egy x/z helyre |
 | `layerling_delete_custom_shape` | eltávolít egy saját alakzatot; a beillesztett testek megmaradnak |
 | `layerling_show_workplane` | elrejti és megmutatja a tárgyasztalt a rácsával, például az alsó oldalról készülő képhez (csak a nézet) |
+| `layerling_focus_mode` | be- és kikapcsolja a fókusz módot: elrejti a címsort és a láblécet, hogy több hely legyen (csak a szerkesztő kerete) |
 | `layerling_set_section_view` | egy sík mentén felnyitja a nézetet, hogy belenézz (csak a nézet, semmi sem vágódik szét) |
 | `layerling_measurements` | megjeleníti vagy elrejti a mérőszalag méréseit, és felsorolja őket a hosszukkal, és elrejti vagy megjeleníti a kijelölés körüli méreteket, mint a [[Q]], és hosszt ír be az egyikhez, ami a végén lévő testet úgy mozdítja el, mint a számra kattintás |
 | `layerling_measure_angle` | szöget mér, mint a szögmérő: három pont csúcsánál vagy két sík lap között, és megmutatja a nézetben |
 | `layerling_saved_view` | elmenti az aktuális nézetet a 7, 8, 9 vagy 0 billentyű alá, és visszaállítja, mint a Shift+billentyű és a billentyű (csak a nézet); az új tervek indulási nézetét is beállítja |
 | `layerling_build_plates` | listázza, hozzáadja, elnevezi, sorba rendezi és eltávolítja a nyomtatótálcákat, objektumokat tesz egy tálcára és elrendezi őket a tálcákon, mint a tálcasáv |
 | `layerling_clear_history` | véglegesen töröl minden visszavonási lépést, ahogy az előzménynézet „Előzmények törlése” gombja; `confirm: true` kell hozzá |
+| `layerling_delete_history_steps` | véglegesen töröl egyes állapotokat az előzményekből, a jelenlegit soha, mint a lépés melletti kuka az előzménynézet listájában; kell hozzá `steps` és `confirm: true` |
+| `layerling_list_backups` | felsorolja a megnyitott terv automatikus mentéseit (Korábbi változatok), `all: true` esetén a böngésző összes tervéét |
+| `layerling_open_backup` | egy mentést az `id`-ja alapján új tervként nyit meg, sosem kötve az eredeti fájlhoz |
 | `layerling_set_history_view` | visszatekint a projekt egy korábbi állapotára, mint az előzménynézet (a valódi terv érintetlen marad; a módosító eszközök várnak, amíg bezárul) |
 | `layerling_restore_from_history` | objektumokat (csoportokon belüli alkatrészeket is) hoz vissza másolatként egy korábbi állapotból a tervbe, mint az előzménynézet visszahozó gombja - egy lépés, amelyet a visszavonás visszavesz |
 | `layerling_export_section_svg` | 1:1 méretarányú SVG-ként adja vissza egy vágósík körvonalait, ugyanazokból a testekből, mint az export |

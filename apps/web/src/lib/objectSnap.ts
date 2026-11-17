@@ -69,3 +69,51 @@ export function objectSnapOffset(moving: SnapBox, targets: SnapBox[], threshold:
   if (dz !== null) addGuides("z");
   return { dx, dz, guides };
 }
+
+/**
+ * Where the dragged side of a resize can stop (Discussion #1647): a line along `axis` with the stretch it takes up
+ * across the other axis, for the guide line. Edges and middles of other bodies, and the walls the side runs into.
+ */
+export type EdgeSnapTarget = { value: number; from: number; to: number };
+
+/** The left, middle and right (or front, middle and back) lines of each box along `axis`. */
+export function boxEdgeTargets(boxes: readonly SnapBox[], axis: "x" | "z"): EdgeSnapTarget[] {
+  return boxes.flatMap((box) => {
+    const [min, max] = axis === "x" ? [box.minX, box.maxX] : [box.minZ, box.maxZ];
+    const [from, to] = axis === "x" ? [box.minZ, box.maxZ] : [box.minX, box.maxX];
+    return lines(min, max).map((value) => ({ value, from, to }));
+  });
+}
+
+/**
+ * The side handle of a resize (Discussion #1647). The side opposite the handle stays at `anchor` (or, with `symmetric`,
+ * the middle stays at `anchor` and both sides move); the dragged side lies `direction` (+1 or -1) times the size from it,
+ * half of it when symmetric. When that side comes within `threshold` of a target it is pulled onto it: the answer is
+ * the size that puts it there exactly, with the target, or null when nothing is near or the size would be below `minSize`.
+ */
+export function snapResizeEdge(
+  edge: { anchor: number; direction: 1 | -1; size: number; symmetric: boolean },
+  targets: readonly EdgeSnapTarget[],
+  threshold: number,
+  minSize: number,
+): { size: number; target: EdgeSnapTarget } | null {
+  if (!(threshold > 0) || !(edge.size > 0)) return null;
+  const reach = edge.symmetric ? edge.size / 2 : edge.size;
+  const side = edge.anchor + edge.direction * reach;
+  let best: { size: number; target: EdgeSnapTarget; distance: number } | null = null;
+  for (const target of targets) {
+    const distance = Math.abs(target.value - side);
+    if (distance > threshold || (best && distance >= best.distance - SAME_LINE)) continue;
+    const towards = (target.value - edge.anchor) * edge.direction;
+    // Rounded to a millionth, so a side snapped to 45.2 from -35.2 gives 80.4 and not 80.40000000000001.
+    const size = Math.round((edge.symmetric ? towards * 2 : towards) * 1e6) / 1e6;
+    if (!(size >= minSize)) continue;
+    best = { size, target, distance };
+  }
+  return best ? { size: best.size, target: best.target } : null;
+}
+
+/** The guide line of a snapped side: along the target, reaching over the moving body's own stretch too. */
+export function edgeSnapGuide(axis: "x" | "z", target: EdgeSnapTarget, movingFrom: number, movingTo: number): ObjectSnapGuide {
+  return { axis, value: target.value, from: Math.min(target.from, movingFrom), to: Math.max(target.to, movingTo) };
+}

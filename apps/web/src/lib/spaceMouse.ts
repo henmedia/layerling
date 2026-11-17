@@ -24,6 +24,29 @@ export function readSpaceMouseReport(axes: SpaceMouseAxes, reportId: number, dat
   return axes;
 }
 
+/**
+ * Whether a game controller of the browser's Gamepad API is a 3D mouse (#1013): a 3Dconnexion device, by the name the
+ * browser gives it ("SpaceMouse Compact (Vendor: 256f Product: c635)", "SpaceNavigator"...). Chrome shows the page such a
+ * controller as soon as it is moved, with no question, so it is found again after every restart, which a WebHID device
+ * without a serial number is not (Discussion #1013, Jeff-Haas).
+ */
+export function isSpaceMouseGamepad(id: string) {
+  return /3dconnexion|space ?(mouse|navigator|explorer|pilot|traveler|traveller)|vendor: ?256f|vendor: ?046d product: ?c6[2-6]/i.test(id);
+}
+
+/**
+ * The six axes of a 3D mouse read as a game controller: the browser gives each as -1 to 1 over the device's own range, in
+ * the order of the HID usages (X, Y, Z, then the turns about them), the order of the report of WebHID, so they are scaled
+ * back to device units. A controller with fewer axes leaves the rest at rest.
+ */
+export function readSpaceMouseGamepad(values: readonly number[]): SpaceMouseAxes {
+  const at = (index: number) => {
+    const value = values[index];
+    return typeof value === "number" && Number.isFinite(value) ? Math.max(-1, Math.min(1, value)) * FULL : 0;
+  };
+  return { tx: at(0), ty: at(1), tz: at(2), rx: at(3), ry: at(4), rz: at(5) };
+}
+
 /** Below this the cap is taken as at rest: a 3D mouse never quite returns to zero. */
 const DEAD_ZONE = 12;
 /** Full deflection, in device units. */
@@ -35,6 +58,33 @@ export function spaceMouseAmount(value: number) {
   if (size <= DEAD_ZONE) return 0;
   const share = Math.min(1, (size - DEAD_ZONE) / (FULL - DEAD_ZONE));
   return Math.sign(value) * share * share;
+}
+
+/**
+ * How quickly the smoothed axes follow the cap, in seconds (#1013): the time in which they cover about two thirds of a
+ * change. A cap turned freely sends several axes at once, each trembling a little round its value, and taken raw from
+ * report to report that made the view jump and stutter; short enough that the view does not feel slow.
+ */
+const SMOOTHING_SECONDS = 0.07;
+
+const AXIS_NAMES = ["tx", "ty", "tz", "rx", "ry", "rz"] as const;
+
+/** Whether the cap is held off its rest band on any axis. */
+export function spaceMouseMoving(axes: SpaceMouseAxes) {
+  return AXIS_NAMES.some((axis) => spaceMouseAmount(axes[axis]) !== 0);
+}
+
+/**
+ * The axes the view is moved by after `seconds` more of the cap held as `raw`: each follows its raw value smoothly, by
+ * the time that passed, so the trembling of several axes at once evens out instead of jerking the view (#1013). With the
+ * cap let go (every axis inside its rest band) the view stops at once rather than drifting on.
+ */
+export function smoothSpaceMouseAxes(smoothed: SpaceMouseAxes, raw: SpaceMouseAxes, seconds: number): SpaceMouseAxes {
+  if (AXIS_NAMES.every((axis) => !spaceMouseAmount(raw[axis]))) return SPACE_MOUSE_REST;
+  const share = 1 - Math.exp(-Math.max(0, seconds) / SMOOTHING_SECONDS);
+  const next = { ...smoothed };
+  for (const axis of AXIS_NAMES) next[axis] = smoothed[axis] + (raw[axis] - smoothed[axis]) * share;
+  return next;
 }
 
 /** How far the view goes in one second at full deflection: turns in radians, shifts in view heights, zoom as a factor. */

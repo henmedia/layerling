@@ -82,10 +82,12 @@ AI 使用的是與你相同的功能，走的也是你在編輯器中操作時�
 | 工具 | 作用 |
 | --- | --- |
 | `layerling_list_editors` | 列出已開啟的編輯器分頁 |
+| `layerling_rename_project` | 為專案命名，和專案名稱旁邊的鉛筆一樣 |
 | `layerling_open_editor` | 在你的預設瀏覽器中開啟新的編輯器分頁，並等待它連線（僅限你自己的電腦） |
 | `layerling_read_scene` | 讀取場景、選取範圍、單位，以及所有物件的精確尺寸 |
 | `layerling_list_objects` | 列出所有物件及其尺寸、位置、旋轉與 id |
 | `layerling_select_objects` | 選取物件 |
+| `layerling_hide_others` | 隱藏選取或指定物件以外的所有內容，只佔一步復原 |
 | `layerling_delete_objects` | 刪除物件 |
 | `layerling_move_object` | 把物件移到物件清單中的另一個位置 |
 | `layerling_create_shape` | 建立形狀：方塊、圓柱、文字（也能彎曲）、螺紋、齒輪、草圖實體，以及其他所有形狀 |
@@ -95,12 +97,16 @@ AI 使用的是與你相同的功能，走的也是你在編輯器中操作時�
 | `layerling_import_mesh` | 把三角網格帶入設計 |
 | `layerling_update_object` | 修改尺寸、位置、顏色、名稱、實體或孔，以及構成該形狀的其他所有設定，包括文字的字母邊緣 |
 | `layerling_align_objects` | 讓物件彼此對齊 |
-| `layerling_scale_objects` | 依百分比縮放物件，可一起縮放，或各自在原位縮放 |
+| `layerling_scale_objects` | 依百分比縮放物件，可一起縮放，或各自在原位縮放，或縮放到 1:87 等模型比例 |
 | `layerling_lay_flat` | 讓物件以某個面平放在平台上 |
 | `layerling_place_on_face` | 把物件放到另一個物件的面上，斜面也可以，就像 C 鍵 |
-| `layerling_perforate_face` | 在平面上切出孔陣列；孔仍會以孔的形式與實體群組在一起 |
+| `layerling_perforate_face` | 在平面上或繞圓柱、圓管、孔的側壁切出孔陣列；孔仍會以孔的形式與實體群組在一起 |
+| `layerling_thread_insert` | 在平面上或圓柱、圓管的外側壁上做出熱熔螺紋嵌件的孔（M2 至 M8、1/4-20 或自訂尺寸），事先檢查孔旁的壁厚與孔後的深度是否足夠；孔仍會以孔的形式與實體群組在一起 |
 | `layerling_sweep_sketch` | 沿著由點構成的路徑，把矩形或圓形斷面掃掠成一個精確實體；封閉路徑會形成圓環 |
 | `layerling_push_face` | 把平面推出，或在其中挖出凹槽，可設定距邊緣的內縮與轉角半徑；新零件是與實體群組在一起的草圖實體 |
+| `layerling_paint` | 為多色列印給實體的部分表面上自己的顏色（上色）：把面填色到銳利邊緣、圓斑，或在平面檢視中畫的套索；橡皮擦、全部清除；隨實體儲存，並在 3MF 中寫成已上色的面 |
+| `layerling_support_rib` | 在以一條稜邊傾斜列印的零件下表面下方立一條薄支撐肋，帶一層高的連接橋（支撐肋） |
+| `layerling_stencil_bridges` | 用與板組合在一起、寬度和高度可設的連接橋固定文字穿透的板中會掉出的部分（模板連接橋） |
 | `layerling_mate_faces` | 把一個物件的面貼到另一個物件的面，可面對面或齊平 |
 | `layerling_open_group` | 開啟群組，以便逐一修改其中的部件，開啟中的群組內還能再開啟群組 |
 | `layerling_close_group` | 再次關閉群組（「完成」）或取消 |
@@ -158,12 +164,16 @@ AI 使用的是與你相同的功能，走的也是你在編輯器中操作時�
 | `layerling_insert_custom_shape` | 把自訂形狀插入開啟中的設計，可指定 x/z 位置 |
 | `layerling_delete_custom_shape` | 移除自訂形狀；已插入的實體會保留 |
 | `layerling_show_workplane` | 隱藏或顯示帶格線的平台，例如為了拍攝底面（只影響檢視） |
+| `layerling_focus_mode` | 開啟或關閉專注模式：隱藏標題列和頁尾以留出更多空間（只影響編輯器框架） |
 | `layerling_set_section_view` | 沿平面剖開檢視以查看內部（只影響檢視，不會真的切開任何東西） |
 | `layerling_measurements` | 顯示或隱藏捲尺的量測，並列出它們及其長度，並像 [[Q]] 一樣隱藏或顯示所選物件周圍的尺寸，並可為其中一個量測輸入長度，像點擊其數字一樣移動其一端的物體 |
 | `layerling_measure_angle` | 像量角器一樣量測角度：三點的頂點處或兩個平面之間，並在檢視中顯示 |
 | `layerling_saved_view` | 把目前檢視儲存到按鍵 7、8、9 或 0，之後可回到該檢視，就像 Shift+按鍵與單按該鍵（只影響檢視）；也可設定新設計的起始視圖 |
 | `layerling_build_plates` | 列出、新增、命名、排序和移除列印板，把物件移到某個列印板並分配到各列印板上，如同列印板列 |
 | `layerling_clear_history` | 永久刪除所有復原步驟，就像歷史記錄檢視的「刪除歷史記錄」按鈕；需要 `confirm: true` |
+| `layerling_delete_history_steps` | 永久刪除歷史記錄中的單一狀態（不會刪除目前狀態），與歷史記錄檢視清單中步驟旁的垃圾桶相同；需要 `steps` 和 `confirm: true` |
+| `layerling_list_backups` | 列出目前設計的自動備份（早期版本），使用 `all: true` 時列出此瀏覽器中所有設計的備份 |
+| `layerling_open_backup` | 依 `id` 將備份作為新設計開啟，絕不與原檔案關聯 |
 | `layerling_set_history_view` | 回看專案較早的狀態，就像歷史記錄檢視（實際設計不受影響；會修改設計的工具會等到它關閉） |
 | `layerling_restore_from_history` | 把物件（也包括群組內的部件）從較早的狀態以副本帶回設計，就像歷史記錄檢視的「帶入設計」——復原時一步就能撤回 |
 | `layerling_export_section_svg` | 以 1:1 的 SVG 回傳剖切平面上的輪廓，所用實體與匯出時相同 |

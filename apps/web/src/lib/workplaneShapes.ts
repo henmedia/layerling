@@ -3,7 +3,7 @@ import { repairClampedMeshBase } from "@/lib/importedMeshBase";
 import { fieldFormulasEqual } from "@/lib/fieldFormulas";
 import { threadFootprintPatch } from "@/lib/threadGeometry";
 import { pulleyFootprint } from "@/lib/pulleyGeometry";
-import { GRIDFINITY_PADDING_KEYS, gridfinityCompartmentLabelsEqual, gridfinityDividerPositionsEqual, gridfinityFootprintPatch, gridfinityOpeningsEqual, gridfinityOutlinesEqual, normalizeGridfinityPadding } from "@/lib/gridfinityGeometry";
+import { GRIDFINITY_OVERHANG_KEYS, GRIDFINITY_PADDING_KEYS, normalizeGridfinityOverhang, gridfinityCompartmentLabelsEqual, gridfinityDividerPositionsEqual, gridfinityFootprintPatch, gridfinityOpeningsEqual, gridfinityOutlinesEqual, normalizeGridfinityPadding } from "@/lib/gridfinityGeometry";
 import { MCP_SHAPE_SETTING_KEYS } from "@/lib/mcpShapeSettings";
 import { bentTubeSegmentsEqual } from "@/lib/bentTubeGeometry";
 import { vaseSettingsEqual } from "@/lib/vaseSettings";
@@ -83,6 +83,9 @@ export function shapeWithParametricSource(shape: WorkplaneShape): WorkplaneShape
     slopeEnd: source.slopeEnd,
     slopeSide: source.slopeSide,
     slopeCurve: source.slopeCurve,
+    slopeFrom: source.slopeFrom,
+    sideDrop: source.sideDrop,
+    sideCurve: source.sideCurve,
     narrowEnd: source.narrowEnd,
     narrowSide: source.narrowSide,
     narrowCurve: source.narrowCurve,
@@ -268,6 +271,23 @@ export function shapeExtrudeDeformAt(shape: WorkplaneShape, normalizedHeight: nu
   };
 }
 
+/**
+ * The vertical line a twist turns about, when the body has a rotation pivot of its own (lib/rotationPivot): its
+ * x and z in millimetres from the body's origin, in the body's own frame before any mirror or turn. The pivot is
+ * stored as a fraction of the body's width and depth from its middle, so this is that fraction times the size
+ * (a mirror cancels out: the pivot is stored after it and the mesh is mirrored after the twist). Only x and z
+ * count: the twist axis is the body's own up axis, so the pivot's height does not move it.
+ * Undefined when there is no pivot or no twist, so the twist keeps turning about the middle of the body, as it
+ * always did, and the geometry signatures of such bodies stay as they were. A lean is a plain shift of the
+ * top, which has no centre, so only the twist follows the pivot.
+ */
+export function extrudeTwistPivot(shape: WorkplaneShape, width = shapeWidth(shape), depth = shapeDepth(shape)): { x: number; z: number } | undefined {
+  const stored = shape.rotationPivot;
+  if (!stored || stored.length < 3 || !stored.every(Number.isFinite)) return undefined;
+  if (!shapeSupportsExtrudeDeform(shape.kind) || Math.abs(shape.extrudeTwist ?? 0) <= 1e-6) return undefined;
+  return { x: stored[0] * Math.max(1e-6, width), z: stored[2] * Math.max(1e-6, depth) };
+}
+
 const THREE_MATH_DEG2RAD = Math.PI / 180;
 const EXTRUDE_TWIST_MAX = 720;
 const EXTRUDE_OFFSET_MAX = 80;
@@ -367,6 +387,19 @@ function eulerRotation(xDegrees: number, yDegrees: number, zDegrees: number): Ro
     [ca * sc + sa * sb * cc, ca * cc - sa * sb * sc, -sa * cb],
     [sa * sc - ca * sb * cc, sa * cc + ca * sb * sc, ca * cb],
   ];
+}
+
+/**
+ * A move of (dx, 0, dz) in a shape's own frame, as it is on the plate: turned as three.js turns the shape (Euler
+ * "XYZ"). Used where a body grows on one side and its other parts must stay where they are, as a Gridfinity bin's
+ * feet when its overhang changes.
+ */
+export function shapeLocalOffset(shape: Pick<WorkplaneShape, "rotation"> & Partial<Pick<WorkplaneShape, "rotationX" | "rotationZ" | "mirrorX" | "mirrorZ">>, localX: number, localZ: number) {
+  const r = eulerRotation(shape.rotationX ?? 0, shape.rotation ?? 0, shape.rotationZ ?? 0);
+  // A mirrored shape is scaled by -1 in its own frame before it is turned, as the viewport draws it.
+  const dx = shape.mirrorX ? -localX : localX;
+  const dz = shape.mirrorZ ? -localZ : localZ;
+  return { x: cleanNearZero(r[0][0] * dx + r[0][2] * dz, 1e-12), z: cleanNearZero(r[2][0] * dx + r[2][2] * dz, 1e-12) };
 }
 
 function transposed(rotation: Rotation): Rotation {
@@ -580,6 +613,8 @@ export function canonicalizeShape(unrepaired: WorkplaneShape): WorkplaneShape {
   if (shape.kind === "gridfinity") {
     // Padding is stored as the geometry reads it, 0 to 41 mm, so a saved project opens again whatever gave it (#455).
     for (const key of Object.values(GRIDFINITY_PADDING_KEYS)) if (typeof next[key] === "number") next[key] = normalizeGridfinityPadding(next[key]);
+    for (const key of Object.values(GRIDFINITY_OVERHANG_KEYS)) if (typeof next[key] === "number") next[key] = normalizeGridfinityOverhang(next[key]);
+    if (typeof next.gridfinityOverhangChamfer === "number") next.gridfinityOverhangChamfer = Number.isFinite(next.gridfinityOverhangChamfer) ? Math.max(0, Math.round(next.gridfinityOverhangChamfer * 100) / 100) : 0;
     const footprint = gridfinityFootprintPatch(next);
     Object.assign(next, footprint);
     next.size = resizedShapeSize(footprint.width, footprint.depth);
@@ -608,6 +643,8 @@ export function canonicalizeShape(unrepaired: WorkplaneShape): WorkplaneShape {
     if (groupResize) next.groupResize = groupResize;
     else delete next.groupResize;
   }
+  // Only a hull keeps its parts' holes, and only when told to: false is the same as left out.
+  if (next.hullKeepHoles !== true || next.groupOperation !== "hull") delete next.hullKeepHoles;
   if (shape.sketchRevolve) {
     next.sketchRevolve = {
       startAngle: shape.sketchRevolve.startAngle,
@@ -615,6 +652,8 @@ export function canonicalizeShape(unrepaired: WorkplaneShape): WorkplaneShape {
       sides: shape.sketchRevolve.sides,
       quality: shape.sketchRevolve.quality,
       ...(shape.sketchRevolve.pitch ? { pitch: shape.sketchRevolve.pitch } : {}),
+      // Kept with the body, or a revolve set smoother came back as standard in its panel and lost it on saving (Discussion #1426).
+      ...(shape.sketchRevolve.smoothness === "fine" || shape.sketchRevolve.smoothness === "extraFine" ? { smoothness: shape.sketchRevolve.smoothness } : {}),
     };
   }
   if (shape.edgeTreatmentHistory) {
@@ -647,6 +686,12 @@ export function sketchStrokesEqual(a: SketchStroke | undefined, b: SketchStroke 
   if (a === b) return true;
   if (!a || !b) return false;
   return a.width === b.width && a.align === b.align && a.join === b.join && a.cap === b.cap;
+}
+
+/** Two lists of numbers that hold the same values (a missing list equals only a missing one). */
+function sameNumberList(a: readonly number[] | undefined, b: readonly number[] | undefined) {
+  if (!a || !b) return a === b;
+  return a.length === b.length && a.every((value, index) => value === b[index]);
 }
 
 export function workplaneShapesEqual(a: WorkplaneShape, b: WorkplaneShape) {
@@ -714,6 +759,9 @@ export function workplaneShapesEqual(a: WorkplaneShape, b: WorkplaneShape) {
     a.slopeEnd === b.slopeEnd &&
     a.slopeSide === b.slopeSide &&
     a.slopeCurve === b.slopeCurve &&
+    a.slopeFrom === b.slopeFrom &&
+    a.sideDrop === b.sideDrop &&
+    a.sideCurve === b.sideCurve &&
     a.narrowEnd === b.narrowEnd &&
     a.narrowSide === b.narrowSide &&
     a.narrowCurve === b.narrowCurve &&
@@ -732,6 +780,8 @@ export function workplaneShapesEqual(a: WorkplaneShape, b: WorkplaneShape) {
     a.gearType === b.gearType &&
     a.helixAngle === b.helixAngle &&
     a.bevelHelixAngle === b.bevelHelixAngle &&
+    a.ringRackHelixAngle === b.ringRackHelixAngle &&
+    a.ringRackHerringbone === b.ringRackHerringbone &&
     a.helixQuality === b.helixQuality &&
     a.gearProfile === b.gearProfile &&
     a.gearPressureAngle === b.gearPressureAngle &&
@@ -784,6 +834,9 @@ export function workplaneShapesEqual(a: WorkplaneShape, b: WorkplaneShape) {
     a.crescentThickness === b.crescentThickness &&
     a.crescentTipFillet === b.crescentTipFillet &&
     a.crescentQuality === b.crescentQuality &&
+    a.sectorAngle === b.sectorAngle &&
+    a.sectorInnerDiameter === b.sectorInnerDiameter &&
+    a.sectorEndRadius === b.sectorEndRadius &&
     a.honeycombCellSize === b.honeycombCellSize &&
     a.honeycombWallThickness === b.honeycombWallThickness &&
     a.honeycombFrameWidth === b.honeycombFrameWidth &&
@@ -792,6 +845,7 @@ export function workplaneShapesEqual(a: WorkplaneShape, b: WorkplaneShape) {
     a.tubeBoreHole === b.tubeBoreHole &&
     a.hingeStyle === b.hingeStyle &&
     a.hingeConeSize === b.hingeConeSize &&
+    a.hingeSnapGrip === b.hingeSnapGrip &&
     a.hingePinDiameter === b.hingePinDiameter &&
     a.hingeLeafThickness === b.hingeLeafThickness &&
     a.hingeClearance === b.hingeClearance &&
@@ -854,11 +908,19 @@ export function workplaneShapesEqual(a: WorkplaneShape, b: WorkplaneShape) {
     a.gridfinityPaddingFront === b.gridfinityPaddingFront &&
     a.gridfinityPaddingLeft === b.gridfinityPaddingLeft &&
     a.gridfinityPaddingRight === b.gridfinityPaddingRight &&
+    a.gridfinityOverhangBack === b.gridfinityOverhangBack &&
+    a.gridfinityOverhangFront === b.gridfinityOverhangFront &&
+    a.gridfinityOverhangLeft === b.gridfinityOverhangLeft &&
+    a.gridfinityOverhangRight === b.gridfinityOverhangRight &&
+    a.gridfinityOverhangChamfer === b.gridfinityOverhangChamfer &&
+    a.gridfinityOverhangSolid === b.gridfinityOverhangSolid &&
+    a.gridfinityOverhangLipOnGrid === b.gridfinityOverhangLipOnGrid &&
     a.gridfinityCornerRadius === b.gridfinityCornerRadius &&
     a.gridfinityBinCornerRadius === b.gridfinityBinCornerRadius &&
     a.gridfinityCompartmentsX === b.gridfinityCompartmentsX &&
     a.gridfinityCompartmentsZ === b.gridfinityCompartmentsZ &&
     a.gridfinityDividerThickness === b.gridfinityDividerThickness &&
+    a.gridfinityDividerHeight === b.gridfinityDividerHeight &&
     gridfinityDividerPositionsEqual(a.gridfinityDividerPositionsX, b.gridfinityDividerPositionsX) &&
     gridfinityDividerPositionsEqual(a.gridfinityDividerPositionsZ, b.gridfinityDividerPositionsZ) &&
     gridfinityCompartmentLabelsEqual(a.gridfinityCompartmentLabels, b.gridfinityCompartmentLabels) &&
@@ -881,6 +943,7 @@ export function workplaneShapesEqual(a: WorkplaneShape, b: WorkplaneShape) {
     a.loftOffsetX === b.loftOffsetX &&
     a.loftOffsetZ === b.loftOffsetZ &&
     a.loftWall === b.loftWall &&
+    a.loftTopWall === b.loftTopWall &&
     a.loftTwist === b.loftTwist &&
     a.loftSmooth === b.loftSmooth &&
     a.loftSegments === b.loftSegments &&
@@ -894,10 +957,15 @@ export function workplaneShapesEqual(a: WorkplaneShape, b: WorkplaneShape) {
     a.screwHoleHeadDepth === b.screwHoleHeadDepth &&
     a.screwHoleAngle === b.screwHoleAngle &&
     a.drillPointAngle === b.drillPointAngle &&
+    Boolean(a.screwHoleSlot) === Boolean(b.screwHoleSlot) &&
+    (a.screwHoleRecess ?? 0) === (b.screwHoleRecess ?? 0) &&
+    (a.screwHoleChamfer ?? 0) === (b.screwHoleChamfer ?? 0) &&
     a.portProfile === b.portProfile &&
     a.portClearance === b.portClearance &&
     a.cornerFillet === b.cornerFillet &&
+    sameNumberList(a.cornerFillets, b.cornerFillets) &&
     a.topBottomFillet === b.topBottomFillet &&
+    a.bottomFillet === b.bottomFillet &&
     a.roundedBoxQuality === b.roundedBoxQuality &&
     a.bentTubeProfile === b.bentTubeProfile &&
     a.bentTubeInnerProfile === b.bentTubeInnerProfile &&
@@ -919,6 +987,7 @@ export function workplaneShapesEqual(a: WorkplaneShape, b: WorkplaneShape) {
     JSON.stringify(a.surfaceTextureLayers ?? null) === JSON.stringify(b.surfaceTextureLayers ?? null) &&
     a.surfaceTextureMask === b.surfaceTextureMask &&
     a.surfaceFillOf === b.surfaceFillOf &&
+    (a.paint === b.paint || JSON.stringify(a.paint ?? null) === JSON.stringify(b.paint ?? null)) &&
     vaseSettingsEqual(a.vase, b.vase) &&
     a.vasePartOf === b.vasePartOf &&
     a.gridfinityKeyOf === b.gridfinityKeyOf &&
@@ -942,6 +1011,7 @@ export function workplaneShapesEqual(a: WorkplaneShape, b: WorkplaneShape) {
     Boolean(a.sbcBoard?.ribbonUp) === Boolean(b.sbcBoard?.ribbonUp) &&
     Boolean(a.sbcBoard?.ribbonSide) === Boolean(b.sbcBoard?.ribbonSide) &&
     Boolean(a.sbcBoard?.gpioUp) === Boolean(b.sbcBoard?.gpioUp) &&
+    Boolean(a.sbcBoard?.lensUp) === Boolean(b.sbcBoard?.lensUp) &&
     (a.sbcBoard?.upReach ?? 0) === (b.sbcBoard?.upReach ?? 0) &&
     (a.sbcBoard?.buttonReach ?? 0) === (b.sbcBoard?.buttonReach ?? 0) &&
     a.importedMesh === b.importedMesh &&
@@ -965,6 +1035,11 @@ export function workplaneShapesEqual(a: WorkplaneShape, b: WorkplaneShape) {
     a.groupOperation === b.groupOperation &&
     a.multicolor === b.multicolor &&
     a.groupResize === b.groupResize &&
+    Boolean(a.hullKeepHoles) === Boolean(b.hullKeepHoles) &&
+    // A rib's body, a stencil bridge and a breakaway base are marked for the print check (#1633): a change there is a change.
+    a.supportRibFor === b.supportRibFor &&
+    Boolean(a.stencilBridge) === Boolean(b.stencilBridge) &&
+    Boolean(a.breakawayBase) === Boolean(b.breakawayBase) &&
     a.rotationPivot === b.rotationPivot &&
     fieldFormulasEqual(a.formulas, b.formulas) &&
     a.locked === b.locked &&

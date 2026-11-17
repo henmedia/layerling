@@ -78,10 +78,12 @@ De AI werkt met dezelfde functies als jij, via dezelfde weg als jouw bediening i
 | Gereedschap | Wat het doet |
 | --- | --- |
 | `layerling_list_editors` | somt de geopende editortabbladen op |
+| `layerling_rename_project` | geeft het project een naam, zoals het potlood naast de projectnaam |
 | `layerling_open_editor` | opent een nieuw editortabblad in je standaardbrowser en wacht tot het verbonden is (alleen op je eigen computer) |
 | `layerling_read_scene` | leest scène, selectie, eenheden en de exacte maten van alle objecten |
 | `layerling_list_objects` | somt alle objecten op met maten, positie, rotatie en id |
 | `layerling_select_objects` | selecteert objecten |
+| `layerling_hide_others` | verbergt alles behalve de selectie of de opgegeven objecten, in één ongedaan-stap |
 | `layerling_delete_objects` | verwijdert objecten |
 | `layerling_move_object` | verplaatst een object naar een andere plek in de objectenlijst |
 | `layerling_create_shape` | maakt een vorm: blok, cilinder, tekst (ook gebogen), schroefdraad, tandwiel, schetslichaam en alle andere |
@@ -91,12 +93,16 @@ De AI werkt met dezelfde functies als jij, via dezelfde weg als jouw bediening i
 | `layerling_import_mesh` | brengt een driehoeksmesh in het ontwerp |
 | `layerling_update_object` | wijzigt maten, positie, kleur, naam, lichaam of gat en al het andere wat de vorm bepaalt, de letterrand van een tekst inbegrepen |
 | `layerling_align_objects` | lijnt objecten ten opzichte van elkaar uit |
-| `layerling_scale_objects` | schaalt objecten met een percentage, samen of elk op zijn plek |
+| `layerling_scale_objects` | schaalt objecten met een percentage, samen of elk op zijn plek, of naar een modelschaal zoals 1:87 |
 | `layerling_lay_flat` | legt een object met één vlak op de plaat |
 | `layerling_place_on_face` | zet objecten neer op een vlak van een ander, ook op schuine, zoals de C-toets |
-| `layerling_perforate_face` | snijdt een gatenpatroon in een plat vlak; de gaten blijven gaten, gegroepeerd met het lichaam |
+| `layerling_perforate_face` | snijdt een gatenpatroon in een plat vlak of rond de wand van een cilinder, buis of boring; de gaten blijven gaten, gegroepeerd met het lichaam |
+| `layerling_thread_insert` | maakt het gat voor een inzetbare schroefdraadbus die met warmte wordt ingedrukt (M2 tot M8, 1/4-20 of een eigen maat) in een plat vlak of de buitenwand van een cilinder of buis, nadat is gecontroleerd of de wand naast het gat en de diepte erachter genoeg zijn; het gat blijft een gat, gegroepeerd met het lichaam |
 | `layerling_sweep_sketch` | trekt een rechthoekige of ronde dwarsdoorsnede langs een pad van punten als één exact lichaam; een gesloten pad geeft een ring |
 | `layerling_push_face` | trekt een plat vlak naar buiten of snijdt er een kamer in, met inspringing vanaf de rand en hoekradius; het nieuwe deel is een schetslichaam, gegroepeerd met het lichaam |
+| `layerling_paint` | beschildert delen van een lichaam in eigen kleuren om in meerdere kleuren te printen (Beschilderen): een vlak vullen tot aan de scherpe randen, een ronde vlek of een lasso in een vlakke weergave; gummen, alles verwijderen; met het lichaam opgeslagen en in een 3MF als beschilderde vlakken geschreven |
+| `layerling_support_rib` | zet een dunne steunrib onder het onderste vlak van een onderdeel dat schuin op een rand wordt geprint, met bruggen van één laag hoog (Steunrib) |
+| `layerling_stencil_bridges` | houdt de delen van een plaat met tekst erdoor die eruit zouden vallen vast met bruggen, gegroepeerd met de plaat, zo breed en hoog als opgegeven (Stencilbruggen) |
 | `layerling_mate_faces` | brengt een vlak van het ene object tegen een vlak van een ander, vlak tegen vlak of gelijk |
 | `layerling_open_group` | opent een groep zodat de onderdelen een voor een kunnen worden gewijzigd, ook een groep binnen een geopende groep |
 | `layerling_close_group` | sluit hem weer ("Klaar") of annuleert |
@@ -154,12 +160,16 @@ De AI werkt met dezelfde functies als jij, via dezelfde weg als jouw bediening i
 | `layerling_insert_custom_shape` | voegt een eigen vorm in het geopende ontwerp in, desgewenst op een plek x/z |
 | `layerling_delete_custom_shape` | verwijdert een eigen vorm; ingevoegde lichamen blijven staan |
 | `layerling_show_workplane` | verbergt en toont de plaat met zijn raster, bijvoorbeeld voor een afbeelding van de onderkant (alleen de weergave) |
+| `layerling_focus_mode` | zet de focusmodus aan en uit: verbergt de titelregel en de voettekst voor meer ruimte (alleen het kader van de editor) |
 | `layerling_set_section_view` | snijdt de weergave open langs een vlak om naar binnen te kijken (alleen de weergave, er wordt niets doorgesneden) |
 | `layerling_measurements` | toont of verbergt de metingen van het meetlint en somt ze op met hun lengtes, en verbergt of toont de maten rond de selectie zoals [[Q]], en typt een lengte voor een ervan, die het lichaam aan het uiteinde verschuift zoals een klik op het getal |
 | `layerling_measure_angle` | meet een hoek zoals de gradenboog: in het hoekpunt van drie punten of tussen twee platte vlakken, en toont hem in de weergave |
 | `layerling_saved_view` | slaat de huidige weergave op onder de toets 7, 8, 9 of 0 en gaat ernaar terug, zoals Shift+toets en de toets (alleen de weergave); stelt ook de startweergave van nieuwe ontwerpen in |
 | `layerling_build_plates` | toont, voegt toe, benoemt, ordent en verwijdert de bouwplaten, zet objecten op een plaat en verdeelt ze over de platen, zoals de platenbalk |
 | `layerling_clear_history` | verwijdert definitief elke stap voor ongedaan maken, zoals de knop "Geschiedenis verwijderen" van de geschiedenisweergave; vereist `confirm: true` |
+| `layerling_delete_history_steps` | verwijdert losse toestanden van de geschiedenis definitief, nooit de huidige, zoals de prullenbak naast een stap in de lijst van de geschiedenisweergave; vraagt `steps` en `confirm: true` |
+| `layerling_list_backups` | toont de automatische back-ups (Eerdere versies) van het geopende ontwerp, of met `all: true` van alle ontwerpen in deze browser |
+| `layerling_open_backup` | opent een back-up via zijn `id` als nieuw ontwerp, nooit gekoppeld aan het oorspronkelijke bestand |
 | `layerling_set_history_view` | kijkt terug naar een eerdere toestand van het project, zoals de geschiedenisweergave (het echte ontwerp blijft onaangeroerd; gereedschappen die iets wijzigen wachten tot hij gesloten is) |
 | `layerling_restore_from_history` | haalt objecten (ook onderdelen in groepen) uit een eerdere toestand als kopieën terug in het ontwerp, zoals „In het ontwerp halen” in de geschiedenisweergave - één stap die ongedaan maken terugneemt |
 | `layerling_export_section_svg` | geeft de contouren op een doorsnedevlak terug als SVG op 1:1, van dezelfde lichamen als de export |

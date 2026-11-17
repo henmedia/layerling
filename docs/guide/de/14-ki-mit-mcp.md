@@ -82,10 +82,12 @@ Die KI arbeitet mit denselben Funktionen wie du, sie läuft über denselben Weg 
 | Werkzeug | Was es tut |
 | --- | --- |
 | `layerling_list_editors` | listet die offenen Editor-Tabs auf |
+| `layerling_rename_project` | gibt dem Projekt einen Namen, wie der Stift neben dem Projektnamen |
 | `layerling_open_editor` | öffnet einen neuen Editor-Tab in deinem Standardbrowser und wartet, bis er verbunden ist (nur auf deinem eigenen Rechner) |
 | `layerling_read_scene` | liest Szene, Auswahl, Einheiten und die genauen Maße aller Objekte |
 | `layerling_list_objects` | listet alle Objekte mit Maßen, Lage, Drehung und Kennung |
 | `layerling_select_objects` | wählt Objekte aus |
+| `layerling_hide_others` | blendet alles außer der Auswahl oder den genannten Objekten aus, in einem Rückgängig-Schritt |
 | `layerling_delete_objects` | löscht Objekte |
 | `layerling_move_object` | verschiebt ein Objekt an eine andere Stelle der Objektliste |
 | `layerling_create_shape` | legt eine Form an: Quader, Zylinder, Text (auch gebogen), Gewinde, Zahnrad, Skizzenkörper und alle anderen |
@@ -95,12 +97,16 @@ Die KI arbeitet mit denselben Funktionen wie du, sie läuft über denselben Weg 
 | `layerling_import_mesh` | bringt ein Dreiecksnetz in den Entwurf |
 | `layerling_update_object` | ändert Maße, Lage, Farbe, Name, Körper oder Aussparung und alles, was die Form sonst ausmacht, bei einem Text auch die Buchstabenkante |
 | `layerling_align_objects` | richtet Objekte aneinander aus |
-| `layerling_scale_objects` | skaliert Objekte um einen Prozentwert, zusammen oder jedes für sich |
+| `layerling_scale_objects` | skaliert Objekte um einen Prozentwert, zusammen oder jedes für sich, oder auf einen Modellbau-Maßstab wie 1:87 |
 | `layerling_lay_flat` | legt ein Objekt mit einer Fläche auf die Platte |
 | `layerling_place_on_face` | setzt Objekte auf eine Fläche eines anderen, auch schräg, wie die Taste C |
-| `layerling_perforate_face` | schneidet ein Lochmuster in eine ebene Fläche, die Löcher bleiben als Aussparungen mit dem Körper gruppiert |
+| `layerling_perforate_face` | schneidet ein Lochmuster in eine ebene Fläche oder rund um die Wand eines Zylinders, Rohrs oder einer Bohrung, die Löcher bleiben als Aussparungen mit dem Körper gruppiert |
+| `layerling_thread_insert` | erzeugt das Loch für einen einzuschmelzenden Gewindeeinsatz (M2 bis M8, 1/4-20 oder eigene Größe) in einer ebenen Fläche oder der Außenwand eines Zylinders oder Rohrs, nachdem geprüft wurde, ob die Wand neben dem Loch und die Tiefe dahinter ausreichen; das Loch bleibt als Aussparung mit dem Körper gruppiert |
 | `layerling_sweep_sketch` | zieht einen rechteckigen oder runden Querschnitt entlang eines Pfades aus Punkten als einen exakten Körper; ein geschlossener Pfad ergibt einen Ring |
 | `layerling_push_face` | zieht eine ebene Fläche heraus oder schneidet eine Tasche hinein, mit Rand zur Kante und Eckenradius; das neue Teil ist ein Skizzenkörper, mit dem Körper gruppiert, oder mit `separate` ein freier eigener Körper |
+| `layerling_paint` | bemalt Teile eines Körpers in eigenen Farben für den Mehrfarbdruck (Bemalen): eine Fläche bis an ihre scharfen Kanten füllen, ein runder Fleck oder ein Lasso in einer flachen Ansicht; radieren, alles abnehmen; mit dem Körper gespeichert und im 3MF als bemalte Flächen |
+| `layerling_support_rib` | stellt eine dünne Stützrippe unter die untere Fläche eines schräg auf einer Kante gedruckten Teils, mit Brücken von einer Schicht Höhe (Stützrippe) |
+| `layerling_stencil_bridges` | hält die Teile einer Platte mit durchgehendem Text, die herausfallen würden, mit Stegen, die mit der Platte gruppiert werden, so breit und hoch wie angegeben (Schablonenstege) |
 | `layerling_mate_faces` | legt eine Fläche eines Objekts an die Fläche eines anderen, gegeneinander oder bündig, oder bringt zwei runde Flächen auf eine Achse |
 | `layerling_open_group` | öffnet eine Gruppe, damit ihre Teile einzeln änderbar sind, auch eine Gruppe in einer geöffneten |
 | `layerling_close_group` | schließt sie wieder („Fertig“) oder bricht ab |
@@ -158,12 +164,16 @@ Die KI arbeitet mit denselben Funktionen wie du, sie läuft über denselben Weg 
 | `layerling_insert_custom_shape` | setzt eine eigene Form in den offenen Entwurf, wahlweise an eine Stelle x/z |
 | `layerling_delete_custom_shape` | entfernt eine eigene Form; eingesetzte Körper bleiben |
 | `layerling_show_workplane` | blendet die Platte mit ihrem Gitter aus und wieder ein, etwa für ein Bild der Unterseite (nur die Ansicht) |
+| `layerling_focus_mode` | schaltet den Fokusmodus ein und aus: blendet Titel- und Fußzeile für mehr Platz aus (nur der Rahmen des Editors) |
 | `layerling_set_section_view` | schneidet die Ansicht entlang einer Ebene auf, um ins Innere zu sehen (nur die Ansicht, nichts wird zerteilt) |
 | `layerling_measurements` | blendet die Messungen des Maßbands ein oder aus und listet sie mit ihren Längen auf; dazu die Maße um die Auswahl, wie [[Q]]; tippt auch eine Länge für eine Messung ein, die den Körper an ihrem Ende verschiebt wie ein Klick auf ihre Zahl |
 | `layerling_measure_angle` | misst einen Winkel wie der Winkelmesser: an der Ecke von drei Punkten oder zwischen zwei ebenen Flächen, und zeigt ihn in der Ansicht |
 | `layerling_saved_view` | speichert die aktuelle Ansicht unter der Taste 7, 8, 9 oder 0 und holt sie zurück, wie Umschalt+Taste und die Taste (nur die Ansicht); setzt auch die Startansicht neuer Entwürfe |
 | `layerling_build_plates` | listet, fügt hinzu, benennt, sortiert und entfernt die Druckplatten, setzt Objekte auf eine Platte und verteilt sie auf die Platten, wie die Plattenleiste |
 | `layerling_clear_history` | löscht jeden Rückgängig-Schritt endgültig, wie der Knopf „Verlauf löschen“ im Verlaufsblick; verlangt `confirm: true` |
+| `layerling_delete_history_steps` | löscht einzelne Stände des Verlaufs endgültig, nie den aktuellen, wie der Papierkorb neben einem Schritt in der Liste der Verlaufsansicht; braucht `steps` und `confirm: true` |
+| `layerling_list_backups` | listet die automatischen Sicherungen (Frühere Fassungen) des offenen Entwurfs, mit `all: true` aller Entwürfe in diesem Browser |
+| `layerling_open_backup` | öffnet eine Sicherung über ihre `id` als neuen Entwurf, nie an die ursprüngliche Datei gebunden |
 | `layerling_set_history_view` | schaut auf einen früheren Stand des Projekts zurück, wie die Verlaufsansicht (der echte Entwurf bleibt unberührt; ändernde Werkzeuge warten, bis sie geschlossen ist) |
 | `layerling_restore_from_history` | holt Objekte (auch Teile in Gruppen) aus einem früheren Stand als Kopien in den Entwurf zurück, wie „In den Entwurf holen“ in der Verlaufsansicht - ein Schritt, den Rückgängig zurücknimmt |
 | `layerling_export_section_svg` | liefert die Umrisse auf einer Schnittebene als SVG im Maßstab 1:1, aus denselben Körpern wie der Export |

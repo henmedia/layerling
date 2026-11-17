@@ -82,10 +82,12 @@ L’IA usa le stesse funzioni che hai a disposizione, attraverso lo stesso perco
 | Strumento | Funzione |
 | --- | --- |
 | `layerling_list_editors` | Elenca le schede degli editor aperte. |
+| `layerling_rename_project` | Dà un nome al progetto, come la matita accanto al nome del progetto. |
 | `layerling_open_editor` | Apre una nuova scheda dell’editor nel browser predefinito e attende che si colleghi (solo sul tuo computer). |
 | `layerling_read_scene` | Legge la scena, la selezione, le unità e le dimensioni esatte di tutti gli oggetti. |
 | `layerling_list_objects` | Elenca tutti gli oggetti con dimensioni, posizione, rotazione e ID. |
 | `layerling_select_objects` | Seleziona gli oggetti. |
+| `layerling_hide_others` | Nasconde tutto tranne la selezione o gli oggetti indicati, in un solo passo di annullamento. |
 | `layerling_delete_objects` | Elimina gli oggetti. |
 | `layerling_move_object` | sposta un oggetto in un altro punto dell'elenco degli oggetti |
 | `layerling_create_shape` | Crea una forma: cubo, cilindro, testo (anche curvo), filettatura, ingranaggio, corpo da schizzo e tutte le altre forme. |
@@ -95,12 +97,16 @@ L’IA usa le stesse funzioni che hai a disposizione, attraverso lo stesso perco
 | `layerling_import_mesh` | Importa nel progetto una mesh di triangoli. |
 | `layerling_update_object` | Modifica dimensioni, posizione, colore, nome, tipo pieno o foro e tutte le altre proprietà della forma, compreso il bordo delle lettere di un testo. |
 | `layerling_align_objects` | Allinea gli oggetti tra loro. |
-| `layerling_scale_objects` | Ridimensiona gli oggetti in percentuale, tutti insieme oppure ciascuno attorno alla propria posizione. |
+| `layerling_scale_objects` | Ridimensiona gli oggetti in percentuale, tutti insieme oppure ciascuno attorno alla propria posizione, oppure a una scala modellistica come 1:87. |
 | `layerling_lay_flat` | Appoggia un oggetto sul piano usando una delle sue facce. |
 | `layerling_place_on_face` | Appoggia gli oggetti su una faccia di un altro, anche se inclinata, come con il tasto C. |
-| `layerling_perforate_face` | Crea un motivo di fori su una faccia piana; i fori restano tali e vengono raggruppati con il corpo. |
+| `layerling_perforate_face` | Crea un motivo di fori su una faccia piana o intorno alla parete di un cilindro, un tubo o un foro; i fori restano tali e vengono raggruppati con il corpo. |
+| `layerling_thread_insert` | Crea il foro per un inserto filettato a caldo (da M2 a M8, 1/4-20 o una misura personalizzata) su una faccia piana o sulla parete esterna di un cilindro o di un tubo, dopo aver verificato che la parete accanto al foro e la profondità dietro siano sufficienti; il foro resta tale e viene raggruppato con il corpo. |
 | `layerling_sweep_sketch` | Estende una sezione rettangolare o circolare lungo un percorso di punti, creando un corpo esatto; se il percorso è chiuso, crea un anello. |
 | `layerling_push_face` | Estende una faccia piana o crea una tasca al suo interno, impostando un margine dal bordo e il raggio degli angoli; la nuova parte è un corpo da schizzo raggruppato con il corpo originale. |
+| `layerling_paint` | dipinge parti di un corpo in colori propri per stampare in più colori (Dipingi): riempire una faccia fino agli spigoli vivi, una macchia rotonda o un lazo tracciato in una vista piana; cancellare, togliere tutto; salvato con il corpo e scritto in un 3MF come facce dipinte |
+| `layerling_support_rib` | mette una nervatura di supporto sottile sotto la faccia inferiore di un pezzo stampato inclinato su uno spigolo, con ponti alti un layer (Nervatura di supporto) |
+| `layerling_stencil_bridges` | trattiene le parti di una piastra attraversata da un testo che cadrebbero, con ponticelli raggruppati con la piastra, larghi e alti come indicato (Ponticelli per stencil) |
 | `layerling_mate_faces` | Accosta una faccia di un oggetto a quella di un altro, facendole combaciare o allineandole a filo. |
 | `layerling_open_group` | Apre un gruppo per modificare le parti singolarmente, anche se si trova dentro un altro gruppo già aperto. |
 | `layerling_close_group` | Chiude il gruppo (con «Fine») oppure annulla l’operazione. |
@@ -158,12 +164,16 @@ L’IA usa le stesse funzioni che hai a disposizione, attraverso lo stesso perco
 | `layerling_insert_custom_shape` | Inserisce una forma personalizzata nel progetto aperto, anche in una posizione x/z specifica. |
 | `layerling_delete_custom_shape` | Elimina una forma personalizzata; i corpi già inseriti restano nel progetto. |
 | `layerling_show_workplane` | Nasconde o mostra il piano con la griglia, per esempio per fotografare la parte inferiore (modifica solo la vista). |
+| `layerling_focus_mode` | attiva e disattiva la modalità concentrazione: nasconde la riga del titolo e il piè di pagina per avere più spazio (solo la cornice dell’editor) |
 | `layerling_set_section_view` | Apre la vista lungo un piano di sezione per mostrare l’interno; non taglia realmente il pezzo (modifica solo la vista). |
 | `layerling_measurements` | mostra o nasconde le misurazioni del metro a nastro e le elenca con le loro lunghezze, e nasconde o mostra le misure attorno alla selezione come [[Q]], e digita una lunghezza per una di esse, che sposta il corpo alla sua estremità come un clic sul numero |
 | `layerling_measure_angle` | misura un angolo come il goniometro: al vertice di tre punti o tra due facce piane, e lo mostra nella vista |
 | `layerling_saved_view` | Salva la vista corrente con il tasto 7, 8, 9 o 0 e la richiama in seguito, come con Maiusc+tasto e poi il tasto (modifica solo la vista). Imposta anche la vista di avvio dei nuovi progetti. |
 | `layerling_build_plates` | Elenca, aggiunge, nomina, ordina e toglie i piatti di stampa, sposta oggetti su un piatto e li distribuisce sui piatti, come la barra dei piatti. |
 | `layerling_clear_history` | Elimina definitivamente tutti i passaggi annullabili, come il pulsante «Elimina cronologia» nella vista Cronologia; richiede `confirm: true`. |
+| `layerling_delete_history_steps` | elimina per sempre singoli stati della cronologia, mai quello attuale, come il cestino accanto a un passaggio nell'elenco della vista cronologia; richiede `steps` e `confirm: true` |
+| `layerling_list_backups` | elenca i backup automatici (Versioni precedenti) del progetto aperto, o con `all: true` di tutti i progetti di questo browser |
+| `layerling_open_backup` | apre un backup tramite il suo `id` come nuovo progetto, mai legato al file originale |
 | `layerling_set_history_view` | Mostra uno stato precedente del progetto, come la vista Cronologia. Il progetto vero e proprio non viene modificato; gli strumenti di modifica restano in attesa finché la vista non viene chiusa. |
 | `layerling_restore_from_history` | Ripristina nel progetto come copie gli oggetti di uno stato precedente, comprese le parti all’interno dei gruppi, come «Inserisci nel progetto» nella vista Cronologia; l’operazione è un singolo passaggio annullabile. |
 | `layerling_export_section_svg` | Restituisce in formato SVG, in scala 1:1, i contorni sul piano di sezione, usando gli stessi corpi dell’esportazione. |

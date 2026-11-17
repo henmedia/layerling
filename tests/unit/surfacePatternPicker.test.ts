@@ -12,7 +12,7 @@ import { SURFACE_TEXTURE_PATTERNS, type SurfaceTexturePattern } from "@/lib/surf
 
 /**
  * The surface texture's pattern, chosen by its picture: a field with the chosen one, and a grid of all of them with a
- * search above. Eighteen names alone are hard to tell apart.
+ * search above. Twenty names alone are hard to tell apart.
  */
 describe("the surface pattern picker", () => {
   let container: HTMLDivElement | null = null;
@@ -65,6 +65,22 @@ describe("the surface pattern picker", () => {
     key(search()!, "Enter");
     expect(chosen).toEqual(["bricks"]);
     expect(container!.querySelector(".pattern-picker-popover")).toBeNull();
+  });
+
+  it("finds the patterns for model buildings by their everyday names", () => {
+    setLanguage("de");
+    mount("grooves");
+    act(() => trigger().click());
+    type(search()!, "fachwerk");
+    expect(tiles().map((tile) => tile.textContent)).toEqual(["Fachwerk"]);
+    type(search()!, "mauer");
+    expect(tiles().map((tile) => tile.textContent)).toEqual(["Natursteinmauer"]);
+    setLanguage("en");
+    type(search()!, "timber");
+    expect(tiles().map((tile) => tile.textContent)).toEqual(["Half-timbering"]);
+    type(search()!, "stone");
+    expect(tiles().map((tile) => tile.textContent)).toEqual(["Stone wall"]);
+    expect(tiles()[0].querySelector("img")?.getAttribute("src")).toBe("assets/editor/surface-patterns/stones.png");
   });
 
   it("says so when no pattern has the name searched for, and Enter takes nothing", () => {

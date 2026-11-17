@@ -15,7 +15,7 @@ Le champ en haut de la fenêtre cherche dans la liste : il ne garde que les racc
 
 Vous ne trouvez pas d'outil ? Appuyez sur [[Ctrl]]+[[K]] ou cliquez sur la loupe dans la zone {{ui:editor.group.help}}, puis tapez ce que vous recherchez : un outil ("congé", "miroir"), une forme ("cylindre") ou une commande ("exporter", "annuler"). Déplacez-vous avec les touches fléchées et appuyez sur [[Enter]], ou cliquez sur l'entrée.
 
-- La recherche comprend aussi bien le mot anglais que le mot allemand et ignore les majuscules et les trémas : "aushoehlen" trouve {{ui:editor.tool.hollow}}.
+- La recherche comprend aussi bien le mot anglais que le mot allemand et ignore les majuscules et les trémas : "aushoehlen" trouve {{ui:editor.tool.hollow}}. La recherche fonctionne avec toutes les écritures : un nom se trouve tel qu'il est écrit dans la langue de l'interface (« 円柱 » en japonais). Les caractères pleine chasse et demi-chasse, le katakana et le hiragana ainsi que les accents comptent pour identiques.
 - Chaque entrée affiche les touches qui font la même chose et le groupe du ruban dans lequel elle se trouve, afin que vous sachiez où elle se trouve.
 - Les entrées grisées ne peuvent pas être exécutées pour le moment, principalement parce que rien n'est sélectionné. Ils restent dans la liste afin que la recherche vous indique toujours où se trouve l'outil.
 
@@ -23,7 +23,23 @@ Le guide que vous lisez dispose également d'un champ de recherche, en haut de c
 - Le nom d'une forme ajoute cette forme au plan de travail, tout comme si vous cliquez dessus dans le menu des formes.
 - Avec un champ vide, la recherche répertorie les commandes que vous avez utilisées en dernier en haut.
 - Le nom d'un corps dans votre conception trouve ce corps et le sélectionne, ce qui facilite une conception comportant de nombreuses pièces. Les corps n'apparaissent qu'une fois que vous tapez.
+- Une forme personnalisée que vous avez enregistrée se trouve aussi par son nom dès que vous tapez, et un clic l'insère dans le motif comme dans le panneau des formes.
 - Cela fonctionne également en mode esquisse, avec les outils d'esquisse.
+
+## Vos propres touches
+
+Toute commande de la recherche de commandes peut aller sur une touche de votre choix : un outil que vous utilisez sans cesse, une forme, {{ui:editor.tool.centerOnWorkplane}} ou {{ui:palette.openShapes}}.
+
+1. Ouvrez {{ui:editor.keyboardShortcuts}} et cliquez sur {{ui:customKeys.add}} sous {{ui:customKeys.title}}, en haut de la fenêtre.
+2. Tapez quelques lettres de la commande et cliquez dessus, ou appuyez sur [[Enter]] pour la première.
+3. Appuyez sur la touche voulue, seule ou avec [[Ctrl]], [[Alt]] ou [[Shift]]. Les lettres, les chiffres et F1 à F12 peuvent porter une commande.
+
+Une touche que l’éditeur utilise déjà, une que le navigateur garde pour lui (comme [[Ctrl]]+[[W]]) ou une de vos propres touches est refusée, et la fenêtre dit à quoi elle sert. Cliquez sur une touche de la liste pour la changer, sur le X à côté pour la retirer, ou sur {{ui:customKeys.removeAll}} pour repartir de zéro.
+
+- La touche lance la commande exactement comme la recherche de commandes. Si elle ne peut pas s’exécuter pour le moment, le plus souvent parce que rien n’est sélectionné, la barre d’état le dit.
+- Vos touches apparaissent à côté de leurs commandes dans la recherche de commandes et sur la liste imprimée.
+- Elles restent dans ce navigateur, comme le thème. Une touche pour un outil d’esquisse marche en mode esquisse, une pour l’éditeur 3D en dehors.
+- Pendant que vous tapez dans un champ, vos touches s’effacent comme toutes les autres.
 
 ## Aide interactive
 

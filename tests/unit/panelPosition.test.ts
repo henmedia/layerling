@@ -32,6 +32,16 @@ describe("where a moved panel may sit", () => {
   it("lands on whole pixels", () => {
     expect(clampPanelPosition({ left: 120.6, top: 80.2 }, panel, area)).toEqual({ left: 121, top: 80 });
   });
+
+  // The shape library moves in the whole editor, and the toolbar lies over its top (#1418).
+  it("stays below a bar over the top of the area, where its title bar can be grabbed", () => {
+    expect(clampPanelPosition({ left: 283, top: 0 }, panel, area, 121)).toEqual({ left: 283, top: 121 });
+    expect(clampPanelPosition({ left: 283, top: 300 }, panel, area, 121)).toEqual({ left: 283, top: 300 });
+  });
+
+  it("keeps below the bar even in an area too low for the title bar under it", () => {
+    expect(clampPanelPosition({ left: 0, top: 400 }, panel, { width: 1000, height: 150 }, 121).top).toBe(121);
+  });
 });
 
 describe("a remembered panel position", () => {

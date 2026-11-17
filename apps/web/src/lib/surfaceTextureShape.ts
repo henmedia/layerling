@@ -22,6 +22,7 @@ import {
   SURFACE_TEXTURE_MAX_MASK_PLANES,
   type SurfaceTextureCarbonWeave,
   type SurfaceTextureBrickBond,
+  type SurfaceTextureTimberBracing,
   type SurfaceTextureBarkType,
   type SurfaceTextureCrackStart,
   type SurfaceTextureCrackStyle,
@@ -143,6 +144,8 @@ export const SURFACE_TEXTURE_LABELS: {
   carbonWeaveHint: Record<SurfaceTextureCarbonWeave, MessageKey>;
   brickBond: Record<SurfaceTextureBrickBond, MessageKey>;
   brickBondHint: Record<SurfaceTextureBrickBond, MessageKey>;
+  timberBracing: Record<SurfaceTextureTimberBracing, MessageKey>;
+  timberBracingHint: Record<SurfaceTextureTimberBracing, MessageKey>;
   barkType: Record<SurfaceTextureBarkType, MessageKey>;
   barkTypeHint: Record<SurfaceTextureBarkType, MessageKey>;
   woodType: Record<SurfaceTextureWoodType, MessageKey>;
@@ -161,6 +164,8 @@ export const SURFACE_TEXTURE_LABELS: {
     bumps: "surfaceTexture.bumps",
     cells: "surfaceTexture.cells",
     bricks: "surfaceTexture.bricks",
+    timber: "surfaceTexture.timber",
+    stones: "surfaceTexture.stones",
     squares: "surfaceTexture.squares",
     triangles: "surfaceTexture.triangles",
     knit: "surfaceTexture.knit",
@@ -199,6 +204,14 @@ export const SURFACE_TEXTURE_LABELS: {
     english: "surfaceTexture.bondEnglishHint",
     englishCross: "surfaceTexture.bondEnglishCrossHint",
     flemish: "surfaceTexture.bondFlemishHint",
+  },
+  timberBracing: { none: "surfaceTexture.timberNone", braces: "surfaceTexture.timberBraces", cross: "surfaceTexture.timberCross", knee: "surfaceTexture.timberKnee", mixed: "surfaceTexture.timberMixed" },
+  timberBracingHint: {
+    none: "surfaceTexture.timberNoneHint",
+    braces: "surfaceTexture.timberBracesHint",
+    cross: "surfaceTexture.timberCrossHint",
+    knee: "surfaceTexture.timberKneeHint",
+    mixed: "surfaceTexture.timberMixedHint",
   },
   barkType: { oak: "surfaceTexture.barkOak", pine: "surfaceTexture.barkPine", spruce: "surfaceTexture.barkSpruce", birch: "surfaceTexture.barkBirch", beech: "surfaceTexture.barkBeech" },
   barkTypeHint: {
@@ -362,8 +375,11 @@ export function textureSurfacePositions(positions: Float64Array, settings: Surfa
 /**
  * The layers of a body's texture as they are made (WorkplaneShape.surfaceTextureLayers): the first as it is, but one that
  * picks no faces of its own leaves out the faces the others take; every further layer goes only on its own picked faces
- * (one with none is left out, it would cover the first). They are made one after the other on the same body, each on
- * the triangles the one before left, so a face keeps the pattern of the layer it belongs to.
+ * or in the region drawn for it (one with neither is left out, it would cover the first). They are made one after the
+ * other on the same body, each on the triangles the one before left, so a face keeps the pattern of the layer it belongs
+ * to. Regions share a face (Discussion #1579): every layer leaves the regions of the layers after it smooth, so where
+ * two overlap the later one's pattern goes, and the faces round them keep the first layer's - or stay smooth, when the
+ * first has a region of its own.
  */
 export function surfaceTextureLayersToMake(first: SurfaceTextureSettings, more: readonly SurfaceTextureSettings[]) {
   // The pattern as a part of its own is the first layer's choice for all of them, when they all go one way.
@@ -371,7 +387,11 @@ export function surfaceTextureLayersToMake(first: SurfaceTextureSettings, more: 
   const others = more.filter(surfaceTextureLayerPlaced).map((layer) => (layer.patternPart === patternPart ? layer : { ...layer, patternPart }));
   const taken = others.flatMap((layer) => layer.faces);
   const lead = normalizeSurfaceTexture({ ...first, exceptFaces: first.faces.length ? [] : taken, patternPart });
-  return [lead, ...others];
+  const all = [lead, ...others];
+  return all.map((layer, index) => {
+    const later = all.slice(index + 1).flatMap((other) => (other.region ? [other.region] : []));
+    return later.length || layer.exceptRegions.length ? { ...layer, exceptRegions: later } : layer;
+  });
 }
 
 /**
@@ -388,6 +408,7 @@ export function mergedSurfaceTextureStats(all: readonly SurfaceTextureOutcome["s
     image: all.find((stats) => stats.image)?.image ?? last.image,
     bricks: all.find((stats) => stats.bricks)?.bricks ?? last.bricks,
     tiles: all.find((stats) => stats.tiles)?.tiles ?? last.tiles,
+    timber: all.find((stats) => stats.timber)?.timber ?? last.timber,
     limited: all.some((stats) => stats.limited),
     tooDeep: all.some((stats) => stats.tooDeep),
     nothing: all.every((stats) => stats.nothing),
@@ -407,9 +428,12 @@ export function mergedSurfaceTextureFill(all: readonly (Float64Array | null)[]):
   return out;
 }
 
-/** Whether a further layer has a place of its own: faces picked for it, or a text or an image once, which go where they are put. */
+/**
+ * Whether a further layer has a place of its own: faces picked for it, a region drawn for it, or a text or an image once,
+ * which go where they are put.
+ */
 export function surfaceTextureLayerPlaced(layer: SurfaceTextureSettings) {
-  return layer.faces.length > 0 || stuckOn(layer);
+  return layer.faces.length > 0 || layer.region !== null || stuckOn(layer);
 }
 
 /** What several layers made, as one outcome: the last one's body, the stats together, the gold and the pattern parts each in one. */
@@ -524,9 +548,9 @@ export function sceneWithSurfaceBody(shapes: readonly WorkplaneShape[], id: stri
  */
 export function surfaceTexturedShape(shape: WorkplaneShape, positions: ArrayLike<number>, settings: SurfaceTextureSettings, createdAt = Date.now(), layers: readonly SurfaceTextureSettings[] = []): WorkplaneShape | null {
   if (positions.length < 9) return null;
-  // The first layer keeps what it was given: the faces it leaves to the others are worked out anew each time.
-  const normalized = normalizeSurfaceTexture({ ...settings, exceptFaces: [] });
-  const more = layers.filter(surfaceTextureLayerPlaced).map((layer) => normalizeSurfaceTexture(layer));
+  // The first layer keeps what it was given: the faces and regions it leaves to the others are worked out anew each time.
+  const normalized = normalizeSurfaceTexture({ ...settings, exceptFaces: [], exceptRegions: [] });
+  const more = layers.filter(surfaceTextureLayerPlaced).map((layer) => normalizeSurfaceTexture({ ...layer, exceptRegions: [] }));
   const textured = canonicalizeShape({
     id: shape.id,
     name: shape.name,
@@ -576,8 +600,8 @@ export function surfacePatternBundle(
   createdAt = Date.now(),
   layers: readonly SurfaceTextureSettings[] = [],
 ): WorkplaneShape | null {
-  const normalized = normalizeSurfaceTexture({ ...settings, exceptFaces: [] });
-  const more = layers.filter(surfaceTextureLayerPlaced).map((layer) => normalizeSurfaceTexture(layer));
+  const normalized = normalizeSurfaceTexture({ ...settings, exceptFaces: [], exceptRegions: [] });
+  const more = layers.filter(surfaceTextureLayerPlaced).map((layer) => normalizeSurfaceTexture({ ...layer, exceptRegions: [] }));
   const way = surfacePatternPartWay(normalized, more);
   if (!way || shape.hole || positions.length < 9 || part.length < 9) return null;
   // The body: raised, the very body as it was (still a box, still its own settings); cut in, the textured mesh.

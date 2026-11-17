@@ -1,6 +1,6 @@
 import manifoldModule from "manifold-3d";
 import { beforeAll, describe, expect, it } from "vitest";
-import { importedMeshFootprint, shapeMeshFootprint } from "@/components/SketchWorkspace";
+import { importedMeshFootprint, referenceShapeTurn, shapeMeshFootprint } from "@/components/SketchWorkspace";
 import { sketchReferenceShapeOnWorkplane } from "@/lib/editorSketchCad";
 import { meshForShape } from "@/lib/editorMeshCore";
 import { rememberManifoldRuntime } from "@/lib/manifoldHandle";
@@ -190,5 +190,25 @@ describe("an imported mesh under a sketch is shown as it is seen from above (Dis
     // One triangle of the cap's top left out: open, so no outline from above; the stem's bottom, as before.
     const open = [...box(-1, 1, 0, 5, -1, 1), ...box(-5, 5, 5, 7, -5, 5).slice(0, -9)];
     expect(extent(importedMeshFootprint(imported(open))?.outlineD ?? null)).toEqual([19, 21, 9, 11]);
+  });
+});
+
+describe("a turned box under a sketch is turned the way it stands (Issue #1734)", () => {
+  // SVG's rotate(degrees) with y pointing down, as the sketch draws a box or a round body underneath.
+  const svgTurn = (x: number, z: number, degrees: number) => {
+    const angle = (degrees * Math.PI) / 180;
+    return [x * Math.cos(angle) - z * Math.sin(angle), x * Math.sin(angle) + z * Math.cos(angle)];
+  };
+
+  it("puts the far end of a box at 45° where its mesh has it, not mirrored", () => {
+    const box = shape({ kind: "box", x: 0, z: 0, width: 100, depth: 10, height: 5, rotation: 45 });
+    const vertices = meshForShape(box).vertices;
+    const far = vertices.reduce((best, vertex) => (vertex[0] > best[0] ? vertex : best));
+    const drawn = [svgTurn(50, -5, referenceShapeTurn(box)), svgTurn(50, 5, referenceShapeTurn(box))]
+      .reduce((best, point) => (point[0] > best[0] ? point : best));
+    expect(drawn[0]).toBeCloseTo(far[0], 4);
+    expect(drawn[1]).toBeCloseTo(far[2], 4);
+    // The far end lies behind the middle, up the screen: the bar runs like "/", as in the view.
+    expect(drawn[1]).toBeLessThan(0);
   });
 });

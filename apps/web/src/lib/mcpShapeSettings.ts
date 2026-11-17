@@ -1,7 +1,9 @@
 import type { ThreadProfile, WorkplaneShape } from "@/types/layerling";
 import { isThreadProfile } from "@/lib/threadProfiles";
 import { normalizeHexColor } from "@/lib/coloredImport";
-import { GRIDFINITY_PADDING_KEYS, gridfinityLabelTextPatch, gridfinityListPatch, gridfinityOutlineFit, gridfinityOutlineLimit, gridfinityOutlineNeedsLargePlate, gridfinityOutlineRemovalPatch, gridfinityPaddingPatch, gridfinityPlateToWorld, gridfinityShapePatch, normalizeGridfinityOutline, normalizeGridfinityType, type GridfinityWall } from "@/lib/gridfinityGeometry";
+import { holdsShapeLock } from "@/lib/shapeLock";
+import { GRIDFINITY_OVERHANG_KEYS, GRIDFINITY_PADDING_KEYS, gridfinityLabelTextPatch, gridfinityListPatch, gridfinityOverhangPatch, gridfinityOutlineFit, gridfinityOutlineLimit, gridfinityOutlineNeedsLargePlate, gridfinityOutlineRemovalPatch, gridfinityPaddingPatch, gridfinityPlateSplit, gridfinityPlateToWorld, gridfinityShapePatch, normalizeGridfinityOutline, normalizeGridfinityType, type GridfinityWall } from "@/lib/gridfinityGeometry";
+import { resizedShapeSize, shapeLocalOffset } from "@/lib/workplaneShapes";
 import { normalizeThreadProfile, THREAD_SIZES, threadSettings, threadSizeById, threadSizeFor, threadSizeSettings, threadStandardSize } from "@/lib/threadGeometry";
 
 /**
@@ -28,26 +30,26 @@ export const MCP_SHAPE_SETTING_KEYS = [
   "topRadius", "baseRadius", "curvedConeTop", "curvedConeBend", "topWidth", "topDepth",
   "screwBossFastener", "screwBossSize", "screwBossHole", "screwBossHoleDepth", "screwBossDiameter", "screwBossGussets", "screwBossGussetHeight", "screwBossGussetThickness", "snapFitPart", "snapFitThickness", "snapFitUndercut", "snapFitClearance", "snapFitLeadAngle", "snapFitRetainAngle", "snapFitFoot", "ribStyle", "ribTop", "ribFoot", "ribThickness", "ribFootThickness", "ribFootShape",
   "taperTopWidth", "taperTopDepth", "taperBottomWidth", "taperBottomDepth",
-  "extrudeTwist", "extrudeTopOffsetX", "extrudeTopOffsetZ", "slopeEnd", "slopeSide", "slopeCurve", "narrowEnd", "narrowSide", "narrowCurve", "narrowStart",
-  "teeth", "toothSize", "toothWidth", "centerHoleSize", "hirthSteepFlank", "hirthReverse", "pulleyBeltWidth", "pulleyFlange", "pulleyFlangeRise", "pulleyHubHeight", "pulleyHubDiameter", "gearType", "helixAngle", "bevelHelixAngle", "helixQuality", "gearProfile", "gearPressureAngle", "gearBacklash", "gearRim",
+  "extrudeTwist", "extrudeTopOffsetX", "extrudeTopOffsetZ", "slopeEnd", "slopeSide", "slopeCurve", "slopeFrom", "sideDrop", "sideCurve", "narrowEnd", "narrowSide", "narrowCurve", "narrowStart",
+  "teeth", "toothSize", "toothWidth", "centerHoleSize", "hirthSteepFlank", "hirthReverse", "pulleyBeltWidth", "pulleyFlange", "pulleyFlangeRise", "pulleyHubHeight", "pulleyHubDiameter", "gearType", "helixAngle", "bevelHelixAngle", "ringRackHelixAngle", "ringRackHerringbone", "helixQuality", "gearProfile", "gearPressureAngle", "gearBacklash", "gearRim",
   "threadRole", "threadHead", "threadHand", "threadProfile", "threadTaper", "threadDiameter", "threadPitch",
   "threadClearance", "threadBoltClearance", "threadAxialClearance", "threadStarts", "threadDepth", "threadFlankAngle", "threadQuality", "threadHeadHeight", "threadChamfer", "threadChamferBottom",
   "threadHeadChamfer", "threadHeadDiameter", "threadDrive", "threadDriveSize", "threadDriveDepth", "threadCollarHeight", "threadCollarDiameter",
   "springTurns", "springWire", "springQuality", "springHand", "springForm", "springPattern", "springEnds",
   "starPoints", "starInnerSize", "starOuterFillet", "starInnerFillet", "starQuality",
   "heartTipFillet", "heartQuality",
-  "crescentThickness", "crescentTipFillet", "crescentQuality",
-  "tubeBoreHole", "hingeKnuckles", "hingeKnuckleWidth", "hingeStyle", "hingeConeSize", "hingePinDiameter", "hingeLeafThickness", "hingeClearance", "hingePinless", "hingeAngle", "hingeScrewHoles", "hingeScrewDiameter", "hingeScrewSpacing", "hingeScrewAcross", "hingeScrewCountersink", "hingeCornerRadius", "hingeLeafStyle", "hingeScrewHead", "hingeNutWidth",
+  "crescentThickness", "crescentTipFillet", "crescentQuality", "sectorAngle", "sectorInnerDiameter", "sectorEndRadius",
+  "tubeBoreHole", "hingeKnuckles", "hingeKnuckleWidth", "hingeStyle", "hingeConeSize", "hingeSnapGrip", "hingePinDiameter", "hingeLeafThickness", "hingeClearance", "hingePinless", "hingeAngle", "hingeScrewHoles", "hingeScrewDiameter", "hingeScrewSpacing", "hingeScrewAcross", "hingeScrewCountersink", "hingeCornerRadius", "hingeLeafStyle", "hingeScrewHead", "hingeNutWidth",
   "gridfinityType", "gridfinityLip", "gridfinityMagnets", "gridfinityHalfGrid", "gridfinityLargePlate", "gridfinitySwallowtail", "gridfinitySwallowtailClearance",
   "gridfinityLabelBack", "gridfinityLabelFront", "gridfinityLabelLeft", "gridfinityLabelRight", "gridfinityLabelBackWidth", "gridfinityLabelBackLength", "gridfinityLabelBackOffset", "gridfinityLabelFrontWidth", "gridfinityLabelFrontLength", "gridfinityLabelFrontOffset", "gridfinityLabelLeftWidth", "gridfinityLabelLeftLength", "gridfinityLabelLeftOffset", "gridfinityLabelRightWidth", "gridfinityLabelRightLength", "gridfinityLabelRightOffset", "gridfinityLabelCorner", "gridfinityLabelCornerSize",
   "gridfinityLabelBackText", "gridfinityLabelFrontText", "gridfinityLabelLeftText", "gridfinityLabelRightText", "gridfinityLabelFont", "gridfinityLabelColor", "gridfinityLabelTextSize",
-  "gridfinityScoopBack", "gridfinityScoopFront", "gridfinityScoopLeft", "gridfinityScoopRight", "gridfinityScoopRadius", "gridfinityFloorHeight", "gridfinityOpenBack", "gridfinityOpenFront", "gridfinityOpenLeft", "gridfinityOpenRight", "gridfinityLipChamfer", "gridfinityWallThickness", "gridfinityPaddingBack", "gridfinityPaddingFront", "gridfinityPaddingLeft", "gridfinityPaddingRight", "gridfinityCornerRadius", "gridfinityBinCornerRadius",
-  "gridfinityCompartmentsX", "gridfinityCompartmentsZ", "gridfinityDividerThickness", "gridfinityDividerPositionsX", "gridfinityDividerPositionsZ", "gridfinityCompartmentLabels", "gridfinityOpenings", "gridfinityOpeningCorner", "gridfinityOpeningCornerSize", "gridfinityOutline",
+  "gridfinityScoopBack", "gridfinityScoopFront", "gridfinityScoopLeft", "gridfinityScoopRight", "gridfinityScoopRadius", "gridfinityFloorHeight", "gridfinityOpenBack", "gridfinityOpenFront", "gridfinityOpenLeft", "gridfinityOpenRight", "gridfinityLipChamfer", "gridfinityWallThickness", "gridfinityPaddingBack", "gridfinityPaddingFront", "gridfinityPaddingLeft", "gridfinityPaddingRight", "gridfinityOverhangBack", "gridfinityOverhangFront", "gridfinityOverhangLeft", "gridfinityOverhangRight", "gridfinityOverhangChamfer", "gridfinityOverhangSolid", "gridfinityOverhangLipOnGrid", "gridfinityCornerRadius", "gridfinityBinCornerRadius",
+  "gridfinityCompartmentsX", "gridfinityCompartmentsZ", "gridfinityDividerThickness", "gridfinityDividerHeight", "gridfinityDividerPositionsX", "gridfinityDividerPositionsZ", "gridfinityCompartmentLabels", "gridfinityOpenings", "gridfinityOpeningCorner", "gridfinityOpeningCornerSize", "gridfinityOutline",
   "knurlPattern", "knurlCount", "knurlDepth", "knurlAngle", "knurlChamfer",
   "dovetailNeckWidth", "dovetailClearance",
-  "loftBottomOutline", "loftTopOutline", "loftBottomWidth", "loftBottomDepth", "loftTopWidth", "loftTopDepth", "loftBottomCorner", "loftTopCorner", "loftBottomSides", "loftTopSides", "loftOffsetX", "loftOffsetZ", "loftWall", "loftTwist", "loftTiltX", "loftTiltZ", "loftSmooth", "loftSegments", "loftSections", "loftThrough", "slotEndRatio", "torusTubeRatio",
-  "screwHoleShaft", "screwHoleHeadDepth", "screwHoleAngle", "drillPointAngle", "portProfile", "portClearance",
-  "cornerFillet", "topBottomFillet", "roundedBoxQuality",
+  "loftBottomOutline", "loftTopOutline", "loftBottomWidth", "loftBottomDepth", "loftTopWidth", "loftTopDepth", "loftBottomCorner", "loftTopCorner", "loftBottomSides", "loftTopSides", "loftOffsetX", "loftOffsetZ", "loftWall", "loftTopWall", "loftTwist", "loftTiltX", "loftTiltZ", "loftSmooth", "loftSegments", "loftSections", "loftThrough", "slotEndRatio", "torusTubeRatio",
+  "screwHoleShaft", "screwHoleHeadDepth", "screwHoleAngle", "drillPointAngle", "screwHoleSlot", "screwHoleRecess", "screwHoleChamfer", "portProfile", "portClearance",
+  "cornerFillet", "topBottomFillet", "bottomFillet", "roundedBoxQuality",
   "bentTubeProfile", "bentTubeInnerProfile", "bentTubeSize", "bentTubeWall", "bentTubeQuality", "bentTubeSegments",
   "vase",
   "text", "font",
@@ -132,6 +134,27 @@ export function mcpGridfinityPaddingPatch(target: WorkplaneShape, patch: Partial
 }
 
 /**
+ * What an update writes for a bin given an overhang, as the settings panel writes it: the box of the same units with
+ * the new overhang, and the bin moved by half the change in its own turned frame, so its feet stay where they are.
+ * Nothing for anything but a bin, nor for an overhang that is no number; a size given is the whole bin on its axis.
+ */
+export function mcpGridfinityOverhangPatch(target: WorkplaneShape, patch: Partial<WorkplaneShape>, params: Record<string, unknown>): Partial<WorkplaneShape> {
+  if (target.kind !== "gridfinity") return {};
+  if (normalizeGridfinityType(patch.gridfinityType ?? target.gridfinityType) !== "bin" || normalizeGridfinityType(target.gridfinityType) !== "bin") return {};
+  const number = (value: unknown) => typeof value === "number" && Number.isFinite(value);
+  const given = (Object.keys(GRIDFINITY_OVERHANG_KEYS) as GridfinityWall[]).filter((wall) => number(params[GRIDFINITY_OVERHANG_KEYS[wall]]));
+  if (!given.length) return {};
+  const overhang = gridfinityOverhangPatch(target, Object.fromEntries(given.map((wall) => [wall, params[GRIDFINITY_OVERHANG_KEYS[wall]]])));
+  const move = shapeLocalOffset(target, overhang.shift.x, overhang.shift.z);
+  const sized: Partial<WorkplaneShape> = { width: overhang.width, depth: overhang.depth, size: resizedShapeSize(overhang.width, overhang.depth), x: target.x + move.x, z: target.z + move.z };
+  if (number(params.width)) delete sized.width;
+  if (number(params.depth)) delete sized.depth;
+  if (number(params.x)) delete sized.x;
+  if (number(params.z)) delete sized.z;
+  return sized;
+}
+
+/**
  * What a create or update writes for a baseplate given an outline (#1061), its points in the plate's own frame as
  * points or as the text layerling_read_scene gives: the outline centred, its box, and the plate moved to its middle;
  * an empty list takes the outline away, and so does a change of type, as in the editor. Refused for anything but a
@@ -155,6 +178,20 @@ export function mcpGridfinityOutlinePatch(shape: WorkplaneShape, params: Record<
   }
   const place = gridfinityPlateToWorld(fit.centre, shape);
   return { ...fit.patch, x: place.x, z: place.z };
+}
+
+export const MCP_GRIDFINITY_SPLIT_NEEDS = "gridfinitySplit needs a Gridfinity baseplate (not a hole) of whole units (not fitted to an outline), lying flat, larger than the bed of the printer chosen in the design's workspace settings, whose single cells, with their padding, fit it";
+export const MCP_GRIDFINITY_SPLIT_ALONE = "gridfinitySplit goes without gridfinityKeys and without locking the plate: the split lays out its own keys, and a locked plate is not split";
+
+/**
+ * Refuses update_object's gridfinitySplit (#1388) before anything changes, for the plate as the call leaves it: asked for
+ * together with gridfinityKeys, on a locked or shape-locked plate, or when `bed`, the chosen printer's, gives the plate no
+ * split.
+ */
+export function mcpGridfinitySplitCheck(shape: WorkplaneShape, params: Record<string, unknown>, bed: { width: number; depth: number; round?: boolean } | null) {
+  if (params.gridfinitySplit !== true) return;
+  if (params.gridfinityKeys === true || shape.locked || holdsShapeLock(shape)) throw new Error(MCP_GRIDFINITY_SPLIT_ALONE);
+  if (!gridfinityPlateSplit(shape, bed)) throw new Error(MCP_GRIDFINITY_SPLIT_NEEDS);
 }
 
 /**

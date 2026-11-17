@@ -167,7 +167,8 @@ export function renderInline(text, context) {
     return `\u0000${spans.length - 1}\u0000`;
   });
   work = escapeHtml(work);
-  const [open, close] = GUIDE_LANGUAGES[context.language].quotes;
+  // A card's title names its tool on its own, so it goes without the quotation marks a name in a sentence gets.
+  const [open, close] = context.bareNames ? ["", ""] : GUIDE_LANGUAGES[context.language].quotes;
   // {{ui:key|10}} fills the {count} of a sentence that counts something, so "{count} grid steps" reads "10 grid steps".
   work = work.replace(/\{\{ui:([A-Za-z0-9_.-]+)(?:\|(\d+))?\}\}/g, (_, key, count) => {
     const label = context.messages?.[key];
@@ -216,10 +217,53 @@ function renderTable(rows, context) {
 }
 
 /**
+ * A card: one tool, or one thing to do, with what to do one step to a line (#1322).
+ *
+ *     ::: icon=line {{ui:sketch.line}} | [[1]]
+ *     Click points one after another.
+ *     => The length and angle of the new line show at the pointer.
+ *     > A tip that belongs to this tool.
+ *     :::
+ *
+ * The head is the title, after `icon=NAME` the picture the toolbar shows for that tool (the names of
+ * sketchReferenceIcons in SecondaryToolbar.tsx, handed in as `context.toolIcons`), and after a bar
+ * what goes on the right, such as its key. Every line of the body is one step; `=>` marks what
+ * happens then, `>` a tip. A line indented by two spaces carries on the one above it.
+ */
+export function renderCard(head, body, context) {
+  const parts = /^:::\s*(?:icon=([\w-]+)\s+)?(.+?)\s*$/.exec(head);
+  if (!parts) throw new Error(`A card needs a title: "${head}"`);
+  const [, icon, heading] = parts;
+  const [title, aside] = heading.split(/\s+\|\s+/);
+  let picture = "";
+  if (icon) {
+    const file = context.toolIcons?.[icon];
+    if (!file) throw new Error(`Unknown tool picture icon=${icon}`);
+    picture = `<span class="card-icon"><img src="/assets/editor/${file}" alt="" width="30" height="30" loading="lazy"></span>`;
+  }
+  const items = [];
+  for (const line of body) {
+    if (!line.trim()) continue;
+    if (/^ {2,}\S/.test(line) && items.length) {
+      items[items.length - 1].text += ` ${line.trim()}`;
+      continue;
+    }
+    const text = line.trim();
+    const result = /^=>\s*(.*)$/.exec(text);
+    const tip = /^>\s?(.*)$/.exec(text);
+    items.push(result ? { kind: "result", text: result[1] } : tip ? { kind: "tip", text: tip[1] } : { kind: "step", text: text.replace(/^[-*]\s+/, "") });
+  }
+  if (!items.length) throw new Error(`The card "${head}" is empty`);
+  const steps = items.map((item) => `<li class="${item.kind}">${renderInline(item.text, context)}</li>`).join("");
+  const keys = aside ? `<span class="card-keys">${renderInline(aside, context)}</span>` : "";
+  return `<div class="tool-card${icon ? "" : " no-icon"}"><div class="card-head">${picture}<span class="card-title">${renderInline(title, { ...context, bareNames: true })}</span>${keys}</div><ul class="card-steps">${steps}</ul></div>`;
+}
+
+/**
  * Block level. Understands headings, paragraphs, lists, block quotes (used for
  * tips), tables, fenced code, rules and pictures written as ![text](shot:name),
  * or ![text](still:name) for one taken by hand that no scene retakes (a window
- * outside layerling, say).
+ * outside layerling, say), and cards between ::: lines (see renderCard).
  * Returns the HTML and the h2 headings for the page's own table of contents.
  */
 /** The ids the headings of a chapter get, in order: what slugify makes of each, outside code blocks. */
@@ -286,7 +330,7 @@ export function renderBlocks(markdown, context) {
   let index = 0;
   // Counted across the tips rendered inside this chapter as well, as headingIds counts them.
   context.headingCount ??= { value: 0 };
-  const startsBlock = (line) => /^(#{1,3} |> ?|\s*[-*] |\s*\d+\. |```|---+$|\|)/.test(line) || /^!\[[^\]]*\]\((?:shot|still):/.test(line);
+  const startsBlock = (line) => /^(#{1,3} |> ?|\s*[-*] |\s*\d+\. |```|---+$|\||:::)/.test(line) || /^!\[[^\]]*\]\((?:shot|still):/.test(line);
 
   while (index < lines.length) {
     const line = lines[index];
@@ -319,6 +363,21 @@ export function renderBlocks(markdown, context) {
     if (/^\{\{shortcuts\}\}\s*$/.test(line)) {
       html.push(context.shortcutsHtml ?? "");
       index += 1;
+      continue;
+    }
+    if (/^:::/.test(line)) {
+      if (/^:::\s*$/.test(line)) throw new Error("A ::: that closes no card");
+      const head = line;
+      const body = [];
+      index += 1;
+      while (index < lines.length && !/^:::\s*$/.test(lines[index])) {
+        if (/^:::/.test(lines[index])) throw new Error(`A card inside a card: "${lines[index]}" (after "${head}")`);
+        body.push(lines[index]);
+        index += 1;
+      }
+      if (index >= lines.length) throw new Error(`The card "${head}" has no closing :::`);
+      index += 1;
+      html.push(renderCard(head, body, context));
       continue;
     }
 
@@ -372,6 +431,22 @@ export function renderBlocks(markdown, context) {
     html.push(`<p>${renderInline(paragraph.join(" "), context)}</p>`);
   }
   return { html: html.join("\n"), headings };
+}
+
+/**
+ * The pictures of the sketch tools, by name, as the toolbar shows them
+ * (sketchReferenceIcons in SecondaryToolbar.tsx): a card with icon=line shows
+ * the same picture as the button, and a picture that goes away stops the build.
+ */
+export async function readToolIcons() {
+  const source = await readFile(join(root, "apps", "web", "src", "components", "workplane", "SecondaryToolbar.tsx"), "utf8");
+  const table = /sketchReferenceIcons\s*=\s*\{([^}]*)\}/.exec(source);
+  if (!table) throw new Error("sketchReferenceIcons not found in SecondaryToolbar.tsx");
+  const icons = Object.fromEntries([...table[1].matchAll(/(\w+):\s*"([^"]+)"/g)].map((match) => [match[1], match[2]]));
+  for (const file of Object.values(icons)) {
+    if (!existsSync(join(publicDirectory, "assets", "editor", file))) throw new Error(`Tool picture ${file} is missing in apps/web/public/assets/editor`);
+  }
+  return icons;
 }
 
 /**
@@ -494,6 +569,28 @@ figure img { display: block; width: 100%; height: auto; border: 1px solid var(--
 figcaption { margin-top: 6px; color: var(--muted); font-size: 13.5px; }
 aside.tip { margin: 18px 0; padding: 12px 16px; border-radius: 8px; background: var(--tint); border: 1px solid var(--edge); }
 aside.tip > :last-child { margin-bottom: 0; }
+/* A card: one tool, one step to a line (#1322). The picture sits on a light tile in every theme, as the
+   toolbar button shows it; the steps line up under the tool's name. */
+.tool-card { margin: 12px 0; padding: 12px 16px 10px; border: 1px solid var(--edge); border-radius: 12px; background: var(--card); }
+.card-head { display: flex; align-items: center; gap: 12px; margin-bottom: 4px; }
+.card-icon { flex: none; display: grid; place-items: center; width: 40px; height: 40px; border-radius: 10px; background: #ffffff; border: 1px solid var(--edge); }
+.card-icon img { width: 30px; height: 30px; object-fit: contain; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .card-icon { background: #ece4d6; border-color: transparent; } }
+:root[data-theme="dark"] .card-icon { background: #ece4d6; border-color: transparent; }
+:root[data-theme="dark"][data-palette="graphite"] .card-icon { background: #e4e4e4; }
+.card-title { font-size: 17px; font-weight: 700; line-height: 1.35; }
+.card-title strong.ui { white-space: normal; }
+.card-keys { margin-inline-start: auto; color: var(--muted); font-size: 14px; white-space: nowrap; }
+.card-steps { list-style: none; margin: 0; padding: 0; }
+.tool-card:not(.no-icon) .card-steps { padding-inline-start: 52px; }
+.card-steps li { position: relative; margin: 0; padding: 3px 0; padding-inline-start: 20px; }
+.card-steps li.step::before { content: ""; position: absolute; inset-inline-start: 5px; top: 0.82em; width: 6px; height: 6px; border-radius: 50%; background: var(--muted); opacity: 0.6; }
+.card-steps li.result::before { content: "\\2192"; position: absolute; inset-inline-start: 0; top: 3px; color: var(--accent); font-weight: 700; }
+[dir="rtl"] .card-steps li.result::before { content: "\\2190"; }
+.card-steps li.result { color: var(--accent); }
+.card-steps li.result a { text-decoration: underline; }
+.card-steps li.tip { margin: 6px 0 4px; padding: 7px 12px; border-radius: 8px; background: var(--tint); font-size: 15px; }
+@media (max-width: 560px) { .tool-card:not(.no-icon) .card-steps { padding-inline-start: 0; } }
 .table-scroll { overflow-x: auto; margin: 0 0 16px; }
 table { border-collapse: collapse; font-size: 15px; min-width: 100%; }
 table.keys { table-layout: fixed; }
@@ -557,7 +654,7 @@ footer.note { max-width: 1100px; margin: 0 auto; padding: 0 16px 12px; color: va
   .shell { display: block; padding: 0; }
   main { max-width: none; }
   h2, h3, h4 { break-after: avoid; }
-  figure, table, pre, aside.tip { break-inside: avoid; }
+  figure, table, pre, aside.tip, .tool-card { break-inside: avoid; }
   figure img { max-height: 120mm; width: auto; max-width: 100%; }
   .print-all .site-footer, .print-all footer.note { display: none; }
   .print-chapter { margin-top: 0; padding-top: 0; border-top: 0; break-before: page; }
@@ -874,6 +971,7 @@ export function effectiveChapters(language, chaptersByLanguage) {
 export async function buildGuide({ log = console.log } = {}) {
   const result = { pages: [], warnings: [] };
   const shortcutGroups = await readShortcutGroups();
+  const toolIcons = await readToolIcons();
   const environment = await readEnvironment();
   const version = JSON.parse(await readFile(join(root, "package.json"), "utf8")).version;
   const chaptersByLanguage = {};
@@ -936,6 +1034,7 @@ export async function buildGuide({ log = console.log } = {}) {
         messages,
         values,
         shortcutsHtml,
+        toolIcons,
         imageSize: (name) => imageSizes.get(name) ?? null,
         imageSrc: (name) => (ownPictures.has(name) ? `/${strings.dir}/img/${name}.webp` : `/${GUIDE_LANGUAGES.en.dir}/img/${name}.webp`),
         references: { uiKeys: new Set(), shots: new Set(), chapters: new Set() },

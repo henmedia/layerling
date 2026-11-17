@@ -460,6 +460,18 @@ function touchingCurve(a: AnalyticSurface, b: AnalyticSurface, p: V3): AnalyticS
   return null;
 }
 
+/**
+ * How far a point may slide to the line a plane touches a cylinder along. A hull joins corners of polygons, so its
+ * corners lie up to half a polygon step round the cylinder from where its side really touches (#1442); that move is
+ * along both surfaces and changes nothing of the shape.
+ */
+function touchingSlide(a: AnalyticSurface, b: AnalyticSurface) {
+  const cyl = a.kind === "cylinder" ? a : b.kind === "cylinder" ? b : null;
+  const plane = a.kind === "plane" ? a : b.kind === "plane" ? b : null;
+  if (!cyl || !plane || Math.abs(dot(cyl.axis, plane.normal)) > 1e-6) return 0;
+  return cyl.radius * Math.sin((8 * Math.PI) / 180);
+}
+
 export function solveOnto(p: V3, given: AnalyticSurface[], tolerance: number, maxMove = tolerance * 20 + 1e-6): V3 | null {
   // Touching pairs are replaced by the curve they touch along, where it is known.
   let allSurfaces = given;
@@ -469,6 +481,7 @@ export function solveOnto(p: V3, given: AnalyticSurface[], tolerance: number, ma
     if (Math.abs(surfaceDistance(a, p)) > tolerance || Math.abs(surfaceDistance(b, p)) > tolerance) continue;
     const curve = touchingCurve(a, b, p);
     if (!curve) continue;
+    maxMove = Math.max(maxMove, touchingSlide(a, b));
     allSurfaces = [...allSurfaces.filter((_, k) => k !== i && k !== j), ...curve];
     i = -1;
     break;

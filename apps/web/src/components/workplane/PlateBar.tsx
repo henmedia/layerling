@@ -143,7 +143,7 @@ export function PlateBar({
           className="plate-bar-text"
           title={t("plates.arrangeHint")}
           disabled={disabled}
-          onClick={onArrange}
+          onClick={() => onArrange()}
         >
           <LayoutGrid size={16} strokeWidth={2.2} aria-hidden="true" />
           <span>{selectionCount > 0 ? t("plates.arrangeSelected", { count: selectionCount }) : t("plates.arrange")}</span>

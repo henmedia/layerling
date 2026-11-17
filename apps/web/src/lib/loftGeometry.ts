@@ -60,6 +60,8 @@ const MIN_LOFT_GAP = 0.01;
 export const LOFT_THROUGH_STEPS = 8;
 /** What a wall leaves at least of the opening, so the inner outline stays a real outline. */
 const MIN_LOFT_OPENING = 0.4;
+/** The thinnest wall at the top of a tube: thinner, the top rim would be no edge at all. */
+export const MIN_LOFT_TOP_WALL = 0.1;
 
 type Point = { x: number; z: number };
 
@@ -89,6 +91,12 @@ export type LoftMeasures = {
   offsetX: number;
   offsetZ: number;
   wall: number;
+  /**
+   * The wall at the top end (Forum 624069): a tube 3 mm thick on the rectangle and 1 mm on the round end. It follows
+   * the wall at the bottom until it is set apart; 0 with no wall, as the body is solid then. Sections between the
+   * ends take the wall evenly in between, by how high they stand.
+   */
+  topWall: number;
   /** Degrees the section turns from bottom to top about the vertical, evenly on the way up (#205). */
   twist: number;
   /** Degrees the top end tilts about the x axis (its front rising) and about the z axis (its right side rising). */
@@ -112,7 +120,7 @@ export type LoftMiddle = Required<LoftMiddleSection>;
 export type LoftShapeFields = Pick<WorkplaneShape,
   "width" | "depth" | "size" | "height"
   | "loftBottomOutline" | "loftTopOutline" | "loftBottomWidth" | "loftBottomDepth" | "loftTopWidth" | "loftTopDepth"
-  | "loftBottomCorner" | "loftTopCorner" | "loftBottomSides" | "loftTopSides" | "loftOffsetX" | "loftOffsetZ" | "loftWall"
+  | "loftBottomCorner" | "loftTopCorner" | "loftBottomSides" | "loftTopSides" | "loftOffsetX" | "loftOffsetZ" | "loftWall" | "loftTopWall"
   | "loftTwist" | "loftTiltX" | "loftTiltZ" | "loftSmooth" | "loftSegments" | "loftSections" | "loftThrough">;
 
 export function normalizeLoftOutline(value: unknown, fallback: LoftOutline = "round"): LoftOutline {
@@ -216,6 +224,10 @@ export function normalizeLoftMeasures(raw: Partial<LoftMeasures>): LoftMeasures 
   const topDepth = Math.max(MIN_LOFT_SIZE, finite(raw.topDepth, DEFAULT_LOFT.topDepth));
   const sizes = { bottomWidth, bottomDepth, topWidth, topDepth };
   const middles = normalizeLoftMiddles(raw.middles);
+  const wallLimit = maxLoftWall({ ...sizes, middles });
+  const wall = Math.min(wallLimit, Math.max(0, finite(raw.wall, 0)));
+  // Both walls stay under the same limit, so a section in between, whose wall lies between them, keeps its opening too.
+  const topWall = wall > 0 ? Math.min(wallLimit, Math.max(MIN_LOFT_TOP_WALL, finite(raw.topWall, wall))) : 0;
   return {
     bottomOutline: normalizeLoftOutline(raw.bottomOutline, DEFAULT_LOFT.bottomOutline),
     topOutline: normalizeLoftOutline(raw.topOutline, DEFAULT_LOFT.topOutline),
@@ -226,7 +238,8 @@ export function normalizeLoftMeasures(raw: Partial<LoftMeasures>): LoftMeasures 
     topSides: normalizeLoftSides(raw.topSides, DEFAULT_LOFT.topSides),
     offsetX: finite(raw.offsetX, 0),
     offsetZ: finite(raw.offsetZ, 0),
-    wall: Math.min(maxLoftWall({ ...sizes, middles }), Math.max(0, finite(raw.wall, 0))),
+    wall,
+    topWall,
     twist: Math.min(MAX_LOFT_TWIST, Math.max(-MAX_LOFT_TWIST, finite(raw.twist, 0))),
     tiltX: Math.min(MAX_LOFT_TILT, Math.max(-MAX_LOFT_TILT, finite(raw.tiltX, 0))),
     tiltZ: Math.min(MAX_LOFT_TILT, Math.max(-MAX_LOFT_TILT, finite(raw.tiltZ, 0))),
@@ -262,6 +275,7 @@ export function loftStoredMeasures(shape: LoftShapeFields): LoftMeasures {
     offsetX: shape.loftOffsetX,
     offsetZ: shape.loftOffsetZ,
     wall: shape.loftWall,
+    topWall: shape.loftTopWall,
     twist: shape.loftTwist,
     tiltX: shape.loftTiltX,
     tiltZ: shape.loftTiltZ,
@@ -335,7 +349,9 @@ export function loftFrameSize(measures: LoftMeasures) {
  */
 export function loftMeasuresPatch(shape: LoftShapeFields, change: Partial<LoftMeasures>) {
   const before = loftMeasures(shape);
-  const next = normalizeLoftMeasures({ ...before, ...change });
+  // A top wall not set apart follows the wall (Forum 624069); one set apart keeps its value.
+  const follows = change.wall !== undefined && change.topWall === undefined && Math.abs(before.topWall - before.wall) < 1e-9;
+  const next = normalizeLoftMeasures({ ...before, ...change, ...(follows ? { topWall: change.wall } : {}) });
   const oldFrame = loftFrameSize(before);
   const newFrame = loftFrameSize(next);
   return {
@@ -378,6 +394,8 @@ export function loftFieldsFromMeasures(measures: LoftMeasures): Partial<Workplan
     loftOffsetX: measures.offsetX,
     loftOffsetZ: measures.offsetZ,
     loftWall: measures.wall,
+    // Stored only when it differs, so a top wall that was never set apart goes on following the wall.
+    loftTopWall: Math.abs(measures.topWall - measures.wall) > 1e-9 ? measures.topWall : undefined,
     loftTwist: measures.twist,
     loftTiltX: measures.tiltX,
     loftTiltZ: measures.tiltZ,
@@ -390,10 +408,10 @@ export function loftFieldsFromMeasures(measures: LoftMeasures): Partial<Workplan
 }
 
 /** The two ends in the shape's own frame, the frame's middle at the origin. */
-export function loftSections(shape: LoftShapeFields): { bottom: LoftSection; top: LoftSection; wall: number; measures: LoftMeasures } {
+export function loftSections(shape: LoftShapeFields): { bottom: LoftSection; top: LoftSection; wall: number; topWall: number; measures: LoftMeasures } {
   const measures = loftMeasures(shape);
   const frame = loftFrameSize(measures);
-  return { ...sectionsAt(measures, -frame.centerX, -frame.centerZ), wall: measures.wall, measures };
+  return { ...sectionsAt(measures, -frame.centerX, -frame.centerZ), wall: measures.wall, topWall: measures.topWall, measures };
 }
 
 /** The two ends with the bottom's box centred on (cx, cz). */
@@ -630,9 +648,9 @@ function pairSections(lower: LoftSection, upper: LoftSection): LoftPieces {
 
 /** The outer pair of outlines and, with a wall, the inner pair (the opening), each pair cut alike. */
 export function loftPieces(shape: LoftShapeFields): { outer: LoftPieces; inner: LoftPieces | null } {
-  const { bottom, top, wall } = loftSections(shape);
+  const { bottom, top, wall, topWall } = loftSections(shape);
   const outer = pairSections(bottom, top);
-  const inner = wall > 1e-6 ? pairSections(insetSection(bottom, wall), insetSection(top, wall)) : null;
+  const inner = wall > 1e-6 ? pairSections(insetSection(bottom, wall), insetSection(top, topWall)) : null;
   return { outer, inner };
 }
 
@@ -658,7 +676,9 @@ export function loftChainPieces(shape: LoftShapeFields) {
   const frame = loftFrameSize(measures);
   const { sections, at } = chainAt(measures, -frame.centerX, -frame.centerZ);
   const outer = cutChain(sections);
-  const inner = measures.wall > 1e-6 ? cutChain(sections.map((section) => insetSection(section, measures.wall))) : null;
+  // The wall goes evenly from the bottom's to the top's, by how high each section stands.
+  const wallAt = (share: number) => measures.wall + (measures.topWall - measures.wall) * share;
+  const inner = measures.wall > 1e-6 ? cutChain(sections.map((section, index) => insetSection(section, wallAt(at[index])))) : null;
   return { outer, inner, at, measures };
 }
 

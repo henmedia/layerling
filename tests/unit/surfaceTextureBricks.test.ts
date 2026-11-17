@@ -90,6 +90,33 @@ function leaning(result: SurfaceTextureResult, from: number, within: (x: number,
   return area;
 }
 
+/**
+ * How far out the textured surface lies at (x, y) on a box's front (inside frame: z to the viewer): the highest front-facing
+ * triangle over that point, seen along z.
+ */
+function frontAt(result: SurfaceTextureResult, x: number, y: number) {
+  const v = result.vertices, I = result.indices;
+  let best = -Infinity;
+  for (let t = 0; t < I.length; t += 3) {
+    const [a, b, c] = [I[t] * 3, I[t + 1] * 3, I[t + 2] * 3];
+    const d = (v[b] - v[a]) * (v[c + 1] - v[a + 1]) - (v[c] - v[a]) * (v[b + 1] - v[a + 1]);
+    // Facing the viewer: counter-clockwise seen along -z.
+    if (!(d > 1e-12)) continue;
+    const l1 = ((x - v[a]) * (v[c + 1] - v[a + 1]) - (v[c] - v[a]) * (y - v[a + 1])) / d;
+    const l2 = ((v[b] - v[a]) * (y - v[a + 1]) - (x - v[a]) * (v[b + 1] - v[a + 1])) / d;
+    if (l1 < -1e-9 || l2 < -1e-9 || l1 + l2 > 1 + 1e-9) continue;
+    best = Math.max(best, v[a + 2] + l1 * (v[b + 2] - v[a + 2]) + l2 * (v[c + 2] - v[a + 2]));
+  }
+  return best;
+}
+
+/** The deepest place along a row on a box's front from x0 to x1 at height y (0.05 mm steps), below its face at z = `face`. */
+function deepestAlong(result: SurfaceTextureResult, face: number, x0: number, x1: number, y: number) {
+  let deepest = 0;
+  for (let x = x0; x <= x1; x += 0.05) deepest = Math.max(deepest, face - frontAt(result, x, y));
+  return deepest;
+}
+
 describe("bricks", () => {
   it("knows its settings and starts as a wall with mortar joints", () => {
     expect(normalizeSurfaceTexture({ pattern: "bricks" })).toMatchObject({ spacing: 12, depth: 0.6, profile: "flat", brickBond: "running", brickHeight: 4, brickJoint: 0.8, brickVary: 0 });
@@ -277,6 +304,43 @@ describe("bricks", () => {
     expect(result.stats.projection).toBe("cylinder");
     expect(leaning(result, -1)).toBeLessThan(20);
   }, 30000);
+
+  it("leaves no stubs of head joints where a border cuts a course to a sliver (Facebook report)", () => {
+    // 60 x 40 x 10, bricks 2.8 x 1.8 with a 0.5 mm joint, 0.2 deep: 23 courses of 1.761 mm from the bottom to the top, the
+    // joints half beyond them. The top and the bottom stay smooth and the bricks end a millimetre (the fade) away from
+    // them, cutting the top and the bottom course to about 0.5 mm: their head joints showed as short ticks.
+    const user = { pattern: "bricks", spacing: 2.8, brickHeight: 1.8, brickJoint: 0.5, depth: 0.2 };
+    const result = applySurfaceTexture(box(60, 40, 10), user);
+    expectClosed(result);
+    const H = result.stats.bricks!.height, v0 = -0.25;
+    expect(result.stats.bricks!.courses).toBe(23);
+    // The top course from 38.49 up shows to 39: nothing pressed in there above its joint - and below the bottom one's.
+    expect(deepestAlong(result, 5, -25, 25, 38.9)).toBeLessThan(1e-6);
+    expect(deepestAlong(result, 5, -25, 25, 38.8)).toBeLessThan(1e-6);
+    expect(deepestAlong(result, 5, -25, 25, v0 + H - 0.3)).toBeLessThan(1e-6);
+    // The joints between the courses are there, and the whole courses keep their head joints.
+    expect(deepestAlong(result, 5, -1, 1, v0 + 22 * H)).toBeCloseTo(0.2, 6);
+    expect(deepestAlong(result, 5, -25, 25, v0 + 21.5 * H)).toBeCloseTo(0.2, 6);
+    expect(deepestAlong(result, 5, -25, 25, v0 + 1.5 * H)).toBeCloseTo(0.2, 6);
+    // Bricks 4 mm high (as they start): the top course shows two thirds of its height, a short course, as it did.
+    const tall = applySurfaceTexture(box(60, 40, 10), { pattern: "bricks" });
+    expect(tall.stats.bricks!.courses).toBe(10);
+    expect(deepestAlong(tall, 5, -25, 25, 38.5)).toBeCloseTo(0.6, 6);
+  }, 60000);
+
+  it("lets the brick beside a sliver at a border run on to it", () => {
+    // Sharp edges kept smooth: the bricks end a millimetre in from the left edge, at x = -29. Along x 22 bricks of 2.75 mm
+    // from x = -30.25: every other course begins half a brick along, its first joint at -28.875 - 0.125 mm beyond the
+    // border. That joint is not there; the next one is, and the other courses' first joint at -27.5 too.
+    const result = applySurfaceTexture(box(60, 40, 10), { pattern: "bricks", spacing: 2.8, brickHeight: 1.8, brickJoint: 0.5, depth: 0.2, keepEdges: true });
+    expectClosed(result);
+    const H = result.stats.bricks!.height, v0 = -0.25;
+    for (const j of [3, 5, 11]) {
+      expect(deepestAlong(result, 5, -28.95, -28.65, v0 + (j + 0.5) * H)).toBeLessThan(1e-6);
+      expect(deepestAlong(result, 5, -26.3, -25.95, v0 + (j + 0.5) * H)).toBeCloseTo(0.2, 6);
+      expect(deepestAlong(result, 5, -27.65, -27.35, v0 + (j + 1.5) * H)).toBeCloseTo(0.2, 6);
+    }
+  }, 60000);
 
   it("stays within the triangle budget on a large vase", () => {
     const result = applySurfaceTexture(cylinder(50, 150), { pattern: "bricks" });

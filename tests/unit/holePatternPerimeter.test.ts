@@ -1,7 +1,7 @@
 import manifoldModule from "manifold-3d";
 import { beforeAll, describe, expect, it } from "vitest";
 import { holePatternCenters, normalizeHolePattern, rectangleOutline, type FaceOutline, type HolePatternSettings, type Point2 } from "@/lib/holePattern";
-import { HOLE_OVERSHOOT, holePatternShapes, type PerforableFace } from "@/lib/holePatternShapes";
+import { HOLE_OVERSHOOT, holePatternScrewPatch, holePatternScrewSize, holePatternShapes, type PerforableFace } from "@/lib/holePatternShapes";
 import { rememberManifoldRuntime } from "@/lib/manifoldHandle";
 
 /*
@@ -126,6 +126,22 @@ describe("holes with a counterbore or countersink", () => {
     expect(holes[0].kind).toBe("countersink");
     expect(holes[0].width).toBeCloseTo(6.3 + 2 * HOLE_OVERSHOOT);
     expect(holes[0].screwHoleAngle).toBe(90);
+  });
+
+  it("makes inch countersinks at 82 degrees and knows their size again (Discussion #1534)", () => {
+    const patch = holePatternScrewPatch("countersink", "#8");
+    expect(patch).toEqual({ size: 4.7, headSize: 8.43, headAngle: 82 });
+    const settings = ring({ perimeterBy: "count", perimeterCount: 4, holeType: "countersink", ...patch });
+    expect(settings.headAngle).toBe(82);
+    expect(holePatternScrewSize(settings)).toBe("#8");
+    const { holes } = holePatternShapes(face, settings, "Hole");
+    expect(holes[0].screwHoleAngle).toBe(82);
+    // The cone opens at 41 degrees to each side, so above the face it widens by tan(41) per millimetre.
+    expect(holes[0].width).toBeCloseTo(8.43 + 2 * HOLE_OVERSHOOT * Math.tan((41 * Math.PI) / 180), 6);
+    // A metric size puts the 90 degrees back, and the setting drops out again.
+    const metric = ring({ ...settings, ...holePatternScrewPatch("countersink", "M4") });
+    expect(metric.headAngle).toBeUndefined();
+    expect(holePatternScrewSize(metric)).toBe("M4");
   });
 
   it("keeps a plain hole for every other form", () => {

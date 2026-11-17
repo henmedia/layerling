@@ -1,15 +1,17 @@
 "use client";
 
 import { useEffect, useRef, useState, type FormEvent, type KeyboardEvent } from "react";
-import { Check, ChevronDown, ChevronRight, CloudUpload, Download, Folder, FolderInput, FolderPlus, Pencil, Plus, Trash2, Upload, X } from "lucide-react";
+import { ArrowDownAZ, CalendarClock, Check, ChevronDown, ChevronRight, CloudUpload, Download, Folder, FolderInput, FolderPlus, Pencil, Plus, Trash2, Upload, X } from "lucide-react";
 import { GuideHelpLink } from "@/components/GuideHelpLink";
 import { t } from "@/lib/i18n";
 import { canHoldSubfolder, folderChildren, folderDescendantIds, folderLabel, foldersInTreeOrder } from "@/lib/customShapeFolders";
 import { cleanMyShapeName, MY_SHAPE_NAME_MAX } from "@/lib/myShapes";
+import { orderCustomShapes, searchCustomShapes, type CustomShapeOrder } from "@/lib/customShapeSearch";
 import { STORE_FOLDER_NAME_LIMIT, storeFolderNameProblem } from "@/lib/storeFolderName";
 
 const COLLAPSED_STORAGE_KEY = "layerling.myShapesCollapsed";
 const OPEN_FOLDERS_STORAGE_KEY = "layerling.myShapesOpenFolders";
+const ORDER_STORAGE_KEY = "layerling.myShapesOrder";
 
 export type CustomShapeLocation = "browser" | "server";
 export type CustomShapeEntry = { id: string; name: string; thumbnail: string; location: CustomShapeLocation; folderId: string | null };
@@ -41,6 +43,8 @@ export interface MyShapesSectionProps {
   onShown: () => void;
   /** The menu closes once a tile was dragged out onto the workplane. */
   onDragDone: () => void;
+  /** A search typed in the shapes window (#1537): then only the custom shapes that match show, in one list, folders aside. */
+  searchQuery?: string;
 }
 
 /** The message for a folder name that cannot be used, or "" when it can (or is still empty). */
@@ -70,6 +74,7 @@ export function MyShapesSection(props: MyShapesSectionProps) {
   const empty = shapes.length === 0 && folders.length === 0;
   const collapsed = choice ?? empty;
   const [openFolders, setOpenFolders] = useState<string[]>([]);
+  const [order, setOrder] = useState<CustomShapeOrder>("saved");
   const [saveName, setSaveName] = useState<string | null>(null);
   const [saveLocation, setSaveLocation] = useState<CustomShapeLocation>(serverAvailable ? "server" : "browser");
   const [saveFolder, setSaveFolder] = useState<string | null>(null);
@@ -87,6 +92,7 @@ export function MyShapesSection(props: MyShapesSectionProps) {
       if (stored === "true" || stored === "false") setCollapsed(stored === "true");
       const open = JSON.parse(window.localStorage.getItem(OPEN_FOLDERS_STORAGE_KEY) ?? "[]") as unknown;
       if (Array.isArray(open)) setOpenFolders(open.filter((id): id is string => typeof id === "string"));
+      if (window.localStorage.getItem(ORDER_STORAGE_KEY) === "name") setOrder("name");
     } catch {
       // Blocked storage: the section starts folded while it holds nothing, the folders closed.
     }
@@ -117,6 +123,16 @@ export function MyShapesSection(props: MyShapesSectionProps) {
       }
       return next;
     });
+  };
+
+  const toggleOrder = () => {
+    const next: CustomShapeOrder = order === "name" ? "saved" : "name";
+    setOrder(next);
+    try {
+      window.localStorage.setItem(ORDER_STORAGE_KEY, next);
+    } catch {
+      // Blocked storage: the order holds until the menu closes.
+    }
   };
 
   const foldersAt = (location: CustomShapeLocation) => folders.filter((folder) => folder.location === location);
@@ -507,7 +523,7 @@ export function MyShapesSection(props: MyShapesSectionProps) {
           <div className="my-shapes-folder-body">
             {newFolder?.parentId === folder.id ? renderNewFolderForm() : null}
             {subfolders.map((child) => renderFolder(child, list))}
-            {own.length ? <div className="shape-menu-list my-shapes-list">{own.map(renderTile)}</div> : null}
+            {own.length ? <div className="shape-menu-list my-shapes-list">{orderCustomShapes(own, order).map(renderTile)}</div> : null}
             {own.length === 0 && subfolders.length === 0 ? <p className="my-shapes-empty">{t("myShapes.folderEmpty")}</p> : null}
           </div>
         ) : null}
@@ -523,11 +539,26 @@ export function MyShapesSection(props: MyShapesSectionProps) {
     return (
       <>
         {folderChildren(locationFolders, null).map((folder) => renderFolder(folder, list))}
-        {loose.length ? <div className="shape-menu-list my-shapes-list">{loose.map(renderTile)}</div> : null}
+        {loose.length ? <div className="shape-menu-list my-shapes-list">{orderCustomShapes(loose, order).map(renderTile)}</div> : null}
         {list.length === 0 && locationFolders.length === 0 ? <p className="my-shapes-empty">{t("myShapes.groupEmpty")}</p> : null}
       </>
     );
   };
+
+  const query = (props.searchQuery ?? "").trim();
+  if (query) {
+    const found = searchCustomShapes(shapes, query);
+    if (found.length === 0) return null;
+    return (
+      <section className="shape-library-section my-shapes-search" aria-label={t("myShapes.title")}>
+        <div className="shape-library-heading">
+          <span>{t("myShapes.title")}</span>
+          <span className="shape-library-count">{t("library.countOf", { shown: found.length, total: shapes.length })}</span>
+        </div>
+        <div className="shape-menu-list my-shapes-list">{found.map(renderTile)}</div>
+      </section>
+    );
+  }
 
   const browserShapes = shapes.filter((shape) => shape.location === "browser");
   const formLocation = serverAvailable ? saveLocation : "browser";
@@ -551,6 +582,16 @@ export function MyShapesSection(props: MyShapesSectionProps) {
           >
             <Plus aria-hidden="true" />
             <span>{t("myShapes.saveSelection")}</span>
+          </button>
+          <button
+            className="my-shapes-icon-button"
+            type="button"
+            title={order === "name" ? t("myShapes.sortBySaved") : t("myShapes.sortByName")}
+            aria-label={order === "name" ? t("myShapes.sortBySaved") : t("myShapes.sortByName")}
+            aria-pressed={order === "name"}
+            onClick={toggleOrder}
+          >
+            {order === "name" ? <CalendarClock aria-hidden="true" /> : <ArrowDownAZ aria-hidden="true" />}
           </button>
           <button className="my-shapes-icon-button" type="button" title={t("myShapes.newFolderHint")} aria-label={t("myShapes.newFolder")} onClick={() => startNewFolder()}>
             <FolderPlus aria-hidden="true" />

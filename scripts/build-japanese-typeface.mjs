@@ -13,6 +13,14 @@
 // new code with an older cut. They are plain files, not chunks: textFonts.ts fetches them the
 // first time a text needs them, and the service worker keeps them out of the install download.
 // It runs before dev, build and export.
+//
+// Chinese (Issue #1757): Zen Maru Gothic has the kanji of JIS X 0208 only, which leaves out most
+// simplified characters (说, 书, 测, 试) and many traditional ones. Resource Han Rounded CN Regular
+// (SIL Open Font License, fonts/resource-han-rounded/OFL.txt), a rounded face like Zen Maru Gothic,
+// with the same em and the same ascender, is cut into four more files in the same folder:
+// zh1.typeface.json (GB2312 symbols and level 1), zh2 (GB2312 level 2), zht1 and zht2 (Big5 levels
+// 1 and 2), each without the characters the Japanese files or an earlier one have
+// (chineseText.ts). They only fill gaps, so a Japanese text keeps its look.
 import { createHash } from "node:crypto";
 import { mkdir, readFile, readdir, rm, writeFile } from "node:fs/promises";
 import { register } from "node:module";
@@ -24,7 +32,9 @@ const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 register("./web-src-alias-hooks.mjs", import.meta.url);
 const { commonJapaneseCharacters, level2JapaneseCharacters } = await import(pathToFileURL(join(root, "apps", "web", "src", "lib", "japaneseText.ts")).href);
 const { contoursFromCommands, normalizeGlyphContours, outlineString } = await import(pathToFileURL(join(root, "apps", "web", "src", "lib", "customFonts.ts")).href);
+const { CHINESE_FILES, chineseFileCharacters } = await import(pathToFileURL(join(root, "apps", "web", "src", "lib", "chineseText.ts")).href);
 const { parse } = await import("opentype.js");
+const chineseSource = join(root, "fonts", "resource-han-rounded", "ResourceHanRoundedCN-Regular.ttf");
 const source = join(root, "fonts", "zen-maru-gothic", "ZenMaruGothic-Regular.ttf");
 const outRoot = join(root, "apps", "web", "public", "fonts", "japanese");
 
@@ -64,9 +74,13 @@ function typefaceGlyph(glyph, resolution) {
   };
 }
 
+async function readFont(path) {
+  const bytes = await readFile(path);
+  return parse(bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength));
+}
+
 async function main() {
-  const bytes = await readFile(source);
-  const font = parse(bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength));
+  const font = await readFont(source);
   const resolution = font.unitsPerEm || 1000;
   const byCharacter = glyphsByCharacter(font);
   const english = (record) => record?.en ?? (record ? Object.values(record)[0] : undefined);
@@ -81,19 +95,29 @@ async function main() {
     boundingBox: head ? { xMin: head.xMin, yMin: head.yMin, xMax: head.xMax, yMax: head.yMax } : { xMin: 0, yMin: font.descender, xMax: resolution, yMax: font.ascender },
     resolution,
   };
-  const cut = (characters, note) => {
+  const cut = (characters, note, from = { byCharacter, fullName, license: english(font.names.license) }) => {
     const glyphs = {};
     for (const char of characters) {
-      const glyph = byCharacter.get(char);
+      const glyph = from.byCharacter.get(char);
       if (glyph) glyphs[char] = typefaceGlyph(glyph, resolution);
     }
-    const information = { format: 0, fullName, license: english(font.names.license), note: `Subset by scripts/build-japanese-typeface.mjs: ${note}` };
+    const information = { format: 0, fullName: from.fullName, license: from.license, note: `Subset by scripts/build-japanese-typeface.mjs: ${note}` };
     return { glyphs, json: JSON.stringify({ glyphs, ...header, original_font_information: information }) };
   };
   const base = cut(commonJapaneseCharacters(), "Latin, JIS X 0208 rows 1-8 and 16-47");
   const level2Characters = level2JapaneseCharacters();
   const level2 = cut(level2Characters, "JIS X 0208 rows 48-84");
-  const hash = createHash("sha256").update(base.json).update(level2.json).digest("hex").slice(0, 12);
+  // The Chinese files are lent glyph by glyph, unscaled: the source must share the em of the Japanese face.
+  const chineseFont = await readFont(chineseSource);
+  if ((chineseFont.unitsPerEm || 1000) !== resolution) throw new Error(`[japanese-typeface] ${chineseSource} has ${chineseFont.unitsPerEm} units per em, the Japanese face ${resolution}`);
+  const chinese = { byCharacter: glyphsByCharacter(chineseFont), fullName: english(chineseFont.names.fullName) ?? "Resource Han Rounded CN Regular", license: english(chineseFont.names.license) };
+  const chineseCuts = CHINESE_FILES.map((file) => {
+    const characters = chineseFileCharacters(file);
+    return { file, characters, cut: cut(characters, `${file} of apps/web/src/lib/chineseText.ts`, chinese) };
+  });
+  const hashing = createHash("sha256").update(base.json).update(level2.json);
+  for (const { cut: chineseCut } of chineseCuts) hashing.update(chineseCut.json);
+  const hash = hashing.digest("hex").slice(0, 12);
   // Other cuts go: the folders of earlier releases would only pile up.
   await mkdir(outRoot, { recursive: true });
   for (const entry of await readdir(outRoot)) {
@@ -103,12 +127,17 @@ async function main() {
   await mkdir(dest, { recursive: true });
   await writeFile(join(dest, "base.typeface.json"), base.json);
   await writeFile(join(dest, "level2.typeface.json"), level2.json);
+  for (const { file, cut: chineseCut } of chineseCuts) await writeFile(join(dest, `${file}.typeface.json`), chineseCut.json);
   await writeFile(join(outRoot, "version.txt"), hash);
   const size = (json) => `${(json.length / 1024 / 1024).toFixed(2)} MB`;
   const count = (cutFont) => Object.keys(cutFont.glyphs).length;
   console.log(`[japanese-typeface] ${fullName}: base ${count(base)} glyphs, ${size(base.json)}; level2 ${count(level2)} glyphs, ${size(level2.json)} -> apps/web/public/fonts/japanese/${hash}/`);
   const missing = level2Characters.length - count(level2);
   if (missing > 0) console.log(`[japanese-typeface] ${missing} of ${level2Characters.length} level-2 kanji are not in the source font`);
+  for (const { file, characters, cut: chineseCut } of chineseCuts) {
+    const lacking = characters.length - count(chineseCut);
+    console.log(`[japanese-typeface] ${file}: ${count(chineseCut)} glyphs, ${size(chineseCut.json)}${lacking > 0 ? `, ${lacking} not in ${chinese.fullName}` : ""}`);
+  }
 }
 
 if (process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]) await main();

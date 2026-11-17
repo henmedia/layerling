@@ -78,13 +78,13 @@ export function TapeLengthField({
       style={{ "--overlay-x": `${x}px`, "--overlay-y": `${y}px` } as CSSProperties}
       onPointerDown={(event) => event.stopPropagation()}
     >
-      <input className="dimension-input tape-length-input" autoFocus aria-label={t("camera.tapeTypeLength")} {...field("length")} />
+      <input className="dimension-input tape-length-input" autoComplete="off" autoFocus aria-label={t("camera.tapeTypeLength")} {...field("length")} />
       {axes.length ? (
         <div className="tape-length-axes">
           {axes.map(({ axis }) => (
             <label key={axis} className="tape-length-axis">
               <span aria-hidden="true">Δ{axis}</span>
-              <input className="dimension-input" data-axis={axis.toLowerCase()} aria-label={t("camera.tapeLengthAlong", { axis })} {...field(axis)} />
+              <input className="dimension-input" autoComplete="off" data-axis={axis.toLowerCase()} aria-label={t("camera.tapeLengthAlong", { axis })} {...field(axis)} />
             </label>
           ))}
         </div>

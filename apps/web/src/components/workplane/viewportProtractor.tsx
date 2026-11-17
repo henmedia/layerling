@@ -1,7 +1,7 @@
 import * as THREE from "three";
 import type { Dispatch, MutableRefObject, SetStateAction } from "react";
 import { outwardFaceNormal } from "@/lib/layFlat";
-import { angleAtVertex, angleBetweenFaces, facetOfCurvedSurface, formatFaceAngles, formatProtractorAngle } from "@/lib/protractor";
+import { angleAtVertex, angleBetweenFaces, facetOfCurvedSurface, formatFaceAngles, formatProtractorAngle, pointAsSeen, straightViewAxis, type ProtractorView } from "@/lib/protractor";
 import { planarFaceTriangles } from "@/lib/rotationPivot";
 import { findShapeObject, projectToScreen, tapePointWorld, worldPointHidden, type TapePoint, type ThreeState } from "./ViewportOverlays";
 import { aimPickRay, firstShapeHit, RENDER_LAYER_SHAPES, worldTrianglePositions } from "./viewportPicking";
@@ -26,9 +26,35 @@ export type ProtractorModel = {
   /** Where the next point or face would go, for the preview. */
   hoverPoint: TapePoint | null;
   hoverFace: ProtractorFace | null;
+  /**
+   * Set when the first point went down in a straight view (#1650): the axis it looked along and, in a
+   * perspective, where the camera stood. The angle is then the one on the plane through the corner square to
+   * it, as it showed, and stays so when the view turns afterwards.
+   */
+  view?: ProtractorView | null;
 };
 
-export const EMPTY_PROTRACTOR: ProtractorModel = { kind: "points", points: [], faces: [], hoverPoint: null, hoverFace: null };
+export const EMPTY_PROTRACTOR: ProtractorModel = { kind: "points", points: [], faces: [], hoverPoint: null, hoverFace: null, view: null };
+
+/** The straight view (top, front, side) the camera looks along now, or null in a tilted view. */
+export function protractorStraightView(state: ThreeState): ProtractorView | null {
+  const normal = straightViewAxis(state.camera.getWorldDirection(new THREE.Vector3()));
+  if (!normal) return null;
+  const eye = state.camera instanceof THREE.PerspectiveCamera ? state.camera.getWorldPosition(new THREE.Vector3()) : null;
+  return { normal, eye: eye ? { x: eye.x, y: eye.y, z: eye.z } : null };
+}
+
+/**
+ * The points of a three-point measurement in the world, the corner first. Measured in a straight view, the two
+ * side points are moved to where they showed on the plane through the corner, so legs, arc and number all give
+ * the angle that was seen.
+ */
+function protractorPointsWorld(state: ThreeState, model: ProtractorModel, points: TapePoint[]) {
+  const world = points.map((point) => tapePointWorld(state, point));
+  const view = model.view;
+  if (!view || world.length < 2) return world;
+  return world.map((point, index) => (index === 0 ? point : new THREE.Vector3().copy(pointAsSeen(world[0], point, view))));
+}
 
 /** A run of a line on screen. `hidden`: a body stands in front of it, so it is drawn dashed and faint. */
 type ProtractorPiece = { points: string; hidden: boolean };
@@ -132,7 +158,7 @@ export function pickProtractorFace(state: ThreeState, clientX: number, clientY: 
 export function protractorReading(state: ThreeState, model: ProtractorModel) {
   if (model.kind === "points") {
     if (model.points.length < 3) return null;
-    const [vertex, a, b] = model.points.map((point) => tapePointWorld(state, point));
+    const [vertex, a, b] = protractorPointsWorld(state, model, model.points);
     const angle = angleAtVertex(vertex, a, b);
     return angle === null ? null : { angle, text: formatProtractorAngle(angle) };
   }
@@ -177,9 +203,10 @@ export function syncProtractorOverlay(
   const toScreen = (point: THREE.Vector3) => projectToScreen(point, state);
   const marker = (point: THREE.Vector3) => ({ ...toScreen(point), hidden: worldPointHidden(point, state) });
   if (model.kind === "points") {
-    const placed = model.points.map((point) => tapePointWorld(state, point));
-    const hover = model.hoverPoint && placed.length < 3 ? tapePointWorld(state, model.hoverPoint) : null;
-    const all = hover ? [...placed, hover] : placed;
+    const withHover = model.hoverPoint && model.points.length < 3 ? [...model.points, model.hoverPoint] : model.points;
+    const all = protractorPointsWorld(state, model, withHover);
+    const placed = all.slice(0, model.points.length);
+    const hover = all.length > placed.length ? all[all.length - 1] : null;
     const screens = all.map(toScreen);
     for (let index = 1; index < all.length; index += 1) {
       const preview = hover !== null && index === all.length - 1;

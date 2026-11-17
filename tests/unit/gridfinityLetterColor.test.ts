@@ -8,7 +8,7 @@ import { buildGroupDisplayMesh, buildGroupedShapeFromSelection, exportBodiesWith
 import { editorHistoryEntry } from "@/lib/editorHistory";
 import { mcpShapeSummary } from "@/lib/editorMcpSummary";
 import { meshForShape, sameShapeApartFromPlacement, type MeshData } from "@/lib/editorMeshCore";
-import { GRIDFINITY_LABEL_TEXT_HEIGHT, GRIDFINITY_LABEL_TEXT_SINK } from "@/lib/gridfinityGeometry";
+import { GRIDFINITY_LABEL_TEXT_HEIGHT, GRIDFINITY_LABEL_TEXT_SINK, gridfinityLabelledTriangles } from "@/lib/gridfinityGeometry";
 import { gridfinityLabelLetters } from "@/lib/gridfinityLabelText";
 import { gridfinityLabelColor, gridfinityLetterGroups, gridfinityLetterMeshes } from "@/lib/gridfinityLetterColor";
 import { exportLylProject, importLylProject } from "@/lib/lylProject";
@@ -75,7 +75,8 @@ function footprint(shape: WorkplaneShape) {
 
 /** What the letters are by area: their tops (the footprint) and their sides (what they add to the bin's surface). */
 function expectedAreas(shape: WorkplaneShape) {
-  const plain = meshArea(meshForShape({ ...shape, gridfinityLabelBackText: undefined, gridfinityLabelFrontText: undefined, gridfinityLabelLeftText: undefined, gridfinityLabelRightText: undefined, gridfinityCompartmentLabels: shape.gridfinityCompartmentLabels?.map(({ text: _text, ...label }) => label) }));
+  // The same body without its letters: on a tray the shelf under a text is lower (#1501), so dropping the text would not do.
+  const plain = gridfinityLabelledTriangles(runtime, { ...shape, width: shape.width!, depth: shape.depth! }).reduce((sum, triangle) => sum + triangleArea(triangle as V[]), 0);
   const lettered = meshArea(meshForShape(shape));
   const top = footprint(shape);
   return { letters: top + lettered - plain, bin: plain - top };
@@ -111,8 +112,9 @@ function expectLetterAreas(shape: WorkplaneShape, mesh?: MeshData, expected: { l
 }
 
 describe("the colour of a Gridfinity bin's letters", () => {
-  it("is the one set, as #rrggbb, on a bin with a text", () => {
+  it("is the one set, as #rrggbb, on a bin or a tray with a text", () => {
     expect(gridfinityLabelColor(binShape())).toBe(LETTERS);
+    expect(gridfinityLabelColor(binShape({ gridfinityType: "tray", height: 20 }))).toBe(LETTERS);
     expect(gridfinityLabelColor(binShape({ gridfinityLabelColor: "#F2C200" }))).toBe(LETTERS);
   });
 
@@ -123,10 +125,9 @@ describe("the colour of a Gridfinity bin's letters", () => {
     expect(gridfinityLabelColor(binShape({ color: "#4F7FA8", gridfinityLabelColor: BIN }))).toBeUndefined();
   });
 
-  it("is none on a bin without a text, on a tray, on a baseplate and on a hole", () => {
+  it("is none on a bin without a text, on a baseplate and on a hole", () => {
     expect(gridfinityLabelColor(binShape({ gridfinityLabelBackText: undefined }))).toBeUndefined();
     expect(gridfinityLabelColor(binShape({ gridfinityLabelBackText: "  " }))).toBeUndefined();
-    expect(gridfinityLabelColor(binShape({ gridfinityType: "tray", height: 20 }))).toBeUndefined();
     expect(gridfinityLabelColor(binShape({ gridfinityType: "baseplate", height: 5 }))).toBeUndefined();
     expect(gridfinityLabelColor(binShape({ hole: true }))).toBeUndefined();
     expect(gridfinityLabelColor({ ...box("b", BIN, 0), gridfinityLabelBackText: "AB", gridfinityLabelColor: LETTERS })).toBeUndefined();
@@ -177,6 +178,11 @@ describe("a Gridfinity bin's letters in their own colour in a 3MF or OBJ", () =>
     ["on all four shelves", { gridfinityLabelFront: true, gridfinityLabelLeft: true, gridfinityLabelRight: true, gridfinityLabelFrontText: "F", gridfinityLabelLeftText: "Left", gridfinityLabelRightText: "R" }],
     ["in Script, whose letters run into one another", { gridfinityLabelBackText: "office", gridfinityLabelFont: "Script" }],
     ["on a compartment's label", { gridfinityLabelBack: false, gridfinityLabelBackText: undefined, gridfinityCompartmentsX: 2, gridfinityCompartmentLabels: [{ column: 1, row: 0, side: "back", text: "Nuts" }] }],
+    ["on a bin overhanging on the right, hollow", { width: 103.5, size: 103.5, gridfinityOverhangRight: 19.75 }],
+    ["on a bin overhanging on the right, solid", { width: 103.5, size: 103.5, gridfinityOverhangRight: 19.75, gridfinityOverhangSolid: true }],
+    ["on a bin overhanging on the right, its lip kept on the grid", { width: 103.5, size: 103.5, gridfinityOverhangRight: 19.75, gridfinityOverhangLipOnGrid: true }],
+    ["on a bin overhanging at the back, solid", { depth: 61.25, gridfinityOverhangBack: 19.5, gridfinityOverhangSolid: true }],
+    ["on a tray, level with its top", { gridfinityType: "tray", height: 20 }],
   ])("finds the letters %s", (_name, fields) => {
     expectLetterAreas(binShape(fields));
   });
@@ -226,7 +232,7 @@ describe("a Gridfinity bin's letters in their own colour in a 3MF or OBJ", () =>
   });
 
   it("leaves the bin as it was without a colour of the letters' own, or with the bin's", () => {
-    for (const fields of [{ gridfinityLabelColor: undefined }, { gridfinityLabelColor: BIN }, { gridfinityLabelColor: "#4F7FA8" }, { gridfinityType: "tray", height: 20 }, { gridfinityLabelBackText: undefined }, { gridfinityLabelBackText: "W".repeat(24), width: 41.5, size: 41.5 }]) {
+    for (const fields of [{ gridfinityLabelColor: undefined }, { gridfinityLabelColor: BIN }, { gridfinityLabelColor: "#4F7FA8" }, { gridfinityLabelBackText: undefined }, { gridfinityLabelBackText: "W".repeat(24), width: 41.5, size: 41.5 }]) {
       expect(multicolorExportSolids(binShape(fields)), JSON.stringify(fields)).toBeNull();
     }
     // The bin's mesh is the same with any colour of its letters, so an STL comes out the same, and is not built again for it.
@@ -314,8 +320,13 @@ function middles(position: THREE.BufferAttribute | THREE.InterleavedBufferAttrib
 }
 
 describe("a Gridfinity bin's letters in their own colour in the view", () => {
-  it("draws the letters' faces as a second group in a second material, the faces an export colours and no others", () => {
-    const shape = binShape();
+  it.each([
+    ["on a bin", {}],
+    ["on a tray", { gridfinityType: "tray", height: 20 }],
+    // A label on a divider set lower (#1560) has its letters lower than one on the wall.
+    ["on a bin with lower dividers", { gridfinityCompartmentsX: 2, gridfinityCompartmentLabels: [{ column: 0, row: 0, side: "back", text: "AB" }, { column: 1, row: 0, side: "left", text: "C" }], gridfinityDividerHeight: 8 }],
+  ])("draws the letters' faces %s as a second group in a second material, the faces an export colours and no others", (_name, fields) => {
+    const shape = binShape(fields);
     const surface = surfaceOf(createShapeObject(shape));
     const materials = surface.material as THREE.MeshStandardMaterial[];
     expect(Array.isArray(materials)).toBe(true);
@@ -325,6 +336,10 @@ describe("a Gridfinity bin's letters in their own colour in the view", () => {
     const position = surface.geometry.getAttribute("position");
     expect(groups[0].start).toBe(0);
     expect(groups[1].start + groups[1].count).toBe(position.count);
+    expect(groups[1].count).toBeGreaterThan(0);
+    // Nothing stands over the top, a tray's letters included (#1501).
+    surface.geometry.computeBoundingBox();
+    expect(surface.geometry.boundingBox!.max.y).toBeCloseTo(shape.height, 4);
     // The view's triangles stand on y = 0 as the shape's mesh does; the same faces in the same colours, one by one.
     const { mesh, colors } = exportColors(shape)!;
     const exported = (color: string) => {
@@ -338,6 +353,21 @@ describe("a Gridfinity bin's letters in their own colour in the view", () => {
     };
     expect(middles(position, groups[1].start, groups[1].count)).toEqual(exported(LETTERS));
     expect(middles(position, 0, groups[0].count)).toEqual(exported(BIN));
+  });
+
+  it.each([
+    ["solid", { gridfinityOverhangSolid: true }],
+    ["its lip kept on the grid", { gridfinityOverhangLipOnGrid: true }],
+  ])("draws the letters of a bin overhanging on the right, %s, where they stand", (_name, fields) => {
+    const shape = binShape({ width: 103.5, size: 103.5, gridfinityOverhangRight: 19.75, ...fields });
+    const { groups, attributes } = surfaceOf(createShapeObject(shape)).geometry;
+    expect(groups).toHaveLength(2);
+    const position = attributes.position;
+    let area = 0;
+    for (let offset = groups[1].start; offset < groups[1].start + groups[1].count; offset += 3) {
+      area += triangleArea([0, 1, 2].map((corner) => [position.getX(offset + corner), position.getY(offset + corner), position.getZ(offset + corner)]) as V[]);
+    }
+    expect(area).toBeCloseTo(expectedAreas(shape).letters, 1);
   });
 
   it("keeps the geometry whatever the letters' colour, sorts it once one is set, and draws them anew when it changes", () => {
