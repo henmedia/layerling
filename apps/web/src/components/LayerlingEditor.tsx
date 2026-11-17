@@ -117,7 +117,7 @@ import { disposeBoundsTree } from "three-mesh-bvh";
 import { clampShellStackHeight, normalizeShellStackFoot, shellStackFloor, type ShellStackFoot } from "@/lib/shellStackLimits";
 import { GRIDFINITY_GRID } from "@/lib/gridfinityGeometry";
 import { magnetsGridLeastSize, magnetsMeetGridCells } from "@/lib/shellGridMagnets";
-import { DIVIDERS_WITH_GRID_MESSAGE, SHELL_GRID_FLOOR, SHELL_GRID_PLAY, MAX_SHELL_GRID_CELLS, normalizeShellDividers, normalizeShellGrid, shellGridEstimate, type ShellDividers, type ShellGrid } from "@/lib/shellGridLimits";
+import { DIVIDERS_WITH_GRID_MESSAGE, SHELL_GRID_FLOOR, shellGridFloor, SHELL_GRID_PLAY, MAX_SHELL_GRID_CELLS, normalizeShellDividers, normalizeShellGrid, shellGridEstimate, type ShellDividers, type ShellGrid } from "@/lib/shellGridLimits";
 import { DEFAULT_SHELL_SHELF_HEIGHT, clampShellShelfHeight, clampShellShelfWidth } from "@/lib/shellShelfLimits";
 import { SHELL_SIDES, shellMaxThickness, shellOpeningsFor, shellOpenSides } from "@/lib/shellLimits";
 import { arrayCirclePivot, arrayFitGap, arrayFitShift, arrayFollowingPivot, arrayGridSize, arrayGroupsCopies, arrayWithFit, circleStepDegrees, clampArrayCount, gridOffsets, moveAlongRadius, rotateAroundVertical, rowOffset, singleAxisSpacing, type ArraySettings } from "@/lib/shapeArray";
@@ -3668,7 +3668,7 @@ export function LayerlingEditor({
   }, [sketchSelection, sketchTool, sketchActive]);
   const [edgeModifier, setEdgeModifier] = useState<EdgeModifierSession | null>(null);
   // `mode: "offset"` is the Offset tool (#919), which shares the hollow tool's state: `thickness` is then the distance.
-  const [shellTool, setShellTool] = useState<{ mode?: "offset"; shrink?: boolean; sideways?: boolean; keepCopy?: boolean; thickness: number; openings: ShellOpenings; edges: ShellEdges; stack?: number; stackFoot?: ShellStackFoot | null; gridCells?: number; gridFit?: boolean; gridColumns?: number; gridRows?: number; dividers?: { x: number; z: number } | null; shelf?: number; shelfHeight?: number; busy: boolean; error: string | null } | null>(null);
+  const [shellTool, setShellTool] = useState<{ mode?: "offset"; shrink?: boolean; sideways?: boolean; keepCopy?: boolean; thickness: number; openings: ShellOpenings; edges: ShellEdges; stack?: number; stackFoot?: ShellStackFoot | null; gridCells?: number; gridFit?: boolean; gridMagnets?: boolean; gridColumns?: number; gridRows?: number; dividers?: { x: number; z: number } | null; shelf?: number; shelfHeight?: number; busy: boolean; error: string | null } | null>(null);
   /** Cut out (#927): `partId` stays, a copy of it grown by `clearance` is cut out of `hostId`. */
   const [cutOutTool, setCutOutTool] = useState<{ partId: string; hostId: string; clearance: number; busy: boolean; error: string | null } | null>(null);
   const [punchTool, setPunchTool] = useState<{ punchId: string; targetId: string; axis: SectionPlaneAxis; clearance: number; busy: boolean; error: string | null } | null>(null);
@@ -5459,7 +5459,7 @@ export function LayerlingEditor({
     );
     const feature = entry.feature;
     if (feature.kind === "shell") {
-      setShellTool({ thickness: feature.amount, openings: feature.openings ?? "top", edges: feature.shellEdges ?? "round", ...(feature.shellStack ? { stack: feature.shellStack } : {}), ...(feature.shellStackFoot ? { stackFoot: feature.shellStackFoot } : {}), ...(feature.shellGrid ? { gridCells: feature.shellGrid.cells, gridFit: feature.shellGrid.fit === true } : {}), ...(feature.shellDividers ? { dividers: feature.shellDividers } : {}), ...(feature.shellShelf ? { shelf: feature.shellShelf, shelfHeight: feature.shellShelfHeight ?? DEFAULT_SHELL_SHELF_HEIGHT } : {}), busy: false, error: null });
+      setShellTool({ thickness: feature.amount, openings: feature.openings ?? "top", edges: feature.shellEdges ?? "round", ...(feature.shellStack ? { stack: feature.shellStack } : {}), ...(feature.shellStackFoot ? { stackFoot: feature.shellStackFoot } : {}), ...(feature.shellGrid ? { gridCells: feature.shellGrid.cells, gridFit: feature.shellGrid.fit === true, gridMagnets: feature.shellGrid.magnets === true } : {}), ...(feature.shellDividers ? { dividers: feature.shellDividers } : {}), ...(feature.shellShelf ? { shelf: feature.shellShelf, shelfHeight: feature.shellShelfHeight ?? DEFAULT_SHELL_SHELF_HEIGHT } : {}), busy: false, error: null });
     } else if (feature.kind === "offset") {
       setShellTool({ mode: "offset", thickness: feature.amount, shrink: feature.offsetShrink === true, sideways: feature.offsetSideways === true, keepCopy: false, openings: "none", edges: feature.shellEdges ?? "round", busy: false, error: null });
     } else if (feature.kind !== "surfaceTexture") {
@@ -8632,7 +8632,7 @@ export function LayerlingEditor({
         edges: hollow.shellEdges ?? "round",
         ...(hollow.shellStack ? { stack: hollow.shellStack } : {}),
         ...(hollow.shellStackFoot ? { stackFoot: hollow.shellStackFoot } : {}),
-        ...(hollow.shellGrid ? { gridCells: hollow.shellGrid.cells, gridFit: hollow.shellGrid.fit === true } : {}),
+        ...(hollow.shellGrid ? { gridCells: hollow.shellGrid.cells, gridFit: hollow.shellGrid.fit === true, ...(hollow.shellGrid.magnets ? { gridMagnets: true } : {}) } : {}),
         ...(hollow.shellDividers ? { dividers: hollow.shellDividers } : {}),
         ...(hollow.shellShelf ? { shelf: hollow.shellShelf, shelfHeight: hollow.shellShelfHeight ?? DEFAULT_SHELL_SHELF_HEIGHT } : {}),
         busy: false,
@@ -9349,7 +9349,7 @@ export function LayerlingEditor({
     // The slider at its right end means every cell that fits, kept as that: a body made larger gets more sockets, smaller fewer.
     const gridMax = shellGridEstimate(shapeWidth(target), shapeDepth(target), thickness).max;
     const gridCells = shellTool.gridCells ?? 0;
-    const grid = normalizeShellGrid({ cells: gridCells > 0 && gridCells >= gridMax ? MAX_SHELL_GRID_CELLS : gridCells, fit: shellTool.gridFit });
+    const grid = normalizeShellGrid({ cells: gridCells > 0 && gridCells >= gridMax ? MAX_SHELL_GRID_CELLS : gridCells, fit: shellTool.gridFit, magnets: shellTool.gridMagnets });
     // Not with a Gridfinity floor: its bins fill the cells.
     const dividers = grid ? null : normalizeShellDividers(shellTool.dividers);
     const shelf = shellTool.shelf ? { width: shellTool.shelf, height: shellTool.shelfHeight ?? DEFAULT_SHELL_SHELF_HEIGHT } : undefined;
@@ -16022,7 +16022,7 @@ export function LayerlingEditor({
           : params.openings === "none" || params.openings === "bottom" || params.openings === "top-bottom" ? params.openings : "top";
         const edges: ShellEdges = params.edges === "sharp" ? "sharp" : "round";
         const stack = typeof params.stack === "number" && params.stack > 0 ? clampShellStackHeight(params.stack) : 0;
-        const grid = normalizeShellGrid({ cells: params.gridCells, fit: params.gridFit === true });
+        const grid = normalizeShellGrid({ cells: params.gridCells, fit: params.gridFit === true, magnets: params.gridMagnets === true });
         const dividers = normalizeShellDividers({ x: params.dividersX, z: params.dividersZ, height: params.dividerHeight, thickness: params.dividerThickness });
         if (grid && dividers) throw new Error(DIVIDERS_WITH_GRID_MESSAGE);
         const stackFoot = stack > 0 ? normalizeShellStackFoot({ hollow: params.stackHollow === true, grip: params.stackGrip, gripDepth: params.stackGripDepth, gripSides: params.stackGripSides, gripHeight: params.stackGripHeight, gripAt: params.stackGripAt }) : null;
@@ -16035,7 +16035,7 @@ export function LayerlingEditor({
           modifiedShape.id,
           t("status.shelledMcp", { size: Number(thickness.toFixed(2)) }),
         );
-        return { object: mcpShapeSummary(modifiedShape), thickness, openings, edges, ...(stack > 0 ? { stack } : {}), ...(stackFoot?.hollow ? { stackHollow: true } : {}), ...(stackFoot?.grip ? { stackGrip: stackFoot.grip, stackGripDepth: stackFoot.gripDepth, stackGripSides: stackFoot.gripSides, ...(stackFoot.gripHeight !== undefined ? { stackGripHeight: stackFoot.gripHeight } : {}), ...(stackFoot.gripAt ? { stackGripAt: stackFoot.gripAt } : {}) } : {}), ...(grid ? { gridCells: grid.cells, gridFit: grid.fit } : {}), ...(dividers ? { dividersX: dividers.x, dividersZ: dividers.z, ...(dividers.height !== undefined ? { dividerHeight: dividers.height } : {}), ...(dividers.thickness !== undefined ? { dividerThickness: dividers.thickness } : {}) } : {}), ...(shelf ? { shelf: shelf.width, shelfHeight: shelf.height } : {}) };
+        return { object: mcpShapeSummary(modifiedShape), thickness, openings, edges, ...(stack > 0 ? { stack } : {}), ...(stackFoot?.hollow ? { stackHollow: true } : {}), ...(stackFoot?.grip ? { stackGrip: stackFoot.grip, stackGripDepth: stackFoot.gripDepth, stackGripSides: stackFoot.gripSides, ...(stackFoot.gripHeight !== undefined ? { stackGripHeight: stackFoot.gripHeight } : {}), ...(stackFoot.gripAt ? { stackGripAt: stackFoot.gripAt } : {}) } : {}), ...(grid ? { gridCells: grid.cells, gridFit: grid.fit, ...(grid.magnets ? { gridMagnets: true } : {}) } : {}), ...(dividers ? { dividersX: dividers.x, dividersZ: dividers.z, ...(dividers.height !== undefined ? { dividerHeight: dividers.height } : {}), ...(dividers.thickness !== undefined ? { dividerThickness: dividers.thickness } : {}) } : {}), ...(shelf ? { shelf: shelf.width, shelfHeight: shelf.height } : {}) };
       }
 
       if (command.action === "offset_object") {
@@ -20262,6 +20262,8 @@ export function LayerlingEditor({
           })}
           gridCells={shellTool.gridCells ?? 0}
           gridFit={shellTool.gridFit === true}
+          gridMagnets={shellTool.gridMagnets === true}
+          onGridMagnetsChange={(magnets) => setShellTool((current) => current ? { ...current, gridMagnets: magnets, error: null } : current)}
           gridMax={shellGridEstimate(shapeWidth(selectedShape), shapeDepth(selectedShape), shellTool.thickness).max}
           gridColumns={shellTool.gridColumns ?? shellGridEstimate(shapeWidth(selectedShape), shapeDepth(selectedShape), shellTool.thickness).columns}
           gridRows={shellTool.gridRows ?? shellGridEstimate(shapeWidth(selectedShape), shapeDepth(selectedShape), shellTool.thickness).rows}
@@ -20269,7 +20271,7 @@ export function LayerlingEditor({
           dividers={shellTool.dividers ?? null}
           // The dividers' full height over the floor: the body's height less its floor (the Gridfinity floor's 6.2 mm, or the wall).
           // Under a shelf ledge, up to its top: the ledge's height is measured from the wall's floor.
-          dividerFullHeight={Math.max(0, Math.round((Math.min(selectedShape.height, (shellTool.shelf ?? 0) > 0 ? shellTool.thickness + (shellTool.shelfHeight ?? DEFAULT_SHELL_SHELF_HEIGHT) : Infinity) - ((shellTool.gridCells ?? 0) > 0 ? SHELL_GRID_FLOOR : shellTool.thickness)) * 10) / 10)}
+          dividerFullHeight={Math.max(0, Math.round((Math.min(selectedShape.height, (shellTool.shelf ?? 0) > 0 ? shellTool.thickness + (shellTool.shelfHeight ?? DEFAULT_SHELL_SHELF_HEIGHT) : Infinity) - ((shellTool.gridCells ?? 0) > 0 ? shellGridFloor({ magnets: shellTool.gridMagnets }) : shellTool.thickness)) * 10) / 10)}
           // A Gridfinity floor takes the dividers away: its bins fill the cells, with no room for a divider.
           onGridChange={(cells, fit) => setShellTool((current) => current ? { ...current, gridCells: cells, gridFit: fit, ...(cells > 0 ? { dividers: null } : {}), error: null } : current)}
           onDividersChange={(value) => setShellTool((current) => current ? { ...current, dividers: value, error: null } : current)}

@@ -5,7 +5,7 @@ import { OcctKernel, type ShapeHandle } from "occt-wasm";
 import { shellSolid } from "@/lib/cadShell";
 import { shellDividersSolid, shellGridSolid } from "@/lib/cadShellGrid";
 import { shellStackSolid } from "@/lib/cadShellStack";
-import { SHELL_GRID_FLOOR } from "@/lib/shellGridLimits";
+import { SHELL_GRID_FLOOR, shellGridFloor } from "@/lib/shellGridLimits";
 
 const ROTATE_Z_TO_Y: number[] = [1, 0, 0, 0, 0, 0, 1, 0, 0, -1, 0, 0];
 
@@ -51,6 +51,33 @@ describe("a Gridfinity floor, fit and dividers with the real OCCT kernel", () =>
     // The floor 4.2 mm thicker over 96 x 76 less the sockets of two cells.
     expect(kernel.getVolume(grid)).toBeGreaterThan(kernel.getVolume(shelled) + 10000);
     expect(kernel.getVolume(grid)).toBeLessThan(kernel.getVolume(shelled) + 96 * 76 * 4.2);
+  });
+
+  it("cuts four magnet holes under each socket and makes the floor that much thicker (Discussion #1693)", () => {
+    const { original, shelled } = hollow(100, 80, 40);
+    const plain = shellGridSolid(kernel, original, shelled, { cells: 99, fit: false });
+    const magnets = shellGridSolid(kernel, original, shelled, { cells: 99, fit: false, magnets: true });
+    expect(kernel.isValid(magnets)).toBe(true);
+    expect(kernel.getSubShapes(magnets, "solid")).toHaveLength(1);
+    const floor = shellGridFloor({ magnets: true });
+    expect(floor).toBeCloseTo(SHELL_GRID_FLOOR + 2.4, 6);
+    // The socket's bottom lies 2.4 mm higher; under it the holes, 13 mm from the cell's middle, 2.4 mm deep, 1.2 mm over the bottom.
+    const socketBottom = floor - 5;
+    for (const cx of [-21, 21]) {
+      for (const [dx, dz] of [[-13, -13], [13, -13], [-13, 13], [13, 13]]) {
+        expect(solid(magnets, cx + dx, socketBottom - 1.2, dz)).toBe(false);
+        expect(solid(magnets, cx + dx, 0.6, dz)).toBe(true);
+        expect(solid(magnets, cx + dx + 3.6, socketBottom - 1.2, dz)).toBe(true);
+      }
+      // Between the holes the floor is solid up to the socket's bottom.
+      expect(solid(magnets, cx, socketBottom - 0.5, 0)).toBe(true);
+      expect(solid(magnets, cx, socketBottom + 0.5, 0)).toBe(false);
+    }
+    // 2.4 mm more floor over the inside, less eight holes.
+    const holes = 8 * Math.PI * 3.25 * 3.25 * 2.4;
+    const more = kernel.getVolume(magnets) - kernel.getVolume(plain);
+    expect(more).toBeGreaterThan(2.4 * 96 * 76 * 0.9 - holes);
+    expect(more).toBeLessThan(2.4 * 96 * 76 - holes + 1);
   });
 
   it("keeps to the number of cells asked for, nearest the middle", () => {

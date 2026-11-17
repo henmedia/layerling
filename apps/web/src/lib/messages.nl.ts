@@ -5760,4 +5760,6 @@ export const MESSAGES_NL: Record<MessageKey, string> = {
   "shell.errorDividersNeedsTop": "Tussenschotten vragen een uitgehold lichaam waarvan alleen de bovenkant open is.",
   "shell.errorDividersFailed": "De tussenschotten konden niet op dit lichaam worden gemaakt. Zet ze uit of kies er minder.",
   "status.shellRoundingSkipped": "De afronding van de randen kon niet opnieuw op de nieuwe wanden worden gelegd en is weggelaten.",
+  "shell.gridMagnets": "Magneetgaten",
+  "shell.gridMagnetsHint": "Vier gaten van 6,5 × 2,4 mm onder elke kom, waar de magneten van een bak zitten (13 mm van het midden van het vak), voor magneten van 6 × 2 mm. De bodem wordt 8,6 mm dik, zodat er 1,2 mm onder de gaten blijft.",
 };

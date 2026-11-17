@@ -5764,4 +5764,6 @@ export const MESSAGES_PL: Partial<Record<MessageKey, string>> = {
   "shell.errorDividersNeedsTop": "Przegrody wymagają wydrążonej bryły otwartej tylko od góry.",
   "shell.errorDividersFailed": "Nie udało się zbudować przegród na tej bryle. Wyłącz je lub wybierz mniej.",
   "status.shellRoundingSkipped": "Zaokrąglenia krawędzi nie udało się ponownie nałożyć na nowe ścianki i pominięto je.",
+  "shell.gridMagnets": "Otwory na magnesy",
+  "shell.gridMagnetsHint": "Cztery otwory 6,5 × 2,4 mm pod każdym gniazdem, tam gdzie są magnesy pojemnika (13 mm od środka pola), na magnesy 6 × 2 mm. Dno ma wtedy 8,6 mm, aby pod otworami zostało 1,2 mm.",
 };

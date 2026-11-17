@@ -5734,4 +5734,6 @@ export const MESSAGES_DA: Partial<Record<MessageKey, string>> = {
   "shell.errorDividersNeedsTop": "Skillevægge kræver en udhulet krop, hvor kun toppen er åben.",
   "shell.errorDividersFailed": "Skillevæggene kunne ikke bygges på denne krop. Slå dem fra, eller vælg færre.",
   "status.shellRoundingSkipped": "Afrundingen af kanterne kunne ikke lægges igen på de nye vægge og blev udeladt.",
+  "shell.gridMagnets": "Magnethuller",
+  "shell.gridMagnetsHint": "Fire huller 6,5 × 2,4 mm under hver fordybning, hvor en beholders magneter sidder (13 mm fra feltets midte), til magneter på 6 × 2 mm. Bunden bliver 8,6 mm tyk, så der er 1,2 mm under hullerne.",
 };

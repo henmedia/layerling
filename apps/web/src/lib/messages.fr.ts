@@ -5736,4 +5736,6 @@ export const MESSAGES_FR: Partial<Record<MessageKey, string>> = {
   "shell.errorDividersNeedsTop": "Les séparateurs demandent un corps évidé dont seul le haut est ouvert.",
   "shell.errorDividersFailed": "Les séparateurs n'ont pas pu être construits sur ce corps. Désactive-les ou en choisis moins.",
   "status.shellRoundingSkipped": "L'arrondi des arêtes n'a pas pu être refait sur les nouvelles parois et a été laissé de côté.",
+  "shell.gridMagnets": "Trous pour aimants",
+  "shell.gridMagnetsHint": "Quatre trous de 6,5 × 2,4 mm sous chaque logement, là où se trouvent les aimants d’un bac (à 13 mm du milieu de la case), pour des aimants de 6 × 2 mm. Le fond fait alors 8,6 mm, pour garder 1,2 mm sous les trous.",
 };

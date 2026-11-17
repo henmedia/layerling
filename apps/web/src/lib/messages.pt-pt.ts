@@ -5732,5 +5732,7 @@ export const MESSAGES_PT_PT: Partial<Record<MessageKey, string>> = {
   "shell.errorDividersNeedsTop": "As divisórias exigem um corpo esvaziado com apenas o topo aberto.",
   "shell.errorDividersFailed": "As divisórias não puderam ser construídas neste corpo. Desliga-as ou escolhe menos.",
   "status.shellRoundingSkipped": "O arredondamento das arestas não pôde ser refeito nas novas paredes e foi omitido.",
+  "shell.gridMagnets": "Furos para ímanes",
+  "shell.gridMagnetsHint": "Quatro furos de 6,5 × 2,4 mm sob cada encaixe, onde ficam os ímanes de uma caixa (a 13 mm do centro da célula), para ímanes de 6 × 2 mm. O fundo passa a ter 8,6 mm, para ficarem 1,2 mm sob os furos.",
 };
 

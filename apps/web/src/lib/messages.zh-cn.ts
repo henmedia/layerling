@@ -5740,4 +5740,6 @@ export const MESSAGES_ZH_CN: Partial<Record<MessageKey, string>> = {
   "shell.errorDividersNeedsTop": "隔板要求只有顶部开口的抽壳实体。",
   "shell.errorDividersFailed": "无法在此实体上做出隔板。请关闭它们或选择更少。",
   "status.shellRoundingSkipped": "边缘的圆角无法重新加到新的壁上，已略去。",
+  "shell.gridMagnets": "磁铁孔",
+  "shell.gridMagnetsHint": "每个凹槽下方 4 个 6.5 × 2.4 mm 的孔，位于收纳盒磁铁所在处（距格子中心 13 mm），用于 6 × 2 mm 磁铁。底板变为 8.6 mm 厚，使孔下仍留 1.2 mm。",
 };

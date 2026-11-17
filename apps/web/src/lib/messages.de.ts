@@ -5759,4 +5759,6 @@ export const MESSAGES_DE: Record<MessageKey, string> = {
   "shell.errorDividersNeedsTop": "Trennstege gehen nur bei einem Körper, der nur oben offen ausgehöhlt ist.",
   "shell.errorDividersFailed": "Die Trennstege ließen sich an diesem Körper nicht bauen. Schalte sie aus oder wähle weniger.",
   "status.shellRoundingSkipped": "Die Rundung der Kanten ließ sich auf den neuen Wänden nicht wieder anlegen und blieb weg.",
+  "shell.gridMagnets": "Magnetlöcher",
+  "shell.gridMagnetsHint": "Vier Löcher 6,5 × 2,4 mm unter jeder Mulde, dort wo die Magnete eines Behälters sitzen (13 mm von der Feldmitte), für Magnete 6 × 2 mm. Der Boden wird 8,6 mm dick, damit unter den Löchern 1,2 mm bleiben.",
 };

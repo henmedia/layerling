@@ -5712,4 +5712,6 @@ export const MESSAGES_HU: Partial<Record<MessageKey, string>> = {
   "shell.errorDividersNeedsTop": "A válaszfalakhoz olyan kivájt test kell, amelynek csak a teteje nyitott.",
   "shell.errorDividersFailed": "A válaszfalakat nem sikerült megépíteni ezen a testen. Kapcsold ki őket, vagy válassz kevesebbet.",
   "status.shellRoundingSkipped": "Az élek lekerekítését nem sikerült újra felvinni az új falakra, ezért kimaradt.",
+  "shell.gridMagnets": "Mágneslyukak",
+  "shell.gridMagnetsHint": "Négy 6,5 × 2,4 mm-es lyuk minden mélyedés alatt, ahol egy tároló mágnesei ülnek (a mező közepétől 13 mm-re), 6 × 2 mm-es mágnesekhez. Az alj 8,6 mm vastag lesz, hogy a lyukak alatt 1,2 mm maradjon.",
 };

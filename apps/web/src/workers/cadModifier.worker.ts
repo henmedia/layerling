@@ -11,7 +11,7 @@ import { STACK_NEEDS_TOP_MESSAGE, shellStackFloor, shellStackSolid } from "@/lib
 import { normalizeShellStackFoot } from "@/lib/shellStackLimits";
 import { GRIDFINITY_FLOOR } from "@/lib/gridfinityGeometry";
 import { shellDividersSolid, shellGridSolid } from "@/lib/cadShellGrid";
-import { DIVIDERS_NEEDS_TOP_MESSAGE, GRID_NEEDS_TOP_MESSAGE, SHELL_GRID_FLOOR, normalizeShellDividers, normalizeShellGrid } from "@/lib/shellGridLimits";
+import { DIVIDERS_NEEDS_TOP_MESSAGE, GRID_NEEDS_TOP_MESSAGE, normalizeShellDividers, normalizeShellGrid, shellGridFloor } from "@/lib/shellGridLimits";
 import { SHELF_NEEDS_TOP_MESSAGE, shellShelfSolid } from "@/lib/cadShellShelf";
 import { DEFAULT_SHELL_SHELF_HEIGHT, clampShellShelfHeight } from "@/lib/shellShelfLimits";
 import { shellOpenSides } from "@/lib/shellLimits";
@@ -1400,7 +1400,7 @@ async function bearbeiteAnfrage(request: CadModifierWorkerRequest, halter: { cad
           // On a stacking floor the sockets start where that floor ends.
           const lift = floorTop === null ? 0 : floorTop - bottom - GRIDFINITY_FLOOR;
           const floored = shellGridSolid(activeCad, solid, component, grid, lift);
-          floorTop = bottom + lift + SHELL_GRID_FLOOR;
+          floorTop = bottom + lift + shellGridFloor(grid);
           activeCad.release(component);
           component = floored;
         }

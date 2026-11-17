@@ -1,9 +1,16 @@
-import { DEFAULT_GRIDFINITY_DIVIDER_THICKNESS, GRIDFINITY_BASEPLATE_HEIGHT, GRIDFINITY_DRAWER_CLEARANCE, GRIDFINITY_FLOOR, GRIDFINITY_GRID, MAX_GRIDFINITY_DIVIDER_THICKNESS, MAX_GRIDFINITY_LARGE_PLATE_UNITS, MIN_GRIDFINITY_DIVIDER_HEIGHT, MIN_GRIDFINITY_DIVIDER_THICKNESS } from "@/lib/gridfinityGeometry";
+import { DEFAULT_GRIDFINITY_DIVIDER_THICKNESS, GRIDFINITY_BASEPLATE_HEIGHT, GRIDFINITY_MAGNET_DEPTH, GRIDFINITY_DRAWER_CLEARANCE, GRIDFINITY_FLOOR, GRIDFINITY_GRID, MAX_GRIDFINITY_DIVIDER_THICKNESS, MAX_GRIDFINITY_LARGE_PLATE_UNITS, MIN_GRIDFINITY_DIVIDER_HEIGHT, MIN_GRIDFINITY_DIVIDER_THICKNESS } from "@/lib/gridfinityGeometry";
 
 /* What the Gridfinity floor, the fit to the grid and the dividers of a hollowed box offer; no kernel in here, so the panel can use it. */
 
 /** The floor of the box up to the top of the baseplate's sockets: the sockets' depth and the closed floor under them, in mm. */
 export const SHELL_GRID_FLOOR = GRIDFINITY_BASEPLATE_HEIGHT + GRIDFINITY_FLOOR;
+/**
+ * The floor with magnet holes (Discussion #1693): four 6.5 x 2.4 mm holes under each socket, where a bin's own magnets
+ * sit (13 mm from the cell's middle each way), with the closed floor still under them, so the floor is that much thicker.
+ */
+export function shellGridFloor(grid: Pick<ShellGrid, "magnets"> | null | undefined) {
+  return SHELL_GRID_FLOOR + (grid?.magnets ? GRIDFINITY_MAGNET_DEPTH : 0);
+}
 /** The room left above the floor: the cavity must be at least this deep, in mm. */
 export const SHELL_GRID_MIN_DEPTH = 3;
 /** The play round the cells of a fitted box, as the drawer fit leaves it, in mm. */
@@ -21,7 +28,7 @@ export const MAX_SHELL_DIVIDER_THICKNESS = MAX_GRIDFINITY_DIVIDER_THICKNESS;
 export const MIN_SHELL_DIVIDER_HEIGHT = MIN_GRIDFINITY_DIVIDER_HEIGHT;
 export const MAX_SHELL_DIVIDERS = 8;
 
-export type ShellGrid = { cells: number; fit: boolean };
+export type ShellGrid = { cells: number; fit: boolean; magnets?: boolean };
 /** `height`: over the floor, in mm, 0 or unset the full height; `thickness`: in mm, unset 1.2. */
 export type ShellDividers = { x: number; z: number; height?: number; thickness?: number };
 
@@ -42,9 +49,9 @@ export function clampShellCount(value: unknown, max: number) {
 /** The Gridfinity floor as stored: null when off. */
 export function normalizeShellGrid(value: unknown): ShellGrid | null {
   if (!value || typeof value !== "object") return null;
-  const { cells, fit } = value as Record<string, unknown>;
+  const { cells, fit, magnets } = value as Record<string, unknown>;
   const count = clampShellCount(cells, MAX_SHELL_GRID_CELLS);
-  return count > 0 ? { cells: count, fit: fit === true } : null;
+  return count > 0 ? { cells: count, fit: fit === true, ...(magnets === true ? { magnets: true } : {}) } : null;
 }
 
 /** The dividers as stored: null when there are none. */

@@ -3561,4 +3561,6 @@ export const MESSAGES_TR: Partial<Record<MessageKey, string>> = {
   "shell.errorDividersNeedsTop": "Bölmeler için yalnızca üstü açık oyulmuş bir gövde gerekir.",
   "shell.errorDividersFailed": "Bölmeler bu gövdede oluşturulamadı. Kapatın veya daha azını seçin.",
   "status.shellRoundingSkipped": "Kenarların yuvarlatması yeni duvarlara yeniden uygulanamadı ve atlandı.",
+  "shell.gridMagnets": "Mıknatıs delikleri",
+  "shell.gridMagnetsHint": "Her yuvanın altında, bir kutunun mıknatıslarının durduğu yerde (hücre ortasından 13 mm) 6,5 × 2,4 mm dört delik, 6 × 2 mm mıknatıslar için. Taban 8,6 mm kalınlığa çıkar, deliklerin altında 1,2 mm kalır.",
 };

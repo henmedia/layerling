@@ -40,6 +40,8 @@ export function ShellPanel({
   onStackFootChange,
   gridCells,
   gridFit,
+  gridMagnets,
+  onGridMagnetsChange,
   gridMax,
   gridColumns,
   gridRows,
@@ -85,6 +87,9 @@ export function ShellPanel({
   /** A Gridfinity baseplate in the floor with this many cells at most (0 for none), the walls fitted to the grid, and how many cells the inside holds at most. */
   gridCells: number;
   gridFit: boolean;
+  /** Magnet holes under the sockets (Discussion #1693). */
+  gridMagnets: boolean;
+  onGridMagnetsChange: (magnets: boolean) => void;
   gridMax: number;
   /** The cells across and along the inside holds, or as asked for: the body is made exactly that large when it is applied. */
   gridColumns: number;
@@ -256,6 +261,11 @@ export function ShellPanel({
               <input type="checkbox" checked={gridFit} disabled={busy} onChange={(event) => onGridChange(gridCells, event.target.checked)} />
               <span>{t("shell.gridFit")}</span>
             </label>
+            <label className="edge-modifier-field offset-copy">
+              <input type="checkbox" checked={gridMagnets} disabled={busy} data-testid="shell-grid-magnets" onChange={(event) => onGridMagnetsChange(event.target.checked)} />
+              <span>{t("shell.gridMagnets")}</span>
+            </label>
+            {gridMagnets ? <span className="shell-openings-summary">{t("shell.gridMagnetsHint")}</span> : null}
           </>) : null}
           <span className="shell-openings-summary">{gridMax < 1 ? t("shell.gridNoCell") : t("shell.gridHint")}</span>
         </div>

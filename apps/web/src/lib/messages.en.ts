@@ -5760,6 +5760,8 @@ export const MESSAGES_EN = {
   "shell.errorDividersNeedsTop": "Dividers need a body hollowed with only its top open.",
   "shell.errorDividersFailed": "The dividers could not be built on this body. Switch them off or choose fewer.",
   "status.shellRoundingSkipped": "The rounding of the edges could not be laid again on the new walls and was left out.",
+  "shell.gridMagnets": "Magnet holes",
+  "shell.gridMagnetsHint": "Four holes 6.5 × 2.4 mm under each socket, where a bin's own magnets sit (13 mm from the middle of the cell), for 6 × 2 mm magnets. The floor becomes 8.6 mm thick, so 1.2 mm stays under the holes.",
 } as const;
 
 export type MessageKey = keyof typeof MESSAGES_EN;

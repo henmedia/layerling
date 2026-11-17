@@ -5731,4 +5731,6 @@ export const MESSAGES_JA: Partial<Record<MessageKey, string>> = {
   "shell.errorDividersNeedsTop": "仕切りは、上だけが開いた中空の形状でのみ使えます。",
   "shell.errorDividersFailed": "この形状には仕切りを作れませんでした。オフにするか、数を減らしてください。",
   "status.shellRoundingSkipped": "角の丸めは新しい壁に付け直せなかったため、省きました。",
+  "shell.gridMagnets": "マグネット穴",
+  "shell.gridMagnetsHint": "各ソケットの下に 6.5 × 2.4 mm の穴を 4 つ。ビンのマグネットがある位置 (セル中心から 13 mm) で、6 × 2 mm のマグネット用です。穴の下に 1.2 mm 残るよう、床は 8.6 mm の厚さになります。",
 };

@@ -5767,4 +5767,6 @@ export const MESSAGES_AR: Partial<Record<MessageKey, string>> = {
   "shell.errorDividersNeedsTop": "تحتاج الفواصل إلى جسم مجوّف مفتوح من الأعلى فقط.",
   "shell.errorDividersFailed": "تعذّر بناء الفواصل على هذا الجسم. أوقفها أو اختر عددًا أقل.",
   "status.shellRoundingSkipped": "تعذّرت إعادة تدوير الحواف على الجدران الجديدة فتم تركه.",
+  "shell.gridMagnets": "ثقوب المغناطيس",
+  "shell.gridMagnetsHint": "أربعة ثقوب 6.5 × 2.4 مم تحت كل تجويف، حيث تقع مغناطيسات الحاوية (على بعد 13 مم من منتصف الخلية)، لمغناطيسات 6 × 2 مم. يصبح القاع بسماكة 8.6 مم ليبقى 1.2 مم تحت الثقوب.",
 };

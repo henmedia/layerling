@@ -5754,4 +5754,6 @@ export const MESSAGES_SV: Partial<Record<MessageKey, string>> = {
   "shell.errorDividersNeedsTop": "Skiljeväggar kräver en urholkad kropp där bara toppen är öppen.",
   "shell.errorDividersFailed": "Skiljeväggarna kunde inte byggas på den här kroppen. Stäng av dem eller välj färre.",
   "status.shellRoundingSkipped": "Rundningen av kanterna kunde inte läggas om på de nya väggarna och utelämnades.",
+  "shell.gridMagnets": "Magnethål",
+  "shell.gridMagnetsHint": "Fyra hål 6,5 × 2,4 mm under varje fack, där en låda har sina magneter (13 mm från rutans mitt), för magneter 6 × 2 mm. Botten blir 8,6 mm tjock, så att 1,2 mm blir kvar under hålen.",
 };

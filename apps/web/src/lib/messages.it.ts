@@ -5736,4 +5736,6 @@ export const MESSAGES_IT: Partial<Record<MessageKey, string>> = {
   "shell.errorDividersNeedsTop": "I divisori richiedono un corpo svuotato con solo il lato superiore aperto.",
   "shell.errorDividersFailed": "I divisori non si sono potuti costruire su questo corpo. Disattivali o sceglierne meno.",
   "status.shellRoundingSkipped": "L'arrotondamento degli spigoli non si è potuto rifare sulle nuove pareti ed è stato tralasciato.",
+  "shell.gridMagnets": "Fori per magneti",
+  "shell.gridMagnetsHint": "Quattro fori da 6,5 × 2,4 mm sotto ogni alloggiamento, dove stanno i magneti di un contenitore (a 13 mm dal centro della cella), per magneti 6 × 2 mm. Il fondo diventa spesso 8,6 mm, così sotto i fori restano 1,2 mm.",
 };

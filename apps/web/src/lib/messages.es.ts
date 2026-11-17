@@ -5761,4 +5761,6 @@ export const MESSAGES_ES: Partial<Record<MessageKey, string>> = {
   "shell.errorDividersNeedsTop": "Los separadores requieren un cuerpo vaciado con solo la parte superior abierta.",
   "shell.errorDividersFailed": "No se pudieron construir los separadores en este cuerpo. Desactívalos o elige menos.",
   "status.shellRoundingSkipped": "El redondeo de los bordes no pudo volver a hacerse en las paredes nuevas y se omitió.",
+  "shell.gridMagnets": "Agujeros para imanes",
+  "shell.gridMagnetsHint": "Cuatro agujeros de 6,5 × 2,4 mm bajo cada hueco, donde van los imanes de una caja (a 13 mm del centro de la celda), para imanes de 6 × 2 mm. El fondo pasa a 8,6 mm para que queden 1,2 mm bajo los agujeros.",
 };

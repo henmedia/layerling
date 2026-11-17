@@ -1,6 +1,6 @@
 import type { OcctKernel, ShapeHandle, Vec3 } from "occt-wasm";
 import { block, rimFaces, tracking } from "@/lib/cadLid";
-import { GRIDFINITY_BASEPLATE_HEIGHT, GRIDFINITY_BASEPLATE_RADIUS, GRIDFINITY_GRID, GRIDFINITY_SOCKET, MAX_GRIDFINITY_LARGE_PLATE_UNITS, gridfinityDividerHeightTop, gridfinityOutlineCells } from "@/lib/gridfinityGeometry";
+import { GRIDFINITY_BASEPLATE_HEIGHT, GRIDFINITY_BASEPLATE_RADIUS, GRIDFINITY_GRID, GRIDFINITY_MAGNET_DEPTH, GRIDFINITY_MAGNET_DIAMETER, GRIDFINITY_MAGNET_OFFSET, GRIDFINITY_SOCKET, MAX_GRIDFINITY_LARGE_PLATE_UNITS, gridfinityDividerHeightTop, gridfinityOutlineCells } from "@/lib/gridfinityGeometry";
 import {
   DIVIDERS_FAILED_MESSAGE,
   DIVIDERS_NEEDS_TOP_MESSAGE,
@@ -9,7 +9,7 @@ import {
   GRID_NO_CELL_MESSAGE,
   GRID_TOO_LOW_MESSAGE,
   SHELL_DIVIDER_THICKNESS,
-  SHELL_GRID_FLOOR,
+  shellGridFloor,
   SHELL_GRID_MIN_DEPTH,
   SHELL_GRID_PLAY,
   type ShellDividers,
@@ -27,6 +27,9 @@ import {
  *   whole cells fit in it, and the box sized to them is the one that holds them.
  * - Dividers stand on the floor between the walls, evenly across and along the inside.
  */
+
+/** The kernel builds a cylinder along z; this stands it up along y. */
+const Z_TO_Y_UP = [1, 0, 0, 0, 0, 0, 1, 0, 0, -1, 0, 0];
 
 /** The cut that reaches a little past the floor's top, so the sockets open cleanly. */
 const PAST = 0.01;
@@ -138,7 +141,7 @@ export function shellGridSolid(kernel: OcctKernel, original: ShapeHandle, shelle
   let result: ShapeHandle | null = null;
   try {
     const { polygon, top, bottom, total, opening, rim } = cavityOutline(cad, shelled, GRID_NEEDS_TOP_MESSAGE);
-    const floorTop = bottom + Math.max(0, lift) + SHELL_GRID_FLOOR;
+    const floorTop = bottom + Math.max(0, lift) + shellGridFloor(grid);
     if (total < floorTop - bottom + SHELL_GRID_MIN_DEPTH) throw new Error(GRID_TOO_LOW_MESSAGE);
     const cells = shellGridCells(polygon, grid.cells);
     const box = cad.getBoundingBox(original);
@@ -159,7 +162,16 @@ export function shellGridSolid(kernel: OcctKernel, original: ShapeHandle, shelle
       parts.push(cad.common(original, cad.cut(slab(floorTop - 1, top), inside)));
     }
     let body = cad.fuseAll(parts);
-    body = cad.cutAll(body, cells.map((cell) => socketCutter(cad, cell, floorTop - GRIDFINITY_BASEPLATE_HEIGHT)));
+    const socketBottom = floorTop - GRIDFINITY_BASEPLATE_HEIGHT;
+    body = cad.cutAll(body, cells.map((cell) => socketCutter(cad, cell, socketBottom)));
+    if (grid.magnets) {
+      // Four magnet holes under each socket, as under a bin's feet, reaching a little into the socket so they open cleanly.
+      const holes = cells.flatMap((cell) => [-1, 1].flatMap((sx) => [-1, 1].map((sz) => cad.translate(
+        cad.transform(cad.makeCylinder(GRIDFINITY_MAGNET_DIAMETER / 2, GRIDFINITY_MAGNET_DEPTH + PAST), Z_TO_Y_UP),
+        cell.x + sx * GRIDFINITY_MAGNET_OFFSET, socketBottom - GRIDFINITY_MAGNET_DEPTH, cell.z + sz * GRIDFINITY_MAGNET_OFFSET,
+      ))));
+      body = cad.cutAll(body, holes);
+    }
     body = cad.simplify(body);
     result = oneSolid(cad, body, GRID_FAILED_MESSAGE);
     return result;
