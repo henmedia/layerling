@@ -57,6 +57,14 @@ describe("exact Gridfinity bins with an overhang", { timeout: 300_000 }, () => {
     expectBuilt(bin({ depth: 61.25, height: 21, gridfinityLip: false, gridfinityOverhangBack: 19.5, gridfinityOverhangSolid: true }));
   });
 
+  it("builds the cases with an edge on four faces in the mesh as one solid matching it (mlugo-apx, after #1542)", () => {
+    const all = { gridfinityOverhangBack: 5, gridfinityOverhangFront: 5, gridfinityOverhangLeft: 5, gridfinityOverhangRight: 5 };
+    expectBuilt(bin({ width: 94, depth: 94, height: 46.4, ...all, gridfinityOverhangSolid: true, gridfinityOverhangChamfer: 10, gridfinityOpenRight: true }));
+    expectBuilt(bin({ width: 103.5, gridfinityBinCornerRadius: 0, gridfinityOverhangRight: 19.75, gridfinityOverhangSolid: true }));
+    expectBuilt(bin({ width: 103.5, gridfinityBinCornerRadius: 0, gridfinityOverhangRight: 19.75, gridfinityOverhangLipOnGrid: true }));
+    expectBuilt(bin({ width: 94, depth: 94, height: 46.4, ...all, gridfinityBinCornerRadius: 0, gridfinityOpenRight: true }));
+  });
+
   it("builds a chamfered overhang with compartments, a scoop and a shelf on the overhung wall", () => {
     expectBuilt(right({ height: 32.4, gridfinityOverhangChamfer: 20, gridfinityCompartmentsX: 3, gridfinityScoopRight: true, gridfinityLabelRight: true }));
   });
