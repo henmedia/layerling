@@ -157,8 +157,10 @@ export function ThreadInsertPanel({
               <span>{t("threadInsert.positionHint")}</span>
             </div>
           ) : null}
-          <div className="edge-modifier-field">
-            <button type="button" className="secondary" disabled={!centerAvailable || busy} onClick={onCenter}>{t("threadInsert.center")}</button>
+          <div className="edge-modifier-field shell-openings">
+            <div className="shell-opening-options">
+              <button type="button" disabled={!centerAvailable || busy} onClick={onCenter}>{t("threadInsert.center")}</button>
+            </div>
             <span>{centerAvailable ? t("threadInsert.centerHint") : t("threadInsert.centerNone")}</span>
           </div>
           <div className="edge-modifier-field"><span>{t("threadInsert.dragHint")}</span></div>
