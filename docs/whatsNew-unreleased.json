@@ -1,6 +1,16 @@
 [
   {
     "title": {
+      "de": "Verschieben bis an die Wand",
+      "en": "Move right up to the wall"
+    },
+    "body": {
+      "de": "Ziehst du ein Teil, rastet es jetzt auch an der Wand ein, auf die es trifft, selbst an der Innenwand eines Kastens oder Gehäuses. So sitzt ein Teil bündig in der Ecke eines Gehäuses, ohne dass du nachmessen musst.",
+      "en": "When you drag a part, it now also snaps to the wall it runs into, even the inside wall of a box or case. So a part sits flush in the corner of a case, without measuring."
+    }
+  },
+  {
+    "title": {
       "de": "Lochmuster bis an die Kante",
       "en": "Hole pattern right to the edge"
     },

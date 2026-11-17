@@ -7,7 +7,7 @@ import { starSettingsForSize } from "@/lib/starGeometry";
 import { gridfinityFootprintPatch } from "@/lib/gridfinityGeometry";
 import { pulleyFootprint, pulleyFromSize, pulleySizedPatch } from "@/lib/pulleyGeometry";
 import { type SelectionFrame } from "@/lib/liftGeometry";
-import type { EdgeSnapTarget, SnapBox } from "@/lib/objectSnap";
+import type { EdgeSnapTarget, MoveWallSnap, SnapBox } from "@/lib/objectSnap";
 import { scaledHorizontalShapePatch, worldBoxOfShapes } from "@/lib/scaleByPercent";
 import { POSITION_TYPED_LIMIT } from "@/lib/workplaneSettings";
 import { heightPatchKeepingBase, shapeIsTurned } from "@/lib/rotationPivot";
@@ -53,8 +53,11 @@ export type TransformDragState = {
   liftStartValue?: number;
   /** Alt was held when a lift began: the shapes stand in for a copy that is made on release (#865). */
   duplicate?: { standIns: THREE.Object3D[] };
-  /** An X or Y arrow on the flat workplane (Discussion #1434): the footprints it snaps to, as a drag does; guideY: where its lines are drawn. */
-  slideSnap?: { moving: SnapBox; targets: SnapBox[]; guideY: number };
+  /**
+   * An X or Y arrow on the flat workplane (Discussion #1434): the footprints and walls it snaps to, as a drag does;
+   * guideY: where its lines are drawn.
+   */
+  slideSnap?: { moving: SnapBox; targets: SnapBox[]; walls?: MoveWallSnap; guideY: number };
   /**
    * A side handle on the flat workplane (Discussion #1647): the dragged side stops at the edges and middles of other
    * bodies and at the walls it runs into. `frameAxis` is the selection's own axis the handle pulls along, `worldAxis`

@@ -7,7 +7,7 @@ import { markEscapeHandled } from "@/lib/escapeHandled";
 import { ArrowDownToLine, Check, ChevronLeft, Crosshair, Cuboid, Download, Eye, EyeOff, FlipHorizontal, GripVertical, Home, Layers, Minus, Move, MousePointer2, PanelsTopLeft, Pointer, ScanEye, PencilLine, PictureInPicture2, Plus, Rotate3d, RotateCcw, RotateCw, Ruler, RulerDimensionLine, Scaling, Slice, Spline, Trash2, X } from "lucide-react";
 import { loadTouchHandleMode, nextTouchHandleMode, saveTouchHandleMode, touchModeMovesBody, type TouchHandleMode } from "@/lib/touchHandleMode";
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperties, type Dispatch, type DragEvent, type MutableRefObject, type PointerEvent as ReactPointerEvent, type ReactNode, type SetStateAction, type WheelEvent as ReactWheelEvent } from "react";
-import { boxEdgeTargets, edgeSnapGuide, objectSnapOffset, shiftSnapBox, snapResizeEdge, type EdgeSnapTarget, type ObjectSnapGuide, type SnapBox } from "@/lib/objectSnap";
+import { boxEdgeTargets, edgeSnapGuide, objectSnapOffset, shiftSnapBox, snapResizeEdge, wallLines, type EdgeSnapTarget, type MoveWallSnap, type ObjectSnapGuide, type SnapBox } from "@/lib/objectSnap";
 import { dragReach } from "@/lib/dragReach";
 import { useMovablePanel, type MovablePanelOptions } from "@/lib/useMovablePanel";
 import { computeSectionPlaneVector, DEFAULT_SECTION_SETTINGS, getSectionBounds, SECTION_AXES_SHOWN, sectionAxisLetter, sectionAxisVector, sectionFineWindow, sectionFrameFromView, sectionFrameFromWorkplane, sectionPlacementWorkplane, sectionPointFromFrame, sectionPointToFrame, type SectionFrame, type SectionOrientation, type SectionPlaneAxis, type SectionPlaneSettings } from "@/lib/sectionView";
@@ -117,7 +117,7 @@ import { syncHistoryPickHighlight, syncPickHighlight } from "@/components/workpl
 import { orbitViewBy, panViewBy } from "@/lib/viewArrowKeys";
 import { useViewportKeyboardHooks } from "@/components/workplane/viewportKeyboard";
 import { useViewportDoubleClick } from "@/components/workplane/useViewportDoubleClick";
-import { aimPickRay, firstShapeHit, paintLassoInView, pickImagePoint, pickLayFlatFace, pickMateFace, pickPaintFace, pickFaceCentre, pickRotationPivot, pickShapeAt, pointerRayFor, shapesUnderPointer, rayPointOnRotationPlane, RENDER_LAYER_SHAPES, splitAxisParameter, usePickOnlyPointer, worldTrianglePositions, type LayFlatPick, type PickOnlySelection } from "@/components/workplane/viewportPicking";
+import { aimPickRay, firstShapeHit, moveSnapWalls, paintLassoInView, pickImagePoint, pickLayFlatFace, pickMateFace, pickPaintFace, pickFaceCentre, pickRotationPivot, pickShapeAt, pointerRayFor, shapesUnderPointer, rayPointOnRotationPlane, RENDER_LAYER_SHAPES, splitAxisParameter, usePickOnlyPointer, WALL_RAYS_ACROSS, WALL_RAYS_UP, wallRaySkip, wallSnapForSelection, worldTrianglePositions, type LayFlatPick, type PickOnlySelection } from "@/components/workplane/viewportPicking";
 import { fastEdgesGeometry } from "@/lib/fastEdgesGeometry";
 import { RENDER_LAYER_HELPERS, type PointCardOffset, type ThreeState, type MoveDimensionSession, type NoteOverlayState, type TapePoint, type TapeAttachment, type TapeEdgeAttachment, type TapeModel, type TapeOverlayState, type TapeCandidate, type DragItem, quaternionForShape, projectToScreen, syncMoveDimensionWorldLines, tapeShapeDimensions, tapePointWorld, tapeEdgeWorldPoints, tapeSegmentWorldPoints, tapeLengthMoverOf, tapeLengthRefusalText, syncTapeOverlay, tapeSegmentLengths, syncNoteOverlay, NoteOverlay, TapeOverlay, type RulerDimensionOverlayItem, type RulerDimensionOverlayState, syncRulerDimensionOverlay, RulerDimensionOverlay, type CornerRulerInstance, type CornerRulerOverlayState, syncCornerRulerToolOverlay, CornerRulerToolOverlay, syncOriginDimensionWorldLines, shapeCenter, shapeLocalExtents, projectShapeExtent, projectShapesExtent, type OriginDimensionFrame, formatMeasure, findShapeObject, releaseSharedShapeMaterials, disposeChildren, disposeObject } from "@/components/workplane/ViewportOverlays";
 import { MIN_SHAPE_SIZE, RENDER_LAYER_PREVIEWS, overhangUniforms, setEdgeLineStyle, setStrongHoles, setRulerInchScale, MODIFIER_EDGE_DEPTH_PULL, clamp, selectionFrameForShapes, refreshFrozenObjectMatrix, updateShapeObjectTransform, applySectionClipping, rebuildShapes, rebuildModifierEdges, setModifierEdgeHover, rebuildSelectionHelpers, cadFacePickLayerMesh, syncCadFaceLayer, syncBentTubeSegment, TRANSPARENT_SOLID_OPACITY, createShapeObject, onGroupDisplayReady } from "./workplane/viewportShapeObjects";
@@ -587,6 +587,8 @@ type DragState = {
   /** World footprint of the dragged shapes at the start, when snapping to other shapes is on. */
   snapMoving?: SnapBox | null;
   snapTargets?: SnapBox[];
+  /** The walls the dragged shapes run into, found on the way (`moveSnapWalls`). */
+  wallSnap?: MoveWallSnap;
 };
 
 type MoveDimensionOverlayState = MoveDimensionOverlayData & {
@@ -1123,37 +1125,26 @@ function resizeSnapForHandle(
   const movingTo = frame.center[otherAxis] + crossSize / 2;
   const targets: EdgeSnapTarget[] = boxEdgeTargets(moveSnapTargets(shapes, moved, points, workplane), worldAxis);
   // Rays from the dragged side, a little inside it so a wall it already touches is met, spread over its face.
-  const skip = new Set([...moved, ...shapes.filter((entry) => entry.hidden).map((entry) => entry.id)]);
+  const skip = wallRaySkip(shapes, moved);
   const direction = new THREE.Vector3();
   direction[worldAxis] = worldDirection;
   const side = framePoint(frame, frameAxis === "x" ? (sign * size) / 2 : 0, 0, frameAxis === "z" ? (sign * size) / 2 : 0);
   const height = frame.max.y - frame.min.y;
   const middleY = (frame.max.y + frame.min.y) / 2;
-  const walls = new Map<string, EdgeSnapTarget>();
+  const hits: THREE.Vector3[] = [];
   state.raycaster.layers.set(RENDER_LAYER_SHAPES);
-  for (const across of [-0.4, -0.2, 0, 0.2, 0.4]) {
-    for (const up of [-0.4, 0, 0.4]) {
+  for (const across of WALL_RAYS_ACROSS) {
+    for (const up of WALL_RAYS_UP) {
       const origin = side.clone()
         .addScaledVector(crossVector, across * crossSize)
         .addScaledVector(frame.yAxis, middleY + up * height)
         .addScaledVector(direction, -0.01);
       state.raycaster.set(origin, direction);
       const hit = firstShapeHit(state, { needsFace: true, skip });
-      if (!hit) continue;
-      // To a hundredth: a mesh carries float rounding, and a hole cuts a thousandth wider than typed.
-      const value = Math.round(hit.point[worldAxis] * 100) / 100;
-      const key = value.toFixed(2);
-      const along = hit.point[otherAxis];
-      const wall = walls.get(key);
-      if (wall) {
-        wall.from = Math.min(wall.from, along);
-        wall.to = Math.max(wall.to, along);
-      } else {
-        walls.set(key, { value, from: along, to: along });
-      }
+      if (hit) hits.push(hit.point);
     }
   }
-  targets.push(...walls.values());
+  targets.push(...wallLines(hits, worldAxis));
   // The guide lies under the body, so it shows on the floor of a case too, not hidden in it on the workplane.
   const guideY = framePoint(frame, 0, frame.min.y, 0).y;
   return { frameAxis, worldAxis, worldDirection, targets, movingFrom, movingTo, guideY };
@@ -4590,7 +4581,8 @@ export function WorkplaneViewport({
       if ((kind === "lift" || kind === "height" || kind === "slide") && !liftStartPoint) {
         return;
       }
-      // On the flat workplane an arrow snaps to the edges and middles of other bodies as a drag does.
+      // On the flat workplane an arrow snaps to the edges and middles of other bodies and the walls it runs
+      // into, as a drag does.
       const slideFlat = kind === "slide" && isWorldHorizontalWorkplane(activeWorkplane);
       const slideMoving = slideFlat && workspaceRef.current.objectSnap
         ? unionSnapBox(frame.ids.flatMap((id) => {
@@ -4602,6 +4594,7 @@ export function WorkplaneViewport({
         ? {
             moving: slideMoving,
             targets: moveSnapTargets(shapesRef.current, new Set(frame.ids), notesVisibleRef.current ? referencePoints(notesRef.current) : [], activeWorkplane),
+            walls: wallSnapForSelection(shapesRef.current, new Set(frame.ids)),
             guideY: activeWorkplane.origin.y,
           }
         : undefined;
@@ -4981,20 +4974,18 @@ export function WorkplaneViewport({
         let delta = snapValue(rawDelta, step);
         const snap = transform.slideSnap;
         if (snap && state) {
-          // As in a drag, an edge or the middle that comes near one of another body is pulled onto it;
-          // Alt lets the selection go free. On the flat workplane the axis is X or minus Z of the scene.
+          // As in a drag, an edge or the middle that comes near one of another body is pulled onto it, and a side onto
+          // a wall; Alt lets the selection go free. On the flat workplane the axis is X or minus Z of the scene.
           const alongX = Math.abs(axis.x) >= Math.abs(axis.z);
           let guides: ObjectSnapGuide[] = [];
           if (!altKey) {
-            const pull = objectSnapOffset(
-              shiftSnapBox(snap.moving, axis.x * rawDelta, axis.z * rawDelta),
-              snap.targets,
-              objectSnapThreshold(state, currentPoint ?? transform.selectionFrame.center),
-            );
+            const moved = shiftSnapBox(snap.moving, axis.x * rawDelta, axis.z * rawDelta);
+            const walls = snap.walls ? moveSnapWalls(state, snap.walls, moved, [alongX ? "x" : "z"]) : undefined;
+            const pull = objectSnapOffset(moved, snap.targets, objectSnapThreshold(state, currentPoint ?? transform.selectionFrame.center), walls);
             const extra = alongX ? pull.dx : pull.dz;
             if (extra !== null) {
               delta = rawDelta + extra / (alongX ? axis.x : axis.z);
-              guides = objectSnapOffset(shiftSnapBox(snap.moving, axis.x * delta, axis.z * delta), snap.targets, 1e-4)
+              guides = objectSnapOffset(shiftSnapBox(snap.moving, axis.x * delta, axis.z * delta), snap.targets, 1e-4, walls)
                 .guides.filter((guide) => guide.axis === (alongX ? "x" : "z"));
             }
           }
@@ -7478,6 +7469,7 @@ export function WorkplaneViewport({
           notesVisibleRef.current ? referencePoints(notesRef.current) : [],
           activeWorkplane,
         );
+        dragRef.current.wallSnap = wallSnapForSelection(shapesRef.current, dragged);
       }
       if (moveDimensionsEnabledRef.current && usesWorldHorizontalAxes) {
         const dragFrame = selectionFrameForShapes(shapesRef.current, items.map((item) => item.id));
@@ -7758,11 +7750,14 @@ export function WorkplaneViewport({
           const hiddenAxis = edgeOn ? (Math.abs(view.z) >= Math.abs(view.x) ? "z" : "x") : null;
           const rawDeltaX = axisLock?.along === "z" ? 0 : raw.x - drag.startPoint.x;
           const rawDeltaZ = axisLock?.along === "x" ? 0 : raw.z - drag.startPoint.z;
-          const snap = objectSnapOffset(shiftSnapBox(drag.snapMoving, rawDeltaX, rawDeltaZ), drag.snapTargets, objectSnapThreshold(state, raw));
+          const rawBox = shiftSnapBox(drag.snapMoving, rawDeltaX, rawDeltaZ);
+          // Judged where the pointer is, so a wall's guide stays once the part is pulled along the other axis.
+          const walls = drag.wallSnap ? moveSnapWalls(state, drag.wallSnap, rawBox, (["x", "z"] as const).filter((axis) => axis !== hiddenAxis && (!axisLock || axisLock.along === axis))) : undefined;
+          const snap = objectSnapOffset(rawBox, drag.snapTargets, objectSnapThreshold(state, raw), walls);
           if (snap.dx !== null && axisLock?.along !== "z" && hiddenAxis !== "x") deltaX = rawDeltaX + snap.dx;
           if (snap.dz !== null && axisLock?.along !== "x" && hiddenAxis !== "z") deltaZ = rawDeltaZ + snap.dz;
           if (snap.dx !== null || snap.dz !== null) {
-            guides = objectSnapOffset(shiftSnapBox(drag.snapMoving, deltaX, deltaZ), drag.snapTargets, 1e-4).guides;
+            guides = objectSnapOffset(shiftSnapBox(drag.snapMoving, deltaX, deltaZ), drag.snapTargets, 1e-4, walls).guides;
           }
         }
         syncObjectSnapGuides(state, guides, drag.guideY + 0.06);
