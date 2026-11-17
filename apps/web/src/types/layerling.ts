@@ -897,6 +897,12 @@ export type EdgeTreatmentFeature = {
   shellEdges?: ShellEdges;
   /** Only for "shell" with the top open: the height in mm of the collar round the top and of the groove under the wall, so one stands on the next; missing means none. */
   shellStack?: number;
+  /** Only with `shellStack`: the foot hollow (the floor on the plate) instead of solid, and a grip recess `grip` mm wide, `gripDepth` deep, at the front of the bottom. */
+  shellStackFoot?: { hollow?: boolean; grip?: number; gripDepth?: number };
+  /** Only for "shell" with the top open: a Gridfinity baseplate in the floor with at most `cells` cells; with `fit` the walls are thickened to the cells. */
+  shellGrid?: { cells: number; fit?: boolean };
+  /** Only for "shell" with the top open: this many dividers across (x) and along (z) the inside, evenly spaced. */
+  shellDividers?: { x: number; z: number; height?: number; thickness?: number };
   /** Only for "shell" with the top open (#1663): the width in mm of a ledge round the inside of the wall for a plate to rest on; missing means none. */
   shellShelf?: number;
   /** Only with `shellShelf`: how high in mm the top of the ledge lies above the inside of the floor. */

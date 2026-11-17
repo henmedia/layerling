@@ -1268,6 +1268,12 @@ html[data-theme="dark"]:where([data-palette="graphite"]) .shell-openings-summary
   border: 1px solid #adadad;
 }
 
+:where(html[data-theme="dark"][data-palette="graphite"]) .edge-modifier-field.lid-latch-label input {
+  color: #3f3f3f;
+  background: white;
+  border: 1px solid #adadad;
+}
+
 :where(html[data-theme="dark"][data-palette="graphite"]) .edge-modifier-check {
   color: #585858;
 }

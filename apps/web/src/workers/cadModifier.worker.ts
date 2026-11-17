@@ -7,9 +7,13 @@ import { cornerEdgeCandidates, edgesTouchingEnds } from "@/lib/cadCornerEdges";
 import { innerCornerEdges, treatAfterInnerCorners } from "@/lib/cadInnerCorners";
 import { OcctKernel, type OcctModuleFactory, type ShapeHandle } from "occt-wasm";
 import { assertCadKernelRunnable } from "@/lib/wasmSupport";
+import { STACK_NEEDS_TOP_MESSAGE, shellStackFloor, shellStackSolid } from "@/lib/cadShellStack";
+import { normalizeShellStackFoot } from "@/lib/shellStackLimits";
+import { GRIDFINITY_FLOOR } from "@/lib/gridfinityGeometry";
+import { shellDividersSolid, shellGridSolid } from "@/lib/cadShellGrid";
+import { DIVIDERS_NEEDS_TOP_MESSAGE, GRID_NEEDS_TOP_MESSAGE, SHELL_GRID_FLOOR, normalizeShellDividers, normalizeShellGrid } from "@/lib/shellGridLimits";
 import { SHELF_NEEDS_TOP_MESSAGE, shellShelfSolid } from "@/lib/cadShellShelf";
-import { DEFAULT_SHELL_SHELF_HEIGHT } from "@/lib/shellShelfLimits";
-import { STACK_NEEDS_TOP_MESSAGE, shellStackSolid } from "@/lib/cadShellStack";
+import { DEFAULT_SHELL_SHELF_HEIGHT, clampShellShelfHeight } from "@/lib/shellShelfLimits";
 import { shellOpenSides } from "@/lib/shellLimits";
 import { CANNOT_OFFSET_MESSAGE, offsetSolid, offsetSolidSideways, orientedFaceNormal, shellSolid, shellThreadByCore, threadShellCoreOf, type ThreadShellCore } from "@/lib/cadShell";
 import { chamfilletSolid } from "@/lib/cadChamfillet";
@@ -1360,21 +1364,51 @@ async function bearbeiteAnfrage(request: CadModifierWorkerRequest, halter: { cad
         component = threadShellCore && baseSolids.length === 1
           ? shellThreadByCore(activeCad, solid, threadShellCore, request.amount, request.shellOpenings ?? "none", request.shellEdges)
           : shellSolid(activeCad, solid, request.amount, request.shellOpenings ?? "none", request.shellEdges);
-        // The shelf ledge (#1663) goes in first, so the collar and the groove are cut round it.
+        // The shelf ledge (#1663) goes in first, so the foot, the floor and the dividers come after it. Its top, so the
+        // dividers end level with it and a shelf plate lies on both.
+        let shelfTop: number | null = null;
         if (request.shellShelf && request.shellShelf > 0) {
+          shelfTop = activeCad.getBoundingBox(component).ymin + request.amount + clampShellShelfHeight(request.shellShelfHeight ?? DEFAULT_SHELL_SHELF_HEIGHT);
           const open = shellOpenSides(request.shellOpenings);
           if (open.length !== 1 || open[0] !== "top") throw new Error(SHELF_NEEDS_TOP_MESSAGE);
           const shelved = shellShelfSolid(activeCad, component, request.shellShelf, request.shellShelfHeight ?? DEFAULT_SHELL_SHELF_HEIGHT, request.amount);
           activeCad.release(component);
           component = shelved;
         }
-        // Stacking: a collar round the top and a groove under the wall, only for a body hollowed with its top open.
-        if (request.shellStack && request.shellStack > 0) {
+        // Stacking first (the foot and the floor raised over it), then a Gridfinity floor on that floor, then dividers: only
+        // for a body hollowed with its top open.
+        const stack = request.shellStack && request.shellStack > 0 ? request.shellStack : 0;
+        const grid = normalizeShellGrid(request.shellGrid);
+        const dividers = normalizeShellDividers(request.shellDividers);
+        if (stack || grid || dividers) {
           const open = shellOpenSides(request.shellOpenings);
-          if (open.length !== 1 || open[0] !== "top") throw new Error(STACK_NEEDS_TOP_MESSAGE);
-          const stacked = shellStackSolid(activeCad, component, request.shellStack, request.amount);
+          if (open.length !== 1 || open[0] !== "top") throw new Error(grid ? GRID_NEEDS_TOP_MESSAGE : dividers ? DIVIDERS_NEEDS_TOP_MESSAGE : STACK_NEEDS_TOP_MESSAGE);
+        }
+        const bottom = activeCad.getBoundingBox(component).ymin;
+        let floorTop: number | null = null;
+        if (stack) {
+          // A Gridfinity floor stands on a solid foot: hollow is left out with it.
+          const foot = normalizeShellStackFoot(request.shellStackFoot);
+          const footStyle = foot && grid ? { ...foot, hollow: false } : foot;
+          const stacked = shellStackSolid(activeCad, component, stack, request.amount, solid, footStyle);
           activeCad.release(component);
           component = stacked;
+          // A hollow foot's floor lies on the plate, a wall thick.
+          floorTop = footStyle?.hollow ? bottom + request.amount : bottom + shellStackFloor(stack, request.amount);
+        }
+        if (grid) {
+          // On a stacking floor the sockets start where that floor ends.
+          const lift = floorTop === null ? 0 : floorTop - bottom - GRIDFINITY_FLOOR;
+          const floored = shellGridSolid(activeCad, solid, component, grid, lift);
+          floorTop = bottom + lift + SHELL_GRID_FLOOR;
+          activeCad.release(component);
+          component = floored;
+        }
+        // With a Gridfinity floor no dividers (its bins fill the cells): a design saved with both keeps its floor.
+        if (dividers && !grid) {
+          const divided = shellDividersSolid(activeCad, solid, component, dividers, floorTop, shelfTop);
+          activeCad.release(component);
+          component = divided;
         }
       } else if (request.kind === "offset") {
         component = (request.offsetSideways ? offsetSolidSideways : offsetSolid)(activeCad, solid, request.amount, request.offsetShrink === true, request.shellEdges);
