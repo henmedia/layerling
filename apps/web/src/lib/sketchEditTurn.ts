@@ -27,6 +27,13 @@ function toPlate(turn: SketchEditTurn, point: Vec2): Vec2 {
   };
 }
 
+function toPlateVector(turn: SketchEditTurn, v: Vec2): Vec2 {
+  return { x: v.x * turn.xAxis.x + v.z * turn.zAxis.x, z: v.x * turn.xAxis.z + v.z * turn.zAxis.z };
+}
+function toBodyVector(turn: SketchEditTurn, v: Vec2): Vec2 {
+  return { x: v.x * turn.xAxis.x + v.z * turn.xAxis.z, z: v.x * turn.zAxis.x + v.z * turn.zAxis.z };
+}
+
 function toBody(turn: SketchEditTurn, point: Vec2): Vec2 {
   const dx = point.x - turn.origin.x;
   const dz = point.z - turn.origin.z;
@@ -48,6 +55,12 @@ export function turnedSketchProfile(profile: SketchProfile, turn: SketchEditTurn
   const moved = <T extends Vec2>(item: T): T => ({ ...item, ...move(item) });
   return {
     ...profile,
+    ...(profile.constraints ? { constraints: profile.constraints.map((rule) => {
+      if ("c" in rule || "outline" in rule) return { ...rule };
+      if (!rule.frameX && direction === "toBody") return { ...rule, frameX: toBodyVector(turn, { x: 1, z: 0 }) };
+      const frameX = rule.frameX ?? { x: 1, z: 0 };
+      return { ...rule, frameX: direction === "toPlate" ? toPlateVector(turn, frameX) : toBodyVector(turn, frameX) };
+    }) } : {}),
     points: profile.points.map((point) => ({
       ...moved(point),
       handleIn: point.handleIn ? move(point.handleIn) : undefined,

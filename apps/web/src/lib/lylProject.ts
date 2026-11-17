@@ -830,6 +830,7 @@ async function serializeShapeNode(
     definition.sketchProfile = {
       points: sketchProfile.points,
       segments: sketchProfile.segments,
+      ...(sketchProfile.constraints?.length ? { constraints: sketchProfile.constraints } : {}),
       ...(images.length ? { images } : {}),
       ...(sketchProfile.stroke ? { stroke: sketchProfile.stroke } : {}),
       ...(sketchProfile.silhouette ? { silhouette: true } : {}),
@@ -1327,6 +1328,56 @@ function validateSketchProfile(value: unknown, label: string) {
     if (!pointIds.has(startId) || !pointIds.has(endId)) throw new Error(`${label} contains a segment with a missing point reference`);
     if (segment.construction !== undefined && typeof segment.construction !== "boolean") throw new Error(`${label}.segments[${index}].construction must be true or false`);
   });
+  if (profile.constraints !== undefined) {
+    if (!Array.isArray(profile.constraints)) throw new Error(`${label}.constraints must be an array`);
+    const ruleIds = new Set<string>();
+    const noDimension = new Set(["horizontal", "vertical", "coincident"]);
+    const withDimension = new Set(["distance", "offset-x", "offset-z", "angle", "point-line-distance", "line-distance", "outline-line-distance", "circle-diameter", "circle-center-distance"]);
+    const betweenLines = new Set(["parallel", "perpendicular", "equal-length", "angle", "line-distance"]);
+    profile.constraints.forEach((rawRule, index) => {
+      const ruleLabel = `${label}.constraints[${index}]`;
+      const rule = objectRecord(rawRule, ruleLabel);
+      const id = stringValue(rule.id, `${ruleLabel}.id`);
+      if (ruleIds.has(id)) throw new Error(`${label}.constraints contains duplicate ID '${id}'`);
+      ruleIds.add(id);
+      const kind = stringValue(rule.kind, `${ruleLabel}.kind`);
+      if (!noDimension.has(kind) && !withDimension.has(kind) && !betweenLines.has(kind)) throw new Error(`${ruleLabel}.kind is not supported`);
+      const a = stringValue(rule.a, `${ruleLabel}.a`);
+      const b = stringValue(rule.b, `${ruleLabel}.b`);
+      if (!pointIds.has(a) || !pointIds.has(b) || a === b) throw new Error(`${ruleLabel} references invalid points`);
+      if (kind === "outline-line-distance" || kind === "circle-center-distance" || kind === "circle-diameter") {
+        if (!Array.isArray(rule.outline) || rule.outline.length < 3 || new Set(rule.outline).size !== rule.outline.length ||
+          rule.outline.some((ref) => typeof ref !== "string" || !pointIds.has(ref)) ||
+          (kind !== "outline-line-distance" && rule.outline.length !== 4) ||
+          (kind === "circle-diameter" ? !rule.outline.includes(a) || !rule.outline.includes(b)
+            : rule.outline.includes(a) || rule.outline.includes(b)) ||
+          (kind === "outline-line-distance" && rule.side !== 1 && rule.side !== -1)) throw new Error(`${ruleLabel} has an invalid outline or side`);
+      }
+      if (kind === "point-line-distance") {
+        const c = stringValue(rule.c, `${ruleLabel}.c`);
+        if (!pointIds.has(c) || c === a || c === b) throw new Error(`${ruleLabel} references an invalid point`);
+      }
+      if (betweenLines.has(kind)) {
+        const c = stringValue(rule.c, `${ruleLabel}.c`);
+        const d = stringValue(rule.d, `${ruleLabel}.d`);
+        if (!pointIds.has(c) || !pointIds.has(d) || c === d ||
+          (a === c && b === d) || (a === d && b === c) || (kind === "angle" && a !== c) ||
+          (kind === "line-distance" && [a, b].some((ref) => ref === c || ref === d))) {
+          throw new Error(`${ruleLabel} references invalid line endpoints`);
+        }
+      }
+      if (rule.frameX !== undefined) {
+        const frame = objectRecord(rule.frameX, `${ruleLabel}.frameX`);
+        const x = finiteNumber(frame.x, `${ruleLabel}.frameX.x`);
+        const z = finiteNumber(frame.z, `${ruleLabel}.frameX.z`);
+        if (Math.abs(Math.hypot(x, z) - 1) > 0.0001) throw new Error(`${ruleLabel}.frameX must be a unit vector`);
+      }
+      if (withDimension.has(kind)) {
+        const dimension = finiteNumber(rule.value, `${ruleLabel}.value`);
+        if ((kind === "angle" && (dimension <= 0 || dimension >= 180)) || Math.abs(dimension) > 1e6 || (kind === "circle-diameter" && dimension <= 0.001) || ((kind === "distance" || kind === "outline-line-distance") && dimension < 0)) throw new Error(`${ruleLabel}.value is outside the supported range`);
+      }
+    });
+  }
   if (profile.silhouette !== undefined && typeof profile.silhouette !== "boolean") throw new Error(`${label}.silhouette must be true or false`);
   if (profile.keyring !== undefined && !isSketchKeyring(profile.keyring)) throw new Error(`${label}.keyring must be { side, diameter, x, z } and a free place (#598) with corners of -1 or 1 if it has one`);
   if (profile.sweepAnchor !== undefined && profile.sweepAnchor !== "left" && profile.sweepAnchor !== "center" && profile.sweepAnchor !== "right") throw new Error(`${label}.sweepAnchor must be left, center or right`);

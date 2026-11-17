@@ -760,8 +760,27 @@ export type SketchInset = { distance: number; radius: number };
  */
 export type SketchNote = { id: string; text: string; x: number; z: number; collapsed?: boolean; offPlane?: number };
 
+/** Persistent, point-ID-based relations in a 2D sketch. Distances are in mm;
+ * signed offsets are measured from point a to point b. */
+/** frameX is the unit X direction of the sketch at the time the rule was made.
+ * Missing means {x:1,z:0}; editing a rotated body preserves these axes. */
+export type SketchConstraintInput =
+  | { kind: "circle-diameter" | "circle-center-distance"; a: string; b: string; outline: string[]; value: number; frameX?: undefined }
+  | { kind: "outline-line-distance"; a: string; b: string; outline: string[]; side: 1 | -1; value: number; frameX?: undefined }
+  // a -> b defines the reference line and normal; the value is signed.
+  | { kind: "point-line-distance"; a: string; b: string; c: string; value: number; frameX?: undefined }
+  | { kind: "line-distance"; a: string; b: string; c: string; d: string; value: number; frameX?: undefined }
+  // Both rays start at the shared corner (a === c). Value is the smaller angle in degrees.
+  | { kind: "angle"; a: string; b: string; c: string; d: string; value: number; frameX?: undefined }
+  | { kind: "parallel" | "perpendicular" | "equal-length"; a: string; b: string; c: string; d: string; frameX?: undefined }
+  | { kind: "horizontal" | "vertical" | "coincident"; a: string; b: string; frameX?: { x: number; z: number } }
+  | { kind: "distance" | "offset-x" | "offset-z"; a: string; b: string; value: number; frameX?: { x: number; z: number } };
+export type SketchConstraint = SketchConstraintInput & { id: string };
+
 export type SketchProfile = {
   points: SketchPoint[];
+  /** Relations kept with the sketch, including its undo history and saved body. */
+  constraints?: SketchConstraint[];
   segments: SketchSegment[];
   images?: SketchImage[];
   stroke?: SketchStroke;

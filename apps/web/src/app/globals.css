@@ -6970,6 +6970,46 @@ html[data-theme="dark"] .sketch-shape-options .unit {
   text-anchor: middle;
 }
 
+.sketch-constraint-markers rect {
+  fill: #245849;
+  stroke: #fff;
+  stroke-width: 1;
+}
+
+.sketch-constraint-markers text {
+  fill: #fff;
+  font-size: 11px;
+  font-weight: 700;
+  text-anchor: middle;
+}
+
+.sketch-length-control,
+.sketch-length-control label {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  white-space: nowrap;
+}
+
+.sketch-length-control label {
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.sketch-length-control .sketch-corner-input {
+  width: 64px;
+}
+
+.sketch-length-control button {
+  border-color: currentColor;
+}
+
+.sketch-constraint-hint {
+  align-self: center;
+  font-size: 10px;
+  white-space: nowrap;
+}
+
 .sketch-dimension-pill.clickable {
   cursor: pointer;
   pointer-events: auto;
@@ -7131,7 +7171,8 @@ html[data-theme="dark"] .sketch-shape-options .unit {
   height: 17px;
 }
 
-.sketch-point-actions button.active {
+.sketch-point-actions button.active,
+.sketch-point-actions button[aria-pressed="true"] {
   color: #8e5112;
   background: #f7f2ea;
   border-color: #e4c7a9;
@@ -15113,7 +15154,8 @@ html[data-theme="dark"] .sketch-selection-position input {
 }
 
 html[data-theme="dark"] .sketch-point-actions button:hover,
-html[data-theme="dark"] .sketch-point-actions button.active {
+html[data-theme="dark"] .sketch-point-actions button.active,
+html[data-theme="dark"] .sketch-point-actions button[aria-pressed="true"] {
   color: #f7fafc;
   background: #2d241e;
   border-color: #554438;

@@ -51,6 +51,8 @@ import { iconSourceFromFile, PICTURE_FILE_ACCEPT, picturePixels, type IconSource
 import { loadedManifoldRuntime, onManifoldReady } from "@/lib/manifoldHandle";
 import { canApplySketchCornerTreatment } from "@/lib/sketchFilletChamfer";
 import { SKETCH_POLYGON_DEFAULT_SIDES, SKETCH_STAR_DEFAULT_INNER_PERCENT, sketchPrimitiveGeometry, sketchPrimitiveStartSize } from "@/lib/sketchPrimitives";
+import { applySketchConstraints, withSketchConstraint } from "@/lib/sketchConstraints";
+import type { SketchConstraintInput } from "@/types/layerling";
 import { cloneSketchProfile, orderedSketchPaths, sketchWithPointMode, withSmoothHandlesAfterRemoval, withSmoothSketchHandles } from "@/lib/sketchSmoothHandles";
 import { curveThroughPoints } from "@/lib/sketchCurveThroughPoints";
 import { addFreehandStroke, FREEHAND_CLOSE_PX, FREEHAND_TOLERANCE_PX, freehandStroke } from "@/lib/sketchFreehand";
@@ -5495,8 +5497,23 @@ export function LayerlingEditor({
       const anchored = "sweepAnchor" in withStroke || !latest?.sweepAnchor ? withStroke : { ...withStroke, sweepAnchor: latest.sweepAnchor };
       // And for the sketch's notes.
       const carried = "notes" in anchored || !latest?.notes ? anchored : { ...anchored, notes: latest.notes };
+      // Retain persistent sketch relationships when older tools create partial profiles.
+      const carriedConstraints = "constraints" in carried || !latest?.constraints ? carried : { ...carried, constraints: latest.constraints };
+      const moved = new Set<string>();
+      if (latest) {
+        const before = new Map(latest.points.map((point) => [point.id, point]));
+        for (const point of carriedConstraints.points) {
+          const was = before.get(point.id);
+          if (was && (Math.abs(was.x - point.x) > 1e-9 || Math.abs(was.z - point.z) > 1e-9)) moved.add(point.id);
+        }
+      }
+      const solved = applySketchConstraints(carriedConstraints, moved);
+      if (!solved.ok) {
+        setNotice(t("status.sketchConstraintConflict"));
+        return;
+      }
       // Moving shapes over each other makes no shared points where their lines cross (#239); drawing does.
-      const snapshot = cloneSketchProfile(latest && onlyMovesPoints(latest, carried) ? carried : addLineIntersectionPoints(carried, createLocalId));
+      const snapshot = cloneSketchProfile(latest && onlyMovesPoints(latest, solved.profile) ? solved.profile : addLineIntersectionPoints(solved.profile, createLocalId));
       // A locked outline (#653) stays as it is, whatever tool tried to change it.
       if (latest && changesLockedOutline(latest, snapshot)) {
         setNotice(t("status.sketchOutlineLocked"));
@@ -6291,6 +6308,15 @@ export function LayerlingEditor({
     setSketchActivePointId(null);
     setSketchSelection({ kind: "multiple", pointIds: mirrored.pointIds, segmentIds: mirrored.segmentIds });
   }, [commitSketchProfile, sketchProfile, sketchSelection]);
+
+  const addSketchConstraint = useCallback((rule: SketchConstraintInput) => {
+    const id = createLocalId("sketch-constraint");
+    commitSketchProfile(withSketchConstraint(sketchProfile, { ...rule, id }), t("status.sketchConstraintAdded"));
+  }, [commitSketchProfile, sketchProfile]);
+
+  const removeSketchConstraint = useCallback((id: string) => {
+    commitSketchProfile({ ...sketchProfile, constraints: (sketchProfile.constraints ?? []).filter((rule) => rule.id !== id) }, t("status.sketchConstraintRemoved"));
+  }, [commitSketchProfile, sketchProfile]);
 
   const moveSketchPoint = useCallback((id: string, position: { x: number; z: number }) => {
     const current = sketchProfile.points.find((point) => point.id === id);
@@ -19689,6 +19715,8 @@ export function LayerlingEditor({
             onDeletePoint={deleteSketchPoint}
             onDeleteSegment={deleteSketchSegment}
             onMovePoint={moveSketchPoint}
+            onAddConstraint={addSketchConstraint}
+            onRemoveConstraint={removeSketchConstraint}
             onToggleOutlineLock={toggleSketchOutlineLock}
             onTransformPoints={transformSketchPoints}
             onMoveHandle={moveSketchHandle}

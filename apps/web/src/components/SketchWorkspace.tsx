@@ -1,6 +1,7 @@
 "use client";
 
 import { previewLabelSpot } from "@/lib/sketchPreviewLabel";
+import { applySketchConstraints, sameSketchEndpoints, sketchRayAngle, sketchLineProjection, sketchOutlineClearance, sketchOutlineSegments, sketchCircleGeometry } from "@/lib/sketchConstraints";
 import { AlignCenterHorizontal, AlignCenterVertical, AlignEndHorizontal, AlignEndVertical, AlignStartHorizontal, AlignStartVertical, Check, ChevronUp, CornerDownRight, Crop, Crosshair, Eye, EyeOff, FlipHorizontal2, FlipVertical2, Home, Layers, Link, Link2Off, LockKeyhole, LockKeyholeOpen, Magnet, Minus, Plus, Ruler, RulerDimensionLine, Scissors, Slash, Spline, Split, Trash2, WandSparkles, Waves, X } from "lucide-react";
 import { displayedHandle, handleAtOffset, handleOffset } from "@/lib/sketchBezierHandles";
 import { curveStretches } from "@/lib/sketchCurveThroughPoints";
@@ -36,7 +37,7 @@ import { mirrorSign, resizedImportedMeshPositions } from "@/lib/workplaneShapes"
 import { loadedManifoldRuntime, manifoldRevision, onManifoldReady, requestManifoldRuntime } from "@/lib/manifoldHandle";
 import { meshTopSilhouette, silhouettePath, type SilhouetteLoop } from "@/lib/meshSilhouette";
 import { DEFAULT_SNAP_GRID, DEFAULT_WORKPLANE_WORKSPACE, keyboardNudgeCoarseFactor, keyboardNudgeStep, normalizeSnapGrid, normalizeWorkspaceSettings, snapGridForShortcut, snapGridOptions, snapGridStep as snapStep, orbitControlsZoomSpeed, zoomDistanceScale, ZOOM_STEP_IN, ZOOM_STEP_OUT } from "@/lib/workplaneSettings";
-import type { GridSize, SketchImage, SketchNote, SketchOperation, SketchPoint, SketchProfile, SketchSegment, SketchStroke, SketchStrokeAlign, SketchStrokeCap, SketchStrokeJoin, SweepAnchor, WorkplaneShape, WorkplaneWorkspaceSettings } from "@/types/layerling";
+import type { GridSize, SketchConstraintInput, SketchImage, SketchNote, SketchOperation, SketchPoint, SketchProfile, SketchSegment, SketchStroke, SketchStrokeAlign, SketchStrokeCap, SketchStrokeJoin, SweepAnchor, WorkplaneShape, WorkplaneWorkspaceSettings } from "@/types/layerling";
 import { resizePointerOnGrid } from "@/lib/sketchFrameResize";
 import { viewArrowStep } from "@/lib/viewArrowKeys";
 import { resizeSketchPoints, resizeSketchPointsToSize, type ResizeHandle, type SelectionBounds } from "@/lib/sketchSelectionResize";
@@ -117,6 +118,9 @@ type SketchWorkspaceProps = {
   onDeletePoint: (id: string) => void;
   onDeleteSegment: (id: string) => void;
   onMovePoint: (id: string, point: { x: number; z: number }) => void;
+  /** Basic persistent constraints. More complex tangent/arc rules need a general solver. */
+  onAddConstraint?: (rule: SketchConstraintInput) => void;
+  onRemoveConstraint?: (id: string) => void;
   /** Locks the selected outline, or unlocks it when all of it is locked (#653). */
   onToggleOutlineLock?: () => void;
   onTransformPoints: (points: SketchPoint[], message?: string, keyRunKey?: string) => void;
@@ -788,6 +792,8 @@ export function SketchWorkspace({
   onDeletePoint,
   onDeleteSegment,
   onMovePoint,
+  onAddConstraint,
+  onRemoveConstraint,
   onToggleOutlineLock,
   onTransformPoints,
   onMoveHandle,
@@ -1039,7 +1045,18 @@ export function SketchWorkspace({
     return profile;
   }, [pointerAction, profile]);
   // A drag that would move a locked outline (#653) shows nothing moving: the editor refuses it on release.
-  const displayProfile = useMemo(() => previewProfile !== profile && changesLockedOutline(profile, previewProfile) ? profile : previewProfile, [previewProfile, profile]);
+  const displayProfile = useMemo(() => {
+    if (previewProfile === profile) return profile;
+    if (changesLockedOutline(profile, previewProfile)) return profile;
+    if (!profile.constraints?.length) return previewProfile;
+    const old = new Map(profile.points.map((point) => [point.id, point]));
+    const moved = new Set(previewProfile.points.filter((point) => {
+      const previous = old.get(point.id);
+      return previous && (Math.abs(previous.x - point.x) > 1e-9 || Math.abs(previous.z - point.z) > 1e-9);
+    }).map((point) => point.id));
+    const solved = applySketchConstraints(previewProfile, moved);
+    return solved.ok ? solved.profile : profile;
+  }, [previewProfile, profile]);
   const displayImages = useMemo(() => {
     const images = profile.images ?? [];
     if (pointerAction?.kind === "move-image") {
@@ -1078,6 +1095,181 @@ export function SketchWorkspace({
   // A single side that is selected: it can be curved, and a curved one shows its two handles.
   const selectedSegment = selected?.kind === "segment" ? displayProfile.segments.find((segment) => segment.id === selected.id) ?? null : null;
   const selectedSegmentCurved = selectedSegment ? isSegmentCurved(displayProfile, selectedSegment) : false;
+  const constraintPairs = selected?.kind === "multiple" && selected.pointIds.length === 2 &&
+    !selected.segmentIds.length && !selected.imageIds?.length ? selected.pointIds : null;
+  const constraintLines = selected?.kind === "multiple" && selected.segmentIds.length === 2 &&
+    !selected.pointIds.length && !selected.imageIds?.length
+    ? selected.segmentIds.map((id) => displayProfile.segments.find((segment) => segment.id === id))
+    : [];
+  const [firstLine, secondLine] = constraintLines;
+  const canRelateLines = firstLine && secondLine && (firstLine.kind ?? "line") === "line" &&
+    (secondLine.kind ?? "line") === "line";
+  const sharedCornerId = canRelateLines
+    ? [firstLine.startId, firstLine.endId].find((id) => id === secondLine.startId || id === secondLine.endId)
+    : undefined;
+  const angleCorner = sharedCornerId && pointById.get(sharedCornerId);
+  const angleFirst = angleCorner && firstLine && pointById.get(firstLine.startId === sharedCornerId ? firstLine.endId : firstLine.startId);
+  const angleSecond = angleCorner && secondLine && pointById.get(secondLine.startId === sharedCornerId ? secondLine.endId : secondLine.startId);
+  const mixedSelection = selected?.kind === "multiple" && selected.segmentIds.length === 1 &&
+    selected.pointIds.length === 1 && !selected.imageIds?.length ? selected : null;
+  const mixedLine = mixedSelection && displayProfile.segments.find((segment) => segment.id === mixedSelection.segmentIds[0]);
+  const mixedPoint = mixedSelection && pointById.get(mixedSelection.pointIds[0]);
+  const pointLine = mixedLine && mixedPoint && (mixedLine.kind ?? "line") === "line" &&
+    mixedLine.startId !== mixedPoint.id && mixedLine.endId !== mixedPoint.id ? mixedLine : undefined;
+  const outlineSelection = selected?.kind === "multiple" && selected.pointIds.length >= 3 &&
+    !selected.imageIds?.length ? selected : null;
+  const outlineSegments = outlineSelection && sketchOutlineSegments(displayProfile, outlineSelection.pointIds);
+  const circle = outlineSegments && sketchCircleGeometry(pointById, outlineSegments);
+  const circles = useMemo(() => paths.flatMap((path) => {
+    if (!path.closed || path.points.length !== 4) return [];
+    const pointIds = path.points.map((point) => point.id);
+    const segments = sketchOutlineSegments(displayProfile, pointIds);
+    const shape = segments && sketchCircleGeometry(pointById, segments);
+    return shape ? [{ ...shape, pointIds, segmentIds: segments.map((segment) => segment.id) }] : [];
+  }), [paths, displayProfile, pointById]);
+  const outlineReference = (() => {
+    if (!outlineSelection || !outlineSegments) return;
+    const outside = outlineSelection.segmentIds.filter((id) => !outlineSegments.some((segment) => segment.id === id));
+    if (outside.length !== 1) return;
+    const line = displayProfile.segments.find((segment) => segment.id === outside[0]);
+    if (line && (line.kind ?? "line") === "line" && !outlineSelection.pointIds.includes(line.startId) &&
+      !outlineSelection.pointIds.includes(line.endId)) return line;
+  })();
+  const dimensionTarget = canRelateLines ? JSON.stringify([firstLine.id, secondLine.id])
+    : pointLine && mixedPoint ? JSON.stringify([pointLine.id, mixedPoint.id])
+    : outlineReference && outlineSelection ? JSON.stringify([outlineReference.id, ...outlineSelection.pointIds])
+    : outlineSelection ? JSON.stringify(outlineSelection.pointIds)
+    : selectedSegment?.id ?? constraintPairs?.join(":");
+  const [dimensionDraft, setDimensionDraft] = useState<{ target: string | undefined; value: string } | null>(null);
+  const draftValue = dimensionDraft?.target === dimensionTarget ? dimensionDraft?.value : undefined;
+  const [centerDraft, setCenterDraft] = useState<string | null>(null);
+  const [gapDraft, setGapDraft] = useState<{ target: string | undefined; value: string } | null>(null);
+  useEffect(() => {
+    setDimensionDraft(null);
+    setGapDraft(null);
+    setCenterDraft(null);
+  }, [dimensionTarget]);
+  const constraints = profile.constraints ?? [];
+  const selectedConstraints = constraints.filter((rule) => {
+    const matchesLine = (line: SketchSegment) =>
+      sameSketchEndpoints(rule.a, rule.b, line.startId, line.endId) ||
+      ("d" in rule && sameSketchEndpoints(rule.c, rule.d, line.startId, line.endId));
+    return selectedSegment ? matchesLine(selectedSegment)
+      : canRelateLines ? matchesLine(firstLine) || matchesLine(secondLine)
+      : outlineReference || outlineSelection ? (outlineReference && matchesLine(outlineReference)) ||
+        ("outline" in rule && outlineSelection && rule.outline.length === outlineSelection.pointIds.length &&
+          rule.outline.every((id) => outlineSelection.pointIds.includes(id)))
+      : pointLine ? matchesLine(pointLine)
+      : selected?.kind === "point" ? rule.kind === "point-line-distance" && rule.c === selected.id
+      : constraintPairs ? !("c" in rule) && constraintPairs.includes(rule.a) && constraintPairs.includes(rule.b)
+      : false;
+  });
+  const diameterRule = selectedConstraints.find((rule) => rule.kind === "circle-diameter");
+  const diameter = diameterRule?.kind === "circle-diameter" ? diameterRule.value : circle ? circle.radius * 2 : undefined;
+  const requestedDiameter = draftValue === undefined ? diameter : parseLengthMm(draftValue);
+  const canSetDiameter = requestedDiameter !== undefined && Number.isFinite(requestedDiameter) && requestedDiameter > 0.001 && requestedDiameter <= 1e6;
+  const centerRule: SketchConstraintInput | undefined = (() => {
+    if (!circle || !outlineReference || !outlineSelection) return;
+    const { startId: a, endId: b } = outlineReference;
+    const outline = outlineSelection.pointIds;
+    const fixed = selectedConstraints.find((rule) => rule.kind === "circle-center-distance" &&
+      sameSketchEndpoints(rule.a, rule.b, a, b) && rule.outline.every((id) => outline.includes(id)));
+    if (fixed?.kind === "circle-center-distance") return fixed;
+    const start = pointById.get(a);
+    const end = pointById.get(b);
+    const projection = start && end && sketchLineProjection(start, end, circle.center);
+    if (projection) return { kind: "circle-center-distance", a, b, outline, value: projection.distance };
+  })();
+  const centerDistance = centerRule && (centerDraft === null ? Math.abs(centerRule.value) : parseLengthMm(centerDraft));
+  const canSetCenterDistance = centerDistance !== undefined && Number.isFinite(centerDistance) && centerDistance >= 0 && centerDistance <= 1e6;
+
+  const gapRule: SketchConstraintInput | undefined = (() => {
+    if (outlineReference && outlineSelection && outlineSegments) {
+      const a = outlineReference.startId;
+      const b = outlineReference.endId;
+      const outline = outlineSelection.pointIds;
+      const fixed = selectedConstraints.find((rule) => rule.kind === "outline-line-distance" &&
+        sameSketchEndpoints(rule.a, rule.b, a, b) && rule.outline.length === outline.length &&
+        rule.outline.every((id) => outline.includes(id)));
+      if (fixed?.kind === "outline-line-distance") return fixed;
+      const start = pointById.get(a);
+      const end = pointById.get(b);
+      const clearance = start && end && sketchOutlineClearance(pointById, outlineSegments, start, end);
+      if (clearance) return { kind: "outline-line-distance", a, b, outline, side: clearance.side,
+        value: Math.max(0, clearance.side * clearance.distance) };
+    }
+    if (constraintPairs) {
+      const [a, b] = constraintPairs;
+      const start = pointById.get(a);
+      const end = pointById.get(b);
+      const fixed = selectedConstraints.find((rule) => rule.kind === "distance");
+      if (!start || !end) return;
+      return { kind: "distance", a, b, value: fixed?.kind === "distance" ? fixed.value : Math.hypot(end.x - start.x, end.z - start.z) };
+    }
+    const reference = pointLine ?? (canRelateLines && !sharedCornerId ? firstLine : undefined);
+    if (!reference) return;
+    const a = reference.startId;
+    const b = reference.endId;
+    const start = pointById.get(a);
+    const end = pointById.get(b);
+    if (!start || !end) return;
+    if (pointLine && mixedPoint) {
+      const fixed = selectedConstraints.find((rule) => rule.kind === "point-line-distance" && rule.c === mixedPoint.id &&
+        sameSketchEndpoints(rule.a, rule.b, a, b));
+      if (fixed?.kind === "point-line-distance") return fixed;
+      const projection = sketchLineProjection(start, end, mixedPoint);
+      if (projection) return { kind: "point-line-distance", a, b, c: mixedPoint.id, value: projection.distance };
+    } else if (secondLine) {
+      const c = secondLine.startId;
+      const d = secondLine.endId;
+      const fixed = selectedConstraints.find((rule) => rule.kind === "line-distance" &&
+        ((sameSketchEndpoints(rule.a, rule.b, a, b) && sameSketchEndpoints(rule.c, rule.d, c, d)) ||
+         (sameSketchEndpoints(rule.a, rule.b, c, d) && sameSketchEndpoints(rule.c, rule.d, a, b))));
+      if (fixed?.kind === "line-distance") return fixed;
+      const first = pointById.get(c);
+      const last = pointById.get(d);
+      if (!first || !last || Math.hypot(last.x - first.x, last.z - first.z) < 1e-5) return;
+      const projection = sketchLineProjection(start, end, { x: (first.x + last.x) / 2, z: (first.z + last.z) / 2 });
+      if (projection) return { kind: "line-distance", a, b, c, d, value: projection.distance };
+    }
+  })();
+  const gapText = gapDraft?.target === dimensionTarget ? gapDraft?.value : undefined;
+  const gapValue = gapRule && (gapText === undefined ? Math.abs(gapRule.value) : parseLengthMm(gapText));
+
+  const minimumGap = gapRule?.kind === "outline-line-distance" ? 0 : 0.001;
+  const canSetGap = gapValue !== undefined && Number.isFinite(gapValue) && gapValue >= minimumGap && gapValue <= 1e6;
+  const fixedAngle = angleCorner && angleFirst && angleSecond && selectedConstraints.find((rule) =>
+    rule.kind === "angle" && rule.a === angleCorner.id &&
+    sameSketchEndpoints(rule.b, rule.d, angleFirst.id, angleSecond.id));
+  const angleDegrees = fixedAngle && fixedAngle.kind === "angle" ? fixedAngle.value
+    : angleCorner && angleFirst && angleSecond ? Math.abs(sketchRayAngle(
+      { x: angleFirst.x - angleCorner.x, z: angleFirst.z - angleCorner.z },
+      { x: angleSecond.x - angleCorner.x, z: angleSecond.z - angleCorner.z },
+    )) * 180 / Math.PI : undefined;
+  const requestedAngle = draftValue === undefined ? angleDegrees : parseMeasurementInput(draftValue);
+  const setFixedAngle = () => {
+    if (!angleCorner || !angleFirst || !angleSecond || requestedAngle === undefined ||
+      !Number.isFinite(requestedAngle) || requestedAngle <= 0 || requestedAngle >= 180) return;
+    onAddConstraint?.({ kind: "angle", a: angleCorner.id, b: angleFirst.id, c: angleCorner.id, d: angleSecond.id, value: requestedAngle });
+    setDimensionDraft(null);
+  };
+  const lengthConstraint = selectedConstraints.find((rule) => rule.kind === "distance");
+  const lengthStart = selectedSegment && pointById.get(selectedSegment.startId);
+  const lengthEnd = selectedSegment && pointById.get(selectedSegment.endId);
+  const currentLength = lengthConstraint?.kind === "distance" ? lengthConstraint.value
+    : lengthStart && lengthEnd ? Math.hypot(lengthEnd.x - lengthStart.x, lengthEnd.z - lengthStart.z) : undefined;
+  const lengthValue = draftValue ?? (currentLength === undefined ? "" : formatDimension(currentLength, workspace.accuracy));
+  const requestedLength = draftValue === undefined ? currentLength : parseLengthMm(draftValue);
+  const setLineLength = () => {
+    if (!selectedSegment || requestedLength === undefined || !Number.isFinite(requestedLength) || requestedLength <= 0.001) return;
+    onAddConstraint?.({ kind: "distance", a: selectedSegment.startId, b: selectedSegment.endId, value: requestedLength });
+    setDimensionDraft(null);
+  };
+  const addOffsetConstraint = (kind: "offset-x" | "offset-z", a: string, b: string) => {
+    const value = parseMeasurementInput(draftValue ?? "");
+    if (!Number.isFinite(value)) return;
+    onAddConstraint?.({ kind, a, b, value });
+  };
   const selectedImage = selected?.kind === "image" ? displayImages.find((image) => image.id === selected.id) ?? null : null;
   const selectedImageId = selectedImage?.id ?? null;
   // Trace (Nachzeichnen) belongs to the selected image too: its settings and the outlines it would give.
@@ -1277,6 +1469,14 @@ export function SketchWorkspace({
     const length = parseLengthMm(editingDimension.value);
     const segment = profile.segments.find((entry) => entry.id === editingDimension.segmentId);
     if (segment && Number.isFinite(length) && length > 0.001) {
+      const fixedLength = profile.constraints?.find((rule) => rule.kind === "distance" &&
+        sameSketchEndpoints(rule.a, rule.b, segment.startId, segment.endId));
+      if (fixedLength && onAddConstraint) {
+        onAddConstraint({ kind: "distance", a: fixedLength.a, b: fixedLength.b, value: length });
+        setDimensionDraft(null);
+        setEditingDimension(null);
+        return;
+      }
       // A locked end (#629) stays, whatever end the selection asks to keep.
       const anchor = lockedLengthAnchor(segment, profile.points, symmetric
         ? SEGMENT_DIMENSION_CENTER
@@ -1287,7 +1487,7 @@ export function SketchWorkspace({
       if (updatedPoints !== profile.points) onTransformPoints(updatedPoints, t("sketch.dimensionUpdated"));
     }
     setEditingDimension(null);
-  }, [editingDimension, profile.segments, profile.points, selectedPoint, onTransformPoints]);
+  }, [editingDimension, profile.segments, profile.points, profile.constraints, selectedPoint, onTransformPoints, onAddConstraint]);
 
   // A typed width or height stretches the selection along that axis only, from its left or top edge.
   const commitBoxSizeEdit = useCallback(() => {
@@ -1325,11 +1525,20 @@ export function SketchWorkspace({
     const degrees = parseMeasurementInput(editingAngle.value);
     const corner = sketchCornerAt(profile, editingAngle.pointId);
     if (corner && Number.isFinite(degrees)) {
+      const fixed = profile.constraints?.find((rule) => rule.kind === "angle" && rule.a === corner.point.id &&
+        sameSketchEndpoints(rule.b, rule.d, corner.before.far.id, corner.after.far.id));
+      if (fixed?.kind === "angle" && onAddConstraint) {
+        const smaller = degrees > 180 ? 360 - degrees : degrees;
+        if (smaller > 0 && smaller < 180) onAddConstraint({ ...fixed, value: smaller });
+        setDimensionDraft(null);
+        setEditingAngle(null);
+        return;
+      }
       const updatedPoints = applyCornerAngle(profile.points, corner, degrees, lockedCornerTurn(corner, turnOverride ?? editingAngle.turn));
       if (updatedPoints !== profile.points) onTransformPoints(updatedPoints, t("sketch.angleUpdated"));
     }
     setEditingAngle(null);
-  }, [editingAngle, profile, onTransformPoints]);
+  }, [editingAngle, profile, onTransformPoints, onAddConstraint]);
 
   const getOverlayPos = useCallback((sketchPos: { x: number; z: number }) => {
     const svg = svgRef.current;
@@ -2800,6 +3009,137 @@ export function SketchWorkspace({
               />
             ))}
           </g>
+          {constraints.length > 0 && (
+            <g className="sketch-constraint-markers" pointerEvents="none">
+              {displayProfile.segments.flatMap((segment) => {
+                const start = pointById.get(segment.startId);
+                const end = pointById.get(segment.endId);
+                if (!start || !end || (segment.kind ?? "line") !== "line") return [];
+                const dx = end.x - start.x;
+                const dz = end.z - start.z;
+                const length = Math.hypot(dx, dz);
+                if (!length) return [];
+                // Use a consistent side regardless of the direction the line was drawn.
+                const side = dx < 0 || (dx === 0 && dz < 0) ? -1 : 1;
+                const markers = constraints.flatMap<{ id: string; label: string; fixedLength?: boolean }>((rule, index) => {
+                  const matches = sameSketchEndpoints(rule.a, rule.b, segment.startId, segment.endId);
+                  if (rule.kind === "angle" || rule.kind === "point-line-distance" || rule.kind === "line-distance") return [];
+                  if ("d" in rule) {
+                    if (!matches && !sameSketchEndpoints(rule.c, rule.d, segment.startId, segment.endId)) return [];
+                    return [{ id: rule.id, label: `${rule.kind === "parallel" ? "∥" : rule.kind === "perpendicular" ? "⊥" : "="}${index + 1}` }];
+                  }
+                  if (matches && rule.kind === "distance") {
+                    return [{ id: rule.id, label: `${formatDimension(rule.value, workspace.accuracy)} mm`, fixedLength: true }];
+                  }
+                  if (!matches || (rule.kind !== "horizontal" && rule.kind !== "vertical")) return [];
+                  return [{ id: rule.id, label: rule.kind === "horizontal" ? "H" : "V" }];
+                });
+                const widths = markers.map(({ label, fixedLength }) => fixedLength ? Math.max(52, label.length * 7 + 22) : label.length > 1 ? 28 : 16);
+                // Space the badges along the edge using their width and height projected onto its direction.
+                const spans = widths.map((width) => (width * Math.abs(dx) + 16 * Math.abs(dz)) / length + 4);
+                let cursor = -spans.reduce((sum, span) => sum + span, 0) / 2;
+                return markers.map(({ id, label, fixedLength }, index) => {
+                  const normalReach = (widths[index] * Math.abs(dz) + 16 * Math.abs(dx)) / (2 * length);
+                  const offset = (normalReach + 6) * screenUnit;
+                  const along = (cursor + spans[index] / 2) * screenUnit;
+                  cursor += spans[index];
+                  const x = (start.x + end.x) / 2 + side * (along * dx + offset * dz) / length;
+                  const z = (start.z + end.z) / 2 + side * (along * dz - offset * dx) / length;
+                  const halfWidth = widths[index] / 2;
+                  return (
+                    <g key={`${segment.id}-${id}`} transform={`translate(${x} ${z}) scale(${screenUnit})`}
+                      role={fixedLength ? "img" : undefined} aria-label={fixedLength ? `Fixed length ${label}` : undefined}>
+                      <rect x={-halfWidth} y={-8} width={widths[index]} height={16} rx={4} />
+                      {fixedLength && <LockKeyhole x={-halfWidth + 4} y={-6} size={12} color="white" aria-hidden="true" />}
+                      <text x={fixedLength ? 7 : 0} y={4}>{label}</text>
+                    </g>
+                  );
+                });
+              })}
+              {constraints.map((rule) => {
+                if (rule.kind !== "distance" && rule.kind !== "point-line-distance" &&
+                  rule.kind !== "line-distance" && rule.kind !== "outline-line-distance" && rule.kind !== "circle-center-distance") return null;
+                const a = pointById.get(rule.a);
+                const b = pointById.get(rule.b);
+                if (!a || !b) return null;
+                let from = a;
+                let to = b;
+                if (rule.kind === "distance") {
+                  if (displayProfile.segments.some((segment) => (segment.kind ?? "line") === "line" &&
+                    sameSketchEndpoints(segment.startId, segment.endId, rule.a, rule.b))) return null;
+                } else if (rule.kind === "outline-line-distance") {
+                  const segments = sketchOutlineSegments(displayProfile, rule.outline);
+                  const clearance = segments && sketchOutlineClearance(pointById, segments, a, b, rule.side);
+                  if (!clearance) return null;
+                  to = { ...a, ...clearance.point };
+                  from = { ...a, x: to.x - clearance.distance * clearance.nx, z: to.z - clearance.distance * clearance.nz };
+                } else if (rule.kind === "circle-center-distance") {
+                  const segments = sketchOutlineSegments(displayProfile, rule.outline);
+                  const shape = segments && sketchCircleGeometry(pointById, segments);
+                  const projection = shape && sketchLineProjection(a, b, shape.center);
+                  if (!shape || !projection) return null;
+                  to = { ...a, ...shape.center };
+                  from = { ...a, x: to.x - projection.distance * projection.nx, z: to.z - projection.distance * projection.nz };
+                } else if ("c" in rule) {
+                  const c = pointById.get(rule.c);
+                  const d = rule.kind === "line-distance" ? pointById.get(rule.d) : c;
+                  if (!c || !d) return null;
+                  to = { ...c, x: (c.x + d.x) / 2, z: (c.z + d.z) / 2 };
+                  const projection = sketchLineProjection(a, b, to);
+                  if (!projection) return null;
+                  from = { ...a, x: to.x - projection.distance * projection.nx, z: to.z - projection.distance * projection.nz };
+                }
+                const label = `${formatDimension(Math.abs(rule.value), workspace.accuracy)} mm`;
+                const width = label.length * 7 + 22;
+                const dx = to.x - from.x;
+                const dz = to.z - from.z;
+                const length = Math.hypot(dx, dz);
+                const alongX = length ? dx / length : b.x - a.x;
+                const alongZ = length ? dz / length : b.z - a.z;
+                const scale = Math.hypot(alongX, alongZ) || 1;
+                const nx = -alongZ / scale;
+                const nz = alongX / scale;
+                const labelOffset = (Math.abs(nx) * width / 2 + Math.abs(nz) * 8 + 5) * screenUnit;
+                const x = (from.x + to.x) / 2 + labelOffset * nx;
+                const z = (from.z + to.z) / 2 + labelOffset * nz;
+                return (
+                  <g key={rule.id} role="img" aria-label={`${rule.kind === "circle-center-distance" ? "Fixed center distance" : "Fixed distance"} ${label}`}>
+                    <line className="sketch-dimension-line" x1={from.x} y1={from.z} x2={to.x} y2={to.z} />
+                    {[from, to].map((end, index) => (
+                      <line key={index} className="sketch-dimension-line"
+                        x1={end.x - nx * 4 * screenUnit} y1={end.z - nz * 4 * screenUnit}
+                        x2={end.x + nx * 4 * screenUnit} y2={end.z + nz * 4 * screenUnit} />
+                    ))}
+                    <g transform={`translate(${x} ${z}) scale(${screenUnit})`}>
+                      <rect x={-width / 2} y={-8} width={width} height={16} rx={4} />
+                      <LockKeyhole x={-width / 2 + 4} y={-6} size={12} color="white" aria-hidden="true" />
+                      <text x={7} y={4}>{label}</text>
+                    </g>
+                  </g>
+                );
+              })}
+              {constraints.map((rule) => {
+                if (rule.kind !== "angle") return null;
+                const corner = pointById.get(rule.a);
+                const first = pointById.get(rule.b);
+                const second = pointById.get(rule.d);
+                if (!corner || !first || !second) return null;
+                const ray = { x: first.x - corner.x, z: first.z - corner.z };
+                const bisector = Math.atan2(ray.z, ray.x) + sketchRayAngle(ray, { x: second.x - corner.x, z: second.z - corner.z }) / 2;
+                const x = corner.x + Math.cos(bisector) * 38 * screenUnit;
+                const z = corner.z + Math.sin(bisector) * 38 * screenUnit;
+                const label = `${formatDimension(rule.value, workspace.accuracy)}°`;
+                const width = label.length * 7 + 22;
+                return (
+                  <g key={rule.id} transform={`translate(${x} ${z}) scale(${screenUnit})`} role="img" aria-label={`Fixed angle ${label}`}>
+                    <rect x={-width / 2} y={-8} width={width} height={16} rx={4} />
+                    <LockKeyhole x={-width / 2 + 4} y={-6} size={12} color="white" aria-hidden="true" />
+                    <text x={7} y={4}>{label}</text>
+                  </g>
+                );
+              })}
+            </g>
+          )}
           {tool === "refine" && refinePreview ? (
             <circle
               className="sketch-cursor-point"
@@ -3329,6 +3669,43 @@ export function SketchWorkspace({
           }) : null}
           {hover && ["line", "arc", "bezier", "smooth", "measure"].includes(tool) ? <circle className="sketch-cursor-point" cx={hover.x} cy={hover.z} r={hoverPointRadius} pointerEvents="none" /> : null}
           {tool === "freehand" ? <polyline ref={freehandLineRef} className="sketch-freehand-preview" points="" pointerEvents="none" /> : null}
+          {tool === "select" && circles.map((shape) => {
+            const lockedDiameter = constraints.find((rule) => rule.kind === "circle-diameter" &&
+              rule.outline.every((id) => shape.pointIds.includes(id)));
+            const label = lockedDiameter?.kind === "circle-diameter"
+              ? `Ø${formatDimension(lockedDiameter.value, workspace.accuracy)} mm` : null;
+            const width = label ? label.length * 7 + 22 : 0;
+            return (
+              <g key={shape.pointIds[0]} className="sketch-constraint-markers"
+                transform={`translate(${shape.center.x} ${shape.center.z}) scale(${screenUnit})`}>
+                <circle r={Math.min(7, Math.max(2, shape.radius / screenUnit * 0.65))} fill="#245849" stroke="white" strokeWidth={1.4} role="button" tabIndex={0}
+                  aria-label="Select circle center" style={{ cursor: "pointer" }}
+                  onPointerDown={(event) => {
+                    if (event.button !== 0) return;
+                    event.stopPropagation();
+                    event.preventDefault();
+                    const lineId = event.shiftKey && selectedSegment && !selectedSegmentCurved ? selectedSegment.id : undefined;
+                    onSelectMany(shape.pointIds, lineId ? [...shape.segmentIds, lineId] : shape.segmentIds, []);
+                  }}
+                  onKeyDown={(event) => {
+                    if (event.key !== "Enter" && event.key !== " ") return;
+                    event.preventDefault();
+                    event.stopPropagation();
+                    onSelectMany(shape.pointIds, shape.segmentIds, []);
+                  }}>
+                  <title>Circle center</title>
+                </circle>
+                <path d="M -3 0 H 3 M 0 -3 V 3" stroke="white" strokeWidth={1.3} pointerEvents="none" />
+                {label && (
+                  <g transform={`translate(0 ${-shape.radius / screenUnit - 13})`} pointerEvents="none" role="img" aria-label={`Fixed diameter ${label}`}>
+                    <rect x={-width / 2} y={-8} width={width} height={16} rx={4} />
+                    <LockKeyhole x={-width / 2 + 4} y={-6} size={12} color="white" aria-hidden="true" />
+                    <text x={7} y={4}>{label}</text>
+                  </g>
+                )}
+              </g>
+            );
+          })}
         </svg>
         {notes?.length && onUpdateNote && onRemoveNote ? (
           <SketchNotes
@@ -3752,6 +4129,149 @@ export function SketchWorkspace({
           {mirrorButton}
           {coordinateFields(null)}
           <GuideHelpLink section="sketchCurve" className="sketch-corner-help" iconSize={17} />
+        </div>
+      ) : null}
+      {tool === "select" && !mirrorOpen && onAddConstraint &&
+        ((selectedSegment && !selectedSegmentCurved) || constraintPairs || canRelateLines || pointLine || outlineReference || circle || selectedConstraints.length > 0) ? (
+        <div className="sketch-point-actions" aria-label="Persistent sketch constraints" style={{ top: 89, maxWidth: "min(90vw, 1050px)", overflowX: "auto", borderRadius: 14 }}>
+          <span className="sketch-corner-label">Constraints</span>
+          {selectedSegment && !selectedSegmentCurved ? (
+            <>
+              <button type="button" aria-pressed={selectedConstraints.some((rule) => rule.kind === "horizontal")} title="Keep this line horizontal when editing" onClick={() => onAddConstraint({ kind: "horizontal", a: selectedSegment.startId, b: selectedSegment.endId })}>Horizontal</button>
+              <button type="button" aria-pressed={selectedConstraints.some((rule) => rule.kind === "vertical")} title="Keep this line vertical when editing" onClick={() => onAddConstraint({ kind: "vertical", a: selectedSegment.startId, b: selectedSegment.endId })}>Vertical</button>
+            </>
+          ) : null}
+          {constraintPairs ? (
+            <>
+              <button type="button" title="Keep these points in the same position" onClick={() => onAddConstraint({ kind: "coincident", a: constraintPairs[0], b: constraintPairs[1] })}>Touch</button>
+              <button type="button" title="Keep these points at the same height" onClick={() => onAddConstraint({ kind: "horizontal", a: constraintPairs[0], b: constraintPairs[1] })}>Same Y</button>
+              <button type="button" title="Keep these points at the same X" onClick={() => onAddConstraint({ kind: "vertical", a: constraintPairs[0], b: constraintPairs[1] })}>Same X</button>
+            </>
+          ) : null}
+          {canRelateLines && (["parallel", "perpendicular", "equal-length"] as const).map((kind) => (
+            <button type="button" key={kind}
+              aria-pressed={selectedConstraints.some((rule) => rule.kind === kind &&
+                ((sameSketchEndpoints(rule.a, rule.b, firstLine.startId, firstLine.endId) &&
+                  sameSketchEndpoints(rule.c, rule.d, secondLine.startId, secondLine.endId)) ||
+                 (sameSketchEndpoints(rule.a, rule.b, secondLine.startId, secondLine.endId) &&
+                  sameSketchEndpoints(rule.c, rule.d, firstLine.startId, firstLine.endId))))}
+              title={kind === "parallel" ? "Keep these lines parallel" : kind === "perpendicular" ? "Keep these lines at 90°" : "Keep both lines the same length"}
+              onClick={() => onAddConstraint({ kind, a: firstLine.startId, b: firstLine.endId, c: secondLine.startId, d: secondLine.endId })}
+            >{kind === "parallel" ? "Parallel" : kind === "perpendicular" ? "Perpendicular" : "Equal Length"}</button>
+          ))}
+          {circle && outlineSelection && !outlineReference && diameter !== undefined && (
+            <form className="sketch-length-control" onSubmit={(event) => {
+              event.preventDefault();
+              if (!canSetDiameter) return;
+              const [a, b] = outlineSelection.pointIds;
+              onAddConstraint({ kind: "circle-diameter", a, b, outline: outlineSelection.pointIds, value: requestedDiameter });
+              setDimensionDraft(null);
+            }}>
+              <label>
+                Diameter <input type="text" inputMode="decimal" className="sketch-corner-input"
+                  value={draftValue ?? formatDimension(diameter, workspace.accuracy)}
+                  onFocus={(event) => event.currentTarget.select()}
+                  onChange={(event) => setDimensionDraft({ target: dimensionTarget, value: event.target.value })}
+                  aria-label="Circle diameter in millimeters" /> mm
+              </label>
+              <button type="submit" disabled={!canSetDiameter}>Set diameter</button>
+              <span className="sketch-constraint-hint">Shift-click a line to dimension the center</span>
+            </form>
+          )}
+          {centerRule && (
+            <form className="sketch-length-control" onSubmit={(event) => {
+              event.preventDefault();
+              if (!canSetCenterDistance) return;
+              onAddConstraint({ ...centerRule, value: centerRule.value < 0 ? -centerDistance : centerDistance });
+              setCenterDraft(null);
+            }}>
+              <label>
+                Center distance <input type="text" inputMode="decimal" className="sketch-corner-input"
+                  value={centerDraft ?? formatDimension(Math.abs(centerRule.value), workspace.accuracy)}
+                  onFocus={(event) => event.currentTarget.select()}
+                  onChange={(event) => setCenterDraft(event.target.value)}
+                  aria-label="Circle center distance in millimeters" /> mm
+              </label>
+              <button type="submit" disabled={!canSetCenterDistance}>Set center distance</button>
+            </form>
+          )}
+          {gapRule && (
+            <form className="sketch-length-control" onSubmit={(event) => {
+              event.preventDefault();
+              if (!canSetGap) return;
+              onAddConstraint({ ...gapRule, value: gapRule.value < 0 ? -gapValue : gapValue });
+              setGapDraft(null);
+            }}>
+              <label>
+                {gapRule.kind === "outline-line-distance" ? "Clearance" : "Distance"} <input type="text" inputMode="decimal" className="sketch-corner-input"
+                  value={gapText ?? formatDimension(Math.abs(gapRule.value), workspace.accuracy)}
+                  onFocus={(event) => event.currentTarget.select()}
+                  onChange={(event) => setGapDraft({ target: dimensionTarget, value: event.target.value })}
+                  aria-label="Distance in millimeters" /> mm
+              </label>
+              <button type="submit" disabled={!canSetGap}
+                title={gapRule.kind === "outline-line-distance" ? "Set the gap from the outline’s nearest edge to the line"
+                  : gapRule.kind === "line-distance" ? "Set perpendicular spacing and keep both lines parallel"
+                  : gapRule.kind === "point-line-distance" ? "Set perpendicular distance to the line" : "Set straight-line distance between the points"}>{gapRule.kind === "outline-line-distance" ? "Set clearance" : "Set distance"}</button>
+            </form>
+          )}
+          {angleDegrees !== undefined && (
+            <form className="sketch-length-control" onSubmit={(event) => { event.preventDefault(); setFixedAngle(); }}>
+              <label>
+                Angle <input type="text" inputMode="decimal" className="sketch-corner-input"
+                  value={draftValue ?? formatDimension(angleDegrees, workspace.accuracy)}
+                  onFocus={(event) => event.currentTarget.select()}
+                  onChange={(event) => setDimensionDraft({ target: dimensionTarget, value: event.target.value })}
+                  aria-label="Corner angle in degrees" />°
+              </label>
+              <button type="submit" title="Set and lock the angle between these edges"
+                disabled={requestedAngle === undefined || !Number.isFinite(requestedAngle) || requestedAngle <= 0 || requestedAngle >= 180}>Set angle</button>
+            </form>
+          )}
+          {selectedSegment && !selectedSegmentCurved ? (
+            <form className="sketch-length-control" onSubmit={(event) => { event.preventDefault(); setLineLength(); }}>
+              <label>
+                Length <input type="text" inputMode="decimal" className="sketch-corner-input" value={lengthValue}
+                  onFocus={(event) => event.currentTarget.select()}
+                  onChange={(event) => setDimensionDraft({ target: dimensionTarget, value: event.target.value })}
+                  onKeyDown={(event) => {
+                    if (event.key === "Escape") {
+                      event.stopPropagation();
+                      setDimensionDraft(null);
+                    }
+                  }}
+                  aria-label="Line length in millimeters" /> mm
+              </label>
+              <button type="submit" title="Set and constrain this line’s length"
+                disabled={requestedLength === undefined || !Number.isFinite(requestedLength) || requestedLength <= 0.001}>Set length</button>
+            </form>
+          ) : null}
+          {constraintPairs ? (
+            <>
+              <label className="sketch-corner-label">
+                Gap <input type="text" inputMode="decimal" className="sketch-corner-input" value={draftValue ?? ""}
+                  onChange={(event) => setDimensionDraft({ target: dimensionTarget, value: event.target.value })}
+                  aria-label="Point gap in millimeters" /> mm
+              </label>
+              <button type="button" title="Keep this signed horizontal distance (from first selected point to second)" onClick={() => addOffsetConstraint("offset-x", constraintPairs[0], constraintPairs[1])}>X gap</button>
+              <button type="button" title="Keep this signed vertical distance (from first selected point to second)" onClick={() => addOffsetConstraint("offset-z", constraintPairs[0], constraintPairs[1])}>Y gap</button>
+            </>
+          ) : null}
+          {selectedSegment && !selectedSegmentCurved && (
+            <span className="sketch-constraint-hint">Shift-click a line or point</span>
+          )}
+          {selectedConstraints.map((rule) => (
+            <button type="button" key={rule.id} title={rule.kind === "distance" ? "Remove fixed length constraint" : `Remove ${rule.kind} constraint`} onClick={() => onRemoveConstraint?.(rule.id)}>
+              {rule.kind === "angle" ? `Fixed angle ${formatDimension(rule.value, workspace.accuracy)}°` : (
+                rule.kind === "circle-diameter" ? `Fixed diameter Ø${formatDimension(rule.value, workspace.accuracy)} mm`
+                : rule.kind === "circle-center-distance" ? `Fixed center distance ${formatDimension(Math.abs(rule.value), workspace.accuracy)} mm`
+                : rule.kind === "outline-line-distance" ? `Fixed clearance ${formatDimension(rule.value, workspace.accuracy)} mm`
+                : rule.kind === "line-distance" || rule.kind === "point-line-distance"
+                  ? `Fixed distance ${formatDimension(Math.abs(rule.value), workspace.accuracy)} mm`
+                  : <>{rule.kind === "distance" ? selectedSegment ? "Fixed length" : "Fixed distance" : rule.kind}{"value" in rule ? ` ${rule.value} mm` : ""}{"c" in rule ? ` ${constraints.indexOf(rule) + 1}` : ""}</>
+              )} ×
+            </button>
+          ))}
         </div>
       ) : null}
       {mirrorOpen && selected && tool === "select" && onMirror ? (

@@ -229,12 +229,19 @@ describe("layerling .lyl project packages", () => {
       sketchOperation: "revolve",
       sketchRevolve: { startAngle: 25, sweepAngle: -220, sides: 48, quality: 8 },
       sketchProfile: {
-        points: [{ id: "p1", x: -4, z: 0 }, { id: "p2", x: -8, z: 0 }, { id: "p3", x: -8, z: 16 }, { id: "p4", x: -4, z: 16 }],
+        points: [{ id: "p1", x: -4, z: 0 }, { id: "p2", x: -8, z: 0 }, { id: "p3", x: -8, z: 16 }, { id: "p4", x: -4, z: 16 },
+          { id: "guide-start", x: -2, z: 0 }, { id: "guide-end", x: -2, z: 16 }],
         segments: [
           { id: "s1", startId: "p1", endId: "p2", kind: "line" },
           { id: "s2", startId: "p2", endId: "p3", kind: "line" },
           { id: "s3", startId: "p3", endId: "p4", kind: "line" },
           { id: "s4", startId: "p4", endId: "p1", kind: "line" },
+          { id: "guide", startId: "guide-start", endId: "guide-end", construction: true },
+        ],
+        constraints: [
+          { id: "line-gap", kind: "line-distance", a: "p1", b: "p2", c: "p3", d: "p4", value: -16 },
+          { id: "clearance", kind: "outline-line-distance", a: "guide-start", b: "guide-end",
+            outline: ["p1", "p2", "p3", "p4"], side: 1, value: 2 },
         ],
       },
       importedMesh: {
@@ -265,11 +272,18 @@ describe("layerling .lyl project packages", () => {
           { id: "s3", startId: "p3", endId: "p1", kind: "line" },
         ],
         inset: { distance: 3, radius: 1.5 },
+        constraints: [
+          { id: "right-angle", kind: "perpendicular", a: "p1", b: "p2", c: "p2", d: "p3" },
+          { id: "equal", kind: "equal-length", a: "p1", b: "p2", c: "p2", d: "p3" },
+          { id: "angle", kind: "angle", a: "p3", b: "p2", c: "p3", d: "p1", value: 53 },
+          { id: "point-gap", kind: "point-line-distance", a: "p1", b: "p2", c: "p3", value: -30 },
+        ],
       },
       importedMesh: { positions: [0, 0, 0, 1, 0, 0, 0, 1, 0], baseWidth: 40, baseDepth: 30, baseHeight: 3, triangleCount: 1, sourceFormat: "json" },
     });
     const restored = await importLylProject(await exportLylProject(input([pad])));
     expect(restored.shapes[0].sketchProfile?.inset).toEqual({ distance: 3, radius: 1.5 });
+    expect(restored.shapes[0].sketchProfile?.constraints).toEqual(pad.sketchProfile?.constraints);
     const broken = { ...pad, sketchProfile: { ...pad.sketchProfile!, inset: { distance: -1, radius: 0 } } };
     await expect(importLylProject(await exportLylProject(input([broken])))).rejects.toThrow(/inset/);
   });
