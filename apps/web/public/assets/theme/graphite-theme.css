@@ -8839,6 +8839,188 @@ html[data-theme="dark"]:where([data-palette="graphite"]) .property-card > button
   color: #fff;
 }
 
+:where(html[data-theme="dark"][data-palette="graphite"]) .layer-check-progress progress {
+  accent-color: #e8851a;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .layer-check-filters label,
+:where(html[data-theme="dark"][data-palette="graphite"]) .layer-view-play label {
+  color: #515151;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .layer-check-filters select,
+:where(html[data-theme="dark"][data-palette="graphite"]) .layer-view-play select {
+  color: #2d2d2d;
+  background: #fcfcfc;
+  border: 1px solid #cacaca;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .layer-check-row {
+  color: #2d2d2d;
+  background: #f7f7f7;
+  border: 1px solid #e2e2e2;
+  border-left: 4px solid #f2c230;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .layer-check-row.problem {
+  border-left-color: #e5484d;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .layer-check-row.active {
+  background: #efefef;
+  box-shadow: 0 0 0 2px rgba(232, 133, 26, 0.45);
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .layer-check-row-main {
+  color: inherit;
+  background: none;
+  border: 0;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .layer-check-row-main > svg {
+  color: #c79a00;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .layer-check-row.problem .layer-check-row-main > svg {
+  color: #e5484d;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .layer-check-row-level {
+  color: #656565;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .layer-check-remedy {
+  color: #8a5a1c;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .layer-check-clear {
+  color: #2f7d4a;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .layer-check-note {
+  color: #656565;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .layer-view-steps button {
+  color: #515151;
+  background: #fcfcfc;
+  border: 1px solid #cacaca;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .layer-view-readout {
+  color: #515151;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .layer-view-readout strong {
+  color: #2d2d2d;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .layer-view-active {
+  color: #323232;
+  background: #fbe9a6;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .layer-view-active.problem {
+  color: #7a1418;
+  background: #f9d0d1;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .layer-view-track {
+  background: #e2e2e2;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .layer-view-track:focus-visible {
+  outline: 2px solid #e8851a;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .layer-view-fill {
+  background: #8fb3e0;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .layer-view-range {
+  background: rgba(47, 95, 158, 0.25);
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .layer-view-thumb {
+  background: #fcfcfc;
+  border: 2px solid #2f5f9e;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .layer-view-mark {
+  background: #f2c230;
+  border: 0;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .layer-view-mark.problem {
+  background: #e5484d;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .layer-view-mark.active {
+  box-shadow: 0 0 0 2px #2f5f9e;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .layer-view-chart {
+  background: #f7f7f7;
+  border: 1px solid #e2e2e2;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .layer-view-chart path {
+  fill: rgba(47, 95, 158, 0.28);
+  stroke: #2f5f9e;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .layer-view-chart line {
+  stroke: #e8851a;
+}
+
+html[data-theme="dark"]:where([data-palette="graphite"]) .layer-check-row {
+  color: #dbdbdb;
+  background: #292929;
+  border-color: #434343;
+}
+
+html[data-theme="dark"]:where([data-palette="graphite"]) .layer-check-row.active {
+  background: #303030;
+}
+
+html[data-theme="dark"]:where([data-palette="graphite"]) .layer-check-row-level,
+html[data-theme="dark"]:where([data-palette="graphite"]) .layer-check-note,
+html[data-theme="dark"]:where([data-palette="graphite"]) .layer-view-readout,
+html[data-theme="dark"]:where([data-palette="graphite"]) .layer-check-filters label,
+html[data-theme="dark"]:where([data-palette="graphite"]) .layer-view-play label {
+  color: #a7a7a7;
+}
+
+html[data-theme="dark"]:where([data-palette="graphite"]) .layer-check-remedy {
+  color: #f0b46c;
+}
+
+html[data-theme="dark"]:where([data-palette="graphite"]) .layer-view-readout strong {
+  color: #dbdbdb;
+}
+
+html[data-theme="dark"]:where([data-palette="graphite"]) .layer-check-filters select,
+html[data-theme="dark"]:where([data-palette="graphite"]) .layer-view-play select,
+html[data-theme="dark"]:where([data-palette="graphite"]) .layer-view-steps button {
+  color: #dbdbdb;
+  background: #2d2d2d;
+  border-color: #555555;
+}
+
+html[data-theme="dark"]:where([data-palette="graphite"]) .layer-view-track {
+  background: #434343;
+}
+
+html[data-theme="dark"]:where([data-palette="graphite"]) .layer-view-chart {
+  background: #292929;
+  border-color: #434343;
+}
+
+html[data-theme="dark"]:where([data-palette="graphite"]) .layer-view-chart path {
+  fill: rgba(143, 179, 224, 0.3);
+  stroke: #8fb3e0;
+}
+
 :where(html[data-theme="dark"][data-palette="graphite"]) .dashboard-welcome-hide {
   color: #717171;
   background: transparent;

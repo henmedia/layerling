@@ -145,6 +145,7 @@ AI'en arbejder med de samme funktioner som dig, gennem den samme vej som din han
 | `layerling_check_clearance` | tjekker før print, hvilke dele der overlapper, rører hinanden eller kommer tættere på end et mindste spillerum (Tjek spillerum), også de adskilte dele af ét objekt |
 | `layerling_printer_play` | læser, sætter eller sletter printerens spillerum ({{ui:workspace.printerPlay}} i indstillingerne) og lægger pasprøven, der måler det |
 | `layerling_check_print` | tjekker før print, hvad der ville gå galt: for tynde vægge til dysen, svævende dele, lille kontakt med pladen, overhæng og åbne mesh (Tjek print) |
+| `layerling_check_layers` | skærer printet i lag og viser lag for lag, hvad der ville gå galt: overhæng, steder uden støtte, broer, tynde vægge, små øer, en del i pladen (Printanalyse) |
 | `layerling_add_reference_points` | markerer referencepunkter - på formens centrum, hjørner eller kantmidtpunkter, eller ved præcise positioner - som former snapper til |
 | `layerling_list_reference_points` | lister referencepunkterne med deres id'er og positioner |
 | `layerling_remove_reference_points` | sletter referencepunkter efter id, eller alle sammen |

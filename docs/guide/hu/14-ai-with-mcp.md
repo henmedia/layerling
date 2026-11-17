@@ -141,6 +141,7 @@ Az MI ugyanazokkal a funkciókkal dolgozik, mint te, ugyanazon az úton, mint a 
 | `layerling_check_clearance` | nyomtatás előtt ellenőrzi, mely alkatrészek fedik át egymást, érnek össze vagy kerülnek közelebb egy minimális hézagnál, egy objektum különálló részeit is |
 | `layerling_printer_play` | kiolvassa, beállítja vagy törli a nyomtató hézagát ({{ui:workspace.printerPlay}} a beállításokban), és elhelyezi az illesztési próbát, amely ezt méri |
 | `layerling_check_print` | nyomtatás előtt ellenőrzi, mi romlana el: a fúvókához túl vékony falak, lebegő alkatrészek, kevés érintkezés a tálcával, túlnyúlások és nyitott hálók |
+| `layerling_check_layers` | rétegekre bontja a nyomatot, és rétegenként felsorolja, mi menne rosszul: túlnyúlások, alátámasztás nélküli részek, hidak, vékony falak, kis szigetek, a tálcába lógó rész (Nyomtatáselemzés) |
 | `layerling_add_reference_points` | referenciapontokat jelöl meg – objektumok középpontján, sarkain vagy élfelezőin, vagy pontos helyeken –, amelyekhez az alakzatok illeszkednek |
 | `layerling_list_reference_points` | felsorolja a referenciapontokat az azonosítójukkal és a helyzetükkel |
 | `layerling_remove_reference_points` | azonosító alapján vagy mindet törli a referenciapontokat |

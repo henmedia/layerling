@@ -127,6 +127,7 @@ import { isTypingTarget } from "@/lib/editorKeyTargets";
 import { liftHandleOffset, screenAngle, framePoint, selectionFrameCorners, workplaneFootprintY, syncTransformOverlay, syncAlignOverlay, syncMirrorOverlay, syncLayFlatHover } from "./workplane/viewportTransformOverlays";
 import { ClearanceMarkOverlay, clearanceFocusBox, syncClearanceMarkOverlay, type ClearanceMark, type ClearanceMarkOverlayState } from "./workplane/ClearanceMarkOverlay";
 import { clipThinWallOverlay, syncThinWallOverlay, type PrintCheckView } from "./workplane/ThinWallOverlay";
+import { restoreLayerViewCamera, saveLayerViewCamera, syncLayerViewOverlay, type LayerView } from "./workplane/LayerViewOverlay";
 import { EMPTY_PROTRACTOR, pickProtractorFace, protractorFaceFromWorld, protractorReading, protractorStraightView, ProtractorOverlay, syncProtractorOverlay, type ProtractorKind, type ProtractorModel, type ProtractorOverlayState } from "./workplane/viewportProtractor";
 import { tapeAttachmentFromWorld, TAPE_PERPENDICULAR_SNAP_PIXELS, pickModelTapeCandidate, tapeCentresNear, sameTapeCentres, distanceToScreenSegment, SectionMeasureModel, SectionMeasureOverlayState, syncSectionMeasureOverlay } from "./workplane/viewportTape";
 export type { LayFlatPick } from "@/components/workplane/viewportPicking";
@@ -222,6 +223,8 @@ type WorkplaneViewportProps = {
   clearanceMark?: ClearanceMark | null;
   /** The print check's thin walls, painted red on the bodies, and the place its Show brings the camera to. */
   printCheckView?: PrintCheckView | null;
+  /** The layer view of the layer check: the bodies cut at a layer, its cross-section and the places found painted. */
+  layerView?: LayerView | null;
   onSetPlacementWorkplane: (workplane: PlacementWorkplane, source: "shape" | "base") => void;
   onToggleWorkplaneTool: () => void;
   onInteractionActiveChange?: (active: boolean) => void;
@@ -1630,6 +1633,7 @@ export function WorkplaneViewport({
   highlightIds,
   clearanceMark = null,
   printCheckView = null,
+  layerView = null,
   onSetPlacementWorkplane,
   onToggleWorkplaneTool,
   onInteractionActiveChange,
@@ -8278,6 +8282,33 @@ export function WorkplaneViewport({
   useEffect(() => {
     syncSectionClippingState(sectionSettings);
   }, [sectionSettings, syncSectionClippingState]);
+
+  // The layer view of the layer check: the section view's plane cuts the bodies at the layer's top while it is open, and
+  // the section view's own settings come back when it closes, as does the camera.
+  const layerViewOpen = Boolean(layerView);
+  const layerViewRef = useRef(layerView);
+  layerViewRef.current = layerView;
+  useEffect(() => {
+    const state = threeRef.current;
+    if (!state) return;
+    if (!layerView) return;
+    const plane = state.sectionPlane ?? new THREE.Plane();
+    plane.normal.set(0, -1, 0);
+    plane.constant = layerView.top + 1e-4;
+    applySectionClipping(state, plane);
+    syncLayerViewOverlay(state, layerView);
+  }, [layerView]);
+  useEffect(() => {
+    const state = threeRef.current;
+    if (!state || !layerViewOpen) return;
+    saveLayerViewCamera(state);
+    return () => {
+      syncLayerViewOverlay(state, null);
+      syncSectionClippingState(sectionSettingsRef.current);
+      restoreLayerViewCamera(state);
+      syncViewCube(state, viewCubeRef.current);
+    };
+  }, [layerViewOpen, syncSectionClippingState]);
 
   useEffect(() => {
     if (!sectionFineDraggingRef.current) setSectionFineAnchor(sectionSettings.offset);

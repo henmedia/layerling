@@ -1908,6 +1908,23 @@ export const tools = [
     },
   },
   {
+    name: "layerling_check_layers",
+    description: "Check a print layer by layer, as the editor's Print analysis does: the bodies (ids, else the selection, else every visible one, joined as the slicer joins them) are cut into layers of `layerHeight` (0.2) and each layer compared with the one below, in one go. First the whole: inBed (reaches into the plate; layers below it are not counted), floatsAbove, openMesh, tooLarge (larger than the printer chosen in the settings). Then per layer: unsupported (starts with nothing under it, or reaches flat out on one side only, such as the arms of a T: a problem), overhang (beyond `overhangHint` 45 degrees from the vertical a hint, beyond `overhangProblem` 60 a problem), bridge (a flat place held on two sides or all round, a hint when its span is over `bridgeSpan` 10 mm), thinWall (under `minWall`, default two lines of the `nozzle` 0.4), smallIsland (a separate place under 2 mm² going on for 2 mm or more), adhesion (a first layer too small for the height). Places under 0.05 mm² are not rated; layers in a row with the same problem at the same place make one finding. Changes nothing. Returns layerHeight, layers (count), findings (problems first, then from the bottom up: kind, level hint|problem, layers from-to, heights in mm, areaMm2, value with unit, at, the part's id and name, and the remedy as text), problems, hints, millis.",
+    inputSchema: {
+      ...editorTargetSchema,
+      properties: {
+        ...editorTargetSchema.properties,
+        ids: { type: "array", items: { type: "string" }, description: "Objects to check. Left out: the selection, or every visible object." },
+        layerHeight: { type: "number", minimum: 0.04, maximum: 1, description: "Layer height in mm. Default 0.2." },
+        nozzle: { type: "number", minimum: 0.1, maximum: 2, description: "Nozzle width in mm. Default 0.4." },
+        overhangHint: { type: "number", description: "Degrees from the vertical from which an overhang is a hint. Default 45." },
+        overhangProblem: { type: "number", description: "Degrees from the vertical from which an overhang is a problem. Default 60." },
+        bridgeSpan: { type: "number", description: "A bridge spanning more than this (mm) is a hint. Default 10." },
+        minWall: { type: "number", description: "Walls thinner than this (mm) are a hint; 0 takes two lines of the nozzle." },
+      },
+    },
+  },
+  {
     name: "layerling_add_reference_points",
     description: "Mark reference points - bare marks in space that shapes snap to when they are dragged, like pencil marks and layout points in a workshop. They are not part of any body, are never printed or exported, and are saved with the design. Mark the centre, the four corners or the four edge middles of objects (on their top face), or pass exact positions with `points`. Points already marked are not added twice. Returns the new points with their ids; shapes can then be placed on them with layerling_update_object.",
     inputSchema: {
