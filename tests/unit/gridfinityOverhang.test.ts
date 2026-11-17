@@ -666,3 +666,34 @@ describe("gridfinity bin overhang: second review, smaller things", { timeout: 12
     }));
   });
 });
+
+describe("gridfinity bin overhang: every edge on two faces (mlugo-apx, after #1542)", { timeout: 120_000 }, () => {
+  let runtime: ManifoldToplevel;
+  beforeAll(async () => {
+    runtime = await manifoldModule();
+    runtime.setup();
+  });
+  const all = (mm: number) => ov(mm, mm, mm, mm);
+
+  it("closes a side switched open between solid, chamfered overhangs with no edge on four faces", () => {
+    [{ gridfinityOpenRight: true }, { gridfinityOpenBack: true, gridfinityOpenFront: true }].forEach((open) => {
+      const shape = bin({ width: 94, depth: 94, height: 46.4, ...all(5), gridfinityOverhangSolid: true, gridfinityOverhangChamfer: 10, ...open });
+      expect(edgeProblems(gridfinityLabelledTriangles(runtime, shape) as V[][]), JSON.stringify(open)).toBe(0);
+    });
+  });
+
+  it("has every edge on two faces across corner radii, kinds of overhang, an open side and a chamfer", () => {
+    [0, 1, 3.75].forEach((radius) => [{}, { gridfinityOverhangSolid: true }, { gridfinityOverhangLipOnGrid: true }].forEach((mode) =>
+      [{}, { gridfinityOpenRight: true }, { gridfinityOpenFront: true }].forEach((open) => [0, 10].forEach((chamfer) => {
+        const shape = bin({ width: 94, depth: 94, height: 46.4, ...all(5), gridfinityBinCornerRadius: radius, gridfinityOverhangChamfer: chamfer, ...mode, ...open });
+        expect(edgeProblems(gridfinityLabelledTriangles(runtime, shape) as V[][]), JSON.stringify({ radius, mode, open, chamfer })).toBe(0);
+      }))));
+  });
+
+  it("joins a solid or lip-on-grid overhang to a bin with square corners with no edge on four faces", () => {
+    [{ gridfinityOverhangSolid: true }, { gridfinityOverhangLipOnGrid: true }].forEach((mode) => {
+      const shape = bin({ width: 103.5, gridfinityBinCornerRadius: 0, gridfinityOverhangRight: 19.75, ...mode });
+      expect(edgeProblems(gridfinityLabelledTriangles(runtime, shape) as V[][]), JSON.stringify(mode)).toBe(0);
+    });
+  });
+});
