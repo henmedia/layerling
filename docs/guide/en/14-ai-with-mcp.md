@@ -145,6 +145,7 @@ The AI works with the same functions as you, through the same path as your opera
 | `layerling_check_clearance` | checks before printing which parts overlap, touch or come closer than a minimum gap (Check clearance), the separate parts of one object too |
 | `layerling_printer_play` | reads, sets or clears the printer's play ({{ui:workspace.printerPlay}} in the settings) and places the fit test that measures it |
 | `layerling_check_print` | checks before printing what would go wrong: walls too thin for the nozzle, floating parts, small contact with the plate, overhangs and open meshes (Print check) |
+| `layerling_split_bolt` | splits a screw or threaded rod lengthwise through its axis and lays both halves on their cut faces for printing, optionally with centring pins |
 | `layerling_add_reference_points` | marks reference points - on the centre, corners or edge middles of objects, or at exact positions - that shapes snap to |
 | `layerling_list_reference_points` | lists the reference points with their ids and positions |
 | `layerling_remove_reference_points` | deletes reference points by id, or all of them |

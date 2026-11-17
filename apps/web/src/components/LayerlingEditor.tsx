@@ -31,6 +31,7 @@ import { NAME_TAG_LAYERS, NAME_TAG_LETTER_SIZE, textKerningPatch, textLetterSize
 import { DEFAULT_ICON_TAG_WIDTH, ICON_TAG_LAYERS, MAX_ICON_TAG_WIDTH, MIN_ICON_TAG_WIDTH, isIconLayerBody, normalizeIconTagCount } from "@/lib/iconTag";
 import { automaticFlexiJoints, automaticFoldJoints, DEFAULT_FLEXI_FOLD, FLEXI_DEFAULTS, normalizeFlexiOptions, type FlexiOptions } from "@/lib/flexiJoints";
 import { LID_HINGE_TYPES, groupedWithMagnets, lidClickBumpsFit, lidDefaults, lidFlipTopFits, lidHandleFits, lidLatchesFit, lidNeckFit, lidNeckFitPatch, lidStandardThread, lidTakesMagnets, lidTetherFits, lidTopEdgeFits, magnetPocketDepth, normalizeLidOptions, type LidOptions, type LidThreadStandard } from "@/lib/lidTool";
+import { boltSplitFits, type BoltSplitOptions } from "@/lib/boltSplit";
 import { FIT_TEST_CLEARANCES, getPrinterPlay, MAX_PRINTER_PLAY, MIN_PRINTER_PLAY, normalizePrinterPlay, PRINTER_PLAY_SETTINGS, printerPlayPrinter, printerPlaySource, printerPlayStart, setPrinterPlay, setPrinterPlayPrinter, withPrinterPlay } from "@/lib/printerPlay";
 import { FIT_TEST_PIN_DIAMETER, fitTestHoles, fitTestShape, fitTestSpot } from "@/lib/fitTest";
 import { fitTestPinBaseChosen } from "@/lib/breakawayBase";
@@ -270,6 +271,7 @@ import { FOOTPRINT_CUT_HEIGHT, footprintCutOffset, projectSectionPoint, SECTION_
 import type { AlignAxis, AlignHandleStatus, AlignSpread, AlignTarget, EdgeTreatmentFeature, GridSize, ParametricSource, ProjectAsset, ProjectAttachment, ShapeAsset, ShapeCustomization, ShapeKind, SketchImage, SketchOperation, SketchPoint, SketchProfile, SketchRevolveSettings, SketchSegment, ShellEdges, ShellOpenings, ShellSide, SweepAnchor, WorkplaneNote, WorkplaneShape, WorkplaneWorkspaceSettings } from "@/types/layerling";
 import { type MeshData, type Cuboid, type ShapeUpdatePatch, type ManifoldSolid, MIN_SHAPE_DIMENSION, resetManifoldRuntime, cleanModelDimension, getManifoldRuntime, meshForShape, meshReachAlong, formatTriangleCount, boundsForShapes, boundsForCuboids, meshAabb, boundsForPositions, quantizedPointKey, sameShapeApartFromPlacement } from "@/lib/editorMeshCore";
 import { meshPartCount } from "@/lib/meshPartCount";
+import { splitBoltOffThread } from "@/lib/geometryWorker";
 import { buildGroupedShapeOffThread, exportSolidVolumeOffThread, callOffFaceRead, faceReadInWorker, createFaceReadKeeper, faceReadPositionsOffThread, simplifyTrianglePositionsOffThread, splitShapesByPlaneOffThread, previewSplitConnectorsOffThread, articulateShapesOffThread, lidForShapesOffThread, lidTopOffThread, checkClearanceOffThread, checkPrintOffThread, subscribeGeometryBusy, warmGeometryWorker } from "@/lib/geometryWorker";
 import { roundedAlignedValue } from "@/lib/alignRounding";
 import { buildSketchLoftFromSelection, canSketchLoft } from "@/lib/sketchLoft";
@@ -12633,6 +12635,37 @@ export function LayerlingEditor({
   }, [commitShapes]);
 
   /**
+   * A screw or threaded rod split lengthwise for printing: the two halves lie on their cut faces where it stood, with
+   * centring pins in both if asked for (lib/boltSplit.ts), in its place and selected. One undo step. The same code
+   * the MCP's split_bolt uses.
+   */
+  const splitBoltForPrint = useCallback(async (shapeId: string, given?: Partial<BoltSplitOptions>) => {
+    const fail = (message: string) => {
+      setNotice(message, true);
+      return { ok: false as const, message };
+    };
+    const bolt = shapesRef.current.find((shape) => shape.id === shapeId);
+    if (!bolt || !boltSplitFits(bolt)) return fail(t("boltSplit.error.notBolt"));
+    if (bolt.locked) return fail(t("status.objectLocked"));
+    if (holdsShapeLock(bolt)) return fail(t("status.shapeLockHeld", { name: displayShapeName(bolt) }));
+    const options = { pins: true, pinPlay: Math.min(0.5, getPrinterPlay() ?? 0.15), ...given };
+    const sourceFingerprint = projectShapesFingerprint(shapesRef.current);
+    const sourceProjectId = projectInfoRef.current.projectId;
+    const result = await splitBoltOffThread({ ...bolt, name: displayShapeName(bolt) }, options);
+    if (!result.parts) return fail(result.error);
+    if (projectInfoRef.current.projectId !== sourceProjectId || projectShapesFingerprint(shapesRef.current) !== sourceFingerprint) return fail(t("status.gridfinityKeysChanged"));
+    if (historyViewStateRef.current) return fail(t("status.historyViewBlocksEdits"));
+    const name = displayShapeName(bolt);
+    const message = result.pins
+      ? t("status.boltSplitPins", { name, count: result.pins, diameter: result.pinDiameter.toLocaleString(numberLocale()), length: result.pinLength.toLocaleString(numberLocale()) })
+      : options.pins ? t("status.boltSplitNoPins", { name }) : t("status.boltSplit", { name });
+    const at = shapesRef.current.findIndex((shape) => shape.id === bolt.id);
+    const next = [...shapesRef.current.slice(0, at), ...result.parts, ...shapesRef.current.slice(at + 1)];
+    commitShapes(next, result.parts.map((part) => part.id), message);
+    return { ok: true as const, parts: result.parts, pins: result.pins, pinDiameter: result.pinDiameter, pinLength: result.pinLength, placed: result.placed };
+  }, [commitShapes]);
+
+  /**
    * A vase's accessories (legs to plug in, a stand, a saucer, an insert, a lid), laid out beside it ready to
    * print; the ones laid out for it before give way, so changed settings come out new. Returns the new parts
    * and the kinds asked for that this vase does not allow.
@@ -16220,6 +16253,26 @@ export function LayerlingEditor({
         };
       }
 
+      if (command.action === "split_bolt") {
+        const requested = typeof params.id === "string" ? params.id : selectedIdsRef.current.length === 1 ? selectedIdsRef.current[0] : null;
+        const bolt = requested ? currentShapes().find((shape) => shape.id === requested) : null;
+        if (!bolt) throw new Error("Pass the id of a screw or threaded rod, or select one");
+        if (!boltSplitFits(bolt)) throw new Error("Only a screw or a threaded rod (a thread of role screw or rod, not a hole) can be split lengthwise");
+        const options: Partial<BoltSplitOptions> = {
+          ...(typeof params.pins === "boolean" ? { pins: params.pins } : {}),
+          ...(typeof params.pinPlay === "number" ? { pinPlay: params.pinPlay } : {}),
+        };
+        const result = await splitBoltForPrint(bolt.id, options);
+        if (!result.ok) throw new Error(result.message);
+        return {
+          parts: result.parts.map((part) => mcpShapeSummary(part)),
+          pins: result.pins,
+          pinDiameter: result.pinDiameter,
+          pinLength: result.pinLength,
+          placed: result.placed,
+        };
+      }
+
       if (command.action === "check_print") {
         // The same check as the panel: it only reads the design. The overhangs at the angle "Show overhangs" uses.
         const requestedIds = mcpStringArray(params.ids ?? params.id);
@@ -19465,6 +19518,7 @@ export function LayerlingEditor({
           onSurfaceRegionLasso={surfaceRegionLasso}
           onVaseAccessories={selectedShapes.length === 1 && selectedShape?.kind === "vase" && !bodyLocked(selectedShape) ? () => layOutVaseAccessories(selectedShape.id) : undefined}
           onGridfinityKeys={selectedShapes.length === 1 && selectedShape?.kind === "gridfinity" && selectedShape.gridfinitySwallowtail === true && !historyViewState ? () => void makeSwallowtailKeys(selectedShape.id) : undefined}
+          onBoltSplit={selectedShapes.length === 1 && selectedShape && boltSplitFits(selectedShape) && !historyViewState ? (pins) => void splitBoltForPrint(selectedShape.id, { pins }) : undefined}
           onGridfinitySplit={selectedShapes.length === 1 && selectedShape?.kind === "gridfinity" && !historyViewState ? () => void splitGridfinityPlate(selectedShape.id) : undefined}
           onLayerText={selectedShapes.length === 1 && offersTextLayers(selectedShape) ? layerSelectedText : undefined}
           onTextTags={selectedShapes.length === 1 && offersTextLayers(selectedShape) ? makeTextTags : undefined}

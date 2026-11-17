@@ -141,6 +141,7 @@ AI používá stejné funkce a stejné zpracování příkazů jako ruční ovl�
 | `layerling_check_clearance` | před tiskem zkontroluje, které díly se překrývají, dotýkají nebo jsou blíž než minimální vůle (Zkontrolovat vůli), i oddělené díly jednoho objektu |
 | `layerling_printer_play` | načte, nastaví nebo smaže vůli tiskárny ({{ui:workspace.printerPlay}} v nastavení) a položí test vůle, který ji změří |
 | `layerling_check_print` | před tiskem zkontroluje, co by se pokazilo: příliš tenké stěny pro trysku, díly ve vzduchu, malou opěru na podložce, převisy a otevřené sítě (Zkontrolovat tisk) |
+| `layerling_split_bolt` | rozdělí šroub nebo závitovou tyč podélně osou a položí obě poloviny na řezné plochy k tisku, volitelně se středicími kolíky |
 | `layerling_add_reference_points` | vytvoří referenční body na středech, rozích, středech hran nebo zadaných souřadnicích |
 | `layerling_list_reference_points` | vypíše referenční body s identifikátory a polohami |
 | `layerling_remove_reference_points` | odstraní vybrané nebo všechny referenční body |
