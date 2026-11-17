@@ -7,7 +7,7 @@ import { markEscapeHandled } from "@/lib/escapeHandled";
 import { ArrowDownToLine, Check, ChevronLeft, Crosshair, Cuboid, Download, Eye, EyeOff, FlipHorizontal, GripVertical, Home, Layers, Minus, Move, MousePointer2, PanelsTopLeft, Pointer, ScanEye, PencilLine, PictureInPicture2, Plus, Rotate3d, RotateCcw, RotateCw, Ruler, RulerDimensionLine, Scaling, Slice, Spline, Trash2, X } from "lucide-react";
 import { loadTouchHandleMode, nextTouchHandleMode, saveTouchHandleMode, touchModeMovesBody, type TouchHandleMode } from "@/lib/touchHandleMode";
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperties, type Dispatch, type DragEvent, type MutableRefObject, type PointerEvent as ReactPointerEvent, type ReactNode, type SetStateAction, type WheelEvent as ReactWheelEvent } from "react";
-import { boxEdgeTargets, edgeSnapGuide, objectSnapOffset, shiftSnapBox, snapResizeEdge, wallLines, type EdgeSnapTarget, type MoveWallSnap, type ObjectSnapGuide, type SnapBox } from "@/lib/objectSnap";
+import { boxEdgeTargets, objectSnapOffset, shiftSnapBox, wallLines, type EdgeSnapTarget, type MoveWallSnap, type ObjectSnapGuide, type SnapBox } from "@/lib/objectSnap";
 import { dragReach } from "@/lib/dragReach";
 import { useMovablePanel, type MovablePanelOptions } from "@/lib/useMovablePanel";
 import { computeSectionPlaneVector, DEFAULT_SECTION_SETTINGS, getSectionBounds, SECTION_AXES_SHOWN, sectionAxisLetter, sectionAxisVector, sectionFineWindow, sectionFrameFromView, sectionFrameFromWorkplane, sectionPlacementWorkplane, sectionPointFromFrame, sectionPointToFrame, type SectionFrame, type SectionOrientation, type SectionPlaneAxis, type SectionPlaneSettings } from "@/lib/sectionView";
@@ -133,7 +133,7 @@ import { moldHandleDirection, pickMoldHandle, syncMoldPreviewOverlay, type MoldP
 import { EMPTY_PROTRACTOR, pickProtractorFace, protractorFaceFromWorld, protractorReading, protractorStraightView, ProtractorOverlay, syncProtractorOverlay, type ProtractorKind, type ProtractorModel, type ProtractorOverlayState } from "./workplane/viewportProtractor";
 import { tapeAttachmentFromWorld, TAPE_PERPENDICULAR_SNAP_PIXELS, pickModelTapeCandidate, tapeCentresNear, sameTapeCentres, distanceToScreenSegment, SectionMeasureModel, SectionMeasureOverlayState, syncSectionMeasureOverlay } from "./workplane/viewportTape";
 export type { LayFlatPick } from "@/components/workplane/viewportPicking";
-import { MIN_ELEVATION, MAX_ELEVATION, ResizeSigns, ResizeAnchorMemory, TransformDragState, TransformDragItem, snapValue, selectionWorldYBounds, resizeSignsForHandle, resizeAnchorPointForFrame, resizeCenterFromAnchor, resizeSignsForDimension, patchWithResizeAnchor, patchWithUniformHeightScale, resizeShapeFromFrameHandle, resizeShapeAlongFrameNormal, resizeSelectionFromHandle, scaleSelectionItems } from "./workplane/viewportResize";
+import { MIN_ELEVATION, MAX_ELEVATION, ResizeSigns, ResizeAnchorMemory, TransformDragState, TransformDragItem, ResizeSnapSide, cornerKeepsBothSides, snapResizeSides, snapValue, selectionWorldYBounds, resizeSignsForHandle, resizeAnchorPointForFrame, resizeCenterFromAnchor, resizeSignsForDimension, patchWithResizeAnchor, patchWithUniformHeightScale, resizeShapeFromFrameHandle, resizeShapeAlongFrameNormal, resizeSelectionFromHandle, scaleSelectionItems } from "./workplane/viewportResize";
 import { pulleySizedPatch } from "@/lib/pulleyGeometry";
 import { setPickRayFromCamera } from "@/lib/cameraRay";
 
@@ -1096,10 +1096,11 @@ function unionSnapBox(boxes: SnapBox[]): SnapBox | null {
 }
 
 /**
- * What a side handle snaps to on the flat workplane (Discussion #1647): the edges and middles of other bodies, as a
- * drag has them, and the walls the dragged side runs into as the body grows, found with rays from that side - so the
- * inside of a box, a hollowed body or an imported case counts too, not only its outline. Only for a side handle of a
- * selection standing upright with its sides along X and Y; otherwise undefined.
+ * What a side or corner handle snaps to on the flat workplane (Discussion #1647): for each dragged side the edges and
+ * middles of other bodies, as a drag has them, and the walls that side runs into as the body grows, found with rays
+ * from it - so the inside of a box, a hollowed body or an imported case counts too, not only its outline. Only for a
+ * selection standing upright with its sides along X and Y; otherwise undefined. A corner on a single body that cannot
+ * keep both sizes (cornerKeepsBothSides) gets none.
  */
 function resizeSnapForHandle(
   state: ThreeState,
@@ -1110,9 +1111,27 @@ function resizeSnapForHandle(
   points: Array<{ x: number; z: number }>,
   workplane: PlacementWorkplane,
 ): TransformDragState["resizeSnap"] {
-  if (!isWorldHorizontalWorkplane(workplane) || Boolean(signs.x) === Boolean(signs.z)) return undefined;
+  if (!isWorldHorizontalWorkplane(workplane) || (!signs.x && !signs.z)) return undefined;
   if (Math.abs(frame.yAxis.y) < 1 - 1e-6) return undefined;
-  const frameAxis = signs.x ? "x" : "z";
+  const single = signs.x && signs.z && moved.size === 1 ? shapes.find((entry) => moved.has(entry.id)) : undefined;
+  if (single && !cornerKeepsBothSides(single)) return undefined;
+  const boxes = moveSnapTargets(shapes, moved, points, workplane);
+  const skip = wallRaySkip(shapes, moved);
+  const sides = (["x", "z"] as const).filter((frameAxis) => signs[frameAxis]).map((frameAxis) => resizeSnapForSide(state, frame, signs, frameAxis, boxes, skip));
+  if (!sides.every((side) => side !== undefined)) return undefined;
+  // The guide lies under the body, so it shows on the floor of a case too, not hidden in it on the workplane.
+  return { sides, guideY: framePoint(frame, 0, frame.min.y, 0).y };
+}
+
+/** One dragged side of a resize: its targets, found as `resizeSnapForHandle` describes. */
+function resizeSnapForSide(
+  state: ThreeState,
+  frame: SelectionFrame,
+  signs: ResizeSigns,
+  frameAxis: "x" | "z",
+  boxes: SnapBox[],
+  skip: ReadonlySet<string>,
+): ResizeSnapSide | undefined {
   const axisVector = frameAxis === "x" ? frame.xAxis : frame.zAxis;
   const worldAxis = Math.abs(axisVector.x) > 1 - 1e-6 ? "x" : Math.abs(axisVector.z) > 1 - 1e-6 ? "z" : null;
   if (!worldAxis) return undefined;
@@ -1124,9 +1143,8 @@ function resizeSnapForHandle(
   const crossVector = frameAxis === "x" ? frame.zAxis : frame.xAxis;
   const movingFrom = frame.center[otherAxis] - crossSize / 2;
   const movingTo = frame.center[otherAxis] + crossSize / 2;
-  const targets: EdgeSnapTarget[] = boxEdgeTargets(moveSnapTargets(shapes, moved, points, workplane), worldAxis);
+  const targets: EdgeSnapTarget[] = boxEdgeTargets(boxes, worldAxis);
   // Rays from the dragged side, a little inside it so a wall it already touches is met, spread over its face.
-  const skip = wallRaySkip(shapes, moved);
   const direction = new THREE.Vector3();
   direction[worldAxis] = worldDirection;
   const side = framePoint(frame, frameAxis === "x" ? (sign * size) / 2 : 0, 0, frameAxis === "z" ? (sign * size) / 2 : 0);
@@ -1146,9 +1164,7 @@ function resizeSnapForHandle(
     }
   }
   targets.push(...wallLines(hits, worldAxis));
-  // The guide lies under the body, so it shows on the floor of a case too, not hidden in it on the workplane.
-  const guideY = framePoint(frame, 0, frame.min.y, 0).y;
-  return { frameAxis, worldAxis, worldDirection, targets, movingFrom, movingTo, guideY };
+  return { frameAxis, worldAxis, worldDirection, targets, movingFrom, movingTo };
 }
 
 /** Converts OBJECT_SNAP_PIXELS into millimetres at `at`, so the pull feels the same at every zoom. */
@@ -5045,45 +5061,34 @@ export function WorkplaneViewport({
         if (!worldPoint) {
           return true;
         }
-        // A side handle stops at the edges of other bodies and the walls it runs into (Discussion #1647); with Alt the
-        // body still grows from its middle and the dragged side snaps all the same. A snapped size goes off the grid.
+        const maxSize = transform.items.length === 1
+          ? handleDimensionLimit(workspaceRef.current, transform.startShape.kind, 220, "across", Math.max(transform.selectionFrame.width, transform.selectionFrame.depth, transform.selectionFrame.height))
+          : Math.max(...transform.items.map((item) => handleDimensionLimit(workspaceRef.current, item.startShape.kind, 260, "across", Math.max(transform.selectionFrame.width, transform.selectionFrame.depth, transform.selectionFrame.height))));
+        // A side handle stops at the edges of other bodies and the walls it runs into (Discussion #1647), a corner handle
+        // each of its two sides; with Alt the body still grows from its middle and the dragged sides snap all the same.
+        // A snapped size goes off the grid.
         const snap = transform.resizeSnap;
         const snapState = threeRef.current;
-        let freeAxis: "x" | "z" | undefined;
+        let freeAxes: ("x" | "z")[] = [];
         if (snap && snapState) {
           let guides: ObjectSnapGuide[] = [];
-          const frame = transform.selectionFrame;
-          const signs = transform.scaleSigns ?? resizeSignsForHandle(transform.handleKey);
-          const axisVector = snap.frameAxis === "x" ? frame.xAxis : frame.zAxis;
-          const sign = snap.frameAxis === "x" ? signs.x : signs.z;
-          const current = snap.frameAxis === "x" ? frame.width : frame.depth;
-          const delta = transform.scaleStartPoint ? worldPoint.clone().sub(transform.scaleStartPoint).dot(axisVector) : 0;
-          const factor = altKey ? 2 : 1;
-          const rawSize = current + sign * delta * factor;
-          const anchorPoint = altKey ? frame.center : transform.scaleAnchorPoint ?? resizeAnchorPointForFrame(frame, signs);
-          if (!(shiftKey || proportionLockRef.current) && rawSize > 0) {
-            const hit = snapResizeEdge(
-              { anchor: anchorPoint[snap.worldAxis], direction: snap.worldDirection, size: rawSize, symmetric: altKey },
-              snap.targets,
-              objectSnapThreshold(snapState, worldPoint),
-              MIN_SHAPE_SIZE,
-            );
-            if (hit) {
-              const wanted = (hit.size - current) / (sign * factor);
-              worldPoint = worldPoint.clone().addScaledVector(axisVector, wanted - delta);
-              freeAxis = snap.frameAxis;
-              guides = [edgeSnapGuide(snap.worldAxis, hit.target, snap.movingFrom, snap.movingTo)];
-            }
+          if (!(shiftKey || proportionLockRef.current)) {
+            const frame = transform.selectionFrame;
+            const signs = transform.scaleSigns ?? resizeSignsForHandle(transform.handleKey);
+            const anchorPoint = altKey ? frame.center : transform.scaleAnchorPoint ?? resizeAnchorPointForFrame(frame, signs);
+            const pull = transform.scaleStartPoint ? worldPoint.clone().sub(transform.scaleStartPoint) : null;
+            const snapped = snapResizeSides(snap.sides, frame, signs, pull, anchorPoint, altKey, step, maxSize, objectSnapThreshold(snapState, worldPoint), transform.items.length === 1 ? transform.startShape : undefined);
+            worldPoint = worldPoint.clone().add(snapped.shift);
+            freeAxes = snapped.freeAxes;
+            guides = snapped.guides;
           }
           syncObjectSnapGuides(snapState, guides, snap.guideY + 0.06);
         }
         if (transform.items.length === 1) {
-          const maxSize = handleDimensionLimit(workspaceRef.current, transform.startShape.kind, 220, "across", Math.max(transform.selectionFrame.width, transform.selectionFrame.depth, transform.selectionFrame.height));
-          const next = resizeShapeFromFrameHandle(transform, worldPoint, transform.handleKey, shiftKey || proportionLockRef.current, altKey, step, maxSize, freeAxis);
+          const next = resizeShapeFromFrameHandle(transform, worldPoint, transform.handleKey, shiftKey || proportionLockRef.current, altKey, step, maxSize, freeAxes);
           onUpdateShape(transform.id, next);
         } else {
-          const maxSize = Math.max(...transform.items.map((item) => handleDimensionLimit(workspaceRef.current, item.startShape.kind, 260, "across", Math.max(transform.selectionFrame.width, transform.selectionFrame.depth, transform.selectionFrame.height))));
-          resizeSelectionFromHandle(transform, worldPoint, transform.handleKey, shiftKey || proportionLockRef.current, altKey, step, maxSize, freeAxis).forEach(({ id, patch }) => onUpdateShape(id, patch));
+          resizeSelectionFromHandle(transform, worldPoint, transform.handleKey, shiftKey || proportionLockRef.current, altKey, step, maxSize, freeAxes).forEach(({ id, patch }) => onUpdateShape(id, patch));
         }
         return true;
       }

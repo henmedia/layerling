@@ -1,6 +1,16 @@
 [
   {
     "title": {
+      "de": "Größe ziehen bis in die Ecke",
+      "en": "Resize right into the corner"
+    },
+    "body": {
+      "de": "Ziehst du eine Form an einem Eckgriff größer, halten jetzt beide Seiten an den Kanten anderer Formen und an den Wänden, auf die sie treffen. So füllt ein Teil die Ecke eines Gehäuses in einem Zug.",
+      "en": "When you drag a corner handle to make a shape bigger, both of its sides now stop at the edges of other shapes and at the walls they run into. So a part fills the corner of a case in one drag."
+    }
+  },
+  {
+    "title": {
       "de": "3MF und OBJ: kleine Teile einer Gruppe bleiben",
       "en": "3MF and OBJ: small parts of a group stay"
     },

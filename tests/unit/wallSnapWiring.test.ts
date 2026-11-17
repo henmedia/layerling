@@ -27,3 +27,22 @@ describe("moving snaps to the wall it runs into, in the viewport", () => {
     expect(viewport).toMatch(/targets\.push\(\.\.\.wallLines\(hits, worldAxis\)\);/);
   });
 });
+
+describe("a corner handle snaps both sides, in the viewport", () => {
+  it("sets up a snap for each side of a corner too, but not on a single body that cannot keep both sizes", () => {
+    expect(viewport).toMatch(/\(!signs\.x && !signs\.z\)\) return undefined;/);
+    expect(viewport).toMatch(/signs\.x && signs\.z && moved\.size === 1 \? /);
+    expect(viewport).toMatch(/if \(single && !cornerKeepsBothSides\(single\)\) return undefined;/);
+    expect(viewport).toMatch(/const boxes = moveSnapTargets\(shapes, moved, points, workplane\);/);
+    expect(viewport).toMatch(/\.filter\(\(frameAxis\) => signs\[frameAxis\]\)\.map\(\(frameAxis\) => resizeSnapForSide/);
+  });
+
+  it("moves the pointer by the snapped sides, keeps their sizes off the grid and draws their guides", () => {
+    expect(viewport).toMatch(/snapResizeSides\(snap\.sides, /);
+    expect(viewport).toMatch(/transform\.items\.length === 1 \? transform\.startShape : undefined\)/);
+    expect(viewport).toMatch(/worldPoint = worldPoint\.clone\(\)\.add\(snapped\.shift\);/);
+    expect(viewport).toMatch(/freeAxes = snapped\.freeAxes;/);
+    expect(viewport).toMatch(/guides = snapped\.guides;/);
+    expect(viewport.match(/maxSize, freeAxes\)/g)).toHaveLength(2);
+  });
+});
