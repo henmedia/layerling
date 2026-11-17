@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { applySketchConstraints, validSketchConstraints, withSketchConstraint } from "@/lib/sketchConstraints";
+import { applySketchConstraints, sketchConstraintGroups, validSketchConstraints, withSketchConstraint } from "@/lib/sketchConstraints";
 import { concentricResizeLocks, resizeSketchPoints, resizeSketchPointsToSize } from "@/lib/sketchSelectionResize";
 import { sketchPrimitiveGeometry } from "@/lib/sketchPrimitives";
 import { cloneSketchProfile } from "@/lib/sketchSmoothHandles";
@@ -439,4 +439,160 @@ it("resizes concentric circles from their shared center without Shift", () => {
   expect(shrunk.ok).toBe(true);
   expect(coordinates(shrunk.profile, second[0]).x).toBeCloseTo(7);
   expect(coordinates(shrunk.profile, second[1]).z).toBeCloseTo(11);
+});
+
+describe("constraint diagnostics and radial gaps", () => {
+  it("reports proven contradictions and keeps the input geometry intact", () => {
+    const profile: SketchProfile = {
+      ...initial(),
+      constraints: [
+        { id: "vertical", kind: "vertical", a: "edge", b: "bottom" },
+        { id: "offset", kind: "offset-x", a: "edge", b: "bottom", value: 8 },
+      ],
+    };
+    const before = JSON.stringify(profile);
+    const result = applySketchConstraints(profile);
+    expect(result.ok).toBe(false);
+    expect(JSON.stringify(profile)).toBe(before);
+    if (!result.ok) {
+      expect(result.profile).toBe(profile);
+      expect(result.failure.conflicting.map((rule) => rule.id).sort()).toEqual(["offset", "vertical"]);
+      expect(result.failure.unsatisfied.length).toBeGreaterThan(0);
+    }
+  });
+
+  it("does not label immovable geometry as a confirmed constraint contradiction", () => {
+    const profile: SketchProfile = {
+      ...initial(),
+      points: initial().points.map((point) => ({ ...point, locked: true })),
+      constraints: [{ id: "length", kind: "distance", a: "edge", b: "bottom", value: 20 }],
+    };
+    const result = applySketchConstraints(profile);
+    expect(result.ok).toBe(false);
+    if (!result.ok) {
+      expect(result.failure.conflicting).toEqual([]);
+      expect(result.failure.unsatisfied.map((rule) => rule.id)).toEqual(["length"]);
+    }
+  });
+
+  function ring() {
+    let id = 0;
+    const nextId = () => `ring-${++id}`;
+    const inner = sketchPrimitiveGeometry("circle", { x: 0, z: 0 }, nextId, 10);
+    const outer = sketchPrimitiveGeometry("circle", { x: 4, z: 3 }, nextId, 20);
+    const first = inner.points.map((point) => point.id);
+    const second = outer.points.map((point) => point.id);
+    const profile: SketchProfile = {
+      points: [...inner.points, ...outer.points],
+      segments: [...inner.segments, ...outer.segments],
+      constraints: [
+        { id: "ring", kind: "concentric", a: first[0], b: second[0], circles: [first, second], radialGap: 3 },
+      ],
+    };
+    return { profile, first, second };
+  }
+
+  function radius(profile: SketchProfile, ids: string[]) {
+    const points = ids.map((id) => coordinates(profile, id));
+    const center = { x: points.reduce((sum, p) => sum + p.x / 4, 0), z: points.reduce((sum, p) => sum + p.z / 4, 0) };
+    return { center, radius: Math.hypot(points[0].x - center.x, points[0].z - center.z) };
+  }
+
+  it.each([0, 1])("maintains a radial gap with circle %s diameter locked", (fixed) => {
+    const { profile, first, second } = ring();
+    const outline = fixed === 0 ? first : second;
+    profile.constraints!.push({ id: "diameter", kind: "circle-diameter", a: outline[0], b: outline[1], outline, value: fixed === 0 ? 10 : 20 });
+    const result = applySketchConstraints(profile);
+    expect(result.ok).toBe(true);
+    const inner = radius(result.profile, first);
+    const outer = radius(result.profile, second);
+    expect(outer.radius - inner.radius).toBeCloseTo(3, 6);
+    expect(outer.center.x).toBeCloseTo(inner.center.x, 6);
+    expect(outer.center.z).toBeCloseTo(inner.center.z, 6);
+    expect(radius(result.profile, outline).radius * 2).toBeCloseTo(fixed === 0 ? 10 : 20, 6);
+    expect(cloneSketchProfile(result.profile).constraints).toEqual(result.profile.constraints);
+  });
+
+  it("updates the same gap constraint even when the circle selection order changes", () => {
+    const { profile, first, second } = ring();
+    const updated = withSketchConstraint(profile, {
+      id: "new", kind: "concentric", a: second[0], b: first[0], circles: [second, first], radialGap: -4,
+    });
+    expect(updated.constraints).toHaveLength(1);
+    expect(updated.constraints![0]).toMatchObject({ id: "ring", radialGap: 4 });
+    const result = applySketchConstraints(updated);
+    expect(result.ok).toBe(true);
+    expect(radius(result.profile, second).radius - radius(result.profile, first).radius).toBeCloseTo(4, 6);
+  });
+
+  it("rejects incompatible fixed diameters and preserves both circles", () => {
+    const { profile, first, second } = ring();
+    for (const [outline, value] of [[first, 10], [second, 20]] as const) {
+      profile.constraints!.push({ id: `size-${value}`, kind: "circle-diameter", a: outline[0], b: outline[1], outline, value });
+    }
+    const before = JSON.stringify(profile);
+    const result = applySketchConstraints(profile);
+    expect(result.ok).toBe(false);
+    expect(JSON.stringify(profile)).toBe(before);
+    expect(result.profile).toBe(profile);
+  });
+
+  it("deletes only the selected constraint while retaining circle geometry", () => {
+    const { profile } = ring();
+    const solved = applySketchConstraints(profile);
+    expect(solved.ok).toBe(true);
+    const removed = applySketchConstraints({ ...solved.profile, constraints: [] });
+    expect(removed.ok).toBe(true);
+    expect(removed.profile.points).toEqual(solved.profile.points);
+    expect(removed.profile.segments).toEqual(solved.profile.segments);
+  });
+  it("lists each circle once with its own constraints and shared relationships", () => {
+    const { profile, first, second } = ring();
+    profile.constraints!.push(
+      { id: "inner-size", kind: "circle-diameter", a: first[0], b: first[1], outline: first, value: 10 },
+      { id: "outer-size", kind: "circle-diameter", a: second[0], b: second[1], outline: second, value: 20 },
+    );
+    const groups = sketchConstraintGroups(profile);
+    expect(groups.map((group) => [group.label, group.constraints.map((rule) => rule.id)])).toEqual([
+      ["Circle 1", ["ring", "inner-size"]],
+      ["Circle 2", ["ring", "outer-size"]],
+    ]);
+    expect(new Set(groups.flatMap((group) => group.constraints.map((rule) => rule.id))).size).toBe(3);
+  });
+
+  it("keeps constraints on connected, branching geometry in one shape group", () => {
+    const profile: SketchProfile = {
+      points: [{ id: "a", x: 0, z: 0 }, { id: "b", x: 10, z: 0 },
+        { id: "c", x: 0, z: 10 }, { id: "d", x: -10, z: 0 }],
+      segments: [
+        { id: "ab", startId: "a", endId: "b" },
+        { id: "ac", startId: "a", endId: "c" },
+        { id: "ad", startId: "a", endId: "d" },
+      ],
+      constraints: [
+        { id: "horizontal", kind: "horizontal", a: "a", b: "b" },
+        { id: "vertical", kind: "vertical", a: "a", b: "c" },
+      ],
+    };
+    const groups = sketchConstraintGroups(profile);
+    expect(groups).toHaveLength(1);
+    expect(groups[0].label).toBe("Shape 1");
+    expect(groups[0].constraints.map((rule) => rule.id)).toEqual(["horizontal", "vertical"]);
+  });
+
+  it("keeps shape names in individual groups and shared relations after solving and cloning", () => {
+    const { profile, first, second } = ring();
+    profile.points = profile.points.map((point) => ({ ...point, shapeName: first.includes(point.id) ? "Bore" : "Rim" }));
+    profile.constraints!.push({ id: "diameter", kind: "circle-diameter", a: first[0], b: first[1], outline: first, value: 10 });
+    const solved = applySketchConstraints(profile);
+    expect(solved.ok).toBe(true);
+    const cloned = cloneSketchProfile(solved.profile);
+    const groups = sketchConstraintGroups(cloned);
+    expect(groups.map((group) => group.label)).toEqual(["Bore", "Rim"]);
+    expect(groups.flatMap((group) => group.shapes.map((shape) => shape.pointIds))).toEqual(expect.arrayContaining([
+      expect.arrayContaining(first), expect.arrayContaining(second),
+    ]));
+    expect(cloned.points.every((point) => point.shapeName)).toBe(true);
+  });
+
 });

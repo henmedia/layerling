@@ -51,7 +51,7 @@ import { iconSourceFromFile, PICTURE_FILE_ACCEPT, picturePixels, type IconSource
 import { loadedManifoldRuntime, onManifoldReady } from "@/lib/manifoldHandle";
 import { canApplySketchCornerTreatment } from "@/lib/sketchFilletChamfer";
 import { SKETCH_POLYGON_DEFAULT_SIDES, SKETCH_STAR_DEFAULT_INNER_PERCENT, sketchPrimitiveGeometry, sketchPrimitiveStartSize } from "@/lib/sketchPrimitives";
-import { applySketchConstraints, withSketchConstraint } from "@/lib/sketchConstraints";
+import { applySketchConstraints, withSketchConstraint, type SketchConstraintFailure } from "@/lib/sketchConstraints";
 import type { SketchConstraintInput } from "@/types/layerling";
 import { cloneSketchProfile, orderedSketchPaths, sketchWithPointMode, withSmoothHandlesAfterRemoval, withSmoothSketchHandles } from "@/lib/sketchSmoothHandles";
 import { curveThroughPoints } from "@/lib/sketchCurveThroughPoints";
@@ -3645,6 +3645,7 @@ export function LayerlingEditor({
   useEffect(() => {
     if (!sketchActive) setSketchFromMiddle(false);
   }, [sketchActive]);
+  const [sketchConstraintFailure, setSketchConstraintFailure] = useState<SketchConstraintFailure | null>(null);
   const [sketchProfile, setSketchProfile] = useState<SketchProfile>(() => emptySketchProfile());
   const [sketchHistory, setSketchHistory] = useState<SketchProfile[]>([emptySketchProfile()]);
   const [sketchHistoryIndex, setSketchHistoryIndex] = useState(0);
@@ -5509,8 +5510,11 @@ export function LayerlingEditor({
       }
       const solved = applySketchConstraints(carriedConstraints, moved);
       if (!solved.ok) {
+        const attempted = (carriedConstraints.constraints ?? []).filter((rule) =>
+          !latest?.constraints?.some((previous) => JSON.stringify(previous) === JSON.stringify(rule)));
+        setSketchConstraintFailure({ ...solved.failure, attempted });
         setNotice(t("status.sketchConstraintConflict"));
-        return;
+        return false;
       }
       // Moving shapes over each other makes no shared points where their lines cross (#239); drawing does.
       const snapshot = cloneSketchProfile(latest && onlyMovesPoints(latest, solved.profile) ? solved.profile : addLineIntersectionPoints(solved.profile, createLocalId));
@@ -5519,9 +5523,10 @@ export function LayerlingEditor({
         setNotice(t("status.sketchOutlineLocked"));
         return;
       }
+      setSketchConstraintFailure(null);
       setSketchProfile(snapshot);
       if (latest && JSON.stringify(latest) === JSON.stringify(snapshot)) {
-        return;
+        return true;
       }
       const now = Date.now();
       const replaceLatest = keyRunKey !== undefined && trimmed.length > 1 && continuesKeyRun(sketchKeyRunRef.current, keyRunKey, now, latest, true);
@@ -5536,6 +5541,7 @@ export function LayerlingEditor({
       setSketchHistory(nextHistory);
       setSketchHistoryIndex(sketchHistoryIndexRef.current);
       if (message) setNotice(message);
+      return true;
     },
     [],
   );
@@ -6311,8 +6317,20 @@ export function LayerlingEditor({
 
   const addSketchConstraint = useCallback((rule: SketchConstraintInput) => {
     const id = createLocalId("sketch-constraint");
-    commitSketchProfile(withSketchConstraint(sketchProfile, { ...rule, id }), t("status.sketchConstraintAdded"));
+    return commitSketchProfile(withSketchConstraint(sketchProfile, { ...rule, id }), t("status.sketchConstraintAdded"));
   }, [commitSketchProfile, sketchProfile]);
+
+  const updateSketchConstraint = useCallback((id: string, value: number) => {
+    const constraints = (sketchProfile.constraints ?? []).map((rule) => {
+      if (rule.id !== id) return rule;
+      if ("value" in rule) return { ...rule, value };
+      if (rule.kind === "concentric") return { ...rule, radialGap: value };
+      return rule;
+    });
+    return commitSketchProfile({ ...sketchProfile, constraints }, t("status.sketchUpdated"));
+  }, [commitSketchProfile, sketchProfile]);
+
+  useEffect(() => { setSketchConstraintFailure(null); }, [sketchProfile]);
 
   const removeSketchConstraint = useCallback((id: string) => {
     commitSketchProfile({ ...sketchProfile, constraints: (sketchProfile.constraints ?? []).filter((rule) => rule.id !== id) }, t("status.sketchConstraintRemoved"));
@@ -19717,6 +19735,9 @@ export function LayerlingEditor({
             onMovePoint={moveSketchPoint}
             onAddConstraint={addSketchConstraint}
             onRemoveConstraint={removeSketchConstraint}
+            onUpdateConstraint={updateSketchConstraint}
+            constraintFailure={sketchConstraintFailure}
+            onDismissConstraintFailure={() => setSketchConstraintFailure(null)}
             onToggleOutlineLock={toggleSketchOutlineLock}
             onTransformPoints={transformSketchPoints}
             onMoveHandle={moveSketchHandle}

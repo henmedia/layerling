@@ -673,6 +673,8 @@ export type AlignSpread = { gap: number | null };
 
 export type SketchPoint = {
   id: string;
+  /** Display name of the connected sketch shape, carried with its vertices. */
+  shapeName?: string;
   x: number;
   z: number;
   handleIn?: { x: number; z: number };
@@ -765,7 +767,7 @@ export type SketchNote = { id: string; text: string; x: number; z: number; colla
 /** frameX is the unit X direction of the sketch at the time the rule was made.
  * Missing means {x:1,z:0}; editing a rotated body preserves these axes. */
 export type SketchConstraintInput =
-  | { kind: "concentric"; a: string; b: string; circles: [string[], string[]]; frameX?: undefined }
+  | { kind: "concentric"; a: string; b: string; circles: [string[], string[]]; radialGap?: number; frameX?: undefined }
   | { kind: "circle-diameter" | "circle-center-distance"; a: string; b: string; outline: string[]; value: number; frameX?: undefined }
   | { kind: "outline-line-distance"; a: string; b: string; outline: string[]; side: 1 | -1; value: number; frameX?: undefined }
   // a -> b defines the reference line and normal; the value is signed.

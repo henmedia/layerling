@@ -18345,3 +18345,159 @@ html[data-theme="dark"] .property-card > button.property-card-header:hover {
     display: block;
   }
 }
+
+.shape-inspector.sketch-constraint-inspector {
+  z-index: 12;
+}
+
+.sketch-constraint-inspector div.property-card-header,
+.sketch-constraint-geometry .outliner-item {
+  cursor: default;
+}
+
+.sketch-constraint-list {
+  flex-shrink: 0;
+  overflow-y: auto;
+  margin-bottom: 0;
+}
+
+.sketch-constraint-list-row {
+  display: flex;
+  align-items: center;
+  padding-right: 8px;
+}
+
+.sketch-constraint-list-row .sketch-constraint-row {
+  flex: 1;
+  min-width: 0;
+}
+
+.sketch-constraint-row {
+  width: 100%;
+  color: inherit;
+  background: transparent;
+  border: 0;
+  text-align: left;
+  cursor: pointer;
+}
+
+.sketch-constraint-row[aria-pressed="true"] {
+  color: inherit;
+}
+
+.sketch-constraint-property {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.sketch-constraint-property strong,
+.sketch-constraint-row .outliner-shape-name {
+  text-transform: capitalize;
+}
+
+.sketch-constraint-geometry .outliner-row-main {
+  padding: 8px 0;
+}
+
+.sketch-constraint-error {
+  color: #d23d35;
+  font-size: 13px;
+}
+
+.sketch-point-actions.sketch-constraint-feedback {
+  top: auto;
+  bottom: 16px;
+  flex-wrap: wrap;
+  max-width: min(90vw, 700px);
+  border: 2px solid #d23d35;
+  border-radius: 14px;
+}
+
+.sketch-constraint-markers [role="button"]:focus-visible rect,
+.sketch-constraint-markers [aria-pressed="true"] rect {
+  stroke: #1688c9;
+  stroke-width: 3;
+}
+
+.sketch-constraint-group-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  list-style: none;
+}
+
+.sketch-constraint-group-header::-webkit-details-marker {
+  display: none;
+}
+
+.sketch-constraint-group-header > span:first-of-type {
+  flex: 1;
+  min-width: 0;
+}
+
+.sketch-constraint-group details[open] > summary > svg {
+  transform: rotate(180deg);
+}
+
+.sketch-constraint-group .sketch-constraint-list-row {
+  padding-left: 12px;
+}
+
+.sketch-constraint-group-shapes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.sketch-constraint-shape-name {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  min-width: 0;
+}
+
+.sketch-constraint-shape-select {
+  padding: 0;
+  color: inherit;
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+  font-weight: inherit;
+  text-align: left;
+}
+
+.sketch-constraint-shape-name .rename-btn {
+  opacity: 1;
+}
+
+
+.sketch-constraint-list-resize {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  height: 12px;
+  margin-bottom: 8px;
+  cursor: ns-resize;
+  touch-action: none;
+  user-select: none;
+}
+
+.sketch-constraint-list-resize::after {
+  content: "";
+  width: 40px;
+  height: 3px;
+  background: currentColor;
+  border-radius: 3px;
+  opacity: 0.35;
+}
+
+.sketch-constraint-list-resize:hover::after,
+.sketch-constraint-list-resize:focus-visible::after {
+  opacity: 0.8;
+}

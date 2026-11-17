@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { applyCornerAngle, sketchCornerAt } from "@/lib/sketchAngles";
+import { applyCornerAngle, cornerAngleConstraint, sketchCornerAt } from "@/lib/sketchAngles";
+import { applySketchConstraints, withSketchConstraint } from "@/lib/sketchConstraints";
 import type { SketchPoint, SketchProfile } from "@/types/layerling";
 
 function polygon(coordinates: Array<[number, number]>): SketchProfile {
@@ -100,5 +101,47 @@ describe("typing an angle", () => {
     const after = turned.find((point) => point.id === "p2")!;
     expect(after.handleIn!.x - after.x).toBeCloseTo(before.handleIn!.x - before.x, 9);
     expect(after.handleOut!.z - after.z).toBeCloseTo(before.handleOut!.z - before.z, 9);
+  });
+});
+
+describe("persistent angles from the inline corner editor", () => {
+  it.each(["after", "before"] as const)("sets 146.3 degrees while turning the %s leg", (turn) => {
+    const profile = polygon([[0, 0], [40, 0], [40, 40], [0, 40]]);
+    const corner = sketchCornerAt(profile, "p1")!;
+    const constraint = cornerAngleConstraint(corner, 146.3, turn)!;
+    const attempted = withSketchConstraint(profile, { ...constraint, id: "corner-angle" });
+    const solved = applySketchConstraints(attempted);
+    expect(solved.ok).toBe(true);
+    expect(angleAt(solved.profile, "p1")).toBeCloseTo(146.3, 6);
+    const fixed = turn === "after" ? corner.before.far : corner.after.far;
+    const turning = turn === "after" ? corner.after.far : corner.before.far;
+    expect(solved.profile.points.find((point) => point.id === fixed.id)).toEqual(fixed);
+    expect(solved.profile.points.find((point) => point.id === corner.point.id)).toEqual(corner.point);
+    const moved = solved.profile.points.find((point) => point.id === turning.id)!;
+    expect(Math.hypot(moved.x - corner.point.x, moved.z - corner.point.z))
+      .toBeCloseTo(Math.hypot(turning.x - corner.point.x, turning.z - corner.point.z), 6);
+    expect(solved.profile.constraints).toHaveLength(1);
+    const updated = withSketchConstraint(solved.profile, { ...constraint, id: "new-id", value: 120 });
+    expect(updated.constraints).toHaveLength(1);
+    expect(updated.constraints![0]).toMatchObject({ id: "corner-angle", value: 120 });
+    expect(applySketchConstraints(updated).ok).toBe(true);
+  });
+
+  it("rejects an impossible locked-corner angle without partially moving its geometry", () => {
+    const profile = polygon([[0, 0], [40, 0], [40, 40], [0, 40]]);
+    profile.points = profile.points.map((point) => ({ ...point, locked: true }));
+    const before = JSON.stringify(profile);
+    const corner = sketchCornerAt(profile, "p1")!;
+    const constraint = cornerAngleConstraint(corner, 146.3)!;
+    const result = applySketchConstraints(withSketchConstraint(profile, { ...constraint, id: "attempt" }));
+    expect(result.ok).toBe(false);
+    expect(JSON.stringify(profile)).toBe(before);
+    expect(result.profile.points).toEqual(profile.points);
+    expect(profile.constraints).toBeUndefined();
+  });
+
+  it.each([0, 180, 270, NaN])("leaves unsupported angle %s to the existing corner editor", (degrees) => {
+    const profile = polygon([[0, 0], [40, 0], [40, 40], [0, 40]]);
+    expect(cornerAngleConstraint(sketchCornerAt(profile, "p1")!, degrees)).toBeNull();
   });
 });

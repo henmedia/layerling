@@ -81,7 +81,7 @@ function mutateProject(bytes: Uint8Array, mutate: (document: LylProjectDocumentV
 describe("layerling .lyl project packages", () => {
   afterEach(() => vi.unstubAllGlobals());
 
-  it("round-trips a concentric circle constraint", async () => {
+  it.each([undefined, 1.5])("round-trips a concentric circle constraint with gap %s", async (radialGap) => {
     let id = 0;
     const nextId = () => `circle-${++id}`;
     const hole = sketchPrimitiveGeometry("circle", { x: 0, z: 0 }, nextId, 3);
@@ -91,9 +91,10 @@ describe("layerling .lyl project packages", () => {
     const body = shape("mesh", "concentric-sketch", {
       sketchOperation: "extrude",
       sketchProfile: {
-        points: [...hole.points, ...recess.points],
+        points: [...hole.points.map((point) => ({ ...point, shapeName: "Bore" })),
+          ...recess.points.map((point) => ({ ...point, shapeName: "Counterbore" }))],
         segments: [...hole.segments, ...recess.segments],
-        constraints: [{ id: "shared-center", kind: "concentric", a: first[0], b: second[0], circles: [first, second] }],
+        constraints: [{ id: "shared-center", kind: "concentric", a: first[0], b: second[0], circles: [first, second], ...(radialGap === undefined ? {} : { radialGap }) }],
       },
     });
     const restored = await importLylProject(await exportLylProject(input([body])));

@@ -8854,6 +8854,39 @@ html[data-theme="dark"]:where([data-palette="graphite"]) .property-card > button
   color: #fff;
 }
 
+:where(html[data-theme="dark"][data-palette="graphite"]) .sketch-constraint-row {
+  color: inherit;
+  background: transparent;
+  border: 0;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .sketch-constraint-row[aria-pressed="true"] {
+  color: inherit;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .sketch-constraint-error {
+  color: #d23d35;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .sketch-point-actions.sketch-constraint-feedback {
+  border: 2px solid #d23d35;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .sketch-constraint-markers [role="button"]:focus-visible rect,
+:where(html[data-theme="dark"][data-palette="graphite"]) .sketch-constraint-markers [aria-pressed="true"] rect {
+  stroke: #1688c9;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .sketch-constraint-shape-select {
+  color: inherit;
+  background: transparent;
+  border: 0;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .sketch-constraint-list-resize::after {
+  background: currentColor;
+}
+
 :where(html[data-theme="dark"][data-palette="graphite"]) .dashboard-welcome-hide {
   color: #717171;
   background: transparent;

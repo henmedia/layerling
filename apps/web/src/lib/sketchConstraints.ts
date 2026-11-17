@@ -8,8 +8,8 @@ import type { SketchConstraint, SketchPoint, SketchProfile } from "@/types/layer
  * handles ordinary connected chains; conflicting or immovable constraints are
  * *rejected*, rather than silently saving an invalid sketch.
  *
- * Not a replacement for a general nonlinear CAD solver (arcs, tangency and
- * under/over-constrained diagnostics are explicitly out of scope).
+ * Failure diagnostics include unsatisfied equations and directly provable
+ * contradictions. General nonlinear conflict analysis remains unsupported.
  */
 const EPSILON = 0.00001; // mm
 const ANGLE_EPSILON = 1e-8; // radians
@@ -121,7 +121,109 @@ export function sketchOutlineClearance(
   return { ...support, side: chosenSide, nx, nz };
 }
 
-type SolveResult = { ok: true; profile: SketchProfile } | { ok: false; profile: SketchProfile };
+export type SketchConstraintFailure = {
+  unsatisfied: SketchConstraint[];
+  conflicting: SketchConstraint[];
+  attempted: SketchConstraint[];
+};
+
+type SolveResult = { ok: true; profile: SketchProfile } | {
+  ok: false;
+  profile: SketchProfile;
+  failure: SketchConstraintFailure;
+};
+
+/** Reference groups distinguish edges and outlines from individual points. */
+export function sketchConstraintReferences(rule: SketchConstraint): string[][] {
+  if (rule.kind === "concentric") return rule.circles;
+  if (rule.kind === "circle-diameter") return [rule.outline];
+  const first = [rule.a, rule.b];
+  if ("outline" in rule) return [first, rule.outline];
+  if ("d" in rule) return [first, [rule.c, rule.d]];
+  if ("c" in rule) return [first, [rule.c]];
+  return [first];
+}
+
+/** Sketches retain point/edge topology, so connected geometry supplies each shape group. */
+export function sketchConstraintGroups(profile: SketchProfile, constraints = profile.constraints ?? []) {
+  const points = new Map(profile.points.map((point) => [point.id, point]));
+  const neighbors = new Map(profile.points.map((point) => [point.id, new Set<string>()]));
+  for (const segment of profile.segments) {
+    neighbors.get(segment.startId)?.add(segment.endId);
+    neighbors.get(segment.endId)?.add(segment.startId);
+  }
+  const shapeByPoint = new Map<string, string>();
+  const shapes = new Map<string, { id: string; name: string; pointIds: string[]; segmentIds: string[] }>();
+  for (const point of profile.points) {
+    if (shapeByPoint.has(point.id)) continue;
+    const ids = new Set<string>();
+    const pending = [point.id];
+    while (pending.length) {
+      const id = pending.pop()!;
+      if (ids.has(id) || !points.has(id)) continue;
+      ids.add(id);
+      shapeByPoint.set(id, point.id);
+      pending.push(...neighbors.get(id) ?? []);
+    }
+    const segments = profile.segments.filter((segment) => ids.has(segment.startId) && ids.has(segment.endId));
+    const kind = !segments.length ? "Point" : sketchCircleGeometry(points, segments) ? "Circle" : "Shape";
+    const name = [...ids].map((id) => points.get(id)?.shapeName?.trim()).find(Boolean) ?? `${kind} ${shapes.size + 1}`;
+    shapes.set(point.id, { id: point.id, name, pointIds: [...ids], segmentIds: segments.map((segment) => segment.id) });
+  }
+  const grouped = new Map<string, { id: string; label: string; shapes: Array<{ id: string; name: string; pointIds: string[]; segmentIds: string[] }>; constraints: SketchConstraint[] }>();
+  for (const shape of shapes.values()) {
+    grouped.set(shape.id, { id: shape.id, label: shape.name, shapes: [shape], constraints: [] });
+  }
+  for (const constraint of constraints) {
+    const affected = new Set(sketchConstraintReferences(constraint).flat().map((id) => shapeByPoint.get(id)));
+    const shapeIds = [...shapes.keys()].filter((id) => affected.has(id));
+    for (const shapeId of shapeIds.length ? shapeIds : [undefined]) {
+      const shape = shapeId === undefined ? undefined : shapes.get(shapeId);
+      const id = shapeId ?? "unassigned";
+      const group = grouped.get(id) ?? {
+        id, label: shape?.name ?? "Other geometry", shapes: shape ? [shape] : [], constraints: [],
+      };
+      group.constraints.push(constraint);
+      grouped.set(id, group);
+    }
+  }
+  return [...grouped.values()];
+}
+
+export function sketchConstraintValueError(rule: SketchConstraint, value: number): string | undefined {
+  if (!Number.isFinite(value)) return "Enter a finite number.";
+  if (Math.abs(value) > 1e6) return "Enter a value within ±1,000,000.";
+  if (rule.kind === "concentric" && value <= 0) return "Enter a radial gap greater than zero.";
+  if (rule.kind === "angle" && (value <= 0 || value >= 180)) return "Enter an angle between 0° and 180°, exclusive.";
+  if (rule.kind === "circle-diameter" && value <= 0.001) return "Enter a diameter greater than 0.001 mm.";
+  if ((rule.kind === "distance" || rule.kind === "outline-line-distance") && value < 0) return "Enter a distance of zero or more.";
+}
+
+/** Report only pairs whose equations directly impose incompatible values. */
+function directlyConflicting(first: SketchConstraint, second: SketchConstraint) {
+  if (!sameSketchEndpoints(first.a, first.b, second.a, second.b)) return false;
+  const distance = first.kind === "distance" ? first : second.kind === "distance" ? second : null;
+  const other = distance === first ? second : first;
+  if (distance && other.kind === "coincident") return distance.value >= 2 * EPSILON;
+  if (distance && other.kind === "distance") return Math.abs(distance.value - other.value) >= 2 * EPSILON;
+
+  const axisEquation = (rule: SketchConstraint) => {
+    const sameDirection = rule.a === first.a;
+    switch (rule.kind) {
+      case "vertical": return { axis: "x", value: 0 };
+      case "horizontal": return { axis: "z", value: 0 };
+      case "offset-x": return { axis: "x", value: sameDirection ? rule.value : -rule.value };
+      case "offset-z": return { axis: "z", value: sameDirection ? rule.value : -rule.value };
+    }
+  };
+  const a = axisEquation(first);
+  const b = axisEquation(second);
+  if (!a || !b || a.axis !== b.axis) return false;
+  const firstFrame = first.frameX ?? { x: 1, z: 0 };
+  const secondFrame = second.frameX ?? { x: 1, z: 0 };
+  return firstFrame.x === secondFrame.x && firstFrame.z === secondFrame.z &&
+    Math.abs(a.value - b.value) >= 2 * EPSILON;
+}
 
 export function sameSketchEndpoints(a: string, b: string, c: string, d: string) {
   return (a === c && b === d) || (a === d && b === c);
@@ -135,7 +237,7 @@ export function validSketchConstraints(profile: SketchProfile): SketchConstraint
     if (!ids.has(rule.a) || !ids.has(rule.b) || rule.a === rule.b) return false;
     if (rule.kind === "concentric") {
       const [first, second] = rule.circles;
-      return first.length === 4 && second.length === 4 && first.includes(rule.a) && second.includes(rule.b) &&
+      return (rule.radialGap === undefined || Number.isFinite(rule.radialGap)) && first.length === 4 && second.length === 4 && first.includes(rule.a) && second.includes(rule.b) &&
         first.every((id) => !second.includes(id)) &&
         Boolean(sketchOutlineSegments(profile, first) && sketchOutlineSegments(profile, second));
     }
@@ -289,7 +391,9 @@ export function applySketchConstraints(profile: SketchProfile, movedIds: Readonl
     const b = working.get(rule.b)!;
     if (rule.kind === "concentric") {
       const delta = concentricDelta(rule);
-      return delta ? Math.hypot(delta.x, delta.z) : Infinity;
+      const [first, second] = concentricOutlines.get(rule.id)!.map((segments) => sketchCircleGeometry(working, segments));
+      const gapError = rule.radialGap === undefined ? 0 : first && second ? Math.abs(second.radius - first.radius - rule.radialGap) : Infinity;
+      return delta ? Math.max(Math.hypot(delta.x, delta.z), gapError) : Infinity;
     }
     const axis = rule.frameX ?? { x: 1, z: 0 };
     const dx = b.x - a.x;
@@ -329,11 +433,38 @@ export function applySketchConstraints(profile: SketchProfile, movedIds: Readonl
     }
   };
 
+  const satisfied = (rule: SketchConstraint) =>
+    error(rule) < (rule.kind === "parallel" || rule.kind === "perpendicular" || rule.kind === "angle" ? ANGLE_EPSILON : EPSILON);
+
   for (let pass = 0; pass < MAX_PASSES; pass++) {
     for (const rule of constraints) {
       const a = working.get(rule.a)!;
       const b = working.get(rule.b)!;
       if (rule.kind === "concentric") {
+        if (rule.radialGap !== undefined) {
+          const shapes = concentricOutlines.get(rule.id)!.map((segments) => sketchCircleGeometry(working, segments));
+          if (shapes.every(Boolean)) {
+            const fixedDiameter = (ids: string[]) => constraints.some((entry) =>
+              entry.kind === "circle-diameter" && entry.outline.every((id) => ids.includes(id)));
+            const canScale = (ids: string[]) => !fixedDiameter(ids) &&
+              ids.every((id) => !working.get(id)!.locked && !movedIds.has(id));
+            const index = canScale(rule.circles[1]) ? 1 : canScale(rule.circles[0]) ? 0 : -1;
+            if (index === 0 || index === 1) {
+              const shape = shapes[index]!;
+              const radius = index === 1 ? shapes[0]!.radius + rule.radialGap : shapes[1]!.radius - rule.radialGap;
+              if (radius > EPSILON) {
+                const scale = (point: { x: number; z: number }) => ({
+                  x: shape.center.x + (point.x - shape.center.x) * radius / shape.radius,
+                  z: shape.center.z + (point.z - shape.center.z) * radius / shape.radius,
+                });
+                for (const id of rule.circles[index]) {
+                  const point = working.get(id)!;
+                  Object.assign(point, scale(point), { handleIn: scale(point.handleIn!), handleOut: scale(point.handleOut!) });
+                }
+              }
+            }
+          }
+        }
         const delta = concentricDelta(rule);
         if (!delta || Math.hypot(delta.x, delta.z) < EPSILON) continue;
         const [first, second] = rule.circles.map((ids) => ids.map((id) => working.get(id)!));
@@ -432,7 +563,7 @@ export function applySketchConstraints(profile: SketchProfile, movedIds: Readonl
       move(a, dx * wa / total, dz * wa / total);
       move(b, -dx * wb / total, -dz * wb / total);
     }
-    if (constraints.every((rule) => error(rule) < (rule.kind === "parallel" || rule.kind === "perpendicular" || rule.kind === "angle" ? ANGLE_EPSILON : EPSILON))) {
+    if (constraints.every(satisfied)) {
       return { ok: true, profile: {
         ...profile,
         points: profile.points.map((point) => working.get(point.id)!),
@@ -440,7 +571,17 @@ export function applySketchConstraints(profile: SketchProfile, movedIds: Readonl
       } };
     }
   }
-  return { ok: false, profile };
+  const unsatisfied = constraints.filter((rule) => !satisfied(rule));
+  const conflicting = new Set<SketchConstraint>();
+  for (const rule of unsatisfied) {
+    for (const other of constraints) {
+      if (directlyConflicting(rule, other)) {
+        conflicting.add(rule);
+        conflicting.add(other);
+      }
+    }
+  }
+  return { ok: false, profile, failure: { unsatisfied, conflicting: [...conflicting], attempted: [] } };
 }
 
 /** Keep constraints attached by stable point IDs, dropping only deleted references. */
@@ -463,6 +604,14 @@ export function withSketchConstraint(profile: SketchProfile, rule: SketchConstra
     if (existing && "value" in existing) {
       if (existing.value === rule.value) return profile;
       return { ...profile, constraints: constraints.map((entry) => entry === existing ? { ...existing, value: rule.value } : entry) };
+    }
+  }
+  if (rule.kind === "concentric" && rule.radialGap !== undefined) {
+    const existing = constraints.find((entry) => entry.kind === "concentric" &&
+      rule.circles.every((ids) => entry.circles.some((other) => ids.every((id) => other.includes(id)))));
+    if (existing?.kind === "concentric") {
+      const radialGap = existing.circles[0].includes(rule.a) ? rule.radialGap : -rule.radialGap;
+      return { ...profile, constraints: constraints.map((entry) => entry.id === existing.id ? { ...existing, radialGap } : entry) };
     }
   }
   if (constraints.some((existing) => {

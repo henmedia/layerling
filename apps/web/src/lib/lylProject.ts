@@ -1313,6 +1313,7 @@ function validateSketchProfile(value: unknown, label: string) {
     const id = stringValue(point.id, `${label}.points[${index}].id`);
     if (pointIds.has(id)) throw new Error(`${label} contains duplicate point ID '${id}'`);
     pointIds.add(id);
+    if (point.shapeName !== undefined && typeof point.shapeName !== "string") throw new Error(`${label}.points[${index}].shapeName must be a string`);
     finiteNumber(point.x, `${label}.points[${index}].x`);
     finiteNumber(point.z, `${label}.points[${index}].z`);
     if (point.locked !== undefined && typeof point.locked !== "boolean") throw new Error(`${label}.points[${index}].locked must be true or false`);
@@ -1346,6 +1347,7 @@ function validateSketchProfile(value: unknown, label: string) {
       const b = stringValue(rule.b, `${ruleLabel}.b`);
       if (!pointIds.has(a) || !pointIds.has(b) || a === b) throw new Error(`${ruleLabel} references invalid points`);
       if (kind === "concentric") {
+        if (rule.radialGap !== undefined) finiteNumber(rule.radialGap, `${ruleLabel}.radialGap`);
         const circles = rule.circles;
         if (!Array.isArray(circles) || circles.length !== 2 ||
           circles.some((circle) => !Array.isArray(circle) || circle.length !== 4 ||

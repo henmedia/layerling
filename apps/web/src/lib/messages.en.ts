@@ -2202,7 +2202,7 @@ export const MESSAGES_EN = {
   "status.sketchLineCurved": "Line curved",
   "status.sketchConstraintAdded": "Sketch constraint added",
   "status.sketchConstraintRemoved": "Sketch constraint removed",
-  "status.sketchConstraintConflict": "The constraints conflict or the required points cannot move.",
+  "status.sketchConstraintConflict": "The solver could not satisfy this operation. Review the highlighted geometry and constraints.",
   "status.sketchLineStraightened": "Line made straight",
   "status.sketchLinesCurved": "{count} lines curved",
   "status.sketchLinesStraightened": "{count} lines made straight",
