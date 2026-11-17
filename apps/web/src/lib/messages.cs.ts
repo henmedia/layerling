@@ -5873,4 +5873,5 @@ export const MESSAGES_CS: Record<MessageKey, string> = {
   "mold.regenerateHint": "Tento díl patří k formě z {name}: nástroj se otevřel s jejím nastavením a „Vytvořit“ nahradí díly formy.",
   "mold.error.masterGone": "Vzor této formy už neexistuje, takže ji nelze vytvořit znovu.",
   "mold.made.again": "Forma vytvořena znovu s novým nastavením.",
+  "mold.note.sprues": "{count} oddělených dutin, každá s vlastním vtokem a nálevkou.",
 };

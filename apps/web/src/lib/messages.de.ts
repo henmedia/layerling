@@ -5873,4 +5873,5 @@ export const MESSAGES_DE: Record<MessageKey, string> = {
   "mold.regenerateHint": "Dieses Teil gehört zu einer Gussform von {name}: Das Werkzeug ist mit deren Einstellungen geöffnet, „Herstellen“ ersetzt die Teile der Form.",
   "mold.error.masterGone": "Das Urmodell dieser Gussform gibt es nicht mehr, sie lässt sich nicht neu erzeugen.",
   "mold.made.again": "Gussform mit den neuen Einstellungen neu erzeugt.",
+  "mold.note.sprues": "{count} getrennte Hohlräume, jeder mit eigenem Einguss und Trichter.",
 };

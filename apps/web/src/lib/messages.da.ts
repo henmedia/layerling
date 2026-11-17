@@ -5848,4 +5848,5 @@ export const MESSAGES_DA: Partial<Record<MessageKey, string>> = {
   "mold.regenerateHint": "Denne del hører til en form af {name}: værktøjet er åbnet med dens indstillinger, og Lav erstatter formens dele.",
   "mold.error.masterGone": "Originalen til denne form findes ikke længere, så den kan ikke laves igen.",
   "mold.made.again": "Formen er lavet igen med de nye indstillinger.",
+  "mold.note.sprues": "{count} adskilte hulrum, hver med sin egen indløbskanal og tragt.",
 };

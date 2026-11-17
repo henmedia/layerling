@@ -5855,4 +5855,5 @@ export const MESSAGES_ZH_CN: Partial<Record<MessageKey, string>> = {
   "mold.regenerateHint": "此零件属于 {name} 的模具：工具已按它的设置打开，点击“生成”会替换模具的零件。",
   "mold.error.masterGone": "此模具的原型已不存在，因此无法重新生成。",
   "mold.made.again": "已按新设置重新生成模具。",
+  "mold.note.sprues": "{count} 个独立型腔，每个都有自己的浇口和漏斗。",
 };

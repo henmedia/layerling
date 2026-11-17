@@ -5853,4 +5853,5 @@ export const MESSAGES_HU: Partial<Record<MessageKey, string>> = {
   "mold.regenerateHint": "Ez a rész egy forma része (mesterminta: {name}): az eszköz a beállításaival nyílt meg, és a Készítés lecseréli a forma részeit.",
   "mold.error.masterGone": "Ennek a formának a mestermintája már nincs meg, ezért nem készíthető el újra.",
   "mold.made.again": "A forma újra elkészült az új beállításokkal.",
+  "mold.note.sprues": "{count} különálló üreg, mindegyik saját beöntőcsatornával és tölcsérrel.",
 };

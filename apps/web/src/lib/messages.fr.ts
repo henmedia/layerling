@@ -5850,4 +5850,5 @@ export const MESSAGES_FR: Partial<Record<MessageKey, string>> = {
   "mold.regenerateHint": "Cette pièce appartient à un moule de {name} : l'outil s'est ouvert avec ses réglages, et Créer remplace les pièces du moule.",
   "mold.error.masterGone": "Le modèle maître de ce moule n'existe plus, il ne peut donc pas être recréé.",
   "mold.made.again": "Moule recréé avec les nouveaux réglages.",
+  "mold.note.sprues": "{count} cavités séparées, chacune avec sa propre carotte et son entonnoir.",
 };

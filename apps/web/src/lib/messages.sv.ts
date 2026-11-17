@@ -5868,4 +5868,5 @@ export const MESSAGES_SV: Partial<Record<MessageKey, string>> = {
   "mold.regenerateHint": "Den här delen hör till en form av {name}: verktyget har öppnats med dess inställningar, och Skapa ersätter formens delar.",
   "mold.error.masterGone": "Originalet för den här formen finns inte längre, så den kan inte skapas igen.",
   "mold.made.again": "Formen skapad igen med de nya inställningarna.",
+  "mold.note.sprues": "{count} separata hålrum, vart och ett med egen ingjutning och tratt.",
 };

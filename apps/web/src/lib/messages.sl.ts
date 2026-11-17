@@ -5852,4 +5852,5 @@ export const MESSAGES_SL: Partial<Record<MessageKey, string>> = {
   "mold.regenerateHint": "Ta del spada h kalupu za {name}: orodje se je odprlo z njegovimi nastavitvami in »Ustvari« zamenja dele kalupa.",
   "mold.error.masterGone": "Izvirnika tega kalupa ni več, zato ga ni mogoče znova narediti.",
   "mold.made.again": "Kalup znova narejen z novimi nastavitvami.",
+  "mold.note.sprues": "{count} ločenih votlin, vsaka s svojim ulivnim kanalom in lijakom.",
 };

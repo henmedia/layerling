@@ -5846,4 +5846,5 @@ export const MESSAGES_JA: Partial<Record<MessageKey, string>> = {
   "mold.regenerateHint": "このパーツは {name} の型の一部です。ツールはその設定で開いています。「作る」を押すと型のパーツが置き換わります。",
   "mold.error.masterGone": "この型の原型がもうないので、作り直せません。",
   "mold.made.again": "新しい設定で型を作り直しました。",
+  "mold.note.sprues": "{count} 個の独立したキャビティ。それぞれに専用の湯口と漏斗があります。",
 };

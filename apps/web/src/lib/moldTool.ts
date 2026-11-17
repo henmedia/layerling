@@ -145,6 +145,8 @@ type Limited = keyof typeof MOLD_LIMITS;
 export const MOLD_ML_PER_US_FL_OZ = 29.5735;
 /** A wall thinner than this warps or breaks under a pour, in mm. */
 export const MOLD_MIN_STRONG_WALL = 3;
+/** At most this many sprues, one per separate cavity, the largest first. */
+export const MOLD_MAX_SPRUES = 24;
 /** A pour box's frame stands this deep in the base's groove, with this play per side, in mm. */
 const BOX_GROOVE = 2;
 const BOX_GROOVE_PLAY = 0.3;
@@ -259,7 +261,7 @@ export type MoldAnalysis = {
 
 export type MoldResult =
   | {
-    parts: MoldPart[]; volume: number; warnings: MoldWarning[]; keys: number; vents: number; clearance?: number; parting?: number; partingFound?: boolean;
+    parts: MoldPart[]; volume: number; warnings: MoldWarning[]; keys: number; vents: number; sprues: number; clearance?: number; parting?: number; partingFound?: boolean;
     analysis?: MoldAnalysis; keysShrunk?: boolean;
   }
   | { error: "notClosed" | "tooSmall" | "empty" | "kernel"; message?: string };
@@ -773,6 +775,7 @@ export function moldForSolid(runtime: ManifoldToplevel, body: ManifoldSolid, giv
     let volume = master.volume() / 1000;
     let keyCount = 0;
     let ventCount = 0;
+    let sprueCount = 0;
     let clearance: number | undefined;
     let parting: number | undefined;
     let partingFound: boolean | undefined;
@@ -820,26 +823,30 @@ export function moldForSolid(runtime: ManifoldToplevel, body: ManifoldSolid, giv
       zp = Math.min(cz1 - 0.02, Math.max(cz0 + 0.02, zp));
 
       // Where the sprue and the vents go: they decide where a contour shell needs its bosses.
-      const points = pointsOf(cavity);
       const r = options.sprueDiameter / 2;
       const funnelRoom = Math.max(r + 3, 10) - r;
-      let spot = topSpot(points);
-      if (options.sprueShiftX || options.sprueShiftY) {
+      // Several masters (or one in separate pieces) leave cavities that do not meet: each needs a sprue of its own, or
+      // only one of them fills. Crumbs under a cubic millimetre get none.
+      const pieces = cavity.decompose().map((piece) => keep(created, piece)).filter((piece) => piece.volume() >= 1);
+      const cavities = pieces.length > 1 ? pieces.sort((a, b) => b.volume() - a.volume()).slice(0, MOLD_MAX_SPRUES) : [cavity];
+      const spots = cavities.map((piece) => {
+        const spot = topSpot(pointsOf(piece));
+        if (!options.sprueShiftX && !options.sprueShiftY) return spot;
         const x = spot.x + options.sprueShiftX;
         const y = spot.y + options.sprueShiftY;
-        const top = topAt(runtime, cavity, x, y, cz0, cz1, created);
-        if (top === null) warnings.push("sprueMissed");
-        spot = { x, y, z: top ?? zp };
-      }
+        const top = topAt(runtime, piece, x, y, cz0, cz1, created);
+        if (top === null && !warnings.includes("sprueMissed")) warnings.push("sprueMissed");
+        return { x, y, z: top ?? zp };
+      });
       const traps: Array<{ at: [number, number, number]; vented: boolean }> = [];
       if (options.sprue) {
-        if (spot.z <= zp + 0.5) warnings.push("sprueLow");
+        if (spots.some((spot) => spot.z <= zp + 0.5)) warnings.push("sprueLow");
         const cell = Math.max(1, Math.min(4, Math.max(cx1 - cx0, cy1 - cy0) / 60));
         const kept: [number, number, number][] = [];
         for (const peak of airTraps(cavity, cell, zp + 1)) {
           const [x, y] = peak;
           // The sprue lets the air out where it stands; peaks close together share one vent.
-          if (Math.hypot(x - spot.x, y - spot.y) <= r + options.ventDiameter * 2) continue;
+          if (spots.some((spot) => Math.hypot(x - spot.x, y - spot.y) <= r + options.ventDiameter * 2)) continue;
           if (kept.every(([kx, ky]) => Math.hypot(x - kx, y - ky) > options.ventDiameter * 3)) kept.push(peak);
           if (kept.length >= 24) break;
         }
@@ -859,7 +866,7 @@ export function moldForSolid(runtime: ManifoldToplevel, body: ManifoldSolid, giv
         const flange = Math.max(options.keySize / 2 + 3, w, options.ears ? EAR_THICK + EAR_REACH : 0, options.prySlots ? PRY_TALL / 2 + 2 : 0);
         const flangeRect = keep(created, runtime.CrossSection.square([hi[0] - lo[0], hi[1] - lo[1]]).translate([lo[0], lo[1]]));
         const circles: CrossSection[] = [];
-        if (options.sprue) circles.push(keep(created, runtime.CrossSection.circle(r + funnelRoom + 2.5, 48).translate([spot.x, spot.y])));
+        if (options.sprue) for (const spot of spots) circles.push(keep(created, runtime.CrossSection.circle(r + funnelRoom + 2.5, 48).translate([spot.x, spot.y])));
         for (const trap of traps) if (trap.vented) circles.push(keep(created, runtime.CrossSection.circle(options.ventDiameter / 2 + 2.5, 24).translate([trap.at[0], trap.at[1]])));
         const bosses = circles.length ? keep(created, runtime.CrossSection.union(circles)) : null;
         lowerOuter = keep(created, contourHalf(runtime, cavity, zp, lo[2], w, flangeRect, flange, null, created).trimByPlane([0, 0, -1], -zp));
@@ -891,13 +898,17 @@ export function moldForSolid(runtime: ManifoldToplevel, body: ManifoldSolid, giv
         upper = keep(created, upper.subtract(both));
       }
       if (options.sprue) {
-        // The sprue from the top down to the master's highest point, widening at 45 degrees into a funnel at the top.
-        const room = hi[2] - spot.z - 0.5;
-        const funnel = Math.max(0, Math.min(funnelRoom, room));
-        const sprueLow = channelBottom(runtime, cavity, spot.x, spot.y, spot.z, r, zp, created);
-        const sprue = upright(runtime, created, spot.x, spot.y, sprueLow, hi[2] - sprueLow + 1, r);
-        const mouth = funnel > 0.2 ? upright(runtime, created, spot.x, spot.y, hi[2] - funnel, funnel + 0.01, r, r + funnel) : null;
-        const channel = mouth ? keep(created, sprue.add(mouth)) : sprue;
+        // A sprue from the top down to each cavity's highest point, widening at 45 degrees into a funnel at the top.
+        const channels = spots.map((spot, index) => {
+          const room = hi[2] - spot.z - 0.5;
+          const funnel = Math.max(0, Math.min(funnelRoom, room));
+          const sprueLow = channelBottom(runtime, cavities[index], spot.x, spot.y, spot.z, r, zp, created);
+          const sprue = upright(runtime, created, spot.x, spot.y, sprueLow, hi[2] - sprueLow + 1, r);
+          const mouth = funnel > 0.2 ? upright(runtime, created, spot.x, spot.y, hi[2] - funnel, funnel + 0.01, r, r + funnel) : null;
+          return mouth ? keep(created, sprue.add(mouth)) : sprue;
+        });
+        const channel = unionOf(runtime, created, channels);
+        sprueCount = channels.length;
         // What is poured fills the sprue as well, up to the top.
         sprueVolume = keep(created, keep(created, channel.intersect(upperOuter)).subtract(cavity)).volume() / 1000;
         upper = keep(created, upper.subtract(channel));
@@ -973,7 +984,7 @@ export function moldForSolid(runtime: ManifoldToplevel, body: ManifoldSolid, giv
       const ab = assembled.map((half) => half.boundingBox());
       const outer: [number, number, number] = [0, 1, 2].map((k) => Math.max(...ab.map((b) => b.max[k])) - Math.min(...ab.map((b) => b.min[k]))) as [number, number, number];
       const highPoints: MoldHighPoint[] = [
-        ...(options.sprue ? [{ point: sceneOf([spot.x, spot.y, spot.z]), vented: true, sprue: true }] : []),
+        ...(options.sprue ? spots.map((spot) => ({ point: sceneOf([spot.x, spot.y, spot.z]), vented: true, sprue: true })) : []),
         ...traps.map((trap) => ({ point: sceneOf(trap.at), vented: trap.vented, sprue: false })),
       ];
       const findings: Finding[] = [];
@@ -1125,7 +1136,7 @@ export function moldForSolid(runtime: ManifoldToplevel, body: ManifoldSolid, giv
     });
     if (placed.some(({ solid }) => solid.isEmpty() || solid.status() !== "NoError")) return { error: "empty" };
     return {
-      parts: placed, volume: Math.max(0, volume), warnings, keys: keyCount, vents: ventCount, ...(clearance !== undefined ? { clearance } : {}),
+      parts: placed, volume: Math.max(0, volume), warnings, keys: keyCount, vents: ventCount, sprues: sprueCount, ...(clearance !== undefined ? { clearance } : {}),
       ...(parting !== undefined ? { parting } : {}), ...(partingFound !== undefined ? { partingFound } : {}), ...(analysis ? { analysis } : {}),
     };
   } catch (error) {
@@ -1161,6 +1172,7 @@ export function moldNotes(result: Extract<MoldResult, { parts: unknown }>, kind:
     notes.push(t("mold.note.direction", { direction: t(`mold.direction.${analysis.axis}`) }));
     notes.push(t("mold.note.weight", { g: Math.round(analysis.weightG).toLocaleString(numberLocale()) }));
   }
+  if (result.sprues > 1) notes.push(t("mold.note.sprues", { count: result.sprues }));
   if (result.parting !== undefined) notes.push(t(result.partingFound ? "mold.note.partingFound" : "mold.note.parting", { percent: result.parting.toLocaleString(numberLocale()) }));
   if (result.clearance !== undefined) notes.push(t("mold.note.clearance", { mm: result.clearance.toLocaleString(numberLocale()) }));
   for (const warning of result.warnings) notes.push(t(`mold.warning.${warning}`));

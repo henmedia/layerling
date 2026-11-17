@@ -5879,4 +5879,5 @@ export const MESSAGES_PL: Partial<Record<MessageKey, string>> = {
   "mold.regenerateHint": "Ta część należy do formy wzorca {name}: narzędzie otworzyło się z jej ustawieniami, a „Utwórz” zastępuje części formy.",
   "mold.error.masterGone": "Wzorca tej formy już nie ma, więc nie da się jej utworzyć ponownie.",
   "mold.made.again": "Forma utworzona ponownie z nowymi ustawieniami.",
+  "mold.note.sprues": "{count} oddzielnych wnęk, każda z własnym wlewem i lejkiem.",
 };

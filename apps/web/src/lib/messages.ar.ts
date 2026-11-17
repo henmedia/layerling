@@ -5882,4 +5882,5 @@ export const MESSAGES_AR: Partial<Record<MessageKey, string>> = {
   "mold.regenerateHint": "تنتمي هذه القطعة إلى قالب {name}: فُتحت الأداة بإعداداته، والضغط على صنع يستبدل قطع القالب.",
   "mold.error.masterGone": "لم يعد النموذج الأصلي لهذا القالب موجودًا، لذا لا يمكن صنعه من جديد.",
   "mold.made.again": "صُنع القالب من جديد بالإعدادات الجديدة.",
+  "mold.note.sprues": "{count} تجاويف منفصلة، لكل منها قناة صب وقمع خاص بها.",
 };

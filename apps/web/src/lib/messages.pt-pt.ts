@@ -5847,5 +5847,6 @@ export const MESSAGES_PT_PT: Partial<Record<MessageKey, string>> = {
   "mold.regenerateHint": "Esta peça pertence a um molde de {name}: a ferramenta abriu com as definições dele, e Criar substitui as peças do molde.",
   "mold.error.masterGone": "O modelo mestre deste molde já não existe, por isso não é possível criá-lo novamente.",
   "mold.made.again": "Molde criado novamente com as novas definições.",
+  "mold.note.sprues": "{count} cavidades separadas, cada uma com o seu próprio canal de vazamento e funil.",
 };
 

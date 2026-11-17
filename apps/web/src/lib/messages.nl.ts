@@ -5874,4 +5874,5 @@ export const MESSAGES_NL: Record<MessageKey, string> = {
   "mold.regenerateHint": "Dit onderdeel hoort bij een mal van {name}: het gereedschap is met de instellingen ervan geopend, en Maken vervangt de onderdelen van de mal.",
   "mold.error.masterGone": "Het origineel van deze mal bestaat niet meer, dus hij kan niet opnieuw gemaakt worden.",
   "mold.made.again": "Mal opnieuw gemaakt met de nieuwe instellingen.",
+  "mold.note.sprues": "{count} losse holtes, elk met een eigen gietkanaal en trechter.",
 };

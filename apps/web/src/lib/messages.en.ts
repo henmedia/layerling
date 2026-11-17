@@ -5874,6 +5874,7 @@ export const MESSAGES_EN = {
   "mold.regenerateHint": "This part belongs to a mold of {name}: the tool has opened with its settings, and Make replaces the mold's parts.",
   "mold.error.masterGone": "The master of this mold is no longer there, so it cannot be made again.",
   "mold.made.again": "Mold made again with the new settings.",
+  "mold.note.sprues": "{count} separate cavities, each with its own sprue and funnel.",
 } as const;
 
 export type MessageKey = keyof typeof MESSAGES_EN;

@@ -46,6 +46,32 @@ function overlap(a: Body, b: Body) {
 }
 
 describe("mold opening directions and checks", () => {
+  it("gives each of six separate masters a sprue of its own, so every cavity fills", async () => {
+    await withKernel((kernel, keep) => {
+      // Six blocks 12 x 12 x 10 mm in two rows of three, 6 mm apart, as in a tray of soap bars.
+      const blocks = [0, 1, 2].flatMap((col) => [0, 1].map((row) => keep(kernel.Manifold.cube([12, 12, 10]).translate([col * 18, row * 18, 0]))));
+      const body = scene(keep(kernel.Manifold.union(blocks)), keep);
+      const result = mold(kernel, body, { kind: "twoPart", direction: "z", keys: false, vents: true }, false, keep);
+      expect(result.sprues).toBe(6);
+      const sprues = result.analysis!.highPoints.filter((point) => point.sprue);
+      expect(sprues).toHaveLength(6);
+      // Every block's top has its sprue over it (scene frame: x across, z along the depth), none shared.
+      const spots = new Set(sprues.map(({ point }) => `${Math.floor(point[0] / 18)},${Math.floor(-point[2] / 18)}`));
+      expect(spots.size).toBe(6);
+      // The upper half has a channel through it into each cavity: six holes through it at least.
+      const upper = result.parts[1].solid as unknown as Body;
+      expect(upper.genus()).toBeGreaterThanOrEqual(6);
+    });
+  });
+
+  it("keeps one sprue for a single master", async () => {
+    await withKernel((kernel, keep) => {
+      const body = scene(keep(kernel.Manifold.cube([20, 20, 10])), keep);
+      const result = mold(kernel, body, { kind: "twoPart", direction: "z" }, false, keep);
+      expect(result.sprues).toBe(1);
+    });
+  });
+
   it("rates a ball parted in the middle free of undercut in every direction", async () => {
     await withKernel((kernel, keep) => {
       const ball = scene(keep(kernel.Manifold.sphere(12, 96).translate([0, 0, 12])), keep);

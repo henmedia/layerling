@@ -3702,4 +3702,5 @@ export const MESSAGES_TR: Partial<Record<MessageKey, string>> = {
   "mold.regenerateHint": "Bu parça {name} kalıbına ait: araç onun ayarlarıyla açıldı ve Oluştur kalıbın parçalarını değiştirir.",
   "mold.error.masterGone": "Bu kalıbın ana modeli artık yok, bu yüzden yeniden oluşturulamaz.",
   "mold.made.again": "Kalıp yeni ayarlarla yeniden oluşturuldu.",
+  "mold.note.sprues": "{count} ayrı boşluk, her birinin kendi döküm kanalı ve hunisi var.",
 };
