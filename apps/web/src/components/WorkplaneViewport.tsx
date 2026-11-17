@@ -1,5 +1,4 @@
 "use client";
-import { DinguinInsertTool } from "./workplane/DinguinInsertTool";
 import { polygonCornerDragPatch } from "@/lib/roundedPolygonGeometry";
 import { holdsShapeLock } from "@/lib/shapeLock";
 import type { TextBlockOptions } from "@/lib/textBlock";
@@ -320,11 +319,9 @@ type WorkplaneViewportProps = {
   mateFacePick?: { shapeIds: string[]; round?: boolean | "either"; joined?: ArrayLike<number> | null } | null;
   onMateFacePick?: (pick: LayFlatPick | null) => void;
   /** Thread insert placement: a true world-space ring on the selected surface. */
-  dinguinPreview?: { origin: {x:number;y:number;z:number}; normal: {x:number;y:number;z:number}; diameter:number; allowed:boolean } | null;
-  dinguinCenter?: {point:{x:number;y:number;z:number};normal:{x:number;y:number;z:number}} | null;
-  onDinguinDragPick?: (pick: LayFlatPick | null) => void;
-  onDinguinInsert?: () => void;
-  dinguinInsertActive?: boolean;
+  threadInsertPreview?: { origin: {x:number;y:number;z:number}; normal: {x:number;y:number;z:number}; diameter:number; allowed:boolean } | null;
+  threadInsertCenter?: {point:{x:number;y:number;z:number};normal:{x:number;y:number;z:number}} | null;
+  onThreadInsertDragPick?: (pick: LayFlatPick | null) => void;
   /**
    * "Point to point" (Discussion #1491): while `picking`, a click takes a corner, a spot on an edge, the centre of a
    * round edge of one of these bodies, or a reference point; `marks` are the points already picked.
@@ -1698,11 +1695,9 @@ export function WorkplaneViewport({
   onLayFlatPick,
   mateFacePick = null,
   onMateFacePick,
-  dinguinPreview = null,
-  dinguinCenter = null,
-  onDinguinDragPick,
-  onDinguinInsert,
-  dinguinInsertActive = false,
+  threadInsertPreview = null,
+  threadInsertCenter = null,
+  onThreadInsertDragPick,
   matePointPick = null,
   onMatePointPick,
   paintPick = null,
@@ -1934,15 +1929,15 @@ export function WorkplaneViewport({
   // Thread insert marker is a temporary helper, never a document shape.
   useEffect(() => {
     const state = threeRef.current;
-    if (!state || !dinguinPreview || !Number.isFinite(dinguinPreview.diameter) || dinguinPreview.diameter <= 0) return;
-    const n = new THREE.Vector3(dinguinPreview.normal.x,dinguinPreview.normal.y,dinguinPreview.normal.z).normalize();
-    const center = new THREE.Vector3(dinguinPreview.origin.x,dinguinPreview.origin.y,dinguinPreview.origin.z).addScaledVector(n,0.025);
+    if (!state || !threadInsertPreview || !Number.isFinite(threadInsertPreview.diameter) || threadInsertPreview.diameter <= 0) return;
+    const n = new THREE.Vector3(threadInsertPreview.normal.x,threadInsertPreview.normal.y,threadInsertPreview.normal.z).normalize();
+    const center = new THREE.Vector3(threadInsertPreview.origin.x,threadInsertPreview.origin.y,threadInsertPreview.origin.z).addScaledVector(n,0.025);
     const u = new THREE.Vector3(0,1,0);
     if (Math.abs(n.dot(u)) > 0.95) u.set(1,0,0);
     u.addScaledVector(n,-u.dot(n)).normalize();
     const w = new THREE.Vector3().crossVectors(n,u).normalize();
-    const radius = dinguinPreview.diameter/2;
-    const color = dinguinPreview.allowed ? 0x18d66b : 0xff3333;
+    const radius = threadInsertPreview.diameter/2;
+    const color = threadInsertPreview.allowed ? 0x18d66b : 0xff3333;
     // WebGL ignores LineBasicMaterial.linewidth on most Windows drivers.
     // Instead use annulus meshes, with a thick white halo and colour ring.
     const annulus=(thickness:number,ringColor:number,order:number)=>{
@@ -1971,13 +1966,13 @@ export function WorkplaneViewport({
       bars.geometry.dispose();(bars.material as THREE.Material).dispose();
       state.needsRender=true;
     };
-  },[dinguinPreview]);
+  },[threadInsertPreview]);
 
   // Purple face-center crosshair: a display-only helper, never included in STL.
   useEffect(() => {
     const state=threeRef.current;
-    if(!state || !dinguinCenter) return;
-    const {point,normal}=dinguinCenter;
+    if(!state || !threadInsertCenter) return;
+    const {point,normal}=threadInsertCenter;
     const n=new THREE.Vector3(normal.x,normal.y,normal.z).normalize();
     if(n.lengthSq()<0.5) return;
     const pos=new THREE.Vector3(point.x,point.y,point.z).addScaledVector(n,0.06);
@@ -2000,7 +1995,7 @@ export function WorkplaneViewport({
       lines.geometry.dispose();material.dispose();dot.geometry.dispose();(dot.material as THREE.Material).dispose();
       state.needsRender=true;
     };
-  },[dinguinCenter]);
+  },[threadInsertCenter]);
 
   // A 3D mouse the site may use steers this view (#1013).
   useSpaceMouse(threeRef);
@@ -7494,9 +7489,9 @@ export function WorkplaneViewport({
   );
 
   const finishDragRef = useRef<((event: ReactPointerEvent<HTMLDivElement>) => void) | null>(null);
-  const dinguinMoveRef = useRef(onDinguinDragPick);
-  dinguinMoveRef.current = onDinguinDragPick;
-  const dinguinLastMoveRef = useRef(0);
+  const threadInsertMoveRef = useRef(onThreadInsertDragPick);
+  threadInsertMoveRef.current = onThreadInsertDragPick;
+  const threadInsertLastMoveRef = useRef(0);
   const handlePointerMove = useCallback(
     (event: ReactPointerEvent<HTMLDivElement>) => {
       // Gehoert die Flaeche gerade der Kamera, hat hier niemand etwas zu
@@ -7593,11 +7588,11 @@ export function WorkplaneViewport({
       }
       if (mateFacePickRef.current) {
         // With left mouse button held, drag the temporary insert circle to a new location.
-        if ((event.buttons & 1) && dinguinMoveRef.current && threeRef.current) {
+        if ((event.buttons & 1) && threadInsertMoveRef.current && threeRef.current) {
           const now = performance.now();
-          if (now-dinguinLastMoveRef.current >= 90) {
-            dinguinLastMoveRef.current=now;
-            dinguinMoveRef.current(pickMateFace(threeRef.current,event.clientX,event.clientY));
+          if (now-threadInsertLastMoveRef.current >= 90) {
+            threadInsertLastMoveRef.current=now;
+            threadInsertMoveRef.current(pickMateFace(threeRef.current,event.clientX,event.clientY));
           }
         }
         mateFaceHoverRef.current = { x: event.clientX, y: event.clientY };
@@ -8869,7 +8864,6 @@ export function WorkplaneViewport({
             >
               <ViewScrollbarsIcon size={24} strokeWidth={2.15} aria-hidden="true" />
             </button>
-            <DinguinInsertTool onClick={() => onDinguinInsert?.()} active={dinguinInsertActive} disabled={!onDinguinInsert} />
             </div>
             <div className="camera-group">
             <div className="workplane-display-control-group">

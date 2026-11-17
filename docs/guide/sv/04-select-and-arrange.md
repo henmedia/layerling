@@ -167,6 +167,17 @@ En AI kan göra samma sak över MCP-bryggan med `layerling_perforate_face` (se k
 
 På en platta eller ett lock med skåror i sidorna fördelar {{ui:holePattern.arrangement.perimeter}} hålen ojämnt. Därför har {{ui:holePattern.title}} en andra flik bredvid {{ui:holePattern.mode.pattern}}, {{ui:holePattern.mode.mounting}}: den lägger hålen i hörnen på den minsta rektangeln runt den valda ytan, lika långt från dess sidor, även på en vriden eller skårad platta. {{ui:holePattern.mounting.distance}} mäts till hålets kant, skruvhuvudet inräknat, eller med {{ui:holePattern.mounting.toCenter}} till dess mitt. Med {{ui:holePattern.mounting.count}} hamnar fyra i hörnen och resten parvis, jämnt fördelade längs sidorna, till exempel för ett vattentätt lock. På en rund yta, som locket till en rund ask, fördelas de jämnt runt en cirkel, tre eller fler. Håltyp och mått är desamma som för mönstret: rakt, med cylindrisk eller konisk försänkning, genomgående eller till ett visst djup. De skapas som vanliga hålformer grupperade med kroppen, så gruppens {{ui:inspector.groupHoleDiameter}} fungerar på dem också.
 
+## Hål för en gänginsats
+
+En gängad värmeinsats pressas in i en plastdel med en lödkolv och ger skruvar en gänga som inte slits ut. {{ui:threadInsert.title}} gör hålet för den där du klickar och talar först om huruvida kroppen har tillräckligt med material där. Markera exakt en kropp och klicka på {{ui:threadInsert.title}} i gruppen {{ui:editor.section.mirrorPattern}} i verktygsfältet, bredvid hålmönstret. Du kan också högerklicka på kroppen eller trycka [[Ctrl]]+[[K]].
+
+1. Välj {{ui:threadInsert.size}} i fönstret: M2 till M8, de korta M3, M4 och M5 eller 1/4-20. Med {{ui:threadInsert.custom}} skriver du in hålets diameter och insatsens längd; väggen som måste finnas kvar runt hålet följer av diametern. Fönstret visar hålets diameter och djup samt den väggen.
+2. Klicka på platsen på kroppen. En plan yta fungerar, och det gör även utsidan av en cylinder eller ett rör; varje annan kurva avvisas med en hint. En ring visar hålet: grön där kroppen har den vägg bredvid hålet och det djup bakom det som insatsen behöver, röd där något av dem inte räcker. Röd säger vilket och med hur mycket, och hur bred kroppen måste vara runt hålet.
+3. Flytta ringen genom att dra över kroppen, eller skriv in avståndet från vänster- och nederkanten på en plan yta under {{ui:threadInsert.position}}. {{ui:threadInsert.center}} lägger den mitt på ytan, där det lila märket visar den. Varje flytt mäts om.
+4. {{ui:threadInsert.repick}} väljer en annan plats och [[Esc]] stänger verktyget. Först {{ui:threadInsert.apply}} skapar hålet, och bara där ringen är grön.
+
+Hålet är en vanlig hålform grupperad med kroppen, precis som hålen i hålmönstret, och CAD-kärnan skär ut det som en riktig cylinder, så borrningen blir exakt. {{ui:editor.tool.ungroup}} frigör det igen. Det är lika djupt som insatsen är lång och sticker ut en bit ur ytan så att det öppnas rent. En AI kan göra samma sak över MCP-bryggan med `layerling_thread_insert` (se kapitlet [AI med MCP](chapter:ai-with-mcp)).
+
 ## Dra ut eller trycka in en yta
 
 För att göra en vägg tjockare, höja en klack på en yta eller fälla in en ficka i den arbetar {{ui:faceTool.title}} på en plan yta. Det fungerar även på importerade STL-filer där det inte finns någon skiss att redigera. Markera exakt en kropp och klicka på {{ui:faceTool.title}} i gruppen {{ui:editor.section.mirrorPattern}} i verktygsfältet bredvid hålmönstret. Du kan också högerklicka på kroppen eller söka med [[Ctrl]]+[[K]].

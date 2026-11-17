@@ -1,5 +1,4 @@
 "use client";
-import { dinguinUiText } from "@/lib/dinguinUiText";
 import { type GroupHoleChange, withHoleDiameters } from "@/lib/groupHoles";
 import { watchAutoTitles } from "@/lib/autoButtonTitles";
 import { deleteSketchDraft, loadSketchDraft, saveSketchDraft, sketchHasWork, type SketchDraft } from "@/lib/sketchDraftStore";
@@ -81,9 +80,9 @@ import { ALL_MATE_AXES, concentricMotion, mateMotion, pointMotion, pointTurnAbou
 import { roundFaceNear } from "@/lib/roundFaceAxis";
 import { carriedOntoFace } from "@/lib/carryOntoFace";
 import { HolePatternPanel } from "./workplane/HolePatternPanel";
-import { DinguinInsertPanel } from "./workplane/DinguinInsertPanel";
-import { DINGUIN_INSERT_SIZES, customDinguinInsert } from "@/lib/dinguinThreadInsertSafety";
-import { measureDinguinInsert, makeDinguinInsertHole, dinguinSurfaceCenter, type DinguinInsertFace } from "@/lib/dinguinInsertGeometry";
+import { ThreadInsertPanel } from "./workplane/ThreadInsertPanel";
+import { CUSTOM_THREAD_INSERT, THREAD_INSERT_DEFAULT, THREAD_INSERT_SIZES, threadInsertSpec, type ThreadInsertSpec } from "@/lib/threadInsert";
+import { makeThreadInsertHole, measureThreadInsert, threadInsertSurfaceCenter, type ThreadInsertFace } from "@/lib/threadInsertGeometry";
 import { PAINT_VIEW_SIDES, paintedBodyMesh, paintedExportFaceColors, paintLassoStroke, paintSideLasso, paintStrokeAt, paintSurfaceNormalAt, rebasePaintStrokes, type PaintLassoView } from "@/lib/paintMesh";
 import { canPaintShape, DEFAULT_PAINT_TOOL, designPaintColors, normalizePaintTool, paintColors, paintStartColor, PAINT_MAX_STROKES, type PaintStroke, type PaintToolSettings } from "@/lib/paint";
 import { normalizeHexColor } from "@/lib/coloredImport";
@@ -3371,12 +3370,12 @@ export function LayerlingEditor({
     settings: HolePatternSettings;
     busy: boolean;
   } | null>(null);
-  const [dinguinTool,setDinguinTool] = useState<{sourceId:string;face:DinguinInsertFace|null;busy:boolean;geometryFingerprint?:string}|null>(null);
-  const [dinguinPreset,setDinguinPreset]=useState("M3");
-  const [dinguinD3,setDinguinD3]=useState("7");
-  const [dinguinL,setDinguinL]=useState("8");
-  const dinguinRunRef=useRef(0);
-  const dinguinTrianglesRef=useRef<ArrayLike<number>|null>(null);
+  const [threadInsertTool, setThreadInsertTool] = useState<{ sourceId: string; face: ThreadInsertFace | null; busy: boolean; geometryFingerprint?: string } | null>(null);
+  const [threadInsertPreset, setThreadInsertPreset] = useState(THREAD_INSERT_DEFAULT);
+  const [threadInsertDiameter, setThreadInsertDiameter] = useState("7");
+  const [threadInsertLength, setThreadInsertLength] = useState("8");
+  const threadInsertRunRef = useRef(0);
+  const threadInsertTrianglesRef = useRef<ArrayLike<number> | null>(null);
   const holePatternSettingsRef = useRef<HolePatternSettings>(DEFAULT_HOLE_PATTERN);
   const holePatternPickRunRef = useRef(0);
   const holePatternPickAbortRef = useRef<AbortController | null>(null);
@@ -10190,199 +10189,241 @@ export function LayerlingEditor({
     if (mateTool && (selectedIds.length !== 1 || selectedIds[0] !== mateTool.sourceId)) setMateTool(null);
   }, [mateTool, selectedIds]);
 
-  // DinguinCAD heat-set insert tool - independent of the existing hole pattern editor.
-  const dinguinSpec = dinguinPreset === "Benutzerdefiniert"
-    ? customDinguinInsert(Number(dinguinD3.replace(",",".")),Number(dinguinL.replace(",",".")))
-    : DINGUIN_INSERT_SIZES.find(s=>s.name===dinguinPreset);
-  // DINGUIN_RC42_LIVE_SAFE: never reuse a safety result from an old mesh.
-  const dinguinCurrentSource = selectedShape?.id === dinguinTool?.sourceId ? selectedShape : null;
-  const dinguinCurrentFingerprint = dinguinCurrentSource ? projectShapesFingerprint([dinguinCurrentSource]) : null;
-  const dinguinFaceCurrent = Boolean(dinguinTool?.face && dinguinCurrentFingerprint && dinguinTool.geometryFingerprint === dinguinCurrentFingerprint);
-  const dinguinResult = useMemo(() => dinguinFaceCurrent && dinguinTool?.face && dinguinSpec
-    ? measureDinguinInsert(dinguinTool.face,dinguinSpec) : null,
-    [dinguinFaceCurrent,dinguinTool?.face,dinguinSpec?.d3,dinguinSpec?.L,dinguinSpec?.W]);
+  // The thread insert tool (PR #1828): a hole for a heat-set insert, with a check of the wall and the depth.
+  const threadInsertSizeSpec = useMemo(
+    () => threadInsertSpec(threadInsertPreset, threadInsertDiameter, threadInsertLength),
+    [threadInsertPreset, threadInsertDiameter, threadInsertLength],
+  );
+  // A result is only good for the body as it was measured: never reuse one from an older mesh.
+  const threadInsertCurrentSource = selectedShape?.id === threadInsertTool?.sourceId ? selectedShape : null;
+  const threadInsertCurrentFingerprint = threadInsertCurrentSource ? projectShapesFingerprint([threadInsertCurrentSource]) : null;
+  const threadInsertFaceCurrent = Boolean(
+    threadInsertTool?.face && threadInsertCurrentFingerprint && threadInsertTool.geometryFingerprint === threadInsertCurrentFingerprint,
+  );
+  const threadInsertResult = useMemo(
+    () => (threadInsertFaceCurrent && threadInsertTool?.face && threadInsertSizeSpec ? measureThreadInsert(threadInsertTool.face, threadInsertSizeSpec) : null),
+    [threadInsertFaceCurrent, threadInsertTool?.face, threadInsertSizeSpec],
+  );
 
-  // Coordinates in mm from the lower-left corner of the selected planar face's
-  // UV bounding rectangle. The coordinate system follows the face when rotated.
-  const dinguinCoordinates = useMemo(() => {
-    const face=dinguinTool?.face;
+  // Millimetres from the lower left corner of the picked flat face's extent; the frame turns with the face.
+  const threadInsertCoordinates = useMemo(() => {
+    const face = threadInsertTool?.face;
     if (!face || isRoundWallFace(face)) return null;
-    const points=face.outline.loops.flat();
+    const points = face.outline.loops.flat();
     if (!points.length) return null;
-    const minU=Math.min(...points.map(p=>p.u));
-    const minV=Math.min(...points.map(p=>p.v));
-    return { x:-minU, y:-minV };
-  },[dinguinTool?.face]);
+    return { x: -Math.min(...points.map((p) => p.u)), y: -Math.min(...points.map((p) => p.v)) };
+  }, [threadInsertTool?.face]);
 
-  const moveDinguinByCoordinates = useCallback((x:number,y:number) => {
-    if (!Number.isFinite(x)||!Number.isFinite(y)) return;
-    setDinguinTool(current => {
+  const moveThreadInsertByCoordinates = useCallback((x: number, y: number) => {
+    if (!Number.isFinite(x) || !Number.isFinite(y)) return;
+    setThreadInsertTool((current) => {
       if (!current?.face || current.busy || isRoundWallFace(current.face)) return current;
-      const face=current.face,w=face.workplane;
-      const points=face.outline.loops.flat();
+      const face = current.face;
+      const w = face.workplane;
+      const points = face.outline.loops.flat();
       if (!points.length) return current;
-      const oldX=-Math.min(...points.map(p=>p.u));
-      const oldY=-Math.min(...points.map(p=>p.v));
-      const du=x-oldX,dv=y-oldY;
-      if (Math.hypot(du,dv)<0.000001) return current;
-      return {...current,face:{...face,
-        workplane:{...w,origin:{
-          x:w.origin.x+w.xAxis.x*du+w.zAxis.x*dv,
-          y:w.origin.y+w.xAxis.y*du+w.zAxis.y*dv,
-          z:w.origin.z+w.xAxis.z*du+w.zAxis.z*dv,
-        }},
-        outline:{...face.outline,loops:face.outline.loops.map(loop=>loop.map(p=>({...p,u:p.u-du,v:p.v-dv})))},
-      }};
+      const du = x + Math.min(...points.map((p) => p.u));
+      const dv = y + Math.min(...points.map((p) => p.v));
+      if (Math.hypot(du, dv) < 0.000001) return current;
+      return {
+        ...current,
+        face: {
+          ...face,
+          workplane: {
+            ...w,
+            origin: {
+              x: w.origin.x + w.xAxis.x * du + w.zAxis.x * dv,
+              y: w.origin.y + w.xAxis.y * du + w.zAxis.y * dv,
+              z: w.origin.z + w.xAxis.z * du + w.zAxis.z * dv,
+            },
+          },
+          outline: { ...face.outline, loops: face.outline.loops.map((loop) => loop.map((p) => ({ ...p, u: p.u - du, v: p.v - dv }))) },
+        },
+      };
     });
-  },[]);
+  }, []);
 
-  const toggleDinguinInsert = useCallback(() => {
-    if (dinguinTool) { dinguinRunRef.current++;setDinguinTool(null);return; }
-    if (refuseBodyLockedSelection()) return;
-    const source=selectedShapes.length===1?selectedShapes[0]:null;
-    if (!source || source.hole || isNonSolidShape(source)) {
-      setNotice(dinguinUiText("selectSolid"));return;
-    }
-    if (edgeModifier || holePatternTool || faceTool || shellTool || deleteFaceTool || splitSession || simplifyToolId) {
-      setNotice(dinguinUiText("closeOtherTool"));return;
-    }
-    stopCruise();setLayFlatPickMode(false);setMateTool(null);
-    dinguinRunRef.current++;
-    dinguinTrianglesRef.current=null;
-    setDinguinTool({sourceId:source.id,face:null,busy:false});
-    setNotice("Gewindeeinsatz: Bohrstelle auf dem Bauteil anklicken.");
-  },[dinguinTool,refuseBodyLockedSelection,selectedShapes,edgeModifier,holePatternTool,faceTool,shellTool,deleteFaceTool,splitSession,simplifyToolId,stopCruise]);
+  const closeThreadInsert = useCallback(() => {
+    threadInsertRunRef.current += 1;
+    setThreadInsertTool(null);
+  }, []);
 
-  // Move a bore marker across neighbouring faces without closing the tool.
-  // The source mesh is read once; cylinder-face detection uses Layerling's existing
-  // readHolePatternFace (planar + cylindrical). Unrecognised curves remain blocked.
-  // Purple fixed reference for the currently selected face (not a cutting tool).
-  const dinguinCenter = useMemo(() => dinguinTool?.face
-    ? dinguinSurfaceCenter(dinguinTool.face) : null, [dinguinTool?.face]);
-
-  const moveDinguinFace = useCallback((pick:LayFlatPick|null) => {
-    const triangles=dinguinTrianglesRef.current;
-    if(!pick || !triangles) return;
-    setDinguinTool(current=>{
-      if(!current?.face || current.busy || pick.shapeId!==current.sourceId) return current;
-      const face=current.face;
-      if(!isRoundWallFace(face)) {
-        const w=face.workplane;
-        const dot=pick.normal.x*w.normal.x+pick.normal.y*w.normal.y+pick.normal.z*w.normal.z;
-        if(dot>=.995) {
-          const dx=pick.point.x-w.origin.x,dy=pick.point.y-w.origin.y,dz=pick.point.z-w.origin.z;
-          const u=dx*w.xAxis.x+dy*w.xAxis.y+dz*w.xAxis.z;
-          const v=dx*w.zAxis.x+dy*w.zAxis.y+dz*w.zAxis.z;
-          if(Math.hypot(u,v)<.001) return current;
-          return {...current,face:{...face,
-            workplane:{...w,origin:{...pick.point}},
-            outline:{...face.outline,loops:face.outline.loops.map(loop=>loop.map(p=>({...p,u:p.u-u,v:p.v-v})))}
-          }};
-        }
-      }
-      const read=readHolePatternFace(triangles,pick.point,pick.normal);
-      return read.ok ? {...current,face:read.face} : {...current,face:null};
-    });
-  },[]);
-  // Centre via the same face-picking path used when dragging the marker.
-  // The actual W/L test is evaluated again by dinguinResult and at commit.
-  const centerDinguinFace = useCallback(() => {
-    if (!dinguinTool?.face || !dinguinCenter || dinguinTool.busy) return;
-    moveDinguinFace({
-      shapeId:dinguinTool.sourceId,
-      point:dinguinCenter.point,
-      normal:dinguinCenter.normal
-    } as LayFlatPick);
-  },[dinguinTool,dinguinCenter,moveDinguinFace]);
-
-  const pickDinguinFace=useCallback(async (pick:LayFlatPick|null)=>{
-    if(!dinguinTool || dinguinTool.busy) return;
-    if(dinguinTool.face && pick && pick.shapeId===dinguinTool.sourceId && dinguinTrianglesRef.current) {
-      moveDinguinFace(pick);return;
-    }
-    const run=++dinguinRunRef.current;
-    const source=shapesRef.current.find(s=>s.id===dinguinTool.sourceId);
-    if(!source || !pick || pick.shapeId!==source.id) {setNotice(dinguinUiText("selectFace"));return;}
-    const fingerprint=projectShapesFingerprint([source]);
-    let triangles:ArrayLike<number>;
-    try {triangles=await faceReadForClick(source,fingerprint,new AbortController().signal);}
-    catch(e) {if(run===dinguinRunRef.current)setNotice(String(e),true);return;}
-    const read=readHolePatternFace(triangles,pick.point,pick.normal);
-    const current=shapesRef.current.find(s=>s.id===source.id);
-    if(run!==dinguinRunRef.current || !current || projectShapesFingerprint([current])!==fingerprint) return;
-    dinguinTrianglesRef.current=triangles;
-    if(!read.ok){setDinguinTool(t=>t?{...t,face:null}:t);setNotice("Diese Rundung ist nicht sicher erkennbar. Keine Bohrung.");return;}
-    setDinguinTool(t=>t&&t.sourceId===source.id?{...t,face:read.face,geometryFingerprint:fingerprint}:t);
-  },[dinguinTool,faceReadForClick,moveDinguinFace]);
-
-  const applyDinguinInsert=useCallback(async()=>{
-    const tool=dinguinTool, spec=dinguinSpec;
-    if(!tool?.face || !spec || tool.busy) return;
-    const liveSource=shapesRef.current.find(s=>s.id===tool.sourceId);
-    if(!liveSource || tool.geometryFingerprint!==projectShapesFingerprint([liveSource])) {
-      setNotice(dinguinUiText("partChangedRecheck"),true);
+  const toggleThreadInsert = useCallback(() => {
+    if (threadInsertTool) {
+      closeThreadInsert();
       return;
     }
-    const verified=measureDinguinInsert(tool.face,spec);
-    if(!verified.allowed){setNotice(verified.warnings.join(" | "),true);return;}
-    const source=shapesRef.current.find(s=>s.id===tool.sourceId);
-    if(!source || bodyLocked(source)) return;
-    const project=projectInfoRef.current.projectId;
-    const fp=projectShapesFingerprint(shapesRef.current);
-    setDinguinTool({...tool,busy:true});
+    if (refuseBodyLockedSelection()) return;
+    const source = selectedShapes.length === 1 ? selectedShapes[0] : null;
+    if (!source || source.hole || isNonSolidShape(source)) {
+      setNotice(t("threadInsert.status.selectOne"));
+      return;
+    }
+    if (edgeModifier || holePatternTool || faceTool || shellTool || deleteFaceTool || splitSession || simplifyToolId) {
+      setNotice(t("threadInsert.status.otherTool"));
+      return;
+    }
+    stopCruise();
+    setLayFlatPickMode(false);
+    setMateTool(null);
+    threadInsertRunRef.current += 1;
+    threadInsertTrianglesRef.current = null;
+    setThreadInsertTool({ sourceId: source.id, face: null, busy: false });
+    setNotice(t("threadInsert.status.pick"));
+  }, [threadInsertTool, closeThreadInsert, refuseBodyLockedSelection, selectedShapes, edgeModifier, holePatternTool, faceTool, shellTool, deleteFaceTool, splitSession, simplifyToolId, stopCruise]);
+
+  // The purple mark: the middle of the picked face, a place to start from.
+  const threadInsertCenter = useMemo(() => (threadInsertTool?.face ? threadInsertSurfaceCenter(threadInsertTool.face) : null), [threadInsertTool?.face]);
+
+  // The mark follows the pointer over the part without closing the tool. The part's mesh was read once, on the first
+  // click; a flat face is moved on in its own frame, any other face is read again from that mesh.
+  const moveThreadInsertFace = useCallback((pick: LayFlatPick | null) => {
+    const triangles = threadInsertTrianglesRef.current;
+    if (!pick || !triangles) return;
+    setThreadInsertTool((current) => {
+      if (!current?.face || current.busy || pick.shapeId !== current.sourceId) return current;
+      const face = current.face;
+      if (!isRoundWallFace(face)) {
+        const w = face.workplane;
+        const sameFace = pick.normal.x * w.normal.x + pick.normal.y * w.normal.y + pick.normal.z * w.normal.z >= 0.995;
+        if (sameFace) {
+          const dx = pick.point.x - w.origin.x;
+          const dy = pick.point.y - w.origin.y;
+          const dz = pick.point.z - w.origin.z;
+          const u = dx * w.xAxis.x + dy * w.xAxis.y + dz * w.xAxis.z;
+          const v = dx * w.zAxis.x + dy * w.zAxis.y + dz * w.zAxis.z;
+          if (Math.hypot(u, v) < 0.001) return current;
+          return {
+            ...current,
+            face: {
+              ...face,
+              workplane: { ...w, origin: { ...pick.point } },
+              outline: { ...face.outline, loops: face.outline.loops.map((loop) => loop.map((p) => ({ ...p, u: p.u - u, v: p.v - v }))) },
+            },
+          };
+        }
+      }
+      const read = readHolePatternFace(triangles, pick.point, pick.normal);
+      return read.ok ? { ...current, face: read.face } : { ...current, face: null };
+    });
+  }, []);
+
+  const centerThreadInsertFace = useCallback(() => {
+    if (!threadInsertTool?.face || !threadInsertCenter || threadInsertTool.busy) return;
+    moveThreadInsertFace({ shapeId: threadInsertTool.sourceId, point: threadInsertCenter.point, normal: threadInsertCenter.normal } as LayFlatPick);
+  }, [threadInsertTool, threadInsertCenter, moveThreadInsertFace]);
+
+  const pickThreadInsertFace = useCallback(async (pick: LayFlatPick | null) => {
+    if (!threadInsertTool || threadInsertTool.busy) return;
+    if (threadInsertTool.face && pick && pick.shapeId === threadInsertTool.sourceId && threadInsertTrianglesRef.current) {
+      moveThreadInsertFace(pick);
+      return;
+    }
+    const run = ++threadInsertRunRef.current;
+    const source = shapesRef.current.find((shape) => shape.id === threadInsertTool.sourceId);
+    if (!source || !pick || pick.shapeId !== source.id) {
+      setNotice(t("threadInsert.status.pickFace"));
+      return;
+    }
+    const fingerprint = projectShapesFingerprint([source]);
+    let triangles: ArrayLike<number>;
     try {
-      const hole=makeDinguinInsertHole(tool.face,spec);
-      const built=await buildGroupedShapeOffThread([source,hole],workspaceSettingsRef.current.booleanTriangleLimit,geometryAbortRef.current?.signal);
-      if(projectInfoRef.current.projectId!==project || fp!==projectShapesFingerprint(shapesRef.current)) {setDinguinTool(null);setNotice(dinguinUiText("partChangedDuring"));return;}
-      if(!built.group){setDinguinTool(t=>t?{...t,busy:false}:t);setNotice(built.failureNotice);return;}
-      const group=canonicalizeShape({...built.group,groupOperation:"group"});
-      dinguinRunRef.current++;
-      setDinguinTool(null);
-      commitShapes([...shapesRef.current.filter(s=>s.id!==source.id),group],group.id,dinguinUiText("holeCreated", { name: spec.name, d3: spec.d3, L: spec.L }));
-    }catch(e){setDinguinTool(t=>t?{...t,busy:false}:t);setNotice(String(e),true);}
-  },[dinguinTool,dinguinSpec,commitShapes]);
-  // DINGUIN_RC42_LIVE_SAFE: refetch the new mesh after resizing the active body.
-  // If the old position cannot be mapped safely, remain blocked and ask for a new pick.
+      triangles = await faceReadForClick(source, fingerprint, new AbortController().signal);
+    } catch (error) {
+      if (run === threadInsertRunRef.current) setNotice(String(error), true);
+      return;
+    }
+    const read = readHolePatternFace(triangles, pick.point, pick.normal);
+    const current = shapesRef.current.find((shape) => shape.id === source.id);
+    if (run !== threadInsertRunRef.current || !current || projectShapesFingerprint([current]) !== fingerprint) return;
+    threadInsertTrianglesRef.current = triangles;
+    if (!read.ok) {
+      setThreadInsertTool((tool) => (tool ? { ...tool, face: null } : tool));
+      setNotice(t("threadInsert.status.notReadable"));
+      return;
+    }
+    setThreadInsertTool((tool) => (tool && tool.sourceId === source.id ? { ...tool, face: read.face, geometryFingerprint: fingerprint } : tool));
+  }, [threadInsertTool, faceReadForClick, moveThreadInsertFace]);
+
+  const applyThreadInsert = useCallback(async () => {
+    const tool = threadInsertTool;
+    const spec = threadInsertSizeSpec;
+    if (!tool?.face || !spec || tool.busy) return;
+    const live = shapesRef.current.find((shape) => shape.id === tool.sourceId);
+    if (!live || tool.geometryFingerprint !== projectShapesFingerprint([live])) {
+      setNotice(t("threadInsert.status.changed"), true);
+      return;
+    }
+    // Measured once more on the face as it stands: the numbers on the panel are only a preview.
+    if (!measureThreadInsert(tool.face, spec).allowed) {
+      setNotice(t("threadInsert.status.blocked"), true);
+      return;
+    }
+    if (bodyLocked(live)) return;
+    const projectId = projectInfoRef.current.projectId;
+    const fingerprint = projectShapesFingerprint(shapesRef.current);
+    setThreadInsertTool({ ...tool, busy: true });
+    try {
+      const hole = makeThreadInsertHole(tool.face, spec);
+      const built = await buildGroupedShapeOffThread([live, hole], workspaceSettingsRef.current.booleanTriangleLimit, geometryAbortRef.current?.signal);
+      if (projectInfoRef.current.projectId !== projectId || fingerprint !== projectShapesFingerprint(shapesRef.current)) {
+        setThreadInsertTool(null);
+        setNotice(t("threadInsert.status.changedWhile"));
+        return;
+      }
+      if (!built.group) {
+        setThreadInsertTool((current) => (current ? { ...current, busy: false } : current));
+        setNotice(built.failureNotice);
+        return;
+      }
+      const group = canonicalizeShape({ ...built.group, groupOperation: "group" });
+      closeThreadInsert();
+      commitShapes(
+        [...shapesRef.current.filter((shape) => shape.id !== live.id), group],
+        group.id,
+        t("threadInsert.status.created", { size: spec.name === CUSTOM_THREAD_INSERT ? `Ø${spec.d3}` : spec.name, diameter: spec.d3, depth: spec.L }),
+      );
+    } catch (error) {
+      setThreadInsertTool((current) => (current ? { ...current, busy: false } : current));
+      setNotice(String(error), true);
+    }
+  }, [threadInsertTool, threadInsertSizeSpec, closeThreadInsert, commitShapes]);
+
+  // The body was changed while the tool stood open (resized, say): read its new mesh and put the spot back on it; if the
+  // old spot cannot be found on the new body the tool waits for a new pick.
   useEffect(() => {
-    if (!dinguinTool?.face || !dinguinCurrentSource || !dinguinCurrentFingerprint ||
-        dinguinTool.geometryFingerprint === dinguinCurrentFingerprint) return;
-    const source = dinguinCurrentSource;
-    const fingerprint = dinguinCurrentFingerprint;
-    const anchor = { ...dinguinTool.face.workplane.origin };
-    const normal = { ...dinguinTool.face.workplane.normal };
-    const run = ++dinguinRunRef.current;
+    if (!threadInsertTool?.face || !threadInsertCurrentSource || !threadInsertCurrentFingerprint || threadInsertTool.geometryFingerprint === threadInsertCurrentFingerprint) return;
+    const source = threadInsertCurrentSource;
+    const fingerprint = threadInsertCurrentFingerprint;
+    const anchor = { ...threadInsertTool.face.workplane.origin };
+    const normal = { ...threadInsertTool.face.workplane.normal };
+    const run = ++threadInsertRunRef.current;
     const controller = new AbortController();
-    dinguinTrianglesRef.current = null;
-    setDinguinTool(current => current?.sourceId === source.id
-      ? { ...current,face:null,geometryFingerprint:undefined } : current);
-    // This callback is tied to the source fingerprint, not to face state updates.
+    threadInsertTrianglesRef.current = null;
+    setThreadInsertTool((current) => (current?.sourceId === source.id ? { ...current, face: null, geometryFingerprint: undefined } : current));
     void (async () => {
       try {
-        const triangles = await faceReadForClick(source,fingerprint,controller.signal);
-        const latest = shapesRef.current.find(s=>s.id===source.id);
-        if (controller.signal.aborted || run!==dinguinRunRef.current || !latest ||
-            projectShapesFingerprint([latest])!==fingerprint) return;
-        const read = readHolePatternFace(triangles,anchor,normal);
-        if(!read.ok) {
-          setNotice(dinguinUiText("chooseNewPosition"),true);
+        const triangles = await faceReadForClick(source, fingerprint, controller.signal);
+        const latest = shapesRef.current.find((shape) => shape.id === source.id);
+        if (controller.signal.aborted || run !== threadInsertRunRef.current || !latest || projectShapesFingerprint([latest]) !== fingerprint) return;
+        const read = readHolePatternFace(triangles, anchor, normal);
+        if (!read.ok) {
+          setNotice(t("threadInsert.status.pickAgain"), true);
           return;
         }
-        dinguinTrianglesRef.current=triangles;
-        setDinguinTool(current=>current?.sourceId===source.id && !current.face
-          ? {...current,face:read.face,geometryFingerprint:fingerprint} : current);
-      } catch(error) {
-        if (!controller.signal.aborted && run===dinguinRunRef.current)
-          setNotice("Neue Geometrie konnte nicht gelesen werden. Bohrstelle neu waehlen.",true);
+        threadInsertTrianglesRef.current = triangles;
+        setThreadInsertTool((current) => (current?.sourceId === source.id && !current.face ? { ...current, face: read.face, geometryFingerprint: fingerprint } : current));
+      } catch {
+        if (!controller.signal.aborted && run === threadInsertRunRef.current) setNotice(t("threadInsert.status.readFailed"), true);
       }
     })();
     return () => controller.abort();
-  },[dinguinCurrentFingerprint,dinguinTool?.sourceId]);
+  }, [threadInsertCurrentFingerprint, threadInsertTool?.sourceId]);
 
-  useEffect(()=>{
-    if(dinguinTool && (selectedIds.length!==1 || selectedIds[0]!==dinguinTool.sourceId)) {
-      dinguinRunRef.current++;setDinguinTool(null);
-    }
-  },[selectedIds,dinguinTool]);
+  // The tool belongs to the body it was started for.
+  useEffect(() => {
+    if (threadInsertTool && (selectedIds.length !== 1 || selectedIds[0] !== threadInsertTool.sourceId)) closeThreadInsert();
+  }, [selectedIds, threadInsertTool, closeThreadInsert]);
 
   // "Hole pattern" (#223): pick a flat face of the selected body, set the holes, create them as holes grouped with the body.
   const toggleHolePattern = useCallback(() => {
@@ -14543,6 +14584,101 @@ export function LayerlingEditor({
               ...(plan.wall.columns !== undefined ? { columns: plan.wall.columns, spacing: Number((plan.wall.spacing ?? 0).toFixed(2)) } : {}),
             },
           } : {}),
+          normal: [normal.x, normal.y, normal.z].map((value) => Number(value.toFixed(4))),
+        };
+      }
+
+      if (command.action === "thread_insert") {
+        // The same code as the thread insert tool in the view (PR #1828): size, spot, check, hole.
+        const all = currentShapes();
+        const selectedNow = selectedIdsRef.current;
+        const targetId = typeof params.targetId === "string"
+          ? params.targetId
+          : typeof params.id === "string" ? params.id : selectedNow.length === 1 ? selectedNow[0] : null;
+        const target = all.find((shape) => shape.id === targetId);
+        if (!target) throw new Error("thread_insert needs targetId (or exactly one selected object)");
+        if (bodyLocked(target)) throw new Error("Unlock the object before making a hole in it");
+        if (target.hole || isNonSolidShape(target)) throw new Error("thread_insert needs a solid body, not a hole");
+        const vec3 = (value: unknown) => (Array.isArray(value) && value.length === 3 && value.every((entry) => typeof entry === "number" && Number.isFinite(entry))
+          ? new THREE.Vector3(value[0] as number, value[1] as number, value[2] as number)
+          : null);
+        const givenPoint = vec3(params.point);
+        let point = givenPoint;
+        let normal = vec3(params.normal);
+        if (!point || !normal || normal.lengthSq() < 1e-12) {
+          const side = typeof params.targetFace === "string" && params.targetFace in LAY_FLAT_SIDES ? params.targetFace as LayFlatSide : "top";
+          const [x, y, z] = LAY_FLAT_SIDES[side];
+          const faceNormal = nearestFaceNormal(target, new THREE.Vector3(x, y, z).applyQuaternion(quaternionForShape(target)));
+          if (!faceNormal) throw new Error("thread_insert found no face on that object");
+          normal = faceNormal.clone().normalize();
+          const center = new THREE.Vector3(target.x, (target.elevation ?? 0) + target.height / 2, target.z);
+          const reach = meshReachAlong(meshForShape(target), normal as THREE.Vector3);
+          point = center.clone().addScaledVector(normal, reach - center.dot(normal));
+        }
+        const sizeName = params.size === undefined ? THREAD_INSERT_DEFAULT : params.size;
+        if (typeof sizeName !== "string" || (sizeName !== CUSTOM_THREAD_INSERT && !THREAD_INSERT_SIZES.some((size) => size.name === sizeName))) {
+          throw new Error(`thread_insert size must be one of ${THREAD_INSERT_SIZES.map((size) => size.name).join(", ")} or custom`);
+        }
+        let spec: ThreadInsertSpec | null;
+        if (sizeName === CUSTOM_THREAD_INSERT) {
+          const diameter = mcpOptionalNumber(params.diameter);
+          const length = mcpOptionalNumber(params.length);
+          if (diameter === undefined || length === undefined) throw new Error("thread_insert size custom needs diameter (the hole's) and length (the insert's) in millimetres");
+          spec = threadInsertSpec(CUSTOM_THREAD_INSERT, String(diameter), String(length));
+          if (!spec) throw new Error("thread_insert diameter and length must be at least 0.1 mm");
+        } else {
+          spec = threadInsertSpec(sizeName, "", "");
+        }
+        if (!spec) throw new Error("thread_insert found no such size");
+        const sourceFingerprint = projectShapesFingerprint(currentShapes());
+        const sourceProjectId = projectInfoRef.current.projectId;
+        const read = readHolePatternFace(await faceReadPositionsOffThread(target, geometryAbortRef.current?.signal), point, normal);
+        if (!read.ok) throw new Error(read.reason === "curved" ? "That face is curved but not a round wall; thread_insert needs a flat face or the outside wall of a cylinder or tube" : "thread_insert found no face there");
+        let face: ThreadInsertFace = read.face;
+        // Without a point of its own the hole goes to the middle of the face, where the purple mark is in the view.
+        if (!givenPoint) {
+          const middle = threadInsertSurfaceCenter(face);
+          if (middle) {
+            const moved = readHolePatternFace(await faceReadPositionsOffThread(target, geometryAbortRef.current?.signal), new THREE.Vector3(middle.point.x, middle.point.y, middle.point.z), normal);
+            if (moved.ok) face = moved.face;
+          }
+        }
+        const measured = measureThreadInsert(face, spec);
+        const report = {
+          size: spec.name,
+          holeDiameter: spec.d3,
+          holeDepth: spec.L,
+          wall: Number(measured.wall.toFixed(2)),
+          requiredWall: measured.requiredWall,
+          materialDepth: Number(measured.materialDepth.toFixed(2)),
+          requiredDepth: measured.requiredDepth,
+          allowed: measured.allowed,
+        };
+        if (params.dryRun === true) return { made: false, ...report };
+        if (!measured.allowed) {
+          const reasons = [
+            measured.wallShort ? `the wall beside the hole is ${measured.wall.toFixed(2)} mm of the ${measured.requiredWall} mm needed (the part must be at least ${(Math.round(measured.minimumOuterDiameter * 10 + 1) / 10)} mm wide round the hole)` : "",
+            measured.depthShort ? `the part is ${measured.materialDepth.toFixed(2)} mm deep of the ${measured.requiredDepth} mm needed` : "",
+            measured.invalid ? "the part could not be measured at that spot" : "",
+          ].filter(Boolean);
+          throw new Error(`No thread insert hole made: ${reasons.join("; ")}`);
+        }
+        const hole = makeThreadInsertHole(face, spec);
+        const result = await buildGroupedShapeOffThread([target, hole], workspaceSettingsRef.current.booleanTriangleLimit, geometryAbortRef.current?.signal);
+        if (projectInfoRef.current.projectId !== sourceProjectId || projectShapesFingerprint(currentShapes()) !== sourceFingerprint) {
+          throw new Error("The scene changed while the hole was made; run the command again");
+        }
+        if (!result.group) throw new Error(result.failureNotice);
+        const editableGroup = canonicalizeShape({ ...result.group, groupOperation: "group" });
+        commitShapes(
+          [...currentShapes().filter((shape) => shape.id !== target.id), editableGroup],
+          editableGroup.id,
+          t("threadInsert.status.created", { size: spec.name === CUSTOM_THREAD_INSERT ? `Ø${spec.d3}` : spec.name, diameter: spec.d3, depth: spec.L }),
+        );
+        return {
+          made: true,
+          object: mcpShapeSummary(editableGroup),
+          ...report,
           normal: [normal.x, normal.y, normal.z].map((value) => Number(value.toFixed(4))),
         };
       }
@@ -19170,6 +19306,7 @@ export function LayerlingEditor({
       );
       if (!single.hole && !isNonSolidShape(single)) {
         items.push({ key: "holePattern", label: t("holePattern.title"), onSelect: toggleHolePattern });
+        items.push({ key: "threadInsert", label: t("threadInsert.title"), onSelect: toggleThreadInsert });
         items.push({ key: "faceTool", label: t("faceTool.title"), onSelect: toggleFaceTool });
         items.push({ key: "supportRib", label: t("supportRib.title"), onSelect: toggleSupportRib });
       }
@@ -19322,6 +19459,8 @@ export function LayerlingEditor({
         mateFacesActive={Boolean(mateTool)}
         onHolePattern={toggleHolePattern}
         holePatternActive={Boolean(holePatternTool)}
+        onThreadInsert={toggleThreadInsert}
+        threadInsertActive={Boolean(threadInsertTool)}
         canHolePattern={selectedShapes.length === 1 && Boolean(selectedShape && !bodyLocked(selectedShape) && !selectedShape.hole && !isNonSolidShape(selectedShape))}
         onFaceTool={toggleFaceTool}
         faceToolActive={Boolean(faceTool)}
@@ -19586,16 +19725,14 @@ export function LayerlingEditor({
           />
         ) : (
           <WorkplaneViewport
-          onDinguinInsert={toggleDinguinInsert}
-          dinguinInsertActive={Boolean(dinguinTool)}
-          dinguinPreview={dinguinFaceCurrent && dinguinTool?.face && dinguinSpec && Number.isFinite(dinguinSpec.d3) && dinguinSpec.d3>0 ? {
-            origin:dinguinTool.face.workplane.origin,
-            normal:dinguinTool.face.workplane.normal,
-            diameter:dinguinSpec.d3,
-            allowed:Boolean(dinguinResult?.allowed)
+          threadInsertPreview={threadInsertFaceCurrent && threadInsertTool?.face && threadInsertSizeSpec ? {
+            origin:threadInsertTool.face.workplane.origin,
+            normal:threadInsertTool.face.workplane.normal,
+            diameter:threadInsertSizeSpec.d3,
+            allowed:Boolean(threadInsertResult?.allowed)
           }:null}
-          dinguinCenter={dinguinCenter}
-          onDinguinDragPick={dinguinFaceCurrent && dinguinTool?.face ? moveDinguinFace : undefined}
+          threadInsertCenter={threadInsertCenter}
+          onThreadInsertDragPick={threadInsertFaceCurrent && threadInsertTool?.face ? moveThreadInsertFace : undefined}
           projectName={projectName}
           projectId={editorOpen ? projectId ?? null : null}
           shapes={historyView.shapes ?? viewportShapes}
@@ -19709,8 +19846,8 @@ export function LayerlingEditor({
           onImageCalibrationPoint={addImageCalibrationPoint}
           layFlatPickMode={layFlatPickMode || Boolean(cableTool?.picking)}
           onLayFlatPick={cableTool?.picking ? pickCableEnd : layFlatOnFace}
-          mateFacePick={dinguinTool
-            ? {shapeIds:[dinguinTool.sourceId]}
+          mateFacePick={threadInsertTool
+            ? {shapeIds:[threadInsertTool.sourceId]}
             : mateTool && mateTool.mode !== "point" && mateTool.step !== "ready"
             ? { shapeIds: mateTool.step === "source" ? [mateTool.sourceId] : shapes.filter((shape) => shape.id !== mateTool.sourceId && !shape.hidden).map((shape) => shape.id), round: mateTool.mode === "concentric" }
             : holePatternTool?.step === "pick"
@@ -19733,7 +19870,7 @@ export function LayerlingEditor({
               }
             : null}
           onMatePointPick={pickMatePoint}
-          onMateFacePick={dinguinTool ? (pick)=>void pickDinguinFace(pick) : mateTool ? pickMateFace : faceTool ? (pick) => void pickFaceToolFace(pick) : supportRibTool ? (pick) => void pickSupportRibFace(pick) : (pick) => void pickHolePatternFace(pick)}
+          onMateFacePick={threadInsertTool ? (pick)=>void pickThreadInsertFace(pick) : mateTool ? pickMateFace : faceTool ? (pick) => void pickFaceToolFace(pick) : supportRibTool ? (pick) => void pickSupportRibFace(pick) : (pick) => void pickHolePatternFace(pick)}
           paintPick={paintTool && !historyViewState ? { shapeId: paintTool.sourceId, mode: paintTool.settings.mode } : null}
           onPaintPick={paintAtPick}
           onPaintLasso={paintLasso}
@@ -19955,15 +20092,31 @@ export function LayerlingEditor({
           onCancel={() => setSimplifyToolId(null)}
         />
       ) : null}
-      {dinguinTool && selectedShape?.id===dinguinTool.sourceId ? (
-        <DinguinInsertPanel name={displayShapeName(selectedShape)} preset={dinguinPreset} customD3={dinguinD3} customL={dinguinL}
-          onPreset={setDinguinPreset} onCustomD3={setDinguinD3} onCustomL={setDinguinL}
-          result={dinguinResult} busy={dinguinTool.busy}
-          coordinates={dinguinCoordinates} onCoordinates={moveDinguinByCoordinates}
-          centerAvailable={Boolean(dinguinCenter)} onCenter={centerDinguinFace}
-          onPick={()=>{dinguinRunRef.current++;setDinguinTool(t=>t?{...t,face:null}:t);}}
-          onCreate={()=>void applyDinguinInsert()} onCancel={()=>{dinguinRunRef.current++;setDinguinTool(null);}} />
-      ):null}
+      {threadInsertTool && selectedShape?.id === threadInsertTool.sourceId ? (
+        <ThreadInsertPanel
+          targetName={displayShapeName(selectedShape)}
+          preset={threadInsertPreset}
+          customDiameter={threadInsertDiameter}
+          customLength={threadInsertLength}
+          spec={threadInsertSizeSpec}
+          result={threadInsertResult}
+          ready={threadInsertFaceCurrent}
+          busy={threadInsertTool.busy}
+          coordinates={threadInsertCoordinates}
+          centerAvailable={Boolean(threadInsertCenter)}
+          onPreset={setThreadInsertPreset}
+          onCustomDiameter={setThreadInsertDiameter}
+          onCustomLength={setThreadInsertLength}
+          onCoordinates={moveThreadInsertByCoordinates}
+          onCenter={centerThreadInsertFace}
+          onRepick={() => {
+            threadInsertRunRef.current += 1;
+            setThreadInsertTool((tool) => (tool ? { ...tool, face: null } : tool));
+          }}
+          onApply={() => void applyThreadInsert()}
+          onCancel={closeThreadInsert}
+        />
+      ) : null}
       {holePatternTool && selectedShape?.id === holePatternTool.sourceId ? (
         <HolePatternPanel
           targetName={displayShapeName(selectedShape)}

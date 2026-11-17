@@ -161,6 +161,17 @@ AI 可以通过 MCP 桥接使用 `layerling_perforate_face` 完成同样的事�
 
 在侧边带缺口的板或盖子上，{{ui:holePattern.arrangement.perimeter}} 会让孔分布不均。为此 {{ui:holePattern.title}} 在 {{ui:holePattern.mode.pattern}} 旁边有第二个标签页 {{ui:holePattern.mode.mounting}}：它把孔放在所选面外接最小矩形的四个角上，到矩形各边的距离相同，即使板被旋转或带有缺口也一样。{{ui:holePattern.mounting.distance}} 量到孔的边缘（含螺丝头），若选 {{ui:holePattern.mounting.toCenter}} 则量到孔的中心。设置 {{ui:holePattern.mounting.count}} 后，四个孔放在角上，其余成对沿各边均匀分布，例如用于防水盖。在圆形面上，例如圆盒的盖子，孔沿一个圆均匀分布，三个或更多。孔的类型和尺寸与阵列相同：普通孔、沉头柱孔或沉头锥孔，通孔或指定深度。它们作为普通孔形状与实体编成一组，因此该组的 {{ui:inspector.groupHoleDiameter}} 也对它们有效。
 
+## 螺纹嵌件的孔
+
+热熔螺纹嵌件用烙铁压入塑料零件，为螺丝提供不会磨损的螺纹。{{ui:threadInsert.title}} 会在你点击的位置打出所需的孔，并先告诉你零件在那里的材料是否足够。只选中一个实体，然后单击 {{ui:threadInsert.title}}，它位于功能区的 {{ui:editor.section.mirrorPattern}} 组中、孔阵列旁边。也可以右键单击实体，或按 [[Ctrl]]+[[K]]。
+
+1. 在窗口中选择 {{ui:threadInsert.size}}：M2 至 M8、较短的 M3、M4 和 M5，或 1/4-20。选 {{ui:threadInsert.custom}} 时，输入孔径和嵌件长度；孔周围必须保留的壁厚由孔径决定。窗口会显示孔的直径和深度以及这个壁厚。
+2. 单击零件上的位置。平面可以，圆柱或圆管的外侧壁也可以；其他曲面会被拒绝并给出提示。圆环显示孔：当零件在孔旁的壁厚和孔后的深度都满足嵌件的需要时为绿色，其中任何一项不足时为红色。红色会说明是哪一项、差多少，以及孔周围的零件需要多宽。
+3. 在零件上拖动即可移动圆环，也可以在 {{ui:threadInsert.position}} 下输入到平面左边缘和下边缘的距离。{{ui:threadInsert.center}} 会把它放到面的中心，紫色标记显示该中心。每次移动都会重新测量。
+4. {{ui:threadInsert.repick}} 可选择另一个位置，[[Esc]] 关闭工具。只有 {{ui:threadInsert.apply}} 才会制作孔，而且只在圆环为绿色的位置。
+
+这个孔是与实体分组的普通孔形状，就像孔阵列的孔一样，CAD 内核会把它切成真正的圆柱，所以孔壁是精确的。{{ui:editor.tool.ungroup}} 会再次释放这个孔。孔的深度等于嵌件的长度，并略微伸出面外，以便干净地开口。AI 可以通过 MCP 桥接使用 `layerling_thread_insert` 完成同样的事（参见 [AI 与 MCP](chapter:ai-with-mcp) 一章）。
+
 ## 将面推出或推入
 
 要加厚壁、在面上加凸台或在面上挖凹槽，可使用 {{ui:faceTool.title}} 工具处理一个平面。它也可用于导入的 STL，那里没有草图可改。只选中一个实体，然后单击 {{ui:faceTool.title}}，它位于功能区的 {{ui:editor.section.mirrorPattern}} 组中、孔阵列旁边。也可以右键单击实体，或用 [[Ctrl]]+[[K]] 找到它。
