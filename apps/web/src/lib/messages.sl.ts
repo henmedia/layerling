@@ -5853,4 +5853,9 @@ export const MESSAGES_SL: Partial<Record<MessageKey, string>> = {
   "mold.error.masterGone": "Izvirnika tega kalupa ni več, zato ga ni mogoče znova narediti.",
   "mold.made.again": "Kalup znova narejen z novimi nastavitvami.",
   "mold.note.sprues": "{count} ločenih votlin, vsaka s svojim ulivnim kanalom in lijakom.",
+  "mold.direction.free": "Prosto",
+  "mold.openTilt": "Nagib od navpičnice",
+  "mold.openTurn": "Zasuk okoli navpičnice",
+  "mold.openHint": "Povleci vijolični gumb v pogledu ali tu nastavi nagib in zasuk: nagib 0° odpira gor in dol, 90° vstran. Število ob Prosto je njegova spodrezanost.",
+  "mold.note.directionFree": "Odpira se nagnjeno {tilt}° od navpičnice, zasukano {turn}°.",
 };

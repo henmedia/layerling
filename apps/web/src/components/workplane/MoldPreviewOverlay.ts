@@ -1,5 +1,6 @@
 import * as THREE from "three";
 import { RENDER_LAYER_HELPERS, setObjectRenderLayer, type ThreeState } from "@/components/workplane/ViewportOverlays";
+import { pointerRayFor } from "@/components/workplane/viewportPicking";
 import type { ClearanceVec3 } from "@/lib/clearanceCheck";
 
 /*
@@ -13,7 +14,12 @@ export type MoldPreview = {
   highPoints: Array<{ point: ClearanceVec3; vented: boolean; sprue: boolean }>;
   /** The scene's direction the mold opens in (the sprue and vents run along it). */
   up: ClearanceVec3;
+  /** With a free direction: the drag handle, an arrow from the master's middle along `up` with a knob at its tip. */
+  handle?: { centre: ClearanceVec3; reach: number } | null;
 };
+
+/** How far from the master's middle the handle's knob stands, as a share of half its diagonal. */
+const HANDLE_REACH = 1.6;
 
 const groups = new WeakMap<ThreeState, THREE.Group>();
 
@@ -62,9 +68,55 @@ export function syncMoldPreviewOverlay(state: ThreeState, preview: MoldPreview |
         group.add(ball);
       }
     }
+    if (preview.handle) {
+      // The arrow both ways (a mold opens both ways), the knob on the upper end, drawn over everything.
+      const { centre, reach } = preview.handle;
+      const length = Math.max(reach, 5) * HANDLE_REACH;
+      const knob = Math.max(1.6, length * 0.06);
+      const middle = new THREE.Vector3(...centre);
+      const shaft = new THREE.Mesh(new THREE.CylinderGeometry(knob * 0.18, knob * 0.18, 2 * length, 12), new THREE.MeshBasicMaterial({ color: "#7c4ddb", depthTest: false, transparent: true, opacity: 0.75 }));
+      shaft.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), up);
+      shaft.position.copy(middle);
+      shaft.renderOrder = 1012;
+      group.add(shaft);
+      const ball = new THREE.Mesh(new THREE.SphereGeometry(knob, 24, 16), new THREE.MeshBasicMaterial({ color: "#7c4ddb", depthTest: false }));
+      ball.position.copy(middle).addScaledVector(up, length);
+      ball.renderOrder = 1013;
+      ball.userData.moldHandle = true;
+      group.add(ball);
+      // A ring round the knob's path, so it is plain that the knob goes round on a sphere.
+      const ring = new THREE.Mesh(new THREE.TorusGeometry(length, knob * 0.08, 6, 96), new THREE.MeshBasicMaterial({ color: "#7c4ddb", depthTest: false, transparent: true, opacity: 0.35 }));
+      ring.position.copy(middle);
+      ring.rotation.x = Math.PI / 2;
+      ring.renderOrder = 1011;
+      group.add(ring);
+    }
     group.traverse((child) => setObjectRenderLayer(child, RENDER_LAYER_HELPERS));
     state.scene.add(group);
     groups.set(state, group);
   }
   state.needsRender = true;
+}
+
+/** Whether the pointer is over the free direction's knob. */
+export function pickMoldHandle(state: ThreeState, clientX: number, clientY: number) {
+  const group = groups.get(state);
+  if (!group) return false;
+  pointerRayFor(state, clientX, clientY);
+  state.raycaster.layers.set(RENDER_LAYER_HELPERS);
+  return state.raycaster.intersectObjects(group.children, false).some((hit) => hit.object.userData.moldHandle === true);
+}
+
+/**
+ * Where the dragged knob points: the pointer ray met with the sphere the knob goes round (the nearer side), or where the
+ * ray passes closest to the middle when it misses the sphere. A unit vector from the middle, or null.
+ */
+export function moldHandleDirection(state: ThreeState, clientX: number, clientY: number, handle: { centre: ClearanceVec3; reach: number }) {
+  pointerRayFor(state, clientX, clientY);
+  const ray = state.raycaster.ray;
+  const middle = new THREE.Vector3(...handle.centre);
+  const sphere = new THREE.Sphere(middle, Math.max(handle.reach, 5) * HANDLE_REACH);
+  const point = ray.intersectSphere(sphere, new THREE.Vector3()) ?? ray.closestPointToPoint(middle, new THREE.Vector3());
+  const direction = point.sub(middle);
+  return direction.lengthSq() > 1e-9 ? direction.normalize() : null;
 }

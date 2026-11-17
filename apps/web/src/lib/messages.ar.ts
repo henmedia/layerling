@@ -5883,4 +5883,9 @@ export const MESSAGES_AR: Partial<Record<MessageKey, string>> = {
   "mold.error.masterGone": "لم يعد النموذج الأصلي لهذا القالب موجودًا، لذا لا يمكن صنعه من جديد.",
   "mold.made.again": "صُنع القالب من جديد بالإعدادات الجديدة.",
   "mold.note.sprues": "{count} تجاويف منفصلة، لكل منها قناة صب وقمع خاص بها.",
+  "mold.direction.free": "حر",
+  "mold.openTilt": "الميل عن العمودي",
+  "mold.openTurn": "الدوران حول العمودي",
+  "mold.openHint": "اسحب المقبض البنفسجي في العرض أو اضبط الميل والدوران هنا: ميل 0° يفتح للأعلى والأسفل، و90° للجانب. الرقم بجانب «حر» هو تقويضه.",
+  "mold.note.directionFree": "يفتح مائلًا {tilt}° عن العمودي، مدارًا {turn}°.",
 };

@@ -5877,4 +5877,9 @@ export const MESSAGES_ES: Partial<Record<MessageKey, string>> = {
   "mold.error.masterGone": "El modelo maestro de este molde ya no existe, así que no se puede volver a crear.",
   "mold.made.again": "Molde creado de nuevo con los nuevos ajustes.",
   "mold.note.sprues": "{count} cavidades separadas, cada una con su propio bebedero y embudo.",
+  "mold.direction.free": "Libre",
+  "mold.openTilt": "Inclinación desde la vertical",
+  "mold.openTurn": "Giro alrededor de la vertical",
+  "mold.openHint": "Arrastra el pomo violeta en la vista o ajusta aquí inclinación y giro: 0° abre hacia arriba y abajo, 90° de lado. La cifra junto a Libre es su contrasalida.",
+  "mold.note.directionFree": "Se abre inclinado {tilt}° desde la vertical, girado {turn}°.",
 };

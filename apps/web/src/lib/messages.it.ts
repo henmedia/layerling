@@ -5852,4 +5852,9 @@ export const MESSAGES_IT: Partial<Record<MessageKey, string>> = {
   "mold.error.masterGone": "Il master di questo stampo non c'è più, quindi non si può ricreare.",
   "mold.made.again": "Stampo ricreato con le nuove impostazioni.",
   "mold.note.sprues": "{count} cavità separate, ognuna con il proprio canale di colata e imbuto.",
+  "mold.direction.free": "Libera",
+  "mold.openTilt": "Inclinazione dalla verticale",
+  "mold.openTurn": "Rotazione attorno alla verticale",
+  "mold.openHint": "Trascina la manopola viola nella vista, o imposta qui inclinazione e rotazione: 0° apre in alto e in basso, 90° di lato. Il numero accanto a Libera è il suo sottosquadro.",
+  "mold.note.directionFree": "Si apre inclinato di {tilt}° dalla verticale, ruotato di {turn}°.",
 };

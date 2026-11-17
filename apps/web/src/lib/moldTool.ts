@@ -36,9 +36,11 @@ export const MOLD_KINDS: readonly MoldKind[] = ["twoPart", "box", "tray", "die"]
 export type MoldDieMode = "form" | "cut" | "relief";
 export const MOLD_DIE_MODES: readonly MoldDieMode[] = ["form", "cut", "relief"];
 /** The way a two-part mold opens: along X (left/right), Y (front/back) or Z (up/down), or the best of them, found. */
-export type MoldDirection = "auto" | "x" | "y" | "z";
+/** "free": any direction, tilted `openTilt` degrees from straight up and turned `openTurn` degrees about the upright. */
+export type MoldDirection = "auto" | "x" | "y" | "z" | "free";
 export type MoldAxis = Exclude<MoldDirection, "auto">;
-export const MOLD_DIRECTIONS: readonly MoldDirection[] = ["auto", "z", "x", "y"];
+export const MOLD_DIRECTIONS: readonly MoldDirection[] = ["auto", "z", "x", "y", "free"];
+/** The three directions every analysis rates side by side; a free one is rated besides when it is asked for. */
 export const MOLD_AXES: readonly MoldAxis[] = ["z", "x", "y"];
 /** What is cast: silicone gives way a little, resin, plaster and the rest are rigid in a rigid mold. */
 export type MoldCastMaterial = "silicone" | "resin" | "plaster" | "other";
@@ -104,6 +106,9 @@ export type MoldOptions = {
   rounding: number;
   /** twoPart: the way the halves open; "auto" takes the one with the least undercut. */
   direction: MoldDirection;
+  /** direction "free": degrees from straight up (0) to level (90), and about the upright from the right (+X, 0) towards the back (90). */
+  openTilt: number;
+  openTurn: number;
   castMaterial: MoldCastMaterial;
   /** How much the cast shrinks as it sets, %: the cavity is made that much larger round the master's centre of mass. */
   shrinkage: number;
@@ -129,7 +134,7 @@ export const MOLD_DEFAULTS: MoldOptions = {
   kind: "twoPart", wall: 5, gap: 10, parting: 50, autoParting: true, keys: true, keySize: 8, keyFit: 0.2, sprue: true, sprueDiameter: 8, vents: true,
   ventDiameter: 2.5, ears: false, boltDiameter: 4.5, prySlots: true, floor: 3, above: 12,
   dieMode: "form", material: 1, depth: 5, base: 5, pins: true, pinDiameter: 6, pinFit: 0.25, rounding: 1,
-  direction: "auto", castMaterial: "silicone", shrinkage: 0.1, density: 1.1, draftLimit: 1, outer: "block", screws: false, screwDiameter: 3.4, bands: false,
+  direction: "auto", openTilt: 45, openTurn: 0, castMaterial: "silicone", shrinkage: 0.1, density: 1.1, draftLimit: 1, outer: "block", screws: false, screwDiameter: 3.4, bands: false,
   ventsOff: [], sprueShiftX: 0, sprueShiftY: 0, output: "print",
 };
 
@@ -138,6 +143,7 @@ export const MOLD_LIMITS = {
   wall: [2, 20], gap: [3, 30], parting: [5, 95], keySize: [4, 20], keyFit: [0, 0.6], sprueDiameter: [4, 20], ventDiameter: [1.5, 5],
   boltDiameter: [2, 8], floor: [1.2, 10], above: [3, 40], material: [0.1, 5], depth: [1, 30], base: [3, 15], pinDiameter: [3, 10],
   pinFit: [0, 0.6], rounding: [0, 5], shrinkage: [0, 5], density: [0.3, 4], draftLimit: [0, 10], screwDiameter: [2, 8], sprueShiftX: [-100, 100], sprueShiftY: [-100, 100],
+  openTilt: [0, 90], openTurn: [-180, 180],
 } as const;
 type Limited = keyof typeof MOLD_LIMITS;
 
@@ -257,6 +263,10 @@ export type MoldAnalysis = {
   weightG: number;
   /** The mold's outside size, mm (X, Y, Z as the user reads them). */
   outer: [number, number, number];
+  /** The direction it opens in (scene frame, unit), and the master's middle and half its diagonal, for the drag handle. */
+  up: ClearanceVec3;
+  centre: ClearanceVec3;
+  reach: number;
 };
 
 export type MoldResult =
@@ -273,16 +283,71 @@ const UP_TO_SCENE: Mat4 = [1, 0, 0, 0, 0, 0, -1, 0, 0, 1, 0, 0, 0, 0, 0, 1];
  * its +x points up, for Y its +y (backwards): the mold is then made as for Z, and its "upper" half is the right or the
  * back one.
  */
-const TO_OPENING: Record<MoldAxis, Mat4> = {
+const TO_OPENING: Record<Exclude<MoldAxis, "free">, Mat4> = {
   z: [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1],
   x: [0, 0, 1, 0, 0, 1, 0, 0, -1, 0, 0, 0, 0, 0, 0, 1],
   y: [1, 0, 0, 0, 0, 0, 1, 0, 0, -1, 0, 0, 0, 0, 0, 1],
 };
-const FROM_OPENING: Record<MoldAxis, Mat4> = {
+const FROM_OPENING: Record<Exclude<MoldAxis, "free">, Mat4> = {
   z: [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1],
   x: [0, 0, -1, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1],
   y: [1, 0, 0, 0, 0, 0, -1, 0, 0, 1, 0, 0, 0, 0, 0, 1],
 };
+
+/**
+ * The free opening direction as a unit vector in the scene's frame (y up). Tilted `tilt` degrees from straight up and
+ * turned `turn` degrees about the upright: 90 and 0 is +X (as "x"), 90 and 90 points to the back (-Z, as "y").
+ */
+export function moldOpeningVector(tilt: number, turn: number): ClearanceVec3 {
+  const a = (tilt * Math.PI) / 180;
+  const b = (turn * Math.PI) / 180;
+  // In the frame z up: (sin a cos b, sin a sin b, cos a); the scene's is (x, z, -y) of it.
+  return [Math.sin(a) * Math.cos(b), Math.cos(a), -Math.sin(a) * Math.sin(b)];
+}
+
+/**
+ * The tilt and turn of a direction in the scene's frame, the way that points up (a mold opens both ways), in whole
+ * degrees: what the drag handle sets.
+ */
+export function moldOpeningAngles(direction: readonly number[]): { tilt: number; turn: number } {
+  let [x, y, z] = direction;
+  const length = Math.hypot(x, y, z) || 1;
+  [x, y, z] = [x / length, y / length, z / length];
+  if (y < 0) [x, y, z] = [-x, -y, -z];
+  const tilt = Math.round((Math.acos(Math.min(1, Math.max(-1, y))) * 180) / Math.PI);
+  const turn = tilt === 0 ? 0 : Math.round((Math.atan2(-z, x) * 180) / Math.PI);
+  return { tilt, turn: turn === -180 ? 180 : turn };
+}
+
+/** From the frame z up to the frame with the free direction up (a turn that takes it onto z), and back. */
+function freeOpening(tilt: number, turn: number): { to: Mat4; from: Mat4 } {
+  const a = (tilt * Math.PI) / 180;
+  const b = (turn * Math.PI) / 180;
+  const v = [Math.sin(a) * Math.cos(b), Math.sin(a) * Math.sin(b), Math.cos(a)];
+  // About k = v x z, normalized, by the tilt: Rodrigues' formula.
+  const kx = v[1];
+  const ky = -v[0];
+  const kl = Math.hypot(kx, ky);
+  if (kl < 1e-9) return { to: TO_OPENING.z, from: FROM_OPENING.z };
+  const [x, y] = [kx / kl, ky / kl];
+  const c = Math.cos(a);
+  const s = Math.sin(a);
+  const t = 1 - c;
+  // Rows of R (k has no z part).
+  const r = [
+    [c + t * x * x, t * x * y, s * y],
+    [t * x * y, c + t * y * y, -s * x],
+    [-s * y, s * x, c],
+  ];
+  const to: Mat4 = [r[0][0], r[1][0], r[2][0], 0, r[0][1], r[1][1], r[2][1], 0, r[0][2], r[1][2], r[2][2], 0, 0, 0, 0, 1];
+  const from: Mat4 = [r[0][0], r[0][1], r[0][2], 0, r[1][0], r[1][1], r[1][2], 0, r[2][0], r[2][1], r[2][2], 0, 0, 0, 0, 1];
+  return { to, from };
+}
+
+/** The turns into and out of an opening direction's frame. */
+function openingFrame(axis: MoldAxis, options: Pick<MoldOptions, "openTilt" | "openTurn">): { to: Mat4; from: Mat4 } {
+  return axis === "free" ? freeOpening(options.openTilt, options.openTurn) : { to: TO_OPENING[axis], from: FROM_OPENING[axis] };
+}
 
 /** A point through a column-major matrix. */
 function through(matrix: Mat4, [x, y, z]: readonly number[]): ClearanceVec3 {
@@ -294,8 +359,8 @@ function through(matrix: Mat4, [x, y, z]: readonly number[]): ClearanceVec3 {
 }
 
 /** A point of the opening's frame in the scene's (y up). */
-function openingToScene(axis: MoldAxis, point: readonly number[]) {
-  return through(UP_TO_SCENE, through(FROM_OPENING[axis], point));
+function openingToScene(from: Mat4, point: readonly number[]) {
+  return through(UP_TO_SCENE, through(from, point));
 }
 
 /** The halves' names for the way they open. */
@@ -789,11 +854,12 @@ export function moldForSolid(runtime: ManifoldToplevel, body: ManifoldSolid, giv
       if (w < MOLD_MIN_STRONG_WALL) warnings.push("thinWall");
       // Every direction is rated, so the panel can show them side by side; the one asked for, or the best, is made.
       const parting0 = options.autoParting ? null : options.parting;
-      const rated = MOLD_AXES.map((candidate) => {
-        const oriented = keep(created, master.transform(TO_OPENING[candidate]));
+      const candidates: MoldAxis[] = options.direction === "free" ? [...MOLD_AXES, "free"] : [...MOLD_AXES];
+      const rated = candidates.map((candidate) => {
+        const oriented = keep(created, master.transform(openingFrame(candidate, options).to));
         return { axis: candidate, oriented, faces: rateFaces(runtime, oriented, candidate, parting0, options.draftLimit, created) };
       });
-      const best = [...rated].sort((a, b) => {
+      const best = rated.filter((entry) => entry.axis !== "free").sort((a, b) => {
         const ua = a.faces.rating.undercutMm2;
         const ub = b.faces.rating.undercutMm2;
         if (Math.abs(ua - ub) > Math.max(1, 0.002 * Math.max(ua, ub))) return ua - ub;
@@ -972,7 +1038,8 @@ export function moldForSolid(runtime: ManifoldToplevel, body: ManifoldSolid, giv
       flipped.add(upper);
 
       // The analysis: what the panel, the preview and the list of findings show.
-      const sceneOf = (point: readonly number[]) => openingToScene(chosen.axis, point);
+      const frame = openingFrame(axis, options);
+      const sceneOf = (point: readonly number[]) => openingToScene(frame.from, point);
       const undercutPositions: number[] = [];
       const draftPositions: number[] = [];
       chosen.faces.flags.forEach((flag, tri) => {
@@ -980,7 +1047,7 @@ export function moldForSolid(runtime: ManifoldToplevel, body: ManifoldSolid, giv
         const into = flag === 1 ? undercutPositions : draftPositions;
         for (let corner = 0; corner < 3; corner += 1) into.push(...sceneOf(Array.from(chosen.faces.corners.subarray(tri * 9 + corner * 3, tri * 9 + corner * 3 + 3))));
       });
-      const assembled = [lower, upper].map((half) => keep(created, half.transform(FROM_OPENING[axis])));
+      const assembled = [lower, upper].map((half) => keep(created, half.transform(frame.from)));
       const ab = assembled.map((half) => half.boundingBox());
       const outer: [number, number, number] = [0, 1, 2].map((k) => Math.max(...ab.map((b) => b.max[k])) - Math.min(...ab.map((b) => b.min[k]))) as [number, number, number];
       const highPoints: MoldHighPoint[] = [
@@ -1009,6 +1076,9 @@ export function moldForSolid(runtime: ManifoldToplevel, body: ManifoldSolid, giv
       analysis = {
         axis, ratings: rated.map((entry) => entry.faces.rating), rating, undercutPositions, draftPositions, partingCorners: pc, highPoints, findings,
         volume: volume + sprueVolume, weightG: (volume + sprueVolume) * options.density, outer,
+        up: openingToScene(frame.from, [0, 0, 1]).map((value, index) => value - openingToScene(frame.from, [0, 0, 0])[index]) as ClearanceVec3,
+        centre: through(UP_TO_SCENE, [(bx0 + bx1) / 2, (by0 + by1) / 2, (bz0 + bz1) / 2]),
+        reach: Math.hypot(bx1 - bx0, by1 - by0, bz1 - bz0) / 2,
       };
     } else if (options.kind === "box") {
       const g = options.gap;
@@ -1120,7 +1190,7 @@ export function moldForSolid(runtime: ManifoldToplevel, body: ManifoldSolid, giv
     const placed: MoldPart[] = parts.map(({ role, solid: made }) => {
       if (!layout || options.output === "assembled") {
         // Closed round the master, turned back from the opening's frame.
-        const back = keep(created, made.transform(FROM_OPENING[axis]));
+        const back = keep(created, made.transform(openingFrame(axis, options).from));
         const scene = back.transform(UP_TO_SCENE);
         handed.add(scene);
         return { role, solid: scene };
@@ -1169,7 +1239,10 @@ export function moldNotes(result: Extract<MoldResult, { parts: unknown }>, kind:
   }));
   if (result.analysis) {
     const { analysis } = result;
-    notes.push(t("mold.note.direction", { direction: t(`mold.direction.${analysis.axis}`) }));
+    if (analysis.axis === "free") {
+      const { tilt, turn } = moldOpeningAngles(analysis.up);
+      notes.push(t("mold.note.directionFree", { tilt, turn }));
+    } else notes.push(t("mold.note.direction", { direction: t(`mold.direction.${analysis.axis}`) }));
     notes.push(t("mold.note.weight", { g: Math.round(analysis.weightG).toLocaleString(numberLocale()) }));
   }
   if (result.sprues > 1) notes.push(t("mold.note.sprues", { count: result.sprues }));

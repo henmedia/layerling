@@ -5856,4 +5856,9 @@ export const MESSAGES_ZH_TW: Partial<Record<MessageKey, string>> = {
   "mold.error.masterGone": "此模具的原型已不存在，因此無法重新建立。",
   "mold.made.again": "已按新設定重新建立模具。",
   "mold.note.sprues": "{count} 個獨立模穴，每個都有自己的澆口和漏斗。",
+  "mold.direction.free": "自由",
+  "mold.openTilt": "相對垂直的傾斜",
+  "mold.openTurn": "繞垂直的旋轉",
+  "mold.openHint": "在視圖中拖曳紫色旋鈕，或在此設定傾斜與旋轉：傾斜 0° 向上下開模，90° 向側面開模。「自由」旁的數字是它的倒扣。",
+  "mold.note.directionFree": "沿相對垂直傾斜 {tilt}°、旋轉 {turn}° 的方向開模。",
 };

@@ -5849,4 +5849,9 @@ export const MESSAGES_DA: Partial<Record<MessageKey, string>> = {
   "mold.error.masterGone": "Originalen til denne form findes ikke længere, så den kan ikke laves igen.",
   "mold.made.again": "Formen er lavet igen med de nye indstillinger.",
   "mold.note.sprues": "{count} adskilte hulrum, hver med sin egen indløbskanal og tragt.",
+  "mold.direction.free": "Fri",
+  "mold.openTilt": "Hældning fra lodret",
+  "mold.openTurn": "Drejning om lodret",
+  "mold.openHint": "Træk den lilla knap i visningen, eller indstil hældning og drejning her: 0° hældning åbner op og ned, 90° til siden. Tallet ved Fri er dens underskæring.",
+  "mold.note.directionFree": "Åbner hældet {tilt}° fra lodret, drejet {turn}°.",
 };

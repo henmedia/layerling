@@ -5874,4 +5874,9 @@ export const MESSAGES_CS: Record<MessageKey, string> = {
   "mold.error.masterGone": "Vzor této formy už neexistuje, takže ji nelze vytvořit znovu.",
   "mold.made.again": "Forma vytvořena znovu s novým nastavením.",
   "mold.note.sprues": "{count} oddělených dutin, každá s vlastním vtokem a nálevkou.",
+  "mold.direction.free": "Volně",
+  "mold.openTilt": "Sklon od svislice",
+  "mold.openTurn": "Natočení kolem svislice",
+  "mold.openHint": "Táhněte fialový knoflík v pohledu nebo nastavte sklon a natočení zde: sklon 0° otevírá nahoru a dolů, 90° do strany. Číslo vedle Volně je jeho podkos.",
+  "mold.note.directionFree": "Otevírá se se sklonem {tilt}° od svislice, natočeno o {turn}°.",
 };

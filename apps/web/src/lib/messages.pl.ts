@@ -5880,4 +5880,9 @@ export const MESSAGES_PL: Partial<Record<MessageKey, string>> = {
   "mold.error.masterGone": "Wzorca tej formy już nie ma, więc nie da się jej utworzyć ponownie.",
   "mold.made.again": "Forma utworzona ponownie z nowymi ustawieniami.",
   "mold.note.sprues": "{count} oddzielnych wnęk, każda z własnym wlewem i lejkiem.",
+  "mold.direction.free": "Dowolny",
+  "mold.openTilt": "Pochylenie od pionu",
+  "mold.openTurn": "Obrót wokół pionu",
+  "mold.openHint": "Przeciągnij fioletowe pokrętło w widoku albo ustaw tu pochylenie i obrót: 0° otwiera w górę i w dół, 90° na bok. Liczba przy Dowolny to jego podcięcie.",
+  "mold.note.directionFree": "Otwiera się pochylony o {tilt}° od pionu, obrócony o {turn}°.",
 };

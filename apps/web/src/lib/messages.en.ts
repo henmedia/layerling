@@ -5875,6 +5875,11 @@ export const MESSAGES_EN = {
   "mold.error.masterGone": "The master of this mold is no longer there, so it cannot be made again.",
   "mold.made.again": "Mold made again with the new settings.",
   "mold.note.sprues": "{count} separate cavities, each with its own sprue and funnel.",
+  "mold.direction.free": "Free",
+  "mold.openTilt": "Tilt from upright",
+  "mold.openTurn": "Turn about upright",
+  "mold.openHint": "Drag the violet knob in the view, or set tilt and turn here: 0° tilt opens up and down, 90° sideways. The figure beside Free is its undercut.",
+  "mold.note.directionFree": "Opens tilted {tilt}° from upright, turned {turn}°.",
 } as const;
 
 export type MessageKey = keyof typeof MESSAGES_EN;

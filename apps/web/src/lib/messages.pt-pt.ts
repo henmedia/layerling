@@ -5848,5 +5848,10 @@ export const MESSAGES_PT_PT: Partial<Record<MessageKey, string>> = {
   "mold.error.masterGone": "O modelo mestre deste molde já não existe, por isso não é possível criá-lo novamente.",
   "mold.made.again": "Molde criado novamente com as novas definições.",
   "mold.note.sprues": "{count} cavidades separadas, cada uma com o seu próprio canal de vazamento e funil.",
+  "mold.direction.free": "Livre",
+  "mold.openTilt": "Inclinação a partir da vertical",
+  "mold.openTurn": "Rotação em torno da vertical",
+  "mold.openHint": "Arraste o botão roxo na vista ou ajuste aqui a inclinação e a rotação: 0° abre para cima e para baixo, 90° de lado. O número junto a Livre é a sua contrassaída.",
+  "mold.note.directionFree": "Abre inclinado {tilt}° da vertical, rodado {turn}°.",
 };
 

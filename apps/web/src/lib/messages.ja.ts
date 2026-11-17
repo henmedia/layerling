@@ -5847,4 +5847,9 @@ export const MESSAGES_JA: Partial<Record<MessageKey, string>> = {
   "mold.error.masterGone": "この型の原型がもうないので、作り直せません。",
   "mold.made.again": "新しい設定で型を作り直しました。",
   "mold.note.sprues": "{count} 個の独立したキャビティ。それぞれに専用の湯口と漏斗があります。",
+  "mold.direction.free": "自由",
+  "mold.openTilt": "鉛直からの傾き",
+  "mold.openTurn": "鉛直まわりの回転",
+  "mold.openHint": "ビューの紫のノブをドラッグするか、ここで傾きと回転を設定します。傾き 0° は上下に、90° は横に開きます。「自由」の横の数値はそのアンダーカットです。",
+  "mold.note.directionFree": "鉛直から {tilt}° 傾け、{turn}° 回して開きます。",
 };

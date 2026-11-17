@@ -3703,4 +3703,9 @@ export const MESSAGES_TR: Partial<Record<MessageKey, string>> = {
   "mold.error.masterGone": "Bu kalıbın ana modeli artık yok, bu yüzden yeniden oluşturulamaz.",
   "mold.made.again": "Kalıp yeni ayarlarla yeniden oluşturuldu.",
   "mold.note.sprues": "{count} ayrı boşluk, her birinin kendi döküm kanalı ve hunisi var.",
+  "mold.direction.free": "Serbest",
+  "mold.openTilt": "Dikeyden eğim",
+  "mold.openTurn": "Dikey etrafında dönüş",
+  "mold.openHint": "Görünümdeki mor düğmeyi sürükleyin ya da eğimi ve dönüşü buradan ayarlayın: 0° eğim yukarı ve aşağı açar, 90° yana. Serbest'in yanındaki sayı onun kalıp çıkmazıdır.",
+  "mold.note.directionFree": "Dikeyden {tilt}° eğik, {turn}° döndürülmüş açılır.",
 };

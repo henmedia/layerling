@@ -31,7 +31,7 @@ import { NAME_TAG_LAYERS, NAME_TAG_LETTER_SIZE, textKerningPatch, textLetterSize
 import { DEFAULT_ICON_TAG_WIDTH, ICON_TAG_LAYERS, MAX_ICON_TAG_WIDTH, MIN_ICON_TAG_WIDTH, isIconLayerBody, normalizeIconTagCount } from "@/lib/iconTag";
 import { automaticFlexiJoints, automaticFoldJoints, DEFAULT_FLEXI_FOLD, FLEXI_DEFAULTS, normalizeFlexiOptions, type FlexiOptions } from "@/lib/flexiJoints";
 import { LID_HINGE_TYPES, groupedWithMagnets, lidClickBumpsFit, lidDefaults, lidFlipTopFits, lidHandleFits, lidLatchesFit, lidNeckFit, lidNeckFitPatch, lidStandardThread, lidTakesMagnets, lidTetherFits, lidTopEdgeFits, magnetPocketDepth, normalizeLidOptions, type LidOptions, type LidThreadStandard } from "@/lib/lidTool";
-import { MOLD_CAST_MATERIAL_DATA, MOLD_DEFAULTS, normalizeMoldOptions, type MoldAnalysis, type MoldOptions } from "@/lib/moldTool";
+import { MOLD_CAST_MATERIAL_DATA, MOLD_DEFAULTS, moldOpeningAngles, moldOpeningVector, normalizeMoldOptions, type MoldAnalysis, type MoldOptions } from "@/lib/moldTool";
 import { readMoldSettings, writeMoldSettings } from "@/lib/moldSettings";
 import type { MoldPreview } from "./workplane/MoldPreviewOverlay";
 import { FIT_TEST_CLEARANCES, getPrinterPlay, MAX_PRINTER_PLAY, MIN_PRINTER_PLAY, normalizePrinterPlay, PRINTER_PLAY_SETTINGS, printerPlayPrinter, printerPlaySource, printerPlayStart, setPrinterPlay, setPrinterPlayPrinter, withPrinterPlay } from "@/lib/printerPlay";
@@ -9227,11 +9227,18 @@ export function LayerlingEditor({
       controller.abort();
     };
   }, [moldCheckKey]);
+  // With a free direction the arrow follows the settings at once (the drag handle), the rest the analysis when it comes.
+  const moldFree = moldTool?.kind === "twoPart" && moldTool.direction === "free";
   const moldPreview = useMemo<MoldPreview | null>(() => {
     const analysis = moldTool?.kind === "twoPart" ? moldTool.analysis : null;
     if (!analysis) return null;
-    return { partingCorners: analysis.partingCorners, highPoints: analysis.highPoints, up: analysis.axis === "x" ? [1, 0, 0] : analysis.axis === "y" ? [0, 0, -1] : [0, 1, 0] };
-  }, [moldTool?.analysis, moldTool?.kind]);
+    const up = moldFree && moldTool ? moldOpeningVector(moldTool.openTilt, moldTool.openTurn) : analysis.up;
+    return { partingCorners: analysis.partingCorners, highPoints: analysis.highPoints, up, handle: moldFree ? { centre: analysis.centre, reach: analysis.reach } : null };
+  }, [moldTool?.analysis, moldTool?.kind, moldFree, moldTool?.openTilt, moldTool?.openTurn]);
+  const dragMoldDirection = useCallback((direction: [number, number, number]) => {
+    const { tilt, turn } = moldOpeningAngles(direction);
+    setMoldTool((current) => current && (current.direction !== "free" || current.openTilt !== tilt || current.openTurn !== turn) ? { ...current, direction: "free", openTilt: tilt, openTurn: turn, error: null } : current);
+  }, []);
   const moldUndercutView = useMemo(() => {
     const analysis = moldTool?.kind === "twoPart" ? moldTool.analysis : null;
     return analysis?.undercutPositions.length ? { thin: analysis.undercutPositions, focus: null, request: 0 } : null;
@@ -15333,6 +15340,8 @@ export function LayerlingEditor({
           ...(analysis ? {
             analysis: {
               direction: analysis.axis,
+              up: analysis.up.map((value) => Number(value.toFixed(4))),
+              ...(analysis.axis === "free" ? moldOpeningAngles(analysis.up) : {}),
               ratings: analysis.ratings.map((rating) => ({ direction: rating.axis, undercutPercent: round(rating.undercutPercent), undercutMm2: round(rating.undercutMm2), parting: rating.parting })),
               findings: analysis.findings.map((finding) => ({ kind: finding.kind, level: finding.level, areaMm2: round(finding.areaMm2), at: { x: round(finding.point[0]), z: round(finding.point[2]), elevation: round(finding.point[1]) } })),
               highPoints: analysis.highPoints.map((point, index) => ({ index, sprue: point.sprue, vented: point.vented, at: { x: round(point.point[0]), z: round(point.point[2]), elevation: round(point.point[1]) } })),
@@ -19601,6 +19610,7 @@ export function LayerlingEditor({
           clearanceMark={clearanceMark}
           printCheckView={printCheckView ?? moldUndercutView}
           moldPreview={moldPreview}
+          onMoldDirectionDrag={moldFree ? dragMoldDirection : undefined}
           onSetPlacementWorkplane={setViewportPlacementWorkplane}
           onToggleWorkplaneTool={activateWorkplaneTool}
           onInteractionActiveChange={updateProjectInteractionActive}

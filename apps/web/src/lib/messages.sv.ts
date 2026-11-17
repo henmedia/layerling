@@ -5869,4 +5869,9 @@ export const MESSAGES_SV: Partial<Record<MessageKey, string>> = {
   "mold.error.masterGone": "Originalet för den här formen finns inte längre, så den kan inte skapas igen.",
   "mold.made.again": "Formen skapad igen med de nya inställningarna.",
   "mold.note.sprues": "{count} separata hålrum, vart och ett med egen ingjutning och tratt.",
+  "mold.direction.free": "Fri",
+  "mold.openTilt": "Lutning från lodrätt",
+  "mold.openTurn": "Vridning runt lodrätt",
+  "mold.openHint": "Dra den lila knoppen i vyn eller ställ in lutning och vridning här: 0° lutning öppnar upp och ned, 90° åt sidan. Talet bredvid Fri är dess släppvinkelfel.",
+  "mold.note.directionFree": "Öppnas lutad {tilt}° från lodrätt, vriden {turn}°.",
 };

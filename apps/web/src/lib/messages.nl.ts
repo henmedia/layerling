@@ -5875,4 +5875,9 @@ export const MESSAGES_NL: Record<MessageKey, string> = {
   "mold.error.masterGone": "Het origineel van deze mal bestaat niet meer, dus hij kan niet opnieuw gemaakt worden.",
   "mold.made.again": "Mal opnieuw gemaakt met de nieuwe instellingen.",
   "mold.note.sprues": "{count} losse holtes, elk met een eigen gietkanaal en trechter.",
+  "mold.direction.free": "Vrij",
+  "mold.openTilt": "Kanteling t.o.v. verticaal",
+  "mold.openTurn": "Draaiing om verticaal",
+  "mold.openHint": "Sleep de paarse knop in het beeld of stel kanteling en draaiing hier in: 0° kanteling opent naar boven en onder, 90° opzij. Het getal naast Vrij is zijn ondersnijding.",
+  "mold.note.directionFree": "Opent {tilt}° gekanteld t.o.v. verticaal, {turn}° gedraaid.",
 };

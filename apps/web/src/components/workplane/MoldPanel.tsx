@@ -91,7 +91,7 @@ export function MoldPanel({
   );
   const ratingOf = (axis: string) => analysis?.ratings.find((rating) => rating.axis === axis);
   const percent = (value: number) => formatEstimateNumber(value, value < 10 ? 1 : 0);
-  const best = analysis ? [...analysis.ratings].sort((a, b) => a.undercutMm2 - b.undercutMm2 || b.partingArea - a.partingArea)[0] : null;
+  const best = analysis ? analysis.ratings.filter((rating) => rating.axis !== "free").sort((a, b) => a.undercutMm2 - b.undercutMm2 || b.partingArea - a.partingArea)[0] : null;
   const length = (mm: number) => formatClearanceLength(mm, workspace);
   const vents = analysis?.highPoints.filter((point) => !point.sprue) ?? [];
   const check = (key: "keys" | "sprue" | "vents" | "ears" | "prySlots" | "pins" | "screws" | "bands", disabled = false) => (
@@ -149,6 +149,11 @@ export function MoldPanel({
             return rating ? t("mold.directionValue", { percent: percent(rating.undercutPercent) }) : null;
           })}
           {best ? <span className="shell-openings-summary">{t("mold.directionHint", { direction: t(`mold.direction.${best.axis}`) })}</span> : null}
+          {settings.direction === "free" ? (<>
+            {slider("openTilt", 1, t("mold.openTilt"), "°")}
+            {slider("openTurn", 1, t("mold.openTurn"), "°")}
+            <span className="shell-openings-summary">{t("mold.openHint")}</span>
+          </>) : null}
           <label className="edge-modifier-field offset-copy">
             <input type="checkbox" checked={settings.autoParting} disabled={busy} onChange={(event) => onChange({ autoParting: event.target.checked })} />
             <span>{t("mold.autoParting")}</span>

@@ -5851,4 +5851,9 @@ export const MESSAGES_FR: Partial<Record<MessageKey, string>> = {
   "mold.error.masterGone": "Le modèle maître de ce moule n'existe plus, il ne peut donc pas être recréé.",
   "mold.made.again": "Moule recréé avec les nouveaux réglages.",
   "mold.note.sprues": "{count} cavités séparées, chacune avec sa propre carotte et son entonnoir.",
+  "mold.direction.free": "Libre",
+  "mold.openTilt": "Inclinaison depuis la verticale",
+  "mold.openTurn": "Rotation autour de la verticale",
+  "mold.openHint": "Faites glisser le bouton violet dans la vue, ou réglez inclinaison et rotation ici : 0° s’ouvre vers le haut et le bas, 90° sur le côté. Le chiffre à côté de Libre est sa contre-dépouille.",
+  "mold.note.directionFree": "S’ouvre incliné de {tilt}° depuis la verticale, tourné de {turn}°.",
 };

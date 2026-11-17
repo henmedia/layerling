@@ -5874,4 +5874,9 @@ export const MESSAGES_DE: Record<MessageKey, string> = {
   "mold.error.masterGone": "Das Urmodell dieser Gussform gibt es nicht mehr, sie lässt sich nicht neu erzeugen.",
   "mold.made.again": "Gussform mit den neuen Einstellungen neu erzeugt.",
   "mold.note.sprues": "{count} getrennte Hohlräume, jeder mit eigenem Einguss und Trichter.",
+  "mold.direction.free": "Frei",
+  "mold.openTilt": "Neigung aus der Senkrechten",
+  "mold.openTurn": "Drehung um die Senkrechte",
+  "mold.openHint": "Zieh den violetten Knopf im Bild oder stell Neigung und Drehung hier ein: 0° Neigung öffnet nach oben und unten, 90° zur Seite. Die Zahl neben „Frei“ ist sein Hinterschnitt.",
+  "mold.note.directionFree": "Öffnet {tilt}° aus der Senkrechten geneigt, {turn}° gedreht.",
 };

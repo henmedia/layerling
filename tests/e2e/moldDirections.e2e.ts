@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import Module from "manifold-3d";
-import { MOLD_DEFAULTS, moldForSolid, moldUndercutLevel, normalizeMoldOptions, type MoldOptions } from "@/lib/moldTool";
+import { MOLD_DEFAULTS, moldForSolid, moldOpeningAngles, moldOpeningVector, moldUndercutLevel, normalizeMoldOptions, type MoldOptions } from "@/lib/moldTool";
 
 /*
  * The test bodies of the mold tool's opening directions, undercut and air checks (Konstruktionsanweisung Gussform,
@@ -46,6 +46,59 @@ function overlap(a: Body, b: Body) {
 }
 
 describe("mold opening directions and checks", () => {
+  it("rates a free direction like the axis it lies on: level towards +X as X, towards the back as Y, upright as Z", async () => {
+    await withKernel((kernel, keep) => {
+      // A block with a peg on one side: it rates differently in each direction.
+      const body = scene(keep(kernel.Manifold.union([keep(kernel.Manifold.cube([20, 14, 10])), keep(keep(kernel.Manifold.cylinder(8, 3, 3, 32)).translate([6, 7, 10]))])), keep);
+      const fixed = mold(kernel, body, { kind: "twoPart", direction: "z" }, false, keep).analysis!;
+      const byAxis = Object.fromEntries(fixed.ratings.map((rating) => [rating.axis, rating.undercutMm2]));
+      for (const [axis, tilt, turn] of [["x", 90, 0], ["y", 90, 90], ["z", 0, 0]] as const) {
+        const free = mold(kernel, body, { kind: "twoPart", direction: "free", openTilt: tilt, openTurn: turn }, false, keep).analysis!;
+        expect(free.axis).toBe("free");
+        expect(free.rating.undercutMm2).toBeCloseTo(byAxis[axis], 0);
+      }
+    });
+  });
+
+  it("opens a slanted peg along its own slant without undercut, and says which way that is", async () => {
+    await withKernel((kernel, keep) => {
+      // A round peg leaning 40 degrees towards +X, in the scene's frame.
+      const peg = keep(keep(kernel.Manifold.cylinder(30, 5, 5, 64, true)).rotate([0, 40, 0]));
+      const body = scene(keep(peg.translate([0, 0, 20])), keep);
+      const slanted = mold(kernel, body, { kind: "twoPart", direction: "free", openTilt: 40, openTurn: 0 }, false, keep).analysis!;
+      expect(slanted.rating.undercutMm2).toBeLessThan(1);
+      // The other free slant (leaning the other way) does not suit it.
+      const wrong = mold(kernel, body, { kind: "twoPart", direction: "free", openTilt: 40, openTurn: 180 }, false, keep).analysis!;
+      expect(wrong.rating.undercutMm2).toBeGreaterThan(20);
+      // The analysis says where it opens: the free direction, up and to the right.
+      const [x, y, z] = slanted.up;
+      expect(x).toBeCloseTo(Math.sin((40 * Math.PI) / 180), 3);
+      expect(y).toBeCloseTo(Math.cos((40 * Math.PI) / 180), 3);
+      expect(z).toBeCloseTo(0, 3);
+    });
+  });
+
+  it("turns a dragged direction into tilt and turn and back, the upper way round", () => {
+    for (const [tilt, turn] of [[0, 0], [30, 45], [90, 0], [90, 90], [60, -120], [15, 180]]) {
+      const v = moldOpeningVector(tilt, turn);
+      expect(moldOpeningAngles(v)).toEqual({ tilt, turn: tilt === 0 ? 0 : turn });
+      // The other way along the same line is the same mold.
+      expect(moldOpeningAngles(v.map((value) => -value))).toEqual({ tilt, turn: tilt === 0 ? 0 : turn });
+    }
+  });
+
+  it("keeps the halves of a free mold closed round the master", async () => {
+    await withKernel((kernel, keep) => {
+      const ball = scene(keep(kernel.Manifold.sphere(10, 64).translate([0, 0, 10])), keep);
+      const result = mold(kernel, ball, { kind: "twoPart", direction: "free", openTilt: 35, openTurn: 20, output: "assembled" }, false, keep);
+      const [lower, upper] = result.parts.map((part) => part.solid as unknown as Body);
+      // Neither half reaches into the master, and the two together close round it.
+      expect(overlap(lower, ball)).toBeLessThan(1);
+      expect(overlap(upper, ball)).toBeLessThan(1);
+      expect(overlap(lower, upper)).toBeLessThan(1);
+    });
+  });
+
   it("gives each of six separate masters a sprue of its own, so every cavity fills", async () => {
     await withKernel((kernel, keep) => {
       // Six blocks 12 x 12 x 10 mm in two rows of three, 6 mm apart, as in a tray of soap bars.
