@@ -163,6 +163,17 @@ AI může provést totéž přes `layerling_perforate_face`, viz [Modelování s
 
 U desky nebo víka s výřezy v bocích rozloží {{ui:holePattern.arrangement.perimeter}} otvory nerovnoměrně. Proto má {{ui:holePattern.title}} vedle {{ui:holePattern.mode.pattern}} druhou kartu, {{ui:holePattern.mode.mounting}}: umístí otvory do rohů nejmenšího obdélníku kolem vybrané plochy, vždy ve stejné vzdálenosti od jeho stran, i na otočené nebo vyříznuté desce. {{ui:holePattern.mounting.distance}} se měří k okraji otvoru včetně hlavy šroubu, nebo s {{ui:holePattern.mounting.toCenter}} k jeho středu. S {{ui:holePattern.mounting.count}} jdou čtyři do rohů a zbytek po dvojicích, rovnoměrně rozmístěný podél stran, například pro vodotěsné víko. Na kulaté ploše, třeba na víku kulaté krabičky, se rozmístí rovnoměrně po kružnici, tři nebo více. Typ a velikosti otvorů jsou stejné jako u vzoru: obyčejný, se zahloubením pro válcovou nebo zápustnou hlavu, průchozí nebo do hloubky. Vzniknou jako běžné tvary otvorů seskupené s tělesem, takže na ně působí i {{ui:inspector.groupHoleDiameter}} skupiny.
 
+## Otvor pro závitovou vložku
+
+Zalisovací závitová vložka se zatlačí do plastového dílu páječkou a šroubům dá závit, který se neopotřebuje. {{ui:threadInsert.title}} vytvoří otvor pro ni tam, kam kliknete, a nejprve vám řekne, zda má díl na tom místě dost materiálu. Vyberte právě jedno těleso a spusťte {{ui:threadInsert.title}} ve skupině {{ui:editor.section.mirrorPattern}} pásu karet vedle rastru otvorů. Můžete také kliknout na těleso pravým tlačítkem nebo stisknout [[Ctrl]]+[[K]].
+
+1. V okně zvolte {{ui:threadInsert.size}}: M2 až M8, krátké M3, M4 a M5, nebo 1/4-20. U {{ui:threadInsert.custom}} zadáte průměr otvoru a délku vložky; stěna, která musí kolem otvoru zůstat, vyplyne z průměru. Okno ukazuje průměr a hloubku otvoru a tuto stěnu.
+2. Klikněte na místo na dílu. Funguje rovná plocha i vnější stěna válce nebo trubky; jakákoli jiná křivka se odmítne s nápovědou. Kroužek ukazuje otvor: zelený tam, kde má díl stěnu vedle otvoru a hloubku za ním, které vložka potřebuje, červený tam, kde jedno z toho chybí. Červená barva říká, které a o kolik, a jak široký musí být díl kolem otvoru.
+3. Kroužek posunete tažením po dílu, nebo u rovné plochy zadáte vzdálenost od levého a dolního okraje v části {{ui:threadInsert.position}}. {{ui:threadInsert.center}} ho umístí na střed plochy, který ukazuje fialová značka. Každý posun se změří znovu.
+4. {{ui:threadInsert.repick}} vybere jiné místo a [[Esc]] nástroj zavře. Otvor vytvoří teprve {{ui:threadInsert.apply}}, a to jen tam, kde je kroužek zelený.
+
+Otvor je běžný tvar otvoru sloučený s tělesem, stejně jako otvory z rastru otvorů, a jádro CAD ho řeže jako pravý válec, takže vývrt je přesný. {{ui:editor.tool.ungroup}} otvor opět uvolní. Je tak hluboký, jak je vložka dlouhá, a o kousek vyčnívá z plochy, aby se čistě otevřel. AI může provést totéž přes most MCP pomocí `layerling_thread_insert`, viz [Modelování s AI](chapter:ai-with-mcp).
+
 ## Vysunutí plochy ven nebo dovnitř
 
 Pro zesílení stěny, vyvýšenou plošku nebo vyříznutou kapsu pracuje nástroj {{ui:faceTool.title}} s jednou rovinnou plochou. Funguje i u importovaného STL, které nemá náčrt ke změně. Vyberte právě jedno těleso a spusťte {{ui:faceTool.title}} v {{ui:editor.section.mirrorPattern}} vedle rastru otvorů, pravým tlačítkem nebo vyhledáváním [[Ctrl]]+[[K]].

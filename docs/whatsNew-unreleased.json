@@ -1,6 +1,19 @@
 [
   {
     "title": {
+      "de": "Gewindeeinsätze: das Loch mit Prüfung",
+      "en": "Thread inserts: the hole, checked first"
+    },
+    "body": {
+      "de": "Das neue Werkzeug „Gewindeeinsatz“ bohrt das Loch für einen Einschmelzeinsatz (M2 bis M8, 1/4-20 oder eigene Größe) genau dort, wo du klickst, in ebene Flächen und in runde Wände. Vorher prüft es, ob neben dem Loch genug Wand und dahinter genug Tiefe bleibt: Ein grüner Ring heißt los, ein roter sperrt das Loch. Von @markopo1982.",
+      "en": "The new Thread insert tool makes the hole for a heat-set insert (M2 to M8, 1/4-20 or a size of your own) exactly where you click, on flat faces and on round walls. First it checks that there is enough wall beside the hole and enough depth behind it: a green ring means go, a red one blocks the hole. By @markopo1982."
+    },
+    "guide": {
+      "section": "threadInsert"
+    }
+  },
+  {
+    "title": {
       "de": "Ein getippter Winkel dreht alle gewählten Teile",
       "en": "A typed angle turns every selected part"
     },
