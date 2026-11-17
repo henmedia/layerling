@@ -1,4 +1,5 @@
 "use client";
+import { dinguinUiText } from "@/lib/dinguinUiText";
 import { type GroupHoleChange, withHoleDiameters } from "@/lib/groupHoles";
 import { watchAutoTitles } from "@/lib/autoButtonTitles";
 import { deleteSketchDraft, loadSketchDraft, saveSketchDraft, sketchHasWork, type SketchDraft } from "@/lib/sketchDraftStore";
@@ -80,6 +81,9 @@ import { ALL_MATE_AXES, concentricMotion, mateMotion, pointMotion, pointTurnAbou
 import { roundFaceNear } from "@/lib/roundFaceAxis";
 import { carriedOntoFace } from "@/lib/carryOntoFace";
 import { HolePatternPanel } from "./workplane/HolePatternPanel";
+import { DinguinInsertPanel } from "./workplane/DinguinInsertPanel";
+import { DINGUIN_INSERT_SIZES, customDinguinInsert } from "@/lib/dinguinThreadInsertSafety";
+import { measureDinguinInsert, makeDinguinInsertHole, dinguinSurfaceCenter, type DinguinInsertFace } from "@/lib/dinguinInsertGeometry";
 import { PAINT_VIEW_SIDES, paintedBodyMesh, paintedExportFaceColors, paintLassoStroke, paintSideLasso, paintStrokeAt, paintSurfaceNormalAt, rebasePaintStrokes, type PaintLassoView } from "@/lib/paintMesh";
 import { canPaintShape, DEFAULT_PAINT_TOOL, designPaintColors, normalizePaintTool, paintColors, paintStartColor, PAINT_MAX_STROKES, type PaintStroke, type PaintToolSettings } from "@/lib/paint";
 import { normalizeHexColor } from "@/lib/coloredImport";
@@ -3367,6 +3371,12 @@ export function LayerlingEditor({
     settings: HolePatternSettings;
     busy: boolean;
   } | null>(null);
+  const [dinguinTool,setDinguinTool] = useState<{sourceId:string;face:DinguinInsertFace|null;busy:boolean;geometryFingerprint?:string}|null>(null);
+  const [dinguinPreset,setDinguinPreset]=useState("M3");
+  const [dinguinD3,setDinguinD3]=useState("7");
+  const [dinguinL,setDinguinL]=useState("8");
+  const dinguinRunRef=useRef(0);
+  const dinguinTrianglesRef=useRef<ArrayLike<number>|null>(null);
   const holePatternSettingsRef = useRef<HolePatternSettings>(DEFAULT_HOLE_PATTERN);
   const holePatternPickRunRef = useRef(0);
   const holePatternPickAbortRef = useRef<AbortController | null>(null);
@@ -10179,6 +10189,200 @@ export function LayerlingEditor({
   useEffect(() => {
     if (mateTool && (selectedIds.length !== 1 || selectedIds[0] !== mateTool.sourceId)) setMateTool(null);
   }, [mateTool, selectedIds]);
+
+  // DinguinCAD heat-set insert tool - independent of the existing hole pattern editor.
+  const dinguinSpec = dinguinPreset === "Benutzerdefiniert"
+    ? customDinguinInsert(Number(dinguinD3.replace(",",".")),Number(dinguinL.replace(",",".")))
+    : DINGUIN_INSERT_SIZES.find(s=>s.name===dinguinPreset);
+  // DINGUIN_RC42_LIVE_SAFE: never reuse a safety result from an old mesh.
+  const dinguinCurrentSource = selectedShape?.id === dinguinTool?.sourceId ? selectedShape : null;
+  const dinguinCurrentFingerprint = dinguinCurrentSource ? projectShapesFingerprint([dinguinCurrentSource]) : null;
+  const dinguinFaceCurrent = Boolean(dinguinTool?.face && dinguinCurrentFingerprint && dinguinTool.geometryFingerprint === dinguinCurrentFingerprint);
+  const dinguinResult = useMemo(() => dinguinFaceCurrent && dinguinTool?.face && dinguinSpec
+    ? measureDinguinInsert(dinguinTool.face,dinguinSpec) : null,
+    [dinguinFaceCurrent,dinguinTool?.face,dinguinSpec?.d3,dinguinSpec?.L,dinguinSpec?.W]);
+
+  // Coordinates in mm from the lower-left corner of the selected planar face's
+  // UV bounding rectangle. The coordinate system follows the face when rotated.
+  const dinguinCoordinates = useMemo(() => {
+    const face=dinguinTool?.face;
+    if (!face || isRoundWallFace(face)) return null;
+    const points=face.outline.loops.flat();
+    if (!points.length) return null;
+    const minU=Math.min(...points.map(p=>p.u));
+    const minV=Math.min(...points.map(p=>p.v));
+    return { x:-minU, y:-minV };
+  },[dinguinTool?.face]);
+
+  const moveDinguinByCoordinates = useCallback((x:number,y:number) => {
+    if (!Number.isFinite(x)||!Number.isFinite(y)) return;
+    setDinguinTool(current => {
+      if (!current?.face || current.busy || isRoundWallFace(current.face)) return current;
+      const face=current.face,w=face.workplane;
+      const points=face.outline.loops.flat();
+      if (!points.length) return current;
+      const oldX=-Math.min(...points.map(p=>p.u));
+      const oldY=-Math.min(...points.map(p=>p.v));
+      const du=x-oldX,dv=y-oldY;
+      if (Math.hypot(du,dv)<0.000001) return current;
+      return {...current,face:{...face,
+        workplane:{...w,origin:{
+          x:w.origin.x+w.xAxis.x*du+w.zAxis.x*dv,
+          y:w.origin.y+w.xAxis.y*du+w.zAxis.y*dv,
+          z:w.origin.z+w.xAxis.z*du+w.zAxis.z*dv,
+        }},
+        outline:{...face.outline,loops:face.outline.loops.map(loop=>loop.map(p=>({...p,u:p.u-du,v:p.v-dv})))},
+      }};
+    });
+  },[]);
+
+  const toggleDinguinInsert = useCallback(() => {
+    if (dinguinTool) { dinguinRunRef.current++;setDinguinTool(null);return; }
+    if (refuseBodyLockedSelection()) return;
+    const source=selectedShapes.length===1?selectedShapes[0]:null;
+    if (!source || source.hole || isNonSolidShape(source)) {
+      setNotice(dinguinUiText("selectSolid"));return;
+    }
+    if (edgeModifier || holePatternTool || faceTool || shellTool || deleteFaceTool || splitSession || simplifyToolId) {
+      setNotice(dinguinUiText("closeOtherTool"));return;
+    }
+    stopCruise();setLayFlatPickMode(false);setMateTool(null);
+    dinguinRunRef.current++;
+    dinguinTrianglesRef.current=null;
+    setDinguinTool({sourceId:source.id,face:null,busy:false});
+    setNotice("Gewindeeinsatz: Bohrstelle auf dem Bauteil anklicken.");
+  },[dinguinTool,refuseBodyLockedSelection,selectedShapes,edgeModifier,holePatternTool,faceTool,shellTool,deleteFaceTool,splitSession,simplifyToolId,stopCruise]);
+
+  // Move a bore marker across neighbouring faces without closing the tool.
+  // The source mesh is read once; cylinder-face detection uses Layerling's existing
+  // readHolePatternFace (planar + cylindrical). Unrecognised curves remain blocked.
+  // Purple fixed reference for the currently selected face (not a cutting tool).
+  const dinguinCenter = useMemo(() => dinguinTool?.face
+    ? dinguinSurfaceCenter(dinguinTool.face) : null, [dinguinTool?.face]);
+
+  const moveDinguinFace = useCallback((pick:LayFlatPick|null) => {
+    const triangles=dinguinTrianglesRef.current;
+    if(!pick || !triangles) return;
+    setDinguinTool(current=>{
+      if(!current?.face || current.busy || pick.shapeId!==current.sourceId) return current;
+      const face=current.face;
+      if(!isRoundWallFace(face)) {
+        const w=face.workplane;
+        const dot=pick.normal.x*w.normal.x+pick.normal.y*w.normal.y+pick.normal.z*w.normal.z;
+        if(dot>=.995) {
+          const dx=pick.point.x-w.origin.x,dy=pick.point.y-w.origin.y,dz=pick.point.z-w.origin.z;
+          const u=dx*w.xAxis.x+dy*w.xAxis.y+dz*w.xAxis.z;
+          const v=dx*w.zAxis.x+dy*w.zAxis.y+dz*w.zAxis.z;
+          if(Math.hypot(u,v)<.001) return current;
+          return {...current,face:{...face,
+            workplane:{...w,origin:{...pick.point}},
+            outline:{...face.outline,loops:face.outline.loops.map(loop=>loop.map(p=>({...p,u:p.u-u,v:p.v-v})))}
+          }};
+        }
+      }
+      const read=readHolePatternFace(triangles,pick.point,pick.normal);
+      return read.ok ? {...current,face:read.face} : {...current,face:null};
+    });
+  },[]);
+  // Centre via the same face-picking path used when dragging the marker.
+  // The actual W/L test is evaluated again by dinguinResult and at commit.
+  const centerDinguinFace = useCallback(() => {
+    if (!dinguinTool?.face || !dinguinCenter || dinguinTool.busy) return;
+    moveDinguinFace({
+      shapeId:dinguinTool.sourceId,
+      point:dinguinCenter.point,
+      normal:dinguinCenter.normal
+    } as LayFlatPick);
+  },[dinguinTool,dinguinCenter,moveDinguinFace]);
+
+  const pickDinguinFace=useCallback(async (pick:LayFlatPick|null)=>{
+    if(!dinguinTool || dinguinTool.busy) return;
+    if(dinguinTool.face && pick && pick.shapeId===dinguinTool.sourceId && dinguinTrianglesRef.current) {
+      moveDinguinFace(pick);return;
+    }
+    const run=++dinguinRunRef.current;
+    const source=shapesRef.current.find(s=>s.id===dinguinTool.sourceId);
+    if(!source || !pick || pick.shapeId!==source.id) {setNotice(dinguinUiText("selectFace"));return;}
+    const fingerprint=projectShapesFingerprint([source]);
+    let triangles:ArrayLike<number>;
+    try {triangles=await faceReadForClick(source,fingerprint,new AbortController().signal);}
+    catch(e) {if(run===dinguinRunRef.current)setNotice(String(e),true);return;}
+    const read=readHolePatternFace(triangles,pick.point,pick.normal);
+    const current=shapesRef.current.find(s=>s.id===source.id);
+    if(run!==dinguinRunRef.current || !current || projectShapesFingerprint([current])!==fingerprint) return;
+    dinguinTrianglesRef.current=triangles;
+    if(!read.ok){setDinguinTool(t=>t?{...t,face:null}:t);setNotice("Diese Rundung ist nicht sicher erkennbar. Keine Bohrung.");return;}
+    setDinguinTool(t=>t&&t.sourceId===source.id?{...t,face:read.face,geometryFingerprint:fingerprint}:t);
+  },[dinguinTool,faceReadForClick,moveDinguinFace]);
+
+  const applyDinguinInsert=useCallback(async()=>{
+    const tool=dinguinTool, spec=dinguinSpec;
+    if(!tool?.face || !spec || tool.busy) return;
+    const liveSource=shapesRef.current.find(s=>s.id===tool.sourceId);
+    if(!liveSource || tool.geometryFingerprint!==projectShapesFingerprint([liveSource])) {
+      setNotice(dinguinUiText("partChangedRecheck"),true);
+      return;
+    }
+    const verified=measureDinguinInsert(tool.face,spec);
+    if(!verified.allowed){setNotice(verified.warnings.join(" | "),true);return;}
+    const source=shapesRef.current.find(s=>s.id===tool.sourceId);
+    if(!source || bodyLocked(source)) return;
+    const project=projectInfoRef.current.projectId;
+    const fp=projectShapesFingerprint(shapesRef.current);
+    setDinguinTool({...tool,busy:true});
+    try {
+      const hole=makeDinguinInsertHole(tool.face,spec);
+      const built=await buildGroupedShapeOffThread([source,hole],workspaceSettingsRef.current.booleanTriangleLimit,geometryAbortRef.current?.signal);
+      if(projectInfoRef.current.projectId!==project || fp!==projectShapesFingerprint(shapesRef.current)) {setDinguinTool(null);setNotice(dinguinUiText("partChangedDuring"));return;}
+      if(!built.group){setDinguinTool(t=>t?{...t,busy:false}:t);setNotice(built.failureNotice);return;}
+      const group=canonicalizeShape({...built.group,groupOperation:"group"});
+      dinguinRunRef.current++;
+      setDinguinTool(null);
+      commitShapes([...shapesRef.current.filter(s=>s.id!==source.id),group],group.id,dinguinUiText("holeCreated", { name: spec.name, d3: spec.d3, L: spec.L }));
+    }catch(e){setDinguinTool(t=>t?{...t,busy:false}:t);setNotice(String(e),true);}
+  },[dinguinTool,dinguinSpec,commitShapes]);
+  // DINGUIN_RC42_LIVE_SAFE: refetch the new mesh after resizing the active body.
+  // If the old position cannot be mapped safely, remain blocked and ask for a new pick.
+  useEffect(() => {
+    if (!dinguinTool?.face || !dinguinCurrentSource || !dinguinCurrentFingerprint ||
+        dinguinTool.geometryFingerprint === dinguinCurrentFingerprint) return;
+    const source = dinguinCurrentSource;
+    const fingerprint = dinguinCurrentFingerprint;
+    const anchor = { ...dinguinTool.face.workplane.origin };
+    const normal = { ...dinguinTool.face.workplane.normal };
+    const run = ++dinguinRunRef.current;
+    const controller = new AbortController();
+    dinguinTrianglesRef.current = null;
+    setDinguinTool(current => current?.sourceId === source.id
+      ? { ...current,face:null,geometryFingerprint:undefined } : current);
+    // This callback is tied to the source fingerprint, not to face state updates.
+    void (async () => {
+      try {
+        const triangles = await faceReadForClick(source,fingerprint,controller.signal);
+        const latest = shapesRef.current.find(s=>s.id===source.id);
+        if (controller.signal.aborted || run!==dinguinRunRef.current || !latest ||
+            projectShapesFingerprint([latest])!==fingerprint) return;
+        const read = readHolePatternFace(triangles,anchor,normal);
+        if(!read.ok) {
+          setNotice(dinguinUiText("chooseNewPosition"),true);
+          return;
+        }
+        dinguinTrianglesRef.current=triangles;
+        setDinguinTool(current=>current?.sourceId===source.id && !current.face
+          ? {...current,face:read.face,geometryFingerprint:fingerprint} : current);
+      } catch(error) {
+        if (!controller.signal.aborted && run===dinguinRunRef.current)
+          setNotice("Neue Geometrie konnte nicht gelesen werden. Bohrstelle neu waehlen.",true);
+      }
+    })();
+    return () => controller.abort();
+  },[dinguinCurrentFingerprint,dinguinTool?.sourceId]);
+
+  useEffect(()=>{
+    if(dinguinTool && (selectedIds.length!==1 || selectedIds[0]!==dinguinTool.sourceId)) {
+      dinguinRunRef.current++;setDinguinTool(null);
+    }
+  },[selectedIds,dinguinTool]);
 
   // "Hole pattern" (#223): pick a flat face of the selected body, set the holes, create them as holes grouped with the body.
   const toggleHolePattern = useCallback(() => {
@@ -19382,6 +19586,16 @@ export function LayerlingEditor({
           />
         ) : (
           <WorkplaneViewport
+          onDinguinInsert={toggleDinguinInsert}
+          dinguinInsertActive={Boolean(dinguinTool)}
+          dinguinPreview={dinguinFaceCurrent && dinguinTool?.face && dinguinSpec && Number.isFinite(dinguinSpec.d3) && dinguinSpec.d3>0 ? {
+            origin:dinguinTool.face.workplane.origin,
+            normal:dinguinTool.face.workplane.normal,
+            diameter:dinguinSpec.d3,
+            allowed:Boolean(dinguinResult?.allowed)
+          }:null}
+          dinguinCenter={dinguinCenter}
+          onDinguinDragPick={dinguinFaceCurrent && dinguinTool?.face ? moveDinguinFace : undefined}
           projectName={projectName}
           projectId={editorOpen ? projectId ?? null : null}
           shapes={historyView.shapes ?? viewportShapes}
@@ -19495,7 +19709,9 @@ export function LayerlingEditor({
           onImageCalibrationPoint={addImageCalibrationPoint}
           layFlatPickMode={layFlatPickMode || Boolean(cableTool?.picking)}
           onLayFlatPick={cableTool?.picking ? pickCableEnd : layFlatOnFace}
-          mateFacePick={mateTool && mateTool.mode !== "point" && mateTool.step !== "ready"
+          mateFacePick={dinguinTool
+            ? {shapeIds:[dinguinTool.sourceId]}
+            : mateTool && mateTool.mode !== "point" && mateTool.step !== "ready"
             ? { shapeIds: mateTool.step === "source" ? [mateTool.sourceId] : shapes.filter((shape) => shape.id !== mateTool.sourceId && !shape.hidden).map((shape) => shape.id), round: mateTool.mode === "concentric" }
             : holePatternTool?.step === "pick"
               ? { shapeIds: [holePatternTool.sourceId], joined: faceJoinPositions, round: "either" }
@@ -19517,7 +19733,7 @@ export function LayerlingEditor({
               }
             : null}
           onMatePointPick={pickMatePoint}
-          onMateFacePick={mateTool ? pickMateFace : faceTool ? (pick) => void pickFaceToolFace(pick) : supportRibTool ? (pick) => void pickSupportRibFace(pick) : (pick) => void pickHolePatternFace(pick)}
+          onMateFacePick={dinguinTool ? (pick)=>void pickDinguinFace(pick) : mateTool ? pickMateFace : faceTool ? (pick) => void pickFaceToolFace(pick) : supportRibTool ? (pick) => void pickSupportRibFace(pick) : (pick) => void pickHolePatternFace(pick)}
           paintPick={paintTool && !historyViewState ? { shapeId: paintTool.sourceId, mode: paintTool.settings.mode } : null}
           onPaintPick={paintAtPick}
           onPaintLasso={paintLasso}
@@ -19739,6 +19955,15 @@ export function LayerlingEditor({
           onCancel={() => setSimplifyToolId(null)}
         />
       ) : null}
+      {dinguinTool && selectedShape?.id===dinguinTool.sourceId ? (
+        <DinguinInsertPanel name={displayShapeName(selectedShape)} preset={dinguinPreset} customD3={dinguinD3} customL={dinguinL}
+          onPreset={setDinguinPreset} onCustomD3={setDinguinD3} onCustomL={setDinguinL}
+          result={dinguinResult} busy={dinguinTool.busy}
+          coordinates={dinguinCoordinates} onCoordinates={moveDinguinByCoordinates}
+          centerAvailable={Boolean(dinguinCenter)} onCenter={centerDinguinFace}
+          onPick={()=>{dinguinRunRef.current++;setDinguinTool(t=>t?{...t,face:null}:t);}}
+          onCreate={()=>void applyDinguinInsert()} onCancel={()=>{dinguinRunRef.current++;setDinguinTool(null);}} />
+      ):null}
       {holePatternTool && selectedShape?.id === holePatternTool.sourceId ? (
         <HolePatternPanel
           targetName={displayShapeName(selectedShape)}
