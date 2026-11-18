@@ -1,5 +1,200 @@
 [
   {
+    "version": "1.166.0",
+    "items": [
+      {
+        "title": {
+          "de": "Gussform: Öffnungsrichtung, Material und Luftblasen",
+          "en": "Mold & die: opening direction, material and air traps"
+        },
+        "body": {
+          "de": "Das Werkzeug „Gussform und Stempel“ schlägt jetzt die beste Öffnungsrichtung vor: Jede Richtung zeigt, wie viel der Oberfläche hängen bleiben würde, und Hinterschnitte sind rot auf dem Modell. Dazu kommt eine freie Richtung, die du an einem Griff im Bild drehst, und ein Gussmaterial (Silikon, Gießharz, Gips, Wachs, Seife, Beton) mit Schwund und Dichte.\n\n– Vor dem Machen: Außenmaß, Füllmenge mit Einguss, Gewicht und Luftfallen, mit einem roten Punkt, wo Luft bliebe.\n– Mehrere Modelle bekommen je einen Einguss.\n– Außen ein Block oder eine Konturhülle, die Filament spart.\n– „Stempel und Matrize“ kann das Relief einer Münze oder eines Logos übernehmen.",
+          "en": "The Mold & die tool now suggests the best opening direction: each direction shows how much of the surface would stick, and undercuts are red on the model. There is also a free direction you turn by a knob in the view, and a casting material (silicone, casting resin, plaster, wax, soap, concrete) with its shrinkage and density.\n\n– Before making: outside size, pour volume with the sprue, weight and air traps, with a red dot where air would stay.\n– Several masters get a sprue each.\n– On the outside a block or a contour shell that saves filament.\n– Stamp & die can copy the relief of a coin or a logo."
+        },
+        "guide": {
+          "section": "mold"
+        }
+      },
+      {
+        "title": {
+          "de": "Aushöhlen: Gridfinity-Boden, Stapeln und neue Verschlüsse",
+          "en": "Hollow: Gridfinity floor, stacking and new latches"
+        },
+        "body": {
+          "de": "Eine oben offen ausgehöhlte Box kann jetzt einen Gridfinity-Boden bekommen, mit einer Mulde für jedes ganze Feld, auf Wunsch mit Magnetlöchern, und Trennwände wie bei einem Gridfinity-Behälter. Das Stapeln läuft jetzt über einen Fuß, der in die Box darunter greift, auf Wunsch hohl und mit Griffmulden; ein Stapeldeckel nimmt den Fuß der nächsten Box auf.\n\nDer Deckel hat zwei neue Verschlussarten neben den Klammern: Schieber wie an einem Werkzeugkoffer und Riegel, die in einem Rohr an der Wand sitzen und an Ort und Stelle gedruckt werden.",
+          "en": "A box hollowed with its top open can now get a Gridfinity floor, with a socket for each whole cell, magnet holes on request, and dividers like a Gridfinity bin's. Stacking now goes by a foot that fits into the box below, hollow and with grip recesses if you like; a stacking top takes the next box's foot.\n\nThe lid has two new kinds of latch next to the clips: sliders as on a tool case, and barrel bolts that sit in a tube on the wall and are printed in place."
+        },
+        "guide": {
+          "section": "hollowing"
+        }
+      },
+      {
+        "title": {
+          "de": "Druckanalyse: jede Schicht geprüft, mit Schichtansicht",
+          "en": "Print analysis: every layer checked, with a layer view"
+        },
+        "body": {
+          "de": "Neben „Druckprüfung“ gibt es jetzt die „Druckanalyse“. Sie schneidet die gewählten Teile (oder alle sichtbaren) in die Schichten, die dein Drucker aufträgt, und vergleicht jede mit der darunter. Heraus kommt eine Liste: erst Probleme, dann Hinweise, etwa schwebende Teile, Flächen ohne Stütze, Überhänge, Brücken, zu dünne Wände, kleine Inseln und zu wenig Haftung am Bett, jeweils mit dem, was hilft, oft mit einem Knopf dafür.\n\nEin Klick auf einen Befund öffnet die Schichtansicht: das Teil in dieser Schicht aufgeschnitten, die Stelle farbig, mit Schichtregler und Verlauf der Querschnittsfläche. Ein Slicer-Vorschau ist es nicht.",
+          "en": "Next to Print check there is now Print analysis. It cuts the selected parts (or every visible one) into the layers your printer lays down and compares each with the one below. You get a list, problems first and then hints: floating parts, areas without support, overhangs, bridges, walls that are too thin, small islands and too little bed adhesion, each with what helps, often with a button for it.\n\nA click on a finding opens the layer view: the part cut open at that layer with the spot painted, a layer slider and the cross-section over the height. It is no slicer preview."
+        },
+        "guide": {
+          "section": "layerCheck"
+        }
+      },
+      {
+        "title": {
+          "de": "Schrauben und Gewindestangen längs teilen",
+          "en": "Screws and threaded rods, split lengthwise"
+        },
+        "body": {
+          "de": "Eine stehend gedruckte Schraube bricht unter Last entlang ihrer Schichten, liegend gedruckt ist ihr Gewinde um ein Vielfaches stabiler. In den Eigenschaften einer Schraube oder Gewindestange teilt „Längs teilen und flach legen“ sie durch ihre eigene Achse und legt beide Hälften auf ihre Schnittflächen, in einem Schritt zum Rückgängigmachen.\n\nMit Zentrierstiften (standardmäßig an) sitzen die Hälften genau aufeinander, auch in Längsrichtung, damit die Gewindegänge treffen und die Mutter nicht klemmt. Danach werden die Hälften geklebt.",
+          "en": "A screw printed standing breaks along its layers under load; printed lying down its thread is many times stronger. In the properties of a screw or threaded rod, Split lengthwise and lay flat cuts it in two through its own axis and lays both halves on their cut faces, in one undo step.\n\nWith centring pins (on by default) the halves line up exactly, along the axis too, so the turns meet and the nut does not jam. Glue the halves afterwards."
+        },
+        "guide": {
+          "chapter": "threads"
+        }
+      },
+      {
+        "title": {
+          "de": "Gewindeeinsätze: das Loch mit Prüfung",
+          "en": "Thread inserts: the hole, checked first",
+          "da": "Gevindindsatser: hullet tjekkes først"
+        },
+        "body": {
+          "de": "Das neue Werkzeug „Gewindeeinsatz“ bohrt das Loch für einen Einschmelzeinsatz (M2 bis M8, 1/4-20 oder eigene Größe) genau dort, wo du klickst, in ebene Flächen und in runde Wände. Vorher prüft es, ob neben dem Loch genug Wand und dahinter genug Tiefe bleibt: Ein grüner Ring heißt los, ein roter sperrt das Loch. Von @markopo1982.",
+          "en": "The new Thread insert tool makes the hole for a heat-set insert (M2 to M8, 1/4-20 or a size of your own) exactly where you click, on flat faces and on round walls. First it checks that there is enough wall beside the hole and enough depth behind it: a green ring means go, a red one blocks the hole. By @markopo1982.",
+          "da": "Det nye værktøj Gevindindsats laver hullet til en varmeindsats (M2 til M8, 1/4-20 eller en størrelse af din egen) præcis, hvor du klikker, på flade flader og runde vægge, og tjekker først, at væggen ved siden af hullet og dybden bagved rækker: en grøn ring betyder kør, en rød blokerer hullet. Af @markopo1982."
+        },
+        "guide": {
+          "section": "threadInsert"
+        }
+      },
+      {
+        "title": {
+          "de": "Ein getippter Winkel dreht alle gewählten Teile",
+          "en": "A typed angle turns every selected part",
+          "da": "En indtastet vinkel drejer alle de valgte dele"
+        },
+        "body": {
+          "de": "Waren mehrere Teile ausgewählt, drehte ein ins Winkelfeld getippter Winkel nur das letzte: Bei zwei Quadern und 30° blieb der erste bei 0°. Jetzt drehen sich alle, und ein Rückgängig dreht sie alle zurück.",
+          "en": "With several parts selected, an angle typed into the angle box turned only the last of them: with two boxes and 30°, the first stayed at 0°. Now they all turn, and one Undo turns them all back.",
+          "da": "Når flere dele var valgt, drejede en vinkel, der blev tastet i vinkelfeltet, kun den sidste af dem: med to kasser og 30° blev den første stående på 0°. Nu drejer de alle, og én Fortryd drejer dem alle tilbage."
+        },
+        "guide": {
+          "section": "rotating"
+        }
+      },
+      {
+        "title": {
+          "de": "Befestigungslöcher für Platten und Deckel",
+          "en": "Mounting holes for plates and lids",
+          "da": "Monteringshuller til plader og låg"
+        },
+        "body": {
+          "de": "Das Lochmuster hat einen zweiten Reiter „Befestigungslöcher“. Er setzt Schraubenlöcher in die Ecken des kleinsten Rechtecks um die gewählte Fläche, gleich weit von den Seiten, auch bei einer gedrehten oder eingekerbten Platte, bei der „Entlang der Kante“ die Löcher ungleichmäßig verteilt.\n\n– Abstand zu den Seiten: bis zur Kante des Lochs (ein Schraubenkopf zählt mit) oder bis zur Lochmitte.\n– Anzahl: vier in den Ecken, die übrigen paarweise gleichmäßig entlang der Seiten, etwa für einen wasserdichten Deckel.\n– Auf einer runden Fläche, zum Beispiel dem Deckel einer runden Box, verteilen sie sich gleichmäßig auf einem Kreis, mindestens drei.\n– Einfach, mit Senkung oder Kegelsenkung, durch oder bis zu einer Tiefe.\n\nEs entstehen gewöhnliche Lochformen, mit dem Körper gruppiert, die Bohrungskarte der Gruppe wirkt also auch auf sie.",
+          "en": "The Hole pattern has a second tab, Mounting holes. It puts screw holes in the corners of the smallest rectangle round the picked face, the same distance from its sides, even on a turned or notched plate where \"Along the edge\" spreads the holes unevenly.\n\n– Distance from the sides: to the hole's edge (a screw head counts) or to the hole's middle.\n– Number of holes: four in the corners, the rest in pairs, evenly spaced along the sides, for example for a watertight lid.\n– On a round face, such as the lid of a round box, they go evenly round a circle, three or more.\n– Plain, counterbore or countersink, through or to a depth.\n\nThey are made as ordinary hole shapes grouped with the body, so the group's hole diameter card works on them too.",
+          "da": "Hulmønsteret har en anden fane, Monteringshuller. Den sætter skruehuller i hjørnerne af det mindste rektangel omkring den valgte flade, i samme afstand fra dets sider, også på en drejet eller udskåret plade, hvor \"Langs kanten\" fordeler hullerne ujævnt.\n\n– Afstand fra siderne: til hullets kant (et skruehoved medregnes) eller til hullets midte.\n\n– Antal huller: fire i hjørnerne, resten parvis, jævnt fordelt langs siderne, for eksempel til et vandtæt låg.\n\n– På en rund flade, som låget på en rund æske, sidder de jævnt fordelt rundt på en cirkel, tre eller flere.\n\n– Almindeligt, med cylindrisk forsænkning eller kegleforsænkning, gennemgående eller til en dybde.\n\nDe laves som almindelige hulformer grupperet med formen, så gruppens \"Huldiameter\" virker på dem også."
+        },
+        "guide": {
+          "section": "holePattern"
+        }
+      },
+      {
+        "title": {
+          "de": "Neue Form: Kreisausschnitt",
+          "en": "New shape: Sector",
+          "da": "Ny form: Cirkeludsnit"
+        },
+        "body": {
+          "de": "In der Formenbibliothek unter den Grundformen (nach dem Torus) gibt es den „Kreisausschnitt“: eine Kreisscheibe, die du über den Winkel (1 bis 360°) wie einen Uhrzeiger zurückschneidest, von zwölf Uhr im Uhrzeigersinn.\n\n– Innen-Ø: bei 0 ein volles Stück, darüber ein Ring oder ein Ringsegment.\n– Enden runden: rundet die beiden Enden bis zum Halbkreis. So entsteht ein gebogenes Langloch, zum Beispiel für Monitorhalter und andere Teile, die sich drehen und festklemmen lassen.\n– Durchmesser und Höhe wie beim Zylinder.\n\nDer Rahmen bleibt der volle Kreis, die Form dreht sich also um die Mitte des Kreises.",
+          "en": "The shape library has a new basic shape after the Torus, the Sector: a disc that you cut back with the angle (1 to 360°) like a clock hand, from twelve o'clock clockwise.\n\n– Inner diameter: 0 is a solid piece, more gives a ring or a ring segment.\n– End rounding: rounds the two ends, up to a half circle. That gives a curved slot, for example for monitor mounts and other parts that turn and get clamped.\n– Diameter and height as on the Cylinder.\n\nThe frame stays the full circle, so the shape turns about the circle's middle.",
+          "da": "Formbiblioteket har en ny grundform efter Torus, Cirkeludsnit: en skive, som du skærer ind med vinklen (1 til 360°) som en urviser, fra klokken tolv og med uret.\n\n– Indvendig diameter: 0 er et massivt stykke, mere giver en ring eller et ringstykke.\n\n– Afrunding af enderne: runder de to ender, op til en halvcirkel. Det giver et buet langhul, for eksempel til skærmbeslag og andre dele, der drejes og spændes fast.\n\n– Diameter og højde som på cylinderen.\n\nRammen forbliver den fulde cirkel, så formen drejer om cirklens midte."
+        },
+        "guide": {
+          "chapter": "shapes"
+        }
+      },
+      {
+        "title": {
+          "de": "Mehrkant mit runden Ecken",
+          "en": "Polygon with rounded corners",
+          "da": "Polygon med runde hjørner"
+        },
+        "body": {
+          "de": "Ein Mehrkant hat jetzt unter „Seiten“ einen Regler „Eckenverrundung“ und einen Ziehpunkt am Modell, wie bei der Box mit runden Ecken. Ein Radius für alle Ecken, bei jeder Seitenzahl.\n\nDer Radius gilt in mm, ein gestreckter Mehrkant behält also runde Ecken. Der größte Wert ist dort, wo sich benachbarte Rundungen treffen. 0 ist der einfache Mehrkant, genau wie bisher.",
+          "en": "A polygon now has a \"Corner fillet\" slider under \"Sides\" and a drag dot on the model, like the Rounded box. One radius for every corner, for any number of sides.\n\nThe radius is in mm, so a stretched polygon keeps round corners. The largest value is where neighbouring roundings meet. 0 is the plain polygon, exactly as before.",
+          "da": "En polygon har nu skyderen \"Hjørnerunding\" under \"Sider\" og et trækpunkt på modellen, ligesom den rundede kasse. Én radius gælder for alle hjørner, uanset antal sider.\n\nDen angives i millimeter, så en strakt polygon beholder runde hjørner. Den største værdi er der, hvor nabohjørnernes rundinger mødes. 0 er den almindelige polygon, præcis som før."
+        },
+        "guide": {
+          "chapter": "shapes"
+        }
+      },
+      {
+        "title": {
+          "de": "Bohrungen einer Gruppe auf einmal ändern",
+          "en": "Change the holes of a group at once",
+          "da": "Skift hullerne i en gruppe på én gang"
+        },
+        "body": {
+          "de": "Enthält eine Gruppe, oder eine Gruppe darin, runde Bohrungen, zeigt ihr Fenster einen Regler „Bohrungsdurchmesser“ für alle gleichzeitig und den Schalter „Einzeln“, der jede Bohrung mit eigenem Durchmesser auflistet.\n\nJede Bohrung behält ihre Mitte und ihre Tiefe. Die Gruppen werden von innen nach außen neu aufgebaut, wie bei „Gruppe bearbeiten → Fertig“, als ein Schritt zum Rückgängigmachen. Platinen, Schilder, QR-Codes und Bündel bleiben unberührt, und nur runde Bohrungen zählen, eckige oder ovale ändern sich nicht.",
+          "en": "When a group, or a group inside it, holds round holes, its window shows a \"Hole diameter\" slider for all of them at once and a \"One by one\" switch that lists each hole with its own diameter.\n\nEvery hole keeps its middle and its depth. The groups are rebuilt from the inside out, the way Edit group → Done does it, as one undo step. Boards, tags, QR codes and bundles are left alone, and only round holes count, so square or oval ones are not touched.",
+          "da": "Når gruppen, eller en gruppe i den, indeholder runde huller, viser dens vindue skyderen \"Huldiameter\" for dem alle på én gang og kontakten \"Ét ad gangen\", som viser hvert hul med sin egen diameter.\n\nHvert hul beholder sit centrum og sin dybde. Grupperne bygges igen indefra og ud, som \"Redigér gruppe\" og \"Udført\" gør det, i ét fortrydelsestrin. Plader, skilte, QR-koder og bundter lades urørt, og kun runde huller tæller, så firkantede eller ovale ændres ikke."
+        },
+        "guide": {
+          "chapter": "shapes"
+        }
+      },
+      {
+        "title": {
+          "de": "Gridfinity-Behälter mit Überstand",
+          "en": "Gridfinity bins that overhang the grid",
+          "da": "Gridfinity-bakker, der rækker ud over gitteret"
+        },
+        "body": {
+          "de": "Füllt eine Bodenplatte mit Ausgleich eine Schublade, die kein ganzes Raster misst, kann ein Behälter jetzt auf jeder Seite über das Raster hinausreichen, über den Ausgleich bis an die Wand, damit nichts daneben hinunterfällt. Die Füße bleiben auf dem Raster. Eine Fase unter dem Überstand lässt ihn ohne Stützen drucken; ein massiver Überstand oder ein Stapelrand auf dem Raster sind wählbar.",
+          "en": "When a padded baseplate fills a drawer that is not whole units, a bin can now reach out beyond the grid on any side, over the padding to the wall, so nothing falls down beside it. Its feet stay on the grid. A chamfer under the overhang lets it print without supports; a solid overhang or a lip kept on the grid are there to choose.",
+          "da": "Når en grundplade med kantfyld udfylder en skuffle, der ikke er et helt antal gitterenheder, kan en bakke nu række ud over gitteret på hver side, over kantfyldet til væggen, så intet falder ned ved siden af den. Dens fødder bliver på gitteret. En fase under overhænget gør, at den kan printes uden støtte; et massivt overhæng eller \"Hold stabelkraven på gitteret\" kan du vælge imellem."
+        }
+      },
+      {
+        "title": {
+          "de": "Niedrigere Trennwände in Gridfinity-Behältern",
+          "en": "Lower dividers in Gridfinity bins",
+          "da": "Lavere skillevægge i Gridfinity-bakker"
+        },
+        "body": {
+          "de": "Die Trennwände eines Gridfinity-Behälters oder einer Schale müssen nicht mehr über die ganze Höhe reichen: Stell unter „Fächer“ die „Trennwandhöhe“ ein, gemessen vom Boden, ab 3 mm. Die Wände bleiben, wie sie sind, und eine Etikettenleiste an einer Trennwand sitzt mit ihr tiefer.",
+          "en": "The dividers in a Gridfinity bin or tray no longer have to run their full height: set \"Divider height\" under \"Compartments\", measured from the floor, from 3 mm up. The walls stay as they are, and a label shelf on a divider comes down with it.",
+          "da": "Skillevæggene i en Gridfinity-bakke eller -skål behøver ikke længere at løbe i fuld højde: sæt \"Skillevægshøjde\" under \"Rum\", målt fra bunden, fra 3 mm op. Væggene bliver, som de er, og en etiketliste på en skillevæg kommer ned med den."
+        }
+      },
+      {
+        "title": {
+          "de": "Text auf den Etikettenleisten von Gridfinity-Schalen",
+          "en": "Text on a Gridfinity tray's label shelves",
+          "da": "Tekst på Gridfinity-skålens etikethylder"
+        },
+        "body": {
+          "de": "Auch die Etikettenleisten einer Gridfinity-Schale können jetzt einen Text tragen, an der Wand oder in einem Fach, mit Schriftart, Buchstabenfarbe und Buchstabengröße wie bei einem Behälter. Eine Leiste mit Text sitzt 0,4 mm tiefer, sodass die Buchstaben bündig mit der Oberkante der Schale enden. Tipp den Text im Eigenschaften-Fenster unter der Leiste bei „Text“ ein.",
+          "en": "A Gridfinity tray's label shelves now take a text too, along a wall or in a compartment, with the same font, letter colour and letter size as a bin's. A shelf with a text sits 0.4 mm lower, so the letters end level with the tray's top. Type the text under \"Text\" below the shelf in the Properties panel.",
+          "da": "En Gridfinity-skåls etikethylder kan nu også tage en tekst, langs en væg eller i et rum, med samme font, bogstavfarve og bogstavstørrelse som en bakkes. En hylde med tekst sidder 0,4 mm lavere, så bogstaverne ender i flugt med skålens top. Skriv teksten under \"Tekst\" under hyldens værdier i Egenskaber."
+        }
+      },
+      {
+        "title": {
+          "de": "Bodenplatten, passend zum Drucker geteilt",
+          "en": "Baseplates split to fit your printer",
+          "da": "Bundplader deles, så de passer til din printer"
+        },
+        "body": {
+          "de": "Ist dein Drucker in den Arbeitsbereich-Einstellungen gewählt, hat eine Bodenplatte, die größer ist als sein Druckbett, im Eigenschaften-Fenster den Knopf „Passend zum Drucker teilen“. Er teilt die Platte an den Zellgrenzen in so wenige Platten wie möglich, die auf das Druckbett passen, jede mit „Swallowtail“, und legt die Verbinder davor, die sie zusammenhalten. Die Platten bleiben, wo ihre Zellen waren, also schiebe oder drehe sie eine nach der anderen auf das Druckbett.",
+          "en": "With your printer chosen in the workspace settings, a baseplate larger than the printer's bed has \"Split to fit the printer\" in its Properties panel. It cuts the plate on its cell lines into the fewest plates that fit the bed, each with \"Swallowtail\", and lays out the keys that hold them together. The plates stay where their cells were, so move or turn them onto the bed one by one.",
+          "da": "Når din printer er valgt i arbejdsområdeindstillingerne, har en bundplade, der er større end printerens byggeplade, \"Del til printeren\" i Egenskaber. Den skærer pladen langs cellernes kanter i de færrest mulige plader, der passer på byggepladen, hver med \"Svalehale\", og lægger de samlestykker, der holder dem sammen, frem foran dem. Pladerne ligger, hvor deres celler lå, så flyt eller drej dem ind på byggepladen én ad gang."
+        }
+      }
+    ]
+  },
+  {
     "version": "1.165.2",
     "items": [
       {
