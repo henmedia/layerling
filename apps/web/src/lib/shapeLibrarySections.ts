@@ -28,7 +28,7 @@ export type ShapeLibrarySectionId =
 export const SHAPE_LIBRARY_SECTIONS: readonly { id: Exclude<ShapeLibrarySectionId, "other">; shapes: readonly string[] }[] = [
   { id: "basic", shapes: ["box", "roundedBox", "cylinder", "slot", "ellipse", "polygon", "wedge", "sphere", "cone", "curvedCone", "pyramid", "round-roof", "half-sphere", "paraboloid", "torus", "sector"] },
   { id: "vessels", shapes: ["loft", "tube", "bentTube", "vase"] },
-  { id: "holes", shapes: ["counterbore", "countersink", "teardrop", "port"] },
+  { id: "holes", shapes: ["counterbore", "countersink", "teardrop", "port", "threadInsert"] },
   { id: "connections", shapes: ["thread", "finishingWasher", "hinge", "dovetail"] },
   { id: "enclosure", shapes: ["screwBoss", "snapFit", "rib"] },
   { id: "mechanics", shapes: ["spring", "gear", "hirth", "pulley"] },

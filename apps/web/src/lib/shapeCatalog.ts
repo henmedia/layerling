@@ -381,7 +381,16 @@ export const sbcBoardAsset: ToolbarShapeAsset = {
  * The double countersink is not listed on its own: it is the countersink with "Both sides" switched on (#621). The
  * kind stays in the catalogue, so bodies that already are one, and the MCP, keep working.
  */
-export const libraryShapeAssets: ToolbarShapeAsset[] = toolbarShapeAssets.flatMap((asset) => (asset.id === "text" ? [asset, nameTagAsset, iconTagAsset, qrCodeAsset] : asset.id === "port" ? [asset, sbcBoardAsset] : asset.id === "doubleCountersink" ? [] : [asset]));
+export const threadInsertLibraryAsset: ToolbarShapeAsset = {
+  id: "threadInsert",
+  name: "Thread insert",
+  src: "assets/editor/shape-icons-gray/counterbore.png",
+  menuIcon: "assets/editor/shape-icons-gray/counterbore.png",
+  kind: "counterbore",
+  color: "#b69b46",
+};
+
+export const libraryShapeAssets: ToolbarShapeAsset[] = [threadInsertLibraryAsset, ...toolbarShapeAssets.flatMap((asset) => (asset.id === "text" ? [asset, nameTagAsset, iconTagAsset, qrCodeAsset] : asset.id === "port" ? [asset, sbcBoardAsset] : asset.id === "doubleCountersink" ? [] : [asset]))];
 
 /**
  * The colour a new shape of this asset starts with: the asset's own, unless the shape
@@ -1510,6 +1519,7 @@ const SHAPE_MENU_LABEL_KEYS: Record<string, MessageKey> = {
 };
 
 export function shapeAssetMenuLabel(asset: Pick<ShapeAsset, "id" | "name">): string {
+  if (asset.id === "threadInsert") return t("threadInsert.title");
   const key = SHAPE_MENU_LABEL_KEYS[asset.id];
   return key ? t(key) : shapeAssetLabel(asset);
 }

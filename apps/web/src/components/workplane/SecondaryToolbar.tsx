@@ -789,6 +789,13 @@ export function SecondaryToolbar({
     onToolbarModeChange(mode);
   };
   const addShapeFromMenu = (shape: ShapeAsset) => {
+    if (shape.id === "threadInsert") {
+      if (canHolePattern || threadInsertActive) {
+        onThreadInsert();
+        closeShapesAfterPick();
+      }
+      return;
+    }
     onAddShape({ ...shape, name: shapeAssetLabel(shape) });
     closeShapesAfterPick();
   };
@@ -1083,7 +1090,8 @@ export function SecondaryToolbar({
         title={shapeAssetMenuLabel(shape).replace(/\s+/g, " ")}
         aria-label={shapeAssetMenuLabel(shape).replace(/\s+/g, " ")}
         style={{ "--shape-default-color": shapeAssetColor(shape, shapeCustomizations[shape.kind]) } as CSSProperties}
-        draggable
+        draggable={shape.id !== "threadInsert"}
+        disabled={shape.id === "threadInsert" && !canHolePattern && !threadInsertActive}
         onClick={() => {
           if (suppressNextShapeClickRef.current) {
             suppressNextShapeClickRef.current = false;
@@ -1133,6 +1141,10 @@ export function SecondaryToolbar({
           addShapeFromMenu(shape);
         }}
         onDragStart={(event) => {
+          if (shape.id === "threadInsert") {
+            event.preventDefault();
+            return;
+          }
           event.dataTransfer.effectAllowed = "copy";
           event.dataTransfer.setData("application/x-layerling-shape", JSON.stringify(shape));
         }}
