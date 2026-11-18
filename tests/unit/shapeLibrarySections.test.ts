@@ -64,7 +64,7 @@ describe("searching the shape library (#1170)", () => {
     expect(found("charniere")).toEqual(["hinge"]);
     expect(found("ressort")).toEqual(["spring"]);
     expect(found("gear")).toEqual(["gear"]);
-    expect(found("Gewinde")).toEqual(["thread"]);
+    expect([...found("Gewinde")].sort()).toEqual(["thread", "threadInsert"]); // the thread insert is found by "Gewinde" too, through its keywords
     await setLanguage("en", false);
     expect(found("charniere")).toEqual([]);
   });

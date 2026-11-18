@@ -172,7 +172,7 @@ På en plade eller et låg med udskæringer i siderne fordeler {{ui:holePattern.
 
 ## Hul til en gevindindsats
 
-En varmeindsats presses ind i en plastdel med en loddekolbe og giver skruer et gevind, der ikke slides op. {{ui:threadInsert.title}} laver hullet til den, hvor du klikker, og fortæller dig først, om formen har nok materiale dér. Vælg præcis én form og klik på {{ui:threadInsert.title}} i {{ui:editor.section.mirrorPattern}}-gruppen i båndet, ved siden af hulmønsteret. Du kan også højreklikke på formen eller trykke på [[Ctrl]]+[[K]].
+En varmeindsats presses ind i en plastdel med en loddekolbe og giver skruer et gevind, der ikke slides op. {{ui:threadInsert.title}} laver hullet til den, hvor du klikker, og fortæller dig først, om formen har nok materiale dér. Vælg præcis én form, åbn formbiblioteket og klik på {{ui:threadInsert.title}} under {{ui:library.section.holes}}. Du kan også finde den med [[Ctrl]]+[[K]]. I modsætning til de andre former kan den ikke trækkes ind i tegningen, fordi den virker på den valgte form.
 
 1. Vælg {{ui:threadInsert.size}} i vinduet: M2 til M8, de korte M3, M4 og M5, eller 1/4-20. Med {{ui:threadInsert.custom}} skriver du hullets diameter og indsatsens længde; den væg, der skal blive stående rundt om hullet, følger af diameteren. Vinduet viser hullets diameter og dybde og denne væg.
 2. Klik på stedet på formen. En flad flade duer, og det gør den ydre væg på en cylinder eller et rør også; enhver anden kurve afvises med et tip. En ring viser hullet: grøn, hvor formen har den væg ved siden af hullet og den dybde bagved, som indsatsen skal bruge, rød, hvor en af dem kommer til kort. Rød fortæller hvilken og med hvor meget, og hvor bred formen skal være rundt om hullet.

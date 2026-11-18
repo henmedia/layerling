@@ -169,7 +169,7 @@ På en platta eller ett lock med skåror i sidorna fördelar {{ui:holePattern.ar
 
 ## Hål för en gänginsats
 
-En gängad värmeinsats pressas in i en plastdel med en lödkolv och ger skruvar en gänga som inte slits ut. {{ui:threadInsert.title}} gör hålet för den där du klickar och talar först om huruvida kroppen har tillräckligt med material där. Markera exakt en kropp och klicka på {{ui:threadInsert.title}} i gruppen {{ui:editor.section.mirrorPattern}} i verktygsfältet, bredvid hålmönstret. Du kan också högerklicka på kroppen eller trycka [[Ctrl]]+[[K]].
+En gängad värmeinsats pressas in i en plastdel med en lödkolv och ger skruvar en gänga som inte slits ut. {{ui:threadInsert.title}} gör hålet för den där du klickar och talar först om huruvida kroppen har tillräckligt med material där. Markera exakt en kropp, öppna formbiblioteket och klicka på {{ui:threadInsert.title}} under {{ui:library.section.holes}}. Du hittar den också med [[Ctrl]]+[[K]]. Till skillnad från de andra formerna går den inte att dra in i designen, eftersom den verkar på den markerade kroppen.
 
 1. Välj {{ui:threadInsert.size}} i fönstret: M2 till M8, de korta M3, M4 och M5 eller 1/4-20. Med {{ui:threadInsert.custom}} skriver du in hålets diameter och insatsens längd; väggen som måste finnas kvar runt hålet följer av diametern. Fönstret visar hålets diameter och djup samt den väggen.
 2. Klicka på platsen på kroppen. En plan yta fungerar, och det gör även utsidan av en cylinder eller ett rör; varje annan kurva avvisas med en hint. En ring visar hålet: grön där kroppen har den vägg bredvid hålet och det djup bakom det som insatsen behöver, röd där något av dem inte räcker. Röd säger vilket och med hur mycket, och hur bred kroppen måste vara runt hålet.

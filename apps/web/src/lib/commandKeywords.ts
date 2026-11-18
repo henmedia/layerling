@@ -39,7 +39,6 @@ export const COMMAND_KEYWORDS: Readonly<Record<string, readonly string[]>> = {
   stencilBridges: ["stencil", "stencil bridges", "bridges", "bridge", "islands", "counter", "letters fall out", "falls out", "cut out text", "schablone", "schablonenstege", "stege", "steg", "brücken", "bruecken", "inseln", "buchstaben fallen heraus", "fällt heraus", "faellt heraus"],
   supportRib: ["support rib", "support", "supports", "tilted", "tilt", "45 degrees", "falls over", "tip over", "brim", "stützrippe", "stuetzrippe", "stütze", "stuetze", "schräg drucken", "schraeg drucken", "kippt", "umkippen", "rippe"],
   holePattern: ["hole pattern", "perforate", "perforation", "perforated", "holes", "vent", "ventilation", "grille", "honeycomb", "hexagon holes", "slots", "lochmuster", "lochraster", "perforieren", "locher", "löcher", "loecher", "lüftung", "lueftung", "gitter", "wabe", "langloch", "luftschlitze", "cylinder holes", "round wall", "pen holder", "zylinder löcher", "runde wand", "stiftebecher"],
-  threadInsert: ["thread insert", "threaded insert", "heat set", "heat-set", "heat set insert", "brass insert", "insert nut", "screw insert", "m3 insert", "hole for insert", "gewindeeinsatz", "gewindeeinsätze", "gewindebuchse", "einpressmutter", "einschmelzmutter", "messingeinsatz", "schraubeneinsatz", "bohrung für einsatz"],
   faceTool: ["face", "push", "pull", "push pull", "extrude", "pad", "boss", "pocket", "recess", "thicken", "thicker", "wall", "inset", "flaeche", "fläche", "herausziehen", "hineinziehen", "tasche", "vertiefung", "aufdicken", "verdicken", "erhebung"],
   array: ["array", "pattern", "repeat", "muster", "reihe", "kreis", "wiederholen", "vervielfachen"],
   split: ["split", "cut", "slice", "teilen", "schneiden", "trennen", "saegen", "sägen", "ebene", "dowel", "dowels", "plug", "peg", "pin", "connector", "connectors", "dübel", "duebel", "zapfen", "passstift", "verbinder", "dovetail", "tongue", "groove", "schwalbenschwanz", "stretch", "lengthen", "elongate", "longer", "shorten", "strecken", "verlängern", "verlaengern", "länger", "laenger", "kürzen", "kuerzen"],
@@ -93,6 +92,7 @@ export const COMMAND_KEYWORDS: Readonly<Record<string, readonly string[]>> = {
 
 /** The words of a shape, beyond its name: what people call it elsewhere. */
 export const SHAPE_KEYWORDS: Readonly<Record<string, readonly string[]>> = {
+  threadInsert: ["thread insert", "threaded insert", "heat set", "heat-set", "heat set insert", "brass insert", "insert nut", "screw insert", "m3 insert", "hole for insert", "gewindeeinsatz", "gewindeeinsätze", "gewindebuchse", "einpressmutter", "einschmelzmutter", "messingeinsatz", "schraubeneinsatz", "bohrung für einsatz"],
   box: ["cube", "block", "quader", "wuerfel", "würfel", "rechteck"],
   roundedBox: ["rounded cube", "abgerundet", "rounded box", "rundquader"],
   cylinder: ["tube", "pipe", "rod", "zylinder", "rohr", "stab", "walze", "drill point", "drilled hole", "blind hole", "bohrerspitze", "bohrspitze", "bohrung", "sackloch"],
