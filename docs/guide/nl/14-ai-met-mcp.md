@@ -142,6 +142,7 @@ De AI werkt met dezelfde functies als jij, via dezelfde weg als jouw bediening i
 | `layerling_check_clearance` | controleert vóór het printen welke onderdelen overlappen, elkaar raken of dichter bij elkaar komen dan een minimale speling (Speling controleren), ook de losse delen van één object |
 | `layerling_printer_play` | leest, zet of wist de speling van de printer ({{ui:workspace.printerPlay}} in de instellingen) en legt de pastest neer die hem meet |
 | `layerling_check_print` | controleert vóór het printen wat er mis zou gaan: te dunne wanden voor de nozzle, zwevende delen, weinig houvast op de plaat, overhangen en open meshes (Print controleren) |
+| `layerling_check_layers` | snijdt de print in lagen en geeft per laag wat er mis zou gaan: overhangen, plekken zonder steun, bruggen, dunne wanden, kleine eilanden, een deel in het bed (Printanalyse) |
 | `layerling_split_bolt` | deelt een schroef of draadeind in de lengte door de as en legt beide helften op hun snijvlak om te printen, desgewenst met centreerpennen |
 | `layerling_add_reference_points` | markeert referentiepunten - op het midden, de hoeken of de randmiddens van objecten, of op exacte posities - waarop vormen snappen |
 | `layerling_list_reference_points` | somt de referentiepunten op met hun id's en posities |

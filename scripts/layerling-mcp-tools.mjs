@@ -1926,6 +1926,23 @@ export const tools = [
     },
   },
   {
+    name: "layerling_check_layers",
+    description: "Check a print layer by layer, as the editor's Print analysis does: the bodies (ids, else the selection, else every visible one, joined as the slicer joins them) are cut into layers of `layerHeight` (0.2) and each layer compared with the one below, in one go. First the whole: inBed (reaches into the plate; layers below it are not counted), floatsAbove, openMesh, tooLarge (larger than the printer chosen in the settings). Then per layer: unsupported (starts with nothing under it, or reaches flat out on one side only, such as the arms of a T: a problem), overhang (beyond `overhangHint` 45 degrees from the vertical a hint, beyond `overhangProblem` 60 a problem), bridge (a flat place held on two sides or all round, a hint when its span is over `bridgeSpan` 10 mm), thinWall (under `minWall`, default two lines of the `nozzle` 0.4), smallIsland (a separate place under 2 mm² going on for 2 mm or more), adhesion (a first layer too small for the height). Places under 0.05 mm² are not rated; layers in a row with the same problem at the same place make one finding. Changes nothing. Returns layerHeight, layers (count), findings (problems first, then from the bottom up: kind, level hint|problem, layers from-to, heights in mm, areaMm2, value with unit, at, the part's id and name, and the remedy as text), problems, hints, millis.",
+    inputSchema: {
+      ...editorTargetSchema,
+      properties: {
+        ...editorTargetSchema.properties,
+        ids: { type: "array", items: { type: "string" }, description: "Objects to check. Left out: the selection, or every visible object." },
+        layerHeight: { type: "number", minimum: 0.04, maximum: 1, description: "Layer height in mm. Default 0.2." },
+        nozzle: { type: "number", minimum: 0.1, maximum: 2, description: "Nozzle width in mm. Default 0.4." },
+        overhangHint: { type: "number", description: "Degrees from the vertical from which an overhang is a hint. Default 45." },
+        overhangProblem: { type: "number", description: "Degrees from the vertical from which an overhang is a problem. Default 60." },
+        bridgeSpan: { type: "number", description: "A bridge spanning more than this (mm) is a hint. Default 10." },
+        minWall: { type: "number", description: "Walls thinner than this (mm) are a hint; 0 takes two lines of the nozzle." },
+      },
+    },
+  },
+  {
     name: "layerling_split_bolt",
     description: "Split a screw or threaded rod (a thread object of role screw or rod, not a hole) lengthwise for printing, like the Split lengthwise and lay flat button in its properties: a thread printed lying down is far stronger than one printed standing, whose layers part under load. The body is cut in two through its own axis (however it is turned on the workplane) and both halves are laid on their cut faces where it stood, side by side, ready to print without support; glue them together afterwards. With `pins` (default true) centring pins line the halves up exactly, along the axis too, so the turns of both halves meet: one in the head (on the axis past the drive's floor, else beside the drive) and one to three along the thread by its length (about one per 20 mm; a rod gets one near each end), each in a hole square to the cut face in both halves that ends in a 45 degree cone, so the holes need no bridge. The pins (diameter 0.25 of the thread's core, 2 to 6 mm, in half millimetres; `pinPlay` per side, default the printer's play, else 0.15 mm, and 0.3 mm shorter than the two holes at each end, chamfered) stand in a row beside the halves as one body. The head always gets one and the thread at least one: where they do not fit, thinner pins (down to 1.5 mm) and a 0.4 mm wall are tried, other places along the thread, and a shorter pin in the head (headPinLength); a thread under about M6 is too thin for any pin, its head still gets one. The screw is replaced by the parts (mesh bodies named \"<name> - half 1\", \"... half 2\", \"... centring pins\") in one undo step, and they are selected. Returns the parts, pins (how many), pinDiameter, pinLength and headPinLength (where the head's differs) in mm, and placed (head, thread).",
     inputSchema: {

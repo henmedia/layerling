@@ -146,6 +146,7 @@ L’IA usa le stesse funzioni che hai a disposizione, attraverso lo stesso perco
 | `layerling_check_clearance` | Controlla prima della stampa quali parti si sovrappongono, si toccano o sono più vicine di un gioco minimo, anche le parti separate di un oggetto |
 | `layerling_printer_play` | legge, imposta o cancella il gioco della stampante ({{ui:workspace.printerPlay}} nelle impostazioni) e mette la prova di accoppiamento che lo misura |
 | `layerling_check_print` | Controlla prima della stampa cosa andrebbe storto: pareti troppo sottili per l'ugello, parti sospese, poco contatto con il piatto, sporgenze e mesh aperte |
+| `layerling_check_layers` | taglia la stampa in strati e elenca strato per strato cosa andrebbe storto: sbalzi, zone senza appoggio, ponti, pareti sottili, piccole isole, un pezzo nel piano (Analisi di stampa) |
 | `layerling_split_bolt` | divide una vite o una barra filettata per il lungo lungo l’asse e stende le due metà sulla faccia di taglio per la stampa, a scelta con spine di centraggio |
 | `layerling_add_reference_points` | Aggiunge punti di riferimento — al centro, agli angoli o nei punti medi degli spigoli degli oggetti, oppure in posizioni precise — a cui si agganciano le forme. |
 | `layerling_list_reference_points` | Elenca i punti di riferimento con i rispettivi ID e posizioni. |

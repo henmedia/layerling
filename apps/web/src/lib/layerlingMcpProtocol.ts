@@ -156,6 +156,7 @@ export type LayerlingMcpCommandName =
   | "check_clearance"
   | "printer_play"
   | "check_print"
+  | "check_layers"
   | "split_bolt"
   | "add_reference_points"
   | "list_reference_points"

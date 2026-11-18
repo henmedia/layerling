@@ -111,6 +111,11 @@ import { ArrayPanel } from "./workplane/ArrayPanel";
 import { DEFAULT_SCALE_PERCENT_SETTINGS, ScalePercentPanel, type ScalePercentSettings } from "./workplane/ScalePercentPanel";
 import { ClearancePanel, clearanceMarkFor, clearanceRowIds, type ClearanceSettings, type ClearanceToolState } from "./workplane/ClearancePanel";
 import { CLEARANCE_THRESHOLD_LIMITS, clearanceMeshShape, clearanceSourceShapes, clearanceStartThreshold, normalizeClearanceOptions, reclassifyClearance, readClearanceSettings, writeClearanceSettings } from "@/lib/clearanceCheck";
+import { LayerCheckPanel, LAYER_VIEW_DEFAULTS, type LayerCheckSettings, type LayerCheckToolState, type LayerViewState } from "./workplane/LayerCheckPanel";
+import type { LayerView } from "./workplane/LayerViewOverlay";
+import { readLayerCheckSettings, writeLayerCheckSettings } from "@/lib/layerCheckSettings";
+import { filterFindings, stepFinding, type Finding, type FindingKind } from "@/lib/findings";
+import { findingLine, findingRemedy } from "./workplane/findingText";
 import { PrintCheckPanel, printCheckLineFocus, printCheckLineIds, type PrintCheckLine, type PrintCheckSettings, type PrintCheckToolState } from "./workplane/PrintCheckPanel";
 import { normalizePrintCheckOptions, printCheckFloating, printCheckSmallContacts, printCheckTopLevelId, printCheckWarnings, PRINT_CHECK_NOZZLE_LIMITS, readPrintCheckSettings, writePrintCheckSettings } from "@/lib/printCheck";
 import { scaleShapesByPercent, worldBoxOfShapes } from "@/lib/scaleByPercent";
@@ -275,7 +280,7 @@ import type { AlignAxis, AlignHandleStatus, AlignSpread, AlignTarget, EdgeTreatm
 import { type MeshData, type Cuboid, type ShapeUpdatePatch, type ManifoldSolid, MIN_SHAPE_DIMENSION, resetManifoldRuntime, cleanModelDimension, getManifoldRuntime, meshForShape, meshReachAlong, formatTriangleCount, boundsForShapes, boundsForCuboids, meshAabb, boundsForPositions, quantizedPointKey, sameShapeApartFromPlacement } from "@/lib/editorMeshCore";
 import { meshPartCount } from "@/lib/meshPartCount";
 import { splitBoltOffThread } from "@/lib/geometryWorker";
-import { buildGroupedShapeOffThread, exportSolidVolumeOffThread, callOffFaceRead, faceReadInWorker, createFaceReadKeeper, faceReadPositionsOffThread, simplifyTrianglePositionsOffThread, splitShapesByPlaneOffThread, previewSplitConnectorsOffThread, articulateShapesOffThread, lidForShapesOffThread, lidTopOffThread, checkClearanceOffThread, checkPrintOffThread, subscribeGeometryBusy, warmGeometryWorker } from "@/lib/geometryWorker";
+import { buildGroupedShapeOffThread, exportSolidVolumeOffThread, callOffFaceRead, faceReadInWorker, createFaceReadKeeper, faceReadPositionsOffThread, simplifyTrianglePositionsOffThread, splitShapesByPlaneOffThread, previewSplitConnectorsOffThread, articulateShapesOffThread, lidForShapesOffThread, lidTopOffThread, checkClearanceOffThread, checkPrintOffThread, checkLayersOffThread, subscribeGeometryBusy, warmGeometryWorker } from "@/lib/geometryWorker";
 import { roundedAlignedValue } from "@/lib/alignRounding";
 import { buildSketchLoftFromSelection, canSketchLoft } from "@/lib/sketchLoft";
 import { alignBounds, sizeAlignmentState, sizedShapesForSelection } from "@/lib/alignSize";
@@ -313,6 +318,7 @@ const HISTORY_VIEW_MCP_ACTIONS = new Set([
   "estimate_print",
   "check_clearance",
   "check_print",
+  "check_layers",
   "list_reference_points",
   "list_notes",
   "show_overhangs",
@@ -11903,6 +11909,177 @@ export function LayerlingEditor({
   const printCheckToolOpenRef = useRef(false);
   printCheckToolOpenRef.current = Boolean(printCheckTool);
 
+  // The layer check (Druckanalyse): every layer compared with the one below in one go, off the page, with a bar and a
+  // stop. It only reads the design; its layer view cuts the bodies at a layer and puts the camera back when it closes.
+  const [layerCheckTool, setLayerCheckTool] = useState<LayerCheckToolState | null>(null);
+  const layerCheckAbortRef = useRef<AbortController | null>(null);
+  const layerCheckStale = useMemo(() => {
+    const checked = layerCheckTool?.checked;
+    if (!checked) return false;
+    const scope = layerCheckTool.scopeIds;
+    const current = scope ? shapes.filter((shape) => scope.includes(shape.id)) : shapes;
+    return current.length !== checked.size || current.some((shape) => checked.get(shape.id) !== shape);
+  }, [layerCheckTool?.checked, layerCheckTool?.scopeIds, shapes]);
+  const runLayerCheck = useCallback(async (settings: LayerCheckSettings, scopeIds: readonly string[] | null) => {
+    const source = scopeIds ? shapesRef.current.filter((shape) => scopeIds.includes(shape.id)) : shapesRef.current;
+    layerCheckAbortRef.current?.abort();
+    const controller = new AbortController();
+    layerCheckAbortRef.current = controller;
+    const printer = printerPresetById(workspaceSettingsRef.current.printer);
+    const buildVolume: [number, number, number] | null = printer ? [printer.width, printer.depth, printer.height] : null;
+    setLayerCheckTool((current) => current ? { ...current, settings, running: true, progress: 0, stopped: false, error: null } : current);
+    try {
+      const result = await checkLayersOffThread(source, { ...settings, buildVolume }, controller.signal, (progress) => {
+        if (layerCheckAbortRef.current === controller) setLayerCheckTool((current) => current ? { ...current, progress } : current);
+      });
+      if (layerCheckAbortRef.current !== controller) return;
+      setLayerCheckTool((current) => current ? {
+        ...current, result, running: false, progress: 1, error: null, checked: new Map(source.map((shape) => [shape.id, shape])), activeId: null,
+        view: { ...current.view, layer: Math.min(Math.max(1, current.view.layer), Math.max(1, result.layers.length)), playing: false },
+      } : current);
+    } catch (error) {
+      if (layerCheckAbortRef.current !== controller) return;
+      const message = error instanceof Error ? localizedError(error.message) : String(error);
+      setLayerCheckTool((current) => current ? { ...current, running: false, error: t("layerCheck.failed", { message }) } : current);
+    }
+  }, []);
+  /** Stops the check at once: the worker is let go, the last result (if any) stays, marked as stopped. */
+  const stopLayerCheck = useCallback(() => {
+    layerCheckAbortRef.current?.abort();
+    layerCheckAbortRef.current = null;
+    setLayerCheckTool((current) => current ? { ...current, running: false, stopped: true } : current);
+  }, []);
+  const closeLayerCheck = useCallback(() => {
+    layerCheckAbortRef.current?.abort();
+    layerCheckAbortRef.current = null;
+    setLayerCheckTool(null);
+  }, []);
+  const toggleLayerCheck = useCallback(() => {
+    if (layerCheckTool) {
+      closeLayerCheck();
+      return;
+    }
+    if (otherToolPanelOpen) {
+      setNotice(t("layerCheck.otherTool"));
+      return;
+    }
+    const scope = selectedShapes.length ? selectedShapes : shapes;
+    if (!clearanceSourceShapes(scope).length) {
+      setNotice(t("layerCheck.nothing"));
+      return;
+    }
+    closeClearanceCheck();
+    closePrintCheck();
+    const settings = readLayerCheckSettings(readPrintCheckSettings().nozzle);
+    const scopeIds = selectedIds.length ? [...selectedIds] : null;
+    setLayerCheckTool({
+      settings, result: null, running: true, progress: 0, stopped: false, error: null, checked: null, scopeIds, activeId: null, request: 0, filterKind: "", filterPart: "",
+      view: { ...LAYER_VIEW_DEFAULTS },
+    });
+    void runLayerCheck(settings, scopeIds);
+  }, [closeClearanceCheck, closeLayerCheck, closePrintCheck, layerCheckTool, otherToolPanelOpen, runLayerCheck, selectedIds, selectedShapes, shapes]);
+  const changeLayerCheckSettings = useCallback((patch: Partial<LayerCheckSettings>) => {
+    if (!layerCheckTool) return;
+    const settings = { ...layerCheckTool.settings, ...patch };
+    writeLayerCheckSettings(settings);
+    void runLayerCheck(settings, layerCheckTool.scopeIds);
+  }, [layerCheckTool, runLayerCheck]);
+  /** A finding clicked: the layer view opens on its first layer, the camera goes to the place, the place is painted. */
+  const showLayerFinding = useCallback((finding: Finding) => {
+    setLayerCheckTool((current) => {
+      if (!current) return current;
+      const hasLayers = finding.layerFrom !== undefined;
+      return {
+        ...current,
+        activeId: finding.id,
+        request: current.request + 1,
+        view: hasLayers ? { ...current.view, open: true, playing: false, layer: finding.layerFrom ?? current.view.layer } : current.view,
+      };
+    });
+    const ids = [...new Set(finding.partIds.map((id) => printCheckTopLevelId(shapesRef.current, id)).filter((id): id is string => Boolean(id)))];
+    if (ids.length && finding.layerFrom === undefined) setSelectedIds(ids);
+  }, []);
+  const layerCheckShown = useMemo(() => (layerCheckTool?.result
+    ? filterFindings(layerCheckTool.result.findings, { kinds: layerCheckTool.filterKind ? [layerCheckTool.filterKind] : null, partId: layerCheckTool.filterPart || null })
+    : []), [layerCheckTool?.filterKind, layerCheckTool?.filterPart, layerCheckTool?.result]);
+  const stepLayerFinding = useCallback((step: 1 | -1) => {
+    const next = stepFinding(layerCheckShown, layerCheckTool?.activeId ?? null, step);
+    if (next) showLayerFinding(next);
+  }, [layerCheckShown, layerCheckTool?.activeId, showLayerFinding]);
+  // A finding's tool: its parts are selected first, the tool opens once the selection is there.
+  const [pendingFindingAction, setPendingFindingAction] = useState<Finding["action"] | null>(null);
+  const runLayerFindingAction = useCallback((finding: Finding) => {
+    const ids = [...new Set(finding.partIds.map((id) => printCheckTopLevelId(shapesRef.current, id)).filter((id): id is string => Boolean(id)))];
+    if (!ids.length || !finding.action) return;
+    setSelectedIds(ids);
+    setPendingFindingAction(finding.action);
+  }, []);
+  useEffect(() => {
+    if (!pendingFindingAction) return;
+    const action = pendingFindingAction;
+    setPendingFindingAction(null);
+    if (action === "dropToPlate") dropSelectedToWorkplane();
+    else if (action === "layFlat") {
+      closeLayerCheck();
+      toggleLayFlat();
+    } else if (action === "supportRib") {
+      closeLayerCheck();
+      toggleSupportRib();
+    }
+  }, [closeLayerCheck, dropSelectedToWorkplane, pendingFindingAction, toggleLayFlat, toggleSupportRib]);
+  const changeLayerView = useCallback((patch: Partial<LayerViewState>) => {
+    setLayerCheckTool((current) => current ? { ...current, view: { ...current.view, ...patch } } : current);
+  }, []);
+  /** What the 3D view draws for the layer view: the cut, the layer's cross-section, the places found and the shadow. */
+  const layerView = useMemo<LayerView | null>(() => {
+    const tool = layerCheckTool;
+    const result = tool?.result;
+    if (!tool || !result || layerCheckStale || !tool.view.open || !result.layers.length) return null;
+    const count = result.layers.length;
+    const layer = Math.min(count, Math.max(1, tool.view.layer));
+    const shownLayer = result.layers[layer - 1];
+    const from = Math.min(layer, Math.max(1, tool.view.from));
+    const bottom = tool.view.mode === "only" ? shownLayer.bottom : tool.view.mode === "range" ? result.layers[from - 1].bottom : null;
+    const marks: LayerView["marks"] = [];
+    for (const finding of layerCheckShown) {
+      if (!finding.regions?.length || finding.layerFrom === undefined || finding.layerTo === undefined) continue;
+      if (layer < finding.layerFrom || layer > finding.layerTo) continue;
+      // The outline kept nearest this layer (a long finding keeps every few layers' outline only).
+      const region = finding.regions.reduce((best, here) => (Math.abs(here.layer - layer) < Math.abs(best.layer - layer) ? here : best));
+      marks.push({ z: shownLayer.top + 0.004, polygons: region.polygons, level: finding.level, active: finding.id === tool.activeId });
+    }
+    marks.sort((a, b) => Number(a.active) - Number(b.active));
+    const ghost: LayerView["ghost"] = [];
+    if (tool.view.ghost) {
+      const every = Math.max(1, Math.round(count / 80));
+      for (let index = layer; index < count; index += every) ghost.push({ z: result.layers[index].top, polygons: result.outlines[index] ?? [] });
+    }
+    const active = result.findings.find((finding) => finding.id === tool.activeId);
+    return {
+      top: shownLayer.top,
+      bottom,
+      cap: { z: shownLayer.top, polygons: result.outlines[layer - 1] ?? [] },
+      marks,
+      ghost,
+      focus: active?.layerFrom !== undefined ? active.box : null,
+      request: active?.layerFrom !== undefined ? tool.request : 0,
+    };
+  }, [layerCheckShown, layerCheckStale, layerCheckTool]);
+  /** For a finding with no layers (a part in the plate, an open mesh) the camera goes to it as for the print check. */
+  const layerFocusView = useMemo(() => {
+    const tool = layerCheckTool;
+    const active = tool?.result?.findings.find((finding) => finding.id === tool.activeId);
+    if (!tool || !active || active.layerFrom !== undefined || layerCheckStale) return null;
+    return { thin: null, focus: active.box, request: tool.request };
+  }, [layerCheckStale, layerCheckTool]);
+  useEffect(() => () => layerCheckAbortRef.current?.abort(), []);
+  useEffect(() => {
+    if (otherToolPanelOpen) closeLayerCheck();
+  }, [closeLayerCheck, otherToolPanelOpen]);
+  useEffect(() => {
+    if (clearanceOpen || printCheckTool) closeLayerCheck();
+  }, [clearanceOpen, closeLayerCheck, printCheckTool]);
+
   const intersectSelected = useCallback(async () => {
     if (refuseLockedSelection()) return;
     // While the preview shows, its shapes are the ones that are intersected, whatever is selected.
@@ -16593,6 +16770,47 @@ export function LayerlingEditor({
         };
       }
 
+      if (command.action === "check_layers") {
+        // The same check as the Print analysis window: it only reads the design.
+        const requestedIds = mcpStringArray(params.ids ?? params.id);
+        const pickIds = requestedIds.length ? requestedIds : selectedIdsRef.current;
+        const source = pickIds.length ? currentShapes().filter((shape) => pickIds.includes(shape.id)) : currentShapes();
+        if (requestedIds.length && source.length === 0) throw new Error("No matching objects to check");
+        if (!clearanceSourceShapes(source).length) throw new Error("Nothing to check: no visible solid body");
+        const printer = printerPresetById(workspaceSettingsRef.current.printer);
+        const given = (key: string) => (typeof params[key] === "number" ? params[key] as number : undefined);
+        const result = await checkLayersOffThread(source, {
+          ...readLayerCheckSettings(readPrintCheckSettings().nozzle),
+          ...Object.fromEntries(["layerHeight", "nozzle", "overhangHint", "overhangProblem", "bridgeSpan", "minWall"].flatMap((key) => (given(key) === undefined ? [] : [[key, given(key)]]))),
+          buildVolume: printer ? [printer.width, printer.depth, printer.height] : null,
+        });
+        const mm = (value: number) => Number(value.toFixed(3));
+        const units = { units: workspaceSettingsRef.current.units, scale: workspaceSettingsRef.current.scale };
+        const counted = { problems: result.findings.filter((finding) => finding.level === "problem").length, hints: result.findings.filter((finding) => finding.level === "hint").length };
+        return {
+          scope: requestedIds.length ? "ids" : pickIds.length ? "selection" : "design",
+          layerHeight: result.layerHeight,
+          coarsened: result.coarsened,
+          layers: result.layers.length,
+          ...counted,
+          findings: result.findings.map((finding) => ({
+            kind: finding.kind,
+            level: finding.level,
+            ...(finding.layerFrom !== undefined ? { layers: [finding.layerFrom, finding.layerTo], heightsMm: [mm(finding.zFrom ?? 0), mm(finding.zTo ?? 0)] } : {}),
+            areaMm2: mm(finding.areaMm2),
+            ...(finding.value !== undefined ? { value: mm(finding.value), unit: finding.unit } : {}),
+            at: { x: mm(finding.point[0]), z: mm(finding.point[2]), elevation: mm(finding.point[1]) },
+            ids: finding.partIds,
+            name: finding.partName,
+            text: findingLine(finding, units, { wall: result.minimumWallMm }),
+            remedy: findingRemedy(finding, units, { wall: result.minimumWallMm }),
+          })),
+          unchecked: result.unchecked,
+          millis: result.millis,
+          note: "Layers counted from 1 at the plate; heights in mm above it. Points: x, z (towards the front) and elevation in mm. No slicer: supports, infill and print time come from the slicer.",
+        };
+      }
+
       if (command.action === "split_bolt") {
         const requested = typeof params.id === "string" ? params.id : selectedIdsRef.current.length === 1 ? selectedIdsRef.current[0] : null;
         const bolt = requested ? currentShapes().find((shape) => shape.id === requested) : null;
@@ -19536,6 +19754,8 @@ export function LayerlingEditor({
         clearanceActive={Boolean(clearanceTool)}
         canCheckClearance={canCheckClearance}
         onPrintCheck={togglePrintCheck}
+        onLayerCheck={toggleLayerCheck}
+        layerCheckActive={Boolean(layerCheckTool)}
         printCheckActive={Boolean(printCheckTool)}
         onFillet={() => edgeModifier?.kind === "fillet" ? cancelEdgeModifier() : startEdgeModifier("fillet")}
         onHollow={startShellTool}
@@ -19837,7 +20057,8 @@ export function LayerlingEditor({
           onShapeContextMenu={historyViewState ? undefined : openShapeContextMenu}
           highlightIds={clearanceHighlightIds ?? menuHighlightIds}
           clearanceMark={clearanceMark}
-          printCheckView={printCheckView}
+          printCheckView={printCheckView ?? layerFocusView}
+          layerView={layerView}
           onSetPlacementWorkplane={setViewportPlacementWorkplane}
           onToggleWorkplaneTool={activateWorkplaneTool}
           onInteractionActiveChange={updateProjectInteractionActive}
@@ -20108,6 +20329,27 @@ export function LayerlingEditor({
             setTopPanel("export");
           }}
           onClose={closePrintCheck}
+        />
+      ) : null}
+      {layerCheckTool ? (
+        <LayerCheckPanel
+          scope={!layerCheckTool.scopeIds
+            ? t("printCheck.scope.all")
+            : layerCheckTool.scopeIds.length === 1
+              ? shapes.find((shape) => shape.id === layerCheckTool.scopeIds?.[0])?.name ?? t("printCheck.scope.all")
+              : t("printCheck.scope.selection", { count: layerCheckTool.scopeIds.length })}
+          state={layerCheckTool}
+          workspace={workspaceSettings}
+          stale={layerCheckStale && !layerCheckTool.running}
+          onChange={changeLayerCheckSettings}
+          onCheck={() => void runLayerCheck(layerCheckTool.settings, layerCheckTool.scopeIds)}
+          onStop={stopLayerCheck}
+          onFinding={showLayerFinding}
+          onStep={stepLayerFinding}
+          onAction={runLayerFindingAction}
+          onFilter={(patch: { filterKind?: FindingKind | ""; filterPart?: string }) => setLayerCheckTool((current) => current ? { ...current, ...patch } : current)}
+          onView={changeLayerView}
+          onClose={closeLayerCheck}
         />
       ) : null}
       {scalePercentTool && selectedShapes.length > 0 ? (
