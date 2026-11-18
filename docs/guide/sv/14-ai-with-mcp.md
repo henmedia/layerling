@@ -120,6 +120,7 @@ AI:n arbetar med samma funktioner som du, via samma väg som din användning i r
 | `layerling_cookie_cutter` | gör en pepparkaksform av objekten: en vägg med en skäregg och en kant runt den spegelvända konturen (Pepparkaksform) |
 | `layerling_flexi_joints` | skär upp en platt kropp i länkar med leder som skrivs ut på plats och svänger åt sidorna (Flexileder) |
 | `layerling_make_lid` | gör ett lock till en kropp som är öppen upptill: intryckt, utanpå eller platt, med den passning du väljer och magneter om du vill (Lock) |
+| `layerling_make_mold` | skapar en form eller en stans från ett original: en tvådelad form att gjuta i, en gjutlåda för silikon, en öppen form eller en stämpel och en matris för tunt material (Gjutform & stans) |
 | `layerling_make_cable_channel` | drar en rund kanal för en kabel genom en kropp från en ingång till en utgång och letar själv upp vägen med mjuka böjar (Kabelkanal) |
 | `layerling_loft_sketches` | förenar två skisskroppar till en övergång från ena konturen till den andra (Lofta skisser) |
 | `layerling_separate_parts` | delar upp en form i dess lösa delar, en skisskropp i en kropp per kontur |

@@ -5,6 +5,7 @@ import { buildMessage } from "@/lib/buildStamp";
 import { checkClearance, type ClearanceOptions } from "@/lib/clearanceCheck";
 import { articulateShapes, type FlexiOptions } from "@/lib/flexiJoints";
 import { lidForShapes, lidTopForShapes, type LidOptions } from "@/lib/lidTool";
+import { analyseMoldForShapes, moldForShapes, type MoldOptions } from "@/lib/moldTool";
 import { checkPrint, type PrintCheckOptions } from "@/lib/printCheck";
 import { checkLayers, type LayerCheckOptions } from "@/lib/layerCheck";
 import { buildGroupedShapeFromSelection, exportSolidVolume, faceReadPositions, previewSplitConnectors, splitShapeIfCrossed } from "@/lib/editorBooleans";
@@ -74,6 +75,12 @@ self.onmessage = async (event: MessageEvent<GeometryWorkerRequest>) => {
     } else if (request.task === "lid") {
       const { targets, options } = args as { targets: WorkplaneShape[]; options: LidOptions };
       result = await lidForShapes(targets, options);
+    } else if (request.task === "mold") {
+      const { targets, options } = args as { targets: WorkplaneShape[]; options: MoldOptions };
+      result = await moldForShapes(targets, options);
+    } else if (request.task === "moldCheck") {
+      const { targets, options } = args as { targets: WorkplaneShape[]; options: MoldOptions };
+      result = await analyseMoldForShapes(targets, options);
     } else if (request.task === "boltSplit") {
       const { shape, options } = args as { shape: WorkplaneShape; options: Partial<BoltSplitOptions> };
       result = await splitBoltForShape(shape, options);

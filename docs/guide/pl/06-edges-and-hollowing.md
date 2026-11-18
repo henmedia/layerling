@@ -147,6 +147,21 @@ Wybierz {{ui:lid.type.slide}}, jeśli pokrywka ma się wsuwać jak w drewnianym 
 
 Żeby zagłębić pokrywkę poniżej krawędzi, ustaw {{ui:lid.slideFrame}} (na początku 0). Pokrywka i jej rowki leżą wtedy o tyle niżej, a ścianki nad nimi zachowują pełną wysokość, jak ramka wokół pokrywki. Również ścianka, przez którą pokrywka się wsuwa, nie jest wtedy obniżana: zachowuje pełną wysokość, a tam, gdzie przechodzi pokrywka, ma otwór, który koniec pokrywki wypełnia równo z zewnętrzną stroną. Nad pokrywką otwór zostawia taką samą szczelinę jak po bokach ({{ui:lid.gap}}), a z {{ui:lid.clickBumps}} dodatkowo wysokość wypustki, żeby pokrywka przy wysuwaniu mogła się nad nią lekko wygiąć do góry; nad nim musi zostać co najmniej 1 mm ścianki, a niższa ramka jest odrzucana z podaniem potrzebnej (1,2 mm przy szczelinie 0,2 mm). Pudełko nadal drukuje się na stojąco: tylko góra otworu drukuje się w powietrzu, jako krótki, poziomy mostek na szerokość pokrywki, który większość drukarek robi bez podpór. Rowki pod kciuk leżą wtedy tuż za tą ścianką, a języczek wystaje z otworu.
 
+## Formy i matryce
+
+{{ui:editor.tool.mold}} zamienia bryłę w formę, żeby ją odlać, albo w stempel i matrycę, żeby wytłoczyć ją w cienkim materiale. Bryła jest wzorcem, kształtem, który chcesz skopiować. Zaznacz ją i kliknij {{ui:editor.tool.mold}}. W oknie wybierasz, co ma powstać:
+
+- {{ui:mold.kind.twoPart}}: sztywna forma z dwóch połówek, wydrukowana i gotowa do bezpośredniego odlewania: żywica, gips, wosk, mydło, czekolada albo beton. Stożki centrujące ustawiają połówki względem siebie (jeden jest mniejszy, więc forma zamyka się tylko w jeden sposób), lejek i wlew doprowadzają materiał w najwyższym punkcie wzorca, a odpowietrzenia wypuszczają powietrze tam, gdzie zostałoby uwięzione. Szczeliny do podważania na łączeniu pomagają rozdzielić połówki, a uszy do ściskania z otworami na śruby mogą je trzymać razem.
+- {{ui:mold.kind.box}}: rama i płyta podstawy do zalania silikonem wydrukowanego wzorca. Wzorzec siedzi w płytkim gnieździe, a rama stoi w rowku, więc nic nie wycieka. Okno podaje, ile silikonu potrzeba.
+- {{ui:mold.kind.tray}}: jednoczęściowa forma otwarta od góry, do wzorca z płaską stroną. Płaska strona staje się otwartą górą; wylej ją do pełna.
+- {{ui:mold.kind.die}}: stempel i matryca do skóry, kartonu, folii albo cienkiej blachy. Stempel to kontur wzorca widziany z góry na płytce, matryca to płytka z tym konturem jako wgłębieniem. Przy ustawieniu {{ui:mold.dieMode.form}} luz dookoła to {{ui:mold.material}}, a krawędź stempla jest zaokrąglona, żeby materiał się nie rwał; przy ustawieniu {{ui:mold.dieMode.cut}} luz to kilka procent tej grubości, a matryca jest otwarta od spodu, więc wycięty kawałek przez nią wypada. Kołki prowadzące utrzymują obie części w osi.
+
+Kliknij {{ui:mold.apply}}: części leżą obok wzorca tak, jak się drukują, bez podpór: połówki powierzchnią podziału do góry, matryca gotowa do odwrócenia i położenia na stemplu. Wzorzec pozostaje bez zmian.
+
+Najczęstszy problem z formami to odlew, który się zaklinowuje. Tam, gdzie wzorzec jest nad podziałem szerszy niż pod nim, okno ostrzega przed podcięciem: przesuń {{ui:mold.parting}} tam, gdzie wzorzec jest najszerszy, obróć wzorzec albo weź skrzynkę do silikonu, który puszcza podcięcia.
+
+> **Wskazówka:** Uszczelnij wydrukowaną formę (żywicą albo woskiem) i użyj środka rozdzielającego, inaczej odlew wczepi się w linie warstw. PLA mięknie już od ok. 55 °C: do gorącego wosku, mydła albo żywicy, która nagrzewa się przy utwardzaniu, wydrukuj formę z PETG albo ASA.
+
 ## Kanał na kabel przez bryłę
 
 {{ui:editor.tool.cableChannel}} prowadzi przez bryłę okrągły tunel na kabel albo przewód LED, od miejsca, gdzie wchodzi, do miejsca, gdzie wychodzi, i sam znajduje drogę. Zaznacz bryłę i kliknij {{ui:editor.tool.cableChannel}}, potem kliknij na bryłę tam, gdzie kabel wchodzi ({{ui:cable.entry}}), i tam, gdzie wychodzi ({{ui:cable.exit}}). Droga zaczyna się i kończy prosto wzdłuż powierzchni, biegnie prosto, gdzie się da, i skręca, gdzie musi, nigdy ciaśniej niż {{ui:cable.minBend}}, i trzyma się jak najdalej od zewnętrznej strony, nigdy bliżej niż {{ui:cable.minWall}}. Kabel przechodzi przez łuk o promieniu około pięciu swoich średnic. {{ui:cable.diameter}} to średnica samego kanału.

@@ -158,6 +158,8 @@ async function callTool(name, args) {
       return bridgeCommand("flexi_joints", args, 120000);
     case "layerling_make_lid":
       return bridgeCommand("make_lid", args, 120000);
+    case "layerling_make_mold":
+      return bridgeCommand("make_mold", args, 120000);
     case "layerling_make_cable_channel":
       return bridgeCommand("make_cable_channel", args, 120000);
     case "layerling_loft_sketches":

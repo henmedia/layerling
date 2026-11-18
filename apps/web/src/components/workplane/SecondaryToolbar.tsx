@@ -23,7 +23,7 @@ import { ribbonSectionOrders, useRibbonOrder } from "@/lib/ribbonOrder";
 import { ribbonToolOrderFor, sortByRibbonToolOrder, useRibbonToolOrder } from "@/lib/ribbonToolOrder";
 import { ribbonCollapsePriority, ribbonFoldOf, useRibbonFold } from "@/lib/ribbonFold";
 import { normalizePolygonSides, normalizeStarInnerPercent, SKETCH_POLYGON_MAX_SIDES, SKETCH_POLYGON_MIN_SIDES, SKETCH_STAR_MAX_INNER_PERCENT, SKETCH_STAR_MIN_INNER_PERCENT } from "@/lib/sketchPrimitives";
-import { SketchBoltCircleIcon, SketchEllipseIcon, SketchHalfCircleIcon, SketchPieSliceIcon, ToolbarAlignIcon, ToolbarAttachmentsIcon, ToolbarBuildPlatesIcon, ToolbarCenterOnWorkplaneIcon, ToolbarChamferIcon, ToolbarCaretDownIcon, ToolbarCookieCutterIcon, ToolbarFlexiIcon, ToolbarLidIcon,
+import { SketchBoltCircleIcon, SketchEllipseIcon, SketchHalfCircleIcon, SketchPieSliceIcon, ToolbarAlignIcon, ToolbarMoldIcon, ToolbarAttachmentsIcon, ToolbarBuildPlatesIcon, ToolbarCenterOnWorkplaneIcon, ToolbarChamferIcon, ToolbarCaretDownIcon, ToolbarCookieCutterIcon, ToolbarFlexiIcon, ToolbarLidIcon,
   ToolbarCableChannelIcon, ToolbarCopyIcon, ToolbarDuplicateIcon, ToolbarDropToWorkplaneIcon, ToolbarBundleIcon, ToolbarGroupIcon, ToolbarGuideIcon, ToolbarHideSelectedIcon, ToolbarHomeIcon, ToolbarImportIcon, ToolbarIntersectionIcon,ToolbarClearanceIcon, ToolbarPrintCheckIcon, ToolbarLayerCheckIcon, ToolbarHullIcon, ToolbarLoftSketchesIcon, ToolbarKeyboardIcon, ToolbarFilletIcon, ToolbarHistoryIcon, ToolbarHollowIcon, ToolbarOffsetIcon, ToolbarCutOutIcon, ToolbarPunchIcon, ToolbarDeleteFaceIcon, ToolbarSimplifyIcon, ToolbarMakeExactIcon, ToolbarSurfaceTextureIcon, ToolbarPaintIcon, ToolbarMirrorIcon, ToolbarRotationPivotIcon, ToolbarPatternIcon, ToolbarHolePatternIcon, ToolbarFaceToolIcon, ToolbarSupportRibIcon, ToolbarStencilBridgeIcon, ToolbarConstructionLineIcon, ToolbarMiddleLineIcon, ToolbarLayFlatIcon, ToolbarMateFacesIcon, ToolbarNoteIcon, ToolbarSplitIcon, ToolbarPasteIcon, ToolbarRedoIcon, ToolbarSnapGridIcon, ToolbarSettingsIcon, ToolbarShapeAddIcon, ToolbarTrashIcon, ToolbarUngroupIcon, ToolbarUndoIcon, ToolbarVectorExportIcon } from "../icons";
 import { type SketchPrimitive, type SketchTool } from "../SketchWorkspace";
 import { CommandPalette, type PaletteCommand } from "./CommandPalette";
@@ -254,6 +254,7 @@ export function SecondaryToolbar({
   flexiActive,
   canLid,
   lidActive,
+  moldActive,
   canCableChannel,
   cableChannelActive,
   canLoftSketches,
@@ -342,6 +343,7 @@ export function SecondaryToolbar({
   onCookieCutter,
   onFlexi,
   onLid,
+  onMold,
   onCableChannel,
   onLoftSketches,
   intersectPreviewActive,
@@ -440,6 +442,7 @@ export function SecondaryToolbar({
   flexiActive: boolean;
   canLid: boolean;
   lidActive: boolean;
+  moldActive: boolean;
   /** The cable channel (one solid selected) and whether its panel is open. */
   canCableChannel: boolean;
   cableChannelActive: boolean;
@@ -537,6 +540,7 @@ export function SecondaryToolbar({
   onCookieCutter: () => void;
   onFlexi: () => void;
   onLid: () => void;
+  onMold: () => void;
   onCableChannel: () => void;
   onLoftSketches: () => void;
   /** Intersection shows the common part first and applies it on the second click (#372). */
@@ -1054,6 +1058,7 @@ export function SecondaryToolbar({
     { id: "supportRib", section: "shape", label: t("supportRib.title"), icon: ToolbarSupportRibIcon, action: onSupportRib, enabled: canFaceTool || supportRibActive, active: supportRibActive, needs: need("oneSolid") },
     { id: "stencilBridges", section: "shape", label: t("stencilBridges.title"), icon: ToolbarStencilBridgeIcon, action: onStencilBridges, enabled: canStencilBridges || stencilBridgesActive, active: stencilBridgesActive, needs: need("solid") },
     { id: "cookieCutter", section: "shape", label: t("editor.tool.cookieCutter"), icon: ToolbarCookieCutterIcon, action: onCookieCutter, enabled: canCookieCutter, needs: need("body") },
+    { id: "mold", section: "shape", label: t("editor.tool.mold"), icon: ToolbarMoldIcon, action: onMold, enabled: canLid || moldActive, active: moldActive, needs: need("solid") },
     { id: "chamfer", section: "edges", label: t("editor.tool.chamfer"), icon: ToolbarChamferIcon, action: onChamfer, enabled: canEdgeModify, active: edgeModifierKind === "chamfer" || edgeModifierKind === "chamfillet", needs: need("oneBody") },
     { id: "fillet", section: "edges", label: t("editor.tool.fillet"), icon: ToolbarFilletIcon, action: onFillet, enabled: canEdgeModify, active: edgeModifierKind === "fillet", needs: need("oneBody") },
     { id: "hollow", section: "edges", label: t("editor.tool.hollow"), icon: ToolbarHollowIcon, action: onHollow, enabled: canEdgeModify, active: hollowActive, needs: need("oneBody") },

@@ -146,6 +146,21 @@ Zvol {{ui:lid.type.slide}} pro víko, které se zasouvá jako u dřevěného pen
 
 Chceš-li víko zapustit pod okraj, nastav {{ui:lid.slideFrame}} (zpočátku 0). Víko i jeho drážky pak leží o tolik níž a stěny nad nimi si nechají plnou výšku jako rámeček kolem víka. Ani stěna, kterou se víko zasouvá, se pak nesnižuje: zůstane v plné výšce a tam, kde víko prochází, má štěrbinu, kterou konec víka vyplní, zarovnaný s vnější stranou. Nad víkem nechává štěrbina stejnou vůli jako po stranách ({{ui:lid.gap}}) a s {{ui:lid.clickBumps}} ještě výšku výstupku, aby se víko při vysouvání mohlo nad ním trochu prohnout nahoru; nad ní musí zůstat aspoň 1 mm stěny a nižší rámeček se odmítne s potřebnou výškou (1,2 mm při vůli 0,2 mm). Krabička se dál tiskne nastojato: jen horní strana štěrbiny se tiskne do vzduchu, jako krátký vodorovný most přes šířku víka, který většina tiskáren zvládne bez podpěr. Drážky pro palec pak leží hned za touto stěnou a jazýček vyčnívá ze štěrbiny.
 
+## Formy a raznice
+
+{{ui:editor.tool.mold}} udělá z tělesa formu, do které ho odlijete, nebo razník s matricí, kterými ho vylisujete do tenkého materiálu. Těleso je vzor, tvar, který chcete zkopírovat. Vyberte ho a klikněte na {{ui:editor.tool.mold}}. V okně zvolíte, co má vzniknout:
+
+- {{ui:mold.kind.twoPart}}: pevná forma ze dvou polovin, vytištěná a připravená k přímému odlévání: pryskyřice, sádra, vosk, mýdlo, čokoláda nebo beton. Středicí kužely srovnají poloviny (jeden je menší, takže se forma zavře jen jedním způsobem), nálevka a vtok přivádějí materiál v nejvyšším bodě vzoru a odvzdušnění vypouštějí vzduch tam, kde by zůstal uvězněný. Páčicí drážky ve spáře pomáhají poloviny rozdělit a upínací oka s otvory pro šrouby je podle potřeby drží pohromadě.
+- {{ui:mold.kind.box}}: rámeček se základovou deskou k zalití vytištěného vzoru silikonem. Vzor sedí v mělkém lůžku a rámeček stojí v drážce, aby nic nevyteklo. Okno ukáže, kolik silikonu je potřeba.
+- {{ui:mold.kind.tray}}: jednodílná forma otevřená nahoře pro vzor s rovnou stranou. Rovná strana se stane otevřeným vrškem; zalijte ji po okraj.
+- {{ui:mold.kind.die}}: razník a matrice pro kůži, karton, fólii nebo tenký plech. Razník je obrys vzoru při pohledu shora na desce, matrice deska s tímto obrysem jako prohlubní. Při volbě {{ui:mold.dieMode.form}} je vůle dokola rovna hodnotě {{ui:mold.material}} a hrana razníku je zaoblená, aby se materiál neroztrhl; při volbě {{ui:mold.dieMode.cut}} je vůle jen několik procent této tloušťky a matrice je dole otevřená, takže výstřižek propadne. Vodicí kolíky drží obojí v ose.
+
+Klikněte na {{ui:mold.apply}}: díly leží vedle vzoru tak, jak se tisknou bez podpor: poloviny dělicí plochou nahoru, matrice připravená k otočení a položení na razník. Vzor zůstane, jak je.
+
+Nejčastější potíží u forem je odlitek, který uvízne. Kde je vzor nad dělením širší než pod ním, okno upozorní na podkos: posuňte {{ui:mold.parting}} tam, kde je vzor nejširší, otočte vzor nebo použijte rámeček na silikon, který podkosy uvolní.
+
+> **Tip:** Vytištěnou formu utěsněte (pryskyřicí nebo voskem) a použijte separátor, jinak se odlitek zachytí ve vrstvách tisku. PLA měkne už od asi 55 °C: pro horký vosk, mýdlo nebo pryskyřici, která se při tuhnutí zahřívá, tiskněte formu z PETG nebo ASA.
+
 ## Kabelový kanál tělesem
 
 {{ui:editor.tool.cableChannel}} vede tělesem kulatý průchod pro kabel nebo vodič LED, od místa, kde vstupuje, k místu, kde vychází, a cestu najde sám. Vyberte těleso a klikněte na {{ui:editor.tool.cableChannel}}, pak klikněte na těleso tam, kde kabel vstupuje ({{ui:cable.entry}}), a kde vychází ({{ui:cable.exit}}). Cesta začíná a končí rovně, kolmo k povrchu, vede rovně, kde to jde, a ohýbá se, kde musí, nikdy ostřeji než {{ui:cable.minBend}}, a drží se co nejdál od vnějšího povrchu, nikdy blíž než {{ui:cable.minWall}}. Kabel se dá protlačit obloukem o poloměru asi pětinásobku jeho průměru; {{ui:cable.diameter}} je průměr kanálu.

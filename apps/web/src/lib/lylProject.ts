@@ -1418,6 +1418,12 @@ function validateShapeDefinition(definition: Record<string, unknown>, label: str
     if (definition[field] !== undefined && typeof definition[field] !== "boolean") throw new Error(`${label}.${field} must be true or false`);
   }
   if (definition.supportRibFor !== undefined && typeof definition.supportRibFor !== "string") throw new Error(`${label}.supportRibFor must be an id`);
+  // A mold part's master, group and settings (lib/moldTool).
+  if (definition.moldOf !== undefined) {
+    const mold = objectRecord(definition.moldOf, `${label}.moldOf`);
+    if (typeof mold.master !== "string" || typeof mold.group !== "string") throw new Error(`${label}.moldOf must name its master and group`);
+    objectRecord(mold.settings, `${label}.moldOf.settings`);
+  }
   // What a group does with its parts when it is resized (Discussion #526).
   if (definition.groupResize !== undefined && definition.groupResize !== "stretch" && definition.groupResize !== "keepParts") {
     throw new Error(`${label}.groupResize must be stretch or keepParts`);

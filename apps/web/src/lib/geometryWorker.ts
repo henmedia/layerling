@@ -5,6 +5,7 @@ import { buildGroupedShapeFromSelection, exportSolidVolume, faceReadJoins, faceR
 import { packValue, packedTransfer, unpackValue } from "@/lib/geometryTransfer";
 import { articulateShapes, type FlexiOptions, type FlexiShapesResult } from "@/lib/flexiJoints";
 import { lidForShapes, lidTopForShapes, type LidOptions, type LidShapeResult } from "@/lib/lidTool";
+import { analyseMoldForShapes, moldForShapes, type MoldAnalysisResult, type MoldOptions, type MoldShapeResult } from "@/lib/moldTool";
 import { checkPrint, type PrintCheckOptions, type PrintCheckResult } from "@/lib/printCheck";
 import { checkLayers, type LayerCheckOptions, type LayerCheckResult } from "@/lib/layerCheck";
 import { resultMeshes, type GeometryTask, type GeometryWorkerRequest, type GeometryWorkerResponse } from "@/lib/geometryWorkerTypes";
@@ -339,11 +340,25 @@ export function splitBoltOffThread(shape: WorkplaneShape, options: Partial<BoltS
   return runGeometryTask<BoltSplitShapeResult>("boltSplit", { shape, options }, onPage, () => ({ parts: null, error: t("status.computeTimedOut") }), signal);
 }
 
+/** analyseMoldForShapes (lib/moldTool.ts) off the page, quietly: the mold panel's live check. Called off, it never answers. */
+export function analyseMoldOffThread(targets: readonly WorkplaneShape[], options: MoldOptions, signal?: AbortSignal): Promise<MoldAnalysisResult> {
+  const onPage = () => analyseMoldForShapes([...targets], options);
+  if (containsText([...targets])) return onPage();
+  return runGeometryTask<MoldAnalysisResult>("moldCheck", { targets: [...targets], options }, onPage, () => ({ analysis: null, error: t("status.computeTimedOut") }), signal, true);
+}
+
 /** lidForShapes (lib/lidTool.ts) off the page: the lid for a body open at the top (#1009). */
 export function lidForShapesOffThread(targets: readonly WorkplaneShape[], options: LidOptions, signal?: AbortSignal): Promise<LidShapeResult> {
   const onPage = () => lidForShapes([...targets], options);
   if (containsText([...targets])) return onPage();
   return runGeometryTask<LidShapeResult>("lid", { targets: [...targets], options }, onPage, () => ({ lid: null, error: t("status.computeTimedOut") }), signal);
+}
+
+/** moldForShapes (lib/moldTool.ts) off the page: the mold or die for a master. */
+export function moldForShapesOffThread(targets: readonly WorkplaneShape[], options: MoldOptions, signal?: AbortSignal): Promise<MoldShapeResult> {
+  const onPage = () => moldForShapes([...targets], options);
+  if (containsText([...targets])) return onPage();
+  return runGeometryTask<MoldShapeResult>("mold", { targets: [...targets], options }, onPage, () => ({ parts: null, error: t("status.computeTimedOut") }), signal);
 }
 
 /**

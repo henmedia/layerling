@@ -148,6 +148,21 @@ Vælg {{ui:lid.type.slide}} til et låg, der skydes ind som på et penalhus af t
 
 Vil du have låget sænket under kanten, så indstil {{ui:lid.slideFrame}} (0 til at begynde med). Låget og dets noter ligger så tilsvarende lavere, og væggene beholder deres fulde højde over dem, som en ramme om låget. Heller ikke væggen, låget skydes ind gennem, bliver så sænket: den beholder sin fulde højde og får en slids, hvor låget går igennem, og lågets ende udfylder slidsen, i flugt med ydersiden. Over låget giver slidsen samme spillerum som i siderne ({{ui:lid.gap}}), og med {{ui:lid.clickBumps}} også knoppens højde, så låget kan bue lidt op over den, når det trækkes ud; over slidsen skal der stå mindst 1 mm af væggen, og en lavere ramme afvises med den ramme, der skal til (1,2 mm ved en spalte på 0,2 mm). Kassen printes stadig stående: kun slidsens overside printes i luften, som en kort, vandret bro over lågets bredde, som de fleste printere klarer uden support. Tommelfingerrillerne sidder så lige bag den væg, og en trækflig stikker ud af slidsen.
 
+## Støbeforme og stanseværktøj
+
+{{ui:editor.tool.mold}} laver et legeme om til en form, så du kan støbe det, eller til et stempel og en matrice, så du kan presse det ind i tyndt materiale. Legemet er originalen, den form du vil kopiere. Vælg det, og klik på {{ui:editor.tool.mold}}. I vinduet vælger du, hvad der skal laves:
+
+- {{ui:mold.kind.twoPart}}: en fast form i to halvdele, printet og klar til at støbe i direkte: harpiks, gips, voks, sæbe, chokolade eller beton. Centreringskegler retter halvdelene ind (den ene er mindre, så formen kun lukker på én måde), en tragt og et indløb leder materialet ind ved originalens højeste punkt, og luftkanaler lukker luften ud, hvor den ellers ville blive fanget. Brækslidser i samlingen hjælper med at skille halvdelene ad, og spændeører med bolthuller holder dem sammen, hvis du vil.
+- {{ui:mold.kind.box}}: en ramme og en bundplade til at hælde silikone omkring den printede original. Originalen sidder i en lav fordybning, og rammen står i en rille, så intet løber ud. Vinduet fortæller, hvor meget silikone der skal bruges.
+- {{ui:mold.kind.tray}}: en udelt form, åben foroven, til en original med en flad side. Den flade side bliver den åbne top; fyld den op til kanten.
+- {{ui:mold.kind.die}}: et stempel og en matrice til læder, karton, folie eller tynd metalplade. Stemplet er originalens omrids set ovenfra på en plade, matricen en plade med omridset som fordybning. Ved {{ui:mold.dieMode.form}} er spillerummet hele vejen rundt lig med {{ui:mold.material}}, og stemplets kant er afrundet, så materialet ikke river; ved {{ui:mold.dieMode.cut}} er spillerummet nogle få procent af den, og matricen er åben forneden, så det udskårne falder igennem. Styrestifter holder begge dele på linje.
+
+Klik på {{ui:mold.apply}}: Delene ligger ved siden af originalen, sådan som de printes uden support: halvdelene med delefladen opad, matricen klar til at blive vendt om ned på stemplet. Originalen forbliver, som den er.
+
+Det mest almindelige problem med forme er en støbning, der sidder fast. Hvor originalen er bredere over delingen end under den, advarer vinduet om en underskæring: flyt {{ui:mold.parting}} derhen, hvor originalen er bredest, vend originalen, eller tag støbekassen til silikone, som slipper underskæringer.
+
+> **Tip:** Forsegl en printet form (med harpiks eller voks), og brug slipmiddel, ellers hager støbningen sig fast i laglinjerne. PLA bliver blødt fra omkring 55 °C: til varm voks, sæbe eller harpiks, der bliver varm, mens den hærder, skal formen printes i PETG eller ASA.
+
 ## En kabelkanal gennem et legeme
 
 {{ui:editor.tool.cableChannel}} lægger en rund gang gennem et legeme til et kabel eller en LED-ledning, fra der hvor det går ind, til der hvor det kommer ud, og finder selv vejen. Vælg legemet og klik på {{ui:editor.tool.cableChannel}}, og klik så på legemet der, hvor kablet går ind ({{ui:cable.entry}}), og der, hvor det kommer ud ({{ui:cable.exit}}). Vejen begynder og ender lige, vinkelret på overfladen, går lige, hvor den kan, og bøjer, hvor den må, aldrig skarpere end {{ui:cable.minBend}}, og holder sig så langt fra ydersiden som muligt, aldrig tættere end {{ui:cable.minWall}}. Et kabel kan skubbes gennem en bøjning på cirka fem gange dets diameter; {{ui:cable.diameter}} er kanalens egen.

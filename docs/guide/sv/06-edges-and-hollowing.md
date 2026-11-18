@@ -147,6 +147,21 @@ Välj {{ui:lid.type.slide}} för ett lock som skjuts in som på ett klassiskt tr
 
 För att sänka ned locket under kanten ställer du in {{ui:lid.slideFrame}} (0 från start). Locket och dess spår hamnar då så mycket lägre medan väggarna behåller sin fulla höjd ovanför, som en ram runt locket. Väggen som det skjuts in genom kapas då inte heller ned upptill: den behåller full höjd med en springa rakt igenom där locket löper, och lockets ände fyller springan kant i kant med utsidan. Ovanför locket lämnar springan samma spel som vid sidorna ({{ui:lid.gap}}), plus klackens höjd med {{ui:lid.clickBumps}} så att locket kan fjädra upp förbi sin klack på vägen ut; minst 1 mm vägg måste finnas kvar ovanför springan, och en lägre ram nekas med uppgift om minsta nödvändiga höjd (1,2 mm med 0,2 mm spel). Lådan skrivs fortfarande ut stående: springans ovankant är det enda stället i luften, en kort vågrät brygga över lockets bredd som de flesta skrivare överbryggar utan stöd. Tumskårorna hamnar då strax innanför den väggen, medan en dragflik sticker ut ur springan.
 
+## Gjutformar och stansar
+
+{{ui:editor.tool.mold}} gör om en kropp till en form att gjuta den i, eller till en stämpel och en matris för att pressa in den i tunt material. Kroppen är originalet, formen du vill kopiera. Markera den och klicka på {{ui:editor.tool.mold}}. I fönstret väljer du vad som ska skapas:
+
+- {{ui:mold.kind.twoPart}}: en styv form i två halvor, utskriven och klar att gjuta i direkt: harts, gips, vax, tvål, choklad eller betong. Styrkoner riktar in halvorna (en är mindre, så formen bara stängs på ett sätt), en tratt och ett ingöt leder in materialet vid originalets högsta punkt, och luftkanaler släpper ut luften där den annars skulle stängas inne. Bändspår i skarven hjälper till att dela halvorna, och spännöron med bulthål håller ihop dem om du vill.
+- {{ui:mold.kind.box}}: en ram och en bottenplatta för att gjuta silikon runt det utskrivna originalet. Originalet sitter i en grund fördjupning och ramen står i ett spår, så att inget rinner ut. Fönstret visar hur mycket silikon som behövs.
+- {{ui:mold.kind.tray}}: en odelad form, öppen upptill, för ett original med en plan sida. Den plana sidan blir den öppna ovansidan; fyll den till brädden.
+- {{ui:mold.kind.die}}: en stämpel och en matris för läder, kartong, folie eller tunn plåt. Stämpeln är originalets kontur sedd ovanifrån på en platta, matrisen en platta med konturen som fördjupning. Vid {{ui:mold.dieMode.form}} är spelrummet runtom lika med {{ui:mold.material}}, och stämpelns kant avrundas så att materialet inte rivs sönder; vid {{ui:mold.dieMode.cut}} är spelrummet några procent av den och matrisen är öppen undertill, så att det utskurna faller igenom. Styrstift håller båda i linje.
+
+Klicka på {{ui:mold.apply}}: delarna ligger bredvid originalet så som de skrivs ut, utan stöd: halvorna med delningsytan uppåt, matrisen redo att vändas upp och ner på stämpeln. Originalet förblir som det är.
+
+Det vanligaste problemet med formar är ett gjutstycke som fastnar. Där originalet är bredare ovanför delningen än under den varnar fönstret för en underskärning: flytta {{ui:mold.parting}} dit där originalet är bredast, vänd originalet eller ta gjutlådan för silikon, som släpper underskärningar.
+
+> **Tips:** Försegla en utskriven form (med harts eller vax) och använd släppmedel, annars hakar gjutstycket fast i lagerlinjerna. PLA mjuknar från cirka 55 °C: för varmt vax, tvål eller harts som blir varmt när det härdar, skriv ut formen i PETG eller ASA.
+
 ## En kabelkanal genom en kropp
 
 {{ui:editor.tool.cableChannel}} drar en rund tunnel genom en kropp för en kabel eller LED-sladd, från ingång till utgång, och letar själv upp vägen. Markera kroppen och klicka på {{ui:editor.tool.cableChannel}}, klicka sedan på kroppen där kabeln går in ({{ui:cable.entry}}) och där den kommer ut ({{ui:cable.exit}}). Banan börjar och slutar vinkelrätt mot ytan, löper rakt där det går och böjer där det behövs, aldrig snävare än {{ui:cable.minBend}}, och håller sig så långt från utsidan som möjligt och aldrig närmare än {{ui:cable.minWall}}. En kabel går lätt att skjuta genom en böj med radie omkring fem gånger dess diameter; {{ui:cable.diameter}} är kanalens diameter.

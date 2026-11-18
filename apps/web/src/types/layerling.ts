@@ -1709,6 +1709,11 @@ export type WorkplaneShape = {
    */
   supportRibFor?: string;
   /**
+   * A part of a mold the mold tool made: the master's id, an id the parts of the same mold share, and the settings it was
+   * made with, so "Make the mold again" opens the tool with them and replaces the mold's parts. See lib/moldTool.
+   */
+  moldOf?: { master: string; group: string; settings: Record<string, unknown> };
+  /**
    * A bridge the stencil bridge tool made (Discussion #1438): a box that holds a part inside a hole, such as the middle
    * of an "o", to the plate round it. Running the tool on its group again puts new bridges in place of these. See
    * lib/stencilBridgeTool.

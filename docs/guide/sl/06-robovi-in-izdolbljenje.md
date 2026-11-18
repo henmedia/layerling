@@ -146,6 +146,21 @@ Izberi {{ui:lid.type.slide}} za pokrov, ki se potisne noter kot pri lesenem pere
 
 Če želiš pokrov pogrezniti pod rob, nastavi {{ui:lid.slideFrame}} (na začetku 0). Pokrov in njegovi utori so tedaj toliko nižje, stene nad njimi pa ohranijo polno višino, kot okvir okoli pokrova. Tudi stena, skozi katero pokrov zdrsne noter, tedaj ni znižana: ohrani polno višino, kjer gre pokrov skozi, pa ima prorez, ki ga konec pokrova zapolni, poravnan z zunanjo stranjo. Nad pokrovom pusti prorez enako režo kot ob straneh ({{ui:lid.gap}}), z {{ui:lid.clickBumps}} pa še višino izbokline, da se pokrov pri izvleku lahko malo upogne navzgor čeznjo; nad njim mora ostati vsaj 1 mm stene, nižji okvir pa je zavrnjen s potrebno višino (1,2 mm pri reži 0,2 mm). Škatla se še vedno natisne pokonci: le zgornja stran proreza se natisne v zraku, kot kratek, raven most čez širino pokrova, ki ga večina tiskalnikov zmore brez podpor. Žlebički za palec so tedaj tik za to steno, jeziček pa gleda iz proreza.
 
+## Kalupi in matrice
+
+{{ui:editor.tool.mold}} iz telesa naredi kalup, da ga uliješ, ali pestič in matrico, da ga vtisneš v tanek material. Telo je izvirnik, oblika, ki jo želiš kopirati. Izberi ga in klikni {{ui:editor.tool.mold}}. V oknu izbereš, kaj naj nastane:
+
+- {{ui:mold.kind.twoPart}}: trden kalup iz dveh polovic, natisnjen in pripravljen za neposredno vlivanje: smola, mavec, vosek, milo, čokolada ali beton. Centrirni stožci poravnajo polovici (eden je manjši, zato se kalup zapre le na en način), lijak in ulivnik vodita material noter na najvišji točki izvirnika, zračniki pa spustijo ven zrak tam, kjer bi ostal ujet. Reže za vzvod na stiku pomagajo ločiti polovici, vpenjalna ušesa z luknjami za vijake pa ju po želji držijo skupaj.
+- {{ui:mold.kind.box}}: okvir z osnovno ploščo za vlivanje silikona okoli natisnjenega izvirnika. Izvirnik sedi v plitvem ležišču, okvir stoji v utoru, da nič ne izteče. Okno pove, koliko silikona potrebuješ.
+- {{ui:mold.kind.tray}}: enodelni, zgoraj odprt kalup za izvirnik z ravno stranjo. Ravna stran postane odprti vrh; napolni ga do roba.
+- {{ui:mold.kind.die}}: pestič in matrica za usnje, karton, folijo ali tanko pločevino. Pestič je obris izvirnika, gledan od zgoraj, na plošči, matrica pa plošča s tem obrisom kot vdolbino. Pri izbiri {{ui:mold.dieMode.form}} je reža naokoli enaka vrednosti {{ui:mold.material}}, rob pestiča pa je zaobljen, da se material ne strga; pri izbiri {{ui:mold.dieMode.cut}} je reža le nekaj odstotkov te debeline, matrica pa je spodaj odprta, zato izrezani kos pade skozi. Vodilni zatiči držijo oba dela poravnana.
+
+Klikni {{ui:mold.apply}}: deli ležijo poleg izvirnika tako, kot se natisnejo brez podpor: polovici z delilno ploskvijo navzgor, matrica pripravljena, da jo obrneš na pestič. Izvirnik ostane, kakršen je.
+
+Najpogostejša težava s kalupi je ulitek, ki se zatakne. Kjer je izvirnik nad delitvijo širši kot pod njo, okno opozori na spodrez: premakni {{ui:mold.parting}} tja, kjer je izvirnik najširši, obrni izvirnik ali vzemi okvir za silikon, ki spodreze sprosti.
+
+> **Namig:** Natisnjeni kalup zatesni (s smolo ali voskom) in uporabi ločilno sredstvo, sicer se ulitek zagrabi v linije slojev. PLA se zmehča že pri približno 55 °C: za vroč vosek, milo ali smolo, ki se pri strjevanju segreje, natisni kalup v PETG ali ASA.
+
 ## Kabelski kanal skozi telo
 
 {{ui:editor.tool.cableChannel}} napelje okrogel prehod skozi telo za kabel ali žico LED, od mesta, kjer vstopi, do mesta, kjer izstopi, in sam najde pot. Izberi telo in klikni {{ui:editor.tool.cableChannel}}, nato klikni na telo, kjer kabel vstopi ({{ui:cable.entry}}), in kjer izstopi ({{ui:cable.exit}}). Pot se začne in konča naravnost, pravokotno na površino, gre naravnost, kjer gre, in se ukrivi, kjer mora, nikoli ožje od {{ui:cable.minBend}}, in ostane čim dlje od zunanje površine, nikoli bliže od {{ui:cable.minWall}}. Kabel se da potisniti skozi lok s polmerom približno petkratnika njegovega premera; {{ui:cable.diameter}} je premer kanala.

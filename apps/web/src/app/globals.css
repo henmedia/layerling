@@ -18367,6 +18367,7 @@ html[data-theme="dark"] .property-card > button.property-card-header:hover {
   border-radius: 6px;
 }
 
+/* Findings in the mold window: each with its level, what it is and what helps. */
 .layer-check-list {
   display: flex;
   flex-direction: column;
@@ -18651,6 +18652,30 @@ html[data-theme="dark"] .layer-view-play label {
 
 html[data-theme="dark"] .layer-check-remedy {
   color: #f0b46c;
+}
+
+.tool-plain-section > strong {
+  display: block;
+  margin-bottom: 6px;
+}
+
+.mold-analysis p {
+  margin: 4px 0;
+  font-size: 13px;
+}
+
+.mold-analysis.stale {
+  opacity: 0.6;
+}
+
+.mold-option-figure {
+  font-weight: 500;
+  opacity: 0.8;
+}
+
+.mold-vents {
+  display: grid;
+  gap: 4px;
 }
 
 html[data-theme="dark"] .layer-view-readout strong {
