@@ -1,5 +1,6 @@
 /// <reference lib="webworker" />
 
+import { splitBoltForShape, type BoltSplitOptions } from "@/lib/boltSplit";
 import { buildMessage } from "@/lib/buildStamp";
 import { checkClearance, type ClearanceOptions } from "@/lib/clearanceCheck";
 import { articulateShapes, type FlexiOptions } from "@/lib/flexiJoints";
@@ -60,6 +61,9 @@ self.onmessage = async (event: MessageEvent<GeometryWorkerRequest>) => {
     } else if (request.task === "lid") {
       const { targets, options } = args as { targets: WorkplaneShape[]; options: LidOptions };
       result = await lidForShapes(targets, options);
+    } else if (request.task === "boltSplit") {
+      const { shape, options } = args as { shape: WorkplaneShape; options: Partial<BoltSplitOptions> };
+      result = await splitBoltForShape(shape, options);
     } else if (request.task === "lidTop") {
       const { targets } = args as { targets: WorkplaneShape[] };
       result = await lidTopForShapes(targets);

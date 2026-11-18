@@ -1926,6 +1926,19 @@ export const tools = [
     },
   },
   {
+    name: "layerling_split_bolt",
+    description: "Split a screw or threaded rod (a thread object of role screw or rod, not a hole) lengthwise for printing, like the Split lengthwise and lay flat button in its properties: a thread printed lying down is far stronger than one printed standing, whose layers part under load. The body is cut in two through its own axis (however it is turned on the workplane) and both halves are laid on their cut faces where it stood, side by side, ready to print without support; glue them together afterwards. With `pins` (default true) centring pins line the halves up exactly, along the axis too, so the turns of both halves meet: one in the head (on the axis past the drive's floor, else beside the drive) and one to three along the thread by its length (about one per 20 mm; a rod gets one near each end), each in a hole square to the cut face in both halves that ends in a 45 degree cone, so the holes need no bridge. The pins (diameter 0.25 of the thread's core, 2 to 6 mm, in half millimetres; `pinPlay` per side, default the printer's play, else 0.15 mm, and 0.3 mm shorter than the two holes at each end, chamfered) stand in a row beside the halves as one body. The head always gets one and the thread at least one: where they do not fit, thinner pins (down to 1.5 mm) and a 0.4 mm wall are tried, other places along the thread, and a shorter pin in the head (headPinLength); a thread under about M6 is too thin for any pin, its head still gets one. The screw is replaced by the parts (mesh bodies named \"<name> - half 1\", \"... half 2\", \"... centring pins\") in one undo step, and they are selected. Returns the parts, pins (how many), pinDiameter, pinLength and headPinLength (where the head's differs) in mm, and placed (head, thread).",
+    inputSchema: {
+      ...editorTargetSchema,
+      properties: {
+        ...editorTargetSchema.properties,
+        id: { type: "string", description: "The screw or rod to split. Left out: the one selected object." },
+        pins: { type: "boolean", description: "Holes in both halves and loose centring pins for them. Default true." },
+        pinPlay: { type: "number", minimum: 0, maximum: 0.5, description: "The pins' play per side in their holes, mm. Default the printer's play, else 0.15." },
+      },
+    },
+  },
+  {
     name: "layerling_add_reference_points",
     description: "Mark reference points - bare marks in space that shapes snap to when they are dragged, like pencil marks and layout points in a workshop. They are not part of any body, are never printed or exported, and are saved with the design. Mark the centre, the four corners or the four edge middles of objects (on their top face), or pass exact positions with `points`. Points already marked are not added twice. Returns the new points with their ids; shapes can then be placed on them with layerling_update_object.",
     inputSchema: {

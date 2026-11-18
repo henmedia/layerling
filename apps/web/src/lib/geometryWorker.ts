@@ -1,3 +1,4 @@
+import { splitBoltForShape, type BoltSplitOptions, type BoltSplitShapeResult } from "@/lib/boltSplit";
 import { buildsDiffer, BUILD_ID, isBuildMessage, reportWorkerBuild } from "@/lib/buildStamp";
 import { checkClearance, type ClearanceOptions, type ClearanceResult } from "@/lib/clearanceCheck";
 import { buildGroupedShapeFromSelection, exportSolidVolume, faceReadJoins, faceReadPositions, previewSplitConnectors, splitShapeIfCrossed, splitShapesByPlane, type ExportSolidVolume, type RebuildStretchedGroup, type GroupBuildResult, type SplitConnectorPreview, type SplitShapesOutcome } from "@/lib/editorBooleans";
@@ -310,6 +311,12 @@ export function checkPrintOffThread(source: readonly WorkplaneShape[], options: 
   return runGeometryTask<PrintCheckResult>("printCheck", { source: [...source], options }, onPage, () => {
     throw new Error(t("status.computeTimedOut"));
   }, signal);
+}
+
+/** splitBoltForShape (lib/boltSplit.ts) off the page: a screw or rod cut lengthwise and laid flat for printing. */
+export function splitBoltOffThread(shape: WorkplaneShape, options: Partial<BoltSplitOptions>, signal?: AbortSignal): Promise<BoltSplitShapeResult> {
+  const onPage = () => splitBoltForShape(shape, options);
+  return runGeometryTask<BoltSplitShapeResult>("boltSplit", { shape, options }, onPage, () => ({ parts: null, error: t("status.computeTimedOut") }), signal);
 }
 
 /** lidForShapes (lib/lidTool.ts) off the page: the lid for a body open at the top (#1009). */
