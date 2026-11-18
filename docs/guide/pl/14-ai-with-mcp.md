@@ -146,6 +146,8 @@ AI pracuje tymi samymi funkcjami co Ty, tą samą drogą co Twoja praca w edytor
 | `layerling_check_clearance` | sprawdza przed drukiem, które części nachodzą na siebie, stykają się lub są bliżej niż minimalny luz, także osobne części jednego obiektu |
 | `layerling_printer_play` | odczytuje, ustawia lub czyści luz drukarki ({{ui:workspace.printerPlay}} w ustawieniach) i kładzie test pasowania, który go mierzy |
 | `layerling_check_print` | sprawdza przed drukiem, co poszłoby źle: zbyt cienkie ścianki dla dyszy, części w powietrzu, mały styk z płytą, nawisy i otwarte siatki |
+| `layerling_check_layers` | tnie wydruk na warstwy i warstwa po warstwie wymienia, co pójdzie źle: nawisy, miejsca bez podparcia, mosty, cienkie ścianki, małe wyspy, część w stole (Analiza wydruku) |
+| `layerling_split_bolt` | dzieli śrubę lub pręt gwintowany wzdłuż przez oś i kładzie obie połowy na powierzchni cięcia do druku, opcjonalnie z kołkami ustalającymi |
 | `layerling_add_reference_points` | stawia punkty odniesienia (na środku, narożnikach albo środkach krawędzi obiektów albo w dokładnych pozycjach), do których przyciągają się kształty |
 | `layerling_list_reference_points` | wypisuje punkty odniesienia z identyfikatorami i pozycjami |
 | `layerling_remove_reference_points` | usuwa punkty odniesienia według identyfikatora albo wszystkie |

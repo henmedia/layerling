@@ -1,4 +1,4 @@
-import { PrinterCheck, SearchCheck } from "lucide-react";
+import { Layers3, PrinterCheck, SearchCheck } from "lucide-react";
 import type { CSSProperties, SVGProps } from "react";
 
 type IconProps = SVGProps<SVGSVGElement>;
@@ -127,6 +127,11 @@ export function ToolbarClearanceIcon({ className, ...props }: IconProps) {
 /** The print check: a printer with a tick, beside the clearance check's magnifier; the same class for the dimming. */
 export function ToolbarPrintCheckIcon({ className, ...props }: IconProps) {
   return <PrinterCheck className={["toolbar-vector-art-icon", className].filter(Boolean).join(" ")} {...props} />;
+}
+
+/** The print analysis (Druckanalyse): layers stacked, as the slicer lays them down; the same class for the dimming. */
+export function ToolbarLayerCheckIcon({ className, ...props }: IconProps) {
+  return <Layers3 className={["toolbar-vector-art-icon", className].filter(Boolean).join(" ")} {...props} />;
 }
 
 export function ToolbarAlignIcon(props: IconProps) {

@@ -18319,3 +18319,362 @@ html[data-theme="dark"] .property-card > button.property-card-header:hover {
     display: block;
   }
 }
+
+/* Print analysis (Druckanalyse) and its layer view. */
+.layer-check-progress {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 6px 8px;
+  align-items: center;
+}
+
+.layer-check-progress .tool-status {
+  margin: 0;
+}
+
+.layer-check-progress progress {
+  grid-column: 1 / -1;
+  width: 100%;
+  height: 8px;
+  accent-color: #e8851a;
+}
+
+.layer-check-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 10px 0 6px;
+}
+
+.layer-check-filters label,
+.layer-view-play label {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-size: 11px;
+  color: #6d5133;
+}
+
+.layer-check-filters select,
+.layer-view-play select {
+  min-width: 120px;
+  padding: 3px 6px;
+  font: inherit;
+  font-size: 12px;
+  color: #3a2816;
+  background: #fffdf9;
+  border: 1px solid #dccdb8;
+  border-radius: 6px;
+}
+
+.layer-check-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 8px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.layer-check-list.stale {
+  opacity: 0.55;
+}
+
+.layer-check-row {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 6px;
+  padding: 6px 8px;
+  color: #3a2816;
+  background: #fbf8f3;
+  border: 1px solid #ede5d6;
+  border-left: 4px solid #f2c230;
+  border-radius: 6px;
+}
+
+.layer-check-row.problem {
+  border-left-color: #e5484d;
+}
+
+.layer-check-row.active {
+  background: #fff1de;
+  box-shadow: 0 0 0 2px rgba(232, 133, 26, 0.45);
+}
+
+.layer-check-row > .print-check-show {
+  align-self: flex-end;
+}
+
+.layer-check-row-main {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+  padding: 0;
+  color: inherit;
+  text-align: left;
+  background: none;
+  border: 0;
+  cursor: pointer;
+  font: inherit;
+}
+
+.layer-check-row-main > svg {
+  flex: none;
+  margin-top: 1px;
+  color: #c79a00;
+}
+
+.layer-check-row.problem .layer-check-row-main > svg {
+  color: #e5484d;
+}
+
+.layer-check-row-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-size: 12px;
+  line-height: 1.35;
+}
+
+.layer-check-row-level {
+  color: #867360;
+  font-size: 11px;
+}
+
+.layer-check-remedy {
+  color: #8a5a1c;
+}
+
+.layer-check-clear {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  margin: 8px 0 0;
+  color: #2f7d4a;
+  font-size: 12px;
+}
+
+.layer-check-note {
+  margin: 8px 0 0;
+  color: #867360;
+  font-size: 11px;
+  font-style: italic;
+}
+
+.layer-view-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+}
+
+.layer-view-steps {
+  display: flex;
+  gap: 4px;
+}
+
+.layer-view-steps button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 28px;
+  color: #6d5133;
+  background: #fffdf9;
+  border: 1px solid #dccdb8;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.layer-view-steps button:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
+.layer-view {
+  margin-top: 10px;
+}
+
+.layer-view-readout {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 10px;
+  align-items: baseline;
+  margin-bottom: 8px;
+  font-size: 12px;
+  color: #6d5133;
+}
+
+.layer-view-readout strong {
+  color: #3a2816;
+  font-size: 13px;
+}
+
+.layer-view-active {
+  padding: 1px 6px;
+  color: #5c4300;
+  background: #fbe9a6;
+  border-radius: 999px;
+}
+
+.layer-view-active.problem {
+  color: #7a1418;
+  background: #f9d0d1;
+}
+
+.layer-view-slider {
+  display: grid;
+  grid-template-columns: 22px 10px 1fr;
+  gap: 6px;
+  align-items: start;
+  margin-bottom: 10px;
+}
+
+.layer-view-track {
+  position: relative;
+  width: 10px;
+  margin: 0 auto;
+  background: #ede5d6;
+  border-radius: 5px;
+  cursor: ns-resize;
+  touch-action: none;
+}
+
+.layer-view-track:focus-visible {
+  outline: 2px solid #e8851a;
+  outline-offset: 3px;
+}
+
+.layer-view-fill {
+  position: absolute;
+  left: 0;
+  right: 0;
+  background: #8fb3e0;
+  border-radius: 0 0 5px 5px;
+}
+
+.layer-view-range {
+  position: absolute;
+  left: -4px;
+  right: -4px;
+  background: rgba(47, 95, 158, 0.25);
+  border-radius: 3px;
+}
+
+.layer-view-thumb {
+  position: absolute;
+  left: -6px;
+  width: 22px;
+  height: 12px;
+  background: #fffdf9;
+  border: 2px solid #2f5f9e;
+  border-radius: 6px;
+  pointer-events: none;
+}
+
+.layer-view-marks {
+  position: relative;
+}
+
+.layer-view-mark {
+  position: absolute;
+  left: 0;
+  width: 10px;
+  padding: 0;
+  background: #f2c230;
+  border: 0;
+  border-radius: 2px;
+  cursor: pointer;
+}
+
+.layer-view-mark.problem {
+  background: #e5484d;
+}
+
+.layer-view-mark.active {
+  box-shadow: 0 0 0 2px #2f5f9e;
+}
+
+.layer-view-chart {
+  width: 100%;
+  background: #fbf8f3;
+  border: 1px solid #ede5d6;
+  border-radius: 6px;
+  cursor: crosshair;
+}
+
+.layer-view-chart path {
+  fill: rgba(47, 95, 158, 0.28);
+  stroke: #2f5f9e;
+  stroke-width: 0.6;
+  vector-effect: non-scaling-stroke;
+}
+
+.layer-view-chart line {
+  stroke: #e8851a;
+  stroke-width: 2;
+  vector-effect: non-scaling-stroke;
+}
+
+.layer-view-from {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 8px;
+  align-items: center;
+}
+
+.layer-view-play {
+  display: flex;
+  gap: 10px;
+  align-items: flex-end;
+  margin: 8px 0;
+}
+
+html[data-theme="dark"] .layer-check-row {
+  color: #ecdcc9;
+  background: #2f2418;
+  border-color: #53412f;
+}
+
+html[data-theme="dark"] .layer-check-row.active {
+  background: #3f2c18;
+}
+
+html[data-theme="dark"] .layer-check-row-level,
+html[data-theme="dark"] .layer-check-note,
+html[data-theme="dark"] .layer-view-readout,
+html[data-theme="dark"] .layer-check-filters label,
+html[data-theme="dark"] .layer-view-play label {
+  color: #bfa98f;
+}
+
+html[data-theme="dark"] .layer-check-remedy {
+  color: #f0b46c;
+}
+
+html[data-theme="dark"] .layer-view-readout strong {
+  color: #ecdcc9;
+}
+
+html[data-theme="dark"] .layer-check-filters select,
+html[data-theme="dark"] .layer-view-play select,
+html[data-theme="dark"] .layer-view-steps button {
+  color: #ecdcc9;
+  background: #35281b;
+  border-color: #6a5440;
+}
+
+html[data-theme="dark"] .layer-view-track {
+  background: #53412f;
+}
+
+html[data-theme="dark"] .layer-view-chart {
+  background: #2f2418;
+  border-color: #53412f;
+}
+
+html[data-theme="dark"] .layer-view-chart path {
+  fill: rgba(143, 179, 224, 0.3);
+  stroke: #8fb3e0;
+}
