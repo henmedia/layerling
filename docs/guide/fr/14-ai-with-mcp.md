@@ -97,6 +97,7 @@ L'IA fonctionne avec les mêmes fonctions que vous, via le même chemin que votr
 | `layerling_lay_flat` | pose un objet avec une face sur la plaque |
 | `layerling_place_on_face` | pose des objets sur une face d'une autre, également inclinée, comme la touche C |
 | `layerling_perforate_face` | découpe un motif de trous dans une face plate ou autour de la paroi d'un cylindre, d'un tube ou d'un alésage ; les trous restent groupés avec le corps |
+| `layerling_thread_insert` | perce le trou pour un insert fileté à chaud (M2 à M8, 1/4-20 ou votre propre taille) dans une face plate ou la paroi extérieure d'un cylindre ou d'un tube, après avoir vérifié que la paroi à côté du trou et la profondeur derrière sont suffisantes ; le trou reste un trou groupé avec le corps |
 | `layerling_sweep_sketch` | tire une section rectangulaire ou ronde le long d'un chemin de points, comme un seul corps exact ; un chemin fermé donne un anneau |
 | `layerling_push_face` | tire une face plane vers l'extérieur ou y creuse une poche, avec un retrait depuis le bord et un rayon des coins ; la nouvelle pièce est un corps d'esquisse regroupé avec le corps |
 | `layerling_paint` | peint des parties d'un corps dans leurs propres couleurs pour une impression en plusieurs couleurs (Peindre) : remplir une face jusqu'à ses arêtes vives, une tache ronde ou un lasso tracé dans une vue à plat ; gommer, tout retirer ; enregistré avec le corps et écrit dans un 3MF sous forme de faces peintes |

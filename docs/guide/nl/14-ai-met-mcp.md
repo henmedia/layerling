@@ -97,6 +97,7 @@ De AI werkt met dezelfde functies als jij, via dezelfde weg als jouw bediening i
 | `layerling_lay_flat` | legt een object met één vlak op de plaat |
 | `layerling_place_on_face` | zet objecten neer op een vlak van een ander, ook op schuine, zoals de C-toets |
 | `layerling_perforate_face` | snijdt een gatenpatroon in een plat vlak of rond de wand van een cilinder, buis of boring; de gaten blijven gaten, gegroepeerd met het lichaam |
+| `layerling_thread_insert` | maakt het gat voor een inzetbare schroefdraadbus die met warmte wordt ingedrukt (M2 tot M8, 1/4-20 of een eigen maat) in een plat vlak of de buitenwand van een cilinder of buis, nadat is gecontroleerd of de wand naast het gat en de diepte erachter genoeg zijn; het gat blijft een gat, gegroepeerd met het lichaam |
 | `layerling_sweep_sketch` | trekt een rechthoekige of ronde dwarsdoorsnede langs een pad van punten als één exact lichaam; een gesloten pad geeft een ring |
 | `layerling_push_face` | trekt een plat vlak naar buiten of snijdt er een kamer in, met inspringing vanaf de rand en hoekradius; het nieuwe deel is een schetslichaam, gegroepeerd met het lichaam |
 | `layerling_paint` | beschildert delen van een lichaam in eigen kleuren om in meerdere kleuren te printen (Beschilderen): een vlak vullen tot aan de scherpe randen, een ronde vlek of een lasso in een vlakke weergave; gummen, alles verwijderen; met het lichaam opgeslagen en in een 3MF als beschilderde vlakken geschreven |

@@ -315,6 +315,25 @@ export function ToolbarHolePatternIcon(props: IconProps) {
   );
 }
 
+/**
+ * A block seen from above with a round hole and an insert in it, a ring of ticks round the inner circle like the
+ * knurl of a heat-set insert: the thread insert tool (#1828).
+ */
+export function ToolbarThreadInsertIcon(props: IconProps) {
+  const ticks = Array.from({ length: 8 }, (_, i) => {
+    const angle = (i * Math.PI) / 4;
+    return `M${24 + Math.cos(angle) * 7.5} ${24 + Math.sin(angle) * 7.5}L${24 + Math.cos(angle) * 10} ${24 + Math.sin(angle) * 10}`;
+  }).join("");
+  return (
+    <ToolbarVectorIcon {...props}>
+      <rect x="5" y="6" width="38" height="36" rx="3" />
+      <circle cx="24" cy="24" r="10" />
+      <circle cx="24" cy="24" r="4.5" />
+      <path d={ticks} strokeWidth="2" />
+    </ToolbarVectorIcon>
+  );
+}
+
 /** A slab with a pad set in from its edges standing on top, and an arrow out of the face: the face tool. */
 export function ToolbarFaceToolIcon(props: IconProps) {
   return (
