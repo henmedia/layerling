@@ -143,6 +143,8 @@ L'IA fonctionne avec les mêmes fonctions que vous, via le même chemin que votr
 | `layerling_check_clearance` | vérifie avant l'impression quelles pièces se chevauchent, se touchent ou sont plus proches qu'un jeu minimal (Vérifier le jeu), y compris les pièces séparées d'un objet |
 | `layerling_printer_play` | lit, règle ou efface le jeu de l'imprimante ({{ui:workspace.printerPlay}} dans les réglages) et pose le test d'ajustement qui le mesure |
 | `layerling_check_print` | vérifie avant l'impression ce qui raterait : parois trop fines pour la buse, pièces en l'air, faible contact avec le plateau, surplombs et maillages ouverts (Vérifier l'impression) |
+| `layerling_check_layers` | découpe l’impression en couches et liste couche par couche ce qui irait mal : porte-à-faux, zones sans appui, ponts, parois fines, petits îlots, pièce dans le plateau (Analyse d’impression) |
+| `layerling_split_bolt` | coupe une vis ou une tige filetée dans la longueur par son axe et pose les deux moitiés sur leur face de coupe pour l’impression, avec pions de centrage si voulu |
 | `layerling_add_reference_points` | marque des points de référence - au centre, dans les coins ou au milieu des bords des objets, ou à des positions exactes - sur lesquels les formes s'accrochent |
 | `layerling_list_reference_points` | répertorie les points de référence avec leurs identifiants et positions |
 | `layerling_remove_reference_points` | supprime les points de référence par identifiant, ou tous |

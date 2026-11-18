@@ -6614,7 +6614,14 @@ export function createSurfaceTextureSession(positions: ArrayLike<number>) {
         const rl = Math.hypot(cx, cy);
         // Facing the axis, with the body across (see bodyAcross): a wedge's slope past the middle faces it too.
         const isInside = rl > 1e-9 && (fn[i1] * cx + fn[i2] * cy) / rl < -0.3 && faceAcross(t / 3, AXIS_INDEX[s.axis]);
-        smooth = isInside ? !s.inside : !s.outside;
+        // A pit in a floor (a Gridfinity socket in a hollowed box) has walls that face away from the axis, or along the way round
+        // it for the ridge between two pits, but the body lies beyond them: they belong to the inside too. An outer wall has
+        // nothing beyond it. Faces leaning outward look outward along the radius; the others along their own normal.
+        const outward = rl > 1e-9 ? (fn[i1] * cx + fn[i2] * cy) / rl : 0;
+        const level = Math.hypot(fn[i1], fn[i2]) > 0.3;
+        const pit = !isInside && level && rl > 1e-9 && outward > -0.3
+          && innerWall((v[I[t] * 3] + v[I[t + 1] * 3] + v[I[t + 2] * 3]) / 3, (v[I[t] * 3 + 1] + v[I[t + 1] * 3 + 1] + v[I[t + 2] * 3 + 1]) / 3, (v[I[t] * 3 + 2] + v[I[t + 1] * 3 + 2] + v[I[t + 2] * 3 + 2]) / 3, outward > 0.3 ? cx : fn[i1], outward > 0.3 ? cy : fn[i2], i1, i2);
+        smooth = isInside || pit ? !s.inside : !s.outside;
       }
       if (smooth) faces[t / 3] = 1;
       else for (let k = 0; k < 3; k += 1) points[I[t + k]] = 0;

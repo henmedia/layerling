@@ -147,6 +147,8 @@ AI 使用与你相同的功能，走的是与你在编辑器中的操作相同�
 | `layerling_check_clearance` | 打印前检查哪些部件重叠、接触或间距小于最小间隙，也检查同一对象中彼此分离的部件 |
 | `layerling_printer_play` | 读取、设置或清除打印机间隙（设置中的{{ui:workspace.printerPlay}}），并放置用来测量它的配合测试件 |
 | `layerling_check_print` | 打印前检查会出什么问题：对喷嘴来说过薄的壁、悬空的零件、与平台接触过少、悬垂和开放网格 |
+| `layerling_check_layers` | 把打印件切成层，逐层列出会出问题的地方：悬垂、无支撑区域、桥接、薄壁、小岛、陷入热床的零件（打印分析） |
+| `layerling_split_bolt` | 沿轴线把螺钉或螺杆纵向剖成两半，并以剖切面朝下平放以便打印，可选加定位销 |
 | `layerling_add_reference_points` | 标记参考点——可位于对象的中心、角或边中点，也可位于精确位置——形状会吸附到这些点 |
 | `layerling_list_reference_points` | 列出参考点及其 id 和位置 |
 | `layerling_remove_reference_points` | 按 id 删除参考点，或删除全部 |

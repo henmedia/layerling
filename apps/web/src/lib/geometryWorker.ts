@@ -1,3 +1,4 @@
+import { splitBoltForShape, type BoltSplitOptions, type BoltSplitShapeResult } from "@/lib/boltSplit";
 import { buildsDiffer, BUILD_ID, isBuildMessage, reportWorkerBuild } from "@/lib/buildStamp";
 import { checkClearance, type ClearanceOptions, type ClearanceResult } from "@/lib/clearanceCheck";
 import { buildGroupedShapeFromSelection, exportSolidVolume, faceReadJoins, faceReadPositions, previewSplitConnectors, splitShapeIfCrossed, splitShapesByPlane, type ExportSolidVolume, type RebuildStretchedGroup, type GroupBuildResult, type SplitConnectorPreview, type SplitShapesOutcome } from "@/lib/editorBooleans";
@@ -6,6 +7,7 @@ import { articulateShapes, type FlexiOptions, type FlexiShapesResult } from "@/l
 import { lidForShapes, lidTopForShapes, type LidOptions, type LidShapeResult } from "@/lib/lidTool";
 import { analyseMoldForShapes, moldForShapes, type MoldAnalysisResult, type MoldOptions, type MoldShapeResult } from "@/lib/moldTool";
 import { checkPrint, type PrintCheckOptions, type PrintCheckResult } from "@/lib/printCheck";
+import { checkLayers, type LayerCheckOptions, type LayerCheckResult } from "@/lib/layerCheck";
 import { resultMeshes, type GeometryTask, type GeometryWorkerRequest, type GeometryWorkerResponse } from "@/lib/geometryWorkerTypes";
 import { gridfinityHasLabelText } from "@/lib/gridfinityGeometry";
 import { rememberPreparedDisplay } from "@/lib/importedMeshDisplay";
@@ -46,6 +48,8 @@ type Pending = {
   /** Not shown as "calculating": the warm-up. */
   quiet: boolean;
   task: GeometryTask;
+  /** Told how far the task got, when it says so. */
+  progress?: (fraction: number) => void;
 };
 
 let worker: Worker | null = null;
@@ -133,6 +137,10 @@ function startWorker(): Promise<Worker | null> {
         return;
       }
       const response = event.data;
+      if ("progress" in response) {
+        pending.get(response.requestId)?.progress?.(response.progress);
+        return;
+      }
       const entry = settle(response.requestId);
       if (!entry) return;
       if (response.ok) {
@@ -175,7 +183,7 @@ function startWorker(): Promise<Worker | null> {
  * signal calls off never answers: whoever called it off has moved on. A worker that takes longer
  * than GEOMETRY_WORKER_TIMEOUT_MS is stopped and the request answers `timedOut()`.
  */
-async function runGeometryTask<T>(task: GeometryTask, args: unknown, fallback: () => Promise<T>, timedOut: () => T, signal?: AbortSignal, quiet = false): Promise<T> {
+async function runGeometryTask<T>(task: GeometryTask, args: unknown, fallback: () => Promise<T>, timedOut: () => T, signal?: AbortSignal, quiet = false, progress?: (fraction: number) => void): Promise<T> {
   if (disabled || typeof Worker === "undefined" || typeof window === "undefined") return fallback();
   const ready = await startWorker();
   if (!ready) return fallback();
@@ -202,7 +210,7 @@ async function runGeometryTask<T>(task: GeometryTask, args: unknown, fallback: (
         reject(error instanceof Error ? error : new Error(String(error)));
       }
     }, GEOMETRY_WORKER_TIMEOUT_MS);
-    pending.set(requestId, { resolve: resolve as (value: unknown) => void, reject, fallback, timer, sharedLists: packed.lists, quiet, task });
+    pending.set(requestId, { resolve: resolve as (value: unknown) => void, reject, fallback, timer, sharedLists: packed.lists, quiet, task, ...(progress ? { progress } : {}) });
     notifyBusy();
     signal?.addEventListener("abort", () => {
       if (!settle(requestId)) return;
@@ -311,6 +319,25 @@ export function checkPrintOffThread(source: readonly WorkplaneShape[], options: 
   return runGeometryTask<PrintCheckResult>("printCheck", { source: [...source], options }, onPage, () => {
     throw new Error(t("status.computeTimedOut"));
   }, signal);
+}
+
+/**
+ * checkLayers (lib/layerCheck.ts) off the page, telling `progress` how far it got. Calling it off through the signal stops
+ * the worker at once (the next check starts a fresh one); the check never answers then. On the page (no worker, or text in
+ * the design) it stops at the next layers it asks the signal about.
+ */
+export function checkLayersOffThread(source: readonly WorkplaneShape[], options: Partial<LayerCheckOptions>, signal?: AbortSignal, progress?: (fraction: number) => void): Promise<LayerCheckResult> {
+  const onPage = () => checkLayers([...source], options, { progress, stopped: () => Boolean(signal?.aborted) });
+  if (containsText([...source])) return onPage();
+  return runGeometryTask<LayerCheckResult>("layerCheck", { source: [...source], options }, onPage, () => {
+    throw new Error(t("status.computeTimedOut"));
+  }, signal, false, progress);
+}
+
+/** splitBoltForShape (lib/boltSplit.ts) off the page: a screw or rod cut lengthwise and laid flat for printing. */
+export function splitBoltOffThread(shape: WorkplaneShape, options: Partial<BoltSplitOptions>, signal?: AbortSignal): Promise<BoltSplitShapeResult> {
+  const onPage = () => splitBoltForShape(shape, options);
+  return runGeometryTask<BoltSplitShapeResult>("boltSplit", { shape, options }, onPage, () => ({ parts: null, error: t("status.computeTimedOut") }), signal);
 }
 
 /** analyseMoldForShapes (lib/moldTool.ts) off the page, quietly: the mold panel's live check. Called off, it never answers. */

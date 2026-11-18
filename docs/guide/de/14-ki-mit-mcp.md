@@ -147,6 +147,8 @@ Die KI arbeitet mit denselben Funktionen wie du, sie läuft über denselben Weg 
 | `layerling_check_clearance` | prüft vor dem Druck, welche Teile sich überschneiden, berühren oder näher kommen als ein Mindestspiel (Spiel prüfen), auch die getrennten Teile eines Objekts |
 | `layerling_printer_play` | liest, setzt oder löscht das Spiel deines Druckers ({{ui:workspace.printerPlay}} in den Einstellungen) und legt die Passprobe an, die es misst |
 | `layerling_check_print` | prüft vor dem Druck, was schiefginge: zu dünne Wände für die Düse, schwebende Teile, wenig Halt auf der Platte, Überhänge und offene Netze (Druck prüfen) |
+| `layerling_check_layers` | zerlegt den Druck in Schichten und listet Schicht für Schicht, was schiefginge: Überhänge, Bereiche ohne Auflage, Brücken, dünne Wände, kleine Inseln, ein Teil im Druckbett (Druckanalyse) |
+| `layerling_split_bolt` | teilt eine Schraube oder Gewindestange längs durch die Achse und legt beide Hälften für den Druck auf die Schnittfläche, auf Wunsch mit Zentrierstiften |
 | `layerling_add_reference_points` | setzt Bezugspunkte - auf Mitte, Ecken oder Kantenmitten von Objekten oder an genauen Stellen -, an denen Formen einrasten |
 | `layerling_list_reference_points` | listet die Bezugspunkte mit Kennung und Lage auf |
 | `layerling_remove_reference_points` | löscht Bezugspunkte nach Kennung oder alle |

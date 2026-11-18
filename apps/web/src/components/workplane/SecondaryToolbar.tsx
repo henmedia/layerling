@@ -23,8 +23,8 @@ import { ribbonSectionOrders, useRibbonOrder } from "@/lib/ribbonOrder";
 import { ribbonToolOrderFor, sortByRibbonToolOrder, useRibbonToolOrder } from "@/lib/ribbonToolOrder";
 import { ribbonCollapsePriority, ribbonFoldOf, useRibbonFold } from "@/lib/ribbonFold";
 import { normalizePolygonSides, normalizeStarInnerPercent, SKETCH_POLYGON_MAX_SIDES, SKETCH_POLYGON_MIN_SIDES, SKETCH_STAR_MAX_INNER_PERCENT, SKETCH_STAR_MIN_INNER_PERCENT } from "@/lib/sketchPrimitives";
-import { SketchBoltCircleIcon, SketchEllipseIcon, SketchHalfCircleIcon, SketchPieSliceIcon, ToolbarAlignIcon, ToolbarAttachmentsIcon, ToolbarBuildPlatesIcon, ToolbarCenterOnWorkplaneIcon, ToolbarChamferIcon, ToolbarCaretDownIcon, ToolbarCookieCutterIcon, ToolbarFlexiIcon, ToolbarLidIcon, ToolbarMoldIcon,
-  ToolbarCableChannelIcon, ToolbarCopyIcon, ToolbarDuplicateIcon, ToolbarDropToWorkplaneIcon, ToolbarBundleIcon, ToolbarGroupIcon, ToolbarGuideIcon, ToolbarHideSelectedIcon, ToolbarHomeIcon, ToolbarImportIcon, ToolbarIntersectionIcon,ToolbarClearanceIcon, ToolbarPrintCheckIcon, ToolbarHullIcon, ToolbarLoftSketchesIcon, ToolbarKeyboardIcon, ToolbarFilletIcon, ToolbarHistoryIcon, ToolbarHollowIcon, ToolbarOffsetIcon, ToolbarCutOutIcon, ToolbarPunchIcon, ToolbarDeleteFaceIcon, ToolbarSimplifyIcon, ToolbarMakeExactIcon, ToolbarSurfaceTextureIcon, ToolbarPaintIcon, ToolbarMirrorIcon, ToolbarRotationPivotIcon, ToolbarPatternIcon, ToolbarHolePatternIcon, ToolbarFaceToolIcon, ToolbarSupportRibIcon, ToolbarStencilBridgeIcon, ToolbarConstructionLineIcon, ToolbarMiddleLineIcon, ToolbarLayFlatIcon, ToolbarMateFacesIcon, ToolbarNoteIcon, ToolbarSplitIcon, ToolbarPasteIcon, ToolbarRedoIcon, ToolbarSnapGridIcon, ToolbarSettingsIcon, ToolbarShapeAddIcon, ToolbarTrashIcon, ToolbarUngroupIcon, ToolbarUndoIcon, ToolbarVectorExportIcon, ToolbarThreadInsertIcon } from "../icons";
+import { SketchBoltCircleIcon, SketchEllipseIcon, SketchHalfCircleIcon, SketchPieSliceIcon, ToolbarAlignIcon, ToolbarMoldIcon, ToolbarAttachmentsIcon, ToolbarBuildPlatesIcon, ToolbarCenterOnWorkplaneIcon, ToolbarChamferIcon, ToolbarCaretDownIcon, ToolbarCookieCutterIcon, ToolbarFlexiIcon, ToolbarLidIcon,
+  ToolbarCableChannelIcon, ToolbarCopyIcon, ToolbarDuplicateIcon, ToolbarDropToWorkplaneIcon, ToolbarBundleIcon, ToolbarGroupIcon, ToolbarGuideIcon, ToolbarHideSelectedIcon, ToolbarHomeIcon, ToolbarImportIcon, ToolbarIntersectionIcon,ToolbarClearanceIcon, ToolbarPrintCheckIcon, ToolbarLayerCheckIcon, ToolbarHullIcon, ToolbarLoftSketchesIcon, ToolbarKeyboardIcon, ToolbarFilletIcon, ToolbarHistoryIcon, ToolbarHollowIcon, ToolbarOffsetIcon, ToolbarCutOutIcon, ToolbarPunchIcon, ToolbarDeleteFaceIcon, ToolbarSimplifyIcon, ToolbarMakeExactIcon, ToolbarSurfaceTextureIcon, ToolbarPaintIcon, ToolbarMirrorIcon, ToolbarRotationPivotIcon, ToolbarPatternIcon, ToolbarHolePatternIcon, ToolbarFaceToolIcon, ToolbarSupportRibIcon, ToolbarStencilBridgeIcon, ToolbarConstructionLineIcon, ToolbarMiddleLineIcon, ToolbarLayFlatIcon, ToolbarMateFacesIcon, ToolbarNoteIcon, ToolbarSplitIcon, ToolbarPasteIcon, ToolbarRedoIcon, ToolbarSnapGridIcon, ToolbarSettingsIcon, ToolbarShapeAddIcon, ToolbarTrashIcon, ToolbarUngroupIcon, ToolbarUndoIcon, ToolbarVectorExportIcon } from "../icons";
 import { type SketchPrimitive, type SketchTool } from "../SketchWorkspace";
 import { CommandPalette, type PaletteCommand } from "./CommandPalette";
 import { customShapeCommands } from "@/lib/customShapeCommands";
@@ -352,6 +352,8 @@ export function SecondaryToolbar({
   canCheckClearance,
   onPrintCheck,
   printCheckActive,
+  onLayerCheck,
+  layerCheckActive,
   onFillet,
   onHollow,
   hollowActive,
@@ -551,6 +553,8 @@ export function SecondaryToolbar({
   /** The print check (Druck prüfen): opens its panel, or closes it. It checks the same bodies, so canCheckClearance enables it too. */
   onPrintCheck: () => void;
   printCheckActive: boolean;
+  onLayerCheck: () => void;
+  layerCheckActive: boolean;
   onFillet: () => void;
   onHollow: () => void;
   hollowActive: boolean;
@@ -793,6 +797,13 @@ export function SecondaryToolbar({
     onToolbarModeChange(mode);
   };
   const addShapeFromMenu = (shape: ShapeAsset) => {
+    if (shape.id === "threadInsert") {
+      if (canHolePattern || threadInsertActive) {
+        onThreadInsert();
+        closeShapesAfterPick();
+      }
+      return;
+    }
     onAddShape({ ...shape, name: shapeAssetLabel(shape) });
     closeShapesAfterPick();
   };
@@ -1034,13 +1045,13 @@ export function SecondaryToolbar({
     { id: "loftSketches", label: t("editor.tool.loftSketches"), icon: ToolbarLoftSketchesIcon, action: onLoftSketches, enabled: canLoftSketches, needs: need("loft") },
     { id: "clearance-check", label: t("editor.tool.clearance"), icon: ToolbarClearanceIcon, action: onClearanceCheck, enabled: canCheckClearance || clearanceActive, active: clearanceActive, needs: need("visibleBodies") },
     { id: "print-check", label: t("editor.tool.printCheck"), icon: ToolbarPrintCheckIcon, action: onPrintCheck, enabled: canCheckClearance || printCheckActive, active: printCheckActive, needs: need("visibleBodies") },
+    { id: "layer-check", label: t("editor.tool.layerCheck"), icon: ToolbarLayerCheckIcon, action: onLayerCheck, enabled: canCheckClearance || layerCheckActive, active: layerCheckActive, needs: need("visibleBodies") },
   ];
   const modifyTools = [
     { id: "mirror", section: "pattern", label: t("editor.tool.mirror"), icon: ToolbarMirrorIcon, action: onMirror, enabled: canModifySelection, active: mirrorMode, needs: need("selection") },
     { id: "pivot", section: "pattern", label: t("editor.tool.rotationPivot"), icon: ToolbarRotationPivotIcon, action: onRotationPivot, enabled: canModifySelection, active: rotationPivotActive, needs: need("selection") },
     { id: "array", section: "pattern", label: t("editor.tool.array"), icon: ToolbarPatternIcon, action: onArray, enabled: canModifySelection, active: arrayActive, needs: need("selection") },
     { id: "holePattern", section: "pattern", label: t("holePattern.title"), icon: ToolbarHolePatternIcon, action: onHolePattern, enabled: canHolePattern, active: holePatternActive, needs: need("oneSolid") },
-    { id: "threadInsert", section: "pattern", label: t("threadInsert.title"), icon: ToolbarThreadInsertIcon, action: onThreadInsert, enabled: canHolePattern || threadInsertActive, active: threadInsertActive, needs: need("oneSolid") },
     { id: "faceTool", section: "pattern", label: t("faceTool.title"), icon: ToolbarFaceToolIcon, action: onFaceTool, enabled: canFaceTool, active: faceToolActive, needs: need("oneSolid") },
     { id: "split", section: "shape", label: t("editor.tool.split"), icon: ToolbarSplitIcon, action: onSplit, enabled: splitMode || canSplit, active: splitMode, needs: need("visibleBodies") },
     { id: "flexi", section: "shape", label: t("editor.tool.flexi"), icon: ToolbarFlexiIcon, action: onFlexi, enabled: canFlexi || flexiActive, active: flexiActive, needs: need("solid") },
@@ -1088,7 +1099,8 @@ export function SecondaryToolbar({
         title={shapeAssetMenuLabel(shape).replace(/\s+/g, " ")}
         aria-label={shapeAssetMenuLabel(shape).replace(/\s+/g, " ")}
         style={{ "--shape-default-color": shapeAssetColor(shape, shapeCustomizations[shape.kind]) } as CSSProperties}
-        draggable
+        draggable={shape.id !== "threadInsert"}
+        disabled={shape.id === "threadInsert" && !canHolePattern && !threadInsertActive}
         onClick={() => {
           if (suppressNextShapeClickRef.current) {
             suppressNextShapeClickRef.current = false;
@@ -1138,6 +1150,10 @@ export function SecondaryToolbar({
           addShapeFromMenu(shape);
         }}
         onDragStart={(event) => {
+          if (shape.id === "threadInsert") {
+            event.preventDefault();
+            return;
+          }
           event.dataTransfer.effectAllowed = "copy";
           event.dataTransfer.setData("application/x-layerling-shape", JSON.stringify(shape));
         }}
