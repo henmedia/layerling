@@ -48,6 +48,12 @@ const MAX_ARC_RADIUS = 100_000;
 const MIN_ARC_RADIUS = 1e-4;
 /** The sharpest turn, in radians, a corner inside a curve may make: a circle drawn with 9 sides or more turns less. */
 const MAX_ARC_TURN = (40 * Math.PI) / 180;
+/**
+ * A side at least this many times as long as both its neighbours is a straight side, not a piece of a curve: the
+ * corners of a curve drawn as a polygon sit at about the same distance from each other. Without it the straight side
+ * of a slot (3.5 mm between two 0.9 mm sides of its round ends) passes for a very flat arc together with them.
+ */
+const STRAIGHT_SIDE_RATIO = 3;
 /** How many longer runs are still tried after a run fails to be an arc. */
 const DXF_ARC_MISSES = 12;
 
@@ -196,6 +202,7 @@ function arcRun(points: readonly Point[], from: number, to: number) {
     if (index > from && sharpTurn(points, index)) return null;
     if (index > from && Math.abs(distance(a, circle.center) - circle.radius) > DXF_FIT_TOLERANCE) return null;
     if (sagitta(distance(a, b), circle.radius) > DXF_ROUND_SAGITTA) return null;
+    if (straightSide(points, index)) return null;
   }
   // An arc stays an arc; a loop that closes on itself is a circle and was caught before.
   if (Math.abs(total) >= Math.PI * 2 - 1e-6) return null;
@@ -204,6 +211,14 @@ function arcRun(points: readonly Point[], from: number, to: number) {
   let bent = false;
   for (let index = from + 1; index < to && !bent; index += 1) bent = distanceToLine(at(index), start, end) > DXF_FIT_TOLERANCE;
   return { center: circle.center, radius: circle.radius, sign, bent };
+}
+
+/** Whether the side from corner `index` to the next is far longer than both sides beside it (STRAIGHT_SIDE_RATIO). */
+function straightSide(points: readonly Point[], index: number) {
+  const count = points.length;
+  const at = (offset: number) => points[(((index + offset) % count) + count) % count];
+  const side = distance(at(0), at(1));
+  return side > STRAIGHT_SIDE_RATIO * Math.max(distance(at(-1), at(0)), distance(at(1), at(2)));
 }
 
 function degrees(radians: number) {
@@ -242,6 +257,8 @@ function smoothCorner(points: readonly Point[], index: number) {
   const circle = circleThrough(previous, point, next);
   if (!circle || !isRoundCircle(circle.radius)) return false;
   if (sharpTurn(points, index)) return false;
+  // The end of a straight side is where a curve ends, however gently the outline bends there.
+  if (straightSide(points, index) || straightSide(points, index - 1)) return false;
   return sagitta(distance(previous, point), circle.radius) <= DXF_ROUND_SAGITTA && sagitta(distance(point, next), circle.radius) <= DXF_ROUND_SAGITTA;
 }
 

@@ -116,6 +116,32 @@ describe("DXF for laser cutting (#774): lines, arcs and circles", () => {
     expectClosedChain(entities);
   });
 
+  it("keeps a short straight side of a slot a line, between two whole half circles", () => {
+    // The 19" rack slot, 10.3 x 6.8 mm, its ends drawn with 30 sides each as the editor has them: the 3.5 mm side lies
+    // within 0.05 mm of a flat arc through the corners beside it, but is a straight line.
+    const slot = [...circlePoints(1.75, 0, 3.4, 30, -Math.PI / 2, Math.PI / 2, false), ...circlePoints(-1.75, 0, 3.4, 30, Math.PI / 2, Math.PI * 1.5, false)];
+    // Wherever the outline happens to start, as a mesh's outline starts anywhere.
+    for (const start of [0, 5, 31, 40]) {
+      const turned = [...slot.slice(start), ...slot.slice(0, start)];
+      expect(types(dxfLoopEntities(turned)).sort()).toEqual(["arc", "arc", "line", "line"]);
+    }
+    const entities = dxfLoopEntities(slot);
+    const lines = entities.filter((entity): entity is Extract<DxfEntity, { type: "line" }> => entity.type === "line");
+    const arcs = entities.filter((entity): entity is Extract<DxfEntity, { type: "arc" }> => entity.type === "arc");
+    expect(lines).toHaveLength(2);
+    expect(arcs).toHaveLength(2);
+    for (const line of lines) {
+      expect(Math.hypot(line.to[0] - line.from[0], line.to[1] - line.from[1])).toBeCloseTo(3.5, 6);
+      expect(Math.abs(line.from[1])).toBeCloseTo(3.4, 6);
+      expect(Math.abs(line.to[1])).toBeCloseTo(3.4, 6);
+    }
+    for (const arc of arcs) {
+      expect(arc.radius).toBeCloseTo(3.4, 6);
+      expect((arc.endAngle - arc.startAngle + 360) % 360).toBeCloseTo(180, 6);
+    }
+    expectClosedChain(entities);
+  });
+
   it("makes a slot two lines and two half circles", () => {
     const slot = [...circlePoints(62, 30, 4, 12, -Math.PI / 2, Math.PI / 2, false), ...circlePoints(38, 30, 4, 12, Math.PI / 2, Math.PI * 1.5, false)];
     const entities = dxfLoopEntities(slot);
