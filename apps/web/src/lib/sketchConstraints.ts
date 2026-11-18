@@ -1,3 +1,4 @@
+import { updateSketchOffsets } from "@/lib/sketchOffsets";
 import { cubicPoint } from "@/lib/sketchPaths";
 import { orderedSketchPaths } from "@/lib/sketchSmoothHandles";
 import type { SketchConstraint, SketchPoint, SketchProfile } from "@/types/layerling";
@@ -122,6 +123,7 @@ export function sketchOutlineClearance(
 }
 
 export type SketchConstraintFailure = {
+  offsetError?: { message: string; pointIds: string[]; offsetId: string };
   unsatisfied: SketchConstraint[];
   conflicting: SketchConstraint[];
   attempted: SketchConstraint[];
@@ -262,7 +264,7 @@ export function validSketchConstraints(profile: SketchProfile): SketchConstraint
   });
 }
 
-export function applySketchConstraints(profile: SketchProfile, movedIds: ReadonlySet<string> = new Set()): SolveResult {
+function applyBaseSketchConstraints(profile: SketchProfile, movedIds: ReadonlySet<string> = new Set(), holdReferences = true): SolveResult {
   const constraints = validSketchConstraints(profile);
   if (!constraints.length) {
     return { ok: true, profile: profile.constraints?.length ? { ...profile, constraints: [] } : profile };
@@ -272,7 +274,7 @@ export function applySketchConstraints(profile: SketchProfile, movedIds: Readonl
   const preferred = new Set(movedIds);
   // When adding a constraint or editing its dimension, hold the first reference
   // steady by default. Explicit drag targets take precedence.
-  if (!preferred.size) {
+  if (holdReferences && !preferred.size) {
     for (const rule of constraints) if (!("c" in rule) && !("outline" in rule) && rule.kind !== "concentric") preferred.add(rule.a);
   }
   const strength = (point: SketchPoint) => point.locked || preferred.has(point.id) ? 0 : 1;
@@ -571,6 +573,9 @@ export function applySketchConstraints(profile: SketchProfile, movedIds: Readonl
       } };
     }
   }
+  // Default reference anchors are conveniences, not persisted constraints. When they
+  // block a solvable edit, retry without them; explicit locks and drag targets remain fixed.
+  if (holdReferences && !movedIds.size && preferred.size) return applyBaseSketchConstraints(profile, movedIds, false);
   const unsatisfied = constraints.filter((rule) => !satisfied(rule));
   const conflicting = new Set<SketchConstraint>();
   for (const rule of unsatisfied) {
@@ -630,4 +635,16 @@ export function withSketchConstraint(profile: SketchProfile, rule: SketchConstra
     return !("value" in rule) && sameFirst;
   })) return profile;
   return { ...profile, constraints: [...constraints, rule] };
+}
+
+/** Derived paths update around the existing constraint solve in one atomic operation. */
+export function applySketchConstraints(profile: SketchProfile, movedIds: ReadonlySet<string> = new Set()): SolveResult {
+  const prepared = updateSketchOffsets(profile, movedIds);
+  const failure = (offsetError: { message: string; pointIds: string[]; offsetId: string }): SolveResult =>
+    ({ ok: false, profile, failure: { unsatisfied: [], conflicting: [], attempted: [], offsetError } });
+  if (!prepared.ok) return failure(prepared);
+  const solved = applyBaseSketchConstraints(prepared.profile, movedIds);
+  if (!solved.ok) return { ...solved, profile };
+  const updated = updateSketchOffsets(solved.profile);
+  return updated.ok ? { ok: true, profile: updated.profile } : failure(updated);
 }

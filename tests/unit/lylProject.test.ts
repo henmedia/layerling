@@ -1,3 +1,4 @@
+import { updateSketchOffsets } from "@/lib/sketchOffsets";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { strFromU8, strToU8, unzipSync, zipSync } from "fflate";
 import { editorHistoryEntry } from "@/lib/editorHistory";
@@ -97,6 +98,31 @@ describe("layerling .lyl project packages", () => {
         constraints: [{ id: "shared-center", kind: "concentric", a: first[0], b: second[0], circles: [first, second], ...(radialGap === undefined ? {} : { radialGap }) }],
       },
     });
+    const restored = await importLylProject(await exportLylProject(input([body])));
+    expect(restored.shapes[0].sketchProfile).toEqual(body.sketchProfile);
+  });
+
+  it("round-trips linked sketch offsets and rejects dependency cycles", async () => {
+    const generated = updateSketchOffsets({
+      points: [{id:"a",x:0,z:0},{id:"b",x:20,z:0}],
+      segments: [{id:"line",startId:"a",endId:"b"}],
+      offsets: [{id:"offset",name:"Margin",sourceSegmentIds:["line"],pointIds:[],segmentIds:[],distance:3,join:"bevel",miterLimit:4}],
+    });
+    if (!generated.ok) throw Error(generated.message);
+    const body = shape("mesh", "offset-sketch", {sketchOperation:"extrude",sketchProfile:generated.profile});
+    const restored = await importLylProject(await exportLylProject(input([body])));
+    expect(restored.shapes[0].sketchProfile).toEqual(body.sketchProfile);
+    const cycle = {...generated.profile,offsets:generated.profile.offsets!.map(f=>({...f,sourceSegmentIds:f.segmentIds}))};
+    await expect(importLylProject(await exportLylProject(input([{...body,sketchProfile:cycle}])))).rejects.toThrow(/cycle/);
+  });
+
+  it("round-trips an associative oval offset with fitted curve handles", async () => {
+    let n = 0;
+    const source = sketchPrimitiveGeometry("ellipse", { x: 0, z: 0 }, () => `oval-${++n}`, 62);
+    const linked = updateSketchOffsets({ ...source, offsets: [{ id: "oval-offset", sourceSegmentIds: source.segments.map(s => s.id),
+      pointIds: [], segmentIds: [], distance: 5, join: "round", miterLimit: 4 }] });
+    if (!linked.ok) throw Error(linked.message);
+    const body = shape("mesh", "oval-offset-body", { sketchOperation: "extrude", sketchProfile: linked.profile });
     const restored = await importLylProject(await exportLylProject(input([body])));
     expect(restored.shapes[0].sketchProfile).toEqual(body.sketchProfile);
   });

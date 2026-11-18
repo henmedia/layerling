@@ -780,7 +780,21 @@ export type SketchConstraintInput =
   | { kind: "distance" | "offset-x" | "offset-z"; a: string; b: string; value: number; frameX?: { x: number; z: number } };
 export type SketchConstraint = SketchConstraintInput & { id: string };
 
+/** A derived path. Positive distance is outward for loops and left of an open path. */
+export type SketchOffset = {
+  id: string;
+  name?: string;
+  sourceSegmentIds: string[];
+  pointIds: string[];
+  segmentIds: string[];
+  distance: number;
+  join: "miter" | "round" | "bevel";
+  miterLimit: number;
+  hidden?: boolean;
+};
+
 export type SketchProfile = {
+  offsets?: SketchOffset[];
   points: SketchPoint[];
   /** Relations kept with the sketch, including its undo history and saved body. */
   constraints?: SketchConstraint[];

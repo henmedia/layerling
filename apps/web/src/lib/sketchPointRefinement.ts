@@ -186,7 +186,8 @@ function cross(ax: number, az: number, bx: number, bz: number) {
 
 export function addLineIntersectionPoints(profile: SketchProfile, createId: IdFactory) {
   const pointById = new Map(profile.points.map((point) => [point.id, point]));
-  const lines = profile.segments.filter((segment) => isStraightSegment(segment) && pointById.has(segment.startId) && pointById.has(segment.endId));
+  const derivedSegments = new Set(profile.offsets?.flatMap((feature) => feature.segmentIds));
+  const lines = profile.segments.filter((segment) => !derivedSegments.has(segment.id) && isStraightSegment(segment) && pointById.has(segment.startId) && pointById.has(segment.endId));
   const splits = new Map<string, SegmentSplit[]>();
   const addedPoints: SketchPoint[] = [];
 

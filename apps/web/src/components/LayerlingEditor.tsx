@@ -5486,7 +5486,7 @@ export function LayerlingEditor({
   const sketchKeyRunRef = useRef<KeyRun | null>(null);
 
   const commitSketchProfile = useCallback(
-    (next: SketchProfile, message?: string, keyRunKey?: string) => {
+    (next: SketchProfile, message?: string, keyRunKey?: string, offsetEdit = false) => {
       const current = sketchHistoryRef.current;
       const currentIndex = Math.min(sketchHistoryIndexRef.current, Math.max(0, current.length - 1));
       const trimmed = current.slice(0, currentIndex + 1);
@@ -5499,25 +5499,37 @@ export function LayerlingEditor({
       // And for the sketch's notes.
       const carried = "notes" in anchored || !latest?.notes ? anchored : { ...anchored, notes: latest.notes };
       // Retain persistent sketch relationships when older tools create partial profiles.
-      const carriedConstraints = "constraints" in carried || !latest?.constraints ? carried : { ...carried, constraints: latest.constraints };
+      const withConstraints = "constraints" in carried || !latest?.constraints ? carried : { ...carried, constraints: latest.constraints };
+      const carriedConstraints = "offsets" in withConstraints || !latest?.offsets ? withConstraints : { ...withConstraints, offsets: latest.offsets };
       const moved = new Set<string>();
       if (latest) {
         const before = new Map(latest.points.map((point) => [point.id, point]));
         for (const point of carriedConstraints.points) {
           const was = before.get(point.id);
-          if (was && (Math.abs(was.x - point.x) > 1e-9 || Math.abs(was.z - point.z) > 1e-9)) moved.add(point.id);
+          if (was && (Math.abs(was.x - point.x) > 1e-9 || Math.abs(was.z - point.z) > 1e-9 || JSON.stringify(was.handleIn) !== JSON.stringify(point.handleIn) || JSON.stringify(was.handleOut) !== JSON.stringify(point.handleOut))) moved.add(point.id);
         }
+      }
+      // Offset settings regenerate their own targets; those changes are not a direct point drag.
+      if (offsetEdit) for (const feature of carriedConstraints.offsets ?? []) {
+        for (const id of feature.pointIds) moved.delete(id);
       }
       const solved = applySketchConstraints(carriedConstraints, moved);
       if (!solved.ok) {
         const attempted = (carriedConstraints.constraints ?? []).filter((rule) =>
           !latest?.constraints?.some((previous) => JSON.stringify(previous) === JSON.stringify(rule)));
         setSketchConstraintFailure({ ...solved.failure, attempted });
-        setNotice(t("status.sketchConstraintConflict"));
+        setNotice(solved.failure.offsetError?.message ?? t("status.sketchConstraintConflict"));
         return false;
       }
       // Moving shapes over each other makes no shared points where their lines cross (#239); drawing does.
-      const snapshot = cloneSketchProfile(latest && onlyMovesPoints(latest, solved.profile) ? solved.profile : addLineIntersectionPoints(solved.profile, createLocalId));
+      const intersected = latest && onlyMovesPoints(latest, solved.profile) ? solved.profile : addLineIntersectionPoints(solved.profile, createLocalId);
+      const refreshed = intersected !== solved.profile && intersected.offsets?.length ? applySketchConstraints(intersected) : { ok: true as const, profile: intersected };
+      if (!refreshed.ok) {
+        setSketchConstraintFailure(refreshed.failure);
+        setNotice(refreshed.failure.offsetError?.message ?? t("status.sketchConstraintConflict"));
+        return false;
+      }
+      const snapshot = cloneSketchProfile(refreshed.profile);
       // A locked outline (#653) stays as it is, whatever tool tried to change it.
       if (latest && changesLockedOutline(latest, snapshot)) {
         setNotice(t("status.sketchOutlineLocked"));
@@ -19733,6 +19745,7 @@ export function LayerlingEditor({
             onDeletePoint={deleteSketchPoint}
             onDeleteSegment={deleteSketchSegment}
             onMovePoint={moveSketchPoint}
+            onCommitOffsetProfile={(next) => commitSketchProfile(next, t("status.sketchUpdated"), undefined, true)}
             onAddConstraint={addSketchConstraint}
             onRemoveConstraint={removeSketchConstraint}
             onUpdateConstraint={updateSketchConstraint}

@@ -1,5 +1,8 @@
 "use client";
 
+import { sketchOffsetForSelection, sketchOffsetSliderLimit } from "@/lib/sketchOffsetSelection";
+import { sketchOffsetSource } from "@/lib/sketchOffsets";
+import { SketchOffsetPanel } from "@/components/SketchOffsetPanel";
 import { SketchConstraintInspector } from "@/components/SketchConstraintInspector";
 
 import { previewLabelSpot } from "@/lib/sketchPreviewLabel";
@@ -16,7 +19,7 @@ import { SketchNotes } from "@/components/SketchNotes";
 import { SketchLockBadge, SketchRotateHandles, SketchTurnRing } from "@/components/SketchHandles";
 import { lockBadgeSpot, rotateHandleSpots } from "@/lib/sketchHandleSpots";
 import { SKETCH_DOUBLE_CLICK_PIXELS, useSketchViewSlide } from "@/lib/useSketchViewSlide";
-import { ToolbarConstructionLineIcon, ToolbarNoteIcon } from "@/components/toolbarIcons";
+import { ToolbarConstructionLineIcon, ToolbarNoteIcon, ToolbarOffsetIcon } from "@/components/toolbarIcons";
 import { CAMERA_BAR_PANEL, CameraBarHandle, useCameraBarPeek } from "@/components/workplane/CameraBarHandle";
 import { constructionCrossings } from "@/lib/sketchConstruction";
 import { movingSelectionCentre, outlineSideMiddles, selectionSnapTargets, sketchSnapPoints, snappedSelectionTarget } from "@/lib/sketchSnapPoints";
@@ -121,6 +124,7 @@ type SketchWorkspaceProps = {
   onDeleteSegment: (id: string) => void;
   onMovePoint: (id: string, point: { x: number; z: number }) => void;
   /** Basic persistent constraints. More complex tangent/arc rules need a general solver. */
+  onCommitOffsetProfile?: (profile: SketchProfile) => boolean | undefined;
   onAddConstraint?: (rule: SketchConstraintInput) => void;
   onRemoveConstraint?: (id: string) => void;
   onUpdateConstraint?: (id: string, value: number) => boolean | undefined;
@@ -185,7 +189,7 @@ type SketchReferenceFootprint = {
 type PointerAction =
   | { kind: "bezier"; pointerId: number; origin: { x: number; z: number }; current: { x: number; z: number } }
   | { kind: "move-point"; pointerId: number; pointId: string; origin: { x: number; z: number }; current: { x: number; z: number } }
-  | { kind: "move-selection"; pointerId: number; origin: { x: number; z: number }; current: { x: number; z: number }; startPoints: SketchPoint[] }
+  | { kind: "move-selection"; pointerId: number; origin: { x: number; z: number }; current: { x: number; z: number }; startPoints: SketchPoint[]; clickSegment?: { id: string; clientX: number; clientY: number } }
   | { kind: "resize-selection"; pointerId: number; handle: ResizeHandle; current: { x: number; z: number }; startPoints: SketchPoint[]; bounds: SelectionBounds; proportional?: boolean; concentricLocks?: ReadonlySet<string>; grab?: { x: number; z: number } }
   | { kind: "move-handle"; pointerId: number; pointId: string; handle: "in" | "out"; current: { x: number; z: number } }
   | { kind: "pan"; pointerId: number; clientX: number; clientY: number }
@@ -798,6 +802,7 @@ export function SketchWorkspace({
   onDeleteSegment,
   onMovePoint,
   onAddConstraint,
+  onCommitOffsetProfile,
   onRemoveConstraint,
   onUpdateConstraint,
   constraintFailure,
@@ -1053,10 +1058,51 @@ export function SketchWorkspace({
     return profile;
   }, [pointerAction, profile, keepProportions]);
   // A drag that would move a locked outline (#653) shows nothing moving: the editor refuses it on release.
-  const displayProfile = useMemo(() => {
+  const [offsetOpen, setOffsetOpen] = useState(false);
+  const [offsetFeatureId, setOffsetFeatureId] = useState<string | null>(null);
+  const [offsetCreateRequest, setOffsetCreateRequest] = useState(0);
+  const [offsetInspectorRequest, setOffsetInspectorRequest] = useState(0);
+  const [offsetPreview, setOffsetPreview] = useState<SketchProfile | null>(null);
+  const [offsetPreviewInfo, setOffsetPreviewInfo] = useState<{ sourceSegmentIds: string[]; distance: number; changed?: boolean } | null>(null);
+  const [offsetDistanceRequest, setOffsetDistanceRequest] = useState<{ value: number } | null>(null);
+  const offsetDrag = useRef<{ start: { x: number; z: number }; distance: number; vector: { x: number; z: number } } | null>(null);
+  const showOffsetPreview = useCallback((next: SketchProfile | null, details?: { sourceSegmentIds: string[]; distance: number; changed?: boolean }) => {
+    setOffsetPreview(next); setOffsetPreviewInfo(details ?? null);
+    if (!next) offsetDrag.current = null;
+  }, []);
+  useEffect(() => {
+    if (!offsetOpen) return;
+    const cancel = (event: KeyboardEvent) => {
+      if (event.key !== "Escape") return;
+      if (event.target instanceof HTMLInputElement && event.target.dataset.offsetRename === "true") return;
+      markEscapeHandled(event); event.preventDefault(); event.stopPropagation();
+      setOffsetOpen(false); setOffsetPreview(null); offsetDrag.current = null;
+    };
+    window.addEventListener("keydown", cancel, true);
+    return () => window.removeEventListener("keydown", cancel, true);
+  }, [offsetOpen]);
+  const inspectOffsetShape = (pointIds: string[], segmentIds: string[], automatic = false) => {
+    // Selecting references inside the constraint inspector must keep that inspector open.
+    if (automatic && inspectedId) return;
+    if (tool !== "select" || !onCommitOffsetProfile) return;
+    const match = sketchOffsetForSelection(profile, pointIds, segmentIds, offsetFeatureId);
+    if (!match || (!match.offset && !offsetOpen)) return;
+    setOffsetDistanceRequest(null); setInspectedId(null); setOffsetOpen(true);
+    setOffsetFeatureId(match.offset?.id ?? null);
+    if (match.offset) setOffsetInspectorRequest(value => value + 1);
+    if (!match.offset) setOffsetCreateRequest(value => value + 1);
+  };
+  const offsetSelectionKey = JSON.stringify([sketchSelectedPointIds(selected), sketchSelectedSegmentIds(selected)]);
+  const previousOffsetSelection = useRef(offsetSelectionKey);
+  useEffect(() => {
+    if (previousOffsetSelection.current === offsetSelectionKey) return;
+    previousOffsetSelection.current = offsetSelectionKey;
+    inspectOffsetShape(sketchSelectedPointIds(selected), sketchSelectedSegmentIds(selected), true);
+  }, [offsetSelectionKey, profile, tool, offsetOpen, offsetFeatureId]);
+  const solvedDisplayProfile = useMemo(() => {
     if (previewProfile === profile) return profile;
     if (changesLockedOutline(profile, previewProfile)) return profile;
-    if (!profile.constraints?.length) return previewProfile;
+    if (!profile.constraints?.length && !profile.offsets?.length) return previewProfile;
     const old = new Map(profile.points.map((point) => [point.id, point]));
     const moved = new Set(previewProfile.points.filter((point) => {
       const previous = old.get(point.id);
@@ -1065,6 +1111,11 @@ export function SketchWorkspace({
     const solved = applySketchConstraints(previewProfile, moved);
     return solved.ok ? solved.profile : profile;
   }, [previewProfile, profile]);
+  const displayProfile = useMemo(() => {
+    const hidden = new Set(solvedDisplayProfile.offsets?.filter((feature) => feature.hidden).flatMap((feature) => feature.pointIds));
+    return hidden.size ? { ...solvedDisplayProfile, points: solvedDisplayProfile.points.filter((point) => !hidden.has(point.id)),
+      segments: solvedDisplayProfile.segments.filter((segment) => !hidden.has(segment.startId) && !hidden.has(segment.endId)) } : solvedDisplayProfile;
+  }, [solvedDisplayProfile]);
   const displayImages = useMemo(() => {
     const images = profile.images ?? [];
     if (pointerAction?.kind === "move-image") {
@@ -1154,6 +1205,7 @@ export function SketchWorkspace({
       }
       return;
     }
+    if (!extend) inspectOffsetShape(shape.pointIds, shape.segmentIds);
     const lineId = extend && selectedSegment && !selectedSegmentCurved ? selectedSegment.id : undefined;
     onSelectMany(shape.pointIds, lineId ? [...shape.segmentIds, lineId] : shape.segmentIds, []);
   };
@@ -1184,16 +1236,21 @@ export function SketchWorkspace({
   const [inspectedId, setInspectedId] = useState<string | null>(null);
   const [inspectorRequest, setInspectorRequest] = useState(0);
   const inspectConstraint = (id: string) => {
+    setOffsetOpen(false);
     setInspectedId(id);
     setInspectorRequest((request) => request + 1);
   };
   const inspected = constraints.find((rule) => rule.id === inspectedId) ??
     constraintFailure?.attempted.find((rule) => rule.id === inspectedId);
   const inspectedIsSaved = constraints.some((rule) => rule.id === inspectedId);
-  const highlightedGroups = constraintAnnotationsVisible && inspected ? sketchConstraintReferences(inspected) : [];
+  const selectedOffset = offsetOpen ? profile.offsets?.find((feature) => feature.id === offsetFeatureId) : undefined;
+  const highlightedGroups = !constraintAnnotationsVisible ? [] : inspected ? sketchConstraintReferences(inspected)
+    : selectedOffset ? [selectedOffset.pointIds, [...new Set(profile.segments.filter((segment) => selectedOffset.sourceSegmentIds.includes(segment.id)).flatMap((segment) => [segment.startId, segment.endId]))]] : [];
   const failedRules = constraintFailure
     ? [...constraintFailure.unsatisfied, ...constraintFailure.conflicting, ...constraintFailure.attempted] : [];
-  const failedGroups = constraintAnnotationsVisible ? failedRules.flatMap(sketchConstraintReferences) : [];
+  const failedGroups = constraintAnnotationsVisible ? [
+    ...failedRules.flatMap(sketchConstraintReferences), ...(constraintFailure?.offsetError ? [constraintFailure.offsetError.pointIds] : []),
+  ] : [];
   const badgeProps = (id: string) => ({
     role: "button",
     tabIndex: 0,
@@ -2076,6 +2133,7 @@ export function SketchWorkspace({
       const clickPoint = clicked ? unsnappedPointFromEvent(event) : null;
       const shape = clickPoint ? closedPathAt(clickPoint, paths) : null;
       if (shape) {
+        inspectOffsetShape(shape.points.map(point => point.id), shape.steps.map(step => step.segment.id));
         onSelectMany(shape.points.map((point) => point.id), shape.steps.map((step) => step.segment.id), []);
         setPointerAction(null);
         return;
@@ -2103,6 +2161,13 @@ export function SketchWorkspace({
         handleOut: { x: action.origin.x + dx, z: action.origin.z + dz },
       });
     } else if (action.kind === "move-selection") {
+      if (action.clickSegment && Math.hypot(event.clientX - action.clickSegment.clientX, event.clientY - action.clickSegment.clientY) < 4) {
+        const owner = profile.offsets?.find(offset => offset.segmentIds.includes(action.clickSegment!.id));
+        if (owner) onSelectMany(owner.pointIds, owner.segmentIds, []);
+        else onSelectSegment(action.clickSegment.id);
+        setPointerAction(null);
+        return;
+      }
       // A click on a line, without dragging, only selects it.
       if (action.current.x === action.origin.x && action.current.z === action.origin.z) {
         setPointerAction(null);
@@ -2747,6 +2812,10 @@ export function SketchWorkspace({
           >
             <Ruler size={26} strokeWidth={2.2} aria-hidden="true" />
           </button>
+          {onCommitOffsetProfile && <button aria-label="Offset / Inset" title="Offset / Inset" aria-pressed={offsetOpen}
+            onClick={() => { setOffsetOpen(!offsetOpen); setOffsetFeatureId(null); setOffsetDistanceRequest(null); setInspectedId(null); if (tool !== "select") onSelectTool?.("select"); }}>
+            <ToolbarOffsetIcon width={26} height={26} aria-hidden="true" />
+          </button>}
           {onToggleReferenceEdges ? (
             <button
               className={showReferenceEdges ? "active" : ""}
@@ -3063,6 +3132,16 @@ export function SketchWorkspace({
                   const point = pointFromEvent(event);
                   event.preventDefault();
                   event.stopPropagation();
+                  if (event.button === 0 && tool === "select" && !event.shiftKey && !mirrorPicking) inspectOffsetShape([], [segment.id]);
+                  const offset = profile.offsets?.find((feature) => feature.segmentIds.includes(segment.id));
+                  if (event.button === 0 && tool === "select" && offset && onCommitOffsetProfile) {
+                    setOffsetDistanceRequest(null);
+                    setOffsetFeatureId(offset.id);
+                    setOffsetOpen(true);
+                    setInspectedId(null);
+                    onSelectMany(offset.pointIds, offset.segmentIds, []);
+                    return;
+                  }
                   if (event.button === 1) beginPan(event);
                   else if (mirrorPicking && event.button === 0 && onMirror) {
                     onMirror({ segmentId: segment.id });
@@ -3088,20 +3167,23 @@ export function SketchWorkspace({
                     const startPoints = profile.points
                       .filter((entry) => moving.has(entry.id))
                       .map((entry) => ({ ...entry, handleIn: entry.handleIn ? { ...entry.handleIn } : undefined, handleOut: entry.handleOut ? { ...entry.handleOut } : undefined }));
-                    beginEntityDrag(event, { kind: "move-selection", pointerId: event.pointerId, origin: point, current: point, startPoints });
+                    beginEntityDrag(event, { kind: "move-selection", pointerId: event.pointerId, origin: point, current: point, startPoints,
+                      clickSegment: { id: segment.id, clientX: event.clientX, clientY: event.clientY } });
                   } else if (event.button === 0) onSelectSegment(segment.id);
                 }}
               />
             ))}
           </g>
           <g pointerEvents="none" fill="none">
-            {[{ groups: highlightedGroups, color: "#1688c9" }, { groups: failedGroups, color: "#d23d35" }].map(({ groups, color }) => (
-              <g key={color} stroke={color}>
-                {displayProfile.segments.filter((segment) => groups.some((ids) =>
-                  ids.includes(segment.startId) && ids.includes(segment.endId))).map((segment) => (
-                  <path key={segment.id} d={segmentData(segment, pointById)} strokeWidth={4 * screenUnit} />
+            {[{ groups: highlightedGroups, color: "#1688c9", failure: false, context: !inspected && Boolean(selectedOffset) },
+              { groups: failedGroups, color: "#d23d35", failure: true, context: false }].map(({ groups, color, failure, context }) => (
+              <g key={color} stroke={color} strokeOpacity={context ? 0.65 : 1}
+                strokeDasharray={context ? `${4 * screenUnit} ${3 * screenUnit}` : undefined}>
+                {displayProfile.segments.filter(segment => (failure || !isSegmentSelected(segment.id)) && groups.some(ids =>
+                  ids.includes(segment.startId) && ids.includes(segment.endId))).map(segment => (
+                  <path key={segment.id} d={segmentData(segment, pointById)} strokeWidth={(context ? 2 : 4) * screenUnit} />
                 ))}
-                {displayProfile.points.filter((point) => groups.some((ids) => ids.includes(point.id))).map((point) => (
+                {!context && displayProfile.points.filter(point => (failure || !isPointSelected(point.id)) && groups.some(ids => ids.includes(point.id))).map((point) => (
                   <circle key={point.id} cx={point.x} cy={point.z} r={6 * screenUnit} strokeWidth={2 * screenUnit} />
                 ))}
               </g>
@@ -3236,8 +3318,22 @@ export function SketchWorkspace({
                     if (event.button !== 0 || selected?.kind !== "multiple") return;
                     const point = pointFromEvent(event);
                     if (!point) return;
+                    const underneath = document.elementsFromPoint(event.clientX, event.clientY)
+                      .find(element => element.getAttribute("data-sketch-entity") === "segment")?.getAttribute("data-segment-id");
+                    const target = underneath && !selected.segmentIds.includes(underneath)
+                      ? sketchOffsetForSelection(profile, [], [underneath], offsetFeatureId) : undefined;
+                    const inside = closedPathAt(point, paths);
+                    if (target || (inside && !inside.points.every(p => selected.pointIds.includes(p.id)))) {
+                      event.preventDefault(); event.stopPropagation();
+                      const pointIds = target ? profile.segments.filter(s => target.segmentIds.includes(s.id)).flatMap(s => [s.startId, s.endId]) : inside!.points.map(p => p.id);
+                      const segmentIds = target?.segmentIds ?? inside!.steps.map(s => s.segment.id);
+                      inspectOffsetShape(pointIds, segmentIds); onSelectMany([...new Set(pointIds)], segmentIds, []);
+                      return;
+                    }
+                    inspectOffsetShape(selected.pointIds, selected.segmentIds);
                     const startPoints = selected.pointIds.map((id) => profile.points.find((entry) => entry.id === id)).filter((entry): entry is SketchPoint => Boolean(entry)).map((entry) => ({ ...entry, handleIn: entry.handleIn ? { ...entry.handleIn } : undefined, handleOut: entry.handleOut ? { ...entry.handleOut } : undefined }));
-                    beginEntityDrag(event, { kind: "move-selection", pointerId: event.pointerId, origin: point, current: point, startPoints });
+                    beginEntityDrag(event, { kind: "move-selection", pointerId: event.pointerId, origin: point, current: point, startPoints,
+                      ...(underneath ? { clickSegment: { id: underneath, clientX: event.clientX, clientY: event.clientY } } : {}) });
                   }}
                 />
                 {([
@@ -3483,6 +3579,9 @@ export function SketchWorkspace({
                     // No drag here: Shift only changes what is selected.
                     onToggleSelect({ kind: "point", id: point.id });
                   } else if (event.button === 0 && tool === "select") {
+                    inspectOffsetShape([point.id], []);
+                    const owner = profile.offsets?.find(offset => offset.pointIds.includes(point.id));
+                    if (owner && onCommitOffsetProfile) { onSelectMany(owner.pointIds, owner.segmentIds, []); return; }
                     onPointPress(point.id);
                     beginEntityDrag(event, { kind: "move-point", pointerId: event.pointerId, pointId: point.id, origin: { x: point.x, z: point.z }, current: { x: point.x, z: point.z } });
                   } else if (event.button === 0 && tool === "bezier" && activePointId !== point.id) {
@@ -3814,6 +3913,59 @@ export function SketchWorkspace({
               })}
             </g>
           )}
+          {offsetPreview && offsetPreviewInfo?.changed && <g pointerEvents="none" fill="none" stroke="#1688c9" strokeWidth={2 * screenUnit} strokeDasharray={`${5 * screenUnit} ${3 * screenUnit}`}>
+            {offsetPreview.segments.map((segment) => <path key={segment.id} d={segmentData(segment, new Map(offsetPreview.points.map((point) => [point.id, point])))} />)}
+          </g>}
+          {offsetPreviewInfo && offsetPreview?.points[0] && (() => {
+            const at = offsetPreview.points[0];
+            return <circle cx={at.x} cy={at.z} r={7 * screenUnit} fill="#1688c9" stroke="white" strokeWidth={screenUnit}
+              role="slider" tabIndex={0} aria-label="Drag offset on workplane" aria-valuenow={offsetPreviewInfo.distance}
+              style={{ cursor: "ew-resize", touchAction: "none" }}
+              onKeyDown={(event) => {
+                if (event.key !== "ArrowLeft" && event.key !== "ArrowRight") return;
+                event.preventDefault(); event.stopPropagation();
+                const limit = sketchOffsetSliderLimit(profile, offsetPreviewInfo.sourceSegmentIds);
+                setOffsetDistanceRequest({ value: Math.max(-limit, Math.min(limit, offsetPreviewInfo.distance + (event.key === "ArrowRight" ? 1 : -1) * 10 ** -workspace.accuracy)) });
+              }}
+              onPointerDown={(event) => {
+                if (event.button !== 0) return;
+                event.preventDefault(); event.stopPropagation();
+                const start = unsnappedPointFromEvent(event);
+                const source = sketchOffsetSource(profile, offsetPreviewInfo.sourceSegmentIds).points[0];
+                if (!start) return;
+                offsetDrag.current = { start, distance: offsetPreviewInfo.distance,
+                  vector: { x: (at.x - source.x) / offsetPreviewInfo.distance, z: (at.z - source.z) / offsetPreviewInfo.distance } };
+                event.currentTarget.setPointerCapture(event.pointerId);
+              }}
+              onPointerMove={(event) => {
+                const drag = offsetDrag.current;
+                if (!drag) return;
+                event.preventDefault(); event.stopPropagation();
+                const point = unsnappedPointFromEvent(event);
+                if (!point) return;
+                const square = drag.vector.x ** 2 + drag.vector.z ** 2;
+                if (square < 1e-12) return;
+                const value = drag.distance + ((point.x - drag.start.x) * drag.vector.x + (point.z - drag.start.z) * drag.vector.z) / square;
+                const limit = sketchOffsetSliderLimit(profile, offsetPreviewInfo.sourceSegmentIds);
+                setOffsetDistanceRequest({ value: Math.max(-limit, Math.min(limit, Math.abs(value) < 0.01 ? (value < 0 ? -0.01 : 0.01) : value)) });
+              }}
+              onPointerUp={(event) => { event.stopPropagation(); offsetDrag.current = null; event.currentTarget.releasePointerCapture(event.pointerId); }}
+              onPointerCancel={() => { offsetDrag.current = null; }}><title>Drag to change offset distance. Apply in the panel to keep it.</title></circle>;
+          })()}
+          {constraintAnnotationsVisible && (profile.offsets ?? []).filter((feature) => !feature.hidden).map((feature, index) => {
+            const points = feature.pointIds.map((id) => pointById.get(id)).filter((point): point is SketchPoint => Boolean(point));
+            if (!points.length) return null;
+            const x = points.reduce((sum, point) => sum + point.x / points.length, 0);
+            const z = Math.min(...points.map((point) => point.z)) - 14 * screenUnit;
+            const label = `${feature.name ?? "Offset"} ${formatDimension(feature.distance, workspace.accuracy)} ${currentLengthUnitLabel()}`;
+            const width = Math.max(70, label.length * 7);
+            return <g key={feature.id} className="sketch-constraint-markers" role="button" tabIndex={0}
+              aria-label={`Edit offset ${feature.name ?? index + 1}`} transform={`translate(${x} ${z}) scale(${screenUnit})`}
+              onPointerDown={(event) => { event.stopPropagation(); event.preventDefault(); setOffsetOpen(true); setOffsetDistanceRequest(null); setOffsetFeatureId(feature.id); setOffsetInspectorRequest(value => value + 1); setInspectedId(null); }}
+              onKeyDown={(event) => { if (event.key === "Enter") { event.stopPropagation(); setOffsetOpen(true); setOffsetDistanceRequest(null); setOffsetFeatureId(feature.id); setOffsetInspectorRequest(value => value + 1); setInspectedId(null); } }}>
+              <rect x={-width / 2} y={-8} width={width} height={16} rx={4} /><text y={4}>{label}</text>
+            </g>;
+          })}
         </svg>
         {notes?.length && onUpdateNote && onRemoveNote ? (
           <SketchNotes
@@ -4406,6 +4558,12 @@ export function SketchWorkspace({
           ))}
         </div>
       ) : null}
+      {offsetOpen && onCommitOffsetProfile && <SketchOffsetPanel key={offsetFeatureId ? `${offsetFeatureId}:${offsetInspectorRequest}` : `new:${offsetCreateRequest}`}
+        profile={profile} selectedSegmentIds={sketchSelectedSegmentIds(selected).length ? sketchSelectedSegmentIds(selected)
+          : sketchOffsetForSelection(profile, sketchSelectedPointIds(selected), [], offsetFeatureId)?.segmentIds ?? []} featureId={offsetFeatureId}
+        accuracy={workspace.accuracy} distanceRequest={offsetDistanceRequest} onCommit={onCommitOffsetProfile} onPreview={showOffsetPreview}
+        onEdit={(id) => { setOffsetDistanceRequest(null); setOffsetFeatureId(id); }}
+        onClose={() => { setOffsetOpen(false); setOffsetPreview(null); }} />}
       {inspected && tool === "select" && (
         <SketchConstraintInspector key={`${JSON.stringify(inspected)}:${inspectorRequest}`} rule={inspected}
           profile={inspectedIsSaved ? profile : { ...profile, constraints: [...constraints, inspected] }}
@@ -4417,13 +4575,18 @@ export function SketchWorkspace({
           onSelectShape={(pointIds, segmentIds) => onSelectMany(pointIds, segmentIds, [])}
           onRenameShape={(pointIds, name) => {
             const ids = new Set(pointIds);
+            const offset = profile.offsets?.find((entry) => entry.pointIds.some((id) => ids.has(id)));
+            if (offset && onCommitOffsetProfile) {
+              onCommitOffsetProfile({ ...profile, offsets: profile.offsets!.map((entry) => entry.id === offset.id ? { ...entry, name: name || undefined } : entry) });
+              return;
+            }
             onTransformPoints(profile.points.filter((point) => ids.has(point.id))
               .map((point) => ({ ...point, shapeName: name || undefined })), t("status.sketchUpdated"));
           }} />
       )}
       {constraintFailure && (
         <div className="sketch-point-actions sketch-constraint-feedback" role="alert">
-          <span>{constraintFailure.conflicting.length
+          <span>{constraintFailure.offsetError ? constraintFailure.offsetError.message : constraintFailure.conflicting.length
             ? "Contradictory dimensions. Edit or remove a highlighted constraint."
             : "The solver could not satisfy the operation. Review these constraints and any locked points. The cause is undetermined."}</span>
           {[...new Map(failedRules.map((rule) => [rule.id, rule])).values()].map((rule) => (
@@ -4433,6 +4596,9 @@ export function SketchWorkspace({
               {!constraints.some((entry) => entry.id === rule.id) ? " (attempt rejected)" : ""}
             </button>
           ))}
+          {constraintFailure.offsetError && <button type="button" onClick={() => {
+            setInspectedId(null); setOffsetOpen(true); setOffsetFeatureId(constraintFailure.offsetError!.offsetId);
+          }}>Review offset</button>}
           <button type="button" onClick={onDismissConstraintFailure}>Dismiss</button>
         </div>
       )}

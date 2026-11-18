@@ -8,6 +8,9 @@ export function cloneSketchProfile(profile: SketchProfile): SketchProfile {
       handleOut: point.handleOut ? { ...point.handleOut } : undefined,
     })),
     segments: profile.segments.map((segment) => ({ ...segment })),
+    ...(profile.offsets ? { offsets: profile.offsets.map((feature) => ({
+      ...feature, sourceSegmentIds: [...feature.sourceSegmentIds], pointIds: [...feature.pointIds], segmentIds: [...feature.segmentIds],
+    })) } : {}),
     ...(profile.constraints ? { constraints: profile.constraints.map((rule) => rule.kind === "concentric" ? { ...rule, circles: [[...rule.circles[0]], [...rule.circles[1]]] } : "outline" in rule ? { ...rule, outline: [...rule.outline] } : rule.frameX ? { ...rule, frameX: { ...rule.frameX } } : { ...rule }) } : {}),
     images: (profile.images ?? []).map((image) => ({ ...image })),
     ...(profile.stroke ? { stroke: { ...profile.stroke } } : {}),

@@ -1,3 +1,5 @@
+import type { SketchProfile } from "@/types/layerling";
+import { updateSketchOffsets } from "@/lib/sketchOffsets";
 import { checkedTypefaceData, customFontName, isCustomFontId, textCharacters, typefaceSubset } from "@/lib/customFonts";
 import { customFontEntry, registerCustomFont } from "@/lib/textFonts";
 import { strFromU8, strToU8, unzip } from "fflate";
@@ -831,6 +833,7 @@ async function serializeShapeNode(
       points: sketchProfile.points,
       segments: sketchProfile.segments,
       ...(sketchProfile.constraints?.length ? { constraints: sketchProfile.constraints } : {}),
+      ...(sketchProfile.offsets?.length ? { offsets: sketchProfile.offsets } : {}),
       ...(images.length ? { images } : {}),
       ...(sketchProfile.stroke ? { stroke: sketchProfile.stroke } : {}),
       ...(sketchProfile.silhouette ? { silhouette: true } : {}),
@@ -1329,6 +1332,35 @@ function validateSketchProfile(value: unknown, label: string) {
     if (!pointIds.has(startId) || !pointIds.has(endId)) throw new Error(`${label} contains a segment with a missing point reference`);
     if (segment.construction !== undefined && typeof segment.construction !== "boolean") throw new Error(`${label}.segments[${index}].construction must be true or false`);
   });
+  if (profile.offsets !== undefined) {
+    if (!Array.isArray(profile.offsets)) throw new Error(`${label}.offsets must be an array`);
+    const offsetIds = new Set<string>();
+    const derivedPoints = new Set<string>();
+    const derivedSegments = new Set<string>();
+    profile.offsets.forEach((raw, index) => {
+      const offsetLabel = `${label}.offsets[${index}]`;
+      const offset = objectRecord(raw, offsetLabel);
+      const id = stringValue(offset.id, `${offsetLabel}.id`);
+      if (offsetIds.has(id)) throw new Error("Duplicate offset ID");
+      offsetIds.add(id);
+      const sources = stringArray(offset.sourceSegmentIds, `${offsetLabel}.sourceSegmentIds`);
+      const points = stringArray(offset.pointIds, `${offsetLabel}.pointIds`);
+      const segments = stringArray(offset.segmentIds, `${offsetLabel}.segmentIds`);
+      if (!sources.length || new Set(sources).size !== sources.length || sources.some((ref) => !segmentIds.has(ref)) ||
+        !points.length || new Set(points).size !== points.length || points.some((ref) => !pointIds.has(ref) || derivedPoints.has(ref)) ||
+        !segments.length || new Set(segments).size !== segments.length || segments.some((ref) => !segmentIds.has(ref) || derivedSegments.has(ref))) throw new Error("Invalid offset references");
+      points.forEach((ref) => derivedPoints.add(ref));
+      segments.forEach((ref) => derivedSegments.add(ref));
+      const distance = finiteNumber(offset.distance, `${offsetLabel}.distance`);
+      const miterLimit = finiteNumber(offset.miterLimit, `${offsetLabel}.miterLimit`);
+      if (Math.abs(distance) < 1e-6 || Math.abs(distance) > 1e6 || miterLimit < 1 || miterLimit > 100 ||
+        !["miter", "round", "bevel"].includes(String(offset.join))) throw new Error("Invalid offset parameters");
+      if (offset.name !== undefined && typeof offset.name !== "string") throw new Error("Offset name must be text");
+      if (offset.hidden !== undefined && typeof offset.hidden !== "boolean") throw new Error("Offset visibility must be boolean");
+    });
+    const checked = updateSketchOffsets(profile as unknown as SketchProfile);
+    if (!checked.ok) throw new Error(checked.message);
+  }
   if (profile.constraints !== undefined) {
     if (!Array.isArray(profile.constraints)) throw new Error(`${label}.constraints must be an array`);
     const ruleIds = new Set<string>();
