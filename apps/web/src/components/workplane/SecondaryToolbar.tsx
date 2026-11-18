@@ -24,7 +24,7 @@ import { ribbonToolOrderFor, sortByRibbonToolOrder, useRibbonToolOrder } from "@
 import { ribbonCollapsePriority, ribbonFoldOf, useRibbonFold } from "@/lib/ribbonFold";
 import { normalizePolygonSides, normalizeStarInnerPercent, SKETCH_POLYGON_MAX_SIDES, SKETCH_POLYGON_MIN_SIDES, SKETCH_STAR_MAX_INNER_PERCENT, SKETCH_STAR_MIN_INNER_PERCENT } from "@/lib/sketchPrimitives";
 import { SketchBoltCircleIcon, SketchEllipseIcon, SketchHalfCircleIcon, SketchPieSliceIcon, ToolbarAlignIcon, ToolbarAttachmentsIcon, ToolbarBuildPlatesIcon, ToolbarCenterOnWorkplaneIcon, ToolbarChamferIcon, ToolbarCaretDownIcon, ToolbarCookieCutterIcon, ToolbarFlexiIcon, ToolbarLidIcon,
-  ToolbarCableChannelIcon, ToolbarCopyIcon, ToolbarDuplicateIcon, ToolbarDropToWorkplaneIcon, ToolbarBundleIcon, ToolbarGroupIcon, ToolbarGuideIcon, ToolbarHideSelectedIcon, ToolbarHomeIcon, ToolbarImportIcon, ToolbarIntersectionIcon,ToolbarClearanceIcon, ToolbarPrintCheckIcon, ToolbarLayerCheckIcon, ToolbarHullIcon, ToolbarLoftSketchesIcon, ToolbarKeyboardIcon, ToolbarFilletIcon, ToolbarHistoryIcon, ToolbarHollowIcon, ToolbarOffsetIcon, ToolbarCutOutIcon, ToolbarPunchIcon, ToolbarDeleteFaceIcon, ToolbarSimplifyIcon, ToolbarMakeExactIcon, ToolbarSurfaceTextureIcon, ToolbarPaintIcon, ToolbarMirrorIcon, ToolbarRotationPivotIcon, ToolbarPatternIcon, ToolbarHolePatternIcon, ToolbarThreadInsertIcon, ToolbarFaceToolIcon, ToolbarSupportRibIcon, ToolbarStencilBridgeIcon, ToolbarConstructionLineIcon, ToolbarMiddleLineIcon, ToolbarLayFlatIcon, ToolbarMateFacesIcon, ToolbarNoteIcon, ToolbarSplitIcon, ToolbarPasteIcon, ToolbarRedoIcon, ToolbarSnapGridIcon, ToolbarSettingsIcon, ToolbarShapeAddIcon, ToolbarTrashIcon, ToolbarUngroupIcon, ToolbarUndoIcon, ToolbarVectorExportIcon } from "../icons";
+  ToolbarCableChannelIcon, ToolbarCopyIcon, ToolbarDuplicateIcon, ToolbarDropToWorkplaneIcon, ToolbarBundleIcon, ToolbarGroupIcon, ToolbarGuideIcon, ToolbarHideSelectedIcon, ToolbarHomeIcon, ToolbarImportIcon, ToolbarIntersectionIcon,ToolbarClearanceIcon, ToolbarPrintCheckIcon, ToolbarLayerCheckIcon, ToolbarHullIcon, ToolbarLoftSketchesIcon, ToolbarKeyboardIcon, ToolbarFilletIcon, ToolbarHistoryIcon, ToolbarHollowIcon, ToolbarOffsetIcon, ToolbarCutOutIcon, ToolbarPunchIcon, ToolbarDeleteFaceIcon, ToolbarSimplifyIcon, ToolbarMakeExactIcon, ToolbarSurfaceTextureIcon, ToolbarPaintIcon, ToolbarMirrorIcon, ToolbarRotationPivotIcon, ToolbarPatternIcon, ToolbarHolePatternIcon, ToolbarFaceToolIcon, ToolbarSupportRibIcon, ToolbarStencilBridgeIcon, ToolbarConstructionLineIcon, ToolbarMiddleLineIcon, ToolbarLayFlatIcon, ToolbarMateFacesIcon, ToolbarNoteIcon, ToolbarSplitIcon, ToolbarPasteIcon, ToolbarRedoIcon, ToolbarSnapGridIcon, ToolbarSettingsIcon, ToolbarShapeAddIcon, ToolbarTrashIcon, ToolbarUngroupIcon, ToolbarUndoIcon, ToolbarVectorExportIcon } from "../icons";
 import { type SketchPrimitive, type SketchTool } from "../SketchWorkspace";
 import { CommandPalette, type PaletteCommand } from "./CommandPalette";
 import { customShapeCommands } from "@/lib/customShapeCommands";
@@ -793,6 +793,13 @@ export function SecondaryToolbar({
     onToolbarModeChange(mode);
   };
   const addShapeFromMenu = (shape: ShapeAsset) => {
+    if (shape.id === "threadInsert") {
+      if (canHolePattern || threadInsertActive) {
+        onThreadInsert();
+        closeShapesAfterPick();
+      }
+      return;
+    }
     onAddShape({ ...shape, name: shapeAssetLabel(shape) });
     closeShapesAfterPick();
   };
@@ -1041,7 +1048,6 @@ export function SecondaryToolbar({
     { id: "pivot", section: "pattern", label: t("editor.tool.rotationPivot"), icon: ToolbarRotationPivotIcon, action: onRotationPivot, enabled: canModifySelection, active: rotationPivotActive, needs: need("selection") },
     { id: "array", section: "pattern", label: t("editor.tool.array"), icon: ToolbarPatternIcon, action: onArray, enabled: canModifySelection, active: arrayActive, needs: need("selection") },
     { id: "holePattern", section: "pattern", label: t("holePattern.title"), icon: ToolbarHolePatternIcon, action: onHolePattern, enabled: canHolePattern, active: holePatternActive, needs: need("oneSolid") },
-    { id: "threadInsert", section: "pattern", label: t("threadInsert.title"), icon: ToolbarThreadInsertIcon, action: onThreadInsert, enabled: canHolePattern || threadInsertActive, active: threadInsertActive, needs: need("oneSolid") },
     { id: "faceTool", section: "pattern", label: t("faceTool.title"), icon: ToolbarFaceToolIcon, action: onFaceTool, enabled: canFaceTool, active: faceToolActive, needs: need("oneSolid") },
     { id: "split", section: "shape", label: t("editor.tool.split"), icon: ToolbarSplitIcon, action: onSplit, enabled: splitMode || canSplit, active: splitMode, needs: need("visibleBodies") },
     { id: "flexi", section: "shape", label: t("editor.tool.flexi"), icon: ToolbarFlexiIcon, action: onFlexi, enabled: canFlexi || flexiActive, active: flexiActive, needs: need("solid") },
@@ -1088,7 +1094,8 @@ export function SecondaryToolbar({
         title={shapeAssetMenuLabel(shape).replace(/\s+/g, " ")}
         aria-label={shapeAssetMenuLabel(shape).replace(/\s+/g, " ")}
         style={{ "--shape-default-color": shapeAssetColor(shape, shapeCustomizations[shape.kind]) } as CSSProperties}
-        draggable
+        draggable={shape.id !== "threadInsert"}
+        disabled={shape.id === "threadInsert" && !canHolePattern && !threadInsertActive}
         onClick={() => {
           if (suppressNextShapeClickRef.current) {
             suppressNextShapeClickRef.current = false;
@@ -1138,6 +1145,10 @@ export function SecondaryToolbar({
           addShapeFromMenu(shape);
         }}
         onDragStart={(event) => {
+          if (shape.id === "threadInsert") {
+            event.preventDefault();
+            return;
+          }
           event.dataTransfer.effectAllowed = "copy";
           event.dataTransfer.setData("application/x-layerling-shape", JSON.stringify(shape));
         }}
