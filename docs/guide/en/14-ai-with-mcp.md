@@ -101,6 +101,7 @@ The AI works with the same functions as you, through the same path as your opera
 | `layerling_lay_flat` | lays an object with one face on the plate |
 | `layerling_place_on_face` | sets objects down on a face of another, sloped ones too, like the C key |
 | `layerling_perforate_face` | cuts a hole pattern into a flat face or round the wall of a cylinder, tube or bore; the holes stay as holes grouped with the body |
+| `layerling_thread_insert` | makes the hole for a heat-set thread insert (M2 to M8, 1/4-20 or your own size) in a flat face or the outside wall of a cylinder or tube, after checking that the wall beside the hole and the depth behind it are enough; the hole stays a hole grouped with the body |
 | `layerling_sweep_sketch` | pulls a rectangular or round cross-section along a path of points as one exact body; a closed path makes a ring |
 | `layerling_push_face` | pushes a flat face out or cuts a pocket into it, with an inset from the edge and a corner radius; the new part is a sketch body grouped with the body, or a free body of its own with `separate` |
 | `layerling_paint` | paints parts of a body in colours of their own for printing in several colours (Paint): fill a face up to its sharp edges, a round patch, or a lasso drawn in a flat view; erase, clear; saved with the body and written to a 3MF as painted faces |

@@ -101,6 +101,7 @@ La IA trabaja con las mismas funciones que tú, por el mismo camino que sigues c
 | `layerling_lay_flat` | apoya un objeto sobre la placa por una de sus caras |
 | `layerling_place_on_face` | posa objetos sobre una cara de otro, aunque esté inclinada, como la tecla C |
 | `layerling_perforate_face` | corta un patrón de orificios en una cara plana o alrededor de la pared de un cilindro, un tubo o un taladro; los orificios se quedan como orificios agrupados con el cuerpo |
+| `layerling_thread_insert` | hace el orificio para un inserto roscado térmico (M2 a M8, 1/4-20 o tu propia medida) en una cara plana o en la pared exterior de un cilindro o un tubo, tras comprobar que la pared junto al orificio y la profundidad detrás son suficientes; el orificio se queda como orificio agrupado con el cuerpo |
 | `layerling_sweep_sketch` | hace un barrido de una sección rectangular o redonda a lo largo de una trayectoria de puntos, como un único cuerpo exacto; una trayectoria cerrada da un anillo |
 | `layerling_push_face` | empuja hacia fuera una cara plana o abre un hueco en ella, con un desfase hacia dentro desde la arista y un radio de esquina; la parte nueva es un cuerpo de boceto agrupado con el cuerpo, o un cuerpo independiente con `separate` |
 | `layerling_paint` | pinta partes de un cuerpo en colores propios para imprimir en varios colores (Pintar): rellenar una cara hasta sus aristas vivas, una mancha redonda o un lazo trazado en una vista plana; borrar, quitar todo; se guarda con el cuerpo y se escribe en un 3MF como caras pintadas |

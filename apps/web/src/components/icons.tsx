@@ -175,6 +175,7 @@ export {
   ToolbarRotationPivotIcon,
   ToolbarPatternIcon,
   ToolbarHolePatternIcon,
+  ToolbarThreadInsertIcon,
   ToolbarFaceToolIcon,
   ToolbarSupportRibIcon,
   ToolbarStencilBridgeIcon,

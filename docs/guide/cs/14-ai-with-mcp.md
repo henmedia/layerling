@@ -97,6 +97,7 @@ AI používá stejné funkce a stejné zpracování příkazů jako ruční ovl�
 | `layerling_lay_flat` | položí objekt vybranou plochou na podložku |
 | `layerling_place_on_face` | umístí objekty na plochu jiného tělesa, i šikmou, jako klávesa C |
 | `layerling_perforate_face` | vytvoří rastr otvorů na rovinné ploše nebo dokola na stěně válce, trubky či díry; výřezy zůstanou sloučené s tělesem |
+| `layerling_thread_insert` | vytvoří otvor pro zalisovací závitovou vložku (M2 až M8, 1/4-20 nebo vlastní velikost) na rovinné ploše nebo na vnější stěně válce či trubky poté, co ověří, že stěna vedle otvoru i hloubka za ním stačí; výřez zůstane sloučený s tělesem |
 | `layerling_sweep_sketch` | protáhne obdélníkový nebo kruhový průřez podél dráhy z bodů jako jedno přesné těleso; uzavřená dráha dá prstenec |
 | `layerling_push_face` | vysune rovinnou plochu ven nebo do ní vyřízne kapsu, s odsazením od okraje a poloměrem rohů; nový díl je těleso z náčrtu sloučené s tělesem |
 | `layerling_paint` | obarví části tělesa vlastními barvami pro tisk více barvami (Malování): vyplnit plochu k ostrým hranám, kulatá skvrna nebo laso v rovinném pohledu; gumovat, smazat vše; uloží se s tělesem a do 3MF se zapíše jako obarvené plochy |
