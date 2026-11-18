@@ -19306,7 +19306,6 @@ export function LayerlingEditor({
       );
       if (!single.hole && !isNonSolidShape(single)) {
         items.push({ key: "holePattern", label: t("holePattern.title"), onSelect: toggleHolePattern });
-        items.push({ key: "threadInsert", label: t("threadInsert.title"), onSelect: toggleThreadInsert });
         items.push({ key: "faceTool", label: t("faceTool.title"), onSelect: toggleFaceTool });
         items.push({ key: "supportRib", label: t("supportRib.title"), onSelect: toggleSupportRib });
       }

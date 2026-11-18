@@ -384,8 +384,8 @@ export const sbcBoardAsset: ToolbarShapeAsset = {
 export const threadInsertLibraryAsset: ToolbarShapeAsset = {
   id: "threadInsert",
   name: "Thread insert",
-  src: "assets/editor/shape-icons-gray/counterbore.png",
-  menuIcon: "assets/editor/shape-icons-gray/counterbore.png",
+  src: "assets/editor/shape-icons-gray/threadInsert.svg",
+  menuIcon: "assets/editor/shape-icons-gray/threadInsert.svg",
   kind: "counterbore",
   color: "#b69b46",
 };
