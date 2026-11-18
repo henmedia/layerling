@@ -147,6 +147,7 @@ AI 使用的是與你相同的功能，走的也是你在編輯器中操作時�
 | `layerling_printer_play` | 讀取、設定或清除印表機間隙（設定中的{{ui:workspace.printerPlay}}），並放置用來測量它的配合測試件 |
 | `layerling_check_print` | 列印前檢查會出什麼問題：對噴嘴來說過薄的壁、懸空的零件、與平台接觸過少、懸垂和開放網格 |
 | `layerling_check_layers` | 把列印件切成層，逐層列出會出問題的地方：懸垂、無支撐區域、橋接、薄壁、小島、陷入熱床的零件（列印分析） |
+| `layerling_split_bolt` | 沿軸線把螺絲或螺桿縱向剖成兩半，並以剖切面朝下平放以便列印，可選加定位銷 |
 | `layerling_add_reference_points` | 標記參考點——可落在物件的中心、角落或邊中點，也可指定精確位置——形狀會吸附到這些點 |
 | `layerling_list_reference_points` | 列出參考點及其 id 與位置 |
 | `layerling_remove_reference_points` | 依 id 刪除參考點，或全部刪除 |

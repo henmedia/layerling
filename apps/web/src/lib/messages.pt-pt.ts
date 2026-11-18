@@ -5766,5 +5766,17 @@ export const MESSAGES_PT_PT: Partial<Record<MessageKey, string>> = {
   "finding.action.layFlat": "Assentar sobre uma face",
   "finding.action.supportRib": "Nervura de suporte",
   "finding.action.openMold": "Molde e matriz",
+  "boltSplit.halfName": "{name} – metade {number}",
+  "boltSplit.error.notBolt": "Só um parafuso ou um varão roscado pode ser dividido no comprimento.",
+  "boltSplit.error.notClosed": "O corpo não está fechado e não pode ser dividido.",
+  "boltSplit.error.kernel": "Não foi possível dividir: {message}",
+  "inspector.boltSplit": "Dividir no comprimento e deitar",
+  "inspector.boltSplitHint": "Para imprimir: cortado em dois pelo eixo, cada metade deitada sobre a face de corte. Uma rosca impressa deitada é muito mais forte do que de pé. Depois cole as metades.",
+  "status.boltSplit": "{name} dividido no comprimento: duas metades sobre as faces de corte.",
+  "boltSplit.pinsName": "{name} – pinos de centragem",
+  "inspector.boltSplitPins": "Com pinos de centragem",
+  "inspector.boltSplitPinsHint": "Pinos Ø {diameter} mm, um na cabeça e de um a três na rosca conforme o comprimento, em furos perpendiculares à face de corte: alinham as metades com exatidão, também no comprimento, para que as voltas coincidam. Os furos terminam num cone de 45°, por isso tudo imprime sem suportes.",
+  "status.boltSplitPins": "{name} dividido no comprimento: duas metades sobre as faces de corte e {count} pinos de centragem Ø {diameter} × {length} mm.",
+  "status.boltSplitNoPins": "{name} dividido no comprimento: duas metades sem pinos de centragem (não há espaço para eles).",
 };
 

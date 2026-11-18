@@ -5832,6 +5832,18 @@ export const MESSAGES_EN = {
   "finding.action.layFlat": "Lay flat",
   "finding.action.supportRib": "Support rib",
   "finding.action.openMold": "Mold & die",
+  "boltSplit.halfName": "{name} – half {number}",
+  "boltSplit.error.notBolt": "Only a screw or a threaded rod can be split lengthwise.",
+  "boltSplit.error.notClosed": "The body is not closed, so it cannot be split.",
+  "boltSplit.error.kernel": "Could not split: {message}",
+  "inspector.boltSplit": "Split lengthwise and lay flat",
+  "inspector.boltSplitHint": "For printing: cut in two through its axis, each half lying on its cut face. A thread printed lying down is much stronger than one printed standing. Glue the halves together afterwards.",
+  "status.boltSplit": "{name} split lengthwise: two halves lying on their cut faces.",
+  "boltSplit.pinsName": "{name} – centring pins",
+  "inspector.boltSplitPins": "With centring pins",
+  "inspector.boltSplitPinsHint": "Pins Ø {diameter} mm, one in the head and one to three along the thread by its length, in holes square to the cut face: they line the halves up exactly, along the axis too, so the turns meet. The holes end in a 45° cone, so everything prints without support.",
+  "status.boltSplitPins": "{name} split lengthwise: two halves lying on their cut faces and {count} centring pins Ø {diameter} × {length} mm.",
+  "status.boltSplitNoPins": "{name} split lengthwise: two halves, without centring pins (there is no room for them).",
 } as const;
 
 export type MessageKey = keyof typeof MESSAGES_EN;

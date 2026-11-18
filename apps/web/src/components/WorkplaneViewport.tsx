@@ -268,6 +268,7 @@ type WorkplaneViewportProps = {
   onGridfinityKeys?: () => void;
   /** Splits the selected baseplate into plates that fit the printer (#1388). */
   onGridfinitySplit?: () => void;
+  onBoltSplit?: (pins: boolean) => void;
   onLayerText?: (patch: TextLayerPatch) => void;
   onTextTags?: (names: string[], gap: number) => void;
   /** Several lines of text under one another, one text each (#1207). */
@@ -1668,6 +1669,7 @@ export function WorkplaneViewport({
   onVaseAccessories,
   onGridfinityKeys,
   onGridfinitySplit,
+  onBoltSplit,
   onLayerText,
   onTextTags,
   onTextBlock,
@@ -9670,6 +9672,7 @@ export function WorkplaneViewport({
           onVaseAccessories={onVaseAccessories}
           onGridfinityKeys={onGridfinityKeys}
           onGridfinitySplit={onGridfinitySplit}
+          onBoltSplit={onBoltSplit}
           onLayerText={onLayerText}
           onTextTags={onTextTags}
           onTextBlock={onTextBlock}
