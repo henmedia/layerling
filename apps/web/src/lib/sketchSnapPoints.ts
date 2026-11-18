@@ -1,5 +1,6 @@
 import { circularArcCenter } from "@/lib/sketchCircularArc";
 import { constructionCrossings } from "@/lib/sketchConstruction";
+import { sketchConstraintReferences } from "@/lib/sketchConstraints";
 import { cubicPoint } from "@/lib/sketchPaths";
 import type { SketchPoint, SketchProfile } from "@/types/layerling";
 
@@ -49,16 +50,33 @@ export function outlineSideMiddles(corners: readonly Plane[]): Plane[] {
 }
 
 /**
- * Where the middle of a moved selection snaps to (#1236): the ends and corners of the rest of the sketch, the middles
- * of its lines and centres of its circles, and where its construction lines cross. What moves is left out, and so is
- * every line with an end among it, as it would move along under the selection.
+ * Stable sketch geometry for drag snapping. Excludes the dragged points, their
+ * constraint participants, and lines with an excluded end.
  */
-export function selectionSnapTargets(profile: SketchProfile, movingIds: ReadonlySet<string>): Plane[] {
-  const rest: SketchProfile = {
+export function sketchDragSnapProfile(profile: SketchProfile, movingIds: ReadonlySet<string>): SketchProfile {
+  const excluded = new Set(movingIds);
+  const references = (profile.constraints ?? []).map(rule => sketchConstraintReferences(rule).flat());
+  // Constraint participants can follow the dragged points even across independent
+  // paths. Snapping to their solved positions feeds the previous preview back into
+  // the next cursor target (a midpoint drag can alternate between its own endpoints).
+  let changed = true;
+  while (changed) {
+    changed = false;
+    for (const ids of references) {
+      if (!ids.some(id => excluded.has(id))) continue;
+      for (const id of ids) if (!excluded.has(id)) { excluded.add(id); changed = true; }
+    }
+  }
+  return {
     ...profile,
-    points: profile.points.filter((point) => !movingIds.has(point.id)),
-    segments: profile.segments.filter((segment) => !movingIds.has(segment.startId) && !movingIds.has(segment.endId)),
+    points: profile.points.filter((point) => !excluded.has(point.id)),
+    segments: profile.segments.filter((segment) => !excluded.has(segment.startId) && !excluded.has(segment.endId)),
   };
+}
+
+/** Ends, middles, circle centres, and construction crossings outside the moving geometry (#1236). */
+export function selectionSnapTargets(profile: SketchProfile, movingIds: ReadonlySet<string>): Plane[] {
+  const rest = sketchDragSnapProfile(profile, movingIds);
   const found = new Map<string, Plane>();
   const add = (point: Plane) => {
     const x = round(point.x);

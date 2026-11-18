@@ -187,6 +187,13 @@ function cross(ax: number, az: number, bx: number, bz: number) {
 export function addLineIntersectionPoints(profile: SketchProfile, createId: IdFactory) {
   const pointById = new Map(profile.points.map((point) => [point.id, point]));
   const derivedSegments = new Set(profile.offsets?.flatMap((feature) => feature.segmentIds));
+  // These relationships refer to whole lines. An incidental crossing must not replace
+  // a reference with split edges and silently discard the persisted constraint.
+  const references = (profile.constraints ?? []).flatMap((rule): string[][] =>
+    rule.kind === "midpoint" || rule.kind === "point-on-line" ? [[rule.a, rule.b]]
+      : rule.kind === "symmetry" ? [rule.axis, ...(rule.pair ? [[rule.a, rule.pair[0]], [rule.b, rule.pair[1]]] : [])] : []);
+  for (const segment of profile.segments) if (references.some(([a, b]) =>
+    (a === segment.startId && b === segment.endId) || (b === segment.startId && a === segment.endId))) derivedSegments.add(segment.id);
   const lines = profile.segments.filter((segment) => !derivedSegments.has(segment.id) && isStraightSegment(segment) && pointById.has(segment.startId) && pointById.has(segment.endId));
   const splits = new Map<string, SegmentSplit[]>();
   const addedPoints: SketchPoint[] = [];

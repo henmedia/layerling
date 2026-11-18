@@ -33,7 +33,7 @@ export function sketchMirrorAxisThroughSegment(profile: SketchProfile, segmentId
   return { point: { x: start.x, z: start.z }, direction: { x: (end.x - start.x) / length, z: (end.z - start.z) / length } };
 }
 
-function reflect(axis: SketchMirrorAxis, position: Vec): Vec {
+export function reflectSketchPoint(axis: SketchMirrorAxis, position: Vec): Vec {
   const dx = position.x - axis.point.x;
   const dz = position.z - axis.point.z;
   const along = dx * axis.direction.x + dz * axis.direction.z;
@@ -53,6 +53,7 @@ export function mirrorSketchSelection(
   selection: SketchClipboardSelection,
   axis: SketchMirrorAxis,
   createId: (prefix: string) => string,
+  options: { preserveReferences?: boolean } = {},
 ) {
   const copied = copySketchSelection(profile, selection);
   if (!copied || copied.points.length === 0) return null;
@@ -63,10 +64,10 @@ export function mirrorSketchSelection(
     .filter((point) => pointIdMap.get(point.id) !== point.id)
     .map((point) => ({
       ...point,
-      ...reflect(axis, point),
+      ...reflectSketchPoint(axis, point),
       id: pointIdMap.get(point.id)!,
-      handleIn: point.handleIn ? reflect(axis, point.handleIn) : undefined,
-      handleOut: point.handleOut ? reflect(axis, point.handleOut) : undefined,
+      handleIn: point.handleIn ? reflectSketchPoint(axis, point.handleIn) : undefined,
+      handleOut: point.handleOut ? reflectSketchPoint(axis, point.handleOut) : undefined,
     }));
 
   const existing = new Set(profile.segments.map((segment) => [segment.startId, segment.endId].sort().join("|")));
@@ -83,16 +84,18 @@ export function mirrorSketchSelection(
   });
   if (mirrored.length === 0 && segments.length === 0) return null;
 
-  const next = addLineIntersectionPoints({
+  const reflectedProfile: SketchProfile = {
     ...profile,
     points: [...profile.points, ...mirrored],
     segments: [...profile.segments, ...segments],
-  }, createId);
+  };
+  const next = options.preserveReferences ? reflectedProfile : addLineIntersectionPoints(reflectedProfile, createId);
   // The same bookkeeping as a paste: crossing points lie on a mirrored line, and the split keeps the new lines last.
   const existingPointIds = new Set(profile.points.map((point) => point.id));
   const firstNew = segments.length ? next.segments.findIndex((segment) => segment.id === segments[0].id) : -1;
   return {
     profile: next,
+    pointIdMap,
     pointIds: next.points.filter((point) => !existingPointIds.has(point.id)).map((point) => point.id),
     segmentIds: firstNew < 0 ? [] : next.segments.slice(firstNew).map((segment) => segment.id),
   };

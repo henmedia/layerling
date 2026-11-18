@@ -16,7 +16,7 @@ export function useEditorNotice() {
   // „Bereit" braucht niemand zu lesen - dass nichts los ist, sieht man.
   const [notice, setNoticeText] = useState("");
   // A message may carry one button, for what the person can do about it right away (#489).
-  const [noticeAction, setNoticeAction] = useState<NoticeAction | null>(null);
+  const [noticeAction, setNoticeAction] = useState<NoticeAction | NoticeAction[] | null>(null);
   // When the message came (performance.now()), so the editor can tell one that reports a change just made.
   const [noticeAt, setNoticeAt] = useState(0);
   // An ordinary message goes after a few seconds and carries no button of its own: a confirmation, which can be switched off (#1708).
@@ -34,7 +34,7 @@ export function useEditorNotice() {
     }, ms);
   }, []);
   // "stay": the message stays until the next one or the close button - for work that runs long and for what went wrong (#286).
-  const setNotice = useCallback((message: string, patient: boolean | "stay" = false, action: NoticeAction | null = null) => {
+  const setNotice = useCallback((message: string, patient: boolean | "stay" = false, action: NoticeAction | NoticeAction[] | null = null) => {
     reportNoticesRef.current = rememberBugReportEvent(reportNoticesRef.current, message);
     setNoticeText(message);
     setNoticeAction(action);
@@ -52,7 +52,9 @@ export function useEditorNotice() {
     if (noticeTimerRef.current !== null) window.clearTimeout(noticeTimerRef.current);
     noticeTimerRef.current = null;
   }, []);
-  const releaseNotice = useCallback(() => clearLater(NOTICE_AFTER_HOVER_MS), [clearLater]);
+  const releaseNotice = useCallback(() => {
+    if (!Array.isArray(noticeAction)) clearLater(NOTICE_AFTER_HOVER_MS);
+  }, [clearLater, noticeAction]);
   const dismissNotice = useCallback(() => {
     holdNotice();
     setNoticeText("");

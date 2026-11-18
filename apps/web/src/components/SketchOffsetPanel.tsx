@@ -1,5 +1,8 @@
 "use client";
 
+import { localizedError } from "@/lib/userErrors";
+import { t } from "@/lib/i18n";
+import { useLanguage } from "@/lib/useLanguage";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { ChevronDown, Eye, EyeOff, Pencil, Trash2, Unlink, X } from "lucide-react";
 import { ToolbarOffsetIcon } from "@/components/toolbarIcons";
@@ -23,9 +26,10 @@ export function SketchOffsetPanel({ profile, selectedSegmentIds, featureId, accu
   onEdit: (id: string | null) => void;
   onClose: () => void;
 }) {
+  useLanguage();
   const feature = profile.offsets?.find((offset) => offset.id === featureId);
-  const defaultName = `Offset ${(profile.offsets?.length ?? 0) + 1}`;
-  const [nameText, setNameText] = useState(feature?.name ?? (feature ? `Offset ${profile.offsets!.indexOf(feature) + 1}` : defaultName));
+  const defaultName = t("sketchUi.offset", { value0: (profile.offsets?.length ?? 0) + 1 });
+  const [nameText, setNameText] = useState(feature?.name ?? "");
   const createRef = useRef<HTMLLIElement>(null);
   const [distanceText, setDistanceText] = useState(formatLengthMm(feature?.distance ?? 2, accuracy));
   const [join, setJoin] = useState<SketchOffset["join"]>(feature?.join ?? "miter");
@@ -42,7 +46,7 @@ export function SketchOffsetPanel({ profile, selectedSegmentIds, featureId, accu
   useEffect(() => { if (feature) setDistanceText(formatLengthMm(feature.distance, accuracy)); }, [feature?.distance, accuracy]);
   useEffect(() => { if (feature) setJoin(feature.join); }, [feature?.join]);
   useEffect(() => { if (feature) setLimitText(String(feature.miterLimit)); }, [feature?.miterLimit]);
-  useEffect(() => { if (feature) setNameText(feature.name ?? `Offset ${profile.offsets!.indexOf(feature) + 1}`); }, [feature?.name]);
+  useEffect(() => { if (feature) setNameText(feature.name ?? ""); }, [feature?.name]);
   useEffect(() => {
     if (distanceRequest) setDistanceText(formatLengthMm(distanceRequest.value, accuracy));
   }, [distanceRequest, accuracy]);
@@ -74,7 +78,7 @@ export function SketchOffsetPanel({ profile, selectedSegmentIds, featureId, accu
         points: [...generated.points, ...(second?.points ?? [])], segments: [...generated.segments, ...(second?.segments ?? [])],
       } };
     } catch (failure) {
-      return { ok: false as const, message: failure instanceof Error ? failure.message : "The offset preview could not be calculated." };
+      return { ok: false as const, message: failure instanceof Error ? failure.message : t("sketchUi.theOffsetPreviewCouldNotBeCalculated") };
     }
   }, [profile, feature, selectionKey, distance, join, miterLimit, wholePath, bothSides, independent, secondText]);
   const sliderLimit = sketchOffsetSliderLimit(profile, feature?.sourceSegmentIds ?? (preview.ok ? preview.source : selectedSegmentIds));
@@ -104,7 +108,7 @@ export function SketchOffsetPanel({ profile, selectedSegmentIds, featureId, accu
       setError(undefined);
       onPreview(null);
       if (associative) onEdit(primary.id);
-    } else setError("The offset could not be applied. Review the source geometry and constraints.");
+    } else setError(t("sketchUi.theOffsetCouldNotBeAppliedReviewTheSource"));
   };
 
   const saveName = () => {
@@ -113,7 +117,7 @@ export function SketchOffsetPanel({ profile, selectedSegmentIds, featureId, accu
     if (editingName.id === "new") setNameText(name);
     else {
       const next = { ...profile, offsets: profile.offsets!.map(offset => offset.id === editingName.id ? { ...offset, name: name || undefined } : offset) };
-      if (!onCommit(next)) { setError("The offset could not be renamed."); return; }
+      if (!onCommit(next)) { setError(t("sketchUi.theOffsetCouldNotBeRenamed")); return; }
       if (editingName.id === featureId) setNameText(name);
     }
     setEditingName(null);
@@ -121,7 +125,7 @@ export function SketchOffsetPanel({ profile, selectedSegmentIds, featureId, accu
   const nameHeader = (id: string, label: string) => (
     <span className="sketch-constraint-shape-name">
       {editingName?.id === id ? <input className="outliner-rename-input" type="text" data-offset-rename="true"
-        aria-label="Offset name" autoFocus maxLength={80} value={editingName.draft}
+        aria-label={t("sketchUi.offsetName")} autoFocus maxLength={80} value={editingName.draft}
         onFocus={event => event.currentTarget.select()}
         onClick={event => { event.stopPropagation(); event.preventDefault(); }}
         onChange={event => setEditingName({ id, draft: event.target.value })}
@@ -131,52 +135,52 @@ export function SketchOffsetPanel({ profile, selectedSegmentIds, featureId, accu
           if (event.key === "Escape") { event.preventDefault(); setEditingName(null); }
         }} /> : <>
         <span>{label}</span>
-        <button className="outliner-action-btn rename-btn" type="button" aria-label={`Rename offset ${label}`} title="Rename offset"
+        <button className="outliner-action-btn rename-btn" type="button" aria-label={t("sketchUi.renameOffset", { value0: label })} title={t("sketchUi.renameOffset2")}
           onClick={event => { event.preventDefault(); event.stopPropagation(); setEditingName({ id, draft: label }); }}><Pencil size={13} /></button>
       </>}
     </span>
   );
   const settings = (
-<div className="property-card" style={{ paddingTop: 14 }} aria-label={feature ? "Offset properties" : "New offset properties"}>
+<div className="property-card" style={{ paddingTop: 14 }} aria-label={feature ? t("sketchUi.offsetProperties") : t("sketchUi.newOffsetProperties")}>
         <div className="property-list">
-          {!feature && <label className="check-property"><input type="checkbox" checked={wholePath} onChange={(event) => setWholePath(event.target.checked)} />Whole connected path</label>}
-          <label className="sketch-image-position-field"><span>Distance ({currentLengthUnitLabel()})</span>
-            <input type="text" className="sketch-image-number-input" aria-label="Offset distance" value={distanceText}
+          {!feature && <label className="check-property"><input type="checkbox" checked={wholePath} onChange={(event) => setWholePath(event.target.checked)} />{t("sketchUi.wholeConnectedPath")}</label>}
+          <label className="sketch-image-position-field"><span>{t("sketchUi.distanceUnit", { unit: currentLengthUnitLabel() })}</span>
+            <input type="text" className="sketch-image-number-input" aria-label={t("sketchUi.offsetDistance")} value={distanceText}
               onChange={(event) => { setDistanceText(event.target.value); setError(undefined); }} />
           </label>
-          <input type="range" aria-label="Drag offset distance" min={-sliderLimit} max={sliderLimit}
+          <input type="range" aria-label={t("sketchUi.dragOffsetDistance")} min={-sliderLimit} max={sliderLimit}
             step={10 ** -accuracy} value={Number.isFinite(distance) ? Math.max(-sliderLimit, Math.min(sliderLimit, distance)) : 0}
             onChange={(event) => setDistanceText(formatLengthMm(Number(event.target.value), accuracy))} />
-          <span className="outliner-shape-kind">Slider: ±{formatLengthMm(sliderLimit, accuracy)} {currentLengthUnitLabel()}. Type a distance for a larger offset.</span>
+          <span className="outliner-shape-kind">{t("sketchUi.offsetSliderHelp", { limit: formatLengthMm(sliderLimit, accuracy), unit: currentLengthUnitLabel() })}</span>
           <span className="outliner-shape-kind">{preview.ok && !preview.closed
-            ? "Positive is left of start → end. Negative is right." : "Positive is outset. Negative is inset."}</span>
-          {preview.ok && preview.approximate && <span className="outliner-shape-kind">Curve approximation target: 0.01 mm</span>}
-          <button type="button" className="inspector-action-button" onClick={() => setDistanceText(formatLengthMm(-distance, accuracy))}>Flip direction</button>
-          <label className="sketch-image-position-field"><span>Corner style</span>
-            <select aria-label="Offset corner style" value={join} onChange={(event) => setJoin(event.target.value as SketchOffset["join"])}>
-              <option value="miter">Miter / Sharp</option><option value="round">Round</option><option value="bevel">Bevel</option>
+            ? t("sketchUi.positiveIsLeftOfStartEndNegativeIsRight") : t("sketchUi.positiveIsOutsetNegativeIsInset")}</span>
+          {preview.ok && preview.approximate && <span className="outliner-shape-kind">{t("sketchUi.curveApproximationTarget001Mm")}</span>}
+          <button type="button" className="inspector-action-button" onClick={() => setDistanceText(formatLengthMm(-distance, accuracy))}>{t("sketchUi.flipDirection")}</button>
+          <label className="sketch-image-position-field"><span>{t("sketchUi.cornerStyle")}</span>
+            <select aria-label={t("sketchUi.offsetCornerStyle")} value={join} onChange={(event) => setJoin(event.target.value as SketchOffset["join"])}>
+              <option value="miter">{t("sketchUi.miterSharp")}</option><option value="round">{t("sketch.strokeCap.round")}</option><option value="bevel">{t("sketch.strokeJoin.bevel")}</option>
             </select>
           </label>
-          {join === "miter" && <label className="sketch-image-position-field"><span>Miter limit</span>
-            <input type="text" className="sketch-image-number-input" aria-label="Offset miter limit" value={limitText} onChange={(event) => setLimitText(event.target.value)} />
+          {join === "miter" && <label className="sketch-image-position-field"><span>{t("sketchUi.miterLimit")}</span>
+            <input type="text" className="sketch-image-number-input" aria-label={t("sketchUi.offsetMiterLimit")} value={limitText} onChange={(event) => setLimitText(event.target.value)} />
           </label>}
           {!feature && <>
-            <label className="check-property"><input type="checkbox" checked={associative} onChange={(event) => setAssociative(event.target.checked)} />Keep linked to source</label>
+            <label className="check-property"><input type="checkbox" checked={associative} onChange={(event) => setAssociative(event.target.checked)} />{t("sketchUi.keepLinkedToSource")}</label>
             {preview.ok && !preview.closed && <>
-              <label className="check-property"><input type="checkbox" checked={bothSides} onChange={(event) => setBothSides(event.target.checked)} />Both sides</label>
+              <label className="check-property"><input type="checkbox" checked={bothSides} onChange={(event) => setBothSides(event.target.checked)} />{t("prop.screwHoleBothSides")}</label>
               {bothSides && <>
-                <label className="check-property"><input type="checkbox" checked={independent} onChange={(event) => setIndependent(event.target.checked)} />Independent opposite distance</label>
-                {independent && <label className="sketch-image-position-field"><span>Opposite distance ({currentLengthUnitLabel()})</span>
-                  <input className="sketch-image-number-input" aria-label="Opposite offset distance" value={secondText} onChange={(event) => setSecondText(event.target.value)} />
+                <label className="check-property"><input type="checkbox" checked={independent} onChange={(event) => setIndependent(event.target.checked)} />{t("sketchUi.independentOppositeDistance")}</label>
+                {independent && <label className="sketch-image-position-field"><span>{t("sketchUi.oppositeDistanceUnit", { unit: currentLengthUnitLabel() })}</span>
+                  <input className="sketch-image-number-input" aria-label={t("sketchUi.oppositeOffsetDistance")} value={secondText} onChange={(event) => setSecondText(event.target.value)} />
                 </label>}
               </>}
             </>}
           </>}
-          {error || !preview.ok ? <p role="alert" className="sketch-constraint-error">{error ?? (!preview.ok ? preview.message : "")}</p> : null}
-          <button type="button" className="inspector-action-button" disabled={!preview.ok || !hasChanges} onClick={apply}>{feature ? "Apply offset" : "Create offset"}</button>
+          {error || !preview.ok ? <p role="alert" className="sketch-constraint-error">{localizedError(error ?? (!preview.ok ? preview.message : ""))}</p> : null}
+          <button type="button" className="inspector-action-button" disabled={!preview.ok || !hasChanges} onClick={apply}>{feature ? t("sketchUi.applyOffset") : t("sketchUi.createOffset")}</button>
           {feature && <button type="button" className="inspector-action-button" onClick={() => {
             if (onCommit(removeSketchOffset(profile, feature.id, true))) onEdit(null);
-          }}><Unlink size={16} aria-hidden="true" />Detach geometry</button>}
+          }}><Unlink size={16} aria-hidden="true" />{t("sketchUi.detachGeometry")}</button>}
         </div>
 </div>
   );
@@ -184,29 +188,29 @@ export function SketchOffsetPanel({ profile, selectedSegmentIds, featureId, accu
   return (
     <aside ref={movable.panelRef} style={movable.style}
       className={`shape-inspector sketch-offset-inspector ${movable.moved ? "floating" : ""}`}
-      aria-label="Offset and inset" onPointerDown={event => event.stopPropagation()}
+      aria-label={t("sketchUi.offsetAndInset")} onPointerDown={event => event.stopPropagation()}
       onKeyDown={event => { event.stopPropagation(); if (event.key === "Escape") onClose(); }}>
       <div className="shape-inspector-header movable" {...movable.handleProps}>
-        <ToolbarOffsetIcon width={17} height={17} aria-hidden="true" /><strong>Offsets</strong>
+        <ToolbarOffsetIcon width={17} height={17} aria-hidden="true" /><strong>{t("sketchUi.offsets")}</strong>
         <span className="outliner-count-badge">{profile.offsets?.length ?? 0}</span>
-        <button type="button" className="inspector-header-icon" aria-label="Close offset settings" onClick={onClose}><X size={16} /></button>
+        <button type="button" className="inspector-header-icon" aria-label={t("sketchUi.closeOffsetSettings")} onClick={onClose}><X size={16} /></button>
       </div>
-      <ul className="outliner-list" aria-label="Sketch offsets">
+      <ul className="outliner-list" aria-label={t("sketchUi.sketchOffsets")}>
         {(profile.offsets ?? []).map((offset, index) => {
           const active = featureId === offset.id;
-          const label = offset.name ?? `Offset ${index + 1}`;
+          const label = offset.name ?? t("sketchUi.offset", { value0: index + 1 });
           const open = active && detailsOpen;
           return <li key={offset.id} className="sketch-constraint-group" data-offset-id={offset.id}>
             <details open={open}>
-              <summary className="sketch-constraint-group-header" aria-expanded={open} aria-label={`${open ? "Collapse" : "Expand"} ${label}`}
+              <summary className="sketch-constraint-group-header" aria-expanded={open} aria-label={`${open ? t("sketchUi.collapse") : t("sketchUi.expand")} ${label}`}
                 onClick={event => { event.preventDefault(); if (active) setDetailsOpen(value => !value); else onEdit(offset.id); }}>
                 <ChevronDown size={15} aria-hidden="true" />
                 <span className="sketch-constraint-group-shapes">{nameHeader(offset.id, label)}</span>
-                <button type="button" className="inspector-header-icon" aria-label={offset.hidden ? "Show offset geometry" : "Hide offset geometry"}
+                <button type="button" className="inspector-header-icon" aria-label={offset.hidden ? t("sketchUi.showOffsetGeometry") : t("sketchUi.hideOffsetGeometry")}
                   onClick={event => { event.preventDefault(); event.stopPropagation(); onCommit({ ...profile, offsets: profile.offsets!.map(entry => entry.id === offset.id ? { ...entry, hidden: !entry.hidden } : entry) }); }}>
                   {offset.hidden ? <EyeOff size={16} /> : <Eye size={16} />}
                 </button>
-                <button type="button" className="inspector-header-icon danger" aria-label="Delete offset" onClick={event => {
+                <button type="button" className="inspector-header-icon danger" aria-label={t("sketchUi.deleteOffset")} onClick={event => {
                   event.preventDefault(); event.stopPropagation();
                   if (onCommit(removeSketchOffset(profile, offset.id))) onEdit(null);
                 }}><Trash2 size={16} /></button>
@@ -215,14 +219,14 @@ export function SketchOffsetPanel({ profile, selectedSegmentIds, featureId, accu
             </details>
           </li>;
         })}
-        <li ref={createRef} className="sketch-constraint-group" aria-label="Create new offset"
+        <li ref={createRef} className="sketch-constraint-group" aria-label={t("sketchUi.createNewOffset")}
           style={!feature ? { outline: "2px solid var(--primary)", outlineOffset: -1 } : undefined}>
           <details open={!feature && detailsOpen}>
-            <summary className="sketch-constraint-group-header" aria-expanded={!feature && detailsOpen} aria-label="Create offset settings"
+            <summary className="sketch-constraint-group-header" aria-expanded={!feature && detailsOpen} aria-label={t("sketchUi.createOffsetSettings")}
               onClick={event => { event.preventDefault(); if (feature) onEdit(null); else setDetailsOpen(value => !value); }}>
               <ChevronDown size={15} aria-hidden="true" />
-              <span className="sketch-constraint-group-shapes">{feature ? "Create offset" : nameHeader("new", nameText || defaultName)}</span>
-              {!feature && <span className="outliner-count-badge">New</span>}
+              <span className="sketch-constraint-group-shapes">{feature ? t("sketchUi.createOffset") : nameHeader("new", nameText || defaultName)}</span>
+              {!feature && <span className="outliner-count-badge">{t("sketchUi.new")}</span>}
             </summary>
             {!feature && detailsOpen && settings}
           </details>

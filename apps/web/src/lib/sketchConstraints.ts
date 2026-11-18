@@ -1,3 +1,5 @@
+import { t } from "@/lib/i18n";
+import { reflectSketchPoint } from "@/lib/sketchMirror";
 import { updateSketchOffsets } from "@/lib/sketchOffsets";
 import { cubicPoint } from "@/lib/sketchPaths";
 import { orderedSketchPaths } from "@/lib/sketchSmoothHandles";
@@ -137,6 +139,7 @@ type SolveResult = { ok: true; profile: SketchProfile } | {
 
 /** Reference groups distinguish edges and outlines from individual points. */
 export function sketchConstraintReferences(rule: SketchConstraint): string[][] {
+  if (rule.kind === "symmetry") return [rule.axis, ...(rule.pair ? [[rule.a, rule.pair[0]], [rule.b, rule.pair[1]]] : [[rule.a], [rule.b]])];
   if (rule.kind === "concentric") return rule.circles;
   if (rule.kind === "circle-diameter") return [rule.outline];
   const first = [rule.a, rule.b];
@@ -169,7 +172,11 @@ export function sketchConstraintGroups(profile: SketchProfile, constraints = pro
     }
     const segments = profile.segments.filter((segment) => ids.has(segment.startId) && ids.has(segment.endId));
     const kind = !segments.length ? "Point" : sketchCircleGeometry(points, segments) ? "Circle" : "Shape";
-    const name = [...ids].map((id) => points.get(id)?.shapeName?.trim()).find(Boolean) ?? `${kind} ${shapes.size + 1}`;
+    const offset = profile.offsets?.find(feature => feature.pointIds.some(id => ids.has(id)));
+    const storedName = [...ids].map((id) => points.get(id)?.shapeName?.trim()).find(Boolean);
+    const displayName = offset ? offset.name ?? t("sketchUi.offset", { value0: profile.offsets!.indexOf(offset) + 1 })
+      : storedName === "Mirror axis" && segments.every(segment => segment.construction) ? t("sketchUi.mirrorAxis") : storedName;
+    const name = displayName ?? t(kind === "Point" ? "sketchUi.defaultPoint" : kind === "Circle" ? "sketchUi.defaultCircle" : "sketchUi.defaultShape", { index: shapes.size + 1 });
     shapes.set(point.id, { id: point.id, name, pointIds: [...ids], segmentIds: segments.map((segment) => segment.id) });
   }
   const grouped = new Map<string, { id: string; label: string; shapes: Array<{ id: string; name: string; pointIds: string[]; segmentIds: string[] }>; constraints: SketchConstraint[] }>();
@@ -183,7 +190,7 @@ export function sketchConstraintGroups(profile: SketchProfile, constraints = pro
       const shape = shapeId === undefined ? undefined : shapes.get(shapeId);
       const id = shapeId ?? "unassigned";
       const group = grouped.get(id) ?? {
-        id, label: shape?.name ?? "Other geometry", shapes: shape ? [shape] : [], constraints: [],
+        id, label: shape?.name ?? t("sketchUi.otherGeometry"), shapes: shape ? [shape] : [], constraints: [],
       };
       group.constraints.push(constraint);
       grouped.set(id, group);
@@ -237,6 +244,14 @@ export function validSketchConstraints(profile: SketchProfile): SketchConstraint
     (segment.kind ?? "line") === "line" && sameSketchEndpoints(a, b, segment.startId, segment.endId));
   return (profile.constraints ?? []).filter((rule) => {
     if (!ids.has(rule.a) || !ids.has(rule.b) || rule.a === rule.b) return false;
+    if (rule.kind === "symmetry") {
+      const refs = [...rule.axis, rule.a, rule.b, ...(rule.pair ?? [])];
+      return refs.every((id) => ids.has(id)) && new Set(refs).size === refs.length && hasLine(...rule.axis) &&
+        (!rule.pair || (hasLine(rule.a, rule.pair[0]) && hasLine(rule.b, rule.pair[1])));
+    }
+    if (rule.kind === "midpoint" || rule.kind === "point-on-line") {
+      return ids.has(rule.c) && rule.c !== rule.a && rule.c !== rule.b && hasLine(rule.a, rule.b);
+    }
     if (rule.kind === "concentric") {
       const [first, second] = rule.circles;
       return (rule.radialGap === undefined || Number.isFinite(rule.radialGap)) && first.length === 4 && second.length === 4 && first.includes(rule.a) && second.includes(rule.b) &&
@@ -275,7 +290,7 @@ function applyBaseSketchConstraints(profile: SketchProfile, movedIds: ReadonlySe
   // When adding a constraint or editing its dimension, hold the first reference
   // steady by default. Explicit drag targets take precedence.
   if (holdReferences && !preferred.size) {
-    for (const rule of constraints) if (!("c" in rule) && !("outline" in rule) && rule.kind !== "concentric") preferred.add(rule.a);
+    for (const rule of constraints) if (!("c" in rule) && !("outline" in rule) && rule.kind !== "concentric" && rule.kind !== "symmetry") preferred.add(rule.a);
   }
   const strength = (point: SketchPoint) => point.locked || preferred.has(point.id) ? 0 : 1;
   const move = (point: SketchPoint, dx: number, dz: number) => {
@@ -370,6 +385,44 @@ function applyBaseSketchConstraints(profile: SketchProfile, movedIds: ReadonlySe
     }
   };
 
+  // Project only independent scalar equations, distributing corrections across movable references.
+  const projectScalar = (residual: number, entries: Array<{ point: SketchPoint; x: number; z: number }>, tolerance = EPSILON) => {
+    if (!Number.isFinite(residual) || Math.abs(residual) < tolerance) return;
+    const gradients = new Map<SketchPoint, { x: number; z: number }>();
+    for (const { point, x, z } of entries) {
+      const previous = gradients.get(point) ?? { x: 0, z: 0 };
+      gradients.set(point, { x: previous.x + x, z: previous.z + z });
+    }
+    let total = 0;
+    for (const [point, g] of gradients) total += strength(point) * (g.x ** 2 + g.z ** 2);
+    if (!Number.isFinite(total) || total < 1e-20) return;
+    for (const [point, g] of gradients) move(point, -residual * strength(point) * g.x / total, -residual * strength(point) * g.z / total);
+  };
+  const symmetryEquations = (rule: Extract<SketchConstraint, { kind: "symmetry" }>, p: SketchPoint, q: SketchPoint) => {
+    const a = working.get(rule.axis[0])!;
+    const b = working.get(rule.axis[1])!;
+    const mid = { x: (p.x + q.x) / 2, z: (p.z + q.z) / 2 };
+    const projection = sketchLineProjection(a, b, mid);
+    if (!projection) return null;
+    const { nx, nz, along, distance } = projection;
+    const length = Math.hypot(b.x - a.x, b.z - a.z);
+    const tx = nz, tz = -nx;
+    const dx = q.x - p.x, dz = q.z - p.z;
+    const normalDelta = (nx * dx + nz * dz) / length;
+    return [
+      { residual: distance, entries: [
+        { point: p, x: nx / 2, z: nz / 2 }, { point: q, x: nx / 2, z: nz / 2 },
+        { point: a, x: (along - 1) * nx, z: (along - 1) * nz }, { point: b, x: -along * nx, z: -along * nz },
+      ] },
+      { residual: tx * dx + tz * dz, entries: [
+        { point: p, x: -tx, z: -tz }, { point: q, x: tx, z: tz },
+        { point: a, x: -normalDelta * nx, z: -normalDelta * nz }, { point: b, x: normalDelta * nx, z: normalDelta * nz },
+      ] },
+    ];
+  };
+  const symmetryPairs = (rule: Extract<SketchConstraint, { kind: "symmetry" }>) =>
+    [[rule.a, rule.b], ...(rule.pair ? [rule.pair] : [])].map(([p, q]) => [working.get(p)!, working.get(q)!]);
+
   const outlineSegments = new Map(constraints.flatMap((rule) => "outline" in rule
     ? [[rule.id, sketchOutlineSegments(profile, rule.outline)!] as const] : []));
 
@@ -391,6 +444,13 @@ function applyBaseSketchConstraints(profile: SketchProfile, movedIds: ReadonlySe
   const error = (rule: SketchConstraint): number => {
     const a = working.get(rule.a)!;
     const b = working.get(rule.b)!;
+    if (rule.kind === "midpoint") {
+      const c = working.get(rule.c)!;
+      return Math.hypot(b.x - a.x, b.z - a.z) < EPSILON ? Infinity : Math.hypot(c.x - (a.x + b.x) / 2, c.z - (a.z + b.z) / 2);
+    }
+    if (rule.kind === "point-on-line") return Math.abs(sketchLineProjection(a, b, working.get(rule.c)!)?.distance ?? Infinity);
+    if (rule.kind === "symmetry") return Math.max(...symmetryPairs(rule).flatMap(([p, q]) =>
+      symmetryEquations(rule, p, q)?.map((eq) => Math.abs(eq.residual)) ?? [Infinity]));
     if (rule.kind === "concentric") {
       const delta = concentricDelta(rule);
       const [first, second] = concentricOutlines.get(rule.id)!.map((segments) => sketchCircleGeometry(working, segments));
@@ -442,6 +502,42 @@ function applyBaseSketchConstraints(profile: SketchProfile, movedIds: ReadonlySe
     for (const rule of constraints) {
       const a = working.get(rule.a)!;
       const b = working.get(rule.b)!;
+      if (rule.kind === "midpoint") {
+        const c = working.get(rule.c)!;
+        if (pass === 0 && !movedIds.size && strength(c)) move(c, (a.x + b.x) / 2 - c.x, (a.z + b.z) / 2 - c.z);
+        // The final check measures a 2D distance. Each coordinate must converge
+        // below that tolerance too, otherwise a small diagonal edit stalls.
+        for (const coordinate of ["x", "z"] as const) {
+          projectScalar(c[coordinate] - (a[coordinate] + b[coordinate]) / 2,
+            [a, b, c].map((point, index) => ({ point, x: coordinate === "x" ? (index === 2 ? 1 : -0.5) : 0,
+              z: coordinate === "z" ? (index === 2 ? 1 : -0.5) : 0 })), EPSILON / 2);
+        }
+        continue;
+      }
+      if (rule.kind === "point-on-line") { projectGap(a, b, working.get(rule.c)!, 0, pass === 0); continue; }
+      if (rule.kind === "symmetry") {
+        for (const [p, q] of symmetryPairs(rule)) {
+          // Prefer the unheld counterpart on the first pass; an ordinary drag should
+          // keep an otherwise established axis steady. Later passes can use all free DOF.
+          const draggedPair = movedIds.has(p.id) || movedIds.has(q.id);
+          const axisMoved = rule.axis.some((id) => movedIds.has(id));
+          if (pass === 0 && !axisMoved && (!movedIds.size || draggedPair)) {
+            const from = strength(q) ? p : q;
+            const target = from === p ? q : p;
+            const projection = sketchLineProjection(working.get(rule.axis[0])!, working.get(rule.axis[1])!, from);
+            if (strength(target) && projection) {
+              const reflected = reflectSketchPoint({ point: working.get(rule.axis[0])!, direction: { x: projection.nz, z: -projection.nx } }, from);
+              move(target, reflected.x - target.x, reflected.z - target.z);
+            }
+          }
+          // Re-evaluate after each scalar correction because the axis itself may move.
+          for (let equation = 0; equation < 2; equation++) {
+            const eq = symmetryEquations(rule, p, q)?.[equation];
+            if (eq) projectScalar(eq.residual, eq.entries);
+          }
+        }
+        continue;
+      }
       if (rule.kind === "concentric") {
         if (rule.radialGap !== undefined) {
           const shapes = concentricOutlines.get(rule.id)!.map((segments) => sketchCircleGeometry(working, segments));
@@ -621,6 +717,13 @@ export function withSketchConstraint(profile: SketchProfile, rule: SketchConstra
   }
   if (constraints.some((existing) => {
     if (existing.kind !== rule.kind) return false;
+    if ((rule.kind === "midpoint" || rule.kind === "point-on-line") && (existing.kind === "midpoint" || existing.kind === "point-on-line"))
+      return existing.c === rule.c && sameSketchEndpoints(existing.a, existing.b, rule.a, rule.b);
+    if (rule.kind === "symmetry" && existing.kind === "symmetry") {
+      if (!sameSketchEndpoints(...rule.axis, ...existing.axis) || Boolean(rule.pair) !== Boolean(existing.pair)) return false;
+      const pairs = (r: typeof rule) => [[r.a, r.b], ...(r.pair ? [r.pair] : [])];
+      return pairs(rule).every(([a, b]) => pairs(existing).some(([c, d]) => sameSketchEndpoints(a, b, c, d)));
+    }
     const sameFirst = sameSketchEndpoints(existing.a, existing.b, rule.a, rule.b);
     if (existing.kind === "concentric" && rule.kind === "concentric") {
       const sameCircle = (first: string[], second: string[]) => first.every((id) => second.includes(id));
@@ -647,4 +750,39 @@ export function applySketchConstraints(profile: SketchProfile, movedIds: Readonl
   if (!solved.ok) return { ...solved, profile };
   const updated = updateSketchOffsets(solved.profile);
   return updated.ok ? { ok: true, profile: updated.profile } : failure(updated);
+}
+
+/** One user-facing relationship may contain several independent solver equations. */
+export function sketchConstraintRelationships(profile: SketchProfile, constraints = profile.constraints ?? []) {
+  const shapeByPoint = new Map(sketchConstraintGroups(profile, []).flatMap((group) =>
+    group.shapes.flatMap((shape) => shape.pointIds.map((id) => [id, shape.id] as const))));
+  const grouped = new Map<string, { rule: SketchConstraint; members: SketchConstraint[] }>();
+  for (const rule of constraints) {
+    // Older linked mirrors lack operation IDs. Matching connected shape pairs and
+    // the same axis is sufficient to present their symmetry equations together.
+    const key = rule.relationshipId ? `operation:${rule.relationshipId}` : rule.kind === "symmetry"
+      ? JSON.stringify(["symmetry", [...rule.axis].sort(), [shapeByPoint.get(rule.a), shapeByPoint.get(rule.b)].sort()]) : rule.id;
+    const entry = grouped.get(key);
+    if (entry) {
+      entry.members.push(rule);
+      if (entry.rule.kind !== "symmetry" && rule.kind === "symmetry") entry.rule = rule;
+    } else grouped.set(key, { rule, members: [rule] });
+  }
+  return [...grouped.values()].map((entry) => {
+    if (entry.members.length === 1) return { ...entry, references: sketchConstraintReferences(entry.rule) };
+    const references = new Map<string, Set<string>>();
+    for (const id of entry.members.flatMap(sketchConstraintReferences).flat()) {
+      const key = shapeByPoint.get(id) ?? id;
+      const points = references.get(key) ?? new Set<string>();
+      points.add(id);
+      references.set(key, points);
+    }
+    return { ...entry, references: [...references.values()].map((ids) => [...ids]) };
+  });
+}
+
+export function removeSketchConstraintRelationship(profile: SketchProfile, id: string): SketchProfile {
+  const relationship = sketchConstraintRelationships(profile).find((entry) => entry.members.some((rule) => rule.id === id));
+  const ids = new Set(relationship?.members.map((rule) => rule.id) ?? [id]);
+  return { ...profile, constraints: (profile.constraints ?? []).filter((rule) => !ids.has(rule.id)) };
 }

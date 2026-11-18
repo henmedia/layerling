@@ -6,7 +6,7 @@ import { SketchOffsetPanel } from "@/components/SketchOffsetPanel";
 import { SketchConstraintInspector } from "@/components/SketchConstraintInspector";
 
 import { previewLabelSpot } from "@/lib/sketchPreviewLabel";
-import { applySketchConstraints, sketchConstraintReferences, type SketchConstraintFailure, sameSketchEndpoints, sketchRayAngle, sketchLineProjection, sketchOutlineClearance, sketchOutlineSegments, sketchCircleGeometry } from "@/lib/sketchConstraints";
+import { applySketchConstraints, sketchConstraintReferences, sketchConstraintRelationships, type SketchConstraintFailure, sameSketchEndpoints, sketchRayAngle, sketchLineProjection, sketchOutlineClearance, sketchOutlineSegments, sketchCircleGeometry } from "@/lib/sketchConstraints";
 import { AlignCenterHorizontal, AlignCenterVertical, AlignEndHorizontal, AlignEndVertical, AlignStartHorizontal, AlignStartVertical, Check, ChevronUp, CornerDownRight, Crop, Crosshair, Eye, EyeOff, FlipHorizontal2, FlipVertical2, Home, Layers, Link, Link2Off, LockKeyhole, LockKeyholeOpen, Magnet, Minus, Plus, Ruler, RulerDimensionLine, Scissors, Slash, Spline, Split, Trash2, WandSparkles, Waves, X } from "lucide-react";
 import { displayedHandle, handleAtOffset, handleOffset } from "@/lib/sketchBezierHandles";
 import { curveStretches } from "@/lib/sketchCurveThroughPoints";
@@ -22,15 +22,18 @@ import { SKETCH_DOUBLE_CLICK_PIXELS, useSketchViewSlide } from "@/lib/useSketchV
 import { ToolbarConstructionLineIcon, ToolbarNoteIcon, ToolbarOffsetIcon } from "@/components/toolbarIcons";
 import { CAMERA_BAR_PANEL, CameraBarHandle, useCameraBarPeek } from "@/components/workplane/CameraBarHandle";
 import { constructionCrossings } from "@/lib/sketchConstruction";
-import { movingSelectionCentre, outlineSideMiddles, selectionSnapTargets, sketchSnapPoints, snappedSelectionTarget } from "@/lib/sketchSnapPoints";
+import { movingSelectionCentre, outlineSideMiddles, selectionSnapTargets, sketchDragSnapProfile, sketchSnapPoints, snappedSelectionTarget } from "@/lib/sketchSnapPoints";
 import { openEndPoints } from "@/lib/sketchPointJoin";
 import { canApplySketchCornerTreatment } from "@/lib/sketchFilletChamfer";
 import { t } from "@/lib/i18n";
+import { sketchConstraintLabel } from "@/lib/sketchConstraintLabels";
+import { localizedError } from "@/lib/userErrors";
 import { useLanguage } from "@/lib/useLanguage";
 import { useMovablePanel, type MovablePanelOptions } from "@/lib/useMovablePanel";
 import { currentLengthUnitLabel, formatLengthMm, lengthDisplayUnit, parseLengthMm, parseMeasurementInput, resolveLengthMm, setLengthUnit } from "@/lib/measurementUnits";
 import { applySegmentDimension, SEGMENT_DIMENSION_CENTER } from "@/lib/sketchDimensions";
 import { applyCornerAngle, cornerAngleConstraint, sketchCornerAt, type CornerTurn, type SketchCorner } from "@/lib/sketchAngles";
+import { reflectSketchPoint } from "@/lib/sketchMirror";
 import { isSegmentCurved } from "@/lib/sketchSegmentCurve";
 import { DEFAULT_SKETCH_BACKGROUND, DEFAULT_SKETCH_GRID_COLOR, DEFAULT_SKETCH_PLATE_COLOR, workplaneGridLayout } from "@/lib/workplaneGrid";
 import { closestPointOnSketchSegment, type SketchSegmentPlacement } from "@/lib/sketchPointRefinement";
@@ -147,7 +150,7 @@ type SketchWorkspaceProps = {
   /** Curve or straighten all the selected lines at once (#283). */
   onCurveSegments?: (ids: string[]) => void;
   /** Copies the selection to the other side of the vertical or the horizontal axis through the middle of the plate, or of a straight line (#512). */
-  onMirror?: (across: "vertical" | "horizontal" | { segmentId: string }) => void;
+  onMirror?: (across: "vertical" | "horizontal" | { segmentId: string }, maintainSymmetry?: boolean) => void;
   onStraightenSegments?: (ids: string[]) => void;
   onStraightenSegment?: (id: string) => void;
   /** Makes a line a construction line (#229), or a normal line again. */
@@ -1111,6 +1114,9 @@ export function SketchWorkspace({
     const solved = applySketchConstraints(previewProfile, moved);
     return solved.ok ? solved.profile : profile;
   }, [previewProfile, profile]);
+  const draggedPointId = pointerAction?.kind === "move-point" ? pointerAction.pointId : null;
+  const pointDragSnapProfile = useMemo(() => draggedPointId
+    ? sketchDragSnapProfile(profile, new Set([draggedPointId])) : null, [profile, draggedPointId]);
   const displayProfile = useMemo(() => {
     const hidden = new Set(solvedDisplayProfile.offsets?.filter((feature) => feature.hidden).flatMap((feature) => feature.pointIds));
     return hidden.size ? { ...solvedDisplayProfile, points: solvedDisplayProfile.points.filter((point) => !hidden.has(point.id)),
@@ -1175,6 +1181,42 @@ export function SketchWorkspace({
   const mixedPoint = mixedSelection && pointById.get(mixedSelection.pointIds[0]);
   const pointLine = mixedLine && mixedPoint && (mixedLine.kind ?? "line") === "line" &&
     mixedLine.startId !== mixedPoint.id && mixedLine.endId !== mixedPoint.id ? mixedLine : undefined;
+  const symmetrySelection = selected?.kind === "multiple" && !selected.imageIds?.length ? selected : null;
+  const symmetryLines = symmetrySelection?.segmentIds.map((id) => displayProfile.segments.find((segment) => segment.id === id)) ?? [];
+  const pointSymmetry = symmetrySelection?.pointIds.length === 2 && symmetryLines.length === 1 && symmetryLines[0] &&
+    (symmetryLines[0].kind ?? "line") === "line" ? symmetryLines[0] : null;
+  const segmentSymmetry = symmetrySelection?.pointIds.length === 0 && symmetryLines.length === 3 &&
+    symmetryLines.every((line) => line && (line.kind ?? "line") === "line");
+  const [symmetryAxisChoice, setSymmetryAxisChoice] = useState("");
+  const symmetryAxis = pointSymmetry ?? (segmentSymmetry ? symmetryLines.find((line) => line?.id === symmetryAxisChoice) : null);
+  const symmetryTargets = segmentSymmetry && symmetryAxis ? symmetryLines.filter((line) => line && line !== symmetryAxis) : [];
+  const symmetryRule: SketchConstraintInput | undefined = (() => {
+    if (!symmetryAxis) return;
+    const axis: [string, string] = [symmetryAxis.startId, symmetryAxis.endId];
+    const a = pointById.get(axis[0]), b = pointById.get(axis[1]);
+    if (!a || !b || Math.hypot(a.x - b.x, a.z - b.z) < 0.00001) return;
+    if (pointSymmetry && symmetrySelection && symmetrySelection.pointIds.every((id) => !axis.includes(id)))
+      return { kind: "symmetry", a: symmetrySelection.pointIds[0], b: symmetrySelection.pointIds[1], axis };
+    const [first, second] = symmetryTargets;
+    if (!first || !second || new Set([...axis, first.startId, first.endId, second.startId, second.endId]).size !== 6) return;
+    // Pair once at creation, then persist the mapping. Reflection distance resolves reversed drawn directions.
+    const cost = (p: string, q: string) => {
+      const point = pointById.get(p)!, target = pointById.get(q)!;
+      const projected = sketchLineProjection(a, b, point)!;
+      const reflected = reflectSketchPoint({ point: a, direction: { x: projected.nz, z: -projected.nx } }, point);
+      return Math.hypot(reflected.x - target.x, reflected.z - target.z);
+    };
+    const reverse = cost(first.startId, second.endId) + cost(first.endId, second.startId) <
+      cost(first.startId, second.startId) + cost(first.endId, second.endId);
+    return { kind: "symmetry", a: first.startId, b: reverse ? second.endId : second.startId,
+      pair: [first.endId, reverse ? second.startId : second.endId], axis };
+  })();
+  const derivedConstraintPoints = new Set(profile.offsets?.flatMap((offset) => offset.pointIds));
+  const symmetryEditable = symmetryRule && !sketchConstraintReferences({ ...symmetryRule, id: "selection" }).flat().some((id) => derivedConstraintPoints.has(id));
+  const eligiblePointLine = pointLine && mixedPoint && ![pointLine.startId, pointLine.endId, mixedPoint.id].some((id) => derivedConstraintPoints.has(id)) && (() => {
+    const a = pointById.get(pointLine.startId), b = pointById.get(pointLine.endId);
+    return a && b && Math.hypot(a.x - b.x, a.z - b.z) >= 0.00001;
+  })();
   const outlineSelection = selected?.kind === "multiple" && selected.pointIds.length >= 3 &&
     !selected.imageIds?.length ? selected : null;
   const outlineSegments = outlineSelection && sketchOutlineSegments(displayProfile, outlineSelection.pointIds);
@@ -1232,31 +1274,35 @@ export function SketchWorkspace({
     setCenterDraft(null);
   }, [dimensionTarget]);
   const constraints = profile.constraints ?? [];
+  const constraintRelationships = useMemo(() => sketchConstraintRelationships(profile), [profile]);
+  const displayedConstraintIds = new Set(constraintRelationships.map((entry) => entry.rule.id));
   const [constraintAnnotationsVisible, setConstraintAnnotationsVisible] = useState(true);
   const [inspectedId, setInspectedId] = useState<string | null>(null);
   const [inspectorRequest, setInspectorRequest] = useState(0);
   const inspectConstraint = (id: string) => {
     setOffsetOpen(false);
-    setInspectedId(id);
+    setInspectedId(constraintRelationships.find((entry) => entry.members.some((member) => member.id === id))?.rule.id ?? id);
     setInspectorRequest((request) => request + 1);
   };
   const inspected = constraints.find((rule) => rule.id === inspectedId) ??
     constraintFailure?.attempted.find((rule) => rule.id === inspectedId);
   const inspectedIsSaved = constraints.some((rule) => rule.id === inspectedId);
   const selectedOffset = offsetOpen ? profile.offsets?.find((feature) => feature.id === offsetFeatureId) : undefined;
-  const highlightedGroups = !constraintAnnotationsVisible ? [] : inspected ? sketchConstraintReferences(inspected)
+  const highlightedGroups = !constraintAnnotationsVisible ? [] : inspected ? (constraintRelationships.find((entry) => entry.members.some((member) => member.id === inspected.id))?.references ?? sketchConstraintReferences(inspected))
     : selectedOffset ? [selectedOffset.pointIds, [...new Set(profile.segments.filter((segment) => selectedOffset.sourceSegmentIds.includes(segment.id)).flatMap((segment) => [segment.startId, segment.endId]))]] : [];
   const failedRules = constraintFailure
     ? [...constraintFailure.unsatisfied, ...constraintFailure.conflicting, ...constraintFailure.attempted] : [];
   const failedGroups = constraintAnnotationsVisible ? [
     ...failedRules.flatMap(sketchConstraintReferences), ...(constraintFailure?.offsetError ? [constraintFailure.offsetError.pointIds] : []),
   ] : [];
-  const badgeProps = (id: string) => ({
+  const badgeProps = (id: string) => {
+    const kind = constraints.find((rule) => rule.id === id)?.kind;
+    return ({
     role: "button",
     tabIndex: 0,
     pointerEvents: "all" as const,
     style: { cursor: "pointer" },
-    "aria-label": `Inspect ${constraints.find((rule) => rule.id === id)?.kind ?? "constraint"}`,
+    "aria-label": t("sketchUi.inspect", { value0: kind ? sketchConstraintLabel(kind) : t("sketchUi.constraints") }),
     "aria-pressed": inspectedId === id,
     onPointerDown: (event: ReactPointerEvent<SVGGElement>) => {
       if (event.button !== 0) return;
@@ -1274,9 +1320,17 @@ export function SketchWorkspace({
       event.stopPropagation();
       inspectConstraint(id);
     },
-  });
+    });
+  };
 
   const selectedConstraints = constraints.filter((rule) => {
+    if (rule.kind === "symmetry") {
+      const ids = new Set(sketchConstraintReferences(rule).flat());
+      return selectedSegment ? ids.has(selectedSegment.startId) && ids.has(selectedSegment.endId)
+        : selectedPoint ? ids.has(selectedPoint.id) : symmetryRule?.kind === "symmetry" &&
+          sameSketchEndpoints(...rule.axis, ...symmetryRule.axis) && sameSketchEndpoints(rule.a, rule.b, symmetryRule.a, symmetryRule.b);
+    }
+    if (selectedPoint && (rule.kind === "midpoint" || rule.kind === "point-on-line")) return rule.c === selectedPoint.id;
     if (rule.kind === "concentric") return rule.circles.some((ids) =>
       selectedCircles.some((shape) => ids.every((id) => shape.pointIds.includes(id))));
     const matchesLine = (line: SketchSegment) =>
@@ -1482,6 +1536,7 @@ export function SketchWorkspace({
   // Mirror (#512): the bar with the choice of axis, and the step where a line is picked as the axis.
   const [mirrorOpen, setMirrorOpen] = useState(false);
   const [mirrorPicking, setMirrorPicking] = useState(false);
+  const [mirrorLinked, setMirrorLinked] = useState(false);
   useEffect(() => {
     if (selected) return;
     setMirrorOpen(false);
@@ -1505,7 +1560,7 @@ export function SketchWorkspace({
   const mirrorButton = onMirror ? (
     <>
       <span className="sketch-point-divider" />
-      <button type="button" title={t("sketch.mirrorHint")} onClick={() => setMirrorOpen(true)}><FlipHorizontal2 /><span>{t("sketch.mirror")}</span></button>
+      <button type="button" title={t("sketch.mirrorHint")} onClick={() => { setMirrorLinked(false); setMirrorOpen(true); }}><FlipHorizontal2 /><span>{t("sketch.mirror")}</span></button>
     </>
   ) : null;
 
@@ -1835,8 +1890,9 @@ export function SketchWorkspace({
       let nearest: { x: number; z: number } | null = null;
       let nearestDistance = reach;
       // A dragged point leaves out the middle of its own lines, which would move away under it.
-      const targets = pointerAction?.kind === "move-point"
-        ? [...referenceSnapPoints, ...crossingSnapPoints, ...sketchSnapPoints(displayProfile, pointerAction.pointId), ...openEndPoints(displayProfile, pointerAction.pointId)]
+      const targets = pointDragSnapProfile
+        ? [...referenceSnapPoints, ...constructionCrossings(pointDragSnapProfile), ...sketchSnapPoints(pointDragSnapProfile),
+          ...openEndPoints({ ...profile, points: pointDragSnapProfile.points })]
         : snapTargets;
       targets.forEach((candidate) => {
         const distance = Math.hypot(candidate.x - local.x, candidate.z - local.z);
@@ -2812,7 +2868,7 @@ export function SketchWorkspace({
           >
             <Ruler size={26} strokeWidth={2.2} aria-hidden="true" />
           </button>
-          {onCommitOffsetProfile && <button aria-label="Offset / Inset" title="Offset / Inset" aria-pressed={offsetOpen}
+          {onCommitOffsetProfile && <button aria-label={t("sketchUi.offsetInset")} title={t("sketchUi.offsetInset")} aria-pressed={offsetOpen}
             onClick={() => { setOffsetOpen(!offsetOpen); setOffsetFeatureId(null); setOffsetDistanceRequest(null); setInspectedId(null); if (tool !== "select") onSelectTool?.("select"); }}>
             <ToolbarOffsetIcon width={26} height={26} aria-hidden="true" />
           </button>}
@@ -3144,7 +3200,7 @@ export function SketchWorkspace({
                   }
                   if (event.button === 1) beginPan(event);
                   else if (mirrorPicking && event.button === 0 && onMirror) {
-                    onMirror({ segmentId: segment.id });
+                    onMirror({ segmentId: segment.id }, mirrorLinked);
                     closeMirror();
                   }
                   else if (tool === "erase") onDeleteSegment(segment.id);
@@ -3386,7 +3442,7 @@ export function SketchWorkspace({
                       beginEntityDrag(event, { kind: "resize-selection", pointerId: event.pointerId, handle: handle.id, current: { x: handle.x, z: handle.z }, grab: handle.grab, startPoints, bounds, concentricLocks });
                     }}
                   >
-                    {diameterResizeLocked ? <title>Diameter locked. Use Set diameter to change it.</title>
+                    {diameterResizeLocked ? <title>{t("sketchUi.diameterLockedUseSetDiameterToChangeIt")}</title>
                       : selectionLocked ? <title>{t("status.objectLocked")}</title> : null}
                   </rect>
                 ))}
@@ -3748,7 +3804,7 @@ export function SketchWorkspace({
               <g key={shape.pointIds[0]} className="sketch-constraint-markers"
                 transform={`translate(${shape.center.x} ${shape.center.z}) scale(${screenUnit})`}>
                 <circle r={Math.min(7, Math.max(2, shape.radius / screenUnit * 0.65))} fill="#245849" stroke="white" strokeWidth={1.4} role="button" tabIndex={0}
-                  aria-label="Select circle center" style={{ cursor: "pointer" }}
+                  aria-label={t("sketchUi.selectCircleCenter")} style={{ cursor: "pointer" }}
                   onPointerDown={(event) => {
                     if (event.button !== 0) return;
                     event.stopPropagation();
@@ -3761,7 +3817,7 @@ export function SketchWorkspace({
                     event.stopPropagation();
                     selectCircle(shape, event.shiftKey);
                   }}>
-                  <title>Circle center (Shift-click to add to selection)</title>
+                  <title>{t("sketchUi.circleCenterShiftClickToAddToSelection")}</title>
                 </circle>
                 <path d="M -3 0 H 3 M 0 -3 V 3" stroke="white" strokeWidth={1.3} pointerEvents="none" />
                 {constraintAnnotationsVisible && concentric && (
@@ -3795,7 +3851,12 @@ export function SketchWorkspace({
                 // Use a consistent side regardless of the direction the line was drawn.
                 const side = dx < 0 || (dx === 0 && dz < 0) ? -1 : 1;
                 const markers = constraints.flatMap<{ id: string; label: string; fixedLength?: boolean }>((rule, index) => {
+                  if (!displayedConstraintIds.has(rule.id)) return [];
                   const matches = sameSketchEndpoints(rule.a, rule.b, segment.startId, segment.endId);
+                  if (rule.kind === "midpoint" || rule.kind === "point-on-line")
+                    return matches ? [{ id: rule.id, label: `${rule.kind === "midpoint" ? "M" : "P∈L"}${index + 1}` }] : [];
+                  if (rule.kind === "symmetry") return sameSketchEndpoints(...rule.axis, segment.startId, segment.endId)
+                    ? [{ id: rule.id, label: `S${index + 1}` }] : [];
                   if (rule.kind === "angle" || rule.kind === "point-line-distance" || rule.kind === "line-distance") return [];
                   if ("d" in rule) {
                     if (!matches && !sameSketchEndpoints(rule.c, rule.d, segment.startId, segment.endId)) return [];
@@ -3807,7 +3868,7 @@ export function SketchWorkspace({
                   if (!matches || (rule.kind !== "horizontal" && rule.kind !== "vertical")) return [];
                   return [{ id: rule.id, label: rule.kind === "horizontal" ? "H" : "V" }];
                 });
-                const widths = markers.map(({ label, fixedLength }) => fixedLength ? Math.max(52, label.length * 7 + 22) : label.length > 1 ? 28 : 16);
+                const widths = markers.map(({ label, fixedLength }) => fixedLength ? Math.max(52, label.length * 7 + 22) : label.length > 1 ? Math.max(28, label.length * 7 + 10) : 16);
                 // Space the badges along the edge using their width and height projected onto its direction.
                 const spans = widths.map((width) => (width * Math.abs(dx) + 16 * Math.abs(dz)) / length + 4);
                 let cursor = -spans.reduce((sum, span) => sum + span, 0) / 2;
@@ -3919,7 +3980,7 @@ export function SketchWorkspace({
           {offsetPreviewInfo && offsetPreview?.points[0] && (() => {
             const at = offsetPreview.points[0];
             return <circle cx={at.x} cy={at.z} r={7 * screenUnit} fill="#1688c9" stroke="white" strokeWidth={screenUnit}
-              role="slider" tabIndex={0} aria-label="Drag offset on workplane" aria-valuenow={offsetPreviewInfo.distance}
+              role="slider" tabIndex={0} aria-label={t("sketchUi.dragOffsetOnWorkplane")} aria-valuenow={offsetPreviewInfo.distance}
               style={{ cursor: "ew-resize", touchAction: "none" }}
               onKeyDown={(event) => {
                 if (event.key !== "ArrowLeft" && event.key !== "ArrowRight") return;
@@ -3950,17 +4011,17 @@ export function SketchWorkspace({
                 setOffsetDistanceRequest({ value: Math.max(-limit, Math.min(limit, Math.abs(value) < 0.01 ? (value < 0 ? -0.01 : 0.01) : value)) });
               }}
               onPointerUp={(event) => { event.stopPropagation(); offsetDrag.current = null; event.currentTarget.releasePointerCapture(event.pointerId); }}
-              onPointerCancel={() => { offsetDrag.current = null; }}><title>Drag to change offset distance. Apply in the panel to keep it.</title></circle>;
+              onPointerCancel={() => { offsetDrag.current = null; }}><title>{t("sketchUi.dragToChangeOffsetDistanceApplyInThePanel")}</title></circle>;
           })()}
           {constraintAnnotationsVisible && (profile.offsets ?? []).filter((feature) => !feature.hidden).map((feature, index) => {
             const points = feature.pointIds.map((id) => pointById.get(id)).filter((point): point is SketchPoint => Boolean(point));
             if (!points.length) return null;
             const x = points.reduce((sum, point) => sum + point.x / points.length, 0);
             const z = Math.min(...points.map((point) => point.z)) - 14 * screenUnit;
-            const label = `${feature.name ?? "Offset"} ${formatDimension(feature.distance, workspace.accuracy)} ${currentLengthUnitLabel()}`;
+            const label = `${feature.name ?? t("offset.apply")} ${formatDimension(feature.distance, workspace.accuracy)} ${currentLengthUnitLabel()}`;
             const width = Math.max(70, label.length * 7);
             return <g key={feature.id} className="sketch-constraint-markers" role="button" tabIndex={0}
-              aria-label={`Edit offset ${feature.name ?? index + 1}`} transform={`translate(${x} ${z}) scale(${screenUnit})`}
+              aria-label={t("sketchUi.editOffset", { value0: feature.name ?? index + 1 })} transform={`translate(${x} ${z}) scale(${screenUnit})`}
               onPointerDown={(event) => { event.stopPropagation(); event.preventDefault(); setOffsetOpen(true); setOffsetDistanceRequest(null); setOffsetFeatureId(feature.id); setOffsetInspectorRequest(value => value + 1); setInspectedId(null); }}
               onKeyDown={(event) => { if (event.key === "Enter") { event.stopPropagation(); setOffsetOpen(true); setOffsetDistanceRequest(null); setOffsetFeatureId(feature.id); setOffsetInspectorRequest(value => value + 1); setInspectedId(null); } }}>
               <rect x={-width / 2} y={-8} width={width} height={16} rx={4} /><text y={4}>{label}</text>
@@ -4392,20 +4453,34 @@ export function SketchWorkspace({
         </div>
       ) : null}
       {tool === "select" && !mirrorOpen && onAddConstraint &&
-        ((selectedSegment && !selectedSegmentCurved) || constraintPairs || canRelateLines || pointLine || outlineReference || circle || circlePair || selectedConstraints.length > 0) ? (
-        <div className="sketch-point-actions" aria-label="Persistent sketch constraints" style={{ top: 89, maxWidth: "min(90vw, 1050px)", overflowX: "auto", borderRadius: 14 }}>
-          <span className="sketch-corner-label">Constraints</span>
+        ((selectedSegment && !selectedSegmentCurved) || constraintPairs || canRelateLines || pointLine || pointSymmetry || segmentSymmetry || outlineReference || circle || circlePair || selectedConstraints.length > 0) ? (
+        <div className="sketch-point-actions" aria-label={t("sketchUi.persistentSketchConstraints")} style={{ top: 89, maxWidth: "min(90vw, 1050px)", overflowX: "auto", borderRadius: 14 }}>
+          <span className="sketch-corner-label">{t("sketchUi.constraints")}</span>
+          {pointLine && mixedPoint && <>
+            <button type="button" disabled={!eligiblePointLine} title={eligiblePointLine ? t("sketchUi.keepThisPointAtTheExactMidpointOfThe") : t("sketchUi.selectANonzeroSourceLineAndEditablePointDetach")}
+              onClick={() => onAddConstraint({ kind: "midpoint", a: pointLine.startId, b: pointLine.endId, c: mixedPoint.id })}>{t("sketchUi.midpoint")}</button>
+            <button type="button" disabled={!eligiblePointLine} title={eligiblePointLine ? t("sketchUi.keepThisPointOnTheInfiniteSupportingLineSliding") : t("sketchUi.selectANonzeroSourceLineAndEditablePointDetach")}
+              onClick={() => onAddConstraint({ kind: "point-on-line", a: pointLine.startId, b: pointLine.endId, c: mixedPoint.id })}>{t("sketchUi.pointOnLine")}</button>
+          </>}
+          {segmentSymmetry && <label>{t("sketchUi.symmetryAxis")} <select aria-label={t("sketchUi.symmetryAxis")} value={symmetryAxisChoice}
+            onChange={(event) => setSymmetryAxisChoice(event.target.value)}>
+            <option value="">{t("sketchUi.chooseAxis")}</option>
+            {symmetryLines.map((line, index) => line && <option key={line.id} value={line.id}>{t("inspector.positionEdge")} {index + 1}: {formatDimension(pointById.get(line.startId)!.x, workspace.accuracy)}, {formatDimension(pointById.get(line.startId)!.z, workspace.accuracy)} → {formatDimension(pointById.get(line.endId)!.x, workspace.accuracy)}, {formatDimension(pointById.get(line.endId)!.z, workspace.accuracy)}</option>)}
+          </select></label>}
+          {(pointSymmetry || segmentSymmetry) && <button type="button" disabled={!symmetryEditable}
+            title={symmetryRule && !symmetryEditable ? t("sketchUi.detachTheLinkedOffsetBeforeConstrainingItsGeneratedGeometry") : t("sketchUi.keepTheSelectedPointsOrSegmentsReflectedAboutThe")}
+            onClick={() => symmetryRule && onAddConstraint(symmetryRule)}>{t("prop.vaseDrawSymmetry")}</button>}
           {selectedSegment && !selectedSegmentCurved ? (
             <>
-              <button type="button" aria-pressed={selectedConstraints.some((rule) => rule.kind === "horizontal")} title="Keep this line horizontal when editing" onClick={() => onAddConstraint({ kind: "horizontal", a: selectedSegment.startId, b: selectedSegment.endId })}>Horizontal</button>
-              <button type="button" aria-pressed={selectedConstraints.some((rule) => rule.kind === "vertical")} title="Keep this line vertical when editing" onClick={() => onAddConstraint({ kind: "vertical", a: selectedSegment.startId, b: selectedSegment.endId })}>Vertical</button>
+              <button type="button" aria-pressed={selectedConstraints.some((rule) => rule.kind === "horizontal")} title={t("sketchUi.keepThisLineHorizontalWhenEditing")} onClick={() => onAddConstraint({ kind: "horizontal", a: selectedSegment.startId, b: selectedSegment.endId })}>{t("sketchUi.horizontal")}</button>
+              <button type="button" aria-pressed={selectedConstraints.some((rule) => rule.kind === "vertical")} title={t("sketchUi.keepThisLineVerticalWhenEditing")} onClick={() => onAddConstraint({ kind: "vertical", a: selectedSegment.startId, b: selectedSegment.endId })}>{t("sketchUi.vertical")}</button>
             </>
           ) : null}
           {constraintPairs ? (
             <>
-              <button type="button" title="Keep these points in the same position" onClick={() => onAddConstraint({ kind: "coincident", a: constraintPairs[0], b: constraintPairs[1] })}>Touch</button>
-              <button type="button" title="Keep these points at the same height" onClick={() => onAddConstraint({ kind: "horizontal", a: constraintPairs[0], b: constraintPairs[1] })}>Same Y</button>
-              <button type="button" title="Keep these points at the same X" onClick={() => onAddConstraint({ kind: "vertical", a: constraintPairs[0], b: constraintPairs[1] })}>Same X</button>
+              <button type="button" title={t("sketchUi.keepThesePointsInTheSamePosition")} onClick={() => onAddConstraint({ kind: "coincident", a: constraintPairs[0], b: constraintPairs[1] })}>{t("sketchUi.touch")}</button>
+              <button type="button" title={t("sketchUi.keepThesePointsAtTheSameHeight")} onClick={() => onAddConstraint({ kind: "horizontal", a: constraintPairs[0], b: constraintPairs[1] })}>{t("sketchUi.sameY")}</button>
+              <button type="button" title={t("sketchUi.keepThesePointsAtTheSameX")} onClick={() => onAddConstraint({ kind: "vertical", a: constraintPairs[0], b: constraintPairs[1] })}>{t("sketchUi.sameX")}</button>
             </>
           ) : null}
           {canRelateLines && (["parallel", "perpendicular", "equal-length"] as const).map((kind) => (
@@ -4415,9 +4490,9 @@ export function SketchWorkspace({
                   sameSketchEndpoints(rule.c, rule.d, secondLine.startId, secondLine.endId)) ||
                  (sameSketchEndpoints(rule.a, rule.b, secondLine.startId, secondLine.endId) &&
                   sameSketchEndpoints(rule.c, rule.d, firstLine.startId, firstLine.endId))))}
-              title={kind === "parallel" ? "Keep these lines parallel" : kind === "perpendicular" ? "Keep these lines at 90°" : "Keep both lines the same length"}
+              title={kind === "parallel" ? t("sketchUi.keepTheseLinesParallel") : kind === "perpendicular" ? t("sketchUi.keepTheseLinesAt90") : t("sketchUi.keepBothLinesTheSameLength")}
               onClick={() => onAddConstraint({ kind, a: firstLine.startId, b: firstLine.endId, c: secondLine.startId, d: secondLine.endId })}
-            >{kind === "parallel" ? "Parallel" : kind === "perpendicular" ? "Perpendicular" : "Equal Length"}</button>
+            >{kind === "parallel" ? t("split.workplaneParallel") : kind === "perpendicular" ? t("sketchUi.perpendicular") : t("sketchUi.equalLength")}</button>
           ))}
           {circlePair && (
             <form className="sketch-length-control" key={`${dimensionTarget}:${circlePair[0].radius}:${circlePair[1].radius}`} onSubmit={(event) => {
@@ -4429,10 +4504,10 @@ export function SketchWorkspace({
               onAddConstraint({ kind: "concentric", a: inner.pointIds[0], b: outer.pointIds[0],
                 circles: [inner.pointIds, outer.pointIds], radialGap: value });
             }}>
-              <label>Radial gap <input name="radialGap" type="text" inputMode="decimal"
-                className="sketch-corner-input" aria-label="Radial gap between circles in millimeters"
-                defaultValue={formatDimension(Math.abs(circlePair[0].radius - circlePair[1].radius), workspace.accuracy)} /> mm</label>
-              <button type="submit">Set gap</button>
+              <label>{t("sketchUi.radialGap")} <input name="radialGap" type="text" inputMode="decimal"
+                className="sketch-corner-input" aria-label={t("sketchUi.radialGapBetweenCirclesInMillimeters")}
+                defaultValue={formatDimension(Math.abs(circlePair[0].radius - circlePair[1].radius), workspace.accuracy)} />  {t("sketchUi.mm")}</label>
+              <button type="submit">{t("sketchUi.setGap")}</button>
             </form>
           )}
           {circlePair && (
@@ -4440,7 +4515,7 @@ export function SketchWorkspace({
               const [first, second] = circlePair;
               onAddConstraint({ kind: "concentric", a: first.pointIds[0], b: second.pointIds[0],
                 circles: [first.pointIds, second.pointIds] });
-            }}>Make concentric</button>
+            }}>{t("sketchUi.makeConcentric")}</button>
           )}
           {circle && outlineSelection && !outlineReference && diameter !== undefined && (
             <form className="sketch-length-control" onSubmit={(event) => {
@@ -4451,14 +4526,15 @@ export function SketchWorkspace({
               setDimensionDraft(null);
             }}>
               <label>
-                Diameter <input type="text" inputMode="decimal" className="sketch-corner-input"
+
+                {t("split.connectorDiameter")} <input type="text" inputMode="decimal" className="sketch-corner-input"
                   value={draftValue ?? formatDimension(diameter, workspace.accuracy)}
                   onFocus={(event) => event.currentTarget.select()}
                   onChange={(event) => setDimensionDraft({ target: dimensionTarget, value: event.target.value })}
-                  aria-label="Circle diameter in millimeters" /> mm
+                  aria-label={t("sketchUi.circleDiameterInMillimeters")} />  {t("sketchUi.mm")}
               </label>
-              <button type="submit" disabled={!canSetDiameter}>Set diameter</button>
-              <span className="sketch-constraint-hint">Shift-click another center or a line</span>
+              <button type="submit" disabled={!canSetDiameter}>{t("sketchUi.setDiameter")}</button>
+              <span className="sketch-constraint-hint">{t("sketchUi.shiftClickAnotherCenterOrALine")}</span>
             </form>
           )}
           {centerRule && (
@@ -4469,13 +4545,14 @@ export function SketchWorkspace({
               setCenterDraft(null);
             }}>
               <label>
-                Center distance <input type="text" inputMode="decimal" className="sketch-corner-input"
+
+                {t("sketchUi.centerDistance")} <input type="text" inputMode="decimal" className="sketch-corner-input"
                   value={centerDraft ?? formatDimension(Math.abs(centerRule.value), workspace.accuracy)}
                   onFocus={(event) => event.currentTarget.select()}
                   onChange={(event) => setCenterDraft(event.target.value)}
-                  aria-label="Circle center distance in millimeters" /> mm
+                  aria-label={t("sketchUi.circleCenterDistanceInMillimeters")} />  {t("sketchUi.mm")}
               </label>
-              <button type="submit" disabled={!canSetCenterDistance}>Set center distance</button>
+              <button type="submit" disabled={!canSetCenterDistance}>{t("sketchUi.setCenterDistance")}</button>
             </form>
           )}
           {gapRule && (
@@ -4486,35 +4563,37 @@ export function SketchWorkspace({
               setGapDraft(null);
             }}>
               <label>
-                {gapRule.kind === "outline-line-distance" ? "Clearance" : "Distance"} <input type="text" inputMode="decimal" className="sketch-corner-input"
+                {gapRule.kind === "outline-line-distance" ? t("prop.hingeClearance") : t("edge.distance")} <input type="text" inputMode="decimal" className="sketch-corner-input"
                   value={gapText ?? formatDimension(Math.abs(gapRule.value), workspace.accuracy)}
                   onFocus={(event) => event.currentTarget.select()}
                   onChange={(event) => setGapDraft({ target: dimensionTarget, value: event.target.value })}
-                  aria-label="Distance in millimeters" /> mm
+                  aria-label={t("sketchUi.distanceInMillimeters")} />  {t("sketchUi.mm")}
               </label>
               <button type="submit" disabled={!canSetGap}
-                title={gapRule.kind === "outline-line-distance" ? "Set the gap from the outline’s nearest edge to the line"
-                  : gapRule.kind === "line-distance" ? "Set perpendicular spacing and keep both lines parallel"
-                  : gapRule.kind === "point-line-distance" ? "Set perpendicular distance to the line" : "Set straight-line distance between the points"}>{gapRule.kind === "outline-line-distance" ? "Set clearance" : "Set distance"}</button>
+                title={gapRule.kind === "outline-line-distance" ? t("sketchUi.setTheGapFromTheOutlineSNearestEdge")
+                  : gapRule.kind === "line-distance" ? t("sketchUi.setPerpendicularSpacingAndKeepBothLinesParallel")
+                  : gapRule.kind === "point-line-distance" ? t("sketchUi.setPerpendicularDistanceToTheLine") : t("sketchUi.setStraightLineDistanceBetweenThePoints")}>{gapRule.kind === "outline-line-distance" ? t("sketchUi.setClearance") : t("sketchUi.setDistance")}</button>
             </form>
           )}
           {angleDegrees !== undefined && (
             <form className="sketch-length-control" onSubmit={(event) => { event.preventDefault(); setFixedAngle(); }}>
               <label>
-                Angle <input type="text" inputMode="decimal" className="sketch-corner-input"
+
+                {t("edge.angle")} <input type="text" inputMode="decimal" className="sketch-corner-input"
                   value={draftValue ?? formatDimension(angleDegrees, workspace.accuracy)}
                   onFocus={(event) => event.currentTarget.select()}
                   onChange={(event) => setDimensionDraft({ target: dimensionTarget, value: event.target.value })}
-                  aria-label="Corner angle in degrees" />°
+                  aria-label={t("sketchUi.cornerAngleInDegrees")} />°
               </label>
-              <button type="submit" title="Set and lock the angle between these edges"
-                disabled={requestedAngle === undefined || !Number.isFinite(requestedAngle) || requestedAngle <= 0 || requestedAngle >= 180}>Set angle</button>
+              <button type="submit" title={t("sketchUi.setAndLockTheAngleBetweenTheseEdges")}
+                disabled={requestedAngle === undefined || !Number.isFinite(requestedAngle) || requestedAngle <= 0 || requestedAngle >= 180}>{t("sketchUi.setAngle")}</button>
             </form>
           )}
           {selectedSegment && !selectedSegmentCurved ? (
             <form className="sketch-length-control" onSubmit={(event) => { event.preventDefault(); setLineLength(); }}>
               <label>
-                Length <input type="text" inputMode="decimal" className="sketch-corner-input" value={lengthValue}
+
+                {t("workspace.length")} <input type="text" inputMode="decimal" className="sketch-corner-input" value={lengthValue}
                   onFocus={(event) => event.currentTarget.select()}
                   onChange={(event) => setDimensionDraft({ target: dimensionTarget, value: event.target.value })}
                   onKeyDown={(event) => {
@@ -4523,36 +4602,37 @@ export function SketchWorkspace({
                       setDimensionDraft(null);
                     }
                   }}
-                  aria-label="Line length in millimeters" /> mm
+                  aria-label={t("sketchUi.lineLengthInMillimeters")} />  {t("sketchUi.mm")}
               </label>
-              <button type="submit" title="Set and constrain this line’s length"
-                disabled={requestedLength === undefined || !Number.isFinite(requestedLength) || requestedLength <= 0.001}>Set length</button>
+              <button type="submit" title={t("sketchUi.setAndConstrainThisLineSLength")}
+                disabled={requestedLength === undefined || !Number.isFinite(requestedLength) || requestedLength <= 0.001}>{t("sketchUi.setLength")}</button>
             </form>
           ) : null}
           {constraintPairs ? (
             <>
               <label className="sketch-corner-label">
-                Gap <input type="text" inputMode="decimal" className="sketch-corner-input" value={draftValue ?? ""}
+
+                {t("align.gapLabel")} <input type="text" inputMode="decimal" className="sketch-corner-input" value={draftValue ?? ""}
                   onChange={(event) => setDimensionDraft({ target: dimensionTarget, value: event.target.value })}
-                  aria-label="Point gap in millimeters" /> mm
+                  aria-label={t("sketchUi.pointGapInMillimeters")} />  {t("sketchUi.mm")}
               </label>
-              <button type="button" title="Keep this signed horizontal distance (from first selected point to second)" onClick={() => addOffsetConstraint("offset-x", constraintPairs[0], constraintPairs[1])}>X gap</button>
-              <button type="button" title="Keep this signed vertical distance (from first selected point to second)" onClick={() => addOffsetConstraint("offset-z", constraintPairs[0], constraintPairs[1])}>Y gap</button>
+              <button type="button" title={t("sketchUi.keepThisSignedHorizontalDistanceFromFirstSelectedPoint")} onClick={() => addOffsetConstraint("offset-x", constraintPairs[0], constraintPairs[1])}>{t("sketchUi.xGap")}</button>
+              <button type="button" title={t("sketchUi.keepThisSignedVerticalDistanceFromFirstSelectedPoint")} onClick={() => addOffsetConstraint("offset-z", constraintPairs[0], constraintPairs[1])}>{t("sketchUi.yGap")}</button>
             </>
           ) : null}
           {selectedSegment && !selectedSegmentCurved && (
-            <span className="sketch-constraint-hint">Shift-click a line or point</span>
+            <span className="sketch-constraint-hint">{t("sketchUi.shiftClickALineOrPoint")}</span>
           )}
-          {selectedConstraints.map((rule) => (
-            <button type="button" key={rule.id} title={`Inspect ${rule.kind} constraint`} onClick={() => inspectConstraint(rule.id)}>
-              {rule.kind === "angle" ? `Fixed angle ${formatDimension(rule.value, workspace.accuracy)}°` : (
-                rule.kind === "concentric" ? `Concentric${rule.radialGap === undefined ? "" : ` · gap ${formatDimension(Math.abs(rule.radialGap), workspace.accuracy)} mm`}`
-                : rule.kind === "circle-diameter" ? `Fixed diameter Ø${formatDimension(rule.value, workspace.accuracy)} mm`
-                : rule.kind === "circle-center-distance" ? `Fixed center distance ${formatDimension(Math.abs(rule.value), workspace.accuracy)} mm`
-                : rule.kind === "outline-line-distance" ? `Fixed clearance ${formatDimension(rule.value, workspace.accuracy)} mm`
+          {constraintRelationships.filter((entry) => entry.members.some((member) => selectedConstraints.some((rule) => rule.id === member.id))).map(({ rule }) => (
+            <button type="button" key={rule.id} title={t("sketchUi.inspectConstraint", { value0: sketchConstraintLabel(rule.kind) })} onClick={() => inspectConstraint(rule.id)}>
+              {rule.kind === "angle" ? t("sketchUi.fixedAngle", { value0: formatDimension(rule.value, workspace.accuracy) }) : (
+                rule.kind === "concentric" ? rule.radialGap === undefined ? sketchConstraintLabel("concentric") : t("sketchUi.concentricGap", { gap: formatDimension(Math.abs(rule.radialGap), workspace.accuracy) })
+                : rule.kind === "circle-diameter" ? t("sketchUi.fixedDiameterMm", { value0: formatDimension(rule.value, workspace.accuracy) })
+                : rule.kind === "circle-center-distance" ? t("sketchUi.fixedCenterDistanceMm", { value0: formatDimension(Math.abs(rule.value), workspace.accuracy) })
+                : rule.kind === "outline-line-distance" ? t("sketchUi.fixedClearanceMm", { value0: formatDimension(rule.value, workspace.accuracy) })
                 : rule.kind === "line-distance" || rule.kind === "point-line-distance"
-                  ? `Fixed distance ${formatDimension(Math.abs(rule.value), workspace.accuracy)} mm`
-                  : <>{rule.kind === "distance" ? selectedSegment ? "Fixed length" : "Fixed distance" : rule.kind}{"value" in rule ? ` ${rule.value} mm` : ""}{"c" in rule ? ` ${constraints.indexOf(rule) + 1}` : ""}</>
+                  ? t("sketchUi.fixedDistanceMm", { value0: formatDimension(Math.abs(rule.value), workspace.accuracy) })
+                  : <>{rule.kind === "distance" ? selectedSegment ? t("sketchUi.fixedLength") : t("sketchUi.fixedDistance") : sketchConstraintLabel(rule.kind)}{"value" in rule ? ` ${rule.value} mm` : ""}{"c" in rule ? ` ${constraints.indexOf(rule) + 1}` : ""}</>
               )}
             </button>
           ))}
@@ -4566,7 +4646,7 @@ export function SketchWorkspace({
         onClose={() => { setOffsetOpen(false); setOffsetPreview(null); }} />}
       {inspected && tool === "select" && (
         <SketchConstraintInspector key={`${JSON.stringify(inspected)}:${inspectorRequest}`} rule={inspected}
-          profile={inspectedIsSaved ? profile : { ...profile, constraints: [...constraints, inspected] }}
+          profile={inspectedIsSaved ? profile : { ...profile, constraints: [...constraints, ...(constraintFailure?.attempted ?? [inspected]).filter((entry) => !constraints.some((rule) => rule.id === entry.id))] }}
           rejectedConstraintId={inspectedIsSaved ? undefined : inspected.id}
           annotationsVisible={constraintAnnotationsVisible}
           onToggleAnnotations={() => setConstraintAnnotationsVisible((visible) => !visible)}
@@ -4586,30 +4666,33 @@ export function SketchWorkspace({
       )}
       {constraintFailure && (
         <div className="sketch-point-actions sketch-constraint-feedback" role="alert">
-          <span>{constraintFailure.offsetError ? constraintFailure.offsetError.message : constraintFailure.conflicting.length
-            ? "Contradictory dimensions. Edit or remove a highlighted constraint."
-            : "The solver could not satisfy the operation. Review these constraints and any locked points. The cause is undetermined."}</span>
+          <span>{constraintFailure.offsetError ? localizedError(constraintFailure.offsetError.message) : constraintFailure.conflicting.length
+            ? t("sketchUi.contradictoryDimensionsEditOrRemoveAHighlightedConstraint")
+            : t("sketchUi.theSolverCouldNotSatisfyTheOperationReviewThese")}</span>
           {[...new Map(failedRules.map((rule) => [rule.id, rule])).values()].map((rule) => (
             <button key={rule.id} type="button" aria-pressed={inspectedId === rule.id}
               onClick={() => inspectConstraint(rule.id)}>
-              {rule.kind}{"value" in rule ? ` ${rule.value}` : ""}
-              {!constraints.some((entry) => entry.id === rule.id) ? " (attempt rejected)" : ""}
+              {sketchConstraintLabel(rule.kind)}{"value" in rule ? ` ${rule.value}` : ""}
+              {!constraints.some((entry) => entry.id === rule.id) ? ` ${t("sketchUi.attemptRejected")}` : ""}
             </button>
           ))}
           {constraintFailure.offsetError && <button type="button" onClick={() => {
             setInspectedId(null); setOffsetOpen(true); setOffsetFeatureId(constraintFailure.offsetError!.offsetId);
-          }}>Review offset</button>}
-          <button type="button" onClick={onDismissConstraintFailure}>Dismiss</button>
+          }}>{t("sketchUi.reviewOffset")}</button>}
+          <button type="button" onClick={onDismissConstraintFailure}>{t("sketchUi.dismiss")}</button>
         </div>
       )}
       {mirrorOpen && selected && tool === "select" && onMirror ? (
         <div className="sketch-point-actions" aria-label={t("sketch.mirror")}>
+          <button type="button" aria-pressed={mirrorLinked} className={mirrorLinked ? "active" : ""}
+            title={t("sketchUi.keepMirroredPointsAndStraightLinesSymmetricWhenEither")}
+            onClick={() => setMirrorLinked((value) => !value)}>{t("sketchUi.maintainSymmetry")}</button>
           {mirrorPicking ? (
             <span className="sketch-corner-label">{t("sketch.mirrorPickLine")}</span>
           ) : (
             <>
-              <button type="button" title={t("sketch.mirrorLeftRightHint")} onClick={() => { onMirror("vertical"); closeMirror(); }}><FlipHorizontal2 /><span>{t("sketch.mirrorLeftRight")}</span></button>
-              <button type="button" title={t("sketch.mirrorTopBottomHint")} onClick={() => { onMirror("horizontal"); closeMirror(); }}><FlipVertical2 /><span>{t("sketch.mirrorTopBottom")}</span></button>
+              <button type="button" title={t("sketch.mirrorLeftRightHint")} onClick={() => { onMirror("vertical", mirrorLinked); closeMirror(); }}><FlipHorizontal2 /><span>{t("sketch.mirrorLeftRight")}</span></button>
+              <button type="button" title={t("sketch.mirrorTopBottomHint")} onClick={() => { onMirror("horizontal", mirrorLinked); closeMirror(); }}><FlipVertical2 /><span>{t("sketch.mirrorTopBottom")}</span></button>
               <button type="button" title={t("sketch.mirrorAcrossLineHint")} onClick={() => setMirrorPicking(true)}><Slash /><span>{t("sketch.mirrorAcrossLine")}</span></button>
             </>
           )}

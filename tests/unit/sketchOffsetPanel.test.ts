@@ -2,6 +2,7 @@
 import { act, createElement } from "react";
 import { createRoot, type Root } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { setLanguage, translate } from "@/lib/i18n";
 import { SketchOffsetPanel } from "@/components/SketchOffsetPanel";
 import { updateSketchOffsets } from "@/lib/sketchOffsets";
 import type { SketchProfile } from "@/types/layerling";
@@ -24,6 +25,21 @@ describe("offset settings",()=>{
     value("Offset distance","4");click("Flip direction");click("Create offset");
     const next=props.onCommit.mock.calls[0][0] as SketchProfile;
     expect(next.offsets?.[0].distance).toBe(-4);expect(next.points).toHaveLength(4);expect(next.points.at(-1)?.z).toBe(-4);
+  });
+  it("translates an open panel without saving its default label as a custom name", async () => {
+    const props = render();
+    try {
+      await act(async () => { await setLanguage("de", false); });
+      expect(container.textContent).toContain(translate("de", "sketchUi.offset", { value0: 1 }));
+      expect(container.querySelector('aside')?.getAttribute("aria-label"))
+        .toBe(translate("de", "sketchUi.offsetAndInset"));
+      const button = [...container.querySelectorAll("button")].find(button => button.textContent === translate("de", "sketchUi.createOffset"))!;
+      act(() => button.click());
+      const next = props.onCommit.mock.calls[0][0] as SketchProfile;
+      expect(next.offsets?.[0].name).toBeUndefined();
+    } finally {
+      await act(async () => { await setLanguage("en", false); });
+    }
   });
   it("accepts a workplane drag request as a draft without committing",()=>{
     const props=render();

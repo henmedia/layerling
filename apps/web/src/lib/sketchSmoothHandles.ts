@@ -11,7 +11,7 @@ export function cloneSketchProfile(profile: SketchProfile): SketchProfile {
     ...(profile.offsets ? { offsets: profile.offsets.map((feature) => ({
       ...feature, sourceSegmentIds: [...feature.sourceSegmentIds], pointIds: [...feature.pointIds], segmentIds: [...feature.segmentIds],
     })) } : {}),
-    ...(profile.constraints ? { constraints: profile.constraints.map((rule) => rule.kind === "concentric" ? { ...rule, circles: [[...rule.circles[0]], [...rule.circles[1]]] } : "outline" in rule ? { ...rule, outline: [...rule.outline] } : rule.frameX ? { ...rule, frameX: { ...rule.frameX } } : { ...rule }) } : {}),
+    ...(profile.constraints ? { constraints: profile.constraints.map((rule) => rule.kind === "symmetry" ? { ...rule, axis: [...rule.axis] as [string, string], ...(rule.pair ? { pair: [...rule.pair] as [string, string] } : {}) } : rule.kind === "concentric" ? { ...rule, circles: [[...rule.circles[0]], [...rule.circles[1]]] } : "outline" in rule ? { ...rule, outline: [...rule.outline] } : rule.frameX ? { ...rule, frameX: { ...rule.frameX } } : { ...rule }) } : {}),
     images: (profile.images ?? []).map((image) => ({ ...image })),
     ...(profile.stroke ? { stroke: { ...profile.stroke } } : {}),
     ...(profile.silhouette ? { silhouette: true } : {}),

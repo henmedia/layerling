@@ -1363,8 +1363,10 @@ function validateSketchProfile(value: unknown, label: string) {
   }
   if (profile.constraints !== undefined) {
     if (!Array.isArray(profile.constraints)) throw new Error(`${label}.constraints must be an array`);
+    const referenceLine = (a: string, b: string) => (profile as unknown as SketchProfile).segments.some((segment) =>
+      (segment.kind ?? "line") === "line" && ((segment.startId === a && segment.endId === b) || (segment.startId === b && segment.endId === a)));
     const ruleIds = new Set<string>();
-    const noDimension = new Set(["horizontal", "vertical", "coincident", "concentric"]);
+    const noDimension = new Set(["horizontal", "vertical", "coincident", "concentric", "midpoint", "point-on-line", "symmetry"]);
     const withDimension = new Set(["distance", "offset-x", "offset-z", "angle", "point-line-distance", "line-distance", "outline-line-distance", "circle-diameter", "circle-center-distance"]);
     const betweenLines = new Set(["parallel", "perpendicular", "equal-length", "angle", "line-distance"]);
     profile.constraints.forEach((rawRule, index) => {
@@ -1374,6 +1376,10 @@ function validateSketchProfile(value: unknown, label: string) {
       if (ruleIds.has(id)) throw new Error(`${label}.constraints contains duplicate ID '${id}'`);
       ruleIds.add(id);
       const kind = stringValue(rule.kind, `${ruleLabel}.kind`);
+      if (rule.relationshipId !== undefined) {
+        stringValue(rule.relationshipId, `${ruleLabel}.relationshipId`);
+        if (kind !== "symmetry" && kind !== "point-on-line") throw new Error(`${ruleLabel} has unsupported relationship metadata`);
+      }
       if (!noDimension.has(kind) && !withDimension.has(kind) && !betweenLines.has(kind)) throw new Error(`${ruleLabel}.kind is not supported`);
       const a = stringValue(rule.a, `${ruleLabel}.a`);
       const b = stringValue(rule.b, `${ruleLabel}.b`);
@@ -1396,9 +1402,22 @@ function validateSketchProfile(value: unknown, label: string) {
             : rule.outline.includes(a) || rule.outline.includes(b)) ||
           (kind === "outline-line-distance" && rule.side !== 1 && rule.side !== -1)) throw new Error(`${ruleLabel} has an invalid outline or side`);
       }
-      if (kind === "point-line-distance") {
+      if (kind === "point-line-distance" || kind === "midpoint" || kind === "point-on-line") {
         const c = stringValue(rule.c, `${ruleLabel}.c`);
         if (!pointIds.has(c) || c === a || c === b) throw new Error(`${ruleLabel} references an invalid point`);
+      }
+      if ((kind === "midpoint" || kind === "point-on-line") && !referenceLine(a, b))
+        throw new Error(`${ruleLabel} requires an existing straight reference line`);
+      if (kind === "symmetry") {
+        const pair = rule.pair;
+        if (!Array.isArray(rule.axis) || rule.axis.length !== 2 || rule.axis.some((id) => typeof id !== "string" || !pointIds.has(id)) ||
+          (pair !== undefined && (!Array.isArray(pair) || pair.length !== 2 || pair.some((id) => typeof id !== "string" || !pointIds.has(id)))))
+          throw new Error(`${ruleLabel} has invalid symmetry references`);
+        const refs = [a, b, ...rule.axis, ...(Array.isArray(pair) ? pair : [])];
+        if (new Set(refs).size !== refs.length) throw new Error(`${ruleLabel} has overlapping symmetry references`);
+        if (!referenceLine(rule.axis[0] as string, rule.axis[1] as string) ||
+          (Array.isArray(pair) && (!referenceLine(a, pair[0] as string) || !referenceLine(b, pair[1] as string))))
+          throw new Error(`${ruleLabel} requires existing straight symmetry lines`);
       }
       if (betweenLines.has(kind)) {
         const c = stringValue(rule.c, `${ruleLabel}.c`);

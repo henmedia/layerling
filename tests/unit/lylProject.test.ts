@@ -1,3 +1,4 @@
+import { linkedMirrorSketchSelection } from "@/lib/sketchLinkedMirror";
 import { updateSketchOffsets } from "@/lib/sketchOffsets";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { strFromU8, strToU8, unzipSync, zipSync } from "fflate";
@@ -81,6 +82,31 @@ function mutateProject(bytes: Uint8Array, mutate: (document: LylProjectDocumentV
 
 describe("layerling .lyl project packages", () => {
   afterEach(() => vi.unstubAllGlobals());
+
+  it("round-trips a Mirror-created symmetry and its addressable origin axis", async () => {
+    let id=0;
+    const mirrored=linkedMirrorSketchSelection({points:[{id:"a",x:10,z:10},{id:"b",x:20,z:30}],segments:[{id:"line",startId:"a",endId:"b"}]},
+      {kind:"segment",id:"line"},"vertical",prefix=>`${prefix}-${++id}`);
+    expect(mirrored.ok).toBe(true);if(!mirrored.ok)return;
+    const pad=shape("mesh","linked-mirror",{sketchProfile:mirrored.profile});
+    const restored=await importLylProject(await exportLylProject(input([pad])));
+    expect(restored.shapes[0].sketchProfile).toEqual(expect.objectContaining(mirrored.profile));
+  });
+
+  it("round-trips midpoint, point-on-line, and stored segment symmetry correspondence", async () => {
+    const pad = shape("mesh", "relations", { sketchProfile: {
+      points: [{id:"a",x:0,z:0},{id:"b",x:100,z:0},{id:"p",x:50,z:0},{id:"q",x:50,z:0},{id:"r",x:80,z:20},{id:"s",x:80,z:-20}],
+      segments: [{id:"axis",startId:"a",endId:"b",construction:true},{id:"first",startId:"p",endId:"r"},{id:"second",startId:"q",endId:"s"}],
+      constraints: [{id:"m",kind:"midpoint",a:"a",b:"b",c:"p"},{id:"l",kind:"point-on-line",a:"a",b:"b",c:"q"},
+        {id:"s",kind:"symmetry",a:"p",b:"q",axis:["a","b"],pair:["r","s"]}],
+    }});
+    const restored = await importLylProject(await exportLylProject(input([pad])));
+    expect(restored.shapes[0].sketchProfile?.constraints).toEqual(pad.sketchProfile?.constraints);
+    const invalid = structuredClone(pad);
+    const symmetry = invalid.sketchProfile!.constraints![2];
+    if (symmetry.kind === "symmetry") symmetry.axis[0] = "missing";
+    await expect(importLylProject(await exportLylProject(input([invalid])))).rejects.toThrow(/symmetry references/);
+  });
 
   it.each([undefined, 1.5])("round-trips a concentric circle constraint with gap %s", async (radialGap) => {
     let id = 0;

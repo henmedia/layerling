@@ -2,6 +2,7 @@
 import { act, createElement } from "react";
 import { createRoot, type Root } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { setLanguage, translate } from "@/lib/i18n";
 import { sketchPrimitiveGeometry } from "@/lib/sketchPrimitives";
 import { SketchConstraintInspector } from "@/components/SketchConstraintInspector";
 import type { SketchConstraint, SketchProfile } from "@/types/layerling";
@@ -33,6 +34,19 @@ describe("constraint inspector", () => {
     act(() => root.render(createElement(SketchConstraintInspector, props)));
     return props;
   }
+  it("updates the open inspector when the interface language changes", async () => {
+    render();
+    try {
+      await act(async () => { await setLanguage("de", false); });
+      expect(container.querySelector('[role="dialog"]')?.getAttribute("aria-label"))
+        .toBe(translate("de", "sketchUi.constraintInspector"));
+      expect(container.textContent).toContain(translate("de", "inspector.properties"));
+      expect(container.textContent).not.toContain("Properties");
+    } finally {
+      await act(async () => { await setLanguage("en", false); });
+    }
+  });
+
   function setValue(value: string) {
     const input = container.querySelector("input")!;
     act(() => {
@@ -43,6 +57,40 @@ describe("constraint inspector", () => {
   function submit() {
     act(() => { container.querySelector("form")!.dispatchEvent(new Event("submit", { bubbles: true, cancelable: true })); });
   }
+
+  it.each(["midpoint", "point-on-line", "symmetry"] as const)("inspects and deletes %s without a dimension editor", (kind) => {
+    const profile: SketchProfile = {
+      points: [{id:"a",x:0,z:0},{id:"b",x:100,z:0},{id:"p",x:50,z:0},{id:"q",x:50,z:0}],
+      segments: [{id:"axis",startId:"a",endId:"b"}],
+    };
+    const rule: SketchConstraint = kind === "symmetry" ? {id:"r",kind,a:"p",b:"q",axis:["a","b"]}
+      : {id:"r",kind,a:"a",b:"b",c:"p"};
+    const props = render({profile:{...profile,constraints:[rule]},rule});
+    expect(container.querySelector("form")).toBeNull();
+    act(() => container.querySelector<HTMLButtonElement>('button[aria-controls]')!.click());
+    expect(container.textContent).toContain(kind === "symmetry" ? "Axis: a → b" : "Reference line: a → b");
+    if(kind === "point-on-line") expect(container.textContent).toContain("infinite supporting line");
+    act(() => container.querySelector<HTMLButtonElement>('[aria-label="Delete constraint"]')!.click());
+    expect(props.onDelete).toHaveBeenCalledWith("r");expect(profile.points).toHaveLength(4);
+  });
+
+  it("shows several Mirror equations as one selectable relationship per shape",()=>{
+    const profile: SketchProfile = {
+      points:[{id:"a",x:10,z:10},{id:"b",x:20,z:30},{id:"c",x:30,z:10},{id:"d",x:-10,z:10},{id:"e",x:-20,z:30},{id:"f",x:-30,z:10},{id:"u",x:0,z:0},{id:"v",x:0,z:50}],
+      segments:[{id:"ab",startId:"a",endId:"b"},{id:"bc",startId:"b",endId:"c"},{id:"de",startId:"d",endId:"e"},{id:"ef",startId:"e",endId:"f"},{id:"axis",startId:"u",endId:"v"}],
+      constraints:[{id:"first",kind:"symmetry",a:"a",b:"d",pair:["b","e"],axis:["u","v"],relationshipId:"mirror"},
+        {id:"second",kind:"symmetry",a:"c",b:"f",axis:["u","v"],relationshipId:"mirror"}],
+    };
+    const props=render({profile,rule:profile.constraints![1]});
+    const rows=container.querySelectorAll('.sketch-constraint-row');expect(rows).toHaveLength(3);
+    expect(container.querySelector('.outliner-count-badge')?.textContent).toBe("1");
+    expect(container.textContent).toContain("Linked symmetry · 3 point pairs");
+    act(()=>container.querySelector<HTMLButtonElement>('button[aria-controls]')!.click());
+    expect(container.textContent).toContain("Affects 5 edges and 8 points");
+    expect([...rows].every(row=>row.getAttribute('aria-pressed')==="true")).toBe(true);
+    act(()=>container.querySelector<HTMLButtonElement>('[aria-label="Delete constraint"]')!.click());
+    expect(props.onDelete).toHaveBeenCalledWith("first");expect(props.onClose).toHaveBeenCalled();
+  });
 
   it("shows affected geometry and updates the existing constraint by ID", () => {
     const props = render();
@@ -133,7 +181,7 @@ describe("constraint inspector", () => {
   it("deletes another constraint from its row and keeps the current inspector open", () => {
     const other: SketchConstraint = { id: "horizontal", kind: "horizontal", a: "a", b: "b" };
     const props = render({ profile: { ...profile, constraints: [rule, other] } });
-    act(() => container.querySelector<HTMLButtonElement>('[aria-label="Delete horizontal constraint"]')!.click());
+    act(() => container.querySelector<HTMLButtonElement>('[aria-label="Delete Horizontal constraint"]')!.click());
     expect(props.onDelete).toHaveBeenCalledWith("horizontal");
     expect(props.onClose).not.toHaveBeenCalled();
   });
@@ -142,7 +190,7 @@ describe("constraint inspector", () => {
     const other: SketchConstraint = { id: "horizontal", kind: "horizontal", a: "a", b: "b" };
     const onSelect = vi.fn();
     const props = render({ profile: { ...profile, constraints: [rule, other] }, onSelect });
-    act(() => container.querySelector<HTMLButtonElement>('[aria-label="Delete distance constraint"]')!.click());
+    act(() => container.querySelector<HTMLButtonElement>('[aria-label="Delete Distance constraint"]')!.click());
     expect(props.onDelete).toHaveBeenCalledWith("dimension");
     expect(onSelect).toHaveBeenCalledWith("horizontal");
     expect(props.onClose).not.toHaveBeenCalled();
@@ -159,8 +207,8 @@ describe("constraint inspector", () => {
     expect(groups).toHaveLength(2);
     expect(groups[0].querySelector("summary")?.textContent).toContain("Shape 1");
     expect(groups[1].querySelector("summary")?.textContent).toContain("Shape 2");
-    expect(groups[0].querySelector('[aria-label="Delete distance constraint"]')).not.toBeNull();
-    expect(groups[1].querySelector('[aria-label="Delete horizontal constraint"]')).not.toBeNull();
+    expect(groups[0].querySelector('[aria-label="Delete Distance constraint"]')).not.toBeNull();
+    expect(groups[1].querySelector('[aria-label="Delete Horizontal constraint"]')).not.toBeNull();
     act(() => groups[0].querySelector("summary")!.click());
     expect(groups[0].open).toBe(false);
     expect(groups[1].open).toBe(false);
@@ -282,7 +330,7 @@ describe("constraint inspector", () => {
       rule: attempted, rejectedConstraintId: attempted.id, onUpdate, onDelete });
     expect(container.querySelector("details")!.open).toBe(true);
     expect(container.textContent).toContain("rejected attempt");
-    expect(container.querySelector<HTMLButtonElement>('[aria-label="Delete offset x constraint"]')!.disabled).toBe(true);
+    expect(container.querySelector<HTMLButtonElement>('[aria-label="Delete Offset x constraint"]')!.disabled).toBe(true);
     expect(container.querySelector<HTMLButtonElement>('[aria-label="Delete constraint"]')!.disabled).toBe(true);
     expect(container.querySelector<HTMLInputElement>('[aria-label="Constraint value"]')!.readOnly).toBe(true);
     submit();

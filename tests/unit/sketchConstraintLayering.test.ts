@@ -31,7 +31,7 @@ describe("constraint badge hit areas", () => {
     const container = document.createElement("div");
     container.innerHTML = renderToStaticMarkup(createElement(SketchWorkspace, props));
     const selection = container.querySelector(".sketch-geometry-selection");
-    const badge = container.querySelector('[aria-label="Inspect horizontal"]');
+    const badge = container.querySelector('[aria-label="Inspect Horizontal"]');
     expect(selection).not.toBeNull();
     expect(badge).not.toBeNull();
     expect(selection!.compareDocumentPosition(badge!) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();

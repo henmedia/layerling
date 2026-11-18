@@ -164,7 +164,7 @@ export function updateSketchOffsets(profile: SketchProfile, moved: ReadonlySet<s
     const fail = (message: string): OffsetUpdate => ({ ok: false, message, pointIds: [...sourceIds, ...feature.pointIds], offsetId: feature.id });
     if (profile.constraints?.some((rule) => {
       const references = [rule.a, rule.b, ...("c" in rule ? [rule.c] : []), ...("d" in rule ? [rule.d] : []),
-        ...("outline" in rule ? rule.outline : []), ...(rule.kind === "concentric" ? rule.circles.flat() : [])];
+        ...("outline" in rule ? rule.outline : []), ...(rule.kind === "concentric" ? rule.circles.flat() : []), ...(rule.kind === "symmetry" ? [...rule.axis, ...(rule.pair ?? [])] : [])];
       return references.some((id) => feature.pointIds.includes(id));
     })) return fail("Offset geometry is driven by its source. Detach it before adding constraints to the derived path.");
     if (feature.pointIds.some((id) => moved.has(id)) && ![...sourceIds].some((id) => moved.has(id))) {
