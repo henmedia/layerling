@@ -813,6 +813,24 @@ export const tools = [
     },
   },
   {
+    name: "layerling_thread_insert",
+    description: "Make the hole for a heat-set thread insert in a flat face, or in the outside wall of a cylinder or tube, of a solid body - the editor's Thread insert tool (PR #1828 by @markopo1982). A heat-set insert is pressed into the hole with a soldering iron and gives a screw a thread that does not wear out. Before the hole is made the tool checks that the part has the wall beside the hole and the depth behind it that the insert needs; if not, nothing is cut and the error says what is short and by how much. The hole is an ordinary round hole shape grouped with the body (ungroup frees it), as deep as the insert is long; the CAD kernel cuts it as an exact cylinder. Set dryRun to only check. Give point and normal for the spot on the face, or leave them out for the middle of targetFace.",
+    inputSchema: {
+      ...editorTargetSchema,
+      properties: {
+        ...editorTargetSchema.properties,
+        targetId: { type: "string", description: "The body to make the hole in. If omitted, the one selected object (id also works)." },
+        targetFace: { type: "string", enum: ["bottom", "top", "left", "right", "front", "back"], description: "Side of the body's own box, taken in its current turn (default top). Used when point and normal are not given: the hole goes to the middle of that face." },
+        point: { type: "array", items: { type: "number" }, minItems: 3, maxItems: 3, description: "The spot of the hole on the face, [x, y, z] in world coordinates (y up). With normal, wins over targetFace." },
+        normal: { type: "array", items: { type: "number" }, minItems: 3, maxItems: 3, description: "Outward normal [x, y, z] of the face at point, in world coordinates." },
+        size: { type: "string", enum: ["M2", "M2.5", "M3", "M4", "M5", "M6", "M8", "M3 short", "M4 short", "M5 short", "1/4-20", "custom"], description: "The insert (default M3). custom takes diameter and length." },
+        diameter: { type: "number", minimum: 0.1, description: "size custom only: the hole's diameter in millimetres. The wall that has to stay round it is diameter / 2.45, rounded up to 0.1 mm." },
+        length: { type: "number", minimum: 0.1, description: "size custom only: the insert's length in millimetres, which is the hole's depth." },
+        dryRun: { type: "boolean", description: "Only check: return the wall and depth the part has at the spot and whether the hole is allowed, and cut nothing (default false)." },
+      },
+    },
+  },
+  {
     name: "layerling_support_rib",
     description: "Stand a thin support rib under the lower face of a part printed tilted on one edge - the editor's Support rib tool (Discussion #1385). A part standing at 45 degrees on an edge needs no slicer supports but can fall over; the rib holds it: a thin triangle under the face a gap away (its slope parallel to the face, its back upright, its foot on the bed), on an oval foot plate, rounded where it meets the plate and at its top, and small bridges, each one layer high and one line wide and lying exactly on a layer of the print, reaching across the gap into the part so it cannot tip the other way. The face must look down, slope between 15 and 75 degrees and reach down to the bed straight down its slope from the point, or stop at most 3 mm above it at a rounded or chamfered bottom edge (click the flat face above the rounding); the part must stand on the bed (the layers count from there); the rib must not run into the part anywhere - else the command refuses and says why. Name the part and a side of its own box (targetFace, snapped to the nearest real face; the point is the face's middle) or give point and normal on the face. Thickness (two lines), gap (half a line), bridge width (one line) and foot thickness (first layer plus one) follow nozzle and layers unless set. The rib is a mesh body; bundled with the part unless bundle is false. The answer gives the rib, its height and the bridges' heights. One undo step.",
     inputSchema: {

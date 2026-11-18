@@ -110,6 +110,7 @@ export type LayerlingMcpCommandName =
   | "lay_flat"
   | "place_on_face"
   | "perforate_face"
+  | "thread_insert"
   | "sweep_sketch"
   | "push_face"
   | "paint_object"

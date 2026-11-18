@@ -205,8 +205,8 @@ describe("the editor's wiring of a group's joined face", () => {
   });
 
   it("lets only the clicks share the kept read, never an MCP action", () => {
-    // The hole pattern's, the Face tool's and the support rib's (#1385).
-    expect(editor.match(/faceReadForClick\(/g)).toHaveLength(3);
+    // Hole pattern, Face tool, support rib (#1385), and two threaded-insert reads.
+    expect(editor.match(/faceReadForClick\(/g)).toHaveLength(5);
     expect(editor.match(/faceReads\.forClick\(/g)).toHaveLength(1);
     // A click's read counts only for the body as it stands.
     expect(between(editor, "const faceReadForClick =", "}), [faceReads]);")).toContain("return latest ? projectShapesFingerprint([latest]) === fingerprint : false;");
