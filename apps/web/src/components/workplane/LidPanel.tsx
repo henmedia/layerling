@@ -65,6 +65,19 @@ import {
   lidFlipTopFits,
   lidHandleFits,
   lidLatchesFit,
+  lidStackTopFits,
+  LID_LATCH_STYLES,
+  MAX_LID_BOLT_DIAMETER,
+  MAX_LID_BOLT_PLAY,
+  MAX_LID_BOLT_TRAVEL,
+  MAX_LID_LATCH_LABEL,
+  MAX_LID_SLIDER_PLAY,
+  MAX_LID_SLIDER_WIDTH,
+  MIN_LID_BOLT_DIAMETER,
+  MIN_LID_BOLT_PLAY,
+  MIN_LID_BOLT_TRAVEL,
+  MIN_LID_SLIDER_PLAY,
+  MIN_LID_SLIDER_WIDTH,
   lidNeckDiameter,
   lidNeckFit,
   lidTakesExtras,
@@ -634,6 +647,14 @@ export function LidPanel({
         <span>{t("lid.hinge")}</span>
       </label>
       {!hingeFits && extras && !slide ? <span className="shell-openings-summary">{t("lid.hingeTypeHint")}</span> : null}
+      {/* A stacking top: the lid prints upright with a foot and carries the next stackable box in a tray on top. */}
+      {lidStackTopFits(settings) ? (<>
+        <label className="edge-modifier-field offset-copy">
+          <input type="checkbox" checked={settings.stackTop} disabled={busy} onChange={(event) => onChange({ stackTop: event.target.checked })} />
+          <span>{t("lid.stackTop")}</span>
+        </label>
+        {settings.stackTop ? <span className="shell-openings-summary">{t("lid.stackTopHint")} {t("lid.outcomeUpright")}</span> : null}
+      </>) : null}
       {settings.hinge && hingeFits ? (<>
         {/* Where it sits: behind the back, in the wall (the box keeps its size), or a lid that turns on two pins. */}
         <div className="edge-modifier-field shell-openings" role="radiogroup" aria-label={t("lid.hingeStyle")}>
@@ -758,35 +779,64 @@ export function LidPanel({
         />
         {!latchesFit ? <span className="shell-openings-summary">{t("lid.error.latchLidType")}</span> : null}
         {settings.latches > 0 && latchesFit ? (<>
+          <div className="edge-modifier-field shell-openings" role="radiogroup" aria-label={t("lid.latchStyle")}>
+            <span>{t("lid.latchStyle")}</span>
+            <div className="shell-opening-options">
+              {LID_LATCH_STYLES.map((style) => (
+                <button key={style} type="button" role="radio" aria-checked={settings.latchStyle === style} className={settings.latchStyle === style ? "active" : ""} disabled={busy} onClick={() => onChange({ latchStyle: style })}>
+                  {t(`lid.latchStyle.${style}`)}
+                </button>
+              ))}
+            </div>
+          </div>
           {settings.hinge ? null : (
             <label className="edge-modifier-field offset-copy">
               <input type="checkbox" checked={settings.latchBack} disabled={busy} onChange={(event) => onChange({ latchBack: event.target.checked })} />
               <span>{t("lid.latchBack")}</span>
             </label>
           )}
-          <EdgeModifierSlider
-            label={t("lid.latchWidth")}
-            value={settings.latchWidth}
-            min={MIN_LID_LATCH_WIDTH}
-            max={MAX_LID_LATCH_WIDTH}
-            step={0.5}
-            workspace={workspace}
-            length
-            disabled={busy}
-            onChange={(value) => onChange({ latchWidth: value })}
-          />
-          <EdgeModifierSlider
-            label={t("lid.latchGrip")}
-            value={settings.latchGrip}
-            min={MIN_LID_LATCH_GRIP}
-            max={MAX_LID_LATCH_GRIP}
-            step={0.05}
-            workspace={workspace}
-            length
-            disabled={busy}
-            onChange={(value) => onChange({ latchGrip: value })}
-          />
-          <span className="shell-openings-summary">{t(settings.hinge ? "lid.latchHintHinge" : "lid.latchHint", { pin: millimetres(Math.round(2 * lidLatchMeasures(settings.latchWidth, settings.latchGrip).pin * 10) / 10) })}</span>
+          {settings.latchStyle === "bolt" ? (<>
+            <EdgeModifierSlider label={t("lid.boltDiameter")} value={settings.boltDiameter} min={MIN_LID_BOLT_DIAMETER} max={MAX_LID_BOLT_DIAMETER} step={0.5} workspace={workspace} length disabled={busy} onChange={(value) => onChange({ boltDiameter: value })} />
+            <EdgeModifierSlider label={t("lid.boltTravel")} value={settings.boltTravel} min={MIN_LID_BOLT_TRAVEL} max={MAX_LID_BOLT_TRAVEL} step={0.5} workspace={workspace} length disabled={busy} onChange={(value) => onChange({ boltTravel: value })} />
+            <EdgeModifierSlider label={t("lid.boltPlay")} value={settings.boltPlay} min={MIN_LID_BOLT_PLAY} max={MAX_LID_BOLT_PLAY} step={0.05} workspace={workspace} length disabled={busy} onChange={(value) => onChange({ boltPlay: value })} />
+            <label className="edge-modifier-field lid-latch-label">
+              <span>{t("lid.latchLabel")}</span>
+              <input type="text" value={settings.latchLabel} maxLength={MAX_LID_LATCH_LABEL} disabled={busy} onChange={(event) => onChange({ latchLabel: event.target.value })} />
+            </label>
+            <span className="shell-openings-summary">{t("lid.boltHint")}</span>
+          </>) : settings.latchStyle === "slider" ? (<>
+            <EdgeModifierSlider label={t("lid.sliderWidth")} value={settings.sliderWidth} min={MIN_LID_SLIDER_WIDTH} max={MAX_LID_SLIDER_WIDTH} step={1} workspace={workspace} length disabled={busy} onChange={(value) => onChange({ sliderWidth: value })} />
+            <EdgeModifierSlider label={t("lid.sliderPlay")} value={settings.sliderPlay} min={MIN_LID_SLIDER_PLAY} max={MAX_LID_SLIDER_PLAY} step={0.05} workspace={workspace} length disabled={busy} onChange={(value) => onChange({ sliderPlay: value })} />
+            <label className="edge-modifier-field lid-latch-label">
+              <span>{t("lid.latchLabel")}</span>
+              <input type="text" value={settings.latchLabel} maxLength={MAX_LID_LATCH_LABEL} disabled={busy} onChange={(event) => onChange({ latchLabel: event.target.value })} />
+            </label>
+            <span className="shell-openings-summary">{t("lid.sliderHint")}</span>
+          </>) : (<>
+            <EdgeModifierSlider
+              label={t("lid.latchWidth")}
+              value={settings.latchWidth}
+              min={MIN_LID_LATCH_WIDTH}
+              max={MAX_LID_LATCH_WIDTH}
+              step={0.5}
+              workspace={workspace}
+              length
+              disabled={busy}
+              onChange={(value) => onChange({ latchWidth: value })}
+            />
+            <EdgeModifierSlider
+              label={t("lid.latchGrip")}
+              value={settings.latchGrip}
+              min={MIN_LID_LATCH_GRIP}
+              max={MAX_LID_LATCH_GRIP}
+              step={0.05}
+              workspace={workspace}
+              length
+              disabled={busy}
+              onChange={(value) => onChange({ latchGrip: value })}
+            />
+            <span className="shell-openings-summary">{t(settings.hinge ? "lid.latchHintHinge" : "lid.latchHint", { pin: millimetres(Math.round(2 * lidLatchMeasures(settings.latchWidth, settings.latchGrip).pin * 10) / 10) })}</span>
+          </>)}
         </>) : null}
       </>) : null}
 

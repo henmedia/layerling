@@ -1,10 +1,12 @@
 /// <reference lib="webworker" />
 
+import { splitBoltForShape, type BoltSplitOptions } from "@/lib/boltSplit";
 import { buildMessage } from "@/lib/buildStamp";
 import { checkClearance, type ClearanceOptions } from "@/lib/clearanceCheck";
 import { articulateShapes, type FlexiOptions } from "@/lib/flexiJoints";
 import { lidForShapes, lidTopForShapes, type LidOptions } from "@/lib/lidTool";
 import { checkPrint, type PrintCheckOptions } from "@/lib/printCheck";
+import { checkLayers, type LayerCheckOptions } from "@/lib/layerCheck";
 import { buildGroupedShapeFromSelection, exportSolidVolume, faceReadPositions, previewSplitConnectors, splitShapeIfCrossed } from "@/lib/editorBooleans";
 import { getManifoldRuntime, setManifoldAssetBase } from "@/lib/editorMeshCore";
 import { packValue, packedTransfer, unpackValue } from "@/lib/geometryTransfer";
@@ -57,9 +59,24 @@ self.onmessage = async (event: MessageEvent<GeometryWorkerRequest>) => {
     } else if (request.task === "printCheck") {
       const { source, options } = args as { source: WorkplaneShape[]; options: Partial<PrintCheckOptions> };
       result = await checkPrint(source, options);
+    } else if (request.task === "layerCheck") {
+      // Says how far it got, at most every 100 ms, so the panel's bar moves.
+      const { source, options } = args as { source: WorkplaneShape[]; options: Partial<LayerCheckOptions> };
+      let told = 0;
+      result = await checkLayers(source, options, {
+        progress: (fraction) => {
+          const now = Date.now();
+          if (now - told < 100 && fraction < 1) return;
+          told = now;
+          post({ requestId: request.requestId, progress: fraction });
+        },
+      });
     } else if (request.task === "lid") {
       const { targets, options } = args as { targets: WorkplaneShape[]; options: LidOptions };
       result = await lidForShapes(targets, options);
+    } else if (request.task === "boltSplit") {
+      const { shape, options } = args as { shape: WorkplaneShape; options: Partial<BoltSplitOptions> };
+      result = await splitBoltForShape(shape, options);
     } else if (request.task === "lidTop") {
       const { targets } = args as { targets: WorkplaneShape[] };
       result = await lidTopForShapes(targets);

@@ -3,7 +3,7 @@ import type { PreparedImportedMeshDisplay } from "@/lib/importedMeshDisplay";
 import type { WorkplaneShape } from "@/types/layerling";
 
 /** What the page asks the geometry worker (workers/geometry.worker.ts) to work out. */
-export type GeometryTask = "group" | "split" | "splitConnectors" | "stl" | "obj" | "step" | "stepExport" | "estimate" | "simplify" | "face" | "flexi" | "lid" | "lidTop" | "clearance" | "printCheck" | "warm";
+export type GeometryTask = "group" | "split" | "splitConnectors" | "stl" | "obj" | "step" | "stepExport" | "estimate" | "simplify" | "face" | "flexi" | "lid" | "lidTop" | "boltSplit" | "clearance" | "printCheck" | "layerCheck" | "warm";
 
 export interface GeometryWorkerRequest {
   requestId: number;
@@ -26,7 +26,9 @@ export type GeometryWorkerResponse =
     /** The view's geometry for each of resultMeshes(task, result), in that order (lib/importedMeshDisplay.ts). */
     displays: Array<PreparedImportedMeshDisplay | null>;
   }
-  | { requestId: number; ok: false; message: string; name: string };
+  | { requestId: number; ok: false; message: string; name: string }
+  /** How far a long task got (0 to 1), sent now and then before its answer; the layer check sends it. */
+  | { requestId: number; progress: number };
 
 type ImportedMesh = NonNullable<WorkplaneShape["importedMesh"]>;
 
@@ -36,6 +38,7 @@ export function resultMeshes(task: GeometryTask, result: unknown): Array<Importe
   if (task === "group") return [(result as { group?: WorkplaneShape | null }).group?.importedMesh];
   if (task === "split") return ((result as { parts?: WorkplaneShape[] | null }).parts ?? []).map((part) => part.importedMesh);
   if (task === "flexi") return ((result as { links?: WorkplaneShape[] | null }).links ?? []).map((link) => link.importedMesh);
+  if (task === "boltSplit") return ((result as { parts?: WorkplaneShape[] | null }).parts ?? []).map((part) => part.importedMesh);
   if (task === "lid") {
     const made = result as { lid?: WorkplaneShape | null; magnets?: { posts?: WorkplaneShape[] } };
     return [made.lid?.importedMesh, ...(made.magnets?.posts ?? []).map((post) => post.importedMesh)];

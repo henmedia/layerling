@@ -146,6 +146,8 @@ AI:n arbetar med samma funktioner som du, via samma väg som din användning i r
 | `layerling_check_clearance` | kontrollerar före utskrift vilka delar som överlappar, nuddar varandra eller kommer närmare än ett minsta mellanrum (Kontrollera spelrum), även de lösa delarna i ett och samma objekt |
 | `layerling_printer_play` | läser av, ställer in eller rensar skrivarens spel ({{ui:workspace.printerPlay}} i inställningarna) och placerar passningstestet som mäter upp det |
 | `layerling_check_print` | kontrollerar före utskrift vad som skulle gå fel: väggar som är för tunna för munstycket, svävande delar, för liten kontaktyta mot plattan, överhäng och öppna nät (Utskriftskontroll) |
+| `layerling_check_layers` | delar utskriften i lager och listar lager för lager vad som skulle gå fel: överhäng, ställen utan stöd, broar, tunna väggar, små öar, en del i bädden (Utskriftsanalys) |
+| `layerling_split_bolt` | delar en skruv eller gängstång på längden genom axeln och lägger båda halvorna på snittytan för utskrift, valfritt med styrpinnar |
 | `layerling_add_reference_points` | markerar referenspunkter – på objekts mittpunkt, hörn eller kanters mittpunkter, eller vid exakta koordinater – som former fäster mot |
 | `layerling_list_reference_points` | listar referenspunkterna med sina id:n och positioner |
 | `layerling_remove_reference_points` | tar bort referenspunkter efter id, eller alla tillsammans |
