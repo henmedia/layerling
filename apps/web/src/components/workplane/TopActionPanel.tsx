@@ -48,6 +48,7 @@ export function TopActionPanel({
   onExport,
   stlFileName = null,
   onExportLyl,
+  lylSelectedCount = 0,
   onExportStep,
   onExportDrawing,
   drawingExporting,
@@ -88,7 +89,9 @@ export function TopActionPanel({
   onExport: (format: DirectExportFormat, exportName: string, chooseFile?: boolean, svgView?: SvgExportView, toServer?: boolean, bridges?: StencilBridgeOptions | null) => void;
   /** The STL file this design exports into, once one was chosen (Chrome and Edge). */
   stlFileName?: string | null;
-  onExportLyl: (exportName: string, historyLimit: LylHistoryLimit, target?: LylExportTarget) => void;
+  onExportLyl: (exportName: string, historyLimit: LylHistoryLimit, target?: LylExportTarget, selectedOnly?: boolean) => void;
+  /** How many objects are selected for the .lyl's "Selected only" choice; 0 offers only the whole design. */
+  lylSelectedCount?: number;
   onExportStep: (exportName: string, toServer?: boolean) => void;
   onExportDrawing: (exportName: string, format: "svg" | "pdf", toServer?: boolean) => void;
   drawingExporting: boolean;
@@ -145,6 +148,10 @@ export function TopActionPanel({
   // Starts at the history setting from the workspace settings, so a project
   // file carries what the editor keeps unless it is changed here.
   const [lylHistoryLimit, setLylHistoryLimit] = useState<LylHistoryLimit>(workspaceHistoryLimit);
+  // The whole design (as before) or only the selected objects, as a design of their own; with nothing selected only
+  // the whole design is there to save.
+  const [lylScopeChoice, setLylScopeChoice] = useState<"all" | "selected">("all");
+  const lylSelectedOnly = lylScopeChoice === "selected" && lylSelectedCount > 0;
   useEffect(() => setLylHistoryLimit(workspaceHistoryLimit), [workspaceHistoryLimit]);
   // A name that is still the one suggested follows a new suggestion; a typed one stays.
   useEffect(() => {
@@ -299,7 +306,7 @@ export function TopActionPanel({
     if (exportFormat === "drawing") onExportDrawing(exportName, drawingFormat, toServer);
     else if (exportFormat === "step") onExportStep(exportName, toServer);
     else if (exportFormat === "png") onExportImage(exportName, imageOptions, toServer);
-    else if (exportFormat === "lyl") onExportLyl(exportName, lylHistoryLimit, lylFileAccessSupported() ? "fileAs" : "download");
+    else if (exportFormat === "lyl") onExportLyl(exportName, lylHistoryLimit, lylFileAccessSupported() ? "fileAs" : "download", lylSelectedOnly);
     else {
       const view = exportFormat === "dxf" ? dxfView : svgView;
       // Bridges go into a cut outline: the DXF, or the SVG's silhouette.
@@ -443,7 +450,7 @@ export function TopActionPanel({
                 <strong>{t("export.format")}</strong>
               </div>
               <span className="export-scope-badge">{exportFormat === "lyl"
-                  ? t("export.fullProject")
+                  ? lylSelectedOnly ? t("export.lylSelectedBadge", { count: lylSelectedCount }) : t("export.fullProject")
                   : exportFormat === "png"
                   ? t("export.png.scope")
                   : t(scopeLabel === "selected" ? "export.scopeSelected" : "export.scopeTotal", { count: shapeCount })}</span>
@@ -643,6 +650,36 @@ export function TopActionPanel({
           ) : null}
 
           {exportFormat === "lyl" ? (
+            <section className="export-setting-section lyl-scope-section">
+              <div className="export-section-heading">
+                <div>
+                  <strong>{t("export.lylScope")}</strong>
+                  <span>{lylSelectedCount > 0 ? t("export.lylScopeHint") : t("export.lylScopeNoSelection")}</span>
+                </div>
+              </div>
+              <div className="shell-opening-options" role="radiogroup" aria-label={t("export.lylScope")}>
+                {(["all", "selected"] as const).map((option) => {
+                  const active = option === "selected" ? lylSelectedOnly : !lylSelectedOnly;
+                  return (
+                    <button
+                      key={option}
+                      type="button"
+                      role="radio"
+                      aria-checked={active}
+                      className={active ? "active" : ""}
+                      disabled={option === "selected" && lylSelectedCount === 0}
+                      onClick={() => setLylScopeChoice(option)}
+                    >
+                      {option === "all" ? t("export.fullProject") : t("export.lylSelectedOption", { count: lylSelectedCount })}
+                    </button>
+                  );
+                })}
+              </div>
+              {lylSelectedOnly ? <p className="export-plate-scope-hint">{t("export.lylSelectedNote")}</p> : null}
+            </section>
+          ) : null}
+
+          {exportFormat === "lyl" && !lylSelectedOnly ? (
             <section className="export-setting-section lyl-history-section">
               <div className="export-section-heading">
                 <div>
@@ -703,7 +740,7 @@ export function TopActionPanel({
                 <button
                   className="export-shared-button"
                   type="button"
-                  onClick={() => onExportLyl(exportName, lylHistoryLimit, "shared")}
+                  onClick={() => onExportLyl(exportName, lylHistoryLimit, "shared", lylSelectedOnly)}
                   disabled={lylExporting || stepExporting || drawingExporting}
                 >
                   <CloudUpload />

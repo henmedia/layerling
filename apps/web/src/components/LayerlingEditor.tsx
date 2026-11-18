@@ -503,7 +503,7 @@ declare global {
     __layerlingBooleanTest?: BooleanAutomationResult;
     __layerlingBooleanTestImage?: string;
     layerlingCaptureCanvas?: () => string;
-    layerlingCaptureCanvasAsync?: () => Promise<string>;
+    layerlingCaptureCanvasAsync?: (onlyIds?: readonly string[]) => Promise<string>;
     layerlingCaptureView?: (face?: LayerlingMcpViewFace) => Promise<string> | string;
     /** The section view for MCP: applies what is given, returns the settings it ends on and the plane's range. */
     layerlingSectionView?: (patch: Partial<SectionPlaneSettings> & { center?: boolean; cutFace?: SectionCutFace }) => { settings: SectionPlaneSettings; bounds: { min: number; max: number; center: number }; cutFace: SectionCutFace };
@@ -3037,9 +3037,9 @@ const COOKIE_CUTTER_SETTINGS_STORAGE_KEY = "layerling.cookieCutterSettings";
  * The picture of the design as its card shows it, for the file it is saved in (#1226), or "" when the view cannot give
  * one: a view of no size (a hidden tab) throws at once. The file then goes without it; saving never fails over it.
  */
-async function capturedDesignPicture(): Promise<string> {
+async function capturedDesignPicture(onlyIds?: readonly string[]): Promise<string> {
   try {
-    return (await window.layerlingCaptureCanvasAsync?.()) ?? "";
+    return (await window.layerlingCaptureCanvasAsync?.(onlyIds)) ?? "";
   } catch {
     return "";
   }
@@ -18534,8 +18534,17 @@ export function LayerlingEditor({
     }
   }, [deliverExportFile, exportSource, projectName, stepExporting]);
 
-  const exportLylDesign = useCallback(async (exportName: string, historyLimit: LylHistoryLimit, target: LylExportTarget = "download") => {
+  const exportLylDesign = useCallback(async (exportName: string, historyLimit: LylHistoryLimit, target: LylExportTarget = "download", selectedOnly = false) => {
     if (lylExporting) return;
+    // Only the selected objects, as a design of their own: without the rest, its history, notes or files, and never
+    // tied to this design's file, so Ctrl+S still saves the whole design where it saved it before. Ctrl+S and the
+    // History view always write the whole design.
+    const partIds = selectedOnly && target !== "file" && !historyViewStateRef.current ? new Set(selectedIdsRef.current) : null;
+    const partShapes = partIds ? shapesRef.current.filter((shape) => partIds.has(shape.id)) : null;
+    if (partIds && !partShapes?.length) {
+      setNotice(t("export.lylSelectedNone"), true);
+      return;
+    }
     if (target === "shared" && !onSaveSharedProject) {
       setNotice(t("status.sharedUnavailable"), true);
       return;
@@ -18562,6 +18571,7 @@ export function LayerlingEditor({
           }
           if (!fileHandle) {
             fileHandle = await pickLylFileToSave(projectExportFileName(exportName, "lyl"));
+            // A part saved on its own is a new design in that file: this one stays tied to its own.
             pickedNewFile = true;
           }
           // The backup folder may need the browser's permission again after a reload, and it is asked only while
@@ -18589,7 +18599,7 @@ export function LayerlingEditor({
     setNotice(target === "shared" ? t("status.packagingShared") : t("status.packagingProject"));
     try {
       // Every file carries the picture of the design for other programs to show (#1226); the server needs it.
-      const thumbnailDataUrl = await capturedDesignPicture();
+      const thumbnailDataUrl = await capturedDesignPicture(partShapes?.map((shape) => shape.id));
       if (target === "shared" && (!thumbnailDataUrl.startsWith("data:image/png;base64,") || thumbnailDataUrl.length <= 100)) {
         throw new Error("Could not capture the current project preview");
       }
@@ -18601,8 +18611,27 @@ export function LayerlingEditor({
         : editorHistoryForExport(historyRef.current, historyIndexRef.current, historyLimit);
       // A design written to the server under another name carries that name inside too, or it
       // would open under the old one while the overview shows the file name (#265).
-      const packageName = target === "shared" ? exportName.trim().replace(/\.(lyl|skf)$/i, "") || projectName : projectName;
-      const bytes = await exportLylProject({
+      const packageName = target === "shared" || partShapes ? exportName.trim().replace(/\.(lyl|skf)$/i, "") || projectName : projectName;
+      const now = Date.now();
+      const bytes = await exportLylProject(partShapes ? {
+        // A new design: no id of its own yet, so opening it never takes the place of this one.
+        projectName: packageName,
+        createdAt: now,
+        modifiedAt: now,
+        extraFiles: lylThumbnailFiles(await projectThumbnailPngBytes(thumbnailDataUrl)),
+        shapes: partShapes,
+        notes: [],
+        history: [],
+        historyIndex: 0,
+        // Only the sources the selected objects use go in (the archive keeps the referenced ones).
+        assets: projectAssetsRef.current,
+        attachments: [],
+        workspace: workspaceSettingsRef.current,
+        snapGrid,
+        placementElevation,
+        placementWorkplane,
+        sketchPlacementWorkplane: placementWorkplane,
+      } : {
         projectId: projectInfoRef.current.projectId,
         projectName: packageName,
         createdAt: projectCreatedAt,
@@ -18625,19 +18654,19 @@ export function LayerlingEditor({
       } else if (fileHandle) {
         // The file as it is on the disk stays as a backup before it is written over; a backup that fails does not
         // stop the save.
-        const backup = await backupFileBeforeOverwrite(fileHandle, { projectId: projectId || null, projectName });
+        const backup = await backupFileBeforeOverwrite(fileHandle, partShapes ? { projectId: null, projectName: packageName } : { projectId: projectId || null, projectName });
         try {
           await writeLylFile(fileHandle, bytes);
         } catch {
           // The file may be gone, moved or locked: the next Save asks for one again.
-          forgetLylFile(projectId);
+          if (!partShapes) forgetLylFile(projectId);
           throw new Error(t("status.saveFileFailed", { name: fileHandle.name }));
         }
-        rememberLylFile(projectId, fileHandle);
+        if (!partShapes) rememberLylFile(projectId, fileHandle);
         // A different name typed into the file dialog may be on purpose (a version, a date), so
         // the draft only takes it on a click (#1035).
         const fileStem = fileHandle.name.replace(/\.(lyl|skf)$/i, "").trim();
-        const offerRename = pickedNewFile && onProjectNameChange && fileStem
+        const offerRename = !partShapes && pickedNewFile && onProjectNameChange && fileStem
           && fileHandle.name !== projectExportFileName(projectName, "lyl");
         const backupNote = backup.failed
           ? t("status.previousVersionNotKept")
@@ -18647,7 +18676,7 @@ export function LayerlingEditor({
         const folderNote = backup.folder === "noPermission"
           ? t("status.backupFolderNeedsPermission")
           : backup.folder === "failed" ? t("status.backupFolderFailed") : "";
-        const savedText = [t("status.savedToFile", { name: fileHandle.name }), backupNote, folderNote].filter(Boolean).join(" ");
+        const savedText = [t(partShapes ? "status.savedSelectedToFile" : "status.savedToFile", { name: fileHandle.name, count: partShapes?.length ?? 0 }), backupNote, folderNote].filter(Boolean).join(" ");
         setNotice(
           savedText,
           Boolean(offerRename) || Boolean(folderNote),
@@ -18667,7 +18696,7 @@ export function LayerlingEditor({
       } else {
         const buffer = bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength) as ArrayBuffer;
         await downloadBlobFile(projectExportFileName(exportName, "lyl"), new Blob([buffer], { type: LYL_MEDIA_TYPE }));
-        setNotice(t("status.savedProject"));
+        setNotice(partShapes ? t("status.savedSelectedProject", { count: partShapes.length }) : t("status.savedProject"));
       }
       setTopPanel(null);
     } catch (error) {
@@ -21329,6 +21358,7 @@ export function LayerlingEditor({
           onExport={(format, exportName, chooseFile, svgView, toServer, bridges) => void exportDesign(format, exportName, chooseFile, svgView, toServer, bridges)}
           stlFileName={topPanel === "export" && !workspaceSettings.stlAsDownload ? linkedStlFile(projectId ?? "")?.name ?? null : null}
           onExportLyl={exportLylDesign}
+          lylSelectedCount={exportSelectionScoped ? selectedShapes.length : 0}
           onExportStep={exportStepDesign}
           onExportDrawing={exportDrawingDesign}
           drawingExporting={drawingExporting}

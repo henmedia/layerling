@@ -535,7 +535,7 @@ declare global {
       get: () => ViewportPerfStats;
     };
     layerlingCaptureCanvas?: () => string;
-    layerlingCaptureCanvasAsync?: () => Promise<string>;
+    layerlingCaptureCanvasAsync?: (onlyIds?: readonly string[]) => Promise<string>;
     layerlingCaptureView?: (face?: LayerlingMcpViewFace) => Promise<string> | string;
     layerlingCaptureImage?: (options?: { plate?: boolean; transparent?: boolean; scale?: number }) => string;
     /** The section view for MCP: applies what is given, returns the settings it ends on and the plane's range. */
@@ -3325,7 +3325,17 @@ export function WorkplaneViewport({
     // The preview of a design (the cards of the overview, the server copy) shows all its bodies, framed, from the side
     // the view looks from: not the screen as it stands, which is a close-up or a speck on the plate, depending on how far
     // in or out the work was done. The camera is put back at once; the screen is not shown in between.
-    window.layerlingCaptureCanvasAsync = () => {
+    // With ids (a .lyl of only the selected objects) the picture shows just those: the others are left out for it.
+    window.layerlingCaptureCanvasAsync = async (onlyIds?: readonly string[]) => {
+      const only = onlyIds?.length ? new Set(onlyIds) : null;
+      const leftOut: THREE.Object3D[] = [];
+      if (only) {
+        state.shapeRecords.forEach((record, id) => {
+          if (only.has(id) || !record.object.visible) return;
+          record.object.visible = false;
+          leftOut.push(record.object);
+        });
+      }
       const bounds = selectionBounds(state, [...state.shapeRecords.keys()].filter((id) => state.shapeRecords.get(id)?.object.visible));
       const saved = bounds
         ? { position: state.camera.position.clone(), target: state.controls.target.clone(), up: state.camera.up.clone(), zoom: state.camera.zoom, reach: state.focusReach, turn: state.cameraTurn }
@@ -3337,6 +3347,8 @@ export function WorkplaneViewport({
       state.camera.updateMatrixWorld();
       renderFrame(state);
       const picture = thumbnailPngDataUrl(state.renderer.domElement);
+      leftOut.forEach((object) => { object.visible = true; });
+      if (leftOut.length) state.needsRender = true;
       if (saved) {
         state.camera.position.copy(saved.position);
         state.controls.target.copy(saved.target);
