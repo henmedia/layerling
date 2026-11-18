@@ -163,6 +163,17 @@ Umetna inteligenca lahko isto naredi prek vmesnika MCP, z `layerling_perforate_f
 
 Na plošči ali pokrovu z zarezami ob straneh {{ui:holePattern.arrangement.perimeter}} razporedi luknje neenakomerno. Zato ima {{ui:holePattern.title}} poleg {{ui:holePattern.mode.pattern}} še drugi zavihek, {{ui:holePattern.mode.mounting}}: luknje postavi v vogale najmanjšega pravokotnika okoli izbrane ploskve, v enaki razdalji od njegovih stranic, tudi na zasukani ali zarezani plošči. {{ui:holePattern.mounting.distance}} se meri do roba luknje, vključno z glavo vijaka, ali z {{ui:holePattern.mounting.toCenter}} do njenega središča. Z {{ui:holePattern.mounting.count}} gredo štiri v vogale, ostale pa v parih, enakomerno razporejene ob stranicah, na primer za vodotesen pokrov. Na okrogli ploskvi, na primer na pokrovu okrogle škatle, se enakomerno razporedijo po krogu, tri ali več. Vrsta in mere lukenj so enake kot pri vzorcu: navadna, z valjastim ali stožčastim povrtanjem, skoznja ali do globine. Nastanejo kot navadne oblike lukenj, združene s telesom v skupino, zato nanje deluje tudi {{ui:inspector.groupHoleDiameter}} skupine.
 
+## Luknja za navojno vložko
+
+Vtaljiva navojna vložka se s spajkalnikom vtisne v plastični del in vijakom da navoj, ki se ne obrabi. {{ui:threadInsert.title}} naredi luknjo zanjo, kamor klikneš, in ti najprej pove, ali ima telo tam dovolj materiala. Izberi natanko eno telo in v skupini {{ui:editor.section.mirrorPattern}} orodne vrstice klikni {{ui:threadInsert.title}}, tik ob polju lukenj. Lahko tudi z desnim gumbom klikneš na telo ali pritisneš [[Ctrl]]+[[K]].
+
+1. V oknu izberi {{ui:threadInsert.size}}: od M2 do M8, kratke M3, M4 in M5 ali 1/4-20. Pri {{ui:threadInsert.custom}} vneseš premer luknje in dolžino vložke; stena, ki mora ostati okoli luknje, sledi iz premera. Okno pokaže premer in globino luknje ter to steno.
+2. Klikni mesto na telesu. Gre ravna ploskev, pa tudi zunanja stena valja ali cevi; vsaka druga krivulja je zavrnjena z opombo. Obroč kaže luknjo: zelen tam, kjer ima telo steno ob luknji in globino za njo, ki ju vložka potrebuje, rdeč tam, kjer eno od obeh manjka. Rdeči pove, katera in za koliko, ter kako široko mora biti telo okoli luknje.
+3. Obroč premakneš tako, da povlečeš čez telo, ali pa pod {{ui:threadInsert.position}} vneseš razdaljo od levega in spodnjega roba ravne ploskve. {{ui:threadInsert.center}} ga postavi na sredino ploskve, ki jo kaže vijolična oznaka. Po vsakem premiku se znova izmeri.
+4. {{ui:threadInsert.repick}} izbere drugo mesto, [[Esc]] pa zapre orodje. Šele {{ui:threadInsert.apply}} naredi luknjo, in to samo tam, kjer je obroč zelen.
+
+Luknja je navadna oblika luknje, združena s telesom, kakor luknje polja lukenj, jedro CAD pa jo izreže kot pravi valj, zato je izvrtina natančna. {{ui:editor.tool.ungroup}} jo spet osvobodi. Globoka je toliko, kolikor je dolga vložka, in malo moli iz ploskve, da se čisto odpre. Umetna inteligenca lahko isto naredi prek vmesnika MCP z `layerling_thread_insert` (glej poglavje [Umetna inteligenca z MCP](chapter:ai-z-mcp)).
+
 ## Vlečenje ploskve navzven ali navznoter
 
 Za debelejšo steno, dvignjeno ploščico na ploskvi ali vanjo izrezan žep orodje {{ui:faceTool.title}} dela na eni ravni ploskvi. Deluje tudi na uvoženem STL, ki nima skice za spreminjanje. Izberi natanko eno telo in v skupini {{ui:editor.section.mirrorPattern}} orodne vrstice klikni {{ui:faceTool.title}}, tik ob vzorcu lukenj. Lahko tudi z desnim gumbom klikneš na telo ali ga poiščeš s [[Ctrl]]+[[K]].
