@@ -23,7 +23,7 @@ layerling 里的每个零件都从一个形状开始。用这些形状，你可�
 
 - **{{ui:library.section.basic}}：** {{ui:shape.box}}、{{ui:shape.roundedBox}}、{{ui:shape.cylinder}}、{{ui:shape.slot}}、{{ui:shape.ellipse}}、{{ui:shape.polygon}}（三到二十四条边）、{{ui:shape.wedge}}、{{ui:shape.sphere}}、{{ui:shape.cone}}、{{ui:shape.curvedCone}}（侧面向内弯成像伪球面那样的喇叭形，或向外鼓成圆顶；由 {{ui:prop.curvedConeTop}} 和 {{ui:prop.curvedConeBend}} 设置，并且像所有精确实体一样可以抽壳和倒圆角）、{{ui:shape.pyramid}}（三到二十四条边，因此也有三棱锥）、{{ui:shape.roundRoof}}、{{ui:shape.halfSphere}}、{{ui:shape.paraboloid}}（收窄成圆头的穹顶，高度随离轴距离的平方下降）和 {{ui:shape.torus}}。
 - **{{ui:library.section.vessels}}：** 从一个轮廓过渡到另一个轮廓的 {{ui:shape.loft}}，比如从方形到圆形，{{ui:shape.tube}}，由最多十二段直管及之间的弯头组成的 {{ui:shape.bentTube}}，以及 {{ui:shape.vase}}。
-- **{{ui:library.section.holes}}：** 用于螺钉头的 {{ui:shape.counterbore}} 和 {{ui:shape.countersink}}、用于水平孔的 {{ui:shape.teardrop}}，以及用于 USB、HDMI、DisplayPort 和 RJ45 插座的 {{ui:shape.port}}。
+- **{{ui:library.section.holes}}：** 用于螺钉头的 {{ui:shape.counterbore}} 和 {{ui:shape.countersink}}、用于水平孔的 {{ui:shape.teardrop}}，以及用于 USB、HDMI、DisplayPort 和 RJ45 插座的 {{ui:shape.port}}。 {{ui:threadInsert.title}} 在你选中的实体上打出热熔嵌件的孔；它不能拖入设计。
 - **{{ui:library.section.connections}}：** {{ui:shape.thread}}（螺杆、螺钉、螺母和螺纹孔）、沉头螺钉下的 {{ui:shape.finishingWasher}}、一体打印的 {{ui:shape.hinge}} 和 {{ui:shape.dovetail}}。更多见[螺纹与机械件](chapter:threads-and-mechanics)。
 - **{{ui:library.section.enclosure}}：** 用于热熔螺母和自攻螺钉的 {{ui:shape.screwBoss}}、带卡座的 {{ui:shape.snapFit}}，以及 {{ui:shape.rib}} 或角撑板。更多见[螺纹与机械件](chapter:threads-and-mechanics)。
 - **{{ui:library.section.mechanics}}：** {{ui:shape.spring}}、{{ui:shape.gear}}、{{ui:shape.hirth}} 和 {{ui:shape.pulley}}。

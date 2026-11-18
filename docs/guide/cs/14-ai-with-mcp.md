@@ -116,6 +116,7 @@ AI používá stejné funkce a stejné zpracování příkazů jako ruční ovl�
 | `layerling_cookie_cutter` | makes a cookie cutter from the objects: a wall and a rim round the outline (Cookie cutter) |
 | `layerling_flexi_joints` | cuts a flat body into links with joints printed in place that swing to the sides (Flexi joints) |
 | `layerling_make_lid` | makes a lid for a body open at the top: pushed in, over the top or flat, with the fit you choose and magnets if you like (Lid) |
+| `layerling_make_mold` | makes a mold or a die from a master: a two-part mold to cast in, a silicone pour box, an open mold, or a stamp and die for sheet (Mold & die) |
 | `layerling_make_cable_channel` | runs a round channel for a cable through a body from an entry to an exit, finding the way itself with gentle bends (Cable channel) |
 | `layerling_loft_sketches` | joins two sketch bodies into a loft from one outline to the other (Loft sketches) |
 | `layerling_separate_parts` | rozdělí tvar na jeho nespojené části, těleso z náčrtu na jedno těleso za každý obrys |
@@ -142,6 +143,8 @@ AI používá stejné funkce a stejné zpracování příkazů jako ruční ovl�
 | `layerling_check_clearance` | před tiskem zkontroluje, které díly se překrývají, dotýkají nebo jsou blíž než minimální vůle (Zkontrolovat vůli), i oddělené díly jednoho objektu |
 | `layerling_printer_play` | načte, nastaví nebo smaže vůli tiskárny ({{ui:workspace.printerPlay}} v nastavení) a položí test vůle, který ji změří |
 | `layerling_check_print` | před tiskem zkontroluje, co by se pokazilo: příliš tenké stěny pro trysku, díly ve vzduchu, malou opěru na podložce, převisy a otevřené sítě (Zkontrolovat tisk) |
+| `layerling_check_layers` | rozřeže tisk na vrstvy a po vrstvách vypíše, co by se pokazilo: převisy, místa bez opory, mosty, tenké stěny, malé ostrůvky, díl v podložce (Analýza tisku) |
+| `layerling_split_bolt` | rozdělí šroub nebo závitovou tyč podélně osou a položí obě poloviny na řezné plochy k tisku, volitelně se středicími kolíky |
 | `layerling_add_reference_points` | vytvoří referenční body na středech, rozích, středech hran nebo zadaných souřadnicích |
 | `layerling_list_reference_points` | vypíše referenční body s identifikátory a polohami |
 | `layerling_remove_reference_points` | odstraní vybrané nebo všechny referenční body |

@@ -116,6 +116,7 @@ De AI werkt met dezelfde functies als jij, via dezelfde weg als jouw bediening i
 | `layerling_cookie_cutter` | makes a cookie cutter from the objects: a wall and a rim round the outline (Cookie cutter) |
 | `layerling_flexi_joints` | cuts a flat body into links with joints printed in place that swing to the sides (Flexi joints) |
 | `layerling_make_lid` | makes a lid for a body open at the top: pushed in, over the top or flat, with the fit you choose and magnets if you like (Lid) |
+| `layerling_make_mold` | makes a mold or a die from a master: a two-part mold to cast in, a silicone pour box, an open mold, or a stamp and die for sheet (Mold & die) |
 | `layerling_make_cable_channel` | runs a round channel for a cable through a body from an entry to an exit, finding the way itself with gentle bends (Cable channel) |
 | `layerling_loft_sketches` | joins two sketch bodies into a loft from one outline to the other (Loft sketches) |
 | `layerling_separate_parts` | splitst een vorm in zijn losse delen, een schetslichaam in één lichaam per omtrek |
@@ -142,6 +143,8 @@ De AI werkt met dezelfde functies als jij, via dezelfde weg als jouw bediening i
 | `layerling_check_clearance` | controleert vóór het printen welke onderdelen overlappen, elkaar raken of dichter bij elkaar komen dan een minimale speling (Speling controleren), ook de losse delen van één object |
 | `layerling_printer_play` | leest, zet of wist de speling van de printer ({{ui:workspace.printerPlay}} in de instellingen) en legt de pastest neer die hem meet |
 | `layerling_check_print` | controleert vóór het printen wat er mis zou gaan: te dunne wanden voor de nozzle, zwevende delen, weinig houvast op de plaat, overhangen en open meshes (Print controleren) |
+| `layerling_check_layers` | snijdt de print in lagen en geeft per laag wat er mis zou gaan: overhangen, plekken zonder steun, bruggen, dunne wanden, kleine eilanden, een deel in het bed (Printanalyse) |
+| `layerling_split_bolt` | deelt een schroef of draadeind in de lengte door de as en legt beide helften op hun snijvlak om te printen, desgewenst met centreerpennen |
 | `layerling_add_reference_points` | markeert referentiepunten - op het midden, de hoeken of de randmiddens van objecten, of op exacte posities - waarop vormen snappen |
 | `layerling_list_reference_points` | somt de referentiepunten op met hun id's en posities |
 | `layerling_remove_reference_points` | verwijdert referentiepunten op id, of allemaal |

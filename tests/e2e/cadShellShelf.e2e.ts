@@ -3,6 +3,7 @@ import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
 import { OcctKernel, type ShapeHandle } from "occt-wasm";
 import { shellSolid } from "@/lib/cadShell";
+import { shellGridSolid } from "@/lib/cadShellGrid";
 import { shellStackSolid } from "@/lib/cadShellStack";
 import { SHELF_FAILED_MESSAGE, SHELF_HEIGHT_MESSAGE, SHELF_NEEDS_TOP_MESSAGE, SHELF_NOT_STRAIGHT_MESSAGE, shellShelfSolid } from "@/lib/cadShellShelf";
 
@@ -72,13 +73,18 @@ describe("a shelf ledge in a hollowed box with the real OCCT kernel", () => {
     expect(kernel.getVolume(shelf) - before).toBeCloseTo(ring, 0);
   });
 
-  it("goes together with stacking, the collar built round the ledge", () => {
-    const shelf = shellShelfSolid(kernel, hollowBox(), 1.5, 20, 2);
-    const stacked = shellStackSolid(kernel, shelf, 3, 2);
+  it("goes together with the stacking foot and with a Gridfinity floor", () => {
+    const solid = yUp(kernel.makeBox(100, 60, 40));
+    const hollow = shellSolid(kernel, solid, 2, "top");
+    const shelf = shellShelfSolid(kernel, hollow, 1.5, 20, 2);
+    const withoutShelf = shellStackSolid(kernel, hollow, 3, 2, solid);
+    const stacked = shellStackSolid(kernel, shelf, 3, 2, solid);
     expect(kernel.isValid(stacked)).toBe(true);
     expect(kernel.getSubShapes(stacked, "solid")).toHaveLength(1);
-    const above = kernel.translate(stacked, 0, 40, 0);
-    expect(kernel.getVolume(kernel.common(stacked, above))).toBeLessThan(1e-6);
+    expect(kernel.getVolume(stacked)).toBeGreaterThan(kernel.getVolume(withoutShelf) + 1);
+    const floored = shellGridSolid(kernel, solid, shelf, { cells: 2, fit: false }, 0);
+    expect(kernel.isValid(floored)).toBe(true);
+    expect(kernel.getSubShapes(floored, "solid")).toHaveLength(1);
   });
 
   it("says why it cannot", () => {

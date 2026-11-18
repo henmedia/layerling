@@ -120,6 +120,7 @@ Die KI arbeitet mit denselben Funktionen wie du, sie läuft über denselben Weg 
 | `layerling_cookie_cutter` | baut aus den Objekten eine Ausstechform: Wand mit Schneidkante und Rand um den gespiegelten Umriss (Ausstechform) |
 | `layerling_flexi_joints` | teilt einen flachen Körper in Glieder mit mitgedruckten Gelenken, die zur Seite schwenken (Flexi-Gelenke) |
 | `layerling_make_lid` | macht einen Deckel für einen oben offenen Körper: eingesteckt, übergestülpt oder flach, mit wählbarer Passung und auf Wunsch mit Magneten (Deckel) |
+| `layerling_make_mold` | macht aus einem Urmodell eine Gussform oder einen Prägestempel mit Matrize: zweiteilige Form, Silikon-Gießrahmen, offene Form oder Stempel und Matrize (Gussform & Stanze) |
 | `layerling_make_cable_channel` | legt einen runden Kanal für ein Kabel durch einen Körper, von einem Eingang zu einem Ausgang, und sucht den Weg mit sanften Bögen selbst (Kabelkanal) |
 | `layerling_loft_sketches` | verbindet zwei Skizzenkörper zu einem Übergang von einem Umriss zum anderen (Übergang aus Skizzen) |
 | `layerling_separate_parts` | zerlegt eine Form mit losen Teilen, einen Skizzenkörper in einen Körper je Umriss |
@@ -146,6 +147,8 @@ Die KI arbeitet mit denselben Funktionen wie du, sie läuft über denselben Weg 
 | `layerling_check_clearance` | prüft vor dem Druck, welche Teile sich überschneiden, berühren oder näher kommen als ein Mindestspiel (Spiel prüfen), auch die getrennten Teile eines Objekts |
 | `layerling_printer_play` | liest, setzt oder löscht das Spiel deines Druckers ({{ui:workspace.printerPlay}} in den Einstellungen) und legt die Passprobe an, die es misst |
 | `layerling_check_print` | prüft vor dem Druck, was schiefginge: zu dünne Wände für die Düse, schwebende Teile, wenig Halt auf der Platte, Überhänge und offene Netze (Druck prüfen) |
+| `layerling_check_layers` | zerlegt den Druck in Schichten und listet Schicht für Schicht, was schiefginge: Überhänge, Bereiche ohne Auflage, Brücken, dünne Wände, kleine Inseln, ein Teil im Druckbett (Druckanalyse) |
+| `layerling_split_bolt` | teilt eine Schraube oder Gewindestange längs durch die Achse und legt beide Hälften für den Druck auf die Schnittfläche, auf Wunsch mit Zentrierstiften |
 | `layerling_add_reference_points` | setzt Bezugspunkte - auf Mitte, Ecken oder Kantenmitten von Objekten oder an genauen Stellen -, an denen Formen einrasten |
 | `layerling_list_reference_points` | listet die Bezugspunkte mit Kennung und Lage auf |
 | `layerling_remove_reference_points` | löscht Bezugspunkte nach Kennung oder alle |

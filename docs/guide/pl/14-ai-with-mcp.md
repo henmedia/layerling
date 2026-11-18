@@ -120,6 +120,7 @@ AI pracuje tymi samymi funkcjami co Ty, tą samą drogą co Twoja praca w edytor
 | `layerling_cookie_cutter` | robi z obiektów foremkę do ciastek: ściankę z ostrzem i kołnierz wokół odbitego konturu (Foremka do ciastek) |
 | `layerling_flexi_joints` | tnie płaską bryłę na ogniwa z przegubami drukowanymi w miejscu, które wychylają się na boki (Przeguby flexi) |
 | `layerling_make_lid` | robi pokrywkę do bryły otwartej u góry: wciskaną, nakładaną albo płaską, z wybranym pasowaniem (Pokrywka) |
+| `layerling_make_mold` | tworzy formę albo matrycę z wzorca: dwuczęściową formę do odlewania, skrzynkę do silikonu, formę otwartą albo stempel i matrycę do cienkiego materiału (Forma i matryca) |
 | `layerling_make_cable_channel` | prowadzi okrągły kanał na kabel przez bryłę, od wejścia do wyjścia, i sam znajduje drogę łagodnymi łukami (Kanał na kabel) |
 | `layerling_loft_sketches` | łączy dwie bryły ze szkicu w przejście od jednego konturu do drugiego (Przejście między szkicami) |
 | `layerling_separate_parts` | rozdziela kształt na jego luźne części, bryłę ze szkicu na jedną bryłę na kontur |
@@ -146,6 +147,8 @@ AI pracuje tymi samymi funkcjami co Ty, tą samą drogą co Twoja praca w edytor
 | `layerling_check_clearance` | sprawdza przed drukiem, które części nachodzą na siebie, stykają się lub są bliżej niż minimalny luz, także osobne części jednego obiektu |
 | `layerling_printer_play` | odczytuje, ustawia lub czyści luz drukarki ({{ui:workspace.printerPlay}} w ustawieniach) i kładzie test pasowania, który go mierzy |
 | `layerling_check_print` | sprawdza przed drukiem, co poszłoby źle: zbyt cienkie ścianki dla dyszy, części w powietrzu, mały styk z płytą, nawisy i otwarte siatki |
+| `layerling_check_layers` | tnie wydruk na warstwy i warstwa po warstwie wymienia, co pójdzie źle: nawisy, miejsca bez podparcia, mosty, cienkie ścianki, małe wyspy, część w stole (Analiza wydruku) |
+| `layerling_split_bolt` | dzieli śrubę lub pręt gwintowany wzdłuż przez oś i kładzie obie połowy na powierzchni cięcia do druku, opcjonalnie z kołkami ustalającymi |
 | `layerling_add_reference_points` | stawia punkty odniesienia (na środku, narożnikach albo środkach krawędzi obiektów albo w dokładnych pozycjach), do których przyciągają się kształty |
 | `layerling_list_reference_points` | wypisuje punkty odniesienia z identyfikatorami i pozycjami |
 | `layerling_remove_reference_points` | usuwa punkty odniesienia według identyfikatora albo wszystkie |

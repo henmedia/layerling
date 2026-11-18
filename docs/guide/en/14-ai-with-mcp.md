@@ -120,6 +120,7 @@ The AI works with the same functions as you, through the same path as your opera
 | `layerling_cookie_cutter` | makes a cookie cutter from the objects: a wall with a cutting edge and a rim round the mirrored outline (Cookie cutter) |
 | `layerling_flexi_joints` | cuts a flat body into links with joints printed in place that swing to the sides (Flexi joints) |
 | `layerling_make_lid` | makes a lid for a body open at the top: pushed in, over the top or flat, with the fit you choose and magnets if you like (Lid) |
+| `layerling_make_mold` | makes a mold or a die from a master: a two-part mold to cast in, a silicone pour box, an open mold, or a stamp and die for sheet (Mold & die) |
 | `layerling_make_cable_channel` | runs a round channel for a cable through a body from an entry to an exit, finding the way itself with gentle bends (Cable channel) |
 | `layerling_loft_sketches` | joins two sketch bodies into a loft from one outline to the other (Loft sketches) |
 | `layerling_separate_parts` | separates a shape into its loose parts, a sketch body into one body per outline |
@@ -146,6 +147,8 @@ The AI works with the same functions as you, through the same path as your opera
 | `layerling_check_clearance` | checks before printing which parts overlap, touch or come closer than a minimum gap (Check clearance), the separate parts of one object too |
 | `layerling_printer_play` | reads, sets or clears the printer's play ({{ui:workspace.printerPlay}} in the settings) and places the fit test that measures it |
 | `layerling_check_print` | checks before printing what would go wrong: walls too thin for the nozzle, floating parts, small contact with the plate, overhangs and open meshes (Print check) |
+| `layerling_check_layers` | cuts the print into layers and lists what would go wrong layer by layer: overhangs, places without support, bridges, thin walls, small islands, a part in the plate (Print analysis) |
+| `layerling_split_bolt` | splits a screw or threaded rod lengthwise through its axis and lays both halves on their cut faces for printing, optionally with centring pins |
 | `layerling_add_reference_points` | marks reference points - on the centre, corners or edge middles of objects, or at exact positions - that shapes snap to |
 | `layerling_list_reference_points` | lists the reference points with their ids and positions |
 | `layerling_remove_reference_points` | deletes reference points by id, or all of them |

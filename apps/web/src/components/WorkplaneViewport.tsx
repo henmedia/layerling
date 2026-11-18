@@ -127,6 +127,8 @@ import { isTypingTarget } from "@/lib/editorKeyTargets";
 import { liftHandleOffset, screenAngle, framePoint, selectionFrameCorners, workplaneFootprintY, syncTransformOverlay, syncAlignOverlay, syncMirrorOverlay, syncLayFlatHover } from "./workplane/viewportTransformOverlays";
 import { ClearanceMarkOverlay, clearanceFocusBox, syncClearanceMarkOverlay, type ClearanceMark, type ClearanceMarkOverlayState } from "./workplane/ClearanceMarkOverlay";
 import { clipThinWallOverlay, syncThinWallOverlay, type PrintCheckView } from "./workplane/ThinWallOverlay";
+import { restoreLayerViewCamera, saveLayerViewCamera, syncLayerViewOverlay, type LayerView } from "./workplane/LayerViewOverlay";
+import { moldHandleDirection, pickMoldHandle, syncMoldPreviewOverlay, type MoldPreview } from "./workplane/MoldPreviewOverlay";
 import { EMPTY_PROTRACTOR, pickProtractorFace, protractorFaceFromWorld, protractorReading, protractorStraightView, ProtractorOverlay, syncProtractorOverlay, type ProtractorKind, type ProtractorModel, type ProtractorOverlayState } from "./workplane/viewportProtractor";
 import { tapeAttachmentFromWorld, TAPE_PERPENDICULAR_SNAP_PIXELS, pickModelTapeCandidate, tapeCentresNear, sameTapeCentres, distanceToScreenSegment, SectionMeasureModel, SectionMeasureOverlayState, syncSectionMeasureOverlay } from "./workplane/viewportTape";
 export type { LayFlatPick } from "@/components/workplane/viewportPicking";
@@ -222,6 +224,12 @@ type WorkplaneViewportProps = {
   clearanceMark?: ClearanceMark | null;
   /** The print check's thin walls, painted red on the bodies, and the place its Show brings the camera to. */
   printCheckView?: PrintCheckView | null;
+  /** The layer view of the layer check: the bodies cut at a layer, its cross-section and the places found painted. */
+  layerView?: LayerView | null;
+  /** The mold tool's preview: the parting face, the sprue, the vents and the air traps. */
+  moldPreview?: MoldPreview | null;
+  /** The knob of the free mold direction dragged: the new direction (scene frame, unit). */
+  onMoldDirectionDrag?: (direction: [number, number, number]) => void;
   onSetPlacementWorkplane: (workplane: PlacementWorkplane, source: "shape" | "base") => void;
   onToggleWorkplaneTool: () => void;
   onInteractionActiveChange?: (active: boolean) => void;
@@ -265,6 +273,7 @@ type WorkplaneViewportProps = {
   onGridfinityKeys?: () => void;
   /** Splits the selected baseplate into plates that fit the printer (#1388). */
   onGridfinitySplit?: () => void;
+  onBoltSplit?: (pins: boolean) => void;
   onLayerText?: (patch: TextLayerPatch) => void;
   onTextTags?: (names: string[], gap: number) => void;
   /** Several lines of text under one another, one text each (#1207). */
@@ -1634,6 +1643,9 @@ export function WorkplaneViewport({
   highlightIds,
   clearanceMark = null,
   printCheckView = null,
+  layerView = null,
+  moldPreview = null,
+  onMoldDirectionDrag,
   onSetPlacementWorkplane,
   onToggleWorkplaneTool,
   onInteractionActiveChange,
@@ -1664,6 +1676,7 @@ export function WorkplaneViewport({
   onVaseAccessories,
   onGridfinityKeys,
   onGridfinitySplit,
+  onBoltSplit,
   onLayerText,
   onTextTags,
   onTextBlock,
@@ -2303,6 +2316,12 @@ export function WorkplaneViewport({
   onSplitSurfacePickRef.current = onSplitSurfacePick;
   const [splitPickOverFace, setSplitPickOverFace] = useState(false);
   const splitDragRef = useRef<SplitPlaneDragState | null>(null);
+  // The knob of the free mold direction while it is dragged, and the newest preview and callback for the pointer handlers.
+  const moldDragRef = useRef<{ pointerId: number } | null>(null);
+  const moldPreviewRef = useRef(moldPreview);
+  moldPreviewRef.current = moldPreview;
+  const onMoldDirectionDragRef = useRef(onMoldDirectionDrag);
+  onMoldDirectionDragRef.current = onMoldDirectionDrag;
   const [splitHandleState, setSplitHandleState] = useState<"hover" | "drag" | null>(null);
   const perfRef = useRef({
     fps: 0,
@@ -5918,6 +5937,14 @@ export function WorkplaneViewport({
   useEffect(() => () => {
     if (threeRef.current) syncThinWallOverlay(threeRef.current, null);
   }, []);
+  // The mold tool's preview while its panel is open.
+  useEffect(() => {
+    const state = threeRef.current;
+    if (state) syncMoldPreviewOverlay(state, moldPreview);
+  }, [moldPreview]);
+  useEffect(() => () => {
+    if (threeRef.current) syncMoldPreviewOverlay(threeRef.current, null);
+  }, []);
   const printCheckRequest = printCheckView?.request ?? 0;
   const printCheckFocusRef = useRef<PrintCheckView["focus"]>(null);
   printCheckFocusRef.current = printCheckView?.focus ?? null;
@@ -6916,6 +6943,14 @@ export function WorkplaneViewport({
       if (event.button !== 0 || event.ctrlKey || event.metaKey) {
         return;
       }
+      if (moldPreviewRef.current?.handle && onMoldDirectionDragRef.current && pickMoldHandle(state, event.clientX, event.clientY)) {
+        event.preventDefault();
+        capturePointer(event.currentTarget, event.pointerId);
+        moldDragRef.current = { pointerId: event.pointerId };
+        state.controls.enabled = false;
+        onInteractionActiveChange?.(true);
+        return;
+      }
       if (splitActiveRef.current) {
         if (splitSurfacePickRef.current) {
           const surface = pickPlacementSurface(event.clientX, event.clientY, false);
@@ -7512,6 +7547,14 @@ export function WorkplaneViewport({
       carryPointerRef.current = { x: event.clientX, y: event.clientY };
       if (cruiseAssetRef.current) moveCruiseGhost(event.clientX, event.clientY);
       if (carryIdsRef.current) moveCarry(event.clientX, event.clientY);
+      const moldDrag = moldDragRef.current;
+      const moldHandle = moldPreviewRef.current?.handle;
+      if (moldDrag && moldHandle && threeRef.current) {
+        if (moldDrag.pointerId !== event.pointerId) return;
+        const direction = moldHandleDirection(threeRef.current, event.clientX, event.clientY, moldHandle);
+        if (direction) onMoldDirectionDragRef.current?.([direction.x, direction.y, direction.z]);
+        return;
+      }
       if (splitActiveRef.current) {
         const state = threeRef.current;
         if (!state) return;
@@ -7966,6 +8009,15 @@ export function WorkplaneViewport({
         return;
       }
       const state = threeRef.current;
+      const moldDrag = moldDragRef.current;
+      if (moldDrag) {
+        if (moldDrag.pointerId !== event.pointerId) return;
+        if (event.currentTarget.hasPointerCapture(moldDrag.pointerId)) event.currentTarget.releasePointerCapture(moldDrag.pointerId);
+        moldDragRef.current = null;
+        if (state) state.controls.enabled = true;
+        onInteractionActiveChange?.(false);
+        return;
+      }
       const splitDrag = splitDragRef.current;
       if (splitDrag) {
         if (splitDrag.pointerId !== event.pointerId) return;
@@ -8367,6 +8419,33 @@ export function WorkplaneViewport({
   useEffect(() => {
     syncSectionClippingState(sectionSettings);
   }, [sectionSettings, syncSectionClippingState]);
+
+  // The layer view of the layer check: the section view's plane cuts the bodies at the layer's top while it is open, and
+  // the section view's own settings come back when it closes, as does the camera.
+  const layerViewOpen = Boolean(layerView);
+  const layerViewRef = useRef(layerView);
+  layerViewRef.current = layerView;
+  useEffect(() => {
+    const state = threeRef.current;
+    if (!state) return;
+    if (!layerView) return;
+    const plane = state.sectionPlane ?? new THREE.Plane();
+    plane.normal.set(0, -1, 0);
+    plane.constant = layerView.top + 1e-4;
+    applySectionClipping(state, plane);
+    syncLayerViewOverlay(state, layerView);
+  }, [layerView]);
+  useEffect(() => {
+    const state = threeRef.current;
+    if (!state || !layerViewOpen) return;
+    saveLayerViewCamera(state);
+    return () => {
+      syncLayerViewOverlay(state, null);
+      syncSectionClippingState(sectionSettingsRef.current);
+      restoreLayerViewCamera(state);
+      syncViewCube(state, viewCubeRef.current);
+    };
+  }, [layerViewOpen, syncSectionClippingState]);
 
   useEffect(() => {
     if (!sectionFineDraggingRef.current) setSectionFineAnchor(sectionSettings.offset);
@@ -9639,6 +9718,7 @@ export function WorkplaneViewport({
           onVaseAccessories={onVaseAccessories}
           onGridfinityKeys={onGridfinityKeys}
           onGridfinitySplit={onGridfinitySplit}
+          onBoltSplit={onBoltSplit}
           onLayerText={onLayerText}
           onTextTags={onTextTags}
           onTextBlock={onTextBlock}

@@ -165,7 +165,7 @@ Na plošči ali pokrovu z zarezami ob straneh {{ui:holePattern.arrangement.perim
 
 ## Luknja za navojno vložko
 
-Vtaljiva navojna vložka se s spajkalnikom vtisne v plastični del in vijakom da navoj, ki se ne obrabi. {{ui:threadInsert.title}} naredi luknjo zanjo, kamor klikneš, in ti najprej pove, ali ima telo tam dovolj materiala. Izberi natanko eno telo in v skupini {{ui:editor.section.mirrorPattern}} orodne vrstice klikni {{ui:threadInsert.title}}, tik ob polju lukenj. Lahko tudi z desnim gumbom klikneš na telo ali pritisneš [[Ctrl]]+[[K]].
+Vtaljiva navojna vložka se s spajkalnikom vtisne v plastični del in vijakom da navoj, ki se ne obrabi. {{ui:threadInsert.title}} naredi luknjo zanjo, kamor klikneš, in ti najprej pove, ali ima telo tam dovolj materiala. Izberi natanko eno telo, odpri knjižnico oblik in klikni {{ui:threadInsert.title}} v razdelku {{ui:library.section.holes}}. Najdeš ga tudi s [[Ctrl]]+[[K]]. Za razliko od drugih oblik ga ni mogoče povleči v načrt, ker deluje na izbrano telo.
 
 1. V oknu izberi {{ui:threadInsert.size}}: od M2 do M8, kratke M3, M4 in M5 ali 1/4-20. Pri {{ui:threadInsert.custom}} vneseš premer luknje in dolžino vložke; stena, ki mora ostati okoli luknje, sledi iz premera. Okno pokaže premer in globino luknje ter to steno.
 2. Klikni mesto na telesu. Gre ravna ploskev, pa tudi zunanja stena valja ali cevi; vsaka druga krivulja je zavrnjena z opombo. Obroč kaže luknjo: zelen tam, kjer ima telo steno ob luknji in globino za njo, ki ju vložka potrebuje, rdeč tam, kjer eno od obeh manjka. Rdeči pove, katera in za koliko, ter kako široko mora biti telo okoli luknje.

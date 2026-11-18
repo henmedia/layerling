@@ -120,6 +120,7 @@ L’IA usa le stesse funzioni che hai a disposizione, attraverso lo stesso perco
 | `layerling_cookie_cutter` | makes a cookie cutter from the objects: a wall and a rim round the outline (Cookie cutter) |
 | `layerling_flexi_joints` | cuts a flat body into links with joints printed in place that swing to the sides (Flexi joints) |
 | `layerling_make_lid` | makes a lid for a body open at the top: pushed in, over the top or flat, with the fit you choose and magnets if you like (Lid) |
+| `layerling_make_mold` | makes a mold or a die from a master: a two-part mold to cast in, a silicone pour box, an open mold, or a stamp and die for sheet (Mold & die) |
 | `layerling_make_cable_channel` | runs a round channel for a cable through a body from an entry to an exit, finding the way itself with gentle bends (Cable channel) |
 | `layerling_loft_sketches` | joins two sketch bodies into a loft from one outline to the other (Loft sketches) |
 | `layerling_separate_parts` | Separa una forma nelle sue parti distinte; un corpo da schizzo viene diviso in un corpo per contorno. |
@@ -146,6 +147,8 @@ L’IA usa le stesse funzioni che hai a disposizione, attraverso lo stesso perco
 | `layerling_check_clearance` | Controlla prima della stampa quali parti si sovrappongono, si toccano o sono più vicine di un gioco minimo, anche le parti separate di un oggetto |
 | `layerling_printer_play` | legge, imposta o cancella il gioco della stampante ({{ui:workspace.printerPlay}} nelle impostazioni) e mette la prova di accoppiamento che lo misura |
 | `layerling_check_print` | Controlla prima della stampa cosa andrebbe storto: pareti troppo sottili per l'ugello, parti sospese, poco contatto con il piatto, sporgenze e mesh aperte |
+| `layerling_check_layers` | taglia la stampa in strati e elenca strato per strato cosa andrebbe storto: sbalzi, zone senza appoggio, ponti, pareti sottili, piccole isole, un pezzo nel piano (Analisi di stampa) |
+| `layerling_split_bolt` | divide una vite o una barra filettata per il lungo lungo l’asse e stende le due metà sulla faccia di taglio per la stampa, a scelta con spine di centraggio |
 | `layerling_add_reference_points` | Aggiunge punti di riferimento — al centro, agli angoli o nei punti medi degli spigoli degli oggetti, oppure in posizioni precise — a cui si agganciano le forme. |
 | `layerling_list_reference_points` | Elenca i punti di riferimento con i rispettivi ID e posizioni. |
 | `layerling_remove_reference_points` | Elimina i punti di riferimento indicati tramite ID oppure li elimina tutti. |

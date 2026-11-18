@@ -169,7 +169,7 @@ Na płycie lub pokrywie z wcięciami w bokach {{ui:holePattern.arrangement.perim
 
 ## Otwór pod wkładkę gwintową
 
-Wtapiana wkładka gwintowa jest wciskana w plastikową część lutownicą i daje śrubom gwint, który się nie zużywa. Narzędzie {{ui:threadInsert.title}} robi do niej otwór tam, gdzie klikniesz, i najpierw mówi, czy bryła ma tam dość materiału. Zaznacz dokładnie jedną bryłę i kliknij {{ui:threadInsert.title}} w grupie {{ui:editor.section.mirrorPattern}} paska narzędzi, obok wzoru otworów. Możesz też kliknąć bryłę prawym przyciskiem albo nacisnąć [[Ctrl]]+[[K]].
+Wtapiana wkładka gwintowa jest wciskana w plastikową część lutownicą i daje śrubom gwint, który się nie zużywa. Narzędzie {{ui:threadInsert.title}} robi do niej otwór tam, gdzie klikniesz, i najpierw mówi, czy bryła ma tam dość materiału. Zaznacz dokładnie jedną bryłę, otwórz bibliotekę kształtów i kliknij {{ui:threadInsert.title}} w sekcji {{ui:library.section.holes}}. Znajdziesz go też przez [[Ctrl]]+[[K]]. W przeciwieństwie do innych kształtów nie da się go przeciągnąć do projektu, bo działa na zaznaczoną bryłę.
 
 1. Wybierz w oknie {{ui:threadInsert.size}}: M2 do M8, krótkie M3, M4 i M5 albo 1/4-20. Przy {{ui:threadInsert.custom}} wpisujesz średnicę otworu i długość wkładki; ścianka, która ma zostać wokół otworu, wynika ze średnicy. Okno pokazuje średnicę i głębokość otworu oraz tę ściankę.
 2. Kliknij miejsce na bryle. Działa płaska ściana, a także zewnętrzna ścianka walca lub rury; każda inna krzywizna jest odrzucana z podpowiedzią. Pierścień pokazuje otwór: zielony tam, gdzie bryła ma ściankę obok otworu i głębokość za nim, których wkładka potrzebuje, czerwony tam, gdzie któregoś z nich brakuje. Czerwony mówi, którego i o ile, oraz jak szeroka musi być bryła wokół otworu.

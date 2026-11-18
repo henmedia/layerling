@@ -165,7 +165,7 @@ U desky nebo víka s výřezy v bocích rozloží {{ui:holePattern.arrangement.p
 
 ## Otvor pro závitovou vložku
 
-Zalisovací závitová vložka se zatlačí do plastového dílu páječkou a šroubům dá závit, který se neopotřebuje. {{ui:threadInsert.title}} vytvoří otvor pro ni tam, kam kliknete, a nejprve vám řekne, zda má díl na tom místě dost materiálu. Vyberte právě jedno těleso a spusťte {{ui:threadInsert.title}} ve skupině {{ui:editor.section.mirrorPattern}} pásu karet vedle rastru otvorů. Můžete také kliknout na těleso pravým tlačítkem nebo stisknout [[Ctrl]]+[[K]].
+Zalisovací závitová vložka se zatlačí do plastového dílu páječkou a šroubům dá závit, který se neopotřebuje. {{ui:threadInsert.title}} vytvoří otvor pro ni tam, kam kliknete, a nejprve vám řekne, zda má díl na tom místě dost materiálu. Vyberte právě jedno těleso, otevřete knihovnu tvarů a klikněte na {{ui:threadInsert.title}} v sekci {{ui:library.section.holes}}. Najdete ho také pomocí [[Ctrl]]+[[K]]. Na rozdíl od ostatních tvarů ho nelze přetáhnout do návrhu, protože pracuje s vybraným tělesem.
 
 1. V okně zvolte {{ui:threadInsert.size}}: M2 až M8, krátké M3, M4 a M5, nebo 1/4-20. U {{ui:threadInsert.custom}} zadáte průměr otvoru a délku vložky; stěna, která musí kolem otvoru zůstat, vyplyne z průměru. Okno ukazuje průměr a hloubku otvoru a tuto stěnu.
 2. Klikněte na místo na dílu. Funguje rovná plocha i vnější stěna válce nebo trubky; jakákoli jiná křivka se odmítne s nápovědou. Kroužek ukazuje otvor: zelený tam, kde má díl stěnu vedle otvoru a hloubku za ním, které vložka potřebuje, červený tam, kde jedno z toho chybí. Červená barva říká, které a o kolik, a jak široký musí být díl kolem otvoru.

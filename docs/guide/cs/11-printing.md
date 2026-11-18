@@ -91,6 +91,12 @@ Od té chvíle začínají nová použití s vůlí místo vestavěné hodnoty: 
 
 {{ui:printCheck.show}} u řádku tam přenese kameru; vybere díly ve vzduchu, díly s malou opěrou a otevřené sítě, a u převisů zapne **zobrazení převisů**. Tělesa, která se překrývají, se kontrolují sloučená, jak je sloučí slicer. Když model změníte, zatímco je okno otevřené, objeví se {{ui:printCheck.stale}}; klikněte na to nebo na {{ui:printCheck.checkAgain}}. [[Esc]] okno zavře. Na modelu se nic nezmění. AI dělá stejnou kontrolu přes `layerling_check_print`. Okno jen kontroluje, nic netiskne ani neukládá: k tisku model exportujte pro slicer pomocí {{ui:editor.export}} ve skupině {{ui:editor.group.file}}. {{ui:printCheck.openExport}} v okně kontrolu zavře a otevře export.
 
+### Analýza tisku a zobrazení vrstev
+
+{{ui:editor.tool.layerCheck}} vedle {{ui:editor.tool.printCheck}} rozřeže vybrané objekty (nebo všechny viditelné) na vrstvy, které tiskárna klade, a porovná každou vrstvu s tou pod ní, najednou. Okno vypíše **nálezy**: nejprve problémy (červeně), pak upozornění (žlutě), odspodu nahoru, u každého kde, jak vážné a co pomůže. Nejprve se kontroluje celek ({{ui:finding.kind.inBed}}, díly ve vzduchu, neuzavřené sítě, díl větší než tiskárna), pak vrstva po vrstvě: {{ui:finding.kind.unsupported}}, {{ui:finding.kind.overhang}}, {{ui:finding.kind.bridge}}, {{ui:finding.kind.thinWall}}, {{ui:finding.kind.smallIsland}} a {{ui:finding.kind.adhesion}}. {{ui:layerCheck.layerHeight}} a {{ui:layerCheck.nozzle}} zvolíte nahoře; {{ui:layerCheck.stop}} kontrolu hned zastaví.
+
+Klik na nález otevře **zobrazení vrstev** na jeho první vrstvě, kamera přejede k místu a místo se na vrstvě obarví. Posuvník stojí svisle vedle profilu plochy průřezu; značky vedle něj ukazují nálezy. [[↑]] a [[↓]] posunou o vrstvu, [[Space]] přehrává, [[N]] přejde na další nález. Tlačítko otevře vhodný nástroj, třeba {{ui:finding.action.dropToPlate}} nebo {{ui:finding.action.supportRib}}. Po zavření se kamera vrátí. Není to náhled sliceru: podpory, výplň a čas tisku určuje slicer.
+
 ## Dokončení
 
 Zvolte {{ui:editor.export}} a formát **STL** nebo **3MF**. STL je nejjednodušší. 3MF uchovává názvy a barvy jednotlivých těles, a hodí se proto pro vícebarevný tisk. Exportní okno ukazuje také odhad hmotnosti a délky filamentu při plném tisku. Podrobnosti najdete v kapitole [Soubory a ukládání](chapter:files-and-saving).

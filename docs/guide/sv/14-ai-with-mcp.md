@@ -120,6 +120,7 @@ AI:n arbetar med samma funktioner som du, via samma väg som din användning i r
 | `layerling_cookie_cutter` | gör en pepparkaksform av objekten: en vägg med en skäregg och en kant runt den spegelvända konturen (Pepparkaksform) |
 | `layerling_flexi_joints` | skär upp en platt kropp i länkar med leder som skrivs ut på plats och svänger åt sidorna (Flexileder) |
 | `layerling_make_lid` | gör ett lock till en kropp som är öppen upptill: intryckt, utanpå eller platt, med den passning du väljer och magneter om du vill (Lock) |
+| `layerling_make_mold` | skapar en form eller en stans från ett original: en tvådelad form att gjuta i, en gjutlåda för silikon, en öppen form eller en stämpel och en matris för tunt material (Gjutform & stans) |
 | `layerling_make_cable_channel` | drar en rund kanal för en kabel genom en kropp från en ingång till en utgång och letar själv upp vägen med mjuka böjar (Kabelkanal) |
 | `layerling_loft_sketches` | förenar två skisskroppar till en övergång från ena konturen till den andra (Lofta skisser) |
 | `layerling_separate_parts` | delar upp en form i dess lösa delar, en skisskropp i en kropp per kontur |
@@ -146,6 +147,8 @@ AI:n arbetar med samma funktioner som du, via samma väg som din användning i r
 | `layerling_check_clearance` | kontrollerar före utskrift vilka delar som överlappar, nuddar varandra eller kommer närmare än ett minsta mellanrum (Kontrollera spelrum), även de lösa delarna i ett och samma objekt |
 | `layerling_printer_play` | läser av, ställer in eller rensar skrivarens spel ({{ui:workspace.printerPlay}} i inställningarna) och placerar passningstestet som mäter upp det |
 | `layerling_check_print` | kontrollerar före utskrift vad som skulle gå fel: väggar som är för tunna för munstycket, svävande delar, för liten kontaktyta mot plattan, överhäng och öppna nät (Utskriftskontroll) |
+| `layerling_check_layers` | delar utskriften i lager och listar lager för lager vad som skulle gå fel: överhäng, ställen utan stöd, broar, tunna väggar, små öar, en del i bädden (Utskriftsanalys) |
+| `layerling_split_bolt` | delar en skruv eller gängstång på längden genom axeln och lägger båda halvorna på snittytan för utskrift, valfritt med styrpinnar |
 | `layerling_add_reference_points` | markerar referenspunkter – på objekts mittpunkt, hörn eller kanters mittpunkter, eller vid exakta koordinater – som former fäster mot |
 | `layerling_list_reference_points` | listar referenspunkterna med sina id:n och positioner |
 | `layerling_remove_reference_points` | tar bort referenspunkter efter id, eller alla tillsammans |

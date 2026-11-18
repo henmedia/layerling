@@ -120,6 +120,7 @@ La IA trabaja con las mismas funciones que tú, por el mismo camino que sigues c
 | `layerling_cookie_cutter` | crea un cortador de galletas a partir de los objetos: una pared con filo y un reborde alrededor del contorno reflejado (Cortador de galletas) |
 | `layerling_flexi_joints` | corta un cuerpo plano en eslabones con articulaciones impresas ya montadas que giran hacia los lados (Articulaciones flexi) |
 | `layerling_make_lid` | crea una tapa para un cuerpo abierto por arriba: encajada dentro, por encima o plana, con el ajuste que elijas y, si quieres, con imanes (Tapa) |
+| `layerling_make_mold` | crea un molde o un troquel a partir de un modelo maestro: un molde de dos partes para colar, una caja para silicona, un molde abierto o un punzón y una matriz para lámina (Molde y troquel) |
 | `layerling_make_cable_channel` | abre un canal redondo para un cable a través de un cuerpo, de una entrada a una salida, y encuentra solo el camino con curvas suaves (Canal para cable) |
 | `layerling_loft_sketches` | une dos cuerpos de boceto en una transición de un contorno al otro (Transición entre bocetos) |
 | `layerling_separate_parts` | separa una forma en sus piezas sueltas, y un cuerpo de boceto en un cuerpo por contorno |
@@ -146,6 +147,8 @@ La IA trabaja con las mismas funciones que tú, por el mismo camino que sigues c
 | `layerling_check_clearance` | comprueba antes de imprimir qué piezas se solapan, se tocan o quedan más cerca que una holgura mínima, también las piezas separadas de un mismo objeto |
 | `layerling_printer_play` | lee, fija o borra la holgura de la impresora ({{ui:workspace.printerPlay}} en los ajustes) y coloca la prueba de ajuste que la mide |
 | `layerling_check_print` | comprueba antes de imprimir qué saldría mal: paredes demasiado finas para la boquilla, piezas flotantes, poco contacto con la placa, voladizos y mallas abiertas |
+| `layerling_check_layers` | corta la impresión en capas y enumera capa a capa lo que saldría mal: voladizos, zonas sin apoyo, puentes, paredes finas, islas pequeñas, una pieza dentro de la cama (Análisis de impresión) |
+| `layerling_split_bolt` | divide un tornillo o varilla roscada a lo largo por su eje y tumba las dos mitades sobre su cara de corte para imprimir, opcionalmente con pasadores de centrado |
 | `layerling_add_reference_points` | marca puntos de referencia (en el centro, las esquinas o los puntos medios de las aristas de los objetos, o en posiciones exactas) a los que se ajustan las formas |
 | `layerling_list_reference_points` | lista los puntos de referencia con sus id y posiciones |
 | `layerling_remove_reference_points` | elimina puntos de referencia por id, o todos |

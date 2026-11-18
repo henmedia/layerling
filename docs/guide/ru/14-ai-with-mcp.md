@@ -116,6 +116,7 @@ Claude Desktop не читает файлы проекта. Впишите се�
 | `layerling_cookie_cutter` | makes a cookie cutter from the objects: a wall and a rim round the outline (Cookie cutter) |
 | `layerling_flexi_joints` | cuts a flat body into links with joints printed in place that swing to the sides (Flexi joints) |
 | `layerling_make_lid` | makes a lid for a body open at the top: pushed in, over the top or flat, with the fit you choose and magnets if you like (Lid) |
+| `layerling_make_mold` | makes a mold or a die from a master: a two-part mold to cast in, a silicone pour box, an open mold, or a stamp and die for sheet (Mold & die) |
 | `layerling_make_cable_channel` | runs a round channel for a cable through a body from an entry to an exit, finding the way itself with gentle bends (Cable channel) |
 | `layerling_loft_sketches` | joins two sketch bodies into a loft from one outline to the other (Loft sketches) |
 | `layerling_separate_parts` | разделяет фигуру на её отдельные части, тело эскиза — на тело для каждого контура |
@@ -142,6 +143,8 @@ Claude Desktop не читает файлы проекта. Впишите се�
 | `layerling_check_clearance` | перед печатью проверяет, какие детали пересекаются, касаются или сближаются сильнее минимального зазора (Проверить зазор), в том числе отдельные части одного объекта |
 | `layerling_printer_play` | читает, задаёт или сбрасывает зазор принтера ({{ui:workspace.printerPlay}} в настройках) и кладёт тест посадки, который его измеряет |
 | `layerling_check_print` | перед печатью проверяет, что пойдёт не так: слишком тонкие для сопла стенки, детали в воздухе, малую опору на столе, нависания и открытые сетки (Проверить печать) |
+| `layerling_check_layers` | разрезает печать на слои и по слоям перечисляет, что пойдёт не так: нависания, места без опоры, мосты, тонкие стенки, маленькие островки, деталь в столе (Анализ печати) |
+| `layerling_split_bolt` | разрезает винт или резьбовую шпильку вдоль по оси и кладёт обе половины на плоскость разреза для печати, по желанию с центрирующими штифтами |
 | `layerling_add_reference_points` | ставит опорные точки — по центру, углам или серединам рёбер объектов, либо в точных позициях, — к которым привязываются фигуры |
 | `layerling_list_reference_points` | перечисляет опорные точки с их id и позициями |
 | `layerling_remove_reference_points` | удаляет опорные точки по id или все сразу |

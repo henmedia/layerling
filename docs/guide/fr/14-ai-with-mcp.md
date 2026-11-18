@@ -116,6 +116,7 @@ L'IA fonctionne avec les mêmes fonctions que vous, via le même chemin que votr
 | `layerling_cookie_cutter` | makes a cookie cutter from the objects: a wall and a rim round the outline (Cookie cutter) |
 | `layerling_flexi_joints` | cuts a flat body into links with joints printed in place that swing to the sides (Flexi joints) |
 | `layerling_make_lid` | makes a lid for a body open at the top: pushed in, over the top or flat, with the fit you choose and magnets if you like (Lid) |
+| `layerling_make_mold` | makes a mold or a die from a master: a two-part mold to cast in, a silicone pour box, an open mold, or a stamp and die for sheet (Mold & die) |
 | `layerling_make_cable_channel` | runs a round channel for a cable through a body from an entry to an exit, finding the way itself with gentle bends (Cable channel) |
 | `layerling_loft_sketches` | joins two sketch bodies into a loft from one outline to the other (Loft sketches) |
 | `layerling_separate_parts` | sépare une forme en ses parties détachées, un corps d'esquisse en un corps par contour |
@@ -142,6 +143,8 @@ L'IA fonctionne avec les mêmes fonctions que vous, via le même chemin que votr
 | `layerling_check_clearance` | vérifie avant l'impression quelles pièces se chevauchent, se touchent ou sont plus proches qu'un jeu minimal (Vérifier le jeu), y compris les pièces séparées d'un objet |
 | `layerling_printer_play` | lit, règle ou efface le jeu de l'imprimante ({{ui:workspace.printerPlay}} dans les réglages) et pose le test d'ajustement qui le mesure |
 | `layerling_check_print` | vérifie avant l'impression ce qui raterait : parois trop fines pour la buse, pièces en l'air, faible contact avec le plateau, surplombs et maillages ouverts (Vérifier l'impression) |
+| `layerling_check_layers` | découpe l’impression en couches et liste couche par couche ce qui irait mal : porte-à-faux, zones sans appui, ponts, parois fines, petits îlots, pièce dans le plateau (Analyse d’impression) |
+| `layerling_split_bolt` | coupe une vis ou une tige filetée dans la longueur par son axe et pose les deux moitiés sur leur face de coupe pour l’impression, avec pions de centrage si voulu |
 | `layerling_add_reference_points` | marque des points de référence - au centre, dans les coins ou au milieu des bords des objets, ou à des positions exactes - sur lesquels les formes s'accrochent |
 | `layerling_list_reference_points` | répertorie les points de référence avec leurs identifiants et positions |
 | `layerling_remove_reference_points` | supprime les points de référence par identifiant, ou tous |

@@ -116,6 +116,7 @@ Umetna inteligenca dela z istimi funkcijami kot ti, teče po isti poti kot tvoje
 | `layerling_cookie_cutter` | makes a cookie cutter from the objects: a wall and a rim round the outline (Cookie cutter) |
 | `layerling_flexi_joints` | cuts a flat body into links with joints printed in place that swing to the sides (Flexi joints) |
 | `layerling_make_lid` | makes a lid for a body open at the top: pushed in, over the top or flat, with the fit you choose and magnets if you like (Lid) |
+| `layerling_make_mold` | makes a mold or a die from a master: a two-part mold to cast in, a silicone pour box, an open mold, or a stamp and die for sheet (Mold & die) |
 | `layerling_make_cable_channel` | runs a round channel for a cable through a body from an entry to an exit, finding the way itself with gentle bends (Cable channel) |
 | `layerling_loft_sketches` | joins two sketch bodies into a loft from one outline to the other (Loft sketches) |
 | `layerling_separate_parts` | razstavi obliko z ločenimi deli, telo iz skice na eno telo za vsak obris |
@@ -142,6 +143,8 @@ Umetna inteligenca dela z istimi funkcijami kot ti, teče po isti poti kot tvoje
 | `layerling_check_clearance` | pred tiskanjem preveri, kateri deli se prekrivajo, dotikajo ali so bližje od najmanjše zračnosti (Preveri zračnost), tudi ločene dele enega predmeta |
 | `layerling_printer_play` | prebere, nastavi ali izbriše zračnost tiskalnika ({{ui:workspace.printerPlay}} v nastavitvah) in položi preizkus ujemanja, ki jo izmeri |
 | `layerling_check_print` | pred tiskanjem preveri, kaj bi šlo narobe: pretanke stene za šobo, lebdeče dele, majhen stik s ploščo, previse in odprte mreže (Preveri tisk) |
+| `layerling_check_layers` | razreže tisk na plasti in po plasteh našteje, kaj bi šlo narobe: previsi, mesta brez podpore, mostovi, tanke stene, majhni otočki, del v podlagi (Analiza tiska) |
+| `layerling_split_bolt` | razdeli vijak ali navojno palico po dolžini skozi os in obe polovici položi na rezno ploskev za tisk, po želji s centrirnimi zatiči |
 | `layerling_add_reference_points` | postavi referenčne točke - na sredine, vogale ali sredine robov objektov ali na natančna mesta -, na katere se oblike zaskočijo |
 | `layerling_list_reference_points` | našteje referenčne točke z oznako in lego |
 | `layerling_remove_reference_points` | izbriše referenčne točke po oznaki ali vse |

@@ -3910,11 +3910,12 @@ function trianglesOfManifold(manifold: ReturnType<ManifoldToplevel["Manifold"]["
 }
 
 /**
- * An outline plate (#1061) as closed triangles: the outline's slab less a socket in each of its cells, cut by Manifold
- * as the exact body is; the plain slab if that fails.
+ * A body of closed triangles less a baseplate's socket in each cell, cut by Manifold as the exact body is: each socket is
+ * what a square-cornered plate of one cell lacks of its block, standing on `bottom` and as tall as a baseplate. A body
+ * that cannot be cut is given back as it is.
  */
-function gridfinityOutlineTriangles(runtime: ManifoldToplevel, plan: GridfinityPlan, slabTriangles: Vec3[][]): Vec3[][] {
-  if (plan.cells.length === 0) return slabTriangles;
+export function gridfinityCutSockets(runtime: ManifoldToplevel, bodyTriangles: Vec3[][], cells: ReadonlyArray<GridfinityOutlinePoint>, bottom = 0): Vec3[][] {
+  if (cells.length === 0) return bodyTriangles;
   const { Manifold } = runtime;
   const made: Array<{ delete: () => void }> = [];
   const keep = <T extends { delete: () => void }>(value: T) => {
@@ -3922,20 +3923,26 @@ function gridfinityOutlineTriangles(runtime: ManifoldToplevel, plan: GridfinityP
     return value;
   };
   try {
-    const slab = keep(manifoldOfTriangles(runtime, slabTriangles));
-    // A socket is what a square-cornered plate of one cell lacks of its block.
+    const body = keep(manifoldOfTriangles(runtime, bodyTriangles));
     const cell = keep(manifoldOfTriangles(runtime, gridfinityTriangles({ width: GRIDFINITY_GRID, depth: GRIDFINITY_GRID, height: GRIDFINITY_BASEPLATE_HEIGHT, gridfinityType: "baseplate", gridfinityCornerRadius: 0 })));
     const block = keep(keep(Manifold.cube([GRIDFINITY_GRID, GRIDFINITY_BASEPLATE_HEIGHT, GRIDFINITY_GRID], true)).translate([0, GRIDFINITY_BASEPLATE_HEIGHT / 2, 0]));
     const socket = keep(block.subtract(cell));
-    const sockets = keep(Manifold.union(plan.cells.map((c) => keep(socket.translate([c.x, 0, c.z])))));
-    const result = keep(keep(slab.subtract(sockets)).simplify(LABEL_SLIVER));
-    return result.status() === "NoError" ? trianglesOfManifold(result) : slabTriangles;
+    const sockets = keep(Manifold.union(cells.map((c) => keep(socket.translate([c.x, bottom, c.z])))));
+    const result = keep(keep(body.subtract(sockets)).simplify(LABEL_SLIVER));
+    return result.status() === "NoError" ? trianglesOfManifold(result) : bodyTriangles;
   } catch {
-    // The plate is drawn as its plain slab rather than not at all.
-    return slabTriangles;
+    return bodyTriangles;
   } finally {
     new Set(made).forEach((value) => value.delete());
   }
+}
+
+/**
+ * An outline plate (#1061) as closed triangles: the outline's slab less a socket in each of its cells; the plain slab if
+ * that fails.
+ */
+function gridfinityOutlineTriangles(runtime: ManifoldToplevel, plan: GridfinityPlan, slabTriangles: Vec3[][]): Vec3[][] {
+  return gridfinityCutSockets(runtime, slabTriangles, plan.cells);
 }
 
 /**
