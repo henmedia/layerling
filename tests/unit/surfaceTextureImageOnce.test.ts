@@ -298,6 +298,33 @@ describe("an image pressed on once", () => {
       expect(edge.some((p) => Math.abs(reach(p) - 10) > 0.1)).toBe(true);
     }, 60_000);
 
+    it("cuts along the outlines round a body too, laid on around an axis (#1347)", () => {
+      // The reporter's case: a drawing pressed on once round a curved body, "Laid on: Around an axis". On a cylinder 25 mm
+      // round the diamond's edge, measured along the surface (the angle times the radius) and up, lies on the outline.
+      const radius = 25;
+      const raisedRound = (result: SurfaceTextureResult) => {
+        const out: { u: number; y: number; by: number }[] = [];
+        const v = result.vertices;
+        for (let i = 0; i < v.length; i += 3) {
+          const by = Math.hypot(v[i], v[i + 2]) - radius;
+          if (by > 0.01 && v[i + 1] > 0.01 && v[i + 1] < 39.99) out.push({ u: Math.atan2(v[i], v[i + 2]) * radius, y: v[i + 1], by });
+        }
+        return out;
+      };
+      const reach = (p: { u: number; y: number }) => Math.abs(p.u) + Math.abs(p.y - 20);
+      const round = { ...settings, projection: "cylinder" };
+      const result = applySurfaceTexture(cylinder(radius, 40, 192, 24), round);
+      expect(result.stats.image?.placed).toBe(true);
+      expectClosed(result);
+      const edge = raisedRound(result).filter((p) => p.by > 0.3 && p.by < 0.7);
+      expect(edge.length).toBeGreaterThan(8);
+      expect(edge.every((p) => Math.abs(reach(p) - 10) < 0.15)).toBe(true);
+      // Without the outlines the edge follows the small image's steps.
+      const { outline: _outline, ...grey } = drawn;
+      const stepped = raisedRound(applySurfaceTexture(cylinder(radius, 40, 192, 24), { ...round, imageOwn: grey })).filter((p) => p.by > 0.3 && p.by < 0.7);
+      expect(stepped.some((p) => Math.abs(reach(p) - 10) > 0.15)).toBe(true);
+    }, 120_000);
+
     it("swaps what is raised inside its box when inverted, the surface beside the box staying smooth", () => {
       const result = applySurfaceTexture(box(60, 40, 20), { ...settings, imageInvert: true });
       expectClosed(result);

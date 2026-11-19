@@ -1,7 +1,7 @@
 /**
- * Outlines of a drawing, for an image pressed on once (#1268): where the grey of the drawing crosses half, found on a
- * fine raster of it, so the surface can be cut along them as it is along a text's letters, instead of following the
- * points of a small grey image (which came out in steps on a slanted line or a curve).
+ * Outlines of a drawing, for an image pressed on once (#1268, and for a bitmap #1347): where the grey of the drawing
+ * crosses half, found on a fine raster of it, so the surface can be cut along them as it is along a text's letters,
+ * instead of following the points of a small grey image (which came out in steps on a slanted line or a curve).
  */
 
 /** How fine the drawing is looked at: points on its longer side. */
@@ -48,7 +48,7 @@ export function inTwoTones(grey: ArrayLike<number>) {
  * SURFACE_IMAGE_OUTLINE_UNITS across the image, v up. Marching squares over the points' middles, the crossing put
  * where the grey interpolates to 0.5 (so an anti-aliased edge is found between its points), the image's border a ground.
  */
-export function drawingOutlines(grey: ArrayLike<number>, width: number, height: number, maxPoints = SURFACE_IMAGE_OUTLINE_MAX_POINTS): number[][] {
+export function drawingOutlines(grey: ArrayLike<number>, width: number, height: number, maxPoints = SURFACE_IMAGE_OUTLINE_MAX_POINTS, minArea = 0): number[][] {
   if (width < 2 || height < 2) return [];
   // One ground point round the drawing, so a shape that reaches the border still closes.
   const W = width + 2;
@@ -125,7 +125,7 @@ export function drawingOutlines(grey: ArrayLike<number>, width: number, height: 
       at = step;
       if (at === start) break;
     }
-    if (ring.length >= 3) rings.push(ring);
+    if (ring.length >= 3 && Math.abs(ringArea(ring)) >= minArea) rings.push(ring);
   }
   let tolerance = 0.12;
   let out: number[][] = [];
@@ -135,6 +135,32 @@ export function drawingOutlines(grey: ArrayLike<number>, width: number, height: 
     tolerance *= 1.6;
   }
   return out.filter((ring) => ring.length >= 6);
+}
+
+/** A ring's area in points of the raster, signed by its turn (the shoelace formula). */
+function ringArea(ring: Array<[number, number]>) {
+  let area = 0;
+  for (let i = 0, j = ring.length - 1; i < ring.length; j = i, i += 1) area += ring[j][0] * ring[i][1] - ring[i][0] * ring[j][1];
+  return area / 2;
+}
+
+/**
+ * Specks smaller than this many points of the raster are left out of a bitmap's outlines: a photographed or JPEG-saved
+ * drawing has a few stray points near half grey on its ground, which would each become a ring of their own. A dot of
+ * two by two points is a fifth of a millimetre on an image 100 mm wide, too small to print.
+ */
+export const SURFACE_IMAGE_OUTLINE_BITMAP_MIN_AREA = 4;
+
+/**
+ * The outlines of one's own image as loaded from a file, looked at on its fine raster (RGBA, SURFACE_IMAGE_OUTLINE_RASTER
+ * points on its longer side at most), or none for a picture in shades. An SVG and a bitmap (PNG, JPEG ...) alike: a line
+ * drawing or a logo saved as a bitmap came out in steps on slanted lines and curves just as an SVG had (#1347), so a
+ * bitmap in two tones is cut along its outlines too, without the specks a bitmap has (SURFACE_IMAGE_OUTLINE_BITMAP_MIN_AREA).
+ */
+export function ownImageOutline(rgba: ArrayLike<number>, width: number, height: number, bitmap: boolean): number[][] {
+  const grey = drawingGrey(rgba, width, height);
+  if (!inTwoTones(grey)) return [];
+  return drawingOutlines(grey, width, height, SURFACE_IMAGE_OUTLINE_MAX_POINTS, bitmap ? SURFACE_IMAGE_OUTLINE_BITMAP_MIN_AREA : 0);
 }
 
 /** The points of a ring in whole parts of the image (v up). */
