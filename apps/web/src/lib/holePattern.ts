@@ -67,6 +67,14 @@ export type HolePatternSettings = {
    * opposite sides and as evenly spaced as the sides allow - a watertight lid wants more than four screws. Even, 4 up.
    */
   cornerCount?: number;
+  /**
+   * Mounting holes for a 19" rack (EIA-310, IEC 60297-3-100): four slots of the standard size in the corners, 465.1 mm
+   * apart across the panel and one rail spacing apart up it, so the panel screws onto the rack's rails. The size, the
+   * hole type and the distance from the sides do not apply then.
+   */
+  rack?: boolean;
+  /** 19" rack: a standard panel height from 1U to 6U, its holes as the standard has them; 0 or unset fits the panel. */
+  rackUnits?: number;
   perimeterStart?: number;
   /** Own shape (#1235): the id of the shape from the scene that is repeated. */
   customId?: string;
@@ -526,7 +534,162 @@ export type HolePatternResult = {
   ring?: { length: number; onCorners: boolean };
   /** Mounting holes only: the face is round, so the holes go evenly round a circle instead of into corners. */
   roundFace?: boolean;
+  /** 19" rack holes: how the slots came out on the face, or why there are none. */
+  rack?: RackFit;
 };
+
+/** The panel heights of IEC 60297-3-100 (table 1): the height, and the distance between the upper and lower holes. */
+export const RACK_STANDARD_PANELS = [
+  { units: 1, height: 43.65, spacing: 31.75 },
+  { units: 2, height: 88.1, spacing: 76.2 },
+  { units: 3, height: 132.55, spacing: 57.15 },
+  { units: 4, height: 177, spacing: 101.6 },
+  { units: 5, height: 221.45, spacing: 146.05 },
+  { units: 6, height: 265.9, spacing: 190.5 },
+] as const;
+/** The front panel of a 19" rack is 19 inches wide. */
+export const RACK_PANEL_WIDTH = 482.6;
+/** Centre to centre of the two rails, 18 5/16 inches (EIA-310). */
+export const RACK_HOLE_SPACING = 465.1;
+/** The slot of IEC 60297-3-100 (as Schroff, Fischer and other makers cut it): 10.3 mm long across, 6.8 mm high. */
+export const RACK_SLOT_LENGTH = 10.3;
+export const RACK_SLOT_WIDTH = 6.8;
+/** One rack unit, 1 3/4 inches; its three rail holes sit 1/4, 7/8 and 1 1/2 inches up from its bottom. */
+export const RACK_UNIT = 44.45;
+const RACK_RAIL_HOLES = [6.35, 22.225, 38.1];
+/** The least room from a hole's middle to the panel's edge: what the standard's 1U and 2U panels keep. */
+export const RACK_EDGE = 5.95;
+/** The least material left beside a slot, across the panel and up it. */
+const RACK_RIM = 1;
+
+export type RackFit = {
+  /** The holes: four, or none and why. */
+  ok: boolean;
+  reason?: "narrow" | "low";
+  /** The panel as the face has it, across (its long side) and up. */
+  width: number;
+  height: number;
+  /** Up the panel: centre to centre of the lower and upper holes, and from a hole's middle to the nearer edge. */
+  spacing: number;
+  edge: number;
+  /** How many units of the rack the panel takes; it sits in their middle. */
+  space: number;
+  /** A standard height that was asked for, and the height its panel has. */
+  units?: number;
+  standardHeight?: number;
+  /** The slots' turn in the face, in degrees as `holeAngle` takes it: they lie along the panel's width. */
+  angle: number;
+};
+
+/** A standard panel height asked for, 1 to 6, or 0 for one that fits the panel. */
+export function normalizeRackUnits(value: unknown) {
+  return typeof value === "number" && Number.isFinite(value) ? Math.min(RACK_STANDARD_PANELS.length, Math.max(0, Math.round(value))) : 0;
+}
+
+/**
+ * The holes of a panel of any height on a rack's rail. The panel takes the fewest whole units it fits in and sits in
+ * their middle, so it never reaches into its neighbours' room and fits on any unit of the rack. The rail's holes are
+ * the same about the middle of any whole number of units (1/4, 7/8 and 1 1/2 inch up each unit), so the outermost two
+ * that keep RACK_EDGE to the panel's edges lie the same distance from its upper and lower edges.
+ */
+export function rackPanelFit(height: number): { units: number; spacing: number; edge: number } | null {
+  if (!(height > 0)) return null;
+  const units = Math.max(1, Math.ceil(height / RACK_UNIT - 1e-9));
+  const room = units * RACK_UNIT;
+  const below = (room - height) / 2;
+  for (let unit = 0; unit < units; unit += 1) {
+    for (const hole of RACK_RAIL_HOLES) {
+      const position = unit * RACK_UNIT + hole;
+      if (position >= room / 2) return null;
+      const edge = position - below;
+      if (edge >= RACK_EDGE - 1e-6) {
+        const round = (value: number) => Math.round(value * 1e6) / 1e6;
+        return { units, spacing: round(room - 2 * position), edge: round(edge) };
+      }
+    }
+  }
+  return null;
+}
+
+/** The smallest rectangle round a face's hull: it lies along one of the hull's sides; the face's own x wins a tie. */
+function outlineBox(hull: readonly Point2[]) {
+  let best: { angle: number; area: number; minA: number; maxA: number; minB: number; maxB: number } | null = null;
+  const angles = [0, ...hull.map((point, index) => {
+    const next = hull[(index + 1) % hull.length];
+    return Math.atan2(next.v - point.v, next.u - point.u);
+  })];
+  for (const raw of angles) {
+    // A rectangle repeats every quarter turn.
+    let angle = raw % (Math.PI / 2);
+    if (angle < 0) angle += Math.PI / 2;
+    if (angle > Math.PI / 4 + 1e-9) angle -= Math.PI / 2;
+    const cos = Math.cos(angle);
+    const sin = Math.sin(angle);
+    let minA = Infinity, maxA = -Infinity, minB = Infinity, maxB = -Infinity;
+    for (const point of hull) {
+      const a = point.u * cos + point.v * sin;
+      const b = -point.u * sin + point.v * cos;
+      minA = Math.min(minA, a); maxA = Math.max(maxA, a); minB = Math.min(minB, b); maxB = Math.max(maxB, b);
+    }
+    const area = (maxA - minA) * (maxB - minB);
+    if (!best || area < best.area * (1 - 1e-6)) best = { angle, area, minA, maxA, minB, maxB };
+  }
+  return best;
+}
+
+/**
+ * 19" rack holes: four slots in the corners of the smallest rectangle round the face, its long side across the rack.
+ * Across they sit 465.1 mm apart about its middle; up it either as a standard panel of 1U to 6U has them, or for any
+ * other height the longest distance between two rail holes that leaves room to the edges, again about its middle -
+ * so they sit the same distance from the upper and lower edges and still meet the rail's holes.
+ */
+export function rackCenters(loops: readonly Point2[][], settings: Pick<HolePatternSettings, "rackUnits">): { centers: Point2[]; fit: RackFit | null } {
+  const hull = convexHull(loops.flat());
+  const box = hull.length >= 3 ? outlineBox(hull) : null;
+  if (!box) return { centers: [], fit: null };
+  const sizeA = box.maxA - box.minA;
+  const sizeB = box.maxB - box.minB;
+  const across = sizeA >= sizeB;
+  const width = across ? sizeA : sizeB;
+  const height = across ? sizeB : sizeA;
+  // The slots lie along the panel's width: the turn from the face's x to it, as a hole's angle (counter-clockwise).
+  const turn = across ? box.angle : box.angle + Math.PI / 2;
+  const angle = normalizeHoleAngle((-turn * 180) / Math.PI);
+  const units = normalizeRackUnits(settings.rackUnits);
+  const standard = units > 0 ? RACK_STANDARD_PANELS[units - 1] : null;
+  const fitted = standard ? null : rackPanelFit(height);
+  const spacing = standard ? standard.spacing : fitted?.spacing ?? 0;
+  const round = (value: number) => Math.round(value * 1000) / 1000;
+  const fit: RackFit = {
+    ok: false,
+    width: round(width),
+    height: round(height),
+    spacing,
+    edge: Math.round(((height - spacing) / 2) * 1e6) / 1e6,
+    space: standard ? units : fitted?.units ?? 0,
+    angle,
+    ...(standard ? { units, standardHeight: standard.height } : {}),
+  };
+  if (width < RACK_HOLE_SPACING + RACK_SLOT_LENGTH + 2 * RACK_RIM - 1e-9) return { centers: [], fit: { ...fit, reason: "narrow" } };
+  if (!(spacing > 0) || height < spacing + RACK_SLOT_WIDTH + 2 * RACK_RIM - 1e-9) return { centers: [], fit: { ...fit, reason: "low" } };
+  const middleA = (box.minA + box.maxA) / 2;
+  const middleB = (box.minB + box.maxB) / 2;
+  const halfAcross = RACK_HOLE_SPACING / 2;
+  const halfUp = spacing / 2;
+  const cos = Math.cos(box.angle);
+  const sin = Math.sin(box.angle);
+  const back = (a: number, b: number): Point2 => ({ u: a * cos - b * sin, v: a * sin + b * cos });
+  const offsets = across
+    ? [[-halfAcross, -halfUp], [halfAcross, -halfUp], [halfAcross, halfUp], [-halfAcross, halfUp]]
+    : [[-halfUp, -halfAcross], [halfUp, -halfAcross], [halfUp, halfAcross], [-halfUp, halfAcross]];
+  return { centers: offsets.map(([a, b]) => back(middleA + a, middleB + b)), fit: { ...fit, ok: true } };
+}
+
+/** The holes a rack's slots are made of: the standard slot, plain, straight through the wall, turned along the panel. */
+export function rackSlotSettings(settings: HolePatternSettings, angle = 0): HolePatternSettings {
+  const { holeType: _type, headSize: _head, headDepth: _depth, headAngle: _angle, holeTilt: _tilt, ...rest } = settings;
+  return { ...rest, form: "slot", size: RACK_SLOT_LENGTH, height: RACK_SLOT_WIDTH, holeAngle: angle };
+}
 
 /**
  * The centres of a hole pattern on a face. Only holes that lie wholly inside
@@ -637,27 +800,7 @@ export function cornerCenters(
     return { centers, round: true };
   }
   // The smallest rectangle round the outline lies along one of its hull's sides; the face's own x wins a tie.
-  let best: { angle: number; area: number; minA: number; maxA: number; minB: number; maxB: number } | null = null;
-  const angles = [0, ...hull.map((point, index) => {
-    const next = hull[(index + 1) % hull.length];
-    return Math.atan2(next.v - point.v, next.u - point.u);
-  })];
-  for (const raw of angles) {
-    // A rectangle repeats every quarter turn.
-    let angle = raw % (Math.PI / 2);
-    if (angle < 0) angle += Math.PI / 2;
-    if (angle > Math.PI / 4 + 1e-9) angle -= Math.PI / 2;
-    const cos = Math.cos(angle);
-    const sin = Math.sin(angle);
-    let minA = Infinity, maxA = -Infinity, minB = Infinity, maxB = -Infinity;
-    for (const point of hull) {
-      const a = point.u * cos + point.v * sin;
-      const b = -point.u * sin + point.v * cos;
-      minA = Math.min(minA, a); maxA = Math.max(maxA, a); minB = Math.min(minB, b); maxB = Math.max(maxB, b);
-    }
-    const area = (maxA - minA) * (maxB - minB);
-    if (!best || area < best.area * (1 - 1e-6)) best = { angle, area, minA, maxA, minB, maxB };
-  }
+  const best = outlineBox(hull);
   if (!best) return { centers: [], round: false };
   const left = best.minA + inset;
   const right = best.maxA - inset;
@@ -749,6 +892,11 @@ export function holePatternCenters(
   }
   const segments = loopSegments(loops);
   const fits = holeFitter((point) => insideRegion(loops, point), segments, footprint, margin);
+
+  if (settings.arrangement === "corners" && settings.rack) {
+    const { centers, fit } = rackCenters(loops, settings);
+    return { centers, tooMany: false, rows: centers.length ? 2 : 0, ...(fit ? { rack: fit } : {}) };
+  }
 
   if (settings.arrangement === "corners") {
     // Holes between the corners that would leave the face (a notch in a side) are left out; the corners always stay.
@@ -1352,6 +1500,8 @@ export function normalizeHolePattern(input: Partial<HolePatternSettings>): HoleP
     ...(input.cornerToCenter === true ? { cornerToCenter: true } : {}),
     // Kept as given (3 to 40): a round face takes it as it is, a rectangle the even number at or below it.
     ...(typeof input.cornerCount === "number" && Number.isFinite(input.cornerCount) && Math.round(input.cornerCount) !== MIN_CORNER_COUNT ? { cornerCount: normalizeCornerCount(input.cornerCount, true) } : {}),
+    ...(input.rack === true ? { rack: true } : {}),
+    ...(input.rack === true && normalizeRackUnits(input.rackUnits) > 0 ? { rackUnits: normalizeRackUnits(input.rackUnits) } : {}),
     ...custom,
     depth: typeof input.depth === "number" && Number.isFinite(input.depth) && input.depth > 0 ? Math.min(input.depth, 1000) : null,
     ...(input.allowMany === true ? { allowMany: true } : {}),

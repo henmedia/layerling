@@ -13,11 +13,13 @@ import {
   holeCrossSection,
   holeTiltRadians,
   holeTurn,
+  rackSlotSettings,
   roundWallCenters,
   withoutHoleTilt,
   type FaceOutline,
   type HolePatternSettings,
   type Point2,
+  type RackFit,
   type RoundWallOutline,
 } from "@/lib/holePattern";
 import { placementPatchForNewShape, type PlacementWorkplane } from "@/lib/placementWorkplane";
@@ -478,6 +480,8 @@ export type HolePatternPlan = {
   ring?: { length: number; onCorners: boolean };
   /** Mounting holes on a round face: they go round a circle. */
   roundFace?: boolean;
+  /** 19" rack holes: how the slots came out on the face, or why there are none. */
+  rack?: RackFit;
   /** On a round wall (#1393): its diameter, whether it goes all the way round, and then how many holes a row holds at what step. */
   wall?: { diameter: number; closed: boolean; columns?: number; spacing?: number };
 };
@@ -536,11 +540,16 @@ export function holePatternShapes(
 ): HolePatternPlan {
   // Sloping through the wall is for flat faces for now.
   if (isRoundWallFace(face)) return roundWallHoleShapes(face, withoutHoleTilt(settings), namePrefix, previewIdPrefix, custom);
+  // 19" rack holes are the standard slot whatever form was set before.
+  const forRack = settings.arrangement === "corners" && Boolean(settings.rack);
+  if (forRack) settings = rackSlotSettings(settings);
   if (settings.form === "custom" && !custom) return { holes: [], tooMany: false };
   const tilt = holeTiltRadians(settings);
   const wall = face.wall ?? face.thickness;
-  const { centers, tooMany, ring, roundFace } = holePatternCenters(face.outline, settings, tilt === 0 ? 0 : wall);
-  if (tooMany || centers.length === 0) return { holes: [], tooMany, ...(ring ? { ring } : {}), ...(roundFace ? { roundFace } : {}) };
+  const { centers, tooMany, ring, roundFace, rack } = holePatternCenters(face.outline, settings, tilt === 0 ? 0 : wall);
+  // The slots lie along the panel's width, however the face's frame runs.
+  if (forRack && rack) settings = rackSlotSettings(settings, rack.angle);
+  if (tooMany || centers.length === 0) return { holes: [], tooMany, ...(ring ? { ring } : {}), ...(roundFace ? { roundFace } : {}), ...(rack ? { rack } : {}) };
 
   if (settings.form === "custom" && custom) {
     // A copy of the shape stands upright on every place, turned with the face: a body a little sunk in so it joins, a
@@ -627,7 +636,7 @@ export function holePatternShapes(
     const placed = { ...sized, ...placementPatchForNewShape(sized, holeFrame, base), ...(previewIdPrefix ? { id: `${previewIdPrefix}-${index}` } : {}) };
     return canonicalizeShape(withHoleMode(placed, true));
   });
-  return { holes, tooMany: false, ...(ring ? { ring } : {}), ...(roundFace ? { roundFace } : {}) };
+  return { holes, tooMany: false, ...(ring ? { ring } : {}), ...(roundFace ? { roundFace } : {}), ...(rack ? { rack } : {}) };
 }
 
 /**
