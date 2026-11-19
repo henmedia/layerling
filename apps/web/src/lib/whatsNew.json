@@ -5,11 +5,13 @@
       {
         "title": {
           "de": "Gussform: Öffnungsrichtung, Material und Luftblasen",
-          "en": "Mold & die: opening direction, material and air traps"
+          "en": "Mold & die: opening direction, material and air traps",
+          "da": "Støbeform & prægestempel: åbningsretning, materiale og luftlommer"
         },
         "body": {
           "de": "Das Werkzeug „Gussform und Stempel“ schlägt jetzt die beste Öffnungsrichtung vor: Jede Richtung zeigt, wie viel der Oberfläche hängen bleiben würde, und Hinterschnitte sind rot auf dem Modell. Dazu kommt eine freie Richtung, die du an einem Griff im Bild drehst, und ein Gussmaterial (Silikon, Gießharz, Gips, Wachs, Seife, Beton) mit Schwund und Dichte.\n\n– Vor dem Machen: Außenmaß, Füllmenge mit Einguss, Gewicht und Luftfallen, mit einem roten Punkt, wo Luft bliebe.\n– Mehrere Modelle bekommen je einen Einguss.\n– Außen ein Block oder eine Konturhülle, die Filament spart.\n– „Stempel und Matrize“ kann das Relief einer Münze oder eines Logos übernehmen.",
-          "en": "The Mold & die tool now suggests the best opening direction: each direction shows how much of the surface would stick, and undercuts are red on the model. There is also a free direction you turn by a knob in the view, and a casting material (silicone, casting resin, plaster, wax, soap, concrete) with its shrinkage and density.\n\n– Before making: outside size, pour volume with the sprue, weight and air traps, with a red dot where air would stay.\n– Several masters get a sprue each.\n– On the outside a block or a contour shell that saves filament.\n– Stamp & die can copy the relief of a coin or a logo."
+          "en": "The Mold & die tool now suggests the best opening direction: each direction shows how much of the surface would stick, and undercuts are red on the model. There is also a free direction you turn by a knob in the view, and a casting material (silicone, casting resin, plaster, wax, soap, concrete) with its shrinkage and density.\n\n– Before making: outside size, pour volume with the sprue, weight and air traps, with a red dot where air would stay.\n– Several masters get a sprue each.\n– On the outside a block or a contour shell that saves filament.\n– Stamp & die can copy the relief of a coin or a logo.",
+          "da": "Værktøjet Støbeform & prægestempel foreslår nu den bedste åbningsretning: hver retning viser, hvor stor en del af overfladen der ville sidde fast, og underskæringer er røde på modellen. Der er også en fri retning, du drejer med en knap i visningen, og et støbemateriale (silikone, støbeharpiks, gips, voks, sæbe, beton) med sin svind og densitet.\n\n– Før du laver formen: ydre mål, støbevolumen med indløbet, vægt og luftlommer, med en rød prik der, hvor luften ville blive fanget.\n– Flere originaler får hvert sit indløb.\n– Ud i siden er der en blok eller en konturskal, der sparer filament.\n– Stempel & matrice kan kopiere reliefet af en mønt eller et logo."
         },
         "guide": {
           "section": "mold"
@@ -18,11 +20,13 @@
       {
         "title": {
           "de": "Aushöhlen: Gridfinity-Boden, Stapeln und neue Verschlüsse",
-          "en": "Hollow: Gridfinity floor, stacking and new latches"
+          "en": "Hollow: Gridfinity floor, stacking and new latches",
+          "da": "Udhuling: Gridfinity-bund, stabling og nye låse"
         },
         "body": {
           "de": "Eine oben offen ausgehöhlte Box kann jetzt einen Gridfinity-Boden bekommen, mit einer Mulde für jedes ganze Feld, auf Wunsch mit Magnetlöchern, und Trennwände wie bei einem Gridfinity-Behälter. Das Stapeln läuft jetzt über einen Fuß, der in die Box darunter greift, auf Wunsch hohl und mit Griffmulden; ein Stapeldeckel nimmt den Fuß der nächsten Box auf.\n\nDer Deckel hat zwei neue Verschlussarten neben den Klammern: Schieber wie an einem Werkzeugkoffer und Riegel, die in einem Rohr an der Wand sitzen und an Ort und Stelle gedruckt werden.",
-          "en": "A box hollowed with its top open can now get a Gridfinity floor, with a socket for each whole cell, magnet holes on request, and dividers like a Gridfinity bin's. Stacking now goes by a foot that fits into the box below, hollow and with grip recesses if you like; a stacking top takes the next box's foot.\n\nThe lid has two new kinds of latch next to the clips: sliders as on a tool case, and barrel bolts that sit in a tube on the wall and are printed in place."
+          "en": "A box hollowed with its top open can now get a Gridfinity floor, with a socket for each whole cell, magnet holes on request, and dividers like a Gridfinity bin's. Stacking now goes by a foot that fits into the box below, hollow and with grip recesses if you like; a stacking top takes the next box's foot.\n\nThe lid has two new kinds of latch next to the clips: sliders as on a tool case, and barrel bolts that sit in a tube on the wall and are printed in place.",
+          "da": "En kasse, der er udhulet med toppen åben, kan nu få en Gridfinity-bund, med en fordybning til hvert helt felt, magnethuller på forespørgsel, og skillevægge som en Gridfinity-bakkes. Stabling sker nu med en fod, der går ned i æsken under, hul og med greb, som du vil; et stabellåg tager den næste æskes fod.\n\nLåget har to nye slags låse ud over klipsene: skydere som på en værktøjskasse, og skudrigler, der sidder i et rør på væggen og printes på stedet."
         },
         "guide": {
           "section": "hollowing"
@@ -31,11 +35,13 @@
       {
         "title": {
           "de": "Druckanalyse: jede Schicht geprüft, mit Schichtansicht",
-          "en": "Print analysis: every layer checked, with a layer view"
+          "en": "Print analysis: every layer checked, with a layer view",
+          "da": "Printanalyse: hvert lag tjekket, med lagvisning"
         },
         "body": {
           "de": "Neben „Druckprüfung“ gibt es jetzt die „Druckanalyse“. Sie schneidet die gewählten Teile (oder alle sichtbaren) in die Schichten, die dein Drucker aufträgt, und vergleicht jede mit der darunter. Heraus kommt eine Liste: erst Probleme, dann Hinweise, etwa schwebende Teile, Flächen ohne Stütze, Überhänge, Brücken, zu dünne Wände, kleine Inseln und zu wenig Haftung am Bett, jeweils mit dem, was hilft, oft mit einem Knopf dafür.\n\nEin Klick auf einen Befund öffnet die Schichtansicht: das Teil in dieser Schicht aufgeschnitten, die Stelle farbig, mit Schichtregler und Verlauf der Querschnittsfläche. Ein Slicer-Vorschau ist es nicht.",
-          "en": "Next to Print check there is now Print analysis. It cuts the selected parts (or every visible one) into the layers your printer lays down and compares each with the one below. You get a list, problems first and then hints: floating parts, areas without support, overhangs, bridges, walls that are too thin, small islands and too little bed adhesion, each with what helps, often with a button for it.\n\nA click on a finding opens the layer view: the part cut open at that layer with the spot painted, a layer slider and the cross-section over the height. It is no slicer preview."
+          "en": "Next to Print check there is now Print analysis. It cuts the selected parts (or every visible one) into the layers your printer lays down and compares each with the one below. You get a list, problems first and then hints: floating parts, areas without support, overhangs, bridges, walls that are too thin, small islands and too little bed adhesion, each with what helps, often with a button for it.\n\nA click on a finding opens the layer view: the part cut open at that layer with the spot painted, a layer slider and the cross-section over the height. It is no slicer preview.",
+          "da": "Ved siden af \"Tjek print\" er der nu \"Printanalyse\". Den skærer de valgte dele (eller alle synlige) i de lag, din printer lægger, og sammenligner hvert lag med laget nedenunder. Du får en liste, fejlene først og så bemærkningerne: dele, der svæver over arbejdsplanet, områder uden støtte, overhæng, broer, for tynde vægge, små øer og for dårlig vedhæftning til pladen, hver med det, der hjælper, ofte med en knap til det.\n\nEt klik på et fund åbner lagvisningen: delen skåret åben i det lag med stedet malet, en lagskyder og tværsnittet over højden. Det er ikke en forhåndsvisning fra sliceren."
         },
         "guide": {
           "section": "layerCheck"
@@ -44,11 +50,13 @@
       {
         "title": {
           "de": "Schrauben und Gewindestangen längs teilen",
-          "en": "Screws and threaded rods, split lengthwise"
+          "en": "Screws and threaded rods, split lengthwise",
+          "da": "Skruer og gevindstænger, delt på langs"
         },
         "body": {
           "de": "Eine stehend gedruckte Schraube bricht unter Last entlang ihrer Schichten, liegend gedruckt ist ihr Gewinde um ein Vielfaches stabiler. In den Eigenschaften einer Schraube oder Gewindestange teilt „Längs teilen und flach legen“ sie durch ihre eigene Achse und legt beide Hälften auf ihre Schnittflächen, in einem Schritt zum Rückgängigmachen.\n\nMit Zentrierstiften (standardmäßig an) sitzen die Hälften genau aufeinander, auch in Längsrichtung, damit die Gewindegänge treffen und die Mutter nicht klemmt. Danach werden die Hälften geklebt.",
-          "en": "A screw printed standing breaks along its layers under load; printed lying down its thread is many times stronger. In the properties of a screw or threaded rod, Split lengthwise and lay flat cuts it in two through its own axis and lays both halves on their cut faces, in one undo step.\n\nWith centring pins (on by default) the halves line up exactly, along the axis too, so the turns meet and the nut does not jam. Glue the halves afterwards."
+          "en": "A screw printed standing breaks along its layers under load; printed lying down its thread is many times stronger. In the properties of a screw or threaded rod, Split lengthwise and lay flat cuts it in two through its own axis and lays both halves on their cut faces, in one undo step.\n\nWith centring pins (on by default) the halves line up exactly, along the axis too, so the turns meet and the nut does not jam. Glue the halves afterwards.",
+          "da": "En skrue, der er printet stående, knækker langs lagene under belastning; printet liggende er dens gevind mange gange stærkere. I egenskaberne for en skrue eller en gevindstang deler \"Del på langs og læg ned\" den i to gennem dens egen akse og lægger begge halvdele på deres snitflader, i ét fortrydelsestrin.\n\nMed styrestifter (slået til som standard) flugter halvdelene præcist, også på langs, så omgangsene mødes og møtrikken ikke binder. Lim halvdelene sammen bagefter."
         },
         "guide": {
           "chapter": "threads"
