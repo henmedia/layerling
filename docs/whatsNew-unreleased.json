@@ -2,11 +2,13 @@
   {
     "title": {
       "de": "Scharnier-Deckel: Filament passt leichter",
-      "en": "Hinged lid: filament fits more easily"
+      "en": "Hinged lid: filament fits more easily",
+      "da": "Hængslet låg: filamentet passer lettere"
     },
     "body": {
       "de": "Beim Scharnier-Deckel saß der Stift aus Filament in den Löchern des Körpers oft zu stramm oder ging gar nicht hinein. Die Löcher sind jetzt etwas größer: bei den Standardwerten 0,1 mm pro Seite statt 0,05 mm. Braucht dein Drucker mehr Luft, folgt das Loch dem Spiel aus dem Passungstest. Der Stift sitzt im Körper weiter fester als im Deckel, rutscht also nicht heraus.",
-      "en": "With a hinged lid, the pin made from a piece of filament often sat too tight in the body's holes, or would not go in at all. The holes are now a little larger: 0.1 mm per side with the default settings instead of 0.05 mm. If your printer needs more room, the hole follows the play from the fit test. The pin still sits tighter in the body than in the lid, so it does not slide out."
+      "en": "With a hinged lid, the pin made from a piece of filament often sat too tight in the body's holes, or would not go in at all. The holes are now a little larger: 0.1 mm per side with the default settings instead of 0.05 mm. If your printer needs more room, the hole follows the play from the fit test. The pin still sits tighter in the body than in the lid, so it does not slide out.",
+      "da": "Med et hængslet låg sad stiften, der er lavet af et stykke filament, ofte for stramt i kroppens huller, eller den ville slet ikke gå ind. Hullerne er nu lidt større: 0,1 mm pr. side med standardindstillingerne i stedet for 0,05 mm. Hvis din printer skal have mere plads, følger hullet spillerummet fra pasprøven. Stiften sidder stadig strammere i kroppen end i låget, så den glider ikke ud."
     },
     "guide": {
       "section": "lid"
