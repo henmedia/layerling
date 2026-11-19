@@ -279,12 +279,19 @@ export const MAX_HINGE_KNUCKLES = 15;
 export const MIN_HINGE_PIN_PLAY = 0.05;
 export const MAX_HINGE_PIN_PLAY = 0.5;
 /**
- * How much larger than a piece of filament as the pin the body's holes are, per side, in mm, whatever the play: the pin
- * sits tight in the body's part of the hinge and only the lid turns on it, so the filament does not slide out (#1220). A
- * printed hole comes out a little smaller than drawn, so this presses filament in. The same as the least play, so the
- * body's knuckles keep at least HINGE_KNUCKLE_WALL round their hole.
+ * The least that the body's holes are larger than a piece of filament as the pin, per side, in mm: the pin sits tight in
+ * the body's part of the hinge and only the lid turns on it, so the filament does not slide out (#1220). A printed hole
+ * comes out a little smaller than drawn, so this presses filament in. The same as the least play, so the body's knuckles
+ * keep at least HINGE_KNUCKLE_WALL round their hole. Usually the grip is more: HINGE_PIN_GRIP_SHARE of the play.
  */
 export const HINGE_PIN_GRIP = 0.05;
+/**
+ * The share of the pin's play the body's holes get round a piece of filament: half, so 0.1 mm per side with the 0.2 mm
+ * the play starts from. At a fixed 0.05 mm the filament went in hard or not at all on many printers with the default
+ * settings (#1220, 1.151.0); following the play, the grip grows with a printer that needs more room - the play takes the
+ * fit test's value - and with a play opened by hand, and stays tighter than the lid's holes.
+ */
+export const HINGE_PIN_GRIP_SHARE = 0.5;
 /**
  * How much larger than the pin the body's holes are, per side, in mm, when the pin is printed apart: a printed pin comes
  * out at its full diameter and the holes a little smaller than drawn, so at HINGE_PIN_GRIP it hardly ever went in (a
@@ -1075,12 +1082,13 @@ export function hingeKnuckleRadius(options: Pick<LidOptions, "hingePin"> & Parti
 }
 
 /**
- * How much larger than the pin the body's holes are, per side, in mm: HINGE_PIN_GRIP for a piece of filament,
- * HINGE_PRINTED_PIN_GRIP for a pin printed apart. Never more than the pin's play, so the body's holes are never looser
- * than the lid's and its knuckles keep at least HINGE_KNUCKLE_WALL round them.
+ * How much larger than the pin the body's holes are, per side, in mm: for a piece of filament HINGE_PIN_GRIP_SHARE of
+ * the pin's play, at least HINGE_PIN_GRIP; HINGE_PRINTED_PIN_GRIP for a pin printed apart. Never more than the pin's
+ * play, so the body's holes are never looser than the lid's and its knuckles keep at least HINGE_KNUCKLE_WALL round them.
  */
 export function hingePinGrip(options: Pick<LidOptions, "hingePinPlay"> & Partial<Pick<LidOptions, "hingePrintPin">>) {
-  return options.hingePrintPin ? Math.min(HINGE_PRINTED_PIN_GRIP, options.hingePinPlay) : HINGE_PIN_GRIP;
+  const grip = options.hingePrintPin ? HINGE_PRINTED_PIN_GRIP : Math.max(HINGE_PIN_GRIP, HINGE_PIN_GRIP_SHARE * options.hingePinPlay);
+  return Math.min(grip, options.hingePinPlay);
 }
 
 /**
@@ -3502,8 +3510,8 @@ export function lidForSolid(runtime: ManifoldToplevel, body: ManifoldSolid, give
         // standing on a corner so its top is a point at 45 degrees, as the teardrop's (which lies within it), and it prints
         // without droop; its corners are cut flat where they would leave less than TEARDROP_WALL of the knuckle, as the
         // teardrop's point is. The body's square is as tight round the pin as its round holes, so the pin goes in through it
-        // before the plugs; each plug is that square HINGE_PIN_GRIP smaller all round (as thick as a piece of filament, a
-        // little thicker for a printed pin's roomier hole), so it sits tight and cannot turn, and its outer end is cut to the
+        // before the plugs; each plug is that square HINGE_PIN_GRIP smaller all round (a little thicker than a piece of
+        // filament, more so for a printed pin's roomier hole), so it sits tight and cannot turn, and its outer end is cut to the
         // body's outline, flush with it.
         const squareAlong = (from: number, to: number, half: number, corner: number) => {
           const square = keep(created, keep(created, runtime.CrossSection.square([2 * half, 2 * half], true)).rotate(45));
