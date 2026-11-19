@@ -17,11 +17,13 @@
   {
     "title": {
       "de": "19-Zoll-Rack-Löcher",
-      "en": "19″ rack holes"
+      "en": "19″ rack holes",
+      "da": "Huller til 19″-rack"
     },
     "body": {
       "de": "Bei den Befestigungslöchern gibt es jetzt neben „Schrauben“ auch „19″-Rack“: vier Langlöcher in den Ecken einer Frontplatte, genau im Abstand der Rack-Schienen. Die Höhe passt sich der Platte an oder folgt einer Normplatte von 1U bis 6U. Eine Zeile zeigt, wo die Löcher gelandet sind.",
-      "en": "The mounting holes now offer \"19″ rack\" next to \"Screws\": four slots in the corners of a front panel, exactly where a rack's rails have their holes. The height is fitted to the panel or follows a standard 1U to 6U panel. A line shows where the holes came out."
+      "en": "The mounting holes now offer \"19″ rack\" next to \"Screws\": four slots in the corners of a front panel, exactly where a rack's rails have their holes. The height is fitted to the panel or follows a standard 1U to 6U panel. A line shows where the holes came out.",
+      "da": "Fanen Monteringshuller har nu \"19″-rack\" ved siden af \"Skruer\": fire aflange huller i hjørnerne af en frontplade, lige dér hvor rackets skinner har deres huller. Højden tilpasses pladen eller følger en standardpanel fra 1U til 6U. En linje viser, hvor hullerne kom ud."
     },
     "guide": {
       "section": "holePattern"
@@ -30,11 +32,13 @@
   {
     "title": {
       "de": "Nur die Auswahl als LYL speichern",
-      "en": "Save only the selection as LYL"
+      "en": "Save only the selection as LYL",
+      "da": "Gem kun de valgte objekter som LYL"
     },
     "body": {
       "de": "Im Exportfenster kann die LYL-Datei jetzt nur die ausgewählten Objekte enthalten, als neuen Entwurf ohne Verlauf, Notizen und Anhänge. Dein Entwurf bleibt mit seiner Datei verbunden. Praktisch für Teile, die du in einer Bibliothek aufhebst und mit „Aus Design einfügen“ wieder holst.",
-      "en": "In the export window, the LYL file can now hold only the selected objects, as a new design without history, notes or attachments. Your design stays tied to its own file. Handy for parts you keep in a library and bring back with Insert from design."
+      "en": "In the export window, the LYL file can now hold only the selected objects, as a new design without history, notes or attachments. Your design stays tied to its own file. Handy for parts you keep in a library and bring back with Insert from design.",
+      "da": "I eksportvinduet kan LYL-filen nu rumme kun de valgte objekter, som et eget design uden historik, noter eller vedhæftede filer. Dit design forbliver knyttet til sin egen fil. Praktisk for dele, du opbevarer i et bibliotek og henter frem igen med \"Indsæt i dette design\"."
     },
     "guide": {
       "chapter": "files"
