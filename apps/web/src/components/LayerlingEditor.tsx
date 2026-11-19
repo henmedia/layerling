@@ -15127,6 +15127,7 @@ export function LayerlingEditor({
           perimeterStart: mcpOptionalNumber(params.start),
           cornerToCenter: params.toCenter === true,
           ...(arrangement === "corners" && count !== undefined ? { cornerCount: count } : {}),
+          ...(arrangement === "corners" && params.rack === true ? { rack: true, rackUnits: mcpOptionalNumber(params.rackUnits) } : {}),
           ...(custom ? holePatternCustomFootprint(custom) : {}),
         });
         // Taken before the face is read: joining a group's or bundle's parts takes a moment, and the scene may change meanwhile.
@@ -15139,6 +15140,11 @@ export function LayerlingEditor({
         if (isRoundWallFace(read.face) && holeTiltRadians(settings) !== 0) throw new Error("holeTilt needs a flat face for now; on a round wall the holes point straight at the axis");
         const plan = holePatternShapes(read.face, settings, t("holePattern.holeName"), undefined, custom);
         if (plan.tooMany) throw new Error("That would be too many holes; make them bigger or the spacing wider");
+        if (plan.holes.length === 0 && plan.rack) {
+          throw new Error(plan.rack.reason === "narrow"
+            ? `Too narrow for a 19" rack: the face is ${plan.rack.width} mm across, a rack panel is 482.6 mm`
+            : `Too low for the rack holes: the face is ${plan.rack.height} mm high${plan.rack.standardHeight !== undefined ? `, the ${plan.rack.units}U holes need ${plan.rack.standardHeight} mm` : ""}`);
+        }
         if (plan.holes.length === 0) throw new Error("No hole fits on that face with this size and margin");
         const result = await buildGroupedShapeOffThread([target, ...plan.holes], workspaceSettingsRef.current.booleanTriangleLimit, geometryAbortRef.current?.signal);
         if (projectInfoRef.current.projectId !== sourceProjectId || projectShapesFingerprint(currentShapes()) !== sourceFingerprint) {
@@ -20838,6 +20844,7 @@ export function LayerlingEditor({
           tooMany={Boolean(holePatternPreview?.tooMany)}
           ring={holePatternPreview?.ring}
           roundFace={Boolean(holePatternPreview?.roundFace)}
+          rack={holePatternPreview?.rack}
           wall={holePatternTool.face && isRoundWallFace(holePatternTool.face) ? holePatternPreview?.wall ?? { diameter: holePatternTool.face.round.radius * 2, closed: holePatternTool.face.round.outline.closed } : undefined}
           customChoices={holePatternCustomChoices(shapes, holePatternTool.sourceId).map((shape) => ({ id: shape.id, name: displayShapeName(shape) }))}
           customIsHole={Boolean(holePatternCustom?.hole)}
