@@ -6,6 +6,8 @@ code still carries it - so a lower number further down is older, not newer.
 
 ## Unreleased
 
+- **Lid hinge: a piece of filament fits more easily in the body's holes (Discussion #1220, PR #1873 by @marcus040473):** With the default settings the hinge pin's holes in the body were a fixed 0.05 mm per side larger than a piece of filament. A printed hole comes out a little smaller than drawn and filament is often a little over 1.75 mm, so on many printers the pin went in hard or not at all. The body's holes now get half the pin's play per side (0.1 mm with the 0.2 mm play the lid starts from), at least 0.05 mm and never more than the play itself, so a printer whose fit test needs more room gets more and a play set tighter by hand gets less. The lid's holes keep the whole play, so the pin still sits tighter in the body than in the lid and does not slide out. A printed pin keeps its 0.15 mm; the end plugs stay 0.05 mm smaller all round than their pocket, so with filament they are 1.85 mm square instead of 1.75. Reported by @smussadi.
+
 ## 1.166.0
 
 - **CAD kernel occt-wasm 5.17.2 (from 5.17.1) and brepjs 20.28.3 (from 20.27.0):** The kernel's fix for swept and offset faces, which are now taken on their BSpline form, comes along, and brepjs reports how shapes without metadata were changed, moves a shape by its location on a kernel that shares geometry, and imports each body of a mesh as its own solid or shell.
