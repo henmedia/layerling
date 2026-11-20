@@ -3156,6 +3156,7 @@ export const MESSAGES_TR: Partial<Record<MessageKey, string>> = {
   "outliner.show": "Nesneyi göster",
   "outliner.solid": "Katı",
   "outliner.hole": "Delik",
+  "outliner.selectSameColor": "Bu renkteki tüm şekilleri seç",
   "group.edit": "Grubu düzenle",
   "group.editBundle": "Paketi düzenle",
   "group.done": "Bitti",

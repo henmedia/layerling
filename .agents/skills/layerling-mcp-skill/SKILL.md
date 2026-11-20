@@ -61,7 +61,7 @@ Every object carries a `settings` block beside its dimensions, holding what the 
 
 Useful tools:
 
-- `layerling_select_objects`: select ids in the live editor; `invert: true` selects every visible object except those ids (or except the current selection), the editor's Invert selection.
+- `layerling_select_objects`: select ids in the live editor; `invert: true` selects every visible object except those ids (or except the current selection), the editor's Invert selection; `sameColor: true` selects every visible object in the colour of those ids (or of the current selection, all holes together), the editor's Select same colour.
 - `layerling_hide_others`: hide every visible object except the given ids (or the current selection) in one undo step, the editor's Hide others; undo or `update_object` with `hidden: false` brings them back.
 - `layerling_rename_project`: give the project a name (`name`, at most 80 characters), as the pencil beside the project name does, so a design is easy to find in the project list later. `layerling_list_editors` and `layerling_read_scene` report the project's name: check it before changing a design, so the shapes land in the right project.
 - `layerling_delete_objects`: delete ids in the live editor, or delete the current selection when ids are omitted

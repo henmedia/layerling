@@ -258,5 +258,18 @@
     "guide": {
       "section": "hollowing"
     }
+  },
+  {
+    "title": {
+      "de": "Alle Formen einer Farbe auswählen",
+      "en": "Select all shapes of one colour"
+    },
+    "body": {
+      "de": "In der Objektliste wählt ein Klick auf den Farbpunkt vor dem Namen jede sichtbare Form dieser Farbe aus, praktisch, wenn jede Baugruppe ihre eigene Farbe hat. Mit Strg (Cmd am Mac) oder Umschalt kommen sie zur Auswahl hinzu. „Gleiche Farbe auswählen“ im Rechtsklick-Menü und in der Befehlssuche (Strg+K) macht dasselbe für die Farben der ausgewählten Formen.",
+      "en": "In the object list, a click on the colour dot in front of a name selects every visible shape of that colour, handy when each component has a colour of its own. Ctrl (Cmd on a Mac) or Shift adds them to what is selected. \"Select same colour\" in the right-click menu and the command search (Ctrl+K) does the same for the colours of the selected shapes."
+    },
+    "guide": {
+      "section": "objectList"
+    }
   }
 ]

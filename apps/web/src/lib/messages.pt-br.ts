@@ -4656,6 +4656,7 @@ export const MESSAGES_PT_BR: Partial<Record<MessageKey, string>> = {
   "outliner.show": "Mostrar objeto",
   "outliner.solid": "Sólido",
   "outliner.hole": "Buraco",
+  "outliner.selectSameColor": "Selecionar todas as formas desta cor",
   "group.edit": "Editar grupo",
   "group.editBundle": "Editar conjunto",
   "group.done": "Concluído",
