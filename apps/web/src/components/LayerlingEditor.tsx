@@ -172,7 +172,7 @@ import { getEditorProfile, profileBooleanValue } from "@/lib/editorProfile";
 import { CAD_MODIFIER_MAX_SHARP_ANGLE, CAD_MODIFIER_REQUEST_TIMEOUT_MS, CAD_MODIFIER_PREPARE_TRIANGLE_LIMIT, cadModifierPrepareTimeoutMs, cadModifierTimeoutMessage, cadModifierSizeRefusal, cadModifierUserErrorMessage, cadModifierWorkerFailureMessage, cadModifierCandidateEdge, cadModifierPresetValues, defaultCadModifierTangentChain, rescueSharpAngleForEdges, selectableCadModifierEdge, type CadModifierRequestPhase } from "@/lib/cadModifierRuntime";
 import { isThinFace, thinFacesWith } from "@/lib/cadThinFaces";
 import { createCadPreviewQueue } from "@/lib/cadPreviewQueue";
-import { cloneWorkplaneShapeSnapshot, compactEdgeTreatmentHistory, edgeTreatmentAppliedFrame, groupBeforeEdgeTreatments, restoreShapeBeforeEdgeTreatment, tubeBeforeEdgeTreatments, wasGroupBeforeEdgeTreatments } from "@/lib/edgeTreatmentHistory";
+import { cloneWorkplaneShapeSnapshot, compactEdgeTreatmentHistory, edgeTreatmentAppliedFrame, groupBeforeEdgeTreatments, restoreShapeBeforeEdgeTreatment, sketchRebuildDropsTreatments, tubeBeforeEdgeTreatments, wasGroupBeforeEdgeTreatments } from "@/lib/edgeTreatmentHistory";
 import { describeHistoryStep, historyStepsAround } from "@/lib/historyStepDescription";
 import { historyStepText } from "@/lib/historyStepText";
 import { historyViewMcpCommand } from "./workplane/historyViewMcp";
@@ -5670,7 +5670,9 @@ export function LayerlingEditor({
     setSketchMeasurement(null);
     setEditingSketchShapeId(editingId);
     // A face tool body shows the face's outline; the body is built set in from it, which the sketch does not draw.
-    setNotice(editingId
+    // Finishing builds the body anew, without what the edge tools did to it: said before the work is put in (#1804).
+    if (body && sketchRebuildDropsTreatments(body)) setNotice(t("status.editingProfileEdgesLost"), true);
+    else setNotice(editingId
       ? initial.inset
         ? t("status.editingInsetProfile", { distance: Number(initial.inset.distance.toFixed(2)), radius: Number(initial.inset.radius.toFixed(2)) })
         : t(operation === "revolve" ? "status.editingRevolveProfile" : operation === "sweep" ? "status.editingSweepProfile" : "status.editingProfile")
@@ -6654,6 +6656,10 @@ export function LayerlingEditor({
             ? t("status.sweepCreated")
             : t("status.exactSketchCreated"),
     );
+    // The fillets, chamfers and hollowing went with the old body (#1804): said, and it stays to be read, rather than left to be found out.
+    if (editedBody && sketchRebuildDropsTreatments(editedBody) && shapesRef.current.some((shape) => shape.id === resolved.id && !shape.edgeTreatments?.length)) {
+      setNotice(t("status.sketchUpdatedEdgesLost"), true);
+    }
     setSketchActive(false);
     setNoteMode(false);
     setSketchStrokePanelOpen(false);

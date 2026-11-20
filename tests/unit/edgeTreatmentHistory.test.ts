@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { compactEdgeTreatmentHistory, edgeTreatmentAppliedFrame, restoreShapeBeforeEdgeTreatment, shapeBeforeEdgeTreatments } from "@/lib/edgeTreatmentHistory";
+import { compactEdgeTreatmentHistory, edgeTreatmentAppliedFrame, restoreShapeBeforeEdgeTreatment, shapeBeforeEdgeTreatments, sketchRebuildDropsTreatments } from "@/lib/edgeTreatmentHistory";
 import type { EdgeTreatmentHistoryEntry, WorkplaneShape } from "@/types/layerling";
 
 function box(overrides: Partial<WorkplaneShape> = {}): WorkplaneShape {
@@ -200,5 +200,26 @@ describe("the shape a treated body was made from (#1689)", () => {
     expect(shapeBeforeEdgeTreatments(box({ kind: "mesh", importedMesh: mesh, edgeTreatmentHistory: [historyEntry(group)] }))).toBeNull();
     expect(shapeBeforeEdgeTreatments(box({ kind: "mesh", importedMesh: mesh, edgeTreatmentHistory: [historyEntry(imported)] }))).toBeNull();
     expect(shapeBeforeEdgeTreatments(box())).toBeNull();
+  });
+});
+
+// #1804: a sketch body opens its sketch again whatever was done to it, and finishing builds it anew without its fillets and
+// chamfers. The editor warns of that when it is opened and says it when it is finished - for exactly these bodies.
+describe("sketchRebuildDropsTreatments", () => {
+  const sketchProfile = { points: [], segments: [] };
+
+  it("holds for a sketch body with a chamfer, a fillet or a hollowing", () => {
+    for (const kind of ["chamfer", "fillet", "shell"] as const) {
+      expect(sketchRebuildDropsTreatments(box({ sketchProfile, edgeTreatments: [{ kind, amount: 1, edgeCount: 4 }] }))).toBe(true);
+    }
+  });
+
+  it("does not hold for a sketch body nothing was done to, nor once the treatments are taken back", () => {
+    expect(sketchRebuildDropsTreatments(box({ sketchProfile }))).toBe(false);
+    expect(sketchRebuildDropsTreatments(box({ sketchProfile, edgeTreatments: [] }))).toBe(false);
+  });
+
+  it("does not hold for a body without a sketch: there is nothing to open", () => {
+    expect(sketchRebuildDropsTreatments(box({ edgeTreatments: [{ kind: "chamfer", amount: 1, edgeCount: 4 }] }))).toBe(false);
   });
 });
