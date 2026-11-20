@@ -1209,6 +1209,7 @@ export const MESSAGES_DA: Partial<Record<MessageKey, string>> = {
   "workspace.spaceMouseInvertZoom": "Zoom",
   "workspace.spaceMouseInvertTilt": "Vip",
   "workspace.spaceMouseInvertTwist": "Drej",
+  "workspace.spaceMouseInvertPad": "Lige nu viser browseren musen som en spilcontroller. Det, du sætter kryds ved her, gælder kun for det; efter et klik på „Tilslut 3D-mus“ gælder igen de retninger, der er sat kryds ved for den.",
   "notice.movedToRoot": "{name} flyttet til øverste niveau.",
   "notice.movedToFolder": "{name} flyttet til mappen {folder}.",
   "notice.folderDeleted": "Mappe {name} slettet; det der var i den, rykkede et niveau op.",

@@ -4501,6 +4501,7 @@ export const MESSAGES_HU: Partial<Record<MessageKey, string>> = {
   "workspace.spaceMouseInvertZoom": "Nagyítás",
   "workspace.spaceMouseInvertTilt": "Döntés",
   "workspace.spaceMouseInvertTwist": "Csavarás",
+  "workspace.spaceMouseInvertPad": "A böngésző most játékvezérlőként mutatja az egeret. Amit itt bejelölsz, csak erre érvényes; a „3D egér csatlakoztatása” gombra kattintva újra az ahhoz bejelölt irányok érvényesek.",
   "workspace.printerPlay": "Nyomtató holtjátéka",
   "workspace.printerPlayNone": "nincs lemérve",
   "workspace.printerPlayUnit": "mm oldalanként",

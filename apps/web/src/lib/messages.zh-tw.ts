@@ -5082,6 +5082,7 @@ export const MESSAGES_ZH_TW: Partial<Record<MessageKey, string>> = {
   "workspace.spaceMouseInvertZoom": "縮放",
   "workspace.spaceMouseInvertTilt": "傾斜",
   "workspace.spaceMouseInvertTwist": "扭轉",
+  "workspace.spaceMouseInvertPad": "瀏覽器目前把滑鼠當作遊戲控制器。在這裡勾選的方向只對這種方式有效；按下「連接 3D 滑鼠」後，會重新使用為那種方式勾選的方向。",
   "workspace.slow": "慢",
   "workspace.fast": "快",
   "workspace.units": "單位",

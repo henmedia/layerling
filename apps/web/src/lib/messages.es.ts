@@ -5172,6 +5172,7 @@ export const MESSAGES_ES: Partial<Record<MessageKey, string>> = {
   "workspace.spaceMouseInvertZoom": "Zoom",
   "workspace.spaceMouseInvertTilt": "Inclinar",
   "workspace.spaceMouseInvertTwist": "Girar",
+  "workspace.spaceMouseInvertPad": "Ahora mismo el navegador muestra el ratón como un mando de juego. Lo que marques aquí vale solo para eso; tras hacer clic en «Conectar ratón 3D» vuelven a valer las direcciones marcadas para él.",
   "workspace.slow": "Lenta",
   "workspace.fast": "Rápida",
   "workspace.units": "Unidades",

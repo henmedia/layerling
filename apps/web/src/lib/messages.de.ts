@@ -5092,6 +5092,7 @@ export const MESSAGES_DE: Record<MessageKey, string> = {
   "workspace.spaceMouseInvertZoom": "Zoomen",
   "workspace.spaceMouseInvertTilt": "Kippen",
   "workspace.spaceMouseInvertTwist": "Drehen",
+  "workspace.spaceMouseInvertPad": "Der Browser zeigt die Maus gerade als Spielcontroller. Was du hier anhakst, gilt nur dafür; nach einem Klick auf „3D-Maus verbinden“ gelten wieder die dafür angehakten Richtungen.",
   "workspace.slow": "Langsam",
   "workspace.fast": "Schnell",
   "workspace.units": "Einheiten",

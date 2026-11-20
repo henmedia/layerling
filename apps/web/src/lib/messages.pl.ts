@@ -5098,6 +5098,7 @@ export const MESSAGES_PL: Partial<Record<MessageKey, string>> = {
   "workspace.spaceMouseInvertZoom": "Powiększenie",
   "workspace.spaceMouseInvertTilt": "Pochylenie",
   "workspace.spaceMouseInvertTwist": "Obrót",
+  "workspace.spaceMouseInvertPad": "Przeglądarka pokazuje teraz mysz jako kontroler do gier. To, co tu zaznaczysz, dotyczy tylko tego sposobu; po kliknięciu „Podłącz mysz 3D” znów obowiązują kierunki zaznaczone dla niego.",
   "workspace.slow": "Wolno",
   "workspace.fast": "Szybko",
   "workspace.units": "Jednostki",

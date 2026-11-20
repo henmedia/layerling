@@ -5077,6 +5077,7 @@ export const MESSAGES_FR: Partial<Record<MessageKey, string>> = {
   "workspace.spaceMouseInvertZoom": "Zoom",
   "workspace.spaceMouseInvertTilt": "Inclinaison",
   "workspace.spaceMouseInvertTwist": "Rotation",
+  "workspace.spaceMouseInvertPad": "Le navigateur présente actuellement la souris comme une manette de jeu. Ce que vous cochez ici ne vaut que pour ce cas ; après un clic sur « Connecter une souris 3D », les directions cochées pour elle s'appliquent de nouveau.",
   "workspace.slow": "Lent",
   "workspace.fast": "Rapide",
   "workspace.units": "Unités",

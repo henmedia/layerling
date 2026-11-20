@@ -5093,6 +5093,7 @@ export const MESSAGES_NL: Record<MessageKey, string> = {
   "workspace.spaceMouseInvertZoom": "Zoomen",
   "workspace.spaceMouseInvertTilt": "Kantelen",
   "workspace.spaceMouseInvertTwist": "Draaien",
+  "workspace.spaceMouseInvertPad": "De browser toont de muis nu als gamecontroller. Wat je hier aanvinkt, geldt alleen daarvoor; na een klik op '3D-muis verbinden' gelden weer de richtingen die daarvoor zijn aangevinkt.",
   "workspace.slow": "Langzaam",
   "workspace.fast": "Snel",
   "workspace.units": "Eenheden",

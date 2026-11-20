@@ -5083,6 +5083,7 @@ export const MESSAGES_CS: Record<MessageKey, string> = {
   "workspace.spaceMouseInvertZoom": "Přiblížení",
   "workspace.spaceMouseInvertTilt": "Náklon",
   "workspace.spaceMouseInvertTwist": "Otočení",
+  "workspace.spaceMouseInvertPad": "Prohlížeč teď myš ukazuje jako herní ovladač. Co zaškrtneš tady, platí jen pro tento způsob; po kliknutí na „Připojit 3D myš“ znovu platí směry zaškrtnuté pro něj.",
   "workspace.slow": "Pomalu",
   "workspace.fast": "Rychle",
   "workspace.units": "Jednotky",

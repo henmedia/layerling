@@ -5090,6 +5090,7 @@ export const MESSAGES_JA: Partial<Record<MessageKey, string>> = {
   "workspace.spaceMouseInvertZoom": "ズーム",
   "workspace.spaceMouseInvertTilt": "かたむける",
   "workspace.spaceMouseInvertTwist": "ひねる",
+  "workspace.spaceMouseInvertPad": "いまブラウザーはマウスをゲームコントローラーとして見せています。ここでチェックした向きはその場合だけに使われ、「3Dマウスをつなぐ」をクリックした後は、そちら用にチェックした向きに戻ります。",
   "workspace.slow": "遅い",
   "workspace.fast": "速い",
   "workspace.units": "単位",

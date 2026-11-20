@@ -5155,6 +5155,7 @@ export const MESSAGES_IT: Partial<Record<MessageKey, string>> = {
   "workspace.spaceMouseInvertZoom": "Zoom",
   "workspace.spaceMouseInvertTilt": "Inclinare",
   "workspace.spaceMouseInvertTwist": "Ruotare",
+  "workspace.spaceMouseInvertPad": "In questo momento il browser mostra il mouse come controller di gioco. Ciò che spunti qui vale solo per questo caso; dopo un clic su «Collega il mouse 3D» valgono di nuovo le direzioni spuntate per quello.",
   "workspace.slow": "Lenta",
   "workspace.fast": "Veloce",
   "workspace.units": "Unità",

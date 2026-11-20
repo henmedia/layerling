@@ -5082,6 +5082,7 @@ export const MESSAGES_ZH_CN: Partial<Record<MessageKey, string>> = {
   "workspace.spaceMouseInvertZoom": "缩放",
   "workspace.spaceMouseInvertTilt": "倾斜",
   "workspace.spaceMouseInvertTwist": "扭转",
+  "workspace.spaceMouseInvertPad": "浏览器目前把鼠标当作游戏手柄。在这里勾选的方向只对这种方式有效；点击“连接 3D 鼠标”后，重新使用为那种方式勾选的方向。",
   "workspace.slow": "慢",
   "workspace.fast": "快",
   "workspace.units": "单位",

@@ -4915,6 +4915,7 @@ export const MESSAGES_PT_PT: Partial<Record<MessageKey, string>> = {
   "workspace.spaceMouseInvertZoom": "Ampliação e redução",
   "workspace.spaceMouseInvertTilt": "Inclinação",
   "workspace.spaceMouseInvertTwist": "Torção",
+  "workspace.spaceMouseInvertPad": "Neste momento o navegador mostra o rato como um comando de jogo. O que marcares aqui vale só para isso; depois de um clique em «Ligar rato 3D» voltam a valer as direções marcadas para ele.",
   "workspace.slow": "Lenta",
   "workspace.fast": "Rápida",
   "workspace.units": "Unidades",

@@ -5084,6 +5084,7 @@ export const MESSAGES_RU: Partial<Record<MessageKey, string>> = {
   "workspace.spaceMouseInvertZoom": "Масштаб",
   "workspace.spaceMouseInvertTilt": "Наклон",
   "workspace.spaceMouseInvertTwist": "Поворот",
+  "workspace.spaceMouseInvertPad": "Сейчас браузер показывает мышь как игровой контроллер. То, что вы отметите здесь, действует только для этого способа; после нажатия «Подключить 3D-мышь» снова действуют направления, отмеченные для него.",
   "workspace.slow": "Медленно",
   "workspace.fast": "Быстро",
   "workspace.units": "Единицы",

@@ -57,5 +57,18 @@
       "de": "Ein Rohr, Ring oder gebogenes Rohr mit „Bohrung schneidet beim Gruppieren wie ein Loch“ öffnet, womit es gruppiert ist. Eine Fase oder Verrundung an dieser Gruppe hat die Öffnung wieder verschlossen. Jetzt bleibt sie offen.",
       "en": "A tube, ring or bent tube with \"Bore cuts as a hole when grouped\" opens whatever it is grouped with. A chamfer or fillet on that group closed the opening again. Now it stays open."
     }
+  },
+  {
+    "title": {
+      "de": "3D-Maus: Richtungen bleiben nach einem Neustart richtig",
+      "en": "3D mouse: directions stay right after a restart"
+    },
+    "body": {
+      "de": "Nach einem Neustart des Browsers liest layerling eine 3D-Maus als Spielcontroller, bis du wieder auf „3D-Maus verbinden“ klickst. Bei manchen Geräten laufen die Richtungen dabei andersherum, und die angehakten Richtungen passten dann nicht mehr. layerling merkt sie sich jetzt für beide Wege getrennt: Unter Einstellungen, Bedienung, 3D-Maus steht eine Zeile, wenn die Maus gerade als Spielcontroller gelesen wird, und was du dann anhakst, gilt nur dafür. Deine bisherigen Einstellungen bleiben für die verbundene Maus erhalten.",
+      "en": "After the browser is restarted, layerling reads a 3D mouse as a game controller until you click Connect 3D mouse again. On some devices the directions run the other way round there, and the ticked directions no longer fitted. layerling now keeps them apart for the two ways: under Settings, Controls, 3D mouse a line says when the mouse is read as a game controller, and what you tick then holds for that only. Your settings so far stay with the connected mouse."
+    },
+    "guide": {
+      "section": "settingsView"
+    }
   }
 ]

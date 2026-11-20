@@ -5164,6 +5164,7 @@ export const MESSAGES_SV: Partial<Record<MessageKey, string>> = {
   "workspace.spaceMouseInvertZoom": "Zooma",
   "workspace.spaceMouseInvertTilt": "Luta",
   "workspace.spaceMouseInvertTwist": "Vrida",
+  "workspace.spaceMouseInvertPad": "Just nu visar webbläsaren musen som en spelkontroll. Det du bockar för här gäller bara för det; efter ett klick på ”Anslut 3D-mus” gäller åter de riktningar som är förbockade för den.",
   "workspace.slow": "Långsam",
   "workspace.fast": "Snabb",
   "workspace.units": "Enheter",
