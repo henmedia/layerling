@@ -46,7 +46,7 @@ Du kan trække en form forbi kanten af pladen og lade den stå der, omkring én 
 
 ## Snap under flytning
 
-Når du trækker en form hen over arbejdsplanet, snapper den til andre former: dens venstre, højre, for- eller bagkant eller dens midte lander præcis på en kant eller midte af en anden form. En lyserød hjælpelinje viser hvad den holder fast i. Sådan sidder to dele lige ud for hinanden eller centreret den ene bag den anden uden at taste tal. Det virker også med gitteret slået fra. Arbejdsplanets midte tæller også: de lyserøde linjer viser, når formen står midt på pladen langs X, langs Y eller begge.
+Når du trækker en form hen over arbejdsplanet, snapper den til andre former: dens venstre, højre, for- eller bagkant eller dens midte lander præcis på en kant eller midte af en anden form. En lyserød hjælpelinje viser hvad den holder fast i. Sådan sidder to dele lige ud for hinanden eller centreret den ene bag den anden uden at taste tal. Det virker også med gitteret slået fra. Arbejdsplanets midte tæller også: de lyserøde linjer viser, når formen står midt på pladen langs X, langs Y eller begge. En form, der står oprejst med siderne langs X og Y, snapper desuden til den væg, den løber ind i, også indervæggen i en kasse, en udhulet form eller et importeret kabinet, så en del sidder tæt inde i hjørnet af et kabinet.
 
 Også når du ændrer størrelse, snapper det: Trækker du i et sidehåndtag, stopper den side ved kanter og centre af andre former og ved den væg, den løber ind i, også indervæggen i en kasse, en udhulet form eller et importeret kabinet, og den lyserøde linje viser hvor. Det mål bevares nøjagtigt, uden for gitteret. Sådan fylder en del et kabinet fra væg til væg: læg den mod den ene væg, og træk dens anden side hen til den modsatte. Med [[Alt]] vokser formen fra midten, og den trukne side snapper på samme måde; med [[Shift]] beholder den sine proportioner og snapper ikke. Det virker på det flade arbejdsplan for former, der står oprejst med siderne langs X og Y, og {{ui:workspace.objectSnap}} slår det fra sammen med snap under flytning.
 
@@ -54,7 +54,7 @@ Hold [[Shift]] mens du trækker for at holde flytningen på én akse: formen fø
 
 Eller træk i den røde eller grønne pil oven på markeringen: den flytter kun langs X eller kun langs Y, og formen følger musen langs den linje, også i en lav visning, hvor frit træk løber langt væk. Pilene snapper som ved træk, [[Alt]] slipper, og bagefter kan du klikke på den tilbagelagte afstand og skrive den nøjagtige værdi.
 
-Med [[Alt]] allerede holdt når trækket begynder, trækker du en kopi, som i Tinkercad: formen bliver hvor den er, og kopien lander hvor du slap. At trykke [[Alt]] først på vejen pauserer snap; formen følger så kun gitteret. En kopi snapper også først når du slipper [[Alt]] på vejen. For at slå snap helt fra, brug gittermenuen nederst til højre ({{ui:inspector.objectSnap}}) eller indstillingerne. Indtil videre snapper kun flytning på det almindelige arbejdsplan, ikke løft og ikke ændring af størrelse.
+Med [[Alt]] allerede holdt når trækket begynder, trækker du en kopi, som i Tinkercad: formen bliver hvor den er, og kopien lander hvor du slap. At trykke [[Alt]] først på vejen pauserer snap; formen følger så kun gitteret. En kopi snapper også først når du slipper [[Alt]] på vejen. For at slå snap helt fra, brug gittermenuen nederst til højre ({{ui:inspector.objectSnap}}) eller indstillingerne. På det almindelige arbejdsplan snapper flytning og sidehåndtagene, ikke løft og håndtaget på overfladen.
 
 ## Justering
 

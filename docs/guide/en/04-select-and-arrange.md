@@ -44,7 +44,7 @@ You can drag a shape past the edge of the plate and leave it there, about one pl
 
 ## Snapping while moving
 
-When you drag a shape across the workplane, it snaps to other shapes: its left, right, front or back edge or its centre lands exactly on an edge or centre of another shape. A pink guide line shows what it is holding on to. That way two parts sit flush side by side or centred one behind the other without typing numbers. It works with the grid switched off, too. The centre of the workplane counts too: the pink lines show when the shape sits in the middle of the plate along X, along Y or both.
+When you drag a shape across the workplane, it snaps to other shapes: its left, right, front or back edge or its centre lands exactly on an edge or centre of another shape. A pink guide line shows what it is holding on to. That way two parts sit flush side by side or centred one behind the other without typing numbers. It works with the grid switched off, too. The centre of the workplane counts too: the pink lines show when the shape sits in the middle of the plate along X, along Y or both. A shape standing upright with its sides along X and Y also snaps to the wall it runs into, the inside wall of a box, a hollowed body or an imported case as well, so a part goes flush into the corner of a case.
 
 Resizing snaps too: when you drag a side handle, that side stops at the edges and centres of other shapes and at the wall it runs into, the inside wall of a box, a hollowed body or an imported case as well, and the pink line shows where. That size is kept exactly, off the grid. So a part fills a case from wall to wall: put it against one wall and drag its other side to the opposite one. With [[Alt]] the shape grows from its middle and the dragged side snaps the same way; with [[Shift]] it keeps its proportions and does not snap. This works on the flat workplane, for shapes standing upright with their sides along X and Y, and {{ui:workspace.objectSnap}} switches it off together with snapping while moving.
 
@@ -52,7 +52,7 @@ Hold [[Shift]] while dragging to keep the move on one axis: the shape follows wh
 
 Or pull the red or the green arrow on top of the selection: it moves along X or along Y only, and the shape follows the mouse along that line even in a low view, where a free drag runs off far. The arrows snap as a drag does, [[Alt]] lets go, and afterwards you can click the distance moved and type the exact value.
 
-With [[Alt]] already held when the drag begins, you drag a copy, as in Tinkercad: the shape stays where it is and the copy lands where you let go. Pressing [[Alt]] only on the way pauses snapping; the shape then follows the grid only. A copy, too, snaps only once you let go of [[Alt]] on the way. To switch snapping off for good, use the grid menu in the bottom right ({{ui:inspector.objectSnap}}) or the settings. For now only moving on the normal workplane snaps, not lifting and not resizing.
+With [[Alt]] already held when the drag begins, you drag a copy, as in Tinkercad: the shape stays where it is and the copy lands where you let go. Pressing [[Alt]] only on the way pauses snapping; the shape then follows the grid only. A copy, too, snaps only once you let go of [[Alt]] on the way. To switch snapping off for good, use the grid menu in the bottom right ({{ui:inspector.objectSnap}}) or the settings. On the normal workplane, moving and the side handles snap; lifting and the handle on the top face do not.
 
 ## Aligning
 
