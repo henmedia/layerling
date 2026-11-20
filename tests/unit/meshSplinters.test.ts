@@ -132,3 +132,48 @@ describe("loose splinters of an export (#352)", () => {
     expect(result.mesh.faces.length).toBe(plate.faces.length);
   });
 });
+
+/*
+ * The body as it was before the cut tells a part someone drew from a leftover of the cut (Issue #1781): four small
+ * teeth in one group, standing in a head of another colour, came out of the cut that gave the head their place as
+ * pieces of 0.3 mm3 each, and all but one went as splinters.
+ */
+describe("small pieces a body was drawn with (Issue #1781)", () => {
+  const plate = prism(32, 10, 3);
+  /** A tooth of 1 x 1 x 1 mm at x, and what a cut left of it: the 0.3 mm that stood out of the head. */
+  const tooth = (x: number) => box([x, 0, 0], [x + 1, 1, 1]);
+  const toothLeft = (x: number) => box([x, 0, 0.7], [x + 1, 1, 1]);
+
+  it("keeps what is left of every drawn piece, though each is under half a cubic millimetre", () => {
+    const drawn = join("details", [plate, tooth(20), tooth(23), tooth(26)]);
+    const cut = join("details", [plate, toothLeft(20), toothLeft(23), toothLeft(26)]);
+    expect(removeLooseSplinters(cut).removed).toBe(3);
+    const result = removeLooseSplinters(cut, [drawn]);
+    expect(result.removed).toBe(0);
+    expect(result.mesh).toBe(cut);
+  });
+
+  it("keeps a small drawn piece a merge left as it was", () => {
+    const speck = box([20, 0, 0], [20.6, 0.6, 0.6]);
+    const merged = join("merged", [plate, speck]);
+    expect(removeLooseSplinters(merged).removed).toBe(1);
+    expect(removeLooseSplinters(merged, [join("plate", [plate]), join("speck", [speck])]).removed).toBe(0);
+  });
+
+  it("still takes out the sliver left of a large drawn piece, and a splinter that lies in no drawn piece", () => {
+    // A letter of 6 x 3 x 3 mm that another layer took but for a grain of 0.027 mm3, and a grain beside everything drawn.
+    const letter = box([20, 0, 0], [26, 3, 3]);
+    const drawn = join("letters", [plate, letter]);
+    const cut = join("letters", [plate, box([20, 0, 0], [20.3, 0.3, 0.3]), tetra([40, 0, 0], [40.4, 0, 0], [40, 0.4, 0], [40, 0, 0.4])]);
+    expect(removeLooseSplinters(cut, [drawn]).removed).toBe(2);
+  });
+
+  it("keeps only the largest part left of a drawn piece, and nothing that holds next to nothing", () => {
+    // The cut left two parts of one tooth, 0.3 and 0.1 mm3, and of another tooth a sheet of 0.005 mm3.
+    const drawn = join("details", [plate, tooth(20), tooth(23)]);
+    const cut = join("details", [plate, toothLeft(20), box([20, 0, 0], [21, 1, 0.1]), box([23, 0, 0], [24, 1, 0.005])]);
+    const result = removeLooseSplinters(cut, [drawn]);
+    expect(result.removed).toBe(2);
+    expect(result.mesh.faces.length).toBe(plate.faces.length + 12);
+  });
+});
