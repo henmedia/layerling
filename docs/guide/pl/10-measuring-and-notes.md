@@ -69,6 +69,8 @@ Z opcją {{ui:workspace.dimensionAxisColors}} każde pole ma kolor swojej osi, j
 
 Jeśli na chwilę przeszkadzają, naciśnij [[Q]]: wymiary i odległości wokół zaznaczenia znikają, a przesuwana część jest dobrze widoczna. Ponowne [[Q]] przywraca je. Uchwyt, na który wskazujesz, nadal pokazuje swój wymiar.
 
+Przy bardzo małej części przeszkadzać mogą same uchwyty. [[Shift+Q]] ukrywa je wszystkie - kwadraty rozmiaru oraz strzałki podnoszenia, przesuwania i obracania - a ponowne [[Shift+Q]] je przywraca. Bez nich nadal możesz przeciągać część i wpisywać jej wymiary po prawej, a lista obiektów pokazuje, która część jest zaznaczona.
+
 ## Sprawdzanie luzu
 
 Części, które po druku mają się ruszać - smok flexi, zawias drukowany w całości, pudełko z pokrywką, oś w otworze - potrzebują luzu między sobą. Za mały i sklejają się; jeśli nachodzą na siebie, drukują się jako jeden kawałek. {{ui:editor.tool.clearance}} obok {{ui:editor.tool.loftSketches}} sprawdza to przed drukiem. Bierze zaznaczone obiekty albo, gdy nic nie jest zaznaczone, wszystkie widoczne (te same, które bierze eksport), i sprawdza każdą parę:

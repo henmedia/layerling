@@ -73,6 +73,8 @@ Med {{ui:workspace.dimensionAxisColors}} får hvert felt farven på sin akse, li
 
 Står de i vejen et øjeblik, så tryk [[Q]]: målene og afstandene omkring markeringen forsvinder, så en del du flytter er nem at se. [[Q]] igen henter dem tilbage. Et håndtag du peger på viser stadig sit mål.
 
+På en meget lille del kan selve håndtagene stå i vejen. [[Shift+Q]] skjuler dem alle - firkanterne til størrelsen og pilene til at løfte, skubbe og dreje - og [[Shift+Q]] igen henter dem tilbage. Uden dem kan du stadig trække delen og skrive dens mål til højre, og objektlisten viser, hvilken del der er markeret.
+
 ## Tjek spillerum
 
 Dele, der skal kunne bevæge sig efter print - en flexi-drage, et hængsel printet i ét stykke, en æske med låg, en aksel i sit hul - skal have afstand til hinanden. Er den for lille, hænger de sammen; overlapper de, printes de som ét stykke. {{ui:editor.tool.clearance}} ved siden af {{ui:editor.tool.loftSketches}} tjekker det, før du printer. Det tager de valgte objekter eller, når intet er valgt, alle synlige (de samme som en eksport tager) og tjekker hvert par:

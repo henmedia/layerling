@@ -69,6 +69,8 @@ Mit {{ui:workspace.dimensionAxisColors}} bekommt jedes Kästchen die Farbe seine
 
 Wenn sie kurz stören, drück [[Q]]: Die Maße und Abstände um die Auswahl verschwinden, und ein Teil, das du verschiebst, ist gut zu sehen. Noch einmal [[Q]] holt sie zurück. Ein Griff, auf den du zeigst, zeigt sein Maß trotzdem.
 
+Bei einem sehr kleinen Teil können die Griffe selbst im Weg sein. [[Umschalt+Q]] blendet sie alle aus - die Quadrate für die Größe und die Pfeile zum Anheben, Schieben und Drehen -, noch einmal [[Umschalt+Q]] holt sie zurück. Ohne sie kannst du das Teil weiter ziehen und seine Maße rechts eintippen, und die Objektliste zeigt, welches Teil ausgewählt ist.
+
 ## Spiel prüfen
 
 Teile, die sich nach dem Druck bewegen sollen - ein Flexi-Drache, ein am Stück gedrucktes Scharnier, Kasten und Deckel, eine Achse in ihrer Bohrung - brauchen Abstand zueinander. Ist er zu klein, kleben sie zusammen; überschneiden sie sich, werden sie als ein Stück gedruckt. {{ui:editor.tool.clearance}} neben {{ui:editor.tool.loftSketches}} prüft das vor dem Druck. Es nimmt die ausgewählten Objekte oder, wenn nichts ausgewählt ist, alle sichtbaren (dieselben, die ein Export nimmt) und prüft jedes Paar:

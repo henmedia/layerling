@@ -69,6 +69,8 @@ With {{ui:workspace.dimensionAxisColors}} each box takes the colour of its axis,
 
 For a moment without them, press [[Q]]: the sizes and distances around the selection disappear, so a part you move is easy to see. [[Q]] again brings them back. A handle you point at still shows its size.
 
+On a very small part the handles themselves can be in the way. [[Shift+Q]] hides them all - the squares for the size and the arrows for lifting, sliding and turning - and [[Shift+Q]] again brings them back. Without them you can still drag the part and type its sizes at the right, and the list of objects shows which part is selected.
+
 ## Checking clearance
 
 Parts that should move after printing - a flexi dragon, a hinge printed in place, a box and its lid, an axle in its bore - need a gap between them. Too little, and they stick together; overlapping, they print as one piece. {{ui:editor.tool.clearance}}, next to {{ui:editor.tool.loftSketches}}, checks that before you print. It takes the selected objects, or every visible object when nothing is selected (the same ones an export takes), and checks each pair:

@@ -67,6 +67,8 @@ S volbou {{ui:workspace.dimensionAxisColors}} dostane každé políčko barvu sv
 
 Když na chvíli překážejí, stiskněte [[Q]]: rozměry a vzdálenosti kolem výběru zmizí a díl, který posouváte, je dobře vidět. Další [[Q]] je vrátí. Úchyt, na který ukážete, svůj rozměr ukáže i tak.
 
+U velmi malého dílu mohou překážet i samotné úchyty. [[Shift+Q]] je všechny skryje - čtverečky pro velikost i šipky pro zvednutí, posun a otočení - a další [[Shift+Q]] je vrátí. I bez nich lze díl táhnout a jeho rozměry psát vpravo a seznam objektů ukazuje, který díl je vybrán.
+
 ## Kontrola vůle
 
 Díly, které se mají po tisku pohybovat - flexi drak, pant tištěný vcelku, krabička s víkem, osa v otvoru - potřebují mezi sebou mezeru. Když je příliš malá, slepí se; když se překrývají, vytisknou se jako jeden kus. {{ui:editor.tool.clearance}} vedle {{ui:editor.tool.loftSketches}} to zkontroluje před tiskem. Vezme vybrané objekty, nebo všechny viditelné, když není nic vybráno (tytéž, které bere export), a zkontroluje každou dvojici:

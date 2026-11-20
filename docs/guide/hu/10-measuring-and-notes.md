@@ -67,6 +67,8 @@ A {{ui:workspace.dimensionAxisColors}} beállítással minden mező a tengelye s
 
 Ha egy pillanatra zavarnak, nyomd meg a [[Q]] billentyűt: a kijelölés körüli méretek és távolságok eltűnnek, így jól látszik a mozgatott alkatrész. Újabb [[Q]] visszahozza őket. Az a fogantyú, amelyre mutatsz, így is megmutatja a méretét.
 
+Nagyon kicsi alkatrésznél maguk a fogantyúk is útban lehetnek. A [[Shift+Q]] mindet elrejti - a méret négyzeteit és az emelés, a csúsztatás és a forgatás nyilait -, újabb [[Shift+Q]] visszahozza őket. Nélkülük is húzhatod az alkatrészt és beírhatod a méreteit jobbra, az objektumlista pedig megmutatja, melyik alkatrész van kijelölve.
+
 ## Hézag ellenőrzése
 
 Azoknak az alkatrészeknek, amelyeknek nyomtatás után mozogniuk kell - egy flexi sárkány, egy egyben nyomtatott zsanér, egy doboz a fedelével, egy tengely a furatában -, hézag kell egymás között. Ha túl kicsi, összeragadnak; ha átfedik egymást, egy darabként nyomtatódnak ki. A {{ui:editor.tool.clearance}} az {{ui:editor.tool.loftSketches}} mellett ezt nyomtatás előtt ellenőrzi. A kijelölt objektumokat veszi, vagy ha nincs kijelölés, az összes láthatót (ugyanazokat, mint egy exportálás), és minden párt ellenőriz:

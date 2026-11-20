@@ -67,6 +67,8 @@ Met {{ui:workspace.dimensionAxisColors}} krijgt elk vakje de kleur van zijn as, 
 
 Zitten ze even in de weg, druk dan op [[Q]]: de maten en afstanden rond de selectie verdwijnen, zodat een deel dat je verschuift goed te zien is. Nog eens [[Q]] haalt ze terug. Een greep waar je naar wijst, toont zijn maat toch.
 
+Bij een heel klein deel kunnen de grepen zelf in de weg zitten. [[Shift+Q]] verbergt ze allemaal - de vierkantjes voor de grootte en de pijlen voor optillen, schuiven en draaien - en nog eens [[Shift+Q]] haalt ze terug. Zonder ze kun je het deel nog steeds slepen en zijn maten rechts intypen, en de objectenlijst toont welk deel geselecteerd is.
+
 ## Speling controleren
 
 Onderdelen die na het printen moeten bewegen - een flexi-draak, een in één keer geprint scharnier, een doos met deksel, een as in zijn boring - hebben ruimte tussen elkaar nodig. Te weinig en ze plakken aan elkaar; overlappen ze, dan worden ze als één stuk geprint. {{ui:editor.tool.clearance}}, naast {{ui:editor.tool.loftSketches}}, controleert dat vóór het printen. Het neemt de geselecteerde objecten, of alle zichtbare als niets is geselecteerd (dezelfde als bij een export), en controleert elk paar:

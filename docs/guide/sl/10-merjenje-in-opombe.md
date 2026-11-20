@@ -67,6 +67,8 @@ Z {{ui:workspace.dimensionAxisColors}} dobi vsako polje barvo svoje osi, kot ro�
 
 Če vas za trenutek motijo, pritisnite [[Q]]: mere in razdalje okoli izbora izginejo, zato je del, ki ga premikate, dobro viden. Ponovni [[Q]] jih vrne. Ročica, na katero pokažete, svojo mero vseeno pokaže.
 
+Pri zelo majhnem delu so lahko v napoto same ročice. [[Shift+Q]] skrije vse - kvadratke za velikost ter puščice za dvig, premik in vrtenje - ponovni [[Shift+Q]] pa jih vrne. Tudi brez njih lahko del vlečete in njegove mere vpisujete na desni, seznam predmetov pa pokaže, kateri del je izbran.
+
 ## Preverjanje zračnosti
 
 Deli, ki se morajo po tiskanju premikati - fleksi zmaj, tečaj, natisnjen v kosu, škatla s pokrovom, os v izvrtini - potrebujejo razmik med seboj. Če je premajhen, se zlepijo; če se prekrivajo, se natisnejo kot en kos. {{ui:editor.tool.clearance}} poleg {{ui:editor.tool.loftSketches}} to preveri pred tiskanjem. Vzame izbrane predmete ali, če ni izbrano nič, vse vidne (iste kot izvoz) in preveri vsak par:

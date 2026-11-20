@@ -69,6 +69,8 @@ Con {{ui:workspace.dimensionAxisColors}} cada casilla toma el color de su eje, c
 
 Si estorban un momento, pulsa [[Q]]: las medidas y distancias alrededor de la selección desaparecen y la pieza que mueves se ve bien. Otra vez [[Q]] las recupera. Un tirador al que apuntas sigue mostrando su medida.
 
+En una pieza muy pequeña pueden estorbar los propios tiradores. [[Shift+Q]] los oculta todos - los cuadrados del tamaño y las flechas para levantar, deslizar y girar - y otra vez [[Shift+Q]] los recupera. Sin ellos puedes seguir arrastrando la pieza y escribir sus medidas a la derecha, y la lista de objetos muestra qué pieza está seleccionada.
+
 ## Comprobar la holgura
 
 Las piezas que deben moverse después de imprimir - un dragón flexi, una bisagra impresa en su sitio, una caja con su tapa, un eje en su agujero - necesitan holgura entre sí. Si es demasiado poca, se pegan; si se solapan, se imprimen como una sola pieza. {{ui:editor.tool.clearance}}, junto a {{ui:editor.tool.loftSketches}}, lo comprueba antes de imprimir. Toma los objetos seleccionados o, si no hay nada seleccionado, todos los visibles (los mismos que toma una exportación) y comprueba cada pareja:

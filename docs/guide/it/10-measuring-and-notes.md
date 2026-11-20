@@ -69,6 +69,8 @@ Con {{ui:workspace.dimensionAxisColors}} ogni casella prende il colore del suo a
 
 Se per un momento danno fastidio, premi [[Q]]: le misure e le distanze attorno alla selezione spariscono e il pezzo che sposti si vede bene. Di nuovo [[Q]] le riporta. Una maniglia su cui punti mostra comunque la sua misura.
 
+Su un pezzo molto piccolo possono dare fastidio le maniglie stesse. [[Shift+Q]] le nasconde tutte - i quadratini delle dimensioni e le frecce per sollevare, far scorrere e ruotare - e di nuovo [[Shift+Q]] le riporta. Senza di esse puoi comunque trascinare il pezzo e scriverne le misure a destra, e l'elenco degli oggetti mostra quale pezzo è selezionato.
+
 ## Controllare il gioco
 
 Le parti che devono muoversi dopo la stampa - un drago flexi, una cerniera stampata già montata, una scatola con il suo coperchio, un perno nel suo foro - hanno bisogno di gioco tra loro. Se è troppo poco si incollano; se si sovrappongono, vengono stampate come un pezzo unico. {{ui:editor.tool.clearance}}, accanto a {{ui:editor.tool.loftSketches}}, lo controlla prima della stampa. Prende gli oggetti selezionati o, se non è selezionato nulla, tutti quelli visibili (gli stessi di un'esportazione) e controlla ogni coppia:

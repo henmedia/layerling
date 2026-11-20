@@ -69,6 +69,8 @@ Med {{ui:workspace.dimensionAxisColors}} tar varje måttruta sin axels färg pre
 
 För en stund utan dem trycker du [[Q]]: måtten och avstånden kring markeringen försvinner så att delen du flyttar syns tydligt. Tryck [[Q]] igen för att få tillbaka dem. Handtag du pekar på visar fortfarande sina mått.
 
+På en mycket liten del kan handtagen själva vara i vägen. [[Shift+Q]] döljer dem alla - rutorna för storleken och pilarna för att lyfta, skjuta och vrida - och [[Shift+Q]] igen tar tillbaka dem. Utan dem kan du fortfarande dra delen och skriva dess mått till höger, och objektlistan visar vilken del som är markerad.
+
 ## Kontrollera spelrum
 
 Delar som ska kunna röra sig efter utskrift – en ledad flexi-drake, ett färdigmonterat gångjärn, en låda med lock eller en axel i ett hål – behöver ett mellanrum mellan sig. För lite, så smälter de ihop; överlappar de, skrivs allt ut i ett stycke. {{ui:editor.tool.clearance}}, bredvid {{ui:editor.tool.loftSketches}}, kontrollerar det innan du skriver ut. Verktyget granskar de markerade objekten, eller alla synliga objekt om inget är markerat (samma som vid export), och testar varje par:

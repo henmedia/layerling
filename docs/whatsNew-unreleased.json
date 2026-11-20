@@ -119,5 +119,18 @@
     "guide": {
       "section": "commandSearch"
     }
+  },
+  {
+    "title": {
+      "de": "Griffe ausblenden mit Umschalt+Q",
+      "en": "Hide the handles with Shift+Q"
+    },
+    "body": {
+      "de": "Bei sehr kleinen Teilen verdecken die Quadrate und Pfeile um die Auswahl leicht das, woran du gerade arbeitest. Umschalt+Q blendet alle Griffe aus und wieder ein, so wie Q die Maße und Abstände. Das Teil lässt sich weiter ziehen, und seine Maße tippst du rechts ein.\n\nDamit du auch ohne Griffe siehst, was ausgewählt ist, ist die ausgewählte Zeile in der Objektliste jetzt kräftiger eingefärbt und hat links einen orangen Balken.",
+      "en": "On very small parts the squares and arrows around the selection easily cover what you are working on. Shift+Q hides all handles and shows them again, as Q does for the sizes and distances. You can still drag the part, and type its sizes at the right.\n\nSo that you see what is selected without the handles, the selected row in the object list now has a stronger colour and an orange bar at its left."
+    },
+    "guide": {
+      "chapter": "measuring"
+    }
   }
 ]

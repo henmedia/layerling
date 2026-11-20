@@ -67,6 +67,8 @@ Avec {{ui:workspace.dimensionAxisColors}}, chaque case prend la couleur de son a
 
 Pour vous en passer un instant, appuyez sur [[Q]] : les cotes et distances autour de la sélection disparaissent, et la pièce que vous déplacez se voit bien. Un nouvel appui sur [[Q]] les ramène. Une poignée que vous survolez affiche quand même sa cote.
 
+Sur une très petite pièce, les poignées elles-mêmes peuvent gêner. [[Shift+Q]] les masque toutes - les carrés de taille et les flèches pour lever, glisser et tourner - et un nouvel appui sur [[Shift+Q]] les ramène. Sans elles, vous pouvez toujours faire glisser la pièce et saisir ses cotes à droite, et la liste des objets montre quelle pièce est sélectionnée.
+
 ## Vérifier le jeu
 
 Les pièces qui doivent bouger après l'impression - un dragon flexi, une charnière imprimée en place, une boîte et son couvercle, un axe dans son alésage - ont besoin d'un écart entre elles. Trop petit, elles collent ; si elles se chevauchent, elles s'impriment en une seule pièce. {{ui:editor.tool.clearance}}, à côté de {{ui:editor.tool.loftSketches}}, le vérifie avant l'impression. L'outil prend les objets sélectionnés, ou tous les objets visibles si rien n'est sélectionné (les mêmes qu'un export), et vérifie chaque paire :
