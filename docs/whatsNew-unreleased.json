@@ -34,5 +34,18 @@
     "guide": {
       "chapter": "files"
     }
+  },
+  {
+    "title": {
+      "de": "Skizze auf Platte 2 bearbeiten",
+      "en": "Edit a sketch on plate 2"
+    },
+    "body": {
+      "de": "Bei mehreren Druckplatten zeigte „Skizze bearbeiten“ für einen Körper auf einer weiteren Platte die erste Platte, und der Umriss des Körpers lag außerhalb der Zeichenfläche. Die Skizze öffnet sich jetzt auf der Platte, auf der der Körper steht.",
+      "en": "With several build plates, Edit sketch for a body on a further plate showed the first plate, and the body's outline lay outside the sketch area. The sketch now opens on the plate the body stands on."
+    },
+    "guide": {
+      "section": "buildPlates"
+    }
   }
 ]
