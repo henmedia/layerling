@@ -52,6 +52,7 @@ export function ShellPanel({
   shelfOffered,
   workspace,
   busy,
+  previewBusy = false,
   error,
   roundedEdgesHint,
   appliedFeatureCount,
@@ -106,6 +107,8 @@ export function ShellPanel({
   shelfOffered: boolean;
   workspace: WorkplaneWorkspaceSettings;
   busy: boolean;
+  /** The preview is being built for the settings as they are now (Discussion #1811). */
+  previewBusy?: boolean;
   error: string | null;
   /** A rounded box with rounded top and bottom edges: a wall that is too thick has that as its reason (#401). */
   roundedEdgesHint?: boolean;
@@ -566,7 +569,7 @@ export function ShellPanel({
         </div>
       </details>
 
-      {error ? <div className="edge-modifier-error" role="alert">{shellErrorMessage(error, roundedEdgesHint)}</div> : busy ? <span className="shell-openings-summary" role="status"><LoaderCircle className="edge-modifier-spinner" size={15} />{t("shell.working")}</span> : null}
+      {error ? <div className="edge-modifier-error" role="alert">{shellErrorMessage(error, roundedEdgesHint)}</div> : busy ? <span className="shell-openings-summary" role="status"><LoaderCircle className="edge-modifier-spinner" size={15} />{t("shell.working")}</span> : previewBusy ? <span className="shell-openings-summary shell-preview-status" role="status"><LoaderCircle className="edge-modifier-spinner" size={15} />{t("edge.previewBusy")}</span> : null}
       <div className="edge-modifier-footer">
         <button type="button" className="secondary" onClick={onCancel}>{t("common.cancel")}</button>
         <button type="button" className="primary" disabled={busy} onClick={onApply}>

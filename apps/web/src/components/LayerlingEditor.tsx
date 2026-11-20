@@ -133,6 +133,7 @@ import { magnetsGridLeastSize, magnetsMeetGridCells } from "@/lib/shellGridMagne
 import { DIVIDERS_WITH_GRID_MESSAGE, SHELL_GRID_FLOOR, shellGridFloor, SHELL_GRID_PLAY, MAX_SHELL_GRID_CELLS, normalizeShellDividers, normalizeShellGrid, shellGridEstimate, type ShellDividers, type ShellGrid } from "@/lib/shellGridLimits";
 import { DEFAULT_SHELL_SHELF_HEIGHT, clampShellShelfHeight, clampShellShelfWidth } from "@/lib/shellShelfLimits";
 import { SHELL_SIDES, shellMaxThickness, shellOpeningsFor, shellOpenSides } from "@/lib/shellLimits";
+import { createLatestJobRunner, shellPreviewKey } from "@/lib/shellPreview";
 import { arrayCirclePivot, arrayFitGap, arrayFitShift, arrayFollowingPivot, arrayGridSize, arrayGroupsCopies, arrayWithFit, circleStepDegrees, clampArrayCount, gridOffsets, moveAlongRadius, rotateAroundVertical, rowOffset, singleAxisSpacing, type ArraySettings } from "@/lib/shapeArray";
 import { keepDismissedOverhangs, printerPresetById, shapeBedFootprint, type BedOverhang } from "@/lib/printBed";
 import { MAX_BUILD_PLATES, PLATE_GAP, plateCenterX, plateIndexAt, plateName, plateOfShape, plateOverhangs, shapesOnPlateFrame, shapesAfterPlateResize, platePitch, plateCount as buildPlateCount, shapeMovedAlongX } from "@/lib/buildPlates";
@@ -3690,6 +3691,13 @@ export function LayerlingEditor({
   const [edgeModifier, setEdgeModifier] = useState<EdgeModifierSession | null>(null);
   // `mode: "offset"` is the Offset tool (#919), which shares the hollow tool's state: `thickness` is then the distance.
   const [shellTool, setShellTool] = useState<{ mode?: "offset"; shrink?: boolean; sideways?: boolean; keepCopy?: boolean; thickness: number; openings: ShellOpenings; edges: ShellEdges; stack?: number; stackFoot?: ShellStackFoot | null; gridCells?: number; gridFit?: boolean; gridMagnets?: boolean; gridColumns?: number; gridRows?: number; dividers?: { x: number; z: number } | null; shelf?: number; shelfHeight?: number; busy: boolean; error: string | null } | null>(null);
+  /**
+   * The Hollow panel's preview (Discussion #1811): the body hollowed with the panel's settings, shown in the body's place
+   * until Apply or Cancel. `fingerprint` is the body it was built from; a body changed since is shown as it is.
+   */
+  const [shellPreview, setShellPreview] = useState<{ targetId: string; fingerprint: string; shape: WorkplaneShape } | null>(null);
+  const [shellPreviewBusy, setShellPreviewBusy] = useState(false);
+  const shellPreviewRunnerRef = useRef(createLatestJobRunner<WorkplaneShape>());
   /** Cut out (#927): `partId` stays, a copy of it grown by `clearance` is cut out of `hostId`. */
   const [cutOutTool, setCutOutTool] = useState<{ partId: string; hostId: string; clearance: number; busy: boolean; error: string | null } | null>(null);
   const [punchTool, setPunchTool] = useState<{ punchId: string; targetId: string; axis: SectionPlaneAxis; clearance: number; busy: boolean; error: string | null } | null>(null);
@@ -4484,6 +4492,12 @@ export function LayerlingEditor({
     const layer = holePatternPreview?.topLayer;
     return layer ? { ...layer.slab, elevation: (layer.slab.elevation ?? 0) + 0.02, name: t("holePattern.topLayerName") } : null;
   }, [holePatternPreview?.topLayer]);
+  // The body the Hollow panel is open for, and its fingerprint: the preview belongs to exactly this state of it.
+  const shellPreviewTarget = shellTool && shellTool.mode !== "offset" && selectedShapes.length === 1 ? selectedShape : null;
+  const shellPreviewFingerprint = useMemo(() => (shellPreviewTarget ? projectShapesFingerprint([shellPreviewTarget]) : null), [shellPreviewTarget]);
+  const shellPreviewShape = shellPreview && shellPreviewTarget && shellPreview.targetId === shellPreviewTarget.id && shellPreview.fingerprint === shellPreviewFingerprint
+    ? shellPreview.shape
+    : null;
   const baseViewportShapes = useMemo(
     () =>
       arrayPreview
@@ -4498,6 +4512,8 @@ export function LayerlingEditor({
         ? [...shapes, ...stencilBridgePreview.bridges]
         : edgeModifier?.preview && cadModifierBaseShapeRef.current
         ? shapes.map((shape) => shape.id === cadModifierBaseShapeRef.current?.id ? edgeModifier.preview as WorkplaneShape : shape)
+        : shellPreviewShape
+        ? shapes.map((shape) => shape.id === shellPreviewTarget?.id ? shellPreviewShape : shape)
         : alignMode && alignPreview?.spread
         ? distributedShapesForSelection(shapes, alignSelection, effectiveAlignAnchorId, alignPreview.axis, alignAxes, alignPreview.spread.gap).nextShapes
         : alignMode && alignPreview?.size
@@ -4507,7 +4523,7 @@ export function LayerlingEditor({
         : mirrorMode && mirrorPreviewAxis
           ? mirroredShapesForSelection(shapes, selectedIds, selectedShapes, mirrorPreviewAxis).nextShapes
           : shapes,
-    [alignAxes, alignMode, alignPreview, alignSelection, arrayPreview, edgeModifier?.preview, effectiveAlignAnchorId, faceToolPreview, supportRibPreview, stencilBridgePreview, holePatternPreview, holePatternPreviewFrame, holePatternPreviewLayer, mirrorMode, mirrorPreviewAxis, selectedIds, selectedShapes, shapes],
+    [alignAxes, alignMode, alignPreview, alignSelection, arrayPreview, edgeModifier?.preview, effectiveAlignAnchorId, faceToolPreview, supportRibPreview, stencilBridgePreview, holePatternPreview, holePatternPreviewFrame, holePatternPreviewLayer, mirrorMode, mirrorPreviewAxis, selectedIds, selectedShapes, shapes, shellPreviewShape, shellPreviewTarget?.id],
   );
   // The preview of an intersection (#372): the operands see-through, and what they share as a body of its own on top.
   const [intersectPreviewIds, setIntersectPreviewIds] = useState<string[] | null>(null);
@@ -9535,6 +9551,48 @@ export function LayerlingEditor({
 
   // Hollowing again with new settings (defined further down, as it builds on the rebuild after a resize).
   const rehollowRef = useRef<((stale: WorkplaneShape, watched: WorkplaneShape, replace: { amount: number; openings: ShellOpenings; edges: ShellEdges; extras: { stack?: number; stackFoot?: ShellStackFoot | null; grid?: ShellGrid | null; dividers?: ShellDividers | null; shelf?: { width: number; height: number } } }) => Promise<WorkplaneShape | null>) | null>(null);
+  /**
+   * The body hollowed as the panel is set, for the preview and for Apply alike: nothing is laid into the scene here.
+   */
+  const hollowedWithTool = useCallback((target: WorkplaneShape, tool: NonNullable<typeof shellTool>): Promise<WorkplaneShape> => {
+    const { thickness, openings, edges } = tool;
+    const stack = tool.stack ?? 0;
+    // The slider at its right end means every cell that fits, kept as that: a body made larger gets more sockets, smaller fewer.
+    const gridMax = shellGridEstimate(shapeWidth(target), shapeDepth(target), thickness).max;
+    const gridCells = tool.gridCells ?? 0;
+    const grid = normalizeShellGrid({ cells: gridCells > 0 && gridCells >= gridMax ? MAX_SHELL_GRID_CELLS : gridCells, fit: tool.gridFit, magnets: tool.gridMagnets });
+    // Not with a Gridfinity floor: its bins fill the cells.
+    const dividers = grid ? null : normalizeShellDividers(tool.dividers);
+    const shelf = tool.shelf ? { width: tool.shelf, height: tool.shelfHeight ?? DEFAULT_SHELL_SHELF_HEIGHT } : undefined;
+    const extras = { stack, stackFoot: normalizeShellStackFoot(tool.stackFoot), grid, dividers, shelf };
+    // The cells asked for as a number across and a number along: the body is made as large as holds exactly them (the wall
+    // each side and the play the drawer fit leaves), and the floor takes every cell that fits.
+    const columns = Math.round(tool.gridColumns ?? 0), rows = Math.round(tool.gridRows ?? 0);
+    const sized = grid && columns > 0 && rows > 0
+      ? (() => {
+        const width = Number((columns * GRIDFINITY_GRID + SHELL_GRID_PLAY + 2 * thickness).toFixed(2));
+        const depth = Number((rows * GRIDFINITY_GRID + SHELL_GRID_PLAY + 2 * thickness).toFixed(2));
+        return { ...target, width, depth, size: resizedShapeSize(width, depth) };
+      })()
+      : target;
+    // A body that is hollowed already is hollowed again from the state before, so the new settings replace the old.
+    const hollowed = shellRebuildEntry(target) !== null;
+    return hollowed
+      ? (rehollowRef.current ? rehollowRef.current(sized, target, { amount: thickness, openings, edges, extras }) : Promise.resolve(null)).then((again) => again ?? shellShape(sized, thickness, openings, edges, target, undefined, extras))
+      : shellShape(sized, thickness, openings, edges, target, undefined, extras);
+  }, [shellShape]);
+
+  /** Why a body could not be hollowed, in the panel's words. */
+  const shellToolErrorText = useCallback((error: unknown, target: WorkplaneShape) => {
+    // A body the kernel cannot finish said only that the worker was restarted (#1687).
+    const message = error instanceof Error
+      ? (error.message.includes("Timed out waiting for the CAD worker") ? t("shell.errorTooSlow") : localizedError(error.message))
+      : String(error);
+    // A body changed after its hollowing (by magnets, a hinge, a cut) cannot be hollowed again from its hollow walls.
+    const changedAfter = (target.edgeTreatmentHistory ?? []).some((entry) => entry.feature.kind === "shell") && shellRebuildEntry(target) === null;
+    return changedAfter ? t("shell.errorChangedAfter") : message;
+  }, []);
+
   const applyShellTool = useCallback(() => {
     if (!shellTool || shellTool.busy) return;
     const target = selectedShape;
@@ -9543,14 +9601,6 @@ export function LayerlingEditor({
       return;
     }
     const { thickness, openings, edges } = shellTool;
-    const stack = shellTool.stack ?? 0;
-    // The slider at its right end means every cell that fits, kept as that: a body made larger gets more sockets, smaller fewer.
-    const gridMax = shellGridEstimate(shapeWidth(target), shapeDepth(target), thickness).max;
-    const gridCells = shellTool.gridCells ?? 0;
-    const grid = normalizeShellGrid({ cells: gridCells > 0 && gridCells >= gridMax ? MAX_SHELL_GRID_CELLS : gridCells, fit: shellTool.gridFit, magnets: shellTool.gridMagnets });
-    // Not with a Gridfinity floor: its bins fill the cells.
-    const dividers = grid ? null : normalizeShellDividers(shellTool.dividers);
-    const shelf = shellTool.shelf ? { width: shellTool.shelf, height: shellTool.shelfHeight ?? DEFAULT_SHELL_SHELF_HEIGHT } : undefined;
     setShellTool((current) => current ? { ...current, busy: true, error: null } : current);
     if (shellTool.mode === "offset") {
       const shrink = shellTool.shrink === true;
@@ -9571,24 +9621,14 @@ export function LayerlingEditor({
         });
       return;
     }
-    const extras = { stack, stackFoot: normalizeShellStackFoot(shellTool.stackFoot), grid, dividers, shelf };
-    // The cells asked for as a number across and a number along: the body is made as large as holds exactly them (the wall
-    // each side and the play the drawer fit leaves), and the floor takes every cell that fits.
-    const columns = Math.round(shellTool.gridColumns ?? 0), rows = Math.round(shellTool.gridRows ?? 0);
-    const sized = grid && columns > 0 && rows > 0
-      ? (() => {
-        const width = Number((columns * GRIDFINITY_GRID + SHELL_GRID_PLAY + 2 * thickness).toFixed(2));
-        const depth = Number((rows * GRIDFINITY_GRID + SHELL_GRID_PLAY + 2 * thickness).toFixed(2));
-        return { ...target, width, depth, size: resizedShapeSize(width, depth) };
-      })()
-      : target;
-    // A body that is hollowed already is hollowed again from the state before, so the new settings replace the old.
-    const hollowed = shellRebuildEntry(target) !== null;
-    const make = hollowed
-      ? (rehollowRef.current ? rehollowRef.current(sized, target, { amount: thickness, openings, edges, extras }) : Promise.resolve(null)).then((again) => again ?? shellShape(sized, thickness, openings, edges, target, undefined, extras))
-      : shellShape(sized, thickness, openings, edges, target, undefined, extras);
-    void make
+    // What the preview has built for these settings is laid in as it is; a hollowing still at work for them is waited for.
+    const key = shellPreviewKey(projectShapesFingerprint([target]), shellTool);
+    void shellPreviewRunnerRef.current.request(key, () => hollowedWithTool(target, shellTool), { retryFailed: true })
       .then((modifiedShape) => {
+        if (!modifiedShape) {
+          setShellTool((current) => current ? { ...current, busy: false } : current);
+          return;
+        }
         commitShapes(
           shapesRef.current.map((candidate) => candidate.id === target.id ? modifiedShape : candidate),
           modifiedShape.id,
@@ -9598,15 +9638,58 @@ export function LayerlingEditor({
         setShellTool(null);
       })
       .catch((error: unknown) => {
-        // A body the kernel cannot finish said only that the worker was restarted (#1687).
-        const message = error instanceof Error
-          ? (error.message.includes("Timed out waiting for the CAD worker") ? t("shell.errorTooSlow") : localizedError(error.message))
-          : String(error);
-        // A body changed after its hollowing (by magnets, a hinge, a cut) cannot be hollowed again from its hollow walls.
-        const changedAfter = (target.edgeTreatmentHistory ?? []).some((entry) => entry.feature.kind === "shell") && shellRebuildEntry(target) === null;
-        setShellTool((current) => current ? { ...current, busy: false, error: changedAfter ? t("shell.errorChangedAfter") : message } : current);
+        const message = shellToolErrorText(error, target);
+        setShellTool((current) => current ? { ...current, busy: false, error: message } : current);
       });
-  }, [commitShapes, offsetShape, selectedShape, selectedShapes.length, shellShape, shellTool]);
+  }, [commitShapes, hollowedWithTool, offsetShape, selectedShape, selectedShapes.length, shellTool, shellToolErrorText]);
+
+  /*
+   * The preview (Discussion #1811): a moment after the panel's settings come to rest the body is hollowed with them and
+   * shown in its place, as the edge tool shows its chamfer. Only the newest settings are built; a body that cannot be
+   * hollowed that way says so in the panel at once, before Apply.
+   */
+  const shellPreviewKeyNow = useMemo(
+    () => (shellTool && shellPreviewTarget && shellPreviewFingerprint ? shellPreviewKey(shellPreviewFingerprint, shellTool) : null),
+    [shellPreviewFingerprint, shellPreviewTarget, shellTool],
+  );
+  const shellToolBusy = shellTool?.busy === true;
+  useEffect(() => {
+    const runner = shellPreviewRunnerRef.current;
+    const target = shellPreviewTarget;
+    const tool = shellTool;
+    const key = shellPreviewKeyNow;
+    const fingerprint = shellPreviewFingerprint;
+    if (!tool || !target || !key || !fingerprint) {
+      runner.reset();
+      setShellPreview(null);
+      setShellPreviewBusy(false);
+      return;
+    }
+    // Apply or the stacking lid is at work.
+    if (shellToolBusy) return;
+    let overtaken = false;
+    const timer = window.setTimeout(() => {
+      setShellPreviewBusy(true);
+      void runner.request(key, () => hollowedWithTool(target, tool))
+        .then((shape) => {
+          if (overtaken || !shape) return;
+          // A sealed cavity cannot be seen from outside (#658): the preview is see-through then.
+          setShellPreview({ targetId: target.id, fingerprint, shape: shellOpenSides(tool.openings).length === 0 ? { ...shape, transparent: true } : shape });
+          setShellPreviewBusy(false);
+        })
+        .catch((error: unknown) => {
+          if (overtaken) return;
+          const message = shellToolErrorText(error, target);
+          setShellPreview(null);
+          setShellPreviewBusy(false);
+          setShellTool((current) => current && !current.busy ? { ...current, error: message } : current);
+        });
+    }, 250);
+    return () => {
+      overtaken = true;
+      window.clearTimeout(timer);
+    };
+  }, [shellPreviewKeyNow, shellToolBusy]);
 
   /**
    * A stacking lid for the selected box: a flat box of the same outline, with the same foot and wall, beside it. Its foot goes
@@ -9638,7 +9721,9 @@ export function LayerlingEditor({
     const placed = [...shapesRef.current, lid];
     commitShapes(placed, lid.id);
     setShellTool((current) => current ? { ...current, busy: true, error: null } : current);
-    void shellShape(lid, wall, "top", shellTool.edges, lid, undefined, { stack })
+    // A preview still at work comes back first: the CAD worker holds one body at a time.
+    void shellPreviewRunnerRef.current.settled()
+      .then(() => shellShape(lid, wall, "top", shellTool.edges, lid, undefined, { stack }))
       .then((made) => {
         commitShapes(shapesRef.current.map((candidate) => candidate.id === lid.id ? made : candidate), made.id, t("status.shelled", { size: Number(wall.toFixed(2)) }));
         setShellTool(null);
@@ -21234,6 +21319,7 @@ export function LayerlingEditor({
           openings={shellTool.openings}
           workspace={workspaceSettings}
           busy={shellTool.busy}
+          previewBusy={shellPreviewBusy}
           error={shellTool.error}
           roundedEdgesHint={selectedShape.kind === "roundedBox" && ((selectedShape.topBottomFillet ?? 0) > 0 || (selectedShape.bottomFillet ?? 0) > 0)}
           appliedFeatureCount={selectedEdgeFeatureCount}
