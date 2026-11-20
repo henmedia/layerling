@@ -174,6 +174,17 @@ Vtaljiva navojna vložka se s spajkalnikom vtisne v plastični del in vijakom da
 
 Luknja je navadna oblika luknje, združena s telesom, kakor luknje polja lukenj, jedro CAD pa jo izreže kot pravi valj, zato je izvrtina natančna. {{ui:editor.tool.ungroup}} jo spet osvobodi. Globoka je toliko, kolikor je dolga vložka, in malo moli iz ploskve, da se čisto odpre. Umetna inteligenca lahko isto naredi prek vmesnika MCP z `layerling_thread_insert` (glej poglavje [Umetna inteligenca z MCP](chapter:ai-z-mcp)).
 
+## Ležišče za magnet
+
+Slikarji figuric v spoje figure iz več delov namesto lepila vstavijo majhne okrogle magnete: tako se razstavi za barvanje in pošiljanje; škatle in pokrovi držijo enako. Orodje {{ui:magnetPocket.title}} izreže ležišče: globoko kot magnet in še 0,2 mm, da sedi tik pod ploskvijo, pod njim pa ožjo jamico za lepilo, da ima lepilo prostor in magnet leži na stopnici in ne zdrsne v votel natis. Ležišče in jamica sta obrnjen cilinder. Izberi natanko eno telo, odpri knjižnico oblik in klikni {{ui:magnetPocket.title}} pod {{ui:library.section.holes}} ali ga najdi s [[Ctrl]]+[[K]].
+
+1. Izberi {{ui:magnetPocket.size}}, od 2 × 1 do 12 × 3 mm, ali vpiši premer in višino magneta. {{ui:magnetPocket.gap}} je na začetku 0,1 mm; {{ui:magnetPocket.well}} je vklopljena.
+2. Klikni mesto, ravno ploskev ali zunanjo steno valja ali cevi, kot pri navojni vložki. Obroč kaže ležišče: zelen, kjer ima del ob njem 1 mm stene in za njim globino, rdeč, kjer ne, z razlogom. Povleci ga, vpiši položaj ali ga postavi na sredino ploskve.
+3. {{ui:magnetPocket.both}} (na začetku vklopljeno) poišče del, ki se na tem mestu dotika ploskve, največ 1 mm stran: drugo polovico spoja, postavljeno tako, kot se prilega. Dobi enako ležišče nasproti, da se magneta srečata; kaže ga drugi obroč, vrstica pa pove, zakaj del ležišča ne dobi. Da dosežeš ploskev, ki jo pokriva drugi del, ta del skrij: ležišče vseeno dobi.
+4. Šele {{ui:magnetPocket.apply}} izreže ležišči.
+
+Vsako ležišče je navadna luknja, združena s svojim delom; {{ui:editor.tool.ungroup}} jo sprosti. Pred vtiskanjem vsak par magnetov sestavi, da se privlači, in označi zunanjo stran. Tudi orodje Razdeli ima magnete kot spojnik. UI naredi isto z `layerling_magnet_pocket` (glej poglavje [UI z MCP](chapter:ai-z-mcp)).
+
 ## Vlečenje ploskve navzven ali navznoter
 
 Za debelejšo steno, dvignjeno ploščico na ploskvi ali vanjo izrezan žep orodje {{ui:faceTool.title}} dela na eni ravni ploskvi. Deluje tudi na uvoženem STL, ki nima skice za spreminjanje. Izberi natanko eno telo in v skupini {{ui:editor.section.mirrorPattern}} orodne vrstice klikni {{ui:faceTool.title}}, tik ob vzorcu lukenj. Lahko tudi z desnim gumbom klikneš na telo ali ga poiščeš s [[Ctrl]]+[[K]].

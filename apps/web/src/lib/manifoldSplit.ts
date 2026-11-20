@@ -5,6 +5,7 @@ import {
   CONNECTOR_WALL,
   alongTongues,
   connectorChamfer,
+  connectorFootprint,
   connectorHoleRadius,
   dovetailChamfer,
   dovetailGrooveDepth,
@@ -15,6 +16,7 @@ import {
   placeSplitConnectors,
   placeSplitDovetails,
   plugHeight,
+  splitMagnetPocket,
   splitPlaneFrame,
   toSplitFrame,
   type SectionRing,
@@ -213,6 +215,22 @@ function holeCutter(runtime: ManifoldToplevel, options: SplitConnectorOptions, c
   return revolved(runtime, [[0, -CONNECTOR_OVERLAP], [mouth, -CONNECTOR_OVERLAP], [radius, HOLE_MOUTH_CHAMFER], [radius, options.depth], [0, options.depth]], created);
 }
 
+/**
+ * A magnet's pocket in the frame, from the plane into the half above it: the pocket the magnet sits in, a narrow
+ * chamfer at its mouth (less than a dowel hole's, the pocket of a small magnet is small), and below it the glue well,
+ * narrower, so the magnet rests on the ledge between them (magnetPocket.ts).
+ */
+function magnetCutter(runtime: ManifoldToplevel, options: SplitConnectorOptions, created: Disposable[]) {
+  const pocket = splitMagnetPocket(options);
+  const radius = pocket.pocketDiameter / 2;
+  const chamfer = Math.min(HOLE_MOUTH_CHAMFER, radius * 0.15);
+  const mouth = radius + chamfer + CONNECTOR_OVERLAP;
+  const profile: FramePoint[] = [[0, -CONNECTOR_OVERLAP], [mouth, -CONNECTOR_OVERLAP], [radius, chamfer], [radius, pocket.pocketDepth]];
+  if (pocket.wellDepth > 0) profile.push([pocket.wellDiameter / 2, pocket.pocketDepth], [pocket.wellDiameter / 2, pocket.totalDepth]);
+  profile.push([0, pocket.totalDepth]);
+  return revolved(runtime, profile, created);
+}
+
 /** A plug's peg in the frame, standing up from the plane with its foot in the half below and its end chamfered. */
 function plugPeg(runtime: ManifoldToplevel, options: SplitConnectorOptions, created: Disposable[]) {
   const radius = options.diameter / 2;
@@ -245,10 +263,13 @@ export function planSplitConnectors(runtime: ManifoldToplevel, positive: Manifol
   const frame = splitPlaneFrame(normal);
   const pieces = splitCutFacePieces(runtime, positive, negative, frame, position, created);
   if (options.kind === "dovetail") return planSplitDovetails(runtime, positive, frame, position, pieces, options, created);
-  const placed = placeSplitConnectors(pieces, options);
+  const magnets = options.kind === "magnets";
+  const placed = placeSplitConnectors(pieces, { diameter: connectorFootprint(options), count: options.count });
   const toFrame = toSplitFrame(frame);
-  const probeRadius = connectorHoleRadius(options) + HOLE_SIDE_WALL;
-  const probeLength = options.depth + CONNECTOR_FLOOR_SKIN;
+  // A magnet's pocket must lie in its half with a wall beside it and a skin below; its glue well may open into a hollow.
+  const pocket = magnets ? splitMagnetPocket(options) : null;
+  const probeRadius = (pocket ? pocket.pocketDiameter / 2 : connectorHoleRadius(options)) + HOLE_SIDE_WALL;
+  const probeLength = (pocket ? pocket.pocketDepth : options.depth) + CONNECTOR_FLOOR_SKIN;
   const fits = (half: ManifoldSolid, upward: boolean) => {
     if (!placed.points.length) return [];
     const probe = runtime.Manifold.cylinder(probeLength, probeRadius, probeRadius, CONNECTOR_SIDES);
@@ -269,7 +290,7 @@ export function planSplitConnectors(runtime: ManifoldToplevel, positive: Manifol
     });
   };
   const above = fits(positive, true);
-  const below = options.kind === "dowels" ? fits(negative, false) : above.map(() => true);
+  const below = options.kind === "dowels" || magnets ? fits(negative, false) : above.map(() => true);
   const points = placed.points.filter((_, index) => above[index] && below[index]);
   return {
     frame,
@@ -531,7 +552,7 @@ export function applySplitConnectors(
     created.push(moved);
     return moved;
   };
-  const cutter = holeCutter(runtime, options, created);
+  const cutter = options.kind === "magnets" ? magnetCutter(runtime, options, created) : holeCutter(runtime, options, created);
   const placedAbove = plan.points.map(([a, b]) => {
     const placed = cutter.translate([a, b, plan.position]);
     created.push(placed);
@@ -559,6 +580,8 @@ export function applySplitConnectors(
   });
   const cutNegative = negative.subtract(world(placedBelow));
   created.push(cutNegative);
+  // Magnets are bought, not printed: the two pockets face each other and nothing stands beside the halves.
+  if (options.kind === "magnets") return { positive: cutPositive, negative: cutNegative, pins: null };
   const pin = dowelPin(runtime, options, created).transform(PIN_UPRIGHT);
   created.push(pin);
   const radius = options.diameter / 2;

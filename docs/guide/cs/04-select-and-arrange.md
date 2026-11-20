@@ -174,6 +174,17 @@ Zalisovací závitová vložka se zatlačí do plastového dílu páječkou a š
 
 Otvor je běžný tvar otvoru sloučený s tělesem, stejně jako otvory z rastru otvorů, a jádro CAD ho řeže jako pravý válec, takže vývrt je přesný. {{ui:editor.tool.ungroup}} otvor opět uvolní. Je tak hluboký, jak je vložka dlouhá, a o kousek vyčnívá z plochy, aby se čistě otevřel. AI může provést totéž přes most MCP pomocí `layerling_thread_insert`, viz [Modelování s AI](chapter:ai-with-mcp).
 
+## Kapsa na magnet
+
+Malíři figurek vkládají do spojů vícedílné figurky malé kulaté magnety místo lepení: figurka se tak rozebere k malování i k odeslání; krabičky a víčka drží stejně. Nástroj {{ui:magnetPocket.title}} vyřízne kapsu: tak hlubokou jako magnet a o 0,2 mm víc, aby seděl těsně pod plochou, a pod ní užší jamku na lepidlo, aby lepidlo mělo místo a magnet ležel na osazení a nezajel do dutého výtisku. Kapsa s jamkou tvoří obrácený cylindr. Vyberte právě jedno těleso, otevřete knihovnu tvarů a klikněte na {{ui:magnetPocket.title}} v {{ui:library.section.holes}}, nebo jej najděte přes [[Ctrl]]+[[K]].
+
+1. Zvolte {{ui:magnetPocket.size}}, od 2 × 1 do 12 × 3 mm, nebo zadejte průměr a výšku magnetu. {{ui:magnetPocket.gap}} je zpočátku 0,1 mm; {{ui:magnetPocket.well}} je zapnutá.
+2. Klikněte na místo, rovnou plochu nebo vnější stěnu válce či trubky, jako u závitové vložky. Kroužek ukazuje kapsu: zelený, když má díl vedle 1 mm stěny a za ní hloubku, červený, když ne, s důvodem. Táhněte jím, zadejte jeho polohu nebo jej dejte doprostřed plochy.
+3. {{ui:magnetPocket.both}} (zpočátku zapnuto) hledá díl, který v tom místě přiléhá k ploše, nejvýš 1 mm daleko: druhou polovinu spoje, postavenou tak, jak pasuje. Dostane stejnou kapsu naproti, aby se magnety potkaly; ukáže ji druhý kroužek a řádek řekne, proč díl kapsu nedostane. Chcete-li se dostat k ploše, kterou zakrývá druhý díl, skryjte jej: kapsu přesto dostane.
+4. Teprve {{ui:magnetPocket.apply}} kapsy vyřízne.
+
+Každá kapsa je obyčejný otvor seskupený se svým dílem; {{ui:editor.tool.ungroup}} jej uvolní. Před vtlačením přiložte každý pár magnetů k sobě, aby se přitahoval, a označte vnější stranu. Nástroj Rozdělit má magnety také jako spojku. AI udělá totéž přes `layerling_magnet_pocket` (viz kapitola [AI s MCP](chapter:ai-with-mcp)).
+
 ## Vysunutí plochy ven nebo dovnitř
 
 Pro zesílení stěny, vyvýšenou plošku nebo vyříznutou kapsu pracuje nástroj {{ui:faceTool.title}} s jednou rovinnou plochou. Funguje i u importovaného STL, které nemá náčrt ke změně. Vyberte právě jedno těleso a spusťte {{ui:faceTool.title}} v {{ui:editor.section.mirrorPattern}} vedle rastru otvorů, pravým tlačítkem nebo vyhledáváním [[Ctrl]]+[[K]].

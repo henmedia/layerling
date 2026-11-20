@@ -178,6 +178,17 @@ Wtapiana wkładka gwintowa jest wciskana w plastikową część lutownicą i daj
 
 Otwór jest zwykłym kształtem otworu zgrupowanym z bryłą, tak jak otwory ze wzoru otworów, a jądro CAD wycina go jako prawdziwy walec, więc nawiercenie jest dokładne. {{ui:editor.tool.ungroup}} znów go uwalnia. Jest tak głęboki, jak długa jest wkładka, i wystaje trochę ponad ścianę, żeby czysto się otwierał. AI może zrobić to samo przez most MCP poleceniem `layerling_thread_insert` (zobacz rozdział [AI przez MCP](chapter:ai-with-mcp)).
 
+## Gniazdo na magnes
+
+Malarze figurek wklejają małe okrągłe magnesy w połączenia figurki z kilku części zamiast ją sklejać: rozbiera się ją do malowania i wysyłki; pudełka i pokrywki trzymają tak samo. Narzędzie {{ui:magnetPocket.title}} wycina gniazdo: tak głębokie jak magnes plus 0,2 mm, aby siedział tuż pod ścianą, a pod nim węższe wgłębienie na klej, aby klej miał miejsce, a magnes opierał się na stopniu i nie wsunął się do pustego wydruku. Gniazdo i wgłębienie tworzą odwrócony cylinder. Zaznacz dokładnie jedną bryłę, otwórz bibliotekę kształtów i kliknij {{ui:magnetPocket.title}} w {{ui:library.section.holes}} albo znajdź je przez [[Ctrl]]+[[K]].
+
+1. Wybierz {{ui:magnetPocket.size}}, od 2 × 1 do 12 × 3 mm, albo wpisz średnicę i wysokość magnesu. {{ui:magnetPocket.gap}} na start to 0,1 mm; {{ui:magnetPocket.well}} jest włączone.
+2. Kliknij miejsce, płaską ścianę albo zewnętrzną ściankę walca lub rury, jak przy wkładce gwintowej. Pierścień pokazuje gniazdo: zielony, gdy obok jest 1 mm ścianki i za nim głębokość, czerwony, gdy nie, z powodem. Przeciągnij go, wpisz położenie albo ustaw na środku ściany.
+3. {{ui:magnetPocket.both}} (na start włączone) szuka części, która w tym miejscu przylega do ściany, najwyżej 1 mm dalej: drugiej połowy połączenia, ustawionej tak, jak pasuje. Dostaje to samo gniazdo naprzeciwko, aby magnesy się spotkały; pokazuje je drugi pierścień, a wiersz mówi, dlaczego część gniazda nie dostaje. Aby dostać się do ściany zasłoniętej przez drugą część, ukryj tę część: i tak dostanie swoje gniazdo.
+4. Dopiero {{ui:magnetPocket.apply}} wycina gniazda.
+
+Każde gniazdo to zwykły otwór zgrupowany ze swoją częścią; {{ui:editor.tool.ungroup}} go uwalnia. Przed wciśnięciem złóż każdą parę magnesów tak, by się przyciągała, i zaznacz stronę zewnętrzną. Narzędzie Podziel też ma magnesy jako łącznik. AI robi to samo przez `layerling_magnet_pocket` (zob. rozdział [AI z MCP](chapter:ai-with-mcp)).
+
 ## Wypychanie ściany na zewnątrz lub do środka
 
 Do grubszej ścianki, wypukłej podkładki na ścianie albo wyciętej w niej kieszeni służy narzędzie {{ui:faceTool.title}}, które działa na jednej płaskiej ścianie. Działa też na zaimportowanym STL, gdzie nie ma szkicu do zmiany. Zaznacz dokładnie jedną bryłę i kliknij {{ui:faceTool.title}} w grupie {{ui:editor.section.mirrorPattern}} paska narzędzi, obok wzoru otworów. Możesz też kliknąć bryłę prawym przyciskiem albo znaleźć narzędzie przez [[Ctrl]]+[[K]].

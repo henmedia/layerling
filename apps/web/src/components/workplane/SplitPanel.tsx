@@ -11,6 +11,7 @@ import { EdgeModifierSlider } from "@/components/workplane/EdgeModifierPanel";
 import { MovableToolPanel } from "@/components/workplane/MovableToolPanel";
 import { t } from "@/lib/i18n";
 import { fromPrinterPlay } from "@/lib/printerPlay";
+import { CUSTOM_MAGNET_SIZE, MAGNET_POCKET_SIZES, magnetPocketSummary, magnetSizeFromId, magnetSizeId, magnetSizeName, MAX_MAGNET_POCKET_DIAMETER, MAX_MAGNET_POCKET_HEIGHT, MIN_MAGNET_POCKET_DIAMETER, MIN_MAGNET_POCKET_HEIGHT } from "@/lib/magnetPocket";
 import {
   MAX_CONNECTOR_CLEARANCE,
   MAX_CONNECTOR_COUNT,
@@ -26,6 +27,7 @@ import {
   MIN_DOVETAIL_DEPTH,
   MIN_DOVETAIL_WIDTH,
   SPLIT_CONNECTOR_KINDS,
+  splitMagnetPocket,
   type SplitConnectorKind,
   type SplitConnectorOptions,
   type SplitConnectorTally,
@@ -414,6 +416,49 @@ export function SplitPanel({
             disabled={busy}
             onChange={(value) => onConnectorsChange({ dovetailTurn: value })}
           />
+        </>) : connectors.kind === "magnets" ? (<>
+          <label className="edge-modifier-field">
+            <span>{t("magnetPocket.size")}</span>
+            <select
+              aria-label={t("magnetPocket.size")}
+              value={magnetSizeId({ diameter: connectors.magnetDiameter, height: connectors.magnetHeight })}
+              disabled={busy}
+              onChange={(event) => {
+                const size = magnetSizeFromId(event.currentTarget.value);
+                if (size) onConnectorsChange({ magnetDiameter: size.diameter, magnetHeight: size.height });
+              }}
+            >
+              {MAGNET_POCKET_SIZES.map((size) => <option key={`${size.diameter}x${size.height}`} value={`${size.diameter}x${size.height}`}>{t("magnetPocket.sizeOption", { size: magnetSizeName(size) })}</option>)}
+              <option value={CUSTOM_MAGNET_SIZE}>{t("magnetPocket.custom")}</option>
+            </select>
+          </label>
+          <EdgeModifierSlider
+            label={t("magnetPocket.diameter")}
+            value={connectors.magnetDiameter}
+            min={MIN_MAGNET_POCKET_DIAMETER}
+            max={MAX_MAGNET_POCKET_DIAMETER}
+            step={0.5}
+            workspace={workspace}
+            length
+            disabled={busy}
+            onChange={(value) => onConnectorsChange({ magnetDiameter: value })}
+          />
+          <EdgeModifierSlider
+            label={t("magnetPocket.height")}
+            value={connectors.magnetHeight}
+            min={MIN_MAGNET_POCKET_HEIGHT}
+            max={MAX_MAGNET_POCKET_HEIGHT}
+            step={0.5}
+            workspace={workspace}
+            length
+            disabled={busy}
+            onChange={(value) => onConnectorsChange({ magnetHeight: value })}
+          />
+          <label className="edge-modifier-check" title={t("magnetPocket.wellHint")}>
+            <input type="checkbox" checked={connectors.magnetWell} disabled={busy} onChange={(event) => onConnectorsChange({ magnetWell: event.currentTarget.checked })} />
+            <span>{t("magnetPocket.well")}</span>
+          </label>
+          <span className="shell-openings-summary">{magnetPocketSummary(splitMagnetPocket(connectors))}</span>
         </>) : (<>
           <EdgeModifierSlider
             label={t("split.connectorDiameter")}

@@ -130,7 +130,7 @@ export function panelGuideHref(element: Element): string | null {
 const GENERIC_PANEL_KEYS = [
   "common.cancel", "common.delete", "common.rename", "panel.close", "edge.apply", "edge.clear", "edge.cancelChamfer", "edge.cancelFillet",
   "split.apply", "split.cancelAria", "deleteFace.apply", "deleteFace.cancel", "shell.apply", "shell.cancel", "holePattern.apply", "holePattern.cancel",
-  "holePattern.repick", "threadInsert.apply", "threadInsert.cancel", "threadInsert.repick", "array.apply", "array.cancel", "faceTool.apply", "faceTool.cancel", "faceTool.repick", "simplify.apply", "mate.apply",
+  "holePattern.repick", "threadInsert.apply", "threadInsert.cancel", "threadInsert.repick", "magnetPocket.apply", "magnetPocket.cancel", "array.apply", "array.cancel", "faceTool.apply", "faceTool.cancel", "faceTool.repick", "simplify.apply", "mate.apply",
   "mate.cancel", "scalePercent.apply",
 ] as const;
 

@@ -1,3 +1,4 @@
+import { MAGNET_POCKET_DEFAULTS, magnetPocketMeasures, MAX_MAGNET_POCKET_DIAMETER, MAX_MAGNET_POCKET_HEIGHT, MIN_MAGNET_POCKET_DIAMETER, MIN_MAGNET_POCKET_HEIGHT } from "@/lib/magnetPocket";
 import { printerPlayStart } from "@/lib/printerPlay";
 
 /*
@@ -9,6 +10,9 @@ import { printerPlayStart } from "@/lib/printerPlay";
  * - a dovetail: a tongue that widens away from the cut face, standing on one half and running straight across it from
  *   edge to edge, and the groove it slides into in the other half (as OrcaSlicer's cut tool has it). The halves are
  *   pushed together sideways along it, and then hold without glue: they cannot pull apart across the cut.
+ * - magnets: a round pocket for a magnet in each half, face to face across the cut, with a narrower well below it for
+ *   the glue (an inverted top hat, as figure painters set magnets into the joints of a multi-part figure), so the halves
+ *   hold together and still come apart (magnetPocket.ts).
  * None, the default, splits as the tool always did.
  *
  * What is worked out here is plain arithmetic, the same on the page and in the worker: the settings and their limits,
@@ -24,9 +28,9 @@ import { printerPlayStart } from "@/lib/printerPlay";
  * The tongues of a dovetail are laid out across the piece instead, see placeDovetailsOnPiece.
  */
 
-export type SplitConnectorKind = "none" | "dowels" | "plugs" | "dovetail";
+export type SplitConnectorKind = "none" | "dowels" | "plugs" | "dovetail" | "magnets";
 
-export const SPLIT_CONNECTOR_KINDS: readonly SplitConnectorKind[] = ["none", "dowels", "plugs", "dovetail"];
+export const SPLIT_CONNECTOR_KINDS: readonly SplitConnectorKind[] = ["none", "dowels", "plugs", "dovetail", "magnets"];
 
 /**
  * `count` connectors on each piece of the cut face (0: as many as its size suits), `diameter` of the pin or peg, each
@@ -35,7 +39,8 @@ export const SPLIT_CONNECTOR_KINDS: readonly SplitConnectorKind[] = ["none", "do
  * face, `dovetailDepth` how far it stands out of it into the other half, both in mm, `dovetailAngle` how far each flank
  * leans out from square to the face, and `dovetailTurn` how far the tongues are turned from the cut face's long way,
  * both in degrees. `dowelBase` stands the loose dowels on a breakaway base (breakawayBase.ts), for a printer whose bed
- * moves.
+ * moves. Magnets take `count`, `clearance` (round the magnet, per side) and their own size: `magnetDiameter` and
+ * `magnetHeight` in mm, and `magnetWell` for the glue well below each pocket.
  */
 export type SplitConnectorOptions = {
   kind: SplitConnectorKind;
@@ -48,6 +53,9 @@ export type SplitConnectorOptions = {
   dovetailAngle: number;
   dovetailTurn: number;
   dowelBase: boolean;
+  magnetDiameter: number;
+  magnetHeight: number;
+  magnetWell: boolean;
 };
 
 export const SPLIT_CONNECTOR_DEFAULTS: SplitConnectorOptions = {
@@ -61,6 +69,9 @@ export const SPLIT_CONNECTOR_DEFAULTS: SplitConnectorOptions = {
   dovetailAngle: 15,
   dovetailTurn: 0,
   dowelBase: false,
+  magnetDiameter: MAGNET_POCKET_DEFAULTS.diameter,
+  magnetHeight: MAGNET_POCKET_DEFAULTS.height,
+  magnetWell: MAGNET_POCKET_DEFAULTS.well,
 };
 export const MIN_CONNECTOR_DIAMETER = 2;
 export const MAX_CONNECTOR_DIAMETER = 20;
@@ -153,6 +164,11 @@ export function normalizeSplitConnectorOptions(value?: Partial<Record<keyof Spli
   const turn = finiteNumber(value?.dovetailTurn);
   if (turn !== null) result.dovetailTurn = clamp(turn, -MAX_DOVETAIL_TURN, MAX_DOVETAIL_TURN);
   if (typeof value?.dowelBase === "boolean") result.dowelBase = value.dowelBase;
+  const magnetDiameter = finiteNumber(value?.magnetDiameter);
+  if (magnetDiameter !== null) result.magnetDiameter = clamp(magnetDiameter, MIN_MAGNET_POCKET_DIAMETER, MAX_MAGNET_POCKET_DIAMETER);
+  const magnetHeight = finiteNumber(value?.magnetHeight);
+  if (magnetHeight !== null) result.magnetHeight = clamp(magnetHeight, MIN_MAGNET_POCKET_HEIGHT, MAX_MAGNET_POCKET_HEIGHT);
+  if (typeof value?.magnetWell === "boolean") result.magnetWell = value.magnetWell;
   return result;
 }
 
@@ -173,6 +189,19 @@ export function connectorEdgeMargin(diameter: number) {
 /** A hole's radius: the pin's or peg's with the clearance on each side. */
 export function connectorHoleRadius(options: Pick<SplitConnectorOptions, "diameter" | "clearance">) {
   return options.diameter / 2 + options.clearance;
+}
+
+/** The magnets' pocket as magnetPocket.ts makes it, from the split's settings. */
+export function splitMagnetPocket(options: Pick<SplitConnectorOptions, "magnetDiameter" | "magnetHeight" | "magnetWell" | "clearance">) {
+  return magnetPocketMeasures({ diameter: options.magnetDiameter, height: options.magnetHeight, gap: options.clearance, well: options.magnetWell });
+}
+
+/**
+ * The diameter connectors are spread by on the cut face: a pin's or peg's, or - magnets - the pocket's, so each pocket
+ * keeps its wall to the edges and to the next one.
+ */
+export function connectorFootprint(options: Pick<SplitConnectorOptions, "kind" | "diameter" | "magnetDiameter" | "magnetHeight" | "magnetWell" | "clearance">) {
+  return options.kind === "magnets" ? splitMagnetPocket(options).pocketDiameter : options.diameter;
 }
 
 /** A loose dowel's length: both holes' depths, less the end play at each end, so each hole is deeper than half the pin. */
