@@ -252,7 +252,7 @@ import type { RasterPart } from "@/lib/rasterTrace";
 import { DEFAULT_SKETCH_STROKE, normalizeSketchStroke, strokedSketchProfile } from "@/lib/sketchStroke";
 import { bottomCadModifierEdgeIds, horizontalCadModifierEdgeIds, topCadModifierEdgeIds, verticalCadModifierEdgeIds } from "@/lib/topEdges";
 import { tangentCadEdgeChain } from "@/lib/cadEdgeChain";
-import { sketchEditTurn, turnedSketchProfile, type SketchEditTurn } from "@/lib/sketchEditTurn";
+import { sketchEditTurn, sketchEditTurnOnPlate, turnedSketchProfile, type SketchEditTurn } from "@/lib/sketchEditTurn";
 import { movedWithEditedOutline, placedLikeExisting, placeSketchShape, sketchBodyAnchor, sketchPoseOf, type SketchAnchor } from "@/lib/sketchPlacement";
 import { notesWithSketchNotes, sketchNoteFrame, sketchNotesFromBody } from "@/lib/sketchNotes";
 import { useSketchNotes } from "@/lib/useSketchNotes";
@@ -5661,10 +5661,14 @@ export function LayerlingEditor({
       // Turned only about the vertical, it opens on the plate as it stands in 3D, turned and moved, on the plate's grid
       // (forum, 621358); before, its own frame made the bodies round it look turned and the grid sit off the plate's.
       const upright = !body.rotationX && !body.rotationZ && !body.mirrorX && !body.mirrorY && !body.mirrorZ;
+      // On a further build plate the sketch lies on that plate, its plane moved to the plate's middle as for a new sketch
+      // there (#1660): on the first plate's plane the sketch view showed plate 1 with its bodies, and the body's own
+      // outline lay out of reach beside it (Discussion #1887).
+      const plateX = plateCenterX(workspaceSettingsRef.current, plateOfShape(workspaceSettingsRef.current, selectedShape));
       turn = upright && !selectedShape.sketchProfile.keyring
-        ? sketchEditTurn({ x: origin.x, z: origin.z }, { x: xAxis.x, z: xAxis.z }, { x: zAxis.x, z: zAxis.z })
+        ? sketchEditTurnOnPlate(sketchEditTurn({ x: origin.x, z: origin.z }, { x: xAxis.x, z: xAxis.z }, { x: zAxis.x, z: zAxis.z }), plateX)
         : null;
-      if (turn) editWorkplane = placementWorkplaneFromSurface({ x: 0, y: origin.y, z: 0 }, { x: 0, y: 1, z: 0 }, { x: 1, y: 0, z: 0 });
+      if (turn) editWorkplane = placementWorkplaneFromSurface({ x: plateX, y: origin.y, z: 0 }, { x: 0, y: 1, z: 0 }, { x: 1, y: 0, z: 0 });
     } else if (operation === "revolve") {
       const quaternion = quaternionForShape(selectedShape);
       const normal = new THREE.Vector3(0, 1, 0).applyQuaternion(quaternion).normalize();
