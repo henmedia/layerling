@@ -8,7 +8,7 @@ import { innerCornerEdges, treatAfterInnerCorners } from "@/lib/cadInnerCorners"
 import { OcctKernel, type OcctModuleFactory, type ShapeHandle } from "occt-wasm";
 import { assertCadKernelRunnable } from "@/lib/wasmSupport";
 import { STACK_NEEDS_TOP_MESSAGE, shellStackFloor, shellStackSolid } from "@/lib/cadShellStack";
-import { normalizeShellStackFoot } from "@/lib/shellStackLimits";
+import { normalizeShellStackFoot, shellStackRoom } from "@/lib/shellStackLimits";
 import { GRIDFINITY_FLOOR } from "@/lib/gridfinityGeometry";
 import { shellDividersSolid, shellGridSolid } from "@/lib/cadShellGrid";
 import { DIVIDERS_NEEDS_TOP_MESSAGE, GRID_NEEDS_TOP_MESSAGE, normalizeShellDividers, normalizeShellGrid, shellGridFloor } from "@/lib/shellGridLimits";
@@ -1407,7 +1407,8 @@ async function bearbeiteAnfrage(request: CadModifierWorkerRequest, halter: { cad
         }
         // With a Gridfinity floor no dividers (its bins fill the cells): a design saved with both keeps its floor.
         if (dividers && !grid) {
-          const divided = shellDividersSolid(activeCad, solid, component, dividers, floorTop, shelfTop);
+          // In a stackable box the dividers end under the foot of the box above.
+          const divided = shellDividersSolid(activeCad, solid, component, dividers, floorTop, shelfTop, stack ? shellStackRoom(stack) : 0);
           activeCad.release(component);
           component = divided;
         }

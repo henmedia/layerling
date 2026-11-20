@@ -5,6 +5,7 @@ import { OcctKernel, type ShapeHandle } from "occt-wasm";
 import { shellSolid } from "@/lib/cadShell";
 import { shellDividersSolid, shellGridSolid } from "@/lib/cadShellGrid";
 import { shellStackSolid } from "@/lib/cadShellStack";
+import { shellStackFloor, shellStackRoom } from "@/lib/shellStackLimits";
 import { SHELL_GRID_FLOOR, shellGridFloor } from "@/lib/shellGridLimits";
 
 const ROTATE_Z_TO_Y: number[] = [1, 0, 0, 0, 0, 0, 1, 0, 0, -1, 0, 0];
@@ -143,6 +144,32 @@ describe("a Gridfinity floor, fit and dividers with the real OCCT kernel", () =>
     // A height set lower than the ledge stays lower.
     const lower = shellDividersSolid(kernel, original, shelled, { x: 1, z: 0, height: 4 }, null, 10);
     expect(solid(lower, 0, 6.1, 5)).toBe(false);
+  });
+
+  it("ends the dividers of a stackable box under the foot of the box above, so that box stands on the rim", () => {
+    const { original, shelled } = hollow(100, 80, 40);
+    // As the worker does it: the foot first, then the dividers on its raised floor (3 + 2.25 + 2 mm).
+    const footed = shellStackSolid(kernel, shelled, 3, 2, original);
+    const floor = shellStackFloor(3, 2);
+    const stacked = shellDividersSolid(kernel, original, footed, { x: 1, z: 1 }, floor, null, shellStackRoom(3));
+    expect(kernel.isValid(stacked)).toBe(true);
+    expect(kernel.getSubShapes(stacked, "solid")).toHaveLength(1);
+    // The foot is 3 mm high and goes that deep into the box below; the dividers end the play lower, 3.25 mm under the rim.
+    expect(solid(stacked, 0, 36.6, 20)).toBe(true);
+    expect(solid(stacked, 0, 36.9, 20)).toBe(false);
+    // The same box set on its rim: the two do not meet. With the dividers up to the rim its foot stood in them.
+    const above = kernel.translate(stacked, 0, 37, 0);
+    expect(kernel.getVolume(kernel.common(stacked, above))).toBeLessThan(1e-6);
+    const toRim = shellDividersSolid(kernel, original, footed, { x: 1, z: 1 }, floor);
+    expect(kernel.getVolume(kernel.common(toRim, kernel.translate(toRim, 0, 37, 0)))).toBeGreaterThan(1);
+    // A height set lower stays lower.
+    const low = shellDividersSolid(kernel, original, footed, { x: 1, z: 0, height: 10 }, floor, null, shellStackRoom(3));
+    expect(solid(low, 0, floor + 9.9, 20)).toBe(true);
+    expect(solid(low, 0, floor + 10.1, 20)).toBe(false);
+    // A box too low to keep a divider under the foot says so.
+    const flat = hollow(100, 80, 11);
+    const flatFooted = shellStackSolid(kernel, flat.shelled, 3, 2, flat.original);
+    expect(() => shellDividersSolid(kernel, flat.original, flatFooted, { x: 1, z: 0 }, floor, null, shellStackRoom(3))).toThrow(/dividers could not be built/);
   });
 
   it("stands on a Gridfinity floor, with dividers and a stack", () => {

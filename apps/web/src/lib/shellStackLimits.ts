@@ -22,6 +22,14 @@ export function clampShellStackHeight(value: number) {
   return Math.min(SHELL_STACK_MAX_HEIGHT, Math.max(SHELL_STACK_MIN_HEIGHT, Math.round(value * 10) / 10));
 }
 
+/**
+ * How far below its rim a stackable box keeps its inside free: the foot of the box above goes that deep into it, and the
+ * play more. Dividers end there, or the box above would stand on them and not on the rim.
+ */
+export function shellStackRoom(height: number) {
+  return clampShellStackHeight(height) + SHELL_STACK_PLAY;
+}
+
 /** How far the foot is set in from the outside: the wall and the play. */
 export function shellStackInset(wall: number) {
   return Math.max(0, wall) + SHELL_STACK_PLAY;
