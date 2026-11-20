@@ -308,6 +308,13 @@ const HINGE_KNUCKLE_WALL = 1.6;
 const MIN_KNUCKLE_WIDTH = 3;
 /** A stacking top's flare is built up in steps this high and as wide, in mm: 45 degrees, finer than a layer. */
 const STACK_TOP_STEP = 0.1;
+/**
+ * A lip or a rim along a wall that leans (issue #1868) is cut to the body every this many mm of its reach, at most
+ * LEAN_MAX_STEPS times; a wall that leans less than LEAN_MIN mm over that reach counts as upright.
+ */
+const LEAN_STEP = 0.25;
+const LEAN_MAX_STEPS = 48;
+const LEAN_MIN = 0.02;
 /** How far the hinge stays from the ends of the straight back side, in mm (its corners may be rounded). */
 const HINGE_END_MARGIN = 0.5;
 /** How much of a knuckle a teardrop hole leaves above its point, in mm: a point that would reach closer is cut flat. */
@@ -3090,7 +3097,11 @@ export type LidLatch = {
   boltLabels?: { point: [number, number, number]; normal: [number, number, number]; height: number }[];
 };
 
-export type LidResult = { lid: ManifoldSolid; magnets?: LidMagnets; hinge?: LidHinge; latch?: LidLatch; clickBumps?: LidClickBumps; handle?: LidHandleResult; screw?: LidScrew; bayonet?: LidBayonet; slide?: LidSlide; tether?: LidTether; flipTop?: LidFlipTop } | { error: LidError };
+/**
+ * `leaning` says that the lip or the rim follows a wall that leans (`leaningWalls` in `lidForSolid`): the exact lid, which
+ * is upright, must not take this one's place.
+ */
+export type LidResult = { lid: ManifoldSolid; leaning?: boolean; magnets?: LidMagnets; hinge?: LidHinge; latch?: LidLatch; clickBumps?: LidClickBumps; handle?: LidHandleResult; screw?: LidScrew; bayonet?: LidBayonet; slide?: LidSlide; tether?: LidTether; flipTop?: LidFlipTop } | { error: LidError };
 
 /** Where a lid cuts the body to find its top: just below the rim, so a rim that is a hair uneven still counts as the top. */
 function lidRimHeight(top: number, height: number) {
@@ -3313,6 +3324,60 @@ export function lidForSolid(runtime: ManifoldToplevel, body: ManifoldSolid, give
       const around = filled(runtime, cut, created);
       return { outline: around.toPolygons() as Point[][], opening: keep(created, around.subtract(cut)).toPolygons() as Point[][] };
     };
+    /**
+     * Where the body's walls lean within the lip's or the rim's reach (issue #1868): a pot that narrows towards its foot, a
+     * tapered capsule. Cut every LEAN_STEP from the rim down to `depth` below the top, and at the height of the click
+     * bumps: `free` is what of the opening is open at that height and at every one above it, so what goes down into it
+     * from above; `clear` the outline with all those above it, what a rim must go round on its way down. `open` and
+     * `outline` are the opening and the outline at that height alone. `lip` says that the opening narrows by more than
+     * LEAN_MIN on the way down, `rim` that the outline widens by as much; null where neither does, and the lip and the rim
+     * are upright as before. An opening that widens below the rim leaves the lip upright: one that followed it could
+     * not be pushed in.
+     */
+    const leaningWalls = () => {
+      const low = top - options.depth;
+      const steps = Math.max(1, Math.min(LEAN_MAX_STEPS, Math.ceil((rim - low) / LEAN_STEP)));
+      const heights = Array.from({ length: steps }, (_, index) => rim - ((rim - low) * (index + 1)) / steps);
+      const middle = top - options.depth / 2;
+      if (middle < rim - 1e-6 && heights.every((z) => Math.abs(z - middle) > 1e-6)) heights.push(middle);
+      heights.sort((a, b) => b - a);
+      const levels = [{ z: rim, free: opening, clear: outline, open: opening, outline }];
+      for (const z of heights) {
+        const cut = keep(created, up.slice(z));
+        const around = filled(runtime, cut, created);
+        const open = keep(created, around.subtract(cut));
+        const above = levels[levels.length - 1];
+        levels.push({ z, free: keep(created, above.free.intersect(open)), clear: keep(created, above.clear.add(around)), open, outline: around });
+      }
+      const lowest = levels[levels.length - 1];
+      // Only what this lid has counts: a plug has no rim, a cap no lip.
+      const lip = options.type !== "cap" && hasOpening && keep(created, opening.subtract(keep(created, lowest.free.offset(LEAN_MIN, "Round", 2, 48)))).area() > 1e-3;
+      const rimLeans = options.type !== "plug" && keep(created, lowest.clear.subtract(keep(created, outline.offset(LEAN_MIN, "Round", 2, 48)))).area() > 1e-3;
+      return lip || rimLeans ? { levels, lip, rim: rimLeans } : null;
+    };
+    let lean: ReturnType<typeof leaningWalls> = null;
+    /**
+     * A solid through `sections`, from the rim down (`leaningWalls`), and upright from the rim to the top: between two
+     * heights the hull of the two sections where both are convex, so a leaning wall comes out flat; otherwise the lower
+     * one, in steps as fine as the heights are apart. It ends where a section is too small to count. As a `hole`, to cut
+     * out of such a solid, it reaches below the lowest height as well. Null where there is nothing at the rim.
+     */
+    const lofted = (sections: { z: number; area: CrossSection }[], hole: boolean) => {
+      if (sections[0].area.area() < MIN_OPENING_AREA) return null;
+      const pieces: ManifoldSolid[] = [prism(sections[0].area, sections[0].z, top)];
+      let reached = sections[0];
+      for (let index = 1; index < sections.length; index += 1) {
+        const upper = sections[index - 1];
+        const lower = sections[index];
+        if (lower.area.area() < MIN_OPENING_AREA) break;
+        pieces.push(convex(lower.area) && convex(upper.area)
+          ? keep(created, runtime.Manifold.hull([prism(lower.area, lower.z, lower.z + 0.001), prism(upper.area, upper.z - 0.001, upper.z)]))
+          : prism(lower.area, lower.z, upper.z));
+        reached = lower;
+      }
+      if (hole && reached === sections[sections.length - 1]) pieces.push(prism(reached.area, reached.z - 1, reached.z + 0.001));
+      return keep(created, runtime.Manifold.union(pieces));
+    };
     if (options.type === "screw") {
       const plan = screwPlan(sliceAt, options, top, box.min[2], rim);
       if ("error" in plan) return { error: plan.error };
@@ -3358,14 +3423,29 @@ export function lidForSolid(runtime: ManifoldToplevel, body: ManifoldSolid, give
       parts.push(prism(keep(created, outline.subtract(opening)), top + flareHeight + options.thickness - 0.01, lidTop));
     } else {
       parts.push(prism(options.type === "plug" ? outline : outer, top, top + options.thickness));
+      lean = leaningWalls();
       if (options.type !== "cap") {
         const lip = keep(created, opening.offset(-options.gap, "Round", 2, 48));
         if (lip.area() < MIN_OPENING_AREA) return { error: { code: "tooSmall" } };
-        const inside = keep(created, opening.offset(-(options.gap + options.wall), "Round", 2, 48));
-        const ring = inside.area() >= MIN_OPENING_AREA ? keep(created, lip.subtract(inside)) : lip;
-        parts.push(prism(ring, top - options.depth, top));
+        if (lean?.lip) {
+          // The opening narrows below the rim: the lip follows it, the gap from the wall at every height.
+          const hollow = lofted(lean.levels.map(({ z, free }) => ({ z, area: keep(created, free.offset(-(options.gap + options.wall), "Round", 2, 48)) })), true);
+          const whole = lofted(lean.levels.map(({ z, free }) => ({ z, area: keep(created, free.offset(-options.gap, "Round", 2, 48)) })), false);
+          if (!whole) return { error: { code: "tooSmall" } };
+          parts.push(hollow ? keep(created, whole.subtract(hollow)) : whole);
+        } else {
+          const inside = keep(created, opening.offset(-(options.gap + options.wall), "Round", 2, 48));
+          const ring = inside.area() >= MIN_OPENING_AREA ? keep(created, lip.subtract(inside)) : lip;
+          parts.push(prism(ring, top - options.depth, top));
+        }
       }
-      if (options.type !== "plug") parts.push(prism(keep(created, outer.subtract(inner)), top - options.depth, top));
+      if (options.type !== "plug") {
+        const around = lean?.rim ? lofted(lean.levels.map(({ z, clear }) => ({ z, area: keep(created, clear.offset(options.gap + options.wall, "Round", 2, 48)) })), false) : null;
+        const room = lean?.rim ? lofted(lean.levels.map(({ z, clear }) => ({ z, area: keep(created, clear.offset(options.gap, "Round", 2, 48)) })), true) : null;
+        // The body widens below the rim: the cap's rim follows it, the gap from the wall at every height.
+        if (around && room) parts.push(keep(created, around.subtract(room)));
+        else parts.push(prism(keep(created, outer.subtract(inner)), top - options.depth, top));
+      }
     }
     // A tether: the collar and the bead its ring sits between are joined to the cap; the bead for the body comes with it.
     let tether: { plan: TetherPlan; bead: ManifoldSolid; part: ManifoldSolid } | null = null;
@@ -3918,7 +3998,17 @@ export function lidForSolid(runtime: ManifoldToplevel, body: ManifoldSolid, give
     // wall. Where the wall is too thin for that, bump and dimple stop short, the bump that play short of the dimple.
     let dimples: ManifoldSolid | null = null;
     let bumpCount = 0;
+    // Along a wall that leans (`leaningWalls`), the bumps stand on the lip or the rim as it is at their height, and the
+    // dimples go into the wall as it is there: the opening and the outline cut at that height, not at the rim.
+    const bumpLevel = lean?.levels.find(({ z }) => z <= top - options.depth / 2 + 1e-6) ?? null;
+    const atBumps = {
+      opening: bumpLevel ? (options.type !== "cap" && lean?.lip ? bumpLevel.free : bumpLevel.open) : opening,
+      outline: bumpLevel ? bumpLevel.outline : outline,
+      inner: bumpLevel && lean?.rim ? keep(created, bumpLevel.clear.offset(options.gap, "Round", 2, 48)) : inner,
+      outer: bumpLevel && lean?.rim ? keep(created, bumpLevel.clear.offset(options.gap + options.wall, "Round", 2, 48)) : outer,
+    };
     if (options.clickBumps && !slide) {
+      const { opening, outline, inner, outer } = atBumps;
       const onLip = options.type !== "cap";
       const middle = top - options.depth / 2;
       const reach = options.clickBumpHeight;
@@ -4147,7 +4237,7 @@ export function lidForSolid(runtime: ManifoldToplevel, body: ManifoldSolid, give
       handed.add(cuts);
       slideResult = { cuts, side: options.slideSide, depth: slide.plan.depth, wall: slide.plan.wall, bumps: slide.bumps, frame: slide.plan.frame };
     }
-    const extras = { ...(hinge ? { hinge } : {}), ...(latch ? { latch } : {}), ...(clickBumps ? { clickBumps } : {}), ...(handle ? { handle } : {}), ...(screwResult ? { screw: screwResult } : {}), ...(bayonetResult ? { bayonet: bayonetResult } : {}), ...(slideResult ? { slide: slideResult } : {}), ...(tetherResult ? { tether: tetherResult } : {}), ...(flipTopResult ? { flipTop: flipTopResult } : {}) };
+    const extras = { ...(hinge ? { hinge } : {}), ...(latch ? { latch } : {}), ...(clickBumps ? { clickBumps } : {}), ...(handle ? { handle } : {}), ...(screwResult ? { screw: screwResult } : {}), ...(bayonetResult ? { bayonet: bayonetResult } : {}), ...(slideResult ? { slide: slideResult } : {}), ...(tetherResult ? { tether: tetherResult } : {}), ...(flipTopResult ? { flipTop: flipTopResult } : {}), ...(lean ? { leaning: true } : {}) };
     if (!options.magnets) return { lid, ...extras };
     handed.add(posts);
     // Back in the scene's frame: up is y, and the frame's y is the scene's z turned round.
@@ -4357,7 +4447,7 @@ export type LidShapeTether = { part: WorkplaneShape; bead: WorkplaneShape; strap
 /** With latches, the body's cheeks and pins (grouped with it), the clips (a body of their own beside the lid) and how many. */
 export type LidShapeLatch = { body: WorkplaneShape; clips: WorkplaneShape; count: number; width: number; pin: number; style?: LidLatchStyle; travel?: number; labels?: { point: [number, number, number]; width: number; height: number }[]; boltLabels?: { point: [number, number, number]; normal: [number, number, number]; height: number }[] };
 
-export type LidShapeResult = { lid: WorkplaneShape; magnets?: LidShapeMagnets; hinge?: LidShapeHinge; latch?: LidShapeLatch; clickBumps?: LidShapeClickBumps; handle?: LidShapeHandle; screw?: LidShapeScrew; bayonet?: LidShapeBayonet; slide?: LidShapeSlide; tether?: LidShapeTether; flipTop?: LidFlipTop } | { lid: null; error: string };
+export type LidShapeResult = { lid: WorkplaneShape; leaning?: boolean; magnets?: LidShapeMagnets; hinge?: LidShapeHinge; latch?: LidShapeLatch; clickBumps?: LidShapeClickBumps; handle?: LidShapeHandle; screw?: LidShapeScrew; bayonet?: LidShapeBayonet; slide?: LidShapeSlide; tether?: LidShapeTether; flipTop?: LidFlipTop } | { lid: null; error: string };
 
 /**
  * The body a lid is made for, in the kernel: the solids among `targets` joined and the holes among them cut away. Null
@@ -4508,7 +4598,7 @@ export async function lidForShapes(targets: readonly WorkplaneShape[], given: Li
       const { side, depth, wall, bumps, frame } = result.slide;
       slide = { cuts, side, depth, wall, bumps, frame };
     }
-    const extras = { ...(hinge ? { hinge } : {}), ...(latch ? { latch } : {}), ...(clickBumps ? { clickBumps } : {}), ...(handle ? { handle } : {}), ...(screw ? { screw } : {}), ...(bayonet ? { bayonet } : {}), ...(slide ? { slide } : {}), ...(tether ? { tether } : {}), ...(result.flipTop ? { flipTop: result.flipTop } : {}) };
+    const extras = { ...(hinge ? { hinge } : {}), ...(latch ? { latch } : {}), ...(clickBumps ? { clickBumps } : {}), ...(handle ? { handle } : {}), ...(screw ? { screw } : {}), ...(bayonet ? { bayonet } : {}), ...(slide ? { slide } : {}), ...(tether ? { tether } : {}), ...(result.flipTop ? { flipTop: result.flipTop } : {}), ...(result.leaning ? { leaning: true } : {}) };
     if (!result.magnets) return { lid, ...extras };
     const postName = t("lid.magnetPosts", { name: source.name });
     const meshPost = result.magnets.posts
