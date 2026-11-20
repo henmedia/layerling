@@ -163,3 +163,61 @@ describe("the words marked on the page a result leads to (#1059)", () => {
     expect(marked("Mirror", "align")).toEqual([]);
   });
 });
+
+describe("an exact phrase in quotation marks (#1841)", () => {
+  const text = core.prepare([
+    { c: "Text", h: "Text on a circular arc", u: "/guide/text.html#arc", t: "Bend the line: the text follows a circular arc. Größe and Maßband stay as typed." },
+    { c: "Text", h: "Search", u: "/guide/text.html#search", t: "The search box finds a font. On a circle the arc of the text closes; circular it is not." },
+    { c: "Holes", h: "Rack", u: "/guide/holes.html#rack", t: 'A 19" rack panel has four slots.' },
+  ]);
+  const urls = (query: string, umlauts = false) => core.search(text, query, 8, umlauts).map((hit) => hit.entry.u);
+  const marked = (sentence: string, query: string) => core.ranges(core.fold(sentence), query).map((r) => sentence.slice(r.at, r.at + r.len));
+
+  it("wants the words next to each other and in this order", () => {
+    expect(urls("circular arc")).toEqual(["/guide/text.html#arc", "/guide/text.html#search"]);
+    expect(urls('"circular arc"')).toEqual(["/guide/text.html#arc"]);
+    expect(urls('"arc circular"')).toEqual([]);
+    expect(urls('"CIRCULAR   Arc"')).toEqual(["/guide/text.html#arc"]);
+  });
+
+  it("takes a quoted word whole, not as a part of a longer one", () => {
+    expect(urls("sear")).toEqual(["/guide/text.html#search"]);
+    expect(urls('"sear"')).toEqual([]);
+    expect(urls('"search"')).toEqual(["/guide/text.html#search"]);
+    expect(urls('"text follows"')).toEqual(["/guide/text.html#arc"]);
+    expect(urls('"ext follows"')).toEqual([]);
+    expect(urls('"text follow"')).toEqual([]);
+  });
+
+  it("mixes a phrase with plain words, all of which must be there", () => {
+    expect(urls('"circular arc" bend')).toEqual(["/guide/text.html#arc"]);
+    expect(urls('font "the arc"')).toEqual(["/guide/text.html#search"]);
+    expect(urls('"circular arc" font')).toEqual([]);
+  });
+
+  it("reads curly and angled quotation marks like straight ones", () => {
+    expect(urls("“circular arc”")).toEqual(["/guide/text.html#arc"]);
+    expect(urls("„circular arc“")).toEqual(["/guide/text.html#arc"]);
+    expect(urls("«circular arc»")).toEqual(["/guide/text.html#arc"]);
+    expect(urls("「circular arc」")).toEqual(["/guide/text.html#arc"]);
+  });
+
+  it("still folds case, accents, the sharp s and the umlauts inside a phrase", () => {
+    expect(urls('"grosse and massband"')).toEqual(["/guide/text.html#arc"]);
+    expect(urls('"groesse and massband"', true)).toEqual([]);
+    expect(urls('"groeße and maßband"', true)).toEqual(["/guide/text.html#arc"]);
+  });
+
+  it("takes a mark without a partner for a space: an inch sign, a phrase still being typed", () => {
+    expect(urls('19" rack')).toEqual(["/guide/holes.html#rack"]);
+    expect(urls('"circular ar')).toEqual(["/guide/text.html#arc", "/guide/text.html#search"]);
+    expect(urls('""')).toEqual([]);
+    expect(urls('" "')).toEqual([]);
+  });
+
+  it("marks the phrase as one piece on the page, and only where it stands whole", () => {
+    expect(marked("A circular arc; an arc that is circular. Circular arcs.", '"circular arc"')).toEqual(["circular arc"]);
+    expect(marked("Search the arc, ARC by arc.", '"arc"')).toEqual(["arc", "ARC", "arc"]);
+    expect(marked("Bend the text on an arc.", '"an arc" bend')).toEqual(["Bend", "an arc"]);
+  });
+});

@@ -15,6 +15,11 @@
  * in the heading above one in the chapter's title above one in the text. "ss" and the sharp s are
  * the same to them, whichever one is typed and whichever one the text has; where people write "ae",
  * "oe" and "ue" for the umlauts, those find them too.
+ *
+ * Words between quotation marks are one exact phrase (#1841): the words as typed, next to each
+ * other and whole, so "arc" in quotes finds "an arc" and not "search". Such a phrase travels through
+ * these functions as a single token that begins with a straight quotation mark; guideFind reads the
+ * mark and never counts it into a length.
  */
 
 /** One section of the guide as the search index holds it: chapter, heading, address and plain text. */
@@ -41,9 +46,19 @@ export function guideForms(word: string, umlauts: boolean): string[] {
   return forms;
 }
 
+/** A letter or a digit of a folded text. Scripts without capitals have none: a phrase in them is found anywhere. */
+export function guideWordChar(letter: string): boolean {
+  return letter !== letter.toUpperCase() || (letter >= "0" && letter <= "9");
+}
+
 export function guideFind(text: string, forms: string[], from: number): GuideFound | null {
   var best: GuideFound | null = null;
-  for (var i = 0; i < forms.length; i++) { var k = text.indexOf(forms[i], from); if (k >= 0 && (!best || k < best.at)) best = { at: k, len: forms[i].length }; }
+  for (var i = 0; i < forms.length; i++) {
+    // An exact phrase (it begins with a quotation mark) must not start or end inside a word.
+    var exact = forms[i].charAt(0) === String.fromCharCode(34), word = exact ? forms[i].slice(1) : forms[i], k = text.indexOf(word, from);
+    while (exact && k >= 0 && (guideWordChar(text.charAt(k - 1)) || guideWordChar(text.charAt(k + word.length)))) k = text.indexOf(word, k + 1);
+    if (k >= 0 && (!best || k < best.at)) best = { at: k, len: word.length };
+  }
   return best;
 }
 
@@ -51,13 +66,34 @@ export function guidePrepare(entries: GuideSearchEntry[]): GuidePrepared[] {
   return entries.map(function (e) { return { e: e, c: guideFold(e.c), h: guideFold(e.h), t: guideFold(e.t) }; });
 }
 
+/**
+ * The words of a query. What stands between two quotation marks - straight, curly, angled or the
+ * corner brackets of Chinese and Japanese - is one token, an exact phrase, marked by a straight
+ * quotation mark in front. A mark without a partner is no more than a space: the inch sign of 19"
+ * and a phrase still being typed search as plain words.
+ */
 export function guideTokens(query: string): string[] {
-  return guideFold(query).split(" ").filter(function (w) { return w.length > 0; });
+  var folded = guideFold(query), marks = String.fromCharCode(34, 171, 187, 8220, 8221, 8222, 12300, 12301, 12302, 12303), straight = String.fromCharCode(34);
+  var tokens: string[] = [], word = "", quoted = false;
+  function isMark(at: number) { return marks.indexOf(folded.charAt(at)) >= 0; }
+  function closes(at: number) { for (var j = at + 1; j < folded.length; j++) if (isMark(j)) return true; return false; }
+  function push() {
+    var w = quoted ? word.split(" ").filter(function (part) { return part.length > 0; }).join(" ") : word;
+    if (w) tokens.push(quoted ? straight + w : w);
+    word = "";
+  }
+  for (var i = 0; i < folded.length; i++) {
+    if (isMark(i)) { var open: boolean = !quoted && closes(i); push(); quoted = open; }
+    else if (folded.charAt(i) === " " && !quoted) push();
+    else word += folded.charAt(i);
+  }
+  push();
+  return tokens;
 }
 
 export function guideSearch(prepared: GuidePrepared[], query: string, limit?: number, umlauts?: boolean): GuideHit[] {
   var tokens = guideTokens(query); if (!tokens.length) return [];
-  var forms = tokens.map(function (w) { return guideForms(w, !!umlauts); }), phrase = guideForms(tokens.join(" "), !!umlauts), found: GuideHit[] = [];
+  var forms = tokens.map(function (w) { return guideForms(w, !!umlauts); }), phrase = guideForms(tokens.join(" ").split(String.fromCharCode(34)).join(""), !!umlauts), found: GuideHit[] = [];
   prepared.forEach(function (p) {
     var score = 0;
     for (var i = 0; i < tokens.length; i++) {
@@ -98,4 +134,4 @@ export function guideRanges(text: string, query: string, umlauts?: boolean): Gui
 }
 
 /** The functions in the order a page needs them, for the build to copy. */
-export const GUIDE_SEARCH_CORE_FUNCTIONS = [guideFold, guideForms, guideFind, guidePrepare, guideTokens, guideSearch, guideRanges];
+export const GUIDE_SEARCH_CORE_FUNCTIONS = [guideFold, guideForms, guideWordChar, guideFind, guidePrepare, guideTokens, guideSearch, guideRanges];
