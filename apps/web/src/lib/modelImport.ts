@@ -189,6 +189,8 @@ export async function importModelFiles(
           : importedShapesFrom3mf(file.name, buffer);
         if ("missingMaterialColors" in colored && colored.missingMaterialColors) result.notes.push(t("status.importObjNoMtl", { name: file.name }));
         if ("droppedVertexColors" in colored && colored.droppedVertexColors) result.notes.push(t("status.importObjVertexColors", { name: file.name }));
+        // The same words fit a 3MF whose object has a colour at almost every point (#1867).
+        if ("droppedColors" in colored && colored.droppedColors) result.notes.push(t("status.importObjVertexColors", { name: file.name }));
         if ("painted" in colored && colored.painted > 0) result.notes.push(t("status.import3mfPainted", { name: file.name }));
         if (colored.split) {
           result.shapes.push(...colored.shapes);
