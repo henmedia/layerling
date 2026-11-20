@@ -191,5 +191,18 @@
     "guide": {
       "section": "tapeMeasure"
     }
+  },
+  {
+    "title": {
+      "de": "Verlauf bleibt nach Ändern im Feld erhalten",
+      "en": "History is kept after a change in a field"
+    },
+    "body": {
+      "de": "Wer ein Maß im Feld mit dem Mausrad oder den Pfeiltasten verstellt und den Tab danach schloss oder neu lud, ohne das Feld zu verlassen, fand den Entwurf beim nächsten Öffnen ohne Verlauf vor: Rückgängig und der Verlaufsblick waren leer. Dasselbe traf eine .lyl-Datei, die in diesem Moment mit Strg+S gespeichert wurde. Der Verlauf bleibt jetzt vollständig, und die letzte Änderung steht als eigener Schritt darin.\n\nEntwürfe, die ihren Verlauf auf diesem Weg schon verloren haben, bekommen ihn nicht zurück. Ihr aktueller Stand ist unverändert, und eine Gruppe lässt sich weiterhin auflösen oder mit „Gruppe bearbeiten“ öffnen.",
+      "en": "If you changed a measure in its field with the mouse wheel or the arrow keys and then closed or reloaded the tab without leaving the field, the design opened without its history the next time: Undo and the History view were empty. The same happened to a .lyl file saved with Ctrl+S in that moment. The history now stays complete, and the last change is a step of its own in it.\n\nDesigns that already lost their history this way do not get it back. Their current state is unchanged, and a group can still be ungrouped or opened with Edit group."
+    },
+    "guide": {
+      "section": "historyView"
+    }
   }
 ]
