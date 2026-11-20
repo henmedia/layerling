@@ -148,6 +148,7 @@ summary: 选择形状、在对象列表中查找它们、对齐、镜像、旋�
    - **{{ui:holePattern.wall}}：** 同一距离的另一种说法：相邻两个孔之间留下的壁，也就是打印件中的壁厚。设定它，中心距会随之变化（矩形和槽孔的行距也一样），反之亦然。对于六边形、矩形和槽孔，layerling 测量它们边缘之间的最短距离。
    - **{{ui:holePattern.arrangement}}：** {{ui:holePattern.arrangement.grid}} 将孔排成行与列。{{ui:holePattern.arrangement.staggered}} 将每隔一行错开半个间距，并让行更靠近，使每个孔到相邻孔的距离相同——用于六边形时便形成蜂窝。
    - **{{ui:holePattern.arrangement.perimeter}}：** 改为沿面的外边缘放一圈孔，向内缩进 {{ui:holePattern.margin}}——比如盖子或板子四周的螺钉孔。{{ui:holePattern.perimeterBy}} {{ui:holePattern.perimeterBy.spacing}} 大致保持间距，{{ui:holePattern.perimeterBy.count}} 则设定 {{ui:holePattern.perimeterCount}}；两种方式都会把间距调匀，让这一圈无缝闭合。{{ui:holePattern.perimeterCorners}}（默认开启）在每个角放一个孔，并把角之间的每条边均匀分配。在圆形面上，或取消勾选时，孔从顶部开始均匀绕一圈，{{ui:holePattern.perimeterStart}} 可沿边缘移动整圈孔。
+   - **{{ui:holePattern.centerHole}}：** 用于 {{ui:holePattern.arrangement.perimeter}} 和 {{ui:holePattern.mode.mounting}} 选项卡（不适用于 19 英寸机架）。勾选后，在面的中间再加一个与其他孔相同的孔——比如花盆底部的排水孔。它不计入孔数。对于普通的圆孔、方孔和六边形孔，可以用 {{ui:holePattern.centerHoleOwnSize}} 单独设定 {{ui:holePattern.centerHoleSize}}。如果面的中间是空的，或者这个孔会离其他孔太近，就不会生成，并有一行提示说明。
    - **{{ui:holePattern.margin}}：** 孔与面边缘之间的净距离。只有完全位于“面减去此边距”范围内的孔才会生成；任何会超出该范围的孔都会被略过。面中的开口周围也会保留此边距。
    - **{{ui:holePattern.depth}}：** {{ui:holePattern.depth.through}}（默认）会切穿整面壁。使用 {{ui:holePattern.depth.custom}} 时，以毫米为单位给出深度，例如用于凹槽。
 3. 孔会立即在面上以预览形式显示，并跟随每个数值变化。窗口会说明能容纳多少个孔。{{ui:holePattern.repick}} 可选择另一个面，[[Esc]] 关闭工具；和其他工具窗口一样，可拖动其标题栏移动。

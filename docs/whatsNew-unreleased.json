@@ -219,5 +219,18 @@
     "guide": {
       "section": "holePattern"
     }
+  },
+  {
+    "title": {
+      "de": "Lochmuster: ein Loch in der Mitte",
+      "en": "Hole pattern: a hole in the middle"
+    },
+    "body": {
+      "de": "Ein Kranz von Löchern am Rand oder Befestigungslöcher können jetzt ein weiteres Loch in der Mitte der Fläche bekommen, etwa für die Abflusslöcher im Boden eines Blumentopfs. Der Haken „Ein Loch in der Mitte“ steht im Lochmuster bei „Am Rand“ und im Reiter „Befestigungslöcher“ und ist zunächst aus.\n\nDas Loch ist wie die anderen (Form, Lochart, Tiefe) und zählt bei der Anzahl nicht mit. Bei einfachen runden, quadratischen und sechseckigen Löchern lässt sich seine Größe eigens einstellen. Passt es nicht, weil die Mitte offen ist oder es den anderen zu nahe käme, wird es weggelassen, und eine Zeile sagt das.",
+      "en": "A ring of holes along the edge, or mounting holes, can now have one more hole in the middle of the face, for the drain holes in the floor of a plant pot, say. The box \"A hole in the middle\" is in the hole pattern under \"Along the edge\" and on the \"Mounting holes\" tab, and is off at first.\n\nThe hole is like the others (shape, hole type, depth) and does not count in their number. For plain round, square and hexagon holes its size can be set on its own. Where it does not fit, because the middle is open or it would come too close to the others, it is left out and a line says so."
+    },
+    "guide": {
+      "section": "holePattern"
+    }
   }
 ]

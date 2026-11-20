@@ -148,6 +148,7 @@ summary: 選取形狀、在物件清單中找到它們、對齊、鏡像、旋�
    - **{{ui:holePattern.wall}}：** 同一距離的另一種說法：相鄰兩個孔之間留下的壁，也就是列印件中的壁厚。設定它，中心距會隨之變化（矩形與槽孔的列距也一樣），反之亦然。對於六邊形、矩形和槽孔，layerling 會量測它們邊緣之間的最短距離。
    - **{{ui:holePattern.arrangement}}：** {{ui:holePattern.arrangement.grid}} 將孔排成列與欄。{{ui:holePattern.arrangement.staggered}} 將每隔一列錯開半個間距，並讓列更靠近，使每個孔到相鄰孔的距離相同——用於六邊形時便形成蜂巢。
    - **{{ui:holePattern.arrangement.perimeter}}：** 改為沿面的外邊緣放一圈孔，向內縮進 {{ui:holePattern.margin}}——例如蓋子或板子四周的螺絲孔。{{ui:holePattern.perimeterBy}} {{ui:holePattern.perimeterBy.spacing}} 大致保持間距，{{ui:holePattern.perimeterBy.count}} 則設定 {{ui:holePattern.perimeterCount}}；兩種方式都會把間距調勻，讓這一圈無縫閉合。{{ui:holePattern.perimeterCorners}}（預設開啟）在每個角放一個孔，並把角之間的每條邊平均分配。在圓形面上，或取消勾選時，孔從頂部開始平均繞一圈，{{ui:holePattern.perimeterStart}} 可沿邊緣移動整圈孔。
+   - **{{ui:holePattern.centerHole}}：** 用於 {{ui:holePattern.arrangement.perimeter}} 和 {{ui:holePattern.mode.mounting}} 分頁（不適用於 19 吋機架）。勾選後，在面的中間再加一個與其他孔相同的孔——例如花盆底部的排水孔。它不計入孔數。對於一般的圓孔、方孔和六邊形孔，可以用 {{ui:holePattern.centerHoleOwnSize}} 單獨設定 {{ui:holePattern.centerHoleSize}}。如果面的中間是空的，或者這個孔會離其他孔太近，就不會產生，並有一行提示說明。
    - **{{ui:holePattern.margin}}：** 孔與面邊緣之間的淨距離。只有完全位於「面減去此邊距」範圍內的孔才會製作；任何會超出該範圍的孔都會被略過。面中的開口周圍也會保留此邊距。
    - **{{ui:holePattern.depth}}：** {{ui:holePattern.depth.through}}（預設）會切穿整面壁。使用 {{ui:holePattern.depth.custom}} 時，以公釐為單位給出深度，例如用於凹槽。
 3. 孔會立即在面上以預覽形式顯示，並跟隨每個數值變化。視窗會說明能容納多少個孔。{{ui:holePattern.repick}} 可選擇另一個面，[[Esc]] 關閉工具；和其他工具視窗一樣，可拖曳其標題列移動。
