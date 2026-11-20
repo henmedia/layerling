@@ -38,6 +38,7 @@ import {
   holeTiltApplies,
   holeHeadDepth,
   holeHeadSize,
+  holePatternHasAngle,
   holePatternHasRowSpacing,
   holePatternMinRowSpacing,
   holePatternMinSpacing,
@@ -382,8 +383,9 @@ export function HolePatternPanel({
           onChange={(value) => onChange({ height: value })}
         />
       ) : null}
-      {/* A rectangle or slot can lie at any angle in the face, counter-clockwise as seen looking at it; 0 lays its width along x. */}
-      {twoSizes ? (
+      {/* Every form but the round hole can lie at any angle in the face, counter-clockwise as seen looking at it; 0 lays
+          its width along x. A square at 45 is a diamond (Discussion 1795), a hexagon at 30 lies on a flat. */}
+      {holePatternHasAngle(settings.form) ? (
         <EdgeModifierSlider
           label={t("holePattern.holeAngle")}
           value={settings.holeAngle ?? 0}
