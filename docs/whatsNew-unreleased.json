@@ -21,5 +21,18 @@
     "guide": {
       "chapter": "files"
     }
+  },
+  {
+    "title": {
+      "de": "3MF aus dem Scanner: ein Körper statt Tausender",
+      "en": "3MF from a scanner: one body instead of thousands"
+    },
+    "body": {
+      "de": "Eine 3MF aus einem 3D-Scanner trägt an fast jedem Punkt eine eigene Farbe. layerling machte daraus je Farbe einen Körper: aus einem Scan wurden über 42.000 Körper, der Import dauerte Minuten. Eine solche Datei kommt jetzt als ein Körper in einer Farbe herein, mit einem Hinweis, dass der Farbverlauf nicht erhalten bleibt. Dateien mit wenigen Farben werden wie bisher je Farbe ein Körper.",
+      "en": "A 3MF from a 3D scanner carries its own colour at almost every point. layerling made one body per colour: one scan became more than 42,000 bodies, and the import took minutes. Such a file now comes in as one body in a single colour, with a note that the colour gradient is not kept. Files with a few colours still become one body per colour."
+    },
+    "guide": {
+      "chapter": "files"
+    }
   }
 ]
