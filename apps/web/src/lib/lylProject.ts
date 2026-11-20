@@ -1,3 +1,5 @@
+import type { SketchProfile } from "@/types/layerling";
+import { updateSketchOffsets } from "@/lib/sketchOffsets";
 import { checkedTypefaceData, customFontName, isCustomFontId, textCharacters, typefaceSubset } from "@/lib/customFonts";
 import { customFontEntry, registerCustomFont } from "@/lib/textFonts";
 import { strFromU8, strToU8, unzip } from "fflate";
@@ -830,6 +832,8 @@ async function serializeShapeNode(
     definition.sketchProfile = {
       points: sketchProfile.points,
       segments: sketchProfile.segments,
+      ...(sketchProfile.constraints?.length ? { constraints: sketchProfile.constraints } : {}),
+      ...(sketchProfile.offsets?.length ? { offsets: sketchProfile.offsets } : {}),
       ...(images.length ? { images } : {}),
       ...(sketchProfile.stroke ? { stroke: sketchProfile.stroke } : {}),
       ...(sketchProfile.silhouette ? { silhouette: true } : {}),
@@ -1312,6 +1316,7 @@ function validateSketchProfile(value: unknown, label: string) {
     const id = stringValue(point.id, `${label}.points[${index}].id`);
     if (pointIds.has(id)) throw new Error(`${label} contains duplicate point ID '${id}'`);
     pointIds.add(id);
+    if (point.shapeName !== undefined && typeof point.shapeName !== "string") throw new Error(`${label}.points[${index}].shapeName must be a string`);
     finiteNumber(point.x, `${label}.points[${index}].x`);
     finiteNumber(point.z, `${label}.points[${index}].z`);
     if (point.locked !== undefined && typeof point.locked !== "boolean") throw new Error(`${label}.points[${index}].locked must be true or false`);
@@ -1327,6 +1332,114 @@ function validateSketchProfile(value: unknown, label: string) {
     if (!pointIds.has(startId) || !pointIds.has(endId)) throw new Error(`${label} contains a segment with a missing point reference`);
     if (segment.construction !== undefined && typeof segment.construction !== "boolean") throw new Error(`${label}.segments[${index}].construction must be true or false`);
   });
+  if (profile.offsets !== undefined) {
+    if (!Array.isArray(profile.offsets)) throw new Error(`${label}.offsets must be an array`);
+    const offsetIds = new Set<string>();
+    const derivedPoints = new Set<string>();
+    const derivedSegments = new Set<string>();
+    profile.offsets.forEach((raw, index) => {
+      const offsetLabel = `${label}.offsets[${index}]`;
+      const offset = objectRecord(raw, offsetLabel);
+      const id = stringValue(offset.id, `${offsetLabel}.id`);
+      if (offsetIds.has(id)) throw new Error("Duplicate offset ID");
+      offsetIds.add(id);
+      const sources = stringArray(offset.sourceSegmentIds, `${offsetLabel}.sourceSegmentIds`);
+      const points = stringArray(offset.pointIds, `${offsetLabel}.pointIds`);
+      const segments = stringArray(offset.segmentIds, `${offsetLabel}.segmentIds`);
+      if (!sources.length || new Set(sources).size !== sources.length || sources.some((ref) => !segmentIds.has(ref)) ||
+        !points.length || new Set(points).size !== points.length || points.some((ref) => !pointIds.has(ref) || derivedPoints.has(ref)) ||
+        !segments.length || new Set(segments).size !== segments.length || segments.some((ref) => !segmentIds.has(ref) || derivedSegments.has(ref))) throw new Error("Invalid offset references");
+      points.forEach((ref) => derivedPoints.add(ref));
+      segments.forEach((ref) => derivedSegments.add(ref));
+      const distance = finiteNumber(offset.distance, `${offsetLabel}.distance`);
+      const miterLimit = finiteNumber(offset.miterLimit, `${offsetLabel}.miterLimit`);
+      if (Math.abs(distance) < 1e-6 || Math.abs(distance) > 1e6 || miterLimit < 1 || miterLimit > 100 ||
+        !["miter", "round", "bevel"].includes(String(offset.join))) throw new Error("Invalid offset parameters");
+      if (offset.name !== undefined && typeof offset.name !== "string") throw new Error("Offset name must be text");
+      if (offset.hidden !== undefined && typeof offset.hidden !== "boolean") throw new Error("Offset visibility must be boolean");
+    });
+    const checked = updateSketchOffsets(profile as unknown as SketchProfile);
+    if (!checked.ok) throw new Error(checked.message);
+  }
+  if (profile.constraints !== undefined) {
+    if (!Array.isArray(profile.constraints)) throw new Error(`${label}.constraints must be an array`);
+    const referenceLine = (a: string, b: string) => (profile as unknown as SketchProfile).segments.some((segment) =>
+      (segment.kind ?? "line") === "line" && ((segment.startId === a && segment.endId === b) || (segment.startId === b && segment.endId === a)));
+    const ruleIds = new Set<string>();
+    const noDimension = new Set(["horizontal", "vertical", "coincident", "concentric", "midpoint", "point-on-line", "symmetry"]);
+    const withDimension = new Set(["distance", "offset-x", "offset-z", "angle", "point-line-distance", "line-distance", "outline-line-distance", "circle-diameter", "circle-center-distance"]);
+    const betweenLines = new Set(["parallel", "perpendicular", "equal-length", "angle", "line-distance"]);
+    profile.constraints.forEach((rawRule, index) => {
+      const ruleLabel = `${label}.constraints[${index}]`;
+      const rule = objectRecord(rawRule, ruleLabel);
+      const id = stringValue(rule.id, `${ruleLabel}.id`);
+      if (ruleIds.has(id)) throw new Error(`${label}.constraints contains duplicate ID '${id}'`);
+      ruleIds.add(id);
+      const kind = stringValue(rule.kind, `${ruleLabel}.kind`);
+      if (rule.relationshipId !== undefined) {
+        stringValue(rule.relationshipId, `${ruleLabel}.relationshipId`);
+        if (kind !== "symmetry" && kind !== "point-on-line") throw new Error(`${ruleLabel} has unsupported relationship metadata`);
+      }
+      if (!noDimension.has(kind) && !withDimension.has(kind) && !betweenLines.has(kind)) throw new Error(`${ruleLabel}.kind is not supported`);
+      const a = stringValue(rule.a, `${ruleLabel}.a`);
+      const b = stringValue(rule.b, `${ruleLabel}.b`);
+      if (!pointIds.has(a) || !pointIds.has(b) || a === b) throw new Error(`${ruleLabel} references invalid points`);
+      if (kind === "concentric") {
+        if (rule.radialGap !== undefined) finiteNumber(rule.radialGap, `${ruleLabel}.radialGap`);
+        const circles = rule.circles;
+        if (!Array.isArray(circles) || circles.length !== 2 ||
+          circles.some((circle) => !Array.isArray(circle) || circle.length !== 4 ||
+            circle.some((ref) => typeof ref !== "string" || !pointIds.has(ref))) ||
+          new Set(circles.flat()).size !== 8 || !circles[0].includes(a) || !circles[1].includes(b)) {
+          throw new Error(`${ruleLabel} references invalid circle outlines`);
+        }
+      }
+      if (kind === "outline-line-distance" || kind === "circle-center-distance" || kind === "circle-diameter") {
+        if (!Array.isArray(rule.outline) || rule.outline.length < 3 || new Set(rule.outline).size !== rule.outline.length ||
+          rule.outline.some((ref) => typeof ref !== "string" || !pointIds.has(ref)) ||
+          (kind !== "outline-line-distance" && rule.outline.length !== 4) ||
+          (kind === "circle-diameter" ? !rule.outline.includes(a) || !rule.outline.includes(b)
+            : rule.outline.includes(a) || rule.outline.includes(b)) ||
+          (kind === "outline-line-distance" && rule.side !== 1 && rule.side !== -1)) throw new Error(`${ruleLabel} has an invalid outline or side`);
+      }
+      if (kind === "point-line-distance" || kind === "midpoint" || kind === "point-on-line") {
+        const c = stringValue(rule.c, `${ruleLabel}.c`);
+        if (!pointIds.has(c) || c === a || c === b) throw new Error(`${ruleLabel} references an invalid point`);
+      }
+      if ((kind === "midpoint" || kind === "point-on-line") && !referenceLine(a, b))
+        throw new Error(`${ruleLabel} requires an existing straight reference line`);
+      if (kind === "symmetry") {
+        const pair = rule.pair;
+        if (!Array.isArray(rule.axis) || rule.axis.length !== 2 || rule.axis.some((id) => typeof id !== "string" || !pointIds.has(id)) ||
+          (pair !== undefined && (!Array.isArray(pair) || pair.length !== 2 || pair.some((id) => typeof id !== "string" || !pointIds.has(id)))))
+          throw new Error(`${ruleLabel} has invalid symmetry references`);
+        const refs = [a, b, ...rule.axis, ...(Array.isArray(pair) ? pair : [])];
+        if (new Set(refs).size !== refs.length) throw new Error(`${ruleLabel} has overlapping symmetry references`);
+        if (!referenceLine(rule.axis[0] as string, rule.axis[1] as string) ||
+          (Array.isArray(pair) && (!referenceLine(a, pair[0] as string) || !referenceLine(b, pair[1] as string))))
+          throw new Error(`${ruleLabel} requires existing straight symmetry lines`);
+      }
+      if (betweenLines.has(kind)) {
+        const c = stringValue(rule.c, `${ruleLabel}.c`);
+        const d = stringValue(rule.d, `${ruleLabel}.d`);
+        if (!pointIds.has(c) || !pointIds.has(d) || c === d ||
+          (a === c && b === d) || (a === d && b === c) || (kind === "angle" && a !== c) ||
+          (kind === "line-distance" && [a, b].some((ref) => ref === c || ref === d))) {
+          throw new Error(`${ruleLabel} references invalid line endpoints`);
+        }
+      }
+      if (rule.frameX !== undefined) {
+        const frame = objectRecord(rule.frameX, `${ruleLabel}.frameX`);
+        const x = finiteNumber(frame.x, `${ruleLabel}.frameX.x`);
+        const z = finiteNumber(frame.z, `${ruleLabel}.frameX.z`);
+        if (Math.abs(Math.hypot(x, z) - 1) > 0.0001) throw new Error(`${ruleLabel}.frameX must be a unit vector`);
+      }
+      if (withDimension.has(kind)) {
+        const dimension = finiteNumber(rule.value, `${ruleLabel}.value`);
+        if ((kind === "angle" && (dimension <= 0 || dimension >= 180)) || Math.abs(dimension) > 1e6 || (kind === "circle-diameter" && dimension <= 0.001) || ((kind === "distance" || kind === "outline-line-distance") && dimension < 0)) throw new Error(`${ruleLabel}.value is outside the supported range`);
+      }
+    });
+  }
   if (profile.silhouette !== undefined && typeof profile.silhouette !== "boolean") throw new Error(`${label}.silhouette must be true or false`);
   if (profile.keyring !== undefined && !isSketchKeyring(profile.keyring)) throw new Error(`${label}.keyring must be { side, diameter, x, z } and a free place (#598) with corners of -1 or 1 if it has one`);
   if (profile.sweepAnchor !== undefined && profile.sweepAnchor !== "left" && profile.sweepAnchor !== "center" && profile.sweepAnchor !== "right") throw new Error(`${label}.sweepAnchor must be left, center or right`);

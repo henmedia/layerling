@@ -1,5 +1,5 @@
 import { orderedSketchPaths } from "@/lib/sketchSmoothHandles";
-import type { SketchPoint, SketchProfile, SketchSegment } from "@/types/layerling";
+import type { SketchConstraintInput, SketchPoint, SketchProfile, SketchSegment } from "@/types/layerling";
 
 /** Which of a corner's two lines turns when its angle is typed: the one that follows, or the one before. */
 export type CornerTurn = "after" | "before";
@@ -94,6 +94,14 @@ export function sketchCornerAt(profile: SketchProfile, pointId: string): SketchC
     startAngle: Math.atan2(fromFirst.z, fromFirst.x),
     sweep,
   };
+}
+
+/** The inline editor and persistent angle use the same fixed and turning legs. */
+export function cornerAngleConstraint(corner: SketchCorner, degrees: number, turn: CornerTurn = "after"): SketchConstraintInput | null {
+  if (!Number.isFinite(degrees) || degrees < 0.1 || degrees >= 180) return null;
+  const fixed = turn === "after" ? corner.before.far : corner.after.far;
+  const turning = turn === "after" ? corner.after.far : corner.before.far;
+  return { kind: "angle", a: corner.point.id, b: fixed.id, c: corner.point.id, d: turning.id, value: degrees };
 }
 
 /**

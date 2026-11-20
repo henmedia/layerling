@@ -1,4 +1,6 @@
 "use client";
+
+import { linkedMirrorSketchSelection } from "@/lib/sketchLinkedMirror";
 import { type GroupHoleChange, withHoleDiameters } from "@/lib/groupHoles";
 import { watchAutoTitles } from "@/lib/autoButtonTitles";
 import { deleteSketchDraft, loadSketchDraft, saveSketchDraft, sketchHasWork, type SketchDraft } from "@/lib/sketchDraftStore";
@@ -55,6 +57,8 @@ import { iconSourceFromFile, PICTURE_FILE_ACCEPT, picturePixels, type IconSource
 import { loadedManifoldRuntime, onManifoldReady } from "@/lib/manifoldHandle";
 import { canApplySketchCornerTreatment } from "@/lib/sketchFilletChamfer";
 import { SKETCH_POLYGON_DEFAULT_SIDES, SKETCH_STAR_DEFAULT_INNER_PERCENT, sketchPrimitiveGeometry, sketchPrimitiveStartSize } from "@/lib/sketchPrimitives";
+import { applySketchConstraints, withSketchConstraint, removeSketchConstraintRelationship, type SketchConstraintFailure } from "@/lib/sketchConstraints";
+import type { SketchConstraintInput } from "@/types/layerling";
 import { cloneSketchProfile, orderedSketchPaths, sketchWithPointMode, withSmoothHandlesAfterRemoval, withSmoothSketchHandles } from "@/lib/sketchSmoothHandles";
 import { curveThroughPoints } from "@/lib/sketchCurveThroughPoints";
 import { addFreehandStroke, FREEHAND_CLOSE_PX, FREEHAND_TOLERANCE_PX, freehandStroke } from "@/lib/sketchFreehand";
@@ -243,6 +247,7 @@ import { normalizePlacementWorkplane, placementPatchForNewShape, placementWorkpl
 import { localizedError } from "@/lib/userErrors";
 import { alignNaturalCenter, type AlignPoint } from "@/lib/alignCenter";
 import { cylinderToEllipsePatch } from "@/lib/cylinderToEllipse";
+import { constrainedSketchResizeIds, withoutResizedSketchConstraints } from "@/lib/sketchResizeConfirmation";
 import { sketchBodyStretch, stretchedSketchProfile } from "@/lib/sketchResize";
 import { silhouetteSketchProfile } from "@/lib/sketchCadProfile";
 import { svgSketchMatchesMesh } from "@/lib/svgSketch";
@@ -3658,6 +3663,7 @@ export function LayerlingEditor({
   useEffect(() => {
     if (!sketchActive) setSketchFromMiddle(false);
   }, [sketchActive]);
+  const [sketchConstraintFailure, setSketchConstraintFailure] = useState<SketchConstraintFailure | null>(null);
   const [sketchProfile, setSketchProfile] = useState<SketchProfile>(() => emptySketchProfile());
   const [sketchHistory, setSketchHistory] = useState<SketchProfile[]>([emptySketchProfile()]);
   const [sketchHistoryIndex, setSketchHistoryIndex] = useState(0);
@@ -5242,6 +5248,11 @@ export function LayerlingEditor({
   /** The arrow keys' last step in the 3D editor; a run of presses is one step of the history (#370). */
   const keyRunRef = useRef<KeyRun | null>(null);
 
+  const constrainedResizeGuardRef = useRef<(next: WorkplaneShape[], selection: string | string[] | null, message?: string) => boolean>(() => false);
+  const approvedConstrainedResizeRef = useRef(false);
+  const pendingConstrainedResizeRef = useRef<{ next: WorkplaneShape[]; ids: string[]; selection: string[]; fingerprint: string; message?: string } | null>(null);
+  const [resizeSketchEditId, setResizeSketchEditId] = useState<string | null>(null);
+
   const commitShapes = useCallback(
     (next: WorkplaneShape[], nextSelection: string | string[] | null = selectedIds, message?: string, keyRunKey?: string, amendNewest = false) => {
       // Solange der Verlaufsblick offen ist, zeigt die Flaeche nicht den
@@ -5260,6 +5271,7 @@ export function LayerlingEditor({
           return;
         }
       }
+      if (!approvedConstrainedResizeRef.current && constrainedResizeGuardRef.current(canonicalNext, nextSelection, message)) return;
       const requestedSelection = Array.isArray(nextSelection) ? nextSelection : nextSelection ? [nextSelection] : [];
       const validSelection = requestedSelection.filter((id, index) => requestedSelection.indexOf(id) === index && canonicalNext.some((shape) => shape.id === id));
       // A note whose body goes away moves to the new body under it, or stays where it stands.
@@ -5505,7 +5517,7 @@ export function LayerlingEditor({
   const sketchKeyRunRef = useRef<KeyRun | null>(null);
 
   const commitSketchProfile = useCallback(
-    (next: SketchProfile, message?: string, keyRunKey?: string) => {
+    (next: SketchProfile, message?: string, keyRunKey?: string, offsetEdit = false) => {
       const current = sketchHistoryRef.current;
       const currentIndex = Math.min(sketchHistoryIndexRef.current, Math.max(0, current.length - 1));
       const trimmed = current.slice(0, currentIndex + 1);
@@ -5517,16 +5529,47 @@ export function LayerlingEditor({
       const anchored = "sweepAnchor" in withStroke || !latest?.sweepAnchor ? withStroke : { ...withStroke, sweepAnchor: latest.sweepAnchor };
       // And for the sketch's notes.
       const carried = "notes" in anchored || !latest?.notes ? anchored : { ...anchored, notes: latest.notes };
+      // Retain persistent sketch relationships when older tools create partial profiles.
+      const withConstraints = "constraints" in carried || !latest?.constraints ? carried : { ...carried, constraints: latest.constraints };
+      const carriedConstraints = "offsets" in withConstraints || !latest?.offsets ? withConstraints : { ...withConstraints, offsets: latest.offsets };
+      const moved = new Set<string>();
+      if (latest) {
+        const before = new Map(latest.points.map((point) => [point.id, point]));
+        for (const point of carriedConstraints.points) {
+          const was = before.get(point.id);
+          if (was && (Math.abs(was.x - point.x) > 1e-9 || Math.abs(was.z - point.z) > 1e-9 || JSON.stringify(was.handleIn) !== JSON.stringify(point.handleIn) || JSON.stringify(was.handleOut) !== JSON.stringify(point.handleOut))) moved.add(point.id);
+        }
+      }
+      // Offset settings regenerate their own targets; those changes are not a direct point drag.
+      if (offsetEdit) for (const feature of carriedConstraints.offsets ?? []) {
+        for (const id of feature.pointIds) moved.delete(id);
+      }
+      const solved = applySketchConstraints(carriedConstraints, moved);
+      if (!solved.ok) {
+        const attempted = (carriedConstraints.constraints ?? []).filter((rule) =>
+          !latest?.constraints?.some((previous) => JSON.stringify(previous) === JSON.stringify(rule)));
+        setSketchConstraintFailure({ ...solved.failure, attempted });
+        setNotice(solved.failure.offsetError ? localizedError(solved.failure.offsetError.message) : t("status.sketchConstraintConflict"));
+        return false;
+      }
       // Moving shapes over each other makes no shared points where their lines cross (#239); drawing does.
-      const snapshot = cloneSketchProfile(latest && onlyMovesPoints(latest, carried) ? carried : addLineIntersectionPoints(carried, createLocalId));
+      const intersected = latest && onlyMovesPoints(latest, solved.profile) ? solved.profile : addLineIntersectionPoints(solved.profile, createLocalId);
+      const refreshed = intersected !== solved.profile && intersected.offsets?.length ? applySketchConstraints(intersected) : { ok: true as const, profile: intersected };
+      if (!refreshed.ok) {
+        setSketchConstraintFailure(refreshed.failure);
+        setNotice(refreshed.failure.offsetError ? localizedError(refreshed.failure.offsetError.message) : t("status.sketchConstraintConflict"));
+        return false;
+      }
+      const snapshot = cloneSketchProfile(refreshed.profile);
       // A locked outline (#653) stays as it is, whatever tool tried to change it.
       if (latest && changesLockedOutline(latest, snapshot)) {
         setNotice(t("status.sketchOutlineLocked"));
         return;
       }
+      setSketchConstraintFailure(null);
       setSketchProfile(snapshot);
       if (latest && JSON.stringify(latest) === JSON.stringify(snapshot)) {
-        return;
+        return true;
       }
       const now = Date.now();
       const replaceLatest = keyRunKey !== undefined && trimmed.length > 1 && continuesKeyRun(sketchKeyRunRef.current, keyRunKey, now, latest, true);
@@ -5541,6 +5584,7 @@ export function LayerlingEditor({
       setSketchHistory(nextHistory);
       setSketchHistoryIndex(sketchHistoryIndexRef.current);
       if (message) setNotice(message);
+      return true;
     },
     [],
   );
@@ -5688,6 +5732,53 @@ export function LayerlingEditor({
     setToolbarMode("geometry");
     setNotice(t("status.sketchCancelled"));
   }, []);
+
+  useEffect(() => {
+    if (!resizeSketchEditId || selectedIds.length !== 1 || selectedIds[0] !== resizeSketchEditId) return;
+    setResizeSketchEditId(null);
+    beginSketchEdit();
+  }, [resizeSketchEditId, selectedIds, beginSketchEdit]);
+
+  constrainedResizeGuardRef.current = (next, selection, message) => {
+    if (sketchActive || approvedConstrainedResizeRef.current) return false;
+    const ids = constrainedSketchResizeIds(shapesRef.current, next);
+    if (!ids.length) return false;
+    const fingerprint = projectShapesFingerprint(shapesRef.current);
+    const previous = pendingConstrainedResizeRef.current;
+    const selected = Array.isArray(selection) ? selection : selection ? [selection] : ids;
+    pendingConstrainedResizeRef.current = { next, ids, selection: selected, fingerprint, message };
+    // During a drag, keep the latest requested size without replacing the warning on every frame.
+    if (previous?.fingerprint === fingerprint && Array.isArray(noticeAction) && noticeAction.some((action) => action.label === t("sketchUi.removeConstraintsAndResize"))) return true;
+    setNotice(t("sketchUi.resizingThisSketchInThe3DViewerWillRemove"), "stay", [
+      { label: t("sketchUi.removeConstraintsAndResize"), run: () => {
+        const request = pendingConstrainedResizeRef.current;
+        pendingConstrainedResizeRef.current = null;
+        if (!request) return;
+        if (projectShapesFingerprint(shapesRef.current) !== request.fingerprint) {
+          setNotice(t("sketchUi.theDesignChangedTryTheResizeAgain"), "stay");
+          return;
+        }
+        approvedConstrainedResizeRef.current = true;
+        try { commitShapes(withoutResizedSketchConstraints(request.next, request.ids), request.selection, request.message); }
+        finally { approvedConstrainedResizeRef.current = false; }
+      } },
+      { label: t("sketchUi.editSketch"), run: () => {
+        const request = pendingConstrainedResizeRef.current;
+        pendingConstrainedResizeRef.current = null;
+        if (!request) return;
+        const id = request.ids[0];
+        if (!shapesRef.current.some((shape) => shape.id === id)) return;
+        setSelectedIds([id]);
+        setResizeSketchEditId(id);
+      } },
+      { label: t("sketch.cancel"), run: () => {
+        const request = pendingConstrainedResizeRef.current;
+        pendingConstrainedResizeRef.current = null;
+        if (request) setSelectedIds(request.selection);
+      } },
+    ]);
+    return true;
+  };
 
   const sketchNotes = useSketchNotes({ profile: sketchProfile, commit: commitSketchProfile, notes, editedId: editingSketchShapeId, onPlaced: () => setNoteMode(false), setNotice });
 
@@ -6298,21 +6389,44 @@ export function LayerlingEditor({
   }, [insertSketchCopy, sketchProfile, sketchSelection]);
 
   // Mirror (#512): copies the selection to the other side of an axis; the originals stay.
-  const mirrorSketchSelectionAction = useCallback((across: "vertical" | "horizontal" | { segmentId: string }) => {
+  const mirrorSketchSelectionAction = useCallback((across: "vertical" | "horizontal" | { segmentId: string }, maintainSymmetry = false) => {
     const axis = across === "vertical" ? SKETCH_MIRROR_VERTICAL : across === "horizontal" ? SKETCH_MIRROR_HORIZONTAL : sketchMirrorAxisThroughSegment(sketchProfile, across.segmentId);
     if (!axis) {
       setNotice(t("status.sketchMirrorNoAxis"));
       return;
     }
-    const mirrored = mirrorSketchSelection(sketchProfile, sketchSelection, axis, createLocalId);
+    const linked = maintainSymmetry ? linkedMirrorSketchSelection(sketchProfile, sketchSelection, across, createLocalId) : null;
+    if (linked && !linked.ok) { setNotice(localizedError(linked.message)); return; }
+    const mirrored = linked?.ok ? linked : mirrorSketchSelection(sketchProfile, sketchSelection, axis, createLocalId);
     if (!mirrored) {
       setNotice(t("status.sketchMirrorNothing"));
       return;
     }
-    commitSketchProfile(mirrored.profile, t("status.sketchMirrored"));
+    if (!commitSketchProfile(mirrored.profile, t("status.sketchMirrored"))) return;
     setSketchActivePointId(null);
     setSketchSelection({ kind: "multiple", pointIds: mirrored.pointIds, segmentIds: mirrored.segmentIds });
   }, [commitSketchProfile, sketchProfile, sketchSelection]);
+
+  const addSketchConstraint = useCallback((rule: SketchConstraintInput) => {
+    const id = createLocalId("sketch-constraint");
+    return commitSketchProfile(withSketchConstraint(sketchProfile, { ...rule, id }), t("status.sketchConstraintAdded"));
+  }, [commitSketchProfile, sketchProfile]);
+
+  const updateSketchConstraint = useCallback((id: string, value: number) => {
+    const constraints = (sketchProfile.constraints ?? []).map((rule) => {
+      if (rule.id !== id) return rule;
+      if ("value" in rule) return { ...rule, value };
+      if (rule.kind === "concentric") return { ...rule, radialGap: value };
+      return rule;
+    });
+    return commitSketchProfile({ ...sketchProfile, constraints }, t("status.sketchUpdated"));
+  }, [commitSketchProfile, sketchProfile]);
+
+  useEffect(() => { setSketchConstraintFailure(null); }, [sketchProfile]);
+
+  const removeSketchConstraint = useCallback((id: string) => {
+    commitSketchProfile(removeSketchConstraintRelationship(sketchProfile, id), t("status.sketchConstraintRemoved"));
+  }, [commitSketchProfile, sketchProfile]);
 
   const moveSketchPoint = useCallback((id: string, position: { x: number; z: number }) => {
     const current = sketchProfile.points.find((point) => point.id === id);
@@ -6922,6 +7036,9 @@ export function LayerlingEditor({
         });
         return { changed, next };
       };
+
+      const proposed = applyPatch(shapesRef.current);
+      if (proposed.changed && constrainedResizeGuardRef.current(proposed.next, selectedIdsRef.current)) return;
 
       if (projectInteractionActiveRef.current) {
         setShapes((current) => {
@@ -20409,6 +20526,12 @@ export function LayerlingEditor({
             onDeletePoint={deleteSketchPoint}
             onDeleteSegment={deleteSketchSegment}
             onMovePoint={moveSketchPoint}
+            onCommitOffsetProfile={(next) => commitSketchProfile(next, t("status.sketchUpdated"), undefined, true)}
+            onAddConstraint={addSketchConstraint}
+            onRemoveConstraint={removeSketchConstraint}
+            onUpdateConstraint={updateSketchConstraint}
+            constraintFailure={sketchConstraintFailure}
+            onDismissConstraintFailure={() => setSketchConstraintFailure(null)}
             onToggleOutlineLock={toggleSketchOutlineLock}
             onTransformPoints={transformSketchPoints}
             onMoveHandle={moveSketchHandle}
@@ -21472,8 +21595,9 @@ export function LayerlingEditor({
         />
       ) : null}
       {notice && showsNotice(workspaceSettings.showStepNotices, noticeOrdinary, noticeReportsLastChange(noticeAt, lastHistoryChangeRef.current, historyIndex)) ? (
-        <p className="editor-status" role="status" aria-live="polite" onMouseEnter={holdNotice} onMouseLeave={releaseNotice}>
-          <span className="editor-status-text">{notice}</span>
+        <p className="editor-status" role="status" aria-live="polite" onMouseEnter={holdNotice} onMouseLeave={releaseNotice}
+          style={Array.isArray(noticeAction) ? { top: "auto", bottom: 48, left: "50%", transform: "translateX(-50%)", width: "min(720px, calc(100vw - 32px))", maxWidth: "calc(100vw - 32px)", flexWrap: "wrap" } : undefined}>
+          <span className="editor-status-text" style={Array.isArray(noticeAction) ? { flexBasis: "100%" } : undefined}>{notice}</span>
           {!noticeAction && noticeReportsLastChange(noticeAt, lastHistoryChangeRef.current, historyIndex) ? (
             <button
               className="editor-status-action"
@@ -21486,22 +21610,15 @@ export function LayerlingEditor({
               {t("shortcuts.undo")}
             </button>
           ) : null}
-          {noticeAction ? (
-            <button
-              className="editor-status-action"
-              type="button"
-              onClick={() => {
-                const run = noticeAction.run;
-                dismissNotice();
-                run();
-              }}
-            >
-              {noticeAction.label}
+          {noticeAction ? (Array.isArray(noticeAction) ? noticeAction : [noticeAction]).map((action) => (
+            <button key={action.label} className="editor-status-action" type="button"
+              onClick={() => { dismissNotice(); action.run(); }}>
+              {action.label}
             </button>
-          ) : null}
-          <button className="editor-status-close" type="button" aria-label={t("status.dismiss")} title={t("status.dismiss")} onClick={dismissNotice}>
+          )) : null}
+          {!Array.isArray(noticeAction) && <button className="editor-status-close" type="button" aria-label={t("status.dismiss")} title={t("status.dismiss")} onClick={() => { pendingConstrainedResizeRef.current = null; dismissNotice(); }}>
             <X size={13} strokeWidth={2.6} aria-hidden="true" />
-          </button>
+          </button>}
         </p>
       ) : null}
       <pre data-codex-state hidden>

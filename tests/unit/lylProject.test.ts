@@ -1,7 +1,10 @@
+import { linkedMirrorSketchSelection } from "@/lib/sketchLinkedMirror";
+import { updateSketchOffsets } from "@/lib/sketchOffsets";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { strFromU8, strToU8, unzipSync, zipSync } from "fflate";
 import { editorHistoryEntry } from "@/lib/editorHistory";
 import { placementWorkplaneFromSurface } from "@/lib/placementWorkplane";
+import { sketchPrimitiveGeometry } from "@/lib/sketchPrimitives";
 import { projectAssetFromBytes } from "@/lib/projectAssets";
 import { canonicalizeShape } from "@/lib/workplaneShapes";
 import {
@@ -79,6 +82,76 @@ function mutateProject(bytes: Uint8Array, mutate: (document: LylProjectDocumentV
 
 describe("layerling .lyl project packages", () => {
   afterEach(() => vi.unstubAllGlobals());
+
+  it("round-trips a Mirror-created symmetry and its addressable origin axis", async () => {
+    let id=0;
+    const mirrored=linkedMirrorSketchSelection({points:[{id:"a",x:10,z:10},{id:"b",x:20,z:30}],segments:[{id:"line",startId:"a",endId:"b"}]},
+      {kind:"segment",id:"line"},"vertical",prefix=>`${prefix}-${++id}`);
+    expect(mirrored.ok).toBe(true);if(!mirrored.ok)return;
+    const pad=shape("mesh","linked-mirror",{sketchProfile:mirrored.profile});
+    const restored=await importLylProject(await exportLylProject(input([pad])));
+    expect(restored.shapes[0].sketchProfile).toEqual(expect.objectContaining(mirrored.profile));
+  });
+
+  it("round-trips midpoint, point-on-line, and stored segment symmetry correspondence", async () => {
+    const pad = shape("mesh", "relations", { sketchProfile: {
+      points: [{id:"a",x:0,z:0},{id:"b",x:100,z:0},{id:"p",x:50,z:0},{id:"q",x:50,z:0},{id:"r",x:80,z:20},{id:"s",x:80,z:-20}],
+      segments: [{id:"axis",startId:"a",endId:"b",construction:true},{id:"first",startId:"p",endId:"r"},{id:"second",startId:"q",endId:"s"}],
+      constraints: [{id:"m",kind:"midpoint",a:"a",b:"b",c:"p"},{id:"l",kind:"point-on-line",a:"a",b:"b",c:"q"},
+        {id:"s",kind:"symmetry",a:"p",b:"q",axis:["a","b"],pair:["r","s"]}],
+    }});
+    const restored = await importLylProject(await exportLylProject(input([pad])));
+    expect(restored.shapes[0].sketchProfile?.constraints).toEqual(pad.sketchProfile?.constraints);
+    const invalid = structuredClone(pad);
+    const symmetry = invalid.sketchProfile!.constraints![2];
+    if (symmetry.kind === "symmetry") symmetry.axis[0] = "missing";
+    await expect(importLylProject(await exportLylProject(input([invalid])))).rejects.toThrow(/symmetry references/);
+  });
+
+  it.each([undefined, 1.5])("round-trips a concentric circle constraint with gap %s", async (radialGap) => {
+    let id = 0;
+    const nextId = () => `circle-${++id}`;
+    const hole = sketchPrimitiveGeometry("circle", { x: 0, z: 0 }, nextId, 3);
+    const recess = sketchPrimitiveGeometry("circle", { x: 0, z: 0 }, nextId, 6);
+    const first = hole.points.map((point) => point.id);
+    const second = recess.points.map((point) => point.id);
+    const body = shape("mesh", "concentric-sketch", {
+      sketchOperation: "extrude",
+      sketchProfile: {
+        points: [...hole.points.map((point) => ({ ...point, shapeName: "Bore" })),
+          ...recess.points.map((point) => ({ ...point, shapeName: "Counterbore" }))],
+        segments: [...hole.segments, ...recess.segments],
+        constraints: [{ id: "shared-center", kind: "concentric", a: first[0], b: second[0], circles: [first, second], ...(radialGap === undefined ? {} : { radialGap }) }],
+      },
+    });
+    const restored = await importLylProject(await exportLylProject(input([body])));
+    expect(restored.shapes[0].sketchProfile).toEqual(body.sketchProfile);
+  });
+
+  it("round-trips linked sketch offsets and rejects dependency cycles", async () => {
+    const generated = updateSketchOffsets({
+      points: [{id:"a",x:0,z:0},{id:"b",x:20,z:0}],
+      segments: [{id:"line",startId:"a",endId:"b"}],
+      offsets: [{id:"offset",name:"Margin",sourceSegmentIds:["line"],pointIds:[],segmentIds:[],distance:3,join:"bevel",miterLimit:4}],
+    });
+    if (!generated.ok) throw Error(generated.message);
+    const body = shape("mesh", "offset-sketch", {sketchOperation:"extrude",sketchProfile:generated.profile});
+    const restored = await importLylProject(await exportLylProject(input([body])));
+    expect(restored.shapes[0].sketchProfile).toEqual(body.sketchProfile);
+    const cycle = {...generated.profile,offsets:generated.profile.offsets!.map(f=>({...f,sourceSegmentIds:f.segmentIds}))};
+    await expect(importLylProject(await exportLylProject(input([{...body,sketchProfile:cycle}])))).rejects.toThrow(/cycle/);
+  });
+
+  it("round-trips an associative oval offset with fitted curve handles", async () => {
+    let n = 0;
+    const source = sketchPrimitiveGeometry("ellipse", { x: 0, z: 0 }, () => `oval-${++n}`, 62);
+    const linked = updateSketchOffsets({ ...source, offsets: [{ id: "oval-offset", sourceSegmentIds: source.segments.map(s => s.id),
+      pointIds: [], segmentIds: [], distance: 5, join: "round", miterLimit: 4 }] });
+    if (!linked.ok) throw Error(linked.message);
+    const body = shape("mesh", "oval-offset-body", { sketchOperation: "extrude", sketchProfile: linked.profile });
+    const restored = await importLylProject(await exportLylProject(input([body])));
+    expect(restored.shapes[0].sketchProfile).toEqual(body.sketchProfile);
+  });
 
   it("round-trips every supported native shape kind and editable properties", async () => {
     const nativeKinds: ShapeKind[] = [
@@ -229,12 +302,19 @@ describe("layerling .lyl project packages", () => {
       sketchOperation: "revolve",
       sketchRevolve: { startAngle: 25, sweepAngle: -220, sides: 48, quality: 8 },
       sketchProfile: {
-        points: [{ id: "p1", x: -4, z: 0 }, { id: "p2", x: -8, z: 0 }, { id: "p3", x: -8, z: 16 }, { id: "p4", x: -4, z: 16 }],
+        points: [{ id: "p1", x: -4, z: 0 }, { id: "p2", x: -8, z: 0 }, { id: "p3", x: -8, z: 16 }, { id: "p4", x: -4, z: 16 },
+          { id: "guide-start", x: -2, z: 0 }, { id: "guide-end", x: -2, z: 16 }],
         segments: [
           { id: "s1", startId: "p1", endId: "p2", kind: "line" },
           { id: "s2", startId: "p2", endId: "p3", kind: "line" },
           { id: "s3", startId: "p3", endId: "p4", kind: "line" },
           { id: "s4", startId: "p4", endId: "p1", kind: "line" },
+          { id: "guide", startId: "guide-start", endId: "guide-end", construction: true },
+        ],
+        constraints: [
+          { id: "line-gap", kind: "line-distance", a: "p1", b: "p2", c: "p3", d: "p4", value: -16 },
+          { id: "clearance", kind: "outline-line-distance", a: "guide-start", b: "guide-end",
+            outline: ["p1", "p2", "p3", "p4"], side: 1, value: 2 },
         ],
       },
       importedMesh: {
@@ -265,11 +345,18 @@ describe("layerling .lyl project packages", () => {
           { id: "s3", startId: "p3", endId: "p1", kind: "line" },
         ],
         inset: { distance: 3, radius: 1.5 },
+        constraints: [
+          { id: "right-angle", kind: "perpendicular", a: "p1", b: "p2", c: "p2", d: "p3" },
+          { id: "equal", kind: "equal-length", a: "p1", b: "p2", c: "p2", d: "p3" },
+          { id: "angle", kind: "angle", a: "p3", b: "p2", c: "p3", d: "p1", value: 53 },
+          { id: "point-gap", kind: "point-line-distance", a: "p1", b: "p2", c: "p3", value: -30 },
+        ],
       },
       importedMesh: { positions: [0, 0, 0, 1, 0, 0, 0, 1, 0], baseWidth: 40, baseDepth: 30, baseHeight: 3, triangleCount: 1, sourceFormat: "json" },
     });
     const restored = await importLylProject(await exportLylProject(input([pad])));
     expect(restored.shapes[0].sketchProfile?.inset).toEqual({ distance: 3, radius: 1.5 });
+    expect(restored.shapes[0].sketchProfile?.constraints).toEqual(pad.sketchProfile?.constraints);
     const broken = { ...pad, sketchProfile: { ...pad.sketchProfile!, inset: { distance: -1, radius: 0 } } };
     await expect(importLylProject(await exportLylProject(input([broken])))).rejects.toThrow(/inset/);
   });
