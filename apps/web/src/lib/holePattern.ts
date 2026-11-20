@@ -76,6 +76,17 @@ export type HolePatternSettings = {
   /** 19" rack: a standard panel height from 1U to 6U, its holes as the standard has them; 0 or unset fits the panel. */
   rackUnits?: number;
   /**
+   * A ring along the edge and mounting holes for screws (Discussion #1904): one more hole in the middle of the face,
+   * like the others - the drain holes in a plant pot's floor. It does not count among the ring's or the mounting
+   * holes' number, and is left out where it does not fit: in an opening, or too close to the others.
+   */
+  centerHole?: boolean;
+  /**
+   * The hole in the middle in a size of its own, for holes with a single size and no head (round, square, hexagon):
+   * its diameter, side or diameter across the corners. Unset, it is as big as the others and follows them.
+   */
+  centerHoleSize?: number;
+  /**
    * When the edge cuts the holes (`holePatternCutsAtEdge`): a solid frame this wide (mm) along the face's edge and its
    * openings; the holes are cut off where it starts. 0 or unset: no frame, the holes run right to the edge.
    */
@@ -139,6 +150,27 @@ export const DEFAULT_HOLE_PATTERN: HolePatternSettings = {
 /** Whether the holes have a head: round ones with a counterbore or countersink. */
 export function holeHasHead(settings: Pick<HolePatternSettings, "form"> & Partial<Pick<HolePatternSettings, "holeType">>) {
   return settings.form === "round" && (settings.holeType === "counterbore" || settings.holeType === "countersink");
+}
+
+/** Whether the arrangement takes one more hole in the middle of the face: a ring along the edge, and mounting holes for screws. */
+export function holeCenterApplies(settings: Partial<Pick<HolePatternSettings, "arrangement" | "rack">>) {
+  return settings.arrangement === "perimeter" || (settings.arrangement === "corners" && !settings.rack);
+}
+
+/** Whether the hole in the middle can have a size of its own: holes with a single size and no head. */
+export function holeCenterTakesOwnSize(settings: Pick<HolePatternSettings, "form"> & Partial<Pick<HolePatternSettings, "holeType">>) {
+  return (settings.form === "round" || settings.form === "square" || settings.form === "hexagon") && !holeHasHead(settings);
+}
+
+/** The size of the hole in the middle where it differs from the others', or null: no such hole, or one like the others. */
+export function holeCenterOwnSize(
+  settings: Pick<HolePatternSettings, "form" | "size"> & Partial<Pick<HolePatternSettings, "arrangement" | "rack" | "holeType" | "centerHole" | "centerHoleSize">>,
+): number | null {
+  if (!settings.centerHole || !holeCenterApplies(settings) || !holeCenterTakesOwnSize(settings)) return null;
+  const own = settings.centerHoleSize;
+  if (typeof own !== "number" || !Number.isFinite(own)) return null;
+  const size = Math.min(HOLE_PATTERN_MAX_SIZE, Math.max(HOLE_PATTERN_MIN_SIZE, own));
+  return Math.abs(size - settings.size) < 1e-9 ? null : size;
 }
 
 /** The head of a counterbore or countersink at the face: twice the shaft unless set, always a little wider than it. */
@@ -568,6 +600,11 @@ export type HolePatternResult = {
    * `thin` counts the holes inside the face that leave a strip to its edge thinner than the walls between holes.
    */
   edgeCut?: { thin: number; wall: number; border: number };
+  /**
+   * A hole in the middle was asked for (`centerHole`): its place in `centers` (the last one), or null where it does
+   * not fit - the middle lies in an opening or off the face, or the hole would come too close to the others.
+   */
+  centerHole?: { index: number | null };
 };
 
 /** The panel heights of IEC 60297-3-100 (table 1): the height, and the distance between the upper and lower holes. */
@@ -1005,6 +1042,19 @@ export function cornerCenters(
   return { centers: [...corners, ...between.filter(onFace)], round: false };
 }
 
+/** The middle of a face: of a round one its circle's, else that of the smallest rectangle round its outline (where the mounting holes' corners come from). */
+export function faceMiddle(loops: readonly Point2[][]): Point2 | null {
+  const hull = convexHull(loops.flat());
+  if (hull.length < 3) return null;
+  const circle = roundOutline(hull);
+  if (circle) return { u: circle.u, v: circle.v };
+  const box = outlineBox(hull);
+  if (!box) return null;
+  const a = (box.minA + box.maxA) / 2;
+  const b = (box.minB + box.maxB) / 2;
+  return { u: a * Math.cos(box.angle) - b * Math.sin(box.angle), v: a * Math.sin(box.angle) + b * Math.cos(box.angle) };
+}
+
 /** The middle and radius of an outline that is a circle (its hull's corners all as far from the middle), or null. */
 function roundOutline(hull: readonly Point2[]): { u: number; v: number; radius: number } | null {
   if (hull.length < 12) return null;
@@ -1060,6 +1110,22 @@ export function holePatternCenters(
   const segments = loopSegments(loops);
   const fits = holeFitter((point) => insideRegion(loops, point), segments, footprint, margin);
 
+  // One more hole in the middle of the face (Discussion #1904), like the others or in its own size: it keeps the margin
+  // to the edge and to openings, and the least wall to every other hole, or is left out.
+  const withCenterHole = (centers: Point2[]): Pick<HolePatternResult, "centers" | "centerHole"> => {
+    if (!settings.centerHole || !holeCenterApplies(settings) || centers.length === 0) return { centers };
+    const own = holeCenterOwnSize(settings);
+    const room = own === null ? footprint : holeFitPolygon({ ...settings, size: own }, wall);
+    const reach = (polygon: readonly Point2[]) => polygon.reduce((most, point) => Math.max(most, Math.hypot(point.u, point.v)), 0);
+    const clear = reach(room) + reach(footprint) + HOLE_PATTERN_MIN_WALL;
+    const middle = faceMiddle(loops);
+    const fitsMiddle = own === null ? fits : holeFitter((point) => insideRegion(loops, point), segments, room, margin);
+    if (!middle || !fitsMiddle(middle) || centers.some((center) => Math.hypot(center.u - middle.u, center.v - middle.v) < clear - EPSILON)) {
+      return { centers, centerHole: { index: null } };
+    }
+    return { centers: [...centers, middle], centerHole: { index: centers.length } };
+  };
+
   if (settings.arrangement === "corners" && settings.rack) {
     const { centers, fit } = rackCenters(loops, settings);
     return { centers, tooMany: false, rows: centers.length ? 2 : 0, ...(fit ? { rack: fit } : {}) };
@@ -1069,7 +1135,7 @@ export function holePatternCenters(
     // Holes between the corners that would leave the face (a notch in a side) are left out; the corners always stay.
     const onFace = holeFitter((point) => insideRegion(loops, point), segments, footprint, 0);
     const { centers, round } = cornerCenters(loops, settings, footprint, onFace);
-    return { centers, tooMany: false, rows: centers.length ? 2 : 0, ...(round ? { roundFace: true } : {}) };
+    return { ...withCenterHole(centers), tooMany: false, rows: centers.length ? 2 : 0, ...(round ? { roundFace: true } : {}) };
   }
 
   if (settings.arrangement === "perimeter") {
@@ -1082,7 +1148,7 @@ export function holePatternCenters(
     const ring = perimeterRing(runtime, loops, settings, wall);
     if (ring.tooMany) return { ...empty, tooMany: true };
     const centers = ring.centers.filter(fits);
-    return { centers, tooMany: false, rows: centers.length ? 1 : 0, ring: { length: ring.length, onCorners: ring.onCorners } };
+    return { ...withCenterHole(centers), tooMany: false, rows: centers.length ? 1 : 0, ring: { length: ring.length, onCorners: ring.onCorners } };
   }
 
   if (holePatternCutsAtEdge(settings)) {
@@ -1740,6 +1806,9 @@ export function normalizeHolePattern(input: Partial<HolePatternSettings>): HoleP
     ...(typeof input.cornerCount === "number" && Number.isFinite(input.cornerCount) && Math.round(input.cornerCount) !== MIN_CORNER_COUNT ? { cornerCount: normalizeCornerCount(input.cornerCount, true) } : {}),
     ...(input.rack === true ? { rack: true } : {}),
     ...(input.rack === true && normalizeRackUnits(input.rackUnits) > 0 ? { rackUnits: normalizeRackUnits(input.rackUnits) } : {}),
+    // Kept while another arrangement or form is chosen, so going back finds the hole in the middle as it was.
+    ...(input.centerHole === true ? { centerHole: true } : {}),
+    ...(typeof input.centerHoleSize === "number" && Number.isFinite(input.centerHoleSize) ? { centerHoleSize: number(input.centerHoleSize, size, HOLE_PATTERN_MIN_SIZE, HOLE_PATTERN_MAX_SIZE) } : {}),
     ...custom,
     depth: typeof input.depth === "number" && Number.isFinite(input.depth) && input.depth > 0 ? Math.min(input.depth, 1000) : null,
     ...(input.allowMany === true ? { allowMany: true } : {}),

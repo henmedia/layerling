@@ -99,7 +99,7 @@ import { buildSupportRib, normalizeSupportRib, readSupportRibSettings, supportRi
 import { StencilBridgePanel } from "./workplane/StencilBridgePanel";
 import { normalizeStencilBridgeTool, readStencilBridgeToolSettings, stencilBridgeBase, stencilBridgeBoxes, stencilBridgeLevels, stencilBridgePlan, writeStencilBridgeToolSettings, STENCIL_BRIDGE_POSITIONS, type StencilBridgePlan, type StencilBridgePosition, type StencilBridgeToolSettings } from "@/lib/stencilBridgeTool";
 import { faceToolBody } from "@/lib/faceToolBody";
-import { DEFAULT_HOLE_PATTERN, holeTiltRadians, normalizeHolePattern, type HolePatternSettings } from "@/lib/holePattern";
+import { DEFAULT_HOLE_PATTERN, holeCenterApplies, holeCenterTakesOwnSize, holeTiltRadians, normalizeHolePattern, type HolePatternSettings } from "@/lib/holePattern";
 import { holePatternCustomFootprint, holePatternScrewPatch, holePatternScrewSizes, holePatternShapes, isRoundWallFace, readHolePatternFace, readPerforableFace, type HolePatternFace, type HolePatternPlan, type PerforableFace } from "@/lib/holePatternShapes";
 import { honeycombReplacementParts } from "@/lib/honeycombMigration";
 import { groupNeedsThreadRecut, placeRecutGroup, threadRecutParts } from "@/lib/groupThreadRecut";
@@ -15201,6 +15201,7 @@ export function LayerlingEditor({
           perimeterCorners: params.corners !== false,
           perimeterStart: mcpOptionalNumber(params.start),
           cornerToCenter: params.toCenter === true,
+          ...(params.centerHole === true ? { centerHole: true, centerHoleSize: mcpOptionalNumber(params.centerHoleSize) } : {}),
           ...(arrangement === "corners" && count !== undefined ? { cornerCount: count } : {}),
           ...(arrangement === "corners" && params.rack === true ? { rack: true, rackUnits: mcpOptionalNumber(params.rackUnits) } : {}),
           ...(custom ? holePatternCustomFootprint(custom) : {}),
@@ -15213,6 +15214,8 @@ export function LayerlingEditor({
         if (!read.ok) throw new Error(read.reason === "curved" ? "That face is curved but not a round wall; perforate_face needs a flat face or the wall of a cylinder, tube or bore" : "perforate_face found no face there");
         if (isRoundWallFace(read.face) && (arrangement === "perimeter" || arrangement === "corners")) throw new Error(`arrangement ${arrangement} needs a flat face; on a round wall use grid or staggered`);
         if (isRoundWallFace(read.face) && holeTiltRadians(settings) !== 0) throw new Error("holeTilt needs a flat face for now; on a round wall the holes point straight at the axis");
+        if (params.centerHole === true && !holeCenterApplies(settings)) throw new Error("centerHole needs arrangement perimeter or corners (not rack)");
+        if (mcpOptionalNumber(params.centerHoleSize) !== undefined && params.centerHole === true && !holeCenterTakesOwnSize(settings)) throw new Error("centerHoleSize needs form round, square or hexagon without a counterbore or countersink");
         const plan = holePatternShapes(read.face, settings, t("holePattern.holeName"), undefined, custom);
         if (plan.tooMany) throw new Error("That would be too many holes; make them bigger or the spacing wider");
         if (plan.holes.length === 0 && plan.rack) {
@@ -15238,6 +15241,7 @@ export function LayerlingEditor({
           settings,
           ...(plan.ring ? { ring: { length: Number(plan.ring.length.toFixed(2)), onCorners: plan.ring.onCorners } } : {}),
           ...(plan.edgeCut ? { edgeCut: { thin: plan.edgeCut.thin, wall: Number(plan.edgeCut.wall.toFixed(2)), border: plan.edgeCut.border } } : {}),
+          ...(plan.centerHole ? { centerHole: plan.centerHole.index !== null } : {}),
           ...(plan.topLayer ? { topLayer: { thickness: Number(plan.topLayer.thickness.toFixed(2)), color: plan.topLayer.color } } : {}),
           ...(plan.wall ? {
             wall: {
@@ -20954,6 +20958,7 @@ export function LayerlingEditor({
           roundFace={Boolean(holePatternPreview?.roundFace)}
           rack={holePatternPreview?.rack}
           edgeCut={holePatternPreview?.edgeCut}
+          centerHole={holePatternPreview?.centerHole}
           wall={holePatternTool.face && isRoundWallFace(holePatternTool.face) ? holePatternPreview?.wall ?? { diameter: holePatternTool.face.round.radius * 2, closed: holePatternTool.face.round.outline.closed } : undefined}
           customChoices={holePatternCustomChoices(shapes, holePatternTool.sourceId).map((shape) => ({ id: shape.id, name: displayShapeName(shape) }))}
           customIsHole={Boolean(holePatternCustom?.hole)}

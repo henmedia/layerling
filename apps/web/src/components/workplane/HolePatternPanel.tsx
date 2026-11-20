@@ -31,6 +31,8 @@ import {
   RACK_SLOT_WIDTH,
   RACK_STANDARD_PANELS,
   holeHasHead,
+  holeCenterApplies,
+  holeCenterTakesOwnSize,
   holePatternCutsAtEdge,
   holePatternEdgeBorder,
   holePatternTopLayer,
@@ -76,6 +78,7 @@ export function HolePatternPanel({
   roundFace,
   rack,
   edgeCut,
+  centerHole,
   wall,
   customChoices,
   customIsHole,
@@ -101,6 +104,8 @@ export function HolePatternPanel({
   rack?: RackFit;
   /** The face's edge cuts the holes: how many holes inside leave a strip to it thinner than the walls between holes. */
   edgeCut?: { thin: number; wall: number; border: number };
+  /** A hole in the middle was asked for (Discussion #1904): its place among the holes, or null where it does not fit. */
+  centerHole?: { index: number | null };
   /** A round wall picked (#1393): its diameter, and round a closed one how many holes a row holds at what step. */
   wall?: { diameter: number; closed: boolean; columns?: number; spacing?: number };
   /** Own shape (#1235): the other objects of the scene that can be repeated, and whether the chosen one is a hole. */
@@ -159,6 +164,10 @@ export function HolePatternPanel({
   // A top layer in a second colour: a net over the solid body, for a pattern of plain holes in a flat face.
   const layerOffered = pattern && !wall && !custom && !head;
   const netLayer = layerOffered && Boolean(settings.topLayer);
+  // One more hole in the middle of the face (Discussion #1904): with a ring along the edge and with mounting holes for screws.
+  const middleOffered = !wall && holeCenterApplies(settings);
+  const middleHole = middleOffered && Boolean(settings.centerHole);
+  const middleOwnSize = middleHole && holeCenterTakesOwnSize(settings) && settings.centerHoleSize !== undefined;
   const millimetres = (value: number) => (Math.round(value * 10) / 10).toLocaleString(numberLocale());
   const wallNote = wall
     ? wall.closed && wall.columns
@@ -585,6 +594,40 @@ export function HolePatternPanel({
         />
       ) : null}
       {screws ? <p className="hole-pattern-mounting-note">{t(roundFace ? "holePattern.mounting.roundNote" : "holePattern.mounting.countNote")}</p> : null}
+
+      {/* One more hole in the middle of the face (Discussion #1904), like the others: the drain holes in a plant pot's
+          floor. A hole with a single size and no head can have its own size there. */}
+      {middleOffered ? (
+        <label className="edge-modifier-check">
+          <input type="checkbox" checked={middleHole} onChange={(event) => onChange({ centerHole: event.target.checked })} />
+          <span>{t("holePattern.centerHole")}</span>
+        </label>
+      ) : null}
+      {middleHole && holeCenterTakesOwnSize(settings) ? (
+        <label className="edge-modifier-check">
+          <input
+            type="checkbox"
+            checked={middleOwnSize}
+            onChange={(event) => onChange({ centerHoleSize: event.target.checked ? settings.size : undefined })}
+          />
+          <span>{t("holePattern.centerHoleOwnSize")}</span>
+        </label>
+      ) : null}
+      {middleOwnSize ? (
+        <EdgeModifierSlider
+          label={t("holePattern.centerHoleSize")}
+          value={settings.centerHoleSize ?? settings.size}
+          min={HOLE_PATTERN_MIN_SIZE}
+          max={HOLE_PATTERN_MAX_SIZE / 2}
+          step={0.5}
+          workspace={workspace}
+          length
+          onChange={(value) => onChange({ centerHoleSize: value })}
+        />
+      ) : null}
+      {middleHole && ready && holeCount > 0 && centerHole && centerHole.index === null ? (
+        <p className="hole-pattern-mounting-note">{t("holePattern.centerHoleMissing")}</p>
+      ) : null}
 
       {/* With a top layer in a second colour the holes go through that layer only: no depth to choose. */}
       {custom || netLayer ? null : <div className="edge-modifier-field shell-openings" role="radiogroup" aria-label={t("holePattern.depth")}>
