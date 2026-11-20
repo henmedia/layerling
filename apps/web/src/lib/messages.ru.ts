@@ -4858,6 +4858,7 @@ export const MESSAGES_RU: Partial<Record<MessageKey, string>> = {
   "camera.tapeCentreHole": "Центр отверстия",
   "camera.tapeCentreCircle": "Центр окружности",
   "camera.tapeDistance": "Расстояние {length}",
+  "camera.tapeThickness": "Толщина {thickness}",
   "camera.tapeLengthMoves": "Введите длину: «{name}» сдвинется вдоль линии; отрицательная длина переместит его за другую точку",
   "camera.tapeLengthAlong": "Расстояние по {axis}: тело сдвинется только по {axis}",
   "camera.tapeLengthLocked": "Объект «{name}» заблокирован, введённая длина его не сдвинет",

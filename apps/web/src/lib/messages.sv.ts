@@ -4938,6 +4938,7 @@ export const MESSAGES_SV: Partial<Record<MessageKey, string>> = {
   "camera.tapeCentreHole": "Hålets mittpunkt",
   "camera.tapeCentreCircle": "Cirkelns mittpunkt",
   "camera.tapeDistance": "Avstånd {length}",
+  "camera.tapeThickness": "Tjocklek {thickness}",
   "camera.tapeLengthMoves": "Ange en längd: “{name}” flyttas längs linjen; en negativ längd flyttar den förbi den andra punkten",
   "camera.tapeLengthAlong": "Avstånd längs {axis}: kroppen flyttas endast längs {axis}",
   "camera.tapeLengthLocked": "“{name}” är låst, så en angiven längd kan inte flytta den",

@@ -4872,6 +4872,7 @@ export const MESSAGES_PL: Partial<Record<MessageKey, string>> = {
   "camera.tapeCentreHole": "Środek otworu",
   "camera.tapeCentreCircle": "Środek okręgu",
   "camera.tapeDistance": "Odległość {length}",
+  "camera.tapeThickness": "Grubość {thickness}",
   "camera.tapeLengthMoves": "Wpisz długość: „{name}” przesunie się wzdłuż linii, a ujemna długość przesunie go za drugi punkt",
   "camera.tapeLengthAlong": "Odległość wzdłuż {axis}: bryła przesunie się tylko wzdłuż {axis}",
   "camera.tapeLengthLocked": "Obiekt „{name}” jest zablokowany, więc wpisana długość go nie przesunie",

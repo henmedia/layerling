@@ -4866,6 +4866,7 @@ export const MESSAGES_DE: Record<MessageKey, string> = {
   "camera.tapeCentreHole": "Mitte des Lochs",
   "camera.tapeCentreCircle": "Kreismitte",
   "camera.tapeDistance": "Abstand {length}",
+  "camera.tapeThickness": "Dicke {thickness}",
   "camera.tapeLengthMoves": "Länge eintippen: „{name}“ rückt entlang der Linie; bei einer negativen Länge über den anderen Punkt hinaus",
   "camera.tapeLengthAlong": "Abstand entlang {axis}: der Körper rückt nur entlang {axis}",
   "camera.tapeLengthLocked": "„{name}“ ist gesperrt und bleibt beim Eintippen einer Länge stehen",

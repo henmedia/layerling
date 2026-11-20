@@ -4851,6 +4851,7 @@ export const MESSAGES_FR: Partial<Record<MessageKey, string>> = {
   "camera.tapeCentreHole": "Centre du trou",
   "camera.tapeCentreCircle": "Centre du cercle",
   "camera.tapeDistance": "Distance {length}",
+  "camera.tapeThickness": "Épaisseur {thickness}",
   "camera.tapeLengthMoves": "Saisir une longueur : « {name} » se déplace le long de la ligne ; une longueur négative le fait passer au-delà de l'autre point",
   "camera.tapeLengthAlong": "Distance selon {axis} : le corps se déplace uniquement selon {axis}",
   "camera.tapeLengthLocked": "« {name} » est verrouillé : une longueur saisie ne peut pas le déplacer",

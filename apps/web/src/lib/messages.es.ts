@@ -4946,6 +4946,7 @@ export const MESSAGES_ES: Partial<Record<MessageKey, string>> = {
   "camera.tapeCentreHole": "Centro del orificio",
   "camera.tapeCentreCircle": "Centro del círculo",
   "camera.tapeDistance": "Distancia {length}",
+  "camera.tapeThickness": "Grosor {thickness}",
   "camera.tapeLengthMoves": "Escribir una longitud: «{name}» se mueve a lo largo de la línea; una longitud negativa lo lleva más allá del otro punto",
   "camera.tapeLengthAlong": "Distancia en {axis}: el cuerpo se mueve solo en {axis}",
   "camera.tapeLengthLocked": "«{name}» está bloqueado, así que una longitud escrita no puede moverlo",

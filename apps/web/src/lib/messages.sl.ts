@@ -3742,6 +3742,7 @@ export const MESSAGES_SL: Partial<Record<MessageKey, string>> = {
   "camera.tapeCentreHole": "Središče luknje",
   "camera.tapeCentreCircle": "Središče kroga",
   "camera.tapeDistance": "Razdalja {length}",
+  "camera.tapeThickness": "Debelina {thickness}",
   "camera.tapeLengthMoves": "Vnesite dolžino: „{name}“ se premakne vzdolž črte; negativna dolžina ga premakne čez drugo točko",
   "camera.tapeLengthAlong": "Razdalja vzdolž {axis}: telo se premakne samo vzdolž {axis}",
   "camera.tapeLengthLocked": "Objekt „{name}“ je zaklenjen, zato ga vnesena dolžina ne more premakniti",

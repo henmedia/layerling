@@ -71,6 +71,7 @@ export const MESSAGES_CS: Record<MessageKey, string> = {
   "camera.tapeCentreHole": "Střed otvoru",
   "camera.tapeCentreCircle": "Střed kružnice",
   "camera.tapeDistance": "Vzdálenost {length}",
+  "camera.tapeThickness": "Tloušťka {thickness}",
   "camera.tapeLengthMoves": "Zadejte délku: „{name}“ se posune podél čáry; záporná délka ho posune za druhý bod",
   "camera.tapeLengthAlong": "Vzdálenost podél {axis}: těleso se posune jen podél {axis}",
   "camera.tapeLengthLocked": "Objekt „{name}“ je zamčen, zadaná délka s ním nepohne",

@@ -4659,6 +4659,7 @@ export const MESSAGES_DA: Partial<Record<MessageKey, string>> = {
   "camera.tapeCentreHole": "Hullets midte",
   "camera.tapeCentreCircle": "Cirklens midtpunkt",
   "camera.tapeDistance": "Afstand {length}",
+  "camera.tapeThickness": "Tykkelse {thickness}",
   "camera.tapeLengthMoves": "Skriv en længde: “{name}” flyttes langs linjen; en negativ længde flytter det forbi det andet punkt",
   "camera.tapeLengthAlong": "Afstand langs {axis}: legemet flyttes kun langs {axis}",
   "camera.tapeLengthLocked": "“{name}” er låst, så en indtastet længde kan ikke flytte det",

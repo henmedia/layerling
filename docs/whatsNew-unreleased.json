@@ -271,5 +271,18 @@
     "guide": {
       "section": "objectList"
     }
+  },
+  {
+    "title": {
+      "de": "Maßband zeigt die Dicke unter dem Mauszeiger",
+      "en": "Tape measure shows the thickness under the pointer"
+    },
+    "body": {
+      "de": "Ist beim Maßband „Maß hinzufügen“ aktiv und noch kein Punkt gesetzt, zeigt das Zeigen auf eine Fläche, wie dick der Körper dort ist: senkrecht zur Fläche gerade hinein gemessen, bis das Material endet. Eine gestrichelte Linie zeigt, wo gemessen wird. So prüfst du Wände und Böden, indem du einfach mit der Maus über das Teil fährst. Ein Klick setzt wie bisher den ersten Messpunkt.",
+      "en": "With Add measurement active on the tape measure and no point placed yet, pointing at a face shows how thick the body is there: measured straight in, square to the face, to where the material ends. A dashed line shows where it measures. So you check walls and floors just by moving the mouse over the part. A click still sets the first measuring point as before."
+    },
+    "guide": {
+      "section": "tapeMeasure"
+    }
   }
 ]

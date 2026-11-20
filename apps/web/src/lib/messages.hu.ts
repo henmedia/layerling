@@ -5356,6 +5356,7 @@ export const MESSAGES_HU: Partial<Record<MessageKey, string>> = {
   "camera.tapeCentreHole": "Furat közepe",
   "camera.tapeCentreCircle": "Kör közepe",
   "camera.tapeDistance": "Távolság: {length}",
+  "camera.tapeThickness": "Vastagság: {thickness}",
   "camera.tapeLengthMoves": "Írj be egy hosszt: „{name}” a vonal mentén mozdul; negatív hossz átviszi a másik ponton",
   "camera.tapeLengthAlong": "Távolság a(z) {axis} mentén: a test csak a(z) {axis} mentén mozdul",
   "camera.tapeLengthLocked": "„{name}” zárolva van, így a beírt hossz nem mozdíthatja el",

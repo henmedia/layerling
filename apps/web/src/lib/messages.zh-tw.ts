@@ -4856,6 +4856,7 @@ export const MESSAGES_ZH_TW: Partial<Record<MessageKey, string>> = {
   "camera.tapeCentreHole": "孔的中心",
   "camera.tapeCentreCircle": "圓心",
   "camera.tapeDistance": "距離 {length}",
+  "camera.tapeThickness": "厚度 {thickness}",
   "camera.tapeLengthMoves": "輸入長度：「{name}」沿線移動；負值會把它移過另一個點",
   "camera.tapeLengthAlong": "沿 {axis} 的距離：物體只沿 {axis} 移動",
   "camera.tapeLengthLocked": "「{name}」已鎖定，輸入的長度無法移動它",

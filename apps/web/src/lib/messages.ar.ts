@@ -4952,6 +4952,7 @@ export const MESSAGES_AR: Partial<Record<MessageKey, string>> = {
   "camera.tapeCentreHole": "مركز الثقب",
   "camera.tapeCentreCircle": "مركز الدائرة",
   "camera.tapeDistance": "المسافة {length}",
+  "camera.tapeThickness": "السماكة {thickness}",
   "camera.tapeLengthMoves": "اكتب طولاً: يتحرك «{name}» على طول الخط؛ الطول السالب ينقله إلى ما بعد النقطة الأخرى",
   "camera.tapeLengthAlong": "المسافة على المحور {axis}: يتحرك الجسم على المحور {axis} فقط",
   "camera.tapeLengthLocked": "«{name}» مقفل، لذا لا يستطيع الطول المكتوب تحريكه",

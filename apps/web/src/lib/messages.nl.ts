@@ -4867,6 +4867,7 @@ export const MESSAGES_NL: Record<MessageKey, string> = {
   "camera.tapeCentreHole": "Midden van het gat",
   "camera.tapeCentreCircle": "Middelpunt van de cirkel",
   "camera.tapeDistance": "Afstand {length}",
+  "camera.tapeThickness": "Dikte {thickness}",
   "camera.tapeLengthMoves": "Lengte typen: ‘{name}’ schuift langs de lijn; een negatieve lengte schuift het voorbij het andere punt",
   "camera.tapeLengthAlong": "Afstand langs {axis}: het lichaam schuift alleen langs {axis}",
   "camera.tapeLengthLocked": "‘{name}’ is vergrendeld, dus een getypte lengte kan het niet verschuiven",
