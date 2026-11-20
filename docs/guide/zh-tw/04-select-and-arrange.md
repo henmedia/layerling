@@ -139,7 +139,7 @@ summary: 選取形狀、在物件清單中找到它們、對齊、鏡像、旋�
 2. 在視窗中設定孔的外觀和排列：
    - **{{ui:holePattern.form}}：** {{ui:holePattern.form.round}}、{{ui:holePattern.form.square}}、{{ui:holePattern.form.rectangle}}、{{ui:holePattern.form.hexagon}} 或 {{ui:holePattern.form.slot}}。
    - **大小：** 圓孔用 {{ui:holePattern.size.diameter}}，方孔用 {{ui:holePattern.size.side}}，矩形和槽孔用 {{ui:holePattern.size.width}} 與 {{ui:holePattern.size.height}}。六邊形的大小是 {{ui:holePattern.size.corners}}。
-   - **{{ui:holePattern.holeAngle}}：** 僅限矩形和槽孔：把每個孔在面內轉過這麼多度，面向該面看為逆時針，範圍 -90 到 90。行保持筆直；如果轉過的孔彼此太近（斜向也算），layerling 會加大間距和行距，讓孔之間留有壁。
+   - **{{ui:holePattern.holeAngle}}：** {{ui:holePattern.form.square}}, {{ui:holePattern.form.rectangle}}, {{ui:holePattern.form.hexagon}}, {{ui:holePattern.form.slot}}（正方形轉 45 度即為菱形）：把每個孔在面內轉過這麼多度，面向該面看為逆時針，範圍 -90 到 90。行保持筆直；如果轉過的孔彼此太近（斜向也算），layerling 會加大間距和行距，讓孔之間留有壁。
    - **{{ui:holePattern.holeTilt}}：** 僅限平面，不能與沉頭孔、埋頭孔或自訂形狀同用：讓每個孔斜穿牆壁，範圍 -60 到 60 度。在豎立的牆上，正值讓孔的內端更高，雨水會流回外面。尺寸仍是孔本身的截面，所以在面上看起來略長；每個孔的兩端都保持邊距。只有當壁厚乘以 sin(角度) 不小於孔的高度時，傾斜才能擋住看向內部的視線，因此需要用低矮的槽孔或更厚的牆。
    - **{{ui:holePattern.form.custom}}：** 用場景中的一個形狀代替孔來重複：鉚釘、凸點，或花紋板上的花紋。在 {{ui:holePattern.customShape}} 中選擇它。它的寬度和深度就是它佔用的位置；它按原樣豎立在面上，不帶自身的旋轉。實體會放到面上並與之合併，孔則依其高度切入。形狀本身保持原位。
    - **{{ui:holePattern.holeType}}：** 僅限圓孔。{{ui:holePattern.holeType.plain}} 是直孔，{{ui:shape.counterbore}} 為圓柱頭螺絲的頭部加一個沉台，{{ui:shape.countersink}} 為沉頭螺絲加一個 90° 錐面。此時大小就是 {{ui:prop.screwHoleShaft}}；{{ui:prop.screwHoleHead}} 以及沉台的 {{ui:prop.screwHoleHeadDepth}} 設定頭部。{{ui:prop.screwHoleSize}} 會依公制螺絲填好所有數值。 選錐形沉孔時，它也提供英制規格 #2 至 #14，其錐角為 82°。

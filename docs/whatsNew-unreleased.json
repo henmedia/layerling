@@ -204,5 +204,20 @@
     "guide": {
       "section": "historyView"
     }
+  },
+  {
+    "title": {
+      "de": "Lochmuster: Quadrate und Sechsecke drehen",
+      "en": "Hole pattern: turn squares and hexagons",
+      "da": "Hulmønster: drej kvadrater og sekskanter"
+    },
+    "body": {
+      "de": "Der Regler „Winkel der Löcher“ im Lochmuster gilt jetzt auch für Quadrate und Sechsecke, nicht mehr nur für Rechtecke und Langlöcher. Ein Quadrat wird bei 45° zur Raute, ein Sechseck liegt bei 30° auf einer flachen Seite. Der Abstand passt sich an, sodass zwischen den gedrehten Löchern immer eine Wand bleibt.",
+      "en": "The Angle of the holes slider in the hole pattern now works for squares and hexagons too, not only for rectangles and slots. A square at 45° is a diamond, a hexagon at 30° lies on a flat side. The spacing follows, so a wall always stays between the turned holes.",
+      "da": "Skyderen Vinkel på hullerne i hulmønsteret virker nu også for kvadrater og sekskanter, ikke kun for rektangler og slidser. Et kvadrat ved 45° bliver en rombe, en sekskant ved 30° ligger på en flad side. Afstanden følger med, så der altid bliver en væg mellem de drejede huller."
+    },
+    "guide": {
+      "section": "holePattern"
+    }
   }
 ]
