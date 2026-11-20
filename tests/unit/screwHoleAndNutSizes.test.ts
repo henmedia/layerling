@@ -13,12 +13,27 @@ describe("counterbores and countersinks by screw size", () => {
   });
 
   it("offers a countersink only up to M20, a counterbore up to M30", () => {
-    expect(screwHoleSizesFor("counterbore")).toEqual(SCREW_HOLE_SIZE_ORDER);
+    expect(screwHoleSizesFor("counterbore")).toEqual(SCREW_HOLE_SIZE_ORDER.filter((size) => size !== "M3.5"));
     expect(screwHoleSizesFor("countersink").filter((size) => !isInchScrewHoleSize(size)).at(-1)).toBe("M20");
     expect(isScrewHoleSize("M30", "counterbore")).toBe(true);
     expect(isScrewHoleSize("M30", "countersink")).toBe(false);
     expect(isScrewHoleSize("M7", "counterbore")).toBe(false);
     expect(isScrewHoleSize(5, "counterbore")).toBe(false);
+  });
+
+  it("offers M3.5 as a countersink to ISO 15065 over the clearance hole of ISO 273, and no counterbore: ISO 4762 has no such screw (Discussion #1908)", () => {
+    expect(SCREW_HOLE_SIZE_ORDER.indexOf("M3.5")).toBe(SCREW_HOLE_SIZE_ORDER.indexOf("M3") + 1);
+    expect(screwHoleFields("countersink", "M3.5", 20)).toEqual({ width: 8.2, depth: 8.2, height: 20, screwHoleShaft: 3.9, screwHoleAngle: 90 });
+    expect(screwHoleFields("doubleCountersink", "M3.5", 20)).toMatchObject({ width: 8.2, screwHoleShaft: 3.9 });
+    expect(isScrewHoleSize("M3.5", "countersink")).toBe(true);
+    expect(isScrewHoleSize("M3.5", "doubleCountersink")).toBe(true);
+    expect(isScrewHoleSize("M3.5", "counterbore")).toBe(false);
+    expect(screwHoleSizesFor("counterbore")).not.toContain("M3.5");
+    // A counterbore of an M3's or M4's measures still shows its size.
+    for (const size of ["M3", "M4"] as const) {
+      const fields = screwHoleFields("counterbore", size, 20);
+      expect(screwHoleSizeFor("counterbore", { width: fields.width, screwHoleShaft: fields.screwHoleShaft, screwHoleHeadDepth: fields.screwHoleHeadDepth ?? 0, screwHoleAngle: 90 })).toBe(size);
+    }
   });
 
   it("keeps every size as the shape's own limits leave it, so the hole shows its size again", () => {
@@ -70,6 +85,14 @@ describe("nut pockets from the hexagon (ISO 4032)", () => {
     const pocket = nutPocketFields("M5");
     expect(pocket.width).toBeCloseTo(8 + NUT_POCKET_ROOM, 9);
     expect(pocket.height).toBeCloseTo(4.7 + NUT_POCKET_ROOM, 9);
+  });
+
+  it("makes an M3.5 pocket 6.4 across flats and 3.2 high (Discussion #1908)", () => {
+    const pocket = nutPocketFields("M3.5");
+    expect(pocket.width).toBeCloseTo(6 + NUT_POCKET_ROOM, 9);
+    expect(pocket.height).toBeCloseTo(2.8 + NUT_POCKET_ROOM, 9);
+    expect(isNutPocketSize("M3.5")).toBe(true);
+    expect(NUT_POCKET_SIZE_ORDER.indexOf("M3.5")).toBe(NUT_POCKET_SIZE_ORDER.indexOf("M3") + 1);
   });
 
   it("is a regular hexagon: across corners to across flats as the editor's hexagon", () => {

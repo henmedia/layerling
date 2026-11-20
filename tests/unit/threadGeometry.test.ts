@@ -31,6 +31,9 @@ import {
   threadCollarFields,
   threadCollarHeightLimits,
   threadNaturalHeight,
+  threadSizeSpec,
+  threadSizeById,
+  threadSeriesFor,
 } from "@/lib/threadGeometry";
 import { THREAD_PROFILES } from "@/lib/threadProfiles";
 import type { ThreadDrive, ThreadRole } from "@/types/layerling";
@@ -239,6 +242,29 @@ describe("thread geometry", () => {
     expect(normalizeThreadPitch(40, 6)).toBe(4.5);
     expect(normalizeThreadQuality(50)).toBe(48);
     expect(normalizeThreadQuality(1000)).toBe(96);
+  });
+
+  it("has M3.5 with its pitch of 0.6 mm between M3 and M4 (Discussion #1908)", () => {
+    const size = threadSizeFor(3.5, 0.6);
+    expect(size?.id).toBe("M3.5");
+    expect(threadSizeById("M3.5")).toBe(size);
+    expect(threadSeriesFor(size!)).toBe(threadSeriesFor(threadSizeById("M3")!));
+    // Hexagon and nut to ISO 4032, the countersunk head to ISO 7046.
+    expect(size).toMatchObject({ system: "metric", profile: "v", acrossFlats: 6, nutHeight: 2.8, countersunkDiameter: 7.3 });
+    // ISO 4762 has no M3.5: the socket head is the one a free thread of 3.5 mm gets.
+    const free = threadSizeSpec(3.5, 0.55);
+    expect(free.id).toBe("");
+    expect(size).toMatchObject({ socket: free.socket, headDiameter: free.headDiameter, headHeight: free.headHeight });
+    expect(defaultThreadPitch(3.5)).toBe(0.6);
+    expect(defaultThreadPitch(3)).toBe(0.5);
+    expect(defaultThreadPitch(4)).toBe(0.7);
+    // The thread builds closed as a rod, a screw, a nut and a tapped hole.
+    for (const [role, height] of [["rod", 10], ["screw", 12], ["nut", 2.8], ["bore", 8]] as const) {
+      const { geometry } = geometryFor(role, height, { threadDiameter: 3.5, threadPitch: 0.6 });
+      const position = geometry.getAttribute("position") as unknown as Position;
+      expect([...edgeUseCounts(position).values()].every((uses) => uses === 2), role).toBe(true);
+      expect(signedVolume(position), role).toBeGreaterThan(0);
+    }
   });
 
   it("carries the thread settings through a saved package", async () => {
