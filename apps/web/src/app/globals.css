@@ -15835,9 +15835,11 @@ html[data-theme="dark"] .theme-check {
   background: rgba(240, 234, 224, 0.6);
 }
 
+/* The selected row is plain to see without the handles in the view: a stronger tone and a bar at its left (Discussion #1893). */
 .outliner-item.selected {
-  background: #faefe0;
+  background: #f6d9ae;
   border-color: rgba(220, 160, 90, 0.4);
+  box-shadow: inset 4px 0 0 #d97a1c;
 }
 
 .outliner-item.hidden-shape {
@@ -16209,8 +16211,9 @@ html[data-theme="dark"] .outliner-item:hover {
 }
 
 html[data-theme="dark"] .outliner-item.selected {
-  background: #3e3223;
+  background: #5a4424;
   border-color: rgba(246, 173, 85, 0.35);
+  box-shadow: inset 4px 0 0 #f6ad55;
 }
 
 html[data-theme="dark"] .outliner-shape-name {

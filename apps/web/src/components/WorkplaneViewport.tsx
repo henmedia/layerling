@@ -1824,6 +1824,11 @@ export function WorkplaneViewport({
     dimensionsHiddenRef.current = !visible;
     setDimensionsHidden(!visible);
   }, []);
+  // Shift+Q puts away the handles around the selection - the squares for the size, the arrows for lifting, sliding and
+  // turning - so they do not cover a very small part (Discussion #1893). The part can still be dragged, and its sizes typed.
+  const [handlesHidden, setHandlesHidden] = useState(false);
+  const handlesHiddenRef = useRef(handlesHidden);
+  handlesHiddenRef.current = handlesHidden;
   const workplaneLayerHiddenRef = useRef(workplaneLayerHidden);
   workplaneLayerHiddenRef.current = workplaneLayerHidden;
   // With a workplane on a face showing, the switch puts away only the build plate (Discussion #1714) and says so.
@@ -8830,6 +8835,11 @@ export function WorkplaneViewport({
         const visible = dimensionsHiddenRef.current;
         showDimensions(visible);
         onNotice?.(t(visible ? "camera.dimensionsShown" : "camera.dimensionsHidden"));
+      } else if (key === "q" && event.shiftKey && !event.ctrlKey && !event.metaKey && !event.altKey) {
+        event.preventDefault();
+        const hidden = !handlesHiddenRef.current;
+        setHandlesHidden(hidden);
+        onNotice?.(t(hidden ? "camera.handlesHidden" : "camera.handlesShown"));
       } else if ((event.key === "+" || event.key === "=") && !event.ctrlKey && !event.metaKey && !event.altKey) {
         // With Ctrl or Cmd these are the browser's own page zoom, which the page must not swallow.
         event.preventDefault();
@@ -9498,7 +9508,7 @@ export function WorkplaneViewport({
               locked={selectionLocked}
               showSlideArrows={workspace.showSlideArrows}
               sizeLocked={selectionSizeLocked}
-              handleMode={touchDevice ? touchHandleMode : "all"}
+              handleMode={handlesHidden ? "none" : touchDevice ? touchHandleMode : "all"}
               showRotationWheel={activeRotationWheel}
               hideSelectionChrome={activeTransformKind === "rotate"}
               hideDimensionMarks={false}

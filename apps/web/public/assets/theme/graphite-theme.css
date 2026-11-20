@@ -7441,8 +7441,9 @@ html[data-theme="dark"]:where([data-palette="graphite"]) .theme-check {
 }
 
 :where(html[data-theme="dark"][data-palette="graphite"]) .outliner-item.selected {
-  background: #ededed;
+  background: #f6d9ae;
   border-color: rgba(220, 160, 90, 0.4);
+  box-shadow: inset 4px 0 0 #d97a1c;
 }
 
 :where(html[data-theme="dark"][data-palette="graphite"]) .outliner-item.locked-shape .outliner-shape-name {
@@ -7635,8 +7636,9 @@ html[data-theme="dark"]:where([data-palette="graphite"]) .outliner-item:hover {
 }
 
 html[data-theme="dark"]:where([data-palette="graphite"]) .outliner-item.selected {
-  background: #353535;
+  background: #424242;
   border-color: rgba(246, 173, 85, 0.35);
+  box-shadow: inset 4px 0 0 #f6ad55;
 }
 
 html[data-theme="dark"]:where([data-palette="graphite"]) .outliner-shape-name {
