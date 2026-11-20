@@ -3035,6 +3035,9 @@ export function restoreGroupedChildrenForEdges(group: WorkplaneShape, scope: num
   if (group.groupOperation === "hull" || group.groupOperation === "intersection" || group.groupOperation === "loft") return [{ shape: group, scope }];
   return restoreGroupedChildren(group).flatMap((child) => {
     const grandChildren = child.groupedShapes ?? [];
+    // A tube whose bore cuts as a hole counts as both, a solid and a hole (#1790): a group with one in it cuts its own
+    // solids with that bore, so it opens into a scope of its own as any group that mixes the two.
+    const cutParts = grandChildren.flatMap(splitBoreTube);
     // Only while its mesh is still nothing but its parts. Every computed group carries its mesh, so that alone says
     // nothing; baking an edge treatment, a deform or a simplification drops the parts, and texture, wrap or vase stay out.
     const plainParts = grandChildren.length > 0
@@ -3047,16 +3050,16 @@ export function restoreGroupedChildrenForEdges(group: WorkplaneShape, scope: num
     const plainGroup = plainParts && (child.groupOperation === undefined || child.groupOperation === "group");
     // A bundle of nothing but holes cuts what it is grouped with, as its holes would one by one. Left closed it went as
     // its mesh, each round hole a polygon of 96 flat strips, and filleting their rims lost a whole hole (#1503).
-    const holeBundle = plainParts && child.groupOperation === "bundle" && Boolean(child.hole) && grandChildren.every((part) => part.hole);
+    const holeBundle = plainParts && child.groupOperation === "bundle" && Boolean(child.hole) && cutParts.every((part) => part.hole);
     const opensCleanly = holeBundle || (plainGroup
-      && (grandChildren.every((part) => part.hole) || grandChildren.every((part) => !part.hole))
-      && (child.hole || grandChildren.every((part) => !part.hole)));
+      && (cutParts.every((part) => part.hole) || cutParts.every((part) => !part.hole))
+      && (child.hole || cutParts.every((part) => !part.hole)));
     // Opened into the same level, so it numbers the scopes inside it on with that level's count.
     if (opensCleanly) return restoreGroupedChildrenForEdges(child, scope, nestedScopes);
     const opensInOwnScope = plainGroup
       && !child.hole
-      && grandChildren.some((part) => part.hole)
-      && grandChildren.some((part) => !part.hole);
+      && cutParts.some((part) => part.hole)
+      && cutParts.some((part) => !part.hole);
     if (opensInOwnScope) return restoreGroupedChildrenForEdges(child, [...scope, nestedScopes.count++], { count: 0 });
     // A bundle that mixes solids and holes: its holes cut what it is grouped with, not its own solids (#646). Left closed it
     // went as its mesh, which has the hole already taken out of its own solids and so no hole at all: a peg standing in its
@@ -3070,10 +3073,12 @@ export function restoreGroupedChildrenForEdges(group: WorkplaneShape, scope: num
       && !child.surfaceTexture
       && !child.cylinderWrap
       && !child.vase
-      && grandChildren.some((part) => part.hole)
-      && grandChildren.some((part) => !part.hole);
+      && cutParts.some((part) => part.hole)
+      && cutParts.some((part) => !part.hole);
     if (opensAsBundle) return restoreGroupedChildrenForEdges(child, [...scope, BUNDLE_SCOPE_BASE + nestedScopes.count++], { count: 0 });
-    return [{ shape: child, scope }];
+    // A tube whose bore cuts as a hole goes as the group was cut: the tube and its bore, a hole (#1790). Handed on as the
+    // one hollow tube it is, its bore cut nothing, and a chamfer on the group filled the opening it had made in the rest.
+    return splitBoreTube(child).map((shape) => ({ shape, scope }));
   });
 }
 
