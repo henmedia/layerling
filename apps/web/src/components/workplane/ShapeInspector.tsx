@@ -6894,6 +6894,7 @@ const SURFACE_SPACING_LABEL: Partial<Record<SurfaceTexturePattern, MessageKey>> 
 };
 const SURFACE_COVERAGE_LABEL: Partial<Record<SurfaceTexturePattern, MessageKey>> = {
   cells: "inspector.surfaceCoverageCells",
+  hammered: "inspector.surfaceCoverageHammered",
   knit: "inspector.surfaceCoverageKnit",
   rope: "inspector.surfaceCoverageRope",
   weave: "inspector.surfaceCoverageWeave",
@@ -7463,10 +7464,10 @@ export function SurfaceTextureCard({
                       <p className="cylinder-wrap-hint">{t("inspector.surfaceTileHint")}</p>
                     </>
                   ) : null}
-                  {settings.pattern === "cells" || grain ? (
+                  {settings.pattern === "cells" || settings.pattern === "hammered" || grain ? (
                     <>
                       {range("surfaceSeed", t("inspector.surfaceSeed"), settings.seed, [1, 999], 1, (seed) => set({ seed }))}
-                      <p className="cylinder-wrap-hint">{t("inspector.surfaceSeedHint")}</p>
+                      <p className="cylinder-wrap-hint">{t(settings.pattern === "hammered" ? "inspector.surfaceHammeredHint" : "inspector.surfaceSeedHint")}</p>
                     </>
                   ) : null}
                 </>

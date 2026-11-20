@@ -103,7 +103,7 @@ import {
   type SurfaceTextureOwnImage,
 } from "@/lib/surfaceTextureImages";
 
-export const SURFACE_TEXTURE_PATTERNS = ["grooves", "knurl", "honeycomb", "bumps", "cells", "bricks", "timber", "stones", "squares", "triangles", "knit", "rope", "weave", "bark", "wood", "carbon", "grain", "image", "cracks", "text"] as const;
+export const SURFACE_TEXTURE_PATTERNS = ["grooves", "knurl", "honeycomb", "bumps", "cells", "hammered", "bricks", "timber", "stones", "squares", "triangles", "knit", "rope", "weave", "bark", "wood", "carbon", "grain", "image", "cracks", "text"] as const;
 export type SurfaceTexturePattern = (typeof SURFACE_TEXTURE_PATTERNS)[number];
 /** Cross-section of a groove or joint: round (cosine), pointed (V) or flat (a flat floor with steep flanks). */
 /** round: a soft bell; pointed: a V (a cone on a bump); flat: a flat floor or top; dome: a half circle (half a ball on a bump). */
@@ -770,7 +770,7 @@ const TILE_SNAP = 1.25 * SURFACE_MIN_EDGE;
 const TILE_COST = 160;
 const TILE_CUT_LIMIT = 2;
 /** Around a cylinder a whole number of cells, stitches, strands, stakes or tiles goes round. */
-const ROUND_PATTERNS: readonly SurfaceTexturePattern[] = ["honeycomb", "bumps", "cells", "knit", "rope", "weave", "carbon", "bark", "image"];
+const ROUND_PATTERNS: readonly SurfaceTexturePattern[] = ["honeycomb", "bumps", "cells", "hammered", "knit", "rope", "weave", "carbon", "bark", "image"];
 const SQRT3 = Math.sqrt(3);
 
 function clamp(value: number, min: number, max: number) {
@@ -854,6 +854,8 @@ export const SURFACE_TEXTURE_STARTERS: Partial<Record<SurfaceTexturePattern, Par
   grooves: { angle: 0 },
   bumps: { profile: "dome" },
   cells: { spacing: 9, depth: 0.8, width: 0.22, profile: "round" },
+  // Hammered dents soft as a hammer's round face leaves them, about 7 mm across: the look of a hand-hammered mug.
+  hammered: { spacing: 5, depth: 0.5, profile: "round" },
   // Bricks run into a box's corners: kept smooth there, the corner stood in a strip of its own between two walls.
   bricks: { spacing: 12, depth: 0.6, profile: "flat", keepEdges: false },
   // A panel about a metre wide and beams of 20 cm at 1:87; a corner post on both sides of a corner, as on a house.
@@ -1095,6 +1097,45 @@ function cellEdge(u: number, v: number, cell: number, around: number | null, see
     if (d < best) best = d;
   }
   return best;
+}
+
+/** A hammered dent is this share of the spacing across at `width` 0, and this much more at `width` 1, before its own spread. */
+const HAMMER_SIZE = 0.45;
+const HAMMER_SIZE_WIDTH = 0.5;
+/** How much each dent's size and depth go up or down from the others' (0 to 1). */
+const HAMMER_SIZE_SPREAD = 0.4;
+const HAMMER_DEPTH_SPREAD = 0.35;
+/** Where two dents meet, the ridge between them is rounded over this share of the depth (a smooth maximum), so it prints and shades without a staircase. */
+const HAMMER_RIDGE = 0.18;
+
+/**
+ * Hammered metal (Discussion #1892): round dents, each where a hammer struck, one at a random point in every grid cell of
+ * `cell` mm (the cells' points, see cellSites), each a little larger or smaller and deeper or shallower than the others
+ * by the seed. They overlap, and where they do the deeper one wins, so little ridges (rounded a touch) stay between them as on a
+ * hand-hammered copper mug. `width` sets their size (at 0.6 about three quarters of the spacing across), the profile
+ * their shape (round: a soft hollow; dome: a ball's print). 1 is the deepest point, 0 the surface between dents.
+ */
+function hammeredValue(u: number, v: number, cell: number, around: number | null, seed: number, width: number, profile: SurfaceTextureProfile) {
+  const { n } = cellSites(u, v, cell, around, seed);
+  const base = cell * (HAMMER_SIZE + HAMMER_SIZE_WIDTH * clamp(width, 0.02, 1));
+  let best = 0;
+  let second = 0;
+  for (let k = 0; k < n; k += 1) {
+    const key = CELL_KEY[k];
+    const size = base * (1 - HAMMER_SIZE_SPREAD / 2 + HAMMER_SIZE_SPREAD * hash3(key % 100000, Math.floor(key / 100000), seed + 104729));
+    const t = Math.sqrt(CELL_D[k]) / size;
+    if (t >= 1) continue;
+    const depth = 1 - HAMMER_DEPTH_SPREAD * hash3(Math.floor(key / 100000), key % 100000, seed + 15485863);
+    const value = surfaceFalloff(t, profile) * depth;
+    if (value > best) {
+      second = best;
+      best = value;
+    } else if (value > second) second = value;
+  }
+  // The two deepest dents here meet in a rounded ridge; the rounding fades out where the second dent ends, so a dent's rim
+  // stays where it is.
+  const near = Math.max(HAMMER_RIDGE - (best - second), 0) / HAMMER_RIDGE;
+  return Math.min(1, best + ((near * near * HAMMER_RIDGE) / 4) * Math.min(1, second / HAMMER_RIDGE));
 }
 
 /** The cross-section of a yarn or strand: round (and dome) a half circle, else as the other patterns. */
@@ -2466,6 +2507,8 @@ function patternValue(u: number, v: number, s: SurfaceTextureSettings, layout: S
     }
     case "cells":
       return surfaceFalloff(cellEdge(u, v, layout.cell, layout.around, s.seed) / ((layout.cell / 2) * s.width), s.profile);
+    case "hammered":
+      return hammeredValue(u, v, layout.cell, layout.around, s.seed, s.width, s.profile);
     case "bricks":
       return brickValue(u, v, s, layout, axis, face);
     case "timber":
@@ -3330,7 +3373,7 @@ function stripesAreCut(s: SurfaceTextureSettings) {
  * weave and crossing bands, the bricks' bond, joint and courses (not how unevenly they lie: that only moves their faces).
  */
 function patternExtras(s: SurfaceTextureSettings, layout: SurfaceTextureLayout) {
-  if (s.pattern === "cells" || s.pattern === "grain") return [s.seed];
+  if (s.pattern === "cells" || s.pattern === "grain" || s.pattern === "hammered") return [s.seed];
   if (s.pattern === "bumps") return [s.bumpGrid];
   if (s.pattern === "carbon") return [s.carbonWeave, s.carbonCross];
   if (s.pattern === "bricks") return [s.brickBond, s.brickJoint, layout.rowHeight ?? s.brickHeight, layout.rowOrigin ?? 0, layout.brickAxes ?? null, layout.capBricks ?? null];
@@ -3364,7 +3407,7 @@ function targetEdge(s: SurfaceTextureSettings) {
   // Bark: its marks are a share of its size (a birch's lenticels are thin); wood: a ring (flanks refined after).
   // A stone wall: its faces' bulge and lumps a quarter of a stone at medium detail; the edges are refined and cut after
   // (see stoneCuts), finer, every grid triangle cost as many more there.
-  const size = s.pattern === "stones" ? s.spacing / 0.8 : s.pattern === "bricks" ? Math.min(s.spacing, s.brickHeight) : s.pattern === "bark" ? s.spacing / BARK_STARTS[s.barkType].detail : s.pattern === "wood" ? s.ringWidth : s.pattern === "grain" ? s.spacing / 2 : s.pattern === "knit" ? s.spacing / 2.2 : s.pattern === "rope" ? s.spacing / 1.5 : s.pattern === "weave" ? s.spacing / 2 : s.pattern === "carbon" ? Math.min(s.spacing, s.carbonCross || s.spacing) * (s.projection === "cylinder" ? 2 : 0.5) : s.spacing;
+  const size = s.pattern === "stones" ? s.spacing / 0.8 : s.pattern === "bricks" ? Math.min(s.spacing, s.brickHeight) : s.pattern === "bark" ? s.spacing / BARK_STARTS[s.barkType].detail : s.pattern === "wood" ? s.ringWidth : s.pattern === "grain" ? s.spacing / 2 : s.pattern === "knit" ? s.spacing / 2.2 : s.pattern === "rope" ? s.spacing / 1.5 : s.pattern === "weave" ? s.spacing / 2 : s.pattern === "hammered" ? s.spacing / 1.6 : s.pattern === "carbon" ? Math.min(s.spacing, s.carbonCross || s.spacing) * (s.projection === "cylinder" ? 2 : 0.5) : s.spacing;
   return (size / steps) * narrow;
 }
 

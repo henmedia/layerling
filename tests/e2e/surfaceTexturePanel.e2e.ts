@@ -115,7 +115,7 @@ function type(input: HTMLInputElement, value: string) {
 }
 
 describe("the surface texture card in a shape's settings", () => {
-  it("shows the twenty patterns by their pictures, knurling first chosen", () => {
+  it("shows the twenty-one patterns by their pictures, knurling first chosen", () => {
     const { panel } = mount(cylinder);
     // The pattern is no longer a list of names: the field shows the chosen one's picture.
     expect(selectWith(panel, "knurl")).toBeUndefined();
@@ -124,7 +124,7 @@ describe("the surface texture card in a shape's settings", () => {
     act(() => patternField(panel).click());
     const tiles = patternTiles(panel);
     expect(tiles.map((tile) => tile.textContent)).toEqual([
-      "Grooves", "Knurling", "Honeycomb", "Bumps", "Cells", "Bricks", "Half-timbering", "Stone wall", "Squares", "Triangles", "Knitting", "Rope", "Basket weave", "Bark", "Wood grain", "Carbon (twill)", "Grain", "Image", "Cracks (kintsugi)", "Text (stuck on)",
+      "Grooves", "Knurling", "Honeycomb", "Bumps", "Cells", "Hammered", "Bricks", "Half-timbering", "Stone wall", "Squares", "Triangles", "Knitting", "Rope", "Basket weave", "Bark", "Wood grain", "Carbon (twill)", "Grain", "Image", "Cracks (kintsugi)", "Text (stuck on)",
     ]);
     expect(tiles.map((tile) => tile.querySelector("img")?.getAttribute("src"))).toEqual(SURFACE_TEXTURE_PATTERNS.map((pattern) => `assets/editor/surface-patterns/${pattern}.png`));
     expect(tiles.filter((tile) => tile.getAttribute("aria-selected") === "true").map((tile) => tile.textContent)).toEqual(["Knurling"]);
@@ -232,6 +232,23 @@ describe("the surface texture card in a shape's settings", () => {
     expect(rangeNamed(panel, "Spacing")?.value).toBe("3.00");
     expect(rangeNamed(panel, "Depth")?.value).toBe("0.60");
     expect(selectWith(panel, "outward")?.value).toBe("inward");
+  });
+
+  it("lays hammered dents: soft and round from the start, their size and arrangement, and hands them to the editor (#1892)", async () => {
+    const { panel, calls } = mount(cylinder);
+    choosePattern(panel, "Hammered");
+    expect(patternField(panel).querySelector("img")?.getAttribute("src")).toBe("assets/editor/surface-patterns/hammered.png");
+    expect(rangeNamed(panel, "Spacing")?.value).toBe("5.00");
+    expect(rangeNamed(panel, "Depth")?.value).toBe("0.50");
+    expect(rangeNamed(panel, "Arrangement")?.value).toBe("1");
+    expect(card(panel).textContent).toContain("Round dents like hammer strikes");
+    expect(card(panel).textContent).not.toContain("Another number lays the cells or grains out anew.");
+    type(rangeNamed(panel, "Arrangement")!, "7");
+    act(() => button(panel, "More")!.click());
+    expect(rangeNamed(panel, "Dent size (%)")?.value).toBe("60");
+    expect(selectWith(panel, "round")?.value).toBe("round");
+    await act(async () => button(panel, "Apply texture")!.click());
+    expect(calls.applied[0]).toMatchObject({ pattern: "hammered", spacing: 5, depth: 0.5, width: 0.6, profile: "round", direction: "inward", seed: 7 });
   });
 
   it("lays a stone wall: stone size, how different and how round, the joint and the arrangement", async () => {
