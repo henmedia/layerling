@@ -1,7 +1,7 @@
 import manifoldModule from "manifold-3d";
 import { beforeAll, describe, expect, it } from "vitest";
-import { holeFitPolygon, holePatternCenters, holePatternCutsAtEdge, holePatternEdgeBorder, holePatternWall, normalizeHolePattern, rectangleOutline, type HolePatternSettings } from "@/lib/holePattern";
-import { holePatternShapes, type PerforableFace } from "@/lib/holePatternShapes";
+import { holeFitPolygon, holePatternCenters, holePatternCutsAtEdge, holePatternEdgeBorder, holePatternTopLayer, holePatternWall, normalizeHolePattern, rectangleOutline, type HolePatternSettings } from "@/lib/holePattern";
+import { HOLE_OVERSHOOT, holePatternShapes, TOP_LAYER_OVERCUT, type PerforableFace } from "@/lib/holePatternShapes";
 import { rememberManifoldRuntime } from "@/lib/manifoldHandle";
 
 beforeAll(async () => {
@@ -166,6 +166,53 @@ describe("Hole pattern: the face's edge cuts the holes at margin 0 (Discussion #
       const plan = holePatternShapes(face, honeycomb({ edgeBorder: 0 }), "Hole");
       expect(plan.frame).toBeUndefined();
       expect(plan.edgeCut?.border).toBe(0);
+    });
+  });
+
+  describe("with a top layer in a second colour", () => {
+    const face: PerforableFace = {
+      workplane: { origin: { x: 0, y: 10, z: 0 }, normal: { x: 0, y: 1, z: 0 }, xAxis: { x: 1, y: 0, z: 0 }, zAxis: { x: 0, y: 0, z: 1 } } as PerforableFace["workplane"],
+      outline: rectangleOutline(-45, -35, 45, 35),
+      thickness: 6,
+    };
+
+    it("is made for a pattern of plain holes only, and stays thinner than the body", () => {
+      expect(holePatternTopLayer(honeycomb({ topLayer: true }), 6)).toEqual({ thickness: 1, color: "#ffffff" });
+      expect(holePatternTopLayer(honeycomb({ topLayer: true, topLayerThickness: 2.5, topLayerColor: "#D41721" }), 6)).toEqual({ thickness: 2.5, color: "#d41721" });
+      expect(holePatternTopLayer(honeycomb({ topLayer: true, topLayerThickness: 9 }), 6)!.thickness).toBeCloseTo(5.8, 9);
+      expect(holePatternTopLayer(honeycomb({ topLayer: false }), 6)).toBeNull();
+      // Any depth set before: the holes go through the layer only.
+      expect(holePatternTopLayer(honeycomb({ topLayer: true, depth: 2 }), 6)).not.toBeNull();
+      expect(holePatternTopLayer(honeycomb({ topLayer: true, form: "round", holeType: "counterbore", headSize: 9, headDepth: 2 }), 6)).toBeNull();
+      expect(holePatternTopLayer(honeycomb({ topLayer: true, arrangement: "corners" }), 6)).toBeNull();
+      expect(holePatternTopLayer(honeycomb({ topLayer: true }), 0.3)).toBeNull();
+      // Any margin: the top layer does not need the edge to cut the holes.
+      expect(holePatternTopLayer(honeycomb({ topLayer: true, margin: 3 }), 6)).not.toBeNull();
+    });
+
+    it("gives the slab of the face, as thick as asked, in its colour", () => {
+      const plan = holePatternShapes(face, honeycomb({ topLayer: true, topLayerThickness: 1, topLayerColor: "#d41721", edgeBorder: 2 }), "Hole");
+      const layer = plan.topLayer!;
+      expect(layer.thickness).toBe(1);
+      expect(layer.slab.color).toBe("#d41721");
+      expect(layer.slab.width).toBeCloseTo(90, 4);
+      expect(layer.slab.depth).toBeCloseTo(70, 4);
+      expect(layer.slab.height).toBeCloseTo(1, 4);
+      // From the face (y 10) one mm down.
+      expect(layer.slab.elevation).toBeCloseTo(9, 4);
+      expect(plan.frame).toBeDefined();
+    });
+
+    it("cuts the holes through the layer only, so the body stays solid below it", () => {
+      const plan = holePatternShapes(face, honeycomb({ topLayer: true, topLayerThickness: 1.2 }), "Hole");
+      expect(plan.holes.length).toBeGreaterThan(150);
+      for (const hole of plan.holes) {
+        // From HOLE_OVERSHOOT above the face to a hair under the layer.
+        expect(hole.height).toBeCloseTo(HOLE_OVERSHOOT + 1.2 + TOP_LAYER_OVERCUT, 6);
+        expect(hole.elevation).toBeCloseTo(10 - 1.2 - TOP_LAYER_OVERCUT, 6);
+      }
+      // The edge still cuts the net's holes at margin 0, even with a depth set before.
+      expect(holePatternShapes(face, honeycomb({ topLayer: true, depth: 3 }), "Hole").edgeCut).toBeDefined();
     });
   });
 });

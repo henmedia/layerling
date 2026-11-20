@@ -1172,6 +1172,11 @@ html[data-theme="dark"]:where([data-palette="graphite"]) .edge-modifier-quick-ac
   background: rgba(217, 120, 19, 0.08);
 }
 
+:where(html[data-theme="dark"][data-palette="graphite"]) .hole-pattern-layer-color input[type="color"] {
+  border: 1px solid var(--border, #ccc);
+  background: none;
+}
+
 :where(html[data-theme="dark"][data-palette="graphite"]) .model-scale-result {
   color: #515151;
 }

@@ -4479,12 +4479,17 @@ export function LayerlingEditor({
     const source = shapes.find((shape) => shape.id === holePatternTool?.sourceId);
     return { ...frame, color: source?.color ?? frame.color, name: t("holePattern.frameName") };
   }, [holePatternPreview?.frame, holePatternTool?.sourceId, shapes]);
+  // The top layer shows in its colour on the body while the numbers change, a hair above it so the two do not flicker.
+  const holePatternPreviewLayer = useMemo(() => {
+    const layer = holePatternPreview?.topLayer;
+    return layer ? { ...layer.slab, elevation: (layer.slab.elevation ?? 0) + 0.02, name: t("holePattern.topLayerName") } : null;
+  }, [holePatternPreview?.topLayer]);
   const baseViewportShapes = useMemo(
     () =>
       arrayPreview
         ? [...shapes, ...arrayPreview]
         : holePatternPreview?.holes.length
-        ? [...shapes, ...holePatternPreview.holes, ...(holePatternPreviewFrame ? [holePatternPreviewFrame] : [])]
+        ? [...shapes, ...holePatternPreview.holes, ...(holePatternPreviewFrame ? [holePatternPreviewFrame] : []), ...(holePatternPreviewLayer ? [holePatternPreviewLayer] : [])]
         : faceToolPreview?.shape
         ? [...shapes, faceToolPreview.shape]
         : supportRibPreview?.shape
@@ -4502,7 +4507,7 @@ export function LayerlingEditor({
         : mirrorMode && mirrorPreviewAxis
           ? mirroredShapesForSelection(shapes, selectedIds, selectedShapes, mirrorPreviewAxis).nextShapes
           : shapes,
-    [alignAxes, alignMode, alignPreview, alignSelection, arrayPreview, edgeModifier?.preview, effectiveAlignAnchorId, faceToolPreview, supportRibPreview, stencilBridgePreview, holePatternPreview, holePatternPreviewFrame, mirrorMode, mirrorPreviewAxis, selectedIds, selectedShapes, shapes],
+    [alignAxes, alignMode, alignPreview, alignSelection, arrayPreview, edgeModifier?.preview, effectiveAlignAnchorId, faceToolPreview, supportRibPreview, stencilBridgePreview, holePatternPreview, holePatternPreviewFrame, holePatternPreviewLayer, mirrorMode, mirrorPreviewAxis, selectedIds, selectedShapes, shapes],
   );
   // The preview of an intersection (#372): the operands see-through, and what they share as a body of its own on top.
   const [intersectPreviewIds, setIntersectPreviewIds] = useState<string[] | null>(null);
@@ -10916,11 +10921,34 @@ export function LayerlingEditor({
   const holePatternGroup = useCallback(async (source: WorkplaneShape, plan: HolePatternPlan) => {
     const limit = workspaceSettingsRef.current.booleanTriangleLimit;
     const inner = await buildGroupedShapeOffThread([source, ...plan.holes], limit, geometryAbortRef.current?.signal);
-    if (!plan.frame || !inner.group) return inner;
-    const body = canonicalizeShape({ ...inner.group, groupOperation: "group" });
-    const frame = { ...plan.frame, color: source.color, name: t("holePattern.frameName") };
-    const outer = await buildGroupedShapeOffThread([body, frame], limit, geometryAbortRef.current?.signal);
-    return outer.group ? { ...outer, group: { ...outer.group, name: body.name } } : outer;
+    if (!inner.group || (!plan.frame && !plan.topLayer)) return inner;
+    let body = canonicalizeShape({ ...inner.group, groupOperation: "group" });
+    if (plan.frame) {
+      const frame = { ...plan.frame, color: source.color, name: t("holePattern.frameName") };
+      const outer = await buildGroupedShapeOffThread([body, frame], limit, geometryAbortRef.current?.signal);
+      if (!outer.group) return outer;
+      body = canonicalizeShape({ ...outer.group, name: body.name, groupOperation: "group" });
+    }
+    if (!plan.topLayer) return { ...inner, group: body };
+    // The top layer in a second colour (Discussion #1771): what of the perforated body lies in the slab under the face is
+    // the net; the body less the net is the other colour, solid below and filling the net's holes up to the face, so the
+    // face is flat and both colours start on the first layers when it is printed face down (no bridges, no supports).
+    // The two are bundled, so they move together and reach the slicer as two bodies in their own colours.
+    const layerName = t("holePattern.topLayerName");
+    const slab = { ...plan.topLayer.slab, color: plan.topLayer.color, name: layerName };
+    const top = await buildIntersectionShapeFromSelection([body, slab], limit);
+    if (!top.group) return { ...inner, group: null, failureNotice: top.failureNotice || t("status.intersectionEmpty") };
+    const upper = canonicalizeShape({ ...top.group, name: layerName, color: plan.topLayer.color, groupOperation: "intersection" });
+    const netMesh = meshForShape(upper);
+    const netPositions = netMesh.faces.flatMap((face) => face.flatMap((index) => netMesh.vertices[index]));
+    const cut = clearanceMeshShape(createLocalId("top-layer-cut"), layerName, plan.topLayer.color, netPositions);
+    if (!cut) return { ...inner, group: null };
+    const below = await buildGroupedShapeOffThread([source, withHoleMode(cut, true)], limit, geometryAbortRef.current?.signal);
+    if (!below.group) return below;
+    const lower = canonicalizeShape({ ...below.group, name: source.name, color: source.color, groupOperation: "group" });
+    const bundle = groupedShape([lower, upper]);
+    if (!bundle) return { ...inner, group: null };
+    return { ...inner, group: canonicalizeShape({ ...bundle, name: source.name, groupOperation: "bundle" }) };
   }, []);
 
   const applyHolePattern = useCallback(async () => {
@@ -10954,7 +10982,7 @@ export function LayerlingEditor({
       setNotice(result.failureNotice);
       return;
     }
-    const editableGroup = canonicalizeShape({ ...result.group, groupOperation: "group" });
+    const editableGroup = canonicalizeShape({ ...result.group, groupOperation: result.group.groupOperation === "bundle" ? "bundle" : "group" });
     setHolePatternTool(null);
     commitShapes(
       [...shapesRef.current.filter((shape) => shape.id !== source.id), editableGroup],
@@ -15138,6 +15166,8 @@ export function LayerlingEditor({
           rowSpacing: mcpOptionalNumber(params.rowSpacing),
           margin: mcpNumber(params.margin, DEFAULT_HOLE_PATTERN.margin),
           ...(mcpOptionalNumber(params.border) !== undefined ? { edgeBorder: mcpOptionalNumber(params.border) } : {}),
+          ...(mcpOptionalNumber(params.topLayer) !== undefined ? { topLayer: true, topLayerThickness: mcpOptionalNumber(params.topLayer) } : {}),
+          ...(typeof params.topLayerColor === "string" ? { topLayerColor: params.topLayerColor } : {}),
           depth: depth !== undefined && depth > 0 ? depth : null,
           holeType,
           headSize: mcpOptionalNumber(params.headSize) ?? screw?.headSize,
@@ -15173,7 +15203,7 @@ export function LayerlingEditor({
           throw new Error("The scene changed while perforating; run the command again");
         }
         if (!result.group) throw new Error(result.failureNotice);
-        const editableGroup = canonicalizeShape({ ...result.group, groupOperation: "group" });
+        const editableGroup = canonicalizeShape({ ...result.group, groupOperation: result.group.groupOperation === "bundle" ? "bundle" : "group" });
         commitShapes(
           [...currentShapes().filter((shape) => shape.id !== target.id), editableGroup],
           editableGroup.id,
@@ -15185,6 +15215,7 @@ export function LayerlingEditor({
           settings,
           ...(plan.ring ? { ring: { length: Number(plan.ring.length.toFixed(2)), onCorners: plan.ring.onCorners } } : {}),
           ...(plan.edgeCut ? { edgeCut: { thin: plan.edgeCut.thin, wall: Number(plan.edgeCut.wall.toFixed(2)), border: plan.edgeCut.border } } : {}),
+          ...(plan.topLayer ? { topLayer: { thickness: Number(plan.topLayer.thickness.toFixed(2)), color: plan.topLayer.color } } : {}),
           ...(plan.wall ? {
             wall: {
               diameter: Number(plan.wall.diameter.toFixed(2)),
