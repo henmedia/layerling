@@ -33,6 +33,8 @@ import {
   holeHasHead,
   holePatternCutsAtEdge,
   holePatternEdgeBorder,
+  holePatternTopLayer,
+  HOLE_PATTERN_TOP_LAYER_MIN,
   holeTiltApplies,
   holeHeadDepth,
   holeHeadSize,
@@ -608,6 +610,38 @@ export function HolePatternPanel({
           onChange={(value) => onChange({ depth: value })}
         />
       ) : null}
+
+      {/* A second colour on top (Discussion #1771): the top of the body under the face as a body of its own. */}
+      {pattern && !wall && !custom && settings.depth === null ? (
+        <label className="edge-modifier-check">
+          <input type="checkbox" checked={Boolean(settings.topLayer)} onChange={(event) => onChange({ topLayer: event.target.checked })} />
+          <span>{t("holePattern.topLayer")}</span>
+        </label>
+      ) : null}
+      {pattern && !wall && !custom && settings.depth === null && settings.topLayer ? (() => {
+        const layer = holePatternTopLayer(settings, thickness > 0 ? thickness : undefined);
+        return (
+          <>
+            <EdgeModifierSlider
+              label={t("holePattern.topLayerThickness")}
+              value={layer?.thickness ?? HOLE_PATTERN_TOP_LAYER_MIN}
+              min={HOLE_PATTERN_TOP_LAYER_MIN}
+              max={Math.max(HOLE_PATTERN_TOP_LAYER_MIN, Math.round((thickness - HOLE_PATTERN_TOP_LAYER_MIN) * 10) / 10)}
+              step={0.1}
+              workspace={workspace}
+              length
+              onChange={(value) => onChange({ topLayerThickness: value })}
+            />
+            <label className="edge-modifier-field hole-pattern-layer-color">
+              <span>{t("holePattern.topLayerColor")}</span>
+              <input type="color" value={layer?.color ?? "#ffffff"} onChange={(event) => onChange({ topLayerColor: event.target.value })} />
+            </label>
+            <p className="hole-pattern-mounting-note">
+              {layer ? t("holePattern.topLayerNote", { thickness: millimetres(layer.thickness) }) : t("holePattern.topLayerThin")}
+            </p>
+          </>
+        );
+      })() : null}
 
       {ready && tooMany && !settings.allowMany ? (
         <div className="edge-modifier-field">

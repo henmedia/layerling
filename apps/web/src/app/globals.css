@@ -3218,6 +3218,24 @@ html[data-theme="dark"] .edge-modifier-quick-actions button.active {
   opacity: 0.8;
 }
 
+/* The top layer's colour: the label and a swatch on one line. */
+.hole-pattern-layer-color {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.hole-pattern-layer-color input[type="color"] {
+  width: 44px;
+  height: 28px;
+  padding: 0;
+  border: 1px solid var(--border, #ccc);
+  border-radius: 6px;
+  background: none;
+  cursor: pointer;
+}
+
 /* Scale by percent: the model railway gauges, four to a row. */
 .model-scale-presets {
   grid-template-columns: repeat(4, minmax(0, 1fr));

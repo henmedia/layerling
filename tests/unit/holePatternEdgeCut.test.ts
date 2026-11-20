@@ -1,6 +1,6 @@
 import manifoldModule from "manifold-3d";
 import { beforeAll, describe, expect, it } from "vitest";
-import { holeFitPolygon, holePatternCenters, holePatternCutsAtEdge, holePatternEdgeBorder, holePatternWall, normalizeHolePattern, rectangleOutline, type HolePatternSettings } from "@/lib/holePattern";
+import { holeFitPolygon, holePatternCenters, holePatternCutsAtEdge, holePatternEdgeBorder, holePatternTopLayer, holePatternWall, normalizeHolePattern, rectangleOutline, type HolePatternSettings } from "@/lib/holePattern";
 import { holePatternShapes, type PerforableFace } from "@/lib/holePatternShapes";
 import { rememberManifoldRuntime } from "@/lib/manifoldHandle";
 
@@ -166,6 +166,39 @@ describe("Hole pattern: the face's edge cuts the holes at margin 0 (Discussion #
       const plan = holePatternShapes(face, honeycomb({ edgeBorder: 0 }), "Hole");
       expect(plan.frame).toBeUndefined();
       expect(plan.edgeCut?.border).toBe(0);
+    });
+  });
+
+  describe("with a top layer in a second colour", () => {
+    const face: PerforableFace = {
+      workplane: { origin: { x: 0, y: 10, z: 0 }, normal: { x: 0, y: 1, z: 0 }, xAxis: { x: 1, y: 0, z: 0 }, zAxis: { x: 0, y: 0, z: 1 } } as PerforableFace["workplane"],
+      outline: rectangleOutline(-45, -35, 45, 35),
+      thickness: 6,
+    };
+
+    it("is made for through holes of a pattern only, and stays thinner than the body", () => {
+      expect(holePatternTopLayer(honeycomb({ topLayer: true }), 6)).toEqual({ thickness: 1, color: "#ffffff" });
+      expect(holePatternTopLayer(honeycomb({ topLayer: true, topLayerThickness: 2.5, topLayerColor: "#D41721" }), 6)).toEqual({ thickness: 2.5, color: "#d41721" });
+      expect(holePatternTopLayer(honeycomb({ topLayer: true, topLayerThickness: 9 }), 6)!.thickness).toBeCloseTo(5.8, 9);
+      expect(holePatternTopLayer(honeycomb({ topLayer: false }), 6)).toBeNull();
+      expect(holePatternTopLayer(honeycomb({ topLayer: true, depth: 2 }), 6)).toBeNull();
+      expect(holePatternTopLayer(honeycomb({ topLayer: true, arrangement: "corners" }), 6)).toBeNull();
+      expect(holePatternTopLayer(honeycomb({ topLayer: true }), 0.3)).toBeNull();
+      // Any margin: the top layer does not need the edge to cut the holes.
+      expect(holePatternTopLayer(honeycomb({ topLayer: true, margin: 3 }), 6)).not.toBeNull();
+    });
+
+    it("gives the slab of the face, as thick as asked, in its colour", () => {
+      const plan = holePatternShapes(face, honeycomb({ topLayer: true, topLayerThickness: 1, topLayerColor: "#d41721", edgeBorder: 2 }), "Hole");
+      const layer = plan.topLayer!;
+      expect(layer.thickness).toBe(1);
+      expect(layer.slab.color).toBe("#d41721");
+      expect(layer.slab.width).toBeCloseTo(90, 4);
+      expect(layer.slab.depth).toBeCloseTo(70, 4);
+      expect(layer.slab.height).toBeCloseTo(1, 4);
+      // From the face (y 10) one mm down.
+      expect(layer.slab.elevation).toBeCloseTo(9, 4);
+      expect(plan.frame).toBeDefined();
     });
   });
 });

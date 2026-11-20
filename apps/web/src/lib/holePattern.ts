@@ -80,6 +80,13 @@ export type HolePatternSettings = {
    * openings; the holes are cut off where it starts. 0 or unset: no frame, the holes run right to the edge.
    */
   edgeBorder?: number;
+  /**
+   * A pattern of through holes in a flat face (Discussion #1771): the top `topLayerThickness` mm of the body under the
+   * face becomes a body of its own in `topLayerColor`, cut by the same holes, for a second colour printed on top.
+   */
+  topLayer?: boolean;
+  topLayerThickness?: number;
+  topLayerColor?: string;
   perimeterStart?: number;
   /** Own shape (#1235): the id of the shape from the scene that is repeated. */
   customId?: string;
@@ -100,6 +107,10 @@ export const HOLE_PATTERN_MIN_SIZE = 0.5;
 export const HOLE_PATTERN_MAX_SIZE = 200;
 export const HOLE_PATTERN_MAX_SPACING = 400;
 export const HOLE_PATTERN_MAX_MARGIN = 100;
+/** The top layer in a second colour: its thickness by default, the thinnest it can be, and its colour by default. */
+export const HOLE_PATTERN_TOP_LAYER_DEFAULT = 1;
+export const HOLE_PATTERN_TOP_LAYER_MIN = 0.2;
+export const HOLE_PATTERN_TOP_LAYER_COLOR = "#ffffff";
 /** The widest frame along the edge when the edge cuts the holes. */
 export const HOLE_PATTERN_MAX_EDGE_BORDER = 20;
 export const HOLE_PATTERN_MIN_PERIMETER_COUNT = 2;
@@ -796,6 +807,23 @@ export function holePatternCutsAtEdge(settings: Pick<HolePatternSettings, "arran
   if (settings.arrangement !== "grid" && settings.arrangement !== "staggered") return false;
   if (settings.form === "custom" || holeHasHead(settings)) return false;
   return settings.depth === null && !(settings.margin > EPSILON);
+}
+
+/**
+ * The top layer in a second colour, when it is asked for and can be made: a pattern (not mounting holes) of plain or
+ * screw holes through a flat face, not an own shape. Its thickness stays under the body's (`thickness`, when known),
+ * so some of the body is left under it.
+ */
+export function holePatternTopLayer(
+  settings: Pick<HolePatternSettings, "arrangement" | "form" | "depth"> & Partial<Pick<HolePatternSettings, "topLayer" | "topLayerThickness" | "topLayerColor">>,
+  thickness?: number,
+): { thickness: number; color: string } | null {
+  if (!settings.topLayer || settings.arrangement === "corners" || settings.form === "custom" || settings.depth !== null) return null;
+  const asked = typeof settings.topLayerThickness === "number" && Number.isFinite(settings.topLayerThickness) ? settings.topLayerThickness : HOLE_PATTERN_TOP_LAYER_DEFAULT;
+  const most = thickness !== undefined && thickness > 0 ? thickness - HOLE_PATTERN_TOP_LAYER_MIN : Infinity;
+  if (!(most >= HOLE_PATTERN_TOP_LAYER_MIN)) return null;
+  const color = typeof settings.topLayerColor === "string" && /^#[0-9a-f]{6}$/i.test(settings.topLayerColor) ? settings.topLayerColor : HOLE_PATTERN_TOP_LAYER_COLOR;
+  return { thickness: Math.min(most, Math.max(HOLE_PATTERN_TOP_LAYER_MIN, asked)), color };
 }
 
 /** The frame along the edge when the edge cuts the holes, in mm; 0 when it does not cut them or has no frame. */
@@ -1657,6 +1685,9 @@ export function normalizeHolePattern(input: Partial<HolePatternSettings>): HoleP
     arrangement,
     margin: number(input.margin, base.margin, 0, HOLE_PATTERN_MAX_MARGIN),
     ...(input.edgeBorder !== undefined ? { edgeBorder: number(input.edgeBorder, 0, 0, HOLE_PATTERN_MAX_EDGE_BORDER) } : {}),
+    ...(input.topLayer !== undefined ? { topLayer: Boolean(input.topLayer) } : {}),
+    ...(input.topLayerThickness !== undefined ? { topLayerThickness: number(input.topLayerThickness, HOLE_PATTERN_TOP_LAYER_DEFAULT, HOLE_PATTERN_TOP_LAYER_MIN, 100) } : {}),
+    ...(typeof input.topLayerColor === "string" && /^#[0-9a-f]{6}$/i.test(input.topLayerColor) ? { topLayerColor: input.topLayerColor.toLowerCase() } : {}),
     // Kept while another form or arrangement is chosen, so going back finds them as they were.
     holeType,
     ...head,
