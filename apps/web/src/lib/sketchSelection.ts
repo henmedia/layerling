@@ -62,6 +62,15 @@ export function sketchSelectionCount(selected: SketchSelection): number {
  * The points that move when the selection moves: the selected points and the
  * end points of the selected lines. A line has no position of its own, so
  * moving it means moving its two ends.
+ *
+ * One kind of line is left out: a line of a larger selection that hangs on the
+ * selected points by one end only. A frame drawn round a part of an outline
+ * selects the points inside it and every line that touches one of them, so the
+ * two lines that lead out of the frame are selected with it. They are the
+ * connection to the rest of the outline and stretch as the part moves; taking
+ * their far ends along would move points that were never selected. Dragging the
+ * frame always left those points alone, the arrow keys and the typed position
+ * did not (Issue #1800). All of them ask here now, so they move the same points.
  */
 export function sketchSelectionMovePointIds(profile: Pick<SketchProfile, "segments">, selected: SketchSelection): string[] {
   if (!selected || selected.kind === "image") return [];
@@ -76,8 +85,13 @@ export function sketchSelectionMovePointIds(profile: Pick<SketchProfile, "segmen
   if (selected.kind === "point") ids.add(selected.id);
   else if (selected.kind === "segment") addSegment(selected.id);
   else {
+    const selectedPoints = new Set(selected.pointIds);
     selected.pointIds.forEach((id) => ids.add(id));
-    selected.segmentIds.forEach(addSegment);
+    selected.segmentIds.forEach((segmentId) => {
+      const segment = profile.segments.find((entry) => entry.id === segmentId);
+      if (segment && selectedPoints.has(segment.startId) !== selectedPoints.has(segment.endId)) return;
+      addSegment(segmentId);
+    });
   }
   return [...ids];
 }
@@ -85,12 +99,15 @@ export function sketchSelectionMovePointIds(profile: Pick<SketchProfile, "segmen
 /**
  * What dragging a line moves: the whole selection when the line is part of a
  * larger one (it is then the handle for all of it), otherwise its own two ends.
+ * The line in the hand always comes along whole, also where it leads out of the
+ * selection and would only stretch when the selection is moved another way.
  */
 export function sketchSegmentDragPointIds(profile: Pick<SketchProfile, "segments">, selected: SketchSelection, segmentId: string): string[] {
+  const own = sketchSelectionMovePointIds(profile, { kind: "segment", id: segmentId });
   if (selected?.kind === "multiple" && selected.segmentIds.includes(segmentId)) {
-    return sketchSelectionMovePointIds(profile, selected);
+    return [...new Set([...sketchSelectionMovePointIds(profile, selected), ...own])];
   }
-  return sketchSelectionMovePointIds(profile, { kind: "segment", id: segmentId });
+  return own;
 }
 
 /** Shift while dragging: the move stays on the axis it follows more, like on the workplane. */
