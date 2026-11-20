@@ -47,5 +47,15 @@
     "guide": {
       "section": "buildPlates"
     }
+  },
+  {
+    "title": {
+      "de": "Fase an einer Gruppe verschließt die Rohrbohrung nicht mehr",
+      "en": "A chamfer on a group no longer closes a tube's bore"
+    },
+    "body": {
+      "de": "Ein Rohr, Ring oder gebogenes Rohr mit „Bohrung schneidet beim Gruppieren wie ein Loch“ öffnet, womit es gruppiert ist. Eine Fase oder Verrundung an dieser Gruppe hat die Öffnung wieder verschlossen. Jetzt bleibt sie offen.",
+      "en": "A tube, ring or bent tube with \"Bore cuts as a hole when grouped\" opens whatever it is grouped with. A chamfer or fillet on that group closed the opening again. Now it stays open."
+    }
   }
 ]
