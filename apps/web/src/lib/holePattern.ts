@@ -75,6 +75,11 @@ export type HolePatternSettings = {
   rack?: boolean;
   /** 19" rack: a standard panel height from 1U to 6U, its holes as the standard has them; 0 or unset fits the panel. */
   rackUnits?: number;
+  /**
+   * When the edge cuts the holes (`holePatternCutsAtEdge`): a solid frame this wide (mm) along the face's edge and its
+   * openings; the holes are cut off where it starts. 0 or unset: no frame, the holes run right to the edge.
+   */
+  edgeBorder?: number;
   perimeterStart?: number;
   /** Own shape (#1235): the id of the shape from the scene that is repeated. */
   customId?: string;
@@ -95,6 +100,8 @@ export const HOLE_PATTERN_MIN_SIZE = 0.5;
 export const HOLE_PATTERN_MAX_SIZE = 200;
 export const HOLE_PATTERN_MAX_SPACING = 400;
 export const HOLE_PATTERN_MAX_MARGIN = 100;
+/** The widest frame along the edge when the edge cuts the holes. */
+export const HOLE_PATTERN_MAX_EDGE_BORDER = 20;
 export const HOLE_PATTERN_MIN_PERIMETER_COUNT = 2;
 export const HOLE_PATTERN_MAX_PERIMETER_COUNT = 200;
 export const HOLE_PATTERN_MAX_PERIMETER_START = 2000;
@@ -540,7 +547,7 @@ export type HolePatternResult = {
    * The edge cuts the holes (`holePatternCutsAtEdge`): holes reaching past it are cut off there instead of left out.
    * `thin` counts the holes inside the face that leave a strip to its edge thinner than the walls between holes.
    */
-  edgeCut?: { thin: number; wall: number };
+  edgeCut?: { thin: number; wall: number; border: number };
 };
 
 /** The panel heights of IEC 60297-3-100 (table 1): the height, and the distance between the upper and lower holes. */
@@ -791,6 +798,32 @@ export function holePatternCutsAtEdge(settings: Pick<HolePatternSettings, "arran
   return settings.depth === null && !(settings.margin > EPSILON);
 }
 
+/** The frame along the edge when the edge cuts the holes, in mm; 0 when it does not cut them or has no frame. */
+export function holePatternEdgeBorder(settings: Parameters<typeof holePatternCutsAtEdge>[0] & Partial<Pick<HolePatternSettings, "edgeBorder">>) {
+  if (!holePatternCutsAtEdge(settings)) return 0;
+  const border = typeof settings.edgeBorder === "number" && Number.isFinite(settings.edgeBorder) ? settings.edgeBorder : 0;
+  return Math.min(HOLE_PATTERN_MAX_EDGE_BORDER, Math.max(0, border));
+}
+
+/**
+ * The face set in by `border` along its edge and its openings, in the face's frame: where the frame ends and the holes
+ * are cut off. Sharp corners stay sharp (mitred), so the frame is as wide all round.
+ */
+export function insetFaceLoops(runtime: ManifoldToplevel, loops: readonly Point2[][], border: number): Point2[][] {
+  const made: { delete(): void }[] = [];
+  try {
+    const region = new runtime.CrossSection(loops.map((loop) => loop.map((point): [number, number] => [point.u, point.v])), "EvenOdd");
+    made.push(region);
+    const inset = region.offset(-border, "Miter", 2);
+    made.push(inset);
+    const simple = inset.simplify(1e-6);
+    made.push(simple);
+    return simple.toPolygons().map((polygon) => polygon.map((point) => ({ u: point[0], v: point[1] }))).filter((loop) => loop.length >= 3);
+  } finally {
+    made.forEach((section) => section.delete());
+  }
+}
+
 /** How far a hole cut off by the edge must reach into the face at least, so it does not leave a bare scratch. */
 const EDGE_CUT_MIN_BITE = 0.4;
 /** A hole this close to the edge counts as touching it, with no strip between. */
@@ -1015,19 +1048,32 @@ export function holePatternCenters(
 
   if (holePatternCutsAtEdge(settings)) {
     // The edge cuts the holes: those reaching past it stay, and of the ways to lay the lattice the one leaving the
-    // fewest thin strips along the edge wins.
-    const inside = (point: Point2) => insideRegion(loops, point);
+    // fewest thin strips along the edge wins. With a frame the line it starts on, set in from the edge, cuts them.
     const wall = holePatternWall(settings);
+    const border = holePatternEdgeBorder(settings);
+    let cutLoops = loops;
+    if (border > 0) {
+      const runtime = loadedManifoldRuntime();
+      if (!runtime) {
+        requestManifoldRuntime();
+        return empty;
+      }
+      cutLoops = insetFaceLoops(runtime, loops, border);
+      if (cutLoops.length === 0) return { ...empty, edgeCut: { thin: 0, wall, border } };
+    }
+    const cutSegments = cutLoops === loops ? segments : loopSegments(cutLoops);
+    const inside = (point: Point2) => insideRegion(cutLoops, point);
+    const whole = cutLoops === loops ? fits : holeFitter(inside, cutSegments, footprint, 0);
     const bounds = { minU, maxU, minV, maxV };
-    const keep = edgeCutFitter(inside, segments, footprint, fits);
-    const thinOf = thinStripCounter(segments, footprint, fits, wall);
+    const keep = edgeCutFitter(inside, cutSegments, footprint, whole);
+    const thinOf = thinStripCounter(cutSegments, footprint, whole, wall);
     let cut = bestLattice(bounds, pitchU, pitchV, staggered, keep, thinOf);
     if (!cut) return { ...empty, tooMany: true };
     // Laid evenly about the middle, a staggered row often keeps a thin strip whichever way: then the lattice is moved
     // in finer steps across one step each way, and the place with the fewest thin strips (then the most holes) wins.
     if (cut.thin > 0) {
       // About the work of one lattice, so a big face or a long curved outline stays quick: finer steps only as far as that allows.
-      const work = Math.max(1, cut.centers.length) * Math.max(1, segments.length);
+      const work = Math.max(1, cut.centers.length) * Math.max(1, cutSegments.length);
       const steps = [EDGE_CUT_SHIFT_STEPS, EDGE_CUT_SHIFT_STEPS / 2].find((count) => work * count * count <= EDGE_CUT_SHIFT_BUDGET) ?? 0;
       const shifts: Point2[] = [];
       for (let i = 0; i < steps; i += 1) for (let j = 0; j < steps; j += 1) shifts.push({ u: (pitchU * i) / steps, v: (pitchV * j) / steps });
@@ -1035,7 +1081,7 @@ export function holePatternCenters(
       if (moved && (moved.thin < cut.thin || (moved.thin === cut.thin && moved.centers.length > cut.centers.length))) cut = moved;
     }
     if (cut.centers.length > (settings.allowMany ? HOLE_PATTERN_MANY_HOLES : HOLE_PATTERN_MAX_HOLES)) return { centers: [], tooMany: true, rows: 0 };
-    return { centers: cut.centers, tooMany: false, rows: cut.rows, edgeCut: { thin: cut.thin, wall } };
+    return { centers: cut.centers, tooMany: false, rows: cut.rows, edgeCut: { thin: cut.thin, wall, border } };
   }
 
   const lattice = bestLattice({ minU, maxU, minV, maxV }, pitchU, pitchV, staggered, fits);
@@ -1610,6 +1656,7 @@ export function normalizeHolePattern(input: Partial<HolePatternSettings>): HoleP
     ...(rowSpacing !== undefined ? { rowSpacing } : {}),
     arrangement,
     margin: number(input.margin, base.margin, 0, HOLE_PATTERN_MAX_MARGIN),
+    ...(input.edgeBorder !== undefined ? { edgeBorder: number(input.edgeBorder, 0, 0, HOLE_PATTERN_MAX_EDGE_BORDER) } : {}),
     // Kept while another form or arrangement is chosen, so going back finds them as they were.
     holeType,
     ...head,

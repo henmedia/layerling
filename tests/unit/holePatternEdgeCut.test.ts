@@ -1,5 +1,14 @@
-import { describe, expect, it } from "vitest";
-import { holeFitPolygon, holePatternCenters, holePatternCutsAtEdge, holePatternWall, normalizeHolePattern, type HolePatternSettings } from "@/lib/holePattern";
+import manifoldModule from "manifold-3d";
+import { beforeAll, describe, expect, it } from "vitest";
+import { holeFitPolygon, holePatternCenters, holePatternCutsAtEdge, holePatternEdgeBorder, holePatternWall, normalizeHolePattern, rectangleOutline, type HolePatternSettings } from "@/lib/holePattern";
+import { holePatternShapes, type PerforableFace } from "@/lib/holePatternShapes";
+import { rememberManifoldRuntime } from "@/lib/manifoldHandle";
+
+beforeAll(async () => {
+  const runtime = await manifoldModule();
+  runtime.setup();
+  rememberManifoldRuntime(runtime);
+});
 
 type P = { u: number; v: number };
 const rect = (w: number, d: number): P[] => [[-w / 2, -d / 2], [w / 2, -d / 2], [w / 2, d / 2], [-w / 2, d / 2]].map(([u, v]) => ({ u, v }));
@@ -107,5 +116,56 @@ describe("Hole pattern: the face's edge cuts the holes at margin 0 (Discussion #
     const gaps = result.centers.map((c) => 60 - (Math.hypot(c.u, c.v) + 2)).filter((gap) => gap > 0);
     expect(result.edgeCut!.thin).toBeGreaterThanOrEqual(gaps.filter((gap) => gap > 0.1 && gap < wall - 0.1).length);
     expect(result.edgeCut!.thin).toBeLessThanOrEqual(gaps.filter((gap) => gap < wall + 0.1).length);
+  });
+
+  describe("with a frame along the edge", () => {
+    const face: PerforableFace = {
+      workplane: { origin: { x: 0, y: 10, z: 0 }, normal: { x: 0, y: 1, z: 0 }, xAxis: { x: 1, y: 0, z: 0 }, zAxis: { x: 0, y: 0, z: 1 } } as PerforableFace["workplane"],
+      outline: rectangleOutline(-45, -35, 45, 35),
+      thickness: 6,
+    };
+
+    it("applies only where the edge cuts the holes", () => {
+      expect(holePatternEdgeBorder(honeycomb({ edgeBorder: 2 }))).toBe(2);
+      expect(holePatternEdgeBorder(honeycomb({ edgeBorder: 2, margin: 1 }))).toBe(0);
+      expect(holePatternEdgeBorder(honeycomb({ edgeBorder: 2, depth: 3 }))).toBe(0);
+      expect(holePatternEdgeBorder(honeycomb({ edgeBorder: 50 }))).toBe(20);
+      expect(normalizeHolePattern({ edgeBorder: -3 }).edgeBorder).toBe(0);
+    });
+
+    it("cuts the holes off where a 2 mm frame starts, and makes the frame as a solid band round the face", () => {
+      const settings = honeycomb({ edgeBorder: 2 });
+      const plan = holePatternShapes(face, settings, "Hole");
+      expect(plan.edgeCut?.border).toBe(2);
+      expect(plan.holes.length).toBeGreaterThan(150);
+      // Every hole bites into the face inside the frame: its middle or a corner well within 43 x 33.
+      const { centers } = holePatternCenters(face.outline, settings);
+      for (const c of centers) {
+        const points = [c, ...corners(settings, c)];
+        expect(points.some((p) => Math.abs(p.u) < 43 && Math.abs(p.v) < 33)).toBe(true);
+      }
+      const frame = plan.frame!;
+      expect(frame).toBeDefined();
+      expect(frame.hole).toBe(false);
+      expect(frame.width).toBeCloseTo(90, 4);
+      expect(frame.depth).toBeCloseTo(70, 4);
+      expect(frame.height).toBeCloseTo(6, 4);
+      // From the face (y 10) down through the body's thickness.
+      expect(frame.elevation).toBeCloseTo(4, 4);
+      // A closed band of the right volume, facing outwards: (90 x 70 - 86 x 66) x 6.
+      const p = frame.importedMesh!.positions;
+      let volume = 0;
+      for (let i = 0; i < p.length; i += 9) {
+        const [ax, ay, az, bx, by, bz, cx, cy, cz] = p.slice(i, i + 9);
+        volume += (ax * (by * cz - bz * cy) - ay * (bx * cz - bz * cx) + az * (bx * cy - by * cx)) / 6;
+      }
+      expect(volume).toBeCloseTo((90 * 70 - 86 * 66) * 6, 1);
+    });
+
+    it("makes no frame at 0", () => {
+      const plan = holePatternShapes(face, honeycomb({ edgeBorder: 0 }), "Hole");
+      expect(plan.frame).toBeUndefined();
+      expect(plan.edgeCut?.border).toBe(0);
+    });
   });
 });
