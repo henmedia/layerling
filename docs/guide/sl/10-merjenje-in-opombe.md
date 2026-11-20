@@ -7,7 +7,7 @@ Kdor želi del zgraditi natančno, mora znati meriti. layerling ima za to več o
 
 ## Merilni trak
 
-Merilni trak je na spodnjem koncu vrstice pogleda ob levem robu ({{ui:camera.tapeTools}}). Meri razdalje med vogali, robovi in ploskvami. Klik nanj odpre pet gumbov. Če zakrivajo tisto, kar želiš izmeriti, jih za ročaj levo prosto povlečeš po delovni površini; dvoklik na ročaj jih vrne nazaj:
+Merilni trak je na spodnjem koncu vrstice pogleda ob levem robu ({{ui:camera.tapeTools}}). Meri razdalje med vogali, robovi in ploskvami. Klik nanj odpre pet gumbov. {{ui:camera.addMeasurement}} je takoj vklopljen, zato naslednja dva klika v pogledu že merita; še en klik na ta gumb orodje odloži, gumbi pa ostanejo odprti. Če so mere skrite, ostane izklopljen, dokler ga ne klikneš. Če zakrivajo tisto, kar želiš izmeriti, jih za ročaj levo prosto povlečeš po delovni površini; dvoklik na ročaj jih vrne nazaj:
 
 ![Merilni trak z gumbi: Dodaj mero, Premakni merilne točke, Odstrani mero, Cele robove, Odstrani vse mere.](shot:tape-menu)
 

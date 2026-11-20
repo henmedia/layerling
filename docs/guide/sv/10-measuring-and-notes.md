@@ -7,7 +7,7 @@ För att bygga en del exakt behöver du kunna mäta. layerling har flera verktyg
 
 ## Måttbandet
 
-Måttbandet sitter längst ned i vyfältet längs vänsterkanten ({{ui:camera.tapeTools}}). Det mäter avstånd mellan hörn, kanter och ytor. Ett klick öppnar fem knappar. Om de täcker det du ska mäta kan du dra dem i greppet till vänster var som helst på arbetsytan; ett dubbelklick på greppet sätter tillbaka dem:
+Måttbandet sitter längst ned i vyfältet längs vänsterkanten ({{ui:camera.tapeTools}}). Det mäter avstånd mellan hörn, kanter och ytor. Ett klick öppnar fem knappar. {{ui:camera.addMeasurement}} är påslaget direkt, så de två följande klicken i vyn mäter; ett klick till på den knappen lägger undan verktyget och knapparna förblir öppna. Är måtten dolda förblir den avstängd tills du klickar på den. Om de täcker det du ska mäta kan du dra dem i greppet till vänster var som helst på arbetsytan; ett dubbelklick på greppet sätter tillbaka dem:
 
 ![Måttbandet med sina knappar: lägg till mätning, flytta mätpunkter, ta bort mätning, hela kanter, radera alla mätningar.](shot:tape-menu)
 

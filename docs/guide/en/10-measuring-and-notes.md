@@ -7,7 +7,7 @@ To build a part exactly, you need to measure. layerling has several tools for th
 
 ## The tape measure
 
-The tape measure sits at the lower end of the view bar on the left edge ({{ui:camera.tapeTools}}). It measures distances between corners, edges and faces. A click on it opens five buttons. If they cover what you want to measure, drag them by the grip on the left anywhere on the workplane; a double-click on the grip puts them back:
+The tape measure sits at the lower end of the view bar on the left edge ({{ui:camera.tapeTools}}). It measures distances between corners, edges and faces. A click on it opens five buttons. {{ui:camera.addMeasurement}} is switched on straight away, so the next two clicks in the view measure; another click on that button puts the tool down and leaves the buttons open. If the measurements are hidden, it stays off until you click it. If they cover what you want to measure, drag them by the grip on the left anywhere on the workplane; a double-click on the grip puts them back:
 
 ![The tape measure with its buttons: add measurement, move measuring points, remove measurement, whole edges, delete all measurements.](shot:tape-menu)
 

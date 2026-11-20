@@ -7,7 +7,7 @@ Om een onderdeel precies te bouwen, moet je meten. layerling heeft daar verschil
 
 ## Het meetlint
 
-Het meetlint zit aan de onderkant van de weergavebalk aan de linkerrand ({{ui:camera.tapeTools}}). Het meet afstanden tussen hoeken, randen en vlakken. Een klik erop opent vijf knoppen. Zitten die in de weg bij wat je wilt meten, sleep ze dan aan de greep links naar een willekeurige plek op het werkvlak; een dubbelklik op de greep zet ze terug:
+Het meetlint zit aan de onderkant van de weergavebalk aan de linkerrand ({{ui:camera.tapeTools}}). Het meet afstanden tussen hoeken, randen en vlakken. Een klik erop opent vijf knoppen. {{ui:camera.addMeasurement}} staat meteen aan, dus de volgende twee klikken in de weergave meten al; nog een klik op die knop legt het gereedschap weg en laat de knoppen open. Zijn de metingen verborgen, dan blijft hij uit tot je erop klikt. Zitten die in de weg bij wat je wilt meten, sleep ze dan aan de greep links naar een willekeurige plek op het werkvlak; een dubbelklik op de greep zet ze terug:
 
 ![Het meetlint met zijn knoppen: meting toevoegen, meetpunten verplaatsen, meting verwijderen, hele randen, alle metingen verwijderen.](shot:tape-menu)
 

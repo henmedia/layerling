@@ -7,7 +7,7 @@ Per costruire un pezzo con precisione, devi poterlo misurare. layerling offre di
 
 ## Il metro a nastro
 
-Il metro a nastro si trova in fondo alla barra della vista, sul bordo sinistro ({{ui:camera.tapeTools}}). Misura la distanza tra angoli, spigoli e facce. Facendo clic si apre una serie di sei pulsanti. Se coprono la zona che vuoi misurare, trascinali dalla maniglia a sinistra e spostali sul piano di lavoro; un doppio clic sulla maniglia li riporta al loro posto:
+Il metro a nastro si trova in fondo alla barra della vista, sul bordo sinistro ({{ui:camera.tapeTools}}). Misura la distanza tra angoli, spigoli e facce. Facendo clic si apre una serie di sei pulsanti. {{ui:camera.addMeasurement}} è subito attivo, quindi i due clic successivi nella vista misurano già; un altro clic su quel pulsante mette via lo strumento e lascia aperti i pulsanti. Se le misure sono nascoste, resta disattivato finché non ci fai clic. Se coprono la zona che vuoi misurare, trascinali dalla maniglia a sinistra e spostali sul piano di lavoro; un doppio clic sulla maniglia li riporta al loro posto:
 
 ![Il metro a nastro con i pulsanti: aggiungi misura, sposta i punti di misurazione, rimuovi misura, misura spigoli interi, elimina tutte le misure.](shot:tape-menu)
 

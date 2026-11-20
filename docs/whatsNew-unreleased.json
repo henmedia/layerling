@@ -142,5 +142,18 @@
       "de": "In einem langen Werkzeugfenster, etwa beim Aushöhlen, blieben „Abbrechen“ und „Anwenden“ immer sichtbar, die Meldung, warum etwas nicht geht, stand aber ganz unten und war erst nach dem Herunterrollen zu sehen. Ein Klick schien dann nichts zu tun. Die Meldung steht jetzt direkt über den Knöpfen und bleibt dort sichtbar.",
       "en": "In a long tool panel, Hollow for example, Cancel and Apply always stayed in view, but the message why something cannot be done stood at the very bottom and only showed after scrolling down. A click then seemed to do nothing. The message now stands right above the buttons and stays in view there."
     }
+  },
+  {
+    "title": {
+      "de": "Maßband misst sofort",
+      "en": "Tape measure measures at once"
+    },
+    "body": {
+      "de": "Ein Klick auf das Maßband schaltet jetzt gleich „Maß hinzufügen“ ein: Maßband anklicken, ersten Punkt klicken, zweiten Punkt klicken, fertig. Bisher musste man nach dem Öffnen erst noch das Plus wählen.\n\nEin weiterer Klick auf das Plus legt das Werkzeug weg, die Schaltflächen bleiben offen – etwa um zwischendurch einen Körper auszuwählen. Sind die Maße ausgeblendet, öffnet sich das Maßband ohne eingeschaltetes Werkzeug, damit sie ausgeblendet bleiben.",
+      "en": "A click on the tape measure now switches Add measurement on straight away: click the tape measure, click the first point, click the second, done. Until now you had to pick the plus after opening it.\n\nAnother click on the plus puts the tool down and leaves the buttons open, to select a body in between for example. If the measurements are hidden, the tape measure opens without the tool, so they stay hidden."
+    },
+    "guide": {
+      "section": "tapeMeasure"
+    }
   }
 ]

@@ -7,7 +7,7 @@ For at bygge en del præcist skal man måle. layerling har flere værktøjer til
 
 ## Målebåndet
 
-Målebåndet sidder for neden i visningsbjælken ved venstre kant ({{ui:camera.tapeTools}}). Det måler afstande mellem hjørner, kanter og flader. Et klik på den åbner fem knapper. Dækker de det du vil måle, så træk dem i grebet til venstre, et hvilket som helst sted på arbejdsplanet; et dobbeltklik på grebet sætter dem tilbage:
+Målebåndet sidder for neden i visningsbjælken ved venstre kant ({{ui:camera.tapeTools}}). Det måler afstande mellem hjørner, kanter og flader. Et klik på den åbner fem knapper. {{ui:camera.addMeasurement}} er slået til med det samme, så de næste to klik i visningen måler; et klik mere på knappen lægger værktøjet væk, og knapperne bliver åbne. Er målingerne skjult, bliver den slået fra, indtil du klikker på den. Dækker de det du vil måle, så træk dem i grebet til venstre, et hvilket som helst sted på arbejdsplanet; et dobbeltklik på grebet sætter dem tilbage:
 
 ![Målebåndet med dets knapper: tilføj mål, flyt målepunkter, fjern mål, hele kanter, slet alle mål.](shot:tape-menu)
 

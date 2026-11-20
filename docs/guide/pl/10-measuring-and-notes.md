@@ -7,7 +7,7 @@ Aby zbudować część dokładnie, trzeba mierzyć. layerling ma do tego kilka n
 
 ## Narzędzie Zmierz
 
-Narzędzie Zmierz jest na dolnym końcu paska widoku przy lewej krawędzi ({{ui:camera.tapeTools}}). Mierzy odległości między narożnikami, krawędziami i ścianami. Kliknięcie go otwiera pięć przycisków. Jeśli zasłaniają to, co chcesz zmierzyć, przeciągnij je za uchwyt po lewej w dowolne miejsce na płaszczyźnie roboczej. Dwukrotne kliknięcie uchwytu odkłada je na miejsce:
+Narzędzie Zmierz jest na dolnym końcu paska widoku przy lewej krawędzi ({{ui:camera.tapeTools}}). Mierzy odległości między narożnikami, krawędziami i ścianami. Kliknięcie go otwiera pięć przycisków. {{ui:camera.addMeasurement}} jest od razu włączone, więc dwa następne kliknięcia w widoku już mierzą; kolejne kliknięcie tego przycisku odkłada narzędzie, a przyciski zostają otwarte. Jeśli pomiary są ukryte, pozostaje wyłączone, dopóki go nie klikniesz. Jeśli zasłaniają to, co chcesz zmierzyć, przeciągnij je za uchwyt po lewej w dowolne miejsce na płaszczyźnie roboczej. Dwukrotne kliknięcie uchwytu odkłada je na miejsce:
 
 ![Narzędzie Zmierz z przyciskami: dodaj pomiar, przesuń punkty pomiaru, usuń pomiar, całe krawędzie, usuń wszystkie pomiary.](shot:tape-menu)
 

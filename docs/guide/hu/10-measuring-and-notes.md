@@ -7,7 +7,7 @@ Egy alkatrész pontos megépítéséhez mérni kell. A layerlingben erre több e
 
 ## A mérőszalag
 
-A mérőszalag a bal szélen lévő nézetsáv alsó végén van ({{ui:camera.tapeTools}}). Sarkok, élek és lapok közötti távolságokat mér. Rákattintva öt gomb nyílik meg. Ha eltakarják, amit mérnél, húzd őket a bal oldali fogónál fogva bárhová a munkasíkon; a fogóra dupla kattintás visszateszi őket:
+A mérőszalag a bal szélen lévő nézetsáv alsó végén van ({{ui:camera.tapeTools}}). Sarkok, élek és lapok közötti távolságokat mér. Rákattintva öt gomb nyílik meg. A {{ui:camera.addMeasurement}} azonnal be van kapcsolva, így a következő két kattintás a nézetben már mér; a gombra még egyszer kattintva leteszed az eszközt, a gombok pedig nyitva maradnak. Ha a mérések el vannak rejtve, kikapcsolva marad, amíg rá nem kattintasz. Ha eltakarják, amit mérnél, húzd őket a bal oldali fogónál fogva bárhová a munkasíkon; a fogóra dupla kattintás visszateszi őket:
 
 ![A mérőszalag a gombjaival: mérés hozzáadása, mérési pontok mozgatása, mérés eltávolítása, teljes élek, minden mérés törlése.](shot:tape-menu)
 

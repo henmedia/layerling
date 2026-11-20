@@ -7,7 +7,7 @@ Přesné modelování vyžaduje měření. Layerling nabízí několik nástroj�
 
 ## Měření vzdáleností
 
-Nástroj je ve spodní části levé lišty pohledu, {{ui:camera.tapeTools}}. Měří vzdálenosti mezi rohy, hranami a plochami. Kliknutím otevřete nabídku pěti tlačítek. Překáží-li, přetáhněte ji za úchyt vlevo na jiné místo. Dvojklik na úchyt ji vrátí.
+Nástroj je ve spodní části levé lišty pohledu, {{ui:camera.tapeTools}}. Měří vzdálenosti mezi rohy, hranami a plochami. Kliknutím otevřete nabídku pěti tlačítek. {{ui:camera.addMeasurement}} je hned zapnuté, takže další dvě kliknutí v pohledu už měří; druhé kliknutí na toto tlačítko nástroj odloží a nabídka zůstane otevřená. Jsou-li měření skrytá, zůstane vypnuté, dokud na něj nekliknete. Překáží-li, přetáhněte ji za úchyt vlevo na jiné místo. Dvojklik na úchyt ji vrátí.
 
 ![Nabídka měření: přidání, přesunutí bodů, odebrání, celé hrany a odstranění všech měření.](shot:tape-menu)
 
