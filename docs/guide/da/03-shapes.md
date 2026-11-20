@@ -40,6 +40,8 @@ Du får en trekant på to måder: {{ui:shape.polygon}} med tre sider er en ligeb
 
 {{ui:shape.polygon}} har skyderen {{ui:prop.cornerFillet}} under {{ui:prop.sides}} og et trækpunkt på modellen, ligesom {{ui:shape.roundedBox}}. Én radius gælder for alle hjørner, uanset antal sider. Den angives i millimeter, så en strakt polygon beholder runde hjørner; den største værdi er der, hvor nabohjørnernes rundinger mødes, og 0 er den almindelige polygon.
 
+{{ui:prop.polygonFlat}} drejer polygonen en halv side, så en flad side vender fremad i stedet for et hjørne. Længde og bredde måles på rammen om polygonen: en ottekant rører den ellers med fire hjørner, så begge mål går fra hjørne til hjørne; med kontakten slået til rører den rammen med fire flade sider, og begge mål går fra flade til flade, altså nøglevidden. En sekskant har så sine flade sider foran og bagved i stedet for til venstre og højre. Når du skifter, bliver legemet, som det er, og de to tal følger med.
+
 ## Formens indstillinger
 
 Så snart en form er valgt, vises dens indstillinger til højre. Øverst er navnet; blyanten ved siden af ({{ui:outliner.rename}}) lader dig taste et nyt. [[Enter]] beholder det, [[Esc]] annullerer, og et tomt navn bringer formens standardnavn tilbage. Længere til højre, hængelåsen låser formen mod utilsigtet flytning og øjet skjuler den. Pilen yderst til venstre folder indstillingerne ned til deres titellinje.

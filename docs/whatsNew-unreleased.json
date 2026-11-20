@@ -312,5 +312,18 @@
     "guide": {
       "chapter": "text"
     }
+  },
+  {
+    "title": {
+      "de": "Mehrkant: flache Seite nach vorn",
+      "en": "Polygon: flat side in front"
+    },
+    "body": {
+      "de": "Ein Achtkant maß bisher von Ecke zu Ecke: Wer 26 mm eintrug, bekam zwischen den flachen Seiten nur 24 mm. Der Mehrkant hat jetzt unter „Seiten“ den Schalter „Flache Seite nach vorn“. Er dreht den Mehrkant um eine halbe Seite, sodass Länge und Breite beim Achtkant von Fläche zu Fläche gehen, wie die Schlüsselweite.\n\nBeim Umschalten bleibt der Körper, wie er ist, nur die beiden Zahlen ziehen mit. Ein Sechskant hat seine flachen Seiten dann vorn und hinten statt links und rechts.",
+      "en": "An octagon used to measure from corner to corner: type 26 mm and you got only 24 mm between its flat sides. The Polygon now has the switch “Flat side in front” under “Sides”. It turns the polygon by half a side, so an octagon's length and width run from flat to flat, like the size of a wrench.\n\nTurning the switch keeps the body as it is, only the two numbers change with it. A hexagon then has its flat sides in front and behind instead of left and right."
+    },
+    "guide": {
+      "section": "addShape"
+    }
   }
 ]

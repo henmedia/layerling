@@ -40,6 +40,8 @@ The {{ui:shape.sector}} is a disc that you cut back with the {{ui:prop.sectorAng
 
 The {{ui:shape.polygon}} has the {{ui:prop.cornerFillet}} slider under {{ui:prop.sides}} and a drag dot on the model, like the {{ui:shape.roundedBox}}. One radius applies to every corner, for any number of sides. It is given in millimetres, so a stretched polygon keeps round corners; the largest value is where neighbouring roundings meet, and 0 is the plain polygon.
 
+{{ui:prop.polygonFlat}} turns the polygon by half a side, so that a flat side faces the front instead of a corner. Length and width are measured over the frame round the polygon: an octagon normally touches it with four corners, so both read from corner to corner; with the switch on it touches it with four flat sides and both read from flat to flat, the measure a wrench has. A hexagon then has its flat sides in front and behind instead of left and right. Turning the switch keeps the body as it is and changes the two numbers with it.
+
 ## The shape's settings
 
 As soon as a shape is selected, its settings appear on the right. At the top is the name; the pencil beside it ({{ui:outliner.rename}}) lets you type a new one. [[Enter]] keeps it, [[Esc]] cancels, and an empty name brings back the shape's default name. Further right, the padlock locks the shape against accidental moving and the eye hides it. The arrow on the far left folds the settings down to their title bar. The cards below fold open and shut with a click on their title ({{ui:inspector.properties}}, {{ui:inspector.position}}, {{ui:inspector.rotation}}, {{ui:inspector.taper}}, {{ui:inspector.twist}} and the cards of the special shapes); layerling remembers which ones you left open, for the next shape and the next visit.

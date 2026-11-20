@@ -3664,6 +3664,8 @@ export const MESSAGES_IT: Partial<Record<MessageKey, string>> = {
   "prop.screwHoleSizeCountersinkHint": "Imposta diametro del gambo e della testa per una vite svasata di questa misura: foro di passaggio medio secondo ISO 273, svasatura a 90° secondo ISO 15065. Misure in pollici da #2 a #14 secondo ASME B18.6.1 a 82°, che corrispondono anche ai gauge australiani (6-gauge = #6). La lunghezza resta invariata.",
   "prop.nutPocketSize": "Sede del dado",
   "prop.nutPocketSizeHint": "Crea una sede esagonale per un dado di questa misura (ISO 4032), più larga e profonda di 0,4 mm rispetto al dado. Cambia la forma in foro per tagliare la sede.",
+  "prop.polygonFlat": "Lato piatto davanti",
+  "prop.polygonFlatHint": "Ruota il poligono di mezzo lato, così davanti c'è un lato piatto invece di un angolo. Un ottagono si misura allora, in lunghezza e larghezza, da lato a lato e non da angolo ad angolo.",
   "prop.rimChamfer": "Smusso del bordo",
   "prop.threadsPerInch": "Filetti per pollice",
   "prop.startAngle": "Angolo iniziale",

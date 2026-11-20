@@ -3551,6 +3551,8 @@ export const MESSAGES_ZH_CN: Partial<Record<MessageKey, string>> = {
   "prop.screwHoleSizeCountersinkHint": "按此规格的沉头螺钉设置轴径和头部直径：通孔按 ISO 273 中等，锥形沉孔按 ISO 15065、90°。英制规格 #2 至 #14 按 ASME B18.6.1、82°，也对应澳大利亚的 gauge 规格（6-gauge = #6）。长度不变。",
   "prop.nutPocketSize": "螺母槽",
   "prop.nutPocketSizeHint": "把六棱柱变成此螺钉规格六角螺母（ISO 4032）的槽，比螺母宽和高 0.4 mm。设为孔即可切出螺母槽。",
+  "prop.polygonFlat": "平边朝前",
+  "prop.polygonFlatHint": "将多边形转过半条边，使朝前的是一条平边而不是一个角。这样八边形的长度和宽度就按对边之间测量，而不是按对角之间。",
   "prop.rimChamfer": "边缘倒角",
   "prop.threadsPerInch": "每英寸牙数",
   "prop.startAngle": "起始角度",

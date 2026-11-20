@@ -3600,6 +3600,8 @@ export const MESSAGES_NL: Record<MessageKey, string> = {
   "prop.screwHoleSizeCountersinkHint": "Zet schacht en kopdiameter voor een verzonken schroef van deze maat: doorlaatgat ISO 273, middel, verzinking ISO 15065 onder 90°. Inchmaten #2 tot #14 volgens ASME B18.6.1 onder 82°; ze komen ook overeen met de Australische gauges (6-gauge = #6). De lengte blijft.",
   "prop.nutPocketSize": "Moeruitsparing",
   "prop.nutPocketSizeHint": "Maakt van de zeshoek de uitsparing voor een zeskantmoer van deze schroefmaat (ISO 4032), 0,4 mm breder en hoger dan de moer. Als gat snijdt hij de uitsparing uit.",
+  "prop.polygonFlat": "Vlakke zijde naar voren",
+  "prop.polygonFlatHint": "Draait de veelhoek een halve zijde, zodat er vooraan een vlakke zijde ligt in plaats van een hoek. Een achthoek meet dan in lengte en breedte van vlak tot vlak, niet van hoek tot hoek.",
   "prop.rimChamfer": "Afschuining rand",
   "prop.threadsPerInch": "Gangen per inch",
   "prop.startAngle": "Beginhoek",

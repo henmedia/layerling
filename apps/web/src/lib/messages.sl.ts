@@ -2521,6 +2521,8 @@ export const MESSAGES_SL: Partial<Record<MessageKey, string>> = {
   "prop.screwHoleSizeCountersinkHint": "Nastavi steblo in premer glave za vijak z ugreznjeno glavo te velikosti: prehodna luknja po ISO 273, srednja, poglobitev po ISO 15065 pod 90°. Palčne velikosti od #2 do #14 po ASME B18.6.1 pod 82°; ustrezajo tudi avstralskim gauge (6-gauge = #6). Dolžina ostane.",
   "prop.nutPocketSize": "Žep za matico",
   "prop.nutPocketSizeHint": "Iz šesterokotnika naredi žep za šestrobo matico te velikosti vijaka (ISO 4032), 0,4 mm širši in višji od matice. Kot luknja izreže žep.",
+  "prop.polygonFlat": "Ravna stranica spredaj",
+  "prop.polygonFlatHint": "Mnogokotnik zasuka za pol stranice, tako da je spredaj ravna stranica namesto vogala. Osemkotnik se nato po dolžini in širini meri od stranice do stranice, ne od vogala do vogala.",
   "prop.rimChamfer": "Posnetje roba",
   "prop.threadsPerInch": "Navojev na palec",
   "prop.startAngle": "Začetni kot",

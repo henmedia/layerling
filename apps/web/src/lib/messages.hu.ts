@@ -3233,6 +3233,8 @@ export const MESSAGES_HU: Partial<Record<MessageKey, string>> = {
   "prop.screwHoleSizeCountersinkHint": "Beállítja a szárat és a fej átmérőjét egy ilyen méretű süllyesztett fejű csavarhoz: átmenő furat az ISO 273 szerint, közepes, süllyesztés az ISO 15065 szerint 90°-kal. A hossz marad.",
   "prop.nutPocketSize": "Anyafészek",
   "prop.nutPocketSizeHint": "A hatszögből fészket készít egy ilyen csavarméretű hatlapú anyához (ISO 4032), 0,4 mm-rel szélesebbet és magasabbat az anyánál. Furatként kivágja a fészket.",
+  "prop.polygonFlat": "Lapos oldal elöl",
+  "prop.polygonFlatHint": "Fél oldallal elforgatja a sokszöget, így elöl sarok helyett lapos oldal áll. A nyolcszög hossza és szélessége ekkor laptól lapig mérődik, nem saroktól sarokig.",
   "prop.rimChamfer": "Peremletörés",
   "prop.threadsPerInch": "Menet/col",
   "prop.startAngle": "Kezdőszög",

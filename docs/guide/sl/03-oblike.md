@@ -40,6 +40,8 @@ Trikotnik dobiš na dva načina: {{ui:shape.polygon}} s tremi stranicami je enak
 
 {{ui:shape.polygon}} ima pod {{ui:prop.sides}} drsnik {{ui:prop.cornerFillet}} in vlečno točko na modelu, tako kot {{ui:shape.roundedBox}}. Isti polmer velja za vse vogale, pri poljubnem številu stranic. Podan je v milimetrih, zato raztegnjen večkotnik obdrži okrogle vogale; največja vrednost je tam, kjer se sosednji zaobljitvi srečata, 0 pa je navaden večkotnik.
 
+{{ui:prop.polygonFlat}} zasuka mnogokotnik za pol stranice, tako da je spredaj ravna stranica namesto vogala. Dolžina in širina se merita na okvirju okoli mnogokotnika: osemkotnik se ga sicer dotika s štirimi vogali, zato obe meri tečeta od vogala do vogala; z vklopljenim stikalom se ga dotika s štirimi ravnimi stranicami in obe meri tečeta od stranice do stranice, kar je mera ključa. Šestkotnik ima nato ravni stranici spredaj in zadaj namesto levo in desno. Ob preklopu ostane telo takšno, kot je, številki pa se spremenita z njim.
+
 ## Nastavitve oblike
 
 Ko je oblika izbrana, se desno pokažejo njene nastavitve. Čisto na vrhu je ime; s svinčnikom ob njem ({{ui:outliner.rename}}) vpišeš novo. [[Enter]] ga sprejme, [[Esc]] prekine, prazno ime pa vrne privzeto ime oblike. Bolj desno ključavnica zaklene obliko pred nehotenim premikanjem in oko jo skrije. Puščica čisto levo zloži nastavitve do naslovne vrstice. Kartice pod tem se odprejo in zaprejo s klikom na njihov naslov ({{ui:inspector.properties}}, {{ui:inspector.position}}, {{ui:inspector.rotation}}, {{ui:inspector.taper}}, {{ui:inspector.twist}} in kartice posebnih oblik); layerling si zapomni, katere si pustil odprte, za naslednjo obliko in naslednji obisk.

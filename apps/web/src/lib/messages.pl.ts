@@ -3565,6 +3565,8 @@ export const MESSAGES_PL: Partial<Record<MessageKey, string>> = {
   "prop.screwHoleSizeCountersinkHint": "Ustawia trzpień i średnicę łba dla śruby z łbem stożkowym tego rozmiaru: otwór przelotowy wg ISO 273, średni, pogłębienie wg ISO 15065 pod kątem 90°. Rozmiary calowe od #2 do #14 wg ASME B18.6.1 pod kątem 82°; odpowiadają też australijskim gauge (6-gauge = #6). Długość zostaje.",
   "prop.nutPocketSize": "Gniazdo nakrętki",
   "prop.nutPocketSizeHint": "Zmienia sześciokąt w gniazdo nakrętki sześciokątnej tego rozmiaru śruby (ISO 4032), o 0,4 mm szersze i wyższe niż nakrętka. Jako otwór wycina gniazdo.",
+  "prop.polygonFlat": "Płaski bok z przodu",
+  "prop.polygonFlatHint": "Obraca wielokąt o pół boku, tak że z przodu jest płaski bok zamiast narożnika. Ośmiokąt mierzy się wtedy na długość i szerokość od boku do boku, a nie od narożnika do narożnika.",
   "prop.rimChamfer": "Fazka obrzeża",
   "prop.threadsPerInch": "Zwoje na cal",
   "prop.startAngle": "Kąt początkowy",

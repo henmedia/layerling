@@ -3586,6 +3586,8 @@ export const MESSAGES_FR: Partial<Record<MessageKey, string>> = {
   "prop.screwHoleSizeCountersinkHint": "Règle le fût et le diamètre de la tête pour une vis à tête fraisée de cette taille : trou de passage ISO 273, moyen, fraisure ISO 15065 à 90°. Tailles en pouces #2 à #14 selon ASME B18.6.1 à 82° ; elles correspondent aussi aux gauges australiens (6-gauge = #6). La longueur reste.",
   "prop.nutPocketSize": "Logement d'écrou",
   "prop.nutPocketSizeHint": "Fait de l'hexagone le logement d'un écrou hexagonal de cette taille de vis (ISO 4032), 0,4 mm plus large et plus haut que l'écrou. En trou, il creuse le logement.",
+  "prop.polygonFlat": "Côté plat à l'avant",
+  "prop.polygonFlatHint": "Tourne le polygone d'un demi-côté : un côté plat se trouve à l'avant au lieu d'un coin. Un octogone se mesure alors, en longueur et en largeur, de plat à plat et non de coin à coin.",
   "prop.rimChamfer": "Chanfrein de jante",
   "prop.threadsPerInch": "Fils par pouce",
   "prop.startAngle": "Angle de départ",

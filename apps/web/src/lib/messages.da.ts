@@ -3993,6 +3993,8 @@ export const MESSAGES_DA: Partial<Record<MessageKey, string>> = {
   "prop.screwHoleSizeCountersinkHint": "Sætter skaft og hoveddiameter til en undersænket skrue i denne størrelse: frigangshul efter ISO 273, middel, forsænkning efter ISO 15065 med 90°. Tommestørrelser #2 til #14 efter ASME B18.6.1 med 82°; de svarer også til de australske gauges (6-gauge = #6). Længden bliver.",
   "prop.nutPocketSize": "Møtriklomme",
   "prop.nutPocketSizeHint": "Gør sekskanten til lommen for en sekskantmøtrik i denne skruestørrelse (ISO 4032), 0,4 mm bredere og højere end møtrikken. Som hul skærer den lommen ud.",
+  "prop.polygonFlat": "Flad side fortil",
+  "prop.polygonFlatHint": "Drejer polygonen en halv side, så en flad side vender fremad i stedet for et hjørne. En ottekant måles så i længde og bredde fra flade til flade, ikke fra hjørne til hjørne.",
   "prop.rimChamfer": "Kantfas",
   "prop.threadsPerInch": "Gevind pr. tomme",
   "prop.startAngle": "Startvinkel",

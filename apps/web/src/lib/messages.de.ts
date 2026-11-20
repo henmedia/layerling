@@ -3599,6 +3599,8 @@ export const MESSAGES_DE: Record<MessageKey, string> = {
   "prop.screwHoleSizeCountersinkHint": "Setzt Schaft und Kopfdurchmesser für eine Senkkopfschraube dieser Größe: Durchgangsbohrung nach ISO 273, mittel, Senkung nach ISO 15065 mit 90°. Zollgrößen #2 bis #14 nach ASME B18.6.1 mit 82°; sie entsprechen auch den australischen Gauges (6-gauge = #6). Die Länge bleibt.",
   "prop.nutPocketSize": "Mutternaussparung",
   "prop.nutPocketSizeHint": "Macht den Sechskant zur Aussparung für eine Sechskantmutter dieser Schraubengröße (ISO 4032), 0,4 mm breiter und höher als die Mutter. Als Loch schneidet er die Aussparung aus.",
+  "prop.polygonFlat": "Flache Seite nach vorn",
+  "prop.polygonFlatHint": "Dreht den Mehrkant um eine halbe Seite, sodass vorn eine flache Seite statt einer Ecke liegt. Ein Achtkant misst dann in Länge und Breite von Fläche zu Fläche statt von Ecke zu Ecke.",
   "prop.rimChamfer": "Außenfase",
   "prop.threadsPerInch": "Gänge je Zoll",
   "prop.startAngle": "Startwinkel",

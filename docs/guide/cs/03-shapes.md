@@ -40,6 +40,8 @@ Trojúhelník získáte dvěma způsoby. {{ui:shape.polygon}} se třemi stranami
 
 {{ui:shape.polygon}} má pod {{ui:prop.sides}} posuvník {{ui:prop.cornerFillet}} a tažný bod na modelu, stejně jako {{ui:shape.roundedBox}}. Jeden poloměr platí pro všechny rohy, při libovolném počtu stran. Zadává se v milimetrech, takže natažený mnohoúhelník si zachová kulaté rohy; největší hodnota je tam, kde se sousední zaoblení dotknou, a 0 je obyčejný mnohoúhelník.
 
+{{ui:prop.polygonFlat}} otočí mnohoúhelník o půl strany, takže vpředu je plochá strana místo rohu. Délka a šířka se měří na rámu kolem mnohoúhelníku: osmiúhelník se ho jinak dotýká čtyřmi rohy, obě míry tedy jdou od rohu k rohu; se zapnutým přepínačem se ho dotýká čtyřmi plochými stranami a obě míry jdou od strany ke straně, což je rozměr klíče. Šestiúhelník má pak ploché strany vpředu a vzadu místo vlevo a vpravo. Při přepnutí zůstane těleso, jak je, a obě čísla se změní s ním.
+
 ## Nastavení tvaru
 
 Vybranému tvaru se vpravo zobrazí jeho nastavení. Nahoře je název; tužka vedle něj ({{ui:outliner.rename}}) umožní napsat nový. [[Enter]] ho ponechá, [[Esc]] zruší a prázdný název vrátí výchozí název tvaru. Dál vpravo zámek chrání tvar před nechtěným posunutím a oko ho skryje. Šipka úplně vlevo sbalí nastavení do záhlaví. Karty pod ním se otevírají a zavírají kliknutím na jejich název ({{ui:inspector.properties}}, {{ui:inspector.position}}, {{ui:inspector.rotation}}, {{ui:inspector.taper}}, {{ui:inspector.twist}} a karty zvláštních tvarů); layerling si pamatuje, které jste nechali otevřené, pro další tvar i příští návštěvu.

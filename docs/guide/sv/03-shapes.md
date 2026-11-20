@@ -40,6 +40,8 @@ En triangel får du på två sätt: {{ui:shape.polygon}} med tre sidor är en li
 
 {{ui:shape.polygon}} har reglaget {{ui:prop.cornerFillet}} under {{ui:prop.sides}} och en dragpunkt på modellen, precis som {{ui:shape.roundedBox}}. En enda radie gäller för alla hörn, oavsett antal sidor. Den anges i millimeter, så en utsträckt polygon behåller runda hörn; det största värdet är där angränsande rundningar möts, och 0 är den vanliga polygonen.
 
+{{ui:prop.polygonFlat}} vrider polygonen en halv sida, så att en plan sida vänder framåt i stället för ett hörn. Längd och bredd mäts på ramen runt polygonen: en åttahörning rör den annars med fyra hörn, så båda måtten går från hörn till hörn; med reglaget på rör den ramen med fyra plana sidor och båda måtten går från plan sida till plan sida, alltså nyckelvidden. En sexhörning har då sina plana sidor fram och bak i stället för till vänster och höger. När du växlar förblir kroppen som den är och de två talen följer med.
+
 ## Formens inställningar
 
 Så snart en form är markerad visas dess inställningar till höger. Överst står namnet; med pennan bredvid ({{ui:outliner.rename}}) skriver du in ett nytt. [[Enter]] sparar det, [[Esc]] avbryter och ett tomt namn ger tillbaka formens standardnamn. Längre åt höger låser hänglåset formen mot oavsiktlig flytt och ögat döljer den. Pilen längst till vänster fäller ihop inställningarna till bara rubrikraden. Korten nedanför fälls upp och igen med ett klick på sin rubrik ({{ui:inspector.properties}}, {{ui:inspector.position}}, {{ui:inspector.rotation}}, {{ui:inspector.taper}}, {{ui:inspector.twist}} samt specialformernas egna kort); layerling kommer ihåg vilka du har lämnat öppna, till nästa form och nästa besök.

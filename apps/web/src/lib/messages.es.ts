@@ -3679,6 +3679,8 @@ export const MESSAGES_ES: Partial<Record<MessageKey, string>> = {
   "prop.screwHoleSizeCountersinkHint": "Ajusta el vástago y el diámetro de la cabeza para un tornillo avellanado de este tamaño: agujero pasante ISO 273, medio, avellanado ISO 15065 a 90°. Tamaños en pulgadas #2 a #14 según ASME B18.6.1 a 82°; equivalen también a los gauges australianos (6-gauge = #6). La longitud se mantiene.",
   "prop.nutPocketSize": "Alojamiento de tuerca",
   "prop.nutPocketSizeHint": "Convierte el hexágono en el alojamiento de una tuerca hexagonal de este tamaño de tornillo (ISO 4032), 0,4 mm más ancho y alto que la tuerca. Como agujero, recorta el alojamiento.",
+  "prop.polygonFlat": "Lado plano al frente",
+  "prop.polygonFlatHint": "Gira el polígono medio lado, de modo que al frente queda un lado plano en lugar de una esquina. Un octógono se mide entonces en longitud y anchura de lado a lado, no de esquina a esquina.",
   "prop.rimChamfer": "Chaflán del borde",
   "prop.threadsPerInch": "Hilos por pulgada",
   "prop.startAngle": "Ángulo inicial",

@@ -3671,6 +3671,8 @@ export const MESSAGES_SV: Partial<Record<MessageKey, string>> = {
   "prop.screwHoleSizeCountersinkHint": "Ställer in skaft och skalldiameter för en försänkt skruv i den här storleken: frigående hål enligt ISO 273, medel, och försänkning enligt ISO 15065 på 90°. Tumstorlekar #2 till #14 enligt ASME B18.6.1 på 82°; de motsvarar också de australiska måtten (6-gauge = #6). Längden behålls.",
   "prop.nutPocketSize": "Mutterficka",
   "prop.nutPocketSizeHint": "Gör sexkanten till en ficka för en sexkantsmutter för den här skruvstorleken (ISO 4032), 0,4 mm bredare och högre än muttern. Ändra den till ett hål för att skära ut fickan.",
+  "prop.polygonFlat": "Plan sida framåt",
+  "prop.polygonFlatHint": "Vrider polygonen en halv sida, så att en plan sida vänder framåt i stället för ett hörn. En åttahörning mäts då i längd och bredd från plan sida till plan sida, inte från hörn till hörn.",
   "prop.rimChamfer": "Kantfasning",
   "prop.threadsPerInch": "Gängor per tum",
   "prop.startAngle": "Startvinkel",
