@@ -30,6 +30,7 @@ import {
   RACK_SLOT_WIDTH,
   RACK_STANDARD_PANELS,
   holeHasHead,
+  holePatternCutsAtEdge,
   holeTiltApplies,
   holeHeadDepth,
   holeHeadSize,
@@ -69,6 +70,7 @@ export function HolePatternPanel({
   ring,
   roundFace,
   rack,
+  edgeCut,
   wall,
   customChoices,
   customIsHole,
@@ -92,6 +94,8 @@ export function HolePatternPanel({
   roundFace?: boolean;
   /** 19" rack holes: how the slots came out on the picked face, or why there are none. */
   rack?: RackFit;
+  /** The face's edge cuts the holes: how many holes inside leave a strip to it thinner than the walls between holes. */
+  edgeCut?: { thin: number; wall: number };
   /** A round wall picked (#1393): its diameter, and round a closed one how many holes a row holds at what step. */
   wall?: { diameter: number; closed: boolean; columns?: number; spacing?: number };
   /** Own shape (#1235): the other objects of the scene that can be repeated, and whether the chosen one is a hole. */
@@ -526,6 +530,17 @@ export function HolePatternPanel({
         length
         onChange={(value) => onChange({ margin: value })}
       />}
+      {/* Under the distance it follows from: at 0 the edge cuts the plain through holes off instead of leaving them out. */}
+      {pattern && !wall && holePatternCutsAtEdge(settings) ? (
+        <p className="hole-pattern-mounting-note">
+          {[
+            t("holePattern.edgeCut"),
+            ready && edgeCut && edgeCut.thin > 0
+              ? t(edgeCut.thin === 1 ? "holePattern.edgeCutThin.one" : "holePattern.edgeCutThin.many", { count: edgeCut.thin, wall: millimetres(edgeCut.wall) })
+              : "",
+          ].filter(Boolean).join(" ")}
+        </p>
+      ) : null}
       {/* Under the distance it belongs to: whether it counts to the holes' edge or to their middles. */}
       {screws ? (
         <label className="edge-modifier-check">

@@ -15162,6 +15162,7 @@ export function LayerlingEditor({
           holes: plan.holes.length,
           settings,
           ...(plan.ring ? { ring: { length: Number(plan.ring.length.toFixed(2)), onCorners: plan.ring.onCorners } } : {}),
+          ...(plan.edgeCut ? { edgeCut: { thin: plan.edgeCut.thin, wall: Number(plan.edgeCut.wall.toFixed(2)) } } : {}),
           ...(plan.wall ? {
             wall: {
               diameter: Number(plan.wall.diameter.toFixed(2)),
@@ -20874,6 +20875,7 @@ export function LayerlingEditor({
           ring={holePatternPreview?.ring}
           roundFace={Boolean(holePatternPreview?.roundFace)}
           rack={holePatternPreview?.rack}
+          edgeCut={holePatternPreview?.edgeCut}
           wall={holePatternTool.face && isRoundWallFace(holePatternTool.face) ? holePatternPreview?.wall ?? { diameter: holePatternTool.face.round.radius * 2, closed: holePatternTool.face.round.outline.closed } : undefined}
           customChoices={holePatternCustomChoices(shapes, holePatternTool.sourceId).map((shape) => ({ id: shape.id, name: displayShapeName(shape) }))}
           customIsHole={Boolean(holePatternCustom?.hole)}

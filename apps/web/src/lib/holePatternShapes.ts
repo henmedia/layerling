@@ -482,6 +482,8 @@ export type HolePatternPlan = {
   roundFace?: boolean;
   /** 19" rack holes: how the slots came out on the face, or why there are none. */
   rack?: RackFit;
+  /** The face's edge cuts the holes (Discussion #1771): how many thin strips it keeps to holes inside, and the wall it is measured by. */
+  edgeCut?: { thin: number; wall: number };
   /** On a round wall (#1393): its diameter, whether it goes all the way round, and then how many holes a row holds at what step. */
   wall?: { diameter: number; closed: boolean; columns?: number; spacing?: number };
 };
@@ -546,10 +548,10 @@ export function holePatternShapes(
   if (settings.form === "custom" && !custom) return { holes: [], tooMany: false };
   const tilt = holeTiltRadians(settings);
   const wall = face.wall ?? face.thickness;
-  const { centers, tooMany, ring, roundFace, rack } = holePatternCenters(face.outline, settings, tilt === 0 ? 0 : wall);
+  const { centers, tooMany, ring, roundFace, rack, edgeCut } = holePatternCenters(face.outline, settings, tilt === 0 ? 0 : wall);
   // The slots lie along the panel's width, however the face's frame runs.
   if (forRack && rack) settings = rackSlotSettings(settings, rack.angle);
-  if (tooMany || centers.length === 0) return { holes: [], tooMany, ...(ring ? { ring } : {}), ...(roundFace ? { roundFace } : {}), ...(rack ? { rack } : {}) };
+  if (tooMany || centers.length === 0) return { holes: [], tooMany, ...(ring ? { ring } : {}), ...(roundFace ? { roundFace } : {}), ...(rack ? { rack } : {}), ...(edgeCut ? { edgeCut } : {}) };
 
   if (settings.form === "custom" && custom) {
     // A copy of the shape stands upright on every place, turned with the face: a body a little sunk in so it joins, a
@@ -636,7 +638,7 @@ export function holePatternShapes(
     const placed = { ...sized, ...placementPatchForNewShape(sized, holeFrame, base), ...(previewIdPrefix ? { id: `${previewIdPrefix}-${index}` } : {}) };
     return canonicalizeShape(withHoleMode(placed, true));
   });
-  return { holes, tooMany: false, ...(ring ? { ring } : {}), ...(roundFace ? { roundFace } : {}), ...(rack ? { rack } : {}) };
+  return { holes, tooMany: false, ...(ring ? { ring } : {}), ...(roundFace ? { roundFace } : {}), ...(rack ? { rack } : {}), ...(edgeCut ? { edgeCut } : {}) };
 }
 
 /**

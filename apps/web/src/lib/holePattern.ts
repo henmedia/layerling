@@ -536,6 +536,11 @@ export type HolePatternResult = {
   roundFace?: boolean;
   /** 19" rack holes: how the slots came out on the face, or why there are none. */
   rack?: RackFit;
+  /**
+   * The edge cuts the holes (`holePatternCutsAtEdge`): holes reaching past it are cut off there instead of left out.
+   * `thin` counts the holes inside the face that leave a strip to its edge thinner than the walls between holes.
+   */
+  edgeCut?: { thin: number; wall: number };
 };
 
 /** The panel heights of IEC 60297-3-100 (table 1): the height, and the distance between the upper and lower holes. */
@@ -733,7 +738,11 @@ function bestLattice(
   pitchV: number,
   staggered: boolean,
   fits: (c: Point2) => boolean,
-): { centers: Point2[]; rows: number } | null {
+  /** Cut off at the edge: how many of these holes leave a thin strip to it; the way with fewest wins, then the most holes. */
+  thinOf?: (centers: Point2[]) => number,
+  /** Where to try the lattice, moved off the face's middle; by default on a hole or between holes along each axis. */
+  shifts?: readonly Point2[],
+): { centers: Point2[]; rows: number; thin: number } | null {
   const centerU = (bounds.minU + bounds.maxU) / 2;
   const centerV = (bounds.minV + bounds.maxV) / 2;
   const halfSpanU = Math.ceil((bounds.maxU - bounds.minU) / 2 / pitchU) + 1;
@@ -741,7 +750,8 @@ function bestLattice(
   if ((halfSpanU * 2 + 1) * (halfSpanV * 2 + 1) > MAX_CANDIDATES) return null;
   let best: Point2[] = [];
   let bestRows = 0;
-  const offsets = [
+  let bestThin = Infinity;
+  const offsets = shifts ?? [
     { u: 0, v: 0 },
     { u: pitchU / 2, v: 0 },
     { u: 0, v: pitchV / 2 },
@@ -760,12 +770,97 @@ function bestLattice(
         }
       }
     }
-    if (found.length > best.length) {
+    const thin = thinOf ? thinOf(found) : 0;
+    if (thin < bestThin || (thin === bestThin && found.length > best.length)) {
       best = found;
       bestRows = rowsUsed.size;
+      bestThin = thin;
     }
   }
-  return { centers: best, rows: bestRows };
+  return { centers: best, rows: bestRows, thin: Number.isFinite(bestThin) ? bestThin : 0 };
+}
+
+/**
+ * Whether the face's edge cuts the holes (Discussion #1771): with no distance to the edge, the plain holes of a pattern
+ * that go through the body run on past the edge and are cut off by it, so a grille or a honeycomb reaches right to the
+ * edge without a solid strip round it. Screw holes with a head, own shapes, blind holes and a round wall keep to the face.
+ */
+export function holePatternCutsAtEdge(settings: Pick<HolePatternSettings, "arrangement" | "form" | "margin" | "depth"> & Partial<Pick<HolePatternSettings, "holeType">>) {
+  if (settings.arrangement !== "grid" && settings.arrangement !== "staggered") return false;
+  if (settings.form === "custom" || holeHasHead(settings)) return false;
+  return settings.depth === null && !(settings.margin > EPSILON);
+}
+
+/** How far a hole cut off by the edge must reach into the face at least, so it does not leave a bare scratch. */
+const EDGE_CUT_MIN_BITE = 0.4;
+/** A hole this close to the edge counts as touching it, with no strip between. */
+const EDGE_CUT_TOUCH = 0.01;
+/** The finer steps the lattice is moved in across one step each way, when laid about the middle it leaves thin strips. */
+const EDGE_CUT_SHIFT_STEPS = 12;
+/** About how much work that may take, holes times the edges of the face: past it the steps are halved, then left out. */
+const EDGE_CUT_SHIFT_BUDGET = 1200000;
+
+/**
+ * A hole cut off by the edge: kept when some part of it lies on the face at least `EDGE_CUT_MIN_BITE` from every edge,
+ * or when it lies wholly on the face.
+ */
+function edgeCutFitter(inside: (point: Point2) => boolean, segments: readonly Segment[], footprint: readonly Point2[], whole: (c: Point2) => boolean) {
+  const bite = EDGE_CUT_MIN_BITE;
+  const radius = footprint.reduce((most, point) => Math.max(most, Math.hypot(point.u, point.v)), 0);
+  const nearestEdge = (point: Point2, within: number) => {
+    let nearest = within;
+    for (const segment of segments) {
+      if (segment.maxU < point.u - nearest || segment.minU > point.u + nearest || segment.maxV < point.v - nearest || segment.minV > point.v + nearest) continue;
+      nearest = Math.min(nearest, pointSegmentDistance(point, segment.a, segment.b));
+    }
+    return nearest;
+  };
+  // Points spread over the hole: its corners and the middles of its sides (at most 16 of them), and halfway out to those.
+  const rim = footprint.flatMap((corner, index) => {
+    const next = footprint[(index + 1) % footprint.length];
+    return [corner, { u: (corner.u + next.u) / 2, v: (corner.v + next.v) / 2 }];
+  });
+  const every = Math.max(1, Math.ceil(rim.length / 16));
+  const spread = rim.filter((_, index) => index % every === 0);
+  const samples = [...spread, ...spread.map((point) => ({ u: point.u / 2, v: point.v / 2 }))];
+  return (c: Point2) => {
+    // Most holes are settled by their middle alone: well on the face, or so far off it that no part reaches it.
+    const edge = nearestEdge(c, radius + bite);
+    const onFace = inside(c);
+    if (onFace && edge >= bite) return true;
+    if (!onFace && edge >= radius) return false;
+    if (whole(c)) return true;
+    return samples.some((sample) => {
+      const point = { u: c.u + sample.u, v: c.v + sample.v };
+      return inside(point) && nearestEdge(point, bite) >= bite;
+    });
+  };
+}
+
+/**
+ * Counts the holes wholly on the face that come closer to its edge than `wall` without reaching it: there the edge
+ * keeps a strip thinner than the walls between the holes, which prints or cuts poorly.
+ */
+function thinStripCounter(segments: readonly Segment[], footprint: readonly Point2[], whole: (c: Point2) => boolean, wall: number) {
+  let reach = wall;
+  for (const corner of footprint) reach = Math.max(reach, Math.hypot(corner.u, corner.v) + wall);
+  return (centers: Point2[]) => {
+    if (!(wall > EDGE_CUT_TOUCH)) return 0;
+    let thin = 0;
+    for (const c of centers) {
+      if (!whole(c)) continue;
+      const placed = footprint.map((corner) => ({ u: c.u + corner.u, v: c.v + corner.v }));
+      let gap = Infinity;
+      for (const segment of segments) {
+        if (segment.maxU < c.u - reach || segment.minU > c.u + reach || segment.maxV < c.v - reach || segment.minV > c.v + reach) continue;
+        for (let i = 0; i < placed.length; i += 1) {
+          gap = Math.min(gap, segmentSegmentDistance(segment.a, segment.b, placed[i], placed[(i + 1) % placed.length]));
+        }
+      }
+      if (gap > EDGE_CUT_TOUCH && gap < wall - EPSILON) thin += 1;
+    }
+    return thin;
+  };
 }
 
 /**
@@ -916,6 +1011,31 @@ export function holePatternCenters(
     if (ring.tooMany) return { ...empty, tooMany: true };
     const centers = ring.centers.filter(fits);
     return { centers, tooMany: false, rows: centers.length ? 1 : 0, ring: { length: ring.length, onCorners: ring.onCorners } };
+  }
+
+  if (holePatternCutsAtEdge(settings)) {
+    // The edge cuts the holes: those reaching past it stay, and of the ways to lay the lattice the one leaving the
+    // fewest thin strips along the edge wins.
+    const inside = (point: Point2) => insideRegion(loops, point);
+    const wall = holePatternWall(settings);
+    const bounds = { minU, maxU, minV, maxV };
+    const keep = edgeCutFitter(inside, segments, footprint, fits);
+    const thinOf = thinStripCounter(segments, footprint, fits, wall);
+    let cut = bestLattice(bounds, pitchU, pitchV, staggered, keep, thinOf);
+    if (!cut) return { ...empty, tooMany: true };
+    // Laid evenly about the middle, a staggered row often keeps a thin strip whichever way: then the lattice is moved
+    // in finer steps across one step each way, and the place with the fewest thin strips (then the most holes) wins.
+    if (cut.thin > 0) {
+      // About the work of one lattice, so a big face or a long curved outline stays quick: finer steps only as far as that allows.
+      const work = Math.max(1, cut.centers.length) * Math.max(1, segments.length);
+      const steps = [EDGE_CUT_SHIFT_STEPS, EDGE_CUT_SHIFT_STEPS / 2].find((count) => work * count * count <= EDGE_CUT_SHIFT_BUDGET) ?? 0;
+      const shifts: Point2[] = [];
+      for (let i = 0; i < steps; i += 1) for (let j = 0; j < steps; j += 1) shifts.push({ u: (pitchU * i) / steps, v: (pitchV * j) / steps });
+      const moved = shifts.length ? bestLattice(bounds, pitchU, pitchV, staggered, keep, thinOf, shifts) : null;
+      if (moved && (moved.thin < cut.thin || (moved.thin === cut.thin && moved.centers.length > cut.centers.length))) cut = moved;
+    }
+    if (cut.centers.length > (settings.allowMany ? HOLE_PATTERN_MANY_HOLES : HOLE_PATTERN_MAX_HOLES)) return { centers: [], tooMany: true, rows: 0 };
+    return { centers: cut.centers, tooMany: false, rows: cut.rows, edgeCut: { thin: cut.thin, wall } };
   }
 
   const lattice = bestLattice({ minU, maxU, minV, maxV }, pitchU, pitchV, staggered, fits);
