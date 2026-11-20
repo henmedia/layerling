@@ -15957,6 +15957,19 @@ html[data-theme="dark"] .theme-check {
   height: 9px;
 }
 
+/* In a row of the object list the swatch is a button: it selects every shape of its colour (Discussion #1839). */
+button.outliner-swatch {
+  padding: 0;
+  cursor: pointer;
+  appearance: none;
+}
+
+button.outliner-swatch:hover,
+button.outliner-swatch:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 1px;
+}
+
 .outliner-info {
   flex: 1;
   min-width: 0;

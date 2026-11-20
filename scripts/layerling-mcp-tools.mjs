@@ -455,13 +455,14 @@ export const tools = [
   },
   {
     name: "layerling_select_objects",
-    description: "Select objects by id in the Layerling editor. With invert true it is the editor's \"Invert selection\" (Discussion #1472): every visible object except these ids is selected (without ids: except the current selection, so nothing selected gives every visible object); hidden objects and reference images stay out, as with Select all. The answer has selectedIds and the objects.",
+    description: "Select objects by id in the Layerling editor. With invert true it is the editor's \"Invert selection\" (Discussion #1472): every visible object except these ids is selected (without ids: except the current selection, so nothing selected gives every visible object); hidden objects and reference images stay out, as with Select all. With sameColor true it is the editor's \"Select same colour\" (Discussion #1839): every visible object in the colour of these ids is selected (without ids: in the colours of the current selection); holes have no colour and go together, so the id of a hole selects every visible hole. The answer has selectedIds and the objects.",
     inputSchema: {
       ...editorTargetSchema,
       properties: {
         ...editorTargetSchema.properties,
         ids: { type: "array", items: { type: "string" } },
         invert: { type: "boolean", description: "Select every visible object except the ids given (or except the current selection when ids are left out)." },
+        sameColor: { type: "boolean", description: "Select every visible object that has the colour of one of the ids given (or of the current selection when ids are left out). Fails without ids and without a selection." },
       },
     },
   },

@@ -27,6 +27,8 @@ export interface ObjectListPanelProps {
   shapes: WorkplaneShape[];
   selectedIds: string[];
   onSelectShape: (id: string | string[], mode?: "replace" | "toggle") => void;
+  /** A click on a row's colour swatch selects every visible shape of that colour; `add` keeps the selection (Discussion #1839). */
+  onSelectSameColor?: (id: string, add: boolean) => void;
   onToggleLock: (id: string) => void;
   /** Puts the shape lock on a part or takes it off with the shield in its row (#1277). */
   onToggleShapeLock?: (id: string) => void;
@@ -81,6 +83,7 @@ export function ObjectListPanel({
   shapes,
   selectedIds,
   onSelectShape,
+  onSelectSameColor,
   onToggleLock,
   onToggleShapeLock,
   onToggleHidden,
@@ -552,11 +555,27 @@ export function ObjectListPanel({
                         <span className="outliner-expand-spacer" />
                       )}
 
-                      <span
-                        className={`outliner-swatch ${shape.hole ? "swatch-hole" : ""}`}
-                        style={{ backgroundColor: shape.hole ? undefined : shape.color }}
-                        title={shape.hole ? t("outliner.hole") : t("outliner.solid")}
-                      />
+                      {onSelectSameColor ? (
+                        // The swatch selects every visible shape of its colour; Ctrl, Cmd or Shift adds them (Discussion #1839).
+                        <button
+                          type="button"
+                          className={`outliner-swatch ${shape.hole ? "swatch-hole" : ""}`}
+                          style={{ backgroundColor: shape.hole ? undefined : shape.color }}
+                          title={t("outliner.selectSameColor")}
+                          aria-label={t("outliner.selectSameColor")}
+                          data-testid="outliner-same-colour"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            onSelectSameColor(shape.id, e.ctrlKey || e.metaKey || e.shiftKey);
+                          }}
+                        />
+                      ) : (
+                        <span
+                          className={`outliner-swatch ${shape.hole ? "swatch-hole" : ""}`}
+                          style={{ backgroundColor: shape.hole ? undefined : shape.color }}
+                          title={shape.hole ? t("outliner.hole") : t("outliner.solid")}
+                        />
+                      )}
 
                       <div className="outliner-info">
                         {editingId === shape.id ? (

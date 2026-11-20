@@ -15,6 +15,7 @@ import { getLanguage, numberLocale, t, type MessageKey } from "@/lib/i18n";
 import { guideHref } from "@/lib/guideLinks";
 import { largeMeshWarningTriangles } from "@/lib/largeMeshes";
 import { isObjectListOrder, moveShapeBefore, sortObjectList } from "@/lib/objectListSearch";
+import { shapesOfSameColor } from "@/lib/selectSameColor";
 import { useLanguage } from "@/lib/useLanguage";
 import { loftShapePatch, normalizeLoftMiddles, type LoftMeasures } from "@/lib/loftGeometry";
 import { hingePartScope, hingeWorldParts } from "@/lib/hingeParts";
@@ -4436,6 +4437,23 @@ export function LayerlingEditor({
     selectedIdsRef.current = next;
     setNotice(next.length === 0 ? t("status.invertedNone") : next.length === 1 ? t("status.invertedOne") : t("status.invertedMany", { count: next.length }));
     return next;
+  }, []);
+  // Select same colour (Discussion #1839): every visible part in the colour of these (without ids: of the selection),
+  // as Select all counts them; holes go together. `add` keeps what is selected. The object list's swatch, the
+  // right-click menu, the command search and MCP's select_objects with sameColor all go through here.
+  const selectSameColor = useCallback((fromIds?: string[], add = false): string[] => {
+    const matches = shapesOfSameColor(shapesRef.current, fromIds ?? selectedIdsRef.current);
+    if (matches.length === 0) {
+      // A hidden part with no visible one in its colour: the selection stays.
+      setNotice(t("status.sameColorOne"));
+      return [];
+    }
+    const kept = add ? selectedIdsRef.current.filter((id) => !matches.includes(id)) : [];
+    const next = [...kept, ...matches];
+    setSelectedIds(next);
+    selectedIdsRef.current = next;
+    setNotice(matches.length === 1 ? t("status.sameColorOne") : t("status.sameColorMany", { count: matches.length }));
+    return matches;
   }, []);
   const effectiveAlignAnchorId = useMemo(
     () => effectiveAlignmentAnchorId(selectedShapes, alignAnchorId),
@@ -14381,6 +14399,16 @@ export function LayerlingEditor({
           const nextIds = invertSelection(params.ids === undefined && params.id === undefined ? undefined : requestedIds);
           return { selectedIds: nextIds, objects: currentShapes().filter((shape) => nextIds.includes(shape.id)).map(mcpShapeSummary) };
         }
+        if (params.sameColor === true) {
+          // Select same colour (Discussion #1839), the editor's own command: every visible object in the colour of these.
+          const unknownId = requestedIds.find((id) => !currentShapes().some((shape) => shape.id === id));
+          if (unknownId) throw new Error(`No object with the id ${unknownId}`);
+          const fromIds = params.ids === undefined && params.id === undefined ? selectedIdsRef.current : requestedIds;
+          if (fromIds.length === 0) throw new Error("sameColor needs ids or a selection to take the colour from");
+          const nextIds = selectSameColor(fromIds);
+          if (nextIds.length === 0) throw new Error("No visible object has this colour");
+          return { selectedIds: nextIds, objects: currentShapes().filter((shape) => nextIds.includes(shape.id)).map(mcpShapeSummary) };
+        }
         const validIds = requestedIds.filter((id) => currentShapes().some((shape) => shape.id === id));
         setSelectedIds(validIds);
         selectedIdsRef.current = validIds;
@@ -18042,6 +18070,7 @@ export function LayerlingEditor({
     makeSwallowtailKeys,
     splitGridfinityPlate,
     invertSelection,
+    selectSameColor,
     hideOthers,
     fitBodyToNeck,
   ]);
@@ -20166,6 +20195,8 @@ export function LayerlingEditor({
       { key: "duplicate", label: t("common.duplicate"), shortcut: "Ctrl+D", onSelect: duplicateSelected },
       { key: "copy", label: t("editor.tool.copy"), shortcut: "Ctrl+C", onSelect: copySelected },
       { key: "invertSelection", label: t("contextMenu.invertSelection"), onSelect: () => { invertSelection(); } },
+      // Every visible part in the colour of the selected ones (Discussion #1839).
+      { key: "selectSameColor", label: t("contextMenu.selectSameColor"), onSelect: () => { selectSameColor(); } },
       { key: "selectMultiple", label: t("contextMenu.selectMultiple"), onSelect: startMultiSelect },
       ...selectOther,
     ];
@@ -20411,6 +20442,7 @@ export function LayerlingEditor({
         onShowHidden={showHidden}
         onHideOthers={() => { hideOthers(); }}
         onInvertSelection={() => { invertSelection(); }}
+        onSelectSameColor={() => { selectSameColor(); }}
         onToggleHidden={toggleHidden}
         onUngroup={ungroupSelected}
         onUndo={undo}
@@ -20495,6 +20527,7 @@ export function LayerlingEditor({
             shapes={historyViewState?.shapes ?? shapes}
             selectedIds={historyViewState ? [] : selectedIds}
             onSelectShape={selectShape}
+            onSelectSameColor={(id, add) => { selectSameColor([id], add); }}
             onToggleLock={toggleShapeLockById}
             onToggleShapeLock={toggleShapeLockOfShapeById}
             onToggleHidden={toggleShapeHiddenById}

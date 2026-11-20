@@ -7500,6 +7500,11 @@ html[data-theme="dark"]:where([data-palette="graphite"]) .theme-check {
   border: 1px dashed #7a889b;
 }
 
+:where(html[data-theme="dark"][data-palette="graphite"]) button.outliner-swatch:hover,
+:where(html[data-theme="dark"][data-palette="graphite"]) button.outliner-swatch:focus-visible {
+  outline: 2px solid var(--primary);
+}
+
 :where(html[data-theme="dark"][data-palette="graphite"]) .outliner-shape-name {
   color: #2e2e2e;
 }
