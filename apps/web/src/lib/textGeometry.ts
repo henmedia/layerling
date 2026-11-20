@@ -17,6 +17,11 @@ export const MAX_TEXT_RADIUS = 500;
 /** Longest arc the lettering may take, as a share of the full circle - leaves a gap so the ends never meet. */
 const MAX_ARC_SHARE = 0.84;
 
+/** Curved text that closes its circle (#1840): a line of letters only, a column of upright letters has no such thing. */
+export function textClosesCircle(shape: Pick<WorkplaneShape, "textCurved" | "textVertical" | "textFullCircle">): boolean {
+  return Boolean(shape.textCurved && shape.textFullCircle && !shape.textVertical);
+}
+
 function clamp(value: number, min: number, max: number): number {
   return Math.min(max, Math.max(min, value));
 }
@@ -488,16 +493,25 @@ export function curvedTextLayout(shape: WorkplaneShape) {
   const advanceAt = (char: string, letterSize: number) => advanceOf(font, char, letterSize) + (stretch - 1) * advanceOf(baseFont, char, letterSize);
 
   // Too long for the circle: shrink the letters rather than let the ends overlap.
-  const naturalLength = chars.reduce((sum, char, index) => sum + advanceAt(char, size) + (index + 1 < chars.length ? kernBetween(font, char, chars[index + 1], size) : 0), 0);
-  const maxLength = 2 * Math.PI * radius * MAX_ARC_SHARE;
+  const lineLength = (letterSize: number) => chars.reduce((sum, char, index) => sum + advanceAt(char, letterSize) + (index + 1 < chars.length ? kernBetween(font, char, chars[index + 1], letterSize) : 0), 0);
+  // All the way round (#1840): the line closes the circle. Between the last letter and the first lies what lies between
+  // two words - a space, when the text has any - and the room left over is shared out evenly behind every character, so
+  // the join looks like every other gap ("1 2 3 ... 31" as a date ring). The join lies opposite the middle of the line.
+  const closing = textClosesCircle(shape);
+  const joinSpace = (letterSize: number) => (closing && chars.some((char) => !char.trim()) ? advanceAt(" ", letterSize) : 0);
+  const circle = 2 * Math.PI * radius;
+  const naturalLength = lineLength(size) + joinSpace(size);
+  const maxLength = closing ? circle : circle * MAX_ARC_SHARE;
   if (naturalLength > maxLength) size *= maxLength / naturalLength;
+  const slots = chars.length + (joinSpace(size) > 0 ? 1 : 0);
+  const spread = closing ? Math.max(0, circle - lineLength(size) - joinSpace(size)) / Math.max(1, slots) : 0;
 
   // Upside down: the straight line turned over before it is bent - the letters
   // swap order and each turns half round about the middle of the capital band,
   // so the line keeps its place on the circle and reads from the other side.
   const flipped = Boolean(shape.textFlipped);
   const ordered = flipped ? [...chars].reverse() : chars;
-  const advances = ordered.map((char) => advanceAt(char, size));
+  const advances = ordered.map((char) => advanceAt(char, size) + spread);
   // Kerning (#1297) between neighbours, taken in reading order: upside down the line runs the other way round.
   const kerns = ordered.map((char, index) => {
     const next = ordered[index + 1];
@@ -640,7 +654,7 @@ const footprintCache = new Map<string, { width: number; depth: number }>();
 
 /** The width and depth curved text takes at its own radius and letter size. */
 export function curvedTextFootprint(shape: WorkplaneShape): { width: number; depth: number } {
-  const key = JSON.stringify([textOf(shape), shape.font ?? "Multilanguage", customFontRevision(shape.font), curvedSize(shape), curvedRadius(shape), Boolean(shape.textInward), Boolean(shape.textFlipped), Boolean(shape.textVertical), shape.bevel ?? 0, textSpacingOf(shape), Boolean(shape.textKerning), textLetterWidthOf(shape)]);
+  const key = JSON.stringify([textOf(shape), shape.font ?? "Multilanguage", customFontRevision(shape.font), curvedSize(shape), curvedRadius(shape), Boolean(shape.textInward), Boolean(shape.textFlipped), Boolean(shape.textVertical), shape.bevel ?? 0, textSpacingOf(shape), Boolean(shape.textKerning), textLetterWidthOf(shape), textClosesCircle(shape)]);
   const cached = footprintCache.get(key);
   if (cached) return cached;
   const geometry = buildCurvedText({ ...shape, height: 1 });
@@ -663,7 +677,7 @@ function straightTextExtent(shape: WorkplaneShape) {
   return extent;
 }
 
-const CURVE_KEYS = ["textCurved", "textVertical", "textRadius", "textInward", "textFlipped", "textSize", "text", "font", "bevel", "textStroke", "textSpacing", "textKerning", "textLetterWidth"] as const;
+const CURVE_KEYS = ["textCurved", "textVertical", "textRadius", "textInward", "textFlipped", "textSize", "text", "font", "bevel", "textStroke", "textSpacing", "textKerning", "textLetterWidth", "textFullCircle"] as const;
 
 /**
  * Keeps curved text and its box in step. Straight text simply fills its box;
@@ -731,6 +745,8 @@ export function curvedTextPatch(shape: WorkplaneShape, patch: Partial<WorkplaneS
  * other way by the change of radius, turned and mirrored as the shape is.
  */
 export function curvedRadiusPatch(shape: WorkplaneShape, textRadius: number): Partial<WorkplaneShape> {
+  // A closed circle (#1840) has no middle letter to hold in place: it grows about its centre.
+  if (textClosesCircle(shape)) return { textRadius };
   const change = curvedRadius({ ...shape, textRadius }) - curvedRadius(shape);
   const side = shape.textInward ? 1 : -1;
   const middle = shape.textVertical ? new THREE.Vector3(side, 0, 0) : new THREE.Vector3(0, 0, side);

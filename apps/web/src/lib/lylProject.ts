@@ -1456,6 +1456,10 @@ function validateShapeDefinition(definition: Record<string, unknown>, label: str
   if (definition.textLetterWidth !== undefined && !(typeof definition.textLetterWidth === "number" && Number.isFinite(definition.textLetterWidth) && definition.textLetterWidth >= 25 && definition.textLetterWidth <= 400)) {
     throw new Error(`${label}.textLetterWidth must be a number from 25 to 400`);
   }
+  // Curved text that closes its circle (#1840).
+  if (definition.textFullCircle !== undefined && typeof definition.textFullCircle !== "boolean") {
+    throw new Error(`${label}.textFullCircle must be true or false`);
+  }
   // The top edge of a text's letters (#225): round or chamfer, with a size.
   if (definition.textEdge !== undefined && !normalizeTextEdge(definition.textEdge)) {
     throw new Error(`${label}.textEdge must be a round or chamfer edge with a size`);

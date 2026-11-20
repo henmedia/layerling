@@ -1568,6 +1568,12 @@ export type WorkplaneShape = {
    */
   textLetterWidth?: number;
   /**
+   * Curved text only (#1840): the line closes the circle - the letters are spread evenly over all of it, so the gap
+   * between the last and the first is the same as between the others (a date ring, a dial). Text too long for the
+   * circle gets smaller letters instead. Not for a column of upright letters (textVertical).
+   */
+  textFullCircle?: boolean;
+  /**
    * Text only (#225): the top edge of the letters rounded or chamfered by `size` mm, as a name
    * tag's letters on top are finished. Built from the outline stepped inwards, so it works for
    * every font and word; the edge tool takes such a text as a mesh.

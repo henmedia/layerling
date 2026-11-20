@@ -14898,6 +14898,8 @@ export function LayerlingEditor({
             if (!Number.isFinite(letterWidth) || letterWidth < MIN_TEXT_LETTER_WIDTH || letterWidth > MAX_TEXT_LETTER_WIDTH) throw new Error(`letterWidth must be a number from ${MIN_TEXT_LETTER_WIDTH} to ${MAX_TEXT_LETTER_WIDTH} (per cent of the letters' own width)`);
             patch.textLetterWidth = letterWidth === 100 ? undefined : letterWidth;
           }
+          // Curved text (#1840): the line closes the circle, the letters spread evenly all the way round; the box follows in curvedTextPatch.
+          if (typeof params.fullCircle === "boolean") patch.textFullCircle = params.fullCircle || undefined;
           // The top edge of the letters (#225): { kind: "round" | "chamfer", size } or null for none.
           if (params.letterEdge !== undefined) {
             if (params.letterEdge === null || params.letterEdge === false) {
