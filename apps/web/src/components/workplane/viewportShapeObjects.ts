@@ -1052,6 +1052,39 @@ export function boxDimensionsAlongWorkplane(shape: WorkplaneShape, workplane: Pl
   return boxDimensionsAlongAxes(shape, { x: workplane.xAxis, y: workplane.normal, z: workplane.zAxis });
 }
 
+/** How close to the workplane's normal an own axis counts as standing on it: about 0.8 degrees, as for the size fields (orientedMeasures.ts). */
+const LYING_ALIGNED = 1 - 1e-4;
+
+/**
+ * A body that lies on its side on a level workplane (Discussion #1838): one of its own sideways axes, its width or
+ * its length, stands upright there, as after a quarter turn about X or Z. Its handles then stand upright on the
+ * workplane too, as in Tinkercad - the height handle on top still pulls up - and not along the body's own axes,
+ * where the height handle pointed sideways. Returns the upright frame's axes, each along one of the body's own
+ * (it may still be turned about the upright by any angle), and the own measure that runs along each; null for a
+ * body that stands, hangs upside down or is tilted.
+ */
+export function lyingFrameAxes(shape: WorkplaneShape, workplane: PlacementWorkplane): { xAxis: THREE.Vector3; yAxis: THREE.Vector3; zAxis: THREE.Vector3; dimensions: BoxFrameDimensions } | null {
+  const up = new THREE.Vector3(workplane.normal.x, workplane.normal.y, workplane.normal.z).normalize();
+  // Only a level workplane: on one that stands on a side face the handles keep the body's own axes (#933).
+  if (up.y < LYING_ALIGNED) return null;
+  const quaternion = quaternionForShape(shape);
+  const own = [
+    { name: "width" as const, vector: new THREE.Vector3(1, 0, 0).applyQuaternion(quaternion) },
+    { name: "height" as const, vector: new THREE.Vector3(0, 1, 0).applyQuaternion(quaternion) },
+    { name: "depth" as const, vector: new THREE.Vector3(0, 0, 1).applyQuaternion(quaternion) },
+  ];
+  const upright = own.find((entry) => Math.abs(entry.vector.dot(up)) > LYING_ALIGNED);
+  if (!upright || upright.name === "height") return null;
+  const flat = own.filter((entry) => entry !== upright);
+  const along = new THREE.Vector3(workplane.xAxis.x, workplane.xAxis.y, workplane.xAxis.z).normalize();
+  // The frame's x is the own axis nearer the workplane's x, so a body turned by right angles gets the workplane's axes.
+  const first = Math.abs(flat[1].vector.dot(along)) > Math.abs(flat[0].vector.dot(along)) + 1e-6 ? flat[1] : flat[0];
+  const second = first === flat[0] ? flat[1] : flat[0];
+  const xAxis = first.vector.clone().multiplyScalar(first.vector.dot(along) < 0 ? -1 : 1).normalize();
+  const zAxis = new THREE.Vector3().crossVectors(xAxis, up).normalize();
+  return { xAxis, yAxis: up, zAxis, dimensions: { x: first.name, y: upright.name, z: second.name } };
+}
+
 export function selectionFrameForShapes(
   shapes: WorkplaneShape[],
   selectedIds: string[],
@@ -1082,18 +1115,23 @@ export function selectionFrameForShapes(
     })();
   const useWorkplane = Boolean(workplane) && !placementWorkplaneIsBase(workplane!)
     && (!singleShape || (alongWorkplane(new THREE.Vector3(0, 1, 0), workplane!.normal) && alongWorkplane(new THREE.Vector3(1, 0, 0), workplane!.xAxis)) || onSideFace);
+  // A body lying on its side on a level workplane (Discussion #1838): the handles stand upright on the workplane.
+  // Only where a workplane is passed, for the handles and their marks: without one the frame stays the body's own.
+  const lying = singleShape && workplane && !useWorkplane ? lyingFrameAxes(singleShape, workplane) : null;
   const quaternion = useWorkplane
     ? placementWorkplaneQuaternion(workplane!)
-    : singleShape ? quaternionForShape(singleShape) : new THREE.Quaternion();
+    : lying
+      ? new THREE.Quaternion().setFromRotationMatrix(new THREE.Matrix4().makeBasis(lying.xAxis, lying.yAxis, lying.zAxis)).normalize()
+      : singleShape ? quaternionForShape(singleShape) : new THREE.Quaternion();
   const xAxis = useWorkplane
     ? new THREE.Vector3(workplane!.xAxis.x, workplane!.xAxis.y, workplane!.xAxis.z).normalize()
-    : new THREE.Vector3(1, 0, 0).applyQuaternion(quaternion).normalize();
+    : lying ? lying.xAxis : new THREE.Vector3(1, 0, 0).applyQuaternion(quaternion).normalize();
   const yAxis = useWorkplane
     ? new THREE.Vector3(workplane!.normal.x, workplane!.normal.y, workplane!.normal.z).normalize()
-    : new THREE.Vector3(0, 1, 0).applyQuaternion(quaternion).normalize();
+    : lying ? lying.yAxis : new THREE.Vector3(0, 1, 0).applyQuaternion(quaternion).normalize();
   const zAxis = useWorkplane
     ? new THREE.Vector3(workplane!.zAxis.x, workplane!.zAxis.y, workplane!.zAxis.z).normalize()
-    : new THREE.Vector3(0, 0, 1).applyQuaternion(quaternion).normalize();
+    : lying ? lying.zAxis : new THREE.Vector3(0, 0, 1).applyQuaternion(quaternion).normalize();
   const localMin = new THREE.Vector3(Number.POSITIVE_INFINITY, Number.POSITIVE_INFINITY, Number.POSITIVE_INFINITY);
   const localMax = new THREE.Vector3(Number.NEGATIVE_INFINITY, Number.NEGATIVE_INFINITY, Number.NEGATIVE_INFINITY);
   const origin = useWorkplane
@@ -1133,6 +1171,7 @@ export function selectionFrameForShapes(
     min: new THREE.Vector3(-width / 2, -height / 2, -depth / 2),
     max: new THREE.Vector3(width / 2, height / 2, depth / 2),
     singleShape,
+    ...(lying ? { lying: lying.dimensions } : {}),
   };
 }
 

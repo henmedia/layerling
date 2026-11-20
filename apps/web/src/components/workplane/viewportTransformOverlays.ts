@@ -414,16 +414,19 @@ export function syncTransformOverlay(
     left: project(footprintWorld.left),
   };
   const heightPoint = project(showLowerHandles ? lowerCenterWorld : upperCenterWorld);
+  // The dots of a body's own settings (slope, narrowing, corner radius) sit on the body itself: for one lying on its
+  // side (Discussion #1838), whose handles stand upright on the workplane, they keep the body's own frame.
+  const dotFrame = (frame.lying ? selectionFrameForShapes(shapes, selectedIds) : null) ?? frame;
   // Slope along (slopeAlong.ts): a dot on the top of the lower end, dragged up and down like the height.
   const slopeShape = frame.singleShape && shapeSupportsSlope(frame.singleShape) && typeof frame.singleShape.slopeEnd === "number" ? frame.singleShape : null;
   const slopePoint = (() => {
     if (!slopeShape) return { x: 0, y: 0, visible: false };
     const side = normalizeSlopeSide(slopeShape.kind, slopeShape.slopeSide);
-    const y = frame.min.y + slopeEndHeight(slopeShape);
-    const world = side === "back" ? framePoint(frame, 0, y, frame.min.z)
-      : side === "front" ? framePoint(frame, 0, y, frame.max.z)
-        : side === "left" ? framePoint(frame, frame.min.x, y, 0)
-          : framePoint(frame, frame.max.x, y, 0);
+    const y = dotFrame.min.y + slopeEndHeight(slopeShape);
+    const world = side === "back" ? framePoint(dotFrame, 0, y, dotFrame.min.z)
+      : side === "front" ? framePoint(dotFrame, 0, y, dotFrame.max.z)
+        : side === "left" ? framePoint(dotFrame, dotFrame.min.x, y, 0)
+          : framePoint(dotFrame, dotFrame.max.x, y, 0);
     return project(world);
   })();
   // Narrow along: a dot on the narrow end's side, dragged across like a width.
@@ -433,11 +436,11 @@ export function syncTransformOverlay(
     const side = normalizeSlopeSide(narrowShape.kind, narrowShape.narrowSide);
     const half = narrowEndWidth({ ...narrowShape, narrowSide: side }) / 2;
     // On a box halfway up its end; on a round roof at the foot, where its side meets the plate.
-    const y = frame.min.y + (narrowShape.kind === "roundRoof" ? 0 : (frame.max.y - frame.min.y) / 2);
-    const world = side === "back" ? framePoint(frame, half, y, frame.min.z)
-      : side === "front" ? framePoint(frame, half, y, frame.max.z)
-        : side === "left" ? framePoint(frame, frame.min.x, y, half)
-          : framePoint(frame, frame.max.x, y, half);
+    const y = dotFrame.min.y + (narrowShape.kind === "roundRoof" ? 0 : (dotFrame.max.y - dotFrame.min.y) / 2);
+    const world = side === "back" ? framePoint(dotFrame, half, y, dotFrame.min.z)
+      : side === "front" ? framePoint(dotFrame, half, y, dotFrame.max.z)
+        : side === "left" ? framePoint(dotFrame, dotFrame.min.x, y, half)
+          : framePoint(dotFrame, dotFrame.max.x, y, half);
     return project(world);
   })();
   const liftBasePoint = project(liftBaseWorld);
@@ -452,17 +455,17 @@ export function syncTransformOverlay(
   const cornerEntries = (() => {
     if (polygonShape) {
       // A polygon's dot: on the top, where the rounding of its front corner starts on the edge to the next corner.
-      const { point: local } = polygonCornerDot(frame.max.x - frame.min.x, frame.max.z - frame.min.z, polygonShape.sides, polygonShape.cornerFillet ?? 0, Boolean(polygonShape.polygonFlat));
-      const midX = (frame.min.x + frame.max.x) / 2;
-      const midZ = (frame.min.z + frame.max.z) / 2;
-      const point = project(framePoint(frame, midX + local.x, frame.max.y, midZ + local.y));
+      const { point: local } = polygonCornerDot(dotFrame.max.x - dotFrame.min.x, dotFrame.max.z - dotFrame.min.z, polygonShape.sides, polygonShape.cornerFillet ?? 0, Boolean(polygonShape.polygonFlat));
+      const midX = (dotFrame.min.x + dotFrame.max.x) / 2;
+      const midZ = (dotFrame.min.z + dotFrame.max.z) / 2;
+      const point = project(framePoint(dotFrame, midX + local.x, dotFrame.max.y, midZ + local.y));
       const others = [bottom.nearLeft, bottom.nearRight, bottom.farRight, bottom.farLeft, mid.near, mid.right, mid.far, mid.left, heightPoint, slopePoint, narrowPoint, liftPoint].filter((other) => other.visible);
-      const inward = project(framePoint(frame, midX, frame.max.y, midZ));
+      const inward = project(framePoint(dotFrame, midX, dotFrame.max.y, midZ));
       const clear = handleClearOfOthers(point, { x: inward.x - point.x, y: inward.y - point.y }, others);
       return [{ point: clear, handle: { key: "corner-radius", className: "height-top slope-end", kind: "height" as const, x: clear.x, y: clear.y, title: t("transform.cornerRadius") } }];
     }
     if (!cornerShape) return [];
-    const largest = Math.min(frame.max.x - frame.min.x, frame.max.z - frame.min.z) / 2;
+    const largest = Math.min(dotFrame.max.x - dotFrame.min.x, dotFrame.max.z - dotFrame.min.z) / 2;
     // With flat top and bottom a Rounded box may give each corner its own radius: then every corner has a dot.
     const flat = (cornerShape.topBottomFillet ?? 0) <= 1e-4;
     const own = flat ? normalizeCornerFillets(cornerShape.cornerFillets, largest) : undefined;
@@ -471,11 +474,11 @@ export function syncTransformOverlay(
       : [{ key: "corner-radius", radius: plainBox ? 0 : Math.min(Math.max(0, cornerShape.cornerFillet ?? DEFAULT_ROUNDED_BOX_CORNER_FILLET), largest), sx: 1, sz: -1 }];
     const others = [bottom.nearLeft, bottom.nearRight, bottom.farRight, bottom.farLeft, mid.near, mid.right, mid.far, mid.left, heightPoint, slopePoint, narrowPoint, liftPoint].filter((other) => other.visible);
     return corners.map(({ key, radius, sx, sz }) => {
-      const edgeX = sx > 0 ? frame.max.x - radius : frame.min.x + radius;
-      const edgeZ = sz > 0 ? frame.max.z : frame.min.z;
-      const point = project(framePoint(frame, edgeX, frame.max.y, edgeZ));
+      const edgeX = sx > 0 ? dotFrame.max.x - radius : dotFrame.min.x + radius;
+      const edgeZ = sz > 0 ? dotFrame.max.z : dotFrame.min.z;
+      const point = project(framePoint(dotFrame, edgeX, dotFrame.max.y, edgeZ));
       // Along the edge, into the body: the way the dot may slide to leave room.
-      const inward = project(framePoint(frame, edgeX - sx * largest, frame.max.y, edgeZ));
+      const inward = project(framePoint(dotFrame, edgeX - sx * largest, dotFrame.max.y, edgeZ));
       const clear = handleClearOfOthers(point, { x: inward.x - point.x, y: inward.y - point.y }, others);
       // The next corner's dot keeps clear of this one too.
       if (clear.visible) others.push(clear);
@@ -533,7 +536,8 @@ export function syncTransformOverlay(
   // handle shows that single mark instead of a separate width and depth line
   // (which used to appear together at a corner handle, and independently
   // editable at all, letting the two drift apart).
-  const isCircularFootprint = frame.singleShape?.kind === "cylinder" || frame.singleShape?.kind === "star" || frame.singleShape?.kind === "hirth" || frame.singleShape?.kind === "pulley" || frame.singleShape?.kind === "finishingWasher";
+  // Lying on its side (Discussion #1838) such a body shows its length and its diameter, two marks again.
+  const isCircularFootprint = !frame.lying && (frame.singleShape?.kind === "cylinder" || frame.singleShape?.kind === "star" || frame.singleShape?.kind === "hirth" || frame.singleShape?.kind === "pulley" || frame.singleShape?.kind === "finishingWasher");
   const footprintDimensionMarks = Object.fromEntries(
     footprintHandleKeys.map((handleKey) => {
       if (isCircularFootprint) {

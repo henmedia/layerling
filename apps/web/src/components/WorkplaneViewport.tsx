@@ -85,7 +85,7 @@ import { withShapeDefaults } from "@/lib/shapeDefaults";
 import { WORKPLANE_LINE_ELEVATION } from "@/lib/workplaneGrid";
 import { cleanNearZero, cleanRotationDegrees, isNonSolidShape, resizedShapeSize, shapeDepth, shapeHasTaper, shapeWidth, shapeWithParametricSource } from "@/lib/workplaneShapes";
 import type { LayerlingMcpViewFace } from "@/lib/layerlingMcpProtocol";
-import { ownSideForMark } from "@/lib/dimensionSides";
+import { ownHeightSidePressed, ownSideForMark } from "@/lib/dimensionSides";
 import { SelectionCounter } from "@/components/workplane/SelectionCounter";
 import { TouchMultiSelectButton } from "@/components/workplane/TouchMultiSelectButton";
 import { showsTouchMultiSelect } from "@/lib/touchMultiSelect";
@@ -4574,9 +4574,13 @@ export function WorkplaneViewport({
       const scaleAnchorPoint = kind === "scale" && scaleSigns ? resizeAnchorPointForFrame(frame, scaleSigns) : undefined;
       // The narrowing's dot moves across the body, along the axis its end's width runs on.
       // The corner radius's dot runs along the top's back edge, the width's axis.
+      // These dots, and the slope's, sit on the body itself: for one lying on its side (Discussion #1838), whose
+      // handles stand upright on the workplane, they run along the body's own axes.
+      const ownDot = handleKey === "slope-end" || handleKey === "narrow-end" || handleKey.startsWith("corner-radius");
+      const dotFrame = (ownDot && frame.lying ? selectionFrameForShapes(shapesRef.current, ids) : null) ?? frame;
       const narrowAxis = handleKey === "narrow-end"
-        ? (slopeAlongWidth(normalizeSlopeSide(shape.kind, shape.narrowSide)) ? frame.zAxis : frame.xAxis).clone().normalize()
-        : handleKey.startsWith("corner-radius") ? frame.xAxis.clone().normalize() : null;
+        ? (slopeAlongWidth(normalizeSlopeSide(shape.kind, shape.narrowSide)) ? dotFrame.zAxis : dotFrame.xAxis).clone().normalize()
+        : handleKey.startsWith("corner-radius") ? dotFrame.xAxis.clone().normalize() : null;
       // An X or Y arrow (Discussion #1434) moves the selection along that axis of the workplane. The way is
       // measured on a plane through the axis that faces the camera, as for the lift arrow, so it follows the
       // pointer along a line and does not run off into the distance in a low view as a drag on the plane does.
@@ -4588,13 +4592,13 @@ export function WorkplaneViewport({
       const slideFromBelow = Boolean(state && state.camera.position.clone().sub(frame.center).dot(lift.axis) < 0);
       const liftAxis = slideVector
         ? new THREE.Vector3(slideVector.x, slideVector.y, slideVector.z).normalize()
-        : kind === "lift" ? lift.axis : narrowAxis ?? (kind === "height" ? frame.yAxis.clone().normalize() : undefined);
+        : kind === "lift" ? lift.axis : narrowAxis ?? (kind === "height" ? dotFrame.yAxis.clone().normalize() : undefined);
       const liftHandlePoint = liftAxis
         ? (kind === "slide"
             ? lift.pointAt(slideFromBelow ? lift.low : lift.high)
             : kind === "lift"
               ? lift.pointAt(handlesLowerSide ? lift.low : lift.high).addScaledVector(liftAxis, liftOffset)
-              : framePoint(frame, 0, handlesLowerSide ? frame.min.y : frame.max.y, 0).addScaledVector(liftAxis, liftOffset))
+              : framePoint(dotFrame, 0, handlesLowerSide ? dotFrame.min.y : dotFrame.max.y, 0).addScaledVector(liftAxis, liftOffset))
         : undefined;
       const liftPlane = state && liftAxis && liftHandlePoint
         ? axisDragPlaneForCamera(state, liftAxis, liftHandlePoint)
@@ -5412,9 +5416,14 @@ export function WorkplaneViewport({
     const nextValue = Math.min(customLimit ?? Number.POSITIVE_INFINITY, Math.max(MIN_SHAPE_SIZE, value));
     const rememberedAnchor = isCornerRulerMidpoint ? null : lastResizeAnchorRef.current;
     // The held edge was pressed in the workplane's frame; the patch below reads it in the shape's own.
-    const anchor = rememberedAnchor && ownSide && rememberedAnchor.shapeId === shape.id
+    const convertedAnchor = rememberedAnchor && ownSide && rememberedAnchor.shapeId === shape.id
       ? { ...rememberedAnchor, signs: ownSide.convertSigns(rememberedAnchor.signs) }
       : rememberedAnchor;
+    // A body lying on its side (Discussion #1838): a number on the plate that is the body's own height holds the
+    // side across from the handle it was typed at, which is the body's own base or its top.
+    const anchor = convertedAnchor && markFrame?.lying && sizeFrame && axis === "height" && markAxis !== "height" && convertedAnchor.shapeId === shape.id
+      ? { ...convertedAnchor, pressedY: ownHeightSidePressed(markFrame, sizeFrame, markAxis, rememberedAnchor!.signs) }
+      : convertedAnchor;
     if (axis === "width") {
       const frame = sizeFrame;
       if (shapeHasTaper(shape) && frame) {
