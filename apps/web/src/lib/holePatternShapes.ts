@@ -498,8 +498,8 @@ export type HolePatternPlan = {
   frame?: WorkplaneShape;
   /**
    * The top layer in a second colour (Discussion #1771): a slab of the face, `thickness` deep from it, in its colour. What
-   * of the perforated body (frame and all) lies in it becomes the top layer, a net; the body less the slab, without the
-   * holes, stays solid below it.
+   * of the perforated body (frame and all) lies in it becomes the top layer, a net; the body less the net is the other
+   * colour, solid below and filling the net's holes up to the face.
    */
   topLayer?: { slab: WorkplaneShape; thickness: number; color: string };
   /** On a round wall (#1393): its diameter, whether it goes all the way round, and then how many holes a row holds at what step. */
@@ -564,8 +564,8 @@ export function holePatternShapes(
   const forRack = settings.arrangement === "corners" && Boolean(settings.rack);
   if (forRack) settings = rackSlotSettings(settings);
   if (settings.form === "custom" && !custom) return { holes: [], tooMany: false };
-  // A top layer in a second colour is a net: the holes go through that layer and a little into the body below, which
-  // is made solid again when the two are split, so the net is cut clean right through.
+  // A top layer in a second colour is a net: the holes go through that layer and a little into the body below, so the
+  // net is cut clean right through; the body's own colour is the body less the net, filling its holes.
   const layer = holePatternTopLayer(settings, face.thickness);
   if (layer) settings = { ...settings, depth: layer.thickness + TOP_LAYER_OVERCUT };
   const tilt = holeTiltRadians(settings);

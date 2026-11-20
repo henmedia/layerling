@@ -1894,7 +1894,7 @@ export const MESSAGES_SV: Partial<Record<MessageKey, string>> = {
   "holePattern.topLayerThickness": "Översta lagrets tjocklek",
   "holePattern.topLayerColor": "Översta lagrets färg",
   "holePattern.topLayerName": "Översta lager",
-  "holePattern.topLayerNote": "De översta {thickness} mm blir nätet i denna färg: hålen går bara genom det lagret. Under det förblir kroppen massiv i sin egen färg och syns genom hålen. 3MF-filen har de två som separata kroppar, för en skrivare med flera färger.",
+  "holePattern.topLayerNote": "De översta {thickness} mm blir nätet i denna färg. Kroppens egen färg fyller nätets hål upp till ytan, så ytan blir plan och kan skrivas ut med ytan nedåt utan stöd. 3MF-filen har de två som separata kroppar, för en skrivare med flera färger.",
   "holePattern.topLayerThin": "Kroppen är för tunn här för ett eget översta lager.",
   "holePattern.depth": "Djup",
   "holePattern.depth.through": "Genom hela kroppen",

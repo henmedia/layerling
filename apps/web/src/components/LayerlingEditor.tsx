@@ -10931,15 +10931,19 @@ export function LayerlingEditor({
     }
     if (!plan.topLayer) return { ...inner, group: body };
     // The top layer in a second colour (Discussion #1771): what of the perforated body lies in the slab under the face is
-    // the net, and the body itself less the slab, without holes, stays solid below it; bundled, so they move together
-    // and reach the slicer as two bodies in their own colours.
+    // the net; the body less the net is the other colour, solid below and filling the net's holes up to the face, so the
+    // face is flat and both colours start on the first layers when it is printed face down (no bridges, no supports).
+    // The two are bundled, so they move together and reach the slicer as two bodies in their own colours.
     const layerName = t("holePattern.topLayerName");
     const slab = { ...plan.topLayer.slab, color: plan.topLayer.color, name: layerName };
     const top = await buildIntersectionShapeFromSelection([body, slab], limit);
     if (!top.group) return { ...inner, group: null, failureNotice: top.failureNotice || t("status.intersectionEmpty") };
     const upper = canonicalizeShape({ ...top.group, name: layerName, color: plan.topLayer.color, groupOperation: "intersection" });
-    const cut = withHoleMode(cloneWorkplaneShapeTreeWithFreshIds(slab, "top-layer-cut"), true);
-    const below = await buildGroupedShapeOffThread([source, cut], limit, geometryAbortRef.current?.signal);
+    const netMesh = meshForShape(upper);
+    const netPositions = netMesh.faces.flatMap((face) => face.flatMap((index) => netMesh.vertices[index]));
+    const cut = clearanceMeshShape(createLocalId("top-layer-cut"), layerName, plan.topLayer.color, netPositions);
+    if (!cut) return { ...inner, group: null };
+    const below = await buildGroupedShapeOffThread([source, withHoleMode(cut, true)], limit, geometryAbortRef.current?.signal);
     if (!below.group) return below;
     const lower = canonicalizeShape({ ...below.group, name: source.name, color: source.color, groupOperation: "group" });
     const bundle = groupedShape([lower, upper]);

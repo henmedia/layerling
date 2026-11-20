@@ -1823,7 +1823,7 @@ export const MESSAGES_EN = {
   "holePattern.topLayerThickness": "Top layer thickness",
   "holePattern.topLayerColor": "Top layer colour",
   "holePattern.topLayerName": "Top layer",
-  "holePattern.topLayerNote": "The top {thickness} mm become the net in this colour: the holes go through that layer only. Below it the body stays solid in its own colour and shows through the holes. The 3MF holds the two as separate bodies, for a printer with several colours.",
+  "holePattern.topLayerNote": "The top {thickness} mm become the net in this colour. The body's own colour fills the net's holes up to the face, so the face is flat and can be printed face down without supports. The 3MF holds the two as separate bodies, for a printer with several colours.",
   "holePattern.topLayerThin": "The body is too thin here for a top layer of its own.",
   "holePattern.depth": "Depth",
   "holePattern.depth.through": "Through the whole body",

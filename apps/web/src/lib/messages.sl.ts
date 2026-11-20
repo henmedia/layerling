@@ -5084,7 +5084,7 @@ export const MESSAGES_SL: Partial<Record<MessageKey, string>> = {
   "holePattern.topLayerThickness": "Debelina zgornje plasti",
   "holePattern.topLayerColor": "Barva zgornje plasti",
   "holePattern.topLayerName": "Zgornja plast",
-  "holePattern.topLayerNote": "Zgornjih {thickness} mm postane mreža v tej barvi: luknje gredo samo skozi to plast. Pod njo ostane telo polno v svoji barvi in se vidi skozi luknje. 3MF vsebuje obe kot ločeni telesi, za tiskalnik z več barvami.",
+  "holePattern.topLayerNote": "Zgornjih {thickness} mm postane mreža v tej barvi. Lastna barva telesa zapolni luknje mreže do ploskve, zato je ploskev ravna in se tiska s ploskvijo navzdol brez podpor. 3MF vsebuje obe kot ločeni telesi, za tiskalnik z več barvami.",
   "holePattern.topLayerThin": "Telo je tu pretanko za samostojno zgornjo plast.",
   "holePattern.depth": "Globina",
   "holePattern.depth.through": "Skozi celo telo",

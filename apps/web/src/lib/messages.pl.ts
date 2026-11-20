@@ -1784,7 +1784,7 @@ export const MESSAGES_PL: Partial<Record<MessageKey, string>> = {
   "holePattern.topLayerThickness": "Grubość górnej warstwy",
   "holePattern.topLayerColor": "Kolor górnej warstwy",
   "holePattern.topLayerName": "Górna warstwa",
-  "holePattern.topLayerNote": "Górne {thickness} mm staje się siatką w tym kolorze: otwory przechodzą tylko przez tę warstwę. Pod nią bryła pozostaje pełna w swoim kolorze i widać ją przez otwory. Plik 3MF zawiera obie jako osobne bryły, dla drukarki wielokolorowej.",
+  "holePattern.topLayerNote": "Górne {thickness} mm staje się siatką w tym kolorze. Kolor bryły wypełnia otwory siatki aż do powierzchni, więc jest ona płaska i można ją drukować powierzchnią w dół bez podpór. Plik 3MF zawiera obie jako osobne bryły, dla drukarki wielokolorowej.",
   "holePattern.topLayerThin": "Bryła jest tu za cienka na osobną górną warstwę.",
   "holePattern.depth": "Głębokość",
   "holePattern.depth.through": "Przez całą bryłę",

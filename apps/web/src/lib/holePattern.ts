@@ -82,8 +82,8 @@ export type HolePatternSettings = {
   edgeBorder?: number;
   /**
    * A pattern in a flat face (Discussion #1771): the top `topLayerThickness` mm of the body under the face becomes a
-   * body of its own in `topLayerColor`, and the holes go through that layer only: a net in a second colour over the
-   * body, which stays solid below and shows through the holes. `depth` does not apply then.
+   * body of its own in `topLayerColor`, and the holes go through that layer only: a net in a second colour, its holes
+   * filled up to the face by the body's own colour, so the face is flat. `depth` does not apply then.
    */
   topLayer?: boolean;
   topLayerThickness?: number;
@@ -814,7 +814,7 @@ export function holePatternCutsAtEdge(settings: Pick<HolePatternSettings, "arran
 /**
  * The top layer in a second colour (Discussion #1771), when it is asked for and can be made: a pattern (not mounting
  * holes) of plain holes in a flat face, not an own shape. The holes go through that layer only, so it is a net in its
- * colour over the body, which stays solid below and shows through the holes. Its thickness stays under the body's
+ * colour, and the body's own colour fills them up to the face. Its thickness stays under the body's
  * (`thickness`, when known), so some of the body is left under it.
  */
 export function holePatternTopLayer(

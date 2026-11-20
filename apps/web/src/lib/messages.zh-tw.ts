@@ -1778,7 +1778,7 @@ export const MESSAGES_ZH_TW: Partial<Record<MessageKey, string>> = {
   "holePattern.topLayerThickness": "頂層厚度",
   "holePattern.topLayerColor": "頂層顏色",
   "holePattern.topLayerName": "頂層",
-  "holePattern.topLayerNote": "頂部 {thickness} mm 成為此顏色的網格：孔只穿過這一層。其下主體保持實心和自身顏色，從孔中露出。3MF 中兩者為獨立實體，供多色印表機使用。",
+  "holePattern.topLayerNote": "頂部 {thickness} mm 成為此顏色的網格。主體顏色將網格的孔填滿到表面，表面平整，可面朝下無支撐列印。3MF 中兩者為獨立實體，供多色印表機使用。",
   "holePattern.topLayerThin": "此處主體太薄，無法另設頂層。",
   "holePattern.depth": "深度",
   "holePattern.depth.through": "貫穿整個實體",

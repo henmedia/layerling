@@ -2485,7 +2485,7 @@ export const MESSAGES_DA: Partial<Record<MessageKey, string>> = {
   "holePattern.topLayerThickness": "Tykkelse af øverste lag",
   "holePattern.topLayerColor": "Øverste lags farve",
   "holePattern.topLayerName": "Øverste lag",
-  "holePattern.topLayerNote": "De øverste {thickness} mm bliver nettet i denne farve: hullerne går kun gennem det lag. Nedenunder forbliver legemet massivt i sin egen farve og ses gennem hullerne. 3MF-filen har de to som separate legemer, til en printer med flere farver.",
+  "holePattern.topLayerNote": "De øverste {thickness} mm bliver nettet i denne farve. Legemets egen farve fylder nettets huller op til fladen, så fladen er plan og kan printes med fladen nedad uden støtte. 3MF-filen har de to som separate legemer, til en printer med flere farver.",
   "holePattern.topLayerThin": "Legemet er for tyndt her til et eget øverste lag.",
   "holePattern.depth": "Dybde",
   "holePattern.depth.through": "Gennem hele formen",

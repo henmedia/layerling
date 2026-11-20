@@ -1822,7 +1822,7 @@ export const MESSAGES_DE: Record<MessageKey, string> = {
   "holePattern.topLayerThickness": "Dicke der obersten Schicht",
   "holePattern.topLayerColor": "Farbe der obersten Schicht",
   "holePattern.topLayerName": "Oberste Schicht",
-  "holePattern.topLayerNote": "Die obersten {thickness} mm werden das Netz in dieser Farbe: Die Löcher gehen nur durch diese Schicht. Darunter bleibt der Körper massiv in seiner eigenen Farbe und ist durch die Löcher zu sehen. Das 3MF enthält beide als getrennte Körper, für einen Mehrfarbendrucker.",
+  "holePattern.topLayerNote": "Die obersten {thickness} mm werden das Netz in dieser Farbe. Die eigene Farbe des Körpers füllt die Löcher des Netzes bis zur Fläche, so ist die Fläche eben und lässt sich ohne Stützen mit der Fläche nach unten drucken. Das 3MF enthält beide als getrennte Körper, für einen Mehrfarbendrucker.",
   "holePattern.topLayerThin": "Der Körper ist hier zu dünn für eine eigene oberste Schicht.",
   "holePattern.depth": "Tiefe",
   "holePattern.depth.through": "Durch die ganze Form",

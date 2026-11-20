@@ -1735,7 +1735,7 @@ export const MESSAGES_PT_PT: Partial<Record<MessageKey, string>> = {
   "holePattern.topLayerThickness": "Espessura da camada superior",
   "holePattern.topLayerColor": "Cor da camada superior",
   "holePattern.topLayerName": "Camada superior",
-  "holePattern.topLayerNote": "Os {thickness} mm de cima passam a ser a rede nesta cor: os furos atravessam só essa camada. Por baixo, o corpo fica maciço na sua cor e vê-se pelos furos. O 3MF guarda os dois como corpos separados, para uma impressora de várias cores.",
+  "holePattern.topLayerNote": "Os {thickness} mm de cima passam a ser a rede nesta cor. A cor do corpo preenche os furos da rede até à face, que fica plana e pode ser impressa virada para baixo sem suportes. O 3MF guarda os dois como corpos separados, para uma impressora de várias cores.",
   "holePattern.topLayerThin": "O corpo é demasiado fino aqui para uma camada superior própria.",
   "holePattern.depth": "Profundidade",
   "holePattern.depth.through": "Atravessar todo o sólido",

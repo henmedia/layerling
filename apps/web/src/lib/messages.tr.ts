@@ -1060,7 +1060,7 @@ export const MESSAGES_TR: Partial<Record<MessageKey, string>> = {
   "holePattern.topLayerThickness": "Üst katman kalınlığı",
   "holePattern.topLayerColor": "Üst katman rengi",
   "holePattern.topLayerName": "Üst katman",
-  "holePattern.topLayerNote": "Üstteki {thickness} mm bu renkte ağ olur: delikler yalnızca bu katmandan geçer. Altında gövde kendi renginde dolu kalır ve deliklerden görünür. 3MF ikisini çok renkli yazıcılar için ayrı gövdeler olarak tutar.",
+  "holePattern.topLayerNote": "Üstteki {thickness} mm bu renkte ağ olur. Gövdenin kendi rengi ağın deliklerini yüzeye kadar doldurur; böylece yüzey düz olur ve yüzü aşağı bakacak şekilde desteksiz basılabilir. 3MF ikisini çok renkli yazıcılar için ayrı gövdeler olarak tutar.",
   "holePattern.topLayerThin": "Gövde burada ayrı bir üst katman için fazla ince.",
   "holePattern.depth": "Derinlik",
   "holePattern.depth.through": "Tüm gövde boyunca",
