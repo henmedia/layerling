@@ -97,28 +97,43 @@ export type SpaceMouseInvert = { shift: boolean; lift: boolean; zoom: boolean; t
 
 export const SPACE_MOUSE_NO_INVERT: SpaceMouseInvert = { shift: false, lift: false, zoom: false, tilt: false, twist: false };
 
-const INVERT_KEY = "layerling.spaceMouseInvert";
+/**
+ * The two ways a 3D mouse is read: over WebHID after Connect 3D mouse, or as a game controller, which the browser shows
+ * by itself. On some devices the two do not run the same way round (#1871), so each keeps its own reversed directions.
+ */
+export type SpaceMouseWay = "hid" | "pad";
+
+const INVERT_KEYS: Record<SpaceMouseWay, string> = { hid: "layerling.spaceMouseInvert", pad: "layerling.spaceMouseInvertPad" };
 export const SPACE_MOUSE_INVERT_EVENT = "layerling:spacemouse-invert";
 
-/** The reversed directions the person ticked in the settings; none where the browser keeps nothing. */
-export function readSpaceMouseInvert(): SpaceMouseInvert {
+function storedSpaceMouseInvert(way: SpaceMouseWay): SpaceMouseInvert | null {
   try {
-    const stored = JSON.parse(window.localStorage.getItem(INVERT_KEY) ?? "{}") as Partial<SpaceMouseInvert>;
+    const text = window.localStorage.getItem(INVERT_KEYS[way]);
+    if (text === null) return null;
+    const stored = JSON.parse(text) as Partial<SpaceMouseInvert> | null;
     return {
-      shift: stored.shift === true,
-      lift: stored.lift === true,
-      zoom: stored.zoom === true,
-      tilt: stored.tilt === true,
-      twist: stored.twist === true,
+      shift: stored?.shift === true,
+      lift: stored?.lift === true,
+      zoom: stored?.zoom === true,
+      tilt: stored?.tilt === true,
+      twist: stored?.twist === true,
     };
   } catch {
-    return SPACE_MOUSE_NO_INVERT;
+    return null;
   }
 }
 
-export function saveSpaceMouseInvert(invert: SpaceMouseInvert) {
+/**
+ * The reversed directions the person ticked in the settings for one way of reading the mouse; none where the browser keeps
+ * nothing. A mouse read as a game controller starts from those of WebHID until its own were ticked (#1871).
+ */
+export function readSpaceMouseInvert(way: SpaceMouseWay = "hid"): SpaceMouseInvert {
+  return storedSpaceMouseInvert(way) ?? (way === "pad" ? storedSpaceMouseInvert("hid") : null) ?? SPACE_MOUSE_NO_INVERT;
+}
+
+export function saveSpaceMouseInvert(invert: SpaceMouseInvert, way: SpaceMouseWay = "hid") {
   try {
-    window.localStorage.setItem(INVERT_KEY, JSON.stringify(invert));
+    window.localStorage.setItem(INVERT_KEYS[way], JSON.stringify(invert));
   } catch {
     // The choice then holds until the page is closed.
   }

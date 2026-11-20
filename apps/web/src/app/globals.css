@@ -12970,6 +12970,14 @@ html[data-theme="dark"] .pattern-picker-empty {
   gap: 5px;
 }
 
+.workspace-space-mouse-invert-way {
+  flex-basis: 100%;
+  color: #756657;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
 .workspace-history-setting {
   display: grid;
   gap: 12px;
