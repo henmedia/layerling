@@ -2783,6 +2783,7 @@ export const MESSAGES_SV: Partial<Record<MessageKey, string>> = {
   "inspector.hole": "Hål",
   "inspector.transparent": "Transparent",
   "inspector.multicolor": "Flerfärg",
+  "inspector.partColors": "Delarnas färger",
   "inspector.groupResize": "Vid storleksändring",
   "inspector.groupResizeStretch": "Sträck allt",
   "inspector.groupResizeKeepParts": "Behåll hål och smådelar",

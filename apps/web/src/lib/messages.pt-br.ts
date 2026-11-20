@@ -634,6 +634,7 @@ export const MESSAGES_PT_BR: Partial<Record<MessageKey, string>> = {
   "inspector.hole": "Buraco",
   "inspector.transparent": "Transparente",
   "inspector.multicolor": "Multicor",
+  "inspector.partColors": "Cores das partes",
   "inspector.settingsFor": "Configurações de {name}",
   "inspector.expand": "Expandir configurações",
   "inspector.minimize": "Minimizar configurações",

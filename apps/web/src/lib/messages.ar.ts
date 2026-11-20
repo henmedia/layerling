@@ -2797,6 +2797,7 @@ export const MESSAGES_AR: Partial<Record<MessageKey, string>> = {
   "inspector.hole": "ثقب",
   "inspector.transparent": "شفاف",
   "inspector.multicolor": "متعدد الألوان",
+  "inspector.partColors": "ألوان الأجزاء",
   "inspector.groupResize": "عند تغيير الحجم",
   "inspector.groupResizeStretch": "تمديد كل شيء",
   "inspector.groupResizeKeepParts": "الإبقاء على الثقوب والأجزاء الصغيرة",

@@ -2752,6 +2752,7 @@ export const MESSAGES_JA: Partial<Record<MessageKey, string>> = {
   "inspector.hole": "穴",
   "inspector.transparent": "透明",
   "inspector.multicolor": "マルチカラー",
+  "inspector.partColors": "パーツの色",
   "inspector.groupResize": "サイズを変えるとき",
   "inspector.groupResizeStretch": "すべてのばす",
   "inspector.groupResizeKeepParts": "穴と小さなパーツはそのまま",

@@ -2794,6 +2794,7 @@ export const MESSAGES_CS: Record<MessageKey, string> = {
   "inspector.hole": "Výřez",
   "inspector.transparent": "Průhledný",
   "inspector.multicolor": "Více barev",
+  "inspector.partColors": "Barvy částí",
   "inspector.groupResize": "Při změně velikosti",
   "inspector.groupResizeStretch": "Roztáhnout vše",
   "inspector.groupResizeKeepParts": "Zachovat výřezy a malé díly",

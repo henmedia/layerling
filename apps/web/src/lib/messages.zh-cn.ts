@@ -2663,6 +2663,7 @@ export const MESSAGES_ZH_CN: Partial<Record<MessageKey, string>> = {
   "inspector.hole": "孔",
   "inspector.transparent": "透明",
   "inspector.multicolor": "多色",
+  "inspector.partColors": "各部分颜色",
   "inspector.groupResize": "调整大小时",
   "inspector.groupResizeStretch": "全部拉伸",
   "inspector.groupResizeKeepParts": "保持孔和小零件",

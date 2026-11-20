@@ -1925,6 +1925,7 @@ export const MESSAGES_SL: Partial<Record<MessageKey, string>> = {
   "inspector.hole": "Luknja",
   "inspector.transparent": "Prozorno",
   "inspector.multicolor": "Večbarvno",
+  "inspector.partColors": "Barve delov",
   "inspector.groupResize": "Pri spreminjanju velikosti",
   "inspector.groupResizeStretch": "Raztegni vse",
   "inspector.groupResizeKeepParts": "Ohrani luknje in majhne dele",

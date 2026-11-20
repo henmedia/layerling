@@ -2318,6 +2318,7 @@ export const MESSAGES_HU: Partial<Record<MessageKey, string>> = {
   "inspector.hole": "Lyuk",
   "inspector.transparent": "Átlátszó",
   "inspector.multicolor": "Többszínű",
+  "inspector.partColors": "Részek színe",
   "inspector.groupResize": "Átméretezéskor",
   "inspector.groupResizeStretch": "Mindent megnyújt",
   "inspector.groupResizeKeepParts": "Lyukak és kis részek megtartása",
