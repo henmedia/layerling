@@ -168,6 +168,88 @@ function sharedThumbnailPath(folder: string, fileName: string, revision: string)
   return path.join(folder, SHARED_THUMBNAILS_DIR, `${fileName}.${revision}.png`);
 }
 
+/** The folder's picture names, read once per request: a listing asks for many files of one folder. */
+type SharedThumbnailNames = Map<string, Promise<string[]>>;
+
+/**
+ * The names in a folder's picture directory that are pictures of this one file, each with the revision it was
+ * written under. Only names of exactly the shape `<fileName>.<size hex>-<time hex>.png` count, so a project
+ * whose own name merely starts the same way ("a.lyl" and "a.lyl.1-2.png.lyl") never lends its picture.
+ */
+async function sharedThumbnailsOf(folder: string, fileName: string, names?: SharedThumbnailNames) {
+  let listing = names?.get(folder);
+  if (!listing) {
+    listing = fs.readdir(path.join(folder, SHARED_THUMBNAILS_DIR)).catch(() => [] as string[]);
+    names?.set(folder, listing);
+  }
+  const prefix = `${fileName}.`;
+  const pictures: Array<{ name: string; sizeHex: string; timeMicros: number }> = [];
+  for (const name of await listing) {
+    if (!name.startsWith(prefix)) continue;
+    const match = /^([0-9a-f]{1,13})-([0-9a-f]{1,13})\.png$/.exec(name.slice(prefix.length));
+    if (match) pictures.push({ name, sizeHex: match[1], timeMicros: parseInt(match[2], 16) });
+  }
+  return pictures;
+}
+
+/**
+ * Finds the picture that belongs to a project file (Issue #1874).
+ *
+ * A picture is stored under the revision of the file it shows, and the revision is the file's size and its
+ * modification time. That is exact on one computer. A store folder that a sync program carries to a second
+ * computer (Google Drive for desktop, in the report) does not arrive with the same modification time - it was
+ * some fifteen seconds off - so there the file has another revision, no picture of that name exists, and the
+ * start page showed "No snapshot" for every design saved on the other computer.
+ *
+ * So when no picture carries the exact revision, a picture of the same file with the same size is taken, the
+ * one whose time is nearest to the file's. The size part must still match: a picture of another size is
+ * certainly of older contents. A picture of the same size can in principle be of older contents too - an
+ * edit outside the app that keeps the file's length to the byte, or a save whose picture has not been synced
+ * yet while an old one of that length is still there. A design is a compressed package, so that is rare, and
+ * the worst that follows is an outdated picture on the start page until the next save; the saved design, and
+ * the revision that guards a save against overwriting someone else's (which stays exact), are not touched.
+ *
+ * Reading never renames or removes a picture: two computers that see different times for the same file would
+ * otherwise take it from each other in turns, with the sync program carrying every change back and forth.
+ *
+ * The names come from the picture directory itself and are checked against the fixed shape above, so nothing
+ * from the request reaches a path here beyond the file name the caller has already validated.
+ */
+async function findSharedThumbnail(folder: string, fileName: string, stat: { size: number; mtimeMs: number }, names?: SharedThumbnailNames) {
+  const revision = revisionForStat(stat);
+  const exactPath = sharedThumbnailPath(folder, fileName, revision);
+  const exactStat = await regularFileStat(exactPath);
+  if (exactStat) return { imagePath: exactPath, imageStat: exactStat, exact: true };
+
+  const sizeHex = stat.size.toString(16);
+  const fileMicros = Math.round(stat.mtimeMs * 1000);
+  const candidates = (await sharedThumbnailsOf(folder, fileName, names))
+    .filter((picture) => picture.sizeHex === sizeHex)
+    .sort((a, b) => Math.abs(a.timeMicros - fileMicros) - Math.abs(b.timeMicros - fileMicros));
+  for (const candidate of candidates) {
+    const imagePath = path.join(folder, SHARED_THUMBNAILS_DIR, candidate.name);
+    const imageStat = await regularFileStat(imagePath).catch(() => null);
+    if (imageStat) return { imagePath, imageStat, exact: false };
+  }
+  return null;
+}
+
+/**
+ * Removes the pictures of a file that no longer show it: after a save every picture but the new one, after a
+ * delete, a move or a rename all that are left under the old name.
+ *
+ * Removing only the picture of the revision this computer saw is not enough since pictures are also found by
+ * size (see findSharedThumbnail): the one written on another computer has another time in its name, would
+ * stay behind, and could be shown again for later contents that happen to have the same length.
+ */
+async function removeSharedThumbnails(folder: string, fileName: string, keepRevisions: string[] = []) {
+  const keep = new Set(keepRevisions.map((revision) => `${fileName}.${revision}.png`));
+  for (const picture of await sharedThumbnailsOf(folder, fileName)) {
+    if (keep.has(picture.name)) continue;
+    await fs.unlink(path.join(folder, SHARED_THUMBNAILS_DIR, picture.name)).catch(() => undefined);
+  }
+}
+
 /** Relative on purpose: the app may be served from a sub-directory. */
 function sharedThumbnailUrl(fileName: string, revision: string, folderPath: string) {
   const query = new URLSearchParams({ fileName, thumbnail: "1", v: revision });
@@ -326,13 +408,15 @@ export async function GET(request: Request) {
         if (requestedRevision && requestedRevision !== revision) {
           return new NextResponse("Shared project thumbnail revision is stale", { status: 404 });
         }
-        const imagePath = sharedThumbnailPath(folder, fileName, revision);
-        const imageStat = await regularFileStat(imagePath);
-        if (!imageStat) return new NextResponse("Shared project thumbnail was not found", { status: 404 });
+        const found = await findSharedThumbnail(folder, fileName, stat);
+        if (!found) return new NextResponse("Shared project thumbnail was not found", { status: 404 });
+        const { imagePath, imageStat } = found;
         const imageStream = Readable.toWeb(createReadStream(imagePath));
         return new Response(imageStream as BodyInit, {
           headers: {
-            "Cache-Control": "public, max-age=31536000, immutable",
+            // A picture found by size only (#1874) may be replaced by the exact one once the sync program has
+            // brought it, under the same address - so the browser must not keep that one for a year.
+            "Cache-Control": found.exact ? "public, max-age=31536000, immutable" : "no-store",
             "Content-Length": String(imageStat.size),
             "Content-Type": "image/png",
             ETag: `"${revision}"`,
@@ -352,14 +436,14 @@ export async function GET(request: Request) {
     }
 
     const entries = await fs.readdir(folder, { withFileTypes: true });
+    const thumbnailNames: SharedThumbnailNames = new Map();
     const projects = await Promise.all(entries
       .filter((entry) => entry.isFile() && /\.(lyl|skf)$/i.test(entry.name))
       .map(async (entry) => {
         const stat = await regularFileStat(path.join(folder, entry.name));
         if (!stat) return null;
-        const revision = revisionForStat(stat);
-        const thumbnailStat = await regularFileStat(sharedThumbnailPath(folder, entry.name, revision));
-        return projectRecord(entry.name, stat, Boolean(thumbnailStat), folderPath);
+        const thumbnail = await findSharedThumbnail(folder, entry.name, stat, thumbnailNames);
+        return projectRecord(entry.name, stat, Boolean(thumbnail), folderPath);
       }));
     const folders = await Promise.all(entries
       .filter((entry) => entry.isDirectory() && !entry.name.startsWith("."))
@@ -399,6 +483,7 @@ async function searchStore(root: string, term: string) {
   const folders: Array<{ name: string; path: string; projects: number; folders: number }> = [];
   let truncated = false;
   let visited = 0;
+  const thumbnailNames: SharedThumbnailNames = new Map();
 
   const walk = async (folder: string, depth: number): Promise<void> => {
     if (depth > SEARCH_DEPTH_LIMIT || visited >= SEARCH_FOLDER_LIMIT) {
@@ -427,8 +512,7 @@ async function searchStore(root: string, term: string) {
       if (!name.toLowerCase().includes(needle)) continue;
       const stat = await regularFileStat(full);
       if (!stat) continue;
-      const revision = revisionForStat(stat);
-      const thumbnail = await regularFileStat(sharedThumbnailPath(folder, entry.name, revision));
+      const thumbnail = await findSharedThumbnail(folder, entry.name, stat, thumbnailNames);
       projects.push(projectRecord(entry.name, stat, Boolean(thumbnail), folderPath));
     }
   };
@@ -478,10 +562,11 @@ async function storeDesigns(root: string) {
 /** Every design with the folder it is in, and the folders with nothing in them, for "Download all". */
 async function allDesigns(root: string) {
   const { designs, emptyFolders, truncated } = await storeDesigns(root);
+  const thumbnailNames: SharedThumbnailNames = new Map();
   const projects = await Promise.all(designs.map(async ({ folder, fileName }) => {
     const stat = await regularFileStat(path.join(folder, fileName));
     if (!stat) return null;
-    const thumbnail = await regularFileStat(sharedThumbnailPath(folder, fileName, revisionForStat(stat)));
+    const thumbnail = await findSharedThumbnail(folder, fileName, stat, thumbnailNames);
     return projectRecord(fileName, stat, Boolean(thumbnail), folderKey(root, folder));
   }));
   return NextResponse.json(
@@ -575,12 +660,13 @@ async function moveProject(root: string, folder: string, requestedTarget: string
 
     const movedStat = await fs.stat(targetPath);
     const movedRevision = revisionForStat(movedStat);
-    const thumbnail = sharedThumbnailPath(folder, fileName, currentRevision);
+    const thumbnail = await findSharedThumbnail(folder, fileName, currentStat);
     let hasThumbnail = false;
-    if (await regularFileStat(thumbnail)) {
+    if (thumbnail) {
       await fs.mkdir(path.join(target, SHARED_THUMBNAILS_DIR), { recursive: true });
-      hasThumbnail = await fs.rename(thumbnail, sharedThumbnailPath(target, fileName, movedRevision)).then(() => true, () => false);
+      hasThumbnail = await fs.rename(thumbnail.imagePath, sharedThumbnailPath(target, fileName, movedRevision)).then(() => true, () => false);
     }
+    await removeSharedThumbnails(folder, fileName);
     const record = projectRecord(fileName, movedStat, hasThumbnail, folderKey(root, target));
     return NextResponse.json(
       { project: record, movedFrom: folderKey(root, folder) },
@@ -628,11 +714,12 @@ async function renameProjectFile(root: string, folder: string, requestedName: st
 
     const renamedStat = await fs.stat(newPath);
     const renamedRevision = revisionForStat(renamedStat);
-    const thumbnail = sharedThumbnailPath(folder, fileName, currentRevision);
+    const thumbnail = await findSharedThumbnail(folder, fileName, currentStat);
     let hasThumbnail = false;
-    if (await regularFileStat(thumbnail)) {
-      hasThumbnail = await fs.rename(thumbnail, sharedThumbnailPath(folder, newFileName, renamedRevision)).then(() => true, () => false);
+    if (thumbnail) {
+      hasThumbnail = await fs.rename(thumbnail.imagePath, sharedThumbnailPath(folder, newFileName, renamedRevision)).then(() => true, () => false);
     }
+    await removeSharedThumbnails(folder, fileName);
     const record = projectRecord(newFileName, renamedStat, hasThumbnail, folderKey(root, folder));
     return NextResponse.json(
       { project: record, renamedFrom: fileName },
@@ -690,11 +777,10 @@ async function copyProject(root: string, folder: string, requestedName: string, 
 
     const copyStat = await fs.stat(copyPath);
     const copyRevision = revisionForStat(copyStat);
-    const thumbnail = sharedThumbnailPath(folder, fileName, currentRevision);
+    const thumbnail = await findSharedThumbnail(folder, fileName, currentStat);
     let hasThumbnail = false;
-    if (await regularFileStat(thumbnail)) {
-      await fs.mkdir(path.join(folder, SHARED_THUMBNAILS_DIR), { recursive: true });
-      hasThumbnail = await fs.copyFile(thumbnail, sharedThumbnailPath(folder, copyFileName, copyRevision)).then(() => true, () => false);
+    if (thumbnail) {
+      hasThumbnail = await fs.copyFile(thumbnail.imagePath, sharedThumbnailPath(folder, copyFileName, copyRevision)).then(() => true, () => false);
     }
     const record = projectRecord(copyFileName, copyStat, hasThumbnail, folderKey(root, folder));
     return NextResponse.json(
@@ -924,6 +1010,8 @@ export async function DELETE(request: Request) {
     await fs.unlink(thumbnailPath).catch((error) => {
       if ((error as NodeJS.ErrnoException).code !== "ENOENT") throw error;
     });
+    // A picture written on another computer carries that computer's time in its name (#1874); it goes too.
+    await removeSharedThumbnails(folder, fileName);
     return NextResponse.json(
       { deleted: true, fileName },
       { headers: { "Cache-Control": "no-store" } },
@@ -1033,9 +1121,10 @@ export async function POST(request: Request) {
     if (thumbnailBytes && savedRevision !== project.revision) {
       await fs.rename(sharedThumbnailPath(folder, fileName, savedRevision), sharedThumbnailPath(folder, fileName, project.revision)).catch(() => undefined);
     }
-    if (currentRevision && currentRevision !== project.revision) {
-      await fs.unlink(sharedThumbnailPath(folder, fileName, currentRevision)).catch(() => undefined);
-    }
+    // Every picture of the contents that were just replaced goes, also one that another computer wrote under
+    // its own time (#1874). The name the new picture was first written under is kept as well: if the rename
+    // above failed, that is where it still is, and it is found there by its size.
+    await removeSharedThumbnails(folder, fileName, [project.revision, savedRevision]);
     return NextResponse.json(
       { project: { ...project, name: summary.projectName } },
       { status: currentStat ? 200 : 201, headers: { "Cache-Control": "no-store", ETag: `"${project.revision}"` } },
