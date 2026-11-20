@@ -4867,6 +4867,7 @@ export const MESSAGES_EN = {
   "camera.tapeCentreHole": "Centre of hole",
   "camera.tapeCentreCircle": "Centre of circle",
   "camera.tapeDistance": "Distance {length}",
+  "camera.tapeThickness": "Thickness {thickness}",
   "camera.tapeLengthMoves": "Type a length: “{name}” moves along the line; a negative length takes it past the other point",
   "camera.tapeLengthAlong": "Distance along {axis}: the body moves along {axis} only",
   "camera.tapeLengthLocked": "“{name}” is locked, so a typed length cannot move it",

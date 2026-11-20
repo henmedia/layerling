@@ -10,6 +10,7 @@ import { pointerReach } from "@/lib/pointerReach";
 import { outwardFaceNormal } from "@/lib/layFlat";
 import { axisLockedPoint, circleOfEdgePoints, closedRoundEdge, cornerOnRoundEdge, perpendicularFootOnPlane, perpendicularFootOnSegment, perpendicularPointsOnCircle, pointAcrossCircle, roundEdgeMeasure } from "@/lib/tapeCircle";
 import { planarFaces } from "@/lib/faceCentre";
+import { wallThicknessAt } from "@/lib/tapeThickness";
 import { aimPickRay, RENDER_LAYER_SHAPES } from "@/components/workplane/viewportPicking";
 import { type ThreeState, type TapeAttachment, type TapeEdgeAttachment, type TapeCandidate, type TapeCentre, type TapeCentreKind, projectToScreen, tapeShapeDimensions, formatMeasure, findShapeObject, worldPointHidden } from "@/components/workplane/ViewportOverlays";
 import { clamp } from "./viewportShapeObjects";
@@ -690,7 +691,12 @@ export function pickModelTapeCandidate(
     }
   }
   const attachment = tapeAttachmentFromWorld(state, shapeId, surfaceHit.point);
-  return attachment ? { x: surfaceHit.point.x, y: surfaceHit.point.y, z: surfaceHit.point.z, attachment, surfaceNormal } : null;
+  if (!attachment) return null;
+  // Before the first point is placed, a face also says how thick the body is under the pointer (Discussion #1820).
+  const body = !startWorld && hitNormal ? findShapeObject(state, shapeId) : null;
+  const wall = body && hitNormal ? wallThicknessAt(body, surfaceHit.point, hitNormal, RENDER_LAYER_SHAPES) : null;
+  const thickness = wall ? { exit: wall.exit.toArray(), value: wall.thickness } : undefined;
+  return { x: surfaceHit.point.x, y: surfaceHit.point.y, z: surfaceHit.point.z, attachment, surfaceNormal, ...(thickness ? { thickness } : {}) };
 }
 
 export function distanceToScreenSegment(x: number, y: number, ax: number, ay: number, bx: number, by: number) {
