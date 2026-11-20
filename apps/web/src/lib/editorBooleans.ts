@@ -2323,6 +2323,30 @@ function intersectionOperandsOverlap(operands: WorkplaneShape[][]) {
   return rest.every((operand) => hasSolidHoleOverlap(first, operand));
 }
 
+/**
+ * What two bodies have in common, without the sheets of no thickness where they only touch. A box standing exactly on
+ * another has nothing in common with it, but the kernel counts a shared face as an overlap with no height: of a box with
+ * a ball in it and a box on top of that box, the ball's upper part came out with the whole touching face hanging on it
+ * as a paper-thin layer (Issue #1886). The kernel folds walls that thin away, as it does the steps a hole's padding
+ * leaves (#1133); it folds only within one source mesh, so the result is taken as a mesh of its own first.
+ *
+ * A sheet has no volume, so taking it away changes none and only makes the surface smaller. A fold that moved volume or
+ * added surface did something else (Discussion #1272) and is not taken. Two bodies that only touch fold to nothing at
+ * all, which is the empty intersection they have.
+ */
+function withoutTouchingSheets(result: ManifoldSolid, created: ManifoldSolid[]): ManifoldSolid {
+  const whole = result.asOriginal();
+  created.push(whole);
+  const tidy = whole.setTolerance(MERGE_SLIVER_TOLERANCE);
+  created.push(tidy);
+  if (tidy.status() !== "NoError") return result;
+  const before = measured(result);
+  const after = measured(tidy);
+  const sameVolume = Math.abs(after.volume - before.volume) <= Math.max(0.05, Math.abs(before.volume) * 1e-4);
+  const noNewSurface = after.area <= before.area + Math.max(1, before.area * 1e-3);
+  return sameVolume && noNewSurface ? tidy : result;
+}
+
 async function manifoldIntersectionMeshShape(plan: IntersectionPlan, triangleLimit: number): Promise<IntersectionAttempt> {
   const sourceTriangleCount = plan.children.reduce((total, shape) => total + meshForShape(shape).faces.length, 0);
   if (sourceTriangleCount > triangleLimit) {
@@ -2348,6 +2372,7 @@ async function manifoldIntersectionMeshShape(plan: IntersectionPlan, triangleLim
         return { status: "unsupported" };
       }
     }
+    if (result) result = withoutTouchingSheets(result, created);
     if (!result || result.numTri() < 1) {
       return { status: "empty" };
     }
