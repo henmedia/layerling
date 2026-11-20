@@ -325,5 +325,20 @@
     "guide": {
       "section": "addShape"
     }
+  },
+  {
+    "title": {
+      "de": "Skizze: Koordinaten eines Punktes",
+      "en": "Sketch: a point's coordinates",
+      "da": "Skitse: et punkts koordinater"
+    },
+    "body": {
+      "de": "Ruht der Mauszeiger in der Skizze auf einem Punkt, zeigt ein kleines Schild daneben sein X und Y. Beim Ziehen läuft es mit, so siehst du gleich, wo der Punkt landet. „Maße anzeigen“ blendet es mit den anderen Maßen aus.\n\nAußerdem bleibt ein Punkt jetzt liegen, wenn du ihn nur anklickst: Bisher konnte er dabei ein kleines Stück aufs Raster springen.",
+      "en": "With the pointer resting on a point of a sketch, a small label beside it shows the point's X and Y. It follows the point while you drag it, so you see at once where it will land. \"Show measurements\" hides it with the other dimensions.\n\nAlso, a point now stays where it is when you only click it: until now it could jump a little, onto the grid.",
+      "da": "Når markøren hviler på et punkt i en skitse, viser en lille etiket ved siden af punktets X og Y. Den følger med, mens du trækker punktet, så du straks ser, hvor det lander. \"Vis mål\" skjuler den sammen med de andre mål.\n\nDesuden bliver et punkt nu liggende, når du kun klikker på det: hidtil kunne det springe et lille stykke hen på gitteret."
+    },
+    "guide": {
+      "chapter": "sketches"
+    }
   }
 ]

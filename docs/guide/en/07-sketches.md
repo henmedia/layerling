@@ -188,7 +188,7 @@ With nothing selected, double-click an empty spot to slide it to the middle of t
 ::: Dimensions
 Click a line or a point.
 => The sketch shows the length of the line, or for a point the lengths of the lines that meet there.
-{{ui:sketch.showMeasurements}} on the sketch toolbar hides and shows these dimensions when they get in the way, for example while shaping curves.
+{{ui:sketch.showMeasurements}} on the sketch toolbar hides and shows these dimensions when they get in the way, for example while shaping curves. With the pointer resting on a point, a small label beside it shows the point's X and Y, in mm from the sketch's origin, and follows the point while it is dragged; the button hides this label too.
 The {{ui:camera.tapeTools}} on the sketch toolbar measures the distance between two points; it keeps working with the dimensions hidden.
 :::
 

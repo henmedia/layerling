@@ -188,7 +188,7 @@ Gdy nic nie jest zaznaczone, kliknij dwukrotnie puste miejsce, aby przesunąć j
 ::: Wymiary
 Kliknij linię albo punkt.
 => Szkic pokazuje długość linii, a dla punktu długości linii, które się w nim spotykają.
-{{ui:sketch.showMeasurements}} na pasku narzędzi szkicu ukrywa i pokazuje te wymiary, gdy przeszkadzają, na przykład podczas kształtowania krzywych.
+{{ui:sketch.showMeasurements}} na pasku narzędzi szkicu ukrywa i pokazuje te wymiary, gdy przeszkadzają, na przykład podczas kształtowania krzywych. Gdy wskaźnik spoczywa na punkcie, mała etykieta obok pokazuje jego X i Y, w mm od początku szkicu, i podąża za punktem podczas przeciągania; przycisk ukrywa także tę etykietę.
 {{ui:camera.tapeTools}} na pasku narzędzi szkicu mierzy odległość między dwoma punktami. Działa dalej, gdy wymiary są ukryte.
 :::
 

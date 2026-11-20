@@ -188,7 +188,7 @@ När inget är markerat dubbelklickar du på en tom plats för att skjuta den ti
 ::: Mått
 Klicka på en linje eller en punkt.
 => Skissen visar linjens längd, eller för en punkt längderna på de linjer som möts där.
-{{ui:sketch.showMeasurements}} i skissverktygsfältet döljer och visar de här måtten när de är i vägen, till exempel medan du formar kurvor.
+{{ui:sketch.showMeasurements}} i skissverktygsfältet döljer och visar de här måtten när de är i vägen, till exempel medan du formar kurvor. När pekaren vilar på en punkt visar en liten etikett bredvid punktens X och Y, i mm från skissens origo, och den följer med medan punkten dras; knappen döljer även den etiketten.
 {{ui:camera.tapeTools}} i skissverktygsfältet mäter avståndet mellan två punkter; det fortsätter fungera även när måtten är dolda.
 :::
 

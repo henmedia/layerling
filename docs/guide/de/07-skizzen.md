@@ -188,7 +188,7 @@ Ist nichts ausgewählt, schiebt ein Doppelklick auf eine freie Stelle sie in die
 ::: Maße
 Eine Linie oder einen Punkt anklicken.
 => Die Skizze zeigt bei einer Linie ihre Länge, bei einem Punkt die Längen der Linien, die dort zusammentreffen.
-Die Schaltfläche {{ui:sketch.showMeasurements}} in der Skizzenleiste blendet diese Maße aus und wieder ein, wenn sie stören, zum Beispiel beim Formen von Kurven.
+Die Schaltfläche {{ui:sketch.showMeasurements}} in der Skizzenleiste blendet diese Maße aus und wieder ein, wenn sie stören, zum Beispiel beim Formen von Kurven. Ruht der Mauszeiger auf einem Punkt, zeigt ein kleines Schild daneben sein X und Y, in mm vom Ursprung der Skizze, und läuft mit, während der Punkt gezogen wird; die Schaltfläche blendet auch dieses Schild aus.
 Das {{ui:camera.tapeTools}} in der Skizzenleiste misst den Abstand zwischen zwei Punkten; es funktioniert auch bei ausgeblendeten Maßen.
 :::
 
