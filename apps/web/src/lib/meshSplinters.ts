@@ -26,6 +26,13 @@ export const SPLINTER_THIN_SHARE = 0.05;
  */
 export const SPLINTER_DRAWN_SHARE = 0.05;
 
+/**
+ * A mesh a body was made from. `workedOut` marks one layerling worked out itself - a group as the editor keeps it, the
+ * result of a cut: of its loose pieces only those of more than a handful of triangles are parts someone drew, as a
+ * cut made earlier in the design has left its own splinters in it (#352).
+ */
+export type DrawnMesh = MeshData & { workedOut?: boolean };
+
 const WELD = 1000;
 /** How far a piece may reach past the box of the drawn piece it is left of, in millimetres: the weld's own step. */
 const DRAWN_BOX_SLACK = 2 / WELD;
@@ -109,8 +116,13 @@ function boxWithin(inner: readonly number[], outer: readonly number[]) {
  * as the largest piece of the whole body does, while it still holds a real share of the piece
  * (SPLINTER_DRAWN_SHARE) and holds something at all. Which drawn piece a part is left of is read from the boxes:
  * the smallest drawn piece whose box it lies in.
+ *
+ * A group is kept as the mesh layerling worked out for it, and so are the parts of a logo grouped from such meshes: the
+ * teeth and whisker dots of a cat's face, 41 pieces in one group, each with hundreds of triangles round its outline
+ * and some with 0.02 mm3 in them, are pieces someone drew all the same (Issue #1781). In such a mesh (`workedOut`) a
+ * piece of a handful of triangles is not taken for drawn: that is what a cut made earlier leaves behind (#352).
  */
-export function removeLooseSplinters(mesh: MeshData, drawn: readonly MeshData[] = []): { mesh: MeshData; removed: number } {
+export function removeLooseSplinters(mesh: MeshData, drawn: readonly DrawnMesh[] = []): { mesh: MeshData; removed: number } {
   const faceCount = mesh.faces.length;
   if (faceCount < 8) return { mesh, removed: 0 };
 
@@ -181,8 +193,16 @@ export function removeLooseSplinters(mesh: MeshData, drawn: readonly MeshData[] 
   });
   if (splinters.size > 0 && drawn.length > 0) {
     const drawnPieces = drawn.flatMap((source) => {
-      const measured = measuredPieces(source, loosePieces(source));
-      return [...measured.box].map(([root, bounds]) => ({ bounds, held: Math.abs(measured.volume.get(root) ?? 0) }));
+      const sourcePieces = loosePieces(source);
+      const measured = measuredPieces(source, sourcePieces);
+      const all = [...measured.box].map(([root, bounds]) => ({ root, bounds, held: Math.abs(measured.volume.get(root) ?? 0) }));
+      if (!source.workedOut) return all;
+      const count = new Map<number, number>();
+      for (const [a] of source.faces) {
+        const root = sourcePieces.find(sourcePieces.corner[a]);
+        count.set(root, (count.get(root) ?? 0) + 1);
+      }
+      return all.filter((piece) => (count.get(piece.root) ?? 0) > SPLINTER_MAX_TRIANGLES);
     });
     [...splinters].forEach((root) => {
       const bounds = box.get(root)!;

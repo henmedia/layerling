@@ -122,4 +122,83 @@ describe("small parts in the colour-separated export (Issue #1781)", () => {
     expect(trim.volume).toBeGreaterThan(49);
     expect(trim.volume).toBeLessThan(51);
   });
+
+  /*
+   * The report's own design: a cat's face, its yellow inlay a group of 41 loose pieces - teeth, whisker dots, stripes
+   * of fur, 1 mm high. The editor keeps a group as the mesh it worked out for it (sourceFormat "json"), and such a mesh
+   * was not asked for its drawn pieces at all, as a cut made earlier may have left splinters in it. So 16 of the 41
+   * pieces, each under half a cubic millimetre, still went. They have hundreds of triangles round their outline;
+   * what a cut leaves behind has a handful (#352), and only that is not taken for drawn in such a mesh.
+   */
+  describe("in a group as the editor keeps it, a mesh worked out from its parts", () => {
+    type Vec = [number, number, number];
+    type Part = { vertices: Vec[]; faces: [number, number, number][] };
+    const YELLOW = "#f2cf10";
+    const PURPLE = "#9b3bd2";
+
+    /** A standing prism with a regular base, outward facing: a dot of 4n - 4 triangles. */
+    function dot(sides: number, radius: number, height: number, x: number, y: number): Part {
+      const vertices: Vec[] = [];
+      for (let level = 0; level < 2; level += 1) {
+        for (let k = 0; k < sides; k += 1) vertices.push([x + radius * Math.cos((k / sides) * 2 * Math.PI), y + level * height, radius * Math.sin((k / sides) * 2 * Math.PI)]);
+      }
+      const faces: [number, number, number][] = [];
+      for (let k = 1; k < sides - 1; k += 1) faces.push([0, k + 1, k], [sides, sides + k, sides + k + 1]);
+      for (let k = 0; k < sides; k += 1) {
+        const next = (k + 1) % sides;
+        faces.push([k, next, sides + next], [k, sides + next, sides + k]);
+      }
+      return { vertices, faces };
+    }
+
+    /** A bar of 20 x 6 x 10 mm from x = 10 to 30, 2 mm above the plate, as twelve triangles. */
+    const bar = (): Part => {
+      const [x0, y0, z0, x1, y1, z1] = [10, 2, -5, 30, 8, 5];
+      const vertices: Vec[] = [[x0, y0, z0], [x1, y0, z0], [x1, y1, z0], [x0, y1, z0], [x0, y0, z1], [x1, y0, z1], [x1, y1, z1], [x0, y1, z1]];
+      const faces: [number, number, number][] = [];
+      for (const [a, b, c, d] of [[0, 3, 2, 1], [4, 5, 6, 7], [0, 1, 5, 4], [2, 3, 7, 6], [1, 2, 6, 5], [3, 0, 4, 7]]) faces.push([a, b, c], [a, c, d]);
+      return { vertices, faces };
+    };
+
+    /** These pieces as one body the way a group is kept: its mesh, worked out by layerling, and no parts to build it from. */
+    function keptGroup(name: string, color: string, parts: Part[]): WorkplaneShape {
+      const corners = parts.flatMap((part) => part.vertices);
+      const min = [0, 1, 2].map((axis) => Math.min(...corners.map((corner) => corner[axis])));
+      const max = [0, 1, 2].map((axis) => Math.max(...corners.map((corner) => corner[axis])));
+      const [width, height, depth] = [0, 1, 2].map((axis) => max[axis] - min[axis]);
+      const centerX = (min[0] + max[0]) / 2;
+      const centerZ = (min[2] + max[2]) / 2;
+      const positions: number[] = [];
+      parts.forEach((part) => part.faces.forEach((face) => face.forEach((index) => {
+        const [x, y, z] = part.vertices[index];
+        positions.push(x - centerX, y - min[1], z - centerZ);
+      })));
+      return {
+        id: name, name, kind: "mesh", color, x: centerX, z: centerZ, elevation: min[1], rotation: 0, width, depth, height, size: Math.max(width, depth), locked: false, hidden: false,
+        importedMesh: { positions, baseWidth: width, baseDepth: depth, baseHeight: height, triangleCount: positions.length / 9, sourceFormat: "json" },
+      } as WorkplaneShape;
+    }
+
+    // The face, 40 x 10 x 40 mm round the middle, comes later and takes the half of the bar that lies in it.
+    const face = () => box("face", PURPLE, 0, 0, 0, 40, 10, 40);
+    // Three whisker dots of 0.3 mm beside the bar that the face does not reach: 60 triangles and 0.07 mm3 each.
+    const dots = () => [32, 33, 34].map((x) => dot(16, 0.15, 1, x, 9));
+
+    it("keeps the dots of the group when another colour cuts it", async () => {
+      const { bodies, splinters } = await threeMfBodies([keptGroup("inlay", YELLOW, [bar(), ...dots()]), face()]);
+      expect(splinters).toBe(0);
+      const inlay = bodies.find((body) => body.name === "inlay")!;
+      expect(inlay.pieces).toBe(4);
+      const one = dot(16, 0.15, 1, 0, 0);
+      expect(inlay.volume).toBeCloseTo(10 * 6 * 10 + 3 * Math.abs(closedMeshVolume(one.vertices, one.faces)), 2);
+    });
+
+    it("still leaves out a grain of a few triangles that an earlier cut left in the group", async () => {
+      // A closed grain of four triangles and 0.036 mm3 beside the dots: what #352 was about, already in the group's mesh.
+      const grain: Part = { vertices: [[36, 9, 0], [36.6, 9, 0], [36, 9.6, 0], [36, 9, 0.6]], faces: [[0, 2, 1], [0, 1, 3], [1, 2, 3], [0, 3, 2]] };
+      const { bodies, splinters } = await threeMfBodies([keptGroup("inlay", YELLOW, [bar(), ...dots(), grain]), face()]);
+      expect(splinters).toBe(1);
+      expect(bodies.find((body) => body.name === "inlay")!.pieces).toBe(4);
+    });
+  });
 });

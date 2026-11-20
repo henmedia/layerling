@@ -1,7 +1,7 @@
 
 import { bentTubeParameterPatch, bentTubeProfileRadii, bentTubeSettings } from "@/lib/bentTubeGeometry";
 import { BUNDLE_SCOPE_BASE } from "@/lib/cadModifierGroups";
-import { removeLooseSplinters } from "@/lib/meshSplinters";
+import { removeLooseSplinters, type DrawnMesh } from "@/lib/meshSplinters";
 import { closeSmallMeshHoles } from "@/lib/meshHoleFill";
 import { meshIsConvex } from "@/lib/meshConvexity";
 import type { ManifoldToplevel } from "manifold-3d";
@@ -1408,11 +1408,13 @@ function isPileOfSolids(shape: WorkplaneShape) {
 }
 
 async function unionOverlappingExportMeshesRaw(shapes: WorkplaneShape[], meshes: MeshData[], cut?: readonly boolean[]) {
-  // The meshes whose loose pieces are parts someone drew. A body a loose hole was cut from is none any more, and
-  // neither is a mesh layerling worked out itself, such as a group cut with its holes: a cut may have left splinters there.
-  const drawnMeshes = (indices: readonly number[]) => indices
-    .filter((index) => !cut?.[index] && shapes[index]?.importedMesh?.sourceFormat !== "json")
-    .map((index) => meshes[index]);
+  // The meshes whose loose pieces are parts someone drew. A body a loose hole was cut from is none any more. A mesh
+  // layerling worked out itself, such as a group cut with its holes, may hold the splinters of that cut, so it is
+  // marked: there only a piece of more than a handful of triangles is a drawn one. Every group the editor keeps is
+  // such a mesh, and left out altogether the teeth and dots of a grouped logo still went as splinters (Issue #1781).
+  const drawnMeshes = (indices: readonly number[]): DrawnMesh[] => indices
+    .filter((index) => !cut?.[index])
+    .map((index) => (shapes[index]?.importedMesh?.sourceFormat === "json" ? { ...meshes[index], workedOut: true } : meshes[index]));
   const gruppen = overlappingExportClusters(meshes.map((mesh) => meshBounds(mesh.vertices)));
   if (!gruppen.some((gruppe) => gruppe.length > 1 || isPileOfSolids(shapes[gruppe[0]]))) {
     return { meshes, quellen: meshes.map((_, index) => index), verschmolzen: 0, gescheitert: 0, gestutzt: meshes.map((_, index) => Boolean(cut?.[index])), gezeichnet: meshes.map((_, index) => drawnMeshes([index])) };
@@ -1422,7 +1424,7 @@ async function unionOverlappingExportMeshesRaw(shapes: WorkplaneShape[], meshes:
   // Which results a cut or a merge of several bodies made: only there a splinter can have been left behind (#585).
   const gestutzt: boolean[] = [];
   // The meshes each result was made from: their loose pieces are parts someone drew, not splinters (Issue #1781).
-  const gezeichnet: MeshData[][] = [];
+  const gezeichnet: DrawnMesh[][] = [];
   // Which input shape each result stands for - a merged body takes its first
   // member, so the 3MF export can keep names and colours.
   const quellen: number[] = [];
@@ -1845,7 +1847,7 @@ async function colorSeparatedExportMeshesRaw(shapes: WorkplaneShape[], meshes: M
   if (farben.length <= 1) {
     return unionOverlappingExportMeshesRaw(shapes, meshes, cut);
   }
-  const koerper: { mesh: MeshData; quelle: number; farbe: number; gestutzt: boolean; gezeichnet: MeshData[] }[] = [];
+  const koerper: { mesh: MeshData; quelle: number; farbe: number; gestutzt: boolean; gezeichnet: DrawnMesh[] }[] = [];
   let verschmolzen = 0;
   let gescheitert = 0;
   for (const [farbe, gruppe] of farben.entries()) {
@@ -1869,7 +1871,7 @@ async function colorSeparatedExportMeshesRaw(shapes: WorkplaneShape[], meshes: M
   const ergebnis: MeshData[] = [];
   const quellen: number[] = [];
   const gestutzt: boolean[] = [];
-  const gezeichnet: MeshData[][] = [];
+  const gezeichnet: DrawnMesh[][] = [];
 
   /** The bodies of another colour that reach a body and came later: the shapes that cut it (Discussion #79). */
   const spaeter = (index: number) => koerper
@@ -1967,7 +1969,7 @@ async function colorSeparatedExportMeshesRaw(shapes: WorkplaneShape[], meshes: M
  * What an export writes: the loose splinters a cut or the colour separation leaves behind are left out (#352), as
  * `splinters` counts. A slicer shows them as spikes, and they can lift a flat design off the plate.
  */
-function withoutSplinters<T extends { meshes: MeshData[]; gestutzt: boolean[]; gezeichnet: MeshData[][] }>(result: T): T & { splinters: number } {
+function withoutSplinters<T extends { meshes: MeshData[]; gestutzt: boolean[]; gezeichnet: DrawnMesh[][] }>(result: T): T & { splinters: number } {
   let splinters = 0;
   const meshes = result.meshes.map((mesh, index) => {
     // Only what a cut, a merge of several bodies or the colour separation made can hold a splinter. A body they did

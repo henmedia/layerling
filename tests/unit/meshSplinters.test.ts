@@ -176,4 +176,26 @@ describe("small pieces a body was drawn with (Issue #1781)", () => {
     expect(result.removed).toBe(2);
     expect(result.mesh.faces.length).toBe(plate.faces.length + 12);
   });
+
+  describe("in a mesh layerling worked out itself, as every group is kept (Issue #1781)", () => {
+    const moved = (part: Part, dx: number): Part => ({ vertices: part.vertices.map(([x, y, z]) => [x + dx, y, z] as Vec), faces: part.faces });
+    // A whisker dot of a logo: 60 triangles round its outline, 0.07 mm3 in it.
+    const dot = (x: number) => moved(prism(16, 0.15, 1), x);
+    // What a cut made earlier in the design left in the group: a closed grain of four triangles, 0.036 mm3.
+    const grain = tetra([40, 0, 0], [40.6, 0, 0], [40, 0.6, 0], [40, 0, 0.6]);
+
+    it("keeps the small pieces of many triangles the group was drawn with", () => {
+      const body = join("inlay", [plate, dot(20), dot(23), dot(26)]);
+      expect(removeLooseSplinters(body).removed).toBe(3);
+      const result = removeLooseSplinters(body, [{ ...body, workedOut: true }]);
+      expect(result.removed).toBe(0);
+      expect(result.mesh).toBe(body);
+    });
+
+    it("still takes out a handful of triangles, which is drawn only in a mesh that was not worked out", () => {
+      const body = join("inlay", [plate, dot(20), grain]);
+      expect(removeLooseSplinters(body, [{ ...body, workedOut: true }]).removed).toBe(1);
+      expect(removeLooseSplinters(body, [body]).removed).toBe(0);
+    });
+  });
 });
