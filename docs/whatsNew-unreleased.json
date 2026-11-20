@@ -232,5 +232,18 @@
     "guide": {
       "section": "holePattern"
     }
+  },
+  {
+    "title": {
+      "de": "M3.5 in den Größenlisten",
+      "en": "M3.5 in the size lists"
+    },
+    "body": {
+      "de": "M3.5 steht jetzt zwischen M3 und M4 zur Wahl: beim Gewinde (Stange, Schraube, Mutter und Gewindeloch, Steigung 0,6 mm), bei der Mutternaussparung des Sechskants, bei den Unterlegscheiben des Rohrs und als Schraubengröße von Senkbohrung, Doppelsenkung, Rosette und den Senkungen im Lochmuster.\n\nDie Stufenbohrung bietet M3.5 nicht an, weil es dafür keine genormte Zylinderschraube mit Innensechskant gibt; dort trägst du die Maße selbst ein.",
+      "en": "M3.5 is now offered between M3 and M4: for the thread (rod, screw, nut and tapped hole, pitch 0.6 mm), the nut pocket of the hexagon, the washers of the tube, and as a screw size of the countersink, the double countersink, the finishing washer and the countersunk holes of the hole pattern.\n\nThe counterbore does not offer M3.5, because there is no standard socket head cap screw of that size; there you type the measures yourself."
+    },
+    "guide": {
+      "chapter": "threads"
+    }
   }
 ]
