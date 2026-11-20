@@ -2007,6 +2007,10 @@ function validateShapeDefinition(definition: Record<string, unknown>, label: str
     const portClearance = finiteNumber(definition.portClearance, `${label}.portClearance`);
     if (portClearance < 0 || portClearance > 2) throw new Error(`${label}.portClearance is outside the supported range`);
   }
+  if (kind === "polygon" && definition.polygonFlat !== undefined && typeof definition.polygonFlat !== "boolean") {
+    // A polygon with a flat side in front (Discussion #1787): on or off.
+    throw new Error(`${label}.polygonFlat must be true or false`);
+  }
   if ((kind === "port" || kind === "polygon") && definition.cornerFillet !== undefined) {
     const cornerFillet = finiteNumber(definition.cornerFillet, `${label}.cornerFillet`);
     if (cornerFillet < 0 || cornerFillet > 1e6) throw new Error(`${label}.cornerFillet is outside the supported range`);

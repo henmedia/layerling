@@ -1,6 +1,6 @@
 import { transformMesh } from "@/lib/editorMeshCore";
 import { pyramidAngleOffset } from "@/lib/pyramidGeometry";
-import { regularPolygonFootprintScale } from "@/lib/regularPolygonFootprint";
+import { polygonFlatAngle, regularPolygonFootprintScale } from "@/lib/regularPolygonFootprint";
 import type { WorkplaneShape } from "@/types/layerling";
 
 export type AlignPoint = { x: number; y: number; z: number };
@@ -21,7 +21,7 @@ function ownMiddle(shape: WorkplaneShape): { x: number; z: number; y?: number } 
   }
   if (shape.kind === "star") return { x: 0, z: 0 };
   if (shape.kind === "polygon") {
-    const fit = regularPolygonFootprintScale(shape.width, shape.depth, Math.max(3, Math.round(shape.sides ?? 6)));
+    const fit = regularPolygonFootprintScale(shape.width, shape.depth, Math.max(3, Math.round(shape.sides ?? 6)), polygonFlatAngle(shape.sides, shape.polygonFlat));
     return { x: fit.offsetX, z: fit.offsetZ };
   }
   if (shape.kind === "pyramid") {

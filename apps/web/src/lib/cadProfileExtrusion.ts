@@ -10,7 +10,7 @@ import { cadTransformFromMatrix } from "@/lib/cadBakeMetadata";
 import { CAD_MODIFIER_EXACT_SEGMENT_LIMIT } from "@/lib/cadModifierRuntime";
 import { deformsAboutOrigin, extrudeTwistPivot, meshYawDegrees, mirrorSign, shapeDepth, shapeHasExtrudeDeform, shapeHasShapeDeform, shapeHasTaper, shapeTaperDimensions, shapeWidth } from "@/lib/workplaneShapes";
 import { alongLevels, LYING_ALONG_KINDS, narrowCurveForShape, narrowHalfWidthAt, normalizeSlopeSide, shapeHasAlongDeform, shapeHasNarrow, shapeHasSymmetricDeform, shapeHasSlope, slopeAlongWidth, slopeCurveForShape, slopeLengths, slopeScaleAt, slopeSectionCount } from "@/lib/slopeAlong";
-import { regularPolygonFootprintScale } from "@/lib/regularPolygonFootprint";
+import { polygonFlatAngle, regularPolygonFootprintScale } from "@/lib/regularPolygonFootprint";
 import { roundSideCount } from "@/lib/roundSideCount";
 import { drawnRound, ROUND_FROM_BENT_TUBE_QUALITY, ROUND_FROM_HALF_SPHERE_STEPS, ROUND_FROM_ROOF_SIDES, ROUND_FROM_SIDES, ROUND_FROM_SPHERE_STEPS } from "@/lib/roundness";
 import { bentTubeLocalPlacement, bentTubePathPieces, bentTubeProfileRadii, bentTubeSelfIntersects, bentTubeSettings, profilePoints as bentTubeProfilePoints } from "@/lib/bentTubeGeometry";
@@ -162,15 +162,17 @@ function fitLoop(loop: CadModifierProfileLoop, width: number, depth: number) {
 }
 
 /** createPrismGeometry: THREE.CylinderGeometry corners (sin, cos) fitted with regularPolygonFootprintScale. */
-export function polygonProfileLoops(width: number, depth: number, sides = 6, cornerRadius = 0) {
+export function polygonProfileLoops(width: number, depth: number, sides = 6, cornerRadius = 0, flat = false) {
   const count = Math.max(3, Math.round(sides));
-  const fit = regularPolygonFootprintScale(width, depth, count);
+  // A flat side in front (#1787): the corners half a side step further round, as the mesh has them.
+  const offset = polygonFlatAngle(count, flat);
+  const fit = regularPolygonFootprintScale(width, depth, count, offset);
   const points = Array.from({ length: count }, (_, index) => {
-    const angle = (index / count) * Math.PI * 2;
+    const angle = (index / count) * Math.PI * 2 + offset;
     return { x: Math.sin(angle) * fit.x + fit.offsetX, z: Math.cos(angle) * fit.z + fit.offsetZ };
   });
   // Rounded corners (roundedPolygonGeometry.ts) as true arcs, one radius for every corner.
-  const radius = normalizePolygonCornerRadius(cornerRadius, width, depth, count);
+  const radius = normalizePolygonCornerRadius(cornerRadius, width, depth, count, flat);
   if (radius <= 1e-4) return [polygonLoop(points)];
   const corners = points.map((corner, index): Corner => {
     const previous = points[(index - 1 + count) % count];
@@ -1056,7 +1058,7 @@ export function cadProfileForShapeKind(shape: WorkplaneShape, designedRound = fa
     case "bentTube":
       return bentTubeSweep(shape, width, depth, designedRound);
     case "polygon":
-      return { loops: polygonProfileLoops(width, depth, shape.sides ?? 6, shape.cornerFillet ?? 0) };
+      return { loops: polygonProfileLoops(width, depth, shape.sides ?? 6, shape.cornerFillet ?? 0, Boolean(shape.polygonFlat)) };
     case "star":
       return { loops: starProfileLoops(width, depth, shape) };
     case "heart":

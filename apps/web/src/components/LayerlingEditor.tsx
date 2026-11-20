@@ -14531,7 +14531,7 @@ export function LayerlingEditor({
           : kind === "finishingWasher" && isFinishingWasherSize(params.screwSize) ? finishingWasherFields(params.screwSize) : undefined;
         if (holeKind && params.screwSize !== undefined && !screwHole) throw new Error(`screwSize must be one of ${screwHoleSizesFor(holeKind).join(", ")}`);
         if (kind === "finishingWasher" && params.screwSize !== undefined && !screwHole) throw new Error(`screwSize must be one of ${finishingWasherSizes().join(", ")}`);
-        const nutPocket = kind === "polygon" && isNutPocketSize(params.nut) ? nutPocketFields(params.nut) : undefined;
+        const nutPocket = kind === "polygon" && isNutPocketSize(params.nut) ? nutPocketFields(params.nut, params.polygonFlat === true) : undefined;
         if (kind === "polygon" && params.nut !== undefined && !nutPocket) throw new Error(`nut must be one of ${NUT_POCKET_SIZE_ORDER.join(", ")}`);
         if (nutPocket && params.sides !== undefined && Math.round(Number(params.sides)) !== 6) throw new Error("nut needs a hexagon: leave sides out or set it to 6");
         const sizePreset = washer ?? screwHole ?? nutPocket;

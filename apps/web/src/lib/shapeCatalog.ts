@@ -1,5 +1,5 @@
 import { canonicalizeShape } from "@/lib/workplaneShapes";
-import { regularPolygonAspect } from "@/lib/regularPolygonFootprint";
+import { polygonFlatAngle, regularPolygonAspect } from "@/lib/regularPolygonFootprint";
 import { normalizePolygonCornerRadius } from "@/lib/roundedPolygonGeometry";
 import { normalizePyramidTop } from "@/lib/pyramidGeometry";
 import { createLocalId } from "@/lib/localIds";
@@ -982,6 +982,7 @@ export function sceneShape(shape: Partial<WorkplaneShape> & Pick<WorkplaneShape,
     portProfile: shape.portProfile,
     portClearance: shape.portClearance,
     cornerFillet: shape.cornerFillet,
+    polygonFlat: shape.polygonFlat,
     cornerFillets: shape.cornerFillets,
     topBottomFillet: shape.topBottomFillet,
     bottomFillet: shape.bottomFillet,
@@ -1038,13 +1039,26 @@ export function clipboardShape(entry: unknown): WorkplaneShape | null {
   return canonicalizeShape({ ...sceneShape({ ...shape, name, kind, color }), ...shape, name, kind, color });
 }
 
+/**
+ * A new Polygon with a flat side in front (Discussion #1787) starts regular too: the hexagon's default footprint
+ * with its corners turned by half a side, so length and width change places.
+ */
+function flatPolygonDefaultDimensions(sides: number | undefined) {
+  const count = Math.max(3, Math.round(sides ?? 6));
+  const aspect = regularPolygonAspect(count, polygonFlatAngle(count, true));
+  const longest = Math.max(aspect.width, aspect.depth);
+  return { width: (20 * aspect.width) / longest, depth: (20 * aspect.depth) / longest, height: 20 };
+}
+
 export function makeShapeFromAsset(
   asset: ShapeAsset,
   point?: { x: number; z: number; elevation?: number },
   customization: ShapeCustomization = {},
 ): WorkplaneShape {
   // A flat spring (#1076) starts as a strip on the plate, not in the coil's upright box.
-  const defaults = asset.kind === "spring" && customization.springForm === "flat" ? FLAT_SPRING_DIMENSIONS : shapeAssetDefaultDimensions(asset.kind);
+  const defaults = asset.kind === "spring" && customization.springForm === "flat" ? FLAT_SPRING_DIMENSIONS
+    : asset.kind === "polygon" && customization.polygonFlat ? flatPolygonDefaultDimensions(customization.sides)
+      : shapeAssetDefaultDimensions(asset.kind);
   // Ein Gewinde bekommt seinen Platzbedarf aus Durchmesser und Art. Eine
   // eingetragene Breite waere hier nicht nur ueberfluessig, sondern falsch:
   // sie wuerde spaeter als Zug am Anfasser gelesen und den Durchmesser
@@ -1433,7 +1447,9 @@ export function makeShapeFromAsset(
     cornerFillet: asset.kind === "roundedBox" ? normalizeCornerFillet(customization.cornerFillet ?? DEFAULT_ROUNDED_BOX_CORNER_FILLET, Math.min(width, depth) / 2)
       : asset.kind === "port" ? normalizePortCorner(customization.cornerFillet, width, height, customization.portProfile)
         // A polygon's rounded corners (roundedPolygonGeometry.ts); left out while they are sharp.
-        : asset.kind === "polygon" && (customization.cornerFillet ?? 0) > 0 ? normalizePolygonCornerRadius(customization.cornerFillet, width, depth, customization.sides ?? 6) : undefined,
+        : asset.kind === "polygon" && (customization.cornerFillet ?? 0) > 0 ? normalizePolygonCornerRadius(customization.cornerFillet, width, depth, customization.sides ?? 6, Boolean(customization.polygonFlat)) : undefined,
+    // A polygon with a flat side in front (Discussion #1787); left out when off, as the editor leaves it.
+    polygonFlat: asset.kind === "polygon" && customization.polygonFlat ? true : undefined,
     portProfile: asset.kind === "port" ? normalizePortProfile(customization.portProfile) : undefined,
     portClearance: asset.kind === "port" && normalizePortClearance(customization.portClearance) > 0 ? normalizePortClearance(customization.portClearance) : undefined,
     ...(asset.kind === "roundedBox"

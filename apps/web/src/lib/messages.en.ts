@@ -3600,6 +3600,8 @@ export const MESSAGES_EN = {
   "prop.screwHoleSizeCountersinkHint": "Sets shaft and head diameter for a countersunk screw of this size: clearance hole to ISO 273, medium, countersink to ISO 15065 at 90°. Inch sizes #2 to #14 to ASME B18.6.1 at 82°; they are also the Australian gauges (6-gauge = #6). The length stays.",
   "prop.nutPocketSize": "Nut pocket",
   "prop.nutPocketSizeHint": "Makes the hexagon the pocket for a hex nut of this screw size (ISO 4032), 0.4 mm wider and higher than the nut. Switch it to a hole to cut the pocket.",
+  "prop.polygonFlat": "Flat side in front",
+  "prop.polygonFlatHint": "Turns the polygon by half a side, so a flat side faces the front instead of a corner. An octagon then measures from flat to flat in length and width, not from corner to corner.",
   "prop.rimChamfer": "Rim chamfer",
   "prop.threadsPerInch": "Threads per inch",
   "prop.startAngle": "Start Angle",

@@ -32,6 +32,15 @@ function regularPolygonBounds(sides: number, angleOffset = 0): RegularPolygonBou
 }
 
 /**
+ * The turn of a Polygon that shows a flat side to the front instead of a corner (Discussion #1787): half a side
+ * step. An octagon then touches its frame with four flat sides, so length and width measure from flat to flat,
+ * not from corner to corner; a hexagon swaps which of the two is which.
+ */
+export function polygonFlatAngle(sides: number | undefined, flat: boolean | undefined) {
+  return flat ? Math.PI / Math.max(3, Math.round(sides ?? 6)) : 0;
+}
+
+/**
  * Wie breit und wie tief ein Vieleck mit Umkreis 1 misst. Ein Sechskant ist
  * ueber die Ecken breiter als ueber die Flaechen, ein Fuenfkant ganz anders -
  * wer die Seitenzahl aendert und trotzdem ein regelmaessiges Vieleck behalten

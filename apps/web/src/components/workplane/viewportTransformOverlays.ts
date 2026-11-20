@@ -452,7 +452,7 @@ export function syncTransformOverlay(
   const cornerEntries = (() => {
     if (polygonShape) {
       // A polygon's dot: on the top, where the rounding of its front corner starts on the edge to the next corner.
-      const { point: local } = polygonCornerDot(frame.max.x - frame.min.x, frame.max.z - frame.min.z, polygonShape.sides, polygonShape.cornerFillet ?? 0);
+      const { point: local } = polygonCornerDot(frame.max.x - frame.min.x, frame.max.z - frame.min.z, polygonShape.sides, polygonShape.cornerFillet ?? 0, Boolean(polygonShape.polygonFlat));
       const midX = (frame.min.x + frame.max.x) / 2;
       const midZ = (frame.min.z + frame.max.z) / 2;
       const point = project(framePoint(frame, midX + local.x, frame.max.y, midZ + local.y));

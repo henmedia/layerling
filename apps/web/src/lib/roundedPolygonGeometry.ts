@@ -1,6 +1,6 @@
 import * as THREE from "three";
 import { extrudeOutlineGeometry, type OutlinePoint } from "@/lib/outlineExtrusion";
-import { regularPolygonFootprintScale } from "@/lib/regularPolygonFootprint";
+import { polygonFlatAngle, regularPolygonFootprintScale } from "@/lib/regularPolygonFootprint";
 
 /**
  * Polygon with rounded corners: every corner of the outline seen from above rounded with one radius, like the
@@ -14,11 +14,13 @@ function sideCount(sides: number | undefined) {
 }
 
 /** The corners of the polygon in its frame, as the plain polygon has them: x along the width, y along the depth. */
-export function polygonCorners(width: number, depth: number, sides: number | undefined): OutlinePoint[] {
+export function polygonCorners(width: number, depth: number, sides: number | undefined, flat = false): OutlinePoint[] {
   const count = sideCount(sides);
-  const fit = regularPolygonFootprintScale(width, depth, count);
+  // A flat side in front (#1787): every corner half a side step further round.
+  const offset = polygonFlatAngle(count, flat);
+  const fit = regularPolygonFootprintScale(width, depth, count, offset);
   return Array.from({ length: count }, (_, i) => {
-    const angle = (i / count) * Math.PI * 2;
+    const angle = (i / count) * Math.PI * 2 + offset;
     return { x: fit.offsetX + fit.x * Math.sin(angle), y: fit.offsetZ + fit.z * Math.cos(angle) };
   });
 }
@@ -35,8 +37,8 @@ function halfCornerAngle(corners: OutlinePoint[], i: number) {
 }
 
 /** The largest radius that fits: the roundings of two neighbouring corners may meet on their edge, not overlap. */
-export function maxPolygonCornerRadius(width: number, depth: number, sides: number | undefined) {
-  const corners = polygonCorners(width, depth, sides);
+export function maxPolygonCornerRadius(width: number, depth: number, sides: number | undefined, flat = false) {
+  const corners = polygonCorners(width, depth, sides, flat);
   const n = corners.length;
   let limit = Number.POSITIVE_INFINITY;
   for (let i = 0; i < n; i += 1) {
@@ -48,15 +50,15 @@ export function maxPolygonCornerRadius(width: number, depth: number, sides: numb
   return Number.isFinite(limit) ? Math.max(0, limit * 0.999) : 0;
 }
 
-export function normalizePolygonCornerRadius(value: unknown, width: number, depth: number, sides: number | undefined) {
+export function normalizePolygonCornerRadius(value: unknown, width: number, depth: number, sides: number | undefined, flat = false) {
   const radius = typeof value === "number" && Number.isFinite(value) ? value : 0;
-  return THREE.MathUtils.clamp(radius, 0, maxPolygonCornerRadius(width, depth, sides));
+  return THREE.MathUtils.clamp(radius, 0, maxPolygonCornerRadius(width, depth, sides, flat));
 }
 
 /** The outline with every corner rounded by `radius` (already fitting), in order round the polygon. */
-export function roundedPolygonOutline(width: number, depth: number, sides: number | undefined, radius: number): OutlinePoint[] {
-  const corners = polygonCorners(width, depth, sides);
-  const r = normalizePolygonCornerRadius(radius, width, depth, sides);
+export function roundedPolygonOutline(width: number, depth: number, sides: number | undefined, radius: number, flat = false): OutlinePoint[] {
+  const corners = polygonCorners(width, depth, sides, flat);
+  const r = normalizePolygonCornerRadius(radius, width, depth, sides, flat);
   if (r <= 0) return corners;
   const n = corners.length;
   const points: OutlinePoint[] = [];
@@ -88,8 +90,8 @@ export function roundedPolygonOutline(width: number, depth: number, sides: numbe
 }
 
 /** The polygon with rounded corners, from 0 to `height`, in millimetres. */
-export function createRoundedPolygonGeometry(width: number, height: number, depth: number, sides: number | undefined, radius: number) {
-  return extrudeOutlineGeometry([roundedPolygonOutline(width, depth, sides, radius)], height);
+export function createRoundedPolygonGeometry(width: number, height: number, depth: number, sides: number | undefined, radius: number, flat = false) {
+  return extrudeOutlineGeometry([roundedPolygonOutline(width, depth, sides, radius, flat)], height);
 }
 
 /**
@@ -97,12 +99,16 @@ export function createRoundedPolygonGeometry(width: number, height: number, dept
  * starts on the edge to the next corner, so it slides along that edge as the radius changes. `point` is in the
  * polygon's frame (x along the width, y along the depth, round its middle); `gain` turns a pull along the width's
  * axis into a change of the radius (a pull towards +x moves the dot away from the corner, the radius grows).
+ * With a flat side in front (#1787) corner 0 is the right end of that side and the dot slides along it, towards
+ * the corner before: the edge to the next corner of a square would run along the depth, where no pull along the
+ * width could move it.
  */
-export function polygonCornerDot(width: number, depth: number, sides: number | undefined, radius: number) {
-  const corners = polygonCorners(width, depth, sides);
-  const r = normalizePolygonCornerRadius(radius, width, depth, sides);
+export function polygonCornerDot(width: number, depth: number, sides: number | undefined, radius: number, flat = false) {
+  const corners = polygonCorners(width, depth, sides, flat);
+  const r = normalizePolygonCornerRadius(radius, width, depth, sides, flat);
   const half = halfCornerAngle(corners, 0);
-  const direction = new THREE.Vector2(corners[1].x - corners[0].x, corners[1].y - corners[0].y).normalize();
+  const towards = corners[flat ? corners.length - 1 : 1];
+  const direction = new THREE.Vector2(towards.x - corners[0].x, towards.y - corners[0].y).normalize();
   const along = r / Math.tan(half);
   const point = { x: corners[0].x + direction.x * along, y: corners[0].y + direction.y * along };
   const gain = Math.abs(direction.x) > 1e-3 ? Math.tan(half) / direction.x : 0;
@@ -110,11 +116,12 @@ export function polygonCornerDot(width: number, depth: number, sides: number | u
 }
 
 /** A pull of the polygon's corner dot by `delta` along the width's axis: the new shared corner radius. */
-export function polygonCornerDragPatch(start: { kind?: string; width?: number; depth?: number; size: number; sides?: number; cornerFillet?: number }, delta: number) {
+export function polygonCornerDragPatch(start: { kind?: string; width?: number; depth?: number; size: number; sides?: number; cornerFillet?: number; polygonFlat?: boolean }, delta: number) {
   const width = start.width ?? start.size;
   const depth = start.depth ?? start.size;
-  const { gain } = polygonCornerDot(width, depth, start.sides, start.cornerFillet ?? 0);
-  const startRadius = normalizePolygonCornerRadius(start.cornerFillet, width, depth, start.sides);
-  const next = normalizePolygonCornerRadius(startRadius + delta * gain, width, depth, start.sides);
+  const flat = Boolean(start.polygonFlat);
+  const { gain } = polygonCornerDot(width, depth, start.sides, start.cornerFillet ?? 0, flat);
+  const startRadius = normalizePolygonCornerRadius(start.cornerFillet, width, depth, start.sides, flat);
+  const next = normalizePolygonCornerRadius(startRadius + delta * gain, width, depth, start.sides, flat);
   return { cornerFillet: Math.round(next * 1e2) / 1e2 };
 }

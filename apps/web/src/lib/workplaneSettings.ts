@@ -421,6 +421,8 @@ export function normalizeShapeCustomizations(value: unknown, fallback: ShapeCust
       entry.sides = optionalShapeNumber(source.sides, fallbackEntry?.sides, 3, 24, true);
       // A polygon's rounded corners (roundedPolygonGeometry.ts), one radius for all.
       if (kind === "polygon") entry.cornerFillet = optionalShapeNumber(source.cornerFillet, fallbackEntry?.cornerFillet, 0, MAX_CUSTOM_SHAPE_DIMENSION / 2);
+      // A flat side in front (Discussion #1787), so a polygon made through the AI bridge or saved as default keeps it.
+      if (kind === "polygon") entry.polygonFlat = typeof source.polygonFlat === "boolean" ? source.polygonFlat : fallbackEntry?.polygonFlat;
       if (kind === "pyramid") {
         entry.topWidth = optionalShapeNumber(source.topWidth, fallbackEntry?.topWidth, 0, MAX_CUSTOM_SHAPE_DIMENSION);
         entry.topDepth = optionalShapeNumber(source.topDepth, fallbackEntry?.topDepth, 0, MAX_CUSTOM_SHAPE_DIMENSION);

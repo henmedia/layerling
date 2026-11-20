@@ -47,7 +47,7 @@ import { customFontRevision } from "@/lib/textFonts";
 import { rulerTicks } from "@/lib/rulerDimensions";
 import { horizontalPlacementWorkplane, placementWorkplaneIsBase, placementWorkplaneQuaternion, type PlacementWorkplane } from "@/lib/placementWorkplane";
 import { groundFootprintForFrame, type SelectionFrame } from "@/lib/liftGeometry";
-import { regularPolygonFootprintScale } from "@/lib/regularPolygonFootprint";
+import { polygonFlatAngle, regularPolygonFootprintScale } from "@/lib/regularPolygonFootprint";
 import { createRoundedPolygonGeometry } from "@/lib/roundedPolygonGeometry";
 import { roundSideCount } from "@/lib/roundSideCount";
 import { createPyramidGeometry } from "@/lib/pyramidGeometry";
@@ -519,6 +519,7 @@ export function tapeShapeTopologyKey(shape: WorkplaneShape): string {
     // A dovetail cut-out grows by its clearance, so body and socket differ.
     dovetailHole: shape.kind === "dovetail" ? Boolean(shape.hole) : undefined,
     cornerFillet: shape.cornerFillet,
+    polygonFlat: shape.polygonFlat ? true : undefined,
     cornerFillets: shape.cornerFillets,
     topBottomFillet: shape.topBottomFillet,
         bottomFillet: shape.bottomFillet,
@@ -634,6 +635,11 @@ export function polygonSidesForShape(shape: WorkplaneShape) {
   return roundSideCount(shape.sides, shapeWidth(shape), shapeDepth(shape));
 }
 
+/** The turn of a Polygon with a flat side in front (#1787); cylinder and ellipse share the build and stay unturned. */
+function polygonFlatAngleForShape(shape: WorkplaneShape) {
+  return shape.kind === "polygon" ? polygonFlatAngle(shape.sides, shape.polygonFlat) : 0;
+}
+
 export function shapeGeometrySignature(shape: WorkplaneShape): string {
   // A painted body is drawn from its mesh with the paint cut in, in millimetres (paintedBodyGeometry): its strokes,
   // its size and whether the kernel was there to cut them are part of it too.
@@ -705,9 +711,9 @@ export function shapeGeometrySignature(shape: WorkplaneShape): string {
   if (shape.kind === "polygon") {
     // Rounded corners are built in millimetres, so the size is part of the geometry.
     if ((shape.cornerFillet ?? 0) > 0) {
-      return JSON.stringify({ kind: "polygon", sides: shape.sides, cornerFillet: shape.cornerFillet, taper, deform, size: [shapeWidth(shape), shapeDepth(shape), shape.height] });
+      return JSON.stringify({ kind: "polygon", sides: shape.sides, flat: Boolean(shape.polygonFlat), cornerFillet: shape.cornerFillet, taper, deform, size: [shapeWidth(shape), shapeDepth(shape), shape.height] });
     }
-    return JSON.stringify({ kind: "polygon", sides: shape.sides, segments: shape.segments, taper, deform, size });
+    return JSON.stringify({ kind: "polygon", sides: shape.sides, flat: Boolean(shape.polygonFlat), segments: shape.segments, taper, deform, size });
   }
   if (shape.kind === "sphere") {
     return JSON.stringify({ kind: "sphere", steps: shape.steps, taper, deform, size });
@@ -976,6 +982,7 @@ export function shapeGeometrySignature(shape: WorkplaneShape): string {
     // A dovetail cut-out grows by its clearance, so body and socket differ.
     dovetailHole: shape.kind === "dovetail" ? Boolean(shape.hole) : undefined,
     cornerFillet: shape.cornerFillet,
+    polygonFlat: shape.polygonFlat ? true : undefined,
     cornerFillets: shape.cornerFillets,
     topBottomFillet: shape.topBottomFillet,
         bottomFillet: shape.bottomFillet,
@@ -1171,7 +1178,7 @@ export function syncShapeObjectDimensions(object: THREE.Group, shape: WorkplaneS
     scale = new THREE.Vector3(width, shape.height, depth);
   } else if ((shape.kind === "cylinder" && shapeDrillPointLength(shape) === 0) || shape.kind === "ellipse" || (shape.kind === "polygon" && !((shape.cornerFillet ?? 0) > 0))) {
     // A drilled hole is no unit body (Discussion #621): it was built at its size and is built again when that changes.
-    const fit = regularPolygonFootprintScale(width, depth, polygonSidesForShape(shape));
+    const fit = regularPolygonFootprintScale(width, depth, polygonSidesForShape(shape), polygonFlatAngleForShape(shape));
     scale = new THREE.Vector3(fit.x, shape.height, fit.z);
     offsetX = fit.offsetX;
     offsetZ = fit.offsetZ;
@@ -2170,13 +2177,14 @@ export function createShapeObject(
       }
       if (shape.kind === "polygon" && (shape.cornerFillet ?? 0) > 0) {
         // Rounded corners: built at its size, the rounding stays round when the polygon is stretched.
-        addMesh(group, sharedShapeGeometry(geometryCacheKey, () => createRoundedPolygonGeometry(width, height, depth, sides, shape.cornerFillet ?? 0)), material, shape);
+        addMesh(group, sharedShapeGeometry(geometryCacheKey, () => createRoundedPolygonGeometry(width, height, depth, sides, shape.cornerFillet ?? 0, Boolean(shape.polygonFlat))), material, shape);
         break;
       }
-      const fit = regularPolygonFootprintScale(width, depth, sides);
+      const flatAngle = polygonFlatAngleForShape(shape);
+      const fit = regularPolygonFootprintScale(width, depth, sides, flatAngle);
       addMesh(
         group,
-        sharedShapeGeometry(geometryCacheKey, () => new THREE.CylinderGeometry(1, 1, 1, sides, shape.segments ?? 1)),
+        sharedShapeGeometry(geometryCacheKey, () => new THREE.CylinderGeometry(1, 1, 1, sides, shape.segments ?? 1, false, flatAngle)),
         material,
         shape,
         new THREE.Vector3(fit.offsetX, 0, fit.offsetZ),

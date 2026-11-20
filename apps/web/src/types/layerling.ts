@@ -126,6 +126,8 @@ export type ShapeCustomization = {
   height?: number;
   maxDimension?: number;
   cornerFillet?: number;
+  /** Polygon: a flat side faces the front instead of a corner, so an octagon measures from flat to flat (Discussion #1787). */
+  polygonFlat?: boolean;
   /** Rounded box with flat top and bottom: an own radius for each corner (back left, back right, front right, front left); wins over cornerFillet. */
   cornerFillets?: [number, number, number, number];
   topBottomFillet?: number;
@@ -1509,6 +1511,8 @@ export type WorkplaneShape = {
   /** Port opening: extra room in mm on every side on top of the preset's, already in width and height; it lets the preset be recognised. */
   portClearance?: number;
   cornerFillet?: number;
+  /** Polygon: a flat side faces the front instead of a corner, so an octagon measures from flat to flat (Discussion #1787). */
+  polygonFlat?: boolean;
   /** Rounded box with flat top and bottom: an own radius for each corner (back left, back right, front right, front left); wins over cornerFillet. */
   cornerFillets?: [number, number, number, number];
   topBottomFillet?: number;

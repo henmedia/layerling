@@ -27,6 +27,7 @@ const SHAPE_DEFAULT_FIELDS = [
   // opening angle stays out on purpose: new hinges start flat (#1336).
   "screwHoleSlot", "screwHoleRecess", "screwHoleChamfer", "ringRackHelixAngle", "ringRackHerringbone", "bevelHelixAngle",
   "threadTaper", "threadHeadDiameter", "threadDriveSize", "threadDriveDepth", "threadCollarHeight", "threadCollarDiameter",
+  "polygonFlat",
 ] as const;
 
 function sameValue(a: unknown, b: unknown) {

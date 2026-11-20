@@ -374,7 +374,7 @@ import {
   normalizeFlatSpringWire,
   normalizeSpringForm,
 } from "@/lib/flatSpringGeometry";
-import { regularPolygonAspect } from "@/lib/regularPolygonFootprint";
+import { polygonFlatAngle, regularPolygonAspect } from "@/lib/regularPolygonFootprint";
 import { maxPolygonCornerRadius, normalizePolygonCornerRadius } from "@/lib/roundedPolygonGeometry";
 import { DEFAULT_TAPER_DIMENSION_MAX, MAX_HIGH_RESOLUTION_SIDES, MAX_HIGH_RESOLUTION_STEPS, POSITION_TYPED_LIMIT, RULER_MAX_LENGTH, customSnapGridLabel, positionReach, shapeDimensionLimit, snapGridStep } from "@/lib/workplaneSettings";
 import { printerPresetById } from "@/lib/printBed";
@@ -566,6 +566,8 @@ type TogglePropertyConfig = {
   area?: GridfinityWall;
   /** A switch that belongs to the slider just above it: drawn a little in, with a small connecting line. */
   sub?: boolean;
+  /** A line under the switch saying what it does, as under a slider (#215). */
+  hint?: string;
   onChange: (value: boolean) => void;
 };
 
@@ -2806,10 +2808,12 @@ function getShapePropertiesWithAppLimits(shape: WorkplaneShape, onUpdate: ShapeI
 
   if (shape.kind === "polygon") {
     const sides = shape.sides ?? 6;
+    // A flat side in front instead of a corner (Discussion #1787): the corners stand half a side step further round.
+    const flat = Boolean(shape.polygonFlat);
     // A hexagon becomes the pocket for a nut (ISO 4032) in one choice: across flats, across corners and height.
     const applyNutPocket = (value: string) => {
       if (!isNutPocketSize(value)) return;
-      const pocket = nutPocketFields(value);
+      const pocket = nutPocketFields(value, flat);
       onUpdate({ ...widthPatch(pocket.width), depth: pocket.depth, size: resizedShapeSize(pocket.width, pocket.depth), height: pocket.height }, { resizeAxis: "width" });
     };
     const nutPocketProperty: ShapePropertyConfig[] = Math.round(sides) === 6
@@ -2817,7 +2821,7 @@ function getShapePropertiesWithAppLimits(shape: WorkplaneShape, onUpdate: ShapeI
           type: "select" as const,
           id: "nutPocketSize",
           label: t("prop.nutPocketSize"),
-          value: nutPocketSizeFor(sides, width, depth, shape.height) ?? "custom",
+          value: nutPocketSizeFor(sides, width, depth, shape.height, flat) ?? "custom",
           options: [
             { value: "custom", label: t("port.custom") },
             ...NUT_POCKET_SIZE_ORDER.map((size) => ({ value: size, label: size })),
@@ -2840,22 +2844,44 @@ function getShapePropertiesWithAppLimits(shape: WorkplaneShape, onUpdate: ShapeI
           // ein Sechskant. Zieht man es nicht mit, wird aus dem gleichseitigen
           // Vieleck beim Umschalten ein gestauchtes.
           const nextSides = Math.round(value);
-          const current = regularPolygonAspect(shape.sides ?? 6);
-          const next = regularPolygonAspect(nextSides);
+          const current = regularPolygonAspect(shape.sides ?? 6, polygonFlatAngle(shape.sides, flat));
+          const next = regularPolygonAspect(nextSides, polygonFlatAngle(nextSides, flat));
           const nextWidth = Math.max(MIN_SHAPE_SIZE, (width / current.width) * next.width);
           const nextDepth = Math.max(MIN_SHAPE_SIZE, (depth / current.depth) * next.depth);
           onUpdate({ sides: nextSides, width: nextWidth, depth: nextDepth, size: resizedShapeSize(nextWidth, nextDepth) });
         },
       },
       {
+        type: "toggle" as const,
+        id: "polygonFlat",
+        label: t("prop.polygonFlat"),
+        hint: t("prop.polygonFlatHint"),
+        value: flat,
+        onChange: (value: boolean) => {
+          // The body stays the one it was, turned by half a side: length and width follow, as when the number
+          // of sides changes. An octagon of 26 from corner to corner then reads 24.02 from flat to flat.
+          const current = regularPolygonAspect(sides, polygonFlatAngle(sides, flat));
+          const next = regularPolygonAspect(sides, polygonFlatAngle(sides, value));
+          const nextWidth = Math.max(MIN_SHAPE_SIZE, (width / current.width) * next.width);
+          const nextDepth = Math.max(MIN_SHAPE_SIZE, (depth / current.depth) * next.depth);
+          onUpdate({
+            polygonFlat: value || undefined,
+            width: nextWidth,
+            depth: nextDepth,
+            size: resizedShapeSize(nextWidth, nextDepth),
+            ...((shape.cornerFillet ?? 0) > 0 ? { cornerFillet: Math.round(normalizePolygonCornerRadius(shape.cornerFillet, nextWidth, nextDepth, sides, value) * 1e3) / 1e3 } : {}),
+          });
+        },
+      },
+      {
         // The corners rounded like a Rounded box's, one radius for all; the dot on the model does the same.
         id: "cornerFillet",
         label: t("prop.cornerFillet"),
-        value: normalizePolygonCornerRadius(shape.cornerFillet, width, depth, sides),
+        value: normalizePolygonCornerRadius(shape.cornerFillet, width, depth, sides, flat),
         min: 0,
-        max: Math.max(0.01, maxPolygonCornerRadius(width, depth, sides)),
+        max: Math.max(0.01, maxPolygonCornerRadius(width, depth, sides, flat)),
         step: 0.1,
-        onChange: (value) => onUpdate({ cornerFillet: Math.round(normalizePolygonCornerRadius(value, width, depth, sides) * 1e3) / 1e3 }),
+        onChange: (value) => onUpdate({ cornerFillet: Math.round(normalizePolygonCornerRadius(value, width, depth, sides, flat) * 1e3) / 1e3 }),
       },
       { id: "length", label: t("prop.length"), value: depth, min: MIN_SHAPE_SIZE, max: 160, onChange: setDepth },
       { id: "width", label: t("prop.width"), value: width, min: MIN_SHAPE_SIZE, max: 160, onChange: setWidth },
@@ -9029,13 +9055,14 @@ function ColorProperty({ label, value, hint, disabled, onChange, onReset, onInte
   );
 }
 
-function ToggleProperty({ label, value, area, sub, disabled, onChange, onReset }: Omit<TogglePropertyConfig, "id" | "type"> & { disabled?: boolean; onReset?: () => void }) {
-  return (
+function ToggleProperty({ label, value, area, sub, hint, disabled, onChange, onReset }: Omit<TogglePropertyConfig, "id" | "type"> & { disabled?: boolean; onReset?: () => void }) {
+  const row = (
     <label className={`${area ? `check-property check-property-${area}` : "check-property"}${sub ? " check-property-sub" : ""}`}>
       <input type="checkbox" role="switch" checked={value} disabled={disabled} onChange={(event) => onChange(event.currentTarget.checked)} />
       <span>{label}{onReset ? <PropertyResetButton onClick={onReset} /> : null}</span>
     </label>
   );
+  return hint ? <>{row}<p className="property-hint">{hint}</p></> : row;
 }
 
 /** Holt eine Auswahl aus der Merkmalsliste heraus, um sie woanders zu zeichnen. */
