@@ -2706,6 +2706,7 @@ export const MESSAGES_NL: Record<MessageKey, string> = {
   "inspector.hole": "Gat",
   "inspector.transparent": "Doorzichtig",
   "inspector.multicolor": "Meerkleurig",
+  "inspector.partColors": "Kleuren van de delen",
   "inspector.groupResize": "Bij formaat wijzigen",
   "inspector.groupResizeStretch": "Alles uitrekken",
   "inspector.groupResizeKeepParts": "Gaten en kleine onderdelen behouden",

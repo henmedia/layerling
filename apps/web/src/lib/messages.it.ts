@@ -2770,6 +2770,7 @@ export const MESSAGES_IT: Partial<Record<MessageKey, string>> = {
   "inspector.hole": "Foro",
   "inspector.transparent": "Trasparente",
   "inspector.multicolor": "Multicolore",
+  "inspector.partColors": "Colori delle parti",
   "inspector.groupResize": "Al ridimensionamento",
   "inspector.groupResizeStretch": "Allunga tutto",
   "inspector.groupResizeKeepParts": "Mantieni fori e parti piccole",

@@ -3243,6 +3243,7 @@ export const MESSAGES_DA: Partial<Record<MessageKey, string>> = {
   "inspector.hole": "Hul",
   "inspector.transparent": "Gennemsigtig",
   "inspector.multicolor": "Multifarve",
+  "inspector.partColors": "Delenes farver",
   "inspector.groupResize": "Ved ændring af størrelse",
   "inspector.groupResizeStretch": "Stræk alt",
   "inspector.groupResizeKeepParts": "Bevar huller og små dele",

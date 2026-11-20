@@ -2706,6 +2706,7 @@ export const MESSAGES_EN = {
   "inspector.hole": "Hole",
   "inspector.transparent": "Transparent",
   "inspector.multicolor": "Multicolor",
+  "inspector.partColors": "Colours of the parts",
   "inspector.groupResize": "When resized",
   "inspector.groupResizeStretch": "Stretch everything",
   "inspector.groupResizeKeepParts": "Keep holes and small parts",

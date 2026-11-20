@@ -1769,6 +1769,7 @@ export const MESSAGES_TR: Partial<Record<MessageKey, string>> = {
   "inspector.hole": "Delik",
   "inspector.transparent": "Saydam",
   "inspector.multicolor": "Çok renkli",
+  "inspector.partColors": "Parçaların renkleri",
   "inspector.settingsFor": "{name} ayarları",
   "inspector.expand": "Ayarları genişlet",
   "inspector.minimize": "Ayarları küçült",

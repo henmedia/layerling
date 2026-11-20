@@ -2671,6 +2671,7 @@ export const MESSAGES_PL: Partial<Record<MessageKey, string>> = {
   "inspector.hole": "Otwór",
   "inspector.transparent": "Przezroczysty",
   "inspector.multicolor": "Wielokolorowy",
+  "inspector.partColors": "Kolory części",
   "inspector.groupResize": "Przy zmianie rozmiaru",
   "inspector.groupResizeStretch": "Rozciągaj wszystko",
   "inspector.groupResizeKeepParts": "Zachowaj otwory i małe części",
