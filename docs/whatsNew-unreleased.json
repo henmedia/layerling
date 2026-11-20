@@ -93,5 +93,18 @@
     "guide": {
       "section": "buildPlates"
     }
+  },
+  {
+    "title": {
+      "de": "Objektliste: Name bei gesperrter Form",
+      "en": "Object list: the name of a locked shape"
+    },
+    "body": {
+      "de": "Ist bei einem Teil die Form gesperrt (das Schild), bleibt auch sein Name, wie er ist. Die Objektliste bot trotzdem den Stift an und öffnete das Namensfeld, nahm den neuen Namen dann aber nicht an. Jetzt fehlt der Stift bei solchen Teilen. Zum Umbenennen das Schild in der Zeile anklicken, dann ist die Form entsperrt.",
+      "en": "When the shape of a part is locked (the shield), its name stays as it is too. The object list still offered the pencil and opened the name field, but then did not take the new name. The pencil is now left out for such parts. To rename one, click the shield in its row, which unlocks the shape."
+    },
+    "guide": {
+      "section": "objectList"
+    }
   }
 ]
