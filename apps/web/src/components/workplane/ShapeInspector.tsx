@@ -210,6 +210,7 @@ import { MAX_DOVETAIL_CLEARANCE, maxDovetailNeckWidth, normalizeDovetailClearanc
 import { DEFAULT_SKETCH_STROKE, MAX_SKETCH_STROKE_WIDTH, MIN_SKETCH_STROKE_EDGE, MIN_SKETCH_STROKE_WIDTH, normalizeSketchStroke, SKETCH_STROKE_JOINS } from "@/lib/sketchStroke";
 import { MAX_EDGED_TEXT_LENGTH, MAX_TEXT_EDGE, MIN_TEXT_EDGE, normalizeTextEdge, textAllowsEdge, textHasEdge } from "@/lib/textEdge";
 import { wheelBaseStep, wheelNextValue, wheelTurn } from "@/lib/wheelValueStep";
+import { withProportionsKeptOnce } from "@/lib/keepProportions";
 import { textHasFill } from "@/lib/textFill";
 import { TEXT_FILL_CHOICES, textFillChoice, textLineSettingsInView, textStrokeForChoice, textStrokeWider, type TextFillChoice } from "@/lib/textFillChoice";
 import { MAX_TEXT_LAYERS, MAX_TEXT_LAYER_GROW, MIN_TEXT_LAYER_HEIGHT, nameTagKeyringAlongLimit, namesFromList, type NameTagKeyring, type TextLayer } from "@/lib/textLayers";
@@ -8909,7 +8910,10 @@ function RangeProperty({
             }}
             onKeyDown={(event) => {
               if (event.key === "Enter") {
-                event.currentTarget.blur();
+                // Leaving the field hands the value on. With Shift held, a size takes the other two along (#1872).
+                const input = event.currentTarget;
+                if (event.shiftKey) withProportionsKeptOnce(() => input.blur());
+                else input.blur();
               } else if (event.key === "Escape") {
                 setDraft(openingDraft());
                 setEditing(false);
