@@ -8690,6 +8690,8 @@ function RangeProperty({
   const accuracy = workspace.accuracy;
   // A position can be typed beyond the slider, on both sides (#425).
   const freePosition = id === "positionX" || id === "positionY" || id === "positionZ" || id === "pivotX" || id === "pivotY" || id === "pivotZ";
+  // A turn goes round: 216 typed is the same turn as -144, and the wheel carries on past 180 (Discussion #1842).
+  const fullTurn = id === "rotateX" || id === "rotateY" || id === "rotateZ";
   const actualValue = freePosition && Number.isFinite(value) ? value : Math.max(min, Number.isFinite(value) ? value : min);
   const controlValue = isLength ? millimetersToDisplay(actualValue, workspace) : actualValue;
   const controlMin = isLength ? millimetersToDisplay(min, workspace) : min;
@@ -8731,7 +8733,7 @@ function RangeProperty({
     const nextModelValue = toModelValue(finiteNext);
     // The formula rides along with the value it set, in the same change; a plain number clears it.
     onFormula?.(Number.isFinite(next) ? formulaToRemember(draft) : null);
-    onChange(freePosition ? clamp(nextModelValue, -POSITION_TYPED_LIMIT, POSITION_TYPED_LIMIT) : allowsAboveSliderMax ? Math.max(min, nextModelValue) : clamp(nextModelValue, min, max));
+    onChange(fullTurn ? signedDegrees(nextModelValue) : freePosition ? clamp(nextModelValue, -POSITION_TYPED_LIMIT, POSITION_TYPED_LIMIT) : allowsAboveSliderMax ? Math.max(min, nextModelValue) : clamp(nextModelValue, min, max));
     onFormula?.(undefined);
     setEditing(false);
     holdInteraction(false);
@@ -8745,7 +8747,7 @@ function RangeProperty({
   // The wheel stops at the field's lower limit, also for the figure shown: it went on below it, into negative sizes, which the body
   // then kept at the limit and the field showed again as 0.01 only when it was left (#576, prmod3d). Returns the figure to show.
   const setSteppedValue = (turned: number, from: number) => {
-    const next = freePosition ? turned : Math.max(acrossGap(turned, from), controlMin);
+    const next = fullTurn ? signedDegrees(turned) : freePosition ? turned : Math.max(acrossGap(turned, from), controlMin);
     const nextModelValue = toModelValue(next);
     onChange(freePosition ? clamp(nextModelValue, -POSITION_TYPED_LIMIT, POSITION_TYPED_LIMIT) : allowsAboveSliderMax ? Math.max(min, nextModelValue) : clamp(nextModelValue, min, max));
     return formatShown(freePosition || allowsAboveSliderMax ? next : clamp(next, controlMin, controlMax));
