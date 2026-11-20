@@ -284,5 +284,18 @@
     "guide": {
       "section": "tapeMeasure"
     }
+  },
+  {
+    "title": {
+      "de": "Gruppe übernimmt den Namen des benannten Teils",
+      "en": "A group takes the name of the named part"
+    },
+    "body": {
+      "de": "Hat beim Gruppieren oder Bündeln genau ein Teil einen eigenen Namen, heißt die neue Gruppe jetzt so, statt nur „Gruppe“ oder „Bündel“. So bleibt der Name in der Objektliste sichtbar. Haben mehrere Teile einen Namen, bleibt es beim alten Namen; die Teile behalten ihre Namen in der Gruppe.",
+      "en": "When exactly one part has a name of its own as you group or bundle, the new group is now called after it, instead of just Group or Bundle. So the name stays visible in the object list. With several named parts nothing changes; the parts keep their names inside the group."
+    },
+    "guide": {
+      "section": "objectList"
+    }
   }
 ]
