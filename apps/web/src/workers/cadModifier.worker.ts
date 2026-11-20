@@ -1154,7 +1154,8 @@ function treatPastInnerCorners(cad: OcctKernel, solid: ShapeHandle, entries: { i
   // to hold on to: forced past it, it made faces that crossed or crashed outright. Then the refusal stands.
   if ([...entries.map((entry) => entry.id), ...touchingIds].some((id) => polylineLength(edgeInfos[id]?.points ?? []) < request.amount)) return null;
   const touching = touchingIds.map((id) => edgeHandles[id]).filter((edge): edge is ShapeHandle => edge !== undefined);
-  const corners = innerCornerEdges(cad, solid, touching, request.amount);
+  // The look for the corners counts towards the time as well: on a body of many faces it alone took 14 s (Issue #1812).
+  const corners = innerCornerEdges(cad, solid, touching, request.amount, deadline);
   if (corners.length === 0) return null;
   const result = treatAfterInnerCorners(cad, solid, entries.map((entry) => entry.edge), corners, request.amount, (body, edges, amount) => treatEdges(cad, body, edges, { ...request, amount }), deadline, isFatalKernelFault);
   return result ? { ...result, count: corners.length } : null;
