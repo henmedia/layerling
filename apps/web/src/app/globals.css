@@ -2978,6 +2978,14 @@ html[data-theme="dark"] .announcement-body li::marker {
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.92), 0 1px 2px rgba(72, 53, 32, 0.06);
 }
 
+/* A menu that hangs from the toolbar - a folded group's tools, the visibility menu, the Shapes panel - lies over the
+   status message beside the view cube (#1849): the message (z-index 50) covered the menu just opened, and the pointer
+   on the message keeps it there. The menus' own z-index counts inside the toolbar only, so the toolbar itself rises
+   above the message while one of them is open. The pinned Shapes panel is no menu and stays where it is. */
+.secondary-toolbar:has(.toolbar-section[data-collapsed][data-open], .visibility-dropdown, .shape-menu-dropdown:not(.shape-menu-under-inspector)) {
+  z-index: 51;
+}
+
 .edge-modifier-panel {
   position: fixed;
   top: calc(var(--editor-toolbar-height) + 14px);
