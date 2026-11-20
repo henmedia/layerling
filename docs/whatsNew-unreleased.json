@@ -1,6 +1,45 @@
 [
   {
     "title": {
+      "de": "Lochmuster bis an die Kante",
+      "en": "Hole pattern right to the edge"
+    },
+    "body": {
+      "de": "Steht der Rand beim Lochmuster auf 0, schneidet die Kante die Löcher an, statt sie wegzulassen: Gitter und Waben laufen bis zum Rand. Ein neuer Regler „Rahmen am Rand“ lässt dort bei Bedarf einen festen Rahmen stehen, und das Raster wird so gelegt, dass möglichst wenige dünne Reststege entstehen.",
+      "en": "With the margin at 0, the hole pattern's edge now cuts the holes off instead of leaving them out, so a grille or a honeycomb runs right to the edge. A new slider \"Frame along the edge\" keeps a solid frame there if you want one, and the lattice is laid so as few thin strips as possible are left."
+    },
+    "guide": {
+      "section": "holePattern"
+    }
+  },
+  {
+    "title": {
+      "de": "Lochmuster mit Deckschicht in zweiter Farbe",
+      "en": "Hole pattern with a top layer in a second colour"
+    },
+    "body": {
+      "de": "Beim Lochmuster kann die oberste Schicht ein Netz in einer zweiten Farbe sein, mit der eigenen Farbe des Körpers in den Löchern. So bleibt die Fläche eben und beide Farben beginnen auf den ersten Schichten, ohne Stützen. Das 3MF enthält die beiden als getrennte Körper.",
+      "en": "In the hole pattern, the top layer can be a net in a second colour, with the body's own colour in the holes. So the face stays flat and both colours start on the first layers, without supports. The 3MF holds the two as separate bodies."
+    },
+    "guide": {
+      "section": "holePattern"
+    }
+  },
+  {
+    "title": {
+      "de": "Farbe jedes Teils im Inspektor",
+      "en": "Each part's colour in the inspector"
+    },
+    "body": {
+      "de": "Bei einer Gruppe oder einem Bündel mit Mehrfarbig zeigt der Inspektor jetzt die Teile mit je einem Farbfeld. So färbst du ein Teil um, ohne die Gruppe zu öffnen, und das Netz im Zweifarben-Lochmuster verschwindet nicht mehr in der Farbe des Grundkörpers.",
+      "en": "For a group or bundle under Multicolor, the inspector now lists the parts, each with a colour swatch. So you can recolour one part without opening the group, and the net of a two-colour hole pattern no longer vanishes into the base's colour."
+    },
+    "guide": {
+      "section": "colorCard"
+    }
+  },
+  {
+    "title": {
       "de": "Scharnier-Deckel: Filament passt leichter",
       "en": "Hinged lid: filament fits more easily",
       "da": "Hængslet låg: filamentet passer lettere"
