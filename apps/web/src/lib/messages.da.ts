@@ -6075,6 +6075,10 @@ export const MESSAGES_DA: Partial<Record<MessageKey, string>> = {
   "boltSplit.pinsName": "{name} – styrestifter",
   "inspector.boltSplitPins": "Med styrestifter",
   "inspector.boltSplitPinsHint": "Stifter Ø {diameter} mm, én i hovedet og én til tre i gevindet efter længden, i huller vinkelret på snitfladen: de retter halvdelene præcist ind, også på langs, så gevindgangene mødes. Hullerne ender i en 45°-kegle, så alt printes uden støtte.",
+  "inspector.boltSplitFilament": "Filament som stifter (1,75 mm)",
+  "inspector.boltSplitFilamentHint": "I stedet for printede stifter: klip stykker af 1,75 mm filament. Ét ligger i en kanal langs gevindet, halvt i hver halvdel, og retter halvdelene ind på tværs. Hvor hovedet har plads, går et andet på tværs gennem hovedet og retter dem også ind langs aksen; ellers skubbes halvdelenes ender i flugt, mens limen hærder. Virker fra M4; printede stifter passer først i gevindet fra M6.",
+  "status.boltSplitFilament": "{name} delt på langs: to halvdele på deres snitflader. Klip 1,75 mm filament: {pieces}.",
+  "status.boltSplitFilamentFlush": "{name} delt på langs: to halvdele på deres snitflader. Klip 1,75 mm filament: {pieces}. Det retter halvdelene ind på tværs; skub deres ender i flugt, mens limen hærder.",
   "status.boltSplitPins": "{name} delt på langs: to halvdele på deres snitflader og {count} styrestifter Ø {diameter} × {length} mm.",
   "status.boltSplitNoPins": "{name} delt på langs: to halvdele uden styrestifter (der er ikke plads til dem).",
 };

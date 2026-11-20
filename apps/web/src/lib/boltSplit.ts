@@ -1,7 +1,8 @@
 import type { ManifoldToplevel, Mat4 } from "manifold-3d";
 import { shapeToManifoldSolid } from "@/lib/editorBooleans";
 import { getManifoldRuntime, type ManifoldSolid } from "@/lib/editorMeshCore";
-import { t } from "@/lib/i18n";
+import { numberLocale, t } from "@/lib/i18n";
+import { HINGE_PIN_GRIP, HINGE_PIN_GRIP_SHARE } from "@/lib/lidTool";
 import { createLocalId } from "@/lib/localIds";
 import { splitShapeFromWorldPositions } from "@/lib/modelSplit";
 import { threadDriveRadius, threadSettings } from "@/lib/threadGeometry";
@@ -18,6 +19,21 @@ import type { WorkplaneShape } from "@/types/layerling";
  * one in the head and one to three along the thread, by its length, each in a hole square to the cut face in both halves.
  * Laid flat, a hole stands upright from the bed with a 45 degree cone for its top, so it needs no bridge, and the pins
  * print standing, chamfered at both ends.
+ *
+ * Below M6 the thread's core is too thin for a printed pin across it (Discussion #1851). With `filament` the pins are
+ * pieces of 1.75 mm filament instead, nothing printed beside the halves:
+ * - Along the thread a piece lies in a channel on the axis, half of it in each half, laid in from the cut face. It lines
+ *   the halves up across, over the thread's whole length (a long thread takes two pieces, one at each end of it, so
+ *   no piece is longer than filament comes straight). The channel is closed at both ends, so nothing shows at the tip,
+ *   but its ends do not line the halves up along the axis: a piece cut by hand is not exact enough for a thread's pitch.
+ * - Across the head a piece stands in a hole square to the cut face, as a printed pin would, where the head has room
+ *   for a piece of at least FILAMENT_MIN_PIECE (the socket head of an M4 or M5 has not). It lines the halves up along
+ *   the axis. Without it the halves are pushed flush at their ends while the glue sets: both are the same length.
+ * The channel's roof rises at 45 degrees to a point (where the core is thinner, to a flat top at most 0.7 mm wide), so
+ * it prints without support. It fits from M4 up: it keeps CHANNEL_WALL of the core over its roof and PIN_WALL_THIN
+ * beside it on the cut face. The holes are larger than the filament by half a printed pin's play per side, at least
+ * 0.05 mm, as the lid hinge's holes for filament are (#1873), and longer than the piece by 0.6 to 1.1 mm: the lengths
+ * are given in half millimetres, rounded down, so a piece cut half a millimetre long still goes in.
  */
 
 export type BoltSplitOptions = {
@@ -25,9 +41,25 @@ export type BoltSplitOptions = {
   pins: boolean;
   /** The pins' play per side in their holes, mm. */
   pinPlay: number;
+  /** Pieces of 1.75 mm filament as the pins, one across the head and one in a channel along the axis, nothing printed. */
+  filament: boolean;
 };
 
-export const BOLT_SPLIT_DEFAULTS: BoltSplitOptions = { pins: true, pinPlay: 0.15 };
+export const BOLT_SPLIT_DEFAULTS: BoltSplitOptions = { pins: true, pinPlay: 0.15, filament: false };
+/** The filament the pins are cut from, mm. */
+export const BOLT_FILAMENT_DIAMETER = 1.75;
+/** The pieces are cut to lengths in steps of this, mm, and none is shorter than FILAMENT_MIN_PIECE: it could not be held. */
+const FILAMENT_STEP = 0.5;
+const FILAMENT_MIN_PIECE = 3;
+/** Material kept over the channel's roof to the thread's root, mm. */
+const CHANNEL_WALL = 0.3;
+/** The channel's roof rises at 45 degrees to a point; where the core is too thin for that, to a flat top no lower than this many radii. */
+const CHANNEL_MIN_TOP = 1.05;
+/** The channel along the thread is at least this long, mm, or the filament would hold nothing. */
+const CHANNEL_MIN_LENGTH = 4;
+/** A thread longer than this between its ends takes two pieces, each in a channel this long, one at each end, mm. */
+const CHANNEL_SPLIT_FROM = 40;
+const CHANNEL_SPLIT_LENGTH = 15.6;
 export const BOLT_PIN_PLAY_LIMITS: readonly [number, number] = [0, 0.5];
 /** The pin's diameter is this share of the thread's core diameter, rounded to half millimetres, within the limits. */
 const PIN_SHARE = 0.25;
@@ -39,6 +71,31 @@ const PIN_WALL_THIN = 0.4;
 export const BOLT_PIN_MIN_DIAMETER = 1.5;
 /** A pin is shorter than its two holes by this at each end, and chamfered by PIN_CHAMFER. */
 const PIN_END_PLAY = 0.3;
+
+/**
+ * How much larger than the filament its holes are, per side, mm: half the play of a printed pin, at least 0.05, the
+ * rule of the lid hinge's holes for filament (lidTool.ts hingePinGrip, #1873). Filament is exact, a printed pin is not.
+ */
+export function boltFilamentPlay(pinPlay: number) {
+  return Math.max(HINGE_PIN_GRIP, HINGE_PIN_GRIP_SHARE * pinPlay);
+}
+
+/** The piece of filament for a hole or channel `hole` long, mm: shorter by the end play at least, in half millimetres. */
+function filamentPiece(hole: number) {
+  return Math.floor((hole - 2 * PIN_END_PLAY) / FILAMENT_STEP + 1e-6) * FILAMENT_STEP;
+}
+
+/**
+ * Whether this thread's core takes the channel for a piece of filament on its axis (from M4 up), and how high its roof
+ * is: `null` where the core is too thin.
+ */
+export function boltFilamentChannel(shape: WorkplaneShape, pinPlay = BOLT_SPLIT_DEFAULTS.pinPlay): { radius: number; top: number } | null {
+  const settings = threadSettings(shape);
+  const coreRadius = settings.diameter / 2 - settings.depth;
+  const radius = BOLT_FILAMENT_DIAMETER / 2 + boltFilamentPlay(pinPlay);
+  const top = Math.min(radius * Math.SQRT2, coreRadius - CHANNEL_WALL);
+  return top >= radius * CHANNEL_MIN_TOP && coreRadius - radius >= PIN_WALL_THIN ? { radius, top } : null;
+}
 const PIN_CHAMFER = 0.4;
 /** Pins along the thread: about one every this many mm, one to three. */
 const PIN_SPACING = 20;
@@ -50,6 +107,7 @@ export function normalizeBoltSplitOptions(value?: Partial<Record<keyof BoltSplit
   return {
     pins: typeof value?.pins === "boolean" ? value.pins : BOLT_SPLIT_DEFAULTS.pins,
     pinPlay: Number.isFinite(play) ? Math.min(BOLT_PIN_PLAY_LIMITS[1], Math.max(BOLT_PIN_PLAY_LIMITS[0], play)) : BOLT_SPLIT_DEFAULTS.pinPlay,
+    filament: value?.filament === true,
   };
 }
 
@@ -80,7 +138,33 @@ export type BoltSplitParts = {
   headPinLength: number;
   /** Where they went, in the head and along the thread. */
   placed: { head: number; thread: number };
+  /** With filament: the pieces to cut, mm (across the head where it has room, then those in the channels along the axis). */
+  filament: number[];
 };
+
+/** A channel along the axis on the cut face for a piece of filament: from `from` to `to` (heights), its radius. */
+export type BoltChannel = { from: number; to: number; radius: number; /** How far its roof reaches from the cut face, mm. */ top: number };
+
+/**
+ * The channel along y on the axis (`cx`, `cz`): a round hole whose cross section rises at 45 degrees on both sides of the
+ * cut face (x = cx) to a flat top, so each half, laid on its cut face, has a groove with a roof that needs no support.
+ */
+function channelSolid(runtime: ManifoldToplevel, axis: { cx: number; cz: number }, channel: BoltChannel, created: { delete?: () => void }[]) {
+  const keep = <T extends { delete?: () => void }>(value: T) => (created.push(value), value);
+  const r = channel.radius;
+  const points: [number, number][] = [];
+  for (let index = 0; index < 48; index += 1) {
+    const angle = (index / 48) * Math.PI * 2;
+    points.push([Math.cos(angle) * r, Math.sin(angle) * r]);
+  }
+  // The roof's tips on either side of the cut face, at 45 degrees from the circle, cut off flat at `top` where it is lower.
+  const tip = r * Math.SQRT2;
+  const hull = keep(runtime.CrossSection.hull([points, [[tip, 0]], [[-tip, 0]]]));
+  const flat = channel.top < tip - 1e-6 ? keep(hull.intersect(keep(runtime.CrossSection.square([2 * channel.top, 4 * r], true)))) : hull;
+  // Its x across the cut face, its y along the screw's axis: drawn out along z, then turned so z runs up y.
+  const drawn = keep(flat.extrude(channel.to - channel.from));
+  return keep(keep(drawn.rotate([-90, 0, 0])).translate([axis.cx, channel.from, axis.cz]));
+}
 
 /**
  * Along x through the cut face (the plane x = cx) at (y, cz + z): a cylinder `half` long each way with a cone of 45
@@ -118,7 +202,7 @@ export function splitBoltSolid(
   runtime: ManifoldToplevel,
   body: ManifoldSolid,
   axis: { cx: number; cz: number },
-  plan: { spots: readonly BoltPinSpot[]; diameter: number },
+  plan: { spots: readonly BoltPinSpot[]; diameter: number; channels?: readonly BoltChannel[] },
   options: BoltSplitOptions,
   created: { delete?: () => void }[],
 ): BoltSplitParts {
@@ -128,14 +212,24 @@ export function splitBoltSolid(
   const placed = { head: 0, thread: 0 };
   let pinLength = 0;
   let headPinLength = 0;
-  if (options.pins && plan.spots.length) {
-    const bore = plan.diameter / 2 + options.pinPlay;
+  const filament: number[] = [];
+  const channels = options.filament ? plan.channels ?? [] : [];
+  if (options.pins && (plan.spots.length || channels.length)) {
+    const bore = plan.diameter / 2 + (options.filament ? boltFilamentPlay(options.pinPlay) : options.pinPlay);
     const holes: ManifoldSolid[] = [];
     for (const spot of plan.spots) {
       holes.push(pinBore(runtime, axis, spot.y, spot.z, bore, spot.depth, created));
       placed[spot.where] += 1;
     }
-    if (holes.length) {
+    if (options.filament) {
+      plan.spots.forEach((spot) => filament.push(filamentPiece(2 * spot.depth)));
+      for (const channel of channels) {
+        holes.push(channelSolid(runtime, axis, channel, created));
+        placed.thread += 1;
+        filament.push(filamentPiece(channel.to - channel.from));
+      }
+      cut = keep(body.subtract(holes.length > 1 ? keep(runtime.Manifold.union(holes)) : holes[0]));
+    } else if (holes.length) {
       cut = keep(body.subtract(holes.length > 1 ? keep(runtime.Manifold.union(holes)) : holes[0]));
       const r = plan.diameter / 2;
       const lengthOf = (spot: BoltPinSpot) => Math.round((2 * spot.depth - 2 * PIN_END_PLAY) * 100) / 100;
@@ -179,12 +273,27 @@ export function splitBoltSolid(
     pinLength: pinLength || headPinLength,
     headPinLength: headPinLength && pinLength && headPinLength !== pinLength ? headPinLength : 0,
     placed,
+    filament,
   };
 }
 
 export type BoltSplitShapeResult =
-  | { parts: WorkplaneShape[]; pins: number; pinDiameter: number; pinLength: number; headPinLength: number; placed: { head: number; thread: number } }
+  | { parts: WorkplaneShape[]; pins: number; pinDiameter: number; pinLength: number; headPinLength: number; placed: { head: number; thread: number }; filament: number[] }
   | { parts: null; error: string };
+
+/**
+ * What the status line says after the split. With filament: the lengths to cut, across the head first; where no piece
+ * goes across the head, also that the halves' ends are pushed flush, as the channel lines them up across only.
+ */
+export function boltSplitStatus(name: string, result: Pick<Extract<BoltSplitShapeResult, { parts: WorkplaneShape[] }>, "pins" | "pinDiameter" | "pinLength" | "placed" | "filament">, askedForPins: boolean) {
+  const mm = (value: number) => value.toLocaleString(numberLocale());
+  if (result.filament.length) {
+    const pieces = result.filament.map((length) => `${mm(length)} mm`).join(", ");
+    return t(result.placed.head ? "status.boltSplitFilament" : "status.boltSplitFilamentFlush", { name, pieces });
+  }
+  if (result.pins) return t("status.boltSplitPins", { name, count: result.pins, diameter: mm(result.pinDiameter), length: mm(result.pinLength) });
+  return askedForPins ? t("status.boltSplitNoPins", { name }) : t("status.boltSplit", { name });
+}
 
 function positionsOf(solid: ManifoldSolid) {
   const mesh = solid.getMesh();
@@ -236,13 +345,14 @@ export async function splitBoltForShape(shape: WorkplaneShape, given?: Partial<B
      * (a rod one near each end), or, where none of those fit, the one nearest the thread's middle that does. Each hole
      * reaches 1.5 diameters into its half, less where the core is thinner (its cone's tip stays `wall` inside the core).
      */
-    const plan = (diameter: number, wall: number) => {
-      const least = Math.max(0.6 * diameter, 1);
-      // The thread's core too thin for this pin: the head still takes one, the thread none.
+    const plan = (diameter: number, wall: number, play = options.pinPlay, filament = false) => {
+      // A piece of filament is cut by hand: its holes are deep enough for one that can still be held.
+      const least = filament ? FILAMENT_MIN_PIECE / 2 + PIN_END_PLAY : Math.max(0.6 * diameter, 1);
+      // The thread's core too thin for this pin: the head still takes one, the thread none. Filament lies along the thread.
       const coreDepth = Math.min(1.5 * diameter, coreRadius - diameter / 2 - wall - 0.2);
-      const threadFits = coreDepth >= least;
+      const threadFits = !filament && coreDepth >= least;
       const depth = threadFits ? coreDepth : 1.5 * diameter;
-      const bore = diameter / 2 + options.pinPlay;
+      const bore = diameter / 2 + play;
       const taken: BoltPinSpot[] = [];
       const add = (spot: BoltPinSpot) => {
         if (taken.some((other) => Math.hypot(other.y - spot.y, other.z - spot.z) < 2 * diameter + wall)) return false;
@@ -278,12 +388,30 @@ export async function splitBoltForShape(shape: WorkplaneShape, given?: Partial<B
         for (let y = low; y <= high + 1e-9; y += step) ys.push(y);
         ys.sort((p, q) => Math.abs(p - middle) - Math.abs(q - middle)).some((y) => add({ y, z: 0, where: "thread", depth }));
       }
-      return { spots: taken, diameter };
+      return { spots: taken, diameter, low, high };
     };
     // The pin for this thread first, then thinner ones and a thinner wall, until the head (on a screw) and the thread
     // have one each; where nothing does, the plan with the most pins.
-    let chosen: { spots: BoltPinSpot[]; diameter: number } = { spots: [], diameter: boltPinDiameter(shape) };
-    if (options.pins) {
+    let chosen: { spots: BoltPinSpot[]; diameter: number; channels?: BoltChannel[] } = { spots: [], diameter: boltPinDiameter(shape) };
+    if (options.pins && options.filament) {
+      // Filament: across the head as a printed pin would go, where it has room, and in a channel along the thread's
+      // core instead of pins across it.
+      const across = [PIN_WALL, PIN_WALL_THIN].map((wall) => plan(BOLT_FILAMENT_DIAMETER, wall, boltFilamentPlay(options.pinPlay), true));
+      const headPlan = across.find((tried) => tried.spots.length) ?? across[0];
+      const section = boltFilamentChannel(shape, options.pinPlay);
+      const { low, high } = headPlan;
+      const channels: BoltChannel[] = [];
+      if (section && high - low >= CHANNEL_MIN_LENGTH) {
+        const runs = high - low > CHANNEL_SPLIT_FROM ? [[low, low + CHANNEL_SPLIT_LENGTH], [high - CHANNEL_SPLIT_LENGTH, high]] : [[low, high]];
+        for (const [from, to] of runs) {
+          const channel = { from, to, ...section };
+          // Checked against the body as a pin's hole is: a tapered thread's core is thinner at its tip.
+          const outer = channelSolid(runtime, { cx, cz }, { from: from - PIN_WALL_THIN, to: to + PIN_WALL_THIN, radius: section.radius + PIN_WALL_THIN, top: section.top + CHANNEL_WALL / 2 }, created);
+          if (keep(outer.subtract(body)).volume() <= 0.01 * outer.volume()) channels.push(channel);
+        }
+      }
+      chosen = { spots: headPlan.spots, diameter: BOLT_FILAMENT_DIAMETER, channels };
+    } else if (options.pins) {
       search: for (let diameter = boltPinDiameter(shape); diameter >= BOLT_PIN_DIAMETER_LIMITS[0] - 0.5 - 1e-9; diameter -= 0.5) {
         for (const wall of [PIN_WALL, PIN_WALL_THIN]) {
           const tried = plan(Math.max(BOLT_PIN_MIN_DIAMETER, diameter), wall);
@@ -312,7 +440,7 @@ export async function splitBoltForShape(shape: WorkplaneShape, given?: Partial<B
       if (!part) return { parts: null, error: t("boltSplit.error.notClosed") };
       parts.push(canonicalizeShape({ ...part, hidden: false, hole: false, locked: false }));
     }
-    return { parts, pins: split.pins.length, pinDiameter: split.pinDiameter, pinLength: split.pinLength, headPinLength: split.headPinLength, placed: split.placed };
+    return { parts, pins: split.pins.length, pinDiameter: split.pinDiameter, pinLength: split.pinLength, headPinLength: split.headPinLength, placed: split.placed, filament: split.filament };
   } catch (error) {
     return { parts: null, error: t("boltSplit.error.kernel", { message: error instanceof Error ? error.message : String(error ?? "") }) };
   } finally {

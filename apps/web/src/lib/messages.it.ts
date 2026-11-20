@@ -6077,6 +6077,10 @@ export const MESSAGES_IT: Partial<Record<MessageKey, string>> = {
   "boltSplit.pinsName": "{name} – spine di centraggio",
   "inspector.boltSplitPins": "Con spine di centraggio",
   "inspector.boltSplitPinsHint": "Spine Ø {diameter} mm, una nella testa e da una a tre nella filettatura secondo la lunghezza, in fori perpendicolari alla faccia di taglio: allineano esattamente le metà, anche in lunghezza, così le spire combaciano. I fori finiscono con un cono a 45°, quindi tutto si stampa senza supporti.",
+  "inspector.boltSplitFilament": "Filamento come perni (1,75 mm)",
+  "inspector.boltSplitFilamentHint": "Invece di perni stampati: taglia pezzi di filamento da 1,75 mm. Uno sta in un canale lungo la filettatura, per metà in ciascuna metà, e allinea le metà di traverso. Se la testa ha spazio, un altro la attraversa e le allinea anche lungo l'asse; altrimenti spingi le estremità delle metà a filo finché la colla fa presa. Funziona da M4; i perni stampati entrano nella filettatura solo da M6.",
+  "status.boltSplitFilament": "{name} diviso per il lungo: due metà appoggiate sulle facce di taglio. Taglia filamento da 1,75 mm: {pieces}.",
+  "status.boltSplitFilamentFlush": "{name} diviso per il lungo: due metà appoggiate sulle facce di taglio. Taglia filamento da 1,75 mm: {pieces}. Allinea le metà di traverso; spingi le loro estremità a filo finché la colla fa presa.",
   "status.boltSplitPins": "{name} diviso per il lungo: due metà sulle facce di taglio e {count} spine di centraggio Ø {diameter} × {length} mm.",
   "status.boltSplitNoPins": "{name} diviso per il lungo: due metà senza spine di centraggio (non c’è spazio).",
 };

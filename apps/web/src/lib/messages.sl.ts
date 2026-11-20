@@ -6079,6 +6079,10 @@ export const MESSAGES_SL: Partial<Record<MessageKey, string>> = {
   "boltSplit.pinsName": "{name} – centrirni zatiči",
   "inspector.boltSplitPins": "S centrirnimi zatiči",
   "inspector.boltSplitPinsHint": "Zatiči Ø {diameter} mm, eden v glavi in glede na dolžino eden do trije v navoju, v luknjah pravokotno na rezno ploskev: polovici natančno poravnajo, tudi po dolžini, da se navoji ujemajo. Luknje se končajo s 45° stožcem, zato se vse tiska brez podpor.",
+  "inspector.boltSplitFilament": "Filament kot zatiči (1,75 mm)",
+  "inspector.boltSplitFilamentHint": "Namesto natisnjenih zatičev: odrežite koščke filamenta 1,75 mm. En leži v kanalu vzdolž navoja, pol v vsaki polovici, in poravna polovici prečno. Če ima glava prostor, gre drugi prečno skozi glavo in ju poravna tudi vzdolž osi; sicer konca polovic potisnite poravnano, dokler lepilo ne prime. Deluje od M4; natisnjeni zatiči gredo v navoj šele od M6.",
+  "status.boltSplitFilament": "{name} razdeljen po dolžini: dve polovici na rezalnih ploskvah. Odrežite filament 1,75 mm: {pieces}.",
+  "status.boltSplitFilamentFlush": "{name} razdeljen po dolžini: dve polovici na rezalnih ploskvah. Odrežite filament 1,75 mm: {pieces}. Polovici poravna prečno; njuna konca potisnite poravnano, dokler lepilo ne prime.",
   "status.boltSplitPins": "{name} razdeljeno po dolžini: dve polovici na reznih ploskvah in centrirni zatiči ({count}) Ø {diameter} × {length} mm.",
   "status.boltSplitNoPins": "{name} razdeljeno po dolžini: dve polovici brez centrirnih zatičev (zanje ni prostora).",
 };

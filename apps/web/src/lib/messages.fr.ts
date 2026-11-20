@@ -6077,6 +6077,10 @@ export const MESSAGES_FR: Partial<Record<MessageKey, string>> = {
   "boltSplit.pinsName": "{name} – pions de centrage",
   "inspector.boltSplitPins": "Avec pions de centrage",
   "inspector.boltSplitPinsHint": "Pions Ø {diameter} mm, un dans la tête et un à trois dans le filetage selon la longueur, dans des trous perpendiculaires à la face de coupe : ils alignent exactement les moitiés, dans la longueur aussi, pour que les filets se rejoignent. Les trous finissent en cône à 45°, tout s’imprime sans support.",
+  "inspector.boltSplitFilament": "Filament comme goupilles (1,75 mm)",
+  "inspector.boltSplitFilamentHint": "Au lieu de goupilles imprimées : coupez des morceaux de filament de 1,75 mm. L'un se pose dans un canal le long du filetage, à moitié dans chaque moitié, et aligne les moitiés en travers. Si la tête a la place, un autre la traverse et les aligne aussi le long de l'axe ; sinon, poussez les bouts des moitiés à fleur le temps que la colle prenne. Possible dès M4 ; les goupilles imprimées n'entrent dans le filetage qu'à partir de M6.",
+  "status.boltSplitFilament": "{name} coupé en long : deux moitiés posées sur leur face de coupe. Coupez du filament de 1,75 mm : {pieces}.",
+  "status.boltSplitFilamentFlush": "{name} coupé en long : deux moitiés posées sur leur face de coupe. Coupez du filament de 1,75 mm : {pieces}. Il aligne les moitiés en travers ; poussez leurs bouts à fleur le temps que la colle prenne.",
   "status.boltSplitPins": "{name} coupé dans la longueur : deux moitiés sur leur face de coupe et {count} pions de centrage Ø {diameter} × {length} mm.",
   "status.boltSplitNoPins": "{name} coupé dans la longueur : deux moitiés, sans pions de centrage (pas de place).",
 };
