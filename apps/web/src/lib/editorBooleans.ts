@@ -1600,7 +1600,7 @@ export const SECTION_SEEN_FROM_KEYS = {
 export function expandBundles(source: readonly WorkplaneShape[]): WorkplaneShape[] {
   return source.flatMap((shape) => (
     shape.groupOperation === "bundle" && shape.groupedShapes?.length && !keptWholeForItsDeform(shape)
-      ? expandBundles(restoreGroupedChildren(shape).map((part) => (shape.multicolor === false ? { ...part, color: shape.color, gridfinityLabelColor: undefined } : part))).filter((part) => !part.hidden)
+      ? expandBundles(bundleExportParts(shape).map((part) => (shape.multicolor === false ? { ...part, color: shape.color, gridfinityLabelColor: undefined } : part))).filter((part) => !part.hidden)
       : [shape]
   ));
 }
@@ -1614,6 +1614,69 @@ function keptWholeForItsDeform(bundle: WorkplaneShape): boolean {
   if (!shapeHasShapeDeform(bundle)) return false;
   const hasHole = (shape: WorkplaneShape): boolean => (shape.groupedShapes ?? []).some((part) => !part.hidden && (part.hole || hasHole(part)));
   return !hasHole(bundle);
+}
+
+/** A bundle counts as resized when its size differs from its parts' by more than this share along an axis. */
+const BUNDLE_STRETCH_TOLERANCE = 1e-6;
+
+/**
+ * The parts of a bundle as an export writes them. A bundle that was resized is drawn, measured and aligned as its
+ * parts' meshes stretched to its size (meshForShape); taken apart, each part is built again at the size the stretch
+ * gives its box (restoreGroupedChildren). For a box or a cylinder that is the same body. A text is not: its letters
+ * keep their proportions inside their box, and an outline round them keeps its width in millimetres. So a name tag
+ * pulled wider by its handles was written at its old width, and one made larger all round had each layer fit its
+ * letters into its own box at a size of its own - the letters no longer lay where the layers under them had theirs,
+ * and the slicer showed the text apart from its plate (Issue #1899). A text in a resized bundle goes out as the mesh
+ * the bundle shows instead, stretched as the view stretches it. A bundle at its own size keeps its texts as texts,
+ * and so does a tapered, twisted or bent one, whose shape is made of the whole and not of one part.
+ */
+function bundleExportParts(bundle: WorkplaneShape): WorkplaneShape[] {
+  const parts = restoreGroupedChildren(bundle);
+  const children = bundle.groupedShapes ?? [];
+  if (bundle.importedMesh || shapeHasShapeDeform(bundle) || !children.some((child) => child.kind === "text")) return parts;
+  const stretch = groupedContentScale(bundle, localGroupBounds(children));
+  if (stretch.every((factor) => Math.abs(factor - 1) <= BUNDLE_STRETCH_TOLERANCE)) return parts;
+  return parts.map((part, index) => {
+    const child = children[index];
+    if (child.kind !== "text") return part;
+    const local = meshForShape(child);
+    const world = transformMesh({ name: local.name, vertices: scaleGroupedVertices(local.vertices, stretch) as Vec3[], faces: local.faces }, bundle);
+    return stretchedPartMeshShape(part, world) ?? part;
+  });
+}
+
+/** A part of a resized bundle as a mesh body standing where `world` has it, with the part's id, name, colour and whether it is a hole. */
+function stretchedPartMeshShape(part: WorkplaneShape, world: MeshData): WorkplaneShape | null {
+  const bounds = meshBounds(world.vertices);
+  if (!bounds || world.faces.length === 0) return null;
+  const centerX = (bounds.minX + bounds.maxX) / 2;
+  const centerZ = (bounds.minZ + bounds.maxZ) / 2;
+  const width = Math.max(MIN_SHAPE_DIMENSION, bounds.maxX - bounds.minX);
+  const height = Math.max(MIN_SHAPE_DIMENSION, bounds.maxY - bounds.minY);
+  const depth = Math.max(MIN_SHAPE_DIMENSION, bounds.maxZ - bounds.minZ);
+  const positions: number[] = [];
+  world.faces.forEach((face) => face.forEach((point) => {
+    const [x, y, z] = world.vertices[point];
+    positions.push(x - centerX, y - bounds.minY, z - centerZ);
+  }));
+  return {
+    id: part.id,
+    name: part.name,
+    kind: "mesh",
+    color: part.color,
+    x: centerX,
+    z: centerZ,
+    elevation: bounds.minY,
+    size: Math.max(width, depth),
+    width,
+    depth,
+    height,
+    rotation: 0,
+    importedMesh: { positions, baseWidth: width, baseDepth: depth, baseHeight: height, triangleCount: Math.floor(positions.length / 9), sourceFormat: "json" },
+    ...(part.hole ? { hole: true } : {}),
+    locked: part.locked,
+    hidden: part.hidden,
+  };
 }
 
 export function visibleExportShapes(source: readonly WorkplaneShape[]) {
