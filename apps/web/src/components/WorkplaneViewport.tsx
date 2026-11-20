@@ -52,7 +52,7 @@ import type { PaintLassoView } from "@/lib/paintMesh";
 import { onCustomFontsChanged } from "@/lib/textFonts";
 import { readSavedViews, readStartView, SAVED_VIEW_KEYS, savedViewForKey, writeStartView } from "@/lib/designView";
 import { readCornerRulers, writeCornerRulers } from "@/lib/cornerRulerStore";
-import { highestTapeIdNumber, readTape, savedTape, writeTape } from "@/lib/tapeStore";
+import { highestTapeIdNumber, readTape, readTapeWholeEdges, savedTape, writeTape, writeTapeWholeEdges } from "@/lib/tapeStore";
 import { rememberCameraView, useDesignViews } from "@/components/workplane/cameraViews";
 import { timedCameraDamping } from "@/lib/cameraInertia";
 import { fitCameraDepthRange, frameBounds, resetCamera, selectionBounds, startViewOf, setCameraOntoPlane, setCameraToViewDirection, setCameraToViewFace, stepCameraTurn, syncViewCube, toggleCameraProjection, zoomCameraBy } from "@/components/workplane/cameraRig";
@@ -2154,6 +2154,12 @@ export function WorkplaneViewport({
   const mirrorOverlayRef = useRef<MirrorOverlayState | null>(null);
   const tapeModeRef = useRef(false);
   const tapeWholeEdgesRef = useRef(true);
+  // The switch is kept in the browser, so it is not on again after the sketch or a reload (#1805).
+  useEffect(() => {
+    const stored = readTapeWholeEdges();
+    tapeWholeEdgesRef.current = stored;
+    setTapeWholeEdges(stored);
+  }, []);
   const tapeDeleteModeRef = useRef(false);
   const tapeMoveModeRef = useRef(false);
   // Only refs and state setters, so it is the same on every render.
@@ -8353,6 +8359,7 @@ export function WorkplaneViewport({
     const next = !tapeWholeEdgesRef.current;
     tapeWholeEdgesRef.current = next;
     setTapeWholeEdges(next);
+    writeTapeWholeEdges(next);
   }, []);
 
   const activateTapeDelete = useCallback(() => {
