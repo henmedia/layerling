@@ -71,6 +71,8 @@ Del, uvožen kot STEP, prav tako obdrži svojo geometrijo CAD: posnetja, zaokro�
 4. Odloči, ali naj bodo {{ui:shell.edges}} {{ui:shell.edges.round}} ali {{ui:shell.edges.sharp}}.
 5. Klikni {{ui:shell.apply}}.
 
+Dokler je okno orodja odprto, je telo že prikazano izdolbeno s tem, kar si nastavil: trenutek po spremembi debeline stene ali strani sledi predogled. Če ni odprta nobena stran, je telo prikazano prosojno, da vidiš votlino. Nič se ne spremeni, dokler ne klikneš {{ui:shell.apply}}; {{ui:common.cancel}} pusti telo tako, kot je bilo. Če telesa tako ni mogoče izdolbsti, okno orodja to pove takoj.
+
 ![Okno Izdolbi z debelino stene, stikalom za vsako stran, ki ostane odprta, in notranjimi robovi.](shot:hollow-panel)
 
 Stene rastejo navznoter. Zunaj ostane vse, kot je.

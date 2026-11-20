@@ -72,6 +72,8 @@ Kasser, krus, kabinetter og låg har én ting til fælles: de er tomme indeni, m
 4. Bestem om {{ui:shell.edges}} skal være {{ui:shell.edges.round}} eller {{ui:shell.edges.sharp}}.
 5. Klik på {{ui:shell.apply}}.
 
+Så længe værktøjsvinduet er åbent, vises formen allerede udhulet med det, du har indstillet: et øjeblik efter at du ændrer vægtykkelsen eller en side, følger forhåndsvisningen med. Er ingen side åben, vises formen gennemsigtig, så du kan se hulrummet. Intet ændres, før du klikker på {{ui:shell.apply}}; {{ui:common.cancel}} lader formen være, som den var. Kan formen ikke udhules på den måde, siger værktøjsvinduet det med det samme.
+
 ![Udhulingsvinduet med vægtykkelse, en kontakt for hver side der forbliver åben, og de indvendige kanter.](shot:hollow-panel)
 
 Væggene vokser indad. Ydersiden forbliver som den er.

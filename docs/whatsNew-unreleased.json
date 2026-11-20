@@ -245,5 +245,18 @@
     "guide": {
       "chapter": "threads"
     }
+  },
+  {
+    "title": {
+      "de": "Aushöhlen mit Vorschau",
+      "en": "Hollow with a preview"
+    },
+    "body": {
+      "de": "Das Werkzeug Aushöhlen zeigt den Körper jetzt schon ausgehöhlt, solange sein Fenster offen ist. Änderst du die Wandstärke, die offenen Seiten oder eine der anderen Einstellungen, folgt die Vorschau einen Moment später. Ist keine Seite offen, wird der Körper durchsichtig gezeigt, damit du den Hohlraum siehst.\n\nGeändert wird erst mit „Aushöhlen“; „Abbrechen“ lässt den Körper, wie er war. Passt eine Einstellung nicht zum Körper, etwa eine zu dicke Wand, sagt es das Fenster sofort.",
+      "en": "The Hollow tool now shows the body hollowed while its window is open. Change the wall thickness, the open sides or one of the other settings, and the preview follows a moment later. With no side open the body is shown see-through, so you can see the cavity.\n\nNothing is changed until you click \"Hollow\"; \"Cancel\" leaves the body as it was. If a setting does not suit the body, a wall too thick for example, the window says so at once."
+    },
+    "guide": {
+      "section": "hollowing"
+    }
   }
 ]

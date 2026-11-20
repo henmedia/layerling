@@ -71,6 +71,8 @@ Krabičky, nádoby a kryty mají uvnitř prázdný prostor a rovnoměrně silné
 4. Zvolte, zda mají být {{ui:shell.edges}} nastavené na {{ui:shell.edges.round}} nebo {{ui:shell.edges.sharp}}.
 5. Potvrďte {{ui:shell.apply}}.
 
+Dokud je okno nástroje otevřené, těleso se už zobrazuje vydutě podle toho, co je nastaveno: chvíli po změně tloušťky stěny nebo strany se náhled obnoví. Když není otevřená žádná strana, zobrazí se těleso průhledně, aby byla vidět dutina. Nic se nezmění, dokud nekliknete na {{ui:shell.apply}}; {{ui:common.cancel}} nechá těleso tak, jak bylo. Pokud těleso takto vydutit nelze, okno nástroje to řekne hned.
+
 ![Okno pro vytvoření dutiny: tloušťka stěny, otevřené strany a nastavení vnitřních hran.](shot:hollow-panel)
 
 Stěny vznikají směrem dovnitř. Vnější povrch zůstává zachovaný.

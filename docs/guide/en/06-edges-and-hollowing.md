@@ -72,6 +72,8 @@ Boxes, cups, cases and covers have one thing in common: they are empty inside, w
 4. Decide whether the {{ui:shell.edges}} should be {{ui:shell.edges.round}} or {{ui:shell.edges.sharp}}.
 5. Click {{ui:shell.apply}}.
 
+While the tool window is open, the body is already shown hollowed with what you have set: a moment after you change the wall or a side, the preview follows. With no side open it is shown see-through, so you can see the cavity. Nothing is changed until you click {{ui:shell.apply}}; {{ui:common.cancel}} leaves the body as it was. If the body cannot be hollowed that way, the tool window says so at once.
+
 ![The hollowing tool window with wall thickness, a switch for each side that stays open, and the inner edges.](shot:hollow-panel)
 
 The walls grow inward. The outside stays as it is.

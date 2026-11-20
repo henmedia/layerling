@@ -72,6 +72,8 @@ Lådor, koppar, höljen och kåpor har en sak gemensam: de är tomma inuti med j
 4. Bestäm om {{ui:shell.edges}} ska vara {{ui:shell.edges.round}} eller {{ui:shell.edges.sharp}}.
 5. Klicka på {{ui:shell.apply}}.
 
+Så länge verktygsfönstret är öppet visas kroppen redan urgröpt med det du har ställt in: ett ögonblick efter att du ändrar väggtjockleken eller en sida följer förhandsvisningen med. Är ingen sida öppen visas kroppen genomskinlig, så att du ser hålrummet. Inget ändras förrän du klickar på {{ui:shell.apply}}; {{ui:common.cancel}} lämnar kroppen som den var. Går kroppen inte att gröpa ur på det sättet säger verktygsfönstret det direkt.
+
 ![Verktygsfönstret för urgröpning med väggtjocklek, knappar för sidor som lämnas öppna samt inre kanter.](shot:hollow-panel)
 
 Väggarna växer inåt. Utsidan förblir densamma.

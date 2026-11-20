@@ -72,6 +72,8 @@ Dosen, Becher, Gehäuse und Abdeckungen haben eines gemeinsam: Sie sind innen le
 4. Entscheide, ob die {{ui:shell.edges}} {{ui:shell.edges.round}} oder {{ui:shell.edges.sharp}} sein sollen.
 5. Klicke auf {{ui:shell.apply}}.
 
+Solange das Werkzeugfenster offen ist, zeigt die Ansicht den Körper schon ausgehöhlt, so wie eingestellt: Einen Moment nachdem du die Wandstärke oder eine Seite änderst, folgt die Vorschau. Ist keine Seite offen, wird der Körper durchsichtig gezeigt, damit du den Hohlraum siehst. Geändert wird erst mit {{ui:shell.apply}}; {{ui:common.cancel}} lässt den Körper, wie er war. Lässt sich der Körper so nicht aushöhlen, sagt es das Werkzeugfenster sofort.
+
 ![Das Aushöhlen-Fenster mit Wandstärke, einem Schalter für jede Seite, die offen bleibt, und den inneren Kanten.](shot:hollow-panel)
 
 Die Wände wachsen nach innen. Außen bleibt alles, wie es ist.

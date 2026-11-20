@@ -72,6 +72,8 @@ Scatole, tazze, involucri e coperchi hanno una caratteristica in comune: sono vu
 4. Scegli se gli {{ui:shell.edges}} devono essere {{ui:shell.edges.round}} oppure {{ui:shell.edges.sharp}}.
 5. Fai clic su {{ui:shell.apply}}.
 
+Finché la finestra dello strumento è aperta, il corpo viene già mostrato svuotato con le impostazioni scelte: un attimo dopo aver cambiato lo spessore della parete o un lato, l'anteprima si aggiorna. Se nessun lato è aperto, il corpo viene mostrato in trasparenza, così si vede la cavità. Nulla cambia finché non fai clic su {{ui:shell.apply}}; {{ui:common.cancel}} lascia il corpo com'era. Se il corpo non può essere svuotato in quel modo, la finestra dello strumento lo dice subito.
+
 ![La finestra Svuota, con lo spessore della parete, un interruttore per ogni lato da lasciare aperto e le opzioni per gli spigoli interni.](shot:hollow-panel)
 
 Le pareti si sviluppano verso l’interno. L’esterno resta invariato.

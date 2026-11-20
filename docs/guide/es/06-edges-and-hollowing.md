@@ -72,6 +72,8 @@ Cajas, vasos, carcasas y tapas tienen algo en común: están huecos por dentro, 
 4. En {{ui:shell.edges}}, elige {{ui:shell.edges.round}} o {{ui:shell.edges.sharp}}.
 5. Haz clic en {{ui:shell.apply}}.
 
+Mientras la ventana de la herramienta está abierta, el cuerpo ya se muestra vaciado con lo que has ajustado: un momento después de cambiar el grosor de pared o un lado, la vista previa lo sigue. Si no hay ningún lado abierto, el cuerpo se muestra translúcido para que veas la cavidad. Nada cambia hasta que haces clic en {{ui:shell.apply}}; {{ui:common.cancel}} deja el cuerpo como estaba. Si el cuerpo no se puede vaciar así, la ventana de la herramienta lo dice enseguida.
+
 ![La ventana de vaciado con el grosor de pared, un interruptor para cada lado que queda abierto y las aristas interiores.](shot:hollow-panel)
 
 Las paredes crecen hacia dentro. El exterior se queda como está.

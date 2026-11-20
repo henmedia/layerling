@@ -72,6 +72,8 @@ Pudełka, kubki, obudowy i pokrywki mają jedną cechę wspólną: w środku są
 4. Zdecyduj, czy {{ui:shell.edges}} mają być {{ui:shell.edges.round}}, czy {{ui:shell.edges.sharp}}.
 5. Kliknij {{ui:shell.apply}}.
 
+Dopóki okno narzędzia jest otwarte, bryła jest już pokazywana jako wydrążona zgodnie z ustawieniami: chwilę po zmianie grubości ścianki lub strony podgląd się odświeża. Gdy żadna strona nie jest otwarta, bryła jest pokazywana jako przezroczysta, żeby było widać pustą przestrzeń w środku. Nic się nie zmienia, dopóki nie klikniesz {{ui:shell.apply}}; {{ui:common.cancel}} zostawia bryłę taką, jaka była. Jeśli bryły nie da się tak wydrążyć, okno narzędzia mówi o tym od razu.
+
 ![Okno drążenia z grubością ścianki, przełącznikiem dla każdej strony, która zostaje otwarta, i krawędziami wewnętrznymi.](shot:hollow-panel)
 
 Ścianki rosną do środka. Zewnętrzna strona zostaje bez zmian.

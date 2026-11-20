@@ -71,6 +71,8 @@ Boîtes, tasses, étuis et couvercles ont un point commun : ils sont vides à l'
 4. Décidez si {{ui:shell.edges}} doit être {{ui:shell.edges.round}} ou {{ui:shell.edges.sharp}}.
 5. Cliquez sur {{ui:shell.apply}}.
 
+Tant que la fenêtre de l'outil est ouverte, le corps est déjà affiché évidé avec vos réglages : un instant après un changement d'épaisseur ou de côté, l'aperçu suit. Si aucun côté n'est ouvert, le corps est affiché en transparence pour que la cavité soit visible. Rien n'est modifié avant le clic sur {{ui:shell.apply}} ; {{ui:common.cancel}} laisse le corps tel qu'il était. Si le corps ne peut pas être évidé ainsi, la fenêtre de l'outil le dit aussitôt.
+
 ![La fenêtre Creuser avec l'épaisseur de la paroi, un interrupteur pour chaque côté qui reste ouvert et les bords intérieurs.](shot:hollow-panel)
 
 Les murs grandissent vers l’intérieur. L’extérieur reste tel quel.

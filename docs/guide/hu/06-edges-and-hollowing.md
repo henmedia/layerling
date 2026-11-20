@@ -71,6 +71,8 @@ A dobozokban, poharakban, házakban és fedelekben közös, hogy belül üresek,
 4. Döntsd el, hogy a {{ui:shell.edges}} {{ui:shell.edges.round}} vagy {{ui:shell.edges.sharp}} legyenek.
 5. Kattints a {{ui:shell.apply}} gombra.
 
+Amíg az eszközablak nyitva van, a test már kiüregelve látszik a beállításaid szerint: egy pillanattal azután, hogy megváltoztatod a falvastagságot vagy egy oldalt, az előnézet követi. Ha egyik oldal sincs nyitva, a test áttetszően jelenik meg, hogy lásd az üreget. Semmi sem változik, amíg a {{ui:shell.apply}} gombra nem kattintasz; a {{ui:common.cancel}} úgy hagyja a testet, ahogy volt. Ha a testet így nem lehet kiüregelni, az eszközablak ezt azonnal jelzi.
+
 ![A kiüregelés ablak a falvastagsággal, minden nyitva maradó oldalhoz egy kapcsolóval és a belső élekkel.](shot:hollow-panel)
 
 A falak befelé nőnek. A külső oldal változatlan marad.

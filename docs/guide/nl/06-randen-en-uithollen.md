@@ -71,6 +71,8 @@ Dozen, bekers, behuizingen en deksels hebben één ding gemeen: ze zijn vanbinne
 4. Bepaal of de {{ui:shell.edges}} {{ui:shell.edges.round}} of {{ui:shell.edges.sharp}} moeten zijn.
 5. Klik op {{ui:shell.apply}}.
 
+Zolang het gereedschapsvenster open is, wordt het lichaam al uitgehold getoond met wat je hebt ingesteld: een ogenblik nadat je de wanddikte of een zijde wijzigt, volgt de voorvertoning. Is er geen zijde open, dan wordt het lichaam doorzichtig getoond, zodat je de holte ziet. Er verandert pas iets als je op {{ui:shell.apply}} klikt; {{ui:common.cancel}} laat het lichaam zoals het was. Kan het lichaam zo niet worden uitgehold, dan zegt het gereedschapsvenster dat meteen.
+
 ![Het uithollingsvenster met wanddikte, een schakelaar voor elke zijde die open blijft, en de binnenranden.](shot:hollow-panel)
 
 De wanden groeien naar binnen. De buitenkant blijft zoals hij is.
