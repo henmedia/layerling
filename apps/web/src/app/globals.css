@@ -16894,6 +16894,20 @@ html[data-theme="dark"] .color-recent {
   font-weight: 700;
 }
 
+/* What to try when the browser gave the 3D view no WebGL context. */
+.safe-mode-steps {
+  display: grid;
+  gap: 6px;
+}
+
+.safe-mode-steps ol {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+  padding-inline-start: 22px;
+  list-style: decimal;
+}
+
 .safe-mode-details {
   color: var(--muted-strong);
   font-size: 12px;
