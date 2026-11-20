@@ -1,6 +1,7 @@
 "use client";
 
 import { previewLabelSpot } from "@/lib/sketchPreviewLabel";
+import { pointCoordinateLabel, pointCoordinateLabelSpot, pointDragStarted } from "@/lib/sketchPointHover";
 import { AlignCenterHorizontal, AlignCenterVertical, AlignEndHorizontal, AlignEndVertical, AlignStartHorizontal, AlignStartVertical, Check, ChevronUp, CornerDownRight, Crop, Crosshair, Eye, EyeOff, FlipHorizontal2, FlipVertical2, Home, Layers, Link, Link2Off, LockKeyhole, LockKeyholeOpen, Magnet, Minus, Plus, Ruler, RulerDimensionLine, Scissors, Slash, Spline, Split, Trash2, WandSparkles, Waves, X } from "lucide-react";
 import { displayedHandle, handleAtOffset, handleOffset } from "@/lib/sketchBezierHandles";
 import { curveStretches } from "@/lib/sketchCurveThroughPoints";
@@ -175,7 +176,8 @@ type SketchReferenceFootprint = {
 };
 type PointerAction =
   | { kind: "bezier"; pointerId: number; origin: { x: number; z: number }; current: { x: number; z: number } }
-  | { kind: "move-point"; pointerId: number; pointId: string; origin: { x: number; z: number }; current: { x: number; z: number } }
+  // `press` is where the pointer went down on the screen; the point only follows once the pointer has left the reach of a click (`dragging`, #1801).
+  | { kind: "move-point"; pointerId: number; pointId: string; origin: { x: number; z: number }; current: { x: number; z: number }; press: { x: number; y: number }; dragging: boolean }
   | { kind: "move-selection"; pointerId: number; origin: { x: number; z: number }; current: { x: number; z: number }; startPoints: SketchPoint[] }
   | { kind: "resize-selection"; pointerId: number; handle: ResizeHandle; current: { x: number; z: number }; startPoints: SketchPoint[]; bounds: SelectionBounds; proportional?: boolean; grab?: { x: number; z: number } }
   | { kind: "move-handle"; pointerId: number; pointId: string; handle: "in" | "out"; current: { x: number; z: number } }
@@ -858,6 +860,8 @@ export function SketchWorkspace({
   // double click there centres the view, as in the 3D view.
   const emptyPressRef = useRef<{ x: number; y: number } | null>(null);
   const [hover, setHover] = useState<{ x: number; z: number } | null>(null);
+  // The point the pointer rests on: a small label beside it says where it lies (Discussion #1801).
+  const [hoveredPointId, setHoveredPointId] = useState<string | null>(null);
   // Where a shape dragged in from the Shapes menu would land on a snap point (#1236).
   const [dropSnap, setDropSnap] = useState<{ x: number; z: number } | null>(null);
   // The three-point arc (#643): the two ends clicked so far; the third click sets the bend.
@@ -1718,6 +1722,9 @@ export function SketchWorkspace({
         : null;
     const hoverPoint = event.shiftKey && drawingOrigin && point ? constrainDrawing(drawingOrigin, point) : point;
     setHover(hoverPoint);
+    // A click on a point is never quite still: the point stays where it is until the pointer has clearly moved (#1801).
+    const startsPointDrag = pointerAction?.kind === "move-point" && !pointerAction.dragging;
+    if (startsPointDrag && !pointDragStarted(pointerAction.press, { x: event.clientX, y: event.clientY })) return;
     if (point && pointerAction) {
       // Shift held while a point, a line or a selection is being dragged keeps the
       // move on one axis, as on the workplane. Pressing it only starts a drag
@@ -1747,6 +1754,7 @@ export function SketchWorkspace({
       setPointerAction({
         ...pointerAction,
         current,
+        ...(startsPointDrag ? { dragging: true } : {}),
         ...(pointerAction.kind === "resize-selection" ? { proportional: event.shiftKey } : {}),
         ...(pointerAction.kind === "rotate-image" || pointerAction.kind === "rotate-selection" ? { snap: event.shiftKey } : {}),
       } as PointerAction);
@@ -1953,7 +1961,9 @@ export function SketchWorkspace({
         const lockOrigin = pointerAction.kind === "move-point" || pointerAction.kind === "move-selection" || pointerAction.kind === "bezier"
           ? pointerAction.origin
           : null;
-        if (lockOrigin) {
+        // A point pressed but not yet dragged stays where it is under Shift too (#1801).
+        const pressedOnly = pointerAction.kind === "move-point" && !pointerAction.dragging;
+        if (lockOrigin && !pressedOnly) {
           setPointerAction((prev) => prev ? { ...prev, current: shiftKey ? constrainToAxis(lockOrigin, point) : point } : null);
         } else if (pointerAction.kind === "resize-selection") {
           setPointerAction((prev) => prev?.kind === "resize-selection" ? { ...prev, proportional: shiftKey } : prev);
@@ -2124,6 +2134,14 @@ export function SketchWorkspace({
   const hoverPointRadius = 5 * screenUnit;
   const handleSize = 12 * screenUnit;
   const handleRadius = 2 * screenUnit;
+  // Where the point under the pointer lies, and where a dragged point is right now (Discussion #1801). Hidden with
+  // the other measurements, and while anything else is being dragged.
+  const coordinateLabelPointId = !showMeasurements
+    ? null
+    : pointerAction?.kind === "move-point"
+    ? pointerAction.pointId
+    : pointerAction ? null : hoveredPointId;
+  const coordinateLabelPoint = coordinateLabelPointId ? displayProfile.points.find((point) => point.id === coordinateLabelPointId) ?? null : null;
   // A turned picture (#216): its frame is the turned rectangle, the box round it only places the labels.
   const selectedImageCorners = selectedImage ? imageCorners(selectedImage) : null;
   const selectedImageBounds = selectedImageCorners ? {
@@ -3159,6 +3177,8 @@ export function SketchWorkspace({
                 cx={point.x}
                 cy={point.z}
                 r={pointRadius}
+                onPointerEnter={() => setHoveredPointId(point.id)}
+                onPointerLeave={() => setHoveredPointId((current) => current === point.id ? null : current)}
                 onDoubleClick={() => {
                   // A double click on the last point ends the chain (#520).
                   if (onFinishLine && activePointId === point.id && isChainDrawingTool(tool)) onFinishLine();
@@ -3178,7 +3198,7 @@ export function SketchWorkspace({
                     onToggleSelect({ kind: "point", id: point.id });
                   } else if (event.button === 0 && tool === "select") {
                     onPointPress(point.id);
-                    beginEntityDrag(event, { kind: "move-point", pointerId: event.pointerId, pointId: point.id, origin: { x: point.x, z: point.z }, current: { x: point.x, z: point.z } });
+                    beginEntityDrag(event, { kind: "move-point", pointerId: event.pointerId, pointId: point.id, origin: { x: point.x, z: point.z }, current: { x: point.x, z: point.z }, press: { x: event.clientX, y: event.clientY }, dragging: false });
                   } else if (event.button === 0 && tool === "bezier" && activePointId !== point.id) {
                     // A Bezier side may start or end on a point that is already there, and pulling handles out of it works as on empty plane (#635).
                     beginEntityDrag(event, { kind: "bezier", pointerId: event.pointerId, origin: { x: point.x, z: point.z }, current: { x: point.x, z: point.z } });
@@ -3189,6 +3209,17 @@ export function SketchWorkspace({
               />
             ))}
           </g>
+          {coordinateLabelPoint ? (() => {
+            const label = pointCoordinateLabel(coordinateLabelPoint, { x: t("sketch.selectionX"), y: t("sketch.selectionY") }, (value) => formatDimension(value, workspace.accuracy));
+            const pill = dimensionPillSize(label, screenUnit, 18);
+            const spot = pointCoordinateLabelSpot(coordinateLabelPoint, pill, 8 * screenUnit);
+            return (
+              <g className="sketch-segment-dimensions preview sketch-point-coordinates" pointerEvents="none" transform={`translate(${spot.x} ${spot.z})`}>
+                <rect x={-pill.width / 2} y={-pill.height / 2} width={pill.width} height={pill.height} rx={pill.radius} />
+                <text y={5 * screenUnit} fontSize={13 * screenUnit}>{label}</text>
+              </g>
+            );
+          })() : null}
           {selectedImage && selectedImageBounds && tool === "select" ? (
             <g className="sketch-image-selection">
               <polygon
