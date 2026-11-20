@@ -53,6 +53,7 @@ import { onCustomFontsChanged } from "@/lib/textFonts";
 import { readSavedViews, readStartView, SAVED_VIEW_KEYS, savedViewForKey, writeStartView } from "@/lib/designView";
 import { readCornerRulers, writeCornerRulers } from "@/lib/cornerRulerStore";
 import { highestTapeIdNumber, readTape, readTapeWholeEdges, savedTape, writeTape, writeTapeWholeEdges } from "@/lib/tapeStore";
+import { tapeAddAfterClick, tapeMenuOpensMeasuring } from "@/lib/tapeMenu";
 import { rememberCameraView, useDesignViews } from "@/components/workplane/cameraViews";
 import { timedCameraDamping } from "@/lib/cameraInertia";
 import { fitCameraDepthRange, frameBounds, resetCamera, selectionBounds, startViewOf, setCameraOntoPlane, setCameraToViewDirection, setCameraToViewFace, stepCameraTurn, syncViewCube, toggleCameraProjection, zoomCameraBy } from "@/components/workplane/cameraRig";
@@ -8337,15 +8338,23 @@ export function WorkplaneViewport({
       setSectionViewOpen(false);
       setProtractorActive(false);
     }
-    setTapeActive(false);
+    // Opening it measures at once, like the protractor: first point, second point, done (#1768).
+    const measuring = next && tapeMenuOpensMeasuring(tapeModelRef.current);
+    setTapeActive(measuring);
     leaveTapeSubModes();
     if (next) {
       onWorkplaneModeChange(false);
     }
-  }, [onWorkplaneModeChange, tapeToolsOpen, setProtractorActive, setTapeActive]);
+    if (measuring) onCancelCruise?.();
+  }, [onCancelCruise, onWorkplaneModeChange, tapeToolsOpen, setProtractorActive, setTapeActive]);
 
   const activateTapeAdd = useCallback(() => {
     if (splitActiveRef.current) return;
+    // A second click puts the tool down and leaves the menu open, to select or move a body in between (#1768).
+    if (!tapeAddAfterClick(tapeModeRef.current)) {
+      setTapeActive(false);
+      return;
+    }
     setTapeHidden(false);
     leaveTapeSubModes();
     setTapeActive(true);
