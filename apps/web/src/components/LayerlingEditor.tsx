@@ -176,7 +176,7 @@ import { historyStepText } from "@/lib/historyStepText";
 import { historyViewMcpCommand } from "./workplane/historyViewMcp";
 import { attachmentsFingerprint } from "@/lib/projectAttachments";
 import { ATTACHMENT_MCP_READ_ACTIONS, attachmentMcpCommand, attachmentMcpList } from "@/lib/projectAttachmentsMcp";
-import { appendEditorHistorySnapshot, boundedEditorHistoryState, continuesKeyRun, type KeyRun, editorHistoryBranch, editorHistoryEntry, editorHistoryForExport, historyStateAt, hydrateEditorHistoryState, notesForHistoryIndex, projectSceneFingerprint, projectShapesFingerprint, workplaneForHistoryIndex, type EditorHistoryEntry, type EditorHistoryState } from "@/lib/editorHistory";
+import { appendEditorHistorySnapshot, boundedEditorHistoryState, continuesKeyRun, type KeyRun, editorHistoryBranch, editorHistoryEntry, editorHistoryForExport, historyStateAt, historyWithUnfinishedState, hydrateEditorHistoryState, notesForHistoryIndex, projectSceneFingerprint, projectShapesFingerprint, workplaneForHistoryIndex, type EditorHistoryEntry, type EditorHistoryState } from "@/lib/editorHistory";
 import { deleteHistoryEntries, formatHistoryBytes, historyFreedBytes, historyIndexAfterDelete } from "@/lib/historyStepSizes";
 import { snapShapeFootprintToVisibleGrid, visibleGridStep } from "@/lib/gridSnap";
 import { composedShapeRotation, geometryRotationDegreesForShortcut, geometryRotationDelta, rotatedGeometryShapePatch } from "@/lib/geometryRotation";
@@ -4944,6 +4944,23 @@ export function LayerlingEditor({
     setNotice(t("status.pivotSet"));
   }, [ownPivotShape, selectionKey]);
 
+  /**
+   * The history as it goes into a stored design: while a value set in a focused field or a drag has not left its step
+   * yet, with the state it has reached as the newest step, or the design would be stored without any history
+   * (Discussion #1909, historyWithUnfinishedState). The editor's own history stays as it is.
+   */
+  const historyToStore = useCallback(
+    (storedShapes: WorkplaneShape[] = shapesRef.current, shapesFingerprint = projectShapesFingerprint(storedShapes)): EditorHistoryState =>
+      historyWithUnfinishedState(
+        historyRef.current,
+        historyIndexRef.current,
+        shapesFingerprint,
+        () => editorHistoryEntry(storedShapes, selectedIdsRef.current, notesRef.current, placementWorkplaneRef.current),
+        workspaceSettingsRef.current.historyLimit,
+      ),
+    [],
+  );
+
   /** Hands the shapes to the page above, which writes them to the browser's storage. */
   const emitProjectShapes = useCallback(
     (canonicalNext: WorkplaneShape[], serialized: string) => {
@@ -4952,11 +4969,12 @@ export function LayerlingEditor({
       }
       lastProjectShapesSyncRef.current = serialized;
       lastProjectShapesEchoRef.current = serialized;
+      const stored = historyToStore(canonicalNext, serialized);
       onProjectShapesChange({
         projectId,
         shapes: canonicalNext,
-        history: historyRef.current,
-        historyIndex: historyIndexRef.current,
+        history: stored.entries,
+        historyIndex: stored.index,
         assets: projectAssetsRef.current,
         attachments: projectAttachmentsRef.current,
         projectName: projectInfoRef.current.projectName,
@@ -4968,7 +4986,7 @@ export function LayerlingEditor({
         sketchPlacementWorkplane: placementWorkplaneRef.current,
       });
     },
-    [onProjectShapesChange, projectId],
+    [historyToStore, onProjectShapesChange, projectId],
   );
 
   /**
@@ -18674,7 +18692,7 @@ export function LayerlingEditor({
       const view = historyViewStateRef.current;
       const exportedHistory = view
         ? editorHistoryBranch(historyRef.current, view.index, historyLimit)
-        : editorHistoryForExport(historyRef.current, historyIndexRef.current, historyLimit);
+        : (({ entries, index }) => editorHistoryForExport(entries, index, historyLimit))(historyToStore());
       // A design written to the server under another name carries that name inside too, or it
       // would open under the old one while the overview shows the file name (#265).
       const packageName = target === "shared" || partShapes ? exportName.trim().replace(/\.(lyl|skf)$/i, "") || projectName : projectName;
@@ -18796,7 +18814,8 @@ export function LayerlingEditor({
   takeSnapshotRef.current = async () => {
     const snapshotProjectId = projectInfoRef.current.projectId;
     if (!snapshotProjectId) return;
-    const exportedHistory = editorHistoryForExport(historyRef.current, historyIndexRef.current, workspaceSettingsRef.current.historyLimit);
+    const storedHistory = historyToStore();
+    const exportedHistory = editorHistoryForExport(storedHistory.entries, storedHistory.index, workspaceSettingsRef.current.historyLimit);
     const bytes = await exportLylProject({
       projectId: snapshotProjectId,
       projectName,
@@ -18926,7 +18945,7 @@ export function LayerlingEditor({
           ? rememberBugReportEvent(reportErrorsRef.current, lastMcpError)
           : reportErrorsRef.current,
       });
-      const exportedHistory = editorHistoryForExport(historyRef.current, historyIndexRef.current, "unlimited");
+      const exportedHistory = historyToStore(currentShapes);
       // No attachments in a bug report (#820): the file is meant to be sent in, and what a user attached to the design is theirs.
       const bytes = await exportLylProject({
         projectId: projectInfoRef.current.projectId,
@@ -19018,7 +19037,7 @@ export function LayerlingEditor({
         scheduleServerSaveRetry(SERVER_SAVE_BUSY_MS);
         return;
       }
-      const exportedHistory = editorHistoryForExport(historyRef.current, historyIndexRef.current, "unlimited");
+      const exportedHistory = historyToStore();
       const bytes = await exportLylProject({
         projectId: projectInfoRef.current.projectId,
         projectName,

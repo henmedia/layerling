@@ -494,6 +494,42 @@ export function appendEditorHistorySnapshot(
 }
 
 /**
+ * Whether a history entry holds these bodies, asked with the fingerprint of the bodies alone (`projectShapesFingerprint`):
+ * an entry's fingerprint begins with it, and what may follow are its notes (`#`) and its workplane (`@`).
+ */
+export function historyEntryHoldsShapes(entry: Pick<EditorHistoryEntry, "fingerprint"> | undefined, shapesFingerprint: string) {
+  const fingerprint = entry?.fingerprint;
+  if (!fingerprint) return false;
+  return fingerprint === shapesFingerprint || fingerprint.startsWith(`${shapesFingerprint}#`) || fingerprint.startsWith(`${shapesFingerprint}@`);
+}
+
+/**
+ * The history to store with a design whose bodies are not yet the ones its current step holds (Discussion #1909).
+ * A value set with the mouse wheel or the arrow keys in a field that still has the focus, or a drag held still, changes
+ * the bodies at once, but its step is written only when the field is left or the pointer released. A save in between
+ * - two seconds into such an interaction, on leaving the window, Ctrl+S - handed over bodies the history did not end
+ * at, and a history that does not belong to the bodies is thrown away when a design is packed and when it is read
+ * (`hydrateEditorHistoryState`): the stored design kept its newest state and lost every step before it. Closed or
+ * reloaded with the field still in focus, it opened without a history.
+ *
+ * The state is put after the current step, as the step the interaction is about to leave; `current` is only asked
+ * for when it is needed. The history given is not changed.
+ */
+export function historyWithUnfinishedState(
+  entries: EditorHistoryEntry[],
+  requestedIndex: number,
+  shapesFingerprint: string,
+  current: () => EditorHistoryEntry,
+  limit: EditorHistoryExportLimit = "unlimited",
+  now: number = Date.now(),
+): EditorHistoryState {
+  const index = Math.min(Math.max(0, requestedIndex), Math.max(0, entries.length - 1));
+  if (entries.length === 0 || historyEntryHoldsShapes(entries[index], shapesFingerprint)) return { entries, index };
+  const appended = appendEditorHistorySnapshot(entries, index, current(), limit, now);
+  return { entries: appended.entries, index: appended.index };
+}
+
+/**
  * Every save and every project snapshot runs the whole history through
  * `hydrateEditorHistoryState`, and rebuilding an entry means serializing and
  * hashing all of its shapes. A design with a long history and many bodies spent
