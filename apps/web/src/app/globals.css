@@ -18384,8 +18384,8 @@ html[data-theme="dark"] .property-card > button.property-card-header:hover {
   background: rgba(255, 255, 255, 0.1);
 }
 
+/* Shown with every pointer: a tablet has no Alt key, and many Linux desktops take Alt+click to move the window (#1770). */
 .align-size-toggle {
-  display: none;
   position: absolute;
   left: 12px;
   bottom: 72px;
@@ -18400,16 +18400,18 @@ html[data-theme="dark"] .property-card > button.property-card-header:hover {
   touch-action: manipulation;
 }
 
+/* With a mouse the tool rail stands at the left edge; the switch goes beside it. */
+@media not all and (any-pointer: coarse) {
+  .align-size-toggle {
+    left: 76px;
+    bottom: 16px;
+  }
+}
+
 .align-size-toggle.on {
   background: rgba(173, 89, 0, 0.92);
   border-color: rgba(173, 89, 0, 0.92);
   color: #fff;
-}
-
-@media (any-pointer: coarse) {
-  .align-size-toggle {
-    display: block;
-  }
 }
 
 /* Print analysis (Druckanalyse) and its layer view. */
