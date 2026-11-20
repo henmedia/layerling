@@ -1904,7 +1904,7 @@ export const MESSAGES_AR: Partial<Record<MessageKey, string>> = {
   "holePattern.topLayerThickness": "سماكة الطبقة العلوية",
   "holePattern.topLayerColor": "لون الطبقة العلوية",
   "holePattern.topLayerName": "الطبقة العلوية",
-  "holePattern.topLayerNote": "تصبح الـ{thickness} مم العلوية جسمًا مستقلًا بهذا اللون تقطعه الثقوب نفسها؛ ويبقى الباقي أسفلها بلون الجسم. يحفظ ملف 3MF الاثنين جسمين منفصلين لطابعة متعددة الألوان.",
+  "holePattern.topLayerNote": "تصبح الـ{thickness} مم العلوية الشبكةَ بهذا اللون: لا تمر الثقوب إلا عبر هذه الطبقة. وتحتها يبقى الجسم مصمتًا بلونه ويظهر عبر الثقوب. يحفظ ملف 3MF الاثنين جسمين منفصلين لطابعة متعددة الألوان.",
   "holePattern.topLayerThin": "الجسم رقيق جدًا هنا لطبقة علوية مستقلة.",
   "holePattern.depth": "العمق",
   "holePattern.depth.through": "عبر الجسم بأكمله",

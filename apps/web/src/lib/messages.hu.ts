@@ -1616,7 +1616,7 @@ export const MESSAGES_HU: Partial<Record<MessageKey, string>> = {
   "holePattern.topLayerThickness": "A felső réteg vastagsága",
   "holePattern.topLayerColor": "A felső réteg színe",
   "holePattern.topLayerName": "Felső réteg",
-  "holePattern.topLayerNote": "A felső {thickness} mm külön test lesz ebben a színben, ugyanazokkal a lyukakkal; a többi alatta marad a test színében. A 3MF-ben a kettő külön testként van, több színnel nyomtató géphez.",
+  "holePattern.topLayerNote": "A felső {thickness} mm lesz a háló ebben a színben: a lyukak csak ezen a rétegen mennek át. Alatta a test tömör marad a saját színében, és az látszik a lyukakban. A 3MF-ben a kettő külön test, több színnel nyomtató géphez.",
   "holePattern.topLayerThin": "A test itt túl vékony ahhoz, hogy külön felső réteget kapjon.",
   "holePattern.depth": "Mélység",
   "holePattern.depth.through": "Az egész testen át",

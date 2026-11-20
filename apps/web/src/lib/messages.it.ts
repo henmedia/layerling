@@ -1891,7 +1891,7 @@ export const MESSAGES_IT: Partial<Record<MessageKey, string>> = {
   "holePattern.topLayerThickness": "Spessore dello strato superiore",
   "holePattern.topLayerColor": "Colore dello strato superiore",
   "holePattern.topLayerName": "Strato superiore",
-  "holePattern.topLayerNote": "I {thickness} mm superiori diventano un corpo a sé di questo colore, tagliato dagli stessi fori; il resto rimane sotto nel colore del corpo. Il 3MF contiene i due come corpi separati, per una stampante multicolore.",
+  "holePattern.topLayerNote": "I {thickness} mm superiori diventano la rete di questo colore: i fori attraversano solo quello strato. Sotto, il corpo resta pieno nel suo colore e si vede attraverso i fori. Il 3MF contiene i due come corpi separati, per una stampante multicolore.",
   "holePattern.topLayerThin": "Il corpo qui è troppo sottile per uno strato superiore a sé.",
   "holePattern.depth": "Profondità",
   "holePattern.depth.through": "Attraverso tutto il corpo",

@@ -1961,7 +1961,7 @@ export const MESSAGES_CS: Record<MessageKey, string> = {
   "holePattern.topLayerThickness": "Tloušťka horní vrstvy",
   "holePattern.topLayerColor": "Barva horní vrstvy",
   "holePattern.topLayerName": "Horní vrstva",
-  "holePattern.topLayerNote": "Horních {thickness} mm se stane samostatným tělesem v této barvě, proříznutým stejnými otvory; zbytek zůstane pod ním v barvě tělesa. 3MF obsahuje obě jako samostatná tělesa, pro tiskárnu s více barvami.",
+  "holePattern.topLayerNote": "Horních {thickness} mm se stane sítí v této barvě: otvory procházejí jen touto vrstvou. Pod ní zůstává těleso plné ve své barvě a je vidět otvory. 3MF obsahuje obě jako samostatná tělesa, pro tiskárnu s více barvami.",
   "holePattern.topLayerThin": "Těleso je zde příliš tenké na samostatnou horní vrstvu.",
   "holePattern.depth": "Hloubka",
   "holePattern.depth.through": "Skrz celé těleso",

@@ -1778,7 +1778,7 @@ export const MESSAGES_ZH_CN: Partial<Record<MessageKey, string>> = {
   "holePattern.topLayerThickness": "顶层厚度",
   "holePattern.topLayerColor": "顶层颜色",
   "holePattern.topLayerName": "顶层",
-  "holePattern.topLayerNote": "顶部 {thickness} mm 成为此颜色的独立实体，被相同的孔切穿；其余部分以主体颜色留在下面。3MF 中两者为独立实体，供多色打印机使用。",
+  "holePattern.topLayerNote": "顶部 {thickness} mm 成为此颜色的网格：孔只穿过这一层。其下主体保持实心和自身颜色，从孔中露出。3MF 中两者为独立实体，供多色打印机使用。",
   "holePattern.topLayerThin": "此处主体太薄，无法另设顶层。",
   "holePattern.depth": "深度",
   "holePattern.depth.through": "贯穿整个实体",

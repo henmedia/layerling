@@ -1812,7 +1812,7 @@ export const MESSAGES_FR: Partial<Record<MessageKey, string>> = {
   "holePattern.topLayerThickness": "Épaisseur de la couche du dessus",
   "holePattern.topLayerColor": "Couleur de la couche du dessus",
   "holePattern.topLayerName": "Couche du dessus",
-  "holePattern.topLayerNote": "Les {thickness} mm du dessus deviennent un corps à part de cette couleur, percé des mêmes trous ; le reste demeure dessous dans la couleur du corps. Le 3MF contient les deux comme corps séparés, pour une imprimante multicolore.",
+  "holePattern.topLayerNote": "Les {thickness} mm du dessus deviennent le réseau de cette couleur : les trous ne traversent que cette couche. Dessous, le corps reste plein dans sa couleur et se voit à travers les trous. Le 3MF contient les deux comme corps séparés, pour une imprimante multicolore.",
   "holePattern.topLayerThin": "Le corps est trop mince ici pour une couche du dessus à part.",
   "holePattern.depth": "Profondeur",
   "holePattern.depth.through": "À travers tout le corps",

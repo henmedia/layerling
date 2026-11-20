@@ -458,6 +458,9 @@ function slopedHoleReach(face: PerforableFace, settings: HolePatternSettings, ti
   return { cap, inside };
 }
 
+/** How much deeper than a top layer in a second colour its holes reach, so they cut it clean through. */
+export const TOP_LAYER_OVERCUT = 0.05;
+
 /** The depth the holes actually get: the body's thickness plus a skin's worth, or what was asked for. */
 export function holeDepth(face: Pick<PerforableFace, "thickness">, settings: Pick<HolePatternSettings, "depth">) {
   return settings.depth === null ? face.thickness + HOLE_OVERSHOOT : settings.depth;
@@ -494,8 +497,9 @@ export type HolePatternPlan = {
    */
   frame?: WorkplaneShape;
   /**
-   * The top layer in a second colour (Discussion #1771): a slab of the face, `thickness` deep from it, in its colour. The
-   * perforated body (frame and all) is split by it: what lies in it becomes the top layer, the rest the body below.
+   * The top layer in a second colour (Discussion #1771): a slab of the face, `thickness` deep from it, in its colour. What
+   * of the perforated body (frame and all) lies in it becomes the top layer, a net; the body less the slab, without the
+   * holes, stays solid below it.
    */
   topLayer?: { slab: WorkplaneShape; thickness: number; color: string };
   /** On a round wall (#1393): its diameter, whether it goes all the way round, and then how many holes a row holds at what step. */
@@ -560,6 +564,10 @@ export function holePatternShapes(
   const forRack = settings.arrangement === "corners" && Boolean(settings.rack);
   if (forRack) settings = rackSlotSettings(settings);
   if (settings.form === "custom" && !custom) return { holes: [], tooMany: false };
+  // A top layer in a second colour is a net: the holes go through that layer and a little into the body below, which
+  // is made solid again when the two are split, so the net is cut clean right through.
+  const layer = holePatternTopLayer(settings, face.thickness);
+  if (layer) settings = { ...settings, depth: layer.thickness + TOP_LAYER_OVERCUT };
   const tilt = holeTiltRadians(settings);
   const wall = face.wall ?? face.thickness;
   const { centers, tooMany, ring, roundFace, rack, edgeCut } = holePatternCenters(face.outline, settings, tilt === 0 ? 0 : wall);
@@ -653,7 +661,6 @@ export function holePatternShapes(
     return canonicalizeShape(withHoleMode(placed, true));
   });
   const frame = edgeCut && edgeCut.border > 0 ? holePatternFrame(face, edgeCut.border, namePrefix, previewIdPrefix) : null;
-  const layer = holePatternTopLayer(settings, face.thickness);
   const slab = layer ? faceSlab(face, layer.thickness, null, namePrefix, previewIdPrefix ? `${previewIdPrefix}-top` : undefined) : null;
   const topLayer = layer && slab ? { slab: { ...slab, color: layer.color }, ...layer } : null;
   return { holes, tooMany: false, ...(ring ? { ring } : {}), ...(roundFace ? { roundFace } : {}), ...(rack ? { rack } : {}), ...(edgeCut ? { edgeCut } : {}), ...(frame ? { frame } : {}), ...(topLayer ? { topLayer } : {}) };

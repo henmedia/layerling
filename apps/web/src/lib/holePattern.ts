@@ -81,8 +81,9 @@ export type HolePatternSettings = {
    */
   edgeBorder?: number;
   /**
-   * A pattern of through holes in a flat face (Discussion #1771): the top `topLayerThickness` mm of the body under the
-   * face becomes a body of its own in `topLayerColor`, cut by the same holes, for a second colour printed on top.
+   * A pattern in a flat face (Discussion #1771): the top `topLayerThickness` mm of the body under the face becomes a
+   * body of its own in `topLayerColor`, and the holes go through that layer only: a net in a second colour over the
+   * body, which stays solid below and shows through the holes. `depth` does not apply then.
    */
   topLayer?: boolean;
   topLayerThickness?: number;
@@ -803,22 +804,24 @@ function bestLattice(
  * that go through the body run on past the edge and are cut off by it, so a grille or a honeycomb reaches right to the
  * edge without a solid strip round it. Screw holes with a head, own shapes, blind holes and a round wall keep to the face.
  */
-export function holePatternCutsAtEdge(settings: Pick<HolePatternSettings, "arrangement" | "form" | "margin" | "depth"> & Partial<Pick<HolePatternSettings, "holeType">>) {
+export function holePatternCutsAtEdge(settings: Pick<HolePatternSettings, "arrangement" | "form" | "margin" | "depth"> & Partial<Pick<HolePatternSettings, "holeType" | "topLayer">>) {
   if (settings.arrangement !== "grid" && settings.arrangement !== "staggered") return false;
   if (settings.form === "custom" || holeHasHead(settings)) return false;
-  return settings.depth === null && !(settings.margin > EPSILON);
+  // A top layer in a second colour is a net cut right through that layer, whatever depth was set before.
+  return (settings.depth === null || Boolean(settings.topLayer)) && !(settings.margin > EPSILON);
 }
 
 /**
- * The top layer in a second colour, when it is asked for and can be made: a pattern (not mounting holes) of plain or
- * screw holes through a flat face, not an own shape. Its thickness stays under the body's (`thickness`, when known),
- * so some of the body is left under it.
+ * The top layer in a second colour (Discussion #1771), when it is asked for and can be made: a pattern (not mounting
+ * holes) of plain holes in a flat face, not an own shape. The holes go through that layer only, so it is a net in its
+ * colour over the body, which stays solid below and shows through the holes. Its thickness stays under the body's
+ * (`thickness`, when known), so some of the body is left under it.
  */
 export function holePatternTopLayer(
-  settings: Pick<HolePatternSettings, "arrangement" | "form" | "depth"> & Partial<Pick<HolePatternSettings, "topLayer" | "topLayerThickness" | "topLayerColor">>,
+  settings: Pick<HolePatternSettings, "arrangement" | "form"> & Partial<Pick<HolePatternSettings, "topLayer" | "topLayerThickness" | "topLayerColor" | "holeType">>,
   thickness?: number,
 ): { thickness: number; color: string } | null {
-  if (!settings.topLayer || settings.arrangement === "corners" || settings.form === "custom" || settings.depth !== null) return null;
+  if (!settings.topLayer || settings.arrangement === "corners" || settings.form === "custom" || holeHasHead(settings)) return null;
   const asked = typeof settings.topLayerThickness === "number" && Number.isFinite(settings.topLayerThickness) ? settings.topLayerThickness : HOLE_PATTERN_TOP_LAYER_DEFAULT;
   const most = thickness !== undefined && thickness > 0 ? thickness - HOLE_PATTERN_TOP_LAYER_MIN : Infinity;
   if (!(most >= HOLE_PATTERN_TOP_LAYER_MIN)) return null;

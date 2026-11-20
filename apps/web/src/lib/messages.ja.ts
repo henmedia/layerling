@@ -1873,7 +1873,7 @@ export const MESSAGES_JA: Partial<Record<MessageKey, string>> = {
   "holePattern.topLayerThickness": "上の層の厚さ",
   "holePattern.topLayerColor": "上の層の色",
   "holePattern.topLayerName": "上の層",
-  "holePattern.topLayerNote": "上の {thickness} mm がこの色の別のボディになり、同じ穴で切られます。残りは下に本体の色で残ります。3MF には 2 つが別々のボディとして入り、多色プリンターで使えます。",
+  "holePattern.topLayerNote": "上の {thickness} mm がこの色の網になり、穴はその層だけを貫通します。その下の本体は自分の色のまま埋まっていて、穴から見えます。3MF には 2 つが別々のボディとして入り、多色プリンターで使えます。",
   "holePattern.topLayerThin": "ここでは本体が薄すぎて、別の上の層を作れません。",
   "holePattern.depth": "深さ",
   "holePattern.depth.through": "ボディ全体を貫通",

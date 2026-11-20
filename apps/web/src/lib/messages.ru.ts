@@ -1819,7 +1819,7 @@ export const MESSAGES_RU: Partial<Record<MessageKey, string>> = {
   "holePattern.topLayerThickness": "Толщина верхнего слоя",
   "holePattern.topLayerColor": "Цвет верхнего слоя",
   "holePattern.topLayerName": "Верхний слой",
-  "holePattern.topLayerNote": "Верхние {thickness} мм становятся отдельным телом этого цвета, прорезанным теми же отверстиями; остальное остаётся снизу в цвете тела. В 3MF это два отдельных тела, для многоцветного принтера.",
+  "holePattern.topLayerNote": "Верхние {thickness} мм становятся сеткой этого цвета: отверстия проходят только через этот слой. Под ним тело остаётся сплошным своего цвета и видно в отверстиях. В 3MF это два отдельных тела, для многоцветного принтера.",
   "holePattern.topLayerThin": "Тело здесь слишком тонкое для отдельного верхнего слоя.",
   "holePattern.depth": "Глубина",
   "holePattern.depth.through": "Сквозь всё тело",

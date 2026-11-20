@@ -1822,7 +1822,7 @@ export const MESSAGES_NL: Record<MessageKey, string> = {
   "holePattern.topLayerThickness": "Dikte van de bovenste laag",
   "holePattern.topLayerColor": "Kleur van de bovenste laag",
   "holePattern.topLayerName": "Bovenste laag",
-  "holePattern.topLayerNote": "De bovenste {thickness} mm worden een eigen lichaam in deze kleur, door dezelfde gaten gesneden; de rest blijft eronder in de kleur van het lichaam. De 3MF bevat de twee als aparte lichamen, voor een printer met meerdere kleuren.",
+  "holePattern.topLayerNote": "De bovenste {thickness} mm worden het net in deze kleur: de gaten gaan alleen door die laag. Daaronder blijft het lichaam massief in zijn eigen kleur en is het door de gaten te zien. De 3MF bevat de twee als aparte lichamen, voor een printer met meerdere kleuren.",
   "holePattern.topLayerThin": "Het lichaam is hier te dun voor een eigen bovenste laag.",
   "holePattern.depth": "Diepte",
   "holePattern.depth.through": "Door het hele lichaam",

@@ -155,6 +155,9 @@ export function HolePatternPanel({
   const spaced = wall ? withoutHoleTilt(settings) : settings;
   const arrangements = wall ? ARRANGEMENTS.filter((option) => option !== "perimeter") : ARRANGEMENTS;
   const pattern = !mounting;
+  // A top layer in a second colour: a net over the solid body, for a pattern of plain holes in a flat face.
+  const layerOffered = pattern && !wall && !custom && !head;
+  const netLayer = layerOffered && Boolean(settings.topLayer);
   const millimetres = (value: number) => (Math.round(value * 10) / 10).toLocaleString(numberLocale());
   const wallNote = wall
     ? wall.closed && wall.columns
@@ -581,7 +584,8 @@ export function HolePatternPanel({
       ) : null}
       {screws ? <p className="hole-pattern-mounting-note">{t(roundFace ? "holePattern.mounting.roundNote" : "holePattern.mounting.countNote")}</p> : null}
 
-      {custom ? null : <div className="edge-modifier-field shell-openings" role="radiogroup" aria-label={t("holePattern.depth")}>
+      {/* With a top layer in a second colour the holes go through that layer only: no depth to choose. */}
+      {custom || netLayer ? null : <div className="edge-modifier-field shell-openings" role="radiogroup" aria-label={t("holePattern.depth")}>
         <span>{t("holePattern.depth")}</span>
         <div className="shell-opening-options">
           {[true, false].map((through) => (
@@ -598,7 +602,7 @@ export function HolePatternPanel({
           ))}
         </div>
       </div>}
-      {settings.depth !== null && !custom ? (
+      {settings.depth !== null && !custom && !netLayer ? (
         <EdgeModifierSlider
           label={t("holePattern.depthValue")}
           value={settings.depth}
@@ -612,13 +616,13 @@ export function HolePatternPanel({
       ) : null}
 
       {/* A second colour on top (Discussion #1771): the top of the body under the face as a body of its own. */}
-      {pattern && !wall && !custom && settings.depth === null ? (
+      {layerOffered ? (
         <label className="edge-modifier-check">
           <input type="checkbox" checked={Boolean(settings.topLayer)} onChange={(event) => onChange({ topLayer: event.target.checked })} />
           <span>{t("holePattern.topLayer")}</span>
         </label>
       ) : null}
-      {pattern && !wall && !custom && settings.depth === null && settings.topLayer ? (() => {
+      {netLayer ? (() => {
         const layer = holePatternTopLayer(settings, thickness > 0 ? thickness : undefined);
         return (
           <>

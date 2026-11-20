@@ -10930,15 +10930,16 @@ export function LayerlingEditor({
       body = canonicalizeShape({ ...outer.group, name: body.name, groupOperation: "group" });
     }
     if (!plan.topLayer) return { ...inner, group: body };
-    // The top layer in a second colour (Discussion #1771): what of the perforated body lies in the slab under the face,
-    // and the rest below it, bundled so they move together and reach the slicer as two bodies in their own colours.
+    // The top layer in a second colour (Discussion #1771): what of the perforated body lies in the slab under the face is
+    // the net, and the body itself less the slab, without holes, stays solid below it; bundled, so they move together
+    // and reach the slicer as two bodies in their own colours.
     const layerName = t("holePattern.topLayerName");
     const slab = { ...plan.topLayer.slab, color: plan.topLayer.color, name: layerName };
     const top = await buildIntersectionShapeFromSelection([body, slab], limit);
     if (!top.group) return { ...inner, group: null, failureNotice: top.failureNotice || t("status.intersectionEmpty") };
     const upper = canonicalizeShape({ ...top.group, name: layerName, color: plan.topLayer.color, groupOperation: "intersection" });
     const cut = withHoleMode(cloneWorkplaneShapeTreeWithFreshIds(slab, "top-layer-cut"), true);
-    const below = await buildGroupedShapeOffThread([body, cut], limit, geometryAbortRef.current?.signal);
+    const below = await buildGroupedShapeOffThread([source, cut], limit, geometryAbortRef.current?.signal);
     if (!below.group) return below;
     const lower = canonicalizeShape({ ...below.group, name: source.name, color: source.color, groupOperation: "group" });
     const bundle = groupedShape([lower, upper]);
