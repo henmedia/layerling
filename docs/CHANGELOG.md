@@ -6,6 +6,8 @@ code still carries it - so a lower number further down is older, not newer.
 
 ## Unreleased
 
+- **3MF and OBJ export: the teeth and dots of a grouped logo stay (Issue #1781):** The fix in 1.167.0 kept the small parts of a group only where the group was still built from its parts. The editor keeps every group as the mesh it worked out for it, and such a mesh was left out when the export asked which loose pieces were drawn, because a cut made earlier may have left splinters in it. So in the reported design, a cat's face whose yellow inlay is a group of 41 pieces, the 16 pieces under 0.5 mm³ (teeth, whisker dots) still went missing from the 3MF. Such a mesh is asked now too; of its pieces only those of more than 24 triangles count as drawn, so the tetrahedra a cut leaves behind (#352) are removed as before. The reported file now writes all 41 pieces of each cat.
+
 ## 1.167.0
 
 - **Lid: a lip follows an opening that narrows below the rim, a cap's rim a body that widens there (Issue #1868, PR #1910 by @marcus040473):** A push-in lid's lip and a cap's rim were the body's cut just below the rim, pushed straight down, so on a body with leaning walls the upright lip stood in the wall and the lid did not go in (a round pot 40 mm across at the rim and 30 at the foot: a 5 mm lip overlapped the wall by 110 mm³). The body is now cut every 0.25 mm of the lip's or the rim's reach: the lip is what of the opening is open at that height and every one above it, the gap smaller; the rim goes round the outline with all those above it, the gap larger. Click bumps and dimples follow the wall at their height. A wall that leans less than 0.02 mm over the reach counts as upright and the lid is made exactly as before; a leaning lid stays the mesh lid.

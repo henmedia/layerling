@@ -1,1 +1,12 @@
-[]
+[
+  {
+    "title": {
+      "de": "3MF und OBJ: kleine Teile einer Gruppe bleiben",
+      "en": "3MF and OBJ: small parts of a group stay"
+    },
+    "body": {
+      "de": "Bei mehrfarbigen Entwürfen fehlten im 3MF und OBJ weiterhin sehr kleine Teile einer Gruppe, etwa die Zähne und Punkte in einem Logo, während sie in der STL da waren. Jetzt bleiben auch solche Teile in der Datei.",
+      "en": "In designs of several colours, very small parts of a group, such as the teeth and dots of a logo, were still missing from the 3MF and OBJ, while the STL had them. Now such parts stay in the file too."
+    }
+  }
+]
