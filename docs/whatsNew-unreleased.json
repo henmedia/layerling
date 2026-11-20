@@ -132,5 +132,15 @@
     "guide": {
       "chapter": "measuring"
     }
+  },
+  {
+    "title": {
+      "de": "Fehlermeldung bleibt bei den Knöpfen sichtbar",
+      "en": "Error message stays in view with the buttons"
+    },
+    "body": {
+      "de": "In einem langen Werkzeugfenster, etwa beim Aushöhlen, blieben „Abbrechen“ und „Anwenden“ immer sichtbar, die Meldung, warum etwas nicht geht, stand aber ganz unten und war erst nach dem Herunterrollen zu sehen. Ein Klick schien dann nichts zu tun. Die Meldung steht jetzt direkt über den Knöpfen und bleibt dort sichtbar.",
+      "en": "In a long tool panel, Hollow for example, Cancel and Apply always stayed in view, but the message why something cannot be done stood at the very bottom and only showed after scrolling down. A click then seemed to do nothing. The message now stands right above the buttons and stays in view there."
+    }
   }
 ]
