@@ -217,6 +217,7 @@ import { ensureLylFileWritable, forgetLylFile, forgetStlFile, linkedLylFile, lin
 import { addFileBackup, allowBackupFolder, fileBackupsOfDesign, listFileBackups, OPEN_FILE_BACKUPS_EVENT, readFileBackupBytes, readFileBackupSettings } from "@/lib/fileBackups";
 import { backupFileBeforeOverwrite, takeEditorBackupReminder } from "@/components/workplane/fileBackupEditor";
 import { copyNamePatterns, shapeNamesIn, withCopyName } from "@/lib/shapeCopyName";
+import { nameForNewGroup } from "@/lib/groupName";
 import { clipboardShape, displayShapeName, hasOwnShapeName, iconTagAsset, qrCodeAsset, makeShapeFromAsset, nameTagAsset, sbcBoardAsset, shapeAssetLabel, toolbarShapeAssets } from "@/lib/shapeCatalog";
 import { storeRecentShape } from "@/lib/shapeLibrarySections";
 import { PORT_PRESET_ORDER, PORT_PRESETS, portPresetSize, type PortPreset } from "@/lib/portGeometry";
@@ -12142,7 +12143,7 @@ export function LayerlingEditor({
       return;
     }
     const selected = new Set(selectedIds);
-    const editableGroup = withSelectionPivot(canonicalizeShape({ ...group, groupOperation: "group" }), selectionPivot);
+    const editableGroup = withSelectionPivot(canonicalizeShape({ ...group, name: nameForNewGroup(selectedShapes, group.name), groupOperation: "group" }), selectionPivot);
     commitShapes(
       [...shapesRef.current.filter((shape) => !selected.has(shape.id)), editableGroup],
       editableGroup.id,
@@ -12171,7 +12172,7 @@ export function LayerlingEditor({
       return;
     }
     const selected = new Set(selectedIds);
-    const bundle = withSelectionPivot(canonicalizeShape({ ...group, name: "Bundle", groupOperation: "bundle" }), activeRotationPivot);
+    const bundle = withSelectionPivot(canonicalizeShape({ ...group, name: nameForNewGroup(selectedShapes, "Bundle"), groupOperation: "bundle" }), activeRotationPivot);
     commitShapes([...shapesRef.current.filter((shape) => !selected.has(shape.id)), bundle], bundle.id, t("status.bundledMany", { count: selectedShapes.length }));
   }, [selectionLocked, refuseLockedSelection, commitShapes, selectedIds, selectedShapes, activeRotationPivot]);
 
@@ -15854,7 +15855,7 @@ export function LayerlingEditor({
           }
           throw new Error(result.failureNotice);
         }
-        const editableGroup = canonicalizeShape({ ...result.group, groupOperation: "group" });
+        const editableGroup = canonicalizeShape({ ...result.group, name: nameForNewGroup(groupable, result.group.name), groupOperation: "group" });
         commitShapes([...currentShapes().filter((shape) => !ids.has(shape.id)), editableGroup], editableGroup.id, result.mergeWarning ?? withClosedHolesNote(t("status.mcpGrouped", { count: groupable.length }), result.closedHoles));
         const closedHoles = result.closedHoles ? { closedHoles: result.closedHoles } : {};
         return result.mergeWarning
@@ -15870,7 +15871,7 @@ export function LayerlingEditor({
         if (parts.some((shape) => isNonSolidShape(shape))) throw new Error("A ruler isn't a solid and can't be bundled");
         const group = groupedShape(parts);
         if (!group) throw new Error("Could not bundle these objects");
-        const bundle = canonicalizeShape({ ...group, name: "Bundle", groupOperation: "bundle" });
+        const bundle = canonicalizeShape({ ...group, name: nameForNewGroup(parts, "Bundle"), groupOperation: "bundle" });
         commitShapes([...currentShapes().filter((shape) => !ids.has(shape.id)), bundle], bundle.id, t("status.mcpBundled", { count: parts.length }));
         return { object: mcpShapeSummary(bundle) };
       }
