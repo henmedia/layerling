@@ -8,5 +8,18 @@
       "de": "Bei mehrfarbigen Entwürfen fehlten im 3MF und OBJ weiterhin sehr kleine Teile einer Gruppe, etwa die Zähne und Punkte in einem Logo, während sie in der STL da waren. Jetzt bleiben auch solche Teile in der Datei.",
       "en": "In designs of several colours, very small parts of a group, such as the teeth and dots of a logo, were still missing from the 3MF and OBJ, while the STL had them. Now such parts stay in the file too."
     }
+  },
+  {
+    "title": {
+      "de": "Kein Stocken mehr beim Speichern großer importierter Baugruppen",
+      "en": "No more freezing while large imported assemblies are saved"
+    },
+    "body": {
+      "de": "In Entwürfen mit einer importierten STEP-Baugruppe, etwa einer Platine im Gehäuse, blieb der Editor nach fast jeder Änderung für mehrere Sekunden stehen, weil das automatische Speichern jedes Mal den ganzen Entwurf neu gepackt hat. Jetzt wird nur noch neu gepackt, was sich geändert hat, und der Editor bleibt währenddessen bedienbar.",
+      "en": "In designs with an imported STEP assembly, a circuit board in an enclosure for example, the editor froze for several seconds after almost every change, because the automatic save packed the whole design again each time. Now only what has changed is packed again, and the editor stays usable meanwhile."
+    },
+    "guide": {
+      "chapter": "files"
+    }
   }
 ]
