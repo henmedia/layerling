@@ -106,5 +106,18 @@
     "guide": {
       "section": "objectList"
     }
+  },
+  {
+    "title": {
+      "de": "Anleitung: genaue Wortfolge mit Anführungszeichen suchen",
+      "en": "User guide: search for an exact phrase with quotation marks"
+    },
+    "body": {
+      "de": "Das Suchfeld der Anleitung versteht jetzt Anführungszeichen: \"auf dem Kreisbogen\" findet nur die Abschnitte, in denen diese Wörter genau so hintereinander stehen. Ein einzelnes Wort in Anführungszeichen wird nur als ganzes Wort gefunden. Bisher fand eine Suche mit Anführungszeichen gar nichts.",
+      "en": "The search box of the user guide now understands quotation marks: \"circular arc\" finds only the sections where these words stand next to each other in this order. A single word in quotation marks is found only as a whole word. Until now a search with quotation marks found nothing at all."
+    },
+    "guide": {
+      "section": "commandSearch"
+    }
   }
 ]
