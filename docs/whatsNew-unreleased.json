@@ -340,5 +340,18 @@
     "guide": {
       "chapter": "sketches"
     }
+  },
+  {
+    "title": {
+      "de": "Skizze bearbeiten warnt vor verlorenen Fasen",
+      "en": "Edit sketch warns about lost chamfers"
+    },
+    "body": {
+      "de": "Öffnest du die Skizze eines Körpers, der schon Rundungen, Fasen oder eine Aushöhlung hat, sagt layerling jetzt gleich, dass sie beim Abschließen entfallen, weil der Körper neu entsteht. „Abbrechen“ behält sie. Nach dem Abschließen steht es noch einmal da, und „Rückgängig“ holt sie zurück.",
+      "en": "When you open the sketch of a body that already has fillets, chamfers or a hollowing, layerling now says right away that they go when you finish, because the body is built anew. Cancel keeps them. After finishing it says so again, and Undo brings them back."
+    },
+    "guide": {
+      "section": "sketchToBody"
+    }
   }
 ]
