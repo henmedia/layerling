@@ -551,7 +551,9 @@ function encodedAssetPayload(resource: object, encode: () => Uint8Array) {
 // exact bodies or more each one had pushed out the next before it was asked for,
 // and nothing was ever found. Now it holds as many as fit in a budget of text,
 // so a design full of large bodies does not keep copies of all of them either.
-const TEXT_PAYLOAD_CACHE_LIMIT = 256;
+// The count was 256, which an imported assembly of a few hundred small parts
+// passed in the same way (#1794); the budget of text is what bounds the memory.
+const TEXT_PAYLOAD_CACHE_LIMIT = 4096;
 const TEXT_PAYLOAD_CACHE_CHARS = 48 * 1024 * 1024;
 const encodedTextPayloads = new Map<string, Promise<EncodedAssetPayload>>();
 let encodedTextChars = 0;
@@ -1050,8 +1052,8 @@ function activeProjectIndexes(state: LylStateV1) {
   return { features, groups, sketches, exactCad };
 }
 
-function zipAsync(files: ArchiveFiles, level: NonNullable<LylProjectExportInput["compressionLevel"]> = 6, stored?: ReadonlySet<string>) {
-  return boundedProjectZip(files, level, stored);
+function zipAsync(files: ArchiveFiles, level: NonNullable<LylProjectExportInput["compressionLevel"]> = 6, stored?: ReadonlySet<string>, unchanging?: ReadonlySet<string>) {
+  return boundedProjectZip(files, level, stored, unchanging);
 }
 
 function unzipAsync(bytes: Uint8Array) {
@@ -1226,7 +1228,9 @@ export async function exportLylProject(input: LylProjectExportInput) {
   }
   // Attached pictures and PDF files are compressed already: they go in as they are (see `compressed`).
   const stored = new Set(builder.assets.filter((asset) => asset.kind === "attachment" && attachmentTypeForMediaType(asset.mediaType)?.compressed).map((asset) => asset.path));
-  return zipAsync(Object.fromEntries(Object.entries(builder.files).sort(([a], [b]) => a.localeCompare(b))), input.compressionLevel, stored);
+  // An asset's path is the hash of its bytes, so the same path is the same file in every save: deflated once (#1794).
+  const unchanging = new Set(builder.assets.map((asset) => asset.path));
+  return zipAsync(Object.fromEntries(Object.entries(builder.files).sort(([a], [b]) => a.localeCompare(b))), input.compressionLevel, stored, unchanging);
 }
 
 function inspectZipBeforeExpansion(bytes: Uint8Array) {
