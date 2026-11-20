@@ -8060,6 +8060,14 @@ html[data-theme="dark"]:where([data-palette="graphite"]) .color-recent {
   background: inherit;
 }
 
+:where(html[data-theme="dark"][data-palette="graphite"]) .edge-modifier-panel > .edge-modifier-error + .edge-modifier-footer::before {
+  background: inherit;
+}
+
+html[data-theme="dark"]:where([data-palette="graphite"]) .edge-modifier-panel > .edge-modifier-error:has(+ .edge-modifier-footer) {
+  background: #4e181d;
+}
+
 :where(html[data-theme="dark"][data-palette="graphite"]) .font-manager-error {
   color: #b3261e;
 }
