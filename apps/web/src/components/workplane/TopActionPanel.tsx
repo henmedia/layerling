@@ -13,7 +13,7 @@ import { AttachmentsPanel } from "./AttachmentsPanel";
 import { ServerDesignPicker } from "./ServerDesignPicker";
 import { DEFAULT_INFILL_PERCENT, DEFAULT_PRINT_MATERIAL, DEFAULT_WALLS, INFILL_CHOICES, PRINT_MATERIALS, WALL_CHOICES, normalizeInfillPercent, normalizePrintMaterial, normalizeWalls, printEstimateWithInfill, type PrintMaterial } from "@/lib/printEstimate";
 import { type EditorHistoryExportLimit } from "@/lib/editorHistory";
-import { projectExportFileName, stlNameAsksForNewFile } from "@/lib/exportNames";
+import { projectExportFileName, suggestedExportName, stlNameAsksForNewFile } from "@/lib/exportNames";
 import { readImportSvgWidth, readKeepSvgPage, setImportSvgWidth, storeKeepSvgPage } from "@/lib/importPreferences";
 import { lylFileAccessSupported } from "@/lib/lylFileAccess";
 import { hasOwnShapeName } from "@/lib/shapeCatalog";
@@ -77,7 +77,7 @@ export function TopActionPanel({
   /** Set when a selection is exported that leaves out visible bodies: how many are selected, how many are visible. */
   selectionLeavesOut?: { selected: number; total: number } | null;
   /** With several build plates and nothing selected (#456): what to write - all plates, one file per plate, or one plate. */
-  plateScope?: { plates: readonly string[]; value: "all" | "each" | number; onChange: (value: "all" | "each" | number) => void } | null;
+  plateScope?: { plates: readonly string[]; /** Each plate's own name, "" without one: what a plate's file is called (#1860). */ names?: readonly string[]; value: "all" | "each" | number; onChange: (value: "all" | "each" | number) => void } | null;
   onSelectAll?: () => void;
   onlyHoles?: boolean;
   /** Ausgeblendete Teile, die der Export auslaesst - gesagt, bevor er laeuft. */
@@ -130,7 +130,13 @@ export function TopActionPanel({
   const [bridges, setBridges] = useState<StencilBridgeOptions>(DEFAULT_STENCIL_BRIDGES);
   // One body with a name of its own is exported under that name; a design file keeps the design's name.
   const ownObjectName = estimateShapes.length === 1 && hasOwnShapeName(estimateShapes[0]) ? estimateShapes[0].name!.trim() : null;
-  const suggestedName = ownObjectName && exportFormat !== "lyl" ? ownObjectName : projectName;
+  // One build plate chosen (#1860): the file starts out under the plate's name, not the design's.
+  const chosenPlate = plateScope && typeof plateScope.value === "number" && exportFormat !== "lyl" && exportFormat !== "png" ? plateScope.value : null;
+  const suggestedName = suggestedExportName(
+    projectName,
+    exportFormat !== "lyl" ? ownObjectName : null,
+    chosenPlate !== null && plateScope?.plates[chosenPlate] ? { label: plateScope.plates[chosenPlate], name: plateScope.names?.[chosenPlate] ?? "" } : null,
+  );
   const [exportName, setExportName] = useState(suggestedName);
   const previousSuggestedNameRef = useRef(suggestedName);
   // Ready to type a new name when Export opens: the field takes the focus with the name selected, so typing replaces it
