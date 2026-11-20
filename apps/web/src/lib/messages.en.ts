@@ -3516,6 +3516,7 @@ export const MESSAGES_EN = {
   "prop.textKerning": "Automatic kerning",
   "prop.textLetterWidth": "Letter width (%)",
   "prop.textLetterWidthHint": "How wide each letter is drawn on the arc, in per cent of its own width; below 100 narrower, above wider. The letters keep their height, the arc and the box follow.",
+  "prop.textFullCircle": "All the way round",
   "prop.textStretch": "Stretch letters to the frame",
   "prop.textVertical": "Letters top to bottom",
   "prop.textRadius": "Arc radius",

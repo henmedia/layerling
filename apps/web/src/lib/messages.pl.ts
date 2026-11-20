@@ -3481,6 +3481,7 @@ export const MESSAGES_PL: Partial<Record<MessageKey, string>> = {
   "prop.textKerning": "Automatyczny kerning",
   "prop.textLetterWidth": "Szerokość liter (%)",
   "prop.textLetterWidthHint": "Jak szeroko rysowana jest każda litera na łuku, w procentach jej własnej szerokości; poniżej 100 węższa, powyżej szersza. Litery zachowują wysokość, a łuk i ramka podążają za nimi.",
+  "prop.textFullCircle": "Dookoła całego okręgu",
   "prop.textStretch": "Rozciągnij litery do ramki",
   "prop.textVertical": "Litery jedna pod drugą",
   "prop.textRadius": "Promień łuku",

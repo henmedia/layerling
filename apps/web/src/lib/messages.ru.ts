@@ -3509,6 +3509,7 @@ export const MESSAGES_RU: Partial<Record<MessageKey, string>> = {
   "prop.textKerning": "Автоматический кернинг",
   "prop.textLetterWidth": "Ширина букв (%)",
   "prop.textLetterWidthHint": "Насколько широко рисуется каждая буква на дуге, в процентах от её собственной ширины; ниже 100 — уже, выше — шире. Буквы сохраняют высоту, дуга и рамка подстраиваются.",
+  "prop.textFullCircle": "По всей окружности",
   "prop.textStretch": "Растянуть буквы по рамке",
   "prop.textVertical": "Буквы сверху вниз",
   "prop.textRadius": "Радиус дуги",

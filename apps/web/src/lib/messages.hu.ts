@@ -5153,6 +5153,7 @@ export const MESSAGES_HU: Partial<Record<MessageKey, string>> = {
   "prop.textKerning": "Automatikus alávágás",
   "prop.textLetterWidth": "Betűszélesség (%)",
   "prop.textLetterWidthHint": "Milyen szélesre rajzolja az egyes betűket az íven, a saját szélességük százalékában; 100 alatt keskenyebb, felette szélesebb. A betűk megtartják a magasságukat, az ív és a doboz követi őket.",
+  "prop.textFullCircle": "Körbe a teljes körön",
   "prop.textStretch": "Betűk nyújtása a kerethez",
   "prop.textInwardColumn": "A jobb oldalon",
   "prop.revolveSmoothness": "Simaság",

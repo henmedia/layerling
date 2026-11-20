@@ -3467,6 +3467,7 @@ export const MESSAGES_ZH_TW: Partial<Record<MessageKey, string>> = {
   "prop.textKerning": "自動字距調整",
   "prop.textLetterWidth": "字寬（%）",
   "prop.textLetterWidthHint": "弧線上每個字母的繪製寬度，以其本身寬度的百分比表示；小於 100 較窄，大於 100 較寬。字母高度不變，弧線與外框會跟著調整。",
+  "prop.textFullCircle": "環繞整圈",
   "prop.textStretch": "將字母拉伸至外框",
   "prop.textVertical": "文字直排",
   "prop.textRadius": "圓弧半徑",

@@ -3601,6 +3601,7 @@ export const MESSAGES_AR: Partial<Record<MessageKey, string>> = {
   "prop.textKerning": "ضبط المسافة بين أزواج الحروف تلقائيًا",
   "prop.textLetterWidth": "عرض الحروف (%)",
   "prop.textLetterWidthHint": "مدى عرض كل حرف على القوس، بالنسبة المئوية من عرضه الأصلي؛ أقل من 100 أضيق، وأكثر منه أعرض. تحتفظ الحروف بارتفاعها، ويتبعها القوس والصندوق.",
+  "prop.textFullCircle": "حول الدائرة كلها",
   "prop.textStretch": "مط الحروف لتملأ الإطار",
   "prop.textVertical": "الأحرف من الأعلى إلى الأسفل",
   "prop.textRadius": "نصف قطر القوس",

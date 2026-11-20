@@ -297,5 +297,20 @@
     "guide": {
       "section": "objectList"
     }
+  },
+  {
+    "title": {
+      "de": "Gebogener Text rund um den ganzen Kreis",
+      "en": "Curved text all the way round the circle",
+      "da": "Buet tekst hele vejen rundt om cirklen"
+    },
+    "body": {
+      "de": "Gebogener Text ließ bisher immer eine Lücke zwischen Ende und Anfang, er nahm höchstens 84 % des Kreises ein. Mit dem neuen Schalter „Rund um den ganzen Kreis“ im Inspektor schließt er den Kreis: Die Buchstaben werden gleichmäßig rundherum verteilt, und der Abstand zwischen dem letzten und dem ersten ist derselbe wie zwischen den anderen. Praktisch für einen Datumsring von 1 bis 31, ein Zifferblatt oder eine Skala.\n\nDie Buchstaben behalten ihre Größe; nur ein Text, der für den Kreis zu lang ist, wird kleiner. Die Nahtstelle liegt der Textmitte gegenüber, mit Drehen verschiebst du sie.",
+      "en": "Curved text always left a gap between its end and its start, it took at most 84 % of the circle. With the new switch \"All the way round\" in the inspector it closes the circle: the letters are spread evenly all the way round, and the gap between the last and the first is the same as between the others. Handy for a date ring from 1 to 31, a dial or a scale.\n\nThe letters keep their size; only a text too long for the circle gets smaller. The join lies opposite the middle of the text, turn the text to move it.",
+      "da": "Buet tekst efterlod altid et hul mellem slutningen og begyndelsen, den fyldte højst 84 % af cirklen. Med den nye kontakt \"Hele vejen rundt\" i inspektøren lukker den cirklen: bogstaverne fordeles jævnt hele vejen rundt, og afstanden mellem det sidste og det første er den samme som mellem de andre. Praktisk til en datoring fra 1 til 31, en urskive eller en skala.\n\nBogstaverne beholder deres størrelse; kun en tekst, der er for lang til cirklen, bliver mindre. Samlingen ligger over for tekstens midte, drej teksten for at flytte den."
+    },
+    "guide": {
+      "chapter": "text"
+    }
   }
 ]

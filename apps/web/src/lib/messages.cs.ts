@@ -3585,6 +3585,7 @@ export const MESSAGES_CS: Record<MessageKey, string> = {
   "prop.textKerning": "Automatický kerning",
   "prop.textLetterWidth": "Šířka písmen (%)",
   "prop.textLetterWidthHint": "Jak široce se každé písmeno na oblouku kreslí, v procentech jeho vlastní šířky; pod 100 užší, nad 100 širší. Písmena si zachovají výšku, oblouk a rámeček se přizpůsobí.",
+  "prop.textFullCircle": "Kolem celého kruhu",
   "prop.textStretch": "Roztáhnout písmena na rámeček",
   "prop.textVertical": "Písmena pod sebou",
   "prop.textRadius": "Poloměr oblouku",

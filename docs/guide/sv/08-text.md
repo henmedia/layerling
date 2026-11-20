@@ -176,6 +176,7 @@ När du slår på den följer texten cirkeln. Alla bokstäver står på samma ba
 
 - **{{ui:prop.textRadius}}** (5 till 500 mm): Radien för cirkeln som bokstävernas baslinje följer. Bokstäverna behåller sin storlek; bara böjningen ändras.
 - **{{ui:prop.textLetterWidth}}** (25 till 400 %): Hur bred varje bokstav ritas, i procent av sin egen bredd. Under 100 blir bokstäverna smalare, över 100 bredare; höjden består och båglängden växer eller krymper med dem. Praktiskt till exempel för hög, smal text på ett mynt. På rak text gör {{ui:prop.textStretch}} samma sak med ramen.
+- **{{ui:prop.textFullCircle}}:** Sluter cirkeln: tecknen fördelas jämnt hela varvet runt, så att avståndet mellan det sista och det första tecknet är detsamma som mellan de andra. Till exempel för en datumring ("1 2 3 … 31"), en urtavla eller en skala. Har texten mellanslag ligger det ett mellanslag även i skarven. Skarven ligger mitt emot textens mitt; vrid texten för att flytta den. Tecknen behåller sin storlek, bara en text som är för lång för cirkeln blir mindre. Utan inställningen tar en text högst 84 % av cirkeln. Inte för {{ui:prop.textVertical}}.
 - **{{ui:nameTag.letterSize}}:** Hur höga bokstäverna är. Det styrs inte längre av formens bredd.
 - **{{ui:prop.textInward}}:** Flyttar texten från cirkelns ovankant till dess nederkant. Bokstäverna pekar då med toppen inåt mot centrum.
 - **{{ui:prop.textFlipped}}:** Vänder enbart på bokstäverna så att de går att läsa från andra hållet. Texten stannar kvar på sin plats längs cirkeln.

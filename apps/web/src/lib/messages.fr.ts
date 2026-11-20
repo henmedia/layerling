@@ -3502,6 +3502,7 @@ export const MESSAGES_FR: Partial<Record<MessageKey, string>> = {
   "prop.textKerning": "Crénage automatique",
   "prop.textLetterWidth": "Largeur des lettres (%)",
   "prop.textLetterWidthHint": "Largeur de chaque lettre sur l'arc, en pour cent de sa propre largeur ; au-dessous de 100 plus étroite, au-dessus plus large. Les lettres gardent leur hauteur, l'arc et le cadre suivent.",
+  "prop.textFullCircle": "Tout autour du cercle",
   "prop.textStretch": "Étirer les lettres sur le cadre",
   "prop.textVertical": "Lettres de haut en bas",
   "prop.textRadius": "Rayon de l'arc",

@@ -174,6 +174,7 @@ Takoj ko jo vklopiš, besedilo teče vzdolž kroga. Vse črke stojijo na isti os
 
 - **{{ui:prop.textRadius}}** (5 do 500 mm): Polmer kroga, na katerem teče osnovna črta črk. Črke ostanejo na svojem mestu, spremeni se le njihova ukrivljenost.
 - **{{ui:prop.textLetterWidth}}** (25 do 400 %): Kako široko je narisana vsaka črka, v odstotkih njene lastne širine. Pod 100 so črke ožje, nad 100 širše; njihova višina ostane, lok, ki ga zasedajo, pa se z njimi podaljša ali skrajša. Na primer za visok, ozek napis na kovancu. Pri ravnem besedilu to naredi {{ui:prop.textStretch}} z okvirjem.
+- **{{ui:prop.textFullCircle}}:** Sklene krog: črke se enakomerno razporedijo okrog celega kroga, tako da je razmik med zadnjo in prvo črko enak kot med drugimi. Na primer za datumski obroč (»1 2 3 … 31«), številčnico ali merilo. Če ima besedilo presledke, je presledek tudi na stiku. Stik leži nasproti sredine besedila; zavrtite besedilo, da ga premaknete. Črke ohranijo velikost, zmanjša se le besedilo, ki je za krog predolgo. Brez te nastavitve besedilo zavzame največ 84 % kroga. Ni na voljo pri {{ui:prop.textVertical}}.
 - **{{ui:nameTag.letterSize}}:** Kako visoke so črke. Ne visi več na širini oblike.
 - **{{ui:prop.textInward}}:** Preklopi besedilo z zgornje strani kroga na spodnjo. Črke potem kažejo z glavo proti središču.
 - **{{ui:prop.textFlipped}}:** Obrne samo črke, da jih lahko bereš z druge strani. Besedilo pri tem ostane na svojem mestu na krogu.

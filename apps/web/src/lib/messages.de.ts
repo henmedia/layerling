@@ -3515,6 +3515,7 @@ export const MESSAGES_DE: Record<MessageKey, string> = {
   "prop.textKerning": "Automatisches Kerning",
   "prop.textLetterWidth": "Buchstabenbreite (%)",
   "prop.textLetterWidthHint": "Wie breit jeder Buchstabe auf dem Bogen gezeichnet wird, in Prozent seiner eigenen Breite; unter 100 schmaler, darüber breiter. Die Buchstaben behalten ihre Höhe, Bogen und Rahmen folgen.",
+  "prop.textFullCircle": "Rund um den ganzen Kreis",
   "prop.textStretch": "Buchstaben auf den Rahmen strecken",
   "prop.textVertical": "Buchstaben untereinander",
   "prop.textRadius": "Bogenradius",

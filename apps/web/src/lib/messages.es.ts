@@ -3595,6 +3595,7 @@ export const MESSAGES_ES: Partial<Record<MessageKey, string>> = {
   "prop.textKerning": "Interletraje automático",
   "prop.textLetterWidth": "Ancho de letra (%)",
   "prop.textLetterWidthHint": "Qué tan ancha se dibuja cada letra en el arco, en porcentaje de su propio ancho; por debajo de 100, más estrecha; por encima, más ancha. Las letras conservan su altura; el arco y el cuadro se adaptan.",
+  "prop.textFullCircle": "Toda la vuelta",
   "prop.textStretch": "Estirar las letras hasta el marco",
   "prop.textVertical": "Letras de arriba abajo",
   "prop.textRadius": "Radio del arco",

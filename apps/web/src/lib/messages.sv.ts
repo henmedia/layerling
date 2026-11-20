@@ -3587,6 +3587,7 @@ export const MESSAGES_SV: Partial<Record<MessageKey, string>> = {
   "prop.textKerning": "Automatisk kerning",
   "prop.textLetterWidth": "Teckenbredd (%)",
   "prop.textLetterWidthHint": "Hur brett varje tecken ritas på bågen, i procent av sin egen bredd; under 100 smalare, över 100 bredare. Bokstäverna behåller sin höjd, bågen och rutan följer med.",
+  "prop.textFullCircle": "Hela varvet runt",
   "prop.textStretch": "Sträck bokstäver till ramen",
   "prop.textVertical": "Bokstäver uppifrån och ner",
   "prop.textRadius": "Bågradie",

@@ -2452,6 +2452,7 @@ export const MESSAGES_SL: Partial<Record<MessageKey, string>> = {
   "prop.textKerning": "Samodejni kerning",
   "prop.textLetterWidth": "Širina črk (%)",
   "prop.textLetterWidthHint": "Kako široko je vsaka črka narisana na loku, v odstotkih njene lastne širine; pod 100 ožje, nad 100 širše. Črke ohranijo višino, lok in okvir jim sledita.",
+  "prop.textFullCircle": "Okrog celega kroga",
   "prop.textStretch": "Raztegni črke na okvir",
   "prop.textVertical": "Črke ena pod drugo",
   "prop.textRadius": "Polmer loka",

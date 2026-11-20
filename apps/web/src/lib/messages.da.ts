@@ -591,6 +591,7 @@ export const MESSAGES_DA: Partial<Record<MessageKey, string>> = {
   "prop.textKerning": "Automatisk kerning",
   "prop.textLetterWidth": "Bogstavbredde (%)",
   "prop.textLetterWidthHint": "Hvor bredt hvert bogstav tegnes på buen, i procent af dets egen bredde; under 100 smallere, over bredere. Bogstaverne beholder deres højde, buen og feltet følger med.",
+  "prop.textFullCircle": "Hele vejen rundt",
   "prop.textSpacing": "Bogstavafstand (%)",
   "prop.textInwardColumn": "På højre side",
   "surfaceTexture.cracks": "Sprækker (kintsugi)",

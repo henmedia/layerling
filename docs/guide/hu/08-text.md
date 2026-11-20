@@ -172,6 +172,7 @@ Amint bekapcsolod, a szöveg a kör mentén fut. Minden betű ugyanazon az alapv
 
 - **{{ui:prop.textRadius}}** (5–500 mm): Annak a körnek a sugara, amelyen a betűk alapvonala fut. A betűk a helyükön maradnak, csak a hajlításuk változik.
 - **{{ui:prop.textLetterWidth}}** (25–400 %): Milyen szélesre rajzolódik minden betű, a saját szélessége százalékában. 100 alatt keskenyebbek a betűk, fölötte szélesebbek; a magasságuk marad, és az általuk elfoglalt ív velük együtt nő vagy csökken. Például magas, keskeny felirathoz egy érmén. Egyenes szövegnél ezt a {{ui:prop.textStretch}} végzi a kerettel.
+- **{{ui:prop.textFullCircle}}:** Bezárja a kört: a betűk egyenletesen oszlanak el a teljes körön, így az utolsó és az első betű közötti hézag ugyanakkora, mint a többi között. Például dátumgyűrűhöz („1 2 3 … 31”), számlaphoz vagy skálához. Ha a szövegben vannak szóközök, a találkozásnál is szóköz áll. A találkozás a szöveg közepével szemben van; a szöveg elforgatásával áthelyezheted. A betűk megtartják a méretüket, csak a körhöz túl hosszú szöveg lesz kisebb. E beállítás nélkül a szöveg a kör legfeljebb 84 %-át foglalja el. {{ui:prop.textVertical}} esetén nem érhető el.
 - **{{ui:nameTag.letterSize}}:** Milyen magasak a betűk. Már nem függ az alakzat szélességétől.
 - **{{ui:prop.textInward}}:** A szöveget a kör tetejéről az aljára viszi. A betűk ilyenkor a fejükkel a középpont felé mutatnak.
 - **{{ui:prop.textFlipped}}:** Csak a betűket fordítja meg, hogy a másik oldalról olvashasd őket. A szöveg a helyén marad a körön.

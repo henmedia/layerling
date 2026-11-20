@@ -171,6 +171,7 @@ Písmena se rozmístí po kružnici se společným účařím stejně rovnoměrn
 
 - **{{ui:prop.textRadius}}**, 5 až 500 mm: poloměr kružnice, po níž vede účaří. Písmena přitom zůstávají na svém místě, mění se jen jejich zakřivení.
 - **{{ui:prop.textLetterWidth}}**, 25 až 400 %: jak široce se každé písmeno kreslí, v procentech jeho vlastní šířky. Pod 100 jsou písmena užší, nad 100 širší; jejich výška zůstává a oblouk, který zabírají, se s nimi prodlouží nebo zkrátí. Hodí se třeba pro vysoký úzký nápis na minci. U přímého textu to dělá {{ui:prop.textStretch}} s rámečkem.
+- **{{ui:prop.textFullCircle}}:** Uzavře kruh: písmena se rovnoměrně rozloží kolem celého kruhu, takže mezera mezi posledním a prvním písmenem je stejná jako mezi ostatními. Například pro datumový kroužek („1 2 3 … 31“), ciferník nebo stupnici. Má-li text mezery, je mezera i ve spoji. Spoj leží naproti středu textu; otočením textu ho posunete. Písmena si zachovají velikost, zmenší se jen text, který je pro kruh příliš dlouhý. Bez této volby zabere text nejvýše 84 % kruhu. Neplatí pro {{ui:prop.textVertical}}.
 - **{{ui:nameTag.letterSize}}:** velikost písmen nezávislá na šířce tvaru.
 - **{{ui:prop.textInward}}:** přesune text z horního na spodní oblouk; vršky písmen míří do středu.
 - **{{ui:prop.textFlipped}}:** převrátí pouze písmena pro čtení z druhé strany. Poloha textu na kružnici zůstane zachovaná.
