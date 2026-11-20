@@ -1408,14 +1408,21 @@ function isPileOfSolids(shape: WorkplaneShape) {
 }
 
 async function unionOverlappingExportMeshesRaw(shapes: WorkplaneShape[], meshes: MeshData[], cut?: readonly boolean[]) {
+  // The meshes whose loose pieces are parts someone drew. A body a loose hole was cut from is none any more, and
+  // neither is a mesh layerling worked out itself, such as a group cut with its holes: a cut may have left splinters there.
+  const drawnMeshes = (indices: readonly number[]) => indices
+    .filter((index) => !cut?.[index] && shapes[index]?.importedMesh?.sourceFormat !== "json")
+    .map((index) => meshes[index]);
   const gruppen = overlappingExportClusters(meshes.map((mesh) => meshBounds(mesh.vertices)));
   if (!gruppen.some((gruppe) => gruppe.length > 1 || isPileOfSolids(shapes[gruppe[0]]))) {
-    return { meshes, quellen: meshes.map((_, index) => index), verschmolzen: 0, gescheitert: 0, gestutzt: meshes.map((_, index) => Boolean(cut?.[index])) };
+    return { meshes, quellen: meshes.map((_, index) => index), verschmolzen: 0, gescheitert: 0, gestutzt: meshes.map((_, index) => Boolean(cut?.[index])), gezeichnet: meshes.map((_, index) => drawnMeshes([index])) };
   }
   const runtime = await getManifoldRuntime().catch(() => null);
   const ergebnis: MeshData[] = [];
   // Which results a cut or a merge of several bodies made: only there a splinter can have been left behind (#585).
   const gestutzt: boolean[] = [];
+  // The meshes each result was made from: their loose pieces are parts someone drew, not splinters (Issue #1781).
+  const gezeichnet: MeshData[][] = [];
   // Which input shape each result stands for - a merged body takes its first
   // member, so the 3MF export can keep names and colours.
   const quellen: number[] = [];
@@ -1426,6 +1433,7 @@ async function unionOverlappingExportMeshesRaw(shapes: WorkplaneShape[], meshes:
       ergebnis.push(meshes[gruppe[0]]);
       quellen.push(gruppe[0]);
       gestutzt.push(Boolean(cut?.[gruppe[0]]));
+      gezeichnet.push(drawnMeshes(gruppe));
       continue;
     }
     const created: ManifoldSolid[] = [];
@@ -1458,17 +1466,19 @@ async function unionOverlappingExportMeshesRaw(shapes: WorkplaneShape[], meshes:
       quellen.push(gruppe[0]);
       // One shape that is only a pile of its own pieces, such as a text, has lost nothing by being joined.
       gestutzt.push(gruppe.length > 1 || gruppe.some((index) => cut?.[index]));
+      gezeichnet.push(drawnMeshes(gruppe));
       if (gruppe.length > 1) verschmolzen += gruppe.length;
     } else {
       gruppe.forEach((index) => {
         ergebnis.push(meshes[index]);
         quellen.push(index);
         gestutzt.push(Boolean(cut?.[index]));
+        gezeichnet.push(drawnMeshes([index]));
       });
       gescheitert += 1;
     }
   }
-  return { meshes: ergebnis, quellen, verschmolzen, gescheitert, gestutzt };
+  return { meshes: ergebnis, quellen, verschmolzen, gescheitert, gestutzt, gezeichnet };
 }
 
 /**
@@ -1835,12 +1845,12 @@ async function colorSeparatedExportMeshesRaw(shapes: WorkplaneShape[], meshes: M
   if (farben.length <= 1) {
     return unionOverlappingExportMeshesRaw(shapes, meshes, cut);
   }
-  const koerper: { mesh: MeshData; quelle: number; farbe: number; gestutzt: boolean }[] = [];
+  const koerper: { mesh: MeshData; quelle: number; farbe: number; gestutzt: boolean; gezeichnet: MeshData[] }[] = [];
   let verschmolzen = 0;
   let gescheitert = 0;
   for (const [farbe, gruppe] of farben.entries()) {
     const teil = await unionOverlappingExportMeshesRaw(gruppe.map((index) => shapes[index]), gruppe.map((index) => meshes[index]), cut && gruppe.map((index) => cut[index]));
-    teil.meshes.forEach((mesh, index) => koerper.push({ mesh, quelle: gruppe[teil.quellen[index]], farbe, gestutzt: teil.gestutzt[index] }));
+    teil.meshes.forEach((mesh, index) => koerper.push({ mesh, quelle: gruppe[teil.quellen[index]], farbe, gestutzt: teil.gestutzt[index], gezeichnet: teil.gezeichnet[index] }));
     verschmolzen += teil.verschmolzen;
     gescheitert += teil.gescheitert;
   }
@@ -1859,6 +1869,7 @@ async function colorSeparatedExportMeshesRaw(shapes: WorkplaneShape[], meshes: M
   const ergebnis: MeshData[] = [];
   const quellen: number[] = [];
   const gestutzt: boolean[] = [];
+  const gezeichnet: MeshData[][] = [];
 
   /** The bodies of another colour that reach a body and came later: the shapes that cut it (Discussion #79). */
   const spaeter = (index: number) => koerper
@@ -1932,6 +1943,7 @@ async function colorSeparatedExportMeshesRaw(shapes: WorkplaneShape[], meshes: M
       ergebnis.push(entry.mesh);
       quellen.push(entry.quelle);
       gestutzt.push(entry.gestutzt);
+      gezeichnet.push(entry.gezeichnet);
       return;
     }
     const gleich = schneider.length === alle.length && schneider.every(({ otherIndex }) => alle.some((one) => one.otherIndex === otherIndex));
@@ -1946,21 +1958,23 @@ async function colorSeparatedExportMeshesRaw(shapes: WorkplaneShape[], meshes: M
       gestutzt.push(entry.gestutzt);
     }
     quellen.push(entry.quelle);
+    gezeichnet.push(entry.gezeichnet);
   });
-  return { meshes: ergebnis, quellen, verschmolzen, gescheitert, gestutzt };
+  return { meshes: ergebnis, quellen, verschmolzen, gescheitert, gestutzt, gezeichnet };
 }
 
 /**
  * What an export writes: the loose splinters a cut or the colour separation leaves behind are left out (#352), as
  * `splinters` counts. A slicer shows them as spikes, and they can lift a flat design off the plate.
  */
-function withoutSplinters<T extends { meshes: MeshData[]; gestutzt: boolean[] }>(result: T): T & { splinters: number } {
+function withoutSplinters<T extends { meshes: MeshData[]; gestutzt: boolean[]; gezeichnet: MeshData[][] }>(result: T): T & { splinters: number } {
   let splinters = 0;
   const meshes = result.meshes.map((mesh, index) => {
     // Only what a cut, a merge of several bodies or the colour separation made can hold a splinter. A body they did
-    // not touch is as it was drawn: a thin small letter is no splinter (#585).
+    // not touch is as it was drawn: a thin small letter is no splinter (#585). In one they did touch, what is left of
+    // a piece it was drawn with is no splinter either (Issue #1781).
     if (!result.gestutzt[index]) return mesh;
-    const cleaned = removeLooseSplinters(mesh);
+    const cleaned = removeLooseSplinters(mesh, result.gezeichnet[index]);
     splinters += cleaned.removed;
     return cleaned.mesh;
   });
