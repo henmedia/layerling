@@ -9027,6 +9027,11 @@ html[data-theme="dark"]:where([data-palette="graphite"]) .layer-view-chart path 
   stroke: #8fb3e0;
 }
 
+:where(html[data-theme="dark"][data-palette="graphite"]) .part-color-row input[type="color"] {
+  border: 1px solid var(--border, #ccc);
+  background: none;
+}
+
 :where(html[data-theme="dark"][data-palette="graphite"]) .dashboard-welcome-hide {
   color: #717171;
   background: transparent;
