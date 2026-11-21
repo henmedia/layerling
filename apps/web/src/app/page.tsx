@@ -11,6 +11,7 @@ import { ThemeSwitch } from "@/components/ThemeSwitch";
 import { useAppUpdate } from "@/lib/useAppUpdate";
 import { sharedProjectSaveTarget } from "@/lib/sharedProjectTarget";
 import { storeFolderNameProblem, suggestStoreFolderName } from "@/lib/storeFolderName";
+import { folderNameParts } from "@/lib/folderEmoji";
 import {
   DESIGN_FOLDERS_STORAGE_KEY,
   childFolders,
@@ -4321,6 +4322,7 @@ function Dashboard({
                   ) : null}
                   {shownSharedFolders.map((folder) => {
                     const folderPath = joinStorePath(folder.path ?? sharedPath, folder.name);
+                    const nameParts = folderNameParts(folder.name);
                     return (
                     <article
                       className={`project-card server-folder-card${dropFolderPath === folderPath ? " drop-target" : ""}`}
@@ -4332,10 +4334,14 @@ function Dashboard({
                         type="button"
                         onClick={() => (searchResults ? openFolderFromSearch(folderPath) : onOpenStoreFolder(folderPath))}
                       >
-                        <span className="project-preview server-folder-preview">
-                          {isShapesFolder(folder) ? <Shapes aria-hidden="true" /> : <FolderKanban aria-hidden="true" />}
+                        <span className={`project-preview server-folder-preview${nameParts.emoji ? " folder-emoji-preview" : ""}`}>
+                          {isShapesFolder(folder)
+                            ? <Shapes aria-hidden="true" />
+                            : nameParts.emoji
+                              ? <span className="folder-emoji" aria-hidden="true">{nameParts.emoji}</span>
+                              : <FolderKanban aria-hidden="true" />}
                         </span>
-                        <span className="project-card-title" translate="no">{folder.name}</span>
+                        <span className="project-card-title" translate="no" title={nameParts.emoji ? folder.name : undefined}>{nameParts.label}</span>
                         <span className="project-card-meta">{searchResults
                           ? (folder.path ? t("shared.searchFolderIn", { name: folder.path }) : t("shared.searchFolderRoot"))
                           : t("shared.folderMeta")}</span>
@@ -4627,6 +4633,7 @@ function Dashboard({
                   {visibleFolders.map((folder) => {
                     const contents = folderContents(designFolders, localDesigns, folder.id);
                     const where = folderPathNames(designFolders, folder.parentId);
+                    const nameParts = folderNameParts(folder.name);
                     return (
                       <article
                         className={`project-card server-folder-card local-folder-card${localDropTarget === folder.id ? " drop-target" : ""}${draggedFolderId === folder.id ? " dragging" : ""}`}
@@ -4649,10 +4656,12 @@ function Dashboard({
                             onOpenFolder(folder.id);
                           }}
                         >
-                          <span className="project-preview server-folder-preview">
-                            <Folder aria-hidden="true" />
+                          <span className={`project-preview server-folder-preview${nameParts.emoji ? " folder-emoji-preview" : ""}`}>
+                            {nameParts.emoji
+                              ? <span className="folder-emoji" aria-hidden="true">{nameParts.emoji}</span>
+                              : <Folder aria-hidden="true" />}
                           </span>
-                          <span className="project-card-title" translate="no">{folder.name}</span>
+                          <span className="project-card-title" translate="no" title={nameParts.emoji ? folder.name : undefined}>{nameParts.label}</span>
                           <span className="project-card-meta">{localSearch && where.length
                             ? t("shared.searchFolderIn", { name: where.join(" / ") })
                             : contents.designs === 0 && contents.folders === 0
@@ -5288,6 +5297,7 @@ function Dashboard({
           >
             <header>
               <strong id="new-folder-title">{folderDialog.mode === "create" ? t("shared.newFolderTitle") : t("shared.renameFolderTitle")}</strong>
+              <GuideHelpLink chapter="files" section="designFolders" iconSize={16} />
               <button type="button" aria-label={folderDialog.mode === "create" ? t("shared.newFolderCancel") : t("shared.renameFolderCancel")} onClick={closeFolderDialog}>
                 <X size={18} />
               </button>

@@ -39,6 +39,7 @@ Při desítkách projektů jeden seznam nestačí. Na úvodní stránce vytvoř�
 - **Do složky:** přetáhněte projekt na složku nebo v nabídce projektu zvolte {{ui:shared.moveTo}}, kde jsou všechny složky. Nový projekt i soubor, který otevřete nebo importujete, se uloží do právě otevřené složky.
 - **Zase ven:** první dlaždice ve složce, `..`, a řádek pod záložkami vedou zpět; i na ně lze projekt přetáhnout. Složka přetažená na jinou složku se do ní vloží.
 - **Přejmenovat a smazat** najdete v nabídce složky. Smazáním složky se nesmaže žádný projekt: její obsah se posune o úroveň výš.
+- **Obrázek pro složku:** začněte její název emoji, například `💡 Nápady`. Složka pak místo ikony složky ukáže emoji ve velkém a zbytek jako název. Protože emoji je součástí názvu, jde se složkou všude; pro změnu nebo odstranění složku přejmenujte. Platí to i pro složky na serveru.
 - **Vyhledávání** prochází všechny složky; nalezený projekt ukazuje svou složku a kliknutím na ni ji otevřete.
 
 {{ui:dashboard.backupAll}} zachová složky: projekty jsou v záložním souboru ve svých složkách a obnovení je vrátí na místo. Složky tohoto prohlížeče jsou oddělené od složek na serveru. Náhledové obrázky karet jsou v souboru také, takže po obnovení jsou hned zpět.

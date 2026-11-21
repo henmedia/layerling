@@ -39,6 +39,7 @@ Pri desetinah projektov en seznam ni dovolj. Na začetni strani {{ui:shared.newF
 - **V mapo:** povleci projekt na mapo ali v meniju projekta izberi {{ui:shared.moveTo}}, ki ponudi vse mape. Nov projekt in datoteka, ki jo odpreš ali uvoziš, gre v mapo, ki je takrat odprta.
 - **Spet ven:** prva ploščica v mapi, `..`, in vrstica pod zavihki vodita nazaj; nanju lahko povlečeš tudi projekt. Mapa, ki jo povlečeš na drugo mapo, gre vanjo.
 - **Preimenovanje in brisanje** sta v meniju mape. Brisanje mape ne izbriše nobenega projekta: njena vsebina se pomakne za raven višje.
+- **Slika za mapo:** začni njeno ime z emojijem, na primer `💡 Ideje`. Mapa nato namesto ikone mape pokaže emoji v velikem, preostanek pa kot ime. Ker je emoji del imena, gre z mapo povsod; da ga spremeniš ali odstraniš, mapo preimenuj. To velja tudi za mape na strežniku.
 - **Iskanje** pregleda vse mape; najden projekt pokaže svojo mapo, klik nanjo pa jo odpre.
 
 {{ui:dashboard.backupAll}} ohrani mape: projekti so v datoteki varnostne kopije v svojih mapah, obnovitev pa jih vrne tja. Mape tega brskalnika so ločene od map na strežniku. Predogledne slike kartic gredo tudi v datoteko, zato so po obnovitvi takoj nazaj.

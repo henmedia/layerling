@@ -39,6 +39,7 @@ Met tientallen ontwerpen is één lijst niet genoeg. Op de startpagina maakt {{u
 - **In een map:** sleep een ontwerp op de map, of kies {{ui:shared.moveTo}} in het menu van het ontwerp, dat elke map aanbiedt. Een nieuw ontwerp, en een bestand dat je opent of importeert, komt in de map die op dat moment open is.
 - **Er weer uit:** de eerste tegel in een map, `..`, en de regel onder de tabbladen leiden terug; je kunt er ook een ontwerp op slepen. Een map die je op een andere map sleept, gaat daarin.
 - **Hernoemen en verwijderen** staan in het menu van de map. Een map verwijderen verwijdert geen ontwerp: wat erin zat, gaat een niveau omhoog.
+- **Een plaatje voor een map:** begin de naam met een emoji, zoals `💡 Ideeën`. De map toont de emoji dan groot in plaats van het mappictogram, en de rest als naam. Omdat de emoji bij de naam hoort, gaat hij overal mee waar de map heen gaat; hernoem de map om hem te wijzigen of weg te halen. Dat werkt ook voor de mappen op een server.
 - **Zoeken** kijkt in elke map; een gevonden ontwerp toont zijn map, en een klik erop opent die.
 
 {{ui:dashboard.backupAll}} neemt de mappen mee: de ontwerpen staan in het back-upbestand in hun mappen, en bij het terugzetten komen ze daar weer. De mappen van deze browser staan los van de mappen op een server. De voorbeeldafbeeldingen van de kaarten gaan ook mee in het bestand, zodat ze er na het terugzetten meteen weer zijn.

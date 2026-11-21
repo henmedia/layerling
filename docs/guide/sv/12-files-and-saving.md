@@ -39,6 +39,7 @@ Med dussintals designer räcker inte en enda lista. På startsidan skapar {{ui:s
 - **In i en mapp:** dra en design till mappen, eller välj {{ui:shared.moveTo}} i designens meny, som listar varje mapp. En ny design, och en fil som du öppnar eller importerar medan en mapp är öppen, hamnar i den mappen.
 - **Ut igen:** den första rutan i en mapp, `..`, och raden under flikarna leder tillbaka; du kan släppa en design på dem också. En mapp som du drar till en annan mapp hamnar inuti den.
 - **Byta namn och ta bort** finns i mappens meny. Att ta bort en mapp tar inte bort någon design: det som låg i den flyttas upp en nivå.
+- **En bild för en mapp:** börja namnet med en emoji, till exempel `💡 Idéer`. Mappen visar då emojin stort i stället för mappikonen, och resten som namn. Eftersom emojin är en del av namnet följer den med vart mappen än går; byt namn på mappen för att ändra eller ta bort den. Det fungerar även för mapparna på en server.
 - **Sökningen** letar igenom varje mapp; en design som hittas visar sin mapp, och ett klick på den öppnar mappen.
 
 {{ui:dashboard.backupAll}} behåller mapparna: designerna ligger i sina mappar i säkerhetskopian, och att återställa säkerhetskopian lägger tillbaka dem där. Den här webbläsarens mappar är skilda från mapparna på en server. Kortens miniatyrbilder följer med i filen också, så de är tillbaka så fort du återställer.

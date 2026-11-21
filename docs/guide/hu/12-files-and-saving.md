@@ -39,6 +39,7 @@ Több tucat tervnél egyetlen lista már nem elég. A kezdőlapon a {{ui:shared.
 - **Mappába:** húzz egy tervet a mappára, vagy válaszd a terv menüjében a {{ui:shared.moveTo}} pontot, amely minden mappát felsorol. Egy új terv, valamint egy fájl, amelyet nyitott mappa mellett nyitsz meg vagy importálsz, ebbe a mappába kerül.
 - **Ki újra:** egy mappa első csempéje, a `..`, és a fülek alatti sor vezet vissza; ezekre is ejthetsz tervet. Egy másik mappára húzott mappa abba kerül.
 - **Átnevezés és törlés** a mappa menüjében van. Egy mappa törlése nem töröl tervet: ami benne volt, egy szinttel feljebb kerül.
+- **Kép egy mappához:** kezdd a nevét egy emojival, például `💡 Ötletek`. A mappa ekkor a mappaikon helyett nagyban mutatja az emojit, a többit pedig névként. Mivel az emoji a név része, mindenhová megy a mappával; a módosításhoz vagy eltávolításhoz nevezd át a mappát. A szerveren lévő mappáknál is működik.
 - **Keresés** minden mappában keres; egy megtalált terv megmutatja a mappáját, és rákattintva megnyílik a mappa.
 
 A {{ui:dashboard.backupAll}} megőrzi a mappákat: a tervek a biztonsági mentés fájljában a mappáikban ülnek, és a mentés visszaállítása oda teszi vissza őket. Ennek a böngészőnek a mappái külön vannak a szerveren lévő mappáktól. A kártyaképek is bekerülnek a fájlba, így a visszaállítás után azonnal visszatérnek.

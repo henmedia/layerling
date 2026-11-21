@@ -39,6 +39,7 @@ Cuando tienes decenas de diseños, una sola lista no basta. En la página de ini
 - **Meter en una carpeta:** arrastra un diseño hasta la carpeta, o elige {{ui:shared.moveTo}} en el menú del diseño, que muestra todas las carpetas. Si tienes una carpeta abierta, los diseños nuevos y los archivos que abras o importes van a parar a ella.
 - **Sacar de una carpeta:** la primera tarjeta de cada carpeta, `..`, y la línea que hay bajo las pestañas te llevan de vuelta; también puedes soltar un diseño sobre ellas. Una carpeta que arrastres sobre otra queda dentro de ella.
 - **Cambiar el nombre y eliminar** están en el menú de la carpeta. Al eliminar una carpeta no se elimina ningún diseño: lo que contenía sube un nivel.
+- **Una imagen para una carpeta:** empieza su nombre con un emoji, por ejemplo `💡 Ideas`. La carpeta muestra entonces el emoji en grande en lugar del icono de carpeta, y el resto como nombre. Como el emoji forma parte del nombre, va a todas partes con la carpeta; cambia el nombre de la carpeta para cambiarlo o quitarlo. También funciona con las carpetas de un servidor.
 - **La búsqueda** mira en todas las carpetas; cada diseño encontrado muestra su carpeta, y al hacer clic en ella se abre.
 
 {{ui:dashboard.backupAll}} conserva las carpetas: en el archivo de copia de seguridad, los diseños van dentro de sus carpetas, y al restaurar la copia vuelven a ellas. Las carpetas de este navegador son independientes de las carpetas de un servidor. Las imágenes de las tarjetas también van en el archivo, así que reaparecen en cuanto restauras la copia.

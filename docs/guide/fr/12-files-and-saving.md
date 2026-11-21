@@ -39,6 +39,7 @@ Avec des dizaines de dessins, une seule liste ne suffit plus. Sur la page d'accu
 - **Dans un dossier :** faites glisser un dessin sur le dossier, ou choisissez {{ui:shared.moveTo}} dans le menu du dessin, qui propose tous les dossiers. Un nouveau dessin, et un fichier que vous ouvrez ou importez, va dans le dossier ouvert à ce moment.
 - **En ressortir :** la première tuile d'un dossier, `..`, et la ligne sous les onglets ramènent en arrière ; on peut aussi y déposer un dessin. Un dossier glissé sur un autre dossier va dedans.
 - **Renommer et supprimer** se trouvent dans le menu du dossier. Supprimer un dossier ne supprime aucun dessin : son contenu remonte d'un niveau.
+- **Une image pour un dossier :** commencez son nom par un emoji, par exemple `💡 Idées`. Le dossier affiche alors l'emoji en grand à la place de l'icône de dossier, et le reste comme nom. Comme l'emoji fait partie du nom, il suit le dossier partout ; renommez le dossier pour le changer ou l'enlever. Cela vaut aussi pour les dossiers sur un serveur.
 - **La recherche** regarde dans tous les dossiers ; un dessin trouvé indique son dossier, et un clic dessus l'ouvre.
 
 {{ui:dashboard.backupAll}} garde les dossiers : les dessins sont rangés dans leurs dossiers dans le fichier de sauvegarde, et la restauration les remet à leur place. Les dossiers de ce navigateur sont distincts des dossiers d'un serveur. Les aperçus des cartes vont aussi dans le fichier : ils reviennent dès la restauration.

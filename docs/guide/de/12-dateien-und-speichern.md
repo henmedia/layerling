@@ -39,6 +39,7 @@ Bei Dutzenden Entwürfen reicht eine Liste nicht mehr. Auf der Startseite legt {
 - **In einen Ordner:** Zieh einen Entwurf auf den Ordner, oder wähle im Menü des Entwurfs {{ui:shared.moveTo}}, das jeden Ordner anbietet. Ein neuer Entwurf, und eine Datei, die du öffnest oder importierst, landet in dem Ordner, der gerade offen ist.
 - **Wieder hinaus:** Die erste Kachel in einem Ordner, `..`, und die Zeile unter den Reitern führen zurück; auch auf sie kannst du einen Entwurf ziehen. Ein Ordner, den du auf einen anderen ziehst, kommt in diesen hinein.
 - **Umbenennen und Löschen** stehen im Menü des Ordners. Das Löschen eines Ordners löscht keinen Entwurf: Was darin lag, rückt eine Ebene nach oben.
+- **Ein Bild für den Ordner:** Beginne seinen Namen mit einem Emoji, etwa `💡 Ideen`. Der Ordner zeigt das Emoji dann groß statt des Ordnersymbols und den Rest als Namen. Weil das Emoji zum Namen gehört, geht es überall mit, wohin der Ordner geht; zum Ändern oder Entfernen benennst du den Ordner um. Das gilt auch für die Ordner auf einem Server.
 - **Die Suche** schaut in jeden Ordner; ein gefundener Entwurf zeigt seinen Ordner, und ein Klick darauf öffnet ihn.
 
 {{ui:dashboard.backupAll}} nimmt die Ordner mit: Die Entwürfe liegen in der Sicherungsdatei in ihren Ordnern, und das Wiederherstellen legt sie dorthin zurück. Die Ordner dieses Browsers sind andere als die Ordner auf einem Server. Die Vorschaubilder der Karten kommen mit in die Datei und sind nach dem Wiederherstellen gleich wieder da.

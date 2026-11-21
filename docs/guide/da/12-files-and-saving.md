@@ -39,6 +39,7 @@ Med snesevis af designs er én liste ikke nok. På startsiden laver {{ui:shared.
 - **Ind i en mappe:** træk et design over på mappen, eller vælg {{ui:shared.moveTo}} i designets menu, som lister alle mapper. Et nyt design, og en fil du åbner eller importerer, lavet mens en mappe er åben, lander i den mappe.
 - **Ud igen:** den første flise i en mappe, `..`, og linjen under fanerne fører tilbage; du kan også slippe et design på dem. En mappe der trækkes over på en anden mappe, kommer ind i den.
 - **Omdøb og slet** ligger i mappens menu. At slette en mappe sletter intet design: hvad der lå i den, rykker op ét niveau.
+- **Et billede til en mappe:** begynd navnet med en emoji, f.eks. `💡 Idéer`. Mappen viser så emojien stort i stedet for mappeikonet, og resten som navn. Da emojien er en del af navnet, følger den med overalt, hvor mappen kommer hen; omdøb mappen for at ændre eller fjerne den. Det gælder også mapperne på en server.
 - **Søg** ser i alle mapper; et design der findes, viser hvilken mappe det ligger i, og et klik på det åbner mappen.
 
 {{ui:dashboard.backupAll}} bevarer mapperne: designsene sidder i sikkerhedskopien i deres mapper, og at gendanne sikkerhedskopien lægger dem tilbage der. Denne browsers mapper er adskilt fra mapperne på en server. Kortenes forhåndsbilleder kommer også med i filen, så de er tilbage, så snart du gendanner.

@@ -2400,6 +2400,20 @@ html[data-theme="dark"] .announcement-body li::marker {
   transform: translateX(2.5%);
 }
 
+/* A folder whose name starts with an emoji shows that emoji in place of the
+   folder icon (#1932), sized by the card like the icon. */
+.server-folder-preview.folder-emoji-preview {
+  display: grid;
+  place-items: center;
+  container-type: inline-size;
+}
+
+.folder-emoji {
+  font-size: 34cqw;
+  line-height: 1;
+  font-family: "Segoe UI Emoji", "Apple Color Emoji", "Noto Color Emoji", sans-serif;
+}
+
 /* The way back is a folder card, but a quieter one: dashed like the others,
    without the nudge the closed folder needs, and its title is two dots. */
 .store-parent-card .server-folder-preview svg {

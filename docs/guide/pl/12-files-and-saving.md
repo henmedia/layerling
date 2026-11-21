@@ -39,6 +39,7 @@ Przy kilkudziesięciu projektach jedna lista nie wystarcza. Na stronie startowej
 - **Do folderu:** przeciągnij projekt na folder albo wybierz {{ui:shared.moveTo}} w menu projektu, które pokazuje wszystkie foldery. Nowy projekt, a także plik otwarty albo zaimportowany, gdy folder jest otwarty, trafia do tego folderu.
 - **Z powrotem:** pierwszy kafelek w folderze, `..`, oraz wiersz pod kartami prowadzą z powrotem. Na nie też możesz upuścić projekt. Folder przeciągnięty na inny folder trafia do jego wnętrza.
 - **Zmiana nazwy i usuwanie** są w menu folderu. Usunięcie folderu nie usuwa żadnego projektu: jego zawartość przenosi się poziom wyżej.
+- **Obrazek dla folderu:** zacznij jego nazwę od emoji, np. `💡 Pomysły`. Folder pokaże wtedy emoji w dużym rozmiarze zamiast ikony folderu, a resztę jako nazwę. Ponieważ emoji jest częścią nazwy, wędruje wszędzie razem z folderem; aby je zmienić lub usunąć, zmień nazwę folderu. Działa to także dla folderów na serwerze.
 - **Wyszukiwanie** przeszukuje wszystkie foldery. Znaleziony projekt pokazuje swój folder, a kliknięcie go otwiera ten folder.
 
 {{ui:dashboard.backupAll}} zachowuje foldery: projekty leżą w pliku kopii w swoich folderach, a przywrócenie kopii umieszcza je tam z powrotem. Foldery tej przeglądarki są niezależne od folderów na serwerze. Do pliku trafiają też obrazki kart, więc wracają od razu po przywróceniu.

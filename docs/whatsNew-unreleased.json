@@ -1,1 +1,15 @@
-[]
+[
+  {
+    "title": {
+      "de": "Ein Bild für jeden Ordner",
+      "en": "A picture for every folder"
+    },
+    "body": {
+      "de": "Beginnt der Name eines Ordners auf der Startseite mit einem Emoji, etwa „💡 Ideen“, zeigt der Ordner das Emoji groß statt des Ordnersymbols. So findest du deine Ordner auf einen Blick.\n\nDas Emoji gehört zum Namen und geht deshalb überall mit. Zum Ändern oder Entfernen benennst du den Ordner um.",
+      "en": "When the name of a folder on the start page starts with an emoji, such as \"💡 Ideas\", the folder shows that emoji big in place of the folder icon. So you find your folders at a glance.\n\nThe emoji is part of the name, so it goes wherever the folder goes. Rename the folder to change it or take it off."
+    },
+    "guide": {
+      "section": "designFolders"
+    }
+  }
+]

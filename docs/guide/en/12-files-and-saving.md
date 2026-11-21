@@ -39,6 +39,7 @@ With dozens of designs a single list is not enough. On the start page, {{ui:shar
 - **Into a folder:** drag a design onto the folder, or choose {{ui:shared.moveTo}} in the design's menu, which lists every folder. A new design, and a file you open or import, made while a folder is open lands in that folder.
 - **Out again:** the first tile in a folder, `..`, and the line under the tabs lead back; you can drop a design on them too. A folder dragged onto another folder goes inside it.
 - **Rename and delete** are in the folder's menu. Deleting a folder deletes no design: what was in it moves one level up.
+- **A picture for a folder:** start its name with an emoji, such as `💡 Ideas`. The folder then shows the emoji big in place of the folder icon, and the rest as its name. As the emoji is part of the name, it goes wherever the folder goes; rename the folder to change it or take it off. This works for the folders on a server too.
 - **Search** looks through every folder; a design that is found shows its folder, and a click on it opens the folder.
 
 {{ui:dashboard.backupAll}} keeps the folders: the designs sit in the backup file in their folders, and restoring the backup puts them back there. The folders of this browser are separate from the folders on a server. The card pictures go into the file too, so they are back as soon as you restore.
