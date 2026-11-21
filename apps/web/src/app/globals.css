@@ -12370,6 +12370,28 @@ html[data-theme="dark"] .pattern-picker-empty {
   max-height: calc(100vh - 16px);
 }
 
+/* The mm / in switch in the title of the snap menu at the pointer (Discussion #1933): the menu's own buttons are wide
+   list rows, these stay the small switch of the snap field. */
+.snap-menu-title .snap-units {
+  margin-left: auto;
+}
+
+.snap-menu .snap-menu-title .snap-units button {
+  display: inline-block;
+  width: auto;
+  padding: 0 6px;
+  color: inherit;
+  text-align: center;
+}
+
+.snap-menu .snap-menu-title .snap-units button:hover {
+  background: rgba(127, 127, 127, 0.16);
+}
+
+.snap-menu .snap-menu-title .snap-units button[aria-pressed="true"] {
+  background: rgba(127, 127, 127, 0.28);
+}
+
 .snap-menu-title {
   display: flex;
   align-items: center;

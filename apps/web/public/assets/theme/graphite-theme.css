@@ -5193,6 +5193,18 @@ html[data-theme="dark"]:where([data-palette="graphite"]) .pattern-picker-empty {
   border-top: 1px solid var(--border);
 }
 
+:where(html[data-theme="dark"][data-palette="graphite"]) .snap-menu .snap-menu-title .snap-units button {
+  color: inherit;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .snap-menu .snap-menu-title .snap-units button:hover {
+  background: rgba(127, 127, 127, 0.16);
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .snap-menu .snap-menu-title .snap-units button[aria-pressed="true"] {
+  background: rgba(127, 127, 127, 0.28);
+}
+
 :where(html[data-theme="dark"][data-palette="graphite"]) .snap-menu-title {
   color: #4f4f4f;
   border-bottom: 1px solid var(--border);
