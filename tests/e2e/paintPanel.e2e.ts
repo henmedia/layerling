@@ -8,7 +8,7 @@ import { DEFAULT_PAINT_TOOL, normalizePaintTool, type PaintToolSettings } from "
 import { DEFAULT_WORKPLANE_WORKSPACE } from "@/lib/workplaneSettings";
 
 /**
- * The paint tool's window: fill, circle and lasso, the design's colours and one of one's own, the eraser, the angle of
+ * The paint tool's window: fill, circle, brush, lasso and the magnetic lasso, the design's colours and one of one's own, the eraser, the angle of
  * a fill and the size of a circle, how many strokes the body carries, Clear all and Done.
  */
 (globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = true;
@@ -42,6 +42,7 @@ function mount(props: { settings?: Partial<PaintToolSettings>; strokes?: number;
       workspace: DEFAULT_WORKPLANE_WORKSPACE,
       onChange: (patch) => calls.push(JSON.stringify(patch)),
       onClear: () => calls.push("clear"),
+      onFillGaps: () => calls.push("fill-gaps"),
       onClose: () => calls.push("close"),
     }));
   });
@@ -52,17 +53,58 @@ const click = (element: Element | null | undefined) => act(() => (element as HTM
 const button = (panel: HTMLElement, text: string) => [...panel.querySelectorAll<HTMLButtonElement>("button")].find((entry) => entry.textContent?.trim() === text);
 
 describe("the paint tool's window", () => {
-  it("offers fill, circle and lasso, with the fill's angle and what a click does", () => {
+  it("offers fill, circle, brush, lasso and the magnetic lasso, with the fill's angle and what a click does", () => {
     const { panel, calls } = mount();
     const modes = [...panel.querySelectorAll<HTMLButtonElement>("[role=radiogroup] [role=radio]")].filter((entry) => entry.textContent);
-    expect(modes.map((entry) => entry.textContent)).toEqual(["Fill", "Circle", "Lasso"]);
-    expect(modes.map((entry) => entry.getAttribute("aria-checked"))).toEqual(["true", "false", "false"]);
+    expect(modes.map((entry) => entry.textContent)).toEqual(["Fill", "Circle", "Brush", "Height band", "Lasso", "Magnetic lasso"]);
+    expect(modes.map((entry) => entry.getAttribute("aria-checked"))).toEqual(["true", "false", "false", "false", "false", "false"]);
     expect(panel.querySelector("[role=status]")?.textContent).toBe("Click a face to fill it up to its sharp edges.");
     expect(panel.textContent).toContain("Stop at edges sharper than");
     expect(panel.textContent).not.toContain("Diameter");
     click(modes[1]);
+    click(modes[4]);
     click(modes[2]);
-    expect(calls).toEqual([JSON.stringify({ mode: "circle" }), JSON.stringify({ mode: "lasso" })]);
+    click(modes[5]);
+    click(modes[3]);
+    expect(calls).toEqual(["circle", "lasso", "brush", "magnet", "height"].map((mode) => JSON.stringify({ mode })));
+  });
+
+  it("gives the brush its width and the pen's pressure (Discussion #1778)", () => {
+    const { panel, calls } = mount({ settings: { mode: "brush" } });
+    expect(panel.textContent).toContain("Diameter");
+    expect(panel.querySelector("[role=status]")?.textContent).toBe("Hold the button down on the body and paint a line.");
+    const pressure = [...panel.querySelectorAll<HTMLInputElement>("input[type=checkbox]")].find((entry) => entry.parentElement?.textContent?.includes("Pen pressure sets the width"))!;
+    expect(pressure.checked).toBe(true);
+    click(pressure);
+    expect(calls).toEqual([JSON.stringify({ pressure: false })]);
+    expect(panel.textContent).toContain("a light touch paints thinner");
+  });
+
+  it("paints as a ball when asked, gives a band its height, and fills gaps (Discussion #1778)", () => {
+    const circle = mount({ settings: { mode: "circle" }, strokes: 2 });
+    const ball = [...circle.panel.querySelectorAll<HTMLInputElement>("input[type=checkbox]")].find((entry) => entry.parentElement?.textContent?.includes("As a ball"))!;
+    expect(ball.checked).toBe(false);
+    click(ball);
+    expect(circle.panel.textContent).toContain("Ctrl and the mouse wheel");
+    click(button(circle.panel, "Fill gaps"));
+    expect(circle.calls).toEqual([JSON.stringify({ ball: true }), "fill-gaps"]);
+    act(() => root?.unmount());
+    container?.remove();
+    const band = mount({ settings: { mode: "height" } });
+    expect(band.panel.textContent).toContain("Band height");
+    expect(band.panel.textContent).not.toContain("As a ball");
+    expect(band.panel.querySelector("[role=status]")?.textContent).toBe("Click the body at the height the band should run round.");
+    // Nothing painted yet, nothing to fill.
+    expect(button(band.panel, "Fill gaps")?.disabled).toBe(true);
+  });
+
+  it("tells how the magnetic lasso is laid, closed and taken back, with no size to set", () => {
+    const { panel } = mount({ settings: { mode: "magnet" } });
+    expect(panel.querySelector("[role=status]")?.textContent).toContain("Click roughly along an edge; the line finds it.");
+    expect(panel.querySelector("[role=status]")?.textContent).toContain("Backspace takes a point back");
+    expect(panel.textContent).toContain("borders of paint already on it");
+    expect(panel.textContent).not.toContain("Diameter");
+    expect(panel.textContent).not.toContain("Pen pressure");
   });
 
   it("shows the circle's diameter in circle mode, and the eraser's own words", () => {
@@ -113,7 +155,7 @@ describe("the paint tool's window", () => {
     await setLanguage("de", false);
     const { panel } = mount({ settings: { mode: "lasso" } });
     expect(panel.textContent).toContain("Bemalen");
-    expect([...panel.querySelectorAll("[role=radio]")].map((entry) => entry.textContent).filter(Boolean)).toEqual(["Füllen", "Kreis", "Lasso"]);
+    expect([...panel.querySelectorAll("[role=radio]")].map((entry) => entry.textContent).filter(Boolean)).toEqual(["Füllen", "Kreis", "Pinsel", "Höhenband", "Lasso", "Magnet-Lasso"]);
     expect(panel.querySelector("[role=status]")?.textContent).toBe("Halte die Maustaste gedrückt und umfahre den Bereich.");
   });
 });

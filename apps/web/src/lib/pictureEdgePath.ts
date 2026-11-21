@@ -82,20 +82,20 @@ const toTraced = (picture: PreparedPicture, spot: TracePoint) => ({
 const toPicture = (picture: PreparedPicture, x: number, y: number): TracePoint => ({ x: (x + 0.5) * picture.scaleX, y: (y + 0.5) * picture.scaleY });
 
 /**
- * The spot moved onto the strongest edge near it (within a few traced pixels, the nearer the better),
- * in the picture's own pixels; where no edge is near, the spot as it is.
+ * The spot moved onto the strongest edge near it (within `reach` traced pixels, a few unless told, the
+ * nearer the better), in the picture's own pixels; where no edge is near, the spot as it is.
  */
-export function snapToEdge(picture: PreparedPicture, spot: TracePoint): TracePoint {
+export function snapToEdge(picture: PreparedPicture, spot: TracePoint, reach = SNAP_REACH): TracePoint {
   const edges = edgeStrength(picture);
   const { width, height } = picture.pixels;
   const centre = toTraced(picture, spot);
   let best: { x: number; y: number; score: number; edge: number } | null = null;
-  for (let y = Math.max(0, centre.y - SNAP_REACH); y <= Math.min(height - 1, centre.y + SNAP_REACH); y += 1) {
-    for (let x = Math.max(0, centre.x - SNAP_REACH); x <= Math.min(width - 1, centre.x + SNAP_REACH); x += 1) {
+  for (let y = Math.max(0, centre.y - reach); y <= Math.min(height - 1, centre.y + reach); y += 1) {
+    for (let x = Math.max(0, centre.x - reach); x <= Math.min(width - 1, centre.x + reach); x += 1) {
       const away = Math.hypot(x - centre.x, y - centre.y);
-      if (away > SNAP_REACH) continue;
+      if (away > reach) continue;
       const edge = edges[y * width + x];
-      const score = edge - (0.04 * away) / SNAP_REACH;
+      const score = edge - (0.04 * away) / reach;
       if (!best || score > best.score) best = { x, y, score, edge };
     }
   }
