@@ -126,6 +126,8 @@ async function callTool(name, args) {
       return bridgeCommand("perforate_face", args, 60000);
     case "layerling_thread_insert":
       return bridgeCommand("thread_insert", args, 60000);
+    case "layerling_magnet_pocket":
+      return bridgeCommand("magnet_pocket", args, 120000);
     case "layerling_sweep_sketch":
       return bridgeCommand("sweep_sketch", args, 60000);
     case "layerling_push_face":

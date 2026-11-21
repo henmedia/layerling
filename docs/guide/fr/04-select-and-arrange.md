@@ -176,6 +176,17 @@ Un insert fileté à chaud s'enfonce dans une pièce en plastique avec un fer à
 
 Le trou est une forme de trou ordinaire groupée avec le corps, comme les trous du motif de trous, et le noyau CAO le découpe comme un vrai cylindre, donc l'alésage est exact. {{ui:editor.tool.ungroup}} libère de nouveau le trou. Il est aussi profond que l'insert est long et dépasse un peu de la face pour s'ouvrir proprement. Une IA peut faire de même via le pont MCP avec `layerling_thread_insert` (voir le chapitre [AI avec MCP](chapter:ai-with-mcp)).
 
+## Logement d’aimant
+
+Les peintres de figurines collent de petits aimants ronds dans les jointures d’une figurine en plusieurs parties au lieu de la coller : elle se démonte pour la peinture et l’envoi ; boîtes et couvercles tiennent de la même façon. L’outil {{ui:magnetPocket.title}} creuse le logement : aussi profond que l’aimant plus 0,2 mm, pour qu’il reste juste sous la face, et dessous un puits de colle plus étroit, pour que la colle ait de la place et que l’aimant repose sur un rebord sans glisser dans une impression creuse. Logement et puits forment un haut-de-forme renversé. Sélectionnez exactement un corps, ouvrez la bibliothèque de formes et cliquez sur {{ui:magnetPocket.title}} sous {{ui:library.section.holes}}, ou trouvez-le avec [[Ctrl]]+[[K]].
+
+1. Choisissez la {{ui:magnetPocket.size}}, de 2 × 1 à 12 × 3 mm, ou tapez le diamètre et la hauteur de l’aimant. {{ui:magnetPocket.gap}} vaut 0,1 mm au départ ; {{ui:magnetPocket.well}} est activé.
+2. Cliquez sur l’endroit voulu, une face plane ou la paroi extérieure d’un cylindre ou d’un tube, comme pour l’insert fileté. Un anneau montre le logement : vert si la pièce a 1 mm de paroi à côté et la profondeur derrière, rouge sinon, avec la raison. Faites-le glisser, tapez sa position ou placez-le au milieu de la face.
+3. {{ui:magnetPocket.both}} (activé au départ) cherche la pièce qui touche la face à cet endroit, à 1 mm au plus : l’autre moitié de la jointure, placée comme elle s’emboîte. Elle reçoit le même logement en face, pour que les deux aimants se rencontrent ; un second anneau le montre, et une ligne dit pourquoi une pièce n’en reçoit pas. Pour atteindre une face que l’autre pièce recouvre, masquez cette pièce : elle reçoit quand même son logement.
+4. Seul {{ui:magnetPocket.apply}} creuse les logements.
+
+Chaque logement est un trou ordinaire groupé avec sa pièce ; {{ui:editor.tool.ungroup}} le libère. Avant d’enfoncer les aimants, assemblez chaque paire pour qu’elle s’attire et marquez la face extérieure. L’outil de découpe propose aussi les aimants comme connecteur. Une IA fait de même avec `layerling_magnet_pocket` (voir le chapitre [IA avec MCP](chapter:ai-with-mcp)).
+
 ## Tirer une face vers l'extérieur ou l'intérieur
 
 Pour une paroi plus épaisse, un bossage sur une face ou une poche creusée dedans, l'outil {{ui:faceTool.title}} travaille sur une face plane. Il fonctionne aussi sur un STL importé, qui n'a pas d'esquisse à modifier. Sélectionnez exactement un corps et cliquez sur {{ui:faceTool.title}} dans le groupe {{ui:editor.section.mirrorPattern}} du ruban, à côté du motif de trous. Vous pouvez également cliquer avec le bouton droit sur le corps ou le trouver avec [[Ctrl]]+[[K]].

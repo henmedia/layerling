@@ -71,10 +71,10 @@ const done = (tally: Partial<{ placed: number; faces: number; tooSmall: number; 
 });
 
 describe("the Split panel's connectors", () => {
-  it("offers None, Dowels, Plugs and Dovetail, with None chosen and nothing more shown", () => {
+  it("offers None, Dowels, Plugs, Dovetail and Magnets, with None chosen and nothing more shown", () => {
     const { panel, changes } = mount({});
-    expect(kindButtons(panel).map((button) => button.textContent)).toEqual(["None", "Dowels", "Plugs", "Dovetail"]);
-    expect(kindButtons(panel).map((button) => button.getAttribute("aria-pressed"))).toEqual(["true", "false", "false", "false"]);
+    expect(kindButtons(panel).map((button) => button.textContent)).toEqual(["None", "Dowels", "Plugs", "Dovetail", "Magnets"]);
+    expect(kindButtons(panel).map((button) => button.getAttribute("aria-pressed"))).toEqual(["true", "false", "false", "false", "false"]);
     expect(fieldLabels(panel)).toEqual([]);
     expect(panel.querySelector(".split-connector-summary")).toBeNull();
     act(() => kindButtons(panel)[1].click());
@@ -116,9 +116,24 @@ describe("the Split panel's connectors", () => {
     expect(text(own.panel)).not.toContain("From your fit test");
   });
 
+  it("shows the magnets' size, their well and the pocket they get, and hands a listed size over in one go", () => {
+    const { panel, changes } = mount({ kind: "magnets" }, done({ placed: 2, faces: 1 }));
+    expect(kindButtons(panel).map((button) => button.getAttribute("aria-pressed"))).toEqual(["false", "false", "false", "false", "true"]);
+    expect(fieldLabels(panel)).toEqual(["Per cut face (0 = automatic)", "Magnet diameter (mm)", "Magnet height (mm)", "Clearance per side"]);
+    expect(text(panel)).toContain("Glue well below the pocket");
+    expect(text(panel)).toContain("Pocket Ø 6.4 mm, 2.2 mm deep, glue well Ø 3 mm, 1 mm deep");
+    const size = panel.querySelector<HTMLSelectElement>(".split-panel select[aria-label='Magnet size']")!;
+    expect(size.value).toBe("6x2");
+    act(() => {
+      Object.getOwnPropertyDescriptor(HTMLSelectElement.prototype, "value")!.set!.call(size, "3x1");
+      size.dispatchEvent(new Event("change", { bubbles: true }));
+    });
+    expect(changes.at(-1)).toEqual({ magnetDiameter: 3, magnetHeight: 1 });
+  });
+
   it("shows the dovetail's measures, and says in its own words when a cut face has no room for one", () => {
     const { panel, changes } = mount({ kind: "dovetail" }, done({ placed: 1, faces: 2, tooSmall: 1 }));
-    expect(kindButtons(panel).map((button) => button.getAttribute("aria-pressed"))).toEqual(["false", "false", "false", "true"]);
+    expect(kindButtons(panel).map((button) => button.getAttribute("aria-pressed"))).toEqual(["false", "false", "false", "true", "false"]);
     expect(fieldLabels(panel)).toEqual(["Per cut face (0 = automatic)", "Width at the cut face", "Depth into the other half", "Flank angle", "Direction (0 = lengthwise)", "Clearance per side"]);
     expect(text(panel)).toContain("Slide the halves together from the side");
     expect(summary(panel)).toEqual(["Room for 1 on 2 cut faces.", "One cut face is too small for a dovetail."]);

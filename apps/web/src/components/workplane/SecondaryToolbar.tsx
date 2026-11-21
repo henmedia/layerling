@@ -169,6 +169,9 @@ export const MODIFY_SECTIONS = [
   ["surface", "surface", "editor.section.surface", 7],
 ] as const satisfies readonly (readonly [string, string, MessageKey, number])[];
 type ModifySection = (typeof MODIFY_SECTIONS)[number][0];
+/** Library entries that open a tool on the selected body instead of adding a shape. */
+const LIBRARY_TOOL_IDS: ReadonlySet<string> = new Set(["threadInsert", "magnetPocket"]);
+
 const MODIFY_SECTION_ICONS: Record<ModifySection, ComponentType> = {
   pattern: ToolbarMirrorIcon,
   shape: ToolbarSplitIcon,
@@ -327,6 +330,7 @@ export function SecondaryToolbar({
   holePatternActive,
   onThreadInsert,
   threadInsertActive,
+  onMagnetPocket,
   canHolePattern,
   onFaceTool,
   faceToolActive,
@@ -523,6 +527,8 @@ export function SecondaryToolbar({
   holePatternActive: boolean;
   onThreadInsert: () => void;
   threadInsertActive: boolean;
+  /** The magnet pocket tool: the thread insert's spot and check, for a magnet's pocket (magnetPocketGeometry.ts). */
+  onMagnetPocket: () => void;
   canHolePattern: boolean;
   onFaceTool: () => void;
   faceToolActive: boolean;
@@ -800,9 +806,10 @@ export function SecondaryToolbar({
     onToolbarModeChange(mode);
   };
   const addShapeFromMenu = (shape: ShapeAsset) => {
-    if (shape.id === "threadInsert") {
+    if (LIBRARY_TOOL_IDS.has(shape.id)) {
       if (canHolePattern || threadInsertActive) {
-        onThreadInsert();
+        if (shape.id === "magnetPocket") onMagnetPocket();
+        else onThreadInsert();
         closeShapesAfterPick();
       }
       return;
@@ -1102,8 +1109,8 @@ export function SecondaryToolbar({
         title={shapeAssetMenuLabel(shape).replace(/\s+/g, " ")}
         aria-label={shapeAssetMenuLabel(shape).replace(/\s+/g, " ")}
         style={{ "--shape-default-color": shapeAssetColor(shape, shapeCustomizations[shape.kind]) } as CSSProperties}
-        draggable={shape.id !== "threadInsert"}
-        disabled={shape.id === "threadInsert" && !canHolePattern && !threadInsertActive}
+        draggable={!LIBRARY_TOOL_IDS.has(shape.id)}
+        disabled={LIBRARY_TOOL_IDS.has(shape.id) && !canHolePattern && !threadInsertActive}
         onClick={() => {
           if (suppressNextShapeClickRef.current) {
             suppressNextShapeClickRef.current = false;
@@ -1153,7 +1160,7 @@ export function SecondaryToolbar({
           addShapeFromMenu(shape);
         }}
         onDragStart={(event) => {
-          if (shape.id === "threadInsert") {
+          if (LIBRARY_TOOL_IDS.has(shape.id)) {
             event.preventDefault();
             return;
           }

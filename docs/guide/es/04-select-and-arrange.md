@@ -180,6 +180,17 @@ Un inserto roscado térmico se presiona en una pieza de plástico con un soldado
 
 El orificio es una forma de orificio normal agrupada con el cuerpo, igual que los orificios del patrón de orificios, y el núcleo CAD lo corta como un cilindro exacto, así que el taladro es exacto. {{ui:editor.tool.ungroup}} vuelve a liberar el orificio. Es tan profundo como largo es el inserto y sobresale un poco de la cara para que se abra limpiamente. Una IA puede hacer lo mismo a través del puente MCP con `layerling_thread_insert` (consulta el capítulo [IA con MCP](chapter:ai-with-mcp)).
 
+## Alojamiento para imán
+
+Quien pinta figuras pone pequeños imanes redondos en las uniones de una figura de varias piezas en lugar de pegarla: así se desmonta para pintarla y enviarla; cajas y tapas se sujetan igual. La herramienta {{ui:magnetPocket.title}} hace el alojamiento: tan profundo como el imán más 0,2 mm, para que quede justo bajo la cara, y debajo un pozo de pegamento más estrecho, para que el pegamento tenga sitio y el imán descanse en un escalón sin deslizarse dentro de una impresión hueca. Alojamiento y pozo forman una chistera invertida. Selecciona exactamente un cuerpo, abre la biblioteca de formas y haz clic en {{ui:magnetPocket.title}} bajo {{ui:library.section.holes}}, o búscala con [[Ctrl]]+[[K]].
+
+1. Elige el {{ui:magnetPocket.size}}, de 2 × 1 a 12 × 3 mm, o escribe el diámetro y la altura del imán. {{ui:magnetPocket.gap}} empieza en 0,1 mm; {{ui:magnetPocket.well}} está activado.
+2. Haz clic en el lugar, una cara plana o la pared exterior de un cilindro o tubo, como con el inserto roscado. Un anillo muestra el alojamiento: verde si la pieza tiene 1 mm de pared al lado y la profundidad detrás, rojo si no, con el motivo. Arrástralo, escribe su posición o llévalo al centro de la cara.
+3. {{ui:magnetPocket.both}} (activado al principio) busca la pieza que toca la cara en ese lugar, a 1 mm como mucho: la otra mitad de la unión, colocada como encaja. Recibe el mismo alojamiento enfrente para que los dos imanes se encuentren; un segundo anillo lo muestra, y una línea dice por qué una pieza no recibe ninguno. Para llegar a una cara que tapa la otra pieza, oculta esa pieza: igualmente recibe su alojamiento.
+4. Solo {{ui:magnetPocket.apply}} hace los alojamientos.
+
+Cada alojamiento es un agujero normal agrupado con su pieza; {{ui:editor.tool.ungroup}} lo libera. Antes de meter los imanes, junta cada par para que se atraiga y marca la cara exterior. La herramienta de dividir también ofrece imanes como conector. Una IA hace lo mismo con `layerling_magnet_pocket` (ver el capítulo [IA con MCP](chapter:ai-with-mcp)).
+
 ## Empujar una cara hacia fuera o hacia dentro
 
 Para engrosar una pared, poner un resalte sobre una cara o abrir un hueco en ella, la herramienta {{ui:faceTool.title}} trabaja sobre una cara plana. También funciona con un STL importado, donde no hay ningún boceto que cambiar. Selecciona exactamente un cuerpo y haz clic en {{ui:faceTool.title}}, en el grupo {{ui:editor.section.mirrorPattern}} de la cinta, junto al patrón de orificios. También puedes hacer clic derecho en el cuerpo o buscarla con [[Ctrl]]+[[K]].

@@ -331,7 +331,7 @@ type WorkplaneViewportProps = {
   mateFacePick?: { shapeIds: string[]; round?: boolean | "either"; joined?: ArrayLike<number> | null } | null;
   onMateFacePick?: (pick: LayFlatPick | null) => void;
   /** Thread insert placement: a true world-space ring on the selected surface. */
-  threadInsertPreview?: { origin: {x:number;y:number;z:number}; normal: {x:number;y:number;z:number}; diameter:number; allowed:boolean } | null;
+  threadInsertPreview?: { origin: {x:number;y:number;z:number}; normal: {x:number;y:number;z:number}; diameter:number; allowed:boolean; partner?: { origin: {x:number;y:number;z:number}; normal: {x:number;y:number;z:number}; allowed:boolean } } | null;
   threadInsertCenter?: {point:{x:number;y:number;z:number};normal:{x:number;y:number;z:number}} | null;
   onThreadInsertDragPick?: (pick: LayFlatPick | null) => void;
   /**
@@ -1955,44 +1955,51 @@ export function WorkplaneViewport({
     setSnapMenuAt({ x, y });
   }, !pickOnly);
   const threeRef = useRef<ThreeState | null>(null);
-  // Thread insert marker is a temporary helper, never a document shape.
+  // Thread insert marker is a temporary helper, never a document shape. The magnet pocket tool shows a second ring
+  // where the part that meets the spot gets the same pocket.
   useEffect(() => {
     const state = threeRef.current;
     if (!state || !threadInsertPreview || !Number.isFinite(threadInsertPreview.diameter) || threadInsertPreview.diameter <= 0) return;
-    const n = new THREE.Vector3(threadInsertPreview.normal.x,threadInsertPreview.normal.y,threadInsertPreview.normal.z).normalize();
-    const center = new THREE.Vector3(threadInsertPreview.origin.x,threadInsertPreview.origin.y,threadInsertPreview.origin.z).addScaledVector(n,0.025);
-    const u = new THREE.Vector3(0,1,0);
-    if (Math.abs(n.dot(u)) > 0.95) u.set(1,0,0);
-    u.addScaledVector(n,-u.dot(n)).normalize();
-    const w = new THREE.Vector3().crossVectors(n,u).normalize();
     const radius = threadInsertPreview.diameter/2;
-    const color = threadInsertPreview.allowed ? 0x18d66b : 0xff3333;
-    // WebGL ignores LineBasicMaterial.linewidth on most Windows drivers.
-    // Instead use annulus meshes, with a thick white halo and colour ring.
-    const annulus=(thickness:number,ringColor:number,order:number)=>{
-      const half=Math.min(thickness/2,radius*.45);
-      const geometry=new THREE.RingGeometry(Math.max(.01,radius-half),radius+half,96);
-      const material=new THREE.MeshBasicMaterial({color:ringColor,side:THREE.DoubleSide,depthTest:false,depthWrite:false});
-      const mesh=new THREE.Mesh(geometry,material);
-      mesh.position.copy(center);
-      mesh.quaternion.setFromUnitVectors(new THREE.Vector3(0,0,1),n);
-      mesh.renderOrder=order;
-      return mesh;
+    const marker=(origin:{x:number;y:number;z:number},normal:{x:number;y:number;z:number},allowed:boolean)=>{
+      const n = new THREE.Vector3(normal.x,normal.y,normal.z).normalize();
+      const center = new THREE.Vector3(origin.x,origin.y,origin.z).addScaledVector(n,0.025);
+      const u = new THREE.Vector3(0,1,0);
+      if (Math.abs(n.dot(u)) > 0.95) u.set(1,0,0);
+      u.addScaledVector(n,-u.dot(n)).normalize();
+      const w = new THREE.Vector3().crossVectors(n,u).normalize();
+      const color = allowed ? 0x18d66b : 0xff3333;
+      // WebGL ignores LineBasicMaterial.linewidth on most Windows drivers.
+      // Instead use annulus meshes, with a thick white halo and colour ring.
+      const annulus=(thickness:number,ringColor:number,order:number)=>{
+        const half=Math.min(thickness/2,radius*.45);
+        const geometry=new THREE.RingGeometry(Math.max(.01,radius-half),radius+half,96);
+        const material=new THREE.MeshBasicMaterial({color:ringColor,side:THREE.DoubleSide,depthTest:false,depthWrite:false});
+        const mesh=new THREE.Mesh(geometry,material);
+        mesh.position.copy(center);
+        mesh.quaternion.setFromUnitVectors(new THREE.Vector3(0,0,1),n);
+        mesh.renderOrder=order;
+        return mesh;
+      };
+      const halo=annulus(0.62,0xffffff,9998);
+      const ring=annulus(0.34,color,9999);
+      const bars = new THREE.LineSegments(new THREE.BufferGeometry().setFromPoints([
+        center.clone().addScaledVector(u,-radius*.35),center.clone().addScaledVector(u,radius*.35),
+        center.clone().addScaledVector(w,-radius*.35),center.clone().addScaledVector(w,radius*.35)
+      ]),new THREE.LineBasicMaterial({color,depthTest:false,depthWrite:false}));
+      bars.renderOrder=10000;
+      return [halo,ring,bars];
     };
-    const halo=annulus(0.62,0xffffff,9998);
-    const ring=annulus(0.34,color,9999);
-    const bars = new THREE.LineSegments(new THREE.BufferGeometry().setFromPoints([
-      center.clone().addScaledVector(u,-radius*.35),center.clone().addScaledVector(u,radius*.35),
-      center.clone().addScaledVector(w,-radius*.35),center.clone().addScaledVector(w,radius*.35)
-    ]),new THREE.LineBasicMaterial({color,depthTest:false,depthWrite:false}));
-    bars.renderOrder=10000;
-    state.scene.add(halo,ring,bars);
+    const { partner } = threadInsertPreview;
+    const objects=[
+      ...marker(threadInsertPreview.origin,threadInsertPreview.normal,threadInsertPreview.allowed),
+      ...(partner ? marker(partner.origin,partner.normal,partner.allowed) : []),
+    ];
+    state.scene.add(...objects);
     state.needsRender=true;
     return () => {
-      state.scene.remove(halo,ring,bars);
-      halo.geometry.dispose();(halo.material as THREE.Material).dispose();
-      ring.geometry.dispose();(ring.material as THREE.Material).dispose();
-      bars.geometry.dispose();(bars.material as THREE.Material).dispose();
+      state.scene.remove(...objects);
+      objects.forEach((object)=>{object.geometry.dispose();(object.material as THREE.Material).dispose();});
       state.needsRender=true;
     };
   },[threadInsertPreview]);

@@ -390,7 +390,17 @@ export const threadInsertLibraryAsset: ToolbarShapeAsset = {
   color: "#b69b46",
 };
 
-export const libraryShapeAssets: ToolbarShapeAsset[] = [threadInsertLibraryAsset, ...toolbarShapeAssets.flatMap((asset) => (asset.id === "text" ? [asset, nameTagAsset, iconTagAsset, qrCodeAsset] : asset.id === "port" ? [asset, sbcBoardAsset] : asset.id === "doubleCountersink" ? [] : [asset]))];
+/** The magnet pocket tool beside it: a pocket with a glue well for a round magnet (magnetPocket.ts). */
+export const magnetPocketLibraryAsset: ToolbarShapeAsset = {
+  id: "magnetPocket",
+  name: "Magnet pocket",
+  src: "assets/editor/shape-icons-gray/magnetPocket.svg",
+  menuIcon: "assets/editor/shape-icons-gray/magnetPocket.svg",
+  kind: "counterbore",
+  color: "#b04a4a",
+};
+
+export const libraryShapeAssets: ToolbarShapeAsset[] = [threadInsertLibraryAsset, magnetPocketLibraryAsset, ...toolbarShapeAssets.flatMap((asset) => (asset.id === "text" ? [asset, nameTagAsset, iconTagAsset, qrCodeAsset] : asset.id === "port" ? [asset, sbcBoardAsset] : asset.id === "doubleCountersink" ? [] : [asset]))];
 
 /**
  * The colour a new shape of this asset starts with: the asset's own, unless the shape
@@ -1536,6 +1546,7 @@ const SHAPE_MENU_LABEL_KEYS: Record<string, MessageKey> = {
 
 export function shapeAssetMenuLabel(asset: Pick<ShapeAsset, "id" | "name">): string {
   if (asset.id === "threadInsert") return t("threadInsert.title");
+  if (asset.id === "magnetPocket") return t("magnetPocket.title");
   const key = SHAPE_MENU_LABEL_KEYS[asset.id];
   return key ? t(key) : shapeAssetLabel(asset);
 }

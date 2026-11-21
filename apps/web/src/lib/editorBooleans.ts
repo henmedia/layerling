@@ -1133,7 +1133,7 @@ export function withClosedHolesNote(message: string, closedHoles = 0) {
 
 /**
  * A split's status message with what its connectors came to (Discussion #832): the dowels to print beside the halves,
- * the plugs that line them up, the dovetails that hold them and how they go together, or that none fit and the parts
+ * the plugs that line them up, the dovetails that hold them and how they go together, the magnets to press in, or that none fit and the parts
  * were split without. Nothing for a split without connectors, or one that only cut holes.
  */
 export function withConnectorsNote(message: string, kind: SplitConnectorKind, tally?: SplitConnectorTally) {
@@ -1143,6 +1143,8 @@ export function withConnectorsNote(message: string, kind: SplitConnectorKind, ta
     ? t(kind === "dovetail" ? "status.splitNoDovetail" : "status.splitNoConnectors")
     : kind === "dowels"
       ? (count === 1 ? t("status.splitDowelsOne") : t("status.splitDowelsMany", { count }))
+      : kind === "magnets"
+        ? (count === 1 ? t("status.splitMagnetsOne") : t("status.splitMagnetsMany", { count, magnets: 2 * count }))
       : kind === "dovetail"
         ? (count === 1 ? t("status.splitDovetailOne") : t("status.splitDovetailMany", { count }))
         : (count === 1 ? t("status.splitPlugsOne") : t("status.splitPlugsMany", { count }));

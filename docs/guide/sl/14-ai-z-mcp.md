@@ -98,6 +98,7 @@ Umetna inteligenca dela z istimi funkcijami kot ti, teče po isti poti kot tvoje
 | `layerling_place_on_face` | postavi objekte na ploskev drugega, tudi poševno, kot tipka C |
 | `layerling_perforate_face` | vreže vzorec lukenj v ravno ploskev ali okrog stene valja, cevi ali izvrtine, luknje ostanejo kot luknje, združene v skupino s telesom |
 | `layerling_thread_insert` | naredi luknjo za vtisnjeni navojni vložek (M2 do M8, 1/4-20 ali lastna velikost) v ravno ploskev ali v zunanjo steno valja ali cevi, potem ko preveri, da sta stena ob luknji in globina za njo dovolj veliki; luknja ostane kot luknja, združena v skupino s telesom |
+| `layerling_magnet_pocket` | izreže ležišče za okrogel magnet (od 2 × 1 do 12 × 3 mm ali lastna velikost) z ožjo jamico za lepilo pod njim v ravno ploskev ali zunanjo steno valja ali cevi, po enakem preverjanju, in enako ležišče nasproti v delu, ki se tam dotika; vsako ostane luknja, združena s svojim delom |
 | `layerling_sweep_sketch` | povleče pravokoten ali okrogel prerez vzdolž poti iz točk kot eno natančno telo; sklenjena pot da obroč |
 | `layerling_push_face` | ravno ploskev potegne navzven ali vanjo izreže žep, z odmikom od roba in polmerom vogalov; nov del je telo iz skice, združeno v skupino s telesom |
 | `layerling_paint` | pobarva dele telesa v lastnih barvah za tisk v več barvah (Barvanje): zapolni ploskev do ostrih robov, okrogla lisa ali laso v ravnem pogledu; radiranje, odstrani vse; shrani se s telesom in se v 3MF zapiše kot pobarvane ploskve |

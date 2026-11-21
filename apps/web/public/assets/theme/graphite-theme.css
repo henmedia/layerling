@@ -1279,6 +1279,12 @@ html[data-theme="dark"]:where([data-palette="graphite"]) .shell-openings-summary
   border: 1px solid #adadad;
 }
 
+:where(html[data-theme="dark"][data-palette="graphite"]) .magnet-pocket-panel .edge-modifier-field input[type="text"] {
+  color: #3f3f3f;
+  background: white;
+  border: 1px solid #adadad;
+}
+
 :where(html[data-theme="dark"][data-palette="graphite"]) .edge-modifier-check {
   color: #585858;
 }
@@ -6229,6 +6235,7 @@ html[data-theme="dark"]:where([data-palette="graphite"]) .edge-modifier-target,
 html[data-theme="dark"]:where([data-palette="graphite"]) .edge-modifier-quick-actions button,
 html[data-theme="dark"]:where([data-palette="graphite"]) .edge-modifier-footer .secondary,
 html[data-theme="dark"]:where([data-palette="graphite"]) .edge-modifier-field select,
+html[data-theme="dark"]:where([data-palette="graphite"]) .magnet-pocket-panel .edge-modifier-field input[type="text"],
 html[data-theme="dark"]:where([data-palette="graphite"]) .split-axis-control button,
 html[data-theme="dark"]:where([data-palette="graphite"]) .split-position-value input,
 html[data-theme="dark"]:where([data-palette="graphite"]) .split-position-pick:not(.active),
