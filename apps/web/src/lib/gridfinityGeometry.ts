@@ -4,7 +4,7 @@ import type { ManifoldToplevel } from "manifold-3d";
 import { loadedManifoldRuntime, requestManifoldRuntime } from "@/lib/manifoldHandle";
 import { segmentSegmentDistance } from "@/lib/holePattern";
 import { findSketchOutlineIntersection } from "@/lib/sketchProfileValidation";
-import type { GridfinityCompartmentLabel, GridfinityLabelCorner, GridfinityOpening, GridfinityOutlinePoint, GridfinityType, SketchProfile, WorkplaneShape } from "@/types/layerling";
+import type { GridfinityCompartmentLabel, GridfinityCompartmentSplit, GridfinityLabelCorner, GridfinityOpening, GridfinityOutlinePoint, GridfinityType, SketchProfile, WorkplaneShape } from "@/types/layerling";
 
 /*
  * Gridfinity (#381), the open storage system by Zack Freedman: bins on a 42 mm grid
@@ -303,6 +303,8 @@ export const MIN_GRIDFINITY_COMPARTMENT = 6;
 export const GRIDFINITY_COMPARTMENTS_PER_UNIT = 4;
 /** The most compartments a bin takes in all: at 50 with front and back scoops the exact body took up to 19.9 s to build in the browser (with labels). */
 export const MAX_GRIDFINITY_COMPARTMENTS = 40;
+/** The most parts one compartment is split into each way (#1799). */
+export const MAX_GRIDFINITY_COMPARTMENT_PARTS = 6;
 /** The least height a divider stands above the floor. */
 export const MIN_GRIDFINITY_DIVIDER_HEIGHT = 3;
 /** A divider height (#1560) this close under the full height, or over it, is the full height, so the dividers never stop a hair under the top. */
@@ -390,6 +392,7 @@ export type GridfinityShapeFields = Pick<WorkplaneShape, "width" | "height"> & {
   gridfinityDividerPositionsX?: number[];
   gridfinityDividerPositionsZ?: number[];
   gridfinityCompartmentLabels?: GridfinityCompartmentLabel[];
+  gridfinityCompartmentSplits?: GridfinityCompartmentSplit[];
   gridfinityOpenings?: GridfinityOpening[];
   gridfinityOpeningCorner?: GridfinityLabelCorner;
   gridfinityOpeningCornerSize?: number;
@@ -2125,6 +2128,10 @@ export function gridfinityDividerLimits(shape: GridfinityShapeFields, axis: Grid
 export type GridfinityCompartment = {
   column: number;
   row: number;
+  /** Its place among the parts of a compartment split further (#1799), column 0 the left and row 0 the back; 0 and 0 in one not split. */
+  part: { column: number; row: number };
+  /** How many parts its compartment is split into across (x) and deep (z); 1 and 1 when it is not split. */
+  parts: { x: number; z: number };
   x0: number;
   x1: number;
   z0: number;
@@ -2155,22 +2162,132 @@ export function gridfinityCompartments(shape: GridfinityShapeFields) {
   const sides = (dividers: number[], half: number) => ({ from: [-half, ...dividers.map((d) => d + thickness / 2)], to: [...dividers.map((d) => d - thickness / 2), half] });
   const across = sides(xs, hx);
   const deep = sides(zs, hz);
+  const splits = compartmentSplits(shape, counts, across, deep, thickness);
   const cells: GridfinityCompartment[] = [];
   for (let row = 0; row < counts.z; row += 1) {
     for (let column = 0; column < counts.x; column += 1) {
-      const [x0, x1, z0, z1] = [across.from[column], across.to[column], deep.from[row], deep.to[row]];
-      cells.push({
-        column, row, x0, x1, z0, z1,
-        centre: { x: (x0 + x1) / 2, z: (z0 + z1) / 2 },
-        hx: (x1 - x0) / 2,
-        hz: (z1 - z0) / 2,
-        onWall: { back: row === 0, front: row === counts.z - 1, left: column === 0, right: column === counts.x - 1 },
-        open: { back: row === 0 && plan.open.back, front: row === counts.z - 1 && plan.open.front, left: column === 0 && plan.open.left, right: column === counts.x - 1 && plan.open.right },
-        switched: { back: row === 0 && plan.switched.back, front: row === counts.z - 1 && plan.switched.front, left: column === 0 && plan.switched.left, right: column === counts.x - 1 && plan.switched.right },
-      });
+      const parts = splits.get(`${column},${row}`) ?? { x: 1, z: 1 };
+      // A compartment split further (#1799) is cut as its parts, each as wide as the others, with a divider between two.
+      const partSides = (from: number, to: number, n: number) => {
+        const width = (to - from - (n - 1) * thickness) / n;
+        return Array.from({ length: n }, (_, i) => [from + i * (width + thickness), from + i * (width + thickness) + width] as const);
+      };
+      const xParts = partSides(across.from[column], across.to[column], parts.x);
+      const zParts = partSides(deep.from[row], deep.to[row], parts.z);
+      zParts.forEach(([z0, z1], partRow) => xParts.forEach(([x0, x1], partColumn) => {
+        // Only the parts along the compartment's sides that are the bin's wall lie against the wall.
+        const onWall = {
+          back: row === 0 && partRow === 0,
+          front: row === counts.z - 1 && partRow === parts.z - 1,
+          left: column === 0 && partColumn === 0,
+          right: column === counts.x - 1 && partColumn === parts.x - 1,
+        };
+        cells.push({
+          column, row, part: { column: partColumn, row: partRow }, parts, x0, x1, z0, z1,
+          centre: { x: (x0 + x1) / 2, z: (z0 + z1) / 2 },
+          hx: (x1 - x0) / 2,
+          hz: (z1 - z0) / 2,
+          onWall,
+          open: { back: onWall.back && plan.open.back, front: onWall.front && plan.open.front, left: onWall.left && plan.open.left, right: onWall.right && plan.open.right },
+          switched: { back: onWall.back && plan.switched.back, front: onWall.front && plan.switched.front, left: onWall.left && plan.switched.left, right: onWall.right && plan.switched.right },
+        });
+      }));
     }
   }
   return { top: plan.dividerHeightTop, thickness, xs, zs, cells };
+}
+
+/**
+ * How many parts each compartment split further (#1799) is built with, by "column,row": the first entry for a
+ * compartment counts, one the bin does not have is left out, and each way it takes at most 6 parts and no more than leave
+ * each 6 mm wide. With the bin's other compartments there are at most 40 in all; over that, the compartments are taken
+ * from the back left row by row and the parts across are lowered first, then those deep, so a file or an MCP call over
+ * it builds the same every time.
+ */
+function compartmentSplits(
+  shape: GridfinityShapeFields,
+  counts: { x: number; z: number },
+  across: { from: number[]; to: number[] },
+  deep: { from: number[]; to: number[] },
+  thickness: number,
+) {
+  const built = new Map<string, { x: number; z: number }>();
+  const stored = shape.gridfinityCompartmentSplits;
+  if (!Array.isArray(stored) || stored.length === 0) return built;
+  const wanted = new Map<string, GridfinityCompartmentSplit>();
+  stored.forEach((split) => {
+    if (!split || !Number.isInteger(split.column) || !Number.isInteger(split.row)) return;
+    if (split.column < 0 || split.row < 0 || split.column >= counts.x || split.row >= counts.z) return;
+    const key = `${split.column},${split.row}`;
+    if (!wanted.has(key)) wanted.set(key, split);
+  });
+  const along = (value: number | undefined, max: number) => (Number.isFinite(value) ? clamp(Math.round(value as number), 1, max) : 1);
+  let total = counts.x * counts.z;
+  for (let row = 0; row < counts.z; row += 1) {
+    for (let column = 0; column < counts.x; column += 1) {
+      const split = wanted.get(`${column},${row}`);
+      if (!split) continue;
+      const room = (length: number) => Math.max(1, Math.min(MAX_GRIDFINITY_COMPARTMENT_PARTS, compartmentsFit(length, thickness)));
+      // This compartment counts once already; its parts take its place.
+      const left = MAX_GRIDFINITY_COMPARTMENTS - total + 1;
+      const z = along(split.z, Math.min(room(deep.to[row] - deep.from[row]), left));
+      const x = along(split.x, Math.min(room(across.to[column] - across.from[column]), Math.floor(left / z)));
+      if (x * z < 2) continue;
+      built.set(`${column},${row}`, { x, z });
+      total += x * z - 1;
+    }
+  }
+  return built;
+}
+
+/** How many parts a compartment is built with across (x) and deep (z) (#1799): 1 and 1 for one not split, or one the bin does not have. */
+export function gridfinityCompartmentParts(shape: GridfinityShapeFields, column: number, row: number) {
+  return gridfinityCompartments(shape)?.cells.find((cell) => cell.column === column && cell.row === row)?.parts ?? { x: 1, z: 1 };
+}
+
+/**
+ * The most parts the settings window offers for a compartment along an axis (#1799), beside the parts it has the other
+ * way: at most 6, each 6 mm wide, and no more than keep 40 compartments in all with those the bin already has.
+ */
+export function gridfinityCompartmentPartsMax(shape: GridfinityShapeFields, column: number, row: number, axis: GridfinityAxis) {
+  const compartments = gridfinityCompartments(shape);
+  const parts = compartments?.cells.filter((cell) => cell.column === column && cell.row === row) ?? [];
+  if (!compartments || parts.length === 0) return 1;
+  const { thickness } = compartments;
+  // The whole compartment, from its first part's side to its last part's.
+  const length = axis === "x" ? Math.max(...parts.map((cell) => cell.x1)) - Math.min(...parts.map((cell) => cell.x0)) : Math.max(...parts.map((cell) => cell.z1)) - Math.min(...parts.map((cell) => cell.z0));
+  const other = axis === "x" ? parts[0].parts.z : parts[0].parts.x;
+  // The other compartments keep theirs: what is left of the 40, shared by this one's parts the other way.
+  const rest = compartments.cells.length - parts.length;
+  return Math.max(1, Math.min(MAX_GRIDFINITY_COMPARTMENT_PARTS, compartmentsFit(length, thickness), Math.floor((MAX_GRIDFINITY_COMPARTMENTS - rest) / other)));
+}
+
+/**
+ * What a change of a compartment's parts writes (#1799): every other compartment's split as it is, this one's with the
+ * new number along the axis, and none at all for one left whole, so a bin with no split saves as before.
+ */
+export function gridfinityCompartmentSplitPatch(shape: GridfinityShapeFields, column: number, row: number, axis: GridfinityAxis, count: number): Pick<GridfinityShapeFields, "gridfinityCompartmentSplits"> {
+  const current = gridfinityCompartmentParts(shape, column, row);
+  const next = { ...current, [axis]: Math.max(1, Math.round(count)) };
+  const rest = (shape.gridfinityCompartmentSplits ?? []).filter((split) => split.column !== column || split.row !== row);
+  const entry: GridfinityCompartmentSplit = { column, row, ...(next.x > 1 ? { x: next.x } : {}), ...(next.z > 1 ? { z: next.z } : {}) };
+  const all = (next.x > 1 || next.z > 1 ? [...rest, entry] : rest).sort((a, b) => a.row - b.row || a.column - b.column);
+  return { gridfinityCompartmentSplits: all.length > 0 ? all : undefined };
+}
+
+/**
+ * Whether a compartment's part holds the compartment's label (#1799): the label stands in the part on its side that is
+ * furthest left or furthest back, so a split compartment keeps one label, against the side it was set on.
+ */
+function labelPart(cell: Pick<GridfinityCompartment, "part" | "parts">, side: GridfinityWall) {
+  const { part, parts } = cell;
+  if (side === "back" || side === "front") return part.column === 0 && part.row === (side === "back" ? 0 : parts.z - 1);
+  return part.row === 0 && part.column === (side === "left" ? 0 : parts.x - 1);
+}
+
+/** The part of a compartment a label on a side stands in (#1799): the compartment itself when it is not split. */
+export function gridfinityCompartmentLabelCell(shape: GridfinityShapeFields, column: number, row: number, side: GridfinityWall) {
+  return gridfinityCompartments(shape)?.cells.find((cell) => cell.column === column && cell.row === row && labelPart(cell, side)) ?? null;
 }
 
 /** How far each compartment's cutter reaches up into the cutter over the dividers' top, so their faces do not coincide. */
@@ -2262,9 +2379,10 @@ function compartmentLabelTop(plan: GridfinityPlan, cell: { onWall: Record<Gridfi
  */
 export function gridfinityCompartmentLabel(shape: GridfinityShapeFields, column: number, row: number) {
   if (!gridfinityLabelFits(shape)) return null;
-  const cell = gridfinityCompartments(shape)?.cells.find((c) => c.column === column && c.row === row);
   const label = shape.gridfinityCompartmentLabels?.find((l) => l.column === column && l.row === row);
-  if (!cell || !label || !LABEL_WALLS.includes(label.side)) return null;
+  if (!label || !LABEL_WALLS.includes(label.side)) return null;
+  const cell = gridfinityCompartmentLabelCell(shape, column, row, label.side);
+  if (!cell) return null;
   const max = gridfinityCompartmentLabelMaxWidth(shape, cell, label.side);
   if (max < MIN_GRIDFINITY_LABEL_WIDTH) return null;
   return {
@@ -2282,7 +2400,7 @@ export function gridfinityCompartmentLabel(shape: GridfinityShapeFields, column:
  */
 function compartmentLabelPieces(shape: GridfinityShapeFields, cell: GridfinityCompartment): GridfinityLabelPieces | null {
   const label = gridfinityCompartmentLabel(shape, cell.column, cell.row);
-  if (!label) return null;
+  if (!label || !labelPart(cell, label.side)) return null;
   const plan = gridfinityPlan(shape);
   const { side } = label;
   const text = gridfinityLabelText(shape.gridfinityCompartmentLabels?.find((l) => l.column === cell.column && l.row === cell.row)?.text);
@@ -2619,12 +2737,37 @@ export function normalizeGridfinityCompartmentLabels(value: unknown): Gridfinity
 }
 
 /**
+ * Compartments split further from outside (#1799), a list of them: each with its compartment and its parts across and
+ * deep where they are numbers, whole and at least 1; one with neither over 1 is left out, as is a second for the same
+ * compartment. At most one for each compartment any count could give.
+ */
+export function normalizeGridfinityCompartmentSplits(value: unknown): GridfinityCompartmentSplit[] | undefined {
+  if (!Array.isArray(value)) return undefined;
+  const number = (n: unknown): n is number => typeof n === "number" && Number.isFinite(n);
+  const splits: GridfinityCompartmentSplit[] = [];
+  (value as unknown[]).forEach((entry) => {
+    if (!entry || typeof entry !== "object") return;
+    const { column, row, x, z } = entry as Record<string, unknown>;
+    if (!number(column) || !number(row)) return;
+    const [c, r] = [Math.round(column), Math.round(row)];
+    if (c < 0 || r < 0 || c > MAX_GRIDFINITY_DIVIDERS || r > MAX_GRIDFINITY_DIVIDERS) return;
+    if (splits.some((split) => split.column === c && split.row === r)) return;
+    // Within what a compartment is ever built with, so they are saved as they are built.
+    const parts = (n: unknown) => (number(n) ? clamp(Math.round(n), 1, MAX_GRIDFINITY_COMPARTMENT_PARTS) : 1);
+    const [px, pz] = [parts(x), parts(z)];
+    if (px < 2 && pz < 2) return;
+    splits.push({ column: c, row: r, ...(px > 1 ? { x: px } : {}), ...(pz > 1 ? { z: pz } : {}) });
+  });
+  return splits.slice(0, MAX_GRIDFINITY_COMPARTMENT_LABELS);
+}
+
+/**
  * The dividers' places and the labels an MCP action gives, each list it has as it is kept; an empty one unsets it.
  * A count it gives is written as the settings window writes it, at most the 24 the largest bin builds, which puts
  * that axis's dividers back evenly spaced unless the same action places them.
  */
-export function gridfinityListPatch(params: Record<string, unknown>): Pick<GridfinityShapeFields, "gridfinityCompartmentsX" | "gridfinityCompartmentsZ" | "gridfinityDividerPositionsX" | "gridfinityDividerPositionsZ" | "gridfinityCompartmentLabels" | "gridfinityOpenings"> {
-  const patch: Pick<GridfinityShapeFields, "gridfinityCompartmentsX" | "gridfinityCompartmentsZ" | "gridfinityDividerPositionsX" | "gridfinityDividerPositionsZ" | "gridfinityCompartmentLabels" | "gridfinityOpenings"> = {};
+export function gridfinityListPatch(params: Record<string, unknown>): Pick<GridfinityShapeFields, "gridfinityCompartmentsX" | "gridfinityCompartmentsZ" | "gridfinityDividerPositionsX" | "gridfinityDividerPositionsZ" | "gridfinityCompartmentLabels" | "gridfinityCompartmentSplits" | "gridfinityOpenings"> {
+  const patch: Pick<GridfinityShapeFields, "gridfinityCompartmentsX" | "gridfinityCompartmentsZ" | "gridfinityDividerPositionsX" | "gridfinityDividerPositionsZ" | "gridfinityCompartmentLabels" | "gridfinityCompartmentSplits" | "gridfinityOpenings"> = {};
   for (const [axis, key] of [["x", "gridfinityCompartmentsX"], ["z", "gridfinityCompartmentsZ"]] as const) {
     const count = params[key];
     if (typeof count === "number" && Number.isFinite(count)) Object.assign(patch, gridfinityCompartmentCountPatch(axis, clamp(Math.round(count), 1, MAX_GRIDFINITY_DIVIDERS + 1)));
@@ -2635,6 +2778,8 @@ export function gridfinityListPatch(params: Record<string, unknown>): Pick<Gridf
   }
   const labels = normalizeGridfinityCompartmentLabels(params.gridfinityCompartmentLabels);
   if (labels) patch.gridfinityCompartmentLabels = labels.length > 0 ? labels : undefined;
+  const splits = normalizeGridfinityCompartmentSplits(params.gridfinityCompartmentSplits);
+  if (splits) patch.gridfinityCompartmentSplits = splits.length > 0 ? splits : undefined;
   const openings = normalizeGridfinityOpenings(params.gridfinityOpenings);
   if (openings) patch.gridfinityOpenings = openings.length > 0 ? openings : undefined;
   return patch;
@@ -2996,6 +3141,12 @@ export function gridfinityCompartmentLabelsEqual(a: readonly GridfinityCompartme
       && label.width === other.width
       && label.text === other.text;
   });
+}
+
+export function gridfinityCompartmentSplitsEqual(a: readonly GridfinityCompartmentSplit[] | undefined, b: readonly GridfinityCompartmentSplit[] | undefined) {
+  if (a === b) return true;
+  if (!a || !b || a.length !== b.length) return false;
+  return a.every((split, i) => split.column === b[i].column && split.row === b[i].row && split.x === b[i].x && split.z === b[i].z);
 }
 
 /** Whether the bin has pieces joined to it, label shelves, finger scoops or dividers, or a side opened partly, or the plate is fitted into an outline or has Swallowtail pockets: all need Manifold for the display mesh. */

@@ -808,6 +808,18 @@ export type GridfinityCompartmentLabel = {
 };
 
 /**
+ * One compartment of a Gridfinity bin with dividers split further (#1799): column 0 is the left, row 0 the back, as for
+ * a label. `x` is how many parts it is split into across and `z` how many deep, each a whole number from 1 (missing is
+ * 1); the parts are evenly spaced, with dividers as thick and as high as the bin's between them.
+ */
+export type GridfinityCompartmentSplit = {
+  column: number;
+  row: number;
+  x?: number;
+  z?: number;
+};
+
+/**
  * A Gridfinity bin's side switched open, opened only partly (#455): a notch from the lip's top down `depth` mm, `width`
  * mm wide, at its place along the side's straight part: `align` start (towards -x on a back or front side, towards -z on
  * a left or right one), middle or end, and `distance` mm from that end; a missing value is the full depth, the full
@@ -1411,6 +1423,8 @@ export type WorkplaneShape = {
   gridfinityDividerPositionsZ?: number[];
   /** Gridfinity bin with dividers: the compartments' labels, one for each compartment that has one. */
   gridfinityCompartmentLabels?: GridfinityCompartmentLabel[];
+  /** Gridfinity bin with dividers: the compartments split further into evenly spaced parts (#1799), one entry for each split compartment. */
+  gridfinityCompartmentSplits?: GridfinityCompartmentSplit[];
   /** Gridfinity bin: how far each side switched open is opened (#455), one entry a side; missing is the whole side. */
   gridfinityOpenings?: GridfinityOpening[];
   /** Gridfinity bin: the corners of its partly open sides' notches, seen from outside the wall, rounded or chamfered; missing is rounded (#455). */

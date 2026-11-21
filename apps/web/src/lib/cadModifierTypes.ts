@@ -5,7 +5,7 @@ import type { ThreadDriveOutline } from "@/lib/threadGeometry";
 import type { ScrewBossFields } from "@/lib/screwBoss";
 import type { SnapFitFields } from "@/lib/snapFit";
 import type { RibFields } from "@/lib/rib";
-import type { GridfinityCompartmentLabel, GridfinityLabelCorner, GridfinityOpening, GridfinityOutlinePoint, GridfinityType, ShellEdges, ShellOpenings } from "@/types/layerling";
+import type { GridfinityCompartmentLabel, GridfinityCompartmentSplit, GridfinityLabelCorner, GridfinityOpening, GridfinityOutlinePoint, GridfinityType, ShellEdges, ShellOpenings } from "@/types/layerling";
 
 export type CadModifierKind = "chamfer" | "chamfillet" | "fillet" | "shell" | "deleteFace" | "offset";
 
@@ -435,6 +435,7 @@ export type CadModifierGridfinityPart = {
   gridfinityDividerPositionsX?: number[];
   gridfinityDividerPositionsZ?: number[];
   gridfinityCompartmentLabels?: GridfinityCompartmentLabel[];
+  gridfinityCompartmentSplits?: GridfinityCompartmentSplit[];
   gridfinityOpenings?: GridfinityOpening[];
   gridfinityOpeningCorner?: GridfinityLabelCorner;
   gridfinityOpeningCornerSize?: number;

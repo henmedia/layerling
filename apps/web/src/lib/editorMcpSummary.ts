@@ -96,7 +96,7 @@ function mcpShapeSettings(shape: WorkplaneShape): Record<string, string | number
     } else if (key === "gridfinityOutline" && Array.isArray(value)) {
       // As the plate's box stretches it (#1061), so that given back it keeps the box.
       settings[key] = JSON.stringify(gridfinityOutlinePoints(shape)?.map((p) => ({ x: Math.round(p.x * 100) / 100, z: Math.round(p.z * 100) / 100 })));
-    } else if ((key === "bentTubeSegments" || key === "gridfinityDividerPositionsX" || key === "gridfinityDividerPositionsZ" || key === "gridfinityCompartmentLabels" || key === "gridfinityOpenings") && Array.isArray(value)) {
+    } else if ((key === "bentTubeSegments" || key === "gridfinityDividerPositionsX" || key === "gridfinityDividerPositionsZ" || key === "gridfinityCompartmentLabels" || key === "gridfinityCompartmentSplits" || key === "gridfinityOpenings") && Array.isArray(value)) {
       // Eine Liste passt nicht in die flache Auskunft; als Text geht sie
       // hinaus und wird so auch wieder angenommen.
       settings[key] = JSON.stringify(value);

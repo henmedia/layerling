@@ -1889,6 +1889,24 @@ function validateShapeDefinition(definition: Record<string, unknown>, label: str
         if (entry.text !== undefined && (typeof entry.text !== "string" || entry.text.length > MAX_GRIDFINITY_LABEL_TEXT_LENGTH)) throw new Error(`${entryLabel}.text must be a string of at most ${MAX_GRIDFINITY_LABEL_TEXT_LENGTH} characters`);
       });
     }
+    if (definition.gridfinityCompartmentSplits !== undefined) {
+      if (!Array.isArray(definition.gridfinityCompartmentSplits)) throw new Error(`${label}.gridfinityCompartmentSplits must be an array`);
+      const splits = definition.gridfinityCompartmentSplits as unknown[];
+      if (splits.length > 576) throw new Error(`${label}.gridfinityCompartmentSplits has an unsupported number of entries`);
+      splits.forEach((raw, index) => {
+        const entryLabel = `${label}.gridfinityCompartmentSplits[${index}]`;
+        const entry = objectRecord(raw, entryLabel);
+        for (const key of ["column", "row"] as const) {
+          const value = finiteNumber(entry[key], `${entryLabel}.${key}`);
+          if (value < 0 || value > 1e6) throw new Error(`${entryLabel}.${key} is outside the supported range`);
+        }
+        for (const key of ["x", "z"] as const) {
+          if (entry[key] === undefined) continue;
+          const value = finiteNumber(entry[key], `${entryLabel}.${key}`);
+          if (value < 0 || value > 1e6) throw new Error(`${entryLabel}.${key} is outside the supported range`);
+        }
+      });
+    }
     if (definition.gridfinityOpenings !== undefined) {
       if (!Array.isArray(definition.gridfinityOpenings)) throw new Error(`${label}.gridfinityOpenings must be an array`);
       const openings = definition.gridfinityOpenings as unknown[];
