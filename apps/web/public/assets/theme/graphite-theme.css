@@ -9025,6 +9025,16 @@ html[data-theme="dark"]:where([data-palette="graphite"]) .layer-check-remedy {
   color: #f0b46c;
 }
 
+:where(html[data-theme="dark"][data-palette="graphite"]) .mold-openings li button {
+  color: inherit;
+  background: transparent;
+  border: 0;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .mold-openings li button:hover:not(:disabled) {
+  background: rgba(127, 127, 127, 0.18);
+}
+
 html[data-theme="dark"]:where([data-palette="graphite"]) .layer-view-readout strong {
   color: #dbdbdb;
 }

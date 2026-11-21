@@ -162,6 +162,8 @@ Fai clic su {{ui:mold.apply}}: i pezzi si trovano accanto al master così come s
 
 Il problema più comune con gli stampi è un getto che resta bloccato. Dove il master è più largo sopra la separazione che sotto, la finestra avvisa di un sottosquadro: sposta l'{{ui:mold.parting}} dove il master è più largo, ruota il master oppure usa la cassaforma per silicone, che si stacca anche dai sottosquadri.
 
+Con {{ui:mold.ownOpenings}} decidi tu dove entra il materiale e dove esce l'aria. Il canale di colata e gli sfiati non vengono più posizionati da soli: scegli sotto {{ui:mold.openings.kind}} se un clic mette un {{ui:mold.openings.sprue}} o uno {{ui:mold.openings.vent}}, e fai clic sul master nella vista. L'apertura parte da quel punto e attraversa diritta la metà superiore fino alla sommità dello stampo, nella direzione in cui lo stampo si apre. Un clic sull'asta di un'apertura la toglie; la finestra elenca le aperture con la loro posizione, ognuna con un pulsante per toglierla. {{ui:mold.openings.suggested}} riempie l'elenco con le aperture che Layerling metterebbe da solo, così puoi partire da quelle e cambiarle. Un'apertura accanto al master viene tralasciata e segnalata, uno stampo senza canale di colata riceve un avviso perché non si può riempire, e un punto alto senza un'apertura vicina continua a comparire come punto rosso, così vedi dove resterebbe l'aria.
+
 > **Suggerimento:** Sigilla uno stampo stampato (con resina o cera) e usa un distaccante, altrimenti il getto si aggrappa alle linee degli strati. Il PLA si ammorbidisce già da circa 55 °C: per cera calda, sapone o resina che si scalda indurendo, stampa lo stampo in PETG o ASA.
 
 ## Un canale per cavo attraverso un corpo
