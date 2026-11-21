@@ -1,7 +1,7 @@
 /// <reference lib="webworker" />
 
 import { cadHasSolidBody } from "@/lib/cadSolidBody";
-import { cadTreatmentLostFaces, TREATMENT_LOST_FACES_MESSAGE } from "@/lib/cadLostFaces";
+import { cadTreatmentLostFaces, cadTreatmentReach, TREATMENT_LOST_FACES_MESSAGE } from "@/lib/cadLostFaces";
 import { cadFaultyEdgeIds } from "@/lib/cadFaultyEdges";
 import { edgeFaceMap } from "@/lib/cadEdgeFaces";
 import { cornerEdgeCandidates, edgesTouchingEnds } from "@/lib/cadCornerEdges";
@@ -1172,7 +1172,7 @@ function treatmentHolds(cad: OcctKernel, request: EdgePreviewRequest, nearLimit 
       components.push(component);
       if (!cadHasSolidBody(cad, component)) return false;
       const plainTreatment = request.kind === "chamfer" || (request.kind === "fillet" && !request.concave);
-      if (plainTreatment && cadTreatmentLostFaces(cad, solid, edges, component) > 0) return false;
+      if (plainTreatment && cadTreatmentLostFaces(cad, solid, edges, component, cadTreatmentReach(request.amount, request.endAmount, request.kind === "chamfer" ? request.chamferAngle : undefined)) > 0) return false;
     }
     result = components.length === 1 ? components[0] : cad.makeCompound(components);
     if (!cadShapeIsValid(cad, result)) return false;
@@ -1446,7 +1446,7 @@ async function bearbeiteAnfrage(request: CadModifierWorkerRequest, halter: { cad
       // On faceted holes from a mesh boolean the kernel can hand back a "valid" solid with a whole hole filled in
       // (#1503): a face far from every treated edge is gone. Refused like any other size the kernel cannot do.
       const plainTreatment = request.kind === "chamfer" || (request.kind === "fillet" && !request.concave);
-      if (plainTreatment && treatedEdges && cadTreatmentLostFaces(activeCad, solid, treatedEdges, component) > 0) {
+      if (plainTreatment && treatedEdges && cadTreatmentLostFaces(activeCad, solid, treatedEdges, component, cadTreatmentReach(request.amount, request.endAmount, request.kind === "chamfer" ? request.chamferAngle : undefined)) > 0) {
         releaseHandles(activeCad, [component]);
         throw new Error(TREATMENT_LOST_FACES_MESSAGE);
       }
