@@ -26,7 +26,7 @@ import { DEFAULT_THREAD_PROFILE, defaultThreadHeadHeight, normalizeThreadHeadHei
 import { textOffsetAsFill } from "@/lib/textFillChoice";
 import { curvedTextPatch, MAX_TEXT_LETTER_WIDTH, MAX_TEXT_SPACING, MIN_TEXT_LETTER_WIDTH, MIN_TEXT_SPACING } from "@/lib/textGeometry";
 import { normalizeTextEdge } from "@/lib/textEdge";
-import { DEFAULT_TEXT_LAYERS, layerTextKeyringArgument, placedKeyring, layerTextLayersError, nameTagOffsets, normalizeTextLayers, type NameTagKeyring } from "@/lib/textLayers";
+import { DEFAULT_TEXT_LAYERS, layerTextKeyringArgument, placedKeyring, layerTextLayersError, nameTagOffsets, normalizeTextLayers, tagFlushArgument, type NameTagKeyring } from "@/lib/textLayers";
 import { limitedText } from "@/lib/textLength";
 import { NAME_TAG_LAYERS, NAME_TAG_LETTER_SIZE, textKerningPatch, textLetterSize, textLetterSizePatch, textShrinkPatch, textSpacingPatch } from "@/lib/nameTag";
 import { DEFAULT_ICON_TAG_WIDTH, ICON_TAG_LAYERS, MAX_ICON_TAG_WIDTH, MIN_ICON_TAG_WIDTH, isIconLayerBody, normalizeIconTagCount } from "@/lib/iconTag";
@@ -12385,7 +12385,7 @@ export function LayerlingEditor({
         if (!stack) return;
         const keyring = { side: stack.keyring?.side ?? "left", diameter: place.diameter, free: textFreeKeyring(stack.source, place) } as const;
         await keyringRuntimeReady(keyring);
-        commit(layeredTextShape(nameTagSource(stack.source, {}), stack.layers, stack.ids, tag.id, tag, stack.source.text, keyring));
+        commit(layeredTextShape(nameTagSource(stack.source, {}), stack.layers, stack.ids, tag.id, tag, stack.source.text, keyring, stack.flush));
         return;
       }
       const stack = iconLayerStack(tag);
@@ -12394,7 +12394,7 @@ export function LayerlingEditor({
       const area = await iconTagArea(stack.source, stack.width, stack.width);
       const free = iconFreeKeyring(area, stack.place, place);
       if (!free) return;
-      commit(await layeredIconShape(area, stack.layers, stack.place, stack.ids, tag.id, tag, { side: stack.keyring?.side ?? "left", diameter: place.diameter, free }));
+      commit(await layeredIconShape(area, stack.layers, stack.place, stack.ids, tag.id, tag, { side: stack.keyring?.side ?? "left", diameter: place.diameter, free }, stack.flush));
     } catch (error) {
       setNotice(error instanceof Error ? localizedError(error.message) : t("status.sketchCannotExtrude"), true);
     }
@@ -13835,7 +13835,9 @@ export function LayerlingEditor({
     // "Free" (#598) takes it off the tag and puts a key ring tab of its own beside it.
     const keyring = patch.keyringTab ? null : patch.keyring !== undefined ? patch.keyring : stack.keyring;
     await keyringRuntimeReady(keyring);
-    const next = layeredTextShape(source, layers, wasText ? [] : stack.ids, selectedShape.id, selectedShape, stack.source.text, keyring);
+    // Laid in flush (#215) as the card sets it, else as the stack is.
+    const flush = patch.flush !== undefined ? patch.flush : stack.flush;
+    const next = layeredTextShape(source, layers, wasText ? [] : stack.ids, selectedShape.id, selectedShape, stack.source.text, keyring, flush);
     if (patch.keyringTab) {
       const bottom = layers[layers.length - 1];
       const floor = { color: bottom.color, height: bottom.height, elevation: stack.source.elevation ?? 0 };
@@ -13919,7 +13921,9 @@ export function LayerlingEditor({
         const area = await iconTagArea(stack.source, stack.width, wanted.patch.width ?? stack.width);
         // The key ring hole stays as it is unless the patch sets or takes it off (null); "Free" (#598) takes it off too.
         const keyring = wanted.patch.keyringTab ? null : wanted.patch.keyring === undefined ? stack.keyring : wanted.patch.keyring;
-        const next = await layeredIconShape(area, layers, stack.place, wasBody ? [] : stack.ids, current.id, wasBody ? { ...current, name: stack.name } : current, keyring);
+        // Laid in flush (#215) as the card sets it, else as the stack is.
+        const flush = wanted.patch.flush !== undefined ? wanted.patch.flush : stack.flush;
+        const next = await layeredIconShape(area, layers, stack.place, wasBody ? [] : stack.ids, current.id, wasBody ? { ...current, name: stack.name } : current, keyring, flush);
         return { next, area };
       })()
         .then(({ next, area }) => {
@@ -13968,7 +13972,7 @@ export function LayerlingEditor({
     if (!current || !stack) return;
     const source = await iconSourceFromFile(file);
     const { area, name } = await svgIconArea(source.name, source.svg, stack.width);
-    const next = await layeredIconShape(area, stack.layers, stack.place, stack.ids, current.id, { ...current, name }, stack.keyring);
+    const next = await layeredIconShape(area, stack.layers, stack.place, stack.ids, current.id, { ...current, name }, stack.keyring, stack.flush);
     if (!shapesRef.current.some((shape) => shape.id === current.id)) return;
     commitShapes(shapesRef.current.map((shape) => (shape.id === current.id ? next : shape)), [next.id], t("status.iconReplaced", { name }));
   }, [commitShapes, selectedShape, selectedShapes.length]);
@@ -16220,10 +16224,14 @@ export function LayerlingEditor({
         // A free hole (#598) is placed from the middle of the letters.
         const keyring = keyringArgument ? placedKeyring(keyringArgument.keyring, { width: shapeWidth(source), depth: shapeDepth(source) }) : stack.keyring;
         await keyringRuntimeReady(keyring);
+        // Laid in flush (#215): left out it stays as the stack has it.
+        const flushArgument = tagFlushArgument(params.flush);
+        if (flushArgument && "error" in flushArgument) throw new Error(flushArgument.error);
+        const flush = flushArgument ? flushArgument.flush : stack.flush;
         const names = Array.isArray(params.names) ? mcpStringArray(params.names).map((name) => name.trim()).filter(Boolean).slice(0, 100) : [];
         if (names.length) {
           const gap = typeof params.gap === "number" && Number.isFinite(params.gap) ? Math.max(0, params.gap) : 5;
-          const probe = layeredTextShape({ ...source, text: names[0] }, layers, [], target.id, target, stack.source.text, keyring);
+          const probe = layeredTextShape({ ...source, text: names[0] }, layers, [], target.id, target, stack.source.text, keyring, flush);
           const width = shapeWidth(probe);
           const depth = shapeDepth(probe);
           const columns = Math.max(1, Math.round(Math.sqrt((names.length * (depth + gap)) / (width + gap))));
@@ -16236,13 +16244,14 @@ export function LayerlingEditor({
             { locked: false, hidden: false, name },
             stack.source.text,
             keyring,
+            flush,
           ));
           commitShapes([...currentShapes().filter((shape) => shape.id !== target.id), ...tags], tags.map((tag) => tag.id), t("status.mcpTextTagsMade", { count: tags.length }));
           return { objects: tags.map(mcpShapeSummary) };
         }
-        const next = layeredTextShape(source, layers, wasText ? [] : stack.ids, target.id, target, stack.source.text, keyring);
+        const next = layeredTextShape(source, layers, wasText ? [] : stack.ids, target.id, target, stack.source.text, keyring, flush);
         commitShapes(currentShapes().map((shape) => (shape.id === target.id ? next : shape)), next.id, t("status.mcpTextLayered", { count: layers.length }));
-        return { object: mcpShapeSummary(next), layers, keyring };
+        return { object: mcpShapeSummary(next), layers, keyring, flush };
       }
 
       if (command.action === "sweep_sketch") {
@@ -16500,13 +16509,16 @@ export function LayerlingEditor({
         const count = params.count === undefined ? 1 : normalizeIconTagCount(Number(params.count));
         const keyringArgument = layerTextKeyringArgument(params.keyring);
         if (keyringArgument && "error" in keyringArgument) throw new Error(keyringArgument.error);
+        // Laid in flush (#215): left out it stays as the tag has it.
+        const flushArgument = tagFlushArgument(params.flush);
+        if (flushArgument && "error" in flushArgument) throw new Error(flushArgument.error);
         const plate = workspaceSettingsRef.current;
         let tag: WorkplaneShape;
         let status: string;
         if (svg) {
           const label = typeof params.name === "string" && params.name.trim() ? params.name.trim().slice(0, 60) : "Icon tag";
           const { area, name } = await svgIconArea(`${label}.svg`, svg, width ?? DEFAULT_ICON_TAG_WIDTH);
-          tag = await layeredIconShape(area, layers ?? ICON_TAG_LAYERS, { x: 0, z: 0, elevation: 0, rotation: 0, rotationX: 0, rotationZ: 0 }, [], createLocalId("icon-tag"), { locked: false, hidden: false, name }, keyringArgument ? placedKeyring(keyringArgument.keyring, iconBox(area)) : null);
+          tag = await layeredIconShape(area, layers ?? ICON_TAG_LAYERS, { x: 0, z: 0, elevation: 0, rotation: 0, rotationX: 0, rotationZ: 0 }, [], createLocalId("icon-tag"), { locked: false, hidden: false, name }, keyringArgument ? placedKeyring(keyringArgument.keyring, iconBox(area)) : null, flushArgument ? flushArgument.flush : null);
           status = t("status.iconTagAdded", { name });
         } else {
           const target = currentShapes().find((shape) => shape.id === id);
@@ -16518,7 +16530,7 @@ export function LayerlingEditor({
           const wasBody = !target.layeredIcon;
           const area = await iconTagArea(stack.source, stack.width, width ?? stack.width);
           const built = layers ?? (wasBody ? [...ICON_TAG_LAYERS] : stack.layers);
-          tag = await layeredIconShape(area, built, stack.place, wasBody ? [] : stack.ids, target.id, wasBody ? { ...target, name: stack.name } : target, keyringArgument ? placedKeyring(keyringArgument.keyring, iconBox(area)) : stack.keyring);
+          tag = await layeredIconShape(area, built, stack.place, wasBody ? [] : stack.ids, target.id, wasBody ? { ...target, name: stack.name } : target, keyringArgument ? placedKeyring(keyringArgument.keyring, iconBox(area)) : stack.keyring, flushArgument ? flushArgument.flush : stack.flush);
           status = t(wasBody ? "status.iconLayered" : "status.iconLayersUpdated", { count: built.length });
         }
         const tags = count > 1 ? iconTagCopies(tag, count, { width: plate.width, depth: plate.depth }) : [tag];
