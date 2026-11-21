@@ -398,5 +398,20 @@
     "guide": {
       "chapter": "shapes"
     }
+  },
+  {
+    "title": {
+      "de": "Schraube teilen: Filament als Stifte",
+      "en": "Split a screw: filament as the pins",
+      "da": "Del en skrue: filament som stifter"
+    },
+    "body": {
+      "de": "Beim Längs-Teilen einer Schraube oder Gewindestange ab M4 können Stücke 1,75-mm-Filament die Stifte sein, auch wo gedruckte Stifte nicht hineinpassen. Hake „Filament als Stifte“ an; die Meldung sagt, wie lang du die Stücke abschneidest.",
+      "en": "When you split a screw or threaded rod lengthwise, from M4 up, pieces of 1.75 mm filament can be the pins, even where printed pins do not fit. Tick Filament as pins; the message tells you how long to cut the pieces.",
+      "da": "Når du deler en skrue eller gevindstang på langs, fra M4 og op, kan stykker af 1,75 mm filament være stifterne, også hvor printede stifter ikke passer. Sæt flueben ved Filament som stifter; beskeden fortæller, hvor lange stykkerne skal klippes."
+    },
+    "guide": {
+      "chapter": "threads"
+    }
   }
 ]
