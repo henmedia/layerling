@@ -67,6 +67,27 @@ export type HolePatternSettings = {
    * opposite sides and as evenly spaced as the sides allow - a watertight lid wants more than four screws. Even, 4 up.
    */
   cornerCount?: number;
+  /**
+   * Mounting holes for a 19" rack (EIA-310, IEC 60297-3-100): four slots of the standard size in the corners, 465.1 mm
+   * apart across the panel and one rail spacing apart up it, so the panel screws onto the rack's rails. The size, the
+   * hole type and the distance from the sides do not apply then.
+   */
+  rack?: boolean;
+  /** 19" rack: a standard panel height from 1U to 6U, its holes as the standard has them; 0 or unset fits the panel. */
+  rackUnits?: number;
+  /**
+   * When the edge cuts the holes (`holePatternCutsAtEdge`): a solid frame this wide (mm) along the face's edge and its
+   * openings; the holes are cut off where it starts. 0 or unset: no frame, the holes run right to the edge.
+   */
+  edgeBorder?: number;
+  /**
+   * A pattern in a flat face (Discussion #1771): the top `topLayerThickness` mm of the body under the face becomes a
+   * body of its own in `topLayerColor`, and the holes go through that layer only: a net in a second colour, its holes
+   * filled up to the face by the body's own colour, so the face is flat. `depth` does not apply then.
+   */
+  topLayer?: boolean;
+  topLayerThickness?: number;
+  topLayerColor?: string;
   perimeterStart?: number;
   /** Own shape (#1235): the id of the shape from the scene that is repeated. */
   customId?: string;
@@ -87,6 +108,12 @@ export const HOLE_PATTERN_MIN_SIZE = 0.5;
 export const HOLE_PATTERN_MAX_SIZE = 200;
 export const HOLE_PATTERN_MAX_SPACING = 400;
 export const HOLE_PATTERN_MAX_MARGIN = 100;
+/** The top layer in a second colour: its thickness by default, the thinnest it can be, and its colour by default. */
+export const HOLE_PATTERN_TOP_LAYER_DEFAULT = 1;
+export const HOLE_PATTERN_TOP_LAYER_MIN = 0.2;
+export const HOLE_PATTERN_TOP_LAYER_COLOR = "#ffffff";
+/** The widest frame along the edge when the edge cuts the holes. */
+export const HOLE_PATTERN_MAX_EDGE_BORDER = 20;
 export const HOLE_PATTERN_MIN_PERIMETER_COUNT = 2;
 export const HOLE_PATTERN_MAX_PERIMETER_COUNT = 200;
 export const HOLE_PATTERN_MAX_PERIMETER_START = 2000;
@@ -526,7 +553,167 @@ export type HolePatternResult = {
   ring?: { length: number; onCorners: boolean };
   /** Mounting holes only: the face is round, so the holes go evenly round a circle instead of into corners. */
   roundFace?: boolean;
+  /** 19" rack holes: how the slots came out on the face, or why there are none. */
+  rack?: RackFit;
+  /**
+   * The edge cuts the holes (`holePatternCutsAtEdge`): holes reaching past it are cut off there instead of left out.
+   * `thin` counts the holes inside the face that leave a strip to its edge thinner than the walls between holes.
+   */
+  edgeCut?: { thin: number; wall: number; border: number };
 };
+
+/** The panel heights of IEC 60297-3-100 (table 1): the height, and the distance between the upper and lower holes. */
+export const RACK_STANDARD_PANELS = [
+  { units: 1, height: 43.65, spacing: 31.75 },
+  { units: 2, height: 88.1, spacing: 76.2 },
+  { units: 3, height: 132.55, spacing: 57.15 },
+  { units: 4, height: 177, spacing: 101.6 },
+  { units: 5, height: 221.45, spacing: 146.05 },
+  { units: 6, height: 265.9, spacing: 190.5 },
+] as const;
+/** The front panel of a 19" rack is 19 inches wide. */
+export const RACK_PANEL_WIDTH = 482.6;
+/** Centre to centre of the two rails, 18 5/16 inches (EIA-310). */
+export const RACK_HOLE_SPACING = 465.1;
+/** The slot of IEC 60297-3-100 (as Schroff, Fischer and other makers cut it): 10.3 mm long across, 6.8 mm high. */
+export const RACK_SLOT_LENGTH = 10.3;
+export const RACK_SLOT_WIDTH = 6.8;
+/** One rack unit, 1 3/4 inches; its three rail holes sit 1/4, 7/8 and 1 1/2 inches up from its bottom. */
+export const RACK_UNIT = 44.45;
+const RACK_RAIL_HOLES = [6.35, 22.225, 38.1];
+/** The least room from a hole's middle to the panel's edge: what the standard's 1U and 2U panels keep. */
+export const RACK_EDGE = 5.95;
+/** The least material left beside a slot, across the panel and up it. */
+const RACK_RIM = 1;
+
+export type RackFit = {
+  /** The holes: four, or none and why. */
+  ok: boolean;
+  reason?: "narrow" | "low";
+  /** The panel as the face has it, across (its long side) and up. */
+  width: number;
+  height: number;
+  /** Up the panel: centre to centre of the lower and upper holes, and from a hole's middle to the nearer edge. */
+  spacing: number;
+  edge: number;
+  /** How many units of the rack the panel takes; it sits in their middle. */
+  space: number;
+  /** A standard height that was asked for, and the height its panel has. */
+  units?: number;
+  standardHeight?: number;
+  /** The slots' turn in the face, in degrees as `holeAngle` takes it: they lie along the panel's width. */
+  angle: number;
+};
+
+/** A standard panel height asked for, 1 to 6, or 0 for one that fits the panel. */
+export function normalizeRackUnits(value: unknown) {
+  return typeof value === "number" && Number.isFinite(value) ? Math.min(RACK_STANDARD_PANELS.length, Math.max(0, Math.round(value))) : 0;
+}
+
+/**
+ * The holes of a panel of any height on a rack's rail. The panel takes the fewest whole units it fits in and sits in
+ * their middle, so it never reaches into its neighbours' room and fits on any unit of the rack. The rail's holes are
+ * the same about the middle of any whole number of units (1/4, 7/8 and 1 1/2 inch up each unit), so the outermost two
+ * that keep RACK_EDGE to the panel's edges lie the same distance from its upper and lower edges.
+ */
+export function rackPanelFit(height: number): { units: number; spacing: number; edge: number } | null {
+  if (!(height > 0)) return null;
+  const units = Math.max(1, Math.ceil(height / RACK_UNIT - 1e-9));
+  const room = units * RACK_UNIT;
+  const below = (room - height) / 2;
+  for (let unit = 0; unit < units; unit += 1) {
+    for (const hole of RACK_RAIL_HOLES) {
+      const position = unit * RACK_UNIT + hole;
+      if (position >= room / 2) return null;
+      const edge = position - below;
+      if (edge >= RACK_EDGE - 1e-6) {
+        const round = (value: number) => Math.round(value * 1e6) / 1e6;
+        return { units, spacing: round(room - 2 * position), edge: round(edge) };
+      }
+    }
+  }
+  return null;
+}
+
+/** The smallest rectangle round a face's hull: it lies along one of the hull's sides; the face's own x wins a tie. */
+function outlineBox(hull: readonly Point2[]) {
+  let best: { angle: number; area: number; minA: number; maxA: number; minB: number; maxB: number } | null = null;
+  const angles = [0, ...hull.map((point, index) => {
+    const next = hull[(index + 1) % hull.length];
+    return Math.atan2(next.v - point.v, next.u - point.u);
+  })];
+  for (const raw of angles) {
+    // A rectangle repeats every quarter turn.
+    let angle = raw % (Math.PI / 2);
+    if (angle < 0) angle += Math.PI / 2;
+    if (angle > Math.PI / 4 + 1e-9) angle -= Math.PI / 2;
+    const cos = Math.cos(angle);
+    const sin = Math.sin(angle);
+    let minA = Infinity, maxA = -Infinity, minB = Infinity, maxB = -Infinity;
+    for (const point of hull) {
+      const a = point.u * cos + point.v * sin;
+      const b = -point.u * sin + point.v * cos;
+      minA = Math.min(minA, a); maxA = Math.max(maxA, a); minB = Math.min(minB, b); maxB = Math.max(maxB, b);
+    }
+    const area = (maxA - minA) * (maxB - minB);
+    if (!best || area < best.area * (1 - 1e-6)) best = { angle, area, minA, maxA, minB, maxB };
+  }
+  return best;
+}
+
+/**
+ * 19" rack holes: four slots in the corners of the smallest rectangle round the face, its long side across the rack.
+ * Across they sit 465.1 mm apart about its middle; up it either as a standard panel of 1U to 6U has them, or for any
+ * other height the longest distance between two rail holes that leaves room to the edges, again about its middle -
+ * so they sit the same distance from the upper and lower edges and still meet the rail's holes.
+ */
+export function rackCenters(loops: readonly Point2[][], settings: Pick<HolePatternSettings, "rackUnits">): { centers: Point2[]; fit: RackFit | null } {
+  const hull = convexHull(loops.flat());
+  const box = hull.length >= 3 ? outlineBox(hull) : null;
+  if (!box) return { centers: [], fit: null };
+  const sizeA = box.maxA - box.minA;
+  const sizeB = box.maxB - box.minB;
+  const across = sizeA >= sizeB;
+  const width = across ? sizeA : sizeB;
+  const height = across ? sizeB : sizeA;
+  // The slots lie along the panel's width: the turn from the face's x to it, as a hole's angle (counter-clockwise).
+  const turn = across ? box.angle : box.angle + Math.PI / 2;
+  const angle = normalizeHoleAngle((-turn * 180) / Math.PI);
+  const units = normalizeRackUnits(settings.rackUnits);
+  const standard = units > 0 ? RACK_STANDARD_PANELS[units - 1] : null;
+  const fitted = standard ? null : rackPanelFit(height);
+  const spacing = standard ? standard.spacing : fitted?.spacing ?? 0;
+  const round = (value: number) => Math.round(value * 1000) / 1000;
+  const fit: RackFit = {
+    ok: false,
+    width: round(width),
+    height: round(height),
+    spacing,
+    edge: Math.round(((height - spacing) / 2) * 1e6) / 1e6,
+    space: standard ? units : fitted?.units ?? 0,
+    angle,
+    ...(standard ? { units, standardHeight: standard.height } : {}),
+  };
+  if (width < RACK_HOLE_SPACING + RACK_SLOT_LENGTH + 2 * RACK_RIM - 1e-9) return { centers: [], fit: { ...fit, reason: "narrow" } };
+  if (!(spacing > 0) || height < spacing + RACK_SLOT_WIDTH + 2 * RACK_RIM - 1e-9) return { centers: [], fit: { ...fit, reason: "low" } };
+  const middleA = (box.minA + box.maxA) / 2;
+  const middleB = (box.minB + box.maxB) / 2;
+  const halfAcross = RACK_HOLE_SPACING / 2;
+  const halfUp = spacing / 2;
+  const cos = Math.cos(box.angle);
+  const sin = Math.sin(box.angle);
+  const back = (a: number, b: number): Point2 => ({ u: a * cos - b * sin, v: a * sin + b * cos });
+  const offsets = across
+    ? [[-halfAcross, -halfUp], [halfAcross, -halfUp], [halfAcross, halfUp], [-halfAcross, halfUp]]
+    : [[-halfUp, -halfAcross], [halfUp, -halfAcross], [halfUp, halfAcross], [-halfUp, halfAcross]];
+  return { centers: offsets.map(([a, b]) => back(middleA + a, middleB + b)), fit: { ...fit, ok: true } };
+}
+
+/** The holes a rack's slots are made of: the standard slot, plain, straight through the wall, turned along the panel. */
+export function rackSlotSettings(settings: HolePatternSettings, angle = 0): HolePatternSettings {
+  const { holeType: _type, headSize: _head, headDepth: _depth, headAngle: _angle, holeTilt: _tilt, ...rest } = settings;
+  return { ...rest, form: "slot", size: RACK_SLOT_LENGTH, height: RACK_SLOT_WIDTH, holeAngle: angle };
+}
 
 /**
  * The centres of a hole pattern on a face. Only holes that lie wholly inside
@@ -570,7 +757,11 @@ function bestLattice(
   pitchV: number,
   staggered: boolean,
   fits: (c: Point2) => boolean,
-): { centers: Point2[]; rows: number } | null {
+  /** Cut off at the edge: how many of these holes leave a thin strip to it; the way with fewest wins, then the most holes. */
+  thinOf?: (centers: Point2[]) => number,
+  /** Where to try the lattice, moved off the face's middle; by default on a hole or between holes along each axis. */
+  shifts?: readonly Point2[],
+): { centers: Point2[]; rows: number; thin: number } | null {
   const centerU = (bounds.minU + bounds.maxU) / 2;
   const centerV = (bounds.minV + bounds.maxV) / 2;
   const halfSpanU = Math.ceil((bounds.maxU - bounds.minU) / 2 / pitchU) + 1;
@@ -578,7 +769,8 @@ function bestLattice(
   if ((halfSpanU * 2 + 1) * (halfSpanV * 2 + 1) > MAX_CANDIDATES) return null;
   let best: Point2[] = [];
   let bestRows = 0;
-  const offsets = [
+  let bestThin = Infinity;
+  const offsets = shifts ?? [
     { u: 0, v: 0 },
     { u: pitchU / 2, v: 0 },
     { u: 0, v: pitchV / 2 },
@@ -597,12 +789,142 @@ function bestLattice(
         }
       }
     }
-    if (found.length > best.length) {
+    const thin = thinOf ? thinOf(found) : 0;
+    if (thin < bestThin || (thin === bestThin && found.length > best.length)) {
       best = found;
       bestRows = rowsUsed.size;
+      bestThin = thin;
     }
   }
-  return { centers: best, rows: bestRows };
+  return { centers: best, rows: bestRows, thin: Number.isFinite(bestThin) ? bestThin : 0 };
+}
+
+/**
+ * Whether the face's edge cuts the holes (Discussion #1771): with no distance to the edge, the plain holes of a pattern
+ * that go through the body run on past the edge and are cut off by it, so a grille or a honeycomb reaches right to the
+ * edge without a solid strip round it. Screw holes with a head, own shapes, blind holes and a round wall keep to the face.
+ */
+export function holePatternCutsAtEdge(settings: Pick<HolePatternSettings, "arrangement" | "form" | "margin" | "depth"> & Partial<Pick<HolePatternSettings, "holeType" | "topLayer">>) {
+  if (settings.arrangement !== "grid" && settings.arrangement !== "staggered") return false;
+  if (settings.form === "custom" || holeHasHead(settings)) return false;
+  // A top layer in a second colour is a net cut right through that layer, whatever depth was set before.
+  return (settings.depth === null || Boolean(settings.topLayer)) && !(settings.margin > EPSILON);
+}
+
+/**
+ * The top layer in a second colour (Discussion #1771), when it is asked for and can be made: a pattern (not mounting
+ * holes) of plain holes in a flat face, not an own shape. The holes go through that layer only, so it is a net in its
+ * colour, and the body's own colour fills them up to the face. Its thickness stays under the body's
+ * (`thickness`, when known), so some of the body is left under it.
+ */
+export function holePatternTopLayer(
+  settings: Pick<HolePatternSettings, "arrangement" | "form"> & Partial<Pick<HolePatternSettings, "topLayer" | "topLayerThickness" | "topLayerColor" | "holeType">>,
+  thickness?: number,
+): { thickness: number; color: string } | null {
+  if (!settings.topLayer || settings.arrangement === "corners" || settings.form === "custom" || holeHasHead(settings)) return null;
+  const asked = typeof settings.topLayerThickness === "number" && Number.isFinite(settings.topLayerThickness) ? settings.topLayerThickness : HOLE_PATTERN_TOP_LAYER_DEFAULT;
+  const most = thickness !== undefined && thickness > 0 ? thickness - HOLE_PATTERN_TOP_LAYER_MIN : Infinity;
+  if (!(most >= HOLE_PATTERN_TOP_LAYER_MIN)) return null;
+  const color = typeof settings.topLayerColor === "string" && /^#[0-9a-f]{6}$/i.test(settings.topLayerColor) ? settings.topLayerColor : HOLE_PATTERN_TOP_LAYER_COLOR;
+  return { thickness: Math.min(most, Math.max(HOLE_PATTERN_TOP_LAYER_MIN, asked)), color };
+}
+
+/** The frame along the edge when the edge cuts the holes, in mm; 0 when it does not cut them or has no frame. */
+export function holePatternEdgeBorder(settings: Parameters<typeof holePatternCutsAtEdge>[0] & Partial<Pick<HolePatternSettings, "edgeBorder">>) {
+  if (!holePatternCutsAtEdge(settings)) return 0;
+  const border = typeof settings.edgeBorder === "number" && Number.isFinite(settings.edgeBorder) ? settings.edgeBorder : 0;
+  return Math.min(HOLE_PATTERN_MAX_EDGE_BORDER, Math.max(0, border));
+}
+
+/**
+ * The face set in by `border` along its edge and its openings, in the face's frame: where the frame ends and the holes
+ * are cut off. Sharp corners stay sharp (mitred), so the frame is as wide all round.
+ */
+export function insetFaceLoops(runtime: ManifoldToplevel, loops: readonly Point2[][], border: number): Point2[][] {
+  const made: { delete(): void }[] = [];
+  try {
+    const region = new runtime.CrossSection(loops.map((loop) => loop.map((point): [number, number] => [point.u, point.v])), "EvenOdd");
+    made.push(region);
+    const inset = region.offset(-border, "Miter", 2);
+    made.push(inset);
+    const simple = inset.simplify(1e-6);
+    made.push(simple);
+    return simple.toPolygons().map((polygon) => polygon.map((point) => ({ u: point[0], v: point[1] }))).filter((loop) => loop.length >= 3);
+  } finally {
+    made.forEach((section) => section.delete());
+  }
+}
+
+/** How far a hole cut off by the edge must reach into the face at least, so it does not leave a bare scratch. */
+const EDGE_CUT_MIN_BITE = 0.4;
+/** A hole this close to the edge counts as touching it, with no strip between. */
+const EDGE_CUT_TOUCH = 0.01;
+/** The finer steps the lattice is moved in across one step each way, when laid about the middle it leaves thin strips. */
+const EDGE_CUT_SHIFT_STEPS = 12;
+/** About how much work that may take, holes times the edges of the face: past it the steps are halved, then left out. */
+const EDGE_CUT_SHIFT_BUDGET = 1200000;
+
+/**
+ * A hole cut off by the edge: kept when some part of it lies on the face at least `EDGE_CUT_MIN_BITE` from every edge,
+ * or when it lies wholly on the face.
+ */
+function edgeCutFitter(inside: (point: Point2) => boolean, segments: readonly Segment[], footprint: readonly Point2[], whole: (c: Point2) => boolean) {
+  const bite = EDGE_CUT_MIN_BITE;
+  const radius = footprint.reduce((most, point) => Math.max(most, Math.hypot(point.u, point.v)), 0);
+  const nearestEdge = (point: Point2, within: number) => {
+    let nearest = within;
+    for (const segment of segments) {
+      if (segment.maxU < point.u - nearest || segment.minU > point.u + nearest || segment.maxV < point.v - nearest || segment.minV > point.v + nearest) continue;
+      nearest = Math.min(nearest, pointSegmentDistance(point, segment.a, segment.b));
+    }
+    return nearest;
+  };
+  // Points spread over the hole: its corners and the middles of its sides (at most 16 of them), and halfway out to those.
+  const rim = footprint.flatMap((corner, index) => {
+    const next = footprint[(index + 1) % footprint.length];
+    return [corner, { u: (corner.u + next.u) / 2, v: (corner.v + next.v) / 2 }];
+  });
+  const every = Math.max(1, Math.ceil(rim.length / 16));
+  const spread = rim.filter((_, index) => index % every === 0);
+  const samples = [...spread, ...spread.map((point) => ({ u: point.u / 2, v: point.v / 2 }))];
+  return (c: Point2) => {
+    // Most holes are settled by their middle alone: well on the face, or so far off it that no part reaches it.
+    const edge = nearestEdge(c, radius + bite);
+    const onFace = inside(c);
+    if (onFace && edge >= bite) return true;
+    if (!onFace && edge >= radius) return false;
+    if (whole(c)) return true;
+    return samples.some((sample) => {
+      const point = { u: c.u + sample.u, v: c.v + sample.v };
+      return inside(point) && nearestEdge(point, bite) >= bite;
+    });
+  };
+}
+
+/**
+ * Counts the holes wholly on the face that come closer to its edge than `wall` without reaching it: there the edge
+ * keeps a strip thinner than the walls between the holes, which prints or cuts poorly.
+ */
+function thinStripCounter(segments: readonly Segment[], footprint: readonly Point2[], whole: (c: Point2) => boolean, wall: number) {
+  let reach = wall;
+  for (const corner of footprint) reach = Math.max(reach, Math.hypot(corner.u, corner.v) + wall);
+  return (centers: Point2[]) => {
+    if (!(wall > EDGE_CUT_TOUCH)) return 0;
+    let thin = 0;
+    for (const c of centers) {
+      if (!whole(c)) continue;
+      const placed = footprint.map((corner) => ({ u: c.u + corner.u, v: c.v + corner.v }));
+      let gap = Infinity;
+      for (const segment of segments) {
+        if (segment.maxU < c.u - reach || segment.minU > c.u + reach || segment.maxV < c.v - reach || segment.minV > c.v + reach) continue;
+        for (let i = 0; i < placed.length; i += 1) {
+          gap = Math.min(gap, segmentSegmentDistance(segment.a, segment.b, placed[i], placed[(i + 1) % placed.length]));
+        }
+      }
+      if (gap > EDGE_CUT_TOUCH && gap < wall - EPSILON) thin += 1;
+    }
+    return thin;
+  };
 }
 
 /**
@@ -637,27 +959,7 @@ export function cornerCenters(
     return { centers, round: true };
   }
   // The smallest rectangle round the outline lies along one of its hull's sides; the face's own x wins a tie.
-  let best: { angle: number; area: number; minA: number; maxA: number; minB: number; maxB: number } | null = null;
-  const angles = [0, ...hull.map((point, index) => {
-    const next = hull[(index + 1) % hull.length];
-    return Math.atan2(next.v - point.v, next.u - point.u);
-  })];
-  for (const raw of angles) {
-    // A rectangle repeats every quarter turn.
-    let angle = raw % (Math.PI / 2);
-    if (angle < 0) angle += Math.PI / 2;
-    if (angle > Math.PI / 4 + 1e-9) angle -= Math.PI / 2;
-    const cos = Math.cos(angle);
-    const sin = Math.sin(angle);
-    let minA = Infinity, maxA = -Infinity, minB = Infinity, maxB = -Infinity;
-    for (const point of hull) {
-      const a = point.u * cos + point.v * sin;
-      const b = -point.u * sin + point.v * cos;
-      minA = Math.min(minA, a); maxA = Math.max(maxA, a); minB = Math.min(minB, b); maxB = Math.max(maxB, b);
-    }
-    const area = (maxA - minA) * (maxB - minB);
-    if (!best || area < best.area * (1 - 1e-6)) best = { angle, area, minA, maxA, minB, maxB };
-  }
+  const best = outlineBox(hull);
   if (!best) return { centers: [], round: false };
   const left = best.minA + inset;
   const right = best.maxA - inset;
@@ -750,6 +1052,11 @@ export function holePatternCenters(
   const segments = loopSegments(loops);
   const fits = holeFitter((point) => insideRegion(loops, point), segments, footprint, margin);
 
+  if (settings.arrangement === "corners" && settings.rack) {
+    const { centers, fit } = rackCenters(loops, settings);
+    return { centers, tooMany: false, rows: centers.length ? 2 : 0, ...(fit ? { rack: fit } : {}) };
+  }
+
   if (settings.arrangement === "corners") {
     // Holes between the corners that would leave the face (a notch in a side) are left out; the corners always stay.
     const onFace = holeFitter((point) => insideRegion(loops, point), segments, footprint, 0);
@@ -768,6 +1075,44 @@ export function holePatternCenters(
     if (ring.tooMany) return { ...empty, tooMany: true };
     const centers = ring.centers.filter(fits);
     return { centers, tooMany: false, rows: centers.length ? 1 : 0, ring: { length: ring.length, onCorners: ring.onCorners } };
+  }
+
+  if (holePatternCutsAtEdge(settings)) {
+    // The edge cuts the holes: those reaching past it stay, and of the ways to lay the lattice the one leaving the
+    // fewest thin strips along the edge wins. With a frame the line it starts on, set in from the edge, cuts them.
+    const wall = holePatternWall(settings);
+    const border = holePatternEdgeBorder(settings);
+    let cutLoops = loops;
+    if (border > 0) {
+      const runtime = loadedManifoldRuntime();
+      if (!runtime) {
+        requestManifoldRuntime();
+        return empty;
+      }
+      cutLoops = insetFaceLoops(runtime, loops, border);
+      if (cutLoops.length === 0) return { ...empty, edgeCut: { thin: 0, wall, border } };
+    }
+    const cutSegments = cutLoops === loops ? segments : loopSegments(cutLoops);
+    const inside = (point: Point2) => insideRegion(cutLoops, point);
+    const whole = cutLoops === loops ? fits : holeFitter(inside, cutSegments, footprint, 0);
+    const bounds = { minU, maxU, minV, maxV };
+    const keep = edgeCutFitter(inside, cutSegments, footprint, whole);
+    const thinOf = thinStripCounter(cutSegments, footprint, whole, wall);
+    let cut = bestLattice(bounds, pitchU, pitchV, staggered, keep, thinOf);
+    if (!cut) return { ...empty, tooMany: true };
+    // Laid evenly about the middle, a staggered row often keeps a thin strip whichever way: then the lattice is moved
+    // in finer steps across one step each way, and the place with the fewest thin strips (then the most holes) wins.
+    if (cut.thin > 0) {
+      // About the work of one lattice, so a big face or a long curved outline stays quick: finer steps only as far as that allows.
+      const work = Math.max(1, cut.centers.length) * Math.max(1, cutSegments.length);
+      const steps = [EDGE_CUT_SHIFT_STEPS, EDGE_CUT_SHIFT_STEPS / 2].find((count) => work * count * count <= EDGE_CUT_SHIFT_BUDGET) ?? 0;
+      const shifts: Point2[] = [];
+      for (let i = 0; i < steps; i += 1) for (let j = 0; j < steps; j += 1) shifts.push({ u: (pitchU * i) / steps, v: (pitchV * j) / steps });
+      const moved = shifts.length ? bestLattice(bounds, pitchU, pitchV, staggered, keep, thinOf, shifts) : null;
+      if (moved && (moved.thin < cut.thin || (moved.thin === cut.thin && moved.centers.length > cut.centers.length))) cut = moved;
+    }
+    if (cut.centers.length > (settings.allowMany ? HOLE_PATTERN_MANY_HOLES : HOLE_PATTERN_MAX_HOLES)) return { centers: [], tooMany: true, rows: 0 };
+    return { centers: cut.centers, tooMany: false, rows: cut.rows, edgeCut: { thin: cut.thin, wall, border } };
   }
 
   const lattice = bestLattice({ minU, maxU, minV, maxV }, pitchU, pitchV, staggered, fits);
@@ -1342,6 +1687,10 @@ export function normalizeHolePattern(input: Partial<HolePatternSettings>): HoleP
     ...(rowSpacing !== undefined ? { rowSpacing } : {}),
     arrangement,
     margin: number(input.margin, base.margin, 0, HOLE_PATTERN_MAX_MARGIN),
+    ...(input.edgeBorder !== undefined ? { edgeBorder: number(input.edgeBorder, 0, 0, HOLE_PATTERN_MAX_EDGE_BORDER) } : {}),
+    ...(input.topLayer !== undefined ? { topLayer: Boolean(input.topLayer) } : {}),
+    ...(input.topLayerThickness !== undefined ? { topLayerThickness: number(input.topLayerThickness, HOLE_PATTERN_TOP_LAYER_DEFAULT, HOLE_PATTERN_TOP_LAYER_MIN, 100) } : {}),
+    ...(typeof input.topLayerColor === "string" && /^#[0-9a-f]{6}$/i.test(input.topLayerColor) ? { topLayerColor: input.topLayerColor.toLowerCase() } : {}),
     // Kept while another form or arrangement is chosen, so going back finds them as they were.
     holeType,
     ...head,
@@ -1352,6 +1701,8 @@ export function normalizeHolePattern(input: Partial<HolePatternSettings>): HoleP
     ...(input.cornerToCenter === true ? { cornerToCenter: true } : {}),
     // Kept as given (3 to 40): a round face takes it as it is, a rectangle the even number at or below it.
     ...(typeof input.cornerCount === "number" && Number.isFinite(input.cornerCount) && Math.round(input.cornerCount) !== MIN_CORNER_COUNT ? { cornerCount: normalizeCornerCount(input.cornerCount, true) } : {}),
+    ...(input.rack === true ? { rack: true } : {}),
+    ...(input.rack === true && normalizeRackUnits(input.rackUnits) > 0 ? { rackUnits: normalizeRackUnits(input.rackUnits) } : {}),
     ...custom,
     depth: typeof input.depth === "number" && Number.isFinite(input.depth) && input.depth > 0 ? Math.min(input.depth, 1000) : null,
     ...(input.allowMany === true ? { allowMany: true } : {}),

@@ -298,7 +298,9 @@ describe("end plugs for a flush hinge (Discussion #1387, real Manifold kernel)",
         const pieces = plugs!.decompose();
         created.push(...pieces);
         expect(pieces.length, hingeSide).toBe(2);
-        pieces.forEach((piece) => expect(piece.volume(), hingeSide).toBeCloseTo(1.75 * 1.75 * 4, 2));
+        // With filament each plug is 1.85 mm square: the body's hole 0.1 mm per side over the 1.75 mm pin (half the play,
+        // #1220), less 0.05 mm all round.
+        pieces.forEach((piece) => expect(piece.volume(), hingeSide).toBeCloseTo(1.85 * 1.85 * 4, 2));
         const whole = body.add(knuckles).subtract(cuts!);
         created.push(whole);
         // A rod along the hinge's line, from `from` to `to` (along it, from the middle).
@@ -385,7 +387,7 @@ describe("end plugs for a flush hinge (Discussion #1387, real Manifold kernel)",
       expect(narrow.hinge!.pinLength).toBeCloseTo(60 - 2 * (width - 1.5) - 1, 6);
       const pieces = narrow.hinge!.plugs!.decompose();
       created.push(...pieces);
-      pieces.forEach((piece) => expect(piece.volume()).toBeCloseTo(1.75 * 1.75 * (width - 1.5), 2));
+      pieces.forEach((piece) => expect(piece.volume()).toBeCloseTo(1.85 * 1.85 * (width - 1.5), 2));
       // On 50 mm they are 3.05 mm wide, too short for a plug of 2 mm.
       const short = openBox(kernel, created, 0, 50);
       expect(lidForSolid(kernel, short, normalizeLidOptions({ ...HINGED, hingeKnuckles: 15 }))).toEqual({ error: { code: "endPlugsShort" } });

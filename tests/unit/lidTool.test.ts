@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { BAYONET_MIN_WALL, HINGE_PIN_GRIP, HINGE_PRINTED_PIN_GRIP, LID_DEFAULTS, LID_THREAD_STANDARD_SPECS, LID_THREAD_STANDARDS, LID_TYPES, NECK_LARGER, NECK_SMALLER, MAX_BAYONET_AXIAL_GAP, MAX_BAYONET_DEPTH, MAX_BAYONET_DETENT, MAX_BAYONET_LUGS, MAX_BAYONET_TURN, MIN_BAYONET_AXIAL_GAP, MIN_BAYONET_DEPTH, MIN_BAYONET_LUGS, MIN_BAYONET_TURN, MAX_CLICK_BUMP_HEIGHT, MAX_HINGE_PIN, MAX_HINGE_PIN_PLAY, MAX_LID_GAP, MAX_LID_THICKNESS, MAX_LID_THREAD_PITCH, MAX_LID_THREAD_OFFSET, MAX_LID_THREAD_TURNS, MAX_MAGNET_GAP, MIN_CLICK_BUMP_HEIGHT, MIN_HINGE_PIN, MIN_HINGE_PIN_PLAY, MIN_LID_THREAD_OFFSET, MIN_LID_THREAD_PITCH, MIN_LID_THREAD_TURNS, MIN_LID_WALL, MIN_MAGNET_DIAMETER, SCREW_MIN_WALL, bayonetLugSize, bayonetPlan, bayonetTurn, clickBumpPlaces, cornerKnucklePlan, endPlugPlan, hingeKnuckleRadius, hingePinGrip, hingePinHoles, lidClickBumpsFit, lidHandleFits, lidNeckFit, lidStandardThread, lidTakesExtras, lidTakesMagnets, lidThicknessForMagnets, lidThread, magnetPlaces, magnetPocketDepth, normalizeLidOptions, roundOutline, screwPlan, lidTetherFits, tetherPlan, FLIP_HINGE_LENGTH, FLIP_HINGE_THICKNESS, MAX_FLIP_TOP_OPENING, MIN_FLIP_TOP_OPENING, flipTopPlan, flipTopThickness, lidFlipTopFits, screwInPlan, LID_HINGE_TYPES, SLIDE_EDGE, SLIDE_LIP, SLIDE_MAX_GROOVE, SLIDE_MIN_HOLD, SLIDE_WALL_KEEP, slideBoxTurn, slidePlan, slideWall, MAX_SLIDE_FRAME, SLIDE_FRAME_KEEP, slideFrameNeeded, slideSlotRoom } from "@/lib/lidTool";
+import { BAYONET_MIN_WALL, HINGE_PIN_GRIP, HINGE_PIN_GRIP_SHARE, HINGE_PRINTED_PIN_GRIP, LID_DEFAULTS, LID_THREAD_STANDARD_SPECS, LID_THREAD_STANDARDS, LID_TYPES, NECK_LARGER, NECK_SMALLER, MAX_BAYONET_AXIAL_GAP, MAX_BAYONET_DEPTH, MAX_BAYONET_DETENT, MAX_BAYONET_LUGS, MAX_BAYONET_TURN, MIN_BAYONET_AXIAL_GAP, MIN_BAYONET_DEPTH, MIN_BAYONET_LUGS, MIN_BAYONET_TURN, MAX_CLICK_BUMP_HEIGHT, MAX_HINGE_PIN, MAX_HINGE_PIN_PLAY, MAX_LID_GAP, MAX_LID_THICKNESS, MAX_LID_THREAD_PITCH, MAX_LID_THREAD_OFFSET, MAX_LID_THREAD_TURNS, MAX_MAGNET_GAP, MIN_CLICK_BUMP_HEIGHT, MIN_HINGE_PIN, MIN_HINGE_PIN_PLAY, MIN_LID_THREAD_OFFSET, MIN_LID_THREAD_PITCH, MIN_LID_THREAD_TURNS, MIN_LID_WALL, MIN_MAGNET_DIAMETER, SCREW_MIN_WALL, bayonetLugSize, bayonetPlan, bayonetTurn, clickBumpPlaces, cornerKnucklePlan, endPlugPlan, hingeKnuckleRadius, hingePinGrip, hingePinHoles, lidClickBumpsFit, lidHandleFits, lidNeckFit, lidStandardThread, lidTakesExtras, lidTakesMagnets, lidThicknessForMagnets, lidThread, magnetPlaces, magnetPocketDepth, normalizeLidOptions, roundOutline, screwPlan, lidTetherFits, tetherPlan, FLIP_HINGE_LENGTH, FLIP_HINGE_THICKNESS, MAX_FLIP_TOP_OPENING, MIN_FLIP_TOP_OPENING, flipTopPlan, flipTopThickness, lidFlipTopFits, screwInPlan, LID_HINGE_TYPES, SLIDE_EDGE, SLIDE_LIP, SLIDE_MAX_GROOVE, SLIDE_MIN_HOLD, SLIDE_WALL_KEEP, slideBoxTurn, slidePlan, slideWall, MAX_SLIDE_FRAME, SLIDE_FRAME_KEEP, slideFrameNeeded, slideSlotRoom } from "@/lib/lidTool";
 import { threadSize } from "@/lib/vase/vase-geometry.mjs";
 
 describe("lid options (#1009)", () => {
@@ -149,13 +149,17 @@ describe("lid options (#1009)", () => {
 
   it("holds the pin tight in the body's holes and gives it its play only in the lid's (#1220)", () => {
     expect(HINGE_PIN_GRIP).toBe(0.05);
+    expect(HINGE_PIN_GRIP_SHARE).toBe(0.5);
+    // With the defaults 0.1 mm per side in the body: at 0.05 the filament went in hard (#1220, 1.151.0).
     const holes = hingePinHoles(normalizeLidOptions({ hingePin: 1.75 }));
     expect(holes.lidHole).toBeCloseTo(0.875 + 0.2, 9);
-    expect(holes.bodyHole).toBeCloseTo(0.875 + 0.05, 9);
-    // The play changes the lid's holes only.
+    expect(holes.bodyHole).toBeCloseTo(0.875 + 0.1, 9);
+    // The body's holes follow the play at half of it, so they stay tighter than the lid's.
     const wide = hingePinHoles(normalizeLidOptions({ hingePin: 3, hingePinPlay: 0.4 }));
     expect(wide.lidHole).toBeCloseTo(1.9, 9);
-    expect(wide.bodyHole).toBeCloseTo(1.55, 9);
+    expect(wide.bodyHole).toBeCloseTo(1.7, 9);
+    // Never less than HINGE_PIN_GRIP.
+    expect(hingePinGrip({ hingePinPlay: 0.08 })).toBeCloseTo(0.05, 9);
     // The least play is the grip: then both are as tight.
     const least = hingePinHoles(normalizeLidOptions({ hingePin: 1.75, hingePinPlay: 0 }));
     expect(least.lidHole).toBeCloseTo(least.bodyHole, 9);
@@ -180,14 +184,14 @@ describe("lid options (#1009)", () => {
     const printed = hingePinHoles(normalizeLidOptions({ hingePin: 3, hingePrintPin: true }));
     expect(printed.bodyHole).toBeCloseTo(1.5 + 0.15, 9);
     expect(printed.lidHole).toBeCloseTo(1.5 + 0.2, 9);
-    // Filament keeps its tight fit.
-    expect(hingePinHoles(normalizeLidOptions({ hingePin: 3 })).bodyHole).toBeCloseTo(1.5 + 0.05, 9);
+    // Filament keeps a tighter fit.
+    expect(hingePinHoles(normalizeLidOptions({ hingePin: 3 })).bodyHole).toBeCloseTo(1.5 + 0.1, 9);
     // Never looser than the lid's holes: with less play than that, both are as wide.
     const tight = hingePinHoles(normalizeLidOptions({ hingePin: 3, hingePinPlay: 0.1, hingePrintPin: true }));
     expect(tight.bodyHole).toBeCloseTo(tight.lidHole, 9);
     expect(hingePinGrip({ hingePinPlay: 0.1, hingePrintPin: true })).toBeCloseTo(0.1, 9);
     expect(hingePinGrip({ hingePinPlay: 0.3, hingePrintPin: true })).toBeCloseTo(0.15, 9);
-    expect(hingePinGrip({ hingePinPlay: 0.3, hingePrintPin: false })).toBe(HINGE_PIN_GRIP);
+    expect(hingePinGrip({ hingePinPlay: 0.3, hingePrintPin: false })).toBeCloseTo(0.15, 9);
   });
 
   it("brings sizes into range and ignores what is not a number", () => {

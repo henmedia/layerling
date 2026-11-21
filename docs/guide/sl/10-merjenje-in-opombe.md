@@ -7,7 +7,7 @@ Kdor želi del zgraditi natančno, mora znati meriti. layerling ima za to več o
 
 ## Merilni trak
 
-Merilni trak je na spodnjem koncu vrstice pogleda ob levem robu ({{ui:camera.tapeTools}}). Meri razdalje med vogali, robovi in ploskvami. Klik nanj odpre pet gumbov. Če zakrivajo tisto, kar želiš izmeriti, jih za ročaj levo prosto povlečeš po delovni površini; dvoklik na ročaj jih vrne nazaj:
+Merilni trak je na spodnjem koncu vrstice pogleda ob levem robu ({{ui:camera.tapeTools}}). Meri razdalje med vogali, robovi in ploskvami. Klik nanj odpre pet gumbov. {{ui:camera.addMeasurement}} je takoj vklopljen, zato naslednja dva klika v pogledu že merita; še en klik na ta gumb orodje odloži, gumbi pa ostanejo odprti. Če so mere skrite, ostane izklopljen, dokler ga ne klikneš. Če zakrivajo tisto, kar želiš izmeriti, jih za ročaj levo prosto povlečeš po delovni površini; dvoklik na ročaj jih vrne nazaj:
 
 ![Merilni trak z gumbi: Dodaj mero, Premakni merilne točke, Odstrani mero, Cele robove, Odstrani vse mere.](shot:tape-menu)
 
@@ -66,6 +66,8 @@ Z {{ui:workspace.dimensionsAlwaysVisible}} mere ostanejo trajno vidne. Če telo 
 Z {{ui:workspace.dimensionAxisColors}} dobi vsako polje barvo svoje osi, kot ročaji: rdečo za X, zeleno za Y in modro za Z. Tako tudi pri majhnem delu na prvi pogled vidiš, katero število je katero.
 
 Če vas za trenutek motijo, pritisnite [[Q]]: mere in razdalje okoli izbora izginejo, zato je del, ki ga premikate, dobro viden. Ponovni [[Q]] jih vrne. Ročica, na katero pokažete, svojo mero vseeno pokaže.
+
+Pri zelo majhnem delu so lahko v napoto same ročice. [[Shift+Q]] skrije vse - kvadratke za velikost ter puščice za dvig, premik in vrtenje - ponovni [[Shift+Q]] pa jih vrne. Tudi brez njih lahko del vlečete in njegove mere vpisujete na desni, seznam predmetov pa pokaže, kateri del je izbran.
 
 ## Preverjanje zračnosti
 

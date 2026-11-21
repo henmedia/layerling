@@ -2,7 +2,7 @@
 import { strToU8, zipSync } from "fflate";
 import { describe, expect, it } from "vitest";
 import { exportMeshesTo3mf } from "@/lib/threemfExport";
-import { importedShapesFrom3mf } from "@/lib/threemfImport";
+import { importedShapesFrom3mf, MAX_3MF_COLOR_PARTS } from "@/lib/threemfImport";
 
 const CORE = "http://schemas.microsoft.com/3dmanufacturing/core/2015/02";
 const PRODUCTION = "http://schemas.microsoft.com/3dmanufacturing/production/2015/06";
@@ -184,5 +184,55 @@ describe("importedShapesFrom3mf", () => {
     expect(painted('paint_color="8"')).toBe(1);
     // A colour group the file does not have gives the triangle no colour of its own.
     expect(painted('pid="77" p1="0" paint_color="8"')).toBe(1);
+  });
+});
+
+const MATERIAL = "http://schemas.microsoft.com/3dmanufacturing/material/2015/02";
+
+/** Ein Objekt aus einzelnen Dreiecken, jedes in einer eigenen Farbe der Farbgruppe 2 - so schreibt eine Scanner-Software ihren Farbverlauf. */
+function gradientObject(id: number, triangles: number, firstColor = 0) {
+  let vertices = "";
+  let faces = "";
+  for (let index = 0; index < triangles; index += 1) {
+    vertices += `<vertex x="${index}" y="0" z="0"/><vertex x="${index}" y="1" z="0"/><vertex x="${index}" y="0" z="1"/>`;
+    const color = firstColor + index;
+    faces += `<triangle v1="${index * 3}" v2="${index * 3 + 1}" v3="${index * 3 + 2}" pid="2" p1="${color}" p2="${color}" p3="${color}"/>`;
+  }
+  return `<object id="${id}" type="model"><mesh><vertices>${vertices}</vertices><triangles>${faces}</triangles></mesh></object>`;
+}
+
+function gradientPackage(colors: number, objects: string, build: string) {
+  const group = Array.from({ length: colors }, (_, index) => `<m:color color="#${index.toString(16).padStart(6, "0")}ff"/>`).join("");
+  return package3mf({
+    "3D/3dmodel.model": `<?xml version="1.0" encoding="UTF-8"?><model unit="millimeter" xmlns="${CORE}" xmlns:m="${MATERIAL}"><resources><m:colorgroup id="2">${group}</m:colorgroup>${objects}</resources><build>${build}</build></model>`,
+  });
+}
+
+describe("3MF with a colour on almost every point (#1867)", () => {
+  it("comes in as one body instead of one body per colour", () => {
+    const result = importedShapesFrom3mf("scan.3mf", gradientPackage(600, gradientObject(3, 600), '<item objectid="3"/>'));
+    expect(result.droppedColors).toBe(true);
+    expect(result.split).toBe(false);
+    expect(result.shapes).toHaveLength(1);
+    expect(result.shapes[0].importedMesh?.triangleCount).toBe(600);
+    expect(result.shapes[0].importedMesh?.sourceFormat).toBe("3mf");
+  });
+
+  it("still splits at the limit itself", () => {
+    const result = importedShapesFrom3mf("limit.3mf", gradientPackage(MAX_3MF_COLOR_PARTS, gradientObject(3, MAX_3MF_COLOR_PARTS), '<item objectid="3"/>'));
+    expect(result.droppedColors).toBe(false);
+    expect(result.split).toBe(true);
+    expect(result.shapes).toHaveLength(MAX_3MF_COLOR_PARTS);
+  });
+
+  it("keeps the colours of the other objects in the file", () => {
+    // The second object has two colours of its own; only the scan beside it loses its gradient.
+    const objects = gradientObject(3, 200) + gradientObject(4, 2, 300);
+    const result = importedShapesFrom3mf("both.3mf", gradientPackage(302, objects, '<item objectid="3"/><item objectid="4"/>'));
+    expect(result.droppedColors).toBe(true);
+    expect(result.objects).toBe(2);
+    expect(result.shapes).toHaveLength(3);
+    expect(result.shapes.map((shape) => shape.importedMesh?.triangleCount)).toEqual([200, 1, 1]);
+    expect(result.shapes.slice(1).map((shape) => shape.color)).toEqual(["#00012c", "#00012d"]);
   });
 });

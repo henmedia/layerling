@@ -7,7 +7,7 @@ Přesné modelování vyžaduje měření. Layerling nabízí několik nástroj�
 
 ## Měření vzdáleností
 
-Nástroj je ve spodní části levé lišty pohledu, {{ui:camera.tapeTools}}. Měří vzdálenosti mezi rohy, hranami a plochami. Kliknutím otevřete nabídku pěti tlačítek. Překáží-li, přetáhněte ji za úchyt vlevo na jiné místo. Dvojklik na úchyt ji vrátí.
+Nástroj je ve spodní části levé lišty pohledu, {{ui:camera.tapeTools}}. Měří vzdálenosti mezi rohy, hranami a plochami. Kliknutím otevřete nabídku pěti tlačítek. {{ui:camera.addMeasurement}} je hned zapnuté, takže další dvě kliknutí v pohledu už měří; druhé kliknutí na toto tlačítko nástroj odloží a nabídka zůstane otevřená. Jsou-li měření skrytá, zůstane vypnuté, dokud na něj nekliknete. Překáží-li, přetáhněte ji za úchyt vlevo na jiné místo. Dvojklik na úchyt ji vrátí.
 
 ![Nabídka měření: přidání, přesunutí bodů, odebrání, celé hrany a odstranění všech měření.](shot:tape-menu)
 
@@ -66,6 +66,8 @@ V nastavení {{ui:workspace.appearance}} jsou dva přepínače průběžného k�
 S volbou {{ui:workspace.dimensionAxisColors}} dostane každé políčko barvu své osy jako úchyty: červenou pro X, zelenou pro Y a modrou pro Z. I u malého dílu tak hned vidíš, které číslo je které.
 
 Když na chvíli překážejí, stiskněte [[Q]]: rozměry a vzdálenosti kolem výběru zmizí a díl, který posouváte, je dobře vidět. Další [[Q]] je vrátí. Úchyt, na který ukážete, svůj rozměr ukáže i tak.
+
+U velmi malého dílu mohou překážet i samotné úchyty. [[Shift+Q]] je všechny skryje - čtverečky pro velikost i šipky pro zvednutí, posun a otočení - a další [[Shift+Q]] je vrátí. I bez nich lze díl táhnout a jeho rozměry psát vpravo a seznam objektů ukazuje, který díl je vybrán.
 
 ## Kontrola vůle
 

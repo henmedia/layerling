@@ -11,6 +11,7 @@ import {
   smoothSpaceMouseAxes,
   spaceMouseMoving,
   type SpaceMouseAxes,
+  type SpaceMouseWay,
 } from "@/lib/spaceMouse";
 import type { ThreeState } from "@/components/workplane/ViewportOverlays";
 
@@ -69,6 +70,26 @@ export async function connectSpaceMouse(): Promise<string | null> {
   return device.productName || "3D mouse";
 }
 
+/** Sent when the editor took up or lost a 3D mouse over WebHID, so the settings show which way it is read. */
+export const SPACE_MOUSE_WAY_EVENT = "layerling:spacemouse-way";
+
+/**
+ * The way the 3D mouse is read right now (#1871): over WebHID when the site holds one open, else as a game controller when
+ * the browser shows one, else over WebHID when the site may use one; null with no mouse at all. The editor reads it the
+ * same way: WebHID first, the game controller only without it.
+ */
+export async function spaceMouseWay(): Promise<SpaceMouseWay | null> {
+  let allowed: HidDevice[] = [];
+  try {
+    allowed = ((await webHid()?.getDevices()) ?? []).filter(isSpaceMouse);
+  } catch {
+    // No device over WebHID.
+  }
+  if (allowed.some((device) => device.opened)) return "hid";
+  if (spaceMousePads().length) return "pad";
+  return allowed.length ? "hid" : null;
+}
+
 /** The names of the 3D mice this site may already use. */
 export async function knownSpaceMice(): Promise<string[]> {
   const names: string[] = [];
@@ -100,9 +121,11 @@ export function useSpaceMouse(threeRef: RefObject<ThreeState | null>) {
     let axes: SpaceMouseAxes = SPACE_MOUSE_REST;
     // What the view is moved by: the cap's axes smoothed over a few hundredths of a second (#1013).
     let smoothed: SpaceMouseAxes = SPACE_MOUSE_REST;
-    let invert = readSpaceMouseInvert();
+    // Where the axes came from last: each way of reading the mouse has its own reversed directions (#1871).
+    let way: SpaceMouseWay = "hid";
+    let invert = { hid: readSpaceMouseInvert("hid"), pad: readSpaceMouseInvert("pad") };
     const onInvert = () => {
-      invert = readSpaceMouseInvert();
+      invert = { hid: readSpaceMouseInvert("hid"), pad: readSpaceMouseInvert("pad") };
     };
     let frame = 0;
     let last = 0;
@@ -118,7 +141,7 @@ export function useSpaceMouse(threeRef: RefObject<ThreeState | null>) {
         return;
       }
       smoothed = smoothSpaceMouseAxes(smoothed, axes, seconds);
-      if (moveCameraBySpaceMouse(state.camera, state.controls.target, smoothed, seconds, invert)) {
+      if (moveCameraBySpaceMouse(state.camera, state.controls.target, smoothed, seconds, invert[way])) {
         state.cameraTurn = null;
         state.controls.update();
         state.needsRender = true;
@@ -129,6 +152,7 @@ export function useSpaceMouse(threeRef: RefObject<ThreeState | null>) {
     const onReport = (event: Event) => {
       const report = event as HidInputReportEvent;
       axes = readSpaceMouseReport(axes, report.reportId, report.data);
+      way = "hid";
       if (!frame) {
         last = performance.now();
         frame = requestAnimationFrame(step);
@@ -145,6 +169,7 @@ export function useSpaceMouse(threeRef: RefObject<ThreeState | null>) {
       if (disposed) return;
       devices.add(device);
       device.addEventListener("inputreport", onReport);
+      window.dispatchEvent(new Event(SPACE_MOUSE_WAY_EVENT));
     };
     const scan = () => {
       hid?.getDevices().then((list) => list.forEach((device) => void attach(device))).catch(() => {});
@@ -163,6 +188,7 @@ export function useSpaceMouse(threeRef: RefObject<ThreeState | null>) {
       padFrame = requestAnimationFrame(padPoll);
       if (devices.size) return;
       axes = readSpaceMouseGamepad(pad.axes);
+      way = "pad";
       if (!frame && spaceMouseMoving(axes)) {
         last = performance.now();
         frame = requestAnimationFrame(step);
@@ -183,6 +209,7 @@ export function useSpaceMouse(threeRef: RefObject<ThreeState | null>) {
       device.removeEventListener("inputreport", onReport);
       devices.delete(device);
       axes = SPACE_MOUSE_REST;
+      window.dispatchEvent(new Event(SPACE_MOUSE_WAY_EVENT));
     };
     scan();
     hid?.addEventListener("connect", onConnect);

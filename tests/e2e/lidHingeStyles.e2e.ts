@@ -289,9 +289,11 @@ describe("a flush hinge's ends where there is nothing to fill (Discussion #1387,
     // lid, the body's knuckles, the cuts grouped with the body, the printed pin and the plugs, and the pin's length. With a
     // printed pin the body's holes and the plugs' pockets have since been 0.1 mm per side roomier (#1220), so knuckles,
     // cuts and plugs there are taken again; lid, pin and length are as before.
+    // A piece of filament's holes in the body have since been half the pin's play per side, 0.1 instead of 0.05 mm (#1220),
+    // so the knuckles and cuts on the right, the one hinge here with filament, are taken again.
     const before = [
       ["square box, flush", openBox(kernel, created), { hingeStyle: "flush" }, [5429.1403, 1196], [751.498, 1184], [864.0838, 1180], [134.205, 160], null, null],
-      ["square box, flush on the right", openBox(kernel, created), { hingeStyle: "flush", hingeSide: "right" }, [5574.8683, 830], [541.2539, 888], [535.0294, 836], null, null, null],
+      ["square box, flush on the right", openBox(kernel, created), { hingeStyle: "flush", hingeSide: "right" }, [5574.8683, 830], [533.8462, 888], [543.0862, 836], null, null, null],
       ["square box, end plugs", openBox(kernel, created), { hingeStyle: "flush", hingeEndPlugs: true }, [5429.1403, 1196], [746.0303, 1216], [870.9185, 1364], [116.0078, 160], [30.42, 24], 51],
       ["rounded box, end plugs", roundedBox(kernel, created, 6).body, { hingeStyle: "flush", hingeEndPlugs: true }, [5269.6395, 1530], [825.8996, 1244], [710.6078, 944], [111.4305, 160], [30.0224, 120], 48.9877],
       ["box rounded within the gap, flush", roundedBox(kernel, created, 0.3).body, { hingeStyle: "flush" }, [5398.8937, 1092], [792.9111, 888], [811.4176, 836], [133.4842, 160], null, null],
@@ -419,8 +421,8 @@ describe("the pin's holes: tight in the body's part of the hinge, with the play 
     };
     try {
       expect(HINGE_PIN_GRIP).toBe(0.05);
-      // A 1.75 mm pin: 0.925 mm round in the body (0.05 mm per side), 1.075 mm in the lid (0.2 mm of play).
-      const tight: [number, number] = [0.9, 0.95];
+      // A 1.75 mm pin: 0.975 mm round in the body (0.1 mm per side, half the play), 1.075 mm in the lid (0.2 mm of play).
+      const tight: [number, number] = [0.95, 1.0];
       const free: [number, number] = [1.05, 1.1];
       for (const hingeTeardrop of [true, false]) {
         // Outside: the body's knuckles on the back wall, the lid's between them.

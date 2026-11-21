@@ -22,6 +22,25 @@ describe("what moves with a sketch selection", () => {
     expect([...ids].sort()).toEqual(["a", "b", "c", "d"]);
   });
 
+  it("leaves the far end of a line that leads out of the selected points where it is (Issue #1800)", () => {
+    // A frame round b and c of the open chain a-b-c-d selects the two points and all three lines:
+    // s1 and s3 each touch one of the points. Only b and c move; a and d were never selected.
+    const framed = { kind: "multiple" as const, pointIds: ["b", "c"], segmentIds: ["s1", "s2", "s3"] };
+    expect([...sketchSelectionMovePointIds(profile, framed)].sort()).toEqual(["b", "c"]);
+    // A line picked on its own beside the points, with neither end among them, still moves by its two ends.
+    const apart = { kind: "multiple" as const, pointIds: ["a"], segmentIds: ["s3"] };
+    expect([...sketchSelectionMovePointIds(profile, apart)].sort()).toEqual(["a", "c", "d"]);
+    // Lines alone move by their ends, as before.
+    const lines = { kind: "multiple" as const, pointIds: [], segmentIds: ["s1", "s3"] };
+    expect([...sketchSelectionMovePointIds(profile, lines)].sort()).toEqual(["a", "b", "c", "d"]);
+  });
+
+  it("takes a grabbed line along whole, also where it leads out of the selection", () => {
+    const framed = { kind: "multiple" as const, pointIds: ["b", "c"], segmentIds: ["s1", "s2", "s3"] };
+    expect([...sketchSegmentDragPointIds(profile, framed, "s2")].sort()).toEqual(["b", "c"]);
+    expect([...sketchSegmentDragPointIds(profile, framed, "s1")].sort()).toEqual(["a", "b", "c"]);
+  });
+
   it("drags a line by itself, or the whole selection when the line belongs to a larger one", () => {
     expect(sketchSegmentDragPointIds(profile, null, "s1")).toEqual(["a", "b"]);
     expect(sketchSegmentDragPointIds(profile, { kind: "segment", id: "s3" }, "s1")).toEqual(["a", "b"]);

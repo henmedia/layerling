@@ -5,6 +5,7 @@ import { AlertTriangle, Download, Home, PlusCircle } from "lucide-react";
 import { t } from "@/lib/i18n";
 import { PROJECT_SHAPES_DB_NAME } from "@/lib/storageMigration";
 import { useMovablePanel } from "@/lib/useMovablePanel";
+import { isWebGLContextError } from "@/lib/webglError";
 
 type ProjectRecord = {
   id: string;
@@ -62,11 +63,13 @@ export type SafeModeScreenProps = {
 /**
  * What shows instead of a blank page when something breaks: the error, a way to save the design
  * as it was last stored in the browser, and ways out. Like every window in layerling it can be
- * moved by its title bar.
+ * moved by its title bar. When the browser gave the 3D view no WebGL context, it says so and lists
+ * what helps on the computer, and leaves out "Start a new design", which would stop the same way.
  */
 export function SafeModeScreen({ error, projectId, projectName, onGoToDashboard, onNewEmptyProject }: SafeModeScreenProps) {
   const movable = useMovablePanel<HTMLDivElement>("layerling.safeModePosition", { floatingStyle: { position: "absolute", margin: 0 } });
   const [backup, setBackup] = useState<"idle" | "busy" | "missing">("idle");
+  const noWebGL = isWebGLContextError(error);
 
   const downloadBackup = async () => {
     if (!projectId) return;
@@ -89,10 +92,22 @@ export function SafeModeScreen({ error, projectId, projectName, onGoToDashboard,
         style={movable.style}
       >
         <header className="workspace-modal-header movable" title={t("panel.moveHint")} {...movable.handleProps}>
-          <strong id="safe-mode-title"><AlertTriangle size={20} aria-hidden="true" />{t("crash.title")}</strong>
+          <strong id="safe-mode-title"><AlertTriangle size={20} aria-hidden="true" />{t(noWebGL ? "crash.webgl.title" : "crash.title")}</strong>
         </header>
         <div className="safe-mode-body">
-          <p id="safe-mode-description">{t("crash.description")}</p>
+          <p id="safe-mode-description">{t(noWebGL ? "crash.webgl.description" : "crash.description")}</p>
+          {noWebGL ? (
+            <div className="safe-mode-steps">
+              <p>{t("crash.webgl.stepsTitle")}</p>
+              <ol>
+                <li>{t("crash.webgl.stepRestart")}</li>
+                <li>{t("crash.webgl.stepAcceleration")}</li>
+                <li>{t("crash.webgl.stepPrivacy")}</li>
+                <li>{t("crash.webgl.stepUpdate")}</li>
+                <li>{t("crash.webgl.stepOtherBrowser")}</li>
+              </ol>
+            </div>
+          ) : null}
           {projectName ? <p className="safe-mode-project">{t("crash.projectHint", { name: projectName })}</p> : null}
           {error?.message ? (
             <details className="safe-mode-details">
@@ -112,7 +127,7 @@ export function SafeModeScreen({ error, projectId, projectName, onGoToDashboard,
               <Home size={16} aria-hidden="true" />
               {t("crash.goToDashboard")}
             </button>
-            {onNewEmptyProject ? (
+            {onNewEmptyProject && !noWebGL ? (
               <button type="button" onClick={onNewEmptyProject}>
                 <PlusCircle size={16} aria-hidden="true" />
                 {t("crash.newEmptyProject")}

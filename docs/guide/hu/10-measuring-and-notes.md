@@ -7,7 +7,7 @@ Egy alkatrész pontos megépítéséhez mérni kell. A layerlingben erre több e
 
 ## A mérőszalag
 
-A mérőszalag a bal szélen lévő nézetsáv alsó végén van ({{ui:camera.tapeTools}}). Sarkok, élek és lapok közötti távolságokat mér. Rákattintva öt gomb nyílik meg. Ha eltakarják, amit mérnél, húzd őket a bal oldali fogónál fogva bárhová a munkasíkon; a fogóra dupla kattintás visszateszi őket:
+A mérőszalag a bal szélen lévő nézetsáv alsó végén van ({{ui:camera.tapeTools}}). Sarkok, élek és lapok közötti távolságokat mér. Rákattintva öt gomb nyílik meg. A {{ui:camera.addMeasurement}} azonnal be van kapcsolva, így a következő két kattintás a nézetben már mér; a gombra még egyszer kattintva leteszed az eszközt, a gombok pedig nyitva maradnak. Ha a mérések el vannak rejtve, kikapcsolva marad, amíg rá nem kattintasz. Ha eltakarják, amit mérnél, húzd őket a bal oldali fogónál fogva bárhová a munkasíkon; a fogóra dupla kattintás visszateszi őket:
 
 ![A mérőszalag a gombjaival: mérés hozzáadása, mérési pontok mozgatása, mérés eltávolítása, teljes élek, minden mérés törlése.](shot:tape-menu)
 
@@ -66,6 +66,8 @@ A {{ui:workspace.dimensionsAlwaysVisible}} beállítással a méretek állandóa
 A {{ui:workspace.dimensionAxisColors}} beállítással minden mező a tengelye színét kapja, mint a fogantyúk: X piros, Y zöld, Z kék. Így egy kis alkatrésznél is egy pillantással látod, melyik szám melyik.
 
 Ha egy pillanatra zavarnak, nyomd meg a [[Q]] billentyűt: a kijelölés körüli méretek és távolságok eltűnnek, így jól látszik a mozgatott alkatrész. Újabb [[Q]] visszahozza őket. Az a fogantyú, amelyre mutatsz, így is megmutatja a méretét.
+
+Nagyon kicsi alkatrésznél maguk a fogantyúk is útban lehetnek. A [[Shift+Q]] mindet elrejti - a méret négyzeteit és az emelés, a csúsztatás és a forgatás nyilait -, újabb [[Shift+Q]] visszahozza őket. Nélkülük is húzhatod az alkatrészt és beírhatod a méreteit jobbra, az objektumlista pedig megmutatja, melyik alkatrész van kijelölve.
 
 ## Hézag ellenőrzése
 

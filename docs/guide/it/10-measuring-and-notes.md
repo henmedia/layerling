@@ -7,7 +7,7 @@ Per costruire un pezzo con precisione, devi poterlo misurare. layerling offre di
 
 ## Il metro a nastro
 
-Il metro a nastro si trova in fondo alla barra della vista, sul bordo sinistro ({{ui:camera.tapeTools}}). Misura la distanza tra angoli, spigoli e facce. Facendo clic si apre una serie di sei pulsanti. Se coprono la zona che vuoi misurare, trascinali dalla maniglia a sinistra e spostali sul piano di lavoro; un doppio clic sulla maniglia li riporta al loro posto:
+Il metro a nastro si trova in fondo alla barra della vista, sul bordo sinistro ({{ui:camera.tapeTools}}). Misura la distanza tra angoli, spigoli e facce. Facendo clic si apre una serie di sei pulsanti. {{ui:camera.addMeasurement}} è subito attivo, quindi i due clic successivi nella vista misurano già; un altro clic su quel pulsante mette via lo strumento e lascia aperti i pulsanti. Se le misure sono nascoste, resta disattivato finché non ci fai clic. Se coprono la zona che vuoi misurare, trascinali dalla maniglia a sinistra e spostali sul piano di lavoro; un doppio clic sulla maniglia li riporta al loro posto:
 
 ![Il metro a nastro con i pulsanti: aggiungi misura, sposta i punti di misurazione, rimuovi misura, misura spigoli interi, elimina tutte le misure.](shot:tape-menu)
 
@@ -68,6 +68,8 @@ Con {{ui:workspace.dimensionsAlwaysVisible}} le misure restano sempre visibili. 
 Con {{ui:workspace.dimensionAxisColors}} ogni casella prende il colore del suo asse, come le maniglie: rosso per X, verde per Y e blu per Z. Così anche su un pezzo piccolo vedi a colpo d'occhio quale numero è quale.
 
 Se per un momento danno fastidio, premi [[Q]]: le misure e le distanze attorno alla selezione spariscono e il pezzo che sposti si vede bene. Di nuovo [[Q]] le riporta. Una maniglia su cui punti mostra comunque la sua misura.
+
+Su un pezzo molto piccolo possono dare fastidio le maniglie stesse. [[Shift+Q]] le nasconde tutte - i quadratini delle dimensioni e le frecce per sollevare, far scorrere e ruotare - e di nuovo [[Shift+Q]] le riporta. Senza di esse puoi comunque trascinare il pezzo e scriverne le misure a destra, e l'elenco degli oggetti mostra quale pezzo è selezionato.
 
 ## Controllare il gioco
 

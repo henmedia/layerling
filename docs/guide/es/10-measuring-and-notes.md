@@ -7,7 +7,7 @@ Para construir una pieza con exactitud hay que medir. layerling tiene varias her
 
 ## La cinta métrica
 
-La cinta métrica está en el extremo inferior de la barra de vista, en el borde izquierdo ({{ui:camera.tapeTools}}). Mide distancias entre vértices, aristas y caras. Al hacer clic en ella se abren cinco botones. Si tapan lo que quieres medir, arrástralos por el asa de la izquierda a cualquier punto de la zona de trabajo; un doble clic en el asa los devuelve a su sitio:
+La cinta métrica está en el extremo inferior de la barra de vista, en el borde izquierdo ({{ui:camera.tapeTools}}). Mide distancias entre vértices, aristas y caras. Al hacer clic en ella se abren cinco botones. {{ui:camera.addMeasurement}} queda activado al momento, así que los dos clics siguientes en la vista ya miden; otro clic en ese botón deja la herramienta y los botones siguen abiertos. Si las medidas están ocultas, queda desactivado hasta que hagas clic en él. Si tapan lo que quieres medir, arrástralos por el asa de la izquierda a cualquier punto de la zona de trabajo; un doble clic en el asa los devuelve a su sitio:
 
 ![La cinta métrica con sus botones: añadir medida, mover los puntos de medida, quitar medida, aristas enteras y eliminar todas las medidas.](shot:tape-menu)
 
@@ -68,6 +68,8 @@ Con {{ui:workspace.dimensionsAlwaysVisible}}, las medidas se ven siempre. Un cue
 Con {{ui:workspace.dimensionAxisColors}} cada casilla toma el color de su eje, como los tiradores: rojo para X, verde para Y y azul para Z. Así, incluso en una pieza pequeña, ves de un vistazo qué número es cuál.
 
 Si estorban un momento, pulsa [[Q]]: las medidas y distancias alrededor de la selección desaparecen y la pieza que mueves se ve bien. Otra vez [[Q]] las recupera. Un tirador al que apuntas sigue mostrando su medida.
+
+En una pieza muy pequeña pueden estorbar los propios tiradores. [[Shift+Q]] los oculta todos - los cuadrados del tamaño y las flechas para levantar, deslizar y girar - y otra vez [[Shift+Q]] los recupera. Sin ellos puedes seguir arrastrando la pieza y escribir sus medidas a la derecha, y la lista de objetos muestra qué pieza está seleccionada.
 
 ## Comprobar la holgura
 
