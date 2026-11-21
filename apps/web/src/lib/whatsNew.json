@@ -5,35 +5,41 @@
       {
         "title": {
           "de": "Größe ziehen bis in die Ecke",
-          "en": "Resize right into the corner"
+          "en": "Resize right into the corner",
+          "ar": "تغيير الحجم حتى الزاوية تمامًا"
         },
         "body": {
           "de": "Ziehst du eine Form an einem Eckgriff größer, halten jetzt beide Seiten an den Kanten anderer Formen und an den Wänden, auf die sie treffen. So füllt ein Teil die Ecke eines Gehäuses in einem Zug.",
-          "en": "When you drag a corner handle to make a shape bigger, both of its sides now stop at the edges of other shapes and at the walls they run into. So a part fills the corner of a case in one drag."
+          "en": "When you drag a corner handle to make a shape bigger, both of its sides now stop at the edges of other shapes and at the walls they run into. So a part fills the corner of a case in one drag.",
+          "ar": "عندما تسحب مقبض زاوية لتكبير شكل، يتوقف الآن جانباه كلاهما عند حواف الأشكال الأخرى وعند الجدران التي يصلان إليها. وهكذا تملأ القطعة زاوية العلبة بسحبة واحدة."
         }
       },
       {
         "title": {
           "de": "3MF und OBJ: kleine Teile einer Gruppe bleiben",
           "en": "3MF and OBJ: small parts of a group stay",
-          "da": "3MF og OBJ: små dele af en gruppe bliver med"
+          "da": "3MF og OBJ: små dele af en gruppe bliver med",
+          "ar": "3MF وOBJ: الأجزاء الصغيرة من المجموعة تبقى"
         },
         "body": {
           "de": "Bei mehrfarbigen Entwürfen fehlten im 3MF und OBJ weiterhin sehr kleine Teile einer Gruppe, etwa die Zähne und Punkte in einem Logo, während sie in der STL da waren. Jetzt bleiben auch solche Teile in der Datei.",
           "en": "In designs of several colours, very small parts of a group, such as the teeth and dots of a logo, were still missing from the 3MF and OBJ, while the STL had them. Now such parts stay in the file too.",
-          "da": "I designs med flere farver manglede meget små dele af en gruppe, som tænderne og prikkerne i et logo, stadig i 3MF-filen og OBJ-filen, mens STL-filen havde dem. Nu bliver også sådanne dele i filen."
+          "da": "I designs med flere farver manglede meget små dele af en gruppe, som tænderne og prikkerne i et logo, stadig i 3MF-filen og OBJ-filen, mens STL-filen havde dem. Nu bliver også sådanne dele i filen.",
+          "ar": "في التصاميم متعددة الألوان كانت الأجزاء الصغيرة جدًا من المجموعة، مثل أسنان الشعار ونقاطه، لا تزال تغيب عن ملفي 3MF وOBJ، بينما كانت موجودة في STL. الآن تبقى هذه الأجزاء في الملف أيضًا."
         }
       },
       {
         "title": {
           "de": "Kein Stocken mehr beim Speichern großer importierter Baugruppen",
           "en": "No more freezing while large imported assemblies are saved",
-          "da": "Ingen frysning mere, når store importerede samlinger gemmes"
+          "da": "Ingen frysning mere, når store importerede samlinger gemmes",
+          "ar": "لا تجمّد بعد الآن عند حفظ التجميعات المستوردة الكبيرة"
         },
         "body": {
           "de": "In Entwürfen mit einer importierten STEP-Baugruppe, etwa einer Platine im Gehäuse, blieb der Editor nach fast jeder Änderung für mehrere Sekunden stehen, weil das automatische Speichern jedes Mal den ganzen Entwurf neu gepackt hat. Jetzt wird nur noch neu gepackt, was sich geändert hat, und der Editor bleibt währenddessen bedienbar.",
           "en": "In designs with an imported STEP assembly, a circuit board in an enclosure for example, the editor froze for several seconds after almost every change, because the automatic save packed the whole design again each time. Now only what has changed is packed again, and the editor stays usable meanwhile.",
-          "da": "I designs med en importeret STEP-samling, et printkort i et kabinet for eksempel, frøs editoren i flere sekunder efter næsten hver ændring, fordi den automatiske gemning pakkede hele designet sammen igen hver gang. Nu pakkes kun det, der er ændret, sammen igen, og editoren er brugbar imens."
+          "da": "I designs med en importeret STEP-samling, et printkort i et kabinet for eksempel, frøs editoren i flere sekunder efter næsten hver ændring, fordi den automatiske gemning pakkede hele designet sammen igen hver gang. Nu pakkes kun det, der er ændret, sammen igen, og editoren er brugbar imens.",
+          "ar": "في التصاميم التي فيها تجميعة STEP مستوردة، كلوحة دارة داخل علبة مثلًا، كان المحرر يتجمّد عدة ثوانٍ بعد كل تغيير تقريبًا، لأن الحفظ التلقائي كان يعيد حزم التصميم كله في كل مرة. الآن يُعاد حزم ما تغيّر فقط، ويبقى المحرر قابلًا للاستخدام في أثناء ذلك."
         },
         "guide": {
           "chapter": "files"
@@ -43,12 +49,14 @@
         "title": {
           "de": "3MF aus dem Scanner: ein Körper statt Tausender",
           "en": "3MF from a scanner: one body instead of thousands",
-          "da": "3MF fra en scanner: ét legeme i stedet for tusinder"
+          "da": "3MF fra en scanner: ét legeme i stedet for tusinder",
+          "ar": "3MF من الماسح الضوئي: جسم واحد بدل الآلاف"
         },
         "body": {
           "de": "Eine 3MF aus einem 3D-Scanner trägt an fast jedem Punkt eine eigene Farbe. layerling machte daraus je Farbe einen Körper: aus einem Scan wurden über 42.000 Körper, der Import dauerte Minuten. Eine solche Datei kommt jetzt als ein Körper in einer Farbe herein, mit einem Hinweis, dass der Farbverlauf nicht erhalten bleibt. Dateien mit wenigen Farben werden wie bisher je Farbe ein Körper.",
           "en": "A 3MF from a 3D scanner carries its own colour at almost every point. layerling made one body per colour: one scan became more than 42,000 bodies, and the import took minutes. Such a file now comes in as one body in a single colour, with a note that the colour gradient is not kept. Files with a few colours still become one body per colour.",
-          "da": "En 3MF fra en 3D-scanner har sin egen farve næsten ved hvert punkt. layerling laved ét legeme pr. farve: ét scan blev til over 42.000 legemer, og importen tog minutter. Sådan en fil kommer nu ind som ét legeme i én farve, med en note om, at farvegradienten ikke bevares. Filer med få farver bliver stadig ét legeme pr. farve."
+          "da": "En 3MF fra en 3D-scanner har sin egen farve næsten ved hvert punkt. layerling laved ét legeme pr. farve: ét scan blev til over 42.000 legemer, og importen tog minutter. Sådan en fil kommer nu ind som ét legeme i én farve, med en note om, at farvegradienten ikke bevares. Filer med få farver bliver stadig ét legeme pr. farve.",
+          "ar": "ملف 3MF من ماسح ضوئي ثلاثي الأبعاد يحمل لونًا خاصًا لكل نقطة تقريبًا. كان layerling يصنع جسمًا لكل لون: فصار مسح واحد أكثر من 42,000 جسم، واستغرق الاستيراد دقائق. الآن يُستورد مثل هذا الملف جسمًا واحدًا بلون واحد، مع ملاحظة بأن تدرّج الألوان لم يُحفظ. أما الملفات ذات الألوان القليلة فلا تزال تصبح جسمًا لكل لون."
         },
         "guide": {
           "chapter": "files"
@@ -58,12 +66,14 @@
         "title": {
           "de": "Skizze auf Platte 2 bearbeiten",
           "en": "Edit a sketch on plate 2",
-          "da": "Redigér en skitse på plade 2"
+          "da": "Redigér en skitse på plade 2",
+          "ar": "تعديل رسم تخطيطي على اللوح 2"
         },
         "body": {
           "de": "Bei mehreren Druckplatten zeigte „Skizze bearbeiten“ für einen Körper auf einer weiteren Platte die erste Platte, und der Umriss des Körpers lag außerhalb der Zeichenfläche. Die Skizze öffnet sich jetzt auf der Platte, auf der der Körper steht.",
           "en": "With several build plates, Edit sketch for a body on a further plate showed the first plate, and the body's outline lay outside the sketch area. The sketch now opens on the plate the body stands on.",
-          "da": "Med flere byggeplader viste \"Redigér skitse\" for en del på en anden plade den første plade, og delens omrids lå uden for skitsefladen. Skitsen åbner nu på den plade, delen står på."
+          "da": "Med flere byggeplader viste \"Redigér skitse\" for en del på en anden plade den første plade, og delens omrids lå uden for skitsefladen. Skitsen åbner nu på den plade, delen står på.",
+          "ar": "مع عدة ألواح طباعة، كان «تعديل الرسم التخطيطي» لجسم على لوح آخر يُظهر اللوح الأول، فيقع الحد الخارجي للجسم خارج منطقة الرسم. الآن يُفتح الرسم التخطيطي على اللوح الذي يقف عليه الجسم."
         },
         "guide": {
           "section": "buildPlates"
@@ -73,24 +83,28 @@
         "title": {
           "de": "Fase an einer Gruppe verschließt die Rohrbohrung nicht mehr",
           "en": "A chamfer on a group no longer closes a tube's bore",
-          "da": "En fase på en gruppe lukker ikke længere et rørs boring"
+          "da": "En fase på en gruppe lukker ikke længere et rørs boring",
+          "ar": "الشطف على مجموعة لم يعد يسدّ الثقب النافذ للأنبوب"
         },
         "body": {
           "de": "Ein Rohr, Ring oder gebogenes Rohr mit „Bohrung schneidet beim Gruppieren wie ein Loch“ öffnet, womit es gruppiert ist. Eine Fase oder Verrundung an dieser Gruppe hat die Öffnung wieder verschlossen. Jetzt bleibt sie offen.",
           "en": "A tube, ring or bent tube with \"Bore cuts as a hole when grouped\" opens whatever it is grouped with. A chamfer or fillet on that group closed the opening again. Now it stays open.",
-          "da": "Et rør, en ring eller et bøjet rør med \"Boringen skærer som et hul ved gruppering\" åbner, hvad den er grupperet med. En fase eller en rundning på den gruppe lukkede åbningen igen. Nu står åbningen stadig åben."
+          "da": "Et rør, en ring eller et bøjet rør med \"Boringen skærer som et hul ved gruppering\" åbner, hvad den er grupperet med. En fase eller en rundning på den gruppe lukkede åbningen igen. Nu står åbningen stadig åben.",
+          "ar": "الأنبوب أو الحلقة أو الأنبوب المنحني الذي فُعّل فيه «الثقب النافذ يقطع كثقب عند التجميع» يفتح ما يُجمَّع معه. وكان الشطف أو التنعيم على تلك المجموعة يسدّ الفتحة من جديد. الآن تبقى مفتوحة."
         }
       },
       {
         "title": {
           "de": "3D-Maus: Richtungen bleiben nach einem Neustart richtig",
           "en": "3D mouse: directions stay right after a restart",
-          "da": "3D-mus: retningerne bliver rigtige efter en genstart"
+          "da": "3D-mus: retningerne bliver rigtige efter en genstart",
+          "ar": "الفأرة ثلاثية الأبعاد: الاتجاهات تبقى صحيحة بعد إعادة التشغيل"
         },
         "body": {
           "de": "Nach einem Neustart des Browsers liest layerling eine 3D-Maus als Spielcontroller, bis du wieder auf „3D-Maus verbinden“ klickst. Bei manchen Geräten laufen die Richtungen dabei andersherum, und die angehakten Richtungen passten dann nicht mehr. layerling merkt sie sich jetzt für beide Wege getrennt: Unter Einstellungen, Bedienung, 3D-Maus steht eine Zeile, wenn die Maus gerade als Spielcontroller gelesen wird, und was du dann anhakst, gilt nur dafür. Deine bisherigen Einstellungen bleiben für die verbundene Maus erhalten.",
           "en": "After the browser is restarted, layerling reads a 3D mouse as a game controller until you click Connect 3D mouse again. On some devices the directions run the other way round there, and the ticked directions no longer fitted. layerling now keeps them apart for the two ways: under Settings, Controls, 3D mouse a line says when the mouse is read as a game controller, and what you tick then holds for that only. Your settings so far stay with the connected mouse.",
-          "da": "Når browseren er genstartet, læser layerling en 3D-mus som en spilcontroller, indtil du klikker på \"Tilslut 3D-mus\" igen. På nogle enheder løber retningerne den anden vej dér, og de afkrydsede retninger passede så ikke mere. layerling holder dem nu adskilt for de to måder: under Indstillinger, Betjening, 3D-mus står der en linje, når musen læses som en spilcontroller, og hvad du så sætter kryds ved gælder kun for det. Dine indstillinger hidtil bliver ved den tilsluttede mus."
+          "da": "Når browseren er genstartet, læser layerling en 3D-mus som en spilcontroller, indtil du klikker på \"Tilslut 3D-mus\" igen. På nogle enheder løber retningerne den anden vej dér, og de afkrydsede retninger passede så ikke mere. layerling holder dem nu adskilt for de to måder: under Indstillinger, Betjening, 3D-mus står der en linje, når musen læses som en spilcontroller, og hvad du så sætter kryds ved gælder kun for det. Dine indstillinger hidtil bliver ved den tilsluttede mus.",
+          "ar": "بعد إعادة تشغيل المتصفح، يقرأ layerling الفأرة ثلاثية الأبعاد كذراع ألعاب إلى أن تنقر «توصيل الفأرة ثلاثية الأبعاد» من جديد. وفي بعض الأجهزة تعمل الاتجاهات عندها بالعكس، فلا تعود الاتجاهات المحددة مناسبة. الآن يفصل layerling بين الطريقتين: في «الإعدادات» ← «التحكم» ← «الفأرة ثلاثية الأبعاد» يظهر سطر يقول متى تُقرأ الفأرة كذراع ألعاب، وما تحدّده عندها يسري على تلك الطريقة فقط. وتبقى إعداداتك السابقة مع الفأرة الموصولة."
         },
         "guide": {
           "section": "settingsView"
@@ -100,24 +114,28 @@
         "title": {
           "de": "Wenn die 3D-Ansicht nicht startet: klare Meldung",
           "en": "When the 3D view does not start: a clear message",
-          "da": "Når 3D-visningen ikke starter: en klar besked"
+          "da": "Når 3D-visningen ikke starter: en klar besked",
+          "ar": "عندما لا يبدأ العرض ثلاثي الأبعاد: رسالة واضحة"
         },
         "body": {
           "de": "Gibt der Browser layerling keinen Zugriff auf die Grafik (WebGL), erschien bisher nur „layerling ist auf einen Fehler gestoßen“. Jetzt sagt das Fenster, was los ist: Die Ursache liegt im Browser oder im Grafiktreiber, deine Entwürfe bleiben erhalten. Darunter steht, was meistens hilft: Browser oder Rechner neu starten, die Grafikbeschleunigung einschalten, Browser und Grafiktreiber aktualisieren oder einen anderen Browser versuchen. Den zuletzt gespeicherten Stand kannst du dort weiter als .lyl sichern.",
           "en": "When the browser gives layerling no access to the graphics (WebGL), all you saw was \"layerling ran into an error\". The window now says what is going on: the cause lies in the browser or the graphics driver, and your designs are kept. Below that it lists what usually helps: restart the browser or the computer, turn on graphics acceleration, update the browser and the graphics driver, or try another browser. You can still save the last stored state as a .lyl file from there.",
-          "da": "Når browseren ikke giver layerling adgang til grafikken (WebGL), så du kun fik \"layerling løb ind i en fejl\". Nu siger vinduet, hvad der sker: årsagen ligger i browseren eller i grafikdriveren, og dine designs er bevaret. Under det står der, hvad der som regel hjælper: genstart browseren eller computeren, slå grafikacceleration til, opdater browseren og grafikdriveren, eller prøv en anden browser. Du kan stadig gemme den sidst gemte tilstand som en .lyl-fil derfra."
+          "da": "Når browseren ikke giver layerling adgang til grafikken (WebGL), så du kun fik \"layerling løb ind i en fejl\". Nu siger vinduet, hvad der sker: årsagen ligger i browseren eller i grafikdriveren, og dine designs er bevaret. Under det står der, hvad der som regel hjælper: genstart browseren eller computeren, slå grafikacceleration til, opdater browseren og grafikdriveren, eller prøv en anden browser. Du kan stadig gemme den sidst gemte tilstand som en .lyl-fil derfra.",
+          "ar": "عندما لا يمنح المتصفح layerling الوصول إلى الرسوميات (WebGL)، كان كل ما تراه «layerling ran into an error». الآن تقول النافذة ما يحدث: السبب في المتصفح أو في برنامج تشغيل بطاقة الرسوميات، وتصاميمك محفوظة. وتحت ذلك قائمة بما يفيد في الغالب: إعادة تشغيل المتصفح أو الحاسوب، وتفعيل تسريع الرسوميات، وتحديث المتصفح وبرنامج تشغيل بطاقة الرسوميات، أو تجربة متصفح آخر. ولا يزال بإمكانك من هناك حفظ آخر حالة مخزّنة كملف .lyl."
         }
       },
       {
         "title": {
           "de": "Druckplatten: Name auf Platte 1 und im Dateinamen",
           "en": "Build plates: name on plate 1 and in the file name",
-          "da": "Byggeplader: navn på plade 1 og i filnavnet"
+          "da": "Byggeplader: navn på plade 1 og i filnavnet",
+          "ar": "ألواح الطباعة: الاسم على اللوح 1 وفي اسم الملف"
         },
         "body": {
           "de": "Hat die erste Druckplatte einen eigenen Namen, steht er jetzt auch auf der Platte, wie bei den weiteren Platten: „Platte 1: Deckel“, der Name des Entwurfs klein darüber. Wählst du im Exportfenster eine einzelne Platte, beginnt der Dateiname mit dem Namen dieser Platte statt mit dem des Entwurfs; eine Platte ohne Namen heißt „Entwurf - Platte 2“.",
           "en": "When the first build plate has a name of its own, it is now written on the plate as on the further plates: \"Plate 1: Lid\", with the design's name in small above it. And when you pick a single plate in the export window, the file name starts as that plate's name instead of the design's; a plate without a name becomes \"Design - Plate 2\".",
-          "da": "Når den første byggeplade har sit eget navn, står det nu også på pladen som på de andre plader: \"Plade 1: Låg\", med designets navn i lille skrift oven over. Og når du vælger én plade i eksportvinduet, begynder filnavnet med den plades navn i stedet for designets; en plade uden navn bliver \"Design - Plade 2\"."
+          "da": "Når den første byggeplade har sit eget navn, står det nu også på pladen som på de andre plader: \"Plade 1: Låg\", med designets navn i lille skrift oven over. Og når du vælger én plade i eksportvinduet, begynder filnavnet med den plades navn i stedet for designets; en plade uden navn bliver \"Design - Plade 2\".",
+          "ar": "عندما يكون للوح الطباعة الأول اسم خاص، يُكتب الآن على اللوح كما على الألواح الأخرى: «اللوح 1: الغطاء»، واسم التصميم بخط صغير فوقه. وعندما تختار لوحًا واحدًا في نافذة التصدير، يبدأ اسم الملف باسم ذلك اللوح بدل اسم التصميم؛ واللوح بلا اسم يصبح «التصميم - اللوح 2»."
         },
         "guide": {
           "section": "buildPlates"
@@ -127,12 +145,14 @@
         "title": {
           "de": "Objektliste: Name bei gesperrter Form",
           "en": "Object list: the name of a locked shape",
-          "da": "Objektliste: navnet på en låst form"
+          "da": "Objektliste: navnet på en låst form",
+          "ar": "قائمة الأجسام: اسم الشكل المقفل"
         },
         "body": {
           "de": "Ist bei einem Teil die Form gesperrt (das Schild), bleibt auch sein Name, wie er ist. Die Objektliste bot trotzdem den Stift an und öffnete das Namensfeld, nahm den neuen Namen dann aber nicht an. Jetzt fehlt der Stift bei solchen Teilen. Zum Umbenennen das Schild in der Zeile anklicken, dann ist die Form entsperrt.",
           "en": "When the shape of a part is locked (the shield), its name stays as it is too. The object list still offered the pencil and opened the name field, but then did not take the new name. The pencil is now left out for such parts. To rename one, click the shield in its row, which unlocks the shape.",
-          "da": "Når en dels form er låst (skjoldet), bliver dens navn også, som det er. Objektlisten tilbød stadig blyanten og åbnede navnefeltet, men tog så ikke det nye navn. Blyanten er nu væk for sådanne dele. Vil du omdøbe en del, klikker du på skjoldet i dens række, så bliver formen låst op."
+          "da": "Når en dels form er låst (skjoldet), bliver dens navn også, som det er. Objektlisten tilbød stadig blyanten og åbnede navnefeltet, men tog så ikke det nye navn. Blyanten er nu væk for sådanne dele. Vil du omdøbe en del, klikker du på skjoldet i dens række, så bliver formen låst op.",
+          "ar": "عندما يكون شكل القطعة مقفلًا (الدرع)، يبقى اسمها كما هو أيضًا. وكانت قائمة الأجسام لا تزال تعرض القلم وتفتح حقل الاسم، ثم لا تأخذ الاسم الجديد. الآن لا يظهر القلم لهذه القطع. ولإعادة تسمية إحداها، انقر الدرع في صفّها، فيُفتح قفل الشكل."
         },
         "guide": {
           "section": "objectList"
@@ -142,12 +162,14 @@
         "title": {
           "de": "Anleitung: genaue Wortfolge mit Anführungszeichen suchen",
           "en": "User guide: search for an exact phrase with quotation marks",
-          "da": "Brugervejledning: søg på en præcis ordlyd med anførselstegn"
+          "da": "Brugervejledning: søg på en præcis ordlyd med anførselstegn",
+          "ar": "دليل المستخدم: البحث عن عبارة بعينها بعلامات التنصيص"
         },
         "body": {
           "de": "Das Suchfeld der Anleitung versteht jetzt Anführungszeichen: \"auf dem Kreisbogen\" findet nur die Abschnitte, in denen diese Wörter genau so hintereinander stehen. Ein einzelnes Wort in Anführungszeichen wird nur als ganzes Wort gefunden. Bisher fand eine Suche mit Anführungszeichen gar nichts.",
           "en": "The search box of the user guide now understands quotation marks: \"circular arc\" finds only the sections where these words stand next to each other in this order. A single word in quotation marks is found only as a whole word. Until now a search with quotation marks found nothing at all.",
-          "da": "Søgeboksen i brugervejledningen forstår nu anførselstegn: \"cirkelbue\" finder kun de sektioner, hvor ordene står lige efter hinanden i den rækkefølge. Et enkelt ord i anførselstegn findes kun som helt ord. Før nu fandt en søgning med anførselstegn slet ingen ting."
+          "da": "Søgeboksen i brugervejledningen forstår nu anførselstegn: \"cirkelbue\" finder kun de sektioner, hvor ordene står lige efter hinanden i den rækkefølge. Et enkelt ord i anførselstegn findes kun som helt ord. Før nu fandt en søgning med anførselstegn slet ingen ting.",
+          "ar": "مربع البحث في دليل المستخدم يفهم الآن علامات التنصيص: \"قوس دائري\" يجد فقط الأقسام التي تأتي فيها هذه الكلمات متجاورة وبهذا الترتيب. والكلمة الواحدة بين علامتي تنصيص لا توجد إلا ككلمة كاملة. حتى الآن لم يكن البحث بعلامات التنصيص يجد شيئًا على الإطلاق."
         },
         "guide": {
           "section": "commandSearch"
@@ -157,12 +179,14 @@
         "title": {
           "de": "Griffe ausblenden mit Umschalt+Q",
           "en": "Hide the handles with Shift+Q",
-          "da": "Skjul håndtagene med Shift+Q"
+          "da": "Skjul håndtagene med Shift+Q",
+          "ar": "إخفاء المقابض بـ Shift+Q"
         },
         "body": {
           "de": "Bei sehr kleinen Teilen verdecken die Quadrate und Pfeile um die Auswahl leicht das, woran du gerade arbeitest. Umschalt+Q blendet alle Griffe aus und wieder ein, so wie Q die Maße und Abstände. Das Teil lässt sich weiter ziehen, und seine Maße tippst du rechts ein.\n\nDamit du auch ohne Griffe siehst, was ausgewählt ist, ist die ausgewählte Zeile in der Objektliste jetzt kräftiger eingefärbt und hat links einen orangen Balken.",
           "en": "On very small parts the squares and arrows around the selection easily cover what you are working on. Shift+Q hides all handles and shows them again, as Q does for the sizes and distances. You can still drag the part, and type its sizes at the right.\n\nSo that you see what is selected without the handles, the selected row in the object list now has a stronger colour and an orange bar at its left.",
-          "da": "På meget små dele dækker firkanterne og pilene omkring markeringen let det, du arbejder på. Shift+Q skjuler alle håndtag og viser dem igen, som Q gør for målene og afstandene. Du kan stadig trække delen og skrive dens mål til højre.\n\nSå du kan se, hvad der er valgt, uden håndtagene, har den valgte række i objektlisten nu en stærkere farve og en orange stribe til venstre."
+          "da": "På meget små dele dækker firkanterne og pilene omkring markeringen let det, du arbejder på. Shift+Q skjuler alle håndtag og viser dem igen, som Q gør for målene og afstandene. Du kan stadig trække delen og skrive dens mål til højre.\n\nSå du kan se, hvad der er valgt, uden håndtagene, har den valgte række i objektlisten nu en stærkere farve og en orange stribe til venstre.",
+          "ar": "على القطع الصغيرة جدًا تغطي المربعات والأسهم حول التحديد بسهولة ما تعمل عليه. Shift+Q يخفي كل المقابض ويُظهرها من جديد، كما يفعل Q للأحجام والمسافات. ولا يزال بإمكانك سحب القطعة وكتابة أحجامها على اليمين.\n\nولكي ترى المحدد دون المقابض، صار للصف المحدد في قائمة الأجسام الآن لون أقوى وشريط برتقالي على يساره."
         },
         "guide": {
           "chapter": "measuring"
@@ -172,24 +196,28 @@
         "title": {
           "de": "Fehlermeldung bleibt bei den Knöpfen sichtbar",
           "en": "Error message stays in view with the buttons",
-          "da": "Fejlmeddelelsen bliver ved knapperne i syne"
+          "da": "Fejlmeddelelsen bliver ved knapperne i syne",
+          "ar": "رسالة الخطأ تبقى ظاهرة مع الأزرار"
         },
         "body": {
           "de": "In einem langen Werkzeugfenster, etwa beim Aushöhlen, blieben „Abbrechen“ und „Anwenden“ immer sichtbar, die Meldung, warum etwas nicht geht, stand aber ganz unten und war erst nach dem Herunterrollen zu sehen. Ein Klick schien dann nichts zu tun. Die Meldung steht jetzt direkt über den Knöpfen und bleibt dort sichtbar.",
           "en": "In a long tool panel, Hollow for example, Cancel and Apply always stayed in view, but the message why something cannot be done stood at the very bottom and only showed after scrolling down. A click then seemed to do nothing. The message now stands right above the buttons and stays in view there.",
-          "da": "I en lang værktøjsvindue som Hul for eksempel stod Annullér og Anvend altid i syne, men beskeden om, hvorfor noget ikke kan gøres, lå helt nede og kom først til syne, når du rullede ned. Et klik så derefter ud til at gøre intet. Beskeden står nu lige over knapperne og bliver der i syne."
+          "da": "I en lang værktøjsvindue som Hul for eksempel stod Annullér og Anvend altid i syne, men beskeden om, hvorfor noget ikke kan gøres, lå helt nede og kom først til syne, når du rullede ned. Et klik så derefter ud til at gøre intet. Beskeden står nu lige over knapperne og bliver der i syne.",
+          "ar": "في لوحة أداة طويلة، مثل «تفريغ»، كان «إلغاء» و«تطبيق» يبقيان ظاهرين دائمًا، لكن الرسالة التي تشرح لماذا لا يمكن فعل شيء كانت في الأسفل تمامًا ولا تظهر إلا بعد التمرير إلى الأسفل. فكانت النقرة تبدو كأنها لا تفعل شيئًا. الآن تقف الرسالة فوق الأزرار مباشرة وتبقى ظاهرة هناك."
         }
       },
       {
         "title": {
           "de": "Maßband misst sofort",
           "en": "Tape measure measures at once",
-          "da": "Målebåndet måler med det samme"
+          "da": "Målebåndet måler med det samme",
+          "ar": "شريط القياس يقيس فورًا"
         },
         "body": {
           "de": "Ein Klick auf das Maßband schaltet jetzt gleich „Maß hinzufügen“ ein: Maßband anklicken, ersten Punkt klicken, zweiten Punkt klicken, fertig. Bisher musste man nach dem Öffnen erst noch das Plus wählen.\n\nEin weiterer Klick auf das Plus legt das Werkzeug weg, die Schaltflächen bleiben offen – etwa um zwischendurch einen Körper auszuwählen. Sind die Maße ausgeblendet, öffnet sich das Maßband ohne eingeschaltetes Werkzeug, damit sie ausgeblendet bleiben.",
           "en": "A click on the tape measure now switches Add measurement on straight away: click the tape measure, click the first point, click the second, done. Until now you had to pick the plus after opening it.\n\nAnother click on the plus puts the tool down and leaves the buttons open, to select a body in between for example. If the measurements are hidden, the tape measure opens without the tool, so they stay hidden.",
-          "da": "Et klik på målebåndet tænder nu \"Tilføj mål\" med det samme: klik på målebåndet, klik på det første punkt, klik på det andet, færdig. Før nu skulle du trykke på plusknappen efter at have åbnet målebåndet.\n\nEt klik på plusknappen igen lægger værktøjet væk og lader knapperne være åbne, så du for eksempel kan vælge en del imellem. Er målingerne skjult, åbner målebåndet uden værktøjet, så de bliver skjult."
+          "da": "Et klik på målebåndet tænder nu \"Tilføj mål\" med det samme: klik på målebåndet, klik på det første punkt, klik på det andet, færdig. Før nu skulle du trykke på plusknappen efter at have åbnet målebåndet.\n\nEt klik på plusknappen igen lægger værktøjet væk og lader knapperne være åbne, så du for eksempel kan vælge en del imellem. Er målingerne skjult, åbner målebåndet uden værktøjet, så de bliver skjult.",
+          "ar": "النقر على شريط القياس يفعّل الآن «إضافة قياس» مباشرة: انقر شريط القياس، ثم النقطة الأولى، ثم الثانية، وانتهى. حتى الآن كان عليك اختيار علامة الزائد بعد فتحه.\n\nونقرة أخرى على علامة الزائد تضع الأداة جانبًا وتترك الأزرار مفتوحة، لتحديد جسم في الأثناء مثلًا. وإذا كانت القياسات مخفية، يُفتح شريط القياس دون الأداة، فتبقى مخفية."
         },
         "guide": {
           "section": "tapeMeasure"
@@ -198,11 +226,13 @@
       {
         "title": {
           "de": "Verlauf bleibt nach Ändern im Feld erhalten",
-          "en": "History is kept after a change in a field"
+          "en": "History is kept after a change in a field",
+          "ar": "السجل يُحفظ بعد تغيير في حقل"
         },
         "body": {
           "de": "Wer ein Maß im Feld mit dem Mausrad oder den Pfeiltasten verstellt und den Tab danach schloss oder neu lud, ohne das Feld zu verlassen, fand den Entwurf beim nächsten Öffnen ohne Verlauf vor: Rückgängig und der Verlaufsblick waren leer. Dasselbe traf eine .lyl-Datei, die in diesem Moment mit Strg+S gespeichert wurde. Der Verlauf bleibt jetzt vollständig, und die letzte Änderung steht als eigener Schritt darin.\n\nEntwürfe, die ihren Verlauf auf diesem Weg schon verloren haben, bekommen ihn nicht zurück. Ihr aktueller Stand ist unverändert, und eine Gruppe lässt sich weiterhin auflösen oder mit „Gruppe bearbeiten“ öffnen.",
-          "en": "If you changed a measure in its field with the mouse wheel or the arrow keys and then closed or reloaded the tab without leaving the field, the design opened without its history the next time: Undo and the History view were empty. The same happened to a .lyl file saved with Ctrl+S in that moment. The history now stays complete, and the last change is a step of its own in it.\n\nDesigns that already lost their history this way do not get it back. Their current state is unchanged, and a group can still be ungrouped or opened with Edit group."
+          "en": "If you changed a measure in its field with the mouse wheel or the arrow keys and then closed or reloaded the tab without leaving the field, the design opened without its history the next time: Undo and the History view were empty. The same happened to a .lyl file saved with Ctrl+S in that moment. The history now stays complete, and the last change is a step of its own in it.\n\nDesigns that already lost their history this way do not get it back. Their current state is unchanged, and a group can still be ungrouped or opened with Edit group.",
+          "ar": "إذا غيّرت قياسًا في حقله بعجلة الفأرة أو بمفاتيح الأسهم ثم أغلقت علامة التبويب أو أعدت تحميلها دون مغادرة الحقل، كان التصميم يُفتح في المرة التالية بلا سجله: «تراجع» وعرض السجل فارغان. وكان الأمر نفسه يحدث لملف .lyl حُفظ بـ Ctrl+S في تلك اللحظة. الآن يبقى السجل كاملًا، ويكون التغيير الأخير خطوة مستقلة فيه.\n\nالتصاميم التي فقدت سجلها بهذه الطريقة لا تستعيده. حالتها الحالية لم تتغيّر، ولا يزال بالإمكان فك تجميع المجموعة أو فتحها بـ «تعديل المجموعة»."
         },
         "guide": {
           "section": "historyView"
@@ -212,12 +242,14 @@
         "title": {
           "de": "Lochmuster: Quadrate und Sechsecke drehen",
           "en": "Hole pattern: turn squares and hexagons",
-          "da": "Hulmønster: drej kvadrater og sekskanter"
+          "da": "Hulmønster: drej kvadrater og sekskanter",
+          "ar": "نمط الثقوب: تدوير المربعات والأشكال السداسية"
         },
         "body": {
           "de": "Der Regler „Winkel der Löcher“ im Lochmuster gilt jetzt auch für Quadrate und Sechsecke, nicht mehr nur für Rechtecke und Langlöcher. Ein Quadrat wird bei 45° zur Raute, ein Sechseck liegt bei 30° auf einer flachen Seite. Der Abstand passt sich an, sodass zwischen den gedrehten Löchern immer eine Wand bleibt.",
           "en": "The Angle of the holes slider in the hole pattern now works for squares and hexagons too, not only for rectangles and slots. A square at 45° is a diamond, a hexagon at 30° lies on a flat side. The spacing follows, so a wall always stays between the turned holes.",
-          "da": "Skyderen Vinkel på hullerne i hulmønsteret virker nu også for kvadrater og sekskanter, ikke kun for rektangler og slidser. Et kvadrat ved 45° bliver en rombe, en sekskant ved 30° ligger på en flad side. Afstanden følger med, så der altid bliver en væg mellem de drejede huller."
+          "da": "Skyderen Vinkel på hullerne i hulmønsteret virker nu også for kvadrater og sekskanter, ikke kun for rektangler og slidser. Et kvadrat ved 45° bliver en rombe, en sekskant ved 30° ligger på en flad side. Afstanden følger med, så der altid bliver en væg mellem de drejede huller.",
+          "ar": "شريط التمرير «زاوية الثقوب» في نمط الثقوب يعمل الآن للمربعات والأشكال السداسية أيضًا، لا للمستطيلات والشقوق فقط. المربع عند 45° معيّن، والسداسي عند 30° يستقر على ضلع مستوٍ. ويتبعه التباعد، فيبقى جدار دائمًا بين الثقوب المدوّرة."
         },
         "guide": {
           "section": "holePattern"
@@ -226,11 +258,13 @@
       {
         "title": {
           "de": "Lochmuster: ein Loch in der Mitte",
-          "en": "Hole pattern: a hole in the middle"
+          "en": "Hole pattern: a hole in the middle",
+          "ar": "نمط الثقوب: ثقب في المنتصف"
         },
         "body": {
           "de": "Ein Kranz von Löchern am Rand oder Befestigungslöcher können jetzt ein weiteres Loch in der Mitte der Fläche bekommen, etwa für die Abflusslöcher im Boden eines Blumentopfs. Der Haken „Ein Loch in der Mitte“ steht im Lochmuster bei „Am Rand“ und im Reiter „Befestigungslöcher“ und ist zunächst aus.\n\nDas Loch ist wie die anderen (Form, Lochart, Tiefe) und zählt bei der Anzahl nicht mit. Bei einfachen runden, quadratischen und sechseckigen Löchern lässt sich seine Größe eigens einstellen. Passt es nicht, weil die Mitte offen ist oder es den anderen zu nahe käme, wird es weggelassen, und eine Zeile sagt das.",
-          "en": "A ring of holes along the edge, or mounting holes, can now have one more hole in the middle of the face, for the drain holes in the floor of a plant pot, say. The box \"A hole in the middle\" is in the hole pattern under \"Along the edge\" and on the \"Mounting holes\" tab, and is off at first.\n\nThe hole is like the others (shape, hole type, depth) and does not count in their number. For plain round, square and hexagon holes its size can be set on its own. Where it does not fit, because the middle is open or it would come too close to the others, it is left out and a line says so."
+          "en": "A ring of holes along the edge, or mounting holes, can now have one more hole in the middle of the face, for the drain holes in the floor of a plant pot, say. The box \"A hole in the middle\" is in the hole pattern under \"Along the edge\" and on the \"Mounting holes\" tab, and is off at first.\n\nThe hole is like the others (shape, hole type, depth) and does not count in their number. For plain round, square and hexagon holes its size can be set on its own. Where it does not fit, because the middle is open or it would come too close to the others, it is left out and a line says so.",
+          "ar": "يمكن الآن لحلقة الثقوب على طول الحافة، أو لثقوب التثبيت، أن يكون لها ثقب إضافي في منتصف الوجه، لثقوب التصريف في قاع أصيص نبات مثلًا. خانة «ثقب في المنتصف» موجودة في نمط الثقوب تحت «على الحافة» وفي تبويب «ثقوب التثبيت»، وهي غير مفعّلة في البداية.\n\nالثقب مثل الثقوب الأخرى (الشكل ونوع الثقب والعمق) ولا يُحسب في عددها. وللثقوب الدائرية والمربعة والسداسية البسيطة يمكن ضبط حجمه وحده. وحيث لا يتسع، لأن المنتصف مفتوح أو لأنه سيقترب كثيرًا من الثقوب الأخرى، يُترك ويقول سطر ذلك."
         },
         "guide": {
           "section": "holePattern"
@@ -239,11 +273,13 @@
       {
         "title": {
           "de": "M3.5 in den Größenlisten",
-          "en": "M3.5 in the size lists"
+          "en": "M3.5 in the size lists",
+          "ar": "M3.5 في قوائم المقاسات"
         },
         "body": {
           "de": "M3.5 steht jetzt zwischen M3 und M4 zur Wahl: beim Gewinde (Stange, Schraube, Mutter und Gewindeloch, Steigung 0,6 mm), bei der Mutternaussparung des Sechskants, bei den Unterlegscheiben des Rohrs und als Schraubengröße von Senkbohrung, Doppelsenkung, Rosette und den Senkungen im Lochmuster.\n\nDie Stufenbohrung bietet M3.5 nicht an, weil es dafür keine genormte Zylinderschraube mit Innensechskant gibt; dort trägst du die Maße selbst ein.",
-          "en": "M3.5 is now offered between M3 and M4: for the thread (rod, screw, nut and tapped hole, pitch 0.6 mm), the nut pocket of the hexagon, the washers of the tube, and as a screw size of the countersink, the double countersink, the finishing washer and the countersunk holes of the hole pattern.\n\nThe counterbore does not offer M3.5, because there is no standard socket head cap screw of that size; there you type the measures yourself."
+          "en": "M3.5 is now offered between M3 and M4: for the thread (rod, screw, nut and tapped hole, pitch 0.6 mm), the nut pocket of the hexagon, the washers of the tube, and as a screw size of the countersink, the double countersink, the finishing washer and the countersunk holes of the hole pattern.\n\nThe counterbore does not offer M3.5, because there is no standard socket head cap screw of that size; there you type the measures yourself.",
+          "ar": "صار M3.5 متاحًا بين M3 وM4: للسن اللولبي (القضيب والبرغي والصامولة والثقب الملولب، بخطوة 0.6 مم)، ولجيب الصامولة في السداسي، ولحلقات الأنبوب، وكمقاس برغي في «ثقب غاطس» و«ثقب غاطس مزدوج» و«حلقة تشطيب» والثقوب الغاطسة في نمط الثقوب.\n\nأما «ثقب متدرج» فلا يعرض M3.5، لأنه لا يوجد برغي قياسي برأس أسطواني ومقبس سداسي بهذا المقاس؛ هناك تكتب القياسات بنفسك."
         },
         "guide": {
           "chapter": "threads"
@@ -252,11 +288,13 @@
       {
         "title": {
           "de": "Aushöhlen mit Vorschau",
-          "en": "Hollow with a preview"
+          "en": "Hollow with a preview",
+          "ar": "التفريغ مع معاينة"
         },
         "body": {
           "de": "Das Werkzeug Aushöhlen zeigt den Körper jetzt schon ausgehöhlt, solange sein Fenster offen ist. Änderst du die Wandstärke, die offenen Seiten oder eine der anderen Einstellungen, folgt die Vorschau einen Moment später. Ist keine Seite offen, wird der Körper durchsichtig gezeigt, damit du den Hohlraum siehst.\n\nGeändert wird erst mit „Aushöhlen“; „Abbrechen“ lässt den Körper, wie er war. Passt eine Einstellung nicht zum Körper, etwa eine zu dicke Wand, sagt es das Fenster sofort.",
-          "en": "The Hollow tool now shows the body hollowed while its window is open. Change the wall thickness, the open sides or one of the other settings, and the preview follows a moment later. With no side open the body is shown see-through, so you can see the cavity.\n\nNothing is changed until you click \"Hollow\"; \"Cancel\" leaves the body as it was. If a setting does not suit the body, a wall too thick for example, the window says so at once."
+          "en": "The Hollow tool now shows the body hollowed while its window is open. Change the wall thickness, the open sides or one of the other settings, and the preview follows a moment later. With no side open the body is shown see-through, so you can see the cavity.\n\nNothing is changed until you click \"Hollow\"; \"Cancel\" leaves the body as it was. If a setting does not suit the body, a wall too thick for example, the window says so at once.",
+          "ar": "تُظهر أداة «تفريغ» الآن الجسم مفرّغًا ما دامت نافذتها مفتوحة. غيّر سماكة الجدار أو الجوانب المفتوحة أو أحد الإعدادات الأخرى، فتتبعها المعاينة بعد لحظة. وإذا لم يكن أي جانب مفتوحًا يظهر الجسم شفافًا، فترى التجويف.\n\nلا يتغيّر شيء حتى تنقر «تفريغ»؛ و«إلغاء» يترك الجسم كما كان. وإذا كان إعداد لا يناسب الجسم، كجدار أسمك من اللازم مثلًا، تقول النافذة ذلك فورًا."
         },
         "guide": {
           "section": "hollowing"
@@ -265,11 +303,13 @@
       {
         "title": {
           "de": "Alle Formen einer Farbe auswählen",
-          "en": "Select all shapes of one colour"
+          "en": "Select all shapes of one colour",
+          "ar": "تحديد كل الأشكال بلون واحد"
         },
         "body": {
           "de": "In der Objektliste wählt ein Klick auf den Farbpunkt vor dem Namen jede sichtbare Form dieser Farbe aus, praktisch, wenn jede Baugruppe ihre eigene Farbe hat. Mit Strg (Cmd am Mac) oder Umschalt kommen sie zur Auswahl hinzu. „Gleiche Farbe auswählen“ im Rechtsklick-Menü und in der Befehlssuche (Strg+K) macht dasselbe für die Farben der ausgewählten Formen.",
-          "en": "In the object list, a click on the colour dot in front of a name selects every visible shape of that colour, handy when each component has a colour of its own. Ctrl (Cmd on a Mac) or Shift adds them to what is selected. \"Select same colour\" in the right-click menu and the command search (Ctrl+K) does the same for the colours of the selected shapes."
+          "en": "In the object list, a click on the colour dot in front of a name selects every visible shape of that colour, handy when each component has a colour of its own. Ctrl (Cmd on a Mac) or Shift adds them to what is selected. \"Select same colour\" in the right-click menu and the command search (Ctrl+K) does the same for the colours of the selected shapes.",
+          "ar": "في قائمة الأجسام، النقر على نقطة اللون أمام الاسم يحدد كل شكل ظاهر بذلك اللون، وهذا مفيد عندما يكون لكل مكوّن لونه الخاص. Ctrl (أو Cmd على Mac) أو Shift يضيفها إلى المحدد. و«تحديد اللون نفسه» في قائمة النقر بالزر الأيمن وفي البحث عن الأوامر (Ctrl+K) يفعل الشيء نفسه لألوان الأشكال المحددة."
         },
         "guide": {
           "section": "objectList"
@@ -278,11 +318,13 @@
       {
         "title": {
           "de": "Maßband zeigt die Dicke unter dem Mauszeiger",
-          "en": "Tape measure shows the thickness under the pointer"
+          "en": "Tape measure shows the thickness under the pointer",
+          "ar": "شريط القياس يُظهر السماكة تحت المؤشر"
         },
         "body": {
           "de": "Ist beim Maßband „Maß hinzufügen“ aktiv und noch kein Punkt gesetzt, zeigt das Zeigen auf eine Fläche, wie dick der Körper dort ist: senkrecht zur Fläche gerade hinein gemessen, bis das Material endet. Eine gestrichelte Linie zeigt, wo gemessen wird. So prüfst du Wände und Böden, indem du einfach mit der Maus über das Teil fährst. Ein Klick setzt wie bisher den ersten Messpunkt.",
-          "en": "With Add measurement active on the tape measure and no point placed yet, pointing at a face shows how thick the body is there: measured straight in, square to the face, to where the material ends. A dashed line shows where it measures. So you check walls and floors just by moving the mouse over the part. A click still sets the first measuring point as before."
+          "en": "With Add measurement active on the tape measure and no point placed yet, pointing at a face shows how thick the body is there: measured straight in, square to the face, to where the material ends. A dashed line shows where it measures. So you check walls and floors just by moving the mouse over the part. A click still sets the first measuring point as before.",
+          "ar": "عندما يكون «إضافة قياس» مفعّلًا في شريط القياس ولم تُوضع نقطة بعد، فإن الإشارة إلى وجه تُظهر سماكة الجسم هناك: مقيسة إلى الداخل مباشرة، عموديًا على الوجه، حتى تنتهي المادة. ويُظهر خط متقطع أين يقيس. وهكذا تفحص الجدران والقيعان بمجرد تحريك الفأرة فوق القطعة. والنقرة لا تزال تضع نقطة القياس الأولى كما كانت."
         },
         "guide": {
           "section": "tapeMeasure"
@@ -291,11 +333,13 @@
       {
         "title": {
           "de": "Gruppe übernimmt den Namen des benannten Teils",
-          "en": "A group takes the name of the named part"
+          "en": "A group takes the name of the named part",
+          "ar": "المجموعة تأخذ اسم الجزء المسمّى"
         },
         "body": {
           "de": "Hat beim Gruppieren oder Bündeln genau ein Teil einen eigenen Namen, heißt die neue Gruppe jetzt so, statt nur „Gruppe“ oder „Bündel“. So bleibt der Name in der Objektliste sichtbar. Haben mehrere Teile einen Namen, bleibt es beim alten Namen; die Teile behalten ihre Namen in der Gruppe.",
-          "en": "When exactly one part has a name of its own as you group or bundle, the new group is now called after it, instead of just Group or Bundle. So the name stays visible in the object list. With several named parts nothing changes; the parts keep their names inside the group."
+          "en": "When exactly one part has a name of its own as you group or bundle, the new group is now called after it, instead of just Group or Bundle. So the name stays visible in the object list. With several named parts nothing changes; the parts keep their names inside the group.",
+          "ar": "عندما يكون لجزء واحد بالضبط اسم خاص عند التجميع أو الحزم، تُسمّى المجموعة الجديدة الآن باسمه بدل «مجموعة» أو «حزمة» فقط. وهكذا يبقى الاسم ظاهرًا في قائمة الأجسام. ومع عدة أجزاء مسمّاة لا يتغيّر شيء؛ وتحتفظ الأجزاء بأسمائها داخل المجموعة."
         },
         "guide": {
           "section": "objectList"
@@ -305,12 +349,14 @@
         "title": {
           "de": "Gebogener Text rund um den ganzen Kreis",
           "en": "Curved text all the way round the circle",
-          "da": "Buet tekst hele vejen rundt om cirklen"
+          "da": "Buet tekst hele vejen rundt om cirklen",
+          "ar": "النص المنحني حول الدائرة كلها"
         },
         "body": {
           "de": "Gebogener Text ließ bisher immer eine Lücke zwischen Ende und Anfang, er nahm höchstens 84 % des Kreises ein. Mit dem neuen Schalter „Rund um den ganzen Kreis“ im Inspektor schließt er den Kreis: Die Buchstaben werden gleichmäßig rundherum verteilt, und der Abstand zwischen dem letzten und dem ersten ist derselbe wie zwischen den anderen. Praktisch für einen Datumsring von 1 bis 31, ein Zifferblatt oder eine Skala.\n\nDie Buchstaben behalten ihre Größe; nur ein Text, der für den Kreis zu lang ist, wird kleiner. Die Nahtstelle liegt der Textmitte gegenüber, mit Drehen verschiebst du sie.",
           "en": "Curved text always left a gap between its end and its start, it took at most 84 % of the circle. With the new switch \"All the way round\" in the inspector it closes the circle: the letters are spread evenly all the way round, and the gap between the last and the first is the same as between the others. Handy for a date ring from 1 to 31, a dial or a scale.\n\nThe letters keep their size; only a text too long for the circle gets smaller. The join lies opposite the middle of the text, turn the text to move it.",
-          "da": "Buet tekst efterlod altid et hul mellem slutningen og begyndelsen, den fyldte højst 84 % af cirklen. Med den nye kontakt \"Hele vejen rundt\" i inspektøren lukker den cirklen: bogstaverne fordeles jævnt hele vejen rundt, og afstanden mellem det sidste og det første er den samme som mellem de andre. Praktisk til en datoring fra 1 til 31, en urskive eller en skala.\n\nBogstaverne beholder deres størrelse; kun en tekst, der er for lang til cirklen, bliver mindre. Samlingen ligger over for tekstens midte, drej teksten for at flytte den."
+          "da": "Buet tekst efterlod altid et hul mellem slutningen og begyndelsen, den fyldte højst 84 % af cirklen. Med den nye kontakt \"Hele vejen rundt\" i inspektøren lukker den cirklen: bogstaverne fordeles jævnt hele vejen rundt, og afstanden mellem det sidste og det første er den samme som mellem de andre. Praktisk til en datoring fra 1 til 31, en urskive eller en skala.\n\nBogstaverne beholder deres størrelse; kun en tekst, der er for lang til cirklen, bliver mindre. Samlingen ligger over for tekstens midte, drej teksten for at flytte den.",
+          "ar": "كان النص المنحني يترك دائمًا فجوة بين نهايته وبدايته، فلا يأخذ أكثر من 84 % من الدائرة. ومع المفتاح الجديد «حول الدائرة كلها» في الخصائص يُغلق الدائرة: تتوزع الحروف بالتساوي حولها كلها، وتكون الفجوة بين الحرف الأخير والأول مثل الفجوات بين الحروف الأخرى. مفيد لحلقة تاريخ من 1 إلى 31، أو لقرص ساعة أو لتدريج.\n\nتحتفظ الحروف بحجمها؛ ولا يصغر إلا النص الأطول من الدائرة. ويقع موضع الالتقاء مقابل منتصف النص، أدر النص لتحريكه."
         },
         "guide": {
           "chapter": "text"
@@ -319,11 +365,13 @@
       {
         "title": {
           "de": "Mehrkant: flache Seite nach vorn",
-          "en": "Polygon: flat side in front"
+          "en": "Polygon: flat side in front",
+          "ar": "المضلع: ضلع مستوٍ في الأمام"
         },
         "body": {
           "de": "Ein Achtkant maß bisher von Ecke zu Ecke: Wer 26 mm eintrug, bekam zwischen den flachen Seiten nur 24 mm. Der Mehrkant hat jetzt unter „Seiten“ den Schalter „Flache Seite nach vorn“. Er dreht den Mehrkant um eine halbe Seite, sodass Länge und Breite beim Achtkant von Fläche zu Fläche gehen, wie die Schlüsselweite.\n\nBeim Umschalten bleibt der Körper, wie er ist, nur die beiden Zahlen ziehen mit. Ein Sechskant hat seine flachen Seiten dann vorn und hinten statt links und rechts.",
-          "en": "An octagon used to measure from corner to corner: type 26 mm and you got only 24 mm between its flat sides. The Polygon now has the switch “Flat side in front” under “Sides”. It turns the polygon by half a side, so an octagon's length and width run from flat to flat, like the size of a wrench.\n\nTurning the switch keeps the body as it is, only the two numbers change with it. A hexagon then has its flat sides in front and behind instead of left and right."
+          "en": "An octagon used to measure from corner to corner: type 26 mm and you got only 24 mm between its flat sides. The Polygon now has the switch “Flat side in front” under “Sides”. It turns the polygon by half a side, so an octagon's length and width run from flat to flat, like the size of a wrench.\n\nTurning the switch keeps the body as it is, only the two numbers change with it. A hexagon then has its flat sides in front and behind instead of left and right.",
+          "ar": "كان المثمّن يُقاس من زاوية إلى زاوية: تكتب 26 مم فلا تحصل إلا على 24 مم بين ضلعيه المستويين. الآن للمضلع المفتاح «ضلع مستوٍ في الأمام» تحت «الأضلاع». يدير المضلع بمقدار نصف ضلع، فيمتد طول المثمّن وعرضه من ضلع إلى ضلع، مثل مقاس مفتاح الربط.\n\nتغيير المفتاح يُبقي الجسم كما هو، ولا يتغيّر معه إلا الرقمان. ويصبح للسداسي عندها ضلعاه المستويان في الأمام والخلف بدل اليسار واليمين."
         },
         "guide": {
           "section": "addShape"
@@ -333,12 +381,14 @@
         "title": {
           "de": "Skizze: Koordinaten eines Punktes",
           "en": "Sketch: a point's coordinates",
-          "da": "Skitse: et punkts koordinater"
+          "da": "Skitse: et punkts koordinater",
+          "ar": "الرسم التخطيطي: إحداثيات النقطة"
         },
         "body": {
           "de": "Ruht der Mauszeiger in der Skizze auf einem Punkt, zeigt ein kleines Schild daneben sein X und Y. Beim Ziehen läuft es mit, so siehst du gleich, wo der Punkt landet. „Maße anzeigen“ blendet es mit den anderen Maßen aus.\n\nAußerdem bleibt ein Punkt jetzt liegen, wenn du ihn nur anklickst: Bisher konnte er dabei ein kleines Stück aufs Raster springen.",
           "en": "With the pointer resting on a point of a sketch, a small label beside it shows the point's X and Y. It follows the point while you drag it, so you see at once where it will land. \"Show measurements\" hides it with the other dimensions.\n\nAlso, a point now stays where it is when you only click it: until now it could jump a little, onto the grid.",
-          "da": "Når markøren hviler på et punkt i en skitse, viser en lille etiket ved siden af punktets X og Y. Den følger med, mens du trækker punktet, så du straks ser, hvor det lander. \"Vis mål\" skjuler den sammen med de andre mål.\n\nDesuden bliver et punkt nu liggende, når du kun klikker på det: hidtil kunne det springe et lille stykke hen på gitteret."
+          "da": "Når markøren hviler på et punkt i en skitse, viser en lille etiket ved siden af punktets X og Y. Den følger med, mens du trækker punktet, så du straks ser, hvor det lander. \"Vis mål\" skjuler den sammen med de andre mål.\n\nDesuden bliver et punkt nu liggende, når du kun klikker på det: hidtil kunne det springe et lille stykke hen på gitteret.",
+          "ar": "عندما يستقر المؤشر على نقطة في رسم تخطيطي، تُظهر لافتة صغيرة بجانبها قيمتي X وY للنقطة. وتتبع النقطة في أثناء سحبها، فترى فورًا أين ستستقر. و«إظهار القياسات» يخفيها مع الأبعاد الأخرى.\n\nكذلك تبقى النقطة الآن في مكانها عندما تنقرها فقط: حتى الآن كانت قد تقفز قليلًا إلى الشبكة."
         },
         "guide": {
           "chapter": "sketches"
@@ -347,11 +397,13 @@
       {
         "title": {
           "de": "Skizze bearbeiten warnt vor verlorenen Fasen",
-          "en": "Edit sketch warns about lost chamfers"
+          "en": "Edit sketch warns about lost chamfers",
+          "ar": "تعديل الرسم التخطيطي ينبّه إلى فقدان الشطف"
         },
         "body": {
           "de": "Öffnest du die Skizze eines Körpers, der schon Rundungen, Fasen oder eine Aushöhlung hat, sagt layerling jetzt gleich, dass sie beim Abschließen entfallen, weil der Körper neu entsteht. „Abbrechen“ behält sie. Nach dem Abschließen steht es noch einmal da, und „Rückgängig“ holt sie zurück.",
-          "en": "When you open the sketch of a body that already has fillets, chamfers or a hollowing, layerling now says right away that they go when you finish, because the body is built anew. Cancel keeps them. After finishing it says so again, and Undo brings them back."
+          "en": "When you open the sketch of a body that already has fillets, chamfers or a hollowing, layerling now says right away that they go when you finish, because the body is built anew. Cancel keeps them. After finishing it says so again, and Undo brings them back.",
+          "ar": "عندما تفتح الرسم التخطيطي لجسم فيه تنعيم أو شطف أو تفريغ، يقول layerling الآن فورًا إنها ستزول عند الإنهاء، لأن الجسم يُبنى من جديد. و«إلغاء» يُبقي عليها. وبعد الإنهاء يقول ذلك مرة أخرى، و«تراجع» يعيدها."
         },
         "guide": {
           "section": "sketchToBody"
@@ -361,12 +413,14 @@
         "title": {
           "de": "Liegende Formen: der Höhengriff bleibt oben",
           "en": "Shapes lying on their side: the height handle stays on top",
-          "da": "Former der ligger på siden: højdehåndtaget bliver øverst"
+          "da": "Former der ligger på siden: højdehåndtaget bliver øverst",
+          "ar": "الأشكال المستلقية على جانبها: مقبض الارتفاع يبقى في الأعلى"
         },
         "body": {
           "de": "Hast du eine Form um 90° auf die Seite gedreht, zeigte ihr Höhengriff zur Seite und die Eckgriffe standen in der Luft. Jetzt stehen die Griffe einer liegenden Form aufrecht auf der Arbeitsebene, wie in Tinkercad: Der Griff oben zieht sie in die Höhe, die Unterseite bleibt, wo sie ist, und die Griffe unten ändern die Maße entlang der Platte. Ein liegender Zylinder bleibt dabei rund.",
           "en": "A shape turned 90° onto its side had its height handle pointing sideways and its corner handles standing in the air. The handles of a shape lying on its side now stand upright on the workplane, as in Tinkercad: the handle on top pulls it up, the underside stays where it is, and the handles at the bottom change the sizes along the plate. A lying cylinder stays round.",
-          "da": "Havde du drejet en form 90° om på siden, pegede dens højdehåndtag til siden, og hjørnehåndtagene stod i luften. Nu står håndtagene på en form, der ligger på siden, oprejst på arbejdsplanet, som i Tinkercad: Håndtaget øverst trækker den op, undersiden bliver, hvor den er, og håndtagene forneden ændrer målene langs pladen. En liggende cylinder forbliver rund."
+          "da": "Havde du drejet en form 90° om på siden, pegede dens højdehåndtag til siden, og hjørnehåndtagene stod i luften. Nu står håndtagene på en form, der ligger på siden, oprejst på arbejdsplanet, som i Tinkercad: Håndtaget øverst trækker den op, undersiden bliver, hvor den er, og håndtagene forneden ændrer målene langs pladen. En liggende cylinder forbliver rund.",
+          "ar": "الشكل المُدار 90° على جانبه كان مقبض ارتفاعه يشير إلى الجانب ومقابض زواياه معلّقة في الهواء. الآن تقف مقابض الشكل المستلقي على جانبه قائمة على سطح العمل، كما في Tinkercad: المقبض في الأعلى يرفعه، والوجه السفلي يبقى في مكانه، والمقابض في الأسفل تغيّر الأحجام على امتداد اللوحة. وتبقى الأسطوانة المستلقية مستديرة."
         },
         "guide": {
           "chapter": "shapes"
@@ -376,12 +430,14 @@
         "title": {
           "de": "Bild-Textur: Zeichnungen als PNG ohne Stufen",
           "en": "Image texture: PNG drawings without steps",
-          "da": "Billedtekstur: PNG-tegninger uden trin"
+          "da": "Billedtekstur: PNG-tegninger uden trin",
+          "ar": "نسيج الصورة: رسومات PNG بلا درجات"
         },
         "body": {
           "de": "Eine Strichzeichnung oder ein Logo als PNG oder JPEG, einmal aufgedrückt, wird jetzt wie eine SVG entlang der Umrisse geschnitten: schräge Linien und Kurven werden glatt statt treppig. Lade das Bild in einem älteren Entwurf einfach noch einmal.",
           "en": "A line drawing or a logo as a PNG or JPEG, pressed on once, is now cut along its outlines like an SVG: slanted lines and curves come out smooth instead of stepped. In an older design, simply load the picture again.",
-          "da": "En stregtegning eller et logo som PNG eller JPEG, trykt på én gang, skæres nu langs konturerne som en SVG: skrå linjer og kurver bliver glatte i stedet for trappede. I et ældre design indlæser du bare billedet igen."
+          "da": "En stregtegning eller et logo som PNG eller JPEG, trykt på én gang, skæres nu langs konturerne som en SVG: skrå linjer og kurver bliver glatte i stedet for trappede. I et ældre design indlæser du bare billedet igen.",
+          "ar": "الرسم الخطي أو الشعار بصيغة PNG أو JPEG، المضغوط على الوجه مرة واحدة، يُقطع الآن على امتداد حدوده الخارجية مثل SVG: تخرج الخطوط المائلة والمنحنيات ناعمة بدل أن تكون متدرّجة. وفي تصميم أقدم، حمّل الصورة من جديد ببساطة."
         },
         "guide": {
           "chapter": "shapes"
@@ -391,12 +447,14 @@
         "title": {
           "de": "Neue Oberflächentextur: Hammerschlag",
           "en": "New surface texture: Hammered",
-          "da": "Ny overfladetekstur: Hamret"
+          "da": "Ny overfladetekstur: Hamret",
+          "ar": "نسيج سطح جديد: مطروق"
         },
         "body": {
           "de": "Runde, sich überlappende Dellen wie auf einem handgehämmerten Kupferbecher, jede etwas anders groß und tief. Du findest sie unter Oberflächentextur; „Dellengröße“ bestimmt, wie stark sie sich überlappen, und „Anordnung“ verteilt sie neu.",
           "en": "Round, overlapping dents like on a hand-hammered copper mug, each a little different in size and depth. You find it under Surface texture; Dent size sets how much they overlap, and Arrangement lays them out anew.",
-          "da": "Runde, overlappende buler som på et håndhamret kobberkrus, hver lidt forskellig i størrelse og dybde. Du finder den under Overfladetekstur; bulestørrelsen bestemmer, hvor meget de overlapper, og arrangementet fordeler dem på ny."
+          "da": "Runde, overlappende buler som på et håndhamret kobberkrus, hver lidt forskellig i størrelse og dybde. Du finder den under Overfladetekstur; bulestørrelsen bestemmer, hvor meget de overlapper, og arrangementet fordeler dem på ny.",
+          "ar": "حُفَر مستديرة متداخلة كما على كوب نحاسي مطروق باليد، كل واحدة بحجم وعمق مختلفين قليلًا. تجده تحت «نسيج السطح»؛ «حجم الحُفَر (%)» يحدد مقدار تداخلها، و«الترتيب» يوزعها من جديد."
         },
         "guide": {
           "chapter": "shapes"
@@ -406,12 +464,14 @@
         "title": {
           "de": "Schraube teilen: Filament als Stifte",
           "en": "Split a screw: filament as the pins",
-          "da": "Del en skrue: filament som stifter"
+          "da": "Del en skrue: filament som stifter",
+          "ar": "تقسيم برغي: خيط الطباعة كدبابيس"
         },
         "body": {
           "de": "Beim Längs-Teilen einer Schraube oder Gewindestange ab M4 können Stücke 1,75-mm-Filament die Stifte sein, auch wo gedruckte Stifte nicht hineinpassen. Hake „Filament als Stifte“ an; die Meldung sagt, wie lang du die Stücke abschneidest.",
           "en": "When you split a screw or threaded rod lengthwise, from M4 up, pieces of 1.75 mm filament can be the pins, even where printed pins do not fit. Tick Filament as pins; the message tells you how long to cut the pieces.",
-          "da": "Når du deler en skrue eller gevindstang på langs, fra M4 og op, kan stykker af 1,75 mm filament være stifterne, også hvor printede stifter ikke passer. Sæt flueben ved Filament som stifter; beskeden fortæller, hvor lange stykkerne skal klippes."
+          "da": "Når du deler en skrue eller gevindstang på langs, fra M4 og op, kan stykker af 1,75 mm filament være stifterne, også hvor printede stifter ikke passer. Sæt flueben ved Filament som stifter; beskeden fortæller, hvor lange stykkerne skal klippes.",
+          "ar": "عندما تقسم برغيًا أو قضيبًا ملولبًا طوليًا، من M4 فما فوق، يمكن لقطع من خيط طباعة 1.75 مم أن تكون الدبابيس، حتى حيث لا تتسع الدبابيس المطبوعة. فعّل «خيط الطباعة كدبابيس (1.75 مم)»؛ وتخبرك الرسالة بطول القطع التي تقصّها."
         },
         "guide": {
           "chapter": "threads"
@@ -421,12 +481,14 @@
         "title": {
           "de": "Gussform: Einguss und Entlüftungen selbst setzen",
           "en": "Mold: set the pour opening and the vents yourself",
-          "da": "Støbeform: sæt indløb og luftkanaler selv"
+          "da": "Støbeform: sæt indløb og luftkanaler selv",
+          "ar": "القالب: ضع فتحة الصب وفتحات التهوية بنفسك"
         },
         "body": {
           "de": "Bei der zweiteiligen Gussform kannst du mit „Öffnungen selbst setzen“ bestimmen, wo das Material hineinläuft und die Luft entweicht: Klick aufs Urmodell setzt einen Einguss oder eine Entlüftung, ein Klick auf ihren Stab nimmt sie weg. „Vorschläge übernehmen“ gibt dir die automatischen als Anfang.",
           "en": "For the two-part mold, Set the openings myself lets you decide where the material runs in and the air escapes: a click on the master sets a sprue or a vent, a click on its post takes it away. Take over the suggested ones gives you the automatic ones as a start.",
-          "da": "Ved den todelte støbeform kan du med Sæt åbningerne selv bestemme, hvor materialet løber ind, og luften slipper ud: et klik på originalen sætter et indløb eller en luftkanal, et klik på dens stav fjerner den igen. De foreslåede åbninger kan du overtage som udgangspunkt."
+          "da": "Ved den todelte støbeform kan du med Sæt åbningerne selv bestemme, hvor materialet løber ind, og luften slipper ud: et klik på originalen sætter et indløb eller en luftkanal, et klik på dens stav fjerner den igen. De foreslåede åbninger kan du overtage som udgangspunkt.",
+          "ar": "في القالب من نصفين، يتيح لك «أضع الفتحات بنفسي» أن تقرر أين تدخل المادة وأين يخرج الهواء: النقر على النموذج الأصلي يضع مجرى صب أو فتحة تهوية، والنقر على عمودها يزيلها. و«اعتماد المقترحة» يعطيك الفتحات التلقائية كبداية."
         },
         "guide": {
           "section": "mold"
@@ -436,12 +498,14 @@
         "title": {
           "de": "Magnet-Taschen",
           "en": "Magnet pockets",
-          "da": "Magnetlommer"
+          "da": "Magnetlommer",
+          "ar": "جيوب المغناطيس"
         },
         "body": {
           "de": "Neu in der Formenbibliothek unter Löcher & Ausschnitte: die Magnet-Tasche. Klick auf eine Stelle, und layerling schneidet eine Tasche für einen runden Magneten mit Klebermulde darunter, auf Wunsch gleich auch im Gegenstück. Beim Teilen gibt es Magnete jetzt auch als Verbinder.",
           "en": "New in the shape library under Holes & cut-outs: the Magnet pocket. Click a spot and layerling cuts a pocket for a round magnet with a glue well below it, and if you like the matching one in the part that meets it. Split now offers magnets as connectors too.",
-          "da": "Nyt i formbiblioteket under Huller og udskæringer: Magnetlommen. Klik på et sted, så skærer layerling en lomme til en rund magnet med en limbrønd nedenunder, og hvis du vil, også den modsvarende i delen, der møder den. Ved opdeling kan magneter nu også være forbindelser."
+          "da": "Nyt i formbiblioteket under Huller og udskæringer: Magnetlommen. Klik på et sted, så skærer layerling en lomme til en rund magnet med en limbrønd nedenunder, og hvis du vil, også den modsvarende i delen, der møder den. Ved opdeling kan magneter nu også være forbindelser.",
+          "ar": "جديد في مكتبة الأشكال تحت «الثقوب والفتحات»: «جيب مغناطيس». انقر موضعًا فيقطع layerling جيبًا لمغناطيس دائري مع حفرة للغراء تحته، وإن شئت الجيب المطابق في القطعة الملامسة له. وصار «تقسيم» يعرض المغناطيسات كوصلات أيضًا."
         },
         "guide": {
           "section": "magnetPocket"
@@ -450,11 +514,13 @@
       {
         "title": {
           "de": "Skizze: gehaltene Pfeiltaste ohne Nachlaufen",
-          "en": "Sketch: a held arrow key without lag"
+          "en": "Sketch: a held arrow key without lag",
+          "ar": "الرسم التخطيطي: مفتاح سهم مضغوط بلا تأخير"
         },
         "body": {
           "de": "Hältst du in der Skizze eine Pfeiltaste gedrückt, folgt die Auswahl jetzt der Taste und bleibt stehen, sobald du loslässt. Bei großen Umrissen hinkte sie bisher weit hinterher und lief nach dem Loslassen noch lange weiter. Ein gehaltener Lauf bleibt ein Schritt beim Rückgängigmachen.",
-          "en": "When you hold an arrow key in the sketch, the selection now follows the key and stops as soon as you let go. On large outlines it used to lag far behind and kept moving long after the key was released. A held run is still one step of Undo."
+          "en": "When you hold an arrow key in the sketch, the selection now follows the key and stops as soon as you let go. On large outlines it used to lag far behind and kept moving long after the key was released. A held run is still one step of Undo.",
+          "ar": "عندما تضغط مفتاح سهم مطوّلًا في الرسم التخطيطي، يتبع التحديد الآن المفتاح ويتوقف فور رفع إصبعك. وفي الحدود الخارجية الكبيرة كان يتأخر كثيرًا ويستمر في الحركة طويلًا بعد ترك المفتاح. ولا تزال الضغطة المطوّلة خطوة واحدة في «تراجع»."
         }
       }
     ]
@@ -466,24 +532,28 @@
         "title": {
           "de": "Verschieben bis an die Wand",
           "en": "Move right up to the wall",
-          "da": "Flyt helt op til væggen"
+          "da": "Flyt helt op til væggen",
+          "ar": "التحريك حتى الجدار تمامًا"
         },
         "body": {
           "de": "Ziehst du ein Teil, rastet es jetzt auch an der Wand ein, auf die es trifft, selbst an der Innenwand eines Kastens oder Gehäuses. So sitzt ein Teil bündig in der Ecke eines Gehäuses, ohne dass du nachmessen musst.",
           "en": "When you drag a part, it now also snaps to the wall it runs into, even the inside wall of a box or case. So a part sits flush in the corner of a case, without measuring.",
-          "da": "Når du trækker en del, snapper den nu også til den væg, den løber ind i, også indervæggen i en kasse eller et kabinet. Så sidder en del tæt inde i hjørnet af et kabinet, uden at måle."
+          "da": "Når du trækker en del, snapper den nu også til den væg, den løber ind i, også indervæggen i en kasse eller et kabinet. Så sidder en del tæt inde i hjørnet af et kabinet, uden at måle.",
+          "ar": "عندما تسحب قطعة، تلتقط الآن أيضًا إلى الجدار الذي تصطدم به، حتى الجدار الداخلي لصندوق أو علبة. وهكذا تستقر القطعة ملاصقة تمامًا في زاوية العلبة، دون قياس."
         }
       },
       {
         "title": {
           "de": "Lochmuster bis an die Kante",
           "en": "Hole pattern right to the edge",
-          "da": "Hulmønster helt ud til kanten"
+          "da": "Hulmønster helt ud til kanten",
+          "ar": "نمط الثقوب حتى الحافة"
         },
         "body": {
           "de": "Steht der Rand beim Lochmuster auf 0, schneidet die Kante die Löcher an, statt sie wegzulassen: Gitter und Waben laufen bis zum Rand. Ein neuer Regler „Rahmen am Rand“ lässt dort bei Bedarf einen festen Rahmen stehen, und das Raster wird so gelegt, dass möglichst wenige dünne Reststege entstehen.",
           "en": "With the margin at 0, the hole pattern's edge now cuts the holes off instead of leaving them out, so a grille or a honeycomb runs right to the edge. A new slider \"Frame along the edge\" keeps a solid frame there if you want one, and the lattice is laid so as few thin strips as possible are left.",
-          "da": "Når marginen er 0, skærer fladens kant nu hullerne af i stedet for at lade dem væk, så mønsteret går helt ud til kanten. En ny skyder \"Ramme langs kanten\" holder en massiv ramme der, hvis du vil have en, og gitteret lægges, så der efterlades færrest mulige tynde strimler."
+          "da": "Når marginen er 0, skærer fladens kant nu hullerne af i stedet for at lade dem væk, så mønsteret går helt ud til kanten. En ny skyder \"Ramme langs kanten\" holder en massiv ramme der, hvis du vil have en, og gitteret lægges, så der efterlades færrest mulige tynde strimler.",
+          "ar": "عندما يكون الهامش 0، تقطع حافة نمط الثقوب الآن الثقوب بدل أن تتركها، فتمتد الشبكة أو خلية النحل حتى الحافة. وشريط تمرير جديد «إطار على طول الحافة» يُبقي إطارًا صلبًا هناك إن أردت، وتوضع الشبكة بحيث يبقى أقل عدد ممكن من الشرائط الرقيقة."
         },
         "guide": {
           "section": "holePattern"
@@ -493,12 +563,14 @@
         "title": {
           "de": "Lochmuster mit Deckschicht in zweiter Farbe",
           "en": "Hole pattern with a top layer in a second colour",
-          "da": "Hulmønster med et øverste lag i en anden farve"
+          "da": "Hulmønster med et øverste lag i en anden farve",
+          "ar": "نمط الثقوب مع طبقة علوية بلون ثانٍ"
         },
         "body": {
           "de": "Beim Lochmuster kann die oberste Schicht ein Netz in einer zweiten Farbe sein, mit der eigenen Farbe des Körpers in den Löchern. So bleibt die Fläche eben und beide Farben beginnen auf den ersten Schichten, ohne Stützen. Das 3MF enthält die beiden als getrennte Körper.",
           "en": "In the hole pattern, the top layer can be a net in a second colour, with the body's own colour in the holes. So the face stays flat and both colours start on the first layers, without supports. The 3MF holds the two as separate bodies.",
-          "da": "I hulmønsteret kan det øverste lag være et net i en anden farve, med legemets egen farve i hullerne. Så forbliver fladen plan, og begge farver begynder på de første lag, uden støtte. 3MF-filen har de to som separate legemer."
+          "da": "I hulmønsteret kan det øverste lag være et net i en anden farve, med legemets egen farve i hullerne. Så forbliver fladen plan, og begge farver begynder på de første lag, uden støtte. 3MF-filen har de to som separate legemer.",
+          "ar": "في نمط الثقوب يمكن أن تكون الطبقة العلوية شبكة بلون ثانٍ، ولون الجسم نفسه في الثقوب. وهكذا يبقى الوجه مستويًا ويبدأ اللونان كلاهما في الطبقات الأولى، دون دعامات. ويحفظ ملف 3MF الاثنين جسمين منفصلين."
         },
         "guide": {
           "section": "holePattern"
@@ -508,12 +580,14 @@
         "title": {
           "de": "Farbe jedes Teils im Inspektor",
           "en": "Each part's colour in the inspector",
-          "da": "Delenes farver i egenskabspanelet"
+          "da": "Delenes farver i egenskabspanelet",
+          "ar": "لون كل جزء في الخصائص"
         },
         "body": {
           "de": "Bei einer Gruppe oder einem Bündel mit Mehrfarbig zeigt der Inspektor jetzt die Teile mit je einem Farbfeld. So färbst du ein Teil um, ohne die Gruppe zu öffnen, und das Netz im Zweifarben-Lochmuster verschwindet nicht mehr in der Farbe des Grundkörpers.",
           "en": "For a group or bundle under Multicolor, the inspector now lists the parts, each with a colour swatch. So you can recolour one part without opening the group, and the net of a two-colour hole pattern no longer vanishes into the base's colour.",
-          "da": "For en gruppe eller et bundt med Multifarve viser egenskabspanelet nu delene, hver med et farvefelt. Så kan du omfarve én del uden at åbne gruppen, og nettet i et tofarvet hulmønster forsvinder ikke længere i grundlegemets farve."
+          "da": "For en gruppe eller et bundt med Multifarve viser egenskabspanelet nu delene, hver med et farvefelt. Så kan du omfarve én del uden at åbne gruppen, og nettet i et tofarvet hulmønster forsvinder ikke længere i grundlegemets farve.",
+          "ar": "لمجموعة أو حزمة تحت «متعدد الألوان»، تعرض الخصائص الآن الأجزاء، لكل منها عيّنة لون. وهكذا يمكنك إعادة تلوين جزء دون فتح المجموعة، ولم تعد شبكة نمط الثقوب ذي اللونين تختفي في لون القاعدة."
         },
         "guide": {
           "section": "colorCard"
@@ -523,12 +597,14 @@
         "title": {
           "de": "Scharnier-Deckel: Filament passt leichter",
           "en": "Hinged lid: filament fits more easily",
-          "da": "Hængslet låg: filamentet passer lettere"
+          "da": "Hængslet låg: filamentet passer lettere",
+          "ar": "الغطاء بمفصلة: خيط الطباعة يدخل بسهولة أكبر"
         },
         "body": {
           "de": "Beim Scharnier-Deckel saß der Stift aus Filament in den Löchern des Körpers oft zu stramm oder ging gar nicht hinein. Die Löcher sind jetzt etwas größer: bei den Standardwerten 0,1 mm pro Seite statt 0,05 mm. Braucht dein Drucker mehr Luft, folgt das Loch dem Spiel aus dem Passungstest. Der Stift sitzt im Körper weiter fester als im Deckel, rutscht also nicht heraus.",
           "en": "With a hinged lid, the pin made from a piece of filament often sat too tight in the body's holes, or would not go in at all. The holes are now a little larger: 0.1 mm per side with the default settings instead of 0.05 mm. If your printer needs more room, the hole follows the play from the fit test. The pin still sits tighter in the body than in the lid, so it does not slide out.",
-          "da": "Med et hængslet låg sad stiften, der er lavet af et stykke filament, ofte for stramt i kroppens huller, eller den ville slet ikke gå ind. Hullerne er nu lidt større: 0,1 mm pr. side med standardindstillingerne i stedet for 0,05 mm. Hvis din printer skal have mere plads, følger hullet spillerummet fra pasprøven. Stiften sidder stadig strammere i kroppen end i låget, så den glider ikke ud."
+          "da": "Med et hængslet låg sad stiften, der er lavet af et stykke filament, ofte for stramt i kroppens huller, eller den ville slet ikke gå ind. Hullerne er nu lidt større: 0,1 mm pr. side med standardindstillingerne i stedet for 0,05 mm. Hvis din printer skal have mere plads, følger hullet spillerummet fra pasprøven. Stiften sidder stadig strammere i kroppen end i låget, så den glider ikke ud.",
+          "ar": "في الغطاء بمفصلة، كان الدبوس المصنوع من قطعة خيط طباعة يركب في الغالب بإحكام زائد في ثقوب الجسم، أو لا يدخل إطلاقًا. الآن صارت الثقوب أكبر قليلًا: 0.1 مم لكل جانب بالإعدادات الافتراضية بدل 0.05 مم. وإذا كانت طابعتك تحتاج إلى خلوص أكبر، يتبع الثقب الخلوص من اختبار الملاءمة. ولا يزال الدبوس أشد إحكامًا في الجسم منه في الغطاء، فلا ينزلق خارجًا."
         },
         "guide": {
           "section": "lid"
@@ -538,12 +614,14 @@
         "title": {
           "de": "19-Zoll-Rack-Löcher",
           "en": "19″ rack holes",
-          "da": "Huller til 19″-rack"
+          "da": "Huller til 19″-rack",
+          "ar": "ثقوب حامل 19″"
         },
         "body": {
           "de": "Bei den Befestigungslöchern gibt es jetzt neben „Schrauben“ auch „19″-Rack“: vier Langlöcher in den Ecken einer Frontplatte, genau im Abstand der Rack-Schienen. Die Höhe passt sich der Platte an oder folgt einer Normplatte von 1U bis 6U. Eine Zeile zeigt, wo die Löcher gelandet sind.",
           "en": "The mounting holes now offer \"19″ rack\" next to \"Screws\": four slots in the corners of a front panel, exactly where a rack's rails have their holes. The height is fitted to the panel or follows a standard 1U to 6U panel. A line shows where the holes came out.",
-          "da": "Fanen Monteringshuller har nu \"19″-rack\" ved siden af \"Skruer\": fire aflange huller i hjørnerne af en frontplade, lige dér hvor rackets skinner har deres huller. Højden tilpasses pladen eller følger en standardpanel fra 1U til 6U. En linje viser, hvor hullerne kom ud."
+          "da": "Fanen Monteringshuller har nu \"19″-rack\" ved siden af \"Skruer\": fire aflange huller i hjørnerne af en frontplade, lige dér hvor rackets skinner har deres huller. Højden tilpasses pladen eller følger en standardpanel fra 1U til 6U. En linje viser, hvor hullerne kom ud.",
+          "ar": "تعرض ثقوب التثبيت الآن «حامل 19″» بجانب «البراغي»: أربعة شقوق في زوايا اللوحة الأمامية، بالضبط حيث توجد ثقوب قضبان الحامل. ويُضبط الارتفاع على اللوحة أو يتبع لوحة قياسية من 1U إلى 6U. ويُظهر سطر أين وقعت الثقوب."
         },
         "guide": {
           "section": "holePattern"
@@ -553,12 +631,14 @@
         "title": {
           "de": "Nur die Auswahl als LYL speichern",
           "en": "Save only the selection as LYL",
-          "da": "Gem kun de valgte objekter som LYL"
+          "da": "Gem kun de valgte objekter som LYL",
+          "ar": "حفظ المحدد فقط كملف LYL"
         },
         "body": {
           "de": "Im Exportfenster kann die LYL-Datei jetzt nur die ausgewählten Objekte enthalten, als neuen Entwurf ohne Verlauf, Notizen und Anhänge. Dein Entwurf bleibt mit seiner Datei verbunden. Praktisch für Teile, die du in einer Bibliothek aufhebst und mit „Aus Design einfügen“ wieder holst.",
           "en": "In the export window, the LYL file can now hold only the selected objects, as a new design without history, notes or attachments. Your design stays tied to its own file. Handy for parts you keep in a library and bring back with Insert from design.",
-          "da": "I eksportvinduet kan LYL-filen nu rumme kun de valgte objekter, som et eget design uden historik, noter eller vedhæftede filer. Dit design forbliver knyttet til sin egen fil. Praktisk for dele, du opbevarer i et bibliotek og henter frem igen med \"Indsæt i dette design\"."
+          "da": "I eksportvinduet kan LYL-filen nu rumme kun de valgte objekter, som et eget design uden historik, noter eller vedhæftede filer. Dit design forbliver knyttet til sin egen fil. Praktisk for dele, du opbevarer i et bibliotek og henter frem igen med \"Indsæt i dette design\".",
+          "ar": "في نافذة التصدير يمكن لملف LYL الآن أن يضم الأجسام المحددة فقط، كتصميم جديد بلا سجل ولا ملاحظات ولا مرفقات. ويبقى تصميمك مرتبطًا بملفه. مفيد للقطع التي تحتفظ بها في مكتبة وتعيدها بـ «إدراج في هذا التصميم»."
         },
         "guide": {
           "chapter": "files"
@@ -573,12 +653,14 @@
         "title": {
           "de": "Gussform: Öffnungsrichtung, Material und Luftblasen",
           "en": "Mold & die: opening direction, material and air traps",
-          "da": "Støbeform & prægestempel: åbningsretning, materiale og luftlommer"
+          "da": "Støbeform & prægestempel: åbningsretning, materiale og luftlommer",
+          "ar": "القالب والمكبس: اتجاه الفتح والمادة وجيوب الهواء"
         },
         "body": {
           "de": "Das Werkzeug „Gussform und Stempel“ schlägt jetzt die beste Öffnungsrichtung vor: Jede Richtung zeigt, wie viel der Oberfläche hängen bleiben würde, und Hinterschnitte sind rot auf dem Modell. Dazu kommt eine freie Richtung, die du an einem Griff im Bild drehst, und ein Gussmaterial (Silikon, Gießharz, Gips, Wachs, Seife, Beton) mit Schwund und Dichte.\n\n– Vor dem Machen: Außenmaß, Füllmenge mit Einguss, Gewicht und Luftfallen, mit einem roten Punkt, wo Luft bliebe.\n– Mehrere Modelle bekommen je einen Einguss.\n– Außen ein Block oder eine Konturhülle, die Filament spart.\n– „Stempel und Matrize“ kann das Relief einer Münze oder eines Logos übernehmen.",
           "en": "The Mold & die tool now suggests the best opening direction: each direction shows how much of the surface would stick, and undercuts are red on the model. There is also a free direction you turn by a knob in the view, and a casting material (silicone, casting resin, plaster, wax, soap, concrete) with its shrinkage and density.\n\n– Before making: outside size, pour volume with the sprue, weight and air traps, with a red dot where air would stay.\n– Several masters get a sprue each.\n– On the outside a block or a contour shell that saves filament.\n– Stamp & die can copy the relief of a coin or a logo.",
-          "da": "Værktøjet Støbeform & prægestempel foreslår nu den bedste åbningsretning: hver retning viser, hvor stor en del af overfladen der ville sidde fast, og underskæringer er røde på modellen. Der er også en fri retning, du drejer med en knap i visningen, og et støbemateriale (silikone, støbeharpiks, gips, voks, sæbe, beton) med sin svind og densitet.\n\n– Før du laver formen: ydre mål, støbevolumen med indløbet, vægt og luftlommer, med en rød prik der, hvor luften ville blive fanget.\n– Flere originaler får hvert sit indløb.\n– Ud i siden er der en blok eller en konturskal, der sparer filament.\n– Stempel & matrice kan kopiere reliefet af en mønt eller et logo."
+          "da": "Værktøjet Støbeform & prægestempel foreslår nu den bedste åbningsretning: hver retning viser, hvor stor en del af overfladen der ville sidde fast, og underskæringer er røde på modellen. Der er også en fri retning, du drejer med en knap i visningen, og et støbemateriale (silikone, støbeharpiks, gips, voks, sæbe, beton) med sin svind og densitet.\n\n– Før du laver formen: ydre mål, støbevolumen med indløbet, vægt og luftlommer, med en rød prik der, hvor luften ville blive fanget.\n– Flere originaler får hvert sit indløb.\n– Ud i siden er der en blok eller en konturskal, der sparer filament.\n– Stempel & matrice kan kopiere reliefet af en mønt eller et logo.",
+          "ar": "تقترح أداة «القالب والمكبس» الآن أفضل اتجاه للفتح: كل اتجاه يُظهر مقدار ما سيعلق من السطح، والتجاويف المعاكسة تظهر بالأحمر على النموذج. وهناك أيضًا اتجاه حر تديره بمقبض في العرض، ومادة صب (سيليكون أو راتنج صب أو جبس أو شمع أو صابون أو خرسانة) مع انكماشها وكثافتها.\n\n– قبل الصنع: الحجم الخارجي، وحجم الصب مع مجرى الصب، والوزن وجيوب الهواء، مع نقطة حمراء حيث سيبقى الهواء.\n– لكل نموذج أصلي من عدة نماذج مجرى صب خاص به.\n– في الخارج كتلة أو غلاف يتبع الشكل يوفر الخيط.\n– يمكن لـ «مكبس وقالب كبس» أن ينسخ النقش البارز لعملة أو شعار."
         },
         "guide": {
           "section": "mold"
@@ -588,12 +670,14 @@
         "title": {
           "de": "Aushöhlen: Gridfinity-Boden, Stapeln und neue Verschlüsse",
           "en": "Hollow: Gridfinity floor, stacking and new latches",
-          "da": "Udhuling: Gridfinity-bund, stabling og nye låse"
+          "da": "Udhuling: Gridfinity-bund, stabling og nye låse",
+          "ar": "التفريغ: قاع Gridfinity والتكديس وأقفال جديدة"
         },
         "body": {
           "de": "Eine oben offen ausgehöhlte Box kann jetzt einen Gridfinity-Boden bekommen, mit einer Mulde für jedes ganze Feld, auf Wunsch mit Magnetlöchern, und Trennwände wie bei einem Gridfinity-Behälter. Das Stapeln läuft jetzt über einen Fuß, der in die Box darunter greift, auf Wunsch hohl und mit Griffmulden; ein Stapeldeckel nimmt den Fuß der nächsten Box auf.\n\nDer Deckel hat zwei neue Verschlussarten neben den Klammern: Schieber wie an einem Werkzeugkoffer und Riegel, die in einem Rohr an der Wand sitzen und an Ort und Stelle gedruckt werden.",
           "en": "A box hollowed with its top open can now get a Gridfinity floor, with a socket for each whole cell, magnet holes on request, and dividers like a Gridfinity bin's. Stacking now goes by a foot that fits into the box below, hollow and with grip recesses if you like; a stacking top takes the next box's foot.\n\nThe lid has two new kinds of latch next to the clips: sliders as on a tool case, and barrel bolts that sit in a tube on the wall and are printed in place.",
-          "da": "En kasse, der er udhulet med toppen åben, kan nu få en Gridfinity-bund, med en fordybning til hvert helt felt, magnethuller på forespørgsel, og skillevægge som en Gridfinity-bakkes. Stabling sker nu med en fod, der går ned i æsken under, hul og med greb, som du vil; et stabellåg tager den næste æskes fod.\n\nLåget har to nye slags låse ud over klipsene: skydere som på en værktøjskasse, og skudrigler, der sidder i et rør på væggen og printes på stedet."
+          "da": "En kasse, der er udhulet med toppen åben, kan nu få en Gridfinity-bund, med en fordybning til hvert helt felt, magnethuller på forespørgsel, og skillevægge som en Gridfinity-bakkes. Stabling sker nu med en fod, der går ned i æsken under, hul og med greb, som du vil; et stabellåg tager den næste æskes fod.\n\nLåget har to nye slags låse ud over klipsene: skydere som på en værktøjskasse, og skudrigler, der sidder i et rør på væggen og printes på stedet.",
+          "ar": "الصندوق المفرّغ المفتوح من الأعلى يمكن أن يحصل الآن على قاع Gridfinity، مع تجويف لكل خلية كاملة، وثقوب مغناطيس عند الطلب، وفواصل مثل فواصل علبة Gridfinity. وصار التكديس يتم بقدم تدخل في الصندوق الذي تحته، مفرّغة ومع مسكات إن شئت؛ وحوض التكديس في الأعلى يستقبل قدم الصندوق التالي.\n\nوللغطاء نوعان جديدان من الأقفال بجانب المشابك: منزلقات كما في حقيبة العدّة، ومزاليج أسطوانية تقع في أنبوب على الجدار وتُطبع في مكانها."
         },
         "guide": {
           "section": "hollowing"
@@ -603,12 +687,14 @@
         "title": {
           "de": "Druckanalyse: jede Schicht geprüft, mit Schichtansicht",
           "en": "Print analysis: every layer checked, with a layer view",
-          "da": "Printanalyse: hvert lag tjekket, med lagvisning"
+          "da": "Printanalyse: hvert lag tjekket, med lagvisning",
+          "ar": "تحليل الطباعة: فحص كل طبقة، مع عرض الطبقات"
         },
         "body": {
           "de": "Neben „Druckprüfung“ gibt es jetzt die „Druckanalyse“. Sie schneidet die gewählten Teile (oder alle sichtbaren) in die Schichten, die dein Drucker aufträgt, und vergleicht jede mit der darunter. Heraus kommt eine Liste: erst Probleme, dann Hinweise, etwa schwebende Teile, Flächen ohne Stütze, Überhänge, Brücken, zu dünne Wände, kleine Inseln und zu wenig Haftung am Bett, jeweils mit dem, was hilft, oft mit einem Knopf dafür.\n\nEin Klick auf einen Befund öffnet die Schichtansicht: das Teil in dieser Schicht aufgeschnitten, die Stelle farbig, mit Schichtregler und Verlauf der Querschnittsfläche. Ein Slicer-Vorschau ist es nicht.",
           "en": "Next to Print check there is now Print analysis. It cuts the selected parts (or every visible one) into the layers your printer lays down and compares each with the one below. You get a list, problems first and then hints: floating parts, areas without support, overhangs, bridges, walls that are too thin, small islands and too little bed adhesion, each with what helps, often with a button for it.\n\nA click on a finding opens the layer view: the part cut open at that layer with the spot painted, a layer slider and the cross-section over the height. It is no slicer preview.",
-          "da": "Ved siden af \"Tjek print\" er der nu \"Printanalyse\". Den skærer de valgte dele (eller alle synlige) i de lag, din printer lægger, og sammenligner hvert lag med laget nedenunder. Du får en liste, fejlene først og så bemærkningerne: dele, der svæver over arbejdsplanet, områder uden støtte, overhæng, broer, for tynde vægge, små øer og for dårlig vedhæftning til pladen, hver med det, der hjælper, ofte med en knap til det.\n\nEt klik på et fund åbner lagvisningen: delen skåret åben i det lag med stedet malet, en lagskyder og tværsnittet over højden. Det er ikke en forhåndsvisning fra sliceren."
+          "da": "Ved siden af \"Tjek print\" er der nu \"Printanalyse\". Den skærer de valgte dele (eller alle synlige) i de lag, din printer lægger, og sammenligner hvert lag med laget nedenunder. Du får en liste, fejlene først og så bemærkningerne: dele, der svæver over arbejdsplanet, områder uden støtte, overhæng, broer, for tynde vægge, små øer og for dårlig vedhæftning til pladen, hver med det, der hjælper, ofte med en knap til det.\n\nEt klik på et fund åbner lagvisningen: delen skåret åben i det lag med stedet malet, en lagskyder og tværsnittet over højden. Det er ikke en forhåndsvisning fra sliceren.",
+          "ar": "بجانب «فحص الطباعة» صار هناك الآن «تحليل الطباعة». يقطّع القطع المحددة (أو كل القطع الظاهرة) إلى الطبقات التي تضعها طابعتك، ويقارن كل طبقة بالتي تحتها. فتحصل على قائمة، المشكلات أولًا ثم التنبيهات: قطع معلّقة، ومناطق بلا دعم، وبروزات، وجسور، وجدران رقيقة جدًا، وجزر صغيرة، والتصاق ضعيف بالسرير، ولكل منها ما يفيد، وغالبًا مع زر له.\n\nالنقر على نتيجة يفتح عرض الطبقات: القطعة مقطوعة عند تلك الطبقة والموضع ملوّن، وشريط تمرير للطبقات، والمقطع العرضي على امتداد الارتفاع. وهو ليس معاينة برنامج التقطيع."
         },
         "guide": {
           "section": "layerCheck"
@@ -618,12 +704,14 @@
         "title": {
           "de": "Schrauben und Gewindestangen längs teilen",
           "en": "Screws and threaded rods, split lengthwise",
-          "da": "Skruer og gevindstænger, delt på langs"
+          "da": "Skruer og gevindstænger, delt på langs",
+          "ar": "البراغي والقضبان الملولبة، مقسومة طوليًا"
         },
         "body": {
           "de": "Eine stehend gedruckte Schraube bricht unter Last entlang ihrer Schichten, liegend gedruckt ist ihr Gewinde um ein Vielfaches stabiler. In den Eigenschaften einer Schraube oder Gewindestange teilt „Längs teilen und flach legen“ sie durch ihre eigene Achse und legt beide Hälften auf ihre Schnittflächen, in einem Schritt zum Rückgängigmachen.\n\nMit Zentrierstiften (standardmäßig an) sitzen die Hälften genau aufeinander, auch in Längsrichtung, damit die Gewindegänge treffen und die Mutter nicht klemmt. Danach werden die Hälften geklebt.",
           "en": "A screw printed standing breaks along its layers under load; printed lying down its thread is many times stronger. In the properties of a screw or threaded rod, Split lengthwise and lay flat cuts it in two through its own axis and lays both halves on their cut faces, in one undo step.\n\nWith centring pins (on by default) the halves line up exactly, along the axis too, so the turns meet and the nut does not jam. Glue the halves afterwards.",
-          "da": "En skrue, der er printet stående, knækker langs lagene under belastning; printet liggende er dens gevind mange gange stærkere. I egenskaberne for en skrue eller en gevindstang deler \"Del på langs og læg ned\" den i to gennem dens egen akse og lægger begge halvdele på deres snitflader, i ét fortrydelsestrin.\n\nMed styrestifter (slået til som standard) flugter halvdelene præcist, også på langs, så omgangsene mødes og møtrikken ikke binder. Lim halvdelene sammen bagefter."
+          "da": "En skrue, der er printet stående, knækker langs lagene under belastning; printet liggende er dens gevind mange gange stærkere. I egenskaberne for en skrue eller en gevindstang deler \"Del på langs og læg ned\" den i to gennem dens egen akse og lægger begge halvdele på deres snitflader, i ét fortrydelsestrin.\n\nMed styrestifter (slået til som standard) flugter halvdelene præcist, også på langs, så omgangsene mødes og møtrikken ikke binder. Lim halvdelene sammen bagefter.",
+          "ar": "البرغي المطبوع واقفًا ينكسر على امتداد طبقاته تحت الحمل؛ أما المطبوع مستلقيًا فسنّه أقوى بأضعاف. في خصائص البرغي أو القضيب الملولب، يقسمه «قسّم طوليًا وضعه مسطحًا» إلى نصفين عبر محوره ويضع النصفين على وجهي القطع، في خطوة تراجع واحدة.\n\nومع دبابيس التوسيط (مفعّلة افتراضيًا) يتحاذى النصفان بدقة، طوليًا أيضًا، فتتطابق لفات السن ولا تعلق الصامولة. الصق النصفين بعد ذلك."
         },
         "guide": {
           "chapter": "threads"
@@ -633,12 +721,14 @@
         "title": {
           "de": "Gewindeeinsätze: das Loch mit Prüfung",
           "en": "Thread inserts: the hole, checked first",
-          "da": "Gevindindsatser: hullet tjekkes først"
+          "da": "Gevindindsatser: hullet tjekkes først",
+          "ar": "الحشوات الملولبة: الثقب، مفحوصًا أولًا"
         },
         "body": {
           "de": "Das neue Werkzeug „Gewindeeinsatz“ bohrt das Loch für einen Einschmelzeinsatz (M2 bis M8, 1/4-20 oder eigene Größe) genau dort, wo du klickst, in ebene Flächen und in runde Wände. Vorher prüft es, ob neben dem Loch genug Wand und dahinter genug Tiefe bleibt: Ein grüner Ring heißt los, ein roter sperrt das Loch. Von @markopo1982.",
           "en": "The new Thread insert tool makes the hole for a heat-set insert (M2 to M8, 1/4-20 or a size of your own) exactly where you click, on flat faces and on round walls. First it checks that there is enough wall beside the hole and enough depth behind it: a green ring means go, a red one blocks the hole. By @markopo1982.",
-          "da": "Det nye værktøj Gevindindsats laver hullet til en varmeindsats (M2 til M8, 1/4-20 eller en størrelse af din egen) præcis, hvor du klikker, på flade flader og runde vægge, og tjekker først, at væggen ved siden af hullet og dybden bagved rækker: en grøn ring betyder kør, en rød blokerer hullet. Af @markopo1982."
+          "da": "Det nye værktøj Gevindindsats laver hullet til en varmeindsats (M2 til M8, 1/4-20 eller en størrelse af din egen) præcis, hvor du klikker, på flade flader og runde vægge, og tjekker først, at væggen ved siden af hullet og dybden bagved rækker: en grøn ring betyder kør, en rød blokerer hullet. Af @markopo1982.",
+          "ar": "تنشئ أداة «حشوة ملولبة» الجديدة الثقب لحشوة ملولبة حرارية (من M2 إلى M8 أو 1/4-20 أو مقاس خاص بك) بالضبط حيث تنقر، على الوجوه المسطحة وعلى الجدران الدائرية. وتتحقق أولًا من أن الجدار بجانب الثقب والعمق خلفه كافيان: الحلقة الخضراء تعني المتابعة، والحمراء تمنع الثقب. من @markopo1982."
         },
         "guide": {
           "section": "threadInsert"
@@ -648,12 +738,14 @@
         "title": {
           "de": "Ein getippter Winkel dreht alle gewählten Teile",
           "en": "A typed angle turns every selected part",
-          "da": "En indtastet vinkel drejer alle de valgte dele"
+          "da": "En indtastet vinkel drejer alle de valgte dele",
+          "ar": "الزاوية المكتوبة تدير كل القطع المحددة"
         },
         "body": {
           "de": "Waren mehrere Teile ausgewählt, drehte ein ins Winkelfeld getippter Winkel nur das letzte: Bei zwei Quadern und 30° blieb der erste bei 0°. Jetzt drehen sich alle, und ein Rückgängig dreht sie alle zurück.",
           "en": "With several parts selected, an angle typed into the angle box turned only the last of them: with two boxes and 30°, the first stayed at 0°. Now they all turn, and one Undo turns them all back.",
-          "da": "Når flere dele var valgt, drejede en vinkel, der blev tastet i vinkelfeltet, kun den sidste af dem: med to kasser og 30° blev den første stående på 0°. Nu drejer de alle, og én Fortryd drejer dem alle tilbage."
+          "da": "Når flere dele var valgt, drejede en vinkel, der blev tastet i vinkelfeltet, kun den sidste af dem: med to kasser og 30° blev den første stående på 0°. Nu drejer de alle, og én Fortryd drejer dem alle tilbage.",
+          "ar": "مع تحديد عدة قطع، كانت الزاوية المكتوبة في حقل الزاوية تدير آخرها فقط: مع صندوقين و30° يبقى الأول عند 0°. الآن تدور كلها، و«تراجع» واحد يعيدها كلها."
         },
         "guide": {
           "section": "rotating"
@@ -663,12 +755,14 @@
         "title": {
           "de": "Befestigungslöcher für Platten und Deckel",
           "en": "Mounting holes for plates and lids",
-          "da": "Monteringshuller til plader og låg"
+          "da": "Monteringshuller til plader og låg",
+          "ar": "ثقوب تثبيت للألواح والأغطية"
         },
         "body": {
           "de": "Das Lochmuster hat einen zweiten Reiter „Befestigungslöcher“. Er setzt Schraubenlöcher in die Ecken des kleinsten Rechtecks um die gewählte Fläche, gleich weit von den Seiten, auch bei einer gedrehten oder eingekerbten Platte, bei der „Entlang der Kante“ die Löcher ungleichmäßig verteilt.\n\n– Abstand zu den Seiten: bis zur Kante des Lochs (ein Schraubenkopf zählt mit) oder bis zur Lochmitte.\n– Anzahl: vier in den Ecken, die übrigen paarweise gleichmäßig entlang der Seiten, etwa für einen wasserdichten Deckel.\n– Auf einer runden Fläche, zum Beispiel dem Deckel einer runden Box, verteilen sie sich gleichmäßig auf einem Kreis, mindestens drei.\n– Einfach, mit Senkung oder Kegelsenkung, durch oder bis zu einer Tiefe.\n\nEs entstehen gewöhnliche Lochformen, mit dem Körper gruppiert, die Bohrungskarte der Gruppe wirkt also auch auf sie.",
           "en": "The Hole pattern has a second tab, Mounting holes. It puts screw holes in the corners of the smallest rectangle round the picked face, the same distance from its sides, even on a turned or notched plate where \"Along the edge\" spreads the holes unevenly.\n\n– Distance from the sides: to the hole's edge (a screw head counts) or to the hole's middle.\n– Number of holes: four in the corners, the rest in pairs, evenly spaced along the sides, for example for a watertight lid.\n– On a round face, such as the lid of a round box, they go evenly round a circle, three or more.\n– Plain, counterbore or countersink, through or to a depth.\n\nThey are made as ordinary hole shapes grouped with the body, so the group's hole diameter card works on them too.",
-          "da": "Hulmønsteret har en anden fane, Monteringshuller. Den sætter skruehuller i hjørnerne af det mindste rektangel omkring den valgte flade, i samme afstand fra dets sider, også på en drejet eller udskåret plade, hvor \"Langs kanten\" fordeler hullerne ujævnt.\n\n– Afstand fra siderne: til hullets kant (et skruehoved medregnes) eller til hullets midte.\n\n– Antal huller: fire i hjørnerne, resten parvis, jævnt fordelt langs siderne, for eksempel til et vandtæt låg.\n\n– På en rund flade, som låget på en rund æske, sidder de jævnt fordelt rundt på en cirkel, tre eller flere.\n\n– Almindeligt, med cylindrisk forsænkning eller kegleforsænkning, gennemgående eller til en dybde.\n\nDe laves som almindelige hulformer grupperet med formen, så gruppens \"Huldiameter\" virker på dem også."
+          "da": "Hulmønsteret har en anden fane, Monteringshuller. Den sætter skruehuller i hjørnerne af det mindste rektangel omkring den valgte flade, i samme afstand fra dets sider, også på en drejet eller udskåret plade, hvor \"Langs kanten\" fordeler hullerne ujævnt.\n\n– Afstand fra siderne: til hullets kant (et skruehoved medregnes) eller til hullets midte.\n\n– Antal huller: fire i hjørnerne, resten parvis, jævnt fordelt langs siderne, for eksempel til et vandtæt låg.\n\n– På en rund flade, som låget på en rund æske, sidder de jævnt fordelt rundt på en cirkel, tre eller flere.\n\n– Almindeligt, med cylindrisk forsænkning eller kegleforsænkning, gennemgående eller til en dybde.\n\nDe laves som almindelige hulformer grupperet med formen, så gruppens \"Huldiameter\" virker på dem også.",
+          "ar": "لـ «نمط الثقوب» تبويب ثانٍ: «ثقوب التثبيت». يضع ثقوب البراغي في زوايا أصغر مستطيل حول الوجه المختار، على المسافة نفسها من جوانبه، حتى على لوح مُدار أو محزّز حيث يوزع «على الحافة» الثقوب بشكل غير متساوٍ.\n\n– «المسافة من الجوانب»: إلى حافة الثقب (رأس البرغي يُحسب) أو إلى منتصف الثقب.\n– «عدد الثقوب»: أربعة في الزوايا، والبقية أزواجًا بتباعد متساوٍ على طول الجوانب، لغطاء محكم ضد الماء مثلًا.\n– على الوجه الدائري، كغطاء صندوق دائري، تتوزع بالتساوي على دائرة، ثلاثة أو أكثر.\n– ثقب بسيط أو متدرج أو غاطس، نافذ أو حتى عمق معيّن.\n\nتُصنع كأشكال ثقوب عادية مجمّعة مع الجسم، فتعمل عليها بطاقة قطر الثقوب في المجموعة أيضًا."
         },
         "guide": {
           "section": "holePattern"
@@ -678,12 +772,14 @@
         "title": {
           "de": "Neue Form: Kreisausschnitt",
           "en": "New shape: Sector",
-          "da": "Ny form: Cirkeludsnit"
+          "da": "Ny form: Cirkeludsnit",
+          "ar": "شكل جديد: قطاع دائري"
         },
         "body": {
           "de": "In der Formenbibliothek unter den Grundformen (nach dem Torus) gibt es den „Kreisausschnitt“: eine Kreisscheibe, die du über den Winkel (1 bis 360°) wie einen Uhrzeiger zurückschneidest, von zwölf Uhr im Uhrzeigersinn.\n\n– Innen-Ø: bei 0 ein volles Stück, darüber ein Ring oder ein Ringsegment.\n– Enden runden: rundet die beiden Enden bis zum Halbkreis. So entsteht ein gebogenes Langloch, zum Beispiel für Monitorhalter und andere Teile, die sich drehen und festklemmen lassen.\n– Durchmesser und Höhe wie beim Zylinder.\n\nDer Rahmen bleibt der volle Kreis, die Form dreht sich also um die Mitte des Kreises.",
           "en": "The shape library has a new basic shape after the Torus, the Sector: a disc that you cut back with the angle (1 to 360°) like a clock hand, from twelve o'clock clockwise.\n\n– Inner diameter: 0 is a solid piece, more gives a ring or a ring segment.\n– End rounding: rounds the two ends, up to a half circle. That gives a curved slot, for example for monitor mounts and other parts that turn and get clamped.\n– Diameter and height as on the Cylinder.\n\nThe frame stays the full circle, so the shape turns about the circle's middle.",
-          "da": "Formbiblioteket har en ny grundform efter Torus, Cirkeludsnit: en skive, som du skærer ind med vinklen (1 til 360°) som en urviser, fra klokken tolv og med uret.\n\n– Indvendig diameter: 0 er et massivt stykke, mere giver en ring eller et ringstykke.\n\n– Afrunding af enderne: runder de to ender, op til en halvcirkel. Det giver et buet langhul, for eksempel til skærmbeslag og andre dele, der drejes og spændes fast.\n\n– Diameter og højde som på cylinderen.\n\nRammen forbliver den fulde cirkel, så formen drejer om cirklens midte."
+          "da": "Formbiblioteket har en ny grundform efter Torus, Cirkeludsnit: en skive, som du skærer ind med vinklen (1 til 360°) som en urviser, fra klokken tolv og med uret.\n\n– Indvendig diameter: 0 er et massivt stykke, mere giver en ring eller et ringstykke.\n\n– Afrunding af enderne: runder de to ender, op til en halvcirkel. Det giver et buet langhul, for eksempel til skærmbeslag og andre dele, der drejes og spændes fast.\n\n– Diameter og højde som på cylinderen.\n\nRammen forbliver den fulde cirkel, så formen drejer om cirklens midte.",
+          "ar": "في مكتبة الأشكال شكل أساسي جديد بعد «حلقة (Torus)»، هو «قطاع دائري»: قرص تقصّه بالزاوية (من 1 إلى 360°) كعقرب الساعة، من الساعة الثانية عشرة باتجاه عقارب الساعة.\n\n– «القطر الداخلي»: 0 قطعة صلبة، وأكثر يعطي حلقة أو جزءًا من حلقة.\n– «تنعيم الطرفين»: ينعّم الطرفين حتى نصف دائرة. وهذا يعطي شقًا منحنيًا، لحوامل الشاشات مثلًا وغيرها من القطع التي تدور ثم تُشدّ.\n– القطر والارتفاع كما في «أسطوانة».\n\nيبقى الإطار الدائرة الكاملة، فيدور الشكل حول منتصف الدائرة."
         },
         "guide": {
           "chapter": "shapes"
@@ -693,12 +789,14 @@
         "title": {
           "de": "Mehrkant mit runden Ecken",
           "en": "Polygon with rounded corners",
-          "da": "Polygon med runde hjørner"
+          "da": "Polygon med runde hjørner",
+          "ar": "مضلع بزوايا مستديرة"
         },
         "body": {
           "de": "Ein Mehrkant hat jetzt unter „Seiten“ einen Regler „Eckenverrundung“ und einen Ziehpunkt am Modell, wie bei der Box mit runden Ecken. Ein Radius für alle Ecken, bei jeder Seitenzahl.\n\nDer Radius gilt in mm, ein gestreckter Mehrkant behält also runde Ecken. Der größte Wert ist dort, wo sich benachbarte Rundungen treffen. 0 ist der einfache Mehrkant, genau wie bisher.",
           "en": "A polygon now has a \"Corner fillet\" slider under \"Sides\" and a drag dot on the model, like the Rounded box. One radius for every corner, for any number of sides.\n\nThe radius is in mm, so a stretched polygon keeps round corners. The largest value is where neighbouring roundings meet. 0 is the plain polygon, exactly as before.",
-          "da": "En polygon har nu skyderen \"Hjørnerunding\" under \"Sider\" og et trækpunkt på modellen, ligesom den rundede kasse. Én radius gælder for alle hjørner, uanset antal sider.\n\nDen angives i millimeter, så en strakt polygon beholder runde hjørner. Den største værdi er der, hvor nabohjørnernes rundinger mødes. 0 er den almindelige polygon, præcis som før."
+          "da": "En polygon har nu skyderen \"Hjørnerunding\" under \"Sider\" og et trækpunkt på modellen, ligesom den rundede kasse. Én radius gælder for alle hjørner, uanset antal sider.\n\nDen angives i millimeter, så en strakt polygon beholder runde hjørner. Den største værdi er der, hvor nabohjørnernes rundinger mødes. 0 er den almindelige polygon, præcis som før.",
+          "ar": "صار للمضلع شريط تمرير «تنعيم الزاوية» تحت «الأضلاع» ونقطة سحب على النموذج، كما في «صندوق مستدير». نصف قطر واحد لكل الزوايا، لأي عدد من الأضلاع.\n\nنصف القطر بالمليمتر، فيحتفظ المضلع الممطوط بزوايا مستديرة. وأكبر قيمة هي حيث يلتقي تنعيم الزوايا المتجاورة. و0 هو المضلع العادي، تمامًا كما كان."
         },
         "guide": {
           "chapter": "shapes"
@@ -708,12 +806,14 @@
         "title": {
           "de": "Bohrungen einer Gruppe auf einmal ändern",
           "en": "Change the holes of a group at once",
-          "da": "Skift hullerne i en gruppe på én gang"
+          "da": "Skift hullerne i en gruppe på én gang",
+          "ar": "تغيير ثقوب المجموعة دفعة واحدة"
         },
         "body": {
           "de": "Enthält eine Gruppe, oder eine Gruppe darin, runde Bohrungen, zeigt ihr Fenster einen Regler „Bohrungsdurchmesser“ für alle gleichzeitig und den Schalter „Einzeln“, der jede Bohrung mit eigenem Durchmesser auflistet.\n\nJede Bohrung behält ihre Mitte und ihre Tiefe. Die Gruppen werden von innen nach außen neu aufgebaut, wie bei „Gruppe bearbeiten → Fertig“, als ein Schritt zum Rückgängigmachen. Platinen, Schilder, QR-Codes und Bündel bleiben unberührt, und nur runde Bohrungen zählen, eckige oder ovale ändern sich nicht.",
           "en": "When a group, or a group inside it, holds round holes, its window shows a \"Hole diameter\" slider for all of them at once and a \"One by one\" switch that lists each hole with its own diameter.\n\nEvery hole keeps its middle and its depth. The groups are rebuilt from the inside out, the way Edit group → Done does it, as one undo step. Boards, tags, QR codes and bundles are left alone, and only round holes count, so square or oval ones are not touched.",
-          "da": "Når gruppen, eller en gruppe i den, indeholder runde huller, viser dens vindue skyderen \"Huldiameter\" for dem alle på én gang og kontakten \"Ét ad gangen\", som viser hvert hul med sin egen diameter.\n\nHvert hul beholder sit centrum og sin dybde. Grupperne bygges igen indefra og ud, som \"Redigér gruppe\" og \"Udført\" gør det, i ét fortrydelsestrin. Plader, skilte, QR-koder og bundter lades urørt, og kun runde huller tæller, så firkantede eller ovale ændres ikke."
+          "da": "Når gruppen, eller en gruppe i den, indeholder runde huller, viser dens vindue skyderen \"Huldiameter\" for dem alle på én gang og kontakten \"Ét ad gangen\", som viser hvert hul med sin egen diameter.\n\nHvert hul beholder sit centrum og sin dybde. Grupperne bygges igen indefra og ud, som \"Redigér gruppe\" og \"Udført\" gør det, i ét fortrydelsestrin. Plader, skilte, QR-koder og bundter lades urørt, og kun runde huller tæller, så firkantede eller ovale ændres ikke.",
+          "ar": "عندما تضم مجموعة، أو مجموعة داخلها، ثقوبًا دائرية، تُظهر نافذتها شريط تمرير «قطر الثقوب» لها كلها دفعة واحدة، ومفتاح «كلٌّ على حدة» يعرض كل ثقب بقطره الخاص.\n\nيحتفظ كل ثقب بمركزه وعمقه. وتُعاد بناء المجموعات من الداخل إلى الخارج، كما يفعل «تعديل المجموعة» ← «تم»، في خطوة تراجع واحدة. وتُترك اللوحات والبطاقات ورموز QR والحزم كما هي، ولا تُحسب إلا الثقوب الدائرية، فلا تُمس المربعة أو البيضاوية."
         },
         "guide": {
           "chapter": "shapes"
@@ -723,48 +823,56 @@
         "title": {
           "de": "Gridfinity-Behälter mit Überstand",
           "en": "Gridfinity bins that overhang the grid",
-          "da": "Gridfinity-bakker, der rækker ud over gitteret"
+          "da": "Gridfinity-bakker, der rækker ud over gitteret",
+          "ar": "علب Gridfinity تبرز خارج الشبكة"
         },
         "body": {
           "de": "Füllt eine Bodenplatte mit Ausgleich eine Schublade, die kein ganzes Raster misst, kann ein Behälter jetzt auf jeder Seite über das Raster hinausreichen, über den Ausgleich bis an die Wand, damit nichts daneben hinunterfällt. Die Füße bleiben auf dem Raster. Eine Fase unter dem Überstand lässt ihn ohne Stützen drucken; ein massiver Überstand oder ein Stapelrand auf dem Raster sind wählbar.",
           "en": "When a padded baseplate fills a drawer that is not whole units, a bin can now reach out beyond the grid on any side, over the padding to the wall, so nothing falls down beside it. Its feet stay on the grid. A chamfer under the overhang lets it print without supports; a solid overhang or a lip kept on the grid are there to choose.",
-          "da": "Når en grundplade med kantfyld udfylder en skuffle, der ikke er et helt antal gitterenheder, kan en bakke nu række ud over gitteret på hver side, over kantfyldet til væggen, så intet falder ned ved siden af den. Dens fødder bliver på gitteret. En fase under overhænget gør, at den kan printes uden støtte; et massivt overhæng eller \"Hold stabelkraven på gitteret\" kan du vælge imellem."
+          "da": "Når en grundplade med kantfyld udfylder en skuffle, der ikke er et helt antal gitterenheder, kan en bakke nu række ud over gitteret på hver side, over kantfyldet til væggen, så intet falder ned ved siden af den. Dens fødder bliver på gitteret. En fase under overhænget gør, at den kan printes uden støtte; et massivt overhæng eller \"Hold stabelkraven på gitteret\" kan du vælge imellem.",
+          "ar": "عندما يملأ لوح شبكة بحاشية درجًا ليس عرضه وحدات كاملة، يمكن للعلبة الآن أن تمتد خارج الشبكة على أي جانب، فوق الحاشية حتى الجدار، فلا يسقط شيء بجانبها. وتبقى أقدامها على الشبكة. والشطف تحت البروز يتيح طباعتها دون دعامات؛ ويمكن اختيار «بروز صلب» أو «حافة التكديس على الشبكة»."
         }
       },
       {
         "title": {
           "de": "Niedrigere Trennwände in Gridfinity-Behältern",
           "en": "Lower dividers in Gridfinity bins",
-          "da": "Lavere skillevægge i Gridfinity-bakker"
+          "da": "Lavere skillevægge i Gridfinity-bakker",
+          "ar": "فواصل أخفض في علب Gridfinity"
         },
         "body": {
           "de": "Die Trennwände eines Gridfinity-Behälters oder einer Schale müssen nicht mehr über die ganze Höhe reichen: Stell unter „Fächer“ die „Trennwandhöhe“ ein, gemessen vom Boden, ab 3 mm. Die Wände bleiben, wie sie sind, und eine Etikettenleiste an einer Trennwand sitzt mit ihr tiefer.",
           "en": "The dividers in a Gridfinity bin or tray no longer have to run their full height: set \"Divider height\" under \"Compartments\", measured from the floor, from 3 mm up. The walls stay as they are, and a label shelf on a divider comes down with it.",
-          "da": "Skillevæggene i en Gridfinity-bakke eller -skål behøver ikke længere at løbe i fuld højde: sæt \"Skillevægshøjde\" under \"Rum\", målt fra bunden, fra 3 mm op. Væggene bliver, som de er, og en etiketliste på en skillevæg kommer ned med den."
+          "da": "Skillevæggene i en Gridfinity-bakke eller -skål behøver ikke længere at løbe i fuld højde: sæt \"Skillevægshøjde\" under \"Rum\", målt fra bunden, fra 3 mm op. Væggene bliver, som de er, og en etiketliste på en skillevæg kommer ned med den.",
+          "ar": "لم يعد على الفواصل في علبة Gridfinity أو صينيتها أن تمتد بكامل ارتفاعها: اضبط «ارتفاع الفواصل» تحت «الحجرات»، مقيسًا من القاع، من 3 مم فما فوق. وتبقى الجدران كما هي، ورف الملصق على فاصل ينخفض معه."
         }
       },
       {
         "title": {
           "de": "Text auf den Etikettenleisten von Gridfinity-Schalen",
           "en": "Text on a Gridfinity tray's label shelves",
-          "da": "Tekst på Gridfinity-skålens etikethylder"
+          "da": "Tekst på Gridfinity-skålens etikethylder",
+          "ar": "نص على رفوف ملصقات صينية Gridfinity"
         },
         "body": {
           "de": "Auch die Etikettenleisten einer Gridfinity-Schale können jetzt einen Text tragen, an der Wand oder in einem Fach, mit Schriftart, Buchstabenfarbe und Buchstabengröße wie bei einem Behälter. Eine Leiste mit Text sitzt 0,4 mm tiefer, sodass die Buchstaben bündig mit der Oberkante der Schale enden. Tipp den Text im Eigenschaften-Fenster unter der Leiste bei „Text“ ein.",
           "en": "A Gridfinity tray's label shelves now take a text too, along a wall or in a compartment, with the same font, letter colour and letter size as a bin's. A shelf with a text sits 0.4 mm lower, so the letters end level with the tray's top. Type the text under \"Text\" below the shelf in the Properties panel.",
-          "da": "En Gridfinity-skåls etikethylder kan nu også tage en tekst, langs en væg eller i et rum, med samme font, bogstavfarve og bogstavstørrelse som en bakkes. En hylde med tekst sidder 0,4 mm lavere, så bogstaverne ender i flugt med skålens top. Skriv teksten under \"Tekst\" under hyldens værdier i Egenskaber."
+          "da": "En Gridfinity-skåls etikethylder kan nu også tage en tekst, langs en væg eller i et rum, med samme font, bogstavfarve og bogstavstørrelse som en bakkes. En hylde med tekst sidder 0,4 mm lavere, så bogstaverne ender i flugt med skålens top. Skriv teksten under \"Tekst\" under hyldens værdier i Egenskaber.",
+          "ar": "صارت رفوف الملصقات في صينية Gridfinity تأخذ نصًا أيضًا، على طول جدار أو في حجرة، بالخط ولون الحروف وحجمها نفسها كما في العلبة. والرف الذي عليه نص يكون أخفض بـ 0.4 مم، فتنتهي الحروف عند مستوى أعلى الصينية. اكتب النص تحت «النص» أسفل الرف في لوحة «الخصائص»."
         }
       },
       {
         "title": {
           "de": "Bodenplatten, passend zum Drucker geteilt",
           "en": "Baseplates split to fit your printer",
-          "da": "Bundplader deles, så de passer til din printer"
+          "da": "Bundplader deles, så de passer til din printer",
+          "ar": "ألواح الشبكة مقسومة لتناسب طابعتك"
         },
         "body": {
           "de": "Ist dein Drucker in den Arbeitsbereich-Einstellungen gewählt, hat eine Bodenplatte, die größer ist als sein Druckbett, im Eigenschaften-Fenster den Knopf „Passend zum Drucker teilen“. Er teilt die Platte an den Zellgrenzen in so wenige Platten wie möglich, die auf das Druckbett passen, jede mit „Swallowtail“, und legt die Verbinder davor, die sie zusammenhalten. Die Platten bleiben, wo ihre Zellen waren, also schiebe oder drehe sie eine nach der anderen auf das Druckbett.",
           "en": "With your printer chosen in the workspace settings, a baseplate larger than the printer's bed has \"Split to fit the printer\" in its Properties panel. It cuts the plate on its cell lines into the fewest plates that fit the bed, each with \"Swallowtail\", and lays out the keys that hold them together. The plates stay where their cells were, so move or turn them onto the bed one by one.",
-          "da": "Når din printer er valgt i arbejdsområdeindstillingerne, har en bundplade, der er større end printerens byggeplade, \"Del til printeren\" i Egenskaber. Den skærer pladen langs cellernes kanter i de færrest mulige plader, der passer på byggepladen, hver med \"Svalehale\", og lægger de samlestykker, der holder dem sammen, frem foran dem. Pladerne ligger, hvor deres celler lå, så flyt eller drej dem ind på byggepladen én ad gang."
+          "da": "Når din printer er valgt i arbejdsområdeindstillingerne, har en bundplade, der er større end printerens byggeplade, \"Del til printeren\" i Egenskaber. Den skærer pladen langs cellernes kanter i de færrest mulige plader, der passer på byggepladen, hver med \"Svalehale\", og lægger de samlestykker, der holder dem sammen, frem foran dem. Pladerne ligger, hvor deres celler lå, så flyt eller drej dem ind på byggepladen én ad gang.",
+          "ar": "عندما تكون طابعتك مختارة في إعدادات مساحة العمل، يظهر للوح الشبكة الأكبر من سرير الطابعة «تقسيم ليناسب الطابعة» في لوحة «الخصائص». يقطع اللوح على حدود الخلايا إلى أقل عدد من الألواح التي تتسع على السرير، لكل منها «Swallowtail»، ويضع الوصلات التي تجمعها. وتبقى الألواح في موضع خلاياها، فانقلها أو أدرها على السرير واحدًا تلو الآخر."
         }
       }
     ]

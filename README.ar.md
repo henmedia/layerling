@@ -477,7 +477,7 @@ docker compose -f docker/compose.dev.yml up
 
 أسماء الأدوات الرئيسية هي `layerling_list_editors` و`layerling_read_scene` و`layerling_list_objects`
 و`layerling_create_shape` و`layerling_update_object` و`layerling_list_edges` و`layerling_apply_edge_treatment`
-و`layerling_hollow_object` و`layerling_make_lid` و`layerling_offset_object` و`layerling_cut_out` و`layerling_punch` و`layerling_array_objects` و`layerling_set_section_view` و`layerling_capture_image`.
+و`layerling_hollow_object` و`layerling_make_lid` و`layerling_make_mold` و`layerling_offset_object` و`layerling_cut_out` و`layerling_punch` و`layerling_array_objects` و`layerling_set_section_view` و`layerling_capture_image`.
 
 ### Claude Code
 
