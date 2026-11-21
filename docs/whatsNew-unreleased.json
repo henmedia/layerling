@@ -383,5 +383,20 @@
     "guide": {
       "chapter": "shapes"
     }
+  },
+  {
+    "title": {
+      "de": "Neue Oberflächentextur: Hammerschlag",
+      "en": "New surface texture: Hammered",
+      "da": "Ny overfladetekstur: Hamret"
+    },
+    "body": {
+      "de": "Runde, sich überlappende Dellen wie auf einem handgehämmerten Kupferbecher, jede etwas anders groß und tief. Du findest sie unter Oberflächentextur; „Dellengröße“ bestimmt, wie stark sie sich überlappen, und „Anordnung“ verteilt sie neu.",
+      "en": "Round, overlapping dents like on a hand-hammered copper mug, each a little different in size and depth. You find it under Surface texture; Dent size sets how much they overlap, and Arrangement lays them out anew.",
+      "da": "Runde, overlappende buler som på et håndhamret kobberkrus, hver lidt forskellig i størrelse og dybde. Du finder den under Overfladetekstur; bulestørrelsen bestemmer, hvor meget de overlapper, og arrangementet fordeler dem på ny."
+    },
+    "guide": {
+      "chapter": "shapes"
+    }
   }
 ]
