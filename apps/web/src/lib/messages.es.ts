@@ -6119,6 +6119,10 @@ export const MESSAGES_ES: Partial<Record<MessageKey, string>> = {
   "boltSplit.pinsName": "{name} – pasadores de centrado",
   "inspector.boltSplitPins": "Con pasadores de centrado",
   "inspector.boltSplitPinsHint": "Pasadores Ø {diameter} mm, uno en la cabeza y de uno a tres en la rosca según la longitud, en agujeros perpendiculares a la cara de corte: alinean las mitades con exactitud, también a lo largo, para que las vueltas coincidan. Los agujeros terminan en un cono de 45°, así que todo se imprime sin soportes.",
+  "inspector.boltSplitFilament": "Filamento como pasadores (1,75 mm)",
+  "inspector.boltSplitFilamentHint": "En lugar de pasadores impresos: corta trozos de filamento de 1,75 mm. Uno va en un canal a lo largo de la rosca, la mitad en cada mitad, y alinea las mitades a lo ancho. Si la cabeza tiene sitio, otro la atraviesa y las alinea también a lo largo del eje; si no, empuja los extremos de las mitades hasta que queden a ras mientras seca el pegamento. Funciona desde M4; los pasadores impresos solo caben en la rosca desde M6.",
+  "status.boltSplitFilament": "{name} partido a lo largo: dos mitades apoyadas en sus caras de corte. Corta filamento de 1,75 mm: {pieces}.",
+  "status.boltSplitFilamentFlush": "{name} partido a lo largo: dos mitades apoyadas en sus caras de corte. Corta filamento de 1,75 mm: {pieces}. Alinea las mitades a lo ancho; empuja sus extremos hasta que queden a ras mientras seca el pegamento.",
   "status.boltSplitPins": "{name} dividido a lo largo: dos mitades sobre sus caras de corte y {count} pasadores de centrado Ø {diameter} × {length} mm.",
   "status.boltSplitNoPins": "{name} dividido a lo largo: dos mitades sin pasadores de centrado (no hay sitio para ellos).",
 };

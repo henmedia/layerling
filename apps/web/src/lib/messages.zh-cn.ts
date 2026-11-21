@@ -6098,6 +6098,10 @@ export const MESSAGES_ZH_CN: Partial<Record<MessageKey, string>> = {
   "boltSplit.pinsName": "{name} – 定位销",
   "inspector.boltSplitPins": "带定位销",
   "inspector.boltSplitPinsHint": "Ø {diameter} mm 的销钉，头部一根，螺纹部分按长度一到三根，装在垂直于剖切面的孔中：把两半精确对齐，包括轴向，使螺纹圈对上。孔以 45° 锥面收尾，所有零件都无需支撑即可打印。",
+  "inspector.boltSplitFilament": "用耗材做销钉（1.75 mm）",
+  "inspector.boltSplitFilamentHint": "不打印销钉，而是剪几段 1.75 mm 耗材：一段放进沿螺纹的槽中，两半各嵌一半，使两半在横向对准。螺钉头有位置时，另一段横穿螺钉头，使两半在轴向也对准；否则在胶水固化前把两半的端面推齐。M4 起可用；打印销钉要到 M6 才放得进螺纹。",
+  "status.boltSplitFilament": "{name} 已纵向剖开：两半以剖面朝下放置。请剪 1.75 mm 耗材：{pieces}。",
+  "status.boltSplitFilamentFlush": "{name} 已纵向剖开：两半以剖面朝下放置。请剪 1.75 mm 耗材：{pieces}。它使两半在横向对准；请在胶水固化前把两半的端面推齐。",
   "status.boltSplitPins": "{name} 已纵向剖分：两半以剖切面朝下，另有 {count} 根定位销 Ø {diameter} × {length} mm。",
   "status.boltSplitNoPins": "{name} 已纵向剖分：两半，无定位销（没有空间）。",
 };

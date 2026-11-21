@@ -6117,6 +6117,10 @@ export const MESSAGES_CS: Record<MessageKey, string> = {
   "boltSplit.pinsName": "{name} – středicí kolíky",
   "inspector.boltSplitPins": "Se středicími kolíky",
   "inspector.boltSplitPinsHint": "Kolíky Ø {diameter} mm, jeden v hlavě a podle délky jeden až tři v závitu, v otvorech kolmých k řezné ploše: přesně vyrovnají poloviny, i podélně, aby na sebe závity navazovaly. Otvory končí kuželem 45°, vše se tiskne bez podpěr.",
+  "inspector.boltSplitFilament": "Filament jako kolíky (1,75 mm)",
+  "inspector.boltSplitFilamentHint": "Místo tištěných kolíků: ustřihněte kousky filamentu 1,75 mm. Jeden leží v kanálku podél závitu, napůl v každé polovině, a srovná poloviny napříč. Kde má hlava místo, jde druhý napříč hlavou a srovná je i podél osy; jinak konce polovin srovnejte do roviny, dokud lepidlo neztuhne. Funguje od M4; tištěné kolíky se do závitu vejdou až od M6.",
+  "status.boltSplitFilament": "{name} rozdělen podélně: dvě poloviny na řezných plochách. Ustřihněte filament 1,75 mm: {pieces}.",
+  "status.boltSplitFilamentFlush": "{name} rozdělen podélně: dvě poloviny na řezných plochách. Ustřihněte filament 1,75 mm: {pieces}. Srovná poloviny napříč; jejich konce srovnejte do roviny, dokud lepidlo neztuhne.",
   "status.boltSplitPins": "{name} rozděleno podélně: dvě poloviny na řezných plochách a {count} středicí kolíky Ø {diameter} × {length} mm.",
   "status.boltSplitNoPins": "{name} rozděleno podélně: dvě poloviny bez středicích kolíků (není pro ně místo).",
 };

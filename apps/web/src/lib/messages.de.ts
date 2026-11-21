@@ -6117,6 +6117,10 @@ export const MESSAGES_DE: Record<MessageKey, string> = {
   "boltSplit.pinsName": "{name} – Zentrierstifte",
   "inspector.boltSplitPins": "Mit Zentrierstiften",
   "inspector.boltSplitPinsHint": "Stifte Ø {diameter} mm, einer im Kopf und je nach Länge ein bis drei im Gewinde, in Bohrungen senkrecht zur Schnittfläche: Sie richten die Hälften genau aus, auch längs, damit die Gewindegänge aufeinanderpassen. Die Bohrungen enden in einem 45°-Kegel, so druckt alles ohne Stützen.",
+  "inspector.boltSplitFilament": "Filament als Stifte (1,75 mm)",
+  "inspector.boltSplitFilamentHint": "Statt gedruckter Stifte: Stücke 1,75-mm-Filament abschneiden. Eines liegt in einer Rinne längs im Gewinde, je zur Hälfte in beiden Hälften, und richtet sie quer aus. Hat der Kopf Platz, kommt ein zweites quer in den Kopf und richtet sie auch längs aus; sonst die Enden der Hälften bündig schieben, bis der Kleber hält. Geht ab M4; gedruckte Stifte passen erst ab M6 ins Gewinde.",
+  "status.boltSplitFilament": "{name} längs geteilt: zwei Hälften auf ihren Schnittflächen. 1,75-mm-Filament abschneiden: {pieces}.",
+  "status.boltSplitFilamentFlush": "{name} längs geteilt: zwei Hälften auf ihren Schnittflächen. 1,75-mm-Filament abschneiden: {pieces}. Es richtet die Hälften quer aus; die Enden bündig schieben, bis der Kleber hält.",
   "status.boltSplitPins": "{name} längs geteilt: zwei Hälften auf ihren Schnittflächen und {count} Zentrierstifte Ø {diameter} × {length} mm.",
   "status.boltSplitNoPins": "{name} längs geteilt: zwei Hälften, ohne Zentrierstifte (dafür ist kein Platz).",
 };

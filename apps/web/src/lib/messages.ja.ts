@@ -6040,6 +6040,10 @@ export const MESSAGES_JA: Partial<Record<MessageKey, string>> = {
   "boltSplit.pinsName": "{name} – 位置決めピン",
   "inspector.boltSplitPins": "位置決めピン付き",
   "inspector.boltSplitPinsHint": "Ø {diameter} mm のピンを頭部に 1 本、ねじ部に長さに応じて 1～3 本、切断面に垂直な穴に入れます。軸方向も含めて半分同士を正確に合わせるので、ねじ山がずれません。穴の先は 45° の円錐なので、すべてサポートなしで印刷できます。",
+  "inspector.boltSplitFilament": "ピンにフィラメントを使う（1.75 mm）",
+  "inspector.boltSplitFilamentHint": "印刷したピンの代わりに 1.75 mm のフィラメントを切って使います。1 本はねじに沿った溝に、両方の半分へ半分ずつ入り、半分どうしを横方向に合わせます。頭部に余裕があれば、もう 1 本が頭部を横切り、軸方向にも合わせます。余裕がなければ、接着剤が固まるまで両方の半分の端をそろえて押さえてください。M4 から使えます（印刷ピンがねじ部に入るのは M6 から）。",
+  "status.boltSplitFilament": "{name} を縦に分割しました。2 つの半分が切断面を下にしています。1.75 mm フィラメントを切ってください：{pieces}。",
+  "status.boltSplitFilamentFlush": "{name} を縦に分割しました。2 つの半分が切断面を下にしています。1.75 mm フィラメントを切ってください：{pieces}。フィラメントは半分どうしを横方向に合わせます。接着剤が固まるまで端をそろえて押さえてください。",
   "status.boltSplitPins": "{name} を縦に分割: 切断面を下にした二つの半分と位置決めピン {count} 本 (Ø {diameter} × {length} mm)。",
   "status.boltSplitNoPins": "{name} を縦に分割: 位置決めピンなしの二つの半分 (ピンを入れる場所がありません)。",
 };

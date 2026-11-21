@@ -6025,6 +6025,10 @@ export const MESSAGES_HU: Partial<Record<MessageKey, string>> = {
   "boltSplit.pinsName": "{name} – illesztőcsapok",
   "inspector.boltSplitPins": "Illesztőcsapokkal",
   "inspector.boltSplitPinsHint": "Ø {diameter} mm-es csapok, egy a fejben és hossztól függően egy–három a menetben, a vágott lapra merőleges furatokban: pontosan egymáshoz igazítják a feleket, hosszirányban is, hogy a menetek összeérjenek. A furatok 45°-os kúpban végződnek, így minden támasz nélkül nyomtatható.",
+  "inspector.boltSplitFilament": "Filament mint csap (1,75 mm)",
+  "inspector.boltSplitFilamentHint": "Nyomtatott csapok helyett: vágj 1,75 mm-es filamentdarabokat. Egy a menet mentén futó csatornában fekszik, félig az egyik, félig a másik félben, és keresztben igazítja egymáshoz a feleket. Ha a fejben van hely, egy másik keresztben a fejbe kerül, és a tengely mentén is beigazítja őket; különben told egy síkba a felek végeit, amíg a ragasztó megköt. M4-től működik; nyomtatott csap csak M6-tól fér a menetbe.",
+  "status.boltSplitFilament": "{name} hosszában kettévágva: két fél a vágott felületén fekszik. Vágj 1,75 mm-es filamentet: {pieces}.",
+  "status.boltSplitFilamentFlush": "{name} hosszában kettévágva: két fél a vágott felületén fekszik. Vágj 1,75 mm-es filamentet: {pieces}. Keresztben igazítja egymáshoz a feleket; a végeiket told egy síkba, amíg a ragasztó megköt.",
   "status.boltSplitPins": "{name} hosszában felosztva: két fél a vágott lapján és {count} illesztőcsap, Ø {diameter} × {length} mm.",
   "status.boltSplitNoPins": "{name} hosszában felosztva: két fél illesztőcsapok nélkül (nincs hely számukra).",
 };

@@ -6122,6 +6122,10 @@ export const MESSAGES_PL: Partial<Record<MessageKey, string>> = {
   "boltSplit.pinsName": "{name} – kołki ustalające",
   "inspector.boltSplitPins": "Z kołkami ustalającymi",
   "inspector.boltSplitPinsHint": "Kołki Ø {diameter} mm, jeden w łbie i od jednego do trzech w gwincie zależnie od długości, w otworach prostopadłych do powierzchni cięcia: dokładnie wyrównują połowy, także wzdłuż, aby zwoje się zgadzały. Otwory kończą się stożkiem 45°, więc wszystko drukuje się bez podpór.",
+  "inspector.boltSplitFilament": "Filament jako kołki (1,75 mm)",
+  "inspector.boltSplitFilamentHint": "Zamiast drukowanych kołków: utnij kawałki filamentu 1,75 mm. Jeden leży w kanale wzdłuż gwintu, po połowie w każdej połówce, i ustawia połówki w poprzek. Gdy łeb ma miejsce, drugi idzie w poprzek łba i ustawia je też wzdłuż osi; w przeciwnym razie zrównaj końce połówek, aż klej zwiąże. Działa od M4; drukowane kołki mieszczą się w gwincie dopiero od M6.",
+  "status.boltSplitFilament": "{name} przecięty wzdłuż: dwie połówki leżą na powierzchniach cięcia. Utnij filament 1,75 mm: {pieces}.",
+  "status.boltSplitFilamentFlush": "{name} przecięty wzdłuż: dwie połówki leżą na powierzchniach cięcia. Utnij filament 1,75 mm: {pieces}. Ustawia połówki w poprzek; zrównaj ich końce, aż klej zwiąże.",
   "status.boltSplitPins": "{name} podzielone wzdłuż: dwie połowy na powierzchniach cięcia i kołki ustalające ({count}) Ø {diameter} × {length} mm.",
   "status.boltSplitNoPins": "{name} podzielone wzdłuż: dwie połowy bez kołków ustalających (nie ma na nie miejsca).",
 };
