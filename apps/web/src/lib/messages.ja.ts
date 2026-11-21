@@ -3127,6 +3127,7 @@ export const MESSAGES_JA: Partial<Record<MessageKey, string>> = {
   "shape.text": "テキスト",
   "shape.nameTag": "ネームタグ",
   "shape.roundRoof": "かまぼこ",
+  "shape.roof": "屋根",
   "shape.halfSphere": "半球",
   "shape.torus": "トーラス",
   "shape.tube": "パイプ",

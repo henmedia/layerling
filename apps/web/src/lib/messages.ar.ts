@@ -3212,6 +3212,7 @@ export const MESSAGES_AR: Partial<Record<MessageKey, string>> = {
   "shape.text": "نص",
   "shape.nameTag": "بطاقة اسم",
   "shape.roundRoof": "سقف مستدير",
+  "shape.roof": "سقف",
   "shape.halfSphere": "نصف كرة",
   "shape.torus": "حلقة (Torus)",
   "shape.tube": "أنبوب",

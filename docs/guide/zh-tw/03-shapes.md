@@ -21,7 +21,7 @@ layerling 的每個零件都從一個形狀開始。其餘一切都是由形狀�
 
 形狀庫提供：
 
-- **{{ui:library.section.basic}}：** {{ui:shape.box}}、{{ui:shape.roundedBox}}、{{ui:shape.cylinder}}、{{ui:shape.slot}}、{{ui:shape.ellipse}}、{{ui:shape.polygon}}（三到二十四邊）、{{ui:shape.wedge}}、{{ui:shape.sphere}}、{{ui:shape.cone}}、{{ui:shape.curvedCone}}（側面向內彎成像偽球面那樣的喇叭形，或向外鼓成圓頂；由 {{ui:prop.curvedConeTop}} 與 {{ui:prop.curvedConeBend}} 設定，並且像所有精確實體一樣可以薄殼與導圓角）、{{ui:shape.pyramid}}（三到二十四邊，因此也有三角錐）、{{ui:shape.roundRoof}}、{{ui:shape.halfSphere}}、{{ui:shape.paraboloid}}（收窄成圓頭的穹頂，高度隨離軸距離的平方下降）和 {{ui:shape.torus}}。
+- **{{ui:library.section.basic}}：** {{ui:shape.box}}、{{ui:shape.roundedBox}}、{{ui:shape.cylinder}}、{{ui:shape.slot}}、{{ui:shape.ellipse}}、{{ui:shape.polygon}}（三到二十四邊）、{{ui:shape.wedge}}、{{ui:shape.roof}}、{{ui:shape.sphere}}、{{ui:shape.cone}}、{{ui:shape.curvedCone}}（側面向內彎成像偽球面那樣的喇叭形，或向外鼓成圓頂；由 {{ui:prop.curvedConeTop}} 與 {{ui:prop.curvedConeBend}} 設定，並且像所有精確實體一樣可以薄殼與導圓角）、{{ui:shape.pyramid}}（三到二十四邊，因此也有三角錐）、{{ui:shape.roundRoof}}、{{ui:shape.halfSphere}}、{{ui:shape.paraboloid}}（收窄成圓頭的穹頂，高度隨離軸距離的平方下降）和 {{ui:shape.torus}}。
 - **{{ui:library.section.vessels}}：** 從一個輪廓過渡到另一個輪廓的 {{ui:shape.loft}}，例如從方形到圓形，{{ui:shape.tube}}，由最多十二段直管與其間的彎角組成的 {{ui:shape.bentTube}}，以及 {{ui:shape.vase}}。
 - **{{ui:library.section.holes}}：** 用於螺絲頭的 {{ui:shape.counterbore}} 與 {{ui:shape.countersink}}、用於水平孔的 {{ui:shape.teardrop}}，以及用於 USB、HDMI、DisplayPort 與 RJ45 插座的 {{ui:shape.port}}。 {{ui:threadInsert.title}} 在你選取的實體上開出熱熔嵌件的孔；它不能拖入設計。
 - **{{ui:library.section.connections}}：** {{ui:shape.thread}}（螺桿、螺絲、螺帽與螺紋孔）、沉頭螺絲下的 {{ui:shape.finishingWasher}}、可一體列印的 {{ui:shape.hinge}} 與 {{ui:shape.dovetail}}。更多內容見[螺紋與機械件](chapter:threads-and-mechanics)。
@@ -33,6 +33,8 @@ layerling 的每個零件都從一個形狀開始。其餘一切都是由形狀�
 - **{{ui:library.section.helpers}}：** {{ui:shape.ruler}}，它只是量測工具，永遠不會出現在匯出檔案中。
 
 要得到三角形有兩種方式：三邊的 {{ui:shape.polygon}} 是等腰三角形，也就是 Tinkercad 的「Roof」；{{ui:shape.wedge}} 則是直角三角形。兩者都是真正的三角柱。想挖出三角形孔，可複製該形狀、把副本縮小、標記為孔，再用 {{ui:editor.tool.centerOnWorkplane}} 或 {{ui:editor.tool.align}} 對齊。兩者都按形狀的邊界框運作，也就是包住它的最小方框，所以切掉一半的正方形仍算作完整正方形。命令搜尋（[[Ctrl]]+[[K]]）在「triangle」或「roof」下也找得到這兩種形狀。楔形的屬性裡還有{{ui:prop.wedgeAngle}}，即其斜面與平台的夾角。輸入一個角度，高度會在寬度不變的情況下隨之改變，便於把面上的工作平面設成一定的傾角。
+
+形狀庫中的{{ui:shape.roof}}正是這個三邊的多邊形，插入時已平躺在一個平面上，像屋頂一樣尖角朝上。頂部的控制點改變三角形的高度，底邊保持在平台上；底部的控制點改變寬度和長度。它仍然是{{ui:shape.polygon}}，所有設定都保留。
 
 {{ui:shape.slot}} 可以一端比另一端窄，例如用在兩顆皮帶輪之間的皮帶護罩。在 {{ui:inspector.properties}} 下設定 {{ui:prop.slotSmallEnd}}；大端與膠囊同寬，兩側從一段圓弧直通到另一段圓弧。{{ui:prop.slotCentreDistance}} 是兩段圓弧圓心之間的距離，也就是兩顆皮帶輪的間距。改變小端時圓心距保持不變，膠囊會變長或變短。錐形膠囊同樣是精確實體，可套用圓角並匯出 STEP。
 

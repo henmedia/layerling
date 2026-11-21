@@ -3126,6 +3126,7 @@ export const MESSAGES_EN = {
   "shape.text": "Text",
   "shape.nameTag": "Name tag",
   "shape.roundRoof": "Round Roof",
+  "shape.roof": "Roof",
   "shape.halfSphere": "Half Sphere",
   "shape.torus": "Torus",
   "shape.tube": "Tube",

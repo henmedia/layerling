@@ -3197,6 +3197,7 @@ export const MESSAGES_SV: Partial<Record<MessageKey, string>> = {
   "shape.text": "Text",
   "shape.nameTag": "Namnskylt",
   "shape.roundRoof": "Rundat tak",
+  "shape.roof": "Tak",
   "shape.halfSphere": "Halvsfär",
   "shape.torus": "Torus",
   "shape.tube": "Rör",

@@ -2950,6 +2950,7 @@ export const MESSAGES_PT_PT: Partial<Record<MessageKey, string>> = {
   "shape.text": "Texto",
   "shape.nameTag": "Placa de identificação",
   "shape.roundRoof": "Telhado arredondado",
+  "shape.roof": "Telhado",
   "shape.halfSphere": "Hemisfério",
   "shape.torus": "Toroide",
   "shape.tube": "Tubo",

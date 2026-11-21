@@ -239,6 +239,7 @@ const SHAPE_LABEL_KEYS: Record<string, MessageKey> = {
   iconTag: "shape.iconTag",
   qrCode: "shape.qrCode",
   sbcBoard: "shape.sbcBoard",
+  roof: "shape.roof",
   "round-roof": "shape.roundRoof",
   "half-sphere": "shape.halfSphere",
   paraboloid: "shape.paraboloid",
@@ -376,8 +377,46 @@ export const sbcBoardAsset: ToolbarShapeAsset = {
 };
 
 /**
+ * The roof (#1931): the three-sided polygon, put in lying on one flat side like Tinkercad's Roof, so a
+ * triangle lying on the plate is found by looking. People turned a wedge until it looked like one and then
+ * had no handle for the triangle's height; the polygon tile shows a hexagon. It is a polygon, not a kind
+ * of its own: `roofShape` lays it down as it is put in, and from then on it is an ordinary polygon.
+ */
+export const roofAsset: ToolbarShapeAsset = {
+  id: "roof",
+  name: "Roof",
+  src: "assets/editor/shape-icons-gray/roof.png",
+  menuIcon: "assets/editor/shape-icons-gray/roof.png",
+  kind: "polygon",
+  color: "#3f9b8a",
+};
+
+/**
+ * The saved polygon defaults as the roof takes them: always three sides, a corner on top, and 20 mm each way
+ * as Tinkercad's Roof, so the triangle is as high as its base is wide (the regular triangle would be narrower).
+ */
+export function roofCustomization(customization: ShapeCustomization = {}): ShapeCustomization {
+  return { ...customization, sides: 3, polygonFlat: false, width: ROOF_SIZE, depth: ROOF_SIZE, height: ROOF_SIZE };
+}
+
+const ROOF_SIZE = 20;
+
+/** The saved defaults a library entry starts from: the roof's are the polygon's, with three sides. */
+export function libraryAssetCustomization(asset: ShapeAsset, customization: ShapeCustomization = {}): ShapeCustomization {
+  return asset.id === roofAsset.id ? roofCustomization(customization) : customization;
+}
+
+/**
+ * The turn about its own X axis a library entry is set down with, in degrees (placementPatchForNewShape):
+ * the roof lies on one flat side with the corner on top, the rest stand as they are.
+ */
+export function libraryAssetTurnX(asset: ShapeAsset): number {
+  return asset.id === roofAsset.id ? 270 : 0;
+}
+
+/**
  * What the shape library lists: the catalogue, with the name tag, the icon tag and the QR code after the text,
- * and the SBC board after the port opening.
+ * the roof before the round roof, and the SBC board after the port opening.
  * The double countersink is not listed on its own: it is the countersink with "Both sides" switched on (#621). The
  * kind stays in the catalogue, so bodies that already are one, and the MCP, keep working.
  */
@@ -400,7 +439,7 @@ export const magnetPocketLibraryAsset: ToolbarShapeAsset = {
   color: "#b04a4a",
 };
 
-export const libraryShapeAssets: ToolbarShapeAsset[] = [threadInsertLibraryAsset, magnetPocketLibraryAsset, ...toolbarShapeAssets.flatMap((asset) => (asset.id === "text" ? [asset, nameTagAsset, iconTagAsset, qrCodeAsset] : asset.id === "port" ? [asset, sbcBoardAsset] : asset.id === "doubleCountersink" ? [] : [asset]))];
+export const libraryShapeAssets: ToolbarShapeAsset[] = [threadInsertLibraryAsset, magnetPocketLibraryAsset, ...toolbarShapeAssets.flatMap((asset) => (asset.id === "text" ? [asset, nameTagAsset, iconTagAsset, qrCodeAsset] : asset.id === "port" ? [asset, sbcBoardAsset] : asset.id === "round-roof" ? [roofAsset, asset] :asset.id === "doubleCountersink" ? [] : [asset]))];
 
 /**
  * The colour a new shape of this asset starts with: the asset's own, unless the shape

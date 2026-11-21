@@ -3560,6 +3560,7 @@ export const MESSAGES_DA: Partial<Record<MessageKey, string>> = {
   "shape.text": "Tekst",
   "shape.nameTag": "Navneskilt",
   "shape.roundRoof": "Rundt tag",
+  "shape.roof": "Tag",
   "shape.halfSphere": "Halvkugle",
   "shape.torus": "Torus",
   "shape.tube": "Rør",

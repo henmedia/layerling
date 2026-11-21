@@ -126,6 +126,7 @@ export const SHAPE_KEYWORDS: Readonly<Record<string, readonly string[]>> = {
   torus: ["ring", "donut", "o-ring", "oring"],
   wedge: ["ramp", "keil", "rampe", "schraege", "schräge", "triangle", "right triangle", "dreieck", "rechtwinklig"],
   polygon: ["triangle", "roof", "hexagon", "dreieck", "dach", "sechskant", "vieleck", "mehrkant"],
+  roof: ["roof", "dach", "triangle", "dreieck", "gable", "giebel", "satteldach", "prism", "prisma", "toit", "tejado"],
   "round-roof": ["roof", "dach", "arch", "toit rond", "dachrund", "halbzylinder"],
   pyramid: ["pyramide", "triangle", "dreieck"],
   slot: ["capsule", "kapsel", "langloch", "oblong"],

@@ -2287,6 +2287,7 @@ export const MESSAGES_SL: Partial<Record<MessageKey, string>> = {
   "shape.wedge": "Klin",
   "shape.text": "Besedilo",
   "shape.roundRoof": "Okrogla streha",
+  "shape.roof": "Streha",
   "shape.halfSphere": "Polkrogla",
   "shape.paraboloid": "Paraboloid",
   "shape.curvedCone": "Ukrivljen stožec",

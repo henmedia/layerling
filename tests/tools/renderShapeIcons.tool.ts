@@ -356,6 +356,25 @@ describe("palette icons", () => {
         return prism;
       },
     });
+    // The roof (#1931): the three-sided polygon lying on one flat side, as the library tile puts it in.
+    render({
+      name: "apps/web/public/assets/editor/shape-icons-gray/roof.png",
+      height: 17,
+      lay: false,
+      azimuth: 35,
+      elevation: 26,
+      build: () => {
+        const aspect = regularPolygonAspect(3);
+        const longest = Math.max(aspect.width, aspect.depth);
+        const prism = createPrismGeometry((22 * aspect.width) / longest, 26, (22 * aspect.depth) / longest, 3).toNonIndexed();
+        prism.rotateX(-Math.PI / 2);
+        prism.computeBoundingBox();
+        const box = prism.boundingBox!;
+        prism.translate(-(box.min.x + box.max.x) / 2, -box.min.y, -(box.min.z + box.max.z) / 2);
+        prism.computeVertexNormals();
+        return prism;
+      },
+    });
     render({
       name: "apps/web/public/assets/editor/shape-icons-gray/star.png",
       height: 10,

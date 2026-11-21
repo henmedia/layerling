@@ -3206,6 +3206,7 @@ export const MESSAGES_CS: Record<MessageKey, string> = {
   "shape.text": "Text",
   "shape.nameTag": "Jmenovka",
   "shape.roundRoof": "Oblá střecha",
+  "shape.roof": "Střecha",
   "shape.halfSphere": "Polokoule",
   "shape.torus": "Prstenec",
   "shape.tube": "Trubka",

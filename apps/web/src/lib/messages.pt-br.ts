@@ -809,6 +809,7 @@ export const MESSAGES_PT_BR: Partial<Record<MessageKey, string>> = {
   "shape.text": "Texto",
   "shape.nameTag": "Etiqueta de nome",
   "shape.roundRoof": "Telhado arredondado",
+  "shape.roof": "Telhado",
   "shape.halfSphere": "Meia esfera",
   "shape.torus": "Toro",
   "shape.tube": "Tubo",

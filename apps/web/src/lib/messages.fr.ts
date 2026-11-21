@@ -3112,6 +3112,7 @@ export const MESSAGES_FR: Partial<Record<MessageKey, string>> = {
   "shape.text": "Texte",
   "shape.nameTag": "Badge nominatif",
   "shape.roundRoof": "Demi-cylindre",
+  "shape.roof": "Toit",
   "shape.halfSphere": "Hémisphère",
   "shape.paraboloid": "Paraboloïde",
   "shape.curvedCone": "Cône courbe",

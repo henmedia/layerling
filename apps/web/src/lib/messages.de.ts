@@ -3125,6 +3125,7 @@ export const MESSAGES_DE: Record<MessageKey, string> = {
   "shape.text": "Text",
   "shape.nameTag": "Namensschild",
   "shape.roundRoof": "Rundes Dach",
+  "shape.roof": "Dach",
   "shape.halfSphere": "Halbkugel",
   "shape.torus": "Torus",
   "shape.tube": "Rohr",

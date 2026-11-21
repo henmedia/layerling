@@ -221,7 +221,7 @@ import { addFileBackup, allowBackupFolder, fileBackupsOfDesign, listFileBackups,
 import { backupFileBeforeOverwrite, takeEditorBackupReminder } from "@/components/workplane/fileBackupEditor";
 import { copyNamePatterns, shapeNamesIn, withCopyName } from "@/lib/shapeCopyName";
 import { nameForNewGroup } from "@/lib/groupName";
-import { clipboardShape, displayShapeName, hasOwnShapeName, iconTagAsset, qrCodeAsset, makeShapeFromAsset, nameTagAsset, sbcBoardAsset, shapeAssetLabel, toolbarShapeAssets } from "@/lib/shapeCatalog";
+import { clipboardShape, displayShapeName, hasOwnShapeName, iconTagAsset, qrCodeAsset, makeShapeFromAsset, nameTagAsset, libraryAssetCustomization, libraryAssetTurnX, sbcBoardAsset, shapeAssetLabel, toolbarShapeAssets } from "@/lib/shapeCatalog";
 import { storeRecentShape } from "@/lib/shapeLibrarySections";
 import { PORT_PRESET_ORDER, PORT_PRESETS, portPresetSize, type PortPreset } from "@/lib/portGeometry";
 import { WASHER_SIZE_ORDER, isWasherSize, washerTubeFields } from "@/lib/washerSizes";
@@ -6826,13 +6826,14 @@ export function LayerlingEditor({
         return;
       }
       // The saved defaults of the kind, and where they say nothing, the printer's play (printerPlay.ts).
-      const shape = makeShapeFromAsset(asset, undefined, withPrinterPlay(asset.kind, workspaceSettingsRef.current.shapeCustomizations[asset.kind], getPrinterPlay()));
+      // The roof (#1931) takes the polygon's defaults with three sides and is set down lying on one flat side.
+      const shape = makeShapeFromAsset(asset, undefined, libraryAssetCustomization(asset, withPrinterPlay(asset.kind, workspaceSettingsRef.current.shapeCustomizations[asset.kind], getPrinterPlay())));
       // Dropped on a body's face, the shape lies on that face; otherwise on the current workplane.
       const workplane = onFace ?? placementWorkplane;
       const nextShape = prepareNewShape(asset, {
         ...shape,
         // Put in without a spot, it lands on the active build plate (#456).
-        ...placementPatchForNewShape(shape, workplane, point ?? buildPlates.newShapeOrigin(workplane), sunk && onFace !== undefined),
+        ...placementPatchForNewShape(shape, workplane, point ?? buildPlates.newShapeOrigin(workplane), sunk && onFace !== undefined, libraryAssetTurnX(asset)),
       });
       commitShapes([...shapes, nextShape], nextShape.id, t("status.shapeAdded", { name: shapeAssetLabel(asset) }));
     },

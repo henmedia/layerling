@@ -72,7 +72,7 @@ import { GuideHelpLink } from "@/components/GuideHelpLink";
 import { heightWithFaceOnGrid, liftDeltaOnGrid, liftGeometryForFrame, type SelectionFrame } from "@/lib/liftGeometry";
 import { slideAxisForHandle, slideAxisVector } from "@/lib/slideArrows";
 import { projectThumbnailDimensions } from "@/lib/projectThumbnail";
-import { displayShapeName, makeShapeFromAsset, parseDroppedShapeAsset } from "@/lib/shapeCatalog";
+import { displayShapeName, libraryAssetCustomization, libraryAssetTurnX, makeShapeFromAsset, parseDroppedShapeAsset } from "@/lib/shapeCatalog";
 import { getPrinterPlay, withPrinterPlay } from "@/lib/printerPlay";
 import { planarFaceCentre } from "@/lib/faceCentre";
 import { scaledHorizontalShapePatch } from "@/lib/scaleByPercent";
@@ -3987,12 +3987,13 @@ export function WorkplaneViewport({
     const state = threeRef.current;
     if (!state) return;
     // As the shape will be made when it is put down: the saved defaults, and the printer's play where they say nothing.
-    const customization = withPrinterPlay(cruiseAsset.kind, workspaceRef.current.shapeCustomizations[cruiseAsset.kind], getPrinterPlay());
+    const customization = libraryAssetCustomization(cruiseAsset, withPrinterPlay(cruiseAsset.kind, workspaceRef.current.shapeCustomizations[cruiseAsset.kind], getPrinterPlay()));
     const base = makeShapeFromAsset(cruiseAsset, undefined, customization);
     const workplane = placementWorkplaneRef.current;
     const placed = {
       ...base,
-      ...placementPatchForNewShape(base, workplane, workplane.origin),
+      // The roof (#1931) lies on one flat side, as it will when it is put down.
+      ...placementPatchForNewShape(base, workplane, workplane.origin, false, libraryAssetTurnX(cruiseAsset)),
     };
     const shape = prepareNewShapeRef.current ? prepareNewShapeRef.current(cruiseAsset, placed) : placed;
     const object = createShapeObject(shape, false, () => {

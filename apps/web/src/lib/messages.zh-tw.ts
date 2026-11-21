@@ -3077,6 +3077,7 @@ export const MESSAGES_ZH_TW: Partial<Record<MessageKey, string>> = {
   "shape.text": "文字",
   "shape.nameTag": "名牌",
   "shape.roundRoof": "圓形屋頂",
+  "shape.roof": "屋頂",
   "shape.halfSphere": "半球",
   "shape.torus": "圓環",
   "shape.tube": "管",

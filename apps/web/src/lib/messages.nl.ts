@@ -3126,6 +3126,7 @@ export const MESSAGES_NL: Record<MessageKey, string> = {
   "shape.text": "Tekst",
   "shape.nameTag": "Naambordje",
   "shape.roundRoof": "Rond dak",
+  "shape.roof": "Dak",
   "shape.halfSphere": "Halve bol",
   "shape.torus": "Torus",
   "shape.tube": "Buis",

@@ -2530,6 +2530,7 @@ export const MESSAGES_HU: Partial<Record<MessageKey, string>> = {
   "shape.text": "Szöveg",
   "shape.nameTag": "Névcímke",
   "shape.roundRoof": "Íves tető",
+  "shape.roof": "Tető",
   "shape.halfSphere": "Félgömb",
   "shape.torus": "Tórusz",
   "shape.tube": "Cső",

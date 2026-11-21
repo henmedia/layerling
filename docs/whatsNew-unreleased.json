@@ -1,6 +1,19 @@
 [
   {
     "title": {
+      "de": "Neue Form: Dach",
+      "en": "New shape: Roof"
+    },
+    "body": {
+      "de": "In den Grundformen steht jetzt neben dem runden Dach ein Dach: ein Dreieck, das auf der Arbeitsebene liegt, die Spitze oben. Der Griff oben ändert die Höhe des Dreiecks, die Grundseite bleibt dabei auf der Platte; die Griffe unten ändern Breite und Länge.\n\nEs ist ein Mehrkant mit drei Seiten, mit all seinen Einstellungen.",
+      "en": "The basic shapes now have a Roof next to the Round roof: a triangle lying on the workplane, its corner on top. The handle on top changes the height of the triangle while its base stays on the plate; the handles at the bottom change its width and length.\n\nIt is a Polygon with three sides, with all its settings."
+    },
+    "guide": {
+      "chapter": "shapes"
+    }
+  },
+  {
+    "title": {
       "de": "Ein Bild für jeden Ordner",
       "en": "A picture for every folder",
       "ar": "صورة لكل مجلد"

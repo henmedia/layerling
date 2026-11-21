@@ -1966,6 +1966,7 @@ export const MESSAGES_TR: Partial<Record<MessageKey, string>> = {
   "shape.text": "Metin",
   "shape.nameTag": "İsimlik",
   "shape.roundRoof": "Yuvarlak çatı",
+  "shape.roof": "Çatı",
   "shape.halfSphere": "Yarım küre",
   "shape.torus": "Simit",
   "shape.tube": "Boru",
