@@ -18757,6 +18757,40 @@ html[data-theme="dark"] .layer-check-remedy {
   gap: 4px;
 }
 
+.mold-openings ul {
+  display: grid;
+  gap: 2px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.mold-openings li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 13px;
+}
+
+.mold-openings li button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  padding: 0;
+  color: inherit;
+  background: transparent;
+  border: 0;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.mold-openings li button:hover:not(:disabled) {
+  background: rgba(127, 127, 127, 0.18);
+}
+
 html[data-theme="dark"] .layer-view-readout strong {
   color: #ecdcc9;
 }

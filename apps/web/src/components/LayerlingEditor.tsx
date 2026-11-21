@@ -32,9 +32,9 @@ import { DEFAULT_ICON_TAG_WIDTH, ICON_TAG_LAYERS, MAX_ICON_TAG_WIDTH, MIN_ICON_T
 import { automaticFlexiJoints, automaticFoldJoints, DEFAULT_FLEXI_FOLD, FLEXI_DEFAULTS, normalizeFlexiOptions, type FlexiOptions } from "@/lib/flexiJoints";
 import { LID_HINGE_TYPES, groupedWithMagnets, lidClickBumpsFit, lidStackTopFits, lidDefaults, lidFlipTopFits, lidHandleFits, lidLatchesFit, lidNeckFit, lidNeckFitPatch, lidStandardThread, lidTakesMagnets, lidTetherFits, lidTopEdgeFits, magnetPocketDepth, normalizeLidOptions, type LidOptions, type LidThreadStandard } from "@/lib/lidTool";
 import { boltSplitFits, type BoltSplitOptions } from "@/lib/boltSplit";
-import { MOLD_CAST_MATERIAL_DATA, MOLD_DEFAULTS, moldOpeningAngles, moldOpeningVector, normalizeMoldOptions, type MoldAnalysis, type MoldOptions } from "@/lib/moldTool";
+import { MOLD_CAST_MATERIAL_DATA, MOLD_DEFAULTS, moldOpeningAngles, moldOpeningAt, moldOpeningVector, normalizeMoldOpenings, normalizeMoldOptions, type MoldAnalysis, type MoldOpeningKind, type MoldOptions } from "@/lib/moldTool";
 import { readMoldSettings, writeMoldSettings } from "@/lib/moldSettings";
-import type { MoldPreview } from "./workplane/MoldPreviewOverlay";
+import type { MoldOpeningPick, MoldPreview } from "./workplane/MoldPreviewOverlay";
 import { FIT_TEST_CLEARANCES, getPrinterPlay, MAX_PRINTER_PLAY, MIN_PRINTER_PLAY, normalizePrinterPlay, PRINTER_PLAY_SETTINGS, printerPlayPrinter, printerPlaySource, printerPlayStart, setPrinterPlay, setPrinterPlayPrinter, withPrinterPlay } from "@/lib/printerPlay";
 import { FIT_TEST_PIN_DIAMETER, fitTestHoles, fitTestShape, fitTestSpot } from "@/lib/fitTest";
 import { fitTestPinBaseChosen } from "@/lib/breakawayBase";
@@ -3703,6 +3703,11 @@ export function LayerlingEditor({
     analysis?: MoldAnalysis | null; analysing?: boolean;
     /** Opened from a part of an earlier mold: its group, whose parts Make replaces, and the master's name. */
     replaceGroup?: string | null; regenerateOf?: string | null;
+    /**
+     * With the openings set by the user (Discussion #1806): what a click on the master sets, and the openings clicked
+     * since the last check, shown at once where they were clicked until the check draws them itself.
+     */
+    openingKind?: MoldOpeningKind; pendingOpenings?: MoldPreview["highPoints"];
   }) | null>(null);
   /** The cable channel: the body, the two ends clicked on it, which end a click sets now, and its settings. */
   const [cableTool, setCableTool] = useState<(CableChannelOptions & { targetId: string; entry: CableEnd | null; exit: CableEnd | null; picking: CableChannelEndName | null; busy: boolean; error: string | null }) | null>(null);
@@ -9324,7 +9329,7 @@ export function LayerlingEditor({
       setMoldTool(null);
       return;
     }
-    const { targetIds: _ids, busy: _busy, error: _error, analysis: _analysis, analysing: _analysing, replaceGroup, regenerateOf: _of, ...options } = moldTool;
+    const { targetIds: _ids, busy: _busy, error: _error, analysis: _analysis, analysing: _analysing, replaceGroup, regenerateOf: _of, openingKind: _openingKind, pendingOpenings: _pending, ...options } = moldTool;
     setMoldTool((current) => current ? { ...current, busy: true, error: null } : current);
     void makeMold(options, targets, replaceGroup).then((result) => {
       if (result.ok) setMoldTool(null);
@@ -9334,7 +9339,7 @@ export function LayerlingEditor({
 
   // The live check of a two-part mold: a moment after the last change, off the page; a newer change calls the older off.
   const moldCheckKey = moldTool && moldTool.kind === "twoPart"
-    ? JSON.stringify({ ...moldTool, busy: undefined, error: undefined, analysis: undefined, analysing: undefined, replaceGroup: undefined, regenerateOf: undefined, output: undefined })
+    ? JSON.stringify({ ...moldTool, busy: undefined, error: undefined, analysis: undefined, analysing: undefined, replaceGroup: undefined, regenerateOf: undefined, output: undefined, openingKind: undefined, pendingOpenings: undefined })
     : null;
   useEffect(() => {
     if (!moldCheckKey) return;
@@ -9346,7 +9351,7 @@ export function LayerlingEditor({
     const timer = window.setTimeout(() => {
       void analyseMoldOffThread(targets, normalizeMoldOptions(current, MOLD_DEFAULTS), controller.signal).then((result) => {
         if (controller.signal.aborted) return;
-        setMoldTool((tool) => tool ? { ...tool, analysing: false, analysis: result.analysis ?? tool.analysis ?? null } : tool);
+        setMoldTool((tool) => tool ? { ...tool, analysing: false, analysis: result.analysis ?? tool.analysis ?? null, pendingOpenings: undefined } : tool);
       });
     }, 350);
     return () => {
@@ -9360,8 +9365,32 @@ export function LayerlingEditor({
     const analysis = moldTool?.kind === "twoPart" ? moldTool.analysis : null;
     if (!analysis) return null;
     const up = moldFree && moldTool ? moldOpeningVector(moldTool.openTilt, moldTool.openTurn) : analysis.up;
-    return { partingCorners: analysis.partingCorners, highPoints: analysis.highPoints, up, handle: moldFree ? { centre: analysis.centre, reach: analysis.reach } : null };
-  }, [moldTool?.analysis, moldTool?.kind, moldFree, moldTool?.openTilt, moldTool?.openTurn]);
+    // With the openings set by the user, clicks set and remove them. While a newer check is under way the posts' numbers
+    // may be those of an older list, so they cannot be clicked away until it is there; the openings just clicked show at once.
+    const own = Boolean(moldTool?.ownOpenings);
+    const highPoints = own && moldTool?.analysing ? [...analysis.highPoints.map(({ opening: _opening, ...point }) => point), ...(moldTool.pendingOpenings ?? [])] : analysis.highPoints;
+    return {
+      partingCorners: analysis.partingCorners, highPoints, up, handle: moldFree ? { centre: analysis.centre, reach: analysis.reach } : null,
+      openingPick: own && moldTool ? { ids: moldTool.targetIds } : null,
+    };
+  }, [moldTool?.analysis, moldTool?.kind, moldFree, moldTool?.openTilt, moldTool?.openTurn, moldTool?.ownOpenings, moldTool?.analysing, moldTool?.pendingOpenings, moldTool?.targetIds]);
+  /**
+   * A click in the view while the openings are set by the user: on an opening's post it is taken away, on the master a new
+   * one of the kind chosen in the panel is set there. The point becomes a place across the parting face (from the master's
+   * middle, in the frame of the last check), so the opening stays on the master when the master is moved.
+   */
+  const pickMoldOpening = useCallback((pick: MoldOpeningPick) => {
+    setMoldTool((current) => {
+      if (!current || current.busy || !current.ownOpenings) return current;
+      if ("remove" in pick) return { ...current, openings: current.openings.filter((_, index) => index !== pick.remove), error: null };
+      if (!current.analysis) return current;
+      const kind = current.openingKind ?? "sprue";
+      const openings = normalizeMoldOpenings([...current.openings, { ...moldOpeningAt(current.analysis, pick.point), kind }]);
+      // A second click on the same spot, or more than a mold takes: nothing new.
+      if (openings.length === current.openings.length) return current;
+      return { ...current, openings, pendingOpenings: [...(current.pendingOpenings ?? []), { point: pick.point, vented: true, sprue: kind === "sprue" }], error: null };
+    });
+  }, []);
   const dragMoldDirection = useCallback((direction: [number, number, number]) => {
     const { tilt, turn } = moldOpeningAngles(direction);
     setMoldTool((current) => current && (current.direction !== "free" || current.openTilt !== tilt || current.openTurn !== turn) ? { ...current, direction: "free", openTilt: tilt, openTurn: turn, error: null } : current);
@@ -16184,7 +16213,12 @@ export function LayerlingEditor({
               ...(analysis.axis === "free" ? moldOpeningAngles(analysis.up) : {}),
               ratings: analysis.ratings.map((rating) => ({ direction: rating.axis, undercutPercent: round(rating.undercutPercent), undercutMm2: round(rating.undercutMm2), parting: rating.parting })),
               findings: analysis.findings.map((finding) => ({ kind: finding.kind, level: finding.level, areaMm2: round(finding.areaMm2), at: { x: round(finding.point[0]), z: round(finding.point[2]), elevation: round(finding.point[1]) } })),
-              highPoints: analysis.highPoints.map((point, index) => ({ index, sprue: point.sprue, vented: point.vented, at: { x: round(point.point[0]), z: round(point.point[2]), elevation: round(point.point[1]) } })),
+              highPoints: analysis.highPoints.map((point, index) => ({ index, sprue: point.sprue, vented: point.vented, ...(point.opening !== undefined ? { opening: point.opening } : {}), at: { x: round(point.point[0]), z: round(point.point[2]), elevation: round(point.point[1]) } })),
+              // The two directions an opening's x and y run along from the master's middle, and what the automatic placement
+              // makes, as openings: pass them back as `openings` with `ownOpenings` to start from them.
+              across: analysis.across.map((axis) => axis.map((value) => Number(value.toFixed(4)))),
+              suggestedOpenings: analysis.suggested.map((opening) => ({ x: round(opening.x), y: round(opening.y), kind: opening.kind })),
+              ...(analysis.missedOpenings ? { missedOpenings: analysis.missedOpenings } : {}),
               volumeMl: round(analysis.volume), weightG: round(analysis.weightG), outerMm: analysis.outer.map(round),
             },
           } : {}),
@@ -20568,6 +20602,7 @@ export function LayerlingEditor({
           layerView={layerView}
           moldPreview={moldPreview}
           onMoldDirectionDrag={moldFree ? dragMoldDirection : undefined}
+          onMoldOpeningPick={moldPreview?.openingPick ? pickMoldOpening : undefined}
           onSetPlacementWorkplane={setViewportPlacementWorkplane}
           onToggleWorkplaneTool={activateWorkplaneTool}
           onInteractionActiveChange={updateProjectInteractionActive}
@@ -21117,6 +21152,8 @@ export function LayerlingEditor({
           analysis={moldTool.analysis ?? null}
           analysing={Boolean(moldTool.analysing)}
           regenerateOf={moldTool.regenerateOf ?? null}
+          openingKind={moldTool.openingKind ?? "sprue"}
+          onOpeningKind={(openingKind) => setMoldTool((current) => current ? { ...current, openingKind } : current)}
           onChange={(patch) => setMoldTool((current) => {
             if (!current) return current;
             // Another casting material brings its own shrinkage and density.

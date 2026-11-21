@@ -1,22 +1,31 @@
 import * as THREE from "three";
 import { RENDER_LAYER_HELPERS, setObjectRenderLayer, type ThreeState } from "@/components/workplane/ViewportOverlays";
-import { pointerRayFor } from "@/components/workplane/viewportPicking";
+import { RENDER_LAYER_SHAPES, aimPickRay, firstShapeHit, pointerRayFor } from "@/components/workplane/viewportPicking";
 import type { ClearanceVec3 } from "@/lib/clearanceCheck";
 
 /*
  * What the mold tool shows while its panel is open (its undercuts are painted red by the print check's paint, see
  * ThinWallOverlay): the parting face as a see-through coloured plane round the master, the sprue as an orange post on the
- * master's highest point, each vent as a blue post, and every high point left without one as a red ball.
+ * master's highest point, each vent as a blue post, and every high point left without one as a red ball. With the openings
+ * set by the user (Discussion #1806) the posts are those openings, and a click sets one on the master or takes one away.
  */
 
 export type MoldPreview = {
   partingCorners: ClearanceVec3[];
-  highPoints: Array<{ point: ClearanceVec3; vented: boolean; sprue: boolean }>;
+  highPoints: Array<{ point: ClearanceVec3; vented: boolean; sprue: boolean; opening?: number }>;
   /** The scene's direction the mold opens in (the sprue and vents run along it). */
   up: ClearanceVec3;
   /** With a free direction: the drag handle, an arrow from the master's middle along `up` with a knob at its tip. */
   handle?: { centre: ClearanceVec3; reach: number } | null;
+  /**
+   * With the openings set by the user: clicks in the view set and remove them. `ids` are the master's bodies, the only
+   * ones a click sets an opening on (a body standing in front of the master is looked through).
+   */
+  openingPick?: { ids: string[] } | null;
 };
+
+/** What a click meant while the user sets the openings: the post of the opening to take away, or the point on the master for a new one. */
+export type MoldOpeningPick = { remove: number } | { point: ClearanceVec3 };
 
 /** How far from the master's middle the handle's knob stands, as a share of half its diagonal. */
 const HANDLE_REACH = 1.6;
@@ -59,9 +68,20 @@ export function syncMoldPreviewOverlay(state: ThreeState, preview: MoldPreview |
     const up = new THREE.Vector3(...preview.up).normalize();
     const size = Math.max(a.map((value, index) => Math.abs(value - c[index])).reduce((x, y) => Math.max(x, y), 0), 10);
     for (const point of preview.highPoints) {
-      if (point.sprue) group.add(post(point.point, up, size * 0.35, Math.max(0.8, size * 0.02), "#e8851a"));
-      else if (point.vented) group.add(post(point.point, up, size * 0.3, Math.max(0.5, size * 0.01), "#2f6fd6"));
-      else {
+      const marker = point.sprue ? post(point.point, up, size * 0.35, Math.max(0.8, size * 0.02), "#e8851a")
+        : point.vented ? post(point.point, up, size * 0.3, Math.max(0.5, size * 0.01), "#2f6fd6") : null;
+      if (marker) {
+        // An opening the user set knows its place in the list, for the click that takes it away.
+        // A thin post is hard to hit, so a wider one that is not drawn stands round it for the click.
+        if (point.opening !== undefined) {
+          const target = post(point.point, up, size * 0.35, Math.max(2, size * 0.04), "#000000");
+          target.visible = false;
+          target.userData.moldOpening = point.opening;
+          marker.userData.moldOpening = point.opening;
+          group.add(target);
+        }
+        group.add(marker);
+      } else {
         const ball = new THREE.Mesh(new THREE.SphereGeometry(Math.max(0.8, size * 0.025), 16, 12), new THREE.MeshBasicMaterial({ color: "#e5484d", depthTest: false }));
         ball.position.set(...point.point);
         ball.renderOrder = 1011;
@@ -119,4 +139,22 @@ export function moldHandleDirection(state: ThreeState, clientX: number, clientY:
   const point = ray.intersectSphere(sphere, new THREE.Vector3()) ?? ray.closestPointToPoint(middle, new THREE.Vector3());
   const direction = point.sub(middle);
   return direction.lengthSq() > 1e-9 ? direction.normalize() : null;
+}
+
+/**
+ * What a press means while the user sets the openings: on the post of an opening, that opening is to go; on the master
+ * (one of `ids`, whatever stands in front of it), a new opening is to come at that point. Null beside both, so the press
+ * does what it always does.
+ */
+export function pickMoldOpening(state: ThreeState, clientX: number, clientY: number, ids: readonly string[], shapeIds: readonly string[]): MoldOpeningPick | null {
+  const group = groups.get(state);
+  if (group) {
+    pointerRayFor(state, clientX, clientY);
+    state.raycaster.layers.set(RENDER_LAYER_HELPERS);
+    const post = state.raycaster.intersectObjects(group.children, false).find((hit) => typeof hit.object.userData.moldOpening === "number");
+    if (post) return { remove: post.object.userData.moldOpening as number };
+  }
+  aimPickRay(state, clientX, clientY, RENDER_LAYER_SHAPES);
+  const hit = firstShapeHit(state, { needsFace: true, skip: new Set(shapeIds.filter((id) => !ids.includes(id))) });
+  return hit ? { point: [hit.point.x, hit.point.y, hit.point.z] } : null;
 }

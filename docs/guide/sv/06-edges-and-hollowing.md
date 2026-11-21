@@ -160,6 +160,8 @@ Klicka på {{ui:mold.apply}}: delarna ligger bredvid originalet så som de skriv
 
 Det vanligaste problemet med formar är ett gjutstycke som fastnar. Där originalet är bredare ovanför delningen än under den varnar fönstret för en underskärning: flytta {{ui:mold.parting}} dit där originalet är bredast, vänd originalet eller ta gjutlådan för silikon, som släpper underskärningar.
 
+Med {{ui:mold.ownOpenings}} bestämmer du själv var materialet rinner in och var luften kommer ut. Ingötet och luftkanalerna placeras då inte längre av sig själva: välj under {{ui:mold.openings.kind}} om ett klick sätter ett {{ui:mold.openings.sprue}} eller en {{ui:mold.openings.vent}}, och klicka på originalet i vyn. Öppningen går från det stället rakt genom den övre halvan upp till formens ovansida, i den riktning formen öppnas. Ett klick på en öppnings stav tar bort den igen; fönstret räknar upp öppningarna med deras läge, var och en med en knapp för att ta bort den. {{ui:mold.openings.suggested}} fyller listan med de öppningar Layerling själv skulle placera, så att du kan utgå från dem och ändra dem. En öppning bredvid originalet utelämnas och meddelas, en form utan ingöt får en varning eftersom den inte kan fyllas, och en högsta punkt utan öppning i närheten visas fortfarande som en röd prick, så att du ser var luft skulle bli kvar.
+
 > **Tips:** Försegla en utskriven form (med harts eller vax) och använd släppmedel, annars hakar gjutstycket fast i lagerlinjerna. PLA mjuknar från cirka 55 °C: för varmt vax, tvål eller harts som blir varmt när det härdar, skriv ut formen i PETG eller ASA.
 
 ## En kabelkanal genom en kropp

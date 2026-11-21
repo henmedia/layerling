@@ -164,6 +164,8 @@ For en {{ui:mold.kind.twoPart}} vurderer vinduet alle tre måder, formen kan åb
 
 {{ui:mold.direction.free}} åbner den helt uden om, til en original, hvis bedste vej er skrå (en tap, der læner sig ud af en sokkel, for eksempel): træk den lilla knap i visningen rundt om dens ring, eller indstil {{ui:mold.openTilt}} (0° op og ned, 90° til siden) og {{ui:mold.openTurn}}. Tallet på knappen er dens underskæring, som du kan sammenligne med de tre lige retninger; halvdelene ligger stadig fladt med delefladen opad for at blive printet.
 
+Med {{ui:mold.ownOpenings}} bestemmer du selv, hvor materialet løber ind, og hvor luften kommer ud. Indløbet og luftkanalerne placeres så ikke længere af sig selv: vælg under {{ui:mold.openings.kind}}, om et klik sætter et {{ui:mold.openings.sprue}} eller en {{ui:mold.openings.vent}}, og klik på originalen i visningen. Åbningen går fra det sted lige gennem den øverste halvdel op til formens overside, i den retning formen åbner. Et klik på en åbnings stav fjerner den igen; vinduet viser åbningerne med deres plads, hver med en knap til at fjerne den. {{ui:mold.openings.suggested}} fylder listen med de åbninger, Layerling selv ville placere, så du kan begynde derfra og ændre dem. En åbning ved siden af originalen udelades og meldes, en form uden indløb får en advarsel, fordi den ikke kan fyldes, og et højeste punkt uden en åbning i nærheden vises stadig som en rød prik, så du ser, hvor der ville blive luft tilbage.
+
 > **Tip:** Forsegl en printet form (med harpiks eller voks), og brug slipmiddel, ellers hager støbningen sig fast i laglinjerne. PLA bliver blødt fra omkring 55 °C: til varm voks, sæbe eller harpiks, der bliver varm, mens den hærder, skal formen printes i PETG eller ASA.
 
 ## En kabelkanal gennem et legeme

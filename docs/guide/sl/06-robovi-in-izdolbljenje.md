@@ -159,6 +159,8 @@ Klikni {{ui:mold.apply}}: deli ležijo poleg izvirnika tako, kot se natisnejo br
 
 Najpogostejša težava s kalupi je ulitek, ki se zatakne. Kjer je izvirnik nad delitvijo širši kot pod njo, okno opozori na spodrez: premakni {{ui:mold.parting}} tja, kjer je izvirnik najširši, obrni izvirnik ali vzemi okvir za silikon, ki spodreze sprosti.
 
+Z možnostjo {{ui:mold.ownOpenings}} sam določiš, kje gradivo priteka in kje uhaja zrak. Ulivnik in zračniki se potem ne postavijo več sami: pod {{ui:mold.openings.kind}} izberi, ali klik postavi {{ui:mold.openings.sprue}} ali {{ui:mold.openings.vent}}, in klikni izvirnik v pogledu. Odprtina teče od tega mesta naravnost skozi zgornjo polovico do vrha kalupa, v smeri, v kateri se kalup odpira. Klik na paličico odprtine jo spet odstrani; okno našteje odprtine z njihovo lego, vsako z gumbom za odstranitev. {{ui:mold.openings.suggested}} napolni seznam z odprtinami, ki bi jih Layerling postavil sam, da lahko začneš pri njih in jih spremeniš. Odprtina ob izvirniku se izpusti in javi, kalup brez ulivnika dobi opozorilo, ker ga ni mogoče napolniti, najvišja točka brez odprtine v bližini pa je še naprej prikazana kot rdeča pika, da vidiš, kje bi ostal zrak.
+
 > **Namig:** Natisnjeni kalup zatesni (s smolo ali voskom) in uporabi ločilno sredstvo, sicer se ulitek zagrabi v linije slojev. PLA se zmehča že pri približno 55 °C: za vroč vosek, milo ali smolo, ki se pri strjevanju segreje, natisni kalup v PETG ali ASA.
 
 ## Kabelski kanal skozi telo

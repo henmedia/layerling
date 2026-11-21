@@ -159,6 +159,8 @@ Kattints a {{ui:mold.apply}} gombra: a részek a mesterminta mellett fekszenek �
 
 A formák leggyakoribb gondja a beragadó öntvény. Ahol a mesterminta az osztás fölött szélesebb, mint alatta, az ablak alámetszésre figyelmeztet: tedd az {{ui:mold.parting}} értékét oda, ahol a mesterminta a legszélesebb, fordítsd el a mestermintát, vagy válaszd a szilikonöntő keretet, amely elengedi az alámetszéseket.
 
+A {{ui:mold.ownOpenings}} beállítással magad döntöd el, hol folyik be az anyag és hol távozik a levegő. A beömlő és a légzők ekkor már nem kerülnek a helyükre maguktól: a {{ui:mold.openings.kind}} alatt válaszd ki, hogy egy kattintás {{ui:mold.openings.sprue}} vagy {{ui:mold.openings.vent}} nyílást helyez-e el, majd kattints a nézetben a mestermintára. A nyílás ettől a ponttól egyenesen halad át a felső félen a forma tetejéig, abban az irányban, amerre a forma nyílik. Egy nyílás pálcájára kattintva újra eltávolítod; az ablak felsorolja a nyílásokat a helyükkel együtt, mindegyiket egy eltávolító gombbal. A {{ui:mold.openings.suggested}} gomb azokkal a nyílásokkal tölti fel a listát, amelyeket a Layerling magától helyezne el, így ezekből indulhatsz ki és módosíthatod őket. A mesterminta melletti nyílás kimarad, és erről jelzést kapsz, a beömlő nélküli forma figyelmeztetést kap, mert nem tölthető meg, a közelében nyílás nélküli legmagasabb pont pedig továbbra is piros pontként látszik, hogy lásd, hol maradna levegő.
+
 > **Tipp:** Zárd le a nyomtatott formát (gyantával vagy viasszal), és használj formaleválasztót, különben az öntvény beleakad a rétegvonalakba. A PLA már kb. 55 °C-tól lágyul: forró viaszhoz, szappanhoz vagy kötés közben melegedő gyantához a formát PETG-ből vagy ASA-ból nyomtasd.
 
 ## Kábelcsatorna egy testen át

@@ -159,6 +159,8 @@ Klik op {{ui:mold.apply}}: de onderdelen liggen naast het origineel zoals ze zon
 
 Het meest voorkomende probleem met mallen is een gietstuk dat vastzit. Waar het origineel boven de deling breder is dan eronder, waarschuwt het venster voor een ondersnijding: verschuif de {{ui:mold.parting}} naar waar het origineel het breedst is, draai het origineel of neem de gietkist voor siliconen, die ondersnijdingen loslaat.
 
+Met {{ui:mold.ownOpenings}} bepaal je zelf waar het materiaal naar binnen loopt en waar de lucht eruit komt. Het gietkanaal en de ontluchtingen worden dan niet meer vanzelf geplaatst: kies onder {{ui:mold.openings.kind}} of een klik een {{ui:mold.openings.sprue}} of een {{ui:mold.openings.vent}} plaatst, en klik in het beeld op het origineel. De opening loopt vanaf die plek recht door de bovenste helft naar de bovenkant van de mal, in de richting waarin de mal opent. Een klik op het staafje van een opening haalt die weer weg; het venster somt de openingen op met hun plaats, elk met een knop om ze te verwijderen. {{ui:mold.openings.suggested}} vult de lijst met de openingen die Layerling zelf zou plaatsen, zodat je daarvan kunt uitgaan en ze kunt aanpassen. Een opening naast het origineel wordt weggelaten en gemeld, een mal zonder gietkanaal krijgt een waarschuwing omdat hij niet gevuld kan worden, en een hoogste punt zonder opening in de buurt blijft een rode stip, zodat je ziet waar lucht zou achterblijven.
+
 > **Tip:** Seal een geprinte mal (met hars of was) en gebruik lossingsmiddel, anders haakt het gietstuk zich vast in de laaglijnen. PLA wordt vanaf ongeveer 55 °C zacht: print de mal voor hete was, zeep of hars die bij het uitharden warm wordt in PETG of ASA.
 
 ## Een kabelkanaal door een vorm

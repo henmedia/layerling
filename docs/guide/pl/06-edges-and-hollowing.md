@@ -160,6 +160,8 @@ Kliknij {{ui:mold.apply}}: części leżą obok wzorca tak, jak się drukują, b
 
 Najczęstszy problem z formami to odlew, który się zaklinowuje. Tam, gdzie wzorzec jest nad podziałem szerszy niż pod nim, okno ostrzega przed podcięciem: przesuń {{ui:mold.parting}} tam, gdzie wzorzec jest najszerszy, obróć wzorzec albo weź skrzynkę do silikonu, który puszcza podcięcia.
 
+Z opcją {{ui:mold.ownOpenings}} sam decydujesz, którędy wpływa materiał i którędy uchodzi powietrze. Wlew i odpowietrzenia nie są wtedy już ustawiane same: wybierz pod {{ui:mold.openings.kind}}, czy kliknięcie ustawia {{ui:mold.openings.sprue}} czy {{ui:mold.openings.vent}}, i kliknij wzorzec w widoku. Otwór biegnie z tego miejsca prosto przez górną połowę aż do wierzchu formy, w kierunku, w którym forma się otwiera. Kliknięcie słupka otworu usuwa go; okno wymienia otwory z ich położeniem, każdy z przyciskiem do usunięcia. {{ui:mold.openings.suggested}} wypełnia listę otworami, które Layerling ustawiłby sam, żeby można było od nich zacząć i je zmienić. Otwór obok wzorca jest pomijany i zgłaszany, forma bez wlewu dostaje ostrzeżenie, bo nie da się jej zalać, a najwyższy punkt bez otworu w pobliżu nadal widać jako czerwoną kropkę, żeby było widać, gdzie zostałoby powietrze.
+
 > **Wskazówka:** Uszczelnij wydrukowaną formę (żywicą albo woskiem) i użyj środka rozdzielającego, inaczej odlew wczepi się w linie warstw. PLA mięknie już od ok. 55 °C: do gorącego wosku, mydła albo żywicy, która nagrzewa się przy utwardzaniu, wydrukuj formę z PETG albo ASA.
 
 ## Kanał na kabel przez bryłę

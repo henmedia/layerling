@@ -129,7 +129,7 @@ import { liftHandleOffset, screenAngle, framePoint, selectionFrameCorners, workp
 import { ClearanceMarkOverlay, clearanceFocusBox, syncClearanceMarkOverlay, type ClearanceMark, type ClearanceMarkOverlayState } from "./workplane/ClearanceMarkOverlay";
 import { clipThinWallOverlay, syncThinWallOverlay, type PrintCheckView } from "./workplane/ThinWallOverlay";
 import { restoreLayerViewCamera, saveLayerViewCamera, syncLayerViewOverlay, type LayerView } from "./workplane/LayerViewOverlay";
-import { moldHandleDirection, pickMoldHandle, syncMoldPreviewOverlay, type MoldPreview } from "./workplane/MoldPreviewOverlay";
+import { moldHandleDirection, pickMoldHandle, pickMoldOpening, syncMoldPreviewOverlay, type MoldOpeningPick, type MoldPreview } from "./workplane/MoldPreviewOverlay";
 import { EMPTY_PROTRACTOR, pickProtractorFace, protractorFaceFromWorld, protractorReading, protractorStraightView, ProtractorOverlay, syncProtractorOverlay, type ProtractorKind, type ProtractorModel, type ProtractorOverlayState } from "./workplane/viewportProtractor";
 import { tapeAttachmentFromWorld, TAPE_PERPENDICULAR_SNAP_PIXELS, pickModelTapeCandidate, tapeCentresNear, sameTapeCentres, distanceToScreenSegment, SectionMeasureModel, SectionMeasureOverlayState, syncSectionMeasureOverlay } from "./workplane/viewportTape";
 export type { LayFlatPick } from "@/components/workplane/viewportPicking";
@@ -231,6 +231,8 @@ type WorkplaneViewportProps = {
   moldPreview?: MoldPreview | null;
   /** The knob of the free mold direction dragged: the new direction (scene frame, unit). */
   onMoldDirectionDrag?: (direction: [number, number, number]) => void;
+  /** While the mold tool's openings are set by the user (the preview's `openingPick`): a click on the master, or on an opening's post. */
+  onMoldOpeningPick?: (pick: MoldOpeningPick) => void;
   onSetPlacementWorkplane: (workplane: PlacementWorkplane, source: "shape" | "base") => void;
   onToggleWorkplaneTool: () => void;
   onInteractionActiveChange?: (active: boolean) => void;
@@ -1638,6 +1640,7 @@ export function WorkplaneViewport({
   layerView = null,
   moldPreview = null,
   onMoldDirectionDrag,
+  onMoldOpeningPick,
   onSetPlacementWorkplane,
   onToggleWorkplaneTool,
   onInteractionActiveChange,
@@ -2325,6 +2328,8 @@ export function WorkplaneViewport({
   moldPreviewRef.current = moldPreview;
   const onMoldDirectionDragRef = useRef(onMoldDirectionDrag);
   onMoldDirectionDragRef.current = onMoldDirectionDrag;
+  const onMoldOpeningPickRef = useRef(onMoldOpeningPick);
+  onMoldOpeningPickRef.current = onMoldOpeningPick;
   const [splitHandleState, setSplitHandleState] = useState<"hover" | "drag" | null>(null);
   const perfRef = useRef({
     fps: 0,
@@ -6966,6 +6971,17 @@ export function WorkplaneViewport({
         onInteractionActiveChange?.(true);
         return;
       }
+      // The mold tool's openings set by the user (Discussion #1806): a press on the master sets one there, a press on an
+      // opening's post takes it away; beside both the press does what it always does.
+      const moldOpenings = moldPreviewRef.current?.openingPick;
+      if (moldOpenings && onMoldOpeningPickRef.current) {
+        const pick = pickMoldOpening(state, event.clientX, event.clientY, moldOpenings.ids, shapesRef.current.map((shape) => shape.id));
+        if (pick) {
+          event.preventDefault();
+          onMoldOpeningPickRef.current(pick);
+          return;
+        }
+      }
       if (splitActiveRef.current) {
         if (splitSurfacePickRef.current) {
           const surface = pickPlacementSurface(event.clientX, event.clientY, false);
@@ -9470,7 +9486,7 @@ export function WorkplaneViewport({
         )}
       </div>
 
-      <section className={`workplane-wrap ${noteMode ? "note-mode" : ""} ${workplaneMode ? "placing-workplane" : ""} ${splitActive ? "split-mode" : ""} ${splitHandleState ? `split-handle-${splitHandleState}` : ""} ${splitSurfacePick ? "split-picking" : ""} ${splitSurfacePick && splitPickOverFace ? "split-pick-over-face" : ""} ${cruiseAsset || carryIds?.length ? "cruising" : ""} ${tapeMode ? "tape-mode" : ""} ${tapeDeleteMode ? "tape-delete-mode" : ""} ${tapeMoveMode ? "tape-move-mode" : ""} ${cornerRulerMode ? "corner-ruler-mode" : ""} ${protractorOpen ? "protractor-mode" : ""} ${pivotPickMode || layFlatPickMode || mateFacePick || matePointPick?.picking || cadFacePick || paintPick || surfaceRegionDrawing ? "pivot-pick-mode" : ""} ${modifierActive ? "modifier-edge-pick" : ""} ${sectionMeasureMode && sectionSettings.enabled ? "section-measure-mode" : ""} ${workspace.dimensionAxisColors ? "dimension-axis-colors" : ""}`} aria-label={t("aria.workplane")}>
+      <section className={`workplane-wrap ${noteMode ? "note-mode" : ""} ${workplaneMode ? "placing-workplane" : ""} ${splitActive ? "split-mode" : ""} ${splitHandleState ? `split-handle-${splitHandleState}` : ""} ${splitSurfacePick ? "split-picking" : ""} ${splitSurfacePick && splitPickOverFace ? "split-pick-over-face" : ""} ${cruiseAsset || carryIds?.length ? "cruising" : ""} ${tapeMode ? "tape-mode" : ""} ${tapeDeleteMode ? "tape-delete-mode" : ""} ${tapeMoveMode ? "tape-move-mode" : ""} ${cornerRulerMode ? "corner-ruler-mode" : ""} ${protractorOpen ? "protractor-mode" : ""} ${pivotPickMode || layFlatPickMode || mateFacePick || matePointPick?.picking || cadFacePick || paintPick || surfaceRegionDrawing || moldPreview?.openingPick ? "pivot-pick-mode" : ""} ${modifierActive ? "modifier-edge-pick" : ""} ${sectionMeasureMode && sectionSettings.enabled ? "section-measure-mode" : ""} ${workspace.dimensionAxisColors ? "dimension-axis-colors" : ""}`} aria-label={t("aria.workplane")}>
         <div className="workplane-plane">
           <div
             className="three-workplane-host"
