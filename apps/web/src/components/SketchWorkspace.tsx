@@ -2929,7 +2929,9 @@ export function SketchWorkspace({
                     if (event.button !== 0 || selected?.kind !== "multiple") return;
                     const point = pointFromEvent(event);
                     if (!point) return;
-                    const startPoints = selected.pointIds.map((id) => profile.points.find((entry) => entry.id === id)).filter((entry): entry is SketchPoint => Boolean(entry)).map((entry) => ({ ...entry, handleIn: entry.handleIn ? { ...entry.handleIn } : undefined, handleOut: entry.handleOut ? { ...entry.handleOut } : undefined }));
+                    // The same points as the arrow keys and a typed position move (Issue #1800).
+                    const moving = new Set(sketchSelectionMovePointIds(profile, selected));
+                    const startPoints = profile.points.filter((entry) => moving.has(entry.id)).map((entry) => ({ ...entry, handleIn: entry.handleIn ? { ...entry.handleIn } : undefined, handleOut: entry.handleOut ? { ...entry.handleOut } : undefined }));
                     beginEntityDrag(event, { kind: "move-selection", pointerId: event.pointerId, origin: point, current: point, startPoints });
                   }}
                 />

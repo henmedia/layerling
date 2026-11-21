@@ -7,7 +7,7 @@ For at bygge en del præcist skal man måle. layerling har flere værktøjer til
 
 ## Målebåndet
 
-Målebåndet sidder for neden i visningsbjælken ved venstre kant ({{ui:camera.tapeTools}}). Det måler afstande mellem hjørner, kanter og flader. Et klik på den åbner fem knapper. Dækker de det du vil måle, så træk dem i grebet til venstre, et hvilket som helst sted på arbejdsplanet; et dobbeltklik på grebet sætter dem tilbage:
+Målebåndet sidder for neden i visningsbjælken ved venstre kant ({{ui:camera.tapeTools}}). Det måler afstande mellem hjørner, kanter og flader. Et klik på den åbner fem knapper. {{ui:camera.addMeasurement}} er slået til med det samme, så de næste to klik i visningen måler; et klik mere på knappen lægger værktøjet væk, og knapperne bliver åbne. Er målingerne skjult, bliver den slået fra, indtil du klikker på den. Dækker de det du vil måle, så træk dem i grebet til venstre, et hvilket som helst sted på arbejdsplanet; et dobbeltklik på grebet sætter dem tilbage:
 
 ![Målebåndet med dets knapper: tilføj mål, flyt målepunkter, fjern mål, hele kanter, slet alle mål.](shot:tape-menu)
 
@@ -72,6 +72,8 @@ Med {{ui:workspace.dimensionsAlwaysVisible}} bliver dimensionerne permanent synl
 Med {{ui:workspace.dimensionAxisColors}} får hvert felt farven på sin akse, ligesom håndtagene: rød for X, grøn for Y og blå for Z. Så ser du også på en lille del med det samme, hvilket tal der er hvilket.
 
 Står de i vejen et øjeblik, så tryk [[Q]]: målene og afstandene omkring markeringen forsvinder, så en del du flytter er nem at se. [[Q]] igen henter dem tilbage. Et håndtag du peger på viser stadig sit mål.
+
+På en meget lille del kan selve håndtagene stå i vejen. [[Shift+Q]] skjuler dem alle - firkanterne til størrelsen og pilene til at løfte, skubbe og dreje - og [[Shift+Q]] igen henter dem tilbage. Uden dem kan du stadig trække delen og skrive dens mål til højre, og objektlisten viser, hvilken del der er markeret.
 
 ## Tjek spillerum
 

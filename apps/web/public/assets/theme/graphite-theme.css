@@ -1172,6 +1172,11 @@ html[data-theme="dark"]:where([data-palette="graphite"]) .edge-modifier-quick-ac
   background: rgba(217, 120, 19, 0.08);
 }
 
+:where(html[data-theme="dark"][data-palette="graphite"]) .hole-pattern-layer-color input[type="color"] {
+  border: 1px solid var(--border, #ccc);
+  background: none;
+}
+
 :where(html[data-theme="dark"][data-palette="graphite"]) .model-scale-result {
   color: #515151;
 }
@@ -5404,6 +5409,10 @@ html[data-theme="dark"]:where([data-palette="graphite"]) .pattern-picker-empty {
   color: #5a5a5a;
 }
 
+:where(html[data-theme="dark"][data-palette="graphite"]) .workspace-space-mouse-invert-way {
+  color: #5a5a5a;
+}
+
 :where(html[data-theme="dark"][data-palette="graphite"]) .workspace-history-range-control input {
   accent-color: #cf710f;
 }
@@ -7432,8 +7441,9 @@ html[data-theme="dark"]:where([data-palette="graphite"]) .theme-check {
 }
 
 :where(html[data-theme="dark"][data-palette="graphite"]) .outliner-item.selected {
-  background: #ededed;
+  background: #f6d9ae;
   border-color: rgba(220, 160, 90, 0.4);
+  box-shadow: inset 4px 0 0 #d97a1c;
 }
 
 :where(html[data-theme="dark"][data-palette="graphite"]) .outliner-item.locked-shape .outliner-shape-name {
@@ -7626,8 +7636,9 @@ html[data-theme="dark"]:where([data-palette="graphite"]) .outliner-item:hover {
 }
 
 html[data-theme="dark"]:where([data-palette="graphite"]) .outliner-item.selected {
-  background: #353535;
+  background: #424242;
   border-color: rgba(246, 173, 85, 0.35);
+  box-shadow: inset 4px 0 0 #f6ad55;
 }
 
 html[data-theme="dark"]:where([data-palette="graphite"]) .outliner-shape-name {
@@ -8047,6 +8058,14 @@ html[data-theme="dark"]:where([data-palette="graphite"]) .color-recent {
 
 :where(html[data-theme="dark"][data-palette="graphite"]) .edge-modifier-panel > .edge-modifier-footer {
   background: inherit;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .edge-modifier-panel > .edge-modifier-error + .edge-modifier-footer::before {
+  background: inherit;
+}
+
+html[data-theme="dark"]:where([data-palette="graphite"]) .edge-modifier-panel > .edge-modifier-error:has(+ .edge-modifier-footer) {
+  background: #4e181d;
 }
 
 :where(html[data-theme="dark"][data-palette="graphite"]) .font-manager-error {
@@ -9025,6 +9044,11 @@ html[data-theme="dark"]:where([data-palette="graphite"]) .layer-view-chart {
 html[data-theme="dark"]:where([data-palette="graphite"]) .layer-view-chart path {
   fill: rgba(143, 179, 224, 0.3);
   stroke: #8fb3e0;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .part-color-row input[type="color"] {
+  border: 1px solid var(--border, #ccc);
+  background: none;
 }
 
 :where(html[data-theme="dark"][data-palette="graphite"]) .dashboard-welcome-hide {

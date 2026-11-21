@@ -7,7 +7,7 @@ Om een onderdeel precies te bouwen, moet je meten. layerling heeft daar verschil
 
 ## Het meetlint
 
-Het meetlint zit aan de onderkant van de weergavebalk aan de linkerrand ({{ui:camera.tapeTools}}). Het meet afstanden tussen hoeken, randen en vlakken. Een klik erop opent vijf knoppen. Zitten die in de weg bij wat je wilt meten, sleep ze dan aan de greep links naar een willekeurige plek op het werkvlak; een dubbelklik op de greep zet ze terug:
+Het meetlint zit aan de onderkant van de weergavebalk aan de linkerrand ({{ui:camera.tapeTools}}). Het meet afstanden tussen hoeken, randen en vlakken. Een klik erop opent vijf knoppen. {{ui:camera.addMeasurement}} staat meteen aan, dus de volgende twee klikken in de weergave meten al; nog een klik op die knop legt het gereedschap weg en laat de knoppen open. Zijn de metingen verborgen, dan blijft hij uit tot je erop klikt. Zitten die in de weg bij wat je wilt meten, sleep ze dan aan de greep links naar een willekeurige plek op het werkvlak; een dubbelklik op de greep zet ze terug:
 
 ![Het meetlint met zijn knoppen: meting toevoegen, meetpunten verplaatsen, meting verwijderen, hele randen, alle metingen verwijderen.](shot:tape-menu)
 
@@ -66,6 +66,8 @@ Met {{ui:workspace.dimensionsAlwaysVisible}} blijven de maten altijd zichtbaar. 
 Met {{ui:workspace.dimensionAxisColors}} krijgt elk vakje de kleur van zijn as, net als de grepen: rood voor X, groen voor Y en blauw voor Z. Zo zie je ook bij een klein onderdeel in één oogopslag welk getal welk is.
 
 Zitten ze even in de weg, druk dan op [[Q]]: de maten en afstanden rond de selectie verdwijnen, zodat een deel dat je verschuift goed te zien is. Nog eens [[Q]] haalt ze terug. Een greep waar je naar wijst, toont zijn maat toch.
+
+Bij een heel klein deel kunnen de grepen zelf in de weg zitten. [[Shift+Q]] verbergt ze allemaal - de vierkantjes voor de grootte en de pijlen voor optillen, schuiven en draaien - en nog eens [[Shift+Q]] haalt ze terug. Zonder ze kun je het deel nog steeds slepen en zijn maten rechts intypen, en de objectenlijst toont welk deel geselecteerd is.
 
 ## Speling controleren
 

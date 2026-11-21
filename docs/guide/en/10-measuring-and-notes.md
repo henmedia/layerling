@@ -7,7 +7,7 @@ To build a part exactly, you need to measure. layerling has several tools for th
 
 ## The tape measure
 
-The tape measure sits at the lower end of the view bar on the left edge ({{ui:camera.tapeTools}}). It measures distances between corners, edges and faces. A click on it opens five buttons. If they cover what you want to measure, drag them by the grip on the left anywhere on the workplane; a double-click on the grip puts them back:
+The tape measure sits at the lower end of the view bar on the left edge ({{ui:camera.tapeTools}}). It measures distances between corners, edges and faces. A click on it opens five buttons. {{ui:camera.addMeasurement}} is switched on straight away, so the next two clicks in the view measure; another click on that button puts the tool down and leaves the buttons open. If the measurements are hidden, it stays off until you click it. If they cover what you want to measure, drag them by the grip on the left anywhere on the workplane; a double-click on the grip puts them back:
 
 ![The tape measure with its buttons: add measurement, move measuring points, remove measurement, whole edges, delete all measurements.](shot:tape-menu)
 
@@ -68,6 +68,8 @@ With {{ui:workspace.dimensionsAlwaysVisible}} the dimensions stay visible perman
 With {{ui:workspace.dimensionAxisColors}} each box takes the colour of its axis, as the handles do: red for X, green for Y and blue for Z. So on a small part you see at a glance which number is which.
 
 For a moment without them, press [[Q]]: the sizes and distances around the selection disappear, so a part you move is easy to see. [[Q]] again brings them back. A handle you point at still shows its size.
+
+On a very small part the handles themselves can be in the way. [[Shift+Q]] hides them all - the squares for the size and the arrows for lifting, sliding and turning - and [[Shift+Q]] again brings them back. Without them you can still drag the part and type its sizes at the right, and the list of objects shows which part is selected.
 
 ## Checking clearance
 

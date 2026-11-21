@@ -8,7 +8,7 @@ import { innerCornerEdges, treatAfterInnerCorners } from "@/lib/cadInnerCorners"
 import { OcctKernel, type OcctModuleFactory, type ShapeHandle } from "occt-wasm";
 import { assertCadKernelRunnable } from "@/lib/wasmSupport";
 import { STACK_NEEDS_TOP_MESSAGE, shellStackFloor, shellStackSolid } from "@/lib/cadShellStack";
-import { normalizeShellStackFoot } from "@/lib/shellStackLimits";
+import { normalizeShellStackFoot, shellStackRoom } from "@/lib/shellStackLimits";
 import { GRIDFINITY_FLOOR } from "@/lib/gridfinityGeometry";
 import { shellDividersSolid, shellGridSolid } from "@/lib/cadShellGrid";
 import { DIVIDERS_NEEDS_TOP_MESSAGE, GRID_NEEDS_TOP_MESSAGE, normalizeShellDividers, normalizeShellGrid, shellGridFloor } from "@/lib/shellGridLimits";
@@ -1154,7 +1154,8 @@ function treatPastInnerCorners(cad: OcctKernel, solid: ShapeHandle, entries: { i
   // to hold on to: forced past it, it made faces that crossed or crashed outright. Then the refusal stands.
   if ([...entries.map((entry) => entry.id), ...touchingIds].some((id) => polylineLength(edgeInfos[id]?.points ?? []) < request.amount)) return null;
   const touching = touchingIds.map((id) => edgeHandles[id]).filter((edge): edge is ShapeHandle => edge !== undefined);
-  const corners = innerCornerEdges(cad, solid, touching, request.amount);
+  // The look for the corners counts towards the time as well: on a body of many faces it alone took 14 s (Issue #1812).
+  const corners = innerCornerEdges(cad, solid, touching, request.amount, deadline);
   if (corners.length === 0) return null;
   const result = treatAfterInnerCorners(cad, solid, entries.map((entry) => entry.edge), corners, request.amount, (body, edges, amount) => treatEdges(cad, body, edges, { ...request, amount }), deadline, isFatalKernelFault);
   return result ? { ...result, count: corners.length } : null;
@@ -1406,7 +1407,8 @@ async function bearbeiteAnfrage(request: CadModifierWorkerRequest, halter: { cad
         }
         // With a Gridfinity floor no dividers (its bins fill the cells): a design saved with both keeps its floor.
         if (dividers && !grid) {
-          const divided = shellDividersSolid(activeCad, solid, component, dividers, floorTop, shelfTop);
+          // In a stackable box the dividers end under the foot of the box above.
+          const divided = shellDividersSolid(activeCad, solid, component, dividers, floorTop, shelfTop, stack ? shellStackRoom(stack) : 0);
           activeCad.release(component);
           component = divided;
         }

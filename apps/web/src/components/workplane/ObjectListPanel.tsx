@@ -206,6 +206,8 @@ export function ObjectListPanel({
 
   const startRename = (shape: WorkplaneShape, e: MouseEvent) => {
     e.stopPropagation();
+    // Lock shape (#1836): the name is held with the shape, so no field opens that would refuse what is typed into it.
+    if (shape.shapeLocked) return;
     setEditingId(shape.id);
     setEditingDraft(getShapeDisplayName(shape));
   };
@@ -602,7 +604,7 @@ export function ObjectListPanel({
                             <FolderOpen size={13} />
                           </button>
                         ) : null}
-                        {onRenameShape && editingId !== shape.id ? (
+                        {onRenameShape && editingId !== shape.id && !shape.shapeLocked ? (
                           <button
                             type="button"
                             className="outliner-action-btn rename-btn"

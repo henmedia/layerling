@@ -9,6 +9,12 @@ import type { TransformHandleKind } from "@/components/workplane/transformOverla
 
 export type TouchHandleMode = "all" | "move" | "size" | "turn";
 
+/**
+ * What the handles around a selection show: one of the touch modes, or "none" while Shift+Q has put them
+ * all away for a clear look at a small part (Discussion #1893). "none" is never kept and no button goes to it.
+ */
+export type TransformHandleMode = TouchHandleMode | "none";
+
 /** In the order the camera bar button goes through them. */
 export const TOUCH_HANDLE_MODES: readonly TouchHandleMode[] = ["all", "move", "size", "turn"];
 
@@ -19,8 +25,9 @@ export function nextTouchHandleMode(mode: TouchHandleMode): TouchHandleMode {
 }
 
 /** Whether a handle of this kind shows in the mode: the lift and slide arrows move, the size and height handles size, the arrows around turn. */
-export function touchModeShowsHandle(mode: TouchHandleMode, kind: TransformHandleKind): boolean {
+export function touchModeShowsHandle(mode: TransformHandleMode, kind: TransformHandleKind): boolean {
   if (mode === "all") return true;
+  if (mode === "none") return false;
   if (mode === "move") return kind === "lift" || kind === "slide";
   if (mode === "size") return kind === "scale" || kind === "height";
   return kind === "rotate";

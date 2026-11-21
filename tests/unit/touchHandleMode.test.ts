@@ -29,6 +29,13 @@ describe("which handles a finger reaches (Discussion #1747)", () => {
     expect(shown("turn")).toEqual(["rotate"]);
   });
 
+  it("shows no handle at all while Shift+Q has put them away, and never keeps that (Discussion #1893)", () => {
+    expect(KINDS.filter((kind) => touchModeShowsHandle("none", kind))).toEqual([]);
+    expect(TOUCH_HANDLE_MODES).not.toContain("none");
+    window.localStorage.setItem("layerling.touchHandleMode", "none");
+    expect(loadTouchHandleMode()).toBe("all");
+  });
+
   it("lets a finger on the part move it only in all and move", () => {
     expect(TOUCH_HANDLE_MODES.filter(touchModeMovesBody)).toEqual(["all", "move"]);
   });

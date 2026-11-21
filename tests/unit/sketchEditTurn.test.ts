@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { sketchEditTurn, turnedSketchProfile } from "@/lib/sketchEditTurn";
+import { sketchEditTurn, sketchEditTurnOnPlate, turnedSketchProfile } from "@/lib/sketchEditTurn";
+import { plateCenterX, plateIndexAt } from "@/lib/buildPlates";
 import { imageAngleTo } from "@/lib/sketchImageTransform";
 import type { SketchProfile } from "@/types/layerling";
 
@@ -67,5 +68,40 @@ describe("a sketch body turned about the vertical, edited on the plate", () => {
     expect(back.images?.[0].x).toBeCloseTo(5, 9);
     expect(back.notes?.[0].z).toBeCloseTo(4, 9);
     expect(back.segments).toEqual(profile.segments);
+  });
+});
+
+// Discussion #1887: a sketch body on plate 2 opened on the first plate's plane; the sketch view showed plate 1 with the
+// bodies there, and the body's own outline lay a plate further to the right, out of reach.
+describe("a sketch body on a further build plate, edited on that plate", () => {
+  const workspace = { width: 200, depth: 200, plates: ["", ""] };
+  // The body stands on plate 2, unturned, its sketch's origin 30 mm right of that plate's middle.
+  const bodyOrigin = { x: plateCenterX(workspace, 1) + 30, z: -7 };
+  const plain = sketchEditTurn(bodyOrigin, { x: 1, z: 0 }, { x: 0, z: 1 });
+
+  it("counts the drawing from the middle of the body's plate, so it lies on the plate that is shown", () => {
+    const plateX = plateCenterX(workspace, plateIndexAt(workspace, bodyOrigin.x));
+    expect(plateX).toBe(220);
+    const onPlate = sketchEditTurnOnPlate(plain, plateX);
+    if (!onPlate) throw new Error("no turn");
+    const drawn = turnedSketchProfile(profile, onPlate, "toPlate");
+    // Within the plate's own half width, where before it lay 220 mm further on.
+    drawn.points.forEach((point) => expect(Math.abs(point.x)).toBeLessThanOrEqual(workspace.width / 2));
+    expect(drawn.points[1].x).toBeCloseTo(40, 9);
+    // On the plate's plane moved to its middle, that is where the body stands in the scene.
+    expect(plateX + drawn.points[1].x).toBeCloseTo(bodyOrigin.x + 10, 9);
+    expect(drawn.points[1].z).toBeCloseTo(-7, 9);
+  });
+
+  it("comes back as it was drawn, and leaves a body on the first plate alone", () => {
+    const onPlate = sketchEditTurnOnPlate(plain, 220);
+    if (!onPlate) throw new Error("no turn");
+    const back = turnedSketchProfile(turnedSketchProfile(profile, onPlate, "toPlate"), onPlate, "toBody");
+    back.points.forEach((point, index) => {
+      expect(point.x).toBeCloseTo(profile.points[index].x, 9);
+      expect(point.z).toBeCloseTo(profile.points[index].z, 9);
+    });
+    expect(sketchEditTurnOnPlate(plain, 0)).toBe(plain);
+    expect(sketchEditTurnOnPlate(null, 220)).toBeNull();
   });
 });

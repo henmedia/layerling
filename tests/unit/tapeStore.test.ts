@@ -1,7 +1,7 @@
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { editorHistoryEntry } from "@/lib/editorHistory";
 import { exportLylProject, importLylProject } from "@/lib/lylProject";
-import { highestTapeIdNumber, normalizeSavedTape, savedTape, type SavedTape } from "@/lib/tapeStore";
+import { highestTapeIdNumber, normalizeSavedTape, readTapeWholeEdges, savedTape, writeTapeWholeEdges, type SavedTape } from "@/lib/tapeStore";
 import { DEFAULT_SNAP_GRID, DEFAULT_WORKPLANE_WORKSPACE } from "@/lib/workplaneSettings";
 import type { WorkplaneShape } from "@/types/layerling";
 
@@ -95,5 +95,31 @@ describe("highestTapeIdNumber", () => {
     expect(highestTapeIdNumber({ points: [{ id: "tape-point-1" }], segments: [{ id: "tape-segment-12" }] })).toBe(12);
     // Ids from elsewhere (an AI, an older file) without a number are passed over.
     expect(highestTapeIdNumber({ points: [{ id: "a" }, { id: "tape-point-4" }], segments: [] })).toBe(4);
+  });
+});
+
+// #1805: "Measure edges" switched off came back switched on after the sketch, since only the 3D view held it.
+describe("the tape measure's Measure edges switch", () => {
+  afterEach(() => vi.unstubAllGlobals());
+
+  it("stays as it was set when the 3D view is built again", () => {
+    const entries = new Map<string, string>();
+    vi.stubGlobal("window", {
+      localStorage: {
+        getItem: (key: string) => entries.get(key) ?? null,
+        setItem: (key: string, value: string) => void entries.set(key, String(value)),
+      },
+    });
+    expect(readTapeWholeEdges()).toBe(true);
+    writeTapeWholeEdges(false);
+    expect(readTapeWholeEdges()).toBe(false);
+    writeTapeWholeEdges(true);
+    expect(readTapeWholeEdges()).toBe(true);
+  });
+
+  it("is on, and writing does not throw, without storage", () => {
+    vi.stubGlobal("window", { localStorage: { getItem: () => { throw new Error("blocked"); }, setItem: () => { throw new Error("blocked"); } } });
+    expect(readTapeWholeEdges()).toBe(true);
+    expect(() => writeTapeWholeEdges(false)).not.toThrow();
   });
 });

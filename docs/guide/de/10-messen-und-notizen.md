@@ -7,7 +7,7 @@ Wer ein Teil genau bauen will, muss messen können. layerling hat dafür mehrere
 
 ## Das Maßband
 
-Das Maßband liegt am unteren Ende der Ansichtsleiste am linken Rand ({{ui:camera.tapeTools}}). Es misst Abstände zwischen Ecken, Kanten und Flächen. Ein Klick darauf öffnet fünf Schaltflächen. Verdecken sie, was du messen willst, ziehst du sie am Griff links frei über die Arbeitsfläche; ein Doppelklick auf den Griff bringt sie zurück:
+Das Maßband liegt am unteren Ende der Ansichtsleiste am linken Rand ({{ui:camera.tapeTools}}). Es misst Abstände zwischen Ecken, Kanten und Flächen. Ein Klick darauf öffnet fünf Schaltflächen. {{ui:camera.addMeasurement}} ist dabei gleich eingeschaltet, die nächsten zwei Klicks in der Ansicht messen also schon; ein weiterer Klick auf die Schaltfläche legt das Werkzeug weg, die Schaltflächen bleiben offen. Sind die Maße ausgeblendet, bleibt sie aus, bis du sie anklickst. Verdecken sie, was du messen willst, ziehst du sie am Griff links frei über die Arbeitsfläche; ein Doppelklick auf den Griff bringt sie zurück:
 
 ![Das Maßband mit seinen Schaltflächen: Maß hinzufügen, Messpunkte verschieben, Maß entfernen, ganze Kanten messen, alle Maße entfernen.](shot:tape-menu)
 
@@ -68,6 +68,8 @@ Mit {{ui:workspace.dimensionsAlwaysVisible}} bleiben die Maße dauerhaft sichtba
 Mit {{ui:workspace.dimensionAxisColors}} bekommt jedes Kästchen die Farbe seiner Achse, wie die Griffe: rot für X, grün für Y und blau für Z. So siehst du auch an einem kleinen Teil auf einen Blick, welche Zahl welche ist.
 
 Wenn sie kurz stören, drück [[Q]]: Die Maße und Abstände um die Auswahl verschwinden, und ein Teil, das du verschiebst, ist gut zu sehen. Noch einmal [[Q]] holt sie zurück. Ein Griff, auf den du zeigst, zeigt sein Maß trotzdem.
+
+Bei einem sehr kleinen Teil können die Griffe selbst im Weg sein. [[Umschalt+Q]] blendet sie alle aus - die Quadrate für die Größe und die Pfeile zum Anheben, Schieben und Drehen -, noch einmal [[Umschalt+Q]] holt sie zurück. Ohne sie kannst du das Teil weiter ziehen und seine Maße rechts eintippen, und die Objektliste zeigt, welches Teil ausgewählt ist.
 
 ## Spiel prüfen
 
