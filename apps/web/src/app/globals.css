@@ -4438,6 +4438,10 @@ html[data-theme="dark"] .toolbar-title-help .action-icon-button.active svg path 
   display: flex;
   min-width: 88px;
   height: var(--editor-toolbar-tools-height);
+  /* A group is never narrower than its tools. Where the bar does not wrap (wider than 1737 px, e.g. in focus mode) the
+     browser squeezed Visibility, Combine or Edges & walls below their buttons, Visibility's first button spilled over
+     Shapes, and the folding measured the squeezed widths, so it saw no need to fold (Stefan, 21.11.2026). */
+  flex-shrink: 0;
   flex-direction: column;
   justify-content: flex-start;
   border-right: 0;

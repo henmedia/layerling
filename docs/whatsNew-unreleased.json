@@ -62,5 +62,18 @@
     "guide": {
       "section": "backingUp"
     }
+  },
+  {
+    "title": {
+      "de": "Menüleiste: keine Knöpfe mehr übereinander",
+      "en": "Menu bar: no more buttons on top of each other"
+    },
+    "body": {
+      "de": "Bei manchen Fensterbreiten, vor allem im Fokusmodus, wurden Gruppen der Menüleiste schmaler gedrückt als ihre Knöpfe. Dann ragte etwa der Knopf der Objektliste aus „Sichtbarkeit“ in „Formen“ hinein.\n\nJetzt behält jede Gruppe ihre volle Breite, und reicht der Platz nicht, wird eine Gruppe mehr zu einem Knopf zusammengefaltet.",
+      "en": "At some window widths, above all in focus mode, groups of the menu bar were squeezed narrower than their buttons. Then the Outliner button of Visibility, for one, stuck out into Shapes.\n\nNow every group keeps its full width, and where there is not enough room, one more group folds into a single button."
+    },
+    "guide": {
+      "section": "focusMode"
+    }
   }
 ]
