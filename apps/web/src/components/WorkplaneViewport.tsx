@@ -2057,7 +2057,8 @@ export function WorkplaneViewport({
   const touchRotateRef = useRef(false);
   const touchEmptyTapRef = useRef<{ pointerId: number; x: number; y: number } | null>(null);
   /** A left press on empty space that turns the view in the slicer scheme (#1013): let go where it began, it clears the selection. */
-  const slicerEmptyPressRef = useRef<{ pointerId: number; x: number; y: number } | null>(null);
+  // onClick: in a tool that picks with the left button, what a click that took nothing does instead of clearing the selection.
+  const slicerEmptyPressRef = useRef<{ pointerId: number; x: number; y: number; onClick?: () => void } | null>(null);
   // A finger held still on a body or on empty space opens the menu a right click opens (#337).
   const longPressRef = useRef<{ pointerId: number; timer: number; stop: () => void } | null>(null);
   const longPressFiredRef = useRef<number | null>(null);
@@ -6985,6 +6986,18 @@ export function WorkplaneViewport({
       if (event.button !== 0 || event.ctrlKey || event.metaKey) {
         return;
       }
+      /*
+       * In a tool that picks with the left button (Split, the edge tools, a face to pick ...), a press where the tool
+       * finds nothing to take turns the view in the slicer scheme, as on empty space outside a tool (Facebook, Shawn
+       * Lamble). A click that does not turn the view does what the tool always did there (onClick).
+       */
+      const turnInTool = (onClick: () => void = () => undefined) => {
+        if (!slicerLeftTurn(workspaceRef.current.mouseScheme, event) || !state.turnWithLeftButton) return false;
+        event.preventDefault();
+        slicerEmptyPressRef.current = { pointerId: event.pointerId, x: event.clientX, y: event.clientY, onClick };
+        state.turnWithLeftButton(event.nativeEvent);
+        return true;
+      };
       if (moldPreviewRef.current?.handle && onMoldDirectionDragRef.current && pickMoldHandle(state, event.clientX, event.clientY)) {
         event.preventDefault();
         capturePointer(event.currentTarget, event.pointerId);
@@ -7007,7 +7020,10 @@ export function WorkplaneViewport({
       if (splitActiveRef.current) {
         if (splitSurfacePickRef.current) {
           const surface = pickPlacementSurface(event.clientX, event.clientY, false);
-          if (!surface) return;
+          if (!surface) {
+            turnInTool();
+            return;
+          }
           event.preventDefault();
           onSplitSurfacePickRef.current?.(
             [surface.point.x, surface.point.y, surface.point.z],
@@ -7016,7 +7032,10 @@ export function WorkplaneViewport({
           return;
         }
         const plane = splitPlaneRef.current;
-        if (!plane || !pickSplitPlaneHandle(state, event.clientX, event.clientY)) return;
+        if (!plane || !pickSplitPlaneHandle(state, event.clientX, event.clientY)) {
+          turnInTool();
+          return;
+        }
         const axisOrigin = new THREE.Vector3(...plane.origin);
         const axisNormal = new THREE.Vector3(...plane.normal).normalize();
         const startParameter = splitAxisParameter(state, event.clientX, event.clientY, axisOrigin, axisNormal);
@@ -7036,6 +7055,7 @@ export function WorkplaneViewport({
         event.preventDefault();
         const edgeId = pickModifierEdge(event.clientX, event.clientY);
         if (edgeId !== null) onModifierEdgeToggle?.(edgeId, event.shiftKey);
+        else turnInTool();
         return;
       }
 
@@ -7043,6 +7063,7 @@ export function WorkplaneViewport({
         event.preventDefault();
         const snap = pickSectionMeasurePoint(event.clientX, event.clientY);
         if (snap) placeSectionMeasurePoint(snap.point);
+        else turnInTool();
         return;
       }
 
@@ -7075,6 +7096,8 @@ export function WorkplaneViewport({
         );
         if (candidate) {
           selectTapeCandidate(candidate);
+        } else {
+          turnInTool();
         }
         return;
       }
@@ -7089,32 +7112,42 @@ export function WorkplaneViewport({
       if (pivotPickModeRef.current) {
         event.preventDefault();
         const pick = pickRotationPivot(state, event.clientX, event.clientY);
+        if (!pick && turnInTool(() => onPivotPick?.(null, undefined))) return;
         onPivotPick?.(pick?.point ?? null, pick?.face);
         return;
       }
 
       if (layFlatPickModeRef.current) {
         event.preventDefault();
-        onLayFlatPick?.(pickLayFlatFace(state, event.clientX, event.clientY));
+        const pick = pickLayFlatFace(state, event.clientX, event.clientY);
+        if (!pick && turnInTool(() => onLayFlatPick?.(null))) return;
+        onLayFlatPick?.(pick);
         return;
       }
 
       if (mateFacePickRef.current) {
         event.preventDefault();
-        onMateFacePick?.(pickMateFace(state, event.clientX, event.clientY));
+        const pick = pickMateFace(state, event.clientX, event.clientY);
+        if (!pick && turnInTool(() => onMateFacePick?.(null))) return;
+        onMateFacePick?.(pick);
         return;
       }
 
       if (matePointPickRef.current?.picking) {
         event.preventDefault();
-        onMatePointPickRef.current?.(resolveMatePoint(event.clientX, event.clientY));
+        const point = resolveMatePoint(event.clientX, event.clientY);
+        if (!point && turnInTool(() => onMatePointPickRef.current?.(null))) return;
+        onMatePointPickRef.current?.(point);
         return;
       }
 
       if (surfaceRegionDrawingRef.current) {
         // Pressed on a body, the region is drawn round the place with the button held; beside it, the view turns.
         const start = pickLayFlatFace(state, event.clientX, event.clientY);
-        if (!start) return;
+        if (!start) {
+          turnInTool();
+          return;
+        }
         event.preventDefault();
         capturePointer(event.currentTarget, event.pointerId);
         paintLassoRef.current = { pointerId: event.pointerId, points: [[event.clientX - rect.left, event.clientY - rect.top]], region: start };
@@ -7136,7 +7169,9 @@ export function WorkplaneViewport({
           onInteractionActiveChange?.(true);
           return;
         }
-        onPaintPickRef.current?.(pickPaintFace(state, paint.shapeId, event.clientX, event.clientY));
+        const pick = pickPaintFace(state, paint.shapeId, event.clientX, event.clientY);
+        if (!pick && turnInTool(() => onPaintPickRef.current?.(null))) return;
+        onPaintPickRef.current?.(pick);
         return;
       }
 
@@ -7144,6 +7179,7 @@ export function WorkplaneViewport({
         event.preventDefault();
         const faceId = pickCadFace(state, cadFacePickRef.current, event.clientX, event.clientY);
         if (faceId !== null) onCadFacePick?.(faceId);
+        else turnInTool();
         return;
       }
 
@@ -8060,7 +8096,8 @@ export function WorkplaneViewport({
         // A click on empty space that did not turn the view clears the selection, as a click there always did;
         // in Align that ends it too (#1340). The plate becomes Align's reference with Shift, which draws the box here.
         if (Math.hypot(event.clientX - slicerEmptyPress.x, event.clientY - slicerEmptyPress.y) < 5) {
-          if (multiSelectRef.current) onMultiSelectEndRef.current?.();
+          if (slicerEmptyPress.onClick) slicerEmptyPress.onClick();
+          else if (multiSelectRef.current) onMultiSelectEndRef.current?.();
           else onSelectShape(null);
         }
         return;
