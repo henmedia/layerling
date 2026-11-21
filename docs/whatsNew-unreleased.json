@@ -357,11 +357,13 @@
   {
     "title": {
       "de": "Liegende Formen: der Höhengriff bleibt oben",
-      "en": "Shapes lying on their side: the height handle stays on top"
+      "en": "Shapes lying on their side: the height handle stays on top",
+      "da": "Former der ligger på siden: højdehåndtaget bliver øverst"
     },
     "body": {
       "de": "Hast du eine Form um 90° auf die Seite gedreht, zeigte ihr Höhengriff zur Seite und die Eckgriffe standen in der Luft. Jetzt stehen die Griffe einer liegenden Form aufrecht auf der Arbeitsebene, wie in Tinkercad: Der Griff oben zieht sie in die Höhe, die Unterseite bleibt, wo sie ist, und die Griffe unten ändern die Maße entlang der Platte. Ein liegender Zylinder bleibt dabei rund.",
-      "en": "A shape turned 90° onto its side had its height handle pointing sideways and its corner handles standing in the air. The handles of a shape lying on its side now stand upright on the workplane, as in Tinkercad: the handle on top pulls it up, the underside stays where it is, and the handles at the bottom change the sizes along the plate. A lying cylinder stays round."
+      "en": "A shape turned 90° onto its side had its height handle pointing sideways and its corner handles standing in the air. The handles of a shape lying on its side now stand upright on the workplane, as in Tinkercad: the handle on top pulls it up, the underside stays where it is, and the handles at the bottom change the sizes along the plate. A lying cylinder stays round.",
+      "da": "Havde du drejet en form 90° om på siden, pegede dens højdehåndtag til siden, og hjørnehåndtagene stod i luften. Nu står håndtagene på en form, der ligger på siden, oprejst på arbejdsplanet, som i Tinkercad: Håndtaget øverst trækker den op, undersiden bliver, hvor den er, og håndtagene forneden ændrer målene langs pladen. En liggende cylinder forbliver rund."
     },
     "guide": {
       "chapter": "shapes"
