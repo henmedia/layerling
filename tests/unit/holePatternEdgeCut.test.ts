@@ -29,6 +29,25 @@ const inside = (loops: P[][], p: P) => {
 const corners = (settings: HolePatternSettings, c: P) => holeFitPolygon(settings).map((p) => ({ u: c.u + p.u, v: c.v + p.v }));
 
 describe("Hole pattern: the face's edge cuts the holes at margin 0 (Discussion #1771)", () => {
+  it("cuts turned squares off along their turned outline, diamonds running to the edge (Discussion #1795)", () => {
+    const loops = [rect(90, 70)];
+    const diamonds = honeycomb({ form: "square", size: 5, spacing: 8, arrangement: "grid", holeAngle: 45 });
+    expect(holePatternCutsAtEdge(diamonds)).toBe(true);
+    const cut = holePatternCenters({ loops }, diamonds);
+    const kept = holePatternCenters({ loops }, { ...diamonds, margin: 0.0001 });
+    expect(cut.edgeCut).toBeDefined();
+    expect(cut.centers.length).toBeGreaterThan(kept.centers.length);
+    // The outline used is the diamond's: its corners lie on the axes, 5 / sqrt(2) from the middle.
+    const outline = holeFitPolygon(diamonds);
+    expect(Math.max(...outline.map((p) => Math.abs(p.u)))).toBeCloseTo(5 / Math.SQRT2, 5);
+    // Diamonds reach past the sides, and every one still bites into the panel.
+    expect(cut.centers.some((c) => corners(diamonds, c).some((p) => p.u > 45))).toBe(true);
+    for (const c of cut.centers) {
+      const points = [c, ...corners(diamonds, c)];
+      expect(points.some((p) => inside(loops, p))).toBe(true);
+    }
+  });
+
   it("applies to plain through holes of a grid or staggered pattern only", () => {
     expect(holePatternCutsAtEdge(honeycomb())).toBe(true);
     expect(holePatternCutsAtEdge(honeycomb({ arrangement: "grid" }))).toBe(true);
