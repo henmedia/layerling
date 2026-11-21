@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { nearestFaceTriangle, pivotAfterJoin, planarFaceCentroid, planarFaceTriangles } from "@/lib/rotationPivot";
+import { nearestFaceTriangle, pivotAfterJoin, planarFaceCentroid, planarFaceTriangles, snapsToWalls } from "@/lib/rotationPivot";
+import type { WorkplaneShape } from "@/types/layerling";
 
 type Point = [number, number, number];
 
@@ -141,5 +142,28 @@ describe("pivotAfterJoin", () => {
 
   it("keeps the drawn face's middle when the click lies off the joined face", () => {
     expect(pivotAfterJoin(drawn, { point: { x: 3, y: 20.5, z: 3 }, normal: up }, top)).toEqual(drawn);
+  });
+});
+
+describe("which parts snap to walls", () => {
+  const part = (extra: Partial<WorkplaneShape>) => ({ id: "p", name: "Box", kind: "box", color: "#d41721", x: 0, z: 0, size: 10, width: 10, depth: 10, height: 10, rotation: 0, ...extra }) as WorkplaneShape;
+
+  it("snaps parts standing upright or upside down and turned by whole quarter turns or not at all, tapered too", () => {
+    for (const rotation of [0, 90, 180, 270, -90, -0, 1e-14, 360, -1e-9, 90 - 1e-9]) expect(snapsToWalls(part({ rotation }))).toBe(true);
+    expect(snapsToWalls(part({ rotation: 90, rotationX: 0, rotationZ: -0 }))).toBe(true);
+    expect(snapsToWalls(part({ rotationX: 180 }))).toBe(true);
+    expect(snapsToWalls(part({ rotationZ: -180, rotation: 270 }))).toBe(true);
+    // A taper stays inside the box the part is measured by.
+    expect(snapsToWalls(part({ taperTopWidth: 6 }))).toBe(true);
+  });
+
+  it("leaves out a part turned part of the way, tipped, twisted or leaning, whose box is not where a wall would meet it", () => {
+    for (const rotation of [45, 0.01, 89.99]) expect(snapsToWalls(part({ rotation }))).toBe(false);
+    expect(snapsToWalls(part({ rotationX: 90 }))).toBe(false);
+    expect(snapsToWalls(part({ rotationX: 179.5 }))).toBe(false);
+    expect(snapsToWalls(part({ rotationZ: 0.5 }))).toBe(false);
+    expect(snapsToWalls(part({ rotationZ: 90 }))).toBe(false);
+    expect(snapsToWalls(part({ extrudeTwist: 30 }))).toBe(false);
+    expect(snapsToWalls(part({ extrudeTopOffsetX: 4 }))).toBe(false);
   });
 });

@@ -1,0 +1,29 @@
+import { readFileSync } from "node:fs";
+import { fileURLToPath } from "node:url";
+import { describe, expect, it } from "vitest";
+
+const viewport = readFileSync(fileURLToPath(new URL("../../apps/web/src/components/WorkplaneViewport.tsx", import.meta.url)), "utf8");
+
+describe("moving snaps to the wall it runs into, in the viewport", () => {
+  it("gives a drag the walls beside the part where the pointer is, along the axes it may move on, and their guides", () => {
+    expect(viewport).toMatch(/dragRef\.current\.wallSnap = wallSnapForSelection\(/);
+    expect(viewport).toMatch(/moveSnapWalls\(state, drag\.wallSnap, rawBox, /);
+    expect(viewport).toMatch(/axis !== hiddenAxis && \(!axisLock \|\| axisLock\.along === axis\)/);
+    expect(viewport).toMatch(/objectSnapOffset\(rawBox, drag\.snapTargets, [^;]*, walls\)/);
+    expect(viewport).toMatch(/drag\.snapTargets, 1e-4, walls\)\.guides/);
+  });
+
+  it("gives an arrow the walls along its own axis, and none with Alt", () => {
+    expect(viewport).toMatch(/walls: wallSnapForSelection\(/);
+    expect(viewport).toMatch(/if \(!altKey\) \{\s*const moved = shiftSnapBox\(/);
+    expect(viewport).toMatch(/objectSnapOffset\(moved, snap\.targets, [^;]*, walls\)/);
+    expect(viewport).toMatch(/moveSnapWalls\(state, snap\.walls, moved, \[alongX \? "x" : "z"\]\)/);
+    expect(viewport).toMatch(/snap\.targets, 1e-4, walls\)/);
+  });
+
+  it("finds a side handle's walls by the same rule as a move's", () => {
+    expect(viewport).toMatch(/wallRaySkip\(shapes, moved\)/);
+    expect(viewport).toMatch(/firstShapeHit\(state, \{ needsFace: true, skip \}\)/);
+    expect(viewport).toMatch(/targets\.push\(\.\.\.wallLines\(hits, worldAxis\)\);/);
+  });
+});

@@ -187,12 +187,16 @@ export function shellGridSolid(kernel: OcctKernel, original: ShapeHandle, shelle
   }
 }
 
+/** Dividers under the foot of a box stacked on this one are at least this high over the floor, in mm; lower, there is no room for them. */
+const MIN_STACKED_DIVIDER = 1;
+
 /**
  * The body with dividers: `dividers.x` walls across (along z) and `dividers.z` along, evenly spaced over the inside, from
  * the floor (`floorTop`, the top of the Gridfinity floor if there is one) to the rim or `dividers.height` over the floor,
- * `dividers.thickness` thick, clipped to the box's outline; with a shelf ledge no higher than its top (`shelfTop`).
+ * `dividers.thickness` thick, clipped to the box's outline; with a shelf ledge no higher than its top (`shelfTop`), and
+ * in a stackable box no higher than `stackRoom` below the rim (`shellStackRoom`), where the foot of the box above ends.
  */
-export function shellDividersSolid(kernel: OcctKernel, original: ShapeHandle, body: ShapeHandle, dividers: ShellDividers, floorTop: number | null, shelfTop: number | null = null): ShapeHandle {
+export function shellDividersSolid(kernel: OcctKernel, original: ShapeHandle, body: ShapeHandle, dividers: ShellDividers, floorTop: number | null, shelfTop: number | null = null, stackRoom = 0): ShapeHandle {
   const made: ShapeHandle[] = [];
   const cad = tracking(kernel, made);
   let result: ShapeHandle | null = null;
@@ -206,7 +210,10 @@ export function shellDividersSolid(kernel: OcctKernel, original: ShapeHandle, bo
     // Lower dividers by the rule the Gridfinity compartments keep (#1560): at least 3 mm over the floor, the full height
     // when unset, 0, or within 0.1 mm of the rim.
     // Under a shelf ledge they end level with its top, so the shelf plate lies on the ledge and on them.
-    const dividerTop = Math.min(gridfinityDividerHeightTop(dividers.height, base, top), shelfTop ?? top);
+    // In a stackable box they leave the room the foot of the box above goes into: up to the rim, that box stood on the
+    // dividers, not on the rim, and did not hold. Where that leaves no divider at all, the body says so.
+    const dividerTop = Math.min(gridfinityDividerHeightTop(dividers.height, base, top), shelfTop ?? top, top - Math.max(0, stackRoom));
+    if (dividerTop < base + MIN_STACKED_DIVIDER) throw new Error(DIVIDERS_FAILED_MESSAGE);
     for (let i = 1; i <= dividers.x; i += 1) {
       const x = b.minX + ((b.maxX - b.minX) * i) / (dividers.x + 1);
       pieces.push(cad.makeBoxFromCorners({ x: x - t / 2, y: base - 0.2, z: b.minZ - 1 }, { x: x + t / 2, y: dividerTop, z: b.maxZ + 1 }));

@@ -44,7 +44,7 @@ Obliko lahko povlečeš čez rob plošče in jo pustiš tam, približno za širi
 
 ## Zaskakovanje med premikanjem
 
-Če oblika vlečeš čez delovno ravnino, se zaskoči na druge oblike: njen levi, desni, sprednji ali zadnji rob ali njena sredina se položi natanko na rob ali sredino druge oblike. Roza pomožna črta kaže, na kaj je ravno pripeta. Tako postaviš dva dela poravnana drug ob drugega ali sredinsko drug za drugim, ne da bi vpisoval številke. To velja tudi, če je mreža izklopljena. Šteje tudi sredina delovne ravnine: rožnate črte pokažejo, kdaj oblika stoji na sredini plošče vzdolž X, Y ali obeh.
+Če oblika vlečeš čez delovno ravnino, se zaskoči na druge oblike: njen levi, desni, sprednji ali zadnji rob ali njena sredina se položi natanko na rob ali sredino druge oblike. Roza pomožna črta kaže, na kaj je ravno pripeta. Tako postaviš dva dela poravnana drug ob drugega ali sredinsko drug za drugim, ne da bi vpisoval številke. To velja tudi, če je mreža izklopljena. Šteje tudi sredina delovne ravnine: rožnate črte pokažejo, kdaj oblika stoji na sredini plošče vzdolž X, Y ali obeh. Oblika, ki stoji pokonci s stranicami vzdolž X in Y, se zaskoči tudi na steno, v katero zadene, tudi na notranjo steno škatle, izdolbenega telesa ali uvoženega ohišja, tako da del sede tesno v kot ohišja.
 
 Pripenjanje deluje tudi pri spreminjanju velikosti: ko vlečeš stranski ročaj, se ta stranica ustavi na robovih in središčih drugih oblik in ob steni, v katero zadene, tudi ob notranji steni škatle, izdolbenega telesa ali uvoženega ohišja, rožnata črta pa pokaže kje. Ta mera ostane natančno taka, zunaj mreže. Tako del zapolni ohišje od stene do stene: prisloni ga k eni steni in njegovo drugo stranico povleci do nasprotne. Z [[Alt]] oblika raste iz sredine in vlečena stranica se pripne enako; s [[Shift]] obdrži razmerja in se ne pripne. To deluje na ravni delovni ravnini za oblike, ki stojijo pokonci s stranicami vzdolž X in Y, {{ui:workspace.objectSnap}} pa to izklopi skupaj s pripenjanjem med premikanjem.
 
@@ -52,7 +52,7 @@ Pripenjanje deluje tudi pri spreminjanju velikosti: ko vlečeš stranski ročaj,
 
 Ali povleci rdečo ali zeleno puščico na vrhu izbire: premika samo vzdolž X ali samo vzdolž Y, oblika pa sledi miški po tej črti tudi v nizkem pogledu, kjer prosto vlečenje uide daleč. Puščici se pripenjata kot pri vlečenju, [[Alt]] to izklopi, prevoženo razdaljo pa lahko potem klikneš in vpišeš natančno.
 
-Če je [[Alt]] že pritisnjen, ko se vlečenje začne, vlečeš kopijo, kot v Tinkercadu: oblika ostane, kjer je, kopija pa pristane tam, kjer spustiš. Če [[Alt]] pritisneš šele med potjo, se zaskakovanje prekine in oblika sledi samo mreži. Tudi pri vlečenju kopije se zaskoči šele, ko [[Alt]] med potjo spustiš. Zaskakovanje lahko povsem izklopiš v meniju pripenjanja spodaj desno ({{ui:inspector.objectSnap}}) ali v nastavitvah. Zaenkrat se zaskoči samo premikanje na običajni delovni ravnini, ne dviganje in ne sprememba velikosti.
+Če je [[Alt]] že pritisnjen, ko se vlečenje začne, vlečeš kopijo, kot v Tinkercadu: oblika ostane, kjer je, kopija pa pristane tam, kjer spustiš. Če [[Alt]] pritisneš šele med potjo, se zaskakovanje prekine in oblika sledi samo mreži. Tudi pri vlečenju kopije se zaskoči šele, ko [[Alt]] med potjo spustiš. Zaskakovanje lahko povsem izklopiš v meniju pripenjanja spodaj desno ({{ui:inspector.objectSnap}}) ali v nastavitvah. Na običajni delovni ravnini se zaskočijo premikanje in stranski ročaji, dviganje in ročaj na zgornji ploskvi pa ne.
 
 ## Poravnava
 

@@ -636,7 +636,7 @@ export function canonicalizeShape(unrepaired: WorkplaneShape): WorkplaneShape {
     next.torusTubeRatio = torusTubeRatio(next);
   }
   if (shape.groupedShapes) {
-    next.groupedShapes = shape.groupedShapes.map(canonicalizeShape);
+    next.groupedShapes = canonicalGroupedShapes(shape.groupedShapes);
   }
   if ("groupResize" in shape) {
     const groupResize = normalizeGroupResize(shape.groupResize);
@@ -659,6 +659,27 @@ export function canonicalizeShape(unrepaired: WorkplaneShape): WorkplaneShape {
   if (shape.edgeTreatmentHistory) {
     next.edgeTreatmentHistory = canonicalEdgeTreatmentHistory(shape.edgeTreatmentHistory);
   }
+  return next;
+}
+
+const canonicalGroupParts = new WeakMap<readonly WorkplaneShape[], WorkplaneShape[]>();
+
+/**
+ * A group's parts canonicalized once (Issue #1875). Moving a group, or moving something else in the design, keeps the
+ * group's array of parts, and handing back the same canonical array each time is what lets the view keep what it has
+ * built from it: the view tells a group in its parts' colours by this array (shapeGeometrySignature) and keeps the
+ * coloured mesh under it (getPartColoredMeshGeometry). Every step of the history canonicalizes the whole design, and a
+ * new array for every group each time made every arrow key, every Undo and every Redo build all Multicolor groups of
+ * the design again, not only what had moved - seconds in a large design, while a mouse drag, which hands the bodies it
+ * does not touch on as they are, stayed quick. A group whose parts change gets a new array from whoever changes them,
+ * and with it a new canonical one.
+ */
+function canonicalGroupedShapes(parts: readonly WorkplaneShape[]): WorkplaneShape[] {
+  const cached = canonicalGroupParts.get(parts);
+  if (cached) return cached;
+  const next = parts.map(canonicalizeShape);
+  canonicalGroupParts.set(parts, next);
+  canonicalGroupParts.set(next, next);
   return next;
 }
 

@@ -10,6 +10,7 @@ import { useLanguage } from "@/lib/useLanguage";
 import {
   HOLE_PATTERN_MANY_HOLES,
   HOLE_PATTERN_MAX_HOLES,
+  HOLE_PATTERN_MAX_EDGE_BORDER,
   HOLE_PATTERN_MAX_MARGIN,
   HOLE_PATTERN_MAX_PERIMETER_COUNT,
   HOLE_PATTERN_MAX_SIZE,
@@ -30,6 +31,10 @@ import {
   RACK_SLOT_WIDTH,
   RACK_STANDARD_PANELS,
   holeHasHead,
+  holePatternCutsAtEdge,
+  holePatternEdgeBorder,
+  holePatternTopLayer,
+  HOLE_PATTERN_TOP_LAYER_MIN,
   holeTiltApplies,
   holeHeadDepth,
   holeHeadSize,
@@ -69,6 +74,7 @@ export function HolePatternPanel({
   ring,
   roundFace,
   rack,
+  edgeCut,
   wall,
   customChoices,
   customIsHole,
@@ -92,6 +98,8 @@ export function HolePatternPanel({
   roundFace?: boolean;
   /** 19" rack holes: how the slots came out on the picked face, or why there are none. */
   rack?: RackFit;
+  /** The face's edge cuts the holes: how many holes inside leave a strip to it thinner than the walls between holes. */
+  edgeCut?: { thin: number; wall: number; border: number };
   /** A round wall picked (#1393): its diameter, and round a closed one how many holes a row holds at what step. */
   wall?: { diameter: number; closed: boolean; columns?: number; spacing?: number };
   /** Own shape (#1235): the other objects of the scene that can be repeated, and whether the chosen one is a hole. */
@@ -147,6 +155,9 @@ export function HolePatternPanel({
   const spaced = wall ? withoutHoleTilt(settings) : settings;
   const arrangements = wall ? ARRANGEMENTS.filter((option) => option !== "perimeter") : ARRANGEMENTS;
   const pattern = !mounting;
+  // A top layer in a second colour: a net over the solid body, for a pattern of plain holes in a flat face.
+  const layerOffered = pattern && !wall && !custom && !head;
+  const netLayer = layerOffered && Boolean(settings.topLayer);
   const millimetres = (value: number) => (Math.round(value * 10) / 10).toLocaleString(numberLocale());
   const wallNote = wall
     ? wall.closed && wall.columns
@@ -526,6 +537,32 @@ export function HolePatternPanel({
         length
         onChange={(value) => onChange({ margin: value })}
       />}
+      {/* Under the distance it follows from: at 0 the edge cuts the plain through holes off instead of leaving them out,
+          or a thin frame along the edge does, as wide as set under it. */}
+      {pattern && !wall && holePatternCutsAtEdge(settings) ? (
+        <>
+          <EdgeModifierSlider
+            label={t("holePattern.edgeBorder")}
+            value={holePatternEdgeBorder(settings)}
+            min={0}
+            max={HOLE_PATTERN_MAX_EDGE_BORDER / 2}
+            step={0.1}
+            workspace={workspace}
+            length
+            onChange={(value) => onChange({ edgeBorder: value })}
+          />
+          <p className="hole-pattern-mounting-note">
+            {[
+              holePatternEdgeBorder(settings) > 0
+                ? t("holePattern.edgeCutBorder", { border: millimetres(holePatternEdgeBorder(settings)) })
+                : t("holePattern.edgeCut"),
+              ready && edgeCut && edgeCut.thin > 0
+                ? t(edgeCut.thin === 1 ? "holePattern.edgeCutThin.one" : "holePattern.edgeCutThin.many", { count: edgeCut.thin, wall: millimetres(edgeCut.wall) })
+                : "",
+            ].filter(Boolean).join(" ")}
+          </p>
+        </>
+      ) : null}
       {/* Under the distance it belongs to: whether it counts to the holes' edge or to their middles. */}
       {screws ? (
         <label className="edge-modifier-check">
@@ -547,7 +584,8 @@ export function HolePatternPanel({
       ) : null}
       {screws ? <p className="hole-pattern-mounting-note">{t(roundFace ? "holePattern.mounting.roundNote" : "holePattern.mounting.countNote")}</p> : null}
 
-      {custom ? null : <div className="edge-modifier-field shell-openings" role="radiogroup" aria-label={t("holePattern.depth")}>
+      {/* With a top layer in a second colour the holes go through that layer only: no depth to choose. */}
+      {custom || netLayer ? null : <div className="edge-modifier-field shell-openings" role="radiogroup" aria-label={t("holePattern.depth")}>
         <span>{t("holePattern.depth")}</span>
         <div className="shell-opening-options">
           {[true, false].map((through) => (
@@ -564,7 +602,7 @@ export function HolePatternPanel({
           ))}
         </div>
       </div>}
-      {settings.depth !== null && !custom ? (
+      {settings.depth !== null && !custom && !netLayer ? (
         <EdgeModifierSlider
           label={t("holePattern.depthValue")}
           value={settings.depth}
@@ -576,6 +614,38 @@ export function HolePatternPanel({
           onChange={(value) => onChange({ depth: value })}
         />
       ) : null}
+
+      {/* A second colour on top (Discussion #1771): the top of the body under the face as a body of its own. */}
+      {layerOffered ? (
+        <label className="edge-modifier-check">
+          <input type="checkbox" checked={Boolean(settings.topLayer)} onChange={(event) => onChange({ topLayer: event.target.checked })} />
+          <span>{t("holePattern.topLayer")}</span>
+        </label>
+      ) : null}
+      {netLayer ? (() => {
+        const layer = holePatternTopLayer(settings, thickness > 0 ? thickness : undefined);
+        return (
+          <>
+            <EdgeModifierSlider
+              label={t("holePattern.topLayerThickness")}
+              value={layer?.thickness ?? HOLE_PATTERN_TOP_LAYER_MIN}
+              min={HOLE_PATTERN_TOP_LAYER_MIN}
+              max={Math.max(HOLE_PATTERN_TOP_LAYER_MIN, Math.round((thickness - HOLE_PATTERN_TOP_LAYER_MIN) * 10) / 10)}
+              step={0.1}
+              workspace={workspace}
+              length
+              onChange={(value) => onChange({ topLayerThickness: value })}
+            />
+            <label className="edge-modifier-field hole-pattern-layer-color">
+              <span>{t("holePattern.topLayerColor")}</span>
+              <input type="color" value={layer?.color ?? "#ffffff"} onChange={(event) => onChange({ topLayerColor: event.target.value })} />
+            </label>
+            <p className="hole-pattern-mounting-note">
+              {layer ? t("holePattern.topLayerNote", { thickness: millimetres(layer.thickness) }) : t("holePattern.topLayerThin")}
+            </p>
+          </>
+        );
+      })() : null}
 
       {ready && tooMany && !settings.allowMany ? (
         <div className="edge-modifier-field">

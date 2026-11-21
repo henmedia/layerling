@@ -73,3 +73,42 @@ describe("the arrow keys on the grip of the object list (#1277)", () => {
     }
   });
 });
+
+// #1836: the list opened the name field of a part of locked shape and threw the new name away on Enter,
+// while a locked part, the stricter lock, took it.
+describe("renaming a part of locked shape in the object list (#1836)", () => {
+  let host: HTMLDivElement | undefined;
+  afterEach(() => {
+    host?.remove();
+    host = undefined;
+  });
+
+  it("offers the pencil and the name field only where the name can change", () => {
+    (globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = true;
+    const onRenameShape = vi.fn();
+    host = document.createElement("div");
+    document.body.appendChild(host);
+    const root = createRoot(host);
+    const locked: WorkplaneShape = { ...box("locked"), locked: true };
+    act(() => root.render(createElement(ObjectListPanel, props([box("free"), box("held", true), locked], { onRenameShape }))));
+    try {
+      const rows = [...host.querySelectorAll<HTMLElement>(".outliner-item")];
+      expect(rows).toHaveLength(3);
+      const row = (name: string) => rows.find((entry) => entry.querySelector(".outliner-shape-name")?.textContent === name)!;
+      expect(row("free").querySelector(".rename-btn")).not.toBeNull();
+      expect(row("locked").querySelector(".rename-btn")).not.toBeNull();
+      expect(row("held").querySelector(".rename-btn")).toBeNull();
+      // A double click on the name opens no field either.
+      act(() => {
+        row("held").querySelector(".outliner-label-group")!.dispatchEvent(new MouseEvent("dblclick", { bubbles: true }));
+      });
+      expect(host.querySelector(".outliner-rename-input")).toBeNull();
+      act(() => {
+        row("free").querySelector(".outliner-label-group")!.dispatchEvent(new MouseEvent("dblclick", { bubbles: true }));
+      });
+      expect(host.querySelector(".outliner-rename-input")).not.toBeNull();
+    } finally {
+      act(() => root.unmount());
+    }
+  });
+});

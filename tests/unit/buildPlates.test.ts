@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
+  firstPlateCornerLabel,
   MAX_BUILD_PLATES,
   PLATE_GAP,
   normalizePlateNames,
@@ -158,5 +159,23 @@ describe("build plates side by side (Discussion #456)", () => {
     expect(normalizeWorkspaceSettings({ width: 200, depth: 150 }).plates).toBeUndefined();
     const withDefault = workspaceWithSavedDefault(design, normalizeWorkspaceSettings({ width: 300, depth: 300 }));
     expect(withDefault.plates).toEqual(["", "Lid"]);
+  });
+});
+
+describe("what the first plate says in its corner (Discussion #1860)", () => {
+  const label = (index: number) => `Plate ${index + 1}: named`;
+
+  it("stays the design's name alone while the plate has no name of its own", () => {
+    expect(firstPlateCornerLabel({ width: 200, depth: 200 }, "Gearbox", label)).toEqual({ title: "Gearbox", subtitle: "" });
+    expect(firstPlateCornerLabel({ width: 200, depth: 200, plates: ["", "Lid"] }, "Gearbox", label)).toEqual({ title: "Gearbox", subtitle: "" });
+  });
+
+  it("shows the plate's own label, as the further plates do, under the design's name once the plate has a name", () => {
+    expect(firstPlateCornerLabel({ width: 200, depth: 200, plates: ["Main Plate 5x5", "Padding Part"] }, "Base plate templates", label))
+      .toEqual({ title: "Plate 1: named", subtitle: "Base plate templates" });
+  });
+
+  it("shows the plate's label alone in a design without a name", () => {
+    expect(firstPlateCornerLabel({ width: 200, depth: 200, plates: ["Main Plate 5x5"] }, " ", label)).toEqual({ title: "Plate 1: named", subtitle: "" });
   });
 });

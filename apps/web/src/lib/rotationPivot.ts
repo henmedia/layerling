@@ -1,6 +1,6 @@
 import * as THREE from "three";
 import { quaternionForShape } from "@/lib/geometryRotation";
-import { mirrorSign, shapeDepth, shapeWidth } from "@/lib/workplaneShapes";
+import { mirrorSign, normalizeDegrees, shapeDepth, shapeHasExtrudeDeform, shapeWidth } from "@/lib/workplaneShapes";
 import type { WorkplaneShape } from "@/types/layerling";
 
 export type PivotPoint = { x: number; y: number; z: number };
@@ -237,6 +237,27 @@ export function heightPatchKeepingBase(shape: WorkplaneShape, patch: Partial<Wor
 /** Whether a body is turned at all, so that its own up axis is not the world's. */
 export function shapeIsTurned(shape: WorkplaneShape): boolean {
   return Math.abs(quaternionForShape(shape).w) <= 1 - 1e-9;
+}
+
+const TURN_TOLERANCE = 1e-6;
+
+/** How far `degrees` lies from the nearest whole multiple of `step`. */
+function offTurn(degrees: number, step: number) {
+  const rest = normalizeDegrees(degrees) % step;
+  return Math.min(rest, step - rest);
+}
+
+/**
+ * Whether a part snaps to walls: standing upright or upside down, turned only by whole quarter turns, and neither
+ * twisted nor leaning. A resize checks its selection frame; a move checks each part, as its box is all a wall meets: a
+ * turned cylinder or text would stop short of the wall with the corner of its box, and the top of a leaning part, which
+ * its box leaves out, would go into it.
+ */
+export function snapsToWalls(shape: WorkplaneShape) {
+  return offTurn(shape.rotationX ?? 0, 180) < TURN_TOLERANCE
+    && offTurn(shape.rotationZ ?? 0, 180) < TURN_TOLERANCE
+    && offTurn(shape.rotation ?? 0, 90) < TURN_TOLERANCE
+    && !shapeHasExtrudeDeform(shape);
 }
 
 /** Where a body's own pivot lies in the world, or null if it has none. */

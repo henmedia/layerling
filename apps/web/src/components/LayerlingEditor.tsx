@@ -103,7 +103,7 @@ import { StencilBridgePanel } from "./workplane/StencilBridgePanel";
 import { normalizeStencilBridgeTool, readStencilBridgeToolSettings, stencilBridgeBase, stencilBridgeBoxes, stencilBridgeLevels, stencilBridgePlan, writeStencilBridgeToolSettings, STENCIL_BRIDGE_POSITIONS, type StencilBridgePlan, type StencilBridgePosition, type StencilBridgeToolSettings } from "@/lib/stencilBridgeTool";
 import { faceToolBody } from "@/lib/faceToolBody";
 import { DEFAULT_HOLE_PATTERN, holeTiltRadians, normalizeHolePattern, type HolePatternSettings } from "@/lib/holePattern";
-import { holePatternCustomFootprint, holePatternScrewPatch, holePatternScrewSizes, holePatternShapes, isRoundWallFace, readHolePatternFace, readPerforableFace, type HolePatternFace, type PerforableFace } from "@/lib/holePatternShapes";
+import { holePatternCustomFootprint, holePatternScrewPatch, holePatternScrewSizes, holePatternShapes, isRoundWallFace, readHolePatternFace, readPerforableFace, type HolePatternFace, type HolePatternPlan, type PerforableFace } from "@/lib/holePatternShapes";
 import { honeycombReplacementParts } from "@/lib/honeycombMigration";
 import { groupNeedsThreadRecut, placeRecutGroup, threadRecutParts } from "@/lib/groupThreadRecut";
 import { groupsStretchedInstead, groupsToKeepParts, keptPartsForResize, placeKeptPartsGroup } from "@/lib/groupKeepParts";
@@ -255,7 +255,7 @@ import type { RasterPart } from "@/lib/rasterTrace";
 import { DEFAULT_SKETCH_STROKE, normalizeSketchStroke, strokedSketchProfile } from "@/lib/sketchStroke";
 import { bottomCadModifierEdgeIds, horizontalCadModifierEdgeIds, topCadModifierEdgeIds, verticalCadModifierEdgeIds } from "@/lib/topEdges";
 import { tangentCadEdgeChain } from "@/lib/cadEdgeChain";
-import { sketchEditTurn, turnedSketchProfile, type SketchEditTurn } from "@/lib/sketchEditTurn";
+import { sketchEditTurn, sketchEditTurnOnPlate, turnedSketchProfile, type SketchEditTurn } from "@/lib/sketchEditTurn";
 import { movedWithEditedOutline, placedLikeExisting, placeSketchShape, sketchBodyAnchor, sketchPoseOf, type SketchAnchor } from "@/lib/sketchPlacement";
 import { notesWithSketchNotes, sketchNoteFrame, sketchNotesFromBody } from "@/lib/sketchNotes";
 import { useSketchNotes } from "@/lib/useSketchNotes";
@@ -4482,12 +4482,24 @@ export function LayerlingEditor({
       : null),
     [holePatternTool?.face, holePatternTool?.settings, holePatternCustom],
   );
+  // The frame along the edge (Discussion #1771) shows in the body's own colour while the numbers change.
+  const holePatternPreviewFrame = useMemo(() => {
+    const frame = holePatternPreview?.frame;
+    if (!frame) return null;
+    const source = shapes.find((shape) => shape.id === holePatternTool?.sourceId);
+    return { ...frame, color: source?.color ?? frame.color, name: t("holePattern.frameName") };
+  }, [holePatternPreview?.frame, holePatternTool?.sourceId, shapes]);
+  // The top layer shows in its colour on the body while the numbers change, a hair above it so the two do not flicker.
+  const holePatternPreviewLayer = useMemo(() => {
+    const layer = holePatternPreview?.topLayer;
+    return layer ? { ...layer.slab, elevation: (layer.slab.elevation ?? 0) + 0.02, name: t("holePattern.topLayerName") } : null;
+  }, [holePatternPreview?.topLayer]);
   const baseViewportShapes = useMemo(
     () =>
       arrayPreview
         ? [...shapes, ...arrayPreview]
         : holePatternPreview?.holes.length
-        ? [...shapes, ...holePatternPreview.holes]
+        ? [...shapes, ...holePatternPreview.holes, ...(holePatternPreviewFrame ? [holePatternPreviewFrame] : []), ...(holePatternPreviewLayer ? [holePatternPreviewLayer] : [])]
         : faceToolPreview?.shape
         ? [...shapes, faceToolPreview.shape]
         : supportRibPreview?.shape
@@ -4505,7 +4517,7 @@ export function LayerlingEditor({
         : mirrorMode && mirrorPreviewAxis
           ? mirroredShapesForSelection(shapes, selectedIds, selectedShapes, mirrorPreviewAxis).nextShapes
           : shapes,
-    [alignAxes, alignMode, alignPreview, alignSelection, arrayPreview, edgeModifier?.preview, effectiveAlignAnchorId, faceToolPreview, supportRibPreview, stencilBridgePreview, holePatternPreview, mirrorMode, mirrorPreviewAxis, selectedIds, selectedShapes, shapes],
+    [alignAxes, alignMode, alignPreview, alignSelection, arrayPreview, edgeModifier?.preview, effectiveAlignAnchorId, faceToolPreview, supportRibPreview, stencilBridgePreview, holePatternPreview, holePatternPreviewFrame, holePatternPreviewLayer, mirrorMode, mirrorPreviewAxis, selectedIds, selectedShapes, shapes],
   );
   // The preview of an intersection (#372): the operands see-through, and what they share as a body of its own on top.
   const [intersectPreviewIds, setIntersectPreviewIds] = useState<string[] | null>(null);
@@ -5659,10 +5671,14 @@ export function LayerlingEditor({
       // Turned only about the vertical, it opens on the plate as it stands in 3D, turned and moved, on the plate's grid
       // (forum, 621358); before, its own frame made the bodies round it look turned and the grid sit off the plate's.
       const upright = !body.rotationX && !body.rotationZ && !body.mirrorX && !body.mirrorY && !body.mirrorZ;
+      // On a further build plate the sketch lies on that plate, its plane moved to the plate's middle as for a new sketch
+      // there (#1660): on the first plate's plane the sketch view showed plate 1 with its bodies, and the body's own
+      // outline lay out of reach beside it (Discussion #1887).
+      const plateX = plateCenterX(workspaceSettingsRef.current, plateOfShape(workspaceSettingsRef.current, selectedShape));
       turn = upright && !selectedShape.sketchProfile.keyring
-        ? sketchEditTurn({ x: origin.x, z: origin.z }, { x: xAxis.x, z: xAxis.z }, { x: zAxis.x, z: zAxis.z })
+        ? sketchEditTurnOnPlate(sketchEditTurn({ x: origin.x, z: origin.z }, { x: xAxis.x, z: xAxis.z }, { x: zAxis.x, z: zAxis.z }), plateX)
         : null;
-      if (turn) editWorkplane = placementWorkplaneFromSurface({ x: 0, y: origin.y, z: 0 }, { x: 0, y: 1, z: 0 }, { x: 1, y: 0, z: 0 });
+      if (turn) editWorkplane = placementWorkplaneFromSurface({ x: plateX, y: origin.y, z: 0 }, { x: 0, y: 1, z: 0 }, { x: 1, y: 0, z: 0 });
     } else if (operation === "revolve") {
       const quaternion = quaternionForShape(selectedShape);
       const normal = new THREE.Vector3(0, 1, 0).applyQuaternion(quaternion).normalize();
@@ -9028,7 +9044,8 @@ export function LayerlingEditor({
         ? t("lid.error.magnetsGridSize", { columns: least.columns, rows: least.rows, width: mm(least.width), depth: mm(least.depth) })
         : t("lid.error.magnetsGrid"));
     }
-    const lid = (await exactLid(targets, options, result.lid, result.magnets)) ?? result.lid;
+    // A lip or a rim that follows a leaning wall (issue #1868) stays the mesh lid: the exact one is upright.
+    const lid = (result.leaning ? null : await exactLid(targets, options, result.lid, result.magnets)) ?? result.lid;
     if (changed()) return fail(t("lid.error.changed"));
     const type = t(`lid.type.${options.type}`);
     const hinge = result.hinge;
@@ -11033,6 +11050,43 @@ export function LayerlingEditor({
     });
   }, []);
 
+  /**
+   * The body grouped with its holes; with a frame along the edge (Discussion #1771) that group is grouped again with the
+   * frame, so the holes stop where the frame starts and ungrouping still frees each step.
+   */
+  const holePatternGroup = useCallback(async (source: WorkplaneShape, plan: HolePatternPlan) => {
+    const limit = workspaceSettingsRef.current.booleanTriangleLimit;
+    const inner = await buildGroupedShapeOffThread([source, ...plan.holes], limit, geometryAbortRef.current?.signal);
+    if (!inner.group || (!plan.frame && !plan.topLayer)) return inner;
+    let body = canonicalizeShape({ ...inner.group, groupOperation: "group" });
+    if (plan.frame) {
+      const frame = { ...plan.frame, color: source.color, name: t("holePattern.frameName") };
+      const outer = await buildGroupedShapeOffThread([body, frame], limit, geometryAbortRef.current?.signal);
+      if (!outer.group) return outer;
+      body = canonicalizeShape({ ...outer.group, name: body.name, groupOperation: "group" });
+    }
+    if (!plan.topLayer) return { ...inner, group: body };
+    // The top layer in a second colour (Discussion #1771): what of the perforated body lies in the slab under the face is
+    // the net; the body less the net is the other colour, solid below and filling the net's holes up to the face, so the
+    // face is flat and both colours start on the first layers when it is printed face down (no bridges, no supports).
+    // The two are bundled, so they move together and reach the slicer as two bodies in their own colours.
+    const layerName = t("holePattern.topLayerName");
+    const slab = { ...plan.topLayer.slab, color: plan.topLayer.color, name: layerName };
+    const top = await buildIntersectionShapeFromSelection([body, slab], limit);
+    if (!top.group) return { ...inner, group: null, failureNotice: top.failureNotice || t("status.intersectionEmpty") };
+    const upper = canonicalizeShape({ ...top.group, name: layerName, color: plan.topLayer.color, groupOperation: "intersection" });
+    const netMesh = meshForShape(upper);
+    const netPositions = netMesh.faces.flatMap((face) => face.flatMap((index) => netMesh.vertices[index]));
+    const cut = clearanceMeshShape(createLocalId("top-layer-cut"), layerName, plan.topLayer.color, netPositions);
+    if (!cut) return { ...inner, group: null };
+    const below = await buildGroupedShapeOffThread([source, withHoleMode(cut, true)], limit, geometryAbortRef.current?.signal);
+    if (!below.group) return below;
+    const lower = canonicalizeShape({ ...below.group, name: source.name, color: source.color, groupOperation: "group" });
+    const bundle = groupedShape([lower, upper]);
+    if (!bundle) return { ...inner, group: null };
+    return { ...inner, group: canonicalizeShape({ ...bundle, name: source.name, groupOperation: "bundle" }) };
+  }, []);
+
   const applyHolePattern = useCallback(async () => {
     const tool = holePatternTool;
     if (!tool?.face || tool.busy) return;
@@ -11053,7 +11107,7 @@ export function LayerlingEditor({
     setHolePatternTool({ ...tool, busy: true });
     const sourceFingerprint = projectShapesFingerprint(shapesRef.current);
     const sourceProjectId = projectInfoRef.current.projectId;
-    const result = await buildGroupedShapeOffThread([source, ...plan.holes], workspaceSettingsRef.current.booleanTriangleLimit, geometryAbortRef.current?.signal);
+    const result = await holePatternGroup(source, plan);
     if (projectInfoRef.current.projectId !== sourceProjectId || projectShapesFingerprint(shapesRef.current) !== sourceFingerprint) {
       setHolePatternTool(null);
       setNotice(t("status.groupChanged"));
@@ -11064,14 +11118,14 @@ export function LayerlingEditor({
       setNotice(result.failureNotice);
       return;
     }
-    const editableGroup = canonicalizeShape({ ...result.group, groupOperation: "group" });
+    const editableGroup = canonicalizeShape({ ...result.group, groupOperation: result.group.groupOperation === "bundle" ? "bundle" : "group" });
     setHolePatternTool(null);
     commitShapes(
       [...shapesRef.current.filter((shape) => shape.id !== source.id), editableGroup],
       editableGroup.id,
       t(custom && !custom.hole ? "status.holePatternCreatedPieces" : "status.holePatternCreated", { count: plan.holes.length }),
     );
-  }, [commitShapes, holePatternTool]);
+  }, [commitShapes, holePatternGroup, holePatternTool]);
 
   // The tool belongs to the body it was started for, and gives way to the tools that pick faces or open panels of their own.
   useEffect(() => {
@@ -15247,6 +15301,9 @@ export function LayerlingEditor({
           spacing: mcpNumber(params.spacing, DEFAULT_HOLE_PATTERN.spacing),
           rowSpacing: mcpOptionalNumber(params.rowSpacing),
           margin: mcpNumber(params.margin, DEFAULT_HOLE_PATTERN.margin),
+          ...(mcpOptionalNumber(params.border) !== undefined ? { edgeBorder: mcpOptionalNumber(params.border) } : {}),
+          ...(mcpOptionalNumber(params.topLayer) !== undefined ? { topLayer: true, topLayerThickness: mcpOptionalNumber(params.topLayer) } : {}),
+          ...(typeof params.topLayerColor === "string" ? { topLayerColor: params.topLayerColor } : {}),
           depth: depth !== undefined && depth > 0 ? depth : null,
           holeType,
           headSize: mcpOptionalNumber(params.headSize) ?? screw?.headSize,
@@ -15277,12 +15334,12 @@ export function LayerlingEditor({
             : `Too low for the rack holes: the face is ${plan.rack.height} mm high${plan.rack.standardHeight !== undefined ? `, the ${plan.rack.units}U holes need ${plan.rack.standardHeight} mm` : ""}`);
         }
         if (plan.holes.length === 0) throw new Error("No hole fits on that face with this size and margin");
-        const result = await buildGroupedShapeOffThread([target, ...plan.holes], workspaceSettingsRef.current.booleanTriangleLimit, geometryAbortRef.current?.signal);
+        const result = await holePatternGroup(target, plan);
         if (projectInfoRef.current.projectId !== sourceProjectId || projectShapesFingerprint(currentShapes()) !== sourceFingerprint) {
           throw new Error("The scene changed while perforating; run the command again");
         }
         if (!result.group) throw new Error(result.failureNotice);
-        const editableGroup = canonicalizeShape({ ...result.group, groupOperation: "group" });
+        const editableGroup = canonicalizeShape({ ...result.group, groupOperation: result.group.groupOperation === "bundle" ? "bundle" : "group" });
         commitShapes(
           [...currentShapes().filter((shape) => shape.id !== target.id), editableGroup],
           editableGroup.id,
@@ -15293,6 +15350,8 @@ export function LayerlingEditor({
           holes: plan.holes.length,
           settings,
           ...(plan.ring ? { ring: { length: Number(plan.ring.length.toFixed(2)), onCorners: plan.ring.onCorners } } : {}),
+          ...(plan.edgeCut ? { edgeCut: { thin: plan.edgeCut.thin, wall: Number(plan.edgeCut.wall.toFixed(2)), border: plan.edgeCut.border } } : {}),
+          ...(plan.topLayer ? { topLayer: { thickness: Number(plan.topLayer.thickness.toFixed(2)), color: plan.topLayer.color } } : {}),
           ...(plan.wall ? {
             wall: {
               diameter: Number(plan.wall.diameter.toFixed(2)),
@@ -18112,6 +18171,7 @@ export function LayerlingEditor({
     }
   }, [
     placeFitTest,
+    holePatternGroup,
     alignSizeLimit,
     buildSectionSvg,
     sectionSketchAt,
@@ -21175,6 +21235,7 @@ export function LayerlingEditor({
           ring={holePatternPreview?.ring}
           roundFace={Boolean(holePatternPreview?.roundFace)}
           rack={holePatternPreview?.rack}
+          edgeCut={holePatternPreview?.edgeCut}
           wall={holePatternTool.face && isRoundWallFace(holePatternTool.face) ? holePatternPreview?.wall ?? { diameter: holePatternTool.face.round.radius * 2, closed: holePatternTool.face.round.outline.closed } : undefined}
           customChoices={holePatternCustomChoices(shapes, holePatternTool.sourceId).map((shape) => ({ id: shape.id, name: displayShapeName(shape) }))}
           customIsHole={Boolean(holePatternCustom?.hole)}
@@ -21654,7 +21715,7 @@ export function LayerlingEditor({
           shapeCount={exportableShapeCount}
           scopeLabel={exportScopeLabel}
           plateScope={buildPlates.count > 1 && !exportSelectionScoped && !historyViewState
-            ? { plates: buildPlates.plates.map((plate) => plate.label), value: buildPlates.exportPlate, onChange: buildPlates.setExportPlate }
+            ? { plates: buildPlates.plates.map((plate) => plate.label), names: buildPlates.plates.map((plate) => plate.name), value: buildPlates.exportPlate, onChange: buildPlates.setExportPlate }
             : null}
           selectionLeavesOut={exportSelectionScoped && exportSelectedVisibleCount < exportVisibleCount ? { selected: selectedShapes.length, total: exportVisibleCount } : null}
           onSelectAll={selectAllVisible}

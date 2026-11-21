@@ -7,7 +7,7 @@ Pour construire une pièce avec précision, vous devez mesurer. layerling dispos
 
 ## Le mètre ruban
 
-Le ruban à mesurer se trouve à l'extrémité inférieure de la barre de vue, sur le bord gauche ({{ui:camera.tapeTools}}). Il mesure les distances entre les coins, les arêtes et les faces. Un clic dessus ouvre cinq boutons. S'ils couvrent ce que vous souhaitez mesurer, faites-les glisser par la poignée de gauche n'importe où sur le plan de travail ; un double-clic sur la poignée les remet :
+Le ruban à mesurer se trouve à l'extrémité inférieure de la barre de vue, sur le bord gauche ({{ui:camera.tapeTools}}). Il mesure les distances entre les coins, les arêtes et les faces. Un clic dessus ouvre cinq boutons. {{ui:camera.addMeasurement}} est activé aussitôt, les deux clics suivants dans la vue mesurent donc déjà ; un nouveau clic sur ce bouton pose l'outil et laisse les boutons ouverts. Si les mesures sont masquées, il reste désactivé jusqu'à ce que vous cliquiez dessus. S'ils couvrent ce que vous souhaitez mesurer, faites-les glisser par la poignée de gauche n'importe où sur le plan de travail ; un double-clic sur la poignée les remet :
 
 ![Le mètre ruban avec ses boutons : ajouter une mesure, déplacer des points de mesure, supprimer une mesure, des bords entiers, supprimer toutes les mesures.](shot:tape-menu)
 
@@ -66,6 +66,8 @@ Avec {{ui:workspace.dimensionsAlwaysVisible}} les cotes restent visibles en perm
 Avec {{ui:workspace.dimensionAxisColors}}, chaque case prend la couleur de son axe, comme les poignées : rouge pour X, vert pour Y et bleu pour Z. Ainsi, même sur une petite pièce, vous voyez d'un coup d'œil quel nombre est lequel.
 
 Pour vous en passer un instant, appuyez sur [[Q]] : les cotes et distances autour de la sélection disparaissent, et la pièce que vous déplacez se voit bien. Un nouvel appui sur [[Q]] les ramène. Une poignée que vous survolez affiche quand même sa cote.
+
+Sur une très petite pièce, les poignées elles-mêmes peuvent gêner. [[Shift+Q]] les masque toutes - les carrés de taille et les flèches pour lever, glisser et tourner - et un nouvel appui sur [[Shift+Q]] les ramène. Sans elles, vous pouvez toujours faire glisser la pièce et saisir ses cotes à droite, et la liste des objets montre quelle pièce est sélectionnée.
 
 ## Vérifier le jeu
 

@@ -4472,6 +4472,30 @@ function getShapeProperties(shape: WorkplaneShape, onUpdate: ShapeInspectorUpdat
  */
 const SliderSnapContext = createContext(0);
 
+/** The most parts a group's card lists with their own colours; a bigger group is coloured in its own editing. */
+const PART_COLOR_LIMIT = 12;
+
+/**
+ * A part's colour swatch: the system colour picker, taken once the picker is closed (its "change"), so dragging in the
+ * picker makes one undo step, not one for every shade passed on the way.
+ */
+function PartColorInput({ color, disabled, onCommit }: { color: string; disabled: boolean; onCommit: (color: string) => void }) {
+  const ref = useRef<HTMLInputElement>(null);
+  const commitRef = useRef(onCommit);
+  commitRef.current = onCommit;
+  useEffect(() => {
+    const input = ref.current;
+    if (!input) return;
+    if (input.value !== color) input.value = color;
+    const changed = () => {
+      if (/^#[0-9a-f]{6}$/i.test(input.value) && input.value.toLowerCase() !== color.toLowerCase()) commitRef.current(input.value.toLowerCase());
+    };
+    input.addEventListener("change", changed);
+    return () => input.removeEventListener("change", changed);
+  }, [color]);
+  return <input ref={ref} type="color" defaultValue={color} disabled={disabled} />;
+}
+
 export function ShapeInspector({
   shape,
   snap,
@@ -4603,6 +4627,15 @@ export function ShapeInspector({
   const solidColor = shape.color;
   // Picking one colour for a group means one colour for all of it, as in similar tools.
   const singleColorPatch: Partial<WorkplaneShape> = canToggleGroupColors(shape) ? { multicolor: false } : {};
+  // A group or bundle showing its parts in their own colours: the solid parts, each with its colour, to change it right
+  // here (a cut group shows one mesh, so only groups whose parts stay apart). Up to a dozen, so the card stays short.
+  const partColors = !shape.hole && groupShowsPartColors(shape) && (shape.groupOperation === "bundle" || !shape.importedMesh)
+    ? (shape.groupedShapes ?? [])
+        .filter((part) => !part.hole && !isNonSolidShape(part))
+        .slice(0, PART_COLOR_LIMIT + 1)
+        .map((part) => ({ id: part.id, name: displayShapeName(part), color: /^#[0-9a-f]{6}$/i.test(part.color) ? part.color.toLowerCase() : "#888888" }))
+    : [];
+  if (partColors.length > PART_COLOR_LIMIT || partColors.length < 2) partColors.length = 0;
   const locked = Boolean(shape.locked);
   // Lock shape (#1277): where the part stands and how it turns stay free; its size, settings and name do not.
   const shapeLocked = Boolean(shape.shapeLocked);
@@ -5174,6 +5207,22 @@ export function ShapeInspector({
             disabled={frozen}
             onChange={(multicolor) => onUpdate({ multicolor })}
           />
+        ) : null}
+        {/* Under Multicolor: each part's own colour, to change one part without opening the group (a two-colour plate's base or top). */}
+        {partColors.length ? (
+          <div className="part-colors" role="group" aria-label={t("inspector.partColors")}>
+            <span>{t("inspector.partColors")}</span>
+            {partColors.map((part) => (
+              <label key={part.id} className="part-color-row">
+                <PartColorInput
+                  color={part.color}
+                  disabled={frozen}
+                  onCommit={(color) => onUpdate({ groupedShapes: shape.groupedShapes!.map((child) => (child.id === part.id ? { ...child, color } : child)) })}
+                />
+                <span>{part.name}</span>
+              </label>
+            ))}
+          </div>
         ) : null}
       </div>
       ) : null}

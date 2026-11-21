@@ -1,4 +1,6 @@
-import { describe, expect, it } from "vitest";
+import { AsyncZipDeflate, ZipDeflate } from "fflate";
+import { afterEach, describe, expect, it, vi } from "vitest";
+import { forgetDeflatedProjectEntries } from "@/lib/boundedProjectZip";
 import { editorHistoryEntry, hydrateEditorHistoryState, type EditorHistoryEntry } from "@/lib/editorHistory";
 import { exportLylProject, importLylProject, type LylProjectExportInput } from "@/lib/lylProject";
 import { DEFAULT_SNAP_GRID, DEFAULT_WORKPLANE_WORKSPACE } from "@/lib/workplaneSettings";
@@ -52,7 +54,40 @@ function exportInput(entries: EditorHistoryEntry[], shapes: WorkplaneShape[]): L
   };
 }
 
+afterEach(() => vi.restoreAllMocks());
+
 describe("exporting a project again", () => {
+  // #1794: every autosave deflated every mesh and exact body of an imported assembly again, on the page's thread.
+  it("deflates only the project file when a part was moved, and gives the package a save from nothing gives", async () => {
+    const part = (index: number): WorkplaneShape => box(`part-${index}`, index, {
+      importedMesh: {
+        positions: Array.from({ length: 900 }, (_unused, at) => (at * 7 + index) % 31),
+        baseWidth: 20,
+        baseDepth: 18,
+        baseHeight: 16,
+        triangleCount: 100,
+        sourceFormat: "step",
+        brepStep: `ISO-10303-21; part ${index}; ${"#1=CARTESIAN_POINT('',(0.,1.,2.)); ".repeat(40)}`,
+      },
+    });
+    const parts = Array.from({ length: 12 }, (_unused, index) => part(index));
+    const before = [...parts, box("lid", 0)];
+    const after = [...parts, box("lid", 5)];
+    const entries = [editorHistoryEntry(before, [], [], undefined, 1_700_000_000_000)];
+    await exportLylProject(exportInput(entries, before));
+    const moved = [...entries, editorHistoryEntry(after, ["lid"], [], undefined, 1_700_000_000_001)];
+    const onThread = vi.spyOn(ZipDeflate.prototype, "push");
+    const offThread = vi.spyOn(AsyncZipDeflate.prototype, "push");
+    const saved = await exportLylProject(exportInput(moved, after));
+    expect(onThread.mock.calls.length + offThread.mock.calls.length).toBe(1);
+    forgetDeflatedProjectEntries();
+    const fresh = await exportLylProject(exportInput(structuredClone(moved), structuredClone(after)));
+    expect(Buffer.from(saved).equals(Buffer.from(fresh))).toBe(true);
+    const reopened = await importLylProject(saved);
+    expect(reopened.shapes.find((shape) => shape.id === "lid")?.x).toBe(5);
+    expect(reopened.shapes[0].importedMesh?.brepStep).toBe(parts[0].importedMesh?.brepStep);
+  });
+
   it("gives the same package when the history was seen before as when it is new", async () => {
     const { entries, shapes } = history();
     const first = await exportLylProject(exportInput(entries, shapes));

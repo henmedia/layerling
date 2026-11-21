@@ -7,7 +7,7 @@ För att bygga en del exakt behöver du kunna mäta. layerling har flera verktyg
 
 ## Måttbandet
 
-Måttbandet sitter längst ned i vyfältet längs vänsterkanten ({{ui:camera.tapeTools}}). Det mäter avstånd mellan hörn, kanter och ytor. Ett klick öppnar fem knappar. Om de täcker det du ska mäta kan du dra dem i greppet till vänster var som helst på arbetsytan; ett dubbelklick på greppet sätter tillbaka dem:
+Måttbandet sitter längst ned i vyfältet längs vänsterkanten ({{ui:camera.tapeTools}}). Det mäter avstånd mellan hörn, kanter och ytor. Ett klick öppnar fem knappar. {{ui:camera.addMeasurement}} är påslaget direkt, så de två följande klicken i vyn mäter; ett klick till på den knappen lägger undan verktyget och knapparna förblir öppna. Är måtten dolda förblir den avstängd tills du klickar på den. Om de täcker det du ska mäta kan du dra dem i greppet till vänster var som helst på arbetsytan; ett dubbelklick på greppet sätter tillbaka dem:
 
 ![Måttbandet med sina knappar: lägg till mätning, flytta mätpunkter, ta bort mätning, hela kanter, radera alla mätningar.](shot:tape-menu)
 
@@ -68,6 +68,8 @@ Med {{ui:workspace.dimensionsAlwaysVisible}} förblir måtten synliga hela tiden
 Med {{ui:workspace.dimensionAxisColors}} tar varje måttruta sin axels färg precis som handtagen: rött för X, grönt för Y och blått för Z. På en liten del ser du då direkt vilket mått som är vilket.
 
 För en stund utan dem trycker du [[Q]]: måtten och avstånden kring markeringen försvinner så att delen du flyttar syns tydligt. Tryck [[Q]] igen för att få tillbaka dem. Handtag du pekar på visar fortfarande sina mått.
+
+På en mycket liten del kan handtagen själva vara i vägen. [[Shift+Q]] döljer dem alla - rutorna för storleken och pilarna för att lyfta, skjuta och vrida - och [[Shift+Q]] igen tar tillbaka dem. Utan dem kan du fortfarande dra delen och skriva dess mått till höger, och objektlistan visar vilken del som är markerad.
 
 ## Kontrollera spelrum
 

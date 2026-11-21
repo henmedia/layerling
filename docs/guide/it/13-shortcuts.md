@@ -19,7 +19,7 @@ Non trovi uno strumento? Premi [[Ctrl]]+[[K]] oppure fai clic sulla lente d’in
 - Ogni risultato mostra i tasti che eseguono la stessa operazione e il gruppo della barra degli strumenti in cui si trova, così puoi imparare dove cercarlo.
 - Le voci disattivate non sono disponibili in quel momento, spesso perché non hai selezionato nulla. Restano nell’elenco, così la ricerca ti indica comunque dove si trova lo strumento.
 
-Anche la guida che stai leggendo ha una casella di ricerca in cima a ogni pagina: digita una o due parole e verranno elencate le sezioni che le contengono tutte, con i termini corrispondenti evidenziati. Fai clic su una sezione oppure premi [[Enter]] per aprire la prima. La pagina che si apre evidenzia ogni punto in cui compaiono le tue parole e scorre fino al primo in quella sezione; [[Esc]] o un clic su un'evidenziazione le rimuove.
+Anche la guida che stai leggendo ha una casella di ricerca in cima a ogni pagina: digita una o due parole e verranno elencate le sezioni che le contengono tutte, con i termini corrispondenti evidenziati. Fai clic su una sezione oppure premi [[Enter]] per aprire la prima. La pagina che si apre evidenzia ogni punto in cui compaiono le tue parole e scorre fino al primo in quella sezione; [[Esc]] o un clic su un'evidenziazione le rimuove. Le parole tra virgolette vengono cercate come frase esatta: vengono elencate solo le sezioni in cui compaiono una dopo l'altra in quell'ordine, e una singola parola tra virgolette viene trovata solo come parola intera, non come parte di una più lunga.
 
 - Il nome di una forma la aggiunge al piano di lavoro, proprio come se la scegliessi dal menu delle forme.
 - Se il campo è vuoto, in cima compaiono i comandi usati più di recente.

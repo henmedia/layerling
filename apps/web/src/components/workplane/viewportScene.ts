@@ -12,7 +12,7 @@ import { pinchWheelDelta, wheelZoomDelta } from "@/lib/wheelZoom";
 import { CAMERA_FOV, CAMERA_MAX_DISTANCE, CAMERA_MIN_DISTANCE, CAMERA_TARGET, updateCameraViewport } from "@/components/workplane/cameraRig";
 import { horizontalPlacementWorkplane, placementWorkplaneIsBase, placementWorkplaneLiesOnBase, placementWorkplaneQuaternion, type PlacementWorkplane } from "@/lib/placementWorkplane";
 import { printerPresetById } from "@/lib/printBed";
-import { plateCenterX, plateCount } from "@/lib/buildPlates";
+import { firstPlateCornerLabel, plateCenterX, plateCount } from "@/lib/buildPlates";
 import { DEFAULT_WORKPLANE_WORKSPACE, effectiveViewSettings, viewPixelRatio, orbitControlsZoomSpeed, orbitControlsPanSpeed } from "@/lib/workplaneSettings";
 import { axisCrossWidth, mmPerScreenPixel, workplaneGridBandWidths, AXIS_ARROW_COLORS, axisArrowLayout, fillLightPosition, keyLightPosition, sceneLightLevels, shadowBlurRadius, softSceneLightLevels, workplaneGridLayout, workplaneGridLines, workplaneGridPalette, workplaneLabelLayout, workplaneThemePalette, WORKPLANE_LABEL_ASPECT, WORKPLANE_LINE_ELEVATION, type WorkplaneGridLayout } from "@/lib/workplaneGrid";
 import type { WorkplaneWorkspaceSettings } from "@/types/layerling";
@@ -401,7 +401,10 @@ export function rebuildWorkplane(
   theme: ResolvedAppTheme = "light",
   placementWorkplane: PlacementWorkplane = horizontalPlacementWorkplane(),
   projectName = "",
-  /** The label written on each further build plate (Discussion #456), by its index from 1; plate 0 shows the design's name. */
+  /**
+   * The label written on each further build plate (Discussion #456), by its index from 1; plate 0 shows the design's
+   * name, and once it has a name of its own its label as well, the design's name in small above it (Discussion #1860).
+   */
   plateLabel: (index: number) => string = (index) => `${index + 1}`,
 ) {
   if (!state) {
@@ -507,13 +510,14 @@ export function rebuildWorkplane(
       const labelPalette = workplaneGridPalette(theme, lineColor, state.palette).major;
       // The design's name in the near left corner, so a screenshot of the scene
       // says what it shows - unless it was switched off as a distraction (#192).
+      const cornerLabel = extraPlate ? { title: extraPlate.label, subtitle: "" } : firstPlateCornerLabel(workspace, projectName, plateLabel);
       const label = workspace.showPlateLabels === false ? null : createWorkplaneLabel(
         cornerWidth,
         cornerDepth,
         labelPalette.color,
         muted ? labelPalette.opacity * 0.5 : labelPalette.opacity,
-        extraPlate ? extraPlate.label : projectName,
-        "",
+        cornerLabel.title,
+        cornerLabel.subtitle,
         { outline: muted ? undefined : palette.surface.color },
       );
       if (label) {
