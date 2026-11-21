@@ -40,6 +40,8 @@ import { DEFAULT_SNAP_GRID, DEFAULT_WORKPLANE_WORKSPACE, keyboardNudgeCoarseFact
 import type { GridSize, SketchImage, SketchNote, SketchOperation, SketchPoint, SketchProfile, SketchSegment, SketchStroke, SketchStrokeAlign, SketchStrokeCap, SketchStrokeJoin, SweepAnchor, WorkplaneShape, WorkplaneWorkspaceSettings } from "@/types/layerling";
 import { resizePointerOnGrid } from "@/lib/sketchFrameResize";
 import { viewArrowStep } from "@/lib/viewArrowKeys";
+import { createKeyRepeatBatch } from "@/lib/keyRepeatBatch";
+import { flushSync } from "react-dom";
 import { resizeSketchPoints, resizeSketchPointsToSize, type ResizeHandle, type SelectionBounds } from "@/lib/sketchSelectionResize";
 import { alignSketchSelection, canAlignSketchSelection, type SketchAlignMode } from "@/lib/sketchAlign";
 import { changesLockedOutline, lockedCornerTurn, lockedLengthAnchor, sketchLockState } from "@/lib/sketchLock";
@@ -1944,6 +1946,66 @@ export function SketchWorkspace({
     return true;
   };
 
+  /**
+   * Moves what the arrow keys move by dx/dz: a clicked handle first (#347), else an image, else the
+   * selected points. Says whether there is anything to move; with `apply` false it only says so.
+   * Rebuilt with every drawing, so a move the key-repeat batch hands over a frame later starts from
+   * the sketch as it is then.
+   */
+  const nudgeSketchSelection = (dx: number, dz: number, apply = true): boolean => {
+    // A clicked handle goes first (#347): it moves alone, a smooth point's other handle with it.
+    const handlePoint = selectedHandle ? profile.points.find((point) => point.id === selectedHandle.pointId) : undefined;
+    const handleAt = handlePoint && selectedHandle ? (selectedHandle.handle === "in" ? handlePoint.handleIn : handlePoint.handleOut) : undefined;
+    if (selectedHandle && handleAt) {
+      if (!apply) return true;
+      const moved = { x: clamp(handleAt.x + dx, -reach.halfWidth, reach.halfWidth), z: clamp(handleAt.z + dz, -reach.halfDepth, reach.halfDepth) };
+      if (moved.x === handleAt.x && moved.z === handleAt.z) return true;
+      // A run of arrow presses is one step of the history, as for points (#370).
+      onMoveHandle(selectedHandle.pointId, selectedHandle.handle, moved, `handle:${selectedHandle.pointId}:${selectedHandle.handle}`);
+      return true;
+    }
+    if (selected?.kind === "image") {
+      const image = (profile.images ?? []).find((entry) => entry.id === selected.id);
+      if (!image || image.locked) return false;
+      if (!apply) return true;
+      onUpdateImage(image.id, {
+        x: clamp(image.x + dx, -reach.halfWidth, reach.halfWidth),
+        z: clamp(image.z + dz, -reach.halfDepth, reach.halfDepth),
+      }, t("sketch.imageMoved"), `image:${image.id}`);
+      return true;
+    }
+    const moving = new Set(sketchSelectionMovePointIds(profile, selected));
+    const startPoints = profile.points.filter((point) => moving.has(point.id));
+    if (!startPoints.length) return false;
+    if (!apply) return true;
+    const allowed = clampNudge(startPoints, dx, dz, reach.halfWidth, reach.halfDepth);
+    if (allowed.dx === 0 && allowed.dz === 0) return true;
+    // A run of arrow presses is one step of the history (#370).
+    onTransformPoints(translateSketchPoints(startPoints, allowed.dx, allowed.dz), t("sketch.shapeMoved"), `points:${startPoints.map((point) => point.id).join(",")}`);
+    return true;
+  };
+  const nudgeSketchSelectionRef = useRef(nudgeSketchSelection);
+  nudgeSketchSelectionRef.current = nudgeSketchSelection;
+  // Repeats of a held arrow key move once a frame, by their sum, as in the 3D view (#1042): each move
+  // draws the whole editor again, and with a repeat each the sketch fell behind a held key and went on
+  // after it was let go (#1930). Drawn at once, so the next frame's move starts from this one.
+  const keyRepeatBatchRef = useRef<ReturnType<typeof createKeyRepeatBatch> | null>(null);
+  keyRepeatBatchRef.current ??= createKeyRepeatBatch(({ x, z }) => {
+    flushSync(() => {
+      nudgeSketchSelectionRef.current(x, z);
+    });
+  });
+  useEffect(() => {
+    const flush = () => keyRepeatBatchRef.current?.flush();
+    window.addEventListener("keyup", flush);
+    window.addEventListener("blur", flush);
+    return () => {
+      window.removeEventListener("keyup", flush);
+      window.removeEventListener("blur", flush);
+      keyRepeatBatchRef.current?.cancel();
+    };
+  }, []);
+
   useEffect(() => {
     const syncShiftConstrain = (shiftKey: boolean) => {
       if (!lastPointerRef.current) return;
@@ -2045,35 +2107,10 @@ export function SketchWorkspace({
         const step = keyboardNudgeStep(snap, event.shiftKey, keyboardNudgeCoarseFactor(workspace), event.altKey);
         const dx = event.key === "ArrowLeft" ? -step : event.key === "ArrowRight" ? step : 0;
         const dz = event.key === "ArrowUp" ? -step : event.key === "ArrowDown" ? step : 0;
-        // A clicked handle goes first (#347): it moves alone, a smooth point's other handle with it.
-        const handlePoint = selectedHandle ? profile.points.find((point) => point.id === selectedHandle.pointId) : undefined;
-        const handleAt = handlePoint && selectedHandle ? (selectedHandle.handle === "in" ? handlePoint.handleIn : handlePoint.handleOut) : undefined;
-        if (selectedHandle && handleAt) {
-          event.preventDefault();
-          const moved = { x: clamp(handleAt.x + dx, -reach.halfWidth, reach.halfWidth), z: clamp(handleAt.z + dz, -reach.halfDepth, reach.halfDepth) };
-          if (moved.x === handleAt.x && moved.z === handleAt.z) return;
-          // A run of arrow presses is one step of the history, as for points (#370).
-          onMoveHandle(selectedHandle.pointId, selectedHandle.handle, moved, `handle:${selectedHandle.pointId}:${selectedHandle.handle}`);
-          return;
-        }
-        if (selected?.kind === "image") {
-          const image = (profile.images ?? []).find((entry) => entry.id === selected.id);
-          if (!image || image.locked) return;
-          event.preventDefault();
-          onUpdateImage(image.id, {
-            x: clamp(image.x + dx, -reach.halfWidth, reach.halfWidth),
-            z: clamp(image.z + dz, -reach.halfDepth, reach.halfDepth),
-          }, t("sketch.imageMoved"), `image:${image.id}`);
-          return;
-        }
-        const moving = new Set(sketchSelectionMovePointIds(profile, selected));
-        const startPoints = profile.points.filter((point) => moving.has(point.id));
-        if (!startPoints.length) return;
+        if (!nudgeSketchSelection(dx, dz, false)) return;
         event.preventDefault();
-        const allowed = clampNudge(startPoints, dx, dz, reach.halfWidth, reach.halfDepth);
-        if (allowed.dx === 0 && allowed.dz === 0) return;
-        // A run of arrow presses is one step of the history (#370).
-        onTransformPoints(translateSketchPoints(startPoints, allowed.dx, allowed.dz), t("sketch.shapeMoved"), `points:${startPoints.map((point) => point.id).join(",")}`);
+        // A fresh press moves at once; the repeats of a held key are added up and moved once a frame (#1930).
+        keyRepeatBatchRef.current?.add({ x: dx, z: dz, rise: 0 }, event.repeat);
       }
     };
     const handleKeyUp = (event: KeyboardEvent) => {

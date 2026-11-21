@@ -86,11 +86,14 @@ export function sketchSelectionMovePointIds(profile: Pick<SketchProfile, "segmen
   else if (selected.kind === "segment") addSegment(selected.id);
   else {
     const selectedPoints = new Set(selected.pointIds);
+    // Looked up once, not line by line: a frame round a large outline selects hundreds of lines (#1930).
+    const segmentsById = new Map(profile.segments.map((segment) => [segment.id, segment]));
     selected.pointIds.forEach((id) => ids.add(id));
     selected.segmentIds.forEach((segmentId) => {
-      const segment = profile.segments.find((entry) => entry.id === segmentId);
-      if (segment && selectedPoints.has(segment.startId) !== selectedPoints.has(segment.endId)) return;
-      addSegment(segmentId);
+      const segment = segmentsById.get(segmentId);
+      if (!segment || selectedPoints.has(segment.startId) !== selectedPoints.has(segment.endId)) return;
+      ids.add(segment.startId);
+      ids.add(segment.endId);
     });
   }
   return [...ids];
