@@ -14012,8 +14012,14 @@ export function LayerlingEditor({
     const current = selectedShapes.length === 1 ? selectedShape : null;
     const settings = qrCodeOf(current);
     if (!current || !settings) return;
+    const sourceFingerprint = projectShapesFingerprint([current]);
+    const sourceProjectId = projectInfoRef.current.projectId;
     const next = await regeneratedQrCodeShape(current, { ...settings, text }, workspaceSettingsRef.current.booleanTriangleLimit);
-    if (!shapesRef.current.some((shape) => shape.id === current.id)) return;
+    const currentTarget = shapesRef.current.find((shape) => shape.id === current.id);
+    if (projectInfoRef.current.projectId !== sourceProjectId || !currentTarget || projectShapesFingerprint([currentTarget]) !== sourceFingerprint) {
+      setNotice(t("status.qrCodeChanged"));
+      return;
+    }
     commitShapes(shapesRef.current.map((shape) => (shape.id === current.id ? next : shape)), [next.id], t("status.qrCodeRegenerated"));
   }, [commitShapes, selectedShape, selectedShapes.length]);
 
@@ -14064,8 +14070,14 @@ export function LayerlingEditor({
   const regenerateSelectedSbcBoard = useCallback(async (settings: SbcBoardSettings) => {
     const current = selectedShapes.length === 1 ? selectedShape : null;
     if (!current || !sbcBoardOf(current)) return;
+    const sourceFingerprint = projectShapesFingerprint([current]);
+    const sourceProjectId = projectInfoRef.current.projectId;
     const next = await regeneratedSbcBoardShape(current, settings, workspaceSettingsRef.current.booleanTriangleLimit);
-    if (!shapesRef.current.some((shape) => shape.id === current.id)) return;
+    const currentTarget = shapesRef.current.find((shape) => shape.id === current.id);
+    if (projectInfoRef.current.projectId !== sourceProjectId || !currentTarget || projectShapesFingerprint([currentTarget]) !== sourceFingerprint) {
+      setNotice(t("status.sbcBoardChanged"));
+      return;
+    }
     commitShapes(shapesRef.current.map((shape) => (shape.id === current.id ? next : shape)), [next.id], t("status.sbcBoardRegenerated", { name: next.name }));
   }, [commitShapes, selectedShape, selectedShapes.length]);
 
