@@ -1,6 +1,19 @@
 [
   {
     "title": {
+      "de": "Namensschild und Symbolschild: Flache Intarsie",
+      "en": "Name tag and icon tag: Flat inlay"
+    },
+    "body": {
+      "de": "Auf den Karten „Namensschild“ und „Symbolschild“ gibt es unter der Schichttabelle den Schalter „Flache Intarsie“. Dann sinken Buchstaben (oder Symbol) und Rand in die unterste Schicht ein, und alle Farben enden auf einer ebenen Fläche. So lässt sich das Schild mit dieser Seite nach unten auf die Platte drucken, mit der Struktur der Platte auf der Fläche.\n\nDie unterste Schicht ist der Träger: ihre Höhe ist die Dicke des ganzen Schilds, das Öhr für den Schlüsselring sitzt an ihr. Der Regler „Intarsientiefe“ bestimmt, wie tief die Schichten darüber reichen, alle zusammen. Er beginnt bei 0,8 mm (vier Lagen zu 0,2 mm), für die meisten PLA genug. Durchscheinenderes Filament (PETG, manche Weißtöne) braucht mehr: erst einen Test drucken.\n\nSolange der Schalter an ist, sind die Höhen der oberen Schichten ausgegraut. Ausgeschaltet steht das Schild wieder gestapelt da. Im STEP-Export sind die eingelassenen Schichten Netze, 3MF und STL sind nicht betroffen.",
+      "en": "On the cards \"Name tag\" and \"Icon tag\" the switch \"Flat inlay\" sits under the Layers table. With it on, the letters (or the icon) and the rim sink into the bottom layer, and all colours end on one flat face. So the tag can be printed face down on the plate, with the plate's texture on the face.\n\nThe bottom layer is the carrier: its height is the thickness of the whole tag, and the key ring ear sits on it. The slider \"Inlay depth\" sets how deep the layers above it go, all together. It starts at 0.8 mm (four 0.2 mm layers), enough for most PLA. A more translucent filament (PETG, some whites) needs more: print a test first.\n\nWhile the switch is on, the heights of the upper layers are greyed out. Switched off, the tag is stacked again. In a STEP export the inlaid layers are meshes, 3MF and STL are not affected."
+    },
+    "guide": {
+      "section": "textLayers"
+    }
+  },
+  {
+    "title": {
       "de": "Neue Form: Dach",
       "en": "New shape: Roof"
     },

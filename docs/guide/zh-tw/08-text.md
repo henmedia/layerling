@@ -117,6 +117,7 @@ layerling 無法讀取 WOFF2 檔案（幾乎總是有 TTF 或 OTF 版本）、�
 - **{{ui:nameTag.layers}}：** 每個分層一列，由上往下排列。每列包含顏色（點擊色塊）、該層比字母寬出多少、高度，以及 {{ui:nameTag.noHoles}}，用來填平 O、A 等字母中的孔。{{ui:nameTag.corners}} 設定加寬的分層如何繞過字母轉角：{{ui:nameTag.corner.round}}、{{ui:nameTag.corner.bevel}} 或 {{ui:nameTag.corner.miter}}。最上面一列就是字母本身。**+** 會在底部新增一層，**–** 會移除最底層。名牌可有二到六層。
 - **{{ui:nameTag.keyring}}：** 在底層加上一個末端為圓形的直舌片，並開一個鑰匙圈孔；舌片會隨孔一起變大。預設的 3 mm 孔會做出寬 6.5 mm、外伸 6.75 mm 的舌片，孔緣距底層邊緣 2 mm。選擇 {{ui:nameTag.keyringDiameter}} 與 {{ui:nameTag.keyringSide}}：{{ui:nameTag.side.left}}、{{ui:nameTag.side.right}} 或 {{ui:nameTag.side.top}}。{{ui:nameTag.side.free}} 會把孔從名牌上拿開，並在旁邊放一個獨立的 {{ui:nameTag.keyringTab}}，顏色和高度都與底層相同：這是一般形狀，你可以用控制點把它移到名牌需要的任何位置並旋轉。放好後，其屬性中的 {{ui:nameTag.keyringTabFix}} 會把它併入最近的名牌，就固定在目前位置：孔會穿過它到達的每一層，耳片併入底層，而文字或尺寸改變時，兩者都會留在字母的該轉角處。{{ui:nameTag.side.free}} 會把舌片放回原位，讓你再次移動它。孔會穿過它接觸的每一層；改變文字、字母大小或字型時，舌片也會跟著移動。{{ui:nameTag.keyringAlong}} 會讓舌片沿所在邊上下移動（在頂邊上則是左右移動），直到即將離開該邊為止；0 表示中央。當邊的中央正好遇到空隙時（例如 J 旁邊），可以用它把舌片移到字母伸出的部位。
 - **{{ui:nameTag.letterEdge}}：** 對頂層字母的頂邊做圓角或倒角，就像列印出的名牌那樣收邊：{{ui:nameTag.edge.none}}、{{ui:nameTag.edge.round}} 或 {{ui:nameTag.edge.chamfer}}，並設定 {{ui:nameTag.letterEdgeSize}}（初始 0.4 mm，最大不超過層高）。它適用於所有字型與文字。這個邊是字母網格的一部分，因此邊工具會把這類文字當作網格處理，對如此精細的文字負擔很重；請改在這裡選擇邊緣處理。
+- **{{ui:nameTag.flush}}：** 把字母和邊框嵌入最底層，使所有顏色終止於同一個平面；列印時讓這一面朝下貼在列印板上。最底層是承載層：它的高度就是整個標牌的厚度。{{ui:nameTag.flushDepth}} 決定上面各層嵌入多深，所有層一起，初始為 0.8 公釐，對大多數 PLA 足夠；更透光的線材（PETG、部分白色）需要更深，請先列印一個試件。開啟時，上面各層的高度顯示為灰色。在 STEP 匯出中，這些層是網格。
 
 每次變更都會立即顯示。名牌是一個綁定：它會整體移動，而每一層仍是各自獨立、各有顏色的實體，切片軟體進行多色列印正需要如此。要對某一層的邊做圓角或倒角，點擊 {{ui:group.editBundle}} 並選擇該層，見[邊緣倒角與抽殼實體](chapter:edges-and-hollowing)。
 
@@ -136,6 +137,7 @@ layerling 無法讀取 WOFF2 檔案（幾乎總是有 TTF 或 OTF 版本）、�
 - **{{ui:iconTag.replace}}：** 把另一個檔案（SVG、PNG 或 JPG）的圖示換到圖示牌上；分層與寬度維持不變。
 - **{{ui:iconTag.iconWidth}}：** 上層圖示的寬度，單位為 mm。所有分層都會跟著調整並保持對齊。
 - **{{ui:nameTag.layers}}：** 各列與名牌相同——顏色、加寬多少、{{ui:nameTag.corners}}、高度與 {{ui:nameTag.noHoles}}，以及 **+** 與 **–**，二到六層。最上面一列就是圖示本身。
+- **{{ui:nameTag.flush}}** 和 **{{ui:nameTag.flushDepth}}：** 與名牌相同：圖示和邊框嵌入最底層，所有顏色終止於同一個平面。
 - **{{ui:nameTag.keyring}}：** 與名牌相同：穿過每一層的鑰匙圈孔，底層在圖示之外有一個末端為圓形的舌片。{{ui:nameTag.keyringDiameter}} 與 {{ui:nameTag.keyringSide}} 選擇大小與位置；{{ui:nameTag.side.free}} 會產生獨立舌片，與名牌相同。舌片是依圖示輪廓製作，因此輪廓很不規則的圖示請確認它與底板相接的位置。{{ui:nameTag.keyringAlong}} 會讓舌片沿所在邊移動，與名牌相同。
 - **{{ui:iconTag.count}}：** 想要幾個圖示牌，1 到 100。{{ui:iconTag.fill}} 會依設定中所選印表機的列印平台計算，小標誌可以排滿一整個平台。下方按鈕會製作出來，間距 5 mm，以平台中央為中心排列；第一個就是圖示牌本身。
 
