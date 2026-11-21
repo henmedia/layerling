@@ -86,11 +86,18 @@ function filamentPiece(hole: number) {
 }
 
 /**
+ * The smallest thread that takes filament, mm: M4. An M3.5 (#1908) passes the wall rule below just, but the channel
+ * would take well over half its core, so the screw would be weak; the texts say "from M4 up".
+ */
+export const BOLT_FILAMENT_MIN_DIAMETER = 4;
+
+/**
  * Whether this thread's core takes the channel for a piece of filament on its axis (from M4 up), and how high its roof
  * is: `null` where the core is too thin.
  */
 export function boltFilamentChannel(shape: WorkplaneShape, pinPlay = BOLT_SPLIT_DEFAULTS.pinPlay): { radius: number; top: number } | null {
   const settings = threadSettings(shape);
+  if (settings.diameter < BOLT_FILAMENT_MIN_DIAMETER - 1e-6) return null;
   const coreRadius = settings.diameter / 2 - settings.depth;
   const radius = BOLT_FILAMENT_DIAMETER / 2 + boltFilamentPlay(pinPlay);
   const top = Math.min(radius * Math.SQRT2, coreRadius - CHANNEL_WALL);
