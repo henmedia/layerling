@@ -368,5 +368,20 @@
     "guide": {
       "chapter": "shapes"
     }
+  },
+  {
+    "title": {
+      "de": "Bild-Textur: Zeichnungen als PNG ohne Stufen",
+      "en": "Image texture: PNG drawings without steps",
+      "da": "Billedtekstur: PNG-tegninger uden trin"
+    },
+    "body": {
+      "de": "Eine Strichzeichnung oder ein Logo als PNG oder JPEG, einmal aufgedrückt, wird jetzt wie eine SVG entlang der Umrisse geschnitten: schräge Linien und Kurven werden glatt statt treppig. Lade das Bild in einem älteren Entwurf einfach noch einmal.",
+      "en": "A line drawing or a logo as a PNG or JPEG, pressed on once, is now cut along its outlines like an SVG: slanted lines and curves come out smooth instead of stepped. In an older design, simply load the picture again.",
+      "da": "En stregtegning eller et logo som PNG eller JPEG, trykt på én gang, skæres nu langs konturerne som en SVG: skrå linjer og kurver bliver glatte i stedet for trappede. I et ældre design indlæser du bare billedet igen."
+    },
+    "guide": {
+      "chapter": "shapes"
+    }
   }
 ]
