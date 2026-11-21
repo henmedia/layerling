@@ -443,5 +443,15 @@
     "guide": {
       "section": "magnetPocket"
     }
+  },
+  {
+    "title": {
+      "de": "Skizze: gehaltene Pfeiltaste ohne Nachlaufen",
+      "en": "Sketch: a held arrow key without lag"
+    },
+    "body": {
+      "de": "Hältst du in der Skizze eine Pfeiltaste gedrückt, folgt die Auswahl jetzt der Taste und bleibt stehen, sobald du loslässt. Bei großen Umrissen hinkte sie bisher weit hinterher und lief nach dem Loslassen noch lange weiter. Ein gehaltener Lauf bleibt ein Schritt beim Rückgängigmachen.",
+      "en": "When you hold an arrow key in the sketch, the selection now follows the key and stops as soon as you let go. On large outlines it used to lag far behind and kept moving long after the key was released. A held run is still one step of Undo."
+    }
   }
 ]
