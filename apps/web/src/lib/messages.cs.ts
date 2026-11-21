@@ -3810,6 +3810,7 @@ export const MESSAGES_CS: Record<MessageKey, string> = {
   "prop.gridfinityMagnets": "Otvory pro magnety",
   "prop.gridfinityHalfGrid": "Poloviční mřížka (21 mm)",
   "gridfinity.halfGridHint": "Jednotky do šířky a do hloubky počítají buňky po 21 mm, každou s vlastní nožkou; čtyři stojí v jednom lůžku nosné desky.",
+  "gridfinity.bedLimitHint": "Až {size} mm do šířky i hloubky: tolik, kolik pojme tisková podložka zvolená v nastavení pracovní plochy, bez tiskárny 252 mm.",
   "prop.gridfinityLargePlate": "Velká deska (až 12 jednotek)",
   "gridfinity.largePlateHint": "Až 12 jednotek do šířky i hloubky místo 6, pro tiskové podložky nad 256 mm. Když je v nastavení vybraná tiskárna, deska větší než její podložka se označí.",
   "prop.gridfinitySwallowtail": "Swallowtail",

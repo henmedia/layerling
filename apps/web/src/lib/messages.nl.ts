@@ -3752,6 +3752,7 @@ export const MESSAGES_NL: Record<MessageKey, string> = {
   "prop.gridfinityMagnets": "Magneetgaten",
   "prop.gridfinityHalfGrid": "Half raster (21 mm)",
   "gridfinity.halfGridHint": "Eenheden breed en diep tellen cellen van 21 mm, elk met een eigen voet; vier staan in één vak van een draagplaat.",
+  "gridfinity.bedLimitHint": "Tot {size} mm breed en diep: zoveel als het printbed dat in de werkruimte-instellingen is gekozen toelaat, zonder printer 252 mm.",
   "prop.gridfinityLargePlate": "Grote draagplaat (tot 12 eenheden)",
   "gridfinity.largePlateHint": "Tot 12 eenheden breed en diep in plaats van 6, voor printbedden boven 256 mm. Als je printer in de instellingen gekozen is, wordt een plaat gemarkeerd die groter is dan het printbed.",
   "prop.gridfinitySwallowtail": "Swallowtail",

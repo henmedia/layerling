@@ -2673,6 +2673,7 @@ export const MESSAGES_SL: Partial<Record<MessageKey, string>> = {
   "prop.gridfinityMagnets": "Luknje za magnete",
   "prop.gridfinityHalfGrid": "Polovična mreža (21 mm)",
   "gridfinity.halfGridHint": "Enote v širino in globino štejejo celice po 21 mm, vsako s svojo nogo; štiri stojijo v enem ležišču podstavka.",
+  "gridfinity.bedLimitHint": "Do {size} mm v širino in globino: kolikor dopušča tiskalna plošča, izbrana v nastavitvah delovnega prostora, brez tiskalnika 252 mm.",
   "prop.gridfinityLargePlate": "Velik podstavek (do 12 enot)",
   "gridfinity.largePlateHint": "Do 12 enot v širino in globino namesto 6, za tiskalne plošče nad 256 mm. Ko je tvoj tiskalnik izbran v nastavitvah, je podstavek, večji od njegove plošče, označen.",
   "prop.gridfinitySwallowtail": "Swallowtail",

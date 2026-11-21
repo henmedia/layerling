@@ -246,7 +246,6 @@ import {
   MAX_GRIDFINITY_PADDING,
   MAX_GRIDFINITY_SWALLOWTAIL_CLEARANCE,
   MAX_GRIDFINITY_TRAY_HEIGHT,
-  MAX_GRIDFINITY_TRAY_SIZE,
   MIN_GRIDFINITY_COMPARTMENT_LABEL_LENGTH,
   MIN_GRIDFINITY_COMPARTMENT_LABEL_MM,
   MIN_GRIDFINITY_DIVIDER_HEIGHT,
@@ -297,6 +296,9 @@ import {
   gridfinityLabelWidth,
   gridfinityLipChamfer,
   gridfinityMaxUnits,
+  gridfinityBedReach,
+  gridfinityTrayMax,
+  type GridfinityBed,
   gridfinityOpenFits,
   gridfinityOpening,
   gridfinityOpeningCornerSize,
@@ -778,6 +780,8 @@ type ShapePropertyView = {
   setLoftSection: (index: number) => void;
   /** Sets a socket that has screw holes (D-Sub 9) on the opening and groups it with them, where the editor can. */
   portPresetWithScrewHoles?: (patch: Partial<WorkplaneShape>) => void;
+  /** The bed of the printer chosen in the workspace settings, which a Gridfinity bin or tray may reach across (#1917). */
+  bed?: GridfinityBed;
 };
 const NO_PROPERTY_VIEW: ShapePropertyView = { loftSection: 0, setLoftSection: () => undefined };
 
@@ -1810,7 +1814,7 @@ function getShapePropertiesWithAppLimits(shape: WorkplaneShape, onUpdate: ShapeI
     const needsLargePlate = gridfinityOutlineNeedsLargePlate({ ...shape, depth });
     // The size is whole grid units; every change writes the box they make; a tray's and an outline plate's are free in mm.
     const apply = (next: Parameters<typeof gridfinityShapePatch>[1]) => {
-      const patch = gridfinityShapePatch({ ...shape, depth }, next);
+      const patch = gridfinityShapePatch({ ...shape, depth }, next, view.bed);
       onUpdate({ ...patch, size: resizedShapeSize(patch.width, patch.depth) });
     };
     const properties: ShapePropertyConfig[] = [
@@ -1848,17 +1852,21 @@ function getShapePropertiesWithAppLimits(shape: WorkplaneShape, onUpdate: ShapeI
         { id: "width", label: t("prop.width"), value: plan.size.width, min: MIN_GRIDFINITY_TRAY_SIZE, max: limit, hint: [plan.cells.length > 0 ? t("gridfinity.outlineCells", { cells: plan.cells.length }) : t("gridfinity.outlineNoCells"), ...(needsLargePlate ? [t("gridfinity.outlineNeedsLargePlate", { size: gridfinityOutlineLimit({ ...shape, gridfinityLargePlate: false }) })] : [])].join(" "), onChange: setWidth },
       );
     } else if (plan.type === "tray") {
-      // A tray (#837) has no grid: its size is free in mm, as a box's.
+      // A tray (#837) has no grid: its size is free in mm, as a box's, as far as the printer's bed reaches (#1917).
+      const trayMax = Math.max(gridfinityTrayMax(view.bed), plan.size.width, plan.size.depth);
       properties.push(
-        { id: "length", label: t("prop.length"), value: plan.size.depth, min: MIN_GRIDFINITY_TRAY_SIZE, max: MAX_GRIDFINITY_TRAY_SIZE, onChange: setDepth },
-        { id: "width", label: t("prop.width"), value: plan.size.width, min: MIN_GRIDFINITY_TRAY_SIZE, max: MAX_GRIDFINITY_TRAY_SIZE, onChange: setWidth },
+        { id: "length", label: t("prop.length"), value: plan.size.depth, min: MIN_GRIDFINITY_TRAY_SIZE, max: trayMax, onChange: setDepth },
+        { id: "width", label: t("prop.width"), value: plan.size.width, min: MIN_GRIDFINITY_TRAY_SIZE, max: trayMax, hint: t("gridfinity.bedLimitHint", { size: gridfinityTrayMax(view.bed).toLocaleString(numberLocale()) }), onChange: setWidth },
         { id: "height", label: t("prop.height"), value: plan.size.height, min: MIN_GRIDFINITY_TRAY_HEIGHT, max: MAX_GRIDFINITY_TRAY_HEIGHT, onChange: setHeight },
       );
     } else {
-      const maxUnits = gridfinityMaxUnits(shape);
+      // A bin takes as many units as the printer's bed reaches (#1917); a bin already larger, from a drag, a file or the
+      // MCP, keeps its units in the field.
+      const maxUnits = Math.max(gridfinityMaxUnits(shape, view.bed), plan.type === "bin" ? Math.max(plan.count.x, plan.count.z) : 0);
+      const bedHint = plan.type === "bin" ? t("gridfinity.bedLimitHint", { size: gridfinityBedReach(view.bed).toLocaleString(numberLocale()) }) : undefined;
       properties.push(
         { id: "gridfinityUnitsX", label: t("prop.gridfinityUnitsX"), value: plan.count.x, min: MIN_GRIDFINITY_UNITS, max: maxUnits, step: 1, hint: plan.halfGrid ? t("gridfinity.halfGridHint") : plan.largePlate ? t("gridfinity.largePlateHint") : undefined, onChange: (value) => apply({ x: Math.round(value) }) },
-        { id: "gridfinityUnitsZ", label: t("prop.gridfinityUnitsZ"), value: plan.count.z, min: MIN_GRIDFINITY_UNITS, max: maxUnits, step: 1, onChange: (value) => apply({ z: Math.round(value) }) },
+        { id: "gridfinityUnitsZ", label: t("prop.gridfinityUnitsZ"), value: plan.count.z, min: MIN_GRIDFINITY_UNITS, max: maxUnits, step: 1, hint: bedHint, onChange: (value) => apply({ z: Math.round(value) }) },
       );
     }
     if (plan.type === "baseplate" && !plan.outline) {
@@ -4455,7 +4463,8 @@ function getShapeProperties(shape: WorkplaneShape, onUpdate: ShapeInspectorUpdat
   const customLimit = workspace.shapeCustomizations[shape.kind]?.maxDimension;
   // A body turned by right angles names its measures by the way they run now (#230).
   const oriented = orientedMeasures(shape);
-  const own = getShapePropertiesWithAppLimits(shape, onUpdate, view);
+  const printer = printerPresetById(workspace.printer);
+  const own = getShapePropertiesWithAppLimits(shape, onUpdate, { ...view, bed: printer ? { width: printer.width, depth: printer.depth } : null });
   const properties = withOrientedMeasures(own, oriented, MEASURE_LABELS());
   if (customLimit === undefined) return properties;
   return properties.map((property) => {

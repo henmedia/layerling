@@ -2436,6 +2436,7 @@ export const MESSAGES_TR: Partial<Record<MessageKey, string>> = {
   "prop.gridfinityMagnets": "Mıknatıs delikleri",
   "prop.gridfinityHalfGrid": "Yarım ızgara (21 mm)",
   "gridfinity.halfGridHint": "Genişlik ve derinlik birimleri 21 mm'lik hücreleri sayar, her birinin kendi ayağı vardır; dördü taban plakasının bir yuvasında durur.",
+  "gridfinity.bedLimitHint": "Genişlik ve derinlikte en fazla {size} mm: çalışma alanı ayarlarında seçilen baskı tablasının aldığı kadar, yazıcı yoksa 252 mm.",
   "prop.gridfinityLargePlate": "Büyük taban plakası (12 birime kadar)",
   "gridfinity.largePlateHint": "Genişlikte ve derinlikte 6 yerine 12 birime kadar, 256 mm'den büyük baskı tablaları için. Ayarlarda yazıcın seçiliyse, tablasından büyük bir plaka işaretlenir.",
   "prop.gridfinitySwallowtail": "Swallowtail",

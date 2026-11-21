@@ -3738,6 +3738,7 @@ export const MESSAGES_FR: Partial<Record<MessageKey, string>> = {
   "prop.gridfinityMagnets": "Trous pour aimants",
   "prop.gridfinityHalfGrid": "Demi-grille (21 mm)",
   "gridfinity.halfGridHint": "Les unités en largeur et en profondeur comptent des cellules de 21 mm, chacune avec son propre pied ; quatre se posent dans un logement du socle.",
+  "gridfinity.bedLimitHint": "Jusqu'à {size} mm en largeur et en profondeur : autant que le plateau d'impression choisi dans les paramètres de l'espace de travail le permet, 252 mm sans imprimante.",
   "prop.gridfinityLargePlate": "Grand socle (jusqu'à 12 unités)",
   "gridfinity.largePlateHint": "Jusqu'à 12 unités en largeur et en profondeur au lieu de 6, pour les plateaux d'impression de plus de 256 mm. Si votre imprimante est choisie dans les paramètres, un socle plus grand que son plateau est signalé.",
   "prop.gridfinitySwallowtail": "Swallowtail",
