@@ -428,5 +428,20 @@
     "guide": {
       "section": "mold"
     }
+  },
+  {
+    "title": {
+      "de": "Magnet-Taschen",
+      "en": "Magnet pockets",
+      "da": "Magnetlommer"
+    },
+    "body": {
+      "de": "Neu in der Formenbibliothek unter Löcher & Ausschnitte: die Magnet-Tasche. Klick auf eine Stelle, und layerling schneidet eine Tasche für einen runden Magneten mit Klebermulde darunter, auf Wunsch gleich auch im Gegenstück. Beim Teilen gibt es Magnete jetzt auch als Verbinder.",
+      "en": "New in the shape library under Holes & cut-outs: the Magnet pocket. Click a spot and layerling cuts a pocket for a round magnet with a glue well below it, and if you like the matching one in the part that meets it. Split now offers magnets as connectors too.",
+      "da": "Nyt i formbiblioteket under Huller og udskæringer: Magnetlommen. Klik på et sted, så skærer layerling en lomme til en rund magnet med en limbrønd nedenunder, og hvis du vil, også den modsvarende i delen, der møder den. Ved opdeling kan magneter nu også være forbindelser."
+    },
+    "guide": {
+      "section": "magnetPocket"
+    }
   }
 ]
