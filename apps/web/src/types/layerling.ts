@@ -1016,8 +1016,14 @@ export type CadPrimitiveFrame = {
   frame: CadBrepFrame;
 };
 
-/** The top edge of a text's letters: rounded or chamfered, `size` mm wide and high (#225). */
-export type TextEdge = { kind: "round" | "chamfer"; size: number };
+/** Which end of a text's letters takes the edge: the top (left out), the bottom or both. */
+export type TextEdgeSide = "top" | "bottom" | "both";
+
+/**
+ * The edge of a text's letters: rounded or chamfered, `size` mm wide and high (#225), on the top
+ * unless `side` says the bottom or both ends; only "bottom" and "both" are stored.
+ */
+export type TextEdge = { kind: "round" | "chamfer"; size: number; side?: "bottom" | "both" };
 
 /** A section of a transition between its bottom and its top (#1034). */
 export type LoftMiddleSection = {
@@ -1569,8 +1575,8 @@ export type WorkplaneShape = {
   textLetterWidth?: number;
   /**
    * Text only (#225): the top edge of the letters rounded or chamfered by `size` mm, as a name
-   * tag's letters on top are finished. Built from the outline stepped inwards, so it works for
-   * every font and word; the edge tool takes such a text as a mesh.
+   * tag's letters on top are finished, or with `side` the bottom edge or both. Built from the
+   * outline stepped inwards, so it works for every font and word; the edge tool takes such a text as a mesh.
    */
   textEdge?: TextEdge;
   /** Text only (#215): a key ring hole, with the ear round it on the bottom layer of a name tag. Straight text only. */

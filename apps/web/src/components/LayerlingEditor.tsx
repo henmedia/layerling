@@ -24,7 +24,7 @@ import { GRIDFINITY_SWALLOWTAIL_KEY_THICKNESS, gridfinityHasLabelText, gridfinit
 import { DEFAULT_THREAD_PROFILE, defaultThreadHeadHeight, normalizeThreadHeadHeight, threadCollarFields, threadCollarSettings, threadDriveFields, threadDriveSettings, threadNaturalFootprint, threadSettings } from "@/lib/threadGeometry";
 import { textOffsetAsFill } from "@/lib/textFillChoice";
 import { curvedTextPatch, MAX_TEXT_LETTER_WIDTH, MAX_TEXT_SPACING, MIN_TEXT_LETTER_WIDTH, MIN_TEXT_SPACING } from "@/lib/textGeometry";
-import { normalizeTextEdge } from "@/lib/textEdge";
+import { isTextEdgeSide, normalizeTextEdge } from "@/lib/textEdge";
 import { DEFAULT_TEXT_LAYERS, layerTextKeyringArgument, placedKeyring, layerTextLayersError, nameTagOffsets, normalizeTextLayers, type NameTagKeyring } from "@/lib/textLayers";
 import { limitedText } from "@/lib/textLength";
 import { NAME_TAG_LAYERS, NAME_TAG_LETTER_SIZE, textKerningPatch, textLetterSize, textLetterSizePatch, textShrinkPatch, textSpacingPatch } from "@/lib/nameTag";
@@ -14766,13 +14766,15 @@ export function LayerlingEditor({
             if (!Number.isFinite(letterWidth) || letterWidth < MIN_TEXT_LETTER_WIDTH || letterWidth > MAX_TEXT_LETTER_WIDTH) throw new Error(`letterWidth must be a number from ${MIN_TEXT_LETTER_WIDTH} to ${MAX_TEXT_LETTER_WIDTH} (per cent of the letters' own width)`);
             patch.textLetterWidth = letterWidth === 100 ? undefined : letterWidth;
           }
-          // The top edge of the letters (#225): { kind: "round" | "chamfer", size } or null for none.
+          // The edge of the letters (#225): { kind: "round" | "chamfer", size, side?: "top" | "bottom" | "both" } or null for none.
           if (params.letterEdge !== undefined) {
             if (params.letterEdge === null || params.letterEdge === false) {
               patch.textEdge = undefined;
             } else {
               const letterEdge = normalizeTextEdge(params.letterEdge);
               if (!letterEdge) throw new Error("letterEdge needs a kind (round or chamfer) and a size in mm, or null for none");
+              const side = (params.letterEdge as { side?: unknown }).side;
+              if (side !== undefined && !isTextEdgeSide(side)) throw new Error("letterEdge.side must be top, bottom or both");
               patch.textEdge = letterEdge;
             }
           }
