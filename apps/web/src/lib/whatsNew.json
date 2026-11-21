@@ -6,11 +6,13 @@
         "title": {
           "de": "Größe ziehen bis in die Ecke",
           "en": "Resize right into the corner",
+          "da": "Træk størrelsen helt ind i hjørnet",
           "ar": "تغيير الحجم حتى الزاوية تمامًا"
         },
         "body": {
           "de": "Ziehst du eine Form an einem Eckgriff größer, halten jetzt beide Seiten an den Kanten anderer Formen und an den Wänden, auf die sie treffen. So füllt ein Teil die Ecke eines Gehäuses in einem Zug.",
           "en": "When you drag a corner handle to make a shape bigger, both of its sides now stop at the edges of other shapes and at the walls they run into. So a part fills the corner of a case in one drag.",
+          "da": "Når du trækker et hjørnehåndtag for at gøre en form større, stopper begge dens sider nu ved kanterne på andre former og ved de vægge, de løber ind i. Så fylder en del hjørnet af et kabinet i ét træk.",
           "ar": "عندما تسحب مقبض زاوية لتكبير شكل، يتوقف الآن جانباه كلاهما عند حواف الأشكال الأخرى وعند الجدران التي يصلان إليها. وهكذا تملأ القطعة زاوية العلبة بسحبة واحدة."
         }
       },
@@ -227,11 +229,13 @@
         "title": {
           "de": "Verlauf bleibt nach Ändern im Feld erhalten",
           "en": "History is kept after a change in a field",
+          "da": "Historikken bevares efter en ændring i et felt",
           "ar": "السجل يُحفظ بعد تغيير في حقل"
         },
         "body": {
           "de": "Wer ein Maß im Feld mit dem Mausrad oder den Pfeiltasten verstellt und den Tab danach schloss oder neu lud, ohne das Feld zu verlassen, fand den Entwurf beim nächsten Öffnen ohne Verlauf vor: Rückgängig und der Verlaufsblick waren leer. Dasselbe traf eine .lyl-Datei, die in diesem Moment mit Strg+S gespeichert wurde. Der Verlauf bleibt jetzt vollständig, und die letzte Änderung steht als eigener Schritt darin.\n\nEntwürfe, die ihren Verlauf auf diesem Weg schon verloren haben, bekommen ihn nicht zurück. Ihr aktueller Stand ist unverändert, und eine Gruppe lässt sich weiterhin auflösen oder mit „Gruppe bearbeiten“ öffnen.",
           "en": "If you changed a measure in its field with the mouse wheel or the arrow keys and then closed or reloaded the tab without leaving the field, the design opened without its history the next time: Undo and the History view were empty. The same happened to a .lyl file saved with Ctrl+S in that moment. The history now stays complete, and the last change is a step of its own in it.\n\nDesigns that already lost their history this way do not get it back. Their current state is unchanged, and a group can still be ungrouped or opened with Edit group.",
+          "da": "Hvis du ændrede et mål i sit felt med musehjulet eller piletasterne og derefter lukkede eller genindlæste fanen uden at forlade feltet, åbnedes designet næste gang uden sin historik: Fortryd og historikvisningen var tomme. Det samme skete for en .lyl-fil, der blev gemt med Ctrl+S i det øjeblik. Historikken er nu hel, og den sidste ændring er et trin for sig selv i den.\n\nDesigns, der allerede har mistet deres historik på denne måde, får den ikke tilbage. Deres nuværende tilstand er uændret, og en gruppe kan stadig opløses eller åbnes med Redigér gruppe.",
           "ar": "إذا غيّرت قياسًا في حقله بعجلة الفأرة أو بمفاتيح الأسهم ثم أغلقت علامة التبويب أو أعدت تحميلها دون مغادرة الحقل، كان التصميم يُفتح في المرة التالية بلا سجله: «تراجع» وعرض السجل فارغان. وكان الأمر نفسه يحدث لملف .lyl حُفظ بـ Ctrl+S في تلك اللحظة. الآن يبقى السجل كاملًا، ويكون التغيير الأخير خطوة مستقلة فيه.\n\nالتصاميم التي فقدت سجلها بهذه الطريقة لا تستعيده. حالتها الحالية لم تتغيّر، ولا يزال بالإمكان فك تجميع المجموعة أو فتحها بـ «تعديل المجموعة»."
         },
         "guide": {
@@ -259,11 +263,13 @@
         "title": {
           "de": "Lochmuster: ein Loch in der Mitte",
           "en": "Hole pattern: a hole in the middle",
+          "da": "Hulmønster: et hul i midten",
           "ar": "نمط الثقوب: ثقب في المنتصف"
         },
         "body": {
           "de": "Ein Kranz von Löchern am Rand oder Befestigungslöcher können jetzt ein weiteres Loch in der Mitte der Fläche bekommen, etwa für die Abflusslöcher im Boden eines Blumentopfs. Der Haken „Ein Loch in der Mitte“ steht im Lochmuster bei „Am Rand“ und im Reiter „Befestigungslöcher“ und ist zunächst aus.\n\nDas Loch ist wie die anderen (Form, Lochart, Tiefe) und zählt bei der Anzahl nicht mit. Bei einfachen runden, quadratischen und sechseckigen Löchern lässt sich seine Größe eigens einstellen. Passt es nicht, weil die Mitte offen ist oder es den anderen zu nahe käme, wird es weggelassen, und eine Zeile sagt das.",
           "en": "A ring of holes along the edge, or mounting holes, can now have one more hole in the middle of the face, for the drain holes in the floor of a plant pot, say. The box \"A hole in the middle\" is in the hole pattern under \"Along the edge\" and on the \"Mounting holes\" tab, and is off at first.\n\nThe hole is like the others (shape, hole type, depth) and does not count in their number. For plain round, square and hexagon holes its size can be set on its own. Where it does not fit, because the middle is open or it would come too close to the others, it is left out and a line says so.",
+          "da": "En ring af huller langs kanten, eller monteringshuller, kan nu have ét hul mere i midten af fladen, til drænhullerne i bunden af en blomsterpotte for eksempel. Kassen \"Et hul i midten\" ligger i hulmønsteret under \"Langs kanten\" og på fanen \"Monteringshuller\", og er fra starten slået fra.\n\nHullet er som de andre (hulform, hultype, dybde) og tæller ikke med i deres antal. For almindelige runde, firkantede og hexagonale huller kan dets størrelse sættes for sig. Hvor det ikke passer, fordi midten er åben eller det kommer for tæt på de andre, springes det over, og en linje siger det.",
           "ar": "يمكن الآن لحلقة الثقوب على طول الحافة، أو لثقوب التثبيت، أن يكون لها ثقب إضافي في منتصف الوجه، لثقوب التصريف في قاع أصيص نبات مثلًا. خانة «ثقب في المنتصف» موجودة في نمط الثقوب تحت «على الحافة» وفي تبويب «ثقوب التثبيت»، وهي غير مفعّلة في البداية.\n\nالثقب مثل الثقوب الأخرى (الشكل ونوع الثقب والعمق) ولا يُحسب في عددها. وللثقوب الدائرية والمربعة والسداسية البسيطة يمكن ضبط حجمه وحده. وحيث لا يتسع، لأن المنتصف مفتوح أو لأنه سيقترب كثيرًا من الثقوب الأخرى، يُترك ويقول سطر ذلك."
         },
         "guide": {
@@ -274,11 +280,13 @@
         "title": {
           "de": "M3.5 in den Größenlisten",
           "en": "M3.5 in the size lists",
+          "da": "M3.5 i størrelseslisterne",
           "ar": "M3.5 في قوائم المقاسات"
         },
         "body": {
           "de": "M3.5 steht jetzt zwischen M3 und M4 zur Wahl: beim Gewinde (Stange, Schraube, Mutter und Gewindeloch, Steigung 0,6 mm), bei der Mutternaussparung des Sechskants, bei den Unterlegscheiben des Rohrs und als Schraubengröße von Senkbohrung, Doppelsenkung, Rosette und den Senkungen im Lochmuster.\n\nDie Stufenbohrung bietet M3.5 nicht an, weil es dafür keine genormte Zylinderschraube mit Innensechskant gibt; dort trägst du die Maße selbst ein.",
           "en": "M3.5 is now offered between M3 and M4: for the thread (rod, screw, nut and tapped hole, pitch 0.6 mm), the nut pocket of the hexagon, the washers of the tube, and as a screw size of the countersink, the double countersink, the finishing washer and the countersunk holes of the hole pattern.\n\nThe counterbore does not offer M3.5, because there is no standard socket head cap screw of that size; there you type the measures yourself.",
+          "da": "M3.5 tilbydes nu mellem M3 og M4: til gevindet (stang, skrue, møtrik og gevindhul, stigning 0,6 mm), til møtriklommen i sekskanten, til rørets spændeskiver og som skruestørrelse i undersænkningen, den dobbelte forsænkning, rosetskiven og de undersænkede huller i hulmønsteret.\n\nForsænkningen tilbyder ikke M3.5, fordi der ikke findes en normeret unbrakoskrue i den størrelse; der skriver du målene selv ind.",
           "ar": "صار M3.5 متاحًا بين M3 وM4: للسن اللولبي (القضيب والبرغي والصامولة والثقب الملولب، بخطوة 0.6 مم)، ولجيب الصامولة في السداسي، ولحلقات الأنبوب، وكمقاس برغي في «ثقب غاطس» و«ثقب غاطس مزدوج» و«حلقة تشطيب» والثقوب الغاطسة في نمط الثقوب.\n\nأما «ثقب متدرج» فلا يعرض M3.5، لأنه لا يوجد برغي قياسي برأس أسطواني ومقبس سداسي بهذا المقاس؛ هناك تكتب القياسات بنفسك."
         },
         "guide": {
@@ -289,11 +297,13 @@
         "title": {
           "de": "Aushöhlen mit Vorschau",
           "en": "Hollow with a preview",
+          "da": "Udholning med forhåndsvisning",
           "ar": "التفريغ مع معاينة"
         },
         "body": {
           "de": "Das Werkzeug Aushöhlen zeigt den Körper jetzt schon ausgehöhlt, solange sein Fenster offen ist. Änderst du die Wandstärke, die offenen Seiten oder eine der anderen Einstellungen, folgt die Vorschau einen Moment später. Ist keine Seite offen, wird der Körper durchsichtig gezeigt, damit du den Hohlraum siehst.\n\nGeändert wird erst mit „Aushöhlen“; „Abbrechen“ lässt den Körper, wie er war. Passt eine Einstellung nicht zum Körper, etwa eine zu dicke Wand, sagt es das Fenster sofort.",
           "en": "The Hollow tool now shows the body hollowed while its window is open. Change the wall thickness, the open sides or one of the other settings, and the preview follows a moment later. With no side open the body is shown see-through, so you can see the cavity.\n\nNothing is changed until you click \"Hollow\"; \"Cancel\" leaves the body as it was. If a setting does not suit the body, a wall too thick for example, the window says so at once.",
+          "da": "Værktøjet \"Hul\" viser nu legemet udhulet, mens sit vindue er åbent. Ændrer du vægtykkelsen, de åbne sider eller en af de andre indstillinger, følger forhåndsvisningen et øjeblik efter. Er ingen side åben, vises legemet gennemsigtigt, så du kan se hulrummet.\n\nIntet ændres, før du klikker på \"Anvend\"; \"Annullér\" lader legemet være, som den var. Passer en indstilling ikke til legemet, en for tyk væg for eksempel, siger vinduet det med det samme.",
           "ar": "تُظهر أداة «تفريغ» الآن الجسم مفرّغًا ما دامت نافذتها مفتوحة. غيّر سماكة الجدار أو الجوانب المفتوحة أو أحد الإعدادات الأخرى، فتتبعها المعاينة بعد لحظة. وإذا لم يكن أي جانب مفتوحًا يظهر الجسم شفافًا، فترى التجويف.\n\nلا يتغيّر شيء حتى تنقر «تفريغ»؛ و«إلغاء» يترك الجسم كما كان. وإذا كان إعداد لا يناسب الجسم، كجدار أسمك من اللازم مثلًا، تقول النافذة ذلك فورًا."
         },
         "guide": {
@@ -304,11 +314,13 @@
         "title": {
           "de": "Alle Formen einer Farbe auswählen",
           "en": "Select all shapes of one colour",
+          "da": "Vælg alle former i én farve",
           "ar": "تحديد كل الأشكال بلون واحد"
         },
         "body": {
           "de": "In der Objektliste wählt ein Klick auf den Farbpunkt vor dem Namen jede sichtbare Form dieser Farbe aus, praktisch, wenn jede Baugruppe ihre eigene Farbe hat. Mit Strg (Cmd am Mac) oder Umschalt kommen sie zur Auswahl hinzu. „Gleiche Farbe auswählen“ im Rechtsklick-Menü und in der Befehlssuche (Strg+K) macht dasselbe für die Farben der ausgewählten Formen.",
           "en": "In the object list, a click on the colour dot in front of a name selects every visible shape of that colour, handy when each component has a colour of its own. Ctrl (Cmd on a Mac) or Shift adds them to what is selected. \"Select same colour\" in the right-click menu and the command search (Ctrl+K) does the same for the colours of the selected shapes.",
+          "da": "I objektlisten vælger et klik på farveprikken foran et navn alle synlige former i den farve, praktisk når hver del har sin egen farve. Ctrl (Cmd på en Mac) eller Shift føjer dem til det valgte. \"Vælg samme farve\" i højreklikmenuen og i kommandosøgningen (Ctrl+K) gør det samme for farverne på de valgte former.",
           "ar": "في قائمة الأجسام، النقر على نقطة اللون أمام الاسم يحدد كل شكل ظاهر بذلك اللون، وهذا مفيد عندما يكون لكل مكوّن لونه الخاص. Ctrl (أو Cmd على Mac) أو Shift يضيفها إلى المحدد. و«تحديد اللون نفسه» في قائمة النقر بالزر الأيمن وفي البحث عن الأوامر (Ctrl+K) يفعل الشيء نفسه لألوان الأشكال المحددة."
         },
         "guide": {
@@ -319,11 +331,13 @@
         "title": {
           "de": "Maßband zeigt die Dicke unter dem Mauszeiger",
           "en": "Tape measure shows the thickness under the pointer",
+          "da": "Målebåndet viser tykkelsen under markøren",
           "ar": "شريط القياس يُظهر السماكة تحت المؤشر"
         },
         "body": {
           "de": "Ist beim Maßband „Maß hinzufügen“ aktiv und noch kein Punkt gesetzt, zeigt das Zeigen auf eine Fläche, wie dick der Körper dort ist: senkrecht zur Fläche gerade hinein gemessen, bis das Material endet. Eine gestrichelte Linie zeigt, wo gemessen wird. So prüfst du Wände und Böden, indem du einfach mit der Maus über das Teil fährst. Ein Klick setzt wie bisher den ersten Messpunkt.",
           "en": "With Add measurement active on the tape measure and no point placed yet, pointing at a face shows how thick the body is there: measured straight in, square to the face, to where the material ends. A dashed line shows where it measures. So you check walls and floors just by moving the mouse over the part. A click still sets the first measuring point as before.",
+          "da": "Når \"Tilføj mål\" er slået til på målebåndet, og intet punkt endnu er sat, viser et blik på en flade, hvor tykt legemet er der: målt lige ind, vinkelret på fladen, til hvor materialet holder op. En stiplet linje viser, hvor der måles. Så tjekker du vægge og gulve bare ved at føre musen over delen. Et klik sætter stadig det første målepunkt som før.",
           "ar": "عندما يكون «إضافة قياس» مفعّلًا في شريط القياس ولم تُوضع نقطة بعد، فإن الإشارة إلى وجه تُظهر سماكة الجسم هناك: مقيسة إلى الداخل مباشرة، عموديًا على الوجه، حتى تنتهي المادة. ويُظهر خط متقطع أين يقيس. وهكذا تفحص الجدران والقيعان بمجرد تحريك الفأرة فوق القطعة. والنقرة لا تزال تضع نقطة القياس الأولى كما كانت."
         },
         "guide": {
@@ -334,11 +348,13 @@
         "title": {
           "de": "Gruppe übernimmt den Namen des benannten Teils",
           "en": "A group takes the name of the named part",
+          "da": "En gruppe overtager navnet på den navngivne del",
           "ar": "المجموعة تأخذ اسم الجزء المسمّى"
         },
         "body": {
           "de": "Hat beim Gruppieren oder Bündeln genau ein Teil einen eigenen Namen, heißt die neue Gruppe jetzt so, statt nur „Gruppe“ oder „Bündel“. So bleibt der Name in der Objektliste sichtbar. Haben mehrere Teile einen Namen, bleibt es beim alten Namen; die Teile behalten ihre Namen in der Gruppe.",
           "en": "When exactly one part has a name of its own as you group or bundle, the new group is now called after it, instead of just Group or Bundle. So the name stays visible in the object list. With several named parts nothing changes; the parts keep their names inside the group.",
+          "da": "Når præcis én del har sit eget navn, mens du grupperer eller bundter, hedder den nye gruppe nu efter den, i stedet for bare \"Gruppe\" eller \"Bundt\". Så forbliver navnet synligt i objektlisten. Har flere dele et navn, ændrer intet sig; delene beholder deres navne i gruppen.",
           "ar": "عندما يكون لجزء واحد بالضبط اسم خاص عند التجميع أو الحزم، تُسمّى المجموعة الجديدة الآن باسمه بدل «مجموعة» أو «حزمة» فقط. وهكذا يبقى الاسم ظاهرًا في قائمة الأجسام. ومع عدة أجزاء مسمّاة لا يتغيّر شيء؛ وتحتفظ الأجزاء بأسمائها داخل المجموعة."
         },
         "guide": {
@@ -366,11 +382,13 @@
         "title": {
           "de": "Mehrkant: flache Seite nach vorn",
           "en": "Polygon: flat side in front",
+          "da": "Polygon: flad side fortil",
           "ar": "المضلع: ضلع مستوٍ في الأمام"
         },
         "body": {
           "de": "Ein Achtkant maß bisher von Ecke zu Ecke: Wer 26 mm eintrug, bekam zwischen den flachen Seiten nur 24 mm. Der Mehrkant hat jetzt unter „Seiten“ den Schalter „Flache Seite nach vorn“. Er dreht den Mehrkant um eine halbe Seite, sodass Länge und Breite beim Achtkant von Fläche zu Fläche gehen, wie die Schlüsselweite.\n\nBeim Umschalten bleibt der Körper, wie er ist, nur die beiden Zahlen ziehen mit. Ein Sechskant hat seine flachen Seiten dann vorn und hinten statt links und rechts.",
           "en": "An octagon used to measure from corner to corner: type 26 mm and you got only 24 mm between its flat sides. The Polygon now has the switch “Flat side in front” under “Sides”. It turns the polygon by half a side, so an octagon's length and width run from flat to flat, like the size of a wrench.\n\nTurning the switch keeps the body as it is, only the two numbers change with it. A hexagon then has its flat sides in front and behind instead of left and right.",
+          "da": "En ottekant målte før fra hjørne til hjørne: tastede du 26 mm, fik du kun 24 mm mellem de flade sider. Polygonen har nu under \"Sider\" kontakten \"Flad side fortil\". Den drejer polygonen en halv side, så en ottekants længde og bredde går fra flade til flade, altså nøglevidden.\n\nNår du skifter, bliver legemet, som det er, kun de to tal følger med. En sekskant har så sine flade sider foran og bagved i stedet for til venstre og højre.",
           "ar": "كان المثمّن يُقاس من زاوية إلى زاوية: تكتب 26 مم فلا تحصل إلا على 24 مم بين ضلعيه المستويين. الآن للمضلع المفتاح «ضلع مستوٍ في الأمام» تحت «الأضلاع». يدير المضلع بمقدار نصف ضلع، فيمتد طول المثمّن وعرضه من ضلع إلى ضلع، مثل مقاس مفتاح الربط.\n\nتغيير المفتاح يُبقي الجسم كما هو، ولا يتغيّر معه إلا الرقمان. ويصبح للسداسي عندها ضلعاه المستويان في الأمام والخلف بدل اليسار واليمين."
         },
         "guide": {
@@ -398,11 +416,13 @@
         "title": {
           "de": "Skizze bearbeiten warnt vor verlorenen Fasen",
           "en": "Edit sketch warns about lost chamfers",
+          "da": "Redigér skitse advarer om tabte faser",
           "ar": "تعديل الرسم التخطيطي ينبّه إلى فقدان الشطف"
         },
         "body": {
           "de": "Öffnest du die Skizze eines Körpers, der schon Rundungen, Fasen oder eine Aushöhlung hat, sagt layerling jetzt gleich, dass sie beim Abschließen entfallen, weil der Körper neu entsteht. „Abbrechen“ behält sie. Nach dem Abschließen steht es noch einmal da, und „Rückgängig“ holt sie zurück.",
           "en": "When you open the sketch of a body that already has fillets, chamfers or a hollowing, layerling now says right away that they go when you finish, because the body is built anew. Cancel keeps them. After finishing it says so again, and Undo brings them back.",
+          "da": "Åbner du skitsen af et legeme, der allerede har runder, faser eller en udhuling, siger layerling nu med det samme, at de forsvinder, når du afslutter, fordi legemet bygges på ny. \"Annullér\" beholder dem. Efter afslutningen siger det det igen, og Fortryd henter dem tilbage.",
           "ar": "عندما تفتح الرسم التخطيطي لجسم فيه تنعيم أو شطف أو تفريغ، يقول layerling الآن فورًا إنها ستزول عند الإنهاء، لأن الجسم يُبنى من جديد. و«إلغاء» يُبقي عليها. وبعد الإنهاء يقول ذلك مرة أخرى، و«تراجع» يعيدها."
         },
         "guide": {
@@ -515,11 +535,13 @@
         "title": {
           "de": "Skizze: gehaltene Pfeiltaste ohne Nachlaufen",
           "en": "Sketch: a held arrow key without lag",
+          "da": "Skitse: en holdt piletast uden forsinkelse",
           "ar": "الرسم التخطيطي: مفتاح سهم مضغوط بلا تأخير"
         },
         "body": {
           "de": "Hältst du in der Skizze eine Pfeiltaste gedrückt, folgt die Auswahl jetzt der Taste und bleibt stehen, sobald du loslässt. Bei großen Umrissen hinkte sie bisher weit hinterher und lief nach dem Loslassen noch lange weiter. Ein gehaltener Lauf bleibt ein Schritt beim Rückgängigmachen.",
           "en": "When you hold an arrow key in the sketch, the selection now follows the key and stops as soon as you let go. On large outlines it used to lag far behind and kept moving long after the key was released. A held run is still one step of Undo.",
+          "da": "Holder du en piletast nede i skitsen, følger markeringen nu tasten og stopper, så snart du slipper. På store omrids hinkede den tidligere langt bagefter og fortsatte længe, efter at tasten var sluppet. Et holdt løb er stadig ét trin i Fortryd.",
           "ar": "عندما تضغط مفتاح سهم مطوّلًا في الرسم التخطيطي، يتبع التحديد الآن المفتاح ويتوقف فور رفع إصبعك. وفي الحدود الخارجية الكبيرة كان يتأخر كثيرًا ويستمر في الحركة طويلًا بعد ترك المفتاح. ولا تزال الضغطة المطوّلة خطوة واحدة في «تراجع»."
         }
       }

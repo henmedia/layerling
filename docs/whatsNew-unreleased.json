@@ -2,11 +2,13 @@
   {
     "title": {
       "de": "Namensschild und Symbolschild: Flache Intarsie",
-      "en": "Name tag and icon tag: Flat inlay"
+      "en": "Name tag and icon tag: Flat inlay",
+      "da": "Navneskilt og ikon-tag: Flad intarsia"
     },
     "body": {
       "de": "Auf den Karten „Namensschild“ und „Symbolschild“ gibt es unter der Schichttabelle den Schalter „Flache Intarsie“. Dann sinken Buchstaben (oder Symbol) und Rand in die unterste Schicht ein, und alle Farben enden auf einer ebenen Fläche. So lässt sich das Schild mit dieser Seite nach unten auf die Platte drucken, mit der Struktur der Platte auf der Fläche.\n\nDie unterste Schicht ist der Träger: ihre Höhe ist die Dicke des ganzen Schilds, das Öhr für den Schlüsselring sitzt an ihr. Der Regler „Intarsientiefe“ bestimmt, wie tief die Schichten darüber reichen, alle zusammen. Er beginnt bei 0,8 mm (vier Lagen zu 0,2 mm), für die meisten PLA genug. Durchscheinenderes Filament (PETG, manche Weißtöne) braucht mehr: erst einen Test drucken.\n\nSolange der Schalter an ist, sind die Höhen der oberen Schichten ausgegraut. Ausgeschaltet steht das Schild wieder gestapelt da. Im STEP-Export sind die eingelassenen Schichten Netze, 3MF und STL sind nicht betroffen.",
-      "en": "On the cards \"Name tag\" and \"Icon tag\" the switch \"Flat inlay\" sits under the Layers table. With it on, the letters (or the icon) and the rim sink into the bottom layer, and all colours end on one flat face. So the tag can be printed face down on the plate, with the plate's texture on the face.\n\nThe bottom layer is the carrier: its height is the thickness of the whole tag, and the key ring ear sits on it. The slider \"Inlay depth\" sets how deep the layers above it go, all together. It starts at 0.8 mm (four 0.2 mm layers), enough for most PLA. A more translucent filament (PETG, some whites) needs more: print a test first.\n\nWhile the switch is on, the heights of the upper layers are greyed out. Switched off, the tag is stacked again. In a STEP export the inlaid layers are meshes, 3MF and STL are not affected."
+      "en": "On the cards \"Name tag\" and \"Icon tag\" the switch \"Flat inlay\" sits under the Layers table. With it on, the letters (or the icon) and the rim sink into the bottom layer, and all colours end on one flat face. So the tag can be printed face down on the plate, with the plate's texture on the face.\n\nThe bottom layer is the carrier: its height is the thickness of the whole tag, and the key ring ear sits on it. The slider \"Inlay depth\" sets how deep the layers above it go, all together. It starts at 0.8 mm (four 0.2 mm layers), enough for most PLA. A more translucent filament (PETG, some whites) needs more: print a test first.\n\nWhile the switch is on, the heights of the upper layers are greyed out. Switched off, the tag is stacked again. In a STEP export the inlaid layers are meshes, 3MF and STL are not affected.",
+      "da": "På kortene \"Navneskilt\" og \"Ikon-tag\" ligger kontakten \"Flad intarsia\" under tabellen med lag. Med den slået til sænker bogstaverne (eller ikonet) og kanten sig ned i det nederste lag, så alle farver ender i én plan flade. Så kan skiltet printes med denne side ned mod pladen, med pladens tekstur på fladen.\n\nDet nederste lag er bæreren: dets højde er tykkelsen på hele skiltet, og nøgleringsfligen sidder på det. Skyderen \"Intarsiadybde\" bestemmer, hvor dybt lagene over det går, alle sammen. Den starter på 0,8 mm (fire lag à 0,2 mm), nok til de fleste PLA. Et mere gennemsigtigt filament (PETG, nogle hvide) kræver mere, så print en test.\n\nMens kontakten er slået til, er højderne på de øverste lag nedtonede. Slås den fra, stables skiltet igen. I en STEP-eksport er de indlagte lag net, mens 3MF og STL ikke berøres."
     },
     "guide": {
       "section": "textLayers"
@@ -15,11 +17,13 @@
   {
     "title": {
       "de": "Neue Form: Dach",
-      "en": "New shape: Roof"
+      "en": "New shape: Roof",
+      "da": "Ny form: Tag"
     },
     "body": {
       "de": "In den Grundformen steht jetzt neben dem runden Dach ein Dach: ein Dreieck, das auf der Arbeitsebene liegt, die Spitze oben. Der Griff oben ändert die Höhe des Dreiecks, die Grundseite bleibt dabei auf der Platte; die Griffe unten ändern Breite und Länge.\n\nSeine drei Seiten bleiben fest; für eine andere Zahl von Seiten nimm den Mehrkant.",
-      "en": "The basic shapes now have a Roof next to the Round roof: a triangle lying on the workplane, its corner on top. The handle on top changes the height of the triangle while its base stays on the plate; the handles at the bottom change its width and length.\n\nIts three sides stay as they are; for another number of sides take the Polygon."
+      "en": "The basic shapes now have a Roof next to the Round roof: a triangle lying on the workplane, its corner on top. The handle on top changes the height of the triangle while its base stays on the plate; the handles at the bottom change its width and length.\n\nIts three sides stay as they are; for another number of sides take the Polygon.",
+      "da": "De basise former har nu et Tag ved siden af det Runde tag: en trekant, der ligger på arbejdsplanet, med spidsen opad. Håndtaget øverst ændrer trekantens højde, mens dens grundlinje bliver på pladen, håndtagene forneden bredden og længden.\n\nDens tre sider bliver, som de er; til et andet antal sider tager du Polygon."
     },
     "guide": {
       "chapter": "shapes"
@@ -29,11 +33,13 @@
     "title": {
       "de": "Ein Bild für jeden Ordner",
       "en": "A picture for every folder",
+      "da": "Et billede til hver mappe",
       "ar": "صورة لكل مجلد"
     },
     "body": {
       "de": "Beginnt der Name eines Ordners auf der Startseite mit einem Emoji, etwa „💡 Ideen“, zeigt der Ordner das Emoji groß statt des Ordnersymbols. So findest du deine Ordner auf einen Blick.\n\nDas Emoji gehört zum Namen und geht deshalb überall mit. Zum Ändern oder Entfernen benennst du den Ordner um.",
       "en": "When the name of a folder on the start page starts with an emoji, such as \"💡 Ideas\", the folder shows that emoji big in place of the folder icon. So you find your folders at a glance.\n\nThe emoji is part of the name, so it goes wherever the folder goes. Rename the folder to change it or take it off.",
+      "da": "Begynder navnet på en mappe på startsiden med en emoji, som \"💡 Idéer\", viser mappen den emoji stor i stedet for mappeikonet. Så finder du dine mapper med ét blik.\n\nEmojien er en del af navnet, så den følger med, hvor mappen kommer hen. Omdøb mappen for at ændre den eller fjerne den.",
       "ar": "عندما يبدأ اسم مجلد في صفحة البداية برمز تعبيري (إيموجي)، مثل «💡 أفكار»، يُظهر المجلد ذلك الرمز كبيرًا مكان أيقونة المجلد. وهكذا تجد مجلداتك بنظرة واحدة.\n\nالرمز التعبيري جزء من الاسم، فيذهب أينما ذهب المجلد. أعد تسمية المجلد لتغييره أو إزالته."
     },
     "guide": {
@@ -43,21 +49,25 @@
   {
     "title": {
       "de": "Skizze: Pfeiltasten reagieren sofort",
-      "en": "Sketch: the arrow keys respond at once"
+      "en": "Sketch: the arrow keys respond at once",
+      "da": "Skitse: piletastene reagerer med det samme"
     },
     "body": {
       "de": "In der Skizze zeigte ein Druck auf eine Pfeiltaste die Verschiebung erst nach einem kurzen Moment, und mit gehaltener Taste sprang die Auswahl in großen Sätzen. Jetzt bewegt sie sich sofort und gleichmäßig. Ein ganzer Lauf mit den Pfeiltasten bleibt ein Schritt beim Rückgängigmachen.",
-      "en": "In the sketch a press of an arrow key showed the move only after a short moment, and with the key held the selection jumped in big steps. Now it moves at once and evenly. A whole run with the arrow keys is still one step of Undo."
+      "en": "In the sketch a press of an arrow key showed the move only after a short moment, and with the key held the selection jumped in big steps. Now it moves at once and evenly. A whole run with the arrow keys is still one step of Undo.",
+      "da": "I skitsen viste et tryk på en piletast flytningen først efter et kort øjeblik, og med tasten holdt sprang markeringen i store skridt. Nu flytter den sig med det samme og jævnt. Et helt løb med piletasterne er stadig ét trin i Fortryd."
     }
   },
   {
     "title": {
       "de": "Teile landen an ihrem Platz aus der Datei",
-      "en": "Parts land where their file puts them"
+      "en": "Parts land where their file puts them",
+      "da": "Dele lander, hvor deres fil placerer dem"
     },
     "body": {
       "de": "Hast du die Teile eines Modells als einzelne Dateien, etwa Körper, Arme und Beine einer Miniatur, schalte im Importfenster „STL, OBJ, 3MF: Lage aus der Datei beibehalten“ ein. Dann steht jedes Teil dort, wo seine Datei es hinsetzt, und alles passt zusammen, auch wenn du die Dateien nacheinander importierst.\n\nDer Schalter bleibt, bis du ihn wieder ausschaltest. Ohne ihn kommt jede Datei wie bisher für sich nahe der Plattenmitte an.",
-      "en": "If you have the parts of one model as separate files, such as the body, arms and legs of a miniature, switch on \"STL, OBJ, 3MF: keep the position from the file\" in the import window. Each part then stands where its file puts it, and everything fits together, even when you import the files one after the other.\n\nThe switch stays on until you turn it off. Without it every file comes in on its own near the middle of the plate, as before."
+      "en": "If you have the parts of one model as separate files, such as the body, arms and legs of a miniature, switch on \"STL, OBJ, 3MF: keep the position from the file\" in the import window. Each part then stands where its file puts it, and everything fits together, even when you import the files one after the other.\n\nThe switch stays on until you turn it off. Without it every file comes in on its own near the middle of the plate, as before.",
+      "da": "Har du delene af én model som separate filer, som krop, arme og ben på en miniature, så slå \"STL, OBJ, 3MF: bevar placeringen fra filen\" til i importvinduet. Hver del står så, hvor dens fil placerer den, og alt passer sammen, selv når du importerer filerne én efter én.\n\nKontakten bliver slået til, indtil du slår den fra. Uden den kommer hver fil stadig for sig tæt på pladens midte."
     },
     "guide": {
       "section": "importing"
@@ -66,11 +76,13 @@
   {
     "title": {
       "de": "Leere Entwürfe kommen aus der Sicherung zurück",
-      "en": "Empty designs come back from your backup"
+      "en": "Empty designs come back from your backup",
+      "da": "Tomme designs kommer tilbage fra sikkerhedskopien"
     },
     "body": {
       "de": "Nach einem Absturz kann es passieren, dass die Karten auf der Startseite noch ihre Namen und die Zahl der Formen zeigen, die Entwürfe aber leer aufgehen. Bisher hat „Sicherung wiederherstellen“ genau diese Entwürfe übersprungen, weil es sie für schon vorhanden hielt.\n\nJetzt holt die Sicherung ihren Inhalt in dieselbe Karte zurück. Entwürfe, die noch ihre Formen haben, bleiben, wie sie sind.",
-      "en": "After a crash the cards on the start page can still show their names and how many shapes they have, while the designs open empty. Until now \"Restore backup\" skipped exactly those designs, because it took them for ones that are already here.\n\nNow the backup brings their content back into the same card. Designs that still have their shapes stay as they are."
+      "en": "After a crash the cards on the start page can still show their names and how many shapes they have, while the designs open empty. Until now \"Restore backup\" skipped exactly those designs, because it took them for ones that are already here.\n\nNow the backup brings their content back into the same card. Designs that still have their shapes stay as they are.",
+      "da": "Efter et nedbrud kan kortene på startsiden stadig vise deres navne og hvor mange former de har, mens designene åbner tomme. \"Gendan sikkerhedskopi\" sprang netop disse designs over, fordi den tog dem for at være dem, der allerede er her.\n\nNu henter sikkerhedskopien indholdet tilbage i det samme kort. Designs, der stadig har deres former, bliver, som de er."
     },
     "guide": {
       "section": "backingUp"
@@ -79,11 +91,13 @@
   {
     "title": {
       "de": "Menüleiste: keine Knöpfe mehr übereinander",
-      "en": "Menu bar: no more buttons on top of each other"
+      "en": "Menu bar: no more buttons on top of each other",
+      "da": "Menulinje: ingen knapper oven på hinanden"
     },
     "body": {
       "de": "Bei manchen Fensterbreiten, vor allem im Fokusmodus, wurden Gruppen der Menüleiste schmaler gedrückt als ihre Knöpfe. Dann ragte etwa der Knopf der Objektliste aus „Sichtbarkeit“ in „Formen“ hinein.\n\nJetzt behält jede Gruppe ihre volle Breite, und reicht der Platz nicht, wird eine Gruppe mehr zu einem Knopf zusammengefaltet.",
-      "en": "At some window widths, above all in focus mode, groups of the menu bar were squeezed narrower than their buttons. Then the Outliner button of Visibility, for one, stuck out into Shapes.\n\nNow every group keeps its full width, and where there is not enough room, one more group folds into a single button."
+      "en": "At some window widths, above all in focus mode, groups of the menu bar were squeezed narrower than their buttons. Then the Outliner button of Visibility, for one, stuck out into Shapes.\n\nNow every group keeps its full width, and where there is not enough room, one more group folds into a single button.",
+      "da": "Ved nogle vinduesbredder, især i fokustilstand, blev grupperne i menulinjen presset smallere end deres knapper. Så stak for eksempel objektlisteknappen under Synlighed ud i Former.\n\nNu beholder hver gruppe sin fulde bredde, og hvor der ikke er plads, folder én gruppe mere sammen til en enkelt knap."
     },
     "guide": {
       "section": "focusMode"
