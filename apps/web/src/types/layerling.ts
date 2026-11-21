@@ -718,6 +718,19 @@ export type SketchStrokeAlign = "center" | "inside" | "outside" | "grow" | "shri
 export type SketchStrokeJoin = "miter" | "round" | "bevel";
 export type SketchStrokeCap = "flat" | "square" | "round";
 /**
+ * A layer of a name tag or an icon tag laid in flush instead of stacked: all layers end on the same top. Every layer above the
+ * bottom one is `depth` high; the bottom one keeps its own height and carries the others. Each layer has a pocket `depth` deep
+ * in its top, the shape of the layer above it (`pocket`: that layer's widening, corners and holes), which that layer fills - so
+ * the colours lie side by side on one flat face, none on another. `height` is the layer's own height in the stack, kept so the
+ * stack comes back as it was when it is stacked again. The top layer has no pocket.
+ */
+export type FlushLayer = {
+  depth: number;
+  height: number;
+  pocket?: { grow: number; join?: SketchStrokeJoin; silhouette?: boolean };
+};
+
+/**
  * A sketch drawn as a line of this width instead of a filled area (#154). `edge` makes the wall a cutting edge (#982): its top
  * runs in to that width with a 45° chamfer on both sides; only for a line inside, outside or centred, and narrower than the line.
  */
@@ -771,6 +784,8 @@ export type SketchProfile = {
   silhouette?: boolean;
   /** A key ring hole cut through the body, with its ear on the bottom layer of an icon tag (#391). */
   keyring?: SketchKeyring;
+  /** A layer of an icon tag laid in flush, as a name tag's (textFlush): see FlushLayer. */
+  flush?: FlushLayer;
   /** Built set in from its outlines by the face tool: the body keeps the face's outline and builds the inset from it. */
   inset?: SketchInset;
   /** Which edge of a swept cross-section runs along the path: "center" (the default, left out) or "left"/"right" as seen along the path. */
@@ -1544,6 +1559,11 @@ export type WorkplaneShape = {
   textStroke?: SketchStroke;
   /** Text only (#215): the letters without their counters (the holes in O, A, e), as the usual Silhouette. */
   textSilhouette?: boolean;
+  /**
+   * A layer of a name tag laid in flush (#215): every layer's top on one level, the layer under each colour set in
+   * where the colour above lies, so the tag's face is flat. See FlushLayer.
+   */
+  textFlush?: FlushLayer;
   /**
    * Straight text only (#382): the letters are stretched to fill the box in both directions, so a
    * capital can be made lower or narrower as in Tinkercad. Without it the letters keep their

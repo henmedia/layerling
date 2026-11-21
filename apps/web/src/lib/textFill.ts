@@ -2,12 +2,13 @@ import * as THREE from "three";
 import type { CrossSection, ManifoldToplevel } from "manifold-3d";
 import { mergeGeometries } from "three/examples/jsm/utils/BufferGeometryUtils.js";
 import { toCreasedNormals } from "@/lib/creasedNormals";
+import { flushLayerSolid } from "@/lib/flushLayers";
 import { extrudeOutline, type OutlinePoint } from "@/lib/gearGeometry";
 import { normalizeTextEdge, textEdgeLevels, textHasEdge } from "@/lib/textEdge";
 import { loftedTextEdge } from "@/lib/textEdgeLoft";
 import { loadedManifoldRuntime, requestManifoldRuntime } from "@/lib/manifoldHandle";
 import { normalizeSketchStroke, strokeRegion, type Keep } from "@/lib/sketchStroke";
-import { createTextGeometry, freeKeyringStrip, keyringBandCenter, keyringEarRadius, textGlyphShapes, textKeyringCenter, textKeyringOf, textLetterOffset } from "@/lib/textGeometry";
+import { createTextGeometry, freeKeyringStrip, keyringBandCenter, keyringEarRadius, textFillExtent, textGlyphShapes, textKeyringCenter, textKeyringOf, textLetterBox, textLetterOffset } from "@/lib/textGeometry";
 import type { TextKeyringSide, WorkplaneShape } from "@/types/layerling";
 
 /**
@@ -23,7 +24,7 @@ export type TextFillComponent = { outer: OutlinePoint[]; holes: OutlinePoint[][]
 
 /** Whether this text is drawn through the fill path at all - a key ring hole (#215) is cut there too. */
 export function textHasFill(shape: WorkplaneShape) {
-  return shape.kind === "text" && (Boolean(normalizeSketchStroke(shape.textStroke)) || Boolean(shape.textSilhouette) || Boolean(textKeyringOf(shape)));
+  return shape.kind === "text" && (Boolean(normalizeSketchStroke(shape.textStroke)) || Boolean(shape.textSilhouette) || Boolean(textKeyringOf(shape)) || Boolean(shape.textFlush?.pocket));
 }
 
 const signedArea = (points: OutlinePoint[]) => points.reduce((sum, point, index) => {
@@ -276,12 +277,59 @@ export function textFillClosedGeometry(runtime: ManifoldToplevel, shape: Workpla
   try {
     const region = textBodyRegion(runtime, keep as Keep, shape);
     if (!region) return null;
+    const flushed = flushPocketRegion(runtime, keep as Keep, shape);
+    if (flushed && shape.textFlush) {
+      // A layer laid in flush (#215): the layer above it lies in a pocket in its top.
+      const solid = flushLayerSolid(runtime, region, flushed, shape.height, shape.textFlush.depth);
+      return solid ? indexedGeometry(solid.positions, solid.indices) : null;
+    }
     return extrudedRegionGeometry(keep, region, shape.height);
   } catch {
     return null;
   } finally {
     new Set(made).forEach((item) => item.delete());
   }
+}
+
+/**
+ * The pocket a name tag layer laid in flush (#215) has in its top: the outline of the layer above it - the same letters with
+ * that layer's widening, corners and holes, without a key ring. Null when the layer has none.
+ */
+function flushPocketRegion(runtime: ManifoldToplevel, keep: Keep, shape: WorkplaneShape): CrossSection | null {
+  const pocket = shape.textFlush?.pocket;
+  if (!pocket) return null;
+  const { textKeyring: _keyring, textStroke: _stroke, textSilhouette: _silhouette, ...plain } = shape;
+  const stroke = pocket.grow > 0 ? { width: pocket.grow, align: "grow" as const, join: pocket.join ?? "round", cap: "flat" as const } : undefined;
+  // The letters are fitted into a text's box less its fill's reach and its ear: the layer above has a box of its own
+  // round the same letters, and the letters stand where they stand in this layer (off its middle beside an ear).
+  const letters = textLetterBox(shape);
+  const reach = textFillExtent({ textStroke: stroke });
+  const width = letters.width + 2 * reach;
+  const depth = letters.depth + 2 * reach;
+  const above: WorkplaneShape = {
+    ...plain,
+    width,
+    depth,
+    size: Math.max(width, depth),
+    ...(stroke ? { textStroke: stroke } : {}),
+    ...(pocket.silhouette ? { textSilhouette: true } : {}),
+  };
+  const region = textRegion(runtime, keep, above);
+  if (!region || region.isEmpty()) return null;
+  const middle = textLetterOffset(shape);
+  const placed = middle.x || middle.z ? keep(region.translate([middle.x, middle.z])) : region;
+  return pocket.silhouette ? withoutHoles(runtime, keep, placed) : placed;
+}
+
+/** Triangles with y up as a display body, its normals creased as a 2D kernel extrusion's. */
+function indexedGeometry(positions: Float32Array, indices: Uint32Array): THREE.BufferGeometry {
+  const indexed = new THREE.BufferGeometry();
+  indexed.setAttribute("position", new THREE.Float32BufferAttribute(positions, 3));
+  indexed.setIndex(Array.from(indices));
+  const geometry = toCreasedNormals(indexed, THREE.MathUtils.degToRad(12));
+  indexed.dispose();
+  geometry.computeBoundingBox();
+  return geometry;
 }
 
 /** A region of the text's x/z plane as one closed body from the floor to `height`, extruded by the 2D kernel. */

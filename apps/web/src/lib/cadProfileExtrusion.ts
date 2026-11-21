@@ -851,6 +851,8 @@ export function textGlyphProfiles(shape: WorkplaneShape) {
   if (bevel > 0) return null;
   // The letters' rounded or chamfered top edge (#225) is part of the display mesh only.
   if (textHasEdge(shape)) return null;
+  // A name tag layer laid in flush (#215) has a pocket in its top, which only its display mesh carries.
+  if (shape.textFlush?.pocket) return null;
   const width = shapeWidth(shape);
   const depth = shapeDepth(shape);
   if (![width, depth, shape.height].every((value) => Number.isFinite(value) && value > 0)) return null;

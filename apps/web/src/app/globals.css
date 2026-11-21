@@ -11660,6 +11660,12 @@ html[data-theme="dark"] .property-hint {
   border-color: #c96f12;
 }
 
+/* A choice that does nothing now (a letter edge on an inlaid tag, #215; too long a text) is greyed out. */
+.name-tag-sides button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
 .name-tag-letters {
   display: block;
   overflow: hidden;

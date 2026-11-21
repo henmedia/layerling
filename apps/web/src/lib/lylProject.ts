@@ -1,4 +1,5 @@
 import { checkedTypefaceData, customFontName, isCustomFontId, textCharacters, typefaceSubset } from "@/lib/customFonts";
+import { normalizeFlushLayer } from "@/lib/flushLayers";
 import { customFontEntry, registerCustomFont } from "@/lib/textFonts";
 import { strFromU8, strToU8, unzip } from "fflate";
 import { boundedProjectZip } from "@/lib/boundedProjectZip";
@@ -836,6 +837,7 @@ async function serializeShapeNode(
       ...(sketchProfile.stroke ? { stroke: sketchProfile.stroke } : {}),
       ...(sketchProfile.silhouette ? { silhouette: true } : {}),
       ...(sketchProfile.keyring ? { keyring: sketchProfile.keyring } : {}),
+      ...(sketchProfile.flush ? { flush: sketchProfile.flush } : {}),
       ...(sketchProfile.inset ? { inset: sketchProfile.inset } : {}),
       ...(sketchProfile.sweepAnchor && sketchProfile.sweepAnchor !== "center" ? { sweepAnchor: sketchProfile.sweepAnchor } : {}),
     };
@@ -1332,6 +1334,7 @@ function validateSketchProfile(value: unknown, label: string) {
     if (segment.construction !== undefined && typeof segment.construction !== "boolean") throw new Error(`${label}.segments[${index}].construction must be true or false`);
   });
   if (profile.silhouette !== undefined && typeof profile.silhouette !== "boolean") throw new Error(`${label}.silhouette must be true or false`);
+  if (profile.flush !== undefined && !normalizeFlushLayer(profile.flush)) throw new Error(`${label}.flush must be { depth, height } above 0 and, if it has one, a pocket { grow, join, silhouette }`);
   if (profile.keyring !== undefined && !isSketchKeyring(profile.keyring)) throw new Error(`${label}.keyring must be { side, diameter, x, z } and a free place (#598) with corners of -1 or 1 if it has one`);
   if (profile.sweepAnchor !== undefined && profile.sweepAnchor !== "left" && profile.sweepAnchor !== "center" && profile.sweepAnchor !== "right") throw new Error(`${label}.sweepAnchor must be left, center or right`);
   if (profile.inset !== undefined) {
@@ -1438,6 +1441,10 @@ function validateShapeDefinition(definition: Record<string, unknown>, label: str
   }
   if (definition.textSilhouette !== undefined && typeof definition.textSilhouette !== "boolean") {
     throw new Error(`${label}.textSilhouette must be true or false`);
+  }
+  // A name tag layer laid in flush (#215).
+  if (definition.textFlush !== undefined && !normalizeFlushLayer(definition.textFlush)) {
+    throw new Error(`${label}.textFlush must be { depth, height } above 0 and, if it has one, a pocket { grow, join, silhouette }`);
   }
   if (definition.textStretch !== undefined && typeof definition.textStretch !== "boolean") {
     throw new Error(`${label}.textStretch must be true or false`);

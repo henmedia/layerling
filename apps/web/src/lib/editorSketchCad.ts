@@ -1,4 +1,5 @@
 
+import { flushSketchSolid } from "@/lib/flushSketch";
 import { t } from "@/lib/i18n";
 import { isBuildMessage, reportWorkerBuild } from "@/lib/buildStamp";
 import { createKernelGate, isKernelStatusMessage, type KernelGate } from "@/lib/cadKernelGate";
@@ -125,7 +126,10 @@ export async function cadShapeFromSketchProfile(profile: SketchProfile, height: 
   const topChamfer = strokeEdgeChamfer(profile.stroke, safeHeight);
   const buildOnWorker = (build: SketchProfile, stroke?: SketchStroke, inset?: SketchInset) =>
     requestSketchCad({ type: "build", profile: cloneSketchProfile(build), height: safeHeight, ...(stroke ? { stroke } : {}), ...(inset ? { inset } : {}), ...(topChamfer > 0 ? { topChamfer } : {}) });
-  let response: SketchCadBuildResponse;
+  // An icon tag layer laid in flush (#215): the layer above lies in a pocket in its top, which the 2D kernel builds as a mesh.
+  const flushed = profile.flush?.pocket ? flushSketchSolid(await getManifoldRuntime(), profile, safeHeight) : null;
+  if (profile.flush?.pocket && !flushed) throw new Error(t("sketch.strokeEmpty"));
+  let response: SketchCadBuildResponse | null = null;
   // A key ring hole (#391): the outline the sketch fills with its ear and its hole is worked out here and built as an area.
   const withKeyring = profile.keyring ? keyringSketchProfile(await getManifoldRuntime(), profile) : null;
   // With No holes and a "Wider" line, parts that touch once wider can close a pocket between
@@ -135,7 +139,9 @@ export async function cadShapeFromSketchProfile(profile: SketchProfile, height: 
   // A face tool body given a stroke: the stroke runs along the outline set in, built as straight lines.
   const strokedInset = profile.stroke && profile.inset ? insetSketchProfile(await getManifoldRuntime(), buildProfile, profile.inset) : null;
   if (profile.stroke && profile.inset && !strokedInset) throw new Error(t("faceTool.empty"));
-  if (withKeyring) {
+  if (flushed) {
+    // Built below as a mesh, as a stepped cutting edge is.
+  } else if (withKeyring) {
     response = await buildOnWorker(withKeyring);
   } else if (pocketsFilled) {
     response = await buildOnWorker(pocketsFilled);
@@ -167,11 +173,11 @@ export async function cadShapeFromSketchProfile(profile: SketchProfile, height: 
   }
   // Where the kernel cannot chamfer the cutting edge (a logo's sharp points), the wall is built with the edge in fine steps,
   // from polygon offsets, as a mesh instead of an exact body (#982).
-  let stepped: ReturnType<typeof steppedEdgeWall> = null;
-  if (response.type === "error" && response.message === SKETCH_EDGE_FAILED) {
+  let stepped: ReturnType<typeof steppedEdgeWall> = flushed;
+  if (response?.type === "error" && response.message === SKETCH_EDGE_FAILED) {
     stepped = steppedEdgeWall(await getManifoldRuntime(), { ...buildProfile, stroke: profile.stroke }, safeHeight, topChamfer);
     if (!stepped) throw new Error(t("sketch.edgeFailed"));
-  } else if (response.type === "error") {
+  } else if (response?.type === "error") {
     throw new Error(response.message);
   }
   const source = canonicalizeShape({
@@ -200,7 +206,7 @@ export async function cadShapeFromSketchProfile(profile: SketchProfile, height: 
     if (!mesh) throw new Error(t("sketch.edgeFailed"));
     return withExtrudeDeformsKept({ ...mesh, cadBrep: undefined, cadBrepFrame: undefined, cadMeshDeflection: undefined, sketchProfile: cloneSketchProfile(profile), sketchOperation: "extrude" as const, sketchPose: undefined }, existing);
   }
-  if (response.type === "error") throw new Error(response.message);
+  if (!response || response.type === "error") throw new Error(response?.message ?? t("sketch.strokeEmpty"));
   const shape = shapeFromCadMesh(source, response.positions, response.normals, response.indices, response.brep, response.deflection ?? SKETCH_CAD_DEFLECTION);
   if (!shape) throw new Error("OpenCascade returned an empty sketch solid");
   // Built in the sketch's own coordinates, not baked where a body stands: no pose to keep.
