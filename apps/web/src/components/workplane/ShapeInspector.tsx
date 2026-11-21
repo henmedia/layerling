@@ -2811,6 +2811,24 @@ function getShapePropertiesWithAppLimits(shape: WorkplaneShape, onUpdate: ShapeI
     const sides = shape.sides ?? 6;
     // A flat side in front instead of a corner (Discussion #1787): the corners stand half a side step further round.
     const flat = Boolean(shape.polygonFlat);
+    // The Roof (#1931) keeps its three sides and lies on one of them: no side count and no flat side. Its measures
+    // are named by the way they run on the plate by withOrientedMeasures (#230), as for any body turned on its side.
+    if (shape.polygonRoof) {
+      return [
+        {
+          id: "cornerFillet",
+          label: t("prop.cornerFillet"),
+          value: normalizePolygonCornerRadius(shape.cornerFillet, width, depth, sides, flat),
+          min: 0,
+          max: Math.max(0.01, maxPolygonCornerRadius(width, depth, sides, flat)),
+          step: 0.1,
+          onChange: (value) => onUpdate({ cornerFillet: Math.round(normalizePolygonCornerRadius(value, width, depth, sides, flat) * 1e3) / 1e3 }),
+        },
+        { id: "length", label: t("prop.length"), value: depth, min: MIN_SHAPE_SIZE, max: 160, onChange: setDepth },
+        { id: "width", label: t("prop.width"), value: width, min: MIN_SHAPE_SIZE, max: 160, onChange: setWidth },
+        { id: "height", label: t("prop.height"), value: shape.height, min: MIN_SHAPE_SIZE, max: 160, onChange: setHeight },
+      ];
+    }
     // A hexagon becomes the pocket for a nut (ISO 4032) in one choice: across flats, across corners and height.
     const applyNutPocket = (value: string) => {
       if (!isNutPocketSize(value)) return;
@@ -5632,7 +5650,8 @@ export function ShapeInspector({
                 </button>
               </>
             ) : null}
-            {onShapeDefaultsChange && propertyDefaults ? (
+            {/* The Roof (#1931) is a polygon underneath: its sizes saved as defaults would turn every new polygon into a triangle. */}
+            {onShapeDefaultsChange && propertyDefaults && !shape.polygonRoof ? (
               <div className="property-defaults-actions">
                 <button type="button" disabled={frozen || sameDefaults} title={t("inspector.saveDefaultsHint")} onClick={() => onShapeDefaultsChange(shape.kind, defaultsToSave)}>
                   {t("inspector.saveDefaults")}

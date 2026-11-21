@@ -128,6 +128,8 @@ export type ShapeCustomization = {
   cornerFillet?: number;
   /** Polygon: a flat side faces the front instead of a corner, so an octagon measures from flat to flat (Discussion #1787). */
   polygonFlat?: boolean;
+  /** Polygon: the Roof of the shape library (#1931), three sides for good; its panel offers no side count and no flat side. */
+  polygonRoof?: boolean;
   /** Rounded box with flat top and bottom: an own radius for each corner (back left, back right, front right, front left); wins over cornerFillet. */
   cornerFillets?: [number, number, number, number];
   topBottomFillet?: number;
@@ -1513,6 +1515,8 @@ export type WorkplaneShape = {
   cornerFillet?: number;
   /** Polygon: a flat side faces the front instead of a corner, so an octagon measures from flat to flat (Discussion #1787). */
   polygonFlat?: boolean;
+  /** Polygon: the Roof of the shape library (#1931), three sides for good; its panel offers no side count and no flat side. */
+  polygonRoof?: boolean;
   /** Rounded box with flat top and bottom: an own radius for each corner (back left, back right, front right, front left); wins over cornerFillet. */
   cornerFillets?: [number, number, number, number];
   topBottomFillet?: number;

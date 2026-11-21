@@ -379,8 +379,9 @@ export const sbcBoardAsset: ToolbarShapeAsset = {
 /**
  * The roof (#1931): the three-sided polygon, put in lying on one flat side like Tinkercad's Roof, so a
  * triangle lying on the plate is found by looking. People turned a wedge until it looked like one and then
- * had no handle for the triangle's height; the polygon tile shows a hexagon. It is a polygon, not a kind
- * of its own: `roofShape` lays it down as it is put in, and from then on it is an ordinary polygon.
+ * had no handle for the triangle's height; the polygon tile shows a hexagon. Underneath it is a polygon with
+ * `polygonRoof`, so its exact body and edges are the polygon's; the mark keeps its three sides and takes the side
+ * count out of its panel. `libraryAssetTurnX` lays it down as it is put in.
  */
 export const roofAsset: ToolbarShapeAsset = {
   id: "roof",
@@ -396,7 +397,7 @@ export const roofAsset: ToolbarShapeAsset = {
  * as Tinkercad's Roof, so the triangle is as high as its base is wide (the regular triangle would be narrower).
  */
 export function roofCustomization(customization: ShapeCustomization = {}): ShapeCustomization {
-  return { ...customization, sides: 3, polygonFlat: false, width: ROOF_SIZE, depth: ROOF_SIZE, height: ROOF_SIZE };
+  return { ...customization, sides: 3, polygonFlat: false, polygonRoof: true, width: ROOF_SIZE, depth: ROOF_SIZE, height: ROOF_SIZE };
 }
 
 const ROOF_SIZE = 20;
@@ -1499,6 +1500,7 @@ export function makeShapeFromAsset(
         : asset.kind === "polygon" && (customization.cornerFillet ?? 0) > 0 ? normalizePolygonCornerRadius(customization.cornerFillet, width, depth, customization.sides ?? 6, Boolean(customization.polygonFlat)) : undefined,
     // A polygon with a flat side in front (Discussion #1787); left out when off, as the editor leaves it.
     polygonFlat: asset.kind === "polygon" && customization.polygonFlat ? true : undefined,
+    polygonRoof: asset.kind === "polygon" && customization.polygonRoof ? true : undefined,
     portProfile: asset.kind === "port" ? normalizePortProfile(customization.portProfile) : undefined,
     portClearance: asset.kind === "port" && normalizePortClearance(customization.portClearance) > 0 ? normalizePortClearance(customization.portClearance) : undefined,
     ...(asset.kind === "roundedBox"

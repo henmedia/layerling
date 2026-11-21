@@ -1,4 +1,10 @@
+import { readFileSync } from "node:fs";
+import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
+import { editorHistoryEntry } from "@/lib/editorHistory";
+import { exportLylProject, importLylProject } from "@/lib/lylProject";
+import { DEFAULT_SNAP_GRID, DEFAULT_WORKPLANE_WORKSPACE } from "@/lib/workplaneSettings";
+import { canonicalizeShape } from "@/lib/workplaneShapes";
 import { horizontalPlacementWorkplane, placementPatchForNewShape } from "@/lib/placementWorkplane";
 import { libraryAssetCustomization, libraryAssetTurnX, libraryShapeAssets, makeShapeFromAsset, roofAsset, toolbarShapeAssets } from "@/lib/shapeCatalog";
 import { SHAPE_LIBRARY_SECTIONS, searchShapeLibrary, shapeLibrarySections } from "@/lib/shapeLibrarySections";
@@ -17,6 +23,7 @@ describe("the roof tile (#1931)", () => {
     expect(shape.kind).toBe("polygon");
     expect(shape.sides).toBe(3);
     expect(shape.polygonFlat).toBeFalsy();
+    expect(shape.polygonRoof).toBe(true);
     // Tinkercad's Roof: as high as it is wide.
     expect([shape.width, shape.depth, shape.height]).toEqual([20, 20, 20]);
   });
@@ -41,5 +48,29 @@ describe("the roof tile (#1931)", () => {
       const found = searchShapeLibrary(sections, word, (shape) => shape.name).flatMap((section) => section.shapes.map((shape) => shape.id));
       expect(found, word).toContain("roof");
     }
+  });
+
+  it("keeps its three sides and its mark, also through a saved design; a plain polygon has no mark", async () => {
+    const roof = { ...makeShapeFromAsset(roofAsset, undefined, libraryAssetCustomization(roofAsset)), id: "roof" };
+    expect(canonicalizeShape({ ...roof, sides: 5, polygonFlat: true })).toMatchObject({ sides: 3, polygonRoof: true });
+    expect(canonicalizeShape({ ...roof, polygonFlat: true }).polygonFlat).toBeUndefined();
+    const polygon = makeShapeFromAsset(toolbarShapeAssets.find((asset) => asset.id === "polygon")!);
+    expect(polygon.polygonRoof).toBeUndefined();
+    expect(canonicalizeShape({ ...polygon, kind: "box", polygonRoof: true }).polygonRoof).toBeUndefined();
+    const file = await exportLylProject({
+      projectId: "roof", projectName: "Roof", createdAt: 1_700_000_000_000, modifiedAt: 1_700_000_100_000,
+      shapes: [roof], history: [editorHistoryEntry([roof], [])], historyIndex: 0, assets: [],
+      workspace: DEFAULT_WORKPLANE_WORKSPACE, snapGrid: DEFAULT_SNAP_GRID, placementElevation: 0,
+    });
+    const restored = (await importLylProject(file)).shapes.find((entry) => entry.id === "roof");
+    expect(restored).toMatchObject({ kind: "polygon", sides: 3, polygonRoof: true });
+  });
+
+  it("offers no side count and no saving as polygon defaults in its panel", () => {
+    const inspector = readFileSync(fileURLToPath(new URL("../../apps/web/src/components/workplane/ShapeInspector.tsx", import.meta.url)), "utf8");
+    const roofBranch = inspector.slice(inspector.indexOf("if (shape.polygonRoof) {"), inspector.indexOf("const nutPocketProperty"));
+    expect(roofBranch).not.toContain('id: "sides"');
+    expect(roofBranch).not.toContain('id: "polygonFlat"');
+    expect(inspector).toContain("onShapeDefaultsChange && propertyDefaults && !shape.polygonRoof ?");
   });
 });

@@ -604,6 +604,13 @@ export function canonicalizeShape(unrepaired: WorkplaneShape): WorkplaneShape {
     mirrorY: shape.mirrorY || undefined,
     mirrorZ: shape.mirrorZ || undefined,
   };
+  // The Roof (#1931) keeps its three sides and a corner on top, whatever else asks to change them.
+  if (shape.kind === "polygon" && shape.polygonRoof) {
+    next.sides = 3;
+    next.polygonFlat = undefined;
+  } else if (next.polygonRoof !== undefined) {
+    next.polygonRoof = undefined;
+  }
   if (shape.kind === "thread") {
     const footprint = threadFootprintPatch(next);
     Object.assign(next, footprint);
@@ -985,6 +992,7 @@ export function workplaneShapesEqual(a: WorkplaneShape, b: WorkplaneShape) {
     a.portClearance === b.portClearance &&
     a.cornerFillet === b.cornerFillet &&
     Boolean(a.polygonFlat) === Boolean(b.polygonFlat) &&
+    Boolean(a.polygonRoof) === Boolean(b.polygonRoof) &&
     sameNumberList(a.cornerFillets, b.cornerFillets) &&
     a.topBottomFillet === b.topBottomFillet &&
     a.bottomFillet === b.bottomFillet &&
