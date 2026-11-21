@@ -3,6 +3,7 @@
 import { cadHasSolidBody } from "@/lib/cadSolidBody";
 import { cadTreatmentLostFaces, TREATMENT_LOST_FACES_MESSAGE } from "@/lib/cadLostFaces";
 import { cadFaultyEdgeIds } from "@/lib/cadFaultyEdges";
+import { edgeFaceMap } from "@/lib/cadEdgeFaces";
 import { cornerEdgeCandidates, edgesTouchingEnds } from "@/lib/cadCornerEdges";
 import { innerCornerEdges, treatAfterInnerCorners } from "@/lib/cadInnerCorners";
 import { OcctKernel, type OcctModuleFactory, type ShapeHandle } from "occt-wasm";
@@ -132,22 +133,6 @@ function storedBrep(cad: OcctKernel, shape: ShapeHandle) {
   } finally {
     cad.release(bare);
   }
-}
-
-function parseEdgeFaceMap(values: number[]) {
-  const map = new Map<number, number[]>();
-  for (let index = 0; index + 1 < values.length; ) {
-    const edgeHash = values[index++];
-    const count = values[index++];
-    const faces = values.slice(index, index + count);
-    index += count;
-    const current = map.get(edgeHash) ?? [];
-    faces.forEach((hash) => {
-      if (!current.includes(hash)) current.push(hash);
-    });
-    map.set(edgeHash, current);
-  }
-  return map;
 }
 
 type FaceFacts = {
@@ -931,7 +916,7 @@ function collectEdges(cad: OcctKernel, shape: ShapeHandle, sharpAngle: number, s
         return type;
       },
     };
-    const adjacentFaces = parseEdgeFaceMap(cad.edgeToFaceMap(shape, HASH_UPPER_BOUND));
+    const adjacentFaces = edgeFaceMap(cad, faces);
     const wire = cad.wireframe(shape, CAD_EDGE_WIREFRAME_DEFLECTION);
     const pointsByHash = new Map<number, number[]>();
     for (let index = 0; index + 2 < wire.edgeGroups.length; index += 3) {
