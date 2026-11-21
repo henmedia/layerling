@@ -8,6 +8,8 @@
  *   diameter) plus 0.4 mm, so the head sits a little below the face.
  * - Countersink: diameter to ISO 15065 at 90 degrees, for countersunk screws (ISO 10642, ISO 7046). The norm goes
  *   up to M20.
+ * - M3.5 (Discussion #1908) has a countersink only: ISO 4762 has no socket head cap screw of that size, so there is no
+ *   head a counterbore could follow.
  *
  * Inch screws (Discussion #1534), countersink only: the numbered sizes #2 to #14 of ASME B18.6.1 (wood screws; machine
  * screws of the same number to B18.6.3 have the same body and head), which are also the gauges Australian wood screws are
@@ -18,16 +20,17 @@
 
 import { countersinkDepth } from "@/lib/screwHoleGeometry";
 
-export type MetricScrewHoleSize = "M2" | "M2.5" | "M3" | "M4" | "M5" | "M6" | "M8" | "M10" | "M12" | "M14" | "M16" | "M20" | "M24" | "M30";
+export type MetricScrewHoleSize = "M2" | "M2.5" | "M3" | "M3.5" | "M4" | "M5" | "M6" | "M8" | "M10" | "M12" | "M14" | "M16" | "M20" | "M24" | "M30";
 export type InchScrewHoleSize = "#2" | "#3" | "#4" | "#5" | "#6" | "#7" | "#8" | "#9" | "#10" | "#12" | "#14";
 export type ScrewHoleSize = MetricScrewHoleSize | InchScrewHoleSize;
 
-type ScrewHoleRow = { diameter: number; shaft: number; counterbore: number; countersink?: number };
+type ScrewHoleRow = { diameter: number; shaft: number; counterbore?: number; countersink?: number };
 
 const SCREW_HOLE_ROWS: Record<MetricScrewHoleSize, ScrewHoleRow> = {
   M2: { diameter: 2, shaft: 2.4, counterbore: 4.4, countersink: 4.4 },
   "M2.5": { diameter: 2.5, shaft: 2.9, counterbore: 5.5, countersink: 5.5 },
   M3: { diameter: 3, shaft: 3.4, counterbore: 6.5, countersink: 6.3 },
+  "M3.5": { diameter: 3.5, shaft: 3.9, countersink: 8.2 },
   M4: { diameter: 4, shaft: 4.5, counterbore: 8, countersink: 9.4 },
   M5: { diameter: 5, shaft: 5.5, counterbore: 10, countersink: 10.4 },
   M6: { diameter: 6, shaft: 6.6, counterbore: 11, countersink: 12.6 },
@@ -86,10 +89,10 @@ export const SCREW_HOLE_SIZE_ORDER = Object.keys(SCREW_HOLE_ROWS) as MetricScrew
 /** The inch sizes, smallest first: countersinks only. */
 export const INCH_SCREW_HOLE_SIZES = Object.keys(INCH_SCREW_ROWS) as InchScrewHoleSize[];
 
-/** The sizes a hole of this kind offers: a counterbore the metric ones, a countersink those ISO 15065 has and the inch ones. */
+/** The sizes a hole of this kind offers: a counterbore the metric ones with a socket head, a countersink those ISO 15065 has and the inch ones. */
 export function screwHoleSizesFor(kind: ScrewHoleKind): ScrewHoleSize[] {
   return kind === "counterbore"
-    ? SCREW_HOLE_SIZE_ORDER
+    ? SCREW_HOLE_SIZE_ORDER.filter((size) => SCREW_HOLE_ROWS[size].counterbore !== undefined)
     : [...SCREW_HOLE_SIZE_ORDER.filter((size) => SCREW_HOLE_ROWS[size].countersink !== undefined), ...INCH_SCREW_HOLE_SIZES];
 }
 
@@ -118,15 +121,17 @@ export function screwHoleFields(kind: ScrewHoleKind, size: ScrewHoleSize, length
   const row = SCREW_HOLE_ROWS[size];
   if (kind === "counterbore") {
     const headDepth = row.diameter + COUNTERBORE_HEAD_ROOM;
+    // Every size a counterbore offers has one (screwHoleSizesFor); the fallback only keeps the type whole.
+    const bore = row.counterbore ?? row.countersink ?? row.shaft;
     return {
-      width: row.counterbore,
-      depth: row.counterbore,
+      width: bore,
+      depth: bore,
       height: Math.max(length, headDepth + MIN_SHAFT_RUN),
       screwHoleShaft: row.shaft,
       screwHoleHeadDepth: headDepth,
     };
   }
-  const head = row.countersink ?? row.counterbore;
+  const head = row.countersink ?? row.counterbore ?? row.shaft;
   const cone = countersinkDepth(head, row.shaft, METRIC_COUNTERSINK_ANGLE);
   return {
     width: head,
@@ -174,7 +179,7 @@ export function isFinishingWasherSize(value: unknown): value is MetricScrewHoleS
 /** A finishing washer of this size as the shape's own fields. */
 export function finishingWasherFields(size: MetricScrewHoleSize): FinishingWasherFields {
   const row = SCREW_HOLE_ROWS[size];
-  const seat = row.countersink ?? row.counterbore;
+  const seat = row.countersink ?? row.counterbore ?? row.shaft;
   const seatDepth = roundToHundredth(countersinkDepth(seat, row.shaft, METRIC_COUNTERSINK_ANGLE));
   const outer = roundToHundredth(seat + 2 * Math.max(2, row.diameter / 3));
   return {

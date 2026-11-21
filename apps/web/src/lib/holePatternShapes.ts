@@ -5,19 +5,24 @@ import {
   HOLE_PATTERN_MIN_SIZE,
   holeFootprintPolygon,
   holeFootprintSize,
+  holeCenterOwnSize,
   holeHasHead,
   holeHeadAngle,
   holeHeadDepth,
   holeHeadSize,
   holePatternCenters,
+  holePatternTopLayer,
   holeCrossSection,
+  insetFaceLoops,
   holeTiltRadians,
   holeTurn,
+  rackSlotSettings,
   roundWallCenters,
   withoutHoleTilt,
   type FaceOutline,
   type HolePatternSettings,
   type Point2,
+  type RackFit,
   type RoundWallOutline,
 } from "@/lib/holePattern";
 import { placementPatchForNewShape, type PlacementWorkplane } from "@/lib/placementWorkplane";
@@ -26,6 +31,7 @@ import { roundFaceTriangles, type RoundFaceAxis } from "@/lib/roundFaceAxis";
 import { screwHoleFields, screwHoleSizesFor, type ScrewHoleSize } from "@/lib/screwHoleSizes";
 import { makeShapeFromAsset, toolbarShapeAssets } from "@/lib/shapeCatalog";
 import { createLocalId } from "@/lib/localIds";
+import { loadedManifoldRuntime } from "@/lib/manifoldHandle";
 import { canonicalizeShape, shapeDepth, shapeWidth, withHoleMode } from "@/lib/workplaneShapes";
 import type { ShapeKind, WorkplaneShape } from "@/types/layerling";
 
@@ -453,6 +459,9 @@ function slopedHoleReach(face: PerforableFace, settings: HolePatternSettings, ti
   return { cap, inside };
 }
 
+/** How much deeper than a top layer in a second colour its holes reach, so they cut it clean through. */
+export const TOP_LAYER_OVERCUT = 0.05;
+
 /** The depth the holes actually get: the body's thickness plus a skin's worth, or what was asked for. */
 export function holeDepth(face: Pick<PerforableFace, "thickness">, settings: Pick<HolePatternSettings, "depth">) {
   return settings.depth === null ? face.thickness + HOLE_OVERSHOOT : settings.depth;
@@ -476,6 +485,26 @@ export type HolePatternPlan = {
   tooMany: boolean;
   /** Holes round the edge: the length of the line they go round on, and whether they sit on its corners. */
   ring?: { length: number; onCorners: boolean };
+  /** Mounting holes on a round face: they go round a circle. */
+  roundFace?: boolean;
+  /** 19" rack holes: how the slots came out on the face, or why there are none. */
+  rack?: RackFit;
+  /** A hole in the middle was asked for (Discussion #1904): its place among `holes`, or null where it does not fit. */
+  centerHole?: { index: number | null };
+  /** The face's edge cuts the holes (Discussion #1771): how many thin strips it keeps to holes inside, and the wall it is measured by. */
+  edgeCut?: { thin: number; wall: number; border: number };
+  /**
+   * The edge cuts the holes and keeps a frame (`edgeBorder`): the frame as a solid of its own, along the face's edge and
+   * its openings, as thick as the body behind the face. It goes with the body after the holes are cut, so they stop where
+   * it starts. Its colour is set to the body's by whoever builds the group.
+   */
+  frame?: WorkplaneShape;
+  /**
+   * The top layer in a second colour (Discussion #1771): a slab of the face, `thickness` deep from it, in its colour. What
+   * of the perforated body (frame and all) lies in it becomes the top layer, a net; the body less the net is the other
+   * colour, solid below and filling the net's holes up to the face.
+   */
+  topLayer?: { slab: WorkplaneShape; thickness: number; color: string };
   /** On a round wall (#1393): its diameter, whether it goes all the way round, and then how many holes a row holds at what step. */
   wall?: { diameter: number; closed: boolean; columns?: number; spacing?: number };
 };
@@ -534,11 +563,20 @@ export function holePatternShapes(
 ): HolePatternPlan {
   // Sloping through the wall is for flat faces for now.
   if (isRoundWallFace(face)) return roundWallHoleShapes(face, withoutHoleTilt(settings), namePrefix, previewIdPrefix, custom);
+  // 19" rack holes are the standard slot whatever form was set before.
+  const forRack = settings.arrangement === "corners" && Boolean(settings.rack);
+  if (forRack) settings = rackSlotSettings(settings);
   if (settings.form === "custom" && !custom) return { holes: [], tooMany: false };
+  // A top layer in a second colour is a net: the holes go through that layer and a little into the body below, so the
+  // net is cut clean right through; the body's own colour is the body less the net, filling its holes.
+  const layer = holePatternTopLayer(settings, face.thickness);
+  if (layer) settings = { ...settings, depth: layer.thickness + TOP_LAYER_OVERCUT };
   const tilt = holeTiltRadians(settings);
   const wall = face.wall ?? face.thickness;
-  const { centers, tooMany, ring } = holePatternCenters(face.outline, settings, tilt === 0 ? 0 : wall);
-  if (tooMany || centers.length === 0) return { holes: [], tooMany, ...(ring ? { ring } : {}) };
+  const { centers, tooMany, ring, roundFace, rack, edgeCut, centerHole } = holePatternCenters(face.outline, settings, tilt === 0 ? 0 : wall);
+  // The slots lie along the panel's width, however the face's frame runs.
+  if (forRack && rack) settings = rackSlotSettings(settings, rack.angle);
+  if (tooMany || centers.length === 0) return { holes: [], tooMany, ...(ring ? { ring } : {}), ...(roundFace ? { roundFace } : {}), ...(rack ? { rack } : {}), ...(edgeCut ? { edgeCut } : {}), ...(centerHole ? { centerHole } : {}) };
 
   if (settings.form === "custom" && custom) {
     // A copy of the shape stands upright on every place, turned with the face: a body a little sunk in so it joins, a
@@ -564,7 +602,7 @@ export function holePatternShapes(
       };
       return canonicalizeShape(placed);
     });
-    return { holes: pieces, tooMany: false, ...(ring ? { ring } : {}) };
+    return { holes: pieces, tooMany: false, ...(ring ? { ring } : {}), ...(roundFace ? { roundFace } : {}), ...(centerHole ? { centerHole } : {}) };
   }
 
   // A round hole with a head is a counterbore or countersink shape (#1232), its head on the face.
@@ -582,7 +620,7 @@ export function holePatternShapes(
       ? { screwHoleHeadDepth: holeHeadDepth(settings) + HOLE_OVERSHOOT, width: holeHeadSize(settings) }
       : { screwHoleAngle: holeHeadAngle(settings), width: holeHeadSize(settings) + 2 * HOLE_OVERSHOOT * countersinkSlope(settings) }),
   } : null;
-  const size = head ? { width: head.width, height: head.width } : holeFootprintSize(settings);
+  const patternSize = head ? { width: head.width, height: head.width } : holeFootprintSize(settings);
   const { workplane } = face;
   const normal = new THREE.Vector3(workplane.normal.x, workplane.normal.y, workplane.normal.z);
   const origin = new THREE.Vector3(workplane.origin.x, workplane.origin.y, workplane.origin.z);
@@ -593,9 +631,18 @@ export function holePatternShapes(
   // A hole sloping through the wall stands in that frame tipped about the face's x; `out` is its axis, out of the wall.
   const holeFrame = tilt === 0 ? turnedFrame : tiltedWorkplane(turnedFrame, workplane, tilt);
   const out = new THREE.Vector3(holeFrame.normal.x, holeFrame.normal.y, holeFrame.normal.z);
-  const sloped = tilt === 0 ? null : slopedHoleReach(face, settings, tilt, wall, centers.length);
+  const patternSloped = tilt === 0 ? null : slopedHoleReach(face, settings, tilt, wall, centers.length);
+  // The hole in the middle in a size of its own (Discussion #1904): the same hole, wider or narrower.
+  const middleSize = holeCenterOwnSize(settings);
+  const middleSettings = middleSize === null ? null : { ...settings, size: middleSize };
+  const middle = middleSettings && centerHole && centerHole.index !== null
+    ? { index: centerHole.index, size: holeFootprintSize(middleSettings), sloped: tilt === 0 ? null : slopedHoleReach(face, middleSettings, tilt, wall, centers.length) }
+    : null;
 
   const holes = centers.map((center, index) => {
+    const own = middle && middle.index === index ? middle : null;
+    const size = own ? own.size : patternSize;
+    const sloped = own ? own.sloped : patternSloped;
     const onFace = origin.clone().addScaledVector(xAxis, center.u).addScaledVector(zAxis, center.v);
     let top: THREE.Vector3;
     let base: THREE.Vector3;
@@ -625,7 +672,100 @@ export function holePatternShapes(
     const placed = { ...sized, ...placementPatchForNewShape(sized, holeFrame, base), ...(previewIdPrefix ? { id: `${previewIdPrefix}-${index}` } : {}) };
     return canonicalizeShape(withHoleMode(placed, true));
   });
-  return { holes, tooMany: false, ...(ring ? { ring } : {}) };
+  const frame = edgeCut && edgeCut.border > 0 ? holePatternFrame(face, edgeCut.border, namePrefix, previewIdPrefix) : null;
+  const slab = layer ? faceSlab(face, layer.thickness, null, namePrefix, previewIdPrefix ? `${previewIdPrefix}-top` : undefined) : null;
+  const topLayer = layer && slab ? { slab: { ...slab, color: layer.color }, ...layer } : null;
+  return { holes, tooMany: false, ...(ring ? { ring } : {}), ...(roundFace ? { roundFace } : {}), ...(rack ? { rack } : {}), ...(edgeCut ? { edgeCut } : {}), ...(centerHole ? { centerHole } : {}), ...(frame ? { frame } : {}), ...(topLayer ? { topLayer } : {}) };
+}
+
+/**
+ * The frame along a flat face's edge and its openings, `border` wide: the face less the face set in by that much, from
+ * the face down through the body's thickness behind it, as a mesh object in the scene's frame.
+ */
+export function holePatternFrame(face: PerforableFace, border: number, name: string, previewIdPrefix?: string): WorkplaneShape | null {
+  if (!(border > 0)) return null;
+  return faceSlab(face, face.thickness, border, name, previewIdPrefix ? `${previewIdPrefix}-frame` : undefined);
+}
+
+/**
+ * The face, `height` deep from it into the body, as a mesh object in the scene's frame: the whole face, or with `border`
+ * only the band that wide along its edge and openings.
+ */
+function faceSlab(face: PerforableFace, height: number, border: number | null, name: string, previewId?: string): WorkplaneShape | null {
+  const runtime = loadedManifoldRuntime();
+  if (!runtime || !(height > 0)) return null;
+  const loops = face.outline.loops.filter((loop) => loop.length >= 3);
+  if (!loops.length) return null;
+  const inner = border ? insetFaceLoops(runtime, loops, border) : [];
+  const made: { delete(): void }[] = [];
+  let positions: number[] = [];
+  try {
+    const region = new runtime.CrossSection(loops.map((loop) => loop.map((point): [number, number] => [point.u, point.v])), "EvenOdd");
+    made.push(region);
+    const kept = border && inner.length ? new runtime.CrossSection(inner.map((loop) => loop.map((point): [number, number] => [point.u, point.v])), "EvenOdd") : null;
+    if (kept) made.push(kept);
+    const band = kept ? region.subtract(kept) : region;
+    if (band !== region) made.push(band);
+    if (band.isEmpty()) return null;
+    const solid = band.extrude(height);
+    made.push(solid);
+    const mesh = solid.getMesh();
+    const { workplane } = face;
+    const origin = new THREE.Vector3(workplane.origin.x, workplane.origin.y, workplane.origin.z);
+    const xAxis = new THREE.Vector3(workplane.xAxis.x, workplane.xAxis.y, workplane.xAxis.z);
+    const zAxis = new THREE.Vector3(workplane.zAxis.x, workplane.zAxis.y, workplane.zAxis.z);
+    const normal = new THREE.Vector3(workplane.normal.x, workplane.normal.y, workplane.normal.z);
+    // The section's x and y run along the face's x and z; its height runs down from the face into the body.
+    const flip = new THREE.Matrix3().set(xAxis.x, zAxis.x, normal.x, xAxis.y, zAxis.y, normal.y, xAxis.z, zAxis.z, normal.z).determinant() < 0;
+    const at = (index: number) => {
+      const base = index * mesh.numProp;
+      const u = mesh.vertProperties[base];
+      const v = mesh.vertProperties[base + 1];
+      const h = mesh.vertProperties[base + 2] - height;
+      return origin.clone().addScaledVector(xAxis, u).addScaledVector(zAxis, v).addScaledVector(normal, h);
+    };
+    for (let t = 0; t < mesh.triVerts.length; t += 3) {
+      const corners = [mesh.triVerts[t], mesh.triVerts[t + 1], mesh.triVerts[t + 2]];
+      if (flip) corners.reverse();
+      for (const corner of corners) {
+        const point = at(corner);
+        positions.push(point.x, point.y, point.z);
+      }
+    }
+  } finally {
+    made.forEach((item) => item.delete());
+  }
+  if (positions.length < 9) return null;
+  // A mesh object standing on its lowest point, as the scene keeps them.
+  const min = [Infinity, Infinity, Infinity];
+  const max = [-Infinity, -Infinity, -Infinity];
+  positions.forEach((value, index) => {
+    min[index % 3] = Math.min(min[index % 3], value);
+    max[index % 3] = Math.max(max[index % 3], value);
+  });
+  const center = [(min[0] + max[0]) / 2, min[1], (min[2] + max[2]) / 2];
+  positions = positions.map((value, index) => value - center[index % 3]);
+  const width = Math.max(1e-3, max[0] - min[0]);
+  const tall = Math.max(1e-3, max[1] - min[1]);
+  const depth = Math.max(1e-3, max[2] - min[2]);
+  return canonicalizeShape({
+    id: previewId ?? createLocalId("hole-pattern-slab"),
+    name,
+    kind: "mesh",
+    color: "#888888",
+    hole: false,
+    x: center[0],
+    z: center[2],
+    elevation: center[1],
+    size: Math.max(width, depth),
+    width,
+    depth,
+    height: tall,
+    rotation: 0,
+    importedMesh: { positions, baseWidth: width, baseDepth: depth, baseHeight: tall, triangleCount: Math.floor(positions.length / 9), sourceFormat: "json" },
+    locked: false,
+    hidden: false,
+  } as WorkplaneShape);
 }
 
 /**

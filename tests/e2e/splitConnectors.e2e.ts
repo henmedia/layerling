@@ -308,6 +308,10 @@ describe("dowels on a breakaway base (a mail from Michael Celotto)", () => {
     expect(based.parts).toHaveLength(3);
     expect(based.connectors).toEqual(plain.connectors);
     const pins = based.parts![2];
+    // Marked for the print check, which leaves out the feet over the sockets and their thin floors (#1633).
+    expect(pins.breakawayBase).toBe(true);
+    expect(plain.parts![2].breakawayBase).toBeUndefined();
+    expect(based.parts![0].breakawayBase).toBeUndefined();
     const created: ManifoldSolid[] = [];
     const solid = solidOf(pins, created);
     const plainSolid = solidOf(plain.parts![2], created);

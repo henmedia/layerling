@@ -5,7 +5,8 @@ import { cleanNearZero, resizedShapeSize, shapeDepth, shapeHasTaper, shapeTaperD
 import type { WorkplaneShape } from "@/types/layerling";
 
 const MIN_SIZE = 0.01;
-export const SCALE_PERCENT_MIN = 1;
+/** As small as 1:10,000 of the size, for model scales such as Z (1:220) and below. */
+export const SCALE_PERCENT_MIN = 0.01;
 export const SCALE_PERCENT_MAX = 1000;
 
 /**

@@ -30,6 +30,13 @@ import { automaticSideCount, roundSideCount } from "@/lib/roundSideCount";
  * Statt Senkungen koennen die Schraubenloecher Sechskant-Taschen fuer Muttern
  * haben, auf beiden Blaettern oder auf B allein.
  *
+ * Zum Einschnappen (Discussion #1520) traegt A den Stift wie sonst, die
+ * Knoechel von B aber sind offene Klammern: Ihre Bohrung ist oben durch einen
+ * Schlitz offen (oben wie bei den Senkungen, die Seite, die beim Zuklappen zu A
+ * zeigt), etwas schmaler als der Stift, mit einer Fase als Einfuehrung. Jede
+ * Haelfte wird fuer sich flach gedruckt, ohne Stuetzen, und zugeklappt drueckt
+ * man B auf den Stift, bis es einrastet; dann dreht es sich frei.
+ *
  * Erhoeht liegt Blatt B um Hoehe - 2 Staerken - Spiel ueber der Platte
  * (#1259): Zugeklappt liegt es dann flach auf A, das Spiel dazwischen, und das
  * Scharnier klappt weit ueber die flache Lage hinaus nach unten. Es beginnt
@@ -84,17 +91,36 @@ const MIN_NUT_DEPTH = 0.4;
 export const MAX_HINGE_NUT_WIDTH = 40;
 /** A cone reaches this far into its own knuckle, and a recess's cutter this far out of the end face, so no faces lie flush. */
 const CONE_OVERCUT = 0.05;
+/** The snap hinge: how much narrower the clip's opening is than the pin, in mm (#1520). */
+export const DEFAULT_HINGE_SNAP_GRIP = 0.3;
+export const MIN_HINGE_SNAP_GRIP = 0.05;
+export const MAX_HINGE_SNAP_GRIP = 1.5;
+/** The snap clip's lead-in: at the top of the knuckle its 45 degree chamfers are this much wider than the pin each side. */
+const SNAP_LEAD_IN = 0.5;
+/** Its opening is at least this wide, however small the pin, and its cutters reach this far past the knuckle. */
+const MIN_SNAP_OPENING = 0.4;
+const SNAP_OVERCUT = 0.05;
 
-export type HingeStyle = "pin" | "pinless" | "cone" | "liftOff";
+export type HingeStyle = "pin" | "pinless" | "cone" | "liftOff" | "snap";
 
 /**
  * The hinge's style (#907): a printed pin through the knuckles (default), a bore for a pin of one's own ("pinless", which
  * `hingePinless` used to switch on and still does for designs that have it), cones on every other knuckle nesting into the
- * others, or lift-off: two knuckles, the lower one carrying the pin to the end, the upper one a sleeve that lifts off it.
+ * others, lift-off: two knuckles, the lower one carrying the pin to the end, the upper one a sleeve that lifts off it, or
+ * snap (#1520): A's knuckles carry the pin and B's are open clips that snap over it, the two halves printed apart.
  */
 export function normalizeHingeStyle(value?: string, pinless?: boolean): HingeStyle {
-  if (value === "cone" || value === "pinless" || value === "pin" || value === "liftOff") return value;
+  if (value === "cone" || value === "pinless" || value === "pin" || value === "liftOff" || value === "snap") return value;
   return pinless === true ? "pinless" : "pin";
+}
+
+/**
+ * How much narrower the snap clip's opening is than the pin, in mm: what the clip's sides give way by as the pin goes in,
+ * and what holds it there. At 0.3 the clip of a hinge of the default size bends by about one percent, which PLA and PETG
+ * take again and again; more holds tighter and bends further.
+ */
+export function normalizeHingeSnapGrip(value?: number) {
+  return clamp(finite(value, DEFAULT_HINGE_SNAP_GRIP), MIN_HINGE_SNAP_GRIP, MAX_HINGE_SNAP_GRIP);
 }
 
 /**
@@ -270,10 +296,12 @@ export type HingeShapeFields = Pick<WorkplaneShape, "width" | "height"> & {
   hingeClearance?: number;
   /** No printed pin: the bore runs through every knuckle, for a pin of one's own. */
   hingePinless?: boolean;
-  /** "pin" (default), "pinless" (a bore for a pin of one's own), "cone" (cones on every other knuckle nesting into the others) or "liftOff" (two knuckles, the upper one lifts off the pin). */
+  /** "pin" (default), "pinless" (a bore for a pin of one's own), "cone" (cones on every other knuckle nesting into the others), "liftOff" (two knuckles, the upper one lifts off the pin) or "snap" (B's knuckles are clips that snap over the pin). */
   hingeStyle?: string;
   /** The cone hinge: the diameter of a cone where it grows from its knuckle, in mm; left out, the largest that fits. */
   hingeConeSize?: number;
+  /** The snap hinge: how much narrower the clip's opening is than the pin, in mm; left out, 0.3. */
+  hingeSnapGrip?: number;
   /** Part B folded up about the pin's axis, in degrees (0 = lying flat, 180 = closed, below 0 folded down). */
   hingeAngle?: number;
   /** Screw holes in each leaf along the axis; 0 or left out, none. */
@@ -316,7 +344,19 @@ export function hingePlan(shape: HingeShapeFields) {
   // knuckle: a thicker leaf (a cone hinge's may be as thick as the knuckle) is made thinner, and a knuckle too small for
   // two leaves keeps both on the plate. A lift of a rounding error is none, or B's knuckle would tear open.
   const most = (height - clearance) / 2;
-  const raised = leafStyle === "raised" && most >= MIN_LEAF;
+  // The snap clip's opening: narrower than the pin by the grip, but never closed (a pin of a few tenths keeps a slit narrower
+  // than itself). Its chamfers run from the top of the knuckle down to where the opening is the pin and the lead-in wider
+  // each side; they stop short of the bore, and where the bore comes too near the top there is none.
+  const snap = style === "snap";
+  const snapGrip = normalizeHingeSnapGrip(shape.hingeSnapGrip);
+  const snapHalf = Math.max(pinRadius - snapGrip / 2, Math.min(MIN_SNAP_OPENING / 2, pinRadius / 2));
+  const snapRoom = radius - Math.sqrt(boreRadius * boreRadius - snapHalf * snapHalf) - 0.2;
+  const snapLeadIn = snap ? Math.max(0, Math.min(pinRadius - snapHalf + SNAP_LEAD_IN, snapRoom)) : 0;
+  // A raised leaf B joins its clip near the top: it has to join below the opening and its lead-in, with a little to spare,
+  // or the opening would cut the clip off its leaf. Where it would, B's leaf stays on the plate.
+  const snapReach = snapHalf + 0.2 < radius ? radius + Math.sqrt(radius * radius - (snapHalf + 0.2) ** 2) - snapLeadIn : 0;
+  const snapLets = !snap || height - Math.min(asked, most) - clearance <= snapReach;
+  const raised = leafStyle === "raised" && most >= MIN_LEAF && snapLets;
   const leaf = raised ? Math.min(asked, most) : asked;
   const above = height - 2 * leaf - clearance;
   const lift = raised && above > 1e-6 ? above : 0;
@@ -375,7 +415,7 @@ export function hingePlan(shape: HingeShapeFields) {
   const footprint = Math.max(...[screwTops.a, screwTops.b].map((kind) => (kind === "countersunk" ? screwHeadRadius : kind === "nut" ? nutRadius : screwRadius)));
   const screws = screwHolePlaces(fingers ? 0 : normalizeHingeScrewHoles(shape.hingeScrewHoles), width, depth / 2, leafStartB, cornerRadius, footprint, finite(shape.hingeScrewSpacing, 0), finite(shape.hingeScrewAcross, 0));
   return {
-    width, depth, height, radius, clearance, pinless, angle, style, coneRadius, recessRadius, recessDepth, pinRadius, boreRadius, leaf, raised, lift, knuckles, knuckleLength, chord, leafStart, leafStartB, segments, sides,
+    width, depth, height, radius, clearance, pinless, angle, style, snapGrip, snapHalf, snapLeadIn, coneRadius, recessRadius, recessDepth, pinRadius, boreRadius, leaf, raised, lift, knuckles, knuckleLength, chord, leafStart, leafStartB, segments, sides,
     fingers, cornerRadius, screwRadius, screwSink, screwHeadRadius, screwHead, screwTops, nutWidth, nutDepth, nutRadius, screwZ: screws.z, screwXs: screws.xs,
   };
 }
@@ -412,6 +452,69 @@ function arc(plan: HingePlan, from: number, to: number): P[] {
   return points;
 }
 
+/** Where the segment p-q crosses r-s: the share `t` along p-q and `s` along r-s, or null when they do not cross. */
+function crossing(p: P, q: P, r: P, s: P) {
+  const du = q.u - p.u, dv = q.v - p.v, eu = s.u - r.u, ev = s.v - r.v;
+  const det = du * ev - dv * eu;
+  if (Math.abs(det) < 1e-12) return null;
+  const t = ((r.u - p.u) * ev - (r.v - p.v) * eu) / det;
+  const k = ((r.u - p.u) * dv - (r.v - p.v) * du) / det;
+  return t >= 0 && t <= 1 && k >= 0 && k < 1 ? { t, k } : null;
+}
+
+/**
+ * The snap hinge's clip: B's knuckle section `knuckle` (as bKnuckle, from the leaf's top round to its bottom) with its bore
+ * opened up through the top. The opening is a slot `snapHalf` either side of the axis from the bore up, its mouth
+ * chamfered at 45 degrees from `snapLeadIn` below the top; the cut follows that line from beyond the knuckle on the right
+ * down the slot, round the bore underneath and up and out on the left. Where it first crosses the knuckle's outline and
+ * where it last does, it takes the outline's place, so the loop still starts and ends at the leaf.
+ */
+function snapClip(plan: HingePlan, knuckle: P[]): P[] {
+  const { radius, boreRadius, snapHalf: h, snapLeadIn: c } = plan;
+  const top = 2 * radius;
+  const lip = Math.sqrt(boreRadius * boreRadius - h * h);
+  // The bore's corners from the right side of the slot clockwise round to the left side, the long way.
+  const from = Math.atan2(lip, h);
+  const bore = Array.from({ length: plan.sides }, (_, k) => {
+    let angle = -Math.PI / 2 + (2 * Math.PI * k) / plan.sides;
+    while (angle > from) angle -= 2 * Math.PI;
+    while (angle <= from - 2 * Math.PI) angle += 2 * Math.PI;
+    return angle;
+  })
+    .filter((angle) => angle < from - 1e-9 && angle > -Math.PI - from + 1e-9)
+    .sort((p, q) => q - p)
+    .map((angle) => ({ u: boreRadius * Math.cos(angle), v: radius + boreRadius * Math.sin(angle) }));
+  const cut: P[] = [
+    { u: h + c + 1, v: top + 1 },
+    { u: h, v: top - c },
+    { u: h, v: radius + lip },
+    ...bore,
+    { u: -h, v: radius + lip },
+    { u: -h, v: top - c },
+    { u: -h - c - 1, v: top + 1 },
+  ];
+  const hits: Array<{ along: number; edge: number; at: P }> = [];
+  for (let n = 0; n + 1 < cut.length; n += 1) {
+    knuckle.forEach((p, edge) => {
+      const hit = crossing(cut[n], cut[n + 1], p, knuckle[(edge + 1) % knuckle.length]);
+      if (hit) hits.push({ along: n + hit.t, edge, at: { u: cut[n].u + hit.t * (cut[n + 1].u - cut[n].u), v: cut[n].v + hit.t * (cut[n + 1].v - cut[n].v) } });
+    });
+  }
+  if (hits.length < 2) return knuckle;
+  hits.sort((p, q) => p.along - q.along);
+  const enter = hits[0], leave = hits[hits.length - 1];
+  if (enter.edge > leave.edge) return knuckle;
+  const loop = [
+    ...knuckle.slice(0, enter.edge + 1),
+    enter.at,
+    ...cut.slice(Math.floor(enter.along) + 1, Math.floor(leave.along) + 1),
+    leave.at,
+    ...knuckle.slice(leave.edge + 1),
+  ];
+  // A crossing on a corner of the outline or the cut would repeat that corner.
+  return loop.filter((p, n) => n === 0 || Math.hypot(p.u - loop[n - 1].u, p.v - loop[n - 1].v) > 1e-9);
+}
+
 /** The sections every body is made of, counter-clockwise in (u = z, v = y). */
 export function hingeSections(plan: HingePlan) {
   const { depth, leaf, chord, leafStart: e, leafStartB: eB, lift } = plan;
@@ -428,6 +531,7 @@ export function hingeSections(plan: HingePlan) {
   const arcA = arc(plan, -Math.PI / 2, left);
   const low = meet(lift), high = meet(lift + leaf);
   const arcB = arc(plan, high.angle, low.angle + 2 * Math.PI);
+  const bKnuckle = [{ u: eB, v: lift + leaf }, high.at, ...arcB, low.at, { u: eB, v: lift }];
   return {
     // A's knuckle with its leaf, the pin inside it.
     aFull: [{ u: -half, v: 0 }, { u: -e, v: 0 }, bottom, ...arcA, { u: -chord, v: leaf }, { u: -e, v: leaf }, { u: -half, v: leaf }],
@@ -439,7 +543,9 @@ export function hingeSections(plan: HingePlan) {
     bFull: [low.at, { u: eB, v: lift }, { u: half, v: lift }, { u: half, v: lift + leaf }, { u: eB, v: lift + leaf }, high.at, ...arcB],
     bCap: [low.at, { u: eB, v: lift }, { u: eB, v: lift + leaf }, high.at, ...arcB],
     // B's knuckle as bCap, starting so that the side towards the leaf (u = eB) closes the loop, as aCap's does.
-    bKnuckle: [{ u: eB, v: lift + leaf }, high.at, ...arcB, low.at, { u: eB, v: lift }],
+    bKnuckle,
+    // The snap hinge's B: its knuckle as a clip open at the top, the same way round.
+    clip: plan.style === "snap" ? snapClip(plan, bKnuckle) : bKnuckle,
     bLeaf: [{ u: eB, v: lift }, { u: half, v: lift }, { u: half, v: lift + leaf }, { u: eB, v: lift + leaf }],
     bore: circle(plan, plan.boreRadius),
   };
@@ -632,6 +738,13 @@ export function hingeTriangles(shape: HingeShapeFields) {
   const firstOfB = triangles.length;
   const b = plan.segments.filter((segment) => segment.owner === "b");
   b.forEach((segment) => {
+    if (plan.style === "snap") {
+      // The clip: one loop round the knuckle, down the slot and round the bore, open only where the leaf joins it.
+      walls(s.clip, segment.x0, segment.x1, false, true);
+      cap(s.clip, [], segment.x0, -1);
+      cap(s.clip, [], segment.x1, 1);
+      return;
+    }
     walls(s.bKnuckle, segment.x0, segment.x1, false, true);
     if (coned) {
       // A blind conical recess in each end face, for the cones of the neighbours.
@@ -674,7 +787,7 @@ export function createHingeGeometry(shape: HingeShapeFields): THREE.BufferGeomet
 }
 
 export type HingeLocalPart = Pick<WorkplaneShape, "kind" | "x" | "z" | "elevation" | "width" | "depth" | "height" | "rotationX" | "rotationZ" | "bevel" | "hole" | "screwHoleShaft" | "screwHoleAngle" | "sides"> & {
-  /** Its knuckle's index in `plan.segments`, for a knuckle of B whose parts are joined and cut on their own (the cone hinge). */
+  /** Its knuckle's index in `plan.segments`, for a knuckle of B whose parts are joined and cut on their own (the cone and snap hinges). */
   knuckle?: number;
 };
 
@@ -686,7 +799,9 @@ export type HingeLocalPart = Pick<WorkplaneShape, "kind" | "x" | "z" | "elevatio
  * the screw holes are parts marked `hole`, cut out of them afterwards. The cone
  * hinge's cones are lying cones on A's knuckles; each knuckle of B, with the
  * strip under it, has its two recesses cut on its own (`knuckle`), as the cone
- * of the neighbour sits in each recess and would be cut with it.
+ * of the neighbour sits in each recess and would be cut with it. The snap
+ * hinge's clips are opened the same way, each on its own round the pin: a box
+ * for the slot and two boxes turned 45 degrees for the lead-in.
  */
 export function hingeLocalParts(shape: HingeShapeFields): HingeLocalPart[] {
   const plan = hingePlan(shape);
@@ -725,7 +840,7 @@ export function hingeLocalParts(shape: HingeShapeFields): HingeLocalPart[] {
   // B's parts that fold up with it; its tubes lie on the axis and only spin in place.
   const folding = new Set<HingeLocalPart>(bLeaf);
   // The pin runs the whole length: through all knuckles, or (lift-off) on into the upper one, which lifts off it.
-  if (plan.style === "pin" || plan.style === "liftOff") parts.push({ kind: "cylinder", ...lying(0, pinRadius * 2, width) });
+  if (plan.style === "pin" || plan.style === "liftOff" || plan.style === "snap") parts.push({ kind: "cylinder", ...lying(0, pinRadius * 2, width) });
   const coned = plan.style === "cone";
   // A cone lying on the axis, its base of radius `base` at `x` and its point at `apexX`: turned -90 degrees about z its
   // point is towards +x, turned 90 towards -x.
@@ -751,14 +866,26 @@ export function hingeLocalParts(shape: HingeShapeFields): HingeLocalPart[] {
       parts.push(under);
       folding.add(under);
     } else {
-      parts.push({ kind: "tube", ...lying(center, radius * 2, knuckleLength), bevel: radius - boreRadius });
+      // The snap hinge's clip is cut open on its own, as the pin lies in it and would be cut with it.
+      const own = plan.style === "snap" ? { knuckle: index } : {};
+      parts.push({ kind: "tube", ...lying(center, radius * 2, knuckleLength), bevel: radius - boreRadius, ...own });
       // Raised, the strip under the knuckle starts in the tube's wall where the bore ends at the leaf's height nearest the
       // axis, so the pin stays free and the leaf still reaches the knuckle.
       const near = Math.max(0, lift - radius, radius - lift - leaf);
       const from = lift > 0 ? Math.sqrt(Math.max(0, boreRadius * boreRadius - near * near)) : 0;
-      const under: HingeLocalPart = { kind: "box", x: center, z: (from + eB) / 2, elevation: lift, width: knuckleLength, depth: eB - from, height: leaf };
+      const under: HingeLocalPart = { kind: "box", x: center, z: (from + eB) / 2, elevation: lift, width: knuckleLength, depth: eB - from, height: leaf, ...own };
       parts.push(under);
       folding.add(under);
+      if (plan.style === "snap") {
+        // The opening: a slot from inside the bore up through the top, and for the lead-in a square turned 45 degrees on
+        // each of its edges, its corner where the chamfer meets the slot. All a little longer than the knuckle and turning with B.
+        const long = knuckleLength + 2 * SNAP_OVERCUT;
+        const cutters: HingeLocalPart[] = [{ kind: "box", x: center, z: 0, elevation: radius, width: long, depth: 2 * plan.snapHalf, height: radius + SNAP_OVERCUT, hole: true, knuckle: index }];
+        const side = plan.snapLeadIn * Math.SQRT2;
+        if (side > 0) cutters.push(...[-1, 1].map((end): HingeLocalPart => ({ kind: "box", x: center, z: end * plan.snapHalf, elevation: 2 * radius - side / 2, width: long, depth: side, height: side, rotationX: 45, hole: true, knuckle: index })));
+        parts.push(...cutters);
+        cutters.forEach((part) => folding.add(part));
+      }
     }
   });
   const bScrews = screwParts(1);
@@ -772,7 +899,8 @@ export function hingeLocalParts(shape: HingeShapeFields): HingeLocalPart[] {
       const dz = part.z ?? 0;
       part.elevation = radius + dy * Math.cos(turn) + dz * Math.sin(turn) - part.height / 2;
       part.z = -dy * Math.sin(turn) + dz * Math.cos(turn);
-      part.rotationX = -plan.angle;
+      // On top of its own turn: the snap clip's lead-in stands at 45 degrees.
+      part.rotationX = (part.rotationX ?? 0) - plan.angle;
     });
   }
   return parts;

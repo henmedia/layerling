@@ -93,10 +93,11 @@ Umetna inteligenca dela z istimi funkcijami kot ti, teče po isti poti kot tvoje
 | `layerling_import_mesh` | prinese mrežo trikotnikov v načrt |
 | `layerling_update_object` | spremeni mere, lego, barvo, ime, telo ali luknjo in vse, kar oblika še ima, pri besedilu tudi rob črk |
 | `layerling_align_objects` | poravna objekte drug z drugim |
-| `layerling_scale_objects` | poveča objekte za odstotno vrednost, skupaj ali vsak zase |
+| `layerling_scale_objects` | poveča objekte za odstotno vrednost, skupaj ali vsak zase ali v modelarsko merilo, npr. 1:87 |
 | `layerling_lay_flat` | položi objekt s ploskvijo na ploščo |
 | `layerling_place_on_face` | postavi objekte na ploskev drugega, tudi poševno, kot tipka C |
 | `layerling_perforate_face` | vreže vzorec lukenj v ravno ploskev ali okrog stene valja, cevi ali izvrtine, luknje ostanejo kot luknje, združene v skupino s telesom |
+| `layerling_thread_insert` | naredi luknjo za vtisnjeni navojni vložek (M2 do M8, 1/4-20 ali lastna velikost) v ravno ploskev ali v zunanjo steno valja ali cevi, potem ko preveri, da sta stena ob luknji in globina za njo dovolj veliki; luknja ostane kot luknja, združena v skupino s telesom |
 | `layerling_sweep_sketch` | povleče pravokoten ali okrogel prerez vzdolž poti iz točk kot eno natančno telo; sklenjena pot da obroč |
 | `layerling_push_face` | ravno ploskev potegne navzven ali vanjo izreže žep, z odmikom od roba in polmerom vogalov; nov del je telo iz skice, združeno v skupino s telesom |
 | `layerling_paint` | pobarva dele telesa v lastnih barvah za tisk v več barvah (Barvanje): zapolni ploskev do ostrih robov, okrogla lisa ali laso v ravnem pogledu; radiranje, odstrani vse; shrani se s telesom in se v 3MF zapiše kot pobarvane ploskve |
@@ -115,6 +116,7 @@ Umetna inteligenca dela z istimi funkcijami kot ti, teče po isti poti kot tvoje
 | `layerling_cookie_cutter` | makes a cookie cutter from the objects: a wall and a rim round the outline (Cookie cutter) |
 | `layerling_flexi_joints` | cuts a flat body into links with joints printed in place that swing to the sides (Flexi joints) |
 | `layerling_make_lid` | makes a lid for a body open at the top: pushed in, over the top or flat, with the fit you choose and magnets if you like (Lid) |
+| `layerling_make_mold` | makes a mold or a die from a master: a two-part mold to cast in, a silicone pour box, an open mold, or a stamp and die for sheet (Mold & die) |
 | `layerling_make_cable_channel` | runs a round channel for a cable through a body from an entry to an exit, finding the way itself with gentle bends (Cable channel) |
 | `layerling_loft_sketches` | joins two sketch bodies into a loft from one outline to the other (Loft sketches) |
 | `layerling_separate_parts` | razstavi obliko z ločenimi deli, telo iz skice na eno telo za vsak obris |
@@ -141,6 +143,8 @@ Umetna inteligenca dela z istimi funkcijami kot ti, teče po isti poti kot tvoje
 | `layerling_check_clearance` | pred tiskanjem preveri, kateri deli se prekrivajo, dotikajo ali so bližje od najmanjše zračnosti (Preveri zračnost), tudi ločene dele enega predmeta |
 | `layerling_printer_play` | prebere, nastavi ali izbriše zračnost tiskalnika ({{ui:workspace.printerPlay}} v nastavitvah) in položi preizkus ujemanja, ki jo izmeri |
 | `layerling_check_print` | pred tiskanjem preveri, kaj bi šlo narobe: pretanke stene za šobo, lebdeče dele, majhen stik s ploščo, previse in odprte mreže (Preveri tisk) |
+| `layerling_check_layers` | razreže tisk na plasti in po plasteh našteje, kaj bi šlo narobe: previsi, mesta brez podpore, mostovi, tanke stene, majhni otočki, del v podlagi (Analiza tiska) |
+| `layerling_split_bolt` | razdeli vijak ali navojno palico po dolžini skozi os in obe polovici položi na rezno ploskev za tisk, po želji s centrirnimi zatiči |
 | `layerling_add_reference_points` | postavi referenčne točke - na sredine, vogale ali sredine robov objektov ali na natančna mesta -, na katere se oblike zaskočijo |
 | `layerling_list_reference_points` | našteje referenčne točke z oznako in lego |
 | `layerling_remove_reference_points` | izbriše referenčne točke po oznaki ali vse |
@@ -166,6 +170,9 @@ Umetna inteligenca dela z istimi funkcijami kot ti, teče po isti poti kot tvoje
 | `layerling_saved_view` | shrani trenutni pogled pod tipko 7, 8, 9 ali 0 in se vrne nanj, kot Shift+tipka in tipka (samo pogled); nastavi tudi začetni pogled novih osnutkov |
 | `layerling_build_plates` | našteje, doda, poimenuje, razvrsti in odstrani tiskalne plošče, premakne predmete na ploščo in jih razporedi po ploščah, kot vrstica plošč |
 | `layerling_clear_history` | za vedno izbriše vse korake razveljavitve, kot gumb »Izbriši zgodovino« v pogledu zgodovine; potrebuje `confirm: true` |
+| `layerling_delete_history_steps` | trajno izbriše posamezna stanja zgodovine, nikoli trenutnega, kot koš ob koraku na seznamu pogleda zgodovine; potrebuje `steps` in `confirm: true` |
+| `layerling_list_backups` | navede samodejne varnostne kopije (Prejšnje različice) odprtega projekta, z `all: true` pa vseh projektov v tem brskalniku |
+| `layerling_open_backup` | odpre varnostno kopijo po njenem `id` kot nov projekt, nikoli vezan na izvirno datoteko |
 | `layerling_set_history_view` | pogleda nazaj na prejšnje stanje projekta, kot pogled zgodovine (pravi načrt ostane nedotaknjen; orodja, ki spreminjajo, počakajo, da se zapre) |
 | `layerling_restore_from_history` | vrne objekte (tudi dele v skupinah) iz prejšnjega stanja v načrt kot kopije, kot »Vrni v načrt« v pogledu zgodovine - en korak, ki ga razveljavitev vzame nazaj |
 | `layerling_export_drawing` | naredi delavniško risbo izvoza »2D«: trije pogledi v merilu 1:1 na listu ISO s skupnimi merami in tabelo okroglih izvrtin, kot besedilo SVG ali PDF |

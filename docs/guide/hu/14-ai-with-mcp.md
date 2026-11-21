@@ -93,10 +93,11 @@ Az MI ugyanazokkal a funkciókkal dolgozik, mint te, ugyanazon az úton, mint a 
 | `layerling_import_mesh` | háromszöghálót hoz be a tervbe |
 | `layerling_update_object` | méreteket, helyzetet, színt, nevet, tömör vagy lyuk állapotot és minden mást módosít, ami az alakzathoz tartozik, egy szöveg betűélét is |
 | `layerling_align_objects` | objektumokat igazít egymáshoz |
-| `layerling_scale_objects` | objektumokat méretez százalékban, együtt vagy mindegyiket a helyén |
+| `layerling_scale_objects` | objektumokat méretez százalékban, együtt vagy mindegyiket a helyén, vagy modellméretarányra, például 1:87-re |
 | `layerling_lay_flat` | egy objektumot az egyik lapjával a tárgyasztalra fektet |
 | `layerling_place_on_face` | objektumokat tesz le egy másik objektum lapjára, a ferdékre is, mint a C billentyű |
 | `layerling_perforate_face` | lyukmintát vág egy sík lapba vagy egy henger, cső vagy furat kerek falára körbe; a lyukak a testtel csoportosított lyukak maradnak |
+| `layerling_thread_insert` | elkészíti a lyukat egy hőbesüllyesztéses menetes betéthez (M2-től M8-ig, 1/4-20 vagy saját méret) egy sík lapba vagy egy henger vagy cső külső falába, miután ellenőrizte, hogy a lyuk melletti fal és a mögötte lévő mélység elég; a lyuk a testtel csoportosított lyuk marad |
 | `layerling_sweep_sketch` | téglalap vagy kör keresztmetszetet húz végig egy pontokból álló pályán egyetlen pontos testként; zárt pálya gyűrűt ad |
 | `layerling_push_face` | kihúz egy sík lapot, vagy zsebet vág bele, a lap szélétől mért távolsággal és sarokrádiusszal; az új rész a testtel csoportosított vázlattest |
 | `layerling_paint` | többszínű nyomtatáshoz saját színekkel festi egy test részeit (Festés): lap kitöltése az éles élekig, kerek folt vagy sík nézetben rajzolt lasszó; radírozás, mindent levesz; a testtel mentődik, és a 3MF-be festett lapokként kerül |
@@ -115,6 +116,7 @@ Az MI ugyanazokkal a funkciókkal dolgozik, mint te, ugyanazon az úton, mint a 
 | `layerling_cookie_cutter` | makes a cookie cutter from the objects: a wall and a rim round the outline (Cookie cutter) |
 | `layerling_flexi_joints` | cuts a flat body into links with joints printed in place that swing to the sides (Flexi joints) |
 | `layerling_make_lid` | makes a lid for a body open at the top: pushed in, over the top or flat, with the fit you choose and magnets if you like (Lid) |
+| `layerling_make_mold` | makes a mold or a die from a master: a two-part mold to cast in, a silicone pour box, an open mold, or a stamp and die for sheet (Mold & die) |
 | `layerling_make_cable_channel` | runs a round channel for a cable through a body from an entry to an exit, finding the way itself with gentle bends (Cable channel) |
 | `layerling_loft_sketches` | joins two sketch bodies into a loft from one outline to the other (Loft sketches) |
 | `layerling_separate_parts` | egy alakzatot a különálló részeire bont, a vázlattestet körvonalanként egy testre |
@@ -141,6 +143,8 @@ Az MI ugyanazokkal a funkciókkal dolgozik, mint te, ugyanazon az úton, mint a 
 | `layerling_check_clearance` | nyomtatás előtt ellenőrzi, mely alkatrészek fedik át egymást, érnek össze vagy kerülnek közelebb egy minimális hézagnál, egy objektum különálló részeit is |
 | `layerling_printer_play` | kiolvassa, beállítja vagy törli a nyomtató hézagát ({{ui:workspace.printerPlay}} a beállításokban), és elhelyezi az illesztési próbát, amely ezt méri |
 | `layerling_check_print` | nyomtatás előtt ellenőrzi, mi romlana el: a fúvókához túl vékony falak, lebegő alkatrészek, kevés érintkezés a tálcával, túlnyúlások és nyitott hálók |
+| `layerling_check_layers` | rétegekre bontja a nyomatot, és rétegenként felsorolja, mi menne rosszul: túlnyúlások, alátámasztás nélküli részek, hidak, vékony falak, kis szigetek, a tálcába lógó rész (Nyomtatáselemzés) |
+| `layerling_split_bolt` | egy csavart vagy menetes szárat hosszában a tengelyén át kettévág, és mindkét felét a vágott lapjára fekteti nyomtatáshoz, kérésre illesztőcsapokkal |
 | `layerling_add_reference_points` | referenciapontokat jelöl meg – objektumok középpontján, sarkain vagy élfelezőin, vagy pontos helyeken –, amelyekhez az alakzatok illeszkednek |
 | `layerling_list_reference_points` | felsorolja a referenciapontokat az azonosítójukkal és a helyzetükkel |
 | `layerling_remove_reference_points` | azonosító alapján vagy mindet törli a referenciapontokat |
@@ -166,6 +170,9 @@ Az MI ugyanazokkal a funkciókkal dolgozik, mint te, ugyanazon az úton, mint a 
 | `layerling_saved_view` | elmenti az aktuális nézetet a 7, 8, 9 vagy 0 billentyű alá, és visszaállítja, mint a Shift+billentyű és a billentyű (csak a nézet); az új tervek indulási nézetét is beállítja |
 | `layerling_build_plates` | listázza, hozzáadja, elnevezi, sorba rendezi és eltávolítja a nyomtatótálcákat, objektumokat tesz egy tálcára és elrendezi őket a tálcákon, mint a tálcasáv |
 | `layerling_clear_history` | véglegesen töröl minden visszavonási lépést, ahogy az előzménynézet „Előzmények törlése” gombja; `confirm: true` kell hozzá |
+| `layerling_delete_history_steps` | véglegesen töröl egyes állapotokat az előzményekből, a jelenlegit soha, mint a lépés melletti kuka az előzménynézet listájában; kell hozzá `steps` és `confirm: true` |
+| `layerling_list_backups` | felsorolja a megnyitott terv automatikus mentéseit (Korábbi változatok), `all: true` esetén a böngésző összes tervéét |
+| `layerling_open_backup` | egy mentést az `id`-ja alapján új tervként nyit meg, sosem kötve az eredeti fájlhoz |
 | `layerling_set_history_view` | visszatekint a projekt egy korábbi állapotára, mint az előzménynézet (a valódi terv érintetlen marad; a módosító eszközök várnak, amíg bezárul) |
 | `layerling_restore_from_history` | objektumokat (csoportokon belüli alkatrészeket is) hoz vissza másolatként egy korábbi állapotból a tervbe, mint az előzménynézet visszahozó gombja - egy lépés, amelyet a visszavonás visszavesz |
 | `layerling_export_section_svg` | 1:1 méretarányú SVG-ként adja vissza egy vágósík körvonalait, ugyanazokból a testekből, mint az export |

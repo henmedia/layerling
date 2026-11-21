@@ -1,3 +1,4 @@
+import { normalizePolygonCornerRadius } from "@/lib/roundedPolygonGeometry";
 import * as THREE from "three";
 import { taperedSlotOutline } from "@/lib/slotGeometry";
 import { weldOnGrid } from "@/lib/gridWeld";
@@ -8,7 +9,7 @@ import { profileArcPoint, profileLoopBounds, TWIST_SECTION_STEP, validateCadProf
 import { cadTransformFromMatrix } from "@/lib/cadBakeMetadata";
 import { CAD_MODIFIER_EXACT_SEGMENT_LIMIT } from "@/lib/cadModifierRuntime";
 import { deformsAboutOrigin, extrudeTwistPivot, meshYawDegrees, mirrorSign, shapeDepth, shapeHasExtrudeDeform, shapeHasShapeDeform, shapeHasTaper, shapeTaperDimensions, shapeWidth } from "@/lib/workplaneShapes";
-import { alongLevels, LYING_ALONG_KINDS, narrowCurveForShape, narrowHalfWidthAt, normalizeSlopeSide, shapeHasAlongDeform, shapeHasNarrow, shapeHasSymmetricDeform, shapeHasSlope, slopeAlongWidth, slopeCurveForShape, slopeScaleAt, slopeSectionCount } from "@/lib/slopeAlong";
+import { alongLevels, LYING_ALONG_KINDS, narrowCurveForShape, narrowHalfWidthAt, normalizeSlopeSide, shapeHasAlongDeform, shapeHasNarrow, shapeHasSymmetricDeform, shapeHasSlope, slopeAlongWidth, slopeCurveForShape, slopeLengths, slopeScaleAt, slopeSectionCount } from "@/lib/slopeAlong";
 import { regularPolygonFootprintScale } from "@/lib/regularPolygonFootprint";
 import { roundSideCount } from "@/lib/roundSideCount";
 import { drawnRound, ROUND_FROM_BENT_TUBE_QUALITY, ROUND_FROM_HALF_SPHERE_STEPS, ROUND_FROM_ROOF_SIDES, ROUND_FROM_SIDES, ROUND_FROM_SPHERE_STEPS } from "@/lib/roundness";
@@ -36,11 +37,11 @@ import { loadedManifoldRuntime } from "@/lib/manifoldHandle";
 import { threadBuildPlan, WHITWORTH_PROFILE_CONSTANTS } from "@/lib/threadGeometry";
 import { springBuildPlan, springRingSectionShare } from "@/lib/springGeometry";
 import { flatSpringProfileLoops } from "@/lib/flatSpringGeometry";
-import { gridfinityHasPieces, gridfinityPlan } from "@/lib/gridfinityGeometry";
+import { gridfinityHasPieces, gridfinityLabelText, gridfinityPlan } from "@/lib/gridfinityGeometry";
 import { gridfinityLabelGlyphs } from "@/lib/gridfinityLabelText";
 import { knurlCorners, knurlSettings, roundKnurlWave } from "@/lib/knurlGeometry";
 import { pulleyArcPoint, pulleyMeasures, pulleyToothArcs } from "@/lib/pulleyGeometry";
-import { BEVEL_GEAR_TOP_SCALE, bevelGearIsSpiral, gearHelixTwist, gearOutlineCorners, gearTypeHasHelix, internalGearMeasures, internalGearOutline, involuteFlankPoint, involuteGearMeasures, involuteOutlineStretch, involuteToothCentre, normalizeGearCenterHoleSize, normalizeGearProfile, normalizeGearToothSize, normalizeGearType, rackMeasures, rackOutlinePoints, rackToothArcs, roundGearMeasures, roundInternalMeasures, roundToothArcs, type GearOutlineOptions, type InternalGearOptions, type InvoluteGearMeasures, type RackOptions, type RoundWave } from "@/lib/gearGeometry";
+import { BEVEL_GEAR_TOP_SCALE, bevelGearIsSpiral, extendedRackMeasures, gearHelixTwist, gearOutlineCorners, gearTypeHasHelix, internalGearMeasures, internalGearOutline, involuteFlankPoint, involuteGearMeasures, involuteOutlineStretch, involuteToothCentre, normalizeGearCenterHoleSize, normalizeGearProfile, normalizeGearToothSize, normalizeGearTeeth, normalizeGearType, rackExtraTeeth, rackHelixTravel, rackMeasures, rackOutlinePoints, rackToothArcs, ringGearHelixTwist, ringRackIsHelical, roundGearMeasures, roundInternalMeasures, roundToothArcs, type GearOutlineOptions, type InternalGearOptions, type InvoluteGearMeasures, type RackOptions, type RoundWave } from "@/lib/gearGeometry";
 
 /*
  * The outlines below follow the display geometry of each shape
@@ -161,14 +162,23 @@ function fitLoop(loop: CadModifierProfileLoop, width: number, depth: number) {
 }
 
 /** createPrismGeometry: THREE.CylinderGeometry corners (sin, cos) fitted with regularPolygonFootprintScale. */
-export function polygonProfileLoops(width: number, depth: number, sides = 6) {
+export function polygonProfileLoops(width: number, depth: number, sides = 6, cornerRadius = 0) {
   const count = Math.max(3, Math.round(sides));
   const fit = regularPolygonFootprintScale(width, depth, count);
   const points = Array.from({ length: count }, (_, index) => {
     const angle = (index / count) * Math.PI * 2;
     return { x: Math.sin(angle) * fit.x + fit.offsetX, z: Math.cos(angle) * fit.z + fit.offsetZ };
   });
-  return [polygonLoop(points)];
+  // Rounded corners (roundedPolygonGeometry.ts) as true arcs, one radius for every corner.
+  const radius = normalizePolygonCornerRadius(cornerRadius, width, depth, count);
+  if (radius <= 1e-4) return [polygonLoop(points)];
+  const corners = points.map((corner, index): Corner => {
+    const previous = points[(index - 1 + count) % count];
+    const next = points[(index + 1) % count];
+    const angles = cornerAngles(previous, corner, next);
+    return roundedCorner(previous, corner, next, radius / angles.tanAlpha, radius, angles.sinAlpha);
+  });
+  return [loopFromCorners(corners)];
 }
 
 /** createStarGeometry / buildStarContourPoints, with the corner roundings as true arcs. */
@@ -1046,7 +1056,7 @@ export function cadProfileForShapeKind(shape: WorkplaneShape, designedRound = fa
     case "bentTube":
       return bentTubeSweep(shape, width, depth, designedRound);
     case "polygon":
-      return { loops: polygonProfileLoops(width, depth, shape.sides ?? 6) };
+      return { loops: polygonProfileLoops(width, depth, shape.sides ?? 6, shape.cornerFillet ?? 0) };
     case "star":
       return { loops: starProfileLoops(width, depth, shape) };
     case "heart":
@@ -1225,7 +1235,7 @@ export function cadProfileForShapeKind(shape: WorkplaneShape, designedRound = fa
       const slot = shape.screwHoleSlot ? screwHoleSlotMeasures(width, depth) : null;
       // Only a round hole is a body of revolution; stretched along z it stays a mesh.
       if (!slot && Math.abs(width - depth) > 1e-6) return null;
-      const points = screwHoleProfile({ kind: shape.kind, width: slot ? slot.head : width, height: shape.height, screwHoleShaft: shape.screwHoleShaft, screwHoleHeadDepth: shape.screwHoleHeadDepth, screwHoleAngle: shape.screwHoleAngle, screwHoleRecess: shape.screwHoleRecess, drillPointAngle: shapeDrillPointAngle(shape) })
+      const points = screwHoleProfile({ kind: shape.kind, width: slot ? slot.head : width, height: shape.height, screwHoleShaft: shape.screwHoleShaft, screwHoleHeadDepth: shape.screwHoleHeadDepth, screwHoleAngle: shape.screwHoleAngle, screwHoleRecess: shape.screwHoleRecess, screwHoleChamfer: shape.screwHoleChamfer, drillPointAngle: shapeDrillPointAngle(shape) })
         .map(({ r, y }) => ({ x: r, z: y }));
       // A drill point's tip (Discussion #621) lies on the axis already; the loop leaves out the edge of no length to it.
       const section = [{ x: 0, z: points[0].z }, ...points, { x: 0, z: points[points.length - 1].z }];
@@ -1248,6 +1258,8 @@ export function cadProfileForShapeKind(shape: WorkplaneShape, designedRound = fa
     }
     case "gear": {
       const gearType = normalizeGearType(shape.gearType);
+      // Slanted teeth (Discussion #1627) are no straight extrusion: cadModifierHelicalGearForShape builds them.
+      if (ringRackIsHelical(shape)) return null;
       if (gearType === "internal") return { loops: internalGearLoops(width, depth, shape) };
       if (gearType === "rack") return { loops: [rackLoop(width, depth, shape)] };
       return gearType === "spur" ? { loops: gearProfileLoops(width, depth, shape) } : null;
@@ -1445,7 +1457,8 @@ function trimmedUprightProfile(shape: WorkplaneShape, width: number, depth: numb
     if (topRound > 1e-4 || bottomRound > 1e-4) return null;
   }
   const alongWidth = slopeAlongWidth(side);
-  const half = (alongWidth ? width : depth) / 2;
+  // A tube's bore split off as a hole is trimmed by the tube's top line, which runs on past it at both ends (#1698).
+  const half = Math.max(alongWidth ? width : depth, slopeLengths(shape, alongWidth).span) / 2;
   const keepAt = keptEndAt(side, half);
   const farAt = -keepAt;
   const outward = Math.sign(farAt - keepAt);
@@ -1780,7 +1793,7 @@ export function cadModifierGridfinityForShape(shape: WorkplaneShape): CadModifie
   const width = shapeWidth(shape);
   const depth = shapeDepth(shape);
   if (![width, depth, shape.height].every((value) => Number.isFinite(value) && value > 0)) return null;
-  const plan = gridfinityPlan({ width, depth, height: shape.height, gridfinityType: shape.gridfinityType, gridfinityLip: shape.gridfinityLip, gridfinityMagnets: shape.gridfinityMagnets, gridfinityHalfGrid: shape.gridfinityHalfGrid, gridfinityLargePlate: shape.gridfinityLargePlate, gridfinitySwallowtail: shape.gridfinitySwallowtail, gridfinityPaddingBack: shape.gridfinityPaddingBack, gridfinityPaddingFront: shape.gridfinityPaddingFront, gridfinityPaddingLeft: shape.gridfinityPaddingLeft, gridfinityPaddingRight: shape.gridfinityPaddingRight, gridfinityOutline: shape.gridfinityOutline });
+  const plan = gridfinityPlan({ width, depth, height: shape.height, gridfinityType: shape.gridfinityType, gridfinityLip: shape.gridfinityLip, gridfinityMagnets: shape.gridfinityMagnets, gridfinityHalfGrid: shape.gridfinityHalfGrid, gridfinityLargePlate: shape.gridfinityLargePlate, gridfinitySwallowtail: shape.gridfinitySwallowtail, gridfinityPaddingBack: shape.gridfinityPaddingBack, gridfinityPaddingFront: shape.gridfinityPaddingFront, gridfinityPaddingLeft: shape.gridfinityPaddingLeft, gridfinityPaddingRight: shape.gridfinityPaddingRight, gridfinityOverhangBack: shape.gridfinityOverhangBack, gridfinityOverhangFront: shape.gridfinityOverhangFront, gridfinityOverhangLeft: shape.gridfinityOverhangLeft, gridfinityOverhangRight: shape.gridfinityOverhangRight, gridfinityOverhangChamfer: shape.gridfinityOverhangChamfer, gridfinityOverhangSolid: shape.gridfinityOverhangSolid, gridfinityOverhangLipOnGrid: shape.gridfinityOverhangLipOnGrid, gridfinityOutline: shape.gridfinityOutline });
   // Label shelves, finger scoops and dividers, an outline plate's sockets and a Swallowtail plate's pockets, are in the display mesh only once Manifold has loaded; until then the body would not match it (#455, #554, #1061).
   if (!loadedManifoldRuntime() && gridfinityHasPieces({ ...shape, width, depth })) return null;
   // The letters on the shelves (#1308) with the font's own curves, laid out where the display mesh has them.
@@ -1795,9 +1808,10 @@ export function cadModifierGridfinityForShape(shape: WorkplaneShape): CadModifie
       return outer && holes.every((hole) => hole !== null) ? [[outer, ...(holes as CadModifierProfileLoop[])]] : [];
     }),
   }));
+  // An overhang built as a ring (solid, or the lip kept on the grid) plans the bin without it: the part is the whole box.
   return {
-    width: plan.size.width,
-    depth: plan.size.depth,
+    width: plan.overhang?.outer.width ?? plan.size.width,
+    depth: plan.overhang?.outer.depth ?? plan.size.depth,
     height: plan.size.height,
     gridfinityType: plan.type,
     gridfinityLip: plan.lip,
@@ -1823,6 +1837,11 @@ export function cadModifierGridfinityForShape(shape: WorkplaneShape): CadModifie
     gridfinityLabelRightOffset: shape.gridfinityLabelRightOffset,
     gridfinityLabelCorner: shape.gridfinityLabelCorner,
     gridfinityLabelCornerSize: shape.gridfinityLabelCornerSize,
+    // The texts lower a tray's shelves under them (#1501); normalised, so a blank one gives the same part as none. The letters come as outlines below.
+    gridfinityLabelBackText: gridfinityLabelText(shape.gridfinityLabelBackText),
+    gridfinityLabelFrontText: gridfinityLabelText(shape.gridfinityLabelFrontText),
+    gridfinityLabelLeftText: gridfinityLabelText(shape.gridfinityLabelLeftText),
+    gridfinityLabelRightText: gridfinityLabelText(shape.gridfinityLabelRightText),
     gridfinityScoopBack: shape.gridfinityScoopBack,
     gridfinityScoopFront: shape.gridfinityScoopFront,
     gridfinityScoopLeft: shape.gridfinityScoopLeft,
@@ -1839,11 +1858,19 @@ export function cadModifierGridfinityForShape(shape: WorkplaneShape): CadModifie
     gridfinityPaddingFront: shape.gridfinityPaddingFront,
     gridfinityPaddingLeft: shape.gridfinityPaddingLeft,
     gridfinityPaddingRight: shape.gridfinityPaddingRight,
+    gridfinityOverhangBack: shape.gridfinityOverhangBack,
+    gridfinityOverhangFront: shape.gridfinityOverhangFront,
+    gridfinityOverhangLeft: shape.gridfinityOverhangLeft,
+    gridfinityOverhangRight: shape.gridfinityOverhangRight,
+    gridfinityOverhangChamfer: shape.gridfinityOverhangChamfer,
+    gridfinityOverhangSolid: shape.gridfinityOverhangSolid,
+    gridfinityOverhangLipOnGrid: shape.gridfinityOverhangLipOnGrid,
     gridfinityCornerRadius: shape.gridfinityCornerRadius,
     gridfinityBinCornerRadius: shape.gridfinityBinCornerRadius,
     gridfinityCompartmentsX: shape.gridfinityCompartmentsX,
     gridfinityCompartmentsZ: shape.gridfinityCompartmentsZ,
     gridfinityDividerThickness: shape.gridfinityDividerThickness,
+    gridfinityDividerHeight: shape.gridfinityDividerHeight,
     gridfinityDividerPositionsX: shape.gridfinityDividerPositionsX,
     gridfinityDividerPositionsZ: shape.gridfinityDividerPositionsZ,
     gridfinityCompartmentLabels: shape.gridfinityCompartmentLabels,
@@ -1853,8 +1880,9 @@ export function cadModifierGridfinityForShape(shape: WorkplaneShape): CadModifie
     gridfinityOutline: shape.gridfinityOutline,
     ...(letters.length > 0 ? { gridfinityLetters: letters } : {}),
     // Mesh and body are built at the size of the grid units, which canonicalizeShape
-    // keeps the shape's box at; a box that differs anyway stretches the body to it.
-    transform: profileTransformForShape(shape, new THREE.Matrix4().makeScale(width / plan.size.width, shape.height / plan.size.height, depth / plan.size.depth)),
+    // keeps the shape's box at; a box that differs anyway stretches the body to it. A
+    // solid overhang's plan is the bin on the grid, and the box is its whole outline.
+    transform: profileTransformForShape(shape, new THREE.Matrix4().makeScale(width / (plan.overhang?.outer.width ?? plan.size.width), shape.height / plan.size.height, depth / (plan.overhang?.outer.depth ?? plan.size.depth))),
   };
 }
 
@@ -1891,8 +1919,10 @@ function turningReach(radius: number, angle: number, twist: number) {
 const HELICAL_GEAR_CORNER_LIMIT = 480;
 
 export function cadModifierHelicalGearForShape(shape: WorkplaneShape, options: { anySize?: boolean } = {}): CadModifierHelicalGearPart | null {
-  if (shape.kind !== "gear" || !gearTypeHasHelix(shape.gearType)) return null;
+  if (shape.kind !== "gear") return null;
   if (shape.importedMesh || shape.groupedShapes?.length || shape.cadBrep || shape.imagePlate || shapeHasShapeDeform(shape)) return null;
+  if (ringRackIsHelical(shape)) return slantedRingRackPart(shape, options);
+  if (!gearTypeHasHelix(shape.gearType)) return null;
   const width = shapeWidth(shape);
   const depth = shapeDepth(shape);
   if (![width, depth, shape.height].every((value) => Number.isFinite(value) && value > 0)) return null;
@@ -1926,6 +1956,37 @@ export function cadModifierHelicalGearForShape(shape: WorkplaneShape, options: {
     if (!(boreRadius < outlineClearance(ring) * Math.min(stretch.x, stretch.z) * 0.999)) return null;
   }
   return { corners, twist, ...(herringbone ? { herringbone } : {}), height: shape.height, stretch, boreRadius, transform: profileTransformForShape(shape) };
+}
+
+/**
+ * A ring gear or a rack with slanted teeth (Discussion #1627) as the exact body its display mesh draws. The ring
+ * gear's teeth turn inside the round rim as the helical gear's ring does - on an oval footprint, or past the corner
+ * limit outside the STEP export, it stays a mesh like the helical gear; the rack is the outline of a longer straight
+ * rack drawn out at the slant and cut off square at its ends.
+ */
+function slantedRingRackPart(shape: WorkplaneShape, options: { anySize?: boolean }): CadModifierHelicalGearPart | null {
+  const width = shapeWidth(shape);
+  const depth = shapeDepth(shape);
+  if (![width, depth, shape.height].every((value) => Number.isFinite(value) && value > 0)) return null;
+  const herringbone = shape.ringRackHerringbone === true;
+  const transform = profileTransformForShape(shape);
+  if (normalizeGearType(shape.gearType) === "rack") {
+    const measures = rackMeasures(width, depth, shape);
+    const travel = rackHelixTravel(shape.height, shape.ringRackHelixAngle);
+    const outline = rackOutlinePoints(extendedRackMeasures(measures, rackExtraTeeth(measures, travel)));
+    return {
+      corners: [], twist: 0, ...(herringbone ? { herringbone } : {}), height: shape.height, stretch: { x: 1, z: 1 }, boreRadius: 0,
+      rack: { outline, length: measures.length, backZ: measures.backZ, tipZ: measures.tipZ, travel }, transform,
+    };
+  }
+  if (Math.abs(width - depth) > 1e-6) return null;
+  const outlineOfRing = internalGearOutline(width, depth, shape);
+  const corners = outlineOfRing.corners.map((corner) => ({ angle: corner.angle, radius: corner.radiusX }));
+  if (!options.anySize && corners.length > HELICAL_GEAR_CORNER_LIMIT) return null;
+  return {
+    corners, twist: ringGearHelixTwist(outlineOfRing.module, normalizeGearTeeth(shape.teeth), shape.height, shape.ringRackHelixAngle), ...(herringbone ? { herringbone } : {}),
+    height: shape.height, stretch: outlineOfRing.stretch, boreRadius: 0, ringRadius: outlineOfRing.rimRadius, transform,
+  };
 }
 
 /**

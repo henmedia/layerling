@@ -203,6 +203,20 @@ describe("backups into a folder of one's own (Facebook group, 07.11.2026)", () =
     expect(await pickBackupTarget("layerling-backup.zip")).toEqual({ fileName: "layerling-backup.zip" });
   });
 
+  it("leaves the dialog out for \"Download instead\", where it hands back no file for any folder", async () => {
+    const save = vi.fn(async () => {
+      throw new DOMException("closed", "AbortError");
+    });
+    pickers().showSaveFilePicker = save;
+    expect(await pickBackupTarget("layerling-backup.zip")).toBeNull();
+    expect(await pickBackupTarget("layerling-backup.zip", true)).toEqual({ fileName: "layerling-backup.zip" });
+    expect(save).toHaveBeenCalledTimes(1);
+    const download = vi.fn();
+    const zip = new Blob(["zip"]);
+    await writeBackupTarget({ fileName: "layerling-backup.zip" }, zip, download);
+    expect(download).toHaveBeenCalledWith("layerling-backup.zip", zip);
+  });
+
   it("removes a picked file again when there was nothing to put in it", async () => {
     const { handle } = fakeHandle({ name: "empty.zip" });
     const remove = vi.fn(async () => undefined);

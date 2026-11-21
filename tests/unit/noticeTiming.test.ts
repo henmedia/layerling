@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { NOTICE_CHANGE_WINDOW_MS, NOTICE_LINGER_MS, NOTICE_PATIENT_MS, noticeDurationMs, noticeReportsLastChange } from "@/lib/noticeTiming";
+import { NOTICE_CHANGE_WINDOW_MS, NOTICE_LINGER_MS, NOTICE_PATIENT_MS, noticeDurationMs, noticeReportsLastChange, showsNotice } from "@/lib/noticeTiming";
 import { DEFAULT_WORKPLANE_WORKSPACE, snapGridForUnits, workspaceForUnits } from "@/lib/workplaneSettings";
 
 describe("how long a message of the status line stays (#422)", () => {
@@ -18,6 +18,20 @@ describe("how long a message of the status line stays (#422)", () => {
   it("never keeps a message longer than the patient time, and a patient one at least that long", () => {
     expect(noticeDurationMs("x".repeat(5000))).toBe(NOTICE_PATIENT_MS);
     expect(noticeDurationMs("Short but patient", true)).toBe(NOTICE_PATIENT_MS);
+  });
+});
+
+describe("the message after each step can be switched off (Discussion #1708)", () => {
+  it("shows every message while the setting is on", () => {
+    expect(showsNotice(true, true, true)).toBe(true);
+    expect(showsNotice(true, false, false)).toBe(true);
+  });
+
+  it("leaves out only an ordinary message that reports the step just taken", () => {
+    expect(showsNotice(false, true, true)).toBe(false);
+    // One that waits for something, warns or carries its own button still shows, and so does one about something else.
+    expect(showsNotice(false, false, true)).toBe(true);
+    expect(showsNotice(false, true, false)).toBe(true);
   });
 });
 

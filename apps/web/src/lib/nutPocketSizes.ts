@@ -8,13 +8,14 @@
  * across corners.
  */
 
-export type NutPocketSize = "M2" | "M2.5" | "M3" | "M4" | "M5" | "M6" | "M8" | "M10" | "M12" | "M14" | "M16" | "M20" | "M24" | "M30";
+export type NutPocketSize = "M2" | "M2.5" | "M3" | "M3.5" | "M4" | "M5" | "M6" | "M8" | "M10" | "M12" | "M14" | "M16" | "M20" | "M24" | "M30";
 
 /** Width across flats and height of the nut, ISO 4032. */
 const NUTS: Record<NutPocketSize, { acrossFlats: number; height: number }> = {
   M2: { acrossFlats: 4, height: 1.6 },
   "M2.5": { acrossFlats: 5, height: 2 },
   M3: { acrossFlats: 5.5, height: 2.4 },
+  "M3.5": { acrossFlats: 6, height: 2.8 },
   M4: { acrossFlats: 7, height: 3.2 },
   M5: { acrossFlats: 8, height: 4.7 },
   M6: { acrossFlats: 10, height: 5.2 },

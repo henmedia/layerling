@@ -3,6 +3,17 @@ import type { WorkplaneShape } from "@/types/layerling";
 
 export type ImportedMeshResource = NonNullable<WorkplaneShape["importedMesh"]>;
 
+/**
+ * The revision for an edit (Discussion #1652): newer than the clock, than the last one this page gave out and than
+ * every revision the design already has. Revisions are times, and the cache and the browser's storage keep only a
+ * newer one; a stored revision ahead of the clock (a clock set back, a design from another computer) made every
+ * edit after a reload "older", so none was kept and the next reload of the editor put the old state back.
+ */
+export function nextProjectRevision(now: number, lastIssued: number, ...known: Array<number | undefined>): number {
+  const newestKnown = Math.max(0, ...known.filter((revision): revision is number => typeof revision === "number" && Number.isFinite(revision)));
+  return Math.max(now, lastIssued + 1, newestKnown + 1);
+}
+
 export function reconcileLoadedProjectShapeCacheEntry<T extends { revision: number }>(
   existing: T | undefined,
   loaded: T,

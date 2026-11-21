@@ -7,7 +7,7 @@ To build a part exactly, you need to measure. layerling has several tools for th
 
 ## The tape measure
 
-The tape measure sits at the lower end of the view bar on the left edge ({{ui:camera.tapeTools}}). It measures distances between corners, edges and faces. A click on it opens five buttons. If they cover what you want to measure, drag them by the grip on the left anywhere on the workplane; a double-click on the grip puts them back:
+The tape measure sits at the lower end of the view bar on the left edge ({{ui:camera.tapeTools}}). It measures distances between corners, edges and faces. A click on it opens five buttons. {{ui:camera.addMeasurement}} is switched on straight away, so the next two clicks in the view measure; another click on that button puts the tool down and leaves the buttons open. If the measurements are hidden, it stays off until you click it. If they cover what you want to measure, drag them by the grip on the left anywhere on the workplane; a double-click on the grip puts them back:
 
 ![The tape measure with its buttons: add measurement, move measuring points, remove measurement, whole edges, delete all measurements.](shot:tape-menu)
 
@@ -18,6 +18,7 @@ The tape measure sits at the lower end of the view bar on the left edge ({{ui:ca
 5. **{{ui:camera.deleteAllMeasurements}}:** Removes every measurement at once. Because this cannot be undone, layerling asks first; with no measurements there is nothing to do.
 6. **{{ui:camera.tapeMarkMiddle}}:** In the middle of every measurement sits a small round mark, its lower half filled. It puts a [reference point](#reference-points) in the middle of the measurement: after a click on a round edge, such as the rim of a hole, in the centre of that circle - on an imported mesh too, where nothing else marks the middle of a hole - and for a diameter or any straight measurement halfway along it. A shape you drag then snaps to the point with its centre. A point that is there already is not made twice. The tape measure snaps to a reference point like to a corner, so you can measure from the centre of a circle or from the middle of a line: mark it, then click the point.
 7. **{{ui:camera.tapeTypeLength}}:** When at least one end of a straight measurement sits on a body, its number can be clicked. Type a new length and press [[Enter]]: the body at the second point moves along the measured line until the distance is exactly that, as with the ruler in Tinkercad. If only the body at the first point is selected, that one moves instead. The measuring points stay on the body, so the measurement follows. Measure from a corner, an edge or the centre of a face or a hole to place parts at an exact distance: from the centre of a hole to the middle of a cylinder's top, the cylinder moves centre to centre. A negative length takes it that far past the first point, say 5 mm inside the edge of a box. A [reference point](#reference-points) belongs to no body, so between two of them nothing moves. When the measurement runs along two or three axes, the field also has a box under the length for each of them (ΔX, ΔY, ΔZ, the reach shown when you point at the number): type there instead, and the body moves along that axis only. [[Tab]] goes from box to box, [[Esc]] closes the field without moving anything. Pointing at the number tells which body will move, or why none can: it is locked, both points lie on the same body, or neither lies on a body. The message afterwards says what moved and how far; one undo takes it back.
+8. **Thickness under the pointer:** While **{{ui:camera.addMeasurement}}** is active and no point is placed yet, pointing at a face shows how thick the body is there: measured straight in, square to the face, to where the material ends, with a dashed line through the body. On a hollowed box that is the wall, on a solid block all of the block, on the side of a cylinder its diameter. Move the pointer over the part to check its walls without placing a measurement.
 
 [[Esc]] leaves measuring mode.
 
@@ -35,6 +36,7 @@ The framing square lies on the workplane. If that sits on the side of a body, th
 - **A short click on the handle** turns it by 90°.
 - **The ×** beside it removes it.
 - **Dragging the small circle at the end of an arm** makes that arm longer or shorter, in whole millimetres. The lowest button under the handle, {{ui:ruler.armsToPlate}}, makes both arms as long as the build plate is wide and deep, for the printer set in the settings. The square keeps its arms' lengths with the design, and a square set again takes them over.
+- **{{ui:ruler.arms}}** (the button with three axes, just above) opens a switch for each arm, named after the axis it runs along. Besides the two arms in the plane there is a third that stands up from the corner, square to the workplane: on the plate it points up along Z, with its own ticks, for a cylinder or anything you build upwards. It is off to begin with: click its letter to show it, and drag the small circle at its end to make it longer or shorter. The arms in the plane can be switched off the same way when they get in the way; one arm always stays. The green numbers of a selected body stay whichever arms are shown, and the design keeps which ones are.
 - **The small button left of the handle** switches what is measured from: the outside of a body (endpoint, an icon with lines) or its middle (midpoint, a crosshair). A small switch of the same kind sits beside each green number and sets that number alone: for a standing cylinder the middle in the two arms and the bottom in height, for a lying one the middle across and an end along. When all three agree again, the button at the handle shows the common mode.
 
 If bodies stand at one of the arms, the framing square shows their dimensions automatically, selected or not: bodies inside the square, beside an arm or across it. A body outside it, behind the corner or beside an arm from the outside, gets none. That works on the base plate only, not on the side of a body. The button with the arrow under the square's handle switches that off, so that only the selected bodies show their dimensions; it is kept with the design.
@@ -51,7 +53,7 @@ Both the tape measure and the framing square stay where they are while you sketc
 
 Click {{ui:camera.protractor}} in the view bar to measure an angle. A row of buttons opens beside it, and until you click the button again or press [[Esc]], a click in the view measures with the protractor. Like the tape measure, it snaps to the corners and edges of bodies; beside the bodies it sets a point on the plate.
 
-- {{ui:camera.protractorPoints}}: click the corner of the angle first, then a point on each side. While you place the last point, the angle shows already; after the third click it stays, with an arc between the sides. It is the angle at the corner, from 0° to 180°.
+- {{ui:camera.protractorPoints}}: click the corner of the angle first, then a point on each side. While you place the last point, the angle shows already; after the third click it stays, with an arc between the sides. It is the angle at the corner, from 0° to 180°. Seen straight from the top, the front or a side, it measures the angle as it shows there: a top corner and the bottom corner right below it are the same spot. In a tilted view it is the angle in space.
 - {{ui:camera.protractorFaces}}: click two flat faces. A short blue line on each shows which way it faces, and the label gives both angles the faces make, the smaller first: a 45° chamfer against the top reads 45° · 135°, two sides of a box just 90°. A curved face has no single direction, so the protractor asks for a flat one.
 
 The next click after a finished angle starts a new one, and {{ui:camera.protractorClear}} removes it. The angle follows the bodies when they move or turn. Nothing of it is saved or goes into the history: it is gone when you put the protractor away.
@@ -60,13 +62,15 @@ The next click after a finished angle starts a new one, and {{ui:camera.protract
 
 In the settings under {{ui:workspace.appearance}} there are two switches for live dimensions:
 
-- {{ui:workspace.showMoveDimensions}} shows by how much you move while dragging. That includes lifting with the black arrow above a body; the way up or down shows at its front corner. The arrow keys show their way as well: the presses add up until you select something else or drag, and [[Ctrl]]+[[↑]] and [[Ctrl]]+[[↓]] show the way up or down. Once you let go, click such a number and type the exact distance; a minus goes down.
+- {{ui:workspace.showMoveDimensions}} shows by how much you move while dragging. That includes lifting with the blue arrow above a body; the way up or down shows at its front corner. The arrow keys show their way as well: the presses add up until you select something else or drag, and [[Ctrl]]+[[↑]] and [[Ctrl]]+[[↓]] show the way up or down. Once you let go, click such a number and type the exact distance; a minus goes down.
 - {{ui:workspace.showOriginDimensions}} shows the distances of the selection to the origin of the plate, also with several selected bodies.
 
 With {{ui:workspace.dimensionsAlwaysVisible}} the dimensions stay visible permanently. A body that does not stand on the workplane also shows its height above it; click the number to type a new one.
 With {{ui:workspace.dimensionAxisColors}} each box takes the colour of its axis, as the handles do: red for X, green for Y and blue for Z. So on a small part you see at a glance which number is which.
 
 For a moment without them, press [[Q]]: the sizes and distances around the selection disappear, so a part you move is easy to see. [[Q]] again brings them back. A handle you point at still shows its size.
+
+On a very small part the handles themselves can be in the way. [[Shift+Q]] hides them all - the squares for the size and the arrows for lifting, sliding and turning - and [[Shift+Q]] again brings them back. Without them you can still drag the part and type its sizes at the right, and the list of objects shows which part is selected.
 
 ## Checking clearance
 

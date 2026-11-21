@@ -130,11 +130,12 @@ export interface BackupTarget {
  * straight into a folder of one's own, on a cloud drive say, instead of Downloads (asked in the Facebook group,
  * 07.11.2026). Other browsers, or a dialog that will not open, keep the download. null when the dialog is closed
  * without a choice: then there is no backup. The dialog needs the click that started it, so this comes before
- * anything slow.
+ * anything slow. `asDownload` leaves the dialog out: on some PCs it hands back no file for any folder, and the
+ * "Download instead" button of the message that follows makes the backup a download (Facebook group, 12.11.2026).
  */
-export async function pickBackupTarget(suggestedName: string): Promise<BackupTarget | null> {
+export async function pickBackupTarget(suggestedName: string, asDownload = false): Promise<BackupTarget | null> {
   const picker = filePickerWindow().showSaveFilePicker;
-  if (!picker) return { fileName: suggestedName };
+  if (!picker || asDownload) return { fileName: suggestedName };
   try {
     const handle = await picker({ id: BACKUP_PICKER_ID, suggestedName, types: [{ description: "layerling backup", accept: { "application/zip": [".zip"] } }] });
     return { fileName: handle.name, handle };

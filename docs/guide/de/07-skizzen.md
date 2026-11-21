@@ -57,6 +57,7 @@ Punkte nacheinander anklicken.
 ::: Eine Linie schließen oder beenden
 Um den Umriss zu schließen, klickst du am Ende wieder auf den ersten Punkt.
 Die Linienkette beendest du, ohne den Umriss zu schließen, mit einem Rechtsklick ohne Bewegung oder einem Doppelklick auf den letzten Punkt.
+Wechselst du mitten in der Kette zu {{ui:sketch.line}}, {{ui:sketch.bezier}} oder {{ui:sketch.smooth}}, geht die Linie am letzten Punkt weiter.
 => Ein Körper entsteht nur aus einem **geschlossenen** Umriss.
 :::
 
@@ -303,7 +304,7 @@ Die Kontur stellst du auch ein, ohne die Skizze zu öffnen: In den Eigenschaften
 
 {{ui:prop.sketchSilhouette}} lässt alle Umrisse weg, die in einem anderen liegen: Löcher und was in ihnen liegt. Übrig bleibt nur der äußere Umriss. Zusammen mit {{ui:prop.sketchFill.outside}} wird daraus ein Ausstecher: Importiere ein SVG zweimal, einmal mit Silhouette als Fläche für den Boden und einmal mit Silhouette und 1 bis 2 mm Kontur außen als Wand. Den Schalter gibt es auch im Fenster {{ui:sketch.stroke}} im Skizzenmodus.
 
-Verrundungen und Fasen an den Kanten gehen beim Neubau verloren, wie beim Bearbeiten der Skizze.
+Verrundungen und Fasen an den Kanten gehen beim Neubau verloren, wie beim Bearbeiten der Skizze. {{ui:inspector.taper}} und {{ui:inspector.twist}} bleiben; eine Verjüngung wächst oder schrumpft mit dem Umriss.
 
 ## Schräge Wände, für Stempel
 
@@ -353,6 +354,7 @@ Den Baum neben einem Haus, eine Figur vor unruhigem Hintergrund – wo keine Far
 | [[Strg]]+[[A]] | alle Punkte und Linien auswählen |
 | [[Strg]]+[[I]] | {{ui:sketch.addImage}} |
 | [[Umschalt]] | beim Zeichnen: Linie in 15°-Schritten einrasten; beim Ziehen: Bewegung auf eine Achse beschränken |
+| [[Alt]] | beim Setzen oder Ziehen eines Punkts: nur aufs Raster, ohne Einrasten an Ecken und Mitten |
 | Ziffer, [[<]], [[Tab]], [[Enter]] | beim Zeichnen: Länge und Winkel der nächsten Linie eintippen und setzen |
 | [[R]] | geschlossene Skizze um 45° drehen |
 | [[Strg]]+[[L]] | gewählten Umriss oder das Vorlagenbild sperren oder entsperren |

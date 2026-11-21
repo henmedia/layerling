@@ -24,6 +24,7 @@ export type ShapeKind =
   | "star"
   | "heart"
   | "crescent"
+  | "sector"
   | "gear"
   | "hirth"
   | "pulley"
@@ -200,6 +201,10 @@ export type ShapeCustomization = {
   helixQuality?: number;
   /** A bevel gear's helix angle (Discussion #1299): its teeth turn while they taper, a spiral bevel gear; missing or 0 keeps them straight. */
   bevelHelixAngle?: number;
+  /** A ring gear's or a rack's helix angle (Discussion #1627): its teeth run at a slant; missing or 0 keeps them straight. */
+  ringRackHelixAngle?: number;
+  /** A ring gear or a rack with a helix angle: its teeth turn back at half the height, herringbone teeth (Discussion #1627). */
+  ringRackHerringbone?: boolean;
   /** Involute teeth (#201) or the straight ones every gear had before; missing means straight. */
   gearProfile?: GearProfile;
   /** Involute teeth: pressure angle in degrees (20 by default). */
@@ -257,6 +262,12 @@ export type ShapeCustomization = {
   crescentThickness?: number;
   crescentTipFillet?: number;
   crescentQuality?: number;
+  /** Sector: how far the piece runs round from twelve o'clock, clockwise, in degrees (1 to 360). */
+  sectorAngle?: number;
+  /** Sector: the bore's diameter in mm, 0 for a solid piece. */
+  sectorInnerDiameter?: number;
+  /** Sector: the rounding of the piece's two ends in mm, up to a half circle. */
+  sectorEndRadius?: number;
   honeycombCellSize?: number;
   honeycombWallThickness?: number;
   honeycombFrameWidth?: number;
@@ -268,8 +279,10 @@ export type ShapeCustomization = {
   hingeKnuckleWidth?: number;
   /** Hinge, cone style: the diameter of the cones at their root in mm; left out, the largest that fits (#907). */
   hingeConeSize?: number;
-  /** Hinge: "pin" (default) or "cone": cones on every other knuckle that nest into the others, printing without bridges (#907). */
-  hingeStyle?: "pin" | "pinless" | "cone" | "liftOff";
+  /** Hinge: "pin" (default) or "cone": cones on every other knuckle that nest into the others, printing without bridges (#907); "snap": B's knuckles are open clips that snap over A's pin (#1520). */
+  hingeStyle?: "pin" | "pinless" | "cone" | "liftOff" | "snap";
+  /** Hinge, snap style: how much narrower the clips' opening is than the pin in mm; left out, 0.3 (#1520). */
+  hingeSnapGrip?: number;
   /** Hinge: diameter of the pin in mm; the other part's bore is wider by the clearance. */
   hingePinDiameter?: number;
   /** Hinge: thickness of the two leaves in mm. */
@@ -390,6 +403,20 @@ export type ShapeCustomization = {
   gridfinityPaddingLeft?: number;
   /** Gridfinity baseplate: the border along the right. */
   gridfinityPaddingRight?: number;
+  /** Gridfinity bin: how far its body above the feet reaches out beyond the grid at the back, in mm from the grid line, over a baseplate's padding; missing is none, at most 41. The feet stay on the grid. */
+  gridfinityOverhangBack?: number;
+  /** Gridfinity bin: the overhang at the front. */
+  gridfinityOverhangFront?: number;
+  /** Gridfinity bin: the overhang on the left. */
+  gridfinityOverhangLeft?: number;
+  /** Gridfinity bin: the overhang on the right. */
+  gridfinityOverhangRight?: number;
+  /** Gridfinity bin: the height in mm the overhang's underside rises to at the outer wall, sloping straight up to it from the grid line so it prints without supports; missing or 0 leaves it flat on the padding. */
+  gridfinityOverhangChamfer?: number;
+  /** Gridfinity bin: the overhang is solid, and the inside stays on the grid; missing is hollow, the inside reaching out into it. */
+  gridfinityOverhangSolid?: boolean;
+  /** Gridfinity bin: the stacking lip stays on the grid, and the overhang is solid with a flat top at the lip's foot; missing is the lip on the wider outline. */
+  gridfinityOverhangLipOnGrid?: boolean;
   /** Gridfinity baseplate: the radius of its four outer corners in mm; missing is the specification's 4, at least 0 (square), at most 4; the sockets keep theirs (#856). */
   gridfinityCornerRadius?: number;
   /** Gridfinity bin: the radius of its outer corners above the feet in mm; missing is the specification's 3.75, at least 0 (square), at most 3.75; the feet, the inside and the lip's slopes keep theirs (#856). */
@@ -400,6 +427,8 @@ export type ShapeCustomization = {
   gridfinityCompartmentsZ?: number;
   /** Gridfinity bin: the dividers' thickness in mm, 0.8 to 3; missing is 1.2. */
   gridfinityDividerThickness?: number;
+  /** Gridfinity bin: the dividers' height over the floor in mm, at least 3; missing, 0, or within 0.1 mm of the full height or over it is the full height (#1560). */
+  gridfinityDividerHeight?: number;
   /** Knurling: grooves straight along the axis, or crossed into diamonds. */
   knurlPattern?: "straight" | "diamond" | "round";
   /** Knurling: number of grooves around the grip. */
@@ -464,6 +493,8 @@ export type ShapeCustomization = {
   screwHoleSlot?: boolean;
   /** Countersink and double countersink: how far in mm the head sits below the face (Discussion #1531), as on the shape. */
   screwHoleRecess?: number;
+  /** Counterbore: a 45-degree chamfer in mm at the rim of the pocket (Discussion #1632), as on the shape. */
+  screwHoleChamfer?: number;
   /** Port opening: rounded corners, or the lower ones cut off as on an HDMI or DisplayPort socket. */
   portProfile?: PortProfile;
   /** Port opening: extra room in mm on every side on top of the preset's, already in width and height; it lets the preset be recognised. */
@@ -586,10 +617,14 @@ export type WorkplaneWorkspaceSettings = {
   dimensionAxisColors: boolean;
   /** A turned body shows its angles about X, Y and Z beside it while it is selected. */
   showRotationAngles: boolean;
+  /** The red X and green Y arrows round the top of a selection that move it along one axis (Discussion #1434); on by default. */
+  showSlideArrows: boolean;
   /** The editor opens a design with the view's scrollbars shown (Discussion #1241); the view bar still switches them. */
   startWithScrollbars: boolean;
   /** A folded view bar opens while the mouse is over its arrow and folds again once the mouse has left it (Discussion #1552). */
   viewBarOpensOnHover: boolean;
+  /** The short message after a step, such as a union, with its Undo button (Discussion #1708); on by default. Off, messages that want something, warn or carry a button of their own still show. */
+  showStepNotices: boolean;
   zoomSpeed: number;
   /** How fast shifting the 3D view follows the mouse, a slider from 1 to 9; at 5 the grabbed point stays under the cursor (#1553). */
   panSpeed: number;
@@ -860,6 +895,18 @@ export type EdgeTreatmentFeature = {
   openings?: ShellOpenings;
   /** Only for "shell" and "offset"; missing means "round". */
   shellEdges?: ShellEdges;
+  /** Only for "shell" with the top open: the height in mm of the collar round the top and of the groove under the wall, so one stands on the next; missing means none. */
+  shellStack?: number;
+  /** Only with `shellStack`: the foot hollow (the floor on the plate) instead of solid, and a grip recess `grip` mm wide, `gripDepth` deep, at the front of the bottom. */
+  shellStackFoot?: { hollow?: boolean; grip?: number; gripDepth?: number };
+  /** Only for "shell" with the top open: a Gridfinity baseplate in the floor with at most `cells` cells; with `fit` the walls are thickened to the cells. */
+  shellGrid?: { cells: number; fit?: boolean; magnets?: boolean };
+  /** Only for "shell" with the top open: this many dividers across (x) and along (z) the inside, evenly spaced. */
+  shellDividers?: { x: number; z: number; height?: number; thickness?: number };
+  /** Only for "shell" with the top open (#1663): the width in mm of a ledge round the inside of the wall for a plate to rest on; missing means none. */
+  shellShelf?: number;
+  /** Only with `shellShelf`: how high in mm the top of the ledge lies above the inside of the floor. */
+  shellShelfHeight?: number;
   /** Only for "offset": the faces moved inward, the body shrunk; missing means grown. */
   offsetShrink?: boolean;
   /** Only for "offset" (#1057): only the sides moved, flat tops and bottoms kept at their heights; missing means every face. */
@@ -1088,6 +1135,11 @@ export type WorkplaneShape = {
   /** Side drop: -1 to 1, 0 a straight line from the middle to the edge, above 0 bulging up, below 0 sagging. */
   sideCurve?: number;
   /**
+   * Only on a tube's bore split off as a hole (splitBoreTube), never saved: the width and depth of the
+   * tube around it. Its slope and side drop are measured over the tube, so its top lies on the tube's (#1698).
+   */
+  slopeSpan?: { width: number; depth: number };
+  /**
    * Narrow along: seen from above, the width of the narrow end in mm,
    * both long sides running in evenly. Missing or the full width means no narrowing.
    */
@@ -1121,6 +1173,10 @@ export type WorkplaneShape = {
   helixQuality?: number;
   /** A bevel gear's helix angle (Discussion #1299): its teeth turn while they taper, a spiral bevel gear; missing or 0 keeps them straight. */
   bevelHelixAngle?: number;
+  /** A ring gear's or a rack's helix angle (Discussion #1627): its teeth run at a slant; missing or 0 keeps them straight. */
+  ringRackHelixAngle?: number;
+  /** A ring gear or a rack with a helix angle: its teeth turn back at half the height, herringbone teeth (Discussion #1627). */
+  ringRackHerringbone?: boolean;
   /** Involute teeth (#201) or the straight ones every gear had before; missing means straight. */
   gearProfile?: GearProfile;
   /** Involute teeth: pressure angle in degrees (20 by default). */
@@ -1178,6 +1234,12 @@ export type WorkplaneShape = {
   crescentThickness?: number;
   crescentTipFillet?: number;
   crescentQuality?: number;
+  /** Sector: how far the piece runs round from twelve o'clock, clockwise, in degrees (1 to 360). */
+  sectorAngle?: number;
+  /** Sector: the bore's diameter in mm, 0 for a solid piece. */
+  sectorInnerDiameter?: number;
+  /** Sector: the rounding of the piece's two ends in mm, up to a half circle. */
+  sectorEndRadius?: number;
   honeycombCellSize?: number;
   honeycombWallThickness?: number;
   honeycombFrameWidth?: number;
@@ -1189,8 +1251,10 @@ export type WorkplaneShape = {
   hingeKnuckleWidth?: number;
   /** Hinge, cone style: the diameter of the cones at their root in mm; left out, the largest that fits (#907). */
   hingeConeSize?: number;
-  /** Hinge: "pin" (default) or "cone": cones on every other knuckle that nest into the others, printing without bridges (#907). */
-  hingeStyle?: "pin" | "pinless" | "cone" | "liftOff";
+  /** Hinge: "pin" (default) or "cone": cones on every other knuckle that nest into the others, printing without bridges (#907); "snap": B's knuckles are open clips that snap over A's pin (#1520). */
+  hingeStyle?: "pin" | "pinless" | "cone" | "liftOff" | "snap";
+  /** Hinge, snap style: how much narrower the clips' opening is than the pin in mm; left out, 0.3 (#1520). */
+  hingeSnapGrip?: number;
   /** Hinge: diameter of the pin in mm; the other part's bore is wider by the clearance. */
   hingePinDiameter?: number;
   /** Hinge: thickness of the two leaves in mm. */
@@ -1315,6 +1379,20 @@ export type WorkplaneShape = {
   gridfinityPaddingLeft?: number;
   /** Gridfinity baseplate: the border along the right. */
   gridfinityPaddingRight?: number;
+  /** Gridfinity bin: how far its body above the feet reaches out beyond the grid at the back, in mm from the grid line, over a baseplate's padding; missing is none, at most 41. The feet stay on the grid. */
+  gridfinityOverhangBack?: number;
+  /** Gridfinity bin: the overhang at the front. */
+  gridfinityOverhangFront?: number;
+  /** Gridfinity bin: the overhang on the left. */
+  gridfinityOverhangLeft?: number;
+  /** Gridfinity bin: the overhang on the right. */
+  gridfinityOverhangRight?: number;
+  /** Gridfinity bin: the height in mm the overhang's underside rises to at the outer wall, sloping straight up to it from the grid line so it prints without supports; missing or 0 leaves it flat on the padding. */
+  gridfinityOverhangChamfer?: number;
+  /** Gridfinity bin: the overhang is solid, and the inside stays on the grid; missing is hollow, the inside reaching out into it. */
+  gridfinityOverhangSolid?: boolean;
+  /** Gridfinity bin: the stacking lip stays on the grid, and the overhang is solid with a flat top at the lip's foot; missing is the lip on the wider outline. */
+  gridfinityOverhangLipOnGrid?: boolean;
   /** Gridfinity baseplate: the radius of its four outer corners in mm; missing is the specification's 4, at least 0 (square), at most 4; the sockets keep theirs (#856). */
   gridfinityCornerRadius?: number;
   /** Gridfinity bin: the radius of its outer corners above the feet in mm; missing is the specification's 3.75, at least 0 (square), at most 3.75; the feet, the inside and the lip's slopes keep theirs (#856). */
@@ -1325,6 +1403,8 @@ export type WorkplaneShape = {
   gridfinityCompartmentsZ?: number;
   /** Gridfinity bin: the dividers' thickness in mm, 0.8 to 3; missing is 1.2. */
   gridfinityDividerThickness?: number;
+  /** Gridfinity bin: the dividers' height over the floor in mm, at least 3; missing, 0, or within 0.1 mm of the full height or over it is the full height (#1560). */
+  gridfinityDividerHeight?: number;
   /** Gridfinity bin: each divider across, in mm from the inside of the left wall to its middle, left to right; missing spaces them evenly. */
   gridfinityDividerPositionsX?: number[];
   /** Gridfinity bin: each divider deep, in mm from the inside of the back wall to its middle, back to front; missing spaces them evenly. */
@@ -1419,6 +1499,11 @@ export type WorkplaneShape = {
    * straight pocket as wide as the head above the cone, on the double countersink at both ends. Missing or 0: flush.
    */
   screwHoleRecess?: number;
+  /**
+   * Counterbore: a 45-degree chamfer in mm at the rim of the pocket (Discussion #1632). The rim opens by that much
+   * outside the head's diameter, so the pocket keeps its width; it stays shallower than the pocket. Missing or 0: none.
+   */
+  screwHoleChamfer?: number;
   /** Port opening: rounded corners, or the lower ones cut off as on an HDMI or DisplayPort socket. */
   portProfile?: PortProfile;
   /** Port opening: extra room in mm on every side on top of the preset's, already in width and height; it lets the preset be recognised. */
@@ -1624,11 +1709,22 @@ export type WorkplaneShape = {
    */
   supportRibFor?: string;
   /**
+   * A part of a mold the mold tool made: the master's id, an id the parts of the same mold share, and the settings it was
+   * made with, so "Make the mold again" opens the tool with them and replaces the mold's parts. See lib/moldTool.
+   */
+  moldOf?: { master: string; group: string; settings: Record<string, unknown> };
+  /**
    * A bridge the stencil bridge tool made (Discussion #1438): a box that holds a part inside a hole, such as the middle
    * of an "o", to the plate round it. Running the tool on its group again puts new bridges in place of these. See
    * lib/stencilBridgeTool.
    */
   stencilBridge?: boolean;
+  /**
+   * The body stands on a breakaway base (lib/breakawayBase), as the fit test's pin and the Split tool's loose dowels can:
+   * the pin's foot hangs a little over the socket's floor and that floor is one layer thick, on purpose, so the print
+   * check leaves both out (#1633).
+   */
+  breakawayBase?: boolean;
   /**
    * The point this body turns about, kept with the body: a fraction of its
    * width, height and depth from its centre, in its own frame, so it moves,
@@ -1713,7 +1809,7 @@ export type QrErrorCorrection = "L" | "M" | "Q" | "H";
 export type QrStyle = "code" | "raised" | "engraved";
 /** What a QR body keeps so it can be made again from the inspector (#553). */
 /** The single-board computers the SBC board shape knows (#1098). */
-export type SbcBoardType = "pi5" | "pi4" | "pi3bPlus" | "zero2w" | "bttPi12" | "xiaoEsp32c6" | "esp32c3SuperMini" | "esp32c6SuperMini" | "featherEsp32s3" | "arduinoUno" | "arduinoMega" | "arduinoNano" | "wemosD1Mini" | "pico" | "picoW" | "pico2" | "pico2W" | "esp32CamMb" | "esp32s3Cam" | "esp32DevKitC" | "esp32DevKitV1";
+export type SbcBoardType = "pi5" | "pi4" | "pi3bPlus" | "zero2w" | "bttPi12" | "xiaoEsp32c6" | "esp32c3SuperMini" | "esp32c6SuperMini" | "featherEsp32s3" | "arduinoUno" | "arduinoMega" | "arduinoNano" | "wemosD1Mini" | "pico" | "picoW" | "pico2" | "pico2W" | "esp32CamMb" | "esp32s3Cam" | "esp32DevKitC" | "esp32DevKitV1" | "cyd" | "cyd2usb" | "waveshareEsp32s3Zero" | "arduinoProMini" | "nanoPiNeo3Plus" | "waveshareEsp32p4Nano";
 
 export type SbcBoardSettings = {
   board: SbcBoardType;

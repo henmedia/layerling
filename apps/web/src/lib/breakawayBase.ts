@@ -28,6 +28,18 @@ export const BREAKAWAY_BASE = {
   overlap: 0.1,
 } as const;
 
+/**
+ * How high above a body's lowest point its breakaway base is made the way it is on purpose, in mm (#1633): the pin's foot
+ * hangs over the socket at the lift, held by the nub, and the socket's floor below it is one layer thick. The print check
+ * neither calls that foot an overhang nor that floor a thin wall. A little over the lift, for the mesh's rounding.
+ */
+export const BREAKAWAY_FOOT_MM = BREAKAWAY_BASE.lift + 0.05;
+
+/** Whether a body stands on a breakaway base (the fit test's pin, the Split tool's loose dowels). */
+export function standsOnBreakawayBase(shape: { breakawayBase?: boolean }) {
+  return shape.breakawayBase === true;
+}
+
 /** The nub's side is half the pin's diameter, within these, in mm. */
 const MIN_NUB = 0.8;
 const MAX_NUB = 3;

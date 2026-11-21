@@ -1,6 +1,8 @@
 import type { PointerEvent as ReactPointerEvent, WheelEvent as ReactWheelEvent } from "react";
 
 /** "slide": the red and green arrows that move the selection along X or Y only (Discussion #1434). */
+import type { TransformHandleMode } from "@/lib/touchHandleMode";
+
 export type TransformHandleKind = "scale" | "height" | "lift" | "rotate" | "slide";
 export type RotationAxis = "x" | "y" | "z";
 export type RotationWheelView = { x: number; y: number; radius: number };
@@ -330,6 +332,18 @@ export function snappedWheelRotation(
   };
 }
 
+/**
+ * Where the protractor's needle points, in the wheel's degrees: from its zero line (straight up, -90) on by the turn being
+ * applied, in the wheel's direction. Taken from the pointer itself, it started beside the zero by as much as the arrow was
+ * grabbed beside its middle, while the readout said 0° (#1672).
+ */
+export function rotationNeedleAngle(delta: number, directionSign = 1) {
+  let angle = -90 + delta * (directionSign < 0 ? -1 : 1);
+  while (angle > 180) angle -= 360;
+  while (angle <= -180) angle += 360;
+  return angle;
+}
+
 export function continuousSnappedWheelRotation(
   rotation: { delta: number; pointerAngle: number },
   snapDegrees: number,
@@ -474,6 +488,10 @@ export type TransformOverlayProps = {
   locked?: boolean;
   /** Lock shape (#1277): the size handles and size labels are left out; moving and turning stay. */
   sizeLocked?: boolean;
+  /** The red and green arrows that move the selection along X or Y; off in the settings, they are left out. */
+  showSlideArrows?: boolean;
+  /** On a touch screen, which handles a finger can reach (Discussion #1747); "all" shows every one, "none" (Shift+Q, #1893) not one. */
+  handleMode?: TransformHandleMode;
   showRotationWheel: boolean;
   hideSelectionChrome: boolean;
   hideDimensionMarks: boolean;

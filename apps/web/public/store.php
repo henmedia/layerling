@@ -252,9 +252,11 @@ function existing_project_file_name(string $requested): string
 
 /**
  * An opaque token that changes whenever the file does. PHP only reports whole
- * seconds for the modification time, so this is coarser than the Node version -
- * which does not matter, because the two never share a folder and the value is
- * only ever compared against itself.
+ * seconds for the modification time, so this is coarser than the Node version.
+ * For the token itself that does not matter, it is only ever compared against
+ * itself. A picture is named after it, though, and a folder can reach another
+ * computer or the Node version through a sync program, with another time: see
+ * find_thumbnail.
  */
 function revision_for(array $stat): string
 {
@@ -350,6 +352,97 @@ function folder_key(string $root, string $folder): string
 function thumbnail_path(string $root, string $fileName, string $revision): string
 {
     return $root . DIRECTORY_SEPARATOR . THUMBNAILS_DIRECTORY . DIRECTORY_SEPARATOR . $fileName . '.' . $revision . '.png';
+}
+
+/**
+ * The names in a folder's picture directory that are pictures of this one
+ * file, each with the size and the time of the revision it was written under.
+ * Only names of exactly the shape `<fileName>.<size hex>-<time hex>.png` count,
+ * so a project whose own name merely starts the same way never lends its
+ * picture. A listing asks for many files of one folder; it passes $listings so
+ * the directory is read once per request.
+ */
+function thumbnails_of(string $folder, string $fileName, ?array &$listings = null): array
+{
+    if ($listings !== null && isset($listings[$folder])) {
+        $listing = $listings[$folder];
+    } else {
+        $listing = @scandir($folder . DIRECTORY_SEPARATOR . THUMBNAILS_DIRECTORY) ?: [];
+        if ($listings !== null) {
+            $listings[$folder] = $listing;
+        }
+    }
+    $prefix = $fileName . '.';
+    $pictures = [];
+    foreach ($listing as $name) {
+        $name = (string) $name;
+        if (strncmp($name, $prefix, strlen($prefix)) !== 0) {
+            continue;
+        }
+        if (preg_match('/^([0-9a-f]{1,13})-([0-9a-f]{1,13})[.]png$/', substr($name, strlen($prefix)), $match) === 1) {
+            $pictures[] = ['name' => $name, 'sizeHex' => $match[1], 'timeMicros' => (int) hexdec($match[2])];
+        }
+    }
+    return $pictures;
+}
+
+/**
+ * The picture that belongs to a design, or null (Issue #1874). The same rule
+ * as findSharedThumbnail in the Node route, so both decide alike.
+ *
+ * A picture is named after the revision of the file it shows, and the revision
+ * holds the modification time. A store folder that a sync program carries to
+ * another computer does not arrive with the same time, so the name written on
+ * one computer is not the one the other works out. When no picture carries the
+ * exact revision, a picture of the same file with the same size is taken, the
+ * one whose time is nearest to the file's. The size must still match: a
+ * picture of another size is certainly of older contents.
+ *
+ * Reading never renames or removes a picture: a rename would travel back
+ * through the sync and take the picture away from the computer that wrote it.
+ */
+function find_thumbnail(string $folder, string $fileName, array $stat, ?array &$listings = null): ?string
+{
+    $exact = thumbnail_path($folder, $fileName, revision_for($stat));
+    if (regular_file_stat($exact) !== null) {
+        return $exact;
+    }
+    $sizeHex = dechex($stat['size']);
+    $fileMicros = (int) round($stat['mtime'] * 1000000);
+    $candidates = [];
+    foreach (thumbnails_of($folder, $fileName, $listings) as $picture) {
+        if ($picture['sizeHex'] === $sizeHex) {
+            $candidates[] = $picture;
+        }
+    }
+    usort($candidates, static fn(array $a, array $b): int => abs($a['timeMicros'] - $fileMicros) <=> abs($b['timeMicros'] - $fileMicros));
+    foreach ($candidates as $candidate) {
+        $path = $folder . DIRECTORY_SEPARATOR . THUMBNAILS_DIRECTORY . DIRECTORY_SEPARATOR . $candidate['name'];
+        if (regular_file_stat($path) !== null) {
+            return $path;
+        }
+    }
+    return null;
+}
+
+/**
+ * Removes the pictures of a file that no longer show it: after a save every
+ * picture but the new one, after a delete, a move or a rename all that are
+ * left under the old name. The one written on another computer has another
+ * time in its name (#1874) and would otherwise stay behind, to be shown again
+ * for later contents that happen to have the same length.
+ */
+function remove_thumbnails(string $folder, string $fileName, array $keepRevisions = []): void
+{
+    $keep = [];
+    foreach ($keepRevisions as $revision) {
+        $keep[$fileName . '.' . $revision . '.png'] = true;
+    }
+    foreach (thumbnails_of($folder, $fileName) as $picture) {
+        if (!isset($keep[$picture['name']])) {
+            @unlink($folder . DIRECTORY_SEPARATOR . THUMBNAILS_DIRECTORY . DIRECTORY_SEPARATOR . $picture['name']);
+        }
+    }
 }
 
 /** Relative on purpose: the app may be served from a sub-directory. */
@@ -603,13 +696,14 @@ function search_store(string $root, string $term): void
     $folders = [];
     $truncated = false;
     $visited = 0;
+    $thumbnailListings = [];
 
     $contains = static function (string $haystack) use ($needle): bool {
         $lower = function_exists('mb_strtolower') ? mb_strtolower($haystack) : strtolower($haystack);
         return $needle === '' || strpos($lower, $needle) !== false;
     };
 
-    $walk = static function (string $folder, int $depth) use (&$walk, $root, $contains, &$projects, &$folders, &$truncated, &$visited): void {
+    $walk = static function (string $folder, int $depth) use (&$walk, $root, $contains, &$projects, &$folders, &$truncated, &$visited, &$thumbnailListings): void {
         if ($depth > SEARCH_DEPTH_LIMIT || $visited >= SEARCH_FOLDER_LIMIT) {
             $truncated = true;
             return;
@@ -643,8 +737,7 @@ function search_store(string $root, string $term): void
             if ($stat === null) {
                 continue;
             }
-            $revision = revision_for($stat);
-            $hasThumbnail = regular_file_stat(thumbnail_path($folder, $entry, $revision)) !== null;
+            $hasThumbnail = find_thumbnail($folder, $entry, $stat, $thumbnailListings) !== null;
             $projects[] = project_record($entry, $stat, $hasThumbnail, $folderKey);
         }
     };
@@ -708,12 +801,13 @@ function handle_all_designs(string $root): void
 {
     $store = store_designs($root);
     $projects = [];
+    $thumbnailListings = [];
     foreach ($store['designs'] as ['folder' => $folder, 'entry' => $entry]) {
         $stat = regular_file_stat($folder . DIRECTORY_SEPARATOR . $entry);
         if ($stat === null) {
             continue;
         }
-        $hasThumbnail = regular_file_stat(thumbnail_path($folder, $entry, revision_for($stat))) !== null;
+        $hasThumbnail = find_thumbnail($folder, $entry, $stat, $thumbnailListings) !== null;
         $projects[] = project_record($entry, $stat, $hasThumbnail, folder_key($root, $folder));
     }
     send_json([
@@ -728,6 +822,7 @@ function handle_list(string $root, string $folder): void
 {
     $projects = [];
     $folders = [];
+    $thumbnailListings = [];
     foreach (scandir($folder) ?: [] as $entry) {
         if ($entry === '.' || $entry === '..' || $entry[0] === '.') {
             continue;
@@ -744,8 +839,7 @@ function handle_list(string $root, string $folder): void
         if ($stat === null) {
             continue;
         }
-        $revision = revision_for($stat);
-        $hasThumbnail = regular_file_stat(thumbnail_path($folder, $entry, $revision)) !== null;
+        $hasThumbnail = find_thumbnail($folder, $entry, $stat, $thumbnailListings) !== null;
         $projects[] = project_record($entry, $stat, $hasThumbnail, folder_key($root, $folder));
     }
     usort($projects, static fn(array $a, array $b): int => $b['updatedAt'] <=> $a['updatedAt']);
@@ -868,12 +962,15 @@ function handle_download(string $root, string $folder, string $requested): void
         if ($requestedRevision !== '' && $requestedRevision !== $revision) {
             fail('Shared project thumbnail revision is stale', 404);
         }
-        $imagePath = thumbnail_path($folder, $fileName, $revision);
-        if (regular_file_stat($imagePath) === null) {
+        $imagePath = find_thumbnail($folder, $fileName, $stat);
+        if ($imagePath === null) {
             fail('Shared project thumbnail was not found', 404);
         }
         header('Content-Type: image/png');
-        header('Cache-Control: public, max-age=31536000, immutable');
+        // A picture found by size only (#1874) may be replaced by the exact one once the sync program has
+        // brought it, under the same address - so the browser must not keep that one for a year.
+        $exactPicture = $imagePath === thumbnail_path($folder, $fileName, $revision);
+        header('Cache-Control: ' . ($exactPicture ? 'public, max-age=31536000, immutable' : 'no-store'));
         header('ETag: "' . $revision . '"');
         header('Content-Length: ' . (string) filesize($imagePath));
         stream_file($imagePath);
@@ -1011,9 +1108,10 @@ function handle_save(string $root, string $folder): void
     if ($thumbnailBytes !== null && $finalRevision !== $savedRevision) {
         @rename(thumbnail_path($folder, $fileName, $savedRevision), thumbnail_path($folder, $fileName, $finalRevision));
     }
-    if ($currentRevision !== null && $currentRevision !== $finalRevision) {
-        @unlink(thumbnail_path($folder, $fileName, $currentRevision));
-    }
+    // Every picture of the contents that were just replaced goes, also one that another computer wrote under
+    // its own time (#1874). The name the new picture was first written under is kept as well: if the rename
+    // above failed, that is where it still is, and it is found there by its size.
+    remove_thumbnails($folder, $fileName, [$finalRevision, $savedRevision]);
 
     $record = project_record($fileName, $savedStat, $thumbnailBytes !== null, folder_key($root, $folder));
     send_json(['project' => $record], $currentStat === null ? 201 : 200, ['ETag' => '"' . $record['revision'] . '"']);
@@ -1259,7 +1357,7 @@ function handle_delete(string $root, string $folder): void
     if (!@unlink($filePath)) {
         fail('The project could not be removed', 500);
     }
-    @unlink(thumbnail_path($folder, $fileName, $currentRevision));
+    remove_thumbnails($folder, $fileName);
     send_json(['deleted' => true, 'fileName' => $fileName]);
 }
 
@@ -1319,15 +1417,16 @@ function handle_move(string $root, string $folder, string $requestedTarget): voi
         fail('The project vanished right after it was moved', 500);
     }
     $movedRevision = revision_for($movedStat);
-    $thumbnail = thumbnail_path($folder, $fileName, $currentRevision);
+    $thumbnail = find_thumbnail($folder, $fileName, $currentStat);
     $hasThumbnail = false;
-    if (regular_file_stat($thumbnail) !== null) {
+    if ($thumbnail !== null) {
         $thumbnailsRoot = $target . DIRECTORY_SEPARATOR . THUMBNAILS_DIRECTORY;
         if (!is_dir($thumbnailsRoot)) {
             @mkdir($thumbnailsRoot, 0775, true);
         }
         $hasThumbnail = @rename($thumbnail, thumbnail_path($target, $fileName, $movedRevision));
     }
+    remove_thumbnails($folder, $fileName);
 
     $record = project_record($fileName, $movedStat, $hasThumbnail, folder_key($root, $target));
     send_json([
@@ -1388,11 +1487,12 @@ function handle_rename_file(string $root, string $folder, string $requestedName)
         fail('The project vanished right after it was renamed', 500);
     }
     $renamedRevision = revision_for($renamedStat);
-    $thumbnail = thumbnail_path($folder, $fileName, $currentRevision);
+    $thumbnail = find_thumbnail($folder, $fileName, $currentStat);
     $hasThumbnail = false;
-    if (regular_file_stat($thumbnail) !== null) {
+    if ($thumbnail !== null) {
         $hasThumbnail = @rename($thumbnail, thumbnail_path($folder, $newFileName, $renamedRevision));
     }
+    remove_thumbnails($folder, $fileName);
 
     $record = project_record($newFileName, $renamedStat, $hasThumbnail, folder_key($root, $folder));
     send_json([
@@ -1461,9 +1561,9 @@ function handle_copy(string $root, string $folder, string $requestedName): void
         fail('The copy vanished right after it was written', 500);
     }
     $copyRevision = revision_for($copyStat);
-    $thumbnail = thumbnail_path($folder, $fileName, $currentRevision);
+    $thumbnail = find_thumbnail($folder, $fileName, $currentStat);
     $hasThumbnail = false;
-    if (regular_file_stat($thumbnail) !== null) {
+    if ($thumbnail !== null) {
         $thumbnailsRoot = $folder . DIRECTORY_SEPARATOR . THUMBNAILS_DIRECTORY;
         if (!is_dir($thumbnailsRoot)) {
             @mkdir($thumbnailsRoot, 0775, true);

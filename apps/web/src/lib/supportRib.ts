@@ -12,7 +12,9 @@ import type { WorkplaneShape } from "@/types/layerling";
  * the face a gap away, its back upright, as Ingo built it by hand - a wedge two lines of the nozzle thick, an oval
  * plate under it so its narrow foot holds on the bed, a rounding where the rib meets the plate and at its top. The rib
  * does not touch the part, so it comes off cleanly; small bridges hold the part from tipping the other way: each one
- * layer high and one line wide, lying exactly on a layer of the print, across the gap from the rib into the part.
+ * layer high and one line wide, lying exactly on a layer of the print, across the gap from the rib into the part - or,
+ * with a bridge gap (Discussion #1653, after Clough42's breakaway supports), out of the rib to just short of the part,
+ * so the slicer prints each one as a path of its own that holds the part by the squash of its line and leaves no mark.
  *
  * The rib is built in its own frame - s along the bed under the face (the way the face looks down), y up, w across the
  * rib - and set into the scene from there. One cut by the plane a gap off the face keeps every part of it clear of the
@@ -36,6 +38,11 @@ export type SupportRibSettings = {
   thickness: number | null;
   gap: number | null;
   bridgeWidth: number | null;
+  /**
+   * How far each bridge stops short of the part, mm, measured in its layer as the slicer sees it; 0: it reaches into the
+   * part, as before. Half a line or so keeps the bridge a path of its own (Discussion #1653).
+   */
+  bridgeGap: number;
   footThickness: number | null;
   /** The oval plate's width across the rib, mm. */
   footWidth: number;
@@ -55,6 +62,7 @@ export const DEFAULT_SUPPORT_RIB: SupportRibSettings = {
   thickness: null,
   gap: null,
   bridgeWidth: null,
+  bridgeGap: 0,
   footThickness: null,
   footWidth: 8,
   filletRadius: 1.5,
@@ -76,6 +84,8 @@ export const SUPPORT_RIB_RAISED_END = 3;
 /** How far a bridge reaches into the part and into the rib, mm. */
 const BRIDGE_INTO_PART = 0.3;
 const BRIDGE_INTO_RIB = 0.6;
+/** How far a bridge stopping short of the part must at least stand out of the rib, mm. */
+export const BRIDGE_MIN_REACH = 0.1;
 const ROUND_SEGMENTS = 12;
 const FOOT_SEGMENTS = 64;
 
@@ -97,6 +107,7 @@ export function normalizeSupportRib(input: Partial<SupportRibSettings>): Support
     thickness: optional(input.thickness, 0.2, 20),
     gap: optional(input.gap, 0.05, 5),
     bridgeWidth: optional(input.bridgeWidth, 0.1, 5),
+    bridgeGap: number(input.bridgeGap, base.bridgeGap, 0, 2),
     footThickness: optional(input.footThickness, 0.1, 10),
     footWidth: number(input.footWidth, base.footWidth, 1, 200),
     filletRadius: number(input.filletRadius, base.filletRadius, 0, 20),
@@ -200,7 +211,7 @@ export type SupportRibPlan = {
 
 export type SupportRibBuild =
   | { ok: true; positions: Float64Array; plan: SupportRibPlan }
-  | { ok: false; reason: "tooLow" | "collides" | "partOffBed" | "failed" };
+  | { ok: false; reason: "tooLow" | "bridgeGapTooWide" | "collides" | "partOffBed" | "failed" };
 
 /** The height a rib takes on this face unless set: half way up it, on the half millimetre, and never above it. */
 export function supportRibHeight(face: SupportRibFace, settings: SupportRibSettings) {
@@ -221,6 +232,8 @@ export function buildSupportRib(runtime: ManifoldToplevel, face: SupportRibFace,
   const { sine, cosine } = frame;
   const height = supportRibHeight(face, settings);
   if (height < footThickness + 0.5) return { ok: false, reason: "tooLow" };
+  // A bridge stopping short of the part must still stand out of the rib: the gap across the layer is gap / sine.
+  if (settings.bridgeGap > 0 && settings.bridgeGap > gap / sine - BRIDGE_MIN_REACH) return { ok: false, reason: "bridgeGapTooWide" };
   // The face's plane and the plane a gap off it, as distances along the bed at a height y.
   const py = face.point.y;
   const faceAt = (y: number) => (cosine * (y - py)) / sine;
@@ -321,7 +334,8 @@ export function buildSupportRib(runtime: ManifoldToplevel, face: SupportRibFace,
     }
 
     // The bridges: on every layer `spacing` apart from the plate's top up to where the slope ends, each one layer high
-    // and one line wide, from inside the part across the gap into the rib.
+    // and one line wide, from inside the part across the gap into the rib. With a bridge gap the end at the part is cut
+    // by the face's plane moved that far along the bed, so the gap is the same all through the layer.
     const bridges: number[] = [];
     const every = Math.max(1, Math.round(settings.bridgeSpacing / settings.layerHeight));
     const layerBottom = (index: number) => tidy(index === 0 ? 0 : settings.firstLayer + (index - 1) * settings.layerHeight);
@@ -333,7 +347,9 @@ export function buildSupportRib(runtime: ManifoldToplevel, face: SupportRibFace,
       const bottom = layerBottom(index);
       const start = faceAt(bottom) - BRIDGE_INTO_PART / sine;
       const end = offAt(bottom) + BRIDGE_INTO_RIB;
-      const bar = keep(keep(keep(Manifold.cube([end - start, settings.layerHeight, bridgeWidth])).translate([start, bottom, -bridgeWidth / 2])).transform(toWorld));
+      let bar = keep(keep(Manifold.cube([end - start, settings.layerHeight, bridgeWidth])).translate([start, bottom, -bridgeWidth / 2]));
+      if (settings.bridgeGap > 0) bar = keep(bar.trimByPlane([sine, -cosine, 0], sine * settings.bridgeGap - cosine * py));
+      bar = keep(bar.transform(toWorld));
       pieces.push(bar);
       bridges.push(bottom);
     }

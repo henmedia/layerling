@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { keepsProportionsOnAxis } from "@/lib/keepProportions";
+import { keepsProportionsForUpdate, keepsProportionsOnAxis } from "@/lib/keepProportions";
 
 describe("keep proportions", () => {
   it("keeps a text's height out of it, the height being the thickness of the letters (#724)", () => {
@@ -13,5 +13,17 @@ describe("keep proportions", () => {
       expect(keepsProportionsOnAxis({ kind }, "height")).toBe(true);
     }
     expect(keepsProportionsOnAxis({ kind: "box" }, undefined)).toBe(false);
+  });
+});
+
+describe("an angle typed with keep proportions on (#1763)", () => {
+  it("changes only the size the angle is reached through", () => {
+    expect(keepsProportionsForUpdate({ kind: "wedge" }, { resizeAxis: "height", angle: true })).toBe(false);
+    expect(keepsProportionsForUpdate({ kind: "teardrop" }, { resizeAxis: "height", angle: true })).toBe(false);
+  });
+
+  it("still scales the other sizes along for a size typed in", () => {
+    expect(keepsProportionsForUpdate({ kind: "wedge" }, { resizeAxis: "height" })).toBe(true);
+    expect(keepsProportionsForUpdate({ kind: "text" }, { resizeAxis: "height" })).toBe(false);
   });
 });

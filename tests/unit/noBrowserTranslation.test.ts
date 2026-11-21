@@ -30,7 +30,8 @@ describe("the browser's translator and the page language", () => {
     expect(bootLanguage(null, ["pt-BR"])).toBe("pt-BR");
     expect(bootLanguage("en", ["de-DE"])).toBe("en");
     expect(bootLanguage(null, ["es-MX", "es"])).toBe("es-ES");
-    expect(bootLanguage(null, ["sv-SE", "sv"])).toBe("en");
-    expect(bootLanguage("xx", ["sv"])).toBe("en");
+    expect(bootLanguage(null, ["sv-SE", "sv"])).toBe("sv");
+    expect(bootLanguage(null, ["nb-NO", "nb"])).toBe("en");
+    expect(bootLanguage("xx", ["ko"])).toBe("en");
   });
 });

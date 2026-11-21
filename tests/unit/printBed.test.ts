@@ -59,6 +59,7 @@ describe("printer presets", () => {
     expect(printerPresetById("bambu-lab-a1")).toMatchObject({ vendor: "Bambu Lab", model: "A1", width: 256, depth: 256, height: 256 });
     expect(printerPresetById("prusa-mk4")).toMatchObject({ width: 250, depth: 210 });
     expect(printerPresetById("ultimaker-s3")).toMatchObject({ vendor: "UltiMaker", model: "S3", width: 230, depth: 190, height: 200 });
+    expect(printerPresetById("prusa-core-one-indx")).toMatchObject({ vendor: "Prusa", model: "CORE One INDX", width: 248, depth: 205, height: 270 });
     expect(printerPresetById("no-such-printer")).toBeNull();
     expect(printerPresetById("")).toBeNull();
   });

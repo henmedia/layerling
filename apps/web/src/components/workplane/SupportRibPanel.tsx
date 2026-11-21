@@ -93,6 +93,7 @@ export function SupportRibPanel({
         {slider("thickness", t("supportRib.thickness"), measures.thickness, 0.2, 5, 0.05, t("supportRib.derivedHint"))}
         {slider("gap", t("supportRib.gap"), measures.gap, 0.05, 2, 0.05, t("supportRib.derivedHint"))}
         {slider("bridgeWidth", t("supportRib.bridgeWidth"), measures.bridgeWidth, 0.1, 2, 0.05, t("supportRib.derivedHint"))}
+        {slider("bridgeGap", t("supportRib.bridgeGap"), settings.bridgeGap, 0, 1, 0.05, t("supportRib.bridgeGapHint"))}
         {slider("footThickness", t("supportRib.footThickness"), measures.footThickness, 0.1, 3, 0.05, t("supportRib.derivedHint"))}
         {slider("footWidth", t("supportRib.footWidth"), settings.footWidth, 1, 40, 0.5)}
         {slider("filletRadius", t("supportRib.filletRadius"), settings.filletRadius, 0, 5, 0.1)}

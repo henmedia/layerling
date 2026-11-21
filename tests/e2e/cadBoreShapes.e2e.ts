@@ -368,6 +368,18 @@ describe("exact bodies for the bore shapes with the real OCCT kernel", () => {
     expect(cad.isValid(slotted)).toBe(true);
   });
 
+  it("chamfered counterbore: a real cone at the rim, outside the head's diameter, round and slotted (Discussion #1632)", () => {
+    const { solid } = exactAgainstMesh(shape("counterbore", { width: 6.4, depth: 6.4, height: 12, hole: true, screwHoleShaft: 3.4, screwHoleHeadDepth: 3.2, screwHoleChamfer: 1 }));
+    const rim = (Math.PI * 1 / 3) * (3.2 ** 2 + 3.2 * 4.2 + 4.2 ** 2);
+    expect(cad.getVolume(solid)).toBeCloseTo(Math.PI * 1.7 ** 2 * 8.8 + Math.PI * 3.2 ** 2 * 2.2 + rim, 2);
+    expect(surfaceTypes(solid).filter((type) => type === "cone").length).toBe(1);
+    const box = cad.getBoundingBox(solid);
+    expect(box.xmax - box.xmin).toBeCloseTo(8.4, 3);
+    expect(box.ymax - box.ymin).toBeCloseTo(12, 3);
+    const slotted = exactAgainstMesh(shape("counterbore", { width: 14, depth: 6.4, height: 12, hole: true, screwHoleShaft: 3.4, screwHoleHeadDepth: 3.2, screwHoleSlot: true, screwHoleChamfer: 1 })).solid;
+    expect(cad.isValid(slotted)).toBe(true);
+  });
+
   it("slotted counterbore along the depth and slotted double countersink: valid bodies where their meshes are (Discussion #1531)", () => {
     const counterbore = exactAgainstMesh(shape("counterbore", { width: 6.4, depth: 10, height: 12, hole: true, screwHoleShaft: 3.4, screwHoleHeadDepth: 3.2, screwHoleSlot: true, rotation: 30 })).solid;
     const round = Math.PI * 1.7 ** 2 * 8.8 + Math.PI * 3.2 ** 2 * 3.2;

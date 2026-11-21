@@ -57,17 +57,30 @@ const searchFor = (panel: HTMLElement, text: string) => {
   return input;
 };
 
+describe("thread insert in the shape library (#1828)", () => {
+  it("lists the thread insert under holes and finds it by search", () => {
+    const panel = library();
+
+    expect(tiles(section(panel, "Holes & cut-outs")!)).toContain("threadInsert");
+
+    searchFor(panel, "Thread insert");
+
+    expect(tiles(panel)).toContain("threadInsert");
+    expect(section(panel, "Holes & cut-outs")).not.toBeNull();
+  });
+});
+
 describe("the shape library in sections (#1170)", () => {
   it("shows every section open the first time, with its count, and each shape once", () => {
     const panel = library();
     const headings = [...panel.querySelectorAll(".shape-library-toggle")].map((button) => button.textContent);
     expect(headings).toEqual([
-      "Basic shapes15", "Vessels, tubes & transitions4", "Holes & cut-outs4", "Connections4", "Enclosure parts3", "Mechanics & moving parts4",
+      "Basic shapes16", "Vessels, tubes & transitions4", "Holes & cut-outs5", "Connections4", "Enclosure parts3", "Mechanics & moving parts4",
       "Systems & templates2", "Lettering & signs4", "Decorative outlines4", "Helpers1",
     ]);
     expect([...panel.querySelectorAll(".shape-library-toggle")].every((button) => button.getAttribute("aria-expanded") === "true")).toBe(true);
-    expect(tiles(panel)).toHaveLength(45);
-    expect(new Set(tiles(panel)).size).toBe(45);
+    expect(tiles(panel)).toHaveLength(47);
+    expect(new Set(tiles(panel)).size).toBe(47);
     expect(panel.querySelector(".custom-stand-in")).not.toBeNull();
     // Nothing put in yet: no "Recently used".
     expect(section(panel, "Recently used")).toBeNull();
@@ -94,7 +107,7 @@ describe("the shape library in sections (#1170)", () => {
     act(() => toggle(panel, "Holes & cut-outs").click());
     searchFor(panel, "USB");
     expect([...panel.querySelectorAll("section")].map((entry) => entry.getAttribute("aria-label"))).toEqual(["Holes & cut-outs"]);
-    expect(section(panel, "Holes & cut-outs")!.textContent).toContain("1 of 4");
+    expect(section(panel, "Holes & cut-outs")!.textContent).toContain("1 of 5");
     expect(tiles(panel)).toEqual(["port"]);
     expect(panel.querySelector(".custom-stand-in")).toBeNull();
     act(() => panel.querySelector<HTMLButtonElement>(".shape-library-clear")!.click());
@@ -115,7 +128,7 @@ describe("the shape library in sections (#1170)", () => {
     });
     expect(escape.defaultPrevented).toBe(true);
     expect(input.value).toBe("");
-    expect(tiles(panel)).toHaveLength(45);
+    expect(tiles(panel)).toHaveLength(47);
   });
 
   it("lists the last four shapes put in on top, newest first, also while the library stays open", () => {

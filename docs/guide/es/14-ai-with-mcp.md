@@ -97,10 +97,11 @@ La IA trabaja con las mismas funciones que tú, por el mismo camino que sigues c
 | `layerling_import_mesh` | trae una malla de triángulos al diseño |
 | `layerling_update_object` | cambia las medidas, la posición, el color, el nombre, si es sólido u orificio y todo lo demás que define la forma, incluido el canto de las letras de un texto |
 | `layerling_align_objects` | alinea objetos entre sí |
-| `layerling_scale_objects` | escala objetos en un porcentaje, juntos o cada uno en su sitio |
+| `layerling_scale_objects` | escala objetos en un porcentaje, juntos o cada uno en su sitio, o a una escala de modelismo como 1:87 |
 | `layerling_lay_flat` | apoya un objeto sobre la placa por una de sus caras |
 | `layerling_place_on_face` | posa objetos sobre una cara de otro, aunque esté inclinada, como la tecla C |
 | `layerling_perforate_face` | corta un patrón de orificios en una cara plana o alrededor de la pared de un cilindro, un tubo o un taladro; los orificios se quedan como orificios agrupados con el cuerpo |
+| `layerling_thread_insert` | hace el orificio para un inserto roscado térmico (M2 a M8, 1/4-20 o tu propia medida) en una cara plana o en la pared exterior de un cilindro o un tubo, tras comprobar que la pared junto al orificio y la profundidad detrás son suficientes; el orificio se queda como orificio agrupado con el cuerpo |
 | `layerling_sweep_sketch` | hace un barrido de una sección rectangular o redonda a lo largo de una trayectoria de puntos, como un único cuerpo exacto; una trayectoria cerrada da un anillo |
 | `layerling_push_face` | empuja hacia fuera una cara plana o abre un hueco en ella, con un desfase hacia dentro desde la arista y un radio de esquina; la parte nueva es un cuerpo de boceto agrupado con el cuerpo, o un cuerpo independiente con `separate` |
 | `layerling_paint` | pinta partes de un cuerpo en colores propios para imprimir en varios colores (Pintar): rellenar una cara hasta sus aristas vivas, una mancha redonda o un lazo trazado en una vista plana; borrar, quitar todo; se guarda con el cuerpo y se escribe en un 3MF como caras pintadas |
@@ -119,6 +120,7 @@ La IA trabaja con las mismas funciones que tú, por el mismo camino que sigues c
 | `layerling_cookie_cutter` | crea un cortador de galletas a partir de los objetos: una pared con filo y un reborde alrededor del contorno reflejado (Cortador de galletas) |
 | `layerling_flexi_joints` | corta un cuerpo plano en eslabones con articulaciones impresas ya montadas que giran hacia los lados (Articulaciones flexi) |
 | `layerling_make_lid` | crea una tapa para un cuerpo abierto por arriba: encajada dentro, por encima o plana, con el ajuste que elijas y, si quieres, con imanes (Tapa) |
+| `layerling_make_mold` | crea un molde o un troquel a partir de un modelo maestro: un molde de dos partes para colar, una caja para silicona, un molde abierto o un punzón y una matriz para lámina (Molde y troquel) |
 | `layerling_make_cable_channel` | abre un canal redondo para un cable a través de un cuerpo, de una entrada a una salida, y encuentra solo el camino con curvas suaves (Canal para cable) |
 | `layerling_loft_sketches` | une dos cuerpos de boceto en una transición de un contorno al otro (Transición entre bocetos) |
 | `layerling_separate_parts` | separa una forma en sus piezas sueltas, y un cuerpo de boceto en un cuerpo por contorno |
@@ -145,6 +147,8 @@ La IA trabaja con las mismas funciones que tú, por el mismo camino que sigues c
 | `layerling_check_clearance` | comprueba antes de imprimir qué piezas se solapan, se tocan o quedan más cerca que una holgura mínima, también las piezas separadas de un mismo objeto |
 | `layerling_printer_play` | lee, fija o borra la holgura de la impresora ({{ui:workspace.printerPlay}} en los ajustes) y coloca la prueba de ajuste que la mide |
 | `layerling_check_print` | comprueba antes de imprimir qué saldría mal: paredes demasiado finas para la boquilla, piezas flotantes, poco contacto con la placa, voladizos y mallas abiertas |
+| `layerling_check_layers` | corta la impresión en capas y enumera capa a capa lo que saldría mal: voladizos, zonas sin apoyo, puentes, paredes finas, islas pequeñas, una pieza dentro de la cama (Análisis de impresión) |
+| `layerling_split_bolt` | divide un tornillo o varilla roscada a lo largo por su eje y tumba las dos mitades sobre su cara de corte para imprimir, opcionalmente con pasadores de centrado |
 | `layerling_add_reference_points` | marca puntos de referencia (en el centro, las esquinas o los puntos medios de las aristas de los objetos, o en posiciones exactas) a los que se ajustan las formas |
 | `layerling_list_reference_points` | lista los puntos de referencia con sus id y posiciones |
 | `layerling_remove_reference_points` | elimina puntos de referencia por id, o todos |
@@ -170,6 +174,9 @@ La IA trabaja con las mismas funciones que tú, por el mismo camino que sigues c
 | `layerling_saved_view` | guarda la vista actual en la tecla 7, 8, 9 o 0 y vuelve a ella, como Mayús+tecla y la tecla (solo la vista); también fija la vista de arranque de los diseños nuevos |
 | `layerling_build_plates` | lista, añade, nombra, ordena y quita las placas de impresión, mueve objetos a una placa y los reparte en las placas, como la barra de placas |
 | `layerling_clear_history` | elimina para siempre todos los pasos de deshacer, como el botón «Eliminar historial» de la vista del historial; necesita `confirm: true` |
+| `layerling_delete_history_steps` | borra para siempre estados sueltos del historial, nunca el actual, como la papelera junto a un paso en la lista de la vista del historial; necesita `steps` y `confirm: true` |
+| `layerling_list_backups` | lista las copias automáticas (Versiones anteriores) del diseño abierto, o con `all: true` de todos los diseños de este navegador |
+| `layerling_open_backup` | abre una copia por su `id` como diseño nuevo, nunca ligado al archivo original |
 | `layerling_set_history_view` | consulta un estado anterior del proyecto, como la vista del historial (el diseño real no se toca; las herramientas que cambian algo esperan a que se cierre) |
 | `layerling_restore_from_history` | trae al diseño, como copias, objetos de un estado anterior (también piezas dentro de grupos), igual que «Traer al diseño» en la vista del historial; es un solo paso, que deshacer revierte |
 | `layerling_export_section_svg` | devuelve los contornos en un plano de corte como SVG a escala 1:1, a partir de los mismos cuerpos que la exportación |

@@ -178,7 +178,7 @@ export function mcpShapeSummary(shape: WorkplaneShape): LayerlingMcpShapeSummary
     ...(shape.sbcBoard ? { sbcBoard: shape.sbcBoard } : {}),
     // A surface texture: its settings, the masks as a count, and whether the body under it is kept to change or remove it.
     ...(shape.surfaceTexture ? { surfaceTexture: { ...shape.surfaceTexture, masks: shape.surfaceTexture.masks.length, changeable: Boolean(surfaceTextureEntry(shape)) } } : {}),
-    ...(shape.surfaceTextureLayers?.length ? { surfaceTextureLayers: shape.surfaceTextureLayers.map((layer) => ({ pattern: layer.pattern, faces: layer.faces.length })) } : {}),
+    ...(shape.surfaceTextureLayers?.length ? { surfaceTextureLayers: shape.surfaceTextureLayers.map((layer) => ({ pattern: layer.pattern, faces: layer.faces.length, ...(layer.region ? { region: layer.region.points.length } : {}) })) } : {}),
     // Paint (paint.ts): how many strokes the body carries and the colours they show.
     ...(shape.paint?.length ? { paint: { strokes: shape.paint.length, colors: paintColors(shape) } } : {}),
     children: shape.groupedShapes?.map(mcpShapeSummary),

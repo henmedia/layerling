@@ -1,14 +1,8 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { setAppTheme } from "@/lib/appTheme";
-import { writeCustomShortcuts } from "@/lib/customShortcuts";
+import { applySettingsFile } from "@/lib/applySettingsFile";
 import { t } from "@/lib/i18n";
-import { setPrinterPlayFor } from "@/lib/printerPlay";
-import { writeRibbonHidden } from "@/lib/ribbonHidden";
-import { writeRibbonOrder } from "@/lib/ribbonOrder";
-import { writeRibbonToolOrder } from "@/lib/ribbonToolOrder";
-import { writeRibbonFold } from "@/lib/ribbonFold";
 import {
   buildSettingsFile,
   parseSettingsFile,
@@ -17,10 +11,7 @@ import {
   settingsFileName,
   settingsFileText,
 } from "@/lib/settingsFile";
-import { setShapeColors } from "@/lib/shapeColors";
-import { setToolbarSize } from "@/lib/toolbarSize";
-import { setViewCubePosition } from "@/lib/viewCubePosition";
-import { saveWorkspaceDefault, workspaceWithSavedDefault } from "@/lib/workplaneSettings";
+import { workspaceWithSavedDefault } from "@/lib/workplaneSettings";
 import type { GridSize, WorkplaneWorkspaceSettings } from "@/types/layerling";
 
 /**
@@ -61,21 +52,10 @@ export function SettingsFileButtons({
       setMessage(t("workspace.importSettingsFailed"));
       return;
     }
-    saveWorkspaceDefault(parsed.workspace, parsed.snap);
+    applySettingsFile(parsed);
     const next = workspaceWithSavedDefault(workspace, parsed.workspace);
     onWorkspaceChange(next);
     if (next.units === workspace.units) onSnapChange(parsed.snap);
-    setAppTheme(parsed.browser.theme);
-    setToolbarSize(parsed.browser.toolbarSize);
-    setViewCubePosition(parsed.browser.viewCubePosition);
-    setShapeColors(parsed.browser.shapeColors);
-    for (const [printer, play] of Object.entries(parsed.browser.printerPlays)) setPrinterPlayFor(printer, play);
-    // A file from before your own keys existed has none and leaves this browser's keys as they are.
-    if (parsed.browser.customShortcuts) writeCustomShortcuts(parsed.browser.customShortcuts);
-    if (parsed.browser.ribbonHidden) writeRibbonHidden(parsed.browser.ribbonHidden);
-    if (parsed.browser.ribbonOrder) writeRibbonOrder(parsed.browser.ribbonOrder);
-    if (parsed.browser.ribbonToolOrder) writeRibbonToolOrder(parsed.browser.ribbonToolOrder);
-    if (parsed.browser.ribbonFold) writeRibbonFold(parsed.browser.ribbonFold);
     setMessage(t("workspace.importSettingsDone"));
   };
 

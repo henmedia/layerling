@@ -7,7 +7,7 @@ For at bygge en del præcist skal man måle. layerling har flere værktøjer til
 
 ## Målebåndet
 
-Målebåndet sidder for neden i visningsbjælken ved venstre kant ({{ui:camera.tapeTools}}). Det måler afstande mellem hjørner, kanter og flader. Et klik på den åbner fem knapper. Dækker de det du vil måle, så træk dem i grebet til venstre, et hvilket som helst sted på arbejdsplanet; et dobbeltklik på grebet sætter dem tilbage:
+Målebåndet sidder for neden i visningsbjælken ved venstre kant ({{ui:camera.tapeTools}}). Det måler afstande mellem hjørner, kanter og flader. Et klik på den åbner fem knapper. {{ui:camera.addMeasurement}} er slået til med det samme, så de næste to klik i visningen måler; et klik mere på knappen lægger værktøjet væk, og knapperne bliver åbne. Er målingerne skjult, bliver den slået fra, indtil du klikker på den. Dækker de det du vil måle, så træk dem i grebet til venstre, et hvilket som helst sted på arbejdsplanet; et dobbeltklik på grebet sætter dem tilbage:
 
 ![Målebåndet med dets knapper: tilføj mål, flyt målepunkter, fjern mål, hele kanter, slet alle mål.](shot:tape-menu)
 
@@ -20,6 +20,7 @@ Målebåndet sidder for neden i visningsbjælken ved venstre kant ({{ui:camera.t
 5. **{{ui:camera.deleteAllMeasurements}}:** Fjerner hvert mål på én gang. Da det ikke kan fortrydes, spørger layerling først; uden mål er der intet at gøre.
 6. **{{ui:camera.tapeMarkMiddle}}:** Midt på hvert mål sidder et lille rundt mærke med den nederste halvdel udfyldt. Den sætter et [referencepunkt](#referencepunkter) midt i målet: efter et klik på en rund kant, såsom kanten af et hul, i midten af den cirkel - også på et importeret mesh, hvor intet andet markerer midten af et hul - og for en diameter eller et hvilket som helst lige mål halvvejs langs det. En form du trækker snapper så til punktet med sit centrum. Et punkt der allerede er der laves ikke to gange.
 7. **{{ui:camera.tapeTypeLength}}:** Når mindst én ende af en lige måling sidder på et legeme, kan tallet klikkes. Skriv en ny længde og tryk [[Enter]]: legemet ved det andet punkt flyttes langs den målte linje, til afstanden er præcis den, som med linealen i Tinkercad. Er kun legemet ved det første punkt valgt, flyttes det i stedet. Målepunkterne bliver på legemet, så målingen følger med. Mål fra et hjørne, en kant eller midten af en flade eller et hul for at placere dele i en præcis afstand: fra midten af et hul til midten af toppen af en cylinder flyttes cylinderen fra midte til midte. En negativ længde flytter det så langt forbi det første punkt, for eksempel 5 mm inden for kanten af en kasse. Et [referencepunkt](#referencepunkter) hører ikke til noget legeme, så mellem to referencepunkter flytter intet sig. Går målingen langs to eller tre akser, har feltet under længden også en boks til hver af dem (ΔX, ΔY, ΔZ, de afstande der vises, når du peger på tallet): skriv der i stedet, så flyttes legemet kun langs den akse. [[Tab]] springer fra boks til boks, [[Esc]] lukker feltet uden at flytte noget. Peger du på tallet, står der, hvilket legeme der flyttes, eller hvorfor intet kan: det er låst, begge punkter ligger på samme legeme, eller ingen af dem ligger på et legeme. Beskeden bagefter siger, hvad der blev flyttet og hvor langt; én fortryd tager det tilbage.
+8. **Tykkelse under markøren:** Så længe **{{ui:camera.addMeasurement}}** er aktiv, og der endnu ikke er sat et punkt, viser det at pege på en flade, hvor tyk kroppen er dér: målt lige ind, vinkelret på fladen, til dér hvor materialet slutter, med en stiplet linje gennem kroppen. På en udhulet kasse er det væggen, på en massiv klods hele klodsen, på siden af en cylinder dens diameter. Før markøren hen over delen for at tjekke dens vægge uden at sætte et mål.
    Målebåndet snapper til et referencepunkt som til et hjørne, så du kan måle fra centrum af en cirkel eller fra midten af en linje: markér punktet, og klik så på det.
 
 [[Esc]] forlader måletilstand.
@@ -38,6 +39,7 @@ Vinkelmåleren ligger på arbejdsplanet. Ligger det på siden af en form, ligger
 - **Et kort klik på håndtaget** drejer den 90°.
 - **×** ved siden af fjerner den.
 - **Træk i den lille cirkel for enden af en arm** for at gøre armen længere eller kortere, i hele millimeter. Den nederste knap under håndtaget, {{ui:ruler.armsToPlate}}, gør begge arme lige så lange, som printpladen på printeren fra indstillingerne er bred og dyb. Vinklen gemmer armenes længder med designet, og en vinkel, der sættes igen, overtager dem.
+- **{{ui:ruler.arms}}** (knappen med tre akser, lige over den) åbner en kontakt for hver arm, opkaldt efter den akse, den løber langs. Ud over de to arme i planet er der en tredje, som står op fra hjørnet, vinkelret på arbejdsplanet: på printpladen peger den op langs Z, med sine egne streger, til en cylinder eller alt, hvad du bygger i højden. Den er slukket fra start: klik på dens bogstav for at vise den, og træk i den lille cirkel for enden for at gøre den længere eller kortere. Armene i planet slukkes på samme måde, når de er i vejen; én arm bliver altid. De grønne tal for et valgt legeme bliver, uanset hvilke arme der vises, og designet husker hvilke.
 - **Den lille knap til venstre for håndtaget** skifter hvad der måles fra: ydersiden af en form (endepunkt, et ikon med streger) eller dens midte (midtpunkt, et sigtekorn).
   En lille kontakt af samme slags sidder ved siden af hvert grønt tal og sætter kun det tal: for en stående cylinder er det midten i de to arme og bunden i højden, for en liggende midten på tværs og en ende i længden. Når alle tre igen er enige, viser knappen ved håndtaget den fælles tilstand.
 
@@ -55,7 +57,7 @@ Både målebåndet og vinkelmåleren bliver hvor de er mens du skitser og kommer
 
 Klik på {{ui:camera.protractor}} i visningsbjælken for at måle en vinkel. Ved siden af åbner en række knapper, og indtil du klikker på knappen igen eller trykker [[Esc]], måler et klik i visningen med gradskiven. Ligesom målebåndet fanger den hjørner og kanter på former; ved siden af formerne sætter den et punkt på pladen.
 
-- {{ui:camera.protractorPoints}}: klik først på vinklens hjørne, derefter på et punkt på hvert ben. Mens du sætter det sidste punkt, vises vinklen allerede; efter det tredje klik bliver den stående med en bue mellem benene. Det er vinklen i hjørnet, fra 0° til 180°.
+- {{ui:camera.protractorPoints}}: klik først på vinklens hjørne, derefter på et punkt på hvert ben. Mens du sætter det sidste punkt, vises vinklen allerede; efter det tredje klik bliver den stående med en bue mellem benene. Det er vinklen i hjørnet, fra 0° til 180°. Set lige oppefra, forfra eller fra siden måler den vinklen, som den ser ud der: et øverste hjørne og det nederste lige under det er det samme punkt. I en skrå visning er det vinklen i rummet.
 - {{ui:camera.protractorFaces}}: klik på to plane flader. En kort blå streg på hver viser, hvilken vej fladen vender, og mærkaten angiver begge vinkler, fladerne danner, den mindste først: en 45°-affasning mod toppen giver 45° · 135°, to sider af en kasse kun 90°. En krum flade har ikke én retning, så gradskiven beder om en plan flade.
 
 Det næste klik efter en færdig vinkel starter en ny, og {{ui:camera.protractorClear}} fjerner den. Vinklen følger formerne, når de flyttes eller drejes. Intet af den gemmes eller kommer i historikken: den er væk, når du lægger gradskiven fra dig.
@@ -64,13 +66,15 @@ Det næste klik efter en færdig vinkel starter en ny, og {{ui:camera.protractor
 
 Under {{ui:workspace.appearance}} i indstillingerne er der to kontakter for levende dimensioner:
 
-- {{ui:workspace.showMoveDimensions}} viser hvor meget du flytter mens du trækker. Det gælder også, når du løfter med den sorte pil over et legeme; vejen måles op langs dets forreste hjørne. Piletasterne viser også vejen: tastetrykkene tæller sammen, indtil du markerer noget andet eller drager, og [[Ctrl]]+[[↑]] og [[Ctrl]]+[[↓]] viser vejen op eller ned. Når du har sluppet, klikker du på sådan et tal og skriver den nøjagtige afstand; minus går ned.
+- {{ui:workspace.showMoveDimensions}} viser hvor meget du flytter mens du trækker. Det gælder også, når du løfter med den blå pil over et legeme; vejen måles op langs dets forreste hjørne. Piletasterne viser også vejen: tastetrykkene tæller sammen, indtil du markerer noget andet eller drager, og [[Ctrl]]+[[↑]] og [[Ctrl]]+[[↓]] viser vejen op eller ned. Når du har sluppet, klikker du på sådan et tal og skriver den nøjagtige afstand; minus går ned.
 - {{ui:workspace.showOriginDimensions}} viser afstandene fra markeringen til pladens nulpunkt, også med flere valgte former.
 
 Med {{ui:workspace.dimensionsAlwaysVisible}} bliver dimensionerne permanent synlige. Et legeme, der ikke står på arbejdsplanet, viser også sin højde over det; klik på tallet for at skrive en ny.
 Med {{ui:workspace.dimensionAxisColors}} får hvert felt farven på sin akse, ligesom håndtagene: rød for X, grøn for Y og blå for Z. Så ser du også på en lille del med det samme, hvilket tal der er hvilket.
 
 Står de i vejen et øjeblik, så tryk [[Q]]: målene og afstandene omkring markeringen forsvinder, så en del du flytter er nem at se. [[Q]] igen henter dem tilbage. Et håndtag du peger på viser stadig sit mål.
+
+På en meget lille del kan selve håndtagene stå i vejen. [[Shift+Q]] skjuler dem alle - firkanterne til størrelsen og pilene til at løfte, skubbe og dreje - og [[Shift+Q]] igen henter dem tilbage. Uden dem kan du stadig trække delen og skrive dens mål til højre, og objektlisten viser, hvilken del der er markeret.
 
 ## Tjek spillerum
 

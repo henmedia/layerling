@@ -295,8 +295,12 @@ function tonguePoint(tongue: SplitTongue, position: number, s: number, t: number
   return [a, b, position + z];
 }
 
-/** A tongue's stretch, chamfered at both ends: the hull of its full section a chamfer in from each end, and its section shrunk by the chamfer at the ends. */
-function tongueSolid(runtime: ManifoldToplevel, tongue: SplitTongue, [start, end]: FramePoint, position: number, options: SplitConnectorOptions, created: Disposable[]) {
+/**
+ * A tongue's stretch, chamfered at both ends: the hull of its full section a chamfer in from each end, and its section
+ * shrunk by the chamfer at the ends. An end given in `onward` is not chamfered but carried on that far past the stretch
+ * at its full section, to be trimmed to the other half later (tongueEndsGoingOn).
+ */
+function tongueSolid(runtime: ManifoldToplevel, tongue: SplitTongue, [start, end]: FramePoint, position: number, options: SplitConnectorOptions, created: Disposable[], onward: { start: number; end: number } = { start: 0, end: 0 }) {
   const slope = Math.tan((options.dovetailAngle * Math.PI) / 180);
   const inward = 1 / Math.cos((options.dovetailAngle * Math.PI) / 180);
   const half = options.dovetailWidth / 2;
@@ -312,9 +316,32 @@ function tongueSolid(runtime: ManifoldToplevel, tongue: SplitTongue, [start, end
     tonguePoint(tongue, position, s, -measures.top, measures.height),
     tonguePoint(tongue, position, s, measures.top, measures.height),
   ];
-  const solid = runtime.Manifold.hull([...section(start, shrunk), ...section(start + chamfer, full), ...section(end - chamfer, full), ...section(end, shrunk)]);
+  const first = onward.start > 0 ? section(start - onward.start, full) : [...section(start, shrunk), ...section(start + chamfer, full)];
+  const last = onward.end > 0 ? section(end + onward.end, full) : [...section(end - chamfer, full), ...section(end, shrunk)];
+  const solid = runtime.Manifold.hull([...first, ...last]);
   created.push(solid);
   return solid;
+}
+
+/** How much of the probe past a stretch's end must lie in the other half for the tongue to go on there. */
+const GOES_ON_SHARE = 1e-3;
+
+/**
+ * Which ends of a tongue's stretch the other half goes on past, over the tongue (Discussion #1658). A ramp cut upright
+ * across its slope rises above the cut face's top edge: the groove runs on up through the slope, and a tongue ending
+ * square at the face's edge left a step in the slope above it, as deep as the tongue over the slope. There the tongue is
+ * carried on and trimmed to the other half, so its end follows the slope. Where the other half ends at the face's edge,
+ * as at the side of a box, or leans in, the end keeps its chamfer. The probe is the tongue's box its depth past the end.
+ */
+function tongueEndsGoingOn(runtime: ManifoldToplevel, framedPositive: ManifoldSolid, tongue: SplitTongue, [start, end]: FramePoint, position: number, options: SplitConnectorOptions, created: Disposable[]) {
+  const half = dovetailTopWidth(options) / 2;
+  const goesOn = (from: number, to: number) => {
+    const probe = tongueBox(runtime, tongue, position, [from, to], half, SECTION_STEP, options.dovetailDepth, created);
+    const inside = framedPositive.intersect(probe);
+    created.push(inside);
+    return inside.volume() > GOES_ON_SHARE * probe.volume();
+  };
+  return { start: goesOn(start - options.dovetailDepth, start), end: goesOn(end, end + options.dovetailDepth) };
 }
 
 /**
@@ -387,7 +414,8 @@ function planSplitDovetails(runtime: ManifoldToplevel, positive: ManifoldSolid, 
 /**
  * A dovetail made: the tongues joined to the half on the minus side of the plane, and their grooves cut through the
  * other. A tongue's top is kept within the other half - where that half is narrower above the cut than the face, its ends
- * follow its surface - and its foot within its own half, where that one leans in below the face. The groove runs straight through the other half along the tongue, but only through the part of it
+ * follow its surface, and where it goes on past the face over the tongue, as up a ramp, the tongue goes on with it
+ * (tonguesGoingOn) - and its foot within its own half, where that one leans in below the face. The groove runs straight through the other half along the tongue, but only through the part of it
  * that holds the tongue: where a cut through two legs lines a tongue up with the other leg, that leg keeps its material,
  * as each stump slides on by itself. Only when both halves are one body each, and so must slide together, do the grooves
  * run through all of the other half.
@@ -441,6 +469,7 @@ function applySplitDovetails(runtime: ManifoldToplevel, positive: ManifoldSolid,
   const throughAll = holding.length === parts.length || (oneBody(positive) && oneBody(negative));
   const grooved = throughAll ? framedPositive.subtract(grooves) : framedPositive.subtract(unionOf(runtime, holding, created));
   created.push(grooved);
+  tongues = tonguesGoingOn(runtime, plan, framedPositive, framedNegative, tongues, throughAll ? cut : unionOf(runtime, holding, created), reach, options, created);
   const toWorld = fromSplitFrame(plan.frame);
   const cutPositive = grooved.transform(toWorld);
   const movedTongues = tongues.transform(toWorld);
@@ -448,6 +477,34 @@ function applySplitDovetails(runtime: ManifoldToplevel, positive: ManifoldSolid,
   const joined = negative.add(movedTongues);
   created.push(joined);
   return { positive: cutPositive, negative: joined, pins: null };
+}
+
+/**
+ * The tongues again, carried on past the ends of their stretches where the other half goes on over them
+ * (tongueEndsGoingOn, Discussion #1658), and trimmed: above the plane to what the grooves took out of the other half
+ * (`taken`), so a tongue never reaches into material left whole, below it to its own half. Of what is left, only the
+ * bodies that meet the tongues as they were stay: a tongue carried on out of the other half and into it again elsewhere
+ * would leave a loose piece there. Where no end goes on, the tongues stay as they were.
+ */
+function tonguesGoingOn(runtime: ManifoldToplevel, plan: SplitConnectorPlan, framedPositive: ManifoldSolid, framedNegative: ManifoldSolid, tongues: ManifoldSolid, taken: ManifoldSolid, reach: number, options: SplitConnectorOptions, created: Disposable[]) {
+  const ends = plan.tongues.map((tongue) => tongue.segments.map((segment) => tongueEndsGoingOn(runtime, framedPositive, tongue, segment, plan.position, options, created)));
+  if (!ends.some((segments) => segments.some((end) => end.start || end.end))) return tongues;
+  const far = 2 * reach;
+  const carried = unionOf(runtime, plan.tongues.flatMap((tongue, index) => tongue.segments.map((segment, part) => {
+    const { start, end } = ends[index][part];
+    return tongueSolid(runtime, tongue, segment, plan.position, options, created, { start: start ? far : 0, end: end ? far : 0 });
+  })), created);
+  const room = runtime.Manifold.union([taken, framedNegative]);
+  const trimmed = carried.intersect(room);
+  created.push(room, trimmed);
+  const bodies = trimmed.decompose();
+  created.push(...bodies);
+  const kept = bodies.filter((body) => {
+    const meets = body.intersect(tongues);
+    created.push(meets);
+    return meets.volume() > 1e-6;
+  });
+  return kept.length ? unionOf(runtime, kept, created) : tongues;
 }
 
 /**
@@ -534,7 +591,9 @@ function dowelBreakawayBase(runtime: ManifoldToplevel, options: SplitConnectorOp
   const zs = spots.map(([, z]) => z);
   const minX = Math.min(...xs) - reach;
   const minZ = Math.min(...zs) - reach;
-  const plate = runtime.Manifold.cube([Math.max(...xs) + reach - minX, height, Math.max(...zs) + reach - minZ]).translate([minX, floorY, minZ]);
+  const box = runtime.Manifold.cube([Math.max(...xs) + reach - minX, height, Math.max(...zs) + reach - minZ]);
+  created.push(box);
+  const plate = box.translate([minX, floorY, minZ]);
   created.push(plate);
   const socketRadius = breakawaySocketDiameter(options.diameter) / 2;
   const socket = revolved(runtime, [[0, floor], [socketRadius, floor], [socketRadius, height + CONNECTOR_OVERLAP], [0, height + CONNECTOR_OVERLAP]], created).transform(PIN_UPRIGHT);

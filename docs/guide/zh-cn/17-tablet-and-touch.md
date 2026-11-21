@@ -36,6 +36,8 @@ layerling 可在平板的浏览器中运行，也可从主屏幕作为应用运�
 
 指尖会遮住它所瞄准的东西。layerling 允许手指比鼠标指针伸得更远一点去够控制柄、点、线和边，但触控笔更精细。这适用于平板识别为笔的笔，例如 Apple Pencil 或 S Pen。带橡胶笔尖的普通触控笔会被屏幕当作手指，并不比手指更精细，所以只能像手指一样使用。在 iPad 上悬停于屏幕上方的 Apple Pencil 稍后还会在一个小气泡中显示控件的名称，就像鼠标指针的提示框那样。
 
+选中对象周围的尺寸控制柄、旋转箭头和移动箭头挨得很近，手指很容易碰错。视图栏里带指向手形的按钮选择手指能做什么：{{ui:camera.touchHandles.all}}、{{ui:camera.touchHandles.move}}、{{ui:camera.touchHandles.size}}或{{ui:camera.touchHandles.turn}}，每点一次换到下一个。其他控制柄会隐藏；选尺寸或旋转时，手指按在物体上只会选中它，不再移动它。浏览器会记住这个选择。和{{ui:camera.touchRotate}}一样，这个按钮只在有触摸屏的设备上显示。
+
 在草图模式中，{{ui:sketch.freehand}} 可用笔或手指像在纸上一样绘制；抬起后线条会变成可编辑的草图点，参见[草图](chapter:sketches)。
 
 如果实体在儿童或匆忙的手触碰时会被挪动，请在设置中开启 {{ui:workspace.selectBeforeMoving}}：这样必须先选中实体，只有下一次拖动才会移动它。

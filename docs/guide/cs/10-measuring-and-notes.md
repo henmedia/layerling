@@ -7,7 +7,7 @@ Přesné modelování vyžaduje měření. Layerling nabízí několik nástroj�
 
 ## Měření vzdáleností
 
-Nástroj je ve spodní části levé lišty pohledu, {{ui:camera.tapeTools}}. Měří vzdálenosti mezi rohy, hranami a plochami. Kliknutím otevřete nabídku pěti tlačítek. Překáží-li, přetáhněte ji za úchyt vlevo na jiné místo. Dvojklik na úchyt ji vrátí.
+Nástroj je ve spodní části levé lišty pohledu, {{ui:camera.tapeTools}}. Měří vzdálenosti mezi rohy, hranami a plochami. Kliknutím otevřete nabídku pěti tlačítek. {{ui:camera.addMeasurement}} je hned zapnuté, takže další dvě kliknutí v pohledu už měří; druhé kliknutí na toto tlačítko nástroj odloží a nabídka zůstane otevřená. Jsou-li měření skrytá, zůstane vypnuté, dokud na něj nekliknete. Překáží-li, přetáhněte ji za úchyt vlevo na jiné místo. Dvojklik na úchyt ji vrátí.
 
 ![Nabídka měření: přidání, přesunutí bodů, odebrání, celé hrany a odstranění všech měření.](shot:tape-menu)
 
@@ -18,6 +18,7 @@ Nástroj je ve spodní části levé lišty pohledu, {{ui:camera.tapeTools}}. M�
 5. **{{ui:camera.deleteAllMeasurements}}:** Odstraní všechna měření. Protože operaci nelze vrátit, program si vyžádá potvrzení. Bez měření nemá příkaz co odstranit.
 6. **{{ui:camera.tapeMarkMiddle}}:** Uprostřed každého měření je malá kulatá značka se spodní polovinou vyplněnou. Vytvoří [referenční bod](#referencni-body) ve středu měření. U kruhové hrany, například okraje otvoru, je to střed kružnice, a to i u importované sítě. U průměru nebo přímého měření vznikne bod v polovině úsečky. Přetahovaný tvar se na něj přichytí svým středem. Již existující bod se nevytváří znovu. Měřicí pásmo se k referenčním bodům přichytává stejně jako k rohům. Chcete-li měřit od středu kružnice nebo úsečky, nejprve jej označte a potom na bod klikněte.
 7. **{{ui:camera.tapeTypeLength}}:** Leží-li aspoň jeden konec přímého měření na tělese, lze na jeho číslo kliknout. Zadejte novou délku a stiskněte [[Enter]]: těleso u druhého bodu se posune podél změřené čáry, až je vzdálenost přesně taková, jako u pravítka v Tinkercadu. Je-li vybráno jen těleso u prvního bodu, posune se to. Měřicí body zůstávají na tělese, takže měření jde s ním. Měřte od rohu, hrany nebo středu plochy či otvoru, a díly tak umístíte na přesnou vzdálenost: od středu otvoru ke středu horní plochy válce se válec posune střed na střed. Záporná délka ho posune o tolik za první bod, třeba 5 mm dovnitř za hranu kvádru. [Referenční bod](#referencni-body) nepatří k žádnému tělesu, mezi dvěma referenčními body se proto nic neposune. Vede-li měření podél dvou nebo tří os, má pole pod délkou ještě políčko pro každou z nich (ΔX, ΔY, ΔZ, vzdálenosti, které se ukážou při najetí na číslo): zadejte hodnotu tam a těleso se posune jen podél této osy. [[Tab]] přechází z políčka na políčko, [[Esc]] pole zavře a nic neposune. Při najetí na číslo uvidíte, které těleso se posune, nebo proč žádné nemůže: je zamčené, oba body leží na stejném tělese, nebo žádný neleží na tělese. Hlášení potom řekne, co se posunulo a o kolik; jedno Zpět to vrátí.
+8. **Tloušťka pod ukazatelem:** Dokud je aktivní **{{ui:camera.addMeasurement}}** a ještě není umístěn žádný bod, ukáže najetí na plochu, jak je tam těleso tlusté: měřeno kolmo k ploše přímo dovnitř až tam, kde materiál končí, s čárkovanou čarou skrz těleso. U vydutého boxu je to stěna, u plného kvádru celý kvádr, na boku válce jeho průměr. Přejíždějte ukazatelem po dílu a zkontrolujte jeho stěny, aniž byste umístili měření.
 
 [[Esc]] ukončí režim měření.
 
@@ -35,6 +36,7 @@ Pro měření v pravém úhlu použijte {{ui:camera.cornerRulerTool}} v liště 
 - **Krátkým kliknutím na úchyt** otočíte úhelník o 90°.
 - **×** vedle úhelníku jej odstraní.
 - **Tažením malého kroužku na konci ramene** rameno prodloužíte nebo zkrátíte, po celých milimetrech. Nejspodnější tlačítko pod úchytem, {{ui:ruler.armsToPlate}}, nastaví obě ramena na šířku a hloubku tiskové podložky tiskárny zvolené v nastavení. Úhelník si délky ramen pamatuje s návrhem a nově umístěný je převezme.
+- **{{ui:ruler.arms}}** (tlačítko se třemi osami, hned nad ním) otevře přepínač pro každé rameno, pojmenovaný podle osy, podél které vede. Kromě dvou ramen v rovině je tu třetí, které stojí v rohu kolmo k pracovní rovině: na podložce míří nahoru podél Z, s vlastní stupnicí, pro válec nebo cokoli, co stavíte do výšky. Na začátku je vypnuté: klikněte na jeho písmeno a zobrazí se, a tažením malého kroužku na jeho konci ho prodloužíte nebo zkrátíte. Ramena v rovině se stejně vypínají, když překážejí; jedno rameno zůstane vždy. Zelená čísla vybraného tělesa zůstávají, ať jsou vidět kterákoli ramena, a návrh si pamatuje, která to jsou.
 - **Malé tlačítko vlevo od úchytu** přepíná měření od vnějšího okraje tělesa, se symbolem čar, nebo od jeho středu, se zaměřovacím křížem. Stejný malý přepínač je i u každého zeleného čísla a nastavuje pouze danou kótu. U stojícího válce tak můžete měřit v obou ramenech ke středu a ve výšce ke spodní straně, u ležícího napříč ke středu a podélně ke konci. Pokud se všechna tři nastavení shodují, tlačítko u úchytu ukáže společný režim.
 
 U těles umístěných u ramen úhelník automaticky ukazuje rozměry. To funguje pouze na základní podložce, nikoli na boční stěně. Tlačítko se šipkou pod úchytem úhelníku to vypne, takže míry ukazují jen vybraná tělesa; ukládá se s projektem.
@@ -49,7 +51,7 @@ Měřicí nástroj i úhelník zůstávají na místě při přechodu do náčrt
 
 Úhel změříte tlačítkem {{ui:camera.protractor}} v liště pohledu. Vedle něj se otevře řada tlačítek, a dokud na tlačítko znovu nekliknete nebo nestisknete [[Esc]], měří každé kliknutí do pohledu úhloměrem. Stejně jako měření vzdáleností se přichytává k rohům a hranám těles; vedle těles položí bod na podložku.
 
-- {{ui:camera.protractorPoints}}: nejprve klikněte na vrchol úhlu, pak na bod na každém rameni. Už při umisťování posledního bodu se úhel zobrazuje; po třetím kliknutí zůstane, s obloukem mezi rameny. Je to úhel ve vrcholu, od 0° do 180°.
+- {{ui:camera.protractorPoints}}: nejprve klikněte na vrchol úhlu, pak na bod na každém rameni. Už při umisťování posledního bodu se úhel zobrazuje; po třetím kliknutí zůstane, s obloukem mezi rameny. Je to úhel ve vrcholu, od 0° do 180°. Při pohledu přímo shora, zepředu nebo z boku měří úhel tak, jak je tam vidět: horní roh a dolní roh přímo pod ním jsou tentýž bod. V šikmém pohledu je to úhel v prostoru.
 - {{ui:camera.protractorFaces}}: klikněte na dvě rovné plochy. Krátká modrá čárka na každé ukazuje, kam plocha směřuje, a popisek uvádí oba úhly, které plochy svírají, menší jako první: zkosení 45° proti horní ploše dá 45° · 135°, dvě stěny kvádru jen 90°. Zakřivená plocha nemá jediný směr, proto úhloměr žádá rovnou plochu.
 
 Další kliknutí po hotovém úhlu začne nový a {{ui:camera.protractorClear}} jej odstraní. Úhel sleduje tělesa, když je posunete nebo otočíte. Nic z něj se neukládá ani nejde do historie: zmizí, jakmile úhloměr odložíte.
@@ -58,13 +60,15 @@ Další kliknutí po hotovém úhlu začne nový a {{ui:camera.protractorClear}}
 
 V nastavení {{ui:workspace.appearance}} jsou dva přepínače průběžného kótování:
 
-- {{ui:workspace.showMoveDimensions}} zobrazuje posunutí během tažení. Patří sem i zvedání černou šipkou nad tělesem, měřené podél jeho přední hrany. Po puštění klikni na takové číslo a napiš přesnou vzdálenost; záporná hodnota jde dolů.
+- {{ui:workspace.showMoveDimensions}} zobrazuje posunutí během tažení. Patří sem i zvedání modrou šipkou nad tělesem, měřené podél jeho přední hrany. Po puštění klikni na takové číslo a napiš přesnou vzdálenost; záporná hodnota jde dolů.
 - {{ui:workspace.showOriginDimensions}} zobrazuje vzdálenosti výběru od počátku podložky, i při výběru více těles.
 
 {{ui:workspace.dimensionsAlwaysVisible}} ponechá rozměry zobrazené trvale. Když těleso nestojí na pracovní rovině, zobrazí se i jeho výška nad ní; kliknutím na číslo zadáš novou.
 S volbou {{ui:workspace.dimensionAxisColors}} dostane každé políčko barvu své osy jako úchyty: červenou pro X, zelenou pro Y a modrou pro Z. I u malého dílu tak hned vidíš, které číslo je které.
 
 Když na chvíli překážejí, stiskněte [[Q]]: rozměry a vzdálenosti kolem výběru zmizí a díl, který posouváte, je dobře vidět. Další [[Q]] je vrátí. Úchyt, na který ukážete, svůj rozměr ukáže i tak.
+
+U velmi malého dílu mohou překážet i samotné úchyty. [[Shift+Q]] je všechny skryje - čtverečky pro velikost i šipky pro zvednutí, posun a otočení - a další [[Shift+Q]] je vrátí. I bez nich lze díl táhnout a jeho rozměry psát vpravo a seznam objektů ukazuje, který díl je vybrán.
 
 ## Kontrola vůle
 

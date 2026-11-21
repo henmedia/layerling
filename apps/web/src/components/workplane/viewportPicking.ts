@@ -1,18 +1,21 @@
 import * as THREE from "three";
+import { acceleratedRaycast, computeBoundsTree } from "three-mesh-bvh";
 import { useCallback, useRef } from "react";
 import type { PointerEvent as ReactPointerEvent } from "react";
 import type { WorkplaneShape } from "@/types/layerling";
-import type { ThreeState } from "@/components/workplane/ViewportOverlays";
+import { projectShapesExtent, type ThreeState } from "@/components/workplane/ViewportOverlays";
 import { outwardFaceNormal } from "@/lib/layFlat";
 import type { PaintLassoView } from "@/lib/paintMesh";
-import { planarFaceCentroid, planarFaceTriangles, type PivotPoint } from "@/lib/rotationPivot";
+import { planarFaceCentroid, planarFaceTriangles, snapsToWalls, type PivotPoint } from "@/lib/rotationPivot";
 import { roundFaceTriangles, type RoundFaceAxis } from "@/lib/roundFaceAxis";
 import { setPickRayFromCamera } from "@/lib/cameraRay";
+import { wallsInBand, wallTargetsFromHits, type MoveWallSnap, type SideWalls, type SnapBox, type WallHit } from "@/lib/objectSnap";
 
 /**
  * Finding what is under the pointer in the 3D view: the ray from the camera
- * through the pointer, the body it hits first, and the pick-only clicks of the
- * History view.
+ * through the pointer, the body it hits first, the pick-only clicks of the
+ * History view, and the rays that find the walls a moved or resized part
+ * snaps to.
  */
 
 export const RENDER_LAYER_SHAPES = 1;
@@ -58,7 +61,7 @@ function pickableShapeHit(state: ThreeState, shapes: readonly WorkplaneShape[]) 
     // Only surfaces pick a body. Its edge lines count as hit within 1.15 mm of the ray, so
     // through a slot narrower than about 3 mm the rim always won over the body behind it (#193).
     if (!(entry.object instanceof THREE.Mesh)) return false;
-    if (state.sectionPlane && state.sectionPlane.distanceToPoint(entry.point) < -0.001) return false;
+    if (cutAway(state, entry.point)) return false;
     const shapeId = entry.object.userData.shapeId;
     if (typeof shapeId !== "string") return false;
     const shape = shapes.find((candidate) => candidate.id === shapeId);
@@ -139,7 +142,7 @@ export function pickShapeAt(
  */
 export function firstShapeHit(state: ThreeState, options: { needsFace?: boolean; skip?: ReadonlySet<string>; throughSeeThrough?: boolean } = {}) {
   const hits = state.raycaster.intersectObjects(state.shapeLayer.children, true).filter((entry) => {
-    if (state.sectionPlane && state.sectionPlane.distanceToPoint(entry.point) < -0.001) return false;
+    if (cutAway(state, entry.point)) return false;
     if (!(entry.object instanceof THREE.Mesh)) return false;
     const shapeId = entry.object.userData.shapeId;
     if (typeof shapeId !== "string" || options.skip?.has(shapeId)) return false;
@@ -153,6 +156,102 @@ export function firstShapeHit(state: ThreeState, options: { needsFace?: boolean;
 function seeThrough(mesh: THREE.Mesh) {
   const materials = Array.isArray(mesh.material) ? mesh.material : [mesh.material];
   return materials.every((material) => material.transparent && material.opacity < 1);
+}
+
+/** Whether the section view has cut `point` away. */
+function cutAway(state: ThreeState, point: THREE.Vector3) {
+  return Boolean(state.sectionPlane && state.sectionPlane.distanceToPoint(point) < -0.001);
+}
+
+/** Where the rays that find walls start, across a side and up its height, as parts of each from its middle. */
+export const WALL_RAYS_ACROSS = [-0.4, -0.2, 0, 0.2, 0.4];
+export const WALL_RAYS_UP = [-0.4, 0, 0.4];
+
+/**
+ * Every surface met by rays along `axis` right across the scene, beside a part being moved, spread as a resize sends
+ * them from a side handle. Each ray counts every surface it crosses, so the inner wall of a box is found from outside
+ * it too. `skip` holds the moved and the hidden bodies.
+ */
+export function castWallHits(state: ThreeState, box: SnapBox, height: { min: number; max: number }, axis: "x" | "z", skip: ReadonlySet<string>): WallHit[] {
+  const across = axis === "x" ? "z" : "x";
+  const [crossMin, crossMax] = axis === "x" ? [box.minZ, box.maxZ] : [box.minX, box.maxX];
+  const strip = new THREE.Box3(new THREE.Vector3(-Infinity, height.min, -Infinity), new THREE.Vector3(Infinity, height.max, Infinity));
+  strip.min[across] = crossMin;
+  strip.max[across] = crossMax;
+  // Only the bodies the rays can meet, so a heavy body off to the side costs nothing. A treated body that has no tree
+  // yet gets one here once, indirect, so its triangles keep the order face picking counts them by.
+  const meshes: THREE.Mesh[] = [];
+  const reach = new THREE.Box3();
+  const bounds = new THREE.Box3();
+  state.shapeLayer.traverse((object) => {
+    if (!(object instanceof THREE.Mesh) || typeof object.userData.shapeId !== "string" || skip.has(object.userData.shapeId)) return;
+    if (!object.layers.isEnabled(RENDER_LAYER_SHAPES)) return;
+    if (!object.geometry.boundingBox) object.geometry.computeBoundingBox();
+    if (!bounds.copy(object.geometry.boundingBox!).applyMatrix4(object.matrixWorld).intersectsBox(strip)) return;
+    if (!object.geometry.boundsTree && object.raycast !== acceleratedRaycast) {
+      computeBoundsTree.call(object.geometry, { targetLeafSize: 12, indirect: true });
+    }
+    meshes.push(object);
+    reach.union(bounds);
+  });
+  if (meshes.length === 0) return [];
+  const direction = new THREE.Vector3();
+  direction[axis] = 1;
+  const normalMatrix = new THREE.Matrix3();
+  const hits: WallHit[] = [];
+  // A raycaster of its own: the shared one stops at the first hit of a bounds tree.
+  const raycaster = new THREE.Raycaster();
+  for (const side of WALL_RAYS_ACROSS) {
+    for (const up of WALL_RAYS_UP) {
+      const origin = new THREE.Vector3();
+      // A millimetre before the first body, so every face is met from outside.
+      origin[axis] = reach.min[axis] - 1;
+      origin[across] = (crossMin + crossMax) / 2 + side * (crossMax - crossMin);
+      origin.y = (height.min + height.max) / 2 + up * (height.max - height.min);
+      raycaster.set(origin, direction);
+      const found: THREE.Intersection[] = [];
+      meshes.forEach((mesh) => acceleratedRaycast.call(mesh, raycaster, found));
+      found.forEach((entry) => {
+        if (!entry.face || cutAway(state, entry.point)) return;
+        // The face's own normal, not the one turned towards the ray: which way a wall faces is the point.
+        const normal = entry.face.normal.clone().applyMatrix3(normalMatrix.getNormalMatrix(entry.object.matrixWorld)).normalize();
+        hits.push({ point: entry.point, normal });
+      });
+    }
+  }
+  return hits;
+}
+
+/** The bodies the rays that find walls pass through: the moved and the hidden ones. */
+export function wallRaySkip(shapes: WorkplaneShape[], moved: Set<string>) {
+  return new Set([...moved, ...shapes.filter((entry) => entry.hidden).map((entry) => entry.id)]);
+}
+
+/**
+ * What finding the walls beside a moved selection starts from, or undefined unless every part of it snaps to walls
+ * (snapsToWalls).
+ */
+export function wallSnapForSelection(shapes: WorkplaneShape[], moved: Set<string>): MoveWallSnap | undefined {
+  const selected = shapes.filter((entry) => moved.has(entry.id));
+  if (selected.length === 0 || !selected.every(snapsToWalls)) return undefined;
+  const { min, max } = projectShapesExtent(selected, new THREE.Vector3(1, 0, 0), new THREE.Vector3(0, 1, 0), new THREE.Vector3(0, 0, 1), new THREE.Vector3());
+  // No stretch covered yet, so the first move casts.
+  const uncast = () => ({ min: [], max: [], from: Infinity, to: -Infinity });
+  return { height: { min: min.y, max: max.y }, skip: wallRaySkip(shapes, moved), x: uncast(), z: uncast() };
+}
+
+/**
+ * The walls beside `box` along `axes`: found with rays the first time, and again once the selection's middle has left
+ * the stretch they were found over, so rays are not sent on every move.
+ */
+export function moveSnapWalls(state: ThreeState, wallSnap: MoveWallSnap, box: SnapBox, axes: readonly ("x" | "z")[]): SideWalls {
+  axes.forEach((axis) => {
+    const [from, to] = axis === "x" ? [box.minZ, box.maxZ] : [box.minX, box.maxX];
+    const centre = (from + to) / 2;
+    if (centre >= wallSnap[axis].from && centre <= wallSnap[axis].to) return;
+    wallSnap[axis] = { ...wallTargetsFromHits(castWallHits(state, box, wallSnap.height, axis, wallSnap.skip), axis), from, to };
+  });
+  return wallsInBand(wallSnap, box);
 }
 
 /** The first body the ray meets, whatever it is, without the near-miss ring. */

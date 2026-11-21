@@ -15,11 +15,11 @@ A caixa no alto da janela pesquisa a lista: ela mantém só os atalhos cuja fras
 
 Não acha uma ferramenta? Pressione [[Ctrl]]+[[K]] ou clique na lupa na área {{ui:editor.group.help}} e digite o que você procura: uma ferramenta ("arredondamento", "espelhar"), uma forma ("cilindro") ou um comando ("exportar", "desfazer"). Navegue com as setas e pressione [[Enter]], ou clique na entrada.
 
-- A pesquisa entende a palavra em português, em inglês e em alemão, e ignora maiúsculas e acentos: "aushoehlen" encontra {{ui:editor.tool.hollow}}.
+- A pesquisa entende a palavra em português, em inglês e em alemão, e ignora maiúsculas e acentos: "aushoehlen" encontra {{ui:editor.tool.hollow}}. A pesquisa funciona em qualquer escrita: um nome é encontrado como aparece no idioma da interface ("円柱" em japonês). Caracteres de largura total e meia largura, katakana e hiragana e acentos contam como iguais.
 - Cada entrada mostra o atalho de teclado e o grupo da barra de opções em que ela fica. Assim, você aprende onde encontrá-la.
 - Entradas em cinza não podem ser executadas agora, na maioria das vezes porque nada está selecionado. Elas continuam na lista para que a pesquisa ainda mostre onde a ferramenta fica.
 
-O guia que você está lendo também tem uma caixa de pesquisa, no topo de cada página: digite uma ou duas palavras e ela lista as seções que contêm todas elas, com as palavras encontradas destacadas. Clique numa delas, ou pressione [[Enter]] para a primeira, para ir direto até lá. A página que se abre destaca cada lugar onde suas palavras aparecem e rola até o primeiro naquela seção; [[Esc]] ou um clique num destaque os remove.
+O guia que você está lendo também tem uma caixa de pesquisa, no topo de cada página: digite uma ou duas palavras e ela lista as seções que contêm todas elas, com as palavras encontradas destacadas. Clique numa delas, ou pressione [[Enter]] para a primeira, para ir direto até lá. A página que se abre destaca cada lugar onde suas palavras aparecem e rola até o primeiro naquela seção; [[Esc]] ou um clique num destaque os remove. Palavras entre aspas são procuradas como frase exata: só aparecem as seções em que elas estão juntas e nessa ordem, e uma única palavra entre aspas só é encontrada inteira, não como parte de uma palavra maior.
 - O nome de uma forma adiciona essa forma ao plano de trabalho, como clicar nela no menu de formas.
 - Com o campo vazio, a pesquisa de comandos lista no topo os comandos que você usou por último.
 - O nome de um sólido do seu projeto encontra esse sólido e o seleciona, o que ajuda num projeto com muitas peças. Os sólidos só aparecem depois que você digita.

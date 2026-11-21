@@ -37,6 +37,18 @@ function browserStorage(): Storage | null {
 }
 
 /**
+ * Whether the surface texture card - which is the texture tool - stays open when the selected body changes from
+ * `before` to `after` (ids, null for none or several). It is not kept like the other cards: kept, it stayed on for
+ * every body chosen later and after a reload, so the tool looked switched on by itself. Choosing another body or none
+ * closes it; a body an edit replaced under a new id (a texture made or changed, undo) keeps it, as it is the same
+ * body to the user. `present` says which ids are still in the design.
+ */
+export function surfaceTextureCardStaysOpen(before: string | null, after: string | null, present: (id: string) => boolean) {
+  if (before === after) return true;
+  return before !== null && after !== null && !present(before);
+}
+
+/**
  * Open or closed, like useState, but kept in this browser: a card that was left open stays open for the next
  * shape and the next visit. `initial` is what a card shows until somebody has opened or closed it.
  */

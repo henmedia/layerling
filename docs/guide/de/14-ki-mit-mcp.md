@@ -97,10 +97,11 @@ Die KI arbeitet mit denselben Funktionen wie du, sie läuft über denselben Weg 
 | `layerling_import_mesh` | bringt ein Dreiecksnetz in den Entwurf |
 | `layerling_update_object` | ändert Maße, Lage, Farbe, Name, Körper oder Aussparung und alles, was die Form sonst ausmacht, bei einem Text auch die Buchstabenkante |
 | `layerling_align_objects` | richtet Objekte aneinander aus |
-| `layerling_scale_objects` | skaliert Objekte um einen Prozentwert, zusammen oder jedes für sich |
+| `layerling_scale_objects` | skaliert Objekte um einen Prozentwert, zusammen oder jedes für sich, oder auf einen Modellbau-Maßstab wie 1:87 |
 | `layerling_lay_flat` | legt ein Objekt mit einer Fläche auf die Platte |
 | `layerling_place_on_face` | setzt Objekte auf eine Fläche eines anderen, auch schräg, wie die Taste C |
 | `layerling_perforate_face` | schneidet ein Lochmuster in eine ebene Fläche oder rund um die Wand eines Zylinders, Rohrs oder einer Bohrung, die Löcher bleiben als Aussparungen mit dem Körper gruppiert |
+| `layerling_thread_insert` | erzeugt das Loch für einen einzuschmelzenden Gewindeeinsatz (M2 bis M8, 1/4-20 oder eigene Größe) in einer ebenen Fläche oder der Außenwand eines Zylinders oder Rohrs, nachdem geprüft wurde, ob die Wand neben dem Loch und die Tiefe dahinter ausreichen; das Loch bleibt als Aussparung mit dem Körper gruppiert |
 | `layerling_sweep_sketch` | zieht einen rechteckigen oder runden Querschnitt entlang eines Pfades aus Punkten als einen exakten Körper; ein geschlossener Pfad ergibt einen Ring |
 | `layerling_push_face` | zieht eine ebene Fläche heraus oder schneidet eine Tasche hinein, mit Rand zur Kante und Eckenradius; das neue Teil ist ein Skizzenkörper, mit dem Körper gruppiert, oder mit `separate` ein freier eigener Körper |
 | `layerling_paint` | bemalt Teile eines Körpers in eigenen Farben für den Mehrfarbdruck (Bemalen): eine Fläche bis an ihre scharfen Kanten füllen, ein runder Fleck oder ein Lasso in einer flachen Ansicht; radieren, alles abnehmen; mit dem Körper gespeichert und im 3MF als bemalte Flächen |
@@ -119,6 +120,7 @@ Die KI arbeitet mit denselben Funktionen wie du, sie läuft über denselben Weg 
 | `layerling_cookie_cutter` | baut aus den Objekten eine Ausstechform: Wand mit Schneidkante und Rand um den gespiegelten Umriss (Ausstechform) |
 | `layerling_flexi_joints` | teilt einen flachen Körper in Glieder mit mitgedruckten Gelenken, die zur Seite schwenken (Flexi-Gelenke) |
 | `layerling_make_lid` | macht einen Deckel für einen oben offenen Körper: eingesteckt, übergestülpt oder flach, mit wählbarer Passung und auf Wunsch mit Magneten (Deckel) |
+| `layerling_make_mold` | macht aus einem Urmodell eine Gussform oder einen Prägestempel mit Matrize: zweiteilige Form, Silikon-Gießrahmen, offene Form oder Stempel und Matrize (Gussform & Stanze) |
 | `layerling_make_cable_channel` | legt einen runden Kanal für ein Kabel durch einen Körper, von einem Eingang zu einem Ausgang, und sucht den Weg mit sanften Bögen selbst (Kabelkanal) |
 | `layerling_loft_sketches` | verbindet zwei Skizzenkörper zu einem Übergang von einem Umriss zum anderen (Übergang aus Skizzen) |
 | `layerling_separate_parts` | zerlegt eine Form mit losen Teilen, einen Skizzenkörper in einen Körper je Umriss |
@@ -145,6 +147,8 @@ Die KI arbeitet mit denselben Funktionen wie du, sie läuft über denselben Weg 
 | `layerling_check_clearance` | prüft vor dem Druck, welche Teile sich überschneiden, berühren oder näher kommen als ein Mindestspiel (Spiel prüfen), auch die getrennten Teile eines Objekts |
 | `layerling_printer_play` | liest, setzt oder löscht das Spiel deines Druckers ({{ui:workspace.printerPlay}} in den Einstellungen) und legt die Passprobe an, die es misst |
 | `layerling_check_print` | prüft vor dem Druck, was schiefginge: zu dünne Wände für die Düse, schwebende Teile, wenig Halt auf der Platte, Überhänge und offene Netze (Druck prüfen) |
+| `layerling_check_layers` | zerlegt den Druck in Schichten und listet Schicht für Schicht, was schiefginge: Überhänge, Bereiche ohne Auflage, Brücken, dünne Wände, kleine Inseln, ein Teil im Druckbett (Druckanalyse) |
+| `layerling_split_bolt` | teilt eine Schraube oder Gewindestange längs durch die Achse und legt beide Hälften für den Druck auf die Schnittfläche, auf Wunsch mit Zentrierstiften |
 | `layerling_add_reference_points` | setzt Bezugspunkte - auf Mitte, Ecken oder Kantenmitten von Objekten oder an genauen Stellen -, an denen Formen einrasten |
 | `layerling_list_reference_points` | listet die Bezugspunkte mit Kennung und Lage auf |
 | `layerling_remove_reference_points` | löscht Bezugspunkte nach Kennung oder alle |
@@ -170,6 +174,9 @@ Die KI arbeitet mit denselben Funktionen wie du, sie läuft über denselben Weg 
 | `layerling_saved_view` | speichert die aktuelle Ansicht unter der Taste 7, 8, 9 oder 0 und holt sie zurück, wie Umschalt+Taste und die Taste (nur die Ansicht); setzt auch die Startansicht neuer Entwürfe |
 | `layerling_build_plates` | listet, fügt hinzu, benennt, sortiert und entfernt die Druckplatten, setzt Objekte auf eine Platte und verteilt sie auf die Platten, wie die Plattenleiste |
 | `layerling_clear_history` | löscht jeden Rückgängig-Schritt endgültig, wie der Knopf „Verlauf löschen“ im Verlaufsblick; verlangt `confirm: true` |
+| `layerling_delete_history_steps` | löscht einzelne Stände des Verlaufs endgültig, nie den aktuellen, wie der Papierkorb neben einem Schritt in der Liste der Verlaufsansicht; braucht `steps` und `confirm: true` |
+| `layerling_list_backups` | listet die automatischen Sicherungen (Frühere Fassungen) des offenen Entwurfs, mit `all: true` aller Entwürfe in diesem Browser |
+| `layerling_open_backup` | öffnet eine Sicherung über ihre `id` als neuen Entwurf, nie an die ursprüngliche Datei gebunden |
 | `layerling_set_history_view` | schaut auf einen früheren Stand des Projekts zurück, wie die Verlaufsansicht (der echte Entwurf bleibt unberührt; ändernde Werkzeuge warten, bis sie geschlossen ist) |
 | `layerling_restore_from_history` | holt Objekte (auch Teile in Gruppen) aus einem früheren Stand als Kopien in den Entwurf zurück, wie „In den Entwurf holen“ in der Verlaufsansicht - ein Schritt, den Rückgängig zurücknimmt |
 | `layerling_export_section_svg` | liefert die Umrisse auf einer Schnittebene als SVG im Maßstab 1:1, aus denselben Körpern wie der Export |

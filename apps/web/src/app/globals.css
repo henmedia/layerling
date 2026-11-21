@@ -710,34 +710,36 @@ button {
   transform: translate(-50%, -50%);
 }
 
+/* No rounding: the shimmer's radius only showed on the corners the faces share with their boxes, not on the top. */
 .editor-loading-model span {
   position: absolute;
-  border-radius: 8px;
+  border-radius: 0;
   box-shadow: 0 10px 24px rgba(94, 72, 48, 0.08);
 }
 
+/* A 2:1 isometric box, 66 px from its middle to each side, the faces 6 px apart with even seams. */
 .editor-loading-model-top {
-  top: 9px;
+  top: 10px;
   left: 24px;
   width: 132px;
   height: 66px;
-  clip-path: polygon(50% 0, 100% 44%, 50% 100%, 0 44%);
+  clip-path: polygon(66px 0, 132px 33px, 66px 66px, 0 33px);
 }
 
 .editor-loading-model-front {
-  top: 66px;
+  top: 49px;
   left: 24px;
-  width: 66px;
-  height: 78px;
-  clip-path: polygon(0 0, 100% 27%, 100% 100%, 0 72%);
+  width: 63px;
+  height: 103.5px;
+  clip-path: polygon(0 0, 63px 31.5px, 63px 103.5px, 0 72px);
 }
 
 .editor-loading-model-side {
-  top: 66px;
-  left: 90px;
-  width: 66px;
-  height: 78px;
-  clip-path: polygon(0 27%, 100% 0, 100% 72%, 0 100%);
+  top: 49px;
+  left: 93px;
+  width: 63px;
+  height: 103.5px;
+  clip-path: polygon(0 31.5px, 63px 0, 63px 72px, 0 103.5px);
 }
 
 .editor-loading-viewport-controls {
@@ -1377,6 +1379,29 @@ html[data-theme="dark"] .dashboard-trademark {
   color: #6c5640;
   font-size: 13px;
   font-weight: 600;
+}
+
+/* The button a notice may carry, such as "Download instead" after a backup whose save dialog handed back no file. */
+.dashboard-notice-action {
+  margin-left: 10px;
+  padding: 3px 10px;
+  border: 1px solid #c96a12;
+  border-radius: 6px;
+  background: #fff4e6;
+  color: #9a4f08;
+  font: inherit;
+  cursor: pointer;
+}
+
+.dashboard-notice-action:hover,
+.dashboard-notice-action:focus-visible {
+  background: #ffe6c2;
+}
+
+html[data-theme="dark"] .dashboard-notice-action {
+  border-color: #f3a452;
+  background: #3a2c16;
+  color: #f3a452;
 }
 
 /* The recommendation to install layerling as an app: a card under the start tiles that is meant
@@ -2069,6 +2094,38 @@ html[data-theme="dark"] .whats-new-earlier:hover {
   background: #3a2c16;
 }
 
+/* An announcement from the author (announcements.json): the whole text, paragraphs and points, read like a letter. */
+.announcement {
+  /* Opened again from the footer, it scrolls up to just below the sticky top bar. */
+  scroll-margin-top: 86px;
+}
+
+.announcement-body p {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.55;
+}
+
+.announcement-body ul {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+  padding-inline-start: 20px;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.5;
+  list-style: disc;
+}
+
+.announcement-body li::marker {
+  color: #bf6508;
+}
+
+html[data-theme="dark"] .announcement-body li::marker {
+  color: #f3a452;
+}
+
 .dashboard-action-tile {
   display: flex;
   min-width: 0;
@@ -2664,6 +2721,30 @@ html[data-theme="dark"] .whats-new-earlier:hover {
   opacity: 0.45;
 }
 
+/* "Keep empty design?" (Discussion #1669): the question larger and centred,
+   Keep in green beside the red Delete, so the answers tell themselves apart. */
+.empty-project-dialog header {
+  justify-content: center;
+  text-align: center;
+}
+
+.empty-project-dialog header strong {
+  font-size: 18px;
+}
+
+.empty-project-dialog p {
+  text-align: center;
+}
+
+.empty-project-dialog .dashboard-confirm-actions {
+  justify-content: center;
+}
+
+.empty-project-dialog .dashboard-confirm-save {
+  border-color: #2e7d32;
+  background: #2e7d32;
+}
+
 .dashboard-rename-dialog > label {
   display: grid;
   gap: 7px;
@@ -2897,6 +2978,14 @@ html[data-theme="dark"] .whats-new-earlier:hover {
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.92), 0 1px 2px rgba(72, 53, 32, 0.06);
 }
 
+/* A menu that hangs from the toolbar - a folded group's tools, the visibility menu, the Shapes panel - lies over the
+   status message beside the view cube (#1849): the message (z-index 50) covered the menu just opened, and the pointer
+   on the message keeps it there. The menus' own z-index counts inside the toolbar only, so the toolbar itself rises
+   above the message while one of them is open. The pinned Shapes panel is no menu and stays where it is. */
+.secondary-toolbar:has(.toolbar-section[data-collapsed][data-open], .visibility-dropdown, .shape-menu-dropdown:not(.shape-menu-under-inspector)) {
+  z-index: 51;
+}
+
 .edge-modifier-panel {
   position: fixed;
   top: calc(var(--editor-toolbar-height) + 14px);
@@ -3100,6 +3189,80 @@ html[data-theme="dark"] .edge-modifier-quick-actions button.active {
 /* Five hole shapes: three to a row. */
 .hole-pattern-panel .hole-pattern-forms {
   grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+/* The hole pattern's two jobs as tabs at the top: a pattern of holes, or mounting holes in the corners. */
+.hole-pattern-panel .hole-pattern-modes {
+  margin-top: 10px;
+}
+
+.hole-pattern-panel .hole-pattern-modes .shell-opening-options {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+/* Mounting holes have their own heading, so they are not taken for a vent pattern. */
+.hole-pattern-mounting-title {
+  display: grid;
+  gap: 2px;
+  margin-top: 10px;
+  padding: 8px 10px;
+  border-left: 3px solid var(--accent, #d97813);
+  border-radius: 4px;
+  background: rgba(217, 120, 19, 0.08);
+}
+
+.hole-pattern-mounting-title strong {
+  font-size: 12px;
+}
+
+.hole-pattern-mounting-title span {
+  font-size: 11px;
+  opacity: 0.85;
+}
+
+.hole-pattern-mounting-note {
+  margin: 4px 0 8px;
+  font-size: 11px;
+  opacity: 0.8;
+}
+
+/* The top layer's colour: the label and a swatch on one line. */
+.hole-pattern-layer-color {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.hole-pattern-layer-color input[type="color"] {
+  width: 44px;
+  height: 28px;
+  padding: 0;
+  border: 1px solid var(--border, #ccc);
+  border-radius: 6px;
+  background: none;
+  cursor: pointer;
+}
+
+/* Scale by percent: the model railway gauges, four to a row. */
+.model-scale-presets {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.model-scale-presets button {
+  padding: 0 4px;
+  white-space: nowrap;
+}
+
+.model-scale-result {
+  margin: 8px 0 0;
+  color: #6d5133;
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+}
+
+html[data-theme="dark"] .model-scale-result {
+  color: #d9c3a8;
 }
 
 /* Paint: fill, circle and lasso side by side. */
@@ -3367,6 +3530,22 @@ html[data-theme="dark"] .shell-openings-summary {
 .edge-modifier-field select {
   height: 31px;
   color: #533d26;
+  background: white;
+  border: 1px solid #c4ad96;
+  border-radius: 6px;
+}
+
+/* The text on a lid's sliders or beside its bolts, a short line under its label. */
+.edge-modifier-field.lid-latch-label input {
+  display: block;
+  box-sizing: border-box;
+  width: 100%;
+  height: 31px;
+  margin-top: 5px;
+  padding: 0 7px;
+  color: #533d26;
+  font: inherit;
+  font-weight: 600;
   background: white;
   border: 1px solid #c4ad96;
   border-radius: 6px;
@@ -4130,8 +4309,7 @@ html[data-theme="dark"] .toolbar-ribbon-pin:hover {
   color: inherit;
 }
 
-.toolbar-title-help .action-icon-button:hover,
-.toolbar-title-help .action-icon-button.active {
+.toolbar-title-help .action-icon-button:hover {
   color: var(--group-color);
 }
 
@@ -4139,9 +4317,34 @@ html[data-theme="dark"] .toolbar-title-help .action-icon-button {
   color: #e3d3c0;
 }
 
-html[data-theme="dark"] .toolbar-title-help .action-icon-button:hover,
-html[data-theme="dark"] .toolbar-title-help .action-icon-button.active {
+html[data-theme="dark"] .toolbar-title-help .action-icon-button:hover {
   color: #f7f2ea;
+}
+
+/* Interactive Help, while it is on: its circle is filled orange with the question mark light in it. Only a change of
+   colour of the question mark looked like the other help buttons, and it was taken for off (Discussion #1640). The
+   circle itself is filled, not the button: the button is wider than the icon, and a filled button stood square and
+   to one side of the round icon. */
+.toolbar-title-help .action-icon-button.active,
+.toolbar-title-help .action-icon-button.active:hover {
+  color: #d07415;
+}
+
+.toolbar-title-help .action-icon-button.active svg circle {
+  fill: currentColor;
+}
+
+.toolbar-title-help .action-icon-button.active svg path {
+  stroke: #fff;
+}
+
+html[data-theme="dark"] .toolbar-title-help .action-icon-button.active,
+html[data-theme="dark"] .toolbar-title-help .action-icon-button.active:hover {
+  color: #f29a45;
+}
+
+html[data-theme="dark"] .toolbar-title-help .action-icon-button.active svg path {
+  stroke: #2a2017;
 }
 
 /* On a narrow window - a tablet held upright - the name of the design needs the room: the colour scheme keeps its
@@ -4794,6 +4997,18 @@ html[data-theme="dark"] .toolbar-title-help .action-icon-button.active {
 
 .shape-menu-trigger.active::before {
   transform: translateX(-50%) scaleY(-1);
+}
+
+/* The tab's hit area: resting the mouse on it opens the shapes panel, as on a folded group (#1722). A little larger than
+   the chevron, so it is easy to meet, and above it, so the chevron itself stays a drawing only. */
+.shape-menu-tab {
+  position: absolute;
+  z-index: 2;
+  bottom: -13px;
+  left: 50%;
+  width: 26px;
+  height: 13px;
+  transform: translateX(-50%);
 }
 
 .shape-menu-dropdown {
@@ -7144,7 +7359,6 @@ html[data-theme="dark"] .sketch-shape-options .unit {
   color: #321d07;
   background: rgba(247, 235, 223, 0.82);
   border-color: rgba(207, 182, 155, 0.7);
-  transform: translateX(1px);
 }
 
 .camera-controls button:focus-visible {
@@ -7890,6 +8104,21 @@ html[data-theme="dark"] .inspector-bundle-note {
   max-height: none;
 }
 
+.print-check-export {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 8px;
+  color: #867360;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+.print-check-export > span {
+  flex: 1;
+}
+
 .print-check-row {
   display: flex;
   align-items: flex-start;
@@ -8389,7 +8618,8 @@ html[data-theme="dark"] .touch-multi-select {
   filter: drop-shadow(0 0 4px rgba(129, 67, 0, 0.4));
 }
 
-/* An arm's end, dragged to make the arm longer or shorter (Discussion #1469): smaller than the corner's handle. */
+/* An arm's end, dragged to make the arm longer or shorter (Discussion #1469): smaller than the corner's handle.
+   The pointer follows the arm's direction on the screen (cornerRulerArmCursor, Discussion #1743); ew-resize is the fallback. */
 .corner-ruler-end-handle {
   fill: #ffffff;
   stroke: #b66108;
@@ -8404,16 +8634,39 @@ html[data-theme="dark"] .touch-multi-select {
   filter: drop-shadow(0 0 4px rgba(129, 67, 0, 0.4));
 }
 
+/* The numbers sit on a small plate of their own, so grid lines behind them do not cut through
+   the digits at any zoom (Discussion #1704: 10 px plain text on a 1/8" grid was unreadable). */
 .corner-ruler-tick-label {
   position: absolute;
   z-index: 2;
-  color: #5a3917;
-  font-size: 10px;
-  font-weight: 600;
+  padding: 2px 4px;
+  color: #4a2e12;
+  background: rgba(255, 255, 255, 0.88);
+  border-radius: 4px;
+  box-shadow: 0 0 0 1px rgba(90, 57, 23, 0.18);
+  font-size: 12px;
+  font-weight: 700;
   line-height: 1;
   text-align: center;
+  white-space: nowrap;
   pointer-events: none;
   transform: translate(-50%, -50%);
+}
+
+/* Dark and graphite: the dark brown of the square vanished on the dark grid (Discussion #1686). The arms take
+   the orange of the tape measure, the ticks a light tan, the numbers a light tone with a dark edge. */
+html[data-theme="dark"] .corner-ruler-arm {
+  stroke: #f2a65a;
+}
+
+html[data-theme="dark"] .corner-ruler-tick {
+  stroke: #d9b48a;
+}
+
+html[data-theme="dark"] .corner-ruler-tick-label {
+  color: #f6dfc2;
+  background: rgba(24, 20, 16, 0.86);
+  box-shadow: 0 0 0 1px rgba(242, 166, 90, 0.35);
 }
 
 .corner-ruler-delete {
@@ -8513,15 +8766,46 @@ html[data-theme="dark"] .touch-multi-select {
 /* The ruler's lines stay in view over bodies (the eye is open) or hide behind them. */
 .corner-ruler-occlude-toggle,
 .corner-ruler-selected-toggle,
-.corner-ruler-plate-toggle {
+.corner-ruler-plate-toggle,
+.corner-ruler-arms-toggle {
   color: #6b5b46;
   background: rgba(255, 255, 255, 0.96);
   border-color: rgba(182, 97, 8, 0.45);
 }
 
 .corner-ruler-occlude-toggle.active,
-.corner-ruler-selected-toggle.active {
+.corner-ruler-selected-toggle.active,
+.corner-ruler-arms-toggle.active {
   color: #b66108;
+}
+
+/* The switch of one arm (Discussion #1649): its axis letter, filled in the axis colour while the arm is shown. */
+.corner-ruler-arm-toggle {
+  --corner-ruler-arm-axis: #6b5b46;
+  width: 18px;
+  height: 18px;
+  color: var(--corner-ruler-arm-axis);
+  background: rgba(255, 255, 255, 0.96);
+  border: 1px dashed var(--corner-ruler-arm-axis);
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.corner-ruler-arm-toggle.axis-x { --corner-ruler-arm-axis: #d6363c; }
+.corner-ruler-arm-toggle.axis-y { --corner-ruler-arm-axis: #2f9a4b; }
+.corner-ruler-arm-toggle.axis-z { --corner-ruler-arm-axis: #2f6fe0; }
+
+.corner-ruler-arm-toggle.active,
+.corner-ruler-arm-toggle.active:hover {
+  color: #ffffff;
+  background: var(--corner-ruler-arm-axis);
+  border-style: solid;
+}
+
+/* The last arm shown cannot be switched off. */
+.corner-ruler-arm-toggle:disabled {
+  cursor: default;
 }
 
 .corner-ruler-tick-label.hidden,
@@ -8577,6 +8861,22 @@ html[data-theme="dark"] .touch-multi-select {
 [data-theme="dark"] .corner-ruler-mode-toggle:hover {
   background: rgba(46, 125, 50, 0.35);
   border-color: #81c784;
+}
+
+[data-theme="dark"] .corner-ruler-arm-toggle.axis-x { --corner-ruler-arm-axis: #ff6b70; }
+[data-theme="dark"] .corner-ruler-arm-toggle.axis-y { --corner-ruler-arm-axis: #5fd47c; }
+[data-theme="dark"] .corner-ruler-arm-toggle.axis-z { --corner-ruler-arm-axis: #6aa0ff; }
+
+[data-theme="dark"] .corner-ruler-arm-toggle {
+  color: var(--corner-ruler-arm-axis);
+  border-color: var(--corner-ruler-arm-axis);
+}
+
+[data-theme="dark"] .corner-ruler-arm-toggle.active,
+[data-theme="dark"] .corner-ruler-arm-toggle.active:hover {
+  color: #14110e;
+  background: var(--corner-ruler-arm-axis);
+  border-color: var(--corner-ruler-arm-axis);
 }
 
 [data-theme="dark"] .ruler-coordinate-badge {
@@ -9244,6 +9544,7 @@ html[data-theme="dark"] .align-dot.axis-z, html[data-theme="dark"] .align-spread
     border-color: var(--hover-accent-border-color);
 }
 
+/* The lift arrow moves along Z, so it is blue like the Z turn arrow and the Z axis arrow on the plate (Facebook group). */
 .transform-handle.height-lift {
   border: 0;
   width: 0;
@@ -9251,13 +9552,13 @@ html[data-theme="dark"] .align-dot.axis-z, html[data-theme="dark"] .align-spread
   background: transparent;
   border-left: 6px solid transparent;
   border-right: 6px solid transparent;
-  border-bottom: 13px solid #433629;
+  border-bottom: 13px solid #2f6fe0;
   box-shadow: none;
 }
 
 .transform-handle.height-lift.lower {
   border-bottom: 0;
-  border-top: 13px solid #433629;
+  border-top: 13px solid #2f6fe0;
 }
 
 .transform-handle.height-lift:hover {
@@ -9935,6 +10236,34 @@ html[data-theme="dark"] .rotation-angle-badge {
   font-weight: 600;
 }
 
+/* The colour code in the header of the colour card, to type in (Discussion #1674): text until pointed at. */
+.color-hex-input {
+  width: 92px;
+  min-width: 0;
+  padding: 3px 6px;
+  border: 1px solid transparent;
+  border-radius: 5px;
+  background: transparent;
+  font-family: inherit;
+  text-align: right;
+}
+
+.color-hex-input:hover:not(:disabled),
+.color-hex-input:focus {
+  border-color: rgba(152, 132, 111, 0.55);
+}
+
+.color-hex-input:focus {
+  outline: none;
+  background: rgba(152, 132, 111, 0.1);
+  text-align: left;
+}
+
+.color-hex-input::placeholder {
+  color: inherit;
+  opacity: 1;
+}
+
 .color-grid {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
@@ -10101,6 +10430,19 @@ html[data-theme="dark"] .rotation-angle-badge {
 
 .property-card-header:hover {
   color: #c3731f;
+}
+
+.property-card-note {
+  flex: 1 1 auto;
+  min-width: 0;
+  margin: 0 8px 0 12px;
+  overflow: hidden;
+  font-size: 13px;
+  font-weight: 400;
+  text-align: right;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  opacity: 0.75;
 }
 
 .property-list {
@@ -12636,6 +12978,14 @@ html[data-theme="dark"] .pattern-picker-empty {
   gap: 5px;
 }
 
+.workspace-space-mouse-invert-way {
+  flex-basis: 100%;
+  color: #756657;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
 .workspace-history-setting {
   display: grid;
   gap: 12px;
@@ -14071,7 +14421,8 @@ html[data-theme="dark"] .print-check-nozzle-field input {
 }
 
 html[data-theme="dark"] .print-check-nozzle-field span,
-html[data-theme="dark"] .print-check-nozzle-hint {
+html[data-theme="dark"] .print-check-nozzle-hint,
+html[data-theme="dark"] .print-check-export {
   color: #b9a58f;
 }
 
@@ -14454,11 +14805,11 @@ html[data-theme="dark"] .transform-handle.axis-y { background: #5fd47c; border-c
 html[data-theme="dark"] .transform-handle.axis-z { background: #6aa0ff; border-color: #163f86; }
 
 html[data-theme="dark"] .transform-handle.height-lift {
-  border-bottom-color: #ffffff;
+  border-bottom-color: #6aa0ff;
 }
 
 html[data-theme="dark"] .transform-handle.height-lift.lower {
-  border-top-color: #ffffff;
+  border-top-color: #6aa0ff;
 }
 
 html[data-theme="dark"] .transform-handle.height-lift:hover {
@@ -15292,7 +15643,10 @@ html[data-theme="dark"] .theme-check {
   display: flex;
   flex-direction: column;
   width: 300px;
-  max-width: calc(100vw - 120px);
+  /* Wider or narrower at the lower right corner (Discussion #1636); MIN/MAX_PANEL_WIDTH in ObjectListPanel.tsx. */
+  min-width: min(240px, calc(100vw - 120px));
+  max-width: min(600px, calc(100vw - 120px));
+  resize: horizontal;
   max-height: calc(100% - 96px);
   background: rgba(254, 253, 252, 0.96);
   backdrop-filter: blur(12px);
@@ -15481,9 +15835,11 @@ html[data-theme="dark"] .theme-check {
   background: rgba(240, 234, 224, 0.6);
 }
 
+/* The selected row is plain to see without the handles in the view: a stronger tone and a bar at its left (Discussion #1893). */
 .outliner-item.selected {
-  background: #faefe0;
+  background: #f6d9ae;
   border-color: rgba(220, 160, 90, 0.4);
+  box-shadow: inset 4px 0 0 #d97a1c;
 }
 
 .outliner-item.hidden-shape {
@@ -15601,6 +15957,19 @@ html[data-theme="dark"] .theme-check {
   height: 9px;
 }
 
+/* In a row of the object list the swatch is a button: it selects every shape of its colour (Discussion #1839). */
+button.outliner-swatch {
+  padding: 0;
+  cursor: pointer;
+  appearance: none;
+}
+
+button.outliner-swatch:hover,
+button.outliner-swatch:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 1px;
+}
+
 .outliner-info {
   flex: 1;
   min-width: 0;
@@ -15657,14 +16026,18 @@ html[data-theme="dark"] .theme-check {
   flex: none;
 }
 
+/* One letter for Solid or Hole, the word as its tooltip (Discussion #1636). */
 .outliner-badge {
   display: inline-block;
-  padding: 1px 6px;
+  min-width: 18px;
+  padding: 1px 4px;
   font-size: 10px;
   font-weight: 700;
+  line-height: 14px;
+  text-align: center;
   border-radius: 4px;
   text-transform: uppercase;
-  letter-spacing: 0.02em;
+  cursor: default;
 }
 
 .outliner-badge.badge-solid {
@@ -15680,8 +16053,10 @@ html[data-theme="dark"] .theme-check {
 }
 
 .outliner-badge.small {
-  padding: 0 4px;
+  min-width: 15px;
+  padding: 0 3px;
   font-size: 9px;
+  line-height: 12px;
 }
 
 .outliner-row-actions {
@@ -15849,8 +16224,9 @@ html[data-theme="dark"] .outliner-item:hover {
 }
 
 html[data-theme="dark"] .outliner-item.selected {
-  background: #3e3223;
+  background: #5a4424;
   border-color: rgba(246, 173, 85, 0.35);
+  box-shadow: inset 4px 0 0 #f6ad55;
 }
 
 html[data-theme="dark"] .outliner-shape-name {
@@ -16016,6 +16392,40 @@ html[data-theme="dark"] .export-holes-only-warning svg {
 /* ==========================================================================
    Open group: the bar that closes it again
    ========================================================================== */
+/* The newest state of the design could not be stored (#1652): stays up, red, until a save gets through. */
+.unsaved-design-banner {
+  position: fixed;
+  bottom: 140px;
+  left: 50%;
+  z-index: 42;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  max-width: min(640px, calc(100vw - 32px));
+  padding: 10px 16px;
+  color: #fff;
+  font-size: 13px;
+  line-height: 1.4;
+  background: #c82031;
+  border-radius: 10px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.25);
+  transform: translateX(-50%);
+}
+
+.unsaved-design-banner strong {
+  font-size: 14px;
+}
+
+/* The browser's own words and its storage figures (#1639): smaller, and selectable to copy. */
+.unsaved-design-banner .unsaved-design-detail {
+  margin-top: 4px;
+  font-size: 11px;
+  line-height: 1.35;
+  opacity: 0.9;
+  overflow-wrap: anywhere;
+  user-select: text;
+}
+
 .open-group-banner {
   position: fixed;
   bottom: 88px;
@@ -16188,6 +16598,11 @@ html[data-theme="dark"] .shape-menu-pin.active {
 /* Collapsed: the title bar alone, without the line that separates it from the list. */
 .outliner-panel.collapsed .outliner-header {
   border-bottom: none;
+}
+
+/* The title bar alone has no corner to drag the width at. */
+.outliner-panel.collapsed {
+  resize: none;
 }
 
 .guide-modal h3 {
@@ -16503,6 +16918,20 @@ html[data-theme="dark"] .color-recent {
   font-weight: 700;
 }
 
+/* What to try when the browser gave the 3D view no WebGL context. */
+.safe-mode-steps {
+  display: grid;
+  gap: 6px;
+}
+
+.safe-mode-steps ol {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+  padding-inline-start: 22px;
+  list-style: decimal;
+}
+
 .safe-mode-details {
   color: var(--muted-strong);
   font-size: 12px;
@@ -16747,6 +17176,34 @@ html[data-theme="dark"] .color-recent {
   margin-bottom: -14px;
   padding-bottom: 14px;
   background: inherit;
+}
+
+/* The message why a tool refused stays in view with the buttons (Discussion #1869): in a panel that
+   scrolls, the buttons were always there, but the message stood at the very foot, out of sight until
+   one scrolled down - a click on "Hollow" then seemed to do nothing. 60px is the height of the
+   buttons' row with its line and the gap above it; a long message scrolls inside itself. */
+.edge-modifier-panel > .edge-modifier-error:has(+ .edge-modifier-footer) {
+  position: sticky;
+  bottom: 60px;
+  z-index: 1;
+  max-height: 30dvh;
+  overflow-y: auto;
+}
+
+/* What scrolls past must not show in the gap between the message and the buttons' line. */
+.edge-modifier-panel > .edge-modifier-error + .edge-modifier-footer::before {
+  content: "";
+  position: absolute;
+  right: 0;
+  bottom: calc(100% + 1px);
+  left: 0;
+  height: 15px;
+  background: inherit;
+}
+
+/* The dark message is a little see-through; over the fields that scroll under it, it is not. */
+html[data-theme="dark"] .edge-modifier-panel > .edge-modifier-error:has(+ .edge-modifier-footer) {
+  background: #4e181d;
 }
 
 /* The angles at a selected point's two neighbouring corners (#149): the same, a touch quieter. */
@@ -17099,6 +17556,27 @@ html[data-theme="dark"] .qr-code-panel small.qr-code-warning {
   border-color: #b45a0c;
 }
 
+.new-version-notice-actions .primary:disabled {
+  cursor: progress;
+  opacity: 0.6;
+}
+
+/* The open design could not be stored (#1639): reloading would lose its newest changes. */
+.new-version-notice .new-version-notice-unsaved {
+  margin: 0;
+  padding: 8px 10px;
+  color: #ffffff;
+  font-weight: 600;
+  background: #c82031;
+  border-radius: 6px;
+}
+
+.new-version-notice-actions .danger {
+  color: #ffffff;
+  background: #c82031;
+  border-color: #a81a29;
+}
+
 /* Interactive Help (#424): while it is on the pointer is a question mark and whatever has a name
    under it is outlined; a click asks the guide about it. The window is a tool panel of its own,
    at the left edge so it stands beside the tool panels at the right, and above every dialog. */
@@ -17218,6 +17696,11 @@ html[data-theme="dark"] .interactive-help-window a:not(.primary):not(.secondary)
   color: inherit;
   font: inherit;
   cursor: pointer;
+  /* Held on a phone or tablet: no text selection, magnifier or long-press menu, and the touch stays with the button (#1671). */
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
+  touch-action: none;
 }
 
 .simple-mode-hold::after {
@@ -17242,6 +17725,7 @@ html[data-theme="dark"] .interactive-help-window a:not(.primary):not(.secondary)
 .dashboard-welcome-switch a,
 .dashboard-welcome-videos a,
 .whats-new-note a,
+.announcement-body a,
 .guide-videos a,
 .interactive-help-more a {
   color: #8f4700;
@@ -17254,6 +17738,7 @@ html[data-theme="dark"] .interactive-help-window a:not(.primary):not(.secondary)
 .dashboard-welcome-switch a:hover,
 .dashboard-welcome-videos a:hover,
 .whats-new-note a:hover,
+.announcement-body a:hover,
 .guide-videos a:hover,
 .interactive-help-more a:hover {
   color: #ad6206;
@@ -17263,6 +17748,7 @@ html[data-theme="dark"] .interactive-help-window a:not(.primary):not(.secondary)
 .dashboard-welcome-switch a[target="_blank"]::after,
 .dashboard-welcome-videos a[target="_blank"]::after,
 .whats-new-note a[target="_blank"]::after,
+.announcement-body a[target="_blank"]::after,
 .guide-videos a[target="_blank"]::after,
 .interactive-help-more a[target="_blank"]::after {
   content: "\00a0\2197\FE0E";
@@ -17274,6 +17760,7 @@ html[data-theme="dark"] .interactive-help-window a:not(.primary):not(.secondary)
 html[data-theme="dark"] .dashboard-welcome-switch a,
 html[data-theme="dark"] .dashboard-welcome-videos a,
 html[data-theme="dark"] .whats-new-note a,
+html[data-theme="dark"] .announcement-body a,
 html[data-theme="dark"] .guide-videos a,
 html[data-theme="dark"] .interactive-help-more a {
   color: #f3a452;
@@ -17282,6 +17769,7 @@ html[data-theme="dark"] .interactive-help-more a {
 html[data-theme="dark"] .dashboard-welcome-switch a:hover,
 html[data-theme="dark"] .dashboard-welcome-videos a:hover,
 html[data-theme="dark"] .whats-new-note a:hover,
+html[data-theme="dark"] .announcement-body a:hover,
 html[data-theme="dark"] .guide-videos a:hover,
 html[data-theme="dark"] .interactive-help-more a:hover {
   color: #ffc784;
@@ -17894,4 +18382,453 @@ html[data-theme="dark"] .select-property select option {
 }
 html[data-theme="dark"] .property-card > button.property-card-header:hover {
   background: rgba(255, 255, 255, 0.1);
+}
+
+.align-size-toggle {
+  display: none;
+  position: absolute;
+  left: 12px;
+  bottom: 72px;
+  padding: 8px 14px;
+  border: 1px solid var(--border-strong);
+  border-radius: 999px;
+  background: var(--panel);
+  color: var(--foreground);
+  font: 600 13px var(--font-ui);
+  box-shadow: 0 2px 8px rgba(40, 27, 13, 0.22);
+  pointer-events: auto;
+  touch-action: manipulation;
+}
+
+.align-size-toggle.on {
+  background: rgba(173, 89, 0, 0.92);
+  border-color: rgba(173, 89, 0, 0.92);
+  color: #fff;
+}
+
+@media (any-pointer: coarse) {
+  .align-size-toggle {
+    display: block;
+  }
+}
+
+/* Print analysis (Druckanalyse) and its layer view. */
+.layer-check-progress {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 6px 8px;
+  align-items: center;
+}
+
+.layer-check-progress .tool-status {
+  margin: 0;
+}
+
+.layer-check-progress progress {
+  grid-column: 1 / -1;
+  width: 100%;
+  height: 8px;
+  accent-color: #e8851a;
+}
+
+.layer-check-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 10px 0 6px;
+}
+
+.layer-check-filters label,
+.layer-view-play label {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-size: 11px;
+  color: #6d5133;
+}
+
+.layer-check-filters select,
+.layer-view-play select {
+  min-width: 120px;
+  padding: 3px 6px;
+  font: inherit;
+  font-size: 12px;
+  color: #3a2816;
+  background: #fffdf9;
+  border: 1px solid #dccdb8;
+  border-radius: 6px;
+}
+
+/* Findings in the mold window: each with its level, what it is and what helps. */
+.layer-check-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 8px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.layer-check-list.stale {
+  opacity: 0.55;
+}
+
+.layer-check-row {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 6px;
+  padding: 6px 8px;
+  color: #3a2816;
+  background: #fbf8f3;
+  border: 1px solid #ede5d6;
+  border-left: 4px solid #f2c230;
+  border-radius: 6px;
+}
+
+.layer-check-row.problem {
+  border-left-color: #e5484d;
+}
+
+.layer-check-row.active {
+  background: #fff1de;
+  box-shadow: 0 0 0 2px rgba(232, 133, 26, 0.45);
+}
+
+.layer-check-row > .print-check-show {
+  align-self: flex-end;
+}
+
+.layer-check-row-main {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+  padding: 0;
+  color: inherit;
+  text-align: left;
+  background: none;
+  border: 0;
+  cursor: pointer;
+  font: inherit;
+}
+
+.layer-check-row-main > svg {
+  flex: none;
+  margin-top: 1px;
+  color: #c79a00;
+}
+
+.layer-check-row.problem .layer-check-row-main > svg {
+  color: #e5484d;
+}
+
+.layer-check-row-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-size: 12px;
+  line-height: 1.35;
+}
+
+.layer-check-row-level {
+  color: #867360;
+  font-size: 11px;
+}
+
+.layer-check-remedy {
+  color: #8a5a1c;
+}
+
+.layer-check-clear {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  margin: 8px 0 0;
+  color: #2f7d4a;
+  font-size: 12px;
+}
+
+.layer-check-note {
+  margin: 8px 0 0;
+  color: #867360;
+  font-size: 11px;
+  font-style: italic;
+}
+
+.layer-view-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+}
+
+.layer-view-steps {
+  display: flex;
+  gap: 4px;
+}
+
+.layer-view-steps button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 28px;
+  color: #6d5133;
+  background: #fffdf9;
+  border: 1px solid #dccdb8;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.layer-view-steps button:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
+.layer-view {
+  margin-top: 10px;
+}
+
+.layer-view-readout {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 10px;
+  align-items: baseline;
+  margin-bottom: 8px;
+  font-size: 12px;
+  color: #6d5133;
+}
+
+.layer-view-readout strong {
+  color: #3a2816;
+  font-size: 13px;
+}
+
+.layer-view-active {
+  padding: 1px 6px;
+  color: #5c4300;
+  background: #fbe9a6;
+  border-radius: 999px;
+}
+
+.layer-view-active.problem {
+  color: #7a1418;
+  background: #f9d0d1;
+}
+
+.layer-view-slider {
+  display: grid;
+  grid-template-columns: 22px 10px 1fr;
+  gap: 6px;
+  align-items: start;
+  margin-bottom: 10px;
+}
+
+.layer-view-track {
+  position: relative;
+  width: 10px;
+  margin: 0 auto;
+  background: #ede5d6;
+  border-radius: 5px;
+  cursor: ns-resize;
+  touch-action: none;
+}
+
+.layer-view-track:focus-visible {
+  outline: 2px solid #e8851a;
+  outline-offset: 3px;
+}
+
+.layer-view-fill {
+  position: absolute;
+  left: 0;
+  right: 0;
+  background: #8fb3e0;
+  border-radius: 0 0 5px 5px;
+}
+
+.layer-view-range {
+  position: absolute;
+  left: -4px;
+  right: -4px;
+  background: rgba(47, 95, 158, 0.25);
+  border-radius: 3px;
+}
+
+.layer-view-thumb {
+  position: absolute;
+  left: -6px;
+  width: 22px;
+  height: 12px;
+  background: #fffdf9;
+  border: 2px solid #2f5f9e;
+  border-radius: 6px;
+  pointer-events: none;
+}
+
+.layer-view-marks {
+  position: relative;
+}
+
+.layer-view-mark {
+  position: absolute;
+  left: 0;
+  width: 10px;
+  padding: 0;
+  background: #f2c230;
+  border: 0;
+  border-radius: 2px;
+  cursor: pointer;
+}
+
+.layer-view-mark.problem {
+  background: #e5484d;
+}
+
+.layer-view-mark.active {
+  box-shadow: 0 0 0 2px #2f5f9e;
+}
+
+.layer-view-chart {
+  width: 100%;
+  background: #fbf8f3;
+  border: 1px solid #ede5d6;
+  border-radius: 6px;
+  cursor: crosshair;
+}
+
+.layer-view-chart path {
+  fill: rgba(47, 95, 158, 0.28);
+  stroke: #2f5f9e;
+  stroke-width: 0.6;
+  vector-effect: non-scaling-stroke;
+}
+
+.layer-view-chart line {
+  stroke: #e8851a;
+  stroke-width: 2;
+  vector-effect: non-scaling-stroke;
+}
+
+.layer-view-from {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 8px;
+  align-items: center;
+}
+
+.layer-view-play {
+  display: flex;
+  gap: 10px;
+  align-items: flex-end;
+  margin: 8px 0;
+}
+
+html[data-theme="dark"] .layer-check-row {
+  color: #ecdcc9;
+  background: #2f2418;
+  border-color: #53412f;
+}
+
+html[data-theme="dark"] .layer-check-row.active {
+  background: #3f2c18;
+}
+
+html[data-theme="dark"] .layer-check-row-level,
+html[data-theme="dark"] .layer-check-note,
+html[data-theme="dark"] .layer-view-readout,
+html[data-theme="dark"] .layer-check-filters label,
+html[data-theme="dark"] .layer-view-play label {
+  color: #bfa98f;
+}
+
+html[data-theme="dark"] .layer-check-remedy {
+  color: #f0b46c;
+}
+
+.tool-plain-section > strong {
+  display: block;
+  margin-bottom: 6px;
+}
+
+.mold-analysis p {
+  margin: 4px 0;
+  font-size: 13px;
+}
+
+.mold-analysis.stale {
+  opacity: 0.6;
+}
+
+.mold-option-figure {
+  font-weight: 500;
+  opacity: 0.8;
+}
+
+.mold-vents {
+  display: grid;
+  gap: 4px;
+}
+
+html[data-theme="dark"] .layer-view-readout strong {
+  color: #ecdcc9;
+}
+
+html[data-theme="dark"] .layer-check-filters select,
+html[data-theme="dark"] .layer-view-play select,
+html[data-theme="dark"] .layer-view-steps button {
+  color: #ecdcc9;
+  background: #35281b;
+  border-color: #6a5440;
+}
+
+html[data-theme="dark"] .layer-view-track {
+  background: #53412f;
+}
+
+html[data-theme="dark"] .layer-view-chart {
+  background: #2f2418;
+  border-color: #53412f;
+}
+
+html[data-theme="dark"] .layer-view-chart path {
+  fill: rgba(143, 179, 224, 0.3);
+  stroke: #8fb3e0;
+}
+
+/* A multicolour group's parts, each with its own colour, under the Multicolor switch. */
+.part-colors {
+  display: grid;
+  gap: 4px;
+  grid-column: 1 / -1;
+  margin-top: 4px;
+  font-size: 12px;
+}
+
+.part-colors > span {
+  opacity: 0.8;
+}
+
+.part-color-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.part-color-row span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.part-color-row input[type="color"] {
+  flex: none;
+  width: 32px;
+  height: 22px;
+  padding: 0;
+  border: 1px solid var(--border, #ccc);
+  border-radius: 5px;
+  background: none;
+  cursor: pointer;
 }

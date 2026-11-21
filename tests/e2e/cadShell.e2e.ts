@@ -299,11 +299,19 @@ describe("hollowing a solid with the real OCCT kernel", () => {
         return typeof value === "function" ? value.bind(target) : value;
       },
     });
-    const result = shellSolid(watching, body, 2, "top");
+    // Open at the front the thick solid builds it, and the strip is taken out first.
+    const result = shellSolid(watching, body, 2, ["front"]);
     expect(cleaned).toBe(1);
     expect(kernel.isValid(result)).toBe(true);
-    expect(kernel.getVolume(result)).toBeCloseTo(40 * 20 * 30 - 36 * 18 * 26, 1);
+    expect(kernel.getVolume(result)).toBeCloseTo(40 * 20 * 30 - 36 * 16 * 28, 1);
     kernel.release(result);
+    // Open at the top it is an upright prism, hollowed through its outline strip and all (Discussion #1615).
+    cleaned = 0;
+    const throughOutline = shellSolid(watching, body, 2, "top");
+    expect(cleaned).toBe(0);
+    expect(kernel.isValid(throughOutline)).toBe(true);
+    expect(kernel.getVolume(throughOutline)).toBeCloseTo(40 * 20 * 30 - 36 * 18 * 26, 1);
+    kernel.release(throughOutline);
     kernel.release(body);
   });
 
@@ -435,5 +443,68 @@ describe("hollowing a solid with the real OCCT kernel", () => {
     expect(kernel.subShapeCount(open, "solid")).toBe(1);
     expect(kernel.getVolume(open)).toBeLessThan(kernel.getVolume(body) * 0.2);
     [open, body, grooved, notch, groove, rounded, box].forEach((handle) => kernel.release(handle));
+  });
+
+  it("hollows a flat figure whose STL sampled its top and bottom outlines apart (Discussion #1615)", () => {
+    // A lobed outline 10 mm high, sampled with 150 points below and 170 on top, so the sides are single triangles
+    // leaning a little each way, as in the reporter's STL; two points 0.0009 mm apart on the bottom leave slivers.
+    const radius = (angle: number) => 30 + 6 * Math.cos(5 * angle);
+    const ring = (count: number, height: number, extra: number[] = []) => [...Array.from({ length: count }, (_, index) => (2 * Math.PI * (index + 0.37 * (height > 0 ? 1 : 0))) / count), ...extra]
+      .sort((a, b) => a - b)
+      .map((angle) => ({ angle, point: [radius(angle) * Math.cos(angle), height, radius(angle) * Math.sin(angle)] as [number, number, number] }));
+    const bottom = ring(150, 0, [(2 * Math.PI * 40) / 150 + 0.0009 / 30]);
+    const top = ring(170, 10);
+    const triangles: Array<[number, number, number][]> = [];
+    const facing = (corners: [number, number, number][], outward: [number, number, number]) => {
+      const [a, b, c] = corners;
+      const normal = [(b[1] - a[1]) * (c[2] - a[2]) - (b[2] - a[2]) * (c[1] - a[1]), (b[2] - a[2]) * (c[0] - a[0]) - (b[0] - a[0]) * (c[2] - a[2]), (b[0] - a[0]) * (c[1] - a[1]) - (b[1] - a[1]) * (c[0] - a[0])];
+      triangles.push(normal[0] * outward[0] + normal[1] * outward[1] + normal[2] * outward[2] >= 0 ? corners : [a, c, b]);
+    };
+    for (const [points, height, up] of [[bottom, 0, -1], [top, 10, 1]] as const) {
+      points.forEach(({ point }, index) => facing([[0, height, 0], point, points[(index + 1) % points.length].point], [0, up, 0]));
+    }
+    // The sides: the two rings zipped together by angle.
+    let below = 0;
+    let above = 0;
+    while (below < bottom.length || above < top.length) {
+      const nextBelow = below < bottom.length ? bottom[(below + 1) % bottom.length].angle + (below + 1 >= bottom.length ? 2 * Math.PI : 0) : Infinity;
+      const nextAbove = above < top.length ? top[(above + 1) % top.length].angle + (above + 1 >= top.length ? 2 * Math.PI : 0) : Infinity;
+      const b = bottom[below % bottom.length].point;
+      const t = top[above % top.length].point;
+      const out: [number, number, number] = [b[0] + t[0], 0, b[2] + t[2]];
+      if (nextBelow <= nextAbove) {
+        facing([b, bottom[(below + 1) % bottom.length].point, t], out);
+        below += 1;
+      } else {
+        facing([b, top[(above + 1) % top.length].point, t], out);
+        above += 1;
+      }
+    }
+    const stl = ["solid figure", ...triangles.map((corners) => `facet normal 0 0 0\nouter loop\n${corners.map((p) => `vertex ${p.join(" ")}`).join("\n")}\nendloop\nendfacet`), "endsolid figure"].join("\n");
+    // As the editor's CAD worker builds a mesh body: the triangles sewn into one solid, flat faces joined.
+    const faces = kernel.getSubShapes(kernel.importStl(stl), "face");
+    let body = kernel.unifySameDomain(kernel.removeDegenerateEdges(kernel.fixFaceOrientations(kernel.fixShape(kernel.sewAndSolidify(faces, 1e-5)))));
+    if (kernel.isSolid(body)) body = kernel.healSolid(body, 1e-5);
+    expect(kernel.isSolid(body)).toBe(true);
+    expect(kernel.isValid(body)).toBe(true);
+    const volume = kernel.getVolume(body);
+    const before = kernel.getBoundingBox(body, false);
+    for (const [openings, edges] of [["top", "round"], ["top", "sharp"], ["top-bottom", "round"]] as const) {
+      const result = shellSolid(kernel, body, 2, openings, edges);
+      const name = `${openings} ${edges}`;
+      expect(kernel.isValid(result), name).toBe(true);
+      expect(kernel.subShapeCount(result, "solid"), name).toBe(1);
+      // About 200 mm of outline with a 2 mm wall, 10 mm high, and a 2 mm floor where it stays.
+      expect(kernel.getVolume(result), name).toBeGreaterThan(volume * 0.15);
+      expect(kernel.getVolume(result), name).toBeLessThan(volume * 0.45);
+      // The outside is the body's own: cut as it is, not stood up from its bottom.
+      const bounds = kernel.getBoundingBox(result, false);
+      for (const axis of ["x", "y", "z"] as const) {
+        expect(bounds[`${axis}min`], name).toBeCloseTo(before[`${axis}min`], 4);
+        expect(bounds[`${axis}max`], name).toBeCloseTo(before[`${axis}max`], 4);
+      }
+      kernel.release(result);
+    }
+    kernel.release(body);
   });
 });

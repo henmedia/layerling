@@ -30,6 +30,16 @@ export function plateName(workspace: PlateWorkspace, index: number): string {
   return workspace.plates?.[index] ?? "";
 }
 
+/**
+ * What the first plate says in its near left corner: the design's name - and once the plate has a name of its
+ * own (Discussion #1860) "Plate 1: Lid" as the further plates say theirs, with the design's name in small above
+ * it; before, the first plate said the design's name only.
+ */
+export function firstPlateCornerLabel(workspace: PlateWorkspace, projectName: string, plateLabel: (index: number) => string): { title: string; subtitle: string } {
+  if (!plateName(workspace, 0)) return { title: projectName, subtitle: "" };
+  return { title: plateLabel(0), subtitle: projectName.trim() };
+}
+
 /** From the middle of one plate to the middle of the next. */
 export function platePitch(workspace: PlateWorkspace): number {
   return workspace.width + PLATE_GAP;

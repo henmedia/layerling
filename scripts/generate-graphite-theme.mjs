@@ -217,7 +217,7 @@ export function graphiteThemeCss(sourceCss) {
 }
 
 /** The style sheets the app loads, in the order layout.tsx imports them. */
-export const GRAPHITE_SOURCES = ["apps/web/src/app/globals.css", "apps/web/src/app/dashboard.css", "apps/web/src/app/historyView.css", "apps/web/src/app/notes.css", "apps/web/src/app/tape.css", "apps/web/src/app/myShapes.css", "apps/web/src/app/shapeLibrary.css", "apps/web/src/app/attachments.css", "apps/web/src/app/viewCube.css", "apps/web/src/app/shortcuts.css", "apps/web/src/app/sketchImage.css", "apps/web/src/app/sketchLock.css", "apps/web/src/app/dashboardSelect.css"];
+export const GRAPHITE_SOURCES = ["apps/web/src/app/globals.css", "apps/web/src/app/dashboard.css", "apps/web/src/app/historyView.css", "apps/web/src/app/notes.css", "apps/web/src/app/tape.css", "apps/web/src/app/myShapes.css", "apps/web/src/app/shapeLibrary.css", "apps/web/src/app/attachments.css", "apps/web/src/app/viewCube.css", "apps/web/src/app/secondView.css", "apps/web/src/app/viewScrollbars.css", "apps/web/src/app/shortcuts.css", "apps/web/src/app/ribbonButtons.css", "apps/web/src/app/sketchImage.css", "apps/web/src/app/sketchLock.css", "apps/web/src/app/dashboardSelect.css", "apps/web/src/app/focusMode.css", "apps/web/src/app/fileBackups.css"];
 export const GRAPHITE_TARGET = "apps/web/public/assets/theme/graphite-theme.css";
 
 /** The app's style sheets as one text, in the order they apply. */

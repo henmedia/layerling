@@ -4,7 +4,7 @@
  * own: the tube's properties offer the sizes, and a tube that has one's measures shows that size.
  */
 
-export type WasherSize = "M1.6" | "M2" | "M2.5" | "M3" | "M4" | "M5" | "M6" | "M8" | "M10" | "M12" | "M14" | "M16" | "M20" | "M24" | "M30";
+export type WasherSize = "M1.6" | "M2" | "M2.5" | "M3" | "M3.5" | "M4" | "M5" | "M6" | "M8" | "M10" | "M12" | "M14" | "M16" | "M20" | "M24" | "M30";
 
 export type WasherMeasures = { inner: number; outer: number; thickness: number };
 
@@ -13,6 +13,7 @@ export const WASHER_SIZES: Record<WasherSize, WasherMeasures> = {
   M2: { inner: 2.2, outer: 5, thickness: 0.3 },
   "M2.5": { inner: 2.7, outer: 6, thickness: 0.5 },
   M3: { inner: 3.2, outer: 7, thickness: 0.5 },
+  "M3.5": { inner: 3.7, outer: 8, thickness: 0.5 },
   M4: { inner: 4.3, outer: 9, thickness: 0.8 },
   M5: { inner: 5.3, outer: 10, thickness: 1 },
   M6: { inner: 6.4, outer: 12, thickness: 1.6 },

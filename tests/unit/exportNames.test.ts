@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { projectExportFileName, stlNameAsksForNewFile } from "@/lib/exportNames";
+import { plateExportName, projectExportFileName, stlNameAsksForNewFile, suggestedExportName } from "@/lib/exportNames";
 
 describe("project export filenames", () => {
   it("uses the project name for each supported export format", () => {
@@ -40,5 +40,30 @@ describe("a name typed for an STL that is linked to a file already", () => {
   it("keeps writing into the link when the name typed is the linked file's own, with or without .stl", () => {
     expect(stlNameAsksForNewFile("model", project, "Model.stl")).toBe(false);
     expect(stlNameAsksForNewFile("Model.STL", project, "Model.stl")).toBe(false);
+  });
+});
+
+describe("the name suggested for one build plate (Discussion #1860)", () => {
+  it("is the plate's own name", () => {
+    expect(plateExportName("Base plate templates", "Plate 1: Main Plate 5x5", "Main Plate 5x5")).toBe("Main Plate 5x5");
+    expect(plateExportName("Base plate templates", "Plate 2: Padding Part", "  Padding Part ")).toBe("Padding Part");
+  });
+
+  it("is the design's name with the plate behind it for a plate without a name, so two plates do not share a file name", () => {
+    expect(plateExportName("Base plate templates", "Plate 2", "")).toBe("Base plate templates - Plate 2");
+    expect(plateExportName("  ", "Plate 2", "")).toBe("Plate 2");
+  });
+
+  it("goes before the design's name and before the one body's own name in the export window", () => {
+    expect(suggestedExportName("Gearbox", null, null)).toBe("Gearbox");
+    expect(suggestedExportName("Gearbox", "Lid", null)).toBe("Lid");
+    expect(suggestedExportName("Gearbox", null, { label: "Plate 1: Main Plate 5x5", name: "Main Plate 5x5" })).toBe("Main Plate 5x5");
+    expect(suggestedExportName("Gearbox", "Lid", { label: "Plate 1: Main Plate 5x5", name: "Main Plate 5x5" })).toBe("Main Plate 5x5");
+    expect(suggestedExportName("Gearbox", "Lid", { label: "Plate 2", name: "" })).toBe("Lid");
+    expect(suggestedExportName("Gearbox", null, { label: "Plate 2", name: "" })).toBe("Gearbox - Plate 2");
+  });
+
+  it("gives a file name the system takes", () => {
+    expect(projectExportFileName(plateExportName("Gearbox", "Plate 2", ""), "stl")).toBe("Gearbox - Plate 2.stl");
   });
 });

@@ -14,6 +14,7 @@ import {
   cornerRulerDimensionMatches,
   cornerRulerDimensionMatchesFromCorner,
   cornerRulerTicks,
+  thinCornerRulerLabels,
   worldAxisNameOfDirection,
   rulerTicks,
   pointAlongRuler,
@@ -198,6 +199,37 @@ describe("cornerRulerTicks", () => {
     const ticks = cornerRulerTicks(0);
 
     expect(ticks).toEqual([{ offset: 0, height: 0.62, label: undefined }]);
+  });
+});
+
+describe("thinCornerRulerLabels (Discussion #1704)", () => {
+  const along = (count: number, spacing: number, vertical = false) =>
+    Array.from({ length: count }, (_, index) => ({
+      x: vertical ? 100 : 100 + (index + 1) * spacing,
+      y: vertical ? 100 + (index + 1) * spacing : 100,
+      text: String((index + 1) * 10),
+    }));
+
+  it("behaelt alle Zahlen, wenn ihre Schilder nebeneinander Platz haben", () => {
+    const labels = along(10, 60);
+    expect(thinCornerRulerLabels(labels)).toEqual(labels);
+  });
+
+  it("zeigt herausgezoomt nur jede 2., 5. oder 10. Zahl, gezaehlt ab der Ecke", () => {
+    // "100" braucht rund 32 px Schild und 4 px Luft.
+    expect(thinCornerRulerLabels(along(20, 20)).map((label) => label.text)).toEqual(["20", "40", "60", "80", "100", "120", "140", "160", "180", "200"]);
+    expect(thinCornerRulerLabels(along(20, 10)).map((label) => label.text)).toEqual(["50", "100", "150", "200"]);
+    expect(thinCornerRulerLabels(along(30, 4)).map((label) => label.text)).toEqual(["100", "200", "300"]);
+  });
+
+  it("rechnet bei einem senkrecht laufenden Arm mit der Hoehe des Schilds, nicht seiner Breite", () => {
+    const labels = along(10, 24, true);
+    expect(thinCornerRulerLabels(labels)).toEqual(labels);
+  });
+
+  it("laesst eine einzelne Zahl stehen", () => {
+    const labels = along(1, 1);
+    expect(thinCornerRulerLabels(labels)).toEqual(labels);
   });
 });
 

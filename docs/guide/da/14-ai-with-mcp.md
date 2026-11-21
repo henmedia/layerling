@@ -97,10 +97,11 @@ AI'en arbejder med de samme funktioner som dig, gennem den samme vej som din han
 | `layerling_import_mesh` | bringer et trekantsmesh ind i designet |
 | `layerling_update_object` | ændrer dimensioner, position, farve, navn, solid eller hul og alt andet der udgør formen, en teksts bogstavkant inkluderet |
 | `layerling_align_objects` | justerer objekter med hinanden |
-| `layerling_scale_objects` | skalerer objekter med en procent, sammen eller hver på stedet |
+| `layerling_scale_objects` | skalerer objekter med en procent, sammen eller hver på stedet, eller til en modelskala som 1:87 |
 | `layerling_lay_flat` | lægger et objekt med én flade på pladen |
 | `layerling_place_on_face` | sætter objekter ned på en flade af en anden, også skrå, som C-tasten |
 | `layerling_perforate_face` | skærer et hulmønster ind i en flad flade eller rundt om væggen på en cylinder, et rør eller en boring; hullerne bliver som huller grupperet med formen |
+| `layerling_thread_insert` | laver hullet til en varmeindsat med gevind (M2 til M8, 1/4-20 eller din egen størrelse) i en flad flade eller på ydersiden af væggen på en cylinder eller et rør, efter at have kontrolleret, at væggen ved siden af hullet og dybden bagved er nok; hullet bliver som hul grupperet med formen |
 | `layerling_sweep_sketch` | trækker et rektangulært eller rundt tværsnit langs en sti af punkter som ét eksakt legeme; en lukket sti giver en ring |
 | `layerling_push_face` | skubber en flad flade ud eller skærer en lomme ind i den, med en indrykning fra kanten og en hjørneradius; den nye del er en skitseform grupperet med formen, eller et frit legeme for sig med `separate` |
 | `layerling_paint` | maler dele af et legeme i egne farver til print i flere farver (Mal): fyld en flade ud til de skarpe kanter, en rund plet eller en lasso i en flad visning; viskelæder, fjern alt; gemt med legemet og skrevet til 3MF som malede flader |
@@ -119,6 +120,7 @@ AI'en arbejder med de samme funktioner som dig, gennem den samme vej som din han
 | `layerling_cookie_cutter` | laver en småkageudstikker af objekterne: en væg med en skærekant og en kant rundt om det spejlede omrids (Småkageudstikker) |
 | `layerling_flexi_joints` | skærer et fladt legeme i stykker med led, der er printet på plads og svinger ud til siden (Flexi-led) |
 | `layerling_make_lid` | laver et låg til et legeme, der er åbent foroven: skubbet ind, over ydersiden eller fladt, med den pasning du vælger og magneter, hvis du vil (Låg) |
+| `layerling_make_mold` | laver en form eller en stans ud fra en original: en todelt form at støbe i, en støbekasse til silikone, en åben form eller et stempel og en matrice til tyndt materiale (Støbeform & stans) |
 | `layerling_make_cable_channel` | lægger en rund kanal til et kabel gennem et legeme fra en indgang til en udgang og finder selv vejen med bløde bøjninger (Kabelkanal) |
 | `layerling_loft_sketches` | forbinder to skitseformer i en overgang fra det ene omrids til det andet (Overgang mellem skitser) |
 | `layerling_separate_parts` | adskiller en form i dens løse dele, et skitselegeme i ét legeme pr. omrids |
@@ -145,6 +147,8 @@ AI'en arbejder med de samme funktioner som dig, gennem den samme vej som din han
 | `layerling_check_clearance` | tjekker før print, hvilke dele der overlapper, rører hinanden eller kommer tættere på end et mindste spillerum (Tjek spillerum), også de adskilte dele af ét objekt |
 | `layerling_printer_play` | læser, sætter eller sletter printerens spillerum ({{ui:workspace.printerPlay}} i indstillingerne) og lægger pasprøven, der måler det |
 | `layerling_check_print` | tjekker før print, hvad der ville gå galt: for tynde vægge til dysen, svævende dele, lille kontakt med pladen, overhæng og åbne mesh (Tjek print) |
+| `layerling_check_layers` | skærer printet i lag og viser lag for lag, hvad der ville gå galt: overhæng, steder uden støtte, broer, tynde vægge, små øer, en del i pladen (Printanalyse) |
+| `layerling_split_bolt` | deler en skrue eller gevindstang på langs gennem aksen og lægger begge halvdele på snitfladen til print, valgfrit med styrestifter |
 | `layerling_add_reference_points` | markerer referencepunkter - på formens centrum, hjørner eller kantmidtpunkter, eller ved præcise positioner - som former snapper til |
 | `layerling_list_reference_points` | lister referencepunkterne med deres id'er og positioner |
 | `layerling_remove_reference_points` | sletter referencepunkter efter id, eller alle sammen |
@@ -170,6 +174,9 @@ AI'en arbejder med de samme funktioner som dig, gennem den samme vej som din han
 | `layerling_saved_view` | gemmer den aktuelle visning under tasten 7, 8, 9 eller 0 og går tilbage til den, som Shift+tast og tasten (kun visningen); sætter også startvisningen for nye designs |
 | `layerling_build_plates` | viser, tilføjer, navngiver, ordner og fjerner byggepladerne, flytter objekter til en plade og fordeler dem på pladerne, som pladelinjen |
 | `layerling_clear_history` | sletter hvert fortryd-trin for evigt, som historikvisningens "Slet historik"-knap; kræver `confirm: true` |
+| `layerling_delete_history_steps` | sletter enkelte tilstande i historikken for altid, aldrig den aktuelle, som skraldespanden ved et trin i historikvisningens liste; kræver `steps` og `confirm: true` |
+| `layerling_list_backups` | viser de automatiske sikkerhedskopier (Tidligere versioner) af det åbne design, eller med `all: true` af alle designs i denne browser |
+| `layerling_open_backup` | åbner en sikkerhedskopi via dens `id` som et nyt design, aldrig knyttet til den oprindelige fil |
 | `layerling_set_history_view` | ser tilbage på en tidligere tilstand af projektet, som historikvisningen (det rigtige design forbliver urørt; ændringsværktøjer venter indtil den er lukket) |
 | `layerling_restore_from_history` | henter objekter (også dele i grupper) fra en tidligere tilstand tilbage i designet som kopier, som historikvisningens knap til at hente ind i designet - ét trin, som fortryd tager tilbage |
 | `layerling_export_section_svg` | returnerer omridsene på et skæreplan som en SVG i 1:1, fra de samme former som eksporten |

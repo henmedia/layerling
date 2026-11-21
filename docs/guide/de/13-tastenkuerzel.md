@@ -15,11 +15,11 @@ Das Feld oben im Fenster durchsucht die Liste: Es lässt nur die Kürzel stehen,
 
 Du findest ein Werkzeug nicht? Drücke [[Strg]]+[[K]] oder klicke auf die Lupe im Bereich {{ui:editor.group.help}} und tippe, was du suchst: ein Werkzeug („Verrunden“, „Spiegeln“), eine Form („Zylinder“) oder einen Befehl („Exportieren“, „Rückgängig“). Mit den Pfeiltasten wählst du, [[Enter]] führt aus; ein Klick auf den Eintrag geht auch.
 
-- Die Suche versteht das deutsche und das englische Wort und ignoriert Groß- und Kleinschreibung und Umlaute: „aushoehlen“ findet {{ui:editor.tool.hollow}}.
+- Die Suche versteht das deutsche und das englische Wort und ignoriert Groß- und Kleinschreibung und Umlaute: „aushoehlen“ findet {{ui:editor.tool.hollow}}. Die Suche funktioniert in jeder Schrift: Ein Name wird so gefunden, wie er in der Sprache der Oberfläche steht („円柱“ auf Japanisch). Voll- und Halbbreite, Katakana und Hiragana sowie Akzente gelten als gleich.
 - Jeder Eintrag zeigt die Tasten, die dasselbe tun, und die Gruppe des Menübands, in der er liegt, so lernst du, wo er sitzt.
 - Ausgegraute Einträge lassen sich gerade nicht ausführen, meist weil nichts ausgewählt ist. Sie bleiben in der Liste, damit die Suche trotzdem verrät, wo das Werkzeug liegt.
 
-Auch diese Anleitung hat oben auf jeder Seite ein Suchfeld: Tippe ein oder zwei Wörter, und es listet die Abschnitte auf, in denen alle vorkommen, die Treffer hervorgehoben. Ein Klick, oder [[Enter]] für den ersten, springt direkt dorthin. Die Seite, die sich öffnet, markiert jede Stelle, an der deine Wörter stehen, und rollt zur ersten im gewählten Abschnitt; [[Esc]] oder ein Klick auf eine Markierung nimmt sie wieder weg.
+Auch diese Anleitung hat oben auf jeder Seite ein Suchfeld: Tippe ein oder zwei Wörter, und es listet die Abschnitte auf, in denen alle vorkommen, die Treffer hervorgehoben. Ein Klick, oder [[Enter]] für den ersten, springt direkt dorthin. Die Seite, die sich öffnet, markiert jede Stelle, an der deine Wörter stehen, und rollt zur ersten im gewählten Abschnitt; [[Esc]] oder ein Klick auf eine Markierung nimmt sie wieder weg. Wörter in Anführungszeichen sucht es als genaue Wortfolge: "auf dem Kreisbogen" listet nur die Abschnitte auf, in denen diese Wörter genau so hintereinander stehen, und ein einzelnes Wort in Anführungszeichen wird nur als ganzes Wort gefunden, nicht als Teil eines längeren.
 - Der Name einer Form fügt diese Form auf die Arbeitsfläche ein, genau wie ein Klick im Formenmenü.
 - Bei leerem Feld stehen die zuletzt benutzten Befehle oben.
 - Der Name eines Körpers in deinem Entwurf findet diesen Körper und wählt ihn aus, praktisch bei Entwürfen mit vielen Teilen. Körper erscheinen erst, sobald du etwas tippst.

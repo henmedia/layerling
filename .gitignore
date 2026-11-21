@@ -100,3 +100,6 @@ apps/web/public/fonts/japanese/
 
 # Built European Portuguese user guide.
 apps/web/public/guia-pt-pt/
+
+# Built Swedish user guide.
+apps/web/public/handbok/

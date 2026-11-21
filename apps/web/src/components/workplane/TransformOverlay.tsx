@@ -19,6 +19,7 @@ export {
   measureKeyForHandle,
   normalizedRotationPlaneBasis,
   rotateHandleArrow,
+  rotationNeedleAngle,
   rotationPlaneDirectionSign,
   screenSpaceDimensionMark,
   transformBoundsIntersectClipVolume,
@@ -44,6 +45,7 @@ export {
 } from "@/components/workplane/transformOverlayTypes";
 import { sizeDimensionAxis } from "@/lib/dimensionAxisColors";
 import { selectWholeValue } from "@/lib/numberField";
+import { touchModeShowsHandle } from "@/lib/touchHandleMode";
 import { useTouchSecondTap } from "@/lib/touchSecondTap";
 import { visibleWorkArea, type VisibleWorkArea } from "@/lib/visibleWorkArea";
 
@@ -71,6 +73,8 @@ export function TransformOverlay({
   angleBadge = null,
   locked = false,
   sizeLocked = false,
+  showSlideArrows = true,
+  handleMode = "all",
   showRotationWheel,
   hideSelectionChrome,
   hideDimensionMarks,
@@ -308,7 +312,8 @@ export function TransformOverlay({
         </label>
       ) : null}
       {/* Lock shape (#1277): no handle that changes the size; the lift arrow and the turns stay. */}
-      {box.handles.filter((handle) => !sizeLocked || (handle.kind !== "scale" && handle.kind !== "height")).map((handle) => (
+      {/* On a touch screen the camera bar can leave only moving, the size or turning to the finger (Discussion #1747). */}
+      {box.handles.filter((handle) => (!sizeLocked || (handle.kind !== "scale" && handle.kind !== "height")) && touchModeShowsHandle(handleMode, handle.kind)).map((handle) => (
         <button
           key={handle.key}
           className={`transform-handle ${handle.className}`}
@@ -349,7 +354,7 @@ export function TransformOverlay({
           }}
         />
       ))}
-      {box.rotateHandles.map((handle) => (
+      {touchModeShowsHandle(handleMode, "rotate") ? box.rotateHandles.map((handle) => (
         <button
           key={handle.key}
           className={`rotate-handle ${handle.className}`}
@@ -380,9 +385,9 @@ export function TransformOverlay({
             </svg>
           </span>
         </button>
-      ))}
-      {/* The X and Y arrows (Discussion #1434) only move the selection; a locked one keeps still and shows none. */}
-      {locked ? null : box.slideHandles.map((handle) => (
+      )) : null}
+      {/* The X and Y arrows (Discussion #1434) only move the selection; a locked one keeps still and shows none, and the settings can leave them out. */}
+      {locked || !showSlideArrows || !touchModeShowsHandle(handleMode, "slide") ? null : box.slideHandles.map((handle) => (
         <button
           key={handle.key}
           className={`slide-handle ${handle.className}`}

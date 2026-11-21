@@ -1,13 +1,13 @@
 "use client";
 
-import { Sparkles, X } from "lucide-react";
+import { BookOpen, Sparkles, X } from "lucide-react";
 import { useMemo, useState } from "react";
 import { GuideHelpLink } from "@/components/GuideHelpLink";
 import { releaseNotesUrl } from "@/lib/appUpdate";
 import { localizedText, t } from "@/lib/i18n";
 import { useLanguage } from "@/lib/useLanguage";
 import type { WhatsNewView } from "@/lib/useWhatsNew";
-import { whatsNewBefore, type WhatsNewEntry } from "@/lib/whatsNew";
+import { whatsNewBefore, whatsNewBlocks, whatsNewGuideLinks, type WhatsNewEntry } from "@/lib/whatsNew";
 
 /** The cards are a selection: smaller changes and fixes are only in the release notes on GitHub. */
 export function WhatsNewNote() {
@@ -20,7 +20,24 @@ export function WhatsNewNote() {
   );
 }
 
-/** The versions with their highlights, in the interface language. */
+/** A card's text: one paragraph as it always was, or several with lists where the card is longer. */
+function WhatsNewBody({ text }: { text: string }) {
+  const blocks = whatsNewBlocks(text);
+  if (blocks.length === 1 && blocks[0].kind === "paragraph") return <span>{blocks[0].text}</span>;
+  return (
+    <div className="whats-new-text">
+      {blocks.map((block, index) => block.kind === "paragraph"
+        ? <span key={index}>{block.text}</span>
+        : (
+          <ul key={index} className="whats-new-points">
+            {block.items.map((point) => <li key={point}>{point}</li>)}
+          </ul>
+        ))}
+    </div>
+  );
+}
+
+/** The versions with their highlights, in the interface language, with a link to the guide where a card has one. */
 export function WhatsNewList({ entries }: { entries: readonly WhatsNewEntry[] }) {
   const language = useLanguage();
   return (
@@ -32,7 +49,13 @@ export function WhatsNewList({ entries }: { entries: readonly WhatsNewEntry[] })
             {entry.items.map((item) => (
               <li key={item.title.en}>
                 <strong>{localizedText(item.title, language)}</strong>
-                <span>{localizedText(item.body, language)}</span>
+                <WhatsNewBody text={localizedText(item.body, language)} />
+                {whatsNewGuideLinks(item, language).map((link) => (
+                  <a className="whats-new-guide-link" key={link.href} href={link.href} target="_blank" rel="noreferrer">
+                    <BookOpen size={14} aria-hidden="true" />
+                    {link.label ? localizedText(link.label, language) : t("guide.helpLink")}
+                  </a>
+                ))}
               </li>
             ))}
           </ul>

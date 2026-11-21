@@ -64,7 +64,7 @@ export const LYL_FILE_TYPES_FORMAT_VERSION = 4;
 /** The newest format this layerling reads. */
 export const LYL_NEWEST_READABLE_FORMAT_VERSION = LYL_FILE_TYPES_FORMAT_VERSION;
 export const LYL_OLDEST_READABLE_FORMAT_VERSION = 1;
-export const LYL_CREATED_WITH_VERSION = "1.156.4";
+export const LYL_CREATED_WITH_VERSION = "1.167.0";
 export const LYL_MEDIA_TYPE = "application/vnd.layerling.project+zip";
 
 export const LYL_LIMITS = {
@@ -82,7 +82,7 @@ export const LYL_LIMITS = {
 
 const SHAPE_KINDS = new Set([
   "box", "roundedBox", "cylinder", "slot", "ellipse", "sphere", "sketch", "scribble", "cone", "pyramid", "roof", "text", "roundRoof",
-  "halfSphere", "paraboloid", "curvedCone", "torus", "tube", "bentTube", "star", "heart", "crescent", "gear", "hirth", "pulley", "honeycomb", "hinge", "knurl", "dovetail", "screwBoss", "snapFit", "rib", "counterbore", "countersink", "doubleCountersink", "finishingWasher", "teardrop", "port", "loft", "vase", "thread", "spring", "gridfinity", "ring", "wedge", "polygon", "icosahedron", "ruler", "mesh",
+  "halfSphere", "paraboloid", "curvedCone", "torus", "tube", "bentTube", "star", "heart", "crescent", "sector", "gear", "hirth", "pulley", "honeycomb", "hinge", "knurl", "dovetail", "screwBoss", "snapFit", "rib", "counterbore", "countersink", "doubleCountersink", "finishingWasher", "teardrop", "port", "loft", "vase", "thread", "spring", "gridfinity", "ring", "wedge", "polygon", "icosahedron", "ruler", "mesh",
 ]);
 
 const FEATURE_TYPES = new Set([
@@ -551,7 +551,9 @@ function encodedAssetPayload(resource: object, encode: () => Uint8Array) {
 // exact bodies or more each one had pushed out the next before it was asked for,
 // and nothing was ever found. Now it holds as many as fit in a budget of text,
 // so a design full of large bodies does not keep copies of all of them either.
-const TEXT_PAYLOAD_CACHE_LIMIT = 256;
+// The count was 256, which an imported assembly of a few hundred small parts
+// passed in the same way (#1794); the budget of text is what bounds the memory.
+const TEXT_PAYLOAD_CACHE_LIMIT = 4096;
 const TEXT_PAYLOAD_CACHE_CHARS = 48 * 1024 * 1024;
 const encodedTextPayloads = new Map<string, Promise<EncodedAssetPayload>>();
 let encodedTextChars = 0;
@@ -1050,8 +1052,8 @@ function activeProjectIndexes(state: LylStateV1) {
   return { features, groups, sketches, exactCad };
 }
 
-function zipAsync(files: ArchiveFiles, level: NonNullable<LylProjectExportInput["compressionLevel"]> = 6, stored?: ReadonlySet<string>) {
-  return boundedProjectZip(files, level, stored);
+function zipAsync(files: ArchiveFiles, level: NonNullable<LylProjectExportInput["compressionLevel"]> = 6, stored?: ReadonlySet<string>, unchanging?: ReadonlySet<string>) {
+  return boundedProjectZip(files, level, stored, unchanging);
 }
 
 function unzipAsync(bytes: Uint8Array) {
@@ -1226,7 +1228,9 @@ export async function exportLylProject(input: LylProjectExportInput) {
   }
   // Attached pictures and PDF files are compressed already: they go in as they are (see `compressed`).
   const stored = new Set(builder.assets.filter((asset) => asset.kind === "attachment" && attachmentTypeForMediaType(asset.mediaType)?.compressed).map((asset) => asset.path));
-  return zipAsync(Object.fromEntries(Object.entries(builder.files).sort(([a], [b]) => a.localeCompare(b))), input.compressionLevel, stored);
+  // An asset's path is the hash of its bytes, so the same path is the same file in every save: deflated once (#1794).
+  const unchanging = new Set(builder.assets.map((asset) => asset.path));
+  return zipAsync(Object.fromEntries(Object.entries(builder.files).sort(([a], [b]) => a.localeCompare(b))), input.compressionLevel, stored, unchanging);
 }
 
 function inspectZipBeforeExpansion(bytes: Uint8Array) {
@@ -1412,6 +1416,17 @@ function validateShapeDefinition(definition: Record<string, unknown>, label: str
     if (!Array.isArray(definition.paint) || definition.paint.length > PAINT_MAX_STROKES || definition.paint.some((stroke) => !normalizePaintStroke(stroke))) {
       throw new Error(`${label}.paint must be a list of at most ${PAINT_MAX_STROKES} paint strokes`);
     }
+  }
+  // Marks and switches the editor writes as true or false, and the id of the body a rib was made for (lib/supportRib).
+  for (const field of ["breakawayBase", "stencilBridge", "hullKeepHoles", "multicolor", "shapeLocked"] as const) {
+    if (definition[field] !== undefined && typeof definition[field] !== "boolean") throw new Error(`${label}.${field} must be true or false`);
+  }
+  if (definition.supportRibFor !== undefined && typeof definition.supportRibFor !== "string") throw new Error(`${label}.supportRibFor must be an id`);
+  // A mold part's master, group and settings (lib/moldTool).
+  if (definition.moldOf !== undefined) {
+    const mold = objectRecord(definition.moldOf, `${label}.moldOf`);
+    if (typeof mold.master !== "string" || typeof mold.group !== "string") throw new Error(`${label}.moldOf must name its master and group`);
+    objectRecord(mold.settings, `${label}.moldOf.settings`);
   }
   // What a group does with its parts when it is resized (Discussion #526).
   if (definition.groupResize !== undefined && definition.groupResize !== "stretch" && definition.groupResize !== "keepParts") {
@@ -1666,6 +1681,13 @@ function validateShapeDefinition(definition: Record<string, unknown>, label: str
       const bevelHelixAngle = finiteNumber(definition.bevelHelixAngle, `${label}.bevelHelixAngle`);
       if (bevelHelixAngle < -45 || bevelHelixAngle > 45) throw new Error(`${label}.bevelHelixAngle is outside the supported range`);
     }
+    if (definition.ringRackHelixAngle !== undefined) {
+      const ringRackHelixAngle = finiteNumber(definition.ringRackHelixAngle, `${label}.ringRackHelixAngle`);
+      if (ringRackHelixAngle < -45 || ringRackHelixAngle > 45) throw new Error(`${label}.ringRackHelixAngle is outside the supported range`);
+    }
+    if (definition.ringRackHerringbone !== undefined && typeof definition.ringRackHerringbone !== "boolean") {
+      throw new Error(`${label}.ringRackHerringbone must be a boolean`);
+    }
     if (definition.helixQuality !== undefined) {
       const helixQuality = finiteNumber(definition.helixQuality, `${label}.helixQuality`);
       if (!Number.isInteger(helixQuality) || helixQuality < 4 || helixQuality > 32) {
@@ -1720,6 +1742,18 @@ function validateShapeDefinition(definition: Record<string, unknown>, label: str
       }
     }
   }
+  if (kind === "sector") {
+    if (definition.sectorAngle !== undefined) {
+      const sectorAngle = finiteNumber(definition.sectorAngle, `${label}.sectorAngle`);
+      if (sectorAngle < 1 || sectorAngle > 360) throw new Error(`${label}.sectorAngle is outside the supported range`);
+    }
+    for (const field of ["sectorInnerDiameter", "sectorEndRadius"] as const) {
+      if (definition[field] !== undefined) {
+        const value = finiteNumber(definition[field], `${label}.${field}`);
+        if (value < 0 || value > 1e6) throw new Error(`${label}.${field} is outside the supported range`);
+      }
+    }
+  }
   if (kind === "crescent") {
     if (definition.crescentThickness !== undefined) {
       const crescentThickness = finiteNumber(definition.crescentThickness, `${label}.crescentThickness`);
@@ -1738,7 +1772,7 @@ function validateShapeDefinition(definition: Record<string, unknown>, label: str
   }
   if (kind === "counterbore" || kind === "countersink" || kind === "doubleCountersink" || kind === "finishingWasher") {
     // Lenient on purpose: the geometry clamps the values itself; only nonsense is refused.
-    for (const key of ["screwHoleShaft", "screwHoleHeadDepth", "screwHoleAngle", "screwHoleRecess"] as const) {
+    for (const key of ["screwHoleShaft", "screwHoleHeadDepth", "screwHoleAngle", "screwHoleRecess", "screwHoleChamfer"] as const) {
       if (definition[key] === undefined) continue;
       const value = finiteNumber(definition[key], `${label}.${key}`);
       if (value < 0 || value > 1e6) throw new Error(`${label}.${key} is outside the supported range`);
@@ -1795,10 +1829,10 @@ function validateShapeDefinition(definition: Record<string, unknown>, label: str
     if (definition.gridfinityType !== undefined && definition.gridfinityType !== "bin" && definition.gridfinityType !== "baseplate" && definition.gridfinityType !== "tray") {
       throw new Error(`${label}.gridfinityType is invalid`);
     }
-    for (const key of ["gridfinityLip", "gridfinityMagnets", "gridfinityHalfGrid", "gridfinityLargePlate", "gridfinitySwallowtail", "gridfinityLabelBack", "gridfinityLabelFront", "gridfinityLabelLeft", "gridfinityLabelRight", "gridfinityScoopBack", "gridfinityScoopFront", "gridfinityScoopLeft", "gridfinityScoopRight", "gridfinityOpenBack", "gridfinityOpenFront", "gridfinityOpenLeft", "gridfinityOpenRight", "hingePinless"] as const) {
+    for (const key of ["gridfinityLip", "gridfinityMagnets", "gridfinityHalfGrid", "gridfinityLargePlate", "gridfinitySwallowtail", "gridfinityLabelBack", "gridfinityLabelFront", "gridfinityLabelLeft", "gridfinityLabelRight", "gridfinityScoopBack", "gridfinityScoopFront", "gridfinityScoopLeft", "gridfinityScoopRight", "gridfinityOpenBack", "gridfinityOpenFront", "gridfinityOpenLeft", "gridfinityOpenRight", "gridfinityOverhangSolid", "gridfinityOverhangLipOnGrid", "hingePinless"] as const) {
       if (definition[key] !== undefined && typeof definition[key] !== "boolean") throw new Error(`${label}.${key} must be true or false`);
     }
-    for (const key of ["gridfinityLabelBackWidth", "gridfinityLabelBackLength", "gridfinityLabelBackOffset", "gridfinityLabelFrontWidth", "gridfinityLabelFrontLength", "gridfinityLabelFrontOffset", "gridfinityLabelLeftWidth", "gridfinityLabelLeftLength", "gridfinityLabelLeftOffset", "gridfinityLabelRightWidth", "gridfinityLabelRightLength", "gridfinityLabelRightOffset", "gridfinityLabelCornerSize", "gridfinityLabelTextSize", "gridfinityScoopRadius", "gridfinityFloorHeight", "gridfinityLipChamfer", "gridfinityWallThickness", "gridfinityOpeningCornerSize", "gridfinityPaddingBack", "gridfinityPaddingFront", "gridfinityPaddingLeft", "gridfinityPaddingRight", "gridfinityCornerRadius", "gridfinityBinCornerRadius", "gridfinitySwallowtailClearance", "gridfinityCompartmentsX", "gridfinityCompartmentsZ", "gridfinityDividerThickness"] as const) {
+    for (const key of ["gridfinityLabelBackWidth", "gridfinityLabelBackLength", "gridfinityLabelBackOffset", "gridfinityLabelFrontWidth", "gridfinityLabelFrontLength", "gridfinityLabelFrontOffset", "gridfinityLabelLeftWidth", "gridfinityLabelLeftLength", "gridfinityLabelLeftOffset", "gridfinityLabelRightWidth", "gridfinityLabelRightLength", "gridfinityLabelRightOffset", "gridfinityLabelCornerSize", "gridfinityLabelTextSize", "gridfinityOverhangBack", "gridfinityOverhangFront", "gridfinityOverhangLeft", "gridfinityOverhangRight", "gridfinityOverhangChamfer", "gridfinityScoopRadius", "gridfinityFloorHeight", "gridfinityLipChamfer", "gridfinityWallThickness", "gridfinityOpeningCornerSize", "gridfinityPaddingBack", "gridfinityPaddingFront", "gridfinityPaddingLeft", "gridfinityPaddingRight", "gridfinityCornerRadius", "gridfinityBinCornerRadius", "gridfinitySwallowtailClearance", "gridfinityCompartmentsX", "gridfinityCompartmentsZ", "gridfinityDividerThickness", "gridfinityDividerHeight"] as const) {
       if (definition[key] === undefined) continue;
       const value = finiteNumber(definition[key], `${label}.${key}`);
       // Only an offset runs both ways along a wall.
@@ -1884,7 +1918,7 @@ function validateShapeDefinition(definition: Record<string, unknown>, label: str
   }
   if (kind === "hinge") {
     // Lenient on purpose: the geometry clamps the values itself; only nonsense is refused.
-    for (const key of ["hingeKnuckles", "hingeKnuckleWidth", "hingeConeSize", "hingePinDiameter", "hingeLeafThickness", "hingeClearance", "hingeAngle", "hingeScrewHoles", "hingeScrewDiameter", "hingeScrewSpacing", "hingeScrewAcross", "hingeCornerRadius", "hingeNutWidth"] as const) {
+    for (const key of ["hingeKnuckles", "hingeKnuckleWidth", "hingeConeSize", "hingeSnapGrip", "hingePinDiameter", "hingeLeafThickness", "hingeClearance", "hingeAngle", "hingeScrewHoles", "hingeScrewDiameter", "hingeScrewSpacing", "hingeScrewAcross", "hingeCornerRadius", "hingeNutWidth"] as const) {
       if (definition[key] === undefined) continue;
       const value = finiteNumber(definition[key], `${label}.${key}`);
       // The opening angle may fold the leaf down below lying flat (#1259).
@@ -1969,7 +2003,7 @@ function validateShapeDefinition(definition: Record<string, unknown>, label: str
     const portClearance = finiteNumber(definition.portClearance, `${label}.portClearance`);
     if (portClearance < 0 || portClearance > 2) throw new Error(`${label}.portClearance is outside the supported range`);
   }
-  if (kind === "port" && definition.cornerFillet !== undefined) {
+  if ((kind === "port" || kind === "polygon") && definition.cornerFillet !== undefined) {
     const cornerFillet = finiteNumber(definition.cornerFillet, `${label}.cornerFillet`);
     if (cornerFillet < 0 || cornerFillet > 1e6) throw new Error(`${label}.cornerFillet is outside the supported range`);
   }

@@ -93,10 +93,11 @@ L'IA fonctionne avec les mêmes fonctions que vous, via le même chemin que votr
 | `layerling_import_mesh` | apporte un maillage triangulaire dans la conception |
 | `layerling_update_object` | change les dimensions, la position, la couleur, le nom, le solide ou le trou et tout ce qui constitue la forme, le bord d'une lettre de texte inclus |
 | `layerling_align_objects` | aligne les objets les uns avec les autres |
-| `layerling_scale_objects` | met à l'échelle les objets selon un pourcentage, ensemble ou chacun en place |
+| `layerling_scale_objects` | met à l'échelle les objets selon un pourcentage, ensemble ou chacun en place, ou à une échelle de modélisme comme 1:87 |
 | `layerling_lay_flat` | pose un objet avec une face sur la plaque |
 | `layerling_place_on_face` | pose des objets sur une face d'une autre, également inclinée, comme la touche C |
 | `layerling_perforate_face` | découpe un motif de trous dans une face plate ou autour de la paroi d'un cylindre, d'un tube ou d'un alésage ; les trous restent groupés avec le corps |
+| `layerling_thread_insert` | perce le trou pour un insert fileté à chaud (M2 à M8, 1/4-20 ou votre propre taille) dans une face plate ou la paroi extérieure d'un cylindre ou d'un tube, après avoir vérifié que la paroi à côté du trou et la profondeur derrière sont suffisantes ; le trou reste un trou groupé avec le corps |
 | `layerling_sweep_sketch` | tire une section rectangulaire ou ronde le long d'un chemin de points, comme un seul corps exact ; un chemin fermé donne un anneau |
 | `layerling_push_face` | tire une face plane vers l'extérieur ou y creuse une poche, avec un retrait depuis le bord et un rayon des coins ; la nouvelle pièce est un corps d'esquisse regroupé avec le corps |
 | `layerling_paint` | peint des parties d'un corps dans leurs propres couleurs pour une impression en plusieurs couleurs (Peindre) : remplir une face jusqu'à ses arêtes vives, une tache ronde ou un lasso tracé dans une vue à plat ; gommer, tout retirer ; enregistré avec le corps et écrit dans un 3MF sous forme de faces peintes |
@@ -115,6 +116,7 @@ L'IA fonctionne avec les mêmes fonctions que vous, via le même chemin que votr
 | `layerling_cookie_cutter` | makes a cookie cutter from the objects: a wall and a rim round the outline (Cookie cutter) |
 | `layerling_flexi_joints` | cuts a flat body into links with joints printed in place that swing to the sides (Flexi joints) |
 | `layerling_make_lid` | makes a lid for a body open at the top: pushed in, over the top or flat, with the fit you choose and magnets if you like (Lid) |
+| `layerling_make_mold` | makes a mold or a die from a master: a two-part mold to cast in, a silicone pour box, an open mold, or a stamp and die for sheet (Mold & die) |
 | `layerling_make_cable_channel` | runs a round channel for a cable through a body from an entry to an exit, finding the way itself with gentle bends (Cable channel) |
 | `layerling_loft_sketches` | joins two sketch bodies into a loft from one outline to the other (Loft sketches) |
 | `layerling_separate_parts` | sépare une forme en ses parties détachées, un corps d'esquisse en un corps par contour |
@@ -141,6 +143,8 @@ L'IA fonctionne avec les mêmes fonctions que vous, via le même chemin que votr
 | `layerling_check_clearance` | vérifie avant l'impression quelles pièces se chevauchent, se touchent ou sont plus proches qu'un jeu minimal (Vérifier le jeu), y compris les pièces séparées d'un objet |
 | `layerling_printer_play` | lit, règle ou efface le jeu de l'imprimante ({{ui:workspace.printerPlay}} dans les réglages) et pose le test d'ajustement qui le mesure |
 | `layerling_check_print` | vérifie avant l'impression ce qui raterait : parois trop fines pour la buse, pièces en l'air, faible contact avec le plateau, surplombs et maillages ouverts (Vérifier l'impression) |
+| `layerling_check_layers` | découpe l’impression en couches et liste couche par couche ce qui irait mal : porte-à-faux, zones sans appui, ponts, parois fines, petits îlots, pièce dans le plateau (Analyse d’impression) |
+| `layerling_split_bolt` | coupe une vis ou une tige filetée dans la longueur par son axe et pose les deux moitiés sur leur face de coupe pour l’impression, avec pions de centrage si voulu |
 | `layerling_add_reference_points` | marque des points de référence - au centre, dans les coins ou au milieu des bords des objets, ou à des positions exactes - sur lesquels les formes s'accrochent |
 | `layerling_list_reference_points` | répertorie les points de référence avec leurs identifiants et positions |
 | `layerling_remove_reference_points` | supprime les points de référence par identifiant, ou tous |
@@ -166,6 +170,9 @@ L'IA fonctionne avec les mêmes fonctions que vous, via le même chemin que votr
 | `layerling_saved_view` | enregistre la vue actuelle sous la touche 7, 8, 9 ou 0 et y revient, comme Maj+touche et la touche (seulement la vue); règle aussi la vue de départ des nouveaux designs |
 | `layerling_build_plates` | liste, ajoute, nomme, ordonne et retire les plateaux d'impression, déplace des objets sur un plateau et les répartit sur les plateaux, comme la barre des plateaux |
 | `layerling_clear_history` | supprime définitivement chaque étape d'annulation, comme le fait le bouton "Supprimer l'historique" de la vue Historique ; besoins `confirm: true` |
+| `layerling_delete_history_steps` | supprime définitivement des états isolés de l'historique, jamais l'état actuel, comme la corbeille à côté d'une étape dans la liste de la vue de l'historique ; demande `steps` et `confirm: true` |
+| `layerling_list_backups` | liste les sauvegardes automatiques (Versions précédentes) du dessin ouvert, ou avec `all: true` de tous les dessins de ce navigateur |
+| `layerling_open_backup` | ouvre une sauvegarde par son `id` comme nouveau dessin, jamais lié au fichier d'origine |
 | `layerling_set_history_view` | revient sur un état antérieur du projet, comme la vue Historique (la conception réelle reste intacte ; les outils de changement attendent qu'il soit fermé) |
 | `layerling_restore_from_history` | ramène des objets (aussi des pièces dans des groupes) d'un état antérieur dans la conception, sous forme de copies, comme « Ramener dans la conception » de la vue Historique - une étape que l'annulation reprend |
 | `layerling_export_section_svg` | renvoie les contours sur un plan de coupe au format SVG à 1:1, à partir des mêmes corps que l'export |

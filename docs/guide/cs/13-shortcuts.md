@@ -15,11 +15,11 @@ Pole nahoře v okně prohledává seznam: ponechá jen zkratky, v jejichž vět�
 
 Nemůžete najít nástroj? Stiskněte [[Ctrl]]+[[K]] nebo klikněte na lupu v části {{ui:editor.group.help}}. Zadejte nástroj, například „zaoblení“ nebo „zrcadlit“, tvar, například „válec“, nebo příkaz, například „export“ či „zpět“. Šipkami vyberte výsledek a potvrďte [[Enter]], případně na něj klikněte.
 
-- Vyhledávání rozumí anglickým i německým názvům, nerozlišuje velikost písmen a německé přehlásky: například „aushoehlen“ vyhledá {{ui:editor.tool.hollow}}.
+- Vyhledávání rozumí anglickým i německým názvům, nerozlišuje velikost písmen a německé přehlásky: například „aushoehlen“ vyhledá {{ui:editor.tool.hollow}}. Vyhledávání funguje v každém písmu: název se najde tak, jak je napsán v jazyce rozhraní („円柱“ v japonštině). Znaky plné a poloviční šířky, katakana a hiragana i diakritika se berou jako totožné.
 - Každá položka uvádí odpovídající klávesovou zkratku i část pásu nástrojů, ve které ji najdete.
 - Neaktivní položku nyní nelze spustit, zpravidla proto, že není nic vybráno. V seznamu zůstává, abyste věděli, kde nástroj hledat.
 
-Vyhledávací pole má i tato příručka, nahoře na každé stránce. Zadejte jedno či více slov. Zobrazí se části obsahující všechna zadaná slova se zvýrazněnými shodami. Kliknutím nebo klávesou [[Enter]] přejdete na první výsledek. Otevřená stránka zvýrazní každé místo, kde se hledaná slova vyskytují, a posune se na první z nich ve zvolené části; [[Esc]] nebo kliknutí na zvýraznění ho zase odstraní.
+Vyhledávací pole má i tato příručka, nahoře na každé stránce. Zadejte jedno či více slov. Zobrazí se části obsahující všechna zadaná slova se zvýrazněnými shodami. Kliknutím nebo klávesou [[Enter]] přejdete na první výsledek. Otevřená stránka zvýrazní každé místo, kde se hledaná slova vyskytují, a posune se na první z nich ve zvolené části; [[Esc]] nebo kliknutí na zvýraznění ho zase odstraní. Slova v uvozovkách se hledají jako přesná fráze: zobrazí se jen části, kde stojí hned za sebou v tomto pořadí, a jediné slovo v uvozovkách se najde jen jako celé slovo, ne jako součást delšího.
 - Zadání názvu tvaru jej přidá na pracovní rovinu stejně jako výběr v nabídce tvarů.
 - Prázdné pole nabízí nahoře naposledy použité příkazy.
 - Názvem tělesa vyhledáte a vyberete příslušný objekt v projektu. Pomůže to ve složitém modelu. Objekty se nabízejí až po zadání textu.

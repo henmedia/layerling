@@ -4,6 +4,7 @@ import {
   HOLE_PATTERN_MIN_WALL,
   holeFootprintPolygon,
   holePatternCenters,
+  holePatternHasAngle,
   holePatternWall,
   holeTurn,
   normalizeHolePattern,
@@ -19,9 +20,9 @@ import { makeShapeFromAsset, toolbarShapeAssets } from "@/lib/shapeCatalog";
 import type { WorkplaneShape } from "@/types/layerling";
 
 /*
- * The rectangle and the slot of the hole pattern can be turned in the face (holeAngle, in degrees, counter-clockwise as
- * seen looking at the face). The turned outline is what the holes are fitted and spaced with, and every hole is cut
- * turned the same; the grid itself stays straight.
+ * The square, the rectangle, the hexagon and the slot of the hole pattern can be turned in the face (holeAngle, in
+ * degrees, counter-clockwise as seen looking at the face; squares and hexagons since Discussion 1795). The turned
+ * outline is what the holes are fitted and spaced with, and every hole is cut turned the same; the grid itself stays straight.
  */
 
 function insideConvex(polygon: readonly Point2[], point: Point2) {
@@ -71,16 +72,21 @@ describe("hole angle: the setting", () => {
     expect(normalizeHoleAngle("30")).toBe(0);
   });
 
-  it("turns only rectangles and slots, and is kept (but not used) while another form is chosen", () => {
-    expect(holeTurn({ form: "slot", holeAngle: 30 })).toBeCloseTo((-30 * Math.PI) / 180, 12);
-    expect(holeTurn({ form: "rectangle", holeAngle: 30 })).toBeCloseTo((-30 * Math.PI) / 180, 12);
-    for (const form of ["round", "square", "hexagon", "custom"] as const) expect(holeTurn({ form, holeAngle: 30 })).toBe(0);
+  it("turns every form but the round hole and the own shape, and is kept (but not used) while one of those is chosen", () => {
+    for (const form of ["square", "rectangle", "hexagon", "slot"] as const) {
+      expect(holePatternHasAngle(form)).toBe(true);
+      expect(holeTurn({ form, holeAngle: 30 })).toBeCloseTo((-30 * Math.PI) / 180, 12);
+    }
+    for (const form of ["round", "custom"] as const) {
+      expect(holePatternHasAngle(form)).toBe(false);
+      expect(holeTurn({ form, holeAngle: 30 })).toBe(0);
+    }
     expect(holeTurn({ form: "slot" })).toBe(0);
-    const square = normalizeHolePattern({ form: "square", size: 6, spacing: 1, holeAngle: 30 });
-    const plain = normalizeHolePattern({ form: "square", size: 6, spacing: 1 });
-    expect(square.holeAngle).toBe(30);
-    expect(square.spacing).toBeCloseTo(plain.spacing, 9);
-    expect(holeFootprintPolygon(square)).toEqual(holeFootprintPolygon(plain));
+    const round = normalizeHolePattern({ form: "round", size: 6, spacing: 1, holeAngle: 30 });
+    const plain = normalizeHolePattern({ form: "round", size: 6, spacing: 1 });
+    expect(round.holeAngle).toBe(30);
+    expect(round.spacing).toBeCloseTo(plain.spacing, 9);
+    expect(holeFootprintPolygon(round)).toEqual(holeFootprintPolygon(plain));
     // 0 is left out, so settings saved without the angle stay as they were.
     expect("holeAngle" in normalizeHolePattern({ form: "slot", holeAngle: 0 })).toBe(false);
     expect(normalizeHolePattern({ form: "slot", holeAngle: 120 }).holeAngle).toBe(-60);
@@ -104,6 +110,41 @@ describe("hole angle: the setting", () => {
       expect(farEnd.v).toBeLessThan(-3);
     });
   }
+
+  it("turns a square by 45 into a diamond and a hexagon by 30 onto a flat (Discussion 1795)", () => {
+    const diamond = holeFootprintPolygon({ form: "square", size: 4, height: 4, holeAngle: 45 });
+    expect(diamond).toHaveLength(4);
+    // The corners lie on the frame's axes, half a diagonal out.
+    const half = 4 / Math.SQRT2;
+    for (const point of diamond) expect(Math.abs(point.u) + Math.abs(point.v)).toBeCloseTo(half, 9);
+    for (const point of diamond) expect(Math.min(Math.abs(point.u), Math.abs(point.v))).toBeCloseTo(0, 9);
+    // A quarter turn is the square again.
+    expect(extent(holeFootprintPolygon({ form: "square", size: 4, height: 4, holeAngle: 90 })).u).toBeCloseTo(2, 9);
+    // Unturned the hexagon's corners point along v; at 30 they point along u.
+    const upright = holeFootprintPolygon({ form: "hexagon", size: 6, height: 6 });
+    expect(extent(upright).v).toBeCloseTo(3, 9);
+    expect(extent(upright).u).toBeCloseTo(3 * Math.sqrt(3) / 2, 9);
+    const lying = holeFootprintPolygon({ form: "hexagon", size: 6, height: 6, holeAngle: 30 });
+    expect(extent(lying).u).toBeCloseTo(3, 9);
+    expect(extent(lying).v).toBeCloseTo(3 * Math.sqrt(3) / 2, 9);
+  });
+
+  it("leaves unturned squares and hexagons spaced as they were", () => {
+    for (const form of ["square", "hexagon"] as const) {
+      for (const arrangement of ["grid", "staggered"] as const) {
+        const plain = normalizeHolePattern({ form, size: 6, spacing: 1, arrangement });
+        expect(normalizeHolePattern({ form, size: 6, spacing: 1, arrangement, holeAngle: 0 })).toEqual(plain);
+        // A square turned a quarter is the same square: the same spacing.
+        if (form === "square") expect(normalizeHolePattern({ form, size: 6, spacing: 1, arrangement, holeAngle: 90 }).spacing).toBeCloseTo(plain.spacing, 4);
+      }
+    }
+    // Diamonds in a grid stand corner to corner: a diagonal and the wall apart.
+    const diamonds = normalizeHolePattern({ form: "square", size: 4, spacing: 1, arrangement: "grid", holeAngle: 45 });
+    expect(diamonds.spacing).toBeCloseTo(4 * Math.SQRT2 + HOLE_PATTERN_MIN_WALL, 4);
+    // Staggered the next one in the row still stands corner to corner; only the rows move closer.
+    const interlocked = normalizeHolePattern({ form: "square", size: 4, spacing: 1, arrangement: "staggered", holeAngle: 45 });
+    expect(interlocked.spacing).toBeCloseTo(4 * Math.SQRT2 + HOLE_PATTERN_MIN_WALL, 4);
+  });
 
   it("turns a rectangle's corners exactly", () => {
     // 12 x 5 turned by 30: the corner (6, 2.5) goes to (6 cos 30 + 2.5 sin 30, -6 sin 30 + 2.5 cos 30) in the frame.
@@ -165,7 +206,88 @@ function holeAxes(hole: WorkplaneShape) {
   return { width: new THREE.Vector3(1, 0, 0).applyQuaternion(turn), depth: new THREE.Vector3(0, 0, 1).applyQuaternion(turn) };
 }
 
+describe("hole angle: turned squares and hexagons keep the least wall to every neighbour", () => {
+  for (const form of ["square", "hexagon"] as const) {
+  for (const arrangement of ["grid", "staggered"] as const) {
+    for (const holeAngle of [10, 30, 45, 60, 80, -20]) {
+    for (const holeTilt of [0, 40, 60]) {
+      it(`${form}, ${arrangement}, ${holeAngle} degrees, sloped ${holeTilt}: the spacing is raised so no two holes come closer than the wall`, () => {
+        const settings = normalizeHolePattern({ form, size: 6, spacing: 0.5, arrangement, margin: 2, holeAngle, holeTilt });
+        // The wall is measured square to the holes, as the panel shows it; packed close, it is the least wall.
+        const wall = holePatternWall(settings);
+        expect(wall).toBeGreaterThanOrEqual(HOLE_PATTERN_MIN_WALL - 1e-4);
+        expect(wall).toBeLessThan(HOLE_PATTERN_MIN_WALL + 0.05);
+        if (holeTilt !== 0) return;
+        // Straight holes: the same on the face itself, between every pair that could touch.
+        const outline = holeFootprintPolygon(settings);
+        const { centers } = holePatternCenters(rectangleOutline(0, 0, 80, 60), settings);
+        expect(centers.length).toBeGreaterThan(10);
+        const placed = centers.map((c) => outline.map((point) => ({ u: point.u + c.u, v: point.v + c.v })));
+        let nearest = Infinity;
+        for (let i = 0; i < placed.length; i += 1) {
+          for (let j = i + 1; j < placed.length; j += 1) {
+            if (Math.hypot(centers[i].u - centers[j].u, centers[i].v - centers[j].v) > 20) continue;
+            nearest = Math.min(nearest, gapBetween(placed[i], placed[j]));
+          }
+        }
+        expect(nearest).toBeCloseTo(wall, 3);
+      });
+    }
+    }
+  }
+  }
+});
+
 describe("hole angle: the holes cut", () => {
+  it("cuts squares turned by 45 as diamonds on a top face, inside the margin (Discussion 1795)", () => {
+    const positions = boxTriangles(100, 20, 100);
+    const read = readPerforableFace(positions, { x: 0, y: 20, z: 0 }, { x: 0, y: 1, z: 0 });
+    if (!read.ok) throw new Error("no face");
+    const settings = normalizeHolePattern({ form: "square", size: 4, spacing: 8, arrangement: "grid", margin: 4, depth: null, holeAngle: 45 });
+    const plan = holePatternShapes(read.face, settings, "Hole");
+    expect(plan.holes.length).toBeGreaterThan(20);
+    const along = new THREE.Vector3(1, 0, -1).normalize();
+    for (const hole of plan.holes) {
+      expect(hole.kind).toBe("box");
+      expect(hole.width).toBeCloseTo(4, 6);
+      expect(hole.depth).toBeCloseTo(4, 6);
+      const { width, depth } = holeAxes(hole);
+      expect(Math.abs(width.dot(along))).toBeCloseTo(1, 4);
+      expect(Math.abs(depth.y)).toBeLessThan(1e-6);
+      // The diamond's corners point along x and z and stay the margin inside the 100 x 100 face.
+      for (const end of [-1, 1]) {
+        for (const side of [-1, 1]) {
+          const corner = new THREE.Vector3(hole.x, 0, hole.z).addScaledVector(width, end * 2).addScaledVector(depth, side * 2);
+          expect(Math.min(Math.abs(corner.x - hole.x), Math.abs(corner.z - hole.z))).toBeLessThan(1e-4);
+          expect(Math.abs(corner.x)).toBeLessThanOrEqual(50 - 4 + 1e-3);
+          expect(Math.abs(corner.z)).toBeLessThanOrEqual(50 - 4 + 1e-3);
+        }
+      }
+    }
+    // Unturned squares stand along the face as before.
+    const straight = holePatternShapes(read.face, normalizeHolePattern({ ...settings, holeAngle: 0 }), "Hole");
+    for (const hole of straight.holes) expect(Math.abs(holeAxes(hole).width.x)).toBeCloseTo(1, 6);
+  });
+
+  it("cuts hexagons turned by 30 with a corner along the face's x", () => {
+    const positions = boxTriangles(100, 20, 100);
+    const read = readPerforableFace(positions, { x: 0, y: 20, z: 0 }, { x: 0, y: 1, z: 0 });
+    if (!read.ok) throw new Error("no face");
+    const settings = normalizeHolePattern({ form: "hexagon", size: 6, spacing: 9, arrangement: "staggered", margin: 4, depth: null });
+    const upright = holePatternShapes(read.face, settings, "Hole").holes;
+    const lying = holePatternShapes(read.face, normalizeHolePattern({ ...settings, holeAngle: 30 }), "Hole").holes;
+    expect(lying.length).toBeGreaterThan(20);
+    // The hexagon's corners lie along its own depth: unturned along the face's z; turned by 30 the depth stands 30 off z,
+    // and as a hexagon's corners repeat every 60 a corner then lies along x.
+    for (const hole of upright) expect(Math.abs(holeAxes(hole).depth.z)).toBeCloseTo(1, 6);
+    for (const hole of lying) {
+      expect(hole.kind).toBe(upright[0].kind);
+      expect(Math.abs(holeAxes(hole).depth.z)).toBeCloseTo(Math.cos(Math.PI / 6), 4);
+      expect(Math.abs(holeAxes(hole).depth.y)).toBeLessThan(1e-6);
+    }
+  });
+
+
   for (const [form, kind] of [["slot", "slot"], ["rectangle", "box"]] as const) {
   it(`stands every ${form} turned counter-clockwise on a top face, inside the margin`, () => {
     const positions = boxTriangles(100, 20, 100);

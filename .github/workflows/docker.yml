@@ -107,6 +107,26 @@ jobs:
           # The start page is prerendered; a route handler also runs the server's own code.
           check /api/shared-projects application/json
 
+      # A container made from an image up to 1.158.0 and recreated by Portainer or Synology keeps the Node image's
+      # entrypoint and "npm start" (Issue #1664): started that way, the image must answer as well.
+      - name: Start the image as a container from an older image would
+        env:
+          DIGEST: ${{ steps.build.outputs.digest }}
+        run: |
+          docker run -d --name layerling-old -p 3001:3000 --entrypoint docker-entrypoint.sh "$IMAGE@$DIGEST" npm start
+          trap 'docker logs layerling-old; docker rm -f layerling-old >/dev/null' EXIT
+          for _ in $(seq 1 30); do
+            if result=$(curl -sS -o /dev/null -w '%{http_code} %{content_type}' http://127.0.0.1:3001/ 2>/dev/null); then
+              case "$result" in
+                "200 text/html"*) echo "/: $result"; exit 0 ;;
+                *) echo "::error::/ answered $result"; exit 1 ;;
+              esac
+            fi
+            sleep 1
+          done
+          echo "::error::/ did not answer within 30 s"
+          exit 1
+
       - name: Keep the digest
         run: |
           mkdir -p "$RUNNER_TEMP/digests"

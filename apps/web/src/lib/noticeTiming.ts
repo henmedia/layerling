@@ -24,6 +24,15 @@ export function noticeDurationMs(message: string, patient = false) {
 export const NOTICE_CHANGE_WINDOW_MS = 250;
 
 /**
+ * Whether the status line shows a message (Discussion #1708). With step messages switched off, an ordinary message
+ * that only reports the step just taken (the one that offers Undo) stays away; a message that waits for something,
+ * warns or carries a button of its own still shows, as does everything with the setting on.
+ */
+export function showsNotice(showStepNotices: boolean, ordinary: boolean, reportsLastChange: boolean) {
+  return showStepNotices || !ordinary || !reportsLastChange;
+}
+
+/**
  * Whether a message reports the step the design just took, so that it can offer to take it back: it came within a
  * moment of the step, before or after, and the design still stands at that step (not undone, nothing done since).
  */

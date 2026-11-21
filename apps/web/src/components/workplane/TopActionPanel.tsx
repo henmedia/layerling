@@ -3,7 +3,8 @@
 import { DEFAULT_STENCIL_BRIDGES, MAX_BRIDGE_COUNT, normalizedStencilBridges, type StencilBridgeOptions } from "@/lib/stencilBridges";
 import { GuideHelpLink } from "@/components/GuideHelpLink";
 import { MovableToolPanel } from "@/components/workplane/MovableToolPanel";
-import { CloudUpload, Download, EyeOff, FilePlus2, FolderOpen, ImagePlus, Info, Server, X } from "lucide-react";
+import { ArchiveRestore, CloudUpload, Download, EyeOff, FilePlus2, FolderOpen, ImagePlus, Info, Server, X } from "lucide-react";
+import { OPEN_FILE_BACKUPS_EVENT } from "@/lib/fileBackups";
 import { useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
 import { t, type MessageKey } from "@/lib/i18n";
 import { useLanguage } from "@/lib/useLanguage";
@@ -12,7 +13,7 @@ import { AttachmentsPanel } from "./AttachmentsPanel";
 import { ServerDesignPicker } from "./ServerDesignPicker";
 import { DEFAULT_INFILL_PERCENT, DEFAULT_PRINT_MATERIAL, DEFAULT_WALLS, INFILL_CHOICES, PRINT_MATERIALS, WALL_CHOICES, normalizeInfillPercent, normalizePrintMaterial, normalizeWalls, printEstimateWithInfill, type PrintMaterial } from "@/lib/printEstimate";
 import { type EditorHistoryExportLimit } from "@/lib/editorHistory";
-import { projectExportFileName, stlNameAsksForNewFile } from "@/lib/exportNames";
+import { projectExportFileName, suggestedExportName, stlNameAsksForNewFile } from "@/lib/exportNames";
 import { readImportSvgWidth, readKeepSvgPage, setImportSvgWidth, storeKeepSvgPage } from "@/lib/importPreferences";
 import { lylFileAccessSupported } from "@/lib/lylFileAccess";
 import { hasOwnShapeName } from "@/lib/shapeCatalog";
@@ -47,6 +48,7 @@ export function TopActionPanel({
   onExport,
   stlFileName = null,
   onExportLyl,
+  lylSelectedCount = 0,
   onExportStep,
   onExportDrawing,
   drawingExporting,
@@ -75,7 +77,7 @@ export function TopActionPanel({
   /** Set when a selection is exported that leaves out visible bodies: how many are selected, how many are visible. */
   selectionLeavesOut?: { selected: number; total: number } | null;
   /** With several build plates and nothing selected (#456): what to write - all plates, one file per plate, or one plate. */
-  plateScope?: { plates: readonly string[]; value: "all" | "each" | number; onChange: (value: "all" | "each" | number) => void } | null;
+  plateScope?: { plates: readonly string[]; /** Each plate's own name, "" without one: what a plate's file is called (#1860). */ names?: readonly string[]; value: "all" | "each" | number; onChange: (value: "all" | "each" | number) => void } | null;
   onSelectAll?: () => void;
   onlyHoles?: boolean;
   /** Ausgeblendete Teile, die der Export auslaesst - gesagt, bevor er laeuft. */
@@ -87,7 +89,9 @@ export function TopActionPanel({
   onExport: (format: DirectExportFormat, exportName: string, chooseFile?: boolean, svgView?: SvgExportView, toServer?: boolean, bridges?: StencilBridgeOptions | null) => void;
   /** The STL file this design exports into, once one was chosen (Chrome and Edge). */
   stlFileName?: string | null;
-  onExportLyl: (exportName: string, historyLimit: LylHistoryLimit, target?: LylExportTarget) => void;
+  onExportLyl: (exportName: string, historyLimit: LylHistoryLimit, target?: LylExportTarget, selectedOnly?: boolean) => void;
+  /** How many objects are selected for the .lyl's "Selected only" choice; 0 offers only the whole design. */
+  lylSelectedCount?: number;
   onExportStep: (exportName: string, toServer?: boolean) => void;
   onExportDrawing: (exportName: string, format: "svg" | "pdf", toServer?: boolean) => void;
   drawingExporting: boolean;
@@ -126,7 +130,13 @@ export function TopActionPanel({
   const [bridges, setBridges] = useState<StencilBridgeOptions>(DEFAULT_STENCIL_BRIDGES);
   // One body with a name of its own is exported under that name; a design file keeps the design's name.
   const ownObjectName = estimateShapes.length === 1 && hasOwnShapeName(estimateShapes[0]) ? estimateShapes[0].name!.trim() : null;
-  const suggestedName = ownObjectName && exportFormat !== "lyl" ? ownObjectName : projectName;
+  // One build plate chosen (#1860): the file starts out under the plate's name, not the design's.
+  const chosenPlate = plateScope && typeof plateScope.value === "number" && exportFormat !== "lyl" && exportFormat !== "png" ? plateScope.value : null;
+  const suggestedName = suggestedExportName(
+    projectName,
+    exportFormat !== "lyl" ? ownObjectName : null,
+    chosenPlate !== null && plateScope?.plates[chosenPlate] ? { label: plateScope.plates[chosenPlate], name: plateScope.names?.[chosenPlate] ?? "" } : null,
+  );
   const [exportName, setExportName] = useState(suggestedName);
   const previousSuggestedNameRef = useRef(suggestedName);
   // Ready to type a new name when Export opens: the field takes the focus with the name selected, so typing replaces it
@@ -144,6 +154,10 @@ export function TopActionPanel({
   // Starts at the history setting from the workspace settings, so a project
   // file carries what the editor keeps unless it is changed here.
   const [lylHistoryLimit, setLylHistoryLimit] = useState<LylHistoryLimit>(workspaceHistoryLimit);
+  // The whole design (as before) or only the selected objects, as a design of their own; with nothing selected only
+  // the whole design is there to save.
+  const [lylScopeChoice, setLylScopeChoice] = useState<"all" | "selected">("all");
+  const lylSelectedOnly = lylScopeChoice === "selected" && lylSelectedCount > 0;
   useEffect(() => setLylHistoryLimit(workspaceHistoryLimit), [workspaceHistoryLimit]);
   // A name that is still the one suggested follows a new suggestion; a typed one stays.
   useEffect(() => {
@@ -151,14 +165,15 @@ export function TopActionPanel({
     setExportName((current) => current === previousSuggestedName ? suggestedName : current);
     previousSuggestedNameRef.current = suggestedName;
   }, [suggestedName]);
-  // A custom number from the settings joins the usual stops in its place; the last stop, None,
+  // A custom number from the settings joins the usual stops in its place; the first stop, None,
   // saves the design with its current state only, for sharing a file without its undo steps (#246).
+  // More history lies to the right, as on the slider in the workspace settings (#1631).
   const lylHistoryLimits = useMemo<readonly LylHistoryLimit[]>(() => {
-    const presets: number[] = [100, 50, 30];
+    const presets: number[] = [30, 50, 100];
     const numbers = typeof workspaceHistoryLimit === "number" && !presets.includes(workspaceHistoryLimit)
-      ? [...presets, workspaceHistoryLimit].sort((a, b) => b - a)
+      ? [...presets, workspaceHistoryLimit].sort((a, b) => a - b)
       : presets;
-    return ["unlimited", ...numbers, 0];
+    return [0, ...numbers, "unlimited"];
   }, [workspaceHistoryLimit]);
   const lylHistoryLimitIndex = Math.max(0, lylHistoryLimits.indexOf(lylHistoryLimit));
   const [printMaterial, setPrintMaterial] = useState<PrintMaterial>(() => {
@@ -297,7 +312,7 @@ export function TopActionPanel({
     if (exportFormat === "drawing") onExportDrawing(exportName, drawingFormat, toServer);
     else if (exportFormat === "step") onExportStep(exportName, toServer);
     else if (exportFormat === "png") onExportImage(exportName, imageOptions, toServer);
-    else if (exportFormat === "lyl") onExportLyl(exportName, lylHistoryLimit, lylFileAccessSupported() ? "fileAs" : "download");
+    else if (exportFormat === "lyl") onExportLyl(exportName, lylHistoryLimit, lylFileAccessSupported() ? "fileAs" : "download", lylSelectedOnly);
     else {
       const view = exportFormat === "dxf" ? dxfView : svgView;
       // Bridges go into a cut outline: the DXF, or the SVG's silhouette.
@@ -441,7 +456,7 @@ export function TopActionPanel({
                 <strong>{t("export.format")}</strong>
               </div>
               <span className="export-scope-badge">{exportFormat === "lyl"
-                  ? t("export.fullProject")
+                  ? lylSelectedOnly ? t("export.lylSelectedBadge", { count: lylSelectedCount }) : t("export.fullProject")
                   : exportFormat === "png"
                   ? t("export.png.scope")
                   : t(scopeLabel === "selected" ? "export.scopeSelected" : "export.scopeTotal", { count: shapeCount })}</span>
@@ -641,6 +656,36 @@ export function TopActionPanel({
           ) : null}
 
           {exportFormat === "lyl" ? (
+            <section className="export-setting-section lyl-scope-section">
+              <div className="export-section-heading">
+                <div>
+                  <strong>{t("export.lylScope")}</strong>
+                  <span>{lylSelectedCount > 0 ? t("export.lylScopeHint") : t("export.lylScopeNoSelection")}</span>
+                </div>
+              </div>
+              <div className="shell-opening-options" role="radiogroup" aria-label={t("export.lylScope")}>
+                {(["all", "selected"] as const).map((option) => {
+                  const active = option === "selected" ? lylSelectedOnly : !lylSelectedOnly;
+                  return (
+                    <button
+                      key={option}
+                      type="button"
+                      role="radio"
+                      aria-checked={active}
+                      className={active ? "active" : ""}
+                      disabled={option === "selected" && lylSelectedCount === 0}
+                      onClick={() => setLylScopeChoice(option)}
+                    >
+                      {option === "all" ? t("export.fullProject") : t("export.lylSelectedOption", { count: lylSelectedCount })}
+                    </button>
+                  );
+                })}
+              </div>
+              {lylSelectedOnly ? <p className="export-plate-scope-hint">{t("export.lylSelectedNote")}</p> : null}
+            </section>
+          ) : null}
+
+          {exportFormat === "lyl" && !lylSelectedOnly ? (
             <section className="export-setting-section lyl-history-section">
               <div className="export-section-heading">
                 <div>
@@ -691,11 +736,17 @@ export function TopActionPanel({
                   <span>{t("export.stlSaveAs")}</span>
                 </button>
               ) : null}
+              {exportFormat === "lyl" ? (
+                <button className="export-shared-button" type="button" title={t("backups.openTitle")} onClick={() => window.dispatchEvent(new Event(OPEN_FILE_BACKUPS_EVENT))}>
+                  <ArchiveRestore />
+                  <span>{t("backups.title")}</span>
+                </button>
+              ) : null}
               {exportFormat === "lyl" && sharedProjectsEnabled ? (
                 <button
                   className="export-shared-button"
                   type="button"
-                  onClick={() => onExportLyl(exportName, lylHistoryLimit, "shared")}
+                  onClick={() => onExportLyl(exportName, lylHistoryLimit, "shared", lylSelectedOnly)}
                   disabled={lylExporting || stepExporting || drawingExporting}
                 >
                   <CloudUpload />

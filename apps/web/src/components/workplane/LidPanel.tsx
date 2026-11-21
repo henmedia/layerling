@@ -33,6 +33,7 @@ import {
   MAX_LID_DEPTH,
   MAX_LID_GAP,
   MAX_LID_THICKNESS,
+  MAX_LID_THREAD_OFFSET,
   MAX_LID_THREAD_PITCH,
   MAX_LID_THREAD_TURNS,
   MAX_LID_WALL,
@@ -50,6 +51,7 @@ import {
   MIN_HINGE_PIN_PLAY,
   MIN_LID_DEPTH,
   MIN_LID_THICKNESS,
+  MIN_LID_THREAD_OFFSET,
   MIN_LID_THREAD_PITCH,
   MIN_LID_THREAD_TURNS,
   MIN_LID_WALL,
@@ -62,6 +64,20 @@ import {
   lidClickBumpsFit,
   lidFlipTopFits,
   lidHandleFits,
+  lidLatchesFit,
+  lidStackTopFits,
+  LID_LATCH_STYLES,
+  MAX_LID_BOLT_DIAMETER,
+  MAX_LID_BOLT_PLAY,
+  MAX_LID_BOLT_TRAVEL,
+  MAX_LID_LATCH_LABEL,
+  MAX_LID_SLIDER_PLAY,
+  MAX_LID_SLIDER_WIDTH,
+  MIN_LID_BOLT_DIAMETER,
+  MIN_LID_BOLT_PLAY,
+  MIN_LID_BOLT_TRAVEL,
+  MIN_LID_SLIDER_PLAY,
+  MIN_LID_SLIDER_WIDTH,
   lidNeckDiameter,
   lidNeckFit,
   lidTakesExtras,
@@ -76,6 +92,7 @@ import {
   slideFrameNeeded,
   type LidOptions,
 } from "@/lib/lidTool";
+import { MAX_LID_LATCHES, MAX_LID_LATCH_GRIP, MAX_LID_LATCH_WIDTH, MIN_LID_LATCH_GRIP, MIN_LID_LATCH_WIDTH, lidLatchMeasures } from "@/lib/lidLatch";
 import { numberLocale, t } from "@/lib/i18n";
 import { fromPrinterPlay } from "@/lib/printerPlay";
 import { useLanguage } from "@/lib/useLanguage";
@@ -168,6 +185,8 @@ export function LidPanel({
   const neckMiss = neckStandard && neckTop !== undefined ? lidNeckFit(neckStandard, neckTop) : null;
   // A slide-in lid's frame must leave the wall whole above the slot: thinner, it says how much is needed.
   const frameNeeds = slideFrameNeeded(settings);
+  // Latches go on a plug or flat lid whose plate lies on the rim; a pivot lid lies in the opening.
+  const latchesFit = lidLatchesFit(settings) && !(settings.hinge && settings.hingeStyle === "pivot");
   return (
     <MovableToolPanel className="edge-modifier-panel shell-panel offset-panel lid-panel" ariaLabel={title}>
       {(handleProps) => (<>
@@ -333,6 +352,19 @@ export function LidPanel({
             disabled={busy}
             onChange={(value) => onChange({ threadTurns: value })}
           />
+          {/* How far below the rim the thread starts (Discussion #1594): the wall stays plain above it, the rim or plug reaches that much further down. */}
+          <EdgeModifierSlider
+            label={t("lid.threadOffset")}
+            value={settings.threadOffset}
+            min={MIN_LID_THREAD_OFFSET}
+            max={MAX_LID_THREAD_OFFSET}
+            step={0.5}
+            workspace={workspace}
+            length
+            disabled={busy}
+            onChange={(value) => onChange({ threadOffset: value })}
+          />
+          <span className="shell-openings-summary">{t("lid.threadOffsetHint")}</span>
         </>) : screw ? null : bayonet ? (<>
           {/* How many lugs, how far the cap's rim reaches down over them, and its room along the axis above the ledge. */}
           <EdgeModifierSlider
@@ -615,6 +647,14 @@ export function LidPanel({
         <span>{t("lid.hinge")}</span>
       </label>
       {!hingeFits && extras && !slide ? <span className="shell-openings-summary">{t("lid.hingeTypeHint")}</span> : null}
+      {/* A stacking top: the lid prints upright with a foot and carries the next stackable box in a tray on top. */}
+      {lidStackTopFits(settings) ? (<>
+        <label className="edge-modifier-field offset-copy">
+          <input type="checkbox" checked={settings.stackTop} disabled={busy} onChange={(event) => onChange({ stackTop: event.target.checked })} />
+          <span>{t("lid.stackTop")}</span>
+        </label>
+        {settings.stackTop ? <span className="shell-openings-summary">{t("lid.stackTopHint")} {t("lid.outcomeUpright")}</span> : null}
+      </>) : null}
       {settings.hinge && hingeFits ? (<>
         {/* Where it sits: behind the back, in the wall (the box keeps its size), or a lid that turns on two pins. */}
         <div className="edge-modifier-field shell-openings" role="radiogroup" aria-label={t("lid.hingeStyle")}>
@@ -724,11 +764,88 @@ export function LidPanel({
         <span className="shell-openings-summary">{t("lid.hingeHint", { diameter: millimetres(Math.round(2 * hingeKnuckleRadius(settings) * 10) / 10) })}</span>
       </>) : null}
 
+      {/* Latches: a clip over a pin on the body and one on the lid, on the side the lid opens at (and the back without a hinge). */}
+      {extras && !slide ? (<>
+        <EdgeModifierSlider
+          label={t("lid.latches")}
+          value={latchesFit ? settings.latches : 0}
+          min={0}
+          max={MAX_LID_LATCHES}
+          step={1}
+          workspace={workspace}
+          decimals={0}
+          disabled={busy || !latchesFit}
+          onChange={(value) => onChange({ latches: normalizeLidOptions({ latches: value }).latches })}
+        />
+        {!latchesFit ? <span className="shell-openings-summary">{t("lid.error.latchLidType")}</span> : null}
+        {settings.latches > 0 && latchesFit ? (<>
+          <div className="edge-modifier-field shell-openings" role="radiogroup" aria-label={t("lid.latchStyle")}>
+            <span>{t("lid.latchStyle")}</span>
+            <div className="shell-opening-options">
+              {LID_LATCH_STYLES.map((style) => (
+                <button key={style} type="button" role="radio" aria-checked={settings.latchStyle === style} className={settings.latchStyle === style ? "active" : ""} disabled={busy} onClick={() => onChange({ latchStyle: style })}>
+                  {t(`lid.latchStyle.${style}`)}
+                </button>
+              ))}
+            </div>
+          </div>
+          {settings.hinge ? null : (
+            <label className="edge-modifier-field offset-copy">
+              <input type="checkbox" checked={settings.latchBack} disabled={busy} onChange={(event) => onChange({ latchBack: event.target.checked })} />
+              <span>{t("lid.latchBack")}</span>
+            </label>
+          )}
+          {settings.latchStyle === "bolt" ? (<>
+            <EdgeModifierSlider label={t("lid.boltDiameter")} value={settings.boltDiameter} min={MIN_LID_BOLT_DIAMETER} max={MAX_LID_BOLT_DIAMETER} step={0.5} workspace={workspace} length disabled={busy} onChange={(value) => onChange({ boltDiameter: value })} />
+            <EdgeModifierSlider label={t("lid.boltTravel")} value={settings.boltTravel} min={MIN_LID_BOLT_TRAVEL} max={MAX_LID_BOLT_TRAVEL} step={0.5} workspace={workspace} length disabled={busy} onChange={(value) => onChange({ boltTravel: value })} />
+            <EdgeModifierSlider label={t("lid.boltPlay")} value={settings.boltPlay} min={MIN_LID_BOLT_PLAY} max={MAX_LID_BOLT_PLAY} step={0.05} workspace={workspace} length disabled={busy} onChange={(value) => onChange({ boltPlay: value })} />
+            <label className="edge-modifier-field lid-latch-label">
+              <span>{t("lid.latchLabel")}</span>
+              <input type="text" value={settings.latchLabel} maxLength={MAX_LID_LATCH_LABEL} disabled={busy} onChange={(event) => onChange({ latchLabel: event.target.value })} />
+            </label>
+            <span className="shell-openings-summary">{t("lid.boltHint")}</span>
+          </>) : settings.latchStyle === "slider" ? (<>
+            <EdgeModifierSlider label={t("lid.sliderWidth")} value={settings.sliderWidth} min={MIN_LID_SLIDER_WIDTH} max={MAX_LID_SLIDER_WIDTH} step={1} workspace={workspace} length disabled={busy} onChange={(value) => onChange({ sliderWidth: value })} />
+            <EdgeModifierSlider label={t("lid.sliderPlay")} value={settings.sliderPlay} min={MIN_LID_SLIDER_PLAY} max={MAX_LID_SLIDER_PLAY} step={0.05} workspace={workspace} length disabled={busy} onChange={(value) => onChange({ sliderPlay: value })} />
+            <label className="edge-modifier-field lid-latch-label">
+              <span>{t("lid.latchLabel")}</span>
+              <input type="text" value={settings.latchLabel} maxLength={MAX_LID_LATCH_LABEL} disabled={busy} onChange={(event) => onChange({ latchLabel: event.target.value })} />
+            </label>
+            <span className="shell-openings-summary">{t("lid.sliderHint")}</span>
+          </>) : (<>
+            <EdgeModifierSlider
+              label={t("lid.latchWidth")}
+              value={settings.latchWidth}
+              min={MIN_LID_LATCH_WIDTH}
+              max={MAX_LID_LATCH_WIDTH}
+              step={0.5}
+              workspace={workspace}
+              length
+              disabled={busy}
+              onChange={(value) => onChange({ latchWidth: value })}
+            />
+            <EdgeModifierSlider
+              label={t("lid.latchGrip")}
+              value={settings.latchGrip}
+              min={MIN_LID_LATCH_GRIP}
+              max={MAX_LID_LATCH_GRIP}
+              step={0.05}
+              workspace={workspace}
+              length
+              disabled={busy}
+              onChange={(value) => onChange({ latchGrip: value })}
+            />
+            <span className="shell-openings-summary">{t(settings.hinge ? "lid.latchHintHinge" : "lid.latchHint", { pin: millimetres(Math.round(2 * lidLatchMeasures(settings.latchWidth, settings.latchGrip).pin * 10) / 10) })}</span>
+          </>)}
+        </>) : null}
+      </>) : null}
+
       <label className="edge-modifier-field offset-copy">
         <input type="checkbox" checked={settings.clickBumps && bumpsFit} disabled={busy || !bumpsFit} onChange={(event) => onChange({ clickBumps: event.target.checked })} />
         <span>{t("lid.clickBumps")}</span>
       </label>
-      {/* A slide-in lid's is one bump under its end, which clicks past the cut wall; it says what its height is. */}
+      {/* A slide-in lid's is one bump under its end, which clicks past the wall it slides in through (cut down, or with a
+          frame slotted); it says what its height is. */}
       {(settings.clickBumps || !bumpsFit) && extras ? <span className="shell-openings-summary">{t(slide ? "lid.slideBumpHint" : "lid.clickBumpsHint")}</span> : null}
       {/* How far they reach into the body's wall: a small box or a stiff lip wants less (#1220). */}
       {settings.clickBumps && bumpsFit ? (<>

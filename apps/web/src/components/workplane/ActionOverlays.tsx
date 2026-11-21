@@ -54,19 +54,30 @@ export function AlignOverlay({
     onAlign(axis, "center", false, { gap });
   };
   // Alt turns the dots into squares that stretch the parts instead of moving them (#998). Pressing or
-  // letting go of it over a dot shows the other preview at once.
+  // letting go of it over a dot shows the other preview at once. A tablet has no Alt key, so a switch
+  // beside the dots (shown where a finger or pen is the pointer) holds the same mode.
   const [sizeMode, setSizeMode] = useState(false);
+  const [sizePinned, setSizePinned] = useState(false);
   const hovered = useRef<{ axis: AlignAxis; target: AlignTarget } | null>(null);
   const sizeModeRef = useRef(false);
+  const altHeldRef = useRef(false);
+  const pinnedRef = useRef(false);
   const previewRef = useRef(onPreview);
   previewRef.current = onPreview;
+  const refreshSizeMode = () => {
+    const next = altHeldRef.current || pinnedRef.current;
+    if (sizeModeRef.current === next) return;
+    sizeModeRef.current = next;
+    setSizeMode(next);
+    if (hovered.current) previewRef.current(hovered.current.axis, hovered.current.target, next);
+  };
+  const refreshSizeModeRef = useRef(refreshSizeMode);
+  refreshSizeModeRef.current = refreshSizeMode;
 
   useEffect(() => {
-    const change = (next: boolean) => {
-      if (sizeModeRef.current === next) return;
-      sizeModeRef.current = next;
-      setSizeMode(next);
-      if (hovered.current) previewRef.current(hovered.current.axis, hovered.current.target, next);
+    const change = (alt: boolean) => {
+      altHeldRef.current = alt;
+      refreshSizeModeRef.current();
     };
     const onKey = (event: KeyboardEvent) => {
       if (event.key !== "Alt") return;
@@ -74,7 +85,10 @@ export function AlignOverlay({
       event.preventDefault();
       change(event.type === "keydown");
     };
-    const onPointer = (event: PointerEvent) => change(event.altKey);
+    const onPointer = (event: PointerEvent) => {
+      // A finger or pen never holds Alt, so it must not undo what the switch set.
+      if (event.pointerType === "mouse") change(event.altKey);
+    };
     const onBlur = () => change(false);
     window.addEventListener("keydown", onKey);
     window.addEventListener("keyup", onKey);
@@ -107,7 +121,7 @@ export function AlignOverlay({
             disabled={state.disabled}
             onMouseEnter={(event) => {
               hovered.current = { axis: handle.axis, target: handle.target };
-              const size = event.altKey && Boolean(handle.size);
+              const size = (event.altKey || sizeModeRef.current) && Boolean(handle.size);
               const status = size ? handle.size! : handle;
               if (!status.disabled) {
                 onPreview(handle.axis, handle.target, size);
@@ -126,7 +140,7 @@ export function AlignOverlay({
             onClick={(event) => {
               event.stopPropagation();
               onPreviewClear();
-              onAlign(handle.axis, handle.target, event.altKey);
+              onAlign(handle.axis, handle.target, event.altKey || sizeModeRef.current);
             }}
           />
         );
@@ -143,7 +157,7 @@ export function AlignOverlay({
             title={title}
             disabled={disabled}
             onMouseEnter={(event) => {
-              if (!event.altKey && !dot.disabled && !gapField) onPreview(dot.axis, "center", false, { gap: null });
+              if (!event.altKey && !sizeModeRef.current && !dot.disabled && !gapField) onPreview(dot.axis, "center", false, { gap: null });
             }}
             onMouseLeave={() => {
               if (!gapField) onPreviewClear();
@@ -157,7 +171,7 @@ export function AlignOverlay({
             onClick={(event) => {
               event.stopPropagation();
               onPreviewClear();
-              if (event.altKey) {
+              if (event.altKey || sizeModeRef.current) {
                 setGapField({ axis: dot.axis, x: dot.x, y: dot.y });
                 const gap = typedGap(gapText);
                 if (gap !== null) onPreview(dot.axis, "center", false, { gap });
@@ -175,6 +189,22 @@ export function AlignOverlay({
           </button>
         );
       })}
+      <button
+        type="button"
+        className={`align-size-toggle ${sizePinned ? "on" : ""}`}
+        aria-pressed={sizePinned}
+        title={t("align.sizeSwitchTitle")}
+        onPointerDown={(event) => event.stopPropagation()}
+        onClick={(event) => {
+          event.stopPropagation();
+          onPreviewClear();
+          pinnedRef.current = !pinnedRef.current;
+          setSizePinned(pinnedRef.current);
+          refreshSizeMode();
+        }}
+      >
+        {t("align.sizeSwitch")}
+      </button>
       {gapField ? (
         <form
           className="align-gap-field"

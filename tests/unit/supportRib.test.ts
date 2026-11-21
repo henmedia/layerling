@@ -154,6 +154,37 @@ describe("the support rib (#1385)", () => {
     expect(solid.volume()).toBeGreaterThan(0);
   });
 
+  it("lets the bridges stop short of the part by the bridge gap, measured in their layer (#1653)", () => {
+    expect(normalizeSupportRib({}).bridgeGap).toBe(0);
+    expect(normalizeSupportRib({ bridgeGap: 9 }).bridgeGap).toBe(2);
+    const face = lowerFace();
+    const built = buildSupportRib(kernel, face, normalizeSupportRib({ height: 18.5, gap: 1, bridgeGap: 0.2 }), cube);
+    expect(built.ok).toBe(true);
+    if (!built.ok) return;
+    const { plan, positions } = built;
+    expect(plan.bridges.length).toBeGreaterThanOrEqual(5);
+    const n = new THREE.Vector3(face.normal.x, face.normal.y, face.normal.z);
+    const p0 = new THREE.Vector3(face.point.x, face.point.y, face.point.z);
+    // Across the layer the face is the normal's distance divided by its part along the bed.
+    const along = Math.hypot(n.x, n.z);
+    for (const bottom of plan.bridges) {
+      let nearest = Infinity;
+      for (let o = 0; o < positions.length; o += 3) {
+        const point = new THREE.Vector3(positions[o], positions[o + 1], positions[o + 2]);
+        if (point.y < bottom - 1e-4 || point.y > bottom + 0.2 + 1e-4) continue;
+        nearest = Math.min(nearest, point.clone().sub(p0).dot(n) / along);
+      }
+      // The bridge ends 0.2 mm before the part, well out of the rib (1 mm off the face, 1.41 mm across the layer).
+      expect(nearest).toBeCloseTo(0.2, 3);
+    }
+  });
+
+  it("refuses a bridge gap that would leave the bridges inside the rib", () => {
+    // The default gap of 0.2 mm is 0.28 mm across the layer at 45 degrees: a bridge gap of 0.2 leaves less than 0.1.
+    const built = buildSupportRib(kernel, lowerFace(), normalizeSupportRib({ height: 18.5, bridgeGap: 0.2 }), cube);
+    expect(built).toEqual({ ok: false, reason: "bridgeGapTooWide" });
+  });
+
   it("refuses a rib that would run into the part beside the face", () => {
     // A block standing in the way under the cube's lower face, bundled with it as one part.
     const face = lowerFace();

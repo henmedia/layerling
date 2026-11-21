@@ -181,4 +181,29 @@ describe("history step measures (#1023)", () => {
     expect(historyStepTextIn("en", { key: "historyStep.rotatedOne", values: { name: "Box" }, detail: { kind: "angle", degrees: -45 } })).toBe("Rotated Box (-45°)");
     expect(historyStepTextIn("en", { key: "historyStep.colorOne", values: { name: "Box" } })).toBe("Changed the colour of Box");
   });
+
+  // Discussion #1637: the fields used to be compared as JSON text, which took seconds for a group with
+  // its parts' CAD data. The comparison by structure must tell the same changes apart.
+  it("reads a step of a group carrying large data by what changed, not by the data it carries", () => {
+    const part = (id: string, brep: string) => box({ id, cadBrep: brep });
+    const parts = [part("a", "B".repeat(200_000)), part("b", "C".repeat(200_000))];
+    const group = (name: string, x: number, brep: string) => box({ id: "grp", name, kind: "group", x, groupedShapes: parts.map((p) => ({ ...p, cadBrep: p.id === "a" ? brep : p.cadBrep })) } as Partial<WorkplaneShape>);
+    const same = "B".repeat(200_000);
+    expect(step([group("Group", 0, same)], [group("Lid", 0, same)])).toEqual({ key: "historyStep.renamedOne", values: { name: "Group", newName: "Lid" } });
+    expect(step([group("Group", 0, same)], [group("Group", 5, same)])?.key).toBe("historyStep.movedOne");
+    expect(step([group("Group", 0, same)], [group("Group", 0, `${same}x`)])?.key).toBe("historyStep.editedOne");
+  });
+
+  it("treats a missing key and one set to undefined alike, and the order of keys as no change", () => {
+    expect(describeHistoryStep(entry([box({ formulas: undefined } as Partial<WorkplaneShape>)]), entry([box()])).key).toBe("historyStep.changed");
+    const ordered = { a: 1, b: [1, 2] };
+    const reversed = { b: [1, 2], a: 1 };
+    expect(step([box({ paint: ordered } as unknown as Partial<WorkplaneShape>)], [box({ paint: reversed } as unknown as Partial<WorkplaneShape>)])).toEqual({ key: "historyStep.changed" });
+  });
+
+  it("reads the same step only once", () => {
+    const before = entry([box()]);
+    const after = entry([box({ name: "Lid" })]);
+    expect(describeHistoryStep(before, after)).toBe(describeHistoryStep(before, after));
+  });
 });

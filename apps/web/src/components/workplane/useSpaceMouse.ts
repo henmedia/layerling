@@ -1,12 +1,17 @@
 import { useEffect, type RefObject } from "react";
 import {
   moveCameraBySpaceMouse,
+  isSpaceMouseGamepad,
+  readSpaceMouseGamepad,
   readSpaceMouseInvert,
   readSpaceMouseReport,
   SPACE_MOUSE_FILTERS,
   SPACE_MOUSE_INVERT_EVENT,
   SPACE_MOUSE_REST,
+  smoothSpaceMouseAxes,
+  spaceMouseMoving,
   type SpaceMouseAxes,
+  type SpaceMouseWay,
 } from "@/lib/spaceMouse";
 import type { ThreeState } from "@/components/workplane/ViewportOverlays";
 
@@ -23,6 +28,25 @@ type Hid = EventTarget & {
 export function webHid(): Hid | null {
   if (typeof navigator === "undefined" || !("hid" in navigator)) return null;
   return (navigator as Navigator & { hid: Hid }).hid ?? null;
+}
+
+/** The browser's Gamepad API, or null where there is none. */
+export function webGamepads(): (() => (Gamepad | null)[]) | null {
+  if (typeof navigator === "undefined" || typeof navigator.getGamepads !== "function") return null;
+  return () => {
+    try {
+      return Array.from(navigator.getGamepads());
+    } catch {
+      return [];
+    }
+  };
+}
+
+/** The connected game controllers that are 3D mice. */
+export function spaceMousePads(): Gamepad[] {
+  const read = webGamepads();
+  if (!read) return [];
+  return read().filter((pad): pad is Gamepad => Boolean(pad && pad.connected && isSpaceMouseGamepad(pad.id)));
 }
 
 /** Whether a HID device is a 3D mouse: a multi-axis controller. */
@@ -46,15 +70,43 @@ export async function connectSpaceMouse(): Promise<string | null> {
   return device.productName || "3D mouse";
 }
 
+/** Sent when the editor took up or lost a 3D mouse over WebHID, so the settings show which way it is read. */
+export const SPACE_MOUSE_WAY_EVENT = "layerling:spacemouse-way";
+
+/**
+ * The way the 3D mouse is read right now (#1871): over WebHID when the site holds one open, else as a game controller when
+ * the browser shows one, else over WebHID when the site may use one; null with no mouse at all. The editor reads it the
+ * same way: WebHID first, the game controller only without it.
+ */
+export async function spaceMouseWay(): Promise<SpaceMouseWay | null> {
+  let allowed: HidDevice[] = [];
+  try {
+    allowed = ((await webHid()?.getDevices()) ?? []).filter(isSpaceMouse);
+  } catch {
+    // No device over WebHID.
+  }
+  if (allowed.some((device) => device.opened)) return "hid";
+  if (spaceMousePads().length) return "pad";
+  return allowed.length ? "hid" : null;
+}
+
 /** The names of the 3D mice this site may already use. */
 export async function knownSpaceMice(): Promise<string[]> {
+  const names: string[] = [];
   const hid = webHid();
-  if (!hid) return [];
-  try {
-    return (await hid.getDevices()).filter(isSpaceMouse).map((device) => device.productName || "3D mouse");
-  } catch {
-    return [];
+  if (hid) {
+    try {
+      (await hid.getDevices()).filter(isSpaceMouse).forEach((device) => names.push(device.productName || "3D mouse"));
+    } catch {
+      // No device to name.
+    }
   }
+  // Found as a game controller too (#1013): its name, up to the bracket the browser adds ("SpaceMouse Compact (Vendor: ...").
+  spaceMousePads().forEach((pad) => {
+    const name = pad.id.replace(/\s*\(.*$/, "").trim() || "3D mouse";
+    if (!names.includes(name)) names.push(name);
+  });
+  return names;
 }
 
 /**
@@ -65,11 +117,15 @@ export async function knownSpaceMice(): Promise<string[]> {
 export function useSpaceMouse(threeRef: RefObject<ThreeState | null>) {
   useEffect(() => {
     const hid = webHid();
-    if (!hid) return;
+    if (!hid && !webGamepads()) return;
     let axes: SpaceMouseAxes = SPACE_MOUSE_REST;
-    let invert = readSpaceMouseInvert();
+    // What the view is moved by: the cap's axes smoothed over a few hundredths of a second (#1013).
+    let smoothed: SpaceMouseAxes = SPACE_MOUSE_REST;
+    // Where the axes came from last: each way of reading the mouse has its own reversed directions (#1871).
+    let way: SpaceMouseWay = "hid";
+    let invert = { hid: readSpaceMouseInvert("hid"), pad: readSpaceMouseInvert("pad") };
     const onInvert = () => {
-      invert = readSpaceMouseInvert();
+      invert = { hid: readSpaceMouseInvert("hid"), pad: readSpaceMouseInvert("pad") };
     };
     let frame = 0;
     let last = 0;
@@ -80,16 +136,23 @@ export function useSpaceMouse(threeRef: RefObject<ThreeState | null>) {
       const seconds = Math.min(0.05, Math.max(0, (now - last) / 1000));
       last = now;
       const state = threeRef.current;
-      if (!state || document.visibilityState !== "visible") return;
-      if (!moveCameraBySpaceMouse(state.camera, state.controls.target, axes, seconds, invert)) return;
-      state.cameraTurn = null;
-      state.controls.update();
-      state.needsRender = true;
-      frame = requestAnimationFrame(step);
+      if (!state || document.visibilityState !== "visible") {
+        smoothed = SPACE_MOUSE_REST;
+        return;
+      }
+      smoothed = smoothSpaceMouseAxes(smoothed, axes, seconds);
+      if (moveCameraBySpaceMouse(state.camera, state.controls.target, smoothed, seconds, invert[way])) {
+        state.cameraTurn = null;
+        state.controls.update();
+        state.needsRender = true;
+      }
+      // While the cap is held the smoothed axes may still lie inside the rest band for a frame or two: keep going.
+      if (smoothed !== SPACE_MOUSE_REST) frame = requestAnimationFrame(step);
     };
     const onReport = (event: Event) => {
       const report = event as HidInputReportEvent;
       axes = readSpaceMouseReport(axes, report.reportId, report.data);
+      way = "hid";
       if (!frame) {
         last = performance.now();
         frame = requestAnimationFrame(step);
@@ -106,10 +169,36 @@ export function useSpaceMouse(threeRef: RefObject<ThreeState | null>) {
       if (disposed) return;
       devices.add(device);
       device.addEventListener("inputreport", onReport);
+      window.dispatchEvent(new Event(SPACE_MOUSE_WAY_EVENT));
     };
     const scan = () => {
-      hid.getDevices().then((list) => list.forEach((device) => void attach(device))).catch(() => {});
+      hid?.getDevices().then((list) => list.forEach((device) => void attach(device))).catch(() => {});
     };
+    // The same mouse as a game controller (#1013): the browser shows it with no question once it is moved, so it works
+    // again after a restart without Connect. Read every frame while it is there, unless WebHID has the mouse already.
+    let padFrame = 0;
+    const padPoll = () => {
+      padFrame = 0;
+      if (disposed) return;
+      const pad = spaceMousePads()[0];
+      if (!pad) {
+        if (!devices.size) axes = SPACE_MOUSE_REST;
+        return;
+      }
+      padFrame = requestAnimationFrame(padPoll);
+      if (devices.size) return;
+      axes = readSpaceMouseGamepad(pad.axes);
+      way = "pad";
+      if (!frame && spaceMouseMoving(axes)) {
+        last = performance.now();
+        frame = requestAnimationFrame(step);
+      }
+    };
+    const startPads = () => {
+      if (!padFrame && spaceMousePads().length) padFrame = requestAnimationFrame(padPoll);
+    };
+    startPads();
+    window.addEventListener("gamepadconnected", startPads);
     const onConnect = (event: Event) => {
       const device = (event as Event & { device?: HidDevice }).device;
       if (device) void attach(device);
@@ -120,17 +209,20 @@ export function useSpaceMouse(threeRef: RefObject<ThreeState | null>) {
       device.removeEventListener("inputreport", onReport);
       devices.delete(device);
       axes = SPACE_MOUSE_REST;
+      window.dispatchEvent(new Event(SPACE_MOUSE_WAY_EVENT));
     };
     scan();
-    hid.addEventListener("connect", onConnect);
-    hid.addEventListener("disconnect", onDisconnect);
+    hid?.addEventListener("connect", onConnect);
+    hid?.addEventListener("disconnect", onDisconnect);
     window.addEventListener(SPACE_MOUSE_EVENT, scan);
     window.addEventListener(SPACE_MOUSE_INVERT_EVENT, onInvert);
     return () => {
       disposed = true;
       cancelAnimationFrame(frame);
-      hid.removeEventListener("connect", onConnect);
-      hid.removeEventListener("disconnect", onDisconnect);
+      cancelAnimationFrame(padFrame);
+      window.removeEventListener("gamepadconnected", startPads);
+      hid?.removeEventListener("connect", onConnect);
+      hid?.removeEventListener("disconnect", onDisconnect);
       window.removeEventListener(SPACE_MOUSE_EVENT, scan);
       window.removeEventListener(SPACE_MOUSE_INVERT_EVENT, onInvert);
       devices.forEach((device) => {

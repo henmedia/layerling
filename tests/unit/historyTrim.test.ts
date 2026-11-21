@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { historyTrimSteps, isProjectTooLargeError, isStorageFullError, trimHistoryWindow } from "@/lib/historyTrim";
+import { historyTrimSteps, isOutOfMemoryError, isProjectTooLargeError, isRetriedWithLessHistory, isStorageFullError, saveWithLessHistoryIfNeeded, trimHistoryWindow } from "@/lib/historyTrim";
 import { localizedError } from "@/lib/userErrors";
 
 const steps = (count: number) => Array.from({ length: count }, (_, index) => `step-${index}`);
@@ -45,5 +45,61 @@ describe("a design too big to save keeps the newest steps of its history (#475)"
   it("tells a person what to do instead of 'Could not save design shapes'", () => {
     expect(localizedError("Project data exceeds the 64 MB project file limit. Export with fewer history steps or simplify the project.")).toMatch(/too big to save/i);
     expect(localizedError("The current transaction exceeded its quota limitations.")).toMatch(/no room left/i);
+  });
+});
+
+// Discussion #1652: with meshes of millions of triangles, packing the whole history ran the tab out of memory, the save
+// failed every time and a reload brought back a state hours old.
+describe("a design that runs out of memory while it is saved", () => {
+  it("is packed again with fewer history steps, as a package too big for the format is", () => {
+    expect(isOutOfMemoryError(new RangeError("Array buffer allocation failed"))).toBe(true);
+    expect(isOutOfMemoryError(new RangeError("Invalid typed array length: 4294967296"))).toBe(true);
+    expect(isOutOfMemoryError(new Error("Out of memory"))).toBe(true);
+    expect(isOutOfMemoryError(new Error("Could not save project shapes"))).toBe(false);
+    expect(isRetriedWithLessHistory(new RangeError("Array buffer allocation failed"))).toBe(true);
+    expect(isRetriedWithLessHistory(new Error("Project data exceeds the 64 MB project file limit."))).toBe(true);
+    expect(isRetriedWithLessHistory(new Error("The current transaction exceeded its quota limitations."))).toBe(false);
+  });
+
+  it("says why when it fails all the same", () => {
+    expect(localizedError("Array buffer allocation failed")).toMatch(/run out of memory/i);
+  });
+
+  it("writes the design again with fewer history steps when the browser refuses the whole one (#1728)", async () => {
+    const quota = () => Object.assign(new Error(""), { name: "QuotaExceededError" });
+    const written: number[] = [];
+    const result = await saveWithLessHistoryIfNeeded(
+      steps(40),
+      39,
+      async (history) => history.length,
+      async (size) => {
+        if (size > 10) throw quota();
+        written.push(size);
+      },
+    );
+    expect(written).toEqual([10]);
+    expect(result).toEqual({ historyTrimmed: { kept: 10, total: 40 } });
+  });
+
+  it("saves as before when the whole history fits, and fails on errors fewer steps cannot cure (#1728)", async () => {
+    expect(await saveWithLessHistoryIfNeeded(steps(5), 4, async (history) => history.length, async () => undefined)).toEqual({});
+    const broken = new Error("disk gone");
+    await expect(saveWithLessHistoryIfNeeded(steps(5), 4, async () => 1, async () => { throw broken; })).rejects.toBe(broken);
+    const quota = Object.assign(new Error(""), { name: "QuotaExceededError" });
+    await expect(saveWithLessHistoryIfNeeded(steps(5), 4, async () => 1, async () => { throw quota; })).rejects.toBe(quota);
+    await expect(saveWithLessHistoryIfNeeded(steps(1), 0, async () => 1, async () => { throw quota; })).rejects.toBe(quota);
+  });
+
+  it("still packs with fewer steps when the package is too big for the format (#475)", async () => {
+    const result = await saveWithLessHistoryIfNeeded(
+      steps(8),
+      7,
+      async (history) => {
+        if (history.length > 2) throw new Error("The project exceeds the 64 MB project file limit");
+        return history.length;
+      },
+      async () => undefined,
+    );
+    expect(result).toEqual({ historyTrimmed: { kept: 2, total: 8 } });
   });
 });

@@ -97,10 +97,11 @@ The AI works with the same functions as you, through the same path as your opera
 | `layerling_import_mesh` | brings a triangle mesh into the design |
 | `layerling_update_object` | changes dimensions, position, colour, name, solid or hole and everything else that makes up the shape, a text's letter edge included |
 | `layerling_align_objects` | aligns objects with each other |
-| `layerling_scale_objects` | scales objects by a percentage, together or each in place |
+| `layerling_scale_objects` | scales objects by a percentage, together or each in place, or to a model scale such as 1:87 |
 | `layerling_lay_flat` | lays an object with one face on the plate |
 | `layerling_place_on_face` | sets objects down on a face of another, sloped ones too, like the C key |
 | `layerling_perforate_face` | cuts a hole pattern into a flat face or round the wall of a cylinder, tube or bore; the holes stay as holes grouped with the body |
+| `layerling_thread_insert` | makes the hole for a heat-set thread insert (M2 to M8, 1/4-20 or your own size) in a flat face or the outside wall of a cylinder or tube, after checking that the wall beside the hole and the depth behind it are enough; the hole stays a hole grouped with the body |
 | `layerling_sweep_sketch` | pulls a rectangular or round cross-section along a path of points as one exact body; a closed path makes a ring |
 | `layerling_push_face` | pushes a flat face out or cuts a pocket into it, with an inset from the edge and a corner radius; the new part is a sketch body grouped with the body, or a free body of its own with `separate` |
 | `layerling_paint` | paints parts of a body in colours of their own for printing in several colours (Paint): fill a face up to its sharp edges, a round patch, or a lasso drawn in a flat view; erase, clear; saved with the body and written to a 3MF as painted faces |
@@ -119,6 +120,7 @@ The AI works with the same functions as you, through the same path as your opera
 | `layerling_cookie_cutter` | makes a cookie cutter from the objects: a wall with a cutting edge and a rim round the mirrored outline (Cookie cutter) |
 | `layerling_flexi_joints` | cuts a flat body into links with joints printed in place that swing to the sides (Flexi joints) |
 | `layerling_make_lid` | makes a lid for a body open at the top: pushed in, over the top or flat, with the fit you choose and magnets if you like (Lid) |
+| `layerling_make_mold` | makes a mold or a die from a master: a two-part mold to cast in, a silicone pour box, an open mold, or a stamp and die for sheet (Mold & die) |
 | `layerling_make_cable_channel` | runs a round channel for a cable through a body from an entry to an exit, finding the way itself with gentle bends (Cable channel) |
 | `layerling_loft_sketches` | joins two sketch bodies into a loft from one outline to the other (Loft sketches) |
 | `layerling_separate_parts` | separates a shape into its loose parts, a sketch body into one body per outline |
@@ -145,6 +147,8 @@ The AI works with the same functions as you, through the same path as your opera
 | `layerling_check_clearance` | checks before printing which parts overlap, touch or come closer than a minimum gap (Check clearance), the separate parts of one object too |
 | `layerling_printer_play` | reads, sets or clears the printer's play ({{ui:workspace.printerPlay}} in the settings) and places the fit test that measures it |
 | `layerling_check_print` | checks before printing what would go wrong: walls too thin for the nozzle, floating parts, small contact with the plate, overhangs and open meshes (Print check) |
+| `layerling_check_layers` | cuts the print into layers and lists what would go wrong layer by layer: overhangs, places without support, bridges, thin walls, small islands, a part in the plate (Print analysis) |
+| `layerling_split_bolt` | splits a screw or threaded rod lengthwise through its axis and lays both halves on their cut faces for printing, optionally with centring pins |
 | `layerling_add_reference_points` | marks reference points - on the centre, corners or edge middles of objects, or at exact positions - that shapes snap to |
 | `layerling_list_reference_points` | lists the reference points with their ids and positions |
 | `layerling_remove_reference_points` | deletes reference points by id, or all of them |
@@ -170,6 +174,9 @@ The AI works with the same functions as you, through the same path as your opera
 | `layerling_saved_view` | saves the current view under the key 7, 8, 9 or 0 and goes back to it, like Shift+key and the key (only the view); also sets the start view of new designs |
 | `layerling_build_plates` | lists, adds, names, orders and removes the build plates, moves objects onto a plate and arranges them on the plates, like the plate bar |
 | `layerling_clear_history` | deletes every undo step for good, as the History view's "Delete history" button does; needs `confirm: true` |
+| `layerling_delete_history_steps` | deletes single states of the history for good, never the current one, as the bin beside a step in the History view's list does; needs `steps` and `confirm: true` |
+| `layerling_list_backups` | lists the automatic backups (Earlier versions) of the open design, or with `all: true` of every design in this browser |
+| `layerling_open_backup` | opens a backup by its `id` as a new design, never tied to the original file |
 | `layerling_set_history_view` | looks back at an earlier state of the project, like the History view (the real design stays untouched; changing tools wait until it is closed) |
 | `layerling_restore_from_history` | brings objects (also parts inside groups) back from an earlier state into the design as copies, as the History view's Bring into design does - one step that undo takes back |
 | `layerling_export_section_svg` | returns the outlines on a cutting plane as an SVG at 1:1, from the same bodies as the export |

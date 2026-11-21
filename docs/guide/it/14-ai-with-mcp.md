@@ -97,10 +97,11 @@ L’IA usa le stesse funzioni che hai a disposizione, attraverso lo stesso perco
 | `layerling_import_mesh` | Importa nel progetto una mesh di triangoli. |
 | `layerling_update_object` | Modifica dimensioni, posizione, colore, nome, tipo pieno o foro e tutte le altre proprietà della forma, compreso il bordo delle lettere di un testo. |
 | `layerling_align_objects` | Allinea gli oggetti tra loro. |
-| `layerling_scale_objects` | Ridimensiona gli oggetti in percentuale, tutti insieme oppure ciascuno attorno alla propria posizione. |
+| `layerling_scale_objects` | Ridimensiona gli oggetti in percentuale, tutti insieme oppure ciascuno attorno alla propria posizione, oppure a una scala modellistica come 1:87. |
 | `layerling_lay_flat` | Appoggia un oggetto sul piano usando una delle sue facce. |
 | `layerling_place_on_face` | Appoggia gli oggetti su una faccia di un altro, anche se inclinata, come con il tasto C. |
 | `layerling_perforate_face` | Crea un motivo di fori su una faccia piana o intorno alla parete di un cilindro, un tubo o un foro; i fori restano tali e vengono raggruppati con il corpo. |
+| `layerling_thread_insert` | Crea il foro per un inserto filettato a caldo (da M2 a M8, 1/4-20 o una misura personalizzata) su una faccia piana o sulla parete esterna di un cilindro o di un tubo, dopo aver verificato che la parete accanto al foro e la profondità dietro siano sufficienti; il foro resta tale e viene raggruppato con il corpo. |
 | `layerling_sweep_sketch` | Estende una sezione rettangolare o circolare lungo un percorso di punti, creando un corpo esatto; se il percorso è chiuso, crea un anello. |
 | `layerling_push_face` | Estende una faccia piana o crea una tasca al suo interno, impostando un margine dal bordo e il raggio degli angoli; la nuova parte è un corpo da schizzo raggruppato con il corpo originale. |
 | `layerling_paint` | dipinge parti di un corpo in colori propri per stampare in più colori (Dipingi): riempire una faccia fino agli spigoli vivi, una macchia rotonda o un lazo tracciato in una vista piana; cancellare, togliere tutto; salvato con il corpo e scritto in un 3MF come facce dipinte |
@@ -119,6 +120,7 @@ L’IA usa le stesse funzioni che hai a disposizione, attraverso lo stesso perco
 | `layerling_cookie_cutter` | makes a cookie cutter from the objects: a wall and a rim round the outline (Cookie cutter) |
 | `layerling_flexi_joints` | cuts a flat body into links with joints printed in place that swing to the sides (Flexi joints) |
 | `layerling_make_lid` | makes a lid for a body open at the top: pushed in, over the top or flat, with the fit you choose and magnets if you like (Lid) |
+| `layerling_make_mold` | makes a mold or a die from a master: a two-part mold to cast in, a silicone pour box, an open mold, or a stamp and die for sheet (Mold & die) |
 | `layerling_make_cable_channel` | runs a round channel for a cable through a body from an entry to an exit, finding the way itself with gentle bends (Cable channel) |
 | `layerling_loft_sketches` | joins two sketch bodies into a loft from one outline to the other (Loft sketches) |
 | `layerling_separate_parts` | Separa una forma nelle sue parti distinte; un corpo da schizzo viene diviso in un corpo per contorno. |
@@ -145,6 +147,8 @@ L’IA usa le stesse funzioni che hai a disposizione, attraverso lo stesso perco
 | `layerling_check_clearance` | Controlla prima della stampa quali parti si sovrappongono, si toccano o sono più vicine di un gioco minimo, anche le parti separate di un oggetto |
 | `layerling_printer_play` | legge, imposta o cancella il gioco della stampante ({{ui:workspace.printerPlay}} nelle impostazioni) e mette la prova di accoppiamento che lo misura |
 | `layerling_check_print` | Controlla prima della stampa cosa andrebbe storto: pareti troppo sottili per l'ugello, parti sospese, poco contatto con il piatto, sporgenze e mesh aperte |
+| `layerling_check_layers` | taglia la stampa in strati e elenca strato per strato cosa andrebbe storto: sbalzi, zone senza appoggio, ponti, pareti sottili, piccole isole, un pezzo nel piano (Analisi di stampa) |
+| `layerling_split_bolt` | divide una vite o una barra filettata per il lungo lungo l’asse e stende le due metà sulla faccia di taglio per la stampa, a scelta con spine di centraggio |
 | `layerling_add_reference_points` | Aggiunge punti di riferimento — al centro, agli angoli o nei punti medi degli spigoli degli oggetti, oppure in posizioni precise — a cui si agganciano le forme. |
 | `layerling_list_reference_points` | Elenca i punti di riferimento con i rispettivi ID e posizioni. |
 | `layerling_remove_reference_points` | Elimina i punti di riferimento indicati tramite ID oppure li elimina tutti. |
@@ -170,6 +174,9 @@ L’IA usa le stesse funzioni che hai a disposizione, attraverso lo stesso perco
 | `layerling_saved_view` | Salva la vista corrente con il tasto 7, 8, 9 o 0 e la richiama in seguito, come con Maiusc+tasto e poi il tasto (modifica solo la vista). Imposta anche la vista di avvio dei nuovi progetti. |
 | `layerling_build_plates` | Elenca, aggiunge, nomina, ordina e toglie i piatti di stampa, sposta oggetti su un piatto e li distribuisce sui piatti, come la barra dei piatti. |
 | `layerling_clear_history` | Elimina definitivamente tutti i passaggi annullabili, come il pulsante «Elimina cronologia» nella vista Cronologia; richiede `confirm: true`. |
+| `layerling_delete_history_steps` | elimina per sempre singoli stati della cronologia, mai quello attuale, come il cestino accanto a un passaggio nell'elenco della vista cronologia; richiede `steps` e `confirm: true` |
+| `layerling_list_backups` | elenca i backup automatici (Versioni precedenti) del progetto aperto, o con `all: true` di tutti i progetti di questo browser |
+| `layerling_open_backup` | apre un backup tramite il suo `id` come nuovo progetto, mai legato al file originale |
 | `layerling_set_history_view` | Mostra uno stato precedente del progetto, come la vista Cronologia. Il progetto vero e proprio non viene modificato; gli strumenti di modifica restano in attesa finché la vista non viene chiusa. |
 | `layerling_restore_from_history` | Ripristina nel progetto come copie gli oggetti di uno stato precedente, comprese le parti all’interno dei gruppi, come «Inserisci nel progetto» nella vista Cronologia; l’operazione è un singolo passaggio annullabile. |
 | `layerling_export_section_svg` | Restituisce in formato SVG, in scala 1:1, i contorni sul piano di sezione, usando gli stessi corpi dell’esportazione. |

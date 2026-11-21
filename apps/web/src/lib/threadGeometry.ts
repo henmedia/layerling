@@ -127,6 +127,9 @@ const METRIC_SIZES: readonly ThreadSizeSpec[] = ([
   { id: "M2", system: "metric", diameter: 2, pitch: 0.4, socket: 1.5, headDiameter: 3.8, headHeight: 2, acrossFlats: 4, nutHeight: 1.6, countersunkDiameter: 3.8 },
   { id: "M2.5", system: "metric", diameter: 2.5, pitch: 0.45, socket: 2, headDiameter: 4.5, headHeight: 2.5, acrossFlats: 5, nutHeight: 2, countersunkDiameter: 4.7 },
   { id: "M3", system: "metric", diameter: 3, pitch: 0.5, socket: 2.5, headDiameter: 5.5, headHeight: 3, acrossFlats: 5.5, nutHeight: 2.4, countersunkDiameter: 6 },
+  // M3.5 (Discussion #1908), a size of the second choice in ISO 261: hex and nut to ISO 4032 and the countersunk head to
+  // ISO 7046 as the others, but ISO 4762 has no M3.5, so the socket head keeps the measures a thread of 3.5 mm had before.
+  { id: "M3.5", system: "metric", diameter: 3.5, pitch: 0.6, ...proportionalHeadSizes(3.5), acrossFlats: 6, nutHeight: 2.8, countersunkDiameter: 7.3 },
   { id: "M4", system: "metric", diameter: 4, pitch: 0.7, socket: 3, headDiameter: 7, headHeight: 4, acrossFlats: 7, nutHeight: 3.2, countersunkDiameter: 8 },
   { id: "M5", system: "metric", diameter: 5, pitch: 0.8, socket: 4, headDiameter: 8.5, headHeight: 5, acrossFlats: 8, nutHeight: 4, countersunkDiameter: 10 },
   { id: "M6", system: "metric", diameter: 6, pitch: 1, socket: 5, headDiameter: 10, headHeight: 6, acrossFlats: 10, nutHeight: 5, countersunkDiameter: 12 },

@@ -36,6 +36,8 @@ Le cube de la vue en haut à gauche tourne la vue quand vous le faites glisser, 
 
 Le bout d'un doigt cache ce qu'il vise. layerling laisse un doigt atteindre un peu plus loin qu'un pointeur de souris les poignées, les points, les lignes et les arêtes, mais un stylet est plus fin. Cela vaut pour un stylet que la tablette connaît comme stylet, par exemple un Apple Pencil ou un S Pen. Un simple stylet à pointe en caoutchouc compte pour l'écran comme un doigt et n'est pas plus fin : travaillez avec comme avec un doigt. Lorsqu'un Apple Pencil survole un bouton sur l'iPad, son nom apparaît après un instant dans une petite bulle, comme l'info-bulle avec la souris.
 
+Autour d'une sélection, les poignées de taille, les flèches de rotation et les flèches de déplacement sont serrées, et un doigt attrape facilement la mauvaise. Le bouton à la main qui pointe dans la barre de vue choisit ce que fait un doigt : {{ui:camera.touchHandles.all}}, {{ui:camera.touchHandles.move}}, {{ui:camera.touchHandles.size}} ou {{ui:camera.touchHandles.turn}}, chaque toucher passe au suivant. Les autres poignées sont masquées ; en taille ou en rotation, un doigt sur le corps ne fait que le sélectionner et ne le déplace plus. Le navigateur garde le choix. Comme {{ui:camera.touchRotate}}, le bouton n'apparaît que sur un appareil à écran tactile.
+
 En mode esquisse, {{ui:sketch.freehand}} dessine au stylet ou au doigt comme sur du papier ; quand vous le levez, la ligne devient des points d'esquisse modifiables, voir [Esquisses](chapter:sketches).
 
 Si des corps glissent parce que des enfants ou des mains pressées les touchent, activez {{ui:workspace.selectBeforeMoving}} dans les réglages : un corps doit alors d'abord être sélectionné, et seul le glissement suivant le déplace.

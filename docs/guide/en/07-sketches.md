@@ -57,6 +57,7 @@ Click points one after another.
 ::: Closing or ending a line
 To close the outline, click the first point again at the end.
 To end the chain of lines without closing the outline, right-click without moving the pointer, or double-click the last point.
+If you switch to {{ui:sketch.line}}, {{ui:sketch.bezier}} or {{ui:sketch.smooth}} in the middle of a chain, the line goes on from its last point.
 => A body comes only from a **closed** outline.
 :::
 
@@ -303,7 +304,7 @@ You can set the stroke without opening the sketch too: in the properties of a sk
 
 {{ui:prop.sketchSilhouette}} leaves out every outline lying inside another: holes and whatever lies in them. Only the outer outline stays. Together with {{ui:prop.sketchFill.outside}} it makes a cookie cutter: import an SVG twice, once with the silhouette as an area for the base and once with the silhouette and 1 to 2 mm of stroke outside as the wall. The switch is in the {{ui:sketch.stroke}} window in sketch mode as well.
 
-Fillets and chamfers on the edges go when the body is built again, as when the sketch is edited.
+Fillets and chamfers on the edges go when the body is built again, as when the sketch is edited. {{ui:inspector.taper}} and {{ui:inspector.twist}} stay; a taper grows or shrinks with the outline.
 
 ## Slanted walls, for stamps
 
@@ -353,6 +354,7 @@ The tree beside a house, a figure before a busy background – where no colour t
 | [[Ctrl]]+[[A]] | select every point and line |
 | [[Ctrl]]+[[I]] | {{ui:sketch.addImage}} |
 | [[Shift]] | while drawing: snap the line in 15° steps; while dragging: keep movement on one axis |
+| [[Alt]] | while setting or dragging a point: on the grid only, no snapping to corners and middles |
 | digit, [[<]], [[Tab]], [[Enter]] | while drawing: type and set the length and angle of the next line |
 | [[R]] | rotate the closed sketch by 45° |
 | [[Ctrl]]+[[L]] | lock or unlock the selected outline, or the template image |

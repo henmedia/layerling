@@ -449,12 +449,13 @@ describe("text stuck on", () => {
     // "Hi" low on a star 20 mm high: whole both ways, but laid straight on its window tears over the top (36 points).
     const hi = await surfaceTextOutline({ content: "Hi", font: "Multilanguage", size: 8 });
     expect(applySurfaceTexture(starOf(20), { ...TEXT, textOutline: hi, textHeight: 30 }).stats.text).toEqual({ placed: true, torn: 0 });
-    // "OI" turned upright on a star 12 mm high: half way up as whole either way (0.968 over the creases, 0.972 straight
-    // on, within the margin), but straight on it tears at 49 points; low down clearly more whole straight on (0.985 to
-    // 0.918), so that way is kept though its window tears at 136.
+    // "OI" turned upright on a star 12 mm high, half way up: whole either way (0.968 over the creases, 0.972 straight on,
+    // within the margin), but straight on it tears at 49 points, so the way over the creases is kept. Low down it was
+    // clearly more whole straight on (0.985 to 0.918) and its window tore at 136; the star's far sides are now cut as fine
+    // as the middle (#1665), and laid over the creases it tears at none.
     const oi = await surfaceTextOutline({ content: "OI", font: "Multilanguage", size: 10 });
     expect(applySurfaceTexture(starOf(12), { ...TEXT, textOutline: oi, textAround: 9, textTurn: 90 }).stats.text?.torn).toBe(0);
-    expect(applySurfaceTexture(starOf(12), { ...TEXT, textOutline: oi, textAround: 9, textTurn: 90, textHeight: 30 }).stats.text?.torn).toBeGreaterThan(100);
+    expect(applySurfaceTexture(starOf(12), { ...TEXT, textOutline: oi, textAround: 9, textTurn: 90, textHeight: 30 }).stats.text?.torn).toBe(0);
   }, 30000);
 
   it("lays a text straight on along a rod lying across the axis, where folding at its creases would tear it", async () => {
@@ -647,4 +648,119 @@ describe("text stuck on", () => {
     const result = applySurfaceTexture(cylinder(30, 60), { ...TEXT, textOutline: rings });
     expect(result.stats.text?.placed).toBe(true);
   });
+});
+
+
+/** The body of #1665 (Eating Crow): a crow's outline of 21 corners as a plate 30 high; every triangle 9 numbers, y up. Its caps are fans of long slivers. */
+const CROW_PLATE = [
+  -79.5, 0, -14.5, -91.5, 0, -0.5, -79.5, 30, -14.5,
+  -79.5, 30, -14.5, -91.5, 0, -0.5, -91.5, 30, -0.5,
+  -91.5, 0, -0.5, -77.5, 0, 11.5, -91.5, 30, -0.5,
+  -91.5, 30, -0.5, -77.5, 0, 11.5, -77.5, 30, 11.5,
+  -77.5, 0, 11.5, -71.5, 0, -1.5, -77.5, 30, 11.5,
+  -77.5, 30, 11.5, -71.5, 0, -1.5, -71.5, 30, -1.5,
+  -71.5, 0, -1.5, -64.5, 0, -9.5, -71.5, 30, -1.5,
+  -71.5, 30, -1.5, -64.5, 0, -9.5, -64.5, 30, -9.5,
+  -64.5, 0, -9.5, -51.5, 0, -0.5, -64.5, 30, -9.5,
+  -64.5, 30, -9.5, -51.5, 0, -0.5, -51.5, 30, -0.5,
+  -51.5, 0, -0.5, -52.5, 0, 22.5, -51.5, 30, -0.5,
+  -51.5, 30, -0.5, -52.5, 0, 22.5, -52.5, 30, 22.5,
+  -52.5, 0, 22.5, -26.5, 0, 29.5, -52.5, 30, 22.5,
+  -52.5, 30, 22.5, -26.5, 0, 29.5, -26.5, 30, 29.5,
+  -26.5, 0, 29.5, -28.5, 0, 18.5, -26.5, 30, 29.5,
+  -26.5, 30, 29.5, -28.5, 0, 18.5, -28.5, 30, 18.5,
+  -28.5, 0, 18.5, -42.5, 0, 8.5, -28.5, 30, 18.5,
+  -28.5, 30, 18.5, -42.5, 0, 8.5, -42.5, 30, 8.5,
+  -42.5, 0, 8.5, -30.5, 0, -3.5, -42.5, 30, 8.5,
+  -42.5, 30, 8.5, -30.5, 0, -3.5, -30.5, 30, -3.5,
+  -30.5, 30, -3.5, -30.5, 0, -3.5, -10.5, 30, 3.5,
+  -30.5, 0, -3.5, -10.5, 0, 3.5, -10.5, 30, 3.5,
+  -10.5, 0, 3.5, -10.5, 0, 17.5, -10.5, 30, 3.5,
+  -10.5, 30, 3.5, -10.5, 0, 17.5, -10.5, 30, 17.5,
+  -10.5, 30, 17.5, -10.5, 0, 17.5, 5.5, 30, 28.5,
+  -10.5, 0, 17.5, 5.5, 0, 28.5, 5.5, 30, 28.5,
+  5.5, 30, 28.5, 5.5, 0, 28.5, 19.5, 30, 22.5,
+  5.5, 0, 28.5, 19.5, 0, 22.5, 19.5, 30, 22.5,
+  19.5, 0, 22.5, 34.5, 0, 10.5, 19.5, 30, 22.5,
+  19.5, 30, 22.5, 34.5, 0, 10.5, 34.5, 30, 10.5,
+  34.5, 30, 10.5, 34.5, 0, 10.5, 18.5, 30, -2.5,
+  34.5, 0, 10.5, 18.5, 0, -2.5, 18.5, 30, -2.5,
+  18.5, 0, -2.5, 54.5, 0, -4.5, 18.5, 30, -2.5,
+  18.5, 30, -2.5, 54.5, 0, -4.5, 54.5, 30, -4.5,
+  54.5, 0, -4.5, 85.5, 0, 1.5, 54.5, 30, -4.5,
+  54.5, 30, -4.5, 85.5, 0, 1.5, 85.5, 30, 1.5,
+  85.5, 0, 1.5, 91.5, 0, -18.5, 85.5, 30, 1.5,
+  85.5, 30, 1.5, 91.5, 0, -18.5, 91.5, 30, -18.5,
+  91.5, 0, -18.5, 75.5, 0, -29.5, 91.5, 30, -18.5,
+  91.5, 30, -18.5, 75.5, 0, -29.5, 75.5, 30, -29.5,
+  75.5, 0, -29.5, -79.5, 30, -14.5, 75.5, 30, -29.5,
+  75.5, 0, -29.5, -79.5, 0, -14.5, -79.5, 30, -14.5,
+  -79.5, 0, -14.5, -71.5, 0, -1.5, -91.5, 0, -0.5,
+  -64.5, 0, -9.5, -71.5, 0, -1.5, -79.5, 0, -14.5,
+  -71.5, 0, -1.5, -77.5, 0, 11.5, -91.5, 0, -0.5,
+  -64.5, 0, -9.5, -30.5, 0, -3.5, -51.5, 0, -0.5,
+  -30.5, 0, -3.5, -42.5, 0, 8.5, -51.5, 0, -0.5,
+  -42.5, 0, 8.5, -52.5, 0, 22.5, -51.5, 0, -0.5,
+  -42.5, 0, 8.5, -28.5, 0, 18.5, -52.5, 0, 22.5,
+  -28.5, 0, 18.5, -26.5, 0, 29.5, -52.5, 0, 22.5,
+  -30.5, 0, -3.5, 18.5, 0, -2.5, -10.5, 0, 3.5,
+  -10.5, 0, 3.5, 18.5, 0, -2.5, -10.5, 0, 17.5,
+  -10.5, 0, 17.5, 19.5, 0, 22.5, 5.5, 0, 28.5,
+  18.5, 0, -2.5, 19.5, 0, 22.5, -10.5, 0, 17.5,
+  18.5, 0, -2.5, 34.5, 0, 10.5, 19.5, 0, 22.5,
+  -30.5, 0, -3.5, 75.5, 0, -29.5, 18.5, 0, -2.5,
+  75.5, 0, -29.5, 54.5, 0, -4.5, 18.5, 0, -2.5,
+  91.5, 0, -18.5, 85.5, 0, 1.5, 75.5, 0, -29.5,
+  75.5, 0, -29.5, 85.5, 0, 1.5, 54.5, 0, -4.5,
+  -79.5, 0, -14.5, 75.5, 0, -29.5, -64.5, 0, -9.5,
+  -64.5, 0, -9.5, 75.5, 0, -29.5, -30.5, 0, -3.5,
+  -71.5, 30, -1.5, -79.5, 30, -14.5, -91.5, 30, -0.5,
+  -71.5, 30, -1.5, -64.5, 30, -9.5, -79.5, 30, -14.5,
+  -77.5, 30, 11.5, -71.5, 30, -1.5, -91.5, 30, -0.5,
+  -30.5, 30, -3.5, -64.5, 30, -9.5, -51.5, 30, -0.5,
+  -42.5, 30, 8.5, -30.5, 30, -3.5, -51.5, 30, -0.5,
+  -52.5, 30, 22.5, -42.5, 30, 8.5, -51.5, 30, -0.5,
+  -28.5, 30, 18.5, -42.5, 30, 8.5, -52.5, 30, 22.5,
+  -26.5, 30, 29.5, -28.5, 30, 18.5, -52.5, 30, 22.5,
+  18.5, 30, -2.5, -30.5, 30, -3.5, -10.5, 30, 3.5,
+  18.5, 30, -2.5, -10.5, 30, 3.5, -10.5, 30, 17.5,
+  19.5, 30, 22.5, -10.5, 30, 17.5, 5.5, 30, 28.5,
+  19.5, 30, 22.5, 18.5, 30, -2.5, -10.5, 30, 17.5,
+  34.5, 30, 10.5, 18.5, 30, -2.5, 19.5, 30, 22.5,
+  75.5, 30, -29.5, -30.5, 30, -3.5, 18.5, 30, -2.5,
+  54.5, 30, -4.5, 75.5, 30, -29.5, 18.5, 30, -2.5,
+  85.5, 30, 1.5, 91.5, 30, -18.5, 75.5, 30, -29.5,
+  85.5, 30, 1.5, 75.5, 30, -29.5, 54.5, 30, -4.5,
+  75.5, 30, -29.5, -79.5, 30, -14.5, -64.5, 30, -9.5,
+  75.5, 30, -29.5, -64.5, 30, -9.5, -30.5, 30, -3.5,
+];
+
+describe("a text wider than the sides it lies round (#1665)", () => {
+  // 25 strokes of a letter's height, 295 mm across: the window of the unrolling reaches round the whole outline.
+  const strokes = Array.from({ length: 25 }, (_, k) => {
+    const x = -144 + k * 12;
+    return [x, -1, x + 2, -1, x + 2, 9, x, 9];
+  });
+  const wide = { pattern: "text", depth: 0.6, direction: "inward", axis: "z", projection: "auto", textOutline: strokes, textHeight: 50, detail: "medium", patternPart: false, bottomFree: 30, topFree: 30 };
+
+  it("cuts the strokes into the sides far from the middle as well", () => {
+    const result = applySurfaceTexture(CROW_PLATE, wide, { maxTriangles: 400000 });
+    const v = result.vertices;
+    // The far left side (x below -50) in the middle of the height: the points at the strokes' floor, 0.6 mm in from the wall.
+    const planes: number[][] = [];
+    for (let t = 0; t < CROW_PLATE.length; t += 9) {
+      const a = CROW_PLATE.slice(t, t + 9);
+      const u = [a[3] - a[0], a[4] - a[1], a[5] - a[2]], w = [a[6] - a[0], a[7] - a[1], a[8] - a[2]];
+      const n = [u[1] * w[2] - u[2] * w[1], u[2] * w[0] - u[0] * w[2], u[0] * w[1] - u[1] * w[0]];
+      const l = Math.hypot(n[0], n[1], n[2]);
+      if (Math.abs(n[1]) / l < 0.5 && (a[0] + a[3] + a[6]) / 3 < -45) planes.push([n[0] / l, n[1] / l, n[2] / l, (n[0] * a[0] + n[1] * a[1] + n[2] * a[2]) / l]);
+    }
+    let floor = 0;
+    for (let i = 0; i < v.length; i += 3) {
+      if (v[i] > -50 || v[i + 1] < 8 || v[i + 1] > 22) continue;
+      const d = Math.min(...planes.map((p) => Math.abs(p[0] * v[i] + p[1] * v[i + 1] + p[2] * v[i + 2] - p[3])));
+      if (Math.abs(d - 0.6) < 0.05) floor += 1;
+    }
+    expect(floor).toBeGreaterThan(200);
+  }, 60000);
 });

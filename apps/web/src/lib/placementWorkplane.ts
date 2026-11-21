@@ -205,6 +205,28 @@ export function placementWorkplaneCoordinates(workplane: PlacementWorkplane, wor
   };
 }
 
+/** A view tilted less than this towards the workplane sees it edge-on (#1744), as the sine of the angle. */
+export const EDGE_ON_WORKPLANE_SINE = Math.sin(THREE.MathUtils.degToRad(8));
+
+/**
+ * Where the pointer drags on a workplane seen edge-on (#1744), as from the front with the plate level:
+ * the pointer's ray meets an upright plane through the workplane's origin that faces the camera, and
+ * that point is brought straight down onto the workplane. So a part follows the pointer along the
+ * axis that shows and keeps its depth, where the ray itself would miss the workplane or meet it far
+ * behind. Null when the view is not edge-on; then the ray meets the workplane itself.
+ */
+export function edgeOnWorkplanePoint(workplane: PlacementWorkplane, ray: THREE.Ray, viewDirection: THREE.Vector3): THREE.Vector3 | null {
+  const normal = vector(workplane.normal).normalize();
+  const view = viewDirection.clone().normalize();
+  if (Math.abs(view.dot(normal)) >= EDGE_ON_WORKPLANE_SINE) return null;
+  const facing = view.projectOnPlane(normal);
+  if (facing.lengthSq() < 1e-9) return null;
+  const origin = vector(workplane.origin);
+  const hit = ray.intersectPlane(new THREE.Plane().setFromNormalAndCoplanarPoint(facing.normalize(), origin), new THREE.Vector3());
+  if (!hit) return null;
+  return hit.addScaledVector(normal, -normal.dot(hit.clone().sub(origin)));
+}
+
 export function placementWorkplanePoint(workplane: PlacementWorkplane, x: number, z: number): PlacementPoint {
   const world = vector(workplane.origin)
     .addScaledVector(vector(workplane.xAxis), x)
@@ -258,6 +280,20 @@ export function placementWorkplaneIsBase(workplane: PlacementWorkplane) {
     && Math.abs(workplane.normal.y - 1) < 1e-6
     && Math.abs(workplane.normal.z) < 1e-6
   );
+}
+
+/**
+ * How far along X a workplane lies that is the plate itself, only moved sideways - the plate's frame put in the middle of
+ * another build plate, where a new sketch starts on that plate (#1660) - or null for any other workplane (lifted, tilted,
+ * turned, or moved along Z). The base plate itself gives 0.
+ */
+export function placementWorkplanePlateShift(workplane: PlacementWorkplane): number | null {
+  const near = (value: number, target: number) => Math.abs(value - target) < 1e-6;
+  const upright = near(workplane.normal.x, 0) && near(workplane.normal.y, 1) && near(workplane.normal.z, 0);
+  const square = near(workplane.xAxis.x, 1) && near(workplane.xAxis.y, 0) && near(workplane.xAxis.z, 0)
+    && near(workplane.zAxis.x, 0) && near(workplane.zAxis.y, 0) && near(workplane.zAxis.z, 1);
+  if (!upright || !square || Math.abs(workplane.origin.y) > 1e-6 || Math.abs(workplane.origin.z) > 1e-6) return null;
+  return Math.abs(workplane.origin.x) < 1e-6 ? 0 : workplane.origin.x;
 }
 
 // A workplane moved or turned on the plate but still lying in its plane. Its grid

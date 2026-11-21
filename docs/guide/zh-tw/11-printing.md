@@ -55,7 +55,7 @@ FLSun、SeeMeCNC 等品牌的三角洲（Delta）印表機以及 Anycubic Predat
 1. 選取零件，在功能區的 {{ui:editor.section.splitShape}} 群組中點擊 {{ui:supportRib.title}}，或在零件上按右鍵，或用 [[Ctrl]]+[[K]] 尋找。
 2. 點擊下表面上要放支撐肋的位置。該面必須朝下、傾斜 15° 到 75°，並一直延伸到列印板；支撐肋從你點擊處沿該面筆直向下。如果零件的底部稜邊已倒圓或倒角，該面可以在列印板上方最多 3 mm 處結束：請點擊圓角上方的平面。
 3. 依照切片軟體設定 {{ui:supportRib.nozzle}}、{{ui:supportRib.layerHeight}} 和 {{ui:supportRib.firstLayer}}。支撐肋厚度為兩條噴嘴線寬，與零件的間隙為半條線寬；每個連接橋寬一條線、高正好一層，並落在列印的某一層上，因此切片軟體會把它印成一條細線，能乾淨地折斷。{{ui:supportRib.height}} 表示支撐肋沿該面向上到達多高（開始時為一半），{{ui:supportRib.bridgeSpacing}} 表示連接橋之間的距離，以整層計。
-4. 在 {{ui:supportRib.more}} 中可以手動設定厚度、間隙、連接橋寬度和底座厚度（在此之前它們跟隨噴嘴和層高），以及底座寬度、底部和頂部的圓角。
+4. 在 {{ui:supportRib.more}} 中可以手動設定厚度、間隙、連接橋寬度和底座厚度（在此之前它們跟隨噴嘴和層高），以及底座寬度、底部和頂部的圓角。當{{ui:supportRib.bridgeGap}}大於 0 時，連接橋不再伸入零件，而是在零件前這麼遠處停止（在層內測量）：切片軟體會把每座橋列印成獨立路徑，它靠線條的擠壓托住零件，取下時不留痕跡（半條線寬，即 0.4 mm 噴嘴的 0.2 mm，是不錯的起點）。同時加大{{ui:supportRib.gap}}，讓連接橋仍然跨過其中一段。
 5. {{ui:supportRib.apply}} 加入支撐肋。勾選 {{ui:supportRib.bundle}}（初始為開）時，支撐肋與零件綁定在一起：它們一起移動，作為並排的兩個實體進入切片軟體，列印時由連接橋連接。
 
 支撐肋是網格實體：要修改它，請刪除後重新建立。每次點擊產生一條支撐肋；要更多，請點擊 {{ui:supportRib.repick}}，或用 {{ui:editor.tool.array}} 重複。支撐肋不能伸入零件的任何地方，零件也必須立在列印板上，否則視窗會說明原因。你的設定會保存在這個瀏覽器中，供下一條支撐肋使用。
@@ -91,7 +91,7 @@ FLSun、SeeMeCNC 等品牌的三角洲（Delta）印表機以及 Anycubic Predat
 
 ![右側壁只有 0.6 mm 厚的托盤：列印檢查把它塗成紅色，並在視窗中列出。](shot:print-check)
 
-點選某一行的{{ui:printCheck.show}}會把相機移到那裡；它會選取懸空的零件、接觸過少的零件和開放網格，對於懸垂則會開啟**顯示懸垂**。互相重疊的實體會合併後再檢查，就像切片軟體合併它們那樣。如果視窗開啟時修改了設計，會顯示{{ui:printCheck.stale}}；點選它或{{ui:printCheck.checkAgain}}即可。[[Esc]] 關閉視窗。設計本身不會改變。AI 可以用 `layerling_check_print` 做同樣的檢查。
+點選某一行的{{ui:printCheck.show}}會把相機移到那裡；它會選取懸空的零件、接觸過少的零件和開放網格，對於懸垂則會開啟**顯示懸垂**。互相重疊的實體會合併後再檢查，就像切片軟體合併它們那樣。如果視窗開啟時修改了設計，會顯示{{ui:printCheck.stale}}；點選它或{{ui:printCheck.checkAgain}}即可。[[Esc]] 關閉視窗。設計本身不會改變。AI 可以用 `layerling_check_print` 做同樣的檢查。這個視窗只做檢查，不會列印或儲存任何內容：要列印，請用 {{ui:editor.group.file}} 群組中的 {{ui:editor.export}} 為切片軟體匯出模型。視窗中的 {{ui:printCheck.openExport}} 會關閉檢查並開啟匯出。
 
 ## 準備就緒時
 

@@ -2,11 +2,13 @@
 
 import { GuideHelpLink } from "@/components/GuideHelpLink";
 import { FocusModeBar } from "@/components/workplane/FocusModeBar";
+import { ProjectNameField } from "@/components/workplane/ProjectNameField";
 import { FOCUS_MODE_CHANGE_EVENT, FOCUS_MODE_SHORTCUT } from "@/lib/focusMode";
 import { ShapeMenuPanel } from "@/components/workplane/ShapeMenuPanel";
 import { ShapeLibraryList } from "@/components/workplane/ShapeLibraryList";
-import { AlertTriangle, ArrowDownToLine, ArrowLeftRight, ArrowUpFromLine, Check, CircleHelp, Percent, Circle as CircleIcon, Eye, EyeOff, Hexagon as HexagonIcon, ListTree, Maximize2, Minimize2, Pencil, Pentagon as PentagonIcon, Pin, PinOff, Rotate3d, Route as RouteIcon, ScanEye, Search, Sparkles, Square as SquareIcon, Star as StarIcon, Triangle as TriangleIcon, X } from "lucide-react";
-import { useEffect, useLayoutEffect, useRef, useState, type CSSProperties } from "react";
+import { AlertTriangle, ArchiveRestore, ArrowDownToLine, ArrowLeftRight, ArrowUpFromLine, Check, CircleHelp, Percent, Circle as CircleIcon, Eye, EyeOff, Hexagon as HexagonIcon, ListTree, Maximize2, Minimize2, Palette, Pentagon as PentagonIcon, Pin, PinOff, Rotate3d, Route as RouteIcon, ScanEye, Search, Sparkles, Square as SquareIcon, Star as StarIcon, Triangle as TriangleIcon, X } from "lucide-react";
+import { OPEN_FILE_BACKUPS_EVENT } from "@/lib/fileBackups";
+import { useEffect, useLayoutEffect, useRef, useState, type CSSProperties, type PointerEvent as ReactPointerEvent } from "react";
 import { createPortal } from "react-dom";
 import { useWheelField } from "@/lib/useWheelField";
 import { wheelNextValue } from "@/lib/wheelValueStep";
@@ -21,8 +23,8 @@ import { ribbonSectionOrders, useRibbonOrder } from "@/lib/ribbonOrder";
 import { ribbonToolOrderFor, sortByRibbonToolOrder, useRibbonToolOrder } from "@/lib/ribbonToolOrder";
 import { ribbonCollapsePriority, ribbonFoldOf, useRibbonFold } from "@/lib/ribbonFold";
 import { normalizePolygonSides, normalizeStarInnerPercent, SKETCH_POLYGON_MAX_SIDES, SKETCH_POLYGON_MIN_SIDES, SKETCH_STAR_MAX_INNER_PERCENT, SKETCH_STAR_MIN_INNER_PERCENT } from "@/lib/sketchPrimitives";
-import { SketchBoltCircleIcon, SketchEllipseIcon, SketchHalfCircleIcon, SketchPieSliceIcon, ToolbarAlignIcon, ToolbarAttachmentsIcon, ToolbarBuildPlatesIcon, ToolbarCenterOnWorkplaneIcon, ToolbarChamferIcon, ToolbarCaretDownIcon, ToolbarCookieCutterIcon, ToolbarFlexiIcon, ToolbarLidIcon,
-  ToolbarCableChannelIcon, ToolbarCopyIcon, ToolbarDuplicateIcon, ToolbarDropToWorkplaneIcon, ToolbarBundleIcon, ToolbarGroupIcon, ToolbarGuideIcon, ToolbarHideSelectedIcon, ToolbarHomeIcon, ToolbarImportIcon, ToolbarIntersectionIcon,ToolbarClearanceIcon, ToolbarPrintCheckIcon, ToolbarHullIcon, ToolbarLoftSketchesIcon, ToolbarKeyboardIcon, ToolbarFilletIcon, ToolbarHistoryIcon, ToolbarHollowIcon, ToolbarOffsetIcon, ToolbarCutOutIcon, ToolbarPunchIcon, ToolbarDeleteFaceIcon, ToolbarSimplifyIcon, ToolbarMakeExactIcon, ToolbarSurfaceTextureIcon, ToolbarPaintIcon, ToolbarMirrorIcon, ToolbarRotationPivotIcon, ToolbarPatternIcon, ToolbarHolePatternIcon, ToolbarFaceToolIcon, ToolbarSupportRibIcon, ToolbarStencilBridgeIcon, ToolbarConstructionLineIcon, ToolbarMiddleLineIcon, ToolbarLayFlatIcon, ToolbarMateFacesIcon, ToolbarNoteIcon, ToolbarSplitIcon, ToolbarPasteIcon, ToolbarRedoIcon, ToolbarSnapGridIcon, ToolbarSettingsIcon, ToolbarShapeAddIcon, ToolbarTrashIcon, ToolbarUngroupIcon, ToolbarUndoIcon, ToolbarVectorExportIcon } from "../icons";
+import { SketchBoltCircleIcon, SketchEllipseIcon, SketchHalfCircleIcon, SketchPieSliceIcon, ToolbarAlignIcon, ToolbarMoldIcon, ToolbarAttachmentsIcon, ToolbarBuildPlatesIcon, ToolbarCenterOnWorkplaneIcon, ToolbarChamferIcon, ToolbarCaretDownIcon, ToolbarCookieCutterIcon, ToolbarFlexiIcon, ToolbarLidIcon,
+  ToolbarCableChannelIcon, ToolbarCopyIcon, ToolbarDuplicateIcon, ToolbarDropToWorkplaneIcon, ToolbarBundleIcon, ToolbarGroupIcon, ToolbarGuideIcon, ToolbarHideSelectedIcon, ToolbarHomeIcon, ToolbarImportIcon, ToolbarIntersectionIcon,ToolbarClearanceIcon, ToolbarPrintCheckIcon, ToolbarLayerCheckIcon, ToolbarHullIcon, ToolbarLoftSketchesIcon, ToolbarKeyboardIcon, ToolbarFilletIcon, ToolbarHistoryIcon, ToolbarHollowIcon, ToolbarOffsetIcon, ToolbarCutOutIcon, ToolbarPunchIcon, ToolbarDeleteFaceIcon, ToolbarSimplifyIcon, ToolbarMakeExactIcon, ToolbarSurfaceTextureIcon, ToolbarPaintIcon, ToolbarMirrorIcon, ToolbarRotationPivotIcon, ToolbarPatternIcon, ToolbarHolePatternIcon, ToolbarFaceToolIcon, ToolbarSupportRibIcon, ToolbarStencilBridgeIcon, ToolbarConstructionLineIcon, ToolbarMiddleLineIcon, ToolbarLayFlatIcon, ToolbarMateFacesIcon, ToolbarNoteIcon, ToolbarSplitIcon, ToolbarPasteIcon, ToolbarRedoIcon, ToolbarSnapGridIcon, ToolbarSettingsIcon, ToolbarShapeAddIcon, ToolbarTrashIcon, ToolbarUngroupIcon, ToolbarUndoIcon, ToolbarVectorExportIcon } from "../icons";
 import { type SketchPrimitive, type SketchTool } from "../SketchWorkspace";
 import { CommandPalette, type PaletteCommand } from "./CommandPalette";
 import { customShapeCommands } from "@/lib/customShapeCommands";
@@ -35,6 +37,7 @@ import type { CadModifierKind } from "@/lib/cadModifierTypes";
 import type { ShapeAsset, SketchOperation, WorkplaneWorkspaceSettings } from "@/types/layerling";
 import { TopPanel } from "./TopActionPanel";
 import { useToolbarCollapse } from "./useToolbarCollapse";
+import { createHoverOpener, type HoverOpener } from "@/lib/hoverOpen";
 
 
 /** Die Befehle der Suche, die im Verlaufsblick wach bleiben: sie aendern nichts am Entwurf. */
@@ -251,6 +254,7 @@ export function SecondaryToolbar({
   flexiActive,
   canLid,
   lidActive,
+  moldActive,
   canCableChannel,
   cableChannelActive,
   canLoftSketches,
@@ -321,6 +325,8 @@ export function SecondaryToolbar({
   mateFacesActive,
   onHolePattern,
   holePatternActive,
+  onThreadInsert,
+  threadInsertActive,
   canHolePattern,
   onFaceTool,
   faceToolActive,
@@ -337,6 +343,7 @@ export function SecondaryToolbar({
   onCookieCutter,
   onFlexi,
   onLid,
+  onMold,
   onCableChannel,
   onLoftSketches,
   intersectPreviewActive,
@@ -345,6 +352,8 @@ export function SecondaryToolbar({
   canCheckClearance,
   onPrintCheck,
   printCheckActive,
+  onLayerCheck,
+  layerCheckActive,
   onFillet,
   onHollow,
   hollowActive,
@@ -384,6 +393,7 @@ export function SecondaryToolbar({
   onShowHidden,
   onHideOthers,
   onInvertSelection,
+  onSelectSameColor,
   onToggleHidden,
   onUngroup,
   onUndo,
@@ -433,6 +443,7 @@ export function SecondaryToolbar({
   flexiActive: boolean;
   canLid: boolean;
   lidActive: boolean;
+  moldActive: boolean;
   /** The cable channel (one solid selected) and whether its panel is open. */
   canCableChannel: boolean;
   cableChannelActive: boolean;
@@ -510,6 +521,8 @@ export function SecondaryToolbar({
   mateFacesActive: boolean;
   onHolePattern: () => void;
   holePatternActive: boolean;
+  onThreadInsert: () => void;
+  threadInsertActive: boolean;
   canHolePattern: boolean;
   onFaceTool: () => void;
   faceToolActive: boolean;
@@ -528,6 +541,7 @@ export function SecondaryToolbar({
   onCookieCutter: () => void;
   onFlexi: () => void;
   onLid: () => void;
+  onMold: () => void;
   onCableChannel: () => void;
   onLoftSketches: () => void;
   /** Intersection shows the common part first and applies it on the second click (#372). */
@@ -540,6 +554,8 @@ export function SecondaryToolbar({
   /** The print check (Druck prüfen): opens its panel, or closes it. It checks the same bodies, so canCheckClearance enables it too. */
   onPrintCheck: () => void;
   printCheckActive: boolean;
+  onLayerCheck: () => void;
+  layerCheckActive: boolean;
   onFillet: () => void;
   onHollow: () => void;
   hollowActive: boolean;
@@ -586,6 +602,8 @@ export function SecondaryToolbar({
   /** Hide everything but the selection, and select what is not selected (Discussion #1472). */
   onHideOthers: () => void;
   onInvertSelection: () => void;
+  /** Select every visible part in the colour of the selected ones (Discussion #1839). */
+  onSelectSameColor: () => void;
   onToggleHidden: () => void;
   onUngroup: () => void;
   onUndo: () => void;
@@ -654,6 +672,44 @@ export function SecondaryToolbar({
     } catch {
       // The pin still works for this visit.
     }
+  };
+  // Resting the mouse on the chevron tab under the Shapes button opens the panel, as it opens a folded group (#1722).
+  const shapesOpenRef = useRef(false);
+  shapesOpenRef.current = shapesOpen;
+  const shapesHoverRef = useRef<HoverOpener | null>(null);
+  if (!shapesHoverRef.current) {
+    shapesHoverRef.current = createHoverOpener({
+      isOpen: () => shapesOpenRef.current,
+      isPinned: () => shapesPinnedRef.current,
+      open: () => {
+        setVisibilityOpen(false);
+        setShapesOpen(true);
+      },
+      close: () => setShapesOpen(false),
+    });
+  }
+  const shapesHover = shapesHoverRef.current;
+  useEffect(() => () => shapesHover.dispose(), [shapesHover]);
+  // Closed some other way or pinned: the mouse leaving no longer closes it.
+  useEffect(() => {
+    if (!shapesOpen || shapesPinned) shapesHover.settle();
+  }, [shapesOpen, shapesPinned, shapesHover]);
+  /** The pointer handlers of the shapes section: the tab opens, leaving the button and panel closes what the mouse opened. */
+  const shapesHoverProps = {
+    onPointerEnter: (event: ReactPointerEvent) => shapesHover.enter(event.pointerType),
+    onPointerLeave: (event: ReactPointerEvent) => shapesHover.leave(event.pointerType),
+    // Working in the panel (a search typed, a tab chosen) keeps it, as a click on the button does.
+    onPointerDown: (event: ReactPointerEvent) => {
+      if (event.target instanceof Element && !event.target.closest(".shape-menu-trigger")) shapesHover.settle();
+    },
+  };
+  const shapesTab = (
+    <span className="shape-menu-tab" aria-hidden="true" onPointerEnter={(event) => shapesHover.enterTab(event.pointerType)} />
+  );
+  const toggleShapesFromButton = () => {
+    if (!shapesHover.click()) return;
+    setVisibilityOpen(false);
+    setShapesOpen((open) => !open);
   };
   /** Picking a shape closes the panel, unless it is pinned open. */
   const closeShapesAfterPick = () => {
@@ -737,32 +793,6 @@ export function SecondaryToolbar({
   const visibilityMenuRef = useRef<HTMLDivElement>(null);
   const touchShapeStartRef = useRef<{ id: string; x: number; y: number } | null>(null);
   const suppressNextShapeClickRef = useRef(false);
-  const cancelProjectNameEditRef = useRef(false);
-  const projectNameFieldRef = useRef<HTMLLabelElement>(null);
-  const projectNameInputRef = useRef<HTMLInputElement>(null);
-  const [projectNameDraft, setProjectNameDraft] = useState(projectName);
-  useEffect(() => {
-    setProjectNameDraft(projectName);
-  }, [projectName]);
-  useEffect(() => {
-    const finishProjectNameEdit = (event: PointerEvent) => {
-      const input = projectNameInputRef.current;
-      if (input && document.activeElement === input && !projectNameFieldRef.current?.contains(event.target as Node)) {
-        input.blur();
-      }
-    };
-    document.addEventListener("pointerdown", finishProjectNameEdit, true);
-    return () => document.removeEventListener("pointerdown", finishProjectNameEdit, true);
-  }, []);
-  const commitProjectName = (value: string) => {
-    const nextName = value.trim().slice(0, 80);
-    if (!nextName) {
-      setProjectNameDraft(projectName);
-      return;
-    }
-    setProjectNameDraft(nextName);
-    if (nextName !== projectName) onProjectNameChange?.(nextName);
-  };
   const selectToolbarMode = (mode: "geometry" | "sketch") => {
     setShapesOpen(false);
     setVisibilityOpen(false);
@@ -770,6 +800,13 @@ export function SecondaryToolbar({
     onToolbarModeChange(mode);
   };
   const addShapeFromMenu = (shape: ShapeAsset) => {
+    if (shape.id === "threadInsert") {
+      if (canHolePattern || threadInsertActive) {
+        onThreadInsert();
+        closeShapesAfterPick();
+      }
+      return;
+    }
     onAddShape({ ...shape, name: shapeAssetLabel(shape) });
     closeShapesAfterPick();
   };
@@ -904,6 +941,8 @@ export function SecondaryToolbar({
       if (!shapesPinnedRef.current && !shapesMenuRef.current?.contains(event.target as Node)) setShapesOpen(false);
     };
     const closeOnEscape = (event: KeyboardEvent) => {
+      // An Esc that takes back what an input method is composing in the shape search is not one for the panel.
+      if (event.isComposing) return;
       if (event.key === "Escape" && !shapesPinnedRef.current) setShapesOpen(false);
     };
     window.addEventListener("pointerdown", closeOnPointerDown);
@@ -1009,6 +1048,7 @@ export function SecondaryToolbar({
     { id: "loftSketches", label: t("editor.tool.loftSketches"), icon: ToolbarLoftSketchesIcon, action: onLoftSketches, enabled: canLoftSketches, needs: need("loft") },
     { id: "clearance-check", label: t("editor.tool.clearance"), icon: ToolbarClearanceIcon, action: onClearanceCheck, enabled: canCheckClearance || clearanceActive, active: clearanceActive, needs: need("visibleBodies") },
     { id: "print-check", label: t("editor.tool.printCheck"), icon: ToolbarPrintCheckIcon, action: onPrintCheck, enabled: canCheckClearance || printCheckActive, active: printCheckActive, needs: need("visibleBodies") },
+    { id: "layer-check", label: t("editor.tool.layerCheck"), icon: ToolbarLayerCheckIcon, action: onLayerCheck, enabled: canCheckClearance || layerCheckActive, active: layerCheckActive, needs: need("visibleBodies") },
   ];
   const modifyTools = [
     { id: "mirror", section: "pattern", label: t("editor.tool.mirror"), icon: ToolbarMirrorIcon, action: onMirror, enabled: canModifySelection, active: mirrorMode, needs: need("selection") },
@@ -1021,6 +1061,7 @@ export function SecondaryToolbar({
     { id: "supportRib", section: "shape", label: t("supportRib.title"), icon: ToolbarSupportRibIcon, action: onSupportRib, enabled: canFaceTool || supportRibActive, active: supportRibActive, needs: need("oneSolid") },
     { id: "stencilBridges", section: "shape", label: t("stencilBridges.title"), icon: ToolbarStencilBridgeIcon, action: onStencilBridges, enabled: canStencilBridges || stencilBridgesActive, active: stencilBridgesActive, needs: need("solid") },
     { id: "cookieCutter", section: "shape", label: t("editor.tool.cookieCutter"), icon: ToolbarCookieCutterIcon, action: onCookieCutter, enabled: canCookieCutter, needs: need("body") },
+    { id: "mold", section: "shape", label: t("editor.tool.mold"), icon: ToolbarMoldIcon, action: onMold, enabled: canLid || moldActive, active: moldActive, needs: need("solid") },
     { id: "chamfer", section: "edges", label: t("editor.tool.chamfer"), icon: ToolbarChamferIcon, action: onChamfer, enabled: canEdgeModify, active: edgeModifierKind === "chamfer" || edgeModifierKind === "chamfillet", needs: need("oneBody") },
     { id: "fillet", section: "edges", label: t("editor.tool.fillet"), icon: ToolbarFilletIcon, action: onFillet, enabled: canEdgeModify, active: edgeModifierKind === "fillet", needs: need("oneBody") },
     { id: "hollow", section: "edges", label: t("editor.tool.hollow"), icon: ToolbarHollowIcon, action: onHollow, enabled: canEdgeModify, active: hollowActive, needs: need("oneBody") },
@@ -1061,7 +1102,8 @@ export function SecondaryToolbar({
         title={shapeAssetMenuLabel(shape).replace(/\s+/g, " ")}
         aria-label={shapeAssetMenuLabel(shape).replace(/\s+/g, " ")}
         style={{ "--shape-default-color": shapeAssetColor(shape, shapeCustomizations[shape.kind]) } as CSSProperties}
-        draggable
+        draggable={shape.id !== "threadInsert"}
+        disabled={shape.id === "threadInsert" && !canHolePattern && !threadInsertActive}
         onClick={() => {
           if (suppressNextShapeClickRef.current) {
             suppressNextShapeClickRef.current = false;
@@ -1111,6 +1153,10 @@ export function SecondaryToolbar({
           addShapeFromMenu(shape);
         }}
         onDragStart={(event) => {
+          if (shape.id === "threadInsert") {
+            event.preventDefault();
+            return;
+          }
           event.dataTransfer.effectAllowed = "copy";
           event.dataTransfer.setData("application/x-layerling-shape", JSON.stringify(shape));
         }}
@@ -1284,6 +1330,7 @@ export function SecondaryToolbar({
       ),
       plain("hide-others", t("contextMenu.hideOthers"), visibilityGroup, hasSelection, onHideOthers, { icon: EyeOff }),
       plain("invert-selection", t("contextMenu.invertSelection"), t("shortcuts.group.selection"), true, onInvertSelection, { icon: ArrowLeftRight }),
+      plain("select-same-colour", t("contextMenu.selectSameColor"), t("shortcuts.group.selection"), hasSelection, onSelectSameColor, { icon: Palette }),
       plain("notes", t("visibility.notes"), visibilityGroup, noteCount > 0, onToggleNotes, { icon: notesVisible ? Eye : EyeOff, active: notesVisible }),
       plain("overhangs", t("visibility.overhangs", { angle: overhangAngle }), visibilityGroup, true, onToggleOverhangs, { icon: AlertTriangle, active: overhangsVisible }),
       plain("look-onto-workplane", t("camera.lookOntoWorkplane"), t("shortcuts.group.view"), true, () => window.dispatchEvent(new Event("layerling:look-onto-workplane")), { icon: ScanEye }),
@@ -1295,6 +1342,7 @@ export function SecondaryToolbar({
       plain("note", t("editor.tool.note"), visibilityGroup, true, onNoteTool, { icon: ToolbarNoteIcon, active: noteMode }),
       plain("import", t("editor.import"), fileGroup, true, () => onTopPanel("import"), { icon: ToolbarImportIcon }),
       plain("export", t("editor.export"), fileGroup, true, () => onTopPanel("export"), { icon: ToolbarVectorExportIcon }),
+      plain("file-backups", t("backups.title"), fileGroup, true, () => window.dispatchEvent(new Event(OPEN_FILE_BACKUPS_EVENT)), { icon: ArchiveRestore, keywords: ["backup", "backups", "version", "versions", "restore", "sicherung", "fassung", "wiederherstellen"] }),
       plain("attachments", t("editor.attachments"), fileGroup, true, () => onTopPanel("attachments"), { icon: ToolbarAttachmentsIcon, keywords: ["attachment", "file", "notes", "instructions", "readme", "anhang", "datei"] }),
       plain("settings", t("editor.workspaceSettings"), t("editor.group.help"), true, () => window.dispatchEvent(new Event("layerling:open-workspace-settings")), { icon: ToolbarSettingsIcon }),
       plain("focus-mode", focusMode ? t("focusMode.leave") : t("focusMode.enter"), t("shortcuts.group.view"), Boolean(onFocusModeChange), () => onFocusModeChange?.(!focusMode), { icon: focusMode ? Minimize2 : Maximize2, active: focusMode }),
@@ -1411,7 +1459,7 @@ export function SecondaryToolbar({
           <div className="toolbar-section-tools">{historyShown.map(renderToolButton)}</div>
         </div>
         ) : null}
-        <div className={`toolbar-section toolbar-shapes-section${shapesInRibbon ? "" : " out-of-ribbon"}`} data-group="shapes" style={{ order: sectionOrder.shapes }} ref={shapesMenuRef} inert={historyViewActive}>
+        <div className={`toolbar-section toolbar-shapes-section${shapesInRibbon ? "" : " out-of-ribbon"}`} data-group="shapes" style={{ order: sectionOrder.shapes }} ref={shapesMenuRef} inert={historyViewActive} {...shapesHoverProps}>
           {shapesInRibbon ? (
           <>
           <div className="toolbar-section-label">{t("editor.group.shapes")}</div>
@@ -1420,12 +1468,10 @@ export function SecondaryToolbar({
               className={`shape-menu-trigger ${shapesOpen ? "active" : ""}`}
               aria-label={t("editor.addShape")}
               aria-expanded={shapesOpen}
-              onClick={() => {
-                setVisibilityOpen(false);
-                setShapesOpen((value) => !value);
-              }}
+              onClick={toggleShapesFromButton}
             >
               <ToolbarShapeAddIcon />
+              {shapesTab}
             </button>
           </div>
           </>
@@ -1638,7 +1684,7 @@ export function SecondaryToolbar({
                     </button>
                   </div>
                 </div>
-                <div className="toolbar-section toolbar-shapes-section sketch-shapes-section" data-group="shapes" ref={shapesMenuRef}>
+                <div className="toolbar-section toolbar-shapes-section sketch-shapes-section" data-group="shapes" ref={shapesMenuRef} {...shapesHoverProps}>
                   <div className="toolbar-section-label">{t("sketch.group.shapes")}</div>
                   <div className="toolbar-section-tools">
                     <button
@@ -1647,12 +1693,10 @@ export function SecondaryToolbar({
                       aria-label={t("sketch.addShape")}
                       aria-haspopup="menu"
                       aria-expanded={shapesOpen}
-                      onClick={() => {
-                        setVisibilityOpen(false);
-                        setShapesOpen((open) => !open);
-                      }}
+                      onClick={toggleShapesFromButton}
                     >
                       <ToolbarShapeAddIcon />
+                      {shapesTab}
                     </button>
                   </div>
                   {shapesOpen ? (
@@ -1892,32 +1936,7 @@ export function SecondaryToolbar({
           </button>
         </div>
         <div className="toolbar-project-name">
-          <label ref={projectNameFieldRef} className="toolbar-project-name-field" title={t("editor.renameProject")}>
-            <input
-              ref={projectNameInputRef}
-              aria-label={t("confirm.projectName")}
-              value={projectNameDraft}
-              maxLength={80}
-              spellCheck={false}
-              onChange={(event) => setProjectNameDraft(event.target.value)}
-              onBlur={(event) => {
-                if (cancelProjectNameEditRef.current) {
-                  cancelProjectNameEditRef.current = false;
-                  setProjectNameDraft(projectName);
-                  return;
-                }
-                commitProjectName(event.currentTarget.value);
-              }}
-              onKeyDown={(event) => {
-                if (event.key === "Enter") event.currentTarget.blur();
-                if (event.key === "Escape") {
-                  cancelProjectNameEditRef.current = true;
-                  event.currentTarget.blur();
-                }
-              }}
-            />
-            <Pencil size={13} strokeWidth={2.4} aria-hidden="true" />
-          </label>
+          <ProjectNameField projectName={projectName} onProjectNameChange={onProjectNameChange} />
         </div>
         <div className="toolbar-title-row-actions">
           {/* Focus mode (Discussion #1554): this row and the footer make room, a small bar over the view keeps the tabs. */}
@@ -1988,6 +2007,7 @@ export function SecondaryToolbar({
           onSettings={() => window.dispatchEvent(new Event("layerling:open-workspace-settings"))}
           onLeave={() => onFocusModeChange(false)}
           showSearch={!simpleMode}
+          nameField={<ProjectNameField className="focus-mode-bar-name" projectName={projectName} onProjectNameChange={onProjectNameChange} />}
         />
       ) : null}
     </div>

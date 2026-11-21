@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { setLanguage } from "@/lib/i18n";
+import { LANGUAGES } from "@/lib/languages";
 import { libraryShapeAssets, shapeAssetMenuLabel } from "@/lib/shapeCatalog";
 import {
   RECENT_SHAPE_LIMIT,
@@ -23,7 +24,7 @@ describe("the shape library's sections (#1170)", () => {
     // No shape waits in "More shapes": a new one of the catalogue is given its section in SHAPE_LIBRARY_SECTIONS.
     expect(sections.map((section) => section.id)).not.toContain("other");
     expect(Object.fromEntries(sections.map((section) => [section.id, section.shapes.length]))).toEqual({
-      basic: 15, vessels: 4, holes: 4, connections: 4, enclosure: 3, mechanics: 4, systems: 2, lettering: 4, decorative: 4, helpers: 1,
+      basic: 16, vessels: 4, holes: 5, connections: 4, enclosure: 3, mechanics: 4, systems: 2, lettering: 4, decorative: 4, helpers: 1,
     });
   });
 
@@ -35,7 +36,7 @@ describe("the shape library's sections (#1170)", () => {
   });
 
   it("puts a shape no section names at the end, under More shapes", () => {
-    const withNew = shapeLibrarySections([...libraryShapeAssets.slice(0, 3), { id: "newShape", name: "New shape" }]);
+    const withNew = shapeLibrarySections([...libraryShapeAssets.filter((shape) => ["box", "roundedBox", "cylinder"].includes(shape.id)), { id: "newShape", name: "New shape" }]);
     expect(withNew.map((section) => section.id)).toEqual(["basic", "other"]);
     expect(withNew.at(-1)?.shapes.map((shape) => shape.id)).toEqual(["newShape"]);
   });
@@ -49,7 +50,7 @@ describe("the shape library's sections (#1170)", () => {
 describe("searching the shape library (#1170)", () => {
   it("finds the port opening by USB, through the words of the command search", () => {
     setLanguage("en", false);
-    expect(search("USB")).toEqual([expect.objectContaining({ id: "holes", total: 4, shapes: [expect.objectContaining({ id: "port" })] })]);
+    expect(search("USB")).toEqual([expect.objectContaining({ id: "holes", total: 5, shapes: [expect.objectContaining({ id: "port" })] })]);
   });
 
   it("shows what really matches for a word with several meanings: pipe is the cylinder and the tube", () => {
@@ -63,9 +64,33 @@ describe("searching the shape library (#1170)", () => {
     expect(found("charniere")).toEqual(["hinge"]);
     expect(found("ressort")).toEqual(["spring"]);
     expect(found("gear")).toEqual(["gear"]);
-    expect(found("Gewinde")).toEqual(["thread"]);
+    expect([...found("Gewinde")].sort()).toEqual(["thread", "threadInsert"]); // the thread insert is found by "Gewinde" too, through its keywords
     await setLanguage("en", false);
     expect(found("charniere")).toEqual([]);
+  });
+
+  it("finds every shape by its name in every language, whatever script it is written in", async () => {
+    const missing: string[] = [];
+    for (const language of LANGUAGES) {
+      await setLanguage(language, false);
+      for (const shape of libraryShapeAssets) {
+        if (!found(label(shape)).includes(shape.id)) missing.push(`${language}: ${label(shape)}`);
+      }
+    }
+    await setLanguage("en", false);
+    expect(missing).toEqual([]);
+  });
+
+  it("finds a shape by its Japanese name, also from a part of it and from kana typed in hiragana", async () => {
+    await setLanguage("ja", false);
+    expect(found("円柱")).toContain("cylinder");
+    expect(found("歯車")).toContain("gear");
+    expect(found("xyzzy")).toEqual([]);
+    const tile = (id: string) => label(libraryShapeAssets.find((shape) => shape.id === id)!);
+    // Whatever the catalogue calls the sphere: its first two characters are enough, and none of them finds everything.
+    expect(found(tile("sphere").slice(0, 2))).toContain("sphere");
+    expect(found(tile("sphere").slice(0, 2)).length).toBeLessThan(libraryShapeAssets.length);
+    await setLanguage("en", false);
   });
 
   it("finds a shape by its own words, not by the name of its section, and nothing for a word no shape has", async () => {

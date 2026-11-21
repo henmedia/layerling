@@ -9,3 +9,15 @@ export function keepsProportionsOnAxis(shape: Pick<WorkplaneShape, "kind">, axis
   if (!axis) return false;
   return !(shape.kind === "text" && axis === "height");
 }
+
+/**
+ * Whether a change from the shape's window scales the other sizes along with "Keep proportions" on. An angle typed in (a
+ * wedge's slope, a teardrop's tip) is reached through one size alone: scaled along, the body grew and the angle stayed (#1763).
+ */
+export function keepsProportionsForUpdate(
+  shape: Pick<WorkplaneShape, "kind">,
+  options: { resizeAxis?: "width" | "depth" | "height"; angle?: boolean } | undefined,
+) {
+  if (options?.angle) return false;
+  return keepsProportionsOnAxis(shape, options?.resizeAxis);
+}

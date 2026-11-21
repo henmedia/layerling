@@ -59,7 +59,25 @@ COPY --from=builder /runtime/ /app/
 RUN mkdir -p /app/.codex/project-thumbnails \
   && chown -R nextjs:nodejs /app/.codex
 
+# Up to 1.158.0 the image was the Node image, which starts through docker-entrypoint.sh, with "npm start" as
+# its command. Portainer and Synology's Container Manager keep both when they recreate a container from a
+# newer image (Issue #1664), and this image has neither the script nor npm: such a container did not start.
+# The script is back, under the same name, and takes "npm start" for the server; anything else runs as the
+# Node image's script ran it, a first word that is an option or a script file handed to node.
+COPY --chmod=755 <<'EOF' /usr/local/bin/docker-entrypoint.sh
+#!/bin/sh
+set -e
+case "$*" in
+  "npm start" | "npm run start") set -- node apps/web/server.js ;;
+esac
+if [ "${1#-}" != "$1" ] || [ -z "$(command -v "$1")" ] || { [ -f "$1" ] && ! [ -x "$1" ]; }; then
+  set -- node "$@"
+fi
+exec "$@"
+EOF
+
 USER nextjs
 EXPOSE 3000
 
+ENTRYPOINT ["docker-entrypoint.sh"]
 CMD ["node", "apps/web/server.js"]

@@ -43,7 +43,7 @@ describe("finishing washer", () => {
   it("sizes follow the countersink: an M3 is 10.3 x 3 mm, an M6 16.6 x 4.5 mm", () => {
     expect(finishingWasherFields("M3")).toEqual({ width: 10.3, depth: 10.3, height: 2.95, screwHoleShaft: 3.4, screwHoleHeadDepth: 1.45, screwHoleAngle: 90 });
     expect(finishingWasherFields("M6")).toMatchObject({ width: 16.6, height: 4.5, screwHoleShaft: 6.6, screwHoleHeadDepth: 3 });
-    expect(finishingWasherSizes()).toEqual(["M2", "M2.5", "M3", "M4", "M5", "M6", "M8", "M10", "M12", "M14", "M16", "M20"]);
+    expect(finishingWasherSizes()).toEqual(["M2", "M2.5", "M3", "M3.5", "M4", "M5", "M6", "M8", "M10", "M12", "M14", "M16", "M20"]);
   });
 
   it("knows its size again from its measures, and none once one is changed", () => {

@@ -96,6 +96,25 @@
   pointer-events: none;
 }
 
+/* How thick the body is under the pointer: a dashed line through it to where the material ends (Discussion #1820). */
+.tape-thickness-line {
+  fill: none;
+  stroke: #b66108;
+  stroke-width: 2;
+  stroke-dasharray: 4 3;
+  stroke-linecap: round;
+  vector-effect: non-scaling-stroke;
+  pointer-events: none;
+}
+
+.tape-thickness-end {
+  fill: #b66108;
+  stroke: #ffffff;
+  stroke-width: 1.5;
+  vector-effect: non-scaling-stroke;
+  pointer-events: none;
+}
+
 /* A centre on offer, the middle of a face or of a round edge: a cross in a circle, unlike the ring of a corner (Discussion #610). */
 .tape-centre {
   opacity: 0.75;

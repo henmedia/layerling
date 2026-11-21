@@ -16,6 +16,21 @@ export type ResizeHandle = "nw" | "n" | "ne" | "e" | "se" | "s" | "sw" | "w";
 export type SketchImageCrop = { left: number; top: number; right: number; bottom: number };
 
 export const MIN_IMAGE_SIZE = 0.5;
+/** The width and height fields reached only to 200 mm, whatever the plate (#1727). */
+const IMAGE_SLIDER_FLOOR = 200;
+
+/**
+ * How far the width and height of the image go (#1727): the slider to the larger side of the plate, at least
+ * 200 mm and always to the image's own size, so it shows what dragging the handles made; a typed size up to
+ * ten times the plate, which only guards against a slip of the finger.
+ */
+export function sketchImageSizeLimits(plate: { width: number; depth: number }, image: { width: number; depth: number }) {
+  const side = Math.max(Number(plate.width) || 0, Number(plate.depth) || 0);
+  const own = Math.max(Number(image.width) || 0, Number(image.depth) || 0);
+  const slider = Math.max(IMAGE_SLIDER_FLOOR, side, own);
+  return { slider, typed: Math.max(slider, side * 10) };
+}
+
 /** How much of the picture must stay in each direction. */
 const MIN_CROP_REMAINDER = 0.02;
 

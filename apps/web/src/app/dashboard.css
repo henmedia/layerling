@@ -518,3 +518,54 @@ html[data-theme="dark"] .browser-backup-note.backed-up {
 html[data-theme="dark"] .browser-backup-note.backed-up > svg {
   color: #7cc48f;
 }
+
+/* A longer What's new card: paragraphs and a list, and links to the place in the guide that explains it. */
+.whats-new-text {
+  display: grid;
+  gap: 6px;
+}
+
+.whats-new-version .whats-new-points {
+  display: grid;
+  gap: 2px;
+  margin: 0;
+  padding: 0 0 0 18px;
+  list-style: disc;
+}
+
+.whats-new-version .whats-new-points li {
+  display: list-item;
+  color: #7a6650;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.45;
+}
+
+.whats-new-guide-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  justify-self: start;
+  margin-top: 2px;
+  color: #bf6508;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.whats-new-guide-link:hover,
+.whats-new-guide-link:focus-visible {
+  text-decoration: underline;
+}
+
+.dashboard-update-preview .whats-new-version .whats-new-points li {
+  color: inherit;
+  opacity: 0.88;
+}
+
+html[data-theme="dark"] .whats-new-version .whats-new-points li {
+  color: #bda78e;
+}
+
+html[data-theme="dark"] .whats-new-guide-link {
+  color: #f3a452;
+}

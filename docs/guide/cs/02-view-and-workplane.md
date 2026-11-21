@@ -20,7 +20,7 @@ Rychlost přiblížení nastavuje {{ui:workspace.zoomSpeed}} v části {{ui:work
 
 **Tlačítka myši jako ve sliceru.** Pokud jste zvyklí na Bambu Studio nebo OrcaSlicer, nastavte v nastavení, v {{ui:workspace.appearance}}, {{ui:workspace.mouseScheme}} na {{ui:workspace.mouseSchemeSlicer}}. Tažení levým tlačítkem po prázdném místě pak otáčí pohled, pravé tlačítko ho posouvá jako prostřední a Shift s tažením levým kreslí výběrový rámeček. Tažení tělesa ho stále posouvá a krátké kliknutí pravým stále otevře nabídku. V náčrtu posouvá pohled i pravé tlačítko.
 
-**3D myš.** SpaceMouse nebo jiná 3D myš otáčí, posouvá a přibližuje 3D pohled: odtlačte čepičku od sebe pro přiblížení, posuňte ji pro posun pohledu, nakloňte ji pro naklonění pohledu a otočte ji pro otočení pohledu. V nastavení, v {{ui:workspace.appearance}}, klikněte na {{ui:workspace.spaceMouseConnect}} a vyberte zařízení v okně, které prohlížeč otevře; volbu si zapamatuje, takže to stačí udělat jednou. Funguje to v Chrome a Edge, které k takovým zařízením mají přístup; Firefox a Safari ne. Pokud je některý směr obráceně, zaškrtni ho pod tlačítkem: posun do stran, posun nahoru a dolů, přiblížení, náklon nebo otočení.
+**3D myš.** SpaceMouse nebo jiná 3D myš otáčí, posouvá a přibližuje 3D pohled: odtlačte čepičku od sebe pro přiblížení, posuňte ji pro posun pohledu, nakloňte ji pro naklonění pohledu a otočte ji pro otočení pohledu. V nastavení, v {{ui:workspace.controls}}, klikněte na {{ui:workspace.spaceMouseConnect}} a vyberte zařízení v okně, které prohlížeč otevře; volbu si zapamatuje, takže to stačí udělat jednou. Funguje to v Chrome a Edge, které k takovým zařízením mají přístup; Firefox a Safari ne. Pokud je některý směr obráceně, zaškrtni ho pod tlačítkem: posun do stran, posun nahoru a dolů, přiblížení, náklon nebo otočení. Některé 3D myši prohlížeč najde i jako herní ovladač; layerling si takovou myš pak převezme sám, jakmile pohnete hlavicí, bez kliknutí na {{ui:workspace.spaceMouseConnect}} po restartu. Myš převzatá jako herní ovladač si pamatuje zaškrtnuté směry zvlášť od těch, které platí po {{ui:workspace.spaceMouseConnect}}, protože některá zařízení tam běží obráceně; řádek pod políčky říká, kdy se myš čte tímto způsobem.
 
 Na tabletu nebo telefonu dvěma prsty přibližujete a oddalujete a společným posunem prstů posouváte pohled. Jeden prst pracuje s modelem jako levé tlačítko myši. Pro otáčení jedním prstem zapněte {{ui:camera.touchRotate}} v liště pohledu. Volba se zobrazuje jen na dotykových zařízeních.
 
@@ -44,7 +44,7 @@ U levého okraje je úzká lišta. Shora obsahuje:
 - {{ui:camera.orthographic}} zapne rovnoběžné promítání bez perspektivy. Rovnoběžné hrany zůstávají rovnoběžné, což usnadňuje měření a zarovnávání. Přepíná je i [[O]]; dalším kliknutím se vrátíte.
 - {{ui:camera.secondView}} otevře druhý pohled na projekt ve vlastním okně, popsaném níže. Druhé kliknutí ho zavře.
 - {{ui:camera.showScrollbars}} zobrazí posuvník u dolního okraje pohledu a druhý podél pravého okraje. Tažením posuvníku se pohled plynule posouvá, klik na šipku na jeho konci jím posune o kousek (podržením pokračuje) a klik vedle posuvníku o téměř celý pohled. Nic se neotáčí a na rozdíl od šipek na klávesnici posuvníky fungují i s vybraným dílem - šikovné zblízka u drobných detailů. Druhý klik je skryje; zda se návrh otevře s nimi, určuje {{ui:workspace.startWithScrollbars}} v nastavení. Tento prohlížeč si volbu navíc pamatuje.
-- {{ui:camera.hideWorkplane}}, oko nad mřížkou, skryje podložku, aby bylo vidět spodní strany modelu. Mění pouze zobrazení; nové tvary stále dopadají na pracovní rovinu. Další kliknutí ji ukáže.
+- {{ui:camera.hideWorkplane}}, oko nad mřížkou, skryje podložku, aby bylo vidět spodní strany modelu. Mění pouze zobrazení; nové tvary stále dopadají na pracovní rovinu. Další kliknutí ji ukáže. S pracovní rovinou na ploše se jmenuje {{ui:camera.hideBuildPlate}} a skryje jen tiskovou podložku: pracovní rovina na ploše zůstane, má vlastní oko, {{ui:camera.hideFaceWorkplane}}.
 - {{ui:camera.placeWorkplane}}, měření vzdáleností a úhelník jsou samostatné nástroje popsané níže a v kapitole [Měření a poznámky](chapter:measuring-and-notes).
 
 Malá šipka úplně nahoře lištu skryje, pokud překáží.
@@ -101,6 +101,7 @@ Když se návrh nevejde na jednu podložku, třeba krabička s víkem a vložkam
 
 - Každá podložka je velká jako pracovní plocha a podložky leží vedle sebe vpravo od první, 20 mm od sebe. Těleso patří k podložce, na které stojí střed jeho půdorysu, takže přetažením na druhou stranu se dostane na jinou podložku. Návrh má nejvýše 12 podložek.
 - Kliknutí na podložku v liště ji ukáže a nové tvary i importované soubory pak přistanou na ní. {{ui:plates.showAll}} ukáže všechny. Dvojklik na podložku nebo {{ui:plates.rename}} jí dá název, třeba „Víko“, který je na podložce napsán.
+- I nový náčrt na podložce začíná na aktivní podložce: plocha náčrtu ukazuje tuto podložku s tělesy na ní a hotové těleso stojí tam.
 - {{ui:plates.moveLeft}} a {{ui:plates.moveRight}} mění pořadí, tělesa se posouvají se svou podložkou. {{ui:plates.remove}} odebere aktivní podložku; její tělesa přejdou na první podložku na stejné místo.
 - {{ui:plates.arrange}} rozloží vybraná tělesa, nebo všechna, řadu po řadě na podložky, největší první, 5 mm od sebe, a přidává podložky, dokud jsou potřeba. Těleso větší než podložka zůstane na místě.
 - Se zvolenou tiskárnou se každé těleso kontroluje proti své podložce a výška tisku se počítá od nejnižšího tělesa na ní. Podložka s tělesem, které se nevejde, ukáže své číslo červeně.
@@ -117,7 +118,7 @@ Krátké kliknutí prostředním tlačítkem myši, bez pohybu myší, otevře n
 
 ### Okno nastavení
 
-Ozubené kolo v titulním řádku ({{ui:editor.workspaceSettings}}) otevře nastavení. Vlevo je pět oblastí: {{ui:workspace.appearance}}, {{ui:workspace.measurement}}, {{ui:workspace.workplane}}, {{ui:workspace.shapeDefaults}} a {{ui:workspace.history}}. Změna platí okamžitě. {{ui:workspace.makeDefault}} dole uloží současné nastavení jako výchozí, takže nový projekt začne s ním. Otevřený soubor si přinese vlastní nastavení; {{ui:workspace.useMyDefault}} vedle něj použije na otevřený projekt vaše uložené barvy, mřížku a ostatní, přičemž zachová jeho jednotky. Pokud vaše výchozí nastavení obsahuje tiskárnu, přijde i s velikostí své podložky; bez tiskárny si projekt ponechá svou podložku a tiskárnu. {{ui:workspace.close}} vpravo nahoře okno zavře. Tato část prochází nastavení jedno po druhém.
+Ozubené kolo v titulním řádku ({{ui:editor.workspaceSettings}}) otevře nastavení. Vlevo je sedm oblastí: {{ui:workspace.appearance}}, {{ui:workspace.controls}}, {{ui:workspace.output}}, {{ui:workspace.measurement}}, {{ui:workspace.workplane}}, {{ui:workspace.shapeDefaults}} a {{ui:workspace.history}}. Změna platí okamžitě. {{ui:workspace.makeDefault}} dole uloží současné nastavení jako výchozí, takže nový projekt začne s ním. Otevřený soubor si přinese vlastní nastavení; {{ui:workspace.useMyDefault}} vedle něj použije na otevřený projekt vaše uložené barvy, mřížku a ostatní, přičemž zachová jeho jednotky. Pokud vaše výchozí nastavení obsahuje tiskárnu, přijde i s velikostí své podložky; bez tiskárny si projekt ponechá svou podložku a tiskárnu. {{ui:workspace.close}} vpravo nahoře okno zavře. Tato část prochází nastavení jedno po druhém.
 
 {{ui:workspace.exportSettings}} uloží nastavení okna do souboru (layerling-settings-<datum>.json): barvy, mřížku, stíny, kameru a výchozí hodnoty tvarů spolu s motivem, velikostí panelu nástrojů, rohem kostky pohledu, barvami tvarů a vůlí každé tiskárny. Na jiném počítači nebo po ztrátě dat prohlížeče {{ui:workspace.importSettings}} soubor znovu načte: stane se vaším výchozím nastavením pro nové návrhy a použije se na otevřený návrh jako {{ui:workspace.useMyDefault}}. Vaše vlastní klávesy z klávesových zkratek jdou do souboru také.
 
@@ -157,7 +158,7 @@ Pohled náčrtu má vlastní barvy: {{ui:workspace.sketchBackground}} pro okno k
 
 ### Vzhled: šipky os a obrysy
 
-{{ui:workspace.showAxes}}, výchozí zapnuto, kreslí v rohu podložky tři šipky: **X** červeně doprava, **Y** zeleně dozadu a **Z** modře vzhůru, podle údajů polohy. Jde o pravotočivou soustavu jako v Tinkercadu, CAD programech a slicerech. Na pracovní rovině umístěné na ploše se osy přizpůsobí její orientaci. Pokud překážejí, vypněte je.
+{{ui:workspace.showAxes}}, výchozí zapnuto, kreslí v rohu podložky tři šipky: **X** červeně doprava, **Y** zeleně dozadu a **Z** modře vzhůru, podle údajů polohy. Jde o pravotočivou soustavu jako v Tinkercadu, CAD programech a slicerech. Na pracovní rovině umístěné na ploše se osy přizpůsobí její orientaci. Pokud překážejí, vypněte je. Dokud jsou šipky zapnuté, nese jejich barvy i středový kříž mřížky: čára podél X červenou, čára podél Y zelenou, takže i u malého dílu hned vidíte, kam která osa vede.
 
 {{ui:workspace.edgeLines}} kreslí obrys na každém tělese barvou {{ui:workspace.edgeColor}} (nejprve černou, jako v Tinkercadu): pomáhá, když tmavé barvy splývají. Ve výchozím stavu je vypnuto a velmi velké importované sítě se vynechávají.
 
@@ -192,6 +193,8 @@ Pohled náčrtu má vlastní barvy: {{ui:workspace.sketchBackground}} pro okno k
 {{ui:workspace.startWithScrollbars}}: návrh se pak otevře se zobrazenými posuvníky pohledu. Nastavení se ukládá s návrhem i pomocí {{ui:workspace.makeDefault}}.
 
 {{ui:workspace.viewBarOpensOnHover}}: sbalená lišta pohledu se otevře, když je myš nad její šipkou, a krátce poté, co ji myš opustí, se znovu sbalí, pokud se nepoužívá některý z jejích nástrojů. Klik na šipku, dokud je takto otevřená, ji nechá otevřenou. Platí jen pro myš; na dotykové obrazovce lištu otevře klepnutí jako dosud.
+
+{{ui:workspace.showStepNotices}}: po kroku, jako je sjednocení, krátká zpráva vedle krychle pohledu řekne, co se stalo, a nabídne {{ui:shortcuts.undo}}. Po vypnutí se tyto zprávy nezobrazují; zprávy, které od vás něco chtějí nebo hlásí problém, se zobrazují dál a {{ui:editor.tool.undo}} na pásu karet po najetí myší stále uvádí krok.
 
 {{ui:workspace.startView}} určuje úhel, ve kterém se otevře nový projekt a ke kterému se vrací {{ui:camera.home}}. Otočte a přibližte pohled, jak se vám líbí, a pak klikněte na {{ui:workspace.startViewUseCurrent}}; {{ui:workspace.startViewStandard}} vrátí obvyklý pohled zepředu zprava. Platí pro každý projekt v tomto prohlížeči. Projekt, který znovu otevřete, se stále otevře tak, jak jste ho opustili.
 

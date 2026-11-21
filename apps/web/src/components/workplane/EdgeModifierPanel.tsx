@@ -328,6 +328,9 @@ export function EdgeModifierPanel({
   busy,
   prepared,
   error,
+  sizeRefused = false,
+  searchingLargest = false,
+  onFindLargest,
   onAmountChange,
   endAmount = null,
   concave = false,
@@ -376,6 +379,10 @@ export function EdgeModifierPanel({
   busy: boolean;
   prepared: boolean;
   error: string | null;
+  /** The error stands because the size was refused: offer the search for the largest size that fits (#1635). */
+  sizeRefused?: boolean;
+  searchingLargest?: boolean;
+  onFindLargest?: () => void;
   onAmountChange: (value: number) => void;
   /** A fillet whose radius changes along its one edge (#687): the radius at the edge's end, null for one radius. */
   endAmount?: number | null;
@@ -520,7 +527,7 @@ export function EdgeModifierPanel({
         coarse={{ step: lengthDisplayUnit(workspace).label === "in" ? 25.4 / 64 : EDGE_MODIFIER_SLIDER_STEP, max: EDGE_MODIFIER_SLIDER_MAX }}
         workspace={workspace}
         length
-        disabled={!prepared}
+        disabled={!prepared || searchingLargest}
         onChange={onAmountChange}
       />
 
@@ -583,9 +590,17 @@ export function EdgeModifierPanel({
       </label>
 
       {error ? <div ref={errorRef} className="edge-modifier-error" role="alert">{cadModifierUserErrorMessage(error)}</div> : null}
+      {(error && sizeRefused || searchingLargest) && onFindLargest ? (
+        <div className="edge-modifier-quick-actions">
+          <button type="button" disabled={!prepared || searchingLargest} title={t("edge.findLargestHint")} onClick={onFindLargest}>
+            {searchingLargest ? <LoaderCircle className="edge-modifier-spinner" size={15} /> : null}
+            {t(searchingLargest ? "edge.findLargestBusy" : "edge.findLargest")}
+          </button>
+        </div>
+      ) : null}
       <div className="edge-modifier-footer">
         <button type="button" className="secondary" onClick={onCancel}>{t(selectedCount === 0 && !busy ? "edge.done" : "common.cancel")}</button>
-        <button type="button" className="primary" disabled={!prepared || busy || selectedCount === 0 || Boolean(error)} onClick={onApply}>
+        <button type="button" className="primary" disabled={!prepared || busy || searchingLargest || selectedCount === 0 || Boolean(error)} onClick={onApply}>
           {busy ? <LoaderCircle className="edge-modifier-spinner" size={17} /> : <Check size={17} />}
           {t("edge.apply")}
         </button>

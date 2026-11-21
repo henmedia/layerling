@@ -699,6 +699,8 @@ function loftSolid(cad: OcctKernel, profile: CadModifierProfilePart, tolerance: 
    * are split into two halves from the angle 0 and pi: both ends start at
    * the same point of the outline and every ruling joins a point to its own
    * partner. Ends built the same way stay one edge each - one rim to pick.
+   * Still needed with occt-wasm 5.17.1, which lines up a loft's sections itself: without the halves the thin rod
+   * flattening into a blade (cadTaperedBodies) came out twisted, 1.24 instead of 2.04 mm³ (checked 11.11.2026).
    */
   const halves = (loop: CadModifierProfileLoop): CadModifierProfileLoop => {
     if (loop.segments.length !== 1 || !isWholeEllipse(loop.segments[0])) return loop;

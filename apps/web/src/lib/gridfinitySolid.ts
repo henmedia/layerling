@@ -23,6 +23,10 @@ import {
   type GridfinityLabelProfile,
   type GridfinityNotch,
   type GridfinityOpeningInside,
+  type GridfinityOverhangBox,
+  type GridfinityOverhangHole,
+  type GridfinityOverhangPieces,
+  type GridfinityOverhangSection,
   type GridfinityPlan,
   type GridfinityScoopPieces,
   type GridfinityStep,
@@ -40,6 +44,9 @@ import {
   gridfinityOpeningInside,
   gridfinityOpeningOutline,
   gridfinityOpeningSection,
+  gridfinityOverhangPieces,
+  overhangTrim,
+  OVERHANG_SIDE_FRAME,
   gridfinityPlan,
   gridfinityScoopPieces,
   gridfinityScoopPoint,
@@ -89,6 +96,9 @@ import {
  * The letters on the shelves (#1308) come made on the page, each glyph with the
  * font's own curves: each is pushed up from 0.05 mm inside its shelf to 0.4 mm
  * over its top and fused with the finished bin, last, so no cut takes them.
+ *
+ * Dividers set lower (#1560) are cut the same way, with the box above them
+ * always added (see compartmentCutter).
  */
 
 /** z up to y up: (x, y, z) -> (x, z, -y). */
@@ -188,7 +198,7 @@ function binSolid(cad: OcctKernel, plan: GridfinityPlan, scoops: GridfinityScoop
     ? prism(cad, grown.hx - plan.wallThickness, grown.hz - plan.wallThickness, plan.innerRadius, inside[0][1], inside[1][1] + into, grown.x, grown.z)
     : steppedSolid(cad, grown.x, grown.z, grown.hx, grown.hz, GRIDFINITY_BIN_RADIUS, inside);
   const below = cutter;
-  if (compartments) cutter = compartmentCutter(cad, below, compartments, hx, hz, wallTop, !upper);
+  if (compartments) cutter = compartmentCutter(cad, below, compartments, hx, hz, wallTop, !upper || compartments.top < plan.dividerTop);
   else if (plan.floorRounding > 0) {
     const floor = inside[0][1];
     const floorEdges = cad.getSubShapes(cutter, "edge").filter((edge) => {
@@ -269,7 +279,8 @@ function lipChamferKeeper(cad: OcctKernel, plan: GridfinityPlan, hx: number, hz:
  * The cutter for a bin with dividers (#554): the inside above the dividers' top and a rounded prism for each
  * compartment, its floor edges filleted and its scoops taken out, fused into one and kept to the inside, so the bin
  * is cut once. Cutting the compartments one by one took 7 to 15 times as long. Under a ledge the loft over it is the
- * inside above the dividers' top, so no box is added (`withAbove` false).
+ * inside above the dividers' top, so no box is added (`withAbove` false), unless the dividers are set lower (#1560):
+ * the box then takes the inside between their top and the ledge.
  */
 function compartmentCutter(cad: OcctKernel, loft: ShapeHandle, pieces: GridfinityCompartmentPieces, hx: number, hz: number, wallTop: number, withAbove = true) {
   const above = withAbove ? cad.makeBoxFromCorners({ x: -hx - 1, y: -hz - 1, z: pieces.top }, { x: hx + 1, y: hz + 1, z: wallTop + 1 }) : null;
@@ -406,9 +417,77 @@ function letteredSolid(cad: OcctKernel, body: ShapeHandle, part: CadModifierGrid
   return joined;
 }
 
+
+/**
+ * A bin's overhang on its body, in the shape's own frame (y up), as the display mesh has it
+ * (gridfinityOverhangTriangles): in ring mode the body moved to its place in the box and the solid ring joined round
+ * it, then the wedges under a chamfer cut away and the skins over them joined, kept within the box.
+ */
+function withOverhang(cad: OcctKernel, plan: GridfinityPlan, pieces: GridfinityOverhangPieces, body: ShapeHandle) {
+  const standingPrism = (hx: number, hz: number, radius: number, from: number, to: number, cx = 0, cz = 0) => cad.transform(prism(cad, hx, hz, Math.min(radius, hx, hz), from, to, cx, cz), Z_TO_Y_UP);
+  const block = (b: GridfinityOverhangBox) => cad.translate(cad.makeBox(b.x1 - b.x0, b.y1 - b.y0, b.z1 - b.z0), b.x0, b.y0, b.z0);
+  const section = (piece: GridfinityOverhangSection, polygon: Array<[number, number]>) => {
+    const { normal, along } = OVERHANG_SIDE_FRAME[piece.side];
+    const [a0, a1] = piece.along;
+    const points = polygon.map(([u, y]) => ({ x: normal[0] * u + along[0] * a0, y, z: normal[1] * u + along[1] * a0 }));
+    return cad.extrude(polygonFace(cad, points), along[0] * (a1 - a0), 0, along[1] * (a1 - a0));
+  };
+  let result = body;
+  const { envelope, skinClip, ring } = pieces;
+  if (ring && plan.overhang) {
+    result = cad.translate(result, plan.overhang.offset.x, 0, plan.overhang.offset.z);
+    const zones = ring.zones.map(block);
+    const zone = zones.length === 1 ? zones[0] : cad.fuseAll(zones);
+    const layer = (inner: GridfinityOverhangHole, from: number, to: number) => {
+      const outer = standingPrism(envelope.hx, envelope.hz, envelope.radius, from, to);
+      const hole = standingPrism(inner.hx, inner.hz, inner.radius, from - 1, to + 1, inner.cx, inner.cz);
+      return cad.cut(cad.common(outer, zone), hole);
+    };
+    let solid = layer(ring.inner, ring.from, ring.to);
+    if (ring.cap) solid = cad.fuse(solid, layer(ring.cap.inner, ring.cap.from, ring.cap.to));
+    if (ring.open.length > 0) solid = cad.cutAll(solid, ring.open.map(block));
+    result = cad.fuse(result, solid);
+    if (ring.trim !== null) result = cad.cut(result, block(overhangTrim(envelope, ring.trim)));
+    if (ring.keeper) {
+      const { radius, steps, foot } = ring.keeper;
+      let keeper = cad.transform(steppedSolid(cad, 0, 0, envelope.hx, envelope.hz, radius, steps), Z_TO_Y_UP);
+      if (foot !== null) keeper = oneSolid(cad, cad.fuse(keeper, block({ x0: -envelope.hx - 1, x1: envelope.hx + 1, z0: -envelope.hz - 1, z1: envelope.hz + 1, y0: steps[0][1], y1: foot })), "overhang chamfer keeper");
+      result = cad.common(result, keeper);
+    }
+    result = oneSolid(cad, result, "bin with its overhang");
+  }
+  if (pieces.wedges.length > 0) {
+    const wedges = pieces.wedges.map((wedge) => section(wedge, wedge.section));
+    // The skins joined first and every wedge cut once after, so one cut makes the slope, under a corner the higher. A
+    // solid overhang has nothing to keep closed but a side switched open, and elsewhere a skin would stand up through
+    // its trimmed top and chamfered edge.
+    const { skinZones } = pieces;
+    if (skinZones === null || skinZones.length > 0) {
+      // Kept within the outer wall (skinClip), which is solid over the slope there; a side switched open has no outer
+      // wall, and its floor over the slope runs out to the outline.
+      const clip = skinZones === null ? standingPrism(skinClip.hx, skinClip.hz, skinClip.radius, skinClip.from, skinClip.to) : standingPrism(envelope.hx, envelope.hz, envelope.radius, skinClip.from, skinClip.to);
+      const lifted = pieces.wedges.map((wedge) => section(wedge, wedge.skin));
+      let kept = cad.common(lifted.length === 1 ? lifted[0] : cad.fuseAll(lifted), clip);
+      if (skinZones !== null) kept = cad.common(kept, skinZones.length === 1 ? block(skinZones[0]) : cad.fuseAll(skinZones.map(block)));
+      result = cad.fuseAll([result, kept]);
+    }
+    result = oneSolid(cad, cad.cutAll(result, wedges), "bin with its overhang chamfered");
+  }
+  return cad.unifySameDomain(result);
+}
+
 /** The Gridfinity part's exact solid in the shape's own frame, y up. Throws when the kernel cannot build it. */
 export function gridfinityPartSolid(cad: OcctKernel, part: CadModifierGridfinityPart): ShapeHandle {
   const plan = gridfinityPlan(part);
+  const overhang = gridfinityOverhangPieces(plan);
+  const inner = gridfinityInnerPartSolid(cad, part, plan);
+  if (!overhang || (!overhang.ring && overhang.wedges.length === 0)) return inner;
+  const solid = withOverhang(cad, plan, overhang, inner);
+  if (!cad.isValid(solid)) throw new Error("The Gridfinity body is not a valid solid");
+  return solid;
+}
+
+function gridfinityInnerPartSolid(cad: OcctKernel, part: CadModifierGridfinityPart, plan: GridfinityPlan): ShapeHandle {
   const scoopPieces = gridfinityScoopPieces(part);
   const compartments = gridfinityCompartmentPieces(part);
   // A bin with dividers has its scoops in its compartments.

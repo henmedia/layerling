@@ -315,6 +315,25 @@ export function ToolbarHolePatternIcon(props: IconProps) {
   );
 }
 
+/**
+ * A block seen from above with a round hole and an insert in it, a ring of ticks round the inner circle like the
+ * knurl of a heat-set insert: the thread insert tool (#1828).
+ */
+export function ToolbarThreadInsertIcon(props: IconProps) {
+  const ticks = Array.from({ length: 8 }, (_, i) => {
+    const angle = (i * Math.PI) / 4;
+    return `M${24 + Math.cos(angle) * 7.5} ${24 + Math.sin(angle) * 7.5}L${24 + Math.cos(angle) * 10} ${24 + Math.sin(angle) * 10}`;
+  }).join("");
+  return (
+    <ToolbarVectorIcon {...props}>
+      <rect x="5" y="6" width="38" height="36" rx="3" />
+      <circle cx="24" cy="24" r="10" />
+      <circle cx="24" cy="24" r="4.5" />
+      <path d={ticks} strokeWidth="2" />
+    </ToolbarVectorIcon>
+  );
+}
+
 /** A slab with a pad set in from its edges standing on top, and an arrow out of the face: the face tool. */
 export function ToolbarFaceToolIcon(props: IconProps) {
   return (
@@ -557,6 +576,21 @@ export function ToolbarLidIcon(props: IconProps) {
       <path d="M6 9h36v6H6Z" {...SOLID} />
       <path d="M6 9h36v6H6Z" />
       <path d="M16.5 15v4h15v-4" />
+    </ToolbarVectorIcon>
+  );
+}
+
+/** A two-part mold opened: the lower half with a cone key and the cavity, the upper half above it with the funnel. */
+export function ToolbarMoldIcon(props: IconProps) {
+  return (
+    <ToolbarVectorIcon {...props}>
+      <path d="M6 27h36v13H6Z" {...SOLID} />
+      <path d="M6 27h36v13H6Z" />
+      <path d="M17 27a7 7 0 0 0 14 0" />
+      <path d="M9 27l2.5-4 2.5 4" />
+      <path d="M6 8h36v12H6Z" {...SOLID} />
+      <path d="M6 8h36v12H6Z" />
+      <path d="M19 8l3 4v8M29 8l-3 4v8" />
     </ToolbarVectorIcon>
   );
 }

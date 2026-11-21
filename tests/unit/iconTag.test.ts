@@ -12,6 +12,9 @@ import {
   normalizeIconTagCount,
   scaledIconProfile,
 } from "@/lib/iconTag";
+import { iconLayerStack, tagLayerUnderTexture } from "@/lib/editorTextTags";
+import { groupedShape } from "@/lib/editorBooleans";
+import { tagHasLayerSteps } from "@/lib/nameTag";
 import { orderedCadSketchPaths } from "@/lib/sketchCadProfile";
 import { filledGrowPockets } from "@/lib/sketchStroke";
 import type { SketchPoint, SketchProfile, SketchSegment, WorkplaneShape } from "@/types/layerling";
@@ -36,6 +39,15 @@ const body = (overrides: Partial<WorkplaneShape> & { sketchProfile: SketchProfil
 });
 
 const closedOutlines = (profile: SketchProfile) => orderedCadSketchPaths(profile).filter((path) => path.closed).length;
+
+/** A layer as a surface texture leaves it: a mesh that keeps the body under it as its last step. */
+const textureOf = (layer: WorkplaneShape): WorkplaneShape => ({
+  ...layer,
+  kind: "mesh",
+  sketchProfile: undefined,
+  surfaceTexture: { pattern: "knurl" } as unknown as WorkplaneShape["surfaceTexture"],
+  edgeTreatmentHistory: [{ id: "texture", createdAt: 0, feature: { kind: "surfaceTexture", amount: 0.4, edgeCount: 0 }, before: layer }],
+});
 
 describe("icon tag", () => {
   it("starts in the name tag's layers: icon, a 1.5 mm rim, a 3 mm plate 3 mm wider without holes", () => {
@@ -91,6 +103,28 @@ describe("icon tag", () => {
     expect(stack.place.x).toBeCloseTo(10, 6);
     expect(stack.place.z).toBeCloseTo(0, 6);
     expect(stack.place.elevation).toBeCloseTo(10, 6);
+  });
+
+  it("reads a layer with a surface texture by the body under its texture (Discussion #1692)", () => {
+    const rim = body({ id: "rim", name: "Heart 2", color: "#d41721", elevation: 3, height: 1.2, width: 23, depth: 23, sketchProfile: iconLayerProfile(square, { grow: 1.5, height: 1.2, color: "#d41721", join: "miter" }) });
+    // The texture makes the layer a mesh; it keeps the body under it as its step, which is what the tag reads.
+    expect(tagLayerUnderTexture(textureOf(rim))).toMatchObject({ id: "rim", sketchProfile: rim.sketchProfile, elevation: 3 });
+    expect(tagLayerUnderTexture(rim)).toBe(rim);
+  });
+
+  it("reads an icon tag with a textured layer as its layers, and says the layer has a change of its own", () => {
+    const top = body({ id: "top", name: "Heart 1", elevation: 4.2, height: 1.2, sketchProfile: square });
+    const rim = body({ id: "rim", name: "Heart 2", color: "#d41721", elevation: 3, height: 1.2, width: 23, depth: 23, sketchProfile: iconLayerProfile(square, { grow: 1.5, height: 1.2, color: "#d41721", join: "miter" }) });
+    const plate = body({ id: "plate", name: "Heart 3", color: "#2b2b2b", elevation: 0, height: 3, width: 26, depth: 26, sketchProfile: iconLayerProfile(square, ICON_TAG_LAYERS[2]) });
+    const tagOf = (parts: WorkplaneShape[]) => ({ ...groupedShape(parts)!, groupOperation: "bundle" as const, layeredIcon: true });
+    const plain = tagOf([top, rim, plate]);
+    expect(tagHasLayerSteps(plain)).toBe(false);
+    const withTexture = tagOf([top, textureOf(rim), plate]);
+    expect(tagHasLayerSteps(withTexture)).toBe(true);
+    expect(iconLayerStack(withTexture)?.ids).toHaveLength(3);
+    expect(iconLayerStack(withTexture)?.layers).toEqual(iconLayerStack(plain)?.layers);
+    // Not a tag: no note.
+    expect(tagHasLayerSteps({ ...withTexture, layeredIcon: false })).toBe(false);
   });
 
   it("takes one sketch body as a stack of itself, and refuses parts that are not one icon", () => {

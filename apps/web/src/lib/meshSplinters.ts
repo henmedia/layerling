@@ -20,18 +20,25 @@ export const SPLINTER_NO_VOLUME = 0.01;
 /** A thin shard of a few triangles: its volume is this share of the box round it, or less. */
 export const SPLINTER_THIN_SHARE = 0.05;
 
-const WELD = 1000;
+/**
+ * What is left of a piece someone drew is still that piece while it holds at least this share of what the piece held:
+ * a tooth half sunk into a head is a tooth, the sliver left of a letter another layer took is not.
+ */
+export const SPLINTER_DRAWN_SHARE = 0.05;
 
 /**
- * The mesh without its splinters, and how many pieces were left out. A piece counts as a splinter when it is closed
- * and tiny (under half a cubic millimetre), or has only a few triangles and is thin; a small cube or a pyramid
- * someone drew is neither, and neither is a thin ring. The mesh comes back as it was when there is nothing to remove,
- * and the piece with the most triangles always stays.
+ * A mesh a body was made from. `workedOut` marks one layerling worked out itself - a group as the editor keeps it, the
+ * result of a cut: of its loose pieces only those of more than a handful of triangles are parts someone drew, as a
+ * cut made earlier in the design has left its own splinters in it (#352).
  */
-export function removeLooseSplinters(mesh: MeshData): { mesh: MeshData; removed: number } {
-  const faceCount = mesh.faces.length;
-  if (faceCount < 8) return { mesh, removed: 0 };
+export type DrawnMesh = MeshData & { workedOut?: boolean };
 
+const WELD = 1000;
+/** How far a piece may reach past the box of the drawn piece it is left of, in millimetres: the weld's own step. */
+const DRAWN_BOX_SLACK = 2 / WELD;
+
+/** The loose pieces of a mesh: for every vertex the corner it is welded to, and for a corner the piece it belongs to. */
+function loosePieces(mesh: MeshData) {
   // Corners at the same place are one corner, as a soup of triangles lists every corner again.
   const keyToId = new Map<string, number>();
   const corner = new Int32Array(mesh.vertices.length);
@@ -60,6 +67,67 @@ export function removeLooseSplinters(mesh: MeshData): { mesh: MeshData; removed:
     parent[find(corner[b])] = rootA;
     parent[find(corner[c])] = rootA;
   }
+  return { corner, find };
+}
+
+/** What every loose piece holds, signed, and the box round it as [minX, minY, minZ, maxX, maxY, maxZ]. */
+function measuredPieces(mesh: MeshData, { corner, find }: ReturnType<typeof loosePieces>) {
+  const volume = new Map<number, number>();
+  const box = new Map<number, number[]>();
+  for (const [a, b, c] of mesh.faces) {
+    const root = find(corner[a]);
+    const pa = mesh.vertices[a];
+    const pb = mesh.vertices[b];
+    const pc = mesh.vertices[c];
+    const signed = (pa[0] * (pb[1] * pc[2] - pb[2] * pc[1]) - pa[1] * (pb[0] * pc[2] - pb[2] * pc[0]) + pa[2] * (pb[0] * pc[1] - pb[1] * pc[0])) / 6;
+    volume.set(root, (volume.get(root) ?? 0) + signed);
+    const bounds = box.get(root) ?? [Infinity, Infinity, Infinity, -Infinity, -Infinity, -Infinity];
+    for (const p of [pa, pb, pc]) {
+      for (let axis = 0; axis < 3; axis += 1) {
+        if (p[axis] < bounds[axis]) bounds[axis] = p[axis];
+        if (p[axis] > bounds[axis + 3]) bounds[axis + 3] = p[axis];
+      }
+    }
+    box.set(root, bounds);
+  }
+  return { volume, box };
+}
+
+const boxVolumeOf = (bounds: readonly number[]) => (bounds[3] - bounds[0]) * (bounds[4] - bounds[1]) * (bounds[5] - bounds[2]);
+
+/** Whether a box lies in another one, give or take the weld's step. */
+function boxWithin(inner: readonly number[], outer: readonly number[]) {
+  for (let axis = 0; axis < 3; axis += 1) {
+    if (inner[axis] < outer[axis] - DRAWN_BOX_SLACK || inner[axis + 3] > outer[axis + 3] + DRAWN_BOX_SLACK) return false;
+  }
+  return true;
+}
+
+/**
+ * The mesh without its splinters, and how many pieces were left out. A piece counts as a splinter when it is closed
+ * and tiny (under half a cubic millimetre), or has only a few triangles and is thin; a small cube or a pyramid
+ * someone drew is neither, and neither is a thin ring. The mesh comes back as it was when there is nothing to remove,
+ * and the piece with the most triangles always stays.
+ *
+ * `drawn` are the meshes the body was made from, before the cut or the merge. A loose piece one of them already had
+ * is a part someone drew, however small: four teeth of a few tenths of a cubic millimetre, grouped and standing in
+ * a head of another colour, went as splinters of the cut that gave the head their place, all but one, while the
+ * same teeth exported on their own were all there (Issue #1781). So of every drawn piece the largest part left stays,
+ * as the largest piece of the whole body does, while it still holds a real share of the piece
+ * (SPLINTER_DRAWN_SHARE) and holds something at all. Which drawn piece a part is left of is read from the boxes:
+ * the smallest drawn piece whose box it lies in.
+ *
+ * A group is kept as the mesh layerling worked out for it, and so are the parts of a logo grouped from such meshes: the
+ * teeth and whisker dots of a cat's face, 41 pieces in one group, each with hundreds of triangles round its outline
+ * and some with 0.02 mm3 in them, are pieces someone drew all the same (Issue #1781). In such a mesh (`workedOut`) a
+ * piece of a handful of triangles is not taken for drawn: that is what a cut made earlier leaves behind (#352).
+ */
+export function removeLooseSplinters(mesh: MeshData, drawn: readonly DrawnMesh[] = []): { mesh: MeshData; removed: number } {
+  const faceCount = mesh.faces.length;
+  if (faceCount < 8) return { mesh, removed: 0 };
+
+  const pieces = loosePieces(mesh);
+  const { corner, find } = pieces;
 
   const triangles = new Map<number, number>();
   for (const [a] of mesh.faces) {
@@ -99,25 +167,7 @@ export function removeLooseSplinters(mesh: MeshData): { mesh: MeshData; removed:
     if (uses !== 2) openRoots.add(find(Number(key.split(":")[0])));
   });
 
-  const volume = new Map<number, number>();
-  const box = new Map<number, number[]>();
-  for (const [a, b, c] of mesh.faces) {
-    const root = find(corner[a]);
-    if (!candidates.has(root)) continue;
-    const pa = mesh.vertices[a];
-    const pb = mesh.vertices[b];
-    const pc = mesh.vertices[c];
-    const signed = (pa[0] * (pb[1] * pc[2] - pb[2] * pc[1]) - pa[1] * (pb[0] * pc[2] - pb[2] * pc[0]) + pa[2] * (pb[0] * pc[1] - pb[1] * pc[0])) / 6;
-    volume.set(root, (volume.get(root) ?? 0) + signed);
-    const bounds = box.get(root) ?? [Infinity, Infinity, Infinity, -Infinity, -Infinity, -Infinity];
-    for (const p of [pa, pb, pc]) {
-      for (let axis = 0; axis < 3; axis += 1) {
-        if (p[axis] < bounds[axis]) bounds[axis] = p[axis];
-        if (p[axis] > bounds[axis + 3]) bounds[axis + 3] = p[axis];
-      }
-    }
-    box.set(root, bounds);
-  }
+  const { volume, box } = measuredPieces(mesh, pieces);
 
   const splinters = new Set<number>();
   candidates.forEach((root) => {
@@ -141,6 +191,35 @@ export function removeLooseSplinters(mesh: MeshData): { mesh: MeshData; removed:
       splinters.add(root);
     }
   });
+  if (splinters.size > 0 && drawn.length > 0) {
+    const drawnPieces = drawn.flatMap((source) => {
+      const sourcePieces = loosePieces(source);
+      const measured = measuredPieces(source, sourcePieces);
+      const all = [...measured.box].map(([root, bounds]) => ({ root, bounds, held: Math.abs(measured.volume.get(root) ?? 0) }));
+      if (!source.workedOut) return all;
+      const count = new Map<number, number>();
+      for (const [a] of source.faces) {
+        const root = sourcePieces.find(sourcePieces.corner[a]);
+        count.set(root, (count.get(root) ?? 0) + 1);
+      }
+      return all.filter((piece) => (count.get(piece.root) ?? 0) > SPLINTER_MAX_TRIANGLES);
+    });
+    [...splinters].forEach((root) => {
+      const bounds = box.get(root)!;
+      const solid = Math.abs(volume.get(root) ?? 0);
+      if (solid < SPLINTER_NO_VOLUME) return;
+      let home: (typeof drawnPieces)[number] | null = null;
+      for (const piece of drawnPieces) {
+        if (boxWithin(bounds, piece.bounds) && (!home || boxVolumeOf(piece.bounds) < boxVolumeOf(home.bounds))) home = piece;
+      }
+      if (!home || solid < home.held * SPLINTER_DRAWN_SHARE) return;
+      // Only the largest part left of a drawn piece is that piece; what else the cut left in its box stays a splinter.
+      for (const [other, otherBounds] of box) {
+        if (other !== root && Math.abs(volume.get(other) ?? 0) > solid && boxWithin(otherBounds, home.bounds)) return;
+      }
+      splinters.delete(root);
+    });
+  }
   if (splinters.size === 0) return { mesh, removed: 0 };
 
   const faces: [number, number, number][] = [];

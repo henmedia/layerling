@@ -1,5 +1,6 @@
 import { historyStateAt, type EditorHistoryEntry, type ResolvedHistoryState } from "@/lib/editorHistory";
 import { historyStatePartsTree } from "@/lib/historyRestore";
+import { historyFreedBytes, historyStepSizes } from "@/lib/historyStepSizes";
 import { describeHistoryStep, historyStepsAround, type HistoryStepDescription, type OpenGroupCount } from "@/lib/historyStepDescription";
 import { historyStepTextIn } from "@/lib/historyStepText";
 import type { WorkplaneShape } from "@/types/layerling";
@@ -18,6 +19,8 @@ export type HistoryViewMcpContext = {
   busy: () => boolean;
   /** Deletes the whole history; returns how many steps went. */
   clearHistory: () => number;
+  /** Deletes single states (never the current one); returns how many went. */
+  deleteSteps: (indices: readonly number[]) => number;
   bringBack: (index: number, ids: readonly string[]) => WorkplaneShape[];
   openGroups: OpenGroupCount;
   summary: (shape: WorkplaneShape) => unknown;
@@ -42,11 +45,16 @@ function undoRedoSteps(context: HistoryViewMcpContext) {
 function stepList(context: HistoryViewMcpContext, params: Record<string, unknown>) {
   if (params.steps !== true) return {};
   const entries = context.entries();
-  return { steps: entries.map((entry, index) => ({ index, step: stepText(describeHistoryStep(entries[index - 1], entry, context.openGroups)) })) };
+  // What deleting each state alone would free, counted as the stored design keeps it (a shared mesh once).
+  const sizes = historyStepSizes(entries);
+  return {
+    historyBytes: sizes.total,
+    steps: entries.map((entry, index) => ({ index, step: stepText(describeHistoryStep(entries[index - 1], entry, context.openGroups)), freesBytes: sizes.own[index] })),
+  };
 }
 
 /**
- * Runs `clear_history`, `set_history_view` and `restore_from_history`.
+ * Runs `clear_history`, `delete_history_steps`, `set_history_view` and `restore_from_history`.
  * Returns undefined for any other action, which the editor runs itself.
  */
 export function historyViewMcpCommand(action: string, params: Record<string, unknown>, context: HistoryViewMcpContext): unknown {
@@ -54,6 +62,21 @@ export function historyViewMcpCommand(action: string, params: Record<string, unk
     if (params.confirm !== true) throw new Error("clear_history deletes every undo step for good; pass confirm: true to do it");
     const removed = context.clearHistory();
     return { cleared: true, removedSteps: removed, states: context.entries().length };
+  }
+
+  if (action === "delete_history_steps") {
+    const entries = context.entries();
+    const raw = Array.isArray(params.steps) ? params.steps : [];
+    const steps = raw.filter((value): value is number => typeof value === "number" && Number.isInteger(value));
+    if (steps.length === 0) throw new Error("Give the indexes of the states to delete in `steps` (layerling_set_history_view with steps: true lists them)");
+    const outside = steps.filter((index) => index < 0 || index >= entries.length);
+    if (outside.length) throw new Error(`There is no state ${outside.join(", ")}; the history has states 0 to ${entries.length - 1}`);
+    if (steps.includes(context.current())) throw new Error(`State ${context.current()} is the one the design stands at and cannot be deleted`);
+    if (params.confirm !== true) throw new Error("delete_history_steps removes these states for good; pass confirm: true to do it");
+    if (context.busy()) throw new Error("Finish the current action before deleting history steps");
+    const freesBytes = historyFreedBytes(entries, steps);
+    const removed = context.deleteSteps(steps);
+    return { removedSteps: removed, freedBytes: freesBytes, states: context.entries().length, current: context.current() };
   }
 
   if (action === "set_history_view") {

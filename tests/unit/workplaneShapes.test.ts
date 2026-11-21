@@ -1,5 +1,6 @@
 import { restoreShapeBeforeEdgeTreatment } from "@/lib/edgeTreatmentHistory";
 import { describe, expect, it } from "vitest";
+import * as THREE from "three";
 import type { WorkplaneShape } from "@/types/layerling";
 import {
   canonicalizeShape,
@@ -11,6 +12,7 @@ import {
   mirroredAxisCount,
   mirrorSign,
   normalizeDegrees,
+  shapeLocalOffset,
   proportionalResizeScale,
   preservesEdgeTreatmentSize,
   resizedImportedCoordinates,
@@ -641,3 +643,16 @@ describe("workplane shape helpers", () => {
   });
 });
 
+
+describe("shapeLocalOffset", () => {
+  it("turns a move in the shape's own frame into one on the plate, as three.js turns the shape", () => {
+    expect(shapeLocalOffset({ rotation: 0 }, 10, 0)).toEqual({ x: 10, z: 0 });
+    const quarter = shapeLocalOffset({ rotation: 90 }, 10, 0);
+    expect(quarter.x).toBeCloseTo(0, 9);
+    expect(quarter.z).toBeCloseTo(-10, 9);
+    const turned = new THREE.Vector3(3, 0, -4).applyEuler(new THREE.Euler(THREE.MathUtils.degToRad(0), THREE.MathUtils.degToRad(37), 0, "XYZ"));
+    const offset = shapeLocalOffset({ rotation: 37 }, 3, -4);
+    expect(offset.x).toBeCloseTo(turned.x, 9);
+    expect(offset.z).toBeCloseTo(turned.z, 9);
+  });
+});

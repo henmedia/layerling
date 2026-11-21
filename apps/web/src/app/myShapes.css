@@ -192,8 +192,13 @@
   transition: opacity 120ms ease;
 }
 
+/* :has() stands in a rule of its own: Firefox before 121 (the last on Windows 7 is 115) drops a whole list with it, and the
+   buttons stayed hidden (#1761). */
 .my-shape-tile:hover .my-shape-tile-actions,
-.my-shape-tile:focus-within .my-shape-tile-actions,
+.my-shape-tile:focus-within .my-shape-tile-actions {
+  opacity: 1;
+}
+
 .my-shape-tile-actions:has(.danger) {
   opacity: 1;
 }
@@ -365,7 +370,10 @@
 }
 
 .my-shapes-folder-header:hover .my-shapes-folder-actions,
-.my-shapes-folder-header:focus-within .my-shapes-folder-actions,
+.my-shapes-folder-header:focus-within .my-shapes-folder-actions {
+  opacity: 1;
+}
+
 .my-shapes-folder-actions:has(.danger) {
   opacity: 1;
 }

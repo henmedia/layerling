@@ -852,14 +852,18 @@ export function paintedExportFaceColors(mesh: MeshData, shape: WorkplaneShape | 
   const middle = new THREE.Vector3();
   const other = new THREE.Triangle();
   const otherNormal = new THREE.Vector3();
+  // Corners reused for every face (Triangle.set copies them): a large painted body made three new vectors per face twice over.
+  const cornerA = new THREE.Vector3();
+  const cornerB = new THREE.Vector3();
+  const cornerC = new THREE.Vector3();
   const colors = mesh.faces.map(([a, b, c]) => {
-    triangle.set(new THREE.Vector3(...mesh.vertices[a]), new THREE.Vector3(...mesh.vertices[b]), new THREE.Vector3(...mesh.vertices[c]));
+    triangle.set(cornerA.fromArray(mesh.vertices[a]), cornerB.fromArray(mesh.vertices[b]), cornerC.fromArray(mesh.vertices[c]));
     triangle.getMidpoint(middle);
     triangle.getNormal(normal);
     const hit = bvh.closestPointToPoint(middle, undefined, 0, PAINT_TRANSFER_REACH);
     if (!hit || hit.faceIndex === undefined) return shape.color;
     const [i, j, k] = painted.mesh.faces[hit.faceIndex];
-    other.set(new THREE.Vector3(...painted.mesh.vertices[i]), new THREE.Vector3(...painted.mesh.vertices[j]), new THREE.Vector3(...painted.mesh.vertices[k])).getNormal(otherNormal);
+    other.set(cornerA.fromArray(painted.mesh.vertices[i]), cornerB.fromArray(painted.mesh.vertices[j]), cornerC.fromArray(painted.mesh.vertices[k])).getNormal(otherNormal);
     return otherNormal.dot(normal) > 0.9 ? painted.faceColors[hit.faceIndex] : shape.color;
   });
   geometry.dispose();

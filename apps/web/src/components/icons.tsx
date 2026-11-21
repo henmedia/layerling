@@ -1,4 +1,4 @@
-import { PrinterCheck, SearchCheck } from "lucide-react";
+import { Layers3, PrinterCheck, SearchCheck } from "lucide-react";
 import type { CSSProperties, SVGProps } from "react";
 
 type IconProps = SVGProps<SVGSVGElement>;
@@ -129,6 +129,11 @@ export function ToolbarPrintCheckIcon({ className, ...props }: IconProps) {
   return <PrinterCheck className={["toolbar-vector-art-icon", className].filter(Boolean).join(" ")} {...props} />;
 }
 
+/** The print analysis (Druckanalyse): layers stacked, as the slicer lays them down; the same class for the dimming. */
+export function ToolbarLayerCheckIcon({ className, ...props }: IconProps) {
+  return <Layers3 className={["toolbar-vector-art-icon", className].filter(Boolean).join(" ")} {...props} />;
+}
+
 export function ToolbarAlignIcon(props: IconProps) {
   return <ToolbarSpriteIcon rect={{ x: 97.3, y: 46.7, width: 29.1, height: 32.5 }} {...props} />;
 }
@@ -170,6 +175,7 @@ export {
   ToolbarRotationPivotIcon,
   ToolbarPatternIcon,
   ToolbarHolePatternIcon,
+  ToolbarThreadInsertIcon,
   ToolbarFaceToolIcon,
   ToolbarSupportRibIcon,
   ToolbarStencilBridgeIcon,
@@ -177,6 +183,7 @@ export {
   ToolbarMiddleLineIcon,
   ToolbarLayFlatIcon,
   ToolbarLidIcon,
+  ToolbarMoldIcon,
   ToolbarCableChannelIcon,
   ToolbarMateFacesIcon,
   ToolbarNoteIcon,

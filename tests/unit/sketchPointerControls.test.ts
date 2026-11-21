@@ -1,7 +1,18 @@
 import { describe, expect, it } from "vitest";
-import { isChainDrawingTool, isSketchPanGesture, rightClickEndsChain, sketchPinchZoomFactor, SKETCH_MANUAL_MAX_ZOOM, SKETCH_MAX_ZOOM, sketchWheelZoomFactor, zoomSketchViewAt } from "@/lib/sketchPointerControls";
+import { isChainDrawingTool, isSketchPanGesture, rightClickEndsChain, sketchPinchZoomFactor, SKETCH_MANUAL_MAX_ZOOM, SKETCH_MAX_ZOOM, sketchWheelZoomFactor, toolSwitchKeepsChain, zoomSketchViewAt } from "@/lib/sketchPointerControls";
 
 describe("sketch pointer controls", () => {
+  it("goes on with the chain when switching between straight line, curve and smooth line, and ends it otherwise (#1725)", () => {
+    expect(toolSwitchKeepsChain("line", "smooth")).toBe(true);
+    expect(toolSwitchKeepsChain("smooth", "line")).toBe(true);
+    expect(toolSwitchKeepsChain("line", "bezier")).toBe(true);
+    expect(toolSwitchKeepsChain("bezier", "smooth")).toBe(true);
+    expect(toolSwitchKeepsChain("line", "line")).toBe(false);
+    expect(toolSwitchKeepsChain("line", "select")).toBe(false);
+    expect(toolSwitchKeepsChain("smooth", "rectangle")).toBe(false);
+    expect(toolSwitchKeepsChain("select", "line")).toBe(false);
+  });
+
   it("lets a pinch gesture of Safari zoom the plate with the fingers, at the speed of the setting (#439 forum)", () => {
     expect(sketchPinchZoomFactor(2, 0.95, 0.95)).toBeCloseTo(2);
     expect(sketchPinchZoomFactor(0.5, 0.95, 0.95)).toBeCloseTo(0.5);
