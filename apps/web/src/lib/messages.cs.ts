@@ -5925,6 +5925,8 @@ export const MESSAGES_CS: Record<MessageKey, string> = {
   "status.shellRoundingSkipped": "Zaoblení hran se nepodařilo znovu položit na nové stěny a bylo vynecháno.",
   "shell.gridMagnets": "Otvory pro magnety",
   "shell.gridMagnetsHint": "Čtyři otvory 6,5 × 2,4 mm pod každou jamkou, tam kde sedí magnety nádoby (13 mm od středu pole), pro magnety 6 × 2 mm. Dno bude 8,6 mm silné, aby pod otvory zůstalo 1,2 mm.",
+  "shell.gridScrews": "Otvory pro šrouby",
+  "shell.gridScrewsHint": "Zahloubený otvor středem každé jamky, aby šla krabice přišroubovat do zásuvky nebo na desku: široký 4,5 mm, pro 4mm šroub se zápustnou hlavou, která leží v rovině se dnem jamky, takže nádoba v ní dál stojí. Dno bude 8,6 mm silné, jako s otvory pro magnety.",
   "editor.tool.layerCheck": "Analýza tisku",
   "layerCheck.title": "Analýza tisku",
   "layerCheck.subtitle": "Všechny vrstvy zkontrolované najednou, se zobrazením vrstev",

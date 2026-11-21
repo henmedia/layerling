@@ -5902,6 +5902,8 @@ export const MESSAGES_IT: Partial<Record<MessageKey, string>> = {
   "status.shellRoundingSkipped": "L'arrotondamento degli spigoli non si è potuto rifare sulle nuove pareti ed è stato tralasciato.",
   "shell.gridMagnets": "Fori per magneti",
   "shell.gridMagnetsHint": "Quattro fori da 6,5 × 2,4 mm sotto ogni alloggiamento, dove stanno i magneti di un contenitore (a 13 mm dal centro della cella), per magneti 6 × 2 mm. Il fondo diventa spesso 8,6 mm, così sotto i fori restano 1,2 mm.",
+  "shell.gridScrews": "Fori per viti",
+  "shell.gridScrewsHint": "Un foro svasato al centro di ogni alloggiamento, per avvitare la scatola in un cassetto o su una tavola: largo 4,5 mm, per una vite a testa svasata da 4 mm la cui testa resta a filo del fondo dell'alloggiamento, così un contenitore continua a starci. Il fondo diventa spesso 8,6 mm, come con i fori per magneti.",
   "editor.tool.layerCheck": "Analisi di stampa",
   "layerCheck.title": "Analisi di stampa",
   "layerCheck.subtitle": "Tutti gli strati controllati in una volta, con la vista degli strati",

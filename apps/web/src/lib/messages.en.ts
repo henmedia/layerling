@@ -5926,6 +5926,8 @@ export const MESSAGES_EN = {
   "status.shellRoundingSkipped": "The rounding of the edges could not be laid again on the new walls and was left out.",
   "shell.gridMagnets": "Magnet holes",
   "shell.gridMagnetsHint": "Four holes 6.5 × 2.4 mm under each socket, where a bin's own magnets sit (13 mm from the middle of the cell), for 6 × 2 mm magnets. The floor becomes 8.6 mm thick, so 1.2 mm stays under the holes.",
+  "shell.gridScrews": "Screw holes",
+  "shell.gridScrewsHint": "A countersunk hole through the middle of each socket, to screw the box down in a drawer or onto a board: 4.5 mm wide, for a 4 mm countersunk screw whose head lies level with the socket's bottom, so a bin still stands in it. The floor becomes 8.6 mm thick, as with magnet holes.",
   "editor.tool.layerCheck": "Print analysis",
   "layerCheck.title": "Print analysis",
   "layerCheck.subtitle": "Every layer checked in one go, with the layer view",

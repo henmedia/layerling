@@ -5927,6 +5927,8 @@ export const MESSAGES_ES: Partial<Record<MessageKey, string>> = {
   "status.shellRoundingSkipped": "El redondeo de los bordes no pudo volver a hacerse en las paredes nuevas y se omitió.",
   "shell.gridMagnets": "Agujeros para imanes",
   "shell.gridMagnetsHint": "Cuatro agujeros de 6,5 × 2,4 mm bajo cada hueco, donde van los imanes de una caja (a 13 mm del centro de la celda), para imanes de 6 × 2 mm. El fondo pasa a 8,6 mm para que queden 1,2 mm bajo los agujeros.",
+  "shell.gridScrews": "Agujeros para tornillos",
+  "shell.gridScrewsHint": "Un agujero avellanado por el centro de cada hueco, para atornillar la caja en un cajón o sobre un tablero: de 4,5 mm de ancho, para un tornillo de cabeza avellanada de 4 mm cuya cabeza queda a ras del fondo del hueco, así que una caja sigue asentando en él. El fondo pasa a 8,6 mm, como con los agujeros para imanes.",
   "editor.tool.layerCheck": "Análisis de impresión",
   "layerCheck.title": "Análisis de impresión",
   "layerCheck.subtitle": "Todas las capas comprobadas de una vez, con la vista de capas",

@@ -3687,6 +3687,8 @@ export const MESSAGES_TR: Partial<Record<MessageKey, string>> = {
   "status.shellRoundingSkipped": "Kenarların yuvarlatması yeni duvarlara yeniden uygulanamadı ve atlandı.",
   "shell.gridMagnets": "Mıknatıs delikleri",
   "shell.gridMagnetsHint": "Her yuvanın altında, bir kutunun mıknatıslarının durduğu yerde (hücre ortasından 13 mm) 6,5 × 2,4 mm dört delik, 6 × 2 mm mıknatıslar için. Taban 8,6 mm kalınlığa çıkar, deliklerin altında 1,2 mm kalır.",
+  "shell.gridScrews": "Vida delikleri",
+  "shell.gridScrewsHint": "Kutuyu bir çekmeceye veya bir tahtaya vidalamak için her yuvanın ortasından geçen havşalı bir delik: 4,5 mm genişliğinde, 4 mm havşa başlı vida için; vidanın başı yuvanın tabanıyla aynı hizada kalır, böylece kutu yuvaya yine oturur. Taban, mıknatıs deliklerinde olduğu gibi 8,6 mm kalınlığa çıkar.",
   "editor.tool.layerCheck": "Baskı analizi",
   "layerCheck.title": "Baskı analizi",
   "layerCheck.subtitle": "Tüm katmanlar tek seferde kontrol edilir, katman görünümüyle",

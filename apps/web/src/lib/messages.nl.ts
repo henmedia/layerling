@@ -5926,6 +5926,8 @@ export const MESSAGES_NL: Record<MessageKey, string> = {
   "status.shellRoundingSkipped": "De afronding van de randen kon niet opnieuw op de nieuwe wanden worden gelegd en is weggelaten.",
   "shell.gridMagnets": "Magneetgaten",
   "shell.gridMagnetsHint": "Vier gaten van 6,5 × 2,4 mm onder elke kom, waar de magneten van een bak zitten (13 mm van het midden van het vak), voor magneten van 6 × 2 mm. De bodem wordt 8,6 mm dik, zodat er 1,2 mm onder de gaten blijft.",
+  "shell.gridScrews": "Schroefgaten",
+  "shell.gridScrewsHint": "Een verzonken gat door het midden van elke kom, om de doos in een lade of op een plank vast te schroeven: 4,5 mm breed, voor een verzonken schroef van 4 mm waarvan de kop gelijk ligt met de bodem van de kom, zodat een bak er nog steeds in staat. De bodem wordt 8,6 mm dik, net als met magneetgaten.",
   "editor.tool.layerCheck": "Printanalyse",
   "layerCheck.title": "Printanalyse",
   "layerCheck.subtitle": "Elke laag in één keer gecontroleerd, met laagweergave",

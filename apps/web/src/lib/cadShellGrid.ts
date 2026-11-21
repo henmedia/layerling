@@ -10,6 +10,9 @@ import {
   GRID_TOO_LOW_MESSAGE,
   SHELL_DIVIDER_THICKNESS,
   shellGridFloor,
+  SHELL_GRID_SCREW_DIAMETER,
+  SHELL_GRID_SCREW_HEAD,
+  SHELL_GRID_SCREW_SINK,
   SHELL_GRID_MIN_DEPTH,
   SHELL_GRID_PLAY,
   type ShellDividers,
@@ -170,6 +173,19 @@ export function shellGridSolid(kernel: OcctKernel, original: ShapeHandle, shelle
         cad.transform(cad.makeCylinder(GRIDFINITY_MAGNET_DIAMETER / 2, GRIDFINITY_MAGNET_DEPTH + PAST), Z_TO_Y_UP),
         cell.x + sx * GRIDFINITY_MAGNET_OFFSET, socketBottom - GRIDFINITY_MAGNET_DEPTH, cell.z + sz * GRIDFINITY_MAGNET_OFFSET,
       ))));
+      body = cad.cutAll(body, holes);
+    }
+    if (grid.screws) {
+      // A screw hole through the middle of each socket, from under the box up into the socket, and the 45 degree sink
+      // for the head on top of it, which ends level with the socket's bottom.
+      const reach = socketBottom - bottom + 1;
+      const holes = cells.flatMap((cell) => [
+        cad.translate(cad.transform(cad.makeCylinder(SHELL_GRID_SCREW_DIAMETER / 2, reach + PAST), Z_TO_Y_UP), cell.x, bottom - 1, cell.z),
+        cad.translate(
+          cad.transform(cad.makeCone(SHELL_GRID_SCREW_DIAMETER / 2, SHELL_GRID_SCREW_HEAD / 2 + PAST, SHELL_GRID_SCREW_SINK + PAST), Z_TO_Y_UP),
+          cell.x, socketBottom - SHELL_GRID_SCREW_SINK, cell.z,
+        ),
+      ]);
       body = cad.cutAll(body, holes);
     }
     body = cad.simplify(body);

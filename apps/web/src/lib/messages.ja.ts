@@ -5858,6 +5858,8 @@ export const MESSAGES_JA: Partial<Record<MessageKey, string>> = {
   "status.shellRoundingSkipped": "角の丸めは新しい壁に付け直せなかったため、省きました。",
   "shell.gridMagnets": "マグネット穴",
   "shell.gridMagnetsHint": "各ソケットの下に 6.5 × 2.4 mm の穴を 4 つ。ビンのマグネットがある位置 (セル中心から 13 mm) で、6 × 2 mm のマグネット用です。穴の下に 1.2 mm 残るよう、床は 8.6 mm の厚さになります。",
+  "shell.gridScrews": "ねじ穴",
+  "shell.gridScrewsHint": "各ソケットの中央を貫通する皿穴です。箱を引き出しや板にねじ止めできます。幅 4.5 mm で 4 mm の皿ねじ用。頭はソケットの底と同じ高さに収まるので、ビンはそのまま置けます。床はマグネット穴のときと同じく 8.6 mm の厚さになります。",
   "editor.tool.layerCheck": "プリント分析",
   "layerCheck.title": "プリント分析",
   "layerCheck.subtitle": "すべてのレイヤーを一度にチェック、レイヤービュー付き",

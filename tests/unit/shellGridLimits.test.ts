@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { MAX_SHELL_DIVIDERS, MAX_SHELL_GRID_CELLS, normalizeShellDividers, normalizeShellGrid, shellGridEstimate } from "@/lib/shellGridLimits";
+import { MAX_SHELL_DIVIDERS, MAX_SHELL_GRID_CELLS, normalizeShellDividers, normalizeShellGrid, SHELL_GRID_FLOOR, shellGridEstimate, shellGridFloor } from "@/lib/shellGridLimits";
 import { clampShellStackHeight } from "@/lib/shellStackLimits";
 
 describe("what the Gridfinity floor, the dividers and the stacking of a hollow box offer", () => {
@@ -9,6 +9,12 @@ describe("what the Gridfinity floor, the dividers and the stacking of a hollow b
     expect(normalizeShellGrid({ cells: "x" })).toBeNull();
     expect(normalizeShellGrid(null)).toBeNull();
     expect(normalizeShellGrid({ cells: 1e6, fit: "yes" })).toEqual({ cells: MAX_SHELL_GRID_CELLS, fit: false });
+    // Magnet and screw holes are kept only when switched on, and either makes the floor 2.4 mm thicker, once.
+    expect(normalizeShellGrid({ cells: 2, magnets: true, screws: true })).toEqual({ cells: 2, fit: false, magnets: true, screws: true });
+    expect(normalizeShellGrid({ cells: 2, screws: "yes" })).toEqual({ cells: 2, fit: false });
+    expect(shellGridFloor({ screws: true })).toBeCloseTo(SHELL_GRID_FLOOR + 2.4, 6);
+    expect(shellGridFloor({ magnets: true, screws: true })).toBeCloseTo(SHELL_GRID_FLOOR + 2.4, 6);
+    expect(shellGridFloor(null)).toBeCloseTo(SHELL_GRID_FLOOR, 6);
   });
 
   it("keeps the dividers to whole numbers up to the most", () => {

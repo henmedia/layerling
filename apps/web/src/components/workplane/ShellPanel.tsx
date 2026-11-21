@@ -42,6 +42,8 @@ export function ShellPanel({
   gridFit,
   gridMagnets,
   onGridMagnetsChange,
+  gridScrews,
+  onGridScrewsChange,
   gridMax,
   gridColumns,
   gridRows,
@@ -90,6 +92,8 @@ export function ShellPanel({
   /** Magnet holes under the sockets (Discussion #1693). */
   gridMagnets: boolean;
   onGridMagnetsChange: (magnets: boolean) => void;
+  gridScrews: boolean;
+  onGridScrewsChange: (screws: boolean) => void;
   gridMax: number;
   /** The cells across and along the inside holds, or as asked for: the body is made exactly that large when it is applied. */
   gridColumns: number;
@@ -266,6 +270,11 @@ export function ShellPanel({
               <span>{t("shell.gridMagnets")}</span>
             </label>
             {gridMagnets ? <span className="shell-openings-summary">{t("shell.gridMagnetsHint")}</span> : null}
+            <label className="edge-modifier-field offset-copy">
+              <input type="checkbox" checked={gridScrews} disabled={busy} data-testid="shell-grid-screws" onChange={(event) => onGridScrewsChange(event.target.checked)} />
+              <span>{t("shell.gridScrews")}</span>
+            </label>
+            {gridScrews ? <span className="shell-openings-summary">{t("shell.gridScrewsHint")}</span> : null}
           </>) : null}
           <span className="shell-openings-summary">{gridMax < 1 ? t("shell.gridNoCell") : t("shell.gridHint")}</span>
         </div>
