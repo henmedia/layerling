@@ -45,12 +45,16 @@ export function SnapGridMenuItems({ units, customGrids, snap, objectSnap, onObje
  * The snap menu at the pointer, opened by a short click with the middle mouse button on the view (Discussion #1439),
  * as AutoCAD opens its object snap menu there. It opens when the button is let go and stays open until a step is
  * picked, a press lands outside it, Escape is pressed, the wheel turns outside it or the window changes. It stays
- * inside the window, and the step in use has the focus, so the arrow keys and Enter can pick another.
+ * inside the window, and the step in use has the focus, so the arrow keys and Enter can pick another. Its title row
+ * has the same millimetre/inch switch as the snap field (Discussion #1933): switching keeps the menu open with the
+ * steps of the other unit.
  */
-export function SnapGridPointerMenu({ x, y, onSnapChange, onClose, ...menu }: SnapGridMenuProps & {
+export function SnapGridPointerMenu({ x, y, onSnapChange, onClose, onUnitsChange, ...menu }: SnapGridMenuProps & {
   x: number;
   y: number;
   onSnapChange: Dispatch<SetStateAction<GridSize>>;
+  /** Switches between millimetres and inches, as the switch beside the snap field does (#422). */
+  onUnitsChange?: (units: string) => void;
   onClose: () => void;
 }) {
   const menuRef = useRef<HTMLDivElement>(null);
@@ -66,7 +70,7 @@ export function SnapGridPointerMenu({ x, y, onSnapChange, onClose, ...menu }: Sn
       top: Math.max(margin, Math.min(y, window.innerHeight - height - margin)),
     });
     (element.querySelector<HTMLButtonElement>("button.selected") ?? element.querySelector<HTMLButtonElement>("button"))?.focus({ preventScroll: true });
-  }, [x, y]);
+  }, [x, y, menu.units]);
 
   useEffect(() => {
     const outside = (event: Event) => !menuRef.current?.contains(event.target as Node);
@@ -116,6 +120,12 @@ export function SnapGridPointerMenu({ x, y, onSnapChange, onClose, ...menu }: Sn
     >
       <div className="snap-menu-title">
         <span>{t("inspector.snapGrid")}</span>
+        {onUnitsChange ? (
+          <span className="snap-units" role="group" aria-label={t("inspector.unitsSwitch")} title={t("inspector.unitsSwitch")}>
+            <button type="button" data-help={t("inspector.unitsSwitch")} aria-pressed={menu.units === "Metric (Default)"} onClick={() => onUnitsChange("Metric (Default)")}>mm</button>
+            <button type="button" data-help={t("inspector.unitsSwitch")} aria-pressed={menu.units === "Imperial"} onClick={() => onUnitsChange("Imperial")}>in</button>
+          </span>
+        ) : null}
         <GuideHelpLink section="gridAndSnapping" iconSize={14} />
       </div>
       <SnapGridMenuItems

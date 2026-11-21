@@ -167,6 +167,18 @@ describe("the snap menu at the pointer (Discussion #1439)", () => {
     expect(context.closed()).toBe(2);
   });
 
+  it("switches between millimetres and inches in its title row and stays open (Discussion #1933)", () => {
+    expect(open().menu.querySelector(".snap-units")).toBeNull();
+    const switched: string[] = [];
+    const context = open({ onUnitsChange: (units: string) => switched.push(units) });
+    const buttons = [...context.menu.querySelectorAll<HTMLButtonElement>(".snap-menu-title .snap-units button")];
+    expect(buttons.map((button) => [button.textContent, button.getAttribute("aria-pressed")])).toEqual([["mm", "true"], ["in", "false"]]);
+    act(() => buttons[1].click());
+    expect(switched).toEqual(["Imperial"]);
+    expect(context.closed()).toBe(0);
+    expect(context.picked).toEqual([]);
+  });
+
   it("offers snapping to other shapes in the 3D editor only", () => {
     expect(open().menu.querySelector(".snap-object-toggle")).toBeNull();
     const context = open({ objectSnap: true, onObjectSnapChange: () => {} });

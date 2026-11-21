@@ -9852,6 +9852,7 @@ export function WorkplaneViewport({
           onSnapChange={chooseSnapGrid}
           objectSnap={workspace.objectSnap}
           onObjectSnapChange={changeObjectSnap}
+          onUnitsChange={changeUnits}
           onClose={closeSnapMenuAt}
         />
       ) : null}
