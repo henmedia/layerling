@@ -4769,6 +4769,8 @@ export const MESSAGES_DE: Record<MessageKey, string> = {
   "import.dropZone": "STL-, OBJ- (mit .mtl oder als ZIP), 3MF-, STEP-, SVG-, DXF-, PNG- oder JPG-Dateien hier ablegen",
   "import.keepSvgPage": "SVG: Lage auf der Zeichenfläche beibehalten",
   "import.keepSvgPageHint": "Zeichnungen, die auf einer Seite entstanden sind, etwa die Ebenen eines Dokuments als einzelne Dateien, liegen nach dem Import nacheinander wieder deckungsgleich. Ohne das wird jede Zeichnung auf sich selbst zentriert.",
+  "import.keepMeshPosition": "STL, OBJ, 3MF: Lage aus der Datei beibehalten",
+  "import.keepMeshPositionHint": "Teile eines Modells, die als einzelne Dateien exportiert wurden, etwa Körper, Arme und Beine einer Miniatur, passen nach dem Import nacheinander wieder zusammen: Jedes steht dort, wo seine Datei es hinsetzt, der Ursprung der Datei in der Mitte der Platte. Ohne das kommt jede Datei für sich nahe der Plattenmitte an.",
   "import.svgWidth": "SVG und Bild: Breite in mm",
   "import.svgWidthHint": "Tippe die Breite ein, die eine Zeichnung oder ein Bild beim Import haben soll; leer lässt die eigene Größe. Gilt nur für den nächsten Import.",
   "import.svgWidthPlaceholder": "eigene Größe",

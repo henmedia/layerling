@@ -122,6 +122,8 @@ export const MESSAGES_CS: Record<MessageKey, string> = {
   "thread.axialClearanceHint": "Dodatečná vůle podél osy závitu v mm, nad rámec radiální vůle. Každý zub vnitřního závitu se o tuto hodnotu ztenčí, průměr se nezmění. Pro lehký chod bez bočního viklání zkuste radiální vůli přibližně 0,2 až 0,3 mm a zde 0,2 mm. Při 0 vytváří vůli pouze radiální rozšíření, které uvolní boky závitu přibližně o polovinu méně.",
   "import.keepSvgPage": "SVG: zachovat polohu na stránce výkresu",
   "import.keepSvgPageHint": "Výkresy vytvořené na společné stránce, například vrstvy jednoho dokumentu vyexportované do samostatných souborů, se po postupném importu znovu správně překryjí. Bez této volby se každý výkres vystředí samostatně.",
+  "import.keepMeshPosition": "STL, OBJ, 3MF: zachovat polohu ze souboru",
+  "import.keepMeshPositionHint": "Díly jednoho modelu vyexportované do samostatných souborů, například tělo, ruce a nohy figurky, do sebe po postupném importu znovu zapadnou: každý stojí tam, kam ho umístil jeho soubor, s počátkem souboru uprostřed podložky. Bez této volby se každý soubor vloží samostatně poblíž středu podložky.",
   "import.svgWidth": "SVG a obrázek: šířka v mm",
   "import.svgWidthHint": "Zadejte šířku, kterou má výkres nebo obrázek mít při importu; prázdné ponechá vlastní velikost. Platí jen pro další import.",
   "import.svgWidthPlaceholder": "vlastní velikost",

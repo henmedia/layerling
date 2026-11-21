@@ -14428,7 +14428,7 @@ export function LayerlingEditor({
   }, [beginSketch, sectionSketchAt, sketchActive]);
 
   // Der Dateiimport steht weiter unten; die MCP-Aktion nimmt denselben Weg.
-  const importFilesRef = useRef<((files: File[], fileHandle?: LylFileHandle, options?: { keepSvgPage?: boolean; svgWidth?: number | null }) => Promise<{ importedIds: string[]; failures: Array<{ fileName: string; reason: string }>; warning?: string }>) | null>(null);
+  const importFilesRef = useRef<((files: File[], fileHandle?: LylFileHandle, options?: { keepSvgPage?: boolean; svgWidth?: number | null; keepMeshPosition?: boolean }) => Promise<{ importedIds: string[]; failures: Array<{ fileName: string; reason: string }>; warning?: string }>) | null>(null);
 
   const {
     customShapeEntries, customShapeFolders, serverAvailable: customShapesServerAvailable, myShapesFileInputRef,
@@ -18034,7 +18034,7 @@ export function LayerlingEditor({
         const files = [new File([bytes as BlobPart], fileName)];
         if (typeof params.mtl === "string") files.push(new File([params.mtl], fileName.replace(/\.[^.]+$/, "") + ".mtl"));
         // Through MCP the answer does not depend on a setting of the browser: only a wish keeps the page.
-        const result = await importer(files, undefined, { keepSvgPage: params.keepPagePosition === true, svgWidth: typeof params.svgWidth === "number" && params.svgWidth > 0 ? params.svgWidth : null });
+        const result = await importer(files, undefined, { keepSvgPage: params.keepPagePosition === true, svgWidth: typeof params.svgWidth === "number" && params.svgWidth > 0 ? params.svgWidth : null, keepMeshPosition: params.keepFilePosition === true });
         if (!result.importedIds.length) throw new Error(result.failures.map((failure) => `${failure.fileName}: ${failure.reason}`).join("; ") || "Nothing was imported");
         const imported = currentShapes().filter((shape) => result.importedIds.includes(shape.id));
         return {
@@ -19616,7 +19616,7 @@ export function LayerlingEditor({
     if (await insertDesignFile(file)) setTopPanel(null);
   }, [insertDesignFile]);
 
-  const importFiles = useCallback(async (selected: File[], fileHandle?: LylFileHandle, importOptions?: { keepSvgPage?: boolean; svgWidth?: number | null }): Promise<{ importedIds: string[]; failures: Array<{ fileName: string; reason: string }>; warning?: string }> => {
+  const importFiles = useCallback(async (selected: File[], fileHandle?: LylFileHandle, importOptions?: { keepSvgPage?: boolean; svgWidth?: number | null; keepMeshPosition?: boolean }): Promise<{ importedIds: string[]; failures: Array<{ fileName: string; reason: string }>; warning?: string }> => {
     const none = { importedIds: [] as string[], failures: [] as Array<{ fileName: string; reason: string }> };
     if (!selected.length) return none;
     const projectFiles = selected.filter((file) => /\.(lyl|skf)$/i.test(file.name));
@@ -19640,6 +19640,8 @@ export function LayerlingEditor({
     const result = await importModelFiles(selected, {
       cancelled: () => projectInfoRef.current.projectId !== sourceProjectId,
       svgKeepPagePosition: importOptions?.keepSvgPage,
+      // Through the AI bridge it is asked for in the call; in the editor the import window's setting counts (Issue #1939).
+      keepMeshPosition: importOptions?.keepMeshPosition,
       // Typed in the import window it counts once; through the AI bridge it is asked for in the call.
       svgWidth: importOptions?.svgWidth !== undefined ? importOptions.svgWidth : takeImportSvgWidth(),
       // An SVG comes in as a sketch body, its fill changeable afterwards (#197); should the

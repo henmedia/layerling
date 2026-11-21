@@ -4771,6 +4771,8 @@ export const MESSAGES_EN = {
   "import.dropZoneHint": "or click to choose from your computer",
   "import.keepSvgPage": "SVG: keep the place on the drawing page",
   "import.keepSvgPageHint": "Drawings made on one page, such as the layers of one document exported as separate files, line up again when you import them one after the other. Without it every drawing is centred on itself.",
+  "import.keepMeshPosition": "STL, OBJ, 3MF: keep the position from the file",
+  "import.keepMeshPositionHint": "Parts of one model exported as separate files, such as the body, arms and legs of a miniature, fit together again when you import them one after the other: each stands where its file puts it, the file's origin in the middle of the plate. Without it every file comes in on its own near the middle of the plate.",
   "import.svgWidth": "SVG and picture: width in mm",
   "import.svgWidthHint": "Type the width a drawing or picture should have when it comes in; empty keeps its own size. It counts for the next import only.",
   "import.svgWidthPlaceholder": "own size",

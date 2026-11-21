@@ -4564,6 +4564,8 @@ export const MESSAGES_DA: Partial<Record<MessageKey, string>> = {
   "import.dropZoneHint": "eller klik for at vælge fra din computer",
   "import.keepSvgPage": "SVG: bevar pladsen på tegnesiden",
   "import.keepSvgPageHint": "Tegninger lavet på én side, såsom lagene i ét dokument eksporteret som separate filer, passer sammen igen når du importerer dem én efter én. Uden centreres hver tegning på sig selv.",
+  "import.keepMeshPosition": "STL, OBJ, 3MF: bevar placeringen fra filen",
+  "import.keepMeshPositionHint": "Dele af én model eksporteret som separate filer, såsom krop, arme og ben på en miniature, passer sammen igen, når du importerer dem én efter én: hver står, hvor dens fil placerer den, med filens origo midt på pladen. Uden kommer hver fil ind for sig selv nær pladens midte.",
   "import.svgWidth": "SVG og billede: bredde i mm",
   "import.svgWidthHint": "Skriv den bredde en tegning eller et billede skal have ved import; tomt beholder dens egen størrelse. Gælder kun for næste import.",
   "import.svgWidthPlaceholder": "egen størrelse",

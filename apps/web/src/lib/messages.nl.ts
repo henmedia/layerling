@@ -4771,6 +4771,8 @@ export const MESSAGES_NL: Record<MessageKey, string> = {
   "import.dropZoneHint": "of klik om van je computer te kiezen",
   "import.keepSvgPage": "SVG: plek op de tekenpagina behouden",
   "import.keepSvgPageHint": "Tekeningen die op één pagina zijn gemaakt, zoals de lagen van één document die als losse bestanden zijn geëxporteerd, sluiten weer op elkaar aan als je ze na elkaar importeert. Zonder deze optie wordt elke tekening op zichzelf gecentreerd.",
+  "import.keepMeshPosition": "STL, OBJ, 3MF: positie uit het bestand behouden",
+  "import.keepMeshPositionHint": "Onderdelen van één model die als losse bestanden zijn geëxporteerd, zoals romp, armen en benen van een miniatuur, passen weer op elkaar als je ze na elkaar importeert: elk staat waar zijn bestand het plaatst, met de oorsprong van het bestand in het midden van de plaat. Zonder deze optie komt elk bestand los bij het midden van de plaat.",
   "import.svgWidth": "SVG en afbeelding: breedte in mm",
   "import.svgWidthHint": "Typ de breedte die een tekening of afbeelding bij het importeren moet krijgen; leeg laat de eigen grootte. Geldt alleen voor de volgende import.",
   "import.svgWidthPlaceholder": "eigen grootte",

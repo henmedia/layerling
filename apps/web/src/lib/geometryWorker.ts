@@ -16,7 +16,7 @@ import type { ModelSplitPlane } from "@/lib/modelSplit";
 import type { SplitConnectorOptions } from "@/lib/splitConnectors";
 import { simplifyTrianglePositions, type SimplifiedMesh, type SimplifyOptions } from "@/lib/meshSimplify";
 import { importedShapesFromObj, type ObjImportResult } from "@/lib/objImport";
-import { importedShapeFromStl, type StlReadOptions } from "@/lib/stlImport";
+import { importedShapeFromStl, type MeshPlacement, type StlReadOptions } from "@/lib/stlImport";
 import { importedShapesFromStepFile, type StepFileImport } from "@/lib/stepFileImport";
 import type { StepExportResult } from "@/lib/stepExport";
 import type { WorkplaneShape } from "@/types/layerling";
@@ -416,8 +416,8 @@ export async function exportShapesToStepOffThread(shapes: readonly WorkplaneShap
 }
 
 /** An OBJ file read off the page (importedShapesFromObj in lib/objImport.ts). */
-export function importedShapesFromObjOffThread(fileName: string, text: string, mtlSources: readonly string[]): Promise<ObjImportResult> {
-  return runGeometryTask("obj", { fileName, text, mtlSources: [...mtlSources] }, async () => importedShapesFromObj(fileName, text, mtlSources), () => {
+export function importedShapesFromObjOffThread(fileName: string, text: string, mtlSources: readonly string[], placement: MeshPlacement = {}): Promise<ObjImportResult> {
+  return runGeometryTask("obj", { fileName, text, mtlSources: [...mtlSources], placement }, async () => importedShapesFromObj(fileName, text, mtlSources, placement), () => {
     throw new Error(t("status.computeTimedOut"));
   }, undefined, true);
 }

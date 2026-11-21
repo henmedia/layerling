@@ -5649,6 +5649,8 @@ export const MESSAGES_SL: Partial<Record<MessageKey, string>> = {
   "status.sketchLinesStraightened": "Poravnanih črt: {count}",
   "import.keepSvgPage": "SVG: ohrani mesto na risalni strani",
   "import.keepSvgPageHint": "Risbe, narejene na eni strani, na primer plasti enega dokumenta, izvožene kot ločene datoteke, se spet poravnajo, ko jih uvoziš ena za drugo. Brez tega je vsaka risba centrirana sama na sebi.",
+  "import.keepMeshPosition": "STL, OBJ, 3MF: ohrani položaj iz datoteke",
+  "import.keepMeshPositionHint": "Deli enega modela, izvoženi kot ločene datoteke, na primer telo, roke in noge figurice, se spet ujemajo, ko jih uvoziš enega za drugim: vsak stoji tam, kamor ga postavi njegova datoteka, izhodišče datoteke pa je na sredini plošče. Brez tega pride vsaka datoteka zase blizu sredine plošče.",
   "import.svgWidth": "SVG in slika: širina v mm",
   "import.svgWidthHint": "Vpiši širino, ki naj jo ima risba ali slika ob uvozu; prazno pusti lastno velikost. Velja samo za naslednji uvoz.",
   "import.svgWidthPlaceholder": "lastna velikost",

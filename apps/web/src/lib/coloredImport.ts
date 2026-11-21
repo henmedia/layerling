@@ -55,19 +55,22 @@ export function placeColoredParts(
   baseName: string,
   parts: readonly ColoredPart[],
   build: (positions: number[], normals: number[] | undefined) => WorkplaneShape,
+  placement: { keepPosition?: boolean } = {},
 ): WorkplaneShape[] {
   const file = bounds(parts.flatMap((part) => part.positions));
   let fallback = 0;
   return parts.map((part, index): WorkplaneShape => {
     const shape = build(part.positions, part.normals);
     const own = bounds(part.positions);
+    // Kept where the file puts it (Issue #1939), every part stands at its own place in the file's frame.
+    const position = placement.keepPosition
+      ? { x: own.centerX, z: own.centerZ, elevation: own.minY }
+      : { x: shape.x + own.centerX - file.centerX, z: shape.z + own.centerZ - file.centerZ, elevation: own.minY - file.minY };
     return {
       ...shape,
       name: `${baseName} ${part.label || index + 1}`,
       color: part.color ?? FALLBACK_PART_COLORS[fallback++ % FALLBACK_PART_COLORS.length],
-      x: shape.x + own.centerX - file.centerX,
-      z: shape.z + own.centerZ - file.centerZ,
-      elevation: own.minY - file.minY,
+      ...position,
       importedMesh: { ...shape.importedMesh!, sourceFormat: "json" },
     };
   });

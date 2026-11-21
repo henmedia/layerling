@@ -14,7 +14,7 @@ import { ServerDesignPicker } from "./ServerDesignPicker";
 import { DEFAULT_INFILL_PERCENT, DEFAULT_PRINT_MATERIAL, DEFAULT_WALLS, INFILL_CHOICES, PRINT_MATERIALS, WALL_CHOICES, normalizeInfillPercent, normalizePrintMaterial, normalizeWalls, printEstimateWithInfill, type PrintMaterial } from "@/lib/printEstimate";
 import { type EditorHistoryExportLimit } from "@/lib/editorHistory";
 import { projectExportFileName, suggestedExportName, stlNameAsksForNewFile } from "@/lib/exportNames";
-import { readImportSvgWidth, readKeepSvgPage, setImportSvgWidth, storeKeepSvgPage } from "@/lib/importPreferences";
+import { readImportSvgWidth, readKeepMeshPosition, readKeepSvgPage, setImportSvgWidth, storeKeepMeshPosition, storeKeepSvgPage } from "@/lib/importPreferences";
 import { lylFileAccessSupported } from "@/lib/lylFileAccess";
 import { hasOwnShapeName } from "@/lib/shapeCatalog";
 import type { ProjectAttachment, WorkplaneShape } from "@/types/layerling";
@@ -119,6 +119,8 @@ export function TopActionPanel({
   const [serverDesignsOpen, setServerDesignsOpen] = useState(false);
   const [keepSvgPage, setKeepSvgPage] = useState(false);
   useEffect(() => setKeepSvgPage(readKeepSvgPage()), []);
+  const [keepMeshPosition, setKeepMeshPosition] = useState(false);
+  useEffect(() => setKeepMeshPosition(readKeepMeshPosition()), []);
   // The width a picture or an SVG comes in at; empty keeps its own size, and it counts for the next import only.
   const [svgWidthText, setSvgWidthText] = useState(() => { const width = readImportSvgWidth(); return width ? String(width) : ""; });
   const [exportFormat, setExportFormat] = useState<ExportFormat>("stl");
@@ -410,6 +412,18 @@ export function TopActionPanel({
               }}
             />
             <span>{t("import.keepSvgPage")}</span>
+          </label>
+          <label className="import-option" title={t("import.keepMeshPositionHint")}>
+            <input
+              type="checkbox"
+              checked={keepMeshPosition}
+              data-testid="import-keep-mesh-position"
+              onChange={(event) => {
+                setKeepMeshPosition(event.currentTarget.checked);
+                storeKeepMeshPosition(event.currentTarget.checked);
+              }}
+            />
+            <span>{t("import.keepMeshPosition")}</span>
           </label>
           <label className="import-option import-width-option" title={t("import.svgWidthHint")}>
             <span>{t("import.svgWidth")}</span>

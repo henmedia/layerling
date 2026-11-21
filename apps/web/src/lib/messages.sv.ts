@@ -4842,6 +4842,8 @@ export const MESSAGES_SV: Partial<Record<MessageKey, string>> = {
   "import.dropZoneHint": "eller klicka för att välja från datorn",
   "import.keepSvgPage": "SVG: behåll platsen på ritningssidan",
   "import.keepSvgPageHint": "Ritningar gjorda på samma sida, som lagren i ett dokument exporterade som separata filer, passar ihop igen när du importerar dem en efter en. Utan detta centreras varje ritning kring sig själv.",
+  "import.keepMeshPosition": "STL, OBJ, 3MF: behåll positionen från filen",
+  "import.keepMeshPositionHint": "Delar av en modell som exporterats som separata filer, som kropp, armar och ben på en miniatyr, passar ihop igen när du importerar dem en efter en: varje del står där dess fil placerar den, med filens origo mitt på plattan. Utan detta hamnar varje fil för sig nära plattans mitt.",
   "import.svgWidth": "SVG och bild: bredd i mm",
   "import.svgWidthHint": "Ange vilken bredd en ritning eller bild ska ha när den kommer in; tomt behåller dess egen storlek. Gäller bara för nästa import.",
   "import.svgWidthPlaceholder": "egen storlek",

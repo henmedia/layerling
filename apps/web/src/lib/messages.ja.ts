@@ -4721,6 +4721,8 @@ export const MESSAGES_JA: Partial<Record<MessageKey, string>> = {
   "import.dropZoneHint": "またはクリックしてコンピューターから選ぶ",
   "import.keepSvgPage": "SVG: 図面ページ上の位置を保つ",
   "import.keepSvgPageHint": "1つのページで作った図面（1つの文書のレイヤーを別々のファイルにエクスポートしたものなど）は、順に読みこむと再び位置が合います。オフにすると各図面はそれ自体の中心に配置されます。",
+  "import.keepMeshPosition": "STL・OBJ・3MF: ファイルの位置を保つ",
+  "import.keepMeshPositionHint": "1つのモデルを別々のファイルにエクスポートした部品（ミニチュアの胴体・腕・脚など）を順に読みこむと、再びぴったり組み合わさります。各部品はファイルが示す位置に置かれ、ファイルの原点がプレートの中央になります。オフにすると、各ファイルはそれぞれプレート中央付近に置かれます。",
   "import.svgWidth": "SVGと写真・絵: 幅 (mm)",
   "import.svgWidthHint": "図や写真・絵を読みこむときの幅を入力します。空にすると、もとの大きさのままです。次の読みこみだけに使われます。",
   "import.svgWidthPlaceholder": "もとの大きさ",

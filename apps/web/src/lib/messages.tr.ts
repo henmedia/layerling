@@ -2752,6 +2752,8 @@ export const MESSAGES_TR: Partial<Record<MessageKey, string>> = {
   "import.dropZoneHint": "veya bilgisayarından seçmek için tıkla",
   "import.keepSvgPage": "SVG: çizim sayfasındaki yeri koru",
   "import.keepSvgPageHint": "Tek bir sayfada yapılmış çizimler, örneğin ayrı dosyalar olarak dışa aktarılmış tek bir belgenin katmanları, art arda içe aktarıldığında yeniden hizalanır. Bu olmadan her çizim kendi merkezine göre ortalanır.",
+  "import.keepMeshPosition": "STL, OBJ, 3MF: dosyadaki konumu koru",
+  "import.keepMeshPositionHint": "Bir modelin ayrı dosyalar olarak dışa aktarılmış parçaları, örneğin bir minyatürün gövdesi, kolları ve bacakları, art arda içe aktarıldığında yeniden birbirine oturur: her parça dosyasının koyduğu yerde durur, dosyanın orijini tablanın ortasındadır. Bu olmadan her dosya tek başına tablanın ortasına yakın gelir.",
   "import.svgWidth": "SVG ve resim: mm cinsinden genişlik",
   "import.svgWidthHint": "Bir çizimin veya resmin gelirken sahip olacağı genişliği yaz; boş bırakmak kendi boyutunu korur. Sadece bir sonraki içe aktarım için geçerlidir.",
   "import.svgWidthPlaceholder": "kendi boyutu",

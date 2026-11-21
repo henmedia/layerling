@@ -4689,6 +4689,8 @@ export const MESSAGES_ZH_CN: Partial<Record<MessageKey, string>> = {
   "import.dropZoneHint": "或点击从电脑中选择",
   "import.keepSvgPage": "SVG：保留在图纸页面上的位置",
   "import.keepSvgPageHint": "在同一页面上绘制的图形（例如将同一文档的多个图层分别导出为文件）逐个导入后会重新对齐。不勾选时，每张图都以自身为中心。",
+  "import.keepMeshPosition": "STL、OBJ、3MF：保留文件中的位置",
+  "import.keepMeshPositionHint": "同一模型分别导出为多个文件的部件（例如微缩模型的身体、手臂和腿）逐个导入后会重新拼合：每个部件都位于其文件指定的位置，文件原点位于打印板中央。不勾选时，每个文件各自放在打印板中央附近。",
   "import.svgWidth": "SVG 和图片：宽度（mm）",
   "import.svgWidthHint": "输入图形或图片导入时应有的宽度；留空则保持原有尺寸。仅对下一次导入生效。",
   "import.svgWidthPlaceholder": "原尺寸",

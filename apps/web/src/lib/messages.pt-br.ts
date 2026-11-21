@@ -4575,6 +4575,8 @@ export const MESSAGES_PT_BR: Partial<Record<MessageKey, string>> = {
   "import.dropZoneHint": "ou clique para escolher do seu computador",
   "import.keepSvgPage": "SVG: manter o lugar na página do desenho",
   "import.keepSvgPageHint": "Desenhos feitos numa mesma página, como as camadas de um documento exportadas como arquivos separados, se alinham de novo quando você os importa um depois do outro. Sem isso, cada desenho é centralizado em si mesmo.",
+  "import.keepMeshPosition": "STL, OBJ, 3MF: manter a posição do arquivo",
+  "import.keepMeshPositionHint": "Partes de um modelo exportadas como arquivos separados, como o corpo, os braços e as pernas de uma miniatura, voltam a se encaixar quando você as importa uma depois da outra: cada uma fica onde o seu arquivo a coloca, com a origem do arquivo no centro da mesa. Sem isso, cada arquivo entra sozinho perto do centro da mesa.",
   "import.svgWidth": "SVG e imagem: largura em mm",
   "import.svgWidthHint": "Digite a largura que um desenho ou imagem deve ter ao entrar; vazio mantém o tamanho próprio. Vale só para a próxima importação.",
   "import.svgWidthPlaceholder": "tamanho próprio",

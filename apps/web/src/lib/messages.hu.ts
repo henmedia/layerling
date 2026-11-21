@@ -3648,6 +3648,8 @@ export const MESSAGES_HU: Partial<Record<MessageKey, string>> = {
   "import.dropZoneHint": "vagy kattints a számítógépről való kiválasztáshoz",
   "import.keepSvgPage": "SVG: a hely megtartása a rajzlapon",
   "import.keepSvgPageHint": "Az egy lapon készült rajzok, például egy dokumentum külön fájlokba exportált rétegei, egymás után importálva újra egymáshoz illeszkednek. Enélkül minden rajz önmagára van középre igazítva.",
+  "import.keepMeshPosition": "STL, OBJ, 3MF: a fájlban lévő helyzet megtartása",
+  "import.keepMeshPositionHint": "Egy modell külön fájlokba exportált részei, például egy miniatúra teste, karjai és lábai, egymás után importálva újra összeillenek: mindegyik ott áll, ahová a fájlja teszi, a fájl origója a tálca közepén. Enélkül minden fájl külön-külön a tálca közepe közelébe kerül.",
   "import.svgWidth": "SVG és kép: szélesség mm-ben",
   "import.svgWidthHint": "Írd be, milyen széles legyen a rajz vagy a kép importáláskor; üresen marad az eredeti méret. Csak a következő importra érvényes.",
   "import.svgWidthPlaceholder": "eredeti méret",

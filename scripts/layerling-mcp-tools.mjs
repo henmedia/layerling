@@ -563,6 +563,7 @@ export const tools = [
         mtl: { type: "string", description: "The .mtl material file of an OBJ, as text, for its colours." },
         svgWidth: { type: "number", description: "SVG and pictures (PNG, JPG): bring the drawing in at this width in millimetres, scaled from its own size, as the width field of the import window does. Left out, it comes in at its own size." },
         keepPagePosition: { type: "boolean", description: "SVG only: keep the drawing's place on its page (its viewBox) instead of centring it on itself, so that several files exported from one page - the layers of one document - line up when imported one after the other. Default false; a drawing that states no page is centred anyway." },
+        keepFilePosition: { type: "boolean", description: "STL, OBJ and 3MF: put the body where its file puts it - the file's origin in the middle of the plate, its X, Y and Z kept - instead of at the usual spot near the middle, so that the parts of one model exported as separate files (a miniature's body, arms and legs) fit together when imported one after the other. A part whose file puts it below the origin stands below the plate. Default false." },
       },
     },
   },
