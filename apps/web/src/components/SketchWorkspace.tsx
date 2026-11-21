@@ -40,7 +40,6 @@ import { DEFAULT_SNAP_GRID, DEFAULT_WORKPLANE_WORKSPACE, keyboardNudgeCoarseFact
 import type { GridSize, SketchImage, SketchNote, SketchOperation, SketchPoint, SketchProfile, SketchSegment, SketchStroke, SketchStrokeAlign, SketchStrokeCap, SketchStrokeJoin, SweepAnchor, WorkplaneShape, WorkplaneWorkspaceSettings } from "@/types/layerling";
 import { resizePointerOnGrid } from "@/lib/sketchFrameResize";
 import { viewArrowStep } from "@/lib/viewArrowKeys";
-import { createKeyRepeatBatch } from "@/lib/keyRepeatBatch";
 import { flushSync } from "react-dom";
 import { resizeSketchPoints, resizeSketchPointsToSize, type ResizeHandle, type SelectionBounds } from "@/lib/sketchSelectionResize";
 import { alignSketchSelection, canAlignSketchSelection, type SketchAlignMode } from "@/lib/sketchAlign";
@@ -190,6 +189,20 @@ type PointerAction =
   | { kind: "rotate-selection"; pointerId: number; pivot: { x: number; z: number }; start: { x: number; z: number }; current: { x: number; z: number }; startPoints: SketchPoint[]; snap: boolean; ring: number; corner: number }
   | { kind: "rotate-image"; pointerId: number; imageId: string; startAngle: number; current: { x: number; z: number }; start: SketchImage; snap: boolean; ring: number; corner: number }
   | { kind: "crop-image"; pointerId: number; imageId: string; handle: ResizeHandle; current: { x: number; z: number }; start: SketchImage };
+
+/**
+ * A run of arrow presses (#1930): the sketch draws the move itself, as it does for a drag, and hands
+ * it to the editor once, when the keys rest. Handing over every press made the editor draw everything
+ * again each time, which a single press felt as a delay and a held key as jumps.
+ */
+type SketchKeyNudge =
+  | { kind: "points"; startPoints: SketchPoint[]; dx: number; dz: number }
+  | { kind: "handle"; pointId: string; handle: "in" | "out"; at: { x: number; z: number } }
+  | { kind: "image"; imageId: string; at: { x: number; z: number } };
+
+/** How long the keys rest before the moves of a run go to the editor; a quick tap after a tap still joins the run. */
+const KEY_NUDGE_HANDOVER_MS = 300;
+const ARROW_KEYS = new Set(["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown"]);
 
 /** The step a turn of a selection or a picture snaps to, by where the pointer is against the ring it shows. */
 /**
@@ -990,7 +1003,36 @@ export function SketchWorkspace({
       // The switch still holds for this session.
     }
   };
+  // The arrow keys' run, drawn here until it goes to the editor (#1930). The ref is what the key
+  // handler reads, so presses between two drawings add up.
+  const [keyNudge, setKeyNudgeState] = useState<SketchKeyNudge | null>(null);
+  const keyNudgeRef = useRef<SketchKeyNudge | null>(null);
+  const setKeyNudge = (next: SketchKeyNudge | null) => {
+    keyNudgeRef.current = next;
+    setKeyNudgeState(next);
+  };
   const previewProfile = useMemo(() => {
+    if (keyNudge?.kind === "points") {
+      const movedById = new Map(translateSketchPoints(keyNudge.startPoints, keyNudge.dx, keyNudge.dz).map((point) => [point.id, point]));
+      return { ...profile, points: profile.points.map((point) => movedById.get(point.id) ?? point) };
+    }
+    if (keyNudge?.kind === "handle") {
+      return {
+        ...profile,
+        points: profile.points.map((point) => {
+          if (point.id !== keyNudge.pointId) return point;
+          const next = { ...point, handleIn: point.handleIn ? { ...point.handleIn } : undefined, handleOut: point.handleOut ? { ...point.handleOut } : undefined };
+          if (keyNudge.handle === "in") next.handleIn = { ...keyNudge.at };
+          else next.handleOut = { ...keyNudge.at };
+          if (point.mode === "smooth") {
+            const opposite = { x: point.x * 2 - keyNudge.at.x, z: point.z * 2 - keyNudge.at.z };
+            if (keyNudge.handle === "in") next.handleOut = opposite;
+            else next.handleIn = opposite;
+          }
+          return next;
+        }),
+      };
+    }
     if (pointerAction?.kind === "move-selection") {
       const moved = translateSketchPoints(
         pointerAction.startPoints,
@@ -1043,11 +1085,14 @@ export function SketchWorkspace({
       };
     }
     return profile;
-  }, [pointerAction, profile]);
+  }, [keyNudge, pointerAction, profile]);
   // A drag that would move a locked outline (#653) shows nothing moving: the editor refuses it on release.
   const displayProfile = useMemo(() => previewProfile !== profile && changesLockedOutline(profile, previewProfile) ? profile : previewProfile, [previewProfile, profile]);
   const displayImages = useMemo(() => {
     const images = profile.images ?? [];
+    if (keyNudge?.kind === "image") {
+      return images.map((image) => image.id === keyNudge.imageId ? { ...image, x: keyNudge.at.x, z: keyNudge.at.z } : image);
+    }
     if (pointerAction?.kind === "move-image") {
       const deltaX = pointerAction.current.x - pointerAction.origin.x;
       const deltaZ = pointerAction.current.z - pointerAction.origin.z;
@@ -1063,7 +1108,7 @@ export function SketchWorkspace({
       return images.map((image) => image.id === pointerAction.imageId ? { ...image, ...cropImage(pointerAction.start, pointerAction.handle, pointerAction.current) } : image);
     }
     return images;
-  }, [pointerAction, profile.images]);
+  }, [keyNudge, pointerAction, profile.images]);
   const pointById = useMemo(() => new Map(displayProfile.points.map((point) => [point.id, point])), [displayProfile.points]);
   const paths = useMemo(() => orderedPaths(displayProfile), [displayProfile]);
   const closedEdges = useMemo(() => pathEdges(paths.filter((path) => path.closed)), [paths]);
@@ -1949,62 +1994,131 @@ export function SketchWorkspace({
   /**
    * Moves what the arrow keys move by dx/dz: a clicked handle first (#347), else an image, else the
    * selected points. Says whether there is anything to move; with `apply` false it only says so.
-   * Rebuilt with every drawing, so a move the key-repeat batch hands over a frame later starts from
-   * the sketch as it is then.
+   * The move is drawn here and added to the run of presses (#1930); `handOverKeyNudge` gives the
+   * run to the editor once the keys rest.
    */
   const nudgeSketchSelection = (dx: number, dz: number, apply = true): boolean => {
+    const run = keyNudgeRef.current;
     // A clicked handle goes first (#347): it moves alone, a smooth point's other handle with it.
     const handlePoint = selectedHandle ? profile.points.find((point) => point.id === selectedHandle.pointId) : undefined;
     const handleAt = handlePoint && selectedHandle ? (selectedHandle.handle === "in" ? handlePoint.handleIn : handlePoint.handleOut) : undefined;
     if (selectedHandle && handleAt) {
       if (!apply) return true;
-      const moved = { x: clamp(handleAt.x + dx, -reach.halfWidth, reach.halfWidth), z: clamp(handleAt.z + dz, -reach.halfDepth, reach.halfDepth) };
-      if (moved.x === handleAt.x && moved.z === handleAt.z) return true;
-      // A run of arrow presses is one step of the history, as for points (#370).
-      onMoveHandle(selectedHandle.pointId, selectedHandle.handle, moved, `handle:${selectedHandle.pointId}:${selectedHandle.handle}`);
+      const from = run?.kind === "handle" && run.pointId === selectedHandle.pointId && run.handle === selectedHandle.handle ? run.at : handleAt;
+      const moved = { x: clamp(from.x + dx, -reach.halfWidth, reach.halfWidth), z: clamp(from.z + dz, -reach.halfDepth, reach.halfDepth) };
+      if (moved.x === from.x && moved.z === from.z) return true;
+      setKeyNudge({ kind: "handle", pointId: selectedHandle.pointId, handle: selectedHandle.handle, at: moved });
       return true;
     }
     if (selected?.kind === "image") {
       const image = (profile.images ?? []).find((entry) => entry.id === selected.id);
       if (!image || image.locked) return false;
       if (!apply) return true;
-      onUpdateImage(image.id, {
-        x: clamp(image.x + dx, -reach.halfWidth, reach.halfWidth),
-        z: clamp(image.z + dz, -reach.halfDepth, reach.halfDepth),
-      }, t("sketch.imageMoved"), `image:${image.id}`);
+      const from = run?.kind === "image" && run.imageId === image.id ? run.at : { x: image.x, z: image.z };
+      setKeyNudge({
+        kind: "image",
+        imageId: image.id,
+        at: { x: clamp(from.x + dx, -reach.halfWidth, reach.halfWidth), z: clamp(from.z + dz, -reach.halfDepth, reach.halfDepth) },
+      });
       return true;
     }
     const moving = new Set(sketchSelectionMovePointIds(profile, selected));
     const startPoints = profile.points.filter((point) => moving.has(point.id));
     if (!startPoints.length) return false;
     if (!apply) return true;
-    const allowed = clampNudge(startPoints, dx, dz, reach.halfWidth, reach.halfDepth);
-    if (allowed.dx === 0 && allowed.dz === 0) return true;
-    // A run of arrow presses is one step of the history (#370).
-    onTransformPoints(translateSketchPoints(startPoints, allowed.dx, allowed.dz), t("sketch.shapeMoved"), `points:${startPoints.map((point) => point.id).join(",")}`);
+    // The run keeps the points as they were when it began and adds the steps up, held at the edge of the plate.
+    const sameRun = run?.kind === "points"
+      && run.startPoints.length === startPoints.length
+      && run.startPoints.every((point) => moving.has(point.id));
+    const base = sameRun ? run : { kind: "points" as const, startPoints, dx: 0, dz: 0 };
+    const allowed = clampNudge(base.startPoints, base.dx + dx, base.dz + dz, reach.halfWidth, reach.halfDepth);
+    if (allowed.dx === base.dx && allowed.dz === base.dz) return true;
+    setKeyNudge({ kind: "points", startPoints: base.startPoints, dx: allowed.dx, dz: allowed.dz });
     return true;
   };
-  const nudgeSketchSelectionRef = useRef(nudgeSketchSelection);
-  nudgeSketchSelectionRef.current = nudgeSketchSelection;
-  // Repeats of a held arrow key move once a frame, by their sum, as in the 3D view (#1042): each move
-  // draws the whole editor again, and with a repeat each the sketch fell behind a held key and went on
-  // after it was let go (#1930). Drawn at once, so the next frame's move starts from this one.
-  const keyRepeatBatchRef = useRef<ReturnType<typeof createKeyRepeatBatch> | null>(null);
-  keyRepeatBatchRef.current ??= createKeyRepeatBatch(({ x, z }) => {
-    flushSync(() => {
-      nudgeSketchSelectionRef.current(x, z);
-    });
-  });
+
+  /** Gives the arrow keys' run to the editor as one move; a run of runs is still one step of the history (#370). */
+  const handOverKeyNudge = () => {
+    const run = keyNudgeRef.current;
+    if (!run) return;
+    keyNudgeRef.current = null;
+    if (run.kind === "points") {
+      if (run.dx !== 0 || run.dz !== 0) {
+        onTransformPoints(translateSketchPoints(run.startPoints, run.dx, run.dz), t("sketch.shapeMoved"), `points:${run.startPoints.map((point) => point.id).join(",")}`);
+      }
+    } else if (run.kind === "handle") {
+      onMoveHandle(run.pointId, run.handle, run.at, `handle:${run.pointId}:${run.handle}`);
+    } else {
+      onUpdateImage(run.imageId, { x: run.at.x, z: run.at.z }, t("sketch.imageMoved"), `image:${run.imageId}`);
+    }
+    // In the same drawing as the editor's new sketch, so nothing jumps back for a moment.
+    setKeyNudgeState(null);
+  };
+  const handOverKeyNudgeRef = useRef(handOverKeyNudge);
+  handOverKeyNudgeRef.current = handOverKeyNudge;
+  const keyNudgeTimerRef = useRef<number | null>(null);
+  const arrowKeysDownRef = useRef(new Set<string>());
   useEffect(() => {
-    const flush = () => keyRepeatBatchRef.current?.flush();
-    window.addEventListener("keyup", flush);
-    window.addEventListener("blur", flush);
+    const stopTimer = () => {
+      if (keyNudgeTimerRef.current !== null) window.clearTimeout(keyNudgeTimerRef.current);
+      keyNudgeTimerRef.current = null;
+    };
+    // At once and drawn before anything else reads the sketch: another key (Undo, Delete, Escape), a
+    // click, or the window losing focus.
+    const handOverNow = () => {
+      stopTimer();
+      if (!keyNudgeRef.current) return;
+      flushSync(() => handOverKeyNudgeRef.current());
+    };
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (ARROW_KEYS.has(event.key)) {
+        arrowKeysDownRef.current.add(event.key);
+        stopTimer();
+        return;
+      }
+      // Shift and Alt only change the step of the next press.
+      if (event.key === "Shift" || event.key === "Alt") return;
+      if (!keyNudgeRef.current) return;
+      handOverNow();
+      // The handover drew the editor again and its key handlers were set anew, and a key already on its
+      // way does not reach those: Delete or Escape right after the arrows would be lost. It is sent once
+      // more, where it was going. Typing into a field goes on as it is.
+      const target = event.target;
+      if (target instanceof HTMLElement && (target.isContentEditable || ["INPUT", "TEXTAREA", "SELECT"].includes(target.tagName))) return;
+      event.stopImmediatePropagation();
+      const again = new KeyboardEvent("keydown", event);
+      (target ?? window).dispatchEvent(again);
+      if (again.defaultPrevented) event.preventDefault();
+    };
+    const onKeyUp = (event: KeyboardEvent) => {
+      if (!ARROW_KEYS.has(event.key)) return;
+      arrowKeysDownRef.current.delete(event.key);
+      if (arrowKeysDownRef.current.size || !keyNudgeRef.current) return;
+      stopTimer();
+      keyNudgeTimerRef.current = window.setTimeout(handOverNow, KEY_NUDGE_HANDOVER_MS);
+    };
+    const onBlur = () => {
+      arrowKeysDownRef.current.clear();
+      handOverNow();
+    };
+    window.addEventListener("keydown", onKeyDown, true);
+    window.addEventListener("keyup", onKeyUp, true);
+    window.addEventListener("pointerdown", handOverNow, true);
+    window.addEventListener("blur", onBlur);
     return () => {
-      window.removeEventListener("keyup", flush);
-      window.removeEventListener("blur", flush);
-      keyRepeatBatchRef.current?.cancel();
+      window.removeEventListener("keydown", onKeyDown, true);
+      window.removeEventListener("keyup", onKeyUp, true);
+      window.removeEventListener("pointerdown", handOverNow, true);
+      window.removeEventListener("blur", onBlur);
+      stopTimer();
+      // Leaving the sketch with a run still drawn here keeps it.
+      handOverKeyNudgeRef.current();
     };
   }, []);
+  // Another selection or tool ends the run first.
+  useEffect(() => {
+    handOverKeyNudgeRef.current();
+  }, [selected, selectedHandle, tool]);
 
   useEffect(() => {
     const syncShiftConstrain = (shiftKey: boolean) => {
@@ -2109,8 +2223,8 @@ export function SketchWorkspace({
         const dz = event.key === "ArrowUp" ? -step : event.key === "ArrowDown" ? step : 0;
         if (!nudgeSketchSelection(dx, dz, false)) return;
         event.preventDefault();
-        // A fresh press moves at once; the repeats of a held key are added up and moved once a frame (#1930).
-        keyRepeatBatchRef.current?.add({ x: dx, z: dz, rise: 0 }, event.repeat);
+        // Drawn here at once; the editor gets the whole run when the keys rest (#1930).
+        nudgeSketchSelection(dx, dz);
       }
     };
     const handleKeyUp = (event: KeyboardEvent) => {

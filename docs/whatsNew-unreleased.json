@@ -14,6 +14,16 @@
   },
   {
     "title": {
+      "de": "Skizze: Pfeiltasten reagieren sofort",
+      "en": "Sketch: the arrow keys respond at once"
+    },
+    "body": {
+      "de": "In der Skizze zeigte ein Druck auf eine Pfeiltaste die Verschiebung erst nach einem kurzen Moment, und mit gehaltener Taste sprang die Auswahl in großen Sätzen. Jetzt bewegt sie sich sofort und gleichmäßig. Ein ganzer Lauf mit den Pfeiltasten bleibt ein Schritt beim Rückgängigmachen.",
+      "en": "In the sketch a press of an arrow key showed the move only after a short moment, and with the key held the selection jumped in big steps. Now it moves at once and evenly. A whole run with the arrow keys is still one step of Undo."
+    }
+  },
+  {
+    "title": {
       "de": "Teile landen an ihrem Platz aus der Datei",
       "en": "Parts land where their file puts them"
     },

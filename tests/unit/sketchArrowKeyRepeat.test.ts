@@ -1,7 +1,6 @@
 import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
-import { createKeyRepeatBatch, type KeyNudge } from "@/lib/keyRepeatBatch";
 import { sketchSelectionMovePointIds } from "@/lib/sketchSelection";
 
 const workspace = readFileSync(fileURLToPath(new URL("../../apps/web/src/components/SketchWorkspace.tsx", import.meta.url)), "utf8");
@@ -13,46 +12,54 @@ function arrowBranch() {
   return workspace.slice(start, workspace.indexOf("const handleKeyUp", start));
 }
 
-describe("a held arrow key in the sketch keeps up (#1930)", () => {
-  it("adds the repeats of a held key up and moves once a frame, as the 3D view does (#1042)", () => {
+/** The source between a start text and the next end text. */
+function between(startText: string, endText: string) {
+  const start = workspace.indexOf(startText);
+  expect(start).toBeGreaterThan(-1);
+  return workspace.slice(start, workspace.indexOf(endText, start + startText.length));
+}
+
+describe("the arrow keys in the sketch move at once and hand the run over when they rest (#1930)", () => {
+  it("draws each press in the sketch and gives the editor nothing per press", () => {
     const branch = arrowBranch();
-    expect(branch).toContain("keyRepeatBatchRef.current?.add({ x: dx, z: dz, rise: 0 }, event.repeat)");
-    // No move of its own per key event any more.
+    expect(branch).toContain("nudgeSketchSelection(dx, dz);");
     expect(branch).not.toContain("onTransformPoints(");
     expect(branch).not.toContain("onMoveHandle(");
     expect(branch).not.toContain("onUpdateImage(");
+    const nudge = between("const nudgeSketchSelection = ", "const handOverKeyNudge = ");
+    expect(nudge).toContain("setKeyNudge(");
+    expect(nudge).not.toContain("onTransformPoints(");
+    expect(nudge).not.toContain("onMoveHandle(");
+    expect(nudge).not.toContain("onUpdateImage(");
   });
 
-  it("moves from the sketch as it is when the frame comes, drawn at once", () => {
-    expect(workspace).toMatch(/createKeyRepeatBatch\(\(\{ x, z \}\) => \{\s*flushSync\(\(\) => \{\s*nudgeSketchSelectionRef\.current\(x, z\);/);
-    expect(workspace).toContain("nudgeSketchSelectionRef.current = nudgeSketchSelection;");
+  it("shows the run as the drawn sketch: points and handles in the outline, a picture among the pictures", () => {
+    expect(between("const previewProfile = useMemo(", "}, [keyNudge, pointerAction, profile]);")).toMatch(/keyNudge\?\.kind === "points"[\s\S]*keyNudge\?\.kind === "handle"/);
+    expect(between("const displayImages = useMemo(", "}, [keyNudge, pointerAction, profile.images]);")).toContain('keyNudge?.kind === "image"');
   });
 
-  it("hands over what is left when the key comes up or the window loses focus", () => {
-    const start = workspace.indexOf("const flush = () => keyRepeatBatchRef.current?.flush();");
-    expect(start).toBeGreaterThan(-1);
-    const effect = workspace.slice(start, workspace.indexOf("}, []);", start));
-    expect(effect).toContain('window.addEventListener("keyup", flush)');
-    expect(effect).toContain('window.addEventListener("blur", flush)');
-    expect(effect).toContain("keyRepeatBatchRef.current?.cancel()");
+  it("hands the run over as one move with its key, so a run is still one step of Undo (#370)", () => {
+    const handOver = between("const handOverKeyNudge = ", "const handOverKeyNudgeRef");
+    expect(handOver).toContain("onTransformPoints(translateSketchPoints(run.startPoints, run.dx, run.dz), t(\"sketch.shapeMoved\"), `points:");
+    expect(handOver).toContain("onMoveHandle(run.pointId, run.handle, run.at, `handle:");
+    expect(handOver).toContain("`image:${run.imageId}`");
+    // The editor's new sketch and the end of the run are one drawing.
+    expect(handOver.indexOf("setKeyNudgeState(null)")).toBeGreaterThan(handOver.indexOf("onUpdateImage("));
   });
 
-  it("turns twenty repeats in one frame into one move by their sum, and a fresh press into one at once", () => {
-    const moves: KeyNudge[] = [];
-    const frames: (() => void)[] = [];
-    const batch = createKeyRepeatBatch((nudge) => moves.push(nudge), {
-      schedule: (run) => frames.push(run),
-      cancel: () => undefined,
-    });
-    batch.add({ x: 1, z: 0, rise: 0 }, false);
-    expect(moves).toEqual([{ x: 1, z: 0, rise: 0 }]);
-    for (let i = 0; i < 20; i += 1) batch.add({ x: 1, z: 0, rise: 0 }, true);
-    expect(moves).toHaveLength(1);
-    frames.shift()?.();
-    expect(moves).toEqual([{ x: 1, z: 0, rise: 0 }, { x: 20, z: 0, rise: 0 }]);
-    batch.add({ x: 1, z: 0, rise: 0 }, true);
-    batch.flush();
-    expect(moves.at(-1)).toEqual({ x: 1, z: 0, rise: 0 });
+  it("hands over when the arrow keys rest, and at once on another key, a click, losing focus or leaving", () => {
+    const effect = between("const stopTimer = () => {", "// Another selection or tool ends the run first.");
+    expect(effect).toContain("window.setTimeout(handOverNow, KEY_NUDGE_HANDOVER_MS)");
+    expect(effect).toContain("flushSync(() => handOverKeyNudgeRef.current())");
+    expect(effect).toContain('if (event.key === "Shift" || event.key === "Alt") return;');
+    // A key that ends the run is not lost: it is sent again once the editor's handlers are set anew.
+    expect(effect).toMatch(/handOverNow\(\);[\s\S]*event\.stopImmediatePropagation\(\);\s*const again = new KeyboardEvent\("keydown", event\);\s*\(target \?\? window\)\.dispatchEvent\(again\);/);
+    expect(effect).toContain('window.addEventListener("keydown", onKeyDown, true)');
+    expect(effect).toContain('window.addEventListener("keyup", onKeyUp, true)');
+    expect(effect).toContain('window.addEventListener("pointerdown", handOverNow, true)');
+    expect(effect).toContain('window.addEventListener("blur", onBlur)');
+    expect(effect).toMatch(/stopTimer\(\);\s*\/\/ Leaving the sketch[^\n]*\n\s*handOverKeyNudgeRef\.current\(\);/);
+    expect(workspace).toMatch(/useEffect\(\(\) => \{\s*handOverKeyNudgeRef\.current\(\);\s*\}, \[selected, selectedHandle, tool\]\);/);
   });
 });
 
