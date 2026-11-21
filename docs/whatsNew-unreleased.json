@@ -413,5 +413,20 @@
     "guide": {
       "chapter": "threads"
     }
+  },
+  {
+    "title": {
+      "de": "Gussform: Einguss und Entlüftungen selbst setzen",
+      "en": "Mold: set the pour opening and the vents yourself",
+      "da": "Støbeform: sæt indløb og luftkanaler selv"
+    },
+    "body": {
+      "de": "Bei der zweiteiligen Gussform kannst du mit „Öffnungen selbst setzen“ bestimmen, wo das Material hineinläuft und die Luft entweicht: Klick aufs Urmodell setzt einen Einguss oder eine Entlüftung, ein Klick auf ihren Stab nimmt sie weg. „Vorschläge übernehmen“ gibt dir die automatischen als Anfang.",
+      "en": "For the two-part mold, Set the openings myself lets you decide where the material runs in and the air escapes: a click on the master sets a sprue or a vent, a click on its post takes it away. Take over the suggested ones gives you the automatic ones as a start.",
+      "da": "Ved den todelte støbeform kan du med Sæt åbningerne selv bestemme, hvor materialet løber ind, og luften slipper ud: et klik på originalen sætter et indløb eller en luftkanal, et klik på dens stav fjerner den igen. De foreslåede åbninger kan du overtage som udgangspunkt."
+    },
+    "guide": {
+      "section": "mold"
+    }
   }
 ]
