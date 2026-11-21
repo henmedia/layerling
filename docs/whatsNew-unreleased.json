@@ -12,21 +12,25 @@
   {
     "title": {
       "de": "3MF und OBJ: kleine Teile einer Gruppe bleiben",
-      "en": "3MF and OBJ: small parts of a group stay"
+      "en": "3MF and OBJ: small parts of a group stay",
+      "da": "3MF og OBJ: små dele af en gruppe bliver med"
     },
     "body": {
       "de": "Bei mehrfarbigen Entwürfen fehlten im 3MF und OBJ weiterhin sehr kleine Teile einer Gruppe, etwa die Zähne und Punkte in einem Logo, während sie in der STL da waren. Jetzt bleiben auch solche Teile in der Datei.",
-      "en": "In designs of several colours, very small parts of a group, such as the teeth and dots of a logo, were still missing from the 3MF and OBJ, while the STL had them. Now such parts stay in the file too."
+      "en": "In designs of several colours, very small parts of a group, such as the teeth and dots of a logo, were still missing from the 3MF and OBJ, while the STL had them. Now such parts stay in the file too.",
+      "da": "I designs med flere farver manglede meget små dele af en gruppe, som tænderne og prikkerne i et logo, stadig i 3MF-filen og OBJ-filen, mens STL-filen havde dem. Nu bliver også sådanne dele i filen."
     }
   },
   {
     "title": {
       "de": "Kein Stocken mehr beim Speichern großer importierter Baugruppen",
-      "en": "No more freezing while large imported assemblies are saved"
+      "en": "No more freezing while large imported assemblies are saved",
+      "da": "Ingen frysning mere, når store importerede samlinger gemmes"
     },
     "body": {
       "de": "In Entwürfen mit einer importierten STEP-Baugruppe, etwa einer Platine im Gehäuse, blieb der Editor nach fast jeder Änderung für mehrere Sekunden stehen, weil das automatische Speichern jedes Mal den ganzen Entwurf neu gepackt hat. Jetzt wird nur noch neu gepackt, was sich geändert hat, und der Editor bleibt währenddessen bedienbar.",
-      "en": "In designs with an imported STEP assembly, a circuit board in an enclosure for example, the editor froze for several seconds after almost every change, because the automatic save packed the whole design again each time. Now only what has changed is packed again, and the editor stays usable meanwhile."
+      "en": "In designs with an imported STEP assembly, a circuit board in an enclosure for example, the editor froze for several seconds after almost every change, because the automatic save packed the whole design again each time. Now only what has changed is packed again, and the editor stays usable meanwhile.",
+      "da": "I designs med en importeret STEP-samling, et printkort i et kabinet for eksempel, frøs editoren i flere sekunder efter næsten hver ændring, fordi den automatiske gemning pakkede hele designet sammen igen hver gang. Nu pakkes kun det, der er ændret, sammen igen, og editoren er brugbar imens."
     },
     "guide": {
       "chapter": "files"
@@ -35,11 +39,13 @@
   {
     "title": {
       "de": "3MF aus dem Scanner: ein Körper statt Tausender",
-      "en": "3MF from a scanner: one body instead of thousands"
+      "en": "3MF from a scanner: one body instead of thousands",
+      "da": "3MF fra en scanner: ét legeme i stedet for tusinder"
     },
     "body": {
       "de": "Eine 3MF aus einem 3D-Scanner trägt an fast jedem Punkt eine eigene Farbe. layerling machte daraus je Farbe einen Körper: aus einem Scan wurden über 42.000 Körper, der Import dauerte Minuten. Eine solche Datei kommt jetzt als ein Körper in einer Farbe herein, mit einem Hinweis, dass der Farbverlauf nicht erhalten bleibt. Dateien mit wenigen Farben werden wie bisher je Farbe ein Körper.",
-      "en": "A 3MF from a 3D scanner carries its own colour at almost every point. layerling made one body per colour: one scan became more than 42,000 bodies, and the import took minutes. Such a file now comes in as one body in a single colour, with a note that the colour gradient is not kept. Files with a few colours still become one body per colour."
+      "en": "A 3MF from a 3D scanner carries its own colour at almost every point. layerling made one body per colour: one scan became more than 42,000 bodies, and the import took minutes. Such a file now comes in as one body in a single colour, with a note that the colour gradient is not kept. Files with a few colours still become one body per colour.",
+      "da": "En 3MF fra en 3D-scanner har sin egen farve næsten ved hvert punkt. layerling laved ét legeme pr. farve: ét scan blev til over 42.000 legemer, og importen tog minutter. Sådan en fil kommer nu ind som ét legeme i én farve, med en note om, at farvegradienten ikke bevares. Filer med få farver bliver stadig ét legeme pr. farve."
     },
     "guide": {
       "chapter": "files"
@@ -48,11 +54,13 @@
   {
     "title": {
       "de": "Skizze auf Platte 2 bearbeiten",
-      "en": "Edit a sketch on plate 2"
+      "en": "Edit a sketch on plate 2",
+      "da": "Redigér en skitse på plade 2"
     },
     "body": {
       "de": "Bei mehreren Druckplatten zeigte „Skizze bearbeiten“ für einen Körper auf einer weiteren Platte die erste Platte, und der Umriss des Körpers lag außerhalb der Zeichenfläche. Die Skizze öffnet sich jetzt auf der Platte, auf der der Körper steht.",
-      "en": "With several build plates, Edit sketch for a body on a further plate showed the first plate, and the body's outline lay outside the sketch area. The sketch now opens on the plate the body stands on."
+      "en": "With several build plates, Edit sketch for a body on a further plate showed the first plate, and the body's outline lay outside the sketch area. The sketch now opens on the plate the body stands on.",
+      "da": "Med flere byggeplader viste \"Redigér skitse\" for en del på en anden plade den første plade, og delens omrids lå uden for skitsefladen. Skitsen åbner nu på den plade, delen står på."
     },
     "guide": {
       "section": "buildPlates"
@@ -61,21 +69,25 @@
   {
     "title": {
       "de": "Fase an einer Gruppe verschließt die Rohrbohrung nicht mehr",
-      "en": "A chamfer on a group no longer closes a tube's bore"
+      "en": "A chamfer on a group no longer closes a tube's bore",
+      "da": "En fase på en gruppe lukker ikke længere et rørs boring"
     },
     "body": {
       "de": "Ein Rohr, Ring oder gebogenes Rohr mit „Bohrung schneidet beim Gruppieren wie ein Loch“ öffnet, womit es gruppiert ist. Eine Fase oder Verrundung an dieser Gruppe hat die Öffnung wieder verschlossen. Jetzt bleibt sie offen.",
-      "en": "A tube, ring or bent tube with \"Bore cuts as a hole when grouped\" opens whatever it is grouped with. A chamfer or fillet on that group closed the opening again. Now it stays open."
+      "en": "A tube, ring or bent tube with \"Bore cuts as a hole when grouped\" opens whatever it is grouped with. A chamfer or fillet on that group closed the opening again. Now it stays open.",
+      "da": "Et rør, en ring eller et bøjet rør med \"Boringen skærer som et hul ved gruppering\" åbner, hvad den er grupperet med. En fase eller en rundning på den gruppe lukkede åbningen igen. Nu står åbningen stadig åben."
     }
   },
   {
     "title": {
       "de": "3D-Maus: Richtungen bleiben nach einem Neustart richtig",
-      "en": "3D mouse: directions stay right after a restart"
+      "en": "3D mouse: directions stay right after a restart",
+      "da": "3D-mus: retningerne bliver rigtige efter en genstart"
     },
     "body": {
       "de": "Nach einem Neustart des Browsers liest layerling eine 3D-Maus als Spielcontroller, bis du wieder auf „3D-Maus verbinden“ klickst. Bei manchen Geräten laufen die Richtungen dabei andersherum, und die angehakten Richtungen passten dann nicht mehr. layerling merkt sie sich jetzt für beide Wege getrennt: Unter Einstellungen, Bedienung, 3D-Maus steht eine Zeile, wenn die Maus gerade als Spielcontroller gelesen wird, und was du dann anhakst, gilt nur dafür. Deine bisherigen Einstellungen bleiben für die verbundene Maus erhalten.",
-      "en": "After the browser is restarted, layerling reads a 3D mouse as a game controller until you click Connect 3D mouse again. On some devices the directions run the other way round there, and the ticked directions no longer fitted. layerling now keeps them apart for the two ways: under Settings, Controls, 3D mouse a line says when the mouse is read as a game controller, and what you tick then holds for that only. Your settings so far stay with the connected mouse."
+      "en": "After the browser is restarted, layerling reads a 3D mouse as a game controller until you click Connect 3D mouse again. On some devices the directions run the other way round there, and the ticked directions no longer fitted. layerling now keeps them apart for the two ways: under Settings, Controls, 3D mouse a line says when the mouse is read as a game controller, and what you tick then holds for that only. Your settings so far stay with the connected mouse.",
+      "da": "Når browseren er genstartet, læser layerling en 3D-mus som en spilcontroller, indtil du klikker på \"Tilslut 3D-mus\" igen. På nogle enheder løber retningerne den anden vej dér, og de afkrydsede retninger passede så ikke mere. layerling holder dem nu adskilt for de to måder: under Indstillinger, Betjening, 3D-mus står der en linje, når musen læses som en spilcontroller, og hvad du så sætter kryds ved gælder kun for det. Dine indstillinger hidtil bliver ved den tilsluttede mus."
     },
     "guide": {
       "section": "settingsView"
@@ -84,21 +96,25 @@
   {
     "title": {
       "de": "Wenn die 3D-Ansicht nicht startet: klare Meldung",
-      "en": "When the 3D view does not start: a clear message"
+      "en": "When the 3D view does not start: a clear message",
+      "da": "Når 3D-visningen ikke starter: en klar besked"
     },
     "body": {
       "de": "Gibt der Browser layerling keinen Zugriff auf die Grafik (WebGL), erschien bisher nur „layerling ist auf einen Fehler gestoßen“. Jetzt sagt das Fenster, was los ist: Die Ursache liegt im Browser oder im Grafiktreiber, deine Entwürfe bleiben erhalten. Darunter steht, was meistens hilft: Browser oder Rechner neu starten, die Grafikbeschleunigung einschalten, Browser und Grafiktreiber aktualisieren oder einen anderen Browser versuchen. Den zuletzt gespeicherten Stand kannst du dort weiter als .lyl sichern.",
-      "en": "When the browser gives layerling no access to the graphics (WebGL), all you saw was \"layerling ran into an error\". The window now says what is going on: the cause lies in the browser or the graphics driver, and your designs are kept. Below that it lists what usually helps: restart the browser or the computer, turn on graphics acceleration, update the browser and the graphics driver, or try another browser. You can still save the last stored state as a .lyl file from there."
+      "en": "When the browser gives layerling no access to the graphics (WebGL), all you saw was \"layerling ran into an error\". The window now says what is going on: the cause lies in the browser or the graphics driver, and your designs are kept. Below that it lists what usually helps: restart the browser or the computer, turn on graphics acceleration, update the browser and the graphics driver, or try another browser. You can still save the last stored state as a .lyl file from there.",
+      "da": "Når browseren ikke giver layerling adgang til grafikken (WebGL), så du kun fik \"layerling løb ind i en fejl\". Nu siger vinduet, hvad der sker: årsagen ligger i browseren eller i grafikdriveren, og dine designs er bevaret. Under det står der, hvad der som regel hjælper: genstart browseren eller computeren, slå grafikacceleration til, opdater browseren og grafikdriveren, eller prøv en anden browser. Du kan stadig gemme den sidst gemte tilstand som en .lyl-fil derfra."
     }
   },
   {
     "title": {
       "de": "Druckplatten: Name auf Platte 1 und im Dateinamen",
-      "en": "Build plates: name on plate 1 and in the file name"
+      "en": "Build plates: name on plate 1 and in the file name",
+      "da": "Byggeplader: navn på plade 1 og i filnavnet"
     },
     "body": {
       "de": "Hat die erste Druckplatte einen eigenen Namen, steht er jetzt auch auf der Platte, wie bei den weiteren Platten: „Platte 1: Deckel“, der Name des Entwurfs klein darüber. Wählst du im Exportfenster eine einzelne Platte, beginnt der Dateiname mit dem Namen dieser Platte statt mit dem des Entwurfs; eine Platte ohne Namen heißt „Entwurf - Platte 2“.",
-      "en": "When the first build plate has a name of its own, it is now written on the plate as on the further plates: \"Plate 1: Lid\", with the design's name in small above it. And when you pick a single plate in the export window, the file name starts as that plate's name instead of the design's; a plate without a name becomes \"Design - Plate 2\"."
+      "en": "When the first build plate has a name of its own, it is now written on the plate as on the further plates: \"Plate 1: Lid\", with the design's name in small above it. And when you pick a single plate in the export window, the file name starts as that plate's name instead of the design's; a plate without a name becomes \"Design - Plate 2\".",
+      "da": "Når den første byggeplade har sit eget navn, står det nu også på pladen som på de andre plader: \"Plade 1: Låg\", med designets navn i lille skrift oven over. Og når du vælger én plade i eksportvinduet, begynder filnavnet med den plades navn i stedet for designets; en plade uden navn bliver \"Design - Plade 2\"."
     },
     "guide": {
       "section": "buildPlates"
@@ -107,11 +123,13 @@
   {
     "title": {
       "de": "Objektliste: Name bei gesperrter Form",
-      "en": "Object list: the name of a locked shape"
+      "en": "Object list: the name of a locked shape",
+      "da": "Objektliste: navnet på en låst form"
     },
     "body": {
       "de": "Ist bei einem Teil die Form gesperrt (das Schild), bleibt auch sein Name, wie er ist. Die Objektliste bot trotzdem den Stift an und öffnete das Namensfeld, nahm den neuen Namen dann aber nicht an. Jetzt fehlt der Stift bei solchen Teilen. Zum Umbenennen das Schild in der Zeile anklicken, dann ist die Form entsperrt.",
-      "en": "When the shape of a part is locked (the shield), its name stays as it is too. The object list still offered the pencil and opened the name field, but then did not take the new name. The pencil is now left out for such parts. To rename one, click the shield in its row, which unlocks the shape."
+      "en": "When the shape of a part is locked (the shield), its name stays as it is too. The object list still offered the pencil and opened the name field, but then did not take the new name. The pencil is now left out for such parts. To rename one, click the shield in its row, which unlocks the shape.",
+      "da": "Når en dels form er låst (skjoldet), bliver dens navn også, som det er. Objektlisten tilbød stadig blyanten og åbnede navnefeltet, men tog så ikke det nye navn. Blyanten er nu væk for sådanne dele. Vil du omdøbe en del, klikker du på skjoldet i dens række, så bliver formen låst op."
     },
     "guide": {
       "section": "objectList"
@@ -120,11 +138,13 @@
   {
     "title": {
       "de": "Anleitung: genaue Wortfolge mit Anführungszeichen suchen",
-      "en": "User guide: search for an exact phrase with quotation marks"
+      "en": "User guide: search for an exact phrase with quotation marks",
+      "da": "Brugervejledning: søg på en præcis ordlyd med anførselstegn"
     },
     "body": {
       "de": "Das Suchfeld der Anleitung versteht jetzt Anführungszeichen: \"auf dem Kreisbogen\" findet nur die Abschnitte, in denen diese Wörter genau so hintereinander stehen. Ein einzelnes Wort in Anführungszeichen wird nur als ganzes Wort gefunden. Bisher fand eine Suche mit Anführungszeichen gar nichts.",
-      "en": "The search box of the user guide now understands quotation marks: \"circular arc\" finds only the sections where these words stand next to each other in this order. A single word in quotation marks is found only as a whole word. Until now a search with quotation marks found nothing at all."
+      "en": "The search box of the user guide now understands quotation marks: \"circular arc\" finds only the sections where these words stand next to each other in this order. A single word in quotation marks is found only as a whole word. Until now a search with quotation marks found nothing at all.",
+      "da": "Søgeboksen i brugervejledningen forstår nu anførselstegn: \"cirkelbue\" finder kun de sektioner, hvor ordene står lige efter hinanden i den rækkefølge. Et enkelt ord i anførselstegn findes kun som helt ord. Før nu fandt en søgning med anførselstegn slet ingen ting."
     },
     "guide": {
       "section": "commandSearch"
@@ -133,11 +153,13 @@
   {
     "title": {
       "de": "Griffe ausblenden mit Umschalt+Q",
-      "en": "Hide the handles with Shift+Q"
+      "en": "Hide the handles with Shift+Q",
+      "da": "Skjul håndtagene med Shift+Q"
     },
     "body": {
       "de": "Bei sehr kleinen Teilen verdecken die Quadrate und Pfeile um die Auswahl leicht das, woran du gerade arbeitest. Umschalt+Q blendet alle Griffe aus und wieder ein, so wie Q die Maße und Abstände. Das Teil lässt sich weiter ziehen, und seine Maße tippst du rechts ein.\n\nDamit du auch ohne Griffe siehst, was ausgewählt ist, ist die ausgewählte Zeile in der Objektliste jetzt kräftiger eingefärbt und hat links einen orangen Balken.",
-      "en": "On very small parts the squares and arrows around the selection easily cover what you are working on. Shift+Q hides all handles and shows them again, as Q does for the sizes and distances. You can still drag the part, and type its sizes at the right.\n\nSo that you see what is selected without the handles, the selected row in the object list now has a stronger colour and an orange bar at its left."
+      "en": "On very small parts the squares and arrows around the selection easily cover what you are working on. Shift+Q hides all handles and shows them again, as Q does for the sizes and distances. You can still drag the part, and type its sizes at the right.\n\nSo that you see what is selected without the handles, the selected row in the object list now has a stronger colour and an orange bar at its left.",
+      "da": "På meget små dele dækker firkanterne og pilene omkring markeringen let det, du arbejder på. Shift+Q skjuler alle håndtag og viser dem igen, som Q gør for målene og afstandene. Du kan stadig trække delen og skrive dens mål til højre.\n\nSå du kan se, hvad der er valgt, uden håndtagene, har den valgte række i objektlisten nu en stærkere farve og en orange stribe til venstre."
     },
     "guide": {
       "chapter": "measuring"
@@ -146,21 +168,25 @@
   {
     "title": {
       "de": "Fehlermeldung bleibt bei den Knöpfen sichtbar",
-      "en": "Error message stays in view with the buttons"
+      "en": "Error message stays in view with the buttons",
+      "da": "Fejlmeddelelsen bliver ved knapperne i syne"
     },
     "body": {
       "de": "In einem langen Werkzeugfenster, etwa beim Aushöhlen, blieben „Abbrechen“ und „Anwenden“ immer sichtbar, die Meldung, warum etwas nicht geht, stand aber ganz unten und war erst nach dem Herunterrollen zu sehen. Ein Klick schien dann nichts zu tun. Die Meldung steht jetzt direkt über den Knöpfen und bleibt dort sichtbar.",
-      "en": "In a long tool panel, Hollow for example, Cancel and Apply always stayed in view, but the message why something cannot be done stood at the very bottom and only showed after scrolling down. A click then seemed to do nothing. The message now stands right above the buttons and stays in view there."
+      "en": "In a long tool panel, Hollow for example, Cancel and Apply always stayed in view, but the message why something cannot be done stood at the very bottom and only showed after scrolling down. A click then seemed to do nothing. The message now stands right above the buttons and stays in view there.",
+      "da": "I en lang værktøjsvindue som Hul for eksempel stod Annullér og Anvend altid i syne, men beskeden om, hvorfor noget ikke kan gøres, lå helt nede og kom først til syne, når du rullede ned. Et klik så derefter ud til at gøre intet. Beskeden står nu lige over knapperne og bliver der i syne."
     }
   },
   {
     "title": {
       "de": "Maßband misst sofort",
-      "en": "Tape measure measures at once"
+      "en": "Tape measure measures at once",
+      "da": "Målebåndet måler med det samme"
     },
     "body": {
       "de": "Ein Klick auf das Maßband schaltet jetzt gleich „Maß hinzufügen“ ein: Maßband anklicken, ersten Punkt klicken, zweiten Punkt klicken, fertig. Bisher musste man nach dem Öffnen erst noch das Plus wählen.\n\nEin weiterer Klick auf das Plus legt das Werkzeug weg, die Schaltflächen bleiben offen – etwa um zwischendurch einen Körper auszuwählen. Sind die Maße ausgeblendet, öffnet sich das Maßband ohne eingeschaltetes Werkzeug, damit sie ausgeblendet bleiben.",
-      "en": "A click on the tape measure now switches Add measurement on straight away: click the tape measure, click the first point, click the second, done. Until now you had to pick the plus after opening it.\n\nAnother click on the plus puts the tool down and leaves the buttons open, to select a body in between for example. If the measurements are hidden, the tape measure opens without the tool, so they stay hidden."
+      "en": "A click on the tape measure now switches Add measurement on straight away: click the tape measure, click the first point, click the second, done. Until now you had to pick the plus after opening it.\n\nAnother click on the plus puts the tool down and leaves the buttons open, to select a body in between for example. If the measurements are hidden, the tape measure opens without the tool, so they stay hidden.",
+      "da": "Et klik på målebåndet tænder nu \"Tilføj mål\" med det samme: klik på målebåndet, klik på det første punkt, klik på det andet, færdig. Før nu skulle du trykke på plusknappen efter at have åbnet målebåndet.\n\nEt klik på plusknappen igen lægger værktøjet væk og lader knapperne være åbne, så du for eksempel kan vælge en del imellem. Er målingerne skjult, åbner målebåndet uden værktøjet, så de bliver skjult."
     },
     "guide": {
       "section": "tapeMeasure"
