@@ -24,5 +24,18 @@
     "guide": {
       "section": "importing"
     }
+  },
+  {
+    "title": {
+      "de": "Leere Entwürfe kommen aus der Sicherung zurück",
+      "en": "Empty designs come back from your backup"
+    },
+    "body": {
+      "de": "Nach einem Absturz kann es passieren, dass die Karten auf der Startseite noch ihre Namen und die Zahl der Formen zeigen, die Entwürfe aber leer aufgehen. Bisher hat „Sicherung wiederherstellen“ genau diese Entwürfe übersprungen, weil es sie für schon vorhanden hielt.\n\nJetzt holt die Sicherung ihren Inhalt in dieselbe Karte zurück. Entwürfe, die noch ihre Formen haben, bleiben, wie sie sind.",
+      "en": "After a crash the cards on the start page can still show their names and how many shapes they have, while the designs open empty. Until now \"Restore backup\" skipped exactly those designs, because it took them for ones that are already here.\n\nNow the backup brings their content back into the same card. Designs that still have their shapes stay as they are."
+    },
+    "guide": {
+      "section": "backingUp"
+    }
   }
 ]

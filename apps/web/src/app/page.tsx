@@ -85,7 +85,7 @@ import { useFileAccept } from "@/lib/fileAccept";
 import { dropBackupTarget, linkedLylFile, lylFileAccessSupported, onLylFilesLaunched, pickBackupTarget, pickFilesToImport, rememberLylFile, writeBackupTarget, type LylFileHandle } from "@/lib/lylFileAccess";
 import { exportLylProject, importLylProject, inspectLylProjectPackage, LYL_CREATED_WITH_VERSION, LYL_MEDIA_TYPE, withLylProjectName, withLylThumbnail } from "@/lib/lylProject";
 import { relieveOverFineCadMeshes, type RemeshCadBrep } from "@/lib/cadMeshRelief";
-import { backupDesignAlreadyThere, backupEntryPaths, backupFileName, backupFolderPaths, backupNamePrefix, backupThumbnailPath, unpackBackupFolders, isBackupFileName, createBackupWriter, unpackBackup, unpackBackupSettingsText, SETTINGS_BACKUP_FILE, zipHoldsDesigns } from "@/lib/projectBackup";
+import { backupDesignAlreadyThere, backupRefillsDesign, backupEntryPaths, backupFileName, backupFolderPaths, backupNamePrefix, backupThumbnailPath, unpackBackupFolders, isBackupFileName, createBackupWriter, unpackBackup, unpackBackupSettingsText, SETTINGS_BACKUP_FILE, zipHoldsDesigns } from "@/lib/projectBackup";
 import { applySettingsFile, browserSettingsFile } from "@/lib/applySettingsFile";
 import { parseSettingsFile, settingsFileText } from "@/lib/settingsFile";
 import { CUSTOM_SHAPES_FOLDER } from "@/lib/customShapesServer";
@@ -2744,6 +2744,8 @@ export default function Home() {
       return;
     }
     const restoredProjects: DashboardProject[] = [];
+    // Cards that were here but empty and got their content back from the backup; they keep their place and folder.
+    const refilledProjects: DashboardProject[] = [];
     const restoredEntries: Record<string, ProjectShapeCacheEntry> = {};
     let restoredFolders = designFolders;
     let failed = 0;
@@ -2763,6 +2765,37 @@ export default function Home() {
         // A restore keeps the creation time of a design, so the same name and creation time means it is already here (#407).
         const restoredName = restored.projectName || projectNameFromFileName(entries[index].name);
         if (backupDesignAlreadyThere(projects, { name: restoredName, createdAt: restored.createdAt })) {
+          // A card of this browser whose content is gone (a crash can leave the list with names and counts but empty
+          // designs, forum RalphD05) is filled from the backup in place instead of blocking it.
+          const emptyCard = projects.find((project) => !project.sharedProject && project.createdAt === restored.createdAt && project.name === restoredName);
+          const storedHere = emptyCard && restored.shapes.length > 0
+            ? await loadProjectShapes(emptyCard.id).then((record) => record ? { shapes: record.shapes } : null, () => "unreadable" as const)
+            : undefined;
+          if (emptyCard && storedHere !== undefined && backupRefillsDesign(storedHere, restored.shapes.length)) {
+            const now = Date.now() + index;
+            const refilled: DashboardProject = {
+              ...emptyCard,
+              updatedAt: now,
+              revision: now,
+              shapes: restored.shapes.length,
+              workspace: restored.workspace,
+              snapGrid: restored.snapGrid,
+              placementElevation: restored.placementElevation,
+              placementWorkplane: restored.placementWorkplane,
+              sketchPlacementWorkplane: restored.sketchPlacementWorkplane,
+            };
+            const entry = projectShapeCacheEntry(now, restored.shapes, restored.history, restored.historyIndex, restored.assets, restored.attachments);
+            await saveProjectShapes(refilled.id, entry, projectShapeSaveContext(refilled));
+            if (restored.view) writeDesignView(refilled.id, restored.view);
+            if (restored.savedViews) writeSavedViews(refilled.id, restored.savedViews);
+            if (restored.cornerRulers) writeCornerRulers(refilled.id, restored.cornerRulers);
+            if (restored.tapeMeasurements) writeTape(refilled.id, restored.tapeMeasurements);
+            refilledProjects.push(refilled);
+            restoredEntries[refilled.id] = entry;
+            const thumbnail = entries[index].thumbnail;
+            if (thumbnail) restoredThumbnails.push({ projectId: refilled.id, image: pngDataUrl(thumbnail), shapes: restored.shapes.length });
+            continue;
+          }
           if (backupDesignAlreadyThere(projects.filter((project) => !project.sharedProject), { name: restoredName, createdAt: restored.createdAt })) alreadyThere += 1;
           else onServer += 1;
           continue;
@@ -2805,7 +2838,10 @@ export default function Home() {
       }
     }
     setProjectShapesById((current) => ({ ...current, ...restoredEntries }));
-    setProjects((current) => [...restoredProjects, ...current]);
+    setProjects((current) => [
+      ...restoredProjects,
+      ...current.map((project) => refilledProjects.find((refilled) => refilled.id === project.id) ?? project),
+    ]);
     // The pictures the backup holds go back on their cards; a design without one gets it when opened.
     for (const snapshot of restoredThumbnails) await updateProjectSnapshot(snapshot).catch(() => undefined);
     // Only the folders a restored design is in are made, and the empty folders the backup holds;
@@ -2825,16 +2861,17 @@ export default function Home() {
       || [...usedFolders].some((used) => folderTrail(restoredFolders, used).some((onTheWay) => onTheWay.id === folder.id)));
     if (keptFolders.length !== designFolders.length) setDesignFolders(keptFolders);
     const onServerNote = onServer > 0 ? ` ${t("notice.backupOnServerToo", { count: onServer })}` : "";
-    if (restoredProjects.length === 0 && failed === 0 && alreadyThere + onServer > 0) {
+    const restoredCount = restoredProjects.length + refilledProjects.length;
+    if (restoredCount === 0 && failed === 0 && alreadyThere + onServer > 0) {
       setDashboardNotice((alreadyThere === 0
         ? t("notice.backupAllOnServer", { count: onServer, name: file.name })
         : t("notice.backupAllThere", { count: alreadyThere + onServer, name: file.name }) + onServerNote) + shapesNote);
       return;
     }
-    const skippedNote = (alreadyThere > 0 && restoredProjects.length > 0 ? ` ${t("notice.backupAlreadyThere", { count: alreadyThere })}` : "") + onServerNote;
+    const skippedNote = (alreadyThere > 0 && restoredCount > 0 ? ` ${t("notice.backupAlreadyThere", { count: alreadyThere })}` : "") + onServerNote;
     setDashboardNotice((failed
-      ? t("notice.backupRestoredPartly", { count: restoredProjects.length, failed, name: file.name })
-      : t("notice.backupRestored", { count: restoredProjects.length, name: file.name })) + skippedNote + shapesNote + (serverProblem ? ` ${serverProblem}` : ""));
+      ? t("notice.backupRestoredPartly", { count: restoredCount, failed, name: file.name })
+      : t("notice.backupRestored", { count: restoredCount, name: file.name })) + skippedNote + shapesNote + (serverProblem ? ` ${serverProblem}` : ""));
   }, [dashboardSection, designFolders, newDesignsGoToServer, placeNewDesign, projects, refreshSharedProjects, serverAnswer, storeFolderPath, updateProjectSnapshot]);
 
   const importFilesFromDashboard = useCallback(

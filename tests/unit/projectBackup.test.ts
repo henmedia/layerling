@@ -1,6 +1,6 @@
 import { strToU8, zipSync } from "fflate";
 import { describe, expect, it } from "vitest";
-import { backupDesignAlreadyThere, backupEntryNames, backupFileName, backupNamePrefix, backupThumbnailPath, createBackupWriter, packBackup, SETTINGS_BACKUP_FILE, unpackBackup, unpackBackupFolders, unpackBackupSettingsText, zipHoldsDesigns } from "@/lib/projectBackup";
+import { backupDesignAlreadyThere, backupRefillsDesign, backupEntryNames, backupFileName, backupNamePrefix, backupThumbnailPath, createBackupWriter, packBackup, SETTINGS_BACKUP_FILE, unpackBackup, unpackBackupFolders, unpackBackupSettingsText, zipHoldsDesigns } from "@/lib/projectBackup";
 import { buildSettingsFile, parseSettingsFile, readBrowserSettings, settingsFileText } from "@/lib/settingsFile";
 import { DEFAULT_WORKPLANE_WORKSPACE } from "@/lib/workplaneSettings";
 
@@ -57,6 +57,20 @@ describe("restoring a backup twice (#407)", () => {
     expect(backupDesignAlreadyThere(here, { name: "Halter", createdAt: 1001 })).toBe(false);
     expect(backupDesignAlreadyThere(here, { name: "Halter 2", createdAt: 1000 })).toBe(false);
     expect(backupDesignAlreadyThere([], { name: "Halter", createdAt: 1000 })).toBe(false);
+  });
+});
+
+describe("restoring into cards a crash left empty (forum, RalphD05)", () => {
+  it("fills a card whose content is gone, empty or unreadable from the backup", () => {
+    expect(backupRefillsDesign(null, 13)).toBe(true);
+    expect(backupRefillsDesign({ shapes: [] }, 13)).toBe(true);
+    expect(backupRefillsDesign("unreadable", 13)).toBe(true);
+  });
+
+  it("keeps a card that still has its shapes, and takes nothing from an empty design in the backup", () => {
+    expect(backupRefillsDesign({ shapes: [{}] }, 13)).toBe(false);
+    expect(backupRefillsDesign({ shapes: [] }, 0)).toBe(false);
+    expect(backupRefillsDesign(null, 0)).toBe(false);
   });
 });
 
