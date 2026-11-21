@@ -1513,6 +1513,7 @@ export const MESSAGES_PT_BR: Partial<Record<MessageKey, string>> = {
   "sbcBoard.failed": "Não foi possível criar a placa.",
   "status.sbcBoardAdded": "{name} adicionada",
   "status.sbcBoardRegenerated": "{name} refeita",
+  "status.sbcBoardChanged": "A placa mudou enquanto a nova era feita. Escolha a configuração de novo.",
   "port.displayPort": "DisplayPort",
   "port.miniDisplayPort": "Mini DisplayPort",
   "port.rj45": "RJ45 (rede)",
@@ -3769,6 +3770,7 @@ export const MESSAGES_PT_BR: Partial<Record<MessageKey, string>> = {
   "qrCode.regenerate": "Criar de novo",
   "status.qrCodeAdded": "QR code adicionado",
   "status.qrCodeRegenerated": "QR code gerado de novo",
+  "status.qrCodeChanged": "O QR code mudou enquanto o novo era gerado. Clique em Criar de novo mais uma vez.",
 
   "font.manage": "Suas próprias fontes …",
   "font.customGroup": "Suas próprias fontes",
