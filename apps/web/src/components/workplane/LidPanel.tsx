@@ -12,6 +12,9 @@ import {
   LID_HINGE_SIDES,
   LID_HINGE_STYLES,
   LID_HINGE_TYPES,
+  LID_CORNER_SCREW_FASTENERS,
+  LID_CORNER_SCREW_HEADS,
+  LID_CORNER_SCREW_SIZES,
   LID_MAGNET_SIZES,
   LID_THREAD_STANDARDS,
   LID_THREAD_STANDARD_SPECS,
@@ -84,6 +87,8 @@ import {
   lidTakesMagnets,
   lidStandardThread,
   lidTetherFits,
+  cornerScrewPlan,
+  lidThicknessForCornerScrews,
   lidThicknessForMagnets,
   lidThread,
   lidTopEdgeFits,
@@ -148,17 +153,24 @@ export function LidPanel({
   // A magnet needs its pocket and a skin above it in the plate: a thinner plate is made thick enough for it.
   // Raised, it says so under the plate's thickness until that is set by hand; set thinner by hand, it says what is needed.
   const [raised, setRaised] = useState(false);
-  const withMagnet = (patch: Partial<LidOptions>) => {
+  // Screws in the corners (Discussion #1938) go the same way: a countersunk head needs its cone and some hole below it.
+  // They sit where the magnets would and hold the lid down all round, so switching them on switches magnets and a hinge
+  // off, and either of those switches the screws off.
+  const withMagnet = (given: Partial<LidOptions>) => {
+    const patch: Partial<LidOptions> = given.cornerScrews
+      ? { ...given, ...(settings.magnets ? { magnets: false } : {}), ...(settings.hinge ? { hinge: false } : {}) }
+      : (given.magnets || given.hinge) && settings.cornerScrews ? { ...given, cornerScrews: false } : given;
     const next = { ...settings, ...patch };
-    const thickness = lidThicknessForMagnets(next);
-    const raise = next.magnets && settings.thickness < thickness;
+    const thickness = next.cornerScrews ? lidThicknessForCornerScrews(next) : lidThicknessForMagnets(next);
+    const raise = (next.magnets || next.cornerScrews) && settings.thickness < thickness;
     if (raise) setRaised(true);
     onChange(raise ? { ...patch, thickness } : patch);
   };
-  const needed = lidThicknessForMagnets(settings);
+  const needed = settings.cornerScrews ? lidThicknessForCornerScrews(settings) : lidThicknessForMagnets(settings);
   // A slide-in lid takes no magnets: its plate lies between the walls, with no rim under it for their pockets.
   const magnetsFit = lidTakesMagnets(settings);
-  const tooThin = settings.magnets && magnetsFit && settings.thickness < needed - 1e-9;
+  const cornerScrews = settings.cornerScrews && magnetsFit;
+  const tooThin = (settings.magnets || settings.cornerScrews) && magnetsFit && settings.thickness < needed - 1e-9;
   const millimetres = (value: number) => value.toLocaleString(numberLocale());
   // A rim round the outside would hit the back wall as the lid swings open: the hinge goes with a lip or a flat lid.
   const hingeFits = LID_HINGE_TYPES.includes(settings.type);
@@ -292,9 +304,9 @@ export function LidPanel({
         }}
       />
       {tooThin ? (
-        <span className="shell-openings-summary" role="status">{t("lid.error.magnetsThinLid", { thickness: millimetres(needed) })}</span>
-      ) : settings.magnets && magnetsFit && raised ? (
-        <span className="shell-openings-summary" role="status">{t("lid.magnetsThicknessRaised", { thickness: millimetres(settings.thickness) })}</span>
+        <span className="shell-openings-summary" role="status">{t(cornerScrews ? "lid.error.cornerScrewsThinLid" : "lid.error.magnetsThinLid", { thickness: millimetres(needed) })}</span>
+      ) : (settings.magnets || settings.cornerScrews) && magnetsFit && raised ? (
+        <span className="shell-openings-summary" role="status">{t(cornerScrews ? "lid.cornerScrewsThicknessRaised" : "lid.magnetsThicknessRaised", { thickness: millimetres(settings.thickness) })}</span>
       ) : null}
 
       {settings.type === "flat" ? null : (<>
@@ -642,8 +654,47 @@ export function LidPanel({
         <span className="shell-openings-summary">{t("lid.magnetsHint")}</span>
       </>) : null}
 
+      {/* Screws in the corners (Discussion #1938): posts in the body for inserts or screws, and holes for them in the lid. */}
       <label className="edge-modifier-field offset-copy">
-        <input type="checkbox" checked={settings.hinge && hingeFits} disabled={busy || !hingeFits} onChange={(event) => onChange({ hinge: event.target.checked })} />
+        <input type="checkbox" checked={cornerScrews} disabled={busy || !magnetsFit} onChange={(event) => withMagnet({ cornerScrews: event.target.checked })} />
+        <span>{t("lid.cornerScrews")}</span>
+      </label>
+      {cornerScrews ? (<>
+        <div className="edge-modifier-field shell-openings" role="radiogroup" aria-label={t("lid.cornerScrewFastener")}>
+          <span>{t("lid.cornerScrewFastener")}</span>
+          <div className="shell-opening-options">
+            {LID_CORNER_SCREW_FASTENERS.map((fastener) => (
+              <button key={fastener} type="button" role="radio" aria-checked={settings.cornerScrewFastener === fastener} className={settings.cornerScrewFastener === fastener ? "active" : ""} disabled={busy} onClick={() => withMagnet({ cornerScrewFastener: fastener })}>
+                {t(`lid.cornerScrewFastener.${fastener}`)}
+              </button>
+            ))}
+          </div>
+        </div>
+        <div className="edge-modifier-field shell-openings" role="radiogroup" aria-label={t("lid.cornerScrewSize")}>
+          <span>{t("lid.cornerScrewSize")}</span>
+          <div className="shell-opening-options">
+            {LID_CORNER_SCREW_SIZES.map((size) => (
+              <button key={size} type="button" role="radio" aria-checked={settings.cornerScrewSize === size} className={settings.cornerScrewSize === size ? "active" : ""} disabled={busy} onClick={() => withMagnet({ cornerScrewSize: size })}>
+                {size}
+              </button>
+            ))}
+          </div>
+        </div>
+        <div className="edge-modifier-field shell-openings" role="radiogroup" aria-label={t("lid.cornerScrewHead")}>
+          <span>{t("lid.cornerScrewHead")}</span>
+          <div className="shell-opening-options">
+            {LID_CORNER_SCREW_HEADS.map((head) => (
+              <button key={head} type="button" role="radio" aria-checked={settings.cornerScrewHead === head} className={settings.cornerScrewHead === head ? "active" : ""} disabled={busy} onClick={() => withMagnet({ cornerScrewHead: head })}>
+                {t(`lid.cornerScrewHead.${head}`)}
+              </button>
+            ))}
+          </div>
+        </div>
+        <span className="shell-openings-summary">{t("lid.cornerScrewsHint", { hole: millimetres(cornerScrewPlan(settings).hole), depth: millimetres(cornerScrewPlan(settings).depth) })}</span>
+      </>) : null}
+
+      <label className="edge-modifier-field offset-copy">
+        <input type="checkbox" checked={settings.hinge && hingeFits} disabled={busy || !hingeFits} onChange={(event) => withMagnet({ hinge: event.target.checked })} />
         <span>{t("lid.hinge")}</span>
       </label>
       {!hingeFits && extras && !slide ? <span className="shell-openings-summary">{t("lid.hingeTypeHint")}</span> : null}
