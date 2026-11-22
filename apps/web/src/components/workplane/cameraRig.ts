@@ -1,7 +1,7 @@
 import * as THREE from "three";
 import type { ThreeState } from "@/components/workplane/ViewportOverlays";
 import { orthographicFramingZoom, perspectiveFramingDistance } from "@/lib/cameraFraming";
-import { orbitOffsetByDrag, viewCubeAngles, viewFaceDirection, type ViewCubeFace } from "@/lib/viewCubeDrag";
+import { orbitOffsetByDrag, poleDirectionKeepingTurn, viewCubeAngles, viewFaceDirection, type ViewCubeFace } from "@/lib/viewCubeDrag";
 import { cameraTurn, cameraTurnOffset, pivotSlide, pivotSlidePoint, prefersReducedMotion, type CameraTurn } from "@/lib/viewCubeTransition";
 import { readStartView, type DesignView } from "@/lib/designView";
 import { zoomDistanceScale } from "@/lib/workplaneSettings";
@@ -200,7 +200,19 @@ export function toggleCameraProjection(state: CameraRig) {
   state.needsRender = true;
 }
 
+/** Top and Bottom keep the view's turn, to the nearest quarter (Discussion #1967): the setting under Settings > Appearance, off by default. */
+let viewCubeKeepsTurn = false;
+
+/** Takes over the setting "Top and Bottom keep the view's turn" for the 3D view and the second view. */
+export function setViewCubeKeepsTurn(keep: boolean) {
+  viewCubeKeepsTurn = keep;
+}
+
 export function setCameraToViewFace(state: CameraRig, face: ViewCubeFace) {
+  if (viewCubeKeepsTurn && (face === "top" || face === "bottom")) {
+    setCameraToViewDirection(state, poleDirectionKeepingTurn(face, state.camera.position.clone().sub(state.controls.target)));
+    return;
+  }
   setCameraToViewDirection(state, viewFaceDirection(face));
 }
 

@@ -5194,6 +5194,8 @@ export const MESSAGES_PL: Partial<Record<MessageKey, string>> = {
   "workspace.viewBarOpensOnHoverHint": "Zwinięty pasek widoku otwiera się, gdy mysz jest nad jego strzałką, i zwija się ponownie, gdy mysz go opuści. Kliknięcie strzałki pozostawia go otwartym.",
   "workspace.showStepNotices": "Pokazuj komunikat po każdym kroku",
   "workspace.showStepNoticesHint": "Krótki komunikat obok kostki widoku po kroku takim jak połączenie, z przyciskiem Cofnij. Wyłącz, jeśli przeszkadza; komunikaty, które czegoś od ciebie chcą lub zgłaszają problem, nadal się pojawiają, a Cofnij na wstążce nadal podaje krok po najechaniu.",
+  "workspace.viewCubeKeepsTurn": "Góra i Dół zachowują obrót widoku",
+  "workspace.viewCubeKeepsTurnHint": "Kliknięcie Góra lub Dół na kostce widoku albo klawisze 5 i 6 patrzą prosto w dół lub w górę, ale zostawiają widok obrócony tak, jak stoi, zaokrąglony do najbliższej ćwierci obrotu. Wyłączone: przód jest zawsze na dole.",
   "workspace.startView": "Widok startowy",
   "workspace.startViewHint": "Kąt, w jakim otwierają się nowe projekty i do którego wraca Widok początkowy. Obróć widok tak, jak lubisz, a potem użyj bieżącego widoku. Dotyczy wszystkich projektów w tej przeglądarce.",
   "workspace.startViewUseCurrent": "Użyj bieżącego widoku",

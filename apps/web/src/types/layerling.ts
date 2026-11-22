@@ -633,6 +633,8 @@ export type WorkplaneWorkspaceSettings = {
   viewBarOpensOnHover: boolean;
   /** The short message after a step, such as a union, with its Undo button (Discussion #1708); on by default. Off, messages that want something, warn or carry a button of their own still show. */
   showStepNotices: boolean;
+  /** A click on Top or Bottom of the view cube (or 5 and 6) keeps the view turned as it stands, to the nearest quarter turn, instead of the front at the bottom (Discussion #1967); off by default. */
+  viewCubeKeepsTurn: boolean;
   zoomSpeed: number;
   /** How fast shifting the 3D view follows the mouse, a slider from 1 to 9; at 5 the grabbed point stays under the cursor (#1553). */
   panSpeed: number;

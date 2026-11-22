@@ -196,6 +196,8 @@ The sketch view has its own colours: {{ui:workspace.sketchBackground}} for the w
 
 {{ui:workspace.showStepNotices}}: after a step such as a union, a short message beside the view cube says what was done and offers {{ui:shortcuts.undo}}. Switched off, these messages stay away; messages that want something from you or report a problem still appear, and {{ui:editor.tool.undo}} in the ribbon still names the step when you point at it.
 
+{{ui:workspace.viewCubeKeepsTurn}}: a click on Top or Bottom of the view cube, or the keys 5 and 6, looks straight down or up and keeps the view turned as it stands, rounded to the nearest quarter turn. If you were looking at the plate from the right, the right side stays at the bottom. Off, as it starts, the front is always at the bottom.
+
 {{ui:workspace.startView}} sets the angle a new design opens in and {{ui:camera.home}} goes back to. Turn and zoom the view the way you like it, then click {{ui:workspace.startViewUseCurrent}}; {{ui:workspace.startViewStandard}} brings back the usual view from the front right. It holds for every design in this browser. A design you open again still opens the way you left it.
 
 {{ui:workspace.zoomSpeed}} is a slider from slow to fast: how fast the wheel and the trackpad zoom; the zoom buttons and keys keep their own small steps. {{ui:workspace.panSpeed}} is a slider from slow to fast too: how fast the view follows the mouse when you shift it; in the middle the point you grab stays under the cursor. {{ui:workspace.cameraInertia}}: after you let go of the mouse the view turns or shifts on for a moment and slows down gently. Switched off, it stops at once, as in Tinkercad and Fusion 360.

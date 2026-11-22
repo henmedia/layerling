@@ -2104,6 +2104,8 @@ export const MESSAGES_PT_BR: Partial<Record<MessageKey, string>> = {
   "workspace.viewBarOpensOnHoverHint": "Uma barra de visualização recolhida abre enquanto o mouse está sobre a seta dela e se recolhe de novo quando o mouse sai da barra. Um clique na seta a mantém aberta.",
   "workspace.showStepNotices": "Mostrar uma mensagem após cada passo",
   "workspace.showStepNoticesHint": "A mensagem curta ao lado do cubo de visualização após um passo como uma união, com seu botão Desfazer. Desative se atrapalhar; mensagens que pedem algo de você ou relatam um problema continuam aparecendo, e Desfazer na faixa de opções ainda nomeia o passo quando você aponta para ele.",
+  "workspace.viewCubeKeepsTurn": "Superior e Inferior mantêm o giro da vista",
+  "workspace.viewCubeKeepsTurnHint": "Um clique em Superior ou Inferior do cubo de vista, ou as teclas 5 e 6, olha direto para baixo ou para cima, mas mantém a vista girada como está, arredondada ao quarto de volta mais próximo. Desligado, a frente fica sempre embaixo.",
   "workspace.startView": "Vista inicial",
   "workspace.startViewHint": "O ângulo em que novos projetos abrem e ao qual Início volta. Gire a vista como preferir e depois use a vista atual. Vale para todos os projetos deste navegador.",
   "workspace.startViewUseCurrent": "Usar a vista atual",

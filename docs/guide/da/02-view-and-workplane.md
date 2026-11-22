@@ -198,6 +198,8 @@ Skitsevisningen har sine egne farver: {{ui:workspace.sketchBackground}} for vind
 
 {{ui:workspace.showStepNotices}}: efter et trin som en forening siger en kort besked ved siden af visningsterningen, hvad der skete, og tilbyder {{ui:shortcuts.undo}}. Slået fra bliver disse beskeder væk; beskeder, der vil have noget af dig eller melder et problem, vises stadig, og {{ui:editor.tool.undo}} i båndet nævner stadig trinnet, når du peger på det.
 
+{{ui:workspace.viewCubeKeepsTurn}}: et klik på Top eller Bund på visningsterningen, eller tasterne 5 og 6, ser lige ned eller op og beholder visningen drejet, som den står, rundet til nærmeste kvarte omgang. Så du på pladen fra højre, bliver højre side nederst. Slået fra, som fra start, er forsiden altid nederst.
+
 {{ui:workspace.startView}} bestemmer den vinkel, et nyt design åbner i, og som {{ui:camera.home}} vender tilbage til. Drej og zoom visningen, som du kan lide den, og klik så {{ui:workspace.startViewUseCurrent}}; {{ui:workspace.startViewStandard}} giver den sædvanlige visning forfra til højre igen. Det gælder alle designs i denne browser. Et design, du åbner igen, åbner stadig, som du forlod det.
 
 {{ui:workspace.zoomSpeed}} er en skyder fra langsom til hurtig: hvor hurtigt hjulet og trackpad'en zoomer; zoomknapperne og tasterne beholder deres egne små trin. {{ui:workspace.panSpeed}} er også en skyder fra langsom til hurtig: hvor hurtigt visningen følger musen, når du flytter den; i midten bliver det punkt, du griber, under markøren. {{ui:workspace.cameraInertia}}: når du slipper musen, drejer eller flytter visningen sig videre et øjeblik og falder blødt af. Slået fra stopper den med det samme, som i Tinkercad og Fusion 360.

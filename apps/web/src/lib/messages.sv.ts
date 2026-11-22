@@ -5260,6 +5260,8 @@ export const MESSAGES_SV: Partial<Record<MessageKey, string>> = {
   "workspace.viewBarOpensOnHoverHint": "Ett ihopfällt vyfält öppnas medan muspekaren är över dess pil och fälls ihop igen när pekaren lämnar det. Ett klick på pilen håller det öppet.",
   "workspace.showStepNotices": "Visa ett meddelande efter varje steg",
   "workspace.showStepNoticesHint": "Det korta meddelandet bredvid vykuben efter ett steg som en förening, med sin Ångra-knapp. Stäng av om det är i vägen; meddelanden som vill något av dig eller rapporterar ett problem visas fortfarande, och Ångra i menyfliksområdet nämner fortfarande steget när du pekar på det.",
+  "workspace.viewCubeKeepsTurn": "Ovan och Under behåller vyns vridning",
+  "workspace.viewCubeKeepsTurnHint": "Ett klick på Ovan eller Under på vykuben, eller tangenterna 5 och 6, tittar rakt ned eller upp men låter vyn vara vriden som den står, avrundad till närmaste kvarts varv. Avstängt ligger framsidan alltid nederst.",
   "workspace.startView": "Startvy",
   "workspace.startViewHint": "Vinkeln som nya designer öppnas i och som Home återgår till. Vrid vyn som du vill ha den och använd sedan aktuell vy. Gäller för varje design i den här webbläsaren.",
   "workspace.startViewUseCurrent": "Använd aktuell vy",

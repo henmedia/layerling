@@ -3911,6 +3911,8 @@ export const MESSAGES_SL: Partial<Record<MessageKey, string>> = {
   "workspace.viewBarOpensOnHoverHint": "Zložena vrstica pogleda se odpre, ko je miška nad njeno puščico, in se spet zloži, ko jo miška zapusti. Klik na puščico jo pusti odprto.",
   "workspace.showStepNotices": "Po vsakem koraku pokaži sporočilo",
   "workspace.showStepNoticesHint": "Kratko sporočilo ob kocki pogleda po koraku, kot je združitev, z gumbom Razveljavi. Izklopite, če moti; sporočila, ki od vas nekaj želijo ali sporočajo težavo, se še vedno prikažejo, gumb Razveljavi na traku pa ob premiku miške še vedno navede korak.",
+  "workspace.viewCubeKeepsTurn": "Zgoraj in Spodaj ohranita zasuk pogleda",
+  "workspace.viewCubeKeepsTurnHint": "Klik na Zgoraj ali Spodaj na kocki pogleda ali tipki 5 in 6 pogleda naravnost navzdol ali navzgor, a pusti pogled zasukan, kot stoji, zaokroženo na najbližjo četrtino obrata. Izklopljeno je sprednja stran vedno spodaj.",
   "workspace.startView": "Začetni pogled",
   "workspace.startViewHint": "Kot, v katerem se odprejo novi osnutki in kamor se vrne Domov. Zasukajte pogled po svoje in nato uporabite trenutni pogled. Velja za vse osnutke v tem brskalniku.",
   "workspace.startViewUseCurrent": "Uporabi trenutni pogled",

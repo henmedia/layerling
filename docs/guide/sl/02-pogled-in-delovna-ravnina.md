@@ -196,6 +196,8 @@ Skicirni pogled ima lastne barve: {{ui:workspace.sketchBackground}} za okno okol
 
 {{ui:workspace.showStepNotices}}: po koraku, kot je združitev, kratko sporočilo ob kocki pogleda pove, kaj se je zgodilo, in ponudi {{ui:shortcuts.undo}}. Izklopljeno teh sporočil ni; sporočila, ki od vas nekaj želijo ali sporočajo težavo, se še vedno prikažejo, {{ui:editor.tool.undo}} na traku pa ob premiku miške še vedno navede korak.
 
+{{ui:workspace.viewCubeKeepsTurn}}: klik na Zgoraj ali Spodaj na kocki pogleda ali tipki 5 in 6 pogleda naravnost navzdol ali navzgor in pusti pogled zasukan, kot stoji, zaokroženo na najbližjo četrtino obrata. Če si ploščo gledal z desne, ostane desna stran spodaj. Izklopljeno, kot na začetku, je sprednja stran vedno spodaj.
+
 {{ui:workspace.startView}} določa kot, pod katerim se odpre nov načrt in na katerega se vrne {{ui:camera.home}}. Zavrti in približaj pogled, kot ti je všeč, nato klikni {{ui:workspace.startViewUseCurrent}}; {{ui:workspace.startViewStandard}} vrne običajni pogled od spredaj desno. Velja za vsak načrt v tem brskalniku. Načrt, ki ga znova odpreš, se še vedno odpre tako, kot si ga zapustil.
 
 {{ui:workspace.zoomSpeed}} je drsnik od počasi do hitro: kako hitro približujeta kolesce in sledilna ploščica; gumbi in tipke za povečavo obdržijo svoje majhne korake. {{ui:workspace.panSpeed}} je prav tako drsnik od počasi do hitro: kako hitro pogled sledi miški, ko ga premikaš; na sredini ostane točka, ki jo primeš, pod kazalcem. {{ui:workspace.cameraInertia}}: ko spustiš miško, se pogled še malo vrti ali premika in nežno zavira. Izklopljeno pomeni, da se takoj ustavi, kot v Tinkercadu in Fusion 360.

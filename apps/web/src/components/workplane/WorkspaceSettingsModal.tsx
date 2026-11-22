@@ -1032,6 +1032,12 @@ export function WorkspaceSettingsModal({
                     checked={workspace.showStepNotices}
                     onChange={(showStepNotices) => patchWorkspace({ showStepNotices })}
                   />
+                  <WorkspaceToggle
+                    label={t("workspace.viewCubeKeepsTurn")}
+                    description={t("workspace.viewCubeKeepsTurnHint")}
+                    checked={workspace.viewCubeKeepsTurn}
+                    onChange={(viewCubeKeepsTurn) => patchWorkspace({ viewCubeKeepsTurn })}
+                  />
                   <div className="workspace-reset-row" data-help={t("workspace.startViewHint")}>
                     <span>{t("workspace.startView")}</span>
                     <div className="property-defaults-actions">

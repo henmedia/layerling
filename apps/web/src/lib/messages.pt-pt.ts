@@ -5845,6 +5845,8 @@ export const MESSAGES_PT_PT: Partial<Record<MessageKey, string>> = {
   "workspace.viewBarOpensOnHoverHint": "Uma barra de vistas recolhida abre-se enquanto o ponteiro do rato está sobre a respetiva seta e volta a recolher quando o ponteiro sai. Clicar na seta mantém a barra aberta.",
   "workspace.showStepNotices": "Mostrar uma mensagem após cada passo",
   "workspace.showStepNoticesHint": "A mensagem breve junto ao cubo de vistas após um passo, como uma união, com o botão Anular. Desativa-a se atrapalhar; as mensagens que pedem uma ação ou indicam um problema continuam a aparecer e o botão Anular na faixa de ferramentas continua a indicar o passo ao passar o rato.",
+  "workspace.viewCubeKeepsTurn": "Cima e Baixo mantêm a rotação da vista",
+  "workspace.viewCubeKeepsTurnHint": "Um clique em Cima ou Baixo do cubo de vista, ou as teclas 5 e 6, olha a direito para baixo ou para cima, mas mantém a vista rodada como está, arredondada ao quarto de volta mais próximo. Desligado, a frente fica sempre em baixo.",
   "workspace.panSpeedHint": "Velocidade com que a vista acompanha o rato quando a deslocas. Na posição intermédia, o ponto que agarras mantém-se sob o cursor.",
   "workspace.panSpeed": "Velocidade de deslocamento da vista",
   "edge.errorLostFaces": "Com esta dimensão, o núcleo CAD perderia parte do sólido: um furo ou uma face desapareceria. Experimenta um valor ligeiramente menor ou maior.",

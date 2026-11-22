@@ -4561,6 +4561,8 @@ export const MESSAGES_HU: Partial<Record<MessageKey, string>> = {
   "workspace.viewBarOpensOnHoverHint": "Az összecsukott nézetsáv kinyílik, amíg az egér a nyila fölött van, és újra összecsukódik, ha az egér elhagyja. A nyílra kattintva nyitva marad.",
   "workspace.showStepNotices": "Üzenet minden lépés után",
   "workspace.showStepNoticesHint": "A rövid üzenet a nézetkocka mellett egy lépés, például egy egyesítés után, a Visszavonás gombjával. Kapcsold ki, ha zavar; azok az üzenetek, amelyek tőled várnak valamit vagy hibát jeleznek, továbbra is megjelennek, és a szalagon a Visszavonás továbbra is megnevezi a lépést, ha rámutatsz.",
+  "workspace.viewCubeKeepsTurn": "A Felül és Alul megtartja a nézet elforgatását",
+  "workspace.viewCubeKeepsTurnHint": "A nézetkocka Felül vagy Alul lapjára kattintás, vagy az 5 és 6 billentyű, egyenesen lefelé vagy felfelé néz, de a nézetet úgy elforgatva hagyja, ahogy áll, a legközelebbi negyedfordulatra kerekítve. Kikapcsolva az eleje mindig alul van.",
   "workspace.pasteCentered": "Beillesztés középre, leejtve",
   "workspace.pasteCenteredHint": "A beillesztés a részeket a munkasík közepére teszi, és együtt rá is ejti őket, nem oda, ahonnan jöttek. Hasznos más programokból másolt részekhez, amelyek messze a tárgyasztaltól kerülhetnek.",
   "workspace.stlAsDownload": "STL mentése letöltésként",

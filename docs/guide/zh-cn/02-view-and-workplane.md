@@ -186,6 +186,8 @@ X 和 [[Esc]] 会关闭窗口；如果正在测量，[[Esc]] 会先结束测量�
 
 {{ui:workspace.objectSnap}} 让形状的边和中心在拖动时吸附到其他形状；右下角的网格菜单有同样的开关。{{ui:workspace.cruise}} 让新形状挂在鼠标指针上，并落在其下方的面上，类似 Tinkercad 的 Cruise；关闭时，新形状出现在平台中央。更多内容见[选择与排列](chapter:select-and-arrange)。
 
+{{ui:workspace.viewCubeKeepsTurn}}：点击视图立方体的顶面或底面，或按 5 和 6 键，会正对下方或上方，并保留视图当前的旋转，取整到最近的 90°。如果你之前从右侧看打印平台，右侧会留在下方。关闭时（默认如此），前面总在下方。
+
 {{ui:workspace.startView}} 设定新设计打开时的角度，也是 {{ui:camera.home}} 返回的角度。把视图转动、缩放到你喜欢的样子，然后点击 {{ui:workspace.startViewUseCurrent}}；{{ui:workspace.startViewStandard}} 恢复通常的右前方视图。它对此浏览器中的所有设计都有效。再次打开的设计仍按你离开时的样子打开。
 
 ### 外观：视图

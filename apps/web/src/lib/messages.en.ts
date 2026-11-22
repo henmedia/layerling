@@ -5189,6 +5189,8 @@ export const MESSAGES_EN = {
   "workspace.viewBarOpensOnHoverHint": "A folded view bar opens while the mouse is over its arrow and folds again when the mouse leaves it. A click on the arrow keeps it open.",
   "workspace.showStepNotices": "Show a message after each step",
   "workspace.showStepNoticesHint": "The short message beside the view cube after a step such as a union, with its Undo button. Switch off if it gets in the way; messages that want something from you or report a problem still appear, and Undo in the ribbon still names the step when you point at it.",
+  "workspace.viewCubeKeepsTurn": "Top and Bottom keep the view's turn",
+  "workspace.viewCubeKeepsTurnHint": "A click on Top or Bottom of the view cube, or the keys 5 and 6, looks straight down or up but keeps the view turned as it stands, rounded to the nearest quarter turn. Off, the front is always at the bottom.",
   "workspace.startView": "Start view",
   "workspace.startViewHint": "The angle new designs open in and Home goes back to. Turn the view the way you like it, then use the current view. Applies to every design in this browser.",
   "workspace.startViewUseCurrent": "Use current view",

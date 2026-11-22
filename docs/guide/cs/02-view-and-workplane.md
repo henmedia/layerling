@@ -196,6 +196,8 @@ Pohled náčrtu má vlastní barvy: {{ui:workspace.sketchBackground}} pro okno k
 
 {{ui:workspace.showStepNotices}}: po kroku, jako je sjednocení, krátká zpráva vedle krychle pohledu řekne, co se stalo, a nabídne {{ui:shortcuts.undo}}. Po vypnutí se tyto zprávy nezobrazují; zprávy, které od vás něco chtějí nebo hlásí problém, se zobrazují dál a {{ui:editor.tool.undo}} na pásu karet po najetí myší stále uvádí krok.
 
+{{ui:workspace.viewCubeKeepsTurn}}: klik na Shora nebo Zdola na kostce pohledu, nebo klávesy 5 a 6, se podívá přímo dolů nebo nahoru a ponechá pohled natočený tak, jak stojí, zaokrouhleně na nejbližší čtvrtotáčku. Díval-li ses na desku zprava, zůstane pravá strana dole. Vypnuto, jak je na začátku, je přední strana vždy dole.
+
 {{ui:workspace.startView}} určuje úhel, ve kterém se otevře nový projekt a ke kterému se vrací {{ui:camera.home}}. Otočte a přibližte pohled, jak se vám líbí, a pak klikněte na {{ui:workspace.startViewUseCurrent}}; {{ui:workspace.startViewStandard}} vrátí obvyklý pohled zepředu zprava. Platí pro každý projekt v tomto prohlížeči. Projekt, který znovu otevřete, se stále otevře tak, jak jste ho opustili.
 
 {{ui:workspace.zoomSpeed}} je posuvník od pomalého po rychlé: jak rychle přibližuje kolečko a touchpad; tlačítka a klávesy přiblížení si ponechávají vlastní malé kroky. {{ui:workspace.panSpeed}} je také posuvník od pomalého po rychlé: jak rychle pohled při posouvání sleduje myš; uprostřed zůstává uchopený bod pod kurzorem. {{ui:workspace.cameraInertia}}: po puštění myši se pohled ještě chvíli otáčí nebo posouvá a jemně zpomalí. Vypnuté znamená, že se zastaví hned, jako v Tinkercadu a Fusion 360.
