@@ -3910,6 +3910,7 @@ export const MESSAGES_IT: Partial<Record<MessageKey, string>> = {
   "prop.gridfinityMagnets": "Fori per magneti",
   "prop.gridfinityHalfGrid": "Mezza griglia (21 mm)",
   "gridfinity.halfGridHint": "Le unità in larghezza e in profondità contano celle da 21 mm, ognuna con il proprio piede; quattro stanno in un alloggio della base a griglia.",
+  "gridfinity.bedLimitHint": "Fino a {size} mm in larghezza e profondità: quanto consente il piano di stampa scelto nelle impostazioni dell'area di lavoro, 252 mm senza stampante.",
   "prop.gridfinityLargePlate": "Piastra grande (fino a 12 unità)",
   "gridfinity.largePlateHint": "Fino a 12 unità in larghezza e profondità invece di 6, per piani di stampa oltre 256 mm. Seleziona la stampante nelle impostazioni: le piastre più grandi del piano verranno segnalate.",
   "prop.gridfinitySwallowtail": "Coda di rondine",

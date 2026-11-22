@@ -4548,6 +4548,7 @@ export const MESSAGES_PT_BR: Partial<Record<MessageKey, string>> = {
   "gridfinity.tray": "Bandeja",
   "gridfinity.trayHint": "Uma bandeja de qualquer tamanho em mm com fundo plano, para insertos de jogos de tabuleiro e peças pequenas: sem pés e sem borda de empilhamento, então não fica em uma base nem empilha. As divisórias e os apoios de etiqueta vão até o topo.",
   "gridfinity.halfGridHint": "As unidades na largura e na profundidade contam células de 21 mm, cada uma com seu próprio pé; quatro ficam num encaixe da base.",
+  "gridfinity.bedLimitHint": "Até {size} mm de largura e de profundidade: o quanto couber na mesa de impressão escolhida nas configurações do espaço de trabalho, 252 mm sem impressora.",
   "prop.gridfinityLargePlate": "Base grande (até 12 unidades)",
   "gridfinity.largePlateHint": "Até 12 unidades na largura e na profundidade em vez de 6, para mesas de impressão acima de 256 mm. Com a sua impressora escolhida nas configurações, uma base maior que a mesa dela é sinalizada.",
   "prop.gridfinitySwallowtail": "Swallowtail",

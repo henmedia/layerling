@@ -3636,6 +3636,7 @@ export const MESSAGES_PT_PT: Partial<Record<MessageKey, string>> = {
   "prop.gridfinityMagnets": "Furos para ímanes",
   "prop.gridfinityHalfGrid": "Grelha de meia dimensão (21 mm)",
   "gridfinity.halfGridHint": "As unidades na largura e na profundidade correspondem a células de 21 mm, cada uma com o seu próprio pé; quatro cabem num encaixe da placa de base.",
+  "gridfinity.bedLimitHint": "Até {size} mm de largura e de profundidade: o que couber na plataforma de impressão escolhida nas definições da área de trabalho, 252 mm sem impressora.",
   "prop.gridfinityLargePlate": "Placa grande (até 12 unidades)",
   "gridfinity.largePlateHint": "Até 12 unidades de largura e profundidade em vez de 6, para bases de impressão com mais de 256 mm. Se escolheres a impressora nas definições, é assinalada qualquer placa que exceda a respetiva base de impressão.",
   "prop.gridfinitySwallowtail": "Encaixe em cauda de andorinha",

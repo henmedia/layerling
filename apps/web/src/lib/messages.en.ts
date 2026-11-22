@@ -3846,6 +3846,7 @@ export const MESSAGES_EN = {
   "prop.gridfinityMagnets": "Magnet holes",
   "prop.gridfinityHalfGrid": "Half-size grid (21 mm)",
   "gridfinity.halfGridHint": "Units across and deep count cells of 21 mm, each with a foot of its own; four stand in one socket of a baseplate.",
+  "gridfinity.bedLimitHint": "Up to {size} mm across and deep: as much as the print bed chosen in the workspace settings takes, 252 mm without one.",
   "prop.gridfinityLargePlate": "Large plate (up to 12 units)",
   "gridfinity.largePlateHint": "Up to 12 units across and deep instead of 6, for print beds over 256 mm. With your printer chosen in the settings, a plate larger than the printer's bed is flagged.",
   "prop.gridfinitySwallowtail": "Swallowtail",

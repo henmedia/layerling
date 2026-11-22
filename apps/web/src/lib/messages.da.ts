@@ -4216,6 +4216,7 @@ export const MESSAGES_DA: Partial<Record<MessageKey, string>> = {
   "prop.gridfinityMagnets": "Magnethuller",
   "prop.gridfinityHalfGrid": "Halvt gitter (21 mm)",
   "gridfinity.halfGridHint": "Enheder i bredden og dybden tæller celler på 21 mm, hver med sin egen fod; fire står i én fordybning i bundpladen.",
+  "gridfinity.bedLimitHint": "Op til {size} mm i bredden og dybden: så meget som byggepladen valgt i arbejdsområdets indstillinger kan rumme, 252 mm uden printer.",
   "prop.gridfinityLargePlate": "Stor bundplade (op til 12 enheder)",
   "gridfinity.largePlateHint": "Op til 12 enheder i bredden og dybden i stedet for 6, til byggeplader over 256 mm. Når din printer er valgt i indstillingerne, markeres en plade, der er større end dens byggeplade.",
   "prop.gridfinitySwallowtail": "Svalehale",

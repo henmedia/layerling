@@ -3925,6 +3925,7 @@ export const MESSAGES_ES: Partial<Record<MessageKey, string>> = {
   "prop.gridfinityMagnets": "Orificios para imanes",
   "prop.gridfinityHalfGrid": "Media cuadrícula (21 mm)",
   "gridfinity.halfGridHint": "Las unidades de ancho y de fondo cuentan celdas de 21 mm, cada una con su propio pie; cuatro caben en un hueco de la placa base.",
+  "gridfinity.bedLimitHint": "Hasta {size} mm de ancho y de fondo: lo que admita la cama de impresión elegida en los ajustes del espacio de trabajo, 252 mm sin impresora.",
   "prop.gridfinityLargePlate": "Placa base grande (hasta 12 unidades)",
   "gridfinity.largePlateHint": "Hasta 12 unidades de ancho y de fondo en lugar de 6, para camas de impresión de más de 256 mm. Si eliges tu impresora en los ajustes, se marca una placa más grande que su cama.",
   "prop.gridfinitySwallowtail": "Swallowtail",

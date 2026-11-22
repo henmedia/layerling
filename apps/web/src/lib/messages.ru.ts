@@ -3839,6 +3839,7 @@ export const MESSAGES_RU: Partial<Record<MessageKey, string>> = {
   "prop.gridfinityMagnets": "Отверстия под магниты",
   "prop.gridfinityHalfGrid": "Половинная сетка (21 мм)",
   "gridfinity.halfGridHint": "Ширина и глубина считаются в клетках по 21 мм, у каждой своя ножка; четыре встают в одно гнездо базовой плиты.",
+  "gridfinity.bedLimitHint": "До {size} мм в ширину и глубину: столько, сколько вмещает печатный стол, выбранный в настройках рабочей области, без принтера 252 мм.",
   "prop.gridfinityLargePlate": "Большая базовая плита (до 12 ячеек)",
   "gridfinity.largePlateHint": "До 12 ячеек в ширину и в глубину вместо 6, для печатных столов больше 256 мм. Если принтер выбран в настройках, плита больше его стола будет отмечена.",
   "prop.gridfinitySwallowtail": "Swallowtail",

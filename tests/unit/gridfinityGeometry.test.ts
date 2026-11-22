@@ -70,6 +70,8 @@ import {
   gridfinityLipChamfer,
   gridfinityListPatch,
   gridfinityMaxUnits,
+  gridfinityBedReach,
+  gridfinityTrayMax,
   gridfinityOpenFits,
   gridfinityOpening,
   gridfinityOpeningCornerSize,
@@ -226,9 +228,9 @@ describe("gridfinity sizes", () => {
     expect(gridfinityUnits(bin({ width: 125.5, depth: 125.5, height: 42, gridfinityLip: false }))).toEqual({ x: 3, z: 3, y: 6 });
   });
 
-  it("snaps a dragged size to whole units and keeps them between 1 and 6 across", () => {
+  it("snaps a dragged size to whole units and keeps them between 1 and 12 across, the most any bed is offered (#1917)", () => {
     expect(gridfinityFootprintPatch(bin({ width: 100, depth: 30, height: 30 }))).toEqual({ width: 83.5, depth: 41.5, height: 28 + GRIDFINITY_LIP_HEIGHT });
-    expect(gridfinityFootprintPatch(bin({ width: 1000, depth: 1, height: 1 }))).toEqual({ width: 251.5, depth: 41.5, height: 7 + GRIDFINITY_LIP_HEIGHT });
+    expect(gridfinityFootprintPatch(bin({ width: 1000, depth: 1, height: 1 }))).toEqual({ width: 503.5, depth: 41.5, height: 7 + GRIDFINITY_LIP_HEIGHT });
     expect(gridfinityFootprintPatch(plate({ width: 130, depth: 40, height: 20 }))).toEqual({ width: 126, depth: 42, height: 5 });
   });
 
@@ -243,7 +245,8 @@ describe("gridfinity sizes", () => {
     expect(gridfinityShapePatch(bin(), { type: "baseplate" })).toMatchObject({ gridfinityType: "baseplate", width: 84, depth: 42, height: 5 });
     // A baseplate has no height units; turned into a bin it gets the default three.
     expect(gridfinityShapePatch(plate(), { type: "bin" })).toMatchObject({ gridfinityType: "bin", width: 83.5, depth: 41.5, height: 21 + GRIDFINITY_LIP_HEIGHT });
-    expect(gridfinityShapePatch(bin(), { x: 9, y: 0 })).toMatchObject({ width: 251.5, height: 7 + GRIDFINITY_LIP_HEIGHT });
+    expect(gridfinityShapePatch(bin(), { x: 9, y: 0 })).toMatchObject({ width: 377.5, height: 7 + GRIDFINITY_LIP_HEIGHT });
+    expect(gridfinityShapePatch(bin(), { x: 13 })).toMatchObject({ width: 503.5 });
   });
 
   it("keeps the height units when only the lip is switched", () => {
@@ -1004,20 +1007,20 @@ describe("gridfinity half-size grid", () => {
     expect(gridfinityPlan(plate({ gridfinityHalfGrid: true })).size).toEqual({ width: 84, depth: 42, height: 5 });
   });
 
-  it("counts cells of 21 mm, a bin 0.5 mm smaller, up to 12 of them: the 251.5 mm of 6 whole units", () => {
+  it("counts cells of 21 mm, a bin 0.5 mm smaller, up to 24 of them: the 503.5 mm of 12 whole units (#1917)", () => {
     expect(gridfinityPlan(half({ width: 20.5, depth: 62.5 })).size).toEqual({ width: 20.5, depth: 62.5, height: 25.4 });
     expect(gridfinityUnits(half({ width: 20.5, depth: 62.5 }))).toEqual({ x: 1, z: 3, y: 3 });
-    expect(gridfinityUnits(half({ width: 1000, depth: 1 }))).toMatchObject({ x: 12, z: 1 });
-    expect(gridfinityFootprintPatch(half({ width: 1000, depth: 1 }))).toMatchObject({ width: 251.5, depth: 20.5 });
+    expect(gridfinityUnits(half({ width: 1000, depth: 1 }))).toMatchObject({ x: 24, z: 1 });
+    expect(gridfinityFootprintPatch(half({ width: 1000, depth: 1 }))).toMatchObject({ width: 503.5, depth: 20.5 });
     // A drag snaps to 21 mm cells: 30 mm is 1.45 cells, 33 mm 1.6.
     expect(gridfinityFootprintPatch(half({ width: 30, depth: 33 }))).toMatchObject({ width: 20.5, depth: 41.5 });
   });
 
   it("keeps the outline when switched on, and rounds to whole units when switched off", () => {
-    // 2 x 1 whole units are 4 x 2 half units of the same 83.5 x 41.5; 6 x 6 are 12 x 12, and 12 is as many as there can be.
+    // 2 x 1 whole units are 4 x 2 half units of the same 83.5 x 41.5; 6 x 6 are 12 x 12.
     expect(gridfinityShapePatch(bin(), { halfGrid: true })).toMatchObject({ gridfinityHalfGrid: true, width: 83.5, depth: 41.5 });
     expect(gridfinityShapePatch(bin({ width: 251.5, depth: 251.5 }), { halfGrid: true })).toMatchObject({ width: 251.5, depth: 251.5 });
-    expect(gridfinityShapePatch(half(), { x: 12, z: 13 })).toMatchObject({ width: 251.5, depth: 251.5 });
+    expect(gridfinityShapePatch(half(), { x: 12, z: 13 })).toMatchObject({ width: 251.5, depth: 272.5 });
     // 3 half units (62.5) round to 2 whole ones, 1 half unit to 1.
     expect(gridfinityShapePatch(half({ width: 62.5, depth: 20.5 }), { halfGrid: false })).toMatchObject({ gridfinityHalfGrid: false, width: 83.5, depth: 41.5 });
     // A half bin turned into a baseplate keeps its outline in whole units, and back again; an odd count is read as the
@@ -3866,9 +3869,11 @@ describe("gridfinity tray", { timeout: 60_000 }, () => {
     [-40, -39.05, 39.05, 40].forEach((x, i) => expect(across[i]).toBeCloseTo(x, 9));
   });
 
-  it("keeps its size in mm and only clamps it to 10 to 252 mm across and deep and 3 to 140 mm high", () => {
+  it("keeps its size in mm and only clamps it to 10 to 504 mm across and deep and 3 to 140 mm high", () => {
     expect(gridfinityFootprintPatch(tray({ width: 80.3, depth: 40.7, height: 20.2 }))).toEqual({ width: 80.3, depth: 40.7, height: 20.2 });
-    expect(gridfinityFootprintPatch(tray({ width: 5, depth: 400, height: 1 }))).toEqual({ width: 10, depth: 252, height: 3 });
+    // A tray for 32 pill boxes, larger than 252 mm, keeps its size (#1917); past 504 mm it is kept to that.
+    expect(gridfinityFootprintPatch(tray({ width: 5, depth: 282.1, height: 1 }))).toEqual({ width: 10, depth: 282.1, height: 3 });
+    expect(gridfinityFootprintPatch(tray({ width: 600, depth: 400, height: 20 }))).toEqual({ width: 504, depth: 400, height: 20 });
     expect(gridfinityFootprintPatch(tray({ height: 200 }))).toEqual({ width: 80, depth: 40, height: 140 });
   });
 
@@ -3939,7 +3944,8 @@ describe("gridfinity tray", { timeout: 60_000 }, () => {
     expect(makeShapeFromAsset(asset, { x: 0, z: 0 }, { gridfinityType: "tray", width: 92.5 })).toMatchObject({ gridfinityType: "tray", width: 92.5, depth: 40, height: 20 });
     const shape = canonicalizeShape(binShape({ gridfinityType: "tray", width: 92.5, depth: 31.2, height: 17.3 }));
     expect(shape).toMatchObject({ width: 92.5, depth: 31.2, height: 17.3 });
-    expect(canonicalizeShape({ ...shape, width: 500 })).toMatchObject({ width: 252 });
+    expect(canonicalizeShape({ ...shape, width: 500 })).toMatchObject({ width: 500 });
+    expect(canonicalizeShape({ ...shape, width: 600 })).toMatchObject({ width: 504 });
     const save = (shapes: WorkplaneShape[]) => exportLylProject({ projectId: "tray", projectName: "Tray", createdAt: 1, modifiedAt: 2, shapes, history: [editorHistoryEntry(shapes, [])], historyIndex: 0, assets: [], workspace: DEFAULT_WORKPLANE_WORKSPACE, snapGrid: DEFAULT_SNAP_GRID, placementElevation: 0 });
     const [loaded] = (await importLylProject(await save([shape]))).shapes;
     expect(workplaneShapesEqual(loaded, shape)).toBe(true);
@@ -4844,5 +4850,59 @@ describe("gridfinity label shelf text", { timeout: 60_000 }, () => {
       expect(components(triangles), JSON.stringify(fields)).toBe(1);
       expect(signedVolume(triangles), JSON.stringify(fields)).toBeGreaterThan(signedVolume(gridfinityLabelledTriangles(runtime, shape)));
     }
+  });
+});
+
+describe("how large a bin or tray the printer's bed takes (#1917)", () => {
+  const bed = { width: 320, depth: 330 };
+  const half = (fields: Record<string, unknown> = {}) => bin({ gridfinityHalfGrid: true, ...fields });
+
+  it("reaches as far as the bed's longer side, at least the 252 mm of 6 units and at most 504 mm", () => {
+    expect(gridfinityBedReach(null)).toBe(252);
+    expect(gridfinityBedReach(bed)).toBe(330);
+    // A smaller bed than 252 mm keeps what every bed was offered before; the print check flags it.
+    expect(gridfinityBedReach({ width: 180, depth: 180 })).toBe(252);
+    expect(gridfinityBedReach({ width: 1000, depth: 600 })).toBe(504);
+    expect(gridfinityBedReach("any")).toBe(504);
+    expect(gridfinityTrayMax(bed)).toBe(330);
+    expect(gridfinityTrayMax(undefined)).toBe(252);
+  });
+
+  it("offers a bin as many units as fit the bed: 7 on 320 x 330 mm, 6 without a printer", () => {
+    expect(gridfinityMaxUnits(bin())).toBe(6);
+    expect(gridfinityMaxUnits(bin(), bed)).toBe(7);
+    expect(gridfinityMaxUnits(half(), bed)).toBe(15);
+    expect(gridfinityMaxUnits(half())).toBe(12);
+    // A bin of 7 units is 293.5 mm, 0.5 mm less than the units: a bed of exactly that takes it.
+    expect(gridfinityMaxUnits(bin(), { width: 293.5, depth: 200 })).toBe(7);
+    expect(gridfinityMaxUnits(bin(), { width: 293.4, depth: 200 })).toBe(6);
+    expect(gridfinityMaxUnits(bin(), "any")).toBe(12);
+    // A baseplate keeps its 6 units, or 12 on a large plate, and is split for a smaller bed instead (#1388).
+    expect(gridfinityMaxUnits(plate(), bed)).toBe(6);
+    expect(gridfinityMaxUnits(plate({ gridfinityLargePlate: true }), bed)).toBe(12);
+  });
+
+  it("builds a bin of 7 units with its feet and keeps it", () => {
+    const patch = gridfinityShapePatch(bin(), { x: 7, z: 4 });
+    expect(patch).toMatchObject({ width: 293.5, depth: 167.5 });
+    const shape = bin({ width: patch.width, depth: patch.depth });
+    expect(gridfinityUnits(shape)).toMatchObject({ x: 7, z: 4 });
+    expect(gridfinityFootprintPatch(shape)).toMatchObject({ width: 293.5, depth: 167.5 });
+    expect(gridfinityPlan(shape).count).toMatchObject({ x: 7, z: 4 });
+  });
+
+  it("gives a baseplate or tray turned into a bin as many units as the bed takes, and a bin its own", () => {
+    expect(gridfinityShapePatch(plate({ width: 420, gridfinityLargePlate: true }), { type: "bin" })).toMatchObject({ width: 251.5 });
+    expect(gridfinityShapePatch(plate({ width: 420, gridfinityLargePlate: true }), { type: "bin" }, bed)).toMatchObject({ width: 293.5 });
+    // A bin of 9 units, made for a larger bed, keeps them when only its lip is switched.
+    expect(gridfinityShapePatch(bin({ width: 377.5 }), { lip: false })).toMatchObject({ width: 377.5 });
+  });
+
+  it("keeps a wide bin's compartments to the 24 a project keeps", () => {
+    const wide = bin({ width: 503.5, depth: 41.5, height: 42 + GRIDFINITY_LIP_HEIGHT });
+    expect(gridfinityUnitCompartments(wide, "x")).toBe(24);
+    expect(gridfinityUnitCompartments(bin({ width: 293.5 }), "x")).toBe(24);
+    expect(gridfinityUnitCompartments(bin({ width: 251.5 }), "x")).toBe(24);
+    expect(gridfinityUnitCompartments(bin({ width: 209.5 }), "x")).toBe(20);
   });
 });

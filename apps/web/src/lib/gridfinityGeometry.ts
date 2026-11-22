@@ -200,6 +200,12 @@ export const GRIDFINITY_MAGNET_DEPTH = 2.4;
 export const GRIDFINITY_MAGNET_OFFSET = 13;
 export const MIN_GRIDFINITY_UNITS = 1;
 export const MAX_GRIDFINITY_UNITS = 6;
+/**
+ * The most a bin or tray reaches across or deep at all (#1917): 504 mm, 12 units as a large baseplate. The fields
+ * offer as much as the chosen printer's bed takes (gridfinityBedReach), at least the 252 mm of 6 units; this is only
+ * what a drag, a file or the MCP is kept to, so a bin made for a large bed keeps its size without that printer chosen.
+ */
+export const MAX_GRIDFINITY_BED_REACH = 12 * 42;
 /** A large baseplate's most units across and deep (#1061): 504 mm, more than the 11 a 500 mm bed takes. */
 export const MAX_GRIDFINITY_LARGE_PLATE_UNITS = 12;
 export const MAX_GRIDFINITY_HEIGHT_UNITS = 20;
@@ -231,7 +237,10 @@ export const DEFAULT_GRIDFINITY_TYPE: GridfinityType = "bin";
 export const DEFAULT_GRIDFINITY_UNITS = { x: 2, z: 1, y: 3 };
 export const DEFAULT_GRIDFINITY_LIP = true;
 export const DEFAULT_GRIDFINITY_MAGNETS = false;
-/** A tray's size (#837): free in mm, from a 10 mm square, whose 3.75 mm corners still fit a wall, up to six grid units, 252 mm. */
+/**
+ * A tray's size (#837): free in mm, from a 10 mm square, whose 3.75 mm corners still fit a wall, up to six grid units,
+ * 252 mm, or as far as the chosen printer's bed reaches (#1917).
+ */
 export const MIN_GRIDFINITY_TRAY_SIZE = 10;
 export const MAX_GRIDFINITY_TRAY_SIZE = MAX_GRIDFINITY_UNITS * GRIDFINITY_GRID;
 /** A tray's height: at least the 1.2 mm floor and a wall above it, at most the 20 height units of the tallest bin. */
@@ -434,8 +443,8 @@ function labelTop(plan: GridfinityPlan, lettered: boolean) {
 /** A tray's box (#837): its width, depth and height in mm as they are, kept to the tray's limits. */
 function gridfinityTraySize(shape: Pick<GridfinityShapeFields, "width" | "depth" | "height">) {
   return {
-    width: clampLabel(shape.width, DEFAULT_GRIDFINITY_TRAY_SIZE.width, MIN_GRIDFINITY_TRAY_SIZE, MAX_GRIDFINITY_TRAY_SIZE),
-    depth: clampLabel(shape.depth ?? shape.width, DEFAULT_GRIDFINITY_TRAY_SIZE.depth, MIN_GRIDFINITY_TRAY_SIZE, MAX_GRIDFINITY_TRAY_SIZE),
+    width: clampLabel(shape.width, DEFAULT_GRIDFINITY_TRAY_SIZE.width, MIN_GRIDFINITY_TRAY_SIZE, MAX_GRIDFINITY_BED_REACH),
+    depth: clampLabel(shape.depth ?? shape.width, DEFAULT_GRIDFINITY_TRAY_SIZE.depth, MIN_GRIDFINITY_TRAY_SIZE, MAX_GRIDFINITY_BED_REACH),
     height: clampLabel(shape.height, DEFAULT_GRIDFINITY_TRAY_SIZE.height, MIN_GRIDFINITY_TRAY_HEIGHT, MAX_GRIDFINITY_TRAY_HEIGHT),
   };
 }
@@ -449,10 +458,36 @@ function gridfinityPitch(shape: Pick<GridfinityShapeFields, "gridfinityType" | "
   return normalizeGridfinityType(shape.gridfinityType) === "bin" && shape.gridfinityHalfGrid === true ? GRIDFINITY_GRID / 2 : GRIDFINITY_GRID;
 }
 
-/** The most units across or deep: 6 of 42 mm, or the same size in cells of 21 mm; 12 on a large baseplate (#1061). */
-export function gridfinityMaxUnits(shape: Pick<GridfinityShapeFields, "gridfinityType" | "gridfinityHalfGrid" | "gridfinityLargePlate">) {
-  if (normalizeGridfinityType(shape.gridfinityType) === "baseplate" && shape.gridfinityLargePlate === true) return MAX_GRIDFINITY_LARGE_PLATE_UNITS;
-  return (MAX_GRIDFINITY_UNITS * GRIDFINITY_GRID) / gridfinityPitch(shape);
+/** A printer's bed as the Gridfinity limits read it: its width and depth in mm, or none when no printer is chosen. */
+export type GridfinityBed = { width: number; depth: number } | null | undefined;
+
+/**
+ * How far a bin or tray may reach across or deep on a bed (#1917): the bed's longer side, as a box can be turned to lie
+ * along it, but never less than the 252 mm of 6 units, which every bed was offered before, nor more than 504 mm. With
+ * no bed it is 252 mm, as before; with "any" it is the 504 mm a drag, a file or the MCP is kept to.
+ */
+export function gridfinityBedReach(bed: GridfinityBed | "any") {
+  if (bed === "any") return MAX_GRIDFINITY_BED_REACH;
+  const side = bed ? Math.max(bed.width, bed.depth) : 0;
+  return clamp(Number.isFinite(side) ? side : 0, MAX_GRIDFINITY_TRAY_SIZE, MAX_GRIDFINITY_BED_REACH);
+}
+
+/** The largest a tray can be made across or deep in the fields (#837, #1917): what the bed reaches, 252 mm without one. */
+export function gridfinityTrayMax(bed: GridfinityBed) {
+  return gridfinityBedReach(bed);
+}
+
+/**
+ * The most units across or deep. A bin takes as many units of 42 mm, or cells of 21 mm on the half-size grid, as fit
+ * the bed's reach (#1917): its box is 0.5 mm smaller than the units, so 7 units (293.5 mm) fit a 320 x 330 mm bed.
+ * Without a bed that is 6, the same 251.5 mm as 12 cells. A baseplate keeps 6, or 12 on a large plate (#1061); one
+ * larger than the bed is split into plates that fit it instead (#1388).
+ */
+export function gridfinityMaxUnits(shape: Pick<GridfinityShapeFields, "gridfinityType" | "gridfinityHalfGrid" | "gridfinityLargePlate">, bed: GridfinityBed | "any" = null) {
+  const type = normalizeGridfinityType(shape.gridfinityType);
+  if (type === "baseplate") return shape.gridfinityLargePlate === true ? MAX_GRIDFINITY_LARGE_PLATE_UNITS : MAX_GRIDFINITY_UNITS;
+  const pitch = gridfinityPitch(shape);
+  return Math.floor((gridfinityBedReach(bed) + 2 * GRIDFINITY_CLEARANCE + 1e-9) / pitch);
 }
 
 /**
@@ -467,7 +502,8 @@ export function gridfinityUnits(shape: GridfinityShapeFields) {
   if (type === "tray") return { x: 1, z: 1, y: 1 };
   const margin = type === "bin" ? 2 * GRIDFINITY_CLEARANCE : 0;
   const pitch = gridfinityPitch(shape);
-  const max = gridfinityMaxUnits(shape);
+  // A bin keeps any size up to the 504 mm a drag, a file or the MCP may give it (#1917); the fields offer what the bed takes.
+  const max = gridfinityMaxUnits(shape, "any");
   const padding = gridfinityGrowth(shape);
   return {
     x: units((shape.width + margin - padding.left - padding.right) / pitch, DEFAULT_GRIDFINITY_UNITS.x, max),
@@ -510,10 +546,11 @@ export function gridfinityFootprintPatch(shape: GridfinityShapeFields) {
  * (2 whole units are 4 cells) and is rounded to the nearest units where it
  * cannot. A tray keeps the box it is given, and a baseplate turned into one
  * gets a tray's default height; a tray turned into a bin or baseplate is read
- * on the grid, its height counted in height units as a bin's. A large plate
- * switched off goes back to at most 6 units and keeps its padding.
+ * on the grid, its height counted in height units as a bin's, a bin up to as
+ * many units as the bed takes (#1917). A large plate switched off goes back to
+ * at most 6 units and keeps its padding.
  */
-export function gridfinityShapePatch(shape: GridfinityShapeFields, next: { type?: GridfinityType; x?: number; z?: number; y?: number; lip?: boolean; halfGrid?: boolean; largePlate?: boolean; swallowtail?: boolean }) {
+export function gridfinityShapePatch(shape: GridfinityShapeFields, next: { type?: GridfinityType; x?: number; z?: number; y?: number; lip?: boolean; halfGrid?: boolean; largePlate?: boolean; swallowtail?: boolean }, bed: GridfinityBed = null) {
   const current = gridfinityUnits(shape);
   const currentType = normalizeGridfinityType(shape.gridfinityType);
   const type = next.type ?? currentType;
@@ -533,7 +570,9 @@ export function gridfinityShapePatch(shape: GridfinityShapeFields, next: { type?
   }
   const grid = { gridfinityType: type, gridfinityHalfGrid: halfGrid, gridfinityLargePlate: largePlate };
   const pitch = gridfinityPitch(grid);
-  const max = gridfinityMaxUnits(grid);
+  // A bin keeps the units it has, up to the 504 mm any bed is offered (#1917); one it becomes from another type gets
+  // only as many as the printer's bed takes, 6 without one.
+  const max = gridfinityMaxUnits(grid, type === currentType ? "any" : bed);
   // The current size read on the new grid as the new type, as canonicalizeShape reads a size given through the MCP.
   const margin = type === "bin" ? 2 * GRIDFINITY_CLEARANCE : 0;
   const regrid = pitch !== gridfinityPitch(shape) || currentType === "tray";
@@ -2031,7 +2070,8 @@ export function gridfinityDividerFits(shape: GridfinityShapeFields) {
 export function gridfinityUnitCompartments(shape: GridfinityShapeFields, axis: GridfinityAxis) {
   const plan = gridfinityPlan(shape);
   if (plan.type === "tray") return MAX_GRIDFINITY_DIVIDERS + 1;
-  return (GRIDFINITY_COMPARTMENTS_PER_UNIT * plan.count[axis] * plan.pitch) / GRIDFINITY_GRID;
+  // A bin wider than 6 units (#1917) still takes at most the 24 a project keeps.
+  return Math.min(MAX_GRIDFINITY_DIVIDERS + 1, (GRIDFINITY_COMPARTMENTS_PER_UNIT * plan.count[axis] * plan.pitch) / GRIDFINITY_GRID);
 }
 
 /**

@@ -3908,6 +3908,7 @@ export const MESSAGES_AR: Partial<Record<MessageKey, string>> = {
   "prop.gridfinityMagnets": "ثقوب المغناطيس",
   "prop.gridfinityHalfGrid": "نصف شبكة (21 مم)",
   "gridfinity.halfGridHint": "تحسب الوحدات في العرض والعمق خلايا من 21 مم، لكل منها قدم خاصة بها؛ وتقف أربع منها في تجويف واحد من لوح الشبكة.",
+  "gridfinity.bedLimitHint": "حتى {size} مم عرضًا وعمقًا: بقدر ما يتسع له سرير الطباعة المختار في إعدادات مساحة العمل، و252 مم من دون طابعة.",
   "prop.gridfinityLargePlate": "لوح شبكة كبير (حتى 12 وحدة)",
   "gridfinity.largePlateHint": "حتى 12 وحدة في العرض والعمق بدلًا من 6، لأسرّة الطباعة الأكبر من 256 مم. وإذا اخترت طابعتك في الإعدادات، يُعلَّم اللوح الأكبر من سريرها.",
   "prop.gridfinitySwallowtail": "Swallowtail",

@@ -3785,6 +3785,7 @@ export const MESSAGES_ZH_TW: Partial<Record<MessageKey, string>> = {
   "prop.gridfinityMagnets": "磁鐵孔",
   "prop.gridfinityHalfGrid": "半尺寸網格（21 mm）",
   "gridfinity.halfGridHint": "橫向與縱向單元按 21 mm 的格子計算，每個格子都有自己的底腳；四個格子剛好放進底板的一個插槽。",
+  "gridfinity.bedLimitHint": "寬度和深度最多 {size} mm：以工作區設定中所選列印平台能容納的為準，未選印表機時為 252 mm。",
   "prop.gridfinityLargePlate": "大底板（最多 12 個單元）",
   "gridfinity.largePlateHint": "橫向與縱向最多 12 個單元，而非 6 個，適用於大於 256 mm 的列印平台。在工作區設定中選好你的印表機後，比列印平台大的底板會被標示出來。",
   "prop.gridfinitySwallowtail": "Swallowtail",

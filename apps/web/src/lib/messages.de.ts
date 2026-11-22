@@ -3845,6 +3845,7 @@ export const MESSAGES_DE: Record<MessageKey, string> = {
   "prop.gridfinityMagnets": "Magnetlöcher",
   "prop.gridfinityHalfGrid": "Halbes Raster (21 mm)",
   "gridfinity.halfGridHint": "Einheiten breit und tief zählen Zellen von 21 mm, jede mit einem eigenen Fuß; vier stehen in einer Mulde der Bodenplatte.",
+  "gridfinity.bedLimitHint": "Bis {size} mm breit und tief: so viel, wie das in den Arbeitsbereich-Einstellungen gewählte Druckbett fasst, ohne Drucker 252 mm.",
   "prop.gridfinityLargePlate": "Große Bodenplatte (bis 12 Einheiten)",
   "gridfinity.largePlateHint": "Bis zu 12 Einheiten breit und tief statt 6, für Druckbetten über 256 mm. Ist dein Drucker in den Einstellungen gewählt, wird eine Platte markiert, die größer als sein Druckbett ist.",
   "prop.gridfinitySwallowtail": "Swallowtail",

@@ -3803,6 +3803,7 @@ export const MESSAGES_JA: Partial<Record<MessageKey, string>> = {
   "prop.gridfinityMagnets": "磁石の穴",
   "prop.gridfinityHalfGrid": "半分のグリッド（21 mm）",
   "gridfinity.halfGridHint": "横と奥行きのマス数を21 mmのマスで数え、マスごとに足が1つずつ付きます。ベースプレートの1つのくぼみに4つ入ります。",
+  "gridfinity.bedLimitHint": "幅と奥行きは最大 {size} mm：ワークスペース設定で選んだプリントベッドに収まる大きさまでです。プリンターを選んでいない場合は 252 mm です。",
   "prop.gridfinityLargePlate": "大きなベースプレート（最大12マス）",
   "gridfinity.largePlateHint": "横と奥行きを6マスではなく最大12マスにします。256 mmより大きいプリントベッド向けです。設定でプリンターを選んでいると、そのベッドより大きいプレートには印が付きます。",
   "prop.gridfinitySwallowtail": "Swallowtail",

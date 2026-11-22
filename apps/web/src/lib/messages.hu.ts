@@ -3331,6 +3331,7 @@ export const MESSAGES_HU: Partial<Record<MessageKey, string>> = {
   "prop.gridfinityMagnets": "Mágneslyukak",
   "prop.gridfinityHalfGrid": "Fél rács (21 mm)",
   "gridfinity.halfGridHint": "A szélességi és mélységi egységek 21 mm-es cellákat számolnak, mindegyiknek saját lába van; négy áll az alapkeret egy fészkében.",
+  "gridfinity.bedLimitHint": "Szélességben és mélységben legfeljebb {size} mm: amennyit a munkaterület beállításaiban választott tárgyasztal elbír, nyomtató nélkül 252 mm.",
   "prop.gridfinityLargePlate": "Nagy alapkeret (legfeljebb 12 egység)",
   "gridfinity.largePlateHint": "6 helyett legfeljebb 12 egység szélességben és mélységben, 256 mm-nél nagyobb tárgyasztalokhoz. Ha a beállításokban kiválasztottad a nyomtatódat, a tárgyasztalánál nagyobb keret jelölést kap.",
   "prop.gridfinitySwallowtail": "Swallowtail",

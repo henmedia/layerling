@@ -3917,6 +3917,7 @@ export const MESSAGES_SV: Partial<Record<MessageKey, string>> = {
   "prop.gridfinityMagnets": "Magnethål",
   "prop.gridfinityHalfGrid": "Halvrutnät (21 mm)",
   "gridfinity.halfGridHint": "Enheter i bredd och djup räknar rutor på 21 mm, var och en med en egen fot; fyra stycken får plats i en ruta i en basplatta.",
+  "gridfinity.bedLimitHint": "Upp till {size} mm i bredd och djup: så mycket som byggplattan som valts i arbetsytans inställningar rymmer, 252 mm utan skrivare.",
   "prop.gridfinityLargePlate": "Stor basplatta (upp till 12 enheter)",
   "gridfinity.largePlateHint": "Upp till 12 enheter i bredd och djup i stället för 6, för byggplattor över 256 mm. När din skrivare är vald i inställningarna markeras en basplatta som är större än skrivarens byggplatta.",
   "prop.gridfinitySwallowtail": "Laxstjärt",

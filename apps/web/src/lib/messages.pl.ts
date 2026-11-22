@@ -3799,6 +3799,7 @@ export const MESSAGES_PL: Partial<Record<MessageKey, string>> = {
   "prop.gridfinityMagnets": "Otwory na magnesy",
   "prop.gridfinityHalfGrid": "Siatka połówkowa (21 mm)",
   "gridfinity.halfGridHint": "Jednostki wszerz i w głąb liczą komórki po 21 mm, każdą z własną stopką; cztery stoją w jednym gnieździe podstawki.",
+  "gridfinity.bedLimitHint": "Do {size} mm wszerz i w głąb: tyle, ile zmieści stół drukarki wybranej w ustawieniach obszaru roboczego, bez drukarki 252 mm.",
   "prop.gridfinityLargePlate": "Duża podstawka (do 12 jednostek)",
   "gridfinity.largePlateHint": "Do 12 jednostek wszerz i w głąb zamiast 6, dla stołów drukarki powyżej 256 mm. Gdy drukarka jest wybrana w ustawieniach, podstawka większa niż jej stół zostanie oznaczona.",
   "prop.gridfinitySwallowtail": "Swallowtail",
