@@ -3721,6 +3721,8 @@ export function LayerlingEditor({
   const [shellPreview, setShellPreview] = useState<{ targetId: string; fingerprint: string; shape: WorkplaneShape } | null>(null);
   const [shellPreviewBusy, setShellPreviewBusy] = useState(false);
   const shellPreviewRunnerRef = useRef(createLatestJobRunner<WorkplaneShape>());
+  // What the preview built last, with the key it was built for: kept in an instant when the tool is left (keepHollowing).
+  const shellPreviewBuiltRef = useRef<{ key: string; shape: WorkplaneShape } | null>(null);
   /** Cut out (#927): `partId` stays, a copy of it grown by `clearance` is cut out of `hostId`. */
   const [cutOutTool, setCutOutTool] = useState<{ partId: string; hostId: string; clearance: number; busy: boolean; error: string | null } | null>(null);
   const [punchTool, setPunchTool] = useState<{ punchId: string; targetId: string; axis: SectionPlaneAxis; clearance: number; busy: boolean; error: string | null } | null>(null);
@@ -9230,7 +9232,7 @@ export function LayerlingEditor({
           const height = Math.max(2.5, spot.height);
           const width = Math.min(spot.width, letters * height * 0.75);
           const text = makeShapeFromAsset(textAsset, { x: spot.point[0], z: spot.point[2], elevation: spot.point[1] - 0.1 });
-          return canonicalizeShape({ ...text, id: createLocalId(`${latch!.clips.id}-label-${index}`), text: label, width, depth: height, height: 0.7, hole: true, mirrorZ: true, name: label });
+          return canonicalizeShape({ ...text, id: createLocalId(`${latch!.clips.id}-label-${index}`), text: label, width, depth: height, height: 0.7, hole: true, mirrorZ: true, ...(spot.turn ? { rotation: spot.turn } : {}), name: label });
         });
         const engraved = await buildGroupedShapeOffThread([latch.clips, ...holes], workspaceSettingsRef.current.booleanTriangleLimit, geometryAbortRef.current?.signal);
         if (engraved.group) latch = { ...latch, clips: canonicalizeShape({ ...engraved.group, groupOperation: "group", name: latch.clips.name }) };
@@ -9394,7 +9396,17 @@ export function LayerlingEditor({
     closeSplit();
     setMoldTool(null);
     // The gap and the hinge pin's play start from the printer's play when it is measured (printerPlay.ts).
-    setLidTool({ ...lidDefaults(getPrinterPlay()), targetIds: targets.map((shape) => shape.id), busy: false, error: null });
+    const open = () => setLidTool({ ...lidDefaults(getPrinterPlay()), targetIds: targets.map((shape) => shape.id), busy: false, error: null });
+    // Hollow is still open on the body: what it shows is kept first, as its Apply keeps it, so the lid is made for the
+    // hollowed box and not for the block under the preview.
+    const hollow = shellKeepRef.current;
+    if (hollow && shellToolRef.current === hollow.tool && !hollow.tool.busy && !hollow.tool.error && targets.some((shape) => shape.id === hollow.target.id)) {
+      void keepHollowingRef.current(hollow.target, hollow.tool).then((kept) => {
+        if (kept) open();
+      });
+      return;
+    }
+    open();
   }, [closeSplit, edgeModifier, invalidateCadModifierSession, lidTool, selectedShapes]);
 
   const applyLidTool = useCallback(() => {
@@ -9849,6 +9861,7 @@ export function LayerlingEditor({
         .then((shape) => {
           if (overtaken || !shape) return;
           // A sealed cavity cannot be seen from outside (#658): the preview is see-through then.
+          shellPreviewBuiltRef.current = { key, shape };
           setShellPreview({ targetId: target.id, fingerprint, shape: shellOpenSides(tool.openings).length === 0 ? { ...shape, transparent: true } : shape });
           setShellPreviewBusy(false);
         })
@@ -9873,6 +9886,32 @@ export function LayerlingEditor({
    * the tool is gone. A tool that shows an error, or is at work, keeps nothing.
    */
   const shellKeepRef = useRef<{ target: WorkplaneShape; tool: NonNullable<typeof shellTool> } | null>(null);
+  /**
+   * The tool closed and what it showed laid on its body, as Apply lays it: what the preview built for these settings as it
+   * is, else hollowed now. True once the body is hollowed; false when it changed or went meanwhile, or cannot be hollowed.
+   */
+  const keepHollowing = useCallback(async (target: WorkplaneShape, tool: NonNullable<typeof shellTool>) => {
+    const fingerprint = projectShapesFingerprint([target]);
+    const built = shellPreviewBuiltRef.current;
+    setShellTool(null);
+    try {
+      const modifiedShape = built && built.key === shellPreviewKey(fingerprint, tool) ? built.shape : await hollowedWithTool(target, tool);
+      const now = shapesRef.current.find((candidate) => candidate.id === target.id);
+      // Changed or deleted in the meantime: nothing is laid over it.
+      if (!modifiedShape || !now || projectShapesFingerprint([now]) !== fingerprint) return false;
+      commitShapes(
+        shapesRef.current.map((candidate) => candidate.id === target.id ? modifiedShape : candidate),
+        selectedIdsRef.current,
+        t(shellOpenSides(tool.openings).length === 0 ? "status.shelledClosed" : "status.shelled", { size: Number(tool.thickness.toFixed(2)) }),
+      );
+      return true;
+    } catch (error) {
+      setNotice(shellToolErrorText(error, target), true);
+      return false;
+    }
+  }, [commitShapes, hollowedWithTool, shellToolErrorText]);
+  const keepHollowingRef = useRef(keepHollowing);
+  keepHollowingRef.current = keepHollowing;
   const shellTargetId = shellPreviewTarget?.id ?? null;
   useEffect(() => {
     const left = shellKeepRef.current;
@@ -9881,20 +9920,7 @@ export function LayerlingEditor({
     const { target, tool } = left;
     // Still the tool that was open when the selection changed, and not one that was closed on purpose just before.
     if (shellToolRef.current !== tool || tool.busy || tool.error) return;
-    setShellTool(null);
-    const fingerprint = projectShapesFingerprint([target]);
-    void hollowedWithTool(target, tool)
-      .then((modifiedShape) => {
-        const now = shapesRef.current.find((candidate) => candidate.id === target.id);
-        // Changed or deleted in the meantime: nothing is laid over it.
-        if (!modifiedShape || !now || projectShapesFingerprint([now]) !== fingerprint) return;
-        commitShapes(
-          shapesRef.current.map((candidate) => candidate.id === target.id ? modifiedShape : candidate),
-          selectedIdsRef.current,
-          t(shellOpenSides(tool.openings).length === 0 ? "status.shelledClosed" : "status.shelled", { size: Number(tool.thickness.toFixed(2)) }),
-        );
-      })
-      .catch((error: unknown) => setNotice(shellToolErrorText(error, target), true));
+    void keepHollowing(target, tool);
   }, [shellTargetId]);
   // After every render: the body the tool is open on, with the tool as it stands, for the effect above to find next time.
   useEffect(() => {

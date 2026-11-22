@@ -341,6 +341,8 @@ const STACK_TOP_STEP = 0.1;
 const LEAN_STEP = 0.25;
 const LEAN_MAX_STEPS = 48;
 const LEAN_MIN = 0.02;
+/** How far a leaning wall goes sideways for each mm of height at most (some 76 degrees from upright): beyond it, it is a ledge. */
+const LEAN_MAX_SLOPE = 4;
 /** How far the hinge stays from the ends of the straight back side, in mm (its corners may be rounded). */
 const HINGE_END_MARGIN = 0.5;
 /** How much of a knuckle a teardrop hole leaves above its point, in mm: a point that would reach closer is cut flat. */
@@ -3160,7 +3162,8 @@ export type LidFlipTop = { opening: number; flap: number; hingeWidth: number; hi
  */
 export type LidLatch = {
   body: ManifoldSolid; clips: ManifoldSolid; count: number; width: number; pin: number; style?: LidLatchStyle; travel?: number;
-  labels?: { point: [number, number, number]; width: number; height: number }[];
+  /** For sliders: where each label is cut into its slider as it lies, its room, and how far the slider lies turned about the up axis, in degrees (a box standing turned). */
+  labels?: { point: [number, number, number]; width: number; height: number; turn?: number }[];
   /** For bolts: each label's right end on the body's wall and the wall's outward direction, in the scene's frame. */
   boltLabels?: { point: [number, number, number]; normal: [number, number, number]; height: number }[];
 };
@@ -3205,6 +3208,82 @@ export function lidTopRound(runtime: ManifoldToplevel, body: ManifoldSolid): { o
  * bead for the body, and the tether lying beside the cap.
  */
 export function lidForSolid(runtime: ManifoldToplevel, body: ManifoldSolid, given: LidOptions): LidResult {
+  const options = normalizeLidOptions(given);
+  // A hinge, latches and a handle go along a side that runs across or front to back, magnets into corners between such
+  // sides. A box set down turned on the plate has none: it is worked out turned back square, and everything made for it
+  // turned as the box stands. A slide-in lid does so itself (`slideBoxTurn`).
+  const turn = (options.hinge || options.latches > 0 || options.handle !== "none" || options.magnets) && options.type !== "slide" ? lidBoxTurn(runtime, body) : 0;
+  if (!turn) return lidForStandingSolid(runtime, body, given);
+  const square = body.rotate([0, -turn, 0]);
+  try {
+    return lidTurned(lidForStandingSolid(runtime, square, given), turn);
+  } finally {
+    square.delete?.();
+  }
+}
+
+/** A box's outline fills at least this share of the smallest rectangle round it, rounded corners and all. */
+const BOX_OUTLINE_SHARE = 0.9;
+
+/**
+ * How far `body` (in the scene's frame) stands turned about the up axis if its top is a box's, in degrees from -45 to
+ * 45, anticlockwise seen from above (`slideBoxTurn` of its outline below the rim); 0 for a box standing square and for
+ * what is no box seen from above: a round pot, a hexagon, an L.
+ */
+export function lidBoxTurn(runtime: ManifoldToplevel, body: ManifoldSolid): number {
+  const created: { delete?: () => void }[] = [];
+  try {
+    const up = keep(created, body.transform(SCENE_TO_UP));
+    const box = up.boundingBox();
+    const outline = filled(runtime, keep(created, up.slice(lidRimHeight(box.max[2], box.max[2] - box.min[2]))), created);
+    const polygons = outline.toPolygons() as Point[][];
+    const turn = slideBoxTurn(polygons);
+    if (!turn) return 0;
+    const points = turnedByAngle(polygons, -turn).flat();
+    const xs = points.map(([x]) => x);
+    const ys = points.map(([, y]) => y);
+    const rectangle = (Math.max(...xs) - Math.min(...xs)) * (Math.max(...ys) - Math.min(...ys));
+    return rectangle > 0 && outline.area() >= BOX_OUTLINE_SHARE * rectangle ? turn : 0;
+  } finally {
+    Array.from(new Set(created)).forEach((value) => value.delete?.());
+  }
+}
+
+/** A lid made for a box turned back square, turned `degrees` about the up axis as the box stands: its solids, and every place and direction given with them. */
+function lidTurned(result: LidResult, degrees: number): LidResult {
+  if ("error" in result) return result;
+  const cos = Math.cos((degrees * Math.PI) / 180);
+  const sin = Math.sin((degrees * Math.PI) / 180);
+  const solid = <T extends ManifoldSolid | null>(value: T): T => {
+    if (!value) return value;
+    const turned = value.rotate([0, degrees, 0]);
+    value.delete?.();
+    return turned as T;
+  };
+  const place = <T extends { x: number; z: number }>(value: T): T => ({ ...value, x: value.x * cos + value.z * sin, z: -value.x * sin + value.z * cos });
+  const point = ([x, y, z]: [number, number, number]): [number, number, number] => [x * cos + z * sin, y, -x * sin + z * cos];
+  const { lid, magnets, hinge, latch, clickBumps, handle, screw, bayonet, slide, tether, ...rest } = result;
+  return {
+    ...rest,
+    lid: solid(lid),
+    ...(magnets ? { magnets: { posts: solid(magnets.posts), postParts: magnets.postParts.map((part) => ({ ...place(part), rotation: part.rotation + degrees })), pockets: magnets.pockets.map(place) } } : {}),
+    ...(hinge ? { hinge: { ...hinge, knuckles: solid(hinge.knuckles), pin: solid(hinge.pin), cuts: solid(hinge.cuts), plugs: solid(hinge.plugs) } } : {}),
+    ...(latch ? { latch: {
+      ...latch, body: solid(latch.body), clips: solid(latch.clips),
+      ...(latch.labels ? { labels: latch.labels.map((label) => ({ ...label, point: point(label.point), turn: (label.turn ?? 0) + degrees })) } : {}),
+      ...(latch.boltLabels ? { boltLabels: latch.boltLabels.map((label) => ({ ...label, point: point(label.point), normal: point(label.normal) })) } : {}),
+    } } : {}),
+    ...(clickBumps ? { clickBumps: { ...clickBumps, dimples: solid(clickBumps.dimples) } } : {}),
+    ...(handle ? { handle: { ...handle, notch: solid(handle.notch) } } : {}),
+    ...(screw ? { screw: { ...screw, thread: solid(screw.thread) } } : {}),
+    ...(bayonet ? { bayonet: { ...bayonet, lugs: solid(bayonet.lugs) } } : {}),
+    ...(slide ? { slide: { ...slide, cuts: solid(slide.cuts) } } : {}),
+    ...(tether ? { tether: { ...tether, part: solid(tether.part), bead: solid(tether.bead) } } : {}),
+  };
+}
+
+/** `lidForSolid` for a body as it stands: a box's sides run across and front to back. */
+function lidForStandingSolid(runtime: ManifoldToplevel, body: ManifoldSolid, given: LidOptions): LidResult {
   const created: { delete?: () => void }[] = [];
   // What is handed back is not deleted with the rest.
   const handed = new Set<unknown>();
@@ -3449,7 +3528,11 @@ export function lidForSolid(runtime: ManifoldToplevel, body: ManifoldSolid, give
         const upper = sections[index - 1];
         const lower = sections[index];
         if (lower.area.area() < MIN_OPENING_AREA) break;
-        pieces.push(convex(lower.area) && convex(upper.area)
+        // A ledge is no leaning wall (a filling below the rim with a pocket in it): where one section reaches further
+        // than a wall leaning LEAN_MAX_SLOPE would between the two heights, the lower one goes straight up to the upper.
+        const reach = LEAN_MAX_SLOPE * (upper.z - lower.z) + LEAN_MIN;
+        const within = (inner: CrossSection, outer: CrossSection) => keep(created, inner.subtract(keep(created, outer.offset(reach, "Round", 2, 48)))).area() < 1e-3;
+        pieces.push(convex(lower.area) && convex(upper.area) && within(upper.area, lower.area) && within(lower.area, upper.area)
           ? keep(created, runtime.Manifold.hull([prism(lower.area, lower.z, lower.z + 0.001), prism(upper.area, upper.z - 0.001, upper.z)]))
           : prism(lower.area, lower.z, upper.z));
         reached = lower;
@@ -3511,7 +3594,11 @@ export function lidForSolid(runtime: ManifoldToplevel, body: ManifoldSolid, give
           const hollow = lofted(lean.levels.map(({ z, free }) => ({ z, area: keep(created, free.offset(-(options.gap + options.wall), "Round", 2, 48)) })), true);
           const whole = lofted(lean.levels.map(({ z, free }) => ({ z, area: keep(created, free.offset(-options.gap, "Round", 2, 48)) })), false);
           if (!whole) return { error: { code: "tooSmall" } };
-          parts.push(hollow ? keep(created, whole.subtract(hollow)) : whole);
+          const shell = hollow ? keep(created, whole.subtract(hollow)) : whole;
+          // What does not reach up to the plate would hang loose (a ring down in a pocket, below a ledge): left out.
+          const held = shell.decompose().map((piece) => keep(created, piece)).filter((piece) => piece.boundingBox().max[2] >= top - 1e-6);
+          if (!held.length) return { error: { code: "tooSmall" } };
+          parts.push(held.length === 1 ? held[0] : keep(created, runtime.Manifold.union(held)));
         } else {
           const inside = keep(created, opening.offset(-(options.gap + options.wall), "Round", 2, 48));
           const ring = inside.area() >= MIN_OPENING_AREA ? keep(created, lip.subtract(inside)) : lip;
@@ -4546,7 +4633,7 @@ export type LidShapeSlide = { cuts: WorkplaneShape; side: LidHingeSide; depth: n
 export type LidShapeTether = { part: WorkplaneShape; bead: WorkplaneShape; strap: number; neckRing: number; capRing: number };
 
 /** With latches, the body's cheeks and pins (grouped with it), the clips (a body of their own beside the lid) and how many. */
-export type LidShapeLatch = { body: WorkplaneShape; clips: WorkplaneShape; count: number; width: number; pin: number; style?: LidLatchStyle; travel?: number; labels?: { point: [number, number, number]; width: number; height: number }[]; boltLabels?: { point: [number, number, number]; normal: [number, number, number]; height: number }[] };
+export type LidShapeLatch = { body: WorkplaneShape; clips: WorkplaneShape; count: number; width: number; pin: number; style?: LidLatchStyle; travel?: number; labels?: { point: [number, number, number]; width: number; height: number; turn?: number }[]; boltLabels?: { point: [number, number, number]; normal: [number, number, number]; height: number }[] };
 
 export type LidShapeResult = { lid: WorkplaneShape; leaning?: boolean; magnets?: LidShapeMagnets; hinge?: LidShapeHinge; latch?: LidShapeLatch; clickBumps?: LidShapeClickBumps; handle?: LidShapeHandle; screw?: LidShapeScrew; bayonet?: LidShapeBayonet; slide?: LidShapeSlide; tether?: LidShapeTether; flipTop?: LidFlipTop } | { lid: null; error: string };
 
