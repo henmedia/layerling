@@ -51,6 +51,7 @@ import {
   gridfinityScoopPieces,
   gridfinityScoopPoint,
   gridfinityScoopSection,
+  gridfinityClipCuts,
   gridfinitySwallowtailCuts,
   gridfinityWallProfile,
 } from "@/lib/gridfinityGeometry";
@@ -320,8 +321,12 @@ function baseplateSolid(cad: OcctKernel, plan: GridfinityPlan) {
   const top: GridfinityStep = [last[0], last[1] + floor + PAST];
   const steps: GridfinityStep[] = floor > 0 ? [...socket, top] : [[GRIDFINITY_SOCKET[0][0], -PAST], ...socket, top];
   const sockets = plan.cells.map((cell) => steppedSolid(cad, cell.x, cell.z, half, half, GRIDFINITY_BASEPLATE_RADIUS, steps));
-  const pockets = gridfinitySwallowtailCuts(plan, PAST).map(({ outline, y0, y1 }) => cad.extrude(polygonFace(cad, outline.map((p) => ({ x: p.x, y: -p.z, z: y0 }))), 0, 0, y1 - y0));
-  return oneSolid(cad, cad.cutAll(slab, [...sockets, ...pockets]), "baseplate");
+  const prismOf = ({ outline, y0, y1 }: ReturnType<typeof gridfinitySwallowtailCuts>[number]) => cad.extrude(polygonFace(cad, outline.map((p) => ({ x: p.x, y: -p.z, z: y0 }))), 0, 0, y1 - y0);
+  const pockets = gridfinitySwallowtailCuts(plan, PAST).map(prismOf);
+  // A clip notch's two cutters as one, so the notch's sides are single faces without a seam where the two overlap.
+  const clipCuts = gridfinityClipCuts(plan, PAST);
+  const notches = plan.clips.map((_, k) => cad.unifySameDomain(cad.fuse(prismOf(clipCuts[2 * k]), prismOf(clipCuts[2 * k + 1]))));
+  return oneSolid(cad, cad.cutAll(slab, [...sockets, ...pockets, ...notches]), "baseplate");
 }
 
 /** A closed polygon of points (x, y, z) as a face. */
