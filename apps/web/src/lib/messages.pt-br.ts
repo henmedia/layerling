@@ -4936,6 +4936,8 @@ export const MESSAGES_PT_BR: Partial<Record<MessageKey, string>> = {
   "status.shellRoundingSkipped": "O arredondamento das bordas não pôde ser refeito nas novas paredes e foi omitido.",
   "shell.gridMagnets": "Furos para ímãs",
   "shell.gridMagnetsHint": "Quatro furos de 6,5 × 2,4 mm sob cada encaixe, onde ficam os ímãs de uma caixa (a 13 mm do centro da célula), para ímãs de 6 × 2 mm. O fundo passa a ter 8,6 mm, para sobrar 1,2 mm sob os furos.",
+  "shell.gridScrews": "Furos para parafusos",
+  "shell.gridScrewsHint": "Um furo escareado pelo centro de cada encaixe, para parafusar a caixa em uma gaveta ou sobre uma tábua: 4,5 mm de largura, para um parafuso de cabeça chata de 4 mm cuja cabeça fica rente ao fundo do encaixe, de modo que uma caixa continua assentando nele. O fundo passa a ter 8,6 mm, como com os furos para ímãs.",
   "editor.tool.layerCheck": "Análise de impressão",
   "layerCheck.title": "Análise de impressão",
   "layerCheck.subtitle": "Todas as camadas verificadas de uma vez, com a visualização de camadas",

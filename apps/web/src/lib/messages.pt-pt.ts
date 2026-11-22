@@ -5875,6 +5875,8 @@ export const MESSAGES_PT_PT: Partial<Record<MessageKey, string>> = {
   "status.shellRoundingSkipped": "O arredondamento das arestas não pôde ser refeito nas novas paredes e foi omitido.",
   "shell.gridMagnets": "Furos para ímanes",
   "shell.gridMagnetsHint": "Quatro furos de 6,5 × 2,4 mm sob cada encaixe, onde ficam os ímanes de uma caixa (a 13 mm do centro da célula), para ímanes de 6 × 2 mm. O fundo passa a ter 8,6 mm, para ficarem 1,2 mm sob os furos.",
+  "shell.gridScrews": "Furos para parafusos",
+  "shell.gridScrewsHint": "Um furo escareado pelo centro de cada encaixe, para aparafusar a caixa numa gaveta ou sobre uma tábua: 4,5 mm de largura, para um parafuso de cabeça de embeber de 4 mm cuja cabeça fica à face do fundo do encaixe, pelo que uma caixa continua a assentar nele. O fundo passa a ter 8,6 mm, como com os furos para ímanes.",
   "editor.tool.layerCheck": "Análise de impressão",
   "layerCheck.title": "Análise de impressão",
   "layerCheck.subtitle": "Todas as camadas verificadas de uma vez, com a vista de camadas",

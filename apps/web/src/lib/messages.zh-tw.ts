@@ -5969,6 +5969,8 @@ export const MESSAGES_ZH_TW: Partial<Record<MessageKey, string>> = {
   "status.shellRoundingSkipped": "邊緣的圓角無法重新加到新的壁上，已略去。",
   "shell.gridMagnets": "磁鐵孔",
   "shell.gridMagnetsHint": "每個凹槽下方 4 個 6.5 × 2.4 mm 的孔，位於收納盒磁鐵所在處（距格子中心 13 mm），用於 6 × 2 mm 磁鐵。底板變為 8.6 mm 厚，讓孔下仍留 1.2 mm。",
+  "shell.gridScrews": "螺絲孔",
+  "shell.gridScrewsHint": "每個凹槽中心一個沉頭通孔，用來把盒子鎖在抽屜裡或木板上：孔寬 4.5 mm，適用於 4 mm 沉頭螺絲，螺絲頭與凹槽底面齊平，收納盒仍可放入。底板變為 8.6 mm 厚，與磁鐵孔相同。",
   "editor.tool.layerCheck": "列印分析",
   "layerCheck.title": "列印分析",
   "layerCheck.subtitle": "一次檢查每一層，並附分層檢視",

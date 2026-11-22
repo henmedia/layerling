@@ -5965,6 +5965,8 @@ export const MESSAGES_FR: Partial<Record<MessageKey, string>> = {
   "status.shellRoundingSkipped": "L'arrondi des arêtes n'a pas pu être refait sur les nouvelles parois et a été laissé de côté.",
   "shell.gridMagnets": "Trous pour aimants",
   "shell.gridMagnetsHint": "Quatre trous de 6,5 × 2,4 mm sous chaque logement, là où se trouvent les aimants d’un bac (à 13 mm du milieu de la case), pour des aimants de 6 × 2 mm. Le fond fait alors 8,6 mm, pour garder 1,2 mm sous les trous.",
+  "shell.gridScrews": "Trous de vis",
+  "shell.gridScrewsHint": "Un trou fraisé au milieu de chaque logement, pour visser la boîte dans un tiroir ou sur une planche : 4,5 mm de large, pour une vis à tête fraisée de 4 mm dont la tête affleure le fond du logement, si bien qu’un bac s’y pose toujours. Le fond fait alors 8,6 mm, comme avec les trous pour aimants.",
   "editor.tool.layerCheck": "Analyse d'impression",
   "layerCheck.title": "Analyse d'impression",
   "layerCheck.subtitle": "Toutes les couches vérifiées d'un coup, avec la vue des couches",

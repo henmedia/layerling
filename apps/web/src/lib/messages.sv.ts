@@ -5983,6 +5983,8 @@ export const MESSAGES_SV: Partial<Record<MessageKey, string>> = {
   "status.shellRoundingSkipped": "Rundningen av kanterna kunde inte läggas om på de nya väggarna och utelämnades.",
   "shell.gridMagnets": "Magnethål",
   "shell.gridMagnetsHint": "Fyra hål 6,5 × 2,4 mm under varje fack, där en låda har sina magneter (13 mm från rutans mitt), för magneter 6 × 2 mm. Botten blir 8,6 mm tjock, så att 1,2 mm blir kvar under hålen.",
+  "shell.gridScrews": "Skruvhål",
+  "shell.gridScrewsHint": "Ett försänkt hål genom mitten av varje fack, för att skruva fast lådan i en byrålåda eller på en skiva: 4,5 mm brett, för en 4 mm försänkt skruv vars huvud ligger i nivå med fackets botten, så att en låda fortfarande står i det. Botten blir 8,6 mm tjock, som med magnethål.",
   "editor.tool.layerCheck": "Utskriftsanalys",
   "layerCheck.title": "Utskriftsanalys",
   "layerCheck.subtitle": "Varje lager kontrollerat i ett svep, med lagervy",

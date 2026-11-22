@@ -5967,6 +5967,8 @@ export const MESSAGES_SL: Partial<Record<MessageKey, string>> = {
   "shell.errorDividersFailed": "Predelnih sten na tem telesu ni bilo mogoče izdelati. Izklopi jih ali izberi manj.",
   "shell.gridMagnets": "Luknje za magnete",
   "shell.gridMagnetsHint": "Štiri luknje 6,5 × 2,4 mm pod vsako vdolbino, kjer sedijo magneti posode (13 mm od sredine polja), za magnete 6 × 2 mm. Dno postane debelo 8,6 mm, da pod luknjami ostane 1,2 mm.",
+  "shell.gridScrews": "Luknje za vijake",
+  "shell.gridScrewsHint": "Ugreznjena luknja skozi sredino vsake vdolbine, da škatlo privijete v predal ali na desko: široka 4,5 mm, za 4-mm vijak z ugrezno glavo, ki leži poravnano z dnom vdolbine, tako da posoda še vedno stoji v njej. Dno postane debelo 8,6 mm, kot z luknjami za magnete.",
   "editor.tool.layerCheck": "Analiza tiska",
   "layerCheck.title": "Analiza tiska",
   "layerCheck.subtitle": "Vse plasti preverjene naenkrat, s pogledom plasti",

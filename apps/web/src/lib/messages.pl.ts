@@ -5993,6 +5993,8 @@ export const MESSAGES_PL: Partial<Record<MessageKey, string>> = {
   "status.shellRoundingSkipped": "Zaokrąglenia krawędzi nie udało się ponownie nałożyć na nowe ścianki i pominięto je.",
   "shell.gridMagnets": "Otwory na magnesy",
   "shell.gridMagnetsHint": "Cztery otwory 6,5 × 2,4 mm pod każdym gniazdem, tam gdzie są magnesy pojemnika (13 mm od środka pola), na magnesy 6 × 2 mm. Dno ma wtedy 8,6 mm, aby pod otworami zostało 1,2 mm.",
+  "shell.gridScrews": "Otwory na wkręty",
+  "shell.gridScrewsHint": "Otwór z pogłębieniem stożkowym przez środek każdego gniazda, aby przykręcić pudełko w szufladzie lub do deski: szeroki na 4,5 mm, na wkręt 4 mm z łbem stożkowym, którego łeb leży równo z dnem gniazda, więc pojemnik nadal w nim stoi. Dno ma wtedy 8,6 mm, jak z otworami na magnesy.",
   "editor.tool.layerCheck": "Analiza wydruku",
   "layerCheck.title": "Analiza wydruku",
   "layerCheck.subtitle": "Wszystkie warstwy sprawdzone za jednym razem, z widokiem warstw",

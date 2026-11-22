@@ -5963,6 +5963,8 @@ export const MESSAGES_DA: Partial<Record<MessageKey, string>> = {
   "status.shellRoundingSkipped": "Afrundingen af kanterne kunne ikke lægges igen på de nye vægge og blev udeladt.",
   "shell.gridMagnets": "Magnethuller",
   "shell.gridMagnetsHint": "Fire huller 6,5 × 2,4 mm under hver fordybning, hvor en beholders magneter sidder (13 mm fra feltets midte), til magneter på 6 × 2 mm. Bunden bliver 8,6 mm tyk, så der er 1,2 mm under hullerne.",
+  "shell.gridScrews": "Skruehuller",
+  "shell.gridScrewsHint": "Et undersænket hul gennem midten af hver fordybning, så kassen kan skrues fast i en skuffe eller på en plade: 4,5 mm bredt, til en 4 mm undersænket skrue, hvis hoved ligger plant med fordybningens bund, så en beholder stadig står i den. Bunden bliver 8,6 mm tyk, som med magnethuller.",
   "editor.tool.layerCheck": "Printanalyse",
   "layerCheck.title": "Printanalyse",
   "layerCheck.subtitle": "Alle lag tjekket på én gang, med lagvisning",
