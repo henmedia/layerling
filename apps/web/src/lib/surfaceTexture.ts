@@ -3407,7 +3407,9 @@ function targetEdge(s: SurfaceTextureSettings) {
   // Bark: its marks are a share of its size (a birch's lenticels are thin); wood: a ring (flanks refined after).
   // A stone wall: its faces' bulge and lumps a quarter of a stone at medium detail; the edges are refined and cut after
   // (see stoneCuts), finer, every grid triangle cost as many more there.
-  const size = s.pattern === "stones" ? s.spacing / 0.8 : s.pattern === "bricks" ? Math.min(s.spacing, s.brickHeight) : s.pattern === "bark" ? s.spacing / BARK_STARTS[s.barkType].detail : s.pattern === "wood" ? s.ringWidth : s.pattern === "grain" ? s.spacing / 2 : s.pattern === "knit" ? s.spacing / 2.2 : s.pattern === "rope" ? s.spacing / 1.5 : s.pattern === "weave" ? s.spacing / 2 : s.pattern === "hammered" ? s.spacing / 1.6 : s.pattern === "carbon" ? Math.min(s.spacing, s.carbonCross || s.spacing) * (s.projection === "cylinder" ? 2 : 0.5) : s.spacing;
+  // Hammered dents: their rims and the ridges between them run across the grid at every angle; at a third of a dent
+  // across they ran over the grid's triangles in a zigzag that showed as teeth along every rim.
+  const size = s.pattern === "stones" ? s.spacing / 0.8 : s.pattern === "bricks" ? Math.min(s.spacing, s.brickHeight) : s.pattern === "bark" ? s.spacing / BARK_STARTS[s.barkType].detail : s.pattern === "wood" ? s.ringWidth : s.pattern === "grain" ? s.spacing / 2 : s.pattern === "knit" ? s.spacing / 2.2 : s.pattern === "rope" ? s.spacing / 1.5 : s.pattern === "weave" ? s.spacing / 2 : s.pattern === "hammered" ? s.spacing / 2.2 : s.pattern === "carbon" ? Math.min(s.spacing, s.carbonCross || s.spacing) * (s.projection === "cylinder" ? 2 : 0.5) : s.spacing;
   return (size / steps) * narrow;
 }
 
@@ -7753,9 +7755,11 @@ export function createSurfaceTextureSession(positions: ArrayLike<number>) {
     // straight faces of an angular body cut along lines of equal distance to the edge.
     // A pattern standing out: its run-out, finer still (see RUN_OUT_STEPS).
     // Bark all round fades out at the edges it keeps (see weightsFor): over its grid's triangles there in teeth.
-    if (r.crossMax > 0 || r.straightAxis || standsOut(s) || endsInWall(s) || (s.pattern === "bark" && s.projection === "allRound")) {
+    // Hammered dents fade out along the edges they stop at as well (a box's top and bottom, its corners): over the
+    // grid's triangles the fade ran out in a row of teeth there, so it is refined as finely as a run-out.
+    if (r.crossMax > 0 || r.straightAxis || standsOut(s) || endsInWall(s) || (s.pattern === "bark" && s.projection === "allRound") || s.pattern === "hammered") {
       const weightKey = JSON.stringify([r.key, s.bottomFree, s.topFree, s.zoneFrom, s.zoneTo, s.keepEdges, s.edgeAngle, s.fade, s.direction, s.margin, s.outside, s.inside, layout.center, s.masks, s.faces, s.region, s.exceptFaces, s.exceptRegions]);
-      const runOut = standsOut(s) ? Math.min(0.5, Math.max(s.fade, 0.25) / RUN_OUT_STEPS) : Math.min(0.5, Math.max(s.fade, 0.25) / 2);
+      const runOut = standsOut(s) || s.pattern === "hammered" ? Math.min(0.5, Math.max(s.fade, 0.25) / RUN_OUT_STEPS) : Math.min(0.5, Math.max(s.fade, 0.25) / 2);
       if (fadeCache?.key === weightKey) state = fadeCache.state;
       else {
         state = refineTransitions(r, s, layout, weights, faded.distance, Math.max(2 * r.crossMax, runOut), maxTriangles);
