@@ -1,6 +1,19 @@
 [
   {
     "title": {
+      "de": "Deckel: Schrauben in den Ecken",
+      "en": "Lid: screws in the corners"
+    },
+    "body": {
+      "de": "Im Deckel-Werkzeug gibt es unter „Magnete in den Ecken“ die Auswahl „Schrauben in den Ecken“. Der Körper bekommt in jeder Ecke ein Loch, in einer Säule, wo die Wand zu dünn ist; Orte und Säulen sind dieselben wie bei den Magneten.\n\n– Schrauben gehen in: Gewindeeinsätze (das Loch ist 1 mm tiefer als der Einsatz; bei M3 4 mm weit und 6,7 mm tief) oder direkt ins Plastik (Vorbohrung 0,8 × Schraube, 2,5 Schrauben tief).\n– Schraube: M2, M2,5, M3, M4, M5.\n– Loch im Deckel: gesenkt mit 90° (Kopf nach ISO 15065, Durchgangsloch nach ISO 273) oder glatt.\n\nEin Senkkopf macht den Deckel dort dicker (bei M4 und M5 2,9 mm), wie bei den Magneten, mit demselben Hinweis unter der Dicke. Schrauben und Magnete teilen sich die Ecken: schaltet man das eine ein, geht das andere aus. Mit Scharnier, Schraub-, Bajonett- oder Schiebedeckel und Stapeldeckel gehen Schrauben nicht, das Werkzeug sagt es. Mit Schrauben bleibt der Deckel ein Netz-Deckel. Über MCP: `cornerScrews` und Verwandte in `layerling_make_lid`.",
+      "en": "In the Lid tool, below \"Magnets in the corners\", there is a new choice \"Screws in the corners\". The body gets a hole in each corner, in a post where the wall is too thin; places and posts are the same as for the magnets.\n\n– Screws go into: heat-set inserts (the hole is 1 mm deeper than the insert; M3: 4 mm wide, 6.7 mm deep) or the plastic itself (pilot hole 0.8 × the screw, 2.5 screws deep).\n– Screw: M2, M2.5, M3, M4, M5.\n– Hole in the lid: countersunk at 90° (ISO 15065 head, ISO 273 clearance hole) or plain.\n\nA countersunk head raises the lid's thickness where needed (M4 and M5: 2.9 mm), the way the magnets do, with the same note under the thickness. Screws and magnets share the corners: switching one on switches the other off. Screws do not go with a hinge, a screw, bayonet or slide-in lid or a stacking top; the tool says so. With screws the lid stays the mesh lid. Through MCP: `cornerScrews` and its relatives in `layerling_make_lid`."
+    },
+    "guide": {
+      "section": "lid"
+    }
+  },
+  {
+    "title": {
       "de": "Sehr große Entwürfe werden wieder gespeichert",
       "en": "Very large designs are saved again"
     },
