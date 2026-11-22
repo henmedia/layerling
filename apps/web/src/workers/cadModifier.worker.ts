@@ -28,7 +28,7 @@ import { importedStepBody } from "@/lib/cadImportedStep";
 import { threadPartSolid } from "@/lib/threadSolid";
 import { springPartSolid } from "@/lib/springSolid";
 import { gridfinityPartSolid } from "@/lib/gridfinitySolid";
-import { checkedHoleCut, tidiedIfValid } from "@/lib/cadFuzzyCut";
+import { checkedHoleCut, fuzzyFuse, tidiedIfValid } from "@/lib/cadFuzzyCut";
 import { helicalGearPartSolid } from "@/lib/gearSolid";
 import { hirthPartSolid } from "@/lib/hirthSolid";
 import { ENCLOSURE_PART_NAMES, enclosurePartSolid } from "@/lib/enclosureSolid";
@@ -767,7 +767,8 @@ function combinedScope(cad: OcctKernel, parts: CadModifierMeshPart[], depth: num
   const fused = (shapes: ShapeHandle[]) => {
     let joined = shapes[0];
     for (let index = 1; index < shapes.length; index += 1) {
-      const union = cad.fuse(joined, shapes[index]);
+      // Parts within a thousandth of a millimetre of each other count as touching, as a hole cuts (#1954).
+      const union = fuzzyFuse(cad, joined, shapes[index], cadShapeIsValid);
       // Merging the faces of a valid union can break it, as it can after a cut (#938): an enclosure joined with a
       // screen holder made exact from a mesh came out of simplify with a broken shell, every step after it stayed
       // broken, and the group could not be chamfered at all (#1425).

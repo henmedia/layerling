@@ -8,5 +8,18 @@
       "de": "Bei einem sehr großen Entwurf mit langem Verlauf kam in Chrome bei jeder Änderung die rote Meldung „Dieser Entwurf ist nicht gespeichert“, weil der Browser keinen Speicher bekam, um ihn in einem Stück zu verpacken. Jetzt wird er dann mit weniger Verlaufsschritten gespeichert, und der Hinweis sagt, wie viele bleiben.",
       "en": "With a very large design and a long history, Chrome showed the red note \"This design is not saved\" at every change, as the browser found no memory to pack it in one piece. It is now saved with fewer history steps, and the note says how many are kept."
     }
+  },
+  {
+    "title": {
+      "de": "Verrunden zwischen gruppierten Teilen, die genau aufeinander sitzen",
+      "en": "Fillets between grouped parts that sit exactly on each other"
+    },
+    "body": {
+      "de": "Ein Skizzenkörper, der genau auf einem anderen Teil saß, konnte nach dem Bearbeiten der Skizze um einen winzigen Bruchteil eines Millimeters verrutschen. Gruppiert waren die Teile dann nicht verbunden, und eine Verrundung an der Fuge ging nach innen statt die Ecke zu füllen.\n\nDas Bearbeiten einer Skizze verschiebt den Körper jetzt nicht mehr, wenn sich ihr Umriss nicht bewegt hat. Und Teile einer Gruppe, die weniger als einen tausendstel Millimeter auseinanderliegen, werden beim Verrunden und Fasen als ein Körper behandelt, auch in schon gespeicherten Entwürfen.",
+      "en": "A sketch body sitting exactly on another part could slip by a tiny fraction of a millimetre after its sketch was edited. Grouped, the parts were then not joined, and a fillet along the joint went inward instead of filling the corner.\n\nEditing a sketch no longer moves its body when the outline did not move. And parts of a group less than a thousandth of a millimetre apart are treated as one body when you fillet or chamfer, also in designs you saved before."
+    },
+    "guide": {
+      "section": "edgeTreatment"
+    }
   }
 ]

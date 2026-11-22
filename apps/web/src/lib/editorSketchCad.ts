@@ -15,7 +15,7 @@ import { sweepPlan } from "@/lib/cadSketchSweep";
 import { SKETCH_LOFT_FAILED, SKETCH_LOFT_HOLES, SKETCH_LOFT_OUTLINES, SKETCH_LOFT_STROKE_UNSUPPORTED, type SketchLoftSection } from "@/lib/cadSketchLoft";
 import { filledGrowPockets, steppedEdgeWall, strokeEdgeChamfer, strokedSketchProfile } from "@/lib/sketchStroke";
 import { keyringSketchProfile } from "@/lib/sketchKeyring";
-import { bakedSketchPose } from "@/lib/sketchPlacement";
+import { bakedSketchPose, sketchBodyAnchor } from "@/lib/sketchPlacement";
 import type { ManifoldToplevel } from "manifold-3d";
 import type { CadModifierDeflection } from "@/lib/cadModifierTypes";
 import { SKETCH_EDGE_FAILED, SKETCH_INSET_UNSUPPORTED, SKETCH_STROKE_UNSUPPORTED, type SketchCadBuildResponse } from "@/lib/sketchCadTypes";
@@ -118,6 +118,20 @@ export async function remeshCadBrep(brep: string, deflection: CadModifierDeflect
   return response.type === "built" ? response : null;
 }
 
+/**
+ * What shapeFromCadMesh measures a rebuilt sketch body against: the body is built in the sketch's own coordinates, so
+ * its middle is compared with where the body's sketch had its middle before (sketchBodyAnchor, the CAD frame), not with
+ * where the body stands in the world. Compared with the world place, a body standing within a tenth of a millimetre
+ * of where it was drawn had its new middle snapped to that place while the old one was not, and every sketch edit moved
+ * it by half a facet's reach: a hook went 0.00024 mm off the plate it was aligned to, and a fillet along the joint then
+ * treated it as a body of its own (#1954). Against the old middle, a body whose outline did not move keeps it exactly.
+ */
+export function sketchMeshReference(source: WorkplaneShape, existing?: WorkplaneShape | null): WorkplaneShape {
+  if (!existing) return source;
+  const anchor = sketchBodyAnchor(existing);
+  return { ...source, x: anchor.x, z: anchor.z, elevation: existing.cadBrepFrame?.elevation ?? 0, rotation: 0, rotationX: 0, rotationZ: 0 };
+}
+
 export async function cadShapeFromSketchProfile(profile: SketchProfile, height: number, existing?: WorkplaneShape | null) {
   const safeHeight = Math.max(MIN_SHAPE_DIMENSION, height);
   // A silhouette leaves its holes out first, so its outer line runs round the outside only (#197).
@@ -202,12 +216,12 @@ export async function cadShapeFromSketchProfile(profile: SketchProfile, height: 
     cadDisplayEdgesVersion: undefined,
   });
   if (stepped) {
-    const mesh = shapeFromCadMesh(source, stepped.positions, new Float32Array(0), stepped.indices, "");
+    const mesh = shapeFromCadMesh(sketchMeshReference(source, existing), stepped.positions, new Float32Array(0), stepped.indices, "");
     if (!mesh) throw new Error(t("sketch.edgeFailed"));
     return withExtrudeDeformsKept({ ...mesh, cadBrep: undefined, cadBrepFrame: undefined, cadMeshDeflection: undefined, sketchProfile: cloneSketchProfile(profile), sketchOperation: "extrude" as const, sketchPose: undefined }, existing);
   }
   if (!response || response.type === "error") throw new Error(response?.message ?? t("sketch.strokeEmpty"));
-  const shape = shapeFromCadMesh(source, response.positions, response.normals, response.indices, response.brep, response.deflection ?? SKETCH_CAD_DEFLECTION);
+  const shape = shapeFromCadMesh(sketchMeshReference(source, existing), response.positions, response.normals, response.indices, response.brep, response.deflection ?? SKETCH_CAD_DEFLECTION);
   if (!shape) throw new Error("OpenCascade returned an empty sketch solid");
   // Built in the sketch's own coordinates, not baked where a body stands: no pose to keep.
   return withExtrudeDeformsKept({ ...shape, sketchProfile: cloneSketchProfile(profile), sketchOperation: "extrude" as const, sketchPose: undefined }, existing);
@@ -272,7 +286,7 @@ export async function cadShapeFromSketchSweep(profile: SketchProfile, existing?:
     cadDisplayEdges: undefined,
     cadDisplayEdgesVersion: undefined,
   });
-  const shape = shapeFromCadMesh(source, response.positions, response.normals, response.indices, response.brep, response.deflection ?? SKETCH_CAD_DEFLECTION);
+  const shape = shapeFromCadMesh(sketchMeshReference(source, existing), response.positions, response.normals, response.indices, response.brep, response.deflection ?? SKETCH_CAD_DEFLECTION);
   if (!shape) throw new Error(t("sketch.sweepFailed"));
   return { ...shape, sketchProfile: cloneSketchProfile(profile), sketchOperation: "sweep" as const };
 }
