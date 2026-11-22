@@ -164,5 +164,18 @@
     "guide": {
       "section": "surfaceTexture"
     }
+  },
+  {
+    "title": {
+      "de": "Die Buchstabenkante auch unten",
+      "en": "The letter edge on the bottom too"
+    },
+    "body": {
+      "de": "Beim Text wählst du jetzt, wo die Buchstabenkante sitzt: oben, unten oder an beiden Enden. Unten ist für vertiefte Buchstaben, die du mit dem Text als Loch aus einem Körper schneidest: Eine Fase so groß wie die Schnitttiefe ergibt V-förmige Rillen, die auch an einer Seitenwand ohne Brücken drucken.",
+      "en": "On a Text you now choose where the letter edge goes: on the top, the bottom or both ends. The bottom is for inset letters you cut out of a body with the text as a hole: a chamfer as large as the cut is deep makes V-shaped grooves that print without bridges, even on a side wall."
+    },
+    "guide": {
+      "chapter": "text"
+    }
   }
 ]

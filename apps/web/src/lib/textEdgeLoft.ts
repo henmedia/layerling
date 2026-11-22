@@ -1,12 +1,13 @@
 import * as THREE from "three";
 
 /**
- * The top edge of a text's letters as one smooth skin (#225). The 2D kernel steps the letters'
- * outlines inwards level by level (always valid outlines, however sharp a corner or short an edge
- * is); here every ring of a level is joined to the matching ring of the level above it by a band
- * of triangles, so the surface has no ledges and shades smoothly. Where a level has more or fewer
- * rings than the one below - a thin stroke that runs out, a counter that closes - nothing is built
- * (null) and textFill falls back to slabs, which always stand.
+ * The edge of a text's letters as one smooth skin (#225), on the top, the bottom or both. The 2D
+ * kernel steps the letters' outlines inwards level by level (always valid outlines, however sharp
+ * a corner or short an edge is); here every ring of a level is joined to the matching ring of the
+ * level above it by a band of triangles, so the surface has no ledges and shades smoothly. Where a
+ * level has more or fewer rings than the one below - a thin stroke that runs out, a counter that
+ * closes - or a band would fold, nothing is built (null) and textFill falls back to slabs, which
+ * always stand.
  */
 
 type Point = { x: number; z: number };
@@ -29,9 +30,9 @@ function inside(point: Point, ring: EdgeRing) {
 }
 
 /**
- * For each ring of the level above, the ring of the level below it belongs to: an outer ring lies
- * inside its lower one, a hole (which grows as the letters step in) contains it. Null unless that
- * is one ring for each, no ring used twice.
+ * For each ring of the stepped-in level `upper`, the ring of the fuller level `lower` it belongs to:
+ * an outer ring lies inside its fuller one, a hole (which grows as the letters step in) contains it.
+ * Null unless that is one ring for each, no ring used twice.
  */
 function matchLevels(lower: EdgeRing[], upper: EdgeRing[]): number[] | null {
   if (lower.length !== upper.length) return null;
@@ -87,22 +88,69 @@ function band(a: EdgeRing, b: EdgeRing, aIds: number[], bIds: number[]): number[
   return out;
 }
 
+/** The area the rings enclose: outer rings count, holes take away. */
+const netArea = (rings: EdgeRing[]) => rings.reduce((sum, ring) => sum + signedArea(ring), 0);
+
 /**
- * The skin as positions and triangle indices. `levels[k]` holds the rings of the letters stepped
- * in for the k-th boundary of the edge (level 0 is the full outline), `heights[k]` the height it
- * stands at; the walls run from the plate up to level 0. Null where the rings do not match up.
+ * Whether a band's triangles lie side by side, seen from above, all facing one way: up where the
+ * letters step in going up, down where they step out. A band joining two outlines that differ a lot
+ * (a long chamfer in one slope, a sharp inner corner) can fold over itself; the kernel takes such a
+ * skin without a word and cuts with it wrongly, so it is not used.
+ */
+function bandLiesFlat(triangles: number[], positions: number[], up: boolean) {
+  let net = 0;
+  let total = 0;
+  for (let at = 0; at + 2 < triangles.length; at += 3) {
+    const [p, q, r] = [triangles[at], triangles[at + 1], triangles[at + 2]].map((id) => ({ x: positions[id * 3], z: positions[id * 3 + 2] }));
+    // Twice the area seen from above, signed as in `cap`: positive faces up.
+    const twice = (q.z - p.z) * (r.x - p.x) - (q.x - p.x) * (r.z - p.z);
+    net += twice;
+    total += Math.abs(twice);
+  }
+  if ((net > 0) !== up) return false;
+  return total - Math.abs(net) <= Math.max(1e-6, Math.abs(net) * 1e-6);
+}
+
+/**
+ * The skin as positions and triangle indices. `levels[k]` holds the rings of the letters' outline
+ * at `heights[k]`, from the underside up: stepped in (an edge going up), stepped out again (an edge
+ * on the bottom) or the very same array as the level below, which makes a straight wall between them.
+ * Where the first level stands above the plate, the walls run down to it from there. Null where the
+ * rings do not match up or a band would fold.
  */
 export function loftedTextEdge(levels: readonly EdgeRing[][], heights: readonly number[]): { positions: number[]; indices: number[] } | null {
   if (levels.length < 2 || levels.length !== heights.length || levels.some((rings) => rings.length === 0 || rings.some((ring) => ring.length < 3))) return null;
-  const matches: number[][] = [];
-  for (let level = 1; level < levels.length; level += 1) {
-    const found = matchLevels(levels[level - 1], levels[level]);
-    if (!found) return null;
-    matches.push(found);
+  // Walls from the plate up to the first level: that level once more, on the plate.
+  const wallFromPlate = heights[0] > 1e-4;
+  const stack = wallFromPlate ? [levels[0], ...levels] : [...levels];
+  const at = wallFromPlate ? [0, ...heights] : [...heights];
+  // For each level above the first, the ring of the level below each of its rings joins; null for a wall.
+  const matches: (number[] | null)[] = [];
+  for (let level = 1; level < stack.length; level += 1) {
+    const lower = stack[level - 1];
+    const upper = stack[level];
+    if (lower === upper) {
+      matches.push(null);
+      continue;
+    }
+    if (netArea(upper) < netArea(lower)) {
+      const found = matchLevels(lower, upper);
+      if (!found) return null;
+      matches.push(found);
+    } else {
+      // Stepping out going up: matched the other way round, then turned into the lower ring for each upper one.
+      const found = matchLevels(upper, lower);
+      if (!found) return null;
+      const inverse: number[] = [];
+      found.forEach((upperIndex, lowerIndex) => {
+        inverse[upperIndex] = lowerIndex;
+      });
+      matches.push(inverse);
+    }
   }
   const positions: number[] = [];
   const indices: number[] = [];
-  // A row of vertices for each ring at each level, and one under the first level on the plate when the walls have height.
+  // A row of vertices for each ring at each level.
   const rowIds: number[][][] = [];
   const addRow = (ring: EdgeRing, y: number) => {
     const ids: number[] = [];
@@ -112,27 +160,30 @@ export function loftedTextEdge(levels: readonly EdgeRing[][], heights: readonly 
     });
     return ids;
   };
-  const wall = heights[0] > 1e-4;
-  const floor = wall ? levels[0].map((ring) => addRow(ring, 0)) : null;
-  levels.forEach((rings, level) => rowIds.push(rings.map((ring) => addRow(ring, heights[level]))));
+  stack.forEach((rings, level) => rowIds.push(rings.map((ring) => addRow(ring, at[level]))));
 
-  // The walls, between the plate and the first level: quads whose winding faces away from the solid on the left.
-  if (floor) {
-    levels[0].forEach((ring, ringIndex) => ring.forEach((_, index) => {
-      const next = (index + 1) % ring.length;
-      const a = floor[ringIndex][index];
-      const b = floor[ringIndex][next];
-      const c = rowIds[0][ringIndex][index];
-      const d = rowIds[0][ringIndex][next];
-      indices.push(a, d, b, a, c, d);
-    }));
-  }
-  // The bands of the edge between neighbouring levels.
-  for (let level = 1; level < levels.length; level += 1) {
-    levels[level].forEach((ring, ringIndex) => {
-      const lowerIndex = matches[level - 1][ringIndex];
-      indices.push(...band(levels[level - 1][lowerIndex], ring, rowIds[level - 1][lowerIndex], rowIds[level][ringIndex]));
-    });
+  for (let level = 1; level < stack.length; level += 1) {
+    const match = matches[level - 1];
+    if (!match) {
+      // A wall: quads between the same ring at two heights, whose winding faces away from the solid on the left.
+      stack[level].forEach((ring, ringIndex) => ring.forEach((_, index) => {
+        const next = (index + 1) % ring.length;
+        const a = rowIds[level - 1][ringIndex][index];
+        const b = rowIds[level - 1][ringIndex][next];
+        const c = rowIds[level][ringIndex][index];
+        const d = rowIds[level][ringIndex][next];
+        indices.push(a, d, b, a, c, d);
+      }));
+      continue;
+    }
+    // A band of the edge between neighbouring levels.
+    const stepsIn = netArea(stack[level]) < netArea(stack[level - 1]);
+    for (const [ringIndex, ring] of stack[level].entries()) {
+      const lowerIndex = match[ringIndex];
+      const triangles = band(stack[level - 1][lowerIndex], ring, rowIds[level - 1][lowerIndex], rowIds[level][ringIndex]);
+      if (!bandLiesFlat(triangles, positions, stepsIn)) return null;
+      indices.push(...triangles);
+    }
   }
 
   // The bottom looking down and the top looking up: every outer ring with the holes inside it.
@@ -162,7 +213,7 @@ export function loftedTextEdge(levels: readonly EdgeRing[][], heights: readonly 
       }
     }
   };
-  cap(levels[0], floor ?? rowIds[0], false);
-  cap(levels[levels.length - 1], rowIds[levels.length - 1], true);
+  cap(stack[0], rowIds[0], false);
+  cap(stack[stack.length - 1], rowIds[stack.length - 1], true);
   return { positions, indices };
 }

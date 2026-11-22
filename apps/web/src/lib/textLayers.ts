@@ -2,7 +2,7 @@ import * as THREE from "three";
 import { loadedManifoldRuntime } from "@/lib/manifoldHandle";
 import { normalizeSketchStroke, SKETCH_STROKE_JOINS } from "@/lib/sketchStroke";
 import { DEFAULT_FLUSH_DEPTH, flushDepthFor, MAX_FLUSH_DEPTH, MIN_FLUSH_DEPTH } from "@/lib/flushLayers";
-import { normalizeTextEdge } from "@/lib/textEdge";
+import { normalizeTextEdge, topTextEdge } from "@/lib/textEdge";
 import { textOutlineClearance, textOutlineReach } from "@/lib/textFill";
 import { DEFAULT_KEYRING_DIAMETER, freeKeyringAt, KEYRING_HOLE_EDGE_DISTANCE, keyringAlongLimit, keyringEarRadius, MAX_KEYRING_DIAMETER, MIN_KEYRING_DIAMETER, TEXT_KEYRING_SIDES, textFillExtent, textKeyringOf, textKeyringReaches, textLetterBox, textLetterOffset } from "@/lib/textGeometry";
 import type { FlushLayer, FreeKeyring, SketchStroke, SketchStrokeJoin, TextEdge, TextKeyring, TextKeyringSide, WorkplaneShape } from "@/types/layerling";
@@ -56,7 +56,8 @@ export function normalizeTextLayer(layer: Partial<TextLayer>, fallback: TextLaye
     color: typeof layer.color === "string" && /^#[0-9a-f]{6}$/i.test(layer.color) ? layer.color.toLowerCase() : fallback.color,
     ...(layer.silhouette ? { silhouette: true } : {}),
     ...(isTextLayerJoin(layer.join as unknown) && (layer.join as unknown) !== "round" ? { join: layer.join } : {}),
-    ...(normalizeTextEdge(layer.edge) ? { edge: normalizeTextEdge(layer.edge) } : {}),
+    // A layer's edge is on its top only (topTextEdge): on the bottom it would cut a groove where it meets the layer under it.
+    ...(topTextEdge(layer.edge) ? { edge: topTextEdge(layer.edge) } : {}),
   };
 }
 

@@ -208,10 +208,10 @@ import { MAX_WEDGE_ANGLE, MIN_WEDGE_ANGLE, wedgeAngle, wedgeHeightForAngle } fro
 import { MAX_PORT_CLEARANCE, maxPortCorner, normalizePortClearance, normalizePortCorner, PORT_PRESET_ORDER, PORT_PRESETS, portPresetFor, portPresetSize, type PortPreset } from "@/lib/portGeometry";
 import { MAX_DOVETAIL_CLEARANCE, maxDovetailNeckWidth, normalizeDovetailClearance, normalizeDovetailNeckWidth } from "@/lib/dovetailGeometry";
 import { DEFAULT_SKETCH_STROKE, MAX_SKETCH_STROKE_WIDTH, MIN_SKETCH_STROKE_EDGE, MIN_SKETCH_STROKE_WIDTH, normalizeSketchStroke, SKETCH_STROKE_JOINS } from "@/lib/sketchStroke";
-import { MAX_EDGED_TEXT_LENGTH, MAX_TEXT_EDGE, MIN_TEXT_EDGE, normalizeTextEdge, textAllowsEdge, textHasEdge } from "@/lib/textEdge";
+import { isTextEdgeSide, MAX_EDGED_TEXT_LENGTH, MAX_TEXT_EDGE, maxTextEdgeSize, MIN_TEXT_EDGE, normalizeTextEdge, SLOW_BOTH_EDGES_LENGTH, TEXT_EDGE_SIDES, textAllowsEdge, textEdgeBuildsSlowly, textEdgeSide, textHasEdge } from "@/lib/textEdge";
 import { wheelBaseStep, wheelNextValue, wheelTurn } from "@/lib/wheelValueStep";
 import { withProportionsKeptOnce } from "@/lib/keepProportions";
-import { textHasFill } from "@/lib/textFill";
+import { textEdgeFootFloats, textHasFill } from "@/lib/textFill";
 import { TEXT_FILL_CHOICES, textFillChoice, textLineSettingsInView, textStrokeForChoice, textStrokeWider, type TextFillChoice } from "@/lib/textFillChoice";
 import { MAX_TEXT_LAYERS, MAX_TEXT_LAYER_GROW, MIN_TEXT_LAYER_HEIGHT, nameTagKeyringAlongLimit, namesFromList, type NameTagKeyring, type TagFlush, type TextLayer } from "@/lib/textLayers";
 import { DEFAULT_FLUSH_DEPTH, flushDepthFor, MAX_FLUSH_DEPTH, MIN_FLUSH_DEPTH, MIN_FLUSH_FLOOR } from "@/lib/flushLayers";
@@ -385,7 +385,7 @@ import { maxPolygonCornerRadius, normalizePolygonCornerRadius } from "@/lib/roun
 import { DEFAULT_TAPER_DIMENSION_MAX, MAX_HIGH_RESOLUTION_SIDES, MAX_HIGH_RESOLUTION_STEPS, POSITION_TYPED_LIMIT, RULER_MAX_LENGTH, customSnapGridLabel, positionReach, shapeDimensionLimit, snapGridStep } from "@/lib/workplaneSettings";
 import { printerPresetById } from "@/lib/printBed";
 import { maxSideDrop, narrowCrossWidth, narrowEndWidth, normalizeNarrowStart, normalizeSlopeCurve, normalizeSlopeFrom, normalizeSlopeSide, shapeSupportsNarrow, shapeSupportsSlope, SLOPE_MIN_END, slopeAlongWidth, slopeEndHeight, slopeSidesFor } from "@/lib/slopeAlong";
-import type { BentTubeInnerProfile, BentTubeProfile, CustomSnapGrid, GearType, GridfinityCompartmentLabel, GridfinityType, GridSize, MeasurementAccuracy, ShapeCustomization, SketchProfile, SketchStroke, SketchStrokeAlign, SketchStrokeJoin, ThreadDrive, ThreadHead, ThreadProfile, ThreadRole, WorkplaneShape, WorkplaneWorkspaceSettings } from "@/types/layerling";
+import type { BentTubeInnerProfile, BentTubeProfile, CustomSnapGrid, GearType, GridfinityCompartmentLabel, GridfinityType, GridSize, MeasurementAccuracy, ShapeCustomization, SketchProfile, SketchStroke, SketchStrokeAlign, SketchStrokeJoin, TextEdgeSide, ThreadDrive, ThreadHead, ThreadProfile, ThreadRole, WorkplaneShape, WorkplaneWorkspaceSettings } from "@/types/layerling";
 import { selectWholeValue } from "@/lib/numberField";
 import { formulaMatchesValue, formulaToRemember, withFieldFormula, type FieldFormulas } from "@/lib/fieldFormulas";
 import { useKeptColors, useRecentColors } from "@/lib/recentColors";
@@ -4147,7 +4147,7 @@ function getShapePropertiesWithAppLimits(shape: WorkplaneShape, onUpdate: ShapeI
       { id: "letterSize", label: t("nameTag.letterSize"), value: textLetterSize(shape), min: MIN_LETTER_SIZE, max: 60, step: 0.5, hint: t("nameTag.letterSizeHint"), onChange: (size) => onUpdate(textLetterSizePatch(shape, size)) },
       { id: "height", label: t("prop.height"), value: shape.height, min: MIN_SHAPE_SIZE, max: 40, hint: t("prop.textHeightHint"), onChange: setHeight },
       ...textFillProperties(shape, onUpdate),
-      // The top edge of the letters (#499), as on a name tag; a rounded or chamfered edge takes the place of the bevel.
+      // The edge of the letters (#499), on the top as on a name tag, the bottom or both; it takes the place of the bevel.
       ...textEdgeProperties(shape, onUpdate),
       // A fill mode or the silhouette draws the letters flat; bevel and segments belong to the filled letters.
       ...(textHasFill(shape) || textHasEdge(shape) ? [] : [
@@ -4281,7 +4281,11 @@ function getShapePropertiesWithAppLimits(shape: WorkplaneShape, onUpdate: ShapeI
 const TEXT_FILL_MORE_IDS = new Set(["textWiderCorners", "textSilhouette", "textWider"]);
 const TEXT_FILL_IN_VIEW_IDS = new Set(["textFill", "textLineWidth", "textCorners"]);
 
-/** The letters' top edge, round or chamfered, and how large (#499): the setting the name tag has for its top layer. */
+/**
+ * The letters' edge, round or chamfered, how large (#499) and on which end: the top, as the name tag
+ * has it, the bottom - for letters cut out of a body, whose chamfered floor prints without bridges -
+ * or both.
+ */
 function textEdgeProperties(shape: WorkplaneShape, onUpdate: ShapeInspectorUpdate): ShapePropertyConfig[] {
   // A text longer than MAX_EDGED_TEXT_LENGTH takes no letter edge (its build would take a minute): the field is greyed
   // out and says why; a setting it had stays, and comes back once the text is short enough again.
@@ -4298,6 +4302,11 @@ function textEdgeProperties(shape: WorkplaneShape, onUpdate: ShapeInspectorUpdat
     }];
   }
   const edge = normalizeTextEdge(shape.textEdge);
+  const side = textEdgeSide(edge);
+  const withSide = (next: TextEdgeSide) => (next === "top" ? {} : { side: next });
+  const maxSize = Math.max(MIN_TEXT_EDGE, maxTextEdgeSize(shape.height, side));
+  // A solid text whose thin letters would start above the underside says so; a hole just cuts shallower there.
+  const footFloats = edge && side !== "top" && !shape.hole && textEdgeFootFloats(shape) === true;
   return [
     {
       type: "select",
@@ -4305,16 +4314,33 @@ function textEdgeProperties(shape: WorkplaneShape, onUpdate: ShapeInspectorUpdat
       label: t("nameTag.letterEdge"),
       value: edge?.kind ?? "none",
       options: (["none", "round", "chamfer"] as const).map((value) => ({ value, label: t(`nameTag.edge.${value}`) })),
-      onChange: (value) => onUpdate({ textEdge: value === "round" || value === "chamfer" ? { kind: value, size: edge?.size ?? Math.min(0.4, shape.height) } : undefined }),
+      onChange: (value) => onUpdate({ textEdge: value === "round" || value === "chamfer" ? { kind: value, size: edge?.size ?? Math.min(0.4, shape.height), ...withSide(side) } : undefined }),
     },
     ...(edge ? [{
+      type: "select",
+      id: "textEdgeSide",
+      label: t("prop.textEdgeSide"),
+      value: side,
+      options: TEXT_EDGE_SIDES.map((value) => ({ value, label: t(`prop.textEdgeSide.${value}`) })),
+      // Both ends on a long text build slowly (SLOW_BOTH_EDGES_LENGTH): said first, before what the side is good for.
+      hint: [
+        textEdgeBuildsSlowly(shape) ? t("prop.textEdgeBothSlow", { max: SLOW_BOTH_EDGES_LENGTH }) : null,
+        side === "top" ? null : edge.kind === "round" ? t("prop.textEdgeSideRoundHint") : t("prop.textEdgeSideChamferHint"),
+      ].filter(Boolean).join(" ") || undefined,
+      // Both ends take at most half the height each: the size comes down with it.
+      onChange: (value: string) => {
+        const next = isTextEdgeSide(value) ? value : "top";
+        onUpdate({ textEdge: { kind: edge.kind, size: Math.min(edge.size, Math.max(MIN_TEXT_EDGE, maxTextEdgeSize(shape.height, next))), ...withSide(next) } });
+      },
+    } satisfies ShapePropertyConfig, {
       id: "textEdgeSize",
       label: t("nameTag.letterEdgeSize"),
       value: edge.size,
       min: MIN_TEXT_EDGE,
-      max: Math.max(MIN_TEXT_EDGE, Math.min(MAX_TEXT_EDGE, shape.height)),
+      max: maxSize,
       step: 0.05,
-      onChange: (size: number) => onUpdate({ textEdge: { kind: edge.kind, size } }),
+      hint: footFloats ? t("prop.textEdgeFootFloats") : undefined,
+      onChange: (size: number) => onUpdate({ textEdge: { kind: edge.kind, size, ...withSide(side) } }),
     } satisfies ShapePropertyConfig] : []),
   ];
 }
