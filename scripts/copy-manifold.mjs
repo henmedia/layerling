@@ -5,7 +5,7 @@
 // Without this step the browser kept running the manifold of layerling 1.0.0 while
 // package.json and every test moved on to 3.5.x (audit, 22.11.2026);
 // tests/unit/manifoldRuntimeFiles.test.ts fails when the copies fall behind again.
-import { copyFile } from "node:fs/promises";
+import { chmod, copyFile } from "node:fs/promises";
 import { existsSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -21,5 +21,8 @@ if (!existsSync(join(src, "manifold.wasm"))) {
 
 for (const file of ["manifold.js", "manifold.wasm"]) {
   await copyFile(join(src, file), join(dest, file));
+  // The package ships manifold.wasm as executable; copyFile keeps that on Linux, and CI's "generated files are
+  // committed" check then saw a changed mode (1.169.0). The copies are plain files.
+  await chmod(join(dest, file), 0o644);
 }
 console.log("[copy-manifold] manifold.js and manifold.wasm copied to apps/web/public");
