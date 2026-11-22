@@ -34,5 +34,15 @@
     "guide": {
       "section": "edgeTreatment"
     }
+  },
+  {
+    "title": {
+      "de": "Das Dach bleibt liegen",
+      "en": "The roof stays lying down"
+    },
+    "body": {
+      "de": "Ein neues Dach folgte dem Zeiger hochkant und legte sich erst beim Absetzen auf die Seite; mit C wieder aufgenommen, stand es danach hochkant. Jetzt liegt es die ganze Zeit auf einer flachen Seite, mit dem First oben. Die Seiten von Vielecken sind außerdem gleichmäßig schattiert statt mit einem Verlauf.",
+      "en": "A new roof followed the pointer standing on its triangle and only lay down on its side when it was put down; picked up again with C, it then stood on its triangle. It now lies on a flat side all the way, with the peak on top. The sides of polygons are also shaded evenly instead of with a light-to-dark run."
+    }
   }
 ]
