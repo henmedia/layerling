@@ -20,6 +20,7 @@ import {
   attachmentsFormatVersion,
 } from "@/lib/projectAttachments";
 import { normalizeQrSettings } from "@/lib/qrCode";
+import { normalizeRackPlateSettings } from "@/lib/rackPlate";
 import { MAX_SBC_BUTTON_REACH, MAX_SBC_CLEARANCE, MAX_SBC_REACH, MAX_SBC_UP_REACH, MIN_SBC_UP_REACH, SBC_BOARD_ORDER } from "@/lib/sbcBoards";
 import { importedShapeFromStl, stlReadBeforeZUp, type StlReadOptions } from "@/lib/stlImport";
 import { importedShapeFromSvg } from "@/lib/svgImport";
@@ -1522,6 +1523,10 @@ function validateShapeDefinition(definition: Record<string, unknown>, label: str
     if (board.buttonReach !== undefined && (typeof board.buttonReach !== "number" || !Number.isFinite(board.buttonReach) || board.buttonReach < 0 || board.buttonReach > MAX_SBC_BUTTON_REACH)) {
       throw new Error(`${label}.sbcBoard.buttonReach is outside the supported range`);
     }
+  }
+  // A rack plate's settings (rackPlate.ts): read through the same check the plate is made with. Old projects have none.
+  if (definition.rackPlate !== undefined && !normalizeRackPlateSettings(definition.rackPlate)) {
+    throw new Error(`${label}.rackPlate must hold the plate's settings`);
   }
   // The corners of a text's line (#215): a layer of a name tag can be bevelled or sharp now, so an
   // unknown corner is refused rather than read as sharp.

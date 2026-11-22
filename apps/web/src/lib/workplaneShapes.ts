@@ -8,6 +8,7 @@ import { MCP_SHAPE_SETTING_KEYS } from "@/lib/mcpShapeSettings";
 import { bentTubeSegmentsEqual } from "@/lib/bentTubeGeometry";
 import { vaseSettingsEqual } from "@/lib/vaseSettings";
 import { qrSettingsEqual } from "@/lib/qrCode";
+import { rackPlateSettingsEqual } from "@/lib/rackPlate";
 import { torusTubeRatio } from "@/lib/torusShape";
 import { shapeHasAlongDeform } from "@/lib/slopeAlong";
 import type { EdgeTreatmentHistoryEntry, GroupResizeMode, SketchStroke, WorkplaneShape } from "@/types/layerling";
@@ -1050,6 +1051,7 @@ export function workplaneShapesEqual(a: WorkplaneShape, b: WorkplaneShape) {
     Boolean(a.sbcBoard?.lensUp) === Boolean(b.sbcBoard?.lensUp) &&
     (a.sbcBoard?.upReach ?? 0) === (b.sbcBoard?.upReach ?? 0) &&
     (a.sbcBoard?.buttonReach ?? 0) === (b.sbcBoard?.buttonReach ?? 0) &&
+    rackPlateSettingsEqual(a.rackPlate, b.rackPlate) &&
     a.importedMesh === b.importedMesh &&
     a.imagePlate === b.imagePlate &&
     a.sketchProfile === b.sketchProfile &&

@@ -224,7 +224,9 @@ import { FONT_MANAGER_OPTION, requestFontManager } from "@/lib/fontManagerEvents
 import { FontPicker } from "@/components/workplane/FontPicker";
 import { SurfacePatternPicker } from "@/components/workplane/SurfacePatternPicker";
 import { QR_BYTE_CAPACITY, qrByteLength, qrTextFits, type QrCodeSettings } from "@/lib/qrCode";
+import { MAX_RACK_PLATE_CORNER_RADIUS, MAX_RACK_PLATE_HOLE_CLEARANCE, MAX_RACK_PLATE_SCREW_DIAMETER, MAX_RACK_PLATE_SIZE, MAX_RACK_PLATE_THICKNESS, MIN_RACK_PLATE_SCREW_DIAMETER, MIN_RACK_PLATE_SIZE, MIN_RACK_PLATE_THICKNESS, MIN_RACK_PLATE_UNITS, normalizeRackPlateSettings, RACK_PLATE_AXES, rackPlateMaxOffset, rackPlateMaxUnits, rackPlateSleeveLength } from "@/lib/rackPlate";
 import { MAX_SBC_BUTTON_REACH, MAX_SBC_CLEARANCE, MAX_SBC_REACH, MAX_SBC_UP_REACH, MIN_SBC_UP_REACH, normalizeSbcBoardSettings, SBC_BOARDS, SBC_BOARD_ORDER, sbcBoardHasButtons, sbcBoardHasGpio, sbcBoardHasLens, sbcBoardHasRibbon, type SbcBoardSettings, type SbcBoardType } from "@/lib/sbcBoards";
+import type { RackPlateAxis, RackPlateSettings } from "@/types/layerling";
 import { ICON_TAG_LAYERS, iconTagFitCount, MAX_ICON_TAG_WIDTH, MAX_ICON_TAGS, MIN_ICON_TAG_WIDTH, normalizeIconTagCount, type IconLayerStack } from "@/lib/iconTag";
 import { PICTURE_FILE_ACCEPT } from "@/lib/pictureIcon";
 import { customFontList, textFontLabel } from "@/lib/textFonts";
@@ -4645,6 +4647,7 @@ export function ShapeInspector({
   iconTag,
   qrCode,
   sbcBoard,
+  rackPlate,
   referenceImage,
   onInteractionActiveChange,
   onSnapGridAwayChange,
@@ -4719,6 +4722,8 @@ export function ShapeInspector({
   qrCode?: QrCodeControls | null;
   /** The SBC board card's wiring (#1098), for an SBC board; null for anything else. */
   sbcBoard?: SbcBoardControls | null;
+  /** The rack plate card's wiring, for a rack plate; null for anything else. */
+  rackPlate?: RackPlateControls | null;
   /** The reference image card's wiring (#680), for a reference image; null for anything else. */
   referenceImage?: ReferenceImageControls | null;
   onInteractionActiveChange?: (active: boolean) => void;
@@ -5270,6 +5275,7 @@ export function ShapeInspector({
       {shape.kind === "text" && onLayerText ? <MakeLayersButton disabled={frozen} onLayerText={onLayerText} /> : null}
       {qrCode ? <QrCodeCard key={`qr-code-${shape.id}`} shapeId={shape.id} controls={qrCode} disabled={frozen} /> : null}
       {sbcBoard ? <SbcBoardCard key={`sbc-board-${shape.id}`} shapeId={shape.id} controls={sbcBoard} workspace={workspace} disabled={frozen} onInteractionActiveChange={onInteractionActiveChange} /> : null}
+      {rackPlate ? <RackPlateCard key={`rack-plate-${shape.id}`} shapeId={shape.id} controls={rackPlate} workspace={workspace} disabled={frozen} onInteractionActiveChange={onInteractionActiveChange} /> : null}
       {referenceImage ? <ReferenceImageCard key={`reference-image-${shape.id}`} shapeId={shape.id} controls={referenceImage} workspace={workspace} locked={frozen} onInteractionActiveChange={onInteractionActiveChange} /> : null}
       {iconTag?.isTag ? (
         <IconTagCard key={`icon-tag-${shape.id}`} shapeId={shape.id} controls={iconTag} layerSteps={tagHasLayerSteps(shape)} workspace={workspace} disabled={frozen} onInteractionActiveChange={onInteractionActiveChange} />
@@ -6723,6 +6729,109 @@ function SbcBoardCard({ shapeId, controls, workspace, disabled, onInteractionAct
             </>
           ) : null}
           <p className="name-tag-hint">{busy ? t("sbcBoard.building") : t("sbcBoard.passagesHint")}</p>
+          {error ? <p className="name-tag-hint icon-tag-card-error" role="alert">{error}</p> : null}
+        </div>
+      ) : null}
+    </div>
+  );
+}
+
+/** The rack plate card's wiring: the settings the plate was made with, and making it again with others. */
+export type RackPlateControls = {
+  settings: RackPlateSettings;
+  onRegenerate: (settings: RackPlateSettings) => Promise<void>;
+};
+
+/**
+ * The rack plate card, open and first: the plate's size and thickness, the HomeRacker sleeve on its back and the
+ * corner screw holes. Any change makes the plate again where it lies.
+ */
+function RackPlateCard({ shapeId, controls, workspace, disabled, onInteractionActiveChange }: {
+  shapeId: string;
+  controls: RackPlateControls;
+  workspace: WorkplaneWorkspaceSettings;
+  disabled: boolean;
+  onInteractionActiveChange?: (active: boolean) => void;
+}) {
+  const [open, setOpen] = useState(true);
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState("");
+  const settings = controls.settings;
+  const regenerate = (patch: Partial<RackPlateSettings>) => {
+    const next = normalizeRackPlateSettings({ ...settings, ...patch });
+    const same = !next || JSON.stringify(next) === JSON.stringify(normalizeRackPlateSettings(settings));
+    if (busy || disabled || same || !next) return;
+    setBusy(true);
+    setError("");
+    controls.onRegenerate(next)
+      .catch((reason) => setError(reason instanceof Error ? localizedError(reason.message) : String(reason)))
+      .finally(() => setBusy(false));
+  };
+  const unit = lengthDisplayUnit(workspace).label;
+  const maxUnits = rackPlateMaxUnits(settings.sleeveAlong === "depth" ? settings.depth : settings.width);
+  const unitOptions = Array.from({ length: maxUnits - MIN_RACK_PLATE_UNITS + 1 }, (_, index) => {
+    const count = MIN_RACK_PLATE_UNITS + index;
+    return { value: String(count), label: `${count} (${rackPlateSleeveLength(count).toFixed(1)} mm)` };
+  });
+  const maxOffset = rackPlateMaxOffset(settings.width, settings.depth, settings.sleeveAlong);
+  const measure = (key: keyof RackPlateSettings, label: string, min: number, max: number) => (
+    <label key={key} className={`select-property rack-plate-${key}`}>
+      <span>{label} ({unit})</span>
+      <CompactMeasureField
+        label={label}
+        value={settings[key] as number}
+        min={min}
+        max={max}
+        workspace={workspace}
+        disabled={disabled || busy}
+        onChange={(value) => regenerate({ [key]: value })}
+        onInteractionActiveChange={onInteractionActiveChange}
+      />
+    </label>
+  );
+  return (
+    <div className={`property-card name-tag-card rack-plate-card ${open ? "" : "collapsed"}`}>
+      <button className="property-card-header" type="button" aria-expanded={open} aria-controls={`rack-plate-${shapeId}`} onClick={() => setOpen((current) => !current)}>
+        <span>{t("rackPlate.title")}</span>
+        <ChevronUp className={open ? "" : "collapsed"} size={25} strokeWidth={2.8} />
+      </button>
+      {open ? <p className="name-tag-hint">{t("rackPlate.cardHint")}</p> : null}
+      {open ? (
+        <div className="property-list name-tag-body" id={`rack-plate-${shapeId}`} data-testid="rack-plate-card">
+          {measure("width", t("rackPlate.width"), MIN_RACK_PLATE_SIZE, MAX_RACK_PLATE_SIZE)}
+          {measure("depth", t("rackPlate.depth"), MIN_RACK_PLATE_SIZE, MAX_RACK_PLATE_SIZE)}
+          {measure("thickness", t("rackPlate.thickness"), MIN_RACK_PLATE_THICKNESS, MAX_RACK_PLATE_THICKNESS)}
+          {measure("cornerRadius", t("rackPlate.cornerRadius"), 0, MAX_RACK_PLATE_CORNER_RADIUS)}
+          <SelectProperty
+            type="select"
+            label={t("rackPlate.sleeveUnits")}
+            value={String(settings.sleeveUnits)}
+            options={unitOptions}
+            disabled={disabled || busy}
+            onChange={(value) => regenerate({ sleeveUnits: Number(value) })}
+          />
+          <SelectProperty
+            type="select"
+            label={t("rackPlate.sleeveAlong")}
+            value={settings.sleeveAlong}
+            options={RACK_PLATE_AXES.map((axis) => ({ value: axis, label: t(`rackPlate.sleeveAlong.${axis}`) }))}
+            disabled={disabled || busy}
+            onChange={(value) => regenerate({ sleeveAlong: value as RackPlateAxis })}
+          />
+          {maxOffset > 0 ? measure("sleeveOffset", t("rackPlate.sleeveOffset"), -maxOffset, maxOffset) : null}
+          {measure("holeClearance", t("rackPlate.holeClearance"), 0, MAX_RACK_PLATE_HOLE_CLEARANCE)}
+          <p className="name-tag-hint">{t("rackPlate.holeClearanceHint")}</p>
+          <label className="check-property rack-plate-screw-holes">
+            <input type="checkbox" checked={settings.screwHoles} disabled={disabled || busy} data-testid="rack-plate-screw-holes" onChange={(event) => regenerate({ screwHoles: event.currentTarget.checked })} />
+            <span>{t("rackPlate.screwHoles")}</span>
+          </label>
+          {settings.screwHoles ? (
+            <>
+              {measure("screwDiameter", t("rackPlate.screwDiameter"), MIN_RACK_PLATE_SCREW_DIAMETER, MAX_RACK_PLATE_SCREW_DIAMETER)}
+              {measure("screwInset", t("rackPlate.screwInset"), 0, MAX_RACK_PLATE_SIZE / 2)}
+            </>
+          ) : null}
+          <p className="name-tag-hint">{busy ? t("rackPlate.building") : t("rackPlate.attachHint")}</p>
           {error ? <p className="name-tag-hint icon-tag-card-error" role="alert">{error}</p> : null}
         </div>
       ) : null}
