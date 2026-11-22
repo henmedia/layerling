@@ -2386,6 +2386,17 @@ html[data-theme="dark"]:where([data-palette="graphite"]) .import-option.import-w
   background: #282828;
 }
 
+:where(html[data-theme="dark"][data-palette="graphite"]) .export-drawing-info input {
+  border: 1px solid #bfbfbf;
+  background: #f8f8f8;
+  color: inherit;
+}
+
+html[data-theme="dark"]:where([data-palette="graphite"]) .export-drawing-info input {
+  border-color: #4a4a4a;
+  background: #282828;
+}
+
 html[data-theme="dark"]:where([data-palette="graphite"]) .import-option {
   color: #e4e4e4;
 }

@@ -6300,6 +6300,46 @@ html[data-theme="dark"] .import-option.import-width-option input {
   background: #2a241c;
 }
 
+/* The drawing's title block (forum, Lofo): number, revision and who drew it, under the 2D file format. */
+.export-drawing-info {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 6px 10px;
+  align-items: center;
+  margin-top: 10px;
+}
+
+.export-drawing-info label {
+  display: contents;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.export-drawing-info input {
+  min-width: 0;
+  padding: 4px 6px;
+  border: 1px solid #d8c4a5;
+  border-radius: 6px;
+  background: #fffaf1;
+  color: inherit;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+html[data-theme="dark"] .export-drawing-info input {
+  border-color: #5a4a36;
+  background: #2a241c;
+}
+
+.export-drawing-info-hint {
+  grid-column: 1 / -1;
+  margin: 0;
+  font-size: 11px;
+  line-height: 1.35;
+  opacity: 0.8;
+}
+
 html[data-theme="dark"] .import-option {
   color: #f0e7d9;
 }

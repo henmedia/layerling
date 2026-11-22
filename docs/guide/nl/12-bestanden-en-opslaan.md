@@ -115,6 +115,8 @@ Kies het formaat **2D** (houd de muis erboven en er staat Tekening) en, onder de
 
 layerling tekent het voor-, boven- en rechterzijaanzicht in Europese projectie (het rechterzijaanzicht links van het vooraanzicht, het bovenaanzicht eronder) op het kleinste ISO-blad waar het op past, van A4 tot A0, of een groter blad als het onderdeel dat nodig heeft. Het is altijd 1:1. Elk aanzicht krijgt zijn totale breedte en hoogte, en randen die je niet kunt zien, zijn gestippeld. Ronde boringen die evenwijdig aan een kijkrichting lopen, krijgen een hartkruis en een label (F1, T1, R1), en een tabel onderaan geeft hun diameter en positie, gemeten vanaf de linkeronderhoek van het aanzicht. Het titelblok rechtsonder bevat de naam, schaal, eenheden, datum en bladnummer. De woorden op het blad volgen de taal van de interface.
 
+Onder PDF of SVG kun je {{ui:export.drawing.number}}, {{ui:export.drawing.revision}} en {{ui:export.drawing.drawnBy}} invullen; ze komen in het titelblok, een leeg veld toont een streepje. Nummer en revisie blijven bij het ontwerp, ook in het `.lyl`-bestand, en je naam blijft in deze browser voor alle ontwerpen. De datum is altijd de dag van de export.
+
 Print op 100 % of "werkelijke grootte", anders kloppen de lengtes niet. Wat de tekening niet doet: schroefdraad, diepten, toleranties en schuine boringen worden niet bemaat, en de maten komen uit het model als mesh, dus het zijn nominale maten. Een heel gedetailleerd onderdeel (meer dan 100.000 driehoeken) of meer dan 200 boringen wordt met een melding geweigerd; kies dan minder objecten.
 
 De projectie is gebaseerd op het tekenwerk van Cadverix-3D door WC3D.

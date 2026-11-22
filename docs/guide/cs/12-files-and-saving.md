@@ -115,6 +115,8 @@ Vyberte **2D**, jehož popis po najetí označuje výkres, a pod názvem souboru
 
 Nárys, půdorys a pravý bokorys používají promítání v prvním kvadrantu: pravý bokorys je vlevo od nárysu a půdorys pod ním. Výkres se vejde na nejmenší vhodný list ISO od A4 po A0, případně na větší vlastní formát. Měřítko je vždy 1:1. Každý pohled má celkovou šířku a výšku, neviditelné hrany jsou čárkované. Kruhové otvory rovnoběžné se směrem pohledu mají středový kříž a označení F1, T1 nebo R1. Tabulka dole uvádí průměry a polohy od levého dolního rohu příslušného pohledu. Popisové pole vpravo dole obsahuje název, měřítko, jednotky, datum a číslo listu. Popisky používají jazyk rozhraní.
 
+Pod PDF nebo SVG můžete vyplnit {{ui:export.drawing.number}}, {{ui:export.drawing.revision}} a {{ui:export.drawing.drawnBy}}; objeví se v popisovém poli, prázdné pole ukáže pomlčku. Číslo a změna zůstávají u návrhu, i v jeho souboru `.lyl`, a vaše jméno zůstává v tomto prohlížeči pro všechny návrhy. Datum je vždy den exportu.
+
 Tiskněte na 100 % nebo ve skutečné velikosti, jinak rozměry nebudou odpovídat. Automaticky se nekótují závity, hloubky, tolerance ani šikmé otvory. Rozměry pocházejí z polygonové sítě modelu a jsou jmenovité. Nad 100 000 trojúhelníků nebo 200 otvorů program výkres odmítne s vysvětlením; vyberte méně objektů.
 
 Promítání vychází z práce WC3D na výkresech projektu Cadverix-3D.

@@ -121,6 +121,8 @@ Elige el formato **2D** (si pasas el ratón por encima, pone «Plano») y, debaj
 
 layerling dibuja las vistas frontal, superior y lateral derecha en disposición de primer diedro (la lateral derecha, a la izquierda de la frontal, y la superior, debajo) en la hoja ISO más pequeña en la que quepan, de A4 a A0, o en una mayor si la pieza lo necesita. Siempre es a escala 1:1. Cada vista lleva su anchura y su altura totales, y las aristas que no se ven van en línea discontinua. Los taladros redondos paralelos a una dirección de vista llevan una cruz de centro y una etiqueta (F1, T1, R1), y una tabla al pie indica su diámetro y su posición, medida desde la esquina inferior izquierda de la vista. El cuadro de rotulación de la esquina inferior derecha contiene el nombre, la escala, las unidades, la fecha y el número de hoja. Los textos de la hoja siguen el idioma de la interfaz.
 
+Debajo de PDF o SVG puedes rellenar {{ui:export.drawing.number}}, {{ui:export.drawing.revision}} y {{ui:export.drawing.drawnBy}}; van al cajetín, y un campo vacío muestra un guion. El número y la revisión se quedan con el diseño, también en su archivo `.lyl`, y tu nombre se guarda en este navegador para todos los diseños. La fecha es siempre el día de la exportación.
+
 Imprime al 100 % o a «tamaño real», o las longitudes no coincidirán. Lo que el plano no hace: no acota roscas, profundidades, tolerancias ni taladros inclinados, y las medidas salen del modelo como malla, así que son nominales. Una pieza muy detallada (más de 100 000 triángulos) o más de 200 taladros se rechazan con un mensaje; en ese caso, elige menos objetos.
 
 La proyección se basa en el trabajo de planos de Cadverix-3D, de WC3D.

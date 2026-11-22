@@ -308,6 +308,7 @@ import { booleanAutomationScene } from "@/lib/editorAutomation";
 import { debugShapeSummary, mcpPivotRequest, compactShapeSummary, mcpGridfinityLabelFont, mcpShapeSummary, mcpSketchFillProfile, mcpTextFont } from "@/lib/editorMcpSummary";
 import { sweepAnchorFromParams, sweepPathFromParams, sweepSectionFromParams, sweepSketchProfile } from "@/lib/sweepSketch";
 import { emptySketchProfile, cadShapeFromSketchProfile, cadShapeFromSketchSweep, revolveBuildProfile, shapeFromRevolvedSketchProfile, shapeFromCadMesh, sketchBodyAsOperation, sketchBodyOperation, sketchProfileLeftOfAxis, sketchReferenceShapeOnWorkplane, defaultMcpSketchProfile, type SketchMirrorAbout } from "@/lib/editorSketchCad";
+import { drawingInfoFor, type DrawingInfo } from "@/lib/drawingInfo";
 import { drawingLabelsInLanguage } from "@/lib/drawingLabels";
 import { DEFAULT_TEXT_BLOCK_GAP, offersTextBlock, TEXT_BLOCK_ALIGNS, textBlockFor, textBlockLines, type TextBlockAlign, type TextBlockOptions } from "@/lib/textBlock";
 import { offersTextLayers, textLayerStack, layeredTextShape, nameTagSource, nameTagsFor, offersIconLayers, iconLayerStack, iconTagArea, layeredIconShape, iconTagCopies, svgIconArea, iconTagFromSvg, keyringTabShape, keyringTabTag, keyringTabAt, keyringTabPlace, textFreeKeyring, textFreeKeyringPlace, iconFreeKeyring, iconFreeKeyringPlace } from "@/lib/editorTextTags";
@@ -18233,7 +18234,12 @@ export function LayerlingEditor({
         const all = currentShapes();
         const chosen = ids.length ? all.filter((shape) => ids.includes(shape.id)) : all;
         if (ids.length && chosen.length === 0) throw new Error("None of the ids is an object in this design");
-        const { drawing, hiddenNote } = await buildDrawing({ shapes: chosen, selection: ids.length > 0 }, all, projectName);
+        // drawingNumber, revision and drawnBy fill the title block for this drawing only; left out, the ones kept for the design go in.
+        const given: Partial<DrawingInfo> = {};
+        if (params.drawingNumber !== undefined) given.number = mcpString(params.drawingNumber, "");
+        if (params.revision !== undefined) given.revision = mcpString(params.revision, "");
+        if (params.drawnBy !== undefined) given.drawnBy = mcpString(params.drawnBy, "");
+        const { drawing, hiddenNote } = await buildDrawing({ shapes: chosen, selection: ids.length > 0 }, all, projectName, given);
         if (!drawing) throw new Error(t(hiddenNote ? "status.exportOnlyHidden" : "status.addSolidBeforeExport"));
         const { drawingToSvg, drawingToPdf, drawingBoreRows } = await import("@/lib/drawingExport");
         const round = (value: number) => Number(value.toFixed(3));
@@ -19091,7 +19097,7 @@ export function LayerlingEditor({
    * off). `drawing` is null when there is no solid in it. Loose holes count even when only the part
    * they cut is chosen.
    */
-  const buildDrawing = useCallback(async (source: { shapes: WorkplaneShape[]; selection: boolean }, allShapes: WorkplaneShape[], title: string) => {
+  const buildDrawing = useCallback(async (source: { shapes: WorkplaneShape[]; selection: boolean }, allShapes: WorkplaneShape[], title: string, info: Partial<DrawingInfo> = {}) => {
     const scopedShapes = source.selection
       ? [...source.shapes, ...allShapes.filter((shape) => shape.hole && !source.shapes.some((selected) => selected.id === shape.id))]
       : source.shapes;
@@ -19100,17 +19106,18 @@ export function LayerlingEditor({
     const { generateDrawing } = await import("@/lib/drawingExport");
     const { meshes, holeCutsFailed } = await exportBodiesWithLooseHoles(visible);
     if (holeCutsFailed) throw new Error(t("status.drawingHoleCutFailed"));
-    return { drawing: generateDrawing(meshes, title, drawingLabelsInLanguage()), hiddenNote };
+    // The number, revision and name typed in the export window go into the title block (forum, Lofo).
+    return { drawing: generateDrawing(meshes, title, drawingLabelsInLanguage(), drawingInfoFor(projectInfoRef.current.projectId, info)), hiddenNote };
   }, []);
 
-  const exportDrawingDesign = useCallback(async (exportName: string, format: "svg" | "pdf", toServer = false) => {
+  const exportDrawingDesign = useCallback(async (exportName: string, format: "svg" | "pdf", toServer = false, info: Partial<DrawingInfo> = {}) => {
     if (drawingExporting) return;
     const source = exportSource();
     setDrawingExporting(true);
     setNotice(t("status.buildingDrawing"), true);
     try {
       const title = exportName.trim() || projectName;
-      const { drawing, hiddenNote } = await buildDrawing(source, shapes, title);
+      const { drawing, hiddenNote } = await buildDrawing(source, shapes, title, info);
       if (!drawing) {
         setNotice(hiddenNote ? t("status.exportOnlyHidden") : t(source.selection ? "status.selectSolidBeforeExport" : "status.addSolidBeforeExport"));
         return;
@@ -22050,6 +22057,7 @@ export function LayerlingEditor({
           lylSelectedCount={exportSelectionScoped ? selectedShapes.length : 0}
           onExportStep={exportStepDesign}
           onExportDrawing={exportDrawingDesign}
+          drawingProjectId={projectId ?? null}
           drawingExporting={drawingExporting}
           onExportImage={exportViewImage}
           sharedProjectsEnabled={sharedProjectsEnabled}

@@ -121,6 +121,8 @@ Välj formatet **2D** (håll muspekaren över det så står det Ritning) och, un
 
 layerling ritar fram-, uppifrån- och högervy i förstavinkelprojektion (höger sida till vänster om framvyn, toppvyn nedanför den) på det minsta ISO-ark som passar, från A4 till A0, eller ett större om delen kräver det. Skalan är alltid 1:1. Varje vy bär sin totala bredd och höjd, och kanter du inte kan se är streckade. Runda borrhål som löper parallellt med en betraktningsriktning får ett centrumkors och en beteckning (F1, T1, R1), och en tabell längst ned listar deras diameter och position, mätt från vyns nedre vänstra hörn. Ritningshuvudet i nedre högra hörnet innehåller namn, skala, enheter, datum och bladnummer. Orden på bladet följer gränssnittets språk.
 
+Under PDF eller SVG kan du fylla i {{ui:export.drawing.number}}, {{ui:export.drawing.revision}} och {{ui:export.drawing.drawnBy}}; de hamnar i namnrutan, och ett tomt fält visar ett streck. Nummer och revision stannar med designen, också i dess `.lyl`-fil, och ditt namn sparas i den här webbläsaren för alla designer. Datumet är alltid dagen för exporten.
+
 Skriv ut i 100 % eller ”verklig storlek”, annars stämmer inte längderna. Vad ritningen inte gör: gängor, djup, toleranser och sneda borrhål måttsätts inte, och måtten kommer från modellen som en mesh, så de är nominella. En mycket detaljerad del (över 100 000 trianglar) eller fler än 200 borrhål nekas med ett meddelande; välj då färre objekt.
 
 Projektionen bygger på ritningsarbetet i Cadverix-3D av WC3D.

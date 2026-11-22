@@ -1,4 +1,5 @@
 import * as THREE from "three";
+import { drawingInfoText, type DrawingInfo } from "@/lib/drawingInfo";
 import { drawingRotation, projectDrawingMeshes, type DrawingMesh, type DrawingPoint, type DrawingPoint3, type DrawingProjection } from "@/lib/drawingProjection";
 
 export type DrawingHole = { center: DrawingPoint; diameter: number };
@@ -116,7 +117,15 @@ const dimension = (n: number) => (Math.abs(n) < 0.005 ? 0 : n).toFixed(2);
 
 /** First-angle engineering sheet: right view to the left, top below front.
  * One unit = 1 mm; larger parts use larger sheets rather than changing scale. */
-export function generateDrawing(meshes: readonly DrawingMesh[], title: string, labels: DrawingLabels = DRAWING_LABELS_EN): GeneratedDrawing {
+export function generateDrawing(
+  meshes: readonly DrawingMesh[],
+  title: string,
+  labels: DrawingLabels = DRAWING_LABELS_EN,
+  /** What the title block says besides the name (drawingInfo.ts); an empty field shows a dash. */
+  info: Partial<DrawingInfo> = {},
+  /** The day the sheet is dated; the day of the export unless a test fixes it. */
+  today = new Date(),
+): GeneratedDrawing {
   const presets: { id: DrawingView["id"]; name: string; rotation: DrawingPoint3 }[] = [
     { id: "F", name: labels.front, rotation: [0, 0, 0] }, { id: "T", name: labels.top, rotation: [90, 0, 0] }, { id: "R", name: labels.right, rotation: [0, -90, 0] },
   ];
@@ -219,12 +228,15 @@ export function generateDrawing(meshes: readonly DrawingMesh[], title: string, l
   text([blockX + 3, titleTop + 4], `LAYERLING · ${paper ?? labels.customSheet} · ${labels.firstAngle}`, 2);
   const displayTitle = title.length > 64 ? `${title.slice(0, 61)}...` : title;
   text([blockX + 3, titleTop + 10], displayTitle, Math.min(4, (blockWidth - 6) / Math.max(1, textWidth(displayTitle))));
+  // Number / revision and name / date as typed in the export window (forum, Lofo): a long entry shrinks to fit
+  // its half of the block, as the title does, and an empty one keeps the dash the sheet always had.
+  const filled = (value: string | undefined) => drawingInfoText(value) || "—";
+  const cellText = (at: DrawingPoint, value: string) => text(at, value, Math.min(2.5, (blockWidth / 2 - 4) / Math.max(1, textWidth(value))));
   text([blockX + 2, titleTop + 17], labels.revision, 1.8);
-  text([blockX + 2, titleTop + 22], "— / A", 2.5);
+  cellText([blockX + 2, titleTop + 22], `${filled(info.number)} / ${filled(info.revision)}`);
   text([blockX + blockWidth / 2 + 2, titleTop + 17], labels.drawnBy, 1.8);
-  const today = new Date();
   const date = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`;
-  text([blockX + blockWidth / 2 + 2, titleTop + 22], `— / ${date}`, 2.5);
+  cellText([blockX + blockWidth / 2 + 2, titleTop + 22], `${filled(info.drawnBy)} / ${date}`);
   [ [labels.scale, "1:1"], [labels.units, "mm"], [labels.sheet, "1 / 1"] ].forEach(([label, value], i) => {
     const x = blockX + blockWidth * i / 3 + 2;
     text([x, titleTop + 28], label, 1.8); text([x, titleTop + 33], value, 2.5);

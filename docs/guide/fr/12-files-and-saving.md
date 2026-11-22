@@ -121,6 +121,8 @@ Choisissez le format **2D** (survolez-le et il est écrit Dessin) et, sous le no
 
 layerling dessine les vues de face, de dessus et de droite selon une disposition au premier angle (le côté droit à gauche de la vue de face, la vue de dessus en dessous) sur la plus petite feuille ISO adaptée, du A4 au A0, ou une plus grande si la pièce en a besoin. C'est toujours à 1:1. Chaque vue a sa largeur et sa hauteur globales, et les bords que vous ne pouvez pas voir sont en pointillés. Les alésages ronds parallèles à une direction de vue reçoivent une croix centrale et une étiquette (F1, T1, R1), et un tableau en bas répertorie leur diamètre et leur position, mesurés à partir du coin inférieur gauche de la vue. Le cartouche dans le coin inférieur droit contient le nom, l'échelle, les unités, la date et le numéro de feuille. Les mots sur la feuille suivent la langue de l'interface.
 
+Sous PDF ou SVG, tu peux remplir {{ui:export.drawing.number}}, {{ui:export.drawing.revision}} et {{ui:export.drawing.drawnBy}} ; ils figurent dans le cartouche, un champ vide affiche un tiret. Le numéro et l'indice restent avec le projet, aussi dans son fichier `.lyl`, et ton nom reste dans ce navigateur pour tous les projets. La date est toujours celle de l'export.
+
 Imprimez à 100 % ou « taille réelle », sinon les longueurs ne correspondront pas. Ce que le dessin ne fait pas : les filetages, profondeurs, tolérances et alésages en angle ne sont pas cotés, et les dimensions proviennent du modèle sous forme de maillage, elles sont donc nominales. Une pièce très détaillée (plus de 100 000 triangles) ou plus de 200 alésages est refusée avec message ; choisissez alors moins d’objets.
 
 La projection est basée sur le travail de dessin de Cadverix-3D de WC3D.

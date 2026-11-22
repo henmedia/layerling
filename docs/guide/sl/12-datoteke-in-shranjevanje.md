@@ -121,6 +121,8 @@ Izberi obliko **2D** (ko miško zadržiš nad njo, piše Risba) in pod imenom da
 
 layerling nariše pogled od spredaj, od zgoraj in z desne v prvem kotu projekcije (desni pogled levo od sprednjega, zgornji pod njim) na najmanjšem listu ISO, ki zadošča, od A4 do A0, ali na večjem, če ga del potrebuje. Merilo je vedno 1:1. Vsak pogled ima svojo skupno širino in višino, robovi, ki jih ne vidiš, pa so črtkani. Okrogle izvrtine, ki tečejo vzporedno s smerjo pogleda, dobijo središčni križ in oznako (F1, T1, R1), tabela spodaj pa našteje njihov premer in položaj, merjen od spodnjega levega kota pogleda. Naslovni blok v spodnjem desnem kotu vsebuje ime, merilo, enote, datum in številko lista. Besede na listu sledijo jeziku vmesnika.
 
+Pod PDF ali SVG lahko izpolniš {{ui:export.drawing.number}}, {{ui:export.drawing.revision}} in {{ui:export.drawing.drawnBy}}; vpišejo se v glavo risbe, prazno polje pokaže pomišljaj. Številka in revizija ostaneta pri modelu, tudi v njegovi datoteki `.lyl`, tvoje ime pa ostane v tem brskalniku za vse modele. Datum je vedno dan izvoza.
+
 Natisni pri 100 % ali »dejanski velikosti«, sicer dolžine ne bodo ustrezale. Risba ne naredi tega: navoji, globine, tolerance in poševne izvrtine niso kotirani, mere pa izhajajo iz modela kot mreže, zato so nazivne. Zelo podroben del (nad 100.000 trikotnikov) ali več kot 200 izvrtin se zavrne s sporočilom; takrat izberi manj predmetov.
 
 Projekcija temelji na risarskem delu programa Cadverix-3D avtorja WC3D.

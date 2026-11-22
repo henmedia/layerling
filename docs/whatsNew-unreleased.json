@@ -1,1 +1,15 @@
-[]
+[
+  {
+    "title": {
+      "de": "Zeichnung: Nummer, Änderung und Zeichner im Schriftfeld",
+      "en": "Drawing: number, revision and who drew it in the title block"
+    },
+    "body": {
+      "de": "Im 2D-Reiter des Exports gibt es unter PDF oder SVG drei Felder: Zeichnungsnummer, Änderung und Gezeichnet von. Sie stehen im Schriftfeld der Zeichnung, ein leeres Feld zeigt wie bisher einen Strich.\n\nNummer und Änderung bleiben beim Entwurf, auch in seiner .lyl-Datei; deinen Namen merkt sich layerling in diesem Browser für alle Entwürfe. Das Datum ist weiter der Tag des Exports. Über MCP: drawingNumber, revision und drawnBy in layerling_export_drawing.",
+      "en": "In the export window's 2D tab there are three fields below PDF or SVG: Drawing number, Revision and Drawn by. They go into the drawing's title block; a field left empty shows a dash as before.\n\nThe number and revision stay with the design, also in its .lyl file, and layerling keeps your name in this browser for every design. The date is still the day of the export. Through MCP: drawingNumber, revision and drawnBy in layerling_export_drawing."
+    },
+    "guide": {
+      "section": "exporting"
+    }
+  }
+]

@@ -5,6 +5,7 @@ import { GuideHelpLink } from "@/components/GuideHelpLink";
 import { MovableToolPanel } from "@/components/workplane/MovableToolPanel";
 import { ArchiveRestore, CloudUpload, Download, EyeOff, FilePlus2, FolderOpen, ImagePlus, Info, Server, X } from "lucide-react";
 import { OPEN_FILE_BACKUPS_EVENT } from "@/lib/fileBackups";
+import { DRAWING_INFO_MAX_LENGTH, readDesignDrawingInfo, readDrawnBy, writeDesignDrawingInfo, writeDrawnBy, type DesignDrawingInfo, type DrawingInfo } from "@/lib/drawingInfo";
 import { useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
 import { t, type MessageKey } from "@/lib/i18n";
 import { useLanguage } from "@/lib/useLanguage";
@@ -52,6 +53,7 @@ export function TopActionPanel({
   onExportStep,
   onExportDrawing,
   drawingExporting,
+  drawingProjectId = null,
   onExportImage,
   sharedProjectsEnabled,
   lylExporting,
@@ -93,8 +95,10 @@ export function TopActionPanel({
   /** How many objects are selected for the .lyl's "Selected only" choice; 0 offers only the whole design. */
   lylSelectedCount?: number;
   onExportStep: (exportName: string, toServer?: boolean) => void;
-  onExportDrawing: (exportName: string, format: "svg" | "pdf", toServer?: boolean) => void;
+  onExportDrawing: (exportName: string, format: "svg" | "pdf", toServer?: boolean, info?: DrawingInfo) => void;
   drawingExporting: boolean;
+  /** The design whose drawing number and revision the 2D tab shows and keeps (forum, Lofo). */
+  drawingProjectId?: string | null;
   onExportImage: (exportName: string, options: ViewImageOptions, toServer?: boolean) => void;
   sharedProjectsEnabled: boolean;
   lylExporting: boolean;
@@ -125,6 +129,15 @@ export function TopActionPanel({
   const [svgWidthText, setSvgWidthText] = useState(() => { const width = readImportSvgWidth(); return width ? String(width) : ""; });
   const [exportFormat, setExportFormat] = useState<ExportFormat>("stl");
   const [drawingFormat, setDrawingFormat] = useState<"svg" | "pdf">("pdf");
+  // The title block's number and revision belong to the design, the name to this browser; each is kept as it is typed.
+  const [drawingInfo, setDrawingInfo] = useState<DesignDrawingInfo>(() => readDesignDrawingInfo(drawingProjectId));
+  const [drawnBy, setDrawnBy] = useState(readDrawnBy);
+  useEffect(() => setDrawingInfo(readDesignDrawingInfo(drawingProjectId)), [drawingProjectId]);
+  const changeDrawingInfo = (patch: Partial<DesignDrawingInfo>) => {
+    const next = { ...drawingInfo, ...patch };
+    setDrawingInfo(next);
+    writeDesignDrawingInfo(drawingProjectId, next);
+  };
   const [svgView, setSvgView] = useState<SvgExportView>("silhouette");
   const [dxfView, setDxfView] = useState<DxfExportView>("silhouette");
   // Stencil bridges for the parts a cut would let fall out (the middle of an "o"): off unless asked for.
@@ -311,7 +324,8 @@ export function TopActionPanel({
   const selectedExport = exportDetails[exportFormat];
   const runSelectedExport = (toServer = false) => {
     if (drawingExporting || stepExporting || lylExporting) return;
-    if (exportFormat === "drawing") onExportDrawing(exportName, drawingFormat, toServer);
+    // The fields as they stand go with the export, also for a design that has no place to keep them yet.
+    if (exportFormat === "drawing") onExportDrawing(exportName, drawingFormat, toServer, { ...drawingInfo, drawnBy });
     else if (exportFormat === "step") onExportStep(exportName, toServer);
     else if (exportFormat === "png") onExportImage(exportName, imageOptions, toServer);
     else if (exportFormat === "lyl") onExportLyl(exportName, lylHistoryLimit, lylFileAccessSupported() ? "fileAs" : "download", lylSelectedOnly);
@@ -501,6 +515,24 @@ export function TopActionPanel({
                   <option value="svg">SVG</option>
                 </select>
               </label>
+              <div className="export-drawing-info" data-help-section="exporting">
+                <label>
+                  <span>{t("export.drawing.number")}</span>
+                  <input type="text" value={drawingInfo.number} maxLength={DRAWING_INFO_MAX_LENGTH} spellCheck={false} data-testid="drawing-number"
+                    onChange={(event) => changeDrawingInfo({ number: event.currentTarget.value })} />
+                </label>
+                <label>
+                  <span>{t("export.drawing.revision")}</span>
+                  <input type="text" value={drawingInfo.revision} maxLength={DRAWING_INFO_MAX_LENGTH} spellCheck={false} data-testid="drawing-revision"
+                    onChange={(event) => changeDrawingInfo({ revision: event.currentTarget.value })} />
+                </label>
+                <label>
+                  <span>{t("export.drawing.drawnBy")}</span>
+                  <input type="text" value={drawnBy} maxLength={DRAWING_INFO_MAX_LENGTH} spellCheck={false} autoComplete="name" data-testid="drawing-drawn-by"
+                    onChange={(event) => { setDrawnBy(event.currentTarget.value); writeDrawnBy(event.currentTarget.value); }} />
+                </label>
+                <p className="export-drawing-info-hint">{t("export.drawing.infoHint")}</p>
+              </div>
             </section>
           ) : null}
 

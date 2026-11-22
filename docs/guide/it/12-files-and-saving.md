@@ -121,6 +121,8 @@ Scegli il formato **2D** (passandoci sopra con il puntatore compare la dicitura 
 
 layerling disegna le viste frontale, dall’alto e laterale destra con disposizione secondo il metodo europeo (la vista laterale destra a sinistra di quella frontale e la vista dall’alto sotto), sul foglio ISO più piccolo adatto, da A4 ad A0, o su un formato più grande se il pezzo lo richiede. La scala è sempre 1:1. Ogni vista riporta larghezza e altezza complessive; gli spigoli nascosti sono tratteggiati. I fori cilindrici paralleli alla direzione di una vista hanno un asse centrale e un’etichetta (F1, T1, R1); una tabella in basso ne elenca diametro e posizione, misurata dall’angolo inferiore sinistro della vista. Il cartiglio nell’angolo inferiore destro riporta nome, scala, unità, data e numero del foglio. Le diciture del disegno seguono la lingua dell’interfaccia.
 
+Sotto PDF o SVG puoi compilare {{ui:export.drawing.number}}, {{ui:export.drawing.revision}} e {{ui:export.drawing.drawnBy}}; finiscono nel cartiglio, un campo vuoto mostra un trattino. Numero e revisione restano con il progetto, anche nel suo file `.lyl`, e il tuo nome resta in questo browser per tutti i progetti. La data è sempre il giorno dell'esportazione.
+
 Stampa al 100% o in «dimensioni effettive», altrimenti le misure non corrisponderanno. Il disegno non rappresenta le filettature e non quota profondità, tolleranze o fori inclinati. Le dimensioni derivano dal modello sotto forma di mesh e sono quindi nominali. Se il pezzo è molto dettagliato (oltre 100.000 triangoli) o contiene più di 200 fori, l’esportazione viene rifiutata con un messaggio: in tal caso seleziona meno oggetti.
 
 La proiezione si basa sul lavoro di disegno di Cadverix-3D di WC3D.

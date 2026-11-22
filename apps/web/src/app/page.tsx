@@ -81,6 +81,7 @@ import { ToolbarHistoryIcon, ToolbarImportIcon } from "@/components/toolbarIcons
 import { writeDesignView, writeSavedViews } from "@/lib/designView";
 import { seedStartCornerRuler, writeCornerRulers } from "@/lib/cornerRulerStore";
 import { readTape, writeTape } from "@/lib/tapeStore";
+import { readDesignDrawingInfo, writeDesignDrawingInfo } from "@/lib/drawingInfo";
 import { useFileAccept } from "@/lib/fileAccept";
 import { dropBackupTarget, linkedLylFile, lylFileAccessSupported, onLylFilesLaunched, pickBackupTarget, pickFilesToImport, rememberLylFile, writeBackupTarget, type LylFileHandle } from "@/lib/lylFileAccess";
 import { exportLylProject, importLylProject, inspectLylProjectPackage, LYL_CREATED_WITH_VERSION, LYL_MEDIA_TYPE, withLylProjectName, withLylThumbnail } from "@/lib/lylProject";
@@ -1905,6 +1906,7 @@ export default function Home() {
       // A file saved with a view opens in it; the working copy of a server design keeps its own.
       if (restored.view && !existing) writeDesignView(project.id, restored.view);
       if (restored.savedViews && !existing) writeSavedViews(project.id, restored.savedViews);
+      if (restored.drawingInfo && !existing) writeDesignDrawingInfo(project.id, restored.drawingInfo);
       if (restored.cornerRulers && !existing) writeCornerRulers(project.id, restored.cornerRulers);
       if (restored.tapeMeasurements && !existing) writeTape(project.id, restored.tapeMeasurements);
       setProjectShapesById((current) => ({ ...current, [project.id]: entry }));
@@ -2147,6 +2149,7 @@ export default function Home() {
       if (!existing) {
         if (restored.view) writeDesignView(project.id, restored.view);
         if (restored.savedViews) writeSavedViews(project.id, restored.savedViews);
+        if (restored.drawingInfo) writeDesignDrawingInfo(project.id, restored.drawingInfo);
         if (restored.cornerRulers) writeCornerRulers(project.id, restored.cornerRulers);
         if (restored.tapeMeasurements) writeTape(project.id, restored.tapeMeasurements);
       }
@@ -2788,6 +2791,7 @@ export default function Home() {
             await saveProjectShapes(refilled.id, entry, projectShapeSaveContext(refilled));
             if (restored.view) writeDesignView(refilled.id, restored.view);
             if (restored.savedViews) writeSavedViews(refilled.id, restored.savedViews);
+            if (restored.drawingInfo) writeDesignDrawingInfo(refilled.id, restored.drawingInfo);
             if (restored.cornerRulers) writeCornerRulers(refilled.id, restored.cornerRulers);
             if (restored.tapeMeasurements) writeTape(refilled.id, restored.tapeMeasurements);
             refilledProjects.push(refilled);
@@ -2828,6 +2832,7 @@ export default function Home() {
         }
         if (restored.view) writeDesignView(project.id, restored.view);
         if (restored.savedViews) writeSavedViews(project.id, restored.savedViews);
+        if (restored.drawingInfo) writeDesignDrawingInfo(project.id, restored.drawingInfo);
         if (restored.cornerRulers) writeCornerRulers(project.id, restored.cornerRulers);
         if (restored.tapeMeasurements) writeTape(project.id, restored.tapeMeasurements);
         restoredProjects.push(project);
@@ -3115,6 +3120,8 @@ export default function Home() {
       await saveProjectShapes(copy.id, entry, projectShapeSaveContext(copy));
       // The bodies keep their ids in the copy, so the measurements of the tape measure fit it as they did the original (#881).
       writeTape(copy.id, readTape(source.id));
+      // The drawing number and revision go with it, to be changed for the copy's own drawings.
+      writeDesignDrawingInfo(copy.id, readDesignDrawingInfo(source.id));
       // With new designs on the server, the copy goes there too, beside a server original or into the open folder.
       const { project: placed, problem } = await placeNewDesign(copy, source.sharedProject?.path ?? sharedPathRef.current);
       setProjectShapesById((current) => ({ ...current, [placed.id]: entry }));

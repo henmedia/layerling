@@ -121,6 +121,8 @@ Wybierz format **2D** (po najechaniu pokazuje się napis Rysunek), a pod nazwą 
 
 layerling rysuje widok z przodu, z góry i z prawej w układzie metody europejskiej (widok z prawej na lewo od widoku z przodu, widok z góry pod nim) na najmniejszym arkuszu ISO, który się zmieści, od A4 do A0, albo większym, jeśli część tego wymaga. Zawsze w skali 1:1. Każdy widok ma wymiary gabarytowe szerokości i wysokości, a krawędzie niewidoczne są rysowane przerywaną linią. Okrągłe otwory równoległe do kierunku widoku dostają krzyż środka i oznaczenie (F1, T1, R1), a tabela na dole podaje ich średnicę i położenie, mierzone od lewego dolnego narożnika widoku. Tabliczka rysunkowa w prawym dolnym rogu zawiera nazwę, skalę, jednostki, datę i numer arkusza. Napisy na arkuszu są w języku interfejsu.
 
+Pod PDF lub SVG możesz wypełnić {{ui:export.drawing.number}}, {{ui:export.drawing.revision}} i {{ui:export.drawing.drawnBy}}; trafiają do tabliczki rysunkowej, a puste pole pokazuje kreskę. Numer i rewizja zostają przy projekcie, także w jego pliku `.lyl`, a twoje imię zostaje w tej przeglądarce dla wszystkich projektów. Data to zawsze dzień eksportu.
+
 Drukuj w skali 100 % albo „rzeczywisty rozmiar”, bo inaczej długości się nie zgodzą. Czego rysunek nie robi: gwinty, głębokości, tolerancje i otwory pod kątem nie są wymiarowane, a wymiary pochodzą z modelu jako siatki, więc są nominalne. Bardzo szczegółowa część (ponad 100 000 trójkątów) albo ponad 200 otworów zostaje odrzucona z komunikatem. Wybierz wtedy mniej obiektów.
 
 Rzutowanie opiera się na pracy nad rysunkami w Cadverix-3D autorstwa WC3D.

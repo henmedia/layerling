@@ -121,6 +121,8 @@ Válaszd a **2D** formátumot (ha fölé viszed az egeret, a Rajz felirat jeleni
 
 A layerling az elöl-, felül- és jobb oldalnézetet európai vetítési elrendezésben rajzolja meg (a jobb oldalnézet az elölnézettől balra, a felülnézet alatta), a legkisebb olyan ISO lapon A4-től A0-ig, amelyre ráfér, vagy egy nagyobbon, ha az alkatrésznek az kell. Mindig 1:1 méretarányú. Minden nézet a befoglaló szélességét és magasságát mutatja, a nem látható élek szaggatottak. Az egyik nézetiránnyal párhuzamosan futó kerek furatok középkeresztet és jelet kapnak (F1, T1, R1), alul pedig egy táblázat sorolja fel az átmérőjüket és a helyzetüket, a nézet bal alsó sarkától mérve. A jobb alsó sarokban lévő szövegmező a nevet, a méretarányt, a mértékegységet, a dátumot és a lapszámot tartalmazza. A lapon lévő szavak a kezelőfelület nyelvét követik.
 
+A PDF vagy SVG alatt kitöltheted: {{ui:export.drawing.number}}, {{ui:export.drawing.revision}} és {{ui:export.drawing.drawnBy}}; ezek a szövegmezőbe kerülnek, az üresen hagyott mező kötőjelet mutat. A szám és a módosítás a tervnél marad, a `.lyl` fájljában is, a neved pedig ebben a böngészőben marad minden tervhez. A dátum mindig az exportálás napja.
+
 100%-os vagy „tényleges méretben” nyomtasd, különben a hosszak nem stimmelnek. Amit a rajz nem tud: a menetek, a mélységek, a tűrések és a ferde furatok nincsenek beméretezve, a méretek pedig hálóként a modellből származnak, így névlegesek. Egy nagyon részletes alkatrészt (100 000 háromszög fölött) vagy 200-nál több furatot üzenettel elutasít; ilyenkor válassz kevesebb objektumot.
 
 A vetítés a WC3D Cadverix-3D programjának rajzkészítő munkáján alapul.
