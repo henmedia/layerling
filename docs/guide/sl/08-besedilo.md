@@ -28,7 +28,9 @@ Tudi robove pisave lahko posnameš ali zaobliš, ravno ali ukrivljeno, glej [Pos
 
 ## Lastne pisave
 
-Poleg sedmih priloženih pisav lahko vzameš katerokoli lastno pisavo: datoteko pisave z računalnika ali, v Chromu in Edgeu, pisavo, ki je nameščena na tvojem računalniku. Za to pod {{ui:prop.font}} čisto spodaj izberi {{ui:font.manage}}. Odpre se okno {{ui:font.title}}.
+Seznam pod {{ui:prop.font}} vsako pisavo nariše v njenih lastnih črkah, z besedami tvojega besedila, tako da vidiš, kako bo videti, preden izbereš. Enako velja za pisave v oknu spodaj; pisave, naštete z računalnika, pokažejo svoja imena v svojih lastnih črkah. Na seznamu delujejo smerne tipke in [[Enter]], črka pa skoči na naslednjo pisavo, ki se začne z njo.
+
+Poleg osmih priloženih pisav lahko vzameš katerokoli lastno pisavo: datoteko pisave z računalnika ali, v Chromu in Edgeu, pisavo, ki je nameščena na tvojem računalniku. Za to pod {{ui:prop.font}} čisto spodaj izberi {{ui:font.manage}}. Odpre se okno {{ui:font.title}}.
 
 - **{{ui:font.addFile}}** sprejme datoteko TrueType (`.ttf`), datoteko OpenType (`.otf`) ali datoteko WOFF (`.woff`). Datoteko lahko tudi preprosto povlečeš v okno.
 - **V Windowsih** so nameščene pisave v mapi »Pisave« (`C:\Windows\Fonts`). Pogovorno okno za datoteke v brskalniku jo skrije. Namesto tega jo odpri v Raziskovalcu in povleci želeno pisavo v okno {{ui:font.title}}. Pisave, ki so nameščene samo zate, ležijo v `%LOCALAPPDATA%\Microsoft\Windows\Fonts`; to mapo pokaže tudi pogovorno okno za datoteke. Na Macu so pisave v `/Library/Fonts` in `~/Library/Fonts`.

@@ -106,7 +106,7 @@ export function expandShortcutCombo(combo: string): string[] {
     return range ? digitRange(range[1], range[2]) : [key];
   });
   return keys
-    .filter((key) => !["Click", "RightClick", "Drag", "Wheel", "Shift", "Alt", "Ctrl"].includes(key))
+    .filter((key) => !["Click", "RightClick", "MiddleClick", "Drag", "Wheel", "Shift", "Alt", "Ctrl"].includes(key))
     .map((key) => canonicalCombo([...modifiers, key].join("+")))
     .filter((value): value is string => value !== null);
 }
@@ -117,8 +117,9 @@ export function expandShortcutCombo(combo: string): string[] {
  * would run ahead of them, so they are kept free.
  */
 const EDITOR_KEYS: readonly string[] = [
-  ..."BDEFHLMNORSTW".split("").flatMap((letter) => [letter, `Shift+${letter}`]),
-  ..."CPQ".split(""),
+  // Q with Shift too: Shift+Q shows and hides the handles (shortcuts.toggleHandles).
+  ..."BDEFHLMNOQRSTW".split("").flatMap((letter) => [letter, `Shift+${letter}`]),
+  ..."CP".split(""),
   ..."ABCDEGHILOSVXYZ".split("").flatMap((letter) => [`Ctrl+${letter}`, `Ctrl+Shift+${letter}`]),
   "Alt+W",
   ..."0123456789".split("").flatMap((digit) => [digit, `Shift+${digit}`, `Alt+${digit}`]),

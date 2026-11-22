@@ -178,4 +178,12 @@ export const COMMAND_SHORTCUTS: Readonly<Record<string, string>> = {
   "sketch-delete": "Delete",
   "sketch-undo": "Ctrl+Z",
   "sketch-redo": "Ctrl+Y",
+  carry: "C",
+  "sketch-image": "Ctrl+I",
+  // The sketch's drawing tools by number (SKETCH_TOOL_KEYS in SketchWorkspace.tsx).
+  "sketch-line": "1",
+  "sketch-bezier": "2",
+  "sketch-smooth": "3",
+  "sketch-refine": "4",
+  "sketch-freehand": "5",
 };

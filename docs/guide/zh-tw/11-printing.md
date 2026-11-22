@@ -93,6 +93,14 @@ FLSun、SeeMeCNC 等品牌的三角洲（Delta）印表機以及 Anycubic Predat
 
 點選某一行的{{ui:printCheck.show}}會把相機移到那裡；它會選取懸空的零件、接觸過少的零件和開放網格，對於懸垂則會開啟**顯示懸垂**。互相重疊的實體會合併後再檢查，就像切片軟體合併它們那樣。如果視窗開啟時修改了設計，會顯示{{ui:printCheck.stale}}；點選它或{{ui:printCheck.checkAgain}}即可。[[Esc]] 關閉視窗。設計本身不會改變。AI 可以用 `layerling_check_print` 做同樣的檢查。這個視窗只做檢查，不會列印或儲存任何內容：要列印，請用 {{ui:editor.group.file}} 群組中的 {{ui:editor.export}} 為切片軟體匯出模型。視窗中的 {{ui:printCheck.openExport}} 會關閉檢查並開啟匯出。
 
+### 列印分析與分層檢視
+
+{{ui:editor.tool.layerCheck}} 位於 {{ui:editor.tool.printCheck}} 旁邊，更進一步：它把選取的物件（或所有可見物件）切成印表機逐層列印的層，並把每一層與下面一層比較，一次完成。你不必逐層翻看來尋找問題：視窗會列出它的**發現項目**，先是問題（紅色），再是提示（黃色），由下往上排列。每一行說明位置與嚴重程度，例如「第 83–97 層（16.6–19.4 mm）：懸垂 62°，1.4 cm²」，以及怎樣補救。連續多層在同一位置有相同問題時，合併為一個發現項目。
+
+在查看各層之前，它先檢查整體：伸進列印平台的零件（{{ui:finding.kind.inBed}}；工作平面以下的層不計入）、懸浮在平台上方的零件、不封閉的網格、比設定中所選印表機更大的零件。接著逐層檢查：{{ui:finding.kind.unsupported}}（下面什麼都沒有就開始的地方，例如 T 形的兩臂）、{{ui:finding.kind.overhang}}（與垂直方向夾角 45° 起為提示，60° 起為問題）、{{ui:finding.kind.bridge}}（跨距 10 mm 起為提示）、{{ui:finding.kind.thinWall}}（小於噴嘴的兩條線寬）、{{ui:finding.kind.smallIsland}}（小於 2 mm² 且延續 2 mm 或以上的獨立區域）以及 {{ui:finding.kind.adhesion}}。在頂部選擇 {{ui:layerCheck.layerHeight}} 與 {{ui:layerCheck.nozzle}}；各項界限在 {{ui:layerCheck.advanced}} 下。小於 0.05 mm² 的地方（例如尖端或最後一層）不作評估。檢查在背景執行並顯示進度列；{{ui:layerCheck.stop}} 會立即停止它。
+
+點擊一個發現項目：**分層檢視**會在它涉及的第一層開啟，相機移到該位置，該位置在這一層上塗成紅色或黃色，下面的層仍然可見。滑桿直立在沿高度的截面輪廓旁邊；它旁邊的標記顯示發現項目所在的位置，點擊某個標記即可跳過去。在滑桿上，[[↑]] 與 [[↓]] 移動一層，[[Page Up]] 與 [[Page Down]] 移動十層，[[Home]] 與 [[End]] 跳到兩端，[[Space]] 播放，[[N]] 跳到下一個發現項目，[[Shift+N]] 跳到上一個。{{ui:layerCheck.view.mode}} 可選 {{ui:layerCheck.view.mode.upTo}}、{{ui:layerCheck.view.mode.only}} 或 {{ui:layerCheck.view.mode.range}}；後面還沒列印的層可以顯示為淡淡的影子。對於 Layerling 有對應工具的發現項目，會有一個按鈕開啟該工具：{{ui:finding.action.dropToPlate}}、{{ui:finding.action.layFlat}} 或 {{ui:finding.action.supportRib}}。修改設計後，清單會標為已過時，直到你點擊 {{ui:layerCheck.checkAgain}}。關閉視窗後，相機回到原來的位置。這不是切片預覽：支撐、填充與列印時間請以切片軟體為準。
+
 ## 準備就緒時
 
 點擊 {{ui:editor.export}}，然後選擇 **STL** 或 **3MF**。STL 是最簡單的格式。3MF 會保留各個實體的名稱與顏色，因此多色列印時很方便。匯出視窗也會顯示零件以實心列印時需要多少克、多少公尺線材。更多內容見[檔案與儲存](chapter:files-and-saving)。

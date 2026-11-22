@@ -240,13 +240,15 @@ G 规格是符合 ISO 228-1 的平行惠氏管螺纹，常见于水、燃气、�
 
 对于 Anderson Powerpole（PP15、PP30 和 PP45），列表里有{{ui:port.powerpole1}}到{{ui:port.powerpole4}}：外壳并排拼插，每极 7.9 mm，留出燕尾榫凸舌的位置，四周约有 0.25 mm 余量——尺寸来自 Anderson 的图纸。
 
-{{ui:shape.sbcBoard}} 是按实际尺寸做的单板计算机，用来围绕它设计外壳：带四个安装孔的电路板，以及各自着色的元件：轮廓各异的插座——两端圆形的 USB-C、下角切掉的 HDMI 插座——带开口的 USB 和网口外壳、带圆形套环的音频插孔、每针一个圆点的排针、作为方块的较大芯片。在 {{ui:sbcBoard.board}} 下选择：Raspberry Pi 5、4 Model B、3 Model B+ 或 Zero 2 W、BIGTREETECH Pi V1.2，或小型 ESP32 板之一：Seeed Studio XIAO ESP32-C6、ESP32-C3 Super Mini 或 ESP32-C6 Super Mini——这些没有安装孔，USB-C 在右端，邮票孔引脚显示为圆点。两块 Super Mini 没有厂商图纸；它们的尺寸来自社区发布的模型，全部是估计值。带 USB-C 和 HDMI 的前边缘朝向你。轮廓和孔来自厂商的图纸和模型；没有图纸给出的高度是估计的。
+它默认是挖空体，朝向前方。把 {{ui:prop.portDepth}} 设得比壁厚稍大，移到电路板上接口所在的位置，再与外壳组合。用于侧壁时，绕竖直轴旋转 90°。
+
+### 单板计算机
+
+{{ui:shape.sbcBoard}} 是按实际尺寸做的单板计算机，用来围绕它设计外壳：带四个安装孔的电路板，以及各自着色的元件：轮廓各异的插座——两端圆形的 USB-C、下角切掉的 HDMI 插座——带开口的 USB 和网口外壳、带圆形套环的音频插孔、每针一个圆点的排针、作为方块的较大芯片。在 {{ui:sbcBoard.board}} 下选择：Raspberry Pi 5、4 Model B、3 Model B+ 或 Zero 2 W、BIGTREETECH Pi V1.2，或小型 ESP32 板之一：Seeed Studio XIAO ESP32-C6、ESP32-C3 Super Mini 或 ESP32-C6 Super Mini——这些没有安装孔，USB-C 在右端，邮票孔引脚显示为圆点。两块 Super Mini 没有厂商图纸；它们的尺寸来自社区发布的模型，全部是估计值。或者选择一块微控制器板：Adafruit ESP32-S3 Feather、Arduino UNO R3、Arduino MEGA 2560 Rev3、Arduino Nano 或 LOLIN (WEMOS) D1 mini V4.0.0——它们的 USB 插座在左端，与厂商自己的 PCB 文件一致，UNO 和 MEGA 保留其阶梯状轮廓。Feather 的高度来自 Adafruit 的 3D 模型；Arduino 的文件没有给出高度，所以 UNO、MEGA 和 Nano 上的高度是估计的。D1 mini 按 Wemos 的尺寸图制作，不含它的两个安装孔；其元件的尺寸和高度是估计的。Raspberry Pi Pico、Pico W、Pico 2 和 Pico 2 W 来自 Raspberry Pi 自己的 3D 模型，micro-USB 在左端；Pico 2 W 没有自己的模型，沿用 Pico W 的元件，属于估计。接着是两块摄像头板：ESP32-CAM（AI-Thinker）及其下方的 ESP32-CAM-MB USB 编程板，以及带 USB-C 的 nulllab ESP32-S3-CAM；两家厂商都没有给出元件的位置和高度，所以是估计的，ESP32-CAM 上的 microSD 卡槽是边缘的一个接口。在这两块板上，“相机镜头向上穿过盖子”会让镜头按“向上延伸”的长度向上穿过盖子。最后是带 WROOM 模块的 ESP32 板：乐鑫的 ESP32-DevKitC V4（38 针），按乐鑫自己的尺寸图制作；以及无品牌销售的 30 针 ESP32 DevKit V1，按一份公开的实际尺寸图制作，因此全部是估计值。在每块带按钮的板上，“按钮延伸”（初始为 0，最大 100 mm）让 RESET、BOOT 和电源按钮沿按压方向延伸：向上穿过盖子；Pi 5 的电源按钮和 D1 mini 的 RESET 从侧面按压，则穿出侧壁。带 USB-C 和 HDMI 的前边缘朝向你。轮廓和孔来自厂商的图纸和模型；没有图纸给出的高度是估计的。
 
 电路板显示其螺丝柱应放在哪里，以及外壳需要多高。对于开口，在 {{ui:sbcBoard.clearance}} 下给接口留出余量——打印外壳用 0.2 到 0.5 mm——把电路板的副本设为孔，放到电路板在外壳中的位置并与外壳分组：边缘的每个接口都会在壁上切出它的开口。真实接口只伸出电路板 1 到 3 mm，比许多壁都薄：{{ui:sbcBoard.reach}} 让边缘的每个接口在其一侧再向外伸出这么多，从而完全切穿——比壁厚稍多一点。换一块板或改变设置会在原位重新生成它。每块板都以同样的方式使用这两个设置。
 
 microSD 卡槽也是左边缘的接口，位于电路板下方（Zero 2 W 上在上方），因此延伸量会切出卡穿过壁的通道；这时电路板立在卡槽上，比其底面低 1.4 mm。排线也可以引出：{{ui:sbcBoard.ribbonUp}} 让摄像头、显示屏和 PCIe 接口向上穿过盖子开口，{{ui:sbcBoard.ribbonSide}} 让每个接口的开口沿其长边——排线离开的方向——延伸到较近的边缘，再加上延伸量；在 Raspberry Pi 5 上，摄像头和显示屏排线从 PCIe 一端引出，三个开口上下叠放，在 Pi 4 和 3 B+ 上摄像头的开口在显示屏的上方。{{ui:sbcBoard.gpioUp}} 让排针向上穿过盖子，用于 HAT 或杜邦线。向上的部分会伸出其顶部 {{ui:sbcBoard.upReach}}，至少 20 mm，并在周围留出余量。
-
-它默认是挖空体，朝向前方。把 {{ui:prop.portDepth}} 设得比壁厚稍大，移到电路板上接口所在的位置，再与外壳组合。用于侧壁时，绕竖直轴旋转 90°。
 
 ## 沉孔与锥形沉孔
 

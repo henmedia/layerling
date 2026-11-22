@@ -281,12 +281,27 @@ function regular_file_stat(string $path): ?array
  * needs escaped backslashes and a control-code range, and both are easy to get
  * silently wrong in a file that travels through several tools.
  */
+/** The length of a UTF-8 string as JavaScript counts it: one per UTF-16 unit, two for a character beyond U+FFFF. */
+function utf16_length(string $text): int
+{
+    if (preg_match_all('/./su', $text, $characters) === false) {
+        return strlen($text);
+    }
+    $length = 0;
+    foreach ($characters[0] as $character) {
+        $length += strlen($character) === 4 ? 2 : 1;
+    }
+    return $length;
+}
+
 function folder_name_ok(string $segment): bool
 {
     if ($segment === '' || $segment === '.' || $segment === '..' || $segment[0] === '.') {
         return false;
     }
-    if (strlen($segment) > 80) {
+    // 80 as the page counts it (storeFolderName.ts, `trimmed.length`): UTF-16 units, not bytes, so a name in
+    // umlauts or Chinese that the page accepts is not refused here.
+    if (utf16_length($segment) > 80) {
         return false;
     }
     if (strpbrk($segment, FOLDER_NAME_UNSAFE) !== false) {
@@ -508,7 +523,10 @@ function same_origin(): bool
     }
     // LAYERLING_ALLOWED_ORIGINS: full origins or bare hosts, for a proxy that rewrites the host.
     $listed = getenv('LAYERLING_ALLOWED_ORIGINS');
-    if (is_string($listed) && $listed !== '') {
+    if (!is_string($listed) || trim($listed) === '') {
+        $listed = $_ENV['LAYERLING_ALLOWED_ORIGINS'] ?? $_SERVER['LAYERLING_ALLOWED_ORIGINS'] ?? null;
+    }
+    if (is_string($listed) && trim($listed) !== '') {
         $bare = preg_replace('#^https?://#i', '', $origin);
         foreach (explode(',', $listed) as $entry) {
             $entry = rtrim(trim($entry), '/');
@@ -1024,8 +1042,12 @@ function handle_save(string $root, string $folder): void
             fail(upload_error_message($code, 'The project'), in_array($code, [UPLOAD_ERR_INI_SIZE, UPLOAD_ERR_FORM_SIZE], true) ? 413 : 400);
         }
         $receivedPath = received_file((string) $_FILES['project']['tmp_name']);
-        if (!isset($_FILES['thumbnail']) || $_FILES['thumbnail']['error'] !== UPLOAD_ERR_OK) {
+        if (!isset($_FILES['thumbnail'])) {
             fail('Shared project upload is missing its thumbnail', 400);
+        }
+        if ($_FILES['thumbnail']['error'] !== UPLOAD_ERR_OK) {
+            $code = (int) $_FILES['thumbnail']['error'];
+            fail(upload_error_message($code, 'The thumbnail'), in_array($code, [UPLOAD_ERR_INI_SIZE, UPLOAD_ERR_FORM_SIZE], true) ? 413 : 400);
         }
         $thumbnailBytes = (string) file_get_contents($_FILES['thumbnail']['tmp_name']);
         if (strlen($thumbnailBytes) > MAX_THUMBNAIL_BYTES) {
@@ -1590,6 +1612,18 @@ foreach ($_GET as $value) {
 
 $root = store_root();
 $method = $_SERVER['REQUEST_METHOD'] ?? 'GET';
+
+if ($root === null && is_dir(store_base_path())) {
+    // The folder is there, but a signed-in user's own folder in it could not be made (LAYERLING_USER_HEADER):
+    // the web server cannot write to it, which "create a folder" would not explain.
+    $notWritable = configured_store_path() !== null
+        ? 'The folder named in LAYERLING_SHARED_PROJECTS_DIR exists but the web server cannot write to it.'
+        : 'The "' . STORE_DIRECTORY . '" folder exists but the web server cannot write to it.';
+    if ($method === 'GET' && !isset($_GET['fileName'])) {
+        send_json(['enabled' => true, 'projects' => [], 'error' => $notWritable], 500);
+    }
+    fail($notWritable, 500);
+}
 
 if ($root === null) {
     // Not an error: the folder is the switch, and it is off.

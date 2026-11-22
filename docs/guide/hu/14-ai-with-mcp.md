@@ -63,7 +63,11 @@ A Claude Desktop nem olvassa a projektfájlokat. Add meg a szervert a saját kon
 
 Másold a skillt a `docs/skills/layerling-mcp-skill` mappából a Codex skills mappájába, add meg a szervert a Codex konfigurációjában a `docs/mcp/codex-config.example.toml` alapján, és indítsd újra a Codexet.
 
-Mindhárom részletes leírása a [GitHubon lévő README-ben](https://github.com/henmedia/layerling/blob/main/README.md#layerling-mcp-skill) található.
+### Gemini & Antigravity
+
+Az Antigravity magától megtalálja a munkaterület skilljét a `.agents/skills/layerling-mcp-skill` mappában. A Gemini CLI-hez másold a skillt a `docs/skills/layerling-mcp-skill` mappából a globális skills mappádba (`~/.gemini/skills/`), add hozzá a szervert a beállításaidhoz a `docs/mcp/gemini-config.example.json` alapján, és indítsd újra a klienst.
+
+Az egyes kliensek részletes leírása a [GitHubon lévő README-ben](https://github.com/henmedia/layerling/blob/main/README.md#layerling-mcp-skill) található.
 
 ## Egy példány NAS-on vagy szerveren
 

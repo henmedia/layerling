@@ -28,6 +28,8 @@ Grafična tablica s pisalom se obnaša kot miška: konica je levi gumb, stranska
 
 **Na tabličnem računalniku delaj s pisalom, če lahko.** Njegova konica je veliko tanjša od konice prsta in ne zakriva tistega, na kar ciljaš, zato majhne točke, tanke črte in ročaje v skici, merilne točke in robove zadeneš natančno, daljše delo pa je manj utrujajoče. layerling prstu že pusti, da seže malo dlje do točk, črt, ročajev in robov kot kazalec miške, vendar pisalo ostaja natančnejša pot.
 
+Tablica nima desnega gumba miške: pol sekunde drži prst pri miru na obliki ali na praznem mestu in odpre se meni, ki ga odpre desni klik, na praznem mestu z **Izberi vse**. **Izberi več** v istem meniju na tablici nadomešča Shift: vsak dotik telesa ga potem doda v izbor ali ga spet odstrani, dokler se ne dotakneš praznega mesta ali pritisneš [[Esc]]; prst na praznem mestu še vedno vrti pogled. Ročice okoli izbrane oblike lahko s prstom primeš tudi malo ob njih.
+
 ### Orientacijska kocka
 
 Kocka zgoraj levo kaže, kam trenutno gledaš. Klik na eno od njenih stranic skoči v ravni pogled od zgoraj, spodaj, spredaj, zadaj, z leve ali z desne. Klik na oglišče kocke pogleda poševno od tega oglišča na model, klik blizu roba od tega roba, torej med dvema stranicama; mesto se obarva, ko kazalec stoji nad njim. Ravni pogledi gredo tudi s številskimi tipkami [[1]] do [[6]]. Če pri tem držiš [[Shift]], se pogled hkrati približa izboru, kot pri [[Shift]]+[[F]].
@@ -71,11 +73,9 @@ V vsakem načrtu lahko shraniš tudi štiri lastne poglede. [[Shift]]+[[7]], [[S
 - {{ui:camera.sectionMeasure}} meri neposredno na prerezu: obris se pokaže modro, dva klika nanj dasta razdaljo, zraven še njene deleže vzdolž obeh osi ravnine. Obe točki se zaskočita na obris, na ogliščih prednostno. Če je drugi klik kjerkoli na nasprotni steni, se zaskoči pravokotno na prvo točko – tako odčitaš debeline sten, reže in zračnosti, ne da bi moral natančno ciljati. Tretji klik začne naslednje merjenje, [[Esc]] merjenje konča. Če ravnino premakneš, merjenje izgine.
 - {{ui:camera.sectionExportSvg}} shrani obrise na ravnini prereza kot SVG v merilu 1:1, za laser, plotter, šablone ali tesnila. X-prerez je viden z desne, Y-prerez od spredaj, Z-prerez od zgoraj. Kot pri izvozu vanj pridejo samo vidna telesa, luknje so že odštete, telesa iste barve pa so združena v en obris. Vsaka barva ostane svoja pot brez polnila, tako da jo programska oprema za laser loči kot plasti.
 
-Križec in [[Esc]] zapreta okno orodja; če merjenje teče, ga [[Esc]] najprej konča. Prerez ostane, dokler ga ne izklopiš z {{ui:camera.sectionActive}}, ne klikneš njegovega gumba v vrstici, medtem ko je okno odprto, ali se ne vrneš na pregled načrtov. Dokler je vklopljen, njegov gumb ostane poudarjen. Kar postaviš na odrezano stran, se pokaže šele, ko prerez izklopiš. Tablica nima [[Esc]], zato ima okno orodja tam dva gumba več: {{ui:camera.sectionBack}} konča merjenje, če teče, sicer zapre okno orodja, {{ui:camera.sectionConfirm}} pa zapre okno orodja v enem koraku. Računalnik ju ne pokaže.
-
 Okno visi na svojem gumbu. Če kaj zakriva, ga povlečeš za naslovno vrstico po delovni površini; tam se odpre tudi naslednjič. Dvoklik na naslovno vrstico ali odložitev na gumb ga vrne nazaj.
 
-[[Esc]] zapre okno; prerez ostane, dokler ga ne izklopiš ali se ne vrneš na pregled načrtov. Dokler je vklopljen, je gumb poudarjen. Kar potem odložiš na odrezani strani, vidiš šele, ko prerez izklopiš.
+Križec in [[Esc]] zapreta okno orodja; če merjenje teče, ga [[Esc]] najprej konča. Prerez ostane, dokler ga ne izklopiš z {{ui:camera.sectionActive}}, ne klikneš njegovega gumba v vrstici, medtem ko je okno odprto, ali se ne vrneš na pregled načrtov. Dokler je vklopljen, njegov gumb ostane poudarjen. Kar postaviš na odrezano stran, se pokaže šele, ko prerez izklopiš. Tablica nima [[Esc]], zato ima okno orodja tam dva gumba več: {{ui:camera.sectionBack}} konča merjenje, če teče, sicer zapre okno orodja, {{ui:camera.sectionConfirm}} pa zapre okno orodja v enem koraku. Računalnik ju ne pokaže.
 
 ## Delovna ravnina
 
@@ -111,7 +111,7 @@ Okno za izvoz nato ponudi {{ui:export.plates}}: vse plošče v eni datoteki, dru
 
 ## Mreža in pripenjanje
 
-Mreža kaže velikost plošče. Spodaj desno je **pripenjanje**: premikanje in spreminjanje velikosti se zaskočita v korakih te velikosti, na primer 1 mm. Za drobno delo ga nastaviš manjšega, za grobo razporejanje večjega. {{ui:editor.tool.snapToGrid}} v orodni vrstici naknadno pomakne izbrane oblike na najbližje presečišče mreže. Pri premikanju se oblike poleg tega zaskočijo na druge oblike, glej [Izbiranje in razporejanje](chapter:izbiranje-in-razporejanje).
+Mreža kaže velikost plošče. Spodaj desno je **pripenjanje**: premikanje in spreminjanje velikosti se zaskočita v korakih te velikosti, na primer 1 mm. Za drobno delo ga nastaviš manjšega, za grobo razporejanje večjega. {{ui:editor.tool.snapToGrid}} v orodni vrstici naknadno pomakne izbrane oblike na najbližje presečišče mreže. Pri premikanju se oblike poleg tega zaskočijo na druge oblike, glej [Izbiranje in razporejanje](chapter:izbiranje-in-razporejanje). Brez miške: [[Alt]]+[[1]] do [[Alt]]+[[0]] izberejo ta vnos menija ([[Alt]]+[[1]] izklopi pripenjanje), [[,]] in [[.]] pa naredita korak za stopnjo finejši ali grobejši. To deluje tudi v skici.
 Kratek klik s srednjo miškino tipko, brez premikanja miške, odpre meni koraka pripenjanja tik ob kazalcu, tudi v skici; vlečenje s pritisnjeno srednjo tipko še naprej premika pogled. V 3D-urejevalniku ima njegova naslovna vrstica tudi stikalo mm / in, tako da preklapljaš med milimetri in palci, ne da bi se zaprl.
 
 > **Namig:** Ne vrti več pogleda, ko deleže natančno postavljaš drug ob drugega. S številskimi tipkami preklopi na raven pogled od zgoraj ali od spredaj in s [[O]] preklopi na ploski prikaz. Tako takoj vidiš, ali sta dva roba res poravnana.

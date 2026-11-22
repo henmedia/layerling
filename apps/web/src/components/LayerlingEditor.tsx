@@ -134,7 +134,7 @@ import { disposeBoundsTree } from "three-mesh-bvh";
 import { clampShellStackHeight, normalizeShellStackFoot, shellStackFloor, type ShellStackFoot } from "@/lib/shellStackLimits";
 import { GRIDFINITY_GRID } from "@/lib/gridfinityGeometry";
 import { magnetsGridLeastSize, magnetsMeetGridCells } from "@/lib/shellGridMagnets";
-import { DIVIDERS_WITH_GRID_MESSAGE, SHELL_GRID_FLOOR, shellGridFloor, SHELL_GRID_PLAY, MAX_SHELL_GRID_CELLS, normalizeShellDividers, normalizeShellGrid, shellGridEstimate, type ShellDividers, type ShellGrid } from "@/lib/shellGridLimits";
+import { DIVIDERS_WITH_GRID_MESSAGE, shellGridFloor, SHELL_GRID_PLAY, MAX_SHELL_GRID_CELLS, normalizeShellDividers, normalizeShellGrid, shellGridEstimate, type ShellDividers, type ShellGrid } from "@/lib/shellGridLimits";
 import { DEFAULT_SHELL_SHELF_HEIGHT, clampShellShelfHeight, clampShellShelfWidth } from "@/lib/shellShelfLimits";
 import { SHELL_SIDES, shellMaxThickness, shellOpeningsFor, shellOpenSides } from "@/lib/shellLimits";
 import { createLatestJobRunner, shellPreviewKey } from "@/lib/shellPreview";
@@ -221,7 +221,7 @@ import { addFileBackup, allowBackupFolder, fileBackupsOfDesign, listFileBackups,
 import { backupFileBeforeOverwrite, takeEditorBackupReminder } from "@/components/workplane/fileBackupEditor";
 import { copyNamePatterns, shapeNamesIn, withCopyName } from "@/lib/shapeCopyName";
 import { nameForNewGroup } from "@/lib/groupName";
-import { clipboardShape, displayShapeName, hasOwnShapeName, iconTagAsset, qrCodeAsset, makeShapeFromAsset, nameTagAsset, libraryAssetCustomization, libraryAssetTurnX, sbcBoardAsset, shapeAssetLabel, toolbarShapeAssets } from "@/lib/shapeCatalog";
+import { clipboardShape, displayShapeName, hasOwnShapeName, iconTagAsset, qrCodeAsset, makeShapeFromAsset, nameTagAsset, libraryAssetCustomization, libraryAssetTurnX, roofAsset, sbcBoardAsset, shapeAssetLabel, toolbarShapeAssets } from "@/lib/shapeCatalog";
 import { storeRecentShape } from "@/lib/shapeLibrarySections";
 import { PORT_PRESET_ORDER, PORT_PRESETS, portPresetSize, type PortPreset } from "@/lib/portGeometry";
 import { WASHER_SIZE_ORDER, isWasherSize, washerTubeFields } from "@/lib/washerSizes";
@@ -14722,7 +14722,9 @@ export function LayerlingEditor({
       if (command.action === "create_shape") {
         const rawKind = mcpString(params.kind, "box");
         if (rawKind === "honeycomb") throw new Error("The honeycomb shape is gone: use layerling_perforate_face to cut a hexagon hole pattern into a face");
-        const kind = rawKind === "cube" ? "box" : rawKind;
+        // The roof (#1931) is a polygon from the library with three sides, laid down on one flat side.
+        const roof = rawKind === "roof";
+        const kind = rawKind === "cube" ? "box" : roof ? "polygon" : rawKind;
         const width = Math.max(MIN_SHAPE_DIMENSION, mcpNumber(params.width ?? params.size, 20));
         const depth = Math.max(MIN_SHAPE_DIMENSION, mcpNumber(params.depth ?? params.size, rawKind === "cube" ? width : 20));
         const height = Math.max(MIN_SHAPE_DIMENSION, mcpNumber(params.height ?? params.size, rawKind === "cube" ? width : 20));
@@ -14731,7 +14733,7 @@ export function LayerlingEditor({
         const elevation = mcpNumber(params.elevation, placementElevation);
         // Die Farbe steht schon im Katalog; zwei fest eingetragene Farbwerte
         // waeren die dritte Stelle, an der eine neue Form vergessen wird.
-        const asset = toolbarShapeAssets.find((entry) => entry.kind === kind);
+        const asset = roof ? roofAsset : toolbarShapeAssets.find((entry) => entry.kind === kind);
         const color = mcpString(params.color, asset?.color ?? "#d41721");
         const name = mcpString(params.name, kind === "sketch" ? "Sketch extrusion" : rawKind === "cube" ? "Cube" : asset?.name ?? "Box");
         // Nur was ausdruecklich verlangt wurde: sonst gilt das Mass, mit dem der
@@ -14807,9 +14809,11 @@ export function LayerlingEditor({
                   }
                   : shapeParams,
               ), getPrinterPlay()),
-              width: requestedWidth,
-              depth: requestedDepth,
-              height: requestedHeight,
+              // The roof's mark is no shape default either (see update_object), so it is handed in here.
+              ...(roof || (kind === "polygon" && params.polygonRoof === true) ? { sides: 3, polygonFlat: false, polygonRoof: true } : {}),
+              width: requestedWidth ?? (roof ? libraryAssetCustomization(roofAsset).width : undefined),
+              depth: requestedDepth ?? (roof ? libraryAssetCustomization(roofAsset).depth : undefined),
+              height: requestedHeight ?? (roof ? libraryAssetCustomization(roofAsset).height : undefined),
             },
           );
           shape = {
@@ -14845,16 +14849,29 @@ export function LayerlingEditor({
           if (shape.kind === "text" && shape.textCurved) {
             shape = { ...shape, ...curvedTextPatch({ ...shape, textCurved: false }, { textCurved: true, textRadius: shape.textRadius, textSize: shape.textSize }) };
           }
+          // A text's fill (#215) when it is made, with the same words as update_object: the schema offers stroke and
+          // silhouette for kind text, and create_shape left them out. The box follows the fill in curvedTextPatch.
+          if (shape.kind === "text" && ((params.stroke !== undefined && params.stroke !== null && params.stroke !== false) || typeof params.silhouette === "boolean")) {
+            const fill: Partial<WorkplaneShape> = {};
+            if (params.stroke !== undefined && params.stroke !== null && params.stroke !== false) {
+              const stroke = normalizeSketchStroke({ ...DEFAULT_SKETCH_STROKE, ...(params.stroke as object) });
+              if (!stroke) throw new Error("stroke needs a width above 0, or leave it out for the filled letters");
+              fill.textStroke = stroke;
+            }
+            if (typeof params.silhouette === "boolean") fill.textSilhouette = params.silhouette || undefined;
+            shape = { ...shape, ...curvedTextPatch(shape, fill) };
+          }
         } else {
           throw new Error(`MCP create_shape does not know a shape called "${rawKind}"`);
         }
         // Auf einer Arbeitsebene an einer Flaeche steht die neue Form auf ihr,
         // wie beim Ablegen von Hand; x und z zaehlen dann auf dieser Flaeche.
         // Wer Hoehe oder Drehung selbst angibt, meint die Grundplatte.
+        // The roof is laid on one flat side as the shape library lays it, on the base plate too.
         const activeWorkplane = placementWorkplaneRef.current;
-        if (!placementWorkplaneIsBase(activeWorkplane) && [params.elevation, params.rotation, params.rotationX, params.rotationZ].every((value) => value === undefined)) {
+        if ((roof || !placementWorkplaneIsBase(activeWorkplane)) && [params.elevation, params.rotation, params.rotationX, params.rotationZ].every((value) => value === undefined)) {
           const point = placementWorkplanePoint(activeWorkplane, x, z);
-          shape = canonicalizeShape({ ...shape, ...placementPatchForNewShape(shape, activeWorkplane, point) });
+          shape = canonicalizeShape({ ...shape, ...placementPatchForNewShape(shape, activeWorkplane, point, false, roof ? libraryAssetTurnX(roofAsset) : 0) });
         }
         // A font of one's own passes the shape defaults by; it is set here, by id or by name.
         const ownFont = shape.kind === "text" && typeof params.font === "string" ? mcpTextFont(params.font) : null;
@@ -15011,6 +15028,11 @@ export function LayerlingEditor({
         Object.assign(patch, mcpTaperPatch({ ...target, ...patch }, params, shapeDimensionLimit(workspaceSettingsRef.current, target.kind, DEFAULT_TAPER_DIMENSION_MAX)));
         Object.assign(patch, mcpExtrudeDeformPatch({ ...target, ...patch }, params));
         Object.assign(patch, mcpSlopePatch(target, params));
+        // The roof's mark (#1931) is no shape default (a saved polygon default must not turn every polygon into a
+        // roof), so it does not come through the settings above: it is set here, with the three sides it keeps.
+        if (target.kind === "polygon" && typeof params.polygonRoof === "boolean") {
+          Object.assign(patch, params.polygonRoof ? { polygonRoof: true, sides: 3, polygonFlat: false } : { polygonRoof: undefined });
+        }
         if (target.kind === "rib") Object.assign(patch, mcpRibFootPatch(target, patch, params));
         if (target.kind === "loft") {
           // The stored ends were set above as they came; the frame and the place follow from them here.
@@ -16806,7 +16828,6 @@ export function LayerlingEditor({
           } } : {}),
           ...("flipTop" in result && result.flipTop ? { flipTop: result.flipTop } : {}),
           ...("slide" in result && result.slide ? { slide: result.slide } : {}),
-          ...fitted,
           ...fitted,
         };
       }
