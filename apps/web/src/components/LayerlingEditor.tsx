@@ -172,7 +172,7 @@ import { DEFAULT_INFILL_PERCENT, DEFAULT_WALLS, PRINT_MATERIAL_DENSITY, PRINT_MA
 import { matchingEdgeIds } from "@/lib/edgeMatching";
 import { readEdgeModifierSettings, rememberEdgeModifierSetting, startingEdgeModifierAmount, type EdgeModifierSettings } from "@/lib/edgeModifierMemory";
 import { getEditorProfile, profileBooleanValue } from "@/lib/editorProfile";
-import { CAD_MODIFIER_MAX_SHARP_ANGLE, CAD_MODIFIER_REQUEST_TIMEOUT_MS, CAD_MODIFIER_PREPARE_TRIANGLE_LIMIT, cadModifierPrepareTimeoutMs, cadModifierTimeoutMessage, cadModifierSizeRefusal, cadModifierUserErrorMessage, cadModifierWorkerFailureMessage, cadModifierCandidateEdge, cadModifierPresetValues, defaultCadModifierTangentChain, rescueSharpAngleForEdges, selectableCadModifierEdge, type CadModifierRequestPhase } from "@/lib/cadModifierRuntime";
+import { CAD_MODIFIER_MAX_SHARP_ANGLE, CAD_MODIFIER_REQUEST_TIMEOUT_MS, CAD_MODIFIER_PREPARE_TRIANGLE_LIMIT, cadModifierPrepareTimeoutMs, cadModifierTimeoutMessage, cadModifierSizeRefusal, cadModifierUserErrorMessage, cadModifierWorkerFailureMessage, cadModifierCandidateEdge, cadModifierPresetValues, cadModifierPreviewKey, defaultCadModifierTangentChain, rescueSharpAngleForEdges, selectableCadModifierEdge, type CadModifierRequestPhase } from "@/lib/cadModifierRuntime";
 import { isThinFace, thinFacesWith } from "@/lib/cadThinFaces";
 import { createCadPreviewQueue } from "@/lib/cadPreviewQueue";
 import { cloneWorkplaneShapeSnapshot, compactEdgeTreatmentHistory, edgeTreatmentAppliedFrame, groupBeforeEdgeTreatments, restoreShapeBeforeEdgeTreatment, sketchRebuildDropsTreatments, tubeBeforeEdgeTreatments, wasGroupBeforeEdgeTreatments } from "@/lib/edgeTreatmentHistory";
@@ -3752,6 +3752,10 @@ export function LayerlingEditor({
   const edgeEditRequestRef = useRef<{ shapeId: string; historyLength: number; preset: { kind: CadModifierKind; amount: number; chamferAngle: number; endAmount?: number | null; concave?: boolean; edgeIds: number[] } } | null>(null);
   const edgeModifierPresetRef = useRef<{ kind: CadModifierKind; amount: number; chamferAngle: number; endAmount?: number | null; concave?: boolean; edgeIds: number[] } | null>(null);
   const [edgeEditRound, setEdgeEditRound] = useState(0);
+  // The preview that crashed the kernel, for the shape it was on: the reopened tool does not send it again (#1970).
+  const cadModifierFaultedPreviewRef = useRef<{ shapeId: string; key: string } | null>(null);
+  // Set while the tool opens again after such a crash, so its "ready" says why instead of "select edges".
+  const edgeToolReopenedRef = useRef(false);
   const cadModifierWorkerRef = useRef<Worker | null>(null);
   const cadModifierPendingRef = useRef(new Map<number, {
     resolve: (message: CadModifierWorkerResponse) => void;
@@ -3864,6 +3868,27 @@ export function LayerlingEditor({
         return null;
       }
     };
+    /*
+     * The kernel crashed and restarted with nothing prepared (Discussion #1970): a chamfer or fillet tool open on a
+     * body opens again on it, with the edges and the size it had, instead of standing there unable to do anything.
+     * After a crashed preview that same preview is not sent again (it would crash again); the panel asks for another
+     * size. False when there was no such tool to bring back.
+     */
+    function reopenEdgeToolAfterKernelReset(previewCrashed: boolean, shape = cadModifierBaseShapeRef.current) {
+      const session = edgeModifierRef.current;
+      if (!session?.prepared || !shape || (session.kind !== "fillet" && session.kind !== "chamfer" && session.kind !== "chamfillet")) return false;
+      cadModifierFaultedPreviewRef.current = previewCrashed ? { shapeId: shape.id, key: cadModifierPreviewKey(session) } : null;
+      edgeEditRequestRef.current = {
+        shapeId: shape.id,
+        historyLength: shape.edgeTreatmentHistory?.length ?? 0,
+        preset: { kind: session.kind, amount: session.amount, chamferAngle: session.chamferAngle, endAmount: session.endAmount ?? null, concave: session.concave === true, edgeIds: session.selectedEdgeIds },
+      };
+      edgeToolReopenedRef.current = true;
+      setEdgeModifier(null);
+      setNotice(t("status.edgeKernelReopened"), true);
+      setEdgeEditRound((round) => round + 1);
+      return true;
+    }
     function handleWorkerMessage(event: MessageEvent<CadModifierWorkerResponse>) {
       if (isBuildMessage(event.data)) {
         reportWorkerBuild(event.data);
@@ -3876,6 +3901,8 @@ export function LayerlingEditor({
         pending.cancelTimer();
         cadModifierPendingRef.current.delete(message.requestId);
         if (message.type === "error") {
+          // A crash of the kernel during a search also took the edge tool's body along: it comes back by itself.
+          if (message.resetSession) reopenEdgeToolAfterKernelReset(false);
           pending.reject(new Error(message.message));
         } else {
           pending.resolve(message);
@@ -3914,7 +3941,10 @@ export function LayerlingEditor({
             error: message.selectableEdgeIds.length || gesenkteSchwelle ? null : t("edge.noManifoldEdges"),
           };
         });
-        if (message.selectableEdgeIds.length) setNotice(t("status.selectHighlightedEdges"), true);
+        const reopened = edgeToolReopenedRef.current;
+        edgeToolReopenedRef.current = false;
+        if (reopened) setNotice(t("status.edgeKernelReopened"), true);
+        else if (message.selectableEdgeIds.length) setNotice(t("status.selectHighlightedEdges"), true);
         else if (gesenkteSchwelle) setNotice(t("status.sharpAngleLowered", { angle: gesenkteSchwelle }), true);
         return;
       }
@@ -3964,6 +3994,7 @@ export function LayerlingEditor({
           return;
         }
         if (message.resetSession) {
+          const crashedOn = cadModifierBaseShapeRef.current;
           cadPreviewQueueRef.current.reset();
           const requestId = cadModifierRequestRef.current + 1;
           cadModifierRequestRef.current = requestId;
@@ -3972,6 +4003,7 @@ export function LayerlingEditor({
           cadModifierBaseShapeRef.current = null;
           cadModifierBaseFingerprintRef.current = "";
           cadModifierSourcePartsRef.current = [];
+          if (reopenEdgeToolAfterKernelReset(true, crashedOn)) return;
           setEdgeModifier(null);
           setNotice(cadModifierUserErrorMessage(message.message) ?? message.message);
           return;
@@ -10180,6 +10212,8 @@ export function LayerlingEditor({
       found = response;
     } catch (error) {
       stopSearching();
+      // The tool is already opening again after a crash of the kernel and says so itself (#1970).
+      if (edgeToolReopenedRef.current) return;
       const raw = error instanceof Error ? error.message : String(error ?? "");
       setNotice(cadModifierUserErrorMessage(raw) ?? raw);
       return;
@@ -10272,6 +10306,15 @@ export function LayerlingEditor({
       // bliebe der Kreis auf "Anwenden" fuer immer stehen.
       setEdgeModifier((current) => current?.busy && current.selectedEdgeIds.length === 0 ? { ...current, busy: false } : current);
       return;
+    }
+    // The preview that crashed the kernel is not sent again by itself; any other size or edge is (#1970).
+    const faulted = cadModifierFaultedPreviewRef.current;
+    if (faulted) {
+      if (faulted.shapeId === cadModifierBaseShapeRef.current?.id && faulted.key === cadModifierPreviewKey(edgeModifier)) {
+        setEdgeModifier((current) => current ? { ...current, busy: false, error: t("edge.errorKernelFaultSize") } : current);
+        return;
+      }
+      cadModifierFaultedPreviewRef.current = null;
     }
     const timer = window.setTimeout(() => {
       // Read from the ref: the working selection moves with every preview and
