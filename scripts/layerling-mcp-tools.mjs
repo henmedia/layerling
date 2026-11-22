@@ -314,6 +314,21 @@ export const shapeSettingSchema = {
     },
     description: "Gridfinity bin only, with compartments (see gridfinityCompartmentsX) and 3 height units or more: a label in a compartment, with the profile and corners of the label shelves (gridfinityLabelCorner, gridfinityLabelCornerSize). One label per compartment. An empty list [] removes them all. layerling_read_scene reports this list as JSON text, which is accepted here as well.",
   },
+  gridfinityCompartmentSplits: {
+    type: "array",
+    maxItems: 576,
+    items: {
+      type: "object",
+      properties: {
+        column: { type: "number", description: "The compartment's column, 0 the left." },
+        row: { type: "number", description: "The compartment's row, 0 the back." },
+        x: { type: "number", description: "How many parts it is split into across (x), a whole number, 1 to 6 (default 1)." },
+        z: { type: "number", description: "How many parts it is split into deep (z), a whole number, 1 to 6 (default 1)." },
+      },
+      required: ["column", "row"],
+    },
+    description: "Gridfinity bin only, with compartments (see gridfinityCompartmentsX): single compartments split further into evenly spaced parts, with dividers as thick and as high as the bin's between them, for a few small compartments beside large ones. One entry per compartment; each part stays at least 6 mm wide, and with the bin's other compartments there are at most 40 in all (over that, compartments are taken from the back left row by row and their parts across lowered first). The parts take the bin's finger scoops; a compartment's label (gridfinityCompartmentLabels) stands in the part along its side that is furthest left or back. An entry for a compartment the bin does not have is kept but not built. An empty list [] removes all splits. layerling_read_scene reports this list as JSON text, which is accepted here as well.",
+  },
   dovetailNeckWidth: { type: "number", description: "Dovetail only: width of the narrow neck in mm; the shape's width is the wide end, its depth the length of the tail. Must be narrower than the width, by at least 0.1 mm (146 wide takes a neck of up to 145.9)." },
   screwHoleShaft: { type: "number", description: "Counterbore, countersink and doubleCountersink: diameter of the shaft below the head (on the doubleCountersink, between the two cones) in mm. The shape's width is the head diameter, its height the whole length; the head end of a counterbore and a countersink is on top. On a finishingWasher: the bore." },
   screwHoleHeadDepth: { type: "number", description: "Counterbore and finishingWasher only. Counterbore: depth of the cylindrical head pocket in mm; height includes it, so for a socket head cap screw sold by its length under the head give height = that length + this (#1670). FinishingWasher: depth of the seat for the screw head, from the top; the seat's top diameter is the bore plus twice this at 90 degrees." },

@@ -268,9 +268,13 @@ import {
   gridfinityCompartmentCount,
   gridfinityCompartmentCountPatch,
   gridfinityCompartmentLabel,
+  gridfinityCompartmentLabelCell,
   gridfinityCompartmentLabelLeftOut,
   gridfinityCompartmentLabelMaxWidth,
   gridfinityCompartmentMax,
+  gridfinityCompartmentParts,
+  gridfinityCompartmentPartsMax,
+  gridfinityCompartmentSplitPatch,
   gridfinityCompartments,
   gridfinityBinCornerFits,
   gridfinityBinCornerRadius,
@@ -8190,15 +8194,28 @@ function GridfinityCompartmentsCard({
     );
   });
 
-  if (compartments && gridfinityLabelFits(fields)) {
-    const rows = counts.z;
-    const columns = counts.x;
-    const row = Math.min(chosen.row, rows - 1);
-    const column = Math.min(chosen.column, columns - 1);
-    const cell = compartments.cells.find((entry) => entry.row === row && entry.column === column);
+  // One compartment chosen by its row and column, which can be split further (#1799) and take a label.
+  const rows = counts.z;
+  const columns = counts.x;
+  const row = Math.min(chosen.row, rows - 1);
+  const column = Math.min(chosen.column, columns - 1);
+  if (compartments) {
     const numbered = (count: number, key: MessageKey) => Array.from({ length: count }, (_entry, position) => ({ value: String(position), label: t(key, { number: position + 1 }) }));
     if (rows > 1) properties.push({ type: "select", id: "gridfinityCompartmentRow", label: t("prop.gridfinityCompartmentRow"), value: String(row), options: numbered(rows, "gridfinity.fromBack"), onChange: (value) => choose({ row: Number(value) }) });
     if (columns > 1) properties.push({ type: "select", id: "gridfinityCompartmentColumn", label: t("prop.gridfinityCompartmentColumn"), value: String(column), options: numbered(columns, "gridfinity.fromLeft"), onChange: (value) => choose({ column: Number(value) }) });
+    const parts = gridfinityCompartmentParts(fields, column, row);
+    ([["x", "gridfinityCompartmentSplitX", "prop.gridfinityCompartmentSplitX"], ["z", "gridfinityCompartmentSplitZ", "prop.gridfinityCompartmentSplitZ"]] as const).forEach(([axis, id, label]) => {
+      const max = gridfinityCompartmentPartsMax(fields, column, row, axis);
+      // A compartment too small to split is offered no row, unless it is split already that way.
+      if (max < 2 && parts[axis] < 2) return;
+      properties.push({ id, label: t(label), value: parts[axis], min: 1, max: Math.max(max, parts[axis]), step: 1, hint: axis === "z" ? t("gridfinity.compartmentSplitHint") : undefined, onChange: (value) => onUpdate(gridfinityCompartmentSplitPatch(fields, column, row, axis, clamp(Math.round(value), 1, Math.max(max, parts[axis])))) });
+    });
+  }
+
+  if (compartments && gridfinityLabelFits(fields)) {
+    // The part of a split compartment (#1799) a label on a side stands in: the compartment itself when it is not split.
+    const cellFor = (side: GridfinityCompartmentLabel["side"]) => gridfinityCompartmentLabelCell(fields, column, row, side);
+    const cell = cellFor("back");
     if (cell) {
       const labels = shape.gridfinityCompartmentLabels ?? [];
       const stored = labels.find((entry) => entry.column === column && entry.row === row);
@@ -8209,8 +8226,12 @@ function GridfinityCompartmentsCard({
         onUpdate({ gridfinityCompartmentLabels: all.length > 0 ? all : undefined });
       };
       // A side is offered when a label 4 mm wide still leaves 6 mm open, and the side already set always is.
-      const leftOut = stored ? gridfinityCompartmentLabelLeftOut(cell, stored.side) : null;
-      const sides = GRIDFINITY_LABEL_SIDE_OPTIONS.filter(({ value }) => value === stored?.side || gridfinityCompartmentLabelMaxWidth(fields, cell, value) >= MIN_GRIDFINITY_LABEL_WIDTH);
+      const storedCell = stored && cellFor(stored.side);
+      const leftOut = stored && storedCell ? gridfinityCompartmentLabelLeftOut(storedCell, stored.side) : null;
+      const sides = GRIDFINITY_LABEL_SIDE_OPTIONS.filter(({ value }) => {
+        const sideCell = cellFor(value);
+        return value === stored?.side || (sideCell !== null && gridfinityCompartmentLabelMaxWidth(fields, sideCell, value) >= MIN_GRIDFINITY_LABEL_WIDTH);
+      });
       properties.push({
         type: "select",
         id: "gridfinityCompartmentLabel",
@@ -8224,8 +8245,9 @@ function GridfinityCompartmentsCard({
         },
       });
       const built = gridfinityCompartmentLabel(fields, column, row);
-      if (stored && built) {
-        const maxWidth = gridfinityCompartmentLabelMaxWidth(fields, cell, built.side);
+      const builtCell = built && cellFor(built.side);
+      if (stored && built && builtCell) {
+        const maxWidth = gridfinityCompartmentLabelMaxWidth(fields, builtCell, built.side);
         const change = (changes: Partial<GridfinityCompartmentLabel>) => {
           const next: GridfinityCompartmentLabel = { ...stored, ...changes };
           // 100 % and the middle are what a label has unset, so they are written as unset, and so is no text.
@@ -8235,7 +8257,7 @@ function GridfinityCompartmentsCard({
           writeLabel(next);
         };
         // A shelf that comes out shorter than 4 mm is left out, which the row says rather than leave it unexplained.
-        const tooShort = built.length < 100 && (built.length / 100) * 2 * (built.side === "back" || built.side === "front" ? cell.hx : cell.hz) < MIN_GRIDFINITY_COMPARTMENT_LABEL_MM;
+        const tooShort = built.length < 100 && (built.length / 100) * 2 * (built.side === "back" || built.side === "front" ? builtCell.hx : builtCell.hz) < MIN_GRIDFINITY_COMPARTMENT_LABEL_MM;
         properties.push({ id: "gridfinityCompartmentLabelLength", label: t("prop.gridfinityCompartmentLabelLength"), value: built.length, min: MIN_GRIDFINITY_COMPARTMENT_LABEL_LENGTH, max: 100, step: 1, hint: t(tooShort ? "gridfinity.compartmentLabelTooShortHint" : "gridfinity.compartmentLabelLengthHint"), onChange: (value) => change({ length: clamp(value, MIN_GRIDFINITY_COMPARTMENT_LABEL_LENGTH, 100) }) });
         if (built.length < 100) {
           const options = GRIDFINITY_LABEL_ALIGN_OPTIONS[built.side === "back" || built.side === "front" ? "across" : "deep"];
