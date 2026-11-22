@@ -102,5 +102,15 @@
     "guide": {
       "section": "focusMode"
     }
+  },
+  {
+    "title": {
+      "de": "Glatte Verrundung an großen runden Kanten",
+      "en": "Smooth fillets on large round edges"
+    },
+    "body": {
+      "de": "Eine Verrundung von 1 mm und mehr an einer runden Kante, etwa am Rand einer großen Scheibe oder eines Rings, konnte im Editor und im Slicer schräge Kerben zeigen. Die Verrundung selbst war exakt, nur das Dreiecksnetz für Anzeige und Export lief stellenweise quer über die Rundung, bis zu einige Zehntel Millimeter unter der Fläche.\n\nlayerling prüft das Netz jetzt bei jeder Verrundung an einer runden Kante und vernetzt feiner, wo es nötig ist. Eine schon verrundete Kante wird glatt, wenn du die Verrundung noch einmal anwendest.",
+      "en": "A fillet of 1 mm or more on a round edge, such as the rim of a large disc or ring, could show slanted dents in the editor and in the slicer. The fillet itself was exact; only the triangle mesh for the view and the export ran across the curve in places, up to a few tenths of a millimetre below the surface.\n\nlayerling now checks the mesh on every fillet along a round edge and meshes it more finely where needed. An edge you already filleted comes out smooth when you apply the fillet once more."
+    }
   }
 ]
