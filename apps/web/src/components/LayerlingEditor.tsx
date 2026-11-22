@@ -9866,6 +9866,41 @@ export function LayerlingEditor({
     };
   }, [shellPreviewKeyNow, shellToolBusy]);
 
+  /*
+   * Hollow, left by selecting something else or nothing: what the panel showed is kept, as if Apply had been pressed. The
+   * preview stood in the body's place all the while, so dropping it without a word turned the box back into a block and
+   * lost every setting. Cancel, the tool's own button and Apply close the tool themselves and are not meant here: by then
+   * the tool is gone. A tool that shows an error, or is at work, keeps nothing.
+   */
+  const shellKeepRef = useRef<{ target: WorkplaneShape; tool: NonNullable<typeof shellTool> } | null>(null);
+  const shellTargetId = shellPreviewTarget?.id ?? null;
+  useEffect(() => {
+    const left = shellKeepRef.current;
+    shellKeepRef.current = null;
+    if (!left || left.target.id === shellTargetId) return;
+    const { target, tool } = left;
+    // Still the tool that was open when the selection changed, and not one that was closed on purpose just before.
+    if (shellToolRef.current !== tool || tool.busy || tool.error) return;
+    setShellTool(null);
+    const fingerprint = projectShapesFingerprint([target]);
+    void hollowedWithTool(target, tool)
+      .then((modifiedShape) => {
+        const now = shapesRef.current.find((candidate) => candidate.id === target.id);
+        // Changed or deleted in the meantime: nothing is laid over it.
+        if (!modifiedShape || !now || projectShapesFingerprint([now]) !== fingerprint) return;
+        commitShapes(
+          shapesRef.current.map((candidate) => candidate.id === target.id ? modifiedShape : candidate),
+          selectedIdsRef.current,
+          t(shellOpenSides(tool.openings).length === 0 ? "status.shelledClosed" : "status.shelled", { size: Number(tool.thickness.toFixed(2)) }),
+        );
+      })
+      .catch((error: unknown) => setNotice(shellToolErrorText(error, target), true));
+  }, [shellTargetId]);
+  // After every render: the body the tool is open on, with the tool as it stands, for the effect above to find next time.
+  useEffect(() => {
+    shellKeepRef.current = shellTool && shellTool.mode !== "offset" && shellPreviewTarget ? { target: shellPreviewTarget, tool: shellTool } : null;
+  });
+
   /**
    * A stacking lid for the selected box: a flat box of the same outline, with the same foot and wall, beside it. Its foot goes
    * into the box, its floor closes it, and the next box's foot stands in its rim. Made as a body of its own and hollowed
