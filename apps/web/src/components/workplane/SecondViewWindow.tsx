@@ -1,6 +1,7 @@
 "use client";
 
 import * as THREE from "three";
+import { installSafariBufferUploads } from "@/lib/safariBufferUploads";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import { useCallback, useEffect, useRef, useState, type RefObject } from "react";
 import { createPortal } from "react-dom";
@@ -270,6 +271,7 @@ export function SecondViewWindow({ popup, threeRef, projectId, getSelectedIds, o
     if (!container || !host || !main) return;
 
     const canvas = popup.document.createElement("canvas");
+    installSafariBufferUploads();
     const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, powerPreference: "high-performance", preserveDrawingBuffer: false, stencil: true });
     renderer.localClippingEnabled = true;
     renderer.outputColorSpace = main.renderer.outputColorSpace;

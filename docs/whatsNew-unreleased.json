@@ -177,5 +177,15 @@
     "guide": {
       "chapter": "text"
     }
+  },
+  {
+    "title": {
+      "de": "Safari auf Intel-Macs: große Teile wieder richtig gezeichnet",
+      "en": "Safari on Intel Macs: large parts drawn correctly again"
+    },
+    "body": {
+      "de": "In Safari auf einem Mac mit Intel-Prozessor und eigener Grafikkarte wurden große Teile als Gewirr aus Spitzen quer durch die Ansicht gezeichnet, etwa ein Muster, das um einen Zylinder gewickelt ist, oder ein großes importiertes Netz. Kleine Teile sahen richtig aus, und der Export war immer in Ordnung.\n\nDie Ursache ist ein Fehler in Safari: Von großen Datenblöcken kommt dort nur das erste Megabyte auf der Grafikkarte an. layerling schickt große Blöcke in Safari jetzt in kleineren Stücken.",
+      "en": "In Safari on a Mac with an Intel processor and its own graphics card, large parts were drawn as a tangle of spikes across the view, such as a pattern wrapped around a cylinder or a large imported mesh. Small parts looked right, and the export was always fine.\n\nThe cause is a bug in Safari: of large blocks of data, only the first megabyte reaches the graphics card there. layerling now sends large blocks to Safari in smaller pieces."
+    }
   }
 ]

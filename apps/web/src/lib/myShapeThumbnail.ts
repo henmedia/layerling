@@ -1,4 +1,5 @@
 import * as THREE from "three";
+import { installSafariBufferUploads } from "@/lib/safariBufferUploads";
 
 /*
  * The preview tile of a custom shape: the saved bodies alone, drawn from
@@ -25,6 +26,7 @@ export function renderMyShapeThumbnail(meshes: ThumbnailMesh[], size = MY_SHAPE_
   const scene = new THREE.Scene();
   const disposables: Array<{ dispose: () => void }> = [];
   try {
+    installSafariBufferUploads();
     renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true, preserveDrawingBuffer: true });
     renderer.setPixelRatio(1);
     renderer.setSize(size, size, false);
