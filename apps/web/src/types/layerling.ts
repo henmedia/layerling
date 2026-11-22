@@ -451,6 +451,13 @@ export type ShapeCustomization = {
   dovetailNeckWidth?: number;
   /** Dovetail: gap in mm added on every side when the dovetail is a cut-out (its socket). */
   dovetailClearance?: number;
+  /**
+   * A lid made by the Lid tool: the body it closes (its id; the group, where the lid's parts were grouped with the body),
+   * the settings it was made with (lidTool.ts LidOptions), the loose parts lying beside it (a pin, clips, end plugs) and,
+   * with labels, the middles of the box's compartments then (from the box's middle), so each label finds its compartment again.
+   * When that body is hollowed again - other compartments, another wall - the lid is made again in its place.
+   */
+  lidFor?: { body: string; options: Record<string, unknown>; parts?: string[]; rooms?: [number, number][] };
   /** Transition (loft, #188): the outline at the bottom and at the top. */
   loftBottomOutline?: "round" | "rectangle" | "polygon";
   loftTopOutline?: "round" | "rectangle" | "polygon";
@@ -1482,6 +1489,13 @@ export type WorkplaneShape = {
   dovetailNeckWidth?: number;
   /** Dovetail: gap in mm added on every side when the dovetail is a cut-out (its socket). */
   dovetailClearance?: number;
+  /**
+   * A lid made by the Lid tool: the body it closes (its id; the group, where the lid's parts were grouped with the body),
+   * the settings it was made with (lidTool.ts LidOptions), the loose parts lying beside it (a pin, clips, end plugs) and,
+   * with labels, the middles of the box's compartments then (from the box's middle), so each label finds its compartment again.
+   * When that body is hollowed again - other compartments, another wall - the lid is made again in its place.
+   */
+  lidFor?: { body: string; options: Record<string, unknown>; parts?: string[]; rooms?: [number, number][] };
   /** Transition (loft, #188): the outline at the bottom and at the top. */
   loftBottomOutline?: "round" | "rectangle" | "polygon";
   loftTopOutline?: "round" | "rectangle" | "polygon";

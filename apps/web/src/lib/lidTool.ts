@@ -7,7 +7,7 @@ import { DEFAULT_LID_LATCH_GRIP, DEFAULT_LID_LATCH_WIDTH, MAX_LID_LATCHES, MAX_L
 import { splitShapeFromWorldPositions } from "@/lib/modelSplit";
 import { printerPlayStart } from "@/lib/printerPlay";
 import { DEFAULT_SHELL_STACK_HEIGHT, SHELL_STACK_FOOT_CHAMFER } from "@/lib/shellStackLimits";
-import { sceneShape } from "@/lib/shapeCatalog";
+import { makeShapeFromAsset, sceneShape } from "@/lib/shapeCatalog";
 import { roundSideCount } from "@/lib/roundSideCount";
 import { screwBossSize } from "@/lib/screwBoss";
 import { screwHoleFields } from "@/lib/screwHoleSizes";
@@ -203,6 +203,13 @@ export type LidOptions = {
   /** A text cut into the slider's front over an arrow pointing the way it opens, "OPEN" to begin with; empty for none. */
   latchLabel: string;
   stackTop: boolean;
+  /**
+   * Where each compartment's label is cut into the lid: `outside` into the plate's top, `inside` into its underside over
+   * the compartment; `none` for no labels. Cut in, never raised: the lid lies flat as it prints and stacks as before.
+   */
+  labelSide: LidLabelSide;
+  /** The labels, one for each compartment in `lidRooms` order (rows from the back, each from the left); empty for none. */
+  labels: string[];
 };
 
 /** The screws in the corners (Discussion #1938): metric sizes there are heat-set inserts for. */
@@ -215,6 +222,17 @@ export const LID_CORNER_SCREW_FASTENERS: readonly LidCornerScrewFastener[] = ["i
 export type LidCornerScrewHead = "countersunk" | "flat";
 export const LID_CORNER_SCREW_HEADS: readonly LidCornerScrewHead[] = ["countersunk", "flat"];
 
+export type LidLabelSide = "none" | "outside" | "inside";
+export const LID_LABEL_SIDES: readonly LidLabelSide[] = ["none", "outside", "inside"];
+export const MAX_LID_LABELS = 64;
+export const MAX_LID_LABEL_LENGTH = 24;
+/** How deep a label is cut into the plate, in mm, and how much of the plate it leaves at least. */
+export const LID_LABEL_DEPTH = 0.6;
+const LID_LABEL_KEEP = 0.4;
+/** How far a label stays from the edge of its compartment, in mm. */
+const LID_LABEL_MARGIN = 1.5;
+/** A compartment smaller than this, in mm², is none: a sliver between two walls. */
+const MIN_LID_ROOM_AREA = 4;
 export type LidLatchStyle = "clip" | "slider" | "bolt";
 export const LID_LATCH_STYLES: readonly LidLatchStyle[] = ["clip", "slider", "bolt"];
 export const MIN_LID_BOLT_DIAMETER = 5;
@@ -239,6 +257,7 @@ export const LID_DEFAULTS: LidOptions = {
   flipTop: false, flipTopOpening: 8, topEdge: "square", topEdgeSize: 1, slideSide: "front", slideFrame: 0,
   latches: 0, latchBack: false, latchWidth: DEFAULT_LID_LATCH_WIDTH, latchGrip: DEFAULT_LID_LATCH_GRIP,
   latchStyle: "clip", boltDiameter: 6, boltPlay: 0.3, boltTravel: 4, sliderWidth: 22, sliderPlay: 0.3, latchLabel: "OPEN", stackTop: false,
+  labelSide: "none", labels: [],
 };
 /**
  * What a lid starts from with this printer's play (printerPlay.ts): the gap per side and the hinge pin's play take it,
@@ -882,7 +901,19 @@ export function normalizeLidOptions(value?: Partial<Record<keyof LidOptions, unk
   const sliderPlay = finiteNumber(value?.sliderPlay);
   if (sliderPlay !== null) result.sliderPlay = clamp(sliderPlay, MIN_LID_SLIDER_PLAY, MAX_LID_SLIDER_PLAY);
   if (typeof value?.latchLabel === "string") result.latchLabel = value.latchLabel.replace(/\s+/g, " ").trim().slice(0, MAX_LID_LATCH_LABEL).trim();
+  const labelSide = typeof value?.labelSide === "string" ? value.labelSide.trim().toLowerCase() : "";
+  if ((LID_LABEL_SIDES as readonly string[]).includes(labelSide)) result.labelSide = labelSide as LidLabelSide;
+  // Never the defaults' own list: one for each compartment, the empty ones at the end left out.
+  const labels = (Array.isArray(value?.labels) ? value.labels : result.labels).slice(0, MAX_LID_LABELS)
+    .map((label) => (typeof label === "string" || typeof label === "number" ? String(label).replace(/\s+/g, " ").trim().slice(0, MAX_LID_LABEL_LENGTH).trim() : ""));
+  while (labels.length && !labels[labels.length - 1]) labels.pop();
+  result.labels = labels;
   return result;
+}
+
+/** Whether labels for the compartments go with this kind of lid: one with a plate over the opening that is pushed or laid on. */
+export function lidLabelsFit(options: Pick<LidOptions, "type">) {
+  return options.type === "plug" || options.type === "cap" || options.type === "both" || options.type === "flat";
 }
 
 /**
@@ -2451,6 +2482,71 @@ export function slideWall(outline: readonly (readonly Point[])[], hull: readonly
   return Number.isFinite(least) ? least : 0;
 }
 
+/** A compartment of a box seen from above: its outline, a point well inside it, and how wide and deep it is through that point. */
+export type LidRoom = { points: Point[]; centre: Point; width: number; depth: number };
+
+/** Where the line through `at` along x (or along y, `upright`) lies inside `polygon`: the stretch round `at`, else the longest. */
+function chordThrough(polygon: readonly Point[], at: Point, upright: boolean): [number, number] | null {
+  const [along, across] = upright ? [1, 0] : [0, 1];
+  const level = at[across];
+  const cuts: number[] = [];
+  polygon.forEach((start, index) => {
+    const end = polygon[(index + 1) % polygon.length];
+    if ((start[across] > level) === (end[across] > level)) return;
+    cuts.push(start[along] + ((level - start[across]) / (end[across] - start[across])) * (end[along] - start[along]));
+  });
+  cuts.sort((a, b) => a - b);
+  let best: [number, number] | null = null;
+  for (let index = 0; index + 1 < cuts.length; index += 2) {
+    const stretch: [number, number] = [cuts[index], cuts[index + 1]];
+    if (stretch[0] <= at[along] && at[along] <= stretch[1]) return stretch;
+    if (!best || stretch[1] - stretch[0] > best[1] - best[0]) best = stretch;
+  }
+  return best;
+}
+
+/**
+ * The compartments of a box from its opening seen from above (the opening's polygons as `lidForSolid` cuts them, y to
+ * the back): every outline that is no hole in another, slivers left out. In the order they are numbered and labelled:
+ * rows from the back to the front, each row from the left to the right; two compartments are in one row when their
+ * middles lie closer front to back than half the shallowest compartment is deep. A box without dividers has one.
+ */
+export function lidRooms(polygons: readonly (readonly Point[])[]): LidRoom[] {
+  const rooms: LidRoom[] = [];
+  for (const polygon of polygons) {
+    const area = signedArea(polygon as [number, number][]);
+    if (area < MIN_LID_ROOM_AREA) continue;
+    let cx = 0;
+    let cy = 0;
+    polygon.forEach((start, index) => {
+      const end = polygon[(index + 1) % polygon.length];
+      const cross = start[0] * end[1] - end[0] * start[1];
+      cx += (start[0] + end[0]) * cross;
+      cy += (start[1] + end[1]) * cross;
+    });
+    let centre: Point = [cx / (6 * area), cy / (6 * area)];
+    // An L or a wedge may have its middle outside or near an edge: the middle of the stretch through it, both ways.
+    const across = chordThrough(polygon, centre, false);
+    if (!across) continue;
+    centre = [(across[0] + across[1]) / 2, centre[1]];
+    const upright = chordThrough(polygon, centre, true);
+    if (!upright) continue;
+    centre = [centre[0], (upright[0] + upright[1]) / 2];
+    const wide = chordThrough(polygon, centre, false) ?? across;
+    rooms.push({ points: polygon.map(([x, y]): Point => [x, y]), centre, width: wide[1] - wide[0], depth: upright[1] - upright[0] });
+  }
+  if (!rooms.length) return rooms;
+  const same = Math.min(...rooms.map((room) => room.depth)) / 2;
+  const fromBack = [...rooms].sort((a, b) => b.centre[1] - a.centre[1]);
+  const rows: LidRoom[][] = [];
+  for (const room of fromBack) {
+    const row = rows[rows.length - 1];
+    if (row && row[0].centre[1] - room.centre[1] < same) row.push(room);
+    else rows.push([room]);
+  }
+  return rows.flatMap((row) => row.sort((a, b) => a.centre[0] - b.centre[0]));
+}
+
 /**
  * How far a box stands turned on the plate about the up axis, in degrees from -45 to 45 (Discussion #1443): the turn of
  * the smallest rectangle round its opening seen from above, which lies along a box's straight walls, rounded corners or
@@ -3172,7 +3268,16 @@ export type LidLatch = {
  * `leaning` says that the lip or the rim follows a wall that leans (`leaningWalls` in `lidForSolid`): the exact lid, which
  * is upright, must not take this one's place.
  */
-export type LidResult = { lid: ManifoldSolid; leaning?: boolean; magnets?: LidMagnets; cornerScrews?: LidCornerScrews; hinge?: LidHinge; latch?: LidLatch; clickBumps?: LidClickBumps; handle?: LidHandleResult; screw?: LidScrew; bayonet?: LidBayonet; slide?: LidSlide; tether?: LidTether; flipTop?: LidFlipTop } | { error: LidError };
+/**
+ * A compartment's label on the lid as it lies beside the body: which compartment (`lidRooms` order) and its text, the
+ * middle of the label on the lid's face (scene frame), how wide and how high (front to back) the room for it is, how
+ * deep it is cut, and whether that face looks up as the lid lies (`up`) or lies on the plate, where the text is cut
+ * mirrored front to back so it reads right once the lid is turned over. `turn`: how far the lid lies turned about the up
+ * axis, in degrees (a box standing turned).
+ */
+export type LidLabel = { index: number; text: string; point: [number, number, number]; width: number; height: number; depth: number; up: boolean; turn?: number };
+
+export type LidResult = { lid: ManifoldSolid; labels?: LidLabel[]; rooms?: [number, number][]; leaning?: boolean; magnets?: LidMagnets; cornerScrews?: LidCornerScrews; hinge?: LidHinge; latch?: LidLatch; clickBumps?: LidClickBumps; handle?: LidHandleResult; screw?: LidScrew; bayonet?: LidBayonet; slide?: LidSlide; tether?: LidTether; flipTop?: LidFlipTop } | { error: LidError };
 
 /** Where a lid cuts the body to find its top: just below the rim, so a rim that is a hair uneven still counts as the top. */
 function lidRimHeight(top: number, height: number) {
@@ -3212,7 +3317,9 @@ export function lidForSolid(runtime: ManifoldToplevel, body: ManifoldSolid, give
   // A hinge, latches and a handle go along a side that runs across or front to back, magnets into corners between such
   // sides. A box set down turned on the plate has none: it is worked out turned back square, and everything made for it
   // turned as the box stands. A slide-in lid does so itself (`slideBoxTurn`).
-  const turn = (options.hinge || options.latches > 0 || options.handle !== "none" || options.magnets) && options.type !== "slide" ? lidBoxTurn(runtime, body) : 0;
+  // Labels read along the box's own sides too.
+  const labelled = options.labelSide !== "none" && options.labels.some(Boolean);
+  const turn = (options.hinge || options.latches > 0 || options.handle !== "none" || options.magnets || labelled) && options.type !== "slide" ? lidBoxTurn(runtime, body) : 0;
   if (!turn) return lidForStandingSolid(runtime, body, given);
   const square = body.rotate([0, -turn, 0]);
   try {
@@ -3262,10 +3369,11 @@ function lidTurned(result: LidResult, degrees: number): LidResult {
   };
   const place = <T extends { x: number; z: number }>(value: T): T => ({ ...value, x: value.x * cos + value.z * sin, z: -value.x * sin + value.z * cos });
   const point = ([x, y, z]: [number, number, number]): [number, number, number] => [x * cos + z * sin, y, -x * sin + z * cos];
-  const { lid, magnets, hinge, latch, clickBumps, handle, screw, bayonet, slide, tether, ...rest } = result;
+  const { lid, labels, magnets, hinge, latch, clickBumps, handle, screw, bayonet, slide, tether, ...rest } = result;
   return {
     ...rest,
     lid: solid(lid),
+    ...(labels ? { labels: labels.map((label) => ({ ...label, point: point(label.point), turn: (label.turn ?? 0) + degrees })) } : {}),
     ...(magnets ? { magnets: { posts: solid(magnets.posts), postParts: magnets.postParts.map((part) => ({ ...place(part), rotation: part.rotation + degrees })), pockets: magnets.pockets.map(place) } } : {}),
     ...(hinge ? { hinge: { ...hinge, knuckles: solid(hinge.knuckles), pin: solid(hinge.pin), cuts: solid(hinge.cuts), plugs: solid(hinge.plugs) } } : {}),
     ...(latch ? { latch: {
@@ -3298,6 +3406,10 @@ function lidForStandingSolid(runtime: ManifoldToplevel, body: ManifoldSolid, giv
     const outline = filled(runtime, section, created);
     let opening = keep(created, outline.subtract(section));
     const hasOpening = opening.area() >= MIN_OPENING_AREA;
+    // The compartments as the panel numbers them (`lidRoomsForShapes`), before anything is added in the corners.
+    const rooms = hasOpening && options.labelSide !== "none" ? lidRooms(opening.toPolygons() as Point[][]) : [];
+    const outlineBounds = outline.bounds();
+    const outlineMiddle: Point = [(outlineBounds.min[0] + outlineBounds.max[0]) / 2, (outlineBounds.min[1] + outlineBounds.max[1]) / 2];
     // A standard's cap is made to the standard whatever the body: a stand-in for a bottle from the shop may be solid.
     const standardCap = options.type === "screw" && options.threadStandard !== "own";
     if (options.type !== "flat" && !hasOpening && !standardCap) {
@@ -4253,6 +4365,28 @@ function lidForStandingSolid(runtime: ManifoldToplevel, body: ManifoldSolid, giv
       box.min[2] - lidBox.min[2],
     ];
     const placed = keep(created, turned.translate(shift));
+    // The labels' places on the lid as it lies: over each compartment's middle, in the plate's top (on the plate as it
+    // prints, to be cut mirrored) or in its underside, inside the compartment's lip or on a lip that is solid.
+    const labels: LidLabel[] = [];
+    if (rooms.length && lidLabelsFit(options)) {
+      const cut = Math.min(LID_LABEL_DEPTH, Math.max(0.2, options.thickness - LID_LABEL_KEEP));
+      const lipped = !pivot && !stackTop && (options.type === "plug" || options.type === "both");
+      const ring = options.gap + options.wall;
+      rooms.forEach((room, index) => {
+        const text = options.labels[index] ?? "";
+        if (!text) return;
+        const hollow = lipped && room.width > 2 * ring + 2 && room.depth > 2 * ring + 2;
+        // A stacking lid prints as it closes, on its foot: only the tray on top is free.
+        const outside = options.labelSide === "outside" || stackTop;
+        const z = outside
+          ? (pivot ? top : stackTop ? top + flareHeight + options.thickness : top + options.thickness)
+          : pivot ? top - options.thickness : lipped && !hollow ? top - options.depth : top;
+        const inset = (outside || !lipped ? 0 : hollow ? ring : options.gap) + LID_LABEL_MARGIN;
+        const [x, y] = room.centre;
+        const up: [number, number, number] = stackTop ? [x + shift[0], y + shift[1], z + shift[2]] : [x + shift[0], -y + shift[1], -z + shift[2]];
+        labels.push({ index, text, point: [up[0], up[2], -up[1]], width: Math.max(0, room.width - 2 * inset), height: Math.max(0, room.depth - 2 * inset), depth: cut, up: stackTop || !outside });
+      });
+    }
     const lid = placed.transform(UP_TO_SCENE);
     handed.add(lid);
     let hinge: LidHinge | undefined;
@@ -4416,7 +4550,10 @@ function lidForStandingSolid(runtime: ManifoldToplevel, body: ManifoldSolid, giv
       handed.add(cuts);
       slideResult = { cuts, side: options.slideSide, depth: slide.plan.depth, wall: slide.plan.wall, bumps: slide.bumps, frame: slide.plan.frame };
     }
-    const extras = { ...(hinge ? { hinge } : {}), ...(latch ? { latch } : {}), ...(clickBumps ? { clickBumps } : {}), ...(handle ? { handle } : {}), ...(screwResult ? { screw: screwResult } : {}), ...(bayonetResult ? { bayonet: bayonetResult } : {}), ...(slideResult ? { slide: slideResult } : {}), ...(tetherResult ? { tether: tetherResult } : {}), ...(flipTopResult ? { flipTop: flipTopResult } : {}), ...(lean ? { leaning: true } : {}) };
+    // With labels, every compartment's middle from the middle of the box, x to the right and z to the front: `lidLabelsMoved`
+    // finds each label's compartment again by it when the box has other compartments.
+    const roomMiddles = labels.length ? rooms.map((room): [number, number] => [room.centre[0] - outlineMiddle[0], -(room.centre[1] - outlineMiddle[1])]) : [];
+    const extras = { ...(labels.length ? { labels, rooms: roomMiddles } : {}), ...(hinge ? { hinge } : {}), ...(latch ? { latch } : {}), ...(clickBumps ? { clickBumps } : {}), ...(handle ? { handle } : {}), ...(screwResult ? { screw: screwResult } : {}), ...(bayonetResult ? { bayonet: bayonetResult } : {}), ...(slideResult ? { slide: slideResult } : {}), ...(tetherResult ? { tether: tetherResult } : {}), ...(flipTopResult ? { flipTop: flipTopResult } : {}), ...(lean ? { leaning: true } : {}) };
     if (!options.magnets && !screws) return { lid, ...extras };
     handed.add(posts);
     // Back in the scene's frame: up is y, and the frame's y is the scene's z turned round.
@@ -4635,7 +4772,7 @@ export type LidShapeTether = { part: WorkplaneShape; bead: WorkplaneShape; strap
 /** With latches, the body's cheeks and pins (grouped with it), the clips (a body of their own beside the lid) and how many. */
 export type LidShapeLatch = { body: WorkplaneShape; clips: WorkplaneShape; count: number; width: number; pin: number; style?: LidLatchStyle; travel?: number; labels?: { point: [number, number, number]; width: number; height: number; turn?: number }[]; boltLabels?: { point: [number, number, number]; normal: [number, number, number]; height: number }[] };
 
-export type LidShapeResult = { lid: WorkplaneShape; leaning?: boolean; magnets?: LidShapeMagnets; hinge?: LidShapeHinge; latch?: LidShapeLatch; clickBumps?: LidShapeClickBumps; handle?: LidShapeHandle; screw?: LidShapeScrew; bayonet?: LidShapeBayonet; slide?: LidShapeSlide; tether?: LidShapeTether; flipTop?: LidFlipTop } | { lid: null; error: string };
+export type LidShapeResult = { lid: WorkplaneShape; labels?: LidLabel[]; rooms?: [number, number][]; leaning?: boolean; magnets?: LidShapeMagnets; hinge?: LidShapeHinge; latch?: LidShapeLatch; clickBumps?: LidShapeClickBumps; handle?: LidShapeHandle; screw?: LidShapeScrew; bayonet?: LidShapeBayonet; slide?: LidShapeSlide; tether?: LidShapeTether; flipTop?: LidFlipTop } | { lid: null; error: string };
 
 /**
  * The body a lid is made for, in the kernel: the solids among `targets` joined and the holes among them cut away. Null
@@ -4678,6 +4815,88 @@ export async function lidTopForShapes(targets: readonly WorkplaneShape[]): Promi
     return null;
   } finally {
     Array.from(new Set(created)).forEach(disposeManifold);
+  }
+}
+
+/**
+ * The compartments' labels as texts to cut into the lid `lidId` as it lies (`labels` from `lidForSolid`), made from
+ * `asset`, the shape library's text: each a hole as deep as the label is cut, so it can be changed later as any text
+ * can. A label in the face that lies on the plate is mirrored front to back, so it reads right once the lid is turned
+ * over; one on a lid that lies turned (a box standing turned) is turned with it. The letters are as high as half the
+ * compartment's depth and its width allow, between 2 and 12 mm.
+ */
+export function lidLabelHoles(lidId: string, labels: readonly LidLabel[], asset: Parameters<typeof makeShapeFromAsset>[0]): WorkplaneShape[] {
+  return labels.map((spot) => {
+    const letters = Math.max(1, spot.text.length);
+    const height = Math.max(2, Math.min(12, spot.height * 0.5, spot.width / (0.75 * letters)));
+    const text = makeShapeFromAsset(asset, { x: spot.point[0], z: spot.point[2], elevation: spot.up ? spot.point[1] - spot.depth : spot.point[1] - 0.1 });
+    return canonicalizeShape({
+      ...text, id: createLocalId(`${lidId}-label-${spot.index}`), text: spot.text, width: letters * height * 0.75, depth: height, height: spot.depth + 0.1, hole: true,
+      ...(spot.up ? {} : { mirrorZ: true }), ...(spot.turn ? { rotation: spot.turn } : {}), name: spot.text,
+    });
+  });
+}
+
+/**
+ * The labels of a lid made again for a box whose compartments changed: `labels` were given to compartments with their
+ * middles at `before` (from the middle of the box, as `lidForSolid` hands them out with a labelled lid), and `rooms` are
+ * the compartments now (`lidRoomsForShapes`). Each label goes to the compartment its old middle lies in, else to the one
+ * whose middle is nearest; of two labels that would meet in one compartment the first stays, the other goes to the nearest
+ * compartment still free. So a wall put in or taken out leaves every other compartment its label.
+ */
+export function lidLabelsMoved(labels: readonly string[], before: readonly (readonly [number, number])[], rooms: { outline: readonly (readonly (readonly [number, number])[])[]; rooms: readonly { points: readonly (readonly [number, number])[]; centre: readonly [number, number] }[] }): string[] {
+  const all = rooms.outline.flat();
+  if (!all.length || !rooms.rooms.length) return [...labels];
+  const xs = all.map(([x]) => x);
+  const zs = all.map(([, z]) => z);
+  const middle: [number, number] = [(Math.min(...xs) + Math.max(...xs)) / 2, (Math.min(...zs) + Math.max(...zs)) / 2];
+  const moved: string[] = rooms.rooms.map(() => "");
+  const taken = new Set<number>();
+  labels.forEach((label, index) => {
+    const from = before[index];
+    if (!label || !from) return;
+    const at: Point = [from[0] + middle[0], from[1] + middle[1]];
+    const free = rooms.rooms.map((room, to) => ({ room, to })).filter(({ to }) => !taken.has(to));
+    if (!free.length) return;
+    const inside = free.find(({ room }) => insideOutline([room.points as Point[]], at));
+    const nearest = free.reduce((best, entry) => (Math.hypot(entry.room.centre[0] - at[0], entry.room.centre[1] - at[1]) < Math.hypot(best.room.centre[0] - at[0], best.room.centre[1] - at[1]) ? entry : best));
+    const to = (inside ?? nearest).to;
+    taken.add(to);
+    moved[to] = label;
+  });
+  while (moved.length && !moved[moved.length - 1]) moved.pop();
+  return moved;
+}
+
+/**
+ * The compartments of the selected bodies as Make lid numbers them for their labels (`lidRooms`), for the lid panel's
+ * plan: the body's outline below the rim and each compartment's outline and middle, seen from above, x to the right and z
+ * to the front as in the scene, a box that stands turned drawn square (`lidBoxTurn`). Null for no body, one that is not
+ * closed, or one without an opening at the top.
+ */
+export async function lidRoomsForShapes(targets: readonly WorkplaneShape[]): Promise<{ outline: [number, number][][]; rooms: { points: [number, number][]; centre: [number, number] }[] } | null> {
+  if (!targets.some((shape) => !shape.hole && !isNonSolidShape(shape))) return null;
+  const created: { delete?: () => void }[] = [];
+  try {
+    const runtime = await getManifoldRuntime();
+    const body = lidBody(runtime, targets, created as ManifoldSolid[]);
+    if (!body) return null;
+    const turn = lidBoxTurn(runtime, body);
+    const up = keep(created, (turn ? keep(created, body.rotate([0, -turn, 0])) : body).transform(SCENE_TO_UP));
+    const box = up.boundingBox();
+    const section = keep(created, up.slice(lidRimHeight(box.max[2], box.max[2] - box.min[2])));
+    const outline = filled(runtime, section, created);
+    const opening = keep(created, outline.subtract(section));
+    if (opening.area() < MIN_OPENING_AREA) return null;
+    const scene = ([x, y]: Point): [number, number] => [x, -y];
+    return {
+      outline: (outline.toPolygons() as Point[][]).map((polygon) => polygon.map(scene)),
+      rooms: lidRooms(opening.toPolygons() as Point[][]).map((room) => ({ points: room.points.map(scene), centre: scene(room.centre) })),
+    };
+  } catch {
+    return null;
+  } finally {
+    Array.from(new Set(created)).forEach((value) => disposeManifold(value as ManifoldSolid));
   }
 }
 
@@ -4786,7 +5005,7 @@ export async function lidForShapes(targets: readonly WorkplaneShape[], given: Li
       const { side, depth, wall, bumps, frame } = result.slide;
       slide = { cuts, side, depth, wall, bumps, frame };
     }
-    const extras = { ...(hinge ? { hinge } : {}), ...(latch ? { latch } : {}), ...(clickBumps ? { clickBumps } : {}), ...(handle ? { handle } : {}), ...(screw ? { screw } : {}), ...(bayonet ? { bayonet } : {}), ...(slide ? { slide } : {}), ...(tether ? { tether } : {}), ...(result.flipTop ? { flipTop: result.flipTop } : {}), ...(result.leaning ? { leaning: true } : {}) };
+    const extras = { ...(result.labels ? { labels: result.labels, rooms: result.rooms ?? [] } : {}), ...(hinge ? { hinge } : {}), ...(latch ? { latch } : {}), ...(clickBumps ? { clickBumps } : {}), ...(handle ? { handle } : {}), ...(screw ? { screw } : {}), ...(bayonet ? { bayonet } : {}), ...(slide ? { slide } : {}), ...(tether ? { tether } : {}), ...(result.flipTop ? { flipTop: result.flipTop } : {}), ...(result.leaning ? { leaning: true } : {}) };
     if (!result.magnets) return { lid, ...extras };
     const screws = result.cornerScrews;
     const postName = t(screws ? "lid.cornerScrewPosts" : "lid.magnetPosts", { name: source.name });

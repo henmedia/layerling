@@ -33,7 +33,7 @@ import { limitedText } from "@/lib/textLength";
 import { NAME_TAG_LAYERS, NAME_TAG_LETTER_SIZE, textKerningPatch, textLetterSize, textLetterSizePatch, textShrinkPatch, textSpacingPatch } from "@/lib/nameTag";
 import { DEFAULT_ICON_TAG_WIDTH, ICON_TAG_LAYERS, MAX_ICON_TAG_WIDTH, MIN_ICON_TAG_WIDTH, isIconLayerBody, normalizeIconTagCount } from "@/lib/iconTag";
 import { automaticFlexiJoints, automaticFoldJoints, DEFAULT_FLEXI_FOLD, FLEXI_DEFAULTS, normalizeFlexiOptions, type FlexiOptions } from "@/lib/flexiJoints";
-import { LID_HINGE_TYPES, groupedWithMagnets, lidClickBumpsFit, lidStackTopFits, lidDefaults, lidFlipTopFits, lidHandleFits, lidLatchesFit, lidNeckFit, lidNeckFitPatch, lidStandardThread, lidTakesMagnets, lidTetherFits, lidTopEdgeFits, magnetPocketDepth, normalizeLidOptions, type LidOptions, type LidThreadStandard } from "@/lib/lidTool";
+import { LID_HINGE_TYPES, groupedWithMagnets, lidClickBumpsFit, lidLabelHoles, lidLabelsFit, lidLabelsMoved, lidStackTopFits, lidDefaults, lidFlipTopFits, lidHandleFits, lidLatchesFit, lidNeckFit, lidNeckFitPatch, lidStandardThread, lidTakesMagnets, lidTetherFits, lidTopEdgeFits, magnetPocketDepth, normalizeLidOptions, type LidOptions, type LidThreadStandard } from "@/lib/lidTool";
 import { boltSplitFits, boltSplitStatus, type BoltSplitOptions } from "@/lib/boltSplit";
 import { MOLD_CAST_MATERIAL_DATA, MOLD_DEFAULTS, moldOpeningAngles, moldOpeningAt, moldOpeningVector, normalizeMoldOpenings, normalizeMoldOptions, type MoldAnalysis, type MoldOpeningKind, type MoldOptions } from "@/lib/moldTool";
 import { readMoldSettings, writeMoldSettings } from "@/lib/moldSettings";
@@ -299,7 +299,7 @@ import type { AlignAxis, AlignHandleStatus, AlignSpread, AlignTarget, EdgeTreatm
 import { type MeshData, type Cuboid, type ShapeUpdatePatch, type ManifoldSolid, MIN_SHAPE_DIMENSION, resetManifoldRuntime, cleanModelDimension, getManifoldRuntime, meshForShape, meshReachAlong, formatTriangleCount, boundsForShapes, boundsForCuboids, meshAabb, boundsForPositions, quantizedPointKey, sameShapeApartFromPlacement } from "@/lib/editorMeshCore";
 import { meshPartCount } from "@/lib/meshPartCount";
 import { splitBoltOffThread } from "@/lib/geometryWorker";
-import { buildGroupedShapeOffThread, exportSolidVolumeOffThread, callOffFaceRead, faceReadInWorker, createFaceReadKeeper, faceReadPositionsOffThread, simplifyTrianglePositionsOffThread, splitShapesByPlaneOffThread, previewSplitConnectorsOffThread, articulateShapesOffThread, lidForShapesOffThread, lidTopOffThread, checkClearanceOffThread, checkPrintOffThread, moldForShapesOffThread, analyseMoldOffThread, checkLayersOffThread, subscribeGeometryBusy, warmGeometryWorker } from "@/lib/geometryWorker";
+import { buildGroupedShapeOffThread, exportSolidVolumeOffThread, callOffFaceRead, faceReadInWorker, createFaceReadKeeper, faceReadPositionsOffThread, simplifyTrianglePositionsOffThread, splitShapesByPlaneOffThread, previewSplitConnectorsOffThread, articulateShapesOffThread, lidForShapesOffThread, lidTopOffThread, lidRoomsOffThread, checkClearanceOffThread, checkPrintOffThread, moldForShapesOffThread, analyseMoldOffThread, checkLayersOffThread, subscribeGeometryBusy, warmGeometryWorker } from "@/lib/geometryWorker";
 import { roundedAlignedValue } from "@/lib/alignRounding";
 import { buildSketchLoftFromSelection, canSketchLoft } from "@/lib/sketchLoft";
 import { alignBounds, sizeAlignmentState, sizedShapesForSelection } from "@/lib/alignSize";
@@ -385,6 +385,24 @@ export type HistoryProjectRequest = {
   thumbnailDataUrl: string | null;
 };
 type OpenGroupOutcome = { ok: boolean; message: string; partIds?: string[]; groupId?: string };
+/** A status line with what became of the body's lids: made again, or why not. */
+function lidsRemadeNote(message: string, lids: { remade: number; failed: string | null }) {
+  return [message, ...(lids.remade ? [t(lids.remade === 1 ? "status.lidRemadeOne" : "status.lidRemadeMany", { count: lids.remade })] : []), ...(lids.failed !== null ? [t("status.lidNotRemade", { reason: lids.failed })] : [])].join(" ");
+}
+
+/** What Make lid made, handed over instead of laid into the design: the body grouped with the lid's parts (null: it stays as it is), the lid, and the loose parts beside it. */
+type LidMade = { body: WorkplaneShape | null; lid: WorkplaneShape; loose: WorkplaneShape[]; message: string };
+
+/**
+ * The hollowed box inside a body that Make lid grouped with the lid's parts (a hinge's knuckles, magnets' pockets), as it
+ * stands in the design and under the group's id and name: Hollow works on it, and the lid's parts are made again with the
+ * lid afterwards. Null for anything else, and for a box that cannot be hollowed again from its settings.
+ */
+function lidGroupBody(group: WorkplaneShape): WorkplaneShape | null {
+  if (!group.groupedShapes?.length || group.hole) return null;
+  const inner = restoreGroupedChildren(group).find((child) => !child.hole && shellRebuildEntry(child) !== null);
+  return inner ? { ...inner, id: group.id, name: group.name } : null;
+}
 type WithoutRequestId<T> = T extends unknown ? Omit<T, "requestId"> : never;
 type CadModifierWorkerPayload = WithoutRequestId<CadModifierWorkerRequest>;
 type CadPreviewPayload = Extract<CadModifierWorkerPayload, { type: "preview" }>;
@@ -4577,7 +4595,10 @@ export function LayerlingEditor({
     return layer ? { ...layer.slab, elevation: (layer.slab.elevation ?? 0) + 0.02, name: t("holePattern.topLayerName") } : null;
   }, [holePatternPreview?.topLayer]);
   // The body the Hollow panel is open for, and its fingerprint: the preview belongs to exactly this state of it.
-  const shellPreviewTarget = shellTool && shellTool.mode !== "offset" && selectedShapes.length === 1 ? selectedShape : null;
+  // The body Hollow works on: the selected one, or the hollowed box inside it where a lid's parts were grouped with it.
+  const selectedHasLid = useMemo(() => Boolean(selectedShape?.groupedShapes?.length && shapes.some((shape) => shape.lidFor?.body === selectedShape.id)), [selectedShape, shapes]);
+  const shellBody = useMemo(() => (selectedShape ? (selectedHasLid ? lidGroupBody(selectedShape) : null) ?? selectedShape : null), [selectedShape, selectedHasLid]);
+  const shellPreviewTarget = shellTool && shellTool.mode !== "offset" && selectedShapes.length === 1 ? shellBody : null;
   // Hollow with the top as the one open side and no Gridfinity floor: the compartments show on the body in the view while
   // the panel is open, with the grips of walls set by hand and a button for a finger scoop; what they change goes into the tool.
   const shellWallsOffered = Boolean(shellPreviewTarget && shellTool && !(shellTool.gridCells ?? 0) && shellOpenSides(shellTool.openings).length === 1 && shellOpenSides(shellTool.openings)[0] === "top");
@@ -8613,7 +8634,10 @@ export function LayerlingEditor({
       throw new Error("Select one unlocked object to hollow");
     }
     invalidateCadModifierSession();
-    const sourceFingerprint = projectShapesFingerprint([watched]);
+    // The box inside a body that a lid's parts were grouped with (lidGroupBody) stands in the design as that group: the
+    // group is what must not change meanwhile.
+    const standing = shapesRef.current.find((candidate) => candidate.id === watched.id);
+    const sourceFingerprint = projectShapesFingerprint([standing?.groupedShapes?.length && !watched.groupedShapes?.length ? standing : watched]);
     const sourceProjectId = projectInfoRef.current.projectId;
     const { response, sourceParts } = await prepareCadModifierForMcp(shape, 25);
     const previewResponse = await postCadModifierRequestAsync({
@@ -8845,9 +8869,10 @@ export function LayerlingEditor({
     }
     if (edgeModifier) invalidateCadModifierSession();
     closeSplit();
-    const smallest = Math.min(shapeWidth(selectedShape), shapeDepth(selectedShape), selectedShape.height);
+    const body = shellBody ?? selectedShape;
+    const smallest = Math.min(shapeWidth(body), shapeDepth(body), body.height);
     // A body hollowed already starts with the settings it was hollowed with: Apply then changes the hollowing instead of starting over.
-    const hollow = shellRebuildEntry(selectedShape)?.feature;
+    const hollow = shellRebuildEntry(body)?.feature;
     if (hollow) {
       setShellTool({
         thickness: hollow.amount,
@@ -8864,7 +8889,7 @@ export function LayerlingEditor({
       return;
     }
     setShellTool({ thickness: Math.max(0.2, Math.min(2, Number((smallest / 5).toFixed(1)))), openings: "top", edges: "round", busy: false, error: null });
-  }, [refuseLockedSelection, closeSplit, edgeModifier, invalidateCadModifierSession, selectedShape, selectedShapes.length, shellTool, refuseBodyLockedSelection]);
+  }, [refuseLockedSelection, closeSplit, edgeModifier, invalidateCadModifierSession, selectedShape, selectedShapes.length, shellBody, shellTool, refuseBodyLockedSelection]);
 
   const startOffsetTool = useCallback(() => {
     if (shellTool?.mode === "offset") {
@@ -9179,7 +9204,7 @@ export function LayerlingEditor({
    * grouped with the pockets (and the posts for thin corners), as Cut out does, so they stay editable inside the group.
    * The same code the MCP action uses.
    */
-  const makeLid = useCallback(async (given?: Partial<Record<keyof LidOptions, unknown>>, only?: readonly WorkplaneShape[]) => {
+  const makeLid = useCallback(async (given?: Partial<Record<keyof LidOptions, unknown>>, only?: readonly WorkplaneShape[], into?: (made: LidMade) => void) => {
     const fail = (message: string) => {
       setNotice(message);
       return { ok: false as const, message };
@@ -9215,8 +9240,27 @@ export function LayerlingEditor({
         : t("lid.error.magnetsGrid"));
     }
     // A lip or a rim that follows a leaning wall (issue #1868) stays the mesh lid: the exact one is upright.
-    const lid = (result.leaning ? null : await exactLid(targets, options, result.lid, result.magnets)) ?? result.lid;
+    // Labelled, it stays the mesh lid too: the labels' places are worked out on it as it lies.
+    let lid = (result.leaning || result.labels?.length ? null : await exactLid(targets, options, result.lid, result.magnets)) ?? result.lid;
     if (changed()) return fail(t("lid.error.changed"));
+    // The compartments' labels: texts cut into the plate, so they can be changed later as any text can; in the face that
+    // lies on the plate, mirrored front to back so they read right once the lid is turned over.
+    let labelled = 0;
+    if (result.labels?.length) {
+      const textAsset = toolbarShapeAssets.find((entry) => entry.kind === "text");
+      if (textAsset) {
+        const holes = lidLabelHoles(lid.id, result.labels, textAsset);
+        const engraved = await buildGroupedShapeOffThread([lid, ...holes], workspaceSettingsRef.current.booleanTriangleLimit, geometryAbortRef.current?.signal);
+        if (changed()) return fail(t("lid.error.changed"));
+        if (engraved.group) {
+          lid = canonicalizeShape({ ...engraved.group, groupOperation: "group", name: lid.name });
+          labelled = holes.length;
+        }
+      }
+    }
+    // A lid for one body remembers it and its settings: hollowed again, the body gets its lid made again (withLidsRemade).
+    const linked = (shape: WorkplaneShape, bodyId: string, loose: readonly WorkplaneShape[]): WorkplaneShape =>
+      targets.length === 1 && !targets[0].hole ? { ...shape, lidFor: { body: bodyId, options: { ...options }, parts: loose.map((part) => part.id), ...(result.rooms?.length ? { rooms: result.rooms } : {}) } } : shape;
     const type = t(`lid.type.${options.type}`);
     const hinge = result.hinge;
     let latch = result.latch;
@@ -9257,6 +9301,7 @@ export function LayerlingEditor({
       ...(result.handle?.style === "tab" ? [t("status.lidHandleTab")] : result.handle?.style === "notch" ? [t(slide ? "status.lidSlideGrip" : "status.lidHandleNotch")] : []),
       ...(tether ? [t("status.lidTether", { length: tether.strap.toLocaleString(numberLocale()) })] : []),
       ...(flipTop ? [t("status.lidFlipTop", { opening: flipTop.opening.toLocaleString(numberLocale()) })] : []),
+      ...(labelled ? [t(options.labelSide === "inside" && !options.stackTop ? "status.lidLabelsInside" : "status.lidLabelsOutside", { count: labelled })] : []),
     ];
     const withExtras = (message: string) => [message, ...extras].join(" ");
     const handle = result.handle?.style ?? "none";
@@ -9284,7 +9329,9 @@ export function LayerlingEditor({
           ? t("status.lidMadeScrewCapOnly", { standard: standardName, diameter: millimetres(screw.diameter), measured: millimetres(screw.capOnly.diameter), neck: lidStandardThread(screw.standard as Exclude<LidThreadStandard, "own">).minor.toLocaleString(numberLocale()) })
           : t("status.lidMadeScrewCapOnlyNotRound", { standard: standardName, diameter: millimetres(screw.diameter) })
         : withExtras(t("status.lidMade", { type }));
-      commitShapes([...shapesRef.current, lid], lid.id, message);
+      lid = linked(lid, targets[0].id, []);
+      if (into) into({ body: null, lid, loose: [], message });
+      else commitShapes([...shapesRef.current, lid], lid.id, message);
       return { ok: true as const, id: lid.id, type: options.type, handle, ...(screwAnswer ? { screw: screwAnswer } : {}) };
     }
     const posts = result.magnets?.posts ?? [];
@@ -9360,7 +9407,10 @@ export function LayerlingEditor({
         ? t(posts.length ? "status.lidMadeMagnetsPosts" : "status.lidMadeMagnets", { type, count: magnetCount })
         : t("status.lidMade", { type });
     // A pin printed apart, end plugs and a tether are bodies of their own beside the lid.
-    commitShapes([...remaining, body, lid, ...(hinge?.pin ? [hinge.pin] : []), ...(hinge?.plugs ? [hinge.plugs] : []), ...(latch ? [latch.clips] : []), ...(tether ? [tether.part] : [])], lid.id, withClosedHolesNote(withExtras(message), grouped.closedHoles));
+    const loose = [...(hinge?.pin ? [hinge.pin] : []), ...(hinge?.plugs ? [hinge.plugs] : []), ...(latch ? [latch.clips] : []), ...(tether ? [tether.part] : [])];
+    lid = linked(lid, body.id, loose);
+    if (into) into({ body, lid, loose, message: withClosedHolesNote(withExtras(message), grouped.closedHoles) });
+    else commitShapes([...remaining, body, lid, ...loose], lid.id, withClosedHolesNote(withExtras(message), grouped.closedHoles));
     return {
       ok: true as const, id: lid.id, type: options.type, bodyId: body.id, magnets: magnetCount, posts: posts.length > 0,
       ...(cornerScrews ? { cornerScrews: { size: options.cornerScrewSize, fastener: options.cornerScrewFastener, head: options.cornerScrewHead, count: result.magnets?.pockets.length ?? 0, holeDiameter: cornerScrews.hole, holeDepth: cornerScrews.depth, lidHoleDiameter: cornerScrews.shaft, headDiameter: cornerScrews.head } } : {}), clickBumps: result.clickBumps?.count ?? slide?.bumps ?? 0, handle,
@@ -9381,6 +9431,53 @@ export function LayerlingEditor({
       ...(slide ? { slide: { side: slide.side, grooveDepth: Math.round(slide.depth * 1000) / 1000, wall: Math.round(slide.wall * 1000) / 1000, ...(slide.frame > 0 ? { frame: slide.frame } : {}) } } : {}),
     };
   }, [commitShapes, exactLid, selectedShapes]);
+
+  /**
+   * `list` with the lids made for `body` made again (Make lid remembers the body and its settings on the lid, `lidFor`):
+   * `body` is the box as it was just hollowed, alone, also where it stood grouped with a lid's parts. Each lid takes the
+   * old one's place, id and name, its loose parts theirs, and the body is grouped with its parts again under its id.
+   * A lid that cannot be made for the box as it is now stays as it was; `failed` says why.
+   */
+  const withLidsRemade = useCallback(async (list: WorkplaneShape[], body: WorkplaneShape): Promise<{ shapes: WorkplaneShape[]; remade: number; failed: string | null }> => {
+    const lids = list.filter((shape) => shape.lidFor?.body === body.id && shape.id !== body.id);
+    let shapes = list;
+    let remade = 0;
+    let failed: string | null = null;
+    for (const old of lids) {
+      const link = old.lidFor!;
+      // Grouped with the lid's parts, the box inside the group has an id of its own.
+      const inner: WorkplaneShape = { ...body, id: createLocalId(`${body.id}-body`) };
+      // Labels stay with their compartments where the box has other ones now.
+      const labels = Array.isArray(link.options.labels) ? link.options.labels.map((label) => (typeof label === "string" ? label : "")) : [];
+      const rooms = link.rooms?.length && labels.some(Boolean) ? await lidRoomsOffThread([inner]) : null;
+      const options = rooms ? { ...link.options, labels: lidLabelsMoved(labels, link.rooms!, rooms) } : link.options;
+      let made: LidMade | null = null;
+      const result = await makeLid(options, [inner], (plan) => { made = plan; });
+      const plan = made as LidMade | null;
+      if (!result.ok || !plan) {
+        failed = result.ok ? "" : result.message;
+        continue;
+      }
+      const dx = old.x - plan.lid.x;
+      const dz = old.z - plan.lid.z;
+      const dy = (old.elevation ?? 0) - (plan.lid.elevation ?? 0);
+      const loose = plan.loose.map((part, index) => ({ ...part, id: link.parts?.[index] ?? part.id, x: part.x + dx, z: part.z + dz, elevation: (part.elevation ?? 0) + dy }));
+      // Where the old lid lies, turned as it was turned: moved beside the printer's other parts, or set on the box.
+      const lid: WorkplaneShape = canonicalizeShape({
+        ...plan.lid, id: old.id, name: old.name, color: old.color, x: old.x, z: old.z, elevation: old.elevation, rotation: old.rotation, rotationX: old.rotationX, rotationZ: old.rotationZ,
+        mirrorX: old.mirrorX, mirrorY: old.mirrorY, mirrorZ: old.mirrorZ, ...(old.locked ? { locked: old.locked } : {}),
+        lidFor: { ...plan.lid.lidFor!, body: body.id, parts: loose.map((part) => part.id) },
+      });
+      const grouped = plan.body ? canonicalizeShape({ ...plan.body, id: body.id }) : null;
+      const gone = new Set(link.parts ?? []);
+      shapes = [
+        ...shapes.filter((shape) => !gone.has(shape.id)).map((shape) => shape.id === old.id ? lid : grouped && shape.id === body.id ? grouped : shape),
+        ...loose,
+      ];
+      remade += 1;
+    }
+    return { shapes, remade, failed };
+  }, [makeLid]);
 
   const startLidTool = useCallback(() => {
     if (lidTool) {
@@ -9433,6 +9530,8 @@ export function LayerlingEditor({
       latches: lidLatchesFit(lidTool) && !(hinge && hingeStyle === "pivot") ? latches : 0, latchBack: latchBack && !hinge, latchWidth, latchGrip, latchStyle, boltDiameter, boltPlay, boltTravel, sliderWidth, sliderPlay, latchLabel,
       // A stacking top only where the panel shows it.
       stackTop: stackTop && lidStackTopFits(lidTool),
+      // Labels only where the panel shows them: a lid with a plate over the compartments.
+      labelSide: lidLabelsFit(lidTool) ? lidTool.labelSide : "none", labels: lidTool.labels,
     }, targets).then((result) => {
       if (result.ok) setLidTool(null);
       else setLidTool((current) => current ? { ...current, busy: false, error: result.message } : current);
@@ -9782,7 +9881,7 @@ export function LayerlingEditor({
 
   const applyShellTool = useCallback(() => {
     if (!shellTool || shellTool.busy) return;
-    const target = selectedShape;
+    const target = shellTool.mode === "offset" ? selectedShape : shellBody;
     if (!target || selectedShapes.length !== 1) {
       setShellTool(null);
       return;
@@ -9811,16 +9910,18 @@ export function LayerlingEditor({
     // What the preview has built for these settings is laid in as it is; a hollowing still at work for them is waited for.
     const key = shellPreviewKey(projectShapesFingerprint([target]), shellTool);
     void shellPreviewRunnerRef.current.request(key, () => hollowedWithTool(target, shellTool), { retryFailed: true })
-      .then((modifiedShape) => {
+      .then(async (modifiedShape) => {
         if (!modifiedShape) {
           setShellTool((current) => current ? { ...current, busy: false } : current);
           return;
         }
+        // A lid made for this body follows it: made again for the box as it is now, in the same step.
+        const next = await withLidsRemade(shapesRef.current.map((candidate) => candidate.id === target.id ? modifiedShape : candidate), modifiedShape);
         commitShapes(
-          shapesRef.current.map((candidate) => candidate.id === target.id ? modifiedShape : candidate),
+          next.shapes,
           modifiedShape.id,
           // A sealed cavity looks like nothing happened (#658), so say where it went.
-          t(shellOpenSides(openings).length === 0 ? "status.shelledClosed" : "status.shelled", { size: Number(thickness.toFixed(2)) }),
+          lidsRemadeNote(t(shellOpenSides(openings).length === 0 ? "status.shelledClosed" : "status.shelled", { size: Number(thickness.toFixed(2)) }), next),
         );
         setShellTool(null);
       })
@@ -9828,7 +9929,7 @@ export function LayerlingEditor({
         const message = shellToolErrorText(error, target);
         setShellTool((current) => current ? { ...current, busy: false, error: message } : current);
       });
-  }, [commitShapes, hollowedWithTool, offsetShape, selectedShape, selectedShapes.length, shellTool, shellToolErrorText]);
+  }, [commitShapes, hollowedWithTool, offsetShape, selectedShape, selectedShapes.length, shellBody, shellTool, shellToolErrorText, withLidsRemade]);
 
   /*
    * The preview (Discussion #1811): a moment after the panel's settings come to rest the body is hollowed with them and
@@ -9892,24 +9993,33 @@ export function LayerlingEditor({
    */
   const keepHollowing = useCallback(async (target: WorkplaneShape, tool: NonNullable<typeof shellTool>) => {
     const fingerprint = projectShapesFingerprint([target]);
+    // In the design it may be the group a lid's parts were put in with the box (lidGroupBody): that is what must not change.
+    const standing = shapesRef.current.find((candidate) => candidate.id === target.id);
+    const standingFingerprint = standing ? projectShapesFingerprint([standing]) : null;
     const built = shellPreviewBuiltRef.current;
     setShellTool(null);
     try {
       const modifiedShape = built && built.key === shellPreviewKey(fingerprint, tool) ? built.shape : await hollowedWithTool(target, tool);
-      const now = shapesRef.current.find((candidate) => candidate.id === target.id);
+      const unchanged = () => {
+        const now = shapesRef.current.find((candidate) => candidate.id === target.id);
+        return Boolean(now) && projectShapesFingerprint([now!]) === standingFingerprint;
+      };
       // Changed or deleted in the meantime: nothing is laid over it.
-      if (!modifiedShape || !now || projectShapesFingerprint([now]) !== fingerprint) return false;
+      if (!modifiedShape || !unchanged()) return false;
+      // A lid made for this body follows it: made again for the box as it is now, in the same step.
+      const next = await withLidsRemade(shapesRef.current.map((candidate) => candidate.id === target.id ? modifiedShape : candidate), modifiedShape);
+      if (!unchanged()) return false;
       commitShapes(
-        shapesRef.current.map((candidate) => candidate.id === target.id ? modifiedShape : candidate),
+        next.shapes,
         selectedIdsRef.current,
-        t(shellOpenSides(tool.openings).length === 0 ? "status.shelledClosed" : "status.shelled", { size: Number(tool.thickness.toFixed(2)) }),
+        lidsRemadeNote(t(shellOpenSides(tool.openings).length === 0 ? "status.shelledClosed" : "status.shelled", { size: Number(tool.thickness.toFixed(2)) }), next),
       );
       return true;
     } catch (error) {
       setNotice(shellToolErrorText(error, target), true);
       return false;
     }
-  }, [commitShapes, hollowedWithTool, shellToolErrorText]);
+  }, [commitShapes, hollowedWithTool, shellToolErrorText, withLidsRemade]);
   const keepHollowingRef = useRef(keepHollowing);
   keepHollowingRef.current = keepHollowing;
   const shellTargetId = shellPreviewTarget?.id ?? null;
@@ -10201,6 +10311,28 @@ export function LayerlingEditor({
     // The bodies are in the key: measured again when they change, not when anything else does.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [lidNeckKey, lidNeckWaits]);
+  /**
+   * The body's compartments for the lid panel's labels, as Make lid numbers them (`lidRoomsForShapes`): measured off the
+   * page while labels are asked for, again whenever the bodies change. `rooms` is undefined while they are measured, null
+   * for a body without an opening at the top.
+   */
+  const [lidRooms, setLidRooms] = useState<{ key: string; rooms: Awaited<ReturnType<typeof lidRoomsOffThread>> | undefined } | null>(null);
+  const lidRoomsAsked = Boolean(lidTool && lidTool.labelSide !== "none" && lidLabelsFit(lidTool));
+  const lidRoomsKey = useMemo(() => lidRoomsAsked && lidNeckTargets.length ? projectShapesFingerprint(lidNeckTargets) : null, [lidRoomsAsked, lidNeckTargets]);
+  useEffect(() => {
+    if (!lidRoomsKey) {
+      setLidRooms(null);
+      return;
+    }
+    setLidRooms({ key: lidRoomsKey, rooms: undefined });
+    const abort = new AbortController();
+    void lidRoomsOffThread(lidNeckTargets, abort.signal).then((measured) => {
+      if (!abort.signal.aborted) setLidRooms({ key: lidRoomsKey, rooms: measured });
+    });
+    return () => abort.abort();
+    // The bodies are in the key: measured again when they change, not when anything else does.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [lidRoomsKey]);
   const fitLidNeck = useCallback(() => {
     if (!lidTool || lidTool.threadStandard === "own" || lidNeckTargets.length !== 1 || lidNeckFitting) return;
     setLidNeckFitting(true);
@@ -17141,6 +17273,8 @@ export function LayerlingEditor({
           sliderPlay: params.sliderPlay,
           latchLabel: params.latchLabel,
           stackTop: params.stackTop,
+          labelSide: params.labelSide,
+          labels: params.labels,
         }, targets);
         if (!result.ok) throw new Error(fittedToNeck !== null ? `${result.message} (The body was fitted to the neck first, ${fittedToNeck} mm across; undo takes that back.)` : result.message);
         const made = currentShapes().find((shape) => shape.id === result.id);
@@ -17715,12 +17849,14 @@ export function LayerlingEditor({
           ? { width: clampShellShelfWidth(params.shelf), height: clampShellShelfHeight(typeof params.shelfHeight === "number" ? params.shelfHeight : DEFAULT_SHELL_SHELF_HEIGHT) }
           : undefined;
         const modifiedShape = await shellShape(target, thickness, openings, edges, target, undefined, { stack, stackFoot, grid, dividers, shelf });
+        // A lid made for this body follows it, as with the Hollow tool.
+        const lids = await withLidsRemade(shapesRef.current.map((candidate) => candidate.id === target.id ? modifiedShape : candidate), modifiedShape);
         commitShapes(
-          shapesRef.current.map((candidate) => candidate.id === target.id ? modifiedShape : candidate),
+          lids.shapes,
           modifiedShape.id,
-          t("status.shelledMcp", { size: Number(thickness.toFixed(2)) }),
+          lidsRemadeNote(t("status.shelledMcp", { size: Number(thickness.toFixed(2)) }), lids),
         );
-        return { object: mcpShapeSummary(modifiedShape), thickness, openings, edges, ...(stack > 0 ? { stack } : {}), ...(stackFoot?.hollow ? { stackHollow: true } : {}), ...(stackFoot?.grip ? { stackGrip: stackFoot.grip, stackGripDepth: stackFoot.gripDepth, stackGripSides: stackFoot.gripSides, ...(stackFoot.gripHeight !== undefined ? { stackGripHeight: stackFoot.gripHeight } : {}), ...(stackFoot.gripAt ? { stackGripAt: stackFoot.gripAt } : {}) } : {}), ...(grid ? { gridCells: grid.cells, gridFit: grid.fit, ...(grid.magnets ? { gridMagnets: true } : {}), ...(grid.screws ? { gridScrews: true } : {}) } : {}), ...(dividers ? { dividersX: dividers.x, dividersZ: dividers.z, ...(dividers.height !== undefined ? { dividerHeight: dividers.height } : {}), ...(dividers.thickness !== undefined ? { dividerThickness: dividers.thickness } : {}) } : {}), ...(shelf ? { shelf: shelf.width, shelfHeight: shelf.height } : {}) };
+        return { object: mcpShapeSummary(modifiedShape), ...(lids.remade ? { lidsRemade: lids.remade } : {}), ...(lids.failed !== null ? { lidNotRemade: lids.failed } : {}), thickness, openings, edges, ...(stack > 0 ? { stack } : {}), ...(stackFoot?.hollow ? { stackHollow: true } : {}), ...(stackFoot?.grip ? { stackGrip: stackFoot.grip, stackGripDepth: stackFoot.gripDepth, stackGripSides: stackFoot.gripSides, ...(stackFoot.gripHeight !== undefined ? { stackGripHeight: stackFoot.gripHeight } : {}), ...(stackFoot.gripAt ? { stackGripAt: stackFoot.gripAt } : {}) } : {}), ...(grid ? { gridCells: grid.cells, gridFit: grid.fit, ...(grid.magnets ? { gridMagnets: true } : {}), ...(grid.screws ? { gridScrews: true } : {}) } : {}), ...(dividers ? { dividersX: dividers.x, dividersZ: dividers.z, ...(dividers.height !== undefined ? { dividerHeight: dividers.height } : {}), ...(dividers.thickness !== undefined ? { dividerThickness: dividers.thickness } : {}) } : {}), ...(shelf ? { shelf: shelf.width, shelfHeight: shelf.height } : {}) };
       }
 
       if (command.action === "offset_object") {
@@ -22089,6 +22225,7 @@ export function LayerlingEditor({
             fitting: lidNeckFitting,
             onFit: fitLidNeck,
           } : null}
+          rooms={lidRooms ? lidRooms.rooms : null}
         />
       ) : null}
       {moldTool ? (
@@ -22188,17 +22325,17 @@ export function LayerlingEditor({
           onCancel={() => setShellTool(null)}
         />
       ) : null}
-      {shellTool && shellTool.mode !== "offset" && selectedShape ? (
+      {shellTool && shellTool.mode !== "offset" && shellBody ? (
         <ShellPanel
-          targetName={selectedShape.name}
+          targetName={shellBody.name}
           thickness={shellTool.thickness}
-          maxThickness={shellMaxThickness({ width: shapeWidth(selectedShape), depth: shapeDepth(selectedShape), height: selectedShape.height }, shellTool.openings)}
+          maxThickness={shellMaxThickness({ width: shapeWidth(shellBody), depth: shapeDepth(shellBody), height: shellBody.height }, shellTool.openings)}
           openings={shellTool.openings}
           workspace={workspaceSettings}
           busy={shellTool.busy}
           previewBusy={shellPreviewBusy}
           error={shellTool.error}
-          roundedEdgesHint={selectedShape.kind === "roundedBox" && ((selectedShape.topBottomFillet ?? 0) > 0 || (selectedShape.bottomFillet ?? 0) > 0)}
+          roundedEdgesHint={shellBody.kind === "roundedBox" && ((shellBody.topBottomFillet ?? 0) > 0 || (shellBody.bottomFillet ?? 0) > 0)}
           appliedFeatureCount={selectedEdgeFeatureCount}
           reversibleFeatureCount={selectedReversibleEdgeFeatureCount}
           historyOptions={selectedEdgeHistoryOptions}
@@ -22208,7 +22345,7 @@ export function LayerlingEditor({
           onOpeningsChange={(value) => setShellTool((current) => {
             if (!current) return current;
             // A wall that fitted a frame may be too thick once a floor has to stay.
-            const max = shellMaxThickness({ width: shapeWidth(selectedShape), depth: shapeDepth(selectedShape), height: selectedShape.height }, value);
+            const max = shellMaxThickness({ width: shapeWidth(shellBody), depth: shapeDepth(shellBody), height: shellBody.height }, value);
             // Stacking, the Gridfinity floor and the dividers are only for a box with the top as its one open side.
             const sides = shellOpenSides(value);
             const topOnly = sides.length === 1 && sides[0] === "top";
@@ -22220,18 +22357,18 @@ export function LayerlingEditor({
           onGridMagnetsChange={(magnets) => setShellTool((current) => current ? { ...current, gridMagnets: magnets, error: null } : current)}
           gridScrews={shellTool.gridScrews === true}
           onGridScrewsChange={(screws) => setShellTool((current) => current ? { ...current, gridScrews: screws, error: null } : current)}
-          gridMax={shellGridEstimate(shapeWidth(selectedShape), shapeDepth(selectedShape), shellTool.thickness).max}
-          gridColumns={shellTool.gridColumns ?? shellGridEstimate(shapeWidth(selectedShape), shapeDepth(selectedShape), shellTool.thickness).columns}
-          gridRows={shellTool.gridRows ?? shellGridEstimate(shapeWidth(selectedShape), shapeDepth(selectedShape), shellTool.thickness).rows}
+          gridMax={shellGridEstimate(shapeWidth(shellBody), shapeDepth(shellBody), shellTool.thickness).max}
+          gridColumns={shellTool.gridColumns ?? shellGridEstimate(shapeWidth(shellBody), shapeDepth(shellBody), shellTool.thickness).columns}
+          gridRows={shellTool.gridRows ?? shellGridEstimate(shapeWidth(shellBody), shapeDepth(shellBody), shellTool.thickness).rows}
           onGridSize={(columns, rows) => setShellTool((current) => current ? { ...current, gridColumns: columns, gridRows: rows, error: null } : current)}
           dividers={shellTool.dividers ?? null}
           pocketParts={shellPocketParts}
           onAddPocket={(partId) => void addShellPocket(partId)}
-          insideWidth={Math.max(0, shapeWidth(selectedShape) - 2 * shellTool.thickness)}
-          insideDepth={Math.max(0, shapeDepth(selectedShape) - 2 * shellTool.thickness)}
+          insideWidth={Math.max(0, shapeWidth(shellBody) - 2 * shellTool.thickness)}
+          insideDepth={Math.max(0, shapeDepth(shellBody) - 2 * shellTool.thickness)}
           // The dividers' full height over the floor: the body's height less its floor (the Gridfinity floor's 6.2 mm, or the wall).
           // Under a shelf ledge, up to its top: the ledge's height is measured from the wall's floor.
-          dividerFullHeight={Math.max(0, Math.round((Math.min(selectedShape.height, (shellTool.shelf ?? 0) > 0 ? shellTool.thickness + (shellTool.shelfHeight ?? DEFAULT_SHELL_SHELF_HEIGHT) : Infinity) - ((shellTool.gridCells ?? 0) > 0 ? shellGridFloor({ magnets: shellTool.gridMagnets, screws: shellTool.gridScrews }) : shellTool.thickness)) * 10) / 10)}
+          dividerFullHeight={Math.max(0, Math.round((Math.min(shellBody.height, (shellTool.shelf ?? 0) > 0 ? shellTool.thickness + (shellTool.shelfHeight ?? DEFAULT_SHELL_SHELF_HEIGHT) : Infinity) - ((shellTool.gridCells ?? 0) > 0 ? shellGridFloor({ magnets: shellTool.gridMagnets, screws: shellTool.gridScrews }) : shellTool.thickness)) * 10) / 10)}
           // A Gridfinity floor takes the dividers away: its bins fill the cells, with no room for a divider.
           onGridChange={(cells, fit) => setShellTool((current) => current ? { ...current, gridCells: cells, gridFit: fit, ...(cells > 0 ? { dividers: null } : {}), error: null } : current)}
           onDividersChange={(value) => setShellTool((current) => current ? { ...current, dividers: value, error: null } : current)}

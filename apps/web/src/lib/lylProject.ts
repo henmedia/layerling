@@ -2024,6 +2024,14 @@ function validateShapeDefinition(definition: Record<string, unknown>, label: str
       throw new Error(`${label}.loftThrough must be smooth or straight`);
     }
   }
+  if (definition.lidFor !== undefined) {
+    const link = definition.lidFor as { body?: unknown; options?: unknown; parts?: unknown; rooms?: unknown } | null;
+    if (!link || typeof link !== "object" || Array.isArray(link)) throw new Error(`${label}.lidFor must be an object`);
+    if (typeof link.body !== "string" || !link.body) throw new Error(`${label}.lidFor.body must be an object id`);
+    if (!link.options || typeof link.options !== "object" || Array.isArray(link.options)) throw new Error(`${label}.lidFor.options must be an object`);
+    if (link.parts !== undefined && (!Array.isArray(link.parts) || link.parts.length > 16 || link.parts.some((id) => typeof id !== "string"))) throw new Error(`${label}.lidFor.parts must be a list of object ids`);
+    if (link.rooms !== undefined && (!Array.isArray(link.rooms) || link.rooms.length > 256 || link.rooms.some((at) => !Array.isArray(at) || at.length !== 2 || !at.every((value) => typeof value === "number" && Number.isFinite(value))))) throw new Error(`${label}.lidFor.rooms must be a list of points`);
+  }
   if (kind === "dovetail") {
     // Lenient on purpose: the geometry clamps the values itself; only nonsense is refused.
     for (const key of ["dovetailNeckWidth", "dovetailClearance"] as const) {
