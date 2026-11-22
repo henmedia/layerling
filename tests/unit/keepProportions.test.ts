@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { keepsProportionsForUpdate, keepsProportionsOnAxis } from "@/lib/keepProportions";
+import { keepsProportionsForUpdate, keepsProportionsOnAxis, proportionsKeptOnce, withProportionsKeptOnce } from "@/lib/keepProportions";
 
 describe("keep proportions", () => {
   it("keeps a text's height out of it, the height being the thickness of the letters (#724)", () => {
@@ -25,5 +25,18 @@ describe("an angle typed with keep proportions on (#1763)", () => {
   it("still scales the other sizes along for a size typed in", () => {
     expect(keepsProportionsForUpdate({ kind: "wedge" }, { resizeAxis: "height" })).toBe(true);
     expect(keepsProportionsForUpdate({ kind: "text" }, { resizeAxis: "height" })).toBe(false);
+  });
+});
+
+describe("a size confirmed with Shift+Enter in the properties (#1872)", () => {
+  it("keeps the proportions for the change handed on meanwhile, and no longer", () => {
+    expect(proportionsKeptOnce()).toBe(false);
+    expect(withProportionsKeptOnce(() => proportionsKeptOnce())).toBe(true);
+    expect(proportionsKeptOnce()).toBe(false);
+  });
+
+  it("ends with the change even if handing it on fails", () => {
+    expect(() => withProportionsKeptOnce(() => { throw new Error("no"); })).toThrow("no");
+    expect(proportionsKeptOnce()).toBe(false);
   });
 });

@@ -126,6 +126,10 @@ export type ShapeCustomization = {
   height?: number;
   maxDimension?: number;
   cornerFillet?: number;
+  /** Polygon: a flat side faces the front instead of a corner, so an octagon measures from flat to flat (Discussion #1787). */
+  polygonFlat?: boolean;
+  /** Polygon: the Roof of the shape library (#1931), three sides for good; its panel offers no side count and no flat side. */
+  polygonRoof?: boolean;
   /** Rounded box with flat top and bottom: an own radius for each corner (back left, back right, front right, front left); wins over cornerFillet. */
   cornerFillets?: [number, number, number, number];
   topBottomFillet?: number;
@@ -716,6 +720,19 @@ export type SketchStrokeAlign = "center" | "inside" | "outside" | "grow" | "shri
 export type SketchStrokeJoin = "miter" | "round" | "bevel";
 export type SketchStrokeCap = "flat" | "square" | "round";
 /**
+ * A layer of a name tag or an icon tag laid in flush instead of stacked: all layers end on the same top. Every layer above the
+ * bottom one is `depth` high; the bottom one keeps its own height and carries the others. Each layer has a pocket `depth` deep
+ * in its top, the shape of the layer above it (`pocket`: that layer's widening, corners and holes), which that layer fills - so
+ * the colours lie side by side on one flat face, none on another. `height` is the layer's own height in the stack, kept so the
+ * stack comes back as it was when it is stacked again. The top layer has no pocket.
+ */
+export type FlushLayer = {
+  depth: number;
+  height: number;
+  pocket?: { grow: number; join?: SketchStrokeJoin; silhouette?: boolean };
+};
+
+/**
  * A sketch drawn as a line of this width instead of a filled area (#154). `edge` makes the wall a cutting edge (#982): its top
  * runs in to that width with a 45° chamfer on both sides; only for a line inside, outside or centred, and narrower than the line.
  */
@@ -769,6 +786,8 @@ export type SketchProfile = {
   silhouette?: boolean;
   /** A key ring hole cut through the body, with its ear on the bottom layer of an icon tag (#391). */
   keyring?: SketchKeyring;
+  /** A layer of an icon tag laid in flush, as a name tag's (textFlush): see FlushLayer. */
+  flush?: FlushLayer;
   /** Built set in from its outlines by the face tool: the body keeps the face's outline and builds the inset from it. */
   inset?: SketchInset;
   /** Which edge of a swept cross-section runs along the path: "center" (the default, left out) or "left"/"right" as seen along the path. */
@@ -1509,6 +1528,10 @@ export type WorkplaneShape = {
   /** Port opening: extra room in mm on every side on top of the preset's, already in width and height; it lets the preset be recognised. */
   portClearance?: number;
   cornerFillet?: number;
+  /** Polygon: a flat side faces the front instead of a corner, so an octagon measures from flat to flat (Discussion #1787). */
+  polygonFlat?: boolean;
+  /** Polygon: the Roof of the shape library (#1931), three sides for good; its panel offers no side count and no flat side. */
+  polygonRoof?: boolean;
   /** Rounded box with flat top and bottom: an own radius for each corner (back left, back right, front right, front left); wins over cornerFillet. */
   cornerFillets?: [number, number, number, number];
   topBottomFillet?: number;
@@ -1541,6 +1564,11 @@ export type WorkplaneShape = {
   /** Text only (#215): the letters without their counters (the holes in O, A, e), as the usual Silhouette. */
   textSilhouette?: boolean;
   /**
+   * A layer of a name tag laid in flush (#215): every layer's top on one level, the layer under each colour set in
+   * where the colour above lies, so the tag's face is flat. See FlushLayer.
+   */
+  textFlush?: FlushLayer;
+  /**
    * Straight text only (#382): the letters are stretched to fill the box in both directions, so a
    * capital can be made lower or narrower as in Tinkercad. Without it the letters keep their
    * proportions and are fitted into the box, centred.
@@ -1567,6 +1595,12 @@ export type WorkplaneShape = {
    * font has it, below narrower, above wider (25 to 400). The letters keep their height; the arc and the box follow.
    */
   textLetterWidth?: number;
+  /**
+   * Curved text only (#1840): the line closes the circle - the letters are spread evenly over all of it, so the gap
+   * between the last and the first is the same as between the others (a date ring, a dial). Text too long for the
+   * circle gets smaller letters instead. Not for a column of upright letters (textVertical).
+   */
+  textFullCircle?: boolean;
   /**
    * Text only (#225): the top edge of the letters rounded or chamfered by `size` mm, as a name
    * tag's letters on top are finished. Built from the outline stepped inwards, so it works for

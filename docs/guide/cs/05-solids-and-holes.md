@@ -123,6 +123,8 @@ Upozornění: zkosení a zaoblení provedená na **celém** sloučeném tělese 
 
 Pro tisk položte polovinu s drážkou na její plochu řezu a polovinu s lištou tiskněte obráceně, plochou řezu nahoru: boky lišty se pak odklánějí ven jen o svůj úhel, a to se vytiskne bez podpor.
 
+{{ui:split.connectors.magnets}} dá do každé poloviny kapsu na kulatý magnet, naproti sobě přes řez, každou s užší jamkou na lepidlo pod ní, jak je dělá nástroj {{ui:magnetPocket.title}}. Poloviny drží pohromadě, a přesto jdou rozebrat. {{ui:magnetPocket.size}} nabízí běžné magnety od 2 × 1 do 12 × 3 mm, nebo nastavte {{ui:magnetPocket.diameter}} a {{ui:magnetPocket.height}}; {{ui:split.connectorClearance}} je vůle kolem magnetu. Místo bez dostatečné stěny nebo tloušťky se vynechá. Před vtlačením přiložte každý pár k sobě, aby se přitahoval.
+
 Výřezy se rozdělují bez spojovacích prvků.
 
 {{ui:split.modeStretch}} nahoře v panelu vedle {{ui:split.modeSplit}} výběr v rovině prodlouží, místo aby ho rozřízl na dvě části - třeba staženou krabičku bez souboru CAD, jejíž přihrádka má být delší. Umístěte rovinu jako při dělení, přes část, která smí narůst, a zadejte {{ui:split.stretchLength}}: část na straně, kam ukazuje šipka, se posune o tuto délku a řez tělesem v rovině, protažený o tuto délku, vyplní mezeru. Rovné stěny a dna se prodlouží; přihrádky, zaoblení a otvory na obou stranách si zachovají velikost. Záporná hodnota ho zkrátí: na straně šipky se odebere plátek této tloušťky a zbytek se přisune. {{ui:split.stretchApply}} změnu použije; každý objekt, který rovina protne, zůstane jedním uzavřeným tělesem se svým názvem, polygonovou sítí jako poloviny při dělení. Vede-li rovina šikmou nebo zaoblenou částí, její řez se protáhne rovně; umístěte ji proto tam, kde je těleso rovné.

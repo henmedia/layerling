@@ -176,6 +176,17 @@ A beégetős menetes betétet forrasztópákával nyomják be a műanyag alkatr�
 
 A lyuk közönséges lyukforma, a testtel csoportosítva, mint a lyukminta lyukai, és a CAD-kernel valódi hengerként vágja ki, így a furat pontos. A {{ui:editor.tool.ungroup}} újra felszabadítja a lyukat. Olyan mély, amilyen hosszú a betét, és kissé kiáll a lapból, hogy tisztán nyíljon. Egy MI ugyanezt az MCP-hídon át a `layerling_thread_insert` eszközzel teheti meg (lásd az [MI MCP-vel](chapter:ai-with-mcp) fejezetet).
 
+## Mágnesfészek
+
+A figurafestők ragasztás helyett kis kerek mágneseket tesznek egy többrészes figura illesztéseibe: így festéshez és szállításhoz szétszedhető; dobozok és fedelek ugyanígy tartanak. A {{ui:magnetPocket.title}} eszköz kivágja a fészket: olyan mélyre, mint a mágnes, plusz 0,2 mm, hogy épp a lap alatt üljön, alatta pedig egy keskenyebb ragasztóüreget, hogy a ragasztónak legyen helye, a mágnes egy peremen feküdjön, és ne csússzon bele egy üreges nyomatba. A fészek és az üreg egy fordított cilinderkalap. Jelölj ki pontosan egy testet, nyisd meg az alakzatkönyvtárat, és kattints a {{ui:magnetPocket.title}} elemre a {{ui:library.section.holes}} alatt, vagy keresd meg a [[Ctrl]]+[[K]] billentyűkkel.
+
+1. Válaszd ki a {{ui:magnetPocket.size}} értékét 2 × 1 és 12 × 3 mm között, vagy írd be a mágnes átmérőjét és magasságát. A {{ui:magnetPocket.gap}} kezdetben 0,1 mm; a {{ui:magnetPocket.well}} be van kapcsolva.
+2. Kattints a helyre: egy sík lapra vagy egy henger vagy cső külső falára, mint a menetes betétnél. Egy gyűrű mutatja a fészket: zöld, ha mellette 1 mm fal és mögötte elég mélység van, piros, ha nem, az okkal együtt. Húzd, írd be a helyét, vagy tedd a lap közepére.
+3. A {{ui:magnetPocket.both}} (kezdetben bekapcsolva) megkeresi azt az alkatrészt, amely ott legfeljebb 1 mm-re a laphoz ér: az illesztés másik felét, úgy állva, ahogy illeszkedik. Ugyanazt a fészket kapja szemben, hogy a mágnesek találkozzanak; egy második gyűrű mutatja, egy sor pedig megmondja, miért nem kap egy alkatrész fészket. Ha a másik alkatrész eltakarja a lapot, rejtsd el azt az alkatrészt: a fészkét így is megkapja.
+4. Csak a {{ui:magnetPocket.apply}} vágja ki a fészkeket.
+
+Minden fészek egy közönséges lyuk, csoportosítva az alkatrészével; az {{ui:editor.tool.ungroup}} felszabadítja. A mágnesek bepréselése előtt tedd össze mindegyik párt, hogy vonzzák egymást, és jelöld meg a külső oldalt. A felosztó eszköz is kínál mágneseket kötőelemként. Egy MI ugyanezt teszi a `layerling_magnet_pocket` paranccsal (lásd a [MI és MCP](chapter:ai-with-mcp) fejezetet).
+
 ## Lap kitolása vagy benyomása
 
 Vastagabb falhoz, egy lapra emelt párnához vagy egy belevágott zsebhez a {{ui:faceTool.title}} eszköz egyetlen sík lapon dolgozik. Importált STL-en is működik, ahol nincs módosítható vázlat. Jelölj ki pontosan egy testet, és kattints a szalag {{ui:editor.section.mirrorPattern}} csoportjában a {{ui:faceTool.title}} gombra, a lyukminta mellett. A testre jobb gombbal is kattinthatsz, vagy megkeresheted a [[Ctrl]]+[[K]] billentyűkkel.

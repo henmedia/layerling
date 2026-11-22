@@ -187,6 +187,17 @@ En varmeindsats presses ind i en plastdel med en loddekolbe og giver skruer et g
 
 Hullet er en almindelig hulform grupperet med formen, ligesom hullerne i hulmønsteret, og CAD-kernen skærer det som en ægte cylinder, så boringen er præcis. {{ui:editor.tool.ungroup}} frigør hullet igen. Det er lige så dybt, som indsatsen er lang, og står lidt ud af fladen, så det åbner rent. En AI kan gøre det samme gennem MCP-broen med `layerling_thread_insert` (se kapitlet [AI med MCP](chapter:ai-with-mcp)).
 
+## Magnetlomme
+
+Figurmalere sætter små runde magneter i samlingerne på en figur i flere dele i stedet for at lime den: så kan den skilles ad til maling og forsendelse; æsker og låg holder på samme måde. Værktøjet {{ui:magnetPocket.title}} skærer lommen: lige så dyb som magneten plus 0,2 mm, så den sidder lige under fladen, og under den en smallere limbrønd, så limen har plads, og magneten hviler på en kant og ikke glider ind i et hult print. Lomme og brønd er en omvendt høj hat. Vælg præcis ét legeme, åbn formbiblioteket og klik på {{ui:magnetPocket.title}} under {{ui:library.section.holes}}, eller find det med [[Ctrl]]+[[K]].
+
+1. Vælg {{ui:magnetPocket.size}}, fra 2 × 1 til 12 × 3 mm, eller skriv magnetens diameter og højde. {{ui:magnetPocket.gap}} starter på 0,1 mm; {{ui:magnetPocket.well}} er slået til.
+2. Klik på stedet, en plan flade eller ydervæggen på en cylinder eller et rør, som ved gevindindsatsen. En ring viser lommen: grøn, hvor delen har 1 mm væg ved siden af og dybden bagved, rød, hvor ikke, med grunden. Træk den, skriv dens placering eller flyt den til midten af fladen.
+3. {{ui:magnetPocket.both}} (slået til fra start) leder efter den del, der ligger op ad fladen dér, højst 1 mm væk: den anden halvdel af samlingen, placeret som den passer. Den får samme lomme lige overfor, så magneterne mødes; en anden ring viser den, og en linje siger, hvorfor en del ingen får. For at nå en flade, som den anden del dækker, så skjul den del: den får stadig sin lomme.
+4. Først {{ui:magnetPocket.apply}} skærer lommerne.
+
+Hver lomme er et almindeligt hul grupperet med sin del; {{ui:editor.tool.ungroup}} frigør det. Hold hvert par magneter sammen, så de tiltrækker hinanden, og marker ydersiden, før du trykker dem i. Del-værktøjet har også magneter som forbindelse. En AI gør det samme med `layerling_magnet_pocket` (se kapitlet [AI med MCP](chapter:ai-with-mcp)).
+
 ## Skub en flade ud eller ind
 
 Til en tykkere væg, et hævet stykke på en flade eller en lomme skåret ind i den arbejder {{ui:faceTool.title}} på én flad flade. Det virker også på en importeret STL, hvor der ingen skitse er at ændre. Vælg præcis én form og klik på {{ui:faceTool.title}} i {{ui:editor.section.mirrorPattern}}-gruppen i båndet, ved siden af hulmønsteret. Du kan også højreklikke på formen, eller finde den med [[Ctrl]]+[[K]].

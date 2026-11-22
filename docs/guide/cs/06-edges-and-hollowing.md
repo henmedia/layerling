@@ -161,6 +161,8 @@ Klikněte na {{ui:mold.apply}}: díly leží vedle vzoru tak, jak se tisknou bez
 
 Nejčastější potíží u forem je odlitek, který uvízne. Kde je vzor nad dělením širší než pod ním, okno upozorní na podkos: posuňte {{ui:mold.parting}} tam, kde je vzor nejširší, otočte vzor nebo použijte rámeček na silikon, který podkosy uvolní.
 
+S volbou {{ui:mold.ownOpenings}} sami určíte, kudy materiál vtéká a kudy uniká vzduch. Vtok a odvzdušnění se pak už neumisťují samy: pod {{ui:mold.openings.kind}} zvolte, zda kliknutí vloží {{ui:mold.openings.sprue}} nebo {{ui:mold.openings.vent}}, a klikněte na vzor v pohledu. Otvor vede z tohoto místa přímo horní polovinou až k horní straně formy, ve směru, kterým se forma otevírá. Kliknutí na sloupek otvoru ho zase odebere; okno otvory vypisuje s jejich polohou, každý s tlačítkem pro odebrání. {{ui:mold.openings.suggested}} naplní seznam otvory, které by Layerling umístil sám, takže můžete začít od nich a upravit je. Otvor vedle vzoru se vynechá a ohlásí, forma bez vtoku dostane upozornění, protože ji nelze naplnit, a nejvyšší bod bez otvoru poblíž se dál ukazuje jako červená tečka, abyste viděli, kde by zůstal vzduch.
+
 > **Tip:** Vytištěnou formu utěsněte (pryskyřicí nebo voskem) a použijte separátor, jinak se odlitek zachytí ve vrstvách tisku. PLA měkne už od asi 55 °C: pro horký vosk, mýdlo nebo pryskyřici, která se při tuhnutí zahřívá, tiskněte formu z PETG nebo ASA.
 
 ## Kabelový kanál tělesem

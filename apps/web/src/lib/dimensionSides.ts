@@ -32,3 +32,15 @@ export function ownSideForMark(markFrame: FrameAxes, ownFrame: FrameAxes, markAx
   };
   return { axis, convertSigns };
 }
+
+/**
+ * A body lying on its side (Discussion #1838): its own height runs along the workplane, under a mark on the plate.
+ * Which end of that height the handle of the mark stands at - the body's own top or its base ("bottom") - so a
+ * typed size holds the other one; null when the handle does not pull along that mark.
+ */
+export function ownHeightSidePressed(markFrame: FrameAxes, ownFrame: FrameAxes, markAxis: "width" | "depth", signs: Signs): "top" | "bottom" | null {
+  const sign = markAxis === "width" ? signs.x : signs.z;
+  if (!sign || !ownFrame.yAxis) return null;
+  const along = (markAxis === "width" ? markFrame.xAxis : markFrame.zAxis).dot(ownFrame.yAxis) * sign;
+  return Math.abs(along) < 0.5 ? null : along > 0 ? "top" : "bottom";
+}

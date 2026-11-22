@@ -11,6 +11,7 @@ import { ThemeSwitch } from "@/components/ThemeSwitch";
 import { useAppUpdate } from "@/lib/useAppUpdate";
 import { sharedProjectSaveTarget } from "@/lib/sharedProjectTarget";
 import { storeFolderNameProblem, suggestStoreFolderName } from "@/lib/storeFolderName";
+import { folderNameParts } from "@/lib/folderEmoji";
 import {
   DESIGN_FOLDERS_STORAGE_KEY,
   childFolders,
@@ -84,7 +85,7 @@ import { useFileAccept } from "@/lib/fileAccept";
 import { dropBackupTarget, linkedLylFile, lylFileAccessSupported, onLylFilesLaunched, pickBackupTarget, pickFilesToImport, rememberLylFile, writeBackupTarget, type LylFileHandle } from "@/lib/lylFileAccess";
 import { exportLylProject, importLylProject, inspectLylProjectPackage, LYL_CREATED_WITH_VERSION, LYL_MEDIA_TYPE, withLylProjectName, withLylThumbnail } from "@/lib/lylProject";
 import { relieveOverFineCadMeshes, type RemeshCadBrep } from "@/lib/cadMeshRelief";
-import { backupDesignAlreadyThere, backupEntryPaths, backupFileName, backupFolderPaths, backupNamePrefix, backupThumbnailPath, unpackBackupFolders, isBackupFileName, createBackupWriter, unpackBackup, unpackBackupSettingsText, SETTINGS_BACKUP_FILE, zipHoldsDesigns } from "@/lib/projectBackup";
+import { backupDesignAlreadyThere, backupRefillsDesign, backupEntryPaths, backupFileName, backupFolderPaths, backupNamePrefix, backupThumbnailPath, unpackBackupFolders, isBackupFileName, createBackupWriter, unpackBackup, unpackBackupSettingsText, SETTINGS_BACKUP_FILE, zipHoldsDesigns } from "@/lib/projectBackup";
 import { applySettingsFile, browserSettingsFile } from "@/lib/applySettingsFile";
 import { parseSettingsFile, settingsFileText } from "@/lib/settingsFile";
 import { CUSTOM_SHAPES_FOLDER } from "@/lib/customShapesServer";
@@ -2743,6 +2744,8 @@ export default function Home() {
       return;
     }
     const restoredProjects: DashboardProject[] = [];
+    // Cards that were here but empty and got their content back from the backup; they keep their place and folder.
+    const refilledProjects: DashboardProject[] = [];
     const restoredEntries: Record<string, ProjectShapeCacheEntry> = {};
     let restoredFolders = designFolders;
     let failed = 0;
@@ -2762,6 +2765,37 @@ export default function Home() {
         // A restore keeps the creation time of a design, so the same name and creation time means it is already here (#407).
         const restoredName = restored.projectName || projectNameFromFileName(entries[index].name);
         if (backupDesignAlreadyThere(projects, { name: restoredName, createdAt: restored.createdAt })) {
+          // A card of this browser whose content is gone (a crash can leave the list with names and counts but empty
+          // designs, forum RalphD05) is filled from the backup in place instead of blocking it.
+          const emptyCard = projects.find((project) => !project.sharedProject && project.createdAt === restored.createdAt && project.name === restoredName);
+          const storedHere = emptyCard && restored.shapes.length > 0
+            ? await loadProjectShapes(emptyCard.id).then((record) => record ? { shapes: record.shapes } : null, () => "unreadable" as const)
+            : undefined;
+          if (emptyCard && storedHere !== undefined && backupRefillsDesign(storedHere, restored.shapes.length)) {
+            const now = Date.now() + index;
+            const refilled: DashboardProject = {
+              ...emptyCard,
+              updatedAt: now,
+              revision: now,
+              shapes: restored.shapes.length,
+              workspace: restored.workspace,
+              snapGrid: restored.snapGrid,
+              placementElevation: restored.placementElevation,
+              placementWorkplane: restored.placementWorkplane,
+              sketchPlacementWorkplane: restored.sketchPlacementWorkplane,
+            };
+            const entry = projectShapeCacheEntry(now, restored.shapes, restored.history, restored.historyIndex, restored.assets, restored.attachments);
+            await saveProjectShapes(refilled.id, entry, projectShapeSaveContext(refilled));
+            if (restored.view) writeDesignView(refilled.id, restored.view);
+            if (restored.savedViews) writeSavedViews(refilled.id, restored.savedViews);
+            if (restored.cornerRulers) writeCornerRulers(refilled.id, restored.cornerRulers);
+            if (restored.tapeMeasurements) writeTape(refilled.id, restored.tapeMeasurements);
+            refilledProjects.push(refilled);
+            restoredEntries[refilled.id] = entry;
+            const thumbnail = entries[index].thumbnail;
+            if (thumbnail) restoredThumbnails.push({ projectId: refilled.id, image: pngDataUrl(thumbnail), shapes: restored.shapes.length });
+            continue;
+          }
           if (backupDesignAlreadyThere(projects.filter((project) => !project.sharedProject), { name: restoredName, createdAt: restored.createdAt })) alreadyThere += 1;
           else onServer += 1;
           continue;
@@ -2804,7 +2838,10 @@ export default function Home() {
       }
     }
     setProjectShapesById((current) => ({ ...current, ...restoredEntries }));
-    setProjects((current) => [...restoredProjects, ...current]);
+    setProjects((current) => [
+      ...restoredProjects,
+      ...current.map((project) => refilledProjects.find((refilled) => refilled.id === project.id) ?? project),
+    ]);
     // The pictures the backup holds go back on their cards; a design without one gets it when opened.
     for (const snapshot of restoredThumbnails) await updateProjectSnapshot(snapshot).catch(() => undefined);
     // Only the folders a restored design is in are made, and the empty folders the backup holds;
@@ -2824,16 +2861,17 @@ export default function Home() {
       || [...usedFolders].some((used) => folderTrail(restoredFolders, used).some((onTheWay) => onTheWay.id === folder.id)));
     if (keptFolders.length !== designFolders.length) setDesignFolders(keptFolders);
     const onServerNote = onServer > 0 ? ` ${t("notice.backupOnServerToo", { count: onServer })}` : "";
-    if (restoredProjects.length === 0 && failed === 0 && alreadyThere + onServer > 0) {
+    const restoredCount = restoredProjects.length + refilledProjects.length;
+    if (restoredCount === 0 && failed === 0 && alreadyThere + onServer > 0) {
       setDashboardNotice((alreadyThere === 0
         ? t("notice.backupAllOnServer", { count: onServer, name: file.name })
         : t("notice.backupAllThere", { count: alreadyThere + onServer, name: file.name }) + onServerNote) + shapesNote);
       return;
     }
-    const skippedNote = (alreadyThere > 0 && restoredProjects.length > 0 ? ` ${t("notice.backupAlreadyThere", { count: alreadyThere })}` : "") + onServerNote;
+    const skippedNote = (alreadyThere > 0 && restoredCount > 0 ? ` ${t("notice.backupAlreadyThere", { count: alreadyThere })}` : "") + onServerNote;
     setDashboardNotice((failed
-      ? t("notice.backupRestoredPartly", { count: restoredProjects.length, failed, name: file.name })
-      : t("notice.backupRestored", { count: restoredProjects.length, name: file.name })) + skippedNote + shapesNote + (serverProblem ? ` ${serverProblem}` : ""));
+      ? t("notice.backupRestoredPartly", { count: restoredCount, failed, name: file.name })
+      : t("notice.backupRestored", { count: restoredCount, name: file.name })) + skippedNote + shapesNote + (serverProblem ? ` ${serverProblem}` : ""));
   }, [dashboardSection, designFolders, newDesignsGoToServer, placeNewDesign, projects, refreshSharedProjects, serverAnswer, storeFolderPath, updateProjectSnapshot]);
 
   const importFilesFromDashboard = useCallback(
@@ -4321,6 +4359,7 @@ function Dashboard({
                   ) : null}
                   {shownSharedFolders.map((folder) => {
                     const folderPath = joinStorePath(folder.path ?? sharedPath, folder.name);
+                    const nameParts = folderNameParts(folder.name);
                     return (
                     <article
                       className={`project-card server-folder-card${dropFolderPath === folderPath ? " drop-target" : ""}`}
@@ -4332,10 +4371,14 @@ function Dashboard({
                         type="button"
                         onClick={() => (searchResults ? openFolderFromSearch(folderPath) : onOpenStoreFolder(folderPath))}
                       >
-                        <span className="project-preview server-folder-preview">
-                          {isShapesFolder(folder) ? <Shapes aria-hidden="true" /> : <FolderKanban aria-hidden="true" />}
+                        <span className={`project-preview server-folder-preview${nameParts.emoji ? " folder-emoji-preview" : ""}`}>
+                          {isShapesFolder(folder)
+                            ? <Shapes aria-hidden="true" />
+                            : nameParts.emoji
+                              ? <span className="folder-emoji" aria-hidden="true">{nameParts.emoji}</span>
+                              : <FolderKanban aria-hidden="true" />}
                         </span>
-                        <span className="project-card-title" translate="no">{folder.name}</span>
+                        <span className="project-card-title" translate="no" title={nameParts.emoji ? folder.name : undefined}>{nameParts.label}</span>
                         <span className="project-card-meta">{searchResults
                           ? (folder.path ? t("shared.searchFolderIn", { name: folder.path }) : t("shared.searchFolderRoot"))
                           : t("shared.folderMeta")}</span>
@@ -4627,6 +4670,7 @@ function Dashboard({
                   {visibleFolders.map((folder) => {
                     const contents = folderContents(designFolders, localDesigns, folder.id);
                     const where = folderPathNames(designFolders, folder.parentId);
+                    const nameParts = folderNameParts(folder.name);
                     return (
                       <article
                         className={`project-card server-folder-card local-folder-card${localDropTarget === folder.id ? " drop-target" : ""}${draggedFolderId === folder.id ? " dragging" : ""}`}
@@ -4649,10 +4693,12 @@ function Dashboard({
                             onOpenFolder(folder.id);
                           }}
                         >
-                          <span className="project-preview server-folder-preview">
-                            <Folder aria-hidden="true" />
+                          <span className={`project-preview server-folder-preview${nameParts.emoji ? " folder-emoji-preview" : ""}`}>
+                            {nameParts.emoji
+                              ? <span className="folder-emoji" aria-hidden="true">{nameParts.emoji}</span>
+                              : <Folder aria-hidden="true" />}
                           </span>
-                          <span className="project-card-title" translate="no">{folder.name}</span>
+                          <span className="project-card-title" translate="no" title={nameParts.emoji ? folder.name : undefined}>{nameParts.label}</span>
                           <span className="project-card-meta">{localSearch && where.length
                             ? t("shared.searchFolderIn", { name: where.join(" / ") })
                             : contents.designs === 0 && contents.folders === 0
@@ -5288,6 +5334,7 @@ function Dashboard({
           >
             <header>
               <strong id="new-folder-title">{folderDialog.mode === "create" ? t("shared.newFolderTitle") : t("shared.renameFolderTitle")}</strong>
+              <GuideHelpLink chapter="files" section="designFolders" iconSize={16} />
               <button type="button" aria-label={folderDialog.mode === "create" ? t("shared.newFolderCancel") : t("shared.renameFolderCancel")} onClick={closeFolderDialog}>
                 <X size={18} />
               </button>

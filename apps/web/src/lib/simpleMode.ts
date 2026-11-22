@@ -34,7 +34,7 @@ export const SIMPLE_MODE_TOOLS: ReadonlySet<string> = new Set([
 
 /** Library entries the simple mode keeps, by their ids in the shape catalogue. */
 export const SIMPLE_MODE_SHAPES: ReadonlySet<string> = new Set([
-  "box", "roundedBox", "cylinder", "sphere", "half-sphere", "cone", "pyramid", "wedge", "round-roof", "torus", "tube",
+  "box", "roundedBox", "cylinder", "sphere", "half-sphere", "cone", "pyramid", "wedge", "roof", "round-roof", "torus", "tube",
   "text", "nameTag", "star", "heart",
 ]);
 

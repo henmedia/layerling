@@ -166,6 +166,8 @@ For a {{ui:mold.kind.twoPart}} the window rates all three ways the mold could op
 
 {{ui:mold.direction.free}} opens it any way at all, for a master whose best way is slanted (a peg leaning out of a base, say): drag the violet knob in the view round its ring, or set {{ui:mold.openTilt}} (0° up and down, 90° sideways) and {{ui:mold.openTurn}}. The figure on the button is its undercut, to compare with the three straight ways; the halves still lie flat with their parting face up to print.
 
+With {{ui:mold.ownOpenings}} you decide yourself where the material goes in and where the air comes out. The sprue and the vents are then no longer placed by themselves: choose under {{ui:mold.openings.kind}} whether a click sets a {{ui:mold.openings.sprue}} or a {{ui:mold.openings.vent}}, and click on the master in the view. The opening runs from that spot straight through the upper half to the mold's top, the way the mold opens. A click on an opening's post takes it away again; the window lists the openings with their place, each with a button to remove it. {{ui:mold.openings.suggested}} fills the list with the openings Layerling would place by itself, so you can start from those and change them. An opening beside the master is left out and reported, a mold without a sprue gets a warning because it cannot be poured, and a high point with no opening nearby still shows as a red dot, so you see where air would stay.
+
 > **Tip:** Seal a printed mold (with resin or wax) and use release agent, or the cast keys into the layer lines. PLA softens from about 55 °C: for hot wax, soap or resin that gets hot as it sets, print the mold in PETG or ASA.
 
 ## A cable channel through a body

@@ -54,8 +54,8 @@ export function AlignOverlay({
     onAlign(axis, "center", false, { gap });
   };
   // Alt turns the dots into squares that stretch the parts instead of moving them (#998). Pressing or
-  // letting go of it over a dot shows the other preview at once. A tablet has no Alt key, so a switch
-  // beside the dots (shown where a finger or pen is the pointer) holds the same mode.
+  // letting go of it over a dot shows the other preview at once. A tablet has no Alt key, and many Linux
+  // desktops take Alt+click to move the window (#1770), so a switch beside the dots holds the same mode.
   const [sizeMode, setSizeMode] = useState(false);
   const [sizePinned, setSizePinned] = useState(false);
   const hovered = useRef<{ axis: AlignAxis; target: AlignTarget } | null>(null);

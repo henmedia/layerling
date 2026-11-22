@@ -66,7 +66,7 @@ function expectClosed(result: SurfaceTextureResult) {
 /** The body as the core sees it: the screen frame, z up. */
 const screenBase = (positions: number[]) => prepareSurfaceBase(insideToScreenPositions(positions));
 
-const NEW_PATTERNS: SurfaceTexturePattern[] = ["cells", "knit", "rope", "weave", "grain", "image"];
+const NEW_PATTERNS: SurfaceTexturePattern[] = ["cells", "hammered", "knit", "rope", "weave", "grain", "image"];
 const SMALL = { maxTriangles: 250_000 };
 
 describe("the patterns from the surface tool", () => {
@@ -154,9 +154,9 @@ describe("the patterns from the surface tool", () => {
     expect(deep).toBeGreaterThan(20);
   }, 60_000);
 
-  it("gives cells and grain another arrangement with another seed", () => {
+  it("gives cells, hammered dents and grain another arrangement with another seed", () => {
     const base = screenBase(tube(30, 27, 40));
-    for (const pattern of ["cells", "grain"] as const) {
+    for (const pattern of ["cells", "hammered", "grain"] as const) {
       const one = normalizeSurfaceTexture({ pattern, projection: "cylinder" });
       const two = { ...one, seed: 2 };
       const layout = makeSurfaceTextureLayout(base, one);

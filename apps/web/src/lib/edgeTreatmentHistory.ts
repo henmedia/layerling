@@ -165,3 +165,12 @@ export function restoreShapeBeforeEdgeTreatment(shape: WorkplaneShape, entry: Ed
     edgeTreatmentHistory: earlierHistory?.length ? earlierHistory : undefined,
   });
 }
+
+/**
+ * Whether finishing this body's sketch again costs it something (#1804): the body is built anew from the sketch, with new
+ * edges and faces, so what the edge tools did to the old ones - fillets, chamfers, hollowing, deleted faces - cannot be
+ * laid on it again and goes. The editor says so when the sketch is opened and when it is finished.
+ */
+export function sketchRebuildDropsTreatments(shape: Pick<WorkplaneShape, "sketchProfile" | "edgeTreatments">): boolean {
+  return Boolean(shape.sketchProfile && shape.edgeTreatments?.length);
+}

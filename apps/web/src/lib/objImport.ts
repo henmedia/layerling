@@ -3,6 +3,7 @@ import { placeColoredParts } from "@/lib/coloredImport";
 import { reportedMeshExtent } from "@/lib/importedMeshBase";
 import { createLocalId } from "@/lib/localIds";
 import { zUpToLayerling } from "@/lib/meshCoordinates";
+import type { MeshPlacement } from "@/lib/stlImport";
 import type { WorkplaneShape } from "@/types/layerling";
 
 type ObjFaceVertex = {
@@ -111,6 +112,7 @@ function importedObjShapeFromTriangles(
   fileName: string,
   rawPositions: number[],
   rawNormals: number[] | undefined,
+  placement: MeshPlacement = {},
 ): WorkplaneShape {
   if (rawPositions.length < 9 || rawPositions.length % 9 !== 0) {
     throw new Error("OBJ has no readable mesh geometry");
@@ -164,8 +166,8 @@ function importedObjShapeFromTriangles(
     name: objShapeName(fileName),
     kind: "mesh",
     color: "#0098c7",
-    x: 10,
-    z: -10,
+    // Kept where the file puts it (Issue #1939), or at the usual spot.
+    ...(placement.keepPosition ? { x: centerX, z: centerZ, elevation: minY } : { x: 10, z: -10 }),
     size: Math.max(width, depth),
     width,
     depth,
@@ -388,10 +390,10 @@ export function importedShapeFromObj(fileName: string, source: string, legacyAxe
   return wholeShapeFromObjParts(fileName, parseObjPartsLimited(source, new Map(), legacyAxes).parts);
 }
 
-function wholeShapeFromObjParts(fileName: string, parts: readonly ObjPart[]): WorkplaneShape {
+function wholeShapeFromObjParts(fileName: string, parts: readonly ObjPart[], placement: MeshPlacement = {}): WorkplaneShape {
   const positions = parts.flatMap((part) => part.positions);
   const complete = parts.every((part) => partNormals(part));
-  return importedObjShapeFromTriangles(fileName, positions, complete ? parts.flatMap((part) => part.normals) : undefined);
+  return importedObjShapeFromTriangles(fileName, positions, complete ? parts.flatMap((part) => part.normals) : undefined, placement);
 }
 
 export type ObjImportResult = {
@@ -409,14 +411,14 @@ export type ObjImportResult = {
  * zueinander. Einfarbig bleibt es ein Koerper wie bisher, nur in seiner
  * Farbe (Discussion #79).
  */
-export function importedShapesFromObj(fileName: string, source: string, mtlSources: readonly string[] = []): ObjImportResult {
+export function importedShapesFromObj(fileName: string, source: string, mtlSources: readonly string[] = [], placement: MeshPlacement = {}): ObjImportResult {
   const materialColors = new Map<string, string>();
   mtlSources.forEach((mtl) => parseMtlColors(mtl).forEach((color, name) => materialColors.set(name, color)));
   const { parts, droppedVertexColors } = parseObjPartsLimited(source, materialColors);
   const missingMaterialColors = parts.some((part) => part.material !== undefined && !part.color);
 
   if (parts.length <= 1) {
-    const whole = wholeShapeFromObjParts(fileName, parts);
+    const whole = wholeShapeFromObjParts(fileName, parts, placement);
     const color = parts[0]?.color;
     // Eine eigene OBJ traegt ihr Netz selbst: die .lyl baut OBJ-Quellen in der
     // alten Achsen-Lesart nach (siehe `legacyAxes`).
@@ -434,6 +436,7 @@ export function importedShapesFromObj(fileName: string, source: string, mtlSourc
       normals: partNormals(part),
     })),
     (positions, normals) => importedObjShapeFromTriangles(fileName, positions, normals),
+    placement,
   );
   return { shapes, split: true, missingMaterialColors, droppedVertexColors };
 }

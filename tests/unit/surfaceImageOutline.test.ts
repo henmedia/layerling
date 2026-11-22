@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { drawingGrey, drawingOutlines, inTwoTones, SURFACE_IMAGE_OUTLINE_UNITS } from "@/lib/surfaceImageOutline";
+import { drawingGrey, drawingOutlines, inTwoTones, ownImageOutline, SURFACE_IMAGE_OUTLINE_BITMAP_MIN_AREA, SURFACE_IMAGE_OUTLINE_UNITS } from "@/lib/surfaceImageOutline";
 import { normalizeSurfaceTextureOwnImage, ownImageKey } from "@/lib/surfaceTextureImages";
 
 /** A grey raster of `size` points a side, light where `light` says so (the middle of the point in 0..1), anti-aliased by 4 × 4 samples. */
@@ -76,6 +76,48 @@ describe("the outlines of a drawing (#1268)", () => {
   it("tells a drawing in two tones from one in shades", () => {
     expect(inTwoTones(raster(64, (x) => x < 0.5))).toBe(true);
     expect(inTwoTones(Float32Array.from({ length: 100 }, (_, i) => i / 99))).toBe(false);
+  });
+});
+
+/** An opaque RGBA picture from a grey raster: white where it is light, black where it is dark, as a scan or a JPEG is. */
+function opaque(grey: ArrayLike<number>) {
+  const rgba = new Uint8ClampedArray(grey.length * 4);
+  for (let i = 0; i < grey.length; i += 1) {
+    const value = Math.round(grey[i] * 255);
+    rgba.set([value, value, value, 255], i * 4);
+  }
+  return rgba;
+}
+
+describe("the outlines of a bitmap (#1347)", () => {
+  it("cuts a line drawing saved as a bitmap along its outlines, as an SVG's", () => {
+    const size = 256;
+    // A slanted stroke on an opaque ground: the stepped lines the reporter saw on a 4714-point PNG of a drawing.
+    const grey = raster(size, (x, y) => Math.abs(x - y) < 0.04);
+    const rings = ownImageOutline(opaque(grey), size, size, true);
+    expect(rings).toHaveLength(1);
+    // The stroke's edges are straight lines: a handful of points, not one per step of the grid.
+    expect(rings[0].length / 2).toBeLessThan(20);
+    expect(ownImageOutline(opaque(grey), size, size, false)).toEqual(rings);
+  });
+
+  it("leaves a picture in shades to its grey values", () => {
+    const size = 64;
+    const shades = new Float32Array(size * size).map((_, i) => (i % size) / (size - 1));
+    expect(ownImageOutline(opaque(shades), size, size, true)).toEqual([]);
+  });
+
+  it("leaves out a bitmap's stray specks, but not an SVG's dots", () => {
+    const size = 128;
+    // A disc and a speck of one point, such as a JPEG leaves on its ground.
+    const grey = raster(size, (x, y) => Math.hypot(x - 0.5, y - 0.5) < 0.25);
+    grey[10 * size + 10] = 1;
+    expect(SURFACE_IMAGE_OUTLINE_BITMAP_MIN_AREA).toBe(4);
+    expect(ownImageOutline(opaque(grey), size, size, true)).toHaveLength(1);
+    expect(ownImageOutline(opaque(grey), size, size, false)).toHaveLength(2);
+    // A dot of three by three points stays in a bitmap too.
+    for (let y = 30; y < 33; y += 1) for (let x = 30; x < 33; x += 1) grey[y * size + x] = 1;
+    expect(ownImageOutline(opaque(grey), size, size, true)).toHaveLength(2);
   });
 });
 

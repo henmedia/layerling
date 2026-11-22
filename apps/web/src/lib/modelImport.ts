@@ -3,7 +3,7 @@ import { t } from "@/lib/i18n";
 import { localizedError } from "@/lib/userErrors";
 import { importExtensionSupported } from "@/lib/importExtensions";
 import { attachProjectAsset, projectAssetFromBytes, sourceFormatForFileName } from "@/lib/projectAssets";
-import { readKeepSvgPage } from "@/lib/importPreferences";
+import { readKeepMeshPosition, readKeepSvgPage } from "@/lib/importPreferences";
 import { scaleSvgText } from "@/lib/svgScale";
 import { decodeSvgBytes, importedColourShapesFromSvg, importedShapeFromSvgWithReport, prepareSvgImport } from "@/lib/svgImport";
 import { importedShapesFrom3mf } from "@/lib/threemfImport";
@@ -87,9 +87,15 @@ export async function importModelFiles(
     svgKeepPagePosition?: boolean;
     /** An SVG or a picture comes in at this width in mm, scaled from its own size (#448). Null or left out: its own size. */
     svgWidth?: number | null;
+    /**
+     * An STL, OBJ or 3MF stands where its file puts it, so parts exported as separate files fit together (Issue #1939).
+     * Left out: the setting in the import window.
+     */
+    keepMeshPosition?: boolean;
   } = {},
 ): Promise<ModelImportResult | null> {
   const prepared = await prepareImportFiles(selected);
+  const placement = { keepPosition: options.keepMeshPosition ?? readKeepMeshPosition() };
   const files = prepared.files;
   const result: ModelImportResult = {
     shapes: [],
@@ -185,8 +191,8 @@ export async function importModelFiles(
       // die Datei als Ganzes bauen sie nicht nach.
       if (isObj || is3mf) {
         const colored = isObj
-          ? await (await import("@/lib/geometryWorker")).importedShapesFromObjOffThread(file.name, new TextDecoder().decode(bytes), prepared.mtlSources)
-          : importedShapesFrom3mf(file.name, buffer);
+          ? await (await import("@/lib/geometryWorker")).importedShapesFromObjOffThread(file.name, new TextDecoder().decode(bytes), prepared.mtlSources, placement)
+          : importedShapesFrom3mf(file.name, buffer, placement);
         if ("missingMaterialColors" in colored && colored.missingMaterialColors) result.notes.push(t("status.importObjNoMtl", { name: file.name }));
         if ("droppedVertexColors" in colored && colored.droppedVertexColors) result.notes.push(t("status.importObjVertexColors", { name: file.name }));
         // The same words fit a 3MF whose object has a colour at almost every point (#1867).
@@ -267,7 +273,7 @@ export async function importModelFiles(
         }
       } else {
         // Read off the page (lib/geometryWorker.ts), loaded only when a file needs it.
-        shape = await (await import("@/lib/geometryWorker")).importedShapeFromStlOffThread(file.name, buffer);
+        shape = await (await import("@/lib/geometryWorker")).importedShapeFromStlOffThread(file.name, buffer, placement);
       }
       // Eine eigene OBJ traegt ihr Netz selbst ("json") und braucht die Datei nicht.
       if (shape.importedMesh?.sourceFormat === "json") {

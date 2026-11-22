@@ -24,6 +24,31 @@ export function storeKeepSvgPage(keep: boolean) {
   }
 }
 
+const KEEP_MESH_POSITION_KEY = "layerling.importKeepMeshPosition";
+
+/**
+ * Whether an imported STL, OBJ or 3MF keeps the position it has in its file, so the parts of one model, exported as
+ * separate files, fit together again when they are imported one after the other (Issue #1939).
+ */
+export function readKeepMeshPosition(): boolean {
+  if (typeof window === "undefined") return false;
+  try {
+    return window.localStorage.getItem(KEEP_MESH_POSITION_KEY) === "1";
+  } catch {
+    return false;
+  }
+}
+
+export function storeKeepMeshPosition(keep: boolean) {
+  if (typeof window === "undefined") return;
+  try {
+    if (keep) window.localStorage.setItem(KEEP_MESH_POSITION_KEY, "1");
+    else window.localStorage.removeItem(KEEP_MESH_POSITION_KEY);
+  } catch {
+    // The choice still holds for this visit.
+  }
+}
+
 /*
  * The width an SVG or a picture is to come in at (#448), typed in the import window. It is for the
  * next import only and is kept in memory, not in storage: a size from last week must not surprise

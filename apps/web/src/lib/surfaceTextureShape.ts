@@ -163,6 +163,7 @@ export const SURFACE_TEXTURE_LABELS: {
     honeycomb: "surfaceTexture.honeycomb",
     bumps: "surfaceTexture.bumps",
     cells: "surfaceTexture.cells",
+    hammered: "surfaceTexture.hammered",
     bricks: "surfaceTexture.bricks",
     timber: "surfaceTexture.timber",
     stones: "surfaceTexture.stones",

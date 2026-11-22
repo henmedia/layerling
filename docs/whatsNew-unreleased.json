@@ -1,301 +1,106 @@
 [
   {
     "title": {
-      "de": "Größe ziehen bis in die Ecke",
-      "en": "Resize right into the corner"
+      "de": "Namensschild und Symbolschild: Flache Intarsie",
+      "en": "Name tag and icon tag: Flat inlay",
+      "da": "Navneskilt og ikon-tag: Flad intarsia"
     },
     "body": {
-      "de": "Ziehst du eine Form an einem Eckgriff größer, halten jetzt beide Seiten an den Kanten anderer Formen und an den Wänden, auf die sie treffen. So füllt ein Teil die Ecke eines Gehäuses in einem Zug.",
-      "en": "When you drag a corner handle to make a shape bigger, both of its sides now stop at the edges of other shapes and at the walls they run into. So a part fills the corner of a case in one drag."
-    }
-  },
-  {
-    "title": {
-      "de": "3MF und OBJ: kleine Teile einer Gruppe bleiben",
-      "en": "3MF and OBJ: small parts of a group stay",
-      "da": "3MF og OBJ: små dele af en gruppe bliver med"
-    },
-    "body": {
-      "de": "Bei mehrfarbigen Entwürfen fehlten im 3MF und OBJ weiterhin sehr kleine Teile einer Gruppe, etwa die Zähne und Punkte in einem Logo, während sie in der STL da waren. Jetzt bleiben auch solche Teile in der Datei.",
-      "en": "In designs of several colours, very small parts of a group, such as the teeth and dots of a logo, were still missing from the 3MF and OBJ, while the STL had them. Now such parts stay in the file too.",
-      "da": "I designs med flere farver manglede meget små dele af en gruppe, som tænderne og prikkerne i et logo, stadig i 3MF-filen og OBJ-filen, mens STL-filen havde dem. Nu bliver også sådanne dele i filen."
-    }
-  },
-  {
-    "title": {
-      "de": "Kein Stocken mehr beim Speichern großer importierter Baugruppen",
-      "en": "No more freezing while large imported assemblies are saved",
-      "da": "Ingen frysning mere, når store importerede samlinger gemmes"
-    },
-    "body": {
-      "de": "In Entwürfen mit einer importierten STEP-Baugruppe, etwa einer Platine im Gehäuse, blieb der Editor nach fast jeder Änderung für mehrere Sekunden stehen, weil das automatische Speichern jedes Mal den ganzen Entwurf neu gepackt hat. Jetzt wird nur noch neu gepackt, was sich geändert hat, und der Editor bleibt währenddessen bedienbar.",
-      "en": "In designs with an imported STEP assembly, a circuit board in an enclosure for example, the editor froze for several seconds after almost every change, because the automatic save packed the whole design again each time. Now only what has changed is packed again, and the editor stays usable meanwhile.",
-      "da": "I designs med en importeret STEP-samling, et printkort i et kabinet for eksempel, frøs editoren i flere sekunder efter næsten hver ændring, fordi den automatiske gemning pakkede hele designet sammen igen hver gang. Nu pakkes kun det, der er ændret, sammen igen, og editoren er brugbar imens."
+      "de": "Auf den Karten „Namensschild“ und „Symbolschild“ gibt es unter der Schichttabelle den Schalter „Flache Intarsie“. Dann sinken Buchstaben (oder Symbol) und Rand in die unterste Schicht ein, und alle Farben enden auf einer ebenen Fläche. So lässt sich das Schild mit dieser Seite nach unten auf die Platte drucken, mit der Struktur der Platte auf der Fläche.\n\nDie unterste Schicht ist der Träger: ihre Höhe ist die Dicke des ganzen Schilds, das Öhr für den Schlüsselring sitzt an ihr. Der Regler „Intarsientiefe“ bestimmt, wie tief die Schichten darüber reichen, alle zusammen. Er beginnt bei 0,8 mm (vier Lagen zu 0,2 mm), für die meisten PLA genug. Durchscheinenderes Filament (PETG, manche Weißtöne) braucht mehr: erst einen Test drucken.\n\nSolange der Schalter an ist, sind die Höhen der oberen Schichten ausgegraut. Ausgeschaltet steht das Schild wieder gestapelt da. Im STEP-Export sind die eingelassenen Schichten Netze, 3MF und STL sind nicht betroffen.",
+      "en": "On the cards \"Name tag\" and \"Icon tag\" the switch \"Flat inlay\" sits under the Layers table. With it on, the letters (or the icon) and the rim sink into the bottom layer, and all colours end on one flat face. So the tag can be printed face down on the plate, with the plate's texture on the face.\n\nThe bottom layer is the carrier: its height is the thickness of the whole tag, and the key ring ear sits on it. The slider \"Inlay depth\" sets how deep the layers above it go, all together. It starts at 0.8 mm (four 0.2 mm layers), enough for most PLA. A more translucent filament (PETG, some whites) needs more: print a test first.\n\nWhile the switch is on, the heights of the upper layers are greyed out. Switched off, the tag is stacked again. In a STEP export the inlaid layers are meshes, 3MF and STL are not affected.",
+      "da": "På kortene \"Navneskilt\" og \"Ikon-tag\" ligger kontakten \"Flad intarsia\" under tabellen med lag. Med den slået til sænker bogstaverne (eller ikonet) og kanten sig ned i det nederste lag, så alle farver ender i én plan flade. Så kan skiltet printes med denne side ned mod pladen, med pladens tekstur på fladen.\n\nDet nederste lag er bæreren: dets højde er tykkelsen på hele skiltet, og nøgleringsfligen sidder på det. Skyderen \"Intarsiadybde\" bestemmer, hvor dybt lagene over det går, alle sammen. Den starter på 0,8 mm (fire lag à 0,2 mm), nok til de fleste PLA. Et mere gennemsigtigt filament (PETG, nogle hvide) kræver mere, så print en test.\n\nMens kontakten er slået til, er højderne på de øverste lag nedtonede. Slås den fra, stables skiltet igen. I en STEP-eksport er de indlagte lag net, mens 3MF og STL ikke berøres."
     },
     "guide": {
-      "chapter": "files"
+      "section": "textLayers"
     }
   },
   {
     "title": {
-      "de": "3MF aus dem Scanner: ein Körper statt Tausender",
-      "en": "3MF from a scanner: one body instead of thousands",
-      "da": "3MF fra en scanner: ét legeme i stedet for tusinder"
+      "de": "Neue Form: Dach",
+      "en": "New shape: Roof",
+      "da": "Ny form: Tag"
     },
     "body": {
-      "de": "Eine 3MF aus einem 3D-Scanner trägt an fast jedem Punkt eine eigene Farbe. layerling machte daraus je Farbe einen Körper: aus einem Scan wurden über 42.000 Körper, der Import dauerte Minuten. Eine solche Datei kommt jetzt als ein Körper in einer Farbe herein, mit einem Hinweis, dass der Farbverlauf nicht erhalten bleibt. Dateien mit wenigen Farben werden wie bisher je Farbe ein Körper.",
-      "en": "A 3MF from a 3D scanner carries its own colour at almost every point. layerling made one body per colour: one scan became more than 42,000 bodies, and the import took minutes. Such a file now comes in as one body in a single colour, with a note that the colour gradient is not kept. Files with a few colours still become one body per colour.",
-      "da": "En 3MF fra en 3D-scanner har sin egen farve næsten ved hvert punkt. layerling laved ét legeme pr. farve: ét scan blev til over 42.000 legemer, og importen tog minutter. Sådan en fil kommer nu ind som ét legeme i én farve, med en note om, at farvegradienten ikke bevares. Filer med få farver bliver stadig ét legeme pr. farve."
+      "de": "In den Grundformen steht jetzt neben dem runden Dach ein Dach: ein Dreieck, das auf der Arbeitsebene liegt, die Spitze oben. Der Griff oben ändert die Höhe des Dreiecks, die Grundseite bleibt dabei auf der Platte; die Griffe unten ändern Breite und Länge.\n\nSeine drei Seiten bleiben fest; für eine andere Zahl von Seiten nimm den Mehrkant.",
+      "en": "The basic shapes now have a Roof next to the Round roof: a triangle lying on the workplane, its corner on top. The handle on top changes the height of the triangle while its base stays on the plate; the handles at the bottom change its width and length.\n\nIts three sides stay as they are; for another number of sides take the Polygon.",
+      "da": "De basiske former har nu et Tag ved siden af det Runde tag: en trekant, der ligger på arbejdsplanet, med spidsen opad. Håndtaget øverst ændrer trekantens højde, mens dens grundlinje bliver på pladen, håndtagene forneden bredden og længden.\n\nDens tre sider bliver, som de er; til et andet antal sider tager du Polygon."
     },
     "guide": {
-      "chapter": "files"
+      "chapter": "shapes"
     }
   },
   {
     "title": {
-      "de": "Skizze auf Platte 2 bearbeiten",
-      "en": "Edit a sketch on plate 2",
-      "da": "Redigér en skitse på plade 2"
+      "de": "Ein Bild für jeden Ordner",
+      "en": "A picture for every folder",
+      "da": "Et billede til hver mappe",
+      "ar": "صورة لكل مجلد"
     },
     "body": {
-      "de": "Bei mehreren Druckplatten zeigte „Skizze bearbeiten“ für einen Körper auf einer weiteren Platte die erste Platte, und der Umriss des Körpers lag außerhalb der Zeichenfläche. Die Skizze öffnet sich jetzt auf der Platte, auf der der Körper steht.",
-      "en": "With several build plates, Edit sketch for a body on a further plate showed the first plate, and the body's outline lay outside the sketch area. The sketch now opens on the plate the body stands on.",
-      "da": "Med flere byggeplader viste \"Redigér skitse\" for en del på en anden plade den første plade, og delens omrids lå uden for skitsefladen. Skitsen åbner nu på den plade, delen står på."
+      "de": "Beginnt der Name eines Ordners auf der Startseite mit einem Emoji, etwa „💡 Ideen“, zeigt der Ordner das Emoji groß statt des Ordnersymbols. So findest du deine Ordner auf einen Blick.\n\nDas Emoji gehört zum Namen und geht deshalb überall mit. Zum Ändern oder Entfernen benennst du den Ordner um.",
+      "en": "When the name of a folder on the start page starts with an emoji, such as \"💡 Ideas\", the folder shows that emoji big in place of the folder icon. So you find your folders at a glance.\n\nThe emoji is part of the name, so it goes wherever the folder goes. Rename the folder to change it or take it off.",
+      "da": "Begynder navnet på en mappe på startsiden med en emoji, som \"💡 Idéer\", viser mappen den emoji stor i stedet for mappeikonet. Så finder du dine mapper med ét blik.\n\nEmojien er en del af navnet, så den følger med, hvor mappen kommer hen. Omdøb mappen for at ændre den eller fjerne den.",
+      "ar": "عندما يبدأ اسم مجلد في صفحة البداية برمز تعبيري (إيموجي)، مثل «💡 أفكار»، يُظهر المجلد ذلك الرمز كبيرًا مكان أيقونة المجلد. وهكذا تجد مجلداتك بنظرة واحدة.\n\nالرمز التعبيري جزء من الاسم، فيذهب أينما ذهب المجلد. أعد تسمية المجلد لتغييره أو إزالته."
     },
     "guide": {
-      "section": "buildPlates"
+      "section": "designFolders"
     }
   },
   {
     "title": {
-      "de": "Fase an einer Gruppe verschließt die Rohrbohrung nicht mehr",
-      "en": "A chamfer on a group no longer closes a tube's bore",
-      "da": "En fase på en gruppe lukker ikke længere et rørs boring"
+      "de": "Skizze: Pfeiltasten reagieren sofort",
+      "en": "Sketch: the arrow keys respond at once",
+      "da": "Skitse: piletastene reagerer med det samme"
     },
     "body": {
-      "de": "Ein Rohr, Ring oder gebogenes Rohr mit „Bohrung schneidet beim Gruppieren wie ein Loch“ öffnet, womit es gruppiert ist. Eine Fase oder Verrundung an dieser Gruppe hat die Öffnung wieder verschlossen. Jetzt bleibt sie offen.",
-      "en": "A tube, ring or bent tube with \"Bore cuts as a hole when grouped\" opens whatever it is grouped with. A chamfer or fillet on that group closed the opening again. Now it stays open.",
-      "da": "Et rør, en ring eller et bøjet rør med \"Boringen skærer som et hul ved gruppering\" åbner, hvad den er grupperet med. En fase eller en rundning på den gruppe lukkede åbningen igen. Nu står åbningen stadig åben."
+      "de": "In der Skizze zeigte ein Druck auf eine Pfeiltaste die Verschiebung erst nach einem kurzen Moment, und mit gehaltener Taste sprang die Auswahl in großen Sätzen. Jetzt bewegt sie sich sofort und gleichmäßig. Ein ganzer Lauf mit den Pfeiltasten bleibt ein Schritt beim Rückgängigmachen.",
+      "en": "In the sketch a press of an arrow key showed the move only after a short moment, and with the key held the selection jumped in big steps. Now it moves at once and evenly. A whole run with the arrow keys is still one step of Undo.",
+      "da": "I skitsen viste et tryk på en piletast flytningen først efter et kort øjeblik, og med tasten holdt sprang markeringen i store skridt. Nu flytter den sig med det samme og jævnt. Et helt løb med piletasterne er stadig ét trin i Fortryd."
     }
   },
   {
     "title": {
-      "de": "3D-Maus: Richtungen bleiben nach einem Neustart richtig",
-      "en": "3D mouse: directions stay right after a restart",
-      "da": "3D-mus: retningerne bliver rigtige efter en genstart"
+      "de": "Teile landen an ihrem Platz aus der Datei",
+      "en": "Parts land where their file puts them",
+      "da": "Dele lander, hvor deres fil placerer dem"
     },
     "body": {
-      "de": "Nach einem Neustart des Browsers liest layerling eine 3D-Maus als Spielcontroller, bis du wieder auf „3D-Maus verbinden“ klickst. Bei manchen Geräten laufen die Richtungen dabei andersherum, und die angehakten Richtungen passten dann nicht mehr. layerling merkt sie sich jetzt für beide Wege getrennt: Unter Einstellungen, Bedienung, 3D-Maus steht eine Zeile, wenn die Maus gerade als Spielcontroller gelesen wird, und was du dann anhakst, gilt nur dafür. Deine bisherigen Einstellungen bleiben für die verbundene Maus erhalten.",
-      "en": "After the browser is restarted, layerling reads a 3D mouse as a game controller until you click Connect 3D mouse again. On some devices the directions run the other way round there, and the ticked directions no longer fitted. layerling now keeps them apart for the two ways: under Settings, Controls, 3D mouse a line says when the mouse is read as a game controller, and what you tick then holds for that only. Your settings so far stay with the connected mouse.",
-      "da": "Når browseren er genstartet, læser layerling en 3D-mus som en spilcontroller, indtil du klikker på \"Tilslut 3D-mus\" igen. På nogle enheder løber retningerne den anden vej dér, og de afkrydsede retninger passede så ikke mere. layerling holder dem nu adskilt for de to måder: under Indstillinger, Betjening, 3D-mus står der en linje, når musen læses som en spilcontroller, og hvad du så sætter kryds ved gælder kun for det. Dine indstillinger hidtil bliver ved den tilsluttede mus."
+      "de": "Hast du die Teile eines Modells als einzelne Dateien, etwa Körper, Arme und Beine einer Miniatur, schalte im Importfenster „STL, OBJ, 3MF: Lage aus der Datei beibehalten“ ein. Dann steht jedes Teil dort, wo seine Datei es hinsetzt, und alles passt zusammen, auch wenn du die Dateien nacheinander importierst.\n\nDer Schalter bleibt, bis du ihn wieder ausschaltest. Ohne ihn kommt jede Datei wie bisher für sich nahe der Plattenmitte an.",
+      "en": "If you have the parts of one model as separate files, such as the body, arms and legs of a miniature, switch on \"STL, OBJ, 3MF: keep the position from the file\" in the import window. Each part then stands where its file puts it, and everything fits together, even when you import the files one after the other.\n\nThe switch stays on until you turn it off. Without it every file comes in on its own near the middle of the plate, as before.",
+      "da": "Har du delene af én model som separate filer, som krop, arme og ben på en miniature, så slå \"STL, OBJ, 3MF: bevar placeringen fra filen\" til i importvinduet. Hver del står så, hvor dens fil placerer den, og alt passer sammen, selv når du importerer filerne én efter én.\n\nKontakten bliver slået til, indtil du slår den fra. Uden den kommer hver fil stadig for sig tæt på pladens midte."
     },
     "guide": {
-      "section": "settingsView"
+      "section": "importing"
     }
   },
   {
     "title": {
-      "de": "Wenn die 3D-Ansicht nicht startet: klare Meldung",
-      "en": "When the 3D view does not start: a clear message",
-      "da": "Når 3D-visningen ikke starter: en klar besked"
+      "de": "Leere Entwürfe kommen aus der Sicherung zurück",
+      "en": "Empty designs come back from your backup",
+      "da": "Tomme designs kommer tilbage fra sikkerhedskopien"
     },
     "body": {
-      "de": "Gibt der Browser layerling keinen Zugriff auf die Grafik (WebGL), erschien bisher nur „layerling ist auf einen Fehler gestoßen“. Jetzt sagt das Fenster, was los ist: Die Ursache liegt im Browser oder im Grafiktreiber, deine Entwürfe bleiben erhalten. Darunter steht, was meistens hilft: Browser oder Rechner neu starten, die Grafikbeschleunigung einschalten, Browser und Grafiktreiber aktualisieren oder einen anderen Browser versuchen. Den zuletzt gespeicherten Stand kannst du dort weiter als .lyl sichern.",
-      "en": "When the browser gives layerling no access to the graphics (WebGL), all you saw was \"layerling ran into an error\". The window now says what is going on: the cause lies in the browser or the graphics driver, and your designs are kept. Below that it lists what usually helps: restart the browser or the computer, turn on graphics acceleration, update the browser and the graphics driver, or try another browser. You can still save the last stored state as a .lyl file from there.",
-      "da": "Når browseren ikke giver layerling adgang til grafikken (WebGL), så du kun fik \"layerling løb ind i en fejl\". Nu siger vinduet, hvad der sker: årsagen ligger i browseren eller i grafikdriveren, og dine designs er bevaret. Under det står der, hvad der som regel hjælper: genstart browseren eller computeren, slå grafikacceleration til, opdater browseren og grafikdriveren, eller prøv en anden browser. Du kan stadig gemme den sidst gemte tilstand som en .lyl-fil derfra."
-    }
-  },
-  {
-    "title": {
-      "de": "Druckplatten: Name auf Platte 1 und im Dateinamen",
-      "en": "Build plates: name on plate 1 and in the file name",
-      "da": "Byggeplader: navn på plade 1 og i filnavnet"
-    },
-    "body": {
-      "de": "Hat die erste Druckplatte einen eigenen Namen, steht er jetzt auch auf der Platte, wie bei den weiteren Platten: „Platte 1: Deckel“, der Name des Entwurfs klein darüber. Wählst du im Exportfenster eine einzelne Platte, beginnt der Dateiname mit dem Namen dieser Platte statt mit dem des Entwurfs; eine Platte ohne Namen heißt „Entwurf - Platte 2“.",
-      "en": "When the first build plate has a name of its own, it is now written on the plate as on the further plates: \"Plate 1: Lid\", with the design's name in small above it. And when you pick a single plate in the export window, the file name starts as that plate's name instead of the design's; a plate without a name becomes \"Design - Plate 2\".",
-      "da": "Når den første byggeplade har sit eget navn, står det nu også på pladen som på de andre plader: \"Plade 1: Låg\", med designets navn i lille skrift oven over. Og når du vælger én plade i eksportvinduet, begynder filnavnet med den plades navn i stedet for designets; en plade uden navn bliver \"Design - Plade 2\"."
+      "de": "Nach einem Absturz kann es passieren, dass die Karten auf der Startseite noch ihre Namen und die Zahl der Formen zeigen, die Entwürfe aber leer aufgehen. Bisher hat „Sicherung wiederherstellen“ genau diese Entwürfe übersprungen, weil es sie für schon vorhanden hielt.\n\nJetzt holt die Sicherung ihren Inhalt in dieselbe Karte zurück. Entwürfe, die noch ihre Formen haben, bleiben, wie sie sind.",
+      "en": "After a crash the cards on the start page can still show their names and how many shapes they have, while the designs open empty. Until now \"Restore backup\" skipped exactly those designs, because it took them for ones that are already here.\n\nNow the backup brings their content back into the same card. Designs that still have their shapes stay as they are.",
+      "da": "Efter et nedbrud kan kortene på startsiden stadig vise deres navne og hvor mange former de har, mens designene åbner tomme. \"Gendan sikkerhedskopi\" sprang netop disse designs over, fordi den tog dem for at være dem, der allerede er her.\n\nNu henter sikkerhedskopien indholdet tilbage i det samme kort. Designs, der stadig har deres former, bliver, som de er."
     },
     "guide": {
-      "section": "buildPlates"
+      "section": "backingUp"
     }
   },
   {
     "title": {
-      "de": "Objektliste: Name bei gesperrter Form",
-      "en": "Object list: the name of a locked shape",
-      "da": "Objektliste: navnet på en låst form"
+      "de": "Menüleiste: keine Knöpfe mehr übereinander",
+      "en": "Menu bar: no more buttons on top of each other",
+      "da": "Menulinje: ingen knapper oven på hinanden"
     },
     "body": {
-      "de": "Ist bei einem Teil die Form gesperrt (das Schild), bleibt auch sein Name, wie er ist. Die Objektliste bot trotzdem den Stift an und öffnete das Namensfeld, nahm den neuen Namen dann aber nicht an. Jetzt fehlt der Stift bei solchen Teilen. Zum Umbenennen das Schild in der Zeile anklicken, dann ist die Form entsperrt.",
-      "en": "When the shape of a part is locked (the shield), its name stays as it is too. The object list still offered the pencil and opened the name field, but then did not take the new name. The pencil is now left out for such parts. To rename one, click the shield in its row, which unlocks the shape.",
-      "da": "Når en dels form er låst (skjoldet), bliver dens navn også, som det er. Objektlisten tilbød stadig blyanten og åbnede navnefeltet, men tog så ikke det nye navn. Blyanten er nu væk for sådanne dele. Vil du omdøbe en del, klikker du på skjoldet i dens række, så bliver formen låst op."
+      "de": "Bei manchen Fensterbreiten, vor allem im Fokusmodus, wurden Gruppen der Menüleiste schmaler gedrückt als ihre Knöpfe. Dann ragte etwa der Knopf der Objektliste aus „Sichtbarkeit“ in „Formen“ hinein.\n\nJetzt behält jede Gruppe ihre volle Breite, und reicht der Platz nicht, wird eine Gruppe mehr zu einem Knopf zusammengefaltet.",
+      "en": "At some window widths, above all in focus mode, groups of the menu bar were squeezed narrower than their buttons. Then the Outliner button of Visibility, for one, stuck out into Shapes.\n\nNow every group keeps its full width, and where there is not enough room, one more group folds into a single button.",
+      "da": "Ved nogle vinduesbredder, især i fokustilstand, blev grupperne i menulinjen presset smallere end deres knapper. Så stak for eksempel objektlisteknappen under Synlighed ud i Former.\n\nNu beholder hver gruppe sin fulde bredde, og hvor der ikke er plads, folder én gruppe mere sammen til en enkelt knap."
     },
     "guide": {
-      "section": "objectList"
-    }
-  },
-  {
-    "title": {
-      "de": "Anleitung: genaue Wortfolge mit Anführungszeichen suchen",
-      "en": "User guide: search for an exact phrase with quotation marks",
-      "da": "Brugervejledning: søg på en præcis ordlyd med anførselstegn"
-    },
-    "body": {
-      "de": "Das Suchfeld der Anleitung versteht jetzt Anführungszeichen: \"auf dem Kreisbogen\" findet nur die Abschnitte, in denen diese Wörter genau so hintereinander stehen. Ein einzelnes Wort in Anführungszeichen wird nur als ganzes Wort gefunden. Bisher fand eine Suche mit Anführungszeichen gar nichts.",
-      "en": "The search box of the user guide now understands quotation marks: \"circular arc\" finds only the sections where these words stand next to each other in this order. A single word in quotation marks is found only as a whole word. Until now a search with quotation marks found nothing at all.",
-      "da": "Søgeboksen i brugervejledningen forstår nu anførselstegn: \"cirkelbue\" finder kun de sektioner, hvor ordene står lige efter hinanden i den rækkefølge. Et enkelt ord i anførselstegn findes kun som helt ord. Før nu fandt en søgning med anførselstegn slet ingen ting."
-    },
-    "guide": {
-      "section": "commandSearch"
-    }
-  },
-  {
-    "title": {
-      "de": "Griffe ausblenden mit Umschalt+Q",
-      "en": "Hide the handles with Shift+Q",
-      "da": "Skjul håndtagene med Shift+Q"
-    },
-    "body": {
-      "de": "Bei sehr kleinen Teilen verdecken die Quadrate und Pfeile um die Auswahl leicht das, woran du gerade arbeitest. Umschalt+Q blendet alle Griffe aus und wieder ein, so wie Q die Maße und Abstände. Das Teil lässt sich weiter ziehen, und seine Maße tippst du rechts ein.\n\nDamit du auch ohne Griffe siehst, was ausgewählt ist, ist die ausgewählte Zeile in der Objektliste jetzt kräftiger eingefärbt und hat links einen orangen Balken.",
-      "en": "On very small parts the squares and arrows around the selection easily cover what you are working on. Shift+Q hides all handles and shows them again, as Q does for the sizes and distances. You can still drag the part, and type its sizes at the right.\n\nSo that you see what is selected without the handles, the selected row in the object list now has a stronger colour and an orange bar at its left.",
-      "da": "På meget små dele dækker firkanterne og pilene omkring markeringen let det, du arbejder på. Shift+Q skjuler alle håndtag og viser dem igen, som Q gør for målene og afstandene. Du kan stadig trække delen og skrive dens mål til højre.\n\nSå du kan se, hvad der er valgt, uden håndtagene, har den valgte række i objektlisten nu en stærkere farve og en orange stribe til venstre."
-    },
-    "guide": {
-      "chapter": "measuring"
-    }
-  },
-  {
-    "title": {
-      "de": "Fehlermeldung bleibt bei den Knöpfen sichtbar",
-      "en": "Error message stays in view with the buttons",
-      "da": "Fejlmeddelelsen bliver ved knapperne i syne"
-    },
-    "body": {
-      "de": "In einem langen Werkzeugfenster, etwa beim Aushöhlen, blieben „Abbrechen“ und „Anwenden“ immer sichtbar, die Meldung, warum etwas nicht geht, stand aber ganz unten und war erst nach dem Herunterrollen zu sehen. Ein Klick schien dann nichts zu tun. Die Meldung steht jetzt direkt über den Knöpfen und bleibt dort sichtbar.",
-      "en": "In a long tool panel, Hollow for example, Cancel and Apply always stayed in view, but the message why something cannot be done stood at the very bottom and only showed after scrolling down. A click then seemed to do nothing. The message now stands right above the buttons and stays in view there.",
-      "da": "I en lang værktøjsvindue som Hul for eksempel stod Annullér og Anvend altid i syne, men beskeden om, hvorfor noget ikke kan gøres, lå helt nede og kom først til syne, når du rullede ned. Et klik så derefter ud til at gøre intet. Beskeden står nu lige over knapperne og bliver der i syne."
-    }
-  },
-  {
-    "title": {
-      "de": "Maßband misst sofort",
-      "en": "Tape measure measures at once",
-      "da": "Målebåndet måler med det samme"
-    },
-    "body": {
-      "de": "Ein Klick auf das Maßband schaltet jetzt gleich „Maß hinzufügen“ ein: Maßband anklicken, ersten Punkt klicken, zweiten Punkt klicken, fertig. Bisher musste man nach dem Öffnen erst noch das Plus wählen.\n\nEin weiterer Klick auf das Plus legt das Werkzeug weg, die Schaltflächen bleiben offen – etwa um zwischendurch einen Körper auszuwählen. Sind die Maße ausgeblendet, öffnet sich das Maßband ohne eingeschaltetes Werkzeug, damit sie ausgeblendet bleiben.",
-      "en": "A click on the tape measure now switches Add measurement on straight away: click the tape measure, click the first point, click the second, done. Until now you had to pick the plus after opening it.\n\nAnother click on the plus puts the tool down and leaves the buttons open, to select a body in between for example. If the measurements are hidden, the tape measure opens without the tool, so they stay hidden.",
-      "da": "Et klik på målebåndet tænder nu \"Tilføj mål\" med det samme: klik på målebåndet, klik på det første punkt, klik på det andet, færdig. Før nu skulle du trykke på plusknappen efter at have åbnet målebåndet.\n\nEt klik på plusknappen igen lægger værktøjet væk og lader knapperne være åbne, så du for eksempel kan vælge en del imellem. Er målingerne skjult, åbner målebåndet uden værktøjet, så de bliver skjult."
-    },
-    "guide": {
-      "section": "tapeMeasure"
-    }
-  },
-  {
-    "title": {
-      "de": "Verlauf bleibt nach Ändern im Feld erhalten",
-      "en": "History is kept after a change in a field"
-    },
-    "body": {
-      "de": "Wer ein Maß im Feld mit dem Mausrad oder den Pfeiltasten verstellt und den Tab danach schloss oder neu lud, ohne das Feld zu verlassen, fand den Entwurf beim nächsten Öffnen ohne Verlauf vor: Rückgängig und der Verlaufsblick waren leer. Dasselbe traf eine .lyl-Datei, die in diesem Moment mit Strg+S gespeichert wurde. Der Verlauf bleibt jetzt vollständig, und die letzte Änderung steht als eigener Schritt darin.\n\nEntwürfe, die ihren Verlauf auf diesem Weg schon verloren haben, bekommen ihn nicht zurück. Ihr aktueller Stand ist unverändert, und eine Gruppe lässt sich weiterhin auflösen oder mit „Gruppe bearbeiten“ öffnen.",
-      "en": "If you changed a measure in its field with the mouse wheel or the arrow keys and then closed or reloaded the tab without leaving the field, the design opened without its history the next time: Undo and the History view were empty. The same happened to a .lyl file saved with Ctrl+S in that moment. The history now stays complete, and the last change is a step of its own in it.\n\nDesigns that already lost their history this way do not get it back. Their current state is unchanged, and a group can still be ungrouped or opened with Edit group."
-    },
-    "guide": {
-      "section": "historyView"
-    }
-  },
-  {
-    "title": {
-      "de": "Lochmuster: Quadrate und Sechsecke drehen",
-      "en": "Hole pattern: turn squares and hexagons",
-      "da": "Hulmønster: drej kvadrater og sekskanter"
-    },
-    "body": {
-      "de": "Der Regler „Winkel der Löcher“ im Lochmuster gilt jetzt auch für Quadrate und Sechsecke, nicht mehr nur für Rechtecke und Langlöcher. Ein Quadrat wird bei 45° zur Raute, ein Sechseck liegt bei 30° auf einer flachen Seite. Der Abstand passt sich an, sodass zwischen den gedrehten Löchern immer eine Wand bleibt.",
-      "en": "The Angle of the holes slider in the hole pattern now works for squares and hexagons too, not only for rectangles and slots. A square at 45° is a diamond, a hexagon at 30° lies on a flat side. The spacing follows, so a wall always stays between the turned holes.",
-      "da": "Skyderen Vinkel på hullerne i hulmønsteret virker nu også for kvadrater og sekskanter, ikke kun for rektangler og slidser. Et kvadrat ved 45° bliver en rombe, en sekskant ved 30° ligger på en flad side. Afstanden følger med, så der altid bliver en væg mellem de drejede huller."
-    },
-    "guide": {
-      "section": "holePattern"
-    }
-  },
-  {
-    "title": {
-      "de": "Lochmuster: ein Loch in der Mitte",
-      "en": "Hole pattern: a hole in the middle"
-    },
-    "body": {
-      "de": "Ein Kranz von Löchern am Rand oder Befestigungslöcher können jetzt ein weiteres Loch in der Mitte der Fläche bekommen, etwa für die Abflusslöcher im Boden eines Blumentopfs. Der Haken „Ein Loch in der Mitte“ steht im Lochmuster bei „Am Rand“ und im Reiter „Befestigungslöcher“ und ist zunächst aus.\n\nDas Loch ist wie die anderen (Form, Lochart, Tiefe) und zählt bei der Anzahl nicht mit. Bei einfachen runden, quadratischen und sechseckigen Löchern lässt sich seine Größe eigens einstellen. Passt es nicht, weil die Mitte offen ist oder es den anderen zu nahe käme, wird es weggelassen, und eine Zeile sagt das.",
-      "en": "A ring of holes along the edge, or mounting holes, can now have one more hole in the middle of the face, for the drain holes in the floor of a plant pot, say. The box \"A hole in the middle\" is in the hole pattern under \"Along the edge\" and on the \"Mounting holes\" tab, and is off at first.\n\nThe hole is like the others (shape, hole type, depth) and does not count in their number. For plain round, square and hexagon holes its size can be set on its own. Where it does not fit, because the middle is open or it would come too close to the others, it is left out and a line says so."
-    },
-    "guide": {
-      "section": "holePattern"
-    }
-  },
-  {
-    "title": {
-      "de": "M3.5 in den Größenlisten",
-      "en": "M3.5 in the size lists"
-    },
-    "body": {
-      "de": "M3.5 steht jetzt zwischen M3 und M4 zur Wahl: beim Gewinde (Stange, Schraube, Mutter und Gewindeloch, Steigung 0,6 mm), bei der Mutternaussparung des Sechskants, bei den Unterlegscheiben des Rohrs und als Schraubengröße von Senkbohrung, Doppelsenkung, Rosette und den Senkungen im Lochmuster.\n\nDie Stufenbohrung bietet M3.5 nicht an, weil es dafür keine genormte Zylinderschraube mit Innensechskant gibt; dort trägst du die Maße selbst ein.",
-      "en": "M3.5 is now offered between M3 and M4: for the thread (rod, screw, nut and tapped hole, pitch 0.6 mm), the nut pocket of the hexagon, the washers of the tube, and as a screw size of the countersink, the double countersink, the finishing washer and the countersunk holes of the hole pattern.\n\nThe counterbore does not offer M3.5, because there is no standard socket head cap screw of that size; there you type the measures yourself."
-    },
-    "guide": {
-      "chapter": "threads"
-    }
-  },
-  {
-    "title": {
-      "de": "Aushöhlen mit Vorschau",
-      "en": "Hollow with a preview"
-    },
-    "body": {
-      "de": "Das Werkzeug Aushöhlen zeigt den Körper jetzt schon ausgehöhlt, solange sein Fenster offen ist. Änderst du die Wandstärke, die offenen Seiten oder eine der anderen Einstellungen, folgt die Vorschau einen Moment später. Ist keine Seite offen, wird der Körper durchsichtig gezeigt, damit du den Hohlraum siehst.\n\nGeändert wird erst mit „Aushöhlen“; „Abbrechen“ lässt den Körper, wie er war. Passt eine Einstellung nicht zum Körper, etwa eine zu dicke Wand, sagt es das Fenster sofort.",
-      "en": "The Hollow tool now shows the body hollowed while its window is open. Change the wall thickness, the open sides or one of the other settings, and the preview follows a moment later. With no side open the body is shown see-through, so you can see the cavity.\n\nNothing is changed until you click \"Hollow\"; \"Cancel\" leaves the body as it was. If a setting does not suit the body, a wall too thick for example, the window says so at once."
-    },
-    "guide": {
-      "section": "hollowing"
-    }
-  },
-  {
-    "title": {
-      "de": "Alle Formen einer Farbe auswählen",
-      "en": "Select all shapes of one colour"
-    },
-    "body": {
-      "de": "In der Objektliste wählt ein Klick auf den Farbpunkt vor dem Namen jede sichtbare Form dieser Farbe aus, praktisch, wenn jede Baugruppe ihre eigene Farbe hat. Mit Strg (Cmd am Mac) oder Umschalt kommen sie zur Auswahl hinzu. „Gleiche Farbe auswählen“ im Rechtsklick-Menü und in der Befehlssuche (Strg+K) macht dasselbe für die Farben der ausgewählten Formen.",
-      "en": "In the object list, a click on the colour dot in front of a name selects every visible shape of that colour, handy when each component has a colour of its own. Ctrl (Cmd on a Mac) or Shift adds them to what is selected. \"Select same colour\" in the right-click menu and the command search (Ctrl+K) does the same for the colours of the selected shapes."
-    },
-    "guide": {
-      "section": "objectList"
-    }
-  },
-  {
-    "title": {
-      "de": "Maßband zeigt die Dicke unter dem Mauszeiger",
-      "en": "Tape measure shows the thickness under the pointer"
-    },
-    "body": {
-      "de": "Ist beim Maßband „Maß hinzufügen“ aktiv und noch kein Punkt gesetzt, zeigt das Zeigen auf eine Fläche, wie dick der Körper dort ist: senkrecht zur Fläche gerade hinein gemessen, bis das Material endet. Eine gestrichelte Linie zeigt, wo gemessen wird. So prüfst du Wände und Böden, indem du einfach mit der Maus über das Teil fährst. Ein Klick setzt wie bisher den ersten Messpunkt.",
-      "en": "With Add measurement active on the tape measure and no point placed yet, pointing at a face shows how thick the body is there: measured straight in, square to the face, to where the material ends. A dashed line shows where it measures. So you check walls and floors just by moving the mouse over the part. A click still sets the first measuring point as before."
-    },
-    "guide": {
-      "section": "tapeMeasure"
-    }
-  },
-  {
-    "title": {
-      "de": "Gruppe übernimmt den Namen des benannten Teils",
-      "en": "A group takes the name of the named part"
-    },
-    "body": {
-      "de": "Hat beim Gruppieren oder Bündeln genau ein Teil einen eigenen Namen, heißt die neue Gruppe jetzt so, statt nur „Gruppe“ oder „Bündel“. So bleibt der Name in der Objektliste sichtbar. Haben mehrere Teile einen Namen, bleibt es beim alten Namen; die Teile behalten ihre Namen in der Gruppe.",
-      "en": "When exactly one part has a name of its own as you group or bundle, the new group is now called after it, instead of just Group or Bundle. So the name stays visible in the object list. With several named parts nothing changes; the parts keep their names inside the group."
-    },
-    "guide": {
-      "section": "objectList"
+      "section": "focusMode"
     }
   }
 ]

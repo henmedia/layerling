@@ -8,6 +8,7 @@ import {
   fetchAnnouncements,
   parseAnnouncements,
 } from "@/lib/announcements";
+import bundledFile from "@/lib/announcements.json";
 import { LANGUAGES } from "@/lib/languages";
 import { whatsNewBlocks } from "@/lib/whatsNew";
 
@@ -114,7 +115,8 @@ describe("the built-in announcements", () => {
   const list = bundledAnnouncementList();
 
   it("all read and have ids of their own", () => {
-    expect(list.length).toBeGreaterThan(0);
+    // The list may be empty between announcements; every entry it holds has to read.
+    expect(list.length).toBe((bundledFile as { announcements: unknown[] }).announcements.length);
     expect(new Set(list.map((a) => a.id)).size).toBe(list.length);
   });
 

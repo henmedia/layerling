@@ -1279,6 +1279,12 @@ html[data-theme="dark"]:where([data-palette="graphite"]) .shell-openings-summary
   border: 1px solid #adadad;
 }
 
+:where(html[data-theme="dark"][data-palette="graphite"]) .magnet-pocket-panel .edge-modifier-field input[type="text"] {
+  color: #3f3f3f;
+  background: white;
+  border: 1px solid #adadad;
+}
+
 :where(html[data-theme="dark"][data-palette="graphite"]) .edge-modifier-check {
   color: #585858;
 }
@@ -5187,6 +5193,18 @@ html[data-theme="dark"]:where([data-palette="graphite"]) .pattern-picker-empty {
   border-top: 1px solid var(--border);
 }
 
+:where(html[data-theme="dark"][data-palette="graphite"]) .snap-menu .snap-menu-title .snap-units button {
+  color: inherit;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .snap-menu .snap-menu-title .snap-units button:hover {
+  background: rgba(127, 127, 127, 0.16);
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .snap-menu .snap-menu-title .snap-units button[aria-pressed="true"] {
+  background: rgba(127, 127, 127, 0.28);
+}
+
 :where(html[data-theme="dark"][data-palette="graphite"]) .snap-menu-title {
   color: #4f4f4f;
   border-bottom: 1px solid var(--border);
@@ -6229,6 +6247,7 @@ html[data-theme="dark"]:where([data-palette="graphite"]) .edge-modifier-target,
 html[data-theme="dark"]:where([data-palette="graphite"]) .edge-modifier-quick-actions button,
 html[data-theme="dark"]:where([data-palette="graphite"]) .edge-modifier-footer .secondary,
 html[data-theme="dark"]:where([data-palette="graphite"]) .edge-modifier-field select,
+html[data-theme="dark"]:where([data-palette="graphite"]) .magnet-pocket-panel .edge-modifier-field input[type="text"],
 html[data-theme="dark"]:where([data-palette="graphite"]) .split-axis-control button,
 html[data-theme="dark"]:where([data-palette="graphite"]) .split-position-value input,
 html[data-theme="dark"]:where([data-palette="graphite"]) .split-position-pick:not(.active),
@@ -9023,6 +9042,16 @@ html[data-theme="dark"]:where([data-palette="graphite"]) .layer-view-play label 
 
 html[data-theme="dark"]:where([data-palette="graphite"]) .layer-check-remedy {
   color: #f0b46c;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .mold-openings li button {
+  color: inherit;
+  background: transparent;
+  border: 0;
+}
+
+:where(html[data-theme="dark"][data-palette="graphite"]) .mold-openings li button:hover:not(:disabled) {
+  background: rgba(127, 127, 127, 0.18);
 }
 
 html[data-theme="dark"]:where([data-palette="graphite"]) .layer-view-readout strong {

@@ -110,7 +110,7 @@ Az exportálási ablak ekkor felkínálja: {{ui:export.plates}}: minden tálca e
 ## Rács és illesztés
 
 A rács a tárgyasztal méretét mutatja. Jobbra lent van az **illesztési lépés**: a mozgatás és a méretezés ekkora lépésekben illeszkedik, például 1 mm-esekben. Finom munkához vedd kisebbre, durva elrendezéshez nagyobbra. A szalagon a {{ui:editor.tool.snapToGrid}} utólag a legközelebbi rácspontra helyezi a kijelölt alakzatokat. Mozgatás közben az alakzatok más alakzatokhoz is illeszkednek, lásd a [Kijelölés és elrendezés](chapter:select-and-arrange) fejezetet.
-Egy rövid kattintás a középső egérgombbal, az egér mozgatása nélkül, közvetlenül a mutatónál nyitja meg az illesztési lépés menüjét, vázlatban is; a középső gombot lenyomva tartva a húzás továbbra is a nézetet mozgatja.
+Egy rövid kattintás a középső egérgombbal, az egér mozgatása nélkül, közvetlenül a mutatónál nyitja meg az illesztési lépés menüjét, vázlatban is; a középső gombot lenyomva tartva a húzás továbbra is a nézetet mozgatja. A 3D-szerkesztőben a címsorában az mm / in kapcsoló is ott van, így bezárás nélkül válthatsz milliméter és hüvelyk között.
 
 > **Tipp:** Amikor részeket pontosan illesztesz egymáshoz, ne forgasd a nézetet. A számbillentyűkkel válts felül- vagy elölnézetre, és nyomd meg az [[O]] billentyűt a lapos megjelenítéshez. Így azonnal látod, hogy két él tényleg egy síkban van-e.
 

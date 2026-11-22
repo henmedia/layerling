@@ -180,6 +180,17 @@ En gängad värmeinsats pressas in i en plastdel med en lödkolv och ger skruvar
 
 Hålet är en vanlig hålform grupperad med kroppen, precis som hålen i hålmönstret, och CAD-kärnan skär ut det som en riktig cylinder, så borrningen blir exakt. {{ui:editor.tool.ungroup}} frigör det igen. Det är lika djupt som insatsen är lång och sticker ut en bit ur ytan så att det öppnas rent. En AI kan göra samma sak över MCP-bryggan med `layerling_thread_insert` (se kapitlet [AI med MCP](chapter:ai-with-mcp)).
 
+## Magnetficka
+
+Figurmålare sätter små runda magneter i fogarna på en figur i flera delar i stället för att limma den: då går den isär för målning och frakt; askar och lock håller på samma sätt. Verktyget {{ui:magnetPocket.title}} skär fickan: lika djup som magneten plus 0,2 mm, så att den sitter strax under ytan, och under den en smalare limgrop, så att limmet får plats och magneten vilar på en kant och inte glider in i en ihålig utskrift. Ficka och grop bildar en upp-och-nedvänd cylinderhatt. Välj exakt en kropp, öppna formbiblioteket och klicka på {{ui:magnetPocket.title}} under {{ui:library.section.holes}}, eller hitta det med [[Ctrl]]+[[K]].
+
+1. Välj {{ui:magnetPocket.size}}, från 2 × 1 till 12 × 3 mm, eller skriv magnetens diameter och höjd. {{ui:magnetPocket.gap}} börjar på 0,1 mm; {{ui:magnetPocket.well}} är påslagen.
+2. Klicka på platsen, en plan yta eller ytterväggen på en cylinder eller ett rör, som för gänginsatsen. En ring visar fickan: grön där delen har 1 mm vägg bredvid och djupet bakom, röd där den inte har det, med orsaken. Dra den, skriv dess läge eller flytta den till mitten av ytan.
+3. {{ui:magnetPocket.both}} (påslagen från början) letar efter delen som ligger an mot ytan där, högst 1 mm bort: andra halvan av fogen, placerad som den passar. Den får samma ficka mittemot, så att magneterna möts; en andra ring visar den, och en rad säger varför en del inte får någon. För att nå en yta som den andra delen täcker, dölj den delen: den får ändå sin ficka.
+4. Först {{ui:magnetPocket.apply}} skär fickorna.
+
+Varje ficka är ett vanligt hål grupperat med sin del; {{ui:editor.tool.ungroup}} frigör det. Håll ihop varje par magneter så att de drar till sig varandra och märk utsidan innan du trycker i dem. Även Dela-verktyget har magneter som förbindning. En AI gör samma sak med `layerling_magnet_pocket` (se kapitlet [AI med MCP](chapter:ai-with-mcp)).
+
 ## Dra ut eller trycka in en yta
 
 För att göra en vägg tjockare, höja en klack på en yta eller fälla in en ficka i den arbetar {{ui:faceTool.title}} på en plan yta. Det fungerar även på importerade STL-filer där det inte finns någon skiss att redigera. Markera exakt en kropp och klicka på {{ui:faceTool.title}} i gruppen {{ui:editor.section.mirrorPattern}} i verktygsfältet bredvid hålmönstret. Du kan också högerklicka på kroppen eller söka med [[Ctrl]]+[[K]].

@@ -111,6 +111,7 @@ export type LayerlingMcpCommandName =
   | "place_on_face"
   | "perforate_face"
   | "thread_insert"
+  | "magnet_pocket"
   | "sweep_sketch"
   | "push_face"
   | "paint_object"

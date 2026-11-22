@@ -12,6 +12,15 @@ describe("angles a person would write", () => {
     expect(signedDegrees(180)).toBe(180);
   });
 
+  // What a rotation field does with an angle beyond half a turn (Discussion #1842): ten digits round a dial, 36 degrees apart.
+  it("takes a typed angle past 180 as the same turn", () => {
+    expect(signedDegrees(216)).toBe(-144);
+    expect(signedDegrees(324)).toBe(-36);
+    expect(signedDegrees(360)).toBe(0);
+    expect(signedDegrees(-181)).toBe(179);
+    expect(signedDegrees(540)).toBe(180);
+  });
+
   // The case seen with the R key: 135 degrees about the vertical came out as X 180, Y 45, Z 180.
   it("reads a turn about the vertical as just that", () => {
     const angles = readableEulerDegrees(turn(0, 135, 0));

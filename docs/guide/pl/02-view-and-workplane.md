@@ -113,7 +113,7 @@ Okno eksportu oferuje wtedy {{ui:export.plates}}: wszystkie stoły w jednym plik
 ## Siatka i przyciąganie
 
 Siatka pokazuje rozmiar płyty. W prawym dolnym rogu jest **krok przyciągania**: przesuwanie i skalowanie przyciągają się co tyle, na przykład co 1 mm. Zmniejsz go do precyzyjnej pracy, zwiększ do zgrubnego rozmieszczania. {{ui:editor.tool.snapToGrid}} na wstążce przesuwa potem zaznaczone kształty na najbliższe przecięcie siatki. Podczas przesuwania kształty przyciągają się też do innych kształtów, zobacz [Zaznaczanie i rozmieszczanie](chapter:select-and-arrange). Bez myszy: [[Alt]]+[[1]] do [[Alt]]+[[0]] wybierają tę pozycję menu ([[Alt]]+[[1]] wyłącza przyciąganie), a [[,]] i [[.]] zmieniają krok o jeden rozmiar na drobniejszy albo grubszy. Działa to też w szkicu.
-Krótkie kliknięcie środkowym przyciskiem myszy, bez ruszania myszą, otwiera menu kroku przyciągania tuż przy wskaźniku, także w szkicu; przeciąganie z wciśniętym środkowym przyciskiem nadal przesuwa widok.
+Krótkie kliknięcie środkowym przyciskiem myszy, bez ruszania myszą, otwiera menu kroku przyciągania tuż przy wskaźniku, także w szkicu; przeciąganie z wciśniętym środkowym przyciskiem nadal przesuwa widok. W edytorze 3D jego wiersz tytułu ma też przełącznik mm / in, więc przełączasz między milimetrami a calami, a menu się nie zamyka.
 
 > **Wskazówka:** Gdy dokładnie dopasowujesz części, przestań obracać widok. Klawiszami cyfr przejdź do widoku na wprost z góry albo z przodu i naciśnij [[O]], aby włączyć płaski widok. Wtedy od razu widać, czy dwie krawędzie naprawdę są na równo.
 

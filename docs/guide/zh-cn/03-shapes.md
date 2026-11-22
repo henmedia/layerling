@@ -21,7 +21,7 @@ layerling 里的每个零件都从一个形状开始。用这些形状，你可�
 
 形状库提供：
 
-- **{{ui:library.section.basic}}：** {{ui:shape.box}}、{{ui:shape.roundedBox}}、{{ui:shape.cylinder}}、{{ui:shape.slot}}、{{ui:shape.ellipse}}、{{ui:shape.polygon}}（三到二十四条边）、{{ui:shape.wedge}}、{{ui:shape.sphere}}、{{ui:shape.cone}}、{{ui:shape.curvedCone}}（侧面向内弯成像伪球面那样的喇叭形，或向外鼓成圆顶；由 {{ui:prop.curvedConeTop}} 和 {{ui:prop.curvedConeBend}} 设置，并且像所有精确实体一样可以抽壳和倒圆角）、{{ui:shape.pyramid}}（三到二十四条边，因此也有三棱锥）、{{ui:shape.roundRoof}}、{{ui:shape.halfSphere}}、{{ui:shape.paraboloid}}（收窄成圆头的穹顶，高度随离轴距离的平方下降）和 {{ui:shape.torus}}。
+- **{{ui:library.section.basic}}：** {{ui:shape.box}}、{{ui:shape.roundedBox}}、{{ui:shape.cylinder}}、{{ui:shape.slot}}、{{ui:shape.ellipse}}、{{ui:shape.polygon}}（三到二十四条边）、{{ui:shape.wedge}}、{{ui:shape.roof}}、{{ui:shape.sphere}}、{{ui:shape.cone}}、{{ui:shape.curvedCone}}（侧面向内弯成像伪球面那样的喇叭形，或向外鼓成圆顶；由 {{ui:prop.curvedConeTop}} 和 {{ui:prop.curvedConeBend}} 设置，并且像所有精确实体一样可以抽壳和倒圆角）、{{ui:shape.pyramid}}（三到二十四条边，因此也有三棱锥）、{{ui:shape.roundRoof}}、{{ui:shape.halfSphere}}、{{ui:shape.paraboloid}}（收窄成圆头的穹顶，高度随离轴距离的平方下降）和 {{ui:shape.torus}}。
 - **{{ui:library.section.vessels}}：** 从一个轮廓过渡到另一个轮廓的 {{ui:shape.loft}}，比如从方形到圆形，{{ui:shape.tube}}，由最多十二段直管及之间的弯头组成的 {{ui:shape.bentTube}}，以及 {{ui:shape.vase}}。
 - **{{ui:library.section.holes}}：** 用于螺钉头的 {{ui:shape.counterbore}} 和 {{ui:shape.countersink}}、用于水平孔的 {{ui:shape.teardrop}}，以及用于 USB、HDMI、DisplayPort 和 RJ45 插座的 {{ui:shape.port}}。 {{ui:threadInsert.title}} 在你选中的实体上打出热熔嵌件的孔；它不能拖入设计。
 - **{{ui:library.section.connections}}：** {{ui:shape.thread}}（螺杆、螺钉、螺母和螺纹孔）、沉头螺钉下的 {{ui:shape.finishingWasher}}、一体打印的 {{ui:shape.hinge}} 和 {{ui:shape.dovetail}}。更多见[螺纹与机械件](chapter:threads-and-mechanics)。
@@ -34,11 +34,15 @@ layerling 里的每个零件都从一个形状开始。用这些形状，你可�
 
 有两种方式可以得到三角形：三边的 {{ui:shape.polygon}} 是等腰三角形，也就是 Tinkercad 的“Roof”；{{ui:shape.wedge}} 是直角三角形。两者都是真正的三棱柱。要挖出三角形孔，复制该形状，把副本缩小，标记为孔，然后用 {{ui:editor.tool.centerOnWorkplane}} 或 {{ui:editor.tool.align}} 对齐。两者都按形状的边界框工作，也就是包围它的最小方框，所以被切掉一半的正方形仍按完整正方形计算。命令搜索（[[Ctrl]]+[[K]]）在“triangle”或“roof”下也能找到这两种形状。楔形的属性里还有{{ui:prop.wedgeAngle}}，即其斜面与平台的夹角。输入一个角度，高度会在宽度不变的情况下随之改变，便于把面上的工作平面设成一定的倾角。
 
+形状库中的{{ui:shape.roof}}正是这个三边的多边形，插入时已平躺在一个平面上，像屋顶一样尖角朝上。顶部的控制点改变三角形的高度，底边保持在平台上；底部的控制点改变宽度和长度。它的三条边固定不变；需要其他边数时请用{{ui:shape.polygon}}。
+
 {{ui:shape.slot}} 可以一端比另一端窄，例如用于两个带轮之间的皮带护罩。在 {{ui:inspector.properties}} 下设置 {{ui:prop.slotSmallEnd}}；大端与胶囊一样宽，两侧从一段圆弧直通另一段圆弧。{{ui:prop.slotCentreDistance}} 是两段圆弧圆心之间的距离，也就是两个带轮的间距。改变小端时圆心距保持不变，胶囊会变长或变短。锥形胶囊同样是精确实体，可用于圆角和 STEP。
 
 {{ui:shape.sector}} 是一个圆盘，你可以用 {{ui:prop.sectorAngle}}（1 到 360°）像时钟指针一样把它切掉一部分，从十二点钟方向起顺时针计算。{{ui:prop.innerDiameter}} 可以把它变成圆环或圆环段（为 0 时零件保持实心），{{ui:prop.sectorEndRadius}} 则把两端倒成半圆：得到一条弯曲的槽，例如用于显示器支架和其他需要转动并夹紧的零件。直径和高度的设置方法与圆柱相同。外框仍是完整的圆，所以形状绕圆心旋转。
 
 {{ui:shape.polygon}} 在 {{ui:prop.sides}} 下方有 {{ui:prop.cornerFillet}} 滑块，模型上还有一个拖动点，与 {{ui:shape.roundedBox}} 一样。无论有多少条边，一个半径适用于所有角。它以毫米为单位，所以拉伸后的多边形仍保持圆角；最大值是相邻圆角恰好相接的位置，0 则是普通多边形。
+
+{{ui:prop.polygonFlat}}将多边形转过半条边，使朝前的是一条平边而不是一个角。长度和宽度是在多边形外围的框上测量的：八边形通常以四个角接触这个框，因此两个尺寸都是对角之间的距离；打开此开关后，它以四条平边接触这个框，两个尺寸都是对边之间的距离，也就是扳手的对边宽度。六边形的平边这时在前后，而不是在左右。切换开关时，形体保持不变，两个数值随之改变。
 
 ## 形状的设置
 
@@ -120,7 +124,7 @@ layerling 里的每个零件都从一个形状开始。用这些形状，你可�
 - **形状旁的数值**显示尺寸。单击其中一个会打开字段，可输入想要的数字。按 [[Enter]] 时，形状从该数字对面的边开始增大，与拖动时相同；按 [[Alt]]+[[Enter]] 时，它围绕自己的中心增大，因此与另一个形状对齐过的形状仍保持对齐。这适用于宽度和长度；高度始终从底面向上增大。右侧属性中的字段不用按键就保持中心。[[Tab]] 保留数字并打开下一个（宽度、深度、高度）；[[Shift]]+[[Tab]] 返回上一个。在已单击过的属性字段中，鼠标滚轮也会改变数值：一格一个单位，按住 [[Shift]] 为十倍，[[Ctrl]] 为十分之一，[[Alt]] 为百分之一。未单击过的字段把滚轮留给面板，由面板滚动。
 - **单击一个角**（不拖动）会同时打开宽度和深度。输入第一个，按 [[Tab]] 切到第二个，按 [[Enter]] 应用两者。[[Esc]] 取消。
 
-形状一旦按直角转过，例如用 {{ui:editor.tool.layFlat}} 侧放，属性中的字段就会按每项尺寸当前的方向命名：{{ui:prop.height}} 是向上的尺寸，{{ui:prop.width}} 沿 X 方向，{{ui:prop.length}} 沿 Y 方向。有专用名称的字段（例如沉头孔的头部直径）保留其名称。因此输入躺倒形状的高度会改变垂标尺寸，它的底面仍留在平台上。以其他角度倾斜的形状会在字段中显示自己的尺寸，下方会有说明。 提示下方还会显示空间中的总尺寸，因此可以读出倾斜形状实际有多高；它只用于查看。
+形状一旦按直角转过，例如用 {{ui:editor.tool.layFlat}} 侧放，属性中的字段就会按每项尺寸当前的方向命名：{{ui:prop.height}} 是向上的尺寸，{{ui:prop.width}} 沿 X 方向，{{ui:prop.length}} 沿 Y 方向。有专用名称的字段（例如沉头孔的头部直径）保留其名称。因此输入躺倒形状的高度会改变垂标尺寸，它的底面仍留在平台上。侧放在平台或其他水平工作平面上的形状，其控制柄也会竖直显示：顶部的控制柄把它向上拉，底部的控制柄改变沿工作平面方向的尺寸，不论那是形状自身的哪一项尺寸。以其他角度倾斜的形状会在字段中显示自己的尺寸，下方会有说明。 提示下方还会显示空间中的总尺寸，因此可以读出倾斜形状实际有多高；它只用于查看。
 
 不用鼠标时，可以用键盘：方向键按一个吸附步距移动选中项（网格关闭时为 0.01 mm），按住 [[Shift]] 为五步，或者在设置的 {{ui:workspace.appearance}} 下把 {{ui:workspace.gridMajorEvery}} 设为 {{ui:workspace.gridMajorSteps|10}} 时，为十步：直到下一条更深的线，与 Tinkercad 中一样。它们跟随视图：[[→]] 移向屏幕右侧，[[↑]] 远离你，即使转动过平台也是如此。把形状推出画面时，视图会跟着移动。[[Ctrl]]+[[↑]] 和 [[Ctrl]]+[[↓]] 升高和降低它。连续按方向键在历史记录中算作一步：只要下一次按键在 1.5 秒内跟上，撤销就会收回整串操作，而不是一次一次地收回。[[R]] 旋转 45°，[[Shift]]+[[R]] 旋转 22.5°。[[D]] 把选中项放到工作平面上。
 
@@ -192,7 +196,7 @@ layerling 里的每个零件都从一个形状开始。用这些形状，你可�
 
 在 {{ui:inspector.more}} 下选择图案铺在哪里：外壁和内壁，底部和顶部各留多少光滑（光滑的底部让实体平稳地放在热床上），高度上的一条带，以及锐利棱边是否保持光滑。在所有保持光滑的地方旁边，图案会柔和地过渡出现；{{ui:inspector.surfaceFade}} 设定过渡的毫米数。数值越小，图案越靠近棱边；凸起的图案会一直延伸到棱边。在立方体这类棱角实体的平面上，图案则在这个距离处以一条直边结束：凹槽和菱形以一小段壁收尾，只保留完整的凸点。{{ui:inspector.surfaceProfile}} 决定凹槽或接缝的截面：尖形和平形是精确的，圆形则按 {{ui:inspector.surfaceDetail}} 给出的级数分段。
 
-除了 {{ui:surfaceTexture.grooves}}、{{ui:surfaceTexture.knurl}}、{{ui:surfaceTexture.honeycomb}} 和 {{ui:surfaceTexture.bumps}}，还有更多图案。{{ui:surfaceTexture.cells}} 是像铺路石或干裂泥土那样的不规则单元；接缝像蜂窝一样切得干净，换一个 {{ui:inspector.surfaceSeed}} 就重新排布。{{ui:surfaceTexture.knit}}、{{ui:surfaceTexture.rope}} 和 {{ui:surfaceTexture.weave}} 模仿针织线圈、缠绕的绳子以及由立条和编条编成的篮子；它们默认凸起、圆润，大小与原物相当。{{ui:surfaceTexture.grain}} 让表面变得细微粗糙，像喷砂过一样；颗粒分布在空间中，没有接缝，也不会拉伸。{{ui:surfaceTexture.image}} 把一张灰度图当作高度图：可用现成的木纹、地形或水磨石，也可用 {{ui:inspector.surfaceImageLoad}} 载入自己的图。亮处成为完整深度；{{ui:inspector.surfaceSpacingImage}} 设定一块拼贴的宽度，在 {{ui:inspector.surfaceImageTiling}} 下，拼贴可以重复、镜像或错位。透明背景上的深色图画（例如 SVG 里的黑色线条）按其线条计算：线条变成最大深度。选择 {{ui:surfaceTexture.tilingOnce}} 时，图片像标签一样只压印一次：{{ui:inspector.surfaceTextAround}} 和 {{ui:inspector.surfaceTextHeight}} 像文字一样确定它的中心，{{ui:inspector.surfaceImageWidth}} 设定它的宽度，旁边的表面保持平滑。选中了面时，它总是落在这些面上，即使 {{ui:inspector.surfaceTextAround}} 和 {{ui:inspector.surfaceTextHeight}} 指向别处。 双色的 SVG 图案在一次性压上时，会像文字一样沿着轮廓切出，因此斜线和曲线干净利落，不会出现台阶。
+除了 {{ui:surfaceTexture.grooves}}、{{ui:surfaceTexture.knurl}}、{{ui:surfaceTexture.honeycomb}} 和 {{ui:surfaceTexture.bumps}}，还有更多图案。{{ui:surfaceTexture.cells}} 是像铺路石或干裂泥土那样的不规则单元；接缝像蜂窝一样切得干净，换一个 {{ui:inspector.surfaceSeed}} 就重新排布。{{ui:surfaceTexture.hammered}} 是相互重叠的圆形凹坑，像手工锤打铜杯上的锤痕，每个大小和深浅略有不同；换一个 {{ui:inspector.surfaceSeed}} 也会重新排布。{{ui:surfaceTexture.knit}}、{{ui:surfaceTexture.rope}} 和 {{ui:surfaceTexture.weave}} 模仿针织线圈、缠绕的绳子以及由立条和编条编成的篮子；它们默认凸起、圆润，大小与原物相当。{{ui:surfaceTexture.grain}} 让表面变得细微粗糙，像喷砂过一样；颗粒分布在空间中，没有接缝，也不会拉伸。{{ui:surfaceTexture.image}} 把一张灰度图当作高度图：可用现成的木纹、地形或水磨石，也可用 {{ui:inspector.surfaceImageLoad}} 载入自己的图。亮处成为完整深度；{{ui:inspector.surfaceSpacingImage}} 设定一块拼贴的宽度，在 {{ui:inspector.surfaceImageTiling}} 下，拼贴可以重复、镜像或错位。透明背景上的深色图画（例如 SVG 里的黑色线条）按其线条计算：线条变成最大深度。选择 {{ui:surfaceTexture.tilingOnce}} 时，图片像标签一样只压印一次：{{ui:inspector.surfaceTextAround}} 和 {{ui:inspector.surfaceTextHeight}} 像文字一样确定它的中心，{{ui:inspector.surfaceImageWidth}} 设定它的宽度，旁边的表面保持平滑。选中了面时，它总是落在这些面上，即使 {{ui:inspector.surfaceTextAround}} 和 {{ui:inspector.surfaceTextHeight}} 指向别处。 双色的图案（SVG、PNG 或 JPEG）在一次性压上时，会像文字一样沿着轮廓切出，因此斜线和曲线干净利落，不会出现台阶。
 
 {{ui:surfaceTexture.carbon}} 在实体上铺斜纹编织的碳纤维：竖向带和横向带互相上下穿插，每条带错开一条带的位置，于是出现熟悉的斜纹。{{ui:inspector.surfaceCarbonWeave}} 可选 {{ui:surfaceTexture.carbonTwill22}}（大多数碳纤维件的均匀编织），或 {{ui:surfaceTexture.carbonTwill21}} 和 {{ui:surfaceTexture.carbonTwill31}}，后两者竖向带显得长、横向带显得短。{{ui:inspector.surfaceSpacingCarbon}} 设定竖向带的宽度；{{ui:inspector.surfaceCarbonCross}} 让横向带更宽或更窄，得到不均匀的编织（0：一样宽）。绕实体一圈时，带宽会略作取整，使编织无接缝地闭合。单根纤维对打印来说太细了：看得见的是带和它们的交叉。
 

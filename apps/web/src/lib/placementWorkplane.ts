@@ -235,15 +235,23 @@ export function placementWorkplanePoint(workplane: PlacementWorkplane, x: number
 }
 
 export function placementPatchForNewShape(
-  shape: Pick<WorkplaneShape, "height">,
+  shape: Pick<WorkplaneShape, "height"> & Partial<Pick<WorkplaneShape, "depth">>,
   workplane: PlacementWorkplane,
   basePoint: PlacementPoint = workplane.origin,
   /** Sunk into the face: the top of the shape on the point, the body below it, not the foot on it (#940). */
   sunk = false,
+  /**
+   * A turn about the shape's own X axis before it is set on the workplane, in degrees: the roof (#1931) is the
+   * three-sided polygon laid on one flat side. Its foot is then its depth, not its height, below the middle.
+   */
+  turnX = 0,
 ): Pick<WorkplaneShape, "x" | "z" | "elevation" | "rotation" | "rotationX" | "rotationZ"> {
-  const quaternion = placementWorkplaneQuaternion(workplane);
+  const turn = THREE.MathUtils.degToRad(turnX);
+  const quaternion = placementWorkplaneQuaternion(workplane).multiply(new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(1, 0, 0), turn));
   const euler = new THREE.Euler().setFromQuaternion(quaternion, "XYZ");
-  const center = vector(basePoint).addScaledVector(vector(workplane.normal), sunk ? -shape.height / 2 : shape.height / 2);
+  // How far the turned shape reaches along the workplane's normal, from its middle to its foot.
+  const reach = turnX === 0 ? shape.height / 2 : (Math.abs(Math.cos(turn)) * shape.height + Math.abs(Math.sin(turn)) * (shape.depth ?? shape.height)) / 2;
+  const center = vector(basePoint).addScaledVector(vector(workplane.normal), sunk ? -reach : reach);
   return {
     x: clean(center.x),
     z: clean(center.z),

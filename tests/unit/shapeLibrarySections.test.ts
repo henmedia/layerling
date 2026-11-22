@@ -24,7 +24,7 @@ describe("the shape library's sections (#1170)", () => {
     // No shape waits in "More shapes": a new one of the catalogue is given its section in SHAPE_LIBRARY_SECTIONS.
     expect(sections.map((section) => section.id)).not.toContain("other");
     expect(Object.fromEntries(sections.map((section) => [section.id, section.shapes.length]))).toEqual({
-      basic: 16, vessels: 4, holes: 5, connections: 4, enclosure: 3, mechanics: 4, systems: 2, lettering: 4, decorative: 4, helpers: 1,
+      basic: 17, vessels: 4, holes: 6, connections: 4, enclosure: 3, mechanics: 4, systems: 2, lettering: 4, decorative: 4, helpers: 1,
     });
   });
 
@@ -50,7 +50,7 @@ describe("the shape library's sections (#1170)", () => {
 describe("searching the shape library (#1170)", () => {
   it("finds the port opening by USB, through the words of the command search", () => {
     setLanguage("en", false);
-    expect(search("USB")).toEqual([expect.objectContaining({ id: "holes", total: 5, shapes: [expect.objectContaining({ id: "port" })] })]);
+    expect(search("USB")).toEqual([expect.objectContaining({ id: "holes", total: 6, shapes: [expect.objectContaining({ id: "port" })] })]);
   });
 
   it("shows what really matches for a word with several meanings: pipe is the cylinder and the tube", () => {

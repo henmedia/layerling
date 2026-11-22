@@ -162,6 +162,8 @@ Haz clic en {{ui:mold.apply}}: las piezas quedan junto al modelo maestro tal com
 
 El problema más habitual con los moldes es una pieza colada que se queda enganchada. Donde el modelo maestro es más ancho por encima de la partición que por debajo, la ventana avisa de una contrasalida: lleva la {{ui:mold.parting}} a donde el modelo es más ancho, gira el modelo maestro o usa la caja para silicona, que suelta las contrasalidas.
 
+Con {{ui:mold.ownOpenings}} decides tú por dónde entra el material y por dónde sale el aire. El bebedero y los respiraderos ya no se colocan solos: elige en {{ui:mold.openings.kind}} si un clic coloca un {{ui:mold.openings.sprue}} o un {{ui:mold.openings.vent}}, y haz clic en el modelo maestro en la vista. La abertura va desde ese punto en línea recta a través de la mitad superior hasta la cara de arriba del molde, en la dirección en que se abre. Un clic en la varilla de una abertura la quita; la ventana enumera las aberturas con su posición, cada una con un botón para quitarla. {{ui:mold.openings.suggested}} llena la lista con las aberturas que Layerling colocaría por sí mismo, para partir de ellas y cambiarlas. Una abertura junto al modelo maestro se omite y se avisa, un molde sin bebedero recibe una advertencia porque no se puede llenar, y un punto alto sin abertura cerca sigue apareciendo como un punto rojo, para que veas dónde quedaría aire.
+
 > **Consejo:** Sella un molde impreso (con resina o cera) y usa desmoldeante; si no, la pieza colada se agarra a las líneas de capa. El PLA se ablanda a partir de unos 55 °C: para cera caliente, jabón o resina que se calienta al curar, imprime el molde en PETG o ASA.
 
 ## Un canal para cable a través de un cuerpo

@@ -1,6 +1,6 @@
 import { unzipSync } from "fflate";
 import { zUpToLayerling } from "@/lib/meshCoordinates";
-import { importedMeshName, importedShapeFromTriangleSoup } from "@/lib/stlImport";
+import { importedMeshName, importedShapeFromTriangleSoup, type MeshPlacement } from "@/lib/stlImport";
 import type { WorkplaneShape } from "@/types/layerling";
 import { normalizeHexColor, placeColoredParts } from "@/lib/coloredImport";
 
@@ -491,7 +491,7 @@ function itemLabel(name: string | undefined) {
  * Objekt oder Teil zugewiesen hat. Ein Objekt in einer Farbe bleibt ein
  * Koerper wie bisher.
  */
-export function importedShapesFrom3mf(fileName: string, buffer: ArrayBuffer): ThreeMfImportResult {
+export function importedShapesFrom3mf(fileName: string, buffer: ArrayBuffer, placement: MeshPlacement = {}): ThreeMfImportResult {
   const triangles = readPackage(buffer);
   // Ein Objekt mit einem Farbverlauf kommt ohne seine Farben, als ein Koerper.
   const keysIn = new Map<number, Set<string>>();
@@ -521,7 +521,7 @@ export function importedShapesFrom3mf(fileName: string, buffer: ArrayBuffer): Th
   const objects = new Set(order.map((group) => group.item)).size;
 
   if (order.length <= 1) {
-    const whole = importedShapeFromTriangleSoup(fileName, triangles.positions, undefined, "3mf");
+    const whole = importedShapeFromTriangleSoup(fileName, triangles.positions, undefined, "3mf", placement);
     const color = triangles.colors.get(order[0]?.key ?? "")?.color;
     return { shapes: [color ? { ...whole, color } : whole], split: false, objects, painted: triangles.painted, droppedColors };
   }
@@ -542,6 +542,7 @@ export function importedShapesFrom3mf(fileName: string, buffer: ArrayBuffer): Th
       return { color: found?.color, label, positions: byGroup.get(`${item}|${key}`)! };
     }),
     (positions) => importedShapeFromTriangleSoup(fileName, positions, undefined, "3mf"),
+    placement,
   );
   return { shapes, split: true, objects, painted: triangles.painted, droppedColors };
 }

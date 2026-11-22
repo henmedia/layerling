@@ -176,6 +176,17 @@ Een warm in te drukken draadinzet wordt met een soldeerbout in een kunststof ond
 
 Het gat is een gewone gatvorm, gegroepeerd met het lichaam, zoals de gaten van het gatenpatroon, en de CAD-kernel snijdt het als een echte cilinder, dus de boring is exact. {{ui:editor.tool.ungroup}} maakt het gat weer los. Het is zo diep als de inzet lang is en steekt een beetje uit het vlak, zodat het schoon opent. Een AI kan hetzelfde doen via de MCP-brug met `layerling_thread_insert` (zie het hoofdstuk [Bouwen met een AI (MCP)](chapter:ai-met-mcp)).
 
+## Magneetkamer
+
+Figuurschilders zetten kleine ronde magneten in de verbindingen van een figuur uit meerdere delen in plaats van te lijmen: zo gaat hij uit elkaar om te schilderen en te verzenden; dozen en deksels houden op dezelfde manier. Het gereedschap {{ui:magnetPocket.title}} maakt de kamer: zo diep als de magneet plus 0,2 mm, zodat hij net onder het vlak zit, en eronder een smaller lijmputje, zodat de lijm ruimte heeft en de magneet op een richel rust en niet in een holle print schuift. Kamer en putje vormen een omgekeerde hoge hoed. Selecteer precies één lichaam, open de vormenbibliotheek en klik op {{ui:magnetPocket.title}} onder {{ui:library.section.holes}}, of vind het met [[Ctrl]]+[[K]].
+
+1. Kies de {{ui:magnetPocket.size}}, van 2 × 1 tot 12 × 3 mm, of typ diameter en hoogte van de magneet. {{ui:magnetPocket.gap}} begint op 0,1 mm; {{ui:magnetPocket.well}} staat aan.
+2. Klik op de plek, een plat vlak of de buitenwand van een cilinder of buis, zoals bij de draadinzet. Een ring toont de kamer: groen als het deel ernaast 1 mm wand en erachter de diepte heeft, rood als dat niet zo is, met de reden. Sleep hem, typ zijn plaats of zet hem in het midden van het vlak.
+3. {{ui:magnetPocket.both}} (eerst aan) zoekt het deel dat daar tegen het vlak ligt, hoogstens 1 mm weg: de andere helft van de verbinding, staand zoals het past. Het krijgt dezelfde kamer ertegenover, zodat de magneten elkaar raken; een tweede ring toont die, en een regel zegt waarom een deel er geen krijgt. Om een vlak te bereiken dat het andere deel bedekt, verberg je dat deel: het krijgt toch zijn kamer.
+4. Pas {{ui:magnetPocket.apply}} maakt de kamers.
+
+Elke kamer is een gewoon gat, gegroepeerd met zijn deel; {{ui:editor.tool.ungroup}} maakt het weer vrij. Houd voor het indrukken elk paar tegen elkaar zodat ze elkaar aantrekken, en markeer de buitenkant. Ook het gereedschap Splitsen heeft magneten als verbinding. Een AI doet hetzelfde met `layerling_magnet_pocket` (zie het hoofdstuk [AI met MCP](chapter:ai-met-mcp)).
+
 ## Een vlak naar buiten of naar binnen trekken
 
 Voor een dikkere wand, een verhoogd plateau op een vlak of een kamer erin werkt het gereedschap {{ui:faceTool.title}} op één plat vlak. Het werkt ook op een geïmporteerde STL, waar geen schets is om te veranderen. Selecteer precies één lichaam en klik op {{ui:faceTool.title}} in de groep {{ui:editor.section.mirrorPattern}} van het lint, naast het gatenpatroon. Je kunt ook met rechts op het lichaam klikken, of het vinden met [[Ctrl]]+[[K]].

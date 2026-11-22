@@ -1,4 +1,5 @@
 import type { OcctKernel, ShapeHandle, Vec3 } from "occt-wasm";
+import { edgeFaceMap } from "@/lib/cadEdgeFaces";
 import { isCadModifierWasmMemoryFault } from "@/lib/cadModifierRuntime";
 import { orientedFaceNormal } from "@/lib/cadShell";
 import { isKernelMemoryFault } from "@/lib/kernelFault";
@@ -29,22 +30,6 @@ function shapeIsValidSolid(cad: OcctKernel, shape: ShapeHandle) {
     if (isKernelMemoryFault(error)) throw error;
     return false;
   }
-}
-
-function parseEdgeFaceMap(values: number[]) {
-  const map = new Map<number, number[]>();
-  for (let index = 0; index + 1 < values.length; ) {
-    const edgeHash = values[index++];
-    const count = values[index++];
-    const faces = values.slice(index, index + count);
-    index += count;
-    const current = map.get(edgeHash) ?? [];
-    faces.forEach((hash) => {
-      if (!current.includes(hash)) current.push(hash);
-    });
-    map.set(edgeHash, current);
-  }
-  return map;
 }
 
 function edgeMidpoint(cad: OcctKernel, edge: ShapeHandle): Vec3 {
@@ -165,7 +150,7 @@ function findChamferTransitionEdges(
       return [];
     }
 
-    const edgeToFaces = parseEdgeFaceMap(cad.edgeToFaceMap(chamfered, HASH_UPPER_BOUND));
+    const edgeToFaces = edgeFaceMap(cad, faces);
     type BevelBoundaryEdge = {
       edge: ShapeHandle;
       edgeHash: number;

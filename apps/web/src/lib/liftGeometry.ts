@@ -15,6 +15,12 @@ export type SelectionFrame = {
   min: THREE.Vector3;
   max: THREE.Vector3;
   singleShape: WorkplaneShape | null;
+  /**
+   * Set for a single body that lies on its side on a level workplane (Discussion #1838): the frame then stands
+   * upright on the workplane instead of following the body's own axes, and this says which of the body's own
+   * measures runs along each of the frame's axes.
+   */
+  lying?: { x: "width" | "height" | "depth"; y: "width" | "height" | "depth"; z: "width" | "height" | "depth" };
 };
 
 export type LiftGeometry = {

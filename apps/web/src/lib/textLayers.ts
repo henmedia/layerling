@@ -1,10 +1,11 @@
 import * as THREE from "three";
 import { loadedManifoldRuntime } from "@/lib/manifoldHandle";
 import { normalizeSketchStroke, SKETCH_STROKE_JOINS } from "@/lib/sketchStroke";
+import { DEFAULT_FLUSH_DEPTH, flushDepthFor, MAX_FLUSH_DEPTH, MIN_FLUSH_DEPTH } from "@/lib/flushLayers";
 import { normalizeTextEdge } from "@/lib/textEdge";
 import { textOutlineClearance, textOutlineReach } from "@/lib/textFill";
 import { DEFAULT_KEYRING_DIAMETER, freeKeyringAt, KEYRING_HOLE_EDGE_DISTANCE, keyringAlongLimit, keyringEarRadius, MAX_KEYRING_DIAMETER, MIN_KEYRING_DIAMETER, TEXT_KEYRING_SIDES, textFillExtent, textKeyringOf, textKeyringReaches, textLetterBox, textLetterOffset } from "@/lib/textGeometry";
-import type { FreeKeyring, SketchStroke, SketchStrokeJoin, TextEdge, TextKeyring, TextKeyringSide, WorkplaneShape } from "@/types/layerling";
+import type { FlushLayer, FreeKeyring, SketchStroke, SketchStrokeJoin, TextEdge, TextKeyring, TextKeyringSide, WorkplaneShape } from "@/types/layerling";
 
 /**
  * Layered text (#215): one text as a stack of bodies for a multicolour print - the letters on
@@ -202,7 +203,7 @@ export function textLayerSource(text: WorkplaneShape): WorkplaneShape {
   const letters = textLetterBox(text);
   // Beside an ear (#215) the letters sit off the middle of the box; the source stands where they are.
   const middle = turned(text, textLetterOffset(text));
-  const { textStroke: _stroke, textSilhouette: _silhouette, textKeyring: _keyring, textEdge: _edge, ...rest } = text;
+  const { textStroke: _stroke, textSilhouette: _silhouette, textKeyring: _keyring, textEdge: _edge, textFlush: _flush, ...rest } = text;
   // A layer is named "<name> <number>"; the stack's name is the part before the number.
   return {
     ...rest,
@@ -245,7 +246,7 @@ function layerKeyrings(letters: WorkplaneShape, layers: readonly TextLayer[], ke
   const layerText = (layer: TextLayer) => {
     const stroke = growStroke(layer.grow, layer.join);
     const extent = textFillExtent({ textStroke: stroke });
-    const { textStroke: _stroke, textSilhouette: _silhouette, textKeyring: _keyring, textEdge: _edge, ...plain } = letters;
+    const { textStroke: _stroke, textSilhouette: _silhouette, textKeyring: _keyring, textEdge: _edge, textFlush: _flush, ...plain } = letters;
     const shape: WorkplaneShape = { ...plain, width: (letters.width ?? 0) + 2 * extent, depth: (letters.depth ?? 0) + 2 * extent, ...(stroke ? { textStroke: stroke } : {}) };
     return { shape, box: half + extent };
   };
@@ -263,18 +264,58 @@ function layerKeyrings(letters: WorkplaneShape, layers: readonly TextLayer[], ke
   });
 }
 
+/** A tag laid in flush (#215): how deep the layers above the bottom one are set into it, in mm. */
+export type TagFlush = { depth: number };
+
+/**
+ * layerling_layer_text's and layerling_layer_icon's `flush` (#215): left out it stays as it is (undefined); false or
+ * null stacks the layers again; true lays them in flush DEFAULT_FLUSH_DEPTH mm deep; a number, or { depth }, that deep.
+ * A depth out of range is refused, not bent into range.
+ */
+export function tagFlushArgument(value: unknown): { flush: TagFlush | null } | { error: string } | undefined {
+  if (value === undefined) return undefined;
+  if (value === null || value === false) return { flush: null };
+  if (value === true) return { flush: { depth: DEFAULT_FLUSH_DEPTH } };
+  const depth = typeof value === "number" ? value : value && typeof value === "object" && !Array.isArray(value) ? (value as Record<string, unknown>).depth ?? DEFAULT_FLUSH_DEPTH : undefined;
+  if (typeof depth !== "number" || !Number.isFinite(depth) || depth < MIN_FLUSH_DEPTH || depth > MAX_FLUSH_DEPTH) {
+    return { error: `flush must be true, false, or a depth of ${MIN_FLUSH_DEPTH} to ${MAX_FLUSH_DEPTH} mm` };
+  }
+  return { flush: { depth: round(depth) } };
+}
+
+/**
+ * Each layer's flush setting (#215), top to bottom, for a tag laid in flush: the depth the layers are set in (kept on
+ * the bottom layer's height), the layer's own height in the stack, and the pocket the layer above it lies in. Every
+ * layer undefined for a stacked tag, or one of a single layer.
+ */
+export function flushLayersFor(layers: readonly TextLayer[], flush: TagFlush | null | undefined): (FlushLayer | undefined)[] {
+  if (!flush || layers.length < 2) return layers.map(() => undefined);
+  const depth = flushDepthFor(flush.depth, layers[layers.length - 1].height);
+  return layers.map((layer, index) => {
+    const above = index > 0 ? layers[index - 1] : null;
+    return {
+      depth,
+      height: layer.height,
+      ...(above ? { pocket: { grow: above.grow, ...(above.join ? { join: above.join } : {}), ...(above.silhouette ? { silhouette: true } : {}) } } : {}),
+    };
+  });
+}
+
 /**
  * The layers as texts standing in the world, bottom layer first on the source's elevation and
  * each next one on top of the one below; all share the source's letters, place and turn, so the
  * letters line up through the stack. `ids` keep the layers' ids when a stack is built again.
+ * Laid in flush (#215, `flush`), the layers above the bottom one are all `depth` high and end on
+ * the bottom layer's top, each in a pocket of the one under it.
  */
-export function textLayerShapes(source: WorkplaneShape, layers: readonly TextLayer[], ids: (string | undefined)[] = [], keyring: NameTagKeyring | null = null): WorkplaneShape[] {
+export function textLayerShapes(source: WorkplaneShape, layers: readonly TextLayer[], ids: (string | undefined)[] = [], keyring: NameTagKeyring | null = null, flush: TagFlush | null = null): WorkplaneShape[] {
   const letters = textLayerSource(source);
   // The stack grows along the letters' own up, so a tag on a side face stands out of it (#696).
   const foot = footOf(letters);
   const up = upOf(letters);
   // Curved text has no key ring hole.
   const keyrings = layerKeyrings(letters, layers, letters.textCurved ? null : keyring);
+  const flushes = flushLayersFor(layers, flush);
   const bottomUp = [...layers].reverse();
   let below = 0;
   const shapes = bottomUp.map((layer, fromBottom) => {
@@ -282,14 +323,18 @@ export function textLayerShapes(source: WorkplaneShape, layers: readonly TextLay
     const stroke = growStroke(layer.grow, layer.join);
     const extent = textFillExtent({ textStroke: stroke });
     const layerKeyring = keyrings[index];
-    const place = placedOnFoot(letters, foot.clone().addScaledVector(up, below), layer.height);
+    const layerFlush = flushes[index];
+    // Laid in flush every layer above the bottom one stands in its pocket, its top on the bottom layer's.
+    const height = layerFlush && index < layers.length - 1 ? layerFlush.depth : layer.height;
+    const rise = layerFlush && index < layers.length - 1 ? layers[layers.length - 1].height - layerFlush.depth : below;
+    const place = placedOnFoot(letters, foot.clone().addScaledVector(up, rise), height);
     let shape: WorkplaneShape = {
       ...letters,
       id: ids[index] ?? `${letters.id}-layer-${index + 1}`,
       name: layers.length > 1 ? `${letters.name} ${index + 1}` : letters.name,
       color: layer.color,
       hole: false,
-      height: layer.height,
+      height,
       ...place,
       width: round(letters.width + 2 * extent),
       depth: round(letters.depth + 2 * extent),
@@ -298,6 +343,7 @@ export function textLayerShapes(source: WorkplaneShape, layers: readonly TextLay
       ...(layer.silhouette ? { textSilhouette: true } : {}),
       ...(layer.edge ? { textEdge: layer.edge } : {}),
       ...(layerKeyring ? { textKeyring: layerKeyring } : {}),
+      ...(layerFlush ? { textFlush: layerFlush } : {}),
     };
     if (layerKeyring?.ear) {
       // The ear widens the box on its side; the box moves by half of that, so the letters stay put.
@@ -317,8 +363,8 @@ export function textLayerShapes(source: WorkplaneShape, layers: readonly TextLay
   return shapes.reverse();
 }
 
-/** A name tag as its card shows it: the letters, the layers top to bottom, their ids and the key ring hole. */
-export type TextLayerStack = { source: WorkplaneShape; layers: TextLayer[]; ids: string[]; keyring: NameTagKeyring | null };
+/** A name tag as its card shows it: the letters, the layers top to bottom, their ids, the key ring hole and whether it is laid in flush (#215). */
+export type TextLayerStack = { source: WorkplaneShape; layers: TextLayer[]; ids: string[]; keyring: NameTagKeyring | null; flush: TagFlush | null };
 
 /**
  * Reads a stack back from its layers (texts standing in the world, any order): the letters
@@ -332,12 +378,15 @@ export function textLayersOf(shapes: WorkplaneShape[]): TextLayerStack | null {
   // Ordered along the stack's own up, which is not the world's on a side face (#696).
   const up = upOf(shapes[0]);
   const level = (shape: WorkplaneShape) => footOf(shape).dot(up);
-  const topDown = [...shapes].sort((a, b) => level(b) - level(a));
+  // Laid in flush (#215) the layers above the bottom one start on one level: the narrower is the one above.
+  const grownBy = (shape: WorkplaneShape) => textFillExtent({ textStroke: normalizeSketchStroke(shape.textStroke) });
+  const topDown = [...shapes].sort((a, b) => (Math.abs(level(b) - level(a)) > 1e-6 ? level(b) - level(a) : grownBy(a) - grownBy(b)));
   const layers = topDown.map((shape) => {
     const stroke = normalizeSketchStroke(shape.textStroke);
     return normalizeTextLayer({
       grow: stroke?.align === "grow" ? stroke.width : stroke ? textFillExtent({ textStroke: stroke }) : 0,
-      height: shape.height,
+      // A layer laid in flush keeps its own height in the stack (#215).
+      height: shape.textFlush?.height ?? shape.height,
       color: shape.color,
       silhouette: shape.textSilhouette,
       // A wider layer's corners (#215); round is the default and is left out.
@@ -352,9 +401,11 @@ export function textLayersOf(shapes: WorkplaneShape[]): TextLayerStack | null {
   // The key ring hole (#215) is the bottom layer's, where the ear is.
   const ring = textKeyringOf(bottom);
   const keyring = ring ? { side: ring.side, diameter: ring.diameter, ...(ring.along ? { along: ring.along } : {}), ...(ring.free ? { free: ring.free } : {}) } : null;
+  // Laid in flush (#215) when the bottom layer carries a pocket.
+  const flush = topDown.length > 1 && bottom.textFlush?.pocket ? { depth: bottom.textFlush.depth } : null;
   // The letters where the top layer has them, slid down its up onto the bottom layer's underside.
   const foot = footOf(source).addScaledVector(up, level(bottom) - footOf(source).dot(up));
-  return { source: { ...source, ...placedOnFoot(source, foot, source.height) }, layers, ids: topDown.map((shape) => shape.id), keyring };
+  return { source: { ...source, ...placedOnFoot(source, foot, source.height) }, layers, ids: topDown.map((shape) => shape.id), keyring, flush };
 }
 
 /** A name tag per line: empty lines dropped, at most `limit` names. */

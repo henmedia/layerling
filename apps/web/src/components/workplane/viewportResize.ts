@@ -338,13 +338,15 @@ function resizeShapeFromFrameHandleBox(
   // drives the one shared diameter instead of stretching width and depth
   // independently into an ellipse.
   // A Hirth joint too: stretched, its teeth no longer interlock all round (#1016).
-  if ((shape.kind === "cylinder" || shape.kind === "star" || shape.kind === "hirth" || shape.kind === "pulley" || shape.kind === "finishingWasher") && (signs.x || signs.z)) {
+  // Not for a body lying on its side (Discussion #1838): its footprint is then its length and one diameter (see below).
+  const lying = Boolean(frame.lying);
+  if (!lying && (shape.kind === "cylinder" || shape.kind === "star" || shape.kind === "hirth" || shape.kind === "pulley" || shape.kind === "finishingWasher") && (signs.x || signs.z)) {
     const diameter = signs.x && signs.z ? (nextWidth + nextDepth) / 2 : signs.x ? nextWidth : nextDepth;
     nextWidth = diameter;
     nextDepth = diameter;
   }
   // A GT2 pulley is whole teeth: its width is rounded to them before the middle is placed.
-  if (shape.kind === "pulley" && (signs.x || signs.z)) {
+  if (!lying && shape.kind === "pulley" && (signs.x || signs.z)) {
     nextWidth = pulleyFootprint({ ...shape, ...pulleyFromSize(shape, { width: nextWidth }) }).width;
     nextDepth = nextWidth;
   }
@@ -362,7 +364,7 @@ function resizeShapeFromFrameHandleBox(
   }
   // A Gridfinity bin or baseplate is whole grid units (a tray's size is free): the box is rounded to them before the
   // middle is placed, so the side that is not dragged stays where it is.
-  if (shape.kind === "gridfinity" && (signs.x || signs.z)) {
+  if (!lying && shape.kind === "gridfinity" && (signs.x || signs.z)) {
     const footprint = gridfinityFootprintPatch({ ...shape, width: nextWidth, depth: nextDepth });
     nextWidth = footprint.width;
     nextDepth = footprint.depth;
@@ -395,6 +397,22 @@ function resizeShapeFromFrameHandleBox(
       height: dims.height,
       size: resizedShapeSize(dims.width, dims.depth),
     };
+  }
+  // A body lying on its side on a level workplane (Discussion #1838): its handles stand upright on the workplane,
+  // so each size goes to the body's own measure that runs along the handle's axis, as for a turned body of a
+  // selection (#1645). The side that is not dragged and the bottom stay where they are.
+  if (lying) {
+    return turnedItemScalePatch(
+      shape,
+      frame,
+      nextWidth / Math.max(MIN_SHAPE_SIZE, width),
+      nextDepth / Math.max(MIN_SHAPE_SIZE, depth),
+      uniformScale,
+      nextCenter,
+      heightAnchorY,
+      // Rounded, for the frame is measured from the turned body and 38 came out as 37.99999999999999.
+      (size) => Math.round(clamp(size, MIN_SHAPE_SIZE, maxSize) * 1e6) / 1e6,
+    );
   }
   if (shapeHasTaper(shape)) {
     const scaleX = nextWidth / Math.max(MIN_SHAPE_SIZE, width);
@@ -600,6 +618,24 @@ function resizeShapeAlongFrameNormalBox(
     x: cleanNearZero(nextCenter.x, 0.0005),
     z: cleanNearZero(nextCenter.z, 0.0005),
   };
+  // A body lying on its side (Discussion #1838): the height handle pulls one of its sideways measures. A round body
+  // keeps its diameter round, and a cone, a star or a tapered body the settings that follow its width and length.
+  if (frame.lying && dimensionAxis.axis !== "height") {
+    const round = keepsRoundFootprint(shape);
+    const scaleX = dimensionAxis.axis === "width" || round ? Math.abs(scale) : 1;
+    const scaleZ = dimensionAxis.axis === "depth" || round ? Math.abs(scale) : 1;
+    // The frame is measured from the turned body: without rounding a height of 21 came out as 20.999999999999993.
+    const tidy = (value: number) => Math.round(value * 1e6) / 1e6;
+    const sized = scaledHorizontalShapePatch(shape, scaleX, scaleZ);
+    return {
+      ...patch,
+      ...sized,
+      ...(typeof sized.width === "number" ? { width: tidy(sized.width) } : {}),
+      ...(typeof sized.depth === "number" ? { depth: tidy(sized.depth) } : {}),
+      ...(typeof sized.size === "number" ? { size: tidy(sized.size) } : {}),
+      elevation: cleanNearZero(tidy(nextCenter.y - shape.height / 2), 0.0005),
+    };
+  }
   if (dimensionAxis.axis === "width") {
     patch.width = Math.max(MIN_SHAPE_SIZE, shapeWidth(shape) * Math.abs(scale));
     patch.size = resizedShapeSize(patch.width, shapeDepth(shape));

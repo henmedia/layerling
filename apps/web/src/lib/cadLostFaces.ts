@@ -101,20 +101,52 @@ function smoothlyContinuedEdges(cad: OcctKernel, solid: ShapeHandle, edges: Shap
   return reached;
 }
 
+// A little beyond the widest setback, for the faces the kernel trims where the edges end. Kept small: past it lies the
+// other side of a plate whose hole a rounded rim filled in (#1503), and that has to stay a lost face.
+const REACH_MARGIN = 1.25;
+
+/**
+ * How far from its edges a chamfer or fillet may reshape the body: a quarter more than its widest setback. A chamfer at
+ * an angle sets back `amount` on one face and `amount · tan(angle)` on the other, a fillet its larger radius; at the ends
+ * of the edges the kernel trims the faces it runs into as well (#1929).
+ */
+export function cadTreatmentReach(amount: number, endAmount?: number, chamferAngle?: number) {
+  const radius = Math.max(amount, endAmount ?? amount);
+  const angle = chamferAngle === undefined ? 45 : Math.min(Math.max(chamferAngle, 1), 89);
+  return REACH_MARGIN * radius * Math.max(1, Math.tan((angle * Math.PI) / 180));
+}
+
+/** Whether a face lies within `reach` of the edges: the kernel's own distance, so a long face is measured where it comes closest. */
+function withinReach(cad: OcctKernel, face: ShapeHandle, edges: ShapeHandle, reach: number) {
+  try {
+    return cad.distanceBetween(face, edges) <= reach;
+  } catch (error) {
+    // A kernel out of memory has to reach the caller, which starts the kernel afresh; any other failure leaves the face lost.
+    if (isKernelMemoryFault(error)) throw error;
+    return false;
+  }
+}
+
 /**
  * How many faces of the body a chamfer or fillet lost that it had no business with (Issue #1503). A face that shares no
  * vertex with the treated edges comes through the kernel untouched, as the very same face. On the faceted holes a mesh
  * boolean leaves (a circle as 96 flat strips), the kernel sometimes returns a "valid" solid with a whole hole filled in:
  * the strips and the hole's floor are gone, and the floor never touched a treated edge. The edges' own faces and the ones
  * at their ends are left out, since the treatment reshapes or replaces them; so are the faces along the edges the kernel
- * takes with them because they run on smoothly (#1591: one straight rim edge of a tray with rounded corners was refused).
+ * takes with them because they run on smoothly (#1591: one straight rim edge of a tray with rounded corners was refused),
+ * and the faces within the treatment's `reach` of them (#1929: the arc of a groove ending 0.13 mm below a 5 mm rounding
+ * was refused at every size, since its chamfer trims that rounding across the short edge between them). Only the faces
+ * that would count as lost are measured, each once against all the edges together, so a body of many faces or edges
+ * costs no more than before.
  */
-export function cadTreatmentLostFaces(cad: OcctKernel, solid: ShapeHandle, edges: ShapeHandle[], result: ShapeHandle) {
+export function cadTreatmentLostFaces(cad: OcctKernel, solid: ShapeHandle, edges: ShapeHandle[], result: ShapeHandle, reach: number) {
   const owned: ShapeHandle[] = [];
-  const treatedVertices = smoothlyContinuedEdges(cad, solid, edges, owned).flatMap((edge) => cad.getSubShapes(edge, "vertex"));
+  const treatedEdges = smoothlyContinuedEdges(cad, solid, edges, owned);
+  const treatedVertices = treatedEdges.flatMap((edge) => cad.getSubShapes(edge, "vertex"));
   const bodyFaces = cad.getSubShapes(solid, "face");
   const resultFaces = cad.getSubShapes(result, "face");
   const faceVertices: ShapeHandle[] = [];
+  let edgeCompound: ShapeHandle | null = null;
   try {
     const treated = bucketByHash(cad, treatedVertices);
     const kept = bucketByHash(cad, resultFaces);
@@ -124,10 +156,12 @@ export function cadTreatmentLostFaces(cad: OcctKernel, solid: ShapeHandle, edges
       faceVertices.push(...vertices);
       const touched = vertices.some((vertex) => (treated.get(cad.hashCode(vertex, HASH_UPPER_BOUND)) ?? []).some((other) => cad.isSame(vertex, other)));
       if (touched) continue;
-      if (!(kept.get(cad.hashCode(face, HASH_UPPER_BOUND)) ?? []).some((other) => cad.isSame(face, other))) lost += 1;
+      if ((kept.get(cad.hashCode(face, HASH_UPPER_BOUND)) ?? []).some((other) => cad.isSame(face, other))) continue;
+      edgeCompound ??= cad.makeCompound(treatedEdges);
+      if (!withinReach(cad, face, edgeCompound, reach)) lost += 1;
     }
     return lost;
   } finally {
-    release(cad, [...treatedVertices, ...bodyFaces, ...resultFaces, ...faceVertices, ...owned]);
+    release(cad, [...treatedVertices, ...bodyFaces, ...resultFaces, ...faceVertices, ...owned, ...(edgeCompound ? [edgeCompound] : [])]);
   }
 }

@@ -21,3 +21,24 @@ export function keepsProportionsForUpdate(
   if (options?.angle) return false;
   return keepsProportionsOnAxis(shape, options?.resizeAxis);
 }
+
+let typedWithShift = false;
+
+/**
+ * Shift+Enter in a size field of the properties (#1872): the size typed there scales the other two along for this one
+ * change, as Shift+Enter does in the size box on the body (#899), without switching "Keep proportions" on. The field
+ * hands its value on while `run` runs, so the mark holds for exactly that change.
+ */
+export function withProportionsKeptOnce<T>(run: () => T): T {
+  typedWithShift = true;
+  try {
+    return run();
+  } finally {
+    typedWithShift = false;
+  }
+}
+
+/** Whether the change being handed on right now was confirmed with Shift+Enter. */
+export function proportionsKeptOnce() {
+  return typedWithShift;
+}

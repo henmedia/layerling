@@ -112,7 +112,7 @@ Exportfönstret erbjuder sedan {{ui:export.plates}}: alla plattor i en fil, sida
 ## Rutnät och fästning
 
 Rutnätet visar storleken på plattan. Längst ned till höger finns **fäststeget**: flytt och skalning fäster i steg om det måttet, till exempel 1 mm. Gör steget mindre för detaljarbete och större för grov placering. {{ui:editor.tool.snapToGrid}} i verktygsfältet flyttar markerade former i efterhand till närmaste rutnätskorsning. Under flytt fäster former även mot andra former, se [Markera och ordna](chapter:select-and-arrange). Utan musen väljer [[Alt]]+[[1]] till [[Alt]]+[[0]] motsvarande post i menyn ([[Alt]]+[[1]] stänger av fästningen), medan [[,]] och [[.]] gör steget ett snäpp finare eller grövre. Detta fungerar i skissläget också.
-Ett kort klick med musens mittenknapp, utan att röra musen, öppnar fäst menyn direkt vid muspekaren, även i skissläget; att hålla in mittenknappen och dra flyttar fortfarande vyn.
+Ett kort klick med musens mittenknapp, utan att röra musen, öppnar fäst menyn direkt vid muspekaren, även i skissläget; att hålla in mittenknappen och dra flyttar fortfarande vyn. I 3D-redigeraren har dess rubrikrad också omkopplaren mm / in, så du växlar mellan millimeter och tum utan att menyn stängs.
 
 > **Tips:** Sluta vrida vyn när du ska passa ihop delar exakt. Använd siffertangenterna för att hoppa till den raka vyn ovanifrån eller framifrån och tryck [[O]] för ortografisk visning. Då ser du genast om två kanter verkligen ligger i linje.
 

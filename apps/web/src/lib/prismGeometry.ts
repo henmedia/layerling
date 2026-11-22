@@ -12,10 +12,11 @@ import { regularPolygonFootprintScale } from "@/lib/regularPolygonFootprint";
  * Flaechen, und ohne diese Korrektur nennt das Feld einen Wert, den der
  * Koerper gar nicht hat.
  */
-export function createPrismGeometry(width: number, height: number, depth: number, sides = 6, segments = 1, drillPoint = 0) {
+export function createPrismGeometry(width: number, height: number, depth: number, sides = 6, segments = 1, drillPoint = 0, angleOffset = 0) {
   const count = Math.max(3, Math.round(sides));
-  const footprintScale = regularPolygonFootprintScale(width, depth, count);
-  const geometry = new THREE.CylinderGeometry(1, 1, height, count, Math.max(1, Math.round(segments)));
+  const footprintScale = regularPolygonFootprintScale(width, depth, count, angleOffset);
+  // angleOffset turns the corners round the axis: a Polygon with a flat side in front (polygonFlatAngle, #1787).
+  const geometry = new THREE.CylinderGeometry(1, 1, height, count, Math.max(1, Math.round(segments)), false, angleOffset);
   if (drillPoint > 0) {
     // A drilled hole (Discussion #621, drillPoint.ts): the middle of the bottom cap goes down by the tip's length,
     // so the cap becomes the cone, corner for corner on the same outline. The height stays to the shoulder.

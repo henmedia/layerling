@@ -174,6 +174,17 @@ Un inserto filettato a caldo si preme in una parte di plastica con un saldatore 
 
 Il foro è una normale forma di foro raggruppata con il corpo, come i fori dello schema di fori, e il kernel CAD lo taglia come un vero cilindro, quindi l'alesaggio è esatto. {{ui:editor.tool.ungroup}} libera di nuovo il foro. È profondo quanto è lungo l'inserto e sporge un poco dalla faccia, così si apre in modo netto. Un'IA può fare lo stesso tramite il ponte MCP con `layerling_thread_insert` (vedi il capitolo [Progettare con un’IA (MCP)](chapter:ai-with-mcp)).
 
+## Sede per magnete
+
+Chi dipinge miniature mette piccoli magneti tondi nei giunti di una figura in più pezzi invece di incollarla: così si smonta per dipingerla e spedirla; scatole e coperchi tengono allo stesso modo. Lo strumento {{ui:magnetPocket.title}} scava la sede: profonda quanto il magnete più 0,2 mm, così resta appena sotto la faccia, e sotto un pozzetto per la colla più stretto, così la colla ha spazio e il magnete poggia su un gradino senza scivolare in una stampa cava. Sede e pozzetto formano un cilindro capovolto. Seleziona esattamente un corpo, apri la libreria delle forme e fai clic su {{ui:magnetPocket.title}} sotto {{ui:library.section.holes}}, oppure trovalo con [[Ctrl]]+[[K]].
+
+1. Scegli la {{ui:magnetPocket.size}}, da 2 × 1 a 12 × 3 mm, o scrivi diametro e altezza del magnete. {{ui:magnetPocket.gap}} parte da 0,1 mm; {{ui:magnetPocket.well}} è attivo.
+2. Fai clic sul punto, una faccia piana o la parete esterna di un cilindro o di un tubo, come per l’inserto filettato. Un anello mostra la sede: verde se il pezzo ha 1 mm di parete accanto e la profondità dietro, rosso altrimenti, con il motivo. Trascinalo, scrivi la posizione o portalo al centro della faccia.
+3. {{ui:magnetPocket.both}} (attivo all’inizio) cerca il pezzo che tocca la faccia in quel punto, a 1 mm al massimo: l’altra metà del giunto, posizionata come si incastra. Riceve la stessa sede di fronte, così i due magneti si incontrano; un secondo anello la mostra, e una riga dice perché un pezzo non ne riceve. Per raggiungere una faccia coperta dall’altro pezzo, nascondi quel pezzo: riceve comunque la sua sede.
+4. Solo {{ui:magnetPocket.apply}} scava le sedi.
+
+Ogni sede è un foro normale raggruppato con il suo pezzo; {{ui:editor.tool.ungroup}} lo libera. Prima di inserire i magneti, avvicina ogni coppia perché si attragga e segna il lato esterno. Anche lo strumento Dividi offre i magneti come connettore. Un’IA fa lo stesso con `layerling_magnet_pocket` (vedi il capitolo [IA con MCP](chapter:ai-with-mcp)).
+
 ## Estrudere una faccia verso l’esterno o l’interno
 
 Per ispessire una parete, aggiungere una sporgenza su una faccia o ricavarvi una cavità, lo strumento {{ui:faceTool.title}} agisce su una singola faccia piatta. Funziona anche con un file STL importato, che non contiene schizzi modificabili. Seleziona esattamente un corpo e fai clic su {{ui:faceTool.title}} nel gruppo {{ui:editor.section.mirrorPattern}} della barra degli strumenti, accanto allo schema di fori. Puoi anche fare clic destro sul corpo o cercare lo strumento con [[Ctrl]]+[[K]].

@@ -184,6 +184,17 @@ A heat-set thread insert is pressed into a plastic part with a soldering iron an
 
 The hole is an ordinary hole shape grouped with the body, as the holes of the hole pattern are, and the CAD kernel cuts it as a true cylinder, so the bore is exact. {{ui:editor.tool.ungroup}} frees the hole again. It is as deep as the insert is long and stands a little out of the face so that it opens cleanly. An AI can do the same through the MCP bridge with `layerling_thread_insert` (see the chapter [AI with MCP](chapter:ai-with-mcp)).
 
+## Magnet pocket
+
+Figure painters set small round magnets into the joints of a multi-part figure instead of gluing it, so it comes apart for painting and shipping; boxes and lids hold the same way. The {{ui:magnetPocket.title}} tool cuts the pocket for one: as deep as the magnet and 0.2 mm more, so it sits just below the face, and below it a narrower glue well, so the glue has room and the magnet rests on a ledge and cannot slide on into a hollow print. Cut out of the part, pocket and well are an inverted top hat. Select exactly one body, open the shape library and click {{ui:magnetPocket.title}} under {{ui:library.section.holes}}, or find it with [[Ctrl]]+[[K]].
+
+1. Choose the {{ui:magnetPocket.size}}, from 2 × 1 to 12 × 3 mm, or type the magnet's diameter and height. {{ui:magnetPocket.gap}} is the room round the magnet on each side, 0.1 mm to begin with. {{ui:magnetPocket.well}} is on at first. The window shows the pocket's measures.
+2. Click the spot on the part, a flat face or the outside wall of a cylinder or tube, as for the thread insert. A ring shows the pocket: green where the part has a 1 mm wall beside it and its depth behind it, red where not, with the reason. Drag it over the part, type its place, or move it to the middle of the face.
+3. {{ui:magnetPocket.both}} (on at first) looks for the part that meets the face at that spot, at most 1 mm away: the other half of the joint, standing where it fits, as the parts of a figure come from the sculptor. That part gets the same pocket facing this one, so the two magnets meet; a second ring shows it. A line in the window names the part, or says why it gets none (no part there, a curved face, too little material). To reach a face the other part covers, hide that part: it still gets its pocket.
+4. Only {{ui:magnetPocket.apply}} cuts the pockets.
+
+Each pocket is an ordinary hole grouped with its part, as the thread insert's hole is, and {{ui:editor.tool.ungroup}} frees it again. Before pressing the magnets in, put each pair together so they attract and mark the side that faces out, or one magnet ends up the wrong way round. To give two halves of a part you split magnets right away, the split tool has them as a connector (see the chapter on solids and holes). An AI can do the same through the MCP bridge with `layerling_magnet_pocket` (see the chapter [AI with MCP](chapter:ai-with-mcp)).
+
 ## Pushing a face out or in
 
 For a thicker wall, a raised pad on a face or a pocket cut into it, the {{ui:faceTool.title}} tool works on one flat face. It works on an imported STL too, where there is no sketch to change. Select exactly one body and click {{ui:faceTool.title}} in the {{ui:editor.section.mirrorPattern}} group of the ribbon, next to the hole pattern. You can also right-click the body, or find it with [[Ctrl]]+[[K]].

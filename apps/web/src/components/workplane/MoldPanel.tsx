@@ -10,8 +10,8 @@ import { findingKindName, findingRemedy, findingValueText } from "@/components/w
 import { formatPrintCheckArea } from "@/components/workplane/PrintCheckPanel";
 import { formatEstimateNumber } from "@/lib/editorBooleans";
 import {
-  MOLD_CAST_MATERIAL_DATA, MOLD_CAST_MATERIALS, MOLD_DIE_MODES, MOLD_DIRECTIONS, MOLD_KINDS, MOLD_LIMITS, MOLD_MIN_STRONG_WALL, MOLD_ML_PER_US_FL_OZ, MOLD_OUTERS,
-  MOLD_OUTPUTS, moldDieClearance, type MoldAnalysis, type MoldOptions,
+  MOLD_CAST_MATERIAL_DATA, MOLD_CAST_MATERIALS, MOLD_DIE_MODES, MOLD_DIRECTIONS, MOLD_KINDS, MOLD_LIMITS, MOLD_MIN_STRONG_WALL, MOLD_ML_PER_US_FL_OZ, MOLD_OPENING_KINDS, MOLD_OUTERS,
+  MOLD_OUTPUTS, moldDieClearance, type MoldAnalysis, type MoldOpeningKind, type MoldOptions,
 } from "@/lib/moldTool";
 import { useLanguage } from "@/lib/useLanguage";
 import type { WorkplaneWorkspaceSettings } from "@/types/layerling";
@@ -31,6 +31,8 @@ export function MoldPanel({
   analysis = null,
   analysing = false,
   regenerateOf = null,
+  openingKind = "sprue",
+  onOpeningKind,
   onChange,
   onApply,
   onCancel,
@@ -45,6 +47,9 @@ export function MoldPanel({
   analysing?: boolean;
   /** The master's name when the panel was opened from a part of an earlier mold, to make it again. */
   regenerateOf?: string | null;
+  /** With "Set the openings myself": what a click on the master in the view sets, a sprue or a vent. */
+  openingKind?: MoldOpeningKind;
+  onOpeningKind?: (kind: MoldOpeningKind) => void;
   onChange: (patch: Partial<MoldOptions>) => void;
   onApply: () => void;
   onCancel: () => void;
@@ -167,9 +172,59 @@ export function MoldPanel({
           {slider("wall", 0.5)}
           {settings.wall < MOLD_MIN_STRONG_WALL ? <span className="shell-openings-summary">{t("mold.warning.thinWall")}</span> : null}
           {check("keys")}
+          <label className="edge-modifier-field offset-copy">
+            <input type="checkbox" checked={settings.ownOpenings} disabled={busy} onChange={(event) => onChange({ ownOpenings: event.target.checked })} />
+            <span>{t("mold.ownOpenings")}</span>
+          </label>
+          {settings.ownOpenings ? (<>
+            {/* The user sets the openings (Discussion #1806): the kind a click in the view sets, and the list of those set. */}
+            <span className="shell-openings-summary">{t("mold.ownOpeningsHint")}</span>
+            <div className="edge-modifier-field shell-openings" role="radiogroup" aria-label={t("mold.openings.kind")}>
+              <span>{t("mold.openings.kind")}</span>
+              <div className="shell-opening-options">
+                {MOLD_OPENING_KINDS.map((option) => (
+                  <button
+                    key={option}
+                    type="button"
+                    role="radio"
+                    aria-checked={openingKind === option}
+                    className={openingKind === option ? "active" : ""}
+                    disabled={busy}
+                    onClick={() => onOpeningKind?.(option)}
+                  >
+                    {t(`mold.openings.${option}`)}
+                  </button>
+                ))}
+              </div>
+            </div>
+            <div className="edge-modifier-field mold-vents mold-openings" role="group" aria-label={t("mold.openings.title")}>
+              <span>{t("mold.openings.title")}</span>
+              {settings.openings.length ? (
+                <ul>
+                  {settings.openings.map((opening, index) => (
+                    <li key={index} data-kind={opening.kind}>
+                      <span>
+                        {t(`mold.openings.${opening.kind}`)} · {formatEstimateNumber(opening.x, 1)} / {formatEstimateNumber(opening.y, 1)} mm
+                        {analysis?.missedOpenings?.includes(index) ? <small> ({t("mold.openings.missed")})</small> : null}
+                      </span>
+                      <button type="button" aria-label={t("mold.openings.remove")} title={t("mold.openings.remove")} disabled={busy} onClick={() => onChange({ openings: settings.openings.filter((_, other) => other !== index) })}>
+                        <X size={15} />
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              ) : <small>{t("mold.openings.none")}</small>}
+              <div className="shell-opening-options">
+                <button type="button" disabled={busy || !analysis?.suggested.length} onClick={() => onChange({ openings: (analysis?.suggested ?? []).map((opening) => ({ ...opening })) })}>{t("mold.openings.suggested")}</button>
+                <button type="button" disabled={busy || !settings.openings.length} onClick={() => onChange({ openings: [] })}>{t("mold.openings.removeAll")}</button>
+              </div>
+            </div>
+            {settings.openings.some((opening) => opening.kind === "sprue") ? null : <span className="shell-openings-summary">{t("mold.warning.noSprue")}</span>}
+          </>) : (<>
           {check("sprue")}
           {check("vents", !settings.sprue)}
-          {settings.sprue && settings.vents && analysis ? (
+          </>)}
+          {!settings.ownOpenings && settings.sprue && settings.vents && analysis ? (
             <div className="edge-modifier-field mold-vents" role="group" aria-label={t("mold.vents.title")}>
               <span>{t("mold.vents.title")}</span>
               {vents.length ? vents.map((point, index) => (
@@ -243,11 +298,11 @@ export function MoldPanel({
         <details className="edge-modifier-field">
           <summary>{t("mold.advancedTwoPart")}</summary>
           {settings.keys ? (<>{slider("keySize", 0.5)}{slider("keyFit", 0.05)}</>) : null}
-          {settings.sprue ? slider("sprueDiameter", 0.5) : null}
-          {settings.sprue && settings.vents ? slider("ventDiameter", 0.5) : null}
+          {settings.ownOpenings || settings.sprue ? slider("sprueDiameter", 0.5) : null}
+          {settings.ownOpenings || (settings.sprue && settings.vents) ? slider("ventDiameter", 0.5) : null}
           {settings.ears ? slider("boltDiameter", 0.1) : null}
           {settings.screws ? slider("screwDiameter", 0.1) : null}
-          {settings.sprue ? (<>{slider("sprueShiftX", 0.5)}{slider("sprueShiftY", 0.5)}</>) : null}
+          {settings.sprue && !settings.ownOpenings ? (<>{slider("sprueShiftX", 0.5)}{slider("sprueShiftY", 0.5)}</>) : null}
           {MOLD_CAST_MATERIAL_DATA[settings.castMaterial].rigid ? slider("draftLimit", 0.5, t("mold.draftLimit"), "°") : null}
           {slider("density", 0.05, t("mold.density"), "g/cm³")}
         </details>
@@ -271,7 +326,7 @@ export function MoldPanel({
               <p>{analysis.rating.undercutMm2 >= 5
                 ? t("mold.analysis.undercut", { area: formatPrintCheckArea(analysis.rating.undercutMm2), percent: percent(analysis.rating.undercutPercent) })
                 : t("mold.analysis.noUndercut")}</p>
-              {!analysis.findings.some((finding) => finding.kind === "airTrap") && settings.sprue ? <p>{t("mold.analysis.airOk")}</p> : null}
+              {!analysis.findings.some((finding) => finding.kind === "airTrap") && (settings.ownOpenings ? settings.openings.some((opening) => opening.kind === "sprue") : settings.sprue) ? <p>{t("mold.analysis.airOk")}</p> : null}
               {analysis.findings.length ? (
                 <ul className="layer-check-list" aria-label={t("mold.analysis")}>
                   {analysis.findings.map((finding) => (

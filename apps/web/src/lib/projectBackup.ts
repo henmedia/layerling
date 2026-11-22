@@ -256,3 +256,15 @@ export function zipHoldsDesigns(bytes: Uint8Array) {
 export function backupDesignAlreadyThere(existing: ReadonlyArray<{ name: string; createdAt: number }>, restored: { name: string; createdAt: number }) {
   return existing.some((project) => project.createdAt === restored.createdAt && project.name === restored.name);
 }
+
+/**
+ * A design that is already here only blocks its copy from the backup while its own content is still there (forum,
+ * RalphD05): after a crash the list of designs can outlive their content, the cards keep their names and shape counts
+ * but open empty, and those are exactly the designs the backup has to bring back. `stored` is what the browser holds
+ * for the card: null when nothing is stored, "unreadable" when it cannot be read, else its shapes. A card that is
+ * empty on purpose takes the backup's shapes only when the backup has some.
+ */
+export function backupRefillsDesign(stored: { shapes: ReadonlyArray<unknown> } | null | "unreadable", backupShapeCount: number) {
+  if (backupShapeCount <= 0) return false;
+  return stored === null || stored === "unreadable" || stored.shapes.length === 0;
+}

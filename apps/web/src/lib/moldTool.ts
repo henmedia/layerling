@@ -17,8 +17,10 @@ import type { WorkplaneShape } from "@/types/layerling";
  *   the master, `wall` thick, parted level at `parting` % of the master's height. Cones on the lower half's parting face
  *   go into holes in the upper half (the fourth smaller, so the halves close only one way), a funnel and sprue lead in at
  *   the master's highest point, thin vents at the other high points, pry slots on the seam to get the halves apart, and
- *   clamp ears with bolt holes if asked. Both halves are laid out with the parting face up, as they print: the cavity is
- *   then open upward, the keys and the funnel need no support.
+ *   clamp ears with bolt holes if asked. With `ownOpenings` the sprue and the vents are not placed by the tool: the mold
+ *   gets the `openings` the user set, each a channel straight down from the top at its spot (Discussion #1806). Both
+ *   halves are laid out with the parting face up, as they print: the cavity is then open upward, the keys and the funnel
+ *   need no support.
  * - box: a pour box for silicone round a printed master: a base plate with a shallow recess the master sits in and a
  *   groove the frame stands in (so it seals), and the frame `gap` away from the master, `above` mm higher than it.
  * - tray: an open one-part mold, the master's flat underside at the top, poured to the brim.
@@ -51,6 +53,17 @@ export const MOLD_OUTERS: readonly MoldOuter[] = ["block", "shell"];
 /** The parts laid out beside the master as they print, or closed round it, to look at. */
 export type MoldOutput = "print" | "assembled";
 export const MOLD_OUTPUTS: readonly MoldOutput[] = ["print", "assembled"];
+/** What an opening the user sets is for: the material goes in through a sprue (with a funnel), the air out through a vent. */
+export type MoldOpeningKind = "sprue" | "vent";
+export const MOLD_OPENING_KINDS: readonly MoldOpeningKind[] = ["sprue", "vent"];
+/**
+ * An opening of a two-part mold set by the user (Discussion #1806): a channel straight along the opening direction from
+ * the mold's top down into the cavity. `x` and `y` say where, in mm across the parting face from the middle of the
+ * master's bounding box, along the two level axes of the opening's frame (the frame `sprueShiftX`/`sprueShiftY` move the
+ * sprue in, and the one the analysis gives as `across`). Measured from the master's own middle, an opening stays on the
+ * same spot of the master when the master is moved; it belongs to one opening direction, as the vents switched off do.
+ */
+export type MoldOpening = { x: number; y: number; kind: MoldOpeningKind };
 
 /**
  * What each casting material starts with: how much it shrinks as it sets (%) and how heavy it is (g/cm³). Assumptions
@@ -128,6 +141,13 @@ export type MoldOptions = {
   sprueShiftX: number;
   sprueShiftY: number;
   output: MoldOutput;
+  /**
+   * twoPart: the user sets the openings (Discussion #1806). The sprue at the highest point and the vents the analysis
+   * finds are then not made; the mold gets exactly the `openings`, whatever `sprue`, `vents`, `ventsOff` and the sprue's
+   * shift say.
+   */
+  ownOpenings: boolean;
+  openings: MoldOpening[];
 };
 
 export const MOLD_DEFAULTS: MoldOptions = {
@@ -135,7 +155,7 @@ export const MOLD_DEFAULTS: MoldOptions = {
   ventDiameter: 2.5, ears: false, boltDiameter: 4.5, prySlots: true, floor: 3, above: 12,
   dieMode: "form", material: 1, depth: 5, base: 5, pins: true, pinDiameter: 6, pinFit: 0.25, rounding: 1,
   direction: "auto", openTilt: 45, openTurn: 0, castMaterial: "silicone", shrinkage: 0.1, density: 1.1, draftLimit: 1, outer: "block", screws: false, screwDiameter: 3.4, bands: false,
-  ventsOff: [], sprueShiftX: 0, sprueShiftY: 0, output: "print",
+  ventsOff: [], sprueShiftX: 0, sprueShiftY: 0, output: "print", ownOpenings: false, openings: [],
 };
 
 /** The ranges each setting is kept to, in mm (parting in %). */
@@ -153,6 +173,12 @@ export const MOLD_ML_PER_US_FL_OZ = 29.5735;
 export const MOLD_MIN_STRONG_WALL = 3;
 /** At most this many sprues, one per separate cavity, the largest first. */
 export const MOLD_MAX_SPRUES = 24;
+/** At most this many openings set by the user; more than a mold's top has room for is a slip of the hand. */
+export const MOLD_MAX_OPENINGS = 24;
+/** An opening set by the user lies at most this far from the master's middle, in mm (further out there is no master). */
+export const MOLD_OPENING_REACH = 1000;
+/** Two openings closer together than this, in mm, are one: a second click on the same spot. */
+export const MOLD_OPENING_APART = 0.5;
 /** A pour box's frame stands this deep in the base's groove, with this play per side, in mm. */
 const BOX_GROOVE = 2;
 const BOX_GROOVE_PLAY = 0.3;
@@ -184,6 +210,29 @@ function flag(value: unknown, fallback: boolean) {
   return fallback;
 }
 
+/**
+ * The openings set by the user kept to what a mold can take: each needs a place in finite numbers (kept within
+ * `MOLD_OPENING_REACH` of the master's middle) and a kind that exists, or it is left out; one within
+ * `MOLD_OPENING_APART` of an earlier one is the same spot and left out too, and after `MOLD_MAX_OPENINGS` the rest is.
+ * The order stays as given, so an opening keeps its number in the panel's list.
+ */
+export function normalizeMoldOpenings(value: unknown): MoldOpening[] {
+  if (!Array.isArray(value)) return [];
+  const openings: MoldOpening[] = [];
+  for (const entry of value as unknown[]) {
+    if (openings.length >= MOLD_MAX_OPENINGS) break;
+    if (!entry || typeof entry !== "object") continue;
+    const raw = entry as Record<string, unknown>;
+    const x = clamp(raw.x, [-MOLD_OPENING_REACH, MOLD_OPENING_REACH], Number.NaN);
+    const y = clamp(raw.y, [-MOLD_OPENING_REACH, MOLD_OPENING_REACH], Number.NaN);
+    if (!Number.isFinite(x) || !Number.isFinite(y)) continue;
+    if (typeof raw.kind !== "string" || !(MOLD_OPENING_KINDS as readonly string[]).includes(raw.kind)) continue;
+    if (openings.some((other) => Math.hypot(other.x - x, other.y - y) < MOLD_OPENING_APART)) continue;
+    openings.push({ x, y, kind: raw.kind as MoldOpeningKind });
+  }
+  return openings;
+}
+
 /** The settings kept to what is offered; anything missing or out of range takes the default or the nearest end. */
 export function normalizeMoldOptions(value?: Partial<Record<keyof MoldOptions, unknown>> | null, defaults: MoldOptions = MOLD_DEFAULTS): MoldOptions {
   const raw = value ?? {};
@@ -206,6 +255,8 @@ export function normalizeMoldOptions(value?: Partial<Record<keyof MoldOptions, u
     screws: flag(raw.screws, defaults.screws),
     bands: flag(raw.bands, defaults.bands),
     ventsOff,
+    ownOpenings: flag(raw.ownOpenings, defaults.ownOpenings),
+    openings: raw.openings === undefined ? defaults.openings.map((opening) => ({ ...opening })) : normalizeMoldOpenings(raw.openings),
     autoParting: flag(raw.autoParting, defaults.autoParting),
     keys: flag(raw.keys, defaults.keys),
     sprue: flag(raw.sprue, defaults.sprue),
@@ -226,7 +277,7 @@ export function moldDieClearance(mode: MoldDieMode, material: number) {
 
 /** What each part is, for its name. */
 export type MoldPartRole = "lower" | "upper" | "left" | "right" | "front" | "back" | "base" | "frame" | "tray" | "punch" | "die";
-export type MoldWarning = "undercut" | "thinWall" | "sprueLow" | "pinsLeftOut" | "airTrap" | "fineDetails" | "sprueMissed";
+export type MoldWarning = "undercut" | "thinWall" | "sprueLow" | "pinsLeftOut" | "airTrap" | "fineDetails" | "sprueMissed" | "openingMissed" | "noSprue";
 export type MoldPart = { role: MoldPartRole; solid: ManifoldSolid };
 
 /** How one opening direction does: the parting found (or set) and how much undercut and too-steep surface it leaves. */
@@ -243,8 +294,12 @@ export type MoldDirectionRating = {
   partingArea: number;
 };
 
-/** A high point of the cavity, as poured: where air gathers. `vented` when it gets a vent (or the sprue is there). */
-export type MoldHighPoint = { point: ClearanceVec3; vented: boolean; sprue: boolean };
+/**
+ * A high point of the cavity, as poured: where air gathers. `vented` when it gets a vent (or the sprue is there). With
+ * the openings set by the user, each opening made is one of these too, where it meets the master, and `opening` is its
+ * place in the settings' `openings`, so a click on its post in the view can take it away again.
+ */
+export type MoldHighPoint = { point: ClearanceVec3; vented: boolean; sprue: boolean; opening?: number };
 
 /** What the analysis of a two-part mold found, for the panel, the preview and the list of findings. */
 export type MoldAnalysis = {
@@ -267,12 +322,34 @@ export type MoldAnalysis = {
   up: ClearanceVec3;
   centre: ClearanceVec3;
   reach: number;
+  /**
+   * The two level directions of the opening's frame in the scene's (unit): an opening set by the user lies `x` along the
+   * first and `y` along the second from `centre`, so a point picked in the view can be turned into one (`moldOpeningAt`).
+   */
+  across: [ClearanceVec3, ClearanceVec3];
+  /**
+   * The openings the automatic placement makes for this master: a sprue at each separate cavity's highest point (moved
+   * by the sprue's shift) and a vent at each other high point that is not switched off. What "Take over the suggested
+   * ones" fills the user's list with; the same whether the user sets the openings or not.
+   */
+  suggested: MoldOpening[];
+  /** With the openings set by the user: those (by their place in the list) that lie beside the master and were left out. */
+  missedOpenings?: number[];
 };
+
+/** Where a point of the scene (picked on the master in the view) lies as an opening: across the parting face from the master's middle. */
+export function moldOpeningAt(analysis: Pick<MoldAnalysis, "centre" | "across">, point: readonly number[]): { x: number; y: number } {
+  const from = [0, 1, 2].map((k) => point[k] - analysis.centre[k]);
+  const along = (axis: ClearanceVec3) => from[0] * axis[0] + from[1] * axis[1] + from[2] * axis[2];
+  return { x: along(analysis.across[0]), y: along(analysis.across[1]) };
+}
 
 export type MoldResult =
   | {
     parts: MoldPart[]; volume: number; warnings: MoldWarning[]; keys: number; vents: number; sprues: number; clearance?: number; parting?: number; partingFound?: boolean;
     analysis?: MoldAnalysis; keysShrunk?: boolean;
+    /** With the openings set by the user: how many of them lie beside the master and were left out (`vents` and `sprues` count those made). */
+    ownOpenings?: { missed: number };
   }
   | { error: "notClosed" | "tooSmall" | "empty" | "kernel"; message?: string };
 
@@ -629,6 +706,33 @@ function topAt(runtime: ManifoldToplevel, solid: ManifoldSolid, x: number, y: nu
 }
 
 /**
+ * The height of the master's top straight over (x, y), read off its faces: the highest of them there, null beside the
+ * master. For an opening set by the user; exact where `topAt` searches in steps, so that the suggested openings taken
+ * over as they are give the very mold the automatic placement makes (the funnel's depth hangs on this height).
+ */
+function heightOver(mesh: { triVerts: Uint32Array; vertProperties: Float32Array; numProp: number }, x: number, y: number) {
+  let top: number | null = null;
+  const at = (index: number) => {
+    const offset = mesh.triVerts[index] * mesh.numProp;
+    return [mesh.vertProperties[offset], mesh.vertProperties[offset + 1], mesh.vertProperties[offset + 2]];
+  };
+  for (let index = 0; index < mesh.triVerts.length; index += 3) {
+    const [a, b, c] = [at(index), at(index + 1), at(index + 2)];
+    if (x < Math.min(a[0], b[0], c[0]) - 1e-6 || x > Math.max(a[0], b[0], c[0]) + 1e-6 || y < Math.min(a[1], b[1], c[1]) - 1e-6 || y > Math.max(a[1], b[1], c[1]) + 1e-6) continue;
+    const area = (b[0] - a[0]) * (c[1] - a[1]) - (c[0] - a[0]) * (b[1] - a[1]);
+    // An upright face has no height of its own over a point: the faces it joins have.
+    if (Math.abs(area) < 1e-9) continue;
+    const u = ((b[0] - x) * (c[1] - y) - (c[0] - x) * (b[1] - y)) / area;
+    const v = ((c[0] - x) * (a[1] - y) - (a[0] - x) * (c[1] - y)) / area;
+    const w = 1 - u - v;
+    if (u < -1e-6 || v < -1e-6 || w < -1e-6) continue;
+    const z = u * a[2] + v * b[2] + w * c[2];
+    if (top === null || z > top) top = z;
+  }
+  return top;
+}
+
+/**
  * The master's top as heights above its bottom over a grid of `cell` from (x0, y0) to (x1, y1): for a relief stamp. Each
  * node takes the highest of the cells round it, so the relief is never lower than the master; `grown(t)` gives it grown
  * by `t` all round as a ball rolled over it would (the sheet lying on it), node by node.
@@ -846,6 +950,7 @@ export function moldForSolid(runtime: ManifoldToplevel, body: ManifoldSolid, giv
     let partingFound: boolean | undefined;
     let axis: MoldAxis = "z";
     let analysis: MoldAnalysis | undefined;
+    let ownOpenings: { missed: number } | undefined;
     // The halves turned over to print with the parting face up.
     const flipped = new Set<unknown>();
 
@@ -901,13 +1006,15 @@ export function moldForSolid(runtime: ManifoldToplevel, body: ManifoldSolid, giv
         const x = spot.x + options.sprueShiftX;
         const y = spot.y + options.sprueShiftY;
         const top = topAt(runtime, piece, x, y, cz0, cz1, created);
-        if (top === null && !warnings.includes("sprueMissed")) warnings.push("sprueMissed");
+        if (top === null && !options.ownOpenings && !warnings.includes("sprueMissed")) warnings.push("sprueMissed");
         return { x, y, z: top ?? zp };
       });
-      const traps: Array<{ at: [number, number, number]; vented: boolean }> = [];
-      if (options.sprue) {
-        if (spots.some((spot) => spot.z <= zp + 0.5)) warnings.push("sprueLow");
-        const cell = Math.max(1, Math.min(4, Math.max(cx1 - cx0, cy1 - cy0) / 60));
+      const cell = Math.max(1, Math.min(4, Math.max(cx1 - cx0, cy1 - cy0) / 60));
+      /**
+       * The high points the automatic placement looks at besides the sprues, and whether each gets a vent: what it makes
+       * when the user does not set the openings, and what it suggests when the user does.
+       */
+      const automaticTraps = (vents: boolean) => {
         const kept: [number, number, number][] = [];
         for (const peak of airTraps(cavity, cell, zp + 1)) {
           const [x, y] = peak;
@@ -917,12 +1024,64 @@ export function moldForSolid(runtime: ManifoldToplevel, body: ManifoldSolid, giv
           if (kept.length >= 24) break;
         }
         let drilled = 0;
-        kept.forEach((peak, index) => {
-          const vented = options.vents && !options.ventsOff.includes(index) && drilled < 8;
+        return kept.map((peak, index) => {
+          const vented = vents && !options.ventsOff.includes(index) && drilled < 8;
           if (vented) drilled += 1;
-          traps.push({ at: peak, vented });
+          return { at: peak, vented };
         });
-        if (traps.some((trap) => !trap.vented)) warnings.push("airTrap");
+      };
+      // Openings are placed from the middle of the master's bounding box, turned into the opening's frame.
+      const origin = through(openingFrame(axis, options).to, [(bx0 + bx1) / 2, (by0 + by1) / 2, (bz0 + bz1) / 2]);
+      const traps: Array<{ at: [number, number, number]; vented: boolean }> = [];
+      // Where a sprue comes down (and into which cavity), and where a vent goes up; `opening` with those the user set.
+      const sprues: Array<{ x: number; y: number; z: number; piece: ManifoldSolid; opening?: number }> = [];
+      const ventSpots: Array<{ at: [number, number, number]; opening?: number }> = [];
+      const missed: number[] = [];
+      let suggested: MoldOpening[];
+      if (options.ownOpenings) {
+        // The suggestion is what the automatic placement makes with the sprue and the vents on.
+        suggested = [
+          ...spots.map((spot) => ({ x: spot.x - origin[0], y: spot.y - origin[1], kind: "sprue" as const })),
+          ...automaticTraps(true).filter((trap) => trap.vented).map((trap) => ({ x: trap.at[0] - origin[0], y: trap.at[1] - origin[1], kind: "vent" as const })),
+        ];
+        const surface = options.openings.length ? cavity.getMesh() : null;
+        options.openings.forEach((opening, index) => {
+          const x = origin[0] + opening.x;
+          const y = origin[1] + opening.y;
+          const z = surface ? heightOver(surface, x, y) : null;
+          // Beside the master, or over a place that lies wholly in the other half: a channel there meets no cavity.
+          if (z === null || z <= zp + 0.01) missed.push(index);
+          else if (opening.kind === "sprue") sprues.push({ x, y, z, piece: cavity, opening: index });
+          else ventSpots.push({ at: [x, y, z], opening: index });
+        });
+        if (missed.length) warnings.push("openingMissed");
+        if (!sprues.length) warnings.push("noSprue");
+        else if (sprues.some((spot) => spot.z <= zp + 0.5)) warnings.push("sprueLow");
+        // A high point is aired by an opening within the reach the automatic placement gives a sprue and a vent; the
+        // others stay as air traps, so the user sees where air would be left.
+        const peaks: [number, number, number][] = [];
+        for (const peak of airTraps(cavity, cell, zp + 1)) {
+          if (peaks.every(([kx, ky]) => Math.hypot(peak[0] - kx, peak[1] - ky) > options.ventDiameter * 3)) peaks.push(peak);
+          if (peaks.length >= 24) break;
+        }
+        for (const peak of peaks) {
+          const aired = sprues.some((spot) => Math.hypot(peak[0] - spot.x, peak[1] - spot.y) <= r + options.ventDiameter * 2)
+            || ventSpots.some((vent) => Math.hypot(peak[0] - vent.at[0], peak[1] - vent.at[1]) <= options.ventDiameter * 3);
+          if (!aired) traps.push({ at: peak, vented: false });
+        }
+        if (traps.length) warnings.push("airTrap");
+      } else {
+        if (options.sprue) {
+          if (spots.some((spot) => spot.z <= zp + 0.5)) warnings.push("sprueLow");
+          spots.forEach((spot, index) => sprues.push({ ...spot, piece: cavities[index] }));
+          traps.push(...automaticTraps(options.vents));
+          for (const trap of traps) if (trap.vented) ventSpots.push({ at: trap.at });
+          if (traps.some((trap) => !trap.vented)) warnings.push("airTrap");
+        }
+        suggested = [
+          ...spots.map((spot) => ({ x: spot.x - origin[0], y: spot.y - origin[1], kind: "sprue" as const })),
+          ...(options.sprue && options.vents ? traps : automaticTraps(true)).filter((trap) => trap.vented).map((trap) => ({ x: trap.at[0] - origin[0], y: trap.at[1] - origin[1], kind: "vent" as const })),
+        ];
       }
 
       // The outside: a block, or a shell round the master with a flange at the parting face.
@@ -932,8 +1091,8 @@ export function moldForSolid(runtime: ManifoldToplevel, body: ManifoldSolid, giv
         const flange = Math.max(options.keySize / 2 + 3, w, options.ears ? EAR_THICK + EAR_REACH : 0, options.prySlots ? PRY_TALL / 2 + 2 : 0);
         const flangeRect = keep(created, runtime.CrossSection.square([hi[0] - lo[0], hi[1] - lo[1]]).translate([lo[0], lo[1]]));
         const circles: CrossSection[] = [];
-        if (options.sprue) for (const spot of spots) circles.push(keep(created, runtime.CrossSection.circle(r + funnelRoom + 2.5, 48).translate([spot.x, spot.y])));
-        for (const trap of traps) if (trap.vented) circles.push(keep(created, runtime.CrossSection.circle(options.ventDiameter / 2 + 2.5, 24).translate([trap.at[0], trap.at[1]])));
+        for (const spot of sprues) circles.push(keep(created, runtime.CrossSection.circle(r + funnelRoom + 2.5, 48).translate([spot.x, spot.y])));
+        for (const vent of ventSpots) circles.push(keep(created, runtime.CrossSection.circle(options.ventDiameter / 2 + 2.5, 24).translate([vent.at[0], vent.at[1]])));
         const bosses = circles.length ? keep(created, runtime.CrossSection.union(circles)) : null;
         lowerOuter = keep(created, contourHalf(runtime, cavity, zp, lo[2], w, flangeRect, flange, null, created).trimByPlane([0, 0, -1], -zp));
         upperOuter = keep(created, contourHalf(runtime, cavity, zp, hi[2], w, flangeRect, flange, bosses, created).trimByPlane([0, 0, 1], zp));
@@ -963,12 +1122,13 @@ export function moldForSolid(runtime: ManifoldToplevel, body: ManifoldSolid, giv
         lower = keep(created, lower.subtract(both));
         upper = keep(created, upper.subtract(both));
       }
-      if (options.sprue) {
-        // A sprue from the top down to each cavity's highest point, widening at 45 degrees into a funnel at the top.
-        const channels = spots.map((spot, index) => {
+      if (sprues.length) {
+        // A sprue from the top down to each cavity's highest point (or to where the user set one), widening at 45
+        // degrees into a funnel at the top.
+        const channels = sprues.map((spot) => {
           const room = hi[2] - spot.z - 0.5;
           const funnel = Math.max(0, Math.min(funnelRoom, room));
-          const sprueLow = channelBottom(runtime, cavities[index], spot.x, spot.y, spot.z, r, zp, created);
+          const sprueLow = channelBottom(runtime, spot.piece, spot.x, spot.y, spot.z, r, zp, created);
           const sprue = upright(runtime, created, spot.x, spot.y, sprueLow, hi[2] - sprueLow + 1, r);
           const mouth = funnel > 0.2 ? upright(runtime, created, spot.x, spot.y, hi[2] - funnel, funnel + 0.01, r, r + funnel) : null;
           return mouth ? keep(created, sprue.add(mouth)) : sprue;
@@ -978,11 +1138,13 @@ export function moldForSolid(runtime: ManifoldToplevel, body: ManifoldSolid, giv
         // What is poured fills the sprue as well, up to the top.
         sprueVolume = keep(created, keep(created, channel.intersect(upperOuter)).subtract(cavity)).volume() / 1000;
         upper = keep(created, upper.subtract(channel));
-        const vents = traps.filter((trap) => trap.vented).map(({ at: [x, y, z] }) => {
+      }
+      if (ventSpots.length) {
+        const vents = ventSpots.map(({ at: [x, y, z] }) => {
           const low = channelBottom(runtime, cavity, x, y, z, options.ventDiameter / 2, zp, created);
           return upright(runtime, created, x, y, low, hi[2] - low + 1, options.ventDiameter / 2);
         });
-        if (vents.length) upper = keep(created, upper.subtract(unionOf(runtime, created, vents)));
+        upper = keep(created, upper.subtract(unionOf(runtime, created, vents)));
         ventCount = vents.length;
       }
       if (options.prySlots) {
@@ -1050,7 +1212,11 @@ export function moldForSolid(runtime: ManifoldToplevel, body: ManifoldSolid, giv
       const assembled = [lower, upper].map((half) => keep(created, half.transform(frame.from)));
       const ab = assembled.map((half) => half.boundingBox());
       const outer: [number, number, number] = [0, 1, 2].map((k) => Math.max(...ab.map((b) => b.max[k])) - Math.min(...ab.map((b) => b.min[k]))) as [number, number, number];
-      const highPoints: MoldHighPoint[] = [
+      const highPoints: MoldHighPoint[] = options.ownOpenings ? [
+        ...sprues.map((spot) => ({ point: sceneOf([spot.x, spot.y, spot.z]), vented: true, sprue: true, opening: spot.opening })),
+        ...ventSpots.map((vent) => ({ point: sceneOf(vent.at), vented: true, sprue: false, opening: vent.opening })),
+        ...traps.map((trap) => ({ point: sceneOf(trap.at), vented: false, sprue: false })),
+      ] : [
         ...(options.sprue ? spots.map((spot) => ({ point: sceneOf([spot.x, spot.y, spot.z]), vented: true, sprue: true })) : []),
         ...traps.map((trap) => ({ point: sceneOf(trap.at), vented: trap.vented, sprue: false })),
       ];
@@ -1079,7 +1245,11 @@ export function moldForSolid(runtime: ManifoldToplevel, body: ManifoldSolid, giv
         up: openingToScene(frame.from, [0, 0, 1]).map((value, index) => value - openingToScene(frame.from, [0, 0, 0])[index]) as ClearanceVec3,
         centre: through(UP_TO_SCENE, [(bx0 + bx1) / 2, (by0 + by1) / 2, (bz0 + bz1) / 2]),
         reach: Math.hypot(bx1 - bx0, by1 - by0, bz1 - bz0) / 2,
+        across: [[1, 0, 0], [0, 1, 0]].map((level) => openingToScene(frame.from, level).map((value, index) => value - openingToScene(frame.from, [0, 0, 0])[index]) as ClearanceVec3) as [ClearanceVec3, ClearanceVec3],
+        suggested,
+        ...(options.ownOpenings ? { missedOpenings: missed } : {}),
       };
+      if (options.ownOpenings) ownOpenings = { missed: missed.length };
     } else if (options.kind === "box") {
       const g = options.gap;
       const w = options.wall;
@@ -1208,6 +1378,7 @@ export function moldForSolid(runtime: ManifoldToplevel, body: ManifoldSolid, giv
     return {
       parts: placed, volume: Math.max(0, volume), warnings, keys: keyCount, vents: ventCount, sprues: sprueCount, ...(clearance !== undefined ? { clearance } : {}),
       ...(parting !== undefined ? { parting } : {}), ...(partingFound !== undefined ? { partingFound } : {}), ...(analysis ? { analysis } : {}),
+      ...(ownOpenings ? { ownOpenings } : {}),
     };
   } catch (error) {
     return { error: "kernel", message: error instanceof Error ? error.message : String(error ?? "") };
@@ -1229,6 +1400,11 @@ export function moldErrorMessage(error: "notClosed" | "tooSmall" | "empty" | "ke
   return t(`mold.error.${error}`);
 }
 
+/** A warning in words; the one for openings left out says how many (`missed`). */
+export function moldWarningText(warning: MoldWarning, missed = 0) {
+  return warning === "openingMissed" ? t("mold.warning.openingMissed", { count: missed }) : t(`mold.warning.${warning}`);
+}
+
 /** The warnings in words, and the volume, as the status line says them. */
 export function moldNotes(result: Extract<MoldResult, { parts: unknown }>, kind: MoldKind) {
   const notes: string[] = [];
@@ -1245,10 +1421,12 @@ export function moldNotes(result: Extract<MoldResult, { parts: unknown }>, kind:
     } else notes.push(t("mold.note.direction", { direction: t(`mold.direction.${analysis.axis}`) }));
     notes.push(t("mold.note.weight", { g: Math.round(analysis.weightG).toLocaleString(numberLocale()) }));
   }
-  if (result.sprues > 1) notes.push(t("mold.note.sprues", { count: result.sprues }));
+  // Openings the user set are counted as they are; several sprues then need not mean several cavities.
+  if (result.ownOpenings) notes.push(t("mold.note.openings", { sprues: result.sprues, vents: result.vents }));
+  else if (result.sprues > 1) notes.push(t("mold.note.sprues", { count: result.sprues }));
   if (result.parting !== undefined) notes.push(t(result.partingFound ? "mold.note.partingFound" : "mold.note.parting", { percent: result.parting.toLocaleString(numberLocale()) }));
   if (result.clearance !== undefined) notes.push(t("mold.note.clearance", { mm: result.clearance.toLocaleString(numberLocale()) }));
-  for (const warning of result.warnings) notes.push(t(`mold.warning.${warning}`));
+  for (const warning of result.warnings) notes.push(moldWarningText(warning, result.ownOpenings?.missed));
   return notes;
 }
 
@@ -1293,7 +1471,7 @@ export async function analyseMoldForShapes(targets: readonly WorkplaneShape[], g
     const result = moldForSolid(runtime, master, { ...options, output: "assembled" }, false);
     if ("error" in result) return { analysis: null, error: moldErrorMessage(result.error, result.message) };
     created.push(...result.parts.map((part) => part.solid));
-    return { analysis: result.analysis ?? null, notes: result.warnings.map((warning) => t(`mold.warning.${warning}`)) };
+    return { analysis: result.analysis ?? null, notes: result.warnings.map((warning) => moldWarningText(warning, result.ownOpenings?.missed)) };
   } catch (error) {
     return { analysis: null, error: moldErrorMessage("kernel", error instanceof Error ? error.message : String(error ?? "")) };
   } finally {

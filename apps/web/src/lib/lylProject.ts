@@ -1,4 +1,5 @@
 import { checkedTypefaceData, customFontName, isCustomFontId, textCharacters, typefaceSubset } from "@/lib/customFonts";
+import { normalizeFlushLayer } from "@/lib/flushLayers";
 import { customFontEntry, registerCustomFont } from "@/lib/textFonts";
 import { strFromU8, strToU8, unzip } from "fflate";
 import { boundedProjectZip } from "@/lib/boundedProjectZip";
@@ -64,7 +65,7 @@ export const LYL_FILE_TYPES_FORMAT_VERSION = 4;
 /** The newest format this layerling reads. */
 export const LYL_NEWEST_READABLE_FORMAT_VERSION = LYL_FILE_TYPES_FORMAT_VERSION;
 export const LYL_OLDEST_READABLE_FORMAT_VERSION = 1;
-export const LYL_CREATED_WITH_VERSION = "1.167.0";
+export const LYL_CREATED_WITH_VERSION = "1.168.0";
 export const LYL_MEDIA_TYPE = "application/vnd.layerling.project+zip";
 
 export const LYL_LIMITS = {
@@ -836,6 +837,7 @@ async function serializeShapeNode(
       ...(sketchProfile.stroke ? { stroke: sketchProfile.stroke } : {}),
       ...(sketchProfile.silhouette ? { silhouette: true } : {}),
       ...(sketchProfile.keyring ? { keyring: sketchProfile.keyring } : {}),
+      ...(sketchProfile.flush ? { flush: sketchProfile.flush } : {}),
       ...(sketchProfile.inset ? { inset: sketchProfile.inset } : {}),
       ...(sketchProfile.sweepAnchor && sketchProfile.sweepAnchor !== "center" ? { sweepAnchor: sketchProfile.sweepAnchor } : {}),
     };
@@ -1332,6 +1334,7 @@ function validateSketchProfile(value: unknown, label: string) {
     if (segment.construction !== undefined && typeof segment.construction !== "boolean") throw new Error(`${label}.segments[${index}].construction must be true or false`);
   });
   if (profile.silhouette !== undefined && typeof profile.silhouette !== "boolean") throw new Error(`${label}.silhouette must be true or false`);
+  if (profile.flush !== undefined && !normalizeFlushLayer(profile.flush)) throw new Error(`${label}.flush must be { depth, height } above 0 and, if it has one, a pocket { grow, join, silhouette }`);
   if (profile.keyring !== undefined && !isSketchKeyring(profile.keyring)) throw new Error(`${label}.keyring must be { side, diameter, x, z } and a free place (#598) with corners of -1 or 1 if it has one`);
   if (profile.sweepAnchor !== undefined && profile.sweepAnchor !== "left" && profile.sweepAnchor !== "center" && profile.sweepAnchor !== "right") throw new Error(`${label}.sweepAnchor must be left, center or right`);
   if (profile.inset !== undefined) {
@@ -1439,6 +1442,10 @@ function validateShapeDefinition(definition: Record<string, unknown>, label: str
   if (definition.textSilhouette !== undefined && typeof definition.textSilhouette !== "boolean") {
     throw new Error(`${label}.textSilhouette must be true or false`);
   }
+  // A name tag layer laid in flush (#215).
+  if (definition.textFlush !== undefined && !normalizeFlushLayer(definition.textFlush)) {
+    throw new Error(`${label}.textFlush must be { depth, height } above 0 and, if it has one, a pocket { grow, join, silhouette }`);
+  }
   if (definition.textStretch !== undefined && typeof definition.textStretch !== "boolean") {
     throw new Error(`${label}.textStretch must be true or false`);
   }
@@ -1455,6 +1462,10 @@ function validateShapeDefinition(definition: Record<string, unknown>, label: str
   // How wide curved text's letters are drawn (#1196), in per cent of their own width.
   if (definition.textLetterWidth !== undefined && !(typeof definition.textLetterWidth === "number" && Number.isFinite(definition.textLetterWidth) && definition.textLetterWidth >= 25 && definition.textLetterWidth <= 400)) {
     throw new Error(`${label}.textLetterWidth must be a number from 25 to 400`);
+  }
+  // Curved text that closes its circle (#1840).
+  if (definition.textFullCircle !== undefined && typeof definition.textFullCircle !== "boolean") {
+    throw new Error(`${label}.textFullCircle must be true or false`);
   }
   // The top edge of a text's letters (#225): round or chamfer, with a size.
   if (definition.textEdge !== undefined && !normalizeTextEdge(definition.textEdge)) {
@@ -2002,6 +2013,10 @@ function validateShapeDefinition(definition: Record<string, unknown>, label: str
   if (kind === "port" && definition.portClearance !== undefined) {
     const portClearance = finiteNumber(definition.portClearance, `${label}.portClearance`);
     if (portClearance < 0 || portClearance > 2) throw new Error(`${label}.portClearance is outside the supported range`);
+  }
+  if (kind === "polygon" && definition.polygonFlat !== undefined && typeof definition.polygonFlat !== "boolean") {
+    // A polygon with a flat side in front (Discussion #1787): on or off.
+    throw new Error(`${label}.polygonFlat must be true or false`);
   }
   if ((kind === "port" || kind === "polygon") && definition.cornerFillet !== undefined) {
     const cornerFillet = finiteNumber(definition.cornerFillet, `${label}.cornerFillet`);
