@@ -1,1 +1,12 @@
-[]
+[
+  {
+    "title": {
+      "de": "Sehr große Entwürfe werden wieder gespeichert",
+      "en": "Very large designs are saved again"
+    },
+    "body": {
+      "de": "Bei einem sehr großen Entwurf mit langem Verlauf kam in Chrome bei jeder Änderung die rote Meldung „Dieser Entwurf ist nicht gespeichert“, weil der Browser keinen Speicher bekam, um ihn in einem Stück zu verpacken. Jetzt wird er dann mit weniger Verlaufsschritten gespeichert, und der Hinweis sagt, wie viele bleiben.",
+      "en": "With a very large design and a long history, Chrome showed the red note \"This design is not saved\" at every change, as the browser found no memory to pack it in one piece. It is now saved with fewer history steps, and the note says how many are kept."
+    }
+  }
+]
