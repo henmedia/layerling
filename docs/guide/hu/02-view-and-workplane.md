@@ -13,10 +13,10 @@ Egérrel:
 | kattintás jobb gombbal | egy testen menü a leggyakoribb parancsokkal: másolat készítése, lyuk vagy tömör, csoportosítás, elrejtés, zárolás, törlés és még több; üres helyen Beillesztés és Az összes kijelölése |
 | húzás középső gombbal | a nézet mozgatása |
 | egérgörgő | nagyítás és kicsinyítés |
-| [[Ctrl]] / [[Cmd]] nyomva tartása és húzás bal gombbal | szintén a nézetet mozgatja |
+| [[Ctrl]] / [[Cmd]] nyomva tartása és húzás bal gombbal | szintén a nézetet mozgatja (MacBook érintőpadján: tartsd nyomva a [[Cmd]] billentyűt, nyomd le és húzd); Macen ha helyette a Controlt tartod nyomva, az forgatja a nézetet, mert a Control-kattintás a Mac jobb kattintása |
 | dupla kattintás a munkasík egy üres pontjára vagy a tárgyasztal mellé | úgy mozgatja a nézetet, hogy az a pont középre kerüljön; a nézet ezután körülötte forog |
 
-Hogy a görgő milyen gyorsan nagyít, azt a beállításokban a {{ui:workspace.appearance}} alatt a {{ui:workspace.zoomSpeed}} adja meg: egy csúszka 1-től 14-ig, kezdetben 5-ön; 10 fölött csak a görgő gyorsul. Közvetlenül alatta a(z) {{ui:workspace.panSpeed}} adja meg, milyen gyorsan követi a nézet az egeret eltoláskor: csúszka 1-től 9-ig; az induló 5-ön a megfogott pont a kurzor alatt marad.
+Hogy a görgő milyen gyorsan nagyít, azt a beállításokban a {{ui:workspace.appearance}} alatt a {{ui:workspace.zoomSpeed}} adja meg: egy csúszka 1-től 14-ig, kezdetben 5-ön. Csak a görgőt és az érintőpadot állítja: a gombok és a [[+]] és [[−]] billentyűk mindig ugyanakkora kis lépésekben nagyítanak. Az egérgörgő egy kattanása minden böngészőben egyformán nagyít, az érintőpad annyit, amennyit húzol rajta. Közvetlenül alatta a(z) {{ui:workspace.panSpeed}} adja meg, milyen gyorsan követi a nézet az egeret eltoláskor: csúszka 1-től 9-ig; az induló 5-ön a megfogott pont a kurzor alatt marad.
 
 **Egérgombok, mint a szeletelőben.** Ha a Bambu Studióhoz vagy az OrcaSlicerhez szoktál, a beállításokban, a(z) {{ui:workspace.appearance}} alatt állítsd a(z) {{ui:workspace.mouseScheme}} értékét erre: {{ui:workspace.mouseSchemeSlicer}}. A bal gombbal üres helyen húzva ilyenkor a nézet forog, a jobb gomb a középsőhöz hasonlóan eltolja, a Shift és a bal gombos húzás pedig kijelölőkeretet rajzol. Egy test húzása továbbra is mozgatja, és egy rövid jobb kattintás továbbra is megnyitja a menüt. Vázlatban a jobb gomb is eltolja a nézetet.
 
@@ -26,7 +26,9 @@ Táblagépen vagy telefonon két ujjal nagyítasz (széthúzás és összecsíp�
 
 A tollas digitalizáló tábla egérként viselkedik: a toll hegye a bal gomb, a tollon lévő gomb a jobb, a nézet forgatásához és a menühöz. A tábla gyorsgombjait a meghajtójában a layerling [billentyűparancsaira](chapter:shortcuts) állíthatod.
 
-**Táblagépen lehetőleg érintőtollal dolgozz.** A hegye sokkal finomabb, mint egy ujjbegy, és nem takarja el, amire célzol, így a vázlat apró pontjait, vékony vonalait és fogantyúit, a mérési pontokat és az éleket pontosan eltalálod, és a hosszabb munka is kevésbé fárasztó. A layerling már most is kicsit messzebbről engedi elérni ujjal a pontokat, vonalakat, fogantyúkat és éleket, mint egérmutatóval, de az érintőtoll marad a pontosabb.
+**Táblagépen lehetőleg érintőtollal dolgozz.** A hegye sokkal finomabb, mint egy ujjbegy, és nem takarja el, amire célzol, így a vázlat apró pontjait, vékony vonalait és fogantyúit, a mérési pontokat és az éleket pontosan eltalálod, és a hosszabb munka is kevésbé fárasztó. A layerling már most is kicsit messzebbről engedi elérni ujjal a pontokat, vonalakat, fogantyúkat és éleket, mint egérmutatóval, de az érintőtoll marad a pontosabb. Ez olyan tollra érvényes, amelyet a táblagép tollként ismer (S Pen, Apple Pencil és hasonlók). Egy egyszerű, gumihegyű érintőtoll a képernyő számára ujjnak számít, és nem finomabb annál.
+
+Táblagépen nincs jobb egérgomb: tartsd egy ujjadat fél másodpercig mozdulatlanul egy alakzaton vagy üres helyen, és megnyílik az a menü, amelyet a jobb kattintás nyit meg, üres helyen az **Az összes kijelölése** ponttal. Ugyanebben a menüben a **Több kijelölése** helyettesíti táblagépen a Shiftet: minden koppintás egy testre hozzáadja a kijelöléshez vagy újra kiveszi belőle, amíg üres helyre nem koppintasz vagy meg nem nyomod az [[Esc]] billentyűt; egy ujj üres helyen továbbra is forgatja a nézetet. A kijelölt alakzat körüli fogantyúk ujjal kissé mellőlük is megfoghatók.
 
 ### A nézetkocka
 

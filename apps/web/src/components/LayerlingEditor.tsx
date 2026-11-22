@@ -26,7 +26,7 @@ import { shellWallsSource } from "@/components/workplane/ShellWallsOverlay";
 import { DEFAULT_THREAD_PROFILE, defaultThreadHeadHeight, normalizeThreadHeadHeight, threadCollarFields, threadCollarSettings, threadDriveFields, threadDriveSettings, threadNaturalFootprint, threadSettings } from "@/lib/threadGeometry";
 import { textOffsetAsFill } from "@/lib/textFillChoice";
 import { curvedTextPatch, MAX_TEXT_LETTER_WIDTH, MAX_TEXT_SPACING, MIN_TEXT_LETTER_WIDTH, MIN_TEXT_SPACING } from "@/lib/textGeometry";
-import { normalizeTextEdge } from "@/lib/textEdge";
+import { isTextEdgeSide, normalizeTextEdge } from "@/lib/textEdge";
 import { DEFAULT_TEXT_LAYERS, layerTextKeyringArgument, placedKeyring, layerTextLayersError, nameTagOffsets, normalizeTextLayers, tagFlushArgument, type NameTagKeyring } from "@/lib/textLayers";
 import { limitedText } from "@/lib/textLength";
 import { NAME_TAG_LAYERS, NAME_TAG_LETTER_SIZE, textKerningPatch, textLetterSize, textLetterSizePatch, textShrinkPatch, textSpacingPatch } from "@/lib/nameTag";
@@ -93,8 +93,8 @@ import { makeThreadInsertHole, measureThreadInsert, threadInsertSurfaceCenter, t
 import { MagnetPocketPanel, type MagnetPartnerState } from "./workplane/MagnetPocketPanel";
 import { MAGNET_POCKET_DEFAULTS, magnetPocketMeasures, magnetSizeName, normalizeMagnetPocketSpec, type MagnetPocketSpec } from "@/lib/magnetPocket";
 import { boxNearPoint, findMagnetPartnerSpot, magnetInsertSpec, makeMagnetPocketHole } from "@/lib/magnetPocketGeometry";
-import { PAINT_VIEW_SIDES, paintedBodyMesh, paintedExportFaceColors, paintLassoStroke, paintSideLasso, paintStrokeAt, paintSurfaceNormalAt, rebasePaintStrokes, type PaintLassoView } from "@/lib/paintMesh";
-import { canPaintShape, DEFAULT_PAINT_TOOL, designPaintColors, normalizePaintTool, paintColors, paintStartColor, PAINT_MAX_STROKES, type PaintStroke, type PaintToolSettings } from "@/lib/paint";
+import { PAINT_VIEW_SIDES, paintBrushStroke, paintedBodyMesh, paintedExportFaceColors, paintLassoStroke, paintSideLasso, paintStrokeAt, paintSurfaceNormalAt, rebasePaintStrokes, type PaintBrushSample, type PaintLassoView } from "@/lib/paintMesh";
+import { canPaintShape, DEFAULT_PAINT_TOOL, designPaintColors, normalizePaintStroke, normalizePaintTool, paintColors, paintStartColor, PAINT_MAX_STROKES, type PaintStroke, type PaintToolSettings } from "@/lib/paint";
 import { normalizeHexColor } from "@/lib/coloredImport";
 import { PaintPanel } from "./workplane/PaintPanel";
 import { FaceToolPanel } from "./workplane/FaceToolPanel";
@@ -135,7 +135,7 @@ import { disposeBoundsTree } from "three-mesh-bvh";
 import { clampShellStackHeight, normalizeShellStackFoot, shellStackFloor, type ShellStackFoot } from "@/lib/shellStackLimits";
 import { GRIDFINITY_GRID } from "@/lib/gridfinityGeometry";
 import { magnetsGridLeastSize, magnetsMeetGridCells } from "@/lib/shellGridMagnets";
-import { DIVIDERS_WITH_GRID_MESSAGE, SHELL_GRID_FLOOR, shellGridFloor, SHELL_GRID_PLAY, MAX_SHELL_GRID_CELLS, normalizeShellDividers, normalizeShellGrid, shellGridEstimate, SHELL_DIVIDER_THICKNESS, type ShellDividerWall, type ShellDividers, type ShellGrid, type ShellScoop, MAX_SHELL_POCKETS, shellSettingsList } from "@/lib/shellGridLimits";
+import { DIVIDERS_WITH_GRID_MESSAGE, shellGridFloor, SHELL_GRID_PLAY, MAX_SHELL_GRID_CELLS, normalizeShellDividers, normalizeShellGrid, shellGridEstimate, SHELL_DIVIDER_THICKNESS, type ShellDividerWall, type ShellDividers, type ShellGrid, type ShellScoop, MAX_SHELL_POCKETS, shellSettingsList } from "@/lib/shellGridLimits";
 import { shellPocketOutlines } from "@/lib/shellWalls";
 import { DEFAULT_SHELL_SHELF_HEIGHT, clampShellShelfHeight, clampShellShelfWidth } from "@/lib/shellShelfLimits";
 import { SHELL_SIDES, shellMaxThickness, shellOpeningsFor, shellOpenSides } from "@/lib/shellLimits";
@@ -223,7 +223,7 @@ import { addFileBackup, allowBackupFolder, fileBackupsOfDesign, listFileBackups,
 import { backupFileBeforeOverwrite, takeEditorBackupReminder } from "@/components/workplane/fileBackupEditor";
 import { copyNamePatterns, shapeNamesIn, withCopyName } from "@/lib/shapeCopyName";
 import { nameForNewGroup } from "@/lib/groupName";
-import { clipboardShape, displayShapeName, hasOwnShapeName, iconTagAsset, qrCodeAsset, makeShapeFromAsset, nameTagAsset, libraryAssetCustomization, libraryAssetTurnX, sbcBoardAsset, shapeAssetLabel, toolbarShapeAssets } from "@/lib/shapeCatalog";
+import { clipboardShape, displayShapeName, hasOwnShapeName, iconTagAsset, qrCodeAsset, makeShapeFromAsset, nameTagAsset, libraryAssetCustomization, libraryAssetTurnX, roofAsset, sbcBoardAsset, shapeAssetLabel, toolbarShapeAssets } from "@/lib/shapeCatalog";
 import { storeRecentShape } from "@/lib/shapeLibrarySections";
 import { PORT_PRESET_ORDER, PORT_PRESETS, portPresetSize, type PortPreset } from "@/lib/portGeometry";
 import { WASHER_SIZE_ORDER, isWasherSize, washerTubeFields } from "@/lib/washerSizes";
@@ -3704,7 +3704,7 @@ export function LayerlingEditor({
   }, [sketchSelection, sketchTool, sketchActive]);
   const [edgeModifier, setEdgeModifier] = useState<EdgeModifierSession | null>(null);
   // `mode: "offset"` is the Offset tool (#919), which shares the hollow tool's state: `thickness` is then the distance.
-  const [shellTool, setShellTool] = useState<{ mode?: "offset"; shrink?: boolean; sideways?: boolean; keepCopy?: boolean; thickness: number; openings: ShellOpenings; edges: ShellEdges; stack?: number; stackFoot?: ShellStackFoot | null; gridCells?: number; gridFit?: boolean; gridMagnets?: boolean; gridColumns?: number; gridRows?: number; dividers?: ShellDividers | null; shelf?: number; shelfHeight?: number; busy: boolean; error: string | null } | null>(null);
+  const [shellTool, setShellTool] = useState<{ mode?: "offset"; shrink?: boolean; sideways?: boolean; keepCopy?: boolean; thickness: number; openings: ShellOpenings; edges: ShellEdges; stack?: number; stackFoot?: ShellStackFoot | null; gridCells?: number; gridFit?: boolean; gridMagnets?: boolean; gridScrews?: boolean; gridColumns?: number; gridRows?: number; dividers?: ShellDividers | null; shelf?: number; shelfHeight?: number; busy: boolean; error: string | null } | null>(null);
   /**
    * The Hollow panel's preview (Discussion #1811): the body hollowed with the panel's settings, shown in the body's place
    * until Apply or Cancel. `fingerprint` is the body it was built from; a body changed since is shown as it is.
@@ -5602,7 +5602,7 @@ export function LayerlingEditor({
     );
     const feature = entry.feature;
     if (feature.kind === "shell") {
-      setShellTool({ thickness: feature.amount, openings: feature.openings ?? "top", edges: feature.shellEdges ?? "round", ...(feature.shellStack ? { stack: feature.shellStack } : {}), ...(feature.shellStackFoot ? { stackFoot: feature.shellStackFoot } : {}), ...(feature.shellGrid ? { gridCells: feature.shellGrid.cells, gridFit: feature.shellGrid.fit === true, gridMagnets: feature.shellGrid.magnets === true } : {}), ...(feature.shellDividers ? { dividers: feature.shellDividers } : {}), ...(feature.shellShelf ? { shelf: feature.shellShelf, shelfHeight: feature.shellShelfHeight ?? DEFAULT_SHELL_SHELF_HEIGHT } : {}), busy: false, error: null });
+      setShellTool({ thickness: feature.amount, openings: feature.openings ?? "top", edges: feature.shellEdges ?? "round", ...(feature.shellStack ? { stack: feature.shellStack } : {}), ...(feature.shellStackFoot ? { stackFoot: feature.shellStackFoot } : {}), ...(feature.shellGrid ? { gridCells: feature.shellGrid.cells, gridFit: feature.shellGrid.fit === true, gridMagnets: feature.shellGrid.magnets === true, gridScrews: feature.shellGrid.screws === true } : {}), ...(feature.shellDividers ? { dividers: feature.shellDividers } : {}), ...(feature.shellShelf ? { shelf: feature.shellShelf, shelfHeight: feature.shellShelfHeight ?? DEFAULT_SHELL_SHELF_HEIGHT } : {}), busy: false, error: null });
     } else if (feature.kind === "offset") {
       setShellTool({ mode: "offset", thickness: feature.amount, shrink: feature.offsetShrink === true, sideways: feature.offsetSideways === true, keepCopy: false, openings: "none", edges: feature.shellEdges ?? "round", busy: false, error: null });
     } else if (feature.kind !== "surfaceTexture") {
@@ -8788,7 +8788,7 @@ export function LayerlingEditor({
         edges: hollow.shellEdges ?? "round",
         ...(hollow.shellStack ? { stack: hollow.shellStack } : {}),
         ...(hollow.shellStackFoot ? { stackFoot: hollow.shellStackFoot } : {}),
-        ...(hollow.shellGrid ? { gridCells: hollow.shellGrid.cells, gridFit: hollow.shellGrid.fit === true, ...(hollow.shellGrid.magnets ? { gridMagnets: true } : {}) } : {}),
+        ...(hollow.shellGrid ? { gridCells: hollow.shellGrid.cells, gridFit: hollow.shellGrid.fit === true, ...(hollow.shellGrid.magnets ? { gridMagnets: true } : {}), ...(hollow.shellGrid.screws ? { gridScrews: true } : {}) } : {}),
         ...(hollow.shellDividers ? { dividers: hollow.shellDividers } : {}),
         ...(hollow.shellShelf ? { shelf: hollow.shellShelf, shelfHeight: hollow.shellShelfHeight ?? DEFAULT_SHELL_SHELF_HEIGHT } : {}),
         busy: false,
@@ -9662,7 +9662,7 @@ export function LayerlingEditor({
     // The slider at its right end means every cell that fits, kept as that: a body made larger gets more sockets, smaller fewer.
     const gridMax = shellGridEstimate(shapeWidth(target), shapeDepth(target), thickness).max;
     const gridCells = tool.gridCells ?? 0;
-    const grid = normalizeShellGrid({ cells: gridCells > 0 && gridCells >= gridMax ? MAX_SHELL_GRID_CELLS : gridCells, fit: tool.gridFit, magnets: tool.gridMagnets });
+    const grid = normalizeShellGrid({ cells: gridCells > 0 && gridCells >= gridMax ? MAX_SHELL_GRID_CELLS : gridCells, fit: tool.gridFit, magnets: tool.gridMagnets, screws: tool.gridScrews });
     // Not with a Gridfinity floor: its bins fill the cells.
     const dividers = grid ? null : normalizeShellDividers(tool.dividers);
     const shelf = tool.shelf ? { width: tool.shelf, height: tool.shelfHeight ?? DEFAULT_SHELL_SHELF_HEIGHT } : undefined;
@@ -11395,6 +11395,18 @@ export function LayerlingEditor({
     });
   }, []);
 
+  /** Ctrl and the wheel, or [ and ], over the view: the brush or the circle larger or smaller, to a tenth of a millimetre. */
+  const resizePaint = useCallback((factor: number) => {
+    setPaintTool((current) => {
+      if (!current) return current;
+      const grown = current.settings.diameter * factor;
+      const diameter = Math.round(grown * 10) / 10 === current.settings.diameter ? current.settings.diameter + (factor > 1 ? 0.1 : -0.1) : Math.round(grown * 10) / 10;
+      const settings = normalizePaintTool({ ...current.settings, diameter });
+      paintSettingsRef.current = settings;
+      return { ...current, settings };
+    });
+  }, []);
+
   /** A stroke onto the painted body, as a step of the history; one that finds nothing on the body is not kept. */
   const addPaintStroke = useCallback(async (stroke: PaintStroke | null) => {
     const tool = paintTool;
@@ -11432,12 +11444,40 @@ export function LayerlingEditor({
     void addPaintStroke(paintStrokeAt(source, pick.point, pick.normal, tool.settings));
   }, [addPaintStroke, paintTool]);
 
+  const paintBrush = useCallback((samples: PaintBrushSample[]) => {
+    const tool = paintTool;
+    const source = tool ? shapesRef.current.find((shape) => shape.id === tool.sourceId) : null;
+    if (!tool || !source) return;
+    void addPaintStroke(paintBrushStroke(source, samples, tool.settings));
+  }, [addPaintStroke, paintTool]);
+
   const paintLasso = useCallback((view: PaintLassoView, outline: Array<[number, number]>) => {
     const tool = paintTool;
     const source = tool ? shapesRef.current.find((shape) => shape.id === tool.sourceId) : null;
     if (!tool || !source) return;
     void addPaintStroke(paintLassoStroke(source, view, outline, tool.settings));
   }, [addPaintStroke, paintTool]);
+
+  /** Fill gaps: a stroke of its own, so Undo takes it back; none when no patch is that small. */
+  const fillPaintGaps = useCallback(() => {
+    const tool = paintTool;
+    const source = tool ? shapesRef.current.find((shape) => shape.id === tool.sourceId) : null;
+    if (!tool || !source?.paint?.length) return;
+    if (source.locked) {
+      refuseLockedSelection();
+      return;
+    }
+    const stroke = normalizePaintStroke({ mode: "gaps", size: [shapeWidth(source), source.height, shapeDepth(source)], area: tool.settings.gapArea });
+    if (!stroke) return;
+    const next = { ...source, paint: [...source.paint, stroke] };
+    const before = paintedBodyMesh(source)?.colors ?? [];
+    const after = paintedBodyMesh(next)?.colors ?? [];
+    if (before.length === after.length && before.every((color, index) => color === after[index])) {
+      setNotice(t("status.paintNoGaps"));
+      return;
+    }
+    commitShapes(shapesRef.current.map((shape) => (shape.id === source.id ? next : shape)), source.id, t("status.paintGaps"));
+  }, [commitShapes, paintTool, refuseLockedSelection]);
 
   const clearPaint = useCallback(() => {
     const source = paintTool ? shapesRef.current.find((shape) => shape.id === paintTool.sourceId) : null;
@@ -14756,7 +14796,9 @@ export function LayerlingEditor({
       if (command.action === "create_shape") {
         const rawKind = mcpString(params.kind, "box");
         if (rawKind === "honeycomb") throw new Error("The honeycomb shape is gone: use layerling_perforate_face to cut a hexagon hole pattern into a face");
-        const kind = rawKind === "cube" ? "box" : rawKind;
+        // The roof (#1931) is a polygon from the library with three sides, laid down on one flat side.
+        const roof = rawKind === "roof";
+        const kind = rawKind === "cube" ? "box" : roof ? "polygon" : rawKind;
         const width = Math.max(MIN_SHAPE_DIMENSION, mcpNumber(params.width ?? params.size, 20));
         const depth = Math.max(MIN_SHAPE_DIMENSION, mcpNumber(params.depth ?? params.size, rawKind === "cube" ? width : 20));
         const height = Math.max(MIN_SHAPE_DIMENSION, mcpNumber(params.height ?? params.size, rawKind === "cube" ? width : 20));
@@ -14765,7 +14807,7 @@ export function LayerlingEditor({
         const elevation = mcpNumber(params.elevation, placementElevation);
         // Die Farbe steht schon im Katalog; zwei fest eingetragene Farbwerte
         // waeren die dritte Stelle, an der eine neue Form vergessen wird.
-        const asset = toolbarShapeAssets.find((entry) => entry.kind === kind);
+        const asset = roof ? roofAsset : toolbarShapeAssets.find((entry) => entry.kind === kind);
         const color = mcpString(params.color, asset?.color ?? "#d41721");
         const name = mcpString(params.name, kind === "sketch" ? "Sketch extrusion" : rawKind === "cube" ? "Cube" : asset?.name ?? "Box");
         // Nur was ausdruecklich verlangt wurde: sonst gilt das Mass, mit dem der
@@ -14841,9 +14883,11 @@ export function LayerlingEditor({
                   }
                   : shapeParams,
               ), getPrinterPlay()),
-              width: requestedWidth,
-              depth: requestedDepth,
-              height: requestedHeight,
+              // The roof's mark is no shape default either (see update_object), so it is handed in here.
+              ...(roof || (kind === "polygon" && params.polygonRoof === true) ? { sides: 3, polygonFlat: false, polygonRoof: true } : {}),
+              width: requestedWidth ?? (roof ? libraryAssetCustomization(roofAsset).width : undefined),
+              depth: requestedDepth ?? (roof ? libraryAssetCustomization(roofAsset).depth : undefined),
+              height: requestedHeight ?? (roof ? libraryAssetCustomization(roofAsset).height : undefined),
             },
           );
           shape = {
@@ -14879,16 +14923,29 @@ export function LayerlingEditor({
           if (shape.kind === "text" && shape.textCurved) {
             shape = { ...shape, ...curvedTextPatch({ ...shape, textCurved: false }, { textCurved: true, textRadius: shape.textRadius, textSize: shape.textSize }) };
           }
+          // A text's fill (#215) when it is made, with the same words as update_object: the schema offers stroke and
+          // silhouette for kind text, and create_shape left them out. The box follows the fill in curvedTextPatch.
+          if (shape.kind === "text" && ((params.stroke !== undefined && params.stroke !== null && params.stroke !== false) || typeof params.silhouette === "boolean")) {
+            const fill: Partial<WorkplaneShape> = {};
+            if (params.stroke !== undefined && params.stroke !== null && params.stroke !== false) {
+              const stroke = normalizeSketchStroke({ ...DEFAULT_SKETCH_STROKE, ...(params.stroke as object) });
+              if (!stroke) throw new Error("stroke needs a width above 0, or leave it out for the filled letters");
+              fill.textStroke = stroke;
+            }
+            if (typeof params.silhouette === "boolean") fill.textSilhouette = params.silhouette || undefined;
+            shape = { ...shape, ...curvedTextPatch(shape, fill) };
+          }
         } else {
           throw new Error(`MCP create_shape does not know a shape called "${rawKind}"`);
         }
         // Auf einer Arbeitsebene an einer Flaeche steht die neue Form auf ihr,
         // wie beim Ablegen von Hand; x und z zaehlen dann auf dieser Flaeche.
         // Wer Hoehe oder Drehung selbst angibt, meint die Grundplatte.
+        // The roof is laid on one flat side as the shape library lays it, on the base plate too.
         const activeWorkplane = placementWorkplaneRef.current;
-        if (!placementWorkplaneIsBase(activeWorkplane) && [params.elevation, params.rotation, params.rotationX, params.rotationZ].every((value) => value === undefined)) {
+        if ((roof || !placementWorkplaneIsBase(activeWorkplane)) && [params.elevation, params.rotation, params.rotationX, params.rotationZ].every((value) => value === undefined)) {
           const point = placementWorkplanePoint(activeWorkplane, x, z);
-          shape = canonicalizeShape({ ...shape, ...placementPatchForNewShape(shape, activeWorkplane, point) });
+          shape = canonicalizeShape({ ...shape, ...placementPatchForNewShape(shape, activeWorkplane, point, false, roof ? libraryAssetTurnX(roofAsset) : 0) });
         }
         // A font of one's own passes the shape defaults by; it is set here, by id or by name.
         const ownFont = shape.kind === "text" && typeof params.font === "string" ? mcpTextFont(params.font) : null;
@@ -15045,6 +15102,11 @@ export function LayerlingEditor({
         Object.assign(patch, mcpTaperPatch({ ...target, ...patch }, params, shapeDimensionLimit(workspaceSettingsRef.current, target.kind, DEFAULT_TAPER_DIMENSION_MAX)));
         Object.assign(patch, mcpExtrudeDeformPatch({ ...target, ...patch }, params));
         Object.assign(patch, mcpSlopePatch(target, params));
+        // The roof's mark (#1931) is no shape default (a saved polygon default must not turn every polygon into a
+        // roof), so it does not come through the settings above: it is set here, with the three sides it keeps.
+        if (target.kind === "polygon" && typeof params.polygonRoof === "boolean") {
+          Object.assign(patch, params.polygonRoof ? { polygonRoof: true, sides: 3, polygonFlat: false } : { polygonRoof: undefined });
+        }
         if (target.kind === "rib") Object.assign(patch, mcpRibFootPatch(target, patch, params));
         if (target.kind === "loft") {
           // The stored ends were set above as they came; the frame and the place follow from them here.
@@ -15155,13 +15217,15 @@ export function LayerlingEditor({
           }
           // Curved text (#1840): the line closes the circle, the letters spread evenly all the way round; the box follows in curvedTextPatch.
           if (typeof params.fullCircle === "boolean") patch.textFullCircle = params.fullCircle || undefined;
-          // The top edge of the letters (#225): { kind: "round" | "chamfer", size } or null for none.
+          // The edge of the letters (#225): { kind: "round" | "chamfer", size, side?: "top" | "bottom" | "both" } or null for none.
           if (params.letterEdge !== undefined) {
             if (params.letterEdge === null || params.letterEdge === false) {
               patch.textEdge = undefined;
             } else {
               const letterEdge = normalizeTextEdge(params.letterEdge);
               if (!letterEdge) throw new Error("letterEdge needs a kind (round or chamfer) and a size in mm, or null for none");
+              const side = (params.letterEdge as { side?: unknown }).side;
+              if (side !== undefined && !isTextEdgeSide(side)) throw new Error("letterEdge.side must be top, bottom or both");
               patch.textEdge = letterEdge;
             }
           }
@@ -15874,12 +15938,17 @@ export function LayerlingEditor({
         for (const [index, entry] of requested.entries()) {
           if (!entry || typeof entry !== "object") throw new Error(`strokes[${index}] must be an object`);
           const raw = entry as Record<string, unknown>;
-          const mode = raw.mode === "circle" || raw.mode === "lasso" || raw.mode === "fill" ? raw.mode : null;
-          if (!mode) throw new Error(`strokes[${index}].mode must be fill, circle or lasso`);
+          const mode = raw.mode === "circle" || raw.mode === "lasso" || raw.mode === "fill" || raw.mode === "brush" || raw.mode === "height" || raw.mode === "gaps" ? raw.mode : null;
+          if (!mode) throw new Error(`strokes[${index}].mode must be fill, circle, brush, height, lasso or gaps`);
+          if (mode === "gaps") {
+            const gaps = normalizePaintStroke({ mode: "gaps", size: [shapeWidth(target), target.height, shapeDepth(target)], area: mcpOptionalNumber(raw.area) });
+            if (gaps) strokes = [...strokes, gaps];
+            continue;
+          }
           const erase = raw.erase === true || raw.color === null;
           const color = erase ? DEFAULT_PAINT_TOOL.color : normalizeHexColor(typeof raw.color === "string" ? raw.color : undefined);
           if (!color) throw new Error(`strokes[${index}].color must be a colour as #rrggbb (or erase: true)`);
-          const settings = normalizePaintTool({ mode, color, erase, angle: mcpOptionalNumber(raw.angle), diameter: mcpOptionalNumber(raw.diameter) });
+          const settings = normalizePaintTool({ mode, color, erase, angle: mcpOptionalNumber(raw.angle), diameter: mcpOptionalNumber(raw.diameter), band: mcpOptionalNumber(raw.band), ball: raw.ball === true });
           let stroke: PaintStroke | null;
           if (mode === "lasso") {
             const side = PAINT_VIEW_SIDES.find((name) => name === raw.view);
@@ -15890,6 +15959,16 @@ export function LayerlingEditor({
             if (outline.length < 3) throw new Error(`strokes[${index}].outline needs at least three points`);
             const lasso = paintSideLasso(side, outline);
             stroke = paintLassoStroke(target, lasso.view, lasso.outline, settings);
+          } else if (mode === "brush") {
+            const path = Array.isArray(raw.path) ? raw.path.map(vec3) : [];
+            if (!path.length || path.some((point) => !point)) throw new Error(`strokes[${index}].path must be a list of points [x, y, z] on the body's surface (y is the height)`);
+            const normals = Array.isArray(raw.normals) ? raw.normals.map(vec3) : [];
+            const samples = (path as THREE.Vector3[]).map((point, at) => {
+              const normal = normals[at] ?? paintSurfaceNormalAt(target, point);
+              if (!normal || normal.lengthSq() < 1e-12) throw new Error(`strokes[${index}].path[${at}] is not on the body's surface`);
+              return { point, normal };
+            });
+            stroke = paintBrushStroke(target, samples, settings);
           } else {
             const point = vec3(raw.point);
             if (!point) throw new Error(`strokes[${index}].point must be [x, y, z] on the body's surface (y is the height)`);
@@ -16824,7 +16903,6 @@ export function LayerlingEditor({
           ...("flipTop" in result && result.flipTop ? { flipTop: result.flipTop } : {}),
           ...("slide" in result && result.slide ? { slide: result.slide } : {}),
           ...fitted,
-          ...fitted,
         };
       }
 
@@ -17361,7 +17439,7 @@ export function LayerlingEditor({
           : params.openings === "none" || params.openings === "bottom" || params.openings === "top-bottom" ? params.openings : "top";
         const edges: ShellEdges = params.edges === "sharp" ? "sharp" : "round";
         const stack = typeof params.stack === "number" && params.stack > 0 ? clampShellStackHeight(params.stack) : 0;
-        const grid = normalizeShellGrid({ cells: params.gridCells, fit: params.gridFit === true, magnets: params.gridMagnets === true });
+        const grid = normalizeShellGrid({ cells: params.gridCells, fit: params.gridFit === true, magnets: params.gridMagnets === true, screws: params.gridScrews === true });
         const dividers = normalizeShellDividers({ x: params.dividersX, z: params.dividersZ, height: params.dividerHeight, thickness: params.dividerThickness, ...(params.dividerWalls !== undefined ? { manual: true, walls: shellSettingsList(params.dividerWalls) } : {}), ...(params.scoops !== undefined ? { scoops: shellSettingsList(params.scoops), scoopRadius: params.scoopRadius } : {}), ...(params.pockets !== undefined ? { pockets: shellSettingsList(params.pockets), pocketFill: params.pocketFill } : {}) });
         if (grid && dividers) throw new Error(DIVIDERS_WITH_GRID_MESSAGE);
         const stackFoot = stack > 0 ? normalizeShellStackFoot({ hollow: params.stackHollow === true, grip: params.stackGrip, gripDepth: params.stackGripDepth, gripSides: params.stackGripSides, gripHeight: params.stackGripHeight, gripAt: params.stackGripAt }) : null;
@@ -17374,7 +17452,7 @@ export function LayerlingEditor({
           modifiedShape.id,
           t("status.shelledMcp", { size: Number(thickness.toFixed(2)) }),
         );
-        return { object: mcpShapeSummary(modifiedShape), thickness, openings, edges, ...(stack > 0 ? { stack } : {}), ...(stackFoot?.hollow ? { stackHollow: true } : {}), ...(stackFoot?.grip ? { stackGrip: stackFoot.grip, stackGripDepth: stackFoot.gripDepth, stackGripSides: stackFoot.gripSides, ...(stackFoot.gripHeight !== undefined ? { stackGripHeight: stackFoot.gripHeight } : {}), ...(stackFoot.gripAt ? { stackGripAt: stackFoot.gripAt } : {}) } : {}), ...(grid ? { gridCells: grid.cells, gridFit: grid.fit, ...(grid.magnets ? { gridMagnets: true } : {}) } : {}), ...(dividers ? { dividersX: dividers.x, dividersZ: dividers.z, ...(dividers.height !== undefined ? { dividerHeight: dividers.height } : {}), ...(dividers.thickness !== undefined ? { dividerThickness: dividers.thickness } : {}) } : {}), ...(shelf ? { shelf: shelf.width, shelfHeight: shelf.height } : {}) };
+        return { object: mcpShapeSummary(modifiedShape), thickness, openings, edges, ...(stack > 0 ? { stack } : {}), ...(stackFoot?.hollow ? { stackHollow: true } : {}), ...(stackFoot?.grip ? { stackGrip: stackFoot.grip, stackGripDepth: stackFoot.gripDepth, stackGripSides: stackFoot.gripSides, ...(stackFoot.gripHeight !== undefined ? { stackGripHeight: stackFoot.gripHeight } : {}), ...(stackFoot.gripAt ? { stackGripAt: stackFoot.gripAt } : {}) } : {}), ...(grid ? { gridCells: grid.cells, gridFit: grid.fit, ...(grid.magnets ? { gridMagnets: true } : {}), ...(grid.screws ? { gridScrews: true } : {}) } : {}), ...(dividers ? { dividersX: dividers.x, dividersZ: dividers.z, ...(dividers.height !== undefined ? { dividerHeight: dividers.height } : {}), ...(dividers.thickness !== undefined ? { dividerThickness: dividers.thickness } : {}) } : {}), ...(shelf ? { shelf: shelf.width, shelfHeight: shelf.height } : {}) };
       }
 
       if (command.action === "offset_object") {
@@ -21220,8 +21298,18 @@ export function LayerlingEditor({
             : null}
           onMatePointPick={pickMatePoint}
           onMateFacePick={threadInsertTool ? (pick)=>void pickThreadInsertFace(pick) : mateTool ? pickMateFace : faceTool ? (pick) => void pickFaceToolFace(pick) : supportRibTool ? (pick) => void pickSupportRibFace(pick) : (pick) => void pickHolePatternFace(pick)}
-          paintPick={paintTool && !historyViewState ? { shapeId: paintTool.sourceId, mode: paintTool.settings.mode } : null}
+          paintPick={paintTool && !historyViewState ? {
+            shapeId: paintTool.sourceId,
+            mode: paintTool.settings.mode,
+            color: paintTool.settings.erase ? null : paintTool.settings.color,
+            diameter: paintTool.settings.diameter,
+            pressure: paintTool.settings.pressure,
+            smooth: paintTool.settings.smooth,
+            band: paintTool.settings.band,
+          } : null}
           onPaintPick={paintAtPick}
+          onPaintBrush={paintBrush}
+          onPaintResize={resizePaint}
           onPaintLasso={paintLasso}
           cadFacePick={historyViewState ? null : cadFacePick}
           onCadFacePick={deleteFaceTool ? toggleDeleteFace : toggleSurfaceFace}
@@ -21552,6 +21640,7 @@ export function LayerlingEditor({
           workspace={workspaceSettings}
           onChange={changePaintSettings}
           onClear={clearPaint}
+          onFillGaps={fillPaintGaps}
           onClose={() => {
             setPaintTool(null);
             setNotice(t("status.paintClosed"));
@@ -21823,6 +21912,8 @@ export function LayerlingEditor({
           gridFit={shellTool.gridFit === true}
           gridMagnets={shellTool.gridMagnets === true}
           onGridMagnetsChange={(magnets) => setShellTool((current) => current ? { ...current, gridMagnets: magnets, error: null } : current)}
+          gridScrews={shellTool.gridScrews === true}
+          onGridScrewsChange={(screws) => setShellTool((current) => current ? { ...current, gridScrews: screws, error: null } : current)}
           gridMax={shellGridEstimate(shapeWidth(selectedShape), shapeDepth(selectedShape), shellTool.thickness).max}
           gridColumns={shellTool.gridColumns ?? shellGridEstimate(shapeWidth(selectedShape), shapeDepth(selectedShape), shellTool.thickness).columns}
           gridRows={shellTool.gridRows ?? shellGridEstimate(shapeWidth(selectedShape), shapeDepth(selectedShape), shellTool.thickness).rows}
@@ -21834,7 +21925,7 @@ export function LayerlingEditor({
           insideDepth={Math.max(0, shapeDepth(selectedShape) - 2 * shellTool.thickness)}
           // The dividers' full height over the floor: the body's height less its floor (the Gridfinity floor's 6.2 mm, or the wall).
           // Under a shelf ledge, up to its top: the ledge's height is measured from the wall's floor.
-          dividerFullHeight={Math.max(0, Math.round((Math.min(selectedShape.height, (shellTool.shelf ?? 0) > 0 ? shellTool.thickness + (shellTool.shelfHeight ?? DEFAULT_SHELL_SHELF_HEIGHT) : Infinity) - ((shellTool.gridCells ?? 0) > 0 ? shellGridFloor({ magnets: shellTool.gridMagnets }) : shellTool.thickness)) * 10) / 10)}
+          dividerFullHeight={Math.max(0, Math.round((Math.min(selectedShape.height, (shellTool.shelf ?? 0) > 0 ? shellTool.thickness + (shellTool.shelfHeight ?? DEFAULT_SHELL_SHELF_HEIGHT) : Infinity) - ((shellTool.gridCells ?? 0) > 0 ? shellGridFloor({ magnets: shellTool.gridMagnets, screws: shellTool.gridScrews }) : shellTool.thickness)) * 10) / 10)}
           // A Gridfinity floor takes the dividers away: its bins fill the cells, with no room for a divider.
           onGridChange={(cells, fit) => setShellTool((current) => current ? { ...current, gridCells: cells, gridFit: fit, ...(cells > 0 ? { dividers: null } : {}), error: null } : current)}
           onDividersChange={(value) => setShellTool((current) => current ? { ...current, dividers: value, error: null } : current)}

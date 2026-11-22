@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import * as THREE from "three";
+import { installSafariBufferUploads } from "@/lib/safariBufferUploads";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import { leftButtonCameraAction } from "@/lib/cameraMouseButtons";
 import { AlertTriangle, Check, LoaderCircle, X } from "lucide-react";
@@ -176,6 +177,7 @@ export function MeshSimplifyPanel({
     // must not inherit a canvas whose context is lost.
     const canvas = document.createElement("canvas");
     stage.prepend(canvas);
+    installSafariBufferUploads();
     const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
     renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
     renderer.setScissorTest(true);

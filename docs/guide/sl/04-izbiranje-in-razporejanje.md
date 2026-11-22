@@ -65,6 +65,12 @@ Poševno zavrtena oblika, na primer za 45°, ima za izhodišče okvir okoli sebe
 
 Tipka za to je [[L]]. [[Esc]] prekine.
 
+### Ujemanje velikosti
+
+Med poravnavo drži [[Alt]] in točke se spremenijo v kvadratke: klik oblik ne premika več, ampak jim spremeni velikost. Točka ob strani raztegne vsako obliko do te strani, njena druga stran pa ostane, kjer je, kot da bi tja povlekel njen ročaj. Točka na sredini pusti vsako obliko na njenem mestu in ji da širino, dolžino ali višino v tej smeri. Tako na primer zamenjaš kvader z valjem enake velikosti ali pokvarjen kos mreže nadomestiš s čisto obliko. Pojdi z miško čez točko s pridržano tipko [[Alt]] in vnaprej vidiš, kako velike postanejo oblike.
+
+Izhodišče je oblika, ki si jo kliknil prva; spremenijo se samo druge. Brez nje stranske točke raztegnejo vse oblike do najbolj oddaljene strani, srednja točka pa jim vsem da velikost največje. Valj ostane okrogel, zato zraste tudi v drugi smeri. Poševno zavrtena oblika ostane, kakršna je; oblike, zavrtene za 90°, delujejo.
+
 ### Enaki razmiki
 
 Ob srednji točki vsake črte stoji širša točka s črtico na vsaki strani. Razporedi tri ali več oblik v tej smeri tako, da je prostor med sosednjimi robovi povsod enak, ne glede na velikost oblik. Prva in zadnja oblika ostaneta na mestu, tiste vmes se premaknejo. Vrsta lukenj različnih velikosti tako dobi povsod enako steno vmes. Pojdi z miško čez točko in vnaprej vidiš, kam gredo oblike; vrstica stanja nato pove razmik.
@@ -105,13 +111,11 @@ Dva dela naj ležita ploskev ob ploskvi ali naj se končata poravnano? Izberi de
 
 **Natančen kot med dvema ploskvama:** {{ui:editor.tool.mateFaces}} pusti ploskvi vzporedni; za kot med njima ni posebnega orodja, a do njega prideš tako. Najprej ploskvi združi z {{ui:editor.tool.mateFaces}}, da sta vzporedni. Nato nastavi središče vrtenja na rob, kjer se stikata ({{ui:editor.tool.rotationPivot}}, klikni rob ali oglišče) in v kartici {{ui:inspector.rotation}} dela vpiši kot, na primer 15 ali 30. Del se zavrti okoli tega središča. Osi kartice so osi plošče, zato to deluje, kadar rob poteka vzdolž X, Y ali Z.
 
-Podobno preprosta sta {{ui:editor.tool.dropToWorkplane}} ([[D]]), ki izbor odloži na delovno ravnino, in {{ui:editor.tool.centerOnWorkplane}}.
+Podobno preprosta sta {{ui:editor.tool.dropToWorkplane}} ([[D]]), ki izbor odloži na delovno ravnino, in {{ui:editor.tool.centerOnWorkplane}}. Ko je delovna ravnina na ploskvi, centrira na točko, ki si jo izbral s [[W]], in izbor premika samo vzdolž te ploskve, tako da tisto, kar stoji na njej, na njej tudi ostane.
 
 [[Alt]]+[[D]] spusti več delov kot celoto: vsi se pomaknejo navzdol za enako razdaljo in tako ohranijo višine med seboj, medtem ko [[D]] spusti vsak del posebej.
 
 [[C]] dvigne izbor, kot Cruise v Tinkercadu: sledi kazalcu miške in se uleže na ploskev drugega telesa, nad katero si, tudi na poševno. Klik ga tam odloži, [[Esc]] ga pusti, kjer je bil. Njegova spodnja stran potem leži na ploskvi, poravnana z robovi ploskve, kot bi bila nova oblika; svoj zasuk okoli navpične osi obdrži. Več delov potuje skupaj in ohrani razmike. Nad prazno ploščo [[C]] nagnjen del znova postavi pokonci na delovno ravnino. Če med prenašanjem držiš [[Shift]], se del namesto tega pogrezne v ploskev: ostane pokonci, z vrhom poravnanim s ploskvijo in telesom pod njo, tako pride v telo stožčasto ali valjasto ugrezanje; nova oblika iz knjižnice se s [[Shift]] postavi enako. [[Shift]]+[[D]] spusti izbor na delovno ravnino z vrhom namesto z dnom. Brez tipkovnice ima meni dolgega pritiska za isto {{ui:contextMenu.carry}}.
-
-S [[C]] poberi izbor, kot z Cruisom v Tinkercadu: visi na kazalcu in se položi na ploskev drugega telesa, nad katero si ravno, tudi na poševno. Klik ga tam odloži, [[Esc]] ga pusti, kjer je bil. Njegova spodnja stran potem leži na ploskvi in se ravna po njenih robovih kot nova oblika; lastni zasuk okoli navpične osi obdrži. Več delov se premika skupaj in ohrani razmik. Nad prazno ploščo [[C]] nagnjen del spet postavi pokonci na delovno ravnino.
 
 ## Polja: vrsta in krog
 
@@ -152,7 +156,9 @@ Za prezračevalne reže, zvočniške mreže, košare in ohišja {{ui:holePattern
    - **{{ui:holePattern.arrangement}}:** {{ui:holePattern.arrangement.grid}} položi luknje v vrstice in stolpce. {{ui:holePattern.arrangement.staggered}} premakne vsako drugo vrstico za pol razmika in vrstice bliže skupaj, tako da ima vsaka luknja sosede v enaki razdalji – s šestkotniki dobiš satovje.
    - **{{ui:holePattern.arrangement.perimeter}}:** namesto tega venec lukenj vzdolž zunanjega roba ploskve, za {{ui:holePattern.margin}} navznoter - luknje za vijake okoli pokrova ali plošče. {{ui:holePattern.perimeterBy}} {{ui:holePattern.perimeterBy.spacing}} približno ohrani razmik, {{ui:holePattern.perimeterBy.count}} določi {{ui:holePattern.perimeterCount}}; v obeh primerih se razmik izenači, da se venec sklene brez vrzeli. {{ui:holePattern.perimeterCorners}} (na začetku vklopljeno) postavi luknjo v vsak kot in vsako stranico med njimi enakomerno razdeli. Na okrogli ploskvi ali brez kljukice gredo luknje enakomerno naokrog od vrha, {{ui:holePattern.perimeterStart}} pa premakne ves venec vzdolž roba.
    - **{{ui:holePattern.centerHole}}:** pri {{ui:holePattern.arrangement.perimeter}} in na zavihku {{ui:holePattern.mode.mounting}} (ne za 19-palčni rack). Označite za še eno luknjo na sredini ploskve, enako kot druge - na primer odtočne luknje v dnu cvetličnega lonca. V število lukenj se ne šteje. Pri navadnih okroglih, kvadratnih in šestkotnih luknjah z {{ui:holePattern.centerHoleOwnSize}} posebej nastavite {{ui:holePattern.centerHoleSize}}. Če je sredina ploskve odprta ali bi bila luknja preblizu drugim, se izpusti, in vrstica to pove.
-   - **{{ui:holePattern.margin}}:** prosta razdalja med luknjami in robom ploskve. Ustvarijo se samo luknje, ki ležijo povsem znotraj ploskve minus rob; kar bi segalo čez, odpade. Ta rob ostane tudi okoli odprtin v ploskvi.
+   - **{{ui:holePattern.margin}}:** prosta razdalja med luknjami in robom ploskve. Ustvarijo se samo luknje, ki ležijo povsem znotraj ploskve minus rob; kar bi segalo čez, odpade. Ta rob ostane tudi okoli odprtin v ploskvi. Pri 0 rob navadne skoznje luknje v mreži ali zamaknjenem vzorcu odreže, namesto da bi jih izpustil, tako da mreža ali satovje teče vse do roba (luknja, ki bi rob le oprasnila, odpade; povrtanja, pogrezi, slepe luknje, lastne oblike in okrogla stena ostanejo znotraj ploskve). Vrstica pod poljem to pove.
+   - **{{ui:holePattern.edgeBorder}}:** prikaže se samo pri robu 0, od 0 do 10 mm. Nad 0 ostane ob robu in okoli odprtin ploskve poln okvir te širine, luknje pa se odrežejo tam, kjer se začne, zato je rob gladek. Okvir je samostojno telo (»Okvir«), debelo kot telo za ploskvijo, združeno v skupino s preluknjanim telesom. Od načinov, kako položiti vzorec, zmaga tisti, ki pusti najmanj trakov, tanjših od sten med luknjami; vrstica prešteje preostale, nekoliko drugačna velikost ali razmik pa jih premakne.
+   - **{{ui:holePattern.topLayer}}:** za ravne ploskve in navadne luknje. Označi in podaj {{ui:holePattern.topLayerThickness}} (na začetku 1 mm) in {{ui:holePattern.topLayerColor}}: luknje gredo samo skozi to plast. Ob ustvarjanju telo postane sveženj dveh teles, mreža v izbrani barvi (z okvirjem, če obstaja) in telo brez mreže v svoji barvi, spodaj polno in do ploskve zapolni luknje mreže. Ploskev je tako ravna, in natisnjena s ploskvijo navzdol obe barvi začneta na prvih plasteh, brez premoščanja in brez podpor v celicah. 3MF vsebuje obe kot ločeni telesi v njunih barvah.
    - **{{ui:holePattern.depth}}:** {{ui:holePattern.depth.through}} (privzeto) reže skozi celotno steno. Z {{ui:holePattern.depth.custom}} podaš globino v milimetrih, na primer za vdolbine.
 3. Luknje se takoj pokažejo kot predogled na ploskvi in se spreminjajo z vsako vrednostjo. Okno pove, koliko lukenj gre noter. Z {{ui:holePattern.repick}} izbereš drugo ploskev, [[Esc]] zapre orodje, in kot druga okna z orodji ga lahko premakneš za naslovno vrstico.
 4. Šele {{ui:holePattern.apply}} ustvari luknje.
@@ -164,6 +170,8 @@ Luknje sprejme tudi okrogla stena valja, cevi ali izvrtine: lonček za svinčnik
 Umetna inteligenca lahko isto naredi prek vmesnika MCP, z `layerling_perforate_face` (glej poglavje [Umetna inteligenca z MCP](chapter:ai-z-mcp)).
 
 Na plošči ali pokrovu z zarezami ob straneh {{ui:holePattern.arrangement.perimeter}} razporedi luknje neenakomerno. Zato ima {{ui:holePattern.title}} poleg {{ui:holePattern.mode.pattern}} še drugi zavihek, {{ui:holePattern.mode.mounting}}: luknje postavi v vogale najmanjšega pravokotnika okoli izbrane ploskve, v enaki razdalji od njegovih stranic, tudi na zasukani ali zarezani plošči. {{ui:holePattern.mounting.distance}} se meri do roba luknje, vključno z glavo vijaka, ali z {{ui:holePattern.mounting.toCenter}} do njenega središča. Z {{ui:holePattern.mounting.count}} gredo štiri v vogale, ostale pa v parih, enakomerno razporejene ob stranicah, na primer za vodotesen pokrov. Na okrogli ploskvi, na primer na pokrovu okrogle škatle, se enakomerno razporedijo po krogu, tri ali več. Vrsta in mere lukenj so enake kot pri vzorcu: navadna, z valjastim ali stožčastim povrtanjem, skoznja ali do globine. Nastanejo kot navadne oblike lukenj, združene s telesom v skupino, zato nanje deluje tudi {{ui:inspector.groupHoleDiameter}} skupine.
+
+Na zavihku {{ui:holePattern.mode.mounting}} {{ui:holePattern.mounting.for}} ponuja {{ui:holePattern.rack.screws}} (kot zgoraj) ali {{ui:holePattern.rack.option}}, za čelno ploščo, ki gre v 19-palčni rack. V vogale pridejo štiri podolgovate luknje 10,3 × 6,8 mm, položene vzdolž dolge stranice plošče, po širini 465,1 mm narazen, tako da zadenejo vodila racka; vrsta lukenj, mere in razdalja takrat ne veljajo. {{ui:holePattern.rack.size}} je na začetku {{ui:holePattern.rack.fit}}: plošča zasede najmanj celih enot racka, v katere gre, in je na njihovi sredini, zato so zgornje in spodnje luknje enako oddaljene od njenih robov in zadenejo luknje vodila na kateri koli enoti. Lahko pa izbereš standardno ploščo od 1U do 6U, z luknjami po IEC 60297-3-100; opomba pove, kdaj ploskev ni te višine. Vrstica pod izbiro pove, kam so prišle luknje, in pri preozki ali prenizki ploskvi, zakaj jih ni.
 
 ## Luknja za navojno vložko
 
@@ -222,7 +230,7 @@ Pri več delih izbereš, kako rastejo:
 - **{{ui:scalePercent.mode.together}}:** Deli rastejo okoli skupne sredine, razdalje rastejo z njimi. Celota postane večja, kot da bi bila en del.
 - **{{ui:scalePercent.mode.each}}:** Vsak del raste na svojem mestu, razdalje vmes ostanejo enake.
 
-Šele {{ui:scalePercent.apply}} spremeni načrt, korak nazaj pa ga spet razveljavi. Če je v izboru zaklenjen del, se ne odpre.
+Ko se okno odpre, je v polju za odstotke kazalec, zato je s tipkovnico to [[Ctrl]]+[[K]], odstotek, [[Enter]]; [[Esc]] zapre okno. Šele {{ui:scalePercent.apply}} (ali [[Enter]] v polju) spremeni načrt, korak nazaj pa ga spet razveljavi. Če je v izboru zaklenjen del, se ne odpre.
 
 ## Razveljavitev
 

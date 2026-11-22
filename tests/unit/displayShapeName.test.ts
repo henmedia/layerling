@@ -21,6 +21,14 @@ describe("displayShapeName", () => {
     expect(displayShapeName({ name: "Box", kind: "cylinder" })).toBe("Box");
   });
 
+  it("translates the roof from the shape library, also when its name was emptied (#1931)", () => {
+    setLanguage("de", false);
+    expect(displayShapeName({ name: "Roof", kind: "polygon", polygonRoof: true })).toBe("Dach");
+    expect(hasOwnShapeName({ name: "Roof", kind: "polygon", polygonRoof: true })).toBe(false);
+    expect(displayShapeName({ name: "", kind: "polygon", polygonRoof: true })).toBe("Dach");
+    expect(displayShapeName({ name: "", kind: "polygon" })).not.toBe("Dach");
+  });
+
   it("switches back with the language", () => {
     setLanguage("en", false);
     expect(displayShapeName({ name: "Sketch extrusion", kind: "mesh" })).toBe("Sketch body");

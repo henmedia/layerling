@@ -1,4 +1,4 @@
-import type { GridSize, GroupResizeMode, ShapeKind, WorkplaneWorkspaceSettings } from "@/types/layerling";
+import type { GridSize, GroupResizeMode, ShapeKind, WorkplaneShape, WorkplaneWorkspaceSettings } from "@/types/layerling";
 
 export const LAYERLING_MCP_ROUTE = "/api/layerling-mcp";
 export const LAYERLING_MCP_STALE_MS = 15_000;
@@ -59,6 +59,30 @@ export type LayerlingMcpShapeSummary = {
   cadDisplayEdgeCount: number | null;
   sketchPointCount: number;
   sketchSegmentCount: number;
+  /** A sketch body's fill (#197): its stroke or null, whether holes are left out, its inset. */
+  sketchStroke?: NonNullable<WorkplaneShape["sketchProfile"]>["stroke"] | null;
+  silhouette?: boolean;
+  sketchInset?: NonNullable<WorkplaneShape["sketchProfile"]>["inset"] | null;
+  /** A text's fill (#215) and lettering. */
+  textStroke?: WorkplaneShape["textStroke"] | null;
+  textSilhouette?: boolean;
+  textStretch?: boolean;
+  textVertical?: boolean;
+  textSpacing?: number;
+  textKerning?: boolean;
+  textLetterWidth?: number;
+  textFullCircle?: boolean;
+  textEdge?: WorkplaneShape["textEdge"] | null;
+  textKeyring?: WorkplaneShape["textKeyring"];
+  layeredText?: boolean;
+  layeredIcon?: boolean;
+  qrCode?: WorkplaneShape["qrCode"];
+  sbcBoard?: WorkplaneShape["sbcBoard"];
+  /** A surface texture: its settings, the masks as a count, and whether it can still be changed. */
+  surfaceTexture?: Record<string, unknown> & { masks: number; changeable: boolean };
+  surfaceTextureLayers?: { pattern: unknown; faces: number; region?: number }[];
+  /** Paint: how many strokes the body carries and the colours they show. */
+  paint?: { strokes: number; colors: string[] };
   children?: LayerlingMcpShapeSummary[];
 };
 

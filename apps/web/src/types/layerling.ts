@@ -827,6 +827,18 @@ export type GridfinityCompartmentLabel = {
 };
 
 /**
+ * One compartment of a Gridfinity bin with dividers split further (#1799): column 0 is the left, row 0 the back, as for
+ * a label. `x` is how many parts it is split into across and `z` how many deep, each a whole number from 1 (missing is
+ * 1); the parts are evenly spaced, with dividers as thick and as high as the bin's between them.
+ */
+export type GridfinityCompartmentSplit = {
+  column: number;
+  row: number;
+  x?: number;
+  z?: number;
+};
+
+/**
  * A Gridfinity bin's side switched open, opened only partly (#455): a notch from the lip's top down `depth` mm, `width`
  * mm wide, at its place along the side's straight part: `align` start (towards -x on a back or front side, towards -z on
  * a left or right one), middle or end, and `distance` mm from that end; a missing value is the full depth, the full
@@ -919,7 +931,7 @@ export type EdgeTreatmentFeature = {
   /** Only with `shellStack`: the foot hollow (the floor on the plate) instead of solid, and a grip recess `grip` mm wide, `gripDepth` deep, at the front of the bottom. */
   shellStackFoot?: { hollow?: boolean; grip?: number; gripDepth?: number };
   /** Only for "shell" with the top open: a Gridfinity baseplate in the floor with at most `cells` cells; with `fit` the walls are thickened to the cells. */
-  shellGrid?: { cells: number; fit?: boolean; magnets?: boolean };
+  shellGrid?: { cells: number; fit?: boolean; magnets?: boolean; screws?: boolean };
   /** Only for "shell" with the top open: this many dividers across (x) and along (z) the inside, evenly spaced. */
   shellDividers?: { x: number; z: number; height?: number; thickness?: number; manual?: boolean; walls?: { dir: "x" | "z"; at: number; from: number; to: number; slant?: number }[]; angle?: number; scoops?: { x: number; z: number; side: "front" | "back" | "left" | "right" }[]; scoopRadius?: number; pockets?: { points: { x: number; z: number }[]; depth: number }[]; pocketFill?: number };
   /** Only for "shell" with the top open (#1663): the width in mm of a ledge round the inside of the wall for a plate to rest on; missing means none. */
@@ -1035,8 +1047,14 @@ export type CadPrimitiveFrame = {
   frame: CadBrepFrame;
 };
 
-/** The top edge of a text's letters: rounded or chamfered, `size` mm wide and high (#225). */
-export type TextEdge = { kind: "round" | "chamfer"; size: number };
+/** Which end of a text's letters takes the edge: the top (left out), the bottom or both. */
+export type TextEdgeSide = "top" | "bottom" | "both";
+
+/**
+ * The edge of a text's letters: rounded or chamfered, `size` mm wide and high (#225), on the top
+ * unless `side` says the bottom or both ends; only "bottom" and "both" are stored.
+ */
+export type TextEdge = { kind: "round" | "chamfer"; size: number; side?: "bottom" | "both" };
 
 /** A section of a transition between its bottom and its top (#1034). */
 export type LoftMiddleSection = {
@@ -1430,6 +1448,8 @@ export type WorkplaneShape = {
   gridfinityDividerPositionsZ?: number[];
   /** Gridfinity bin with dividers: the compartments' labels, one for each compartment that has one. */
   gridfinityCompartmentLabels?: GridfinityCompartmentLabel[];
+  /** Gridfinity bin with dividers: the compartments split further into evenly spaced parts (#1799), one entry for each split compartment. */
+  gridfinityCompartmentSplits?: GridfinityCompartmentSplit[];
   /** Gridfinity bin: how far each side switched open is opened (#455), one entry a side; missing is the whole side. */
   gridfinityOpenings?: GridfinityOpening[];
   /** Gridfinity bin: the corners of its partly open sides' notches, seen from outside the wall, rounded or chamfered; missing is rounded (#455). */
@@ -1603,8 +1623,8 @@ export type WorkplaneShape = {
   textFullCircle?: boolean;
   /**
    * Text only (#225): the top edge of the letters rounded or chamfered by `size` mm, as a name
-   * tag's letters on top are finished. Built from the outline stepped inwards, so it works for
-   * every font and word; the edge tool takes such a text as a mesh.
+   * tag's letters on top are finished, or with `side` the bottom edge or both. Built from the
+   * outline stepped inwards, so it works for every font and word; the edge tool takes such a text as a mesh.
    */
   textEdge?: TextEdge;
   /** Text only (#215): a key ring hole, with the ear round it on the bottom layer of a name tag. Straight text only. */

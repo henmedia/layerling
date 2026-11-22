@@ -70,6 +70,10 @@ A(z) {{ui:editor.tool.cookieCutter}} sütiszaggatót készít a kijelölésből:
 
 A(z) {{ui:editor.tool.loftSketches}} két vázlattestet vagy importált SVG-t egy testté köt össze: az alsó körvonala lent, a felsőé fent, köztük egyenes falakkal. Így lesz belőle tölcsér, négyzetből körbe vezető átmeneti darab vagy felfelé keskenyedő keret. Tedd a két testet egymás fölé oda, ahová valók, tetszés szerint eltolva és elforgatva, jelöld ki mindkettőt, és kattints az eszközre. A loft az alsó test aljától a felső tetejéig ér.
 
+Mindkettőnek pontosan egy körvonal kell. Ha az egyikben lyuk van, mondjuk egy gyűrűben, a másiknak ugyanannyi kell, és a lyukak is átmenetet kapnak: két gyűrűből üreges fal lesz. A vonalként épített vázlat (a Tulajdonságok alatt kívül, belül vagy középen futó vonal) ilyen gyűrűnek számít. Az importált SVG kitöltve érkezik; hogy gyűrű legyen belőle, adj neki vonalat a Tulajdonságok alatt. Mindkét testnek laposan kell feküdnie; a megdöntötteket az eszköz elutasítja.
+
+A loft pontos CAD-test; az éleszközök és a STEP-export egy testként kezelik. A két vázlat benne marad: a(z) {{ui:group.edit}} csoportként nyitja meg őket, és ha ott áthelyezed vagy módosítod valamelyiket, vagy szerkeszted a vázlatát, majd bezárod, a loft újraépül. A(z) {{ui:editor.tool.ungroup}} újra szabaddá teszi a két vázlatot. Két téglalaphoz, körhöz vagy sokszöghöz az alakzatok között ott van a Loft alakzat is, amelynek a végeit számokkal adod meg.
+
 Ha a csoport, vagy egy benne lévő csoport kerek lyukakat (lyukként használt hengereket) tartalmaz, az ablaka megmutatja a {{ui:inspector.groupHoleDiameter}} csúszkát, amely mindegyiket egyszerre állítja, és a {{ui:inspector.groupHolesOneByOne}} kapcsolót, amely minden lyukat a saját átmérőjével sorol fel. Minden lyuk megtartja a középpontját és a mélységét; a csoportok belülről kifelé épülnek újra, ahogy a {{ui:group.edit}} és a {{ui:group.done}} is teszi, egyetlen visszavonási lépésben. A lapok, a címkék, a QR-kódok és a kötegek érintetlenek maradnak, és csak a kerek lyukak számítanak: a négyzet vagy ovális lyukak nem változnak. A csúszka akkor hat, amikor elengeded vagy beírsz egy értéket, nem minden köztes lépésnél.
 
 ## Egy test kivágása egy másikból
@@ -123,7 +127,7 @@ A(z) {{ui:split.connectors.dovetail}} ragasztó nélkül tartja össze a feleket
 
 Nyomtatáshoz a horonyos felet fektesd a vágott lapjára, a lécest pedig fordítva nyomtasd, a vágott lappal felfelé: így a léc oldalai csak a szögükkel dőlnek kifelé, ami támasz nélkül nyomtatható.
 
-A {{ui:split.connectors.magnets}} mindkét félbe egy kerek mágnes fészkét teszi, egymással szemben a vágáson át, mindegyik alatt keskenyebb ragasztóüreggel, ahogy a {{ui:magnetPocket.title}} eszköz készíti. A felek összetartanak, mégis szétszedhetők. A {{ui:magnetPocket.size}} szokásos mágneseket kínál 2 × 1 és 12 × 3 mm között, vagy állítsd be a {{ui:magnetPocket.diameter}} és {{ui:magnetPocket.height}} értékét; a {{ui:split.connectorClearance}} a hézag a mágnes körül. Ahol nincs elég fal vagy vastagság, az a hely kimarad. Bepréselés előtt tedd össze mindegyik párt, hogy vonzzák egymást.
+A {{ui:split.connectors.magnets}} mindkét félbe egy kerek mágnes fészkét teszi, egymással szemben a vágáson át, mindegyik alatt keskenyebb ragasztóüreggel, ahogy a {{ui:magnetPocket.title}} eszköz készíti (a kijelölésről és elrendezésről szóló fejezetben). A felek összetartanak, mégis szétszedhetők: egy festendő figura, egy nyitható doboz. A {{ui:magnetPocket.size}} szokásos mágneseket kínál 2 × 1 és 12 × 3 mm között, vagy állítsd be a {{ui:magnetPocket.diameter}} és {{ui:magnetPocket.height}} értékét; a {{ui:split.connectorClearance}} a hézag a mágnes körül. Minden fészeknek a saját felében fal kell maga mellett és anyagréteg maga alatt, különben az a hely kimarad. Bepréselés előtt tedd össze mindegyik párt, hogy vonzzák egymást.
 
 A lyukak összekötők nélkül válnak ketté.
 
@@ -132,6 +136,8 @@ A panel tetején, a {{ui:split.modeSplit}} mellett a {{ui:split.modeStretch}} a 
 A csoport csoport marad: a sík által átmetszett részei hosszabbak lesznek, a sík mögötti részei vele mozdulnak, az előtte lévők pedig maradnak, ahogy vannak. A lyukai lyukak maradnak, a síkkal nem érintett részek megtartják a beállításaikat, és a {{ui:editor.tool.ungroup}} utána is szétbontja. A tükrözött, kúposított, lekerekített vagy textúrázott csoportot továbbra is egy testként nyújtja. A többivel együtt kijelölt objektum, amely teljesen a sík mögött van, szintén elmozdul, így a doboz végén lévő lyuk a végén marad.
 
 A felek egyszerű hálók: az olyan beállítások, mint egy henger oldalszáma vagy egy szöveg betűi, elvesznek, ezért ezeket előbb állítsd be. A [[Ctrl]]+[[Z]] egy lépésben visszahozza az eredetit. Zárolt és elrejtett objektumok nem vághatók ketté.
+
+Egy importált hálónak zárt felület kell ahhoz, hogy kettévágható, csoportosítható vagy kivágható legyen. Ha nyílások vannak rajta, például egy figura nyitva hagyott szemei vagy egy szkennelés repedése, a layerling előbb sík fedéllel lezárja őket, és megmondja, hányat zárt le. A kis nyílásokat és a bármekkora sík nyílásokat lezárja; egy nagy, hajló peremű nyílást rád hagy, és az üzenet ezt jelzi. Zárd le abban a programban, amelyből a modell származik, vagy egy hálójavító eszközzel, és importáld újra.
 
 ## Részek szétválasztása
 

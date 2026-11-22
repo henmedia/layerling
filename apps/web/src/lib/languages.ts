@@ -182,7 +182,7 @@ export const LANGUAGE_INFO: Readonly<Record<Language, LanguageInfo>> = {
     readme: "README.de.md",
     quickstartAnchor: "schnellstart-unter-windows",
     legal: { imprint: "Impressum", privacy: "Datenschutz" },
-    keyNames: { Ctrl: "Strg", Shift: "Umschalt", Delete: "Entf", Backspace: "Rücktaste", Home: "Pos1", Click: "Klick", RightClick: "Rechtsklick", MiddleClick: "Mittelklick", Drag: "Ziehen" },
+    keyNames: { Ctrl: "Strg", Shift: "Umschalt", Delete: "Entf", Backspace: "Rücktaste", Home: "Pos1", End: "Ende", Click: "Klick", RightClick: "Rechtsklick", MiddleClick: "Mittelklick", Drag: "Ziehen" },
     asciiUmlauts: true,
     complete: true,
     guide: {

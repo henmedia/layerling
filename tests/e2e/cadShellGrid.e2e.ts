@@ -6,7 +6,7 @@ import { shellSolid } from "@/lib/cadShell";
 import { shellDividersSolid, shellGridSolid } from "@/lib/cadShellGrid";
 import { shellStackSolid } from "@/lib/cadShellStack";
 import { shellStackFloor, shellStackRoom } from "@/lib/shellStackLimits";
-import { SHELL_GRID_FLOOR, shellGridFloor } from "@/lib/shellGridLimits";
+import { SHELL_GRID_FLOOR, SHELL_GRID_SCREW_DIAMETER, SHELL_GRID_SCREW_HEAD, SHELL_GRID_SCREW_SINK, shellGridFloor } from "@/lib/shellGridLimits";
 
 const ROTATE_Z_TO_Y: number[] = [1, 0, 0, 0, 0, 0, 1, 0, 0, -1, 0, 0];
 
@@ -79,6 +79,42 @@ describe("a Gridfinity floor, fit and dividers with the real OCCT kernel", () =>
     const more = kernel.getVolume(magnets) - kernel.getVolume(plain);
     expect(more).toBeGreaterThan(2.4 * 96 * 76 * 0.9 - holes);
     expect(more).toBeLessThan(2.4 * 96 * 76 - holes + 1);
+  });
+
+  it("cuts a countersunk screw hole through the middle of each socket, with the floor of the magnet holes (Discussion #1693)", () => {
+    const { original, shelled } = hollow(100, 80, 40);
+    const plain = shellGridSolid(kernel, original, shelled, { cells: 99, fit: false, magnets: true });
+    const screws = shellGridSolid(kernel, original, shelled, { cells: 99, fit: false, screws: true });
+    expect(kernel.isValid(screws)).toBe(true);
+    expect(kernel.getSubShapes(screws, "solid")).toHaveLength(1);
+    // The floor is as thick with screw holes alone as with magnet holes, and no thicker with both.
+    const floor = shellGridFloor({ screws: true });
+    expect(floor).toBeCloseTo(SHELL_GRID_FLOOR + 2.4, 6);
+    expect(shellGridFloor({ magnets: true, screws: true })).toBeCloseTo(floor, 6);
+    const socketBottom = floor - 5;
+    for (const cx of [-21, 21]) {
+      // Open from under the box up into the socket: 4.5 mm wide below the sink.
+      for (const y of [0.05, 1, socketBottom - SHELL_GRID_SCREW_SINK - 0.1, socketBottom - 0.1]) expect(solid(screws, cx, y, 0), `y ${y}`).toBe(false);
+      expect(solid(screws, cx + SHELL_GRID_SCREW_DIAMETER / 2 - 0.1, 0.5, 0)).toBe(false);
+      expect(solid(screws, cx + SHELL_GRID_SCREW_DIAMETER / 2 + 0.1, 0.5, 0)).toBe(true);
+      // The sink widens at 45 degrees to the head's width at the socket's bottom.
+      expect(solid(screws, cx + SHELL_GRID_SCREW_HEAD / 2 - 0.2, socketBottom - 0.05, 0)).toBe(false);
+      expect(solid(screws, cx + SHELL_GRID_SCREW_HEAD / 2 + 0.2, socketBottom - 0.05, 0)).toBe(true);
+      expect(solid(screws, cx + SHELL_GRID_SCREW_HEAD / 2 - 0.2, socketBottom - 1, 0)).toBe(true);
+      // Where the magnets would sit the floor stays closed.
+      expect(solid(screws, cx + 13, socketBottom - 1.2, 13)).toBe(true);
+    }
+    // Two holes less than the floor with the magnets' thickness and their eight holes more: a bore and a cone's frustum each.
+    const r = SHELL_GRID_SCREW_DIAMETER / 2, R = SHELL_GRID_SCREW_HEAD / 2, h = SHELL_GRID_SCREW_SINK;
+    const hole = Math.PI * r * r * (socketBottom - h) + (Math.PI * h * (r * r + r * R + R * R)) / 3;
+    const magnetHoles = 8 * Math.PI * 3.25 * 3.25 * 2.4;
+    expect(kernel.getVolume(screws) - kernel.getVolume(plain)).toBeCloseTo(magnetHoles - 2 * hole, 0);
+    // Both together: the magnet holes stay, the screw hole goes between them.
+    const both = shellGridSolid(kernel, original, shelled, { cells: 99, fit: false, magnets: true, screws: true });
+    expect(kernel.getSubShapes(both, "solid")).toHaveLength(1);
+    expect(kernel.getVolume(both) - kernel.getVolume(plain)).toBeCloseTo(-2 * hole, 0);
+    expect(solid(both, -21 + 13, socketBottom - 1.2, 13)).toBe(false);
+    expect(solid(both, -21, 0.5, 0)).toBe(false);
   });
 
   it("keeps to the number of cells asked for, nearest the middle", () => {

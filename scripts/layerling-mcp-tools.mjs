@@ -15,10 +15,11 @@ export const editorTargetSchema = {
  * Die Arten, die sich anlegen lassen. Der Editor holt sie aus dem Formenkatalog;
  * diese Liste ist nur die Ansage nach aussen, und ein Test schlaegt fehl, sobald
  * beide auseinanderlaufen. `cube` ist ein Quader mit gleichen Kanten, `sketch`
- * eine ausgezogene Skizze - beide stehen in keinem Katalog.
+ * eine ausgezogene Skizze - beide stehen in keinem Katalog. `roof` ist das Dach
+ * aus der Formenbibliothek (#1931): ein Mehrkant mit drei Seiten, auf eine Seite gelegt.
  */
 export const creatableShapeKinds = [
-  "box", "roundedBox", "cube", "cylinder", "slot", "ellipse", "polygon", "sphere", "cone", "pyramid", "wedge",
+  "box", "roundedBox", "cube", "cylinder", "slot", "ellipse", "polygon", "roof", "sphere", "cone", "pyramid", "wedge",
   "roundRoof", "halfSphere", "paraboloid", "curvedCone", "torus", "loft", "vase", "tube", "bentTube", "star", "heart", "crescent", "sector", "text", "thread", "spring", "gridfinity", "gear", "hirth", "pulley",
   "hinge", "knurl", "dovetail", "screwBoss", "snapFit", "rib", "counterbore", "countersink", "doubleCountersink", "finishingWasher", "teardrop", "port", "ruler", "sketch",
 ];
@@ -92,13 +93,13 @@ export const shapeSettingSchema = {
   ribFootShape: { type: "string", enum: ["square", "oval"], description: "Rib on a foot (ribFoot) only: square (default, the foot's corners square) or oval, an ellipse seen from above with no corners to lift off the bed, centred under the rib, as wide as depth and just long enough that at the rib's ends it still reaches out by the rib's thickness from its middle (a gusset: half an ellipse from the wall past the tip). Its length is the box's width, the rib inside it shorter: 1 / sqrt(1 - (ribThickness / (depth / 2))^2) times, at most 1.5 times unless the foot is so narrow that its ends would stand on less than half of what the foot reaches out in the middle. Switching the shape, the foot, depth or ribThickness keeps the rib as long as it was and moves the width with it (a gusset's box grows away from its wall), unless width is given; a new oval rib is 40 mm long in a longer box." },
   topWidth: { type: "number", description: "Pyramid only: width of the flat top. 0 runs to a point." },
   topDepth: { type: "number", description: "Pyramid only: depth of the flat top. 0 runs to a point." },
-  taperTopWidth: { type: "number", description: "Taper, on every shape except gear, hirth, pulley, thread, spring, gridfinity, hinge, pyramid, bentTube, teardrop, counterbore, countersink and ruler: width of the top face. Setting one value of a face pins the other." },
-  taperTopDepth: { type: "number", description: "Taper, on every shape except gear, hirth, pulley, thread, spring, gridfinity, hinge, pyramid, bentTube, teardrop, counterbore, countersink and ruler: depth of the top face." },
-  taperBottomWidth: { type: "number", description: "Taper, on every shape except gear, hirth, pulley, thread, spring, gridfinity, hinge, pyramid, bentTube, teardrop, counterbore, countersink and ruler: width of the bottom face." },
-  taperBottomDepth: { type: "number", description: "Taper, on every shape except gear, hirth, pulley, thread, spring, gridfinity, hinge, pyramid, bentTube, teardrop, counterbore, countersink and ruler: depth of the bottom face." },
-  extrudeTwist: { type: "number", description: "On every shape except gear, hirth, pulley, thread, spring, gridfinity, hinge, pyramid, bentTube, teardrop, counterbore, countersink and ruler: rotates the top face relative to the base, in degrees, for a twisted extrusion." },
-  extrudeTopOffsetX: { type: "number", description: "On every shape except gear, hirth, pulley, thread, spring, gridfinity, hinge, pyramid, bentTube, teardrop, counterbore, countersink and ruler: shifts the top face along the shape's own X axis, in mm, for a leaning extrusion." },
-  extrudeTopOffsetZ: { type: "number", description: "On every shape except gear, hirth, pulley, thread, spring, gridfinity, hinge, pyramid, bentTube, teardrop, counterbore, countersink and ruler: shifts the top face along the shape's own Z axis, in mm, for a leaning extrusion." },
+  taperTopWidth: { type: "number", description: "Taper, on every shape except gear, hirth, pulley, thread, spring, gridfinity, hinge, pyramid, bentTube, loft, vase, teardrop, counterbore, countersink, doubleCountersink, finishingWasher, port, screwBoss, snapFit, rib and ruler: width of the top face. Setting one value of a face pins the other." },
+  taperTopDepth: { type: "number", description: "Taper, on every shape except gear, hirth, pulley, thread, spring, gridfinity, hinge, pyramid, bentTube, loft, vase, teardrop, counterbore, countersink, doubleCountersink, finishingWasher, port, screwBoss, snapFit, rib and ruler: depth of the top face." },
+  taperBottomWidth: { type: "number", description: "Taper, on every shape except gear, hirth, pulley, thread, spring, gridfinity, hinge, pyramid, bentTube, loft, vase, teardrop, counterbore, countersink, doubleCountersink, finishingWasher, port, screwBoss, snapFit, rib and ruler: width of the bottom face." },
+  taperBottomDepth: { type: "number", description: "Taper, on every shape except gear, hirth, pulley, thread, spring, gridfinity, hinge, pyramid, bentTube, loft, vase, teardrop, counterbore, countersink, doubleCountersink, finishingWasher, port, screwBoss, snapFit, rib and ruler: depth of the bottom face." },
+  extrudeTwist: { type: "number", description: "On every shape except gear, hirth, pulley, thread, spring, gridfinity, hinge, pyramid, bentTube, loft, vase, teardrop, counterbore, countersink, doubleCountersink, finishingWasher, port, screwBoss, snapFit, rib and ruler: rotates the top face relative to the base, in degrees, for a twisted extrusion." },
+  extrudeTopOffsetX: { type: "number", description: "On every shape except gear, hirth, pulley, thread, spring, gridfinity, hinge, pyramid, bentTube, loft, vase, teardrop, counterbore, countersink, doubleCountersink, finishingWasher, port, screwBoss, snapFit, rib and ruler: shifts the top face along the shape's own X axis, in mm, for a leaning extrusion." },
+  extrudeTopOffsetZ: { type: "number", description: "On every shape except gear, hirth, pulley, thread, spring, gridfinity, hinge, pyramid, bentTube, loft, vase, teardrop, counterbore, countersink, doubleCountersink, finishingWasher, port, screwBoss, snapFit, rib and ruler: shifts the top face along the shape's own Z axis, in mm, for a leaning extrusion." },
   slopeEnd: { type: "number", description: "Box, roundedBox, cylinder, ellipse, polygon, tube, ring, wedge and roundRoof only: slope along - the height of the top at the lower end, in mm (0.2 up to the body's height); the other end keeps the body's height. Equal to the height means no slope." },
   slopeSide: { type: "string", enum: ["back", "front", "left", "right"], description: "Where slopeEnd applies: which end goes down (a round roof or a wedge slopes front or back only)." },
   slopeCurve: { type: "number", description: "Slope along only, where slopeEnd applies: how the top runs down to slopeEnd, -1 to 1: 0 straight, above 0 bulging up (level at the high end), below 0 sagging (level at the low end)." },
@@ -314,6 +315,21 @@ export const shapeSettingSchema = {
     },
     description: "Gridfinity bin only, with compartments (see gridfinityCompartmentsX) and 3 height units or more: a label in a compartment, with the profile and corners of the label shelves (gridfinityLabelCorner, gridfinityLabelCornerSize). One label per compartment. An empty list [] removes them all. layerling_read_scene reports this list as JSON text, which is accepted here as well.",
   },
+  gridfinityCompartmentSplits: {
+    type: "array",
+    maxItems: 576,
+    items: {
+      type: "object",
+      properties: {
+        column: { type: "number", description: "The compartment's column, 0 the left." },
+        row: { type: "number", description: "The compartment's row, 0 the back." },
+        x: { type: "number", description: "How many parts it is split into across (x), a whole number, 1 to 6 (default 1)." },
+        z: { type: "number", description: "How many parts it is split into deep (z), a whole number, 1 to 6 (default 1)." },
+      },
+      required: ["column", "row"],
+    },
+    description: "Gridfinity bin only, with compartments (see gridfinityCompartmentsX): single compartments split further into evenly spaced parts, with dividers as thick and as high as the bin's between them, for a few small compartments beside large ones. One entry per compartment; each part stays at least 6 mm wide, and with the bin's other compartments there are at most 40 in all (over that, compartments are taken from the back left row by row and their parts across lowered first). The parts take the bin's finger scoops; a compartment's label (gridfinityCompartmentLabels) stands in the part along its side that is furthest left or back. An entry for a compartment the bin does not have is kept but not built. An empty list [] removes all splits. layerling_read_scene reports this list as JSON text, which is accepted here as well.",
+  },
   dovetailNeckWidth: { type: "number", description: "Dovetail only: width of the narrow neck in mm; the shape's width is the wide end, its depth the length of the tail. Must be narrower than the width, by at least 0.1 mm (146 wide takes a neck of up to 145.9)." },
   screwHoleShaft: { type: "number", description: "Counterbore, countersink and doubleCountersink: diameter of the shaft below the head (on the doubleCountersink, between the two cones) in mm. The shape's width is the head diameter, its height the whole length; the head end of a counterbore and a countersink is on top. On a finishingWasher: the bore." },
   screwHoleHeadDepth: { type: "number", description: "Counterbore and finishingWasher only. Counterbore: depth of the cylindrical head pocket in mm; height includes it, so for a socket head cap screw sold by its length under the head give height = that length + this (#1670). FinishingWasher: depth of the seat for the screw head, from the top; the seat's top diameter is the bore plus twice this at 90 degrees." },
@@ -367,6 +383,7 @@ export const shapeSettingSchema = {
   portProfile: { type: "string", enum: ["rounded", "hdmi", "miniHdmi", "microHdmi", "displayPort", "miniDisplayPort", "xt60", "xt30", "mt60", "dsub9"], description: "Port opening only: rounded corners (default), or the lower corners cut off at a slant as on an HDMI, Mini HDMI, Micro HDMI or Mini DisplayPort socket, or only the lower left one as on DisplayPort; xt60 and xt30 a lying outline with one end narrowed by two cut corners, mt60 a rounded triangle, dsub9 the D-Sub's trapezoid - these four have every corner rounded by cornerFillet. The cut grows with width and height." },
   portClearance: { type: "number", description: "Port opening only: extra room in mm (0 to 2, default 0) on every side, on top of the room a portPreset has already. Together with portPreset when creating, it makes the opening wider and taller by twice this and its corners rounder by it. On its own it does not change the size; it records the extra room, so the inspector still shows the preset." },
   polygonFlat: { type: "boolean", description: "Polygon (kind polygon) only: true turns it by half a side, so a flat side faces the front instead of a corner. An octagon (sides 8) then touches its frame with four flat sides and width and depth measure from flat to flat, not from corner to corner; a hexagon has its flats in front and behind, so depth is across flats and width across corners. Left out or false: a corner faces the front. Width and depth are taken as given: for a regular octagon give both the same." },
+  polygonRoof: { type: "boolean", description: "Polygon (kind polygon) only: true marks it as the Roof (#1931) - it keeps three sides and a corner on top, and its panel has no side count. kind roof sets this, gives 20 x 20 x 20 mm and lays the triangle on one flat side; set on its own it does not turn the shape. false makes it an ordinary polygon again." },
   cornerFillet: { type: "number", description: "Rounded box and port opening only. Rounded box: fillet radius of vertical corners in mm. Port opening: radius of the opening's four corners in mm, at most half its width or height (half the height gives fully round ends, as on USB-C)." },
   topBottomFillet: { type: "number", description: "Rounded box only: fillet radius of top and bottom edges in mm (the top edge only, when bottomFillet is given)." },
   bottomFillet: { type: "number", description: "Rounded box only: fillet radius of the bottom edge in mm, on its own; left out, the bottom takes topBottomFillet. Top and bottom together cannot exceed the height." },
@@ -669,12 +686,13 @@ export const tools = [
               type: "object",
               properties: {
                 kind: { type: "string", enum: ["round", "chamfer"] },
-                size: { type: "number", description: "How wide and high the edge is, in mm (0.05 to 5, at most the text's height)." },
+                size: { type: "number", description: "How wide and high the edge is, in mm (0.05 to 5, at most the text's height; with side both at most half of it)." },
+                side: { type: "string", enum: ["top", "bottom", "both"], description: "Which end of the letters takes the edge: top (default), bottom or both. bottom is for a text used as a hole to cut inset letters out of a body: a chamfer as large as the cut is deep makes a V-shaped groove that prints without bridges on a side wall." },
               },
               required: ["kind", "size"],
             },
           ],
-          description: "Text only: the top edge of the letters rounded or chamfered, as the top layer of a name tag is finished. null takes it off. Built from the outline stepped inwards, so it works for every font and word; the edge tool takes such a text as a mesh.",
+          description: "Text only: the edge of the letters rounded or chamfered - on the top, as the top layer of a name tag is finished, on the bottom or on both ends. null takes it off. A layer of a name tag takes it on the top only. Built from the outline stepped inwards, so it works for every font and word; the edge tool takes such a text as a mesh.",
         },
         x: { type: "number" },
         z: { type: "number" },
@@ -925,7 +943,7 @@ export const tools = [
   },
   {
     name: "layerling_paint",
-    description: "Paint parts of a body's surface in colours of their own, for printing in several colours - the editor's Paint tool (Modify, Surface). Each stroke is a region and a colour, laid in order, a later one over an earlier one: fill spreads from point over the surface up to edges sharper than angle (a flat face, the wall of a cylinder, the floor of a pocket, the inside of a hole); circle lays a round patch diameter mm across onto the surface, centred on point and stopping at the body's sharp edges, never on the back of a wall; lasso paints what a flat view from one side sees inside outline, not the back of the body. A stroke without a colour (erase: true) takes the paint off its region again. The edges of circles and lassos are cut into the body's mesh, which stays closed, so a circle on a box face is round. The strokes are kept with the body in its own frame: they move and turn with it and stretch when it is resized; one that finds nothing on the body is left out (counted in skipped). A 3MF export writes the paint as painted faces (paint_color) for OrcaSlicer, Bambu Studio and PrusaSlicer, an OBJ as face colours; an STL stays one colour. Works on one solid body, or a group cut into one body in one colour; not on a hole, a sketch, a bundle or a group of separate parts (paint its parts). One undo step for the call. Returns object (with paint: strokes and colours), strokes, colors, skipped, cut (false when an open mesh was painted on whole triangles) and paintedFaces.",
+    description: "Paint parts of a body's surface in colours of their own, for printing in several colours - the editor's Paint tool (Modify, Surface). Each stroke is a region and a colour, laid in order, a later one over an earlier one: fill spreads from point over the surface up to edges sharper than angle (a flat face, the wall of a cylinder, the floor of a pocket, the inside of a hole); circle lays a round patch diameter mm across onto the surface, centred on point and stopping at the body's sharp edges, never on the back of a wall; brush paints a line diameter mm wide through the points of path over the surface, each round patch laid along the surface's normal there (so it follows a curved wall and bends over an edge), never on the back of a wall; height paints a band band mm tall level round the whole body, centred on the height of point; with ball: true a circle or a brush paints everything inside the ball (or the balls along the line), round edges and into hollows too; gaps paints nothing itself but gives every patch of one colour smaller than area mm² the colour round it, so specks go; lasso paints what a flat view from one side sees inside outline, not the back of the body. A stroke without a colour (erase: true) takes the paint off its region again. The edges of circles, brush lines and lassos are cut into the body's mesh, which stays closed, so a circle on a box face is round. The strokes are kept with the body in its own frame: they move and turn with it and stretch when it is resized; one that finds nothing on the body is left out (counted in skipped). A 3MF export writes the paint as painted faces (paint_color) for OrcaSlicer, Bambu Studio and PrusaSlicer, an OBJ as face colours; an STL stays one colour. Works on one solid body, or a group cut into one body in one colour; not on a hole, a sketch, a bundle or a group of separate parts (paint its parts). One undo step for the call. Returns object (with paint: strokes and colours), strokes, colors, skipped, cut (false when an open mesh was painted on whole triangles) and paintedFaces.",
     inputSchema: {
       ...editorTargetSchema,
       properties: {
@@ -938,13 +956,18 @@ export const tools = [
           items: {
             type: "object",
             properties: {
-              mode: { type: "string", enum: ["fill", "circle", "lasso"], description: "fill, circle or lasso." },
+              mode: { type: "string", enum: ["fill", "circle", "brush", "height", "lasso", "gaps"], description: "fill, circle, brush, height, lasso or gaps." },
+              ball: { type: "boolean", description: "circle and brush: paint everything inside the ball, round edges too (default false: along the surface, stopping at sharp edges)." },
+              band: { type: "number", minimum: 0.2, maximum: 1000, description: "height: how tall the band is in mm (default 5); point gives its height." },
+              area: { type: "number", minimum: 0.1, maximum: 500, description: "gaps: patches smaller than this many mm² take the colour round them (default 4)." },
               color: { type: "string", description: "The colour as #rrggbb. Left out with erase: true (or null): the stroke takes the paint off." },
               erase: { type: "boolean", description: "true: the stroke takes the paint off its region, the body's own colour shows again." },
-              point: { type: "array", items: { type: "number" }, minItems: 3, maxItems: 3, description: "fill and circle: a point on the body's surface, [x, y, z] in world coordinates (y up), e.g. the middle of a face." },
+              point: { type: "array", items: { type: "number" }, minItems: 3, maxItems: 3, description: "fill, circle and height: a point on the body's surface, [x, y, z] in world coordinates (y up), e.g. the middle of a face." },
               normal: { type: "array", items: { type: "number" }, minItems: 3, maxItems: 3, description: "fill and circle: the surface's outward normal at point; left out, the normal of the nearest face is taken." },
               angle: { type: "number", minimum: 1, maximum: 90, description: "fill: edges sharper than this many degrees stop the fill (default 30; 90 runs over a box's edges)." },
-              diameter: { type: "number", minimum: 0.2, maximum: 1000, description: "circle: diameter in mm (default 10)." },
+              diameter: { type: "number", minimum: 0.2, maximum: 1000, description: "circle: diameter in mm; brush: the line's width in mm (default 10)." },
+              path: { type: "array", items: { type: "array", items: { type: "number" }, minItems: 3, maxItems: 3 }, description: "brush: the points the line runs through, in order, each [x, y, z] on the body's surface in world coordinates (y up). Points further apart than the width are joined by straight pieces; give a point every few mm round a bend." },
+              normals: { type: "array", items: { type: "array", items: { type: "number" }, minItems: 3, maxItems: 3 }, description: "brush: the surface's outward normal at each point of path; left out, the normal of the nearest face is taken." },
               view: { type: "string", enum: ["top", "bottom", "front", "back", "left", "right"], description: "lasso: the side the flat view looks from." },
               outline: { type: "array", items: { type: "array", items: { type: "number" }, minItems: 2, maxItems: 2 }, description: "lasso: the shape, at least three points [a, b] in mm along the world's two axes across the view: [x, z] (z positive towards the front) from top or bottom, [x, height] from front or back, [z, height] from left or right." },
             },
@@ -1621,6 +1644,7 @@ export const tools = [
         gridCells: { type: "integer", description: "Gridfinity cells in the floor, at most (top open only); leave out for none." },
         gridFit: { type: "boolean", description: "With gridCells: thicken the walls so the inside is exactly the cells." },
         gridMagnets: { type: "boolean", description: "With gridCells (Discussion #1693): four magnet holes 6.5 x 2.4 mm under each socket, where a bin's own magnets sit (13 mm from the cell's middle each way), for 6 x 2 mm magnets; the floor is then 8.6 mm thick instead of 6.2, so 1.2 mm stays under the holes." },
+        gridScrews: { type: "boolean", description: "With gridCells (Discussion #1693): a countersunk screw hole through the middle of each socket, to screw the box down in a drawer or onto a board: 4.5 mm wide for a 4 mm countersunk screw, the head (up to 8.5 mm) level with the socket's bottom, so a bin still stands in it. The floor is then 8.6 mm thick instead of 6.2, as with gridMagnets; the two go together." },
         dividersX: { type: "integer", description: "Dividers across the inside, 0 to 8 (top open only; not with gridCells: a Gridfinity floor's bins fill the cells, with only 0.5 mm between them, so asking for both is refused)." },
         dividersZ: { type: "integer", description: "Dividers along the inside, 0 to 8 (top open only)." },
         dividerHeight: { type: "number", description: "With dividers: how high they stand over the floor, in mm, at least 3; unset, 0, or within 0.1 mm of the rim or over it: up to the rim. The same rule as gridfinityDividerHeight." },

@@ -9,7 +9,7 @@ import { importedShapeFromObj } from "@/lib/objImport";
 import { normalizeProjectAsset, sha256Hex } from "@/lib/projectAssets";
 import { canonicalizeShape } from "@/lib/workplaneShapes";
 import { normalizeSketchStroke, SKETCH_STROKE_JOINS } from "@/lib/sketchStroke";
-import { normalizeTextEdge } from "@/lib/textEdge";
+import { isTextEdgeSide, normalizeTextEdge } from "@/lib/textEdge";
 import { isTextKeyring } from "@/lib/textGeometry";
 import { normalizeNotes } from "@/lib/workplaneNotes";
 import {
@@ -1467,9 +1467,12 @@ function validateShapeDefinition(definition: Record<string, unknown>, label: str
   if (definition.textFullCircle !== undefined && typeof definition.textFullCircle !== "boolean") {
     throw new Error(`${label}.textFullCircle must be true or false`);
   }
-  // The top edge of a text's letters (#225): round or chamfer, with a size.
+  // The edge of a text's letters (#225): round or chamfer, with a size, on the top unless its side says the bottom or both.
   if (definition.textEdge !== undefined && !normalizeTextEdge(definition.textEdge)) {
     throw new Error(`${label}.textEdge must be a round or chamfer edge with a size`);
+  }
+  if (definition.textEdge !== undefined && (definition.textEdge as { side?: unknown }).side !== undefined && !isTextEdgeSide((definition.textEdge as { side?: unknown }).side)) {
+    throw new Error(`${label}.textEdge.side must be top, bottom or both`);
   }
   if (definition.layeredText !== undefined && typeof definition.layeredText !== "boolean") {
     throw new Error(`${label}.layeredText must be true or false`);
@@ -1894,6 +1897,24 @@ function validateShapeDefinition(definition: Record<string, unknown>, label: str
         }
         if (entry.align !== undefined && entry.align !== "start" && entry.align !== "middle" && entry.align !== "end") throw new Error(`${entryLabel}.align is invalid`);
         if (entry.text !== undefined && (typeof entry.text !== "string" || entry.text.length > MAX_GRIDFINITY_LABEL_TEXT_LENGTH)) throw new Error(`${entryLabel}.text must be a string of at most ${MAX_GRIDFINITY_LABEL_TEXT_LENGTH} characters`);
+      });
+    }
+    if (definition.gridfinityCompartmentSplits !== undefined) {
+      if (!Array.isArray(definition.gridfinityCompartmentSplits)) throw new Error(`${label}.gridfinityCompartmentSplits must be an array`);
+      const splits = definition.gridfinityCompartmentSplits as unknown[];
+      if (splits.length > 576) throw new Error(`${label}.gridfinityCompartmentSplits has an unsupported number of entries`);
+      splits.forEach((raw, index) => {
+        const entryLabel = `${label}.gridfinityCompartmentSplits[${index}]`;
+        const entry = objectRecord(raw, entryLabel);
+        for (const key of ["column", "row"] as const) {
+          const value = finiteNumber(entry[key], `${entryLabel}.${key}`);
+          if (value < 0 || value > 1e6) throw new Error(`${entryLabel}.${key} is outside the supported range`);
+        }
+        for (const key of ["x", "z"] as const) {
+          if (entry[key] === undefined) continue;
+          const value = finiteNumber(entry[key], `${entryLabel}.${key}`);
+          if (value < 0 || value > 1e6) throw new Error(`${entryLabel}.${key} is outside the supported range`);
+        }
       });
     }
     if (definition.gridfinityOpenings !== undefined) {

@@ -4367,7 +4367,23 @@ function sliceCells(mesh: SurfaceMesh, s: SurfaceTextureSettings, layout: Surfac
     if (skip[f]) continue;
     if (Math.min(dField[I[f * 3]], dField[I[f * 3 + 1]], dField[I[f * 3 + 2]]) < hw * 1.001) sliced[f] = 1;
   }
-  let out = sliceByField(cur, dField, (i, j) => dField[j] - dField[i], 1e6, levels, sliced);
+  const cut = sliceByField(cur, dField, (i, j) => dField[j] - dField[i], 1e6, levels, sliced, null, true);
+  let out: SurfaceMesh = cut;
+  // A point on a level takes that level's value, not its own: a point just off a level counts as on it, and the new
+  // points on the edges from it are placed along the field as snapped, so they lie a few thousandths of a mm off the
+  // joint too (Discussion #1771). Just inside the joint's edge such a point was moved a little, every large flat
+  // triangle of the cell round it sank towards it in a spike, and the pattern as a part of its own reached across
+  // them. Only points whose triangles were all cut here: on a face left smooth or seen along another axis the point's
+  // value is not this cut's.
+  const fixed = new Float32Array(out.vertices.length / 3).fill(NaN);
+  const onLevel = cut.field;
+  if (onLevel) {
+    const outRec = recordsOf(out.vertices);
+    const outSkip = skipOf(out.vertices, outRec, out.indices, out.parents);
+    const touchesSkipped = new Uint8Array(fixed.length);
+    for (let f = 0; f < outSkip.length; f += 1) if (outSkip[f]) for (let k = 0; k < 3; k += 1) touchesSkipped[out.indices[f * 3 + k]] = 1;
+    for (let i = 0; i < fixed.length; i += 1) if (!touchesSkipped[i] && levels.includes(onLevel[i])) fixed[i] = surfaceFalloff(onLevel[i] / hw, s.profile);
+  }
   // Short edges (levels close to a corner, narrow triangles at border and corner line) are pulled together here
   // already, once for all depths - otherwise the output would do it again after every move.
   for (let pass = 0; pass < 12; pass += 1) {
@@ -4377,7 +4393,7 @@ function sliceCells(mesh: SurfaceMesh, s: SurfaceTextureSettings, layout: Surfac
     out = { vertices: out.vertices, indices: c.indices, parents: Uint32Array.from(c.faces, (f) => parents[f]) };
   }
   out.limited = Boolean(mesh.limited);
-  return { mesh: out, reduced: count < Math.max(2, steps) };
+  return { mesh: out, reduced: count < Math.max(2, steps), fixed };
 }
 
 /**

@@ -93,6 +93,14 @@ FLSun、SeeMeCNC 等品牌的三角洲（Delta）打印机以及 Anycubic Predat
 
 点击某一行的{{ui:printCheck.show}}会把相机移到那里；它会选中悬空的零件、接触过少的零件和开放网格，对于悬垂则会打开**显示悬垂**。相互重叠的实体会合并后再检查，就像切片软件合并它们那样。如果窗口打开时修改了设计，会显示{{ui:printCheck.stale}}；点击它或{{ui:printCheck.checkAgain}}即可。[[Esc]] 关闭窗口。设计本身不会改变。AI 可以用 `layerling_check_print` 做同样的检查。这个窗口只做检查，不会打印或保存任何内容：要打印，请用 {{ui:editor.group.file}} 组中的 {{ui:editor.export}} 为切片软件导出模型。窗口中的 {{ui:printCheck.openExport}} 会关闭检查并打开导出。
 
+### 打印分析与分层视图
+
+{{ui:editor.tool.layerCheck}} 位于 {{ui:editor.tool.printCheck}} 旁边，更进一步：它把选中的对象（或所有可见对象）切成打印机逐层打印的层，并把每一层与下面一层比较，一次完成。你不必逐层翻看来寻找问题：窗口会列出它的**发现项**，先是问题（红色），再是提示（黄色），从下往上排列。每一行说明位置和严重程度，例如“第 83–97 层（16.6–19.4 mm）：悬垂 62°，1.4 cm²”，以及怎样补救。连续多层在同一位置有相同问题时，合并为一个发现项。
+
+在查看各层之前，它先检查整体：伸进打印平台的零件（{{ui:finding.kind.inBed}}；工作平面以下的层不计入）、悬浮在平台上方的零件、不封闭的网格、比设置中所选打印机更大的零件。然后逐层检查：{{ui:finding.kind.unsupported}}（下面什么都没有就开始的地方，例如 T 形的两臂）、{{ui:finding.kind.overhang}}（与竖直方向夹角 45° 起为提示，60° 起为问题）、{{ui:finding.kind.bridge}}（跨度 10 mm 起为提示）、{{ui:finding.kind.thinWall}}（小于喷嘴的两条线宽）、{{ui:finding.kind.smallIsland}}（小于 2 mm² 且延续 2 mm 或以上的独立区域）以及 {{ui:finding.kind.adhesion}}。在顶部选择 {{ui:layerCheck.layerHeight}} 和 {{ui:layerCheck.nozzle}}；各项界限在 {{ui:layerCheck.advanced}} 下。小于 0.05 mm² 的地方（例如尖端或最后一层）不作评估。检查在后台运行并显示进度条；{{ui:layerCheck.stop}} 会立即停止它。
+
+单击一个发现项：**分层视图**会在它涉及的第一层打开，相机移到该位置，该位置在这一层上涂成红色或黄色，下面的层仍然可见。滑块竖立在沿高度的截面轮廓旁边；它旁边的标记显示发现项所在的位置，单击某个标记即可跳过去。在滑块上，[[↑]] 和 [[↓]] 移动一层，[[Page Up]] 和 [[Page Down]] 移动十层，[[Home]] 和 [[End]] 跳到两端，[[Space]] 播放，[[N]] 跳到下一个发现项，[[Shift+N]] 跳到上一个。{{ui:layerCheck.view.mode}} 可选 {{ui:layerCheck.view.mode.upTo}}、{{ui:layerCheck.view.mode.only}} 或 {{ui:layerCheck.view.mode.range}}；后面还没打印的层可以显示为淡淡的影子。对于 Layerling 有对应工具的发现项，会有一个按钮打开该工具：{{ui:finding.action.dropToPlate}}、{{ui:finding.action.layFlat}} 或 {{ui:finding.action.supportRib}}。修改设计后，列表会标为已过时，直到你单击 {{ui:layerCheck.checkAgain}}。关闭窗口后，相机回到原来的位置。这不是切片预览：支撑、填充和打印时间请以切片软件为准。
+
 ## 准备就绪时
 
 点击 {{ui:editor.export}}，然后选择 **STL** 或 **3MF**。STL 是最简单的格式。3MF 会保留各个实体的名称和颜色，因此在多色打印时很方便。导出窗口还会显示该部件按实体打印需要多少克、多少米耗材。更多内容见[文件与保存](chapter:files-and-saving)。

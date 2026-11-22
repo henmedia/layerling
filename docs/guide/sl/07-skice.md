@@ -15,6 +15,8 @@ Zgoraj preklopi z {{ui:editor.modeGeometry}} na {{ui:editor.modeSketch}}. V skup
 
 Potem urejevalnik pokaže list z mrežo. To je tvoja risalna površina.
 
+Skica leži na delovni ravnini. Če želiš risati na ploskev telesa, na primer za obris, ki naj se začne višje, najprej s [[W]] postavi delovno ravnino na to ploskev (glej [Pogled in delovna ravnina](chapter:pogled-in-delovna-ravnina)), nato začni skico.
+
 ## Risanje
 
 Orodna vrstica skicirnega načina je razdeljena v področja:
@@ -33,7 +35,7 @@ Telo nastane samo iz **sklenjenega** obrisa.
 
 ![Obris v obliki črke L. Ob izbranem ogliščku zgoraj levo stojita dolžini obeh črt v milimetrih in kot med njima v stopinjah.](shot:sketch-outline)
 
-Tipke [[1]] do [[4]] izberejo orodja za risanje v vrstnem redu vrstice: {{ui:sketch.line}}, {{ui:sketch.bezier}}, {{ui:sketch.smooth}} in {{ui:sketch.refine}}. Delujejo, dokler se ne riše črta; med risanjem črte so številke njena dolžina (glej spodaj).
+Tipke [[1]] do [[4]] izberejo orodja za risanje v vrstnem redu vrstice: {{ui:sketch.line}}, {{ui:sketch.bezier}}, {{ui:sketch.smooth}} in {{ui:sketch.refine}}. Delujejo, dokler se ne riše črta; med risanjem črte so številke njena dolžina (glej spodaj). Z orodjem {{ui:sketch.select}} in izbranimi črtami ali točkami iste tipke te namesto tega spremenijo: [[1]] naredi črte ravne in točke ogliščne, [[2]] spremeni črte v krivulje, [[3]] pa naredi točke gladke. Če ni nič izbrano, izberejo orodje kot prej.
 [[5]] izbere {{ui:sketch.freehand}}.
 
 ## Črte po meri
@@ -179,7 +181,7 @@ Drevo ob hiši, figura pred nemirnim ozadjem – kjer nobena barva ne loči obli
 | Tipka | Učinek |
 | --- | --- |
 | [[Esc]] | odloži orodje za opombe; sicer odloži orodje (nazaj na {{ui:sketch.select}}), nato prekliči izbor |
-| [[Del]] | izbriši izbrani element |
+| [[Delete]] | izbriši izbrani element |
 | [[Ctrl]]+[[C]] | kopiraj izbor |
 | [[Ctrl]]+[[X]] | izreži izbor |
 | [[Ctrl]]+[[V]] | prilepi |

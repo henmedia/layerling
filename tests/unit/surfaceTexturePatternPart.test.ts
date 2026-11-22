@@ -123,6 +123,34 @@ describe("the pattern as a part of its own", () => {
     }
   }, 60_000);
 
+  it("cut in (honeycomb), stays in the joints: no point just inside a joint's edge sinks a cell into spikes (Discussion #1771)", () => {
+    // A panel of 90 x 70 x 6 mm, its top cut in with a flat honeycomb, the pattern a part of its own.
+    const panel = surfaceTextureInput(box({ width: 90, depth: 70, size: 90, height: 6 }));
+    const result = applySurfaceTexture(panel, { pattern: "honeycomb", faces: ["top"], spacing: 5, width: 0.2, depth: 1, profile: "flat", direction: "inward", keepEdges: false, patternPart: true, projection: "flat", axis: "z" });
+    const part = result.part!;
+    expectClosedManifold(part);
+    // The points on the top moved either not at all or right down the flank: one moved by a few hundredths of a mm lay
+    // just inside a joint's edge, and the cell's large flat triangles round it sank towards it.
+    let slight = 0;
+    for (let i = 0; i < result.vertices.length; i += 3) {
+      const [x, y, z] = [result.vertices[i], result.vertices[i + 1], result.vertices[i + 2]];
+      if (Math.abs(x) > 42 || Math.abs(z) > 32 || y < 4.9) continue;
+      if (6 - y > 1e-6 && 6 - y < 0.15) slight += 1;
+    }
+    expect(slight).toBe(0);
+    // The part's top is the joints: a fifth of each cell's inradius on either side of its border, 36 % of the top
+    // (1 - 0.8²). Over those triangles it reached into the cells, about 39 %.
+    let top = 0;
+    for (let t = 0; t < part.indices.length; t += 3) {
+      const [a, b, c] = [0, 1, 2].map((k) => part.indices[t + k] * 3);
+      if ([a, b, c].some((at) => Math.abs(part.vertices[at + 1] - 6) > 1e-6)) continue;
+      const ux = part.vertices[b] - part.vertices[a], uz = part.vertices[b + 2] - part.vertices[a + 2];
+      const vx = part.vertices[c] - part.vertices[a], vz = part.vertices[c + 2] - part.vertices[a + 2];
+      top += Math.max(0, (uz * vx - ux * vz) / 2);
+    }
+    expect(Math.abs(top / (90 * 70) - 0.36)).toBeLessThan(0.006);
+  }, 60_000);
+
   it("is made for a pattern raised or cut in only, not both ways", () => {
     expect(applySurfaceTexture(input, { ...KNURL, direction: "both", patternPart: true }).part).toBeNull();
     const first = normalizeSurfaceTexture({ ...KNURL, patternPart: true });

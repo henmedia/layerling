@@ -63,7 +63,11 @@ Claude Desktop ne bere datotek projekta. Strežnik vpiši v njegovo lastno konfi
 
 Veščino iz `docs/skills/layerling-mcp-skill` kopiraj v svojo mapo veščin Codex, strežnik vpiši v svojo konfiguracijo Codex po `docs/mcp/codex-config.example.toml` in Codex znova zaženi.
 
-Podrobna navodila za vse tri so v [README na GitHubu](https://github.com/henmedia/layerling/blob/main/README.de.md#layerling-mcp-skill).
+### Gemini & Antigravity
+
+Antigravity samodejno najde veščino delovnega prostora v `.agents/skills/layerling-mcp-skill`. Za Gemini CLI kopiraj veščino iz `docs/skills/layerling-mcp-skill` v svojo globalno mapo veščin (`~/.gemini/skills/`), strežnik dodaj v svoje nastavitve po `docs/mcp/gemini-config.example.json` in odjemalca znova zaženi.
+
+Podrobna navodila za vsak odjemalec so v [README na GitHubu](https://github.com/henmedia/layerling/blob/main/README.de.md#layerling-mcp-skill).
 
 ## Kopija na NAS ali strežniku
 

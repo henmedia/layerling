@@ -65,6 +65,12 @@ summary: 选择形状、在对象列表中查找它们、对齐、镜像、旋�
 
 快捷键是 [[L]]。[[Esc]] 取消。
 
+### 匹配尺寸
+
+对齐时按住 [[Alt]]，圆点会变成方块：单击不再移动形状，而是改变它们的大小。侧边的点把每个形状拉伸到那一侧，另一侧保持不动，就像你把它的控点拖到那里一样。中间的点让每个形状留在原位，并赋予它在该方向上的宽度、长度或高度。这样就可以把一个长方体换成同样大小的圆柱，或者用一个干净的形状替换网格中损坏的一块。按住 [[Alt]] 把指针移到某个点上，就能预先看到形状会变成多大。
+
+参照物是你最先单击的形状；只有其他形状会改变。没有参照物时，侧边的点把所有形状拉伸到最远的那一侧，中间的点让它们都取最大形状的尺寸。圆柱保持圆形，所以在另一个方向上也会变大。以某个角度旋转过的形状保持不变；旋转 90° 的形状可以使用。
+
 ### 等间距 (Equal gaps)
 
 每条线的中间点旁边有一个更宽的点，两侧各有一条短竖线。它会沿这个方向分布三个或更多形状，使相邻边缘之间的距离处处相同，无论每个形状有多大。第一个和最后一个形状保持不动，中间的形状移动。这样，一排大小不同的孔之间就有相同厚度的壁。把指针移到这个点上即可预先看到形状的去处；之后状态栏会显示间距。
@@ -136,7 +142,7 @@ summary: 选择形状、在对象列表中查找它们、对齐、镜像、旋�
 
 对于通风口、扬声器格栅、篮子和外壳，{{ui:holePattern.title}} 会在平面上均匀分布孔。你不必再先做一个孔、重复它，再把它放到壁上。只选中一个实体，然后单击 {{ui:holePattern.title}}，它位于功能区的 {{ui:editor.section.mirrorPattern}} 组中、阵列旁边。也可以右键单击实体，或用 [[Ctrl]]+[[K]] 找到它。
 
-1. 单击实体的一个平面。你单击处周围的整个平面都算数，而不只是指针下的三角形。圆柱、圆管或孔的圆形侧壁也可以，见下文；其他曲面不行：会给出提示，请改选一个平面。
+1. 单击实体的一个平面。你单击处周围的整个平面都算数，而不只是指针下的三角形。圆柱、圆管或孔的圆形侧壁也可以，见下文；其他曲面不行：会给出提示，请改选一个平面。在分组或捆绑上，面会跨越相接的部件延续，就像在一个实体上一样；在捆绑上则仅当其中没有孔时如此。工具打开后不久，各部件会被合并；在此之前，指针下只有一个部件的面会亮起，单击会等待合并完成。在含有文字的分组或捆绑上，只有一个部件的面会亮起，单击会合并各部件。
 2. 在窗口中设置孔的外观和排布：
    - **{{ui:holePattern.form}}：** {{ui:holePattern.form.round}}、{{ui:holePattern.form.square}}、{{ui:holePattern.form.rectangle}}、{{ui:holePattern.form.hexagon}} 或 {{ui:holePattern.form.slot}}。
    - **大小：** 圆孔用 {{ui:holePattern.size.diameter}}，方孔用 {{ui:holePattern.size.side}}，矩形和槽孔用 {{ui:holePattern.size.width}} 与 {{ui:holePattern.size.height}}。六边形的大小是 {{ui:holePattern.size.corners}}。
@@ -150,7 +156,9 @@ summary: 选择形状、在对象列表中查找它们、对齐、镜像、旋�
    - **{{ui:holePattern.arrangement}}：** {{ui:holePattern.arrangement.grid}} 将孔排成行与列。{{ui:holePattern.arrangement.staggered}} 将每隔一行错开半个间距，并让行更靠近，使每个孔到相邻孔的距离相同——用于六边形时便形成蜂窝。
    - **{{ui:holePattern.arrangement.perimeter}}：** 改为沿面的外边缘放一圈孔，向内缩进 {{ui:holePattern.margin}}——比如盖子或板子四周的螺钉孔。{{ui:holePattern.perimeterBy}} {{ui:holePattern.perimeterBy.spacing}} 大致保持间距，{{ui:holePattern.perimeterBy.count}} 则设定 {{ui:holePattern.perimeterCount}}；两种方式都会把间距调匀，让这一圈无缝闭合。{{ui:holePattern.perimeterCorners}}（默认开启）在每个角放一个孔，并把角之间的每条边均匀分配。在圆形面上，或取消勾选时，孔从顶部开始均匀绕一圈，{{ui:holePattern.perimeterStart}} 可沿边缘移动整圈孔。
    - **{{ui:holePattern.centerHole}}：** 用于 {{ui:holePattern.arrangement.perimeter}} 和 {{ui:holePattern.mode.mounting}} 选项卡（不适用于 19 英寸机架）。勾选后，在面的中间再加一个与其他孔相同的孔——比如花盆底部的排水孔。它不计入孔数。对于普通的圆孔、方孔和六边形孔，可以用 {{ui:holePattern.centerHoleOwnSize}} 单独设定 {{ui:holePattern.centerHoleSize}}。如果面的中间是空的，或者这个孔会离其他孔太近，就不会生成，并有一行提示说明。
-   - **{{ui:holePattern.margin}}：** 孔与面边缘之间的净距离。只有完全位于“面减去此边距”范围内的孔才会生成；任何会超出该范围的孔都会被略过。面中的开口周围也会保留此边距。
+   - **{{ui:holePattern.margin}}：** 孔与面边缘之间的净距离。只有完全位于“面减去此边距”范围内的孔才会生成；任何会超出该范围的孔都会被略过。面中的开口周围也会保留此边距。边距为 0 时，网格或错位排列中的普通通孔会被边缘截断，而不是被略过，因此格栅或蜂窝可以一直延伸到边缘（只会擦到边缘的孔仍会被略过；沉头柱孔、沉头锥孔、盲孔、自定形状和圆形侧壁仍限于面内）。字段下方有一行说明。
+   - **{{ui:holePattern.edgeBorder}}：** 仅在边距为 0 时显示，范围 0 到 10 mm。大于 0 时，沿边缘和面上的开口周围保留这么宽的实心边框，孔在边框开始处被截断，因此边缘平整。边框是一个独立实体（“Frame”），厚度与面后面的实体相同，并与打孔后的实体编成一组。在铺设孔格的各种方式中，选用留下比孔间壁更细的窄条最少的那一种；一行提示会统计剩下的窄条数量，稍微改变大小或间距可以让它们移位。
+   - **{{ui:holePattern.topLayer}}：** 用于平面和普通孔。勾选后给出 {{ui:holePattern.topLayerThickness}}（初始为 1 mm）和 {{ui:holePattern.topLayerColor}}：孔只穿过这一层。单击“创建”后，实体变成由两个实体组成的捆绑：一个是所选颜色的网格（如有边框也包含在内），另一个是去掉网格后的实体，保持自身颜色，下部实心，并把网格的孔填满到表面。这样表面是平的，面朝下打印时两种颜色都从最初几层开始，无需架桥，孔格中也不需要支撑。3MF 中两者为各自颜色的独立实体。
    - **{{ui:holePattern.depth}}：** {{ui:holePattern.depth.through}}（默认）会切穿整面壁。使用 {{ui:holePattern.depth.custom}} 时，以毫米为单位给出深度，例如用于凹槽。
 3. 孔会立即在面上以预览形式显示，并跟随每个数值变化。窗口会说明能容纳多少个孔。{{ui:holePattern.repick}} 可选择另一个面，[[Esc]] 关闭工具；和其他工具窗口一样，可拖动其标题栏移动。
 4. 只有 {{ui:holePattern.apply}} 才会真正制作孔。
@@ -162,6 +170,8 @@ summary: 选择形状、在对象列表中查找它们、对齐、镜像、旋�
 AI 可以通过 MCP 桥接使用 `layerling_perforate_face` 完成同样的事（参见 [AI 与 MCP](chapter:ai-with-mcp) 一章）。
 
 在侧边带缺口的板或盖子上，{{ui:holePattern.arrangement.perimeter}} 会让孔分布不均。为此 {{ui:holePattern.title}} 在 {{ui:holePattern.mode.pattern}} 旁边有第二个标签页 {{ui:holePattern.mode.mounting}}：它把孔放在所选面外接最小矩形的四个角上，到矩形各边的距离相同，即使板被旋转或带有缺口也一样。{{ui:holePattern.mounting.distance}} 量到孔的边缘（含螺丝头），若选 {{ui:holePattern.mounting.toCenter}} 则量到孔的中心。设置 {{ui:holePattern.mounting.count}} 后，四个孔放在角上，其余成对沿各边均匀分布，例如用于防水盖。在圆形面上，例如圆盒的盖子，孔沿一个圆均匀分布，三个或更多。孔的类型和尺寸与阵列相同：普通孔、沉头柱孔或沉头锥孔，通孔或指定深度。它们作为普通孔形状与实体编成一组，因此该组的 {{ui:inspector.groupHoleDiameter}} 也对它们有效。
+
+在 {{ui:holePattern.mode.mounting}} 标签页上，{{ui:holePattern.mounting.for}} 提供 {{ui:holePattern.rack.screws}}（如上）或 {{ui:holePattern.rack.option}}，用于装入 19 英寸机架的前面板。四个 10.3 × 6.8 mm 的长孔放在四角，沿面板长边方向排列，横向间距 465.1 mm，正好对准机架的导轨；此时孔的类型、尺寸和距离都不适用。{{ui:holePattern.rack.size}} 初始为 {{ui:holePattern.rack.fit}}：面板占用能容纳它的最少整数个机架单元，并位于其中间，因此上下孔到面板边缘的距离相同，在任何单元上都能对准导轨的孔。也可以选择 1U 到 6U 的标准面板，孔位按 IEC 60297-3-100 的规定；面的高度与之不符时会有提示。选项下方的一行说明孔的位置；面太窄或太矮时，说明为什么没有孔。
 
 ## 螺纹嵌件的孔
 
