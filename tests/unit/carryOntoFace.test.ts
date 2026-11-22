@@ -65,6 +65,22 @@ describe("setting parts down on a face (#195)", () => {
     expect(placed.x).toBeCloseTo(40, 6);
   });
 
+  it("keeps the roof lying on a flat side with its corner on top when it is carried again (#1956)", () => {
+    const plate = placementWorkplaneFromSurface({ x: 0, y: 0, z: 0 }, { x: 0, y: 1, z: 0 }, { x: 1, y: 0, z: 0 }, false, true);
+    const base = { ...box("roof"), kind: "polygon", sides: 3, polygonRoof: true, width: 20, depth: 20, height: 20 } as WorkplaneShape;
+    const roof = { ...base, ...placementPatchForNewShape(base, plate, plate.origin, false, 270) } as WorkplaneShape;
+    // The polygon's own axis lies flat, its local +Z (the corner) points up, its side on the plate.
+    const cornerUp = (shape: WorkplaneShape) => new THREE.Vector3(0, 0, 1).applyQuaternion(quaternionForShape(shape));
+    expect(cornerUp(roof).y).toBeCloseTo(1, 6);
+    const patch = carriedOntoFace([roof], ["roof"], { point: { x: 40, y: 0, z: 10 }, normal: { x: 0, y: 1, z: 0 } }).get("roof")!;
+    const placed = { ...roof, ...patch } as WorkplaneShape;
+    expect(cornerUp(placed).y).toBeCloseTo(1, 6);
+    expect(Math.abs(up(placed).y)).toBeCloseTo(0, 6);
+    expect(placed.x).toBeCloseTo(40, 6);
+    expect(placed.z).toBeCloseTo(10, 6);
+    expect(placed.elevation).toBeCloseTo(roof.elevation ?? 0, 6);
+  });
+
   it("from one sloped face to another, the part's edges stay level with the face", () => {
     const front = placementWorkplaneFromSurface({ x: 0, y: 10, z: 15 }, { x: 0, y: 3, z: 4 }, { x: 1, y: 0, z: 0 }, false, true);
     const onFront = { ...box("a"), ...placementPatchForNewShape(box("a"), front) } as WorkplaneShape;

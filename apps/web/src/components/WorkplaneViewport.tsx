@@ -4127,9 +4127,11 @@ export function WorkplaneViewport({
     cruisePointerRef.current = { x: clientX, y: clientY };
     const target = cruiseTarget(clientX, clientY);
     if (!target) return;
+    const asset = cruiseAssetRef.current;
     const next = {
       ...preview.shape,
-      ...placementPatchForNewShape(preview.shape, target.workplane, target.point, target.sunk),
+      // The roof (#1931) lies on one flat side all the way, not only once it is put down (#1956).
+      ...placementPatchForNewShape(preview.shape, target.workplane, target.point, target.sunk, asset ? libraryAssetTurnX(asset) : 0),
     };
     preview.shape = next;
     updateShapeObjectTransform(preview.object, next);

@@ -26,7 +26,8 @@ export function carriedOntoFace(
   const patches = new Map<string, Partial<WorkplaneShape>>();
   if (!moving.length) return patches;
   const lead = moving.find((shape) => shape.id === leadId) ?? moving[0];
-  const leadTurn = quaternionForShape(lead);
+  // The lead as it would stand before its resting turn: a roof's "up" is its corner, not its polygon axis (#1956).
+  const leadTurn = quaternionForShape(lead).multiply(restingTurn(lead).invert());
   const up = new THREE.Vector3(0, 1, 0).applyQuaternion(leadTurn).normalize();
   // The lead's own spin about its up axis, measured against the frame a face facing `up` has.
   const spin = frameFacing(up).invert().multiply(leadTurn);
@@ -65,6 +66,17 @@ export function carriedOntoFace(
     });
   });
   return patches;
+}
+
+/**
+ * The turn about its own X axis a part rests in when it is put in (libraryAssetTurnX): the roof (#1931) is a
+ * three-sided polygon laid on one flat side, so carried onto a face it lies down again instead of standing on
+ * its triangle (#1956). Every other part stands as it is made.
+ */
+function restingTurn(shape: WorkplaneShape) {
+  return shape.kind === "polygon" && shape.polygonRoof
+    ? new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(1, 0, 0), THREE.MathUtils.degToRad(270))
+    : new THREE.Quaternion();
 }
 
 /**
