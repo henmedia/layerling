@@ -9043,7 +9043,8 @@ export function LayerlingEditor({
   const exactLid = useCallback(async (targets: readonly WorkplaneShape[], options: LidOptions, meshLid: WorkplaneShape, magnets?: { posts: WorkplaneShape[]; pockets: WorkplaneShape[] }): Promise<WorkplaneShape | null> => {
     // A hinged lid stays the mesh lid for now: the exact one has no knuckles, nor click bumps or a pull tab; nor a thread,
     // screwed on or in, a bayonet's slots or a slide-in lid's tongues; nor a stacking top's foot and tray.
-    if (targets.length !== 1 || targets[0].hole || magnets?.posts.length || options.stackTop || options.hinge || options.latches > 0 || options.clickBumps || options.handle === "tab" || options.type === "screw" || options.type === "screwIn" || options.type === "bayonet" || options.type === "slide") return null;
+    // Nor the holes for screws in the corners, which go through the plate (Discussion #1938).
+    if (targets.length !== 1 || targets[0].hole || magnets?.posts.length || options.cornerScrews || options.stackTop || options.hinge || options.latches > 0 || options.clickBumps || options.handle === "tab" || options.type === "screw" || options.type === "screwIn" || options.type === "bayonet" || options.type === "slide") return null;
     const pocketDepth = magnetPocketDepth(options);
     const request: CadLidRequest = {
       type: options.type,
@@ -9089,7 +9090,7 @@ export function LayerlingEditor({
     const options = normalizeLidOptions(given, lidDefaults(getPrinterPlay()));
     // The pockets, the hinge's knuckles, the click bumps' dimples, a finger notch, a screw lid's thread (outside or in the
     // opening) a bayonet's lugs and a slide-in lid's grooves go into the body, so it must be free to change and one body.
-    const changesBody = options.magnets || options.hinge || options.latches > 0 || options.clickBumps || options.handle === "notch" || options.type === "screw" || options.type === "screwIn" || options.type === "bayonet" || options.type === "slide";
+    const changesBody = options.magnets || options.cornerScrews || options.hinge || options.latches > 0 || options.clickBumps || options.handle === "notch" || options.type === "screw" || options.type === "screwIn" || options.type === "bayonet" || options.type === "slide";
     if (changesBody && targets.some((shape) => bodyLocked(shape))) return fail(t("status.objectLocked"));
     if (changesBody && targets.some((shape) => shape.groupOperation === "bundle")) return fail(t("lid.error.magnetsBundle"));
     const sourceFingerprint = projectShapesFingerprint(shapesRef.current);
@@ -9100,12 +9101,13 @@ export function LayerlingEditor({
     if (!result.lid) return fail(result.error);
     if (changed()) return fail(t("lid.error.changed"));
     // Magnets in the corners of a box with a Gridfinity floor must stay clear of its cells: the box is made larger or has fewer.
-    const crowded = options.magnets && result.magnets ? targets.find((shape) => !shape.hole && magnetsMeetGridCells(shape, result.magnets!, shapeWidth(shape), shapeDepth(shape))) : undefined;
+    const crowded = (options.magnets || options.cornerScrews) && result.magnets ? targets.find((shape) => !shape.hole && magnetsMeetGridCells(shape, result.magnets!, shapeWidth(shape), shapeDepth(shape))) : undefined;
     if (crowded && result.magnets) {
       // The smallest box that holds the same cells with these magnets, so the message says how large to make it.
       const least = magnetsGridLeastSize(crowded, result.magnets, shapeWidth(crowded), shapeDepth(crowded));
       const mm = (value: number) => value.toLocaleString(numberLocale(), { maximumFractionDigits: 1 });
-      return fail(least
+      // The screws' posts are as wide as their heads need, which the smallest size does not count: the plain message.
+      return fail(options.cornerScrews ? t("lid.error.cornerScrewsGrid") : least
         ? t("lid.error.magnetsGridSize", { columns: least.columns, rows: least.rows, width: mm(least.width), depth: mm(least.depth) })
         : t("lid.error.magnetsGrid"));
     }
@@ -9218,7 +9220,9 @@ export function LayerlingEditor({
     const consumed = new Set(targets.map((shape) => shape.id));
     const remaining = shapesRef.current.filter((shape) => !consumed.has(shape.id));
     const pin = options.hingePin.toLocaleString(numberLocale());
-    const magnetCount = result.magnets?.pockets.length ?? 0;
+    // Screws in the corners come as the magnets do, their holes in the pockets' place (Discussion #1938).
+    const cornerScrews = result.magnets?.cornerScrews;
+    const magnetCount = cornerScrews ? 0 : result.magnets?.pockets.length ?? 0;
     // A turn set by hand that does not fit round the body is held to what fits (bayonetPlan): said after the rest.
     const turnFitted = bayonet && options.bayonetTurn > 0 && bayonet.turn !== options.bayonetTurn ? options.bayonetTurn : null;
     // Under a rim rounded or chamfered, the thread or the lugs sit below the rounding and the cap reaches over it (#1426).
@@ -9247,13 +9251,16 @@ export function LayerlingEditor({
           // hole: how long it is, for a piece of filament cut to fit.
           ? t(hinge.plugs ? "status.lidMadeHingeFlushPlugs" : "status.lidMadeHingeFlushCorners", { type, count: hinge.count, pin, length: (Math.round(hinge.pinLength * 10) / 10).toLocaleString(numberLocale()) })
           : t(magnetCount ? "status.lidMadeHingeMagnets" : hinge.style === "flush" ? "status.lidMadeHingeFlush" : "status.lidMadeHinge", { type, count: hinge.count, pin, magnets: magnetCount })
+      : cornerScrews
+        ? t(options.cornerScrewFastener === "insert" ? "status.lidMadeCornerScrewsInsert" : "status.lidMadeCornerScrewsPlastic", { type, size: options.cornerScrewSize, diameter: millimetres(Number(options.cornerScrewSize.slice(1))), hole: millimetres(cornerScrews.hole), depth: millimetres(cornerScrews.depth) })
       : magnetCount
         ? t(posts.length ? "status.lidMadeMagnetsPosts" : "status.lidMadeMagnets", { type, count: magnetCount })
         : t("status.lidMade", { type });
     // A pin printed apart, end plugs and a tether are bodies of their own beside the lid.
     commitShapes([...remaining, body, lid, ...(hinge?.pin ? [hinge.pin] : []), ...(hinge?.plugs ? [hinge.plugs] : []), ...(latch ? [latch.clips] : []), ...(tether ? [tether.part] : [])], lid.id, withClosedHolesNote(withExtras(message), grouped.closedHoles));
     return {
-      ok: true as const, id: lid.id, type: options.type, bodyId: body.id, magnets: magnetCount, posts: posts.length > 0, clickBumps: result.clickBumps?.count ?? slide?.bumps ?? 0, handle,
+      ok: true as const, id: lid.id, type: options.type, bodyId: body.id, magnets: magnetCount, posts: posts.length > 0,
+      ...(cornerScrews ? { cornerScrews: { size: options.cornerScrewSize, fastener: options.cornerScrewFastener, head: options.cornerScrewHead, count: result.magnets?.pockets.length ?? 0, holeDiameter: cornerScrews.hole, holeDepth: cornerScrews.depth, lidHoleDiameter: cornerScrews.shaft, headDiameter: cornerScrews.head } } : {}), clickBumps: result.clickBumps?.count ?? slide?.bumps ?? 0, handle,
       ...(hinge ? { hinge: {
         knuckles: hinge.style === "pivot" ? 0 : hinge.count, pins: hinge.style === "pivot" ? 2 : 1, pinDiameter: options.hingePin, side: options.hingeSide, style: hinge.style, pinId: hinge.pin?.id ?? null,
         plugsId: hinge.plugs?.id ?? null, pinLength: hinge.pinLength,
@@ -9296,14 +9303,15 @@ export function LayerlingEditor({
       setLidTool(null);
       return;
     }
-    const { type, thickness, gap, depth, wall, magnets, magnetDiameter, magnetHeight, magnetGap, hinge, hingePin, hingeGap, hingePinPlay, hingeKnuckles, hingePrintPin, hingeSide, hingeTeardrop, hingeStyle, hingeEndPlugs, clickBumps, clickBumpHeight, handle, threadPitch, threadTurns, threadOffset, threadStandard, bayonetLugs, bayonetDepth, bayonetAxialGap, bayonetDetent, bayonetTurn, tether, flipTop, flipTopOpening, topEdge, topEdgeSize, slideSide, slideFrame, latches, latchBack, latchWidth, latchGrip, latchStyle, boltDiameter, boltPlay, boltTravel, sliderWidth, sliderPlay, latchLabel, stackTop } = lidTool;
+    const { type, thickness, gap, depth, wall, magnets, magnetDiameter, magnetHeight, magnetGap, cornerScrews, cornerScrewSize, cornerScrewFastener, cornerScrewHead, hinge, hingePin, hingeGap, hingePinPlay, hingeKnuckles, hingePrintPin, hingeSide, hingeTeardrop, hingeStyle, hingeEndPlugs, clickBumps, clickBumpHeight, handle, threadPitch, threadTurns, threadOffset, threadStandard, bayonetLugs, bayonetDepth, bayonetAxialGap, bayonetDetent, bayonetTurn, tether, flipTop, flipTopOpening, topEdge, topEdgeSize, slideSide, slideFrame, latches, latchBack, latchWidth, latchGrip, latchStyle, boltDiameter, boltPlay, boltTravel, sliderWidth, sliderPlay, latchLabel, stackTop } = lidTool;
     setLidTool((current) => current ? { ...current, busy: true, error: null } : current);
     // Click bumps, a handle and end plugs the panel does not show (a flat lid, a pivot lid, a hinge not flush)
     // are not asked for, nor magnets and a hinge where it shows them switched off (a screw, screw-in, bayonet or slide-in
     // lid; a hinge only goes with a lid that pushes in or a flat one), nor a tether without one, nor a flip-top with another
     // lid.
     void makeLid({
-      type, thickness, gap, depth, wall, magnets: magnets && lidTakesMagnets(lidTool), magnetDiameter, magnetHeight, magnetGap, hinge: hinge && LID_HINGE_TYPES.includes(type), hingePin, hingeGap, hingePinPlay, hingeKnuckles, hingePrintPin, hingeSide, hingeTeardrop, hingeStyle,
+      type, thickness, gap, depth, wall, magnets: magnets && lidTakesMagnets(lidTool), magnetDiameter, magnetHeight, magnetGap,
+      cornerScrews: cornerScrews && lidTakesMagnets(lidTool), cornerScrewSize, cornerScrewFastener, cornerScrewHead, hinge: hinge && LID_HINGE_TYPES.includes(type), hingePin, hingeGap, hingePinPlay, hingeKnuckles, hingePrintPin, hingeSide, hingeTeardrop, hingeStyle,
       hingeEndPlugs: hingeEndPlugs && hingeStyle === "flush",
       clickBumps: clickBumps && lidClickBumpsFit(lidTool), clickBumpHeight, handle: lidHandleFits(lidTool) ? handle : "none", threadPitch, threadTurns, threadOffset, threadStandard,
       bayonetLugs, bayonetDepth, bayonetAxialGap, bayonetDetent, bayonetTurn, tether: tether && lidTetherFits(lidTool), flipTop: flipTop && lidFlipTopFits(lidTool), flipTopOpening,
@@ -16680,6 +16688,10 @@ export function LayerlingEditor({
           magnetDiameter: params.magnetDiameter,
           magnetHeight: params.magnetHeight,
           magnetGap: params.magnetGap,
+          cornerScrews: params.cornerScrews,
+          cornerScrewSize: params.cornerScrewSize,
+          cornerScrewFastener: params.cornerScrewFastener,
+          cornerScrewHead: params.cornerScrewHead,
           hinge: params.hinge,
           hingePin: params.hingePin,
           hingeGap: params.hingeGap,
@@ -16733,6 +16745,7 @@ export function LayerlingEditor({
         const clips = "latches" in result && result.latches ? currentShapes().find((shape) => shape.id === result.latches!.clipsId) : null;
         return {
           object: made ? mcpShapeSummary(made) : { id: result.id }, type: result.type, body: body ? mcpShapeSummary(body) : { id: result.bodyId }, magnets: result.magnets, posts: result.posts,
+          ...("cornerScrews" in result && result.cornerScrews ? { cornerScrews: result.cornerScrews } : {}),
           ...(result.clickBumps ? { clickBumps: result.clickBumps } : {}), ...(result.handle !== "none" ? { handle: result.handle } : {}),
           ...("hinge" in result && result.hinge ? { hinge: {
             knuckles: result.hinge.knuckles, pins: result.hinge.pins, pinDiameter: result.hinge.pinDiameter, side: result.hinge.side, style: result.hinge.style, pin: pin ? mcpShapeSummary(pin) : null,
