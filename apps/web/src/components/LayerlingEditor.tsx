@@ -49,6 +49,9 @@ import { IconTagPanel } from "@/components/workplane/IconTagPanel";
 import { QrCodePanel } from "@/components/workplane/QrCodePanel";
 import { qrCodeOf, qrCodeShape, regeneratedQrCodeShape } from "@/lib/editorQrCode";
 import { regeneratedSbcBoardShape, sbcBoardOf, sbcBoardShape } from "@/lib/editorSbcBoard";
+import { rackPlateOf, rackPlateShape, regeneratedRackPlateShape } from "@/lib/editorRackPlate";
+import { DEFAULT_RACK_PLATE } from "@/lib/rackPlate";
+import type { RackPlateSettings } from "@/types/layerling";
 import { portWithScrewHolesGroup } from "@/lib/editorPortScrewHoles";
 import { DEFAULT_SBC_BOARD, MAX_SBC_BUTTON_REACH, MAX_SBC_CLEARANCE, MAX_SBC_REACH, MAX_SBC_UP_REACH, MIN_SBC_UP_REACH, SBC_BOARD_ORDER, type SbcBoardSettings, type SbcBoardType } from "@/lib/sbcBoards";
 import { DEFAULT_QR_WIDTH, MAX_QR_HEIGHT, MAX_QR_WIDTH, MIN_QR_HEIGHT, MIN_QR_WIDTH, QR_BYTE_CAPACITY, QR_ERROR_CORRECTIONS, QR_STYLES, normalizeQrSettings, qrByteLength, qrMatrix, qrModuleSize, qrModuleTooSmall, qrTextFits, type QrCodeSettings, type QrErrorCorrection, type QrStyle } from "@/lib/qrCode";
@@ -221,7 +224,7 @@ import { addFileBackup, allowBackupFolder, fileBackupsOfDesign, listFileBackups,
 import { backupFileBeforeOverwrite, takeEditorBackupReminder } from "@/components/workplane/fileBackupEditor";
 import { copyNamePatterns, shapeNamesIn, withCopyName } from "@/lib/shapeCopyName";
 import { nameForNewGroup } from "@/lib/groupName";
-import { clipboardShape, displayShapeName, hasOwnShapeName, iconTagAsset, qrCodeAsset, makeShapeFromAsset, nameTagAsset, libraryAssetCustomization, libraryAssetTurnX, roofAsset, sbcBoardAsset, shapeAssetLabel, toolbarShapeAssets } from "@/lib/shapeCatalog";
+import { clipboardShape, displayShapeName, hasOwnShapeName, iconTagAsset, qrCodeAsset, makeShapeFromAsset, nameTagAsset, libraryAssetCustomization, libraryAssetTurnX, roofAsset, rackPlateAsset, sbcBoardAsset, shapeAssetLabel, toolbarShapeAssets } from "@/lib/shapeCatalog";
 import { storeRecentShape } from "@/lib/shapeLibrarySections";
 import { PORT_PRESET_ORDER, PORT_PRESETS, portPresetSize, type PortPreset } from "@/lib/portGeometry";
 import { WASHER_SIZE_ORDER, isWasherSize, washerTubeFields } from "@/lib/washerSizes";
@@ -3592,6 +3595,7 @@ export function LayerlingEditor({
   const shapesRef = useRef(shapes);
   /** Builds an SBC board from the library (#1098); set once the commit is known, read by the library's clicks and drops. */
   const placeSbcBoardRef = useRef<((point?: PlacementPoint, onFace?: PlacementWorkplane) => Promise<void>) | null>(null);
+  const placeRackPlateRef = useRef<((point?: PlacementPoint, onFace?: PlacementWorkplane) => Promise<void>) | null>(null);
   const notesRef = useRef(notes);
   const projectAssetsRef = useRef(projectAssets);
   const projectAttachmentsRef = useRef(projectAttachments);
@@ -4278,7 +4282,7 @@ export function LayerlingEditor({
   // click: the one taken up last wins and puts the other one down.
   const startCruise = useCallback((asset: ShapeAsset) => {
     // The icon tag, the QR code and the SBC board are not carried, so this is where they are put in (#1170).
-    if (asset.id === iconTagAsset.id || asset.id === qrCodeAsset.id || asset.id === sbcBoardAsset.id) storeRecentShape(asset.id);
+    if (asset.id === iconTagAsset.id || asset.id === qrCodeAsset.id || asset.id === sbcBoardAsset.id || asset.id === rackPlateAsset.id) storeRecentShape(asset.id);
     // The icon tag has no shape to carry: it starts from an SVG file, in its own window.
     if (asset.id === iconTagAsset.id) {
       setQrCodePanelOpen(false);
@@ -4294,6 +4298,11 @@ export function LayerlingEditor({
     // The SBC board (#1098) is built, not carried: it lands on the middle of the workplane.
     if (asset.id === sbcBoardAsset.id) {
       void placeSbcBoardRef.current?.();
+      return;
+    }
+    // The rack plate is built too: it lands on the middle of the workplane.
+    if (asset.id === rackPlateAsset.id) {
+      void placeRackPlateRef.current?.();
       return;
     }
     closeSplit();
@@ -6825,6 +6834,11 @@ export function LayerlingEditor({
       // The SBC board (#1098) is built where it was dropped.
       if (asset.id === sbcBoardAsset.id) {
         void placeSbcBoardRef.current?.(point, onFace);
+        return;
+      }
+      // The rack plate is built where it was dropped.
+      if (asset.id === rackPlateAsset.id) {
+        void placeRackPlateRef.current?.(point, onFace);
         return;
       }
       // The saved defaults of the kind, and where they say nothing, the printer's play (printerPlay.ts).
@@ -14182,6 +14196,40 @@ export function LayerlingEditor({
     return settings ? { settings, onRegenerate: regenerateSelectedSbcBoard } : null;
   }, [regenerateSelectedSbcBoard, selectedShape, selectedShapes.length]);
 
+  /** The rack plate from the library: the default plate, lying on the workplane at the point, selected. */
+  const placeRackPlate = useCallback(async (point?: PlacementPoint, onFace?: PlacementWorkplane) => {
+    setNotice(t("rackPlate.building"), true);
+    try {
+      const built = await rackPlateShape(DEFAULT_RACK_PLATE, workspaceSettingsRef.current.booleanTriangleLimit);
+      const workplane = onFace ?? placementWorkplaneRef.current;
+      const shape = canonicalizeShape({ ...built, ...placementPatchForNewShape(built, workplane, point ?? workplane.origin) });
+      commitShapes([...shapesRef.current, shape], [shape.id], t("status.rackPlateAdded"));
+    } catch (error) {
+      setNotice(error instanceof Error ? localizedError(error.message) : t("rackPlate.failed"), true);
+    }
+  }, [commitShapes, setNotice]);
+  placeRackPlateRef.current = placeRackPlate;
+
+  /** The rack plate card: another size, thickness or holes, made again where the selected plate lies. */
+  const regenerateSelectedRackPlate = useCallback(async (settings: RackPlateSettings) => {
+    const current = selectedShapes.length === 1 ? selectedShape : null;
+    if (!current || !rackPlateOf(current)) return;
+    const sourceFingerprint = projectShapesFingerprint([current]);
+    const sourceProjectId = projectInfoRef.current.projectId;
+    const next = await regeneratedRackPlateShape(current, settings, workspaceSettingsRef.current.booleanTriangleLimit);
+    const currentTarget = shapesRef.current.find((shape) => shape.id === current.id);
+    if (projectInfoRef.current.projectId !== sourceProjectId || !currentTarget || projectShapesFingerprint([currentTarget]) !== sourceFingerprint) {
+      setNotice(t("status.rackPlateChanged"));
+      return;
+    }
+    commitShapes(shapesRef.current.map((shape) => (shape.id === current.id ? next : shape)), [next.id], t("status.rackPlateRegenerated"));
+  }, [commitShapes, selectedShape, selectedShapes.length]);
+
+  const rackPlateControls = useMemo(() => {
+    const settings = selectedShapes.length === 1 && !bodyLocked(selectedShape) ? rackPlateOf(selectedShape) : null;
+    return settings ? { settings, onRegenerate: regenerateSelectedRackPlate } : null;
+  }, [regenerateSelectedRackPlate, selectedShape, selectedShapes.length]);
+
   /**
    * Reference images (#680): a picture laid on the plate or on the face the workplane stands on, to
    * line parts up on. Added from the import panel, made see-through and calibrated in its card.
@@ -21257,6 +21305,7 @@ export function LayerlingEditor({
           iconTag={historyViewState ? null : iconTagControls}
           qrCode={historyViewState ? null : qrCodeControls}
           sbcBoard={historyViewState ? null : sbcBoardControls}
+          rackPlate={historyViewState ? null : rackPlateControls}
           referenceImage={referenceImageControls}
           toolMemory={viewportToolMemoryRef}
           prepareNewShape={prepareNewShape}

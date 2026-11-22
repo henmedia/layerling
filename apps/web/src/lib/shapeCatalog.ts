@@ -239,6 +239,7 @@ const SHAPE_LABEL_KEYS: Record<string, MessageKey> = {
   iconTag: "shape.iconTag",
   qrCode: "shape.qrCode",
   sbcBoard: "shape.sbcBoard",
+  rackPlate: "shape.rackPlate",
   roof: "shape.roof",
   "round-roof": "shape.roundRoof",
   "half-sphere": "shape.halfSphere",
@@ -377,6 +378,19 @@ export const sbcBoardAsset: ToolbarShapeAsset = {
 };
 
 /**
+ * The rack plate (rackPlate.ts): a flat plate on the HomeRacker grid with lock pin holes, to fix a device to and pin
+ * onto the rack. The library entry places the default plate; the kind only names its picture.
+ */
+export const rackPlateAsset: ToolbarShapeAsset = {
+  id: "rackPlate",
+  name: "Rack plate",
+  src: "assets/editor/shape-icons-gray/rackPlate.svg",
+  menuIcon: "assets/editor/shape-icons-gray/rackPlate.svg",
+  kind: "box",
+  color: "#f7b600",
+};
+
+/**
  * The roof (#1931): the three-sided polygon, put in lying on one flat side like Tinkercad's Roof, so a
  * triangle lying on the plate is found by looking. People turned a wedge until it looked like one and then
  * had no handle for the triangle's height; the polygon tile shows a hexagon. Underneath it is a polygon with
@@ -440,7 +454,7 @@ export const magnetPocketLibraryAsset: ToolbarShapeAsset = {
   color: "#b04a4a",
 };
 
-export const libraryShapeAssets: ToolbarShapeAsset[] = [threadInsertLibraryAsset, magnetPocketLibraryAsset, ...toolbarShapeAssets.flatMap((asset) => (asset.id === "text" ? [asset, nameTagAsset, iconTagAsset, qrCodeAsset] : asset.id === "port" ? [asset, sbcBoardAsset] : asset.id === "round-roof" ? [roofAsset, asset] :asset.id === "doubleCountersink" ? [] : [asset]))];
+export const libraryShapeAssets: ToolbarShapeAsset[] = [threadInsertLibraryAsset, magnetPocketLibraryAsset, ...toolbarShapeAssets.flatMap((asset) => (asset.id === "text" ? [asset, nameTagAsset, iconTagAsset, qrCodeAsset] : asset.id === "port" ? [asset, sbcBoardAsset, rackPlateAsset] : asset.id === "round-roof" ? [roofAsset, asset] :asset.id === "doubleCountersink" ? [] : [asset]))];
 
 /**
  * The colour a new shape of this asset starts with: the asset's own, unless the shape
@@ -1549,6 +1563,7 @@ const GENERATED_NAME_KEYS: Record<string, MessageKey> = {
   "QR code": "shape.qrCode",
   "QR plate": "shape.qrPlate",
   Board: "sbcBoard.board",
+  "Rack plate": "shape.rackPlate",
   // The roof (#1931) is a polygon from the library, not the toolbar, so its name is not found among the toolbar shapes.
   Roof: "shape.roof",
 };

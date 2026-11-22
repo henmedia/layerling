@@ -1665,6 +1665,11 @@ export type WorkplaneShape = {
    */
   sbcBoard?: SbcBoardSettings;
   /**
+   * A rack plate (rackPlate.ts): its grid size, thickness and holes, so the properties panel can make it again.
+   * On the group that holds the plate and its cut holes.
+   */
+  rackPlate?: RackPlateSettings;
+  /**
    * Set on a body made by wrapping around a cylinder (#106): its box is
    * centred on the cylinder's axis, and aligning, snapping and centring use
    * that box rather than the arc the mesh actually covers.
@@ -1874,6 +1879,32 @@ export type QrStyle = "code" | "raised" | "engraved";
 /** What a QR body keeps so it can be made again from the inspector (#553). */
 /** The single-board computers the SBC board shape knows (#1098). */
 export type SbcBoardType = "pi5" | "pi4" | "pi3bPlus" | "zero2w" | "bttPi12" | "xiaoEsp32c6" | "esp32c3SuperMini" | "esp32c6SuperMini" | "featherEsp32s3" | "arduinoUno" | "arduinoMega" | "arduinoNano" | "wemosD1Mini" | "pico" | "picoW" | "pico2" | "pico2W" | "esp32CamMb" | "esp32s3Cam" | "esp32DevKitC" | "esp32DevKitV1" | "cyd" | "cyd2usb" | "waveshareEsp32s3Zero" | "arduinoProMini" | "nanoPiNeo3Plus" | "waveshareEsp32p4Nano";
+
+/** Which side of a rack plate its HomeRacker sleeve runs along. */
+export type RackPlateAxis = "depth" | "width";
+
+/** What a rack plate keeps so it can be made again from the inspector (rackPlate.ts). */
+export type RackPlateSettings = {
+  /** The plate's size in mm, 20 to 300. */
+  width: number;
+  depth: number;
+  /** The plate's thickness in mm, 1.6 to 10. */
+  thickness: number;
+  /** The sleeve's length in 15 mm HomeRacker units, one lock pin hole each; at most what fits along the plate. */
+  sleeveUnits: number;
+  sleeveAlong: RackPlateAxis;
+  /** How far the sleeve sits off the plate's middle, across it, in mm. */
+  sleeveOffset: number;
+  /** Added to the 4 mm square lock pin holes, in mm, 0 to 1. */
+  holeClearance: number;
+  /** Rounding of the plate's corners in mm. */
+  cornerRadius: number;
+  /** A screw hole in each corner the sleeve leaves free. */
+  screwHoles: boolean;
+  screwDiameter: number;
+  /** From the plate's edges to the screw holes' middles, in mm. */
+  screwInset: number;
+};
 
 export type SbcBoardSettings = {
   board: SbcBoardType;

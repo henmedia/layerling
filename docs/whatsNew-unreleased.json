@@ -1,6 +1,16 @@
 [
   {
     "title": {
+      "de": "Rackplatte: eine flache Platte mit HomeRacker-Hülse",
+      "en": "Rack plate: a flat plate with a HomeRacker sleeve"
+    },
+    "body": {
+      "de": "Unter „Systeme & Vorlagen“ in der Formenbibliothek gibt es die Rackplatte: eine flache Platte, auf deren Rückseite eine Hülse für das HomeRacker-System steht. Die Hülse wird über eine 15-mm-Strebe geschoben und mit normalen Lock Pins gesichert; auf die flache Seite klebst oder schraubst du ein Gerät.\n\nIm Eigenschaften-Fenster stellst du Breite, Tiefe, Dicke und Eckenrundung der Platte ein, die Länge der Hülse in HomeRacker-Einheiten, ihre Richtung und ihren Versatz, das Spiel der Pin-Löcher und auf Wunsch Schraublöcher in den Ecken. Gedruckt wird sie flach liegend, Hülse oben, ohne Stützen. Nicht Teil des HomeRacker-Projekts.",
+      "en": "The shape library has a rack plate under \"Systems & templates\": a flat plate with a sleeve for the HomeRacker system standing on its back. The sleeve slips over a 15 mm support and is locked with standard lock pins; glue or screw a device to the flat side.\n\nIn the Properties panel you set the plate's width, depth, thickness and corner rounding, the sleeve's length in HomeRacker units, which way it runs and how far off the middle, the lock pin holes' clearance and, if you like, screw holes in the corners. It prints lying flat, sleeve up, without supports. Not part of the HomeRacker project."
+    }
+  },
+  {
+    "title": {
       "de": "Zeichnung: Nummer, Änderung und Zeichner im Schriftfeld",
       "en": "Drawing: number, revision and who drew it in the title block"
     },
