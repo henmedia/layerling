@@ -83,6 +83,7 @@ apps/web/public/vejledning/
 apps/web/public/it/
 # Built Arabic user guide.
 apps/web/public/dalil/
+apps/web/public/madrich/
 # Built Simplified Chinese user guide.
 apps/web/public/zh-cn/
 # Built Traditional Chinese user guide.
